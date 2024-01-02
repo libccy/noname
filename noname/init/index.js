@@ -59,16 +59,16 @@ export async function boot() {
 	setWindowListener();
 
 	// 无名杀更新日志
-	if (Reflect.has(window, 'noname_update')) {
-		Reflect.set(lib, 'version', Reflect.get(window, 'noname_update').version);
-		lib.changeLog = Reflect.get(window, 'noname_update').changeLog;
-		if (Reflect.get(window, 'noname_update').players) {
-			lib.changeLog.push('players://' + JSON.stringify(Reflect.get(window, 'noname_update').players));
+	if (window.noname_update) {
+		Reflect.set(lib, 'version', window.noname_update.version);
+		lib.changeLog = window.noname_update.changeLog;
+		if (window.noname_update.players) {
+			lib.changeLog.push('players://' + JSON.stringify(window.noname_update.players));
 		}
-		if (Reflect.get(window, 'noname_update').cards) {
-			lib.changeLog.push('cards://' + JSON.stringify(Reflect.get(window, 'noname_update').cards));
+		if (window.noname_update.cards) {
+			lib.changeLog.push('cards://' + JSON.stringify(window.noname_update.cards));
 		}
-		Reflect.deleteProperty(window, 'noname_update');
+		delete window.noname_update;
 	}
 	// 确认手机端平台
 	const noname_inited = localStorage.getItem('noname_inited');
@@ -105,7 +105,7 @@ export async function boot() {
 		Reflect.set(lib, 'path', (await import('../library/path.js')).default);
 		//为其他自定义平台提供文件读写函数赋值的一种方式。
 		//但这种方式只能修改game的文件读写函数。
-		if (Reflect.has(window, 'initReadWriteFunction')) {
+		if (typeof window.initReadWriteFunction == 'function') {
 			const g = {};
 			const ReadWriteFunctionName = ['download', 'readFile', 'readFileAsText', 'writeFile', 'removeFile', 'getFileList', 'ensureDirectory', 'createDir'];
 			ReadWriteFunctionName.forEach(prop => {
@@ -120,7 +120,8 @@ export async function boot() {
 					}
 				});
 			});
-			Reflect.get(window, 'initReadWriteFunction')(g);
+			// @ts-ignore
+			window.initReadWriteFunction(g);
 		}
 		window.onbeforeunload = function () {
 			if (config.get('confirm_exit') && !_status.reloading) {
@@ -177,9 +178,11 @@ export async function boot() {
 
 	if (config.get('debug')) {
 		await lib.init.promises.js(`${lib.assetURL}game`, 'asset');
-		lib.skin = Reflect.get(window, 'noname_skin_list');
-		Reflect.deleteProperty(window, 'noname_skin_list');
-		Reflect.deleteProperty(window, 'noname_asset_list');
+		if (window.noname_skin_list) {
+			lib.skin = window.noname_skin_list;
+			delete window.noname_skin_list;
+			delete window.noname_asset_list;
+		}
 	}
 
 	if (Reflect.get(window, 'isNonameServer'))
@@ -188,13 +191,13 @@ export async function boot() {
 	var pack = Reflect.get(window, 'noname_package');
 	Reflect.deleteProperty(window, 'noname_package');
 	for (const name in pack.character) {
-		if (config.get('all').sgscharacters.contains(name) || config.get('hiddenCharacterPack').indexOf(name) == -1) {
+		if (config.get('all').sgscharacters.includes(name) || config.get('hiddenCharacterPack').indexOf(name) == -1) {
 			config.get('all').characters.push(name);
 			lib.translate[name + '_character_config'] = pack.character[name];
 		}
 	}
 	for (const name in pack.card) {
-		if (config.get('all').sgscards.contains(name) || config.get('hiddenCardPack').indexOf(name) == -1) {
+		if (config.get('all').sgscards.includes(name) || config.get('hiddenCardPack').indexOf(name) == -1) {
 			config.get('all').cards.push(name);
 			lib.translate[name + '_card_config'] = pack.card[name];
 		}
@@ -227,7 +230,7 @@ export async function boot() {
 	}
 	if (pack.background) {
 		for (const name in pack.background) {
-			if (config.get('hiddenBackgroundPack').contains(name)) continue;
+			if (config.get('hiddenBackgroundPack').includes(name)) continue;
 			lib.configMenu.appearence.config.image_background.item[name] = pack.background[name];
 		}
 		for (let i = 0; i < config.get('customBackgroundPack').length; i++) {
@@ -345,7 +348,7 @@ export async function boot() {
 		}
 		var alerted = false;
 		for (var name = 0; name < config.get('extensions').length; name++) {
-			if (Reflect.get(window, 'bannedExtensions').contains(config.get('extensions')[name])) {
+			if (Reflect.get(window, 'bannedExtensions').includes(config.get('extensions')[name])) {
 				//if(!alerted) alert('读取某些扩展时出现问题。');
 				alerted = true;
 				continue;
@@ -372,7 +375,7 @@ export async function boot() {
 		if (config.get('mode') != 'connect' || (!localStorage.getItem(lib.configprefix + 'directstart') && show_splash)) {
 			var alerted = false;
 			for (var name = 0; name < config.get('extensions').length; name++) {
-				if (Reflect.get(window, 'bannedExtensions').contains(config.get('extensions')[name])) {
+				if (Reflect.get(window, 'bannedExtensions').includes(config.get('extensions')[name])) {
 					//if(!alerted) alert('读取某些扩展时出现问题。');
 					alerted = true;
 					continue;
@@ -620,13 +623,13 @@ async function loadConfig() {
 			idbOpenDBRequest.onupgradeneeded = idbVersionChangeEvent => {
 				// @ts-expect-error MaybeHave
 				const idbDatabase = idbVersionChangeEvent.target.result;
-				if (!idbDatabase.objectStoreNames.contains('video')) idbDatabase.createObjectStore('video', {
+				if (!idbDatabase.objectStoreNames.includes('video')) idbDatabase.createObjectStore('video', {
 					keyPath: 'time'
 				});
-				if (!idbDatabase.objectStoreNames.contains('image')) idbDatabase.createObjectStore('image');
-				if (!idbDatabase.objectStoreNames.contains('audio')) idbDatabase.createObjectStore('audio');
-				if (!idbDatabase.objectStoreNames.contains('config')) idbDatabase.createObjectStore('config');
-				if (!idbDatabase.objectStoreNames.contains('data')) idbDatabase.createObjectStore('data');
+				if (!idbDatabase.objectStoreNames.includes('image')) idbDatabase.createObjectStore('image');
+				if (!idbDatabase.objectStoreNames.includes('audio')) idbDatabase.createObjectStore('audio');
+				if (!idbDatabase.objectStoreNames.includes('config')) idbDatabase.createObjectStore('config');
+				if (!idbDatabase.objectStoreNames.includes('data')) idbDatabase.createObjectStore('data');
 			};
 		});
 		Reflect.set(lib, 'db', event.target.result);

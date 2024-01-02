@@ -28,10 +28,10 @@ export class Control extends HTMLDivElement {
 			else control.add(argument);
 		});
 		ui.controls.unshift(control);
-		if (nc) ui.control.animate('nozoom', 100);
+		if (nc) ui.control.addTempClass('nozoom', 100);
 		if (control.childNodes.length) {
 			control.style.transition = 'opacity 0.5s';
-			control.animate('controlpressdownx', 500);
+			control.addTempClass('controlpressdownx', 500);
 			ui.refresh(control);
 			if (!control.stayleft) control.style.transform = `translateX(-${control.offsetWidth / 2}px)`;
 			control.style.opacity = 1;
@@ -68,7 +68,7 @@ export class Control extends HTMLDivElement {
 			this.style.transition = '';
 		}
 		else {
-			this.animate('controlpressdownx', 500);
+			this.addTempClass('controlpressdownx', 500);
 		}
 		ui.updatec();
 		return this;
@@ -81,7 +81,7 @@ export class Control extends HTMLDivElement {
 		node.addEventListener(lib.config.touchscreen ? 'touchend' : 'click', ui.click.control);
 	}
 	close() {
-		this.animate('controlpressdownx', 500);
+		this.addTempClass('controlpressdownx', 500);
 
 		ui.controls.remove(this);
 		this.delete();
@@ -95,7 +95,7 @@ export class Control extends HTMLDivElement {
 		if (ui.skills3 == this) delete ui.skills3;
 	}
 	replace() {
-		// this.animate('controlpressdownx',500);
+		// this.addTempClass('controlpressdownx',500);
 		if (this.replaceTransition === false) {
 			this.style.transitionProperty = 'none';
 			ui.refresh(this);

@@ -193,7 +193,7 @@ export const Content = {
 			if (!player.disabledSlots) player.disabledSlots = {};
 			if (!player.disabledSlots[slot_key]) player.disabledSlots[slot_key] = 0;
 			player.disabledSlots[slot_key] += lose;
-			var cards = player.getEquips(slot).filter(card => !event.cards.contains(card));
+			var cards = player.getEquips(slot).filter(card => !event.cards.includes(card));
 			if (cards.length > 0) {
 				if (lose >= left) {
 					event._result = { bool: true, links: cards };
@@ -305,7 +305,7 @@ export const Content = {
 		if (lose <= 0) event.goto(3);
 		else {
 			var cards = player.getEquips(slot).filter(card => {
-				return !event.cards.contains(card) && lib.filter.canBeReplaced(card, player);
+				return !event.cards.includes(card) && lib.filter.canBeReplaced(card, player);
 			});
 			if (cards.length > 0) {
 				if (lose >= left) {
@@ -357,7 +357,7 @@ export const Content = {
 			return;
 		}
 		else if (event.owner) {
-			if (event.owner.getCards('hejsx').contains(card)) {
+			if (event.owner.getCards('hejsx').includes(card)) {
 				event.finish();
 				return;
 			}
@@ -713,7 +713,7 @@ export const Content = {
 				node.style.transition = 'all ' + speed * 110 + 'ms linear';
 				node.style.transform = 'translateY(' + Math.ceil(height * 1.1) + 'px)';
 				node.timeout = setTimeout(function () {
-					if (nodes.contains(node)) {
+					if (nodes.includes(node)) {
 						nodes.remove(node);
 						player.popup('Miss', 'fire', false);
 						if (player.damagepopups.length) player.$damagepop();
@@ -961,7 +961,7 @@ export const Content = {
 
 			event.custom.replace.button = function (button) {
 				var node = button.parentNode;
-				if (!buttonss.contains(node)) return;
+				if (!buttonss.includes(node)) return;
 				if (!ui.selected.guanxing_button) {
 					ui.selected.guanxing_button = button;
 					button.classList.add('glow2');
@@ -1108,7 +1108,7 @@ export const Content = {
 			var next = player.chooseTarget();
 			next.set('_get_card', card);
 			next.set('filterTarget', event.filterTarget || function (card, player, target) {
-				if (!_status.event.targets.contains(target)) return false;
+				if (!_status.event.targets.includes(target)) return false;
 				if (!_status.event.nodistance && !lib.filter.targetInRange(card, player, target)) return false;
 				return lib.filter.targetEnabledx(card, player, target);
 			});
@@ -1435,7 +1435,7 @@ export const Content = {
 			if (player.hasEnabledSlot(i)) list.push('equip' + i);
 		}
 		if (event.horse) {
-			if (list.contains('equip3') && (get.is.mountCombined() || list.contains('equip4'))) list.push('equip3_4');
+			if (list.includes('equip3') && (get.is.mountCombined() || list.includes('equip4'))) list.push('equip3_4');
 			list.remove('equip3');
 			list.remove('equip4');
 		}
@@ -1573,7 +1573,7 @@ export const Content = {
 			}
 		}
 		else {
-			if (!list.contains(event.directresult)) {
+			if (!list.includes(event.directresult)) {
 				event.finish();
 			}
 		}
@@ -1670,7 +1670,7 @@ export const Content = {
 			}
 		}
 		else {
-			if (!list.contains(event.directresult)) {
+			if (!list.includes(event.directresult)) {
 				event.finish();
 			}
 		}
@@ -1861,7 +1861,7 @@ export const Content = {
 		}
 		player.phase();
 		"step 2";
-		if (!game.players.contains(event.player.next)) {
+		if (!game.players.includes(event.player.next)) {
 			event.player = game.findNext(event.player.next);
 		}
 		else {
@@ -1891,8 +1891,8 @@ export const Content = {
 				if (characterPack) Object.assign(characterPack, character[i].character);
 				else lib.characterPack[i] = character[i].character;
 			}
-			if (character[i].forbid && character[i].forbid.contains(lib.config.mode)) continue;
-			if (character[i].mode && character[i].mode.contains(lib.config.mode) == false) continue;
+			if (character[i].forbid && character[i].forbid.includes(lib.config.mode)) continue;
+			if (character[i].mode && character[i].mode.includes(lib.config.mode) == false) continue;
 
 			if (Array.isArray(lib[j]) && Array.isArray(character[i][j])) {
 				lib[j].addArray(character[i][j]);
@@ -1905,11 +1905,11 @@ export const Content = {
 						if (!character[i][j][k][4]) {
 							character[i][j][k][4] = [];
 						}
-						if (character[i][j][k][4].contains('boss') ||
-							character[i][j][k][4].contains('hiddenboss')) {
+						if (character[i][j][k][4].includes('boss') ||
+							character[i][j][k][4].includes('hiddenboss')) {
 							lib.config.forbidai.add(k);
 						}
-						if (lib.config.forbidai_user && lib.config.forbidai_user.contains(k)) {
+						if (lib.config.forbidai_user && lib.config.forbidai_user.includes(k)) {
 							lib.config.forbidai.add(k);
 						}
 						for (var l = 0; l < character[i][j][k][3].length; l++) {
@@ -1951,7 +1951,7 @@ export const Content = {
 				if (j == 'mode' || j == 'forbid') continue;
 				if (j == 'list') continue;
 				for (k in card[i][j]) {
-					if (j == 'skill' && k[0] == '_' && !lib.config.cards.contains(i)) {
+					if (j == 'skill' && k[0] == '_' && !lib.config.cards.includes(i)) {
 						continue;
 					}
 					if (j == 'translate' && k == i) {
@@ -2348,7 +2348,7 @@ export const Content = {
 	},
 	replaceHandcards: function () {
 		'step 0';
-		if (event.players.contains(game.me)) {
+		if (event.players.includes(game.me)) {
 			game.me.chooseBool('是否置换手牌？');
 		}
 		else {
@@ -2646,7 +2646,7 @@ export const Content = {
 		event.cards = player.getCards('j');
 		if (!event.cards.length) event.finish();
 		"step 1";
-		if (cards.length && player.getCards('j').contains(cards[0])) {
+		if (cards.length && player.getCards('j').includes(cards[0])) {
 			event.card = cards.shift();
 			if (event.card.classList.contains('removing')) {
 				event.card.remove();
@@ -2766,7 +2766,7 @@ export const Content = {
 			if (!info) continue;
 			if (info.enable != undefined) {
 				if (typeof info.enable == 'string' && info.enable == 'phaseUse') bool = true;
-				else if (typeof info.enable == 'object' && info.enable.contains('phaseUse')) bool = true;
+				else if (typeof info.enable == 'object' && info.enable.includes('phaseUse')) bool = true;
 			}
 			if (bool) stat.skill[i] = 0;
 		}
@@ -2842,7 +2842,7 @@ export const Content = {
 			return;
 		}
 		else if (event.isMine()) {
-			if (event.hsskill && !event.forced && _status.prehidden_skills.contains(event.hsskill)) {
+			if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
 				ui.click.cancel();
 				return;
 			}
@@ -3036,7 +3036,7 @@ export const Content = {
 				}
 			}
 			else {
-				ui.control.animate('nozoom', 100);
+				ui.control.addTempClass('nozoom', 100);
 				event._aiexclude.add(event.buttoned);
 			}
 			event.goto(0);
@@ -3095,7 +3095,7 @@ export const Content = {
 				game.modeSwapPlayer(player);
 			}
 			if (event.isMine()) {
-				if (event.hsskill && !event.forced && _status.prehidden_skills.contains(event.hsskill)) {
+				if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
 					ui.click.cancel();
 					return;
 				}
@@ -3230,7 +3230,7 @@ export const Content = {
 				}
 			}
 			else {
-				ui.control.animate('nozoom', 100);
+				ui.control.addTempClass('nozoom', 100);
 				event._aiexclude.add(event.buttoned);
 			}
 			event.goto(0);
@@ -3317,7 +3317,7 @@ export const Content = {
 		}
 		else if (event.isMine()) {
 			game.check();
-			if (event.hsskill && !event.forced && _status.prehidden_skills.contains(event.hsskill)) {
+			if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
 				ui.click.cancel();
 				return;
 			}
@@ -3451,7 +3451,7 @@ export const Content = {
 			var range = get.select(event.selectCard);
 			if (event.isMine()) {
 				game.check();
-				if (event.hsskill && !event.forced && _status.prehidden_skills.contains(event.hsskill)) {
+				if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
 					ui.click.cancel();
 					return;
 				}
@@ -3582,7 +3582,7 @@ export const Content = {
 					if (get.itemtype(i[1]) == 'card') i[1] = [i[1]];
 					if (event._lose) {
 						i[1] = i[1].filter(card => {
-							return !cards.contains(card) || !player.getCards('hejsx').contains(card);
+							return !cards.includes(card) || !player.getCards('hejsx').includes(card);
 						});
 					}
 					if (i[1].length > 0) i[0].$draw(i[1].length);
@@ -3594,7 +3594,7 @@ export const Content = {
 					if (get.itemtype(i[1]) == 'card') i[1] = [i[1]];
 					if (event._lose) {
 						i[1] = i[1].filter(card => {
-							return !cards.contains(card) || !player.getCards('hejsx').contains(card);
+							return !cards.includes(card) || !player.getCards('hejsx').includes(card);
 						});
 					}
 					if (i[1].length > 0) i[0].$gain(i[1].length);
@@ -3606,7 +3606,7 @@ export const Content = {
 					if (get.itemtype(i[1]) == 'card') i[1] = [i[1]];
 					if (event._lose) {
 						i[1] = i[1].filter(card => {
-							return !cards.contains(card) || !player.getCards('hejsx').contains(card);
+							return !cards.includes(card) || !player.getCards('hejsx').includes(card);
 						});
 					}
 					if (i[1].length > 0) i[0].$gain2(i[1]);
@@ -3620,13 +3620,13 @@ export const Content = {
 					if (get.itemtype(i[1]) == 'card') i[1] = [i[1]];
 					if (event._lose) {
 						i[1] = i[1].filter(card => {
-							return !cards.contains(card) || !player.getCards('hejsx').contains(card);
+							return !cards.includes(card) || !player.getCards('hejsx').includes(card);
 						});
 					}
 					var shown = i[1].slice(0), hidden = [];
 					if (event.animate == 'giveAuto') {
 						for (var card of i[1]) {
-							if (evt.hs.contains(card)) {
+							if (evt.hs.includes(card)) {
 								shown.remove(card);
 								hidden.push(card);
 							}
@@ -3785,7 +3785,7 @@ export const Content = {
 			else lose_list.push([player, result[0].cards]);
 		}
 		for (var j = 0; j < targets.length; j++) {
-			if (event.list.contains(targets[j])) {
+			if (event.list.includes(targets[j])) {
 				var i = event.list.indexOf(targets[j]);
 				if (result[i].skill && lib.skill[result[i].skill] && lib.skill[result[i].skill].onCompare) {
 					event.list[i].logSkill(result[i].skill);
@@ -3807,7 +3807,7 @@ export const Content = {
 		event.lose_list = lose_list;
 		event.getNum = function (card) {
 			for (var i of event.lose_list) {
-				if (i[1].contains && i[1].contains(card)) return get.number(card, i[0]);
+				if (i[1].contains && i[1].includes(card)) return get.number(card, i[0]);
 			}
 			return get.number(card, false);
 		};
@@ -3834,7 +3834,7 @@ export const Content = {
 		event.cardlist.forEach((card, index) => {
 			game.log(targets[index], '的拼点牌为', card);
 		});
-		player.animate('target');
+		player.addTempClass('target');
 		game.delay(0, 1000);
 		'step 5';
 		event.target = null;
@@ -3842,7 +3842,7 @@ export const Content = {
 		'step 6';
 		if (event.iwhile < targets.length) {
 			event.target = targets[event.iwhile];
-			event.target.animate('target');
+			event.target.addTempClass('target');
 			event.card2 = event.cardlist[event.iwhile];
 			event.num2 = event.getNum(event.card2);
 			//event.tempplayer.line(event.target);
@@ -3952,7 +3952,7 @@ export const Content = {
 			else lose_list.push([player, result[0].cards]);
 		}
 		for (var j = 0; j < targets.length; j++) {
-			if (event.list.contains(targets[j])) {
+			if (event.list.includes(targets[j])) {
 				var i = event.list.indexOf(targets[j]);
 				if (result[i].skill && lib.skill[result[i].skill] && lib.skill[result[i].skill].onCompare) {
 					event.list[i].logSkill(result[i].skill);
@@ -3974,7 +3974,7 @@ export const Content = {
 		event.lose_list = lose_list;
 		event.getNum = function (card) {
 			for (var i of event.lose_list) {
-				if (i[1].contains && i[1].contains(card)) return get.number(card, i[0]);
+				if (i[1].contains && i[1].includes(card)) return get.number(card, i[0]);
 			}
 			return get.number(card, false);
 		};
@@ -3996,8 +3996,8 @@ export const Content = {
 		"step 5";
 		if (event.iwhile < targets.length) {
 			event.target = targets[event.iwhile];
-			event.target.animate('target');
-			player.animate('target');
+			event.target.addTempClass('target');
+			player.addTempClass('target');
 			event.card2 = event.cardlist[event.iwhile];
 			event.num2 = event.getNum(event.card2);
 			game.log(event.target, '的拼点牌为', event.card2);
@@ -4409,7 +4409,7 @@ export const Content = {
 			}
 		}
 		if (event.isMine()) {
-			if (event.hsskill && !event.forced && _status.prehidden_skills.contains(event.hsskill)) {
+			if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
 				ui.click.cancel();
 				return;
 			}
@@ -4620,7 +4620,7 @@ export const Content = {
 			if (event.isMine()) {
 				game.check();
 				game.pause();
-				if (event.hsskill && !event.forced && _status.prehidden_skills.contains(event.hsskill)) {
+				if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
 					ui.click.cancel();
 					return;
 				}
@@ -4692,7 +4692,7 @@ export const Content = {
 	chooseTarget: function () {
 		"step 0";
 		if (event.isMine()) {
-			if (event.hsskill && !event.forced && _status.prehidden_skills.contains(event.hsskill)) {
+			if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
 				ui.click.cancel();
 				return;
 			}
@@ -4746,7 +4746,7 @@ export const Content = {
 		}
 		if (event.result.bool && event.animate !== false) {
 			for (var i = 0; i < event.result.targets.length; i++) {
-				event.result.targets[i].animate('target');
+				event.result.targets[i].addTempClass('target');
 			}
 		}
 		if (event.dialog) event.dialog.close();
@@ -4767,7 +4767,7 @@ export const Content = {
 	chooseCardTarget: function () {
 		"step 0";
 		if (event.isMine()) {
-			if (event.hsskill && !event.forced && _status.prehidden_skills.contains(event.hsskill)) {
+			if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
 				ui.click.cancel();
 				return;
 			}
@@ -4806,7 +4806,7 @@ export const Content = {
 		event.resume();
 		if (event.result.bool && event.animate !== false) {
 			for (var i = 0; i < event.result.targets.length; i++) {
-				event.result.targets[i].animate('target');
+				event.result.targets[i].addTempClass('target');
 			}
 		}
 		if (event.dialog) event.dialog.close();
@@ -4846,7 +4846,7 @@ export const Content = {
 				game.expandSkills(hidden);
 				if (hidden.length) {
 					for (var i of event.controls) {
-						if (_status.prehidden_skills.contains(i) && hidden.contains(i)) {
+						if (_status.prehidden_skills.includes(i) && hidden.includes(i)) {
 							event.result = {
 								bool: true,
 								control: i,
@@ -4856,7 +4856,7 @@ export const Content = {
 					}
 				}
 			}
-			else if (event.hsskill && _status.prehidden_skills.contains(event.hsskill) && event.controls.contains('cancel2')) {
+			else if (event.hsskill && _status.prehidden_skills.includes(event.hsskill) && event.controls.includes('cancel2')) {
 				event.result = {
 					bool: true,
 					control: 'cancel2',
@@ -5008,11 +5008,11 @@ export const Content = {
 	chooseBool: function () {
 		"step 0";
 		if (event.isMine()) {
-			if (event.frequentSkill && !lib.config.autoskilllist.contains(event.frequentSkill)) {
+			if (event.frequentSkill && !lib.config.autoskilllist.includes(event.frequentSkill)) {
 				ui.click.ok();
 				return;
 			}
-			else if (event.hsskill && _status.prehidden_skills.contains(event.hsskill)) {
+			else if (event.hsskill && _status.prehidden_skills.includes(event.hsskill)) {
 				ui.click.cancel();
 				return;
 			}
@@ -5223,7 +5223,7 @@ export const Content = {
 		}
 		else {
 			if (event.isMine()) {
-				if (event.hsskill && !event.forced && _status.prehidden_skills.contains(event.hsskill)) {
+				if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
 					ui.click.cancel();
 					return;
 				}
@@ -5664,7 +5664,7 @@ export const Content = {
 
 		if (event.hiddencards) {
 			for (var i = 0; i < event.dialog.buttons.length; i++) {
-				if (event.hiddencards.contains(event.dialog.buttons[i].link)) {
+				if (event.hiddencards.includes(event.dialog.buttons[i].link)) {
 					event.dialog.buttons[i].className = 'button card';
 					event.dialog.buttons[i].innerHTML = '';
 				}
@@ -5676,7 +5676,7 @@ export const Content = {
 			dialog.videoId = id;
 			if (cards2) {
 				for (var i = 0; i < dialog.buttons.length; i++) {
-					if (cards2.contains(dialog.buttons[i].link)) {
+					if (cards2.includes(dialog.buttons[i].link)) {
 						dialog.buttons[i].className = 'button card';
 						dialog.buttons[i].innerHTML = '';
 					}
@@ -5902,7 +5902,7 @@ export const Content = {
 			var next = owner.lose(cards, 'visible', ui.ordering).set('type', 'use');
 			var directDiscard = [];
 			for (var i = 0; i < cards.length; i++) {
-				if (!next.cards.contains(cards[i])) {
+				if (!next.cards.includes(cards[i])) {
 					directDiscard.push(cards[i]);
 				}
 			}
@@ -6105,12 +6105,12 @@ export const Content = {
 						targets.sortBySeat((_status.currentPhase || player));
 					}
 					if (animate) for (var i = 0; i < targets.length; i++) {
-						targets[i].animate('target');
+						targets[i].addTempClass('target');
 					}
 				}
 				else if (animate) {
 					for (var i = 0; i < targets.length; i++) {
-						targets[i].animate('target');
+						targets[i].addTempClass('target');
 					}
 				}
 			}
@@ -6287,7 +6287,7 @@ export const Content = {
 		if (targets[num] && targets[num].removed) return;
 		if (targets[num] && info.ignoreTarget && info.ignoreTarget(card, player, targets[num])) return;
 		if (targets.length == 0 && !info.notarget) return;
-		if (targets[num] && event.excluded.contains(targets[num])) {
+		if (targets[num] && event.excluded.includes(targets[num])) {
 			var next = game.createEvent('useCardToExcluded', false);
 			next.setContent('emptyEvent');
 			next.targets = targets;
@@ -6325,14 +6325,14 @@ export const Content = {
 			var customArgs = event.customArgs[next.target.playerid];
 			for (var i in customArgs) next[i] = customArgs[i];
 		}
-		if (next.target && event.directHit.contains(next.target)) next.directHit = true;
+		if (next.target && event.directHit.includes(next.target)) next.directHit = true;
 		if (next.target && !info.multitarget) {
 			if (num == 0 && targets.length > 1) {
 				// var ttt=next.target;
-				// setTimeout(function(){ttt.animate('target');},0.5*lib.config.duration);
+				// setTimeout(function(){ttt.addTempClass('target');},0.5*lib.config.duration);
 			}
 			else {
-				next.target.animate('target');
+				next.target.addTempClass('target');
 			}
 		}
 		if (!info.nodelay && num > 0) {
@@ -6509,26 +6509,26 @@ export const Content = {
 		};
 		if (info.sourceSkill) {
 			logInfo.sourceSkill = info.sourceSkill;
-			if (global.contains(info.sourceSkill)) {
+			if (global.includes(info.sourceSkill)) {
 				logInfo.type = 'global';
 			}
-			else if (players.contains(info.sourceSkill)) {
+			else if (players.includes(info.sourceSkill)) {
 				logInfo.type = 'player';
 			}
-			else if (equips.contains(info.sourceSkill)) {
+			else if (equips.includes(info.sourceSkill)) {
 				logInfo.type = 'equip';
 			}
 		}
 		else {
-			if (global.contains(name)) {
+			if (global.includes(name)) {
 				logInfo.sourceSkill = name;
 				logInfo.type = 'global';
 			}
-			else if (players.contains(name)) {
+			else if (players.includes(name)) {
 				logInfo.sourceSkill = name;
 				logInfo.type = 'player';
 			}
-			else if (equips.contains(name)) {
+			else if (equips.includes(name)) {
 				logInfo.sourceSkill = name;
 				logInfo.type = 'equip';
 			}
@@ -6537,7 +6537,7 @@ export const Content = {
 				for (var i of players) {
 					var expand = [i];
 					game.expandSkills(expand);
-					if (expand.contains(name)) {
+					if (expand.includes(name)) {
 						bool = true;
 						logInfo.sourceSkill = i;
 						logInfo.type = 'player';
@@ -6548,7 +6548,7 @@ export const Content = {
 					for (var i of players) {
 						var expand = [i];
 						game.expandSkills(expand);
-						if (expand.contains(name)) {
+						if (expand.includes(name)) {
 							logInfo.sourceSkill = i;
 							logInfo.type = 'equip';
 							break;
@@ -6608,7 +6608,7 @@ export const Content = {
 				delete lib.tempSortSeat;
 			}
 			for (var i = 0; i < targets.length; i++) {
-				targets[i].animate('target');
+				targets[i].addTempClass('target');
 			}
 		}
 		next.target = targets[num];
@@ -6617,10 +6617,10 @@ export const Content = {
 		if (next.target && !info.multitarget) {
 			if (num == 0 && targets.length > 1) {
 				// var ttt=next.target;
-				// setTimeout(function(){ttt.animate('target');},0.5*lib.config.duration);
+				// setTimeout(function(){ttt.addTempClass('target');},0.5*lib.config.duration);
 			}
 			else {
-				next.target.animate('target');
+				next.target.addTempClass('target');
 			}
 		}
 		if (num == 0) {
@@ -6803,7 +6803,7 @@ export const Content = {
 			var next = owner.lose(cards, 'visible', ui.ordering).set('type', 'use');
 			var directDiscard = [];
 			for (var i = 0; i < cards.length; i++) {
-				if (!next.cards.contains(cards[i])) {
+				if (!next.cards.includes(cards[i])) {
 					directDiscard.push(cards[i]);
 				}
 			}
@@ -6937,10 +6937,10 @@ export const Content = {
 			}
 			else if (event.losing_map) {
 				for (var id in event.losing_map) {
-					if (event.losing_map[id][0].contains(cards[i])) {
+					if (event.losing_map[id][0].includes(cards[i])) {
 						var source = (_status.connectMode ? lib.playerOL : game.playerMap)[id];
 						var hs = source.getCards('hejsx');
-						if (hs.contains(cards[i])) {
+						if (hs.includes(cards[i])) {
 							cards.splice(i--, 1);
 						} else {
 							cards[i].addKnower(event.visible ? 'everyone' : source);
@@ -6968,14 +6968,14 @@ export const Content = {
 		var frag2 = document.createDocumentFragment();
 		var hs = player.getCards('hs');
 		for (var i = 0; i < cards.length; i++) {
-			if (hs.contains(cards[i])) {
+			if (hs.includes(cards[i])) {
 				cards.splice(i--, 1);
 			}
 		}
 		for (var num = 0; num < cards.length; num++) {
 			sort = lib.config.sort_card(cards[num]);
 			if (lib.config.reverse_sort) sort = -sort;
-			if (['o', 'd'].contains(get.position(cards[num], true))) {
+			if (['o', 'd'].includes(get.position(cards[num], true))) {
 				cards[num].addKnower('everyone');
 			}
 			cards[num].fix();
@@ -7140,10 +7140,10 @@ export const Content = {
 			}
 			else if (event.losing_map) {
 				for (var id in event.losing_map) {
-					if (event.losing_map[id][0].contains(cards[i])) {
+					if (event.losing_map[id][0].includes(cards[i])) {
 						var source = (_status.connectMode ? lib.playerOL : game.playerMap)[id];
 						var hs = source.getCards('hejsx');
-						if (hs.contains(cards[i])) {
+						if (hs.includes(cards[i])) {
 							cards.splice(i--, 1);
 						}
 					}
@@ -7157,7 +7157,7 @@ export const Content = {
 		"step 2";
 		var hs = player.getCards('x');
 		for (var i = 0; i < cards.length; i++) {
-			if (hs.contains(cards[i])) {
+			if (hs.includes(cards[i])) {
 				cards.splice(i--, 1);
 			}
 		}
@@ -7306,7 +7306,7 @@ export const Content = {
 		var hej = player.getCards('hejsx');
 		event.stockcards = cards.slice(0);
 		for (var i = 0; i < cards.length; i++) {
-			if (!hej.contains(cards[i])) {
+			if (!hej.includes(cards[i])) {
 				cards.splice(i--, 1);
 				continue;
 			}
@@ -7393,7 +7393,7 @@ export const Content = {
 			else {
 				cards[i].remove();
 			}
-			//if(ss.contains(cards[i])) cards.splice(i--,1);
+			//if(ss.includes(cards[i])) cards.splice(i--,1);
 		}
 		if (player == game.me) ui.updatehl();
 		ui.updatej(player);
@@ -7449,7 +7449,7 @@ export const Content = {
 		}
 		"step 2";
 		if (num < cards.length) {
-			if (event.es.contains(cards[num])) {
+			if (event.es.includes(cards[num])) {
 				event.loseEquip = true;
 				player.removeEquipTrigger(cards[num]);
 				var info = get.info(cards[num]);
@@ -7749,7 +7749,7 @@ export const Content = {
 		if (event.popup !== false) {
 			player.$damagepop(num, 'water');
 		}
-		if (_status.dying.contains(player) && player.hp > 0) {
+		if (_status.dying.includes(player) && player.hp > 0) {
 			_status.dying.remove(player);
 			game.broadcast(function (list) {
 				_status.dying = list;
@@ -7866,7 +7866,7 @@ export const Content = {
 		// player.removeEquipTrigger();
 
 		// for(var i in lib.skill.globalmap){
-		//     if(lib.skill.globalmap[i].contains(player)){
+		//     if(lib.skill.globalmap[i].includes(player)){
 		//      			lib.skill.globalmap[i].remove(player);
 		//      			if(lib.skill.globalmap[i].length==0&&!lib.skill[i].globalFixed){
 		//      						 game.removeGlobalSkill(i);
@@ -8036,7 +8036,7 @@ export const Content = {
 		}
 		else if (event.relatedLose) {
 			var owner = event.relatedLose.player;
-			if (owner.getCards('hejsx').contains(card)) {
+			if (owner.getCards('hejsx').includes(card)) {
 				event.finish();
 				return;
 			}
@@ -8131,7 +8131,7 @@ export const Content = {
 				event = _status.event;
 			}
 			if (game.chess) {
-				event.node = card.copy('thrown', 'center', ui.arena).animate('start');
+				event.node = card.copy('thrown', 'center', ui.arena).addTempClass('start');
 			}
 			else {
 				event.node = player.$throwordered(card.copy(), true);

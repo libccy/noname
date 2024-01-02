@@ -364,7 +364,7 @@ class Create extends Uninstantable {
 				}
 				else {
 					let cardPack = lib.cardPack['mode_' + get.mode()];
-					if (Array.isArray(cardPack) && cardPack.contains(cardName)) {
+					if (Array.isArray(cardPack) && cardPack.includes(cardName)) {
 						bg.setBackground('mode/' + get.mode() + '/card/' + cardName);
 					}
 					else {
@@ -1493,7 +1493,7 @@ class Create extends Uninstantable {
 						lib.config['connect_' + modeorder[i] + '_bannedcards'] = [];
 					}
 				}
-				if (lib.config.all.mode.contains(modeorder[i])) {
+				if (lib.config.all.mode.includes(modeorder[i])) {
 					createModeConfig(modeorder[i], start.firstChild);
 				}
 			}
@@ -1553,7 +1553,7 @@ class Create extends Uninstantable {
 			};
 			var skilllistexpanded = game.expandSkills(lib.skilllist);
 			for (var i in lib.skill) {
-				if (!skilllistexpanded.contains(i)) continue;
+				if (!skilllistexpanded.includes(i)) continue;
 				if (lib.skill[i].frequent && lib.translate[i]) {
 					lib.configMenu.skill.config[i] = {
 						name: lib.translate[i + '_noconf'] || lib.translate[i],
@@ -1585,7 +1585,7 @@ class Create extends Uninstantable {
 				var str2 = '';
 				var str3 = '';
 				for (var j = 0; j < forbid[i].length; j++) {
-					if (!lib.skilllist.contains(forbid[i][j])) {
+					if (!lib.skilllist.includes(forbid[i][j])) {
 						skip = true;
 						break;
 					}
@@ -1673,7 +1673,7 @@ class Create extends Uninstantable {
 						var matchBanSkill = function (skills1, skills2) {
 							if (skills1.length != skills2.length) return false;
 							for (var i = 0; i < skills1.length; i++) {
-								if (!skills2.contains(skills1[i])) return false;
+								if (!skills2.includes(skills1[i])) return false;
 							}
 							return true;
 						}
@@ -2603,7 +2603,7 @@ class Create extends Uninstantable {
 						if (node.mode.startsWith('mode_')) continue;
 						if (node.mode == 'custom') continue;
 						if (connectMenu) {
-							if (!lib.config.connect_characters.contains(node.mode)) {
+							if (!lib.config.connect_characters.includes(node.mode)) {
 								node.classList.remove('off');
 								if (node.link) node.link.firstChild.classList.add('on');
 							}
@@ -2613,7 +2613,7 @@ class Create extends Uninstantable {
 							}
 						}
 						else {
-							if (lib.config.characters.contains(node.mode)) {
+							if (lib.config.characters.includes(node.mode)) {
 								node.classList.remove('off');
 								if (node.link) node.link.firstChild.classList.add('on');
 							}
@@ -2668,10 +2668,10 @@ class Create extends Uninstantable {
 					var alterableCharacters = [];
 					var charactersToAlter = [];
 					for (var i in _info) {
-						if (_info[i][4] && _info[i][4].contains('unseen')) continue;
-						if (connectMenu && lib.connectBanned.contains(i)) continue;
+						if (_info[i][4] && _info[i][4].includes('unseen')) continue;
+						if (connectMenu && lib.connectBanned.includes(i)) continue;
 						list.push(i);
-						if (boolAI && !lib.config.forbidai_user.contains(i)) boolAI = false;
+						if (boolAI && !lib.config.forbidai_user.includes(i)) boolAI = false;
 						for (var j = 0; j < _info[i][3].length; j++) {
 							if (!lib.skill[_info[i][3][j]]) {
 								continue;
@@ -2679,7 +2679,7 @@ class Create extends Uninstantable {
 							if (lib.skill[_info[i][3][j]].alter) {
 								alterableSkills.add(_info[i][3][j]);
 								alterableCharacters.add(i);
-								if (lib.config.vintageSkills.contains(_info[i][3][j])) {
+								if (lib.config.vintageSkills.includes(_info[i][3][j])) {
 									charactersToAlter.add(i);
 								}
 							}
@@ -2691,7 +2691,7 @@ class Create extends Uninstantable {
 					var cfgnode = createConfig({
 						name: '开启',
 						_name: mode,
-						init: connectMenu ? (!lib.config.connect_characters.contains(mode)) : (lib.config.characters.contains(mode)),
+						init: connectMenu ? (!lib.config.connect_characters.includes(mode)) : (lib.config.characters.includes(mode)),
 						onclick: togglePack
 					});
 					var cfgnodeAI = createConfig({
@@ -2783,7 +2783,7 @@ class Create extends Uninstantable {
 						else {
 							_list = lib.config[get.mode() + '_banned'];
 						}
-						if (_list && _list.contains(this.link)) {
+						if (_list && _list.includes(this.link)) {
 							this.classList.add('banned');
 						}
 						else {
@@ -2806,9 +2806,9 @@ class Create extends Uninstantable {
 							var listx = [];
 							var boolx = false;
 							for (var ii = 0; ii < list2.length; ii++) {
-								if (info.contains(list2[ii])) {
+								if (info.includes(list2[ii])) {
 									listx.add(list2[ii]);
-									if (!listb.contains(list2[ii])) boolx = true;
+									if (!listb.includes(list2[ii])) boolx = true;
 									list2.splice(ii--, 1);
 								}
 							}
@@ -2897,7 +2897,7 @@ class Create extends Uninstantable {
 					page.classList.add('menu-buttons');
 					page.classList.add('leftbutton');
 					if (!connectMenu) {
-						if (lib.config.all.sgscharacters.contains(mode)) {
+						if (lib.config.all.sgscharacters.includes(mode)) {
 							ui.create.div('.config.pointerspan', '<span style="opacity:0.5">该武将包不可被隐藏</span>', page);
 						}
 						else if (!mode.startsWith('mode_')) {
@@ -3048,7 +3048,7 @@ class Create extends Uninstantable {
 						if (node.mode == 'custom') continue;
 						if (node.mode == 'cardpile') continue;
 						if (connectMenu) {
-							if (!lib.config.connect_cards.contains(node.mode)) {
+							if (!lib.config.connect_cards.includes(node.mode)) {
 								node.classList.remove('off');
 								if (node.link) node.link.firstChild.classList.add('on');
 							}
@@ -3058,7 +3058,7 @@ class Create extends Uninstantable {
 							}
 						}
 						else {
-							if (lib.config.cards.contains(node.mode)) {
+							if (lib.config.cards.includes(node.mode)) {
 								node.classList.remove('off');
 								if (node.link) node.link.firstChild.classList.add('on');
 							}
@@ -3166,7 +3166,7 @@ class Create extends Uninstantable {
 					var cfgnode = createConfig({
 						name: '开启',
 						_name: mode,
-						init: lib.config.cards.contains(mode),
+						init: lib.config.cards.includes(mode),
 						onclick: togglePack
 					});
 					if (!mode.startsWith('mode_')) {
@@ -3200,7 +3200,7 @@ class Create extends Uninstantable {
 						else {
 							list = lib.config[get.mode() + '_bannedcards'];
 						}
-						if (list && list.contains(this.link[2])) {
+						if (list && list.includes(this.link[2])) {
 							this.classList.add('banned');
 						}
 						else {
@@ -3217,7 +3217,7 @@ class Create extends Uninstantable {
 					}
 					page.classList.add('menu-buttons');
 					page.classList.add('leftbutton');
-					if (!connectMenu && !lib.config.all.sgscards.contains(mode) && !mode.startsWith('mode_')) {
+					if (!connectMenu && !lib.config.all.sgscards.includes(mode) && !mode.startsWith('mode_')) {
 						ui.create.div('.config.pointerspan', '<span>隐藏卡牌包</span>', page, function () {
 							if (this.firstChild.innerHTML == '隐藏卡牌包') {
 								this.firstChild.innerHTML = '卡牌包将在重启后隐藏';
@@ -3374,7 +3374,7 @@ class Create extends Uninstantable {
 								name: ((card[2] == 'sha' && card[3]) ? (get.translation(card[3])) : '') + get.translation(card[2]) + ' ' + get.translation(card[0]) + get.strNumber(card[1]),
 								_number: i,
 								_name: mode,
-								init: !lib.config.bannedpile[mode].contains(i),
+								init: !lib.config.bannedpile[mode].includes(i),
 								onclick: toggleCardPile
 							});
 							cfgnode.type = 'defaultcards';
@@ -3406,7 +3406,7 @@ class Create extends Uninstantable {
 				delete lib.cardPack.mode_banned;
 			}
 			for (var i = 0; i < lib.config.all.cards.length; i++) {
-				if (connectMenu && !lib.connectCardPack.contains(lib.config.all.cards[i])) continue;
+				if (connectMenu && !lib.connectCardPack.includes(lib.config.all.cards[i])) continue;
 				createModeConfig(lib.config.all.cards[i], start.firstChild);
 			}
 			if (!connectMenu) Object.keys(lib.cardPack).forEach(key => {
@@ -3450,7 +3450,7 @@ class Create extends Uninstantable {
 						}
 						var currentpile = get.config('cardpilename');
 						if (!currentpile) {
-							if (list.contains('当前牌堆')) {
+							if (list.includes('当前牌堆')) {
 								currentpile = '当前牌堆';
 							}
 							else {
@@ -3613,7 +3613,7 @@ class Create extends Uninstantable {
 						}
 					}
 					else {
-						if (lib.config.plays.contains(node.mode)) {
+						if (lib.config.plays.includes(node.mode)) {
 							node.classList.remove('off');
 							if (node.link) node.link.firstChild.classList.add('on');
 						}
@@ -3704,8 +3704,8 @@ class Create extends Uninstantable {
 				return node;
 			};
 			for (var i in lib.extensionMenu) {
-				if (lib.config.all.stockextension.contains(i) && !lib.config.all.plays.contains(i)) continue;
-				if (lib.config.hiddenPlayPack.contains(i)) continue;
+				if (lib.config.all.stockextension.includes(i) && !lib.config.all.plays.includes(i)) continue;
+				if (lib.config.hiddenPlayPack.includes(i)) continue;
 				createModeConfig(i, start.firstChild);
 			}
 			(function () {
@@ -4213,7 +4213,7 @@ class Create extends Uninstantable {
 							groups.value = info[1];
 							if (info[4]) {
 								for (var i = 0; i < options.childNodes.length - 1; i++) {
-									if (options.childNodes[i].lastChild && info[4].contains(options.childNodes[i].lastChild.name)) {
+									if (options.childNodes[i].lastChild && info[4].includes(options.childNodes[i].lastChild.name)) {
 										options.childNodes[i].lastChild.checked = true;
 									}
 									else if (options.childNodes[i].lastChild) {
@@ -4652,7 +4652,7 @@ class Create extends Uninstantable {
 									tags.push(options.childNodes[i].lastChild.name);
 								}
 							}
-							if (tags.contains('boss')) {
+							if (tags.includes('boss')) {
 								tags.add('bossallowed');
 							}
 							var des = page.querySelector('input.new_des').value;
@@ -5081,7 +5081,9 @@ class Create extends Uninstantable {
 							}
 							else {
 								if (!window.CodeMirror) {
-									lib.init.js(lib.assetURL + 'game', 'codemirror', () => lib.codeMirrorReady(node, editor));
+									import('../../game/codemirror.js').then(() => {
+										lib.codeMirrorReady(node, editor);
+									});
 									lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
 								}
 								else {
@@ -5291,7 +5293,7 @@ class Create extends Uninstantable {
 									cardpileaddname.appendChild(option);
 								}
 								for (var i = 0; i < pile.childNodes.length; i++) {
-									if (!list2.contains(pile.childNodes[i].name)) {
+									if (!list2.includes(pile.childNodes[i].name)) {
 										pile.childNodes[i].remove(); i--;
 									}
 								}
@@ -5517,7 +5519,9 @@ class Create extends Uninstantable {
 							}
 							else {
 								if (!window.CodeMirror) {
-									lib.init.js(lib.assetURL + 'game', 'codemirror', () => lib.codeMirrorReady(node, editor));
+									import('../../game/codemirror.js').then(() => {
+										lib.codeMirrorReady(node, editor);
+									});
 									lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
 								}
 								else {
@@ -5610,7 +5614,7 @@ class Create extends Uninstantable {
 						var selectname = ui.create.selectlist(list, list[0], commandline);
 						var list3 = [];
 						for (var i in lib.skill) {
-							if (i != 'global' && !get.is.empty(lib.skill[i]) && !lib.skilllist.contains(i)) {
+							if (i != 'global' && !get.is.empty(lib.skill[i]) && !lib.skilllist.includes(i)) {
 								list3.push(i);
 							}
 						}
@@ -5895,7 +5899,9 @@ class Create extends Uninstantable {
 							}
 							else {
 								if (!window.CodeMirror) {
-									lib.init.js(lib.assetURL + 'game', 'codemirror', () => lib.codeMirrorReady(node, this.editor));
+									import('../../game/codemirror.js').then(() => {
+										lib.codeMirrorReady(node, editor);
+									});
 									lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
 								}
 								else {
@@ -6063,7 +6069,7 @@ class Create extends Uninstantable {
 									if (!lib.config.dev) delete window.game;
 									if (game.importedPack) {
 										var extname = game.importedPack.name;
-										if (lib.config.extensions.contains(extname)) {
+										if (lib.config.extensions.includes(extname)) {
 											game.removeExtension(extname, true);
 										}
 										lib.config.extensions.add(extname);
@@ -6590,13 +6596,13 @@ class Create extends Uninstantable {
 											}
 											else {
 												if (updates[i].startsWith('image/character')) {
-													if (updates[i].indexOf('jun_') != 16 && updates[i].indexOf('gz_') != 16 && !skipcharacter.contains(updates[i].slice(16, updates[i].lastIndexOf('.')))) {
+													if (updates[i].indexOf('jun_') != 16 && updates[i].indexOf('gz_') != 16 && !skipcharacter.includes(updates[i].slice(16, updates[i].lastIndexOf('.')))) {
 														updates.splice(i--, 1);
 													}
 												}
 												else if (updates[i].startsWith('image/card')) {
 													let cardname = updates[i].slice(11, updates[i].lastIndexOf('.'));
-													if (lib.card[cardname] && !skipcard.contains(cardname)) {
+													if (lib.card[cardname] && !skipcard.includes(cardname)) {
 														updates.splice(i--, 1);
 													}
 												}
@@ -7183,7 +7189,7 @@ class Create extends Uninstantable {
 						var buttons = ui.create.buttons(list, 'player', row3, true);
 						for (var i = 0; i < buttons.length; i++) {
 							buttons[i].listen(clickrow3);
-							if (game.dead.contains(buttons[i].link)) {
+							if (game.dead.includes(buttons[i].link)) {
 								buttons[i].dead = true;
 							}
 						}
@@ -7354,7 +7360,7 @@ class Create extends Uninstantable {
 								}
 							`))(proxyWindow);
 					const runCommand = () => {
-						if (text2.value && !['up', 'down'].contains(text2.value)) {
+						if (text2.value && !['up', 'down'].includes(text2.value)) {
 							logindex = -1;
 							logs.unshift(text2.value);
 						}
@@ -7927,14 +7933,14 @@ class Create extends Uninstantable {
 	static characterDialog2(filter) {
 		var list = [];
 		for (var i in lib.character) {
-			if (lib.character[i][4].contains('minskin')) continue;
-			if (lib.character[i][4].contains('boss') || lib.character[i][4].contains('hiddenboss')) {
+			if (lib.character[i][4].includes('minskin')) continue;
+			if (lib.character[i][4].includes('boss') || lib.character[i][4].includes('hiddenboss')) {
 				if (lib.config.mode == 'boss') continue;
-				if (!lib.character[i][4].contains('bossallowed')) continue;
+				if (!lib.character[i][4].includes('bossallowed')) continue;
 			}
 
-			if (lib.character[i][4].contains('stonehidden')) continue;
-			if (lib.config.banned.contains(i)) continue;
+			if (lib.character[i][4].includes('stonehidden')) continue;
+			if (lib.config.banned.includes(i)) continue;
 			if (filter && filter(i)) continue;
 			list.push(i);
 		}
@@ -7962,7 +7968,7 @@ class Create extends Uninstantable {
 			}
 			this.classList.add('active');
 			for (var i = 0; i < dialog.buttons.length; i++) {
-				if (this.pack && !this.pack.contains(dialog.buttons[i].link)) {
+				if (this.pack && !this.pack.includes(dialog.buttons[i].link)) {
 					dialog.buttons[i].classList.add('nodisplay');
 				}
 				else {
@@ -8091,15 +8097,15 @@ class Create extends Uninstantable {
 		}
 		else {
 			for (var i in lib.character) {
-				if (lib.character[i][4].contains('minskin')) continue;
-				if (lib.character[i][4].contains('boss') || lib.character[i][4].contains('hiddenboss')) {
+				if (lib.character[i][4].includes('minskin')) continue;
+				if (lib.character[i][4].includes('boss') || lib.character[i][4].includes('hiddenboss')) {
 					if (lib.config.mode == 'boss') continue;
-					if (!lib.character[i][4].contains('bossallowed')) continue;
+					if (!lib.character[i][4].includes('bossallowed')) continue;
 				}
 
-				if (lib.character[i][4].contains('stonehidden')) continue;
-				if (lib.character[i][4].contains('unseen')) continue;
-				if (lib.config.banned.contains(i)) continue;
+				if (lib.character[i][4].includes('stonehidden')) continue;
+				if (lib.character[i][4].includes('unseen')) continue;
+				if (lib.config.banned.includes(i)) continue;
 				if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) continue;
 				if (filter && filter(i)) continue;
 				list.push(i);
@@ -8474,11 +8480,11 @@ class Create extends Uninstantable {
 			});
 			var packlist = [];
 			for (var i = 0; i < lib.config.all.characters.length; i++) {
-				if (!lib.config.characters.contains(lib.config.all.characters[i])) continue;
+				if (!lib.config.characters.includes(lib.config.all.characters[i])) continue;
 				packlist.push(lib.config.all.characters[i]);
 			}
 			for (var i in lib.characterPack) {
-				if (!lib.config.all.characters.contains(i)) {
+				if (!lib.config.all.characters.includes(i)) {
 					packlist.push(i);
 				}
 			}
@@ -8555,7 +8561,7 @@ class Create extends Uninstantable {
 		dialog.getCurrentCapt = function (link, capt, noalph) {
 			var currentcapt = noalph ? this.currentcapt2 : this.currentcapt;
 			if (this.seperatelist && noalph) {
-				if (this.seperatelist[currentcapt].contains(link)) return capt;
+				if (this.seperatelist[currentcapt].includes(link)) return capt;
 				return null;
 			}
 			if (lib.characterDialogGroup[currentcapt]) {
@@ -8762,7 +8768,7 @@ class Create extends Uninstantable {
 			if (ui.skills.skills.length == skills.length && ui.skills.style.display != 'none') {
 				same = true;
 				for (i = 0; i < skills.length; i++) {
-					if (ui.skills.skills.contains(skills[i]) == false) {
+					if (ui.skills.skills.includes(skills[i]) == false) {
 						same = false;
 						break;
 					}
@@ -8796,7 +8802,7 @@ class Create extends Uninstantable {
 			if (ui.skills2.skills.length == skills.length && ui.skills2.style.display != 'none') {
 				same = true;
 				for (i = 0; i < skills.length; i++) {
-					if (ui.skills2.skills.contains(skills[i]) == false) {
+					if (ui.skills2.skills.includes(skills[i]) == false) {
 						same = false;
 						break;
 					}
@@ -8830,7 +8836,7 @@ class Create extends Uninstantable {
 			if (ui.skills3.skills.length == skills.length && ui.skills3.style.display != 'none') {
 				same = true;
 				for (i = 0; i < skills.length; i++) {
-					if (ui.skills3.skills.contains(skills[i]) == false) {
+					if (ui.skills3.skills.includes(skills[i]) == false) {
 						same = false;
 						break;
 					}
@@ -9100,7 +9106,7 @@ class Create extends Uninstantable {
 			}, 1000);
 		}
 		if (get.is.nomenu()) {
-			if (!['menu', 'system'].contains(lib.config.round_menu_func)) {
+			if (!['menu', 'system'].includes(lib.config.round_menu_func)) {
 				lib.config.round_menu_func = 'system';
 			}
 		}
@@ -9235,11 +9241,11 @@ class Create extends Uninstantable {
 		}
 
 		if (lib.forcehide) {
-			if (lib.forcehide.contains('replay')) ui.replay.classList.add('forcehide');
-			if (lib.forcehide.contains('auto')) ui.auto.classList.add('forcehide');
-			if (lib.forcehide.contains('pause')) ui.pause.classList.add('forcehide');
-			if (lib.forcehide.contains('wuxie')) ui.wuxie.classList.add('forcehide');
-			if (lib.forcehide.contains('cardPileButton')) ui.cardPileButton.classList.add('forcehide');
+			if (lib.forcehide.includes('replay')) ui.replay.classList.add('forcehide');
+			if (lib.forcehide.includes('auto')) ui.auto.classList.add('forcehide');
+			if (lib.forcehide.includes('pause')) ui.pause.classList.add('forcehide');
+			if (lib.forcehide.includes('wuxie')) ui.wuxie.classList.add('forcehide');
+			if (lib.forcehide.includes('cardPileButton')) ui.cardPileButton.classList.add('forcehide');
 		}
 		ui.volumn = ui.create.system('♫');
 		lib.setPopped(ui.volumn, ui.click.volumn, 200);
@@ -9295,7 +9301,7 @@ class Create extends Uninstantable {
 		if (!lib.config.show_replay) {
 			ui.replay.style.display = 'none';
 		}
-		ui.control = ui.create.div('#control', ui.arena).animate('nozoom');
+		ui.control = ui.create.div('#control', ui.arena).addTempClass('nozoom');
 		ui.cardPile = ui.create.div('#cardPile');
 		ui.discardPile = ui.create.div('#discardPile');
 		ui.special = ui.create.div('#special');
@@ -9395,7 +9401,7 @@ class Create extends Uninstantable {
 			let mode = lib.config.mode;
 			const config = get.config(`${mode}_mode`);
 			if (typeof config == 'string') mode += `|${config}`;
-			if (favouriteMode.contains(mode)) ui.favmode.classList.add('glow');
+			if (favouriteMode.includes(mode)) ui.favmode.classList.add('glow');
 			else ui.favmode.classList.remove('glow');
 		};
 		ui.favmodelist.add = function (name, index) {
@@ -9504,7 +9510,7 @@ class Create extends Uninstantable {
 			_status.auto = true;
 			ui.auto.classList.add('glow');
 			setTimeout(function () {
-				var node = ui.create.pause().animate('start');
+				var node = ui.create.pause().addTempClass('start');
 				node.appendChild(ui.sidebar);
 				node.firstChild.innerHTML = '正在测试';
 				node.removeEventListener('click', ui.click.resume);
@@ -9985,7 +9991,7 @@ class Create extends Uninstantable {
 		}
 		if (!numberOfPlayers) numberOfPlayers = 5;
 		for (let ordinal = 0; ordinal < numberOfPlayers; ordinal++) {
-			const player = ui.create.player().animate('start');
+			const player = ui.create.player().addTempClass('start');
 			game.players.push(player);
 			player.dataset.position = ordinal;
 		}
@@ -10010,7 +10016,7 @@ class Create extends Uninstantable {
 	}
 	static me(hasme) {
 		ui.mebg = ui.create.div('#mebg', ui.arena);
-		ui.me = ui.create.div('#me', ui.arena).animate('start');
+		ui.me = ui.create.div('#me', ui.arena).addTempClass('start');
 		ui.handcards1Container = ui.create.div('#handcards1', ui.me);
 		ui.handcards2Container = ui.create.div('#handcards2', ui.me);
 		ui.arena.classList.remove('nome');
@@ -10072,12 +10078,12 @@ class Create extends Uninstantable {
 			if (lib.card[lib.card.list[i][2]]) {
 				if (!lib.card.list[i]._replaced) {
 					if (!_status.connectMode) {
-						if (lib.config.bannedcards.contains(lib.card.list[i][2])) continue;
+						if (lib.config.bannedcards.includes(lib.card.list[i][2])) continue;
 					}
 					else {
-						if (lib.configOL.bannedcards.contains(lib.card.list[i][2])) continue;
+						if (lib.configOL.bannedcards.includes(lib.card.list[i][2])) continue;
 					}
-					if (game.bannedcards && game.bannedcards.contains(lib.card.list[i][2])) continue;
+					if (game.bannedcards && game.bannedcards.includes(lib.card.list[i][2])) continue;
 				}
 				lib.inpile.add(lib.card.list[i][2]);
 				if (lib.card.list[i][2] == 'sha' && lib.card.list[i][3]) lib.inpile_nature.add(lib.card.list[i][3]);
@@ -10303,7 +10309,7 @@ class Click extends Uninstantable {
 						}
 						ui.create.div('', '已有' + (fakeinfo.members.length) + '人加入', eventnode);
 						ui.create.div('', '时间：' + str, eventnode);
-						if (fakeinfo.members.contains(game.onlineKey)) {
+						if (fakeinfo.members.includes(game.onlineKey)) {
 							eventnode.classList.add('active');
 						}
 						button.input.value = '';
@@ -10384,7 +10390,7 @@ class Click extends Uninstantable {
 						//ui.create.div('','创建者：'+(button.info[i].nickname)+'<br>ID：'+button.info[i].creator,eventnode);
 						ui.create.div('', '已有' + (button.info[i].members.length) + '人加入', eventnode);
 						ui.create.div('', '时间：' + str, eventnode);
-						if (button.info[i].members.contains(game.onlineKey)) {
+						if (button.info[i].members.includes(game.onlineKey)) {
 							eventnode.classList.add('active');
 						}
 					}
@@ -10705,7 +10711,7 @@ class Click extends Uninstantable {
 				lib.config.favouriteCharacter.remove(this.link);
 			}
 			if (ui.favouriteCharacter) {
-				if (lib.config.favouriteCharacter.contains(this.link)) {
+				if (lib.config.favouriteCharacter.includes(this.link)) {
 					for (var i = 0; i < ui.favouriteCharacter.childElementCount; i++) {
 						if (ui.favouriteCharacter.childNodes[i].link == this.link) {
 							break;
@@ -10877,7 +10883,7 @@ class Click extends Uninstantable {
 					}
 					if (get.mode() == 'guozhan') {
 						if (source._guozhanguess) {
-							if (!source._guozhanguess.contains(i)) {
+							if (!source._guozhanguess.includes(i)) {
 								node.classList.add('transparent');
 							}
 						}
@@ -10991,7 +10997,7 @@ class Click extends Uninstantable {
 		uiintro.type = 'config';
 		var modes = lib.config.modeorder || lib.config.all.mode.slice(0);
 		for (var i = 0; i < modes.length; i++) {
-			if (!lib.config.all.mode.contains(modes[i])) {
+			if (!lib.config.all.mode.includes(modes[i])) {
 				modes.splice(i--, 1);
 			}
 		}
@@ -12527,7 +12533,7 @@ class Click extends Uninstantable {
 		_status.clicked = true;
 		_status.tempunpop = true;
 		this.previousSibling.hide();
-		var node = ui.create.div('.switcher', this.parentNode).animate('start');
+		var node = ui.create.div('.switcher', this.parentNode).addTempClass('start');
 		for (var i = 0; i < this.choice.length; i++) {
 			var choice = ui.create.div('.pointerdiv', node);
 			choice.innerHTML = get.translation(this.choice[i]);
@@ -12671,7 +12677,7 @@ class Click extends Uninstantable {
 		if (!ui.menuContainer) return;
 		var avatar = this;
 		var player = this.parentNode;
-		if (!game.players.contains(player) && !game.dead.contains(player)) return;
+		if (!game.players.includes(player) && !game.dead.includes(player)) return;
 		if (!this._doubleClicking) {
 			this._doubleClicking = true;
 			setTimeout(function () {
@@ -12690,7 +12696,7 @@ class Click extends Uninstantable {
 		if (!ui.menuContainer) return;
 		var avatar = this;
 		var player = this.parentNode;
-		if (!game.players.contains(player) && !game.dead.contains(player)) return;
+		if (!game.players.includes(player) && !game.dead.includes(player)) return;
 		if (!this._doubleClicking) {
 			this._doubleClicking = true;
 			setTimeout(function () {
@@ -13020,7 +13026,7 @@ class Click extends Uninstantable {
 			if (_status.event.type == 'phase' && ui.confirm) {
 				ui.confirm.classList.add('removing');
 			}
-			// ui.control.animate('nozoom',100);
+			// ui.control.addTempClass('nozoom',100);
 			event.restore();
 			var cards = event.player.getCards('hej');
 			for (var i = 0; i < cards.length; i++) {
@@ -13158,7 +13164,7 @@ class Click extends Uninstantable {
 							}
 							else {
 								delete lib.config.skin[nameskin];
-								if (gzbool && lib.character[nameskin2][4].contains('gzskin') && lib.config.mode_config.guozhan.guozhanSkin) {
+								if (gzbool && lib.character[nameskin2][4].includes('gzskin') && lib.config.mode_config.guozhan.guozhanSkin) {
 									bg.setBackground(nameskin2, 'character');
 									if (sourcenode) sourcenode.setBackground(nameskin2, 'character');
 									if (avatar) avatar.setBackground(nameskin2, 'character');
@@ -13176,7 +13182,7 @@ class Click extends Uninstantable {
 							button.setBackgroundImage('image/skin/' + nameskin + '/' + i + '.jpg');
 						}
 						else {
-							if (gzbool && lib.character[nameskin2][4].contains('gzskin') && lib.config.mode_config.guozhan.guozhanSkin) button.setBackground(nameskin2, 'character', 'noskin');
+							if (gzbool && lib.character[nameskin2][4].includes('gzskin') && lib.config.mode_config.guozhan.guozhanSkin) button.setBackground(nameskin2, 'character', 'noskin');
 							else button.setBackground(nameskin, 'character', 'noskin');
 						}
 					}
@@ -13237,7 +13243,7 @@ class Click extends Uninstantable {
 		ban._banning = 'offline';
 		ban.updateBanned = function () {
 			if (noedit === true) return;
-			if (lib.config[get.mode() + '_banned'] && lib.config[get.mode() + '_banned'].contains(name)) {
+			if (lib.config[get.mode() + '_banned'] && lib.config[get.mode() + '_banned'].includes(name)) {
 				ban.classList.add('active');
 			}
 			else {
@@ -13263,7 +13269,7 @@ class Click extends Uninstantable {
 			fav.classList.add('unselectable');
 			ban.classList.add('unselectable');
 		}
-		else if (lib.config.favouriteCharacter.contains(name)) {
+		else if (lib.config.favouriteCharacter.includes(name)) {
 			fav.classList.add('active');
 		}
 
@@ -13337,14 +13343,14 @@ class Click extends Uninstantable {
 				if (info.alter) {
 					intro2.innerHTML += '<br><br><div class="hrefnode skillversion"></div>';
 					var skillversionnode = intro2.querySelector('.hrefnode.skillversion');
-					if (lib.config.vintageSkills.contains(skill)) {
+					if (lib.config.vintageSkills.includes(skill)) {
 						skillversionnode.innerHTML = '切换至新版';
 					}
 					else {
 						skillversionnode.innerHTML = '切换至旧版';
 					}
 					skillversionnode.listen(function () {
-						if (lib.config.vintageSkills.contains(skill)) {
+						if (lib.config.vintageSkills.includes(skill)) {
 							lib.config.vintageSkills.remove(skill);
 							lib.translate[skill + '_info'] = lib.translate[skill + '_info_alter'];
 						}
@@ -13552,14 +13558,14 @@ class Click extends Uninstantable {
 					introduction2.appendChild(document.createElement('br'));
 					ui.create.div('.hrefnode.skillversion', introduction2);
 					var skillversionnode = introduction2.querySelector('.hrefnode.skillversion');
-					if (lib.config.vintageSkills.contains(skill)) {
+					if (lib.config.vintageSkills.includes(skill)) {
 						skillversionnode.innerHTML = '切换至新版';
 					}
 					else {
 						skillversionnode.innerHTML = '切换至旧版';
 					}
 					skillversionnode.listen(function () {
-						if (lib.config.vintageSkills.contains(skill)) {
+						if (lib.config.vintageSkills.includes(skill)) {
 							lib.config.vintageSkills.remove(skill);
 							lib.translate[skill + '_info'] = lib.translate[skill + '_info_alter'];
 						}
@@ -13801,7 +13807,7 @@ class Click extends Uninstantable {
 		game.pause2();
 		var node = ui.create.pause();
 		if (!node) return;
-		node.animate('start');
+		node.addTempClass('start');
 		ui.sidebar3.innerHTML = '';
 		if (lib.config.show_discardpile) {
 			for (var i = 0; i < ui.discardPile.childNodes.length; i++) {
@@ -14141,7 +14147,7 @@ export class UI extends Uninstantable {
 					stayleft._offset += stayleft.currentLeft;
 
 					if (current_offset != stayleft._offset) {
-						stayleft.animate('controlpressdownx', 500);
+						stayleft.addTempClass('controlpressdownx', 500);
 						stayleft.style.transform = 'translateX(' + stayleft._offset + 'px)';
 					}
 				}
@@ -14159,7 +14165,7 @@ export class UI extends Uninstantable {
 		if (minoffset > offset) offset = minoffset;
 		var control = controls.shift();
 		if (control._offset != offset) {
-			control.animate('controlpressdownx', 500);
+			control.addTempClass('controlpressdownx', 500);
 			control.style.transform = 'translateX(' + offset + 'px)';
 			control._offset = offset;
 		}
@@ -14171,7 +14177,7 @@ export class UI extends Uninstantable {
 				offset += 6;
 			}
 			if (control._offset != offset) {
-				control.animate('controlpressdownx', 500);
+				control.addTempClass('controlpressdownx', 500);
 				control.style.transform = 'translateX(' + offset + 'px)';
 				control._offset = offset;
 			}

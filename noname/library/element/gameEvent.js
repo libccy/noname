@@ -7,7 +7,7 @@ import { UI as ui } from '../../ui/index.js';
 import { AsyncFunction } from '../../util/index.js';
 
 export class GameEvent {
-	/** @type { import('../index.js').GameEventPromise } */
+	/** @type { GameEventPromise } */
 	#promise;
 	/**
 	 * @param {string} [name]
@@ -26,11 +26,11 @@ export class GameEvent {
 		this.step = 0;
 		this.finished = false;
 		/**
-		 * @type {(import('../index.js').GameEventPromise)[]}
+		 * @type {GameEventPromise[]}
 		 */
 		this.next = [];
 		/**
-		 * @type {(import('../index.js').GameEventPromise)[]}
+		 * @type {GameEventPromise[]}
 		 */
 		this.after = [];
 		this.custom = {
@@ -218,7 +218,7 @@ export class GameEvent {
 		this.finish();
 		if (notrigger != 'notrigger') {
 			this.trigger(this.name + 'Cancelled');
-			if (this.player && lib.phaseName.contains(this.name)) this.player.getHistory('skipped').add(this.name);
+			if (this.player && lib.phaseName.includes(this.name)) this.player.getHistory('skipped').add(this.name);
 		}
 		return this;
 	}
@@ -249,7 +249,7 @@ export class GameEvent {
 		if (!this.player) return this;
 		var hidden = this.player.hiddenSkills.slice(0);
 		game.expandSkills(hidden);
-		if (hidden.contains(skill)) this.set('hsskill', skill);
+		if (hidden.includes(skill)) this.set('hsskill', skill);
 		return this;
 	}
 	set(key, value) {
@@ -301,7 +301,7 @@ export class GameEvent {
 
 	/**
 	 * 
-	 * @param {import("../util/index.js").AsyncFunction[] | keyof typeof lib.element.contents} contents
+	 * @param {Function | keyof typeof lib.element.contents} contents
 	 * @returns {GameEvent}
 	 */
 	setContents(contents) {
@@ -747,7 +747,7 @@ export class GameEvent {
 	/**
 	 * 事件转为Promise化
 	 * 
-	 * @returns { import('../index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	toPromise() {
 		if (!this.#promise) {
@@ -760,93 +760,93 @@ export class GameEvent {
 	 */
 	typeAnnotation() {
 		/**
-		 * @type {import('../index.js').Player}
+		 * @type { Player }
 		*/
 		// @ts-ignore
 		this.source;
 		/**
-		 * @type {import('../index.js').Player}
+		 * @type { Player }
 		 */
 		// @ts-ignore
 		this.player;
 		/**
-		 * @type {import('../index.js').Player}
+		 * @type { Player }
 		 */
 		// @ts-ignore
 		this.target;
 		/**
-		 * @type {import('../index.js').Player[]}
+		 * @type { Player[] }
 		 */
 		// @ts-ignore
 		this.targets;
 		/**
-		 * @type {import('../index.js').Card}
+		 * @type { Card }
 		 */
 		// @ts-ignore
 		this.card;
 		/**
-		 * @type {import('../index.js').Card[]}
+		 * @type { Card[] }
 		 */
 		// @ts-ignore
 		this.cards;
 		/**
-		 * @type {string}
+		 * @type { string }
 		 */
 		this.skill;
 		/**
-		 * @type {boolean}
+		 * @type { boolean }
 		 */
 		this.forced;
 		/**
-		 * @type {number}
+		 * @type { number }
 		 */
 		this.num;
 		/**
-		 * @type {GameEvent}
+		 * @type { GameEvent }
 		 */
 		// @ts-ignore
 		this._trigger;
 		/**
-		 * @type {Record<string, any>}
+		 * @type { Record<string, any> }
 		 */
 		this._result;
 		/**
-		 * @type {number}
+		 * @type { number }
 		 */
 		// @ts-ignore
 		this.baseDamage;
 		/**
-		 * @type {import('../index.js').Player}
+		 * @type { Player }
 		 */
 		// @ts-ignore
 		this.customSource;
 		/**
-		 * @type {number}
+		 * @type { number }
 		 */
 		// @ts-ignore
 		this.extraDamage;
 		/**
-		 * @type {string}
+		 * @type { string }
 		 */
 		// @ts-ignore
 		this.nature;
 		/**
-		 * @type {boolean}
+		 * @type { boolean }
 		 */
 		// @ts-ignore
 		this.notrigger;
 		/**
-		 * @type {number}
+		 * @type { number }
 		 */
 		// @ts-ignore
 		this.original_num;
 		/**
-		 * @type {boolean}
+		 * @type { boolean }
 		 */
 		// @ts-ignore
 		this.unreal;
 		/**
-		 * @type { import('../index.js').Button[] }
+		 * @type { Button[] }
 		 */
 		// @ts-ignore
 		this.excludeButton;

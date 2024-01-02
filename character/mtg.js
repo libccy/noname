@@ -72,7 +72,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'dieAfter'},
 						forced:true,
 						filter:function(event,player){
-							return !event.player.isMin()&&![player.name,player.name1,player.name2].contains(event.player.name);
+							return !event.player.isMin()&&![player.name,player.name1,player.name2].includes(event.player.name);
 						},
 						content:function(){
 							var skills=lib.character[trigger.player.name][3].slice(0);
