@@ -305,7 +305,7 @@ export async function onload(resetGameTimeout) {
 					connectCharacterPack.push(i);
 					continue;
 				}
-				if (j == 'character' && !lib.config.characters.contains(i) && lib.config.mode != 'connect') {
+				if (j == 'character' && !lib.config.characters.includes(i) && lib.config.mode != 'connect') {
 					if (lib.config.mode == 'chess' && get.config('chess_mode') == 'leader' && get.config('chess_leader_allcharacter')) {
 						for (k in character[i][j]) {
 							lib.hiddenCharacters.push(k);
@@ -324,18 +324,18 @@ export async function onload(resetGameTimeout) {
 						if (!character[i][j][k][4]) {
 							character[i][j][k][4] = [];
 						}
-						if (character[i][j][k][4].contains('boss') ||
-							character[i][j][k][4].contains('hiddenboss')) {
+						if (character[i][j][k][4].includes('boss') ||
+							character[i][j][k][4].includes('hiddenboss')) {
 							lib.config.forbidai.add(k);
 						}
-						if (lib.config.forbidai_user && lib.config.forbidai_user.contains(k)) {
+						if (lib.config.forbidai_user && lib.config.forbidai_user.includes(k)) {
 							lib.config.forbidai.add(k);
 						}
 						for (var l = 0; l < character[i][j][k][3].length; l++) {
 							lib.skilllist.add(character[i][j][k][3][l]);
 						}
 					}
-					if (j == 'skill' && k[0] == '_' && (lib.config.mode != 'connect' ? (!lib.config.characters.contains(i)) : (!character[i].connect))) {
+					if (j == 'skill' && k[0] == '_' && (lib.config.mode != 'connect' ? (!lib.config.characters.includes(i)) : (!character[i].connect))) {
 						continue;
 					}
 					if (j == 'translate' && k == i) {
@@ -421,7 +421,7 @@ export async function onload(resetGameTimeout) {
 						else lib.cardPackList[i] = card[i][j];
 					}
 					else {
-						if (lib.config.cards.contains(i)) {
+						if (lib.config.cards.includes(i)) {
 							var pile;
 							if (typeof card[i][j] == 'function') {
 								pile = card[i][j]();
@@ -453,7 +453,7 @@ export async function onload(resetGameTimeout) {
 				}
 				else {
 					for (k in card[i][j]) {
-						if (j == 'skill' && k[0] == '_' && !card[i][j][k].forceLoad && (lib.config.mode != 'connect' ? (!lib.config.cards.contains(i)) : (!card[i].connect))) {
+						if (j == 'skill' && k[0] == '_' && !card[i][j][k].forceLoad && (lib.config.mode != 'connect' ? (!lib.config.cards.includes(i)) : (!card[i].connect))) {
 							continue;
 						}
 						if (j == 'translate' && k == i) {
@@ -497,7 +497,7 @@ export async function onload(resetGameTimeout) {
 				if (typeof lib.card[lib.cardPack.mode_derivation[i]].derivation == 'string' && !lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]) {
 					lib.cardPack.mode_derivation.splice(i--, 1);
 				}
-				else if (typeof lib.card[lib.cardPack.mode_derivation[i]].derivationpack == 'string' && !lib.config.cards.contains(lib.card[lib.cardPack.mode_derivation[i]].derivationpack)) {
+				else if (typeof lib.card[lib.cardPack.mode_derivation[i]].derivationpack == 'string' && !lib.config.cards.includes(lib.card[lib.cardPack.mode_derivation[i]].derivationpack)) {
 					lib.cardPack.mode_derivation.splice(i--, 1);
 				}
 			}
@@ -507,9 +507,9 @@ export async function onload(resetGameTimeout) {
 		}
 		if (lib.config.mode != 'connect') {
 			for (i in play) {
-				if (lib.config.hiddenPlayPack.contains(i)) continue;
-				if (play[i].forbid && play[i].forbid.contains(lib.config.mode)) continue;
-				if (play[i].mode && play[i].mode.contains(lib.config.mode) == false) continue;
+				if (lib.config.hiddenPlayPack.includes(i)) continue;
+				if (play[i].forbid && play[i].forbid.includes(lib.config.mode)) continue;
+				if (play[i].mode && play[i].mode.includes(lib.config.mode) == false) continue;
 				for (j in play[i].element) {
 					if (!lib.element[j]) lib.element[j] = [];
 					for (k in play[i].element[j]) {
@@ -568,13 +568,13 @@ export async function onload(resetGameTimeout) {
 		lib.connectCardPack = [];
 		for (var i = 0; i < lib.config.all.characters.length; i++) {
 			var packname = lib.config.all.characters[i];
-			if (connectCharacterPack.contains(packname)) {
+			if (connectCharacterPack.includes(packname)) {
 				lib.connectCharacterPack.push(packname)
 			}
 		}
 		for (var i = 0; i < lib.config.all.cards.length; i++) {
 			var packname = lib.config.all.cards[i];
-			if (connectCardPack.contains(packname)) {
+			if (connectCardPack.includes(packname)) {
 				lib.connectCardPack.push(packname)
 			}
 		}
@@ -594,7 +594,7 @@ export async function onload(resetGameTimeout) {
 					lib.card.list.splice(i, 1); i--;
 				}
 				else if (lib.card[lib.card.list[i][2]].mode &&
-					lib.card[lib.card.list[i][2]].mode.contains(lib.config.mode) == false) {
+					lib.card[lib.card.list[i][2]].mode.includes(lib.config.mode) == false) {
 					lib.card.list.splice(i, 1); i--;
 				}
 			}
