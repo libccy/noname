@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'collab',
 		connect:true,
 		character:{
+			dc_sunce:['male','wu',4,['dcshuangbi']],
 			nezha:['male','qun',2,['dcsantou','dcfaqi']],
 			dc_caocao:['male','wei',4,['dcjianxiong']],
 			dc_liubei:['male','shu',4,['dcrende']],
@@ -34,10 +35,89 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				collab_tongque:["sp_fuwan","sp_fuhuanghou","sp_jiben","old_lingju",'sp_mushun'],
 				collab_duanwu:['sunwukong','longwang','taoshen'],
 				collab_decade:['libai','xiaoyuehankehan','zhutiexiong','wu_zhutiexiong'],
-				collab_remake:['dc_caocao','dc_liubei','dc_sunquan','nezha'],
+				collab_remake:['dc_caocao','dc_liubei','dc_sunquan','nezha','dc_sunce'],
 			},
 		},
 		skill:{
+			//孙策
+			//双壁=100%技能周瑜+100%原画孙策
+			dcshuangbi:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				content:function*(event,map){
+					var player=map.player,num=game.countPlayer();
+					var result=yield player.chooseControl().set('choiceList',[
+						'摸'+get.cnNumber(num)+'张牌，本回合手牌上限+'+parseFloat(num),
+						'弃置至多'+get.cnNumber(num)+'张牌，随机对其他角色造成等量火焰伤害',
+						'视为使用'+get.cnNumber(num)+'张火【杀】或【火攻】',
+					]).set('ai',()=>{
+						var player=_status.event.player,card={name:'sha',nature:'fire'};
+						if(!game.hasPlayer(target=>player.canUse(card,target)&&get.effect(target,card,player,player)>0)) return 0;
+						return 2;
+					});
+					player.flashAvatar('dcshuangbi',['re_zhouyu','shen_zhouyu','dc_sb_zhouyu'][result.index]);
+					switch(result.index){
+						case 0:
+							player.draw(num);
+							player.addTempSkill('dcshuangbi_effect');
+							player.addMark('dcshuangbi_effect',num,false);
+							break;
+						case 1:
+							var result2=yield player.chooseToDiscard('双壁：弃置至多'+get.cnNumber(num)+'张牌，随机对其他角色造成等量火焰伤害',[1,num],'he').set('ai',card=>1/(get.value(card)||0.5));
+							if(result2.bool){
+								var map={},sum=result2.cards.length;
+								var targets=game.filterPlayer(target=>target!=player);
+								if(targets.length){
+									while(sum){
+										sum--;
+										var target=targets.randomGet();
+										player.line(target);
+										target.damage(1,'fire');
+										game.delayx();
+									}
+								}
+							}
+							break;
+						case 2:
+							while(num&&game.hasPlayer(target=>player.canUse({name:'sha',nature:'fire'},target)||player.canUse({name:'huogong'},target))){
+								num--;
+								var list=[];
+								if(game.hasPlayer(target=>player.canUse({name:'sha',nature:'fire'},target))) list.push(['基本','','sha','fire']);
+								if(game.hasPlayer(target=>player.canUse({name:'huogong'},target))) list.push(['锦囊','','huogong']);
+								var result2=yield player.chooseButton([
+									'双壁：请选择你要使用的牌',
+									[list,'vcard']],
+								true).set('ai',button=>button.link[2]=='sha'?1:0);
+								if(result2.bool){
+									var card={
+										name:result2.links[0][2],
+										nature:result2.links[0][3],
+									};
+									yield player.chooseUseTarget(true,card,false);
+								}
+								else break;
+							}
+							break;
+					}
+				},
+				ai:{
+					order:9,
+					result:{player:1},
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove:true,
+						intro:{content:'手牌上限+#'},
+						mod:{
+							maxHandcard:function(player,num){
+								return num+player.countMark('dcshuangbi_effect');
+							},
+						},
+					},
+				},
+			},
 			//哪吒
 			dcsantou:{
 				audio:2,
@@ -1763,6 +1843,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcsantou_info:'锁定技。①当你受到伤害时，防止之，然后若以下有条件成立，你失去1点体力：1.你于本回合此前以此法防止过该伤害来源的伤害，且你的体力值不小于3；2.本次伤害为属性伤害，且你的体力值为2；3.本次伤害的渠道为红色的牌，且你的体力值为1。②游戏开始时，若你的体力上限小于3，你将体力上限加至3并将体力回复至3。',
 			dcfaqi:'法器',
 			dcfaqi_info:'当你于出牌阶段使用装备牌结算结束后，你视为使用一张本回合未以此法使用过的普通锦囊牌。',
+			dc_sunce:'经典孙策',
+			dc_sunce_prefix:'经典',
+			dcshuangbi:'双壁',
+			dcshuangbi_info:'出牌阶段限一次，你可以选择一项：①摸X张牌，本回合手牌上限+X；②弃置至多X张牌，随机对其他角色造成等量火焰伤害；③视为使用X张火【杀】或【火攻】。（X为场上存活角色数）',
 			
 			collab_olympic:'OL·伦敦奥运会',
 			collab_tongque:'OL·铜雀台',

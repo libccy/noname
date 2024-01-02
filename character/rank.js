@@ -126,6 +126,8 @@ window.noname_character_rank={
 		'jsrg_pangtong',
 		'star_caoren',
 		'clan_xunyou',
+		'caoxian',
+		'sb_guanyu',
 	],
 	a:[
 		'diy_zaozhirenjun',
@@ -1810,6 +1812,7 @@ window.noname_character_rank={
 			'shichangshi',
 			'dc_guansuo',
 			'dc_xujing',
+			'caoxian',
 		],
 		epic:[
 			'ol_pengyang',

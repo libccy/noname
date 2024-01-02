@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			caoxian:['female','wei',3,['dclingxi','dczhifou']],
 			dc_sb_zhouyu:['male','wu',4,['dcsbronghuo','dcsbyingmou']],
 			dc_sb_lusu:['male','wu',3,['dcsbmingshi','dcsbmengmou']],
 			zhangjian:['male','qun',105,['dc_zj_a','dc_zj_b'],['unseen']],
@@ -96,7 +97,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji'],
 				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie'],
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
-				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue'],
+				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue','caoxian'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan','caoyi'],
 				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli'],
@@ -109,6 +110,173 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//曹宪
+			dclingxi:{
+				audio:2,
+				trigger:{player:['phaseUseBegin','phaseUseEnd']},
+				filter:function(event,player){
+					return player.countCards('he')&&player.maxHp>0;
+				},
+				direct:true,
+				content:function*(event,map){
+					var player=map.player,num=player.maxHp;
+					var result=yield player.chooseCard(get.prompt('dclingxi'),'将至多'+get.cnNumber(num)+'张牌称为“翼”置于武将牌上','he',[1,num]).set('ai',card=>{
+						var player=_status.event.player;
+						if(player.countCards('hs',card=>player.hasValueTarget(card))&&player.countCards('hs',card=>player.hasValueTarget(card)&&!ui.selected.cards.includes(card))<=2) return 0;
+						return 6-get.value(card)+(player.getExpansions('dclingxi').some(cardx=>get.suit(card,false)==get.suit(cardx,false))?1:3);
+					}).set('complexCard',true);
+					if(result.bool){
+						player.logSkill('dclingxi');
+						player.addToExpansion(result.cards,player,'give').gaintag.add('dclingxi');
+					}
+				},
+				marktext:'翼',
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+				onremove:function(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				group:'dclingxi_effect',
+				subSkill:{
+					effect:{
+						audio:'dclingxi',
+						trigger:{
+							player:'loseAfter',
+							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter'],
+						},
+						filter:function(event,player){
+							var num=2*player.getExpansions('dclingxi').reduce((list,card)=>list.add(get.suit(card,false)),[]).length;
+							num-=player.countCards('h');
+							if(!num) return false;
+							if(event.name=='lose'&&event.getlx!==false){
+								for(var i in event.gaintag_map){
+									if(event.gaintag_map[i].includes('dclingxi')) return true;
+								}
+								return false;
+							}
+							return game.getGlobalHistory('cardMove',function(evt){
+								if(evt.name!='lose'||event!=evt.getParent()) return false;
+								for(var i in evt.gaintag_map){
+									if(evt.gaintag_map[i].includes('dclingxi')) return evt.player==player;
+								}
+								return false;
+							}).length;
+						},
+						forced:true,
+						locked:false,
+						content:function(){
+							var num=2*player.getExpansions('dclingxi').reduce((list,card)=>list.add(get.suit(card,false)),[]).length;
+							num-=player.countCards('h');
+							if(num>0) player.draw(num);
+							else player.chooseToDiscard('h',-num,true);
+						},
+					},
+				},
+			},
+			dczhifou:{
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				filter:function(event,player){
+					var num=Math.max(player.getHistory('useSkill',evt=>evt.skill=='dczhifou').length,1);
+					return player.getExpansions('dclingxi').length>=num;
+				},
+				direct:true,
+				content:function*(event,map){
+					var player=map.player,cards=player.getExpansions('dclingxi');
+					var num=Math.max(player.getHistory('useSkill',evt=>evt.skill=='dczhifou').length,1);
+					var result=yield player.chooseButton(['###'+get.prompt('dczhifou')+'###移去至少'+get.cnNumber(num)+'张武将牌上的“翼”',cards],[num,cards.length]).set('ai',button=>{
+						var player=_status.event.player;
+						if(2*player.getExpansions('dclingxi').filter(card=>!ui.selected.buttons.some(but=>but.link==card)).reduce((list,card)=>list.add(get.suit(card,false)),[]).length-player.countCards('h')<=0) return 0;
+						if(player.getExpansions('dclingxi').filter(card=>!ui.selected.buttons.some(but=>get.suit(but.link,false)==get.suit(card,false)))) return 3;
+						return 1;
+					}).set('num',num);
+					if(result.bool){
+						player.logSkill('dczhifou');
+						player.loseToDiscardpile(result.links);
+						var list=[],choiceList=[
+							'将一张牌称为“翼”置于'+get.translation(player)+'的武将牌上',
+							'弃置两张牌',
+							'失去1点体力',
+						];
+						if(!player.hasSkill('dczhifou_0')&&game.hasPlayer(target=>target.countCards('he'))) list.push('置入“翼”');
+						else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
+						if(!player.hasSkill('dczhifou_1')&&game.hasPlayer(target=>{
+							return target==player?target.countDiscardableCards(target,'he'):target.countCards('he');
+						})) list.push('弃置卡牌');
+						else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+						if(!player.hasSkill('dczhifou_2')) list.push('失去体力');
+						else choiceList[2]='<span style="opacity:0.5">'+choiceList[2]+'</span>';
+						if(!list.length) return;
+						var str='';
+						for(var i of list){
+							str+=i;
+							str+='、';
+						}
+						str=str.slice(0,-1);
+						var result2=yield player.chooseTarget('知否：令一名角色执行以下一项',str,(card,player,target)=>{
+							if(!player.hasSkill('dczhifou_2')) return true;
+							if(!player.hasSkill('dczhifou_0')&&target.countCards('he')) return true;
+							return target==player?target.countDiscardableCards(target,'he'):target.countCards('he');
+						},true).set('ai',target=>{
+							var player=_status.event.player,list=[];
+							if(!player.hasSkill('dczhifou_0')) list.push(get.effect(target,{name:'guohe_copy2'},target,player)/2);
+							if(!player.hasSkill('dczhifou_1')) list.push(get.effect(target,{name:'guohe_copy2'},target,player));
+							if(!player.hasSkill('dczhifou_2')) list.push(get.effect(target,{name:'losehp'},player,player));
+							return list.sort((a,b)=>b-a)[0];
+						});
+						if(result2.bool){
+							var target=result2.targets[0];
+							player.line(target);
+							list=list.filter(control=>{
+								if(control=='失去体力') return true;
+								if(control=='置入“翼”'&&target.countCards('he')) return true;
+								return target.countDiscardableCards(target,'he');
+							});
+							var result3;
+							if(!list.length){
+								game.log(target,'没有可执行项');
+								return;
+							}
+							else if(list.length==1) result3={control:list[0]};
+							else result3=yield target.chooseControl(list).set('prompt','知否：请选择一项').set('choiceList',choiceList).set('ai',()=>{
+								var player=_status.event.player;
+								var getNum=function(control){
+									return [
+										get.effect(player,{name:'guohe_copy2'},player,player)/2,
+										get.effect(player,{name:'guohe_copy2'},player,player),
+										get.effect(player,{name:'losehp'},player,player),
+									][['置入“翼”','弃置卡牌','失去体力'].indexOf(control)];
+								};
+								var controls=_status.event.controls.slice();
+								return controls.sort((a,b)=>getNum(b)-getNum(a))[0];
+							});
+							switch(result3.control){
+								case '置入“翼”':
+									player.addTempSkill('dczhifou_0');
+									var result4=yield target.chooseCard('he',choiceList[0],true);
+									if(result4.bool) player.addToExpansion(result4.cards,target,'give').gaintag.add('dclingxi');
+									break;
+								case '弃置卡牌':
+									player.addTempSkill('dczhifou_1');
+									target.chooseToDiscard('he',2,true);
+									break;
+								case '失去体力':
+									player.addTempSkill('dczhifou_2');
+									target.loseHp();
+									break;
+							}
+						}
+					}
+				},
+				subSkill:{
+					'0':{charlotte:true},
+					'1':{charlotte:true},
+					'2':{charlotte:true},
+				},
+			},
 			//周瑜
 			//无 双 万 军 取 首
 			dcsbronghuo:{
@@ -13078,6 +13246,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterIntro:{
+			caoxian:'曹宪（生卒年不详），女，沛国谯县（今安徽省亳州市）人。东汉末年历史人物，汉献帝刘协嫔妃，魏武帝曹操女儿。建安十八年，嫁给汉献帝刘协，受封为贵人。黄初元年（220年），兄弟曹丕称帝后，汉献帝成为山阳公，不知所终。',
 			zhangjian:'张臶（136年－240年），字子明，钜鹿人。汉末三国时期隐士、音乐家，精通谶纬之学。张臶生活的年代从东汉一直到曹魏齐王时期，受到朝廷多次征召，一直回避，不愿做官。他活了一百零五岁，是三国时期有可靠记载的最长寿的人之一。',
 			puyuan:'蒲元是三国时蜀汉杰出的工匠。为诸葛亮造刀三千口，并且制作木牛流马。后来姜维为他写过两部传记《蒲元传》《蒲元别传》。',
 			guanlu:"管辂（209年－256年），字公明，平原（今山东德州平原县）人。三国时期曹魏术士。年八九岁，便喜仰观星辰。成人后，精通《周易》，善于卜筮、相术，习鸟语，相传每言辄中，出神入化。体性宽大，常以德报怨。正元初，为少府丞。北宋时被追封为平原子。管辂是历史上著名的术士，被后世奉为卜卦观相的祖师。",
@@ -13746,6 +13915,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcsbronghuo_info:'锁定技，当你使用火【杀】或【火攻】时，此牌伤害基值改为场上势力数。',
 			dcsbyingmou:'英谋',
 			dcsbyingmou_info:'转换技，每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色：阴，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】；阳，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌（若其没有可使用的牌则将手牌数弃至与你相同）。',
+			caoxian:'曹宪',
+			dclingxi:'灵犀',
+			dclingxi_info:'出牌阶段开始和结束时，你可以将至多X张牌称为“翼”置于你的武将牌上（X为你的体力上限）。当你失去武将牌上的“翼”时，你将手牌数调整至Y张（Y为你武将牌上的“翼”所含有的花色数的两倍）。',
+			dczhifou:'知否',
+			dczhifou_info:'当你使用牌结算完毕后，你可以移去至少X张武将牌上的“翼”（X为本回合此前发动此技能的次数，且X至少为1），然后令一名角色选择执行以下一项：①将一张牌称为“翼”置于你的武将牌上；②弃置两张牌；③失去1点体力。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
