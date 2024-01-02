@@ -79,4 +79,6 @@ declare interface Window {
         ensureDirectory: () => any,
         createDir: () => any,
     })): void;
+
+    bannedKeyWords: string[];
 }
