@@ -3,6 +3,9 @@ export const assetURL = typeof nonameInitialized != 'string' || nonameInitialize
 export const GeneratorFunction = (function* () { }).constructor;
 export const AsyncFunction = (async function () { }).constructor;
 export const userAgent = navigator.userAgent.toLowerCase();
+
+export * as config from './config.js'
+
 /**
  * 不能被new的类
  */
