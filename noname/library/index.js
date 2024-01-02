@@ -19,6 +19,7 @@ import { GNC as gnc } from '../gnc/index.js';
 import { LibInit } from "./init/index.js";
 import { Announce } from "./announce/index.js";
 import { Channel } from "./channel/index.js";
+import { Experimental } from "./experimental/index.js";
 import * as Element from "./element/index.js";
 
 
@@ -119,6 +120,7 @@ export class Library extends Uninstantable {
 		this.playerOL;
 		throw new Error('Do not call this method');
 	}
+
 	//函数钩子
 	static hooks = {
 		// 本体势力的颜色
@@ -300,6 +302,7 @@ export class Library extends Uninstantable {
 			}
 		}],
 	};
+
 	/**
 	 * **无名杀频道推送机制**
 	 * 
@@ -311,7 +314,6 @@ export class Library extends Uninstantable {
 	 * 
 	 * 若需要异步/不报错发送信息，请等待`lib.actor`
 	 * 
-	 * @template T
 	 * @example
 	 * // 创建一个频道
 	 * const channel = new lib.channel();
@@ -323,6 +325,7 @@ export class Library extends Uninstantable {
 	 * await channel.send(item);
 	 */
 	static channel = Channel;
+
 	/**
 	 * **无名杀消息推送库**
 	 * 
@@ -349,6 +352,7 @@ export class Library extends Uninstantable {
 	 * lib.announce.unsubscribe("skinChange", method);
 	 */
 	static announce = new Announce(new EventTarget(), new WeakMap());
+
 	static objectURL = new Map();
 	static hookmap = {};
 	static imported = {};
@@ -9390,6 +9394,9 @@ export class Library extends Uninstantable {
 		stratagem_fury: '怒气',
 		_stratagem_add_buff: '强化'
 	};
+
+	static experimental = Experimental
+
 	static element = {
 		content: Element.Content,
 		contents: Element.Contents,
