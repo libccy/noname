@@ -3143,7 +3143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					var list=['basic','trick','equip'];
 					for(var i of list){
-						if(i!=event.type) player.addTempSkill('dczhanyi_'+i);
+						if(i!=event.type) player.addTempSkill('dczhanyi_'+i,{player:'phaseBegin'});
 					}
 				},
 				subSkill:{
