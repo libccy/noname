@@ -5274,7 +5274,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										var target2=guessTargets.shift();
 										var result2=yield target2.chooseButton(['请猜测'+get.translation(target)+'伪装的手牌',cards],true).set('ai',button=>{
 											var cards=_status.event.cards.slice();
-											var card=cards.find(card=>lib.card.list.some(cardx=>cardx[2]==card.name)&&!lib.card.list.some(cardx=>cardx[2]==card.name&&cardx[0]==get.suit(card,false)&&cardx[0]==get.number(card,false)));
+											var card=cards.find(card=>lib.card.list.some(cardx=>cardx[2]==get.name(card,false))&&!lib.card.list.some(cardx=>cardx[2]==get.name(card,false)&&cardx[0]==get.suit(card,false)&&cardx[0]==get.number(card,false)));
 											return button.link==card?3:1+Math.random();
 										}).set('cards',cards);
 										if(result2.bool){
@@ -5298,7 +5298,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										game.broadcastAll(()=>{
 											if(lib.config.background_speak) game.playAudio('skill','mbdaoshu3');
 										});
-										if(target2.countCards('h')>=2) target.discard(target.getCards('h').randomGets(2));
+										if(target2.countCards('h')>=2) target2.discard(target2.getCards('h').randomGets(2));
 										else target2.loseHp();
 									}
 								});
