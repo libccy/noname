@@ -2121,6 +2121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					storage:{dcjieling:true}
 				},
 				filterCard:function(card,player){
+					if(player.getStorage('dcjieling_count').includes(get.suit(card))) return false;
 					if(ui.selected.cards.length){
 						return get.suit(card)!=get.suit(ui.selected.cards[0]);
 					}
