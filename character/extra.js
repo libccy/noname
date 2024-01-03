@@ -1131,11 +1131,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'damageEnd',
 					source:'damageSource',
 				},
-				forced:true,
-				filter:function(event,player,name){
-					var key=(name=='damageEnd'?'damage':'sourceDamage');
-					return player.getAllHistory(key).indexOf(event)%2==1;
+				filter:function(event,player){
+					return game.getGlobalHistory('damage',evt=>evt.player==player||(evt.source&&evt.source==player)).indexOf(event)%2==1;
 				},
+				forced:true,
 				content:function(){
 					'step 0'
 					var tags=['dctuoyu_fengtian','dctuoyu_qingqu','dctuoyu_junshan'];
@@ -1158,20 +1157,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			dcqijing:{
+				derivation:'dccuixin',
 				audio:2,
 				trigger:{global:'phaseEnd'},
-				forced:true,
-				juexingji:true,
-				derivation:'dccuixin',
-				skillAnimation:true,
-				animationColor:'orange',
 				filter:function(event,player){
 					return player.getStorage('dctuoyu').length==3;
 				},
+				forced:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'orange',
 				content:function(){
 					'step 0'
 					player.awakenSkill('dcqijing');
 					player.loseMaxHp();
+					player.addSkillLog('dccuixin');
 					'step 1'
 					if(game.countPlayer()>2){
 						if(player==trigger.player&&!trigger.skill){
@@ -1202,7 +1202,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},player,target);
 					}
 					'step 3'
-					player.addSkill('dccuixin');
 					player.insertPhase();
 				},
 			},
@@ -7977,9 +7976,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dctuoyu_junshan_tag:'<span data-nature="thundermm">峻山</span>',
 			dctuoyu_info:'①锁定技。当你使用拥有对应副区域标签的牌时，你令此牌获得对应效果。<br>丰田：伤害值或回复值+1；清渠：无次数和距离限制；峻山：不可被响应。②出牌阶段开始时和结束时，你给你的手牌分配对应的已激活副区域标签（每个区域至多五张）。',
 			dcxianjin:'险进',
-			dcxianjin_info:'锁定技。当你造成或受到伤害后，若这是你本局游戏内第偶数次造成或受到伤害，则你激活一个副区域标签并摸X张牌（X为你已激活的副区域数，若你的手牌数为全场最多则改为摸一张牌）。',
+			dcxianjin_info:'锁定技。当你每造成或受到两次伤害后，你激活一个副区域标签并摸X张牌（X为你已激活的副区域数，若你的手牌数为全场最多则改为摸一张牌）。',
 			dcqijing:'奇径',
-			dcqijing_info:'觉醒技。一名角色的回合结束后，若你的三个副区域标签均被激活，则你减1点体力上限，将座位移动至一名其他角色的上家之后，获得〖摧心〗和一个额外回合。',
+			dcqijing_info:'觉醒技。一名角色的回合结束后，若你的三个副区域标签均被激活，则你减1点体力上限，获得〖摧心〗，将座位移动至一名其他角色的上家之后，然后执行一个额外回合。',
 			dccuixin:'摧心',
 			dccuixin_info:'当你不因此技能使用的基本牌或普通锦囊牌结算结束后，若此牌的目标于你使用此牌指定第一个目标时包含你的上家或下家，则你可以视为对下家或上家再使用一张牌名和元素相同的牌。',
 			shen_dianwei:'神典韦',
