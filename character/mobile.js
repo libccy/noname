@@ -66,7 +66,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_jushou:['male','qun','2/3/3',['xinjianying','shibei']],
 			re_bulianshi:['female','wu',3,['reanxu','zhuiyi']],
 			re_caiwenji:['female','qun',3,['rebeige','duanchang']],
-			sp_jianggan:['male','wei',3,['spdaoshu','spdaizui']],
+			sp_jianggan:['male','wei',3,['mbdaoshu','spdaizui']],
 			peixiu:['male','qun',3,['xingtu','juezhi']],
 			re_gaoshun:['male','qun',4,['rexianzhen','rejinjiu']],
 			re_wuguotai:['female','wu',3,['reganlu','buyi']],
@@ -441,7 +441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(result.bool){
 							var target=result.targets[0];
 							player.logSkill('guimou',target);
-							var result2=yield player.choosePlayerCard(target,'h','visible','并选择其中至多三张牌，然后你可以将其中至多两张牌交给另一名其他角色，然后弃置剩余的牌',[1,3],true).set('ai',button=>get.value(button.link));
+							var result2=yield player.choosePlayerCard(target,'h','visible','<div class="text center">选择其中至多三张牌，然后你可以将其中至多两张牌交给另一名其他角色，然后弃置剩余的牌</div>',[1,3],true).set('ai',button=>get.value(button.link));
 							if(result2.bool){
 								var cards=result2.links.slice();
 								var result3;
@@ -5198,6 +5198,122 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			spdaoshu1:{audio:true},
+			mbdaoshu:{
+				audio:3,
+				group:'mbdaoshu_use',
+				subSkill:{
+					use:{
+						enable:'phaseUse',
+						filter:function(event,player){
+							return game.hasPlayer(target=>target!=player&&target.countCards('h')>2);
+						},
+						filterTarget:function(card,player,target){
+							return target!=player&&target.countCards('h')>2;
+						},
+						usable:1,
+						prompt:()=>lib.translate.mbdaoshu_info,
+						content:function*(event,map){
+							var player=map.player,target=event.target;
+							var targets=[player],names=lib.inpile.randomGets(3);
+							if(!names.length) return;
+							var map={};
+							names.forEach(name=>map[get.translation(name)]=name);
+							if(get.mode()!='identity'&&get.mode()!='guozhan') targets.addArray(player.getFriends());
+							targets.remove(target);
+							targets.sortBySeat();
+							var result=yield target.chooseButton([
+								'盗书：请选择伪装的牌和牌名',
+								target.getCards('h'),
+								[Object.keys(map),'tdnodes'],
+							],2,true).set('filterButton',button=>{
+								if(!ui.selected.buttons.length) return true;
+								if(typeof button.link==typeof ui.selected.buttons[0].link) return false;
+								if(typeof button.link=='string') return get.name(ui.selected.buttons[0].link,false)!=button.link;
+								return ui.selected.buttons[0].link!=get.name(button.link,false);
+							}).set('ai',button=>{
+								var map=_status.event.map;
+								if(!ui.selected.buttons.length){
+									if(typeof button.link=='object'){
+										if(Object.values(map).some(name=>lib.card.list.some(card=>card[0]==get.suit(button.link,false)&&card[1]==get.number(button.link,false)&&card[2]==name))) return 5;
+										return 3.5+Math.random();
+									}
+									return 0;
+								}
+								if(typeof button.link=='string'){
+									var cardx=ui.selected.buttons[0].link;
+									if(lib.card.list.some(card=>card[0]==get.suit(cardx,false)&&card[1]==get.number(cardx,false)&&card[2]==map[button.link])) return 2+Math.random();
+									return 1;
+								}
+								return 0;
+							}).set('map',map);
+							if(result.bool){
+								var guessWinner=[];
+								if(typeof result.links[0]=='string') result.links.reverse();
+								var OriginCard=result.links[0],ChangeName=result.links[1],cards=target.getCards('h').slice();
+								var card=game.createCard(ChangeName,get.suit(OriginCard,false),get.number(OriginCard,false));
+								cards[cards.indexOf(OriginCard)]=card;
+								if(_status.connectMode){
+									var list=targets.map(target2=>[target2,['请猜测'+get.translation(target)+'伪装的手牌',cards],true]);
+									var result2=yield player.chooseButtonOL(list).set('switchToAuto',()=>_status.event.result='ai').set('processAI',()=>{
+										var cards=_status.event.cards.slice();
+										var card=cards.find(card=>lib.card.list.some(cardx=>cardx[2]==card.name)&&!lib.card.list.some(cardx=>cardx[2]==card.name&&cardx[0]==get.suit(card,false)&&cardx[0]==get.number(card,false)));
+										return {
+											bool:true,
+											links:card?card:cards.randomGet(),
+										}
+									}).set('cards',cards);
+									for(var i in result2){
+										if(result2[i].links[0]==card) guessWinner.push(lib.playerOL[i]);
+									}
+								}
+								else{
+									var guessTargets=targets.slice();
+									while(guessTargets.length){
+										var target2=guessTargets.shift();
+										var result2=yield target2.chooseButton(['请猜测'+get.translation(target)+'伪装的手牌',cards],true).set('ai',button=>{
+											var cards=_status.event.cards.slice();
+											var card=cards.find(card=>lib.card.list.some(cardx=>cardx[2]==card.name)&&!lib.card.list.some(cardx=>cardx[2]==card.name&&cardx[0]==get.suit(card,false)&&cardx[0]==get.number(card,false)));
+											return button.link==card?3:1+Math.random();
+										}).set('cards',cards);
+										if(result2.bool){
+											if(result2.links[0]==card) guessWinner.push(target2);
+										}
+									}
+								}
+								targets.forEach(target2=>{
+									if(guessWinner.includes(target2)){
+										target2.popup('判断正确','wood');
+										game.log(target2,'猜测','#g正确');
+										game.broadcastAll(()=>{
+											if(lib.config.background_speak) game.playAudio('skill','mbdaoshu2');
+										});
+										target2.line(target);
+										target.damage(1,target2);
+									}
+									else{
+										target2.popup('判断错误','fire');
+										game.log(target2,'猜测','#y错误');
+										game.broadcastAll(()=>{
+											if(lib.config.background_speak) game.playAudio('skill','mbdaoshu3');
+										});
+										if(target2.countCards('h')>=2) target.discard(target.getCards('h').randomGets(2));
+										else target2.loseHp();
+									}
+								});
+							}
+						},
+						ai:{
+							order:9,
+							result:{
+								target:function(player,target){
+									return -1/target.countCards('h');
+								},
+							},
+						},
+					},
+				},
+			},
+			mbdaoshu1:{audio:true},
 			spdaizui:{
 				audio:2,
 				trigger:{player:'damageBegin2'},
@@ -15870,6 +15986,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spdaoshu_info:'每轮限一次。一名敌方角色的出牌阶段开始时，若其有手牌，则你可以令其视为使用一张【酒】。其须声明一个基本牌的牌名，然后你判断其手牌区内是否有该牌名的牌。若你判断正确，则你获得其两张手牌。',
 			spdaoshu_info_identity:'每轮限一次。一名其他角色的出牌阶段开始时，若其有手牌，则你可以令其视为使用一张【酒】。其须声明一个基本牌的牌名，然后你判断其手牌区内是否有该牌名的牌。若你判断正确，则你获得其两张手牌。',
 			spdaoshu_info_guozhan:'每轮限一次。一名其他角色的出牌阶段开始时，若其有手牌，则你可以令其视为使用一张【酒】。其须声明一个基本牌的牌名，然后你判断其手牌区内是否有该牌名的牌。若你判断正确，则你获得其两张手牌。',
+			mbdaoshu:'盗书',
+			mbdaoshu_info:'出牌阶段限一次，你可以选择一名手牌数大于两张的其他角色，其随机获得三个牌名并将一张手牌的牌名伪装成其中一个与原牌名不同的牌名，然后你和队友观看其手牌并猜测其伪装的手牌，猜对的角色对其造成1点伤害，猜错的角色随机弃置两张手牌（手牌数不足两张则改为失去1点体力）。',
+			mbdaoshu_info_identity:'出牌阶段限一次，你可以选择一名手牌数大于两张的其他角色，其随机获得三个牌名并将一张手牌的牌名伪装成其中一个与原牌名不同的牌名，然后你观看其手牌并猜测其伪装的手牌。若猜中，你对其造成1点伤害；若猜错，你随机弃置两张手牌（手牌数不足两张则改为失去1点体力）。',
+			mbdaoshu_info_guozhan:'出牌阶段限一次，你可以选择一名手牌数大于两张的其他角色，其随机获得三个牌名并将一张手牌的牌名伪装成其中一个与原牌名不同的牌名，然后你观看其手牌并猜测其伪装的手牌。若猜中，你对其造成1点伤害；若猜错，你随机弃置两张手牌（手牌数不足两张则改为失去1点体力）。',
 			spdaizui:'戴罪',
 			spdaizui2:'戴罪',
 			spdaizui_info:'限定技。当你受到伤害值不小于体力值的伤害时，你可防止此伤害并将此伤害渠道对应的所有实体牌置于伤害来源的武将牌上，称为“释”。本回合结束时，其获得所有“释”。',
