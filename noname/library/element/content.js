@@ -6666,7 +6666,7 @@ export const Content = {
 		ui.clear();
 	},
 	draw: async (event, _trigger, player) => {
-		const { num } = event;
+		let { num } = event;
 		// if(lib.config.background_audio){
 		// 	game.playAudio('effect','draw');
 		// }
