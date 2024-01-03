@@ -431,7 +431,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.removeSkill(skill);
 						}
 					}
-					targets=targets.filter(target=>target!=player);
+					targets=targets.filter(target=>target!=player&&target.countCards('h'));
 					if(targets.length){
 						var result=yield player.chooseTarget('请选择【诡谋】的目标','观看一名可选择的角色的手牌并选择其中至多三张牌，然后你可以将其中至多两张牌交给另一名其他角色，然后弃置剩余的牌',(card,player,target)=>{
 							return _status.event.targets.includes(target)&&target.countCards('h');
@@ -441,6 +441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(result.bool){
 							var target=result.targets[0];
 							player.logSkill('guimou',target);
+							player.addExpose(0.3);
 							var result2=yield player.choosePlayerCard(target,'h','visible','<div class="text center">选择其中至多三张牌，然后你可以将其中至多两张牌交给另一名其他角色，然后弃置剩余的牌</div>',[1,3],true).set('ai',button=>get.value(button.link));
 							if(result2.bool){
 								var cards=result2.links.slice();
