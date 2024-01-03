@@ -2088,7 +2088,7 @@ window.noname_character_rank={
 		],
 		rare:[
 			'mb_huban',
-			'mb_jianggan',
+			'sp_jianggan',
 			'ol_caozhang',
 			'ol_lingtong',
 			'luoxian',
