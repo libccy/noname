@@ -10,6 +10,9 @@ import { userAgent } from '../util/index.js';
 import * as config from '../util/config.js';
 import { gnc } from '../gnc/index.js';
 
+import { importCardPack, importCharacterPack, importExtension, importMode } from './import.js';
+import { onload } from './onload.js';
+
 // 无名杀，启动！
 export async function boot() {
 	// 不想看，反正别动
@@ -29,11 +32,8 @@ export async function boot() {
 
 	// 设定游戏加载时间，超过时间未加载就提醒
 	const configLoadTime = localStorage.getItem(lib.configprefix + 'loadtime');
-	Reflect.set(
-		window,
-		'resetGameTimeout',
-		setTimeout(lib.init.reset, configLoadTime ? parseInt(configLoadTime) : 10000)
-	);
+	// 现在不暴露到全局变量里了，直接传给onload
+	const resetGameTimeout = setTimeout(lib.init.reset, configLoadTime ? parseInt(configLoadTime) : 10000)
 
 	if (Reflect.has(window, 'cordovaLoadTimeout')) {
 		clearTimeout(Reflect.get(window, 'cordovaLoadTimeout'));
@@ -560,64 +560,7 @@ export async function boot() {
 	}
 
 	await waitDomLoad;
-	lib.init.onload();
-}
-
-/**
- * @param {string} name - 卡牌包名
- */
-async function importCardPack(name) {
-	try {
-		const cardPackContent = await import('../../card/' + name + '.js');
-		if (!cardPackContent.type) return;
-		if (cardPackContent.type !== 'card') throw new Error('Loaded Content is not a CardPack');
-		await game.import('card', cardPackContent.default);
-	} catch (e) {
-		console.error(e);
-	}
-}
-
-/**
- * @param {string} name - 武将包名
- */
-async function importCharacterPack(name) {
-	try {
-		const characterPackContent = await import('../../character/' + name + '.js');
-		if (!characterPackContent.type) return;
-		if (characterPackContent.type !== 'character') throw new Error('Loaded Content is not a CharacterPack');
-		await game.import('character', characterPackContent.default);
-	} catch (e) {
-		console.error(e);
-	}
-}
-
-/**
- * @param {string} name - 扩展名
- */
-async function importExtension(name) {
-	try {
-		const extensionContent = await import('../../extension/' + name + '/extension.js');
-		if (!extensionContent.type) return;
-		if (extensionContent.type !== 'extension') throw new Error('Loaded Content is not a Noname Extension');
-		await game.import('extension', extensionContent.default);
-	} catch (e) {
-		console.error(e);
-		game.removeExtension(name);
-	}
-}
-
-/**
- * @param {string} name - 模式名 
- */
-async function importMode(name) {
-	try {
-		const modeContent = await import('../../mode/' + name + '.js');
-		if (!modeContent.type) return;
-		if (modeContent.type !== 'mode') throw new Error('Loaded Content is not a Mode');
-		await game.import('mode', modeContent.default);
-	} catch (e) {
-		console.error(e);
-	}
+	await onload(resetGameTimeout);
 }
 
 function initSheet(libConfig) {
@@ -680,13 +623,13 @@ async function loadConfig() {
 			idbOpenDBRequest.onupgradeneeded = idbVersionChangeEvent => {
 				// @ts-expect-error MaybeHave
 				const idbDatabase = idbVersionChangeEvent.target.result;
-				if (!idbDatabase.objectStoreNames.includes('video')) idbDatabase.createObjectStore('video', {
+				if (!idbDatabase.objectStoreNames.contains('video')) idbDatabase.createObjectStore('video', {
 					keyPath: 'time'
 				});
-				if (!idbDatabase.objectStoreNames.includes('image')) idbDatabase.createObjectStore('image');
-				if (!idbDatabase.objectStoreNames.includes('audio')) idbDatabase.createObjectStore('audio');
-				if (!idbDatabase.objectStoreNames.includes('config')) idbDatabase.createObjectStore('config');
-				if (!idbDatabase.objectStoreNames.includes('data')) idbDatabase.createObjectStore('data');
+				if (!idbDatabase.objectStoreNames.contains('image')) idbDatabase.createObjectStore('image');
+				if (!idbDatabase.objectStoreNames.contains('audio')) idbDatabase.createObjectStore('audio');
+				if (!idbDatabase.objectStoreNames.contains('config')) idbDatabase.createObjectStore('config');
+				if (!idbDatabase.objectStoreNames.contains('data')) idbDatabase.createObjectStore('data');
 			};
 		});
 		Reflect.set(lib, 'db', event.target.result);
@@ -750,14 +693,13 @@ async function onWindowReady() {
 		var script = document.createElement('script');
 		script.src = 'cordova.js';
 		document.body.appendChild(script);
-		// @ts-ignore
-		const { promise, resolve } = Promise.withResolvers();
-		document.addEventListener('deviceready', async () => {
-			const { cordovaReady } = await import('./cordova.js');
-			await cordovaReady();
-			resolve()
-		});
-		await promise;
+		await new Promise((resolve) => {
+			document.addEventListener('deviceready', async () => {
+				const { cordovaReady } = await import('./cordova.js');
+				await cordovaReady();
+				resolve(void 0)
+			});
+		})
 	}
 	/*
 	if (_status.packLoaded) {
@@ -810,6 +752,12 @@ function setServerIndex() {
 }
 
 function setWindowListener() {
+	// 但愿有用
+	window.addEventListener("unhandledrejection", (error) => {
+		// 希望error.reason能是个正常的error
+		throw error.reason;
+	});
+
 	window.onkeydown = function (e) {
 		if (!Reflect.has(ui, 'menuContainer') || !Reflect.get(ui, 'menuContainer').classList.contains('hidden')) {
 			if (e.keyCode == 116 || ((e.ctrlKey || e.metaKey) && e.keyCode == 82)) {

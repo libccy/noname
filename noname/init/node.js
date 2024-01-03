@@ -6,6 +6,9 @@ import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 
 export function nodeReady() {
+	const versions = window.process.versions;
+	// @ts-ignore
+	const electronVersion = parseFloat(versions.electron);
 	lib.node = {
 		fs: require('fs'),
 		path: require("path"),

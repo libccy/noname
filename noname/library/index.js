@@ -18,6 +18,8 @@ import { GNC as gnc } from '../gnc/index.js';
 
 import { LibInit } from "./init/index.js";
 import { Announce } from "./announce/index.js";
+import { Channel } from "./channel/index.js";
+import { Experimental } from "./experimental/index.js";
 import * as Element from "./element/index.js";
 
 
@@ -118,6 +120,7 @@ export class Library extends Uninstantable {
 		this.playerOL;
 		throw new Error('Do not call this method');
 	}
+
 	//函数钩子
 	static hooks = {
 		// 本体势力的颜色
@@ -299,6 +302,7 @@ export class Library extends Uninstantable {
 			}
 		}],
 	};
+
 	/**
 	 * **无名杀频道推送机制**
 	 * 
@@ -310,7 +314,6 @@ export class Library extends Uninstantable {
 	 * 
 	 * 若需要异步/不报错发送信息，请等待`lib.actor`
 	 * 
-	 * @template T
 	 * @example
 	 * // 创建一个频道
 	 * const channel = new lib.channel();
@@ -321,88 +324,8 @@ export class Library extends Uninstantable {
 	 * // 从某个角落向channel发消息，若无消息接收则等待
 	 * await channel.send(item);
 	 */
-	static channel = class {
-		/**
-		 * @template TValue
-		 * @callback PromiseResolve
-		 * @param {TValue} value
-		 * @returns {void}
-		 */
-		constructor() {
-			/**
-			 * @type {"active" | "receiving" | "sending"}
-			 */
-			this.status = "active";
+	static channel = Channel;
 
-			/**
-			 * @type {PromiseResolve<T> | [T, PromiseResolve<void>] | null}
-			 */
-			this._buffer = null;
-		}
-
-		/**
-		 * 向该频道发送消息，在消息未被接受前将等待
-		 * 
-		 * @param {T} value - 要发送的消息
-		 * @returns {Promise<void>}
-		 */
-		send(value) {
-			return new Promise((resolve, reject) => {
-				switch (this.status) {
-					case "sending":
-						// TODO: handle the error.
-						reject(new Error());
-						break;
-					case "receiving": {
-						/**
-						 * @type {PromiseResolve<T>}
-						 */
-						const buffer = this._buffer;
-						this._buffer = null;
-						buffer(value);
-						this.status = "active";
-						resolve();
-						break;
-					}
-					case "active":
-						this.status = "sending";
-						this._buffer = [value, resolve];
-						break;
-				}
-			});
-		}
-
-		/**
-		 * 接收频道所发送的消息，若无消息发送则等待
-		 * 
-		 * @returns {Promise<T>} 接收到的消息
-		 */
-		receive() {
-			return new Promise((resolve, reject) => {
-				switch (this.status) {
-					case "receiving":
-						// TODO: handle the error.
-						reject(new Error());
-						break;
-					case "sending": {
-						/**
-						 * @type {[T, PromiseResolve<void>]}
-						 */
-						const buffer = this._buffer;
-						this._buffer = null;
-						resolve(buffer[0]);
-						this.status = "active";
-						buffer[1]();
-						break;
-					}
-					case "active":
-						this.status = "receiving";
-						this._buffer = resolve;
-						break;
-				}
-			});
-		}
-	};
 	/**
 	 * **无名杀消息推送库**
 	 * 
@@ -429,6 +352,7 @@ export class Library extends Uninstantable {
 	 * lib.announce.unsubscribe("skinChange", method);
 	 */
 	static announce = new Announce(new EventTarget(), new WeakMap());
+
 	static objectURL = new Map();
 	static hookmap = {};
 	static imported = {};
@@ -9470,6 +9394,9 @@ export class Library extends Uninstantable {
 		stratagem_fury: '怒气',
 		_stratagem_add_buff: '强化'
 	};
+
+	static experimental = Experimental
+
 	static element = {
 		content: Element.Content,
 		contents: Element.Contents,
