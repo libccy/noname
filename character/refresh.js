@@ -4437,7 +4437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!get.tag(card,'damage')) return;
 							if(target.hp<2&&target.countCards('hs')<3||player.hasSkillTag('jueqing',false,target)) return -2;
 							if(target.countMark('redanxin')>1) return [1,1];
-							return [1,Math.min(3.2,0.8*target.hp)];
+							return [1,Math.min(2,0.8*target.hp)];
 						}
 					}
 				}
