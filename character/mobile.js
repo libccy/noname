@@ -5203,6 +5203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'mbdaoshu_use',
 				subSkill:{
 					use:{
+						audio:'mbdaoshu1',
 						enable:'phaseUse',
 						filter:function(event,player){
 							return game.hasPlayer(target=>target!=player&&target.countCards('h')>2);
@@ -5226,10 +5227,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								target.getCards('h'),
 								[Object.keys(map),'tdnodes'],
 							],2,true).set('filterButton',button=>{
+								var map=_status.event.map;
 								if(!ui.selected.buttons.length) return true;
 								if(typeof button.link==typeof ui.selected.buttons[0].link) return false;
-								if(typeof button.link=='string') return get.name(ui.selected.buttons[0].link,false)!=button.link;
-								return ui.selected.buttons[0].link!=get.name(button.link,false);
+								if(typeof button.link=='string') return get.name(ui.selected.buttons[0].link,false)!=map[button.link];
+								return map[ui.selected.buttons[0].link]!=get.name(button.link,false);
 							}).set('ai',button=>{
 								var map=_status.event.map;
 								if(!ui.selected.buttons.length){
@@ -5249,7 +5251,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								var guessWinner=[];
 								if(typeof result.links[0]=='string') result.links.reverse();
-								var OriginCard=result.links[0],ChangeName=result.links[1],cards=target.getCards('h').slice();
+								var OriginCard=result.links[0],ChangeName=map[result.links[1]],cards=target.getCards('h').slice();
 								var card=game.createCard(ChangeName,get.suit(OriginCard,false),get.number(OriginCard,false));
 								cards[cards.indexOf(OriginCard)]=card;
 								if(_status.connectMode){
