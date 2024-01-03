@@ -424,8 +424,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<=2;i++){
 						var skill='guimou_'+i;
 						if(player.hasSkill(skill)){
-							var storage=player.storage[skill];
-							var targetx=storage[0].sort((a,b)=>storage[1][storage[0].indexOf(a)]-storage[1][storage[0].indexOf(b)]);
+							var storage=player.storage[skill],nums=storage[0].slice();
+							var targetx=nums.sort((a,b)=>storage[1][storage[0].indexOf(a)]-storage[1][storage[0].indexOf(b)]);
 							targetx=targetx.filter(target=>storage[1][storage[0].indexOf(target)]==storage[1][storage[0].indexOf(targetx[0])]);
 							targets.addArray(targetx);
 							player.removeSkill(skill);
