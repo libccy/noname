@@ -4363,68 +4363,30 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!event.isFirstTarget) return false;
 					if(!event.targets||!event.targets.length) return false;
 					var evt=lib.skill.dcjianying.getLastUsed(player,event.getParent());
-					if(!evt||!evt.targets||!evt.targets.length||evt.targets.length!=event.targets.length) return false;
-					var targetsx=event.targets.slice();
-					var targetsy=evt.targets.slice();
-					return targetsx.slice().removeArray(targetsy).length==0&&targetsy.slice().removeArray(targetsx).length==0;
+					if(!evt||!evt.targets||!evt.targets.length) return false;
+					return event.targets.some(target=>evt.targets.includes(target));
 				},
 				frequent:true,
 				locked:false,
 				content:function(){
-					player.draw(trigger.targets.length);
+					var evt=lib.skill.dcjianying.getLastUsed(player,trigger.getParent());
+					player.draw(trigger.targets.filter(target=>evt.targets.includes(target)).length);
 				},
+				locked:false,
 				mod:{
 					aiOrder:function(player,card,num){
-						var evt=lib.skill.dcjianying.getLastUsed(player);
-						if(!evt) return;
-						var targets=evt.targets;
-						if(!targets.length) return;
-						var select=get.select(_status.event.selectTarget);
-						if(select[0]==-1){
-							var targetsx=game.filterPlayer(current=>player.canUse(card,current));
-							if(targetsx.length!=targets.length) return;
-						}
-						else if(targets.length>=select[0]&&targets.length<=select[1]){
-							var eff=0;
-							for(var i of targets){
-								eff+=get.effect(i,card,player,player);
-							}
-							if(eff<0) return;
-						}
-						return num+10;
+						var evt=player.getLastUsed();
+						if(evt&&evt.targets&&evt.targets.length&&game.hasPlayer(current=>{
+							return evt.targets.includes(current)&&player.canUse(card,current)&&get.effect(current,card,player,player)>0;
+						})) return num+10;
 					},
 				},
 				ai:{
-					threaten:2.5,
 					effect:{
 						player:function(card,player,target){
-							if(player._dcdanyi_aiChecking) return;
-							player._dcdanyi_aiChecking=true;
-							var evt=lib.skill.dcjianying.getLastUsed(player),targets;
-							if(evt){
-								targets=evt.targets;
-								var select=get.select(_status.event.selectTarget);
-								if(select[0]==-1){
-									var targetsx=game.filterPlayer(current=>player.canUse(card,current));
-									if(targetsx.length!=targets.length){
-										delete player._dcdanyi_aiChecking;
-										return;
-									}
-								}
-								else if(targets.length>=select[0]&&targets.length<=select[1]){
-									var eff=0;
-									for(var i of targets){
-										eff+=get.effect(i,card,player,player);
-									}
-									if(eff<0){
-										delete player._dcdanyi_aiChecking;
-										return;
-									}
-								}
-							}
-							delete player._dcdanyi_aiChecking;
-							if((targets||[]).includes(target)) return [1,1];
-						}
+							var evt=player.getLastUsed();
+							if(evt&&evt.targets.includes(target)) return [1.5,0];
+						},
 					},
 				},
 			},
@@ -4436,14 +4398,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(ui.selected.targets.length){
 						if(ui.selected.targets[0].hp==target.hp) return false;
 					}
-					return target.hp!=player.hp;
+					return target!=player;
 				},
 				selectTarget:[1,2],
 				complexTarget:true,
 				multiline:true,
 				content:function(){
 					'step 0'
-					target.chooseToDiscard(get.translation(player)+'对你发动了【文灿】','是否弃置两张花色不同的牌？或者点击“取消”，令其本回合对你使用牌无次数限制','he',2,(card,player)=>{
+					target.chooseToDiscard(get.translation(player)+'对你发动了【文灿】','是否弃置两张花色不同的牌？或者点击“取消”，令其本回合对你使用牌无距离和次数限制','he',2,(card,player)=>{
 						if(!ui.selected.cards.length) return true;
 						var suit=get.suit(card,player);
 						for(var i of ui.selected.cards){
@@ -4454,7 +4416,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(_status.event.nofear) return 0;
 						return 5-get.value(card);
 					}).set('nofear',player.countCards('hs',card=>{
-						return get.tag(card,'damage')&&player.canUse(card,target)&&get.effect(target,card,player,target)<=0;
+						return get.tag(card,'damage')&&player.canUse(card,target,false)&&get.effect(target,card,player,target)<=0;
 					})<target.hp);
 					'step 1'
 					if(!result.bool){
@@ -4467,9 +4429,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						onremove:true,
 						marktext:'灿',
-						intro:{content:'对$使用牌无次数限制'},
+						intro:{content:'对$使用牌无距离和次数限制'},
 						mod:{
 							cardUsableTarget:function(card,player,target){
+								if(player.getStorage('dcwencan_paoxiao').includes(target)) return true;
+							},
+							targetInRange:function(card,player,target){
 								if(player.getStorage('dcwencan_paoxiao').includes(target)) return true;
 							},
 						}
@@ -5849,8 +5814,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjingzao:{
 				audio:2,
 				enable:'phaseUse',
-				filter:function(event,player) {
-					return !player.hasSkill('dcjingzao_ban')&&game.hasPlayer(current=>lib.skill.dcjingzao.filterTarget(null,player,current));
+				filter:function(event,player){
+					if(3+player.countMark('dcjingzao_add')-player.countMark('dcjingzao_ban')<=0) return false;
+					return game.hasPlayer(current=>lib.skill.dcjingzao.filterTarget(null,player,current));
 				},
 				filterTarget:function(card,player,target){
 					return player!=target&&!target.hasSkill('dcjingzao_temp');
@@ -5858,7 +5824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					target.addTempSkill('dcjingzao_temp');
-					var cards=game.cardsGotoOrdering(get.cards(3+player.countMark('dcjingzao_add'))).cards;
+					var cards=game.cardsGotoOrdering(get.cards(3+player.countMark('dcjingzao_add')-player.countMark('dcjingzao_ban'))).cards;
 					event.cards=cards;
 					game.log(player,'亮出了',event.cards);
 					event.videoId=lib.status.videoId++;
@@ -5909,6 +5875,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(cards2.length) player.gain(cards2,'gain2');
 						player.addTempSkill('dcjingzao_ban');
+						player.addMark('dcjingzao_ban',cards2.length,false);
 					}
 				},
 				ai:{
@@ -5919,7 +5886,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					add:{charlotte:true,onremove:true},
-					ban:{charlotte:true},
+					ban:{charlotte:true,onremove:true},
 					temp:{charlotte:true}
 				}
 			},
@@ -5932,7 +5899,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current.hasHistory('useCard',evt=>{
 							return evt.card.name==event.card.name&&evt!=event.getParent()&&evt.targets&&evt.targets.includes(player);
 						});
-					});
+					})&&(event.card.name=='sha'||get.type(event.card)=='trick');
 				},
 				content:function(){
 					trigger.getParent().excluded.add(player);
@@ -5943,7 +5910,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player===target) return;
 							if(game.hasPlayer2(current=>{
 								return current.hasHistory('useCard',evt=>evt.card.name==card.name&&evt.targets&&evt.targets.includes(player));
-							})) return 'zeroplayertarget';
+							})&&(card.name=='sha'||get.type(card)=='trick')) return 'zeroplayertarget';
 						}
 					}
 				}
@@ -13705,9 +13672,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshouze_info:'锁定技。结束阶段，若你有“绞”，你弃1枚“绞”，随机获得弃牌堆中的一张黑色牌，失去1点体力。',
 			chengbing:'程秉',
 			dcjingzao:'经造',
-			dcjingzao_info:'出牌阶段每名角色限一次。你可以选择一名其他角色并亮出牌堆顶三张牌，其选择一项：1.弃置一张牌名与这些牌的其中一张牌名相同的牌，然后你〖经造〗本回合亮出的牌数+1；2.令你随机获得这些牌中每种牌名的牌各一张，然后你本回合不能再发动〖经造〗。',
+			dcjingzao_info:'出牌阶段每名角色限一次，你可以选择一名其他角色并亮出牌堆顶三张牌，其选择一项：1.弃置一张牌名与这些牌的其中一张牌名相同的牌，然后你本回合发动〖经造〗亮出的牌数+1；2.令你随机获得这些牌中每种牌名的牌各一张，然后你本回合发动〖经造〗亮出的牌数-X（X为你获得的牌数）。',
 			dcenyu:'恩遇',
-			dcenyu_info:'锁定技。当你成为其他角色使用牌的目标后，若你本回合成为过此牌名的牌的目标，此牌对你无效。',
+			dcenyu_info:'锁定技。当你成为其他角色使用【杀】或普通锦囊牌的目标后，若你本回合成为过此牌名的牌的目标，此牌对你无效。',
 			dc_zhouxuān:'周宣',
 			dcwumei:'寤寐',
 			dcwumei_info:'每轮限一次。回合开始时，你可以令一名角色记录场上所有角色的体力值并进行一个额外的回合，并将你的回合移至该回合后进行。该角色以此法进行的回合的结束阶段，将场上所有角色的体力值改为记录内的对应数值。',
@@ -13776,9 +13743,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshexue_info:'①出牌阶段开始时，你可以将一张牌当做上回合的角色于其出牌阶段内使用的最后一张基本牌或普通锦囊牌使用。②出牌阶段结束时，你可以令下回合的角色于其出牌阶段开始时可以将一张牌当做你于此阶段内使用的最后一张基本牌或普通锦囊牌使用（一名角色因〖设学〗使用的牌均无距离和次数限制）。',
 			xizheng:'郤正',
 			dcdanyi:'耽意',
-			dcdanyi_info:'当你使用牌指定第一个目标后，若此牌的目标与你使用的上一张牌目标相同，你可以摸X张牌（X为此牌目标数）。',
+			dcdanyi_info:'当你使用牌指定第一个目标后，你可以摸X张牌（X为此牌目标数与你使用的上一张牌相同的目标数）。',
 			dcwencan:'文灿',
-			dcwencan_info:'出牌阶段限一次。你可以选择至多两名体力值不同且均与你的体力值不同的角色，这些角色依次选择一项：1.弃置两张花色不同的牌；2.本回合你对其使用牌无次数限制。',
+			dcwencan_info:'出牌阶段限一次。你可以选择至多两名体力值不同的其他角色，这些角色依次选择一项：1.弃置两张花色不同的牌；2.本回合你对其使用牌无距离和次数限制。',
 			zhangjinyun:'张瑾云',
 			dchuizhi:'蕙质',
 			dchuizhi_info:'准备阶段，你可以选择是否弃置任意张手牌，然后将手牌摸至与全场手牌数最多的角色相同（至少摸一张，至多摸五张）。',

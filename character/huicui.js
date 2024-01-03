@@ -2074,8 +2074,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					'step 0'
-					if(target) event._result={bool:true,targets:[target]};
-					else player.chooseTarget(get.prompt2('dcshengdu'),lib.filter.notMe).set('ai',target=>{
+					player.chooseTarget(get.prompt2('dcshengdu'),lib.filter.notMe).set('ai',target=>{
 						var player=_status.event.player;
 						var att=get.attitude(player,target);
 						var eff=get.effect(target,{
@@ -2085,64 +2084,46 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var value=att/5;
 						if(value<0) value=-value/1.3;
 						value=Math.max(value-eff/20,0.01);
-						var skills=target.getSkills(null,false,false);
-						for(var skill of skills){
-							var str=get.skillInfoTranslation(skill,target);
-							if(/摸牌阶段[^少放弃]{0,8}摸/.test(str)) value+=Math.random()/2+1.5;
-						}
 						return value;
 					});
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
 						player.logSkill('dcshengdu',target);
-						target.addSkill('dcshengdu_effect');
-						target.markAuto('dcshengdu_effect',[player]);
+						target.addMark('dcshengdu',1);
 					}
 				},
+				intro:{content:'mark'},
+				group:'dcshengdu_effect',
 				subSkill:{
 					effect:{
-						trigger:{player:'gainAfter'},
-						charlotte:true,
-						forced:true,
-						popup:false,
+						audio:'dcshengdu',
+						trigger:{global:'gainAfter'},
 						filter:function(event,player){
-							return event.getParent(2).name=='phaseDraw';
+							return event.getParent(2).name=='phaseDraw'&&event.player.hasMark('dcshengdu');
 						},
+						forced:true,
+						logTarget:'player',
 						content:function(){
-							'step 0'
-							var targets=player.getStorage('dcshengdu_effect');
-							event.targets=targets.sortBySeat(player);
-							'step 1'
-							var target=targets.shift();
-							if(target.isIn()){
-								target.logSkill('dcshengdu_effect',player);
-								target.draw(trigger.cards.length);
-							}
-							if(targets.length) event.redo();
-							'step 2'
-							player.removeSkill('dcshengdu_effect');
-							game.delayx();
+							var num=trigger.player.countMark('dcshengdu');
+							player.draw(num);
+							trigger.player.removeMark('dcshengdu',num);
 						},
-						marktext:'绞',
-						intro:{
-							content:'下个摸牌阶段得到牌后，$摸等量的牌'
-						}
 					}
 				}
 			},
 			dcjieling:{
 				audio:2,
 				enable:'phaseUse',
-				usable:1,
 				position:'hs',
 				viewAs:{
 					name:'sha',
 					storage:{dcjieling:true}
 				},
 				filterCard:function(card,player){
+					if(player.getStorage('dcjieling_count').includes(get.suit(card))) return false;
 					if(ui.selected.cards.length){
-						return get.color(card)!=get.color(ui.selected.cards[0]);
+						return get.suit(card)!=get.suit(ui.selected.cards[0]);
 					}
 					return true;
 				},
@@ -2154,6 +2135,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				precontent:function(){
 					player.addTempSkill('dcjieling_after');
 					event.getParent().addCount=false;
+					player.addTempSkill('dcjieling_count','phaseUseAfter');
+					player.markAuto('dcjieling_count',event.result.cards.reduce((list,card)=>list.add(get.suit(card,player)),[]));
 				},
 				ai:{
 					order:function(item,player){
@@ -2192,10 +2175,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							else{
 								for(var target of targets){
-									var next=game.createEvent('dcshengdu',false);
-									next.player=player;
-									next.target=target;
-									next.setContent(lib.skill.dcshengdu.content);
+									target.addMark('dcshengdu',1);
 								}
 							}
 						}
@@ -6882,7 +6862,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				initList:function(){
 					var list,skills=[];
-					var banned=['xunyi'];
+					var banned=['xunyi','mbyilie'];
 					if(get.mode()=='guozhan'){
 						list=[];
 						for(var i in lib.characterPack.mode_guozhan) list.push(i);
@@ -10952,6 +10932,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mengyou:['mengyou','ns_mengyou'],
 			zhangchu:['zhangchu','jsrg_zhangchu'],
 			xianglang:['xianglang','mb_xianglang'],
+			chengui:['chengui','mb_chengui'],
 		},
 		translate:{
 			re_panfeng:'潘凤',
@@ -11327,9 +11308,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcguangshi_info:'锁定技。准备阶段，若所有其他角色均有“信众”，你摸两张牌并失去1点体力。',
 			dongwan:'董绾',
 			dcshengdu:'生妒',
-			dcshengdu_info:'回合开始时，你可以选择一名其他角色。当其于其的下个摸牌阶段得到牌后，你摸等量的牌。',
+			dcshengdu_info:'回合开始时，你可以选择一名其他角色，令其获得1枚“生妒”标记。有“生妒”标记的角色于摸牌阶段得到牌后，你摸X张牌，然后其移去所有“生妒”标记（X为其拥有的“生妒”标记数）。',
 			dcjieling:'介绫',
-			dcjieling_info:'出牌阶段限一次。你可以将两张颜色不同的手牌当无距离限制且无任何次数限制的【杀】使用。然后若此【杀】：造成了伤害，所有目标角色失去1点体力；未造成伤害，你对所有目标角色依次发动一次〖生妒〗。',
+			dcjieling_info:'出牌阶段每种花色限一次，你可以将两张花色不同的手牌当无距离限制且无任何次数限制的【杀】使用。然后若此【杀】：造成了伤害，所有目标角色失去1点体力；未造成伤害，所有目标角色依次获得1枚“生妒”标记。',
 			yuanyin:'袁胤',
 			dcmoshou:'墨守',
 			dcmoshou_info:'当你成为其他角色使用的黑色牌的目标后，你可以摸X张牌（X为你本局游戏此前发动过此技能的次数÷3的余数+1）。',

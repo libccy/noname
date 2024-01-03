@@ -129,7 +129,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							},
 							prompt:function(links,player){
-								return '将一张牌当作'+get.translation(links[0][3]||'')+'【'+get.translation(links[0][2])+'】'+(_status.event.name=='chooseToUse'?'使用':'打出');
+								return '将一张手牌当作'+get.translation(links[0][3]||'')+'【'+get.translation(links[0][2])+'】'+(_status.event.name=='chooseToUse'?'使用':'打出');
 							},
 						},
 						ai:{
@@ -197,15 +197,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{source:'damageBegin3'},
 				filter:function(event,player){
-					return event.num>=event.player.hp&&!player.getHistory('useSkill',evt=>evt.skill=='sbyijue'&&evt.targets[0]==event.player).length;
+					return event.num>=event.player.hp&&!player.getStorage('sbyijue').includes(event.player);
 				},
 				forced:true,
 				logTarget:'player',
 				content:function(){
 					trigger.cancel();
 					player.addTempSkill('sbyijue_effect');
+					player.markAuto('sbyijue',[trigger.player]);
 					player.markAuto('sbyijue_effect',[trigger.player]);
 				},
+				marktext:'绝',
+				intro:{content:'已放$一马'},
 				subSkill:{
 					effect:{
 						charlotte:true,
@@ -227,6 +230,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 							},
 						},
+						marktext:'义',
 						intro:{content:'本回合放$一马'},
 					},
 				},
@@ -1011,7 +1015,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								target.removeSkill(skills);
 								num+=skills.length;
 							});
-							if(get.mode()=='versus'&&_status.mode=='two') num+=2;
+							if(get.mode()=='versus'&&_status.mode=='two') num+=3;
 							player.draw(num);
 						},
 					},
@@ -5937,7 +5941,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_xiaoqiao_prefix:'谋',
 			sbtianxiang:'天香',
 			sbtianxiang_info:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸等量的牌。',
-			sbtianxiang_info_versus_two:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸X张牌（X为移去的“天香”标记数+2）。',
+			sbtianxiang_info_versus_two:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸X张牌（X为移去的“天香”标记数+3）。',
 			sb_sp_zhugeliang:'谋卧龙',
 			sb_sp_zhugeliang_prefix:'谋',
 			sb_zhugeliang:'谋诸葛亮',

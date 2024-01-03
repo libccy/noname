@@ -795,6 +795,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!player.isPhaseUsing()) return;
 						if(card.name=='sha'&&!player.getStorage('dcjiaoxia_mark').includes(target)) return true;
 					},
+					targetInRange:function(card,player,target){
+						if(!player.isPhaseUsing()) return;
+						if(card.name=='sha'&&!player.getStorage('dcjiaoxia_mark').includes(target)) return true;
+					},
 				},
 				audio:2,
 				locked:false,
@@ -881,9 +885,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!game.online&&!event.dchumei_num){
 						var player=event.player;
 						var evtx=event.getParent('phaseUse');
-						event.set('dchumei_num',player.getHistory('sourceDamage',function(evt){
+						event.set('dchumei_num',player.getHistory('sourceDamage',evt=>{
 							return evt.getParent('phaseUse')==evtx;
-						}).length);
+						}).reduce((sum,evt)=>sum+evt.num,0));
 					}
 				},
 				audio:2,
@@ -3139,7 +3143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					var list=['basic','trick','equip'];
 					for(var i of list){
-						if(i!=event.type) player.addTempSkill('dczhanyi_'+i);
+						if(i!=event.type) player.addTempSkill('dczhanyi_'+i,{player:'phaseBegin'});
 					}
 				},
 				subSkill:{
@@ -3151,11 +3155,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							content:'使用基本牌无距离限制，且伤害值和回复值基数+1',
 						},
 						trigger:{source:['damageBegin1','recoverBegin']},
-						forced:true,
 						filter:function(event,player){
 							var evt=event.getParent();
 							return evt.type=='card'&&get.type(evt.card,false)=='basic';
 						},
+						forced:true,
 						logTarget:'player',
 						content:function(){
 							trigger.num++;
@@ -3177,10 +3181,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							content:'使用锦囊牌时摸一张牌，且锦囊牌不计入本回合的手牌上限',
 						},
 						trigger:{player:'useCard'},
-						forced:true,
 						filter:function(event,player){
 							return get.type2(event.card)=='trick';
 						},
+						forced:true,
 						content:function(){
 							player.draw();
 						},
@@ -3198,13 +3202,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						marktext:'装',
 						mark:true,
 						intro:{
-							content:'使用装备牌时，可弃置一名其他角色的一张牌',
+							content:'有装备牌进汝你的装备时，可弃置一名其他角色的一张牌',
 						},
-						trigger:{player:'useCard'},
-						direct:true,
+						trigger:{player:'equipAfter'},
 						filter:function(event,player){
-							return get.type(event.card)=='equip'&&game.hasPlayer((target)=>(target!=player&&target.countDiscardableCards(player,'he')>0));
+							return game.hasPlayer((target)=>(target!=player&&target.countDiscardableCards(player,'he')>0));
 						},
+						direct:true,
 						content:function(){
 							'step 0'
 							player.chooseTarget('战意：是否弃置一名其他角色的一张牌？',function(card,player,target){
@@ -10629,7 +10633,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			caoanmin:['caoanmin','ns_caoanmin'],
 			duanwei:['duanwei','junk_duanwei'],
 			xushao:['xushao','jsrg_xushao'],
-			huban:['ol_huban','dc_huban'],
+			huban:['ol_huban','dc_huban','mb_huban'],
 			mengda:['ol_mengda','dc_mengda','pe_mengda'],
 			jsp_guanyu:['jsp_guanyu','dc_jsp_guanyu','jsrg_guanyu'],
 			mushun:['mushun','sp_mushun'],
@@ -10890,9 +10894,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiaojie:'狡黠',
 			jiaojie_info:'锁定技，你的红色牌不计入手牌上限。你使用黑色牌无距离和次数限制。',
 			dcjiaoxia:'狡黠',
-			dcjiaoxia_info:'①出牌阶段开始时，你可以令自己的所有手牌于此阶段均视为【杀】。若如此做，你使用以此法转化的【杀】造成伤害后，你可以视为使用此牌对应的原卡牌。②出牌阶段，你对你本阶段未使用过【杀】的角色使用【杀】无次数限制。',
+			dcjiaoxia_info:'①出牌阶段开始时，你可以令自己的所有手牌于此阶段均视为【杀】。若如此做，你使用以此法转化的【杀】造成伤害后，你可以视为使用此牌对应的原卡牌。②出牌阶段，你对你本阶段未使用过【杀】的角色使用【杀】无距离和次数限制。',
 			dchumei:'狐魅',
-			dchumei_info:'出牌阶段各限一次，你可以选择一名体力值不大于X的角色，令其：①摸一张牌。②交给你一张牌。③回复1点体力。（X为你本阶段造成伤害的次数）',
+			dchumei_info:'出牌阶段各限一次，你可以选择一名体力值不大于X的角色，令其：①摸一张牌。②交给你一张牌。③回复1点体力。（X为你本阶段造成的伤害数）',
 			buchen:'不臣',
 			buchen_info:'隐匿技，你于其他角色的回合登场时，可获得当前回合角色的一张牌。',
 			smyyingshi:'鹰视',
@@ -11060,7 +11064,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qibie_info:'一名角色死亡后，若你有手牌且这些手牌均可被弃置，则你可以弃置所有手牌，然后回复1点体力并摸X+2张牌（X为你弃置的牌数）。',
 			dc_zhuling:'朱灵',
 			dczhanyi:'战意',
-			dczhanyi_info:'出牌阶段开始时，你可以弃置所有基本牌/锦囊牌/装备牌，然后获得另外两种类型的牌对应的效果直到回合结束：基本牌、你使用基本牌无距离限制，且伤害值和回复值基数+1；锦囊牌、你使用锦囊牌时摸一张牌，且锦囊牌不计入手牌上限；装备牌，当你使用装备牌时，你可弃置一名其他角色的一张牌。',
+			dczhanyi_info:'出牌阶段开始时，你可以弃置所有基本牌/锦囊牌/装备牌，然后获得另外两种类型的牌对应的效果直到你的下个回合开始：基本牌、你使用基本牌无距离限制，且伤害值和回复值基数+1；锦囊牌、你使用锦囊牌时摸一张牌，且锦囊牌不计入手牌上限；装备牌，当装备牌进入你的装备区时，你可弃置一名其他角色的一张牌。',
 			yanrou:'阎柔',
 			choutao:'仇讨',
 			choutao_info:'当你使用【杀】时，或成为【杀】的目标后，你可以弃置此【杀】使用者的一张牌，令此【杀】不可被响应。若你是此【杀】的使用者，则你令此【杀】不计入次数限制。',
