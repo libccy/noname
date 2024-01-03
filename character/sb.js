@@ -129,7 +129,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							},
 							prompt:function(links,player){
-								return '将一张牌当作'+get.translation(links[0][3]||'')+'【'+get.translation(links[0][2])+'】'+(_status.event.name=='chooseToUse'?'使用':'打出');
+								return '将一张手牌当作'+get.translation(links[0][3]||'')+'【'+get.translation(links[0][2])+'】'+(_status.event.name=='chooseToUse'?'使用':'打出');
 							},
 						},
 						ai:{
