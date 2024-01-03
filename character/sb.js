@@ -197,15 +197,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{source:'damageBegin3'},
 				filter:function(event,player){
-					return event.num>=event.player.hp&&!player.getHistory('useSkill',evt=>evt.skill=='sbyijue'&&evt.targets[0]==event.player).length;
+					return event.num>=event.player.hp&&!player.getStorage('sbyijue').includes(event.player);
 				},
 				forced:true,
 				logTarget:'player',
 				content:function(){
 					trigger.cancel();
 					player.addTempSkill('sbyijue_effect');
+					player.markAuto('sbyijue',[trigger.player]);
 					player.markAuto('sbyijue_effect',[trigger.player]);
 				},
+				marktext:'绝',
+				intro:{content:'已放$一马'},
 				subSkill:{
 					effect:{
 						charlotte:true,
@@ -227,6 +230,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},
 							},
 						},
+						marktext:'义',
 						intro:{content:'本回合放$一马'},
 					},
 				},
