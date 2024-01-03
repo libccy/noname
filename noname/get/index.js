@@ -1253,9 +1253,26 @@ export class Get extends Uninstantable {
 				"[object GeneratorFunction]": true,
 			};
 
+			const transformFunction = (fn) => {
+				const str = fn.toString();
+				// 箭头函数
+				if (/^\s*(?:async)?\s*\(.*\)\s*=>/.test(str)) return str;
+				// 带function标识的
+				if (/^\s*(?:async)?\s*function/.test(str)) return str;
+				const hasAsync = /^\s*(?:async)/.test(str);
+				return `${hasAsync ? "async " : ""}function ${str.replace(/^\s*(?:async)/, '')}`;
+			}
+
 			const createFunction = (fn) => {
 				let cloneFn = null;
-				eval(`cloneFn=${fn.toString()}`);
+				const str = `cloneFn = ${transformFunction(fn)}`;
+				try {
+					eval(str);
+				} catch (error) {
+					console.error(fn.toString())
+					console.error(str);
+					throw error;
+				}
 				return cloneFn;
 			};
 
