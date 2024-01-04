@@ -180,13 +180,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					var num=Math.max(player.getHistory('useSkill',evt=>evt.skill=='dczhifou').length,1);
+					var num=player.getHistory('useSkill',evt=>evt.skill=='dczhifou').length+1;
 					return player.getExpansions('dclingxi').length>=num;
 				},
 				direct:true,
 				content:function*(event,map){
 					var player=map.player,cards=player.getExpansions('dclingxi');
-					var num=Math.max(player.getHistory('useSkill',evt=>evt.skill=='dczhifou').length,1);
+					var num=player.getHistory('useSkill',evt=>evt.skill=='dczhifou').length+1;
 					var result=yield player.chooseButton(['###'+get.prompt('dczhifou')+'###移去至少'+get.cnNumber(num)+'张武将牌上的“翼”',cards],[num,cards.length]).set('ai',button=>{
 						var player=_status.event.player;
 						if(2*player.getExpansions('dclingxi').filter(card=>!ui.selected.buttons.some(but=>but.link==card)).reduce((list,card)=>list.add(get.suit(card,false)),[]).length-player.countCards('h')<=0) return 0;
@@ -197,7 +197,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('dczhifou');
 						player.loseToDiscardpile(result.links);
 						var list=[],choiceList=[
-							'将一张牌称为“翼”置于'+get.translation(player)+'的武将牌上',
+							'将一张牌称为“翼”置于你的武将牌上',
 							'弃置两张牌',
 							'失去1点体力',
 						];
@@ -241,18 +241,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return;
 							}
 							else if(list.length==1) result3={control:list[0]};
-							else result3=yield target.chooseControl(list).set('prompt','知否：请选择一项').set('choiceList',choiceList).set('ai',()=>{
+							else result3=yield player.chooseControl(list).set('prompt','知否：请选择一项').set('choiceList',choiceList.map(str=>'令'+get.translation(target)+str)).set('ai',()=>{
 								var player=_status.event.player;
+								var target=_status.event.target;
 								var getNum=function(control){
 									return [
-										get.effect(player,{name:'guohe_copy2'},player,player)/2,
-										get.effect(player,{name:'guohe_copy2'},player,player),
-										get.effect(player,{name:'losehp'},player,player),
+										get.effect(target,{name:'guohe_copy2'},target,player)/2,
+										get.effect(target,{name:'guohe_copy2'},target,player),
+										get.effect(target,{name:'losehp'},target,player),
 									][['置入“翼”','弃置卡牌','失去体力'].indexOf(control)];
 								};
 								var controls=_status.event.controls.slice();
 								return controls.sort((a,b)=>getNum(b)-getNum(a))[0];
-							});
+							}).set('target',target);
 							switch(result3.control){
 								case '置入“翼”':
 									player.addTempSkill('dczhifou_0');
@@ -13886,7 +13887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclingxi:'灵犀',
 			dclingxi_info:'出牌阶段开始和结束时，你可以将至多X张牌称为“翼”置于你的武将牌上（X为你的体力上限）。当你失去武将牌上的“翼”时，你将手牌数调整至Y张（Y为你武将牌上的“翼”所含有的花色数的两倍）。',
 			dczhifou:'知否',
-			dczhifou_info:'当你使用牌结算完毕后，你可以移去至少X张武将牌上的“翼”（X为本回合此前发动此技能的次数，且X至少为1），然后令一名角色选择执行以下一项：①将一张牌称为“翼”置于你的武将牌上；②弃置两张牌；③失去1点体力。',
+			dczhifou_info:'当你使用牌结算完毕后，你可以移去至少X张武将牌上的“翼”（X为本回合此前发动此技能的次数+1），然后选择一名角色并选择以下一项令其执行：①将一张牌称为“翼”置于你的武将牌上；②弃置两张牌；③失去1点体力。',
 			
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
