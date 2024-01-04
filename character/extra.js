@@ -1126,13 +1126,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			dcxianjin:{
+				init:function(player){
+					var num=game.getAllGlobalHistory('changeHp',evt=>{
+						return evt.getParent().name=='damage'&&(evt.getParent().player==player||(evt.getParent().source&&evt.getParent().source==player));
+					}).concat(game.getAllGlobalHistory('changeHp',evt=>{
+						return evt.getParent().name=='damage'&&evt.getParent().player==player&&evt.getParent().source&&evt.getParent().source==player;
+					})).length;
+					if(num) player.addMark('dcxianjin',num,false);
+				},
+				onremove:true,
 				audio:2,
 				trigger:{
 					player:'damageEnd',
 					source:'damageSource',
 				},
 				filter:function(event,player){
-					return game.getGlobalHistory('damage',evt=>evt.player==player||(evt.source&&evt.source==player)).indexOf(event)%2==1;
+					return player.countMark('dcxianjin')%2==0;
 				},
 				forced:true,
 				content:function(){
@@ -1154,6 +1163,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.popup(get.translation(control+'_tag'));
 					if(player.isMaxHandcard()) player.draw();
 					else player.draw(player.getStorage('dctuoyu').length)
+				},
+				group:'dcxianjin_mark',
+				intro:{content:'已造成或受到#次伤害'},
+				subSkill:{
+					mark:{
+						charlotte:true,
+						trigger:{
+							player:'damageEnd',
+							source:'damageSource',
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content:function(){
+							player.addMark('dcxianjin',1,false);
+						},
+					},
 				},
 			},
 			dcqijing:{
@@ -1178,9 +1204,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var evt=trigger.getParent();
 							if(evt.name=='phaseLoop'&&evt._isStandardLoop) evt.player=player.next;
 						}
-						player.chooseTarget(true,'请选择一名要更换座次的角色，将自己移动到该角色的上家位置',function(card,player,target){
+						player.chooseTarget('请选择一名要更换座次的角色，将自己移动到该角色的上家位置',function(card,player,target){
 							return target!=player&&target!=player.next;
-						}).set('ai',function(target){
+						},true).set('ai',function(target){
 							var player=_status.event.player;
 							var current=_status.currentPhase.next;
 							var max=20,att=0;
@@ -1193,7 +1219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return att;
 						})
 					}
-					else event.goto(3);
+					else event.finish();
 					'step 2'
 					if(result.bool){
 						var target=result.targets[0];
@@ -1201,6 +1227,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.swapSeat(target1,target2,null,true);
 						},player,target);
 					}
+					else event.finish();
 					'step 3'
 					player.insertPhase();
 				},
@@ -7978,7 +8005,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcxianjin:'险进',
 			dcxianjin_info:'锁定技。当你每造成或受到两次伤害后，你激活一个副区域标签并摸X张牌（X为你已激活的副区域数，若你的手牌数为全场最多则改为摸一张牌）。',
 			dcqijing:'奇径',
-			dcqijing_info:'觉醒技。一名角色的回合结束后，若你的三个副区域标签均被激活，则你减1点体力上限，获得〖摧心〗，将座位移动至一名其他角色的上家之后，然后执行一个额外回合。',
+			dcqijing_info:'觉醒技。一名角色的回合结束后，若你的三个副区域标签均被激活，则你减1点体力上限，获得〖摧心〗，将座位移动至两名相邻的其他角色之间并执行一个额外回合。',
 			dccuixin:'摧心',
 			dccuixin_info:'当你不因此技能使用的基本牌或普通锦囊牌结算结束后，若此牌的目标于你使用此牌指定第一个目标时包含你的上家或下家，则你可以视为对下家或上家再使用一张牌名和元素相同的牌。',
 			shen_dianwei:'神典韦',
