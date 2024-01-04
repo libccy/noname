@@ -1229,6 +1229,7 @@ export class Get extends Uninstantable {
 	/**
 	 * @template T
 	 * @param {T} obj
+	 * @param {WeakMap<T, T>} [map] - 拷贝用的临时存储（请勿自行赋值）
 	 * @returns {T}
 	 */
 	static copy(obj, map = new WeakMap()) {
@@ -1236,6 +1237,8 @@ export class Get extends Uninstantable {
 			return structuredClone(obj);
 		}
 		catch {
+			// 暂时有BUG，先返回原始数据再说
+			return obj;
 			// obj不可序列化时，参考[这里](https://juejin.cn/post/7315612852890026021)实现深拷贝
 			const getType = (obj) => Object.prototype.toString.call(obj);
 
