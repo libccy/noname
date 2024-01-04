@@ -7582,7 +7582,7 @@ export class Player extends HTMLDivElement {
 	}
 	getFriends(func) {
 		var player = this;
-		var targets;
+		var targets = [];
 		var mode = get.mode();
 		var self = false;
 		if (func === true) {
