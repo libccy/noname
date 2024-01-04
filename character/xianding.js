@@ -145,13 +145,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return (dis?6:1)-get.useful(card);
 						}
 						if(_status.event.hvt.includes(card)){
+							if(_status.event.suits.length>=4){
+								if(cards.length>8) return 0;
+								return 4.5-get.value(card);
+							}
 							if(!_status.event.suits.includes(suit)) return 6-get.value(card);
 							if(card.name==='sha') return 3-get.value(card);
 							return 1-get.value(card);
 						}
 						return 15-get.value(card);
 					}).set('complexCard',true).set('hvt',player.getCards('hs',card=>{
-						return player.hasValueTarget(card,null,true);
+						return card.name==='zhuge'||player.hasValueTarget(card,null,true);
 					})).set('suits',(()=>{
 						let suits=[];
 						player.getExpansions('dclingxi').forEach(i=>{
@@ -222,7 +226,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var player=map.player,cards=player.getExpansions('dclingxi');
 					var num=Math.max(player.getHistory('useSkill',evt=>evt.skill=='dczhifou').length,1);
 					var result=yield player.chooseButton(['###'+get.prompt('dczhifou')+'###移去至少'+get.cnNumber(num)+'张武将牌上的“翼”',cards],[num,cards.length]).set('ai',button=>{
-						let player=_status.event.player;
 						if(!_status.event.res.bool) return 0;
 						if(_status.event.res.cards.includes(button.link)) return 1;
 						return 0;
