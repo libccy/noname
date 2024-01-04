@@ -6193,8 +6193,8 @@ export class Player extends HTMLDivElement {
 		if (mark) this.markAuto(name);
 		return value;
 	}
-	getStorage(name) {
-		return this.storage[name] || [];
+	getStorage(name, defaultValue = []) {
+		return this.hasStorage(name) ? this.storage[name] : defaultValue;
 	}
 	hasStorage(name, value) {
 		if (!(name in this.storage)) return false;
