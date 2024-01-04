@@ -161,8 +161,8 @@ Reflect.defineProperty(HTMLDivElement.prototype, 'setBackground', {
 			const sex = nameinfo ? nameinfo[0] : 'male';
 			this.style.backgroundImage = [
 				this.style.backgroundImage,
-				`url("${lib.assetURL}image/character/default_silhouette_${sex}${ext}")`,
-				`url("${lib.assetURL}image/character/default_silhouette_male${ext}")`,
+				`url("${lib.assetURL}${lib.characterDefaultPicturePath}${sex}${ext}")`,
+				`url("${lib.assetURL}${lib.characterDefaultPicturePath}male${ext}")`,
 			].join(",");
 		}
 		return this;
