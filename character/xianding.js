@@ -121,10 +121,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function*(event,map){
 					var player=map.player,num=player.maxHp;
 					var result=yield player.chooseCard(get.prompt('dclingxi'),'将至多'+get.cnNumber(num)+'张牌称为“翼”置于武将牌上','he',[1,num]).set('ai',card=>{
-						var player=_status.event.player;
-						if(player.countCards('hs',card=>player.hasValueTarget(card))&&player.countCards('hs',card=>player.hasValueTarget(card)&&!ui.selected.cards.includes(card))<=2) return 0;
-						return 6-get.value(card)+(player.getExpansions('dclingxi').some(cardx=>get.suit(card,false)==get.suit(cardx,false))?1:3);
-					}).set('complexCard',true);
+						let player=_status.event.player,dis=player.needsToDiscard(0,(i,player)=>{
+								return !player.canIgnoreHandcard(i)&&!ui.selected.cards.includes(i);
+							}),
+							cards=ui.selected.cards.concat(player.getExpansions('dclingxi')),
+							suit=get.suit(card,false);
+						if(_status.event.suits.length<4) _status.event.suits.add(get.suit(ui.selected.cards.at(-1),false));
+						if(_status.event.name==='phaseUseEnd'){
+							if(_status.event.suits.includes(suit)) return (dis?10:3)-get.useful(card);
+							return (dis?6:1)-get.useful(card);
+						}
+						_status.event.hvt.remove(ui.selected.cards.at(-1));
+						if(_status.event.hvt.length===1&&card===_status.event.hvt[0]) return 0;
+						let temp;
+						if(!cards.some(i=>{
+							temp=get.suit(i,false);
+							return cards.some(j=>{
+								return i!==j&&suit===get.suit(j,false);
+							});
+						})&&suit===temp) return 15-get.value(card);
+						if(!_status.event.hvt.length){
+							if(_status.event.suits.includes(suit)) return (dis?10:3)-get.useful(card);
+							return (dis?6:1)-get.useful(card);
+						}
+						if(_status.event.hvt.includes(card)){
+							if(!_status.event.suits.includes(suit)) return 6-get.value(card);
+							if(card.name==='sha') return 3-get.value(card);
+							return 1-get.value(card);
+						}
+						return 15-get.value(card);
+					}).set('complexCard',true).set('hvt',player.getCards('hs',card=>{
+						return player.hasValueTarget(card,null,true);
+					})).set('suits',(()=>{
+						let suits=[];
+						player.getExpansions('dclingxi').forEach(i=>{
+							suits.add(get.suit(i,false));
+						});
+						return suits;
+					})()).set('name',event.triggername);
 					if(result.bool){
 						player.logSkill('dclingxi');
 						player.addToExpansion(result.cards,player,'give').gaintag.add('dclingxi');
@@ -188,11 +222,36 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var player=map.player,cards=player.getExpansions('dclingxi');
 					var num=Math.max(player.getHistory('useSkill',evt=>evt.skill=='dczhifou').length,1);
 					var result=yield player.chooseButton(['###'+get.prompt('dczhifou')+'###移去至少'+get.cnNumber(num)+'张武将牌上的“翼”',cards],[num,cards.length]).set('ai',button=>{
-						var player=_status.event.player;
-						if(2*player.getExpansions('dclingxi').filter(card=>!ui.selected.buttons.some(but=>but.link==card)).reduce((list,card)=>list.add(get.suit(card,false)),[]).length-player.countCards('h')<=0) return 0;
-						if(player.getExpansions('dclingxi').filter(card=>!ui.selected.buttons.some(but=>get.suit(but.link,false)==get.suit(card,false)))) return 3;
-						return 1;
-					}).set('num',num);
+						let player=_status.event.player;
+						if(!_status.event.res.bool) return 0;
+						if(_status.event.res.cards.includes(button.link)) return 1;
+						return 0;
+					}).set('num',num).set('res',(()=>{
+						if(player.isPhaseUsing()&&player.hasCard(i=>{
+							return player.hasValueTarget(i,null,true);
+						},'h')) return false;
+						let suits=[],cs=player.getExpansions('dclingxi'),cards=[],temp=num;
+						for(let i=0;i<cs.length;i++){
+							if(!temp) break;
+							let suit=get.suit(cs[i],false);
+							if(suits.includes(suit)){
+								cards.push(cs.splice(i--,1)[0]);
+								temp--;
+							}
+							else suits.push(suit);
+						}
+						while(temp>0){
+							cards.push(cs.pop());
+							temp--;
+						}
+						temp=suits.length*2-player.countCards('h');
+						if(temp>0||!temp&&num<Math.max(2,5-player.hp)) cs=true;
+						else cs=false;
+						return {
+							bool:cs,
+							cards:cards
+						};
+					})());
 					if(result.bool){
 						player.logSkill('dczhifou');
 						player.loseToDiscardpile(result.links);
