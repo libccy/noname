@@ -4544,10 +4544,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					event.logged=false;
-					//event.targets=[];
+					event.targets=[];
 					event.goto(player.countCards('h')%2==1?1:4);
 					'step 1'
-					player.chooseTarget(get.prompt('shenfu'),'对一名其他角色造成1点雷属性伤害',lib.filter.notMe).set('ai',function(target){
+					player.chooseTarget(get.prompt('shenfu'),'对一名其他角色造成1点雷属性伤害',function(card,player,target){
+						return target!=player&&!_status.event.getParent().targets.includes(target);
+					}).set('ai',function(target){
 						var player=_status.event.player;
 						return get.damageEffect(target,player,player,'thunder')*(target.hp==1?2:1);
 					});
@@ -4560,16 +4562,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.logSkill('shenfu',target,'thunder');
 						}
 						else player.line(target,'thunder');
+						event.targets.push(target);
 						target.damage('thunder');
 					}
 					else event.finish();
 					'step 3'
-					if(target.isDead()) event.goto(1);
+					if(target.getHistory('damage',function(evt){
+						return evt.getParent('shenfu')==event&&evt._dyinged;
+					}).length) event.goto(1);
 					else event.finish();
 					'step 4'
-					player.chooseTarget(get.prompt('shenfu'),'令一名角色摸一张牌或弃置其一张手牌'/*,function(card,player,target){
+					player.chooseTarget(get.prompt('shenfu'),'令一名角色摸一张牌或弃置其一张手牌',function(card,player,target){
 						return !_status.event.getParent().targets.includes(target);
-					}*/).set('ai',function(target){
+					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						var delta=target.hp-target.countCards('h');
 						if(Math.abs(delta)==1&&get.sgn(delta)==get.sgn(att)) return 3*Math.abs(att);
@@ -4585,7 +4590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.logSkill('shenfu',target);
 						}
 						else player.line(target,'green');
-						//targets.push(target);
+						event.targets.push(target);
 						if(target.countCards('h')==0) event._result={index:0};
 						else player.chooseControl('摸一张牌','弃置一张手牌').set('prompt','选择一项令'+get.translation(target)+'执行…').set('goon',get.attitude(player,target)>0?0:1).set('ai',()=>_status.event.goon);
 						//else player.discardPlayerCard(target,'h','弃置'+get.translation(target)+'一张手牌，或点【取消】令其摸一张牌。');
@@ -7837,7 +7842,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_zhenji:'神甄宓',
 			shen_zhenji_prefix:'神',
 			shenfu:'神赋',
-			shenfu_info:'回合结束时，若你的手牌数为：奇数，你可对一名其他角色造成1点雷属性伤害。若其死亡，你可重复此流程。偶数，你可选择一名角色，你令其摸一张牌或弃置一张手牌。若其手牌数等于体力值，你可重复此流程。',
+			shenfu_info:'回合结束时，若你的手牌数为：奇数，你可对一名其他角色造成1点雷属性伤害。若其因此进入过濒死状态，你可重复此流程（不能选择本次已选择过的角色）。偶数，你可选择一名角色，你令其摸一张牌或弃置一张手牌。若其手牌数等于体力值，你可重复此流程（不能选择本次已选择过的角色）。',
 			qixian:'七弦',
 			qixian_info:'锁定技，你的手牌上限视为7。',
 			caopi_xingdong:'行动',
