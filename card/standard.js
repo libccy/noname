@@ -1843,7 +1843,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							},0);
 						},
 						target:(player,target,card)=>{
-							let targets=get.copy(ui.selected.targets);
+							let targets=[].concat(ui.selected.targets);
 							if(_status.event.preTarget) targets.add(_status.event.preTarget);
 							if(targets.length){
 								let preTarget=targets.lastItem,pre=_status.event.getTempCache('jiedao_result',preTarget.playerid);
