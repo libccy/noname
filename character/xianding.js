@@ -12665,14 +12665,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(cards[0].name.indexOf('pyzhuren_')==0&&!player.getCards('e').includes(cards[0])) player.draw(2);
 				},
 				ai:{
-					order:11,
+					order:(item,player)=>{
+						if(player.hasCard(i=>get.subtype(i)==='equip1','h')) return 11;
+						return 1;
+					},
 					expose:0.2,
 					result:{
 						target:function(player,target){
 							if(ui.selected.cards.length){
-								var card=ui.selected.cards[0];
-								if(target.getEquip(card)||target.countCards('h',{subtype:get.subtype(card)})) return 0;
-								return get.effect(target,card,player,target);
+								let card=ui.selected.cards[0],tv=get.value(card,target),sub=get.subtype(card);
+								if(sub==='equip1'){
+									let ev=Infinity,te=target.getEquips(1);
+									if(!te.length) return tv;
+									te.forEach(i=>{
+										ev=Math.min(ev,get.value(i));
+									});
+									if(card.name.indexOf('pyzhuren_')==0) return 2+tv-ev;
+									return tv-ev;
+								}
+								if(target.hasCard(i=>get.subtype(i)===sub,'he')) return 0;
+								let pv=get.value(card,player);
+								if(pv>0&&Math.abs(tv)<=pv) return 0;
+								return tv;
 							}
 							return 0;
 						},
@@ -12744,6 +12758,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.color=='red') player.recover();
 					else player.draw(2);
 				},
+				ai:{
+					equipValue:function(card,player){
+						if(player.isDamaged()) return 4.5;
+						return 6;
+					},
+					basic:{
+						equipValue:4.5
+					}
+				}
 			},
 			pyzhuren_diamond:{
 				audio:true,
@@ -12795,7 +12818,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.25,
-				},
+					equipValue:function(card,player){
+						return Math.min(7,3.6+player.countCards('h')/2);
+					},
+					basic:{
+						equipValue:4.5
+					}
+				}
 			},
 			pyzhuren_club:{
 				audio:true,
@@ -12842,6 +12871,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.targets.addArray(event.targets);
 					}
 				},
+				ai:{
+					equipValue:function(card,player){
+						if(player.getEnemies().length<2){
+							if(player.isDamaged()) return 0;
+							return 1;
+						}
+						return 4.5;
+					},
+					basic:{
+						equipValue:4.5
+					}
+				}
 			},
 			pyzhuren_spade:{
 				audio:true,
@@ -12861,6 +12902,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.target.loseHp(Math.min(num,5));//.set('source',player);
 				},
 				ai:{
+					equipValue:function(card,player){
+						return 1+4*Math.min(5,player.getCardUsable('sha'));
+					},
+					basic:{
+						equipValue:5
+					},
 					jueqing:true,
 					unequip_ai:true,
 					skillTagFilter:function(player,tag,arg){
@@ -12900,6 +12947,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.draw();
 					}
 				},
+				ai:{
+					equipValue:function(card,player){
+						if(player.isDamaged()) return 6;
+						return 4.8;
+					},
+					basic:{
+						equipValue:5
+					}
+				}
 			},
 			//管辂和葛玄
 			gxlianhua:{
