@@ -33,13 +33,9 @@ export const importMode = generateImportFunction('mode', (name) => `../../mode/$
  */
 function generateImportFunction(type, pathParser) {
 	return async (name) => {
-		try {
-			const modeContent = await import(pathParser(name));
-			if (!modeContent.type) return;
-			if (modeContent.type !== type) throw new Error(`Loaded Content doesn't conform to "${type}" but "${modeContent.type}".`);
-			await game.import(type, modeContent.default);
-		} catch (e) {
-			console.error(e);
-		}
+		const modeContent = await import(pathParser(name));
+		if (!modeContent.type) return;
+		if (modeContent.type !== type) throw new Error(`Loaded Content doesn't conform to "${type}" but "${modeContent.type}".`);
+		await game.import(type, modeContent.default);
 	}
 }
