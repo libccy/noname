@@ -15,6 +15,11 @@ export class Button extends HTMLDivElement {
 	 */
 	// @ts-ignore
 	constructor(item, type, position, noClick, button) {
+		if (item instanceof Button) {
+			const other = item;
+			// @ts-ignore
+			[item, type, position, noClick, button] = other._args;
+		}
 		if (typeof type == 'function') button = type(item, type, position, noClick, button);
 		else if (ui.create.buttonPresets[type]) button = ui.create.buttonPresets[type](item, type, position, noClick, button);
 		if (button) {
@@ -25,6 +30,8 @@ export class Button extends HTMLDivElement {
 				const intro = button.querySelector('.intro');
 				if (intro) intro.remove();
 			}
+			// @ts-ignore
+			button._args = [item, type, position, noClick, button];
 			return button;
 		} else {
 			console.error([item, type, position, noClick, button]);

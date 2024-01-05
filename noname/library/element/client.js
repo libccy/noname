@@ -8,9 +8,10 @@ import { GNC as gnc } from '../../gnc/index.js';
 
 export class Client {
 	/**
-	 * @param {import('../index.js').NodeWS | InstanceType<typeof import('ws').WebSocket>} ws
+	 * @param {import('../index.js').NodeWS | InstanceType<typeof import('ws').WebSocket> | Client} ws
 	 */
 	constructor(ws) {
+		if (ws instanceof Client) throw new Error('Client cannot copy.')
 		this.ws = ws;
 		/**
 		 * @type { string }

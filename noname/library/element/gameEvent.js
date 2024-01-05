@@ -10,15 +10,21 @@ export class GameEvent {
 	/** @type { GameEventPromise } */
 	#promise;
 	/**
-	 * @param {string} [name]
+	 * @param {string | GameEvent} [name]
 	 * @param {false} [trigger]
 	 */
 	constructor(name, trigger) {
+		if (name instanceof GameEvent) {
+			const other = name;
+			[name, trigger] = other.__args;
+		}
+
 		if (typeof name == 'string') {
 			this.name = name;
 			const gameEvent = get.event();
 			if (gameEvent) {
 				const type = `onNext${name[0].toUpperCase()}${name.slice(1)}`;
+				// @ts-ignore
 				if (gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
 			}
 			game.globalEventHandlers.addHandlerToEvent(this);
@@ -50,6 +56,7 @@ export class GameEvent {
 		 **/
 		this.resolve = null;
 		if (trigger !== false && !game.online) this._triggered = 0;
+		this.__args = [name, trigger];
 	}
 	static initialGameEvent() {
 		return new GameEvent().finish().toPromise();
