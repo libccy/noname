@@ -242,7 +242,7 @@ export class Get extends Uninstantable {
 	}
 	static yunjiao(str) {
 		const util = window.pinyinUtilx;
-		if (util) str = util.removeTone(str)
+		if (util) str = util.removeTone(str);
 		if (lib.pinyins._metadata.zhengtirendu.includes(str)) {
 			str = ('-' + str[str.length - 1]);
 		}
@@ -793,67 +793,77 @@ export class Get extends Uninstantable {
 		}
 	}
 	/**
+	 * 深拷贝函数（虽然只处理了部分情况）
+	 * 
+	 * 除了普通的Object和NullObject，均不考虑自行赋值的数据
+	 * 
 	 * @template T
-	 * @param {T} obj
-	 * @param {WeakMap<object, unknown>} [map] - 拷贝用的临时存储（请勿自行赋值）
-	 * @returns {T}
+	 * @param {T} obj - 要复制的对象，若不是对象则直接返回原值
+	 * @param {WeakMap<object, unknown>} [map] - 拷贝用的临时存储，用于处理循环引用（请勿自行赋值）
+	 * @returns {T} - 深拷贝后的对象，若传入值不是对象则为传入值
 	 */
 	static copy(obj, map = new WeakMap()) {
-		try {
-			return structuredClone(obj);
-		}
-		catch {
-			// obj不可序列化时，参考[这里](https://juejin.cn/post/7315612852890026021)实现深拷贝
-			const getType = (obj) => Object.prototype.toString.call(obj);
+		// 参考[这里](https://juejin.cn/post/7315612852890026021)实现深拷贝
+		// 不再判断是否能structuredClone是因为structuredClone会把Symbol给毙了
+		const getType = (obj) => Object.prototype.toString.call(obj);
 
-			const canTranverse = {
-				"[object Map]": true,
-				"[object Set]": true,
-				"[object Object]": true,
-				"[object Array]": true,
-				"[object Arguments]": true,
-			};
+		const canTranverse = {
+			"[object Map]": true,
+			"[object Set]": true,
+			"[object Object]": true,
+			"[object Array]": true,
+			"[object Arguments]": true,
+		};
 
-			if (typeof obj !== "object" || obj === null) 
-				return obj
+		if (typeof obj !== "object" || obj === null)
+			return obj;
 
-			const constructor = obj.constructor;
-			// @ts-ignore
-			if (!canTranverse[getType(obj)]) return new constructor(obj); // 不能拷贝构造的话我也没办法，摆
-			// @ts-ignore
-			if (map.has(obj)) return map.get(obj);
+		// @ts-ignore
+		if (map.has(obj)) return map.get(obj);
 
-			// @ts-ignore
-			const target = constructor ? new constructor() : Object.create(null);
-			map.set(obj, target);
+		const constructor = obj.constructor;
+		// @ts-ignore
+		if (!canTranverse[getType(obj)]) return new constructor(obj); // 不能拷贝构造的话我也没办法，摆
 
-			if (obj instanceof Map) {
-				obj.forEach((value, key) => {
-					target.set(get.copy(key, map), get.copy(value, map));
-				});
-				return target;
-			}
+		// @ts-ignore
+		const target = constructor ? new constructor() : Object.create(null);
+		map.set(obj, target);
 
-			if (obj instanceof Set) {
-				obj.forEach((value) => {
-					target.add(get.copy(value, map));
-				});
-				return target;
-			}
-
-			for (const key in obj) {
-				if (obj.hasOwnProperty(key)) {
-					target[key] = get.copy(obj[key], map);
-				}
-			}
-
-			const symbols = Object.getOwnPropertySymbols(obj);
-			symbols.forEach((s) => {
-				target[s] = get.copy(obj[s], map);
+		if (obj instanceof Map) {
+			obj.forEach((value, key) => {
+				target.set(get.copy(key, map), get.copy(value, map));
 			});
-
 			return target;
 		}
+		if (obj instanceof Set) {
+			obj.forEach((value) => {
+				target.add(get.copy(value, map));
+			});
+			return target;
+		}
+		
+		for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(obj))) {
+			const { enumerable, configurable } = descriptor;
+			if (obj.hasOwnProperty(key)) {
+				const result = { enumerable, configurable };
+				if (descriptor.hasOwnProperty('value')) {
+					result.value = get.copy(descriptor.value, map);
+					result.writable = descriptor.writable;
+				} else {
+					const { get, set } = descriptor;
+					result.get = get;
+					result.set = set;
+				}
+				Reflect.defineProperty(target, key, result);
+			}
+		}
+
+		const symbols = Object.getOwnPropertySymbols(obj);
+		symbols.forEach((symbol) => {
+			target[symbol] = get.copy(obj[symbol], map);
+		});
+
+		return target;
 	}
 	static inpilefull(type) {
 		var list = [];
@@ -2077,7 +2087,7 @@ export class Get extends Uninstantable {
 				if (str.suit && str.number || str.isCard) {
 					var cardnum = get.number(str, false) || '';
 					if ([1, 11, 12, 13].includes(cardnum)) {
-						cardnum = { '1': 'A', '11': 'J', '12': 'Q', '13': 'K' }[cardnum]
+						cardnum = { '1': 'A', '11': 'J', '12': 'Q', '13': 'K' }[cardnum];
 					}
 					if (arg == 'viewAs' && str.viewAs != str.name && str.viewAs) {
 						str2 += '（' + get.translation(str) + '）';
@@ -2443,7 +2453,7 @@ export class Get extends Uninstantable {
 	 */
 	static cardtag(item, tag) {
 		return (item.cardid && (get.itemtype(item) == 'card' || !item.cards || !item.cards.length || item.name == item.cards[0].name) && _status.cardtag && _status.cardtag[tag] && _status.cardtag[tag].includes(item.cardid))
-			|| (item.cardtags && item.cardtags.includes(tag))
+			|| (item.cardtags && item.cardtags.includes(tag));
 	}
 	static tag(item, tag, item2, bool) {
 		var result;
@@ -4533,4 +4543,4 @@ export const get = Get;
 
 export {
 	Is
-}
+};
