@@ -1126,13 +1126,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			dcxianjin:{
+				init:function(player){
+					var num=game.getAllGlobalHistory('changeHp',evt=>{
+						return evt.getParent().name=='damage'&&(evt.getParent().player==player||(evt.getParent().source&&evt.getParent().source==player));
+					}).concat(game.getAllGlobalHistory('changeHp',evt=>{
+						return evt.getParent().name=='damage'&&evt.getParent().player==player&&evt.getParent().source&&evt.getParent().source==player;
+					})).length;
+					if(num) player.addMark('dcxianjin',num,false);
+				},
+				onremove:true,
 				audio:2,
 				trigger:{
 					player:'damageEnd',
 					source:'damageSource',
 				},
 				filter:function(event,player){
-					return game.getGlobalHistory('damage',evt=>evt.player==player||(evt.source&&evt.source==player)).indexOf(event)%2==1;
+					return player.countMark('dcxianjin')%2==0;
 				},
 				forced:true,
 				content:function(){
@@ -1154,6 +1163,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.popup(get.translation(control+'_tag'));
 					if(player.isMaxHandcard()) player.draw();
 					else player.draw(player.getStorage('dctuoyu').length)
+				},
+				group:'dcxianjin_mark',
+				intro:{content:'已造成或受到#次伤害'},
+				subSkill:{
+					mark:{
+						charlotte:true,
+						trigger:{
+							player:'damageEnd',
+							source:'damageSource',
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content:function(){
+							player.addMark('dcxianjin',1,false);
+						},
+					},
 				},
 			},
 			dcqijing:{
@@ -1178,9 +1204,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var evt=trigger.getParent();
 							if(evt.name=='phaseLoop'&&evt._isStandardLoop) evt.player=player.next;
 						}
-						player.chooseTarget(true,'请选择一名要更换座次的角色，将自己移动到该角色的上家位置',function(card,player,target){
+						player.chooseTarget('请选择一名要更换座次的角色，将自己移动到该角色的上家位置',function(card,player,target){
 							return target!=player&&target!=player.next;
-						}).set('ai',function(target){
+						},true).set('ai',function(target){
 							var player=_status.event.player;
 							var current=_status.currentPhase.next;
 							var max=20,att=0;
@@ -1193,7 +1219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return att;
 						})
 					}
-					else event.goto(3);
+					else event.finish();
 					'step 2'
 					if(result.bool){
 						var target=result.targets[0];
@@ -1201,6 +1227,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.swapSeat(target1,target2,null,true);
 						},player,target);
 					}
+					else event.finish();
 					'step 3'
 					player.insertPhase();
 				},
@@ -4517,10 +4544,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					event.logged=false;
-					//event.targets=[];
+					event.targets=[];
 					event.goto(player.countCards('h')%2==1?1:4);
 					'step 1'
-					player.chooseTarget(get.prompt('shenfu'),'对一名其他角色造成1点雷属性伤害',lib.filter.notMe).set('ai',function(target){
+					player.chooseTarget(get.prompt('shenfu'),'对一名其他角色造成1点雷属性伤害',function(card,player,target){
+						return target!=player&&!_status.event.getParent().targets.includes(target);
+					}).set('ai',function(target){
 						var player=_status.event.player;
 						return get.damageEffect(target,player,player,'thunder')*(target.hp==1?2:1);
 					});
@@ -4533,16 +4562,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.logSkill('shenfu',target,'thunder');
 						}
 						else player.line(target,'thunder');
+						event.targets.push(target);
 						target.damage('thunder');
 					}
 					else event.finish();
 					'step 3'
-					if(target.isDead()) event.goto(1);
+					if(target.getHistory('damage',function(evt){
+						return evt.getParent('shenfu')==event&&evt._dyinged;
+					}).length) event.goto(1);
 					else event.finish();
 					'step 4'
-					player.chooseTarget(get.prompt('shenfu'),'令一名角色摸一张牌或弃置其一张手牌'/*,function(card,player,target){
+					player.chooseTarget(get.prompt('shenfu'),'令一名角色摸一张牌或弃置其一张手牌',function(card,player,target){
 						return !_status.event.getParent().targets.includes(target);
-					}*/).set('ai',function(target){
+					}).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						var delta=target.hp-target.countCards('h');
 						if(Math.abs(delta)==1&&get.sgn(delta)==get.sgn(att)) return 3*Math.abs(att);
@@ -4558,7 +4590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.logSkill('shenfu',target);
 						}
 						else player.line(target,'green');
-						//targets.push(target);
+						event.targets.push(target);
 						if(target.countCards('h')==0) event._result={index:0};
 						else player.chooseControl('摸一张牌','弃置一张手牌').set('prompt','选择一项令'+get.translation(target)+'执行…').set('goon',get.attitude(player,target)>0?0:1).set('ai',()=>_status.event.goon);
 						//else player.discardPlayerCard(target,'h','弃置'+get.translation(target)+'一张手牌，或点【取消】令其摸一张牌。');
@@ -7810,7 +7842,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_zhenji:'神甄宓',
 			shen_zhenji_prefix:'神',
 			shenfu:'神赋',
-			shenfu_info:'回合结束时，若你的手牌数为：奇数，你可对一名其他角色造成1点雷属性伤害。若其死亡，你可重复此流程。偶数，你可选择一名角色，你令其摸一张牌或弃置一张手牌。若其手牌数等于体力值，你可重复此流程。',
+			shenfu_info:'回合结束时，若你的手牌数为：奇数，你可对一名其他角色造成1点雷属性伤害。若其因此进入过濒死状态，你可重复此流程（不能选择本次已选择过的角色）。偶数，你可选择一名角色，你令其摸一张牌或弃置一张手牌。若其手牌数等于体力值，你可重复此流程（不能选择本次已选择过的角色）。',
 			qixian:'七弦',
 			qixian_info:'锁定技，你的手牌上限视为7。',
 			caopi_xingdong:'行动',
@@ -7978,7 +8010,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcxianjin:'险进',
 			dcxianjin_info:'锁定技。当你每造成或受到两次伤害后，你激活一个副区域标签并摸X张牌（X为你已激活的副区域数，若你的手牌数为全场最多则改为摸一张牌）。',
 			dcqijing:'奇径',
-			dcqijing_info:'觉醒技。一名角色的回合结束后，若你的三个副区域标签均被激活，则你减1点体力上限，获得〖摧心〗，将座位移动至一名其他角色的上家之后，然后执行一个额外回合。',
+			dcqijing_info:'觉醒技。一名角色的回合结束后，若你的三个副区域标签均被激活，则你减1点体力上限，获得〖摧心〗，将座位移动至两名相邻的其他角色之间并执行一个额外回合。',
 			dccuixin:'摧心',
 			dccuixin_info:'当你不因此技能使用的基本牌或普通锦囊牌结算结束后，若此牌的目标于你使用此牌指定第一个目标时包含你的上家或下家，则你可以视为对下家或上家再使用一张牌名和元素相同的牌。',
 			shen_dianwei:'神典韦',
