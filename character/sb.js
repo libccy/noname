@@ -1814,7 +1814,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 0;
 				},
-				selectTargetAi:function(event,player){
+				selectTargetAi:(event,player)=>{
 					let cache=_status.event.getTempCache('sblijian','targets');
 					if(Array.isArray(cache)) return cache.length;
 					let targets=[],cards=[0],sbbiyue=player.hasSkill('sbbiyue')?Math.max(0,3-game.countPlayer2(current=>{
@@ -1822,7 +1822,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})):0,alter=[null,1,1],temp;
 					for(let i of game.players){
 						if(player===i) continue;
-						temp=get.effect(i,new lib.element.VCard({name:'juedou',isCard:true}),get.copy(i),i);
+						let vplayer=new lib.element.Player(i);
+						temp=get.effect(i,new lib.element.VCard({name:'juedou',isCard:true}),vplayer,i);
+						vplayer.remove();
 						if(temp){
 							let att=get.attitude(event.player,i);
 							if(!att&&sbbiyue||att*temp>0) targets.push([i,temp,att]);

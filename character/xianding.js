@@ -121,10 +121,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function*(event,map){
 					var player=map.player,num=player.maxHp;
 					var result=yield player.chooseCard(get.prompt('dclingxi'),'将至多'+get.cnNumber(num)+'张牌称为“翼”置于武将牌上','he',[1,num]).set('ai',card=>{
-						var player=_status.event.player;
-						if(player.countCards('hs',card=>player.hasValueTarget(card))&&player.countCards('hs',card=>player.hasValueTarget(card)&&!ui.selected.cards.includes(card))<=2) return 0;
-						return 6-get.value(card)+(player.getExpansions('dclingxi').some(cardx=>get.suit(card,false)==get.suit(cardx,false))?1:3);
-					}).set('complexCard',true);
+						let player=_status.event.player,dis=player.needsToDiscard(0,(i,player)=>{
+								return !player.canIgnoreHandcard(i)&&!ui.selected.cards.includes(i);
+							}),
+							cards=ui.selected.cards.concat(player.getExpansions('dclingxi')),
+							suit=get.suit(card,false);
+						if(_status.event.suits.length<4) _status.event.suits.add(get.suit(ui.selected.cards.at(-1),false));
+						if(_status.event.name==='phaseUseEnd'){
+							if(_status.event.suits.includes(suit)) return (dis?10:3)-get.useful(card);
+							return (dis?6:1)-get.useful(card);
+						}
+						_status.event.hvt.remove(ui.selected.cards.at(-1));
+						if(_status.event.hvt.length===1&&card===_status.event.hvt[0]) return 0;
+						let temp;
+						if(!cards.some(i=>{
+							temp=get.suit(i,false);
+							return cards.some(j=>{
+								return i!==j&&suit===get.suit(j,false);
+							});
+						})&&suit===temp) return 15-get.value(card);
+						if(!_status.event.hvt.length){
+							if(_status.event.suits.includes(suit)) return (dis?10:3)-get.useful(card);
+							return (dis?6:1)-get.useful(card);
+						}
+						if(_status.event.hvt.includes(card)){
+							if(_status.event.suits.length>=4){
+								if(cards.length>8) return 0;
+								return 4.5-get.value(card);
+							}
+							if(!_status.event.suits.includes(suit)) return 6-get.value(card);
+							if(card.name==='sha') return 3-get.value(card);
+							return 1-get.value(card);
+						}
+						return 15-get.value(card);
+					}).set('complexCard',true).set('hvt',player.getCards('hs',card=>{
+						return card.name==='zhuge'||player.hasValueTarget(card,null,true);
+					})).set('suits',(()=>{
+						let suits=[];
+						player.getExpansions('dclingxi').forEach(i=>{
+							suits.add(get.suit(i,false));
+						});
+						return suits;
+					})()).set('name',event.triggername);
 					if(result.bool){
 						player.logSkill('dclingxi');
 						player.addToExpansion(result.cards,player,'give').gaintag.add('dclingxi');
@@ -188,11 +226,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var player=map.player,cards=player.getExpansions('dclingxi');
 					var num=player.getHistory('useSkill',evt=>evt.skill=='dczhifou').length+1;
 					var result=yield player.chooseButton(['###'+get.prompt('dczhifou')+'###移去至少'+get.cnNumber(num)+'张武将牌上的“翼”',cards],[num,cards.length]).set('ai',button=>{
-						var player=_status.event.player;
-						if(2*player.getExpansions('dclingxi').filter(card=>!ui.selected.buttons.some(but=>but.link==card)).reduce((list,card)=>list.add(get.suit(card,false)),[]).length-player.countCards('h')<=0) return 0;
-						if(player.getExpansions('dclingxi').filter(card=>!ui.selected.buttons.some(but=>get.suit(but.link,false)==get.suit(card,false)))) return 3;
-						return 1;
-					}).set('num',num);
+						if(!_status.event.res.bool) return 0;
+						if(_status.event.res.cards.includes(button.link)) return 1;
+						return 0;
+					}).set('num',num).set('res',(()=>{
+						if(player.isPhaseUsing()&&player.hasCard(i=>{
+							return player.hasValueTarget(i,null,true);
+						},'h')) return false;
+						let suits=[],cs=player.getExpansions('dclingxi'),cards=[],temp=num;
+						for(let i=0;i<cs.length;i++){
+							if(!temp) break;
+							let suit=get.suit(cs[i],false);
+							if(suits.includes(suit)){
+								cards.push(cs.splice(i--,1)[0]);
+								temp--;
+							}
+							else suits.push(suit);
+						}
+						while(temp>0){
+							cards.push(cs.pop());
+							temp--;
+						}
+						temp=suits.length*2-player.countCards('h');
+						if(temp>0||!temp&&num<Math.max(2,5-player.hp)) cs=true;
+						else cs=false;
+						return {
+							bool:cs,
+							cards:cards
+						};
+					})());
 					if(result.bool){
 						player.logSkill('dczhifou');
 						player.loseToDiscardpile(result.links);
@@ -12604,14 +12666,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(cards[0].name.indexOf('pyzhuren_')==0&&!player.getCards('e').includes(cards[0])) player.draw(2);
 				},
 				ai:{
-					order:11,
+					order:(item,player)=>{
+						if(player.hasCard(i=>get.subtype(i)==='equip1','h')) return 11;
+						return 1;
+					},
 					expose:0.2,
 					result:{
 						target:function(player,target){
 							if(ui.selected.cards.length){
-								var card=ui.selected.cards[0];
-								if(target.getEquip(card)||target.countCards('h',{subtype:get.subtype(card)})) return 0;
-								return get.effect(target,card,player,target);
+								let card=ui.selected.cards[0],tv=get.value(card,target),sub=get.subtype(card);
+								if(sub==='equip1'){
+									let ev=Infinity,te=target.getEquips(1);
+									if(!te.length) return tv;
+									te.forEach(i=>{
+										ev=Math.min(ev,get.value(i));
+									});
+									if(card.name.indexOf('pyzhuren_')==0) return 2+tv-ev;
+									return tv-ev;
+								}
+								if(target.hasCard(i=>get.subtype(i)===sub,'he')) return 0;
+								let pv=get.value(card,player);
+								if(pv>0&&Math.abs(tv)<=pv) return 0;
+								return tv;
 							}
 							return 0;
 						},
@@ -12683,6 +12759,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.color=='red') player.recover();
 					else player.draw(2);
 				},
+				ai:{
+					equipValue:function(card,player){
+						if(player.isDamaged()) return 4.5;
+						return 6;
+					},
+					basic:{
+						equipValue:4.5
+					}
+				}
 			},
 			pyzhuren_diamond:{
 				audio:true,
@@ -12734,7 +12819,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					expose:0.25,
-				},
+					equipValue:function(card,player){
+						return Math.min(7,3.6+player.countCards('h')/2);
+					},
+					basic:{
+						equipValue:4.5
+					}
+				}
 			},
 			pyzhuren_club:{
 				audio:true,
@@ -12781,6 +12872,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.targets.addArray(event.targets);
 					}
 				},
+				ai:{
+					equipValue:function(card,player){
+						if(player.getEnemies().length<2){
+							if(player.isDamaged()) return 0;
+							return 1;
+						}
+						return 4.5;
+					},
+					basic:{
+						equipValue:4.5
+					}
+				}
 			},
 			pyzhuren_spade:{
 				audio:true,
@@ -12800,6 +12903,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.target.loseHp(Math.min(num,5));//.set('source',player);
 				},
 				ai:{
+					equipValue:function(card,player){
+						return 1+4*Math.min(5,player.getCardUsable('sha'));
+					},
+					basic:{
+						equipValue:5
+					},
 					jueqing:true,
 					unequip_ai:true,
 					skillTagFilter:function(player,tag,arg){
@@ -12839,6 +12948,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.draw();
 					}
 				},
+				ai:{
+					equipValue:function(card,player){
+						if(player.isDamaged()) return 6;
+						return 4.8;
+					},
+					basic:{
+						equipValue:5
+					}
+				}
 			},
 			//管辂和葛玄
 			gxlianhua:{
