@@ -8,7 +8,7 @@
  * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> & typeof Promise<typeof lib.element.GameEvent> } GameEventPromise
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
 */
-import { nonameInitialized, assetURL, userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../util/index.js";
+import { nonameInitialized, assetURL, userAgent, Uninstantable, GeneratorFunction, AsyncFunction, characterDefaultPicturePath } from "../util/index.js";
 import { AI as ai } from '../ai/index.js';
 import { Get as get } from '../get/index.js';
 import { Game as game } from '../game/index.js';
@@ -35,6 +35,7 @@ export class Library extends Uninstantable {
 	static hallURL = '47.99.105.222';
 	static assetURL = assetURL;
 	static userAgent = userAgent;
+	static characterDefaultPicturePath = characterDefaultPicturePath;
 	static compatibleEdition = Boolean(typeof nonameInitialized == 'string' && nonameInitialized.match(/\/(?:com\.widget|yuri\.nakamura)\.noname\//));
 	static changeLog = [];
 	static updates = [];
