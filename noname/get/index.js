@@ -795,7 +795,7 @@ export class Get extends Uninstantable {
 	/**
 	 * @template T
 	 * @param {T} obj
-	 * @param {WeakMap<T, T>} [map] - 拷贝用的临时存储（请勿自行赋值）
+	 * @param {WeakMap<object, unknown>} [map] - 拷贝用的临时存储（请勿自行赋值）
 	 * @returns {T}
 	 */
 	static copy(obj, map = new WeakMap()) {
@@ -803,8 +803,6 @@ export class Get extends Uninstantable {
 			return structuredClone(obj);
 		}
 		catch {
-			// 暂时有BUG，先返回原始数据再说
-			return obj;
 			// obj不可序列化时，参考[这里](https://juejin.cn/post/7315612852890026021)实现深拷贝
 			const getType = (obj) => Object.prototype.toString.call(obj);
 
@@ -816,58 +814,17 @@ export class Get extends Uninstantable {
 				"[object Arguments]": true,
 			};
 
-			const functionMap = {
-				"[object Function]": true,
-				"[object AsyncFunction]": true,
-				"[object GeneratorFunction]": true,
-			};
-
-			const transformFunction = (fn) => {
-				const str = fn.toString();
-				// 箭头函数
-				if (/^\s*(?:async)?\s*\(.*\)\s*=>/.test(str)) return str;
-				// 带function标识的
-				if (/^\s*(?:async)?\s*function/.test(str)) return str;
-				const hasAsync = /^\s*(?:async)/.test(str);
-				return `${hasAsync ? "async " : ""}function ${str.replace(/^\s*(?:async)/, '')}`;
-			}
-
-			const createFunction = (fn) => {
-				let cloneFn = null;
-				const str = `cloneFn = ${transformFunction(fn)}`;
-				try {
-					eval(str);
-				} catch (error) {
-					console.error(fn.toString())
-					console.error(str);
-					throw error;
-				}
-				return cloneFn;
-			};
-
-			const cloneSymbol = (s) => {
-				const key = Symbol.keyFor(s);
-				if (key) return Symbol.for(key);
-				const desc = s.description;
-				if (desc) return Symbol(desc);
-				return Symbol();
-			};
-
-			if (typeof obj !== "object" || obj === null) {
-				// @ts-ignore
-				return typeof obj === "symbol"
-					? cloneSymbol(obj)
-					: functionMap[getType(obj)]
-						? createFunction(obj)
-						: obj;
-			}
+			if (typeof obj !== "object" || obj === null) 
+				return obj
 
 			const constructor = obj.constructor;
 			// @ts-ignore
-			if (!canTranverse[getType(obj)]) return new constructor(obj);
-			if (map.has(obj)) return map.get(obj);
+			if (!canTranverse[getType(obj)]) return new constructor(obj); // 不能拷贝构造的话我也没办法，摆
 			// @ts-ignore
-			const target = new constructor();
+			if (map.has(obj)) return map.get(obj);
+
+			// @ts-ignore
+			const target = constructor ? new constructor() : Object.create(null);
 			map.set(obj, target);
 
 			if (obj instanceof Map) {
@@ -892,7 +849,7 @@ export class Get extends Uninstantable {
 
 			const symbols = Object.getOwnPropertySymbols(obj);
 			symbols.forEach((s) => {
-				target[cloneSymbol(s)] = get.copy(obj[s], map);
+				target[s] = get.copy(obj[s], map);
 			});
 
 			return target;
