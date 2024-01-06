@@ -749,7 +749,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
 				filter:function(event,player){
-					var bool=player.hasCards(card=>card.hasGaintag('sbguanxing'),'s');
+					var bool=player.hasCard(card=>card.hasGaintag('sbguanxing'),'s');
 					if(event.name=='phaseZhunbei'){
 						var num=player.countMark('sbguanxingx');
 						return bool||num<=3;

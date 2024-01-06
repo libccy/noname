@@ -3413,7 +3413,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCard'},
 				forced:true,
 				filter:function(event,player){
-					return (event.card.name=='qizhengxiangsheng'||get.zhinangs().includes(event.card.name)||player.getStorage('dinghan').includes(event.card.name))&&event.card.isCard&&event.cards.length==1;
+					if(!event.card.isCard||!event.cards||event.cards.length!==1) return false;
+					return event.card.name=='qizhengxiangsheng'||get.zhinangs().includes(event.card.name)||player.getStorage('dinghan').includes(event.card.name);
 				},
 				content:function(){
 					player.draw();
