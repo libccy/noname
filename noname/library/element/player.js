@@ -8055,6 +8055,7 @@ export class Player extends HTMLDivElement {
 		let count = 0;
 		if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondSha', true, type, true)) {
 			if (rvt === 'count') count++;
+			else if (rvt === 'odds') return 1;
 			else return true;
 		}
 		if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
@@ -8074,17 +8075,18 @@ export class Player extends HTMLDivElement {
 			return false;
 		});
 		count += cards.length;
-		if (count && rvt !== 'count') return true;
+		if (count && rvt !== 'count') return rvt === 'odds' ? 1 : true;
 		let hs = this.getCards('hs').filter(i => !cards.includes(i)).length;
 		if (!hs) {
 			if (rvt === 'count') return count;
+			else if (rvt === 'odds') return 0;
 			return false;
 		}
 		if (rvt === 'count') {
 			if (this.isPhaseUsing()) return count + hs / 4;
 			return count + hs / 4.8;
 		}
-		if (this.isPhaseUsing()) count += Math.pow(2 + hs, 2) / 40;
+		if (hs > 9 || this.isPhaseUsing()) count += Math.pow(2 + hs, 2) / 40;
 		else count += -1.5 * Math.log(1 - hs / 10);
 		if (rvt === 'odds') return Math.min(1, count);
 		return count > _status.event.getRand('mayHaveSha' + hs + this.playerid);
@@ -8098,6 +8100,7 @@ export class Player extends HTMLDivElement {
 		let count = 0;
 		if ((this.hp > 2 || !this.isZhu && this.hp > 1) && this.hasSkillTag('respondShan', true, type, true)) {
 			if (rvt === 'count') count++;
+			else if (rvt === 'odds') return 1;
 			else return true;
 		}
 		if (get.itemtype(viewer) !== 'player') viewer = _status.event.player;
@@ -8117,10 +8120,11 @@ export class Player extends HTMLDivElement {
 			return false;
 		});
 		count += cards.length;
-		if (count && rvt !== 'count') return true;
+		if (count && rvt !== 'count') return rvt === 'odds' ? 1 : true;
 		let hs = this.getCards('hs').filter(i => !cards.includes(i)).length;
 		if (!hs) {
 			if (rvt === 'count') return count;
+			else if (rvt === 'odds') return 0;
 			return false;
 		}
 		if (rvt === 'count') {

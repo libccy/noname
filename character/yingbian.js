@@ -113,7 +113,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'damageBegin3',
 				},
 				filter:function(event,player){
-					return event.source!=event.player;
+					if(event.source===event.player) return false;
+					if(!event.card||!event.cards||!event.cards.length) return true;
+					let target=event[player===event.source?'player':'source'];
+					return target&&target.isIn();
 				},
 				forced:true,
 				content:function*(event,map){

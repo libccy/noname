@@ -159,7 +159,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(event.shanRequired>1&&target.mayHaveShan(target,'use',null,'count')<event.shanRequired-(event.shanIgnored||0)) return false;
 							if(event.baseDamage+event.extraDamage>=target.hp+
 								((player.hasSkillTag('jueqing',false,target)||target.hasSkill('gangzhi'))?target.hujia:0)) return true;
-							if(get.damageEffect(target,player,target,get.nature(event.card))>=0) return false;
+							if(!game.hasNature(event.card, 'ice')&&get.damageEffect(target,player,target,get.nature(event.card))>=0) return false;
 							return true;
 						})());
 						//next.autochoose=lib.filter.autoRespondShan;

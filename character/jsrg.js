@@ -1126,6 +1126,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},player,evt);
 					},
 					check:function(button){
+						if(button.link[2]==='tao'){
+							let dying=_status.event.getParent(2).dying;
+							if(dying) return get.effect(dying,{
+								name:'tao',
+								isCard:true,
+								storage:{jsrgfenjian:true},
+							},_status.event.player);
+						}
 						return _status.event.player.getUseValue({
 							name:button.link[2],
 							isCard:true,
@@ -1167,7 +1175,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:function(item,player){
 						return Math.max(get.order({name:'juedou'}),get.order({name:'tao'}))+0.2;
 					},
-					result:{player:1},
+					result:{
+						player:(player)=>{
+							if(_status.event.dying) return 2*get.sgnAttitude(player,_status.event.dying);
+							return 1;
+						}
+					}
 				},
 				subSkill:{
 					effect:{
