@@ -795,7 +795,7 @@ export class Get extends Uninstantable {
 	/**
 	 * 深拷贝函数（虽然只处理了部分情况）
 	 * 
-	 * 除了普通的Object和NullObject，均不考虑自行赋值的数据
+	 * 除了普通的Object和NullObject，均不考虑自行赋值的数据，但会原样将Symbol复制过去
 	 * 
 	 * @template T
 	 * @param {T} obj - 要复制的对象，若不是对象则直接返回原值
@@ -822,39 +822,47 @@ export class Get extends Uninstantable {
 		if (map.has(obj)) return map.get(obj);
 
 		const constructor = obj.constructor;
+		let target;
+		if (!canTranverse[getType(obj)]) {
+			try {
+				// @ts-ignore
+				target = new constructor(obj);
+			} catch (error) {
+				if (obj instanceof HTMLElement) {
+					target = obj.cloneNode(true); // 不能cloneNode就寄吧，累了
+				} else throw error
+			}
+		}
 		// @ts-ignore
-		if (!canTranverse[getType(obj)]) return new constructor(obj); // 不能拷贝构造的话我也没办法，摆
-
-		// @ts-ignore
-		const target = constructor ? new constructor() : Object.create(null);
+		else target = constructor ? new constructor() : Object.create(null);
 		map.set(obj, target);
 
 		if (obj instanceof Map) {
 			obj.forEach((value, key) => {
 				target.set(get.copy(key, map), get.copy(value, map));
 			});
-			return target;
-		}
-		if (obj instanceof Set) {
+		} else if (obj instanceof Set) {
 			obj.forEach((value) => {
 				target.add(get.copy(value, map));
 			});
-			return target;
 		}
-		
-		for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(obj))) {
-			const { enumerable, configurable } = descriptor;
-			if (obj.hasOwnProperty(key)) {
-				const result = { enumerable, configurable };
-				if (descriptor.hasOwnProperty('value')) {
-					result.value = get.copy(descriptor.value, map);
-					result.writable = descriptor.writable;
-				} else {
-					const { get, set } = descriptor;
-					result.get = get;
-					result.set = set;
+
+		const descriptors = Object.getOwnPropertyDescriptors(obj);
+		if (descriptors) {
+			for (const [key, descriptor] of Object.entries(descriptors)) {
+				const { enumerable, configurable } = descriptor;
+				if (obj.hasOwnProperty(key)) {
+					const result = { enumerable, configurable };
+					if (descriptor.hasOwnProperty('value')) {
+						result.value = get.copy(descriptor.value, map);
+						result.writable = descriptor.writable;
+					} else {
+						const { get, set } = descriptor;
+						result.get = get;
+						result.set = set;
+					}
+					Reflect.defineProperty(target, key, result);
 				}
-				Reflect.defineProperty(target, key, result);
 			}
 		}
 
