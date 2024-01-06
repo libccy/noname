@@ -305,9 +305,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return typeof num=='number'&&num>0;
 				},
 				check:function(event,player){
-					var num=get.cardNameLength(event.card);
-					if(num>=player.getDamagedHp()) return true;
-					return player.getHistory('useSkill',evt=>evt.skill=='clanhuanghan').length&&player.hasSkill('clanbaozu',null,false,false)&&player.awakenedSkills.includes('clanbaozu');
+					let num=get.cardNameLength(event.card)-player.getDamagedHp();
+					if(num>=0) return true;
+					if(num<-1) return false;
+					if(player.hasSkill('clanbaozu',null,false,false)&&player.awakenedSkills.includes('clanbaozu')&&player.getHistory('useSkill',evt=>{
+						return evt.skill=='clanhuanghan';
+					}).length) return true;
+					return false;
 				},
 				content:function(){
 					'step 0'
@@ -320,7 +324,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.log(player,'恢复了技能','#【保族】');
 					}
 				},
-				ai:{threaten:3},
+				ai:{
+					threaten:3,
+					effect:{
+						target:(card,player,target)=>{
+							if(!get.tag(card,'damage')||player.hasSkillTag('jueqing',false,target)) return;
+							let num=get.cardNameLength(card)-target.getDamagedHp();
+							if(num>0) return [1,num+0.1];
+						}
+					}
+				},
 			},
 			//族钟会
 			clanyuzhi:{
