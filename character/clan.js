@@ -287,11 +287,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.draw(num);
 					}
 				},
-				ai:{threaten:3},
+				ai:{
+					threaten:3,
+					effect:{
+						player:(card,player,target)=>{
+							if(!target||typeof card!=='object'||player._clanjiejian_mod_temp||get.type(card)==='equip'||
+							get.attitude(player,target)<=0||get.cardNameLength(card)!==player.getHistory('useCard').length+1) return;
+							let targets=[target],evt=_status.event.getParent('useCard');
+							targets.addArray(ui.selected.targets);
+							if(evt&&evt.card==card) targets.addArray(evt.targets);
+							return [1,0.8*get.cardNameLength(card)/targets.length];
+						}
+					}
+				},
 				mod:{
 					aiOrder:function(player,card,num){
-						if(typeof card=='object'&&get.cardNameLength(card)==player.getHistory('useCard').length+1&&get.type(card)!='equip'){
-							if(get.effect(player,card,player,player)>0) return num+10;
+						if(typeof card=='object'&&get.type(card)!=='equip'){
+							let cs=get.cardNameLength(card)-player.getHistory('useCard').length-1;
+							if(cs<0) return num;
+							if(cs>0) return num/3;
+							player._clanjiejian_mod_temp=true;
+							let bool=game.hasPlayer(target=>{
+								if(get.attitude(player,target)<=0||!player.canUse(card,target,null,true)) return false;
+								return get.effect(target,card,player,player)+get.effect(target,{name:'draw'},player,player)>0;
+							});
+							delete player._clanjiejian_mod_temp;
+							if(bool) return num+15;
 						}
 					},
 				},
