@@ -37,9 +37,15 @@ export class GameEventPromise extends Promise {
 	}
 	#event;
 	/**
-	 * @param { GameEvent } event
+	 * @param { GameEvent | GameEventPromise } arg
 	 */
-	constructor(event) {
+	constructor(arg) {
+		if (arg instanceof GameEventPromise)
+			throw new Error("GameEventPromise cannot copy.")
+		/**
+		 * @type {GameEvent}
+		 */
+		const event = arg;
 		super(resolve => {
 			// 设置为异步事件
 			event.async = true;

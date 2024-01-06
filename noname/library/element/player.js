@@ -12,6 +12,11 @@ export class Player extends HTMLDivElement {
 	 */
 	// @ts-ignore
 	constructor(position, noclick) {
+		if (position instanceof Player) {
+			const other = position;
+			[position, noclick] = other._args;
+		}
+
 		/**
 		 * @type {this}
 		 */
@@ -19,6 +24,8 @@ export class Player extends HTMLDivElement {
 		const player = ui.create.div('.player', position);
 		Object.setPrototypeOf(player, Player.prototype);
 		player.build(noclick);
+		// @ts-ignore
+		player._args = [position, noclick];
 		return player;
 	}
 	/**
@@ -6193,8 +6200,8 @@ export class Player extends HTMLDivElement {
 		if (mark) this.markAuto(name);
 		return value;
 	}
-	getStorage(name) {
-		return this.storage[name] || [];
+	getStorage(name, defaultValue = []) {
+		return this.hasStorage(name) ? this.storage[name] : defaultValue;
 	}
 	hasStorage(name, value) {
 		if (!(name in this.storage)) return false;

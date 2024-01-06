@@ -8,9 +8,15 @@ import { GNC as gnc } from '../../gnc/index.js';
 
 export class Control extends HTMLDivElement {
 	// @ts-ignore
-	constructor() {
+	constructor(...args) {
+		if (args[0] instanceof Control) {
+			const other = args[0];
+			// @ts-ignore
+			args = other._args;
+		}
+
 		const nc = !ui.control.querySelector('div:not(.removing):not(.stayleft)');
-		const controls = Array.isArray(arguments[0]) ? arguments[0] : Array.from(arguments);
+		const controls = Array.isArray(args[0]) ? args[0] : args;
 		/**
 		 * @type {this}
 		 */
@@ -54,6 +60,8 @@ export class Control extends HTMLDivElement {
 		}
 
 		ui.updatec();
+		// @ts-ignore
+		control._args = args;
 		return control;
 	}
 	open() {

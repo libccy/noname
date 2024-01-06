@@ -13,6 +13,11 @@ export class Card extends HTMLDivElement {
 	 */
 	// @ts-ignore
 	constructor(position, info, noclick) {
+		if (position instanceof Card) {
+			const other = position;
+			// @ts-ignore
+			[position, info, noclick] = other._args;
+		}
 		/**
 		 * @type {this}
 		 */
@@ -20,6 +25,8 @@ export class Card extends HTMLDivElement {
 		const card = ui.create.div('.card', position);
 		Object.setPrototypeOf(card, Card.prototype);
 		card.build(info, noclick);
+		// @ts-ignore
+		card._args = [position, info, noclick];
 		return card;
 	}
 	build(info, noclick) {
