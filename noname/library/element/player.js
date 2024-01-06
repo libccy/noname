@@ -8,17 +8,15 @@ import { UI as ui } from '../../ui/index.js';
 export class Player extends HTMLDivElement {
 	/**
 	 * @param {HTMLDivElement|DocumentFragment} [position]
-	 * @param {true} [noclick]
 	 */
 	// @ts-ignore
-	constructor(position, noclick) {
+	constructor(position) {
 		/**
 		 * @type {this}
 		 */
 		// @ts-ignore
 		const player = ui.create.div('.player', position);
 		Object.setPrototypeOf(player, Player.prototype);
-		player.build(noclick);
 		return player;
 	}
 	/**
@@ -174,6 +172,7 @@ export class Player extends HTMLDivElement {
 		player.buildProperty();
 		player.buildExtra();
 		player.buildEventListener(noclick);
+		return this;
 	}
 	buildNode() {
 		let player = this;

@@ -12,14 +12,13 @@ export class Card extends HTMLDivElement {
 	 * @param {true} [noclick]
 	 */
 	// @ts-ignore
-	constructor(position, info, noclick) {
+	constructor(position) {
 		/**
 		 * @type {this}
 		 */
 		// @ts-ignore
 		const card = ui.create.div('.card', position);
 		Object.setPrototypeOf(card, Card.prototype);
-		card.build(info, noclick);
 		return card;
 	}
 	build(info, noclick) {
@@ -28,6 +27,7 @@ export class Card extends HTMLDivElement {
 		card.buildIntro(noclick);
 		card.buildProperty();
 		card.buildEventListener(info);
+		return this;
 	}
 	buildEventListener(info) {
 		let card = this;

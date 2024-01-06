@@ -29,7 +29,7 @@ export class Dialog extends HTMLDivElement {
 			else if (argument == 'noforcebutton') noForceButton = true;
 			else dialog.add(argument);
 		});
-		if (!hidden) dialog.open();
+		//if (!hidden) dialog.open();
 		if (!lib.config.touchscreen) dialog.contentContainer.onscroll = ui.update;
 		if (!noTouchScroll) {
 			dialog.contentContainer.ontouchstart = ui.click.dialogtouchStart;
