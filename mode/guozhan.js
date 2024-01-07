@@ -1557,9 +1557,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 					return !player.wontYe('wei')||!game.hasPlayer(current=>current.identity=='wei')
 				},
-				check:function(event,player,name){
-					return name!='damageBegin1';
-				},
+				check:function(event,player){
+					return !event.player.hasSkillTag('filterDamage',null,{
+						player:event.source,
+						card:event.card,
+					})&&get.damageEffect(event.player,event.source,player,_status.event.player)>0;
+				},	
 				content:function(){
 					trigger.num++;
 				},
