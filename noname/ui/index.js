@@ -8655,7 +8655,11 @@ class Create extends Uninstantable {
 		return dialog;
 	}
 	static dialog() {
-		return new lib.element.Dialog(...arguments);
+		let dialog = new lib.element.Dialog(...arguments);
+		if(!Array.from(arguments).includes('hidden')){
+			dialog.open();
+		}
+		return dialog;
 	}
 	static line2() {
 		var node = ui.create.line.apply(this, arguments);
@@ -9898,7 +9902,7 @@ class Create extends Uninstantable {
 			dialog.buttons.add(next.firstChild);
 		}
 	}
-	static player(position, noclick) { return new lib.element.Player(position, noclick) }
+	static player(position, noclick) { return new lib.element.Player(position).build(noclick); }
 	static connectPlayers(ip) {
 		ui.updateConnectPlayerPositions();
 		game.connectPlayers = [];
@@ -10047,7 +10051,7 @@ class Create extends Uninstantable {
 			// ui.updatehl();
 		}
 	}
-	static card(position, info, noclick) { return new lib.element.Card(position, info, noclick)}
+	static card(position, info, noclick) { return new lib.element.Card(position).build(info, noclick);}
 	static cardsAsync() {
 		if (lib.onfree) {
 			_status.waitingForCards = Array.from(arguments);
