@@ -824,14 +824,8 @@ export class Get extends Uninstantable {
 		const constructor = obj.constructor;
 		let target;
 		if (!canTranverse[getType(obj)]) {
-			try {
-				// @ts-ignore
-				target = new constructor(obj);
-			} catch (error) {
-				if (obj instanceof HTMLElement) {
-					target = obj.cloneNode(true); // 不能cloneNode就寄吧，累了
-				} else throw error
-			}
+			target = obj;
+			return target;
 		}
 		// @ts-ignore
 		else target = constructor ? new constructor() : Object.create(null);
