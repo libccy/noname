@@ -1444,11 +1444,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}),targets=game.filterPlayer(current=>{
 								return !player.getStorage('dcshangyu_transfer').includes(current);
 							}).sortBySeat(_status.currentPhase);
+							if(targets.length&&targets[0]===_status.currentPhase&&!_status.currentPhase.getCardUsable('sha')) targets.push(targets.shift());
 							event.cards=cards;
 							player.chooseTarget(`赏誉：将${get.translation(cards)}交给一名可选角色`,(card,player,target)=>{
 								return !player.getStorage('dcshangyu_transfer').includes(target);
 							},true).set('ai',target=>{
-								let att=get.sgn(get.attitude(_status.event.player,target)),idx=1+_status.event.targets.indexOf(target);
+								let att=get.sgnAttitude(_status.event.player,target),idx=1+_status.event.targets.indexOf(target);
 								if(att<0) return -idx;
 								return att+1/idx;
 							}).set('targets',targets);
