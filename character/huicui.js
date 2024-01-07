@@ -2179,6 +2179,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 						}
+					},
+					count:{
+						intro:{
+							content:function(s,p){
+								let str='此阶段已转化过的卡牌花色：';
+								for(let i=0;i<s.length;i++){
+									str+=get.translation(s[i]);
+								}
+								return str;
+							}
+						},
+						charlotte:true,
+						onremove:true
 					}
 				}
 			},

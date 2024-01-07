@@ -5972,7 +5972,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:(card,player,target)=>{
 							if(player===target) return;
 							if(game.hasPlayer2(current=>{
-								return current.hasHistory('useCard',evt=>evt.card.name==card.name&&evt.targets&&evt.targets.includes(player));
+								return current.hasHistory('useCard',evt=>evt.card.name==card.name&&evt.targets&&evt.targets.includes(target));
 							})&&(card.name=='sha'||get.type(card)=='trick')) return 'zeroplayertarget';
 						}
 					}

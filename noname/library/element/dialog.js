@@ -7,7 +7,13 @@ import { UI as ui } from '../../ui/index.js';
 
 export class Dialog extends HTMLDivElement {
 	// @ts-ignore
-	constructor() {
+	constructor(...args) {
+		if (args[0] instanceof Dialog) {
+			const other = args[0];
+			// @ts-ignore
+			args = other._args;
+		}
+
 		let hidden = false;
 		let noTouchScroll = false;
 		let forceButton = false;
@@ -21,7 +27,7 @@ export class Dialog extends HTMLDivElement {
 		dialog.bar1 = ui.create.div('.bar.top', dialog);
 		dialog.bar2 = ui.create.div('.bar.bottom', dialog);
 		dialog.buttons = [];
-		Array.from(arguments).forEach(argument => {
+		Array.from(args).forEach(argument => {
 			if (typeof argument == 'boolean') dialog.static = argument;
 			else if (argument == 'hidden') hidden = true;
 			else if (argument == 'notouchscroll') noTouchScroll = true;
@@ -42,6 +48,8 @@ export class Dialog extends HTMLDivElement {
 			dialog.forcebutton = true;
 			dialog.classList.add('forcebutton');
 		}
+		// @ts-ignore
+		dialog._args = args;
 		return dialog;
 	}
 	add(item, noclick, zoom) {

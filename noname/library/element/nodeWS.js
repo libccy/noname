@@ -8,10 +8,10 @@ import { GNC as gnc } from '../../gnc/index.js';
 
 export class NodeWS {
 	/**
-	 * @param {string} id
+	 * @param {string | NodeWS} id
 	 */
 	constructor(id) {
-		this.wsid = id;
+		this.wsid = (id instanceof NodeWS) ? id.wsid : id;
 	}
 	send(message) {
 		game.send('server', 'send', this.wsid, message);

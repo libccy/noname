@@ -6247,11 +6247,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function(){
 					"step 0"
-					var check= player.countCards('h')>2;
 					player.chooseTarget(get.prompt("shensu"),"跳过判定阶段和摸牌阶段，视为对一名其他角色使用一张【杀】",function(card,player,target){
 						if(player==target) return false;
 						return player.canUse({name:'sha'},target,false);
-					}).set('check',check).set('ai',function(target){
+					}).set('check',player.countCards('h')>2).set('ai',function(target){
 						if(!_status.event.check) return 0;
 						return get.effect(target,{name:'sha'},_status.event.player);
 					}).setHiddenSkill('shensu1');
@@ -6280,7 +6279,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					var check=player.needsToDiscard();
 					player.chooseCardTarget({
 						prompt:get.prompt('shensu'),
 						prompt2:"弃置一张装备牌并跳过出牌阶段，视为对一名其他角色使用一张【杀】",
@@ -6300,7 +6298,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(_status.event.check) return 0;
 							return get.effect(target,{name:'sha'},_status.event.player);
 						},
-						check:check
+						check:player.countCards('hs',i=>{
+							return player.hasValueTarget(i,null,true);
+						})>player.hp-1
 					}).setHiddenSkill('shensu2');
 					"step 1"
 					if(result.bool){
