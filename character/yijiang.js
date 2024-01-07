@@ -7698,7 +7698,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var nh=_status.currentPhase.countCards('h')+1;
 					var players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
-						if(players[i].countCards('h')>nh){
+						if(players[i].countCards('h')>=nh){
 							if(!player.countCards('h','shan')||get.attitude(player,players[i])<=0) return true;
 						}
 					}

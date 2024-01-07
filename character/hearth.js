@@ -121,7 +121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// hs_baiguyoulong:['male','qun',4,['hstianqi']],
 			hs_yangyanwageli:['female','qun',3,['hspuzhao','hsyanxin']],
 
-			hs_aiqinvyao:['famale','qun',4,['nsaiqi','nsbeiming']],
+			hs_aiqinvyao:['female','qun',4,['nsaiqi','nsbeiming']],
 
 			hs_yelinlonghou:['female','qun',4,['ylyuchu']],
 			hs_yelinchulong:["male","qun",1,[],['unseen']],
