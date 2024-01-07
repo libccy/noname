@@ -828,7 +828,7 @@ export class Get extends Uninstantable {
 			return target;
 		}
 		// @ts-ignore
-		else target = constructor ? new constructor() : Object.create(null);
+		else target = constructor ? new constructor(target) : Object.create(null);
 		map.set(obj, target);
 
 		if (obj instanceof Map) {
