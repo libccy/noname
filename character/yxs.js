@@ -107,8 +107,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(!player.countCards('h',{name:'sha'})) return false;
 					return event.card&&(event.card.name=='sha'||event.card.name=='juedou');
 				},
-				content:function(){	
-					player.addTempSkill('yxs_fanji2','shaAfter');   
+				content:function(){
+					player.addTempSkill('yxs_fanji2','shaAfter');
 					player.chooseToUse({name:'sha'},trigger.source,'反击：是否对'+get.translation(trigger.source)+'使用一张杀？').logSkill='yxs_fanji';
 				},
 			},
@@ -121,7 +121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					return event.card&&event.card.name=='sha'&&get.color(event.card)=='red';
 				},
-				content:function (){	
+				content:function (){
 					trigger.directHit=true;
 				},
 			},
@@ -142,7 +142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-			},	 
+			},
 			yxs_menshen:{
 				audio:2,
 				trigger:{
@@ -162,7 +162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.attitude(player,target);
 					});
 					"step 1"
-					if(result.bool){		   
+					if(result.bool){
 						var target=result.targets[0];
 						player.line(target,'green');
 						game.log(target,'成为了','【门神】','的目标');
@@ -170,7 +170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.addSkill('yxs_menshen2');
 					}
 					else{
-						event.finish(); 
+						event.finish();
 					}
 				},
 				ai:{

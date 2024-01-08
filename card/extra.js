@@ -1020,7 +1020,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			baiyin:'白银狮子',
 			baiyin_info:'锁定技。①当你受到伤害时，若此伤害大于1，则你将伤害值扣减至1点。②当你失去装备区内的【白银狮子】后，你回复1点体力。',
 			baiyin_skill:'白银狮子',
-			
+
 			muniu:'木牛流马',
 			muniu_bg:'牛',
 			muniu_skill:'木牛',
@@ -1084,7 +1084,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			["spade",13,"wuxie"],
 			["spade",10,"bingliang"],
 			["club",4,"bingliang"],
-			
+
 			['diamond',5,'muniu'],
 		],
 	}

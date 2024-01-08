@@ -5786,7 +5786,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_lvmeng:'谋吕蒙',
 			sbkeji:'克己',
 			sbkeji_info:'①出牌阶段各限一次。你可以选择一项：1.弃置一张手牌，然后获得1点护甲；2.失去1点体力，然后获得2点护甲。②你的手牌上限+X（X为你的护甲数）。③若你不为正在结算濒死流程的角色，你不能使用【桃】。',
-			sbdujiang:'渡江',			
+			sbdujiang:'渡江',
 			sbdujiang_info:'觉醒技。准备阶段，若你的护甲数不少于3，你获得〖夺荆〗，修改〖克己①〗为“出牌阶段限一次”。',
 			sbduojing:'夺荆',
 			sbduojing_info:'当你使用【杀】指定目标时，你可以失去1点护甲。然后令此【杀】无视防具，你获得目标角色一张牌，本回合使用【杀】的次数上限+1。',

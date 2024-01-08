@@ -905,7 +905,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['diamond',9,'kaihua'],
 			['diamond',10,'yinfengjia'],
 			['diamond',11,'sha'],
-			
+
 			['club',3,'jiejia'],
 			['club',4,'sha','thunder'],
 			['club',5,'zheji'],
@@ -914,7 +914,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['club',9,'zhulu_card'],
 			['club',10,'jinhe'],
 			['club',11,'sha'],
-			
+
 			['heart',3,'sha','fire'],
 			['heart',4,'shan'],
 			['heart',5,'numa'],
@@ -923,7 +923,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['heart',9,'kaihua'],
 			['heart',10,'nvzhuang'],
 			['heart',11,'kaihua'],
-			
+
 			['spade',3,'caochuan'],
 			['spade',4,'sha','thunder'],
 			['spade',5,'wufengjian'],

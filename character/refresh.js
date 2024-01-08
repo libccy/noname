@@ -126,11 +126,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhenji:['female','wei',3,['reluoshen','reqingguo']],
 			re_zhugeliang:['male','shu',3,['reguanxing','kongcheng']],
 			re_huaxiong:["male","qun",6,["reyaowu","shizhan"]],
-			
+
 			re_zhangjiao:['male','qun',3,['xinleiji','xinguidao','xinhuangtian'],['zhu']],
 			xin_yuji:['male','qun',3,['reguhuo']],
 			re_zuoci:['male','qun',3,['rehuashen','rexinsheng']],
-			
+
 			ol_xiahouyuan:['male','wei',4,['xinshensu','shebian']],
 			caoren:['male','wei',4,['xinjushou','xinjiewei']],
 			ol_weiyan:['male','shu',4,['xinkuanggu','reqimou']],
@@ -148,7 +148,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_jiangwei:['male','shu',4,['oltiaoxin','olzhiji']],
 			ol_caiwenji:['female','qun',3,['olbeige','duanchang']],
 			ol_liushan:['male','shu',3,['xiangle','olfangquan','olruoyu'],['zhu']],
-			
+
 			re_sunce:['male','wu',4,['oljiang','olhunzi','olzhiba'],['zhu']],
 			re_jianyong:['male','shu',3,['reqiaoshui','jyzongshi']],
 		},
@@ -3700,7 +3700,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										return get.effect(current,{
 											name:card.viewAs||card.name,
 											cards:[card],
-										},current,current)<-2;	
+										},current,current)<-2;
 									});
 									for(var i=0;i<js.length;i++){
 										if(game.hasPlayer(function(current2){
@@ -5665,7 +5665,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					backup1:{
-						audio:'xinpaiyi', 
+						audio:'xinpaiyi',
 						filterCard:()=>false,
 						selectCard:-1,
 						filterTarget:true,
@@ -11535,7 +11535,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			
+
 			"new_yajiao":{
 				audio:"reyajiao",
 				trigger:{
@@ -11603,7 +11603,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return (player.canUse({name:'juedou'},current)&&current!=trigger.player&&current!=player&&get.effect(current,{name:'juedou'},player,_status.event.player)<0);
 						})) return 1;
 						return 4;
-					})()).set('logSkill',['new_liyu',trigger.player]);	
+					})()).set('logSkill',['new_liyu',trigger.player]);
 					'step 1'
 					if(result.bool){
 						if(get.type(result.cards[0])!='equip'){
@@ -12246,7 +12246,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			
+
 			reguanxing:{
 				audio:'guanxing',
 				audioname:['jiangwei','re_jiangwei','re_zhugeliang','gexuan','ol_jiangwei'],
@@ -14786,7 +14786,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhenji_prefix:'界',
 			re_huaxiong:"界华雄",
 			re_huaxiong_prefix:'界',
-			
+
 			ol_sp_zhugeliang:"界卧龙",
 			ol_sp_zhugeliang_prefix:'界',
 			re_zhangjiao:'界张角',
@@ -14797,7 +14797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_yuanshao_prefix:'界',
 			ol_liushan:'界刘禅',
 			ol_liushan_prefix:'界',
-			
+
 			olfangquan:'放权',
 			olfangquan_info:'出牌阶段开始前，你可以跳过此阶段。若如此做，弃牌阶段开始时，你可以弃置一张手牌，令一名其他角色进行一个额外回合。',
 			olruoyu:'若愚',
@@ -14893,7 +14893,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyaowu_info:'锁定技，当你受到牌造成的伤害时，若此牌为红色，则伤害来源摸一张牌；否则你摸一张牌。',
 			reqingguo:'倾国',
 			reqingguo_info:'你可以将一张黑色牌当做【闪】使用或打出。',
-			
+
 			qinxue:'勤学',
 			retuxi:'突袭',
 			reluoyi:'裸衣',
@@ -14971,7 +14971,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			botu_info:'回合结束时，若你本回合出牌阶段内使用的牌包含四种花色，则你可以进行一个额外回合。',
 			rebotu:'博图',
 			rebotu_info:'每轮限X次。回合结束时，若本回合内置入弃牌堆的牌中包含至少四种花色，则你可获得一个额外的回合。（X为存活角色数且至多为3）',
-			
+
 			xin_yuji:'界于吉',
 			xin_yuji_prefix:'界',
 			re_zuoci:'界左慈',
@@ -15304,7 +15304,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olhaoshi_info:'摸牌阶段开始时，你可以多摸两张牌。然后摸牌阶段结束时，若你的手牌数大于5，则你将手牌数的一半（向下取整）交给一名手牌最少其他角色并获得如下效果直到你下回合开始：当你成为【杀】或普通锦囊牌的目标后，其可以交给你一张手牌。',
 			oldimeng:'缔盟',
 			oldimeng_info:'出牌阶段限一次，你可令两名满足X≤Y的其他角色交换手牌并获得如下效果：出牌阶段结束时，你弃置X张牌（X为这两名角色手牌数之差的绝对值；Y为你的牌数）。',
-			
+
 			rejijiang:'激将',
 			rejijiang1:'激将',
 			rejijiang2:'激将',
@@ -15556,7 +15556,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_lidian_prefix:'界',
 			re_xushu:'界徐庶',
 			re_xushu_prefix:'界',
-			
+
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
 			refresh_huo:'界限突破·火',

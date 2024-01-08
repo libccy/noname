@@ -1464,7 +1464,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							const hs=position.includes('h')?target.getGainableCards(player,'h'):[];
 							const es=position.includes('e')?target.getGainableCards(player,'e'):[];
 							const js=position.includes('j')?target.getGainableCards(player,'j'):[];
-							
 							if(get.attitude(player,target)<=0){
 								if(hs.length>0) return -1.5;
 								return (es.some(card=>{
@@ -1487,7 +1486,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							const hs=position.includes('h')?target.getGainableCards(player,'h'):[];
 							const es=position.includes('e')?target.getGainableCards(player,'e'):[];
 							const js=position.includes('j')?target.getGainableCards(player,'j'):[];
-							
 							const att=get.attitude(player,target);
 							if(att<0){
 								if(!hs.length&&!es.some(card=>{

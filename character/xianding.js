@@ -2005,7 +2005,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return 0;
 					}
-				
+
 					for(var i=0;i<targets.length;i++){
 						if(lib.skill.dcpandi.pandi_canUse(player,card,targets[i],null,true)){
 							var eff=lib.skill.dcpandi.pandi_effect(targets[i],card,player,viewer);
@@ -3672,7 +3672,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var suit=get.suit(card);
 					if(get.position(card)!='h'&&player.countCards('h',{suit:suit})==1) return 0.1;
 					if(!player.hasCard(cardx=>cardx!=card&&get.suit(cardx)==suit)) return 7.5-get.value(card);
-					return 6-get.value(card);	
+					return 6-get.value(card);
 				},
 				content:function(){
 					'step 0'
@@ -5665,7 +5665,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.classList.remove('glow_phase');
 								delete _status.currentPhase;
 							},player);
-						} 
+						}
 					}
 				},
 				subSkill:{
@@ -7627,7 +7627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							dialog.content.appendChild(table2);
 							dialog.add('　　');
 							event.dialog.open();
-							
+
 							event.switchToAuto=function(){
 								event._result={
 									bool:true,
@@ -7796,7 +7796,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.content.appendChild(table);
 						dialog.add('　　');
 						dialog.open();
-						
+
 						event.switchToAuto=function(){
 							event.dialog.close();
 							event.control.close();
@@ -9834,7 +9834,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.draw(2);
 							}
 							player.removeSkill('wfyuyan_damage');
-						},	
+						},
 					},
 				},
 			},
@@ -11661,7 +11661,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){},
 				ai:{combo:'shiyuan'},
 			},
-			
+
 			//新岩泽(划掉)留赞
 			refenyin:{
 				audio:2,
@@ -13082,7 +13082,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var target=trigger.player;
 							event.target=target;
 							target.removeMark('zhafu_hf',1);
-							if(target.countCards('h')<=1) event.finish()	
+							if(target.countCards('h')<=1) event.finish()
 							'step 1'
 							target.chooseCard('h',true,'选择保留一张手牌，将其余的手牌交给'+get.translation(player)).set('ai',get.value);
 							'step 2'
@@ -13097,7 +13097,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			
+
 			tuiyan:{
 				audio:2,
 				trigger:{player:'phaseUseBegin'},
@@ -14007,7 +14007,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclingxi_info:'出牌阶段开始和结束时，你可以将至多X张牌称为“翼”置于你的武将牌上（X为你的体力上限）。当你失去武将牌上的“翼”时，你将手牌数调整至Y张（Y为你武将牌上的“翼”所含有的花色数的两倍）。',
 			dczhifou:'知否',
 			dczhifou_info:'当你使用牌结算完毕后，你可以移去至少X张武将牌上的“翼”（X为本回合此前发动此技能的次数+1），然后选择一名角色并选择一项令其执行（每个选项每回合限选择一次）：①将一张牌称为“翼”置于你的武将牌上；②弃置两张牌；③失去1点体力。',
-			
+
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
 			sp2_shengun:'奇人异士',

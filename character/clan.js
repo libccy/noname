@@ -2708,7 +2708,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_xunyou:'族荀攸',
 			clanbaichu:'百出',
 			clanbaichu_info:'锁定技，当你使用一张牌结算完毕后，若你：未记录过此牌的花色和类型组合，则你记录此组合并记录一个普通锦囊牌名，否则你于本轮获得技能〖奇策〗；已记录此牌牌名，你回复1点体力或摸一张牌。',
-			
+
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
 			clan_han:'颍川·韩氏',

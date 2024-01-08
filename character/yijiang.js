@@ -107,9 +107,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jikang:['male','wei',3,['qingxian','juexiang']],
 			qinmi:['male','shu',3,['jianzheng','zhuandui','tianbian']],
 			xuezong:['male','wu',3,['funan','xinjiexun']],
-			
+
 			old_huaxiong:['male','qun',6,['shiyong']],
-			
+
 			yujin:["male","wei",4,["rezhenjun"],[]],
 		},
 		characterIntro:{
@@ -3163,7 +3163,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('zhenjun'),function(card,player,target){
-						return target.countCards('h')>target.hp; 
+						return target.countCards('h')>target.hp;
 					}).set('ai',function(target){
 						return -get.attitude(_status.event.player,target)*(target.countCards('e')+1);
 					});
@@ -14618,7 +14618,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			feiyao:'费曜',
 			zhenfeng:'镇锋',
 			zhenfeng_info:'每回合限一次。当其他角色于其回合内使用牌时，若其手牌数不大于其体力值，你可以猜测其手牌中与此牌类别相同的牌数。若你猜对，你摸X张牌并视为对其使用一张【杀】（X为你连续猜对的次数且至多为5）；若你猜错且差值大于1，其视为对你使用一张【杀】。',
-			
+
 			yijiang_2011:'一将成名2011',
 			yijiang_2012:'一将成名2012',
 			yijiang_2013:'一将成名2013',

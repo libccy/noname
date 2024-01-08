@@ -43,7 +43,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:lib.filter.notMe,
 				content:function (){
-					"step 0"		
+					"step 0"
 					if(!target.countCards('he',{type:'equip'})){
 						target.damage();
 						event.finish();

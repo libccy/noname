@@ -675,7 +675,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			mtg_shamolvzhou_skill:'沙漠绿洲',
 			mtg_shamolvzhou_info:'发现一张基本牌。地图效果：你的基本牌不计入手牌上限。',
 			mtg_shamolvzhou_skill_info:'你的基本牌不计入手牌上限。',
-			
+
 			mtg_duzhao:'毒沼',
 			mtg_duzhao_skill:'毒沼',
 			mtg_duzhao_info:'选择一名角色令其获得一张毒。地图效果：结束阶段，你获得一张毒。',

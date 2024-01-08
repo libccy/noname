@@ -937,7 +937,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					},result);
-					
+
 					var list=[];
 					var players=game.players.slice(0);
 					players.removeArray([game.rZhu,game.bZhu]);
@@ -1503,7 +1503,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						identityList=get.identityList(game.players.length);
 					}
 					var stratagemMode=event.stratagemMode;
-					
+
 					var addSetting=function(dialog){
 						dialog.add('选择身份').classList.add('add-setting');
 						var table=document.createElement('div');
@@ -1634,7 +1634,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										delete _status.cheat_seat;
 										return;
 									}
-									
+
 								}
 								if(stratagemMode){
 									this.classList.add('bluebg');
@@ -2359,7 +2359,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							zhu.update();
 						}
 					},game.zhu,result.links[0],result.links[1],game.players.length>4);
-					
+
 					if(game.zhu.group=='shen'&&!game.zhu.isUnseen(0)){
 						var list=['wei','shu','wu','qun','jin','key'];
 						for(var i=0;i<list.length;i++){
@@ -2516,14 +2516,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							ui.arena.classList.remove('choose-character');
 						},500);
 					},result2,result);
-					
+
 					for(var i in result2){
 						if(!lib.playerOL[i].name){
 							lib.playerOL[i].init(result2[i][0],result2[i][1]);
 						}
 						if(result[i]&&result[i].length) lib.playerOL[i].changeGroup(result[i],false,false);
 					}
-					
+
 					if(event.special_identity){
 						for(var i in event.special_identity){
 							game.zhu.addSkill(i);
