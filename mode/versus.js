@@ -4575,7 +4575,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			yuanjun_info:'出牌阶段，对至多两名已受伤的角色使用。目标角色回复1点体力。',
 			xujiu:'酗酒',
 			xujiu2:'酗酒',
-			xujiu_info:'出牌阶段，对一名本回合未成为过此牌目标的一名敌方角色使用，其本回合受到的伤害+1。',
+			xujiu_info:'出牌阶段，对一名敌方角色使用，其本回合受到的伤害+1。',
 			huoshaowuchao:'火烧乌巢',
 			huoshaowuchao_info:'锁定技，本局游戏内造成的无属性伤害均视为火属性。',
 			liangcaokuifa:'粮草匮乏',
@@ -4648,7 +4648,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			xujiu2:{
 				charlotte:true,
 				onremove:true,
-				trigger:{player:'damageBegin3'},
+				trigger:{player:'damageBegin2'},
 				forced:true,
 				content:function(){
 					trigger.num+=player.countMark('xujiu2');
@@ -6397,12 +6397,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				type:'basic',
 				enable:true,
 				filterTarget:function(card,player,target){
-					return target.isEnemyOf(player)&&!target.hasSkill('xujiu2');
+					return target.isEnemyOf(player);
 				},
 				selectTarget:1,
 				content:function(){
 					target.addTempSkill('xujiu2');
-					target.addMark('xujiu2',1,false);
+					target.addMark('xujiu2',(event.baseDamage||1),false);
 				},
 				ai:{
 					basic:{
