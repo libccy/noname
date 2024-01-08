@@ -3802,11 +3802,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					var cards=cards.filterInD();
 					if(cards.length) player.chooseTarget('将'+get.translation(cards)+'交给一名角色',true).set('ai',function(target){
-						var player=_status.event.player;
-						var att=get.attitude(player,target)/Math.sqrt(1+target.countCards('h'));
+						var player=_status.event.player,att=get.attitude(player,target);
+						if(att<=0) return att;
+						if(target.countCards('h')+_status.event.num>=_status.event.max) att/=3;
 						if(target.hasSkillTag('nogain')) att/=10;
 						return att;
-					});
+					}).set('num',cards.length).set('max',game.filterPlayer().reduce((num,i)=>{
+						return Math.max(num,i.countCards('h'));
+					},0));
 					else event.finish();
 					'step 3'
 					if(result.bool){
