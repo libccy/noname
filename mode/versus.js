@@ -6424,7 +6424,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							var cards=player.getCards('hs',card=>get.tag(card,'damage')&&player.canUse(card,target)&&get.effect(target,card,player,player)>0);
 							if(!cards.length) return 0;
 							var cardx=cards.filter(card=>get.name(card)=='sha');
-							cardx.sort((a,b)=>player.getUseValue(b)-player.getUseValue(a));
+							cardx.sort((a,b)=>get.effect(target,b,player,player)-get.effect(target,a,player,player));
 							cardx=cardx.slice(Math.min(cardx.length,player.getCardUsable('sha')),cardx.length);
 							cards.removeArray(cardx);
 							return -cards.reduce((sum,card)=>sum+get.effect(target,card,player,player),0);
