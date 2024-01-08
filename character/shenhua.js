@@ -1758,6 +1758,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			nzry_juzhany:{},
 			nzry_feijun:{
+				init:(player)=>{
+					if(!Array.isArray(player.storage.nzry_feijun)) player.storage.nzry_feijun=[];
+				},
 				intro:{
 					content:function(storage){
 						if(!storage||!storage.length) return '尚未发动';
@@ -1826,7 +1829,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.target=result.targets[0];
 						var list=player.getStorage('nzry_feijun');
 						if(!list.includes(event.target)){
-							event._nzry_binglve=true;	
+							event._nzry_binglve=true;
 							player.markAuto('nzry_feijun',[event.target]);
 						}
 						player.line(event.target,'green');
