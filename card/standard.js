@@ -268,7 +268,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(player.hasSkillTag('presha',true,null,true)) return 10;
 						if(typeof item==='object'&&game.hasNature(item,'linked')){
 							if(game.hasPlayer(function(current){
-								return current!=player&&current.isLinked()&&player.canUse(item,current,null,true)&&get.effect(current,item,player,player)>0&&lib.card.sha.ai.canLink(player,current,item);
+								return current!=player&&lib.card.sha.ai.canLink(player,current,item)&&player.canUse(item,current,null,true)&&get.effect(current,item,player,player)>0;
 							})&&game.countPlayer(function(current){
 								return current.isLinked()&&get.damageEffect(current,player,player,get.nature(item))>0;
 							})>1) return 3.1;

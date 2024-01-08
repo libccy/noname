@@ -8560,7 +8560,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					if(player.countCards('h')==0) return false;
+					if(player.countCards('he')==0) return false;
 					if(!player.hasSkill('qiangxix')) return true;
 					if(!player.hasSkill('retieji')) return true;
 					if(!player.hasSkill('olxuanfeng')) return true;

@@ -7698,7 +7698,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var nh=_status.currentPhase.countCards('h')+1;
 					var players=game.filterPlayer();
 					for(var i=0;i<players.length;i++){
-						if(players[i].countCards('h')>nh){
+						if(players[i].countCards('h')>=nh){
 							if(!player.countCards('h','shan')||get.attitude(player,players[i])<=0) return true;
 						}
 					}
@@ -11881,25 +11881,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				check:function(event,player){
 					if(event.getParent().excluded.includes(player)) return false;
-					if(get.attitude(player,event.player)>0){
-						return false;
-					}
+					if(get.attitude(player,event.player)>0||player.hp<2&&!get.tag(event.card,'damage')) return false;
+					let evt=event.getParent(),
+						directHit=evt.nowuxie&&get.type(event.card,'trick')==='trick'||evt.directHit&&evt.directHit.includes(player)||evt.customArgs&&evt.customArgs.default&&evt.customArgs.default.directHit2;
 					if(get.tag(event.card,'respondSha')){
-						if(player.countCards('h',{name:'sha'})==0){
-							return true;
-						}
+						if(directHit||player.countCards('h',{name:'sha'})===0) return true;
 					}
 					else if(get.tag(event.card,'respondShan')){
-						if(player.countCards('h',{name:'shan'})==0){
-							return true;
-						}
+						if(directHit||player.countCards('h',{name:'shan'})===0) return true;
 					}
 					else if(get.tag(event.card,'damage')){
-						if(event.card.name=='shuiyanqijunx') return player.countCards('e')==0;
+						if(event.card.name==='huogong') return event.player.countCards('h')>4-player.hp-player.hujia;
+						if(event.card.name==='shuiyanqijunx') return player.countCards('e')===0;
 						return true;
 					}
-					else if((event.card.name=='shunshou'||(event.card.name=='zhujinqiyuan'&&(event.card.yingbian||get.distance(event.player,player)<0)))&&player.hp>2){
-						return true;
+					else if(player.hp>2){
+						if(event.card.name==='shunshou'||(event.card.name==='zhujinqiyuan'&&(event.card.yingbian||get.distance(event.player,player)<0))) return true;
 					}
 					return false;
 				},
