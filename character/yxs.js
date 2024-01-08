@@ -136,7 +136,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				content:function(){
-				 	for(var i=0;i<game.players.length;i++){
+					for(var i=0;i<game.players.length;i++){
 						if(game.players[i].hasSkill('yxs_menshen2')){
 							game.players[i].removeSkill('yxs_menshen2');
 						}
@@ -149,14 +149,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"phaseEnd",
 				},
 				priority:15,
-			   	group:'yxs_menshen3',
+				group:'yxs_menshen3',
 				onremove:true,
 				filter:function (event,player){
 					return game.players.length>1;
 				},
 				content:function(){
-			  		"step 0"
-	 				player.chooseTarget('选择【门神】的目标',lib.translate.yxs_menshen_info,true,function(card,player,target){
+					"step 0"
+					player.chooseTarget('选择【门神】的目标',lib.translate.yxs_menshen_info,true,function(card,player,target){
 						return target!=player;
 					}).set('ai',function(target){
 						return get.attitude(player,target);
@@ -177,7 +177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.5,
 				},
 			},
-		   	yxs_menshen2:{
+			yxs_menshen2:{
 				audio:2,
 				mark:'character',
 				intro:{
@@ -188,7 +188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{
 					target:["shaBegin","juedouBegin"],
 				},
-	 			forced:true,
+				forced:true,
 				popup:false,
 				filter:function(event,player){
 					return player.isAlive();
@@ -197,10 +197,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=player.storage.yxs_menshen2;
 					trigger.player.line(target,'green');
 					trigger.targets.remove(player);
-				  	trigger.targets.push(target);
+					trigger.targets.push(target);
 					trigger.target = target;
 				},
-	   		},
+			},
 			guimian:{
 				trigger:{source:'damageEnd'},
 				forced:true,
@@ -216,7 +216,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				logTarget:'player',
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.player.isIn()&&!event.player.hasSkill('lyuxue2');
 				},
 				content:function(){
@@ -487,7 +487,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.cards=trigger.cards.slice(0);
 					player.chooseCardTarget({
 						filterCard:function(card){
-							return _status.event.getParent().cards.contains(card);
+							return _status.event.getParent().cards.includes(card);
 						},
 						selectCard:1,
 						filterTarget:function(card,player,target){
@@ -568,7 +568,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					player.chooseCardTarget({
 						filterCard:function(card){
-							return _status.event.getParent().cards.contains(card);
+							return _status.event.getParent().cards.includes(card);
 						},
 						selectCard:[1,event.cards.length],
 						filterTarget:function(card,player,target){
@@ -962,7 +962,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				frequent:true,
 				filter:function(event){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.player.isAlive()&&event.parent.name=='yanyi'&&event.player.hp<event.player.maxHp;
 				},
 				content:function(){
@@ -973,7 +973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					player.chooseCardTarget({
 						filterCard:function(card){
-							return _status.event.parent.cards.contains(card);
+							return _status.event.parent.cards.includes(card);
 						},
 						selectCard:[1,event.cards.length],
 						filterTarget:function(card,player,target){
@@ -1437,7 +1437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				direct:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					if(event.player.isDead()) return false;
 					var nh=event.player.countCards('h');
 					if(nh==0) return false;
@@ -1916,7 +1916,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nichang:{
 				trigger:{player:'phaseDrawBefore'},
 				check:function(event,player){
-					if(player.skipList.contains('phaseUse')) return true;
+					if(player.skipList.includes('phaseUse')) return true;
 					var suits=['spade','heart','diamond','club'];
 					var cards=player.getCards('h');
 					for(var i=0;i<cards.length;i++){
@@ -2417,7 +2417,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				priority:15,
 				filter:function(event,player){
 					return event.card.name=='sha'&&event.player!=player&&
-					player.countCards('h','sha')>0&&event.targets.contains(player)==false;
+					player.countCards('h','sha')>0&&event.targets.includes(player)==false;
 				},
 				direct:true,
 				content:function(){

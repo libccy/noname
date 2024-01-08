@@ -14,19 +14,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_yijiang4:["old_caozhen","old_chenqun","old_zhuhuan",'old_caorui'],
 				old_yijiang5:["old_caoxiu","old_zhuzhi"],
 				old_yijiang67:["ol_zhangrang",'old_huanghao','old_liyan'],
-				old_sp:["old_wanglang","old_maliang","old_zhangxingcai","old_wangyun",'old_dingfeng','old_guanyinping'],
+				old_sp:['old_shixie',"panfeng","old_wanglang","old_maliang","old_zhangxingcai","old_wangyun",'old_dingfeng','old_guanyinping'],
 				old_yingbian:['junk_simayi','old_yangyan','old_yangzhi'],
 				old_mobile:["old_caochun"],
 			},
 		},
 		character:{
+			old_shixie:['male','qun',3,['biluan','lixia']],
+			panfeng:['male','qun',4,['kuangfu']],
 			old_shen_zhaoyun:['male','shen',2,['oldjuejing','oldlonghun'],['shu']],
 			old_guanyinping:['female','shu',3,['xueji_old','oldhuxiao','oldwuji']],
 			old_caocao:['male','shen',3,['junkguixin','feiying'],['die_audio']],
 			old_chendao:['male','shu',4,['drlt_wanglie']],
 			old_liyan:['male','shu',3,['duliang','fulin']],
 			old_guanzhang:['male','shu',4,['old_fuhun']],
-			new_caoren:['male','wei',4,['jushou']],
+			new_caoren:['male','wei',4,['moon_jushou','jiewei']],
 			huangzhong:['male','shu',4,['liegong']],
 			junk_sunquan:['male','shen',4,['dili','yuheng'],['wei']],
 			old_dingfeng:['male','wu',4,['fenxun','duanbing']],
@@ -279,7 +281,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.countCards('he')) return false;
 					if(!event.source||event.source==player||!event.source.isIn()) return false;
-					if(player.storage.oldhuisheng&&player.storage.oldhuisheng.contains(event.source)) return false;
+					if(player.storage.oldhuisheng&&player.storage.oldhuisheng.includes(event.source)) return false;
 					return true;
 				},
 				init:function(player){
@@ -361,7 +363,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['re_liubiao'],
 				trigger:{player:'phaseDrawBegin2'},
 				check:function(event,player){
-					return (player.countCards('h')<=2&&player.getDamagedHp()>=2)||player.skipList.contains('phaseUse');
+					return (player.countCards('h')<=2&&player.getDamagedHp()>=2)||player.skipList.includes('phaseUse');
 				},
 				filter:function(event,player){
 					return !event.numFixed&&player.isDamaged();
@@ -409,27 +411,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'jiefan',
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return event.type=='dying'&&_status.currentPhase&&_status.currentPhase.isIn()&&!event.oldjiefan;
+					return event.type=='dying'&&_status.currentPhase&&_status.currentPhase.isIn();
 				},
 				direct:true,
 				content:function(){
-					'step 0'
-					if(_status.connectMode) game.broadcastAll(function(){_status.noclearcountdown=true});
 					player.chooseToUse(function(card,player,event){
 						if(get.name(card)!='sha') return false;
 						return lib.filter.filterCard.apply(this,arguments);
 					},get.prompt2('oldjiefan')).set('targetRequired',true).set('complexSelect',true).set('filterTarget',function(card,player,target){
-						if(target!=_status.currentPhase&&!ui.selected.targets.contains(_status.currentPhase)) return false;
+						if(target!=_status.currentPhase&&!ui.selected.targets.includes(_status.currentPhase)) return false;
 						return lib.filter.filterTarget.apply(this,arguments);
 					}).set('logSkill','oldjiefan').set('oncard',function(){
 						_status.event.player.addTempSkill('oldjiefan_recover');
+					}).set('custom',{
+						add:{},
+						replace:{
+							window:()=>{
+								ui.click.cancel();
+							}
+						},
 					});
-					'step 1'
-					if(!result.bool){
-						var evt=event.getParent(2);
-						evt.oldjiefan=true;
-						evt.goto(0);
-					}
 				},
 				ai:{
 					save:true,
@@ -438,7 +439,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					recover:{
-						audio:'jiefan',
+						// audio:'jiefan',
 						trigger:{source:'damageBegin2'},
 						filter:function(event,player){
 							return event.getParent(4).name=='oldjiefan';
@@ -518,10 +519,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			old_guhuo:{
 				audio:2,
-				group:['old_guhuo_guess'],
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
-					return (lib.inpile.contains(name)&&player.countCards('hs')>0);
+					return (lib.inpile.includes(name)&&player.countCards('hs')>0);
 				},
 				filter:function(event,player){
 					if(!player.countCards('hs')) return false;
@@ -571,11 +571,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(typeof savable=='function') savable=savable(card,player,player);
 							return savable;
 						},'hs')){
-							if(!player.getStorage('old_guhuo_cheated').contains(card.name+card.nature)&&Math.random()<0.4) return 1;
+							if(!player.getStorage('old_guhuo_cheated').includes(card.name+card.nature)&&Math.random()<0.4) return 1;
 							return 0;
 						}
 						var val=_status.event.getParent().type=='phase'?player.getUseValue(card):1;
-						if(player.getStorage('old_guhuo_cheated').contains(card.name+card.nature)&&!player.hasCard(function(cardx){
+						if(player.getStorage('old_guhuo_cheated').includes(card.name+card.nature)&&!player.hasCard(function(cardx){
 							if(card.name==cardx.name){
 								if(card.name!='sha') return true;
 								return get.is.sameNature(card,cardx);
@@ -627,13 +627,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								});
 								var cardx=lib.skill.old_guhuo_backup.viewAs;
 								if(enemyNum){
-									if(card.name==cardx.name&&(card.name!='sha'||get.is.sameNature(card,cardx))||player.getStorage('old_guhuo_cheated').contains(card.name+card.nature)) return (get.suit(card)=='heart'?8:4)+Math.random()*3;
+									if(card.name==cardx.name&&(card.name!='sha'||get.is.sameNature(card,cardx))||player.getStorage('old_guhuo_cheated').includes(card.name+card.nature)) return (get.suit(card)=='heart'?8:4)+Math.random()*3;
 									else if(lib.skill.old_guhuo_backup.aiUse<0.5&&!player.isDying()) return 0;
 								}
 								return get.value(cardx)-get.value(card);
 							},
 							precontent:function(){
 								player.logSkill('old_guhuo');
+								player.addTempSkill('old_guhuo_guess');
 								var card=event.result.cards[0];
 								event.result.card.suit=get.suit(card);
 								event.result.card.number=get.number(card);
@@ -776,7 +777,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(eff<-7) return (Math.random()+Math.pow(-(eff+7)/8,2))/Math.sqrt(evt.betrayers.length+1)+(player.hp-3)*0.05+Math.max(0,4-evt.player.hp)*0.05-(player.hp==1&&!get.tag(card,'damage')?0.2:0);
 								return Math.pow((get.value(card,evt.player,'raw')-4)/(eff==0?3.1:10),2)/Math.sqrt(evt.betrayers.length||1)+(player.hp-3)*0.05+Math.max(0,4-evt.player.hp)*0.05;
 							}
-							if(evt.player.getStorage('old_guhuo_cheated').contains(card.name+card.nature)) return Math.random()+0.3;
+							if(evt.player.getStorage('old_guhuo_cheated').includes(card.name+card.nature)) return Math.random()+0.3;
 						}
 						return Math.random();
 					});
@@ -920,7 +921,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var winners=player.getFriends();
-					game.over(player==game.me||winners.contains(game.me));
+					game.over(player==game.me||winners.includes(game.me));
 				},
 			},
 			oldanxu:{
@@ -1209,6 +1210,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldjuejing_info:'锁定技。①摸牌阶段，你令额定摸牌数+X（X为你已损失的体力值）。②你的手牌上限+2。',
 			oldlonghun:'龙魂',
 			oldlonghun_info:'你可以将花色相同的Y张牌按下列规则使用或打出：♥当【桃】，♦当火【杀】，♣当【闪】，♠当普【无懈可击】（Y为你的体力值且至少为1）。',
+			panfeng:'旧潘凤',
+			panfeng_prefix:'旧',
+			old_shixie:'旧士燮',
+			old_shixie_prefix:'旧',
 			
 			old_standard:'标准包',
 			old_shenhua:'神话再临',

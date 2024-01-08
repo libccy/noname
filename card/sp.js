@@ -197,6 +197,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return lib.card.shandian.ai.result.target(player,target);
 						}
 					},
+					tag:{
+						damage:0.25,
+						natureDamage:0.25,
+						thunderDamage:0.25,
+					}
 				}
 			},
 			qibaodao:{
@@ -268,10 +273,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				multitarget:true,
 				targetprompt:['给一张牌','得两张牌'],
 				filterTarget:function(card,player,target){
-					return target!=player;
+					return target!==player;
 				},
-				filterAddedTarget:function(card,player,target){
-					return target!=player;
+				filterAddedTarget:function(card,player,target,preTarget){
+					return target!==preTarget&&target!==player;
 				},
 				content:function(){
 					'step 0'
@@ -313,21 +318,17 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target){
-							var ok=false;
-							var hs=player.getCards('h');
-							if(hs.length<=1) return 0;
-							for(var i=0;i<hs.length;i++){
-								if(get.value(hs[i])<=5){
-									ok=true;
-									break;
-								}
-							}
-							if(!ok) return 0;
-							if(ui.selected.targets.length==1){
-								if(target.hasSkillTag('nogain')) return 0;
+							let hs=player.getCards('h');
+							if(hs.length<=1||!hs.some(i=>{
+								return get.value(i)<5.5;
+							})) return 0;
+							let targets=get.copy(ui.selected.targets);
+							if(_status.event.preTarget) targets.add(_status.event.preTarget);
+							if(targets.length){
+								if(target.hasSkillTag('nogain')) return 0.01;
 								return 2;
 							}
-							if(target.countCards('he')==0) return 0;
+							if(!target.countCards('he')) return 0;
 							if(player.hasFriend()) return -1;
 							return 0;
 						}
@@ -534,7 +535,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				filter:function(event,player){
 					if(event.player==player) return false;
-					if(event.getParent().directHit.contains(player)) return false;
+					if(event.getParent().directHit.includes(player)) return false;
 					var num=player.countCards('h','jinchan');
 					return num&&num==player.countCards('h');
 				},

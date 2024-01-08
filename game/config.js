@@ -1,6 +1,6 @@
 window.config={
 	extension_sources:{
-		'GitHub Proxy':'https://ghproxy.com/https://raw.githubusercontent.com/libccy/noname-extension/master/',
+		'GitHub Proxy':'https://mirror.ghproxy.com/https://raw.githubusercontent.com/libccy/noname-extension/master/',
 		FastGit:'https://raw.fgit.cf/libccy/noname-extension/master/',
 		GitHub:'https://raw.githubusercontent.com/libccy/noname-extension/master/'
 	},
