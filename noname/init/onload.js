@@ -9,6 +9,7 @@ import { UI as ui } from '../ui/index.js';
 import { userAgent } from '../util/index.js';
 import * as config from '../util/config.js';
 import { gnc } from '../gnc/index.js';
+import { Mutex } from '../util/index.js';
 
 export async function onload(resetGameTimeout) {
 	const libOnload = lib.onload;
@@ -821,15 +822,17 @@ function createTouchDraggedFilter() {
 
 /**
  * @async
- * @param {(() => void | GeneratorFunction)[]} contents 
+ * @param {((function(Mutex): void) | GeneratorFunction)[]} contents 
  */
 function runCustomContents(contents) {
 	if (!Array.isArray(contents)) return
 
+	const mutex = new Mutex();
+
 	const tasks = contents
 		.filter((fn) => typeof fn === "function")
 		.map((fn) => gnc.is.generatorFunc(fn) ? gnc.of(fn) : fn) // 将生成器函数转换成genCoroutin
-		.map((fn) => fn())
+		.map((fn) => fn(mutex))
 
 
 	return Promise
