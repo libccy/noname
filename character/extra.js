@@ -4777,7 +4777,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return list.length>0;
 				},
 				check:function(event,player){
-					if(get.attitude(player,event.player)>=0) return false;
+					if(get.attitude(_status.event.player,event.player)>=0) return false;
 					if(event.getParent('phaseUse').skipped) return true;
 					var nd=player.needsToDiscard();
 					return player.countCards('h',function(card){
@@ -7015,8 +7015,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource'
 				},
 				filter:function(event,player){
+					if(get.attitude(_status.event.player,event.player)>=0) return false;
 					if(player.storage.drlt_duorui.length) return false;
-					return player!=event.player&&event.player.isIn()&&_status.currentPhase==player;
+					return event.player.isIn()&&_status.currentPhase==player;
 				},
 				check:function(event,player){
 					if(player.hasEnabledSlot()&&!player.hasEnabledSlot(5)) return false;
