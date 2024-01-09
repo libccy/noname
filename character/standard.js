@@ -180,7 +180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'tongji',
 				direct:true,
 				filter(event,player){
-					return event.card.name=='sha'&&event.player!=player&&!event.targets.contains(player)&&
+					return event.card.name=='sha'&&event.player!=player&&!event.targets.includes(player)&&
 					event.target.inRange(player)&&event.target.countCards('he')>0;
 				},
 				async content(event,trigger,player){
@@ -688,7 +688,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						let bool;
 						if(judge>0){
 							event.cards.push(card);
-							bool=lib.config.autoskilllist.contains('luoshen')?(await player.chooseBool('是否再次发动【洛神】？')).result.bool:true;
+							bool=lib.config.autoskilllist.includes('luoshen')?(await player.chooseBool('是否再次发动【洛神】？')).result.bool:true;
 						}
 						else{
 							for(let i=0;i<event.cards.length;i++){
@@ -712,7 +712,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					ignoredHandcard(card,player){
-						if(get.is.altered('xinluoshen')&&player.storage.xinluoshen&&player.storage.xinluoshen.contains(card)){
+						if(get.is.altered('xinluoshen')&&player.storage.xinluoshen&&player.storage.xinluoshen.includes(card)){
 							return true;
 						}
 					}
@@ -1520,7 +1520,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.needsToDiscard();
 				},
 				filter(event,player){
-					if(player.getHistory('skipped').contains('phaseUse')) return true;
+					if(player.getHistory('skipped').includes('phaseUse')) return true;
 					const history=player.getHistory('useCard').concat(player.getHistory('respond'));
 					for(let i=0;i<history.length;i++){
 						if(history[i].card.name=='sha'&&history[i].isPhaseUsing()) return false;

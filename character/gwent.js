@@ -329,10 +329,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player.canUse('gw_aozuzhilei',current)&&get.effect(current,{name:'gw_aozuzhilei'},player,player)>0;
 					});
 					var baoxue=game.hasPlayer(function(current){
-						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&[2,3].contains(current.countCards('h'))&&!current.hasSkillTag('noh');
+						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&[2,3].includes(current.countCards('h'))&&!current.hasSkillTag('noh');
 					});
 					var baoxue2=game.hasPlayer(function(current){
-						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&[2].contains(current.countCards('h'))&&!current.hasSkillTag('noh');
+						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&[2].includes(current.countCards('h'))&&!current.hasSkillTag('noh');
 					});
 					var baoxue3=game.hasPlayer(function(current){
 						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&current.countCards('h')>=2&&!current.hasSkillTag('noh');
@@ -648,7 +648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					var skip=['shunshou','huogong','shandianjian','jiu'];
 					player.chooseCardButton(get.prompt('gwminxiang'),list).set('ai',function(button){
-						if(skip.contains(button.link.name)) return 0;
+						if(skip.includes(button.link.name)) return 0;
 						var val=get.value(button.link);
 						if(get.tag(button.link,'damage')){
 							val+=3;
@@ -701,7 +701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var hs=player.getCards('h');
 					var names=[];
 					for(var i=0;i<hs.length;i++){
-						if(['basic','trick'].contains(get.type(hs[i]))&&!get.info(hs[i]).multitarget){
+						if(['basic','trick'].includes(get.type(hs[i]))&&!get.info(hs[i]).multitarget){
 							names.add(hs[i].name);
 						}
 					}
@@ -715,14 +715,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				check:function(card){
-					if(['shunshou','huogong','shandianjian','jiu','tianxianjiu'].contains(card.name)) return 0;
+					if(['shunshou','huogong','shandianjian','jiu','tianxianjiu'].includes(card.name)) return 0;
 					if(get.tag(card,'damage')){
 						return get.value(card)+2;
 					}
 					return get.value(card);
 				},
 				filterCard:function(card,player){
-					if(!['basic','trick'].contains(get.type(card))) return false;
+					if(!['basic','trick'].includes(get.type(card))) return false;
 					return game.countPlayer(function(current){
 						return current!=player&&lib.filter.targetEnabled3({name:card.name},player,current);
 					})>1;
@@ -936,7 +936,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					});
 					'step 1'
-					if(event.targets.contains(result.targets[0])){
+					if(event.targets.includes(result.targets[0])){
 						player.popup('成功');
 						game.log(player,'发动','【血契】','成功');
 						var dialog=ui.create.dialog('hidden');
@@ -1265,7 +1265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					event.repeat=false;
 					var list=game.filterPlayer(function(current){
-						return event.targets.contains(current)&&current.countCards('he');
+						return event.targets.includes(current)&&current.countCards('he');
 					});
 					if(list.length){
 						var target=list.randomGet();
@@ -1606,7 +1606,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(target.hasSkill('gwqinwu')){
 							att/=1.5;
 						}
-						if(target.hasJudge('lebu')||target.skipList.contains('phaseUse')){
+						if(target.hasJudge('lebu')||target.skipList.includes('phaseUse')){
 							att/=2;
 						}
 						return att;
@@ -1676,7 +1676,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'useCard'},
 				forced:true,
 				filter:function(event,player){
-					return player.getEnemies().contains(event.player)&&
+					return player.getEnemies().includes(event.player)&&
 						get.type(event.card,'trick')=='trick'&&get.color(event.card)==get.color(player.storage.huanshu2);
 				},
 				mark:true,
@@ -1717,7 +1717,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('结印',[[['','','gw_wenyi'],['','','gw_yanziyaoshui'],['','','gw_kunenfayin']],'vcard'],'hidden');
 					},
 					filter:function(button,player){
-						if(player.storage.gwjieyin.contains(button.link[2])){
+						if(player.storage.gwjieyin.includes(button.link[2])){
 							return false;
 						}
 						return true;
@@ -1822,8 +1822,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:['useCard','respondAfter']},
 						silent:true,
 						content:function(){
-							if(player.storage.zhengjun_one.contains(trigger.card.name)){
-								if(!player.storage.zhengjun.contains(trigger.card.name)){
+							if(player.storage.zhengjun_one.includes(trigger.card.name)){
+								if(!player.storage.zhengjun.includes(trigger.card.name)){
 									player.storage.zhengjun.add(trigger.card.name);
 									event.trigger('zhengjun');
 								}
@@ -1926,7 +1926,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						for(var i=0;i<player.storage.bolang.length;i++){
-							if(!player.storage.bolang[i].vanishtag.contains('bolang')){
+							if(!player.storage.bolang[i].vanishtag.includes('bolang')){
 								player.storage.bolang.splice(i--,1);
 							}
 						}
@@ -1945,7 +1945,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						usable:1,
 						filter:function(event,player){
 							for(var i=0;i<player.storage.bolang.length;i++){
-								if(player.storage.bolang[i].vanishtag.contains('bolang')){
+								if(player.storage.bolang[i].vanishtag.includes('bolang')){
 									return true;
 								}
 							}
@@ -1954,7 +1954,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 0'
 							var list=[];
 							for(var i=0;i<player.storage.bolang.length;i++){
-								if(player.storage.bolang[i].vanishtag.contains('bolang')){
+								if(player.storage.bolang[i].vanishtag.includes('bolang')){
 									list.push(player.storage.bolang[i]);
 								}
 							}
@@ -2038,7 +2038,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var list=get.gainableSkills(function(info){
 						if(typeof info.enable=='string') return info.enable=='phaseUse';
-						if(Array.isArray(info.enable)) return info.enable.contains('phaseUse');
+						if(Array.isArray(info.enable)) return info.enable.includes('phaseUse');
 					},player);
 					list.remove(player.getSkills());
 					list=list.randomGets(3);
@@ -2189,7 +2189,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					for(var i=0;i<ui.discardPile.childElementCount;i++){
 						var card=ui.discardPile.childNodes[i];
-						if(card.vanishtag.contains('_gwshenyu')) continue;
+						if(card.vanishtag.includes('_gwshenyu')) continue;
 						if(get.type(card)=='spell'&&get.subtype(card)!='spell_gold'){
 							return true;
 						}
@@ -2201,7 +2201,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=[];
 					for(var i=0;i<ui.discardPile.childElementCount;i++){
 						var card=ui.discardPile.childNodes[i];
-						if(card.vanishtag.contains('_gwshenyu')) continue;
+						if(card.vanishtag.includes('_gwshenyu')) continue;
 						if(get.type(card)=='spell'&&get.subtype(card)!='spell_gold'){
 							list.push(card);
 						}
@@ -2682,7 +2682,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('gwtianbian');
 						var list=[];
 						for(var i in lib.card){
-							if(lib.inpile.contains(i)&&
+							if(lib.inpile.includes(i)&&
 							lib.card[i].selectTarget==-1&&
 							lib.card[i].type!='equip'&&
 							lib.card[i].ai&&lib.card[i].ai.tag&&
@@ -3008,7 +3008,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.card=get.cards()[0];
 					player.showCards(event.card,get.translation(player)+'对'+get.translation(trigger.player)+'发动了【穿心】');
 					'step 1'
-					if(player.storage.gwchuanxin&&!player.storage.gwchuanxin.contains(get.suit(event.card))){
+					if(player.storage.gwchuanxin&&!player.storage.gwchuanxin.includes(get.suit(event.card))){
 						player.useCard({name:'sha'},[event.card],trigger.target,false);
 					}
 				},
@@ -3070,13 +3070,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var type=get.type(event.card,'trick');
 					return type=='trick'&&game.hasPlayer(function(current){
-						return player.canUse('sha',current,false)&&!event.targets.contains(current);
+						return player.canUse('sha',current,false)&&!event.targets.includes(current);
 					});
 				},
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt('fengjian'),function(card,player,target){
-						return player.canUse('sha',target,false)&&!trigger.targets.contains(target);
+						return player.canUse('sha',target,false)&&!trigger.targets.includes(target);
 					}).ai=function(target){
 						return get.effect(target,{name:'sha',nature:'thunder'},player,player);
 					}
@@ -3295,7 +3295,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					player.chooseCard(hs.length,true,'选择还给'+get.translation(target)+'的牌').ai=function(card){
 						if(damage){
-							return hs.contains(card)?1:0;
+							return hs.includes(card)?1:0;
 						}
 						else{
 							return -get.value(card,player,'raw');
@@ -3311,7 +3311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					for(var i=0;i<event.hs2.length;i++){
-						if(!event.hs.contains(event.hs2[i])) return;
+						if(!event.hs.includes(event.hs2[i])) return;
 					}
 					player.line(target);
 					target.damage();
@@ -4363,7 +4363,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.list=result.links.slice(0);
 						for(var i=0;i<event.cards.length;i++){
-							if(!event.list.contains(event.cards[i])){
+							if(!event.list.includes(event.cards[i])){
 								event.cards[i].discard();
 							}
 						}

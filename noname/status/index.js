@@ -6,8 +6,9 @@ export const status = {
 	clicked: false,
 	auto: false,
 	/**
-	 * @type {GameEvent}
+	 * @type { GameEventPromise }
 	 */
+	// @ts-ignore
 	event: null,
 	ai: {},
 	lastdragchange: [],
@@ -15,7 +16,11 @@ export const status = {
 	dieClose: [],
 	dragline: [],
 	dying: [],
+	/**
+	 * @type { GameHistory[] }
+	 */
 	globalHistory: [{
+		// @ts-ignore
 		cardMove: [],
 		custom: [],
 		useCard: [],
@@ -32,6 +37,10 @@ export const status = {
 	renku: [],
 	prehidden_skills: [],
 	postReconnect: {},
+	/**
+	 * @type { string | void }
+	 */
+	extension: undefined,
 };
 
 export const _status = status;

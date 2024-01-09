@@ -126,6 +126,9 @@ window.noname_character_rank={
 		'jsrg_pangtong',
 		'star_caoren',
 		'clan_xunyou',
+		'caoxian',
+		'sb_guanyu',
+		'mb_chengui',
 	],
 	a:[
 		'diy_zaozhirenjun',
@@ -644,6 +647,7 @@ window.noname_character_rank={
 		'dc_dongzhao',
 		'zhugeruoxue',
 		'dc_sb_lusu',
+		'mb_huban',
 	],
 	bp:[
 		'chess_diaochan',
@@ -1810,8 +1814,10 @@ window.noname_character_rank={
 			'shichangshi',
 			'dc_guansuo',
 			'dc_xujing',
+			'caoxian',
 		],
 		epic:[
+			'mb_chengui',
 			'ol_pengyang',
 			'ol_luyusheng',
 			'clan_xunchen',
@@ -2081,6 +2087,8 @@ window.noname_character_rank={
 			'dc_sb_zhouyu',
 		],
 		rare:[
+			'mb_huban',
+			'sp_jianggan',
 			'ol_caozhang',
 			'ol_lingtong',
 			'luoxian',

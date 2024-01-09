@@ -1,13 +1,23 @@
 <!DOCTYPE HTML>
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="viewport" content="user-scalable=no, viewport-fit=cover">
-    <title>无名杀</title>
-    <script src="game/update.js"></script>
-    <script src="game/config.js"></script>
-    <script src="game/package.js"></script>
-    <script src="game/game.js"></script>
+	<meta charset="UTF-8">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="user-scalable=no, viewport-fit=cover">
+	<title>无名杀</title>
+	<script>
+		window.onerror = function (msg, src, line, column, err) {
+			var str = `错误文件: ${typeof src == 'string' && src.length > 0 ? decodeURI(src) : '未知文件'}`;
+			str += `\n错误信息: ${msg}`;
+			str += `\n行号: ${line}`;
+			str += `\n列号: ${column}`;
+			if (err && err.stack) str += '\n' + decodeURI(err.stack);
+			console.error(str);
+			alert(str);
+		};
+	</script>
+	<script src="game/update.js"></script>
+	<script src="game/config.js"></script>
+	<script src="game/package.js"></script>
+	<script src="game/game.js"></script>
 </head>

@@ -353,7 +353,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				enable:function(card,player){
 					var enemies=player.getEnemies();
 					return game.hasPlayer(function(current){
-						return current.hp==1&&enemies.contains(current);
+						return current.hp==1&&enemies.includes(current);
 					});
 				},
 				notarget:true,
@@ -364,7 +364,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var enemies=player.getEnemies();
 					var list=game.filterPlayer(function(current){
-						return current.hp==1&&enemies.contains(current);
+						return current.hp==1&&enemies.includes(current);
 					});
 					if(list.length){
 						var target=list.randomGet();
@@ -520,7 +520,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					});
 					player.line(list1);
 					for(var i=0;i<list1.length;i++){
-						list1[i].animate('target');
+						list1[i].addTempClass('target');
 					}
 					setTimeout(function(){
 						var list11=list1.slice(0);
@@ -1031,7 +1031,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var list=[];
 					for(var i in lib.card){
-						if(lib.card[i].mode&&lib.card[i].mode.contains(lib.config.mode)==false) continue;
+						if(lib.card[i].mode&&lib.card[i].mode.includes(lib.config.mode)==false) continue;
 						if(lib.card[i].vanish) continue;
 						if(lib.card[i].type=='delay') list.push([cards[0].suit,cards[0].number,i]);
 					}
@@ -1201,10 +1201,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return player.canUse('gw_aozuzhilei',current)&&get.effect(current,{name:'gw_aozuzhilei'},player,player)>0;
 					});
 					var baoxue=game.hasPlayer(function(current){
-						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&[2,3].contains(current.countCards('h'))&&!current.hasSkillTag('noh');
+						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&[2,3].includes(current.countCards('h'))&&!current.hasSkillTag('noh');
 					});
 					var baoxue2=game.hasPlayer(function(current){
-						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&[2].contains(current.countCards('h'))&&!current.hasSkillTag('noh');
+						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&[2].includes(current.countCards('h'))&&!current.hasSkillTag('noh');
 					});
 					var baoxue3=game.hasPlayer(function(current){
 						return player.canUse('gw_baoxueyaoshui',current)&&get.attitude(player,current)<0&&current.countCards('h')>=2&&!current.hasSkillTag('noh');
@@ -1401,10 +1401,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,current){
 							if(current.hasSkill('gw_qinpendayu')) return 0;
-							if(current.needsToDiscard()) return -1;
-							if(current.needsToDiscard(1)) return -0.7;
-							if(current.needsToDiscard(2)) return -0.4;
-							return -0.1;
+							return Math.max(-1,-0.1-0.3*current.needsToDiscard(2));
 						}
 					},
 					order:1.2,
@@ -2112,7 +2109,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}).sortBySeat();
 						var enemies=player.getEnemies();
 						for(var i=0;i<enemies.length;i++){
-							if(list.contains(enemies[i])){
+							if(list.includes(enemies[i])){
 								break;
 							}
 						}
@@ -2144,7 +2141,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				priority:-11,
 				filter:function(event,player){
 					if(_status.connectMode) return false;
-					if(!lib.config.cards.contains('gwent')) return false;
+					if(!lib.config.cards.includes('gwent')) return false;
 					if(player.isMin()) return false;
 					if(game.fixedPile) return false;
 					return event.num>0&&event.parent.name=='phaseDraw';

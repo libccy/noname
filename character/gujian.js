@@ -282,7 +282,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'useCard'},
 						silent:true,
 						filter:function(event,player){
-							return get.type(event.card)=='land'&&!player.storage.qingshu_all.contains(event.card.name);
+							return get.type(event.card)=='land'&&!player.storage.qingshu_all.includes(event.card.name);
 						},
 						content:function(){
 							player.storage.qingshu.push(trigger.card.name);
@@ -642,7 +642,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						nums.add(player.storage.lingyan[i].number);
 					}
 					return player.hasCard(function(card){
-						return !nums.contains(card.number);
+						return !nums.includes(card.number);
 					},'h');
 				},
 				init:function(player){
@@ -671,7 +671,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i=0;i<player.storage.lingyan.length;i++){
 						nums.add(player.storage.lingyan[i].number);
 					}
-					return !nums.contains(card);
+					return !nums.includes(card);
 				},
 				check:function(card){
 					return 8-get.value(card);
@@ -879,7 +879,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.list.sortBySeat();
 					delete player.storage.lianjing_targets;
 					for(var i=0;i<game.players.length;i++){
-						if(!event.list.contains(game.players[i])){
+						if(!event.list.includes(game.players[i])){
 							game.players[i].out('lianjing');
 							event.exlist.push(game.players[i]);
 						}
@@ -987,7 +987,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!event.card.isCard) return false;
 					if(event.cards[0]&&event.cards[0].zhenying_link) return false;
 					if(get.color(event.card)!='black') return false;
-					if(['delay','equip'].contains(get.type(event.card))) return false;
+					if(['delay','equip'].includes(get.type(event.card))) return false;
 					return true;
 				},
 				content:function(){
@@ -1270,7 +1270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.storage.yunyin) return true;
 					var hs=player.getCards('h');
 					for(var i=0;i<hs.length;i++){
-						if(!player.storage.yunyin.contains(get.suit(hs[i]))) return true;
+						if(!player.storage.yunyin.includes(get.suit(hs[i]))) return true;
 					}
 					return false;
 				},
@@ -1279,7 +1279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseToDiscard(get.prompt('yunyin'),function(card){
 						if(!player.storage.yunyin) return true;
-						return !player.storage.yunyin.contains(get.suit(card));
+						return !player.storage.yunyin.includes(get.suit(card));
 					}).set('logSkill','yunyin').ai=function(card){
 						return 9-get.value(card);
 					}
@@ -1444,14 +1444,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(!player.storage.liuying) player.storage.liuying=[];
 					return event.card&&event.card.name=='sha'&&game.hasPlayer(function(current){
-						return !player.storage.liuying.contains(current)&&player.canUse('sha',current,false);
+						return !player.storage.liuying.includes(current)&&player.canUse('sha',current,false);
 					});
 				},
 				direct:true,
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('liuying'),function(card,player,target){
-						return !player.storage.liuying.contains(target)&&player.canUse('sha',target,false);
+						return !player.storage.liuying.includes(target)&&player.canUse('sha',target,false);
 					}).ai=function(target){
 						return get.effect(target,{name:'sha'},player,player);
 					};
@@ -1497,7 +1497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=0;
 					for(var i=0;i<he.length;i++){
 						var info=lib.card[he[i].name];
-						if(info.type=='equip'&&!info.nomod&&!info.unique&&lib.inpile.contains(he[i].name)){
+						if(info.type=='equip'&&!info.nomod&&!info.unique&&lib.inpile.includes(he[i].name)){
 							num++;
 							if(num>=2) return true;
 						}
@@ -1506,7 +1506,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterCard:function(card){
 					if(ui.selected.cards.length&&card.name==ui.selected.cards[0].name) return false;
 					var info=get.info(card);
-					return info.type=='equip'&&!info.nomod&&!info.unique&&lib.inpile.contains(card.name);
+					return info.type=='equip'&&!info.nomod&&!info.unique&&lib.inpile.includes(card.name);
 				},
 				selectCard:2,
 				position:'he',
@@ -1638,11 +1638,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			meiying:{
-				global:'meiying2',
 				globalSilent:true,
 				trigger:{global:'phaseEnd'},
 				filter:function(event,player){
-					return event.player!=player&&!event.player.tempSkills.meiying3&&event.player.isAlive()&&player.countCards('he',{color:'red'})>0;
+					return event.player!=player&&event.player.isAlive()&&player.countCards('he',{color:'red'})&&event.player.getHistory('useCard',evt=>{
+						return evt.targets&&evt.targets.some(i=>i!==event.player);
+					}).length===0;
 				},
 				direct:true,
 				content:function(){
@@ -1665,18 +1666,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.1
 				}
 			},
-			meiying2:{
-				trigger:{player:'useCard'},
-				filter:function(event,player){
-					return _status.currentPhase==player&&event.targets&&(event.targets.length>1||event.targets[0]!=player);
-				},
-				forced:true,
-				popup:false,
-				content:function(){
-					player.addTempSkill('meiying3');
-				}
-			},
-			meiying3:{},
 			jianwu:{
 				trigger:{player:'shaBegin'},
 				forced:true,
@@ -1693,13 +1682,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.card.name!='sha') return false;
 					return game.hasPlayer(function(current){
-						return (event.targets.contains(current)==false&&current!=player&&
+						return (event.targets.includes(current)==false&&current!=player&&
 						lib.filter.targetEnabled(event.card,player,current))
 					});
 				},
 				content:function(){
 					var list=game.filterPlayer(function(current){
-						return (trigger.targets.contains(current)==false&&current!=player&&
+						return (trigger.targets.includes(current)==false&&current!=player&&
 						lib.filter.targetEnabled(trigger.card,player,current))
 					});
 					if(list.length){

@@ -197,6 +197,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return lib.card.shandian.ai.result.target(player,target);
 						}
 					},
+					tag:{
+						damage:0.25,
+						natureDamage:0.25,
+						thunderDamage:0.25,
+					}
 				}
 			},
 			qibaodao:{
@@ -530,7 +535,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				filter:function(event,player){
 					if(event.player==player) return false;
-					if(event.getParent().directHit.contains(player)) return false;
+					if(event.getParent().directHit.includes(player)) return false;
 					var num=player.countCards('h','jinchan');
 					return num&&num==player.countCards('h');
 				},
