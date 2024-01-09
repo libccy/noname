@@ -445,17 +445,16 @@ export async function boot() {
 	config.set('duration', 500);
 
 	if (!config.get('touchscreen')) {
-		document.addEventListener('mousewheel', ui.click.windowmousewheel, { passive: true });
-		document.addEventListener('mousemove', ui.click.windowmousemove);
-		document.addEventListener('mousedown', ui.click.windowmousedown);
-		document.addEventListener('mouseup', ui.click.windowmouseup);
-		document.addEventListener('contextmenu', ui.click.right);
-	}
-	else {
-		document.addEventListener('touchstart', ui.click.touchconfirm);
-		document.addEventListener('touchstart', ui.click.windowtouchstart);
-		document.addEventListener('touchend', ui.click.windowtouchend);
-		document.addEventListener('touchmove', ui.click.windowtouchmove);
+		document.addEventListener('mousewheel', ui.click.windowmousewheel, { passive: true, capture: false });
+		document.addEventListener('mousemove', ui.click.windowmousemove, false);
+		document.addEventListener('mousedown', ui.click.windowmousedown, false);
+		document.addEventListener('mouseup', ui.click.windowmouseup, false);
+		document.addEventListener('contextmenu', ui.click.right, false);
+	} else {
+		document.addEventListener('touchstart', ui.click.touchconfirm, false);
+		document.addEventListener('touchstart', ui.click.windowtouchstart, false);
+		document.addEventListener('touchend', ui.click.windowtouchend, false);
+		document.addEventListener('touchmove', ui.click.windowtouchmove, false);
 	}
 
 	const stylesLoaded = await Promise.all(stylesLoading);
@@ -783,6 +782,7 @@ function setWindowListener() {
 			}
 			else if (e.keyCode == 83 && (e.ctrlKey || e.metaKey)) {
 				if (Reflect.has(window, 'saveNonameInput')) {
+					// @ts-ignore
 					Reflect.get(window, 'saveNonameInput')();
 				}
 				e.preventDefault();

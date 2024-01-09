@@ -1659,6 +1659,11 @@ export class Get extends Uninstantable {
 		if (obj instanceof lib.element.Dialog) return 'dialog';
 		if (obj instanceof lib.element.GameEvent ||
 			obj instanceof lib.element.GameEventPromise) return 'event';
+		
+		if (typeof obj !== 'object' || obj === null) return;
+		
+		if (lib.experimental.symbol.itemType in obj)
+			return obj[lib.experimental.symbol.itemType]
 	}
 	static equipNum(card) {
 		if (get.type(card) == 'equip') {
