@@ -234,7 +234,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-
 			},
 			jsrgzhenfeng:{
 				audio:2,
@@ -838,7 +837,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							animate:'gain2',
 						}).setContent('gaincardMultiple');
 					}
-
 				},
 				subSkill:{
 					zero:{

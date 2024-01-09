@@ -801,7 +801,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						if(!card) card=event.dialog.buttons[0].link;
 					}
-
 					var button;
 					for(var i=0;i<dialog.buttons.length;i++){
 						if(dialog.buttons[i].link==card){
@@ -2749,7 +2748,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							prompt+=('即将'+(state>0?'生':'失')+'效。');
 						}
 						prompt+='是否使用【无懈可击】？';
-
 						if(player.isUnderControl(true)&&!_status.auto&&!ui.tempnowuxie&&map.tempnowuxie){
 							var translation=get.translation(map.card.name);
 							if(translation.length>=4){
@@ -3263,7 +3261,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					};
-
 					var withme=false;
 					var withol=false;
 					var list=event.list;

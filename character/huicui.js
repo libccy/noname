@@ -505,7 +505,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						player.chat('没有非基本牌…');
 						game.log(`但是${position=='discardPile'?'弃':''}牌堆里没有非基本牌！`);
-
 					}
 				},
 			},
@@ -2730,7 +2729,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.addSkill('dctaji_damage');
 							player.addMark('dctaji_damage',1,false);
 							game.log(player,'下一次对其他角色造成的伤害','#g+1');
-
 						}]
 					];
 					var name=evt.name;

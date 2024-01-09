@@ -246,7 +246,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
 				},
 			},
-
 			"jiuwei":{
 				trigger:{
 					player:"phaseEnd",

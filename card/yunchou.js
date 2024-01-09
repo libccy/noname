@@ -85,7 +85,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						target.lose(result.cards,ui.special);
 						target.$throw(result.cards);
-
 						game.log(target,'用',result.cards,'替换了',event.button.link);
 						target.gain(event.button.link);
 						target.$gain2(event.button.link);

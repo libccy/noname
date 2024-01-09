@@ -766,7 +766,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							capt+=`&nbsp;&nbsp;范围：${infoHp}`;
 						}
 						uiintro.add(capt);
-
 						if(lib.characterTitle[node.link]){
 							uiintro.addText(get.colorspan(lib.characterTitle[node.link]));
 						}
@@ -785,7 +784,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
-
 					return node;
 				},
 				video:function(player,info){
@@ -4471,7 +4469,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{player:1},
 				},
 			},
-
 			caopi_xingdong:{
 				audio:'olfangquan',
 				audioname:['shen_caopi'],
@@ -7008,7 +7005,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
 			"drlt_duorui":{
 				audio:2,
 				init:function(player,skill){

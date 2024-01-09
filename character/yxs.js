@@ -1268,7 +1268,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('heqin');
-
 					player.addSkill('heqin2');
 					target.addSkill('heqin2');
 
@@ -1555,7 +1554,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(target.sex!='male') return false;
 								var name=target.name.indexOf('unknown')==0?target.name2:target.name;
 								if(name==player.storage.yizhuang) return false;
-
 								var info=lib.character[name];
 								if(info){
 									var skills=info[3];
@@ -3097,7 +3095,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			seyou_info:'限定技，出牌阶段，你可以指定任意1名角色，其他所有男性角色需选择1项执行：（1）对你指定的角色出【杀】；（2）令你获得其一张牌。',
 			sheshi:'蛇噬',
 			sheshi_info:'每受到1次伤害，可以指定1种花色，依次展示牌堆顶的牌，直到出现指定花色的牌为止，你获得与指定花色不同花色的所有牌（最多展示四张牌）。',
-
 
 			fengyi:'凤仪',
 			fengyi_info:'出牌阶段，你可以弃一张手牌，指定任意目标摸两张牌。（每回合限用一次）',

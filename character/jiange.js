@@ -571,7 +571,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jingfan:'惊帆',
 			jingfan2:'惊帆',
 			jingfan_info:'回合内，每当你使用一张卡牌，你的进攻距离+1；出牌阶段结束时，你可以将手牌数补至X，并指定至多X名角色令其进攻距离+1直到其下一回合结束，X为你回合内使用的卡牌数。',
-
 		},
 	};
 });

@@ -2005,7 +2005,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return 0;
 					}
-
 					for(var i=0;i<targets.length;i++){
 						if(lib.skill.dcpandi.pandi_canUse(player,card,targets[i],null,true)){
 							var eff=lib.skill.dcpandi.pandi_effect(targets[i],card,player,viewer);
@@ -7627,7 +7626,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							dialog.content.appendChild(table2);
 							dialog.add('　　');
 							event.dialog.open();
-
 							event.switchToAuto=function(){
 								event._result={
 									bool:true,
@@ -11661,7 +11659,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){},
 				ai:{combo:'shiyuan'},
 			},
-
 			//新岩泽(划掉)留赞
 			refenyin:{
 				audio:2,
@@ -13097,7 +13094,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-
 			tuiyan:{
 				audio:2,
 				trigger:{player:'phaseUseBegin'},

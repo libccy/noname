@@ -4737,7 +4737,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.content.appendChild(table2);
 						dialog.add('　　');
 						event.dialog.open();
-
 						event.switchToAuto=function(){
 							event._result={
 								bool:false,
@@ -11142,7 +11141,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-
 			noname_zhuyuan:{
 				enable:"phaseUse",
 				position:"he",
@@ -12360,7 +12358,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.num++;
 				},
 			},
-
 			//手杀削弱版许攸
 			junkshicai:{
 				audio:'nzry_shicai_2',
@@ -15092,7 +15089,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill(result);
 					player.popup(result);
 					game.log(player,'获得了','【'+get.translation(result)+'】');
-
 					var names=[];
 					for(var i=0;i<game.players.length;i++){
 						names.add(game.players[i].name);
@@ -15884,20 +15880,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					leftdist:{
 						mod:{
 							globalFrom:function(from,to,distance){
-
 							},
 							globalTo:function(from,to,distance){
-
 							}
 						}
 					},
 					rightdist:{
 						mod:{
 							globalFrom:function(from,to,distance){
-
 							},
 							globalTo:function(from,to,distance){
-
 							}
 						}
 					},

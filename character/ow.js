@@ -311,7 +311,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('feitiao2');
 						target.randomDiscard();
 					}
-
 				}
 			},
 			feitiao2:{

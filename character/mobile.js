@@ -8092,7 +8092,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						die: new Audio(),
 						played: false,
 					};
-
 					const gnd = {
 						sprite: new Image(),
 						x: 0,
@@ -8149,7 +8148,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							this.pipes.forEach((pipe) => {
 								pipe.x -= dx * deltaTime;
 							});
-
 							if (this.pipes.length && this.pipes[0].x < -this.top.sprite.width) {
 								this.pipes.shift();
 								this.moved = true;
@@ -8215,7 +8213,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										updateText(`${title||'御风飞行'}表演失败……`)
 										setTimeout(switchToAuto,2000);
 									}
-
 									break;
 								case state.gameOver:
 									this.frame = 1;
@@ -8232,7 +8229,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 											SFX.played = true;
 										}
 									}
-
 									break;
 							}
 							const animationsLength = this.animations.length;

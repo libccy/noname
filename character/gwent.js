@@ -573,16 +573,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							huogong:[1,'你可以将一张手牌当作火攻使用'],
 							aoe:[2,'出牌阶段限一次，你可以弃置两张牌，视为使用一张南蛮入侵'],
 							shas:[2,'每当你使用一张杀，你可以追加一名无视距离的目标'],
-
 						},
 						defend:{
-
 						},
 						assist:{
-
 						},
 						control:{
-
 						}
 					}
 				}
@@ -2505,7 +2501,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(event.discard){
 						player.discardPlayerCard(target,'h',true,'visible');
-
 					}
 					else{
 						if(result.links&&result.links.length){

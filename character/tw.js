@@ -3783,7 +3783,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('twqirang_use');
 						player.addTempSkill('twqirang_clear',['phaseZhunbeiAfter','phaseDrawAfter','phaseUseAfter','phaseDiscardAfter','phaseJieshuAfter','phaseAfter']);
 					}
-
 				},
 				ai:{
 					effect:{
@@ -8554,7 +8553,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									player.stat[player.stat.length-1].card.sha--;
 								}
 							}
-
 						}
 					}
 				}
@@ -9093,7 +9091,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									evt.skipped=true;
 								}
 							}
-
 						}
 					}
 				},

@@ -109,7 +109,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					else{
 						card=result.links[0];
 					}
-
 					var button;
 					for(var i=0;i<dialog.buttons.length;i++){
 						if(dialog.buttons[i].link==card){

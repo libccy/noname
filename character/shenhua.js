@@ -1437,8 +1437,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				charlotte:true,
 			},
-
-
 			"drlt_congjian":{
 				audio:2,
 				audioname2:{tongyuan:'ocongjian_tongyuan'},
@@ -1692,7 +1690,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(cards.length) player.gain(cards,'gain2');
 				},
 			},
-
 			nzry_juzhan:{
 				audio:"nzry_juzhan_1",
 				mark:true,
@@ -2662,7 +2659,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete player.storage.nzry_shenshi2;
 				},
 			},
-
 			xinjushou:{
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},

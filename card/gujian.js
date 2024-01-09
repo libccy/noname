@@ -1514,7 +1514,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target.discard(target.getCards('he').randomGet());
 						target.addExpose(0.2);
 					}
-
 					player.storage.mapodoufu_markcount--;
 					if(player.storage.mapodoufu_markcount==0){
 						delete player.storage.mapodoufu;

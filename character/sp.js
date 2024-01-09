@@ -1478,7 +1478,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return [
 						(player.countCards('h')?'弃置至少一半的手牌，然后':'')+'摸三张牌',
 						'摸三张牌，然后弃置至少一半的手牌',
-
 					][player.countCards('h')%2];
 				},
 				check:function(card){
@@ -5414,7 +5413,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseUseTarget(card,true).set('logSkill','oljianman').set('prompt','鹣蛮：选择'+get.translation(card)+'的目标');
 					}
 				}
-
 			},
 			//张华
 			olbihun:{
@@ -16461,7 +16459,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(maxval<=6) return dh;
 						return 0;
-
 					}).set('maxval',maxval);
 					'step 1'
 					if(result.bool){
@@ -25041,7 +25038,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:"limited",
 				},
 			},
-
 			"xinfu_falu":{
 				subSkill:{
 					spade:{
@@ -25665,7 +25661,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lvfan:'吕范',
 			liqueguosi:'李傕郭汜',
 			cuimao:'崔琰毛玠',
-
 
 			caoying:"曹婴",
 			simahui:"司马徽",

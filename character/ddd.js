@@ -1,5 +1,4 @@
 'use strict';
-
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'ddd',
@@ -3834,7 +3833,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							node1.listenTransition(onEnd02);
 						}(players[i],cards1[i],i))
 					}
-
 					setTimeout(function(){
 						var left0=-targets.length*52-(targets.length-1)*8;
 						for(var i=0;i<targets.length;i++){

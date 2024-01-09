@@ -1589,7 +1589,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.targets.length>1) return false;
 					if(!event.target) return false;
 					if(event.target.hp>player.hp) return false;
-
 					var card=event.card;
 					if(card.name=='sha') return true;
 					if(get.color(card)=='black'&&get.type(card,'trick')=='trick') return true;
@@ -11535,7 +11534,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-
 			"new_yajiao":{
 				audio:"reyajiao",
 				trigger:{
@@ -12246,7 +12244,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-
 			reguanxing:{
 				audio:'guanxing',
 				audioname:['jiangwei','re_jiangwei','re_zhugeliang','gexuan','ol_jiangwei'],
@@ -14052,7 +14049,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 3"
 					player.line(result.targets,'green');
 					result.targets[0].gain(event.card,'gain2');
-
 				},
 				ai:{
 					order:9,
