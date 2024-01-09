@@ -799,10 +799,11 @@ export class Get extends Uninstantable {
 	 * 
 	 * @template T
 	 * @param {T} obj - 要复制的对象，若不是对象则直接返回原值
+	 * @param {boolean} [copyKeyDeep = false] - 是否深复制`Map`的`key`
 	 * @param {WeakMap<object, unknown>} [map] - 拷贝用的临时存储，用于处理循环引用（请勿自行赋值）
 	 * @returns {T} - 深拷贝后的对象，若传入值不是对象则为传入值
 	 */
-	static copy(obj, map = new WeakMap()) {
+	static copy(obj, copyKeyDeep = false, map = new WeakMap()) {
 		// 参考[这里](https://juejin.cn/post/7315612852890026021)实现深拷贝
 		// 不再判断是否能structuredClone是因为structuredClone会把Symbol给毙了
 		const getType = (obj) => Object.prototype.toString.call(obj);
@@ -815,29 +816,36 @@ export class Get extends Uninstantable {
 			"[object Arguments]": true,
 		};
 
-		if (typeof obj !== "object" || obj === null)
+		if (typeof obj !== "object" || obj === null || !canTranverse[getType(obj)])
 			return obj;
 
 		// @ts-ignore
 		if (map.has(obj)) return map.get(obj);
 
 		const constructor = obj.constructor;
-		let target;
-		if (!canTranverse[getType(obj)]) {
-			target = obj;
-			return target;
-		}
 		// @ts-ignore
-		else target = constructor ? new constructor(target) : Object.create(null);
+		const target =
+			constructor
+				? (
+					// 这三类数据处理单独处理
+					// （实际上需要处理的只有Map和Set）
+					// 除此之外的就只能祝愿有拷贝构造函数了
+					(Array.isArray(obj) || obj instanceof Map || obj instanceof Set)
+						// @ts-ignore
+						? new constructor()
+						// @ts-ignore
+						: new constructor(obj)
+				)
+				: Object.create(null);
 		map.set(obj, target);
 
 		if (obj instanceof Map) {
 			obj.forEach((value, key) => {
-				target.set(get.copy(key, map), get.copy(value, map));
+				target.set(copyKeyDeep ? get.copy(key, copyKeyDeep, map) : key, get.copy(value, copyKeyDeep, map));
 			});
 		} else if (obj instanceof Set) {
 			obj.forEach((value) => {
-				target.add(get.copy(value, map));
+				target.add(get.copy(value, copyKeyDeep, map));
 			});
 		}
 
@@ -848,7 +856,7 @@ export class Get extends Uninstantable {
 				if (obj.hasOwnProperty(key)) {
 					const result = { enumerable, configurable };
 					if (descriptor.hasOwnProperty('value')) {
-						result.value = get.copy(descriptor.value, map);
+						result.value = get.copy(descriptor.value, copyKeyDeep, map);
 						result.writable = descriptor.writable;
 					} else {
 						const { get, set } = descriptor;
@@ -862,7 +870,7 @@ export class Get extends Uninstantable {
 
 		const symbols = Object.getOwnPropertySymbols(obj);
 		symbols.forEach((symbol) => {
-			target[symbol] = get.copy(obj[symbol], map);
+			target[symbol] = get.copy(obj[symbol], copyKeyDeep, map);
 		});
 
 		return target;
@@ -1623,7 +1631,7 @@ export class Get extends Uninstantable {
 				let bool = true;
 				for (let i = 0; i < obj.length; i++) {
 					if (/h|e|j|s|x/.test(obj[i]) == false) {
-						bool = false; break;
+						bool = false; break; 
 					}
 				}
 				if (bool) return 'position';
