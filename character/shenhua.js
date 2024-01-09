@@ -3222,6 +3222,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinliegong:{
 				shaRelated:true,
 				mod:{
+					aiOrder:function(player,card,num){
+						if(num>0&&(card.name==='sha'||get.tag(card,'draw'))) return num+6;
+					},
 					targetInRange:function(card,player,target){
 						if(card.name=='sha'&&typeof get.number(card)=='number'){
 							if(get.distance(player,target)<=get.number(card)) return true;
