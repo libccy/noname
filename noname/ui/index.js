@@ -9854,7 +9854,9 @@ class Create extends Uninstantable {
 			return node;
 		}
 	}
-	static button(item, type, position, noClick, button) { return new lib.element.Button(item, type, position, noClick, button) }
+	static button(item, type, position, noClick, button) {
+		return new lib.element.Button(item, type, position, noClick, button);
+	}
 	static buttons(list, type, position, noclick, zoom) {
 		var buttons = [];
 		var pre = (typeof type == 'string' && type.slice(0, 3) == 'pre');
@@ -11645,7 +11647,7 @@ class Click extends Uninstantable {
 							_status.clicked = false;
 							_status.dragged = false;
 							var notbefore = itemtype == 'player' && !item.classList.contains('selected');
-							ui.click[itemtype].call(item);
+							//ui.click[itemtype].call(item);
 							if (item.classList.contains('selected')) {
 								if (notbefore) {
 									_status.lastdragchange.push(item);
@@ -12039,7 +12041,7 @@ class Click extends Uninstantable {
 							_status.dragstatuschanged = item;
 							_status.clicked = false;
 							var notbefore = itemtype == 'player' && !item.classList.contains('selected');
-							ui.click[itemtype].call(item);
+							//ui.click[itemtype].call(item);
 							if (item.classList.contains('selected')) {
 								if (notbefore) {
 									_status.lastdragchange.push(item);
@@ -12183,7 +12185,7 @@ class Click extends Uninstantable {
 					!item.classList.contains('selected') &&
 					!item.classList.contains('noclick')) {
 					_status.clicked = false;
-					ui.click[itemtype].call(item);
+					//ui.click[itemtype].call(item);
 					if (item.classList.contains('selected')) {
 						_status.mousedragging = e;
 						_status.mousedragorigin = item;
