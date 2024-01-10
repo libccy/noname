@@ -195,7 +195,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbyijue:{
 				audio:2,
-				trigger:{source:'damageBegin3'},
+				trigger:{source:'damageBegin2'},
 				filter:function(event,player){
 					return event.num>=event.player.hp&&!player.getStorage('sbyijue').includes(event.player);
 				},

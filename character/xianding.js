@@ -344,7 +344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//无 双 万 军 取 首
 			dcsbronghuo:{
 				audio:2,
-				trigger:{player:'useCard'},
+				trigger:{player:'useCard1'},
 				filter:function(event,player){
 					return (event.card.name=='sha'&&game.hasNature(event.card,'fire'))||event.card.name=='huogong';
 				},

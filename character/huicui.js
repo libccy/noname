@@ -2754,7 +2754,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					damage:{
-						trigger:{source:'damageBegin3'},
+						trigger:{source:'damageBegin1'},
 						forced:true,
 						charlotte:true,
 						onremove:true,

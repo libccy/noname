@@ -1527,9 +1527,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(player.countCards('h')!=1||typeof get.number(player.getCards('h')[0],player)!='number') return false;
 					if(player.hasSkill('hezhong_0')&&player.hasSkill('hezhong_1')) return false;
-					if(event.getg) return event.getg(player).length;
-					var evt=event.getl(player);
-					return evt&&evt.player==player&&evt.hs&&evt.hs.length>0;
+					let gain=0,lose=0;
+					if(event.getg) gain=event.getg(player).length;
+					if(event.getl) lose=event.getl(player).hs.length;
+					return gain!=lose;
 				},
 				prompt2:function(event,player){
 					var str='展示最后一张手牌并摸一张牌';
@@ -1590,6 +1591,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'useCard'},
 						filter:function(event,player){
 							if(get.type(event.card)!='trick') return false;
+							if(!event.targets.length) return false;
 							var num=get.number(event.card,player);
 							return typeof num=='number'&&player.getStorage('hezhong_0').some(numx=>num>numx);
 						},
@@ -1626,6 +1628,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'useCard'},
 						filter:function(event,player){
 							if(get.type(event.card)!='trick') return false;
+							if(!event.targets.length) return false;
 							var num=get.number(event.card,player);
 							return typeof num=='number'&&player.getStorage('hezhong_1').some(numx=>num<numx);
 						},
