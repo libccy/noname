@@ -1,4 +1,4 @@
-import { ErrorHandler } from './struct/index.js';
+import { PromiseErrorHandler } from './struct/index.js';
 
 /**
  * 从浏览器名到不同浏览器下异步处理方式的映射
@@ -8,10 +8,10 @@ import { ErrorHandler } from './struct/index.js';
  * @type {Record<"firefox" | "chrome" | "safari" | "other", new () => PromiseErrorHandler>}
  */
 export const promiseErrorHandlerMap = {
-	'chrome': ErrorHandler.ChromePromiseErrorHandler,
-	'firefox': ErrorHandler.FirefoxPromiseErrorHandler,
-	'safari': ErrorHandler.UnknownPromiseErrorHandler,
-	'other': ErrorHandler.UnknownPromiseErrorHandler
+	'chrome': PromiseErrorHandler.ChromePromiseErrorHandler,
+	'firefox': PromiseErrorHandler.FirefoxPromiseErrorHandler,
+	'safari': PromiseErrorHandler.UnknownPromiseErrorHandler,
+	'other': PromiseErrorHandler.UnknownPromiseErrorHandler
 };
 
 /**
