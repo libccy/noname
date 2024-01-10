@@ -8,11 +8,11 @@ import { GNC as gnc } from '../../gnc/index.js';
 
 // 未来再改
 export const Content = {
-	emptyEvent: async (event) => {
+	emptyEvent: () => {
 		event.trigger(event.name);
 	},
 	//增加明置手牌
-	addShownCards: async (event, _trigger, player) => {
+	addShownCards: () => {
 		const hs = player.getCards('h'), showingCards = event._cards.filter(showingCard => hs.includes(showingCard)), shown = player.getShownCards();
 		event.gaintag.forEach(tag => player.addGaintag(showingCards, tag));
 		if (!(event.cards = showingCards.filter(showingCard => !shown.includes(showingCard))).length) return;
@@ -6665,8 +6665,7 @@ export const Content = {
 		"step 5";
 		ui.clear();
 	},
-	draw: async (event, _trigger, player) => {
-		let { num } = event;
+	draw: function() {
 		// if(lib.config.background_audio){
 		// 	game.playAudio('effect','draw');
 		// }
@@ -6724,7 +6723,6 @@ export const Content = {
 		}
 		if (event.gaintag) next.gaintag.addArray(event.gaintag);
 		event.result = cards;
-		await next;
 	},
 	discard: function () {
 		"step 0";
