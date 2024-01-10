@@ -762,8 +762,8 @@ function setWindowListener() {
 		errorList.push([e, stackTraces]);
 	};
 	// 已经有用了
-	window.addEventListener("unhandledrejection", PromiseRejectionEvent => {
-		PromiseRejectionEvent.promise.catch(e => {
+	window.addEventListener("unhandledrejection", promiseRejectionEvent => {
+		promiseRejectionEvent.promise.catch(e => {
 			const result = errorList.find(v => v[0] === e);
 			if (result) {
 				// @ts-ignore
