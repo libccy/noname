@@ -37,7 +37,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kagari:['female','shen',3,['kagari_zongsi'],['key']],
 			key_shiki:['female','shen','3/5',['shiki_omusubi'],['key']],
 			db_key_hina:['female','key',3,['hina_shenshi','hina_xingzhi'],['doublegroup:key:shen']],
-
+			
 			shen_sunce:['male','shen','1/6',['yingba','scfuhai','pinghe'],['wu']],
 			shen_xunyu:['male','shen',3,['tianzuo','lingce','dinghan'],['wei','clan:颍川荀氏']],
 			shen_taishici:['male','shen',4,['dulie','tspowei'],['wu']],
@@ -51,7 +51,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_simayi:['male','shen',4,['renjie','sbaiyin','lianpo'],['wei']],
 			shen_caocao:['male','shen',3,['new_guixin','feiying'],['wei']],
 			shen_lvbu:['male','shen',5,['baonu','wumou','ol_wuqian','ol_shenfen'],['qun']],
-
+			
 			shen_liubei:["male","shen",6,["nzry_longnu","nzry_jieying"],["shu"]],
 			shen_luxun:["male","shen",4,["nzry_junlve","nzry_cuike","nzry_dinghuo"],["wu"]],
 			shen_zhangliao:["male","shen",4,["drlt_duorui","drlt_zhiti"],["wei"]],
@@ -7722,12 +7722,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_longnu_info":"转换技，锁定技，阴：出牌阶段开始时，你失去1点体力并摸一张牌，然后本阶段内你的红色手牌均视为火【杀】且无距离限制。阳：出牌阶段开始时，你减1点体力上限并摸一张牌，然后本阶段内你的锦囊牌均视为雷【杀】且无使用次数限制。",
 			"nzry_jieying":"结营",
 			"nzry_jieying_info":"锁定技，游戏开始时或当你的武将牌重置时，你横置；所有已横置的角色手牌上限+2；结束阶段，你横置一名其他角色。",
-
+			
 			"shen_ganning":"神甘宁",
 			shen_ganning_prefix:'神',
 			"shen_zhangliao":"神张辽",
 			shen_zhangliao_prefix:'神',
-
+			
 			"drlt_poxi":"魄袭",
 			"drlt_poxi_info":"出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以弃置你与其手牌中的四张花色不同的牌。若如此做，根据此次弃置你的牌的数量执行以下效果：零张，扣减1点体力上限；一张，你结束出牌阶段且本回合手牌上限-1；三张，你回复1点体力；四张，你摸四张牌。",
 			"drlt_jieying":"劫营",
@@ -7739,7 +7739,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_duorui_info":"当你于出牌阶段内对一名其他角色造成伤害后，你可以废除你装备区内的一个装备栏（若已全部废除则可以跳过此步骤），然后获得该角色的一个技能直到其的下回合结束或其死亡(觉醒技，限定技，主公技，隐匿技，使命技等特殊技能除外)。若如此做，该角色该技能失效且你不能再发动〖夺锐〗直到你失去以此法获得的技能。",
 			"drlt_zhiti":"止啼",
 			"drlt_zhiti_info":"锁定技，你攻击范围内已受伤的其他角色手牌上限-1；当你拼点或【决斗】胜利，或受到伤害后，你恢复一个装备栏。",
-
+			
 			shen_zhaoyun:'神赵云',
 			shen_zhaoyun_prefix:'神',
 			shen_guanyu:'神关羽',
@@ -7966,7 +7966,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hengwu:'横骛',
 			hengwu_info:'当你使用或打出有花色的牌时，若你的手牌区内没有与此牌花色相同的牌，则你可以摸X张牌（X为场上装备区内花色与此牌相同的牌数）。',
 			hengwu_append:'<span style="font-family: yuanli">棘手，怀念，摧毁！</span>',
-
+			
 			key_kagari:'篝',
 			kagari_zongsi:'纵丝',
 			kagari_zongsi_info:'出牌阶段限一次，你可以选择一张不在游戏外的牌，然后将其置于牌堆/弃牌堆的顶部/底部或一名角色的对应区域内。',
@@ -8053,7 +8053,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			'<br><li>鹤：出牌阶段开始时，你摸三张牌。',
 			youyi:'游医',
 			youyi_info:'①弃牌阶段结束时，你可以将所有于此阶段弃置的牌置入仁区。②出牌阶段限一次。你可以将仁区的所有牌置入弃牌堆，令所有角色各回复1点体力。',
-
+			
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',
 			extra_lin:'神话再临·林',

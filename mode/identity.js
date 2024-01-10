@@ -297,7 +297,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					beginner=game.players[Math.floor(Math.random()*game.players.length)];
 				}
 				event.beginner=beginner;
-
+				
 				var stratagemBroadcast=()=>{
 					_status.stratagemFuryMax=3;
 					ui.css.stratagemCardStyle=lib.init.sheet([
@@ -365,7 +365,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 			game.syncState();
 			event.trigger('gameStart');
-
+			
 			var players=get.players(lib.sort.position);
 			var info=[];
 			for(var i=0;i<players.length;i++){
@@ -937,7 +937,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					},result);
-
+					
 					var list=[];
 					var players=game.players.slice(0);
 					players.removeArray([game.rZhu,game.bZhu]);
@@ -1160,11 +1160,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						game.players[i].identityShown=false;
 					}
-
+					
 					game.zhu.isZhu=(game.zhu.identity=='zhu');
 					game.me.setIdentity();
 					game.me.node.identity.classList.remove('guessing');
-
+					
 					for(var i=0;i<game.players.length;i++){
 						game.players[i].send(function(zhu,zhuid,me,identity){
 							for(var i in lib.playerOL){
@@ -1178,13 +1178,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							ui.arena.classList.add('choose-character');
 						},game.zhu,game.zhu.identity,game.players[i],game.players[i].identity);
 					}
-
+					
 					var list;
 					var list3=[];
 					var list4=[];
 					event.list=[];
 					event.list2=[];
-
+					
 					var libCharacter={};
 					for(var i=0;i<lib.configOL.characterPack.length;i++){
 						var pack=lib.characterPack[lib.configOL.characterPack[i]];
@@ -1225,7 +1225,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					var list=[];
 					var selectButton=(lib.configOL.double_character?2:1);
-
+					
 					var num,num2=0;
 					num=Math.floor(event.list.length/(game.players.length-1));
 					if(num>5){
@@ -1319,27 +1319,27 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							ui.arena.classList.remove('choose-character');
 						},500);
 					},result2,result);
-
+					
 					for(var i in result2){
 						if(!lib.playerOL[i].name){
 							lib.playerOL[i].init(result2[i][0],result2[i][1]);
 						}
 						if(result[i]&&result[i].length) lib.playerOL[i].changeGroup(result[i],false,false);
 					}
-
+					
 					for(var i=0;i<game.players.length;i++){
 						_status.characterlist.remove(game.players[i].name);
 						_status.characterlist.remove(game.players[i].name1);
 						_status.characterlist.remove(game.players[i].name2);
 					}
-
+					
 					['stratagem_gain','stratagem_insight','stratagem_expose'].forEach(globalSkill=>game.addGlobalSkill(globalSkill));
 					game.players.forEach(current=>{
 						current.storage.zhibi=[];
 						current.storage.stratagem_expose=[];
 						current.markSkill('stratagem_fury');
 					});
-
+					
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
@@ -1503,7 +1503,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						identityList=get.identityList(game.players.length);
 					}
 					var stratagemMode=event.stratagemMode;
-
 					var addSetting=function(dialog){
 						dialog.add('选择身份').classList.add('add-setting');
 						var table=document.createElement('div');
@@ -1519,7 +1518,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							listi=['random','zhu','zhong','fan','nei'];
 							if(get.config('enable_commoner')&&!event.stratagemMode) listi.push('commoner');
 						}
-
+						
 						for(var i=0;i<listi.length;i++){
 							var td=ui.create.div('.shadowed.reduce_radius.pointerdiv.tdnode');
 							td.link=listi[i];
@@ -1610,7 +1609,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							});
 						}
 						dialog.content.appendChild(table);
-
+						
 						dialog.add('选择座位').classList.add('add-setting');
 						var seats=document.createElement('div');
 						seats.classList.add('add-setting');
@@ -1634,7 +1633,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										delete _status.cheat_seat;
 										return;
 									}
-
 								}
 								if(stratagemMode){
 									this.classList.add('bluebg');
@@ -1660,7 +1658,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							seats.previousSibling.style.display='none';
 							seats.style.display='none';
 						}
-
+						
 						dialog.add(ui.create.div('.placeholder.add-setting'));
 						dialog.add(ui.create.div('.placeholder.add-setting'));
 						if(get.is.phoneLayout()) dialog.add(ui.create.div('.placeholder.add-setting'));
@@ -1741,7 +1739,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.players[i].identityShown=false;
 						}
 					}
-
+					
 					if(get.config('special_identity')&&!event.zhongmode&&!event.stratagemMode&&game.players.length==8){
 						for(var i=0;i<game.players.length;i++){
 							delete game.players[i].special_identity;
@@ -1774,7 +1772,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
-
+					
 					if(!game.zhu) game.zhu=game.me;
 					else{
 						if(!stratagemMode){
@@ -2011,7 +2009,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else{
 						event.dialogxx=ui.create.characterDialog('heightset');
 					}
-
+					
 					ui.create.cheat2=function(){
 						ui.cheat2=ui.create.control('自由选将',function(){
 							if(this.dialog==_status.event.dialog){
@@ -2134,7 +2132,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
-
+					
 					if(event.special_identity){
 						for(var i=0;i<event.special_identity.length;i++){
 							game.zhu.addSkill(event.special_identity[i]);
@@ -2214,7 +2212,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},game.zhu,map);
 						event.special_identity=map;
 					}
-
+					
 					game.zhu.setIdentity();
 					game.zhu.identityShown=true;
 					game.zhu.isZhu=(game.zhu.identity=='zhu');
@@ -2224,7 +2222,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(game.me.special_identity){
 						game.me.node.identity.firstChild.innerHTML=get.translation(game.me.special_identity+'_bg');
 					}
-
+					
 					for(var i=0;i<game.players.length;i++){
 						game.players[i].send(function(zhu,zhuid,me,identity){
 							for(var i in lib.playerOL){
@@ -2244,14 +2242,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							ui.arena.classList.add('choose-character');
 						},game.zhu,game.zhu.identity,game.players[i],game.players[i].identity);
 					}
-
+					
 					var list;
 					var list2=[];
 					var list3=[];
 					var list4=[];
 					event.list=[];
 					event.list2=[];
-
+					
 					var libCharacter={};
 					for(var i=0;i<lib.configOL.characterPack.length;i++){
 						var pack=lib.characterPack[lib.configOL.characterPack[i]];
@@ -2343,7 +2341,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.list.remove(get.sourceCharacter(game.zhu.name2));
 					event.list2.remove(get.sourceCharacter(game.zhu.name1));
 					event.list2.remove(get.sourceCharacter(game.zhu.name2));
-
+					
 					if(game.players.length>4){
 						game.zhu.maxHp++;
 						game.zhu.hp++;
@@ -2359,7 +2357,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							zhu.update();
 						}
 					},game.zhu,result.links[0],result.links[1],game.players.length>4);
-
+					
 					if(game.zhu.group=='shen'&&!game.zhu.isUnseen(0)){
 						var list=['wei','shu','wu','qun','jin','key'];
 						for(var i=0;i<list.length;i++){
@@ -2388,7 +2386,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					"step 3"
 					var list=[];
 					var selectButton=(lib.configOL.double_character?2:1);
-
+					
 					var num,num2=0;
 					if(event.zhongmode){
 						num=6;
@@ -2516,14 +2514,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							ui.arena.classList.remove('choose-character');
 						},500);
 					},result2,result);
-
+					
 					for(var i in result2){
 						if(!lib.playerOL[i].name){
 							lib.playerOL[i].init(result2[i][0],result2[i][1]);
 						}
 						if(result[i]&&result[i].length) lib.playerOL[i].changeGroup(result[i],false,false);
 					}
-
+					
 					if(event.special_identity){
 						for(var i in event.special_identity){
 							game.zhu.addSkill(i);
@@ -2786,7 +2784,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.zhu.playerfocus(1000);
 						_status.event.trigger('zhuUpdate');
 					}
-
+					
 					if(!_status.over){
 						var giveup;
 						if(get.population('fan')+get.population('nei')==1){
@@ -2803,7 +2801,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							giveup.showGiveup();
 						}
 					}
-
 				},
 				logAi:function(targets,card){
 					if(this.ai.shown==1||this.isMad()) return;
@@ -2860,7 +2857,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(this.ai.shown<-0.5) this.ai.shown=-0.5;
 					if(_status.mode=='purple') return;
 					if(stratagemMode) return;
-
+					
 					var marknow=(!_status.connectMode&&this!=game.me&&get.config('auto_mark_identity')&&this.ai.identity_mark!='finished');
 					// if(true){
 						if(marknow&&_status.clickingidentity&&_status.clickingidentity[0]==this){
@@ -2934,7 +2931,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					// }
-
 				},
 				showIdentity:function(){
 					this.node.identity.classList.remove('guessing');
@@ -4056,7 +4052,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}).set('ai',function(target){
 						var player=_status.event.player;
 						var att=get.attitude(player,target);
-
+						
 						if(att>0){
 							var js=target.getCards('j');
 							if(js.length){

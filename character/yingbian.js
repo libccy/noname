@@ -3982,7 +3982,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oltousui_info:'你可以将任意张牌置于牌堆底，视为使用一张需使用等量张【闪】抵消的【杀】。',
 			olchuming:'畜鸣',
 			olchuming_info:'锁定技。当你对其他角色造成伤害时，或当你受到其他角色造成的伤害时，若此伤害的渠道不为牌或没有对应的实体牌，此伤害+1，否则其于本回合结束时将所有以此法造成伤害的牌当【借刀杀人】或【过河拆桥】对你使用。',
-
+			
 			yingbian_pack1:'文德武备·理',
 			yingbian_pack2:'文德武备·备',
 			yingbian_pack3:'文德武备·果',

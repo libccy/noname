@@ -253,7 +253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const bannedTypes=[];
 					bannedTypes.addArray(event.cards.map(card=>get.type2(card,player)));
 					bannedTypes.addArray(player.getStorage('dcliangxiu'));
-
+					
 					const filter=card=>!bannedTypes.includes(get.type2(card,player));
 					const piles=['cardPile','discardPile'];
 					for(const pile of piles){
@@ -5037,7 +5037,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.classList.add('fullwidth');
 						dialog.classList.add('fullheight');
 						dialog.buttonss=[];
-
+						
 						var list=['仅展示牌的玩家','交出牌的玩家']
 						for(var i=0;i<list.length;i++){
 							dialog.add('<div class="text center">'+list[i]+'</div>');
@@ -5047,7 +5047,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							buttons.classList.add('guanxing');
 						}
 						dialog.open();
-
+						
 						var getx=function(){
 							var item=results.shift();
 							var card=item[1][1],index=item[1][0]=='仅展示牌'?0:1;
@@ -11400,7 +11400,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyijia_info:'一名角色受到伤害后，若你至其的距离不大于1，你可以将场上一张装备牌移动至其对应装备栏（替换原装备）。若其因此脱离了一名角色的攻击范围，你摸一张牌。',
 			dcdingji:'定基',
 			dcdingji_info:'准备阶段，你可以令一名角色将手牌摸或弃置至五张，然后其展示手牌。若牌名均不同，则其可以视为使用其中一张基本或普通锦囊牌。',
-
+			
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
 			sp_zhilan:'芝兰玉树',

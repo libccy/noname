@@ -938,7 +938,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['heart',6,'huoshan','fire'],
 			['club',7,'hongshui'],
 			["diamond",3,'guohe'],
-
+			
 			['diamond',4,'fudichouxin'],
 			['club',6,'fudichouxin'],
 			['spade',1,'fudichouxin'],
@@ -954,9 +954,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['diamond',6,'chenhuodajie'],
 			['diamond',9,'chenhuodajie'],
 			['club',3,'chenhuodajie'],
-
+			
 			['club',13,'suolianjia'],
-
+			
 			['club',3,'caochuanjiejian'],
 			['spade',7,'caochuanjiejian'],
 			// ['spade',5,'xiaolicangdao'],

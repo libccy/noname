@@ -199,7 +199,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.showCards(result.cards).setContent(function(){});
 					event.dialog=ui.create.dialog(get.translation(target)+'展示的手牌',result.cards);
 					event.videoId=lib.status.videoId++;
-
+					
 					game.broadcast('createDialog',event.videoId,get.translation(target)+'展示的手牌',result.cards);
 					game.addVideo('cardDialog',null,[get.translation(target)+'展示的手牌',get.cardsInfo(result.cards),event.videoId]);
 					event.card2=result.cards[0];
@@ -1020,7 +1020,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			baiyin:'白银狮子',
 			baiyin_info:'锁定技。①当你受到伤害时，若此伤害大于1，则你将伤害值扣减至1点。②当你失去装备区内的【白银狮子】后，你回复1点体力。',
 			baiyin_skill:'白银狮子',
-
+			
 			muniu:'木牛流马',
 			muniu_bg:'牛',
 			muniu_skill:'木牛',
@@ -1062,14 +1062,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			["spade",9,"jiu"],
 			["club",3,"jiu"],
 			["club",9,"jiu"],
-
+			
 			["diamond",13,"hualiu"],
 			["club",1,"baiyin"],
 			["spade",2,"tengjia"],
 			["club",2,"tengjia"],
 			["spade",1,"guding"],
 			["diamond",1,"zhuque"],
-
+			
 			["heart",2,"huogong"],
 			["heart",3,"huogong"],
 			["diamond",12,"huogong"],
@@ -1084,7 +1084,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			["spade",13,"wuxie"],
 			["spade",10,"bingliang"],
 			["club",4,"bingliang"],
-
+			
 			['diamond',5,'muniu'],
 		],
 	}

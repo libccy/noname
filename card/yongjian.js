@@ -733,7 +733,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			xinge:'信鸽',
 			xinge_info:'出牌阶段限一次。你可以将一张手牌交给一名其他角色。',
 			xinge_append:'<span class="text" style="font-family: yuanli">咕咕咕。</span>',
-
+			
 			_gifting:'赠予',
 			_gifting_info:'出牌阶段，你可将一张拥有“赠”标签的手牌区装备牌置于一名其他角色的装备区内，或将一张拥有“赠”标签的手牌区非装备牌正面朝上交给一名其他角色。',
 		},
@@ -751,7 +751,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['spade',11,'wuxie'],
 			['spade',12,'chenghuodajie'],
 			['spade',13,'chenghuodajie'],
-
+			
 			['heart',1,'guaguliaodu'],
 			['heart',2,'shan',null,['gifts']],
 			['heart',3,'wugu',null,['gifts']],
@@ -765,7 +765,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['heart',11,'sha',null,['gifts']],
 			['heart',12,'sha',null,['gifts']],
 			['heart',13,'zhanxiang',null,['gifts']],
-
+			
 			['club',1,'duanjian',null,['gifts']],
 			['club',2,'sha','stab'],
 			['club',3,'yinfengyi',null,['gifts']],
@@ -779,7 +779,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['club',11,'wuxie'],
 			['club',12,'wuxie'],
 			['club',13,'yonglv',null,['gifts']],
-
+			
 			['diamond',1,'juedou',null,['gifts']],
 			['diamond',2,'shan'],
 			['diamond',3,'kaihua',null,['gifts']],

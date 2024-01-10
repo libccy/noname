@@ -77,7 +77,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_satomi:['female','key',3,['satomi_luodao','satomi_daohai']],
 			key_iriya:['female','key',3,['iriya_yinji','iriya_haozhi']],
 			key_fuuko:['female','key',3,['fuuko_xingdiao','fuuko_chuanyuan']],
-
+			
 			key_kud:['female','key',3,['kud_qiaoshou','kud_buhui']],
 			key_misuzu:['female','key',3,['misuzu_hengzhou','misuzu_nongyin','misuzu_zhongxing']],
 			key_kamome:['female','key',3,['kamome_yangfan','kamome_huanmeng','kamome_jieban']],
@@ -92,7 +92,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_tomoyo:['female','key',4,['tomoyo_wuwei','tomoyo_zhengfeng']],
 			key_minagi:['female','key',3,['minagi_peiquan','minagi_huanliu']],
 			key_michiru:['female','key',3,['michiru_sheyuan']],
-
+			
 			ns_huangchengyan:['male','shu',3,['nslongyue','nszhenyin']],
 			ns_sunchensunjun:['male','wu',5,['nsxianhai','nsxingchu']],
 			ns_yuanxi:['male','qun',4,['nsshengyan','nsdaizhan']],
@@ -107,7 +107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_limi:['male','jin',3,['nstuilun']],
 			ns_zhonglimu:['male','wu',4,['nskuanhuai','nsdingbian']],
 			prp_zhugeliang:['male','shu',3,['nsxingyun','nshanlang']],
-
+			
 			ns_zhangwei:['female','shu',3,['nsqiyue','nsxuezhu']],
 			diy_wenyang:['male','wei','4/6',['lvli','choujue']],
 			// diy_caocao:['male','wei',4,['xicai','diyjianxiong','hujia']],
@@ -127,14 +127,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_zhenji:['female','wei',3,['diy_jiaoxia','yiesheng']],
 			// diy_menghuo:['male','shu',4,['huoshou','zaiqix']],
 			//re_huangyueying:['female','shu',3,['rejizhi','qicai']],
-
+			
 			diy_liufu:['male','wei',3,['zhucheng','duoqi']],
 			diy_xizhenxihong:['male','shu',4,['fuchou','jinyan']],
 			diy_liuzan:['male','wu',4,['kangyin']],
 			diy_zaozhirenjun:['male','wei',3,['liangce','jianbi','diyjuntun']],
 			diy_yangyi:['male','shu',3,['choudu','liduan']],
 			diy_tianyu:['male','wei',4,['chezhen','youzhan']],
-
+			
 			ns_zuoci:['male','qun',3,['nsxinsheng','nsdunxing']],
 			ns_lvzhi:['female','qun',3,['nsnongquan','nsdufu']],
 			ns_wangyun:["male","qun",4,["liangji","jugong","chengmou"]],
@@ -146,7 +146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_jinke:['male','qun',4,['nspinmin','nsshishou']],
 			ns_yanliang:['male','qun',4,['nsduijue','nsshuangxiong','dualside'],['dualside:ns_wenchou']],
 			ns_wenchou:['male','qun',2,['nsguanyong','dualside'],['unseen']],
-
+			
 			ns_caocao:['male','wei',4,['nscaiyi','nsgefa','nshaoling']],
 			ns_caocaosp:['male','qun',3,['nsjianxiong','nsxionglue']],
 			ns_zhugeliang:['male','shu',3,['nsguanxing','kongcheng','nsyunxing']],
@@ -156,14 +156,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_guanlu:['male','wei',3,['nsbugua','nstuiyan','nstianji']],
 			ns_simazhao:['male','wei',3,['nszhaoxin','nsxiuxin','nsshijun']],
 			ns_sunjian:['male','wu',4,['nswulie','nshunyou','nscangxi']],
-
+			
 			ns_duangui:['male','qun',3,['nscuanquan','nsjianning','nschangshi','nsbaquan']],
 			ns_zhangbao:['male','qun',3,['nsfuhuo','nswangfeng']],
 			ns_masu:['male','shu',3,['nstanbing','nsxinzhan']],
 			ns_zhangxiu:['male','qun',4,['nsbaiming','nsfuge']],
 			ns_lvmeng:['male','wu',3,['nsqinxue','nsbaiyi']],
 			ns_shenpei:['male','qun',3,['nshunji','shibei']],
-
+			
 			ns_yujisp:['male','qun',3,['nsguhuo']],
 			ns_yangyi:['male','shu',3,['nsjuanli','nsyuanchou']],
 			ns_liuzhang:['male','qun',3,['nsanruo','nsxunshan','nskaicheng']],
@@ -180,7 +180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_duji:['male','wei',3,['xinfu_andong','xinyingshi']],
 			old_majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"]],
 			ns_mengyou:['male','qun',4,['nsmanzhi']],
-
+			
 			old_jiakui:['male','wei',4,['tongqu','xinwanlan']],
 			ol_guohuai:['male','wei',3,['rejingce']],
 			junk_zhangrang:['male','qun',3,['junktaoluan'],['sex:male_castrated']],
@@ -311,7 +311,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_haruko:'#bAIR',
 			sp_key_yuri:'#bAngel Beats!',
 			key_fuuko:'#gClannad',
-
+			
 			key_kud:'#b千夜',
 			key_misuzu:'#b长发及腰黑长直',
 			key_kamome:'#b仿生纱',
@@ -325,7 +325,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_kiyu:'#b无面◎隐者',
 			key_tomoyo:'#b长发及腰黑长直',
 			key_minagi:'#b无面◎隐者',
-
+			
 			ns_huangchengyan:'#g竹邀月',
 			ns_sunchensunjun:'#gVenusjeu',
 			ns_yuanxi:'#g食茸二十四',
@@ -340,7 +340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_limi:'#g-心若困兽-',
 			ns_zhonglimu:'#gJG赛文♠7',
 			prp_zhugeliang:'#g阿开木木W🍀',
-
+			
 			ns_luyusheng:'#g猫咪大院 - 魚と水',
 			ns_caimao:'#gP尔号玩家◆',
 			diy_wenyang:'#g最粗的梦想XD',
@@ -12797,7 +12797,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			junktaoluan_backup:{charlotte:true},
-
+			
 			nshuaishuang:{
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
@@ -17984,7 +17984,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_zaozhirenjun:'枣祗任峻',
 			diy_yangyi:'杨仪',
 			diy_tianyu:'田豫',
-
+			
 			// diy_caocao:'曹操',
 			diy_menghuo:'孟获',
 			diy_huangzhong:'黄汉升',
@@ -18003,7 +18003,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diy_lukang:'陆抗',
 			diy_caiwenji:'蔡昭姬',
 			diy_zhenji:'甄宓',
-
+			
 			ns_zuoci:'左慈',
 			ns_wangyun:'王允',
 			ns_lvzhi:'吕后',
@@ -18016,7 +18016,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_yanliang:'颜良',
 			ns_wenchou:'文丑',
 			ns_jinke:'荆轲',
-
+			
 			ns_caocao:'曹操',
 			ns_zhugeliang:'诸葛亮',
 			ns_wangyue:'王越',
@@ -18027,21 +18027,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_sunjian:'孙坚',
 			ns_simazhao:'司马昭',
 			ns_guanlu:'管辂',
-
+			
 			ns_duangui:'段珪',
 			ns_shenpei:'审配',
 			ns_zhangbao:'张宝',
 			ns_masu:'马谡',
 			ns_zhangxiu:'张绣',
 			ns_lvmeng:'吕蒙',
-
+			
 			ns_yujisp:'于吉',
 			ns_lisu:'李肃',
 			ns_yangyi:'杨仪',
 			ns_liuzhang:'刘璋',
 			ns_xinnanhua:'南华老仙',
 			ns_luyusheng:'陆郁生',
-
+			
 			sp_key_yuri:'SP仲村由理',
 			sp_key_yuri_prefix:'SP',
 			key_lucia:'此花露西娅',
@@ -18505,7 +18505,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fuuko_xingdiao_info:'锁定技。游戏开始时，你将手牌摸至8张，然后将所有手牌明置（称为“星”，不计入手牌上限）。每名其他角色限一次，其可以于出牌阶段选择获得你的一张“星”，然后你摸一张牌。',
 			fuuko_chuanyuan:'传愿',
 			fuuko_chuanyuan_info:'锁定技。当你失去一张“星”后，你回复1点体力，然后从牌堆中获得一张和“星”花色点数相同的牌（没有则改为摸一张牌，且使用此牌无距离和次数限制）。',
-
+			
 			key_kud:'库特莉亚芙卡',
 			kud_qiaoshou:'巧手',
 			kud_qiaoshou_equip:'巧手',
@@ -18602,7 +18602,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			michiru_sheyuan:'舍愿',
 			michiru_sheyuan_info:'每轮限一次。若你没有“米券”，则你可以将所有手牌当做任意基本牌或普通锦囊牌使用，然后摸等量的牌。',
 			minagi_tag:'米券',
-
+			
 			noname:"小无",
 			noname_zhuyuan:"祝愿",
 			noname_zhuyuan_info:"①每回合每名角色限一次。出牌阶段，你可以将四张花色各不相同的牌交给一名其他角色。你与其获得技能〖铁骑〗和〖激昂〗至各自的回合结束。②锁定技，若你于当前回合内：未发动过〖祝愿〗，则你使用牌无次数限制；发动过〖祝愿〗，则你使用牌无距离限制。",
@@ -18677,7 +18677,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsqingde_info:'每回合限一次，当你使用【杀】或普通锦囊牌对其他角色造成伤害后，你可使用该牌与受到伤害的角色拼点。你可令输的角色摸两张牌；当你受到其他角色使用【杀】或普通锦囊牌造成的伤害后，可使用该牌与伤害来源拼点。你可令赢的角色回复1点体力。',
 			nsyidi:'遗敌',
 			nsyidi_info:'出牌阶段限一次，你可展示一张手牌，然后将其交给一名其他角色。若为基本牌，该角色可使用此牌；若不为基本牌，你摸一张牌。',
-
+			
 			diy_wenyang:'文鸯',
 			ns_zhangwei:'张葳',
 			nshuaishuang:'怀霜',
@@ -18860,7 +18860,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhucheng_info:'①结束阶段开始时，若没有“筑”，你可以将牌堆顶的X张牌置于你的武将牌上〔称为“筑”〕（X为你已损失的体力值与1中的较大值），否则你可以获取所有“筑”。②当你成为【杀】的目标时，若有“筑”，你可以令此杀的使用者弃置X张牌（X为“筑”的数量），否则杀对你无效。',
 			duoqi:'夺气',
 			duoqi_info:'当一名角色于除你之外的角色的出牌阶段内因弃置而失去牌后，你可以移去一张“筑”，并结束此出牌阶段。',
-
+			
 			siji:'伺机',
 			ciqiu:'刺酋',
 			ciqiu_dying:'刺酋',
@@ -18911,7 +18911,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			moshou_info:'锁定技，你不能成为乐不思蜀和兵粮寸断的目标。',
 			xicai_info:'你可以立即获得对你造成伤害的牌。',
 			diyjianxiong_info:'锁定技，在身份局中，在你回合内死亡的角色均视为反贼，国战中，在你回合内死亡的角色若与你势力相同则随机改为另一个势力。',
-
+			
 			ns_zanghong:'臧洪',
 			nsshimeng:'誓盟',
 			nsshimeng_info:'出牌阶段限一次，你可以选择任意名角色。这些角色依次选择一项：⒈摸一张牌。⒉使用一张【杀】。然后若选择前者角色数大于选择后者的角色数，则你获得1点护甲并失去1点体力。',
@@ -18936,7 +18936,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsxingyun_faq_info:'青龙：无标签普通锦囊牌<br>朱雀：延时锦囊牌<br>白虎：伤害类卡牌<br>玄武：【闪】/回复类卡牌',
 			nshanlang:'酣浪',
 			nshanlang_info:'准备阶段，你可以和至多三名角色拼点。然后若这些角色中有拼点牌唯一最大的角色，则你可以令该角色从牌堆中获得一张不符合“四象天阵”的牌。',
-
+			
 			junktaoluan:'滔乱',
 			junktaoluan_backup:'滔乱',
 			junktaoluan_info:'你可将一张牌当做任意一张基本牌或普通锦囊牌使用（此牌不得是本局游戏你以此法使用过的牌，且每回合每种花色限一次），然后你令一名其他角色选择一项：1.交给你一张与“滔乱”声明的牌类别不同的牌；2.本回合“滔乱”失效且回合结束时你失去1点体力。',
@@ -19002,7 +19002,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_duji:'画饼杜畿',
 			ns_duji_prefix:'画饼',
 			ns_duji_ab:'杜畿',
-
+			
 			diy_tieba:'吧友设计',
 			diy_xushi:'玩点论杀·虚实篇',
 			diy_default:'常规',

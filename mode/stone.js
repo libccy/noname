@@ -8,7 +8,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			_status.mode='deck';
 			game.initStone();
 			var playback=localStorage.getItem(lib.configprefix+'playback');
-
+			
 			if(!playback&&_status.mode=='deck'){
 				var createCardDialog=function(){
 					ui.deckBuilder=ui.create.div('.popup-container#deck-builder',function(){
@@ -128,7 +128,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var observer = new MutationObserver(removeLine);
 					observer.observe(rename,{characterData:true,subtree:true});
 					rename.addEventListener('keyup',removeLine);
-
+					
 					var cardDialog=ui.create.cardDialog(true,function(name){
 						if(lib.card[name].stonehidden) return true;
 						var type=lib.card[name].type;
@@ -260,7 +260,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					cardDialog.listen(function(e){
 						e.stopPropagation();
 					});
-
+					
 					ui.deckBuilder.appendChild(cardDialog);
 					var deckList=ui.create.div('.shadowed.list',ui.deckBuilder,function(e){
 						e.stopPropagation();
@@ -361,7 +361,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},500);
 					}
 				};
-
+				
 				ui.deckcontrol=ui.create.system('卡组管理',function(){
 					if(this.classList.contains('hidden')) return;
 					// if(lib.config.low_performance){
@@ -384,7 +384,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					ui.pause.hide();
 					ui.historybar.hide();
 				},true);
-
+				
 				if(lib.onfree){
 					ui.deckcontrol.style.transition='all 0.5s';
 					ui.deckcontrol.hide();
@@ -394,7 +394,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					createCardDialog();
 				}
 			}
-
+			
 			if(playback){
 				ui.create.me();
 				ui.arena.style.display='none';
@@ -439,7 +439,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},220);
 				if(get.config('skill_bar')){
 					_status.rageEnabled=true;
-
+					
 					ui.friendBar=ui.create.div('.skillbar.right.shadowed.playerbg',ui.arena);
 					ui.enemyBar=ui.create.div('.skillbar.left.shadowed.playerbg',ui.arena);
 					// ui.friendBar.dataset.nature='metal';
@@ -454,7 +454,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					// ui.enemyBar.popnode=ui.create.div('.skillbartext',ui.enemyBar);
 					_status.friendRage=0;
 					_status.enemyRage=0;
-
+					
 					lib.setIntro(ui.friendBar,null,true);
 					lib.setIntro(ui.enemyBar,null,true);
 				}
@@ -464,12 +464,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			game.updateStatusCount();
 			lib.setPopped(_status.friendCount,function(){
 				var uiintro=ui.create.dialog('hidden');
-
+				
 				if(_status.deadfriend.length){
 					uiintro.add('已阵亡');
 					uiintro.add([_status.deadfriend,'player']);
 				}
-
+				
 				uiintro.add('未上场');
 				if(_status.mylist.length){
 					uiintro.add([_status.mylist,'character']);
@@ -477,7 +477,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				else{
 					uiintro.add('（无）')
 				}
-
+				
 				return uiintro;
 			});
 			lib.setPopped(_status.enemyCount,function(){
@@ -488,10 +488,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return uiintro;
 				}
 			});
-
+			
 			game.me.side=Math.random()<0.5;
 			game.enemy.side=!game.me.side;
-
+			
 			var players=get.players(lib.sort.position);
 			var info=[];
 			for(var i=0;i<players.length;i++){
@@ -503,7 +503,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 			_status.videoInited=true,
 			game.addVideo('init',null,info);
-
+			
 			event.trigger('gameStart');
 			if(_status.mode=='deck'){
 				game.gameDraw(game.me,3);
@@ -950,7 +950,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 								game.players.push(player);
 								ui.arena.appendChild(player);
-
+								
 								game.addVideo('stoneSwap',null,{
 									name:player.name1,
 									name2:player.name2,
@@ -975,7 +975,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.resume();
 								game.updateStatusCount();
 							},lib.config.duration);
-
 						}
 					}
 					else if(game.enemy.isDead()){
@@ -1010,7 +1009,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.players.push(player);
 								game.enemy=player;
 								ui.arena.appendChild(player);
-
+								
 								game.addVideo('stoneSwap',null,{
 									name:player.name1,
 									name2:player.name2,
@@ -1096,7 +1095,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_shachuisaman:['male','qun',3,['shaman_fengnu'],['minskin','stone'],[4,4,'shaman']],
 				stone_wanshiyuansu:['male','qun',3,['shaman_zoushi'],['minskin','stone'],[3,1,'shaman']],
 				stone_shalinxingzhe:['male','qun',4,['shaman_anhun'],['minskin','stone'],[4,2,'shaman']],
-
+				
 				stone_kuangyedoushi:['male','wu',3,['druid_nuhuo'],['minskin','stone'],[4,2,'druid']],
 				stone_conglinshouwei:['male','wu',3,['druid_huwei'],['minskin','stone'],[4,2,'druid']],
 				stone_baohuzhishu:['male','qun',6,['lschaofeng'],['minskin','stone'],[6,4,'druid']],
@@ -1109,7 +1108,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_conglinxiaoshou:['male','wei',3,['druid_yuehuo'],['minskin','stone'],[4,4,'druid']],
 				stone_lindishuyao:['female','wei',3,['druid_yeyou'],['minskin','stone'],[3,3,'druid']],
 				stone_xunmenglong:['male','wei',2,['druid_qicheng'],['minskin','stone'],[3,3,'druid']],
-
+				
 				stone_caoyuanshi:['male','qun',5,['hunter_nuhou'],['minskin','stone'],[5,2,'hunter']],
 				stone_leiouke:['male','shu',2,['hunter_zhanhuo'],['minskin','stone'],[3,1,'hunter']],
 				stone_huofu:['male','qun',2,['stone_chongfeng'],['minskin','stone'],[3,4,'hunter']],
@@ -1122,7 +1121,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_jujishou:['male','qun',2,['hunter_juji'],['minskin','stone'],[2,2,'hunter']],
 				stone_damoshatuo:['male','qun',3,['hunter_dusha'],['minskin','stone'],[3,3,'hunter']],
 				stone_huangjialeixiang:['male','qun',2,['hunter_chuanlin'],['minskin','stone'],[2,3,'hunter']],
-
+				
 				stone_shuiyuansu:['male','wei',4,['mage_bingdong'],['minskin','stone'],[4,2,'mage']],
 				stone_wushixuetu:['female','wu',1,['mage_zhufa'],['minskin','stone'],[1,2,'mage']],
 				stone_huoyao:['male','shu',3,['mage_lieyan'],['minskin','stone'],[3,1,'mage']],
@@ -1135,7 +1134,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_kaodalalong:['male','qun',4,['mage_yufa'],['minskin','stone'],[5,4,'mage']],
 				stone_yanshushi:['male','qun',2,['mage_yanshu'],['minskin','stone'],[4,4,'mage']],
 				stone_xulingwushi:['male','qun',2,['mage_pingxu'],['minskin','stone'],[3,3,'mage']],
-
+				
 				stone_hudunren:['male','qun',2,['paladin_hudun'],['minskin','stone'],[2,2,'paladin']],
 				stone_junxuguan:['male','qun',3,['paladin_buji'],['minskin','stone'],[4,1,'paladin']],
 				stone_yurenqishi:['male','qun',2,['paladin_zhaochao'],['minskin','stone'],[4,2,'paladin']],
@@ -1148,7 +1147,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_shixiangweishi:['female','qun',3,['paladin_huashi'],['minskin','stone'],[3,3,'paladin']],
 				stone_xuefanzhanshi:['male','qun',3,['paladin_jinghua'],['minskin','stone'],[4,4,'paladin']],
 				stone_xunmashi:['male','qun',3,['paladin_moma'],['minskin','stone'],[3,2,'paladin']],
-
+				
 				stone_lieyanxiaogui:['male','qun',2,['warlock_nonghuo'],['minskin','stone'],[1,4,'warlock']],
 				stone_xiaoguishouling:['male','qun',3,['warlock_zhaogui'],['minskin','stone'],[3,1,'warlock']],
 				stone_xiaogui:['male','qun',1,[],['minskin','stone','stonehidden'],[1,1]],
@@ -1163,7 +1162,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_tongkunvwang:['male','qun',2,['warlock_tongku'],['minskin','stone'],[2,1,'warlock']],
 				stone_xukongkongmo:['male','qun',3,['warlock_tunshi'],['minskin','stone'],[3,3,'warlock']],
 				stone_fukongmoyan:['male','qun',4,['warlock_shijie'],['minskin','stone'],[5,4,'warlock']],
-
+				
 				stone_zhihuiguan:['female','qun',2,['warrior_tongling'],['minskin','stone'],[3,2,'warrior']],
 				stone_kuangzhanshi:['male','qun',2,['warrior_baoluan'],['minskin','stone'],[3,1,'warrior']],
 				stone_zhujiashi:['male','qun',2,['warrior_zhujia'],['minskin','stone'],[2,1,'warrior']],
@@ -1176,7 +1175,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_jingyingweishi:['male','qun',3,['stone_chongfeng'],['minskin','stone'],[4,3,'warrior']],
 				stone_mengmaren:['male','qun',3,['warrior_chuanci'],['minskin','stone'],[4,4,'warrior']],
 				stone_zhifuzhe:['male','qun',2,['warrior_zhifu'],['minskin','stone'],[3,1,'warrior']],
-
+				
 				stone_daomufeizei:['male','qun',3,['rogue_xunbao'],['minskin','stone'],[4,3,'rogue']],
 				stone_qiezei:['male','qun',2,['rogue_touqie'],['minskin','stone'],[2,2,'rogue']],
 				stone_heitieairen:['male','qun',2,['rogue_qiancang'],['minskin','stone'],[4,3,'rogue']],
@@ -1190,7 +1189,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_shihualong:['male','qun',1,['rogue_fusheng'],['minskin','stone'],[3,2,'rogue']],
 				stone_xiushuihaidao:['male','qun',1,['rogue_jielue'],['minskin','stone'],[1,2,'rogue']],
 				stone_zousishangfan:['male','qun',3,['rogue_jiaoyi'],['minskin','stone'],[4,3,'rogue']],
-
+				
 				stone_beijunmushi:['male','qun',2,['priest_shengliao'],['minskin','stone'],[1,1,'priest']],
 				stone_guanliyuan:['male','qun',2,['priest_faxian'],['minskin','stone'],[2,1,'priest']],
 				stone_linghunjisi:['female','qun',4,['priest_hunwu'],['minskin','stone'],[4,2,'priest']],
@@ -1203,29 +1202,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_guangmingquan:['male','qun',3,['priest_shengshui'],['minskin','stone'],[2,0,'priest']],
 				stone_muguangchulong:['male','qun',2,['priest_muguang'],['minskin','stone'],[1,1,'priest']],
 				stone_shenshengyongshi:['male','qun',3,['priest_shengguang'],['minskin','stone'],[4,3,'priest']],
-
+				
 				stone_zhongshi:['male','wei',1,['stone_zhongshi1'],['minskin','stone'],[1,2]],
 				stone_zhucangzhe:['male','wei',1,['stone_zhucangzhe1'],['minskin','stone'],[1,2]],
 				stone_huoqiangshou:['male','wei',3,['stone_huoqiangshou1'],['minskin','stone'],[3,1]],
-
+				
 				stone_lansaizhanshi:['male','shu',1,['stone_chongfeng'],['minskin','stone'],[1,2]],
 				stone_kutongsiseng:['male','shu',1,['stone_kutongsiseng1'],['minskin','stone'],[1,2]],
 				stone_yuanguanying:['male','shu',3,['stone_yuanguanying1'],['minskin','stone'],[3,1]],
-
+				
 				stone_dijieshicong:['male','wu',2,['stone_dijieshicong1'],['minskin','stone'],[1,1]],
 				stone_yaosaishouwei:['male','wu',2,['stone_yaosaishouwei1'],['minskin','stone'],[1,1]],
 				stone_famingjia:['male','wu',3,['stone_famingjia1'],['minskin','stone'],[3,1]],
-
+				
 				stone_chilundashi:['male','qun',2,['stone_chilundashi1'],['minskin','stone'],[1,1]],
 				stone_hanguangzhizhe:['male','qun',2,['stone_hanguangzhizhe1'],['minskin','stone'],[2,2]],
 				stone_aihaozhihun:['male','qun',3,['stone_aihaozhihun1'],['minskin','stone'],[3,1]],
-
+				
 				stone_fennuxiaoji:['male','qun',1,['stone_fennuxiaoji1'],['minskin','stone'],[1,2]],
 				stone_juxingchanchu:['male','qun',2,['stone_juxingchanchu1'],['minskin','stone'],[2,1]],
 				stone_wuyi:['male','qun',1,['jijiu'],['minskin','stone','die_audio'],[2,2]],
 				stone_langren:['male','qun',1,['stone_qianxing'],['minskin','stone'],[1,2]],
 				stone_shishigui:['male','qun',2,['stone_shishigui1'],['minskin','stone'],[2,1]],
-
+				
 				stone_fatiaozhuru:['female','qun',1,['stone_fatiaozhuru1'],['minskin','stone'],[1,2]],
 				stone_mingguangjisi:['female','wu',2,['shushen'],['minskin','stone'],[2,1]],
 				stone_nianqingjisi:['female','wei',2,['stone_zhufu'],['minskin','stone'],[2,1]],
@@ -1233,7 +1232,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_yanjingshe:['female','qun',2,['stone_yanjingshe1'],['minskin','stone'],[3,2]],
 				stone_zhiyuzhe:['female','qun',3,['stone_zhiyu'],['minskin','stone'],[3,1]],
 				stone_mafengzhuru:['female','qun',1,['stone_mafengzhuru1'],['minskin','stone'],[1,2]],
-
+				
 				stone_shumiao:['none','wu',1,[],['minskin','stone','stonehidden'],[1,1]],
 				stone_shuren:['none','wu',2,['stone_chongfeng','stone_zibao'],['minskin','stone','stonehidden'],[2,2]],
 				stone_shurenx:['none','wu',2,[],['minskin','stone','stonehidden'],[2,2]],
@@ -1247,19 +1246,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				stone_mianyang:['none','qun',1,['mage_mianyang'],['minskin','stone','stonehidden'],[1,0]],
 				stone_qingwa:['none','wu',1,['shaman_qingwa'],['minskin','stone','stonehidden'],[1,0]],
 				stone_shengjiachong:['none','qun',1,['lschaofeng'],['minskin','stone','stonehidden'],[1,1]],
-
+				
 				stone_tuteng1:['none','qun',2,['shaman_tuteng','lschaofeng'],['minskin','stone','stonehidden'],[2,0]],
 				stone_tuteng2:['none','qun',2,['shaman_tuteng','shaman_zhuore'],['minskin','stone','stonehidden'],[2,0]],
 				stone_tuteng3:['none','qun',2,['shaman_tuteng','shaman_fali'],['minskin','stone','stonehidden'],[2,0]],
 				stone_tuteng4:['none','qun',2,['shaman_tuteng','shaman_zhiliao'],['minskin','stone','stonehidden'],[2,0]],
 				stone_xinbing:['none','qun',2,[],['minskin','stone','stonehidden'],[2,0]],
-
+				
 				stone_siwangzhiyi:['male','qun',4,['stone_mieshi'],['minskin','stone','stonehidden','stonelegend'],[6,4]],
 				stone_alaikesita:['female','qun',4,['stone_fushi'],['minskin','stone','stonehidden','stonelegend'],[6,4]],
 				stone_yisela:['female','qun',4,['stone_chenshui'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
 				stone_nuoziduomu:['male','qun',4,['stone_shixu'],['minskin','stone','stonehidden','stonelegend'],[6,4]],
 				stone_maligousi:['male','qun',4,['stone_mowang'],['minskin','stone','stonehidden','stonelegend'],[6,2]],
-
+				
 				stone_aolajier:['male','qun',4,['stone_chongfeng','shaman_fengnu','paladin_hudun','lschaofeng'],['minskin','stone','stonehidden','stonelegend_shaman'],[6,4]],
 				stone_andongni:['male','qun',4,['stone_zhiyin'],['minskin','stone','stonehidden','stonelegend_mage'],[6,4]],
 				stone_jialakesi:['male','qun',6,['stone_bianshen'],['minskin','stone','stonehidden','stonelegend_warlock'],[6,0]],
@@ -1423,7 +1422,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					lib.card.list.randomSort();
 				}
-
+				
 				lib.skill._recasting.usable=3;
 				for(i in lib.skill){
 					if(lib.skill[i].changeSeat){
@@ -1444,7 +1443,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				}
-
+				
 				_status.deadfriend=[];
 				_status.deadenemy=[];
 				game.additionaldead=[];
@@ -1470,7 +1469,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					dialog.add('0/'+(get.config('double_character')?2:1)*get.config('battle_number'));
 					dialog.add([list.slice(0,get.config('battle_number')*2+5),'character']);
 					dialog.open();
-
+					
 					var next=game.me.chooseButton(dialog,true).set('onfree',true);
 					next.selectButton=function(){
 						return (get.config('double_character')?2:1)*get.config('battle_number');
@@ -1490,14 +1489,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.changeCoin(-3);
 						}
 						list.randomSort();
-
+						
 						var buttons=ui.create.div('.buttons');
 						var node=_status.event.dialog.buttons[0].parentNode;
 						_status.event.dialog.buttons=ui.create.buttons(list.slice(0,get.config('battle_number')*2+5),'character',buttons);
 						_status.event.dialog.content.insertBefore(buttons,node);
 						buttons.addTempClass('start');
 						node.remove();
-
+						
 						game.uncheck();
 						game.check();
 					};
@@ -1595,7 +1594,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else{
 								event.dialog=ui.create.dialog('','hidden','forcebutton');
 							}
-
+							
 							var buttons=ui.create.div('.buttons',event.dialog.content);
 							var currentNode=null;
 							var clickButton=function(click){
@@ -1918,7 +1917,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_fuchoudaji:{
 				type:'stonecard',
 				fullimage:true,
@@ -2112,7 +2111,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_jinyingduijue:{
 				type:'stonecard',
 				stoneact:4,
@@ -2310,7 +2309,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_zhenyanshu:{
 				type:'stonecard',
 				stoneact:1,
@@ -2499,7 +2498,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_shalumingling:{
 				type:'stonecard',
 				stoneact:2,
@@ -2680,7 +2679,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-
+			
 			spell_conglinzhihun:{
 				type:'stonecard',
 				stoneact:3,
@@ -2913,7 +2912,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_mengun:{
 				type:'stonecard',
 				stoneact:2,
@@ -3088,7 +3087,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_canying:{
 				type:'stonecard',
 				stoneact:1,
@@ -3311,7 +3310,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_fengnu:{
 				type:'stonecard',
 				stoneact:2,
@@ -3494,7 +3493,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_shenshengxinxing:{
 				type:'stonecard',
 				stoneact:5,
@@ -3715,7 +3714,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_nuxi:{
 				type:'stonecard',
 				stoneact:3,
@@ -3885,7 +3884,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_lierenyinji:{
 				type:'stonecard',
 				stoneact:0,
@@ -4052,7 +4051,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-
+			
 			spell_liliangdaijia:{
 				type:'stonecard',
 				fullimage:true,
@@ -4249,7 +4248,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_yexingchengzhang:{
 				type:'stonecard',
 				fullimage:true,
@@ -4454,7 +4453,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_cigu:{
 				type:'stonecard',
 				fullimage:true,
@@ -4655,7 +4654,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-
+			
 			spell_fengxian:{
 				type:'stonecard',
 				fullimage:true,
@@ -4835,7 +4834,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_lianhuanbaolie:{
 				type:'stonecard',
 				fullimage:true,
@@ -5011,7 +5010,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-
+			
 			spell_hanbingjian:{
 				type:'stonecard',
 				fullimage:true,
@@ -5172,7 +5171,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			spell_chenmo:{
 				type:'stonecard',
 				enable:true,
@@ -5803,7 +5802,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					threaten:1.6
 				}
 			},
-
+			
 			warlock_anyu:{
 				trigger:{source:'fellow'},
 				forced:true,
@@ -5940,7 +5939,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					threaten:1.6
 				}
 			},
-
+			
 			warrior_heiyao:{
 				trigger:{global:'phaseEnd'},
 				forced:true,
@@ -6034,7 +6033,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					target.damage();
 				}
 			},
-
+			
 			priest_puzhao:{
 				trigger:{source:'fellow'},
 				unique:true,
@@ -6182,7 +6181,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.update();
 				}
 			},
-
+			
 			hunter_mishi:{
 				trigger:{global:'fellow'},
 				forced:true,
@@ -6284,7 +6283,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					trigger.num+=player.countFellowSkill('hunter_zhanhuo',true);
 				}
 			},
-
+			
 			rogue_jiaoyi:{
 				trigger:{source:'fellow'},
 				forced:true,
@@ -6409,7 +6408,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.tempHide();
 				}
 			},
-
+			
 			paladin_moma:{
 				global:'paladin_moma2',
 				ai:{
@@ -6568,7 +6567,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			mage_yufa:{
 				trigger:{global:'useSkillAfter'},
 				forced:true,
@@ -6666,7 +6665,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
-
+			
 			druid_juhuo:{
 				trigger:{global:'dieAfter'},
 				filter:function(event,player){
@@ -6774,7 +6773,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					trigger.num++;
 				},
 			},
-
+			
 			shaman_anhun:{
 				trigger:{global:'dieAfter'},
 				forced:true,
@@ -6862,7 +6861,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					threaten:1.5
 				}
 			},
-
+			
 			warlock_fushishu:{
 				trigger:{player:'phaseAfter'},
 				forced:true,
@@ -6877,7 +6876,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					threaten:0.1
 				}
 			},
-
+			
 			paladin_zhengqianghaosheng:{
 				trigger:{player:'phaseBegin'},
 				forced:true,
@@ -6912,7 +6911,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					player.storage.paladin_zhihuizhufu.drawDeck();
 				}
 			},
-
+			
 			priest_kuaisuzhiliao:{
 				mark:true,
 				intro:{
@@ -6985,7 +6984,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-
+			
 			druid_conglinzhihun:{
 				trigger:{player:'dieBegin'},
 				forced:true,
@@ -7059,7 +7058,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					delete player.storage.shaman_xianzuzhihun;
 				}
 			},
-
+			
 			shaman_fengnu:{
 				unique:true,
 				trigger:{player:'phaseAfter'},
@@ -8781,7 +8780,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.chooser.useCard({name:'sha'},result.targets,false);
 					}
-
 				}
 			},
 			stone_zhucangzhe1:{
@@ -9332,7 +9330,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			paladin:'圣骑士',
 			hunter:'猎人',
 			druid:'德鲁伊',
-
+			
 			stone_siwangzhiyi:'死亡之翼',
 			stone_alaikesita:'阿莱克萨',
 			stone_yisela:'伊瑟拉',
@@ -9348,7 +9346,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_sainaliusi:'塞纳留斯',
 			stone_fuding:'弗丁',
 			stone_weilun:'维纶',
-
+			
 			stone_fushi:'缚誓',
 			stone_fushi_info:'你出场时，为所有友方角色回复所有体力值。',
 			stone_mieshi:'灭世',
@@ -9359,7 +9357,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_chenshui_info:'在你的结束阶段，令己方主将获得一张梦境牌。',
 			stone_mowang:'魔网',
 			stone_mowang_info:'己方法术对主将伤害+2，对随从伤害+4。',
-
+			
 			stone_zhiyin:'指引',
 			stone_zhiyin_info:'每当己方主将使用一张法术牌，将一张火球术置于其手牌。',
 			stone_bianshen:'变身',
@@ -9376,7 +9374,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_shenyou_info:'己方主将的职业技能和法术的治疗效果翻倍。',
 			stone_jinu:'激怒',
 			stone_jinu_info:'摸牌阶段，若你己受伤，则额外摸两张牌。',
-
+			
 			spell_shenshengxinxing:'神圣新星',
 			spell_shenshengxinxing_info:'对所有敌方角色造成1点伤害，令所有友方角色回复1点体力。',
 			spell_shengguangzhadan:'圣光炸弹',
@@ -9389,7 +9387,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_naluzhiguang_info:'恢复1点体力值，若目标仍处于受伤状态，则召唤一名圣光护卫。',
 			spell_zhiliaozhihuan:'治疗之环',
 			spell_zhiliaozhihuan_info:'令所有随从回复3点体力。',
-
+			
 			spell_zhenyanshu:'真言术',
 			spell_zhenyanshu_info:'令一名随从增加1点体力和体力上限；从牌库中获得一张牌。',
 			spell_enzeshu:'恩泽术',
@@ -9403,11 +9401,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_xinlinghanbao_info:'对敌方主将造成2点伤害。',
 			spell_kongxinshu:'控心术',
 			spell_kongxinshu_info:'复制敌方牌库中的一张随从，将其置入战场。',
-
+			
 			stone_shengguanghuwei:'圣光护卫',
 			priest_shengguang:'圣光',
 			priest_shengguang_info:'每当一名随从获得治疗，摸一张牌。',
-
+			
 			spell_nuxi:'怒袭',
 			spell_nuxi_info:'造成1点伤害，获得2点护甲。',
 			spell_dunpaimengji:'盾牌猛击',
@@ -9420,7 +9418,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_xuanfengzhan_info:'对所有随从造成1点伤害。',
 			spell_juemingluandou:'绝命乱斗',
 			spell_juemingluandou_info:'随机保留一名随从，然后令所有其他随从死亡。',
-
+			
 			spell_zhongnian:'重碾',
 			spell_zhongnian_info:'造成X点伤害，X为已受伤的友方角色数且不超过3。',
 			spell_zhandounuhuo:'战斗怒火',
@@ -9433,7 +9431,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_kuangbao_info:'令一名已受伤的友方随从摸四张牌。',
 			spell_yingyongdaji:'英勇打击',
 			spell_yingyongdaji_info:'令一名敌方角色对你造成2点伤害，然后对其造成2点伤害。',
-
+			
 			spell_dubiao:'毒镖',
 			spell_dubiao_info:'对一名随机敌方角色造成1点伤害。',
 			spell_qiangfengsheji:'强风射击',
@@ -9448,7 +9446,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_zhuizongshu_info:'从牌库中随机选择三张牌，获得其中的一张。',
 			spell_tianjiangzhuqun:'天降蛛群',
 			spell_tianjiangzhuqun_info:'召唤三只结网蛛。',
-
+			
 			spell_lierenyinji:'猎人印记',
 			spell_lierenyinji_info:'将一名随从的体力上限降至1。',
 			spell_kuaisusheji:'快速射击',
@@ -9461,12 +9459,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_zidanshangtang_info:'随机获得一张猎人职业法术牌，并获得技能〖上膛〗直到回合结束。',
 			spell_duochongsheji:'多重射击',
 			spell_duochongsheji_info:'对两名随机敌方随从各造成2点伤害。',
-
+			
 			stone_liegou:'猎狗',
 			hunter_zidanshangtang:'上膛',
 			hunter_zidanshangtang_bg:'膛',
 			hunter_zidanshangtang_info:'每当你使用一张法术牌，便随机获得一张猎人职业法术牌。',
-
+			
 			spell_zuzhou:'诅咒',
 			spell_zuzhou_info:'将目标随从翻面，摸一张牌。',
 			spell_xishengqiyue:'牺牲契约',
@@ -9479,7 +9477,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_liliangdaijia_info:'令一名友方随从摸四张牌，将体力值变为5，并在其下个回合结束后死亡。',
 			spell_emozhinu:'恶魔之怒',
 			spell_emozhinu_info:'对所有随从造成2点伤害。',
-
+			
 			spell_emozhixin:'恶魔之心',
 			spell_emozhixin_info:'对一名敌方随从造成4点伤害，或令一名友方随从摸四张牌。',
 			spell_ansezhadan:'暗色炸弹',
@@ -9494,7 +9492,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_linghunhongxi_info:'令一名随从死亡，回复1点体力。',
 			spell_siwangchanrao:'死亡缠绕',
 			spell_siwangchanrao_info:'对一名随从造成1点伤害；若该随从死亡，从牌库中获得一张牌。',
-
+			
 			spell_wuyashenxiang:'乌鸦神像',
 			spell_wuyashenxiang_info:'从三张法术牌或随从牌中选择一张加入手牌。',
 			spell_huotigenxu:'活体根须',
@@ -9509,7 +9507,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_yemanpaoxiao_bg:'咆',
 			spell_yemanpaoxiao2:'咆哮',
 			spell_yemanpaoxiao_info:'所有友方角色造成的伤害+1，直到你的下个回合开始。',
-
+			
 			spell_conglinzhihun:'丛林之魂',
 			druid_conglinzhihun:'树魂',
 			druid_conglinzhihun_info:'你死亡后召唤一个树人。',
@@ -9524,21 +9522,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_fennu_info:'对一名随从造成2点伤害，或造成1点伤害并从牌库中获得一张牌。',
 			spell_heiandiyu:'黑暗低语',
 			spell_heiandiyu_info:'召唤若干个小精灵直到你的随从数达到4；或令一名随从增加1点体力和体力上限并摸三张牌。',
-
+			
 			druid_yexingchengzhang:'成长',
 			druid_yexingchengzhang_bg:'长',
 			druid_yexingchengzhang_info:'下个出牌阶段开始时获得三点额外行动值。',
 			druid_ziyang:'滋养',
 			druid_ziyang_bg:'养',
 			druid_ziyang_info:'下个出牌阶段开始时获得四点额外行动值。',
-
+			
 			stone_shumiao:'树苗',
 			stone_shuren:'自爆树人',
 			stone_shurenx:'树人',
 			stone_shurenxx:'嘲讽树人',
 			stone_zibao:'自爆',
 			stone_zibao_info:'结合结束后立即死亡。',
-
+			
 			spell_cigu:'刺骨',
 			spell_cigu_info:'造成1点伤害，你可以弃置一张装备区内的牌令伤害+1。',
 			spell_jianrenluanwu:'剑刃乱舞',
@@ -9551,7 +9549,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_cisha_info:'杀死一名随从。',
 			spell_modaoyou:'磨刀油',
 			spell_modaoyou_info:'令你下一次剑刃乱舞造成的伤害+1，并与一名随机友方随从各摸两张牌。',
-
+			
 			spell_mengun:'闷棍',
 			spell_mengun_info:'令一名敌方随从死亡（不触发死亡技能），将一张该随从的复制置入对手的手牌。',
 			spell_anzhongpohuai:'暗中破坏',
@@ -9567,7 +9565,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_piaoqie_info:'复制两张对手牌库中的牌加入你的手牌。',
 			spell_jipao:'疾跑',
 			spell_jipao_info:'从牌库中获得四张牌。',
-
+			
 			spell_fengxian:'奉献',
 			spell_fengxian_info:'对所有敌方角色造成1点伤害。',
 			spell_fuchouzhinu:'复仇之怒',
@@ -9580,7 +9578,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_zuozhandongyuan_info:'召唤两个新兵，随机装备一把武器。',
 			spell_liliangzhufu:'力量祝福',
 			spell_liliangzhufu_info:'令一名随从摸两张牌。',
-
+			
 			spell_jinyingduijue:'精英对决',
 			spell_jinyingduijue_info:'双方各保留体力值最高的一名随从，然后令其他随从死亡。',
 			spell_shenpan:'审判',
@@ -9596,7 +9594,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_zhihuizhufu:'智慧祝福',
 			paladin_zhihuizhufu:'智慧祝福',
 			spell_zhihuizhufu_info:'选择一名随从，在其每个准备阶段，你从牌库中获得一张牌。',
-
+			
 			spell_fengnu:'风怒',
 			shaman_fengnu:'风怒',
 			shaman_fengnu_info:'回合结束后，你获得一个额外回合。',
@@ -9617,7 +9615,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shaman_xianzuzhishi:'先祖知识',
 			shaman_xianzuzhishi_info:'本回合手牌上限-1。',
 			spell_xianzuzhishi_info:'从牌库中获得两张牌，本回合手牌上限-1（多次使用不叠加）。',
-
+			
 			spell_lianhuanbaolie:'连环爆裂',
 			spell_lianhuanbaolie_info:'造成1~2点雷电伤害。',
 			spell_shandianfengbao:'闪电风暴',
@@ -9630,7 +9628,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_shixue_info:'所有友方随从摸两张牌。',
 			spell_chazhuangshandian:'叉状闪电',
 			spell_chazhuangshandian_info:'对两个随机敌方随从各造成1点雷电伤害。',
-
+			
 			stone_qingwa:'青蛙',
 			stone_youlinglang:'幽灵狼',
 			stone_jingxiang:'镜像',
@@ -9638,7 +9636,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shaman_qingwa:'青蛙',
 			shaman_qingwa_info:'锁定技，你跳过摸牌阶段。',
 			stone_xiaojingling:'小精灵',
-
+			
 			spell_laojiuhuoba:'老旧火把',
 			spell_laojiuhuoba_info:'造成1点伤害，将一张炽热火把置入你的牌库。',
 			spell_chirehuoba:'炽热火把',
@@ -9655,7 +9653,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			mage_hanbingpingzhang:'寒冰屏障',
 			mage_hanbingpingzhang_info:'体力值不能降到2以内。',
 			spell_hanbingpingzhang_info:'令一名角色的体力值不能降到2以内，直到你的下一回合开始。',
-
+			
 			spell_hanbingjian:'寒冰箭',
 			spell_hanbingjian_info:'对一个随从造成2点伤害，然后将其翻面。',
 			spell_lieyanfengbao:'烈焰风暴',
@@ -9668,25 +9666,25 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_bianxingshu_info:'将一个随从变成一只绵羊。',
 			spell_huoqiushu:'火球术',
 			spell_huoqiushu_info:'造成3点火焰伤害（若目标为主将，伤害不能超过目标的当前体力值）。',
-
+			
 			stone_mianyang:'绵羊',
 			mage_mianyang:'绵羊',
 			mage_mianyang_info:'锁定技，你不能使用杀。',
-
+			
 			stone_beijunmushi:'北郡牧师',
 			stone_guangyaozhizi:'光耀之子',
 			stone_longmianjiaoguan:'龙眠教官',
 			stone_linghunjisi:'灵魂祭司',
 			stone_guanliyuan:'管理员',
 			stone_heianjiaotu:'黑暗教徒',
-
+			
 			stone_shengdianzhishi:'圣殿执事',
 			stone_suoxiaojishi:'缩小技师',
 			stone_anyingzisi:'暗影子嗣',
 			stone_guangmingquan:'光明泉',
 			stone_muguangchulong:'暮光雏龙',
 			stone_shenshengyongshi:'神圣勇士',
-
+			
 			priest_puzhao:'普照',
 			priest_puzhao_info:'你出场时，己方主将可令一名其他友方随从增加2点体力和体力上限。',
 			priest_suoxiao:'缩小',
@@ -9697,7 +9695,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			priest_muguang_info:'你出场时，若主将手牌中有随从牌，则增加1点体力和体力上限。',
 			priest_shixin:'蚀心',
 			priest_shixin_info:'每当己方主将使用一次职业技能，对双方主将各造成1点伤害。',
-
+			
 			priest_shengliao:'圣疗',
 			priest_shengliao_info:'每当一名随从回复体力，己方主将从牌库中获得一张牌。',
 			priest_guangyao:'光耀',
@@ -9710,7 +9708,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			priest_faxian_info:'你出场时，己方主将从三张随机随从牌中选择一张加入手牌。',
 			priest_zhufu:'献身',
 			priest_zhufu_info:'你死亡时，令一名随机友方随从增加1点体力和体力上限。',
-
+			
 			stone_daomufeizei:'盗墓匪贼',
 			stone_haidao:'海盗',
 			stone_haidaotoumu:'海盗头目',
@@ -9718,14 +9716,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_tegong:'特工',
 			stone_qiezei:'窃贼',
 			stone_heitieairen:'黑铁矮人',
-
+			
 			stone_duyanhaidao:'独眼海盗',
 			stone_gangtiewushi:'刚铁武师',
 			stone_lifaji:'理发机',
 			stone_shihualong:'石化龙',
 			stone_xiushuihaidao:'锈水海盗',
 			stone_zousishangfan:'走私商贩',
-
+			
 			rogue_duxing:'独行',
 			rogue_duxing_info:'每当敌方主将召唤一名随从，便获得潜行。',
 			rogue_shoudao:'授道',
@@ -9738,7 +9736,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			rogue_jielue_info:'每当己方主将装备一把武器牌，摸两张牌。',
 			rogue_jiaoyi:'交易',
 			rogue_jiaoyi_info:'你出场时，己方主将可以弃置一张装备牌令你摸三张牌。',
-
+			
 			rogue_touqie:'偷窃',
 			rogue_touqie_info:'每当你造成一次伤害，己方主将从牌库中获得一张牌。',
 			rogue_xunbao:'寻宝',
@@ -9751,14 +9749,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			rogue_qiancang_info:'你出场时，对所有未受伤害的敌方随从造成1点伤害。',
 			rogue_zhaomu:'结伙',
 			rogue_zhaomu_info:'你出场时，召唤一个海盗。',
-
+			
 			stone_zhihuiguan:'指挥官',
 			stone_jiangong:'监工',
 			stone_yuanhou:'猿猴',
 			stone_chidunshinv:'持盾侍女',
 			stone_zhujiashi:'铸甲师',
 			stone_kuangzhanshi:'狂战士',
-
+			
 			stone_heiyaoyaoshou:'黑曜妖兽',
 			stone_honglongyongshi:'红龙勇士',
 			stone_peilianshi:'陪练师',
@@ -9766,7 +9764,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_shengjiachong:'圣甲虫',
 			stone_mengmaren:'猛犸人',
 			stone_zhifuzhe:'掷斧者',
-
+			
 			warrior_heiyao:'黑曜',
 			warrior_heiyao_info:'在己方主将的结束阶段，召唤一只圣甲虫。',
 			warrior_peilian:'陪练',
@@ -9777,7 +9775,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			warrior_chuanci_info:'每当你对一名敌方随从造成伤害，对另一名随机敌方随从造成等量的伤害。',
 			warrior_zhifu:'掷斧',
 			warrior_zhifu_info:'每当你受到一次伤害，对敌方主将造成1点伤害。',
-
+			
 			warrior_tongling:'统领',
 			warrior_tongling_info:'每当你召唤一个初始手牌数不大于2的随从，令其获得冲锋。',
 			warrior_baoluan:'暴乱',
@@ -9788,7 +9786,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			warrior_zhujia_info:'每当你受到一次伤害，己方主将获得1点护甲。',
 			warrior_tidun:'提盾',
 			warrior_tidun_info:'你出场时，己方主将获得2点护甲。',
-
+			
 			stone_lieyanxiaogui:'烈焰小鬼',
 			stone_xiaoguishouling:'小鬼首领',
 			stone_kongjuzhanma:'恐惧战马',
@@ -9797,14 +9795,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_diyuhuo:'地狱火',
 			stone_diyuhuox:'地狱火',
 			stone_xiaogui:'小鬼',
-
+			
 			stone_heishitanfan:'黑市摊贩',
 			stone_zhaohuanzhe:'召唤者',
 			stone_meimo:'魅魔',
 			stone_tongkunvwang:'痛苦女王',
 			stone_xukongkongmo:'虚空恐魔',
 			stone_fukongmoyan:'浮空魔眼',
-
+			
 			warlock_anyu:'暗语',
 			warlock_anyu_info:'你出场时，己方主将从三张随机的行动值消耗为1的牌中选择一张加入手牌。',
 			warlock_zhaohuan:'召唤',
@@ -9817,7 +9815,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			warlock_tunshi_info:'你出场时，己方主将须令一名其他友方随从死亡，然后你获得其全部的手牌和体力值。',
 			warlock_shijie:'视界',
 			warlock_shijie_info:'每当己方主将受到一次伤害，你增加1点体力和体力上限并摸一张牌。',
-
+			
 			warlock_nonghuo:'弄火',
 			warlock_nonghuo_info:'你出场时，对己方主将造成1点火焰伤害。',
 			warlock_zhaogui:'召鬼',
@@ -9828,21 +9826,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			warlock_yuhuo_info:'你出场时，对所有其他随从造成1点伤害。',
 			warlock_zaihuo:'灾祸',
 			warlock_zaihuo_info:'你出场时，随机弃置主将的两张手牌。',
-
+			
 			stone_hudunren:'护盾人',
 			stone_junxuguan:'军需官',
 			stone_yurenqishi:'鱼人骑士',
 			stone_chidunweishi:'持盾卫士',
 			stone_liewangshouwei:'列王守卫',
 			stone_longwangpeiou:'龙王配偶',
-
+			
 			stone_baoweizhe:'保卫者',
 			stone_guiqishi:'龟骑士',
 			stone_shenmiqishou:'神秘骑手',
 			stone_shixiangweishi:'石像卫士',
 			stone_xuefanzhanshi:'血帆战士',
 			stone_xunmashi:'训马师',
-
+			
 			paladin_baowei:'保卫',
 			paladin_baowei_info:'你出场时，己方主将可令一名其他随从获得1点护甲。',
 			paladin_tuxi:'吐息',
@@ -9856,7 +9854,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			paladin_moma:'秣马',
 			paladin_moma2:'秣马',
 			paladin_moma_info:'所有友方新兵摸牌阶段摸牌数+1。',
-
+			
 			paladin_zhaohuan:'召唤',
 			paladin_zhaohuan2:'召唤',
 			paladin_zhaohuan_info:'你出场后，你的主将在使用下一张随从牌时获得两点行动值。',
@@ -9870,21 +9868,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			paladin_hudun_info:'你出场时，获得1点护甲值。',
 			paladin_zhaochao:'招潮',
 			paladin_zhaochao_info:'每当你的主将使用一次英雄技能，便摸两张牌。',
-
+			
 			stone_shifazhe:'嗜法者',
 			stone_wushixuetu:'巫师学徒',
 			stone_shuiyuansu:'水元素',
 			stone_falifulong:'法力浮龙',
 			stone_yingxiongzhihun:'英雄之魂',
 			stone_huoyao:'火妖',
-
+			
 			stone_aoshushi:'奥术师',
 			stone_faqishi:'法骑士',
 			stone_fuhuokaijia:'复活铠甲',
 			stone_kaodalalong:'考达拉龙',
 			stone_yanshushi:'炎术士',
 			stone_xulingwushi:'虚灵巫师',
-
+			
 			mage_aoshu:'奥术',
 			mage_aoshu_info:'你出场时，将一张奥术智慧置入主将的手牌。',
 			mage_jili:'激励',
@@ -9897,7 +9895,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			mage_yanshu_info:'你出场时，造成X点火焰伤害，随机分配到敌方随从上，X为己方主将装备区内装备牌的数量。',
 			mage_pingxu:'冯虚',
 			mage_pingxu_info:'你出场时，己方主将从三张随机法术牌中选择一张加入手牌。',
-
+			
 			mage_shifa:'嗜法',
 			mage_shifa_info:'你出场时，将一张随机法术牌置入双方主将的手牌。',
 			mage_minghuo:'冥火',
@@ -9910,21 +9908,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			mage_zhufa_info:'每当己方主将使用一张法术牌，令其获得1点行动值。',
 			mage_bingdong:'冰冻',
 			mage_bingdong_info:'每当你对一个随从造成伤害，该随从将武将牌翻至背面。',
-
+			
 			stone_caoyuanshi:'草原狮',
 			stone_leiouke:'雷欧克',
 			stone_misha:'米莎',
 			stone_huofu:'霍弗',
 			stone_jiewangzhu:'结网蛛',
 			stone_xunshoushi:'驯兽师',
-
+			
 			stone_senlinlang:'森林狼',
 			stone_tujiu:'秃鹫',
 			stone_muyangren:'牧羊人',
 			stone_jujishou:'狙击手',
 			stone_damoshatuo:'大漠沙驼',
 			stone_huangjialeixiang:'皇家雷象',
-
+			
 			hunter_jiewang:'结网',
 			hunter_jiewang_info:'你死亡时，己方主将获得一张随机野兽牌。',
 			hunter_xunshou:'驯兽',
@@ -9934,7 +9932,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			hunter_zhanhuo:'战火',
 			hunter_zhanhuo2:'战火',
 			hunter_zhanhuo_info:'其他友方随从摸牌阶段的摸牌数+1。',
-
+			
 			hunter_qunxi:'群袭',
 			hunter_qunxi_info:'你出场时，所有友方随从摸一张牌。',
 			hunter_mishi:'觅食',
@@ -9947,21 +9945,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			hunter_muyang_info:'你出场时，随机召唤一个行动值消耗为X的随从，X为其他友方随从数。',
 			hunter_juji:'狙击',
 			hunter_juji_info:'你的职业技能可以指定随从为目标。',
-
+			
 			stone_baoqishi:'豹骑士',
 			stone_conglinshouwei:'从林守卫',
 			stone_baohuzhishu:'保护之树',
 			stone_kuangyedoushi:'狂野斗士',
 			stone_liebao:'猎豹',
 			stone_zongxiong:'棕熊',
-
+			
 			stone_renyaqishi:'刃牙骑士',
 			stone_conglinxiaoshou:'丛林枭兽',
 			stone_huangyeqishi:'荒野骑士',
 			stone_xunmenglong:'迅猛龙',
 			stone_lindishuyao:'林地树妖',
 			stone_huoshanxiemu:'火山邪木',
-
+			
 			druid_renya:'刃牙',
 			druid_renya_info:'你出场时，己方主将可以选择一项：令你摸一张牌并将武将牌翻至正面，或令你增加1点体力上限并获得技能潜行。',
 			druid_yuehuo:'月火',
@@ -9974,7 +9972,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			druid_yeyou_info:'双方主将各从牌库中获得一张牌。',
 			druid_juhuo:'举火',
 			druid_juhuo_info:'己方主将回合内，每有一名随从死亡，令己方主将获得1点行动值。',
-
+			
 			stone_chongfeng:'冲锋',
 			stone_chongfeng_info:'你出场时，立即将武将牌翻至正面。',
 			druid_nuhuo:'怒火',
@@ -9984,8 +9982,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			druid_chengzhang_info:'你出场时，己方主将获得1点行动值；你死亡时，己方主将需弃置一张手牌。',
 			druid_huwei:'护卫',
 			druid_huwei_info:'你出场时，己方主将可以选择一项：对一名随从造成1点伤害，或弃置一名随从的所有牌并将其体力上限改为2。',
-
-
+			
 			stone_fachao:'法潮图腾',
 			stone_tutengyongshi:'图腾勇士',
 			stone_huoshe:'火舌图腾',
@@ -9999,7 +9996,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_huoyanweishi:'火焰卫士',
 			stone_wanshiyuansu:'顽石元素',
 			stone_shalinxingzhe:'砂鳞行者',
-
+			
 			shaman_anhun:'暗魂',
 			shaman_anhun_info:'每当一名友方随从死亡，令主将从牌库中获得一张牌。',
 			shaman_zoushi:'走石',
@@ -10018,7 +10015,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shaman_fachao_info:'己方主将在其每个回合结束阶从牌库中获得一张牌并回复1点体力。',
 			shaman_huoshe:'火舌',
 			shaman_huoshe_info:'其他友方随从造成的伤害始终+1。',
-
+			
 			shaman_jili:'激励',
 			shaman_jili_info:'己方主将的结束阶段，所有友方图腾摸一张牌。',
 			shaman_tuteng:'图腾',
@@ -10029,7 +10026,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			shaman_zhiliao_info:'在你的结束阶段，令所有友方随从回复1点体力。',
 			shaman_zhuore:'灼热',
 			shaman_zhuore_info:'已方主将的结束阶段，对一名随机敌方随从造成1点伤害。',
-
+			
 			_shaman_skill:'图腾',
 			_shaman_skill_info:'召唤一个随机图腾。',
 			_mage_skill:'火冲',
@@ -10052,14 +10049,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			_hunter_skill_info:'对敌方主将造成1点伤害。',
 			_druid_skill:'猛击',
 			_druid_skill_info:'视为使用一张不计入出杀次数的杀。',
-
+			
 			stone_tuteng1:'石爪图腾',
 			stone_tuteng2:'灼热图腾',
 			stone_tuteng3:'空气图腾',
 			stone_tuteng4:'治疗图腾',
-
+			
 			stone_xinbing:'新兵',
-
+			
 			stone_zhongshi:'中士',
 			stone_zhongshi1:'叫嚣',
 			stone_zhongshi1_info:'你出场时，己方主将可以弃置对方一名随从的所有牌。',
@@ -10069,7 +10066,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_huoqiangshou:'火枪手',
 			stone_huoqiangshou1:'火枪',
 			stone_huoqiangshou1_info:'你出场时，己方主将可以对对方一名随从造成1点伤害。',
-
+			
 			stone_lansaizhanshi:'蓝腮战士',
 			stone_kutongsiseng:'苦痛侍僧',
 			stone_kutongsiseng1:'苦痛',
@@ -10078,7 +10075,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_yuanguanying:'远古暗影',
 			stone_yuanguanying1:'暗影',
 			stone_yuanguanying1_info:'你出场时，己方主将可视为对一名敌方角色使用一张杀。',
-
+			
 			stone_dijieshicong:'低阶侍从',
 			stone_dijieshicong1:'持枪',
 			stone_dijieshicong1_info:'你出场时，敌方主将随机弃置一张装备牌。',
@@ -10088,7 +10085,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_famingjia:'发明家',
 			stone_famingjia1:'发明',
 			stone_famingjia1_info:'你出场时，己方主将摸两张牌。',
-
+			
 			stone_chilundashi:'齿轮大师',
 			stone_chilundashi1:'齿轮',
 			stone_chilundashi2:'齿轮',
@@ -10099,7 +10096,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_aihaozhihun:'哀嚎之魂',
 			stone_aihaozhihun1:'哀嚎',
 			stone_aihaozhihun1_info:'你出场时，敌方随从弃置所有牌。',
-
+			
 			stone_fennuxiaoji:'愤怒小鸡',
 			stone_fennuxiaoji1:'暴怒',
 			stone_fennuxiaoji1_info:'准备阶段，若你没有手牌，你摸两张牌。',
@@ -10113,7 +10110,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_langren:'狼人',
 			stone_qianxing:'潜行',
 			stone_qianxing_info:'你出场时，获得潜行直到下一回合开始。',
-
+			
 			stone_mingguangjisi:'明光祭司',
 			stone_nianqingjisi:'年轻祭司',
 			stone_zhufu:'祝福',
@@ -10131,12 +10128,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			stone_fatiaozhuru:'发条侏儒',
 			stone_fatiaozhuru1:'发条',
 			stone_fatiaozhuru1_info:'结束阶段，若你没有手牌，你摸两张牌。',
-
+			
 			stonesha:'进攻',
 			stonesha_info:'锁定技，你的装备牌均视为杀。',
 			stoneshan:'格挡',
 			stoneshan_info:'锁定技，你的随从和法术牌均视为闪。',
-
+			
 			stonecharacter:'随从',
 			spell_shengerpingdeng:'生而平等',
 			spell_shengerpingdeng_info:'将所有随从体力上限降为1。',
@@ -10166,7 +10163,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			spell_yanmie_info:'交换你与敌方主将的装备区，并摸若干张牌直到你的手牌数与敌方主将相等。',
 			spell_xiaoshi:'消失',
 			spell_xiaoshi_info:'令敌方主将将所有装备区内的牌收入手牌，并弃置其若干张手牌，直到其手牌数与你相等。',
-
+			
 			stonecard:'法术',
 			mode_stone_card_config:'炉石模式',
 			mode_stone_character_config:'炉石模式',

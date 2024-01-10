@@ -6789,7 +6789,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kongrong_prefix:'战役篇',
 			mateng:'战役篇马腾',
 			mateng_prefix:'战役篇',
-
+			
 			offline_star:'桌游志·SP',
 			offline_sticker:'桌游志·贴纸',
 			offline_yijiang:'一将成名',

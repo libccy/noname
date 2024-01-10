@@ -1270,7 +1270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('heqin');
 					player.addSkill('heqin2');
 					target.addSkill('heqin2');
-
+					
 					target.marks.heqin=target.markCharacter(player,{
 						name:'和亲',
 						content:'摸牌阶段摸牌数+1'
@@ -1281,10 +1281,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						id:'heqin',
 						target:player.dataset.position
 					});
-
+					
 					player.storage.heqin=target;
 					target.storage.heqin=player;
-
+					
 					player.marks.heqin=player.markCharacter(target,{
 						name:'和亲',
 						content:'摸牌阶段摸牌数+1'
@@ -2184,7 +2184,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(trigger.target.hasSkill('yijue2')) return 0;
 						if(trigger.target.hasSkill('shejie2')) return 0;
 						if(trigger.target.hasSkill('shanguang2')) return 0;
-
+						
 						var equip=trigger.target.getEquip(2);
 						if(equip&&equip.name=='bagua') return 1;
 						return trigger.target.countCards('h')<2?0:1;
@@ -2930,7 +2930,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yxs_lanlinwang:'兰陵王',
 			yxs_meixi:'妹喜',
 			yxs_qinqiong:"秦琼",
-
+			
 			yxs_fanji:"反击",
 			yxs_fanji2:"反击",
 			yxs_fanji_info:"当你受到【杀】或【决斗】造成的伤害后，你可以对伤害来源使用一张【杀】。若此【杀】为红色，其不可闪避。",
@@ -3095,7 +3095,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			seyou_info:'限定技，出牌阶段，你可以指定任意1名角色，其他所有男性角色需选择1项执行：（1）对你指定的角色出【杀】；（2）令你获得其一张牌。',
 			sheshi:'蛇噬',
 			sheshi_info:'每受到1次伤害，可以指定1种花色，依次展示牌堆顶的牌，直到出现指定花色的牌为止，你获得与指定花色不同花色的所有牌（最多展示四张牌）。',
-
+			
 			fengyi:'凤仪',
 			fengyi_info:'出牌阶段，你可以弃一张手牌，指定任意目标摸两张牌。（每回合限用一次）',
 			wange:'婉歌',
