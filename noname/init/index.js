@@ -752,10 +752,32 @@ function setServerIndex() {
 }
 
 function setWindowListener() {
+	/**
+	 * @type { [Error, NodeJS.CallSite[]][] }
+	 */
+	const errorList = [];
+	// 这他娘的能捕获浏览器控制台里的输入值，尽量别用
+	// 在火狐里无效
+	Error.prepareStackTrace = function (e, stack) {
+		errorList.push([e, stack]);
+	};
 	// 但愿有用
-	window.addEventListener("unhandledrejection", (error) => {
-		// 希望error.reason能是个正常的error
-		throw error.reason;
+	window.addEventListener("unhandledrejection", error => {
+		error.promise.catch(e => {
+			const result = errorList.find(v => v[0] === e);
+			if (result) {
+				// @ts-ignore
+				window.onerror(
+					result[0].message,
+					// @ts-ignore
+					result[1][0].getScriptNameOrSourceURL(),
+					// @ts-ignore
+					result[1][0].getLineNumber(),
+					// @ts-ignore
+					result[1][0].getColumnNumber(),
+					result[0]);
+			}
+		});
 	});
 
 	window.onkeydown = function (e) {
@@ -857,6 +879,7 @@ function setWindowListener() {
 	};
 
 	window.onerror = function (msg, src, line, column, err) {
+		errorList.length = 0;
 		const winPath = window.__dirname ? ('file:///' + (__dirname.replace(new RegExp('\\\\', 'g'), '/') + '/')) : '';
 		let str = `错误文件: ${typeof src == 'string' ? decodeURI(src).replace(lib.assetURL, '').replace(winPath, '') : '未知文件'}`;
 		str += `\n错误信息: ${msg}`;
