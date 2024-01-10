@@ -241,7 +241,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var nh=player.countCards('h');
 							if(nh<=player.hp&&nh<=4&&_status.event.name=='chooseToUse'){
 								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'huogong'},player,_status.event)){
+									_status.event.filterCard(new lib.element.VCard({name:'huogong'}),player,_status.event)){
 									return -10;
 								}
 								if(_status.event.skill){
@@ -268,7 +268,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							if(target==player){
 								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'huogong'},player,_status.event)){
+									_status.event.filterCard(new lib.element.VCard({name:'huogong'}),player,_status.event)){
 									return -1.15;
 								}
 								if(_status.event.skill){

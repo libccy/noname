@@ -730,7 +730,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player:function(player,target){
 							if(player.countCards('h')<=Math.min(5,Math.max(2,player.hp))&&_status.event.name=='chooseToUse'){
 								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'bingpotong'})){
+									_status.event.filterCard(new lib.element.VCard({name:'bingpotong'}))){
 									return -10;
 								}
 								if(_status.event.skill){
