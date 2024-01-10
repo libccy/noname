@@ -758,24 +758,22 @@ function setWindowListener() {
 	const errorList = [];
 	// 这他娘的能捕获浏览器控制台里的输入值，尽量别用
 	// 在火狐里无效
-	Error.prepareStackTrace = function (e, stack) {
-		errorList.push([e, stack]);
+	Error.prepareStackTrace = function (e, stackTraces) {
+		errorList.push([e, stackTraces]);
 	};
 	// 已经有用了
-	window.addEventListener("unhandledrejection", error => {
-		error.promise.catch(e => {
+	window.addEventListener("unhandledrejection", PromiseRejectionEvent => {
+		PromiseRejectionEvent.promise.catch(e => {
 			const result = errorList.find(v => v[0] === e);
 			if (result) {
 				// @ts-ignore
 				window.onerror(
 					result[0].message,
-					// @ts-ignore
-					result[1][0].getScriptNameOrSourceURL(),
-					// @ts-ignore
-					result[1][0].getLineNumber(),
-					// @ts-ignore
-					result[1][0].getColumnNumber(),
-					result[0]);
+					result[1][0].getScriptNameOrSourceURL() || void 0,
+					result[1][0].getLineNumber() || void 0,
+					result[1][0].getColumnNumber() || void 0,
+					result[0]
+				);
 			}
 		});
 	});
