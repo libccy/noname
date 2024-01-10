@@ -11464,17 +11464,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					_status.olxiuhao_judging=true;
 					var bool=false;
-					if(player==event.source){
-						if(get.attitude(player,event.player)>0) bool=true;
-						if(get.damageEffect(event.player,player,player,event.nature)<=0) bool=true;
-					}
-					else{
-						if(get.attitude(player,event.source)>0) bool=true;
-						if(get.damageEffect(player,event.source,player,event.nature)<0){
-							if(event.source.hasSkillTag('nogain')) bool=true;
-							if(event.num>=player.hp+player.countCards('hs',{name:['tao','jiu']})&&(!player.hasFriend()||player==get.zhu(player))) bool=true;
-						}
-					}
+					if(get.attitude(player,event.player)>0) bool=true;
+					else if(2*get.effect(event.source,{name:'draw'},player,_status.event.player)+event.num*get.damageEffect(player,event.source,_status.event.player,event.nature)>0) bool=true;
+					else if(event.source.hasSkillTag('nogain')) bool=true;
 					delete _status.olxiuhao_judging;
 					return bool;
 				},
@@ -11520,13 +11512,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						]).set('ai',function(){
 							var cards=_status.event.getParent().cards,player=_status.event.player;
 							if(!game.hasPlayer(function(current){
-								return get.attitude(player,current)>0;
+								return player!==current&&get.attitude(player,current)>0;
 							})) return 1;
 							if(game.hasPlayer(function(current){
 								var att=get.attitude(player,current);
-								return att!=0&&current.countDiscardableCards(player,'he',function(i){
-									if(att>0) return get.value(i,current)>=4;
-									return get.value(i,current)<=0;
+								return att&&current.countDiscardableCards(player,'he',function(i){
+									if(att>0) return get.value(i,current)<0;
+									return get.value(i,current)>=4;
 								})>=cards.length&&get.effect(current,{name:'guohe_copy2'},player,player)>0;
 							})) return 1;
 							return 0;
