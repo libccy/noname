@@ -1186,7 +1186,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						audio:'jsrgfenjian',
 						charlotte:true,
-						trigger:{player:'damageBegin1'},
+						trigger:{player:'damageBegin3'},
 						forced:true,
 						onremove:true,
 						content:function(){
