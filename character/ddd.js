@@ -113,6 +113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				hiddenCard:function(player,name){
+					if(player.hasSkill('dddxiaxing_used')) return false;
 					return name=='tao';
 				},
 				filter:function(event,player){
@@ -413,6 +414,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function(event,player){
 					if(get.type(event.card)!='equip') return false;
+					if(get.subtype(event.card)!='equip1') return false;
 					const range=player.getAttackRange();
 					return !game.hasPlayer(current=>{
 						return current.getAttackRange()>range;
