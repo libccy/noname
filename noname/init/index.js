@@ -761,7 +761,7 @@ function setWindowListener() {
 	Error.prepareStackTrace = function (e, stack) {
 		errorList.push([e, stack]);
 	};
-	// 但愿有用
+	// 已经有用了
 	window.addEventListener("unhandledrejection", error => {
 		error.promise.catch(e => {
 			const result = errorList.find(v => v[0] === e);
