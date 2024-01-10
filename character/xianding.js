@@ -3215,6 +3215,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							while(num--) player.draw();
 						},
+						ai:{
+							effect:{
+								player:(card,player,target)=>{
+									if(get.itemtype(card)==='card'&&cardx.hasGaintag('dczhaowen_tag')&&get.color(card,player)==='red') return [1,1];
+								}
+							}
+						}
 					},
 					viewed:{
 						onremove:true,
@@ -3268,6 +3275,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					jiuSustain:true,
 					skillTagFilter:function(player,tag,name){
 						if(name!='phase') return false;
+					},
+					effect:{
+						target:(card,player,target)=>{
+							if(player===target||typeof card!=='object'||get.color(card)!=='black') return;
+							if(target.hasSkill('jiu')){
+								if(card.name!=='huogong'&&get.tag(card,'damage')&&get.attitude(player,target)<=0&&target.hasCard(i=>{
+									return _status.connectMode||lib.filter.cardDiscardable(i,player,'dcjiudun');
+								},'h')) return [0,-1];
+							}
+							else return [1,1.2];
+						}
 					}
 				}
 			},
