@@ -2044,7 +2044,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								temp=get.attitude(target,i);
 								if(temp<0) die.push(i);
 								else{
-									temp=Math.sqrt(att)*i.countMark('twwuhun');
+									temp=Math.sqrt(temp)*i.countMark('twwuhun');
 									if(!extra[0]||temp<extra[1]) extra=[i,temp];
 								}
 							});
