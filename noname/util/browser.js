@@ -1,15 +1,19 @@
 import { ErrorHandler } from './struct/index.js';
 
 /**
- * @typedef {import('./struct/interface/error-handler').ErrorHandler} ErrorHandler
+ * 从浏览器名到不同浏览器下异步处理方式的映射
+ * 
+ * `key`的值同`get.coreInfo`函数返回值的第一个元素
+ * 
+ * @type {Record<"firefox" | "chrome" | "safari" | "other", new () => PromiseErrorHandler>}
  */
+export const promiseErrorHandlerMap = {
+	'chrome': ErrorHandler.ChromePromiseErrorHandler,
+	'firefox': ErrorHandler.FirefoxPromiseErrorHandler,
+	'safari': ErrorHandler.UnknownPromiseErrorHandler,
+	'other': ErrorHandler.UnknownPromiseErrorHandler
+};
 
 /**
- * @type {Record<"firefox" | "chrome" | "safari" | "other", new () => ErrorHandler>}
+ * @typedef {import('./struct/interface/promise-error-handler.js').PromiseErrorHandler} PromiseErrorHandler
  */
-export const errorHandlerMap = {
-	'chrome': ErrorHandler.ChromeErrorHandler,
-	'firefox': ErrorHandler.FirefoxErrorHandler,
-	'safari': ErrorHandler.UnknownErrorHandler,
-	'other': ErrorHandler.UnknownErrorHandler
-};
