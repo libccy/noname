@@ -159,7 +159,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								if(target.hasSkillTag('directHit_ai',true,{
 									target:effs[i].target,
 									card:i
-								},true) || usable===1&&(target.needsToDiscard()>Math.max(0,3-target.hp) || !effs[i].target.mayHaveShan(player,'use'))){
+								},true) || usable===1&&(target.needsToDiscard()>Math.max(0,3-target.hp) || !effs[i].target.mayHaveShan(player,'use',effs[i].target.getCards(i=>{
+									return i.hasGaintag('sha_notshan');
+								})))){
 									delete target._jiu_temp;
 									return 1;
 								}
