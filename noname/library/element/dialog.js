@@ -6,6 +6,23 @@ import { status as _status } from '../../status/index.js';
 import { UI as ui } from '../../ui/index.js';
 
 export class Dialog extends HTMLDivElement {
+	/** @type { HTMLDivElement } */
+	contentContainer;
+	/** @type { HTMLDivElement } */
+	content;
+	/** @type { HTMLDivElement } */
+	bar1;
+	/** @type { HTMLDivElement } */
+	bar2;
+	/** @type { Button[] } */
+	buttons;
+	/** @type { boolean } */
+	static;
+	/** @type { boolean } */
+	noforcebutton;
+	/** @type { boolean } */
+	noopen;
+
 	// @ts-ignore
 	constructor(...args) {
 		if (args[0] instanceof Dialog) {
@@ -18,7 +35,7 @@ export class Dialog extends HTMLDivElement {
 		let noTouchScroll = false;
 		let forceButton = false;
 		let noForceButton = false;
-		/** @type {this} */
+		/** @type { this } */
 		// @ts-ignore
 		const dialog = ui.create.div('.dialog');
 		Object.setPrototypeOf(dialog, Dialog.prototype);
@@ -40,6 +57,7 @@ export class Dialog extends HTMLDivElement {
 		if (!noTouchScroll) {
 			dialog.contentContainer.ontouchstart = ui.click.dialogtouchStart;
 			dialog.contentContainer.ontouchmove = ui.click.touchScroll;
+			// @ts-ignore
 			dialog.contentContainer.style.webkitOverflowScrolling = 'touch';
 			dialog.ontouchstart = ui.click.dragtouchdialog;
 		}
@@ -52,15 +70,21 @@ export class Dialog extends HTMLDivElement {
 		dialog._args = args;
 		return dialog;
 	}
+	/**
+	 * 
+	 * @param { string | HTMLDivElement | Card[] | Player[] } item 
+	 * @param {*} [noclick] 
+	 * @param { boolean } [zoom] 
+	 */
 	add(item, noclick, zoom) {
 		if (typeof item == 'string') {
 			if (item.startsWith('###')) {
-				var items = item.slice(3).split('###');
+				const items = item.slice(3).split('###');
 				this.add(items[0], noclick, zoom);
 				this.addText(items[1], items[1].length <= 20, zoom);
 			}
 			else if (noclick) {
-				var strstr = item;
+				const strstr = item;
 				item = ui.create.div('', this.content);
 				item.innerHTML = strstr;
 			}
@@ -68,17 +92,23 @@ export class Dialog extends HTMLDivElement {
 				item = ui.create.caption(item, this.content);
 			}
 		}
+		// @ts-ignore
 		else if (['div', 'fragment'].includes(get.objtype(item))) {
+			// @ts-ignore
 			this.content.appendChild(item);
 		}
+		// @ts-ignore
 		else if (get.itemtype(item) == 'cards') {
-			var buttons = ui.create.div('.buttons', this.content);
+			const buttons = ui.create.div('.buttons', this.content);
 			if (zoom) buttons.classList.add('smallzoom');
+			// @ts-ignore
 			this.buttons = this.buttons.concat(ui.create.buttons(item, 'card', buttons, noclick));
 		}
+		// @ts-ignore
 		else if (get.itemtype(item) == 'players') {
 			var buttons = ui.create.div('.buttons', this.content);
 			if (zoom) buttons.classList.add('smallzoom');
+			// @ts-ignore
 			this.buttons = this.buttons.concat(ui.create.buttons(item, 'player', buttons, noclick));
 		}
 		else if (item[1] == 'textbutton') {
@@ -87,6 +117,7 @@ export class Dialog extends HTMLDivElement {
 		else {
 			var buttons = ui.create.div('.buttons', this.content);
 			if (zoom) buttons.classList.add('smallzoom');
+			// @ts-ignore
 			this.buttons = this.buttons.concat(ui.create.buttons(item[0], item[1], buttons, noclick));
 		}
 		if (this.buttons.length) {
@@ -101,6 +132,10 @@ export class Dialog extends HTMLDivElement {
 		ui.update();
 		return item;
 	}
+	/**
+	 * @param { string } str 
+	 * @param { boolean } [center] 
+	 */
 	addText(str, center) {
 		if (str && str.startsWith('<div')) this.add(str);
 		else if (center !== false) {
@@ -111,10 +146,12 @@ export class Dialog extends HTMLDivElement {
 		}
 		return this;
 	}
+
 	addSmall(item, noclick) {
 		return this.add(item, noclick, true);
 	}
-	addAuto(content) {
+	addAuto(content) {	
+		// @ts-ignore
 		if (content && content.length > 4 && !this._hovercustomed) {
 			this.addSmall(content);
 		}
@@ -124,7 +161,7 @@ export class Dialog extends HTMLDivElement {
 	}
 	open() {
 		if (this.noopen) return;
-		for (var i = 0; i < ui.dialogs.length; i++) {
+		for (let i = 0; i < ui.dialogs.length; i++) {
 			if (ui.dialogs[i] == this) {
 				this.show();
 				this.refocus();
@@ -137,7 +174,7 @@ export class Dialog extends HTMLDivElement {
 			else ui.dialogs[i].hide();
 		}
 		ui.dialog = this;
-		var translate;
+		let translate;
 		if (lib.config.remember_dialog && lib.config.dialog_transform && !this.classList.contains('fixed')) {
 			translate = lib.config.dialog_transform;
 			this._dragtransform = translate;
@@ -147,7 +184,7 @@ export class Dialog extends HTMLDivElement {
 			this.style.transform = 'scale(0.8)';
 		}
 		this.style.transitionProperty = 'opacity,transform';
-		this.style.opacity = 0;
+		this.style.opacity = '0';
 		ui.arena.appendChild(this);
 		ui.dialogs.unshift(this);
 		ui.update();
@@ -158,10 +195,9 @@ export class Dialog extends HTMLDivElement {
 		else {
 			this.style.transform = 'scale(1)';
 		}
-		this.style.opacity = 1;
-		var that = this;
-		setTimeout(function () {
-			that.style.transitionProperty = '';
+		this.style.opacity = '1';
+		setTimeout(() => {
+			this.style.transitionProperty = '';
 		}, 500);
 		return this;
 	}
@@ -179,7 +215,12 @@ export class Dialog extends HTMLDivElement {
 		// }
 		return this;
 	}
+	/**
+	 * @param { string } str 
+	 */
 	setCaption(str) {
+		
+		// @ts-ignore
 		this.querySelector('.caption').innerHTML = str;
 		return this;
 	}
