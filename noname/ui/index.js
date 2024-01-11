@@ -14026,22 +14026,22 @@ export class UI extends Uninstantable {
 	static touchlines = [];
 	static todiscard = {};
 	/**
-	 * @type {HTMLStyleElement[]}
+	 * @type { HTMLStyleElement[] }
 	 */
 	static playerPositions = [];
 	static create = Create;
 	static click = Click;
 	static selected = {
 		/**
-		 * @type { import('../library/index.js').Button[]}
+		 * @type { Button[] }
 		 */
 		buttons: [],
 		/**
-		 * @type { import('../library/index.js').Card[]}
+		 * @type { Card[] }
 		 */
 		cards: [],
 		/**
-		 * @type { import('../library/index.js').Player[]}
+		 * @type { Player[] }
 		 */
 		targets: []
 	}
