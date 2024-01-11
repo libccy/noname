@@ -12210,6 +12210,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					trigger[get.color(trigger.card)!='red'?'player':'source'].draw();
 				},
+				ai:{
+					effect:{
+						target:(card,player,target)=>{
+							if(typeof card!=='object'||!get.tag(card,'damage')||target.hasSkill('gangzhi')) return;
+							if(player.hasSkillTag('jueqing',null,true)) return;
+							if(get.color(card)==='red') return [1,0,1,0.6];
+							return [1,0.6];
+						}
+					}
+				}
 			},
 			"new_reyaowu":{
 				trigger:{
@@ -12218,27 +12228,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				//priority:1,
 				audio:2,
 				audioname:['sb_huaxiong'],
-				filter:function (event){
+				filter:function(event){
 					return event.card&&event.card.name=='sha'&&(get.color(event.card)!='red'||event.source&&event.source.isIn());
 				},
 				forced:true,
-				check:function (event){
-					if(event.card&&(event.card.name=='sha')){
-						return get.color(event.card)=='black';
-					}
-				},
-				content:function (){
+				content:function(){
 					if(get.color(trigger.card)!='red') player.draw();
 					else trigger.source.chooseDrawRecover(true);
 				},
 				ai:{
 					effect:{
-						target:function (card,player,target,current){
-							if(card.name=='sha'&&(get.color(card)=='red')&&get.attitude(player,target)<=0){
-								return [1,0.8,1,0];
-							}
-							if(card.name=='sha'&&(get.color(card)=='black')){
-								return [1,0.4];
+						target:(card,player,target,current)=>{
+							if(card.name=='sha'){
+								if(get.color(card)=='red'){
+									let num=player.isDamaged()?1.6:0.7;
+									if(get.attitude(player,target)>0&&player.hp<3) return [1,0,1,num];
+									return [1,0,1,num/2];
+								}
+								return [1,0.6];
 							}
 						},
 					},
