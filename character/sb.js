@@ -751,8 +751,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var bool=player.hasCard(card=>card.hasGaintag('sbguanxing'),'s');
 					if(event.name=='phaseZhunbei'){
-						var num=player.countMark('sbguanxingx');
-						return bool||num<=2;
+						return bool||7-lib.skill.sbguanxing.getNum*player.countMark('sbguanxingx')>0;
 					}
 					return bool&&player.hasSkill('sbguanxing_on');
 				},
@@ -768,7 +767,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=player.getCards('s',card=>card.hasGaintag('sbguanxing'));
 					if(cards.length) player.loseToDiscardpile(cards);
 					var num=player.countMark('sbguanxingx')-1;
-					event.num=Math.max(0,7-3*num);
+					event.num=Math.max(0,7-lib.skill.sbguanxing.getNum*num);
 					'step 1'
 					if(num){
 						var cards2=get.cards(num);
@@ -811,6 +810,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else if(trigger.name=='phaseZhunbei') player.addTempSkill('sbguanxing_on');
 				},
+				getNum:3,
 				group:'sbguanxing_unmark',
 				subSkill:{
 					on:{charlotte:true},
