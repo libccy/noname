@@ -276,11 +276,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					value:function(card,player){
 						if(player.countCards('h')>3||get.position(card)!='e') return 0.5;
-						return (player.countCards('h')-5)/3;
+						return (player.countCards('h')-4)*5;
 					},
 					equipValue:function(card,player){
 						if(player.countCards('h')>3||get.position(card)!='e') return 0.5;
-						return (player.countCards('h')-5)/3;
+						return (player.countCards('h')-4)*5;
 					},
 					basic:{
 						equipValue:0.5
