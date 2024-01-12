@@ -447,7 +447,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					target.addTempSkill('xietianzi');
 				},
-				
 				ai:{
 					order:0.5,
 					value:4,
@@ -776,7 +775,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(event.name!='lose'||event.name!='cardsDiscard'||targetPosition!='discardPile') return false;
 					var evt=event.getParent().relatedEvent;
 					if(evt&&evt.name=='useCard') return false;
-					
 					return true;
 				},
 				onDestroy:function(){

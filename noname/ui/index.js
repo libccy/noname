@@ -56,7 +56,7 @@ class Create extends Uninstantable {
 					card.style.transition = '';
 					ui.refresh(card);
 					card.style.transform = '';
-				}
+				};
 				card.listenTransition(onEnd);
 			}, 300);
 		};
@@ -88,9 +88,9 @@ class Create extends Uninstantable {
 			for (let i = createList.length - 1; i >= 0; i--) {
 				createList[i].parentNode && createList[i].parentNode.removeChild(createList[i]);
 			}
-			Array.from(editorpage.children).forEach(v => { v.style.background = '' });
+			Array.from(editorpage.children).forEach(v => { v.style.background = ''; });
 			containerDelete.apply(this, arguments);
-		}
+		};
 		//创建ul列表
 		const createMenu = function (pos, self, List, click) {
 			if (!self || self == window) return;
@@ -249,7 +249,7 @@ class Create extends Uninstantable {
 				const click = function (e) {
 					const size = this.innerHTML;
 					container.style.fontSize = size.slice(0, -2) / game.documentZoom + 'px';
-					Array.from(self.parentElement.children).map(v => v.ul).filter(Boolean).forEach(v => { v.style.fontSize = size.slice(0, -2) / game.documentZoom + 'px' });
+					Array.from(self.parentElement.children).map(v => v.ul).filter(Boolean).forEach(v => { v.style.fontSize = size.slice(0, -2) / game.documentZoom + 'px'; });
 					setTimeout(() => container.editor.refresh(), 0);
 					game.saveConfig('codeMirror_fontSize', size);
 					closeMenu.call(self);
@@ -915,10 +915,10 @@ class Create extends Uninstantable {
 			if (!config.clear) {
 				if (config.name != '开启') {
 					if (config.name == '屏蔽弱将') {
-						config.intro = '强度过低的武将（孙策除外）不会出现在选将框，也不会被AI选择'
+						config.intro = '强度过低的武将（孙策除外）不会出现在选将框，也不会被AI选择';
 					}
 					else if (config.name == '屏蔽强将') {
-						config.intro = '强度过高的武将不会出现在选将框，也不会被AI选择'
+						config.intro = '强度过高的武将不会出现在选将框，也不会被AI选择';
 					}
 					else if (!config.intro) {
 						config.intro = '设置' + config.name;
@@ -985,7 +985,7 @@ class Create extends Uninstantable {
 							config.visualBar(visualBar, config.item, createNode, node);
 							visualBar.update = function () {
 								config.visualBar(visualBar, config.item, createNode, node);
-							}
+							};
 						}
 						for (var i in config.item) {
 							createNode(i);
@@ -1005,7 +1005,7 @@ class Create extends Uninstantable {
 							for (var i = 0; i < split.length; i++) {
 								this.insertBefore(ui.create.node('br'), split[i]);
 							}
-						}
+						};
 						node._link.menu.updateBr();
 					}
 					else {
@@ -1013,7 +1013,7 @@ class Create extends Uninstantable {
 							var textMenu = ui.create.div('', config.item[i], node._link.menu, clickMenuItem);
 							textMenu._link = i;
 							if (config.textMenu) {
-								config.textMenu(textMenu, i, config.item[i], config)
+								config.textMenu(textMenu, i, config.item[i], config);
 							}
 							lib.setScroll(node._link.menu);
 						}
@@ -1057,7 +1057,7 @@ class Create extends Uninstantable {
 						input.innerHTML = input.innerHTML.slice(0, 12);
 						game.saveConfig('connect_nickname', input.innerHTML);
 						game.saveConfig('connect_nickname', input.innerHTML, 'connect');
-					}
+					};
 				}
 				else if (config.name == '联机大厅') {
 					input.innerHTML = config.init || lib.hallURL;
@@ -1067,7 +1067,7 @@ class Create extends Uninstantable {
 						}
 						input.innerHTML = input.innerHTML.replace(/<br>/g, '');
 						game.saveConfig('hall_ip', input.innerHTML, 'connect');
-					}
+					};
 				}
 				else {
 					input.innerHTML = config.init;
@@ -1094,7 +1094,7 @@ class Create extends Uninstantable {
 		if (!connectMenu) {
 			ui.menuContainer = menuContainer;
 			ui.click.configMenu = function () {
-				ui.click.shortcut(false)
+				ui.click.shortcut(false);
 				if (menuContainer.classList.contains('hidden')) {
 					ui.config2.classList.add('pressdown2');
 					ui.arena.classList.add('menupaused');
@@ -1108,7 +1108,7 @@ class Create extends Uninstantable {
 				else {
 					clickContainer.call(menuContainer);
 				}
-			}
+			};
 			menux = createMenu(['开始', '选项', '武将', '卡牌', '扩展', '其它'], {
 				position: menuContainer, bar: 40
 			});
@@ -1142,7 +1142,7 @@ class Create extends Uninstantable {
 				else {
 					clickContainer.call(menuContainer);
 				}
-			}
+			};
 
 			menux = createMenu(['模式', '武将', '卡牌'], {
 				position: menuContainer, bar: 123
@@ -1272,7 +1272,7 @@ class Create extends Uninstantable {
 				var connectDisplayMap = {
 					connect_player_number: null,
 					connect_versus_mode: null,
-				}
+				};
 				var updateConnectDisplayMap = function () {
 					if (_status.waitingForPlayer) {
 						if (connectDisplayMap.connect_player_number) {
@@ -1467,7 +1467,7 @@ class Create extends Uninstantable {
 							infoconfig.update(config, map);
 							node.update = function () {
 								infoconfig.update(config, map);
-							}
+							};
 						}
 					}
 					if (connectMenu) {
@@ -1561,7 +1561,7 @@ class Create extends Uninstantable {
 						type: 'autoskill',
 						onclick: clickAutoSkill,
 						intro: lib.translate[i + '_info']
-					}
+					};
 				}
 			}
 			var clickBanSkill = function (bool) {
@@ -1606,7 +1606,7 @@ class Create extends Uninstantable {
 					type: 'banskill',
 					onclick: clickBanSkill,
 					intro: str3
-				}
+				};
 			}
 
 			var updateView = null;
@@ -1676,7 +1676,7 @@ class Create extends Uninstantable {
 								if (!skills2.includes(skills1[i])) return false;
 							}
 							return true;
-						}
+						};
 						var deleteCustomBanSkill = function () {
 							for (var i = 0; i < lib.config.customforbid.length; i++) {
 								if (matchBanSkill(lib.config.customforbid[i], this.parentNode.link)) {
@@ -1686,7 +1686,7 @@ class Create extends Uninstantable {
 							}
 							game.saveConfig('customforbid', lib.config.customforbid);
 							this.parentNode.remove();
-						}
+						};
 						var createCustomBanSkill = function (skills) {
 							var node = ui.create.div('.config.indent.toggle');
 							node.style.display = 'none';
@@ -1786,7 +1786,7 @@ class Create extends Uninstantable {
 								lib.config.customforbid.push(skills);
 								game.saveConfig('customforbid', lib.config.customforbid);
 								createCustomBanSkill(skills).style.display = '';
-							}
+							};
 						}());
 						page.style.paddingBottom = '10px';
 					}
@@ -1907,7 +1907,7 @@ class Create extends Uninstantable {
 									};
 									fileReader.readAsText(fileToLoad, "UTF-8");
 								}
-							}
+							};
 						}
 						else if (j == 'import_music') {
 							cfgnode.querySelector('button').onclick = function () {
@@ -1922,7 +1922,7 @@ class Create extends Uninstantable {
 									}
 									var link = (game.writeFile ? 'cdv_' : 'custom_') + name;
 									if (lib.config.customBackgroundMusic[link]) {
-										if (!confirm('已经存在文件名称相同的背景音乐，是否仍然要继续导入？')) { _status.music_importing = false; return }
+										if (!confirm('已经存在文件名称相同的背景音乐，是否仍然要继续导入？')) { _status.music_importing = false; return; }
 										for (var i = 1; i < 1000; i++) {
 											if (!lib.config.customBackgroundMusic[link + '_' + i]) {
 												link = link + '_' + i; break;
@@ -1956,13 +1956,13 @@ class Create extends Uninstantable {
 										game.putDB('audio', link, fileToLoad, callback);
 									}
 								}
-							}
+							};
 						}
 						else if (j == 'extension_source') {
 							ui.extension_source = cfgnode;
 							cfgnode.updateInner = function () {
 								this._link.choosing.innerHTML = lib.config.extension_source;
-							}
+							};
 						}
 						map[j] = cfgnode;
 						if (!cfg.unfrequent) {
@@ -2071,11 +2071,11 @@ class Create extends Uninstantable {
 											str += audios.length + '个音频文件';
 										}
 										if (fonts.length) {
-											if (str.length) str += '、'
+											if (str.length) str += '、';
 											str += fonts.length + '个字体文件';
 										}
 										if (images.length) {
-											if (str.length) str += '、'
+											if (str.length) str += '、';
 											str += images.length + '个图片文件';
 										}
 										var filelist = audios.concat(fonts).concat(images);
@@ -2087,7 +2087,7 @@ class Create extends Uninstantable {
 											promptnode.firstChild.querySelectorAll('span')[0].onclick = game.reload;
 											promptnode.firstChild.querySelectorAll('span')[1].onclick = function () {
 												promptnode.style.display = 'none';
-											}
+											};
 										};
 										if (confirm('本次将导入' + str + '，是否继续？')) {
 											promptnode.firstChild.innerHTML = '正在导入... <span class="hrefnode">详细信息</span>';
@@ -2147,7 +2147,7 @@ class Create extends Uninstantable {
 									else {
 										alert('没有检测到素材');
 									}
-								}
+								};
 								if (!window.JSZip) {
 									lib.init.js(lib.assetURL + 'game', 'jszip', loadData);
 								}
@@ -2157,7 +2157,7 @@ class Create extends Uninstantable {
 							};
 							fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
 						}
-					}
+					};
 
 					var dashboard = ui.create.div(pageboard);
 					var clickDash = function () {
@@ -2198,7 +2198,7 @@ class Create extends Uninstantable {
 								else {
 									enterDirectory(page, page.currentpath);
 								}
-							}
+							};
 							unlink();
 						}
 						else {
@@ -2212,7 +2212,7 @@ class Create extends Uninstantable {
 									else {
 										enterDirectory(page, page.currentpath);
 									}
-								}
+								};
 								unlink();
 							});
 						}
@@ -2244,7 +2244,7 @@ class Create extends Uninstantable {
 													else {
 														lib.node.fs.rmdir(__dirname + '/' + path, callback);
 													}
-												}
+												};
 												removeFile();
 											});
 										};
@@ -2434,7 +2434,7 @@ class Create extends Uninstantable {
 								if (a > b) return 1;
 								if (a < b) return -1;
 								return 0;
-							}
+							};
 							folders.sort(sort);
 							files.sort(sort);
 							var parent = path;
@@ -2445,7 +2445,7 @@ class Create extends Uninstantable {
 								if (!page.path && folders[i] == 'app') continue;
 								var entry = ui.create.div('', '<span>' + folders[i], filelist);
 								entry.firstChild.addEventListener(lib.config.touchscreen ? 'touchend' : 'click', clickDirectory);
-								entry.firstChild.path = parent + folders[i]
+								entry.firstChild.path = parent + folders[i];
 							}
 							for (var i = 0; i < files.length; i++) {
 								if (!page.path) {
@@ -2624,7 +2624,7 @@ class Create extends Uninstantable {
 						}
 					}
 				}
-			}
+			};
 			var togglePack = function (bool) {
 				var name = this._link.config._name;
 				if (connectMenu) {
@@ -3069,7 +3069,7 @@ class Create extends Uninstantable {
 						}
 					}
 				}
-			}
+			};
 			var togglePack = function (bool) {
 				var name = this._link.config._name;
 				if (connectMenu) {
@@ -3105,7 +3105,7 @@ class Create extends Uninstantable {
 					lib.config.bannedpile[name].add(number);
 				}
 				recreatePile();
-			}
+			};
 
 			var createModeConfig = function (mode, position) {
 				var info = lib.cardPack[mode];
@@ -3149,7 +3149,7 @@ class Create extends Uninstantable {
 							case 'zhenfa': return 5;
 							default: return 6;
 						}
-					}
+					};
 					list.sort(function (a, b) {
 						var sort1 = sortCard(a);
 						var sort2 = sortCard(b);
@@ -3462,7 +3462,7 @@ class Create extends Uninstantable {
 							restart.style.display = '';
 						});
 						pileList.style.float = 'right';
-					}
+					};
 					var pileChoose = ui.create.div('.config.toggle.cardpilecfg.nomarginleft', '选择牌堆', page);
 					createList();
 
@@ -3545,7 +3545,7 @@ class Create extends Uninstantable {
 						createPileNode(name);
 						createList();
 					};
-				}
+				};
 			}());
 
 			if (!connectMenu) {
@@ -3596,7 +3596,7 @@ class Create extends Uninstantable {
 						break;
 					}
 				}
-			}
+			};
 			var updateNodes = function () {
 				for (var i = 0; i < start.firstChild.childNodes.length; i++) {
 					var node = start.firstChild.childNodes[i];
@@ -3623,7 +3623,7 @@ class Create extends Uninstantable {
 						}
 					}
 				}
-			}
+			};
 			var togglePack = function (bool) {
 				var name = this._link.config._name;
 				if (name.startsWith('extension_')) {
@@ -3859,7 +3859,7 @@ class Create extends Uninstantable {
 						active.link.remove();
 						node.classList.add('active');
 						rightPane.appendChild(node.link);
-					}
+					};
 					var processExtension = function (exportext) {
 						if (page.currentExtension) {
 							if (page.currentExtension != inputExtName.value && !exportext) {
@@ -3990,7 +3990,7 @@ class Create extends Uninstantable {
 							if (typeof game.readFile == "function") {
 								game.readFile('LICENSE', function (data) {
 									extension['LICENSE'] = data;
-									game.writeFile(data, 'extension/' + page.currentExtension, 'LICENSE', function () { })
+									game.writeFile(data, 'extension/' + page.currentExtension, 'LICENSE', function () { });
 									callback();
 								}, function () {
 									alert('许可证文件丢失，无法导出扩展');
@@ -4278,7 +4278,7 @@ class Create extends Uninstantable {
 							button.nodename = ui.create.div(button, '.name', get.verticalStr(page.content.pack.translate[name]));
 							button.nodename.style.top = '8px';
 							page.insertBefore(button, page.childNodes[1]);
-						}
+						};
 						page.reset = function (name) {
 							resetEditor();
 							var buttons = page.querySelectorAll('.button.character');
@@ -4316,7 +4316,7 @@ class Create extends Uninstantable {
 											});
 										};
 										img.src = data;
-									}
+									};
 									if (game.download) {
 										var url = lib.assetURL + 'extension/' + name + '/' + file;
 										createButton(i, url);
@@ -4401,7 +4401,7 @@ class Create extends Uninstantable {
 							editnode.classList.add('disabled');
 							delnode.innerHTML = '取消';
 							delete delnode.button;
-						}
+						};
 
 						newCharacter = ui.create.div('.new_character', page);
 						var fakeme = ui.create.div('.avatar', newCharacter);
@@ -4428,7 +4428,7 @@ class Create extends Uninstantable {
 								};
 								fileReader.readAsDataURL(fileToLoad, "UTF-8");
 							}
-						}
+						};
 						fakeme.appendChild(input);
 
 						ui.create.div('.select_avatar', '选择头像', fakeme);
@@ -4474,7 +4474,7 @@ class Create extends Uninstantable {
 						var dieaudiotag = ui.create.node('audio', dieaudio);
 						var dieaudiopreview = ui.create.node('button', dieaudio, () => {
 							if (dieaudiotag.error) {
-								alert('您使用的客户端不支持预览此音频！')
+								alert('您使用的客户端不支持预览此音频！');
 							} else dieaudiotag.play();
 						});
 						dieaudiopreview.innerHTML = '播放';
@@ -4555,7 +4555,7 @@ class Create extends Uninstantable {
 						page.addSkillButton = addSkillButton;
 						var deletenode = function () {
 							this.remove();
-						}
+						};
 						addSkillButton.onclick = function () {
 							for (var i = 0; i < skillList.firstChild.childNodes.length; i++) {
 								if (skillList.firstChild.childNodes[i].skill == skillopt.value) return alert(selectname.value == 'current_extension' ? '此扩展还未添加技能' : '此武将没有技能可添加');
@@ -4769,7 +4769,7 @@ class Create extends Uninstantable {
 							editnode.classList.remove('disabled');
 							delnode.innerHTML = '删除';
 							delnode.button = this;
-						}
+						};
 						var createButton = function (name, image, fullskin) {
 							var button = ui.create.div('.button.card');
 							button.link = name;
@@ -4794,7 +4794,7 @@ class Create extends Uninstantable {
 							button.classList.add('noclick');
 							button.nodename = ui.create.div(button, '.name', get.verticalStr(page.content.pack.translate[name]));
 							page.insertBefore(button, page.childNodes[1]);
-						}
+						};
 						page.reset = function (name) {
 							resetEditor();
 							var buttons = page.querySelectorAll('.button.card');
@@ -4821,7 +4821,7 @@ class Create extends Uninstantable {
 										pile.appendChild(node);
 										node.onclick = function () {
 											this.remove();
-										}
+										};
 									}
 								}
 								for (var i in page.content.pack.card) {
@@ -4852,7 +4852,7 @@ class Create extends Uninstantable {
 											});
 										};
 										img.src = data;
-									}
+									};
 									if (game.download) {
 										var url = lib.assetURL + 'extension/' + name + '/' + file;
 										createButton(i, url, fullskin);
@@ -4935,7 +4935,7 @@ class Create extends Uninstantable {
 							delnode.innerHTML = '取消';
 							delete delnode.button;
 							container.code = 'card={\n    \n}\n\n/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
-						}
+						};
 
 						newCard = ui.create.div('.new_character', page);
 						newCard.style.height = '173px';
@@ -4973,7 +4973,7 @@ class Create extends Uninstantable {
 								};
 								fileReader.readAsDataURL(fileToLoad, "UTF-8");
 							}
-						}
+						};
 						fakeme.appendChild(input);
 
 						fakeme.imagenode = ui.create.div('.image', fakeme);
@@ -5000,7 +5000,7 @@ class Create extends Uninstantable {
 							citeButton.style.display = 'none';
 							selectname.style.display = '';
 							confirmcontainer.style.display = '';
-						}
+						};
 
 						var list = [];
 						for (var i in lib.card) {
@@ -5047,7 +5047,7 @@ class Create extends Uninstantable {
 							if (lib.translate[selectname.value + '_info']) {
 								newCard.querySelector('input.new_description').value = lib.translate[selectname.value + '_info'];
 							}
-						}
+						};
 
 						var citecancel = document.createElement('button');
 						citecancel.innerHTML = '取消';
@@ -5058,7 +5058,7 @@ class Create extends Uninstantable {
 							citeButton.style.display = '';
 							selectname.style.display = 'none';
 							confirmcontainer.style.display = 'none';
-						}
+						};
 
 						codeButton.onclick = function () {
 							var node = container;
@@ -5090,7 +5090,7 @@ class Create extends Uninstantable {
 									lib.codeMirrorReady(node, editor);
 								}
 							}
-						}
+						};
 
 						var container = ui.create.div('.popup-container.editor');
 						var saveInput = function () {
@@ -5338,7 +5338,7 @@ class Create extends Uninstantable {
 							pile.appendChild(node);
 							node.onclick = function () {
 								this.remove();
-							}
+							};
 						};
 						cardpileadd.appendChild(button);
 						cardpileadd.style.whiteSpace = 'nowrap';
@@ -5447,14 +5447,14 @@ class Create extends Uninstantable {
 							editnode.classList.remove('disabled');
 							delnode.button = this;
 							delnode.innerHTML = '删除';
-						}
+						};
 						var createButton = function (name) {
 							var button = ui.create.div('.menubutton');
 							button.link = name;
 							button.innerHTML = page.content.pack.translate[name];
 							button.listen(clickButton);
 							page.insertBefore(button, page.childNodes[1]);
-						}
+						};
 						var newSkill;
 						var toggle = ui.create.div('.config.more.on', '创建技能 <div>&gt;</div>', page, function () {
 							this.classList.toggle('on');
@@ -5487,7 +5487,7 @@ class Create extends Uninstantable {
 							if (page.fromchar == 'add') {
 								page.fromchar = true;
 							}
-						}
+						};
 
 						newSkill = ui.create.div('.new_character.new_skill', page);
 						page.newSkill = newSkill;
@@ -5528,7 +5528,7 @@ class Create extends Uninstantable {
 									lib.codeMirrorReady(node, editor);
 								}
 							}
-						}
+						};
 
 						var container = ui.create.div('.popup-container.editor');
 						var saveInput = function () {
@@ -5583,7 +5583,7 @@ class Create extends Uninstantable {
 							skillopt.style.display = '';
 							addSkillButton.style.display = '';
 							cancelSkillButton.style.display = '';
-						}
+						};
 
 						var list = [];
 						for (var i in lib.character) {
@@ -5664,7 +5664,7 @@ class Create extends Uninstantable {
 							if (lib.translate[skillopt.value + '_info']) {
 								newSkill.querySelector('input.new_description').value = lib.translate[skillopt.value + '_info'];
 							}
-						}
+						};
 						var cancelSkillButton = document.createElement('button');
 						cancelSkillButton.style.display = 'none';
 						cancelSkillButton.innerHTML = '取消';
@@ -5676,7 +5676,7 @@ class Create extends Uninstantable {
 							skillopt.style.display = 'none';
 							addSkillButton.style.display = 'none';
 							cancelSkillButton.style.display = 'none';
-						}
+						};
 
 						var editnode = ui.create.div('.menubutton.large.new_skill.disabled', '创建技能', function () {
 							var name = page.querySelector('input.new_name').value;
@@ -5909,7 +5909,7 @@ class Create extends Uninstantable {
 								}
 							}
 						};
-						page.content = {}
+						page.content = {};
 						createCode('主', '主代码', page, clickCode, 'content', 'function(config,pack){\n    \n}\n\n/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*/');
 						createCode('启', '启动代码', page, clickCode, 'precontent', 'function(){\n    \n}\n\n/*\n函数执行时机为游戏数据加载之前，且不受禁用扩展的限制\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*/');
 						createCode('选', '选项代码', page, clickCode, 'config', 'config={\n    \n}\n\n/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n     	  item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*/');
@@ -5965,8 +5965,8 @@ class Create extends Uninstantable {
 					importExtension.style.textAlign = 'left';
 					ui.create.div('', '<input type="file" accept="application/zip" style="width:153px"><button>确定</button>', importExtension);
 					ui.create.div('.config', '修改下载地址', page, function () {
-						alert('您可以在“设置→通用→获取扩展地址”中，修改下载扩展时所采用的地址。')
-					})
+						alert('您可以在“设置→通用→获取扩展地址”中，修改下载扩展时所采用的地址。');
+					});
 
 					var extensionURL;
 					var source = lib.config.extension_sources, index = lib.config.extension_source;
@@ -5999,7 +5999,7 @@ class Create extends Uninstantable {
 								}).then(game.reload);
 							}) !== false) importExtension.style.display = 'none';
 						});
-					}
+					};
 
 					var clickExtension = function () {
 						var active = this.parentNode.querySelector('.videonode.current');
@@ -6317,7 +6317,7 @@ class Create extends Uninstantable {
 						url = list.join('.');
 					}
 					return url;
-				}
+				};
 				li1.innerHTML = '游戏版本：' + lib.version + '<p style="margin-top:8px;white-space:nowrap"></p>';
 				li2.innerHTML = '素材版本：' + (lib.config.asset_version || '无') + '<p style="margin-top:8px"></p>';
 				li3.innerHTML = '更新地址：<span>' + trimURL(lib.config.updateURL || lib.updateURL) + '</span><p style="margin-top:8px"></p>';
@@ -6413,7 +6413,7 @@ class Create extends Uninstantable {
 									button.onclick = game.reload;
 									button.style.marginTop = '8px';
 									p.appendChild(button);
-								}
+								};
 								game.multiDownload(updates, function () {
 									n1++;
 									span.innerHTML = '正在下载文件（' + n1 + '/' + n2 + '）';
@@ -6479,7 +6479,7 @@ class Create extends Uninstantable {
 								}
 								var str;
 								if (dev) {
-									str = '开发版仅供测试使用，可能存在风险，是否确定更新？'
+									str = '开发版仅供测试使用，可能存在风险，是否确定更新？';
 								}
 								else {
 									str = '有新版本' + update.version + '可用，是否下载？';
@@ -6690,7 +6690,7 @@ class Create extends Uninstantable {
 									button.onclick = game.reload;
 									button.style.marginTop = '8px';
 									p.appendChild(button);
-								}
+								};
 								game.multiDownload(updates, function () {
 									n1++;
 									span.innerHTML = '正在下载素材（' + n1 + '/' + n2 + '）';
@@ -6756,7 +6756,7 @@ class Create extends Uninstantable {
 							updatepx.style.display = 'none';
 							updatep4.innerHTML = '更新';
 						}
-					}
+					};
 					ui.updateUpdate();
 				}());
 
@@ -6866,7 +6866,7 @@ class Create extends Uninstantable {
 				}
 				span5_check.onchange = function () {
 					game.saveConfig('asset_image', this.checked);
-				}
+				};
 				var span2_br = ui.create.node('br');
 
 				var span4 = ui.create.div('', '字体素材（48MB）');
@@ -6881,7 +6881,7 @@ class Create extends Uninstantable {
 				}
 				span4_check.onchange = function () {
 					game.saveConfig('asset_font', this.checked);
-				}
+				};
 				li2.lastChild.appendChild(span4_check);
 				var span3_br = ui.create.node('br');
 				li2.lastChild.appendChild(span3_br);
@@ -6898,7 +6898,7 @@ class Create extends Uninstantable {
 				}
 				span3_check.onchange = function () {
 					game.saveConfig('asset_audio', this.checked);
-				}
+				};
 				li2.lastChild.appendChild(span3_check);
 				var span4_br = ui.create.node('br');
 				li2.lastChild.appendChild(span4_br);
@@ -6915,7 +6915,7 @@ class Create extends Uninstantable {
 				}
 				span2_check.onchange = function () {
 					game.saveConfig('asset_skin', this.checked);
-				}
+				};
 				li2.lastChild.appendChild(span2_check);
 				var span5_br = ui.create.node('br');
 				li2.lastChild.appendChild(span5_br);
@@ -6937,7 +6937,7 @@ class Create extends Uninstantable {
 				}
 				span6_check.onchange = function () {
 					game.saveConfig('asset_full', this.checked);
-				}
+				};
 				li2.lastChild.appendChild(span6_check);
 
 				span2.style.display = 'none';
@@ -7021,7 +7021,7 @@ class Create extends Uninstantable {
 						cheatButton.classList.remove('glowing');
 						return false;
 					}
-				}
+				};
 				cheatButton.listen(function () {
 					if (checkCheat()) {
 						var num;
@@ -7408,7 +7408,7 @@ class Create extends Uninstantable {
 							}
 							text2.value = '';
 						}
-					}
+					};
 					text2.addEventListener('keydown', e => {
 						if (e.keyCode == 13) {
 							runCommand();
@@ -7485,7 +7485,7 @@ class Create extends Uninstantable {
 						}).join(' ');
 						pre.innerHTML += printResult + '<br>';
 						text.scrollTop = text.scrollHeight;
-					}
+					};
 					if (_status.toprint) {
 						game.print(..._status.toprint);
 						delete _status.toprint;
@@ -7518,7 +7518,7 @@ class Create extends Uninstantable {
 							lib.config.gameRecord[this.parentNode.link] = { data: {} };
 							game.saveConfig('gameRecord', lib.config.gameRecord);
 						}
-					}
+					};
 					for (var i = 0; i < lib.config.all.mode.length; i++) {
 						if (!lib.config.gameRecord[lib.config.all.mode[i]]) continue;
 						if (lib.config.gameRecord[lib.config.all.mode[i]].str) {
@@ -7582,7 +7582,7 @@ class Create extends Uninstantable {
 									this.parentNode.link.starred = false;
 								}
 								store.put(this.parentNode.link);
-							}
+							};
 							var createNode = function (video, before) {
 								var node = ui.create.div('.videonode.menubutton.large', clickcapt);
 								node.link = video;
@@ -7616,7 +7616,7 @@ class Create extends Uninstantable {
 								if (video.starred) {
 									node.classList.add('starred');
 								}
-							}
+							};
 							for (var i = 0; i < lib.videos.length; i++) {
 								createNode(lib.videos[i]);
 							}
@@ -7682,7 +7682,7 @@ class Create extends Uninstantable {
 									createNode(data, true);
 								};
 								fileReader.readAsText(fileToLoad, "UTF-8");
-							}
+							};
 
 							playButton.listen(function () {
 								var current = this.parentNode.querySelector('.videonode.active');
@@ -7718,7 +7718,7 @@ class Create extends Uninstantable {
 								playButton.style.display = '';
 								deleteButton.style.display = '';
 								saveButton.style.display = '';
-							}
+							};
 						}
 					};
 				};
@@ -7957,7 +7957,7 @@ class Create extends Uninstantable {
 				if (lib.characterPack[i][name]) return i;
 			}
 			return null;
-		}
+		};
 		var packs = {};
 		var packnode = ui.create.div('.packnode', dialog);
 		lib.setScroll(packnode);
@@ -7975,7 +7975,7 @@ class Create extends Uninstantable {
 					dialog.buttons[i].classList.remove('nodisplay');
 				}
 			}
-		}
+		};
 		var createNode = function (packname) {
 			var translate;
 			var pack = null;
@@ -7988,7 +7988,7 @@ class Create extends Uninstantable {
 			var node = ui.create.div('.dialogbutton.menubutton.large', packname, packnode, clickCapt);
 			node.pack = pack;
 			return node;
-		}
+		};
 		dialog.add([list, 'character']);
 		var bool = true;
 		var node;
@@ -8084,7 +8084,7 @@ class Create extends Uninstantable {
 				capt = '自定义';
 			}
 			return capt;
-		}
+		};
 		if (thisiscard) {
 			for (var i in lib.card) {
 				if (!lib.translate[i + '_info']) continue;
@@ -8526,7 +8526,7 @@ class Create extends Uninstantable {
 					case 'zhenfa': return 5;
 					default: return 6;
 				}
-			}
+			};
 			list.sort(function (a, b) {
 				var del = groupSort(a) - groupSort(b);
 				if (del != 0) return del;
@@ -8574,7 +8574,7 @@ class Create extends Uninstantable {
 				return null;
 			}
 			return this.currentcapt;
-		}
+		};
 		if (str) {
 			dialog.add(str);
 		}
@@ -8656,7 +8656,7 @@ class Create extends Uninstantable {
 	}
 	static dialog() {
 		let dialog = new lib.element.Dialog(...arguments);
-		if(!Array.from(arguments).includes('hidden')){
+		if (!Array.from(arguments).includes('hidden')) {
 			dialog.open();
 		}
 		return dialog;
@@ -8924,7 +8924,7 @@ class Create extends Uninstantable {
 			// else{
 			//     this.classList.remove('fewplayer');
 			// }
-		}
+		};
 
 		if (lib.config.low_performance) {
 			ui.window.classList.add('low_performance');
@@ -8991,7 +8991,7 @@ class Create extends Uninstantable {
 				});
 			}
 		}
-		lib.init.js(lib.assetURL + 'game', 'pinyinjs', function () { })
+		lib.init.js(lib.assetURL + 'game', 'pinyinjs', function () { });
 		lib.init.js(lib.assetURL + 'game', 'keyWords', function () { });
 
 		lib.updateURL = lib.updateURLS[lib.config.update_link] || lib.updateURLS.coding;
@@ -9280,7 +9280,7 @@ class Create extends Uninstantable {
 					var num = get.number(card, game.me);
 					if (num < 3) return 13 + num;
 					return num;
-				}
+				};
 				hs.sort((a, b) => (getn(b) - getn(a)));
 			}
 			else hs.sort(function (b, a) {
@@ -9351,7 +9351,7 @@ class Create extends Uninstantable {
 				ui.timer.popnode.innerHTML = text;
 			}
 			ui.timer.fillnode.style.top = ((1 - percentage) * 100) + '%';
-		}
+		};
 		var setTimerPosition = function (e) {
 			this.position++;
 			if (this.position > 4) {
@@ -9379,12 +9379,12 @@ class Create extends Uninstantable {
 			else {
 				this.style.left = left1;
 			}
-		}
+		};
 		ui.timer.listen(setTimerPosition);
 
 		ui.shortcut = ui.create.div('#shortcut.hidden', ui.window);
 		ui.shortcut.listen(ui.click.shortcut);
-		ui.create.div(ui.shortcut, function (e) { e.stopPropagation() });
+		ui.create.div(ui.shortcut, function (e) { e.stopPropagation(); });
 		ui.create.div('.menubutton.round', '<span>重来</span>', ui.shortcut, game.reload).dataset.position = 1;
 		ui.create.div('.menubutton.round', '<span>退出</span>', ui.shortcut, game.exit).dataset.position = 3;
 		ui.create.div('.menubutton.round', '<span>记录</span>', ui.shortcut, ui.click.pause).dataset.position = 4;
@@ -9491,7 +9491,7 @@ class Create extends Uninstantable {
 							else {
 								game.saveConfig('asset_version', '无');
 							}
-						}
+						};
 						if (_status.new_tutorial) {
 							_status.new_tutorial = func;
 						}
@@ -9595,7 +9595,7 @@ class Create extends Uninstantable {
 		node.activate = function () {
 			ui.create.button(item, type, position, noclick, node);
 			delete node.activate;
-		}
+		};
 		_status.prebutton.push(node);
 		return node;
 	}
@@ -9790,7 +9790,6 @@ class Create extends Uninstantable {
 				}
 				if (node._replaceButton) {
 					var intro = ui.create.div('.button.replaceButton', node);
-					intro[lib.experimental.symbol.itemType] = 'button';
 					node.node.replaceButton = intro;
 					intro.innerHTML = '切换';
 					intro._node = node;
@@ -9839,7 +9838,7 @@ class Create extends Uninstantable {
 			node.node = {
 				name: ui.create.div('.name', node),
 				intro: ui.create.div('.intro', node)
-			}
+			};
 			if (item.name && item.name.startsWith('unknown')) {
 				if (item.node && item.node.name_seat) {
 					node.classList.add('cardbg');
@@ -9854,8 +9853,8 @@ class Create extends Uninstantable {
 			}
 			return node;
 		}
-	}
-	static button(item, type, position, noClick, button) { return new lib.element.Button(item, type, position, noClick, button) }
+	};
+	static button(item, type, position, noClick, button) { return new lib.element.Button(item, type, position, noClick, button); }
 	static buttons(list, type, position, noclick, zoom) {
 		var buttons = [];
 		var pre = (typeof type == 'string' && type.slice(0, 3) == 'pre');
@@ -10052,7 +10051,7 @@ class Create extends Uninstantable {
 			// ui.updatehl();
 		}
 	}
-	static card(position, info, noclick) { return new lib.element.Card(position).build(info, noclick);}
+	static card(position, info, noclick) { return new lib.element.Card(position).build(info, noclick); }
 	static cardsAsync() {
 		if (lib.onfree) {
 			_status.waitingForCards = Array.from(arguments);
@@ -10099,7 +10098,7 @@ class Create extends Uninstantable {
 		const natures = Array.from(lib.nature.keys());
 		lib.inpile_nature.sort(function (a, b) {
 			return natures.indexOf(a) - natures.indexOf(b);
-		})
+		});
 		for (var i in _status.cardtag) {
 			if (!_status.cardtag[i].length) delete _status.cardtag[i];
 		}
@@ -10182,10 +10181,10 @@ class Click extends Uninstantable {
 				button.input = uiintro.content.lastChild.lastChild;
 				button.input.onfocus = function () {
 					button.focused = true;
-				}
+				};
 				button.input.onblur = function () {
 					delete button.focused;
-				}
+				};
 				if (button.interval) {
 					button.input.disabled = true;
 					button.input.style.opacity = 0.6;
@@ -10284,7 +10283,7 @@ class Click extends Uninstantable {
 							str = '周';
 						}
 						if (fakeinfo.day == 7) {
-							str += '日'
+							str += '日';
 						}
 						else {
 							str += get.cnNumber(fakeinfo.day, true);
@@ -10363,7 +10362,7 @@ class Click extends Uninstantable {
 							str = '周';
 						}
 						if (button.info[i].day == 7) {
-							str += '日'
+							str += '日';
 						}
 						else {
 							str += get.cnNumber(button.info[i].day, true);
@@ -10412,7 +10411,7 @@ class Click extends Uninstantable {
 					daysselect.disabled = true;
 					timeconfirm.disabled = true;
 				}
-			}
+			};
 			uiintro.refresh();
 			ui.window.appendChild(uiintro);
 			_status.connectEventsCallback = function () {
@@ -10464,10 +10463,10 @@ class Click extends Uninstantable {
 				button.input = uiintro.content.lastChild.lastChild;
 				button.input.onfocus = function () {
 					button.focused = true;
-				}
+				};
 				button.input.onblur = function () {
 					delete button.focused;
-				}
+				};
 				if (button.interval) {
 					button.input.disabled = true;
 					button.input.style.opacity = 0.6;
@@ -10504,7 +10503,7 @@ class Click extends Uninstantable {
 							}
 						}, 1000);
 					}
-				}
+				};
 
 				for (var i = 0; i < button.info.length; i++) {
 					var node = ui.create.div('.menubutton.videonode.pointerdiv', uiintro.content);
@@ -10523,7 +10522,7 @@ class Click extends Uninstantable {
 					//node.classList.add('videonodestatus');
 					if (button.info[i][3]) {
 						ui.create.div('.videostatus', node, button.info[i][3].slice(0, 80));
-						node.classList.add('videonodestatus')
+						node.classList.add('videonodestatus');
 					}
 				}
 			};
@@ -10587,7 +10586,7 @@ class Click extends Uninstantable {
 					autoskin();
 				}
 			}
-		}
+		};
 		autoskin();
 	}
 	static skin(avatar, name, callback) {
@@ -10614,14 +10613,14 @@ class Click extends Uninstantable {
 			if (callback) {
 				callback(bool);
 			}
-		}
+		};
 		var img = new Image();
 		img.onload = function () {
 			lib.config.skin[name] = num;
 			game.saveConfig('skin', lib.config.skin);
 			avatar.style.backgroundImage = 'url("' + img.src + '")';
 			finish(true);
-		}
+		};
 		img.onerror = function () {
 			if (lib.config.skin[name]) {
 				finish(true);
@@ -10632,7 +10631,7 @@ class Click extends Uninstantable {
 			delete lib.config.skin[name];
 			game.saveConfig('skin', lib.config.skin);
 			avatar.setBackground(name, 'character');
-		}
+		};
 		img.src = lib.assetURL + 'image/skin/' + name + '/' + num + '.jpg';
 	}
 	static touchpop(forced) {
@@ -11084,7 +11083,7 @@ class Click extends Uninstantable {
 			list.appendChild(node);
 			list.scrollTop = list.scrollHeight;
 			uiintro.style.height = uiintro.content.scrollHeight + 'px';
-		}
+		};
 		_status.addChatEntry = addEntry;
 		_status.addChatEntry._origin = uiintro;
 		if (lib.chatHistory.length) {
@@ -11094,7 +11093,7 @@ class Click extends Uninstantable {
 		}
 		else {
 			list._chatempty = true;
-			list.appendChild(ui.create.div('.text.center', '无聊天记录'))
+			list.appendChild(ui.create.div('.text.center', '无聊天记录'));
 		}
 		uiintro.add(list);
 		uiintro.style.height = uiintro.content.offsetHeight + 'px';
@@ -11108,7 +11107,7 @@ class Click extends Uninstantable {
 		input.style.width = 'calc(100% - 20px)';
 		input.onchange = function () {
 			_status.chatValue = input.value;
-		}
+		};
 		input.onkeydown = function (e) {
 			if (e.keyCode == 13 && input.value) {
 				var player = game.me;
@@ -11145,7 +11144,7 @@ class Click extends Uninstantable {
 				}
 			}
 			e.stopPropagation();
-		}
+		};
 		uiintro._onopen = function () {
 			input.focus();
 			list.scrollTop = list.scrollHeight;
@@ -11419,7 +11418,7 @@ class Click extends Uninstantable {
 				game.resume2();
 				e.stopPropagation();
 				return false;
-			}
+			};
 			uiintro.style.zIndex = 21;
 			layer.onclick = clicklayer;
 			layer.oncontextmenu = clicklayer;
@@ -11508,7 +11507,7 @@ class Click extends Uninstantable {
 				clientX: e.touches[0].clientX,
 				clientY: e.touches[0].clientY,
 				time: get.utc()
-			}
+			};
 		}
 		// if(window.ForceTouch&&!_status.paused2&&!_status.forcetouchinterval&&lib.config.enable_pressure){
 		// 	_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
@@ -11821,7 +11820,7 @@ class Click extends Uninstantable {
 							}
 							break;
 					}
-				}
+				};
 				if (Math.abs(dx) < 100) {
 					if (dy < -200) {
 						goswipe(lib.config.swipe_up);
@@ -12354,7 +12353,7 @@ class Click extends Uninstantable {
 	static mouseentercancel() {
 		if (_status._mouseentertimeout) {
 			clearTimeout(_status._mouseentertimeout);
-			delete _status._mouseentertimeout
+			delete _status._mouseentertimeout;
 		}
 	}
 	static hoverplayer(e) {
@@ -12758,7 +12757,7 @@ class Click extends Uninstantable {
 						if (lib.configOL.mode == 'versus' || lib.configOL.mode == 'doudizhu') return;
 						if (lib.configOL.mode == 'identity' && lib.configOL.identity_mode == 'zhong') return;
 						if (!this.classList.contains('unselectable2') && lib.configOL.number <= 2) return;
-						this.classList.toggle('unselectable2')
+						this.classList.toggle('unselectable2');
 						if (this.classList.contains('unselectable2')) {
 							lib.configOL.number--;
 						}
@@ -12790,7 +12789,7 @@ class Click extends Uninstantable {
 				if (lib.configOL.mode == 'versus' || lib.configOL.mode == 'doudizhu' || lib.configOL.mode == 'single') return;
 				if (lib.configOL.mode == 'identity' && (lib.configOL.identity_mode == 'zhong' || lib.configOL.identity_mode == 'purple')) return;
 				if (!this.classList.contains('unselectable2') && lib.configOL.number <= 2) return;
-				this.classList.toggle('unselectable2')
+				this.classList.toggle('unselectable2');
 				if (this.classList.contains('unselectable2')) {
 					lib.configOL.number--;
 				}
@@ -13121,7 +13120,7 @@ class Click extends Uninstantable {
 			e.stopPropagation();
 			if (resume) game.resume2();
 			return false;
-		}
+		};
 		var uiintro = ui.create.div('.menubg.charactercard', layer);
 		var playerbg = ui.create.div('.menubutton.large.ava', uiintro);
 		var bg = ui.create.div('.avatar', playerbg, function () {
@@ -13198,13 +13197,13 @@ class Click extends Uninstantable {
 					img.onload = function () {
 						num++;
 						loadImage();
-					}
+					};
 					img.onerror = function () {
 						num--;
 						createButtons(num);
-					}
+					};
 					img.src = lib.assetURL + 'image/skin/' + nameskin + '/' + num + '.jpg';
-				}
+				};
 				if (lib.config.change_skin) {
 					loadImage();
 				}
@@ -13288,7 +13287,7 @@ class Click extends Uninstantable {
 				var charactersex = get.translation(nameinfo[0]);
 				const charactergroups = get.is.double(name, true);
 				let charactergroup;
-				if (charactergroups) charactergroup = charactergroups.map(i => get.translation(i)).join('/')
+				if (charactergroups) charactergroup = charactergroups.map(i => get.translation(i)).join('/');
 				else charactergroup = get.translation(nameinfo[1]);
 				var characterhp = nameinfo[2];
 				var characterintroinfo = get.characterIntro(name);
@@ -13380,7 +13379,7 @@ class Click extends Uninstantable {
 						game.playAudio(audio, play);
 					})();
 				}
-			}
+			};
 		}
 		else {
 			// 样式一
@@ -13406,7 +13405,7 @@ class Click extends Uninstantable {
 				new Promise((resolve, reject) => {
 					const imageName = `sex_${characterSex}`, information = lib.card[imageName];
 					if (!information) {
-						resolve(`${lib.assetURL}image/card/${imageName}.png`)
+						resolve(`${lib.assetURL}image/card/${imageName}.png`);
 						return;
 					}
 					const image = information.image;
@@ -13595,7 +13594,7 @@ class Click extends Uninstantable {
 						game.playAudio(audio, play);
 					})();
 				}
-			}
+			};
 		}
 
 		var initskill = false;
@@ -13662,7 +13661,7 @@ class Click extends Uninstantable {
 				uiintro._onclose();
 			}
 			return false;
-		}
+		};
 		layer.addEventListener(lib.config.touchscreen ? 'touchend' : 'click', clicklayer);
 		if (!lib.config.touchscreen) layer.oncontextmenu = clicklayer;
 		if (this.parentNode == ui.historybar && lib.config.touchscreen) {
@@ -14027,25 +14026,65 @@ export class UI extends Uninstantable {
 	static touchlines = [];
 	static todiscard = {};
 	/**
-	 * @type {HTMLStyleElement[]}
+	 * @type { HTMLStyleElement[] }
 	 */
 	static playerPositions = [];
 	static create = Create;
 	static click = Click;
 	static selected = {
 		/**
-		 * @type { import('../library/index.js').Button[]}
+		 * @type { Button[] }
 		 */
 		buttons: [],
 		/**
-		 * @type { import('../library/index.js').Card[]}
+		 * @type { Card[] }
 		 */
 		cards: [],
 		/**
-		 * @type { import('../library/index.js').Player[]}
+		 * @type { Player[] }
 		 */
 		targets: []
-	}
+	};
+	/**
+	 * @type { Dialog[] }
+	 */
+	static dialogs;
+	/**
+	 * @type { Dialog }
+	 */
+	static dialog;
+	/**
+	 * @type { HTMLDivElement }
+	 */
+	static arena;
+	/**
+	 * @type { Control[] }
+	 */
+	static controls;
+	/**
+	 * @type { Control }
+	 */
+	static control;
+	/**
+	 * @type { Control | undefined }
+	 */
+	static confirm;
+	/**
+	 * @type { Control | undefined }
+	 */
+	static skills;
+	/**
+	 * @type { Control | undefined }
+	 */
+	static skills1;
+	/**
+	 * @type { Control | undefined }
+	 */
+	static skills2;
+	/**
+	 * @type { Control | undefined }
+	 */
+	static skills3;
 	static refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}
@@ -14094,7 +14133,7 @@ export class UI extends Uninstantable {
 			else {
 				controls.push(node);
 			}
-		}
+		};
 		widths = leftwidths.concat(widths);
 		var staylefts = [];
 		for (var i = 0; i < ui.control.childNodes.length; i++) {
@@ -14515,7 +14554,7 @@ export class UI extends Uninstantable {
 	static recycle(node, key) {
 		if (!ui._recycle) ui._recycle = {};
 		if (typeof node == 'string') {
-			return ui._recycle[node]
+			return ui._recycle[node];
 		}
 		ui._recycle[key] = node;
 	}

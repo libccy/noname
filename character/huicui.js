@@ -505,7 +505,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						player.chat('没有非基本牌…');
 						game.log(`但是${position=='discardPile'?'弃':''}牌堆里没有非基本牌！`);
-
 					}
 				},
 			},
@@ -1065,14 +1064,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.targets=targets;
 					player.logSkill('dcyouzhan',targets);
 					'step 1'
-					var target=targets.shift();
+					event.target=targets.shift();
+					event.num=trigger.getl(event.target).cards2.length;
+					'step 2'
 					player.draw().gaintag=['dcyouzhan'];
 					player.addTempSkill('dcyouzhan_limit');
 					target.addTempSkill('dcyouzhan_effect');
 					target.addMark('dcyouzhan_effect',1,false);
 					target.addTempSkill('dcyouzhan_draw');
+					if(--event.num) event.redo();
+					'step 3'
 					if(targets.length){
-						event.redo();
+						event.goto(1);
 					}
 				},
 				ai:{
@@ -2730,7 +2733,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.addSkill('dctaji_damage');
 							player.addMark('dctaji_damage',1,false);
 							game.log(player,'下一次对其他角色造成的伤害','#g+1');
-
 						}]
 					];
 					var name=evt.name;
@@ -2754,7 +2756,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					damage:{
-						trigger:{source:'damageBegin3'},
+						trigger:{source:'damageBegin1'},
 						forced:true,
 						charlotte:true,
 						onremove:true,
@@ -5039,7 +5041,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.classList.add('fullwidth');
 						dialog.classList.add('fullheight');
 						dialog.buttonss=[];
-						
+
 						var list=['仅展示牌的玩家','交出牌的玩家']
 						for(var i=0;i<list.length;i++){
 							dialog.add('<div class="text center">'+list[i]+'</div>');
@@ -5049,7 +5051,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							buttons.classList.add('guanxing');
 						}
 						dialog.open();
-						
+
 						var getx=function(){
 							var item=results.shift();
 							var card=item[1][1],index=item[1][0]=='仅展示牌'?0:1;
@@ -6178,7 +6180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.draw();
-					'step 1' 
+					'step 1'
 					var target=trigger.player;
 					if(player.countCards('h')<=target.countCards('h')&&target.countCards('he')>0){
 						player.discardPlayerCard(target,true,'he');
@@ -9177,7 +9179,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
-					var target=lib.skill.fengxiang.getMax(); 
+					var target=lib.skill.fengxiang.getMax();
 					return !target||target.isDamaged();
 				},
 				logTarget:function(event,player){
@@ -10619,7 +10621,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				visible:true,
 				insert:true,
 				content:function(){
-					game.log(player,'将',cards,'置于牌堆顶'); 
+					game.log(player,'将',cards,'置于牌堆顶');
 					player.useCard({name:'sha',isCard:true},false,targets).card.cxliushi=true;
 				},
 				group:'cxliushi_damage',
@@ -11200,7 +11202,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcchongwang:'崇望',
 			dcchongwang_info:'其他角色使用基本牌或普通锦囊牌时，若你是本局游戏内上一张被使用的牌的使用者，则你可以选择一项：⒈令其于此牌结算结束后收回此牌对应的所有实体牌；⒉取消此牌的所有目标。',
 			dchuagui:'化归',
-			dchuagui_info:'出牌阶段开始时，你可以选择至多X名有牌的其他角色（X为场上每个阵营中最大阵营的人数，且你的选择结果不展示）。这些角色同时选择一项：⒈交给你一张牌，⒉展示一张牌。若这些角色均选择选项二，则你获得所有展示牌。',		 
+			dchuagui_info:'出牌阶段开始时，你可以选择至多X名有牌的其他角色（X为场上每个阵营中最大阵营的人数，且你的选择结果不展示）。这些角色同时选择一项：⒈交给你一张牌，⒉展示一张牌。若这些角色均选择选项二，则你获得所有展示牌。',
 			gongsundu:'公孙度',
 			dczhenze:'震泽',
 			dczhenze_info:'弃牌阶段开始时，你可以选择一项：1.令所有手牌数与体力值大小关系与你不同的角色失去1点体力；2.令所有手牌数和体力值关系与你相同的角色回复1点体力。',
@@ -11362,7 +11364,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcbeifen_info:'锁定技。①当你失去牌后，若这些牌中有“胡笳”牌，你获得与你手牌中“胡笳”牌花色均不同的每种花色的牌各一张。②若你手牌中“胡笳”牌数小于不为“胡笳”牌的牌数，你使用牌无距离和次数限制。',
 			dc_wuban:'吴班',
 			dcyouzhan:'诱战',
-			dcyouzhan_info:'锁定技。当其他角色于你的回合内失去牌后，你摸一张牌（不计入本回合的手牌上限），且其获得如下效果：1.其于此回合下一次受到的伤害+1；2.结束阶段，若其于此回合未受到过伤害，其摸X张牌（X为其此回合失去过牌的次数且至多为3）。',
+			dcyouzhan_info:'锁定技。当其他角色于你的回合内失去一张牌后，你摸一张牌（不计入本回合的手牌上限），且其获得如下效果：1.其于此回合下一次受到的伤害+1；2.结束阶段，若其于此回合未受到过伤害，其摸X张牌（X为其此回合失去过牌的次数且至多为3）。',
 			yue_zhoufei:'乐周妃',
 			yue_zhoufei_prefix:'乐',
 			dclingkong:'灵箜',

@@ -295,7 +295,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										return -get.sgn(get.attitude(player,current));
 									}
 								});
-
 								if(num2>=num1) return 0;
 								return 2*(num2-num1);
 							}
@@ -3391,7 +3390,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.removeAdditionalSkill('xshuangren');
 						}
 					}
-
 				},
 				ai:{
 					effect:{

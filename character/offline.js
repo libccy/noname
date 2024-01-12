@@ -1275,7 +1275,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.name(card)!='sha') return false;
 						return lib.filter.filterCard.apply(this,arguments);
 					},trigger.target,-1).set('addCount',false).logSkill='pshuiqiang';
-				} 
+				}
 			},
 			pshuntu:{
 				audio:2,

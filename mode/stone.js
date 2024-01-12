@@ -975,7 +975,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.resume();
 								game.updateStatusCount();
 							},lib.config.duration);
-
 						}
 					}
 					else if(game.enemy.isDead()){
@@ -8781,7 +8780,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						event.chooser.useCard({name:'sha'},result.targets,false);
 					}
-
 				}
 			},
 			stone_zhucangzhe1:{
@@ -9984,7 +9982,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			druid_chengzhang_info:'你出场时，己方主将获得1点行动值；你死亡时，己方主将需弃置一张手牌。',
 			druid_huwei:'护卫',
 			druid_huwei_info:'你出场时，己方主将可以选择一项：对一名随从造成1点伤害，或弃置一名随从的所有牌并将其体力上限改为2。',
-
 
 			stone_fachao:'法潮图腾',
 			stone_tutengyongshi:'图腾勇士',

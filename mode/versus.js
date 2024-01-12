@@ -181,7 +181,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					['zhu','ezhu','zhong','ezhong','zhong','ezhong','zhong','ezhong'],
 					['zhu','ezhong','zhong','ezhong','zhong','ezhu','zhong','ezhong'],
 				].randomGet();
-				
+
 				var side=true;
 				var num=Math.floor(Math.random()*8);
 				list=list.splice(8-num).concat(list);
@@ -2489,7 +2489,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							else{
 								game.friend[i].identity='zhong';
 								game.friend[i].setIdentity(_status.color+'Zhong');
-
 							}
 							if(lib.storage.zhu&&get.distance(game.enemy[i],game.me,'pure')==num){
 								game.enemy[i].identity='zhu';
@@ -2565,7 +2564,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						['zhu','ezhu','zhong','ezhong','zhong','ezhong','zhong','ezhong'],
 						['zhu','ezhong','zhong','ezhong','zhong','ezhu','zhong','ezhong'],
 					].randomGet();
-				
+
 					var side=true;
 					var num=Math.floor(Math.random()*8);
 					list=list.splice(8-num).concat(list);
@@ -2605,7 +2604,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var evt_list=[['huoshaowuchao','chunyuqiong'],['liangcaokuifa','sp_xuyou'],['zhanyanliangzhuwenchou','jsp_guanyu'],['shishengshibai','re_guojia'],['xutuhuanjin','yj_jushou'],['liangjunxiangchi','yj_jushou'],['jianshoudaiyuan','tianfeng'],['yiruoshengqiang','re_caocao'],['shichongerjiao','sp_xuyou']].randomGet();
 					var evt=evt_list[0],character=evt_list[1];
 					game.addGlobalSkill(evt);
-					
+
 					var func=function(map,evt){
 						for(var i in map){
 							var player=lib.playerOL[i];
@@ -3128,7 +3127,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}];
-					
+
 					//22联机分配武将
 					var list=[];
 					var libCharacter={};
@@ -3308,7 +3307,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					event.sendback=sendback;
-					
+
 					//发送
 					event.ai_targets=[];
 					for(var i=0;i<game.players.length;i++){
@@ -3906,9 +3905,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				ui.intro=ui.create.dialog();
 				ui.intro.source='versusCheckFriend';
 
-
-
-
 				if(_status.friendDied.length){
 					ui.intro.add('已阵亡');
 					ui.intro.add([_status.friendDied,'character']);
@@ -4049,7 +4045,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_tuntianchiwen:['male','wei',5,['boss_jiguan','boss_tanshi','boss_tunshi'],['jiangemech','hiddenboss','bossallowed'],'wei'],
 			boss_shihuosuanni:['male','wei',5,['boss_jiguan','boss_lianyujg'],['jiangemech','hiddenboss','bossallowed'],'wei'],
 			boss_lieshiyazi:['male','wei',5,['boss_jiguan','boss_nailuo'],['jiangemech','hiddenboss','bossallowed'],'wei'],
-			
+
 			boss_kumuyuanrang:['male','wei',5,['boss_bashi','boss_danjing'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
 			boss_baijiwenyuan:['male','wei',5,['boss_jiaoxie'],['jiangeboss','hiddenboss','bossallowed'],'wei'],
 			boss_yihanyunchang:['male','shu',5,['boss_xiaorui','boss_huchen'],['jiangeboss','hiddenboss','bossallowed'],'shu'],
@@ -4480,7 +4476,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			boss_tuntianchiwen:'吞天螭吻',
 			boss_shihuosuanni:'食火狻猊',
 			boss_lieshiyazi:'裂石睚眦',
-			
+
 			boss_kumuyuanrang:'枯目元让',
 			boss_baijiwenyuan:'百计文远',
 			boss_yihanyunchang:'翊汉云长',

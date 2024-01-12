@@ -3730,7 +3730,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						addToButton();
 					};
 
-
 					for(var i=0;i<bossbuttons.length;i++){
 						bossbuttons[i].classList.add('noclick');
 						bossbuttons[i].listen(clickBoss);

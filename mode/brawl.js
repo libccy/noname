@@ -1055,7 +1055,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 									game.updateRoundNumber();
 									'step 4'
-									setTimeout(function(){	
+									setTimeout(function(){
 										ui.arena.classList.remove('choose-character');
 									},500);
 									_status.videoInited=true;
@@ -2450,12 +2450,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								var bool=Math.random()<0.5;
 								var bool2=Math.random()<0.5;
 								var ref=game.players[0];
-			
+
 								ref.side=bool;
 								ref.next.side=bool2;
 								ref.next.next.side=!bool;
 								ref.previous.side=!bool2;
-			
+
 								var firstChoose=game.players.randomGet();
 								if(firstChoose.next.side==firstChoose.side){
 									firstChoose=firstChoose.next;
@@ -2465,7 +2465,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									firstChoose.node.name.innerHTML=get.verticalStr(get.cnNumber(i+1,true)+'号位');
 									firstChoose=firstChoose.next;
 								}
-			
+
 								for(var i=0;i<game.players.length;i++){
 									if(game.players[i].side==game.me.side){
 										game.players[i].node.identity.firstChild.innerHTML='友';
@@ -2808,7 +2808,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										game.fellow.removeSkill(skills[i]);
 									}
 								}
-								var cards=game.fellow.getCards('hej');		
+								var cards=game.fellow.getCards('hej');
 								while(cards.length){
 									ui.discardPile.appendChild(cards.shift());
 								}
@@ -2915,7 +2915,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.fan.setIdentity();
 								game.fan.identityShown=true;
 								game.fan.node.identity.classList.remove('guessing');
-								
+
 								event.list=[];
 								for(var i in lib.character){
 									if(lib.filter.characterDisabled(i)) continue;
@@ -2937,7 +2937,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 								dialog.setCaption('选择角色');
 								game.me.chooseButton(dialog,true).set('onfree',true);
-								
+
 								ui.create.cheat=function(){
 									_status.createControl=ui.cheat2;
 									ui.cheat=ui.create.control('更换',function(){
@@ -2947,10 +2947,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										if(game.changeCoin){
 											game.changeCoin(-3);
 										}
-										
+
 										event.list.randomSort();
 										list=event.list.slice(0,5);
-										
+
 										var buttons=ui.create.div('.buttons');
 										var node=_status.event.dialog.buttons[0].parentNode;
 										_status.event.dialog.buttons=ui.create.buttons(list,'character',buttons);
@@ -2974,7 +2974,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								else{
 									event.dialogxx=ui.create.characterDialog('heightset');
 								}
-			
+
 								ui.create.cheat2=function(){
 									ui.cheat2=ui.create.control('自由选将',function(){
 										if(this.dialog==_status.event.dialog){
@@ -3051,7 +3051,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								setTimeout(function(){
 									ui.arena.classList.remove('choose-character');
 								},500);
-								
+
 								var pack={
 									character:{
 										pujing:['male','qun',1,[],[]],
@@ -3455,7 +3455,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									player.side=pack.place[i];
 									player=player.next;
 								}
-			
+
 								for(var i=0;i<game.players.length;i++){
 									if(game.players[i].side==game.me.side){
 										game.players[i].node.identity.firstChild.innerHTML='友';
@@ -3803,7 +3803,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						lib.translate.nei=lib.translate.nei||'内';
 						lib.translate.fan=lib.translate.fan||'反';
 
-
 						this.style.transition='all 0s';
 						this.style.height=(this.offsetHeight-10)+'px';
 						this.style.overflow='scroll';
@@ -3811,7 +3810,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var style={marginLeft:'3px',marginRight:'3px'};
 						var style2={position:'relative',display:'block',left:0,top:0,marginBottom:'6px',padding:0,width:'100%'};
 						var style3={marginLeft:'4px',marginRight:'4px',position:'relative'}
-
 
 						var scenename=ui.create.node('input',ui.create.div(style2,'','场景名称：',this),{width:'120px'});
 						scenename.type='text';
@@ -3921,7 +3919,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.addScene(scene.name,true);
 						},style);
 
-
 						var capt1=ui.create.div(style2,'','角色信息',this);
 						var line2=ui.create.div(style2,this);
 						line2.style.display='none';
@@ -3984,7 +3981,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 						var capt9=ui.create.div(style2,'','编辑牌堆',this);
 						capt9.style.display='none';
-
 
 						var capt2=ui.create.div(style2,'','添加卡牌',this);
 						var line3=ui.create.div(style2,this);
@@ -4271,7 +4267,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.style.margin='-18px';
 							player.node.marks.remove();
 
-
 							line7.appendChild(player);
 							player.listen(function(){
 								if(confirm('是否删除此角色？')){
@@ -4322,7 +4317,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var line7=ui.create.div(style2,this);
 						line7.style.marginTop='12px';
 
-
 						var capt8=ui.create.div(style2,'','胜负条件',this);
 						capt8.style.display='none';
 						var line8=ui.create.div(style2,this);
@@ -4334,7 +4328,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var turns=ui.create.selectlist(turnslist,'1',line8);
 						ui.create.node('span','个回合后',line8,style);
 						var turnsresult=ui.create.selectlist(results,'none',line8);
-
 
 						var washes=ui.create.selectlist(turnslist,'1',line8);
 						washes.style.marginLeft='20px';
@@ -4360,7 +4353,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							line11.style.display='none';
 							line3.style.display='none';
 							line7.style.display='block';
-
 
 							line6_t.style.display='none';
 							line6_b.style.display='none';

@@ -1847,7 +1847,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_sunce_prefix:'经典',
 			dcshuangbi:'双壁',
 			dcshuangbi_info:'出牌阶段限一次，你可以选择一项：①摸X张牌，本回合手牌上限+X；②弃置至多X张牌，随机对其他角色造成等量火焰伤害；③视为使用X张火【杀】或【火攻】。（X为场上存活角色数）',
-			
+
 			collab_olympic:'OL·伦敦奥运会',
 			collab_tongque:'OL·铜雀台',
 			collab_duanwu:'新服·端午畅玩',

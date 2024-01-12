@@ -77,7 +77,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_chenqun:['male','wei',3,['dingpin','oldfaen']],
 			old_zhuhuan:['male','wu',4,['youdi']],
 			old_zhuzhi:['male','wu',4,['anguo']],
-			
+
 			old_zhugezhan:["male","shu",3,["old_zuilun","old_fuyin"]],
 			ol_zhangrang:['male','qun',3,['xintaoluan'],['sex:male_castrated']],
 			//ol_manchong:['male','wei',3,['yuce','junxing']],
@@ -1214,7 +1214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			panfeng_prefix:'旧',
 			old_shixie:'旧士燮',
 			old_shixie_prefix:'旧',
-			
+
 			old_standard:'标准包',
 			old_shenhua:'神话再临',
 			old_refresh:'界限突破',

@@ -1631,7 +1631,7 @@ export class Get extends Uninstantable {
 				let bool = true;
 				for (let i = 0; i < obj.length; i++) {
 					if (/h|e|j|s|x/.test(obj[i]) == false) {
-						bool = false; break; 
+						bool = false; break;
 					}
 				}
 				if (bool) return 'position';
@@ -1653,17 +1653,17 @@ export class Get extends Uninstantable {
 				}
 			}
 		}
-		if (obj instanceof lib.element.Button) return 'button';
+		if (obj instanceof lib.element.Button || (obj instanceof HTMLDivElement && obj.classList.contains('button'))) return 'button';
 		if (obj instanceof lib.element.Card) return 'card';
 		if (obj instanceof lib.element.Player) return 'player';
 		if (obj instanceof lib.element.Dialog) return 'dialog';
 		if (obj instanceof lib.element.GameEvent ||
 			obj instanceof lib.element.GameEventPromise) return 'event';
-		
+
 		if (typeof obj !== 'object' || obj === null) return;
-		
+
 		if (lib.experimental.symbol.itemType in obj)
-			return obj[lib.experimental.symbol.itemType]
+			return obj[lib.experimental.symbol.itemType];
 	}
 	static equipNum(card) {
 		if (get.type(card) == 'equip') {

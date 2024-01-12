@@ -184,6 +184,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					if((!result||!result.bool||!result.result||result.result!='shaned')&&!event.unhurt){
+						if (!event.directHit&&!event.directHit2&&lib.filter.cardEnabled(new lib.element.VCard('shan'), target, 'forceEnable')&&
+							target.hasCard(()=>true,'hs')&&get.damageEffect(target,player,target)<0) target.addGaintag(target.getCards('hs'),'sha_notshan');
 						target.damage(get.nature(event.card));
 						event.result={bool:true}
 						event.trigger('shaDamage');
@@ -278,29 +280,41 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target,card,isLink){
-							var eff=function(){
-								if(!isLink&&player.hasSkill('jiu')){
-									if(!target.hasSkillTag('filterDamage',null,{
-										player:player,
-										card:card,
-										jiu:true,
-									})){
-										if(get.attitude(player,target)>0){
-											return -7;
-										}
-										else{
-											return -4;
-										}
-									}
-									return -0.5;
+							let eff=-1.5,odds=1.35,num=1;
+							if(isLink){
+								let cache=_status.event.getTempCache('sha_result','eff');
+								if(typeof cache!=='object'||cache.card!==get.translation(card)) return eff;
+								if(cache.odds<1.35&&cache.bool) return 1.35*cache.eff;
+								return cache.odds*cache.eff;
+							}
+							if(player.hasSkill('jiu')||player.hasSkillTag('damageBonus',true,{
+								target:target,
+								card:card
+							})){
+								if(target.hasSkillTag('filterDamage',null,{
+									player:player,
+									card:card,
+									jiu:true,
+								})) eff=-0.5;
+								else{
+									num=2;
+									if(get.attitude(player,target)>0) eff=-7;
+									else eff=-4;
 								}
-								return -1.5;
-							}();
-							if(!isLink&&target.mayHaveShan(player,'use')&&!player.hasSkillTag('directHit_ai',true,{
+							}
+							if(!player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:card,
-							},true)) return eff/1.2;
-							return eff;
+							},true)) odds-=0.7*target.mayHaveShan(player,'use',target.getCards(i=>{
+								return i.hasGaintag('sha_notshan');
+							}),'odds');
+							_status.event.putTempCache('sha_result','eff',{
+								bool:target.hp>num&&get.attitude(player,target)>0,
+								card:get.translation(card),
+								eff:eff,
+								odds:odds
+							});
+							return odds*eff;
 						},
 					},
 					tag:{
@@ -801,7 +815,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						if(!card) card=event.dialog.buttons[0].link;
 					}
-
 					var button;
 					for(var i=0;i<dialog.buttons.length;i++){
 						if(dialog.buttons[i].link==card){
@@ -1464,7 +1477,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							const hs=position.includes('h')?target.getGainableCards(player,'h'):[];
 							const es=position.includes('e')?target.getGainableCards(player,'e'):[];
 							const js=position.includes('j')?target.getGainableCards(player,'j'):[];
-							
 							if(get.attitude(player,target)<=0){
 								if(hs.length>0) return -1.5;
 								return (es.some(card=>{
@@ -1487,7 +1499,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							const hs=position.includes('h')?target.getGainableCards(player,'h'):[];
 							const es=position.includes('e')?target.getGainableCards(player,'e'):[];
 							const js=position.includes('j')?target.getGainableCards(player,'j'):[];
-							
 							const att=get.attitude(player,target);
 							if(att<0){
 								if(!hs.length&&!es.some(card=>{
@@ -2751,7 +2762,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							prompt+=('即将'+(state>0?'生':'失')+'效。');
 						}
 						prompt+='是否使用【无懈可击】？';
-
 						if(player.isUnderControl(true)&&!_status.auto&&!ui.tempnowuxie&&map.tempnowuxie){
 							var translation=get.translation(map.card.name);
 							if(translation.length>=4){
@@ -3265,7 +3275,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					};
-
 					var withme=false;
 					var withol=false;
 					var list=event.list;
@@ -3482,6 +3491,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			shandian_info:'出牌阶段，对自己使用。若判定结果为黑桃2~9，则目标角色受到3点雷电伤害。若判定不为黑桃2~9，将之移动到下家的判定区里。',
 			icesha_skill:'冰冻',
 			icesha_skill_info:'防止即将造成的伤害，改为依次弃置其两张牌。',
+			sha_notshan:'invisible',
 			qinggang2:'破防',
 		},
 		list:[

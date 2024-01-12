@@ -33,7 +33,7 @@ export async function boot() {
 	// 设定游戏加载时间，超过时间未加载就提醒
 	const configLoadTime = localStorage.getItem(lib.configprefix + 'loadtime');
 	// 现在不暴露到全局变量里了，直接传给onload
-	const resetGameTimeout = setTimeout(lib.init.reset, configLoadTime ? parseInt(configLoadTime) : 10000)
+	const resetGameTimeout = setTimeout(lib.init.reset, configLoadTime ? parseInt(configLoadTime) : 10000);
 
 	if (Reflect.has(window, 'cordovaLoadTimeout')) {
 		clearTimeout(Reflect.get(window, 'cordovaLoadTimeout'));
@@ -86,9 +86,9 @@ export async function boot() {
 	const waitDomLoad = new Promise((resolve) => {
 		if (document.readyState !== 'complete') {
 			window.onload = resolve;
-		} else resolve(void 0)
+		} else resolve(void 0);
 	}).then(onWindowReady.bind(window));
-	
+
 
 	// 闭源客户端检测并提醒
 	if (lib.assetURL.includes('com.widget.noname.qingyao') || lib.assetURL.includes('online.nonamekill.android')) {
@@ -141,7 +141,7 @@ export async function boot() {
 	// 读取模式
 	if (config2.mode) config.set('mode', config2.mode);
 	if (config.get('mode_config')[config.get('mode')] === undefined)
-		 config.get('mode_config')[config.get('mode')] = {};
+		config.get('mode_config')[config.get('mode')] = {};
 
 	// 复制共有模式设置
 	for (const name in config.get('mode_config').global) {
@@ -445,16 +445,17 @@ export async function boot() {
 	config.set('duration', 500);
 
 	if (!config.get('touchscreen')) {
-		document.addEventListener('mousewheel', ui.click.windowmousewheel, { passive: true, capture: false });
-		document.addEventListener('mousemove', ui.click.windowmousemove, false);
-		document.addEventListener('mousedown', ui.click.windowmousedown, false);
-		document.addEventListener('mouseup', ui.click.windowmouseup, false);
-		document.addEventListener('contextmenu', ui.click.right, false);
-	} else {
-		document.addEventListener('touchstart', ui.click.touchconfirm, false);
-		document.addEventListener('touchstart', ui.click.windowtouchstart, false);
-		document.addEventListener('touchend', ui.click.windowtouchend, false);
-		document.addEventListener('touchmove', ui.click.windowtouchmove, false);
+		document.addEventListener('mousewheel', ui.click.windowmousewheel, { passive: true });
+		document.addEventListener('mousemove', ui.click.windowmousemove);
+		document.addEventListener('mousedown', ui.click.windowmousedown);
+		document.addEventListener('mouseup', ui.click.windowmouseup);
+		document.addEventListener('contextmenu', ui.click.right);
+	}
+	else {
+		document.addEventListener('touchstart', ui.click.touchconfirm);
+		document.addEventListener('touchstart', ui.click.windowtouchstart);
+		document.addEventListener('touchend', ui.click.windowtouchend);
+		document.addEventListener('touchmove', ui.click.windowtouchmove);
 	}
 
 	const stylesLoaded = await Promise.all(stylesLoading);
@@ -696,9 +697,9 @@ async function onWindowReady() {
 			document.addEventListener('deviceready', async () => {
 				const { cordovaReady } = await import('./cordova.js');
 				await cordovaReady();
-				resolve(void 0)
+				resolve(void 0);
 			});
-		})
+		});
 	}
 	/*
 	if (_status.packLoaded) {
@@ -751,10 +752,30 @@ function setServerIndex() {
 }
 
 function setWindowListener() {
-	// 但愿有用
-	window.addEventListener("unhandledrejection", (error) => {
-		// 希望error.reason能是个正常的error
-		throw error.reason;
+	/**
+	 * @type { [Error, NodeJS.CallSite[]][] }
+	 */
+	const errorList = [];
+	// 这他娘的能捕获浏览器控制台里的输入值，尽量别用
+	// 在火狐里无效
+	Error.prepareStackTrace = function (e, stackTraces) {
+		errorList.push([e, stackTraces]);
+	};
+	// 已经有用了
+	window.addEventListener("unhandledrejection", promiseRejectionEvent => {
+		promiseRejectionEvent.promise.catch(e => {
+			const result = errorList.find(v => v[0] === e);
+			if (result) {
+				// @ts-ignore
+				window.onerror(
+					result[0].message,
+					result[1][0].getScriptNameOrSourceURL() || void 0,
+					result[1][0].getLineNumber() || void 0,
+					result[1][0].getColumnNumber() || void 0,
+					result[0]
+				);
+			}
+		});
 	});
 
 	window.onkeydown = function (e) {
@@ -782,7 +803,6 @@ function setWindowListener() {
 			}
 			else if (e.keyCode == 83 && (e.ctrlKey || e.metaKey)) {
 				if (Reflect.has(window, 'saveNonameInput')) {
-					// @ts-ignore
 					Reflect.get(window, 'saveNonameInput')();
 				}
 				e.preventDefault();
@@ -857,6 +877,7 @@ function setWindowListener() {
 	};
 
 	window.onerror = function (msg, src, line, column, err) {
+		errorList.length = 0;
 		const winPath = window.__dirname ? ('file:///' + (__dirname.replace(new RegExp('\\\\', 'g'), '/') + '/')) : '';
 		let str = `错误文件: ${typeof src == 'string' ? decodeURI(src).replace(lib.assetURL, '').replace(winPath, '') : '未知文件'}`;
 		str += `\n错误信息: ${msg}`;

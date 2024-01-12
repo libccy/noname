@@ -190,7 +190,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 			event.playerx=player;
 			event.trigger('gameStart');
-
 			"step 3"
 			game.gameDraw(event.playerx);
 			game.broadcastAll(function(player){
@@ -520,7 +519,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_lvfan:['male','wu',3,['xindiaodu','gzdiancai']],
 				gz_masu:['male','shu',3,['gzsanyao','gzzhiman'],['gzskin']],
 				gz_shamoke:['male','shu',4,['gzjili'],['gzskin']],
-				
+
 				gz_lingcao:['male','wu',4,['dujin']],
 				gz_lifeng:['male','shu',3,['tunchu','shuliang']],
 				gz_beimihu:["female","qun",3,["hmkguishu","hmkyuanyu"]],
@@ -537,7 +536,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_re_xunchen:['male','qun',3,['gzfenglve','gzanyong']],
 				gz_lvlingqi:['female','qun',4,['guowu','gzshenwei','gzzhuangrong'],['gzskin']],
 				gz_dc_yanghu:['male','wei',3,['gzdeshao','gzmingfa']],
-				
+
 				gz_cuimao:['male','wei',3,['gzzhengbi','gzfengying'],[]],
 				gz_yujin:['male','wei',4,['gzjieyue'],['gzskin']],
 				gz_wangping:['male','shu',4,['jianglue'],['gzskin']],
@@ -547,7 +546,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_yuanshu:['male','qun',4,['gzweidi','gzyongsi'],['gzskin']],
 				gz_zhangxiu:['male','qun',4,['gzfudi','gzcongjian'],['gzskin']],
 				gz_jun_caocao:['male','wei',4,['jianan','huibian','gzzongyu','wuziliangjiangdao'],[]],
-				
+
 				gz_jin_zhangchunhua:['female','jin',3,['gzhuishi','gzqingleng']],
 				gz_jin_simayi:['male','jin',3,['gzquanbian','smyyingshi','gzxiongzhi']],
 				gz_jin_wangyuanji:['female','jin',3,['yanxi']],
@@ -577,14 +576,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_tw_liufuren:['female','qun',3,['gzzhuidu','gzshigong'],[]],
 				gz_old_huaxiong:['male','qun',4,['gzyaowu','gzshiyong'],[]],
 				gz_tw_xiahoushang:['male','wei',4,['gztanfeng'],[]],
-				
+
 				gz_xf_huangquan:['male','wei',3,['gzdianhu','gzjianji'],['doublegroup:wei:shu']],
 				gz_guohuai:['male','wei',4,['gzduanshi','gzjingce'],['gzskin']],
 				gz_guanqiujian:['male','wei',4,['gzzhengrong','gzhongju'],[]],
 				gz_zhujun:['male','qun',4,['gzgongjian','gzkuimang'],[]],
 				gz_chengong:['male','qun',3,['gzyinpan','gzxingmou'],['doublegroup:wei:qun','gzskin']],
 				gz_re_xugong:['male','wu',3,['gzbiaozhao','gzyechou'],['doublegroup:wu:qun']],
-				
+
 				gz_yangwan:['female','shu',3,['gzyouyan','gzzhuihuan'],['gzskin']],
 
 				gz_key_ushio:['female','key',3,['ushio_huanxin','ushio_xilv'],['doublegroup:key:wei:shu:wu:qun:jin']],
@@ -1562,7 +1561,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player:event.source,
 						card:event.card,
 					})&&get.damageEffect(event.player,event.source,player,_status.event.player)>0;
-				},	
+				},
 				content:function(){
 					trigger.num++;
 				},
@@ -7066,7 +7065,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						dialog.content.appendChild(table2);
 						dialog.add('　　');
 						event.dialog.open();
-						
+
 						event.switchToAuto=function(){
 							event._result={
 								bool:true,
@@ -8368,7 +8367,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				intro:{content:function(){return get.translation('wuziliangjiangdao_info')}},
 			},
-					
+
 			gzzhengbi:{
 				audio:'zhengbi',
 				trigger:{player:'phaseUseBegin'},
@@ -8554,7 +8553,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			
+
 			junling4_eff:{
 				mod:{
 					cardEnabled2:function(card){
@@ -8587,7 +8586,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-			
+
 			gzjieyue:{
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter:function(event,player){
@@ -8658,7 +8657,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				audio:['jieyue',2],
 			},
-			
+
 			jianglue:{
 				limited:true,
 				audio:2,
@@ -9021,7 +9020,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-					
+
 			gzjushou:{
 				audio:"xinjushou",
 				trigger:{
@@ -10070,7 +10069,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:"target",
 				content:function(){
-					"step 0" 
+					"step 0"
 					var target=trigger.target;
 					var controls=[];
 					if(get.zhu(player,'shouyue')){
@@ -10324,7 +10323,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var color=get.groupnature(player.group,"raw");
 					if(player.isUnseen()) color='fire';
-					player.$fullscreenpop('鏖战模式',color); 
+					player.$fullscreenpop('鏖战模式',color);
 					game.broadcastAll(function(){
 					_status._aozhan=true;
 					ui.aozhan=ui.create.div('.touchinfo.left',ui.window);
@@ -12599,7 +12598,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
-
 				}
 			},
 			gzqianxi:{
@@ -14379,7 +14377,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzluoyi_info:'摸牌阶段结束时，你可弃置一张牌，然后你于本回合内造成渠道为【杀】或【决斗】的伤害+1。',
 			gzqiangxi:'强袭',
 			gzqiangxi_info:'出牌阶段限一次，你可以弃置一张武器牌或失去1点体力，然后对一名其他角色造成1点伤害。',
-			
+
 			gz_sp_duyu:'杜预',
 			gzpozhen:'破阵',
 			gzpozhen_info:'限定技，其他角色的回合开始时，你可以令其本回合不可使用、打出或重铸手牌；若其处于队列或围攻关系中，你可依次弃置此队列或参与围攻关系的其他角色的一张牌。',
@@ -14582,7 +14580,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			huibian_info:'出牌阶段限一次，你可以选择一名魏势力角色和另一名已受伤的魏势力角色。若如此做，你对前者造成1点伤害，然后其摸两张牌，然后后者回复1点体力。',
 			gzzongyu:'总御',
 			gzzongyu_info:'当【六龙骖驾】进入其他角色的装备区后，你可以将你装备区内所有坐骑牌（至少一张）与【六龙骖驾】交换位置。锁定技，当你使用坐骑牌后，若场上或弃牌堆中有【六龙骖驾】，则将【六龙骖驾】置入你的装备区。',
-			
+
 			yigui:"役鬼",
 			"yigui_info":"当你首次明置此武将牌时，你将剩余武将牌堆的两张牌置于武将牌上，称为“魂”；你可以展示一张武将牌上的“魂”并将其置入剩余武将牌堆，视为使用一张本回合内未以此法使用过的基本牌或普通锦囊牌。（此牌须指定目标，且目标须为未确定势力的角色或野心家或与此“魂”势力相同的角色）",
 			"yigui_init":"役鬼",
@@ -14595,7 +14593,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			yigui_gzwuxie:'役鬼',
 			jihun:"汲魂",
 			jihun_info:"当你受到伤害后，或与你势力不同的角色脱离濒死状态后，你可以将剩余武将牌堆的一张牌置于武将牌上，称为“魂”。",
-			
+
 			_guozhan_marks:'标记',
 			_guozhan_marks_backup:'标记',
 			xianqu_mark:"先驱",
@@ -14604,7 +14602,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			_zhulianbihe_mark_tao:"珠联",
 			_yinyang_mark_add:"阴阳鱼",
 			yinyang_add:"阴阳鱼",
-			
+
 			gzjushou:"据守",
 			gzjushou_info:"结束阶段，你可以摸X张牌（X为亮明势力数），然后弃置一张手牌。若以此法弃置的牌为装备牌，则改为使用此牌。若X大于2，则你将武将牌叠置。",
 			"new_duanliang":"断粮",
@@ -14686,7 +14684,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gzsanyao_info:'出牌阶段限一次。你可以弃置一张牌，对一名手牌数或体力值大于你的角色造成1点伤害。',
 			gzzhiman:'制蛮',
 			gzzhiman_info:'当你对其他角色造成伤害时，你可以防止此伤害。若如此做，你获得其装备区或判定区里的一张牌。然后若该角色与你势力相同，该角色可以变更副将。',
-			
+
 			gzdiancai:'典财',
 			gzdiancai_info:'其他角色的出牌阶段结束时，若你于此阶段失去了x张或更多的牌，则你可以将手牌摸至体力上限。若如此做，你可以变更副将（x为你的体力值）。',
 			xuanlve:'旋略',
@@ -15363,7 +15361,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 			['diamond',6,'dinglanyemingzhu'],
 			['heart',13,'liulongcanjia'],
-			
+
 			//['spade',12,'gz_haolingtianxia'],
 			//['diamond',1,'gz_kefuzhongyuan'],
 			//['heart',1,'gz_guguoanbang'],

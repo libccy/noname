@@ -3481,7 +3481,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.delay();
 				}
 			},
-
 			nvwashi:{
 				trigger:{global:'dying'},
 				priority:6,

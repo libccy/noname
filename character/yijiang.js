@@ -107,9 +107,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jikang:['male','wei',3,['qingxian','juexiang']],
 			qinmi:['male','shu',3,['jianzheng','zhuandui','tianbian']],
 			xuezong:['male','wu',3,['funan','xinjiexun']],
-			
+
 			old_huaxiong:['male','qun',6,['shiyong']],
-			
+
 			yujin:["male","wei",4,["rezhenjun"],[]],
 		},
 		characterIntro:{
@@ -1103,46 +1103,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
-				getEffect:function(player,target,event){
-					var att=get.attitude(player,target);
-					if(att==0) return 0;
-					var list1=[],list2=[];
-					var used=[];
-					player.getHistory('useCard',function(evt){
-						used.add(evt.card.name);
-					});
-					event.used=used;
-					for(var name of lib.inpile){
-						var add=false,type=get.type(name);
-						if(name=='sha') add=true;
-						else if(type=='trick'){
-							var info=lib.card[name];
-							if(info&&!info.singleCard&&!info.notarget) add=true;
-						}
-						if(!add) continue;
-						if(used.includes(name)) list1.push(name);
-						else list2.push(name);
-					}
-					var getv=function(name,player,arg){
-						return player.getUseValue({name:name},arg);
-					}
+				getEffect:function(player,target,event,list1,list2){
+					let att=get.attitude(player,target);
+					if(att===0) return 0;
+					let getv=function(name,player,arg){
+						let v=event.getTempCache('sangu',player.id+name);
+						if(typeof v==='number') return v;
+						v=player.getUseValue({name:name,storage:{sangu:true}},arg);
+						event.putTempCache('sangu',player.id+name,v);
+						return v;
+					};
 					if(att<0){
-						for(var i of list1){
-							if(getv(i,target)<=0||target.getUseValue({name:i,storage:{sangu:true}})<=0) return -att*Math.sqrt(get.threaten(target))*2;
+						for(let i of list1){
+							if(getv(i,target)<=0||getv(i,target)<=0) return -att*Math.sqrt(get.threaten(target))*2;
 						}
 						return 0;
 					}
 					else{
-						var list=list1;
-						if(player.hp>1) list=list.concat(list2);
+						let list=list1.concat(player.hp>1?list2:[]),eff=0;
 						list.sort(function(a,b){
 							return getv(b,target)-getv(a,target);
 						});
 						list=list.slice(3);
-						var eff=0,base=5;
-						for(var i of list){
-							var res=getv(i,target);
-							if(res<=base) break;
+						for(let i of list){
+							let res=getv(i,target);
+							if(res<=5) break;
 							else eff+=res;
 						}
 						return Math.sqrt(eff/1.5)*att;
@@ -1150,9 +1135,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					'step 0'
-					player.chooseTarget(get.prompt2('sangu'),lib.filter.notMe).set('ai',function(target){
-						return lib.skill.sangu.getEffect(_status.event.player,target,_status.event.getTrigger());
+					event.list1=[];
+					event.list2=[];
+					event.used=[];
+					player.getHistory('useCard',function(evt){
+						event.used.add(evt.card.name);
 					});
+					for(let name of lib.inpile){
+						let add=false,type=get.type(name);
+						if(name==='sha') add=true;
+						else if(type==='trick'){
+							let info=lib.card[name];
+							if(info&&!info.singleCard&&!info.notarget) add=true;
+						}
+						if(!add) continue;
+						if(event.used.includes(name)) event.list1.push(name);
+						else event.list2.push(name);
+					}
+					if(!event.list1.length&&!event.list2.length) event.finish();
+					else player.chooseTarget(get.prompt2('sangu'),lib.filter.notMe).set('ai',function(target){
+						return lib.skill.sangu.getEffect(_status.event.player,target,_status.event.getTrigger(),_status.event.list1,_status.event.list2);
+					}).set('list1',event.list1).set('list2',event.list2);
 					'step 1'
 					if(result.bool){
 						var target=result.targets[0];
@@ -1161,51 +1164,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					var list1=[],list2=[];
-					var used=[];
-					player.getHistory('useCard',function(evt){
-						used.add(evt.card.name);
-					});
-					event.used=used;
-					for(var name of lib.inpile){
-						var add=false,type=get.type(name);
-						if(name=='sha') add=true;
-						else if(type=='trick'){
-							var info=lib.card[name];
-							if(info&&!info.singleCard&&!info.notarget) add=true;
-						}
-						if(!add) continue;
-						if(used.includes(name)) list1.push([type,'',name]);
-						else list2.push([type,'',name]);
+					var dialog=['为'+get.translation(target)+'选择至多三个牌名'];
+					if(event.list1.length){
+						dialog.push('<div class="text center">本回合已使用过的牌</div>');
+						dialog.push([event.list1.map(i=>[get.type(i),'',i]),'vcard']);
 					}
-					if(!list1.length&&!list2.length) event.finish();
-					else{
-						var dialog=['为'+get.translation(target)+'选择至多三个牌名'];
-						if(list1.length){
-							dialog.push('<div class="text center">本回合已使用过的牌</div>');
-							dialog.push([list1,'vcard']);
-						}
-						if(list2.length){
-							dialog.push('<div class="text center">本回合未使用过的牌</div>');
-							dialog.push([list2,'vcard']);
-						}
-						player.chooseButton(dialog,true,[1,3]).set('ai',function(button){
-							var card={name:button.link[2],storage:{sangu:true}},list=_status.event.list;
-							var player=_status.event.player,target=_status.event.getParent().target;
-							if(get.attitude(player,target)<0){
-								if(!list.includes(card.name)) return 0;
-								return -target.getUseValue(card);
-							}
-							else{
-								if(player.hp<2&&!list.includes(card.name)) return 0;
-								var val=target.getUseValue(card),base=5;
-								val=Math.min(15,val-base);
-								if(card.name=='wuzhong'||card.name=='dongzhuxianji') val+=15;
-								else if(card.name=='shunshou') val+=6;
-								return val;
-							}
-						}).set('list',list1.map((i)=>i[2]));
+					if(event.list2.length){
+						dialog.push('<div class="text center">本回合未使用过的牌</div>');
+						dialog.push([event.list2.map(i=>[get.type(i),'',i]),'vcard']);
 					}
+					player.chooseButton(dialog,true,[1,3]).set('ai',function(button){
+						let name=button.link[2],
+							list=_status.event.list,
+							player=_status.event.player,
+							target=_status.event.getParent().target,
+							trigger=_status.event.getTrigger(),
+							getv=(name,player)=>{
+								let v=trigger.getTempCache('sangu',player.id+name);
+								if(typeof v==='number') return v;
+								v=player.getUseValue({name:name,storage:{sangu:true}},arg);
+								trigger.putTempCache('sangu',player.id+name,v);
+								return v;
+							};
+						if(get.attitude(player,target)<0){
+							if(!list.includes(name)) return 0;
+							return -getv(name,target);
+						}
+						else{
+							if(player.hp<2&&!list.includes(name)) return 0;
+							let val=getv(name,target),base=5;
+							val=Math.min(15,val-base);
+							if(name==='wuzhong'||name==='dongzhuxianji') val+=15;
+							else if(name==='shunshou') val+=6;
+							return val;
+						}
+					}).set('list',event.list1);
 					'step 3'
 					if(result.bool){
 						var names=result.links.map((i)=>i[2]);
@@ -3163,7 +3156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt2('zhenjun'),function(card,player,target){
-						return target.countCards('h')>target.hp; 
+						return target.countCards('h')>target.hp;
 					}).set('ai',function(target){
 						return -get.attitude(_status.event.player,target)*(target.countCards('e')+1);
 					});
@@ -14618,7 +14611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			feiyao:'费曜',
 			zhenfeng:'镇锋',
 			zhenfeng_info:'每回合限一次。当其他角色于其回合内使用牌时，若其手牌数不大于其体力值，你可以猜测其手牌中与此牌类别相同的牌数。若你猜对，你摸X张牌并视为对其使用一张【杀】（X为你连续猜对的次数且至多为5）；若你猜错且差值大于1，其视为对你使用一张【杀】。',
-			
+
 			yijiang_2011:'一将成名2011',
 			yijiang_2012:'一将成名2012',
 			yijiang_2013:'一将成名2013',

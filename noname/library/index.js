@@ -7,6 +7,7 @@
  * @typedef { InstanceType<typeof lib.element.GameEvent> } GameEvent
  * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> & typeof Promise<typeof lib.element.GameEvent> } GameEventPromise
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
+ * @typedef { InstanceType<typeof lib.element.Control> } Control
 */
 import { nonameInitialized, assetURL, userAgent, Uninstantable, GeneratorFunction, AsyncFunction, characterDefaultPicturePath } from "../util/index.js";
 import { AI as ai } from '../ai/index.js';
@@ -147,7 +148,7 @@ export class Library extends Uninstantable {
 					const cs = lib.linq.cselector;
 					const g1 = cs.group(
 						cs.of(
-							cs.class("player", "identity"),
+							cs.class("player ", "identity"),
 							cs.isAttr("data-color", `"${id}"`)
 						),
 						cs.of(
