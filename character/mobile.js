@@ -148,22 +148,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wangyuanji:["female","wei",3,["xinfu_qianchong","xinfu_shangjian"]],
 			pangdegong:["male","qun",3,["xinfu_pingcai","xinfu_pdgyingshi"]],
 			old_yuanshu:['male','qun',4,['xinyongsi','yjixi']],
-			
+
 			shenpei:["male","qun","2/3",["shouye","liezhi"]],
 			re_wangyun:['male','qun',3,['relianji','remoucheng'],['clan:太原王氏']],
-			
+
 			re_baosanniang:['female','shu',3,['meiyong','rexushen','rezhennan']],
-			
+
 			hujinding:['female','shu','2/6',['renshi','wuyuan','huaizi']],
-			
+
 			re_zhanggong:['male','wei',3,['reqianxin','rezhenxing']],
 			re_xugong:['male','qun',3,['rebiaozhao','yechou'],['doublegroup:wu:qun']],
 			re_weiwenzhugezhi:['male','wu',4,['refuhai']],
-			
+
 			xin_yuanshao:['male','qun',4,['reluanji','xueyi'],['zhu']],
 			re_liushan:['male','shu',3,['xiangle','refangquan','ruoyu'],['zhu']],
 			re_sunben:['male','wu',4,['jiang','rehunzi','zhiba'],['zhu']],
-			
+
 			scs_zhangrang:['male','qun','',['scstaoluan'],['unseen','sex:male_castrated']],
 			scs_zhaozhong:['male','qun','',['scschiyan'],['unseen','sex:male_castrated']],
 			scs_sunzhang:['male','qun','',['scszimou'],['unseen','sex:male_castrated']],
@@ -8046,7 +8046,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				$playFlappyBird:function(maxScore,title){
 					//Forked from: https://github.com/aaarafat/JS-Flappy-Bird
-					
+
 					const event=_status.event;
 					const dialog=ui.create.dialog('forcebutton','hidden');
 					dialog.textPrompt=dialog.add('<div class="text center">准备好了吗？</div>');
@@ -8059,7 +8059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const updateText=function(str){
 						dialog.textPrompt.innerHTML='<div class="text center">'+str+'</div>';
 					}
-					
+
 					const canvas=document.createElement('canvas');
 					dialog.appendChild(canvas);
 					canvas.style.position="absolute";
@@ -8070,7 +8070,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					canvas.width=276;
 					canvas.height=414;
 					canvas.style.border='3px solid';
-					
+
 					const RAD = Math.PI / 180;
 					const ctx=canvas.getContext('2d');
 					let frames = 0;
@@ -8333,13 +8333,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					bird.animations[1].sprite.src = lib.assetURL+"image/flappybird/bird/b1.png";
 					bird.animations[2].sprite.src = lib.assetURL+"image/flappybird/bird/b2.png";
 					bird.animations[3].sprite.src = lib.assetURL+"image/flappybird/bird/b0.png";
-					
+
 					SFX.start.src = lib.assetURL+"audio/effect/flappybird_start.wav";
 					SFX.flap.src = lib.assetURL+"audio/effect/flappybird_flap.wav";
 					SFX.score.src = lib.assetURL+"audio/effect/flappybird_score.wav";
 					SFX.hit.src = lib.assetURL+"audio/effect/flappybird_hit.wav";
 					SFX.die.src = lib.assetURL+"audio/effect/flappybird_die.wav";
-					
+
 					const gameLoop = domHighResTimeStamp => {
 						if(frames<0) return;
 						deltaTime = domHighResTimeStamp - previousDOMHighResTimeStamp;
@@ -8349,25 +8349,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						frames++;
 						window.requestAnimationFrame(gameLoop);
 					}
-					
+
 					const update = function(){
 						bird.update();
 						gnd.update();
 						pipe.update();
 						UI.update();
 					}
-					
+
 					const draw = function(){
 						ctx.fillStyle = "#30c0df";
 						ctx.fillRect(0, 0, canvas.width, canvas.height);
 						bg.draw();
 						pipe.draw();
-						
+
 						bird.draw();
 						gnd.draw();
 						UI.draw();
 					}
-					
+
 					const click = function(){
 						switch (state.curr) {
 							case state.getReady:
@@ -8391,11 +8391,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						frames=-1;
 						document.removeEventListener(lib.config.touchscreen?'touchstart':'mousedown',click);
 					}
-					
+
 					dialog.open();
 					game.pause();
 					game.countChoose();
-					
+
 					document.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',click);
 					window.requestAnimationFrame(gameLoop);
 				},
@@ -8466,13 +8466,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.dialog.classList.add('noupdate');
 						event.dialog.style.overflow='hidden';
 						event.dialog.open();
-						
+
 						var height=event.dialog.offsetHeight;
 						var width=event.dialog.offsetWidth;
 						var top=50;
 						var speed=0;
 						var start=false;
-						
+
 						var bird=ui.create.div('');
 						bird.style["background-image"]='linear-gradient(rgba(240, 235, 3, 1), rgba(230, 225, 5, 1))';
 						bird.style["border-radius"]='3px';
@@ -8497,7 +8497,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var right2=left2+10;
 								var bottom2=i.height1;
 								var top2=i.height2;
-								
+
 								if(left2>bright||right2<bleft) continue;
 								if(btop<bottom2) return true;
 								if(bdown>top2) return true;
@@ -8505,7 +8505,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return false;
 						};
-						
+
 						var fly=function(){
 							if(!start){
 								start=true;
@@ -8521,14 +8521,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									}
 									speed+=0.5;
 									if(speed>2.5) speed=2.5;
-									
+
 									if(isDead()==true){
 										event.settle();
 									}
 								},35);
 								var addPipe=function(){
 									var num=get.rand(5,55);
-									
+
 									var pipe1=ui.create.div('');
 									pipe1.style["background-image"]='linear-gradient(rgba(57, 133, 4, 1), rgba(60, 135, 6, 1))';
 									pipe1.style["border-radius"]='3px';
@@ -8541,7 +8541,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									pipe1.style.width=(width/10)+'px';
 									pipe1.style.left=(pipe1.left*width/100)+'px';
 									pipe1.style.top='0px';
-									
+
 									var pipe2=ui.create.div('');
 									pipe2.style["background-image"]='linear-gradient(rgba(57, 133, 4, 1), rgba(60, 135, 6, 1))';
 									pipe2.style["border-radius"]='3px';
@@ -8579,7 +8579,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						};
 						document.addEventListener(lib.config.touchscreen?'touchstart':'mousedown',fly);
-						
+
 						event.settle=function(){
 							clearInterval(event.fly);
 							clearInterval(event.addPipe);
@@ -8588,7 +8588,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								event.switchToAuto()
 							},1000);
 						};
-						
+
 						game.pause();
 						game.countChoose();
 					};
@@ -10625,7 +10625,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							names2.randomSort();
 							names=names.concat(names2);
 						}
-						
+
 						event.zhengjing=names;
 						for(var i of list){
 							event.map[i]=0;
@@ -10674,7 +10674,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							 event.switchToAuto();
 							},1000);
 						};
-						
+
 						var click=function(){
 							var name=this.name;
 							if(name=='du'){
@@ -10728,7 +10728,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},800);
 							else event.settle();
 						};
-						
+
 						game.pause();
 						game.countChoose();
 						addNode();
@@ -13784,7 +13784,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.classList.add('fullheight');
 						dialog.classList.add('noupdate');
 						dialog.videoId=id;
-						
+
 						var canvas2=document.createElement('canvas');
 						dialog.canvas_viewer=canvas2;
 						dialog.appendChild(canvas2);
@@ -13798,7 +13798,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						canvas2.width=249;
 						canvas2.height=249;
 						canvas2.style.border='3px solid';
-						
+
 						var ctx2=canvas2.getContext('2d');
 						var img=new Image();
 						img.src=lib.assetURL+'image/card/'+name+'.png';
@@ -13824,7 +13824,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var chooseButton=function(id,name){
 						var event=_status.event;
 						_status.xinfu_pingcai_finished=false;
-						
+
 						var dialog=ui.create.dialog('forcebutton','hidden');
 						dialog.textPrompt=dialog.add('<div class="text center">擦拭掉宝物上的灰尘吧！</div>');
 						event.switchToAuto=function(){
@@ -13842,13 +13842,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.classList.add('fullheight');
 						dialog.classList.add('noupdate');
 						dialog.videoId=id;
-						
+
 						var canvas=document.createElement('canvas');
 						var canvas2=document.createElement('canvas');
-						
+
 						dialog.appendChild(canvas2);
 						dialog.appendChild(canvas);
-						
+
 						canvas.style.position="absolute";
 						canvas.style.width='249px';
 						canvas.style.height='249px';
@@ -13858,7 +13858,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						canvas.width=249;
 						canvas.height=249;
 						canvas.style.border='3px solid';
-						
+
 						canvas2.style.position="absolute";
 						canvas2.style.width='249px';
 						canvas2.style.height='249px';
@@ -13868,19 +13868,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						canvas2.width=249;
 						canvas2.height=249;
 						canvas2.style.border='3px solid';
-						
+
 						var ctx=canvas.getContext('2d');
 						var ctx2=canvas2.getContext('2d');
-						
+
 						var img=new Image();
 						img.src=lib.assetURL+'image/card/'+name+'.png';
 						img.onload=function(){
 							ctx2.drawImage(this,0,0,this.width,this.height,0,0,canvas2.width,canvas2.height);
 						}
-						
+
 						ctx.fillStyle='lightgray';
 						ctx.fillRect(0,0,canvas.width,canvas.height);
-						
+
 						canvas.onmousedown=function(ev){
 							//if(_status.xinfu_pingcai_finished) return;
 							canvas.onmousemove=function(e){
@@ -13933,9 +13933,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						canvas.ontouchend=function(ev){
 							canvas.ontouchmove=null;
 						}
-						
+
 						dialog.open();
-						
+
 						game.pause();
 						game.countChoose();
 					};
@@ -15552,25 +15552,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relianji_info:'出牌阶段限一次，你可以选择两名其他角色。第一名角色随机使用牌堆中的一张武器牌，然后这名角色视为对另一名角色随机使用一张下列的牌名的牌：【决斗】、【火攻】、【南蛮入侵】、【万箭齐发】或普【杀】。然后若此牌造成伤害，你获得X枚“连计”标记（X为此次扣减的体力值点数）。',
 			remoucheng:'谋逞',
 			remoucheng_info:'觉醒技，当一名角色因〖连计〗造成伤害后，若你拥有的“连计”标记数大于2，你加1点体力上限，回复1点体力，失去“连计”，获得“矜功”。',
-			
+
 			shouye:'守邺',
 			shouye_info:'每回合限一次。当其他角色使用牌指定你为唯一目标时，你可以与其进行【对策】。若你赢，则你取消此牌的目标，且你于此牌结算完成后获得其对应的所有实体牌。',
 			liezhi:'烈直',
 			liezhi_info:'准备阶段，你可以依次弃置至多两名其他角色区域内的各一张牌。若你受到过伤害，则〖烈直〗于你的下个回合无效。',
-			
+
 			xinzhanyi:'战意',
 			xinzhanyi_info:'出牌阶段限一次，你可以弃置一张牌并失去1点体力，然后根据你弃置的牌获得以下效果直到回合结束：基本牌，你可以将一张基本牌当作杀、酒或桃使用，且你本回合第一次以此法使用的牌的回复值/伤害值+1；锦囊牌，摸三张牌且你使用的牌不能被【无懈可击】响应；装备牌，你使用【杀】指定唯一目标后，其弃置两张牌，然后你获得其中的一张。',
 			xinzhanyi_basic_backup:'战意',
 			xinzhanyi_basic:'战意',
 			xinzhanyi_equip:'战意',
-			
+
 			meiyong:'姝勇',
 			meiyong_info:'当你使用或打出【杀】时，你可以获得一名其他角色的一张牌，然后其摸一张牌。',
 			rexushen:'许身',
 			rexushen_info:'限定技，出牌阶段，你可以失去X点体力（X为场上男性角色的数量）。若你以此法进入了濒死状态，则当你因一名角色而脱离此濒死状态后，你可以令其获得技能〖武圣〗和〖当先〗。',
 			rezhennan:'镇南',
 			rezhennan_info:'当你成为其他角色使用的牌的目标后，若此牌的目标数大于该角色的体力值，则你可以弃置一张牌并对其造成1点伤害。',
-			
+
 			hujinding:'手杀胡金定',
 			hujinding_prefix:'手杀',
 			huaizi:'怀子',
@@ -15579,7 +15579,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			renshi_info:'锁定技，当你受到【杀】的伤害时，若你已受伤，则你防止此伤害并获得此【杀】对应的所有实体牌，然后减1点体力上限。',
 			wuyuan:'武缘',
 			wuyuan_info:'出牌阶段限一次，你可将一张【杀】交给一名其他角色，然后你回复1点体力，其摸一张牌。若此【杀】为：红色【杀】，其回复1点体力；属性【杀】，其改为摸两张牌。',
-			
+
 			re_weiwenzhugezhi:'手杀卫温诸葛直',
 			re_weiwenzhugezhi_prefix:'手杀',
 			gz_re_xugong:'许贡',
@@ -15613,7 +15613,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//伊吹 风子
 			qiaosi_c6:'<img src="'+lib.assetURL+'image/card/qiaosi_card6.png" width="60" height="60"> ',
 			//仲村 由理
-			
+
 			yangbiao:'手杀杨彪',
 			yangbiao_prefix:'手杀',
 			zhaohan:'昭汉',
@@ -15675,7 +15675,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhengjing:'整经',
 			zhengjing_info:'出牌阶段，你可以整理卡牌。然后，你将整理出的卡牌中的至少一张作为“经”置于一名角色的武将牌上，然后获得其余的牌。该角色的准备阶段获得这些牌，且跳过此回合的判定和摸牌阶段。',
 			zhengjing2:'整经',
-			
+
 			mobile_yijiang:'将星独具',
 			yj_zhanghe:'☆张郃',
 			yj_zhanghe_prefix:'☆',
@@ -16247,7 +16247,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbyilie2:'义烈',
 			mbyilie3:'义烈',
 			mbyilie_info:'锁定技。①游戏开始时，你选择一名其他角色，然后你获得以下效果：其受到伤害时，若你的“烈”标记数小于2，则你获得等同于伤害值的“烈”标记，然后防止此伤害；其对其他角色造成伤害后，你回复1点体力。②结束阶段，若你有“烈”标记，你摸X张牌并失去X点体力，然后移去所有“烈”标记（X为你拥有的“烈”标记数）。',
-			
+
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',
 			mobile_shenhua_huo:'手杀异构·侵掠如火',

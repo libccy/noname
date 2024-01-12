@@ -7812,7 +7812,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.content.appendChild(table);
 						dialog.add('　　');
 						dialog.open();
-						
+
 						event.switchToAuto=function(){
 							event.dialog.close();
 							event.control.close();
@@ -14021,7 +14021,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclingxi_info:'出牌阶段开始和结束时，你可以将至多X张牌称为“翼”置于你的武将牌上（X为你的体力上限）。当你失去武将牌上的“翼”时，你将手牌数调整至Y张（Y为你武将牌上的“翼”所含有的花色数的两倍）。',
 			dczhifou:'知否',
 			dczhifou_info:'当你使用牌结算完毕后，你可以移去至少X张武将牌上的“翼”（X为本回合此前发动此技能的次数+1），然后选择一名角色并选择一项令其执行（每个选项每回合限选择一次）：①将一张牌称为“翼”置于你的武将牌上；②弃置两张牌；③失去1点体力。',
-			
+
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
 			sp2_shengun:'奇人异士',

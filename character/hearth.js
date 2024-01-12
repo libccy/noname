@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_anduin:['male','qun',3,['shengguang','shijie','anying']],
 			hs_sthrall:['male','wu',4,['tuteng','guozai','zuling']],
 			hs_waleera:['female','shu',3,['jianren','mengun','wlianji']],
-			
+
 			hs_medivh:['male','wei',3,['jingxiang','zuzhou','mdzhoufu']],
 			hs_alleria:['female','wu',3,['fengxing','xinliegong']],
 			hs_magni:['male','shu',4,['zhongjia','dunji']],
@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_morgl:['male','wu',3,['s_tuteng']],
 			hs_khadgar:['male','shu',3,['midian','fuwen','jinzhou']],
 			hs_tyrande:['female','wei',3,['yuelu','xingluo']],
-			
+
 			hs_neptulon:['male','wu',4,['liechao','qingliu']],
 			hs_wvelen:['male','qun',3,['shengyan','xianzhi']],
 			hs_antonidas:['male','wei',3,['yanshu','bingshuang']],
@@ -53,7 +53,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_xialikeer:['female','shu',3,['duxin']],
 			hs_pyros:['female','shu',2,['pyuhuo']],
 			hs_kalimosi:['male','wu',4,['kqizhou']],
-			
+
 			hs_zhishigushu:['male','shu',4,['jiaohui']],
 			hs_zhanzhenggushu:['male','wei',6,['biri']],
 			hs_ronghejuren:['male','shu',8,['ronghuo']],
@@ -75,7 +75,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_lafamu:['male','shu',4,['xieneng']],
 			hs_yelise:['female','wei',3,['xunbao','zhuizong']],
 			hs_jiawodun:['male','wu',4,['jinhua']],
-			
+
 			hs_fandral:['male','shu',4,['nuyan','chouhuo']],
 			hs_hallazeal:['male','wei',4,['shengteng','yuansu']],
 			hs_enzoth:['male','qun',4,['mengye']],
@@ -83,7 +83,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_pengpeng:['male','qun',4,['yindan']],
 			hs_yashaji:['male','qun',4,['ysjqisha']],
 			// hs_wolazi:['male','wei',3,[]],
-			
+
 			hs_tanghangu:['male','shu',5,['zhongji']],
 			hs_aya:['female','wu',3,['ayuling','qingzun']],
 			hs_barnes:['male','shu',4,['hsnitai']],
@@ -99,42 +99,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_shizugui:['male','wu',3,['szbianshen']],
 			hs_hemite:['male','wu',6,['zhuilie']],
 			hs_laila:['male','wu',3,['lieyang']],
-			
+
 			hs_selajin:['male','shu',3,['qianfu','shimo']],
 			hs_bannabusi:['male','wu',14,['qingtian']],
 			hs_amala:['female','wu',3,['azaowu','shouwang']],
 			hs_yinggencao:['male','wu',3,['lieqi']],
-			
+
 			hs_zhihuanhua:['female','wei',3,['huanjue']],
 			hs_shirencao:['male','wu',3,['srjici']],
 			hs_kaituozhe:['female','wu',3,['tansuo','yinzong']],
-			
+
 			hs_fachaotuteng:['male','wei',3,['xiyong']],
 			hs_huolituteng:['male','wei',3,['hllingxi']],
 			hs_manyututeng:['male','wu',3,['zhaochao']],
 			hs_tgolem:['male','wu',4,['xinwuyan','guozaix']],
-			
+
 			hs_heifengqishi:['male','qun',4,['hstianqi']],
 			// hs_yuhuozhe:['male','qun',4,['hstianqi']],
 			// hs_wuyaowang:['male','qun',4,['hstianqi']],
 			// hs_aerfusi:['male','qun',4,['hstianqi']],
 			// hs_baiguyoulong:['male','qun',4,['hstianqi']],
 			hs_yangyanwageli:['female','qun',3,['hspuzhao','hsyanxin']],
-			
+
 			hs_aiqinvyao:['female','qun',4,['nsaiqi','nsbeiming']],
-			
+
 			hs_yelinlonghou:['female','qun',4,['ylyuchu']],
 			hs_yelinchulong:["male","qun",1,[],['unseen']],
 			hs_ashamoer:['female','wei',3,['asyouzhang']],
 			hs_fengjianhuanfengzhe:['male','wei',3,['tuteng','huanfeng']],
 			hs_taisi:['female','wei',3,['hsxingyi','hshuanling']],
 			// hs_bingshuangnvwang:['female','wei',3,['hsshuangshi','hs']]
-			
+
 			hs_hajiasha:['female','wu',3,['zhoujiang','muyin']],
 			hs_tuoqi:['female','shu',3,['tqchuanyue']],
 			hs_siwangxianzhi:['male','wei',3,['hualing','yibian']],
 			hs_xukongzhiying:['female','qun',3,['wxuying']],
-			
+
 			hs_duyaxinshi:['male','wei',3,['hshuanyu']],
 		},
 		characterIntro:{
@@ -154,7 +154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_morgl:'一名鳄鱼人大地之环先知。鳄鱼人自上古时代就生活于索拉查盆地，可以说是最原始的鱼人种族，他们是索拉查盆地－这个泰坦生态实验场的第一批居民之一，虽然他们的相貌的确不敢恭维，但他们却默默的守护着这片区域，守护着泰坦创世时所留下的科技成果。 然而，他们的智力仍保持于原始崇拜的地步，他们基本不在意这些泰坦科技的重要性。',
 			hs_khadgar:'大法师卡德加曾是守护者麦迪文手下的年轻学徒，亲身经历了前两次战争。当他发现麦迪文的计划，了解到麦迪文企图打开德拉诺传送门将受恶魔控制的兽人大军释放到艾泽拉斯之后，卡德加协助打败了他的导师。在战斗中，卡德加中了一个可怕的法术，整个人急剧地衰老。虽然身体变得年迈脆弱，但他的心智依然清醒敏锐。现在卡德加致力于联合艾泽拉斯的所有力量来对抗燃烧军团的入侵，而且要一劳永逸地解决古尔丹。',
 			hs_tyrande:'作为月光之下最出色的猎手，女神艾露恩的选民，泰兰德已经领导暗夜精灵奋战了数个世纪。泰兰德出生于数千年前，与玛法里奥·怒风和伊利丹·怒风一共长大。她响应了暗夜精灵的月亮女神的追随者们，艾露恩姐妹会的召唤，成为一名新手女祭司。而怒风兄弟则走上了另一条道路。但当燃烧军团降临艾泽拉斯，他们的命运又再次发生了交集。',
-			
+
 			hs_neptulon:'耐普图隆被称为"猎潮者"。他是四大元素领主之一。他和拉格纳罗斯能够联手为你提供最好的桑拿服务。',
 			hs_wvelen:'他被逐出他的家园。他兄弟们都变成了邪恶的主宰......但是除此之外，他好像也没有什么别的可以抱怨的了。',
 			hs_antonidas:'肯瑞托的首席法师，达拉然最伟大的子民，安东尼达斯在被巫妖王阿尔萨斯杀死之前，曾是吉安娜的导师。. 预言者警告他必须迁移到西方去, 但安东尼达斯没有注意。最终导致了自己和达拉然的毁灭。',
@@ -7643,7 +7643,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(trigger.card) str=get.translation(trigger.card.viewAs||trigger.card.name);
 					else if(trigger.skill) str=get.translation(trigger.skill);
 					else str=get.translation(trigger.parent.name);
-					
+
 					var cards=[ui.cardPile.childNodes[0],ui.cardPile.childNodes[1]];
 					var att=get.attitude(player,trigger.player);
 					var delta=trigger.judge(ui.cardPile.childNodes[1])-trigger.judge(ui.cardPile.childNodes[0]);
@@ -9526,7 +9526,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_waleera:'瓦莉拉',
 			hs_liadrin:'莉亚德琳',
 			hs_morgl:'摩戈尔',
-			
+
 			hs_neptulon:'耐普图隆',
 			hs_wvelen:'维纶',
 			hs_antonidas:'安东尼达斯',
@@ -9587,7 +9587,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_barnes:'巴内斯',
 			hs_kchromaggus:'克洛玛古斯',
 			hs_kaituozhe:'开拓者',
-			
+
 			hs_yelinlonghou:'夜鳞龙后',
 			hs_yelinchulong:'雏龙',
 			hs_ronghejuren:'熔核巨人',
@@ -9633,7 +9633,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_siwangxianzhi:'死亡先知',
 			hs_xukongzhiying:'虚空之影',
 			hs_duyaxinshi:'渡鸦信使',
-			
+
 			hshuanyu:'幻羽',
 			hshuanyu_info:'每当你受到一次伤害，你获得发现一张炉石衍生牌。',
 			hsfashu:'法术',
@@ -9659,7 +9659,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// hsyingzong_info:'',
 			hsxingyi:'星移',
 			hsxingyi_info:'锁定技，每当一名敌方角色于回合内使用主动技能，你获得此技能直到下一回合结束。',
-			
+
 			hshuanling:'幻灵',
 			hshuanling_bg:'灵',
 			hshuanling_info:'结束阶段，你可以弃置至多X张牌（X为你装备区内的牌数且至少为1）并摸等量的牌，每弃置一张牌，你随机使用一张本局敌方角色使用过的单目标非转化普通锦囊牌，随机指定一个具有正收益的角色为目标。',
@@ -9917,7 +9917,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hsbaowu_cangbaotu_info:'结束阶段，将一张黄金猿猴置入你的手牌；摸一张牌。',
 			hsyaoshui:'药水',
 			hsqingyu:'青玉',
-			
+
 			lianzhan:'连斩',
 			lianzhan_info:'每当你造成一次伤害，若此伤害是你本回合第一次造成伤害，你摸两张牌；否则你增加1点体力上限并回复1点体力。',
 			shifa:'魔瘾',
@@ -10075,7 +10075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liechao_info_alter:'出牌阶阶段限一次，若你的武将牌正面朝上且手牌数不大于当前体力值，你可以翻面并摸三张牌，若如此做，你跳过本回合的弃牌阶段。',
 			aoshu:'奥术',
 			aoshu_info:'出牌阶段限一次，你可以将一张黑桃牌当作无中生有使用。',
-			
+
 			qianhou:'千喉',
 			qianhou_info:'锁定技，准备阶段，你视为使用一张随机普通锦囊牌（随机指定目标）；若目标只有1人且不是你，你可以弃置一张手牌并获得此锦囊。',
 			fengxing:'风行',

@@ -2935,7 +2935,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					};
-					
+
 					var withme=false;
 					var withol=false;
 					var list=event.list;
@@ -3064,7 +3064,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							str+='对'+get.translation(targets||target);
 						}
 						str+='将'+(state>0?'生效':'失效')+'，是否无懈？';
-						
+
 						if(player.isUnderControl(true)&&!_status.auto&&!ui.tempnowuxie&&tempnowuxie){
 							var translation=get.translation(card.name);
 							if(translation.length>=4){
@@ -3548,7 +3548,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			["heart",9,"tao"],
 			["heart",12,"tao"],
 			["diamond",12,"tao"],
-			
+
 			["spade",2,"bagua"],
 			["club",2,"bagua"],
 			["spade",5,"jueying"],
@@ -3566,7 +3566,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			["diamond",5,"guanshi"],
 			["diamond",12,"fangtian"],
 			["heart",5,"qilin"],
-			
+
 			["heart",3,"wugu"],
 			["heart",4,"wugu"],
 			["heart",1,"taoyuan"],

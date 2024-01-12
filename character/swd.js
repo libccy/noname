@@ -4,7 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'swd',
 		character:{
 			swd_huzhongxian:['male','wu',3,['daofa','xielv','hujing']],
-			
+
 			swd_anka:['male','qun',3,['songci','anlianying']],
 			swd_septem:['male','qun',4,['jiying','liaoyuan','yishan']],
 			swd_kama:['female','qun',3,['yueren','shangshi']],
@@ -13,14 +13,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			swd_wangsiyue:['female','wei',3,['duishi','biyue']],
 			swd_weida:['female','qun',3,['yueren','zhenlie','duijue']],
 			swd_xuanyuanjianxian:['male','qun',4,['pozhou','huajian','xuanyuan']],
-			
+
 			swd_chenjingchou:['male','wu',3,['youyin','yihua']],
 			swd_duguningke:['female','qun',3,['nlianji','touxi']],
 			swd_guyue:['male','wei',3,['gtiandao','gxianyin','wangchen']],
 			swd_tuobayuer:['female','shu',4,['swdliuhong','poyue','niepan']],
 			swd_yuwentuo:['male','shu',4,['wushuang','xielei','kunlunjing']],
 			swd_yuxiaoxue:['female','wei',3,['huanhun','daixing','yinyue']],
-			
+
 			swd_jiliang:['male','wu',3,['yunchou','gongxin','jqimou']],
 			swd_shuijing:['female','qun',4,['mojian','duanyue','tuzhen']],
 			swd_quxian:['female','qun',3,['mojian','huanxia']],
@@ -30,37 +30,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			swd_murongshi:['female','shu',4,['duanyi','guxing']],
 			swd_jipeng:['male','wu',3,['reyingzi','guozao']],
 			swd_qi:['male','qun',3,['yaotong','heihuo','pojian']],
-			
+
 			swd_luchengxuan:['male','wu',4,['ljifeng','lxianglong']],
 			swd_xiarou:['female','shu',3,['xianghui','huiqi']],
 			swd_moye:['female','wu',3,['rexue','liuli','senluo']],
-			
+
 			swd_zhaoyun:['male','shu',4,['longdan','pozhen','tanlin']],
 			swd_hengai:['female','shu',3,['funiao','ningxian','hlingbo']],
 			swd_duanmeng:['female','shu',4,['xuanying','lieren']],
 			swd_jiangwu:['male','shu',4,['yijue','dangping']],
 			swd_tuwei:['male','shu',3,['zhanlu','susheng']],
 			swd_yeyaxi:['female','shu',3,['rexue','huopu','shenyan']],
-			
+
 			swd_muyun:['male','wei',4,['zhuhai','polang','jikong']],
 			swd_lanyin:['female','wei',3,['xingdian','yulin','luomei']],
 			swd_zhiyin:['female','wei',3,['xuehuang','ningshuang','zhuyu']],
 			swd_qiner:['female','wei',3,['huanyin','tianhuo','xuanzhou']],
 			swd_jiuyou:['male','wei',3,['lexue']],
 			swd_duopeng:['male','wu',3,['luanji','reyingzi']],
-			
+
 			swd_fengtianling:['male','shu',4,['guiyan','jiang']],
 			swd_huyue:['female','wu',3,['hyunshen','fengming']],
 			swd_jialanduo:['male','qun',4,['xianyin','mailun']],
 			swd_rongshuang:['female','wu',3,['suiyan','duanxing']],
 			swd_zhuoshanzhu:['male','wu',4,['suiyan','wanjun']],
 			swd_jiting:['female','wei',4,['guanhu','lingshi']],
-			
+
 			swd_sikongyu:['male','wu',4,['sliufeng','linyun','hutian']],
 			swd_muyue:['female','wei',3,['xingzhui','lingxian','shouyin']],
 			swd_ziqiao:['female','shu',3,['guaili','fuyan']],
 			swd_fengyu:['male','shu',4,['fzhenwei','shangxi']],
-			
+
 			// swd_wushi:['male','wei',3,['zhoufu','yingbin','xuying']],
 			// swd_lanmoshen:['female','wei',3,['bingjian','lieren']],
 			swd_huanglei:['male','qun',3,['jilve','gongshen','gaizao']],
@@ -74,7 +74,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			swd_kangnalishi:['male','qun',1,['busi','xuying','yinguo']],
 			swd_xuanyuanjiantong:['male','qun',3,['chengjian','huanling']],
 			swd_huiyan:['male','qun',4,['hwendao','lingfeng','hxunzhi']],
-			
+
 			// swd_chenfu:['male','qun',4,['xuanzhou','bingfeng']],
 			// swd_chengyaojin:['male','qun',4,['jiuchi','jufu']],
 			swd_shanxiaoxiao:['female','wu',3,['shehun','xiaomoyu']],
@@ -86,7 +86,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// swd_tuobayueer:['female','shu',3,['shushen','biyue']],
 			// swd_yangshuo:['male','qun',4,['longdan','luomu']],
 			// swd_zhanglie:['male','qun',4,['huajin','poxiao']],
-			
+
 			swd_hanluo:['male','qun',5,['tiebi']],
 			swd_fu:['male','qun',5,['yudun']],
 			swd_linyue:['male','wei',3,['zhenjiu','lmazui']],
@@ -95,18 +95,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			swd_fuyan:['male','qun',4,['lianda']],
 			swd_haidapang:['female','wu',3,['bingjian','rumeng']],
 			swd_shaowei:['female','shu',3,['jianji','huangyu']],
-			
+
 			swd_youzhao:['male','shu',4,['longdan','yuchen']],
 			swd_shangzhang:['male','shu',4,['lianwu']],
 			swd_situqiang:['female','shu',3,['fengze','lingyue','jinlin']],
-			
+
 			swd_chunyuheng:['male','wei',2,['jueqing','shengshou','xuying']],
 			swd_hanlong:['male','wei',4,['ciqiu','siji']],
 			swd_yuli:['female','wu',3,['lingxin','tianxiang']],
 			swd_zhanggao:['male','wei',4,['yicong','poxing']],
 			swd_shuwaner:['female','shu',3,['sxianjing','huodan']],
 			swd_xiaohuanglong:['male','wei',3,['yeying','juxi']],
-			
+
 			swd_hupo:['male','wu',3,['dunxing','guiying']],
 			swd_jiangziya:['male','wu',3,['mingfu','tianlun']],
 		},
@@ -5410,18 +5410,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						equips=[];
 						for(j=0;j<game.players[i].node.handcards1.childNodes.length;j++)
 							handcards1.push(game.players[i].node.handcards1.childNodes[j]);
-						
+
 						for(j=0;j<game.players[i].node.handcards2.childNodes.length;j++)
 							handcards2.push(game.players[i].node.handcards2.childNodes[j]);
-						
+
 						for(j=0;j<game.players[i].node.judges.childNodes.length;j++){
 							viewAs.push(game.players[i].node.judges.childNodes[j].viewAs);
 							judges.push(game.players[i].node.judges.childNodes[j]);
 						}
-						
+
 						for(j=0;j<game.players[i].node.equips.childNodes.length;j++)
 							equips.push(game.players[i].node.equips.childNodes[j]);
-						
+
 						player.storage.kunlunjing.push({
 							player:game.players[i],
 							handcards1:handcards1,
@@ -8486,7 +8486,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('miedao');
 					player.addSkill('jifeng');
 					player.addSkill('swd_xiuluo');
-					
+
 					lib.character.swd_satan=['','qun',4,['moyan','miedao','jifeng','swd_xiuluo'],['temp']];
 					if(player.name=='swd_miles') player.name='swd_satan';
 					if(player.name1=='swd_miles') player.name1='swd_satan';
@@ -9753,7 +9753,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			swd_xiyan:'犀衍',
 			swd_shuwaner:'舒莞儿',
 			swd_xiaohuanglong:'小黄龙',
-			
+
 			cyshuiyun:'水云',
 			cyshuiyun_info:'准备阶段，你可以弃置一名其他角色的一张牌；每当你失去此技能，你可以弃置一名其他角色的一张牌。',
 			cyliuzi:'流紫',
@@ -10019,7 +10019,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huanxing_info:'准备阶段，你可以弃置一张牌并选择一名男性角色，获得其所有技能，直到你首次受到伤害。',
 			meihuo:'魅惑',
 			meihuo_info:'每当你失去最后一张装备牌，你可以获得一名其他角色的一张牌，若此牌来自装备区，你立即装备之。',
-			
+
 			touxi:'偷袭',
 			touxi_info:'在其他角色的结束阶段，你可以进行一次判定，若结果为黑色，你对其造成1点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方可以弃置你的一张牌。',
 			touxi_info_alter:'在其他角色的结束阶段，你可以进行一次判定，若结果为黑色，你对其造成1点雷电伤害，且直到下一回合开始不能再次发动偷袭；若结果为红色，对方可以获得你的一张牌。',
@@ -10040,12 +10040,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mingfu_info:'出牌阶段限一次，你可以将一张梅花牌当鬼幽结使用。',
 			chuanyue:'穿月',
 			chuanyue_info:'出牌阶段限一次，你可以将两张手牌当决斗使用。',
-			
+
 			miedao:'灭道',
 			miedao1:'灭道',
 			miedao2:'灭道',
 			miedao_info:'锁定技，摸牌阶段，你额外摸X张牌；弃牌阶段，你至少须弃X张牌（不足则全弃），X为你已损失的体力值。',
-			
+
 			senluo:'森罗',
 			senluo_info:'出牌阶段限一次，若你的手牌数为全场最少或之一，你可以令所有有手牌的其他角色弃置两张手牌然后摸一张牌。',
 			polang:'破浪',
@@ -10069,7 +10069,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jilve_info_alter:'出牌阶段，你可以观看牌堆顶的两张牌，然后使用其中的非装备牌。每回合最多发动三次。',
 			gongshen:'工神',
 			gongshen_info:'任意一名其他角色使用一张基本牌或锦囊牌指定目标后，你可以弃置一张装备牌令其失效。',
-			
+
 			swdliuhong:'流虹',
 			swdliuhong_info:'每当你使用一张杀，可以摸一张牌。',
 			poyue:'破月',
@@ -10108,7 +10108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guiying_info:'你可以将一张黑色牌当偷梁换柱使用。',
 			shehun:'摄魂',
 			shehun_info:'出牌阶段限一次，你可以弃置任意张花色不同的牌，另一名其他角色弃置等量的牌，若其弃置的牌中有牌的花色与你弃置的牌相同，你对其造成1点伤害。',
-			
+
 			zhanlu:'沾露',
 			luomu:'落木',
 			jifeng:'魔影',

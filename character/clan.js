@@ -2615,7 +2615,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_zhongyu_prefix:'族',
 			clan_wanglun_prefix:'族',
 			clan_xunyou_prefix:'族',
-			
+
 			clan_wuxian:'族吴苋',
 			clanyirong:'移荣',
 			clanyirong_info:'出牌阶段限两次。若你的手牌数：小于X，则你可以将手牌摸至X张（至多摸八张），然后X-1；大于X，则你可以将手牌弃置至X张，然后X+1。（X为你的手牌上限）',
@@ -2708,7 +2708,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_xunyou:'族荀攸',
 			clanbaichu:'百出',
 			clanbaichu_info:'锁定技，当你使用一张牌结算完毕后，若你：未记录过此牌的花色和类型组合，则你记录此组合并记录一个普通锦囊牌名，否则你于本轮获得技能〖奇策〗；已记录此牌牌名，你回复1点体力或摸一张牌。',
-			
+
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
 			clan_han:'颍川·韩氏',

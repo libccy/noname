@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ow_heibaihe:['female','qun',3,['juji','duwen','dulei']],
 			ow_maikelei:['male','shu',4,['shanguang','tiandan','shenqiang']],
 			ow_kuangshu:['male','shu',3,['liudan','shoujia','shihuo']],
-			
+
 			ow_tuobiang:['male','shu',3,['paotai','maoding']],
 			ow_baolei:['male','qun',4,['bshaowei','zhencha']],
 			ow_banzang:['male','qun',4,['bfengshi','yinbo']],
@@ -26,7 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ow_luba:['male','shu',4,['liangou','xiyang']],
 			ow_wensidun:['male','shu',4,['feitiao','dianji']],
 			ow_zhaliya:['female','wei',4,['pingzhang','owliyong']],
-			
+
 			ow_heiying:['female','wei',3,['qinru','yinshen','maichong']],
 			ow_orisa:['female','wu',4,['qianggu','woliu']],
 		},

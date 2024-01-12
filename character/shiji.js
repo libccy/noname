@@ -6560,7 +6560,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_wangcan_prefix:'手杀',
 			sp_sunshao_prefix:'手杀',
 			sp_xunchen_prefix:'手杀',
-			
+
 			sp_wangcan:'手杀王粲',
 			spqiai:'七哀',
 			spqiai_info:'出牌阶段限一次，你可以将一张非基本牌交给一名其他角色。然后其选择一项：①你回复1点体力。②你摸两张牌。',
@@ -6860,7 +6860,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			duanbi_info:'限定技。出牌阶段，若场上所有角色的手牌数之和大于角色数之和的二倍，则你可以令所有其他角色各弃置X张手牌（X为该角色手牌数的一半且向下取整且至多为3）。然后你可选择一名角色，令其随机获得三张以此法被弃置的牌。',
 			tongduo:'统度',
 			tongduo_info:'每回合限一次。当你成为其他角色使用牌的唯一目标后，你可令一名角色重铸一张牌。',
-			
+
 			mobile_shijiren:'始计篇·仁',
 			mobile_shijizhi:'始计篇·智',
 			mobile_shijixin:'始计篇·信',

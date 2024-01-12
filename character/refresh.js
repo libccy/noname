@@ -126,11 +126,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhenji:['female','wei',3,['reluoshen','reqingguo']],
 			re_zhugeliang:['male','shu',3,['reguanxing','kongcheng']],
 			re_huaxiong:["male","qun",6,["reyaowu","shizhan"]],
-			
+
 			re_zhangjiao:['male','qun',3,['xinleiji','xinguidao','xinhuangtian'],['zhu']],
 			xin_yuji:['male','qun',3,['reguhuo']],
 			re_zuoci:['male','qun',3,['rehuashen','rexinsheng']],
-			
+
 			ol_xiahouyuan:['male','wei',4,['xinshensu','shebian']],
 			caoren:['male','wei',4,['xinjushou','xinjiewei']],
 			ol_weiyan:['male','shu',4,['xinkuanggu','reqimou']],
@@ -148,7 +148,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_jiangwei:['male','shu',4,['oltiaoxin','olzhiji']],
 			ol_caiwenji:['female','qun',3,['olbeige','duanchang']],
 			ol_liushan:['male','shu',3,['xiangle','olfangquan','olruoyu'],['zhu']],
-			
+
 			re_sunce:['male','wu',4,['oljiang','olhunzi','olzhiba'],['zhu']],
 			re_jianyong:['male','shu',3,['reqiaoshui','jyzongshi']],
 		},
@@ -1328,7 +1328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.showCards(result.cards).setContent(function(){});
 					event.dialog=ui.create.dialog(get.translation(target)+'展示的手牌',result.cards);
 					event.videoId=lib.status.videoId++;
-					
+
 					game.broadcast('createDialog',event.videoId,get.translation(target)+'展示的手牌',result.cards);
 					game.addVideo('cardDialog',null,[get.translation(target)+'展示的手牌',get.cardsInfo(result.cards),event.videoId]);
 					event.card2=result.cards[0];
@@ -8802,7 +8802,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.dialog.classList.add('center');
 						event.dialog.videoId=id;
 					},player,event.card,judgestr,event.videoId,get.id());
-					
+
 					game.log(player,'展示了',event.card);
 					game.delay(2);
 					if(get.type(event.card,'trick')==get.type(trigger.getParent().card,'trick')){
@@ -10687,7 +10687,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							capt+=`&nbsp;&nbsp;${charactergroup}`;
 						}
 						uiintro.add(capt);
-						
+
 						if(lib.characterTitle[node.link]){
 							uiintro.addText(get.colorspan(lib.characterTitle[node.link]));
 						}
@@ -14774,7 +14774,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_huatuo_prefix:'界',
 			re_liubei:'界刘备',
 			re_liubei_prefix:'界',
-			
+
 			re_diaochan:'界貂蝉',
 			re_diaochan_prefix:'界',
 			re_huangyueying:'界黄月英',
@@ -14789,7 +14789,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_zhenji_prefix:'界',
 			re_huaxiong:"界华雄",
 			re_huaxiong_prefix:'界',
-			
+
 			ol_sp_zhugeliang:"界卧龙",
 			ol_sp_zhugeliang_prefix:'界',
 			re_zhangjiao:'界张角',
@@ -14800,7 +14800,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_yuanshao_prefix:'界',
 			ol_liushan:'界刘禅',
 			ol_liushan_prefix:'界',
-			
+
 			olfangquan:'放权',
 			olfangquan_info:'出牌阶段开始前，你可以跳过此阶段。若如此做，弃牌阶段开始时，你可以弃置一张手牌，令一名其他角色进行一个额外回合。',
 			olruoyu:'若愚',
@@ -14839,7 +14839,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reshuangxiong1:"双雄",
 			reshuangxiong2:"双雄",
 			reshuangxiong_info:"摸牌阶段，你可以放弃摸牌。若如此做，你展示牌堆顶的两张牌并选择获得其中的一张。然后，你本回合内可以将与此牌颜色不同的一张手牌当做【决斗】使用。当你受到【决斗】造成的伤害时，你可以获得对方于此决斗中打出的所有【杀】。",
-			
+
 			reguanxing:'观星',
 			reguanxing_info:'准备阶段，你可以观看牌堆顶的五张牌（存活角色小于4时改为三张），并将其以任意顺序置于牌堆项或牌堆底，若你将〖观星〗的牌都放在了牌堆底，则你可以在结束阶段再次发动〖观星〗。',
 			reluoshen:'洛神',
@@ -14857,7 +14857,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rezhiheng_info:'出牌阶段限一次，你可以弃置任意张牌并摸等量的牌，若你在发动〖制衡〗时弃置了所有手牌，则你多摸一张牌。',
 			rejiuyuan:'救援',
 			rejiuyuan_info:'主公技，其他吴势力角色对自己使用【桃】时，若其体力值大于你，则其可以选择令你回复1点体力，然后其摸一张牌。',
-			
+
 			"new_yajiao":"涯角",
 			"new_yajiao_info":"每当你于回合外使用或打出牌时，你可以亮出牌堆顶的一张牌，并将其交给一名角色。若此牌与你此次使用或打出的牌类别不同，则你弃置一张牌。",
 			"new_liyu":"利驭",
@@ -14896,7 +14896,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reyaowu_info:'锁定技，当你受到牌造成的伤害时，若此牌为红色，则伤害来源摸一张牌；否则你摸一张牌。',
 			reqingguo:'倾国',
 			reqingguo_info:'你可以将一张黑色牌当做【闪】使用或打出。',
-			
+
 			qinxue:'勤学',
 			retuxi:'突袭',
 			reluoyi:'裸衣',
@@ -14974,7 +14974,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			botu_info:'回合结束时，若你本回合出牌阶段内使用的牌包含四种花色，则你可以进行一个额外回合。',
 			rebotu:'博图',
 			rebotu_info:'每轮限X次。回合结束时，若本回合内置入弃牌堆的牌中包含至少四种花色，则你可获得一个额外的回合。（X为存活角色数且至多为3）',
-			
+
 			xin_yuji:'界于吉',
 			xin_yuji_prefix:'界',
 			re_zuoci:'界左慈',
@@ -15307,7 +15307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olhaoshi_info:'摸牌阶段开始时，你可以多摸两张牌。然后摸牌阶段结束时，若你的手牌数大于5，则你将手牌数的一半（向下取整）交给一名手牌最少其他角色并获得如下效果直到你下回合开始：当你成为【杀】或普通锦囊牌的目标后，其可以交给你一张手牌。',
 			oldimeng:'缔盟',
 			oldimeng_info:'出牌阶段限一次，你可令两名满足X≤Y的其他角色交换手牌并获得如下效果：出牌阶段结束时，你弃置X张牌（X为这两名角色手牌数之差的绝对值；Y为你的牌数）。',
-			
+
 			rejijiang:'激将',
 			rejijiang1:'激将',
 			rejijiang2:'激将',
@@ -15559,7 +15559,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_lidian_prefix:'界',
 			re_xushu:'界徐庶',
 			re_xushu_prefix:'界',
-			
+
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',
 			refresh_huo:'界限突破·火',

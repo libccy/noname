@@ -1232,7 +1232,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player1=this.player1;
 						player2=this.player2;
 					}
-					
+
 					var createCard=function(wuxie){
 						var card;
 						if(wuxie){
@@ -1248,7 +1248,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						card.style.margin=0;
 						return card;
 					}
-					
+
 					var func=function(){
 						game.linexy([
 							player1.getLeft()+player1.offsetWidth/2,
@@ -1267,7 +1267,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							card.delete();
 						},1000);
 						player1.node.count.innerHTML='1';
-						
+
 						setTimeout(function(){
 							if(!node.showcaseinterval) return;
 							player1.node.count.innerHTML='2';
@@ -1283,7 +1283,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								card.delete();
 							},1000);
 						},300);
-						
+
 						setTimeout(function(){
 							if(!node.showcaseinterval) return;
 							player2.node.count.innerHTML='1';
@@ -1304,7 +1304,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							setTimeout(function(){
 								card.delete();
 							},700);
-							
+
 							setTimeout(function(){
 								if(!node.showcaseinterval) return;
 								player2.node.count.innerHTML='2';
@@ -1662,7 +1662,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						node.appendChild(card);
 						ui.refresh(card);
 					};
-					
+
 					var list2=['qilin','dawan','zhuahuang'];
 					var func2=function(){
 						var card=game.createCard(list2.shift(),'noclick');
@@ -1679,7 +1679,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						node.appendChild(card);
 						ui.refresh(card);
 					};
-					
+
 					if(init){
 						node.nodes=[];
 					}
@@ -2450,12 +2450,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								var bool=Math.random()<0.5;
 								var bool2=Math.random()<0.5;
 								var ref=game.players[0];
-								
+
 								ref.side=bool;
 								ref.next.side=bool2;
 								ref.next.next.side=!bool;
 								ref.previous.side=!bool2;
-								
+
 								var firstChoose=game.players.randomGet();
 								if(firstChoose.next.side==firstChoose.side){
 									firstChoose=firstChoose.next;
@@ -2465,7 +2465,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									firstChoose.node.name.innerHTML=get.verticalStr(get.cnNumber(i+1,true)+'号位');
 									firstChoose=firstChoose.next;
 								}
-								
+
 								for(var i=0;i<game.players.length;i++){
 									if(game.players[i].side==game.me.side){
 										game.players[i].node.identity.firstChild.innerHTML='友';
@@ -2915,7 +2915,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.fan.setIdentity();
 								game.fan.identityShown=true;
 								game.fan.node.identity.classList.remove('guessing');
-								
+
 								event.list=[];
 								for(var i in lib.character){
 									if(lib.filter.characterDisabled(i)) continue;
@@ -2937,7 +2937,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 								dialog.setCaption('选择角色');
 								game.me.chooseButton(dialog,true).set('onfree',true);
-								
+
 								ui.create.cheat=function(){
 									_status.createControl=ui.cheat2;
 									ui.cheat=ui.create.control('更换',function(){
@@ -2947,10 +2947,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 										if(game.changeCoin){
 											game.changeCoin(-3);
 										}
-										
+
 										event.list.randomSort();
 										list=event.list.slice(0,5);
-										
+
 										var buttons=ui.create.div('.buttons');
 										var node=_status.event.dialog.buttons[0].parentNode;
 										_status.event.dialog.buttons=ui.create.buttons(list,'character',buttons);
@@ -2974,7 +2974,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								else{
 									event.dialogxx=ui.create.characterDialog('heightset');
 								}
-								
+
 								ui.create.cheat2=function(){
 									ui.cheat2=ui.create.control('自由选将',function(){
 										if(this.dialog==_status.event.dialog){
@@ -3051,7 +3051,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								setTimeout(function(){
 									ui.arena.classList.remove('choose-character');
 								},500);
-								
+
 								var pack={
 									character:{
 										pujing:['male','qun',1,[],[]],
@@ -3455,7 +3455,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									player.side=pack.place[i];
 									player=player.next;
 								}
-								
+
 								for(var i=0;i<game.players.length;i++){
 									if(game.players[i].side==game.me.side){
 										game.players[i].node.identity.firstChild.innerHTML='友';
@@ -3635,7 +3635,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								}
 								maxpos=Math.max(maxpos,scene.players[i].position);
 							}
-							
+
 							if(maxpos<scene.players.length){
 								maxpos=scene.players.length;
 							}
@@ -3802,7 +3802,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						lib.translate.zhong=lib.translate.zhong||'忠';
 						lib.translate.nei=lib.translate.nei||'内';
 						lib.translate.fan=lib.translate.fan||'反';
-						
+
 						this.style.transition='all 0s';
 						this.style.height=(this.offsetHeight-10)+'px';
 						this.style.overflow='scroll';
@@ -3810,14 +3810,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var style={marginLeft:'3px',marginRight:'3px'};
 						var style2={position:'relative',display:'block',left:0,top:0,marginBottom:'6px',padding:0,width:'100%'};
 						var style3={marginLeft:'4px',marginRight:'4px',position:'relative'}
-						
+
 						var scenename=ui.create.node('input',ui.create.div(style2,'','场景名称：',this),{width:'120px'});
 						scenename.type='text';
 						scenename.style.marginTop='20px';
 						var sceneintro=ui.create.node('input',ui.create.div(style2,'','场景描述：',this),{width:'120px'});
 						sceneintro.type='text';
 						sceneintro.style.marginBottom='10px';
-						
+
 						var line1=ui.create.div(style2,this);
 						var addCharacter=ui.create.node('button','添加角色',line1,function(){
 							// line1.style.display='none';
@@ -3854,7 +3854,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							line11.style.display='block';
 							capt9.style.display='block';
 							line3.style.display='block';
-							
+
 							line6_t.style.display='block';
 							line6_b.style.display='block';
 							line6_d.style.display='block';
@@ -3918,7 +3918,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							game.save('scene',lib.storage.scene);
 							game.addScene(scene.name,true);
 						},style);
-						
+
 						var capt1=ui.create.div(style2,'','角色信息',this);
 						var line2=ui.create.div(style2,this);
 						line2.style.display='none';
@@ -3947,12 +3947,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						ui.create.node('span','玩家 ',line2_t,{marginLeft:'10px'});
 						var playercontrol=ui.create.node('input',line2_t);
 						playercontrol.type='checkbox';
-						
+
 						var list=[];
 						for(var i in lib.character){
 							list.push([i,lib.translate[i]]);
 						}
-						
+
 						list.sort(function(a,b){
 							a=a[0];b=b[0];
 							var aa=a,bb=b;
@@ -3978,16 +3978,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						name2.style.marginLeft='3px';
 						name2.style.marginRight='3px';
 						name2.style.maxWidth='80px';
-						
+
 						var capt9=ui.create.div(style2,'','编辑牌堆',this);
 						capt9.style.display='none';
-						
+
 						var capt2=ui.create.div(style2,'','添加卡牌',this);
 						var line3=ui.create.div(style2,this);
 						line3.style.display='none';
 						capt1.style.display='none';
 						capt2.style.display='none';
-						
+
 						var line5=ui.create.div(style2,this);
 						line5.style.display='none';
 						var pileaddlist=[];
@@ -4033,7 +4033,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						cardpileaddnumber.style.marginLeft='3px';
 						cardpileaddnumber.style.marginRight='3px';
 						cardpileaddnumber.style.width='85px';
-						
+
 						var fakecard=function(info,position,capt){
 							var name=info[0],suit=info[1],number=info[2];
 							var card=ui.create.card(null,'noclick',true);
@@ -4096,7 +4096,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						cc_j.style.marginLeft='3px';
 						cc_j.style.marginRight='3px';
 						cc_j.style.width='85px';
-						
+
 						var capt_h=ui.create.div(style2,'','手牌区',this);
 						var line6_h=ui.create.div(style2,this);
 						var capt_e=ui.create.div(style2,'','装备区',this);
@@ -4107,7 +4107,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						capt_h.style.display='none';
 						capt_e.style.display='none';
 						capt_j.style.display='none';
-						
+
 						var line10=ui.create.div(style2,this);
 						line10.style.display='none';
 						var ac_h=ui.create.node('button','加入牌堆顶',line10,function(){
@@ -4131,17 +4131,17 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						ac_j.style.marginLeft='3px';
 						ac_j.style.marginRight='3px';
 						ac_j.style.width='85px';
-						
+
 						var line11=ui.create.div(style2,this,'','<span>替换牌堆</span>');
 						line11.style.display='none';
 						var replacepile=ui.create.node('input',line11);
 						replacepile.type='checkbox';
-						
+
 						ui.create.node('span',line11,'开局摸牌',{marginLeft:'10px'});
 						var gameDraw=ui.create.node('input',line11);
 						gameDraw.type='checkbox';
 						gameDraw.checked=true;
-						
+
 						var capt_t=ui.create.div(style2,'','牌堆顶',this);
 						var line6_t=ui.create.div(style2,this);
 						var capt_b=ui.create.div(style2,'','牌堆底',this);
@@ -4152,7 +4152,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						capt_t.style.display='none';
 						capt_b.style.display='none';
 						capt_d.style.display='none';
-						
+
 						var line4=ui.create.div(style2,this);
 						line4.style.display='none';
 						line4.style.marginTop='20px';
@@ -4176,7 +4176,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							capt_h.style.display='none';
 							capt_e.style.display='none';
 							capt_j.style.display='none';
-							
+
 							name1.value='random';
 							name2.value='none';
 							identity.value='fan';
@@ -4266,14 +4266,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							player.style.top=0;
 							player.style.margin='-18px';
 							player.node.marks.remove();
-							
+
 							line7.appendChild(player);
 							player.listen(function(){
 								if(confirm('是否删除此角色？')){
 									this.remove();
 								}
 							});
-							
+
 							return player;
 						};
 						ui.create.div('.menubutton.large','确定',line4,style3,function(){
@@ -4316,7 +4316,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						ui.create.div('.menubutton.large','取消',line4,style3,resetCharacter);
 						var line7=ui.create.div(style2,this);
 						line7.style.marginTop='12px';
-						
+
 						var capt8=ui.create.div(style2,'','胜负条件',this);
 						capt8.style.display='none';
 						var line8=ui.create.div(style2,this);
@@ -4328,12 +4328,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var turns=ui.create.selectlist(turnslist,'1',line8);
 						ui.create.node('span','个回合后',line8,style);
 						var turnsresult=ui.create.selectlist(results,'none',line8);
-						
+
 						var washes=ui.create.selectlist(turnslist,'1',line8);
 						washes.style.marginLeft='20px';
 						ui.create.node('span','次洗牌后',line8,style);
 						var washesresult=ui.create.selectlist(results,'none',line8);
-						
+
 						var line9=ui.create.div(style2,this);
 						line9.style.display='none';
 						line9.style.marginTop='20px';
@@ -4344,7 +4344,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							cardpileaddname.value='random';
 							cardpileaddsuit.value='random';
 							cardpileaddnumber.value='random';
-							
+
 							line8.style.display='none';
 							capt8.style.display='none';
 							capt9.style.display='none';
@@ -4353,14 +4353,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							line11.style.display='none';
 							line3.style.display='none';
 							line7.style.display='block';
-							
+
 							line6_t.style.display='none';
 							line6_b.style.display='none';
 							line6_d.style.display='none';
 							capt_t.style.display='none';
 							capt_b.style.display='none';
 							capt_d.style.display='none';
-							
+
 							if(all===true){
 								replacepile.checked=false;
 								gameDraw.checked=true;
@@ -4373,9 +4373,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								line6_d.innerHTML='';
 							}
 						}
-						
+
 						ui.create.div('.menubutton.large','确定',line9,style3,resetStatus);
-						
+
 						game.addSceneClear=function(){
 							resetCharacter();
 							resetStatus(true);
@@ -4411,7 +4411,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							for(var i=0;i<scene.discardPile.length;i++){
 								fakecard(scene.discardPile[i],line6_d,capt_d);
 							}
-							
+
 							for(var i=0;i<scene.players.length;i++){
 								createCharacter(scene.players[i]);
 							}
@@ -4527,14 +4527,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						// lib.setScroll(this);
 						var style2={position:'relative',display:'block',left:0,top:0,marginBottom:'6px',padding:0,width:'100%'};
 						var style3={marginLeft:'4px',marginRight:'4px',position:'relative'}
-						
+
 						var scenename=ui.create.node('input',ui.create.div(style2,'','关卡名称：',this),{width:'120px'});
 						scenename.type='text';
 						scenename.style.marginTop='20px';
 						var sceneintro=ui.create.node('input',ui.create.div(style2,'','关卡描述：',this),{width:'120px'});
 						sceneintro.type='text';
 						sceneintro.style.marginBottom='10px';
-						
+
 						var line1=ui.create.div(style2,this);
 						var line2=ui.create.div(style2,this);
 						line1.style.marginBottom='10px';

@@ -290,7 +290,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						card.classList.remove('glow');
 						delete card.mtongnian_link;
 						delete card._destroy;
-						
+
 						var list=lib.skill.mtongnian.getList(player);
 						if(list.length){
 							var card=list.randomGet();
@@ -468,7 +468,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mtg_lilianna:'莉莲娜',
 			mtg_nisha:'妮莎',
 			mtg_ayeni:'阿耶尼',
-			
+
 			mduohun:'夺魂',
 			mduohun_info:'锁定技，当你解除濒死状态后，令你进入濒死状态的角色失去1点体力。',
 			lingyong:'灵俑',

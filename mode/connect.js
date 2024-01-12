@@ -23,7 +23,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						ui.click.connectMenu();
 					},true);
 				}
-				
+
 				event.created=true;
 				var node=ui.create.div('.shadowed');
 				node.style.width='400px';
@@ -40,7 +40,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				node.style.webkitUserSelect='text';
 				node.style.textAlign='center';
 				node.style.overflow='hidden';
-				
+
 				var connect=function(e){
 					event.textnode.textContent='正在连接...';
 					clearTimeout(event.timeout);
@@ -68,7 +68,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				});
 				ui.window.appendChild(node);
 				ui.ipnode=node;
-				
+
 				var text=event.textnode;
 				text.style.width='400px';
 				text.style.height='30px';
@@ -81,14 +81,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				text.style.textAlign='center';
 				ui.window.appendChild(text);
 				ui.iptext=text;
-				
+
 				var button=ui.create.div('.menubutton.highlight.large.pointerdiv','连接',connect);
 				button.style.width='70px';
 				button.style.left='calc(50% - 35px)';
 				button.style.top='calc(50% + 60px)';
 				ui.window.appendChild(button);
 				ui.ipbutton=button;
-				
+
 				ui.hall_button=ui.create.system('联机大厅',function(){
 					node.textContent=get.config('hall_ip')||lib.hallURL;
 					connect();

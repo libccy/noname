@@ -77,7 +77,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_chenqun:['male','wei',3,['dingpin','oldfaen']],
 			old_zhuhuan:['male','wu',4,['youdi']],
 			old_zhuzhi:['male','wu',4,['anguo']],
-			
+
 			old_zhugezhan:["male","shu",3,["old_zuilun","old_fuyin"]],
 			ol_zhangrang:['male','qun',3,['xintaoluan'],['sex:male_castrated']],
 			//ol_manchong:['male','wei',3,['yuce','junxing']],
@@ -718,7 +718,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.prompt=get.translation(player)+'声明'+(trigger.targets&&trigger.targets.length?'对'+get.translation(trigger.targets):'')+
 						(trigger.name=='useCard'?'使用':'打出')+(get.translation(trigger.card.nature)||'')+get.translation(trigger.card.name)+'，是否质疑？';
 					event.targets=game.filterPlayer(i=>i!=player&&i.hp>0).sortBySeat(_status.currentPhase);
-					
+
 					game.broadcastAll(function(card,player){
 						_status.old_guhuoNode=card.copy('thrown');
 						if(lib.config.cardback_style!='default'){
@@ -1132,7 +1132,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_yujin_prefix:'节钺',
 			re_yujin:'毅重于禁',
 			re_yujin_prefix:'毅重',
-			
+
 			old_guhuo:"蛊惑",
 			old_guhuo_info:"你可以扣置一张手牌当做一张基本牌或普通锦囊牌使用或打出，体力值不为0的其他角色依次选择是否质疑。然后，若有质疑的角色，你展示此牌：若为假，此牌作废，这些角色摸一张牌；若为真，这些角色失去1点体力，且若此牌不为♥，此牌作废。",
 			old_guhuo_guess:"蛊惑",
@@ -1214,7 +1214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			panfeng_prefix:'旧',
 			old_shixie:'旧士燮',
 			old_shixie_prefix:'旧',
-			
+
 			old_standard:'标准包',
 			old_shenhua:'神话再临',
 			old_refresh:'界限突破',
