@@ -344,7 +344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//无 双 万 军 取 首
 			dcsbronghuo:{
 				audio:2,
-				trigger:{player:'useCard'},
+				trigger:{player:'useCard1'},
 				filter:function(event,player){
 					return (event.card.name=='sha'&&game.hasNature(event.card,'fire'))||event.card.name=='huogong';
 				},
@@ -928,7 +928,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(get.name(event.card,false)!='sha'&&get.type2(event.card)!='trick') return false;
 					if(event.targets.length!=1||!event.targets[0].isIn()) return false;
-					if(!player.canUse(new lib.element.VCard({name:'sha'}),event.targets[0])) return false;
+					if(!player.canUse(new lib.element.VCard({name:'sha'}),event.targets[0],false)) return false;
 					return player.hasHistory('lose',evt=>{
 						if(evt.getParent()!=event) return false;
 						return event.cards.every(card=>{

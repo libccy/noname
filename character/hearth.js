@@ -91,9 +91,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_kazhakusi:['male','shu',3,['lianjin']],
 			// hs_lazi:['male','wei',3,[]],
 			hs_shaku:['male','wei',3,['shouji']],
-			hs_laxiao:['male','shu',3,['guimou','yingxi','hlongyi']],
+			hs_laxiao:['male','shu',3,['hsguimou','yingxi','hlongyi']],
 			// hs_xiangyaqishi:['male','wei',3,[]],
-			// hs_fenjie:['male','shu',3,['guimou','yingxi']],
+			// hs_fenjie:['male','shu',3,['hsguimou','yingxi']],
 			hs_mojinbaozi:['male','wei',3,['jingcu','shengzhang']],
 			hs_shuiwenxuejia:['male','wu',3,['kekao']],
 			hs_shizugui:['male','wu',3,['szbianshen']],
@@ -3666,7 +3666,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.directHit=true;
 				}
 			},
-			guimou:{
+			hsguimou:{
 				trigger:{player:'damageEnd'},
 				check:function(event,player){
 					return get.attitude(player,event.source)<=0;
@@ -9825,8 +9825,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lianjin_info:'出牌阶段限一次，你可以弃置一张牌并获得一张由三张随机牌组成的药水；当你因弃置而失去药水牌时，你随机获得药水的组成卡牌之一。',
 			shouji:'收集',
 			shouji_info:'每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机非特殊装备牌的复制；每回合限各限一次。',
-			guimou:'鬼谋',
-			guimou_info:'每当你受到一次伤害，你可以获得伤害来源的一张手牌，若此牌是黑色，你展示此牌并重复此过程。',
+			hsguimou:'鬼谋',
+			hsguimou_info:'每当你受到一次伤害，你可以获得伤害来源的一张手牌，若此牌是黑色，你展示此牌并重复此过程。',
 			yingxi:'影袭',
 			yingxi_info:'结束阶段，若你本回合未造成伤害，你可以将一张黑色牌当作杀对任意一名角色使用，若目标未受到伤害，此杀不可闪避。',
 			peiyu:'培育',

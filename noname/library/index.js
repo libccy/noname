@@ -148,7 +148,7 @@ export class Library extends Uninstantable {
 					const cs = lib.linq.cselector;
 					const g1 = cs.group(
 						cs.of(
-							cs.class("player", "identity"),
+							cs.class("player ", "identity"),
 							cs.isAttr("data-color", `"${id}"`)
 						),
 						cs.of(
