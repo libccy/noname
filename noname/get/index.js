@@ -1645,7 +1645,7 @@ export class Get extends Uninstantable {
 				}
 			}
 		}
-		if (obj instanceof lib.element.Button) return 'button';
+		if (obj instanceof lib.element.Button || (obj instanceof HTMLDivElement && obj.classList.contains('button'))) return 'button';
 		if (obj instanceof lib.element.Card) return 'card';
 		if (obj instanceof lib.element.Player) return 'player';
 		if (obj instanceof lib.element.Dialog) return 'dialog';
