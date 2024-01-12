@@ -2484,6 +2484,12 @@ export const Content = {
 			event.cancel();
 			player.turnOver();
 			player.phaseSkipped = true;
+			var players = game.players.slice(0).concat(game.dead);
+			for (var i = 0; i < players.length; i++) {
+				var current = players[i];
+				current.getHistory().isSkipped = true;
+				current.getStat().isSkipped = true;
+			}
 		}
 		else {
 			player.phaseSkipped = false;
