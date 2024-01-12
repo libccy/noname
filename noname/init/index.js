@@ -8,6 +8,7 @@ import { UI as ui } from '../ui/index.js';
 
 import { userAgent } from '../util/index.js';
 import * as config from '../util/config.js';
+import { promiseErrorHandlerMap } from '../util/browser.js';
 import { gnc } from '../gnc/index.js';
 
 import { importCardPack, importCharacterPack, importExtension, importMode } from './import.js';
@@ -57,6 +58,7 @@ export async function boot() {
 	_status.event = lib.element.GameEvent.initialGameEvent();
 
 	setWindowListener();
+	await setOnError();
 
 	// 无名杀更新日志
 	if (window.noname_update) {
@@ -751,33 +753,123 @@ function setServerIndex() {
 	}
 }
 
-function setWindowListener() {
-	/**
-	 * @type { [Error, NodeJS.CallSite[]][] }
-	 */
-	const errorList = [];
-	// 这他娘的能捕获浏览器控制台里的输入值，尽量别用
-	// 在火狐里无效
-	Error.prepareStackTrace = function (e, stackTraces) {
-		errorList.push([e, stackTraces]);
-	};
-	// 已经有用了
-	window.addEventListener("unhandledrejection", promiseRejectionEvent => {
-		promiseRejectionEvent.promise.catch(e => {
-			const result = errorList.find(v => v[0] === e);
-			if (result) {
-				// @ts-ignore
-				window.onerror(
-					result[0].message,
-					result[1][0].getScriptNameOrSourceURL() || void 0,
-					result[1][0].getLineNumber() || void 0,
-					result[1][0].getColumnNumber() || void 0,
-					result[0]
-				);
-			}
-		});
+async function setOnError() {
+	const [core] = get.coreInfo();
+
+	const promiseErrorHandler = new ((core in promiseErrorHandlerMap) ? promiseErrorHandlerMap[core] : promiseErrorHandlerMap.other);
+
+	if (promiseErrorHandler.onLoad) await promiseErrorHandler.onLoad();
+
+	window.addEventListener("unhandledrejection", async (event) => {
+		if (promiseErrorHandler.onHandle) await promiseErrorHandler.onHandle(event);
 	});
 
+	window.onerror = function (msg, src, line, column, err) {
+		if (promiseErrorHandler.onErrorPrepare) promiseErrorHandler.onErrorPrepare();
+		const winPath = window.__dirname ? ('file:///' + (__dirname.replace(new RegExp('\\\\', 'g'), '/') + '/')) : '';
+		let str = `错误文件: ${typeof src == 'string' ? decodeURI(src).replace(lib.assetURL, '').replace(winPath, '') : '未知文件'}`;
+		str += `\n错误信息: ${msg}`;
+		const tip = lib.getErrorTip(msg);
+		if (tip) str += `\n错误提示: ${tip}`;
+		str += `\n行号: ${line}`;
+		str += `\n列号: ${column}`;
+		const version = Reflect.has(lib, 'version') ? Reflect.get(lib, 'version') : '';
+		const reg = /[^\d.]/;
+		const match = version.match(reg) != null;
+		str += '\n' + `${match ? '游戏' : '无名杀'}版本: ${version || '未知版本'}`;
+		if (match) str += '\n⚠️您使用的游戏代码不是源于libccy/noname无名杀官方仓库，请自行寻找您所使用的游戏版本开发者反馈！';
+		if (_status && _status.event) {
+			let evt = _status.event;
+			str += `\nevent.name: ${evt.name}\nevent.step: ${evt.step}`;
+			// @ts-ignore
+			if (evt.parent) str += `\nevent.parent.name: ${evt.parent.name}\nevent.parent.step: ${evt.parent.step}`;
+			// @ts-ignore
+			if (evt.parent && evt.parent.parent) str += `\nevent.parent.parent.name: ${evt.parent.parent.name}\nevent.parent.parent.step: ${evt.parent.parent.step}`;
+			if (evt.player || evt.target || evt.source || evt.skill || evt.card) {
+				str += '\n-------------';
+			}
+			if (evt.player) {
+				if (lib.translate[evt.player.name]) str += `\nplayer: ${lib.translate[evt.player.name]}[${evt.player.name}]`;
+				else str += '\nplayer: ' + evt.player.name;
+				let distance = get.distance(_status.roundStart, evt.player, 'absolute');
+				if (distance != Infinity) {
+					str += `\n座位号: ${distance + 1}`;
+				}
+			}
+			if (evt.target) {
+				if (lib.translate[evt.target.name]) str += `\ntarget: ${lib.translate[evt.target.name]}[${evt.target.name}]`;
+				else str += '\ntarget: ' + evt.target.name;
+			}
+			if (evt.source) {
+				if (lib.translate[evt.source.name]) str += `\nsource: ${lib.translate[evt.source.name]}[${evt.source.name}]`;
+				else str += '\nsource: ' + evt.source.name;
+			}
+			if (evt.skill) {
+				if (lib.translate[evt.skill]) str += `\nskill: ${lib.translate[evt.skill]}[${evt.skill}]`;
+				else str += '\nskill: ' + evt.skill;
+			}
+			if (evt.card) {
+				if (lib.translate[evt.card.name]) str += `\ncard: ${lib.translate[evt.card.name]}[${evt.card.name}]`;
+				else str += '\ncard: ' + evt.card.name;
+			}
+		}
+		str += '\n-------------';
+		if (typeof line == 'number' && (typeof Reflect.get(game, 'readFile') == 'function' || location.origin != 'file://')) {
+			const createShowCode = function (lines) {
+				let showCode = '';
+				if (lines.length >= 10) {
+					if (line > 4) {
+						for (let i = line - 5; i < line + 6 && i < lines.length; i++) {
+							showCode += `${i + 1}| ${line == i + 1 ? '⚠️' : ''}${lines[i]}\n`;
+						}
+					} else {
+						for (let i = 0; i < line + 6 && i < lines.length; i++) {
+							showCode += `${i + 1}| ${line == i + 1 ? '⚠️' : ''}${lines[i]}\n`;
+						}
+					}
+				} else {
+					showCode = lines.map((_line, i) => `${i + 1}| ${line == i + 1 ? '⚠️' : ''}${_line}\n`).toString();
+				}
+				return showCode;
+			};
+			//协议名须和html一致(网页端防跨域)，且文件是js 
+			if (typeof src == 'string' && src.startsWith(location.protocol) && src.endsWith('.js')) {
+				//获取代码
+				const codes = lib.init.reqSync('local:' + decodeURI(src).replace(lib.assetURL, '').replace(winPath, ''));
+				if (codes) {
+					const lines = codes.split("\n");
+					str += '\n' + createShowCode(lines);
+					str += '\n-------------';
+				}
+			}
+			//解析parsex里的content fun内容(通常是技能content) 
+			else if (err && err.stack && err.stack.split('\n')[1].trim().startsWith('at Object.eval [as content]')) {
+				const codes = _status.event.content;
+				if (typeof codes == 'function') {
+					const lines = codes.toString().split("\n");
+					str += '\n' + createShowCode(lines);
+					str += '\n-------------';
+				}
+			}
+		}
+		if (err && err.stack) str += '\n' + decodeURI(err.stack).replace(new RegExp(lib.assetURL, 'g'), '').replace(new RegExp(winPath, 'g'), '');
+		alert(str);
+		Reflect.set(window, 'ea', Array.from(arguments));
+		Reflect.set(window, 'em', msg);
+		Reflect.set(window, 'el', line);
+		Reflect.set(window, 'ec', column);
+		Reflect.set(window, 'eo', err);
+		game.print(str);
+		if (promiseErrorHandler.onErrorFinish) promiseErrorHandler.onErrorFinish();
+		// @ts-ignore
+		if (!lib.config.errstop) {
+			_status.withError = true;
+			game.loop();
+		}
+	};
+}
+
+function setWindowListener() {
 	window.onkeydown = function (e) {
 		if (!Reflect.has(ui, 'menuContainer') || !Reflect.get(ui, 'menuContainer').classList.contains('hidden')) {
 			if (e.keyCode == 116 || ((e.ctrlKey || e.metaKey) && e.keyCode == 82)) {
@@ -873,109 +965,6 @@ function setWindowListener() {
 			// else if(e.keyCode==27){
 			// 	if(!ui.arena.classList.contains('paused')) ui.click.config();
 			// }
-		}
-	};
-
-	window.onerror = function (msg, src, line, column, err) {
-		errorList.length = 0;
-		const winPath = window.__dirname ? ('file:///' + (__dirname.replace(new RegExp('\\\\', 'g'), '/') + '/')) : '';
-		let str = `错误文件: ${typeof src == 'string' ? decodeURI(src).replace(lib.assetURL, '').replace(winPath, '') : '未知文件'}`;
-		str += `\n错误信息: ${msg}`;
-		const tip = lib.getErrorTip(msg);
-		if (tip) str += `\n错误提示: ${tip}`;
-		str += `\n行号: ${line}`;
-		str += `\n列号: ${column}`;
-		const version = Reflect.has(lib, 'version') ? Reflect.get(lib, 'version') : '';
-		const reg = /[^\d.]/;
-		const match = version.match(reg) != null;
-		str += '\n' + `${match ? '游戏' : '无名杀'}版本: ${version || '未知版本'}`;
-		if (match) str += '\n⚠️您使用的游戏代码不是源于libccy/noname无名杀官方仓库，请自行寻找您所使用的游戏版本开发者反馈！';
-		if (_status && _status.event) {
-			let evt = _status.event;
-			str += `\nevent.name: ${evt.name}\nevent.step: ${evt.step}`;
-			// @ts-ignore
-			if (evt.parent) str += `\nevent.parent.name: ${evt.parent.name}\nevent.parent.step: ${evt.parent.step}`;
-			// @ts-ignore
-			if (evt.parent && evt.parent.parent) str += `\nevent.parent.parent.name: ${evt.parent.parent.name}\nevent.parent.parent.step: ${evt.parent.parent.step}`;
-			if (evt.player || evt.target || evt.source || evt.skill || evt.card) {
-				str += '\n-------------';
-			}
-			if (evt.player) {
-				if (lib.translate[evt.player.name]) str += `\nplayer: ${lib.translate[evt.player.name]}[${evt.player.name}]`;
-				else str += '\nplayer: ' + evt.player.name;
-				let distance = get.distance(_status.roundStart, evt.player, 'absolute');
-				if (distance != Infinity) {
-					str += `\n座位号: ${distance + 1}`;
-				}
-			}
-			if (evt.target) {
-				if (lib.translate[evt.target.name]) str += `\ntarget: ${lib.translate[evt.target.name]}[${evt.target.name}]`;
-				else str += '\ntarget: ' + evt.target.name;
-			}
-			if (evt.source) {
-				if (lib.translate[evt.source.name]) str += `\nsource: ${lib.translate[evt.source.name]}[${evt.source.name}]`;
-				else str += '\nsource: ' + evt.source.name;
-			}
-			if (evt.skill) {
-				if (lib.translate[evt.skill]) str += `\nskill: ${lib.translate[evt.skill]}[${evt.skill}]`;
-				else str += '\nskill: ' + evt.skill;
-			}
-			if (evt.card) {
-				if (lib.translate[evt.card.name]) str += `\ncard: ${lib.translate[evt.card.name]}[${evt.card.name}]`;
-				else str += '\ncard: ' + evt.card.name;
-			}
-		}
-		str += '\n-------------';
-		if (typeof line == 'number' && (typeof Reflect.get(game, 'readFile') == 'function' || location.origin != 'file://')) {
-			const createShowCode = function (lines) {
-				let showCode = '';
-				if (lines.length >= 10) {
-					if (line > 4) {
-						for (let i = line - 5; i < line + 6 && i < lines.length; i++) {
-							showCode += `${i + 1}| ${line == i + 1 ? '⚠️' : ''}${lines[i]}\n`;
-						}
-					} else {
-						for (let i = 0; i < line + 6 && i < lines.length; i++) {
-							showCode += `${i + 1}| ${line == i + 1 ? '⚠️' : ''}${lines[i]}\n`;
-						}
-					}
-				} else {
-					showCode = lines.map((_line, i) => `${i + 1}| ${line == i + 1 ? '⚠️' : ''}${_line}\n`).toString();
-				}
-				return showCode;
-			};
-			//协议名须和html一致(网页端防跨域)，且文件是js 
-			if (typeof src == 'string' && src.startsWith(location.protocol) && src.endsWith('.js')) {
-				//获取代码
-				const codes = lib.init.reqSync('local:' + decodeURI(src).replace(lib.assetURL, '').replace(winPath, ''));
-				if (codes) {
-					const lines = codes.split("\n");
-					str += '\n' + createShowCode(lines);
-					str += '\n-------------';
-				}
-			}
-			//解析parsex里的content fun内容(通常是技能content) 
-			else if (err && err.stack && err.stack.split('\n')[1].trim().startsWith('at Object.eval [as content]')) {
-				const codes = _status.event.content;
-				if (typeof codes == 'function') {
-					const lines = codes.toString().split("\n");
-					str += '\n' + createShowCode(lines);
-					str += '\n-------------';
-				}
-			}
-		}
-		if (err && err.stack) str += '\n' + decodeURI(err.stack).replace(new RegExp(lib.assetURL, 'g'), '').replace(new RegExp(winPath, 'g'), '');
-		alert(str);
-		Reflect.set(window, 'ea', Array.from(arguments));
-		Reflect.set(window, 'em', msg);
-		Reflect.set(window, 'el', line);
-		Reflect.set(window, 'ec', column);
-		Reflect.set(window, 'eo', err);
-		game.print(str);
-		// @ts-ignore
-		if (!lib.config.errstop) {
-			_status.withError = true;
-			game.loop();
 		}
 	};
 }
