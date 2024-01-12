@@ -31,6 +31,7 @@ declare type GameEvent = import('../../noname/library/index.js').GameEvent;
 declare type GameEventPromise = import('../../noname/library/index.js').GameEventPromise;
 declare type Player = import('../../noname/library/index.js').Player;
 declare type VCard = import('../../noname/library/index.js').VCard;
+declare type Control = import('../../noname/library/index.js').Control;
 
 declare type Video = import('../../noname/game/index.js').Video;
 declare type Videos = import('../../noname/game/index.js').Videos;

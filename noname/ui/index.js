@@ -14026,25 +14026,65 @@ export class UI extends Uninstantable {
 	static touchlines = [];
 	static todiscard = {};
 	/**
-	 * @type {HTMLStyleElement[]}
+	 * @type { HTMLStyleElement[] }
 	 */
 	static playerPositions = [];
 	static create = Create;
 	static click = Click;
 	static selected = {
 		/**
-		 * @type { import('../library/index.js').Button[]}
+		 * @type { Button[] }
 		 */
 		buttons: [],
 		/**
-		 * @type { import('../library/index.js').Card[]}
+		 * @type { Card[] }
 		 */
 		cards: [],
 		/**
-		 * @type { import('../library/index.js').Player[]}
+		 * @type { Player[] }
 		 */
 		targets: []
 	}
+	/**
+	 * @type { Dialog[] }
+	 */
+	static dialogs;
+	/**
+	 * @type { Dialog }
+	 */
+	static dialog;
+	/**
+	 * @type { HTMLDivElement }
+	 */
+	static arena;
+	/**
+	 * @type { Control[] }
+	 */
+	static controls;
+	/**
+	 * @type { Control }
+	 */
+	static control;
+	/**
+	 * @type { Control | undefined }
+	 */
+	static confirm;
+	/**
+	 * @type { Control | undefined }
+	 */
+	static skills;
+	/**
+	 * @type { Control | undefined }
+	 */
+	static skills1;
+	/**
+	 * @type { Control | undefined }
+	 */
+	static skills2;
+	/**
+	 * @type { Control | undefined }
+	 */
+	static skills3;
 	static refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}
