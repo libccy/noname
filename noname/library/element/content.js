@@ -8110,7 +8110,7 @@ export const Content = {
 		cards[0].classList.remove('drawinghidden');
 		delete cards[0]._transform;
 		var viewAs = typeof card == 'string' ? card : card.name;
-		if (!lib.card[viewAs] || !lib.card[viewAs].effect) {
+		if (!lib.card[viewAs] || (!lib.card[viewAs].effect && !lib.card[viewAs].noEffect) ) {
 			game.cardsDiscard(cards[0]);
 		}
 		else {

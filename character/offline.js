@@ -134,10 +134,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		card:{
 			yanxiao_card:{
 				type:'delay',
-				judge:function(card){
-					return 0;
-				},
-				effect:function(){},
+				fullimage:true,
+				noEffect:true,
 				ai:{
 					basic:{
 						order:1,
