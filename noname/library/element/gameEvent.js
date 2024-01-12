@@ -749,6 +749,11 @@ export class GameEvent {
 			// const doing=evt.doingList.find(doing=>doing.player==player);
 			// if(doing) doing.todoList=[];
 		}
+		else if (all==='currentOnly'){
+			if (evt && evt.doingList) {
+				evt.doingList.forEach(doing => doing.todoList = []);
+			}
+		}
 		return this;
 	}
 	/**

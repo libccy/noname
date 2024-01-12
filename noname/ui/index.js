@@ -9621,6 +9621,12 @@ class Create extends Uninstantable {
 		blank: (item, type, position, noclick, node) => {
 			node = ui.create.div('.button.card', position);
 			node.link = item;
+			if (get.position(item) == 'j' && item.viewAs && lib.config.cardtempname != 'off') {
+				node.classList.add('infoflip');
+				node.classList.add('infohidden')
+				ui.create.cardTempName(item, node).style.setProperty('display','block','important')
+				
+			}
 			return node;
 		},
 		/**

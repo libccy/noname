@@ -2646,8 +2646,9 @@ export const Content = {
 		event.cards = player.getCards('j');
 		if (!event.cards.length) event.finish();
 		"step 1";
-		if (cards.length && player.getCards('j').includes(cards[0])) {
+		if (cards.length) {
 			event.card = cards.shift();
+			var cardName = event.card.viewAs || event.card.name, cardInfo=lib.card[cardName];
 			if (event.card.classList.contains('removing')) {
 				event.card.remove();
 				delete event.card;
@@ -2657,20 +2658,25 @@ export const Content = {
 				event.finish();
 				return;
 			}
+			else if (cardInfo.noEffect || !player.getCards('j').includes(event.card)) {
+				event.redo();
+			}
 			else {
 				player.lose(event.card, 'visible', ui.ordering);
 				player.$phaseJudge(event.card);
 				event.cancelled = false;
 				event.trigger('phaseJudge');
-				var name = event.card.viewAs || event.card.name;
-				player.popup(name, 'thunder');
-				if (!lib.card[name].effect) {
+				player.popup(cardName, 'thunder');
+				if (!cardInfo.effect) {
 					game.delay();
 					event.redo();
 				}
-				else if (!lib.card[name].judge) {
+				else if (!cardInfo.judge) {
 					game.delay();
 					event.nojudge = true;
+				}
+				else{
+					event.nojudge = false;
 				}
 			}
 		}
@@ -5193,7 +5199,27 @@ export const Content = {
 					var title = event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
 					title.style.margin = '0px';
 					title.style.padding = '0px';
-					event.dialog.add(js);
+					var shown = js.filter(card => {
+						var name = (card.viewAs || card.name), info = lib.card[name];
+						if (!info || !info.blankCard) return true;
+						return false;
+					});
+					if (shown.length < js.length) {
+						var hidden = js.filter(card => !shown.includes(card));
+						var buttons = ui.create.div('.buttons', event.dialog.content);
+						event.dialog.buttons = event.dialog.buttons.concat(ui.create.buttons(shown, 'card', buttons));
+						event.dialog.buttons = event.dialog.buttons.concat(ui.create.buttons(hidden, 'blank', buttons));
+						if (event.dialog.forcebutton !== false) event.dialog.forcebutton = true;
+						if (event.dialog.buttons.length > 3) {
+							event.dialog.classList.remove('forcebutton-auto');
+						}
+						else if (!event.dialog.noforcebutton) {
+							event.dialog.classList.add('forcebutton-auto');
+						}
+					}
+					else{
+						event.dialog.add(js);
+					}
 					directh = false;
 				}
 			}
@@ -5348,7 +5374,27 @@ export const Content = {
 					var title = event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
 					title.style.margin = '0px';
 					title.style.padding = '0px';
-					event.dialog.add(js);
+					var shown = js.filter(card => {
+						var name = (card.viewAs || card.name), info = lib.card[name];
+						if (!info || !info.blankCard) return true;
+						return false;
+					});
+					if (shown.length < js.length) {
+						var hidden = js.filter(card => !shown.includes(card));
+						var buttons = ui.create.div('.buttons', event.dialog.content);
+						event.dialog.buttons = event.dialog.buttons.concat(ui.create.buttons(shown, 'card', buttons));
+						event.dialog.buttons = event.dialog.buttons.concat(ui.create.buttons(hidden, 'blank', buttons));
+						if (event.dialog.forcebutton !== false) event.dialog.forcebutton = true;
+						if (event.dialog.buttons.length > 3) {
+							event.dialog.classList.remove('forcebutton-auto');
+						}
+						else if (!event.dialog.noforcebutton) {
+							event.dialog.classList.add('forcebutton-auto');
+						}
+					}
+					else{
+						event.dialog.add(js);
+					}
 					directh = false;
 				}
 			}
@@ -5528,7 +5574,27 @@ export const Content = {
 					var title = event.dialog.add('<div class="text center" style="margin: 0px;">判定区</div>');
 					title.style.margin = '0px';
 					title.style.padding = '0px';
-					event.dialog.add(js);
+					var shown = js.filter(card => {
+						var name = (card.viewAs || card.name), info = lib.card[name];
+						if (!info || !info.blankCard) return true;
+						return false;
+					});
+					if (shown.length < js.length) {
+						var hidden = js.filter(card => !shown.includes(card));
+						var buttons = ui.create.div('.buttons', event.dialog.content);
+						event.dialog.buttons = event.dialog.buttons.concat(ui.create.buttons(shown, 'card', buttons));
+						event.dialog.buttons = event.dialog.buttons.concat(ui.create.buttons(hidden, 'blank', buttons));
+						if (event.dialog.forcebutton !== false) event.dialog.forcebutton = true;
+						if (event.dialog.buttons.length > 3) {
+							event.dialog.classList.remove('forcebutton-auto');
+						}
+						else if (!event.dialog.noforcebutton) {
+							event.dialog.classList.add('forcebutton-auto');
+						}
+					}
+					else{
+						event.dialog.add(js);
+					}
 					directh = false;
 				}
 			}

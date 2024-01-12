@@ -5646,7 +5646,7 @@ export class Player extends HTMLDivElement {
 	}
 	canAddJudge(card) {
 		if (this.isDisabledJudge()) return false;
-		var name;
+		let name;
 		if (typeof card == 'string') {
 			name = card;
 		}
@@ -5654,7 +5654,9 @@ export class Player extends HTMLDivElement {
 			name = card.viewAs || card.name;
 		}
 		if (!name) return false;
-		if (this.hasJudge(name)) return false;
+		const cardInfo = lib.card[name];
+		if(!cardInfo) return false;
+		if (!cardInfo.allowDuplicate && this.hasJudge(name)) return false;
 		if (this.isOut()) return false;
 		var mod = game.checkMod(card, this, this, 'unchanged', 'targetEnabled', this);
 		if (mod != 'unchanged') return mod;

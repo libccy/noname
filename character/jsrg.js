@@ -66,6 +66,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		perfectPair:{},
 		card:{
+			xumou_jsrg:{
+				type:'delay',
+				allowDuplicate:true,
+				blankCard:true,
+				effect:function(){
+					'step 0'
+					var card=event.cards[0];
+					player.chooseUseTarget(card,`蓄谋:是否使用${get.translation(card)}？`,`请选择要使用的目标。若不使用此牌，则判定区内的所有“蓄谋”牌都将被置入弃牌堆。`);
+					'step 1'
+					if(!result.bool){
+						var cards=player.getCards('j',card=>{
+							return (card.viewAs||card.name)=='xumou_jsrg';
+						});
+						if(cards.length>0) player.loseToDiscardpile(cards);
+					}
+				},
+			},
 			ying:{
 				audio:true,
 				fullskin:true,
@@ -6311,6 +6328,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_fanjiangzhangda_prefix:'转',
 			jsrgfushan:'负山',
 			jsrgfushan_info:'出牌阶段开始时，所有其他角色可以依次交给你一张牌并令你此阶段使用【杀】的次数上限+1。此阶段结束时，若你使用【杀】的次数未达到上限且此阶段以此法交给你牌的角色均存活，你失去2点体力，否则你将手牌摸至体力上限。',
+			
+			xumou_jsrg:'蓄谋',
+			xumou_jsrg_info:'“蓄谋”牌可在判定区内重复存在。判定阶段开始时，你选择一项：⒈使用此牌对应的实体牌，然后本阶段不能再使用此牌名的牌；⒉将所有的“蓄谋”牌置入弃牌堆。',
 
 			jiangshanrugu_qi:'江山如故·起',
 			jiangshanrugu_cheng:'江山如故·承',

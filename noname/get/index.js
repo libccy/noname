@@ -1653,7 +1653,7 @@ export class Get extends Uninstantable {
 				}
 			}
 		}
-		if (obj instanceof lib.element.Button) return 'button';
+		if (obj instanceof lib.element.Button || obj instanceof HTMLDivElement && obj.classList.contains('button') ) return 'button';
 		if (obj instanceof lib.element.Card) return 'card';
 		if (obj instanceof lib.element.Player) return 'player';
 		if (obj instanceof lib.element.Dialog) return 'dialog';
@@ -3319,7 +3319,12 @@ export class Get extends Uninstantable {
 			}
 			if (get.position(node) == 'j' && node.viewAs && node.viewAs != name) {
 				uiintro.add(get.translation(node.viewAs));
-				uiintro.add('<div class="text center">（' + get.translation(get.translation(node)) + '）</div>');
+				var cardInfo = lib.card[node.viewAs], showCardIntro=true;
+				if (cardInfo.blankCard) {
+					var cardOwner = get.owner(node);
+					if (cardOwner && !cardOwner.isUnderControl(true)) showCardIntro = false;
+				}
+				if (showCardIntro) uiintro.add('<div class="text center">（' + get.translation(get.translation(node)) + '）</div>');
 				// uiintro.add(get.translation(node.viewAs)+'<br><div class="text center" style="padding-top:5px;">（'+get.translation(node)+'）</div>');
 				uiintro.nosub = true;
 				name = node.viewAs;

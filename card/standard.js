@@ -1926,7 +1926,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var trigger=event.getParent(2)._trigger;
 					if(trigger.name=='phaseJudge'){
-						trigger.untrigger();
+						trigger.untrigger('currentOnly');
 						trigger.cancelled=true;
 					}
 					else{
