@@ -126,4 +126,7 @@ export class VCard {
 		if (nature == 'linked') return natures.some(n => lib.linked.includes(n));
 		return get.is.sameNature(natures, nature);
 	}
+	hasGaintag(tag) {
+		return this.gaintag && this.gaintag.includes(tag);
+	}
 }

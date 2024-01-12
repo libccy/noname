@@ -4910,7 +4910,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					// player.$draw(player.storage.xunbao2);
 					player.addSkill('xunbao2');
 					game.delay(2);
-
 					event.node=event.card.copy('thrown','center','thrownhighlight',ui.arena).addTempClass('start');
 					ui.arena.classList.add('thrownhighlight');
 					game.addVideo('thrownhighlight1');
@@ -8218,7 +8217,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.storage.huanfeng_end;
 						},
 						content:function(){
-
 							player.insertPhase();
 							delete player.storage.huanfeng_end;
 						}

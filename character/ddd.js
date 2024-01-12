@@ -1,5 +1,4 @@
 'use strict';
-
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'ddd',
@@ -1042,7 +1041,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					check:function(button){
 						// if(typeof button.link=='number') return button.link;
-						return 1; 
+						return 1;
 					},
 					backup:function(links,player){
 						// if(typeof links[0]=='number') links.reverse();
@@ -3786,7 +3785,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.broadcast(function(players,cards1,targets,cards2){
 						lib.skill['dddfenye'].$compareFenye(players,cards1,targets,cards2);
 					},players,cards1,targets,cards2);
-					
 					var left0=-players.length*52-(players.length-1)*8;
 					for(var i=0;i<players.length;i++){
 						(function(target,card1,i){
@@ -3835,7 +3833,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							node1.listenTransition(onEnd02);
 						}(players[i],cards1[i],i))
 					}
-
 					setTimeout(function(){
 						var left0=-targets.length*52-(targets.length-1)*8;
 						for(var i=0;i<targets.length;i++){
@@ -4619,7 +4616,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						str+='〖枭行〗';
 						choices.push('dddxiaoxing');
 					}
-					if(bool1&&bool2) str+='/'; 
+					if(bool1&&bool2) str+='/';
 					if(bool2){
 						str+='〖狼志〗';
 						choices.push('dddlangzhi');

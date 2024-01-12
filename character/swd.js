@@ -87,7 +87,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// swd_yangshuo:['male','qun',4,['longdan','luomu']],
 			// swd_zhanglie:['male','qun',4,['huajin','poxiao']],
 
-
 			swd_hanluo:['male','qun',5,['tiebi']],
 			swd_fu:['male','qun',5,['yudun']],
 			swd_linyue:['male','wei',3,['zhenjiu','lmazui']],
@@ -1082,7 +1081,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result&&result.cards){
 						event.card=result.cards[0];
 						player.lose(result.cards,ui.special);
-
 						var cardx=ui.create.card();
 						cardx.classList.add('infohidden');
 						cardx.classList.add('infoflip');
@@ -3419,7 +3417,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(target.sex!='male') return false;
 								var name=target.name.indexOf('unknown')==0?target.name2:target.name;
 								if(name==player.storage.huanxing) return false;
-
 								var info=lib.character[name];
 								if(info){
 									var skills=info[3];
@@ -4317,7 +4314,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.attitude(target,player)>0) return 0;
 						return 9-get.value(card);
 					}
-
 					"step 1"
 					if(result.bool){
 						target.addTempSkill('duishi3');
@@ -5260,7 +5256,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.player.update();
 						player.addTempSkill('susheng2');
 					}
-
 				},
 				ai:{
 					threaten:2
@@ -5407,14 +5402,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var handcards1,handcards2,judges,equips,viewAs,i,j;
 					player.storage.kunlunjing=[];
 					player.storage.kunlunjing2=player.hp;
-
 					for(i=0;i<game.players.length;i++){
 						viewAs=[];
 						handcards1=[];
 						handcards2=[];
 						judges=[];
 						equips=[];
-
 						for(j=0;j<game.players[i].node.handcards1.childNodes.length;j++)
 							handcards1.push(game.players[i].node.handcards1.childNodes[j]);
 
@@ -6666,7 +6659,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.targets[i].directgain(get.cards(2));
 						event.targets[i].$draw(2);
 					}
-
 				},
 				ai:{
 					threaten:1.3,
@@ -8505,7 +8497,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						player.node.avatar.setBackground('swd_satan','character');
 					}
-
 					"step 1"
 					player.recover(2);
 					"step 2"
@@ -9136,7 +9127,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							get.cnNumber(i+1,true)+'】</div><div>'+effects[i]+'</div></div>');
 							item.addEventListener('click',clickItem);
 							item.link=i+1;
-
 						}
 						event.control=ui.create.control('取消',function(){
 							event.choice=0;
@@ -9225,7 +9215,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						player.unmarkSkill('mailun');
 					}
-
 					if(event.dialog){
 						event.dialog.close();
 					}
@@ -10119,7 +10108,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guiying_info:'你可以将一张黑色牌当偷梁换柱使用。',
 			shehun:'摄魂',
 			shehun_info:'出牌阶段限一次，你可以弃置任意张花色不同的牌，另一名其他角色弃置等量的牌，若其弃置的牌中有牌的花色与你弃置的牌相同，你对其造成1点伤害。',
-
 
 			zhanlu:'沾露',
 			luomu:'落木',

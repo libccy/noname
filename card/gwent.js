@@ -643,7 +643,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:0.5,
 				}
 			},
-
 			gw_ganhan:{
 				fullborder:'gold',
 				type:'spell',
@@ -892,7 +891,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:0.2,
 				}
 			},
-
 			gw_youer:{
 				fullborder:'silver',
 				type:'spell',
@@ -1268,7 +1266,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:7,
 				}
 			},
-
 			gw_nuhaifengbao:{
 				fullborder:'silver',
 				type:'spell',
@@ -1378,7 +1375,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:1,
 				}
 			},
-
 			gw_qinpendayu:{
 				fullborder:'bronze',
 				type:'spell',

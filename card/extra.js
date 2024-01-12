@@ -159,7 +159,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								if(target.hasSkillTag('directHit_ai',true,{
 									target:effs[i].target,
 									card:i
-								},true) || usable===1&&(target.needsToDiscard()>Math.max(0,3-target.hp) || !effs[i].target.mayHaveShan(player,'use'))){
+								},true) || usable===1&&(target.needsToDiscard()>Math.max(0,3-target.hp) || !effs[i].target.mayHaveShan(player,'use',effs[i].target.getCards(i=>{
+									return i.hasGaintag('sha_notshan');
+								})))){
 									delete target._jiu_temp;
 									return 1;
 								}
@@ -241,7 +243,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							var nh=player.countCards('h');
 							if(nh<=player.hp&&nh<=4&&_status.event.name=='chooseToUse'){
 								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'huogong'},player,_status.event)){
+									_status.event.filterCard(new lib.element.VCard({name:'huogong'}),player,_status.event)){
 									return -10;
 								}
 								if(_status.event.skill){
@@ -268,7 +270,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 							if(target==player){
 								if(typeof _status.event.filterCard=='function'&&
-									_status.event.filterCard({name:'huogong'},player,_status.event)){
+									_status.event.filterCard(new lib.element.VCard({name:'huogong'}),player,_status.event)){
 									return -1.15;
 								}
 								if(_status.event.skill){
@@ -1020,7 +1022,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			baiyin:'白银狮子',
 			baiyin_info:'锁定技。①当你受到伤害时，若此伤害大于1，则你将伤害值扣减至1点。②当你失去装备区内的【白银狮子】后，你回复1点体力。',
 			baiyin_skill:'白银狮子',
-			
+
 			muniu:'木牛流马',
 			muniu_bg:'牛',
 			muniu_skill:'木牛',
@@ -1084,7 +1086,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			["spade",13,"wuxie"],
 			["spade",10,"bingliang"],
 			["club",4,"bingliang"],
-			
+
 			['diamond',5,'muniu'],
 		],
 	}

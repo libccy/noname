@@ -42,7 +42,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diaochan:['female','qun',3,['lijian','biyue']],
 			huaxiong:['male','qun',6,['yaowu']],
 			gongsunzan:['male','qun',4,['reyicong']],
-			
+
 			xf_yiji:["male","shu",3,["xinfu_jijie","xinfu_jiyuan"],[]],
 			re_yuanshu:['male','qun',4,['rewangzun','retongji']],
 		},
@@ -73,7 +73,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lvbu:'字奉先，五原郡九原县人。三国第一猛将，曾独力战刘关张三人，其武力世之无双。时人语曰：“人中有吕布，马中有赤兔。”',
 			diaochan:'中国古代四大美女之一，有闭月羞花之貌。司徒王允之义女，由王允授意施行连环计，离间董卓、吕布，借布手除卓。后貂蝉成为吕布的妾。',
 			huaxiong:'董卓旗下名将，自荐抵抗山东地区反对董卓的诸侯联军于汜水关前，他先后斩杀济北相鲍信之弟鲍忠和孙坚部将祖茂、以及袁术部将俞涉和韩馥手下潘凤等人，最后关东联军派出关羽与之一对一决斗而被杀。',
-			
+
 			xf_yiji:"伊籍，字机伯，生卒年不详，兖州山阳郡（今山东金乡县）人，三国时期蜀汉官员。年少时依附于同乡刘表。刘备落难到荆州时，伊籍时常拜访，托请刘备照顾。建安十三年（208年），刘表病死，伊籍便转投刘备，一起渡江南下。建安十六年（211年），刘备入蜀帮助刘璋，伊籍亦有跟随。随后刘备和刘璋双方决裂。建安十九年（214年），刘备平定益州，任命伊籍为左将军从事中郎，其待遇次于简雍、孙乾等。后升任昭文将军，并与诸葛亮、法正、刘巴、李严共同编制《蜀科》。",
 		},
 		perfectPair:{
@@ -204,7 +204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						return -1;
 					})()>0);
-					if(bool){	
+					if(bool){
 						player.logSkill('retongji',trigger.target);
 						trigger.target.discard(cards);
 						const evt=trigger.getParent();
@@ -2399,7 +2399,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xf_yiji":"伊籍",
 			re_yuanshu:'袁术',
 			caozhang:'曹彰',
-			
+
 			ganglie:'刚烈',
 			tuxi:'突袭',
 			luoyi:'裸衣',
@@ -2539,7 +2539,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			stdshushen:'淑慎',
 			stdshushen_info:'当你回复1点体力时，你可以令一名其他角色摸一张牌（若其没有手牌则改为摸两张牌）。',
 			old_re_lidian:'李典',
-			
+
 			standard_2008:"2008版标准包",
 			standard_2013:"2013版标准包",
 			standard_2019:"2019版标准包",

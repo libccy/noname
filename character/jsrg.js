@@ -234,7 +234,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-
 			},
 			jsrgzhenfeng:{
 				audio:2,
@@ -838,7 +837,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							animate:'gain2',
 						}).setContent('gaincardMultiple');
 					}
-
 				},
 				subSkill:{
 					zero:{
@@ -3201,7 +3199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							goon:get.attitude(player,trigger.player)>1&&(evt.card?get.effect(trigger.player,evt.card,evt.player,player)<0:get.effect(trigger.player,{name:event.list[0]},trigger.player,player)>0),
 							ai1:function(card){
 								if(_status.event.goon) return 6-get.value(card);
-								return 0;	
+								return 0;
 							},
 							_get_card:card,
 						});

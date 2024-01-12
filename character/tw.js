@@ -3783,7 +3783,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addTempSkill('twqirang_use');
 						player.addTempSkill('twqirang_clear',['phaseZhunbeiAfter','phaseDrawAfter','phaseUseAfter','phaseDiscardAfter','phaseJieshuAfter','phaseAfter']);
 					}
-
 				},
 				ai:{
 					effect:{
@@ -8554,7 +8553,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									player.stat[player.stat.length-1].card.sha--;
 								}
 							}
-
 						}
 					}
 				}
@@ -9093,7 +9091,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									evt.skipped=true;
 								}
 							}
-
 						}
 					}
 				},
@@ -14497,12 +14494,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('renshe');
 						switch(result.control){
 							case '选项一':
-								event.goto(3);	
+								event.goto(3);
 								break;
 							case '选项二':
 								player.addMark('waishi_remover',1,false);
 								player.addTempSkill('waishi_remover',{player:'phaseUseAfter'});
-								event.finish();	
+								event.finish();
 								break;
 							case '选项三':
 								player.chooseTarget('请选择一名角色，与其各摸一张牌',lib.filter.notMe,true).set('ai',function(target){
@@ -14627,7 +14624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_caohong_prefix:'TW将',
 			tw_maliang:'TW马良',
 			tw_maliang_prefix:'TW',
-			
+
 			twyanqin:'姻亲',
 			twyanqin_info:'准备阶段，你可以将势力变更为魏或蜀。',
 			twbaobian:'豹变',
