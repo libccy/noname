@@ -107,8 +107,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(!player.countCards('h',{name:'sha'})) return false;
 					return event.card&&(event.card.name=='sha'||event.card.name=='juedou');
 				},
-				content:function(){	
-					player.addTempSkill('yxs_fanji2','shaAfter');   
+				content:function(){
+					player.addTempSkill('yxs_fanji2','shaAfter');
 					player.chooseToUse({name:'sha'},trigger.source,'反击：是否对'+get.translation(trigger.source)+'使用一张杀？').logSkill='yxs_fanji';
 				},
 			},
@@ -121,7 +121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function (event,player){
 					return event.card&&event.card.name=='sha'&&get.color(event.card)=='red';
 				},
-				content:function (){	
+				content:function (){
 					trigger.directHit=true;
 				},
 			},
@@ -142,7 +142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-			},	 
+			},
 			yxs_menshen:{
 				audio:2,
 				trigger:{
@@ -162,7 +162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.attitude(player,target);
 					});
 					"step 1"
-					if(result.bool){		   
+					if(result.bool){
 						var target=result.targets[0];
 						player.line(target,'green');
 						game.log(target,'成为了','【门神】','的目标');
@@ -170,7 +170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.addSkill('yxs_menshen2');
 					}
 					else{
-						event.finish(); 
+						event.finish();
 					}
 				},
 				ai:{
@@ -216,7 +216,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				logTarget:'player',
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.player.isIn()&&!event.player.hasSkill('lyuxue2');
 				},
 				content:function(){
@@ -487,7 +487,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.cards=trigger.cards.slice(0);
 					player.chooseCardTarget({
 						filterCard:function(card){
-							return _status.event.getParent().cards.contains(card);
+							return _status.event.getParent().cards.includes(card);
 						},
 						selectCard:1,
 						filterTarget:function(card,player,target){
@@ -568,7 +568,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					player.chooseCardTarget({
 						filterCard:function(card){
-							return _status.event.getParent().cards.contains(card);
+							return _status.event.getParent().cards.includes(card);
 						},
 						selectCard:[1,event.cards.length],
 						filterTarget:function(card,player,target){
@@ -962,7 +962,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				frequent:true,
 				filter:function(event){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.player.isAlive()&&event.parent.name=='yanyi'&&event.player.hp<event.player.maxHp;
 				},
 				content:function(){
@@ -973,7 +973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					player.chooseCardTarget({
 						filterCard:function(card){
-							return _status.event.parent.cards.contains(card);
+							return _status.event.parent.cards.includes(card);
 						},
 						selectCard:[1,event.cards.length],
 						filterTarget:function(card,player,target){
@@ -1268,7 +1268,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('heqin');
-
 					player.addSkill('heqin2');
 					target.addSkill('heqin2');
 
@@ -1437,7 +1436,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd'},
 				direct:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					if(event.player.isDead()) return false;
 					var nh=event.player.countCards('h');
 					if(nh==0) return false;
@@ -1555,7 +1554,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(target.sex!='male') return false;
 								var name=target.name.indexOf('unknown')==0?target.name2:target.name;
 								if(name==player.storage.yizhuang) return false;
-
 								var info=lib.character[name];
 								if(info){
 									var skills=info[3];
@@ -1916,7 +1914,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nichang:{
 				trigger:{player:'phaseDrawBefore'},
 				check:function(event,player){
-					if(player.skipList.contains('phaseUse')) return true;
+					if(player.skipList.includes('phaseUse')) return true;
 					var suits=['spade','heart','diamond','club'];
 					var cards=player.getCards('h');
 					for(var i=0;i<cards.length;i++){
@@ -2417,7 +2415,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				priority:15,
 				filter:function(event,player){
 					return event.card.name=='sha'&&event.player!=player&&
-					player.countCards('h','sha')>0&&event.targets.contains(player)==false;
+					player.countCards('h','sha')>0&&event.targets.includes(player)==false;
 				},
 				direct:true,
 				content:function(){
@@ -3097,7 +3095,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			seyou_info:'限定技，出牌阶段，你可以指定任意1名角色，其他所有男性角色需选择1项执行：（1）对你指定的角色出【杀】；（2）令你获得其一张牌。',
 			sheshi:'蛇噬',
 			sheshi_info:'每受到1次伤害，可以指定1种花色，依次展示牌堆顶的牌，直到出现指定花色的牌为止，你获得与指定花色不同花色的所有牌（最多展示四张牌）。',
-
 
 			fengyi:'凤仪',
 			fengyi_info:'出牌阶段，你可以弃一张手牌，指定任意目标摸两张牌。（每回合限用一次）',

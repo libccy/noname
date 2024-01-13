@@ -105,7 +105,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							game.chooseCharacterDouble(function(i){
-								if(lib.character[i][4].contains('chessboss')){
+								if(lib.character[i][4].includes('chessboss')){
 									return false;
 								}
 								return !lib.filter.characterDisabled(i);
@@ -213,7 +213,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			_status.enemyCount=_status.enemylist.length;
 			_status.friendCount=_status.mylist.length;
 			while(_status.mylist.length){
-				friend=ui.create.player().animate('start');
+				friend=ui.create.player().addTempClass('start');
 				friend.getId();
 				if(!event.friendZhu){
 					event.friendZhu=friend;
@@ -233,7 +233,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				}
 				else{
 					ui.placeChess(friend,grids.randomRemove());
-					if(_status.enterArena&&game.data.arena.acted.contains(friend.name)){
+					if(_status.enterArena&&game.data.arena.acted.includes(friend.name)){
 						friend.hp--;
 						friend.update();
 					}
@@ -244,7 +244,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				lib.posmap[friend.dataset.position]=friend;
 			}
 			while(_status.enemylist.length){
-				enemy=ui.create.player().animate('start');
+				enemy=ui.create.player().addTempClass('start');
 				enemy.getId();
 				enemy.init(_status.enemylist.shift());
 				enemy.side=!side;
@@ -548,8 +548,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 
 					if(get.mode()=='tafang'&&!_status.video){
-						if(_status.tafangend.contains(this.dataset.position)){
-							if(_status.enemies.contains(this)){
+						if(_status.tafangend.includes(this.dataset.position)){
+							if(_status.enemies.includes(this)){
 								game.over(false);
 							}
 							else{
@@ -619,25 +619,25 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					forbid=forbid||[];
 					if(Math.abs(dx)>Math.abs(dy)){
 						if(dx<0){
-							if(!forbid.contains('moveLeft')&&this.movable(-1,0)){
+							if(!forbid.includes('moveLeft')&&this.movable(-1,0)){
 								this.moveLeft();
 								return 'moveLeft';
 							}
 						}
 						else if(dx>0){
-							if(!forbid.contains('moveRight')&&this.movable(1,0)){
+							if(!forbid.includes('moveRight')&&this.movable(1,0)){
 								this.moveRight();
 								return 'moveRight';
 							}
 						}
 						if(dy<0){
-							if(!forbid.contains('moveUp')&&this.movable(0,-1)){
+							if(!forbid.includes('moveUp')&&this.movable(0,-1)){
 								this.moveUp();
 								return 'moveUp';
 							}
 						}
 						else if(dy>0){
-							if(!forbid.contains('moveDown')&&this.movable(0,1)){
+							if(!forbid.includes('moveDown')&&this.movable(0,1)){
 								this.moveDown();
 								return 'moveDown';
 							}
@@ -645,25 +645,25 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						if(dy<0){
-							if(!forbid.contains('moveUp')&&this.movable(0,-1)){
+							if(!forbid.includes('moveUp')&&this.movable(0,-1)){
 								this.moveUp();
 								return 'moveUp';
 							}
 						}
 						else if(dy>0){
-							if(!forbid.contains('moveDown')&&this.movable(0,1)){
+							if(!forbid.includes('moveDown')&&this.movable(0,1)){
 								this.moveDown();
 								return 'moveDown';
 							}
 						}
 						if(dx<0){
-							if(!forbid.contains('moveLeft')&&this.movable(-1,0)){
+							if(!forbid.includes('moveLeft')&&this.movable(-1,0)){
 								this.moveLeft();
 								return 'moveLeft';
 							}
 						}
 						else if(dx>0){
-							if(!forbid.contains('moveRight')&&this.movable(1,0)){
+							if(!forbid.includes('moveRight')&&this.movable(1,0)){
 								this.moveRight();
 								return 'moveRight';
 							}
@@ -843,7 +843,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var notend=false;
 					for(var i=1;i<game.players.length;i++){
 						if(game.players[i].side!=game.players[0].side){
-							if(source&&game.players.contains(source)){
+							if(source&&game.players.includes(source)){
 								if(_status.mode=='combat'){
 									if(source.side!=player.side){
 										source.draw(get.config('reward'));
@@ -1082,7 +1082,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				$phaseJudge:function(card){
 					game.addVideo('phaseJudge',this,get.cardInfo(card));
-					var clone=card.copy('thrown',this.parentNode).animate('judgestart');
+					var clone=card.copy('thrown',this.parentNode).addTempClass('judgestart');
 					var player=this;
 					clone.style.opacity=0.6;
 					clone.style.left=(Math.random()*100-50+ui.chessContainer.chessLeft+ui.chessContainer.offsetWidth/2-52)+'px';
@@ -1267,7 +1267,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						var dontMove=null;
 						for(var iwhile=0;iwhile<num;iwhile++){
-							if(get.mode()=='tafang'&&_status.enemies.contains(player)){
+							if(get.mode()=='tafang'&&_status.enemies.includes(player)){
 								var targets2=[];
 								for(var i=0;i<ui.chesswidth;i++){
 									var tafangdes=ui.chesswidth*(ui.chessheight-1)+i;
@@ -1523,7 +1523,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				var player=ui.create.player();
 				player.getId();
 				if(enemy=='treasure'){
-					player.animate('judgestart');
+					player.addTempClass('judgestart');
 					player.side=null;
 					player.identity='neutral';
 					player.setIdentity();
@@ -1534,7 +1534,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					game.treasures.add(player);
 				}
 				else{
-					player.animate('start');
+					player.addTempClass('start');
 					if(enemy){
 						if(get.mode()=='tafang'){
 							player.side=true;
@@ -1634,7 +1634,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					pos=y*ui.chesswidth+x;
 				}
 				if(!lib.posmap[pos]){
-					var grid=ui.create.div('.player.minskin.obstacle',ui.chess).animate('start');
+					var grid=ui.create.div('.player.minskin.obstacle',ui.chess).addTempClass('start');
 					ui.placeChess(grid,pos);
 					grid.listen(ui.click.obstacle);
 					lib.posmap[pos]=grid;
@@ -1655,7 +1655,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					pos=pos.dataset.position;
 				}
 				var node=lib.posmap[pos];
-				if(node&&game.obstacles.contains(node)){
+				if(node&&game.obstacles.includes(node)){
 					game.addVideo('removeObstacle',null,pos);
 					game.obstacles.remove(node);
 					delete lib.posmap[pos];
@@ -1667,7 +1667,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					pos=pos.dataset.position;
 				}
 				var node=lib.posmap[pos];
-				if(node&&game.obstacles.contains(node)){
+				if(node&&game.obstacles.includes(node)){
 					pos=parseInt(pos);
 					var x2=pos%ui.chesswidth+x;
 					var y2=Math.floor(pos/ui.chesswidth)+y;
@@ -1699,7 +1699,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					pos=pos.dataset.position;
 				}
 				var node=lib.posmap[pos];
-				if(node&&game.obstacles.contains(node)){
+				if(node&&game.obstacles.includes(node)){
 					game.addVideo('colorObstacle',null,[pos,color]);
 					node.dataset.obscolor=color;
 				}
@@ -1752,10 +1752,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(_status.victory){
 						game.data.arena.win++;
 						for(var i=0;i<game.players.length;i++){
-							if(_status.arenaAdd&&_status.arenaAdd.contains(game.players[i].name)){
+							if(_status.arenaAdd&&_status.arenaAdd.includes(game.players[i].name)){
 								continue;
 							}
-							if(game.data.arena.dead.contains(game.players[i].name)){
+							if(game.data.arena.dead.includes(game.players[i].name)){
 								game.data.arena.dead.remove(game.players[i].name);
 								game.data.arena.acted.push(game.players[i].name);
 							}
@@ -2166,7 +2166,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i in lib.rank.rarity){
 							if(Array.isArray(lib.rank.rarity[i])){
 								for(var j=0;j<lib.rank.rarity[i].length;j++){
-									if(!list.contains(lib.rank.rarity[i][j])||!lib.character[lib.rank.rarity[i][j]]){
+									if(!list.includes(lib.rank.rarity[i][j])||!lib.character[lib.rank.rarity[i][j]]){
 										lib.rank.rarity[i].splice(j--,1);
 									}
 								}
@@ -2175,7 +2175,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						for(var i in lib.rank){
 							if(Array.isArray(lib.rank[i])){
 								for(var j=0;j<lib.rank[i].length;j++){
-									if(!list.contains(lib.rank[i][j])){
+									if(!list.includes(lib.rank[i][j])){
 										lib.rank[i].splice(j--,1);
 									}
 								}
@@ -2200,9 +2200,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						concat(lib.rank.d);
 					lib.rank.rarity.common=[];
 					for(var i=0;i<lib.rank.all.length;i++){
-						if(!lib.rank.rarity.legend.contains(lib.rank.all[i])&&
-							!lib.rank.rarity.epic.contains(lib.rank.all[i])&&
-							!lib.rank.rarity.rare.contains(lib.rank.all[i])){
+						if(!lib.rank.rarity.legend.includes(lib.rank.all[i])&&
+							!lib.rank.rarity.epic.includes(lib.rank.all[i])&&
+							!lib.rank.rarity.rare.includes(lib.rank.all[i])){
 							lib.rank.rarity.common.push(lib.rank.all[i]);
 						}
 					}
@@ -2316,9 +2316,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							else{
 								node.listen(turnCard);
-								if(!game.data.character.contains(name)){
+								if(!game.data.character.includes(name)){
 									game.data.character.push(name);
-									if(game.data.challenge.contains(name)){
+									if(game.data.challenge.includes(name)){
 										game.data.challenge=game.getLeaderList();
 										game.saveData();
 									}
@@ -2626,21 +2626,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									ui.money.childNodes[1].innerHTML=game.data.dust;
 									game.changeMoney(-100);
 									if(game.data.character.length>3&&selected.character.length){
-										event.removeCharacter.animate('controlpressdownx',500);
+										event.removeCharacter.addTempClass('controlpressdownx',500);
 										event.removeCharacter.classList.remove('disabled');
 									}
 									if(game.data.money<150&&!game.data._arena){
 										event.enterArena.classList.add('disabled');
 									}
 									else{
-										event.enterArena.animate('controlpressdownx',500);
+										event.enterArena.addTempClass('controlpressdownx',500);
 										event.enterArena.classList.remove('disabled');
 									}
 									if(game.data.money<100){
 										event.addCharacter.classList.add('disabled');
 									}
 									else{
-										event.addCharacter.animate('controlpressdownx',500);
+										event.addCharacter.addTempClass('controlpressdownx',500);
 										event.addCharacter.classList.remove('disabled');
 									}
 									initcapt();
@@ -2713,11 +2713,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.data.character.remove(node.link);
 								game.saveData();
 								if(game.data.money>=100){
-									event.addCharacter.animate('controlpressdownx',500);
+									event.addCharacter.addTempClass('controlpressdownx',500);
 									event.addCharacter.classList.remove('disabled');
 								}
 								if(game.data.money>=150){
-									event.enterArena.animate('controlpressdownx',500);
+									event.enterArena.addTempClass('controlpressdownx',500);
 									event.enterArena.classList.remove('disabled');
 								}
 								node.delete();
@@ -2952,7 +2952,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						if(selected.character.length&&game.data.character.length>3){
-							event.removeCharacter.animate('controlpressdownx',500);
+							event.removeCharacter.addTempClass('controlpressdownx',500);
 							event.removeCharacter.classList.remove('disabled');
 						}
 						else{
@@ -2990,14 +2990,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							_status.qianfan=false;
 							event.removeCharacter.replace('遣返',qianfan);
 							if(game.data.money>=100){
-								event.addCharacter.animate('controlpressdownx',500);
+								event.addCharacter.addTempClass('controlpressdownx',500);
 								event.addCharacter.classList.remove('disabled');
 							}
 							else{
 								event.addCharacter.classList.add('disabled');
 							}
 							if(game.data.money>=150||game.data._arena){
-								event.enterArena.animate('controlpressdownx',500);
+								event.enterArena.addTempClass('controlpressdownx',500);
 								event.enterArena.classList.remove('disabled');
 							}
 							else{
@@ -3263,13 +3263,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						nodes[8].style.top='calc(50% + 80px)';
 						for(var i=0;i<nodes.length;i++){
 							ui.refresh(nodes[i]);
-							if(game.data.arena.dead.contains(nodes[i].name)){
+							if(game.data.arena.dead.includes(nodes[i].name)){
 								nodes[i].classList.add('dead');
 								nodes[i].style.opacity=0.3;
 							}
 							else{
 								nodes[i].style.opacity=1;
-								if(game.data.arena.acted.contains(nodes[i].name)){
+								if(game.data.arena.acted.includes(nodes[i].name)){
 									var acted=nodes[i].node.action;
 									acted.style.opacity=1;
 									acted.innerHTML='疲劳';
@@ -3435,9 +3435,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(typeof prize[i]=='string'){
 									var name=prize[i];
 									var rarity=game.getRarity(name);
-									if(!game.data.character.contains(name)){
+									if(!game.data.character.includes(name)){
 										game.data.character.push(name);
-										if(game.data.challenge.contains(name)){
+										if(game.data.challenge.includes(name)){
 											game.data.challenge=game.getLeaderList();
 										}
 									}
@@ -3653,16 +3653,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var jiangelist=[];
 					event.list=list;
 					for(i in lib.character){
-						if(lib.character[i][4].contains('chessboss')){
+						if(lib.character[i][4].includes('chessboss')){
 							bosslist.push(i);continue;
 						}
-						else if(lib.character[i][4].contains('jiangeboss')){
+						else if(lib.character[i][4].includes('jiangeboss')){
 							// if(get.config('chess_jiange')) jiangelist.push(i);
 							continue;
 						}
 						if(i.indexOf('treasure_')==0) continue;
-						if(lib.character[i][4].contains('minskin')) continue;
-						if(lib.config.forbidchess.contains(i)) continue;
+						if(lib.character[i][4].includes('minskin')) continue;
+						if(lib.config.forbidchess.includes(i)) continue;
 						if(lib.filter.characterDisabled(i)) continue;
 						list.push(i);
 					}
@@ -3729,7 +3729,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						addToButton();
 					};
-
 
 					for(var i=0;i<bossbuttons.length;i++){
 						bossbuttons[i].classList.add('noclick');
@@ -3885,7 +3884,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							else if(dialog.buttons.length<num){
 								for(var i=dialog.buttons.length;i<num;i++){
-									dialog.buttons.push(ui.create.button(list[i],'character',dialog.buttons[0].parentNode).animate('zoom'))
+									dialog.buttons.push(ui.create.button(list[i],'character',dialog.buttons[0].parentNode).addTempClass('zoom'))
 								}
 								game.check();
 							}
@@ -3905,7 +3904,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var node=_status.event.dialog.buttons[0].parentNode;
 						_status.event.dialog.buttons=ui.create.buttons(list.slice(0,parseInt(get.config('battle_number'))*4+parseInt(get.config('replace_number'))+5),'character',buttons);
 						_status.event.dialog.content.insertBefore(buttons,node);
-						buttons.animate('start');
+						buttons.addTempClass('start');
 						node.remove();
 
 						// _status.event.dialog.close();
@@ -3940,7 +3939,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.dialogxx.classList.add('fullheight');
 						event.dialogxx.classList.add('fixed');
 						if(ui.cheat2){
-							ui.cheat2.animate('controlpressdownx',500);
+							ui.cheat2.addTempClass('controlpressdownx',500);
 							ui.cheat2.classList.remove('disabled');
 						}
 					};
@@ -3963,7 +3962,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								game.uncheck();
 								game.check();
 								if(ui.cheat){
-									ui.cheat.animate('controlpressdownx',500);
+									ui.cheat.addTempClass('controlpressdownx',500);
 									ui.cheat.classList.remove('disabled');
 								}
 							}
@@ -4472,7 +4471,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var targets=[];
 					var skill=lib.skill.leader_zhaoxiang;
 					for(var i=0;i<game.players.length;i++){
-						if(!game.data.character.contains(game.players[i].name)&&game.players[i].side!=player.side){
+						if(!game.data.character.includes(game.players[i].name)&&game.players[i].side!=player.side){
 							targets.push(game.players[i]);
 						}
 					}
@@ -4531,7 +4530,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return game.data.dust>=10;
 				},
 				filterTarget:function(card,player,target){
-					return game.isChessNeighbour(player,target)&&!game.data.character.contains(target.name);
+					return game.isChessNeighbour(player,target)&&!game.data.character.includes(target.name);
 				},
 				content:function(){
 					var chance=lib.skill.leader_zhaoxiang.chance(target,player);
@@ -5151,28 +5150,28 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var xy=player.getXY();
 					var neighbour;
 					neighbour=player.getNeighbour(-1,0);
-					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.includes(neighbour)){
 						num++;
 					}
 					else if(xy[0]==0){
 						num++;
 					}
 					neighbour=player.getNeighbour(1,0);
-					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.includes(neighbour)){
 						num++;
 					}
 					else if(xy[0]+1>=ui.chesswidth){
 						num++;
 					}
 					neighbour=player.getNeighbour(0,-1);
-					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.includes(neighbour)){
 						num++;
 					}
 					else if(xy[1]==0){
 						num++;
 					}
 					neighbour=player.getNeighbour(0,1);
-					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.includes(neighbour)){
 						num++;
 					}
 					else if(xy[1]+1>=ui.chessheight){
@@ -5186,28 +5185,28 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.movemap={};
 					var neighbour;
 					neighbour=player.getNeighbour(-1,0);
-					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.includes(neighbour)){
 						event.obstacles.push(neighbour);
 						if(player.movable(-2,0)){
 							event.movemap['[-1,0]']=neighbour;
 						}
 					}
 					neighbour=player.getNeighbour(1,0);
-					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.includes(neighbour)){
 						event.obstacles.push(neighbour);
 						if(player.movable(2,0)){
 							event.movemap['[1,0]']=neighbour;
 						}
 					}
 					neighbour=player.getNeighbour(0,-1);
-					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.includes(neighbour)){
 						event.obstacles.push(neighbour);
 						if(player.movable(0,-2)){
 							event.movemap['[0,-1]']=neighbour;
 						}
 					}
 					neighbour=player.getNeighbour(0,1);
-					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.contains(neighbour)){
+					if(neighbour&&typeof neighbour.tempObstacle!='number'&&game.obstacles.includes(neighbour)){
 						event.obstacles.push(neighbour);
 						if(player.movable(0,2)){
 							event.movemap['[0,1]']=neighbour;
@@ -5328,7 +5327,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					order:5,
 					result:{
 						playerx:function(player){
-							if(get.mode()=='tafang'&&_status.enemies.contains(player)){
+							if(get.mode()=='tafang'&&_status.enemies.includes(player)){
 								return 1;
 							}
 							var nh=player.countCards('h');
@@ -5341,22 +5340,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 							var neighbour;
 							neighbour=player.getNeighbour(0,1);
-							if(neighbour&&game.players.contains(neighbour)&&neighbour.side!=player.side){
+							if(neighbour&&game.players.includes(neighbour)&&neighbour.side!=player.side){
 								if(get.distance(player,neighbour,'attack')<1) return 1;
 								return 0;
 							}
 							neighbour=player.getNeighbour(0,-1);
-							if(neighbour&&game.players.contains(neighbour)&&neighbour.side!=player.side){
+							if(neighbour&&game.players.includes(neighbour)&&neighbour.side!=player.side){
 								if(get.distance(player,neighbour,'attack')<1) return 1;
 								return 0;
 							}
 							neighbour=player.getNeighbour(1,0);
-							if(neighbour&&game.players.contains(neighbour)&&neighbour.side!=player.side){
+							if(neighbour&&game.players.includes(neighbour)&&neighbour.side!=player.side){
 								if(get.distance(player,neighbour,'attack')<1) return 1;
 								return 0;
 							}
 							neighbour=player.getNeighbour(-1,0);
-							if(neighbour&&game.players.contains(neighbour)&&neighbour.side!=player.side){
+							if(neighbour&&game.players.includes(neighbour)&&neighbour.side!=player.side){
 								if(get.distance(player,neighbour,'attack')<1) return 1;
 								return 0;
 							}
@@ -5793,7 +5792,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				obstacle:function(){
 					if(_status.event.chooseObstacle&&_status.paused&&
-						_status.event.obstacles&&_status.event.obstacles.contains(this)){
+						_status.event.obstacles&&_status.event.obstacles.includes(this)){
 						_status.event.obstacle=this;
 						game.resume();
 					}
@@ -5869,7 +5868,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.pause();
 						_status.imchoosing=true;
 						for(var i=0;i<event.grids.length;i++){
-							event.grids[i].animate('start');
+							event.grids[i].addTempClass('start');
 						}
 						event.dialog=ui.create.dialog('选择一个位置放置障碍');
 					}
@@ -5911,30 +5910,30 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				selectTarget:-1,
 				enable:function(event,player){
-					if(game.obstacles.contains(player.getNeighbour(-1,0))&&player.movable(-2,0)) return true;
-					if(game.obstacles.contains(player.getNeighbour(1,0))&&player.movable(2,0)) return true;
-					if(game.obstacles.contains(player.getNeighbour(0,-1))&&player.movable(0,-2)) return true;
-					if(game.obstacles.contains(player.getNeighbour(0,1))&&player.movable(0,2)) return true;
+					if(game.obstacles.includes(player.getNeighbour(-1,0))&&player.movable(-2,0)) return true;
+					if(game.obstacles.includes(player.getNeighbour(1,0))&&player.movable(2,0)) return true;
+					if(game.obstacles.includes(player.getNeighbour(0,-1))&&player.movable(0,-2)) return true;
+					if(game.obstacles.includes(player.getNeighbour(0,1))&&player.movable(0,2)) return true;
 				},
 				content:function(){
 					var neighbour,num=0;
 					neighbour=player.getNeighbour(-1,0);
-					if(neighbour&&game.obstacles.contains(neighbour)&&player.movable(-2,0)){
+					if(neighbour&&game.obstacles.includes(neighbour)&&player.movable(-2,0)){
 						game.moveObstacle(neighbour,-1,0);
 						num++;
 					}
 					neighbour=player.getNeighbour(1,0);
-					if(neighbour&&game.obstacles.contains(neighbour)&&player.movable(2,0)){
+					if(neighbour&&game.obstacles.includes(neighbour)&&player.movable(2,0)){
 						game.moveObstacle(neighbour,1,0);
 						num++;
 					}
 					neighbour=player.getNeighbour(0,-1);
-					if(neighbour&&game.obstacles.contains(neighbour)&&player.movable(0,-2)){
+					if(neighbour&&game.obstacles.includes(neighbour)&&player.movable(0,-2)){
 						game.moveObstacle(neighbour,0,-1);
 						num++;
 					}
 					neighbour=player.getNeighbour(0,1);
-					if(neighbour&&game.obstacles.contains(neighbour)&&player.movable(0,2)){
+					if(neighbour&&game.obstacles.includes(neighbour)&&player.movable(0,2)){
 						game.moveObstacle(neighbour,0,1);
 						num++;
 					}
@@ -5947,19 +5946,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.obstacles=[];
 					var neighbour;
 					neighbour=player.getNeighbour(-1,0);
-					if(neighbour&&game.obstacles.contains(neighbour)){
+					if(neighbour&&game.obstacles.includes(neighbour)){
 						event.obstacles.push(neighbour);
 					}
 					neighbour=player.getNeighbour(1,0);
-					if(neighbour&&game.obstacles.contains(neighbour)){
+					if(neighbour&&game.obstacles.includes(neighbour)){
 						event.obstacles.push(neighbour);
 					}
 					neighbour=player.getNeighbour(0,-1);
-					if(neighbour&&game.obstacles.contains(neighbour)){
+					if(neighbour&&game.obstacles.includes(neighbour)){
 						event.obstacles.push(neighbour);
 					}
 					neighbour=player.getNeighbour(0,1);
-					if(neighbour&&game.obstacles.contains(neighbour)){
+					if(neighbour&&game.obstacles.includes(neighbour)){
 						event.obstacles.push(neighbour);
 					}
 					if(!event.obstacles.length){

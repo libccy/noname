@@ -85,7 +85,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						target.lose(result.cards,ui.special);
 						target.$throw(result.cards);
-
 						game.log(target,'用',result.cards,'替换了',event.button.link);
 						target.gain(event.button.link);
 						target.$gain2(event.button.link);
@@ -653,7 +652,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						player.chooseCardButton('偷梁换柱',target.getCards('h')).ai=function(button){
 							var val=get.value(button.link,player,'raw')-minval;
 							if(val>=0){
-								if(colors.contains(get.color(button.link))){
+								if(colors.includes(get.color(button.link))){
 									val+=3;
 								}
 							}
@@ -872,7 +871,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				trigger:{target:'shaBefore'},
 				direct:true,
 				filter:function(event,player){
-					return !event.getParent().directHit.contains(player)&&player.hasUsableCard('youdishenru');
+					return !event.getParent().directHit.includes(player)&&player.hasUsableCard('youdishenru');
 				},
 				content:function(){
 					event.youdiinfo={
@@ -892,7 +891,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(event.player==player) return false;
 					if(!event.player.countCards('he')) return false;
 					if(!lib.filter.targetEnabled({name:'chenhuodajie'},player,event.player)) return false;
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return player.hasUsableCard('chenhuodajie');
 				},
 				content:function(){

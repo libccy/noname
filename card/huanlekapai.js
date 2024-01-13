@@ -43,7 +43,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:lib.filter.notMe,
 				content:function (){
-					"step 0"		
+					"step 0"
 					if(!target.countCards('he',{type:'equip'})){
 						target.damage();
 						event.finish();
@@ -173,7 +173,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				equipSkill:true,
 				filter:function (event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.card&&event.card.name=='sha'&&event.notLink()&&event.player.countCards('he')>0;
 				},
 				content:function (){
@@ -201,7 +201,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 								var skills=info[3];
 								for(var j=0;j<skills.length;j++){
 									if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
-										!lib.skill[skills[j]].unique&&!pss.contains(skills[j])){
+										!lib.skill[skills[j]].unique&&!pss.includes(skills[j])){
 										return true;
 									}
 								}
@@ -233,7 +233,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							for(var j=0;j<skills.length;j++){
 								if(lib.translate[skills[j]+'_info']&&lib.skill[skills[j]]&&
 									!lib.skill[skills[j]].unique&&
-									!pss.contains(skills[j])){
+									!pss.includes(skills[j])){
 									list.push(skills[j]);
 								}
 							}
@@ -246,7 +246,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
 				},
 			},
-
 			"jiuwei":{
 				trigger:{
 					player:"phaseEnd",

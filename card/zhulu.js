@@ -45,7 +45,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					var cards=[];
 					for(var i=0;i<num;i++){
 						var cardx=get.cardPile(function(card){
-							return get.type(card)=='equip'&&!cards.contains(card);
+							return get.type(card)=='equip'&&!cards.includes(card);
 						});
 						if(cardx) cards.push(cardx);
 					}
@@ -90,7 +90,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						});
 						next.set('equips',equips);
 						next.set('filterButton',function(button){
-							return _status.event.equips.contains(button.link);
+							return _status.event.equips.includes(button.link);
 						});
 						next.set('dialog',event.preResult);
 						next.set('closeDialog',false);
@@ -109,7 +109,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					else{
 						card=result.links[0];
 					}
-
 					var button;
 					for(var i=0;i<dialog.buttons.length;i++){
 						if(dialog.buttons[i].link==card){
@@ -237,13 +236,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						target:function(player,target,card){
 							var cards=ui.selected.cards.concat(card.cards||[]);
 							var num=player.countCards('he',function(card){
-								if(cards.contains(card)) return false;
+								if(cards.includes(card)) return false;
 								if(get.type(card)=='equip') return 8>get.value(card);
 								return 6>get.value(card);
 							});
 							if(!num) return 0;
 							if(player.countCards('he',function(card){
-								if(cards.contains(card)) return false;
+								if(cards.includes(card)) return false;
 								if(get.type(card)=='equip') return 4>get.value(card);
 								return false;
 							})) return 1.6;
@@ -335,11 +334,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					value:function(card,player){
-						if(player.getEquips(4).contains(card)) return 0;
+						if(player.getEquips(4).includes(card)) return 0;
 						return 4;
 					},
 					equipValue:function(card,player){
-						if(player.getCards('e').contains(card)) return 0;
+						if(player.getCards('e').includes(card)) return 0;
 						return -get.value(player.getCards('e'));
 					},
 					basic:{
@@ -370,7 +369,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(player.hasSkill(skills[i])) return 5;
 						}
 						if(player.countCards('h',function(card){
-							return get.color(card)=='black'&&['wuxie','caochuan'].contains(card);
+							return get.color(card)=='black'&&['wuxie','caochuan'].includes(card);
 						})) return 5;
 						return 2;
 					},
@@ -397,7 +396,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 2;
 					},
 					value:function(card,player){
-						if(player.getEquips(1).contains(card)) return -1.5;
+						if(player.getEquips(1).includes(card)){
+							if(player.hasSkillTag('noh')) return 0;
+							return -3.5;
+						}
 						return 1.5;
 					},
 					basic:{
@@ -436,7 +438,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						return 2;
 					},
 					value:function(card,player){
-						if(player.getEquips(1).contains(card)) return -3;
+						if(player.getEquips(1).includes(card)) return -3.5;
 						return 3;
 					},
 					basic:{
@@ -471,11 +473,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					equipValue:function(card,player){
-						if(get.position(card)=='e') return -1;
+						if(get.position(card)=='e') return -7;
 						return 1;
 					},
 					value:function(card,player){
-						if(player.getEquips(2).contains(card)) return -2.5;
+						if(player.getEquips(2).includes(card)) return -9;
 						return 2.5;
 					},
 					basic:{
@@ -532,7 +534,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9.5,
 					equipValue:function(card,player){
-						if(player.getEquips(2).contains(card)){
+						if(player.getEquips(2).includes(card)){
 							if(player.sex!='male') return 0;
 							var num=player.countCards('he',function(cardx){
 								return cardx!=card;
@@ -648,7 +650,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9.5,
 					equipValue:function(card,player){
-						if(!player.getEquips(5).contains(card)) return 5;
+						if(!player.getEquips(5).includes(card)) return 5;
 						if(_status.jinhe&&_status.jinhe[card.cardid]&&_status.event.name!='gainPlayerCard') return 3*player.countCards('h');
 						return 0;
 					},
@@ -814,13 +816,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(event.card.name!='sha') return false;
 					var cards=player.getEquips('wufengjian');
 					return player.hasCard(function(card){
-						return !cards.contains(card);
+						return !cards.includes(card);
 					},'he');
 				},
 				content:function(){
 					if(player!=game.me&&!player.isUnderControl()&&!player.isOnline()) game.delayx();
 					player.chooseToDiscard(true,'he',function(card){
-						return !_status.event.cards.contains(card);
+						return !_status.event.cards.includes(card);
 					}).set('cards',player.getEquips('wufengjian'));
 				},
 			},
@@ -844,7 +846,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				priority:6,
 				filter:function(event,player){
-					if(event.directHit||!get.tag(event.card,'damage')||!['basic','trick'].contains(get.type(event.card))) return false;
+					if(event.directHit||!get.tag(event.card,'damage')||!['basic','trick'].includes(get.type(event.card))) return false;
 					return player.hasUsableCard('caochuan');
 				},
 				content:function(){
@@ -902,7 +904,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['diamond',9,'kaihua'],
 			['diamond',10,'yinfengjia'],
 			['diamond',11,'sha'],
-			
+
 			['club',3,'jiejia'],
 			['club',4,'sha','thunder'],
 			['club',5,'zheji'],
@@ -911,7 +913,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['club',9,'zhulu_card'],
 			['club',10,'jinhe'],
 			['club',11,'sha'],
-			
+
 			['heart',3,'sha','fire'],
 			['heart',4,'shan'],
 			['heart',5,'numa'],
@@ -920,7 +922,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['heart',9,'kaihua'],
 			['heart',10,'nvzhuang'],
 			['heart',11,'kaihua'],
-			
+
 			['spade',3,'caochuan'],
 			['spade',4,'sha','thunder'],
 			['spade',5,'wufengjian'],

@@ -91,9 +91,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_kazhakusi:['male','shu',3,['lianjin']],
 			// hs_lazi:['male','wei',3,[]],
 			hs_shaku:['male','wei',3,['shouji']],
-			hs_laxiao:['male','shu',3,['guimou','yingxi','hlongyi']],
+			hs_laxiao:['male','shu',3,['hsguimou','yingxi','hlongyi']],
 			// hs_xiangyaqishi:['male','wei',3,[]],
-			// hs_fenjie:['male','shu',3,['guimou','yingxi']],
+			// hs_fenjie:['male','shu',3,['hsguimou','yingxi']],
 			hs_mojinbaozi:['male','wei',3,['jingcu','shengzhang']],
 			hs_shuiwenxuejia:['male','wu',3,['kekao']],
 			hs_shizugui:['male','wu',3,['szbianshen']],
@@ -121,7 +121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			// hs_baiguyoulong:['male','qun',4,['hstianqi']],
 			hs_yangyanwageli:['female','qun',3,['hspuzhao','hsyanxin']],
 
-			hs_aiqinvyao:['famale','qun',4,['nsaiqi','nsbeiming']],
+			hs_aiqinvyao:['female','qun',4,['nsaiqi','nsbeiming']],
 
 			hs_yelinlonghou:['female','qun',4,['ylyuchu']],
 			hs_yelinchulong:["male","qun",1,[],['unseen']],
@@ -313,7 +313,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						priority:-1,
 						filter:function(event,player){
-							return event.cards.contains(player.storage.wxuying);
+							return event.cards.includes(player.storage.wxuying);
 						},
 						content:function(){
 							if(_status.currentPhase==player){
@@ -668,7 +668,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter:function(event,player){
 					if(lib.filter.skillDisabled(event.skill)) return false;
-					if(!game.expandSkills(event.player.getStockSkills()).contains(event.skill)) return false;
+					if(!game.expandSkills(event.player.getStockSkills()).includes(event.skill)) return false;
 					return _status.currentPhase==event.player&&event.player.isEnemiesOf(player);
 				},
 				content:function(){
@@ -707,13 +707,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					// if(get.is.converted(event)) return false;
 					if(!player.countCards('he')) return false;
-					// if(!event.targets||!event.targets.contains(player)) return false;
+					// if(!event.targets||!event.targets.includes(player)) return false;
 					var info=get.info(event.card);
 					if(info.type!='trick'&&info.type!='basic') return false;
 					if(info.multitarget) return false;
 					if(event.targets.length>1) return true;
 					return game.hasPlayer(function(current){
-						return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,event.player,current);
+						return !event.targets.includes(current)&&lib.filter.targetEnabled2(event.card,event.player,current);
 					});
 				},
 				direct:true,
@@ -721,7 +721,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var bool1=(trigger.targets.length>1);
 					var bool2=game.hasPlayer(function(current){
-						return !trigger.targets.contains(current)&&lib.filter.targetEnabled2(trigger.card,trigger.player,current);
+						return !trigger.targets.includes(current)&&lib.filter.targetEnabled2(trigger.card,trigger.player,current);
 					});
 					if(bool1&&bool2){
 						player.chooseControlList(true,get.prompt('hshuanling'),[
@@ -754,10 +754,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(event.type=='add'){
 						var num=game.countPlayer(function(current){
-							return !trigger.targets.contains(current)&&lib.filter.targetEnabled2(trigger.card,trigger.player,current);
+							return !trigger.targets.includes(current)&&lib.filter.targetEnabled2(trigger.card,trigger.player,current);
 						});
 						var num2=game.countPlayer(function(current){
-							if(!trigger.targets.contains(current)&&lib.filter.targetEnabled2(trigger.card,trigger.player,current)){
+							if(!trigger.targets.includes(current)&&lib.filter.targetEnabled2(trigger.card,trigger.player,current)){
 								return get.effect(current,trigger.card,player,player)>0;
 							}
 							return false;
@@ -772,7 +772,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							prompt:event.unchosen?get.prompt('hshuanling'):null,
 							prompt2:'弃置任意张牌，并为'+get.translation(trigger.card)+'增加等量的目标',
 							filterTarget:function(card,player,target){
-								return !trigger.targets.contains(target)&&lib.filter.targetEnabled2(trigger.card,trigger.player,target);
+								return !trigger.targets.includes(target)&&lib.filter.targetEnabled2(trigger.card,trigger.player,target);
 							},
 							ai1:function(card){
 								if(ui.selected.cards.length>=num2) return 0;
@@ -787,7 +787,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						var num=trigger.targets.length-1;
 						var num2=game.countPlayer(function(current){
-							if(trigger.targets.contains(current)){
+							if(trigger.targets.includes(current)){
 								return get.effect(current,trigger.card,player,player)<0;
 							}
 							return false;
@@ -801,10 +801,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							prompt:event.unchosen?get.prompt('hshuanling'):null,
 							prompt2:'弃置任意张牌，并为'+get.translation(trigger.card)+'减少等量的目标',
 							filterTarget:function(card,player,target){
-								return trigger.targets.contains(target);
+								return trigger.targets.includes(target);
 							},
 							ai1:function(card){
-								if(!player.needsToDiscard(ui.selected.cards.length)) return 0;
+								if(!player.needsToDiscard(0,(i,player)=>{
+									return !ui.selected.cards.includes(i)&&!player.canIgnoreHandcard(i);
+								})) return 0;
 								if(ui.selected.cards.length>=num2) return 0;
 								return Math.max(5,get.value(trigger.card))-get.value(card)-1;
 							},
@@ -959,7 +961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.storage.ylyuchu2&&player.storage.ylyuchu3){
 								var idx=player.storage.ylyuchu2.indexOf(event.player);
 								var target=player.storage.ylyuchu3[idx];
-								if(target&&player.storage.ylyuchu.contains(target)){
+								if(target&&player.storage.ylyuchu.includes(target)){
 									return true;
 								}
 							}
@@ -969,7 +971,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.storage.ylyuchu2&&player.storage.ylyuchu3){
 								var idx=player.storage.ylyuchu2.indexOf(trigger.player);
 								var target=player.storage.ylyuchu3[idx];
-								if(target&&player.storage.ylyuchu.contains(target)){
+								if(target&&player.storage.ylyuchu.includes(target)){
 									player.callSubPlayer(target);
 									player.storage.ylyuchu2[idx]=null;
 								}
@@ -1043,7 +1045,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'cards'
 				},
 				filter:function(event,player){
-					if(ui.cardPile.firstChild&&ui.cardPile.firstChild.vanishtag.contains('nsaiqi')){
+					if(ui.cardPile.firstChild&&ui.cardPile.firstChild.vanishtag.includes('nsaiqi')){
 						return false;
 					}
 					return true;
@@ -1205,7 +1207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					var current=game.expandSkills(player.getSkills());
 					var list=get.gainableSkills(function(info,skill,name){
-						if(current.contains(skill)) return false;
+						if(current.includes(skill)) return false;
 						return lib.characterPack.hearth&&lib.characterPack.hearth[name];
 					});
 					if(!list.length){
@@ -1214,7 +1216,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var skill=list.randomGet();
 					var source=[];
 					for(var i in lib.characterPack.hearth){
-						if(lib.characterPack.hearth[i][3].contains(skill)){
+						if(lib.characterPack.hearth[i][3].includes(skill)){
 							source.push(i);
 						}
 					}
@@ -1225,7 +1227,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var skills=[skill];
 					var nameskills=lib.characterPack.hearth[name][3]
 					for(var i=0;i<nameskills.length;i++){
-						if(list.contains(nameskills[i])){
+						if(list.includes(nameskills[i])){
 							skills.add(nameskills[i]);
 						}
 					}
@@ -1310,7 +1312,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				popup:false,
 				content:function(){
 					var card=ui.cardPile.firstChild;
-					if(lib.inpile.contains(card.name)){
+					if(lib.inpile.includes(card.name)){
 						for(var i=1;i<ui.cardPile.childElementCount;i++){
 							var card2=ui.cardPile.childNodes[i];
 							if(get.color(card2)=='red'){
@@ -1434,7 +1436,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(game.showIdentity){
 								game.showIdentity();
 							}
-							if(player.isUnderControl(true)||player.getFriends().contains(game.me)){
+							if(player.isUnderControl(true)||player.getFriends().includes(game.me)){
 								game.over(true);
 							}
 							else{
@@ -1479,7 +1481,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd',player:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return (event.source!=player&&event.source.isIn())||(event.player!=player&&event.player.isIn());
 				},
 				content:function(){
@@ -1554,7 +1556,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							if(event.name=='damage') return event.notLink()&&(event.card?true:false);
 							var info=get.info(event.card);
-							if(info.multitarget&&event.targets&&event.targets.contains(player)) return false;
+							if(info.multitarget&&event.targets&&event.targets.includes(player)) return false;
 							return event.getRand()<0.65;
 						},
 						content:function(){
@@ -1573,7 +1575,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						mod:{
 							targetEnabled:function(card,player,target){
-								if(!player.getEnemies().contains(target)) return false;
+								if(!player.getEnemies().includes(target)) return false;
 							}
 						}
 					},
@@ -1597,7 +1599,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'recoverAfter'},
 						forced:true,
 						filter:function(event,player){
-							return player.getEnemies().contains(event.player);
+							return player.getEnemies().includes(event.player);
 						},
 						content:function(){
 							player.loseHp();
@@ -1780,7 +1782,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					player.draw();
-					if(trigger.player&&trigger.player.isIn()&&!trigger._notrigger.contains(trigger.player)){
+					if(trigger.player&&trigger.player.isIn()&&!trigger._notrigger.includes(trigger.player)){
 						trigger.player.randomDiscard();
 					}
 				},
@@ -1866,7 +1868,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(hs.length){
 							var list2=[];
 							for(var i=0;i<hs.length;i++){
-								if(list2.contains(hs[i].name)){
+								if(list2.includes(hs[i].name)){
 									hs.splice(i--,1);
 								}
 								else{
@@ -1876,7 +1878,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var card=hs.randomGet();
 							var list=[];
 							for(var i=0;i<lib.inpile.length;i++){
-								if(!list2.contains(lib.inpile[i])&&
+								if(!list2.includes(lib.inpile[i])&&
 									(get.type(lib.inpile[i])!='equip'||Math.random()<0.5)){
 									list.push(lib.inpile[i]);
 								}
@@ -2255,7 +2257,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var list=[];
 					for(var i in lib.card){
-						if(game.bannedcards&&game.bannedcards.contains(i)) continue;
+						if(game.bannedcards&&game.bannedcards.includes(i)) continue;
 						if(lib.card[i].type=='delay'){
 							list.push(['锦囊','',i]);
 						}
@@ -3196,7 +3198,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=['yushou_misha','yushou_huofu','yushou_leiouke'];
 					var skills=player.getSkills();
 					for(var i=0;i<list.length;i++){
-						if(!skills.contains(list[i])) list.splice(i--,1);
+						if(!skills.includes(list[i])) list.splice(i--,1);
 					}
 					if(list.length){
 						player.removeSkill(list.randomGet());
@@ -3539,7 +3541,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!info) return 0;
 								if(!Array.isArray(info.names)) return 0;
 								var names=info.names;
-								if(names.contains('xingjiegoutong')&&target.countCards('h')>=3) return -1;
+								if(names.includes('xingjiegoutong')&&target.countCards('h')>=3) return -1;
 								var num=0;
 								for(var i=0;i<names.length;i++){
 									var info2=lib.card[names[i]];
@@ -3664,7 +3666,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.directHit=true;
 				}
 			},
-			guimou:{
+			hsguimou:{
 				trigger:{player:'damageEnd'},
 				check:function(event,player){
 					return get.attitude(player,event.source)<=0;
@@ -3746,7 +3748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						'tuteng5','tuteng6','tuteng7','tuteng8'];
 					var rand2=[];
 					for(var i=0;i<target.skills.length;i++){
-						if(rand.contains(target.skills[i])){
+						if(rand.includes(target.skills[i])){
 							rand.remove(target.skills[i]);
 							rand2.push(target.skills[i]);
 						}
@@ -3781,11 +3783,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.chooseButton(dialog,2,true).filterButton=function(button){
 								if(ui.selected.buttons.length){
 									var current=ui.selected.buttons[0].name;
-									if(rand.contains(current)){
-										return rand2.contains(button.name);
+									if(rand.includes(current)){
+										return rand2.includes(button.name);
 									}
 									else{
-										return rand.contains(button.name);
+										return rand.includes(button.name);
 									}
 								}
 								return true;
@@ -3801,10 +3803,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						else{
 							var gain;
 							if(target.hp<target.maxHp){
-								if(rand.contains('tuteng1')){
+								if(rand.includes('tuteng1')){
 									gain='tuteng1';
 								}
-								else if(rand.contains('tuteng3')){
+								else if(rand.includes('tuteng3')){
 									gain='tuteng3';
 								}
 								else{
@@ -3813,7 +3815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								target.removeSkill(rand2.randomGet())
 							}
 							else{
-								if(rand2.contains('tuteng1')){
+								if(rand2.includes('tuteng1')){
 									gain=rand.randomGet();
 									target.removeSkill('tuteng1');
 								}
@@ -4073,7 +4075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog([list,'vcard']);
 					},
 					filter:function(button,player){
-						if(player.storage.nuyan.contains(button.link[2])) return false;
+						if(player.storage.nuyan.includes(button.link[2])) return false;
 						return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
 					},
 					check:function(button){
@@ -4325,7 +4327,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'equipEnd'},
 				frequent:true,
 				filter:function(event){
-					return lib.inpile.contains(event.card.name)&&get.subtype(event.card)=='equip1'&&typeof lib.cardType.hslingjian=='number';
+					return lib.inpile.includes(event.card.name)&&get.subtype(event.card)=='equip1'&&typeof lib.cardType.hslingjian=='number';
 				},
 				content:function(){
 					var num=1;
@@ -4400,7 +4402,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				filterTarget:function(card,player,target){
-					return player.storage.mobao.contains(target);
+					return player.storage.mobao.includes(target);
 				},
 				position:'he',
 				selectTarget:-1,
@@ -4531,7 +4533,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xueren:{
 				trigger:{source:'damageEnd'},
 				filter:function(event){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.card&&event.card.name=='sha'&&event.player.isAlive();
 				},
 				check:function(event,player){
@@ -4742,7 +4744,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var types=[];
 					for(var i=0;i<hs.length;i++){
 						var type=get.type(hs[i],'trick');
-						if(types.contains(type)){
+						if(types.includes(type)){
 							return false;
 						}
 						else{
@@ -4908,8 +4910,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					// player.$draw(player.storage.xunbao2);
 					player.addSkill('xunbao2');
 					game.delay(2);
-
-					event.node=event.card.copy('thrown','center','thrownhighlight',ui.arena).animate('start');
+					event.node=event.card.copy('thrown','center','thrownhighlight',ui.arena).addTempClass('start');
 					ui.arena.classList.add('thrownhighlight');
 					game.addVideo('thrownhighlight1');
 					game.addVideo('centernode',null,get.cardInfo(event.card));
@@ -5648,7 +5649,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageEnd',player:'damageEnd'},
 				forced:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					if(player==event.source){
 						return event.player!=player&&event.player.countCards('e');
 					}
@@ -5827,7 +5828,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.card.name=='sha'&&event.player!=player&&
 						get.distance(player,event.targets[0])<=1&&
 						player.countCards('h','shan')>0&&
-						event.targets.contains(player)==false&&event.targets.length==1;
+						event.targets.includes(player)==false&&event.targets.length==1;
 				},
 				direct:true,
 				content:function(){
@@ -6283,7 +6284,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				// alter:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					if(get.is.altered('xshixin')&&event.player.hp<player.hp) return false;
 					return event.player.isAlive()&&event.player!=player;
 				},
@@ -6516,7 +6517,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				// alter:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.card&&get.color(event.card)=='black'&&
 					!event.player.isTurnedOver()&&event.player.isAlive();
 				},
@@ -6541,7 +6542,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				// alter:true,
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.card&&get.color(event.card)=='black'&&
 					!event.player.isTurnedOver()&&event.player.isAlive();
 				},
@@ -6762,7 +6763,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bingshuang:{
 				trigger:{source:'damageEnd'},
 				filter:function(event,player){
-					if(event._notrigger.contains(event.player)) return false;
+					if(event._notrigger.includes(event.player)) return false;
 					return event.card&&get.type(event.card)=='trick'&&
 					event.player.isAlive()&&!event.player.isTurnedOver();
 				},
@@ -8001,7 +8002,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var rand=['tuteng1','tuteng2','tuteng3','tuteng4','tuteng5','tuteng6','tuteng7','tuteng8'];
 					var rand2=[];
 					for(var i=0;i<rand.length;i++){
-						if(player.skills.contains(rand[i])){
+						if(player.skills.includes(rand[i])){
 							rand2.push(rand[i]);
 							rand.splice(i--,1);
 						}
@@ -8045,7 +8046,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						rand=rand.concat(['tuteng5','tuteng6','tuteng7','tuteng8']);
 					}
 					for(var i=0;i<player.skills.length;i++){
-						if(rand.contains(player.skills[i])){
+						if(rand.includes(player.skills[i])){
 							rand.remove(player.skills[i]);
 							rand2.push(player.skills[i]);
 						}
@@ -8073,11 +8074,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.chooseButton(dialog,2,true).filterButton=function(button){
 									if(ui.selected.buttons.length){
 										var current=ui.selected.buttons[0].name;
-										if(rand.contains(current)){
-											return rand2.contains(button.name);
+										if(rand.includes(current)){
+											return rand2.includes(button.name);
 										}
 										else{
-											return rand.contains(button.name);
+											return rand.includes(button.name);
 										}
 									}
 									return true;
@@ -8095,7 +8096,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						else{
-							if(player.hp<player.maxHp&&rand.contains('tuteng1')){
+							if(player.hp<player.maxHp&&rand.includes('tuteng1')){
 								player.addSkill('tuteng1');
 							}
 							else{
@@ -8158,7 +8159,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						'tuteng5','tuteng6','tuteng7','tuteng8'];
 						var num=0;
 						for(var i=0;i<player.skills.length;i++){
-							if(rand.contains(player.skills[i])) num++;
+							if(rand.includes(player.skills[i])) num++;
 							if(num>=3){
 								return true;
 							}
@@ -8216,7 +8217,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.storage.huanfeng_end;
 						},
 						content:function(){
-
 							player.insertPhase();
 							delete player.storage.huanfeng_end;
 						}
@@ -8238,7 +8238,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var tuteng=['tuteng1','tuteng2','tuteng3','tuteng4',
 					'tuteng5','tuteng6','tuteng7','tuteng8'];
 					for(var i=0;i<player.skills.length;i++){
-						if(tuteng.contains(player.skills[i])) return true;
+						if(tuteng.includes(player.skills[i])) return true;
 					}
 					return false;
 				},
@@ -8247,7 +8247,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'tuteng5','tuteng6','tuteng7','tuteng8'];
 					var rand=[];
 					for(var i=0;i<player.skills.length;i++){
-						if(tuteng.contains(player.skills[i])){
+						if(tuteng.includes(player.skills[i])){
 							rand.push(player.skills[i]);
 						}
 					}
@@ -8627,7 +8627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(event.list.length){
 						event.current=event.list.shift();
-						event.current.animate('target');
+						event.current.addTempClass('target');
 						var next=event.current.chooseToRespond({name:'sha'});
 						next.ai=function(card){
 							if(get.damageEffect(event.current,player,event.current,'thunder')>=0) return 0;
@@ -9635,64 +9635,64 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hs_duyaxinshi:'渡鸦信使',
 
 			hshuanyu:'幻羽',
-			hshuanyu_info:'每当你受到一次伤害，你获得发现一张炉石衍生牌',
+			hshuanyu_info:'每当你受到一次伤害，你获得发现一张炉石衍生牌。',
 			hsfashu:'法术',
 			hsfashu_anyingjingxiang:'暗影镜像',
-			hsfashu_anyingjingxiang_info:'当你使用或打出一张牌后，暗影镜像变为该牌的复制',
+			hsfashu_anyingjingxiang_info:'当你使用或打出一张牌后，暗影镜像变为该牌的复制。',
 			hsfashu_buwendingyibian:'不稳定异变',
-			hsfashu_buwendingyibian_info:'出牌阶段对一名角色使用，目标将一张手牌重铸为同类别的牌，本回合可重复使用此牌，最多使用X次，X为当前体力值',
+			hsfashu_buwendingyibian_info:'出牌阶段对一名角色使用，目标将一张手牌重铸为同类别的牌，本回合可重复使用此牌，最多使用X次，X为当前体力值。',
 			hualing:'化灵',
-			hualing_info:'每三轮限一次，你可以选择一名其他角色，获得其一项技能，然后将其随机变形为一名强度高一级的武将',
+			hualing_info:'每三轮限一次，你可以选择一名其他角色，获得其一项技能，然后将其随机变形为一名强度高一级的武将。',
 			yibian:'异变',
-			yibian_info:'锁定技，出牌阶段开始时，若你没有不稳定异变，则将一张不稳定异变置于你的手牌',
+			yibian_info:'锁定技，出牌阶段开始时，若你没有不稳定异变，则将一张不稳定异变置于你的手牌。',
 			wxuying:'虚影',
-			wxuying_info:'锁定技，准备阶段，你移去手牌中的暗影镜像，然后获得一张暗影镜像（当你使用或打出一张牌后，暗影镜像变为该牌的复制）；当你回合内使用暗影镜像时，你摸一张牌；当你回合外使用暗影镜像时，你获得潜行直到下一回合开始',
+			wxuying_info:'锁定技，准备阶段，你移去手牌中的暗影镜像，然后获得一张暗影镜像（当你使用或打出一张牌后，暗影镜像变为该牌的复制）；当你回合内使用暗影镜像时，你摸一张牌；当你回合外使用暗影镜像时，你获得潜行直到下一回合开始。',
 			zhoujiang:'咒降',
-			zhoujiang_info:'锁定技，每当你使用一张普通锦囊牌，你将一张随机“诅咒”牌置于你的手牌',
+			zhoujiang_info:'锁定技，每当你使用一张普通锦囊牌，你将一张随机“诅咒”牌置于你的手牌。',
 			muyin:'暮隐',
-			muyin_info:'锁定技，每当你失去最后一张手牌，你获得潜行直到下一回合开始',
+			muyin_info:'锁定技，每当你失去最后一张手牌，你获得潜行直到下一回合开始。',
 			tqchuanyue:'穿越',
-			tqchuanyue_info:'锁定技，准备阶段开始时，你随机选择一个被削弱过的炉石技能，获得其未削弱的版本，替换上一个以此法获得的技能',
+			tqchuanyue_info:'锁定技，准备阶段开始时，你随机选择一个被削弱过的炉石技能，获得其未削弱的版本，替换上一个以此法获得的技能。',
 			// hsxiujian:'袖箭',
-			// hsxiujian_info:'锁定技，在你对一名敌方角色使用一张锦囊牌后，你视为对其使用一张杀',
+			// hsxiujian_info:'锁定技，在你对一名敌方角色使用一张锦囊牌后，你视为对其使用一张杀。',
 			// hsyingzong:'影踪',
 			// hsyingzong_info:'',
 			hsxingyi:'星移',
-			hsxingyi_info:'锁定技，每当一名敌方角色于回合内使用主动技能，你获得此技能直到下一回合结束',
+			hsxingyi_info:'锁定技，每当一名敌方角色于回合内使用主动技能，你获得此技能直到下一回合结束。',
 
 			hshuanling:'幻灵',
 			hshuanling_bg:'灵',
-			hshuanling_info:'结束阶段，你可以弃置至多X张牌（X为你装备区内的牌数且至少为1）并摸等量的牌，每弃置一张牌，你随机使用一张本局敌方角色使用过的单目标非转化普通锦囊牌，随机指定一个具有正收益的角色为目标',
-			// hshuanling_info:'锁定技，当你于回合内使用首张指定其他角色为惟一目标的锦囊牌后，你视为对其随机使用一张锦囊牌（此牌对你有正面效果）',
-			// hshuanling_info:'每当你使用一张基本牌或普通锦囊牌，你可以弃置任意张牌令其增加或减少等量的目标',
+			hshuanling_info:'结束阶段，你可以弃置至多X张牌（X为你装备区内的牌数且至少为1）并摸等量的牌，每弃置一张牌，你随机使用一张本局敌方角色使用过的单目标非转化普通锦囊牌，随机指定一个具有正收益的角色为目标。',
+			// hshuanling_info:'锁定技，当你于回合内使用首张指定其他角色为惟一目标的锦囊牌后，你视为对其随机使用一张锦囊牌（此牌对你有正面效果）。',
+			// hshuanling_info:'每当你使用一张基本牌或普通锦囊牌，你可以弃置任意张牌令其增加或减少等量的目标。',
 			huanfeng:'唤风',
-			huanfeng_info:'锁定技，准备阶段，若你有4个图腾，你失去所有图腾，然后获得并召唤随从奥拉基尔',
+			huanfeng_info:'锁定技，准备阶段，若你有4个图腾，你失去所有图腾，然后获得并召唤随从奥拉基尔。',
 			asyouzhang:'幽瘴',
-			asyouzhang_info:'结束阶段，若你的手牌中没有基本牌/锦囊牌/装备牌，你可以获得牌堆顶的一张基本牌/锦囊牌/装备牌，并可以立即使用',
+			asyouzhang_info:'结束阶段，若你的手牌中没有基本牌/锦囊牌/装备牌，你可以获得牌堆顶的一张基本牌/锦囊牌/装备牌，并可以立即使用。',
 			ylyuchu:'育雏',
-			ylyuchu_info:'锁定技，每当你回复1点体力，你获得一只雏龙随从（不超过3只）；结束阶段，你每有一只雏龙，便随机选择一名其他角色，在该角色的下个回合开始前你切换至该雏龙，然后在此回合结束后进行一个额外回合并切换回本体',
+			ylyuchu_info:'锁定技，每当你回复1点体力，你获得一只雏龙随从（不超过3只）；结束阶段，你每有一只雏龙，便随机选择一名其他角色，在该角色的下个回合开始前你切换至该雏龙，然后在此回合结束后进行一个额外回合并切换回本体。',
 			nsaiqi:'哀泣',
-			nsaiqi_info:'锁定技，每当你使用一张牌，你移除牌堆顶的三张牌；你的手牌上限始终+1',
+			nsaiqi_info:'锁定技，每当你使用一张牌，你移除牌堆顶的三张牌；你的手牌上限始终+1。',
 			nsbeiming:'悲鸣',
-			nsbeiming_info:'锁定技，当你移除的牌不少于9张时，你摸一张牌，然后将移除的牌以任意顺序置于牌堆顶；当被移除过的牌在牌堆顶时（洗牌后重置），你的不能发动【哀泣】移除牌',
+			nsbeiming_info:'锁定技，当你移除的牌不少于9张时，你摸一张牌，然后将移除的牌以任意顺序置于牌堆顶；当被移除过的牌在牌堆顶时（洗牌后重置），你的不能发动【哀泣】移除牌。',
 			hstianqi_dalian:'达里安',
-			hstianqi_dalian_info:'每当你造成一次伤害，你回复等量的体力',
+			hstianqi_dalian_info:'每当你造成一次伤害，你回复等量的体力。',
 			hstianqi_shali:'莎莉',
-			hstianqi_shali_info:'每当你回复体力，你获得等量的护甲',
+			hstianqi_shali_info:'每当你回复体力，你获得等量的护甲。',
 			hstianqi_nazigelin:'纳兹戈林',
-			hstianqi_nazigelin_info:'当你装备此牌时，你获得1点护甲',
+			hstianqi_nazigelin_info:'当你装备此牌时，你获得1点护甲。',
 			hstianqi_suolasi:'索拉斯',
-			hstianqi_suolasi_info:'当你失去此牌时，你回复1点体力',
+			hstianqi_suolasi_info:'当你失去此牌时，你回复1点体力。',
 			hschaoxi:'潮袭',
-			hschaoxi_info:'锁定技，每当你造成一次伤害，你获得两张随机鱼人牌',
+			hschaoxi_info:'锁定技，每当你造成一次伤害，你获得两张随机鱼人牌。',
 			hsnitai:'拟态',
-			hsnitai_info:'锁定技，出牌阶段开始时，你获得一张随机炉石角色的技能牌',
+			hsnitai_info:'锁定技，出牌阶段开始时，你获得一张随机炉石角色的技能牌。',
 			hstianqi:'天启',
-			hstianqi_info:'出牌阶段限一次，你可以选择一项：弃置一张手牌并随机装备一件天启骑士（不能替换现有装备），或弃置一张装备区内的牌并摸两张牌；当你以此法弃置天启骑士时，若你武将牌上没有对应的天启骑士，你将其置于你的武将牌上；准备阶段，若你的武将牌上有4张天启骑士，你获得游戏胜利',
+			hstianqi_info:'出牌阶段限一次，你可以选择一项：弃置一张手牌并随机装备一件天启骑士（不能替换现有装备），或弃置一张装备区内的牌并摸两张牌；当你以此法弃置天启骑士时，若你武将牌上没有对应的天启骑士，你将其置于你的武将牌上；准备阶段，若你的武将牌上有4张天启骑士，你获得游戏胜利。',
 			hspuzhao:'普照',
-			hspuzhao_info:'出牌阶段限一次，你可以弃置一张红桃牌，然后令至多三名随机友方角色各摸一张牌（若你无其他队友，改为摸两张牌）',
+			hspuzhao_info:'出牌阶段限一次，你可以弃置一张红桃牌，然后令至多三名随机友方角色各摸一张牌（若你无其他队友，改为摸两张牌）。',
 			hsyanxin:'炎心',
-			hsyanxin_info:'锁定技，在你摸牌时，若牌堆中有红色牌，你摸到的首张牌必为红色',
+			hsyanxin_info:'锁定技，在你摸牌时，若牌堆中有红色牌，你摸到的首张牌必为红色。',
 			ysjqisha:'七煞',
 			ysjqisha_ju:'惧之煞',
 			ysjqisha_kuang:'狂之煞',
@@ -9701,457 +9701,457 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ysjqisha_wang:'惘之煞',
 			ysjqisha_hen:'恨之煞',
 			ysjqisha_ao:'傲之煞',
-			ysjqisha_info:'锁定技，每当你造成或受到伤害，你令对方随机获得一种消极状态直到下一回合结束',
+			ysjqisha_info:'锁定技，每当你造成或受到伤害，你令对方随机获得一种消极状态直到下一回合结束。',
 			zhaochao:'招潮',
-			zhaochao_info:'锁定技，结束阶段，你视为对一名随机敌人使用一张杀；若此杀被闪避，你视为对另一名随机敌人使用一张杀',
+			zhaochao_info:'锁定技，结束阶段，你视为对一名随机敌人使用一张杀；若此杀被闪避，你视为对另一名随机敌人使用一张杀。',
 			hllingxi:'灵息',
-			hllingxi_info:'出牌阶段，你可以令一名已受伤的其他角色弃置两张牌并回复1点体力（同阶段对一名角色限用一次）；结束阶段，你可以回复1点体力',
+			hllingxi_info:'出牌阶段，你可以令一名已受伤的其他角色弃置两张牌并回复1点体力（同阶段对一名角色限用一次）；结束阶段，你可以回复1点体力。',
 			xiyong:'汐涌',
-			xiyong_info:'结束阶段，你可以摸一张牌并可以使用之，若你使用了此牌，你再摸一张牌',
+			xiyong_info:'结束阶段，你可以摸一张牌并可以使用之，若你使用了此牌，你再摸一张牌。',
 			hsjixie:'机械',
 			hsjixie_zhadan:'炸弹机器人',
 			hsjixie_zhadan_pop:'炸弹',
-			hsjixie_zhadan_info:'出牌阶段对自己使用，对一名随机敌人造成1点火属性伤害',
+			hsjixie_zhadan_info:'出牌阶段对自己使用，对一名随机敌人造成1点火属性伤害。',
 			yindan:'引弹',
-			yindan_info:'出牌阶段限一次，你可以弃置一张黑桃牌并失去1点体力，然后获得两张炸弹机器人',
+			yindan_info:'出牌阶段限一次，你可以弃置一张黑桃牌并失去1点体力，然后获得两张炸弹机器人。',
 			huanjue:'幻觉',
-			huanjue_info:'每当你使用一张牌，若此牌指定了惟一目标，你可以发现一张牌，然后可以代替此牌结算',
+			huanjue_info:'每当你使用一张牌，若此牌指定了惟一目标，你可以发现一张牌，然后可以代替此牌结算。',
 			oldhuanjue:'幻觉',
-			oldhuanjue_info:'每回合限一次，当你成为一名其他角色的卡牌惟一目标时，你可以发现一张牌代替此牌',
+			oldhuanjue_info:'每回合限一次，当你成为一名其他角色的卡牌惟一目标时，你可以发现一张牌代替此牌。',
 			zhziwu:'紫雾',
-			zhziwu_info:'每当你于回合外失去牌，你可以令当前回合角色不能使用杀直到回合结束',
-			huanjue_info_old:'每名角色的回合限一次，当你使用卡牌指定其他角色为惟一目标，或当其他角色使用卡牌指定你为惟一目标时，你可以发现一张牌代替此牌，然后该牌的使用者在结算后摸一张牌',
+			zhziwu_info:'每当你于回合外失去牌，你可以令当前回合角色不能使用杀直到回合结束。',
+			huanjue_info_old:'每名角色的回合限一次，当你使用卡牌指定其他角色为惟一目标，或当其他角色使用卡牌指定你为惟一目标时，你可以发现一张牌代替此牌，然后该牌的使用者在结算后摸一张牌。',
 			yinzong:'影踪',
-			yinzong_info:'锁定技，每当你失去装备区内的牌，你获得一张闪',
+			yinzong_info:'锁定技，每当你失去装备区内的牌，你获得一张闪。',
 			tansuo:'探索',
-			tansuo_info:'出牌阶段限一次，你可以弃置一张牌，然后发现一张炉石衍生牌',
+			tansuo_info:'出牌阶段限一次，你可以弃置一张牌，然后发现一张炉石衍生牌。',
 			srjici:'棘刺',
-			srjici_info:'锁定技，每当你造成一次伤害，你摸一张牌，受伤害角色随机弃置一张牌',
+			srjici_info:'锁定技，每当你造成一次伤害，你摸一张牌，受伤害角色随机弃置一张牌。',
 			lieqi:'猎奇',
-			lieqi_info:'准备和结束阶段，你可以指定一名角色，从一张该角色手牌与另外两张随机牌中猜测哪张为该角色手牌，若猜中，你获得一张该牌的复制（同一回合不能指定相同角色）',
+			lieqi_info:'准备和结束阶段，你可以指定一名角色，从一张该角色手牌与另外两张随机牌中猜测哪张为该角色手牌，若猜中，你获得一张该牌的复制（同一回合不能指定相同角色）。',
 			azaowu:'造物',
 			azaowu_backup:'造物',
-			azaowu_info:'出牌阶段限一次，你可以将一张基本牌当作任意一张基本牌使用',
+			azaowu_info:'出牌阶段限一次，你可以将一张基本牌当作任意一张基本牌使用。',
 			shouwang:'守望',
 			shouwang2:'守望',
-			shouwang_info:'每名角色每局限一次，当一名角色进入濒死状态时，你可以令其回复1点体力并获得1点护甲',
-			shouwang_info_alter:'每名角色每局限一次，当一名角色进入濒死状态时，你可以令其回复1点体力',
+			shouwang_info:'每名角色每局限一次，当一名角色进入濒死状态时，你可以令其回复1点体力并获得1点护甲。',
+			shouwang_info_alter:'每名角色每局限一次，当一名角色进入濒死状态时，你可以令其回复1点体力。',
 			qingtian:'擎天',
-			qingtian_info:'锁定技，若你的体力值为全场最多，你受到的伤害始终+1',
+			qingtian_info:'锁定技，若你的体力值为全场最多，你受到的伤害始终+1。',
 			qianfu:'潜伏',
 			qianfu2:'潜伏',
 			qianfu2_bg:'伏',
-			qianfu_info:'锁定技，在你死亡前，若你没有进入潜伏状态，你弃置所有牌并进入潜伏状态；当你体力值回复到3（或体力上限）时，你解除潜伏状态并摸三张牌',
+			qianfu_info:'锁定技，在你死亡前，若你没有进入潜伏状态，你弃置所有牌并进入潜伏状态；当你体力值回复到3（或体力上限）时，你解除潜伏状态并摸三张牌。',
 			shimo:'尸魔',
-			shimo_info:'锁定技，距离你为1的角色受到伤害时，你回复1点体力，若你没受伤，改为摸一张牌',
+			shimo_info:'锁定技，距离你为1的角色受到伤害时，你回复1点体力，若你没受伤，改为摸一张牌。',
 			lieyang:'裂阳',
-			lieyang_info:'锁定技，每当你于回合内使用一张锦囊牌，你获得一张随机锦囊牌；当你发动三次此技能后，你本回合不能再使用锦囊牌',
+			lieyang_info:'锁定技，每当你于回合内使用一张锦囊牌，你获得一张随机锦囊牌；当你发动三次此技能后，你本回合不能再使用锦囊牌。',
 			zhuilie:'追猎',
-			zhuilie_info:'准备阶段，你可以弃置一张牌，然后将牌堆顶六张牌中的基本牌移至弃牌堆；若移入弃牌堆的牌超过三张，你摸一张牌',
+			zhuilie_info:'准备阶段，你可以弃置一张牌，然后将牌堆顶六张牌中的基本牌移至弃牌堆；若移入弃牌堆的牌超过三张，你摸一张牌。',
 			szbianshen:'变身',
-			szbianshen_info:'限定技，回合开始时，若游戏轮数不少于3，你可以随机观看5张体力上限不小于5的武将牌，将武将牌替换为其中一张',
+			szbianshen_info:'限定技，回合开始时，若游戏轮数不少于3，你可以随机观看5张体力上限不小于5的武将牌，将武将牌替换为其中一张。',
 			kekao:'科考',
-			kekao_info:'结束阶段，你可以发现一张延时锦囊牌',
+			kekao_info:'结束阶段，你可以发现一张延时锦囊牌。',
 			jinhua:'进化',
-			jinhua_info:'锁定技，每当你以自己为目标使用一张非转化的锦囊牌，你发现一个技能并获得之',
+			jinhua_info:'锁定技，每当你以自己为目标使用一张非转化的锦囊牌，你发现一个技能并获得之。',
 			hsqizhou:'祈咒',
 			hsqizhou_feng:'风之祈咒',
-			hsqizhou_feng_info:'出牌阶段对自己使用，令所有目标的敌人打出一张杀或受到1点雷属性伤害',
+			hsqizhou_feng_info:'出牌阶段对自己使用，令所有目标的敌人打出一张杀或受到1点雷属性伤害。',
 			hsqizhou_shui:'水之祈咒',
-			hsqizhou_shui_info:'出牌阶段对自己使用，回复2点体力',
+			hsqizhou_shui_info:'出牌阶段对自己使用，回复2点体力。',
 			hsqizhou_huo:'火之祈咒',
-			hsqizhou_huo_info:'出牌阶段对任意角色使用，令目标受到1点火属性伤害',
+			hsqizhou_huo_info:'出牌阶段对任意角色使用，令目标受到1点火属性伤害。',
 			hsqizhou_tu:'土之祈咒',
-			hsqizhou_tu_info:'出牌阶段对任意其他角色使用，令目标获得1点护甲',
+			hsqizhou_tu_info:'出牌阶段对任意其他角色使用，令目标获得1点护甲。',
 			kqizhou:'祈咒',
-			kqizhou_info:'准备阶段，若你于上回合使用过锦囊牌，则可以获得一张元素祈咒',
+			kqizhou_info:'准备阶段，若你于上回合使用过锦囊牌，则可以获得一张元素祈咒。',
 			jingcu:'晶簇',
-			jingcu_info:'出牌阶段，你可以减少1点体力上限并摸两张牌',
+			jingcu_info:'出牌阶段，你可以减少1点体力上限并摸两张牌。',
 			shengzhang:'生长',
-			shengzhang_info:'锁定技，若你于弃牌阶段弃置了牌，你增加1点体力上限',
+			shengzhang_info:'锁定技，若你于弃牌阶段弃置了牌，你增加1点体力上限。',
 			pyuhuo:'浴火',
-			pyuhuo_info:'锁定技，在你首次进入濒死状态时，你弃置所有牌、重置武将牌、将体力和体力上限变为4并摸四张牌；在你第二次进入濒死状态时，你弃置所有牌、重置武将牌、将体力和体力上限变为6并摸六张牌',
+			pyuhuo_info:'锁定技，在你首次进入濒死状态时，你弃置所有牌、重置武将牌、将体力和体力上限变为4并摸四张牌；在你第二次进入濒死状态时，你弃置所有牌、重置武将牌、将体力和体力上限变为6并摸六张牌。',
 			mengye:'梦魇',
-			mengye_info:'结束阶段，你可以选择一名有手牌的角色将其一张随机的非毒手牌转化为毒，然后令其获得1点护甲',
+			mengye_info:'结束阶段，你可以选择一名有手牌的角色将其一张随机的非毒手牌转化为毒，然后令其获得1点护甲。',
 			mengye_old:'梦魇',
 			mengye_old2:'梦魇',
-			mengye_old_info:'回合结束后，你可以翻面并指定一名的非主公角色，由你控制其进行一个额外的回合。在此回合中，你的本体不参与游戏',
+			mengye_old_info:'回合结束后，你可以翻面并指定一名的非主公角色，由你控制其进行一个额外的回合。在此回合中，你的本体不参与游戏。',
 			fuhua:'腐化',
 			fuhua2:'腐化',
-			fuhua_info:'出牌阶段，你可以将一张毒交给一名没有魔血技能的其他角色，该角色选择一项：1. 获得技能魔血，此后每个结束阶段需交给你一张手牌；2. 视为你对其使用一张决斗',
+			fuhua_info:'出牌阶段，你可以将一张毒交给一名没有魔血技能的其他角色，该角色选择一项：1. 获得技能魔血，此后每个结束阶段需交给你一张手牌；2. 视为你对其使用一张决斗。',
 			moxie:'魔血',
 			moxie_info:'锁定技，当你因【毒】失去体力时，你改为摸两张牌；结束阶段，你将一张随机手牌转化为毒。',
 			gfuhun:'附魂',
-			gfuhun_info:'结束阶段，若你未翻面，你可以和一名其他角色拼点，若你赢，你将武将牌翻至背面，该角色进入混乱状态直到下一回合结束',
+			gfuhun_info:'结束阶段，若你未翻面，你可以和一名其他角色拼点，若你赢，你将武将牌翻至背面，该角色进入混乱状态直到下一回合结束。',
 			hlongyi:'龙裔',
-			hlongyi_info:'锁定技，你的黑色牌不占用手牌上限',
+			hlongyi_info:'锁定技，你的黑色牌不占用手牌上限。',
 			zhongji:'重击',
-			zhongji_info:'每当你即将造成伤害，可弃置一张黑色手牌令伤害+1',
+			zhongji_info:'每当你即将造成伤害，可弃置一张黑色手牌令伤害+1。',
 			fuwen:'符文',
-			fuwen_info:'若你弃牌阶段弃置了锦囊牌，你可以获得1点护甲',
+			fuwen_info:'若你弃牌阶段弃置了锦囊牌，你可以获得1点护甲。',
 			jinzhou:'禁咒',
-			jinzhou_info:'结束阶段，若你手牌中有黑桃牌，你可以令一名其他角色的非锁定技失效直到其下一回合结束',
+			jinzhou_info:'结束阶段，若你手牌中有黑桃牌，你可以令一名其他角色的非锁定技失效直到其下一回合结束。',
 			midian:'秘典',
-			midian_info:'出牌阶段限一次，你可以弃置一张锦囊牌，然后随机获得三张锦囊牌',
+			midian_info:'出牌阶段限一次，你可以弃置一张锦囊牌，然后随机获得三张锦囊牌。',
 			yuelu:'月露',
-			yuelu_info:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复1点体力并获得1点护甲',
-			yuelu_info_alter:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复1点体力',
+			yuelu_info:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复1点体力并获得1点护甲。',
+			yuelu_info_alter:'在一名角色的濒死阶段，你可以弃置一张黑色牌令其回复1点体力。',
 			xingluo:'星落',
-			xingluo_info:'准备阶段，你可以令任意名手牌数多于你的角色各弃置一张手牌，然后你可以从弃置的牌中选择一张加入手牌',
+			xingluo_info:'准备阶段，你可以令任意名手牌数多于你的角色各弃置一张手牌，然后你可以从弃置的牌中选择一张加入手牌。',
 			yushou:'御兽',
-			yushou_info:'出牌阶段，你可以弃置一张牌并召唤一个随机的野兽宠物，回合开始阶段，你随机失去一个宠物',
+			yushou_info:'出牌阶段，你可以弃置一张牌并召唤一个随机的野兽宠物，回合开始阶段，你随机失去一个宠物。',
 			yushou_misha:'米莎',
-			yushou_misha_info:'每当你受到一次伤害，你获得1点护甲',
+			yushou_misha_info:'每当你受到一次伤害，你获得1点护甲。',
 			yushou_huofu:'霍弗',
-			yushou_huofu_info:'你可以将一张黑色牌当作决斗使用',
+			yushou_huofu_info:'你可以将一张黑色牌当作决斗使用。',
 			yushou_leiouke:'雷欧克',
-			yushou_leiouke_info:'你每回合造成的首次伤害+1',
+			yushou_leiouke_info:'你每回合造成的首次伤害+1。',
 			hsqingyu_hufu:'青玉护符',
-			hsqingyu_hufu_info:'令一名角色获得1点护甲',
+			hsqingyu_hufu_info:'令一名角色获得1点护甲。',
 			hsqingyu_zhao:'青玉之爪',
-			hsqingyu_zhao_info:'当你装备此装备时，摸一张牌',
+			hsqingyu_zhao_info:'当你装备此装备时，摸一张牌。',
 			hsqingyu_feibiao:'青玉飞镖',
-			hsqingyu_feibiao_info:'弃置一名角色的一张随机手牌和一张随机装备牌',
+			hsqingyu_feibiao_info:'弃置一名角色的一张随机手牌和一张随机装备牌。',
 			hsqingyu_shandian:'青玉闪电',
-			hsqingyu_shandian_info:'对一名角色造成1点雷电伤害',
+			hsqingyu_shandian_info:'对一名角色造成1点雷电伤害。',
 			hsqingyu_zhanfang:'青玉绽放',
-			hsqingyu_zhanfang_info:'令一名角色增加1点体力上限并摸一张牌',
+			hsqingyu_zhanfang_info:'令一名角色增加1点体力上限并摸一张牌。',
 			ayuling:'玉灵',
-			ayuling_info:'每当你受到一次伤害，你可以获得一张随机青玉牌',
+			ayuling_info:'每当你受到一次伤害，你可以获得一张随机青玉牌。',
 			qingzun:'青樽',
-			qingzun_info:'本局对战中，每当你使用一张青玉牌，你的手牌上限+1；当你累计使用两张青玉牌后，你可以于准备阶段摸一张牌；当你累计使用六张青玉牌后，你可以于结束阶段摸一张牌',
-			qingzun_info_alter:'本局对战中，每当你使用一张青玉牌，你的手牌上限+1；当你累计使用三张青玉牌后，你可以于准备阶段摸一张牌；当你累计使用九张青玉牌后，你可以于结束阶段摸一张牌',
+			qingzun_info:'本局对战中，每当你使用一张青玉牌，你的手牌上限+1；当你累计使用两张青玉牌后，你可以于准备阶段摸一张牌；当你累计使用六张青玉牌后，你可以于结束阶段摸一张牌。',
+			qingzun_info_alter:'本局对战中，每当你使用一张青玉牌，你的手牌上限+1；当你累计使用三张青玉牌后，你可以于准备阶段摸一张牌；当你累计使用九张青玉牌后，你可以于结束阶段摸一张牌。',
 			lianjin:'炼金',
-			lianjin_info:'出牌阶段限一次，你可以弃置一张牌并获得一张由三张随机牌组成的药水；当你因弃置而失去药水牌时，你随机获得药水的组成卡牌之一',
+			lianjin_info:'出牌阶段限一次，你可以弃置一张牌并获得一张由三张随机牌组成的药水；当你因弃置而失去药水牌时，你随机获得药水的组成卡牌之一。',
 			shouji:'收集',
-			shouji_info:'每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机非特殊装备牌的复制；每回合限各限一次',
-			guimou:'鬼谋',
-			guimou_info:'每当你受到一次伤害，你可以获得伤害来源的一张手牌，若此牌是黑色，你展示此牌并重复此过程',
+			shouji_info:'每当你使用一张杀，你可以获得一张目标随机手牌的复制；每当你的杀被闪避，你可以获得一张目标随机非特殊装备牌的复制；每回合限各限一次。',
+			hsguimou:'鬼谋',
+			hsguimou_info:'每当你受到一次伤害，你可以获得伤害来源的一张手牌，若此牌是黑色，你展示此牌并重复此过程。',
 			yingxi:'影袭',
-			yingxi_info:'结束阶段，若你本回合未造成伤害，你可以将一张黑色牌当作杀对任意一名角色使用，若目标未受到伤害，此杀不可闪避',
+			yingxi_info:'结束阶段，若你本回合未造成伤害，你可以将一张黑色牌当作杀对任意一名角色使用，若目标未受到伤害，此杀不可闪避。',
 			peiyu:'培育',
-			peiyu_info:'准备阶段，你可以令一名没有图腾的角色获得一个随机图腾直到其首次受到伤害',
-			peiyu_old_info:'出牌阶段，你可以弃置一张牌令一名没有图腾的角色获得一个随机图腾，或令一名有图腾的角色替换一个图腾；你死亡时，其他角色失去以此法获得的图腾',
+			peiyu_info:'准备阶段，你可以令一名没有图腾的角色获得一个随机图腾直到其首次受到伤害。',
+			peiyu_old_info:'出牌阶段，你可以弃置一张牌令一名没有图腾的角色获得一个随机图腾，或令一名有图腾的角色替换一个图腾；你死亡时，其他角色失去以此法获得的图腾。',
 			wzhanyi:'战意',
-			wzhanyi_info:'你可以跳过出牌阶段，改为摸三张牌并展示之，将摸到的装备牌置于装备区，然后可以使用手牌中的杀',
+			wzhanyi_info:'你可以跳过出牌阶段，改为摸三张牌并展示之，将摸到的装备牌置于装备区，然后可以使用手牌中的杀。',
 			shengteng:'升腾',
-			shengteng_info:'锁定技，每当你使用锦囊牌造成伤害，你增加1点体力上限并回复1点体力',
+			shengteng_info:'锁定技，每当你使用锦囊牌造成伤害，你增加1点体力上限并回复1点体力。',
 			yuansu:'寂灭',
-			yuansu_info:'出牌阶段限一次，若你已损失的体力值不少于3，你可以将体力上限降至与体力值相同，视为使用一张元素毁灭',
+			yuansu_info:'出牌阶段限一次，若你已损失的体力值不少于3，你可以将体力上限降至与体力值相同，视为使用一张元素毁灭。',
 			nuyan:'怒焰',
 			nuyan2:'怒焰',
 			nuyan_backup:'怒焰',
-			nuyan_info:'出牌阶段限一次，你可以将一张红色牌当作任意一张能造成伤害的牌使用（不得是你本局以此法使用过的牌）',
-			nuyan2_info:'出牌阶段限三次，你可以失去1点体力，视为使用任意一张能造成伤害的牌”',
+			nuyan_info:'出牌阶段限一次，你可以将一张红色牌当作任意一张能造成伤害的牌使用（不得是你本局以此法使用过的牌）。',
+			nuyan2_info:'出牌阶段限三次，你可以失去1点体力，视为使用任意一张能造成伤害的牌”。',
 			chouhuo:'仇火',
-			chouhuo_info:'觉醒技，出牌阶段开始时，若你的怒焰技能已将可用的牌用完，你失去1点体力上限，获得2点护甲，然后将怒焰的描述改为“出牌阶段限三次，你可以失去1点体力，视为使用任意一张能造成伤害的牌”',
+			chouhuo_info:'觉醒技，出牌阶段开始时，若你的怒焰技能已将可用的牌用完，你失去1点体力上限，获得2点护甲，然后将怒焰的描述改为“出牌阶段限三次，你可以失去1点体力，视为使用任意一张能造成伤害的牌”。',
 			hsdusu:'毒素',
 			hsdusu_xueji:'血蓟',
-			hsdusu_xueji_info:'随机弃置一名角色的2张装备牌',
+			hsdusu_xueji_info:'随机弃置一名角色的2张装备牌。',
 			hsdusu_shinancao:'石楠草',
-			hsdusu_shinancao_info:'令一名角色下一次造成的伤害+1',
+			hsdusu_shinancao_info:'令一名角色下一次造成的伤害+1。',
 			hsdusu_kuyecao:'枯叶草',
-			hsdusu_kuyecao_info:'令一名角色获得技能潜行，直到其下一回合开始',
+			hsdusu_kuyecao_info:'令一名角色获得技能潜行，直到其下一回合开始。',
 			hsdusu_huoyanhua:'火焰花',
-			hsdusu_huoyanhua_info:'对攻击范围内的一名角色造成1点火焰伤害',
+			hsdusu_huoyanhua_info:'对攻击范围内的一名角色造成1点火焰伤害。',
 			hsdusu_huangxuecao:'皇血草',
-			hsdusu_huangxuecao_info:'摸两张牌',
+			hsdusu_huangxuecao_info:'摸两张牌。',
 			duxin:'毒心',
-			duxin_info:'准备阶段和结束阶段，若你的手中没有毒素牌，你可以获得一张随机毒素牌',
+			duxin_info:'准备阶段和结束阶段，若你的手中没有毒素牌，你可以获得一张随机毒素牌。',
 			oldduxin:'毒心',
-			oldduxin_info:'准备阶段和结束阶段，你可以获得一张随机毒素牌',
+			oldduxin_info:'准备阶段和结束阶段，你可以获得一张随机毒素牌。',
 			hstuteng:'图腾',
 			kuangluan:'狂乱',
 			kuangluan2:'狂乱',
-			// kuangluan_info:'锁定技，每当你于回合内使用一张普通锦囊牌，便于出牌阶段结束时随机使用一张普通锦囊牌（随机指定目标）',
-			kuangluan_info:'锁定技，每当一名其他角色对你造成伤害，该角色进入混乱状态直到当前回合结束',
+			// kuangluan_info:'锁定技，每当你于回合内使用一张普通锦囊牌，便于出牌阶段结束时随机使用一张普通锦囊牌（随机指定目标）。',
+			kuangluan_info:'锁定技，每当一名其他角色对你造成伤害，该角色进入混乱状态直到当前回合结束。',
 			zengli:'赠礼',
-			zengli_info:'出牌阶段限一次，你指定一名其他角色与你各装备一把武器',
+			zengli_info:'出牌阶段限一次，你指定一名其他角色与你各装备一把武器。',
 			xiubu:'修补',
-			xiubu_info:'每当你装备一把未强化的武器，你可以获得数量等同于武器攻击范围的随机零件',
+			xiubu_info:'每当你装备一把未强化的武器，你可以获得数量等同于武器攻击范围的随机零件。',
 			mobao:'魔爆',
-			mobao_info:'出牌阶段限一次，你可以弃置至多三张黑色牌，然后对所有于上轮对你造成过伤害的角色造成等同于你弃牌数的雷电伤害',
+			mobao_info:'出牌阶段限一次，你可以弃置至多三张黑色牌，然后对所有于上轮对你造成过伤害的角色造成等同于你弃牌数的雷电伤害。',
 			xianji:'献祭',
 			xianji2:'献祭',
 			xianji3:'献祭',
-			xianji_info:'其他角色可以在其结束阶段弃置1~2张手牌并令你摸等量的牌，若如此做，直到其下一回合结束，每当你使用卡牌指定其为目标时，其摸一张牌',
+			xianji_info:'其他角色可以在其结束阶段弃置1~2张手牌并令你摸等量的牌，若如此做，直到其下一回合结束，每当你使用卡牌指定其为目标时，其摸一张牌。',
 			xueren:'血刃',
-			xueren_info:'每当你使用杀造成伤害，你可以令受伤害角色与你各失去1点体力，然后你摸两张牌',
+			xueren_info:'每当你使用杀造成伤害，你可以令受伤害角色与你各失去1点体力，然后你摸两张牌。',
 			maoxian:'奇旅',
 			maoxian2:'奇旅',
-			maoxian_info:'出牌阶段限两次，你可以发现一个技能并获得之（替换此前发现的技能）',
+			maoxian_info:'出牌阶段限两次，你可以发现一个技能并获得之（替换此前发现的技能）。',
 			tanmi:'探秘',
-			tanmi_info:'在一名其他角色的结束阶段，若你没有手牌，你可以摸两张牌并可以使用两张牌',
+			tanmi_info:'在一名其他角色的结束阶段，若你没有手牌，你可以摸两张牌并可以使用两张牌。',
 			yiwen:'轶闻',
-			yiwen_info:'锁定技，每当其他角色于回合内首次使用非特殊卡牌指定你为惟一目标，你获得一张此牌的复制',
+			yiwen_info:'锁定技，每当其他角色于回合内首次使用非特殊卡牌指定你为惟一目标，你获得一张此牌的复制。',
 			tanbao_old:'探宝',
-			tanbao_old_info:'出牌阶段限一次，你可以弃置三张牌，然后展示牌堆顶的三张牌，然后获得其中任意张类别不同的牌；若三张牌类别均不相同，你回复全部体力值',
+			tanbao_old_info:'出牌阶段限一次，你可以弃置三张牌，然后展示牌堆顶的三张牌，然后获得其中任意张类别不同的牌；若三张牌类别均不相同，你回复全部体力值。',
 			qianghuax:'强化',
-			qianghuax_info:'出牌阶段限一次，你可以弃置任意张不同类别的牌，然后展示并获得与弃置的牌类别相同且价值更高的牌',
+			qianghuax_info:'出牌阶段限一次，你可以弃置任意张不同类别的牌，然后展示并获得与弃置的牌类别相同且价值更高的牌。',
 			zhuizong:'追踪',
-			zhuizong_info:'出牌阶段限一次，你可以弃置任意张牌，观看牌堆顶的等同于弃牌数四倍的牌，然后获得其中的一张牌',
+			zhuizong_info:'出牌阶段限一次，你可以弃置任意张牌，观看牌堆顶的等同于弃牌数四倍的牌，然后获得其中的一张牌。',
 			xunbao:'寻宝',
 			xunbao2:'寻宝',
-			xunbao_info:'准备阶段，若你的武将牌上没有藏宝图，你可以将一张藏宝图置于你的武将牌上；若你的武将牌上有藏宝图，你可以弃置一张与藏宝图点数相同的牌并获得此藏宝图',
+			xunbao_info:'准备阶段，若你的武将牌上没有藏宝图，你可以将一张藏宝图置于你的武将牌上；若你的武将牌上有藏宝图，你可以弃置一张与藏宝图点数相同的牌并获得此藏宝图。',
 			xieneng:'邪能',
-			xieneng_info:'结束阶段，你可以选择一张神器牌并获得之',
+			xieneng_info:'结束阶段，你可以选择一张神器牌并获得之。',
 			fbeifa:'北伐',
-			fbeifa_info:'每当你失去最后一张手牌，你可以视为使用一张无视距离的杀，若此杀造成伤害，你摸一张牌，每回合最多发动3次',
+			fbeifa_info:'每当你失去最后一张手牌，你可以视为使用一张无视距离的杀，若此杀造成伤害，你摸一张牌，每回合最多发动3次。',
 			oldfbeifa:'北伐',
-			oldfbeifa_info:'每当你失去最后一张手牌，你可以视为使用一张无视距离的杀，若此杀造成伤害，你摸一张牌',
+			oldfbeifa_info:'每当你失去最后一张手牌，你可以视为使用一张无视距离的杀，若此杀造成伤害，你摸一张牌。',
 			yufa:'驭法',
-			yufa_info:'在任意一名其他角色的结束阶段，若你于此回合内受过其伤害，你可以将一张传送门交给除此角色外的任意一名角色',
+			yufa_info:'在任意一名其他角色的结束阶段，若你于此回合内受过其伤害，你可以将一张传送门交给除此角色外的任意一名角色。',
 			bingyan:'冰焰',
-			bingyan_info:'出牌阶段限一次，你可以将一张红色牌当作炽羽袭，或将一张黑色牌当作惊雷闪使用',
+			bingyan_info:'出牌阶段限一次，你可以将一张红色牌当作炽羽袭，或将一张黑色牌当作惊雷闪使用。',
 			hsshenqi:'神器',
 			hsshenqi_morijingxiang:'末日镜像',
-			hsshenqi_morijingxiang_info:'限武将牌正面朝上时使用，从所有其他角色的区域内各获得一张牌；使用后将武将牌翻至背面',
+			hsshenqi_morijingxiang_info:'限武将牌正面朝上时使用，从所有其他角色的区域内各获得一张牌；使用后将武将牌翻至背面。',
 			hsshenqi_kongbusangzhong:'恐怖丧钟',
-			hsshenqi_kongbusangzhong_info:'限武将牌正面朝上时使用，对所有其他角色各造成1点伤害；使用后将武将牌翻至背面',
+			hsshenqi_kongbusangzhong_info:'限武将牌正面朝上时使用，对所有其他角色各造成1点伤害；使用后将武将牌翻至背面。',
 			hsshenqi_nengliangzhiguang:'能量之光',
-			hsshenqi_nengliangzhiguang_info:'限武将牌正面朝上时使用，令一名角色增加1点体力上限，回复1点体力，并摸四张牌；使用后将武将牌翻至背面',
+			hsshenqi_nengliangzhiguang_info:'限武将牌正面朝上时使用，令一名角色增加1点体力上限，回复1点体力，并摸四张牌；使用后将武将牌翻至背面。',
 			hsbaowu:'宝物',
 			hsbaowu_huangjinyuanhou:'黄金猿猴',
-			hsbaowu_huangjinyuanhou_info:'将你的手牌（含此张）替换为随机炉石衍生牌，并获得潜行直到下一回合开始',
+			hsbaowu_huangjinyuanhou_info:'将你的手牌（含此张）替换为随机炉石衍生牌，并获得潜行直到下一回合开始。',
 			hsbaowu_cangbaotu:'藏宝图',
-			hsbaowu_cangbaotu_info:'结束阶段，将一张黄金猿猴置入你的手牌；摸一张牌',
+			hsbaowu_cangbaotu_info:'结束阶段，将一张黄金猿猴置入你的手牌；摸一张牌。',
 			hsyaoshui:'药水',
 			hsqingyu:'青玉',
 
 			lianzhan:'连斩',
-			lianzhan_info:'每当你造成一次伤害，若此伤害是你本回合第一次造成伤害，你摸两张牌；否则你增加1点体力上限并回复1点体力',
+			lianzhan_info:'每当你造成一次伤害，若此伤害是你本回合第一次造成伤害，你摸两张牌；否则你增加1点体力上限并回复1点体力。',
 			shifa:'魔瘾',
-			shifa_info:'锁定技，每当你于回合内使用一张非转化的普通锦囊牌，你摸一张牌（每回合最多发动3次）；出牌阶段开始时，你令你与一名随机敌人各获得一张随机普通锦囊牌',
+			shifa_info:'锁定技，每当你于回合内使用一张非转化的普通锦囊牌，你摸一张牌（每回合最多发动3次）；出牌阶段开始时，你令你与一名随机敌人各获得一张随机普通锦囊牌。',
 			oldshifa:'魔瘾',
-			oldshifa_info:'锁定技，每当你于回合内使用一张非转化的普通锦囊牌，你摸一张牌；出牌阶段开始时，你令你与一名随机敌人各获得一张随机普通锦囊牌',
+			oldshifa_info:'锁定技，每当你于回合内使用一张非转化的普通锦囊牌，你摸一张牌；出牌阶段开始时，你令你与一名随机敌人各获得一张随机普通锦囊牌。',
 			yuanzheng:'远征',
-			yuanzheng_info:'每当你对距离1以外的角色使用一张牌，你可以弃置目标区域内的一张牌',
+			yuanzheng_info:'每当你对距离1以外的角色使用一张牌，你可以弃置目标区域内的一张牌。',
 			bzhuiji:'追击',
-			bzhuiji_info:'每当一名角色死亡，你可以摸两张牌，并视为对杀死该角色的人使用一张决斗',
+			bzhuiji_info:'每当一名角色死亡，你可以摸两张牌，并视为对杀死该角色的人使用一张决斗。',
 			byuhuo:'浴火',
 			byuhuo2:'浴火',
-			byuhuo_info:'觉醒技，当你进入濒死状态时，你须将体力和体力上限变为2，并将武将牌翻至背面；在你的下一准备阶段，你对所有其他角色造成2点火焰伤害，在此之前，你不能成为其他角色的卡牌的目标',
+			byuhuo_info:'觉醒技，当你进入濒死状态时，你须将体力和体力上限变为2，并将武将牌翻至背面；在你的下一准备阶段，你对所有其他角色造成2点火焰伤害，在此之前，你不能成为其他角色的卡牌的目标。',
 			yulu:'雨露',
-			yulu_info:'出牌阶段限一次，你可以指定任意名角色各摸一张牌，然后各弃置区域内的一张牌',
+			yulu_info:'出牌阶段限一次，你可以指定任意名角色各摸一张牌，然后各弃置区域内的一张牌。',
 			oldyulu:'雨露',
-			oldyulu_info:'出牌阶段限一次，你可以指定任意名角色各摸两张牌，然后各弃置区域内的两张牌',
+			oldyulu_info:'出牌阶段限一次，你可以指定任意名角色各摸两张牌，然后各弃置区域内的两张牌。',
 			duzhang:'毒瘴',
 			duzhang2:'毒瘴',
-			duzhang_info:'结束阶段，若你于本回合内未使用过锦囊牌，你可以指定一名其他角色令其下个回合无法使用锦囊牌',
+			duzhang_info:'结束阶段，若你于本回合内未使用过锦囊牌，你可以指定一名其他角色令其下个回合无法使用锦囊牌。',
 			hannu:'寒怒',
-			hannu_info:'锁定技，每当你受到一次伤害，你将手牌数翻倍；若你的手牌数因此超过10张，你随机弃置若干张手牌直到手牌数等于你当前的体力值',
+			hannu_info:'锁定技，每当你受到一次伤害，你将手牌数翻倍；若你的手牌数因此超过10张，你随机弃置若干张手牌直到手牌数等于你当前的体力值。',
 			chuidiao:'垂钓',
-			chuidiao_info:'锁定技，结束阶段，你随机摸0~2张牌',
+			chuidiao_info:'锁定技，结束阶段，你随机摸0~2张牌。',
 			fushi:'缚誓',
-			fushi_info:'出牌阶段限一次，你可以令一名已受伤角色失去1点体力上限并回复1点体力',
+			fushi_info:'出牌阶段限一次，你可以令一名已受伤角色失去1点体力上限并回复1点体力。',
 			oldfushi:'缚誓',
-			oldfushi_info:'出牌阶段，你可以令一名已受伤角色失去1点体力上限并回复1点体力',
+			oldfushi_info:'出牌阶段，你可以令一名已受伤角色失去1点体力上限并回复1点体力。',
 			hhudun:'护盾',
-			hhudun_info:'锁定技，在每名角色的准备阶段，若你没有护甲，你获得1点护甲；每当你的护甲抵消一次伤害，你摸一张牌',
+			hhudun_info:'锁定技，在每名角色的准备阶段，若你没有护甲，你获得1点护甲；每当你的护甲抵消一次伤害，你摸一张牌。',
 			fenlie:'分裂',
-			fenlie_info:'锁定技，每当你于摸牌阶段外获得非特殊卡牌，你获得一张此牌的复制，每回合最多发动两次',
+			fenlie_info:'锁定技，每当你于摸牌阶段外获得非特殊卡牌，你获得一张此牌的复制，每回合最多发动两次。',
 			oldfenlie:'分裂',
-			oldfenlie_info:'锁定技，每当你于摸牌阶段外获得非特殊卡牌，你获得一张此牌的复制',
+			oldfenlie_info:'锁定技，每当你于摸牌阶段外获得非特殊卡牌，你获得一张此牌的复制。',
 			nianfu:'粘附',
-			nianfu_info:'锁定技，每当你造成或受到伤害，你随机获得对方装备区内的一张牌',
+			nianfu_info:'锁定技，每当你造成或受到伤害，你随机获得对方装备区内的一张牌。',
 			xiaorong:'消融',
-			xiaorong_info:'锁定技，你的装备牌不占用手牌上限；结束阶段，你将手牌中的每张装备牌转化为两张随机基本牌，每转化一张装备牌便回复1点体力',
+			xiaorong_info:'锁定技，你的装备牌不占用手牌上限；结束阶段，你将手牌中的每张装备牌转化为两张随机基本牌，每转化一张装备牌便回复1点体力。',
 			shixu:'时序',
-			shixu_info:'锁定技，所有角色于出牌阶段每消耗3秒，便须于结束阶段弃置一张牌',
+			shixu_info:'锁定技，所有角色于出牌阶段每消耗3秒，便须于结束阶段弃置一张牌。',
 			qianghua:'绝手',
-			qianghua_info:'出牌阶段内，你可以令一张你使用的基本牌或普通锦囊牌额外结算一次，每回合限一次',
+			qianghua_info:'出牌阶段内，你可以令一张你使用的基本牌或普通锦囊牌额外结算一次，每回合限一次。',
 			jixuan:'疾旋',
-			jixuan_info:'锁定技，回合结束后，你摸一张牌进行一个额外的回合',
+			jixuan_info:'锁定技，回合结束后，你摸一张牌进行一个额外的回合。',
 			biri:'蔽日',
-			biri_info:'每当距离你1以内的一名其他角色成为杀的惟一目标时，若杀的使用者不是你，你可以弃置一张闪取消之',
+			biri_info:'每当距离你1以内的一名其他角色成为杀的惟一目标时，若杀的使用者不是你，你可以弃置一张闪取消之。',
 			stuxi:'吐息',
 			stuxi2:'吐息',
 			stuxi2_bg:'息',
-			stuxi_info:'锁定技，结束阶段，你令一名随机敌人下一个摸牌阶段摸牌数-1',
+			stuxi_info:'锁定技，结束阶段，你令一名随机敌人下一个摸牌阶段摸牌数-1。',
 			bingdong:'冰冻',
-			bingdong_info:'锁定技，你在一个回合内首次造成伤害后，获得一个冰冻零件',
+			bingdong_info:'锁定技，你在一个回合内首次造成伤害后，获得一个冰冻零件。',
 			ronghuo:'熔火',
-			ronghuo_info:'锁定技，你的普通杀均视为火杀',
+			ronghuo_info:'锁定技，你的普通杀均视为火杀。',
 			luoshi:'落石',
-			luoshi_info:'锁定技，每当你受到一次伤害，你与伤害来源各随机弃置一张牌',
+			luoshi_info:'锁定技，每当你受到一次伤害，你与伤害来源各随机弃置一张牌。',
 			moyao:'魔曜',
-			moyao_info:'锁定技，你不能成为其他角色的锦囊牌的目标',
+			moyao_info:'锁定技，你不能成为其他角色的锦囊牌的目标。',
 			jiaohui:'教诲',
-			jiaohui_info:'结束阶段，若你没有于本回合内造成伤害，你可以令一名角色摸一张牌或回复1点体力',
+			jiaohui_info:'结束阶段，若你没有于本回合内造成伤害，你可以令一名角色摸一张牌或回复1点体力。',
 			bimeng:'碧梦',
-			bimeng_info:'结束阶段，你可以将一张随机梦境牌加入你的手牌',
+			bimeng_info:'结束阶段，你可以将一张随机梦境牌加入你的手牌。',
 			hsmengjing:'梦境',
 			hsmengjing_card_config:'梦境',
 			hsmengjing_feicuiyoulong:'翡翠幼龙',
-			hsmengjing_feicuiyoulong_info:'出牌阶段对任意一名角色使用，对目标造成1点伤害',
+			hsmengjing_feicuiyoulong_info:'出牌阶段对任意一名角色使用，对目标造成1点伤害。',
 			hsmengjing_huanxiaojiemei:'欢笑姐妹',
-			hsmengjing_huanxiaojiemei_info:'出牌阶段对一名已受伤角色使用，令目标恢复1点体力',
+			hsmengjing_huanxiaojiemei_info:'出牌阶段对一名已受伤角色使用，令目标恢复1点体力。',
 			hsmengjing_suxing:'苏醒',
-			hsmengjing_suxing_info:'令所有其他角色失去1点体力并随机弃置两张牌',
+			hsmengjing_suxing_info:'令所有其他角色失去1点体力并随机弃置两张牌。',
 			hsmengjing_mengye:'梦魇',
-			hsmengjing_mengye_info:'令一名角色摸一张牌，并在其下一个结束阶段弃置其所有牌',
+			hsmengjing_mengye_info:'令一名角色摸一张牌，并在其下一个结束阶段弃置其所有牌。',
 			hsmengjing_mengjing:'梦境',
-			hsmengjing_mengjing_info:'令一名角色将装备区内的所有牌收入手牌，并将一张乐不思蜀置于其判定区',
+			hsmengjing_mengjing_info:'令一名角色将装备区内的所有牌收入手牌，并将一张乐不思蜀置于其判定区。',
 			hszuzhou:'诅咒',
 			hszuzhou_nvwudeganguo:'女巫的钳锅',
-			hszuzhou_nvwudeganguo_info:'出牌阶段对一名角色使用，目标弃置一张牌，然后随机获得一张炉石衍生牌',
+			hszuzhou_nvwudeganguo_info:'出牌阶段对一名角色使用，目标弃置一张牌，然后随机获得一张炉石衍生牌。',
 			hszuzhou_nvwudepingguo:'女巫的苹果',
-			hszuzhou_nvwudepingguo_info:'出牌阶段对一名角色使用，目标获得两张杀',
+			hszuzhou_nvwudepingguo_info:'出牌阶段对一名角色使用，目标获得两张杀。',
 			hszuzhou_nvwudexuetu:'女巫的学徒',
-			hszuzhou_nvwudexuetu_info:'出牌阶段对没有咒降技能的角色使用，令目标非锁定技失效，并获得技能咒降直到下一回合结束',
+			hszuzhou_nvwudexuetu_info:'出牌阶段对没有咒降技能的角色使用，令目标非锁定技失效，并获得技能咒降直到下一回合结束。',
 			hszuzhou_wushushike:'巫术时刻',
-			hszuzhou_wushushike_info:'出牌阶段对所有角色使用，将手牌中的闪替换为杀',
+			hszuzhou_wushushike_info:'出牌阶段对所有角色使用，将手牌中的闪替换为杀。',
 			hszuzhou_guhuo:'蛊惑',
-			hszuzhou_guhuo_info:'出牌阶段对一名其他角色使用，令其交给你一张牌',
+			hszuzhou_guhuo_info:'出牌阶段对一名其他角色使用，令其交给你一张牌。',
 			xjumo:'聚魔',
-			xjumo_info:'锁定技，你的手牌上限+3；若你已受伤，改为+5',
+			xjumo_info:'锁定技，你的手牌上限+3；若你已受伤，改为+5。',
 			liehun:'裂魂',
-			liehun_info:'锁定技，结束阶段，你获得手牌中所有非基本、非特殊牌的复制',
+			liehun_info:'锁定技，结束阶段，你获得手牌中所有非基本、非特殊牌的复制。',
 			malymowang:'魔网',
-			malymowang_info:'锁定技，你的锦囊牌在每回合中造成的首次伤害+1；出牌阶段开始时，你发现一张普通锦囊牌',
+			malymowang_info:'锁定技，你的锦囊牌在每回合中造成的首次伤害+1；出牌阶段开始时，你发现一张普通锦囊牌。',
 			oldmalymowang:'魔网',
-			oldmalymowang_info:'锁定技，你的锦囊牌造成的伤害+1；出牌阶段开始时，你发现一张普通锦囊牌',
+			oldmalymowang_info:'锁定技，你的锦囊牌造成的伤害+1；出牌阶段开始时，你发现一张普通锦囊牌。',
 			lingzhou:'灵咒',
-			lingzhou_info:'每当你使用一张非转化的锦囊牌，可令一名角色摸一张牌或回复1点体力',
+			lingzhou_info:'每当你使用一张非转化的锦囊牌，可令一名角色摸一张牌或回复1点体力。',
 			mieshi:'灭世',
-			mieshi_info:'锁定技，结束阶段，你失去1点体力，并对一名随机的其他角色造成1点火焰伤害',
+			mieshi_info:'锁定技，结束阶段，你失去1点体力，并对一名随机的其他角色造成1点火焰伤害。',
 			xshixin:'蚀心',
-			xshixin_info:'锁定技，每当你对一名其他角色造成一次伤害，受伤害角色与你各失去1点体力',
-			xshixin_info_alter:'锁定技，每当你对一名其他角色造成一次伤害，若受伤害角色体力值不小于你，其与你各失去1点体力',
+			xshixin_info:'锁定技，每当你对一名其他角色造成一次伤害，受伤害角色与你各失去1点体力。',
+			xshixin_info_alter:'锁定技，每当你对一名其他角色造成一次伤害，若受伤害角色体力值不小于你，其与你各失去1点体力。',
 			xmojian:'魔箭',
-			xmojian_info:'每当你的武将牌翻至正面时，你可以指定一名角色视为对其使用了一张杀',
+			xmojian_info:'每当你的武将牌翻至正面时，你可以指定一名角色视为对其使用了一张杀。',
 			enze:'恩泽',
-			enze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等（最多摸或弃三张牌）',
+			enze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等（最多摸或弃三张牌）。',
 			oldenze:'恩泽',
-			oldenze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等',
-			enze_info_alter:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等（最多摸或弃两张牌）',
+			oldenze_info:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等。',
+			enze_info_alter:'出牌阶段限一次，你可以指定一名角色令其手牌数与你相等（最多摸或弃两张牌）。',
 			chongsheng:'重生',
 			chongsheng_bg:'生',
-			chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至2-X，并摸2-X张牌，X为你本局发动此技能的次数。每局最多发动2次',
+			chongsheng_info:'濒死阶段，你可弃置所有牌，将体力回复至2-X，并摸2-X张牌，X为你本局发动此技能的次数。每局最多发动2次。',
 			s_tuteng:'神谕',
-			s_tuteng_info:'锁定技，准备阶段，你随机获得一个图腾，若你已有至少3个图腾，则改为随机替换一个图腾',
+			s_tuteng_info:'锁定技，准备阶段，你随机获得一个图腾，若你已有至少3个图腾，则改为随机替换一个图腾。',
 			guozai:'过载',
 			guozai2:'过载',
 			guozai2_bg:'载',
-			guozai_info:'出牌阶段限一次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
-			guozai_info_alter:'出牌阶段限一次，你可将手牌补至三张，并于此阶段结束时弃置等量的牌',
+			guozai_info:'出牌阶段限一次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌。',
+			guozai_info_alter:'出牌阶段限一次，你可将手牌补至三张，并于此阶段结束时弃置等量的牌。',
 			guozaix:'过载',
 			guozaix2:'过载',
 			guozaix2_bg:'载',
-			guozaix_info:'出牌阶段限两次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌',
+			guozaix_info:'出牌阶段限两次，你可将手牌补至四张，并于此阶段结束时弃置等量的牌。',
 			oldhanshuang:'寒霜',
-			oldhanshuang_info:'锁定技，你使用黑色牌对一名未翻面角色造成伤害后，你令受伤害角色翻面',
+			oldhanshuang_info:'锁定技，你使用黑色牌对一名未翻面角色造成伤害后，你令受伤害角色翻面。',
 			hanshuang:'寒霜',
-			hanshuang_info:'锁定技，你使用黑色牌对一名未翻面角色造成伤害后，你令受伤害角色翻面，然后你失去1点体力',
-			hanshuang_info_alter:'锁定技，你使用黑色牌对一名未翻面角色造成伤害后，你令受伤害角色翻面并摸一张牌，然后你失去1点体力',
+			hanshuang_info:'锁定技，你使用黑色牌对一名未翻面角色造成伤害后，你令受伤害角色翻面，然后你失去1点体力。',
+			hanshuang_info_alter:'锁定技，你使用黑色牌对一名未翻面角色造成伤害后，你令受伤害角色翻面并摸一张牌，然后你失去1点体力。',
 			bingshi:'冰噬',
-			bingshi_info:'锁定技，你死亡时，对所有其他角色造成1点伤害',
+			bingshi_info:'锁定技，你死亡时，对所有其他角色造成1点伤害。',
 			huanwu:'唤雾',
-			huanwu_info:'出牌阶段限一次，你可以令一名角色增加1点体力上限，回复1点体力，并摸两张牌（每名角色限发动一次）',
+			huanwu_info:'出牌阶段限一次，你可以令一名角色增加1点体力上限，回复1点体力，并摸两张牌（每名角色限发动一次）。',
 			fengnu:'风怒',
-			fengnu_info:'锁定技，你使用的任何卡牌无数量及距离限制；当你于回合内重复使用同名卡牌时，你摸一张牌（每回合最多以此法摸三张牌）',
-			fengnu_info_alter:'锁定技，你使用的任何卡牌无数量限制；当你于回合内重复使用同名卡牌时，你摸一张牌（每回合最多以此法摸三张牌）',
+			fengnu_info:'锁定技，你使用的任何卡牌无数量及距离限制；当你于回合内重复使用同名卡牌时，你摸一张牌（每回合最多以此法摸三张牌）。',
+			fengnu_info_alter:'锁定技，你使用的任何卡牌无数量限制；当你于回合内重复使用同名卡牌时，你摸一张牌（每回合最多以此法摸三张牌）。',
 			shengdun:'圣盾',
 			shengdun2:'圣盾',
-			shengdun_info:'锁定技，准备阶段，若你没有护甲，你获得1点护甲',
+			shengdun_info:'锁定技，准备阶段，若你没有护甲，你获得1点护甲。',
 			jingmeng:'镜梦',
-			jingmeng_info:'每当你于回合内使用第一张牌时，你可以从牌堆中随机获得一张与之类型相同的牌',
+			jingmeng_info:'每当你于回合内使用第一张牌时，你可以从牌堆中随机获得一张与之类型相同的牌。',
 			kuixin:'窥心',
-			kuixin_info:'结束阶段，你可以获得一名手牌数不少于你的角色的一张手牌',
+			kuixin_info:'结束阶段，你可以获得一名手牌数不少于你的角色的一张手牌。',
 			hswuji:'无羁',
-			hswuji_info:'出牌阶段结束时，你可以摸X张牌，X为你本回合使用的卡牌数',
+			hswuji_info:'出牌阶段结束时，你可以摸X张牌，X为你本回合使用的卡牌数。',
 			yanshu:'炎舞',
-			yanshu_info:'每回合限一次，当你弃置非基本牌后，你可以获得一张流星火雨',
+			yanshu_info:'每回合限一次，当你弃置非基本牌后，你可以获得一张流星火雨。',
 			oldyanshu:'炎舞',
-			oldyanshu_info:'当你弃置非基本牌后，你可以获得一张流星火雨',
+			oldyanshu_info:'当你弃置非基本牌后，你可以获得一张流星火雨。',
 			bingshuang:'冰枪',
-			bingshuang_info:'你使用锦囊牌造成伤害后，可令目标摸两张牌并翻面',
+			bingshuang_info:'你使用锦囊牌造成伤害后，可令目标摸两张牌并翻面。',
 			shengyan:'圣言',
-			shengyan_info:'任意一名角色回复体力后，你可以令其额外回复1点体力，每回合限发动一次',
+			shengyan_info:'任意一名角色回复体力后，你可以令其额外回复1点体力，每回合限发动一次。',
 			qingliu:'清流',
-			qingliu_info:'锁定技，你防止即将受到的火焰伤害',
+			qingliu_info:'锁定技，你防止即将受到的火焰伤害。',
 			liechao:'猎潮',
-			liechao_info:'出牌阶阶段限一次，若你的武将牌正面朝上且手牌数不大于当前体力值，你可以翻面并摸四张牌，若如此做，你跳过本回合的弃牌阶段',
-			liechao_info_alter:'出牌阶阶段限一次，若你的武将牌正面朝上且手牌数不大于当前体力值，你可以翻面并摸三张牌，若如此做，你跳过本回合的弃牌阶段',
+			liechao_info:'出牌阶阶段限一次，若你的武将牌正面朝上且手牌数不大于当前体力值，你可以翻面并摸四张牌，若如此做，你跳过本回合的弃牌阶段。',
+			liechao_info_alter:'出牌阶阶段限一次，若你的武将牌正面朝上且手牌数不大于当前体力值，你可以翻面并摸三张牌，若如此做，你跳过本回合的弃牌阶段。',
 			aoshu:'奥术',
-			aoshu_info:'出牌阶段限一次，你可以将一张黑桃牌当作无中生有使用',
+			aoshu_info:'出牌阶段限一次，你可以将一张黑桃牌当作无中生有使用。',
 
 			qianhou:'千喉',
-			qianhou_info:'锁定技，准备阶段，你视为使用一张随机普通锦囊牌（随机指定目标）；若目标只有1人且不是你，你可以弃置一张手牌并获得此锦囊',
+			qianhou_info:'锁定技，准备阶段，你视为使用一张随机普通锦囊牌（随机指定目标）；若目标只有1人且不是你，你可以弃置一张手牌并获得此锦囊。',
 			fengxing:'风行',
-			fengxing_info:'每当你于回合外首次失去牌，你可以弃置一张牌并摸两张牌',
+			fengxing_info:'每当你于回合外首次失去牌，你可以弃置一张牌并摸两张牌。',
 			xinci:'心刺',
 			xinci_bg:'暗',
-			xinci_info:'出牌阶段限一次，你可以弃置一张黑色牌令一名角色失去1点体力',
+			xinci_info:'出牌阶段限一次，你可以弃置一张黑色牌令一名角色失去1点体力。',
 			zhongjia:'战甲',
-			zhongjia_info:'锁定技，每当你受到一次伤害，你获得1点护甲；当你的体力值大于1且大于手牌数时，你的护甲不为你抵挡伤害',
+			zhongjia_info:'锁定技，每当你受到一次伤害，你获得1点护甲；当你的体力值大于1且大于手牌数时，你的护甲不为你抵挡伤害。',
 			dunji:'盾击',
-			dunji_info:'出牌阶段限一次，你可以对攻击范围内的至多X名其他角色各造成1点伤害，并失去等量的护甲，X为你的护甲数',
+			dunji_info:'出牌阶段限一次，你可以对攻击范围内的至多X名其他角色各造成1点伤害，并失去等量的护甲，X为你的护甲数。',
 			qiaodong:'巧动',
-			qiaodong_info:'你可以将一张装备牌当作闪使用或打出',
+			qiaodong_info:'你可以将一张装备牌当作闪使用或打出。',
 			fengxian:'奉献',
-			fengxian_info:'出牌阶段限一次，你可以令场上所有角色各弃置一张手牌',
+			fengxian_info:'出牌阶段限一次，你可以令场上所有角色各弃置一张手牌。',
 			zhanhou:'战吼',
-			zhanhou_info:'出牌阶段限一次，你可以弃置一张防具牌并获得1点护甲',
+			zhanhou_info:'出牌阶段限一次，你可以弃置一张防具牌并获得1点护甲。',
 			oldzhanhou:'战吼',
-			oldzhanhou_info:'出牌阶段，你可以弃置一张防具牌并获得1点护甲',
+			oldzhanhou_info:'出牌阶段，你可以弃置一张防具牌并获得1点护甲。',
 			anying:'暗影',
-			anying_info:'限定技，出牌阶段，你可以弃置一张黑色牌，失去技能圣光，并获得技能心刺',
+			anying_info:'限定技，出牌阶段，你可以弃置一张黑色牌，失去技能圣光，并获得技能心刺。',
 			shijie:'视界',
-			shijie_info:'结束阶段，你可以获得一名其他角色的一张手牌，然后该角色摸一张牌',
+			shijie_info:'结束阶段，你可以获得一名其他角色的一张手牌，然后该角色摸一张牌。',
 			shengguang:'圣光',
-			shengguang_info:'出牌阶段限一次，你可以弃置一张红色牌令一名角色回复1点体力',
+			shengguang_info:'出牌阶段限一次，你可以弃置一张红色牌令一名角色回复1点体力。',
 			bingjia:'冰甲',
 			bingjia2:'冰甲',
-			bingjia_info:'出牌阶段，若你武将牌上没有牌，你可以将一张手牌背面朝上置于你的武将牌上，当你成为其他角色的与此牌花色相同的牌的目标时，你移去此牌，获得1点护甲，并且本回合内防止一切伤害',
+			bingjia_info:'出牌阶段，若你武将牌上没有牌，你可以将一张手牌背面朝上置于你的武将牌上，当你成为其他角色的与此牌花色相同的牌的目标时，你移去此牌，获得1点护甲，并且本回合内防止一切伤害。',
 			bianxing:'变形',
-			bianxing_info:'当一其他角色于回合内使用卡牌指定了惟一的其他目标后，你可以用一张合理的基本牌替代此牌，每名角色的回合限一次',
+			bianxing_info:'当一其他角色于回合内使用卡牌指定了惟一的其他目标后，你可以用一张合理的基本牌替代此牌，每名角色的回合限一次。',
 			xianzhi:'先知',
-			xianzhi_info:'任意一名角色进行判定前，你可以观看牌堆顶的两张牌，并可以将其调换顺序',
+			xianzhi_info:'任意一名角色进行判定前，你可以观看牌堆顶的两张牌，并可以将其调换顺序。',
 			mdzhoufu:'缚魂',
 			mdzhoufu2:'缚魂',
-			mdzhoufu_info:'出牌阶段，你可以将一张黑色手牌置于一名其他角色的武将牌上，在其判定时以此牌作为判定结果，然后你获得亮出的判定牌',
+			mdzhoufu_info:'出牌阶段，你可以将一张黑色手牌置于一名其他角色的武将牌上，在其判定时以此牌作为判定结果，然后你获得亮出的判定牌。',
 			zuzhou:'诅咒',
-			zuzhou_info:'锁定技，准备阶段，若场上没有浮雷且你手牌中有黑桃牌，你将牌堆中的一张浮雷置于你的判定区；当一名角色受到浮雷伤害时，你移去此浮雷',
-			zuzhou_old_info:'每当你造成或受到一次伤害，你可以令伤害目标或来源进行一次判定，若结果为黑色，其失去1点体力',
+			zuzhou_info:'锁定技，准备阶段，若场上没有浮雷且你手牌中有黑桃牌，你将牌堆中的一张浮雷置于你的判定区；当一名角色受到浮雷伤害时，你移去此浮雷。',
+			zuzhou_old_info:'每当你造成或受到一次伤害，你可以令伤害目标或来源进行一次判定，若结果为黑色，其失去1点体力。',
 			jingxiang:'镜像',
-			jingxiang_info:'每回合限一次，当你需要打出卡牌时，你可以观看一名角色的手牌并将其视为你的手牌打出',
-			jingxiang_info_alter:'每回合限一次，当你需要打出卡牌时，你可以观看一名手牌数不多于你的角色的手牌并将其视为你的手牌打出',
+			jingxiang_info:'每回合限一次，当你需要打出卡牌时，你可以观看一名角色的手牌并将其视为你的手牌打出。',
+			jingxiang_info_alter:'每回合限一次，当你需要打出卡牌时，你可以观看一名手牌数不多于你的角色的手牌并将其视为你的手牌打出。',
 			tuteng:'图腾',
-			tuteng_info:'出牌阶段，你可以获得一个随机基础图腾；每当你受到一次伤害，你随机失去一个图腾',
+			tuteng_info:'出牌阶段，你可以获得一个随机基础图腾；每当你受到一次伤害，你随机失去一个图腾。',
 			zuling:'祖灵',
-			zuling_info:'觉醒技，准备阶段，若你拥有至少3个图腾，你失去1点体力上限，并将图腾描述中的“获得一个随机基础图腾”改为“获得任意一个图腾（若有4个图腾则改为替换一个图腾）”',
+			zuling_info:'觉醒技，准备阶段，若你拥有至少3个图腾，你失去1点体力上限，并将图腾描述中的“获得一个随机基础图腾”改为“获得任意一个图腾（若有4个图腾则改为替换一个图腾）”。',
 			tuteng1:'治疗图腾',
-			tuteng1_info:'结束阶段，你回复1点体力',
+			tuteng1_info:'结束阶段，你回复1点体力。',
 			tuteng2:'灼热图腾',
-			tuteng2_info:'每当你造成一次伤害，你摸一张牌',
+			tuteng2_info:'每当你造成一次伤害，你摸一张牌。',
 			tuteng3:'石爪图腾',
-			tuteng3_info:'你受到下一次伤害时，令伤害-1，然后失去此图腾',
+			tuteng3_info:'你受到下一次伤害时，令伤害-1，然后失去此图腾。',
 			tuteng4:'空气图腾',
-			tuteng4_info:'在你的回合内，你的锦囊牌造成的首次伤害+1',
+			tuteng4_info:'在你的回合内，你的锦囊牌造成的首次伤害+1。',
 			tuteng5:'法潮图腾',
-			tuteng5_info:'结束阶段，你摸一张牌',
+			tuteng5_info:'结束阶段，你摸一张牌。',
 			tuteng6:'火舌图腾',
-			tuteng6_info:'在你的回合内，你的杀造成的首次伤害+1',
+			tuteng6_info:'在你的回合内，你的杀造成的首次伤害+1。',
 			tuteng7:'活力图腾',
-			tuteng7_info:'结束阶段，你令一名其他角色回复1点体力',
+			tuteng7_info:'结束阶段，你令一名其他角色回复1点体力。',
 			tuteng8:'图腾魔像',
-			tuteng8_info:'你的进攻距离+1',
+			tuteng8_info:'你的进攻距离+1。',
 			tzhenji:'震击',
-			tzhenji_info:'每当你因弃置而失去黑色牌，可对一名角色造成1点雷电伤害，并随机弃置其一张牌，每回合限发动一次',
+			tzhenji_info:'每当你因弃置而失去黑色牌，可对一名角色造成1点雷电伤害，并随机弃置其一张牌，每回合限发动一次。',
 			fenliu:'分流',
-			fenliu_info:'出牌阶段限一次，你可以失去1点体力并获得三张牌',
+			fenliu_info:'出牌阶段限一次，你可以失去1点体力并获得三张牌。',
 			hongxi:'虹吸',
-			hongxi_info:'锁定技，每当有一名角色死亡，你将体力回复至体力上限',
+			hongxi_info:'锁定技，每当有一名角色死亡，你将体力回复至体力上限。',
 			jihuo:'激活',
-			jihuo_info:'在你的回合结束后，你可以弃置一张手牌并进行一个额外的回合',
+			jihuo_info:'在你的回合结束后，你可以弃置一张手牌并进行一个额外的回合。',
 			jianren:'刃舞',
-			jianren_info:'出牌阶段限一次，你可以弃置装备区内的武器牌，对所有其他角色造成1点伤害',
+			jianren_info:'出牌阶段限一次，你可以弃置装备区内的武器牌，对所有其他角色造成1点伤害。',
 			mengun:'闷棍',
 			mengun2:'闷棍',
-			mengun_info:'每当一名其他角色于回合内使用基本牌，你可以弃置一张与之花色相同的牌令其收回此牌，且在本回合内不能再次使用，每回合限一次',
+			mengun_info:'每当一名其他角色于回合内使用基本牌，你可以弃置一张与之花色相同的牌令其收回此牌，且在本回合内不能再次使用，每回合限一次。',
 			wlianji:'连击',
-			wlianji_info:'结束阶段，若你本回合使用的卡牌数大于你当前的体力值，你可以摸两张牌',
+			wlianji_info:'结束阶段，若你本回合使用的卡牌数大于你当前的体力值，你可以摸两张牌。',
 		},
 	};
 });

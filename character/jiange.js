@@ -233,7 +233,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					player.chooseTarget(get.prompt('juechen'),function(card,player,target){
-						return player!=target&&!trigger.targets.contains(target)&&target.countCards('he')>0;
+						return player!=target&&!trigger.targets.includes(target)&&target.countCards('he')>0;
 					}).set('autodelay',true).ai=function(target){
 						return -get.attitude(player,target);
 					}
@@ -418,7 +418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var dialog=ui.create.dialog('将三张牌中的锦囊牌或装备牌交给一名角色','hidden');
 						dialog.add(event.cards);
 						for(var i=0;i<dialog.buttons.length;i++){
-							if(event.cards2.contains(dialog.buttons[i].link)){
+							if(event.cards2.includes(dialog.buttons[i].link)){
 								dialog.buttons[i].style.opacity=1;
 							}
 							else{
@@ -571,7 +571,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jingfan:'惊帆',
 			jingfan2:'惊帆',
 			jingfan_info:'回合内，每当你使用一张卡牌，你的进攻距离+1；出牌阶段结束时，你可以将手牌数补至X，并指定至多X名角色令其进攻距离+1直到其下一回合结束，X为你回合内使用的卡牌数。',
-
 		},
 	};
 });

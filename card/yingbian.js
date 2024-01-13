@@ -28,7 +28,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					wuxie:function(target,card,player,viewer,status){
-						if(status*get.attitude(viewer,player)>0&&!player.isMad()) return 0;
+						if(get.attitude(viewer,player._trueMe||player)>0) return 0;
 						if(!card.yingbian_all&&get.distance(player,target)>1&&!target.hasCard(i=>{
 							let val=get.value(i,target),subtypes=get.subtypes(i);
 							if(val<8&&target.hp<2&&!subtypes.includes('equip2')&&!subtypes.includes('equip5')) return false;
@@ -51,7 +51,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						if(get.cardtag(card,'yingbian_add')){
 							if(game.hasPlayer(function(current){
-								return !targets.contains(current)&&lib.filter.targetEnabled2(card,player,current)&&get.effect(current,card,player,player)>0;
+								return !targets.includes(current)&&lib.filter.targetEnabled2(card,player,current)&&get.effect(current,card,player,player)>0;
 							})) base+=5;
 						}
 						if(get.cardtag(card,'yingbian_hit')){
@@ -179,17 +179,34 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					yingbian:function(card,player,targets,viewer){
 						if(get.attitude(viewer,player)<=0) return 0;
 						if(game.hasPlayer(function(current){
-							return !targets.contains(current)&&lib.filter.targetEnabled2(card,player,current)&&get.effect(current,card,player,player)>0;
+							return !targets.includes(current)&&lib.filter.targetEnabled2(card,player,current)&&get.effect(current,card,player,player)>0;
 						})) return 6;
 						return 0;
 					},
 					result:{
-						target:function(player,target,cardx){
-							if(player.hasSkillTag('viewHandcard',null,target,true)) return target.countCards('h',function(card){
-								return get.suit(card)!=get.suit(cardx)
-							})>0?-1.5:0;
-							return -1.4;
-						},
+						target:(player,target,card)=>{
+							//if(typeof card!=='object') return -2;
+							let suit=get.suit(card),
+								view=player.hasSkillTag('viewHandcard',null,target,true),
+								fz=0,
+								fm=0;
+							target.getCards('h',i=>{
+								if(i.isKnownBy(player)){
+									if(suit!==get.suit(i)){
+										if(view||get.is.shownCard(i)) return -2;
+										fz++;
+										fm++;
+									}
+									else if(!view&&!get.is.shownCard(i)) fm++;
+								}
+								else{
+									fz+=0.75;
+									fm++;
+								}
+							});
+							if(!fm) return 0;
+							return -2*fz/fm;
+						}
 					},
 					tag:{
 						damage:1,
@@ -259,11 +276,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				ai:{
 					value:function(card,player){
 						if(player.countCards('h')>3||get.position(card)!='e') return 0.5;
-						return (player.countCards('h')-5)/3;
+						return (player.countCards('h')-4)*5;
 					},
 					equipValue:function(card,player){
 						if(player.countCards('h')>3||get.position(card)!='e') return 0.5;
-						return (player.countCards('h')-5)/3;
+						return (player.countCards('h')-4)*5;
 					},
 					basic:{
 						equipValue:0.5
@@ -545,7 +562,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(info.allowMultiple==false) return false;
 					if(event.targets&&!info.multitarget){
 						if(game.hasPlayer(function(current){
-							return !event.targets.contains(current)&&lib.filter.targetEnabled2(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
+							return !event.targets.includes(current)&&lib.filter.targetEnabled2(event.card,player,current)&&lib.filter.targetInRange(event.card,player,current);
 						})){
 							return true;
 						}
@@ -557,7 +574,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					if(trigger.yingbian_addTarget) player.chooseTarget('应变：是否为'+get.translation(trigger.card)+'增加一个目标？',function(card,player,target){
 						var trigger=_status.event.getTrigger();
 						var card=trigger.card;
-						return !trigger.targets.contains(target)&&lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
+						return !trigger.targets.includes(target)&&lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
 					}).set('ai',function(target){
 						var player=_status.event.player;
 						var card=_status.event.getTrigger().card;
@@ -574,7 +591,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(trigger.yingbian_removeTarget&&trigger.targets.length>1) player.chooseTarget('应变：是否为'+get.translation(trigger.card)+'减少一个目标？',function(card,player,target){
 						var trigger=_status.event.getTrigger();
-						return trigger.targets.contains(target);
+						return trigger.targets.includes(target);
 					}).set('ai',function(target){
 						var player=_status.event.player;
 						var card=_status.event.getTrigger().card;
@@ -720,7 +737,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['spade',13,'wuxie',null,['yingbian_kongchao','yingbian_draw']],
 			['spade',13,'nanman',null,['yingbian_fujia','yingbian_remove']],
 			['spade',13,'dawan'],
-			
+
 			['heart',1,'taoyuan',null,['yingbian_fujia','yingbian_remove']],
 			['heart',1,'wanjian',null,['yingbian_fujia','yingbian_remove']],
 			['heart',1,'wuxie'],
@@ -761,7 +778,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['heart',13,'wuxie',null,['yingbian_kongchao','yingbian_gain']],
 			['heart',13,'shan'],
 			['heart',13,'zhuahuang'],
-			
+
 			['club',1,'juedou'],
 			['club',1,'zhuge'],
 			['club',1,'huxinjing'],
@@ -802,7 +819,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['club',13,'wuxie',null,['yingbian_canqu','yingbian_draw']],
 			['club',13,'tongque'],
 			['club',13,'tiesuo'],
-			
+
 			['diamond',1,'juedou'],
 			['diamond',1,'zhuge'],
 			['diamond',1,'wuxinghelingshan'],
@@ -843,7 +860,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			['diamond',13,'sha'],
 			['diamond',13,'zixin'],
 			['diamond',13,'hualiu'],
-			
+
 			['diamond',5,'muniu'],
 		],
 		help:{
