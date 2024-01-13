@@ -2,8 +2,9 @@ window.noname_update={
 	version:'1.10.6',
 	update:'1.10.5',
 	changeLog:[
-		'整合@nonameShijian @mengxinzxz @PZ157 @Ansolve @Rintim @S-N-O-R-L-A-X @universe-st @copcap 的Pull Request',
+		'整合@nonameShijian @mengxinzxz @PZ157 @Ansolve @Rintim @S-N-O-R-L-A-X @universe-st @copcap @kuangshen04 的Pull Request',
 		'拆分game.js，优化代码逻辑与可读性',
+		'孙策(十周年斗地主)、乐小乔、手杀陈珪、手杀胡班、OL界凌统、OL界曹彰、OL界简雍、OL谋姜维、谋诸葛亮、谋关羽、曹宇、星董卓、曹宪、新杀谋鲁肃、新杀谋周瑜',
 		'其他AI优化与bug修复',
 	],
 	files:[

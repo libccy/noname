@@ -2881,7 +2881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.videoId=id;
 					},player,event.videoId,event.cards);
 					event.time=get.utc();
-					game.addVideo('showCards',player,['涉猎',get.cardsInfo(event.cards)]);
+					game.addVideo('showCards',player,['九伐',get.cardsInfo(event.cards)]);
 					game.addVideo('delay',null,2);
 					"step 1"
 					var next=player.chooseButton([0,9],true);
