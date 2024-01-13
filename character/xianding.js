@@ -1386,13 +1386,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 1'
 					if(get.owner(card)==player&&get.position(card)=='h'&&game.hasPlayer(current=>current!=player)){
-						player.chooseTarget(`是否将${get.translation(card)}交给一名其他角色？`,lib.filter.notMe);
+						let targets=game.filterPlayer(i=>{
+							return get.attitude(player,i)>0;
+						},null,true).sortBySeat(get.zhu(player)||game.findPlayer(i=>{
+							return i.getSeatNum()===1;
+						}));
+						if(targets.includes(player)) targets=targets.slice(0,targets.indexOf(player));
+						player.chooseTarget(`是否将${get.translation(card)}交给一名其他角色？`,lib.filter.notMe).set('ai',target=>{
+							let idx=_status.event.targets.indexOf(target);
+							if(idx<0) return -1;
+							return 1/(idx+1);
+						}).set('targets',targets);
 					}
 					else event.finish();
 					'step 2'
 					if(result.bool){
 						var target=result.targets[0];
 						player.line(target);
+						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.2);
 						player.give(card,target).gaintag.add('dcshangyu_tag');
 					}
 					player.addSkill('dcshangyu_effect');
