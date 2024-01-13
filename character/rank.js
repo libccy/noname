@@ -987,6 +987,7 @@ window.noname_character_rank={
 		'libai',
 		'tw_gongsunfan',
 		'yue_caiwenji',
+		'yue_xiaoqiao',
 		'vtb_xiaole',
 		'vtb_xiaojiu',
 		'ol_zhangzhang',
@@ -1817,6 +1818,7 @@ window.noname_character_rank={
 			'caoxian',
 		],
 		epic:[
+			'yue_xiaoqiao',
 			'mb_chengui',
 			'ol_pengyang',
 			'ol_luyusheng',
