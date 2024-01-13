@@ -91,7 +91,7 @@ new Promise(resolve => {
 		script.async = true
 		script.onerror = (event) => {
 			console.error(event)
-			const message = `您使用的浏览器或无名杀客户端加载内容失败！\n请检查游戏环境以及"(游戏根目录)/game/entry.js"文件的位置\n若该BUG不为您个人原因造成的，请及时反馈给无名杀开发组！`;
+			const message = `您使用的浏览器或无名杀客户端加载内容失败！\n若您使用的客户端为旧版“兼容版”或其他内核较低的版本，请及时更新客户端版本！\n请检查游戏环境以及"(游戏根目录)/game/entry.js"文件的位置\n若该BUG不为您个人原因造成的，请及时反馈给无名杀开发组！`;
 			console.error(message);
 			alert(message);
 			exit()

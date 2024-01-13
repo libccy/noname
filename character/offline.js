@@ -133,7 +133,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		perfectPair:{},
 		card:{
 			yanxiao_card:{
-				type:'delay',
+				type:'special_delay',
 				fullimage:true,
 				noEffect:true,
 				ai:{

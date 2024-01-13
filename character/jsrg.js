@@ -67,9 +67,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		perfectPair:{},
 		card:{
 			xumou_jsrg:{
-				type:'delay',
+				type:'special_delay',
 				allowDuplicate:true,
 				blankCard:true,
+				fullimage:true,
 				effect:function(){
 					'step 0'
 					var card=event.cards[0];

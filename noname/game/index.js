@@ -7399,7 +7399,7 @@ export class Game extends Uninstantable {
 				if (card.ai.basic.value == undefined) card.ai.basic.value = aiBasicValue;
 				if (!card.ai.result.keepAI) card.ai.result.target = aiResultTarget;
 			}
-			else if (card.type == 'delay') {
+			else if (card.type == 'delay' || card.type == 'special_delay') {
 				if (card.enable == undefined) card.enable = true;
 				if (card.filterTarget == undefined) card.filterTarget = lib.filter.judge;
 				if (card.content == undefined) card.content = lib.element.content.addJudgeCard;
