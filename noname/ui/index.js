@@ -9796,6 +9796,7 @@ class Create extends Uninstantable {
 				}
 				if (node._replaceButton) {
 					var intro = ui.create.div('.button.replaceButton', node);
+					intro[lib.experimental.symbol.itemType] = 'button';
 					node.node.replaceButton = intro;
 					intro.innerHTML = '切换';
 					intro._node = node;
