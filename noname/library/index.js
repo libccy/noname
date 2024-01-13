@@ -9271,6 +9271,7 @@ export class Library extends Uninstantable {
 		equip: '装备',
 		trick: '锦囊',
 		delay: '延时锦囊',
+		special_delay: '技能机制',
 		character: '角色',
 		revive: '复活',
 		equip1: '武器',

@@ -2484,6 +2484,12 @@ export const Content = {
 			event.cancel();
 			player.turnOver();
 			player.phaseSkipped = true;
+			var players = game.players.slice(0).concat(game.dead);
+			for (var i = 0; i < players.length; i++) {
+				var current = players[i];
+				current.getHistory().isSkipped = true;
+				current.getStat().isSkipped = true;
+			}
 		}
 		else {
 			player.phaseSkipped = false;
@@ -5204,7 +5210,7 @@ export const Content = {
 						if (!info || !info.blankCard) return true;
 						return false;
 					});
-					if (shown.length < js.length) {
+					if (shown.length < js.length && !target.isUnderControl(true)) {
 						var hidden = js.filter(card => !shown.includes(card));
 						var buttons = ui.create.div('.buttons', event.dialog.content);
 						event.dialog.buttons = event.dialog.buttons.concat(ui.create.buttons(shown, 'card', buttons));
@@ -5379,7 +5385,7 @@ export const Content = {
 						if (!info || !info.blankCard) return true;
 						return false;
 					});
-					if (shown.length < js.length) {
+					if (shown.length < js.length && !target.isUnderControl(true)) {
 						var hidden = js.filter(card => !shown.includes(card));
 						var buttons = ui.create.div('.buttons', event.dialog.content);
 						event.dialog.buttons = event.dialog.buttons.concat(ui.create.buttons(shown, 'card', buttons));
@@ -5579,7 +5585,7 @@ export const Content = {
 						if (!info || !info.blankCard) return true;
 						return false;
 					});
-					if (shown.length < js.length) {
+					if (shown.length < js.length && !target.isUnderControl(true)) {
 						var hidden = js.filter(card => !shown.includes(card));
 						var buttons = ui.create.div('.buttons', event.dialog.content);
 						event.dialog.buttons = event.dialog.buttons.concat(ui.create.buttons(shown, 'card', buttons));
