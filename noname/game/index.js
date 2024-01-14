@@ -7135,14 +7135,14 @@ export class Game extends Uninstantable {
 					event.avatars[i].classList.add('selecting');
 				}
 			}
-			let rand2 = [];
+			let rand = [];
 			for (let i = 0; i < event.config.width; i++) {
 				for (let j = 0; j < event.config.width - i; j++) {
-					rand2.push(i);
+					rand.push(i);
 				}
 			}
 			for (let i = 0; i < event.config.num; i++) {
-				let rand2 = rand2.randomGet();
+				let rand2 = rand.randomGet();
 				for (let j = 0; j < rand2.length; j++) {
 					if (rand2[j] == rand2) {
 						rand2.splice(j--, 1);
