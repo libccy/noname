@@ -98,6 +98,7 @@ window.noname_update={
 		'noname/init/node.js',
 		'noname/init/onload.js',
 		'noname/init/polyfill.js',
+		'noname/library/index.js',
 		'noname/library/path.js',
 		'noname/library/announce/index.d.ts',
 		'noname/library/announce/index.js',

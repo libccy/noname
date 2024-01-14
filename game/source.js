@@ -17,6 +17,7 @@ window.noname_source_list=[
 	'noname/init/node.js',
 	'noname/init/onload.js',
 	'noname/init/polyfill.js',
+	'noname/library/index.js',
 	'noname/library/path.js',
 	'noname/library/announce/index.d.ts',
 	'noname/library/announce/index.js',
@@ -122,9 +123,9 @@ window.noname_source_list=[
 	'game/phantom.js',
 	'game/pinyinjs.js',
 	'game/pressure.js',
+	'game/server.js',
 	'game/source.js',
 	'game/update.js',
-	'game/src/lib/announce.js',
 	
 	'image/card/cardtempname_bg.png',
 	'image/flappybird/BG.png',
