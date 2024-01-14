@@ -107,7 +107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_jishi:['dc_jiben','zhenghun','dc_sunhanhua','liuchongluojun'],
 				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen','dc_jiachong'],
 				sp_yijun:['gongsundu','mengyou'],
-				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong'],
+				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong','yue_xiaoqiao'],
 			}
 		},
 		skill:{
@@ -11552,6 +11552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yue_xiaoqiao:'乐小乔',
 			yue_xiaoqiao_prefix:'乐',
 			dcqiqin:'绮琴',
+			dcqiqin_tag:'乐',
 			dcqiqin_info:'锁定技。①游戏开始时，你将所有手牌标记为“乐”。②你的“乐”牌不计入手牌上限。③准备阶段，你获得弃牌堆中所有你标记过的“乐”牌。',
 			dcweiwan:'媦婉',
 			dcweiwan_info:'出牌阶段限一次，你可以弃置一张“乐”并获得一名其他角色区域内花色与此牌不相同的牌各一张，若你获得了：一张牌，其失去1点体力；两张牌，本回合你对其使用牌无距离和次数限制；三张牌，本回合你不能对其使用牌。',
