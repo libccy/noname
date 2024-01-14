@@ -8652,6 +8652,44 @@ class Create extends Uninstantable {
 				clickCapt.call(node[lib.config.character_dialog_tool]);
 			}
 		}
+
+
+		//注意仅仅下面的部分是新加的，By Curpond
+		let container = dialog.querySelector('.content-container>.content')
+		let Searcher = ui.create.div('.searcher.caption')
+		let input = document.createElement('input')
+		input.style.textAlign = 'center'
+		input.style.border = 'solid 2px #294510'
+		input.style.borderRadius = '6px'
+		input.style.fontWeight = 'bold'
+		input.style.fontSize = '21px'
+		let find = ui.create.button(['find', '搜索'], 'tdnodes')
+		find.style.display = 'inline'
+		let clickfind = function (e) {
+			e.stopPropagation()
+			let value = input.value
+			if (value == '') {
+				game.alert('搜索不能为空')
+				input.focus()
+				return
+			}
+			let list = []
+			for (let btn of dialog.buttons) {
+
+				if ((new RegExp(value, 'g').test(get.translation(btn.link)))) {
+					btn.classList.remove('nodisplay')
+				} else {
+					btn.classList.add('nodisplay')
+				}
+			}
+		}
+		input.addEventListener('keyup', (e) => {
+			if (e.key == 'Enter') clickfind(e)
+		})
+		find.listen(clickfind)
+		Searcher.appendChild(input)
+		Searcher.appendChild(find)
+		container.prepend(Searcher)
 		return dialog;
 	}
 	static dialog() {
@@ -9624,8 +9662,8 @@ class Create extends Uninstantable {
 			if (get.position(item) == 'j' && item.viewAs && lib.config.cardtempname != 'off') {
 				node.classList.add('infoflip');
 				node.classList.add('infohidden')
-				ui.create.cardTempName(item, node).style.setProperty('display','block','important')
-				
+				ui.create.cardTempName(item, node).style.setProperty('display', 'block', 'important')
+
 			}
 			return node;
 		},
