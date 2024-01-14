@@ -13,10 +13,6 @@ export class VCard {
 	 * @param { string } [nature]
 	 */
 	constructor(suitOrCard, numberOrCards, name, nature) {
-		if (suitOrCard instanceof VCard) {
-			const other = suitOrCard;
-			[suitOrCard, numberOrCards, name, nature] = other._args;
-		}
 
 		if (Array.isArray(suitOrCard)) {
 			/**
