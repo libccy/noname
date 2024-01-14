@@ -364,12 +364,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.target=target;
 					var list=['cancel2'];
 					var choiceList=[
-						'弃置一张手牌，令此【杀】可以额外指定一个目标',
+						'令此【杀】可以额外指定一个目标',
 						'弃置其一张手牌，若此【杀】造成伤害，则你摸一张牌且本阶段可以额外使用一张【杀】',
 					];
 					if(target.countCards('h')) list.unshift('其弃置');
 					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
-					if(game.hasPlayer(targetx=>!trigger.targets.includes(targetx)&&player.canUse(trigger.card,targetx))) list.unshift('你弃置');
+					if(game.hasPlayer(targetx=>!trigger.targets.includes(targetx)&&player.canUse(trigger.card,targetx))) list.unshift('多指');
 					else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
 					player.chooseControl(list).set('choiceList',choiceList).set('ai',()=>{
 						var controls=_status.event.controls;
@@ -377,7 +377,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=trigger.player;
 						var target=trigger.target;
 						if(controls.includes('其弃置')&&_status.event.goon) return '其弃置';
-						if(controls.includes('你弃置')){
+						if(controls.includes('多指')){
 							if(game.hasPlayer(targetx=>!trigger.targets.includes(targetx)&&player.canUse(trigger.card,targetx)&&get.effect(targetx,trigger.card,player,player)>0)) return '你弃置';
 						}
 						return 'cancel2';
