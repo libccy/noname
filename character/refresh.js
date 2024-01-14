@@ -6656,7 +6656,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:function(item,player){
-						var num=player.getStorage('gzquanji').length;
+						var num=player.getExpansions('gzquanji').length;
 						if(num==1) return 8;
 						return 1;
 					},
