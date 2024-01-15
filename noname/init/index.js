@@ -468,6 +468,7 @@ export async function boot() {
 
 	if (extensionlist.length && (config.get('mode') != 'connect' || show_splash)) {
 		_status.extensionLoading = [];
+		_status.extensionLoaded = [];
 
 		const bannedExtensions = Reflect.get(window, 'bannedExtensions');
 

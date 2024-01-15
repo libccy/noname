@@ -13,7 +13,6 @@ export class VCard {
 	 * @param { string } [nature]
 	 */
 	constructor(suitOrCard, numberOrCards, name, nature) {
-
 		if (Array.isArray(suitOrCard)) {
 			/**
 			 * @type {string}
@@ -92,8 +91,6 @@ export class VCard {
 		if (typeof nature == 'string') this.nature = nature;
 		if (!this.storage) this.storage = {};
 		if (!this.cards) this.cards = [];
-
-		this._args = [suitOrCard, numberOrCards, name, nature];
 	}
 	sameSuitAs(card) {
 		return get.suit(this) == get.suit(card);
