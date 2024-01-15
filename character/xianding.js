@@ -145,10 +145,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return (dis?6:1)-get.useful(card);
 						}
 						if(_status.event.hvt.includes(card)){
-							if(_status.event.suits.length>=4){
-								if(cards.length>8) return 0;
-								return 4.5-get.value(card);
-							}
 							if(!_status.event.suits.includes(suit)) return 6-get.value(card);
 							if(card.name==='sha') return 3-get.value(card);
 							return 1-get.value(card);
@@ -1306,6 +1302,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dczhangcai:{
 				audio:2,
+				mod:{
+					aiOrder:(player,card,num)=>{
+						if(num>0&&get.tag(card,'draw')&&ui.cardPile.childNodes.length+ui.discardPile.childNodes.length<20) return 0;
+					},
+					aiValue:(player,card,num)=>{
+						if(num>0&&card.name==='zhuge') return 20;
+					},
+					aiUseful:(player,card,num)=>{
+						if(num>0&&card.name==='zhuge') return 10;
+					}
+				},
 				trigger:{
 					player:['useCard','respond'],
 				},
@@ -1318,6 +1325,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					let count=1;
 					if(typeof num=='number') count=Math.max(1,player.countCards('h',card=>get.number(card)==num))
 					return '你可以摸'+get.cnNumber(count)+'张牌。';
+				},
+				check:(event,player)=>{
+					const num=player.hasSkill('dczhangcai_all')?get.number(event.card):8;
+					let count=1;
+					if(typeof num=='number') count=Math.max(1,player.countCards('h',card=>get.number(card)==num));
+					return ui.cardPile.childNodes.length+ui.discardPile.childNodes.length>=count;
 				},
 				frequent:true,
 				content:function(){

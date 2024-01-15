@@ -1095,7 +1095,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						filter:(event,player)=>{
 							if(event.getParent('phaseDraw',true)) return false;
-							const evt=player.getHistory('gain')[0];
+							const evt=player.getHistory('gain',i=>!i.getParent('phaseDraw',true))[0];
 							if(!evt) return false;
 							if(event.name=='gain'){
 								if(evt!=event||event.getlx===false) return false;
