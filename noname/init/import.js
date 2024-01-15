@@ -1,4 +1,5 @@
 import { Game as game } from '../game/index.js';
+import { lib } from '../library/index.js';
 
 /**
  * @param {string} name - 卡牌包名
@@ -33,7 +34,20 @@ export const importMode = generateImportFunction('mode', (name) => `../../mode/$
  */
 function generateImportFunction(type, pathParser) {
 	return async (name) => {
-		const modeContent = await import(pathParser(name));
+		const path = pathParser(name);
+		// 通过浏览器自带的script标签导入可直接获取报错信息，且不会影响JS运行
+		// 此时代码内容也将缓存在浏览器中，故再次import后将不会重新执行代码内容（测试下来如此）
+		const [status, script] = await new Promise((resolve) => {
+			const script = document.createElement('script');
+			script.type = 'module';
+			script.src = `${lib.assetURL}noname/init/${path}`;
+			script.onerror = () => resolve(['error', script]);
+			script.onload = () => resolve(['ok', script]);
+			document.head.appendChild(script);
+		});
+		script.remove();
+		if (status === 'error') return;
+		const modeContent = await import(path);
 		if (!modeContent.type) return;
 		if (modeContent.type !== type) throw new Error(`Loaded Content doesn't conform to "${type}" but "${modeContent.type}".`);
 		await game.import(type, modeContent.default);
