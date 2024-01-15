@@ -727,7 +727,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var {result:{bool,targets}}=await player.chooseTarget(get.prompt2('olgongjie'),[1,num],lib.filter.notMe).set('ai',target=>get.attitude(_status.event.player,target));
 					if(!bool) return;
 					targets=targets.sortBySeat();
-					player.logSkill('gongjie',targets);
+					player.logSkill('olgongjie',targets);
 					for(var target of targets){
 						var {result:{bool,cards}}=await target.gainPlayerCard(player,true,'he');
 						if(bool) draws.add(get.suit(cards[0],player));
@@ -788,6 +788,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('he');
 				},
 				direct:true,
+				limited:true,
+				skillAnimation:true,
+				animationColor:'water',
 				async content(event,trigger,player){
 					var target=_status.currentPhase,num=player.countCards('he');
 					var {result:{bool,cards}}=await player.chooseToGive(get.prompt2('olxiangzuo',target),[1,num],'he').set('ai',card=>{
