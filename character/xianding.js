@@ -20,7 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_sp_machao:['male','qun',4,['zhuiji','dc_olshichou']],
 			old_huangfusong:['male','qun',4,['xinfenyue']],
 			dc_xiahouba:['male','shu',4,['rebaobian']],
-			dc_daxiaoqiao:['female','wu',3,['dcxingwu','dcluoyan']],
+			dc_daxiaoqiao:['female','wu',3,['dcxingwu','dcluoyan'],['tempname:daxiaoqiao']],
 			tianshangyi:['female','wei',3,['dcposuo','dcxiaoren']],
 			sunlingluan:['female','wu',3,['dclingyue','dcpandi']],
 			dc_wangjun:['male','qun',4,['dctongye','dcchangqu']],
@@ -1662,33 +1662,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			dcluoyan: {
-				derivation: ['retianxiang', 'liuli'],
-				init: function (player) {
-					if (player.getStorage('dcxingwu').length) player.addAdditionalSkill('dcluoyan', ['retianxiang_daxiaoqiao', 'liuli_daxiaoqiao']);
+			dcluoyan:{
+				derivation:['retianxiang','liuli'],
+				init:function(player){
+					if(player.getExpansions('dcxingwu').length) player.addAdditionalSkill('dcluoyan',['retianxiang','liuli']);
 					else player.removeAdditionalSkill('dcluoyan');
 				},
-				onremove: function (player) {
+				onremove:function(player){
 					player.removeAdditionalSkill('dcluoyan');
 				},
-				trigger: {
-					player: ['loseAfter', 'loseAsyncAfter', 'addToExpansionAfter'],
+				trigger:{player:['loseAfter','loseAsyncAfter','addToExpansionAfter']},
+				filter:function(event,player){
+					var cards=player.getExpansions('dcxingwu'),skills=player.additionalSkills.dcluoyan;
+					return !((cards.length&&skills&&skills.length)||(!cards.length&&(!skills||!skills.length)));
 				},
-				filter: function (event, player) {
-					var cards = player.getExpansions('dcxingwu'), skills = player.additionalSkills.dcluoyan;
-					if ((cards.length && skills && skills.length) || (!cards.length && (!skills || !skills.length))) {
-						return false;
-					}
-					return true;
-				},
-				forced: true,
-				content: function () {
-					lib.skill.dcluoyan.init(player, 'dcluoyan');
+				forced:true,
+				silent:true,
+				content:function(){
+					lib.skill.dcluoyan.init(player,'dcluoyan');
 				},
 			},
-			retianxiang_daxiaoqiao: {
-				audio: 'tianxiang_daxiaoqiao',
-				inherit: 'retianxiang',
+			retianxiang_daxiaoqiao:{
+				audio:'tianxiang_daxiaoqiao',
+				inherit:'retianxiang',
 			},
 			//田尚衣
 			dcposuo:{
