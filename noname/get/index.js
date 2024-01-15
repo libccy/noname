@@ -814,6 +814,7 @@ export class Get extends Uninstantable {
 			"[object Object]": true,
 			"[object Array]": true,
 			"[object Arguments]": true,
+			"[object Date]": true
 		};
 
 		if (typeof obj !== "object" || obj === null || !canTranverse[getType(obj)])
@@ -827,16 +828,22 @@ export class Get extends Uninstantable {
 		const target =
 			constructor
 				? (
-					// 这三类数据处理单独处理
+					// 这四类数据处理单独处理
 					// （实际上需要处理的只有Map和Set）
 					// 除此之外的就只能祝愿有拷贝构造函数了
-					(Array.isArray(obj) || obj instanceof Map || obj instanceof Set)
+					(Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object)
 						// @ts-ignore
 						? new constructor()
-						// @ts-ignore
-						: new constructor(obj)
+						: (
+							(constructor.name in window && /\[native code\]/.test(constructor.toString()))
+								// @ts-ignore
+								? new constructor(obj)
+								: obj
+						)
 				)
 				: Object.create(null);
+		if (target === obj) return target;
+
 		map.set(obj, target);
 
 		if (obj instanceof Map) {
