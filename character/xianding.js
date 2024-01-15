@@ -1333,6 +1333,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return ui.cardPile.childNodes.length+ui.discardPile.childNodes.length>=count;
 				},
 				frequent:true,
+				locked:false,
 				content:function(){
 					var num=player.hasSkill('dczhangcai_all')?get.number(trigger.card):8;
 					var count=1;
