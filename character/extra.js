@@ -7014,11 +7014,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource'
 				},
 				filter:function(event,player){
-					if(get.attitude(_status.event.player,event.player)>=0) return false;
 					if(player.storage.drlt_duorui.length) return false;
 					return event.player.isIn()&&_status.currentPhase==player;
 				},
 				check:function(event,player){
+					if(get.attitude(_status.event.player,event.player)>=0) return false;
 					if(player.hasEnabledSlot()&&!player.hasEnabledSlot(5)) return false;
 					return true;
 				},
