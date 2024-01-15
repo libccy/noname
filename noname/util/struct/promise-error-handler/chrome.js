@@ -60,6 +60,7 @@ export class ChromePromiseErrorHandler {
 	 */
 	onHandle(event) {
 		event.promise.catch((error) => {
+			console.error(error)
 			const result = this.#errorList.find(savedError => savedError[0] === error);
 			if (result) {
 				// @ts-ignore
