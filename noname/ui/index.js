@@ -4190,7 +4190,7 @@ class Create extends Uninstantable {
 							}
 							editnode.classList.remove('disabled');
 						};
-						var clickButton = async () => {
+						var clickButton = async function () {
 							if (currentButton == this) {
 								resetEditor();
 								return;
