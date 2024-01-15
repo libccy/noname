@@ -2143,11 +2143,11 @@ export const Content = {
 		next._trigger = trigger;
 		next.triggername = event.triggername;
 		
-		if ("contents" in info && Array.isArray(info.contents)) {
-			next.setContents(info.contents);
-		} else {
+		// if ("contents" in info && Array.isArray(info.contents)) {
+		// 	next.setContents(info.contents);
+		// } else {
 			next.setContent(info.content);
-		}
+		// }
 
 		next.skillHidden = event.skillHidden;
 		if (info.forceDie) next.forceDie = true;
