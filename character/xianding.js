@@ -145,10 +145,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return (dis?6:1)-get.useful(card);
 						}
 						if(_status.event.hvt.includes(card)){
-							if(_status.event.suits.length>=4){
-								if(cards.length>8) return 0;
-								return 4.5-get.value(card);
-							}
 							if(!_status.event.suits.includes(suit)) return 6-get.value(card);
 							if(card.name==='sha') return 3-get.value(card);
 							return 1-get.value(card);
@@ -1306,6 +1302,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dczhangcai:{
 				audio:2,
+				mod:{
+					aiValue:(player,card,num)=>{
+						if(num>0&&card.name==='zhuge') return 20;
+					},
+					aiUseful:(player,card,num)=>{
+						if(num>0&&card.name==='zhuge') return 10;
+					}
+				},
 				trigger:{
 					player:['useCard','respond'],
 				},
