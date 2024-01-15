@@ -887,6 +887,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pshengwu:{
 				audio:'hengwu',
 				mod:{
+					aiOrder:(player,card,num)=>{
+						if(num>0&&get.tag(card,'draw')&&ui.cardPile.childNodes.length+ui.discardPile.childNodes.length<20) return 0;
+					},
 					aiValue:(player,card,num)=>{
 						if(num>0&&card.name==='zhuge') return 20;
 					},

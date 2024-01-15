@@ -1303,6 +1303,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhangcai:{
 				audio:2,
 				mod:{
+					aiOrder:(player,card,num)=>{
+						if(num>0&&get.tag(card,'draw')&&ui.cardPile.childNodes.length+ui.discardPile.childNodes.length<20) return 0;
+					},
 					aiValue:(player,card,num)=>{
 						if(num>0&&card.name==='zhuge') return 20;
 					},
@@ -1322,6 +1325,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					let count=1;
 					if(typeof num=='number') count=Math.max(1,player.countCards('h',card=>get.number(card)==num))
 					return '你可以摸'+get.cnNumber(count)+'张牌。';
+				},
+				check:(event,player)=>{
+					const num=player.hasSkill('dczhangcai_all')?get.number(event.card):8;
+					let count=1;
+					if(typeof num=='number') count=Math.max(1,player.countCards('h',card=>get.number(card)==num));
+					return ui.cardPile.childNodes.length+ui.discardPile.childNodes.length>=count;
 				},
 				frequent:true,
 				content:function(){
