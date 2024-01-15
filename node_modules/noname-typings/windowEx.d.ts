@@ -69,16 +69,7 @@ declare interface Window {
         ai: AI;
     }
 
-    initReadWriteFunction?(game = ({
-        download: () => any,
-        readFile: () => any,
-        readFileAsText: () => any,
-        writeFile: () => any,
-        removeFile: () => any,
-        getFileList: () => any,
-        ensureDirectory: () => any,
-        createDir: () => any,
-    })): void;
+    initReadWriteFunction?(game: Game): void;
 
     bannedKeyWords: string[];
 }
