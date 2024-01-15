@@ -1683,7 +1683,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced: true,
 				content: function () {
-					lib.skill.twpingting.init(player, 'dcluoyan');
+					lib.skill.dcluoyan.init(player, 'dcluoyan');
 				},
 			},
 			retianxiang_daxiaoqiao: {
