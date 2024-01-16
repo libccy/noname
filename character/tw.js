@@ -77,7 +77,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_madai:['male','shu',4,['mashu','twqianxi']],
 			tw_niujin:['male','wei',4,['twcuorui','twliewei']],
 			tw_guanqiujian:['male','wei',3,['twzhengrong','twhongju']],
-			tw_daxiaoqiao:['female','wu',3,['twxingwu','twpingting']],
+			tw_daxiaoqiao:['female','wu',3,['twxingwu','twpingting'],['tempname:daxiaoqiao']],
 			tw_furong:['male','shu',4,['twxuewei','twliechi']],
 			tw_yl_luzhi:['male','qun',3,['twmingren','twzhenliang']],
 			tw_liuzhang:['male','qun',3,['jutu','twyaohu','rehuaibi']],
@@ -6240,7 +6240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:['roundStart','dying']},
 				init:function(player,skill){
-					if(player.getExpansions('twxingwu').length) player.addAdditionalSkill(skill,['tianxiang_daxiaoqiao','liuli_daxiaoqiao']);
+					if(player.getExpansions('twxingwu').length) player.addAdditionalSkill(skill,['tianxiang','liuli']);
 					else player.removeAdditionalSkill(skill);
 				},
 				filter:function(event,player){
@@ -6269,18 +6269,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					update:{
-						trigger:{
-							player:['loseAfter','loseAsyncAfter','addToExpansionAfter'],
+						trigger:{player:['loseAfter','loseAsyncAfter','addToExpansionAfter']},
+						filter:function(event,player){
+							var cards=player.getExpansions('twxingwu'),skills=player.additionalSkills.twpingting;
+							return !((cards.length&&skills&&skills.length)||(!cards.length&&(!skills||!skills.length)));
 						},
 						forced:true,
 						silent:true,
-						filter:function(event,player){
-							var cards=player.getExpansions('twxingwu'),skills=player.additionalSkills.twpingting;
-							if((cards.length&&skills&&skills.length)||(!cards.length&&(!skills||!skills.length))){
-								return false;
-							}
-							return true;
-						},
 						content:function(){
 							lib.skill.twpingting.init(player,'twpingting');
 						}
