@@ -14134,6 +14134,14 @@ export class UI extends Uninstantable {
 	 * @type { Control | undefined }
 	 */
 	static skills3;
+	/**
+	 * @type { HTMLDivElement }
+	 */
+	static window;
+	/**
+	 * @type { HTMLDivElement }
+	 */
+	static pause;
 	static refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}

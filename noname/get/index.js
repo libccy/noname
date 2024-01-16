@@ -1961,8 +1961,8 @@ export class Get extends Uninstantable {
 		}
 	}
 	/**
-	 * @param { number | [number, number] | (()=>[number, number]) } [select]
-	 * @returns { [number, number] }
+	 * @param { number | Select | (()=>Select) } [select]
+	 * @returns { Select }
 	 */
 	static select(select) {
 		if (typeof select == 'function') return get.select(select());
