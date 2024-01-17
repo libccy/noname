@@ -1,4 +1,4 @@
-'use strict';
+import { game } from '../noname.js';
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'standard',
@@ -93,6 +93,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ganning:['lingtong','xf_sufei'],
 			guanyu:['zhangfei','liaohua'],
 		},
+		/**
+		 * @type { { [key: string]: Skill } }
+		 */
 		skill:{
 			//标准版甘夫人
 			stdshushen:{
@@ -304,7 +307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'source',
 				preHidden:true,
 				filter(event,player){
-					return (event.source&&event.source.countGainableCards(player,event.source!=player?'he':'e')&&event.num>0);
+					return event.source&&event.source.countGainableCards(player,event.source!=player?'he':'e')>0&&event.num>0;
 				},
 				async content(event,trigger,player){
 					player.gainPlayerCard(true,trigger.source,trigger.source!=player?'he':'e');

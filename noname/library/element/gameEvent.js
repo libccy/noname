@@ -45,6 +45,10 @@ export class GameEvent {
 		};
 		this._aiexclude = [];
 		this._notrigger = [];
+		/**
+		 * @type { Result }
+		 */
+		// @ts-ignore
 		this._result = {};
 		this._set = [];
 		/** 
@@ -862,6 +866,11 @@ export class GameEvent {
 		 */
 		// @ts-ignore
 		this.excludeButton;
+		/**
+		 * @type { Result }
+		 */
+		// @ts-ignore
+		this.result;
 		throw new Error('Do not call this method');
 	}
 }
