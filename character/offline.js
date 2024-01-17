@@ -2663,7 +2663,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:function(item,player){
-						var num=player.getStorage('zyquanji').length;
+						var num=player.getExpansions('zyquanji').length;
 						if(num==1) return 8;
 						return 1;
 					},
