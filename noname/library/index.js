@@ -12790,11 +12790,11 @@ export class Library extends Uninstantable {
 			color: '#c3f9ff',
 			nature: 'thundermm',
 		}],
-		['合', {
+		['转', {
 			color: '#c3f9ff',
 			nature: 'thundermm',
 		}],
-		['转', {
+		['合', {
 			color: '#c3f9ff',
 			nature: 'thundermm',
 		}],
