@@ -880,7 +880,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					]);
 					next.set('prompt','鹰眎：点击将牌移动到牌堆顶或牌堆底');
 					next.processAI=list=>{
-						const cards=list[0][1],player=_status.event.player;
+						const cards=list[1][1],player=_status.event.player;
 						const top=[];
 						const judges=player.getCards('j');
 						let stopped=false;
