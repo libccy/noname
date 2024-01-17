@@ -9691,7 +9691,16 @@ export class Library extends Uninstantable {
 			if (typeof info.usable == 'number' && player.hasSkill('counttrigger') &&
 				player.storage.counttrigger && player.storage.counttrigger[skill] >= info.usable) return false;
 			if (info.round && (info.round - (game.roundNumber - player.storage[skill + '_roundcount']) > 0)) return false;
-			if (player.storage[`temp_ban_${skill}`] === true) return false;
+			for (const item in player.storage) {
+				if (item.startsWith('temp_ban_')) {
+					if(player.storage[item] !== true) continue;
+					const skillName = item.slice(9);
+					if (lib.skill[skillName]) {
+						const skills=game.expandSkills([skillName]);
+						if(skills.includes(skill)) return false;
+					}
+				}
+			}
 			return true;
 		},
 		characterDisabled: function (i, libCharacter) {
@@ -12782,6 +12791,10 @@ export class Library extends Uninstantable {
 			nature: 'thundermm',
 		}],
 		['转', {
+			color: '#c3f9ff',
+			nature: 'thundermm',
+		}],
+		['合', {
 			color: '#c3f9ff',
 			nature: 'thundermm',
 		}],

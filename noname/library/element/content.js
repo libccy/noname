@@ -476,6 +476,9 @@ export const Content = {
 			else black.push([target, card]);
 		}
 		event.red = red; event.black = black;
+		event.trigger('debateShowOpinion');
+		'step 2'
+		var red = event.red, black = event.black;
 		if (red.length) {
 			game.log(red.map(function (i) {
 				return i[0];
@@ -528,7 +531,7 @@ export const Content = {
 			dialog.open();
 		}, get.translation(player), event.videoId, red, black);
 		game.delay(4);
-		'step 2';
+		'step 3';
 		game.broadcastAll('closeDialog', event.videoId);
 		var opinion = null;
 		if (event.red.length > event.black.length) opinion = 'red';
@@ -542,7 +545,7 @@ export const Content = {
 			black: event.black,
 			targets: event.targets
 		};
-		'step 3';
+		'step 4';
 		if (event.callback) {
 			var next = game.createEvent('debateCallback', false);
 			next.player = player;
