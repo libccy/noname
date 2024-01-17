@@ -1777,7 +1777,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const targets=game.filterPlayer(current=>target.inRange(current)&&current!=player);
 							let eff=0;
 							for(const targetx of targets){
-								const effx=get.effect(targetx,{name:'guohe_copy2'},player,target);
+								let effx=get.effect(targetx,{name:'guohe_copy2'},player,target);
 								if(get.attitude(player,targetx)<0) effx/=2;
 								eff+=effx;
 							}
