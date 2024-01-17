@@ -1761,9 +1761,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				async content(event,trigger,player){
 					event.count=trigger.getl(player).es.length;
-					do {
+					while(event.count-->0){
 						player.draw(2);
-						if(!player.hasSkill(event.name)) break;
+						if(!event.count||!player.hasSkill(event.name)) break;
 						if(!get.is.blocked(event.name,player)){
 							const chooseBoolEvent=player.chooseBool(get.prompt2('xiaoji')).set('frequentSkill','xiaoji');
 							chooseBoolEvent.ai=lib.filter.all;
@@ -1771,7 +1771,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(bool) player.logSkill('xiaoji');
 							else break;
 						}
-					}while(event.count-->0);
+					}
 				},
 				ai:{
 					noe:true,
