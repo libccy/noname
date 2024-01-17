@@ -1213,6 +1213,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				viewAs:{name:'lebu'},
 				position:'hes',
+				viewAsFilter(player){
+					return player.countCards('hes');
+				},
 				filterCard(card,player){
 					return get.color(card)=='red'&&get.type2(card)!='trick';
 				},
