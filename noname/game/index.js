@@ -6017,7 +6017,18 @@ export class Game extends Uninstantable {
 						if (info.usable && get.skillCount(skills2[i]) >= info.usable) enable = false;
 						if (info.chooseButton && _status.event.noButton) enable = false;
 						if (info.round && (info.round - (game.roundNumber - player.storage[skills2[i] + '_roundcount']) > 0)) enable = false;
-						if (player.storage[`temp_ban_${skills2[i]}`] === true) enable = false;
+						for (const item in player.storage) {
+							if (item.startsWith('temp_ban_')) {
+								if(player.storage[item] !== true) continue;
+								const skillName = item.slice(9);
+								if (lib.skill[skillName]) {
+									const skills=game.expandSkills([skillName]);
+									if(skills.includes(skills2[i])) {
+										enable = false; break;
+									}
+								}
+							}
+						}
 					}
 					if (enable) {
 						if (event.isMine() || !event._aiexclude.includes(skills2[i])) {
