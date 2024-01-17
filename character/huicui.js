@@ -11092,6 +11092,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangchu:['zhangchu','jsrg_zhangchu'],
 			xianglang:['xianglang','mb_xianglang'],
 			chengui:['chengui','mb_chengui'],
+			liuyong:['liuyong','jsrg_liuyong'],
+			zhangxuan:['zhangxuan','jsrg_zhangxuan'],
+			gaoxiang:['gaoxiang','jsrg_gaoxiang'],
 		},
 		translate:{
 			re_panfeng:'潘凤',

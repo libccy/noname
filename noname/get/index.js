@@ -3014,7 +3014,16 @@ export class Get extends Uninstantable {
 				var js = node.getCards('j');
 				for (var i = 0; i < js.length; i++) {
 					if (js[i].viewAs && js[i].viewAs != js[i].name) {
-						uiintro.add('<div><div class="skill">' + js[i].outerHTML + '</div><div>' + lib.translate[js[i].viewAs] + '：' + lib.translate[js[i].viewAs + '_info'] + '</div></div>');
+						let html = js[i].outerHTML;
+						let cardInfo = lib.card[js[i].viewAs], showCardIntro=true;
+						if (cardInfo.blankCard) {
+							var cardOwner = get.owner(js[i]);
+							if (cardOwner && !cardOwner.isUnderControl(true)) showCardIntro = false;
+						}
+						if (!showCardIntro) {
+							html=ui.create.button(js[i],'blank').outerHTML;
+						}
+						uiintro.add('<div><div class="skill">' + html + '</div><div>' + lib.translate[js[i].viewAs] + '：' + lib.translate[js[i].viewAs + '_info'] + '</div></div>');
 					}
 					else {
 						uiintro.add('<div><div class="skill">' + js[i].outerHTML + '</div><div>' + lib.translate[js[i].name + '_info'] + '</div></div>');
@@ -3484,7 +3493,7 @@ export class Get extends Uninstantable {
 							const defaultYingbianEffect = get.defaultYingbianEffect(node.link || node);
 							if (lib.yingbian.prompt.has(defaultYingbianEffect)) yingbianEffects.push(defaultYingbianEffect);
 						}
-						if (yingbianEffects.length) uiintro.add(`<div class="text" style="font-family: yuanli">应变：${yingbianEffects.map(value => lib.yingbian.prompt.get(value)).join('；')}</div>`);
+						if (yingbianEffects.length && showCardIntro) uiintro.add(`<div class="text" style="font-family: yuanli">应变：${yingbianEffects.map(value => lib.yingbian.prompt.get(value)).join('；')}</div>`);
 					}
 					if (lib.translate[name + '_append']) {
 						uiintro.add('<div class="text" style="display:inline">' + lib.translate[name + '_append'] + '</div>');
