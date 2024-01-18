@@ -17,7 +17,7 @@ export async function cordovaReady() {
 			}
 		});
 		document.addEventListener("resume", () => {
-			if (ui.backgroundMusic) ui.backgroundMusic.play();
+			if (ui.backgroundMusic && !isNaN(ui.backgroundMusic.duration)) ui.backgroundMusic.play();
 		});
 		document.addEventListener("backbutton", function () {
 			if (ui.arena && ui.arena.classList.contains('menupaused')) {
