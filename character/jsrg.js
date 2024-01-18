@@ -1509,22 +1509,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						audio:'jsrgdanxin',
 						trigger:{
-							player:['loseAfter','gainAfter'],
+							global:'gainAfter',
 						},
 						filter(event,player){
-							if(event.getParent(2).name!='tuixinzhifu') return false;
-							const card=event.getParent(3).card;
+							const level=event.player!=player?1:2;
+							if(event.player!=player&&event.getParent(level).name!='tuixinzhifu') return false;
+							if(event.player==player&&event.getParent(level).name!='tuixinzhifu') return false;
+							const card=event.getParent(level+1).card;
 							return card&&card.storage&&card.storage.jsrgdanxin;
 						},
 						forced:true,
 						popup:false,
 						charlotte:true,
 						async content(event,trigger,player){
-							const {targets}=trigger.getParent(3);
+							const level=trigger.player!=player?1:2;
+							const {targets}=trigger.getParent(level+1);
 							await player.showCards(trigger.cards);
 							if(trigger.cards.some(card=>get.suit(card)=='heart')){
-								await get.owner(trigger.cards.find(card=>get.suit(card)=='heart')).recover();
+								const owners=trigger.cards.filter((card=>get.suit(card)=='heart')).map(card=>get.owner(card)).toUniqued();
+								for(const owner of owners){
+									if(owner&&owner.isIn()) await owner.recover();
+								}
 							}
+							if(trigger.player==player) return;
 							player.addTempSkill('jsrgdanxin_distance');
 							if(!player.storage.jsrgdanxin_distance) player.storage.jsrgdanxin_distance={};
 							const id=targets[0].playerid;
@@ -1573,7 +1580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},true).set('ai',target=>{
 						const player=get.player();
 						const att=get.attitude(player,target);
-						const delta=get.value(target.getCards('e'),player)-get.value(player.getCards('e'),player);
+						let delta=get.value(target.getCards('e'),player)-get.value(player.getCards('e'),player);
 						if(att>0){
 							if(delta<0) delta+=att/3;
 						}
