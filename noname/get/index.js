@@ -1367,11 +1367,13 @@ export class Get extends Uninstantable {
 	}
 	static infoFuncOL(info) {
 		var func;
+		const str = info.slice(13).trim();
 		try {
-			eval('func=(' + info.slice(13) + ');');
-		}
-		catch (e) {
-			return function () { };
+			if (str.startsWith("function") || str.startsWith("(")) eval(`func=(${str});`);
+			else eval(`func=(function ${str});`);
+		} catch (e) {
+			console.error(`${e} in \n${str}`);
+			return function () {};
 		}
 		if (Array.isArray(func)) {
 			func = get.filter.apply(this, get.parsedResult(func));
