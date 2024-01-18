@@ -4215,6 +4215,7 @@ export class Game extends Uninstantable {
 	 * @param { string } skill 
 	 * @param { Player } player 
 	 * @param { GameEventPromise } event 
+	 * @returns { GameEventPromise }
 	 */
 	static createTrigger(name, skill, player, event) {
 		let info = get.info(skill);
@@ -4229,6 +4230,7 @@ export class Game extends Uninstantable {
 		next.includeOut = true;
 		next._trigger = event;
 		next.setContent('createTrigger');
+		return next;
 	}
 	/**
 	 * @legacy Use {@link lib.element.GameEvent.constructor} instead.
