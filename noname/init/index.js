@@ -861,7 +861,8 @@ async function setOnError() {
 				}
 			}
 			//解析parsex里的content fun内容(通常是技能content) 
-			else if (err && err.stack && err.stack.split('\n')[1].trim().startsWith('at Object.eval [as content]')) {
+			// @ts-ignore
+			else if (err && err.stack && ['at Object.eval [as content]', 'at Proxy.content'].some(str => err.stack.split('\n')[1].trim().startsWith(str))) {
 				const codes = _status.event.content;
 				if (typeof codes == 'function') {
 					const lines = codes.toString().split("\n");
