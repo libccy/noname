@@ -976,6 +976,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							global:['gainAfter','equipAfter','addJudgeAfter','loseAsyncAfter','addToExpansionAfter'],
 						},
 						filter(event,player){
+							if(player.isHealthy()) return false;
 							const evt=event.getl(player);
 							return evt&&evt.es&&evt.es.length>0;
 						},
@@ -1010,7 +1011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						forced:true,
 						silent:true,
-						async content(event,trigger,player){
+						content(){
 							trigger.player.addGaintag(trigger.cards,'jsrgtuigu');
 							trigger.player.addTempSkill('jsrgtuigu_blocked',{player:'phaseAfter'});
 						}

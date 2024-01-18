@@ -2002,48 +2002,41 @@ export const Content = {
 			event.callback();
 		}
 	},
-	arrangeTrigger: function () {
-		'step 0';
-		event.doing = event.doingList[0];
-		if (event.doing && event.doing.todoList.length) return;
-		if (event.doingList.length) {
-			event.doingList.shift();
-			return event.redo();
+	arrangeTrigger: async function (event,trigger,player) {
+		while(event.doingList.length>0){
+			event.doing = event.doingList.shift();
+			if (trigger.filterStop && trigger.filterStop()) return event.finish();
+			while(true){
+				const usableSkills = event.doing.todoList.filter(info => {
+					if (!lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill)) return false;
+					return lib.skill.global.includes(info.skill) || info.player.hasSkill(info.skill, true);
+				});
+				if (usableSkills.length == 0){
+					break;
+				}
+				else {
+					event.doing.todoList = event.doing.todoList.filter(i => i.priority <= usableSkills[0].priority);
+					event.choice = usableSkills.filter(n => n.priority == usableSkills[0].priority);
+					const currentChoice = event.choice[0] , currentSkillInfo = lib.skill[currentChoice.skill];
+					if (event.choice.length == 1 || typeof event.doing.player=='string' || (currentSkillInfo && currentSkillInfo.silent)) {
+						event.current = currentChoice;
+					}
+					else{
+						const currentPlayer = currentChoice.player , skillsToChoose = event.choice.map(i => i.skill);
+						const next = currentPlayer.chooseControl(skillsToChoose);
+						next.set('prompt', '选择下一个触发的技能');
+						next.set('forceDie', true);
+						next.set('arrangeSkill', true);
+						next.set('includeOut', true);
+						const {result} = await next;
+						event.current = event.doing.todoList.find(info => info.skill == result.control);
+					}
+					event.doing.doneList.push(event.current);
+					event.doing.todoList.remove(event.current);
+					await game.createTrigger(event.triggername, event.current.skill, event.current.player, trigger);
+				}
+			}
 		}
-		event.finish();
-		'step 1';
-		if (trigger.filterStop && trigger.filterStop()) return event.finish();
-		event.current = event.doing.todoList.find(info => lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill));
-		if (!event.current) {
-			event.doing.todoList = [];
-			return event.goto(0);
-		}
-		event.doing.todoList = event.doing.todoList.filter(i => i.priority <= event.current.priority);
-
-		const directUse = info => lib.skill[info.skill].silent || !lib.translate[info.skill];//是否不触发同顺序选择
-		if (directUse(event.current)) return event.goto(4);
-		event.choice = event.doing.todoList.filter(info => {
-			if (!lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill)) return false;
-			if (directUse(info)) return false;
-			if (event.current.player !== info.player) return false;
-			return lib.skill.global.includes(info.skill) || event.current.player.hasSkill(info.skill, true);
-		});
-		event.choice = event.choice.filter(n=>n.priority == event.choice[0].priority);
-		if (event.choice.length < 2) return event.goto(4);
-		'step 2';
-		const next = event.choice[0].player.chooseControl(event.choice.map(i => i.skill));
-		next.set('prompt', '选择下一个触发的技能');
-		next.set('forceDie', true);
-		next.set('arrangeSkill', true);
-		next.set('includeOut', true);
-		'step 3';
-		if (result.control) event.current = event.doing.todoList.find(info => info.skill == result.control && info.player == event.choice[0].player);
-		'step 4';
-		if (!event.current || !event.doing.todoList.includes(event.current)) return;
-		event.doing.doneList.push(event.current);
-		event.doing.todoList.remove(event.current);
-		game.createTrigger(event.triggername, event.current.skill, event.current.player, trigger);
-		event.goto(0);
 	},
 	createTrigger: function () {
 		"step 0";
