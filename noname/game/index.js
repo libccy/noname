@@ -5445,6 +5445,7 @@ export class Game extends Uninstantable {
 						if (event.result) {
 							event.parent._result = event.result;
 						}
+						_status.event = event.parent;
 						if (game.belongAsyncEventList.includes(event)) {
 							game.belongAsyncEventList.remove(event);
 						}
