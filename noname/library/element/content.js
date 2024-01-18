@@ -2025,10 +2025,10 @@ export const Content = {
 		event.choice = event.doing.todoList.filter(info => {
 			if (!lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill)) return false;
 			if (directUse(info)) return false;
+			if (event.current.priority !== info.priority) return false;
 			if (event.current.player !== info.player) return false;
 			return lib.skill.global.includes(info.skill) || event.current.player.hasSkill(info.skill, true);
 		});
-		event.choice = event.choice.filter(n=>n.priority == event.choice[0].priority);
 		if (event.choice.length < 2) return event.goto(4);
 		'step 2';
 		const next = event.choice[0].player.chooseControl(event.choice.map(i => i.skill));
