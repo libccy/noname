@@ -9050,10 +9050,9 @@ class Create extends Uninstantable {
 		ui.backgroundMusic.autoplay = true;
 		ui.backgroundMusic.addEventListener('ended', game.playBackgroundMusic);
 		ui.window.appendChild(ui.backgroundMusic);
-		ui.window.addEventListener(lib.config.touchscreen ? 'touchend' : 'click', function playMusic() {
-			ui.window.removeEventListener(lib.config.touchscreen ? 'touchend' : 'click', playMusic, false);
-			if (!ui.backgroundMusic.played.length && lib.config.background_music != 'music_off') ui.backgroundMusic.play();
-		}, false);
+		ui.window.addEventListener(lib.config.touchscreen ? 'touchend' : 'click', () => {
+			if (!ui.backgroundMusic.played.length && lib.config.background_music != 'music_off' && !isNaN(ui.backgroundMusic.duration)) ui.backgroundMusic.play();
+		}, {once:true});
 		if (lib.config.cursor_style == 'pointer') {
 			ui.window.classList.add('nopointer');
 		}
@@ -14142,6 +14141,10 @@ export class UI extends Uninstantable {
 	 * @type { HTMLDivElement }
 	 */
 	static pause;
+	/**
+	 * @type { HTMLAudioElement }
+	 */
+	static backgroundMusic;
 	static refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}
