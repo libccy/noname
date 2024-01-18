@@ -45,6 +45,10 @@ export class GameEvent {
 		};
 		this._aiexclude = [];
 		this._notrigger = [];
+		/**
+		 * @type { Result }
+		 */
+		// @ts-ignore
 		this._result = {};
 		this._set = [];
 		/** 
@@ -738,7 +742,7 @@ export class GameEvent {
 	untrigger(all = true, player) {
 		const evt = this._triggering;
 		if (all) {
-			this._triggered = 5;
+			if(all !== 'currentOnly') this._triggered = 5;
 			if (evt && evt.doingList) {
 				evt.doingList.forEach(doing => doing.todoList = []);
 			}
@@ -748,11 +752,6 @@ export class GameEvent {
 			// if(!evt||!evt.doingList) return this;
 			// const doing=evt.doingList.find(doing=>doing.player==player);
 			// if(doing) doing.todoList=[];
-		}
-		else if (all==='currentOnly'){
-			if (evt && evt.doingList) {
-				evt.doingList.forEach(doing => doing.todoList = []);
-			}
 		}
 		return this;
 	}
@@ -862,6 +861,11 @@ export class GameEvent {
 		 */
 		// @ts-ignore
 		this.excludeButton;
+		/**
+		 * @type { Result }
+		 */
+		// @ts-ignore
+		this.result;
 		throw new Error('Do not call this method');
 	}
 }

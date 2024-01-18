@@ -332,7 +332,7 @@ export class Is extends Uninstantable {
 		}
 		return true;
 	}
-	static altered() { return false; }
+	static altered(skillName) { return false; }
 	/*
 	 skill=>{
 	 return false;

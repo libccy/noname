@@ -16,7 +16,7 @@ import { AsyncFunction } from '../../util/index.js';
  * 且Promise的原有属性无法被修改，一切对这个类实例的属性修改，删除，
  * 再配置等操作都会转发到事件对应的属性中。
  * 
- * @todo 需要完成异步事件的debugger方法
+ * @template { GameEvent } T
  * 
  * @example
  * 使用await xx()等待异步事件执行：

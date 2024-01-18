@@ -13524,7 +13524,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fengfangnv:['fengfangnv','re_fengfangnv'],
 			luotong:['dc_luotong','luotong'],
 			dc_wangchang:['dc_wangchang','tw_wangchang'],
-			guozhao:['guozhao','xin_guozhao'],
+			guozhao:['guozhao','xin_guozhao','jsrg_guozhao'],
 			dingshangwan:['dingshangwan','ol_dingshangwan'],
 		},
 		translate:{
