@@ -272,7 +272,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.cardsGotoOrdering(cards);
 							const color=event.result.card.name=='wuxie'?'black':'red';
 							if(get.color(cards,false)!=color){
-								player.tempBanSkill('jsrgwentian');
+								player.tempBanSkill('jsrgwentian','roundStart');
 							}
 						}
 					}
@@ -574,7 +574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!get.event('goon')) return 0;
 						return -get.attitude(get.player(),target);
 					}).set('goon',player.countCards('hs',['shan','caochuan'])||player.getHp()>=3);
-					if(!result.bool) return event.finish();
+					if(!result.bool) return;
 					const {targets}=result,target=targets[0];
 					player.logSkill('jsrgyoujin',target);
 					const {result:result2}=await player.chooseToCompare(target).set('small',true);
@@ -1757,7 +1757,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					const target=event.target;
 					const targets=game.filterPlayer(current=>target.inRange(current)&&current!=player).sortBySeat(player);
-					if(!targets.length) return event.finish();
+					if(!targets.length) return;
 					while(targets.length){
 						const current=targets.shift();
 						if(current.countCards('he')) await current.chooseToDiscard('驰应：请弃置一张牌','he',true);
@@ -8203,7 +8203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_zhugeliang:'梦诸葛亮',
 			jsrg_zhugeliang_prefix:'梦',
 			jsrgwentian:'问天',
-			jsrgwentian_info:'①你可以将牌堆顶的牌当【无懈可击】/【火攻】使用，若此牌不为黑色/红色，〖问天〗于本回合失效。②每回合限一次。你的一个阶段开始时，你可以观看牌堆顶的五张牌，然后将其中一张牌交给一名其他角色，将其余牌以任意顺序置于牌堆顶或牌堆底。',
+			jsrgwentian_info:'①你可以将牌堆顶的牌当【无懈可击】/【火攻】使用，若此牌不为黑色/红色，〖问天〗于本轮失效。②每回合限一次。你的一个阶段开始时，你可以观看牌堆顶的五张牌，然后将其中一张牌交给一名其他角色，将其余牌以任意顺序置于牌堆顶或牌堆底。',
 			jsrgchushi:'出师',
 			jsrgchushi_info:'出牌阶段限一次。若你不为主公，你可以与主公议事。若结果为：红色，你与其各摸一张牌，若你与其手牌数之和小于7，重复此流程；黑色，当你于本轮内造成属性伤害时，此伤害+1。',
 			jsrgyinlve:'隐略',
