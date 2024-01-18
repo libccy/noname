@@ -8167,7 +8167,12 @@ export const Content = {
 					cards[0].classList.add('fakejudge');
 					cards[0].node.background.innerHTML = lib.translate[cards[0].viewAs + '_bg'] || get.translation(cards[0].viewAs)[0];
 				}
-				game.log(player, '被贴上了<span class="yellowtext">' + get.translation(cards[0].viewAs) + '</span>（', cards, '）');
+				if(lib.card[viewAs].blankCard){
+					game.log(player, '被扣置了<span class="yellowtext">' + get.translation(cards[0].viewAs) + '</span>');
+				}
+				else {
+					game.log(player, '被贴上了<span class="yellowtext">' + get.translation(cards[0].viewAs) + '</span>（', cards, '）');
+				}
 			}
 			else {
 				cards[0].classList.remove('fakejudge');
