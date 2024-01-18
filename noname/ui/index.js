@@ -13418,12 +13418,14 @@ class Click extends Uninstantable {
 				// 有bug，先用旧版
 				if (lib.config.background_speak && e !== 'init') {
 					let audio, skillnode = this;
+					const playedAudios = [];
 					(function play() {
 						if (!skillnode.audioList || !skillnode.audioList.length) {
 							skillnode.audioList = game.parseSkillAudio(skillnode.link, playername);
-							if (!skillnode.audioList.length) return;
+							if (!skillnode.audioList.length||skillnode.audioList.length==playedAudios.length) return;
 						}
 						audio = skillnode.audioList.shift();
+						playedAudios.push(audio);
 						game.playAudio(audio, play);
 					})();
 				}
@@ -13633,12 +13635,14 @@ class Click extends Uninstantable {
 				// 有bug，先用旧版
 				if (lib.config.background_speak && e !== 'init') {
 					let audio, skillnode = this;
+					const playedAudios = [];
 					(function play() {
 						if (!skillnode.audioList || !skillnode.audioList.length) {
 							skillnode.audioList = game.parseSkillAudio(skillnode.link, playername);
-							if (!skillnode.audioList.length) return;
+							if (!skillnode.audioList.length||skillnode.audioList.length==playedAudios.length) return;
 						}
 						audio = skillnode.audioList.shift();
+						playedAudios.push(audio);
 						game.playAudio(audio, play);
 					})();
 				}
