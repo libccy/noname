@@ -783,7 +783,6 @@ async function setOnError() {
 	});
 
 	window.onerror = function (msg, src, line, column, err) {
-		console.log([...arguments]);
 		if (promiseErrorHandler.onErrorPrepare) promiseErrorHandler.onErrorPrepare();
 		const winPath = window.__dirname ? ('file:///' + (__dirname.replace(new RegExp('\\\\', 'g'), '/') + '/')) : '';
 		let str = `错误文件: ${typeof src == 'string' ? decodeURI(src).replace(lib.assetURL, '').replace(winPath, '') : '未知文件'}`;
