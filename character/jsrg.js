@@ -701,8 +701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return p+c;
 					},0)<-4).set('logSkill',['jsrglonglin',trigger.player]);
 					if(result.bool){
-						trigger.targets.length=0;
-						trigger.all_excluded=true;
+						trigger.excluded.addArray(trigger.targets);
 						game.asyncDelayx();
 						if(trigger.player.canUse(juedou,player)){
 							const {result}=await trigger.player.chooseBool(`是否视为对${get.translation(player)}使用一张【决斗】？`).set('choice',get.effect(player,juedou,trigger.player,trigger.player)>=0);
