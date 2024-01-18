@@ -98,12 +98,12 @@ export class ChromePromiseErrorHandler {
 					let fileName = void 0;
 
 					/**
-					 * @type {string | undefined}
+					 * @type {number | undefined}
 					 */
 					let line = void 0;
 
 					/**
-					 * @type {string | undefined}
+					 * @type {number | undefined}
 					 */
 					let column = void 0;
 
@@ -119,8 +119,8 @@ export class ChromePromiseErrorHandler {
 						const locationParts = extractLocation(location ? location[1] : formatedLine);
 
 						fileName = ['eval', '<anonymous>'].includes(locationParts[0]) ? void 0 : locationParts[0];
-						line = locationParts[1];
-						column = locationParts[2];
+						line = Number(locationParts[1]);
+						column = Number(locationParts[2]);
 						break;
 					}
 
@@ -130,7 +130,11 @@ export class ChromePromiseErrorHandler {
 				// 反之我们只能不考虑报错文件信息，直接调用onerror
 				else {
 					// @ts-ignore
-					window.onerror(error.message, void 0, void 0, void 0, error);
+					let [_, src = void 0, line = void 0, column = void 0] = /at\s+.*\s+\((.*):(\d*):(\d*)\)/i.exec(error.stack.split('\n')[1])
+					if (typeof line == 'string') line = Number(line);
+					if (typeof column == 'string') column = Number(column);
+					// @ts-ignore
+					window.onerror(error.message, src, line, column, error);
 				}
 			}
 			/*
