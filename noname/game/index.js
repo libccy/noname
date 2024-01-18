@@ -5366,10 +5366,11 @@ export class Game extends Uninstantable {
 	 * @param { GameEventPromise } [belongAsyncEvent]
 	 */
 	static async loop(belongAsyncEvent) {
+		if (!game.belongAsyncEventList) game.belongAsyncEventList = [];
 		if (belongAsyncEvent) {
-			game.belongAsyncEvent = belongAsyncEvent;
-		} else if (game.belongAsyncEvent) {
-			return game.loop(game.belongAsyncEvent);
+			game.belongAsyncEventList.push(belongAsyncEvent);
+		} else if (game.belongAsyncEventList.length) {
+			belongAsyncEvent = game.belongAsyncEventList.at(-1);
 		}
 		while (true) {
 			let event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
@@ -5447,8 +5448,8 @@ export class Game extends Uninstantable {
 							event.parent._result = event.result;
 						}
 						_status.event = event.parent;
-						if (game.belongAsyncEvent == event) {
-							delete game.belongAsyncEvent;
+						if (game.belongAsyncEventList.includes(event)) {
+							game.belongAsyncEventList.remove(event);
 						}
 						_resolve();
 						// 此时应该退出了
@@ -5457,8 +5458,8 @@ export class Game extends Uninstantable {
 						}
 					}
 					else {
-						if (game.belongAsyncEvent == event) {
-							delete game.belongAsyncEvent;
+						if (game.belongAsyncEventList.includes(event)) {
+							game.belongAsyncEventList.remove(event);
 						}
 						return _resolve();
 					}
