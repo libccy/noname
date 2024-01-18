@@ -1364,19 +1364,21 @@ export class Game extends Uninstantable {
 			else if (!path.startsWith('db:')) path = `audio/${path}`;
 			if (!lib.config.repeat_audio && _status.skillaudio.includes(path)) return;
 		}
-		_status.skillaudio.add(path);
-		game.addVideo('playAudio', null, path);
-		setTimeout(() => _status.skillaudio.remove(path), 1000);
 		const audio = document.createElement('audio');
-		audio.autoplay = true;
 		audio.volume = lib.config.volumn_audio / 8;
-		audio.addEventListener('ended', () => audio.remove());
-		audio.onerror = event => {
+		audio.autoplay = true;
+		//Some browsers do not support "autoplay", so "oncanplay" listening has been added
+		audio.oncanplay = () => Promise.resolve(audio.play()).catch(() => void 0);
+		audio.onplay = () => {
+			_status.skillaudio.add(path);
+			setTimeout(() => _status.skillaudio.remove(path), 1000);
+			game.addVideo("playAudio", null, path);
+		};
+		audio.onended = (event) => audio.remove();
+		audio.onerror = (event) => {
 			audio.remove();
 			if (onError) onError(event);
 		};
-		//Some browsers do not support "autoplay", so "oncanplay" listening has been added
-		audio.oncanplay = () => Promise.resolve(audio.play()).catch(() => void 0);
 		new Promise((resolve, reject) => {
 			if (path.startsWith('db:')) game.getDB('image', path.slice(3)).then(octetStream => resolve(get.objectURL(octetStream)), reject);
 			else if (lib.path.extname(path)) resolve(`${lib.assetURL}${path}`);

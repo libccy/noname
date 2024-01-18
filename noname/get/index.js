@@ -1368,9 +1368,10 @@ export class Get extends Uninstantable {
 	static infoFuncOL(info) {
 		var func;
 		try {
-			eval('func=(' + info.slice(13) + ');');
+			eval('func=(function ' + info.slice(13) + ');');
 		}
 		catch (e) {
+			console.error(`${e} in \n${info}`);
 			return function () { };
 		}
 		if (Array.isArray(func)) {
