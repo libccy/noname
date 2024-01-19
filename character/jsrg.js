@@ -285,11 +285,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter(event,player){
 					const zhu=get.zhu(player);
 					if(!zhu||!zhu.isZhu2()||!zhu.countCards('h')) return false;
-					return !player.isZhu2();
+					return !player.isZhu2()&&player.countCards('h');
 				},
 				async content(event,trigger,player){
 					player.chooseToDebate(game.filterPlayer(current=>{
-						return current==player||current.isZhu2()&&current.countCards('h');
+						return (current==player||current.isZhu2())&&current.countCards('h');
 					})).set('callback',async event=>{
 						const result=event.debateResult;
 						if(result.bool&&result.opinion){
