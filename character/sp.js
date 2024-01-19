@@ -954,7 +954,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					'step 0'
-					player.addTempSkill('olsilv'+(trigger.getg?'gain':'lose'));
+					player.addTempSkill('olsilv_'+(trigger.getg?'gain':'lose'));
 					if(!trigger.visible){
 						var cards,name=player.storage.ollianju;
 						if(trigger.getg) cards=trigger.getg(player).filter(card=>card.name==name);
