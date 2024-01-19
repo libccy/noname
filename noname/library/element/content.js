@@ -393,6 +393,14 @@ export const Content = {
 			event.swapped = true;
 		}
 		"step 5";
+		if (get.itemtype(result) == 'cards') {
+			for (let card of result){
+				if (card.willBeDestroyed('discardPile', player, event)) {
+					card.selfDestroy(event);
+				}
+			}
+		}
+		"step 6";
 		//if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
 		if (player.isMin() || !player.canEquip(card)) {
 			event.finish();
@@ -411,7 +419,7 @@ export const Content = {
 		game.addVideo('equip', player, get.cardInfo(card));
 		if (event.log != false) game.log(player, '装备了', card);
 		if (event.updatePile) game.updateRoundNumber();
-		"step 6";
+		"step 7";
 		var info = get.info(card, false);
 		if (info.onEquip && (!info.filterEquip || info.filterEquip(card, player))) {
 			if (Array.isArray(info.onEquip)) {
