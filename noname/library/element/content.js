@@ -2016,20 +2016,36 @@ export const Content = {
 				}
 				else {
 					event.doing.todoList = event.doing.todoList.filter(i => i.priority <= usableSkills[0].priority);
-					event.choice = usableSkills.filter(n => n.priority == usableSkills[0].priority);
-					const currentChoice = event.choice[0] , currentSkillInfo = lib.skill[currentChoice.skill];
-					if (event.choice.length == 1 || typeof event.doing.player=='string' || (currentSkillInfo && currentSkillInfo.silent)) {
-						event.current = currentChoice;
+					//firstDo时机和lastDo时机不进行技能优先级选择
+					if (get.itemtype(event.doing.player) !== 'player'){
+						event.current = usableSkills[0];
 					}
-					else{
-						const currentPlayer = currentChoice.player , skillsToChoose = event.choice.map(i => i.skill);
-						const next = currentPlayer.chooseControl(skillsToChoose);
-						next.set('prompt', '选择下一个触发的技能');
-						next.set('forceDie', true);
-						next.set('arrangeSkill', true);
-						next.set('includeOut', true);
-						const {result} = await next;
-						event.current = event.doing.todoList.find(info => info.skill == result.control);
+					else {
+						event.choice = usableSkills.filter(n => n.priority == usableSkills[0].priority);
+						//现在只要找到一个同优先度技能为silent 便优先执行该技能
+						const silentSkill = event.choice.find(item => {
+							const skillInfo = lib.skill[item.skill];
+							return (skillInfo && skillInfo.silent);
+						})
+						if (silentSkill){
+							event.current = silentSkill;
+						}
+						else {
+							const currentChoice = event.choice[0];
+							if (event.choice.length == 1) {
+								event.current = currentChoice;
+							}
+							else{
+								const currentPlayer = currentChoice.player , skillsToChoose = event.choice.map(i => i.skill);
+								const next = currentPlayer.chooseControl(skillsToChoose);
+								next.set('prompt', '选择下一个触发的技能');
+								next.set('forceDie', true);
+								next.set('arrangeSkill', true);
+								next.set('includeOut', true);
+								const {result} = await next;
+								event.current = event.doing.todoList.find(info => info.skill == result.control);
+							}
+						}
 					}
 					event.doing.doneList.push(event.current);
 					event.doing.todoList.remove(event.current);
