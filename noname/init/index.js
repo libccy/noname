@@ -106,7 +106,7 @@ export async function boot() {
 	else if (!Reflect.has(lib, 'device')) {
 		Reflect.set(lib, 'path', (await import('../library/path.js')).default);
 		//为其他自定义平台提供文件读写函数赋值的一种方式。
-		//但这种方式只能修改game的文件读写函数。
+		//但这种方式只允许修改game的文件读写函数。
 		if (typeof window.initReadWriteFunction == 'function') {
 			const g = {};
 			const ReadWriteFunctionName = ['download', 'readFile', 'readFileAsText', 'writeFile', 'removeFile', 'getFileList', 'ensureDirectory', 'createDir'];
@@ -123,7 +123,9 @@ export async function boot() {
 				});
 			});
 			// @ts-ignore
-			window.initReadWriteFunction(g);
+			await window.initReadWriteFunction(g).catch(e => {
+				console.error('文件读写函数初始化失败:', e);
+			});
 		}
 		window.onbeforeunload = function () {
 			if (config.get('confirm_exit') && !_status.reloading) {
