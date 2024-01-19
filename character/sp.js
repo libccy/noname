@@ -727,7 +727,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var {result:{bool,targets}}=await player.chooseTarget(get.prompt2('olgongjie'),[1,num],lib.filter.notMe).set('ai',target=>get.attitude(_status.event.player,target));
 					if(!bool) return;
 					targets=targets.sortBySeat();
-					player.logSkill('gongjie',targets);
+					player.logSkill('olgongjie',targets);
 					for(var target of targets){
 						var {result:{bool,cards}}=await target.gainPlayerCard(player,true,'he');
 						if(bool) draws.add(get.suit(cards[0],player));
@@ -788,6 +788,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('he');
 				},
 				direct:true,
+				limited:true,
+				skillAnimation:true,
+				animationColor:'water',
 				async content(event,trigger,player){
 					var target=_status.currentPhase,num=player.countCards('he');
 					var {result:{bool,cards}}=await player.chooseToGive(get.prompt2('olxiangzuo',target),[1,num],'he').set('ai',card=>{
@@ -951,7 +954,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function(){
 					'step 0'
-					player.addTempSkill('olsilv'+(trigger.getg?'gain':'lose'));
+					player.addTempSkill('olsilv_'+(trigger.getg?'gain':'lose'));
 					if(!trigger.visible){
 						var cards,name=player.storage.ollianju;
 						if(trigger.getg) cards=trigger.getg(player).filter(card=>card.name==name);
@@ -13357,7 +13360,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				direct:true,
 				filter:function(event,player){
-					return player!=event.player&&!event.player.isDisabledJudge()&&event.player.countCards('he')&&!event.player.countCards('j');
+					return player!=event.player&&!event.player.isDisabledJudge()&&event.player.countCards('he')&&!event.player.countCards('j',{type:'delay'});
 				},
 				content:function(){
 					'step 0'
@@ -26329,7 +26332,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			retuogu:'托孤',
 			retuogu_info:'一名角色死亡时，你可以令其选择其武将牌上的一个技能（主公技，限定技，觉醒技，隐匿技、使命技等特殊技能除外），然后你获得其选择的技能并失去上次因〖托孤〗获得的技能。',
 			shanzhuan:'擅专',
-			shanzhuan_info:'当你对其他角色造成伤害后，若其判定区没有牌，则你可以将其的一张牌置于其的判定区。若此牌不为延时锦囊牌且此牌为：红色，此牌视为【乐不思蜀】；黑色，此牌视为【兵粮寸断】。回合结束时，若你本回合内未造成伤害，你可摸一张牌。',
+			shanzhuan_info:'①当你对其他角色造成伤害后，若其判定区没有延时类锦囊牌，则你可以将其的一张牌置于其的判定区。若此牌不为延时锦囊牌且此牌为：红色，此牌视为【乐不思蜀】；黑色，此牌视为【兵粮寸断】。②回合结束时，若你本回合内未造成伤害，你可摸一张牌。',
 			spniluan:'逆乱',
 			spniluan_info:'出牌阶段，你可以将一张黑色牌当做【杀】使用。此【杀】使用结算完成后，若你未因此【杀】造成过伤害，则你令此【杀】不计入使用次数。',
 			spweiwu:'违忤',

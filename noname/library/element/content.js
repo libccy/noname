@@ -393,6 +393,14 @@ export const Content = {
 			event.swapped = true;
 		}
 		"step 5";
+		if (get.itemtype(result) == 'cards') {
+			for (let card of result){
+				if (card.willBeDestroyed('discardPile', player, event)) {
+					card.selfDestroy(event);
+				}
+			}
+		}
+		"step 6";
 		//if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
 		if (player.isMin() || !player.canEquip(card)) {
 			event.finish();
@@ -411,7 +419,7 @@ export const Content = {
 		game.addVideo('equip', player, get.cardInfo(card));
 		if (event.log != false) game.log(player, '装备了', card);
 		if (event.updatePile) game.updateRoundNumber();
-		"step 6";
+		"step 7";
 		var info = get.info(card, false);
 		if (info.onEquip && (!info.filterEquip || info.filterEquip(card, player))) {
 			if (Array.isArray(info.onEquip)) {
@@ -476,6 +484,9 @@ export const Content = {
 			else black.push([target, card]);
 		}
 		event.red = red; event.black = black;
+		event.trigger('debateShowOpinion');
+		'step 2'
+		var red = event.red, black = event.black;
 		if (red.length) {
 			game.log(red.map(function (i) {
 				return i[0];
@@ -528,7 +539,7 @@ export const Content = {
 			dialog.open();
 		}, get.translation(player), event.videoId, red, black);
 		game.delay(4);
-		'step 2';
+		'step 3';
 		game.broadcastAll('closeDialog', event.videoId);
 		var opinion = null;
 		if (event.red.length > event.black.length) opinion = 'red';
@@ -542,7 +553,7 @@ export const Content = {
 			black: event.black,
 			targets: event.targets
 		};
-		'step 3';
+		'step 4';
 		if (event.callback) {
 			var next = game.createEvent('debateCallback', false);
 			next.player = player;
@@ -1999,47 +2010,57 @@ export const Content = {
 			event.callback();
 		}
 	},
-	arrangeTrigger: function () {
-		'step 0';
-		event.doing = event.doingList[0];
-		if (event.doing && event.doing.todoList.length) return;
-		if (event.doingList.length) {
-			event.doingList.shift();
-			return event.redo();
+	arrangeTrigger: async function (event,trigger,player) {
+		while(event.doingList.length>0){
+			event.doing = event.doingList.shift();
+			while(true){
+				if (trigger.filterStop && trigger.filterStop()) return;
+				const usableSkills = event.doing.todoList.filter(info => {
+					if (!lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill)) return false;
+					return lib.skill.global.includes(info.skill) || info.player.hasSkill(info.skill, true);
+				});
+				if (usableSkills.length == 0){
+					break;
+				}
+				else {
+					event.doing.todoList = event.doing.todoList.filter(i => i.priority <= usableSkills[0].priority);
+					//firstDo时机和lastDo时机不进行技能优先级选择
+					if (get.itemtype(event.doing.player) !== 'player'){
+						event.current = usableSkills[0];
+					}
+					else {
+						event.choice = usableSkills.filter(n => n.priority == usableSkills[0].priority);
+						//现在只要找到一个同优先度技能为silent 便优先执行该技能
+						const silentSkill = event.choice.find(item => {
+							const skillInfo = lib.skill[item.skill];
+							return (skillInfo && skillInfo.silent);
+						})
+						if (silentSkill){
+							event.current = silentSkill;
+						}
+						else {
+							const currentChoice = event.choice[0];
+							if (event.choice.length == 1) {
+								event.current = currentChoice;
+							}
+							else{
+								const currentPlayer = currentChoice.player , skillsToChoose = event.choice.map(i => i.skill);
+								const next = currentPlayer.chooseControl(skillsToChoose);
+								next.set('prompt', '选择下一个触发的技能');
+								next.set('forceDie', true);
+								next.set('arrangeSkill', true);
+								next.set('includeOut', true);
+								const {result} = await next;
+								event.current = event.doing.todoList.find(info => info.skill == result.control);
+							}
+						}
+					}
+					event.doing.doneList.push(event.current);
+					event.doing.todoList.remove(event.current);
+					await game.createTrigger(event.triggername, event.current.skill, event.current.player, trigger);
+				}
+			}
 		}
-		event.finish();
-		'step 1';
-		if (trigger.filterStop && trigger.filterStop()) return event.finish();
-		event.current = event.doing.todoList.find(info => lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill));
-		if (!event.current) {
-			event.doing.todoList = [];
-			return event.goto(0);
-		}
-		event.doing.todoList = event.doing.todoList.filter(i => i.priority <= event.current.priority);
-
-		const directUse = info => lib.skill[info.skill].silent || !lib.translate[info.skill];//是否不触发同顺序选择
-		if (directUse(event.current)) return event.goto(4);
-		event.choice = event.doing.todoList.filter(info => {
-			if (!lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill)) return false;
-			if (directUse(info)) return false;
-			if (event.current.player !== info.player) return false;
-			return lib.skill.global.includes(info.skill) || event.current.player.hasSkill(info.skill, true);
-		});
-		if (event.choice.length < 2) return event.goto(4);
-		'step 2';
-		const next = event.choice[0].player.chooseControl(event.choice.map(i => i.skill));
-		next.set('prompt', '选择下一个触发的技能');
-		next.set('forceDie', true);
-		next.set('arrangeSkill', true);
-		next.set('includeOut', true);
-		'step 3';
-		if (result.control) event.current = event.doing.todoList.find(info => info.skill == result.control && info.player == event.choice[0].player);
-		'step 4';
-		if (!event.current || !event.doing.todoList.includes(event.current)) return;
-		event.doing.doneList.push(event.current);
-		event.doing.todoList.remove(event.current);
-		game.createTrigger(event.triggername, event.current.skill, event.current.player, trigger);
-		event.goto(0);
 	},
 	createTrigger: function () {
 		"step 0";
@@ -2143,11 +2164,11 @@ export const Content = {
 		next._trigger = trigger;
 		next.triggername = event.triggername;
 		
-		if ("contents" in info && Array.isArray(info.contents)) {
-			next.setContents(info.contents);
-		} else {
+		// if ("contents" in info && Array.isArray(info.contents)) {
+		// 	next.setContents(info.contents);
+		// } else {
 			next.setContent(info.content);
-		}
+		// }
 
 		next.skillHidden = event.skillHidden;
 		if (info.forceDie) next.forceDie = true;
@@ -8163,7 +8184,12 @@ export const Content = {
 					cards[0].classList.add('fakejudge');
 					cards[0].node.background.innerHTML = lib.translate[cards[0].viewAs + '_bg'] || get.translation(cards[0].viewAs)[0];
 				}
-				game.log(player, '被贴上了<span class="yellowtext">' + get.translation(cards[0].viewAs) + '</span>（', cards, '）');
+				if(lib.card[viewAs].blankCard){
+					game.log(player, '被扣置了<span class="yellowtext">' + get.translation(cards[0].viewAs) + '</span>');
+				}
+				else {
+					game.log(player, '被贴上了<span class="yellowtext">' + get.translation(cards[0].viewAs) + '</span>（', cards, '）');
+				}
 			}
 			else {
 				cards[0].classList.remove('fakejudge');

@@ -1364,19 +1364,21 @@ export class Game extends Uninstantable {
 			else if (!path.startsWith('db:')) path = `audio/${path}`;
 			if (!lib.config.repeat_audio && _status.skillaudio.includes(path)) return;
 		}
-		_status.skillaudio.add(path);
-		game.addVideo('playAudio', null, path);
-		setTimeout(() => _status.skillaudio.remove(path), 1000);
 		const audio = document.createElement('audio');
 		audio.autoplay = true;
 		audio.volume = lib.config.volumn_audio / 8;
-		audio.addEventListener('ended', () => audio.remove());
-		audio.onerror = event => {
+		//Some browsers do not support "autoplay", so "oncanplay" listening has been added
+		audio.oncanplay = () => Promise.resolve(audio.play()).catch(() => void 0);
+		audio.onplay = () => {
+			_status.skillaudio.add(path);
+			setTimeout(() => _status.skillaudio.remove(path), 1000);
+			game.addVideo("playAudio", null, path);
+		};
+		audio.onended = (event) => audio.remove();
+		audio.onerror = (event) => {
 			audio.remove();
 			if (onError) onError(event);
 		};
-		//Some browsers do not support "autoplay", so "oncanplay" listening has been added
-		audio.oncanplay = () => Promise.resolve(audio.play()).catch(() => void 0);
 		new Promise((resolve, reject) => {
 			if (path.startsWith('db:')) game.getDB('image', path.slice(3)).then(octetStream => resolve(get.objectURL(octetStream)), reject);
 			else if (lib.path.extname(path)) resolve(`${lib.assetURL}${path}`);
@@ -4213,6 +4215,7 @@ export class Game extends Uninstantable {
 	 * @param { string } skill 
 	 * @param { Player } player 
 	 * @param { GameEventPromise } event 
+	 * @returns { GameEventPromise }
 	 */
 	static createTrigger(name, skill, player, event) {
 		let info = get.info(skill);
@@ -4227,6 +4230,7 @@ export class Game extends Uninstantable {
 		next.includeOut = true;
 		next._trigger = event;
 		next.setContent('createTrigger');
+		return next;
 	}
 	/**
 	 * @legacy Use {@link lib.element.GameEvent.constructor} instead.
@@ -5362,10 +5366,11 @@ export class Game extends Uninstantable {
 	 * @param { GameEventPromise } [belongAsyncEvent]
 	 */
 	static async loop(belongAsyncEvent) {
+		if (!game.belongAsyncEventList) game.belongAsyncEventList = [];
 		if (belongAsyncEvent) {
-			game.belongAsyncEvent = belongAsyncEvent;
-		} else if (game.belongAsyncEvent) {
-			return game.loop(game.belongAsyncEvent);
+			game.belongAsyncEventList.push(belongAsyncEvent);
+		} else if (game.belongAsyncEventList.length) {
+			belongAsyncEvent = game.belongAsyncEventList.at(-1);
 		}
 		while (true) {
 			let event = (belongAsyncEvent && belongAsyncEvent.parent == _status.event) ? belongAsyncEvent : _status.event;
@@ -5443,8 +5448,8 @@ export class Game extends Uninstantable {
 							event.parent._result = event.result;
 						}
 						_status.event = event.parent;
-						if (game.belongAsyncEvent == event) {
-							delete game.belongAsyncEvent;
+						if (game.belongAsyncEventList.includes(event)) {
+							game.belongAsyncEventList.remove(event);
 						}
 						_resolve();
 						// 此时应该退出了
@@ -5453,8 +5458,8 @@ export class Game extends Uninstantable {
 						}
 					}
 					else {
-						if (game.belongAsyncEvent == event) {
-							delete game.belongAsyncEvent;
+						if (game.belongAsyncEventList.includes(event)) {
+							game.belongAsyncEventList.remove(event);
 						}
 						return _resolve();
 					}
@@ -6017,7 +6022,18 @@ export class Game extends Uninstantable {
 						if (info.usable && get.skillCount(skills2[i]) >= info.usable) enable = false;
 						if (info.chooseButton && _status.event.noButton) enable = false;
 						if (info.round && (info.round - (game.roundNumber - player.storage[skills2[i] + '_roundcount']) > 0)) enable = false;
-						if (player.storage[`temp_ban_${skills2[i]}`] === true) enable = false;
+						for (const item in player.storage) {
+							if (item.startsWith('temp_ban_')) {
+								if(player.storage[item] !== true) continue;
+								const skillName = item.slice(9);
+								if (lib.skill[skillName]) {
+									const skills=game.expandSkills([skillName]);
+									if(skills.includes(skills2[i])) {
+										enable = false; break;
+									}
+								}
+							}
+						}
 					}
 					if (enable) {
 						if (event.isMine() || !event._aiexclude.includes(skills2[i])) {
@@ -7135,14 +7151,14 @@ export class Game extends Uninstantable {
 					event.avatars[i].classList.add('selecting');
 				}
 			}
-			let rand2 = [];
+			let rand = [];
 			for (let i = 0; i < event.config.width; i++) {
 				for (let j = 0; j < event.config.width - i; j++) {
-					rand2.push(i);
+					rand.push(i);
 				}
 			}
 			for (let i = 0; i < event.config.num; i++) {
-				let rand2 = rand2.randomGet();
+				let rand2 = rand.randomGet();
 				for (let j = 0; j < rand2.length; j++) {
 					if (rand2[j] == rand2) {
 						rand2.splice(j--, 1);

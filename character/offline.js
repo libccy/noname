@@ -886,25 +886,39 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			pshengwu:{
 				audio:'hengwu',
+				mod:{
+					aiOrder:(player,card,num)=>{
+						if(num>0&&get.tag(card,'draw')&&ui.cardPile.childNodes.length+ui.discardPile.childNodes.length<20) return 0;
+					},
+					aiValue:(player,card,num)=>{
+						if(num>0&&card.name==='zhuge') return 20;
+					},
+					aiUseful:(player,card,num)=>{
+						if(num>0&&card.name==='zhuge') return 10;
+					}
+				},
 				trigger:{player:['useCard','respond']},
 				direct:true,
+				locked:false,
 				filter:function(event,player){
 					return game.hasPlayer(i=>i.countCards('ej',cardx=>get.type(cardx)=='equip'&&get.suit(event.card)==get.suit(cardx)));
 				},
 				content:function(){
 					'step 0'
-					var suit=get.suit(trigger.card);
-					var prompt2='弃置任意张'+get.translation(suit)+'手牌，然后摸X张牌（X为你弃置的牌数+'+game.filterPlayer().map(i=>i.countCards('ej',cardx=>get.type(cardx)=='equip'&&get.suit(trigger.card)==get.suit(cardx))).reduce((p,c)=>p+c)+'）';
+					var suit=get.suit(trigger.card),extra=game.filterPlayer().map(i=>i.countCards('ej',cardx=>{
+						return get.type(cardx)=='equip'&&get.suit(trigger.card)==get.suit(cardx);
+					})).reduce((p,c)=>p+c);
+					var prompt2='弃置任意张'+get.translation(suit)+'手牌，然后摸X张牌（X为你弃置的牌数+'+extra+'）';
 					player.chooseToDiscard('h',[1,player.countCards('h',{suit:suit})],{suit:suit}).set('prompt',get.prompt('pshengwu')).set('prompt2',prompt2).set('ai',card=>{
-						var player=_status.event.player;
+						if(_status.event.tie) return 0;
+						let player=_status.event.player;
 						if(_status.event.goon) return 12-get.value(card);
-						if(player.countCards('h')>50) return 0;
 						if(player==_status.currentPhase){
 							if(['shan','caochuan','tao','wuxie'].includes(card.name)) return 8-get.value(card);
 							return 6-get.value(card);
 						}
 						return 5.5-get.value(card);
-					}).set('goon',player.countCards('h',{suit:suit})==1).set('logSkill','pshengwu');
+					}).set('goon',player.countCards('h',{suit:suit})==1).set('tie',extra>ui.cardPile.childNodes.length+ui.discardPile.childNodes.length).set('logSkill','pshengwu');
 					'step 1'
 					if(result.bool){
 						var num=result.cards.length;
@@ -2649,7 +2663,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					order:function(item,player){
-						var num=player.getStorage('zyquanji').length;
+						var num=player.getExpansions('zyquanji').length;
 						if(num==1) return 8;
 						return 1;
 					},

@@ -814,6 +814,7 @@ export class Get extends Uninstantable {
 			"[object Object]": true,
 			"[object Array]": true,
 			"[object Arguments]": true,
+			"[object Date]": true
 		};
 
 		if (typeof obj !== "object" || obj === null || !canTranverse[getType(obj)])
@@ -827,16 +828,22 @@ export class Get extends Uninstantable {
 		const target =
 			constructor
 				? (
-					// 这三类数据处理单独处理
+					// 这四类数据处理单独处理
 					// （实际上需要处理的只有Map和Set）
 					// 除此之外的就只能祝愿有拷贝构造函数了
-					(Array.isArray(obj) || obj instanceof Map || obj instanceof Set)
+					(Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object)
 						// @ts-ignore
 						? new constructor()
-						// @ts-ignore
-						: new constructor(obj)
+						: (
+							(constructor.name in window && /\[native code\]/.test(constructor.toString()))
+								// @ts-ignore
+								? new constructor(obj)
+								: obj
+						)
 				)
 				: Object.create(null);
+		if (target === obj) return target;
+
 		map.set(obj, target);
 
 		if (obj instanceof Map) {
@@ -1360,11 +1367,13 @@ export class Get extends Uninstantable {
 	}
 	static infoFuncOL(info) {
 		var func;
+		const str = info.slice(13).trim();
 		try {
-			eval('func=(' + info.slice(13) + ');');
-		}
-		catch (e) {
-			return function () { };
+			if (str.startsWith("function") || str.startsWith("(")) eval(`func=(${str});`);
+			else eval(`func=(function ${str});`);
+		} catch (e) {
+			console.error(`${e} in \n${str}`);
+			return function () {};
 		}
 		if (Array.isArray(func)) {
 			func = get.filter.apply(this, get.parsedResult(func));
@@ -1954,8 +1963,8 @@ export class Get extends Uninstantable {
 		}
 	}
 	/**
-	 * @param { number | [number, number] | (()=>[number, number]) } [select]
-	 * @returns { [number, number] }
+	 * @param { number | Select | (()=>Select) } [select]
+	 * @returns { Select }
 	 */
 	static select(select) {
 		if (typeof select == 'function') return get.select(select());
@@ -3007,7 +3016,16 @@ export class Get extends Uninstantable {
 				var js = node.getCards('j');
 				for (var i = 0; i < js.length; i++) {
 					if (js[i].viewAs && js[i].viewAs != js[i].name) {
-						uiintro.add('<div><div class="skill">' + js[i].outerHTML + '</div><div>' + lib.translate[js[i].viewAs] + '：' + lib.translate[js[i].viewAs + '_info'] + '</div></div>');
+						let html = js[i].outerHTML;
+						let cardInfo = lib.card[js[i].viewAs], showCardIntro=true;
+						if (cardInfo.blankCard) {
+							var cardOwner = get.owner(js[i]);
+							if (cardOwner && !cardOwner.isUnderControl(true)) showCardIntro = false;
+						}
+						if (!showCardIntro) {
+							html=ui.create.button(js[i],'blank').outerHTML;
+						}
+						uiintro.add('<div><div class="skill">' + html + '</div><div>' + lib.translate[js[i].viewAs] + '：' + lib.translate[js[i].viewAs + '_info'] + '</div></div>');
 					}
 					else {
 						uiintro.add('<div><div class="skill">' + js[i].outerHTML + '</div><div>' + lib.translate[js[i].name + '_info'] + '</div></div>');
@@ -3477,7 +3495,7 @@ export class Get extends Uninstantable {
 							const defaultYingbianEffect = get.defaultYingbianEffect(node.link || node);
 							if (lib.yingbian.prompt.has(defaultYingbianEffect)) yingbianEffects.push(defaultYingbianEffect);
 						}
-						if (yingbianEffects.length) uiintro.add(`<div class="text" style="font-family: yuanli">应变：${yingbianEffects.map(value => lib.yingbian.prompt.get(value)).join('；')}</div>`);
+						if (yingbianEffects.length && showCardIntro) uiintro.add(`<div class="text" style="font-family: yuanli">应变：${yingbianEffects.map(value => lib.yingbian.prompt.get(value)).join('；')}</div>`);
 					}
 					if (lib.translate[name + '_append']) {
 						uiintro.add('<div class="text" style="display:inline">' + lib.translate[name + '_append'] + '</div>');

@@ -709,7 +709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'sbkanpo',
 						trigger:{global:'useCard'},
 						filter:function(event,player){
-							return event.player!=player&&player.getStorage('sbkanpo').includes(event.card.name);
+							return event.player!=player&&player.storage.sbkanpo[1].includes(event.card.name);
 						},
 						prompt2:function(event,player){
 							return '移除'+get.translation(event.card.name)+'的记录，令'+get.translation(event.card)+'无效';

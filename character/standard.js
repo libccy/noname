@@ -1,4 +1,4 @@
-'use strict';
+import { game } from '../noname.js';
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'standard',
@@ -93,6 +93,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ganning:['lingtong','xf_sufei'],
 			guanyu:['zhangfei','liaohua'],
 		},
+		/**
+		 * @type { { [key: string]: Skill } }
+		 */
 		skill:{
 			//标准版甘夫人
 			stdshushen:{
@@ -304,7 +307,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'source',
 				preHidden:true,
 				filter(event,player){
-					return (event.source&&event.source.countGainableCards(player,event.source!=player?'he':'e')&&event.num>0);
+					return event.source&&event.source.countGainableCards(player,event.source!=player?'he':'e')>0&&event.num>0;
 				},
 				async content(event,trigger,player){
 					player.gainPlayerCard(true,trigger.source,trigger.source!=player?'he':'e');
@@ -1761,9 +1764,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				async content(event,trigger,player){
 					event.count=trigger.getl(player).es.length;
-					do {
+					while(event.count-->0){
 						player.draw(2);
-						if(!player.hasSkill(event.name)) break;
+						if(!event.count||!player.hasSkill(event.name)) break;
 						if(!get.is.blocked(event.name,player)){
 							const chooseBoolEvent=player.chooseBool(get.prompt2('xiaoji')).set('frequentSkill','xiaoji');
 							chooseBoolEvent.ai=lib.filter.all;
@@ -1771,7 +1774,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(bool) player.logSkill('xiaoji');
 							else break;
 						}
-					}while(event.count-->0);
+					}
 				},
 				ai:{
 					noe:true,
@@ -2325,7 +2328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterReplace:{
 			caocao:['caocao','re_caocao','sb_caocao','dc_caocao'],
 			guojia:['guojia','re_guojia','ps1059_guojia','ps2070_guojia'],
-			simayi:['simayi','re_simayi','ps_simayi','ps2068_simayi'],
+			simayi:['simayi','re_simayi','jsrg_simayi','ps_simayi','ps2068_simayi'],
 			jin_simayi:['jin_simayi','junk_simayi','ps_jin_simayi'],
 			zhenji:['zhenji','re_zhenji','sb_zhenji','yj_zhenji'],
 			xuzhu:['xuzhu','re_xuzhu'],
@@ -2335,15 +2338,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liubei:['liubei','re_liubei','sb_liubei','dc_liubei','junk_liubei'],
 			guanyu:['guanyu','re_guanyu','ps_guanyu','old_guanyu'],
 			zhangfei:['zhangfei','re_zhangfei','old_zhangfei','xin_zhangfei','sb_zhangfei','tw_zhangfei','jsrg_zhangfei','yj_zhangfei'],
-			zhaoyun:['zhaoyun','re_zhaoyun','old_zhaoyun','sb_zhaoyun','ps2063_zhaoyun','ps2067_zhaoyun'],
+			zhaoyun:['zhaoyun','re_zhaoyun','old_zhaoyun','sb_zhaoyun','jsrg_zhaoyun','ps2063_zhaoyun','ps2067_zhaoyun'],
 			sp_zhaoyun:['sp_zhaoyun','jsp_zhaoyun'],
 			machao:['machao','re_machao','sb_machao','ps_machao'],
 			sp_machao:['sp_machao','dc_sp_machao','jsrg_machao','old_machao'],
-			zhugeliang:['zhugeliang','re_zhugeliang','ps2066_zhugeliang','ps_zhugeliang','sb_zhugeliang'],
+			zhugeliang:['zhugeliang','re_zhugeliang','sb_zhugeliang','jsrg_zhugeliang','ps2066_zhugeliang','ps_zhugeliang'],
 			huangyueying:['huangyueying','re_huangyueying','junk_huangyueying','sb_huangyueying'],
 			sunquan:['sunquan','re_sunquan','sb_sunquan','dc_sunquan'],
 			zhouyu:['zhouyu','re_zhouyu','sb_zhouyu','ps1062_zhouyu','ps2080_zhouyu'],
-			luxun:['luxun','re_luxun'],
+			luxun:['luxun','re_luxun','jsrg_luxun'],
 			lvmeng:['lvmeng','re_lvmeng','sb_lvmeng'],
 			huanggai:['huanggai','re_huanggai','sb_huanggai'],
 			daqiao:['daqiao','re_daqiao','sb_daqiao'],

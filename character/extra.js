@@ -155,8 +155,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'虎：当你使用指定唯一目标的牌对目标角色造成伤害时，此伤害+1。',
 					'鹿：①当你获得此效果时，你回复1点体力并弃置判定区的所有牌。②你不能成为延时锦囊牌的目标。',
 					'熊：每回合限一次，当你受到伤害时，此伤害-1。',
-					'猿：出牌阶段开始时，你选择一名角色，随机获得其装备区里的一张牌。',
-					'鹤：出牌阶段开始时，你摸三张牌。',
+					'猿：当你获得此效果时，你选择一名其他角色，获得其装备区里的一张牌。',
+					'鹤：当你获得此效果时，你摸三张牌。',
 				],
 				updateMark:function(player){
 					var wuqinxi=player.storage.wuling_wuqinxi;
@@ -177,11 +177,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.broadcastAll(function(player,curMark){
 						if(player.marks.wuling_wuqinxi) player.marks.wuling_wuqinxi.firstChild.innerHTML=curMark;
 					},player,curMark);
-					if(curMark=='鹿'){
-						player.logSkill('wuling_wuqinxi');
-						player.recover();
-						player.discard(player.getCards('j')).discarder=player;
-					}
+					var next=game.createEvent('wuling_change');
+					next.player=player;
+					next.setContent('emptyEvent');
 				},
 				ai:{
 					order:7,
@@ -214,7 +212,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						trigger:{
 							source:'damageBegin1',
-							player:['phaseZhunbeiBegin','damageBegin4','phaseUseBegin'],
+							player:['phaseZhunbeiBegin','damageBegin4','wuling_change'],
 						},
 						filter:function(event,player,name){
 							const wuqinxi=player.storage.wuling_wuqinxi&&player.storage.wuling_wuqinxi[0];
@@ -228,9 +226,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								case 'damageBegin4':
 									return wuqinxi=='熊'&&!player.hasSkill('wuling_xiong');
 								default:
-									if(wuqinxi=='鹤') return true;
-									if(wuqinxi!='猿') return false;
-									return game.hasPlayer(target=>target.countGainableCards(player,'e'));
+									switch(wuqinxi){
+										case '鹿':
+											return player.isDamaged()||player.countCards('j');
+										case '鹤':
+											return true;
+										case '猿':
+											return game.hasPlayer(target=>target!=playertarget.countGainableCards(player,'e'));
+										default:
+											return false;
+									}
+									break;
 							}
 						},
 						forced:true,
@@ -256,31 +262,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										event.finish();
 										break;
 									default:
-										if(wuqinxi=='鹤'){
-											player.draw(3);
-											event.finish();
-										}
-										else{
-											player.chooseTarget('五禽戏：获得一名角色装备区里的一张装备牌',function(card,player,target){
-												return target.countGainableCards(player,'e');
-											}).set('ai',function(target){
-												var player=_status.event.player;
-												var att=get.attitude(player,target),eff=0;
-												target.getCards('e',function(card){
-													var val=get.value(card,target);
-													eff=Math.max(eff,-val*att);
+										switch(wuqinxi){
+											case '鹿':
+												player.recover();
+												player.discard(player.getCards('j')).discarder=player;
+												event.finish();
+												break;
+											case '鹤':
+												player.draw(3);
+												event.finish();
+												break;
+											case '猿':
+												player.chooseTarget('五禽戏：获得一名其他角色装备区里的一张装备牌',function(card,player,target){
+													return target!=player&&target.countGainableCards(player,'e');
+												}).set('ai',function(target){
+													var player=_status.event.player;
+													var att=get.attitude(player,target),eff=0;
+													target.getCards('e',function(card){
+														var val=get.value(card,target);
+														eff=Math.max(eff,-val*att);
+													});
+													return eff;
 												});
-												return eff;
-											});
+												break;
 										}
+										break;
 								}
 							}
 							'step 1'
 							if(result.bool){
 								var target=result.targets[0];
 								player.line(target,'green');
-								var cards=target.getGainableCards(player,'e');
-								player.gain(cards.randomGets(1),target,'give');
+								player.gainPlayerCard(target,'e',true);
 							}
 						},
 						ai:{
@@ -7014,11 +7027,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource'
 				},
 				filter:function(event,player){
-					if(get.attitude(_status.event.player,event.player)>=0) return false;
 					if(player.storage.drlt_duorui.length) return false;
 					return event.player.isIn()&&_status.currentPhase==player;
 				},
 				check:function(event,player){
+					if(get.attitude(_status.event.player,event.player)>=0) return false;
 					if(player.hasEnabledSlot()&&!player.hasEnabledSlot(5)) return false;
 					return true;
 				},
@@ -8049,8 +8062,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			'<br><li>虎：当你使用指定唯一目标的牌对目标角色造成伤害时，此伤害+1。'+
 			'<br><li>鹿：①当你获得此效果时，你回复1点体力并弃置判定区的所有牌。②你不能成为延时锦囊牌的目标。'+
 			'<br><li>熊：每回合限一次，当你受到伤害时，此伤害-1。'+
-			'<br><li>猿：出牌阶段开始时，你选择一名角色，随机获得其装备区里的一张牌。'+
-			'<br><li>鹤：出牌阶段开始时，你摸三张牌。',
+			'<br><li>猿：当你获得此效果时，你选择一名其他角色，获得其装备区里的一张牌。'+
+			'<br><li>鹤：当你获得此效果时，你摸三张牌。',
 			youyi:'游医',
 			youyi_info:'①弃牌阶段结束时，你可以将所有于此阶段弃置的牌置入仁区。②出牌阶段限一次。你可以将仁区的所有牌置入弃牌堆，令所有角色各回复1点体力。',
 

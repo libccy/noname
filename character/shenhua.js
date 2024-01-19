@@ -3667,7 +3667,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target,current){
 							if(typeof card==='object'&&get.name(card)==='sha'&&target.mayHaveShan(player,'use')) return [0.6,0.75];
 							if(!target.hasFriend()&&!player.hasUnknown()) return;
-							if(_status.currentPhase==target) return;
+							if(_status.currentPhase==target||get.type(card)==='delay') return;
 							if(card.name!='shuiyanqijunx'&&get.tag(card,'loseCard')&&target.countCards('he')){
 								if(target.hasSkill('ziliang')) return 0.7;
 								return [0.5,Math.max(2,target.countCards('h'))];
@@ -7714,7 +7714,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dongzhuo:['dongzhuo','ol_dongzhuo','re_dongzhuo','sp_dongzhuo','yj_dongzhuo'],
 			dengai:['dengai','ol_dengai','re_dengai'],
 			sp_ol_zhanghe:['sp_ol_zhanghe','yj_zhanghe','sp_zhanghe','jsrg_zhanghe'],
-			jiangwei:['jiangwei','ol_jiangwei','re_jiangwei','sb_jiangwei'],
+			jiangwei:['jiangwei','ol_jiangwei','re_jiangwei','sb_jiangwei','jsrg_jiangwei'],
 			liushan:['liushan','ol_liushan','re_liushan'],
 			sunce:['sunce','re_sunce','re_sunben','sb_sunce'],
 			zhangzhang:['zhangzhang','ol_zhangzhang','re_zhangzhang'],

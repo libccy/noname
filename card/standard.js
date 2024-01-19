@@ -184,8 +184,8 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 3"
 					if((!result||!result.bool||!result.result||result.result!='shaned')&&!event.unhurt){
-						if (!event.directHit&&!event.directHit2&&lib.filter.cardEnabled(new lib.element.VCard('shan'), target, 'forceEnable')&&
-							target.hasCard(()=>true,'hs')&&get.damageEffect(target,player,target)<0) target.addGaintag(target.getCards('hs'),'sha_notshan');
+						if (!event.directHit&&!event.directHit2&&lib.filter.cardEnabled(new lib.element.VCard({name:'shan'}), target, 'forceEnable')&&
+							target.countCards('hs')>0&&get.damageEffect(target,player,target)<0) target.addGaintag(target.getCards('hs'),'sha_notshan');
 						target.damage(get.nature(event.card));
 						event.result={bool:true}
 						event.trigger('shaDamage');

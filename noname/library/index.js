@@ -5,7 +5,7 @@
  * @typedef { InstanceType<typeof lib.element.Button> } Button
  * @typedef { InstanceType<typeof lib.element.Dialog> } Dialog
  * @typedef { InstanceType<typeof lib.element.GameEvent> } GameEvent
- * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> & typeof Promise<typeof lib.element.GameEvent> } GameEventPromise
+ * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise & typeof Promise<InstanceType<typeof lib.element.GameEvent>> } GameEventPromise
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
  * @typedef { InstanceType<typeof lib.element.Control> } Control
 */
@@ -9691,7 +9691,16 @@ export class Library extends Uninstantable {
 			if (typeof info.usable == 'number' && player.hasSkill('counttrigger') &&
 				player.storage.counttrigger && player.storage.counttrigger[skill] >= info.usable) return false;
 			if (info.round && (info.round - (game.roundNumber - player.storage[skill + '_roundcount']) > 0)) return false;
-			if (player.storage[`temp_ban_${skill}`] === true) return false;
+			for (const item in player.storage) {
+				if (item.startsWith('temp_ban_')) {
+					if(player.storage[item] !== true) continue;
+					const skillName = item.slice(9);
+					if (lib.skill[skillName]) {
+						const skills=game.expandSkills([skillName]);
+						if(skills.includes(skill)) return false;
+					}
+				}
+			}
 			return true;
 		},
 		characterDisabled: function (i, libCharacter) {
@@ -10198,6 +10207,19 @@ export class Library extends Uninstantable {
 			return 0;
 		}
 	};
+	/**
+	 * @type {{
+	 * 	global: string[];
+	 * 	globalmap: SMap<Player[]>;
+	 * 	storage: SMap<any>;
+	 * 	undist: SMap<any>;
+	 * 	thers: SMap<any>;
+	 * 	zhu: SMap<any>;
+	 * 	zhuSkill: SMap<any>;
+	 * 	land_used: SMap<any>;
+	 * 	[key: string]: Skill;
+	 * }}
+	 */
 	static skill = {
 		stratagem_fury: {
 			marktext: '🔥',
@@ -12785,6 +12807,10 @@ export class Library extends Uninstantable {
 			color: '#c3f9ff',
 			nature: 'thundermm',
 		}],
+		['合', {
+			color: '#c3f9ff',
+			nature: 'thundermm',
+		}],
 		['梦', {
 			color: '#6affe2',
 			nature: 'watermm',
@@ -13062,11 +13088,10 @@ export class Library extends Uninstantable {
 	static other = {
 		ignore: () => void 0
 	};
-}
-Library.config = undefined;
+};
 
+Library.config = undefined;
 Library.configOL = undefined;
-;
 
 export const lib = Library;
 

@@ -107,7 +107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_jishi:['dc_jiben','zhenghun','dc_sunhanhua','liuchongluojun'],
 				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen','dc_jiachong'],
 				sp_yijun:['gongsundu','mengyou'],
-				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong'],
+				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong','yue_xiaoqiao'],
 			}
 		},
 		skill:{
@@ -658,7 +658,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseEnd'},
 				forced:true,
 				filter:function(event,player){
-					return player.getHistory('useCard').length>player.getHp();
+					return player.getHistory('useCard').length>player.getHp()||player.getHistory('gain').reduce((sum,evt)=>sum+evt.cards.length,0)>player.getHp();
 				},
 				content:function*(event,map){
 					const player=map.player;
@@ -1094,9 +1094,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:['gainAfter','loseAsyncAfter']},
 						forced:true,
 						filter:(event,player)=>{
-							// if(player==_status.currentPhase) return false;
 							if(event.getParent('phaseDraw',true)) return false;
-							const evt=player.getHistory('gain')[0];
+							const evt=player.getHistory('gain',i=>!i.getParent('phaseDraw',true))[0];
 							if(!evt) return false;
 							if(event.name=='gain'){
 								if(evt!=event||event.getlx===false) return false;
@@ -1109,8 +1108,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						content:function(){
 							var hs=player.getCards('h'),cards=trigger.getg(player);
-							var card=cards.filter(card=>hs.includes(card)).randomGet();
-							player.addGaintag(card,'dclingkong_tag');
+							cards=cards.filter(card=>hs.includes(card));
+							player.addGaintag(cards,'dclingkong_tag');
 							game.delayx();
 						},
 					},
@@ -2254,7 +2253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						logTarget:'player',
 						content:function(){
 							var num=trigger.player.countMark('dcshengdu');
-							player.draw(num);
+							player.draw(num*trigger.cards.length);
 							trigger.player.removeMark('dcshengdu',num);
 						},
 					}
@@ -11093,6 +11092,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangchu:['zhangchu','jsrg_zhangchu'],
 			xianglang:['xianglang','mb_xianglang'],
 			chengui:['chengui','mb_chengui'],
+			liuyong:['liuyong','jsrg_liuyong'],
+			zhangxuan:['zhangxuan','jsrg_zhangxuan'],
+			gaoxiang:['gaoxiang','jsrg_gaoxiang'],
 		},
 		translate:{
 			re_panfeng:'潘凤',
@@ -11468,7 +11470,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcguangshi_info:'锁定技。准备阶段，若所有其他角色均有“信众”，你摸两张牌并失去1点体力。',
 			dongwan:'董绾',
 			dcshengdu:'生妒',
-			dcshengdu_info:'回合开始时，你可以选择一名其他角色，令其获得1枚“生妒”标记。有“生妒”标记的角色于摸牌阶段得到牌后，你摸X张牌，然后其移去所有“生妒”标记（X为其拥有的“生妒”标记数）。',
+			dcshengdu_info:'回合开始时，你可以选择一名其他角色，令其获得1枚“生妒”标记。有“生妒”标记的角色于摸牌阶段得到牌后，你摸X张牌，然后其移去所有“生妒”标记（X为摸牌数乘以其拥有的“生妒”标记数）。',
 			dcjieling:'介绫',
 			dcjieling_info:'出牌阶段每种花色限一次，你可以将两张花色不同的手牌当无距离限制且无任何次数限制的【杀】使用。然后若此【杀】：造成了伤害，所有目标角色失去1点体力；未造成伤害，所有目标角色依次获得1枚“生妒”标记。',
 			yuanyin:'袁胤',
@@ -11514,7 +11516,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yue_zhoufei_prefix:'乐',
 			dclingkong:'灵箜',
 			dclingkong_tag:'箜篌',
-			dclingkong_info:'锁定技。①游戏开始时，你将所有手牌标记为“箜篌”。②你的“箜篌”牌不计入手牌上限。③当你于一回合内首次于摸牌阶段外得到牌后，系统随机将其中的一张牌标记为“箜篌”。',
+			dclingkong_info:'锁定技。①游戏开始时，你将所有手牌标记为“箜篌”。②你的“箜篌”牌不计入手牌上限。③当你于一回合内首次于摸牌阶段外得到牌后，你将这些牌标记为“箜篌”。',
 			dcxianshu:'贤淑',
 			dcxianshu_info:'出牌阶段，你可以将一张“箜篌”正面向上交给一名其他角色，然后你摸X张牌（X为你与其的体力值之差且至多为5）。若此牌为红色，且该角色的体力值不大于你，则其回复1点体力；若此牌为黑色，且该角色的体力值不小于你，则其失去1点体力。',
 			dc_zhangmancheng:'张曼成',
@@ -11531,7 +11533,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dccaisi:'才思',
 			dccaisi_info:'当你于回合内/回合外使用基本牌结算结束后，若你本回合以此法得到的牌数小于你的体力上限，你可以从牌堆/弃牌堆随机获得一张非基本牌，然后本回合下次发动此技能获得的牌数+1。',
 			dczhuoli:'擢吏',
-			dczhuoli_info:'锁定技。一名角色的回合结束时，若你本回合使用的牌数大于体力值，你加1点体力上限（不能超过存活角色数），回复1点体力。',
+			dczhuoli_info:'锁定技。一名角色的回合结束时，若你本回合使用或获得的牌数大于体力值，你加1点体力上限（不能超过存活角色数），回复1点体力。',
 			yue_caiyong:'乐蔡邕',
 			yue_caiyong_prefix:'乐',
 			dcjiaowei:'焦尾',
@@ -11552,9 +11554,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yue_xiaoqiao:'乐小乔',
 			yue_xiaoqiao_prefix:'乐',
 			dcqiqin:'绮琴',
-			dcqiqin_info:'锁定技。①游戏开始时，你将所有手牌标记为“乐”。②你的“乐”牌不计入手牌上限。③准备阶段，你获得弃牌堆中所有你标记过的“乐”牌。',
+			dcqiqin_tag:'琴',
+			dcqiqin_info:'锁定技。①游戏开始时，你将所有手牌标记为“琴”。②你的“琴”牌不计入手牌上限。③准备阶段，你获得弃牌堆中所有你标记过的“琴”牌。',
 			dcweiwan:'媦婉',
-			dcweiwan_info:'出牌阶段限一次，你可以弃置一张“乐”并获得一名其他角色区域内花色与此牌不相同的牌各一张，若你获得了：一张牌，其失去1点体力；两张牌，本回合你对其使用牌无距离和次数限制；三张牌，本回合你不能对其使用牌。',
+			dcweiwan_info:'出牌阶段限一次，你可以弃置一张“琴”并随机获得一名其他角色区域内花色与此牌不相同的牌各一张，若你获得了：一张牌，其失去1点体力；两张牌，本回合你对其使用牌无距离和次数限制；三张牌，本回合你不能对其使用牌。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',

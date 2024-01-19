@@ -77,7 +77,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_madai:['male','shu',4,['mashu','twqianxi']],
 			tw_niujin:['male','wei',4,['twcuorui','twliewei']],
 			tw_guanqiujian:['male','wei',3,['twzhengrong','twhongju']],
-			tw_daxiaoqiao:['female','wu',3,['twxingwu','twpingting']],
+			tw_daxiaoqiao:['female','wu',3,['twxingwu','twpingting'],['tempname:daxiaoqiao']],
 			tw_furong:['male','shu',4,['twxuewei','twliechi']],
 			tw_yl_luzhi:['male','qun',3,['twmingren','twzhenliang']],
 			tw_liuzhang:['male','qun',3,['jutu','twyaohu','rehuaibi']],
@@ -364,12 +364,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.target=target;
 					var list=['cancel2'];
 					var choiceList=[
-						'弃置一张手牌，令此【杀】可以额外指定一个目标',
+						'令此【杀】可以额外指定一个目标',
 						'弃置其一张手牌，若此【杀】造成伤害，则你摸一张牌且本阶段可以额外使用一张【杀】',
 					];
 					if(target.countCards('h')) list.unshift('其弃置');
 					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
-					if(game.hasPlayer(targetx=>!trigger.targets.includes(targetx)&&player.canUse(trigger.card,targetx))) list.unshift('你弃置');
+					if(game.hasPlayer(targetx=>!trigger.targets.includes(targetx)&&player.canUse(trigger.card,targetx))) list.unshift('多指');
 					else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
 					player.chooseControl(list).set('choiceList',choiceList).set('ai',()=>{
 						var controls=_status.event.controls;
@@ -377,7 +377,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=trigger.player;
 						var target=trigger.target;
 						if(controls.includes('其弃置')&&_status.event.goon) return '其弃置';
-						if(controls.includes('你弃置')){
+						if(controls.includes('多指')){
 							if(game.hasPlayer(targetx=>!trigger.targets.includes(targetx)&&player.canUse(trigger.card,targetx)&&get.effect(targetx,trigger.card,player,player)>0)) return '你弃置';
 						}
 						return 'cancel2';
@@ -6240,7 +6240,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:['roundStart','dying']},
 				init:function(player,skill){
-					if(player.getExpansions('twxingwu').length) player.addAdditionalSkill(skill,['tianxiang_daxiaoqiao','liuli_daxiaoqiao']);
+					if(player.getExpansions('twxingwu').length) player.addAdditionalSkill(skill,['tianxiang','liuli']);
 					else player.removeAdditionalSkill(skill);
 				},
 				filter:function(event,player){
@@ -6269,18 +6269,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					update:{
-						trigger:{
-							player:['loseAfter','loseAsyncAfter','addToExpansionAfter'],
+						trigger:{player:['loseAfter','loseAsyncAfter','addToExpansionAfter']},
+						filter:function(event,player){
+							var cards=player.getExpansions('twxingwu'),skills=player.additionalSkills.twpingting;
+							return !((cards.length&&skills&&skills.length)||(!cards.length&&(!skills||!skills.length)));
 						},
 						forced:true,
 						silent:true,
-						filter:function(event,player){
-							var cards=player.getExpansions('twxingwu'),skills=player.additionalSkills.twpingting;
-							if((cards.length&&skills&&skills.length)||(!cards.length&&(!skills||!skills.length))){
-								return false;
-							}
-							return true;
-						},
 						content:function(){
 							lib.skill.twpingting.init(player,'twpingting');
 						}
