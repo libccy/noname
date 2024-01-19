@@ -2005,8 +2005,8 @@ export const Content = {
 	arrangeTrigger: async function (event,trigger,player) {
 		while(event.doingList.length>0){
 			event.doing = event.doingList.shift();
-			if (trigger.filterStop && trigger.filterStop()) return event.finish();
 			while(true){
+				if (trigger.filterStop && trigger.filterStop()) return;
 				const usableSkills = event.doing.todoList.filter(info => {
 					if (!lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill)) return false;
 					return lib.skill.global.includes(info.skill) || info.player.hasSkill(info.skill, true);
