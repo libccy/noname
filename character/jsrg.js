@@ -284,12 +284,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				filter(event,player){
 					const zhu=get.zhu(player);
-					if(!zhu||!zhu.isZhu2()) return false;
-					return !player.isZhu2();
+					if(!zhu||!zhu.isZhu2()||!zhu.countCards('h')) return false;
+					return !player.isZhu2()&&player.countCards('h');
 				},
 				async content(event,trigger,player){
 					player.chooseToDebate(game.filterPlayer(current=>{
-						return current==player||current.isZhu2();
+						return (current==player||current.isZhu2())&&current.countCards('h');
 					})).set('callback',async event=>{
 						const result=event.debateResult;
 						if(result.bool&&result.opinion){
