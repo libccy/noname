@@ -993,6 +993,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return '手牌上限+'+storage;
 							}
 						},
+						onremove:true,
 						charlotte:true,
 						mod:{
 							maxHandcard(player,num){
