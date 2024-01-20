@@ -11228,6 +11228,7 @@ export class Library extends Uninstantable {
 			charlotte: true,
 			priority: -100,
 			lastDo: true,
+			silent:true,
 			content: function () {
 				player.removeSkill('counttrigger');
 				delete player.storage.counttrigger;
@@ -11253,6 +11254,7 @@ export class Library extends Uninstantable {
 			priority: 100,
 			firstDo: true,
 			popup: false,
+			silent:true,
 			filter: function (event, player) {
 				return player.hp >= player.maxHp;
 			},
@@ -11341,6 +11343,7 @@ export class Library extends Uninstantable {
 			popup: false,
 			priority: -100,
 			lastDo: true,
+			silent:true,
 			filter: function (event) {
 				return !event._cleared && event.card.name != 'wuxie';
 			},
@@ -11357,6 +11360,7 @@ export class Library extends Uninstantable {
 			popup: false,
 			priority: -100,
 			lastDo: true,
+			silent:true,
 			filter: function (event) {
 				return ui.todiscard[event.discardid] ? true : false;
 			},
@@ -11386,6 +11390,7 @@ export class Library extends Uninstantable {
 			priority: 5,
 			forced: true,
 			popup: false,
+			silent:true,
 			filter: function (event, player) {
 				//if(!event.player.isDying()) return false;
 				//if(event.source&&event.source.isIn()&&event.source!=player) return false;
@@ -11539,6 +11544,7 @@ export class Library extends Uninstantable {
 			popup: false,
 			logv: false,
 			forceDie: true,
+			silent:true,
 			//priority:-5,
 			content: function () {
 				"step 0";
@@ -11567,6 +11573,7 @@ export class Library extends Uninstantable {
 			forced: true,
 			popup: false,
 			forceDie: true,
+			silent:true,
 			filter: function (event, player) {
 				var evt = event.getParent();
 				return evt && evt.name == 'damage' && evt.hasNature('linked') && player.isLinked();
