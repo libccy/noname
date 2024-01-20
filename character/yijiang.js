@@ -5958,6 +5958,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				intro:{content:'【矫诏】加成等级：Lv.#'},
+				ai:{
+					maixie:true,
+					effect:{
+						target:(card,player,target)=>{
+							if(!get.tag(card,'damage')) return;
+							if(target.hp+target.hujia<2||player.hasSkillTag('jueqing',false,target)) return 1.8;
+							if(target.countMark('xindanxin')>1) return [1,1];
+							return [1,0.8*target.hp-0.5];
+						}
+					}
+				}
 			},
 			danxin:{
 				trigger:{player:'damageEnd'},
@@ -5998,7 +6009,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:(card,player,target)=>{
 							if(!get.tag(card,'damage')) return;
-							if(target.hp<2||player.hasSkillTag('jueqing',false,target)) return -1.5;
+							if(target.hp<2||player.hasSkillTag('jueqing',false,target)) return 1.5;
 							return [1,1];
 						}
 					}
