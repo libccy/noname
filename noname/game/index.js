@@ -8434,6 +8434,22 @@ export class Game extends Uninstantable {
 			return true;
 		});
 	}
+
+	/**
+	 * 此方法用于对所有targets按顺序执行一个async函数。
+	 * 
+	 * @param { Player[] } targets 需要执行async方法的目标
+	 * @param { AsyncFunction } asyncFunc 需要执行的async方法
+	 * @param { sort } function 排序器，默认为lib.sort.seat
+	 */
+	static async doAsyncInOrder(targets,asyncFunc,sort){
+		if(!sort)sort = lib.sort.seat;
+		let sortedTargets = targets.sort(sort);
+		for(let i=0;i<sortedTargets.length;i++){
+			let target = sortedTargets[i];
+			await Promise.resolve(asyncFunc(target,i));
+		}
+	}
 };
 
 export const game = Game;
