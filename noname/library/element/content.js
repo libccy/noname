@@ -2011,8 +2011,10 @@ export const Content = {
 		}
 	},
 	arrangeTrigger: async function (event,trigger,player) {
-		while(event.doingList.length>0){
-			event.doing = event.doingList.shift();
+		const doingList = event.doingList.slice(0);
+
+		while(doingList.length>0){
+			event.doing = doingList.shift();
 			while(true){
 				if (trigger.filterStop && trigger.filterStop()) return;
 				const usableSkills = event.doing.todoList.filter(info => {
