@@ -129,12 +129,16 @@ export class ChromePromiseErrorHandler {
 				}
 				// 反之我们只能不考虑报错文件信息，直接调用onerror
 				else {
-					// @ts-ignore
-					let [_, src = void 0, line = void 0, column = void 0] = /at\s+.*\s+\((.*):(\d*):(\d*)\)/i.exec(error.stack.split('\n')[1])
-					if (typeof line == 'string') line = Number(line);
-					if (typeof column == 'string') column = Number(column);
-					// @ts-ignore
-					window.onerror(error.message, src, line, column, error);
+					try{
+						// @ts-ignore
+						let [_, src = void 0, line = void 0, column = void 0] = /at\s+.*\s+\((.*):(\d*):(\d*)\)/i.exec(error.stack.split('\n')[1])
+						if (typeof line == 'string') line = Number(line);
+						if (typeof column == 'string') column = Number(column);
+						// @ts-ignore
+						window.onerror(error.message, src, line, column, error);
+					}catch(e){
+						window.onerror(error.message,'',0,0, error);
+					}
 				}
 			}
 			/*
