@@ -80,7 +80,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							return game.hasPlayer(target=>{
 								if(player.countMark('sbxingshang')>1) return true;
-								return target.isLinked()||target.isTurnedOver();
+								return player.countMark('sbxingshang')&&(target.isLinked()||target.isTurnedOver());
 							});
 						},
 						usable:1,
@@ -267,6 +267,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return dialog;
 					},
 					filter:function(button,player){
+						if(button.link>2&&player.countMark('sbxingshang')<3) return false;
 						if(button.link==4) return game.hasPlayer(target=>target!=player&&!target.hasSkill('sbfangzhu_ban'));
 						return true;
 					},
