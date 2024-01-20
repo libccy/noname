@@ -5,7 +5,7 @@
  * @typedef { InstanceType<typeof lib.element.Button> } Button
  * @typedef { InstanceType<typeof lib.element.Dialog> } Dialog
  * @typedef { InstanceType<typeof lib.element.GameEvent> } GameEvent
- * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise & typeof Promise<InstanceType<typeof lib.element.GameEvent>> } GameEventPromise
+ * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> } GameEventPromise
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
  * @typedef { InstanceType<typeof lib.element.Control> } Control
 */
@@ -13088,7 +13088,7 @@ export class Library extends Uninstantable {
 	static other = {
 		ignore: () => void 0
 	};
-};
+}
 
 Library.config = undefined;
 Library.configOL = undefined;
