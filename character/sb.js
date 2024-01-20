@@ -128,7 +128,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									case 2:
 										return Math.min(5,Math.max(1,game.dead.length));
 									case 3:
-										return game.filterPlayer().reduce((list,target)=>list.push(get.recoverEffect(target,player,player)),[]).sort((a,b)=>b-a)[0];
+										return game.filterPlayer().reduce((list,target)=>{
+											list.push(get.recoverEffect(target,player,player));
+											return list;
+										},[]).sort((a,b)=>b-a)[0];
 									case 4:
 										return game.dead.reduce((list,target)=>{
 											let num=0;
