@@ -2679,6 +2679,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				priority:5,
 				popup:false,
 				forced:true,
+				silent:true,
 				filter:function(event,player){
 					if(event.card.storage&&event.card.storage.nowuxie) return false;
 					var card=event.card;

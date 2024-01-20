@@ -710,7 +710,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.storage.xinluoshen=event.cards.slice(0);
 								return;
 							}
-						};
+						}
 					}
 				},
 				mod:{

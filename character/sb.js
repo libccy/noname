@@ -655,7 +655,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								const event=get.event();
 								if(!event.isMine()) return;
 								if(button.classList.contains('selectable')==false) return;
-								if(ui.selected.buttons.length>=lib.skill.sbkanpo.getNumber) return false;
+								if(ui.selected.buttons.length>=sum) return false;
 								button.classList.add('selected');
 								ui.selected.buttons.push(button);
 								let counterNode=button.querySelector('.caption');
@@ -1822,7 +1822,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})):0,alter=[null,1,1],temp;
 					for(let i of game.players){
 						if(player===i) continue;
-						let vplayer=new lib.element.Player(i);
+						let vplayer=ui.create.player(i);
 						temp=get.effect(i,new lib.element.VCard({name:'juedou',isCard:true}),vplayer,i);
 						vplayer.remove();
 						if(temp){

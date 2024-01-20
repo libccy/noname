@@ -8434,7 +8434,6 @@ export class Game extends Uninstantable {
 			return true;
 		});
 	}
-
 	/**
 	 * 此方法用于对所有targets按顺序执行一个async函数。
 	 * 
@@ -8450,6 +8449,6 @@ export class Game extends Uninstantable {
 			await Promise.resolve(asyncFunc(target,i));
 		}
 	}
-};
+}
 
 export const game = Game;

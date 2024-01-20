@@ -2011,8 +2011,10 @@ export const Content = {
 		}
 	},
 	arrangeTrigger: async function (event,trigger,player) {
-		while(event.doingList.length>0){
-			event.doing = event.doingList.shift();
+		const doingList = event.doingList.slice(0);
+
+		while(doingList.length>0){
+			event.doing = doingList.shift();
 			while(true){
 				if (trigger.filterStop && trigger.filterStop()) return;
 				const usableSkills = event.doing.todoList.filter(info => {
@@ -2030,10 +2032,10 @@ export const Content = {
 					}
 					else {
 						event.choice = usableSkills.filter(n => n.priority == usableSkills[0].priority);
-						//现在只要找到一个同优先度技能为silent 便优先执行该技能
+						//现在只要找到一个同优先度技能为silent，或没有技能描述的技能 便优先执行该技能
 						const silentSkill = event.choice.find(item => {
 							const skillInfo = lib.skill[item.skill];
-							return (skillInfo && skillInfo.silent);
+							return (skillInfo && (skillInfo.silent || !lib.translate[item.skill]));
 						})
 						if (silentSkill){
 							event.current = silentSkill;
