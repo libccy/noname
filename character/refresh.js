@@ -14332,8 +14332,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(!target.hasFriend()) return;
-							if(get.tag(card,'damage')==1&&target.hp==3&&!target.isTurnedOver()&&
+							if(target.hp===3&&get.tag(card,'damage')==1&&!target.isTurnedOver()&&
 							_status.currentPhase!=target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [0.5,1];
+							if(target.hp===1&&get.tag(card,'recover')&&!target.isTurnedOver()&&
+							_status.currentPhase!==target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [1,-3];
 						}
 					}
 				}
