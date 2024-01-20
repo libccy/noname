@@ -191,7 +191,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 													return controls[0][0];
 												}).set('prompt','获得一名已阵亡角色的所有技能').set('map',map);
 												if(control){
-													const target2=game.dead.find(target=>map[target2.playerid]==control);
+													const target2=game.dead.find(targetx=>map[targetx.playerid]==control);
 													player.line(target2);
 													game.log(player,'选择了',target2);
 													const skills=target2.getStockSkills(true,true);
