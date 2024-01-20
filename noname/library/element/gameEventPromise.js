@@ -1,9 +1,7 @@
-import { AI as ai } from '../../ai/index.js';
 import { Get as get } from '../../get/index.js';
 import { Game as game } from '../../game/index.js';
 import { Library as lib } from "../index.js";
 import { status as _status } from '../../status/index.js';
-import { UI as ui } from '../../ui/index.js';
 import { AsyncFunction } from '../../util/index.js';
 
 /**
@@ -16,7 +14,7 @@ import { AsyncFunction } from '../../util/index.js';
  * 且Promise的原有属性无法被修改，一切对这个类实例的属性修改，删除，
  * 再配置等操作都会转发到事件对应的属性中。
  * 
- * @template { GameEvent } T
+ * @extends {Promise<GameEvent>}
  * 
  * @example
  * 使用await xx()等待异步事件执行：
