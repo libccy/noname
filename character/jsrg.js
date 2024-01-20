@@ -272,7 +272,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.cardsGotoOrdering(cards);
 							const color=event.result.card.name=='wuxie'?'black':'red';
 							if(get.color(cards,false)!=color){
-								player.tempBanSkill('jsrgwentian');
+								player.tempBanSkill('jsrgwentian','roundStart');
 							}
 						}
 					}
@@ -284,12 +284,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				filter(event,player){
 					const zhu=get.zhu(player);
-					if(!zhu||!zhu.isZhu2()) return false;
-					return !player.isZhu2();
+					if(!zhu||!zhu.isZhu2()||!zhu.countCards('h')) return false;
+					return !player.isZhu2()&&player.countCards('h');
 				},
 				async content(event,trigger,player){
 					player.chooseToDebate(game.filterPlayer(current=>{
-						return current==player||current.isZhu2();
+						return (current==player||current.isZhu2())&&current.countCards('h');
 					})).set('callback',async event=>{
 						const result=event.debateResult;
 						if(result.bool&&result.opinion){
@@ -574,7 +574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!get.event('goon')) return 0;
 						return -get.attitude(get.player(),target);
 					}).set('goon',player.countCards('hs',['shan','caochuan'])||player.getHp()>=3);
-					if(!result.bool) return event.finish();
+					if(!result.bool) return;
 					const {targets}=result,target=targets[0];
 					player.logSkill('jsrgyoujin',target);
 					const {result:result2}=await player.chooseToCompare(target).set('small',true);
@@ -701,8 +701,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return p+c;
 					},0)<-4).set('logSkill',['jsrglonglin',trigger.player]);
 					if(result.bool){
-						trigger.targets.length=0;
-						trigger.all_excluded=true;
+						trigger.excluded.addArray(trigger.targets);
 						game.asyncDelayx();
 						if(trigger.player.canUse(juedou,player)){
 							const {result}=await trigger.player.chooseBool(`是否视为对${get.translation(player)}使用一张【决斗】？`).set('choice',get.effect(player,juedou,trigger.player,trigger.player)>=0);
@@ -880,7 +879,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					]);
 					next.set('prompt','鹰眎：点击将牌移动到牌堆顶或牌堆底');
 					next.processAI=list=>{
-						const cards=list[0][1],player=_status.event.player;
+						const cards=list[1][1],player=_status.event.player;
 						const top=[];
 						const judges=player.getCards('j');
 						let stopped=false;
@@ -977,6 +976,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							global:['gainAfter','equipAfter','addJudgeAfter','loseAsyncAfter','addToExpansionAfter'],
 						},
 						filter(event,player){
+							if(player.isHealthy()) return false;
 							const evt=event.getl(player);
 							return evt&&evt.es&&evt.es.length>0;
 						},
@@ -1011,7 +1011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						forced:true,
 						silent:true,
-						async content(event,trigger,player){
+						content(){
 							trigger.player.addGaintag(trigger.cards,'jsrgtuigu');
 							trigger.player.addTempSkill('jsrgtuigu_blocked',{player:'phaseAfter'});
 						}
@@ -1213,6 +1213,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				viewAs:{name:'lebu'},
 				position:'hes',
+				viewAsFilter(player){
+					return player.countCards('hes');
+				},
 				filterCard(card,player){
 					return get.color(card)=='red'&&get.type2(card)!='trick';
 				},
@@ -1506,22 +1509,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						audio:'jsrgdanxin',
 						trigger:{
-							player:['loseAfter','gainAfter'],
+							global:'gainAfter',
 						},
 						filter(event,player){
-							if(event.getParent(2).name!='tuixinzhifu') return false;
-							const card=event.getParent(3).card;
+							const level=event.player!=player?1:2;
+							if(event.player!=player&&event.getParent(level).name!='tuixinzhifu') return false;
+							if(event.player==player&&event.getParent(level).name!='tuixinzhifu') return false;
+							const card=event.getParent(level+1).card;
 							return card&&card.storage&&card.storage.jsrgdanxin;
 						},
 						forced:true,
 						popup:false,
 						charlotte:true,
 						async content(event,trigger,player){
-							const {targets}=trigger.getParent(3);
+							const level=trigger.player!=player?1:2;
+							const {targets}=trigger.getParent(level+1);
 							await player.showCards(trigger.cards);
 							if(trigger.cards.some(card=>get.suit(card)=='heart')){
-								await get.owner(trigger.cards.find(card=>get.suit(card)=='heart')).recover();
+								const owners=trigger.cards.filter((card=>get.suit(card)=='heart')).map(card=>get.owner(card)).toUniqued();
+								for(const owner of owners){
+									if(owner&&owner.isIn()) await owner.recover();
+								}
 							}
+							if(trigger.player==player) return;
 							player.addTempSkill('jsrgdanxin_distance');
 							if(!player.storage.jsrgdanxin_distance) player.storage.jsrgdanxin_distance={};
 							const id=targets[0].playerid;
@@ -1570,7 +1580,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},true).set('ai',target=>{
 						const player=get.player();
 						const att=get.attitude(player,target);
-						const delta=get.value(target.getCards('e'),player)-get.value(player.getCards('e'),player);
+						let delta=get.value(target.getCards('e'),player)-get.value(player.getCards('e'),player);
 						if(att>0){
 							if(delta<0) delta+=att/3;
 						}
@@ -1754,7 +1764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					const target=event.target;
 					const targets=game.filterPlayer(current=>target.inRange(current)&&current!=player).sortBySeat(player);
-					if(!targets.length) return event.finish();
+					if(!targets.length) return;
 					while(targets.length){
 						const current=targets.shift();
 						if(current.countCards('he')) await current.chooseToDiscard('驰应：请弃置一张牌','he',true);
@@ -1777,7 +1787,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const targets=game.filterPlayer(current=>target.inRange(current)&&current!=player);
 							let eff=0;
 							for(const targetx of targets){
-								const effx=get.effect(targetx,{name:'guohe_copy2'},player,target);
+								let effx=get.effect(targetx,{name:'guohe_copy2'},player,target);
 								if(get.attitude(player,targetx)<0) effx/=2;
 								eff+=effx;
 							}
@@ -8200,7 +8210,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_zhugeliang:'梦诸葛亮',
 			jsrg_zhugeliang_prefix:'梦',
 			jsrgwentian:'问天',
-			jsrgwentian_info:'①你可以将牌堆顶的牌当【无懈可击】/【火攻】使用，若此牌不为黑色/红色，〖问天〗于本回合失效。②每回合限一次。你的一个阶段开始时，你可以观看牌堆顶的五张牌，然后将其中一张牌交给一名其他角色，将其余牌以任意顺序置于牌堆顶或牌堆底。',
+			jsrgwentian_info:'①你可以将牌堆顶的牌当【无懈可击】/【火攻】使用，若此牌不为黑色/红色，〖问天〗于本轮失效。②每回合限一次。你的一个阶段开始时，你可以观看牌堆顶的五张牌，然后将其中一张牌交给一名其他角色，将其余牌以任意顺序置于牌堆顶或牌堆底。',
 			jsrgchushi:'出师',
 			jsrgchushi_info:'出牌阶段限一次。若你不为主公，你可以与主公议事。若结果为：红色，你与其各摸一张牌，若你与其手牌数之和小于7，重复此流程；黑色，当你于本轮内造成属性伤害时，此伤害+1。',
 			jsrgyinlve:'隐略',
