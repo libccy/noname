@@ -8657,7 +8657,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						player:function(card,player,target){
-							if(target.hasMark('twlvren')) return 0.33;
+							if(target&&target.hasMark('twlvren')) return 0.33;
 						}
 					}
 				},

@@ -10575,7 +10575,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player:function(player,target){
 							var huoshao=false;
 							for(var i=0;i<ui.selected.cards.length;i++){
-								if(ui.selected.cards[i].name=='huoshaolianying'){huoshao=true;break}
+								if(ui.selected.cards[i].name=='huoshaolianying'){
+									huoshao=true;
+									break;
+								}
 							}
 							if(huoshao&&player.inline(target.getNext())) return -3;
 							if(target.isUnseen()) return 0;
