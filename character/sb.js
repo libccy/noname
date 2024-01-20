@@ -122,7 +122,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 											let num=0;
 											if(target.isLinked()) num+=0.5;
 											if(target.isTurnedOver()) num+=10;
-											return list.push(num);
+											list.push(num);
+											return list;
 										},[]).sort((a,b)=>b-a)[0];
 									case 2:
 										return Math.min(5,Math.max(1,game.dead.length));
@@ -133,7 +134,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 											let num=0;
 											if(target.name&&lib.character[target.name]) num+=get.rank(target.name,true);
 											if(target.name2&&lib.character[target.name2]) num+=get.rank(target.name2,true);
-											return list.push(num);
+											list.push(num);
+											return list;
 										},[]).sort((a,b)=>b-a)[0];
 								}
 							},
@@ -273,15 +275,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									let num=0;
 									if(target.name&&lib.character[target.name]) num+=get.rank(target.name,true);
 									if(target.name2&&lib.character[target.name2]) num+=get.rank(target.name2,true);
-									return list.push(num);
+									list.push(num);
+									return list;
 								},[]).sort((a,b)=>b-a)[0];
 							case 2:
 								return 0;
 							case 3:
 								return game.filterPlayer(target=>target!=player&&!target.hasSkill('sbfangzhu_ban')).reduce((list,target)=>{
-									if(get.attitude(player,target)>0&&target.isTurnedOver()) return list.push(10*target.countCards('hs')+1);
-									if(get.attitude(player,target)<0&&!target.isTurnedOver()) return list.push(5*target.countCards('hs')+1);
-									return list.push(0);
+									if(get.attitude(player,target)>0&&target.isTurnedOver()) list.push(10*target.countCards('hs')+1);
+									else if(get.attitude(player,target)<0&&!target.isTurnedOver()) list.push(5*target.countCards('hs')+1);
+									else list.push(0);
+									return list;
 								},[]).sort((a,b)=>b-a)[0];
 							case 4:
 								return 0;
