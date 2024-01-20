@@ -414,20 +414,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return target!=player&&target.countCards('he')>0;
 								},
 								ai1:function(card){
-									var player=_status.event.player;
-									var num=player.getExpansions('olkongsheng').length,hs=player.countCards('h');
-									if(get.position(card)!='e') hs--;
-									if(hs==num&&player.isDamaged()&&get.recoverEffect(player,player,player)>0) return 9-get.value(card);
+									let player=_status.event.player;
+									if(_status.event.me){
+										if(get.position(card)===_status.event.me) return 12-player.hp-get.value(card);
+										return 0;
+									}
 									return 5-get.value(card);
 								},
 								ai2:function(target){
-									var player=_status.event.player;
-									var has=target.hasCard(function(card){
+									let player=_status.event.player,att=get.attitude(player,target);
+									if(att>0&&(_status.event.me||target.isHealthy())) return -att;
+									if(att>0&&(target.countCards('he')>target.hp||target.hasCard(function(card){
 										return get.value(card,target)<=0;
-									},'e'),att=get.attitude(player,target);
-									if(!has) att=-att;
-									return att*has?2:1;
+									},'e'))) return att;
+									return -att;
 								},
+								me:function(){
+									if(player.isHealthy()||get.recoverEffect(player,player,_status.event.player)<=0) return false;
+									let ph=player.countCards('h'),num=player.getExpansions('olkongsheng').length;
+									if(ph===num){
+										if(player.hasSkillTag('noh')) return 'h';
+										return 'e';
+									}
+									if(ph-1===num) return 'h';
+									return false;
+								}()
 							});
 							'step 1'
 							if(result.bool){
