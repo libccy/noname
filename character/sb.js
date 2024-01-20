@@ -655,7 +655,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								const event=get.event();
 								if(!event.isMine()) return;
 								if(button.classList.contains('selectable')==false) return;
-								if(ui.selected.buttons.length>=lib.skill.sbkanpo.getNumber) return false;
+								if(ui.selected.buttons.length>=sum) return false;
 								button.classList.add('selected');
 								ui.selected.buttons.push(button);
 								let counterNode=button.querySelector('.caption');
