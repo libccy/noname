@@ -1634,9 +1634,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcminze:{
 				audio:2,
 				enable:'phaseUse',
-				filter:function(event,player){
-					return !player.hasSkill('dcminze_ban');
-				},
 				filterTarget:function(card,player,target){
 					if(player.getStorage('dcminze_targeted').includes(target)) return false;
 					return target.countCards('h')<player.countCards('h');
@@ -1653,16 +1650,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:false,
 				group:'dcminze_draw',
 				content:function(){
-					'step 0'
 					player.give(cards,target);
 					player.addTempSkill('dcminze_targeted','phaseUseAfter');
 					player.markAuto('dcminze_targeted',[target]);
 					player.addTempSkill('dcminze_given');
 					player.markAuto('dcminze_given',cards.map(i=>get.name(i,player)));
-					'step 1'
-					if(target.countCards('h')>player.countCards('h')){
-						player.addTempSkill('dcminze_ban','phaseUseAfter');
-					}
 				},
 				ai:{
 					order:6.5,
@@ -1670,7 +1662,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					targeted:{onremove:true,charlotte:true},
-					ban:{charlotte:true},
 					given:{
 						charlotte:true,
 						onremove:true,
@@ -11494,7 +11485,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczuowei_info:'当你于回合内使用牌时，你可以根据你的手牌数执行对应效果：大于X，令此牌不可被响应；等于X，对一名其他角色造成1点伤害；小于X，摸两张牌且不能于本回合再触发该选项（X为你装备区里牌的数量且至少为1）。',
 			liuchongluojun:'刘宠骆俊',
 			dcminze:'悯泽',
-			dcminze_info:'①出牌阶段每名角色限一次。你可以将至多两张牌名不同的牌交给一名手牌数小于你的角色，若其因此手牌数大于你，〖悯泽①〗于此阶段失效。②结束阶段，你将手牌摸至X张（X为你本回合因〖悯泽①〗失去过的牌的牌名数且至多为5）。',
+			dcminze_info:'①出牌阶段每名角色限一次。你可以将至多两张牌名不同的牌交给一名手牌数小于你的角色。②结束阶段，你将手牌摸至X张（X为你本回合因〖悯泽①〗失去过的牌的牌名数且至多为5）。',
 			dcjini:'击逆',
 			dcjini_info:'当你受到伤害后，你可以重铸至多Y张手牌（Y为你的体力上限减本回合你以此法重铸过的牌数）。若你以此法获得了【杀】，你可以对伤害来源使用一张无视距离且不可被响应的【杀】。',
 			yuechen:'乐綝',
