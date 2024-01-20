@@ -10144,10 +10144,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						target:function(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return;
 							if(player==target.getNext()||player==target.getPrevious()) return;
-							var num=get.tag(card,'damage');
-							if(num){
-								return 0;
-							}
+							if(get.tag(card,'damage')) return 'zeroplayertarget';
 						},
 					},
 				},
