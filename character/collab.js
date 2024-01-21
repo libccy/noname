@@ -387,6 +387,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//会玩孙权
 			dczhiheng:{
 				audio:'rezhiheng',
+				init:(player)=>{
+					player.storage.dczhiheng_hit=[];
+				},
 				enable:'phaseUse',
 				position:'he',
 				filterCard:lib.filter.cardDiscardable,
@@ -440,12 +443,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					hit:{
 						charlotte:true,
-						onremove:true,
+						onremove:(player)=>{
+							player.storage.dczhiheng_hit=[];
+						},
 						mark:true,
 						marktext:'衡',
 						intro:{
-							markcount:function(storage,player){
-								return player.getStorage('dczhiheng_hit').length;
+							markcount:function(storage){
+								if(storage) return storage.length;
+								return 0;
 							},
 							content:'本回合已对$造成过伤害',
 						},
