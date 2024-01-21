@@ -482,32 +482,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'twjieyu',
 				trigger:{player:'phaseJieshuBegin'},
 				filter:function(event,player){
-					for(var i=0;i<ui.discardPile.childElementCount;i++){
-						if(get.type(ui.discardPile.childNodes[i])=='basic') return true;
+					for(let i=0;i<ui.discardPile.childElementCount;i++){
+						if(get.type(ui.discardPile.childNodes[i],false)=='basic') return true;
 					}
 					return false;
 				},
 				prompt2:function(event,player){
-					const num=lib.skill.jieyu.getNum(player,true);
+					const num=lib.skill.jieyu.getNum(player);
 					return '获得弃牌堆中'+get.cnNumber(num)+'张'+(num>1?'牌名各不相同的':'')+'基本牌';
 				},
 				async content(event,trigger,player){
-					const num=lib.skill.jieyu.getNum(player,false);
-					let gains=[],names=lib.inpile.filter(name=>get.type(name)=='basic').randomGets(num);
-					names.forEach(name=>{
-						let card=get.discardPile(card=>card.name==name);
-						if(name) gains.push(card);
-					});
-					if(gains.length) player.gain(gains,'gain2');
+					const num=lib.skill.jieyu.getNum(player,event);
+					let gains=[],names=[];
+					for(let i=0;i<ui.discardPile.childElementCount;i++){
+						let card=ui.discardPile.childNodes[i];
+						if(get.type(card,false)=='basic'&&!names.includes(card.name)){
+							gains.push(card);
+							names.push(card.name);
+						}
+					}
+					if(gains.length) player.gain(gains.randomGets(Math.min(gains.length,num)),'gain2');
 				},
-				getNum:function(player,goon){
-					let num=3,bool=goon;
+				getNum:function(player,event){
+					let num=3;
 					const history=game.getAllGlobalHistory('everything');
 					for(let i=history.length-1;i>=0;i--){
 						const evt=history[i];
-						if(evt.name=='useSkill'&&evt.player==player&&evt.skill=='jieyu'){
-							if(!bool) bool=true;
-							else break;
+						if(evt.name=='jieyu'&&evt.player==player){
+							if(!event||evt!=event) break;
 						}
 						if(evt.name=='useCard'&&evt.player!=player&&evt.targets&&evt.targets.includes(player)&&get.tag(evt.card,'damage')){
 							num--;
@@ -599,7 +601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(to.hujia>0) return distance+1;
 					},
 				},
-				audio:2,
+				audio:true,
 				trigger:{player:'damageBegin2'},
 				filter:function(event,player){
 					return player.hujia>0&&event.hasNature('fire');

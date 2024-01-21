@@ -129,6 +129,7 @@ window.noname_character_rank={
 		'caoxian',
 		'sb_guanyu',
 		'mb_chengui',
+		'sb_caopi',
 	],
 	a:[
 		'diy_zaozhirenjun',
@@ -356,6 +357,7 @@ window.noname_character_rank={
 		'dc_sb_zhouyu',
 	],
 	am:[
+		'muludawang',
 		'diy_caiwenji',
 		'diy_liuyan',
 		'diy_zhenji',
@@ -650,6 +652,7 @@ window.noname_character_rank={
 		'mb_huban',
 	],
 	bp:[
+		'xin_huojun',
 		'chess_diaochan',
 		'chess_huangzhong',
 		'chess_sunshangxiang',
@@ -1019,6 +1022,7 @@ window.noname_character_rank={
 		'sb_huangyueying',
 	],
 	b:[
+		'liyi',
 		'diy_feishi',
 		'diy_liufu',
 		'diy_tianyu',
@@ -2089,6 +2093,8 @@ window.noname_character_rank={
 			'dc_sb_zhouyu',
 		],
 		rare:[
+			'xin_huojun',
+			'muludawang',
 			'mb_huban',
 			'sp_jianggan',
 			'ol_caozhang',
