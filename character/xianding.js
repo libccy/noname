@@ -13859,7 +13859,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjinjie:'尽节',
 			dcjinjie_info:'当一名角色进入濒死状态时，可以令其摸一张牌。然后若你本轮未进行过回合，你可以弃置X张手牌令其回复1点体力（X为本轮你发动过〖尽节〗的次数）。',
 			dcjue:'举讹',
-			dcjue_info:'准备阶段，你可以视为对一名未受伤的角色使用一张【杀】。',
+			dcjue_info:'准备阶段，你可以视为对一名体力值或手牌数大于你的角色使用一张【杀】。',
 			dc_tengfanglan:'滕芳兰',
 			dcluochong:'落宠',
 			dcluochong_info:'一轮游戏开始时，你可以弃置任意名角色区域里的共计至多[4]张牌，然后若你以此法弃置了一名角色的至少三张牌，则你方括号内的数字-1。',
