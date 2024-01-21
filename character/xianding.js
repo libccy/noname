@@ -9182,7 +9182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			huaping:{
-				audio:'huaping',
+				audio:2,
 				trigger:{global:'die'},
 				limited:true,
 				skillAnimation:true,
