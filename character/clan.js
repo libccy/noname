@@ -1927,7 +1927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list.sort((a,b)=>{
 								var del1=lib.inpile.indexOf(a[2])-lib.inpile.indexOf(b[2]);
 								if(del1!=0) return del1;
-								var a1=0,a2=0;
+								var a1=0,b1=0;
 								if(a.length>3) a1=(lib.nature.get(a)||0);
 								if(b.length>3) b1=(lib.nature.get(b)||0);
 								return a1-b1;
