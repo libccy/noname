@@ -769,7 +769,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.tempBanSkill('olxiangxv',null,false);
 					player.when({global:'phaseEnd'}).then(()=>{
 						if(target&&target.isIn()){
-							var num=target.countCards('h')!=player.countCards('h');
+							var num=target.countCards('h')-player.countCards('h');
 							if(num){
 								if(num>0){
 									if(player.countCards('h')<5) player.draw(Math.min(5-player.countCards('h'),num));
@@ -2399,7 +2399,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					evt.set('olqifan',true);
 					var cards=get.bottomCards(lib.skill.olqifan.getNum(),true);
 					var aozhan=player.hasSkill('aozhan');
-					player.chooseButton(['器翻：选择要使用的牌',cards]).set('filterButton',function(button){
+					player.chooseButton(['嚣翻：选择要使用的牌',cards]).set('filterButton',function(button){
 						return _status.event.cards.includes(button.link);
 					}).set('cards',cards.filter(function(card){
 						if(aozhan&&card.name=='tao'){
@@ -2483,7 +2483,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(hs>0) player.chooseToDiscard(hs,pos,true);
 						event.num++;
 						if(event.num<event.maxNum) event.redo();
-					}).translation('器翻');
+					}).translation('嚣翻');
 				},
 				filterCard:function(){return false},
 				selectCard:-1,
@@ -26763,7 +26763,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oljianxuan_info:'当你受到伤害后，你可以令一名角色摸一张牌，然后若其手牌数等于你〖刚述①〗中的任意一项对应的数值，其重复此流程。',
 			ol_pengyang:'OL彭羕',
 			ol_pengyang_prefix:'OL',
-			olqifan:'器翻',
+			olqifan:'嚣翻',
 			olqifan_info:'当你需要使用不为【无懈可击】的牌时，你可以观看牌堆底的X张牌并使用其中的一张。此牌结算结束时，你依次弃置以下前X个区域中的所有牌：⒈判定区、⒉装备区、⒊手牌区（X为本回合使用过的牌中包含的类型数）。',
 			oltuishi:'侻失',
 			oltuishi_info:'锁定技。①你不能使用【无懈可击】。②当你使用点数为字母的牌时，你令此牌无效并摸一张牌，且你对手牌数小于你的角色使用的下一张牌无距离和次数限制。',
