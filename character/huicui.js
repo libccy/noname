@@ -10461,7 +10461,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.markAuto('dcxunji_effect',[target]);
 					player.addTempSkill('dcxunji_effect',{player:'die'});
-					target.markSkill('dcxunji_mark');
+					target.addTempSkill('dcxunji_mark',{player:'phaseEnd'});
 				},
 				ai:{
 					order:1,
@@ -10474,6 +10474,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					mark:{
+						mark:true,
 						marktext:'嫉',
 						intro:{content:'你已经被盯上了！'},
 					},
@@ -10505,10 +10506,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						popup:false,
 						filter:function(event,player){
-							return event.card&&event.card.name=='juedou'&&event.getParent().skill=='dcxunji_effect';
+							return event.card&&event.card.name=='juedou'&&event.getParent().skill=='dcxunji_effect'&&event.player.isIn();
 						},
 						content:function(){
-							player.loseHp(trigger.num);
+							trigger.player.line(player);
+							player.damage(trigger.num,trigger.player);
 						},
 					},
 				},
@@ -11118,7 +11120,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuangdan_info:'锁定技，其他角色的回合结束时，若你的手牌数为全场唯一最多，则你令〖裂胆〗失效直到你下回合结束。',
 			dc_caiyang:'蔡阳',
 			dcxunji:'寻嫉',
-			dcxunji_info:'出牌阶段限一次，你可以选择一名其他角色。该角色的下个结束阶段开始时，若其于该回合内造成过伤害，则你视为对其使用一张【决斗】，且当此【决斗】对其造成伤害后，你失去等量的体力。',
+			dcxunji_info:'出牌阶段限一次，你可以选择一名其他角色。该角色的下个结束阶段开始时，若其于该回合内造成过伤害，则你视为对其使用一张【决斗】，且当此【决斗】对其造成伤害后，其对你造成等量的伤害。',
 			dcjiaofeng:'交锋',
 			dcjiaofeng_info:'锁定技。每回合限一次，当你造成伤害时，若你本回合内未造成过其他伤害且你已损失的体力值：大于0，则你摸一张牌；大于1，则此伤害+1；大于2，则你回复1点体力。',
 			zhoushan:'周善',
