@@ -7377,7 +7377,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					aiOrder:(player,card,num)=>{
 						if(num>0&&get.itemtype(card)==='card'&&get.subtype(card)==='equip1'&&!player.getEquip(1)){
 							if(card.name!=='zhuge'||player.getCardUsable('sha')||!player.needsToDiscard()||player.countCards('hs',i=>{
-								return get.name(i)==='sha'&&lib.filter.cardEnabled(i,target);
+								return get.name(i)==='sha'&&lib.filter.cardEnabled(i,player);
 							})<2) return 0;
 						}
 					},
