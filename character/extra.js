@@ -6061,7 +6061,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:function(player){
 					game.countPlayer2(current=>{
 						if(current.getStorage('dawu2').includes(player)){
-							current.unmarkAuto('dawu2',player);
+							current.unmarkAuto('dawu2',[player]);
 							current.removeAdditionalSkill(`dawu_${player.playerid}`);
 						}
 					},true);
