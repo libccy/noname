@@ -5336,7 +5336,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var dialog=ui.create.dialog('劝谏：令一名其他角色…','hidden');
 						dialog.add([[
 							['damage','对其攻击范围内的一名角色造成1点伤害'],
-							['draw','将其手牌数调整至体力上限（至多摸至五张），且其本回合内不能使用手牌']
+							['draw','将其手牌数调整至手牌上限（至多摸至五张），且其本回合内不能使用手牌']
 						],'textbutton']);
 						return dialog;
 					},
@@ -5349,7 +5349,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					prompt:function(links){
 						if(links[0]=='damage') return '令一名其他角色对攻击范围内的另一名角色造成1点伤害';
-						return '令一名其他角色将手牌数调整至体力上限（至多摸至五张）且本回合内不能使用手牌';
+						return '令一名其他角色将手牌数调整至手牌上限（至多摸至五张）且本回合内不能使用手牌';
 					},
 				},
 				ai:{
@@ -5407,15 +5407,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterTarget:function(card,player,target){
 							if(target==player) return false;
 							var num=target.countCards('h');
-							if(num>target.maxHp) return true;
-							return num<Math.min(5,target.maxHp);
+							if(num>target.getHandcardLimit()) return true;
+							return num<Math.min(5,target.getHandcardLimit());
 						},
 						filterCard:()=>false,
 						selectCard:-1,
 						content:function(){
 							'step 0'
 							player.addTempSkill('dcquanjian_draw','phaseUseAfter');
-							var num1=target.countCards('h'),num2=target.maxHp;
+							var num1=target.countCards('h'),num2=target.getHandcardLimit();
 							var num=0;
 							if(num1>num2){
 								event.index=0;
@@ -5459,7 +5459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							result:{
 								target:function(player,target){
-									var num1=target.countCards('h'),num2=target.maxHp;
+									var num1=target.countCards('h'),num2=target.getHandcardLimit();
 									if(num1>num2) return -1;
 									return Math.min(5,num2)-num1;
 								},
@@ -11330,7 +11330,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyongbi_info:'限定技。出牌阶段，你可以将所有手牌交给一名其他男性角色。你将〖媵予〗的发动时机改为“准备阶段和结束阶段开始时”。然后若这些牌中包含的花色数：大于1，则你与其本局游戏的手牌上限+2；大于2，则当你或其于本局游戏内受到大于1的伤害时，此伤害-1。',
 			dc_huangquan:'黄权',
 			dcquanjian:'劝谏',
-			dcquanjian_info:'出牌阶段每项各限一次。你可以选择一项流程并选择一名其他角色A：⒈令A对其攻击范围内的另一名角色B造成1点伤害。⒉令A将手牌数调整至体力上限（至多摸至五张），且其本回合内不能使用或打出手牌。然后A选择一项：⒈执行此流程。⒉本回合下次受到的伤害+1。',
+			dcquanjian_info:'出牌阶段每项各限一次。你可以选择一项流程并选择一名其他角色A：⒈令A对其攻击范围内的另一名角色B造成1点伤害。⒉令A将手牌数调整至手牌上限（至多摸至五张），且其本回合内不能使用或打出手牌。然后A选择一项：⒈执行此流程。⒉本回合下次受到的伤害+1。',
 			dctujue:'途绝',
 			dctujue_info:'限定技。当你进入濒死状态时，你可以将所有牌交给一名其他角色。然后你回复等量的体力并摸等量的牌。',
 			chengui:'陈珪',
