@@ -599,7 +599,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(to.hujia>0) return distance+1;
 					},
 				},
-				audio:2,
+				audio:true,
 				trigger:{player:'damageBegin2'},
 				filter:function(event,player){
 					return player.hujia>0&&event.hasNature('fire');
