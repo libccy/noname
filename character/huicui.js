@@ -334,7 +334,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const player=map.player;
 					let result;
 					result=yield player.chooseTarget(get.prompt2('dcdingji')).set('ai',target=>{
-						const att=get.attitude(get.player(),target)/2;
+						let att=get.attitude(get.player(),target)/2;
 						const delta=5-target.countCards('h');
 						let fix=1;
 						const hs=target.getCards('h');
