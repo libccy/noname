@@ -731,8 +731,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						});
 						choiceList1=choiceList.filter(control=>{
 							if(choiceList.indexOf(control)==0) return current.countCards('he',card=>current.canRecast(card));
-							if(choiceList.indexOf(control)==2) return current.countCards('he',card=>card.name=='sha'&&current.hasUseTarget(card));
-							if(choiceList.indexOf(control)==1) return current.countCards('he',card=>lib.filter.cardDiscardable(card,current))>1;
+							if(choiceList.indexOf(control)==1) return current.countCards('he',card=>card.name=='sha'&&current.hasUseTarget(card));
+							if(choiceList.indexOf(control)==2) return current.countCards('he',card=>lib.filter.cardDiscardable(card,current))>1;
 						});
 						if(list1.length){
 							if(list1.length==1) result.push(list.indexOf(list1[0]));
