@@ -769,7 +769,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.tempBanSkill('olxiangxv',null,false);
 					player.when({global:'phaseEnd'}).then(()=>{
 						if(target&&target.isIn()){
-							var num=target.countCards('h')!=player.countCards('h');
+							var num=target.countCards('h')-player.countCards('h');
 							if(num){
 								if(num>0){
 									if(player.countCards('h')<5) player.draw(Math.min(5-player.countCards('h'),num));
