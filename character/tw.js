@@ -6188,7 +6188,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseCard('he',get.prompt('twxingwu'),'将一张牌置于武将牌上作为“星舞”').set('ai',function(card){
 						if(_status.event.goon) return 20-get.value(card);
 						return 7-get.value(card);
-					}).set('goon',player.needsToDiscard()||player.getStorage('twxingwu').length>1);
+					}).set('goon',player.needsToDiscard()||player.getExpansions('twxingwu').length>1);
 					'step 1'
 					if(result.bool){
 						player.logSkill('twxingwu');
