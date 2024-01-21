@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			mobile:{
-				mobile_default:['mb_chengui','mb_huban','mb_xianglang','yanxiang','xin_wuban','laimin','baoxin','jiangji','liwei','xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
+				mobile_default:['xin_huojun','muludawang','mb_chengui','mb_huban','mb_xianglang','yanxiang','xin_wuban','laimin','baoxin','jiangji','liwei','xin_guozhao',"miheng","taoqian","lingcao","sunru","lifeng","zhuling","liuye","zhaotongzhaoguang","majun","simazhao","wangyuanji","pangdegong","shenpei","hujinding","zhangyì","jiakui","yangbiao","chendeng","dongcheng","yangyi","dengzhi","zhengxuan","sp_sufei","furong","dingyuan","simashi","yanghuiyu","hucheer","gongsunkang","nanhualaoxian","zhouqun","qiaozhou","fuqian","simafu","mayuanyi","yanpu","sunhanhua","sp_maojie","peixiu","sp_jianggan","ruanhui","xin_mamidi","sp_caosong","yangfu","wangjun","sp_pengyang","qianzhao",'shichangshi'],
 				mobile_yijiang:["yj_zhanghe","yj_zhangliao","yj_xuhuang","yj_ganning",'yj_huangzhong','yj_weiyan','yj_zhoubuyi'],
 				mobile_standard:["xin_xiahoudun","xin_zhangfei"],
 				mobile_shenhua_feng:['re_xiaoqiao',"xin_zhoutai"],
@@ -26,6 +26,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			xin_huojun:['male','shu',4,['sidai','jieyu'],['character:tw_huojun','die_audio:tw_huojun']],
+			muludawang:['male','qun','3/3/1',['shoufa','yuxiang','zhoulin']],
 			mb_chengui:['male','qun',3,['guimou','zhouxian']],
 			mb_huban:['male','wei',4,['mbyilie']],
 			mb_xianglang:['male','shu',3,['naxue','yijie']],
@@ -176,6 +178,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			scs_gaowang:['male','qun','',['scsmiaoyu'],['unseen','sex:male_castrated']],
 		},
 		characterIntro:{
+			muludawang:'古典小说《三国演义》中的虚构人物，八纳洞主，孟获盟友。擅驱兽法，能行风雨，控制猛兽并指挥它们作战。在法术帮助下最初对蜀军取得一些胜利，但在诸葛亮的喷火木兽将他的动物吓跑后战败，最后死于乱军之中。',
 			laimin:'来敏（165年—261年），字敬达，义阳新野人，东汉太中大夫来歙之后，司空来艳之子，三国时期蜀汉官员。东汉末年，逢董卓之乱，来敏跟随姐夫黄琬到荆州避难，黄琬是刘璋祖母的侄子，来敏又与姐姐来氏入蜀，被刘璋引为宾客。来敏喜欢读书，尤其喜欢《左氏春秋》。刘备平定益州后，以来敏为典学校尉，后立太子，来敏为家令。刘禅继位后，任命来敏为虎贲中郎将，诸葛亮驻汉中，请来敏为军祭酒、辅军将军。却因其口出狂言而被罢官，诸葛亮死后，来敏历任大长秋、光禄大夫、执慎将军等职，期间多次因说错话而被免官，蜀汉景耀年间，来敏去世，时年九十七岁。',
 			shichangshi:'十常侍，指中国东汉（公元25年—220年）灵帝时期（168年-189年）操纵政权的十二个宦官：张让、赵忠、夏恽、郭胜、孙璋、毕岚、栗嵩、段珪、高望、张恭、韩悝、宋典（在小说《三国演义》里，十常侍指的是指张让、赵忠、封谞、段珪、曹节、侯览、蹇硕、程旷、夏恽、郭胜十人），他们都任职中常侍。玩弄小皇帝于股掌之中，以至灵帝称“张常侍是我父，赵常侍是我母”。十常侍自己横征暴敛，卖官鬻爵，他们的父兄子弟遍布天下，横行乡里，祸害百姓，无官敢管。人民不堪剥削、压迫，纷纷起来反抗。当时一些比较清醒的官吏，已看出宦官集团的黑暗腐败，导致大规模农民起义的形势。郎中张钧在给皇帝的奏章中明确指出，黄巾起义是外戚宦官专权逼出来的，他说：“张角所以能兴兵作乱，万人所以乐附之者，其源皆由十常侍多放父兄、子弟、婚宗、宾客典据州郡，辜确财利，侵略百姓，百姓之怨无所告诉，故谋议不轨，聚为‘盗贼’。”后被曹操、袁绍所歼。',
 			sunzhang:'孙璋（？-189年？）东汉末期汉灵帝的宦官，官居中常侍，为十常侍之一，在张让、赵忠之下位居第三。光熹元年（189年），张让、赵忠、段珪等诛杀何进，袁绍率军入宫，诛杀孙璋。',
@@ -391,6 +394,255 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//霍骏
+			sidai:{
+				audio:'twsidai',
+				enable:'phaseUse',
+				usable:1,
+				locked:false,
+				limited:true,
+				skillAnimation:true,
+				animationColor:'fire',
+				filter:function(event,player){
+					var cards=player.getCards('h',{type:'basic'});
+					if(!cards.length) return false;
+					for(var i of cards){
+						if(!game.checkMod(i,player,'unchanged','cardEnabled2',player)) return false;
+					}
+					return event.filterCard(get.autoViewAs({name:'sha',storage:{sidai:true}},cards),player,event);
+				},
+				viewAs:{name:'sha',storage:{sidai:true}},
+				filterCard:{type:'basic'},
+				selectCard:-1,
+				check:()=>1,
+				onuse:function(result,player){
+					player.awakenSkill('sidai');
+					player.addTempSkill('sidai_tao');
+					player.addTempSkill('sidai_shan');
+				},
+				ai:{
+					order:function(item,player){
+						return get.order({name:'sha'},player)+0.1;
+					},
+					result:{
+						target:function(player,target){
+							var cards=ui.selected.cards.slice(0);
+							var names=[];
+							for(var i of cards) names.add(i.name);
+							if(names.length<player.hp) return 0;
+							if(player.hasUnknown()&&(player.identity!='fan'||!target.isZhu)) return 0;
+							if(get.attitude(player,target)>=0) return -20;
+							return lib.card.sha.ai.result.target.apply(this,arguments);
+						},
+					},
+				},
+				subSkill:{
+					tao:{
+						trigger:{source:'damageSource'},
+						filter:function(event,player){
+							if(!event.card||!event.card.storage||!event.card.storage.sidai||!event.player.isIn()) return false;
+							for(var i of event.cards){
+								if(i.name=='tao') return true;
+							}
+							return false;
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							trigger.player.loseMaxHp();
+						},
+					},
+					shan:{
+						trigger:{player:'useCardToPlayered'},
+						filter:function(event,player){
+							if(!event.card||!event.card.storage||!event.card.storage.sidai||!event.target.isIn()) return false;
+							for(var i of event.cards){
+								if(i.name=='shan') return true;
+							}
+							return false;
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							'step 0'
+							trigger.target.chooseToDiscard('h',{type:'basic'},'弃置一张基本牌，否则不能响应'+get.translation(trigger.card)).set('ai',function(card){
+								var player=_status.event.player;
+								if(player.hasCard('hs',function(cardx){
+									return cardx!=card&&get.name(cardx,player)=='shan';
+								})) return 12-get.value(card);
+								return 0;
+							});
+							'step 1'
+							if(!result.bool) trigger.directHit.add(trigger.target);
+						},
+					},
+				},
+			},
+			jieyu:{
+				audio:'twjieyu',
+				trigger:{player:'phaseJieshuBegin'},
+				filter:function(event,player){
+					for(var i=0;i<ui.discardPile.childElementCount;i++){
+						if(get.type(ui.discardPile.childNodes[i])=='basic') return true;
+					}
+					return false;
+				},
+				prompt2:function(event,player){
+					const num=lib.skill.jieyu.getNum(player,true);
+					return '获得弃牌堆中'+get.cnNumber(num)+'张'+(num>1?'牌名各不相同的':'')+'基本牌';
+				},
+				async content(event,trigger,player){
+					const num=lib.skill.jieyu.getNum(player,false);
+					let gains=[],names=lib.inpile.filter(name=>get.type(name)=='basic').randomGets(num);
+					names.forEach(name=>{
+						let card=get.discardPile(card=>card.name==name);
+						if(name) gains.push(card);
+					});
+					if(gains.length) player.gain(gains,'gain2');
+				},
+				getNum:function(player,goon){
+					let num=3,bool=goon;
+					const history=game.getAllGlobalHistory('everything');
+					for(let i=history.length-1;i>=0;i--){
+						const evt=history[i];
+						if(evt.name=='useSkill'&&evt.player==player&&evt.skill=='jieyu'){
+							if(!bool) bool=true;
+							else break;
+						}
+						if(evt.name=='useCard'&&evt.player!=player&&evt.targets&&evt.targets.includes(player)&&get.tag(evt.card,'damage')){
+							num--;
+							if(num==1) break;
+						}
+					}
+					return num;
+				},
+			},
+			//木鹿大王
+			shoufa:{
+				audio:2,
+				trigger:{
+					player:'damageEnd',
+					source:'damageSource',
+				},
+				filter:function(event,player,name){
+					if(name=='damageSource'&&player.getHistory('sourceDamage').indexOf(event)!=0) return false;
+					return game.hasPlayer(target=>{
+						if(name=='damageEnd') return get.distance(player,target)>2;
+						return get.distance(player,target)<=2;
+					});
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const zhoufa=player.storage.zhoulin_zhoufa;
+					const str=zhoufa?[
+						'令其受到1点无来源伤害',
+						'你随机获得其一张牌',
+						'你随机弃置其装备区的一张牌',
+						'令其摸一张牌',
+					][['豹','鹰','熊','兔'].indexOf(zhoufa)]:'令其随机执行一个效果';
+					const {result:{bool,targets}}=await player.chooseTarget(get.prompt('shoufa'),'选择一名距离'+(event.triggername=='damageEnd'?'':'不')+'大于2的角色，'+str,(card,player,target)=>{
+						const name=_status.event.name;
+						if(name=='damageEnd'&&get.distance(player,target)<=2) return false;
+						if(name=='damageSource'&&get.distance(player,target)>2) return false;
+						const zhoufa=player.storage.zhoulin_zhoufa;
+						if(!zhoufa) return true;
+						if(zhoufa=='豹'||zhoufa=='兔') return true;
+						if(zhoufa=='鹰') return target.countCards('he');
+						return target.countDiscardableCards(player,'e');
+					}).set('ai',target=>{
+						const player=_status.event.player;
+						const zhoufa=player.storage.zhoulin_zhoufa;
+						if(!zhoufa) return -get.attitude(player,target);
+						switch(zhoufa){
+							case '豹':
+								return get.damageEffect(target,player,player);
+							case '鹰':
+								return get.effect(target,{name:'guohe_copy2'},player,player);
+							case '熊':
+								let att=get.attitude(player,target),eff=0;
+								target.getCards('e',card=>{
+									var val=get.value(card,target);
+									eff=Math.max(eff,-val*att);
+								});
+								return eff;
+							case '兔':
+								return get.effect(target,{name:'draw'},player,player);
+						}
+					}).set('name',event.triggername);
+					if(!bool) return;
+					const target=targets[0];
+					player.logSkill('shoufa',target);
+					const shoufa=zhoufa?zhoufa:['豹','鹰','熊','兔'].randomGet();
+					game.log(target,'执行','#g'+shoufa,'效果');
+					switch(shoufa){
+						case '豹':
+							target.damage('nosource');
+							break;
+						case '鹰':
+							player.gain(target.getGainableCards(player,'he'),target,'giveAuto');
+							break;
+						case '熊':
+							target.discard(target.getGainableCards(player,'e').randomGet()).discarder=player;
+							break;
+						case '兔':
+							target.draw();
+							break;
+					}
+				},
+			},
+			yuxiang:{
+				mod:{
+					globalFrom(from,to,distance){
+						if(from.hujia>0) return distance-1;
+					},
+					globalTo(from,to,distance){
+						if(to.hujia>0) return distance+1;
+					},
+				},
+				audio:2,
+				trigger:{player:'damageBegin2'},
+				filter:function(event,player){
+					return player.hujia>0&&event.hasNature('fire');
+				},
+				forced:true,
+				async content(event,trigger,player){
+					trigger.num++;
+				},
+			},
+			zhoulin:{
+				audio:2,
+				limited:true,
+				unique:true,
+				enable:'phaseUse',
+				skillAnimation:true,
+				animationColor:'fire',
+				async content(event,trigger,player){
+					player.awakenSkill('zhoulin');
+					player.changeHujia(2,null,true);
+					const {result:{control}}=await player.chooseControl('豹','鹰','熊','兔').set('ai',()=>'豹').set('prompt','选择一个固定效果');
+					if(control){
+						player.popup(control);
+						game.log(player,'选择了','#g'+control,'效果');
+						player.addTempSkill('zhoulin_zhoufa');
+						player.storage.zhoulin_zhoufa=control;
+						player.markSkill('zhoulin_zhoufa');
+						game.broadcastAll(function(player,zhoufa){
+							if(player.marks.zhoulin_zhoufa) player.marks.zhoulin_zhoufa.firstChild.innerHTML=zhoufa;
+						},player,control);
+					}
+				},
+				ai:{
+					order:12,
+					result:{player:1},
+				},
+				subSkill:{
+					zhoufa:{
+						charlotte:true,
+						onremove:true,
+						intro:{content:'已选择$效果'},
+					},
+				}
+			},
 			//陈珪
 			guimou:{
 				audio:2,
@@ -15380,6 +15632,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mobilexingxue:function(player){
 				return lib.translate[(player.storage.mobileyanzhu?'mobilexingxuex':'mobilexingxue')+'_info'];
 			},
+			shoufa:function(player){
+				const zhoufa=player.storage.zhoulin_zhoufa;
+				if(!zhoufa) return '当你受到伤害后/于一回合首次造成伤害后，你可以选择一名与你距离大于/不大于2的角色，令其随机执行以下一项：豹，令其受到1点无来源伤害；鹰，你随机获得其一张牌；熊，你随机弃置其装备区的一张牌；兔，令其摸一张牌。';
+				let str='当你受到伤害后/于一回合首次造成伤害后，你可以选择一名与你距离大于/不大于2的角色，';
+				str+=[
+					'令其受到1点无来源伤害',
+					'你随机获得其一张牌',
+					'你随机弃置其装备区的一张牌',
+					'令其摸一张牌',
+				][['豹','鹰','熊','兔'].indexOf(zhoufa)];
+				return str;
+			},
 		},
 		perfectPair:{
 			simazhao:['simayi','jin_simayi','jin_wangyuanji'],
@@ -16247,6 +16511,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbyilie2:'义烈',
 			mbyilie3:'义烈',
 			mbyilie_info:'锁定技。①游戏开始时，你选择一名其他角色，然后你获得以下效果：其受到伤害时，若你的“烈”标记数小于2，则你获得等同于伤害值的“烈”标记，然后防止此伤害；其对其他角色造成伤害后，你回复1点体力。②结束阶段，若你有“烈”标记，你摸X张牌并失去X点体力，然后移去所有“烈”标记（X为你拥有的“烈”标记数）。',
+			muludawang:'木鹿大王',
+			shoufa:'兽法',
+			shoufa_info:'当你受到伤害后/于一回合首次造成伤害后，你可以选择一名与你距离大于/不大于2的角色，令其随机执行以下一项：豹，令其受到1点无来源伤害；鹰，你随机获得其一张牌；熊，你随机弃置其装备区的一张牌；兔，令其摸一张牌。',
+			yuxiang:'御象',
+			yuxiang_info:'锁定技，若你有护甲值，则：①你计算与其他角色的距离-1，其他角色计算与你的距离+1；②当你受到火焰伤害时，此伤害+1。',
+			zhoulin:'咒鳞',
+			zhoulin_info:'限定技，出牌阶段，你可以获得2点护甲值，然后选择一个“兽法”效果，你发动〖兽法〗的执行效果改为你选择的效果直到你的下个回合结束。',
+			xin_huojun:'手杀霍峻',
+			xin_huojun_prefix:'手杀',
+			sidai:'伺怠',
+			sidai_info:'限定技，出牌阶段，你可以将手牌区内的所有基本牌当做【杀】使用。若此牌对应的实体牌中：包含【闪】，则目标角色成为此牌的目标后，需弃置一张基本牌，否则不可响应此牌；包含【桃】，则当目标角色受到此牌的伤害后，其减1点体力上限。',
+			jieyu:'竭御',
+			jieyu_info:'结束阶段，你可以从弃牌堆中获得共X张不同牌名的基本牌（X为3-你上次发动〖竭御〗至今你成为其他角色使用伤害类卡牌目标的次数，且X至少为1）。',
 
 			mobile_standard:'手杀异构·标准包',
 			mobile_shenhua_feng:'手杀异构·其疾如风',

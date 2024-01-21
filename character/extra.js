@@ -232,7 +232,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										case '鹤':
 											return true;
 										case '猿':
-											return game.hasPlayer(target=>target!=playertarget.countGainableCards(player,'e'));
+											return game.hasPlayer(target=>target!=player&&target.countGainableCards(player,'e'));
 										default:
 											return false;
 									}
