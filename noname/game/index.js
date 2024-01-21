@@ -7159,9 +7159,9 @@ export class Game extends Uninstantable {
 			}
 			for (let i = 0; i < event.config.num; i++) {
 				let rand2 = rand.randomGet();
-				for (let j = 0; j < rand2.length; j++) {
-					if (rand2[j] == rand2) {
-						rand2.splice(j--, 1);
+				for (let j = 0; j < rand.length; j++) {
+					if (rand[j] == rand2) {
+						rand.splice(j--, 1);
 					}
 				}
 				event.enemylist.push(event.enemy[rand2]);
