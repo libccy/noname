@@ -798,7 +798,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					end:{
 						audio:'olchanshuang',
-						trigger:{player:'phaseEnd'},
+						trigger:{player:'phaseJieshuBegin'},
 						filter:function(event,player){
 							return player.getHistory('lose',evt=>{
 								if(evt.type=='discard'){
