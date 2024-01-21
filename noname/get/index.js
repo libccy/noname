@@ -12,11 +12,11 @@ export class Get extends Uninstantable {
 	static is = Is;
 	/**
 	 * 获取当前内核版本信息
-	 * 
+	 *
 	 * 目前仅考虑`chrome`, `firefox`和`safari`三种浏览器的信息，其余均归于其他范畴
-	 * 
+	 *
 	 * > 其他后续或许会增加，但`IE`永无可能
-	 * 
+	 *
 	 * @returns {["firefox" | "chrome" | "safari" | "other", number]}
 	 */
 	static coreInfo() {
@@ -79,7 +79,7 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * Generate an object URL from the Base64-encoded octet stream
-	 * 
+	 *
 	 * 从Base64编码的八位字节流生成对象URL
 	 */
 	static objectURL(octetStream) {
@@ -91,7 +91,7 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * Get the card name length
-	 * 
+	 *
 	 * 获取此牌的字数
 	 */
 	static cardNameLength(card, player) {
@@ -102,7 +102,7 @@ export class Get extends Uninstantable {
 	//应变
 	/**
 	 * Get the Yingbian conditions (of the card)
-	 * 
+	 *
 	 * 获取（此牌的）应变条件
 	 */
 	static yingbianConditions(card) { return get.complexYingbianConditions(card).concat(get.simpleYingbianConditions(card)); }
@@ -116,7 +116,7 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * Get the Yingbian effects (of the card)
-	 * 
+	 *
 	 * 获取（此牌的）应变效果
 	 */
 	static yingbianEffects(card) {
@@ -125,7 +125,7 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * Get the default Yingbian effect of the card
-	 * 
+	 *
 	 * 获取此牌的默认应变效果
 	 */
 	static defaultYingbianEffect(card) {
@@ -154,9 +154,9 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * 新装备栏相关
-	 * 
+	 *
 	 * 获取一张装备牌实际占用的装备栏(君曹操六龙)
-	 * 
+	 *
 	 * 用法同get.subtype，返回数组
 	 */
 	static subtypes(obj, player) {
@@ -506,14 +506,14 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * @overload
-	 * @param { string } name 
+	 * @param { string } name
 	 * @returns { Character }
 	 */
 	/**
 	 * @template { 0 | 1 | 2 | 3 | 4 } T
 	 * @overload
-	 * @param { string } name 
-	 * @param { T } num 
+	 * @param { string } name
+	 * @param { T } num
 	 * @returns { Character[T] }
 	 */
 	static character(name, num) {
@@ -794,9 +794,9 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * 深拷贝函数（虽然只处理了部分情况）
-	 * 
+	 *
 	 * 除了普通的Object和NullObject，均不考虑自行赋值的数据，但会原样将Symbol复制过去
-	 * 
+	 *
 	 * @template T
 	 * @param {T} obj - 要复制的对象，若不是对象则直接返回原值
 	 * @param {boolean} [copyKeyDeep = false] - 是否深复制`Map`的`key`
@@ -1586,52 +1586,52 @@ export class Get extends Uninstantable {
 	 */
 	/**
 	 * @overload
-	 * @param { string } obj 
+	 * @param { string } obj
 	 * @returns { 'position' | 'natures' | 'nature' }
 	 */
 	/**
 	 * @overload
-	 * @param { Player[] } obj 
+	 * @param { Player[] } obj
 	 * @returns { 'players' }
 	 */
 	/**
 	 * @overload
-	 * @param { Card[] } obj 
+	 * @param { Card[] } obj
 	 * @returns { 'cards' }
 	 */
 	/**
 	 * @overload
-	 * @param { [number, number] } obj 
+	 * @param { [number, number] } obj
 	 * @returns { 'select' }
 	 */
 	/**
 	 * @overload
-	 * @param { [number, number, number, number] } obj 
+	 * @param { [number, number, number, number] } obj
 	 * @returns { 'divposition' }
 	 */
 	/**
 	 * @overload
-	 * @param { Button } obj 
+	 * @param { Button } obj
 	 * @returns { 'button' }
 	 */
 	/**
 	 * @overload
-	 * @param { Card } obj 
+	 * @param { Card } obj
 	 * @returns { 'card' }
 	 */
 	/**
 	 * @overload
-	 * @param { Player } obj 
+	 * @param { Player } obj
 	 * @returns { 'player' }
 	 */
 	/**
 	 * @overload
-	 * @param { Dialog } obj 
+	 * @param { Dialog } obj
 	 * @returns { 'dialog' }
 	 */
 	/**
 	 * @overload
-	 * @param { GameEvent | GameEventPromise } obj 
+	 * @param { GameEvent | GameEventPromise } obj
 	 * @returns { 'event' }
 	 */
 	static itemtype(obj) {
@@ -1716,7 +1716,7 @@ export class Get extends Uninstantable {
 		return 0;
 	}
 	/**
-	 * 
+	 *
 	 * @param {Card | VCard} card
 	 * @param {false | Player} [player]
 	 * @returns {string}
@@ -1736,7 +1736,7 @@ export class Get extends Uninstantable {
 	 * @returns {string}
 	 */
 	static suit(card, player) {
-		if (!card) return;
+		if (typeof card !== 'object') return;
 		if (Array.isArray(card)) {
 			if (card.length == 1) return get.suit(card[0], player);
 			return 'none';
@@ -1761,7 +1761,7 @@ export class Get extends Uninstantable {
 	 * @returns {string}
 	 */
 	static color(card, player) {
-		if (!card) return;
+		if (typeof card !== 'object') return;
 		if (Array.isArray(card)) {
 			if (!card.length) return 'none';
 			const cards = card.slice(), color = get.color(cards.shift(), player);
@@ -1790,7 +1790,7 @@ export class Get extends Uninstantable {
 	 * @returns {number}
 	 */
 	static number(card, player) {
-		if (!card) return;
+		if (typeof card !== 'object') return;
 		//狗卡你是真敢出啊
 		var number = null;
 		if ('number' in card) {
