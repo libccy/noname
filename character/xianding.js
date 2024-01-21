@@ -121,8 +121,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				logTarget:'player',
 				content:function*(event,map){
-					const player=map.player;
-					let trigger=map.trigger,targets=trigger.targets.slice();
+					const player=map.player,trigger=map.trigger,target=trigger.player;
+					let targets=trigger.targets.slice();
+					targets.sortBySeat((_status.currentPhase||target));
 					targets.remove(player);
 					player.when({global:'useCardToTargeted'}).filter(evt=>targets.length&&evt.getParent()==trigger&&evt.targets.length==evt.getParent().triggeredTargets4.length).then(()=>{
 						trigger.getParent().targets=[player].concat(targets);
