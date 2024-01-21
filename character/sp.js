@@ -764,6 +764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										if(card.name!='sha') return false;
 										return lib.filter.filterCard.apply(this,arguments);
 									},
+									forced:true,
 									ai1:function(card){
 										return _status.event.player.getUseValue(card);
 									},
@@ -819,23 +820,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									return evtx&&evtx.cards2.length==2;
 								}
 							}).length) num++;
-							if(num){
+							if(num&&player.countCards('he',card=>player.canRecast(card))){
 								let result=yield player.chooseCard('he','请重铸一张牌',(card,player)=>player.canRecast(card),true);
-								if(result.bool) player.recast(result.cards);
+								if(result.bool) yield player.recast(result.cards);
 							}
-							if(num>1){
+							if(num>1&&player.countCards('he',card=>card.name=='sha'&&player.hasUseTarget(card))){
 								yield player.chooseToUse({
 									prompt:'请使用一张【杀】',
 									filterCard:function(card,player){
 										if(card.name!='sha') return false;
 										return lib.filter.filterCard.apply(this,arguments);
 									},
+									forced:true,
 									ai1:function(card){
 										return _status.event.player.getUseValue(card);
 									},
 								});
 							}
-							if(num>2) yield player.chooseToDiscard('he',2,true);
+							if(num>2&&player.countCards('he',card=>lib.filter.cardDiscardable(card,player))) yield player.chooseToDiscard('he',2,true);
 						},
 					},
 				},
