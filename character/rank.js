@@ -129,6 +129,7 @@ window.noname_character_rank={
 		'caoxian',
 		'sb_guanyu',
 		'mb_chengui',
+		'jsrg_guozhao',
 		'sb_caopi',
 	],
 	a:[
@@ -355,6 +356,8 @@ window.noname_character_rank={
 		'ol_jianyong',
 		'ol_sb_jiangwei',
 		'dc_sb_zhouyu',
+		'dc_lingcao',
+		'jsrg_zhugeliang',
 	],
 	am:[
 		'muludawang',
@@ -650,6 +653,9 @@ window.noname_character_rank={
 		'zhugeruoxue',
 		'dc_sb_lusu',
 		'mb_huban',
+		'jsrg_simayi',
+		'jsrg_zhaoyun',
+		'jsrg_zhangxuan',
 	],
 	bp:[
 		'xin_huojun',
@@ -1020,6 +1026,13 @@ window.noname_character_rank={
 		'sunhuan',
 		'yue_caiyong',
 		'sb_huangyueying',
+		'jsrg_jiangwei',
+		'jsrg_luxun',
+		'jsrg_caofang',
+		'jsrg_guoxun',
+		'jsrg_gaoxiang',
+		'jsrg_sunlubansunluyu',
+		'jsrg_weiwenzhugezhi',
 	],
 	b:[
 		'liyi',
@@ -1336,6 +1349,8 @@ window.noname_character_rank={
 		'lvboshe',
 		'ol_caozhang',
 		'ol_lingtong',
+		'jsrg_liuyong',
+		'jsrg_sunjun',
 	],
 	bm:[
 		'diy_xizhenxihong',

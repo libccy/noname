@@ -8340,6 +8340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						intro:{content:'使用下一张牌时弃置&张牌'},
 						charlotte:true,
+						onremove:true,
 						audio:'twchayi',
 						trigger:{player:'useCard'},
 						forced:true,
