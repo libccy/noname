@@ -354,6 +354,7 @@ window.noname_character_rank={
 		'ol_jianyong',
 		'ol_sb_jiangwei',
 		'dc_sb_zhouyu',
+		'dc_lingcao',
 	],
 	am:[
 		'diy_caiwenji',

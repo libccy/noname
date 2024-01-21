@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			dc_lingcao:['male','wu','4/5',['dcdufeng']],
 			yue_xiaoqiao:['female','wu',3,['dcqiqin','dcweiwan']],
 			dc_dongzhao:['male','wei',3,['dcyijia','dcdingji']],
 			kuaiqi:['male','wei',3,['dcliangxiu','dcxunjie']],
@@ -97,7 +98,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huicui:{
 				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong','xiahoujie','dc_caiyang','zhoushan'],
 				sp_caizijiaren:['re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
-				sp_zhilan:['liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen'],
+				sp_zhilan:['liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen','dc_lingcao'],
 				sp_guixin:['re_kanze','re_chendeng','caimaozhangyun','dc_lvkuanglvxiang','dc_gaolan','yinfuren','chengui','chenjiao','dc_sp_jiaxu','qinlang','dc_dongzhao'],
 				sp_daihan:['mamidi','dc_jiling','zhangxun','dc_yuejiu','wanglie','leibo','qiaorui','dongwan','yuanyin'],
 				sp_jianghu:['guanning','huzhao','dc_huangchengyan','mengjie'],
@@ -111,6 +112,55 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//凌操
+			dcdufeng:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				forced:true,
+				async content(event,trigger,player){
+					const list=[];
+					for(let i=1;i<6;i++){
+						if(player.isDisabled(i)) continue;
+						list.push('equip'+i);
+					}
+					list.push('cancel2');
+					const next=player.chooseControl(list);
+					next.set('prompt','独锋：请废除一个装备栏，或点击“取消”失去1点体力');
+					next.set('ai',()=>{
+						const list=get.event().list.slice(),player=get.player();
+						if(player.hp<=2&&list.length>1) list.remove('cancel2');
+						const listx=list.filter(subtype=>!player.getEquips(subtype).length);
+						if(listx.length) return listx.randomGet();
+						return list.randomGet();
+					})
+					next.set('list',list);
+					const {result}=await next;
+					if(result.control=='cancel2') await player.loseHp();
+					else await player.disableEquip(result.control);
+					if(!player.isIn()) return;
+					const num=Math.min(player.countDisabled()+player.getDamagedHp(),player.maxHp);
+					await player.draw(num);
+					player.addTempSkill('dcdufeng_effect');
+					player.addMark('dcdufeng_effect',num,false);
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove:true,
+						intro:{
+							content:'本回合攻击范围与使用【杀】的次数上限均为#',
+						},
+						mod:{
+							attackRangeBase(player,num){
+								return player.countMark('dcdufeng_effect');
+							},
+							cardUsable(card,player,num){
+								if(card.name=='sha') return player.countMark('dcdufeng_effect');
+							},
+						},
+					}
+				},
+			},
 			//小乔
 			dcqiqin:{
 				audio:2,
@@ -11095,6 +11145,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuyong:['liuyong','jsrg_liuyong'],
 			zhangxuan:['zhangxuan','jsrg_zhangxuan'],
 			gaoxiang:['gaoxiang','jsrg_gaoxiang'],
+			lingcao:['lingcao','dc_lingcao'],
 		},
 		translate:{
 			re_panfeng:'潘凤',
@@ -11558,6 +11609,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqiqin_info:'锁定技。①游戏开始时，你将所有手牌标记为“琴”。②你的“琴”牌不计入手牌上限。③准备阶段，你获得弃牌堆中所有你标记过的“琴”牌。',
 			dcweiwan:'媦婉',
 			dcweiwan_info:'出牌阶段限一次，你可以弃置一张“琴”并随机获得一名其他角色区域内花色与此牌不相同的牌各一张，若你获得了：一张牌，其失去1点体力；两张牌，本回合你对其使用牌无距离和次数限制；三张牌，本回合你不能对其使用牌。',
+			dc_lingcao:'新杀凌操',
+			dc_lingcao_prefix:'新杀',
+			dcdufeng:'独锋',
+			dcdufeng_info:'锁定技。出牌阶段开始时，你失去1点体力或废除一个装备栏，摸X张牌，然后你的攻击范围与使用【杀】的次数上限均为X直到回合结束（X为你已废除的装备栏数与损失的体力值之和，至多为你的体力上限）。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
