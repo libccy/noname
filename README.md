@@ -1,3 +1,9 @@
+noname-server.exe的源码见以下仓库：
+
+https://github.com/nonameShijian/noname-server
+
+---
+
 在线试玩：
 
 https://spmario233.github.io/noname/index.html (图片素材加载速度较慢，不推荐)

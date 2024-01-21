@@ -767,7 +767,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(roundCount<=0) break;
 					}
 					if(!player.storage.jsrgzhendan_mark&&count>0) return true;
-					return false; 
+					return false;
 				},
 				forced:true,
 				locked:false,
@@ -993,6 +993,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return '手牌上限+'+storage;
 							}
 						},
+						onremove:true,
 						charlotte:true,
 						mod:{
 							maxHandcard(player,num){
@@ -8296,7 +8297,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgpianchong_info:'一名角色的结束阶段，若你于此回合内失去过牌，你可以判定。若结果为红色/黑色，你摸此回合进入弃牌堆的红色/黑色牌数量的牌。',
 			jsrgzunwei:'尊位',
 			jsrgzunwei_info:'出牌阶段限一次。你可以选择一名其他角色并选择执行一项，然后移除该选项：1.将手牌数摸至与该角色相同（最多摸五张）；2.将其装备牌移至你的装备区，直到你装备区的牌数不少于其；3.将体力值回复至与该角色相同。',
-			
+
 			xumou_jsrg:'蓄谋',
 			xumou_jsrg_info:'“蓄谋”牌可在判定区内重复存在。判定阶段开始时，你选择一项：⒈使用此牌对应的实体牌，然后本阶段不能再使用此牌名的牌；⒉将所有的“蓄谋”牌置入弃牌堆。',
 

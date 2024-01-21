@@ -106,7 +106,7 @@ export async function boot() {
 	else if (!Reflect.has(lib, 'device')) {
 		Reflect.set(lib, 'path', (await import('../library/path.js')).default);
 		//为其他自定义平台提供文件读写函数赋值的一种方式。
-		//但这种方式只能修改game的文件读写函数。
+		//但这种方式只允许修改game的文件读写函数。
 		if (typeof window.initReadWriteFunction == 'function') {
 			const g = {};
 			const ReadWriteFunctionName = ['download', 'readFile', 'readFileAsText', 'writeFile', 'removeFile', 'getFileList', 'ensureDirectory', 'createDir'];
@@ -123,7 +123,9 @@ export async function boot() {
 				});
 			});
 			// @ts-ignore
-			window.initReadWriteFunction(g);
+			await window.initReadWriteFunction(g).catch(e => {
+				console.error('文件读写函数初始化失败:', e);
+			});
 		}
 		window.onbeforeunload = function () {
 			if (config.get('confirm_exit') && !_status.reloading) {
@@ -862,7 +864,13 @@ async function setOnError() {
 			}
 			//解析parsex里的content fun内容(通常是技能content) 
 			// @ts-ignore
-			else if (err && err.stack && ['at Object.eval [as content]', 'at Proxy.content'].some(str => err.stack.split('\n')[1].trim().startsWith(str))) {
+			else if (err && err.stack && ['at Object.eval [as content]', 'at Proxy.content'].some(str =>{
+				let stackSplit1 = err.stack.split('\n')[1];
+				if(stackSplit1){
+					return stackSplit1.trim().startsWith(str);
+				}
+				return false;
+			})) {
 				const codes = _status.event.content;
 				if (typeof codes == 'function') {
 					const lines = codes.toString().split("\n");

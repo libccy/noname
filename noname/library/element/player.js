@@ -203,6 +203,22 @@ export class Player extends HTMLDivElement {
 			handcards2: ui.create.div('.handcards'),
 			expansions: ui.create.div('.expansions')
 		};
+		if(lib.config.equip_span){
+			let observer = new MutationObserver(mutationsList=>{
+				for (let mutation of mutationsList) {
+					if (mutation.type === 'childList') {
+						const addedNodes = Array.from(mutation.addedNodes);
+						const removedNodes = Array.from(mutation.removedNodes);
+						if(addedNodes.some(card=>!card.classList.contains('emptyequip')) || 
+						removedNodes.some(card=>!card.classList.contains('emptyequip'))){
+							player.$handleEquipChange();
+						}
+					}
+				}
+			});
+			const config = { childList: true };
+			observer.observe(node.equips, config);
+		}
 		node.expansions.style.display = 'none';
 		const chainLength = game.layout == 'default' ? 64 : 40;
 		for (let repetition = 0; repetition < chainLength; repetition++) {
@@ -2896,14 +2912,14 @@ export class Player extends HTMLDivElement {
 			}
 			else if (arg1[i] == 'e') {
 				for (j = 0; j < this.node.equips.childElementCount; j++) {
-					if (!this.node.equips.childNodes[j].classList.contains('removing') && !this.node.equips.childNodes[j].classList.contains('feichu')) {
+					if (!this.node.equips.childNodes[j].classList.contains('removing') && !this.node.equips.childNodes[j].classList.contains('feichu') && !this.node.equips.childNodes[j].classList.contains('emptyequip')) {
 						cards.push(this.node.equips.childNodes[j]);
 					}
 				}
 			}
 			else if (arg1[i] == 'j') {
 				for (j = 0; j < this.node.judges.childElementCount; j++) {
-					if (!this.node.judges.childNodes[j].classList.contains('removing') && !this.node.judges.childNodes[j].classList.contains('feichu')) {
+					if (!this.node.judges.childNodes[j].classList.contains('removing') && !this.node.judges.childNodes[j].classList.contains('feichu') && !this.node.judges.childNodes[j].classList.contains('emptyequip')) {
 						cards.push(this.node.judges.childNodes[j]);
 						if (this.node.judges.childNodes[j].viewAs && arguments.length > 1) {
 							this.node.judges.childNodes[j].tempJudge = this.node.judges.childNodes[j].name;
@@ -3074,7 +3090,7 @@ export class Player extends HTMLDivElement {
 			var es = [];
 			if (arg3 !== false) {
 				for (i = 0; i < this.node.equips.childElementCount; i++) {
-					if (!this.node.equips.childNodes[i].classList.contains('removing') && !this.node.equips.childNodes[i].classList.contains('feichu')) {
+					if (!this.node.equips.childNodes[i].classList.contains('removing') && !this.node.equips.childNodes[i].classList.contains('feichu') && !this.node.equips.childNodes[i].classList.contains('emptyequip')) {
 						var equipskills = get.info(this.node.equips.childNodes[i]).skills;
 						if (equipskills) {
 							es.addArray(equipskills);
@@ -3115,19 +3131,19 @@ export class Player extends HTMLDivElement {
 			for (i = 0; i < arg1.length; i++) {
 				if (arg1[i] == 'h') {
 					for (j = 0; j < this.node.handcards1.childElementCount; j++) {
-						if (!this.node.handcards1.childNodes[j].classList.contains('removing') && !this.node.handcards1.childNodes[j].classList.contains('feichu') && !this.node.handcards1.childNodes[j].classList.contains('glows')) {
+						if (!this.node.handcards1.childNodes[j].classList.contains('removing') && !this.node.handcards1.childNodes[j].classList.contains('feichu') && !this.node.handcards1.childNodes[j].classList.contains('emptyequip') && !this.node.handcards1.childNodes[j].classList.contains('glows')) {
 							cards.push(this.node.handcards1.childNodes[j]);
 						}
 					}
 					for (j = 0; j < this.node.handcards2.childElementCount; j++) {
-						if (!this.node.handcards2.childNodes[j].classList.contains('removing') && !this.node.handcards2.childNodes[j].classList.contains('feichu') && !this.node.handcards2.childNodes[j].classList.contains('glows')) {
+						if (!this.node.handcards2.childNodes[j].classList.contains('removing') && !this.node.handcards2.childNodes[j].classList.contains('feichu') && !this.node.handcards2.childNodes[j].classList.contains('emptyequip') && !this.node.handcards2.childNodes[j].classList.contains('glows')) {
 							cards.push(this.node.handcards2.childNodes[j]);
 						}
 					}
 				}
 				else if (arg1[i] == 'e') {
 					for (j = 0; j < this.node.equips.childElementCount; j++) {
-						if (!this.node.equips.childNodes[j].classList.contains('removing') && !this.node.equips.childNodes[j].classList.contains('feichu')) {
+						if (!this.node.equips.childNodes[j].classList.contains('removing') && !this.node.equips.childNodes[j].classList.contains('feichu') && !this.node.equips.childNodes[j].classList.contains('emptyequip')) {
 							cards.push(this.node.equips.childNodes[j]);
 						}
 					}
@@ -3140,7 +3156,7 @@ export class Player extends HTMLDivElement {
 				}
 				else if (arg1[i] == 'j') {
 					for (j = 0; j < this.node.judges.childElementCount; j++) {
-						if (!this.node.judges.childNodes[j].classList.contains('removing') && !this.node.judges.childNodes[j].classList.contains('feichu')) {
+						if (!this.node.judges.childNodes[j].classList.contains('removing') && !this.node.judges.childNodes[j].classList.contains('feichu') && !this.node.judges.childNodes[j].classList.contains('emptyequip')) {
 							cards.push(this.node.judges.childNodes[j]);
 							if (this.node.judges.childNodes[j].viewAs && arguments.length > 1) {
 								this.node.judges.childNodes[j].tempJudge = this.node.judges.childNodes[j].name;
@@ -9087,6 +9103,66 @@ export class Player extends HTMLDivElement {
 				//
 				// 	node.delete();
 				// },700);
+			}
+		}
+	}
+	$handleEquipChange(){
+		let player = this;
+		const cards = Array.from(this.node.equips.childNodes);
+		const cardsResume = cards.slice(0);
+		cards.forEach(card=>{
+			if(card.name.indexOf('empty_equip') == 0){
+				let num = get.equipNum(card);
+				let remove = false;
+				if((num == 4 || num == 3) && get.is.mountCombined()){
+					remove = !this.hasEmptySlot('equip3_4') || this.getEquips('equip3_4').length;
+				}else if(!this.hasEmptySlot(num) || this.getEquips(num).length){
+					remove = true;
+				}
+				if(remove){
+					this.node.equips.removeChild(card);
+					cardsResume.remove(card);
+				}
+			}
+		});
+		for(let i=1;i<=4;i++){
+			let add = false;
+			if((i == 4 || i == 3) && get.is.mountCombined()){
+				add = this.hasEmptySlot('equip3_4') && !this.getEquips('equip3_4').length;		
+			}else{
+				add = this.hasEmptySlot(i) && !this.getEquips(i).length;
+			}
+			if(add && !cardsResume.some(card=>{
+				let num = get.equipNum(card);
+				if((i==4|| i==3) && get.is.mountCombined()){
+					return num == 4 || num == 3;
+				}else{
+					return num == i;
+				}
+			})){
+				const card = game.createCard('empty_equip' + i,'', '');
+				card.fix();
+				console.log('add '+card.name);
+				card.style.transform = '';
+				card.classList.remove('drawinghidden');
+				card.classList.add('emptyequip');
+				card.classList.add('hidden');
+				delete card._transform;
+				const equipNum = get.equipNum(card);
+				let equipped = false;
+				for (let j = 0; j < player.node.equips.childNodes.length; j++) {
+					if (get.equipNum(player.node.equips.childNodes[j]) >= equipNum) {
+						player.node.equips.insertBefore(card, player.node.equips.childNodes[j]);
+						equipped = true;
+						break;
+					}
+				}
+				if (!equipped) {
+					player.node.equips.appendChild(card);
+					if (_status.discarded) {
+						_status.discarded.remove(card);
+					}
+				}
 			}
 		}
 	}

@@ -414,7 +414,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				filter:(event,player)=>event.player!=player,
 				logTarget:'player',
 				content:()=>{
-					trigger.deniedGift.add(trigger.card);
+					trigger.deniedGifts.add(trigger.card);
 				},
 				ai:{
 					refuseGifts:true
