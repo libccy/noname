@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			dc_lingcao:['male','wu','4/5',['dcdufeng']],
 			yue_xiaoqiao:['female','wu',3,['dcqiqin','dcweiwan']],
 			dc_dongzhao:['male','wei',3,['dcyijia','dcdingji']],
 			kuaiqi:['male','wei',3,['dcliangxiu','dcxunjie']],
@@ -97,7 +98,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huicui:{
 				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong','xiahoujie','dc_caiyang','zhoushan'],
 				sp_caizijiaren:['re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
-				sp_zhilan:['liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen'],
+				sp_zhilan:['liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen','dc_lingcao'],
 				sp_guixin:['re_kanze','re_chendeng','caimaozhangyun','dc_lvkuanglvxiang','dc_gaolan','yinfuren','chengui','chenjiao','dc_sp_jiaxu','qinlang','dc_dongzhao'],
 				sp_daihan:['mamidi','dc_jiling','zhangxun','dc_yuejiu','wanglie','leibo','qiaorui','dongwan','yuanyin'],
 				sp_jianghu:['guanning','huzhao','dc_huangchengyan','mengjie'],
@@ -111,6 +112,55 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//凌操
+			dcdufeng:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				forced:true,
+				async content(event,trigger,player){
+					const list=[];
+					for(let i=1;i<6;i++){
+						if(player.isDisabled(i)) continue;
+						list.push('equip'+i);
+					}
+					list.push('cancel2');
+					const next=player.chooseControl(list);
+					next.set('prompt','独锋：请废除一个装备栏，或点击“取消”失去1点体力');
+					next.set('ai',()=>{
+						const list=get.event().list.slice(),player=get.player();
+						if(player.hp<=2&&list.length>1) list.remove('cancel2');
+						const listx=list.filter(subtype=>!player.getEquips(subtype).length);
+						if(listx.length) return listx.randomGet();
+						return list.randomGet();
+					})
+					next.set('list',list);
+					const {result}=await next;
+					if(result.control=='cancel2') await player.loseHp();
+					else await player.disableEquip(result.control);
+					if(!player.isIn()) return;
+					const num=Math.min(player.countDisabled()+player.getDamagedHp(),player.maxHp);
+					await player.draw(num);
+					player.addTempSkill('dcdufeng_effect');
+					player.addMark('dcdufeng_effect',num,false);
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove:true,
+						intro:{
+							content:'本回合攻击范围与使用【杀】的次数上限均为#',
+						},
+						mod:{
+							attackRangeBase(player,num){
+								return player.countMark('dcdufeng_effect');
+							},
+							cardUsable(card,player,num){
+								if(card.name=='sha') return player.countMark('dcdufeng_effect');
+							},
+						},
+					}
+				},
+			},
 			//小乔
 			dcqiqin:{
 				audio:2,
@@ -5333,7 +5383,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var dialog=ui.create.dialog('劝谏：令一名其他角色…','hidden');
 						dialog.add([[
 							['damage','对其攻击范围内的一名角色造成1点伤害'],
-							['draw','将其手牌数调整至体力上限（至多摸至五张），且其本回合内不能使用手牌']
+							['draw','将其手牌数调整至手牌上限（至多摸至五张），且其本回合内不能使用手牌']
 						],'textbutton']);
 						return dialog;
 					},
@@ -5346,7 +5396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					prompt:function(links){
 						if(links[0]=='damage') return '令一名其他角色对攻击范围内的另一名角色造成1点伤害';
-						return '令一名其他角色将手牌数调整至体力上限（至多摸至五张）且本回合内不能使用手牌';
+						return '令一名其他角色将手牌数调整至手牌上限（至多摸至五张）且本回合内不能使用手牌';
 					},
 				},
 				ai:{
@@ -5404,15 +5454,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filterTarget:function(card,player,target){
 							if(target==player) return false;
 							var num=target.countCards('h');
-							if(num>target.maxHp) return true;
-							return num<Math.min(5,target.maxHp);
+							if(num>target.getHandcardLimit()) return true;
+							return num<Math.min(5,target.getHandcardLimit());
 						},
 						filterCard:()=>false,
 						selectCard:-1,
 						content:function(){
 							'step 0'
 							player.addTempSkill('dcquanjian_draw','phaseUseAfter');
-							var num1=target.countCards('h'),num2=target.maxHp;
+							var num1=target.countCards('h'),num2=target.getHandcardLimit();
 							var num=0;
 							if(num1>num2){
 								event.index=0;
@@ -5456,7 +5506,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							result:{
 								target:function(player,target){
-									var num1=target.countCards('h'),num2=target.maxHp;
+									var num1=target.countCards('h'),num2=target.getHandcardLimit();
 									if(num1>num2) return -1;
 									return Math.min(5,num2)-num1;
 								},
@@ -10458,7 +10508,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.markAuto('dcxunji_effect',[target]);
 					player.addTempSkill('dcxunji_effect',{player:'die'});
-					target.markSkill('dcxunji_mark');
+					target.addTempSkill('dcxunji_mark',{player:'phaseEnd'});
 				},
 				ai:{
 					order:1,
@@ -10471,6 +10521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					mark:{
+						mark:true,
 						marktext:'嫉',
 						intro:{content:'你已经被盯上了！'},
 					},
@@ -10502,10 +10553,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						popup:false,
 						filter:function(event,player){
-							return event.card&&event.card.name=='juedou'&&event.getParent().skill=='dcxunji_effect';
+							return event.card&&event.card.name=='juedou'&&event.getParent().skill=='dcxunji_effect'&&event.player.isIn();
 						},
 						content:function(){
-							player.loseHp(trigger.num);
+							trigger.player.line(player);
+							player.damage(trigger.num,trigger.player);
 						},
 					},
 				},
@@ -11083,6 +11135,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuyong:['liuyong','jsrg_liuyong'],
 			zhangxuan:['zhangxuan','jsrg_zhangxuan'],
 			gaoxiang:['gaoxiang','jsrg_gaoxiang'],
+			lingcao:['lingcao','dc_lingcao'],
 		},
 		translate:{
 			re_panfeng:'潘凤',
@@ -11115,7 +11168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhuangdan_info:'锁定技，其他角色的回合结束时，若你的手牌数为全场唯一最多，则你令〖裂胆〗失效直到你下回合结束。',
 			dc_caiyang:'蔡阳',
 			dcxunji:'寻嫉',
-			dcxunji_info:'出牌阶段限一次，你可以选择一名其他角色。该角色的下个结束阶段开始时，若其于该回合内造成过伤害，则你视为对其使用一张【决斗】，且当此【决斗】对其造成伤害后，你失去等量的体力。',
+			dcxunji_info:'出牌阶段限一次，你可以选择一名其他角色。该角色的下个结束阶段开始时，若其于该回合内造成过伤害，则你视为对其使用一张【决斗】，且当此【决斗】对其造成伤害后，其对你造成等量的伤害。',
 			dcjiaofeng:'交锋',
 			dcjiaofeng_info:'锁定技。每回合限一次，当你造成伤害时，若你本回合内未造成过其他伤害且你已损失的体力值：大于0，则你摸一张牌；大于1，则此伤害+1；大于2，则你回复1点体力。',
 			zhoushan:'周善',
@@ -11325,7 +11378,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyongbi_info:'限定技。出牌阶段，你可以将所有手牌交给一名其他男性角色。你将〖媵予〗的发动时机改为“准备阶段和结束阶段开始时”。然后若这些牌中包含的花色数：大于1，则你与其本局游戏的手牌上限+2；大于2，则当你或其于本局游戏内受到大于1的伤害时，此伤害-1。',
 			dc_huangquan:'黄权',
 			dcquanjian:'劝谏',
-			dcquanjian_info:'出牌阶段每项各限一次。你可以选择一项流程并选择一名其他角色A：⒈令A对其攻击范围内的另一名角色B造成1点伤害。⒉令A将手牌数调整至体力上限（至多摸至五张），且其本回合内不能使用或打出手牌。然后A选择一项：⒈执行此流程。⒉本回合下次受到的伤害+1。',
+			dcquanjian_info:'出牌阶段每项各限一次。你可以选择一项流程并选择一名其他角色A：⒈令A对其攻击范围内的另一名角色B造成1点伤害。⒉令A将手牌数调整至手牌上限（至多摸至五张），且其本回合内不能使用或打出手牌。然后A选择一项：⒈执行此流程。⒉本回合下次受到的伤害+1。',
 			dctujue:'途绝',
 			dctujue_info:'限定技。当你进入濒死状态时，你可以将所有牌交给一名其他角色。然后你回复等量的体力并摸等量的牌。',
 			chengui:'陈珪',
@@ -11546,6 +11599,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqiqin_info:'锁定技。①游戏开始时，你将所有手牌标记为“琴”。②你的“琴”牌不计入手牌上限。③准备阶段，你获得弃牌堆中所有你标记过的“琴”牌。',
 			dcweiwan:'媦婉',
 			dcweiwan_info:'出牌阶段限一次，你可以弃置一张“琴”并随机获得一名其他角色区域内花色与此牌不相同的牌各一张，若你获得了：一张牌，其失去1点体力；两张牌，本回合你对其使用牌无距离和次数限制；三张牌，本回合你不能对其使用牌。',
+			dc_lingcao:'新杀凌操',
+			dc_lingcao_prefix:'新杀',
+			dcdufeng:'独锋',
+			dcdufeng_info:'锁定技。出牌阶段开始时，你失去1点体力或废除一个装备栏，摸X张牌，然后你的攻击范围与使用【杀】的次数上限均为X直到回合结束（X为你已废除的装备栏数与损失的体力值之和，至多为你的体力上限）。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
