@@ -3056,6 +3056,12 @@ export class Library extends Uninstantable {
 						lib.init.cssstyles();
 					}
 				},
+				equip_span:{
+					name: '装备牌占位',
+					intro:'打开后，没有装备的装备区将在装备栏占据空白位置。',
+					init: false,
+					unfrequent:false,
+				},
 				fold_card: {
 					name: '折叠手牌',
 					init: true,
@@ -9574,6 +9580,30 @@ export class Library extends Uninstantable {
 			subtype: "equip5",
 		},
 		feichu_equip6: {
+			type: "equip",
+			subtype: "equip6",
+		},
+		empty_equip1: {
+			type: "equip",
+			subtype: "equip1",
+		},
+		empty_equip2: {
+			type: "equip",
+			subtype: "equip2",
+		},
+		empty_equip3: {
+			type: "equip",
+			subtype: "equip3",
+		},
+		empty_equip4: {
+			type: "equip",
+			subtype: "equip4",
+		},
+		empty_equip5: {
+			type: "equip",
+			subtype: "equip5",
+		},
+		empty_equip6: {
 			type: "equip",
 			subtype: "equip6",
 		},
