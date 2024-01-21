@@ -5737,7 +5737,7 @@ export class Game extends Uninstantable {
 	 * @param { GameEventPromise } [event] 
 	 */
 	static check(event) {
-		let i, j, range;
+		let i, range;
 		if (event == undefined) event = _status.event;
 		event._checked = true;
 		let custom = event.custom || {};
@@ -5986,10 +5986,9 @@ export class Game extends Uninstantable {
 			}
 		}
 		if (!event.skill && get.noSelected() && !_status.noconfirm) {
-			let skills = [], enable, info;
-			let skills2;
+			const skills = [];
 			if (event._skillChoice) {
-				skills2 = event._skillChoice;
+				let skills2 = event._skillChoice;
 				for (let i = 0; i < skills2.length; i++) {
 					if (event.isMine() || !event._aiexclude.includes(skills2[i])) {
 						skills.push(skills2[i]);
@@ -6007,9 +6006,10 @@ export class Game extends Uninstantable {
 				skills2 = game.filterSkills(skills2.concat(lib.skill.global), player, player.getSkills('e').concat(lib.skill.global));
 				event._skillChoice = [];
 				game.expandSkills(skills2);
-				for (i = 0; i < skills2.length; i++) {
-					info = get.info(skills2[i]);
-					enable = false;
+				for (let i = 0; i < skills2.length; i++) {
+					const info = get.info(skills2[i]);
+					if (!info) throw new ReferenceError(`Cannot find ${skills2[i]} in lib.skill`);
+					let enable = false;
 					if (typeof info.enable == 'function') enable = info.enable(event);
 					else if (Array.isArray(info.enable)) enable = info.enable.includes(event.name);
 					else if (info.enable == 'phaseUse') enable = (event.type == 'phase');
