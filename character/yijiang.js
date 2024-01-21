@@ -8078,60 +8078,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
-				content:function(){
-					'step 0'
+				async content(event,trigger,player){
 					var num=player.hp;
 					if(!player.hasSkill('yanzhu')){
 						num=player.maxHp;
 					}
-					player.chooseTarget([1,num],get.prompt2('xingxue')).set('ai',function(target){
+					const {result:{targets,bool}}=
+					await player.chooseTarget([1,num],get.prompt2('xingxue')).set('ai',function(target){
 						var att=get.attitude(_status.event.player,target);
 						if(target.countCards('he')) return att;
 						return att/10;
 					});
-					'step 1'
-					if(result.bool){
-						player.logSkill('xingxue',result.targets);
-						event.targets=result.targets;
-						event.targets.sort(lib.sort.seat);
+					if(bool){
+						player.logSkill('xingxue',targets);
+						const chooseToPutCard = async function(target){
+							await target.draw();
+							if(target.countCards('he')){
+								const {result:{cards,bool}} = 
+								await target.chooseCard('选择一张牌置于牌堆顶','he',true);
+								if(bool){
+									await target.lose(cards,ui.cardPile,'insert');
+								}
+								game.broadcastAll(function(player){
+									var cardx=ui.create.card();
+									cardx.classList.add('infohidden');
+									cardx.classList.add('infoflip');
+									player.$throw(cardx,1000,'nobroadcast');
+								},target);
+								if(player == game.me){
+									game.delay(0.5);
+								}
+							}
+						};
+						await game.doAsyncInOrder(targets,chooseToPutCard);
 					}
-					else{
-						event.finish();
-					}
-					'step 2'
-					if(event.targets.length){
-						var target=event.targets.shift();
-						target.draw();
-						event.current=target;
-					}
-					else{
-						event.finish();
-					}
-					'step 3'
-					if(event.current&&event.current.countCards('he')){
-						event.current.chooseCard('选择一张牌置于牌堆顶','he',true);
-					}
-					else{
-						event.goto(2);
-					}
-					'step 4'
-					if(result&&result.cards){
-						event.card=result.cards[0];
-						event.current.lose(result.cards,ui.cardPile,'insert');
-						game.broadcastAll(function(player){
-							var cardx=ui.create.card();
-							cardx.classList.add('infohidden');
-							cardx.classList.add('infoflip');
-							player.$throw(cardx,1000,'nobroadcast');
-						},event.current);
-					}
-					else{
-						event.card=null;
-					}
-					'step 5'
-					if(event.current==game.me) game.delay(0.5);
-					event.goto(2);
-				}
+				},
 			},
 			yanzhu:{
 				audio:2,
