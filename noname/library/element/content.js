@@ -2017,10 +2017,7 @@ export const Content = {
 			event.doing = doingList.shift();
 			while(true){
 				if (trigger.filterStop && trigger.filterStop()) return;
-				const usableSkills = event.doing.todoList.filter(info => {
-					if (!lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill)) return false;
-					return lib.skill.global.includes(info.skill) || info.player.hasSkill(info.skill, true);
-				});
+				const usableSkills = event.doing.todoList.filter(info => lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill));
 				if (usableSkills.length == 0){
 					break;
 				}

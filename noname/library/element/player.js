@@ -2096,9 +2096,6 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	uninit() {
-		this.expandedSlots = {};
-		this.disabledSlots = {};
-
 		delete this.name;
 		delete this.name1;
 		delete this.tempname;
@@ -2107,21 +2104,14 @@ export class Player extends HTMLDivElement {
 		delete this.hp;
 		delete this.maxHp;
 		delete this.hujia;
-		this.clearSkills(true);
 
 		if (this.name2) {
 			delete this.singleHp;
 			delete this.name2;
 		}
-		for (var mark in this.marks) {
-			this.marks[mark].remove();
-		}
-		ui.updatem(this);
 
 		this.skipList = [];
-		this.skills = this.skills.filter(skill => {
-			return lib.skill[skill] && lib.skill[skill].superCharlotte;
-		});
+		this.clearSkills(true);
 		this.initedSkills = [];
 		this.additionalSkills = {};
 		this.disabledSkills = {};
@@ -2133,6 +2123,8 @@ export class Player extends HTMLDivElement {
 		this.tempSkills = {};
 		this.storage = {};
 		this.marks = {};
+		this.expandedSlots = {};
+		this.disabledSlots = {};
 		this.ai = { friend: [], enemy: [], neutral: [] };
 
 		this.$uninit();
@@ -2140,18 +2132,18 @@ export class Player extends HTMLDivElement {
 		return this;
 	}
 	$uninit() {
+		this.$syncExpand();
 		this.$syncDisable();
-		if (this.isDisabledJudge()) {
-			game.broadcastAll(function (player) {
-				player.storage._disableJudge = false;
-				for (var i = 0; i < player.node.judges.childNodes.length; i++) {
-					if (player.node.judges.childNodes[i].name == 'disable_judge') {
-						player.node.judges.removeChild(player.node.judges.childNodes[i]);
-						break;
-					}
+		game.broadcastAll(function (player) {
+			delete player.storage._disableJudge;
+			for (var i = 0; i < player.node.judges.childNodes.length; i++) {
+				if (player.node.judges.childNodes[i].name == 'disable_judge') {
+					player.node.judges.removeChild(player.node.judges.childNodes[i]);
+					break;
 				}
-			}, this);
-		}
+			}
+		}, this);
+
 		this.node.avatar.hide();
 		this.node.count.hide();
 		if (this.node.wuxing) {

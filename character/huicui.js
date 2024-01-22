@@ -305,10 +305,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				position:'h',
 				check:(card)=>{
-					let player=_status.event.player;
-					let targets=game.filterPlayer(target=>target!=player&&lib.skill.dcweiwan.ai.result.target(player,target)!=0);
-					targets.sort((a,b)=>Math.abs(lib.skill.dcweiwan.ai.result.target(player,b))-Math.abs(lib.skill.dcweiwan.ai.result.target(player,a)));
-					return lib.skill.dcweiwan.getWeiWanEffect(player,card,targets[0]);
+					const player=_status.event.player;
+					const target = game.players.reduce((result, current) => {
+						if (current === player) return result;
+						const effect = Math.abs(lib.skill.dcweiwan.ai.result.target(player, current));
+						return effect > result[1] ? [current, effect] : result;
+					}, [null, 0])[0];
+					return target?lib.skill.dcweiwan.getWeiWanEffect(player,card,target):0;
 				},
 				usable:1,
 				content:function*(event,map){
@@ -352,35 +355,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:9,
 					result:{
 						target:(player,target)=>{
-							let att=get.sgn(get.attitude(player,target))-1;
-							let cards=player.getCards(lib.skill.dcweiwan.position,card=>{
-								return lib.skill.dcweiwan.filterCard(card,player);
-							});
-							cards.sort((a,b)=>lib.skill.dcweiwan.getWeiWanEffect(player,b,target)-lib.skill.dcweiwan.getWeiWanEffect(player,a,target));
-							return att*lib.skill.dcweiwan.getWeiWanEffect(player,cards[0],target);
+							const att=get.sgn(get.attitude(player,target))-1;
+							const cards=player.getCards(lib.skill.dcweiwan.position,card=>lib.skill.dcweiwan.filterCard(card,player));
+							return att * cards.reduce((result, card) => {
+								const effect = lib.skill.dcweiwan.getWeiWanEffect(player, card, target);
+								return effect > result ? effect : result;
+							},0);
 						},
 					},
 				},
 				getWeiWanEffect:(player,cardx,target)=>{
-					let suit=get.suit(cardx,player);
-					let cards=target.getCards('hej',card=>get.suit(card,target)!=suit&&lib.filter.canBeGained(card,player,target));
-					if(!cards.length) return 0;
-					let suits=lib.suit.slice();
-					suits.reverse();
-					suits.add('none');
-					let num=suits.filter(suit2=>cards.some(card=>get.suit(card,target)==suit2)).length;
+					const suit=get.suit(cardx,player);
+					const cards=target.getCards('hej',card=>get.suit(card,target)!==suit&&lib.filter.canBeGained(card,player,target));
+					const num=lib.suits.filter(suit=>cards.some(card=>get.suit(card,target)===suit)).length;
 					switch(num){
 						case 1:
-							num+=Math.max(0,get.sgn(get.effect(target,{name:'losehp'},player,player)));
-							break;
+							return num+Math.max(0,get.sgn(get.effect(target,{name:'losehp'},player,player)));
 						case 2:
-							num+=player.countCards('he',card=>player.canUse(card,target,false)&&get.effect(target,card,player,player)>0);
-							break;
+							return num+player.countCards('he',card=>player.canUse(card,target,false)&&get.effect(target,card,player,player)>0);
 						case 3:
-							num=Math.ceil(num/2);
-							break;
+							return Math.ceil(num / 2);
+						default:
+							return num;
 					}
-					return num;
 				},
 			},
 			//董昭
@@ -421,7 +418,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const player=map.player;
 					let result;
 					result=yield player.chooseTarget(get.prompt2('dcdingji')).set('ai',target=>{
-						const att=get.attitude(get.player(),target)/2;
+						let att=get.attitude(get.player(),target)/2;
 						const delta=5-target.countCards('h');
 						let fix=1;
 						const hs=target.getCards('h');
