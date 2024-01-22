@@ -1306,7 +1306,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
-					return target.hasCard(card=>lib.filter.canBeGained(card,target,player),get.is.single()?'he':'hej');
+					return target.hasCard(card=>lib.filter.canBeGained(card,player,target),get.is.single()?'he':'hej');
 				},
 				content:function(){
 					let pos=get.is.single()?'he':'hej';
@@ -1563,7 +1563,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					if(player==target) return false;
-					return target.hasCard(card=>lib.filter.canBeDiscarded(card,target,player),get.is.single()?'he':'hej');
+					return target.hasCard(card=>lib.filter.canBeDiscarded(card,player,target),get.is.single()?'he':'hej');
 				},
 				defaultYingbianEffect:'add',
 				content:function(){
