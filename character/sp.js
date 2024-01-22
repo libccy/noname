@@ -12236,7 +12236,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player!==target&&target.getStorage('bixiong2').includes(get.suit(card))) return false;
 					},
 				},
-				intro:{content:'其他角色不能使用$牌指定你为目标'},
+				intro:{content:'不能成为其他角色$牌的目标'},
 			},
 			//高干
 			juguan:{
