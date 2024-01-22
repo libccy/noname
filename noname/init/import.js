@@ -35,6 +35,10 @@ export const importMode = generateImportFunction('mode', (name) => `../../mode/$
 function generateImportFunction(type, pathParser) {
 	return async (name) => {
 		const path = pathParser(name);
+		if(type == 'extension' && !game.hasExtension(name)){
+			await game.import(type,createEmptyExtension(name));
+			return;
+		}
 		// 通过浏览器自带的script标签导入可直接获取报错信息，且不会影响JS运行
 		// 此时代码内容也将缓存在浏览器中，故再次import后将不会重新执行代码内容（测试下来如此）
 		const [status, script] = await new Promise((resolve) => {
@@ -52,4 +56,33 @@ function generateImportFunction(type, pathParser) {
 		if (modeContent.type !== type) throw new Error(`Loaded Content doesn't conform to "${type}" but "${modeContent.type}".`);
 		await game.import(type, modeContent.default);
 	}
+}
+
+function createEmptyExtension(name){
+	return {name:name,content:function(config,pack){},precontent:function(){},config:{},help:{},package:{
+		character:{
+			character:{
+			},
+			translate:{
+			},
+		},
+		card:{
+			card:{
+			},
+			translate:{
+			},
+			list:[],
+		},
+		skill:{
+			skill:{
+			},
+			translate:{
+			},
+		},
+		intro:"扩展《"+name+"》尚未开启，请开启后查看信息。",
+		author:"未知",
+		diskURL:"",
+		forumURL:"",
+		version:"1.0",
+	},files:{"character":[],"card":[],"skill":[],"audio":[]}}
 }
