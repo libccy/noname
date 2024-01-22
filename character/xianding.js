@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			dc_qinghegongzhu:['female','wei',3,['dczhangji','dczengou']],
 			caoxian:['female','wei',3,['dclingxi','dczhifou']],
 			dc_sb_zhouyu:['male','wu',4,['dcsbronghuo','dcsbyingmou']],
 			dc_sb_lusu:['male','wu',3,['dcsbmingshi','dcsbmengmou']],
@@ -97,7 +98,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji'],
 				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie'],
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
-				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue','caoxian'],
+				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue','caoxian','dc_qinghegongzhu'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan','caoyi'],
 				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli'],
@@ -110,6 +111,92 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//清河公主
+			dczhangji:{
+				audio:2,
+				trigger:{global:'useCard'},
+				filter:function(event,player){
+					return event.targets&&event.targets.length>1&&event.targets.includes(player);
+				},
+				forced:true,
+				logTarget:'player',
+				content:function*(event,map){
+					const player=map.player,trigger=map.trigger,target=trigger.player;
+					let targets=trigger.targets.slice();
+					targets.sortBySeat((_status.currentPhase||target));
+					targets.remove(player);
+					player.when({global:'useCardToTargeted'}).filter(evt=>targets.length&&evt.getParent()==trigger&&evt.targets.length==evt.getParent().triggeredTargets4.length).then(()=>{
+						trigger.getParent().targets=[player].concat(targets);
+						trigger.getParent().triggeredTargets4=[player].concat(targets);
+					}).vars({targets:targets});
+					player.when({target:['useCardToEnd','useCardToExcluded']}).filter(evt=>targets.length&&evt.getParent()==trigger).then(()=>{
+						player.draw(targets.length);
+					}).vars({targets:targets});
+				},
+			},
+			dczengou:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return player.maxHp>0&&player.countCards('he')>0;
+				},
+				filterCard:true,
+				selectCard:()=>[1,_status.event.player.maxHp],
+				position:'he',
+				filterTarget:lib.filter.notMe,
+				discard:false,
+				lose:false,
+				delay:false,
+				usable:1,
+				check:function(card){
+					if(card.name=='tao'||card.name=='jiu') return 0;
+					return 1/(get.value(card)||0.5);
+				},
+				content:function*(event,map){
+					const player=map.player,cards=event.cards,target=event.target;
+					yield player.give(cards,target).gaintag.add('dczengou_debuff');
+					yield player.draw(cards.length);
+					target.addSkill('dczengou_debuff');
+				},
+				ai:{
+					order:10,
+					result:{target:-1},
+				},
+				subSkill:{
+					debuff:{
+						charlotte:true,
+						mark:true,
+						intro:{content:'下次体力值增加或使用牌结算完毕后展示所有手牌，然后失去手牌中“谮构”牌数的体力值'},
+						trigger:{player:['changeHp','useCardAfter']},
+						filter:function(event,player){
+							return event.name=='useCard'||event.num>0;
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							player.removeSkill('dczengou_debuff');
+							const cards=player.getCards('h',card=>card.hasGaintag('dczengou_debuff'));
+							player.showHandcards();
+							if(cards.length) player.loseHp(cards.length);
+						},
+						mod:{
+							aiValue:function(player,card,num){
+								if(get.itemtype(card)=='card'&&card.hasGaintag('dczengou_debuff')) return -1;
+							},
+							aiUseful:function(){
+								return lib.skill.dczengou.subSkill.debuff.mod.aiValue.apply(this,arguments);
+							},
+							aiOrder:function(player,card,num){
+								if(get.itemtype(card)=='card'&&card.hasGaintag('dczengou_debuff')){
+									const cards=player.getCards('h',card=>card.hasGaintag('dczengou_debuff'));
+									if(cards.length==1) return num+10;
+									return 0;
+								}
+							},
+						},
+					},
+				},
+			},
 			//曹宪
 			dclingxi:{
 				audio:2,
@@ -13528,6 +13615,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_wangchang:['dc_wangchang','tw_wangchang'],
 			guozhao:['guozhao','xin_guozhao','jsrg_guozhao'],
 			dingshangwan:['dingshangwan','ol_dingshangwan'],
+			qinghegongzhu:['qinghegongzhu','dc_qinghegongzhu'],
 		},
 		translate:{
 			puyuan:'蒲元',
@@ -14044,6 +14132,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclingxi_info:'出牌阶段开始和结束时，你可以将至多X张牌称为“翼”置于你的武将牌上（X为你的体力上限）。当你失去武将牌上的“翼”时，你将手牌数调整至Y张（Y为你武将牌上的“翼”所含有的花色数的两倍）。',
 			dczhifou:'知否',
 			dczhifou_info:'当你使用牌结算完毕后，你可以移去至少X张武将牌上的“翼”（X为本回合此前发动此技能的次数+1），然后选择一名角色并选择一项令其执行（每个选项每回合限选择一次）：①将一张牌称为“翼”置于你的武将牌上；②弃置两张牌；③失去1点体力。',
+			dc_qinghegongzhu:'新杀清河公主',
+			dc_qinghegongzhu_prefix:'新杀',
+			dczhangji:'长姬',
+			dczhangji_info:'锁定技，一名角色使用多目标牌时，若你是此牌的目标之一，则你先结算此牌的效果，然后你摸X张牌（X为此牌的其他目标数）。',
+			dczengou:'谮构',
+			dczengou_info:'出牌阶段限一次，你可以将至多体力上限张牌称为“谮构”交给一名其他角色并摸等量张牌。若如此做，其下次体力值增加或使用牌结算完毕后，其展示所有手牌，然后失去Y点体力（Y为其手牌中的“谮构”牌数）。',
 
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',

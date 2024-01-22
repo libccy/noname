@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			dc_sp_menghuo:['male','qun',4,['dcmanwang']],
 			dc_lingcao:['male','wu','4/5',['dcdufeng']],
 			yue_xiaoqiao:['female','wu',3,['dcqiqin','dcweiwan']],
 			dc_dongzhao:['male','wei',3,['dcyijia','dcdingji']],
@@ -107,11 +108,94 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_yanhan:['dc_liuba','dc_huangquan','furongfuqian','xianglang','dc_huojun','gaoxiang','dc_wuban'],
 				sp_jishi:['dc_jiben','zhenghun','dc_sunhanhua','liuchongluojun'],
 				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen','dc_jiachong'],
-				sp_yijun:['gongsundu','mengyou'],
+				sp_yijun:['gongsundu','mengyou','dc_sp_menghuo'],
 				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong','yue_xiaoqiao'],
 			}
 		},
 		skill:{
+			//新服SP孟获
+			dcmanwang:{
+				audio:'spmanwang',
+				inherit:'spmanwang',
+				check:function(card){
+					var player=_status.event.player;
+					var max=Math.min(player.isDamaged()?3:2,4-player.countMark('dcmanwang'));
+					if(!max&&!player.hasSkill('dcpanqin')) return 0;
+					if(max==0&&ui.selected.length>0) return 0;
+					return 7-ui.selected.cards.length-get.value(card);
+				},
+				content:function(){
+					var num=Math.min(cards.length,4-player.countMark('dcmanwang'));
+					if(num>=1) player.addSkill('dcpanqin');
+					if(num>=2) player.draw();
+					if(num>=3) player.recover();
+					if(num>=4){
+						player.draw(2);
+						player.removeSkill('dcpanqin');
+					}
+				},
+				ai:{
+					order:2,
+					result:{
+						player:function(player,target){
+							if(player.getUseValue({name:'nanman'})<=0) return 0;
+							if(player.getStat('skill').spmanwang&&player.hasSkill('dcpanqin')) return 0;
+							return 1;
+						},
+					},
+				},
+				derivation:'dcpanqin',
+			},
+			dcpanqin:{
+				audio:'sppanqin',
+				inherit:'sppanqin',
+				content:function(){
+					var cards=[];
+					player.getHistory('lose',function(evt){
+						if(evt.type!='discard'||evt.getParent(trigger.name)!=trigger) return false;
+						for(var i of evt.cards2){
+							if(get.position(i,true)=='d'){
+								cards.add(i);
+							}
+						}
+					});
+					player.chooseUseTarget(true,{name:'nanman'},cards);
+					player.addTempSkill('dcpanqin_eff');
+				},
+				subSkill:{
+					eff:{
+						charlotte:true,
+						trigger:{player:'useCard'},
+						filter:function(event,player){
+							return event.card.name=='nanman'&&event.getParent(2).name=='dcpanqin'&&player.countMark('dcmanwang')<4&&player.hasSkill('dcmanwang',null,null,false)&&event.cards.length<=event.targets.length;
+						},
+						forced:true,
+						popup:false,
+						content:function(){
+							'step 0'
+							player.addMark('dcmanwang',1,false);
+							switch(player.countMark('dcmanwang')){
+								case 1:
+									player.draw(2);
+									player.removeSkill('dcpanqin');
+									break;
+								case 2:
+									player.recover();
+									break;
+								case 3:
+									player.draw();
+									break;
+								case 4:
+									player.addSkill('dcpanqin');
+									break;
+							}
+							'step 1'
+							player.gainMaxHp();
+							player.recover();
+						},
+					}
+				}
+			},
 			//凌操
 			dcdufeng:{
 				audio:2,
@@ -11115,6 +11199,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcporui:function(player){
 				return '每轮限'+(player.hasMark('dcgonghu_basic')?'两':'一')+'次。其他角色的结束阶段，你可以弃置一张牌并选择另一名于此回合内失去过牌的其他角色，你视为对其依次使用X+1张【杀】'+(player.hasMark('dcgonghu_damage')?'':'，然后你交给其X张手牌')+'（X为其本回合失去的牌数且至多为5）。';
 			},
+			dcmanwang:function(player){
+				var num=4-player.countMark('dcmanwang');
+				var str='出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：';
+				var list=[
+					'⒈获得〖叛侵〗。',
+					'⒉摸一张牌。',
+					'⒊回复1点体力。',
+					'⒋摸两张牌并失去〖叛侵〗。',
+				];
+				for(var i=0;i<4;i++){
+					if(i==num){
+						str+='<span style="text-decoration: line-through;">';
+					}
+					str+=list[i];
+				}
+				if(num<4) str+='</span>';
+				return str;
+			},
 		},
 		perfectPair:{},
 		characterReplace:{
@@ -11139,6 +11241,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangxuan:['zhangxuan','jsrg_zhangxuan'],
 			gaoxiang:['gaoxiang','jsrg_gaoxiang'],
 			lingcao:['lingcao','dc_lingcao'],
+			sp_menghuo:['sp_menghuo','dc_sp_menghuo'],
 		},
 		translate:{
 			re_panfeng:'潘凤',
@@ -11606,6 +11709,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_lingcao_prefix:'新杀',
 			dcdufeng:'独锋',
 			dcdufeng_info:'锁定技。出牌阶段开始时，你失去1点体力或废除一个装备栏，摸X张牌，然后你的攻击范围与使用【杀】的次数上限均为X直到回合结束（X为你已废除的装备栏数与损失的体力值之和，至多为你的体力上限）。',
+			dc_sp_menghuo:'群孟获',
+			dc_sp_menghuo_prefix:'群',
+			dcmanwang:'蛮王',
+			dcmanwang_info:'出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：⒈获得〖叛侵〗。⒉摸一张牌。⒊回复1点体力。⒋摸两张牌并失去〖叛侵〗。',
+			dcpanqin:'叛侵',
+			dcpanqin_info:'出牌阶段或弃牌阶段结束时，你可将你于本阶段内弃置且位于弃牌堆的所有牌当做【南蛮入侵】使用。然后若此牌被使用时对应的实体牌数不大于此牌的目标数，则你执行并移除〖蛮王〗中的最后一个选项，然后加1点体力上限并回复1点体力。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',

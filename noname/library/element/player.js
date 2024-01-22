@@ -7146,39 +7146,52 @@ export class Player extends HTMLDivElement {
 		return skill;
 	}
 	addTempSkill(skill, expire, checkConflict) {
-		if (this.hasSkill(skill) && this.tempSkills[skill] == undefined) return;
-		this.addSkill(skill, checkConflict, true, true);
-
-		if (!expire) expire = { global: ['phaseAfter', 'phaseBeforeStart'] };
-		else if (typeof expire == 'string' || Array.isArray(expire)) expire = { global: expire };
-		this.tempSkills[skill] = expire;
-
-		if (get.objtype(expire) == 'object') {
-			const roles = ['player', 'source', 'target', 'global'];
-			for (const i of roles) {
-				let triggers = expire[i];
-				if (!Array.isArray(triggers)) triggers = [triggers];
-				triggers.forEach(trigger => lib.hookmap[trigger] = true);
+		if (Array.isArray(skill)) {
+			for (var i = 0; i < skill.length; i++) {
+				this.addTempSkill(skill[i], expire, checkConflict);
 			}
 		}
-
+		else{
+			if (this.hasSkill(skill) && this.tempSkills[skill] == undefined) return;
+			this.addSkill(skill, checkConflict, true, true);
+	
+			if (!expire) expire = { global: ['phaseAfter', 'phaseBeforeStart'] };
+			else if (typeof expire == 'string' || Array.isArray(expire)) expire = { global: expire };
+			this.tempSkills[skill] = expire;
+	
+			if (get.objtype(expire) == 'object') {
+				const roles = ['player', 'source', 'target', 'global'];
+				for (const i of roles) {
+					let triggers = expire[i];
+					if (!Array.isArray(triggers)) triggers = [triggers];
+					triggers.forEach(trigger => lib.hookmap[trigger] = true);
+				}
+			}
+		}
 		return skill;
 	}
 	tempBanSkill(skill, expire, log) {
-		if (this.isTempBanned(skill)) return;
-		this.setStorage(`temp_ban_${skill}`, true);
-
-		if (log !== false && this.hasSkill(skill)) game.log(this, '的技能', `#g【${get.translation(skill)}】`, '暂时失效了');
-
-		if (!expire) expire = { global: ['phaseAfter', 'phaseBeforeStart'] };
-		else if (typeof expire == 'string' || Array.isArray(expire)) expire = { global: expire };
-		this.when(expire).assign({
-			firstDo: true,
-		}).vars({
-			bannedSkill: skill,
-		}).then(() => {
-			delete player.storage[`temp_ban_${bannedSkill}`];
-		});
+		if (Array.isArray(skill)) {
+			for (var i = 0; i < skill.length; i++) {
+				this.tempBanSkill(skill[i], expire, log);
+			}
+		}
+		else{
+			if (this.isTempBanned(skill)) return;
+			this.setStorage(`temp_ban_${skill}`, true);
+	
+			if (log !== false && this.hasSkill(skill)) game.log(this, '的技能', `#g【${get.translation(skill)}】`, '暂时失效了');
+	
+			if (!expire) expire = { global: ['phaseAfter', 'phaseBeforeStart'] };
+			else if (typeof expire == 'string' || Array.isArray(expire)) expire = { global: expire };
+			this.when(expire).assign({
+				firstDo: true,
+			}).vars({
+				bannedSkill: skill,
+			}).then(() => {
+				delete player.storage[`temp_ban_${bannedSkill}`];
+			});
+		}
 		return skill;
 	}
 	isTempBanned(skill) {
