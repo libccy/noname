@@ -12233,10 +12233,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				mod:{
 					targetEnabled:function(card,player,target){
-						if(target.getStorage('bixiong2').includes(get.suit(card))) return false;
+						if(player!==target&&target.getStorage('bixiong2').includes(get.suit(card))) return false;
 					},
 				},
-				intro:{content:'不能成为$牌的目标'},
+				intro:{content:'其他角色不能使用$牌指定你为目标'},
 			},
 			//高干
 			juguan:{
@@ -26610,7 +26610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quxi_info:'限定技。出牌阶段结束时，你可跳过下个弃牌阶段并选择两名手牌数不同的其他角色。你将武将牌翻至背面，令这两名角色中手牌数较少的角色获得另一名角色的一张牌并获得一枚“丰”，另一名角色获得一枚“歉”。拥有“丰”/“歉”的角色的摸牌阶段额定摸牌数+1/-1。拥有“丰”/“歉”的角色死亡时，或一轮游戏开始时，你可转移“丰”/“歉”。',
 			bixiong:'避凶',
 			bixiong2:'避凶',
-			bixiong_info:'锁定技，当你于弃牌阶段弃置手牌后，你不能成为与这些牌花色相同的牌的目标直到你下回合开始。',
+			bixiong_info:'锁定技，当你于弃牌阶段弃置手牌后，其他角色不能使用与这些牌花色相同的牌指定你为目标直到你的下回合开始。',
 			fuwei:'扶危',
 			fuwei_info:'每回合限一次。当你的牌被其他角色弃置或获得后，你可从牌堆中获得一张与此牌名称相同的牌（若没有则改为摸一张牌）。',
 			yuejian:'约俭',
