@@ -499,7 +499,7 @@ export async function boot() {
 		}
 		// await Promise.allSettled(_status.extensionLoading);
 
-		_status.extensionLoaded.filter(Boolean).forEach((name) => {
+		_status.extensionLoaded.filter(name=>game.hasExtension(name)).forEach((name) => {
 			lib.announce.publish("Noname.Init.Extension.onLoad", name);
 			lib.announce.publish(`Noname.Init.Extension.${name}.onLoad`, void 0);
 		});
