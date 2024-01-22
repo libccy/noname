@@ -612,7 +612,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filter(event,player){
 					return !player.hasCard(card=>{
-						return player.hasUseTarget(card);
+						return player.hasUseTarget(card,true,true);
 					});
 				},
 				async content(event,trigger,player){
