@@ -645,7 +645,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterCardx:function(card,player){
 					//if(player.getStorage('sbqicai').includes(card.name)) return false;
-					return get.type(card)=='equip'&&get.hasPlayer(target=>target!=player&&target.hasEmptySlot(get.subtype(card)));
+					return get.type(card)=='equip'&&game.hasPlayer(target=>target!=player&&target.hasEmptySlot(get.subtype(card)));
 				},
 				usable:1,
 				chooseButton:{
