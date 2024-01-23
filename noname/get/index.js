@@ -689,19 +689,19 @@ export class Get extends Uninstantable {
 	}
 	static stringify(obj, level) {
 		level = level || 0;
-		var indent = '';
-		var str;
-		for (var i = 0; i < level; i++) {
+		let indent = '';
+		let str;
+		for (let i = 0; i < level; i++) {
 			indent += '    ';
 		}
-		if (get.objtype(obj) == 'object') {
+		if (get.objtype(obj) == 'object' || obj instanceof lib.element.GameEventPromise) {
 			str = '{\n';
-			for (var i in obj) {
-				var insertDefaultString;
-				var insertFunctionString = indent + '    ' + get.stringify(obj[i], level + 1) + ',\n';
-				var parseFunction = i => {
-					var string = obj[i].toString();
-					var execResult;
+			for (let i in obj) {
+				let insertDefaultString;
+				let insertFunctionString = indent + '    ' + get.stringify(obj[i], level + 1) + ',\n';
+				let parseFunction = i => {
+					// let string = obj[i].toString();
+					let execResult;
 					if (obj[i] instanceof GeneratorFunction) {
 						// *content(){}
 						execResult = new RegExp(`\\*\\s*${i}[\\s\\S]*?\\(`).exec(obj[i]);
@@ -759,9 +759,9 @@ export class Get extends Uninstantable {
 			if (typeof obj == 'function') {
 				str = obj.toString();
 				str = str.replace(/\t/g, '    ');
-				var i = str.lastIndexOf('\n');
-				var num = 0;
-				for (var j = i + 1; j < str.length && str[j] == ' '; j++) {
+				let i = str.lastIndexOf('\n');
+				let num = 0;
+				for (let j = i + 1; j < str.length && str[j] == ' '; j++) {
 					num++;
 				}
 				num = Math.floor(num / 4);
@@ -773,8 +773,8 @@ export class Get extends Uninstantable {
 				try {
 					if (Array.isArray(obj) && obj.includes(Infinity)) {
 						obj = obj.slice(0);
-						var rand = get.id();
-						for (var i = 0; i < obj.length; i++) {
+						let rand = get.id();
+						for (let i = 0; i < obj.length; i++) {
 							if (obj[i] === Infinity) {
 								obj[i] = parseInt(rand);
 							}
