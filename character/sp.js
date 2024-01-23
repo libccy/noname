@@ -3038,13 +3038,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var aimx=game.filterPlayer(current=>{
 									return target.canUse({name:'sha'},current)&&get.effect(current,{name:'sha'},target,target)>0;
 								}).sort((a,b)=>get.effect(b,{name:'sha'},target,target)-get.effect(a,{name:'sha'},target,target))[0];
-								if(get.effect(aimx,{name:'sha'},target,player)<0&&get.effect(aimx,{name:'sha'},target,aimx)<0&&!canSave(player,aimx)) return 0;
+								if(aimx&&get.effect(aimx,{name:'sha'},target,player)<0&&get.effect(aimx,{name:'sha'},target,aimx)<0&&!canSave(player,aimx)) return 0;
 							}
 							if(target.hasValueTarget({name:'juedou'})){
 								var aimy=game.filterPlayer(current=>{
 									return target.canUse({name:'juedou'},current)&&get.effect(current,{name:'juedou'},target,target)>0;
 								}).sort((a,b)=>get.effect(b,{name:'juedou'},target,target)-get.effect(a,{name:'juedou'},target,target))[0];
-								if(get.effect(aimy,{name:'juedou'},target,player)<0&&get.effect(aimy,{name:'sha'},target,aimy)<0&&!canSave(player,aimy)) return 0;
+								if(aimy&&get.effect(aimy,{name:'juedou'},target,player)<0&&get.effect(aimy,{name:'sha'},target,aimy)<0&&!canSave(player,aimy)) return 0;
 							}
 							return -1;
 						},
