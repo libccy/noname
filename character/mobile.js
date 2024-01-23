@@ -6760,7 +6760,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					mingzhi:false,
 					effect:{
 						target:function(card,player,target,current){
-							if((get.tag(card,'respondShan')||get.tag(card,'respondSha'))&&target.getStorage('jibing').length>0&&player.isMaxHp()){
+							if((get.tag(card,'respondShan')||get.tag(card,'respondSha'))&&target.getExpansions('jibing').length>0&&player.isMaxHp()){
 								if(get.attitude(target,player)<=0){
 									return [0,0,1,0.3];
 								}
