@@ -3038,13 +3038,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var aimx=game.filterPlayer(current=>{
 									return target.canUse({name:'sha'},current)&&get.effect(current,{name:'sha'},target,target)>0;
 								}).sort((a,b)=>get.effect(b,{name:'sha'},target,target)-get.effect(a,{name:'sha'},target,target))[0];
-								if(get.effect(aimx,{name:'sha'},target,player)<0&&get.effect(aimx,{name:'sha'},target,aimx)<0&&!canSave(player,aimx)) return 0;
+								if(aimx&&get.effect(aimx,{name:'sha'},target,player)<0&&get.effect(aimx,{name:'sha'},target,aimx)<0&&!canSave(player,aimx)) return 0;
 							}
 							if(target.hasValueTarget({name:'juedou'})){
 								var aimy=game.filterPlayer(current=>{
 									return target.canUse({name:'juedou'},current)&&get.effect(current,{name:'juedou'},target,target)>0;
 								}).sort((a,b)=>get.effect(b,{name:'juedou'},target,target)-get.effect(a,{name:'juedou'},target,target))[0];
-								if(get.effect(aimy,{name:'juedou'},target,player)<0&&get.effect(aimy,{name:'sha'},target,aimy)<0&&!canSave(player,aimy)) return 0;
+								if(aimy&&get.effect(aimy,{name:'juedou'},target,player)<0&&get.effect(aimy,{name:'sha'},target,aimy)<0&&!canSave(player,aimy)) return 0;
 							}
 							return -1;
 						},
@@ -14987,7 +14987,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseCard('he',get.prompt('new_xingwu'),'将一张牌置于武将牌上作为“舞”').set('ai',function(card){
 						if(_status.event.goon) return 20-get.value(card);
 						return 7-get.value(card);
-					}).set('goon',player.needsToDiscard()||player.getStorage('new_xingwu').length>1);
+					}).set('goon',player.needsToDiscard()||player.getExpansions('new_xingwu').length>1);
 					'step 1'
 					if(result.bool){
 						player.logSkill('new_xingwu');
@@ -15061,7 +15061,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			new_luoyan:{
 				init:function(player){
-					if(player.getStorage('new_xingwu').length) player.addAdditionalSkill('new_luoyan',['oltianxiang','liuli']);
+					if(player.getExpansions('new_xingwu').length) player.addAdditionalSkill('new_luoyan',['oltianxiang','liuli']);
 				},
 				onremove:function(player){
 					player.removeAdditionalSkill('new_luoyan');
