@@ -1,7 +1,7 @@
 "use strict";
 
 new Promise(resolve => {
-	// 客户端自带core.js的请注意跟进
+	// 客户端自带core.js的请注意跟进core.js版本
 	if ('__core-js_shared__' in window) resolve(null);
 	else {
 		const nonameInitialized = localStorage.getItem('noname_inited');
@@ -88,15 +88,15 @@ new Promise(resolve => {
 	else {
 		const script = document.createElement('script')
 		script.type = "module";
-		script.src = `${assetURL}game/entry.js`
-		script.async = true
-		script.onerror = (event) => {
-			console.error(event)
+		script.src = `${assetURL}game/entry.js`;
+		script.async = true;
+		script.onerror = event => {
+			console.error(event);
 			const message = `您使用的浏览器或《无名杀》客户端加载内容失败！\n目前使用的浏览器UA信息为：\n${userAgent}\n若您使用的客户端为自带内核的旧版“兼容版”，请及时更新客户端版本！\n若您使用的客户端为手机端的非兼容版《无名杀》，请尝试更新手机的WebView内核，或者更换为1.8.2版本及以上的兼容版！\n若您是直接使用浏览器加载index.html进行游戏，请改为运行文件夹内的“noname-server.exe”（或使用VSCode等工具启动Live Server），以动态服务器的方式启动《无名杀》！`;
 			console.error(message);
 			alert(message);
-			exit()
+			exit();
 		}
-		document.head.appendChild(script)
+		document.head.appendChild(script);
 	}
 });

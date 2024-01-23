@@ -8,8 +8,6 @@ import { UI as ui } from '../../ui/index.js';
 export class Card extends HTMLDivElement {
 	/**
 	 * @param {HTMLDivElement|DocumentFragment} [position]
-	 * @param {'noclick'} [info]
-	 * @param {true} [noclick]
 	 */
 	// @ts-ignore
 	constructor(position) {
@@ -28,6 +26,10 @@ export class Card extends HTMLDivElement {
 		card._args = [position];
 		return card;
 	}
+	/**
+	 * @param {'noclick'} [info]
+	 * @param {true} [noclick]
+	 */
 	build(info, noclick) {
 		let card = this;
 		card.buildNode();

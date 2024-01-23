@@ -17,7 +17,7 @@
  });
  */
 
-import { game, get, lib, boot } from "../noname.js"
+import { game, get, lib, boot } from "../noname.js";
 import { userAgent } from "../noname/util/index.js";
 
 const coreAndVersion = get.coreInfo();
