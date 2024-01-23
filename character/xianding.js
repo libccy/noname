@@ -1700,7 +1700,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if (!list.includes(get.suit(card))) att = 2;
 						if (_status.event.goon) return (20 - get.value(card)) * att;
 						return (7 - get.value(card)) * att;
-					}).set('goon', player.needsToDiscard() || player.getStorage('dcxingwu').length == 2);
+					}).set('goon', player.needsToDiscard() || player.getExpansions('dcxingwu').length == 2);
 					'step 1'
 					if (result.bool) {
 						player.logSkill('dcxingwu');
