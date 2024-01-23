@@ -1214,6 +1214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				viewAs:{name:'lebu'},
 				position:'hes',
+				round:1,
 				viewAsFilter(player){
 					return player.countCards('hes');
 				},
