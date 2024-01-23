@@ -4112,7 +4112,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 1'
 							var hp=player.hp-1,maxhp=player.maxHp-1;
 							if(hp>0&&maxhp>0){
-								player.chooseControl(choices).set('prompt','安国：请选择一项').set('choiceList',[
+								player.chooseControl().set('prompt','安国：请选择一项').set('choiceList',[
 									'失去'+hp+'点体力，令'+get.translation(trigger.player)+'获得1点护甲',
 									'减'+maxhp+'点体力上限，令'+get.translation(trigger.player)+'获得1点护甲'
 								]).set('ai',()=>'选项一');
