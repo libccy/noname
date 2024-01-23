@@ -171,6 +171,16 @@ export class Player extends HTMLDivElement {
 		 */
 		// @ts-ignore
 		this.outCount;
+		/**
+		 * @type { number }
+		 */
+		// @ts-ignore
+		this.maxHp;
+		/**
+		 * @type { number }
+		 */
+		// @ts-ignore
+		this.hp;
 		throw new Error('Do not call this method');
 	}
 	build(noclick) {
@@ -2662,6 +2672,10 @@ export class Player extends HTMLDivElement {
 		if (count > num) this.removeMark(name, count - num, log);
 		else if (count < num) this.addMark(name, num - count, log);
 	}
+	/**
+	 * @param {*} i 
+	 * @returns { number }
+	 */
 	countMark(i) {
 		if (this.storage[i] == undefined) return 0;
 		if (typeof this.storage[i] == 'number') return this.storage[i];
@@ -5652,6 +5666,9 @@ export class Player extends HTMLDivElement {
 		};
 		return next;
 	}
+	/**
+	 * @returns { boolean }
+	 */
 	canAddJudge(card) {
 		if (this.isDisabledJudge()) return false;
 		let name;
@@ -6544,7 +6561,7 @@ export class Player extends HTMLDivElement {
 		var range;
 		var select = get.copy(info.selectTarget);
 		if (select == undefined) {
-			if (info.filterTarget == undefined) return true;
+			if (info.filterTarget == undefined) return 1;
 			range = [1, 1];
 		}
 		else if (typeof select == 'number') range = [select, select];

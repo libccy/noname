@@ -1,4 +1,4 @@
-'use strict';
+import { game } from '../noname.js';
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'yijiang',
@@ -8106,7 +8106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									player.$throw(cardx,1000,'nobroadcast');
 								},target);
 								if(player == game.me){
-									game.delay(0.5);
+									await game.asyncDelay(0.5);
 								}
 							}
 						};
