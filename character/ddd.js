@@ -4564,7 +4564,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter(event,player){
 					if(!event.source||!event.source.isIn()||event.source.group!='qun') return false;
-					if(!event.souce.countCards('he')<2) return false;
+					if(!event.source.countCards('he')<2) return false;
 					if(!player.hasZhuSkill('dddfuyi',event.source)) return false;
 					const skills=player.getStockSkills(true,true).filter(skill=>{
 						return !player.hasSkill(skill,null,false,false);

@@ -1343,7 +1343,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						},
 						target:(card,player,target)=>{
 							if(target._g_taipingyaoshu_temp) return;
-							if(get.subtype(card)==='equip2'&&target.getEquip('taipingyaoshu')&&!target.countEmpty(2)){
+							if(get.subtype(card)==='equip2'&&target.getEquip('taipingyaoshu')&&!target.countEmptySlot(2)){
 								target._g_taipingyaoshu_temp=true;
 								let lose=get.effect(target,{name:'losehp'},target,target),
 									draw=2*get.effect(target,{name:'draw'},target,target);

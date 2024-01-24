@@ -6117,7 +6117,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			kuangfeng3:{
 				trigger:{global:'damageBegin3'},
-				filter:function(event){
+				filter:function(event,player){
 					return event.hasNature('fire')&&event.player.getStorage('kuangfeng2').includes(player);
 				},
 				charlotte:true,

@@ -1871,7 +1871,10 @@ export class Get extends Uninstantable {
 		if (card) return list[0];
 		return list;
 	}
-	static judge(card) { return card.viewAs ? lib.card[card.viewAs].judge : get.info(card).judge; }
+	static judge(card) {
+		const cardInfo = (card.viewAs ? lib.card[card.viewAs] : get.info(card));
+		return (cardInfo && cardInfo.judge) ? cardInfo.judge : ()=>0;
+	}
 	static judge2(card) { return card.viewAs ? lib.card[card.viewAs].judge2 : get.info(card).judge2; }
 	static distance(from, to, method) {
 		if (from == to) return 0;

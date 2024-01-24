@@ -404,6 +404,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbsongwei:{
 				audio:2,
+				init:(player)=>{
+					player.addSkill('sbsongwei_delete');
+				},
 				trigger:{player:'phaseUseBegin'},
 				filter:function(event,player){
 					return game.hasPlayer(target=>target.group=='wei'&&target!=player);
@@ -414,7 +417,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					player.addMark('sbxingshang',game.countPlayer(target=>target.group=='wei'&&target!=player));
 				},
-				group:'sbsongwei_delete',
 				subSkill:{
 					delete:{
 						audio:'sbsongwei',
@@ -453,7 +455,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function*(event,map){
 					var player=map.player;
-					var result=yield player.chooseTarget(get.prompt('sbwusheng'),'选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸一张牌，对其使用五张【杀】后不能对其使用【杀】',(card,player,target)=>{
+					var result=yield player.chooseTarget(get.prompt('sbwusheng'),'选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸一张牌，对其使用三张【杀】后不能对其使用【杀】',(card,player,target)=>{
 						return target!=player&&!target.isZhu2();
 					}).set('ai',target=>{
 						var player=_status.event.player;
@@ -462,6 +464,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.logSkill('sbwusheng',target);
+						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.25);
 						player.addTempSkill('sbwusheng_effect',{player:'phaseUseAfter'});
 						player.storage.sbwusheng_effect[target.playerid]=0;
 					}
@@ -555,7 +558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							playerEnabled:function(card,player,target){
 								if(card.name!='sha'||typeof player.storage.sbwusheng_effect[target.playerid]!='number') return;
-								if(player.storage.sbwusheng_effect[target.playerid]>=5) return false;
+								if(player.storage.sbwusheng_effect[target.playerid]>=3) return false;
 							},
 						},
 						audio:'sbwusheng',
@@ -645,7 +648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterCardx:function(card,player){
 					//if(player.getStorage('sbqicai').includes(card.name)) return false;
-					return get.type(card)=='equip'&&get.hasPlayer(target=>target!=player&&target.hasEmptySlot(get.subtype(card)));
+					return get.type(card)=='equip'&&game.hasPlayer(target=>target!=player&&target.hasEmptySlot(get.subtype(card)));
 				},
 				usable:1,
 				chooseButton:{
@@ -6353,7 +6356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_guanyu_prefix:'谋',
 			sbwusheng:'武圣',
 			sbwusheng_wusheng_backup:'武圣',
-			sbwusheng_info:'你可以将一张手牌当作任意【杀】使用或打出。出牌阶段开始时，你可以选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸一张牌，对其使用五张【杀】后不能对其使用【杀】。',
+			sbwusheng_info:'你可以将一张手牌当作任意【杀】使用或打出。出牌阶段开始时，你可以选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸一张牌，对其使用三张【杀】后不能对其使用【杀】。',
 			sbyijue:'义绝',
 			sbyijue_info:'锁定技，每名角色每局游戏限一次，当你对一名角色造成大于等于其体力值的伤害时，你防止此伤害，且本回合你使用牌指定其为目标后，取消之。',
 			sb_caopi:'谋曹丕',
@@ -6361,7 +6364,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbxingshang:'行殇',
 			sbxingshang_info:'①每回合限一次，当一名角色死亡时或受到伤害时，你获得1个“颂”标记。②出牌阶段限一次，你可以：1.移去1个“颂”标记，令一名角色复原武将牌；2.移去2个“颂”标记，令一名角色摸X张牌（X为场上阵亡角色数，且X至少为1，至多为5）；3.移去3个“颂”标记，令一名体力上限小于10的角色加1点体力上限，回复1点体力，随机恢复一个已废除的装备栏；4.移去4个“颂”标记，获得一名阵亡角色武将牌上的所有技能，然后你失去武将牌上的所有技能。',
 			sbfangzhu:'放逐',
-			sbfangzhu_info:'出牌阶段限一次，你可以：1.移去2个“颂”标记，令一名其他角色的非Charlotte技能失效直到其回合结束；2.移去2个“颂”标记，令一名其他角色不能响应除其以为的角色使用的牌直到其回合结束；3.移去2个“颂”标记，令一名其他角色将武将牌翻面；4.移去2个“颂”标记，令一名其他角色只能使用你选择的一种类型的牌直到其回合结束。',
+			sbfangzhu_info:'出牌阶段限一次，你可以：1.移去2个“颂”标记，令一名其他角色的非Charlotte技能失效直到其回合结束；2.移去2个“颂”标记，令一名其他角色不能响应除其以外的角色使用的牌直到其回合结束；3.移去3个“颂”标记，令一名其他角色将武将牌翻面；4.移去3个“颂”标记，令一名其他角色只能使用你选择的一种类型的牌直到其回合结束。',
 			sbsongwei:'颂威',
 			sbsongwei_info:'主公技。①出牌阶段开始时，你获得Y个“颂”标记（Y为场上其他魏势力角色数）。②每局游戏限一次，出牌阶段，你可以令一名其他魏势力角色失去所有武将牌的技能。',
 
