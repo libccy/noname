@@ -3921,8 +3921,8 @@ export class Library extends Uninstantable {
 					item: {
 						'6': '6',
 						'12': '12',
-						'20': '24',
-						'30': '36',
+						'20': '20',
+						'30': '30',
 					},
 					unfrequent: true
 				},
