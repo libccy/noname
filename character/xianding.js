@@ -1901,7 +1901,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						var target=_status.event.target;
 						var left=0,right=0;
-						var leftx=target.getPrevious(),lefty=target.getNext();
+						var leftx=target.getPrevious(),rightx=target.getNext();
 						while(leftx!=player){
 							if(get.damageEffect(leftx,player,player)<0) break;
 							else{
