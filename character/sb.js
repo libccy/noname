@@ -404,6 +404,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbsongwei:{
 				audio:2,
+				init:(player)=>{
+					player.addSkill('sbsongwei_delete');
+				},
 				trigger:{player:'phaseUseBegin'},
 				filter:function(event,player){
 					return game.hasPlayer(target=>target.group=='wei'&&target!=player);
@@ -414,7 +417,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					player.addMark('sbxingshang',game.countPlayer(target=>target.group=='wei'&&target!=player));
 				},
-				group:'sbsongwei_delete',
 				subSkill:{
 					delete:{
 						audio:'sbsongwei',
@@ -6361,7 +6363,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbxingshang:'行殇',
 			sbxingshang_info:'①每回合限一次，当一名角色死亡时或受到伤害时，你获得1个“颂”标记。②出牌阶段限一次，你可以：1.移去1个“颂”标记，令一名角色复原武将牌；2.移去2个“颂”标记，令一名角色摸X张牌（X为场上阵亡角色数，且X至少为1，至多为5）；3.移去3个“颂”标记，令一名体力上限小于10的角色加1点体力上限，回复1点体力，随机恢复一个已废除的装备栏；4.移去4个“颂”标记，获得一名阵亡角色武将牌上的所有技能，然后你失去武将牌上的所有技能。',
 			sbfangzhu:'放逐',
-			sbfangzhu_info:'出牌阶段限一次，你可以：1.移去2个“颂”标记，令一名其他角色的非Charlotte技能失效直到其回合结束；2.移去2个“颂”标记，令一名其他角色不能响应除其以为的角色使用的牌直到其回合结束；3.移去2个“颂”标记，令一名其他角色将武将牌翻面；4.移去2个“颂”标记，令一名其他角色只能使用你选择的一种类型的牌直到其回合结束。',
+			sbfangzhu_info:'出牌阶段限一次，你可以：1.移去2个“颂”标记，令一名其他角色的非Charlotte技能失效直到其回合结束；2.移去2个“颂”标记，令一名其他角色不能响应除其以外的角色使用的牌直到其回合结束；3.移去3个“颂”标记，令一名其他角色将武将牌翻面；4.移去3个“颂”标记，令一名其他角色只能使用你选择的一种类型的牌直到其回合结束。',
 			sbsongwei:'颂威',
 			sbsongwei_info:'主公技。①出牌阶段开始时，你获得Y个“颂”标记（Y为场上其他魏势力角色数）。②每局游戏限一次，出牌阶段，你可以令一名其他魏势力角色失去所有武将牌的技能。',
 
