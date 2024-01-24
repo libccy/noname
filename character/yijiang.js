@@ -1182,7 +1182,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							getv=(name,player)=>{
 								let v=trigger.getTempCache('sangu',player.id+name);
 								if(typeof v==='number') return v;
-								v=player.getUseValue({name:name,storage:{sangu:true}},arg);
+								v=player.getUseValue({name:name,storage:{sangu:true}});
 								trigger.putTempCache('sangu',player.id+name,v);
 								return v;
 							};
@@ -8094,7 +8094,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const chooseToPutCard = async function(target){
 							await target.draw();
 							if(target.countCards('he')){
-								const {result:{cards,bool}} = 
+								const {result:{cards,bool}} =
 								await target.chooseCard('选择一张牌置于牌堆顶','he',true);
 								if(bool){
 									await target.lose(cards,ui.cardPile,'insert');
