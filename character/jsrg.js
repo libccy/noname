@@ -8252,7 +8252,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrgeqian_info:'①结束阶段，你可以蓄谋任意次。②当你使用【杀】或蓄谋牌指定其他角色为唯一目标后，你可以令此牌不计入次数限制并获得目标一张牌，然后其可以令你本回合至其的距离+2。',
 			jsrgfusha:'伏杀',
 			jsrgfusha_info:'限定技。出牌阶段，若你的攻击范围内仅有一名角色，你可以对其造成X点伤害（X为你的攻击范围，至多为游戏人数）。',
-			jsrg_sunlubansunluyu:'合孙鲁班孙鲁育',
+			jsrg_sunlubansunluyu:'合大小虎',
 			jsrg_sunlubansunluyu_prefix:'合',
 			jsrgdaimou:'殆谋',
 			jsrgdaimou_info:'每回合各限一次。当一名角色使用【杀】指定其他角色/你为目标时，你可以用牌堆顶的牌蓄谋/你须弃置你区域里的一张蓄谋牌。',
