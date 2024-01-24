@@ -6323,7 +6323,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dcshouze:{
-				audio:2,
+				audio:true,
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				filter:function(event,player){
