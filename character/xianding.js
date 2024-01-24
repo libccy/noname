@@ -1901,7 +1901,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						var target=_status.event.target;
 						var left=0,right=0;
-						var leftx=target.getPrevious(),lefty=target.getNext();
+						var leftx=target.getPrevious(),rightx=target.getNext();
 						while(leftx!=player){
 							if(get.damageEffect(leftx,player,player)<0) break;
 							else{
@@ -4436,7 +4436,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var cards=lib.skill.dcshexue.getLast();
 					cards=cards.filter(card=>player.hasUseTarget(card,false));
-					player.chooseButton(['设学：是否将一张牌当作其中一张牌使用？',[cards,'vards']]);
+					player.chooseButton(['设学：是否将一张牌当作其中一张牌使用？',[cards,'vcard']]);
 					'step 1'
 					if(!result.bool) return;
 					var card=result.links[0];
@@ -6323,7 +6323,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dcshouze:{
-				audio:2,
+				audio:true,
 				trigger:{player:'phaseJieshuBegin'},
 				forced:true,
 				filter:function(event,player){
@@ -13507,6 +13507,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianshangyi:'田尚衣，一作陈尚衣，魏文帝曹丕宫中著名宫人。能歌善舞，一时冠绝于世，私以为比之汉宫飞燕也不遑多让。',
 			malingli:'马伶俐，游卡桌游原创角色，设定上为，马超之女，其身形虽娇小，却继承了马超英勇略带冲动的个性，活泼阳光，调皮伶俐，爱摆弄爆竹烟花一类的小器具，包包里经常放置用五色彩纸包装的小炸弹球。马伶俐从小跟随马超和马云騄学习战斗技巧，战斗力超强，坚强的意志和勇气也得到了提升，同时擅长马术，有一匹可爱的小白马伴随其身边。后马伶俐成年，嫁与刘备之子刘理，获封梁王妃。两人琴瑟相和，极为恩爱，常结伴出游，被人誉为天作之合。',
 			zhugeruoxue:'诸葛氏（“若雪”为网络小说虚构），诸葛亮的二姐，庞山民之妻。',
+			caoyi:'曹轶，游卡桌游旗下产品《三国杀》原创角色。设定上为曹纯所收养的孙女，从小受到曹纯的教导，在军营中长大，性情坚毅有担当，军事谋略丰富，战斗能力超强。曹轶喜欢美食，特别是甜食，并且擅长制作各种点心。她身边跟随的雪白小老虎是曹纯在她及笄时送的生辰礼物，希望她如小老虎一样，英勇无畏。曹轶与曹婴交好，两人以姐妹相称。曹轶成年后继承祖父衣钵，接手精锐部队“虎豹骑”，成为新的虎豹骑的统领者。',
 		},
 		characterTitle:{
 			// wulan:'#b对决限定武将',
@@ -14118,7 +14119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_sb_lusu:'新杀谋鲁肃',
 			dc_sb_lusu_prefix:'新杀谋',
 			dcsbmingshi:'明势',
-			dcsbmingshi_info:'摸牌阶段，你可以多摸两张牌，然后令展示三张牌并令一名其他角色选择获得其中的一张牌。',
+			dcsbmingshi_info:'摸牌阶段，你可以多摸两张牌，然后展示三张牌并令一名其他角色选择获得其中的一张牌。',
 			dcsbmengmou:'盟谋',
 			dcsbmengmou_info:'转换技，每回合每项各限一次，当你得到其他角色的牌后，或其他角色得到你的牌后：阴，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力；阳，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力值，Y为X-其打出【杀】数）',
 			dc_sb_zhouyu:'新杀谋周瑜',
