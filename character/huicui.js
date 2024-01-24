@@ -757,7 +757,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
 					if(get.type(event.card)!='basic') return false;
-					if(player.getHistory('gain',evt=>evt.getParent().name=='dccaisi').length>player.maxHp) return false;
+					if(player.getHistory('gain',evt=>{
+						return evt.getParent().name==='dccaisi';
+					}).reduce((num,evt)=>{
+						return num+evt.cards.length;
+					},0)>player.maxHp) return false;
 					return _status.currentPhase;
 				},
 				prompt2:function(event,player){
