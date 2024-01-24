@@ -24834,7 +24834,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				content:function(){
-					player.addMark('xinfu_xionghuo',1);
+					if(player.countMark('xinfu_xionghuo')<3) player.addMark('xinfu_xionghuo',1);
 					if(trigger.player.hp<0&&get.itemtype(trigger.parent.cards)=='cards'&&get.position(trigger.parent.cards[0],true)=='o'){
 						player.gain(trigger.parent.cards,'gain2');
 					}
@@ -25815,7 +25815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_fujian":"伏间",
 			"xinfu_fujian_info":"锁定技，结束阶段开始时，你观看一名随机的其他角色的随机X张手牌。(X为场上手牌最少的角色的手牌数)",
 			xinfu_xionghuo:'凶镬',
-			xinfu_xionghuo_info:'游戏开始时，你获得3个“暴戾”标记。出牌阶段，你可以交给一名其他角色一个“暴戾”标记。当你对有“暴戾”标记的其他角色造成伤害时，此伤害+1。有“暴戾”标记的其他角色的出牌阶段开始时，其移去所有“暴戾”标记并随机执行一项：1.受到1点火焰伤害且本回合不能对你使用【杀】；2.失去1点体力且本回合手牌上限-1；3.你随机获得其一张手牌和一张装备区的牌。',
+			xinfu_xionghuo_info:'游戏开始时，你获得3个“暴戾”标记（标记上限为3）。出牌阶段，你可以交给一名其他角色一个“暴戾”标记。当你对有“暴戾”标记的其他角色造成伤害时，此伤害+1。有“暴戾”标记的其他角色的出牌阶段开始时，其移去所有“暴戾”标记并随机执行一项：1.受到1点火焰伤害且本回合不能对你使用【杀】；2.失去1点体力且本回合手牌上限-1；3.你随机获得其一张手牌和一张装备区的牌。',
 			xinfu_shajue:'杀绝',
 			xinfu_shajue_info:'锁定技，其他角色进入濒死状态时，你获得一个“暴戾”标记。然后若其体力值小于0，你获得使其进入濒死状态的牌。',
 			xinfu_jianjie:"荐杰",
