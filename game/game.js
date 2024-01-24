@@ -5,7 +5,7 @@ new Promise(resolve => {
 	if ('__core-js_shared__' in window) resolve(null);
 	else {
 		const nonameInitialized = localStorage.getItem('noname_inited');
-		const assetURL = typeof nonameInitialized != 'string' || nonameInitialized == 'nodejs' ? '' : nonameInitialized;
+		const assetURL = location.protocol.startsWith('http') ? '' : (typeof nonameInitialized != 'string' || nonameInitialized == 'nodejs' ? '' : nonameInitialized);
 		const coreJSBundle = document.createElement('script');
 		coreJSBundle.onerror = coreJSBundle.onload = resolve;
 		coreJSBundle.src = `${assetURL}game/core-js-bundle.js`;
@@ -13,7 +13,7 @@ new Promise(resolve => {
 	}
 }).then(() => {
 	const nonameInitialized = localStorage.getItem('noname_inited');
-	const assetURL = typeof nonameInitialized != 'string' || nonameInitialized == 'nodejs' ? '' : nonameInitialized;
+	const assetURL = location.protocol.startsWith('http') ? '' : (typeof nonameInitialized != 'string' || nonameInitialized == 'nodejs' ? '' : nonameInitialized);
 	const userAgent = navigator.userAgent.toLowerCase();
 
 	const exit = () => {
