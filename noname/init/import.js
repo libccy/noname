@@ -34,7 +34,7 @@ export const importMode = generateImportFunction('mode', (name) => `../../mode/$
  */
 function generateImportFunction(type, pathParser) {
 	return async (name) => {
-		if(type == 'extension' && !game.hasExtension(name)){
+		if(type == 'extension' && !game.hasExtension(name) && !lib.config.all.stockextension.includes(name)){
 			await game.import(type,createEmptyExtension(name));
 			return;
 		}
