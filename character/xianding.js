@@ -4436,7 +4436,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var cards=lib.skill.dcshexue.getLast();
 					cards=cards.filter(card=>player.hasUseTarget(card,false));
-					player.chooseButton(['设学：是否将一张牌当作其中一张牌使用？',[cards,'vards']]);
+					player.chooseButton(['设学：是否将一张牌当作其中一张牌使用？',[cards,'vcard']]);
 					'step 1'
 					if(!result.bool) return;
 					var card=result.links[0];
