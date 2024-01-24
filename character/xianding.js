@@ -14119,7 +14119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_sb_lusu:'新杀谋鲁肃',
 			dc_sb_lusu_prefix:'新杀谋',
 			dcsbmingshi:'明势',
-			dcsbmingshi_info:'摸牌阶段，你可以多摸两张牌，然后令展示三张牌并令一名其他角色选择获得其中的一张牌。',
+			dcsbmingshi_info:'摸牌阶段，你可以多摸两张牌，然后展示三张牌并令一名其他角色选择获得其中的一张牌。',
 			dcsbmengmou:'盟谋',
 			dcsbmengmou_info:'转换技，每回合每项各限一次，当你得到其他角色的牌后，或其他角色得到你的牌后：阴，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力；阳，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力值，Y为X-其打出【杀】数）',
 			dc_sb_zhouyu:'新杀谋周瑜',
