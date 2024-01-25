@@ -1806,10 +1806,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.getHistory('lose').length;
 				},
 				frequent:true,
-				content(){
-					'step 0'
-					player.judge();
-					'step 1'
+				async content(event,trigger,player){
+					const {result} = await player.judge();
 					let num = 0;
 					game.getGlobalHistory('cardMove',evt=>{
 						if(evt.name!='cardsDiscard'){

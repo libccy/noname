@@ -1372,7 +1372,9 @@ export const Content = {
 		if (!evt.orderingCards) evt.orderingCards = [];
 		if (!evt.noOrdering && !evt.cardsOrdered) {
 			evt.cardsOrdered = true;
-			var next = game.createEvent('orderingDiscard', false, evt.getParent());
+			var next = game.createEvent('orderingDiscard', false);
+			event.next.remove(next);
+			evt.after.push(next);
 			next.relatedEvent = evt;
 			next.setContent('orderingDiscard');
 		}
@@ -7512,7 +7514,9 @@ export const Content = {
 			if (!evt.orderingCards) evt.orderingCards = [];
 			if (!evt.noOrdering && !evt.cardsOrdered) {
 				evt.cardsOrdered = true;
-				var next = game.createEvent('orderingDiscard', false, evt.getParent());
+				var next = game.createEvent('orderingDiscard', false);
+				event.next.remove(next);
+				evt.after.push(next);
 				next.relatedEvent = evt;
 				next.setContent('orderingDiscard');
 			}

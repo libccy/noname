@@ -4773,15 +4773,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(result.bool) target.addExpose(0.1);
 					else{
-						var next=game.createEvent('twdingzhen_addSkill');
-						event.next.remove(next);
-						trigger.after.push(next);
-						next.target=target;
-						next.player=player;
-						next.setContent(function(){
-							target.addSkill('twdingzhen_target');
-							target.markAuto('twdingzhen_target',[player]);
-						})
+						target.addSkill('twdingzhen_target');
+						target.markAuto('twdingzhen_target',[player]);
 					}
 					'step 4'
 					if(event.num<event.targets.length-1){
