@@ -6,13 +6,44 @@ import { Game as game } from '../game/index.js';
 import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 
-import { userAgent } from '../util/index.js';
+import { userAgent, nonameInitialized } from '../util/index.js';
 import * as config from '../util/config.js';
 import { promiseErrorHandlerMap } from '../util/browser.js';
 import { gnc } from '../gnc/index.js';
 
 import { importCardPack, importCharacterPack, importExtension, importMode } from './import.js';
 import { onload } from './onload.js';
+
+// 判断是否从file协议切换到http/s协议
+export function canUseHttpProtocol() {
+	// 如果是http了就不用
+	if (location.protocol.startsWith('http')) return false;
+	if (typeof nonameInitialized == 'string') {
+		// 手机端
+		if (window.cordova) {
+			// 直接确定包名
+			if (nonameInitialized.includes('com.noname.shijian')) {
+				// 每个app自定义能升级的渠道，比如判断版本
+				// @ts-ignore
+				window.noname_shijianInterfaces.getApkVersion() >= 16000;
+			}
+		}
+		// 电脑端
+		else if (typeof window.require == 'function' && typeof window.process == 'object') {
+			try {
+				require('express');
+				return true;
+			} catch  {
+				return false;
+			}
+		}
+		// 浏览器端
+		else {
+			return location.protocol.startsWith('http');
+		}
+	}
+	return false;
+}
 
 // 无名杀，启动！
 export async function boot() {
