@@ -605,6 +605,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.hasCard(card=>get.type2(card)=='trick','hs');
 				},
 				check:function(card){
+					if(get.itemtype(card)!=='card') return true;
 					if(get.event().type=='dying') return 1/Math.max(0.1,get.value(card));
 					return 4-get.value(card);
 				},
