@@ -2597,7 +2597,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							'step 0'
 							event.targets=trigger.targets.filter(i=>!i.isLinked());
-							player.logSkill('sblianhuan_discard',event.targets);
+							if(!event.targets.length) event.finish();
+							else player.logSkill('sblianhuan_discard',event.targets);
 							'step 1'
 							var target=targets.shift();
 							var cards=target.getCards('h',card=>{
