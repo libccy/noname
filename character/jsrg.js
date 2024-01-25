@@ -1806,24 +1806,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.getHistory('lose').length;
 				},
 				frequent:true,
-				async content(event,trigger,player){
-					player.judge().set('callback',()=>{
-						const red=[],black=[];
-						game.getGlobalHistory('cardMove',evt=>{
-							if(evt.name!='cardsDiscard'){
-								if(evt.name!='lose'||evt.position!=ui.discardPile) return false;
-							}
-							const cards=evt.cards.filter(card=>get.position(card,true)=='d');
-							red.addArray(cards.filter(i=>get.color(i,false)=='red'));
-							black.addArray(cards.filter(i=>get.color(i,false)=='black'));
-						});
-						if(event.judgeResult.color=='red'&&red.length){
-							player.draw(red.length);
+				content(){
+					'step 0'
+					player.judge();
+					'step 1'
+					let num = 0;
+					game.getGlobalHistory('cardMove',evt=>{
+						if(evt.name!='cardsDiscard'){
+							if(evt.name!='lose'||evt.position!=ui.discardPile) return false;
 						}
-						else if(event.judgeResult.color=='black'&&black.length){
-							player.draw(black.length);
-						}
-					})
+						num += (evt.cards.filter(i=>get.color(i,false) == result.color).length);
+					});
+					if (num > 0) player.draw(num);
 				},
 			},
 			jsrgzunwei:{
