@@ -62,7 +62,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrg_simayi:['male','wei',4,['jsrgyingshi','jsrgtuigu']],
 			jsrg_guoxun:['male','wei',4,['jsrgeqian','jsrgfusha']],
 			jsrg_sunlubansunluyu:['female','wu',3,['jsrgdaimou','jsrgfangjie']],
-			jsrg_caofang:['male','wei','3/4',['jsrgzhaotu','jsrgjingju','jsrgweizhui']],
+			jsrg_caofang:['male','wei','3/4',['jsrgzhaotu','jsrgjingju','jsrgweizhui'],['zhu']],
 			jsrg_sunjun:['male','wu',4,['jsrgyaoyan','jsrgbazheng']],
 			jsrg_liuyong:['male','shu',3,['jsrgdanxin','jsrgfengxiang']],
 			jsrg_weiwenzhugezhi:['male','wu',4,['jsrgfuhai']],
