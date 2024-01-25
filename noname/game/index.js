@@ -5491,6 +5491,7 @@ export class Game extends Uninstantable {
 					else {
 						next.parent = event;
 						_status.event = next;
+						game.getGlobalHistory('everything').push(next);
 					}
 				}
 				else {
