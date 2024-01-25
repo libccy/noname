@@ -63,6 +63,7 @@ export class GameEventPromise extends Promise {
 						// 得新执行一个只执行这个异步事件的game.loop
 
 						// 事件自行处理skip情况
+						_status.event.next.remove(eventPromise);
 						if (event.player && event.player.skipList.includes(event.name)) {
 							_status.event.trigger(event.name + 'Skipped');
 							event.player.skipList.remove(event.name);

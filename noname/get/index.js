@@ -3736,7 +3736,7 @@ export class Get extends Uninstantable {
 		else if (node.classList.contains('equips') && ui.arena.classList.contains('selecting')) {
 			(function () {
 				uiintro.add('选择装备');
-				uiintro.addSmall(Array.from(node.childNodes).filter(node => !node.classList.contains('feichu')), true);
+				uiintro.addSmall(Array.from(node.childNodes).filter(node => !node.classList.contains('emptyequip') && !node.classList.contains('feichu')), true);
 				uiintro.clickintro = true;
 				ui.control.hide();
 				uiintro._onclose = function () {
