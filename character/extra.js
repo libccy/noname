@@ -227,7 +227,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('ai',target=>{
 						const player=get.player();
 						const pvalue=-player.getCards('h').map(card=>get.value(card,player)).reduce((p,c)=>p+c,0);
-						const tvalue=target.getCards('h').map(card=>get.value(card,player)).reduce((p,c)=>p+c,0);
+						const tvalue=-target.getCards('h').map(card=>get.value(card,target)).reduce((p,c)=>p+c,0)*get.sgnAttitude(player,target);
 						return (pvalue+tvalue)/2;
 					});
 					if(!bool) return;
@@ -263,7 +263,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.loseAsync({
 						gain_list:list,
 						player:player,
-						animate:'gain2',
+						animate:'draw',
 					}).setContent('gaincardMultiple');
 				},
 				ai:{
