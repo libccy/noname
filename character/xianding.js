@@ -655,12 +655,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var str;
 						if(storage) str='令'+get.translation(target)+'打出至多'+get.cnNumber(num)+'张【杀】，然后其失去Y点体力。（Y为'+num+'-其打出【杀】数）';
 						else str='令'+get.translation(target)+'使用至多'+get.cnNumber(num)+'张【杀】，其每以此法造成1点伤害，其回复1点体力';
-						result=yield player.chooseBool(get.prompt('dcsbmengmou',target),str).set('choice',(storage?check_true(player,target):check_false(player,target))>0);
+						result=yield player.chooseBool(get.prompt('dcsbmengmou',target),str).set('choice',(storage?check_false(player,target):check_true(player,target))>0);
 					}
 					else{
 						result=yield player.chooseTarget(get.prompt('dcsbmengmou'),lib.skill.dcsbmengmou.intro.content(storage),(card,player,target)=>_status.event.targets.includes(target)).set('ai',target=>{
 							return _status.event.check(_status.event.player,target);
-						}).set('targets',targets).set('check',storage?check_true:check_false).set('ainmate',false);
+						}).set('targets',targets).set('check',storage?check_false:check_true).set('ainmate',false);
 					}
 					if(result.bool){
 						if(!target) target=result.targets[0];
