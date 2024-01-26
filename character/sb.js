@@ -455,7 +455,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function*(event,map){
 					var player=map.player;
-					var result=yield player.chooseTarget(get.prompt('sbwusheng'),'选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸一张牌，对其使用三张【杀】后不能对其使用【杀】',(card,player,target)=>{
+					var result=yield player.chooseTarget(get.prompt('sbwusheng'),'选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸一张牌，对其使用'+(get.mode()==='identity'?'五':'三')+'张【杀】后不能对其使用【杀】',(card,player,target)=>{
 						return target!=player&&!target.isZhu2();
 					}).set('ai',target=>{
 						var player=_status.event.player;
@@ -558,7 +558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							playerEnabled:function(card,player,target){
 								if(card.name!='sha'||typeof player.storage.sbwusheng_effect[target.playerid]!='number') return;
-								if(player.storage.sbwusheng_effect[target.playerid]>=3) return false;
+								if(player.storage.sbwusheng_effect[target.playerid]>=(get.mode()==='identity'?5:3)) return false;
 							},
 						},
 						audio:'sbwusheng',
@@ -6358,6 +6358,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbwusheng:'武圣',
 			sbwusheng_wusheng_backup:'武圣',
 			sbwusheng_info:'你可以将一张手牌当作任意【杀】使用或打出。出牌阶段开始时，你可以选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸一张牌，对其使用三张【杀】后不能对其使用【杀】。',
+			sbwusheng_info_identity:'你可以将一张手牌当作任意【杀】使用或打出。出牌阶段开始时，你可以选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸一张牌，对其使用五张【杀】后不能对其使用【杀】。',
 			sbyijue:'义绝',
 			sbyijue_info:'锁定技，每名角色每局游戏限一次，当你对一名角色造成大于等于其体力值的伤害时，你防止此伤害，且本回合你使用牌指定其为目标后，取消之。',
 			sb_caopi:'谋曹丕',
