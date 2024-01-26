@@ -1791,20 +1791,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.countPlayer(current=>cards.addArray(current.getCards('hejxs')));
 							for(var name of lib.inpile){
 								if(!get.tag({name:name},'damage')) continue;
-								if(cards.some(card=>get.name(card,false)==name&&!get.natureList(card,false).length)){
+								let same=cards.filter(card=>get.name(card,false)==name&&!get.natureList(card,false).length);
+								if(same.length){
 									for(var suit of suits){
-										if(cards.some(card=>get.name(card,false)==name&&!get.natureList(card,false).length&&get.suit(card,false)==suit)){
+										if(same.some(card=>get.suit(card,false)==suit)){
 											list.push([get.type(name),get.translation(suit),name,undefined,suit]);
 										}
 									}
 								}
-								if(name=='sha'){
-									for(var nature of lib.inpile_nature){
-										if(cards.some(card=>get.name(card,false)==name&&get.is.sameNature(get.natureList(card,false),nature))){
-											for(var suit of suits){
-												if(cards.some(card=>get.name(card,false)==name&&get.is.sameNature(get.natureList(card,false),nature)&&get.suit(card,false)==suit)){
-													list.push([get.type(name),get.translation(suit),name,nature,suit]);
-												}
+								for(var nature of lib.inpile_nature){
+									same=cards.filter(card=>get.name(card,false)==name&&get.is.sameNature(get.natureList(card,false),nature));
+									if(same.length){
+										for(var suit of suits){
+											if(same.some(card=>get.suit(card,false)==suit)){
+												list.push([get.type(name),get.translation(suit),name,nature,suit]);
 											}
 										}
 									}
@@ -1869,84 +1869,89 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dcxiaoren:{
 				audio:2,
-				trigger:{source:'damageSource'},
+				trigger:{
+					source:'damageSource'
+				},
 				usable:1,
+				check:(event,player)=>{
+					let rev=game.countPlayer(i=>{
+						return i.isDamaged()&&get.attitude(_status.event.player,i)>0;
+					});
+					if(!event.player.isIn()||game.countPlayer()<2) return rev;
+					if(get.damageEffect(event.player.getPrevious(),player,_status.event.player)>-rev) return true;
+					return get.damageEffect(event.player.getNext(),player,_status.event.player)>-rev;
+				},
 				content:function(){
 					'step 0'
+					if(!event.target) event.target=trigger.player;
 					player.judge();
 					'step 1'
-					if(result.color!='red'&&result.color!='black') return;
-					if(result.color=='red'&&!game.hasPlayer(current=>current.isDamaged())) return;
-					if(result.color=='black'&&(!trigger.player.isIn()||game.countPlayer()<3)) return;
-					var next=game.createEvent('dcxiaoren_'+result.color);
-					next.player=player;
-					if(result.color=='black') next.target=trigger.player;
-					next.setContent(lib.skill.dcxiaoren['content_'+result.color]);
-				},
-				content_red:function(){
-					'step 0'
-					player.chooseTarget('绡刃：是否令一名其他角色回复1点体力？',(card,player,target)=>target.isDamaged()).set('ai',target=>get.recoverEffect(target,_status.event.player,_status.event.player));
-					'step 1'
+					if(result.color=='red') player.chooseTarget('绡刃：是否令一名角色回复1点体力（若回满则额外摸一张牌）？').set('ai',target=>{
+						let rec=get.recoverEffect(target,_status.event.player,_status.event.player);
+						if(target.getDamagedHp()<=1) return rec+get.effect(target,{name:'draw'},target,_status.event.player);
+						return rec;
+					});
+					else if(result.color!='black'||!trigger.player.isIn()||game.countPlayer()<2) event.goto(8);
+					else event.goto(4);
+					'step 2'
 					if(result.bool){
 						var target=result.targets[0];
+						event.target=target;
 						player.line(target);
 						target.recover();
 					}
-				},
-				content_black:function(){
-					'step 0'
-					if(target.getPrevious()==player) event._result={control:'下家'};
-					else if(target.getNext()==player) event._result={control:'上家'};
-					else player.chooseControl('上家','下家').set('prompt','绡刃：请选择一个方向').set('prompt2','对'+get.translation(target)+'上家或下家造成1点伤害，然后你以此方向可重复此流程直到有角色因此死亡或此方向的下个目标为你').set('ai',()=>{
-						var player=_status.event.player;
-						var target=_status.event.target;
-						var left=0,right=0;
-						var leftx=target.getPrevious(),rightx=target.getNext();
-						while(leftx!=player){
-							if(get.damageEffect(leftx,player,player)<0) break;
-							else{
-								left+=get.damageEffect(leftx,player,player);
-								leftx=leftx.getPrevious();
-							}
-						}
-						while(rightx!=player){
-							if(get.damageEffect(rightx,player,player)<0) break;
-							else{
-								right+=get.damageEffect(rightx,player,player);
-								rightx=leftx.getPrevious();
-							}
-						}
-						return left>right?'上家':'下家';
-					}).set('target',target);
-					'step 1'
-					if(result.control){
-						event.num=1;
-						player.popup(result.control);
-						game.log(player,'选择了','#y'+result.control);
-						event.fangxiang=result.control;
-					}
-					else event.finish();
-					'step 2'
-					var current=target;
-					for(var i=0;i<event.num;i++){
-						current=current[event.fangxiang=='上家'?'getPrevious':'getNext']();
-					}
-					if(current==player) event.finish();
-					else{
-						event.current=current;
-						player.line(current);
-						current.damage();
-					}
+					else event.goto(8);
 					'step 3'
-					var aim=event.current[event.fangxiang=='上家'?'getPrevious':'getNext']();
-					if(!event.current.isIn()||aim==player) event.finish();
-					else player.chooseBool('绡刃：是否对'+get.translation(aim)+'造成1点伤害？').set('choice',get.damageEffect(aim,player,player)>=0);
+					if(event.target.isHealthy()) event.target.draw();
+					player.removeSkill('dcxiaoren_dying');
+					event.goto(8);
 					'step 4'
+					var targets=[].addArray([target.getPrevious(),target.getNext()]);
+					if(targets.length>1) player.chooseTarget('绡刃：对其中一名角色造成1点伤害',(card,player,target)=>{
+						return _status.event.targets.includes(target);
+					},true).set('ai',target=>{
+						let player=_status.event.player;
+						return get.damageEffect(target,player,player);
+					}).set('targets',targets);
+					else if(targets.length) event._result={bool:true,targets:targets};
+					'step 5'
 					if(result.bool){
-						event.num++;
-						event.goto(2);
+						let target=result.targets[0];
+						event.target=target;
+						player.line(target);
+						target.damage('nocard');
 					}
+					else event.goto(8);
+					'step 6'
+					if(player.storage.dcxiaoren_dying||get.is.blocked(event.name,player)) event._result={bool:false};
+					else player.chooseBool('绡刃：是否再次进行判定并执行对应效果直到未能执行此项或有角色进入濒死状态？').set('ai',function(){
+						return _status.event.bool;
+					}).set('frequentSkill','dcxiaoren').set('bool',lib.skill.dcxiaoren.check({player:event.target},player));
+					'step 7'
+					if(result.bool){
+						player.addTempSkill('dcxiaoren_dying');
+						event.goto(0);
+					}
+					'step 8'
+					player.removeSkill('dcxiaoren_dying');
 				},
+				subSkill:{
+					dying:{
+						init:(player)=>{
+							delete player.storage.dcxiaoren_dying;
+						},
+						onremove:(player)=>{
+							delete player.storage.dcxiaoren_dying;
+						},
+						trigger:{global:'dying'},
+						forced:true,
+						popup:false,
+						charlotte:true,
+						content:function(){
+							player.storage.dcxiaoren_dying=true;
+						}
+					},
+				}
 			},
 			//孙翎鸾
 			dclingyue:{
@@ -14058,9 +14063,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dctongye_info:'锁定技。游戏开始时或一名角色死亡后，若场上势力数：不大于4，你的手牌上限+3；不大于3，你的攻击范围+3；不大于2，你使用【杀】的次数上限+3；不大于1，你摸牌阶段额定摸牌数+3。',
 			tianshangyi:'田尚衣',
 			dcposuo:'婆娑',
-			dcposuo_info:'出牌阶段，若你本阶段未造成过伤害，则你可以将一张你本阶段未以此法使用过的花色的手牌当作任意一张存在于游戏的同花色伤害牌使用。',
+			dcposuo_info:'出牌阶段，若你本阶段未对其他角色造成过伤害，则你可以将一张你本阶段未以此法使用过的花色的手牌当作任意一张存在于游戏的同花色伤害牌使用。',
 			dcxiaoren:'绡刃',
-			dcxiaoren_info:'每回合限一次，当你造成伤害后，你可以进行判定，若结果为：红色，你可以令一名角色回复1点体力；黑色，你可以对受伤角色的上家或下家造成1点伤害，然后你可以重复此方向的伤害流程直到有角色因此死亡或下个目标角色为你。',
+			dcxiaoren_info:'每回合限一次，当你造成伤害后，你可以进行判定，若结果为：红色，你可以令一名角色回复1点体力，然后若其满体力，其摸一张牌；黑色，你对受伤角色的上家或下家造成1点伤害，然后你可以重复此流程直到未能执行此项或有角色进入濒死状态。',
 			dc_daxiaoqiao:'新杀大乔小乔',
 			dc_daxiaoqiao_prefix:'新杀',
 			dcxingwu:'星舞',
