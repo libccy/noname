@@ -152,14 +152,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'enterGame',
 				},
 				filter(event,player){
-					return (event.name!='phase'||game.phaseNumber==0)&&game.hasPlayer(current=>{
-						return !current.isZhu2()&&current!=player;
-					});
+					return (event.name!='phase'||game.phaseNumber==0)&&game.countPlayer(current=>{
+						return !current.isZhu2();
+					})>1;
 				},
 				direct:true,
 				async content(event,trigger,player){
 					const toSortPlayers=game.filterPlayer(current=>!current.isZhu2());
-					toSortPlayers.sortBySeat(game.findPlayer2(current=>current.getSeatNum()==1));
+					toSortPlayers.sortBySeat(game.findPlayer2(current=>current.getSeatNum()==1,true));
 					const next=player.chooseToMove('榻谟：是否分配所有角色的座次？');
 					next.set('list',[
 						['（以下排列的顺序即为发动技能后角色的座次顺序）',
@@ -167,7 +167,60 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								const info=item.split('|'),_item=item;
 								const seat=parseInt(info[0]);
 								item=info[1];
-								node=ui.create.buttonPresets.character(item,type,position,noclick);
+								if(node){
+									node.classList.add('button');
+									node.classList.add('character');
+									node.style.display='';
+								}
+								else{
+									node=ui.create.div('.button.character',position);
+								}
+								node._link=item;
+								node.link=item;
+
+								const func=function(node,item){
+									if(item!='unknown') node.setBackground(item,'character');
+									if(node.node){
+										node.node.name.remove();
+										node.node.hp.remove();
+										node.node.group.remove();
+										node.node.intro.remove();
+										if(node.node.replaceButton) node.node.replaceButton.remove();
+									}
+									node.node={
+										name:ui.create.div('.name',node),
+										group:ui.create.div('.identity',node),
+										intro:ui.create.div('.intro',node),
+									};
+									const currentPlayer=game.findPlayer(current=>current.getSeatNum()==seat);
+									const infoitem=[currentPlayer.sex,currentPlayer.group,`${currentPlayer.hp}/${currentPlayer.maxHp}/${currentPlayer.hujia}`];
+									node.node.name.innerHTML=get.slimName(item);
+									if(lib.config.buttoncharacter_style=='default'||lib.config.buttoncharacter_style=='simple'){
+										if(lib.config.buttoncharacter_style=='simple'){
+											node.node.group.style.display='none';
+										}
+										node.classList.add('newstyle');
+										node.node.name.dataset.nature=get.groupnature(get.bordergroup(infoitem));
+										node.node.group.dataset.nature=get.groupnature(get.bordergroup(infoitem),'raw');
+									}
+									node.node.name.style.top='8px';
+									if(node.node.name.querySelectorAll('br').length>=4){
+										node.node.name.classList.add('long');
+										if(lib.config.buttoncharacter_style=='old'){
+											node.addEventListener('mouseenter',ui.click.buttonnameenter);
+											node.addEventListener('mouseleave',ui.click.buttonnameleave);
+										}
+									}
+									node.node.intro.innerHTML=lib.config.intro;
+									if(!noclick){
+										lib.setIntro(node);
+									}
+									node.node.group.innerHTML=`<div>${get.cnNumber(seat,true)}号</div>`;
+									node.node.group.style.backgroundColor=get.translation(`${get.bordergroup(infoitem)}Color`);
+								};
+								node.refresh=func;
+								node.refresh(node,item);
+
 								node.link=_item;
 								node.seatNumber=seat;
 								node._customintro=(uiintro)=>{
