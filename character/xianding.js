@@ -1925,11 +1925,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.goto(9);
 					'step 7'
 					if(player.storage.dcxiaoren_dying||get.is.blocked(event.name,player)) event._result={bool:false};
+					else if(event.frequent) event._result={bool:true};
 					else player.chooseBool('绡刃：是否再次进行判定并执行对应效果直到未能执行此项或有角色进入濒死状态？').set('ai',function(){
 						return _status.event.bool;
-					}).set('frequentSkill','dcxiaoren').set('bool',lib.skill.dcxiaoren.check({player:event.target},player));
+					}).set('bool',lib.skill.dcxiaoren.check({player:event.target},player));
 					'step 8'
-					if(result.bool) event.goto(1);
+					if(result.bool){
+						event.frequent=true;
+						event.goto(1);
+					}
 					'step 9'
 					player.removeSkill('dcxiaoren_dying');
 				},
