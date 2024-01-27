@@ -181,6 +181,11 @@ export class Player extends HTMLDivElement {
 		 */
 		// @ts-ignore
 		this.hp;
+		/**
+		 * @type { number }
+		 */
+		// @ts-ignore
+		this.hujia;
 		throw new Error('Do not call this method');
 	}
 	build(noclick) {
