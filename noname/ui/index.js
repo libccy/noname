@@ -3709,7 +3709,7 @@ class Create extends Uninstantable {
 					return lib.config.extensionSort.indexOf(a) - lib.config.extensionSort.indexOf(b);
 				});
 			}
-			for (var i of extensionsInMenu) {
+			for (let i of extensionsInMenu) {
 				if (lib.config.all.stockextension.includes(i) && !lib.config.all.plays.includes(i)) continue;
 				if (lib.config.hiddenPlayPack.includes(i)) continue;
 				createModeConfig(i, start.firstChild);
