@@ -3703,7 +3703,13 @@ class Create extends Uninstantable {
 				// if(!get.config('menu_loadondemand')) node._initLink();
 				return node;
 			};
-			for (var i in lib.extensionMenu) {
+			let extensionsInMenu = Object.keys(lib.extensionMenu);
+			if(lib.config.extensionSort && Array.isArray(lib.config.extensionSort)){
+				extensionsInMenu.sort((a,b)=>{
+					return lib.config.extensionSort.indexOf(a) - lib.config.extensionSort.indexOf(b);
+				});
+			}
+			for (var i of extensionsInMenu) {
 				if (lib.config.all.stockextension.includes(i) && !lib.config.all.plays.includes(i)) continue;
 				if (lib.config.hiddenPlayPack.includes(i)) continue;
 				createModeConfig(i, start.firstChild);
