@@ -5674,7 +5674,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'sbyingmen_reload',
 				subSkill:{
 					reload:{
-						trigger:{player:'phaseBefore'},
+						trigger:{player:'phaseBegin'},
 						forced:true,
 						locked:false,
 						filter:function(event,player){
@@ -8043,7 +8043,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jsrglinghua:'灵化',
 			jsrglinghua_info:'①准备阶段，你可以执行目标角色为你的【闪电】效果。若你未因此受到伤害，你可以令一名角色回复1点体力。②结束阶段，你可以执行目标角色为你且判定效果反转的【闪电】效果。若你未因此受到伤害，你可以对一名角色造成1点雷电伤害。',
 			sbyingmen:'盈门',
-			sbyingmen_info:'锁定技。①游戏开始时，你将武将牌堆中随机四张武将牌置于你的武将牌上，称为“访客”。②回合开始前，若你的“访客”数小于4，你随机从武将牌堆中将“访客”补至四张。',
+			sbyingmen_info:'锁定技。①游戏开始时，你将武将牌堆中随机四张武将牌置于你的武将牌上，称为“访客”。②回合开始时，若你的“访客”数小于4，你随机从武将牌堆中将“访客”补至四张。',
 			sbpingjian:'评鉴',
 			sbpingjian_info:'你可以于满足你“访客”上的一个无技能标签或仅有锁定技标签的技能条件的时机发动此技能，然后你选择移去一张“访客”。若移去的是本次发动技能的“访客”，则你于此技能结算结束时摸一张牌。',
 			//江山如故·承
