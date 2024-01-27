@@ -1364,7 +1364,7 @@ export class Get extends Uninstantable {
 			const str = func.toString();
 			// js内置的函数
 			if ((/\{\s*\[native code\]\s*\}/).test(str)) return '_noname_func:function () {}';
-			return '_noname_func:' + func.toString();
+			return '_noname_func:' + str;
 		}
 		return '';
 	}
