@@ -2229,6 +2229,19 @@ export class Get extends Uninstantable {
 		return result;
 	}
 	/**
+	 * 遍历子元素
+	 * @param {HTMLElement} node 
+	 * @returns {Iterable<HTMLElement>} 迭代器
+	 */
+	static *iterableChildNodes(node){
+		for(let i=0;i<arguments.length;i++){
+			let arg = arguments[i];
+			for(let j=0;j<arg.childElementCount;j++){
+				yield arg.childNodes[j];
+			}
+		}
+	}
+	/**
 	 * @param {((a: Button, b: Button) => number)} [sort] 排序函数
 	 * @returns { Button[] }
 	 */
@@ -4292,20 +4305,21 @@ export class Get extends Uninstantable {
 				}
 				if (target.hp == 1) result2 *= 2.5;
 				if (target.hp == 2) result2 *= 1.8;
-				if (target.countCards('h') == 0) {
+				let countTargetCards = target.countCards('h');
+				if (countTargetCards == 0) {
 					if (get.tag(card, 'respondSha') || get.tag(card, 'respondShan')) {
 						result2 *= 1.7;
 					}
 					else {
 						result2 *= 1.5;
 					}
-				}
-				if (target.countCards('h') == 1) result2 *= 1.3;
-				if (target.countCards('h') == 2) result2 *= 1.1;
-				if (target.countCards('h') > 3) result2 *= 0.5;
+				}else if (countTargetCards == 1) result2 *= 1.3;
+				else if (countTargetCards == 2) result2 *= 1.1;
+				else if (countTargetCards >= 3) result2 *= 0.5;
+
 				if (target.hp == 4) result2 *= 0.9;
-				if (target.hp == 5) result2 *= 0.8;
-				if (target.hp > 5) result2 *= 0.6;
+				else if (target.hp == 5) result2 *= 0.8;
+				else if (target.hp > 5) result2 *= 0.6;
 			}
 		}
 		else {
@@ -4466,20 +4480,21 @@ export class Get extends Uninstantable {
 				// *** continue here ***
 				if (target.hp == 1) result2 *= 2.5;
 				if (target.hp == 2) result2 *= 1.8;
-				if (target.countCards('h') == 0) {
+				let countTargetCards = target.countCards('h');
+				if (countTargetCards == 0) {
 					if (get.tag(card, 'respondSha') || get.tag(card, 'respondShan')) {
 						result2 *= 1.7;
 					}
 					else {
 						result2 *= 1.5;
 					}
-				}
-				if (target.countCards('h') == 1) result2 *= 1.3;
-				if (target.countCards('h') == 2) result2 *= 1.1;
-				if (target.countCards('h') > 3) result2 *= 0.5;
+				}else if (countTargetCards == 1) result2 *= 1.3;
+				else if (countTargetCards == 2) result2 *= 1.1;
+				else if (countTargetCards >= 3) result2 *= 0.5;
+
 				if (target.hp == 4) result2 *= 0.9;
-				if (target.hp == 5) result2 *= 0.8;
-				if (target.hp > 5) result2 *= 0.6;
+				else if (target.hp == 5) result2 *= 0.8;
+				else if (target.hp > 5) result2 *= 0.6;
 			}
 		}
 		else {

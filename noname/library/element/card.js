@@ -766,6 +766,26 @@ export class Card extends HTMLDivElement {
 		else this._uncheck.length = 0;
 		if (this._uncheck.length == 0) this.classList.remove('uncheck');
 	}
+	/**
+	 * 判断此牌是否包含class样式，参数有多个时，只需一个满足。
+	 * 
+	 * @param {string} className
+	 * 
+	 * @returns {boolean} 是否包含class
+	 */
+	classListContains(className){
+		return Array.from(arguments).has(name=>this.classList.contains(className));
+	}
+	/**
+	 * 判断此牌是否包含class样式，参数有多个时，需全部满足。
+	 * 
+	 * @param {string} className
+	 * 
+	 * @returns {boolean} 是否包含class
+	 */
+	classListContainsAll(){
+		return Array.from(arguments).every(name=>this.classList.contains(this.className));
+	}
 	discard(bool) {
 		if (!this._selfDestroyed) {
 			this.fix();
