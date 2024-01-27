@@ -8,12 +8,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_caozhang:['male','wei',4,['oljiangchi'],['die_audio:xin_caozhang']],
 			ol_jianyong:['male','shu',3,['olqiaoshui','jyzongshi'],['tempname:re_jianyong','die_audio:re_jianyong']],
 			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong']],
+			ol_sb_guanyu:['male','shu',4,['olsbfumeng','olsbguidao']],
 		},
 		characterSort:{
 			onlyOL:{
 				onlyOL_yijiang1:['ol_jianyong','ol_lingtong'],
 				onlyOL_yijiang2:['ol_caozhang'],
-				onlyOL_sb:['ol_sb_jiangwei'],
+				onlyOL_sb:['ol_sb_jiangwei','ol_sb_guanyu'],
 			},
 		},
 		characterIntro:{
@@ -21,6 +22,141 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterReplace:{
 		},
 		skill:{
+			//OL谋关羽
+			//可以和手杀谋关羽组成卧龙凤雏了
+			olsbfumeng:{
+				audio:2,
+				trigger:{global:'roundStart'},
+				filter(event,player){
+					return player.countCards('h');
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const {result:{bool,cards}}=await player.chooseCard(get.prompt2('olsbfumeng'),[1,Infinity]).set('ai',card=>{
+						const player=get.event('player');
+						if(player.hasSkill('olsbfumeng')) return 7-get.value(card);
+						return 4.5-get.value(card);
+					});
+					if(!bool) return;
+					player.logSkill('olsbfumeng');
+					player.addSkill('olsbfumeng_buff');
+					player.addGaintag(cards,'olsbfumeng_buff');
+				},
+				subSkill:{
+					buff:{
+						charlotte:true,
+						mod:{
+							cardname:function(card){
+								if(get.itemtype(card)=='card'&&card.hasGaintag('olsbfumeng_buff')) return 'sha';
+							},
+						},
+					},
+				},
+			},
+			olsbguidao:{
+				audio:2,
+				enable:'phaseUse',
+				filter(event,player){
+					if(event.olsbguidao_num>2) return false;
+					const card=new lib.element.VCard({name:'juedou',storage:{olsbguidao:true}});
+					return game.hasPlayer(target=>{
+						return player.canUse(card,target,false);
+					})&&player.countCards('he',cardx=>{
+						return player.canRecast(cardx);
+					})>=2&&player.countCards('he',cardx=>{
+						return get.name(cardx,player)=='sha'&&player.canRecast(cardx);
+					})>=event.olsbguidao_num;
+				},
+				onChooseToUse(event){
+					if(!game.online&&!event.olsbguidao_num){
+						const player=event.player,history=player.getHistory('lose',evt=>{
+							return evt.getParent(2).name=='recast'&&evt.getParent(3).name=='olsbguidao';
+						});
+						if(!history.length) event.set('olsbguidao_num',0);
+						else{
+							const evt=history[history.length-1];
+							event.set('olsbguidao_num',evt.cards.filter(card=>get.name(card,player)=='sha').length+1);
+						}
+					}
+				},
+				filterCard(card,player){
+					const num=get.event('olsbguidao_num');
+					if(ui.selected.cards.filter(cardx=>get.name(cardx,player)=='sha').length<num&&get.name(card,player)!='sha') return false;
+					return player.canRecast(card);
+				},
+				selectCard:2,
+				position:'he',
+				check(card){
+					const player=get.event('player');
+					if(get.name(card,player)=='sha') return 1/(get.value(card)||0.5);
+					return 7-get.value(card);
+				},
+				complexCard:true,
+				lose:false,
+				discard:false,
+				delay:0,
+				filterTarget(card,player,target){
+					const cardx=new lib.element.VCard({name:'juedou',storage:{olsbguidao:true}});
+					return player.canUse(cardx,target,false);
+				},
+				prompt(){
+					let str='重铸两张牌';
+					const num=get.event('olsbguidao_num');
+					if(num>0) str+='（至少重铸'+get.cnNumber(num)+'张【杀】）';
+					str+='并视为使用【决斗】';
+					return str;
+				},
+				async content(event,trigger,player){
+					const target=event.target,cards=event.cards;
+					const card=new lib.element.VCard({name:'juedou',storage:{olsbguidao:true}});
+					await player.recast(cards);
+					player.addTempSkill('olsbguidao_buff');
+					if(player.canUse(card,target,false)) player.useCard(card,target,false);
+				},
+				ai:{
+					order(item,player){
+						const card=new lib.element.VCard({name:'juedou',storage:{olsbguidao:true}});
+						const order=get.order(card,player);
+						if(order<=0) return 0;
+						return order+0.1;
+					},
+					result:{
+						target(player,target){
+							const card=new lib.element.VCard({name:'juedou',storage:{olsbguidao:true}});
+							return get.sgn(get.attitude(player,target))*get.effect(target,card,player,player);
+						},
+					},
+				},
+				subSkill:{
+					buff:{
+						charlotte:true,
+						trigger:{global:'damageBegin3'},
+						filter(event,player){
+							return event.card&&event.source&&event.card.storage&&event.card.storage.olsbguidao&&event.source==player;
+						},
+						forced:true,
+						popup:false,
+						async content(event,trigger,player){
+							const target=trigger.player;
+							const {result:{control}}=await target.chooseControl('【杀】更多','非【杀】更多')
+							.set('prompt','归刀：请猜测'+get.translation(player)+'手牌中【杀】与非【杀】牌数哪个更多')
+							.set('prompt2','若猜错，则'+get.translation(trigger.card)+'对你造成的伤害+1')
+							.set('ai',()=>_status.event.controls.randomGet());
+							const goon1=player.countCards('h',card=>get.name(card,player)=='sha')>=player.countCards('h',card=>get.name(card,player)!='sha');
+							const goon2=player.countCards('h',card=>get.name(card,player)!='sha')>=player.countCards('h',card=>get.name(card,player)=='sha');
+							if((goon1&&control=='【杀】更多')||(goon2&&control=='非【杀】更多')){
+								target.popup('判断正确','wood');
+								game.log(target,'猜测','#g正确');
+							}
+							else{
+								target.popup('判断错误','fire');
+								game.log(target,'猜测','#y错误');
+								trigger.increase('num');
+							}
+						},
+					},
+				},
+			},
 			//OL谋姜维
 			olsbzhuri:{
 				audio:2,
@@ -354,6 +490,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olsbranji_info:'限定技，结束阶段。若你本回合使用过牌的阶段数大于等于/小于等于体力值，你可以获得技能〖困奋〗/〖诈降〗（同时满足则都获得，以此法获得的〖困奋〗直接修改为非锁定技）。若如此做，你将手牌数调整至手牌上限或将体力值回复至体力上限，然后你不能回复体力直到你杀死角色。',
 			kunfenx:'困奋',
 			kunfenx_info:'结束阶段开始时，你可以失去1点体力，然后摸两张牌。',
+			ol_sb_guanyu:'OL谋关羽',
+			ol_sb_guanyu_prefix:'OL谋',
+			olsbfumeng:'赋梦',
+			olsbfumeng_info:'一轮游戏开始时，你可以令任意张手牌的牌名视为【杀】。',
+			olsbguidao:'归刀',
+			olsbguidao_info:'出牌阶段，你可以重铸两张牌并视为使用一张【决斗】（若你本回合已发动过〖归刀〗，则此次重铸的【杀】数必须比本回合上一次发动〖归刀〗重铸的【杀】数多）。目标角色受到此牌伤害时，其须猜测你手牌中牌名为【杀】的牌数量多还是牌名不为【杀】的牌数多，若其猜错，则此【决斗】对其造成的伤害+1。',
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',
