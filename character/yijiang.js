@@ -11905,6 +11905,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					filterDamage:true,
+					skillTagFilter:(player,tag,arg)=>{
+						return arg&&arg.jiu==true;
+					},
 					effect:{
 						target:(card,player,target)=>{
 							if(target.hp<=0&&target.hasSkill('zhenlie_lose')&&get.tag(card,'recover')) return [1,1.2];
