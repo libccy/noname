@@ -5,6 +5,7 @@ import { Library as lib } from '../library/index.js';
 import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 import { GNC as gnc } from '../gnc/index.js';
+import { CacheContext } from "../library/cache/cacheContext.js";
 
 import { Is } from "./is.js";
 
@@ -4039,13 +4040,10 @@ export class Get extends Uninstantable {
 		if (aii && aii.value) value = aii.value;
 		else if (aii && aii.basic) value = aii.basic.value;
 		if (player == undefined || get.itemtype(player) != 'player') player = _status.event.player;
+		let cache = CacheContext.requireCacheContext();
+		player = cache.delegate(player);
 		var geti = function () {
-			var num = 0, i;
-			var cards = player.getCards('hs', card.name);
-			if (cards.includes(card)) {
-				return cards.indexOf(card);
-			}
-			return cards.length;
+			return player.getCardIndex('hs',card.name,card);
 		};
 		if (typeof value == 'function') {
 			result = value(card, player, geti(), method);
@@ -4117,7 +4115,15 @@ export class Get extends Uninstantable {
 		}
 		return 1;
 	}
+	static cacheOrder(item){
+		let cache = CacheContext.getCacheContext();
+		if(cache){
+			return cache.get.order(item);
+		}
+		return get.order(item);
+	}
 	static order(item) {
+		let cache = CacheContext.requireCacheContext();
 		var info = get.info(item);
 		if (!info) return -1;
 		var aii = info.ai;
@@ -4127,10 +4133,10 @@ export class Get extends Uninstantable {
 		if (order == undefined) return -1;
 		var num = order;
 		if (typeof (order) == 'function') {
-			num = order(item, _status.event.player);
+			num = order(item, cache.delegate(_status.event.player));
 		}
 		if (typeof item == 'object' && _status.event.player) {
-			var player = _status.event.player;
+			var player = cache.delegate(_status.event.player);
 			num = game.checkMod(player, item, num, 'aiOrder', player);
 		}
 		return num;
@@ -4151,6 +4157,13 @@ export class Get extends Uninstantable {
 			}
 		}
 		return result;
+	}
+	static cacheEffectUse(target, card, player, player2, isLink){
+		let cache = CacheContext.getCacheContext();
+		if(cache){
+			return cache.get.effect_use(target,card,player,player2,isLink);
+		}
+		return get.effect_use(target,card,player,player2,isLink);
 	}
 	static effect_use(target, card, player, player2, isLink) {
 		var event = _status.event;
@@ -4305,7 +4318,7 @@ export class Get extends Uninstantable {
 				}
 				if (target.hp == 1) result2 *= 2.5;
 				if (target.hp == 2) result2 *= 1.8;
-				let countTargetCards = target.countCards('h');
+				let countTargetCards = target.cacheCountCards('h');
 				if (countTargetCards == 0) {
 					if (get.tag(card, 'respondSha') || get.tag(card, 'respondShan')) {
 						result2 *= 1.7;
@@ -4347,6 +4360,13 @@ export class Get extends Uninstantable {
 			}
 		}
 		return final;
+	}
+	static cacheEffect(target, card, player, player2, isLink){
+		let cache = CacheContext.getCacheContext();
+		if(cache){
+			return cache.get.effect(target,card,player,player2,isLink);
+		}
+		return get.effect(target,card,player,player2,isLink);
 	}
 	static effect(target, card, player, player2, isLink) {
 		var event = _status.event;
@@ -4480,18 +4500,18 @@ export class Get extends Uninstantable {
 				// *** continue here ***
 				if (target.hp == 1) result2 *= 2.5;
 				if (target.hp == 2) result2 *= 1.8;
-				let countTargetCards = target.countCards('h');
-				if (countTargetCards == 0) {
+				let targetCountCards = target.cacheCountCards('h');
+				if (targetCountCards == 0) {
 					if (get.tag(card, 'respondSha') || get.tag(card, 'respondShan')) {
 						result2 *= 1.7;
 					}
 					else {
 						result2 *= 1.5;
 					}
-				}else if (countTargetCards == 1) result2 *= 1.3;
-				else if (countTargetCards == 2) result2 *= 1.1;
-				else if (countTargetCards >= 3) result2 *= 0.5;
-
+				}
+				if (targetCountCards == 1) result2 *= 1.3;
+				else if (targetCountCards == 2) result2 *= 1.1;
+				else if (targetCountCards > 3) result2 *= 0.5;
 				if (target.hp == 4) result2 *= 0.9;
 				else if (target.hp == 5) result2 *= 0.8;
 				else if (target.hp > 5) result2 *= 0.6;

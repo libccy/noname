@@ -786,6 +786,9 @@ export class Card extends HTMLDivElement {
 	classListContainsAll(){
 		return Array.from(arguments).every(name=>this.classList.contains(this.className));
 	}
+	getCacheKey(){
+		return `[c:${this.playerid}]`;
+	}
 	discard(bool) {
 		if (!this._selfDestroyed) {
 			this.fix();

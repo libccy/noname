@@ -4,6 +4,7 @@ import { Game as game } from '../../game/index.js';
 import { Library as lib } from "../index.js";
 import { status as _status } from '../../status/index.js';
 import { UI as ui } from '../../ui/index.js';
+import { CacheContext } from '../cache/cacheContext.js';
 
 export class Player extends HTMLDivElement {
 	/**
@@ -2847,6 +2848,9 @@ export class Player extends HTMLDivElement {
 		if (typeof num != 'number') return 0;
 		return num;
 	}
+	getCacheKey(){
+		return `[p:${this.playerid}]`;
+	}
 	countSkill(skill) {
 		var num = this.getStat('skill')[skill];
 		if (num == undefined) return 0;
@@ -3007,12 +3011,31 @@ export class Player extends HTMLDivElement {
 		}
 		return list;
 	}
+	cacheCountCards(arg1){
+		let cache = CacheContext.getCacheContext();
+		if(cache){
+			return cache.delegate(this).countCards(arg1);
+		}
+		return this.countCards(arg1);
+	}
 	countCards(arg1, arg2) {
 		let count = 0;
 		for(let item of this.iterableGetCards(arg1,arg2)){
 			count++;
 		}
 		return count;
+	}
+	getCardIndex(arg1,name,card){
+		let count = 0;
+		for(let item of this.iterableGetCards(arg1)){
+			if(get.name(item) == name){
+				if(card == item){
+					return count;
+				}
+				count++;
+			}
+		}
+		return -1;
 	}
 	countDiscardableCards(player, arg1, arg2) {
 		return this.getDiscardableCards(player, arg1, arg2).length;
@@ -3481,8 +3504,8 @@ export class Player extends HTMLDivElement {
 		if (next.position == undefined) {
 			next.position = 'hs';
 		}
-		if (next.ai1 == undefined) next.ai1 = get.order;
-		if (next.ai2 == undefined) next.ai2 = get.effect_use;
+		if (next.ai1 == undefined) next.ai1 = get.cacheOrder;
+		if (next.ai2 == undefined) next.ai2 = get.cacheEffectUse;
 		next.setContent('chooseToUse');
 		next._args = Array.from(arguments);
 		return next;
@@ -4391,6 +4414,9 @@ export class Player extends HTMLDivElement {
 				}
 			}
 		});
+	}
+	cacheSupportFunction(){
+		return ['hasCard','hasValueTarget','getCardIndex','countCards','getSkills','getUseValue','canUse'];
 	}
 	moveCard() {
 		var next = game.createEvent('moveCard');
@@ -6569,9 +6595,13 @@ export class Player extends HTMLDivElement {
 		game.checkMod(card, player, range, 'selectTarget', player);
 		if (!range) return 0;
 
+		let cache = CacheContext.getCacheContext();
+		if(!cache){
+			cache = new CacheContext();
+		}
 		for (var i = 0; i < targets.length; i++) {
-			if (player.canUse(card, targets[i], distance, includecard)) {
-				var eff = get.effect(targets[i], card, player, player);
+			if (cache.delegate(player).canUse(card, targets[i], distance, includecard)) {
+				var eff = cache.get.effect(targets[i], card, player, player);
 				value.push(eff);
 			}
 		}
@@ -7978,6 +8008,10 @@ export class Player extends HTMLDivElement {
 		return false;
 	}
 	hasSkillTag(tag, hidden, arg, globalskill) {
+		let cache = CacheContext.getCacheContext();
+		if(!cache){
+			cache = new CacheContext();
+		}
 		var skills = this.getSkills(hidden);
 		if (globalskill) {
 			skills.addArray(lib.skill.global);
@@ -7987,7 +8021,7 @@ export class Player extends HTMLDivElement {
 			var info = lib.skill[skills[i]];
 			if (info && info.ai) {
 				if (info.ai.skillTagFilter && info.ai[tag] &&
-					info.ai.skillTagFilter(this, tag, arg) === false) continue;
+					info.ai.skillTagFilter(cache.delegate(this), tag, arg) === false) continue;
 				if (typeof info.ai[tag] == 'string') {
 					if (info.ai[tag] == arg) return true;
 				}
@@ -9161,7 +9195,7 @@ export class Player extends HTMLDivElement {
 			})){
 				const card = game.createCard('empty_equip' + i,'', '');
 				card.fix();
-				console.log('add '+card.name);
+				//console.log('add '+card.name);
 				card.style.transform = '';
 				card.classList.remove('drawinghidden');
 				card.classList.add('emptyequip');
