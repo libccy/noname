@@ -277,6 +277,58 @@ export class Player extends HTMLDivElement {
 	 * @type { number }
 	 */
 	hujia;
+	/**
+	 * @type { number }
+	 */
+	seatNum;
+	/**
+	 * @type { Player }
+	 */
+	nextSeat;
+	/**
+	 * @type { Player }
+	 */
+	next;
+	/**
+	 * @type { Player }
+	 */
+	previousSeat;
+	/**
+	 * @type { Player }
+	 */
+	previous;
+	/**
+	 * @type { string }
+	 */
+	name;
+	/**
+	 * @type { string }
+	 */
+	name1;
+	/**
+	 * @type { string }
+	 */
+	name2;
+	/**
+	 * @type { any[] }
+	 */
+	tempname;
+	/**
+	 * @type { string }
+	 */
+	sex;
+	/**
+	 * @type { string }
+	 */
+	group;
+	/**
+	 * @type { ((player: this) => any)[] }
+	 */
+	inits;
+	/**
+	 * @type { ((player: this) => any)[] }
+	 */
+	_inits;
 	//新函数
 	/**
 	 * 怒气
@@ -801,7 +853,7 @@ export class Player extends HTMLDivElement {
 		let num;
 		if (type == undefined) {
 			num = 0;
-			for (var i = 1; i <= 5; i++) {
+			for (let i = 1; i <= 5; i++) {
 				num += this.countDisabledSlot(i);
 			}
 			return num;
@@ -894,15 +946,19 @@ export class Player extends HTMLDivElement {
 		}
 		return this.countEnabledSlot(type) > 0;
 	}
-	//判断一名角色的某个区域未被废除的数量
-	//用法同上
+	/**
+	 * 判断一名角色的某个区域未被废除的数量
+	 * 
+	 * 用法同 {@link hasEnabledSlot}
+	 * @param { string | number } [type] 
+	 */
 	countEnabledSlot(type) {
-		var player = this;
-		var map = (player.expandedSlots || {});
+		const map = (this.expandedSlots || {});
+		let num;
 		if (!type) {
 			num = 0;
-			for (var i = 1; i <= 5; i++) {
-				num += player.countEnabledSlot(i);
+			for (let i = 1; i <= 5; i++) {
+				num += this.countEnabledSlot(i);
 			}
 			return num;
 		}
@@ -911,18 +967,22 @@ export class Player extends HTMLDivElement {
 			if (get.is.mountCombined() && type == 'equip4') {
 				return 0;
 			}
-			var slots = 1;
-			var num = map[type];
+			let slots = 1;
+			num = map[type];
 			if (typeof num == 'number' && num > 0) slots += num;
-			slots -= player.countDisabledSlot(type);
+			slots -= this.countDisabledSlot(type);
 			return slots;
 		}
 	}
-	//获取一名角色装备区内某种类型的装备牌
-	//参数可以为数字/区域字符串/实体牌/虚拟牌/牌名
+	/**
+	 * 获取一名角色装备区内某种类型的装备牌
+	 * 
+	 * 参数可以为数字/区域字符串/实体牌/虚拟牌/牌名
+	 * @param { number | string | Card | VCard } subtype 
+	 * @returns { Card[] }
+	 */
 	getEquips(subtype) {
-		var type = (typeof subtype);
-		switch (type) {
+		switch (typeof subtype) {
 			case 'string':
 				if (subtype == 'equip3_4') {
 					const cards = [];
@@ -947,12 +1007,16 @@ export class Player extends HTMLDivElement {
 				return [];
 		}
 		if (!subtype) return [];
-		return this.getCards('e', function (card) {
+		return this.getCards('e', card => {
+			// @ts-ignore
 			return get.subtypes(card, false).includes(subtype);
 		});
 	}
-	//新的废除装备区/恢复装备区/扩展装备区
-	//参数：废除来源角色（不写默认当前事件角色），废除区域（数字/区域字符串/数组，可以写多个，重复废除）
+	/**
+	 * 新的废除装备区
+	 * 
+	 * 参数：废除来源角色（不写默认当前事件角色），废除区域（数字/区域字符串/数组，可以写多个，重复废除）
+	 */
 	disableEquip() {
 		var next = game.createEvent('disableEquip');
 		next.player = this;
@@ -985,6 +1049,11 @@ export class Player extends HTMLDivElement {
 		next.setContent('disableEquip');
 		return next;
 	}
+	/**
+	 * 新的恢复装备区
+	 * 
+	 * 参数：恢复来源角色（不写默认当前事件角色），恢复区域（数字/区域字符串/数组，可以写多个，重复恢复）
+	 */
 	enableEquip() {
 		var next = game.createEvent('enableEquip');
 		next.player = this;
@@ -1017,6 +1086,11 @@ export class Player extends HTMLDivElement {
 		next.setContent('enableEquip');
 		return next;
 	}
+	/**
+	 * 新的扩展装备区
+	 * 
+	 * 参数：扩展来源角色（不写默认当前事件角色），扩展区域（数字/区域字符串/数组，可以写多个，重复扩展）
+	 */
 	expandEquip() {
 		var next = game.createEvent('expandEquip');
 		next.player = this;
@@ -1049,38 +1123,46 @@ export class Player extends HTMLDivElement {
 		next.setContent('expandEquip');
 		return next;
 	}
-	//判断判定区是否被废除
+	/**
+	 * 判断判定区是否被废除
+	 */
 	isDisabledJudge() {
 		return Boolean(this.storage._disableJudge);
 	}
-	//同步显示扩展装备区状态
+	/**
+	 * 同步显示扩展装备区状态
+	 * @param { SMap<number> } [map] 
+	 */
 	$syncExpand(map) {
-		var player = this;
 		if (!map) {
-			map = (player.expandedSlots || {});
+			map = (this.expandedSlots || {});
 		}
-		game.addVideo('$syncExpand', player, get.copy(map));
+		game.addVideo('$syncExpand', this, get.copy(map));
 		game.broadcast(function (player, map) {
 			player.expandedSlots = map;
 			player.$syncExpand(map);
-		}, player, map);
-		player.markSkill('expandedSlots');
+		}, this, map);
+		this.markSkill('expandedSlots');
 	}
-	//同步装备区废除牌显示状态
+	/**
+	 * 同步装备区废除牌显示状态
+	 * @param { SMap<number> } [map] 
+	 */
 	$syncDisable(map) {
-		const player = this;
 		const suits = { equip3: '+1马栏', equip4: '-1马栏', equip6: '特殊栏' };
 		if (get.is.mountCombined()) suits.equip3 = '坐骑栏';
 		if (!map) {
-			map = (player.disabledSlots || {});
+			map = (this.disabledSlots || {});
 		}
-		game.addVideo('$syncDisable', player, get.copy(map));
+		game.addVideo('$syncDisable', this, get.copy(map));
 		game.broadcast(function (player, map) {
 			player.disabledSlots = map;
 			player.$syncDisable(map);
-		}, player, map);
+		}, this, map);
 		const map2 = get.copy(map);
-		const cards = Array.from(player.node.equips.childNodes);
+		/** @type { Card[] } */
+		// @ts-ignore
+		const cards = Array.from(this.node.equips.childNodes);
 		for (const card of cards) {
 			if (card.name.startsWith('feichu_')) {
 				const index = card.name.slice(7);
@@ -1101,15 +1183,15 @@ export class Player extends HTMLDivElement {
 					delete card._transform;
 					const equipNum = get.equipNum(card);
 					let equipped = false;
-					for (let j = 0; j < player.node.equips.childNodes.length; j++) {
-						if (get.equipNum(player.node.equips.childNodes[j]) >= equipNum) {
-							player.node.equips.insertBefore(card, player.node.equips.childNodes[j]);
+					for (let j = 0; j < this.node.equips.childNodes.length; j++) {
+						if (get.equipNum(this.node.equips.childNodes[j]) >= equipNum) {
+							this.node.equips.insertBefore(card, this.node.equips.childNodes[j]);
 							equipped = true;
 							break;
 						}
 					}
 					if (!equipped) {
-						player.node.equips.appendChild(card);
+						this.node.equips.appendChild(card);
 						if (_status.discarded) {
 							_status.discarded.remove(card);
 						}
@@ -1120,7 +1202,7 @@ export class Player extends HTMLDivElement {
 				for (let i = 0; i > num; i--) {
 					const card = cards.find(card => card.name == 'feichu_' + index);
 					if (card) {
-						player.node.equips.removeChild(card);
+						this.node.equips.removeChild(card);
 						cards.remove(card);
 					}
 				}
@@ -1128,8 +1210,13 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	//以下函数涉及到本次更新内容而进行修改
+	/**
+	 * @param { string | Card | VCard | CardBaseUIData } name 
+	 * @param { boolean } [replace] 
+	 * @returns 
+	 */
 	canEquip(name, replace) {
-		const ranges = get.subtypes(name), rangex = [], player = this, combined = get.is.mountCombined();
+		const ranges = get.subtypes(name), rangex = [], combined = get.is.mountCombined();
 		if (combined) {
 			ranges.forEach(type => {
 				if (type == 'equip3' || type == 'equip4') rangex.add('equip3_4');
@@ -1142,23 +1229,38 @@ export class Player extends HTMLDivElement {
 		for (let range of rangex) {
 			let num = this.countEquipableSlot(range);
 			let num2 = get.numOf(rangex, range);
-			if (!replace) num -= this.getEquips(range).filter(card => lib.filter.canBeReplaced(card, player)).length;
+			if (!replace) num -= this.getEquips(range).filter(card => lib.filter.canBeReplaced(card, this)).length;
 			if (num < num2) return false;
 		}
 		return true;
 	}
 	//以下函数将不再进行后续维护
+	/**
+	 * @deprecated
+	 */
 	countDisabled() {
-		return this.countDisabledSlot.apply(this, arguments);
+		return this.countDisabledSlot(...arguments);
 	}
+	/**
+	 * @deprecated
+	 */
 	isDisabled(arg) {
 		return this.hasDisabledSlot(arg) && !this.hasEnabledSlot(arg);
 	}
+	/**
+	 * @deprecated
+	 */
 	isEmpty(num) {
 		return this.countEnabledSlot(num) > this.getEquips(num).length;
 	}
 	//以下函数将被废弃
+	/**
+	 * @deprecated
+	 */
 	$disableEquip() { }
+	/**
+	 * @deprecated
+	 */
 	$enableEquip() { }
 	//装备区End
 	chooseToDebate() {
@@ -1176,18 +1278,23 @@ export class Player extends HTMLDivElement {
 		next.setContent('chooseToDebate');
 		return next;
 	}
+	/**
+	 * 向target发起协力
+	 * @param { Player } target 
+	 * @param {*} type 
+	 * @param {*} reason 
+	 */
 	cooperationWith(target, type, reason) {
-		var player = this;
-		if (!player.storage.cooperation) player.storage.cooperation = [];
-		var info = {
-			target: target,
-			type: type,
-			reason: reason,
+		if (!this.storage.cooperation) this.storage.cooperation = [];
+		const info = {
+			target,
+			type,
+			reason,
 		};
-		player.storage.cooperation.add(info);
-		player.addTempSkill('cooperation', { player: 'dieAfter' });
-		player.addSkill('cooperation_' + type, { player: 'dieAfter' });
-		game.log(player, '向', target, '发起了“协力”，合作类型是', '#g' + get.translation('cooperation_' + type));
+		this.storage.cooperation.add(info);
+		this.addTempSkill('cooperation', { player: 'dieAfter' });
+		this.addSkill('cooperation_' + type, { player: 'dieAfter' });
+		game.log(this, '向', target, '发起了“协力”，合作类型是', '#g' + get.translation('cooperation_' + type));
 	}
 	chooseCooperationFor() {
 		var next = game.createEvent('chooseCooperationFor');
@@ -1218,66 +1325,83 @@ export class Player extends HTMLDivElement {
 		return false;
 	}
 	removeCooperation(info) {
-		var player = this;
-		var storage = player.getStorage('cooperation');
+		let storage = this.getStorage('cooperation');
 		if (!storage.includes(info)) return;
 		storage.remove(info);
-		var unmark = true, reason = info.type;
+		let unmark = true, reason = info.type;
 		if (!storage.length) {
-			player.removeSkill('cooperation');
+			this.removeSkill('cooperation');
 		}
 		else {
-			for (var i of storage) {
+			for (let i of storage) {
 				if (i.type == reason) {
 					unmark = false;
 					break;
 				}
 			}
 		}
-		if (unmark) player.removeSkill('cooperation_' + reason);
-		else player.markSkill('cooperation_' + reason);
+		if (unmark) this.removeSkill('cooperation_' + reason);
+		else this.markSkill('cooperation_' + reason);
 	}
+	/**
+	 * @param { string } clan 氏族名称
+	 * @param { boolean } unseen 是否无视暗将的限制 
+	 */
 	hasClan(clan, unseen) {
 		if (unseen || !this.isUnseen(0)) {
-			var info = lib.character[this.name1];
+			let info = lib.character[this.name1];
 			if (info && info[4]) {
-				for (var i of info[4]) {
+				for (let i of info[4]) {
 					if (typeof i == 'string' && i.startsWith('clan:') && i.slice(5) == clan) return true;
 				}
 			}
 		}
 		if (this.name2 && (unseen || !this.isUnseen(1))) {
-			var info = lib.character[this.name2];
+			let info = lib.character[this.name2];
 			if (info && info[4]) {
-				for (var i of info[4]) {
+				for (let i of info[4]) {
 					if (typeof i == 'string' && i.startsWith('clan:') && i.slice(5) == clan) return true;
 				}
 			}
 		}
 		return false;
 	}
+	/**
+	 * @param { string } skill 
+	 */
 	changeZhuanhuanji(skill) {
-		var player = this, info = get.info(skill), zhuanhuan = info.zhuanhuanji;
-		if (typeof zhuanhuan == 'function') zhuanhuan(player, skill);
-		else if (zhuanhuan == 'number') player.addMark(skill, 1, false);
-		else player.storage[skill] = !player.storage[skill];
+		let info = get.info(skill), zhuanhuan = info.zhuanhuanji;
+		if (typeof zhuanhuan == 'function') zhuanhuan(this, skill);
+		else if (zhuanhuan == 'number') this.addMark(skill, 1, false);
+		else this.storage[skill] = !this.storage[skill];
 		game.broadcastAll(function (player, skill) {
 			player.$changeZhuanhuanji(skill);
-		}, player, skill);
+		}, this, skill);
 	}
+	/**
+	 * @param { string } skill 
+	 */
 	$changeZhuanhuanji(skill) {
 		var mark = this.marks[skill];
 		if (mark) {
+			// @ts-ignore
 			if (mark.firstChild.reversed) {
+				// @ts-ignore
 				mark.firstChild.reversed = false;
+				// @ts-ignore
 				mark.firstChild.style.transform = 'none';
 			}
 			else {
+				// @ts-ignore
 				mark.firstChild.reversed = true;
+				// @ts-ignore
 				mark.firstChild.style.transform = 'rotate(180deg)';
 			}
 		}
 	}
+	/**
+	 * @param { number } num 
+	 */
 	setSeatNum(num) {
 		_status.seatNumSettled = true;
 		game.broadcastAll(function (player, num) {
@@ -1288,27 +1412,45 @@ export class Player extends HTMLDivElement {
 		if (typeof this.seatNum == 'number') return this.seatNum;
 		return 0;
 	}
+	/**
+	 * 是否拥有某一性别
+	 * @param { string } sex 
+	 */
 	hasSex(sex) {
 		if (this.sex == 'unknown') return false;
 		if (this.sex == 'double') return true;
 		return this.sex == sex;
 	}
+	/**
+	 * 是否和target同一性别
+	 * @param { Player } target 
+	 */
 	sameSexAs(target) {
-		var sex1 = this.sex, sex2 = target.sex;
+		const sex1 = this.sex, sex2 = target.sex;
 		if (sex1 == 'unknown' || sex2 == 'unknown') return false;
 		if (sex1 == 'double' || sex2 == 'double') return true;
 		return sex1 == sex2;
 	}
+	/**
+	 * 是否和target不同性别
+	 * @param { Player } target 
+	 */
 	differentSexFrom(target) {
 		var sex1 = this.sex, sex2 = target.sex;
 		if (sex1 == 'unknown' || sex2 == 'unknown') return false;
 		if (sex1 == 'double' || sex2 == 'double') return true;
 		return sex1 != sex2;
 	}
+	/**
+	 * @param { string } skill 
+	 */
 	addSkillBlocker(skill) {
 		if (!this.storage.skill_blocker) this.storage.skill_blocker = [];
 		this.storage.skill_blocker.push(skill);
 	}
+	/**
+	 * @param { string } skill 
+	 */
 	removeSkillBlocker(skill) {
 		if (this.storage.skill_blocker) {
 			this.storage.skill_blocker.remove(skill);
@@ -1333,6 +1475,10 @@ export class Player extends HTMLDivElement {
 		});
 		return next;
 	}
+	/**
+	 * @param { Card | Card[] } cards 
+	 * @param { string } tag 
+	 */
 	addGaintag(cards, tag) {
 		if (get.itemtype(cards) == 'card') cards = [cards];
 		game.addVideo('addGaintag', this, [get.cardsInfo(cards), tag]);
@@ -1343,6 +1489,10 @@ export class Player extends HTMLDivElement {
 			}
 		}, this, cards, tag);
 	}
+	/**
+	 * @param { string } tag 
+	 * @param { Card[] } [cards] 
+	 */
 	removeGaintag(tag, cards) {
 		cards = cards || this.getCards('h');
 		game.addVideo('removeGaintag', this, [tag, get.cardsInfo(cards)]);
@@ -1350,28 +1500,37 @@ export class Player extends HTMLDivElement {
 			for (var i of cards) i.removeGaintag(tag);
 		}, this, tag, cards);
 	}
+	/**
+	 * @param { Player } target 
+	 */
 	canSave(target) {
-		var player = this;
-		if (player.hasSkillTag('save', true, target, true)) return true;
-		var name = {}, hs = player.getCards('hs');
-		for (var i of hs) name[get.name(i)] = true;
-		for (var i in lib.card) {
+		if (this.hasSkillTag('save', true, target, true)) return true;
+		let name = {}, hs = this.getCards('hs');
+		for (let i of hs) name[get.name(i)] = true;
+		for (let i in lib.card) {
 			if (lib.card[i].savable && (lib.inpile.includes(i) || name[i])) {
-				if (lib.filter.cardSavable({ name: i }, player, target) && (_status.connectMode || player.hasUsableCard(i))) return true;
+				if (lib.filter.cardSavable({ name: i }, this, target) && (_status.connectMode || this.hasUsableCard(i))) return true;
 			}
 		}
 		return false;
 	}
+	/**
+	 * @param { Card } card 
+	 * @param { Player } target 
+	 */
 	canSaveCard(card, target) {
-		var player = this;
-		var mod2 = game.checkMod(card, player, 'unchanged', 'cardEnabled2', player);
+		const mod2 = game.checkMod(card, this, 'unchanged', 'cardEnabled2', this);
 		if (mod2 != 'unchanged') return mod2;
-		var mod = game.checkMod(card, player, target, 'unchanged', 'cardSavable', player);
+		const mod = game.checkMod(card, this, target, 'unchanged', 'cardSavable', this);
 		if (mod != 'unchanged') return mod;
-		var savable = get.info(card).savable;
-		if (typeof savable == 'function') savable = savable(card, player, target);
+		let savable = get.info(card).savable;
+		if (typeof savable == 'function') savable = savable(card, this, target);
 		return savable;
 	}
+	/**
+	 * @param { 0 | 1 | 2 } num 
+	 * @param { false } [log] 
+	 */
 	showCharacter(num, log) {
 		var toShow = [];
 		if ((num == 0 || num == 2) && this.isUnseen(0)) toShow.add(this.name1);
@@ -1390,6 +1549,10 @@ export class Player extends HTMLDivElement {
 		evt.after.push(next);
 		return next;
 	}
+	/**
+	 * @param { 0 | 1 | 2 } num 
+	 * @param { false } [log] 
+	 */
 	$showCharacter(num, log) {
 		if (num == 0 && !this.isUnseen(0)) {
 			return;
@@ -1498,6 +1661,11 @@ export class Player extends HTMLDivElement {
 		next.setContent('chooseToGuanxing');
 		return next;
 	}
+	/**
+	 * @param { Player } target 
+	 * @param { string } name 
+	 * @param {*} rotate 
+	 */
 	$throwEmotion(target, name, rotate) {
 		game.addVideo('throwEmotion', this, [target.dataset.position, name]);
 		var getLeft = function (player) {
@@ -1529,6 +1697,7 @@ export class Player extends HTMLDivElement {
 		}
 		emotion.style['z-index'] = 10;
 		emotion.style.transform = 'translateY(' + (top2 - top) + 'px) translateX(' + (left2 - left) + 'px)';
+		// @ts-ignore
 		if (['egg', 'flower', 'shoe'].includes(name) || rotate) emotion.firstElementChild.style.transform = 'rotate(1440deg)';
 		if (lib.config.background_audio) game.playAudio('effect', 'throw_' + name + get.rand(1, 2));
 		setTimeout(function () {
@@ -1538,14 +1707,21 @@ export class Player extends HTMLDivElement {
 			}, 1200);
 		}, 600);
 	}
+	/**
+	 * @param { boolean } bool 
+	 */
 	tryJudgeAnimate(bool) {
-		var player = this;
 		game.broadcast(function (player, bool) {
 			player.trySkillAnimate(bool);
-		}, player, bool);
+		}, this, bool);
 		if (bool) this.popup('判定生效', 'wood', false);
 		else this.popup('判定失效', 'fire', false);
 	}
+	/**
+	 * @param { string } name 
+	 * @param { string } popname 
+	 * @param { 'main' | 'vice' | boolean } checkShow 
+	 */
 	trySkillAnimate(name, popname, checkShow) {
 		if (!game.online && lib.config.skill_animation_type != 'off' && lib.skill[name] && lib.skill[name].skillAnimation) {
 			if (lib.config.skill_animation_type == 'default') {
@@ -1570,53 +1746,64 @@ export class Player extends HTMLDivElement {
 			else this.popup(get.skillTranslation(name, this), 'water', false);
 		}
 	}
+	/**
+	 * @param { Card } card 
+	 * @param { string } name 
+	 * @param { string } [nature] 
+	 * @param { string } [popname] 
+	 */
 	tryCardAnimate(card, name, nature, popname) {
-		var player = this;
 		game.broadcast(function (player, card, name, nature, popname) {
 			player.tryCardAnimate(card, name, nature, popname);
-		}, player, card, name, nature, popname);
+		}, this, card, name, nature, popname);
 		if (lib.animate.card[card.name]) lib.animate.card[card.name].apply(this, arguments);
 		else {
 			if (!lib.config.show_card_prompt) return;
 			if (get.type(card) == 'equip' && lib.config.hide_card_prompt_equip) return;
 			if (get.type(card) == 'basic' && lib.config.hide_card_prompt_basic) return;
-			if (popname) player.popup({ name: card.name, nature: card.nature }, nature, false);
-			else player.popup(name, nature, false);
+			if (popname) this.popup({ name: card.name, nature: card.nature }, nature, false);
+			else this.popup(name, nature, false);
 		}
 	}
+	/**
+	 * @param { string } name 
+	 */
 	hasUsableCard(name) {
-		var player = this;
-		if (player.countCards('hs', name)) return true;
-		var skills = player.getSkills('invisible').concat(lib.skill.global);
+		if (this.countCards('hs', name)) return true;
+		const skills = this.getSkills('invisible').concat(lib.skill.global);
 		game.expandSkills(skills);
-		for (var i = 0; i < skills.length; i++) {
-			var ifo = get.info(skills[i]);
-			if (ifo.viewAs && typeof ifo.viewAs != 'function' && ifo.viewAs.name == name) {
-				if (!ifo.viewAsFilter || ifo.viewAsFilter(player) !== false) {
+		for (let i = 0; i < skills.length; i++) {
+			const ifo = get.info(skills[i]);
+			if (ifo.viewAs && typeof ifo.viewAs != 'function' && typeof ifo.viewAs != 'string' && ifo.viewAs.name == name) {
+				if (!ifo.viewAsFilter || ifo.viewAsFilter(this) !== false) {
 					return true;
 				}
 			}
 			else {
-				var hiddenCard = get.info(skills[i]).hiddenCard;
-				if (typeof hiddenCard == 'function' && hiddenCard(player, name)) {
+				const hiddenCard = get.info(skills[i]).hiddenCard;
+				if (typeof hiddenCard == 'function' && hiddenCard(this, name)) {
 					return true;
 				}
 			}
 		}
 	}
+	/**
+	 * @param { Player } to 
+	 * @returns { boolean }
+	 */
 	inRange(to) {
-		var from = this;
+		const from = this;
 		if (from == to || from.hasSkill('undist') || to.hasSkill('undist')) return false;
 		if (!game.players.includes(from) && !game.dead.includes(from)) return false;
 		if (!game.players.includes(to) && !game.dead.includes(to)) return false;
-		var mod1 = game.checkMod(from, to, 'unchanged', 'inRange', from);
+		const mod1 = game.checkMod(from, to, 'unchanged', 'inRange', from);
 		if (mod1 != 'unchanged') return mod1;
-		var mod2 = game.checkMod(from, to, 'unchanged', 'inRangeOf', to);
+		const mod2 = game.checkMod(from, to, 'unchanged', 'inRangeOf', to);
 		if (mod2 != 'unchanged') return mod2;
-		var range = from.getAttackRange();
+		const range = from.getAttackRange();
 		if (range < 1) return false;
-		var player = from, m, n = 1, i;
-		var fxy, txy;
+		let player = from, m, n = 1;
+		let fxy, txy;
 		if (game.chess) {
 			fxy = from.getXY();
 			txy = to.getXY();
@@ -1624,9 +1811,9 @@ export class Player extends HTMLDivElement {
 		}
 		else if (to.isMin(true) || from.isMin(true)) {/* empty */ }
 		else {
-			var length = game.players.length;
-			var totalPopulation = game.players.length + game.dead.length + 1;
-			for (var iwhile = 0; iwhile < totalPopulation; iwhile++) {
+			let length = game.players.length;
+			let totalPopulation = game.players.length + game.dead.length + 1;
+			for (let iwhile = 0; iwhile < totalPopulation; iwhile++) {
 				if (player.nextSeat != to) {
 					player = player.nextSeat;
 					if (player.isAlive() && !player.isOut() && !player.hasSkill('undist') && !player.isMin(true)) n++;
@@ -1635,13 +1822,13 @@ export class Player extends HTMLDivElement {
 					break;
 				}
 			}
-			for (i = 0; i < game.players.length; i++) {
+			for (let i = 0; i < game.players.length; i++) {
 				if (game.players[i].isOut() || game.players[i].hasSkill('undist') || game.players[i].isMin(true)) length--;
 			}
 			if (from.isDead()) length++;
 			if (to.isDead()) length++;
-			var left = from.hasSkillTag('left_hand');
-			var right = from.hasSkillTag('right_hand');
+			let left = from.hasSkillTag('left_hand');
+			let right = from.hasSkillTag('right_hand');
 			if (left === right) n = Math.min(n, length - n);
 			else if (left == true) n = length - n;
 		}
@@ -1650,21 +1837,21 @@ export class Player extends HTMLDivElement {
 		m = n;
 		m = game.checkMod(from, to, m, 'attackFrom', from);
 		m = game.checkMod(from, to, m, 'attackTo', to);
-		var equips1 = from.getCards('e', function (card) {
+		const equips1 = from.getCards('e', function (card) {
 			return !ui.selected.cards || !ui.selected.cards.includes(card);
 		}), equips2 = to.getCards('e', function (card) {
 			return !ui.selected.cards || !ui.selected.cards.includes(card);
 		});
-		for (i = 0; i < equips1.length; i++) {
-			var info = get.info(equips1[i]).distance;
+		for (let i = 0; i < equips1.length; i++) {
+			const info = get.info(equips1[i]).distance;
 			if (!info) continue;
 			if (info.globalFrom) {
 				m += info.globalFrom;
 				n += info.globalFrom;
 			}
 		}
-		for (i = 0; i < equips2.length; i++) {
-			var info = get.info(equips2[i]).distance;
+		for (let i = 0; i < equips2.length; i++) {
+			const info = get.info(equips2[i]).distance;
 			if (!info) continue;
 			if (info.globalTo) {
 				m += info.globalTo;
@@ -1676,6 +1863,9 @@ export class Player extends HTMLDivElement {
 		}
 		return m <= range;
 	}
+	/**
+	 * @param { Player } source 
+	 */
 	inRangeOf(source) {
 		return source.inRange(this);
 	}
@@ -1683,6 +1873,8 @@ export class Player extends HTMLDivElement {
 	 * Get the player's HP not less than 0. Set “raw” to true to get the player's raw HP instead.
 	 * 
 	 * 获取角色的体力值。设置“raw”为true以获取角色的体力。
+	 * 
+	 * @param { boolean } [raw] 
 	 */
 	getHp(raw) {
 		return raw ? this.hp : Math.max(0, this.hp);
@@ -1691,10 +1883,15 @@ export class Player extends HTMLDivElement {
 	 * Set “raw” to true to get the player's raw damaged HP instead.
 	 * 
 	 * 设置“raw”为true以获取角色已损失的体力。
+	 * 
+	 * @param { boolean } [raw] 
 	 */
 	getDamagedHp(raw) {
 		return this.maxHp - this.getHp(raw);
 	}
+	/**
+	 * @param { string } group 
+	 */
 	changeGroup(group, log, broadcast) {
 		var next = game.createEvent('changeGroup');
 		next.player = this;
@@ -1714,6 +1911,9 @@ export class Player extends HTMLDivElement {
 		next.setContent('changeGroup');
 		return next;
 	}
+	/**
+	 * @param { Player } target 
+	 */
 	chooseToDuiben(target) {
 		var next = game.createEvent('chooseToDuiben');
 		next.player = this;
@@ -1721,6 +1921,9 @@ export class Player extends HTMLDivElement {
 		next.setContent('chooseToDuiben');
 		return next;
 	}
+	/**
+	 * @param { Player } target 
+	 */
 	chooseToPSS(target) {
 		var next = game.createEvent('chooseToPSS');
 		next.player = this;
@@ -1734,6 +1937,9 @@ export class Player extends HTMLDivElement {
 		next.setContent('chooseToEnable');
 		return next;
 	}
+	/**
+	 * @param { boolean } [horse] 
+	 */
 	chooseToDisable(horse) {
 		var next = game.createEvent('chooseToDisable');
 		next.player = this;
@@ -1741,10 +1947,17 @@ export class Player extends HTMLDivElement {
 		next.setContent('chooseToDisable');
 		return next;
 	}
+	/**
+	 * @param { boolean } [notmeisok] 
+	 */
 	isPhaseUsing(notmeisok) {
 		if (!notmeisok && _status.currentPhase != this) return false;
+		// @ts-ignore
 		return _status.event.name == 'phaseUse' || _status.event.getParent('phaseUse').name == 'phaseUse';
 	}
+	/**
+	 * @param { Player } target 
+	 */
 	swapEquip(target) {
 		var next = game.createEvent('swapEquip');
 		next.player = this;
@@ -1752,6 +1965,11 @@ export class Player extends HTMLDivElement {
 		next.setContent('swapEquip');
 		return next;
 	}
+	/**
+	 * @param { Player } target 
+	 * @param { boolean } [goon] 
+	 * @param { boolean} [bool] 
+	 */
 	canCompare(target, goon, bool) {
 		if (this == target) return false;
 		if ((!this.countCards('h') && goon !== true) || (!target.countCards('h') && bool !== true)) return false;
@@ -1759,24 +1977,23 @@ export class Player extends HTMLDivElement {
 		return true;
 	}
 	$disableJudge() {
-		var player = this;
-		game.addVideo('$disableJudge', player);
-		player.storage._disableJudge = true;
+		game.addVideo('$disableJudge', this);
+		this.storage._disableJudge = true;
 		var card = game.createCard('disable_judge', '', '');
 		card.fix();
 		card.classList.add('feichu');
 		card.style.transform = '';
 		card.classList.add('drawinghidden');
-		player.node.judges.insertBefore(card, player.node.judges.firstChild);
-		ui.updatej(player);
+		this.node.judges.insertBefore(card, this.node.judges.firstChild);
+		ui.updatej(this);
 	}
 	$enableJudge() {
-		var player = this;
-		game.addVideo('$enableJudge', player);
-		player.storage._disableJudge = false;
-		for (var i = 0; i < player.node.judges.childNodes.length; i++) {
-			if (player.node.judges.childNodes[i].name == 'disable_judge') {
-				player.node.judges.removeChild(player.node.judges.childNodes[i]);
+		game.addVideo('$enableJudge', this);
+		this.storage._disableJudge = false;
+		for (let i = 0; i < this.node.judges.childNodes.length; i++) {
+			// @ts-ignore
+			if (this.node.judges.childNodes[i].name == 'disable_judge') {
+				this.node.judges.removeChild(this.node.judges.childNodes[i]);
 				break;
 			}
 		}

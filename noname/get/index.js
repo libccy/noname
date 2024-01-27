@@ -157,7 +157,11 @@ export class Get extends Uninstantable {
 	 *
 	 * 获取一张装备牌实际占用的装备栏(君曹操六龙)
 	 *
-	 * 用法同get.subtype，返回数组
+	 * 用法同{@link subtype}，返回数组
+	 * 
+	 * @param { string | Card | VCard | CardBaseUIData } obj 
+	 * @param { false | Player } [player] 
+	 * @returns { string[] }
 	 */
 	static subtypes(obj, player) {
 		if (typeof obj == 'string') obj = { name: obj };
@@ -1312,7 +1316,7 @@ export class Get extends Uninstantable {
 	}
 	static infoTargets(infos) { return Array.from(infos || []).map(info => game.playerMap[info]); }
 	static cardInfo(card) { return [card.suit, card.number, card.name, card.nature]; }
-	static cardsInfo(cards) { return Array.from(cards || []).map(get.cardInfo); }
+	static cardsInfo(cards = []) { return Array.from(cards).map(get.cardInfo); }
 	static infoCard(info) {
 		var card = ui.create.card();
 		if (info[0]) {
@@ -1715,6 +1719,12 @@ export class Get extends Uninstantable {
 		return lib.card[name].type;
 	}
 	static type2(card, player) { return get.type(card, 'trick', player); }
+	/**
+	 * 
+	 * @param { string | Card | VCard | CardBaseUIData } obj 
+	 * @param { false | Player } [player] 
+	 * @returns { string }
+	 */
 	static subtype(obj, player) {
 		if (typeof obj == 'string') obj = { name: obj };
 		if (typeof obj != 'object') return;
@@ -1730,9 +1740,9 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 *
-	 * @param {Card | VCard} card
-	 * @param {false | Player} [player]
-	 * @returns {string}
+	 * @param { Card | VCard | CardBaseUIData } card
+	 * @param { false | Player } [player]
+	 * @returns { string }
 	 */
 	static name(card, player) {
 		if (get.itemtype(player) == 'player' || (player !== false && get.position(card) == 'h')) {
@@ -1968,6 +1978,17 @@ export class Get extends Uninstantable {
 		else if (method == 'unchecked') return n;
 		return Math.max(1, n);
 	}
+	/**
+	 * @overload
+	 * @param { string } item 
+	 * @returns { Skill }
+	 */
+	/**
+	 * @overload
+	 * @param { Card | VCard | CardBaseUIData } item 
+	 * @param { Player | false } [player]
+	 * @returns { any }
+	 */
 	static info(item, player) {
 		if (typeof item == 'string') {
 			return lib.skill[item];
