@@ -2769,7 +2769,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							card: event.card
 						}),
 						hp = player.hp + tj;
-					if(player.storage.tairan2) hp -= player.storage.tairan2;
+					if(player.storage.tairan) hp -= player.storage.tairan;
 					if(eff <= 0 || fd || att >= -2 || Math.abs(hp) <= 1) return false;
 					if(hp > 2 || eff > 0 && event.player.isLinked() && event.hasNature()) return true;
 					return !event.player.countCards('hs') || event.player.hp > 2 * event.num && !event.player.hasSkillTag('maixie');
@@ -2856,26 +2856,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ruilve3:{},
 			tairan:{
 				audio:2,
-				trigger:{player:'phaseEnd'},
+				trigger:{player:['phaseUseBegin','phaseJieshuBegin']},
 				forced:true,
 				preHidden:true,
-				filter:function(event,player){
+				filter: function (event, player) {
+					if (event.name === 'phaseUse') return true;
 					return player.hp<player.maxHp||player.countCards('h')<player.maxHp;
 				},
 				content:function(){
 					'step 0'
-					player.addSkill('tairan2');
-					if(!player.storage.tairan2) player.storage.tairan2=0;
+					if (event.triggername === 'phaseUseBegin') {
+						var map=player.storage.tairan;
+						if(map>0) player.loseHp(map);
+						var hs=player.getCards('h',function(card){
+							return card.hasGaintag('tairan');
+						});
+						if (hs.length) player.discard(hs);
+						delete player.storage.tairan;
+						event.finish();
+						return;
+					}
+					if(!player.storage.tairan) player.storage.tairan=0;
 					var num=player.maxHp-player.hp;
 					if(num>0){
-						player.storage.tairan2=num;
+						player.storage.tairan=num;
 						player.recover(num);
 					}
 					'step 1'
 					if(player.countCards('h')<player.maxHp) player.drawTo(Math.min(player.maxHp,5+player.countCards('h'))).gaintag=['tairan'];
 				},
-			},
-			tairan2:{
 				mod:{
 					aiOrder:function(player,card,num){
 						if(card.hasGaintag&&card.hasGaintag('tairan')) return 10*num;
@@ -2887,22 +2896,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					aiUseful:function(player,card,num){
-						return lib.skill.tairan2.mod.aiValue.apply(this,arguments);
+						return lib.skill.tairan.mod.aiValue.apply(this,arguments);
 					}
-				},
-				audio:'tairan',
-				trigger:{player:'phaseUseBegin'},
-				charlotte:true,
-				forced:true,
-				onremove:true,
-				content:function(){
-					var map=player.storage.tairan2;
-					if(map>0) player.loseHp(map);
-					var hs=player.getCards('h',function(card){
-						return card.hasGaintag('tairan');
-					});
-					if(hs.length) player.discard(hs);
-					player.removeSkill('tairan2');
 				},
 			},
 			baoqie:{
@@ -3856,8 +3851,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ruilve2:'睿略',
 			ruilve_info:'主公技，其他晋势力角色的出牌阶段限一次，该角色可以将一张带有伤害标签的基本牌或锦囊牌交给你。',
 			tairan:'泰然',
-			tairan2:'泰然',
-			tairan_info:'锁定技，回合结束时，你将体力回复至体力上限，并将手牌摸至体力上限（称为“泰然”牌，且至多摸五张）。然后你的下一个出牌阶段开始时，你失去上一次以此法回复的体力值的体力，弃置所有“泰然”牌。',
+			tairan_info:'锁定技，结束阶段，你将体力回复至体力上限，并将手牌摸至体力上限（至多摸五张）。出牌阶段开始时，你失去以此法回复的体力，弃置以此法获得的牌。',
 			gz_jin_simayi:'司马懿',
 			gz_jin_zhangchunhua:'张春华',
 			gz_jin_simazhao:'司马昭',
