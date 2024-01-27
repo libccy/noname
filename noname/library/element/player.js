@@ -892,7 +892,7 @@ export class Player extends HTMLDivElement {
 		else if (type == 'equip3_4') {
 			type = 'equip3';
 		}
-		return Math.max(0, this.countEnabledSlot(type) - this.getEquips(type).reduce(function (num, card) {
+		return Math.max(0, this.countEnabledSlot(type) - this.getEquips(type).reduce((num, card) => {
 			let types = get.subtypes(card, false);
 			return num + get.numOf(types, type);
 		}, 0));
@@ -921,7 +921,7 @@ export class Player extends HTMLDivElement {
 		else if (get.is.mountCombined() && type == 'equip4') {
 			return 0;
 		}
-		return Math.max(0, this.countEnabledSlot(type) - this.getEquips(type).reduce(function (num, card) {
+		return Math.max(0, this.countEnabledSlot(type) - this.getEquips(type).reduce((num, card) => {
 			let types = get.subtypes(card, false);
 			if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
 			return num;
