@@ -1361,16 +1361,29 @@ export class Get extends Uninstantable {
 			if (func._filter_args) {
 				return '_noname_func:' + JSON.stringify(get.stringifiedResult(func._filter_args, 3));
 			}
+			const str = func.toString();
+			// js内置的函数
+			if ((/\{\s*\[native code\]\s*\}/).test(str)) return '_noname_func:function () {}';
 			return '_noname_func:' + func.toString();
 		}
 		return '';
 	}
 	static infoFuncOL(info) {
-		var func;
+		let func;
 		const str = info.slice(13).trim();
 		try {
+			// js内置的函数
+			if ((/\{\s*\[native code\]\s*\}/).test(str)) return function () {};
+			// 一般fun和数组形式
 			if (str.startsWith("function") || str.startsWith("(")) eval(`func=(${str});`);
-			else eval(`func=(function ${str});`);
+			// 其他奇形怪状的fun
+			else {
+				try {
+					eval(`func = ${str}`);
+				} catch {
+					eval(`let obj = {${str}}; func = obj[Object.keys(obj)[0]]`);
+				}
+			}
 		} catch (e) {
 			console.error(`${e} in \n${str}`);
 			return function () {};
