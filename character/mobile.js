@@ -10558,6 +10558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.logSkill('zhengjian',target);
 						target.addSkill('zhengjian_mark');
+						target.storage.zhengjian_player=player;
 					}
 				},
 				group:'zhengjian_draw',
@@ -10602,13 +10603,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCard1','respond']},
 				silent:true,
 				firstDo:true,
-				onremove:true,
 				charlotte:true,
-				content:function(){
+				content: function () {
+					if (player.storage.zhengjian_player) player.storage.zhengjian_player.logSkill("zhengjian");
 					player.addMark('zhengjian_mark',1,false);
 				},
 				init:function(player,skill){
 					if(!player.storage[skill]) player.storage[skill]=0;
+				},
+				onremove:function (player) {
+					delete player.storage.zhengjian_mark;
+					delete player.storage.zhengjian_player;
 				},
 				mark:true,
 				intro:{
