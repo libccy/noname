@@ -5621,6 +5621,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return typeof num1=='number'&&typeof num2=='number'&&num2%num1==0;
 				},
 				forced:true,
+				direct:true,
 				content:function(){
 					player.draw();
 				},
@@ -5675,6 +5676,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.removeGaintag('xingtu1');
 							player.removeGaintag('xingtu2');
 							if(event.triggername=='useCard1'){
+								player.logSkill('xingtu');
 								var num=get.number(trigger.card,player);
 								player.storage.xingtu_mark=num;
 								player[typeof num!='number'?'unmarkSkill':'markSkill']('xingtu_mark');
