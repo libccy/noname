@@ -27,7 +27,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		character:{
 			xin_huojun:['male','shu',4,['sidai','jieyu'],['character:tw_huojun','die_audio:tw_huojun']],
-			muludawang:['male','qun','3/3/1',['shoufa','yuxiang','zhoulin']],
+			muludawang:['male','qun','3/3/1',['shoufa','zhoulin','yuxiang']],
 			mb_chengui:['male','qun',3,['guimou','zhouxian']],
 			mb_huban:['male','wei',4,['mbyilie']],
 			mb_xianglang:['male','shu',3,['naxue','yijie']],

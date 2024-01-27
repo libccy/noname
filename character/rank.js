@@ -358,6 +358,7 @@ window.noname_character_rank={
 		'dc_sb_zhouyu',
 		'dc_lingcao',
 		'jsrg_zhugeliang',
+		'shen_lusu',
 	],
 	am:[
 		'muludawang',

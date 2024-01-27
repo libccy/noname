@@ -640,7 +640,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return lib.filter.targetEnabled2(event.card,event.player,current);
 					});
 					else list=game.filterPlayer(current=>current.canAddJudge(event.card));
-					return `移去1枚“醉”，${list.length>1?`令${get.translation(event.card)}目标改为${get.translation(list)}中的一名随机角色。若新目标与原目标相同，你`:''}获得牌堆中的一张【酒】。`
+					const gainText=`${list.length>1&&!player.storage.mpmaotao_gained?`若新目标与原目标相同，你`:''}${!player.storage.mpmaotao_gained?'获得牌堆中的一张锦囊牌。':''}`;
+					return `移去1枚“醉”${list.length>1?`，令${get.translation(event.card)}目标改为${get.translation(list)}中的一名随机角色`:''}。${gainText}`;
 				},
 				check:function(event,player){
 					const eff=get.effect(event.target,event.card,player,player);
@@ -668,12 +669,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.targets.push(target);
 					trigger.player.line(target,'thunder');
 					game.log(trigger.card,'的目标被改为',target);
-					if(target==oriTarget){
-						var card=get.cardPile2('jiu');
-						if(card) player.gain(card,'gain2');
+					if(target==oriTarget&&!player.storage.mpmaotao_gained){
+						var card=get.cardPile2(card=>get.type2(card)=='trick');
+						if(card){
+							if(!player.storage.mpmaotao_gained){
+								player.when({global:'phaseAfter'}).then(()=>{
+									delete player.storage.mpmaotao_gained;
+								});
+								player.storage.mpmaotao_gained=true;
+							}
+							player.gain(card,'gain2');
+						}
 						else{
-							player.chat('没酒了！');
-							game.log('但是牌堆中已经没有','#y酒','了!');
+							// player.chat('没酒了！');
+							// game.log('但是牌堆中已经没有','#y酒','了!');
+							player.chat('没牌了！');
+							game.log('但是牌堆中已经没有','#y锦囊牌','了!');
 						}
 					}
 				},
@@ -5842,6 +5853,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				trigger:{player:'useCard2'},
 				direct:true,
+				charlotte:true,
 				filter:function(event,player){
 					if(player!=_status.currentPhase) return false;
 					var card=event.card;
@@ -11161,7 +11173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mpjiusong:'酒颂',
 			mpjiusong_info:'①你可以将一张锦囊牌当【酒】使用。②当一名角色使用【酒】时，你获得1枚“醉”标记（“醉”数至多为3）。',
 			mpmaotao:'酕醄',
-			mpmaotao_info:'当其他角色使用基本牌或普通锦囊牌指定唯一目标时，你可以移去1枚“醉”，令此牌的目标改为随机一名合法角色（无距离限制）。若目标角色与原目标相同，你从牌堆中获得一张【酒】。',
+			mpmaotao_info:'当其他角色使用基本牌或普通锦囊牌指定唯一目标时，你可以移去1枚“醉”，令此牌的目标改为随机一名合法角色（无距离限制）。若目标角色与原目标相同且你本回合未以此法获得过牌，你从牌堆中随机获得一张锦囊牌。',
 			mpbishi:'避世',
 			mpbishi_info:'锁定技。你不能成为伤害类锦囊牌的目标。',
 			star_caoren:'星曹仁',

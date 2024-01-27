@@ -6227,7 +6227,7 @@ export class Player extends HTMLDivElement {
 		return value;
 	}
 	getStorage(name, defaultValue = []) {
-		return this.hasStorage(name) ? this.storage[name] : defaultValue;
+		return this.storage[name] || defaultValue;
 	}
 	hasStorage(name, value) {
 		if (!(name in this.storage)) return false;

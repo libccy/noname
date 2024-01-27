@@ -17,12 +17,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji','shen_sunquan'],
 				extra_mobilezhi:['shen_guojia','shen_xunyu'],
 				extra_mobilexin:['shen_taishici','shen_sunce'],
-				extra_mobileren:['shen_huatuo'],
+				extra_mobileren:['shen_huatuo','shen_lusu'],
 				extra_tw:['tw_shen_guanyu','tw_shen_lvmeng'],
 				extra_offline:['shen_diaochan','boss_zhaoyun','shen_dianwei','le_shen_jiaxu'],
 			},
 		},
 		character:{
+			shen_lusu:['male','shen',3,['dingzhou','tamo','zhimeng'],['wu']],
 			shen_huatuo:['male','shen',3,['wuling','youyi'],['qun']],
 			le_shen_jiaxu:['male','shen',4,['jxlianpo','jxzhaoluan'],['qun']],
 			shen_dianwei:['male','shen',4,['juanjia','qiexie','cuijue'],['wei']],
@@ -90,6 +91,238 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//神鲁肃
+			dingzhou:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filter(event,player){
+					const num=player.countCards('he');
+					return game.hasPlayer(current=>{
+						const total=current.countCards('ej');
+						return total>0&&num>=total;
+					});
+				},
+				filterCard:true,
+				selectCard:[1,Infinity],
+				check(card){
+					return 7-get.value(card);
+				},
+				filterTarget(card,player,target){
+					return ui.selected.cards.length==target.countCards('ej')&&player!=target;
+				},
+				filterOk(){
+					return ui.selected.cards.length==ui.selected.targets[0].countCards('ej');
+				},
+				position:'he',
+				lose:false,
+				discard:false,
+				delay:false,
+				async content(event,trigger,player){
+					const target=event.targets[0];
+					await player.give(event.cards,target);
+					const cards=target.getGainableCards(player,'ej');
+					if(cards.length) player.gain(cards,'give',target);
+				},
+				ai:{
+					order:9,
+					result:{
+						target(player,target){
+							let eff=0;
+							if(ui.selected.cards.length) eff-=ui.selected.cards.map(card=>get.value(card)).reduce((p,c)=>p+c,0);
+							const es=target.getCards('e'),js=target.getCards('j');
+							es.forEach(card=>{
+								eff-=get.value(card,target);
+							});
+							js.forEach(card=>{
+								eff-=get.effect(target,{
+									name:card.viewAs||card.name,
+									cards:[card],
+								},target,target);
+							});
+							return eff;
+						}
+					},
+				},
+			},
+			tamo:{
+				audio:2,
+				trigger:{
+					global:'phaseBefore',
+					player:'enterGame',
+				},
+				filter(event,player){
+					return (event.name!='phase'||game.phaseNumber==0)&&game.countPlayer(current=>{
+						return !current.isZhu2();
+					})>1;
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const toSortPlayers=game.filterPlayer(current=>!current.isZhu2());
+					toSortPlayers.sortBySeat(game.findPlayer2(current=>current.getSeatNum()==1,true));
+					const next=player.chooseToMove('榻谟：是否分配所有角色的座次？');
+					next.set('list',[
+						['（以下排列的顺序即为发动技能后角色的座次顺序）',
+							[toSortPlayers.map(i=>`${i.getSeatNum()}|${i.name}`),(item,type,position,noclick,node)=>{
+								const info=item.split('|'),_item=item;
+								const seat=parseInt(info[0]);
+								item=info[1];
+								if(node){
+									node.classList.add('button');
+									node.classList.add('character');
+									node.style.display='';
+								}
+								else{
+									node=ui.create.div('.button.character',position);
+								}
+								node._link=item;
+								node.link=item;
+
+								const func=function(node,item){
+									if(item!='unknown') node.setBackground(item,'character');
+									if(node.node){
+										node.node.name.remove();
+										node.node.hp.remove();
+										node.node.group.remove();
+										node.node.intro.remove();
+										if(node.node.replaceButton) node.node.replaceButton.remove();
+									}
+									node.node={
+										name:ui.create.div('.name',node),
+										group:ui.create.div('.identity',node),
+										intro:ui.create.div('.intro',node),
+									};
+									const currentPlayer=game.findPlayer(current=>current.getSeatNum()==seat);
+									const infoitem=[currentPlayer.sex,currentPlayer.group,`${currentPlayer.hp}/${currentPlayer.maxHp}/${currentPlayer.hujia}`];
+									node.node.name.innerHTML=get.slimName(item);
+									if(lib.config.buttoncharacter_style=='default'||lib.config.buttoncharacter_style=='simple'){
+										if(lib.config.buttoncharacter_style=='simple'){
+											node.node.group.style.display='none';
+										}
+										node.classList.add('newstyle');
+										node.node.name.dataset.nature=get.groupnature(get.bordergroup(infoitem));
+										node.node.group.dataset.nature=get.groupnature(get.bordergroup(infoitem),'raw');
+									}
+									node.node.name.style.top='8px';
+									if(node.node.name.querySelectorAll('br').length>=4){
+										node.node.name.classList.add('long');
+										if(lib.config.buttoncharacter_style=='old'){
+											node.addEventListener('mouseenter',ui.click.buttonnameenter);
+											node.addEventListener('mouseleave',ui.click.buttonnameleave);
+										}
+									}
+									node.node.intro.innerHTML=lib.config.intro;
+									if(!noclick){
+										lib.setIntro(node);
+									}
+									node.node.group.innerHTML=`<div>${get.cnNumber(seat,true)}号</div>`;
+									node.node.group.style.backgroundColor=get.translation(`${get.bordergroup(infoitem)}Color`);
+								};
+								node.refresh=func;
+								node.refresh(node,item);
+
+								node.link=_item;
+								node.seatNumber=seat;
+								node._customintro=(uiintro)=>{
+									uiintro.add(`${get.translation(node._link)}(原${get.cnNumber(node.seatNumber,true)}号位)`);
+								};
+								return node;
+							}]
+						]
+					]);
+					next.set('processAI',list=>{
+						const listx=list[0][1][0];
+						const me=listx.find(info=>parseInt(info.split('|')[0])==get.player().getSeatNum());
+						listx.remove(me);
+						listx.randomSort();
+						listx.unshift(me);
+						return [listx];
+					});
+					const {result}=await next;
+					if(!result.bool) return;
+					player.logSkill('tamo');
+					const resultList=result.moved[0].map(info=>{
+						return parseInt(info.split('|')[0]);
+					});
+					const toSwapList=[];
+					const cmp=(a,b)=>{
+						return resultList.indexOf(a)-resultList.indexOf(b);
+					}
+					for(let i in toSortPlayers){
+						for(let j in toSortPlayers){
+							if(cmp(toSortPlayers[i].getSeatNum(),toSortPlayers[j].getSeatNum())<0){
+								toSwapList.push([toSortPlayers[i],toSortPlayers[j]]);
+								[toSortPlayers[i],toSortPlayers[j]]=[toSortPlayers[j],toSortPlayers[i]];
+							}
+						}
+					}
+					game.broadcastAll((toSwapList)=>{
+						for(const list of toSwapList){
+							game.swapSeat(list[0],list[1],false);
+						}
+					},toSwapList);
+					await game.asyncDelay();
+				}
+			},
+			//什么均贫卡
+			zhimeng:{
+				audio:2,
+				trigger:{player:'phaseAfter'},
+				filter(event,player){
+					return game.hasPlayer(current=>{
+						return current.countCards('h')+player.countCards('h')>0&&player!=current;
+					})
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const {result:{bool,targets}}=await player.chooseTarget(get.prompt('zhimeng'),'与一名其他角色平分手牌',(card,player,target)=>{
+						return target.countCards('h')+player.countCards('h')>0&&player!=target;
+					}).set('ai',target=>{
+						const player=get.player();
+						const pvalue=-player.getCards('h').map(card=>get.value(card,player)).reduce((p,c)=>p+c,0);
+						const tvalue=-target.getCards('h').map(card=>get.value(card,target)).reduce((p,c)=>p+c,0)*get.sgnAttitude(player,target);
+						return (pvalue+tvalue)/2;
+					});
+					if(!bool) return;
+					const target=targets[0];
+					player.logSkill('zhimeng',target);
+					const lose_list=[];
+					let cards=[];
+					[player,target].forEach(current=>{
+						const hs=current.getCards('h');
+						if(hs.length){
+							cards.addArray(hs);
+							current.$throw(hs.length,500);
+							game.log(current,'将',get.cnNumber(hs.length),'张牌置入了处理区');
+							lose_list.push([current,hs]);
+						}
+					});
+					await game.loseAsync({
+						lose_list:lose_list,
+					}).setContent('chooseToCompareLose');
+					await game.asyncDelay();
+					cards=cards.filterInD();
+					const pcards=cards.randomGets(Math.ceil(cards.length/2));
+					const tcards=cards.removeArray(pcards);
+					const list=[];
+					if(pcards.length){
+						list.push([player,pcards]);
+						game.log(player,'获得了',get.cnNumber(pcards.length),'张牌');
+					}
+					if(tcards.length){
+						list.push([target,tcards]);
+						game.log(target,'获得了',get.cnNumber(tcards.length),'张牌');
+					}
+					game.loseAsync({
+						gain_list:list,
+						player:player,
+						animate:'draw',
+					}).setContent('gaincardMultiple');
+				},
+				ai:{
+					threaten:4,
+				},
+			},
 			//神华佗
 			wuling:{
 				audio:2,
@@ -8066,6 +8299,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			'<br><li>鹤：当你获得此效果时，你摸三张牌。',
 			youyi:'游医',
 			youyi_info:'①弃牌阶段结束时，你可以将所有于此阶段弃置的牌置入仁区。②出牌阶段限一次。你可以将仁区的所有牌置入弃牌堆，令所有角色各回复1点体力。',
+			shen_lusu:'神鲁肃',
+			shen_lusu_prefix:'神',
+			dingzhou:'定州',
+			dingzhou_info:'出牌阶段限一次。你可以交给一名角色X张牌，然后你获得其装备区和判定区里的所有牌（X为其装备区与判定区里的牌数之和）。',
+			tamo:'榻谟',
+			tamo_info:'游戏开始时，你可以重新分配除主公外所有角色的座次。',
+			zhimeng:'智盟',
+			zhimeng_info:'回合结束后，你可以与一名其他角色将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
 
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',
