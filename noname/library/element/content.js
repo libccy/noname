@@ -682,7 +682,7 @@ export const Content = {
 					game.resume();
 					_status.imchoosing = false;
 					if (roundmenu) ui.roundmenu.style.display = '';
-					if (ui.backgroundMusic) ui.backgroundMusic.play();
+					if (ui.backgroundMusic && !isNaN(ui.backgroundMusic.duration)) ui.backgroundMusic.play();
 					hitsound_audio.remove();
 				}, 1000);
 			};
@@ -870,7 +870,7 @@ export const Content = {
 			if (dialog) {
 				dialog.close();
 			}
-			if (ui.backgroundMusic) ui.backgroundMusic.play();
+			if (ui.backgroundMusic && !isNaN(ui.backgroundMusic.duration)) ui.backgroundMusic.play();
 		}, event.videoId, event.time);
 		var result = event.result || result;
 		event.result = result;
@@ -2164,7 +2164,7 @@ export const Content = {
 		next.player = player;
 		next._trigger = trigger;
 		next.triggername = event.triggername;
-		
+
 		// if ("contents" in info && Array.isArray(info.contents)) {
 		// 	next.setContents(info.contents);
 		// } else {
