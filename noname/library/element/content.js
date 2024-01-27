@@ -682,7 +682,7 @@ export const Content = {
 					game.resume();
 					_status.imchoosing = false;
 					if (roundmenu) ui.roundmenu.style.display = '';
-					if (ui.backgroundMusic) ui.backgroundMusic.play();
+					if (ui.backgroundMusic && !isNaN(ui.backgroundMusic.duration)) ui.backgroundMusic.play();
 					hitsound_audio.remove();
 				}, 1000);
 			};
@@ -870,7 +870,7 @@ export const Content = {
 			if (dialog) {
 				dialog.close();
 			}
-			if (ui.backgroundMusic) ui.backgroundMusic.play();
+			if (ui.backgroundMusic && !isNaN(ui.backgroundMusic.duration)) ui.backgroundMusic.play();
 		}, event.videoId, event.time);
 		var result = event.result || result;
 		event.result = result;
@@ -1372,7 +1372,9 @@ export const Content = {
 		if (!evt.orderingCards) evt.orderingCards = [];
 		if (!evt.noOrdering && !evt.cardsOrdered) {
 			evt.cardsOrdered = true;
-			var next = game.createEvent('orderingDiscard', false, evt.getParent());
+			var next = game.createEvent('orderingDiscard', false);
+			event.next.remove(next);
+			evt.after.push(next);
 			next.relatedEvent = evt;
 			next.setContent('orderingDiscard');
 		}
@@ -2011,14 +2013,13 @@ export const Content = {
 		}
 	},
 	arrangeTrigger: async function (event,trigger,player) {
-		while(event.doingList.length>0){
-			event.doing = event.doingList.shift();
+		const doingList = event.doingList.slice(0);
+
+		while(doingList.length>0){
+			event.doing = doingList.shift();
 			while(true){
 				if (trigger.filterStop && trigger.filterStop()) return;
-				const usableSkills = event.doing.todoList.filter(info => {
-					if (!lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill)) return false;
-					return lib.skill.global.includes(info.skill) || info.player.hasSkill(info.skill, true);
-				});
+				const usableSkills = event.doing.todoList.filter(info => lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill));
 				if (usableSkills.length == 0){
 					break;
 				}
@@ -2030,10 +2031,10 @@ export const Content = {
 					}
 					else {
 						event.choice = usableSkills.filter(n => n.priority == usableSkills[0].priority);
-						//现在只要找到一个同优先度技能为silent 便优先执行该技能
+						//现在只要找到一个同优先度技能为silent，或没有技能描述的技能 便优先执行该技能
 						const silentSkill = event.choice.find(item => {
 							const skillInfo = lib.skill[item.skill];
-							return (skillInfo && skillInfo.silent);
+							return (skillInfo && (skillInfo.silent || !lib.translate[item.skill]));
 						})
 						if (silentSkill){
 							event.current = silentSkill;
@@ -2163,7 +2164,7 @@ export const Content = {
 		next.player = player;
 		next._trigger = trigger;
 		next.triggername = event.triggername;
-		
+
 		// if ("contents" in info && Array.isArray(info.contents)) {
 		// 	next.setContents(info.contents);
 		// } else {
@@ -7513,7 +7514,9 @@ export const Content = {
 			if (!evt.orderingCards) evt.orderingCards = [];
 			if (!evt.noOrdering && !evt.cardsOrdered) {
 				evt.cardsOrdered = true;
-				var next = game.createEvent('orderingDiscard', false, evt.getParent());
+				var next = game.createEvent('orderingDiscard', false);
+				event.next.remove(next);
+				evt.after.push(next);
 				next.relatedEvent = evt;
 				next.setContent('orderingDiscard');
 			}

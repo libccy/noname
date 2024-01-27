@@ -1,4 +1,4 @@
-'use strict';
+import { game } from '../noname.js';
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'xinghuoliaoyuan',
@@ -712,10 +712,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:"damageEnd",
 				},
 				filter:function(event,player){
-					return event.source&&event.source.isIn()&&!player.getStorage('xinfu_weilu_effect').includes(event.source)
+					return event.source&&event.source.isIn()&&!player.getStorage('xinfu_weilu_effect').includes(event.source);
 				},
-				check:function (event,player){
-					return (get.effect(target,{name:'losehp'},player,player)>=0);
+				check:function(event,player){
+					return get.effect(event.source,{name:'losehp'},player,player)>=0;
 				},
 				forced:true,
 				logTarget:"source",

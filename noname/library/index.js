@@ -5,7 +5,7 @@
  * @typedef { InstanceType<typeof lib.element.Button> } Button
  * @typedef { InstanceType<typeof lib.element.Dialog> } Dialog
  * @typedef { InstanceType<typeof lib.element.GameEvent> } GameEvent
- * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise & typeof Promise<InstanceType<typeof lib.element.GameEvent>> } GameEventPromise
+ * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> } GameEventPromise
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
  * @typedef { InstanceType<typeof lib.element.Control> } Control
 */
@@ -3056,6 +3056,12 @@ export class Library extends Uninstantable {
 						lib.init.cssstyles();
 					}
 				},
+				equip_span:{
+					name: '装备牌占位',
+					intro:'打开后，没有装备的装备区将在装备栏占据空白位置。',
+					init: false,
+					unfrequent:false,
+				},
 				fold_card: {
 					name: '折叠手牌',
 					init: true,
@@ -3915,8 +3921,8 @@ export class Library extends Uninstantable {
 					item: {
 						'6': '6',
 						'12': '12',
-						'20': '24',
-						'30': '36',
+						'20': '20',
+						'30': '30',
 					},
 					unfrequent: true
 				},
@@ -9577,6 +9583,30 @@ export class Library extends Uninstantable {
 			type: "equip",
 			subtype: "equip6",
 		},
+		empty_equip1: {
+			type: "equip",
+			subtype: "equip1",
+		},
+		empty_equip2: {
+			type: "equip",
+			subtype: "equip2",
+		},
+		empty_equip3: {
+			type: "equip",
+			subtype: "equip3",
+		},
+		empty_equip4: {
+			type: "equip",
+			subtype: "equip4",
+		},
+		empty_equip5: {
+			type: "equip",
+			subtype: "equip5",
+		},
+		empty_equip6: {
+			type: "equip",
+			subtype: "equip6",
+		},
 		zhengsu_leijin: {},
 		zhengsu_mingzhi: {},
 		zhengsu_bianzhen: {},
@@ -9673,7 +9703,7 @@ export class Library extends Uninstantable {
 				console.error(new ReferenceError('缺少info的技能:', skill));
 				return false;
 			}
-			if (!game.expandSkills(player.getSkills(true).concat(lib.skill.global)).includes(skill)) return false;
+			if (!game.expandSkills(player.getSkills('invisible').concat(lib.skill.global)).includes(skill)) return false;
 			if (!game.expandSkills(player.getSkills(false).concat(lib.skill.global)).includes(skill)) {//hiddenSkills
 				if (get.mode() != 'guozhan') return false;
 				if (info.noHidden) return false;
@@ -11228,6 +11258,7 @@ export class Library extends Uninstantable {
 			charlotte: true,
 			priority: -100,
 			lastDo: true,
+			silent:true,
 			content: function () {
 				player.removeSkill('counttrigger');
 				delete player.storage.counttrigger;
@@ -11253,6 +11284,7 @@ export class Library extends Uninstantable {
 			priority: 100,
 			firstDo: true,
 			popup: false,
+			silent:true,
 			filter: function (event, player) {
 				return player.hp >= player.maxHp;
 			},
@@ -11341,6 +11373,7 @@ export class Library extends Uninstantable {
 			popup: false,
 			priority: -100,
 			lastDo: true,
+			silent:true,
 			filter: function (event) {
 				return !event._cleared && event.card.name != 'wuxie';
 			},
@@ -11357,6 +11390,7 @@ export class Library extends Uninstantable {
 			popup: false,
 			priority: -100,
 			lastDo: true,
+			silent:true,
 			filter: function (event) {
 				return ui.todiscard[event.discardid] ? true : false;
 			},
@@ -11386,6 +11420,7 @@ export class Library extends Uninstantable {
 			priority: 5,
 			forced: true,
 			popup: false,
+			silent:true,
 			filter: function (event, player) {
 				//if(!event.player.isDying()) return false;
 				//if(event.source&&event.source.isIn()&&event.source!=player) return false;
@@ -11539,6 +11574,7 @@ export class Library extends Uninstantable {
 			popup: false,
 			logv: false,
 			forceDie: true,
+			silent:true,
 			//priority:-5,
 			content: function () {
 				"step 0";
@@ -11567,6 +11603,7 @@ export class Library extends Uninstantable {
 			forced: true,
 			popup: false,
 			forceDie: true,
+			silent:true,
 			filter: function (event, player) {
 				var evt = event.getParent();
 				return evt && evt.name == 'damage' && evt.hasNature('linked') && player.isLinked();
@@ -13088,7 +13125,7 @@ export class Library extends Uninstantable {
 	static other = {
 		ignore: () => void 0
 	};
-};
+}
 
 Library.config = undefined;
 Library.configOL = undefined;

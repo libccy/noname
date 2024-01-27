@@ -671,9 +671,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									list.push('摸'+(num-i)+'回'+i);
 								}
 								target.chooseControl(list).set('prompt','请分配自己的摸牌数和回复量').ai=function(){
-									if(player.hasSkill('diaohulishan')) return 0;
-									if(_status._aozhan) return list.length-1;
-									return list.randomGet();
+									return Math.min(_status.event.player.getDamagedHp(),list.length)-1;
 								};
 							}
 						}
@@ -1345,7 +1343,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						},
 						target:(card,player,target)=>{
 							if(target._g_taipingyaoshu_temp) return;
-							if(get.subtype(card)==='equip2'&&target.getEquip('taipingyaoshu')&&!target.countEmpty(2)){
+							if(get.subtype(card)==='equip2'&&target.getEquip('taipingyaoshu')&&!target.countEmptySlot(2)){
 								target._g_taipingyaoshu_temp=true;
 								let lose=get.effect(target,{name:'losehp'},target,target),
 									draw=2*get.effect(target,{name:'draw'},target,target);

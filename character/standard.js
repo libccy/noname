@@ -93,9 +93,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ganning:['lingtong','xf_sufei'],
 			guanyu:['zhangfei','liaohua'],
 		},
-		/**
-		 * @type { { [key: string]: Skill } }
-		 */
 		skill:{
 			//标准版甘夫人
 			stdshushen:{
@@ -710,7 +707,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.storage.xinluoshen=event.cards.slice(0);
 								return;
 							}
-						};
+						}
 					}
 				},
 				mod:{

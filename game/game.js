@@ -1,11 +1,11 @@
 "use strict";
 
 new Promise(resolve => {
-	// 客户端自带core.js的请注意跟进
+	// 客户端自带core.js的请注意跟进core.js版本
 	if ('__core-js_shared__' in window) resolve(null);
 	else {
 		const nonameInitialized = localStorage.getItem('noname_inited');
-		const assetURL = typeof nonameInitialized != 'string' || nonameInitialized == 'nodejs' ? '' : nonameInitialized;
+		const assetURL = location.protocol.startsWith('http') || typeof nonameInitialized != 'string' || nonameInitialized == 'nodejs' ? '' : nonameInitialized;
 		const coreJSBundle = document.createElement('script');
 		coreJSBundle.onerror = coreJSBundle.onload = resolve;
 		coreJSBundle.src = `${assetURL}game/core-js-bundle.js`;
@@ -13,7 +13,7 @@ new Promise(resolve => {
 	}
 }).then(() => {
 	const nonameInitialized = localStorage.getItem('noname_inited');
-	const assetURL = typeof nonameInitialized != 'string' || nonameInitialized == 'nodejs' ? '' : nonameInitialized;
+	const assetURL = location.protocol.startsWith('http') || typeof nonameInitialized != 'string' || nonameInitialized == 'nodejs' ? '' : nonameInitialized;
 	const userAgent = navigator.userAgent.toLowerCase();
 
 	const exit = () => {
@@ -62,6 +62,7 @@ new Promise(resolve => {
 		const regex = /(firefox|chrome|safari)\/([\d.]+)/;
 		let result;
 		if (!(result = userAgent.match(regex))) return ["other", NaN];
+		// @ts-ignore
 		if (result[1] !== "safari") return [result[1], parseInt(result[2])];
 		result = userAgent.match(/version\/([\d.]+).*safari/);
 		// @ts-ignore
@@ -78,7 +79,7 @@ new Promise(resolve => {
 	if (core in supportMap && supportMap[core] > version) {
 		const tip = '检测到您的浏览器内核版本无法支持ES Module，请立即升级浏览器或手机webview内核！';
 		console.error(tip);
-		const redirect_tip = '您使用的浏览器或无名杀客户端内核版本过低，已经无法正常运行无名杀！\n点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。\n稍后您的无名杀将自动退出（可能的话）';
+		const redirect_tip = `您使用的浏览器或无名杀客户端内核版本过低，已经无法正常运行无名杀！\n目前使用的浏览器UA信息为：\n${userAgent}\n点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。\n稍后您的无名杀将自动退出（可能的话）`;
 		if (confirm(redirect_tip)) {
 			window.open('https://github.com/libccy/noname/releases/tag/chromium77-client');
 		}
@@ -87,15 +88,15 @@ new Promise(resolve => {
 	else {
 		const script = document.createElement('script')
 		script.type = "module";
-		script.src = `${assetURL}game/entry.js`
-		script.async = true
-		script.onerror = (event) => {
-			console.error(event)
-			const message = `您使用的浏览器或《无名杀》客户端加载内容失败！\n若您使用的客户端为自带内核的旧版“兼容版”，请及时更新客户端版本！\n若您使用的客户端为手机端的非兼容版《无名杀》，请尝试更新手机的WebView内核，或者更换为1.8.2版本及以上的兼容版！\n若您是直接使用浏览器加载index.html进行游戏，请改为运行文件夹内的“noname-server.exe”（或使用VSCode等工具启动Live Server），以动态服务器的方式启动《无名杀》！`;
+		script.src = `${assetURL}game/entry.js`;
+		script.async = true;
+		script.onerror = event => {
+			console.error(event);
+			const message = `您使用的浏览器或《无名杀》客户端加载内容失败！\n目前使用的浏览器UA信息为：\n${userAgent}\n若您使用的客户端为自带内核的旧版“兼容版”，请及时更新客户端版本！\n若您使用的客户端为手机端的非兼容版《无名杀》，请尝试更新手机的WebView内核，或者更换为1.8.2版本及以上的兼容版！\n若您是直接使用浏览器加载index.html进行游戏，请改为运行文件夹内的“noname-server.exe”（或使用VSCode等工具启动Live Server），以动态服务器的方式启动《无名杀》！`;
 			console.error(message);
 			alert(message);
-			exit()
+			exit();
 		}
-		document.head.appendChild(script)
+		document.head.appendChild(script);
 	}
 });

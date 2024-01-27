@@ -1,4 +1,4 @@
-'use strict';
+import { game } from '../noname.js';
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'yingbian',
@@ -971,7 +971,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						forced:true,
 						popup:false,
-						trigger:{global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','loseAfter','gainAfter','addToExpansionAfter']},
+						trigger:{global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','loseAfter','addToExpansionAfter']},
 						usable:1,
 						filter:function(event,player){
 							var target=player.storage.qimei_draw;
@@ -1623,7 +1623,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list,skills=[];
 					if(get.mode()=='guozhan'){
 						list=[];
-						for(var i in lib.characterPack.mode_guozhan) list.push(i);
+						for(var i in lib.characterPack.mode_guozhan){
+							if(lib.character[i])list.push(i);
+						}
 					}
 					else if(_status.connectMode) list=get.charactersOL();
 					else {

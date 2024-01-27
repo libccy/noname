@@ -1,4 +1,4 @@
-'use strict';
+import { game } from '../noname.js';
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'sp2',
@@ -605,6 +605,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.hasCard(card=>get.type2(card)=='trick','hs');
 				},
 				check:function(card){
+					if(get.itemtype(card)!=='card') return true;
 					if(get.event().type=='dying') return 1/Math.max(0.1,get.value(card));
 					return 4-get.value(card);
 				},
@@ -639,7 +640,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return lib.filter.targetEnabled2(event.card,event.player,current);
 					});
 					else list=game.filterPlayer(current=>current.canAddJudge(event.card));
-					return `移去1枚“醉”，${list.length>1?`令${get.translation(event.card)}目标改为${get.translation(list)}中的一名随机角色。若新目标与原目标相同，你`:''}获得牌堆中的一张【酒】。`
+					const gainText=`${list.length>1&&!player.storage.mpmaotao_gained?`若新目标与原目标相同，你`:''}${!player.storage.mpmaotao_gained?'获得牌堆中的一张锦囊牌。':''}`;
+					return `移去1枚“醉”${list.length>1?`，令${get.translation(event.card)}目标改为${get.translation(list)}中的一名随机角色`:''}。${gainText}`;
 				},
 				check:function(event,player){
 					const eff=get.effect(event.target,event.card,player,player);
@@ -667,12 +669,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.targets.push(target);
 					trigger.player.line(target,'thunder');
 					game.log(trigger.card,'的目标被改为',target);
-					if(target==oriTarget){
-						var card=get.cardPile2('jiu');
-						if(card) player.gain(card,'gain2');
+					if(target==oriTarget&&!player.storage.mpmaotao_gained){
+						var card=get.cardPile2(card=>get.type2(card)=='trick');
+						if(card){
+							if(!player.storage.mpmaotao_gained){
+								player.when({global:'phaseAfter'}).then(()=>{
+									delete player.storage.mpmaotao_gained;
+								});
+								player.storage.mpmaotao_gained=true;
+							}
+							player.gain(card,'gain2');
+						}
 						else{
-							player.chat('没酒了！');
-							game.log('但是牌堆中已经没有','#y酒','了!');
+							// player.chat('没酒了！');
+							// game.log('但是牌堆中已经没有','#y酒','了!');
+							player.chat('没牌了！');
+							game.log('但是牌堆中已经没有','#y锦囊牌','了!');
 						}
 					}
 				},
@@ -862,16 +874,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(evt.gaintag_map[i].includes('dcjiaoxia_used')) return true;
 								}
 								return false;
-							}).length&&player.getHistory('sourceDamage',evt=>evt.card==event.card).length&&!['delay','equip'].includes(get.type(event.cards[0],player));
+							}).length&&player.getHistory('sourceDamage',evt=>evt.card==event.card).length&&player.hasUseTarget(event.cards[0]);
 						},
 						direct:true,
 						content:function(){
-							var card={
-								name:get.name(trigger.cards[0],player),
-								nature:get.nature(trigger.cards[0],player),
-								isCard:true,
-							};
-							player.chooseUseTarget(card,get.prompt('dcjiaoxia'),false,false).set('prompt2','视为使用'+get.translation(card)).logSkill='dcjiaoxia';
+							player.chooseUseTarget(trigger.cards[0],get.prompt('dcjiaoxia'),false,false).set('prompt2','使用'+get.translation(card)).logSkill='dcjiaoxia';
 						},
 					},
 				},
@@ -5335,10 +5342,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reliewei:{
 				audio:'liewei',
 				trigger:{global:'dying'},
-				frequent:true,
 				filter:function(event,player){
-					return player==_status.currentPhase;
+					return player==_status.currentPhase||player.getHistory('useSkill',evt=>evt.skill=='reliewei').length<player.getHp();
 				},
+				frequent:true,
 				content:function(){
 					player.draw();
 				},
@@ -5846,6 +5853,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onremove:true,
 				trigger:{player:'useCard2'},
 				direct:true,
+				charlotte:true,
 				filter:function(event,player){
 					if(player!=_status.currentPhase) return false;
 					var card=event.card;
@@ -10895,7 +10903,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiaojie:'狡黠',
 			jiaojie_info:'锁定技，你的红色牌不计入手牌上限。你使用黑色牌无距离和次数限制。',
 			dcjiaoxia:'狡黠',
-			dcjiaoxia_info:'①出牌阶段开始时，你可以令自己的所有手牌于此阶段均视为【杀】。若如此做，你使用以此法转化的【杀】造成伤害后，你可以视为使用此牌对应的原卡牌。②出牌阶段，你对你本阶段未使用过【杀】的角色使用【杀】无距离和次数限制。',
+			dcjiaoxia_info:'①出牌阶段开始时，你可以令自己的所有手牌于此阶段均视为【杀】。若如此做，你使用以此法转化的【杀】造成伤害后，你可以使用此牌对应的原卡牌。②出牌阶段，你对你本阶段未使用过【杀】的角色使用【杀】无距离和次数限制。',
 			dchumei:'狐魅',
 			dchumei_info:'出牌阶段各限一次，你可以选择一名体力值不大于X的角色，令其：①摸一张牌。②交给你一张牌。③回复1点体力。（X为你本阶段造成的伤害数）',
 			buchen:'不臣',
@@ -10953,7 +10961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			recuorui:'摧锐',
 			recuorui_info:'限定技，出牌阶段，你可以依次获得至多X名角色的各一张手牌（X为你的体力值）。',
 			reliewei:'裂围',
-			reliewei_info:'当有角色于你的回合内进入濒死状态时，你可以摸一张牌。',
+			reliewei_info:'每回合限Y次，当有角色于你的回合内进入濒死状态时，你可以摸一张牌（Y为你的体力值，若当前回合角色为你，则Y为Infinity）。',
 			duanwei:'段煨',
 			langmie:'狼灭',
 			langmie_damage:'狼灭',
@@ -11003,7 +11011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gongxiu:'共修',
 			gongxiu_info:'结束阶段，若你本回合内发动过〖经合〗，则你选择一项：①令所有本回合内成为过〖经合〗目标的角色各摸一张牌；②令所有本回合内未成为过〖经合〗目标的角色各弃置一张手牌。',
 			jinghe:'经合',
-			jinghe_info:'出牌阶段限一次，你可以展示四张牌名各不相同的牌并选择等量的角色。系统从“写满技能的天书”中随机选择等量的技能，然后这些角色依次选择获得其中的一个。',
+			jinghe_info:'出牌阶段限一次，你可以展示至多四张牌名各不相同的牌并选择等量的角色。系统从“写满技能的天书”中随机选择等量的技能，然后这些角色依次选择获得其中的一个。',
 			nhyinbing:'阴兵',
 			nhyinbing_info:'锁定技，你使用的【杀】造成伤害改为失去体力。其他角色失去体力后，你摸一张牌。',
 			nhhuoqi:'活气',
@@ -11140,9 +11148,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guānning:'关宁',
 			dcxiuwen:'修文',
 			dcxiuwen_info:'当你使用牌时，若你未记录此牌牌名，你可以记录之并摸一张牌。',
-			oldlongsong:'龙颂',
+			oldlongsong:'龙诵',
 			oldlongsong_info:'出牌阶段开始时，你可以将一张手牌交给一名其他角色。然后其须选择其所有的发动时机为出牌阶段内的空闲时间点且你至多能于此阶段发动一次的技能，其于此阶段这些技能失效，你获得这些技能。',
-			dclongsong:'龙颂',
+			dclongsong:'龙诵',
 			dclongsong_info:'出牌阶段开始时，你可以将一张红色牌交给一名其他角色。然后其须选择其所有的发动时机包含“出牌阶段”的技能，其于此阶段这些技能失效，你获得这些技能且至多可以发动一次。',
 			dc_mengda:'孟达',
 			dclibang:'利傍',
@@ -11165,7 +11173,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mpjiusong:'酒颂',
 			mpjiusong_info:'①你可以将一张锦囊牌当【酒】使用。②当一名角色使用【酒】时，你获得1枚“醉”标记（“醉”数至多为3）。',
 			mpmaotao:'酕醄',
-			mpmaotao_info:'当其他角色使用基本牌或普通锦囊牌指定唯一目标时，你可以移去1枚“醉”，令此牌的目标改为随机一名合法角色（无距离限制）。若目标角色与原目标相同，你从牌堆中获得一张【酒】。',
+			mpmaotao_info:'当其他角色使用基本牌或普通锦囊牌指定唯一目标时，你可以移去1枚“醉”，令此牌的目标改为随机一名合法角色（无距离限制）。若目标角色与原目标相同且你本回合未以此法获得过牌，你从牌堆中随机获得一张锦囊牌。',
 			mpbishi:'避世',
 			mpbishi_info:'锁定技。你不能成为伤害类锦囊牌的目标。',
 			star_caoren:'星曹仁',

@@ -1,4 +1,4 @@
-'use strict';
+import { game } from '../noname.js';
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'tw',
@@ -4773,15 +4773,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(result.bool) target.addExpose(0.1);
 					else{
-						var next=game.createEvent('twdingzhen_addSkill');
-						event.next.remove(next);
-						trigger.after.push(next);
-						next.target=target;
-						next.player=player;
-						next.setContent(function(){
-							target.addSkill('twdingzhen_target');
-							target.markAuto('twdingzhen_target',[player]);
-						})
+						target.addSkill('twdingzhen_target');
+						target.markAuto('twdingzhen_target',[player]);
 					}
 					'step 4'
 					if(event.num<event.targets.length-1){
@@ -6188,7 +6181,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseCard('he',get.prompt('twxingwu'),'将一张牌置于武将牌上作为“星舞”').set('ai',function(card){
 						if(_status.event.goon) return 20-get.value(card);
 						return 7-get.value(card);
-					}).set('goon',player.needsToDiscard()||player.getStorage('twxingwu').length>1);
+					}).set('goon',player.needsToDiscard()||player.getExpansions('twxingwu').length>1);
 					'step 1'
 					if(result.bool){
 						player.logSkill('twxingwu');
@@ -8340,6 +8333,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						intro:{content:'使用下一张牌时弃置&张牌'},
 						charlotte:true,
+						onremove:true,
 						audio:'twchayi',
 						trigger:{player:'useCard'},
 						forced:true,
@@ -8657,7 +8651,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						player:function(card,player,target){
-							if(target.hasMark('twlvren')) return 0.33;
+							if(target&&target.hasMark('twlvren')) return 0.33;
 						}
 					}
 				},
@@ -13658,7 +13652,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return (get.suit(card)!=_status.event.suit?9:6)-get.value(card);
 					}).set('num',num);
 					if(lib.suit.includes(suit)){
-						next.set('prompt2','若弃置的是'+get.suit(suit)+'牌，则改为'+get.translation(player)+'获得之');
+						next.set('prompt2','若弃置的是'+get.translation(suit)+'牌，则改为'+get.translation(player)+'获得之');
 						next.set('suit',suit);
 					}
 					'step 1'

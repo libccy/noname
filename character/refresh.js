@@ -1,4 +1,4 @@
-'use strict';
+import { game } from '../noname.js';
 game.import('character',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'refresh',
@@ -4434,9 +4434,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:(card,player,target)=>{
 							if(!get.tag(card,'damage')) return;
-							if(target.hp+target.hujia<2||player.hasSkillTag('jueqing',false,target)) return -2;
+							if(target.hp+target.hujia<2||player.hasSkillTag('jueqing',false,target)) return 2;
 							if(target.countMark('redanxin')>1) return [1,1];
-							return [1,Math.min(2,0.8*target.hp-0.7)];
+							return [1,0.8*target.hp-0.4];
 						}
 					}
 				}
@@ -14332,8 +14332,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						target:function(card,player,target){
 							if(!target.hasFriend()) return;
-							if(get.tag(card,'damage')==1&&target.hp==3&&!target.isTurnedOver()&&
+							if(target.hp===3&&get.tag(card,'damage')==1&&!target.isTurnedOver()&&
 							_status.currentPhase!=target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [0.5,1];
+							if(target.hp===1&&get.tag(card,'recover')&&!target.isTurnedOver()&&
+							_status.currentPhase!==target&&get.distance(_status.currentPhase,target,'absolute')<=3) return [1,-3];
 						}
 					}
 				}
