@@ -581,7 +581,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.damage('nosource');
 							break;
 						case '鹰':
-							player.gain(target.getGainableCards(player,'he'),target,'giveAuto');
+							player.gain(target.getGainableCards(player,'he').randomGet(),target,'giveAuto');
 							break;
 						case '熊':
 							target.discard(target.getGainableCards(player,'e').randomGet()).discarder=player;
