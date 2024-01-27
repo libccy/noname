@@ -3,6 +3,7 @@ window.noname_update={
 	update:'1.10.6.1',
 	changeLog:[
 		'整合@Curpond @PZ157 @copcap @nonameShijian @Tipx-L @universe-st @kuangshen04 @mengxinzxz @Rintim @tangXins 的Pull Request',
+		'OL李异；新服群孟获、凌操、清河公主；手杀神鲁肃、霍峻、木鹿大王、谋曹丕；',
 		'其他AI优化与bug修复',
 	],
 	files:[
