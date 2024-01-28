@@ -6908,7 +6908,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.target=lib.skill.dczecai.getMax();
 					var str='令一名其他角色于本轮内获得〖集智〗';
 					if(event.target&&event.target!=player) str+=('；若选择的目标为'+get.translation(event.target)+'，则其获得一个额外的回合');
-					player.chooseTarget(lib.filter.notMe,get.prompt('dczecai'),str).set('maximum',event.target).set('ai',function(card,player,target){
+					player.chooseTarget(lib.filter.notMe,get.prompt('dczecai'),str).set('maximum',event.target).set('ai',function(target){
 						if(target!=_status.event.maximum) return 0;
 						return get.attitude(_status.event.player,target);
 					});
