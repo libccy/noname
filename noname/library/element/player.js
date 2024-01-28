@@ -804,10 +804,10 @@ export class Player extends HTMLDivElement {
 		if (cards && !isArray) recast.cards = [cards];
 		else if (isArray && cards.length) recast.cards = cards;
 		else _status.event.next.remove(recast);
-		// if (typeof recastingLose != 'function') recastingLose = (player, cards) => player.loseToDiscardpile(cards).log = false;
+		if (typeof recastingLose != 'function') recastingLose = (player, cards) => player.loseToDiscardpile(cards).log = false;
 		recast.recastingLose = recastingLose;
 		recast.recastingLosingEvents = [];
-		// if (typeof recastingGain != 'function') recastingGain = (player, cards) => player.draw(cards.length).log = false;
+		if (typeof recastingGain != 'function') recastingGain = (player, cards) => player.draw(cards.length).log = false;
 		recast.recastingGain = recastingGain;
 		recast.recastingGainingEvents = [];
 		recast.setContent('recast');
