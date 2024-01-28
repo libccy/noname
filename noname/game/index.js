@@ -8488,6 +8488,18 @@ export class Game extends Uninstantable {
 		});
 	}
 	/**
+	 * 此函数用于计算函数的时间消耗。
+	 * @param {function} 测试的函数
+	 * @returns {number} 消耗的时间
+	 */
+	static testRunCost(func){
+		let time = Date.now();
+		func();
+		let past = Date.now() - time;
+		console.log(past);
+		return past;
+	}
+	/**
 	 * 此方法用于对所有targets按顺序执行一个async函数。
 	 * 
 	 * @param { Player[] } targets 需要执行async方法的目标

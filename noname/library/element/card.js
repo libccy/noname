@@ -774,7 +774,7 @@ export class Card extends HTMLDivElement {
 	 * @returns {boolean} 是否包含class
 	 */
 	classListContains(className){
-		return Array.from(arguments).has(name=>this.classList.contains(className));
+		return Array.from(arguments).some(name=>this.classList.contains(className));
 	}
 	/**
 	 * 判断此牌是否包含class样式，参数有多个时，需全部满足。

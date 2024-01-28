@@ -2475,8 +2475,21 @@ export class Get extends Uninstantable {
 		return num;
 	}
 	static owner(card, method) {
-		return game.players.concat(game.dead).find(current =>
-			current.getCards("hejsx").includes(card) || (current.judging[0] == card && method != "judge"));
+		return game.players.concat(game.dead).find(current=>{
+			if(current.judging[0] == card && method != "judge")return true;
+			let parent = card.parentNode;
+			if(parent == current.node.handcards1 || parent == current.node.handcards2){
+				return !card.classList.contains('removing');
+			}else if(parent == current.node.equips){
+				return !card.classListContains('removing','feichu','emptyequip');
+			}else if(parent == current.node.judges){
+				return !card.classListContains('removing','feichu');
+			}else if(parent == current.node.expansions){
+				return !card.classListContains('removing');
+			}
+		});
+		//return game.players.concat(game.dead).find(current =>
+		//	current.getCards("hejsx").includes(card) || (current.judging[0] == card && method != "judge"));
 	}
 	static noSelected() { return ui.selected.buttons.length + ui.selected.cards.length + ui.selected.targets.length == 0; }
 	static population(identity) {
@@ -4043,7 +4056,7 @@ export class Get extends Uninstantable {
 		let cache = CacheContext.requireCacheContext();
 		player = cache.delegate(player);
 		var geti = function () {
-			return player.getCardIndex('hs',card.name,card);
+			return player.getCardIndex('hs',card.name,card,5);
 		};
 		if (typeof value == 'function') {
 			result = value(card, player, geti(), method);

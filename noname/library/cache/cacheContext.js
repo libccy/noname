@@ -2,6 +2,7 @@ import { Library } from "../index.js";
 import { Game } from "../../game/index.js";
 import { Get } from "../../get/index.js";
 import { status as _status } from "../../status/index.js";
+import { hex_md5 } from "../crypt/md5.js";
 /**
  * 缓存上下文，用于在各种方法中暂时缓存值，以第一次获取的缓存值为准。
  */
@@ -123,9 +124,7 @@ export class CacheContext{
         if(Array.isArray(param)){
             return `[arr:[${param.filter(p=>!(p instanceof CacheContext)).map(p=>CacheContext.wrapParameterToCacheKey(p)).join('-')}]]`;
         }
-        if(typeof param === 'function'){
-            throw new Error('unsupport function param.');
-        }
+        if(typeof param === 'function')return `[f:${hex_md5(param.toString())}]`;
         let entries = Object.entries(param);
         entries.sort((a,b)=>a[0]<b[0]?-1:1);
         return `[obj:{${entries.map(e=>e[0]+":"+CacheContext.wrapParameterToCacheKey(e[1])).join(',')}}]`;

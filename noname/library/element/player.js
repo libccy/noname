@@ -3025,7 +3025,7 @@ export class Player extends HTMLDivElement {
 		}
 		return count;
 	}
-	getCardIndex(arg1,name,card){
+	getCardIndex(arg1,name,card,max){
 		let count = 0;
 		for(let item of this.iterableGetCards(arg1)){
 			if(get.name(item) == name){
@@ -3033,6 +3033,7 @@ export class Player extends HTMLDivElement {
 					return count;
 				}
 				count++;
+				if(count >= max)return count;
 			}
 		}
 		return -1;
