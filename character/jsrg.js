@@ -3478,10 +3478,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						prompt2:`${undamaged.length?'选择一张牌弃置并选择一名未对你造成过伤害的角色，你对其造成1点伤害':''}${undamaged.length&&damaged.length?'；<br>或':''}${damaged.length?'仅选择一名对你造成过伤害的角色，你令其摸两张牌':''}。`,
 						damaged:damaged,
 						aiTarget:(()=>{
-							if(!undamaged.some(i=>{
-								if(get.attitude(player,i)>0) return true;
-								if(i.getHp(true)+i.hujia<2) return true;
-								return false;
+							if(undamaged.includes(player)&&!undamaged.some(i=>{
+								if(i===player) return false;
+								let att=get.attitude(player,i);
+								if(att>0) return true;
+								return att<0&&i.getHp(true)+i.hujia<2;
 							})&&(player.hp>2||get.damageEffect(player,player,player)>=0)) return player;
 							var info=game.filterPlayer().map(current=>{
 								let damage=undamaged.includes(current),card={name:damage?'damage':'draw'};

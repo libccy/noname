@@ -9518,7 +9518,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(att<=0) return att;
 						if(target.hasSkillTag('nodamage')) return 0.01*att;
 						if(target.getEquip('tengjia')||target.getEquip('renwang')) return 0.2*att;
-						if(target.getEquip('bugua')) return 0.3*att;
+						if(target.getEquip('bagua')) return 0.3*att;
 						if(target.getEquip(2)) return att/2;
 						return 1.2*att;
 					});

@@ -26718,7 +26718,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_menghuo:'SP孟获',
 			sp_menghuo_prefix:'SP',
 			spmanwang:'蛮王',
-			spmanwang_info:'出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：⒈获得〖叛侵〗。⒉摸一张牌。⒊回复1点体力。⒋摸两张牌并失去〖叛侵〗。',
+			spmanwang_info:'出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前等量项：⒈获得〖叛侵〗。⒉摸一张牌。⒊回复1点体力。⒋摸两张牌并失去〖叛侵〗。',
 			sppanqin:'叛侵',
 			sppanqin_info:'出牌阶段或弃牌阶段结束时，你可将你于本阶段内弃置且位于弃牌堆的所有牌当做【南蛮入侵】使用。然后若此牌被使用时对应的实体牌数不大于此牌的目标数，则你执行并移除〖蛮王〗中的最后一个选项。',
 			tengfanglan:'OL滕芳兰',
