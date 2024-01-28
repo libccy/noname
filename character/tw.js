@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				tw_yunchouyong:['tw_zongyu','tw_chendong','tw_sunyi'],
 				tw_yunchouyan:['tw_jiangqing'],
 				tw_zhu:['tw_beimihu','tw_ol_sunjian','ol_liuyu','tw_menghuo'],
-				tw_swordsman:['xia_shie','xia_shitao','xia_guanyu','xia_liubei','xia_xiahousone','xia_xiahoudun','xia_zhangwei','xia_xushu','xia_wangyue','xia_liyàn','xia_tongyuan','xia_lusu','xia_dianwei','xia_zhaoe','xia_xiahouzie'],
+				tw_swordsman:['xia_yuzhenzi','xia_shie','xia_shitao','xia_guanyu','xia_liubei','xia_xiahousone','xia_xiahoudun','xia_zhangwei','xia_xushu','xia_wangyue','xia_liyàn','xia_tongyuan','xia_lusu','xia_dianwei','xia_zhaoe','xia_xiahouzie'],
 				tw_mobile:['nashime','tw_gexuan','tw_zhugeguo'],
 				tw_mobile2:['tw_chengpu','tw_guohuai','old_quancong','tw_caoxiu','tw_guanqiujian','tw_re_fazheng','tw_madai','tw_zhangfei','tw_guyong','tw_handang','tw_xuezong','tw_yl_luzhi'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			xia_yuzhenzi:['male','qun',3,['twhuajing','twtianshou']],
 			xia_shie:['male','wei',4,['twdengjian','twxinshou']],
 			xia_shitao:['male','qun',4,['twjieqiu','twenchou']],
 			xia_guanyu:['male','qun',4,['twzhongyi','twchue']],
@@ -130,6 +131,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			yuzhenzi:'评书三国中的人物，其人有徒弟兼义子童渊、徒弟并州李彦，有徒孙常山赵子龙、北地枪王张绣、张任等人。',
 			shie:'三国人物，善剑术。桓、灵间，有虎贲王越以剑术称于京师，阿得其法。魏帝曹丕曾从阿学剑术。曹丕在《典论·自叙》中说：“余又学击剑，阅师多矣，四方之法各异，唯京师为善。桓、灵之间，有虎贲王越善斯术，称於京师。河南史阿言昔与越游，具得其法，余从阿学精熟。尝与平虏将军刘勋、奋威将军邓展等共饮，宿闻展善有手臂，晓五兵，又称其能空手入白刃。余与论剑良久，谓将军非法也，余顾尝好之，又得善术，因求与余对。',
 			shitao:'石韬，字广元，即石广元，颍川（今河南禹州）人，仕魏，官拜典农校尉、郡守。初平年间，石韬与徐庶一同来到荆州，在荆州时与诸葛亮和庞统等人相善。与崔州平（名钧）、孟公威（名建）、徐元直（名庶）为“诸葛四友”。',
 			xiahousone:'夏侯子萼，游卡桌游《三国杀阵面对决》中虚构的人物。在《阵面对决》中，设定为在貂蝉不在时血婆娑的实际首领。在海外服中，设定为夏侯惇的养女，继承了夏侯紫萼的血婆娑，之后“夏侯紫萼”这个名字就被隐匿于历史之中，而“夏侯子萼”则成为了血婆娑的首领“血蔷薇”的固定名号。',
@@ -289,6 +291,301 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//玉真子
+			twhuajing:{
+				audio:2,
+				getSkills(player){
+					let skills=player.getSkills(false,null,false).filter(skill=>{
+						const info=get.info(skill);
+						return info&&info.equipSkill&&info.equipSkill=='equip1';
+					});
+					skills.addArray(player.getCards('e',card=>get.subtype(card)=='equip1').reduce((list,card)=>{
+						const info=get.info(card);
+						if(info&&info.skills) return list.addArray(info.skills);
+						return list;
+					},[]));
+					return skills;
+				},
+				trigger:{global:'phaseBefore',player:'enterGame'},
+				filter(event,player){
+					return event.name!='phase'||game.phaseNumber==0;
+				},
+				forced:true,
+				locked:false,
+				async content(event,trigger,player){
+					const skills=lib.skill.twhuajing.derivation;
+					for(const eff of skills){
+						player.addMark(eff,1);
+						player.unmarkSkill(eff);
+					}
+					player.markSkill('twhuajing');
+				},
+				global:'twhuajing_global',
+				group:'twhuajing_use',
+				derivation:['twhuajing_jian','twhuajing_dao','twhuajing_fu','twhuajing_qiang','twhuajing_ji','twhuajing_gong'],
+				marktext:'武',
+				intro:{
+					markcount(storage,player){
+						return lib.skill.twhuajing.derivation.filter(skill=>player.hasMark(skill)).length;
+					},
+					content(storage,player){
+						const skills=lib.skill.twhuajing.derivation.filter(skill=>player.hasMark(skill));
+						if(!skills.length) return '功力已消耗殆尽';
+						let str='当前武功：';
+						for(const eff of skills){
+							str+='<br><li>';
+							str+=lib.translate[eff];
+							str+='：';
+							str+=lib.translate[eff+'_info'];
+						}
+						return str;
+					},
+				},
+				subSkill:{
+					global:{
+						mod:{
+							attackRange(player,num){
+								const skills=lib.skill.twhuajing.derivation.filter(skill=>player.hasMark(skill)||player.hasSkill(skill));
+								if(skills.length) return num+skills.length*game.countPlayer(target=>target.hasSkill('twhuajing'));
+							},
+						},
+					},
+					use:{
+						audio:'twhuajing',
+						enable:'phaseUse',
+						filter(event,player){
+							return lib.skill.twhuajing.derivation.some(skill=>player.hasMark(skill));
+						},
+						filterCard:true,
+						selectCard:[1,4],
+						position:'h',
+						complexCard:true,
+						discard:false,
+						lose:false,
+						delay:false,
+						check(card){
+							const player=get.event('player'),skills=lib.skill.twhuajing.derivation.filter(skill=>player.hasMark(skill));
+							if(ui.selected.cards.some(cardx=>get.suit(cardx,player)==get.suit(card,player))) return 0;
+							return skills.length-ui.selected.cards.length;
+						},
+						usable:1,
+						prompt:'展示至多四张手牌，然后根据这些牌含有的花色数于本回合获得等量你拥有的“武”标记的效果',
+						async content(event,trigger,player){
+							await player.showCards(event.cards,get.translation(player)+'发动了【经合】');
+							const skills=lib.skill.twhuajing.derivation.filter(skill=>player.hasMark(skill));
+							const gainSkills=skills.randomGets(Math.min(skills.length,event.cards.reduce((list,cardx)=>list.add(get.suit(cardx,player)),[]).length));
+							for(const eff of gainSkills) player.popup(eff);
+							player.addTempSkill(gainSkills);
+							player.addTempSkill('twhuajing_blocker');
+							player.getHistory('custom').push({twhuajing_skills:gainSkills});
+						},
+					},
+					jian:{
+						charlotte:true,
+						mark:true,
+						marktext:'剑',
+						intro:{
+							name:'化境·剑',
+							name2:'剑',
+							content:()=>lib.translate.twhuajing_jian_info,
+						},
+						nopop:true,
+						trigger:{player:'useCardToPlayered'},
+						filter(event,player){
+							return event.card.name=='sha'&&event.target.countCards('he');
+						},
+						forced:true,
+						logTarget:'target',
+						async content(event,trigger,player){
+							const target=trigger.target;
+							const cards=target.getDiscardableCards(player,'he');
+							target.discard(cards.randomGets(Math.min(2,cards.length))).discarder=player;
+						},
+					},
+					dao:{
+						charlotte:true,
+						mark:true,
+						marktext:'刀',
+						intro:{
+							name:'化境·刀',
+							name2:'刀',
+							content:()=>lib.translate.twhuajing_dao_info,
+						},
+						nopop:true,
+						inherit:'guding_skill',
+						equipSkill:false,
+					},
+					fu:{
+						charlotte:true,
+						mark:true,
+						marktext:'斧',
+						intro:{
+							name:'化境·斧',
+							name2:'斧',
+							content:()=>lib.translate.twhuajing_fu_info,
+						},
+						nopop:true,
+						trigger:{player:'shaMiss'},
+						forced:true,
+						logTarget:'target',
+						async content(event,trigger,player){
+							trigger.target.damage();
+						},
+						ai:{
+							directHit_ai:true,
+							skillTagFilter(player,tag,arg){
+								if(!arg||!arg.card||arg.card.name!='sha'||!arg.baseDamage||arg.baseDamage<=1) return false;
+								return true;
+							},
+						},
+					},
+					qiang:{
+						charlotte:true,
+						mark:true,
+						marktext:'枪',
+						intro:{
+							name:'化境·枪',
+							name2:'枪',
+							content:()=>lib.translate.twhuajing_qiang_info,
+						},
+						nopop:true,
+						trigger:{player:'useCardAfter'},
+						filter(event,player){
+							return event.card.name=='sha'&&get.color(event.card)=='black';
+						},
+						forced:true,
+						async content(event,trigger,player){
+							const card=get.cardPile(card=>card.name=='shan');
+							if(card) player.gain(card,'gain2');
+						},
+					},
+					ji:{
+						charlotte:true,
+						mark:true,
+						marktext:'戟',
+						intro:{
+							name:'化境·戟',
+							name2:'戟',
+							content:()=>lib.translate.twhuajing_ji_info,
+						},
+						nopop:true,
+						trigger:{source:'damageBegin3'},
+						filter(event,player){
+							return event.card&&event.card.name=='sha';
+						},
+						forced:true,
+						async content(event,trigger,player){
+							player.draw(trigger.num);
+						},
+					},
+					gong:{
+						charlotte:true,
+						mark:true,
+						marktext:'弓',
+						intro:{
+							name:'化境·弓',
+							name2:'弓',
+							content:()=>lib.translate.twhuajing_gong_info,
+						},
+						nopop:true,
+						trigger:{source:'damageSource'},
+						filter(event,player){
+							return event.card&&event.card.name=='sha'&&event.player.countDiscardableCards(player,'e');
+						},
+						forced:true,
+						logTarget:'player',
+						async content(event,trigger,player){
+							trigger.player.discard(trigger.player.countDiscardableCards(player,'e').randomGets(1)).discarder=player;
+						},
+					},
+					blocker:{
+						charlotte:true,
+						init(player,skill){
+							player.disableSkill(skill,lib.skill.twhuajing.getSkills(player));
+						},
+						mod:{
+							attackRange(player,num){
+								const sum=player.getCards('e',card=>get.subtype(card)=='equip1').reduce((sum,card)=>{
+									const info=get.info(card);
+									if(info&&info.distance&&info.distance.attackFrom){
+										return sum+info.distance.attackFrom;
+									}
+									return sum;
+								},0);
+								if(sum) return num+sum;
+							},
+						},
+						trigger:{
+							player:'loseAfter',
+							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+						},
+						filter(event,player){
+							if(event.name=='equip'&&event.player==player&&get.subtype(event.card)=='equip1') return true;
+							const evt=event.getl(player);
+							return evt&&evt.player==player&&evt.es&&evt.es.some(card=>get.subtype(card)=='equip1');
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						async content(event,trigger,player){
+							await player.enableSkill('twhuajing_blocker');
+							await player.disableSkill('twhuajing_blocker',lib.skill.twhuajing.getSkills(player));
+						},
+					},
+				},
+			},
+			twtianshou:{
+				audio:2,
+				trigger:{player:'phaseEnd'},
+				filter(event,player){
+					return player.getHistory('sourceDamage',evt=>{
+						return evt.card&&evt.card.name=='sha';
+					}).length&&player.getHistory('custom',evt=>{
+						return evt.twhuajing_skills;
+					}).reduce((list,evt)=>list.addArray(evt.twhuajing_skills),[]).some(skill=>player.hasMark(skill));
+				},
+				forced:true,
+				async content(event,trigger,player){
+					const {result:{bool,targets}}=await player.chooseTarget(lib.filter.notMe,true)
+					.set('prompt','天授：令一名其他角色获得1枚“武”并获得此标记的效果')
+					.set('ai',target=>{
+						const player=get.event('player'),att=get.attitude(player,target);
+						const card=new lib.element.VCard({name:'sha'});
+						if(att>0) return game.countPlayer(aim=>{
+							return target.canUse(card,target)&&get.effect(aim,card,target,player)>0&&get.effect(aim,card,target,target)>0;
+						})+10;
+						if(att==0) return 1.5+Math.random();
+						return 0.1+Math.random();
+					});
+					if(bool){
+						const target=targets[0];
+						const skills=player.getHistory('custom',evt=>{
+							return evt.twhuajing_skills;
+						}).reduce((list,evt)=>list.addArray(evt.twhuajing_skills),[]).filter(skill=>player.hasMark(skill));
+						var choiceList=skills.map(i=>{
+							return '<div class="skill">【'+get.translation(lib.translate[i+'_ab']||get.translation(i).slice(0,2))+'】</div>' +
+								'<div>'+get.skillInfoTranslation(i,player)+'</div>';
+						});
+						const {result:{control}}=await player.chooseControl(skills)
+						.set('prompt','选择令'+get.translation(target)+'获得的“武”')
+						.set('choiceList',choiceList).set('displayIndex',false).set('ai',()=>get.event('controls').randomGet());
+						if(control){
+							player.removeMark(control,1);
+							player.markSkill('twhuajing');
+							player.popup(control,'metal');
+							target.addMark(control,1);
+							target.addSkill(control,{player:'phaseAfter'});
+							target.addSkill('twhuajing_blocker',{player:'phaseAfter'});
+							target.when('phaseAfter').then(()=>{
+								if(player.hasMark(control)) player.removeMark(control,1);
+							}).vars({control:control});
+							target.getHistory('custom').push({twhuajing_skills:[control]});
+							await player.draw();
+						}
+					}
+				},
+				ai:{combo:'twhuajing'},
+			},
 			//史阿
 			twdengjian:{
 				audio:2,
@@ -15687,6 +15984,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twdengjian_info:'①其他角色的弃牌阶段结束时，你可以弃置一张牌并随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】，称为“剑法”。②你使用“剑法”牌不计入次数限制。',
 			twxinshou:'心授',
 			twxinshou_info:'当你于出牌阶段使用【杀】时，若此【杀】与你本回合使用的所有其他【杀】的颜色均不相同，则你可以选择执行以下一项本回合未执行过的项：⒈摸一张牌；⒉交给一名其他角色一张牌。若这两项本回合均已被选择过，则你可以令〖登剑①〗失效并令一名其他角色获得〖登剑〗，你的下个回合开始时，其失去〖登剑〗，若其这期间使用【杀】造成过伤害，则你结束〖登剑①〗的失效状态。',
+			xia_yuzhenzi:'玉真子',
+			twhuajing:'化境',
+			twhuajing_info:'①游戏开始时，你获得6个效果各不相同的无效果“武”标记。②一名拥有“武”标记的角色的攻击范围+X（X为其拥有的“武”标记数）。③出牌阶段限一次，你可以展示至多四张手牌，然后根据这些牌含有的花色数于本回合获得等量你拥有的“武”标记的效果。④拥有“武”标记效果的角色的武器牌失效（武器牌不提供攻击范围且武器技能失效）。',
+			twhuajing_jian:'剑',
+			twhuajing_jian_info:'当你使用【杀】指定目标后，你随机弃置目标角色两张牌。',
+			twhuajing_dao:'刀',
+			twhuajing_dao_info:'当你使用【杀】对没有手牌的目标角色造成伤害时，此伤害+1。',
+			twhuajing_fu:'斧',
+			twhuajing_fu_info:'当你使用的【杀】被【闪】响应后，你对目标角色造成1点伤害。',
+			twhuajing_qiang:'枪',
+			twhuajing_qiang_info:'当你使用黑色【杀】结算完毕后，你从牌堆或弃牌堆中获得一张【闪】。',
+			twhuajing_ji:'戟',
+			twhuajing_ji_info:'当你使用【杀】造成伤害时，你摸一张牌。',
+			twhuajing_gong:'弓',
+			twhuajing_gong_info:'当你使用【杀】造成伤害后，你随机弃置受伤角色装备区里的一张牌。',
+			twtianshou:'天授',
+			twtianshou_info:'锁定技，回合结束时，若你本回合使用【杀】造成过伤害，且你拥有本回合获得过效果的“武”标记，则你须将其中一个“武”标记交给一名其他角色并令其获得此标记的效果直到其回合结束，然后你摸一张牌。',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',

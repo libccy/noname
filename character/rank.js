@@ -132,6 +132,7 @@ window.noname_character_rank={
 		'mb_chengui',
 		'jsrg_guozhao',
 		'sb_caopi',
+		'xia_yuzhenzi',
 	],
 	a:[
 		'xia_shitao',
@@ -1661,6 +1662,7 @@ window.noname_character_rank={
 	],
 	rarity:{
 		legend:[
+			'xia_yuzhenzi',
 			'xia_guanyu',
 			'swd_muyun',
 			'swd_zhaoyun',
