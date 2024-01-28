@@ -3234,7 +3234,7 @@ export class Player extends HTMLDivElement {
 							value = getCardName(card);
 						}
 						else {
-							value = cards[i][j];
+							value = card[j];
 						}
 						if ((typeof arg2[j] == 'string' && value != arg2[j]) ||
 							(Array.isArray(arg2[j]) && !arg2[j].includes(value))) {

@@ -3,6 +3,7 @@
 */
 export class ChildNodesWatcher{
     constructor(dom){
+        this.dom = dom;
         this.childNodes = [];
         this.observer = new MutationObserver(mutationsList=>{
             for (let mutation of mutationsList) {
@@ -16,7 +17,7 @@ export class ChildNodesWatcher{
     }
 
     onChildNodesChanged(addedNodes,removedNodes) {
-        this.childNodes.addArray(Array.from(addedNodes));
+        this.childNodes.addArray(Array.from(addedNodes).filter(node=>node.parentNode == this.dom));
         this.childNodes.removeArray(Array.from(removedNodes));
     }
 };
