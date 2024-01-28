@@ -605,12 +605,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return (player.hp+player.countCards('hs',card=>player.canSaveCard(card,player))-num2>0&&num>num2)?'背水！':'回血';
 					}).set('num',num).set('num2',num2);
 					if(control!='cancel2'){
-						if(control=='背水'){
+						if(control=='背水！'){
 							await player.loseHp(num2);
 							player.getHistory('custom').push({twzhongyi:true});
 						}
 						if(control!='回血') await player.draw(num);
-						if(control!='摸牌') await player.recover(num2);
+						if(control!='摸牌') await player.recover(num);
 					}
 				},
 			},
@@ -15686,7 +15686,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twdengjianx:'剑法',
 			twdengjian_info:'①其他角色的弃牌阶段结束时，你可以弃置一张牌并随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】，称为“剑法”。②你使用“剑法”牌不计入次数限制。',
 			twxinshou:'心授',
-			twxinshou_info:'当你于出牌阶段使用【杀】时，若此【杀】与你本回合使用的所有其他【杀】的颜色均不相同，则你可以选择执行以下一项本回合未执行过的项：⒈摸一张牌；⒉交给一名其他角色一张牌。若这两项本回合均已被选择过，则你可以令〖登剑①〗失效并令一名其他角色获得〖登剑〗，你的下个回合开始时，其失去〖登剑〗，若其这期间使用【杀】造成过伤害，则你结束〖登剑①〗的失效状态',
+			twxinshou_info:'当你于出牌阶段使用【杀】时，若此【杀】与你本回合使用的所有其他【杀】的颜色均不相同，则你可以选择执行以下一项本回合未执行过的项：⒈摸一张牌；⒉交给一名其他角色一张牌。若这两项本回合均已被选择过，则你可以令〖登剑①〗失效并令一名其他角色获得〖登剑〗，你的下个回合开始时，其失去〖登剑〗，若其这期间使用【杀】造成过伤害，则你结束〖登剑①〗的失效状态。',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',
