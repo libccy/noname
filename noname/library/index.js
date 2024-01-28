@@ -22,17 +22,15 @@ import { Announce } from "./announce/index.js";
 import { Channel } from "./channel/index.js";
 import { Experimental } from "./experimental/index.js";
 import * as Element from "./element/index.js";
+import { updateURLs } from "./update-urls.js";
 
 
 export class Library extends Uninstantable {
 	static configprefix = 'noname_0.9_';
 	static versionOL = 27;
-	static updateURLS = {
-		coding: 'https://unitedrhythmized.club/libccy/noname/master',
-		github: 'https://raw.githubusercontent.com/libccy/noname',
-	};
-	static updateURL = 'https://raw.githubusercontent.com/libccy/noname';
-	static mirrorURL = 'https://unitedrhythmized.club/libccy/noname/master';
+	static updateURLS = updateURLs;
+	static updateURL = updateURLs.github;
+	static mirrorURL = updateURLs.coding;
 	static hallURL = '47.99.105.222';
 	static assetURL = assetURL;
 	static userAgent = userAgent;
