@@ -2271,14 +2271,8 @@ export class Get extends Uninstantable {
 	static *iterableChildNodes(node){
 		for(let i=0;i<arguments.length;i++){
 			let arg = arguments[i];
-			if(arg._childNodesWatcher){
-				for(let child of arg._childNodesWatcher.childNodes){
-					yield child;
-				}
-			}else{
-				for(let j=0;j<arg.childElementCount;j++){
-					yield arg.childNodes[j];
-				}
+			for(let j=0;j<arg.childElementCount;j++){
+				yield arg.childNodes[j];
 			}
 		}
 	}
