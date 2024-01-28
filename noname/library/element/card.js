@@ -74,6 +74,28 @@ export class Card extends HTMLDivElement {
 	buildIntro(noclick) {
 		if (!noclick) lib.setIntro(this);
 	}
+	/** @type { SMap<HTMLDivElement> } */
+	node;
+	/**
+	 * @type { string }
+	 */
+	name;
+	/**
+	 * @type { SMap<any> }
+	 */
+	storage;
+	/**
+	 * @type { any[] }
+	 */
+	vanishtag;
+	/**
+	 * @type { any[] }
+	 */
+	gaintag;
+	/**
+	 * @type { any[] }
+	 */
+	_uncheck;
 	//执行销毁一张牌的钩子函数
 	selfDestroy(event) {
 		if (this._selfDestroyed) return;
@@ -786,8 +808,13 @@ export class Card extends HTMLDivElement {
 	classListContainsAll(){
 		return Array.from(arguments).every(name=>this.classList.contains(this.className));
 	}
+	/**
+	 * 返回一个键值，用于在缓存中作为键名。
+	 * 
+	 * @returns {string} cacheKey
+	 */
 	getCacheKey(){
-		return `[c:${this.playerid}]`;
+		return `[c:${this.cardid}]`;
 	}
 	discard(bool) {
 		if (!this._selfDestroyed) {

@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			xia_guanyu:['male','qun',4,['twzhongyi','twchue']],
 			xia_liubei:['male','shu',4,['twshenyi','twxinghan']],
 			xia_xiahousone:['female','qun',3,['twchengxi']],
 			xia_xiahoudun:['male','qun',4,['twdanlie']],
@@ -284,6 +285,133 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//侠关羽
+			twzhongyi:{
+				mod:{
+					targetInRange(card){
+						if(card.name=='sha') return true;
+					},
+				},
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				filter(event,player){
+					return player.getHistory('sourceDamage',evt=>evt.card&&evt.card==event.card).length;
+				},
+				forced:true,
+				async content(event,trigger,player){
+					const num=player.getHistory('sourceDamage',evt=>evt.card&&evt.card==trigger.card).reduce((sum,evt)=>sum+evt.num,0);
+					const num2=1+player.getAllHistory('custom',evt=>evt.twzhongyi).length;
+					let choice=['摸牌'],choiceList=['摸'+get.cnNumber(num)+'张牌'];
+					if(player.isDamaged()){
+						choice.addArray(['回血','背水！']);
+						choiceList.addArray([
+							'回复'+num+'点体力',
+							'失去'+num2+'点体力，依次执行以上所有项',
+						]);
+					}
+					const {result:{control}}=await player.chooseControl(choice)
+					.set('prompt','忠义：请选择一项').set('choiceList',choiceList)
+					.set('ai',()=>{
+						const player=get.event('player');
+						const num=get.event('num'),num2=get.event('num2');
+						if(player.isHealthy()) return '摸牌';
+						return (player.hp+player.countCards('hs',card=>player.canSaveCard(card,player))-num2>0&&num>num2)?'背水！':'回血';
+					}).set('num',num).set('num2',num2);
+					if(control!='cancel2'){
+						if(control=='背水'){
+							await player.loseHp(num2);
+							player.getHistory('custom').push({twzhongyi:true});
+						}
+						if(control!='回血') await player.draw(num);
+						if(control!='摸牌') await player.recover(num2);
+					}
+				},
+			},
+			twchue:{
+				audio:2,
+				trigger:{player:'useCardToPlayer'},
+				filter(event,player){
+					return event.card.name=='sha'&&event.isFirstTarget&&event.targets.length==1&&game.hasPlayer(target=>!event.targets.includes(target)&&player.canUse(event.card,target));
+				},
+				prompt2:'失去1点体力，额外指定至多等同于你体力值的目标',
+				check(event,player){
+					return player.hp+player.countCards('hs',card=>player.canSaveCard(card,player))-1>0;
+				},
+				async content(event,trigger,player){
+					await player.loseHp();
+					const targetx=trigger.targets.slice(),num=player.getHp();
+					if(!num) return;
+					const {result:{bool,targets}}=await player.chooseTarget('额外指定至多'+get.cnNumber(num)+'名目标',[1,num],(card,player,target)=>{
+						const trigger=_status.event.getTrigger();
+						return !trigger.targets.includes(target)&&player.canUse(trigger.card,target);
+					}).set('ai',target=>{
+						const player=get.event('player'),trigger=_status.event.getTrigger();
+						return get.effect(target,trigger.card,player,player);
+					});
+					if(!bool) return;
+					player.line(targets);
+					trigger.targets.addArray(targets);
+				},
+				group:['twchue_gain','twchue_effect'],
+				marktext:'勇',
+				intro:{
+					name:'勇',
+					content:'mark',
+				},
+				subSkill:{
+					gain:{
+						audio:'twchue',
+						trigger:{player:['damageEnd','loseHpEnd']},
+						forced:true,
+						locked:false,
+						async content(event,trigger,player){
+							await player.draw();
+							await player.addMark('twchue',1);
+						},
+					},
+					effect:{
+						audio:'twchue',
+						trigger:{global:'phaseEnd'},
+						filter(event,player){
+							const card=new lib.element.VCard({name:'sha'});
+							return player.hasUseTarget(card)&&player.getHistory('useSkill',evt=>{
+								return evt.skill=='twchue_gain';
+							}).length&&player.getHp()&&player.countMark('twchue')>=player.getHp();
+						},
+						check(event,player){
+							return player.hasValueTarget(new lib.element.VCard({name:'sha'}));
+						},
+						prompt2(event,player){
+							const num=player.getHp();
+							return '失去'+num+'个“勇”标记，视为使用一张造成的伤害+1且可以额外指定'+num+'个目标的【杀】';
+						},
+						async content(event,trigger,player){
+							const num=player.getHp();
+							player.removeMark('twchue',num);
+							const card=new lib.element.VCard({name:'sha'});
+							player.when('useCard2')
+							.filter(evt=>evt.card==card&&game.hasPlayer(target=>!evt.targets.includes(target)&&player.canUse(evt.card,target)))
+							.then(()=>{
+								trigger.baseDamage++;
+								player.chooseTarget('额外指定至多'+get.cnNumber(num)+'名目标',[1,num],(card,player,target)=>{
+									const trigger=_status.event.getTrigger();
+									return !trigger.targets.includes(target)&&player.canUse(trigger.card,target);
+								}).set('ai',target=>{
+									const player=get.event('player'),trigger=_status.event.getTrigger();
+									return get.effect(target,trigger.card,player,player);
+								});
+							})
+							.then(()=>{
+								if(result.bool){
+									player.line(targets);
+									trigger.targets.addArray(targets);
+								}
+							}).vars({card:card,num:num});
+							player.chooseUseTarget('视为使用造成的伤害+1且可以额外指定'+num+'个目标的【杀】',card,false,true);
+						},
+					},
+				},
+			},
 			//夏侯惇
 			twdanlie:{
 				audio:2,
@@ -384,7 +512,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('goon',function(){
 						var d1=true;
 						if(player.hasSkill('jueqing')||player.hasSkill('gangzhi')) d1=false;
-						if(!target.mayHaveShan(player,'use')||player.hasSkillTag('directHit_ai',true,{
+						if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+							return i.hasGaintag('sha_notshan');
+						}))||player.hasSkillTag('directHit_ai',true,{
 							target:target,
 							card:trigger.card,
 						},true)){
@@ -2984,7 +3114,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.2,
 					result:{
 						target:function(player,target){
-							if(target.countCards('h')<=target.hp&&!target.mayHaveShan(player,'use')&&get.effect(target,{name:'sha',isCard:true},player,player)>0) return -1;
+							if(target.countCards('h')<=target.hp&&!target.mayHaveShan(player,'use',target.getCards(i=>{
+								return i.hasGaintag('sha_notshan');
+							}))&&get.effect(target,{name:'sha',isCard:true},player,player)>0) return -1;
 							else if(target.countCards('h')>target.hp&&target.hp>2&&target.hasShan()) return 1;
 							return 0;
 						},
@@ -6558,7 +6690,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						if(player.hp+player.countCards('hs',{name:['tao','jiu']})<=1) return -1;
 						var num=1;
-						if((!target.mayHaveShan(player,'use')||player.hasSkillTag('directHit_ai',true,{
+						if((!target.mayHaveShan(player,'use',target.getCards(i=>{
+							return i.hasGaintag('sha_notshan');
+						}))||player.hasSkillTag('directHit_ai',true,{
 							target:target,
 							card:{name:'sha'},
 						},true))&&!target.hasSkillTag('filterDamage',null,{
@@ -11075,7 +11209,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var d1=true;
 								if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false;
 								for(var target of trigger.targets){
-									if(!target.mayHaveShan(player,'use')||trigger.player.hasSkillTag('directHit_ai',true,{
+									if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+										return i.hasGaintag('sha_notshan');
+									}))||trigger.player.hasSkillTag('directHit_ai',true,{
 										target:target,
 										card:trigger.card,
 									},true)){
@@ -13275,7 +13411,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var d1=true;
 						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false
 						for(var target of trigger.targets){
-							if(!target.mayHaveShan(player,'use')||trigger.player.hasSkillTag('directHit_ai',true,{
+							if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+								return i.hasGaintag('sha_notshan');
+							}))||trigger.player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:trigger.card,
 							},true)){
@@ -15231,6 +15369,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twshenyi_info:'每回合限一次，当你或你攻击范围内的一名角色于一回合内首次受到伤害后，你可以声明一种基本牌或锦囊牌（每种牌名限一次），然后从牌堆中将一张同名牌（若没有同名牌则改为同类型的牌）称为“侠义”置于武将牌上。若受伤角色不为你，则你可以将任意张手牌交给其，且当其失去一张你以此法交给其的牌后，你摸一张牌。',
 			twxinghan:'兴汉',
 			twxinghan_info:'①你的回合外或你处于濒死状态时，你可以如手牌般使用或打出“侠义”牌。②准备阶段，若“侠义”牌数大于存活角色数，则你可以依次使用其中所有可以使用的牌。然后你获得如下效果：回合结束时，你弃置所有手牌并失去X点体力（X为你的体力值-1且X至少为1）。',
+			xia_guanyu:'侠关羽',
+			xia_guanyu_prefix:'侠',
+			twzhongyi:'忠义',
+			twzhongyi_info:'锁定技。①你使用【杀】无距离限制。②当你使用【杀】结算完毕后，你选择一项：⒈摸X张牌；⒉回复X点体力；⒊背水：失去Y点体力，依次执行以上两项（X为此牌造成的伤害值，Y为你本局游戏此前选择此项的次数+1）。',
+			twchue:'除恶',
+			twchue_info:'①当你使用【杀】指定唯一目标时，你可以失去1点体力，为此牌额外指定Z个目标。②当你受到伤害或失去体力后，你摸一张牌并获得1个“勇”标记。③回合结束时，若你本回合发动过〖除恶②〗，则你可以失去Z个“勇”标记，视为使用一张伤害+1且可以额外指定Z个目标的【杀】。（Z为你的体力值）',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',

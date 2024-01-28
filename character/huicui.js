@@ -4847,7 +4847,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var d1=true;
 						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false
 						for(var target of trigger.targets){
-							if(!target.mayHaveShan(player,'use')||trigger.player.hasSkillTag('directHit_ai',true,{
+							if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+								return i.hasGaintag('sha_notshan');
+							}))||trigger.player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:trigger.card,
 							},true)){
@@ -11113,7 +11115,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								let ph=player.countCards('h');
 								if(game.hasPlayer(i=>{
 									if(!player.canUse('sha',i,true,true)||get.effect(i,{name:'sha'},player,player)<=0) return false;
-									return !ph||!i.mayHaveShan(player,'use');
+									return !ph||!i.mayHaveShan(player,'use',i.getCards(i=>{
+										return i.hasGaintag('sha_notshan');
+									}));
 								})) return 1;
 							}
 							return 0;

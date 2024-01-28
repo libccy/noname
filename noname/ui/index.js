@@ -14155,6 +14155,18 @@ export class UI extends Uninstantable {
 	 * @type { HTMLAudioElement }
 	 */
 	static backgroundMusic;
+	/**
+	 * @type { HTMLDivElement }
+	 */
+	static special;
+	/**
+	 * @type { HTMLDivElement }
+	 */
+	static fakeme;
+	/**
+	 * @type { HTMLDivElement }
+	 */
+	static chess;
 	static refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}

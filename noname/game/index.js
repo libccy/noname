@@ -43,9 +43,17 @@ export class Game extends Uninstantable {
 	static shuffleNumber = 0;
 	static promises = GamePromises;
 	/**
-	 * @type {string}
+	 * @type { string }
 	 */
 	static layout;
+	/**
+	 * @type { Player }
+	 */
+	static me;
+	/**
+	 * @type { boolean }
+	 */
+	static chess;
 	static globalEventHandlers = new class {
 		constructor() {
 			this._handlers = {};
@@ -3703,7 +3711,7 @@ export class Game extends Uninstantable {
 	/**
 	 * @param { string } type 
 	 * @param { Player } player 
-	 * @param { any } content 
+	 * @param { any } [content] 
 	 * @returns 
 	 */
 	static addVideo(type, player, content) {
@@ -4691,9 +4699,9 @@ export class Game extends Uninstantable {
 	/**
 	 * @overload
 	 * @param { Card | string } name 
-	 * @param { string } suit 
-	 * @param { number } number 
-	 * @param { string } nature 
+	 * @param { string } [suit] 
+	 * @param { number | string } [number] 
+	 * @param { string } [nature] 
 	 */
 	static createCard(name, suit, number, nature) {
 		if (typeof name == 'object') {

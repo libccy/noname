@@ -1257,7 +1257,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						var hasRuanshizi=game.hasPlayer(function(target){
-							return target!=player&&player.canUse('sha',target,null,true)&&!target.mayHaveShan(player,'use')&&get.attitude(player,target)<0&&get.effect(target,{name:'sha'},player,player)>0;
+							return target!=player&&player.canUse('sha',target,null,true)&&!target.mayHaveShan(player,'use',target.getCards(i=>{
+								return i.hasGaintag('sha_notshan');
+							}))&&get.attitude(player,target)<0&&get.effect(target,{name:'sha'},player,player)>0;
 						})
 						for(var card of hs){
 							var name=get.name(card);
@@ -5664,17 +5666,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								return 0.7;
 							}
-						},
-						player(card,player){
-							if(_status.currentPhase!=player) return;
-							if(_status.event.name!='chooseToUse'||_status.event.player!=player) return;
-							if(get.type(card)=='basic') return;
-							if(get.tag(card,'gain')) return;
-							if(get.value(card,player,'raw')>=7) return;
-							if(player.hp<=2) return;
-							if(!player.hasSkill('jilue')||player.storage.renjie==0){
-								return 'zeroplayertarget';
-							}
 						}
 					}
 				}
@@ -5683,7 +5674,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				mod:{
 					aiOrder:(player,card,num)=>{
-						if(num<=0||typeof card!=='object'||!player.isPhaseUsing()) return 0;
+						if(num<=0||typeof card!=='object'||!player.isPhaseUsing()) return num;
 						if(player.awakenedSkills.includes('sbaiyin')){
 							if(player.countMark('renjie')<3&&player.getUseValue(card)<Math.min(1.8,0.18*player.hp*player.hp)) return 0;
 						}
@@ -5854,7 +5845,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player:1
 					},
 					effect:{
-						player:(card,player,target)=>{
+						player(card,player,target){
 							if(target&&player.hasSkill('rewansha')&&target.hp<=1&&get.tag(card,'damage')) return [1,0,1.5,-1.5];
 						}
 					}

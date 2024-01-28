@@ -5453,25 +5453,41 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					result:{
 						target:function(player,target,card,isLink){
-							var eff = function () {
-								if(!isLink && player.hasSkill('jiu')) {
-									if(!target.hasSkillTag('filterDamage', null, {
-										player: player,
-										card: card,
-										jiu: true
-									})){
-										if(get.attitude(player, target) > 0) return -7;
-										return -4;
-									}
-									return -0.5;
+							let eff=-1.5,odds=1.35,num=1;
+							if(isLink){
+								let cache=_status.event.getTempCache('sha_result','eff');
+								if(typeof cache!=='object'||cache.card!==get.translation(card)) return eff;
+								if(cache.odds<1.35&&cache.bool) return 1.35*cache.eff;
+								return cache.odds*cache.eff;
+							}
+							if(player.hasSkill('jiu')||player.hasSkillTag('damageBonus',true,{
+								target:target,
+								card:card
+							})){
+								if(target.hasSkillTag('filterDamage',null,{
+									player:player,
+									card:card,
+									jiu:true,
+								})) eff=-0.5;
+								else{
+									num=2;
+									if(get.attitude(player,target)>0) eff=-7;
+									else eff=-4;
 								}
-								return -1.5;
-							}();
-							if(!isLink && target.mayHaveShan(player,'use') && !player.hasSkillTag('directHit_ai', true, {
-								target: target,
-								card: card
-							}, true)) return eff * 0.6;
-							return eff;
+							}
+							if(!player.hasSkillTag('directHit_ai',true,{
+								target:target,
+								card:card,
+							},true)) odds-=0.7*target.mayHaveShan(player,'use',target.getCards(i=>{
+								return i.hasGaintag('sha_notshan');
+							}),'odds');
+							_status.event.putTempCache('sha_result','eff',{
+								bool:target.hp>num&&get.attitude(player,target)>0,
+								card:get.translation(card),
+								eff:eff,
+								odds:odds
+							});
+							return odds*eff;
 						}
 					},
 					respondSha:true,
@@ -7258,7 +7274,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							var target=trigger.target;
-							if(trigger.targets.length>1||target.mayHaveShan(player,'use')) return 0;
+							if(trigger.targets.length>1||target.mayHaveShan(player,'use',target.getCards(i=>{
+								return i.hasGaintag('sha_notshan');
+							}))) return 0;
 						}
 						var num=trigger.getParent().baseDamage;
 						var map=trigger.getParent().customArgs,id=target.playerid;
@@ -14756,14 +14774,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(num>=delta) return 'zeroplayertarget';
 							}
 							else if(get.tag(card,'respondShan')>0){
-								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveShan(player)){
-									return 0.6;
+								if(current<0&&used==target.getAttackRange()-1){
+									if(card.name==='sha'){
+										if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+											return i.hasGaintag('sha_notshan');
+										}))) return;
+									}
+									else if(!target.mayHaveShan(player)) return 0.9;
+									return [1,(used+1)/2];
 								}
 							}
 							else if(get.tag(card,'respondSha')>0){
-								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveSha(player)){
-									return 0.6;
-								}
+								if(current<0&&used==target.getAttackRange()-1&&target.mayHaveSha(player)) return [1,(used+1)/2];
 							}
 						},
 					},
