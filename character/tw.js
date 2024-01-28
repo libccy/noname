@@ -295,16 +295,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twhuajing:{
 				audio:2,
 				getSkills(player){
-					let skills=player.getSkills(false,null,false).filter(skill=>{
-						const info=get.info(skill);
-						return info&&info.equipSkill&&info.equipSkill=='equip1';
-					});
-					skills.addArray(player.getCards('e',card=>get.subtype(card)=='equip1').reduce((list,card)=>{
+					return player.getCards('e',card=>get.subtype(card)=='equip1').reduce((list,card)=>{
 						const info=get.info(card);
 						if(info&&info.skills) return list.addArray(info.skills);
 						return list;
-					},[]));
-					return skills;
+					},[]);
 				},
 				trigger:{global:'phaseBefore',player:'enterGame'},
 				filter(event,player){
@@ -517,9 +512,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						trigger:{
 							player:'loseAfter',
-							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter','phaseBefore'],
 						},
 						filter(event,player){
+							if(event.name=='phase') return true;
 							if(event.name=='equip'&&event.player==player&&get.subtype(event.card)=='equip1') return true;
 							const evt=event.getl(player);
 							return evt&&evt.player==player&&evt.es&&evt.es.some(card=>get.subtype(card)=='equip1');
@@ -531,6 +527,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							await player.enableSkill('twhuajing_blocker');
 							await player.disableSkill('twhuajing_blocker',lib.skill.twhuajing.getSkills(player));
 						},
+						ai:{unequip_equip1:true},
 					},
 				},
 			},
