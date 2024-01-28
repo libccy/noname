@@ -366,7 +366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						usable:1,
 						prompt:'展示至多四张手牌，然后根据这些牌含有的花色数于本回合获得等量你拥有的“武”标记的效果',
 						async content(event,trigger,player){
-							await player.showCards(event.cards,get.translation(player)+'发动了【经合】');
+							await player.showCards(event.cards,get.translation(player)+'发动了【化境】');
 							const skills=lib.skill.twhuajing.derivation.filter(skill=>player.hasMark(skill));
 							const gainSkills=skills.randomGets(Math.min(skills.length,event.cards.reduce((list,cardx)=>list.add(get.suit(cardx,player)),[]).length));
 							for(const eff of gainSkills) player.popup(eff);
@@ -382,6 +382,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							name:'化境·剑',
 							name2:'剑',
+							markcount:()=>0,
 							content:()=>lib.translate.twhuajing_jian_info,
 						},
 						nopop:true,
@@ -404,6 +405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							name:'化境·刀',
 							name2:'刀',
+							markcount:()=>0,
 							content:()=>lib.translate.twhuajing_dao_info,
 						},
 						nopop:true,
@@ -417,6 +419,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							name:'化境·斧',
 							name2:'斧',
+							markcount:()=>0,
 							content:()=>lib.translate.twhuajing_fu_info,
 						},
 						nopop:true,
@@ -441,6 +444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							name:'化境·枪',
 							name2:'枪',
+							markcount:()=>0,
 							content:()=>lib.translate.twhuajing_qiang_info,
 						},
 						nopop:true,
@@ -461,6 +465,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							name:'化境·戟',
 							name2:'戟',
+							markcount:()=>0,
 							content:()=>lib.translate.twhuajing_ji_info,
 						},
 						nopop:true,
@@ -480,6 +485,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{
 							name:'化境·弓',
 							name2:'弓',
+							markcount:()=>0,
 							content:()=>lib.translate.twhuajing_gong_info,
 						},
 						nopop:true,
@@ -490,7 +496,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						logTarget:'player',
 						async content(event,trigger,player){
-							trigger.player.discard(trigger.player.countDiscardableCards(player,'e').randomGets(1)).discarder=player;
+							trigger.player.discard(trigger.player.getDiscardableCards(player,'e').randomGets(1)).discarder=player;
 						},
 					},
 					blocker:{
@@ -573,12 +579,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.removeMark(control,1);
 							player.markSkill('twhuajing');
 							player.popup(control,'metal');
-							target.addMark(control,1);
 							target.addTempSkill(control,{player:'phaseAfter'});
 							target.addTempSkill('twhuajing_blocker',{player:'phaseAfter'});
-							target.when('phaseAfter').then(()=>{
-								if(player.hasMark(control)) player.removeMark(control,1);
-							}).vars({control:control});
 							target.getHistory('custom').push({twhuajing_skills:[control]});
 							await player.draw();
 						}
