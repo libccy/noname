@@ -158,6 +158,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})>1;
 				},
 				direct:true,
+				changeSeat:true,
 				async content(event,trigger,player){
 					const toSortPlayers=game.filterPlayer(current=>!current.isZhu2());
 					toSortPlayers.sortBySeat(game.findPlayer2(current=>current.getSeatNum()==1,true));
@@ -1440,6 +1441,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				juexingji:true,
 				skillAnimation:true,
 				animationColor:'orange',
+				changeSeat:true,
 				content(){
 					'step 0'
 					player.awakenSkill('dcqijing');
