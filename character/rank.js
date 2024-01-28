@@ -660,6 +660,7 @@ window.noname_character_rank={
 		'jsrg_simayi',
 		'jsrg_zhaoyun',
 		'jsrg_zhangxuan',
+		'sb_xunyu',
 	],
 	bp:[
 		'xin_huojun',
