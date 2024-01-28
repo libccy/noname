@@ -28,11 +28,11 @@ export class Library extends Uninstantable {
 	static configprefix = 'noname_0.9_';
 	static versionOL = 27;
 	static updateURLS = {
-		coding: 'https://gitcode.net/sinat_33405273/noname/-/raw/',
+		coding: 'https://unitedrhythmized.club/libccy/noname/master',
 		github: 'https://raw.githubusercontent.com/libccy/noname',
 	};
 	static updateURL = 'https://raw.githubusercontent.com/libccy/noname';
-	static mirrorURL = 'https://gitcode.net/sinat_33405273/noname/-/raw/';
+	static mirrorURL = 'https://unitedrhythmized.club/libccy/noname/master';
 	static hallURL = '47.99.105.222';
 	static assetURL = assetURL;
 	static userAgent = userAgent;
@@ -1124,7 +1124,7 @@ export class Library extends Uninstantable {
 					init: 'coding',
 					unfrequent: true,
 					item: {
-						coding: 'CSDN',
+						coding: 'URC',
 						github: 'GitHub',
 					},
 					onclick: function (item) {
@@ -11287,7 +11287,6 @@ export class Library extends Uninstantable {
 			charlotte: true,
 			priority: -100,
 			lastDo: true,
-			silent: true,
 			content: function () {
 				player.removeSkill('counttrigger');
 				delete player.storage.counttrigger;

@@ -4,7 +4,7 @@ window.config={
 		FastGit:'https://raw.fgit.cf/libccy/noname-extension/master/',
 		GitHub:'https://raw.githubusercontent.com/libccy/noname-extension/master/'
 	},
-	extension_source:'Coding',
+	extension_source:'GitHub Proxy',
 	forbidai:['ns_liuzhang'],
 	forbidai_user:[],
 	forbidall:[],
