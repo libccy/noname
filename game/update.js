@@ -1,9 +1,9 @@
 window.noname_update={
-	version:'1.10.6.2.1',
+	version:'1.10.7',
 	update:'1.10.6.2',
 	changeLog:[
-		'整合@PZ157 @nonameShijian @universe-st @mengxinzxz 的Pull Request',
-		'OL族吴乔、谋关羽；海外服侠关羽',
+		'整合@PZ157 @nonameShijian @universe-st @mengxinzxz @copcap 的Pull Request',
+		'OL族吴乔、谋关羽；手杀谋荀彧；海外服侠关羽、石韬、史阿',
 		'其他AI优化与bug修复',
 	],
 	files:[
