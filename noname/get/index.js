@@ -2269,13 +2269,13 @@ export class Get extends Uninstantable {
 	 * @returns {Iterable<HTMLElement>} 迭代器
 	 */
 	static *iterableChildNodes(node){
-		if(node._childNodesWatcher){
-			for(let child of node._childNodesWatcher.childNodes){
-				yield child;
-			}
-		}else{
-			for(let i=0;i<arguments.length;i++){
-				let arg = arguments[i];
+		for(let i=0;i<arguments.length;i++){
+			let arg = arguments[i];
+			if(arg._childNodesWatcher){
+				for(let child of arg._childNodesWatcher.childNodes){
+					yield child;
+				}
+			}else{
 				for(let j=0;j<arg.childElementCount;j++){
 					yield arg.childNodes[j];
 				}
