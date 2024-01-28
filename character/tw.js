@@ -571,8 +571,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.markSkill('twhuajing');
 							player.popup(control,'metal');
 							target.addMark(control,1);
-							target.addSkill(control,{player:'phaseAfter'});
-							target.addSkill('twhuajing_blocker',{player:'phaseAfter'});
+							target.addTempSkill(control,{player:'phaseAfter'});
+							target.addTempSkill('twhuajing_blocker',{player:'phaseAfter'});
 							target.when('phaseAfter').then(()=>{
 								if(player.hasMark(control)) player.removeMark(control,1);
 							}).vars({control:control});
