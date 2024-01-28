@@ -211,7 +211,7 @@ export class GameEventPromise extends Promise {
 	/**
 	 * 返回result中的targets项。
 	 * 
-	 * @returns {Promise<lib.element.Player[]>} 返回的targets项。
+	 * @returns {Promise<Player[]>} 返回的targets项。
 	 * 
 	 */
 	forResultTargets(){
@@ -221,7 +221,7 @@ export class GameEventPromise extends Promise {
 	/**
 	 * 返回result中的cards项
 	 * 
-	 * @returns {Promise<lib.element.Card[]>} 返回的cards项。
+	 * @returns {Promise<Card[]>} 返回的cards项。
 	 * 
 	 */
 	forResultCards(){
@@ -231,7 +231,7 @@ export class GameEventPromise extends Promise {
 	/**
 	 * 返回result中的card项
 	 * 
-	 * @returns {Promise<lib.element.VCard>|Promise<lib.element.Card>} 返回的card项。
+	 * @returns {Promise<VCard>|Promise<Card>} 返回的card项。
 	 * 
 	 */
 	forResultCard(){
@@ -250,7 +250,7 @@ export class GameEventPromise extends Promise {
 	/**
 	 * 返回result中的links项。
 	 * 
-	 * @returns {Promise<Array<?>>} 返回的links项。
+	 * @returns {Promise<Array<any>>} 返回的links项。
 	 */
 	forResultLinks(){
 		return this.forResult('links');
