@@ -72,7 +72,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const player=event.player,history=player.getHistory('lose',evt=>{
 							return evt.getParent(2).name=='recast'&&evt.getParent(3).name=='olsbguidao';
 						});
-						if(!history.length) event.set('olsbguidao_num',0);
+						if(!history.length) event.set('olsbguidao_num',1);
 						else{
 							const evt=history[history.length-1];
 							event.set('olsbguidao_num',evt.cards.filter(card=>get.name(card,player)=='sha').length+1);
@@ -495,7 +495,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olsbfumeng:'赋梦',
 			olsbfumeng_info:'一轮游戏开始时，你可以令任意张手牌的牌名视为【杀】。',
 			olsbguidao:'归刀',
-			olsbguidao_info:'出牌阶段，你可以重铸两张牌并视为使用一张【决斗】（若你本回合已发动过〖归刀〗，则此次重铸的【杀】数必须比本回合上一次发动〖归刀〗重铸的【杀】数多）。目标角色受到此牌伤害时，其须猜测你手牌中牌名为【杀】的牌数量多还是牌名不为【杀】的牌数多，若其猜错，则此【决斗】对其造成的伤害+1。',
+			olsbguidao_info:'出牌阶段，你可以重铸两张牌并视为使用一张【决斗】（重铸的【杀】数须比本回合上次发动〖归刀〗重铸的【杀】数多）。目标角色受到此牌伤害时，其须猜测你手牌中牌名为【杀】的牌数量多还是牌名不为【杀】的牌数多，若其猜错，则此【决斗】对其造成的伤害+1。',
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',
