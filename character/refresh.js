@@ -11141,7 +11141,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								if(!target.isHealthy()) club+=2;
 								if(!club&&!spade) return 1;
-								if(!target.mayHaveShan(player)) return 1-0.1*Math.min(5,target.countCards('hs'));
+								if(name==='sha'){
+									if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+										return i.hasGaintag('sha_notshan');
+									}))) return;
+								}
+								else if(!target.mayHaveShan(player)) return 1-0.1*Math.min(5,target.countCards('hs'));
 								if(!target.hasSkillTag('rejudge')) return [1,(club+spade)/4];
 								let pos=(player==target||player.hasSkillTag('viewHandcard',null,target,true))?'hes':'e',better=club>spade?'club':'spade',max=0;
 								target.hasCard(function(cardx){

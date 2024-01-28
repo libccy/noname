@@ -1257,7 +1257,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						var hasRuanshizi=game.hasPlayer(function(target){
-							return target!=player&&player.canUse('sha',target,null,true)&&!target.mayHaveShan(player,'use')&&get.attitude(player,target)<0&&get.effect(target,{name:'sha'},player,player)>0;
+							return target!=player&&player.canUse('sha',target,null,true)&&!target.mayHaveShan(player,'use',target.getCards(i=>{
+								return i.hasGaintag('sha_notshan');
+							}))&&get.attitude(player,target)<0&&get.effect(target,{name:'sha'},player,player)>0;
 						})
 						for(var card of hs){
 							var name=get.name(card);
