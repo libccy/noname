@@ -9428,7 +9428,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return _status.event.skill=='twjiange'?1:Infinity;
 				},
 				precontent:function(){
-					if(player!=_status.currentPhase) player.draw();
+					if(player!=_status.currentPhase){
+						player.when({player:['useCard','respond']})
+						.filter(evt=>evt.skill=='twjiange')
+						.then(()=>player.draw());
+					}
 					event.getParent().addCount=false;
 				},
 				prompt:'将一张非基本牌当杀使用或打出',
