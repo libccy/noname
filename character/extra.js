@@ -249,11 +249,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const cmp=(a,b)=>{
 						return resultList.indexOf(a)-resultList.indexOf(b);
 					}
-					for(let i in toSortPlayers){
-						for(let j in toSortPlayers){
-							if(cmp(toSortPlayers[i].getSeatNum(),toSortPlayers[j].getSeatNum())<0){
-								toSwapList.push([toSortPlayers[i],toSortPlayers[j]]);
-								[toSortPlayers[i],toSortPlayers[j]]=[toSortPlayers[j],toSortPlayers[i]];
+					for(let i of toSortPlayers){
+						for(let j of toSortPlayers){
+							if(cmp(i.getSeatNum(),j.getSeatNum())<0){
+								toSwapList.push([i,j]);
+								[i,j]=[j,i];
 							}
 						}
 					}
