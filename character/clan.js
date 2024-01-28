@@ -46,9 +46,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				async content(event,trigger,player){
-					const {result:{bool}}=await player.chooseToDiscard(get.prompt2('clanqiajue'),(card,player)=>{
+					const {result:{bool}}=await player.chooseToDiscard((card,player)=>{
 						return get.color(card,player)=='black'&&lib.filter.cardDiscardable(card,player);
-					},'he').set('ai',card=>{
+					},'he')
+					.set('prompt','当前手牌点数和为'+player.getCards('h').reduce((sum,card)=>sum+get.number(card),0)+'，'+get.prompt('clanqiajue'))
+					.set('prompt2',lib.translate.clanqiajue_info.slice(lib.translate.clanqiajue_info.indexOf('弃置')).slice(0,-1))
+					.set('ai',card=>{
 						const player=get.event('player'),goon=get.position(card)=='h';
 						let num=player.getCards('h').reduce((sum,card)=>sum+get.number(card),0);
 						if(num-(goon?get.number(card):0)>30) return 0;
