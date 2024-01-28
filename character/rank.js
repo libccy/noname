@@ -49,6 +49,7 @@ window.noname_character_rank={
 		'key_iriya',
 	],
 	ap:[
+		'xia_guanyu',
 		'gjqt_aruan',
 		'gjqt_cenying',
 		'gjqt_ouyangshaogong',
@@ -1657,6 +1658,7 @@ window.noname_character_rank={
 	],
 	rarity:{
 		legend:[
+			'xia_guanyu',
 			'swd_muyun',
 			'swd_zhaoyun',
 			'swd_septem',

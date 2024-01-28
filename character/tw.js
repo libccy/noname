@@ -295,6 +295,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardAfter'},
 				filter(event,player){
+					if(event.card.name!='sha') return false;
 					return player.getHistory('sourceDamage',evt=>evt.card&&evt.card==event.card).length;
 				},
 				forced:true,
@@ -390,7 +391,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.removeMark('twchue',num);
 							const card=new lib.element.VCard({name:'sha'});
 							player.when('useCard2')
-							.filter(evt=>evt.card==card&&game.hasPlayer(target=>!evt.targets.includes(target)&&player.canUse(evt.card,target)))
+							.filter(evt=>evt.getParent(2)==event&&game.hasPlayer(target=>!evt.targets.includes(target)&&player.canUse(evt.card,target)))
+							.assign({
+								firstDo:true,
+							})
 							.then(()=>{
 								trigger.baseDamage++;
 								player.chooseTarget('额外指定至多'+get.cnNumber(num)+'名目标',[1,num],(card,player,target)=>{
@@ -403,10 +407,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							})
 							.then(()=>{
 								if(result.bool){
+									const targets=result.targets;
 									player.line(targets);
 									trigger.targets.addArray(targets);
 								}
-							}).vars({card:card,num:num});
+							}).vars({num:num});
 							player.chooseUseTarget('视为使用造成的伤害+1且可以额外指定'+num+'个目标的【杀】',card,false,true);
 						},
 					},
