@@ -1939,9 +1939,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
 					if(player.countCards('he',function(card){
 						return get.suit(card)=='diamond'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'lebu'},[card]),target);
-					})||(player.countCards('he',function(card){
+					})||player.countCards('he',function(card){
 						return get.suit(card)=='club'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'bingliang'},[card]),target);
-					}))) list.push('选项二');
+					})) list.push('选项二');
 					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
 					if(target.isUnseen(2)&&!player.isUnseen(2)) list.push('背水！');
 					else choiceList[2]='<span style="opacity:0.5">'+choiceList[2]+'</span>';
@@ -1961,10 +1961,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					event.choice=result.control;
 					if(event.choice!='选项二'&&target.countDiscardableCards(player,'he')) player.discardPlayerCard(target,'he',true);
 					'step 2'
-					if(event.choice!='选项一'&&!player.isUnseen(2)&&target.isUnseen(2)&&
-					player.hasCard(function(card){
+					if(event.choice!='选项一'&&(player.hasCard(function(card){
 						return get.suit(card)=='diamond'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'lebu'},[card]),target);
-					},'he')||(player.hasCard(function(card){
+					},'he')||player.hasCard(function(card){
 						return get.suit(card)=='club'&&get.type2(card)!='trick'&&player.canUse(get.autoViewAs({name:'bingliang'},[card]),target,false);
 					},'he'))){
 						var next=game.createEvent('gzzhenxi_use');
