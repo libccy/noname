@@ -22,10 +22,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_zhongyu:['male','wei',3,['clanjiejian','clanhuanghan','clanbaozu'],['clan:颍川钟氏']],
 			clan_wanglun:['male','wei',3,['clanqiuxin','clanjianyuan','clanzhongliu'],['clan:太原王氏']],
 			clan_xunyou:['male','wei',3,['clanbaichu','clandaojie'],['clan:颍川荀氏']],
+			clan_wuqiao:['male','jin',4,['clanqiajue','clanmuyin'],['clan:陈留吴氏']],
 		},
 		characterSort:{
 			clan:{
-				clan_wu:['clan_wuxian','clan_wuban','clan_wukuang'],
+				clan_wu:['clan_wuxian','clan_wuban','clan_wukuang','clan_wuqiao'],
 				clan_xun:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan','clan_xunyou'],
 				clan_han:['clan_hanshao','clan_hanrong'],
 				clan_wang:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun'],
@@ -33,6 +34,46 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//族吴乔
+			clanqiajue:{
+				audio:2,
+				trigger:{player:'phaseDrawBegin'},
+				filter(event,player){
+					return player.countCards('he',card=>{
+						if(_status.connectMode&&get.position(card)=='h') return true;
+						return get.color(card,player)=='black'&&lib.filter.cardDiscardable(card,player);
+					});
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const {result:{bool}}=await player.chooseToDiscard(get.prompt2('clanqiajue'),(card,player)=>{
+						return get.color(card,player)=='black'&&lib.filter.cardDiscardable(card,player);
+					},'he').set('ai',card=>{
+						const player=get.event('player'),goon=get.position(card)=='h';
+						let num=player.getCards('h').reduce((sum,card)=>sum+get.number(card),0);
+						if(num-(goon?get.number(card):0)>30) return 0;
+						return goon?get.number(card):1/(get.value(card)||0.5);
+					}).set('logSkill','clanqiajue');
+					if(bool){
+						player.when({player:['phaseDrawEnd','phaseDrawCancelled','phaseUseSkipped']})
+						.filter(evt=>evt==trigger)
+						.then(()=>{
+							const cards=player.getCards('h'),num=cards.reduce((sum,card)=>sum+get.number(card),0);
+							if(cards.length) player.showCards(cards,get.translation(player)+'【跒倔】展示');
+							if(num>30){
+								player.popup('杯具');
+								lib.skill.chenliuwushi.change(player,-2);
+							}
+							else{
+								player.popup('洗具');
+								const next=player.phaseDraw();
+								event.next.remove(next);
+								trigger.getParent('phase').next.push(next);
+							}
+						})
+					}
+				},
+			},
 			//族荀攸
 			clanbaichu:{
 				derivation:'qice',
@@ -2508,7 +2549,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanmuyin:{
 				audio:2,
 				clanSkill:true,
-				audioname:['clan_wuxian','clan_wuban','clan_wukuang'],
+				audioname:['clan_wuxian','clan_wuban','clan_wukuang','clan_wuqiao'],
 				trigger:{player:'phaseBegin'},
 				isMax(player){
 					var num=player.getHandcardLimit();
@@ -2582,6 +2623,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wanghun:'王浑（223年～297年），字玄冲，太原郡晋阳县（今山西省太原市）人。魏晋时期名臣，曹魏司空王昶的儿子。王浑早年为大将军曹爽的掾吏，高平陵政变后，循例免官，出任怀县县令、散骑侍郎等职，袭封京陵县侯。西晋王朝建立后，加号扬烈将军，历任征虏将军、东中郎将、豫州刺史等职，积极筹划伐吴方略。咸宁五年（279年），配合镇南将军杜预灭亡吴国，迁征东大将军、左仆射、司徒公，晋爵京陵县公。晋惠帝司马衷即位，加任侍中衔。楚王司马玮发动政变，有意寻求支持，遭到严词拒绝。楚王司马玮死后，复任司徒、录尚书事。元康七年（297年），王浑去世，享年七十五岁，谥号为元。《唐会要》尊为“魏晋八君子”之一。',
 			zhongyu:'钟毓（？-263年），字稚叔，颍川长社（今河南长葛市）人。三国时期魏国大臣，太傅钟繇之子、司徒钟会之兄。出身颍川钟氏，机灵敏捷，有其父之遗风。十四岁时，起家散骑侍郎。太和初年，迁黄门侍郎，袭封定陵县侯。正始年间，拜散骑常侍，迁魏郡太守，入为侍中、御史中丞、廷尉 [5] 。随平诸葛诞的淮南叛乱，拜青州刺史、后将军，都督徐州、荆州诸军事。景元四年（263年），去世，追赠车骑将军，谥号为惠，著有文集五卷（见《隋书·经籍志》及《两唐书·经籍志》），传于世。',
 			wanglun:'王沦（233年－257年）字太冲，出身太原晋阳王姓世族（今山西省太原市），王昶三子，王浑、王深之弟，王湛之兄。醇粹简远，崇尚老庄之学，心思平淡。二十多时被举荐为孝廉，没有前往，后任大将军参军。257年，诸葛诞不满司马氏篡权而在寿春起义，王沦跟随司马昭征讨，遭遇疾疫去世，时年二十五，时人惜之，司马昭为他流泪。其兄著诔文《表德论》，表述其德行，说“因为畏惧帝王的典章制度，不能写墓志铭，于是撰写过往的事迹，刻在墓的背面。”',
+			wuqiao:'吴乔，西晋人物，蜀车骑将军吴懿之孙。李雄建立成汉政权，他沦落益州，长达三十年，始终不向李雄屈服。',
 		},
 		dynamicTranslate:{
 			clanlianzhu(player){
@@ -2615,6 +2657,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_zhongyu_prefix:'族',
 			clan_wanglun_prefix:'族',
 			clan_xunyou_prefix:'族',
+			clan_wuqiao_prefix:'族',
 
 			clan_wuxian:'族吴苋',
 			clanyirong:'移荣',
@@ -2708,6 +2751,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_xunyou:'族荀攸',
 			clanbaichu:'百出',
 			clanbaichu_info:'锁定技，当你使用一张牌结算完毕后，若你：未记录过此牌的花色和类型组合，则你记录此组合并记录一个普通锦囊牌名，否则你于本轮获得技能〖奇策〗；已记录此牌牌名，你回复1点体力或摸一张牌。',
+			clan_wuqiao:'族吴乔',
+			clanqiajue:'跒倔',
+			clanqiajue_info:'摸牌阶段开始时，你可以弃置一张黑色牌。若如此做，此阶段结束时，你展示手牌，若这些牌的点数和大于30，你的手牌上限-2，否则你执行一个额外的摸牌阶段。',
 
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',

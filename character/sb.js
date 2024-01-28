@@ -647,7 +647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('h',card=>lib.skill.sbqicai.filterCardx(card,player))||event.sbqicai&&event.sbqicai.length;
 				},
 				filterCardx:function(card,player){
-					//if(player.getStorage('sbqicai').includes(card.name)) return false;
+					if(player.getStorage('sbqicai').includes(card.name)) return false;
 					return get.type(card)=='equip'&&game.hasPlayer(target=>target!=player&&target.hasEmptySlot(get.subtype(card)));
 				},
 				usable:1,
@@ -699,7 +699,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									target.$gain2(cards);
 									game.delayx();
 								}
-								//player.markAuto('sbqicai',[cards[0].name]);
+								if(get.mode()=='doudizhu') player.markAuto('sbqicai',[cards[0].name]);
 								target.equip(cards[0]);
 								player.addSkill('sbqicai_gain');
 								lib.skill.sbqicai.updateCounter(player,target,0);
@@ -945,7 +945,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbkanpo:{
 				init:function(player){
 					if(!player.storage.sbkanpo){
-						player.storage.sbkanpo=[4,[],[]];
+						player.storage.sbkanpo=[get.mode()=='doudizhu'?2:4,[],[]];
 						player.markSkill('sbkanpo');
 					}
 				},
@@ -6342,6 +6342,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbhuoji_info:'使命技。①使命：出牌阶段限一次。你可以对一名其他角色造成1点火焰伤害，然后你对所有与其势力相同的不为其的其他角色各造成1点火焰伤害。②成功：准备阶段，若你本局游戏已造成的火焰伤害不小于本局游戏总角色数，则你失去〖火计〗和〖看破〗，然后获得〖观星〗和〖空城〗。③失败：使命成功前进入濒死状态。',
 			sbkanpo:'看破',
 			sbkanpo_info:'①一轮游戏开始时，你清除〖看破①〗记录的牌名，然后你可以依次记录任意个未于上次发动〖看破①〗记录清除过的非装备牌牌名（对其他角色不可见，每局游戏至多记录4个牌名）。②其他角色使用你〖看破①〗记录过的牌名的牌时，你可以移去一个〖看破①〗中的此牌名的记录令此牌无效，然后你摸一张牌。',
+			sbkanpo_info_doudizhu:'①一轮游戏开始时，你清除〖看破①〗记录的牌名，然后你可以依次记录任意个未于上次发动〖看破①〗记录清除过的非装备牌牌名（对其他角色不可见，每局游戏至多记录2个牌名）。②其他角色使用你〖看破①〗记录过的牌名的牌时，你可以移去一个〖看破①〗中的此牌名的记录令此牌无效，然后你摸一张牌。',
 			sbguanxing:'观星',
 			sbguanxing_info:'①准备阶段，你将所有“星”置入弃牌堆，将牌堆顶的X张牌置于你的武将牌上，称为“星”（X为7-此前发动〖观星①〗次数的三倍，且X至少为0）。然后你可以将任意张“星”置于牌堆顶。②结束阶段，若你未于本回合的准备阶段将“星”置于过牌堆顶，你可以将任意张“星”置于牌堆顶。③你可以如手牌般使用或打出“星”。',
 			sbkongcheng:'空城',
@@ -6351,6 +6352,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbqicai:'奇才',
 			sbqicai_backup:'奇才',
 			sbqicai_info:'①出牌阶段限一次。你可以将手牌中或弃牌堆中的一张装备牌置于一名其他角色的对应装备栏，然后其获得如下效果：当其得到普通锦囊牌后，其将此牌交给你（限三张）。②你使用锦囊牌无距离限制。',
+			sbqicai_info_doudizhu:'①出牌阶段限一次。你可以将手牌中或弃牌堆中的一张装备牌置于一名其他角色的对应装备栏（每种牌名的装备牌每局游戏限选择一次），然后其获得如下效果：当其得到普通锦囊牌后，其将此牌交给你（限三张）。②你使用锦囊牌无距离限制。',
 			sbjizhi:'集智',
 			sbjizhi_info:'锁定技，当你使用一张普通锦囊牌时，你摸一张牌，且此牌本回合不计入你的手牌上限。',
 			sb_guanyu:'谋关羽',

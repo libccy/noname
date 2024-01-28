@@ -361,6 +361,7 @@ window.noname_character_rank={
 		'shen_lusu',
 	],
 	am:[
+		'clan_wuqiao',
 		'muludawang',
 		'diy_caiwenji',
 		'diy_liuyan',
@@ -1038,6 +1039,7 @@ window.noname_character_rank={
 		'jsrg_weiwenzhugezhi',
 	],
 	b:[
+		'ol_sb_guanyu',
 		'liyi',
 		'diy_feishi',
 		'diy_liufu',
@@ -1965,6 +1967,7 @@ window.noname_character_rank={
 			'xushi',
 			'machao',
 			'sunce',
+			're_sunce',
 			're_wangyun',
 			'zuoci',
 			'xuyou',
@@ -2111,6 +2114,7 @@ window.noname_character_rank={
 			'dc_sb_zhouyu',
 		],
 		rare:[
+			'clan_wuqiao',
 			'xin_huojun',
 			'muludawang',
 			'mb_huban',
@@ -2585,10 +2589,10 @@ window.noname_character_rank={
 			'dc_sb_lusu',
 		],
 		junk:[
+			'ol_sb_guanyu',
 			'sunshao',
 			'ol_guohuai',
 			'gongsunzan',
-			're_sunce',
 			'chengpu',
 			'zangba',
 			'tianfeng',
