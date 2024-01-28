@@ -590,6 +590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(const i in event.given_map){
 							const source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
 							player.line(source,'green');
+							if(player!==source&&(get.mode()!=='identity'||player.identity!=='nei')) player.addExpose(0.2);
 							list.push([source, event.given_map[i]]);
 						}
 						game.loseAsync({
@@ -2230,7 +2231,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})
 					.set('prompt',get.prompt2('new_jiangchi'))
 					.forResultControl();
-					
+
 					if(control=='弃牌'){
 						player.chooseToDiscard(true,'he');
 						player.addTempSkill('jiangchi2','phaseUseEnd');

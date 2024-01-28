@@ -11735,6 +11735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i in event.given_map){
 						var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
 						player.line(source,'green');
+						if(player!==source&&(get.mode()!=='identity'||player.identity!=='nei')) player.addExpose(0.18);
 						map.push([source,event.given_map[i]]);
 						cards.addArray(event.given_map[i]);
 					}
