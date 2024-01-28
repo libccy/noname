@@ -498,6 +498,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						init(player,skill){
 							player.disableSkill(skill,lib.skill.twhuajing.getSkills(player));
 						},
+						onremove(player,skill){
+							player.enableSkill(skill);
+						},
 						mod:{
 							attackRange(player,num){
 								const sum=player.getCards('e',card=>get.subtype(card)=='equip1').reduce((sum,card)=>{
