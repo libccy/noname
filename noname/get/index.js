@@ -2527,6 +2527,7 @@ export class Get extends Uninstantable {
 			}else if(parent == current.node.expansions){
 				return !card.classListContains('removing');
 			}
+			return false;
 		});
 		//return game.players.concat(game.dead).find(current =>
 		//	current.getCards("hejsx").includes(card) || (current.judging[0] == card && method != "judge"));
