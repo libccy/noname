@@ -9682,6 +9682,11 @@ export class Library extends Uninstantable {
 			return true;
 		},
 		//装备栏相关
+		/**
+		 * @param { Card } card 
+		 * @param { Player } player 
+		 * @returns { boolean }
+		 */
 		canBeReplaced: function (card, player) {
 			var mod = game.checkMod(card, player, 'unchanged', 'canBeReplaced', player);
 			if (mod != 'unchanged') return mod;
