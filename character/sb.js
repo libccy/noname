@@ -62,6 +62,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
+				filter(event,player){
+					return game.countPlayer(current=>lib.skill.sbquhu.filterTarget(null,player,current))>1;
+				},
 				filterTarget(card,player,target){
 					return player!=target&&target.countCards('he');
 				},
