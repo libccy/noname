@@ -3016,8 +3016,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			erika_yousheng:{
+				init:(player)=>{
+					player.addSkill('erika_yousheng_mamori');
+				},
 				dutySkill:true,
-				group:['erika_yousheng_achieve','erika_yousheng_fail','erika_yousheng_mamori'],
+				group:['erika_yousheng_achieve','erika_yousheng_fail'],
 				trigger:{global:'useCardToTarget'},
 				direct:true,
 				filter(event,player){

@@ -9638,20 +9638,40 @@ export class Library extends Uninstantable {
 	static filter = {
 		all: () => true,
 		none: () => false,
-		//Check if the card does not count toward the player's hand limit
-		//检测此牌是否不计入此角色的手牌上限
+		/**
+		 * Check if the card does not count toward the player's hand limit
+		 * 
+		 * 检测此牌是否不计入此角色的手牌上限
+		 * @param { Card } card
+		 * @param { Player } player 
+		 * @returns { boolean }
+		 */
 		ignoredHandcard: (card, player) => game.checkMod(card, player, false, 'ignoredHandcard', player),
-		//Check if the card is giftable
-		//检测此牌是否可赠予
+		/**
+		 * Check if the card is giftable
+		 * 
+		 * 检测此牌是否可赠予
+		 * @param { Card } card 
+		 * @param { Player } player 
+		 * @param { Player } target 
+		 * @param { boolean } [strict] 
+		 */
 		cardGiftable: (card, player, target, strict) => {
 			const mod = game.checkMod(card, player, target, 'unchanged', 'cardGiftable', player);
 			if (!mod || strict && (mod == 'unchanged' && (get.position(card) != 'h' || !get.cardtag(card, 'gifts')) || player == target)) return false;
 			return get.type(card, false) != 'equip' || target.canEquip(card, true);
 		},
-		//Check if the card is recastable
-		//检查此牌是否可重铸
-		cardRecastable: (card, player, source, strict) => {
-			if (typeof player == 'undefined') player = get.owner(card);
+		/**
+		 * Check if the card is recastable
+		 * 
+		 * 检查此牌是否可重铸
+		 * @param { Card } card 
+		 * @param { Player } player 
+		 * @param { Player } [source] 
+		 * @param { boolean } [strict] 
+		 */
+		cardRecastable: (card, player = get.owner(card), source, strict) => {
+			// if (typeof player == 'undefined') player = get.owner(card);
 			const mod = game.checkMod(card, player, source, 'unchanged', 'cardRecastable', player);
 			if (!mod) return false;
 			if (strict && mod == 'unchanged') {

@@ -42,6 +42,10 @@ export class Game extends Uninstantable {
 	static roundNumber = 0;
 	static shuffleNumber = 0;
 	static promises = GamePromises;
+	/**
+	 * @type {string}
+	 */
+	static layout;
 	static globalEventHandlers = new class {
 		constructor() {
 			this._handlers = {};
