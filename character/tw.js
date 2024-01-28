@@ -310,8 +310,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(num) target.draw(num);
 					target.when('phaseDiscardEnd')
 					.then(()=>{
+						if(!trigger.cards||!trigger.cards.length||!player.hasDisabledSlot()){
+							event.finish();
+							return;
+						}
 						const num=trigger.cards.length;
-						if(!num||!player.hasDisabledSlot()) return;
 						let list=[];
 						for(let i=1;i<6;i++){
 							if(player.hasDisabledSlot(i)){
