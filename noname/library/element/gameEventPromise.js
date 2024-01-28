@@ -180,6 +180,8 @@ export class GameEventPromise extends Promise {
 	 * success:是否做出选择。
 	 * cards:选择的牌。
 	 * targets:选择的目标。
+	 * 
+	 * @returns {Promise} 返回的结果
 	 */
 	forResult(){
 		if(arguments.length == 0){
@@ -200,7 +202,7 @@ export class GameEventPromise extends Promise {
 	/**
 	 * 返回result中的bool项。
 	 * 
-	 * @returns {boolean} 返回的bool项
+	 * @returns {Promise<boolean>} 返回的bool项
 	 */
 	forResultBool(){
 		return this.forResult('bool');
@@ -209,7 +211,7 @@ export class GameEventPromise extends Promise {
 	/**
 	 * 返回result中的targets项。
 	 * 
-	 * @returns {lib.element.Player[]} 返回的targets项。
+	 * @returns {Promise<Player[]>} 返回的targets项。
 	 * 
 	 */
 	forResultTargets(){
@@ -219,7 +221,7 @@ export class GameEventPromise extends Promise {
 	/**
 	 * 返回result中的cards项
 	 * 
-	 * @returns {lib.element.Card[]} 返回的cards项。
+	 * @returns {Promise<Card[]>} 返回的cards项。
 	 * 
 	 */
 	forResultCards(){
@@ -229,7 +231,7 @@ export class GameEventPromise extends Promise {
 	/**
 	 * 返回result中的card项
 	 * 
-	 * @returns {lib.element.VCard|lib.element.Card} 返回的card项。
+	 * @returns {Promise<VCard>|Promise<Card>} 返回的card项。
 	 * 
 	 */
 	forResultCard(){
@@ -239,7 +241,7 @@ export class GameEventPromise extends Promise {
 	/**
 	 * 返回result中的control项。
 	 * 
-	 * @returns {string} 返回的control项。
+	 * @returns {Promise<string>} 返回的control项。
 	 */
 	forResultControl(){
 		return this.forResult('control');
@@ -248,7 +250,7 @@ export class GameEventPromise extends Promise {
 	/**
 	 * 返回result中的links项。
 	 * 
-	 * @returns {Array<?>} 返回的links项。
+	 * @returns {Promise<Array<any>>} 返回的links项。
 	 */
 	forResultLinks(){
 		return this.forResult('links');

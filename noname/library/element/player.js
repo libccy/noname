@@ -4,6 +4,8 @@ import { Game as game } from '../../game/index.js';
 import { Library as lib } from "../index.js";
 import { status as _status } from '../../status/index.js';
 import { UI as ui } from '../../ui/index.js';
+import { CacheContext } from '../cache/cacheContext.js';
+import { ChildNodesWatcher } from '../cache/childNodesWatcher.js';
 
 export class Player extends HTMLDivElement {
 	/**
@@ -57,6 +59,8 @@ export class Player extends HTMLDivElement {
 			handcards2: ui.create.div('.handcards'),
 			expansions: ui.create.div('.expansions')
 		};
+		player.node.handcards1._childNodesWatcher = new ChildNodesWatcher(player.node.handcards1);
+		player.node.handcards2._childNodesWatcher = new ChildNodesWatcher(player.node.handcards2);
 		if(lib.config.equip_span){
 			let observer = new MutationObserver(mutationsList=>{
 				for (let mutation of mutationsList) {
@@ -1505,7 +1509,7 @@ export class Player extends HTMLDivElement {
 	 */
 	canSave(target) {
 		if (this.hasSkillTag('save', true, target, true)) return true;
-		let name = {}, hs = this.getCards('hs');
+		let name = {}, hs = this.iterableGetCards('hs');
 		for (let i of hs) name[get.name(i)] = true;
 		for (let i in lib.card) {
 			if (lib.card[i].savable && (lib.inpile.includes(i) || name[i])) {
@@ -3164,6 +3168,9 @@ export class Player extends HTMLDivElement {
 		if (typeof num != 'number') return 0;
 		return num;
 	}
+	getCacheKey(){
+		return `[p:${this.playerid}]`;
+	}
 	countSkill(skill) {
 		var num = this.getStat('skill')[skill];
 		if (num == undefined) return 0;
@@ -3200,127 +3207,121 @@ export class Player extends HTMLDivElement {
 	/**
 	 * @param { string } [arg1='h']
 	 * @param { string | Record<string, any> | ((card: Card) => boolean) } [arg2]
-	 * @returns { Card[] }
+	 * @returns { Iterable<Card> }
 	 */
-	getCards(arg1, arg2) {
-		if (typeof arg1 != 'string') {
+	*iterableGetCards(arg1,arg2){
+		if(typeof arg1 != 'string'){
 			arg1 = 'h';
 		}
-		var cards = [], cards1 = [];
-		var i, j;
-		for (i = 0; i < arg1.length; i++) {
-			if (arg1[i] == 'h') {
-				for (j = 0; j < this.node.handcards1.childElementCount; j++) {
-					if (!this.node.handcards1.childNodes[j].classList.contains('removing') && !this.node.handcards1.childNodes[j].classList.contains('glows')) {
-						cards.push(this.node.handcards1.childNodes[j]);
-					}
-				}
-				for (j = 0; j < this.node.handcards2.childElementCount; j++) {
-					if (!this.node.handcards2.childNodes[j].classList.contains('removing') && !this.node.handcards2.childNodes[j].classList.contains('glows')) {
-						cards.push(this.node.handcards2.childNodes[j]);
-					}
-				}
+		const getCardName=card=>{
+			if(card.parentNode == this.node.judges){
+				if(card.viewAs)return card.viewAs;
 			}
-			else if (arg1[i] == 's') {
-				for (j = 0; j < this.node.handcards1.childElementCount; j++) {
-					if (!this.node.handcards1.childNodes[j].classList.contains('removing') && this.node.handcards1.childNodes[j].classList.contains('glows')) {
-						cards.push(this.node.handcards1.childNodes[j]);
-					}
-				}
-				for (j = 0; j < this.node.handcards2.childElementCount; j++) {
-					if (!this.node.handcards2.childNodes[j].classList.contains('removing') && this.node.handcards2.childNodes[j].classList.contains('glows')) {
-						cards.push(this.node.handcards2.childNodes[j]);
-					}
-				}
-			}
-			else if (arg1[i] == 'e') {
-				for (j = 0; j < this.node.equips.childElementCount; j++) {
-					if (!this.node.equips.childNodes[j].classList.contains('removing') && !this.node.equips.childNodes[j].classList.contains('feichu') && !this.node.equips.childNodes[j].classList.contains('emptyequip')) {
-						cards.push(this.node.equips.childNodes[j]);
-					}
-				}
-			}
-			else if (arg1[i] == 'j') {
-				for (j = 0; j < this.node.judges.childElementCount; j++) {
-					if (!this.node.judges.childNodes[j].classList.contains('removing') && !this.node.judges.childNodes[j].classList.contains('feichu') && !this.node.judges.childNodes[j].classList.contains('emptyequip')) {
-						cards.push(this.node.judges.childNodes[j]);
-						if (this.node.judges.childNodes[j].viewAs && arguments.length > 1) {
-							this.node.judges.childNodes[j].tempJudge = this.node.judges.childNodes[j].name;
-							this.node.judges.childNodes[j].name = this.node.judges.childNodes[j].viewAs;
-							cards1.push(this.node.judges.childNodes[j]);
-						}
-					}
-				}
-			}
-			else if (arg1[i] == 'x') {
-				for (j = 0; j < this.node.expansions.childElementCount; j++) {
-					if (!this.node.expansions.childNodes[j].classList.contains('removing')) {
-						cards.push(this.node.expansions.childNodes[j]);
-					}
-				}
-			}
-		}
-		if (arguments.length == 1) {
-			return cards;
-		}
-		if (arg2) {
-			if (typeof arg2 == 'string') {
-				for (i = 0; i < cards.length; i++) {
-					if (get.name(cards[i]) != arg2) {
-						cards.splice(i, 1); i--;
-					}
-				}
-			}
-			else if (typeof arg2 == 'object') {
-				for (i = 0; i < cards.length; i++) {
-					for (j in arg2) {
+			return get.name(card);
+		};
+		let filter;
+		if(arg2){
+			if(typeof arg2 == 'string'){
+				filter = card=>(getCardName(card) == arg2);
+			}else if(typeof arg2 == 'object'){
+				filter = card=>{
+					for (let j in arg2) {
 						var value;
 						if (j == 'type' || j == 'subtype' || j == 'color' || j == 'suit' || j == 'number') {
-							value = get[j](cards[i]);
+							value = get[j](card);
+						}
+						else if(j == 'name'){
+							value = getCardName(card);
 						}
 						else {
 							value = cards[i][j];
 						}
 						if ((typeof arg2[j] == 'string' && value != arg2[j]) ||
 							(Array.isArray(arg2[j]) && !arg2[j].includes(value))) {
-							cards.splice(i--, 1); break;
+							return false;
 						}
 					}
+					return true;
+				};
+			}else if(typeof arg2 == 'function'){
+				filter = arg2;
+			}
+		}else{
+			filter = card=>true;
+		}
+		for (let i = 0; i < arg1.length; i++) {
+			if (arg1[i] == 'h') {
+				for(let card of get.iterableChildNodes(this.node.handcards1,this.node.handcards2)){
+					if(!card.classList.contains('removing') 
+					&& !card.classList.contains('glows') && filter(card)){
+						yield card;
+					}
 				}
 			}
-			else if (typeof arg2 == 'function') {
-				for (i = 0; i < cards.length; i++) {
-					if (!arg2(cards[i])) {
-						cards.splice(i--, 1);
+			else if (arg1[i] == 's') {
+				for(let card of get.iterableChildNodes(this.node.handcards1,this.node.handcards2)){
+					if (!card.classList.contains('removing') 
+					&& card.classList.contains('glows') 
+					&& filter(card)) {
+						yield card;
+					}
+				}
+			}
+			else if (arg1[i] == 'e') {
+				for(let card of get.iterableChildNodes(this.node.equips)){
+					if(!card.classList.contains('removing') 
+					&& !card.classList.contains('feichu') 
+					&& !card.classList.contains('emptyequip')
+					&& filter(card)){
+						yield card;
+					}
+				}
+			}
+			else if (arg1[i] == 'j') {
+				for(let card of get.iterableChildNodes(this.node.judges)){
+					if(!card.classList.contains('removing')
+					&& !card.classList.contains('feichu')
+					&& filter(card)){
+						yield card;
+					}
+				}
+			}
+			else if (arg1[i] == 'x') {
+				for(let card of get.iterableChildNodes(this.node.expansions)){
+					if(!card.classList.contains('removing') && filter(card)){
+						yield card;
 					}
 				}
 			}
 		}
-		for (i = 0; i < cards1.length; i++) {
-			if (cards1[i].tempJudge) {
-				cards1[i].name = cards1[i].tempJudge;
-				delete cards1[i].tempJudge;
+	}
+	/**
+	 * @param { string } [arg1='h']
+	 * @param { string | Record<string, any> | ((card: Card) => boolean) } [arg2]
+	 * @returns { Card[] }
+	 */
+	getCards(arg1, arg2) {
+		return Array.from(this.iterableGetCards(arg1,arg2));
+	}
+	*iterableGetDiscardableCards(player,arg1,arg2){
+		for(let card of this.iterableGetCards(arg1,arg2)){
+			if(lib.filter.canBeDiscarded(card,player,this)){
+				yield card;
 			}
 		}
-		return cards;
 	}
 	getDiscardableCards(player, arg1, arg2) {
-		var cards = this.getCards(arg1, arg2);
-		for (var i = 0; i < cards.length; i++) {
-			if (!lib.filter.canBeDiscarded(cards[i], player, this)) {
-				cards.splice(i--, 1);
+		return Array.from(this.iterableGetDiscardableCards(player,arg1,arg2));
+	}
+	*iterableGetGainableCards(player,arg1,arg2){
+		for(let card of this.iterableGetCards(arg1,arg2)){
+			if(lib.filter.canBeGained(card,player,this)){
+				yield card;
 			}
 		}
-		return cards;
 	}
 	getGainableCards(player, arg1, arg2) {
-		var cards = this.getCards(arg1, arg2);
-		for (var i = 0; i < cards.length; i++) {
-			if (!lib.filter.canBeGained(cards[i], player, this)) {
-				cards.splice(i--, 1);
-			}
-		}
-		return cards;
+		return Array.from(this.iterableGetGainableCards(player,arg1,arg2));
 	}
 	getGainableSkills(func) {
 		var list = [];
@@ -3330,8 +3331,32 @@ export class Player extends HTMLDivElement {
 		}
 		return list;
 	}
+	cacheCountCards(arg1){
+		let cache = CacheContext.getCacheContext();
+		if(cache){
+			return cache.delegate(this).countCards(arg1);
+		}
+		return this.countCards(arg1);
+	}
 	countCards(arg1, arg2) {
-		return this.getCards(arg1, arg2).length;
+		let count = 0;
+		for(let item of this.iterableGetCards(arg1,arg2)){
+			count++;
+		}
+		return count;
+	}
+	getCardIndex(arg1,name,card,max){
+		let count = 0;
+		for(let item of this.iterableGetCards(arg1)){
+			if(get.name(item) == name){
+				if(card == item){
+					return count;
+				}
+				count++;
+				if(count >= max)return count;
+			}
+		}
+		return -1;
 	}
 	countDiscardableCards(player, arg1, arg2) {
 		return this.getDiscardableCards(player, arg1, arg2).length;
@@ -3800,8 +3825,8 @@ export class Player extends HTMLDivElement {
 		if (next.position == undefined) {
 			next.position = 'hs';
 		}
-		if (next.ai1 == undefined) next.ai1 = get.order;
-		if (next.ai2 == undefined) next.ai2 = get.effect_use;
+		if (next.ai1 == undefined) next.ai1 = get.cacheOrder;
+		if (next.ai2 == undefined) next.ai2 = get.cacheEffectUse;
 		next.setContent('chooseToUse');
 		next._args = Array.from(arguments);
 		return next;
@@ -4710,6 +4735,9 @@ export class Player extends HTMLDivElement {
 				}
 			}
 		});
+	}
+	cacheSupportFunction(){
+		return ['hasCard','hasValueTarget','getCardIndex','countCards','getSkills','getUseValue','canUse'];
 	}
 	moveCard() {
 		var next = game.createEvent('moveCard');
@@ -6888,9 +6916,13 @@ export class Player extends HTMLDivElement {
 		game.checkMod(card, player, range, 'selectTarget', player);
 		if (!range) return 0;
 
+		let cache = CacheContext.getCacheContext();
+		if(!cache){
+			cache = new CacheContext();
+		}
 		for (var i = 0; i < targets.length; i++) {
-			if (player.canUse(card, targets[i], distance, includecard)) {
-				var eff = get.effect(targets[i], card, player, player);
+			if (cache.delegate(player).canUse(card, targets[i], distance, includecard)) {
+				var eff = cache.get.effect(targets[i], card, player, player);
 				value.push(eff);
 			}
 		}
@@ -8297,6 +8329,10 @@ export class Player extends HTMLDivElement {
 		return false;
 	}
 	hasSkillTag(tag, hidden, arg, globalskill) {
+		let cache = CacheContext.getCacheContext();
+		if(!cache){
+			cache = new CacheContext();
+		}
 		var skills = this.getSkills(hidden);
 		if (globalskill) {
 			skills.addArray(lib.skill.global);
@@ -8306,7 +8342,7 @@ export class Player extends HTMLDivElement {
 			var info = lib.skill[skills[i]];
 			if (info && info.ai) {
 				if (info.ai.skillTagFilter && info.ai[tag] &&
-					info.ai.skillTagFilter(this, tag, arg) === false) continue;
+					info.ai.skillTagFilter(cache.delegate(this), tag, arg) === false) continue;
 				if (typeof info.ai[tag] == 'string') {
 					if (info.ai[tag] == arg) return true;
 				}
@@ -8494,9 +8530,8 @@ export class Player extends HTMLDivElement {
 	}
 	hasCard(name, position) {
 		if (typeof name == 'function') {
-			var hs = this.getCards(position);
-			for (var i = 0; i < hs.length; i++) {
-				if (name(hs[i])) return true;
+			for(let card of this.iterableGetCards(position,name)){
+				return true;
 			}
 		}
 		else {
@@ -9481,7 +9516,7 @@ export class Player extends HTMLDivElement {
 			})){
 				const card = game.createCard('empty_equip' + i,'', '');
 				card.fix();
-				console.log('add '+card.name);
+				//console.log('add '+card.name);
 				card.style.transform = '';
 				card.classList.remove('drawinghidden');
 				card.classList.add('emptyequip');

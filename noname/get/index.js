@@ -5,6 +5,7 @@ import { Library as lib } from '../library/index.js';
 import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 import { GNC as gnc } from '../gnc/index.js';
+import { CacheContext } from "../library/cache/cacheContext.js";
 
 import { Is } from "./is.js";
 
@@ -2263,6 +2264,25 @@ export class Get extends Uninstantable {
 		return result;
 	}
 	/**
+	 * 遍历子元素
+	 * @param {HTMLElement} node 
+	 * @returns {Iterable<HTMLElement>} 迭代器
+	 */
+	static *iterableChildNodes(node){
+		for(let i=0;i<arguments.length;i++){
+			let arg = arguments[i];
+			if(arg._childNodesWatcher){
+				for(let child of arg._childNodesWatcher.childNodes){
+					yield child;
+				}
+			}else{
+				for(let j=0;j<arg.childElementCount;j++){
+					yield arg.childNodes[j];
+				}
+			}
+		}
+	}
+	/**
 	 * @param {((a: Button, b: Button) => number)} [sort] 排序函数
 	 * @returns { Button[] }
 	 */
@@ -2495,8 +2515,22 @@ export class Get extends Uninstantable {
 		return num;
 	}
 	static owner(card, method) {
-		return game.players.concat(game.dead).find(current =>
-			current.getCards("hejsx").includes(card) || (current.judging[0] == card && method != "judge"));
+		return game.players.concat(game.dead).find(current=>{
+			if(current.judging[0] == card && method != "judge")return true;
+			let parent = card.parentNode;
+			if(parent == current.node.handcards1 || parent == current.node.handcards2){
+				return !card.classList.contains('removing');
+			}else if(parent == current.node.equips){
+				return !card.classListContains('removing','feichu','emptyequip');
+			}else if(parent == current.node.judges){
+				return !card.classListContains('removing','feichu');
+			}else if(parent == current.node.expansions){
+				return !card.classListContains('removing');
+			}
+			return false;
+		});
+		//return game.players.concat(game.dead).find(current =>
+		//	current.getCards("hejsx").includes(card) || (current.judging[0] == card && method != "judge"));
 	}
 	static noSelected() { return ui.selected.buttons.length + ui.selected.cards.length + ui.selected.targets.length == 0; }
 	static population(identity) {
@@ -4060,13 +4094,10 @@ export class Get extends Uninstantable {
 		if (aii && aii.value) value = aii.value;
 		else if (aii && aii.basic) value = aii.basic.value;
 		if (player == undefined || get.itemtype(player) != 'player') player = _status.event.player;
+		let cache = CacheContext.requireCacheContext();
+		player = cache.delegate(player);
 		var geti = function () {
-			var num = 0, i;
-			var cards = player.getCards('hs', card.name);
-			if (cards.includes(card)) {
-				return cards.indexOf(card);
-			}
-			return cards.length;
+			return player.getCardIndex('hs',card.name,card,5);
 		};
 		if (typeof value == 'function') {
 			result = value(card, player, geti(), method);
@@ -4138,7 +4169,15 @@ export class Get extends Uninstantable {
 		}
 		return 1;
 	}
+	static cacheOrder(item){
+		let cache = CacheContext.getCacheContext();
+		if(cache){
+			return cache.get.order(item);
+		}
+		return get.order(item);
+	}
 	static order(item) {
+		let cache = CacheContext.requireCacheContext();
 		var info = get.info(item);
 		if (!info) return -1;
 		var aii = info.ai;
@@ -4148,10 +4187,10 @@ export class Get extends Uninstantable {
 		if (order == undefined) return -1;
 		var num = order;
 		if (typeof (order) == 'function') {
-			num = order(item, _status.event.player);
+			num = order(item, cache.delegate(_status.event.player));
 		}
 		if (typeof item == 'object' && _status.event.player) {
-			var player = _status.event.player;
+			var player = cache.delegate(_status.event.player);
 			num = game.checkMod(player, item, num, 'aiOrder', player);
 		}
 		return num;
@@ -4172,6 +4211,13 @@ export class Get extends Uninstantable {
 			}
 		}
 		return result;
+	}
+	static cacheEffectUse(target, card, player, player2, isLink){
+		let cache = CacheContext.getCacheContext();
+		if(cache){
+			return cache.get.effect_use(target,card,player,player2,isLink);
+		}
+		return get.effect_use(target,card,player,player2,isLink);
 	}
 	static effect_use(target, card, player, player2, isLink) {
 		var event = _status.event;
@@ -4326,20 +4372,21 @@ export class Get extends Uninstantable {
 				}
 				if (target.hp == 1) result2 *= 2.5;
 				if (target.hp == 2) result2 *= 1.8;
-				if (target.countCards('h') == 0) {
+				let countTargetCards = target.cacheCountCards('h');
+				if (countTargetCards == 0) {
 					if (get.tag(card, 'respondSha') || get.tag(card, 'respondShan')) {
 						result2 *= 1.7;
 					}
 					else {
 						result2 *= 1.5;
 					}
-				}
-				if (target.countCards('h') == 1) result2 *= 1.3;
-				if (target.countCards('h') == 2) result2 *= 1.1;
-				if (target.countCards('h') > 3) result2 *= 0.5;
+				}else if (countTargetCards == 1) result2 *= 1.3;
+				else if (countTargetCards == 2) result2 *= 1.1;
+				else if (countTargetCards >= 3) result2 *= 0.5;
+
 				if (target.hp == 4) result2 *= 0.9;
-				if (target.hp == 5) result2 *= 0.8;
-				if (target.hp > 5) result2 *= 0.6;
+				else if (target.hp == 5) result2 *= 0.8;
+				else if (target.hp > 5) result2 *= 0.6;
 			}
 		}
 		else {
@@ -4367,6 +4414,13 @@ export class Get extends Uninstantable {
 			}
 		}
 		return final;
+	}
+	static cacheEffect(target, card, player, player2, isLink){
+		let cache = CacheContext.getCacheContext();
+		if(cache){
+			return cache.get.effect(target,card,player,player2,isLink);
+		}
+		return get.effect(target,card,player,player2,isLink);
 	}
 	static effect(target, card, player, player2, isLink) {
 		var event = _status.event;
@@ -4500,7 +4554,8 @@ export class Get extends Uninstantable {
 				// *** continue here ***
 				if (target.hp == 1) result2 *= 2.5;
 				if (target.hp == 2) result2 *= 1.8;
-				if (target.countCards('h') == 0) {
+				let targetCountCards = target.cacheCountCards('h');
+				if (targetCountCards == 0) {
 					if (get.tag(card, 'respondSha') || get.tag(card, 'respondShan')) {
 						result2 *= 1.7;
 					}
@@ -4508,12 +4563,12 @@ export class Get extends Uninstantable {
 						result2 *= 1.5;
 					}
 				}
-				if (target.countCards('h') == 1) result2 *= 1.3;
-				if (target.countCards('h') == 2) result2 *= 1.1;
-				if (target.countCards('h') > 3) result2 *= 0.5;
+				if (targetCountCards == 1) result2 *= 1.3;
+				else if (targetCountCards == 2) result2 *= 1.1;
+				else if (targetCountCards > 3) result2 *= 0.5;
 				if (target.hp == 4) result2 *= 0.9;
-				if (target.hp == 5) result2 *= 0.8;
-				if (target.hp > 5) result2 *= 0.6;
+				else if (target.hp == 5) result2 *= 0.8;
+				else if (target.hp > 5) result2 *= 0.6;
 			}
 		}
 		else {
