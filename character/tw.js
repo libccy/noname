@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				tw_yunchouyong:['tw_zongyu','tw_chendong','tw_sunyi'],
 				tw_yunchouyan:['tw_jiangqing'],
 				tw_zhu:['tw_beimihu','tw_ol_sunjian','ol_liuyu','tw_menghuo'],
-				tw_swordsman:['xia_liubei','xia_xiahousone','xia_xiahoudun','xia_zhangwei','xia_xushu','xia_wangyue','xia_liyàn','xia_tongyuan','xia_lusu','xia_dianwei','xia_zhaoe','xia_xiahouzie'],
+				tw_swordsman:['xia_shitao','xia_guanyu','xia_liubei','xia_xiahousone','xia_xiahoudun','xia_zhangwei','xia_xushu','xia_wangyue','xia_liyàn','xia_tongyuan','xia_lusu','xia_dianwei','xia_zhaoe','xia_xiahouzie'],
 				tw_mobile:['nashime','tw_gexuan','tw_zhugeguo'],
 				tw_mobile2:['tw_chengpu','tw_guohuai','old_quancong','tw_caoxiu','tw_guanqiujian','tw_re_fazheng','tw_madai','tw_zhangfei','tw_guyong','tw_handang','tw_xuezong','tw_yl_luzhi'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			xia_shitao:['male','qun',4,['twjieqiu','twenchou']],
 			xia_guanyu:['male','qun',4,['twzhongyi','twchue']],
 			xia_liubei:['male','shu',4,['twshenyi','twxinghan']],
 			xia_xiahousone:['female','qun',3,['twchengxi']],
@@ -128,6 +129,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			shitao:'石韬，字广元，即石广元，颍川（今河南禹州）人，仕魏，官拜典农校尉、郡守。初平年间，石韬与徐庶一同来到荆州，在荆州时与诸葛亮和庞统等人相善。与崔州平（名钧）、孟公威（名建）、徐元直（名庶）为“诸葛四友”。',
 			xiahousone:'夏侯子萼，游卡桌游《三国杀阵面对决》中虚构的人物。在《阵面对决》中，设定为在貂蝉不在时血婆娑的实际首领。在海外服中，设定为夏侯惇的养女，继承了夏侯紫萼的血婆娑，之后“夏侯紫萼”这个名字就被隐匿于历史之中，而“夏侯子萼”则成为了血婆娑的首领“血蔷薇”的固定名号。',
 			zhangwei:'张葳，游卡桌游《三国杀阵面对决》中虚构的人物。在《阵面对决》中，设定为被夏侯子萼救下后加入的血婆娑成员。在海外服中，设定为张奂的养女，张奂为宦官迫害时与其失散，为神秘女子所救并学得武艺，后与夏侯紫萼一起建立血婆娑。在李儒分成时为了保护百姓而牺牲。',
 			nashime:'难升米（なしめ，或なんしょうまい）是倭国大夫。景初二年六月，受女王卑弥呼之命，与都市牛利出使魏国，被魏国拜为率善中郎将。',
@@ -285,6 +287,107 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//石韬
+			twjieqiu:{
+				audio:2,
+				enable:'phaseUse',
+				filter(event,player){
+					return game.hasPlayer(target=>lib.skill.twjieqiu.filterTarget(null,player,target));
+				},
+				filterTarget(card,player,target){
+					return target!=player&&!target.hasDisabledSlot();
+				},
+				usable:1,
+				async content(event,trigger,player){
+					const target=event.target,num=target.countCards('e');
+					let disables=[];
+					for(let i=1;i<=5;i++){
+						for(let j=0;j<target.countEnabledSlot(i);j++){
+							disables.push(i);
+						}
+					}
+					target.disableEquip(disables);
+					if(num) target.draw(num);
+					target.when('phaseDiscardEnd')
+					.then(()=>{
+						const num=trigger.cards.length;
+						if(!num||!player.hasDisabledSlot()) return;
+						let list=[];
+						for(let i=1;i<6;i++){
+							if(player.hasDisabledSlot(i)){
+								for(let j=0;j<player.countDisabledSlot(i);j++){
+									list.push('equip'+i);
+								}
+							}
+						}
+						event.list=list;
+						const transList=list.map(i=>get.translation(i));
+						player.chooseButton([
+							'劫囚：请选择你要恢复的装备栏',
+							[transList,'tdnodes'],
+						],num,true).set('ai',button=>['equip5','equip4','equip1','equip3','equip2'].indexOf(button.link)+2);
+					})
+					.then(()=>{
+						if(result.bool){
+							let map={};
+							for(let i of event.list){
+								if(!map[get.translation(i)]) map[get.translation(i)]=i;
+							}
+							player.enableEquip(result.links.slice().map(i=>map[i]));
+						}
+					});
+					target.when('phaseEnd')
+					.then(()=>{
+						if(player.hasDisabledSlot()&&target.isIn()&&!target.hasSkill('twjieqiu_used')){
+							target.popup('劫囚');
+							target.addTempSkill('twjieqiu_used','roundStart');
+							target.insertPhase();
+						}
+					}).vars({target:player});
+				},
+				ai:{
+					order:7,
+					result:{
+						target(player,target){
+							return -target.countCards('e')-(get.attitude(player,target)<0?1:0);
+						},
+					},
+				},
+				subSkill:{used:{charlotte:true}},
+			},
+			twenchou:{
+				audio:2,
+				enable:'phaseUse',
+				filter:function(event,player){
+					return game.hasPlayer(current=>lib.skill.twenchou.filterTarget(null,player,current));
+				},
+				position:'he',
+				filterTarget:function(card,player,target){
+					return target!=player&&target.countCards('h')&&target.hasDisabledSlot();
+				},
+				usable:1,
+				async content(event,trigger,player){
+					const target=event.target;
+					await player.gainPlayerCard(target,'h',true,'visible');
+					let list=[],map={};
+					for(let i=1;i<6;i++){
+						map[get.translation('equip'+i)]=('equip'+i);
+						if(target.hasDisabledSlot(i)){
+							list.push('equip'+i);
+						}
+					}
+					const transList=list.map(i=>get.translation(i));
+					const {result:{bool,links}}=await player.chooseButton([
+						'恩仇：请选择'+get.translation(target)+'要恢复的装备栏',
+						[transList,'tdnodes'],
+					],true).set('ai',button=>1/(['equip5','equip4','equip1','equip3','equip2'].indexOf(button.link)+2));
+					if(bool) target.enableEquip(links.slice().map(i=>map[i]));
+				},
+				ai:{
+					order:9,
+					result:{target:-1},
+				},
+			},
 			//侠关羽
 			twzhongyi:{
 				mod:{
@@ -15380,6 +15483,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twzhongyi_info:'锁定技。①你使用【杀】无距离限制。②当你使用【杀】结算完毕后，你选择一项：⒈摸X张牌；⒉回复X点体力；⒊背水：失去Y点体力，依次执行以上两项（X为此牌造成的伤害值，Y为你本局游戏此前选择此项的次数+1）。',
 			twchue:'除恶',
 			twchue_info:'①当你使用【杀】指定唯一目标时，你可以失去1点体力，为此牌额外指定Z个目标。②当你受到伤害或失去体力后，你摸一张牌并获得1个“勇”标记。③回合结束时，若你本回合发动过〖除恶②〗，则你可以失去Z个“勇”标记，视为使用一张伤害+1且可以额外指定Z个目标的【杀】。（Z为你的体力值）',
+			xia_shitao:'石韬',
+			twjieqiu:'劫囚',
+			twjieqiu_info:'出牌阶段限一次，你可以选择一名装备区没有废除栏的其他角色，废除其所有装备栏，然后其摸X张牌（X为其废除装备栏前的装备区牌数）。其下个弃牌阶段结束时，其恢复等同于其弃置牌数的装备栏；其下个回合结束时，若其仍有已废除的装备栏，则你执行一个额外回合（每轮限一次）。',
+			twenchou:'恩仇',
+			twenchou_info:'出牌阶段限一次，你可以观看一名存在废除装备栏的其他角色的手牌并获得其中一张牌，然后你恢复其一个装备栏。',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',

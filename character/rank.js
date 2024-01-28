@@ -134,6 +134,7 @@ window.noname_character_rank={
 		'sb_caopi',
 	],
 	a:[
+		'xia_shitao',
 		'diy_zaozhirenjun',
 		'gjqt_fanglansheng',
 		'gjqt_fengqingxue',
@@ -2114,6 +2115,7 @@ window.noname_character_rank={
 			'ol_jianyong',
 			'ol_sb_jiangwei',
 			'dc_sb_zhouyu',
+			'xia_shitao',
 		],
 		rare:[
 			'clan_wuqiao',
