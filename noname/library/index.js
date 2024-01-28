@@ -307,22 +307,22 @@ export class Library extends Uninstantable {
 
 	/**
 	 * **无名杀频道推送机制**
-	 * 
+	 *
 	 * 鉴于`Javascript`的特性及自身对所需功能的思考，这是一个参考`Golang`的`channel`设计的、完全和`go channel`不一样的异步消息传递对象
-	 * 
+	 *
 	 * 当且仅当接收方和发送方均存在时进行消息传递，完全保证信息传递的单一性（发送方/接收方一旦确定则无法更改）和准确性（发送方必然将消息发送给接收方）
-	 * 
+	 *
 	 * 若存在发送方/接收方时调用`send`/`receive`，将报错
-	 * 
+	 *
 	 * 若需要异步/不报错发送信息，请等待`lib.actor`
-	 * 
+	 *
 	 * @example
 	 * // 创建一个频道
 	 * const channel = new lib.channel();
-	 * 
+	 *
 	 * // 从某个角落接收channel发出的消息，若无消息则等待
 	 * const message = await channel.receive();
-	 * 
+	 *
 	 * // 从某个角落向channel发消息，若无消息接收则等待
 	 * await channel.send(item);
 	 */
@@ -330,12 +330,12 @@ export class Library extends Uninstantable {
 
 	/**
 	 * **无名杀消息推送库**
-	 * 
+	 *
 	 * 通过`EventTarget`机制，实现消息推送和接收的解耦，
 	 * 从而使消息接收方无需依赖发布方，发布方也无需考虑接收方
-	 * 
+	 *
 	 * > `lib.announce`不是`actor`模型，若不存在订阅者，则消息发送将无意义
-	 * 
+	 *
 	 * @example
 	 * // 甲扩展（如《千幻聆音》）在角色皮肤切换后，调用：
 	 * lib.announce.publish("skinChange", {
@@ -344,12 +344,12 @@ export class Library extends Uninstantable {
 	 * 	originSkin: "image/xxx.jpg",
 	 * 	currentSkin: "image/yyy.jpg"
 	 * });
-	 * 
+	 *
 	 * // 乙扩展监听此`skinChange`事件，并修改自己扩展相关界面的图片：
 	 * const method = lib.announce.subscribe("skinChange", (e) => {
 	 * 	div.setBackgroundImage(e.currentSkin);
 	 * });
-	 * 
+	 *
 	 * // 若此时乙扩展不想继续订阅`skinChange`事件，可以通过`unsubscribe`解除订阅
 	 * lib.announce.unsubscribe("skinChange", method);
 	 */
@@ -389,7 +389,7 @@ export class Library extends Uninstantable {
 	};
 	/**
 	 * Yingbian
-	 * 
+	 *
 	 * 应变
 	 */
 	static yingbian = {
@@ -565,7 +565,7 @@ export class Library extends Uninstantable {
 	};
 	/**
 	 * Stratagem buff
-	 * 
+	 *
 	 * 谋攻强化
 	 */
 	static stratagemBuff = {
@@ -655,7 +655,7 @@ export class Library extends Uninstantable {
 	};
 	/**
 	 * The actual card name
-	 * 
+	 *
 	 * 实际的卡牌名称
 	 */
 	static actualCardName = new Map([
@@ -3056,11 +3056,11 @@ export class Library extends Uninstantable {
 						lib.init.cssstyles();
 					}
 				},
-				equip_span:{
+				equip_span: {
 					name: '装备牌占位',
-					intro:'打开后，没有装备的装备区将在装备栏占据空白位置。',
+					intro: '打开后，没有装备的装备区将在装备栏占据空白位置。',
 					init: false,
-					unfrequent:false,
+					unfrequent: false,
 				},
 				fold_card: {
 					name: '折叠手牌',
@@ -8312,7 +8312,7 @@ export class Library extends Uninstantable {
 	static cheat = {
 		/**
 		 * 将游戏内部的对象暴露到全局中
-		 * 
+		 *
 		 * lib.cheat, game, ui, get, ai, lib, _status
 		 */
 		i() {
@@ -8339,15 +8339,15 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 在控制台输出每个扩展文件夹内的所有文件
-		 * 
+		 *
 		 * 需要node环境
-		 * 
+		 *
 		 * @param  { ...string } args 只需要显示的文件夹首字符
 		 */
 		x(...args) {
 			/**
-			 * @param { string } dir 
-			 * @param { (folders: string[], files: string[]) => any } callback 
+			 * @param { string } dir
+			 * @param { (folders: string[], files: string[]) => any } callback
 			 */
 			const gl = function (dir, callback) {
 				const files = [], folders = [];
@@ -8494,10 +8494,10 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 将卡牌的样式在simple和default之间切换
-		 * 
+		 *
 		 * 有参数时改为获得指定的牌
-		 * 
-		 * @param { ...string } args 
+		 *
+		 * @param { ...string } args
 		 */
 		q(...args) {
 			// if(lib.config.layout!='mobile') lib.init.layout('mobile');
@@ -8753,7 +8753,7 @@ export class Library extends Uninstantable {
 		/**
 		 * 炉石模式可用，使用`spell_${name}`卡牌
 		 * @param { string } [name]
-		 * @param { boolean } [act] 
+		 * @param { boolean } [act]
 		 */
 		gs(name = 'yexinglanghun', act) {
 			const card = game.createCard('spell_' + name);
@@ -8770,7 +8770,7 @@ export class Library extends Uninstantable {
 		/**
 		 * 炉石模式可用，获得`stone_${name}_stonecharacter`卡牌
 		 * @param { string } [name]
-		 * @param { boolean } [act] 
+		 * @param { boolean } [act]
 		 */
 		gc(name = 'falifulong', act) {
 			var card = game.createCard('stone_' + name + '_stonecharacter');
@@ -8786,7 +8786,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 进入/关闭快速自动测试模式(游戏速度最快)，只有游戏记录界面
-		 * @param { boolean | string } [bool] 
+		 * @param { boolean | string } [bool]
 		 */
 		a(bool) {
 			if (lib.config.test_game) {
@@ -8809,7 +8809,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 临时去掉“自动测试模式”带来的css效果，
-		 * 
+		 *
 		 * 如果要彻底关闭，需要再执行一次lib.cheat.a
 		 */
 		as() {
@@ -8828,8 +8828,8 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 下家对你使用一张牌
-		 * @param  {...Player | Player[] | string | VCard } args 
-		 * 
+		 * @param  {...Player | Player[] | string | VCard } args
+		 *
 		 * @example
 		 * ```js
 		 * // 传入player是卡牌的使用者
@@ -8912,14 +8912,14 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 打印目标玩家的手牌
-		 * @param { Player } player 
+		 * @param { Player } player
 		 */
 		h(player) {
 			console.log(get.translation(player.getCards('h')));
 		},
 		/**
 		 * 给自己立刻添加手牌
-		 * 
+		 *
 		 * @example
 		 * ```js
 		 * // 获得3张杀和1张闪
@@ -8940,10 +8940,10 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 立即获得指定类型的牌各一张
-		 * 
+		 *
 		 * 会添加到不属于当前模式的牌和某些角色专属牌
-		 * 
-		 * @param { string } type 
+		 *
+		 * @param { string } type
 		 */
 		ga(type) {
 			for (let i in lib.card) {
@@ -8954,7 +8954,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 *  给所有玩家立刻添加一张或多张指定的牌
-		 * @param  {...string} args 
+		 * @param  {...string} args
 		 * @example
 		 * ```js
 		 * // 给所有玩家立刻添加一张杀和一张闪
@@ -8970,7 +8970,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 给目标立即添加一张手牌
-		 * @param { string } name 
+		 * @param { string } name
 		 * @param { Player } target
 		 */
 		gx(name, target = game.me) {
@@ -8986,10 +8986,10 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 创建卡牌
-		 * 
+		 *
 		 * 如果lib.card里没有对应卡牌名返回null
-		 * 
-		 * @param { string } name 
+		 *
+		 * @param { string } name
 		 * @returns { Card }
 		 * @example
 		 * ```js
@@ -9041,7 +9041,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 指定的玩家或自己立即获得诸葛连弩，青龙刀，八卦阵，的卢，赤兔，木牛
-		 * @param { Player } [target] 
+		 * @param { Player } [target]
 		 */
 		ge(target) {
 			if (target) {
@@ -9084,8 +9084,8 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 自己立刻获取牌堆顶num张牌
-		 * @param { number } [num] 
-		 * @param { Player } [target] 
+		 * @param { number } [num]
+		 * @param { Player } [target]
 		 */
 		d(num = 1, target) {
 			const cards = get.cards(num);
@@ -9115,10 +9115,10 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 弃置指定位置玩家的所有牌
-		 * 
+		 *
 		 * 不传入num默认为弃置所有玩家的所有牌
-		 * 
-		 * @param { number | Player } [num] 
+		 *
+		 * @param { number | Player } [num]
 		 */
 		t(num) {
 			if (game.players.includes(num)) {
@@ -9161,7 +9161,7 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * 重新设置当前的主公的武将牌，且血量上限+1(不论当局人数是否大于3)
-		 * @param { string } name 
+		 * @param { string } name
 		 */
 		z(name) {
 			switch (name) {
@@ -9640,21 +9640,21 @@ export class Library extends Uninstantable {
 		none: () => false,
 		/**
 		 * Check if the card does not count toward the player's hand limit
-		 * 
+		 *
 		 * 检测此牌是否不计入此角色的手牌上限
 		 * @param { Card } card
-		 * @param { Player } player 
+		 * @param { Player } player
 		 * @returns { boolean }
 		 */
 		ignoredHandcard: (card, player) => game.checkMod(card, player, false, 'ignoredHandcard', player),
 		/**
 		 * Check if the card is giftable
-		 * 
+		 *
 		 * 检测此牌是否可赠予
-		 * @param { Card } card 
-		 * @param { Player } player 
-		 * @param { Player } target 
-		 * @param { boolean } [strict] 
+		 * @param { Card } card
+		 * @param { Player } player
+		 * @param { Player } target
+		 * @param { boolean } [strict]
 		 */
 		cardGiftable: (card, player, target, strict) => {
 			const mod = game.checkMod(card, player, target, 'unchanged', 'cardGiftable', player);
@@ -9663,12 +9663,12 @@ export class Library extends Uninstantable {
 		},
 		/**
 		 * Check if the card is recastable
-		 * 
+		 *
 		 * 检查此牌是否可重铸
-		 * @param { Card } card 
-		 * @param { Player } player 
-		 * @param { Player } [source] 
-		 * @param { boolean } [strict] 
+		 * @param { Card } card
+		 * @param { Player } player
+		 * @param { Player } [source]
+		 * @param { boolean } [strict]
 		 */
 		cardRecastable: (card, player = get.owner(card), source, strict) => {
 			// if (typeof player == 'undefined') player = get.owner(card);
@@ -9711,11 +9711,11 @@ export class Library extends Uninstantable {
 			return savable;
 		},
 		/**
-		 * 
-		 * @param {GameEvent} event 
-		 * @param {Player} player 
-		 * @param {string} triggername 
-		 * @param {string} skill 
+		 *
+		 * @param {GameEvent} event
+		 * @param {Player} player
+		 * @param {string} triggername
+		 * @param {string} skill
 		 * @returns {boolean}
 		 */
 		filterTrigger: function (event, player, triggername, skill) {
@@ -9748,11 +9748,11 @@ export class Library extends Uninstantable {
 			if (info.round && (info.round - (game.roundNumber - player.storage[skill + '_roundcount']) > 0)) return false;
 			for (const item in player.storage) {
 				if (item.startsWith('temp_ban_')) {
-					if(player.storage[item] !== true) continue;
+					if (player.storage[item] !== true) continue;
 					const skillName = item.slice(9);
 					if (lib.skill[skillName]) {
-						const skills=game.expandSkills([skillName]);
-						if(skills.includes(skill)) return false;
+						const skills = game.expandSkills([skillName]);
+						if (skills.includes(skill)) return false;
 					}
 				}
 			}
@@ -10325,7 +10325,9 @@ export class Library extends Uninstantable {
 						if (game.hasPlayer(current => {
 							if (!player.canUse(card, current)) return false;
 							const storage = player.storage, zhibi = storage.zhibi;
-							return (zhibi && !zhibi.includes(current) || get.effect(current, card, player, player) >= 2 - Math.max(0, (storage.stratagem_fury || 0) - 1)) && current.mayHaveShan(player, 'use') && player.hasSkill('jiu');
+							return (zhibi && !zhibi.includes(current) || get.effect(current, card, player, player) >= 2 - Math.max(0, (storage.stratagem_fury || 0) - 1)) && current.mayHaveShan(player, 'use', current.getCards(i => {
+								return i.hasGaintag('sha_notshan');
+							})) && player.hasSkill('jiu');
 						})) return 1;
 						return 0;
 					}
@@ -10396,7 +10398,9 @@ export class Library extends Uninstantable {
 							if (game.hasPlayer(current => {
 								if (!player.canUse(card, current)) return false;
 								const storage = player.storage, zhibi = storage.zhibi;
-								return (zhibi && !zhibi.includes(current) || (get.effect(current, card, player, player) >= 2 - Math.max(0, (storage.stratagem_fury || 0) - 1))) && current.mayHaveShan(player, 'use');
+								return (zhibi && !zhibi.includes(current) || (get.effect(current, card, player, player) >= 2 - Math.max(0, (storage.stratagem_fury || 0) - 1))) && current.mayHaveShan(player, 'use', current.getCards(i => {
+									return i.hasGaintag('sha_notshan');
+								}));
 							})) return get.order(card, player) + 0.5;
 						}
 						else if (cardName == 'tao' && player.hp <= 2 && player.getDamagedHp() >= 2) return get.order(card, player) + 0.5;
@@ -11283,7 +11287,7 @@ export class Library extends Uninstantable {
 			charlotte: true,
 			priority: -100,
 			lastDo: true,
-			silent:true,
+			silent: true,
 			content: function () {
 				player.removeSkill('counttrigger');
 				delete player.storage.counttrigger;
@@ -11309,7 +11313,7 @@ export class Library extends Uninstantable {
 			priority: 100,
 			firstDo: true,
 			popup: false,
-			silent:true,
+			silent: true,
 			filter: function (event, player) {
 				return player.hp >= player.maxHp;
 			},
@@ -11398,7 +11402,7 @@ export class Library extends Uninstantable {
 			popup: false,
 			priority: -100,
 			lastDo: true,
-			silent:true,
+			silent: true,
 			filter: function (event) {
 				return !event._cleared && event.card.name != 'wuxie';
 			},
@@ -11415,7 +11419,7 @@ export class Library extends Uninstantable {
 			popup: false,
 			priority: -100,
 			lastDo: true,
-			silent:true,
+			silent: true,
 			filter: function (event) {
 				return ui.todiscard[event.discardid] ? true : false;
 			},
@@ -11445,7 +11449,7 @@ export class Library extends Uninstantable {
 			priority: 5,
 			forced: true,
 			popup: false,
-			silent:true,
+			silent: true,
 			filter: function (event, player) {
 				//if(!event.player.isDying()) return false;
 				//if(event.source&&event.source.isIn()&&event.source!=player) return false;
@@ -11599,7 +11603,7 @@ export class Library extends Uninstantable {
 			popup: false,
 			logv: false,
 			forceDie: true,
-			silent:true,
+			silent: true,
 			//priority:-5,
 			content: function () {
 				"step 0";
@@ -11628,7 +11632,7 @@ export class Library extends Uninstantable {
 			forced: true,
 			popup: false,
 			forceDie: true,
-			silent:true,
+			silent: true,
 			filter: function (event, player) {
 				var evt = event.getParent();
 				return evt && evt.name == 'damage' && evt.hasNature('linked') && player.isLinked();
