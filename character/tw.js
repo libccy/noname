@@ -12,7 +12,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				tw_yunchouyong:['tw_zongyu','tw_chendong','tw_sunyi'],
 				tw_yunchouyan:['tw_jiangqing'],
 				tw_zhu:['tw_beimihu','tw_ol_sunjian','ol_liuyu','tw_menghuo'],
-				tw_swordsman:['xia_shitao','xia_guanyu','xia_liubei','xia_xiahousone','xia_xiahoudun','xia_zhangwei','xia_xushu','xia_wangyue','xia_liyàn','xia_tongyuan','xia_lusu','xia_dianwei','xia_zhaoe','xia_xiahouzie'],
+				tw_swordsman:['xia_shie','xia_shitao','xia_guanyu','xia_liubei','xia_xiahousone','xia_xiahoudun','xia_zhangwei','xia_xushu','xia_wangyue','xia_liyàn','xia_tongyuan','xia_lusu','xia_dianwei','xia_zhaoe','xia_xiahouzie'],
 				tw_mobile:['nashime','tw_gexuan','tw_zhugeguo'],
 				tw_mobile2:['tw_chengpu','tw_guohuai','old_quancong','tw_caoxiu','tw_guanqiujian','tw_re_fazheng','tw_madai','tw_zhangfei','tw_guyong','tw_handang','tw_xuezong','tw_yl_luzhi'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			xia_shie:['male','wei',4,['twdengjian','twxinshou']],
 			xia_shitao:['male','qun',4,['twjieqiu','twenchou']],
 			xia_guanyu:['male','qun',4,['twzhongyi','twchue']],
 			xia_liubei:['male','shu',4,['twshenyi','twxinghan']],
@@ -129,6 +130,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kaisa:["male","western",4,["zhengfu"]],
 		},
 		characterIntro:{
+			shie:'三国人物，善剑术。桓、灵间，有虎贲王越以剑术称于京师，阿得其法。魏帝曹丕曾从阿学剑术。曹丕在《典论·自叙》中说：“余又学击剑，阅师多矣，四方之法各异，唯京师为善。桓、灵之间，有虎贲王越善斯术，称於京师。河南史阿言昔与越游，具得其法，余从阿学精熟。尝与平虏将军刘勋、奋威将军邓展等共饮，宿闻展善有手臂，晓五兵，又称其能空手入白刃。余与论剑良久，谓将军非法也，余顾尝好之，又得善术，因求与余对。',
 			shitao:'石韬，字广元，即石广元，颍川（今河南禹州）人，仕魏，官拜典农校尉、郡守。初平年间，石韬与徐庶一同来到荆州，在荆州时与诸葛亮和庞统等人相善。与崔州平（名钧）、孟公威（名建）、徐元直（名庶）为“诸葛四友”。',
 			xiahousone:'夏侯子萼，游卡桌游《三国杀阵面对决》中虚构的人物。在《阵面对决》中，设定为在貂蝉不在时血婆娑的实际首领。在海外服中，设定为夏侯惇的养女，继承了夏侯紫萼的血婆娑，之后“夏侯紫萼”这个名字就被隐匿于历史之中，而“夏侯子萼”则成为了血婆娑的首领“血蔷薇”的固定名号。',
 			zhangwei:'张葳，游卡桌游《三国杀阵面对决》中虚构的人物。在《阵面对决》中，设定为被夏侯子萼救下后加入的血婆娑成员。在海外服中，设定为张奂的养女，张奂为宦官迫害时与其失散，为神秘女子所救并学得武艺，后与夏侯紫萼一起建立血婆娑。在李儒分成时为了保护百姓而牺牲。',
@@ -287,6 +289,184 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//史阿
+			twdengjian:{
+				audio:2,
+				trigger:{global:'phaseDiscardEnd'},
+				filter(event,player){
+					if(player.hasSkill('twdengjian_ban')) return false;
+					return event.player!=player&&lib.skill.twdengjian.getCards(player,event.player).length;
+				},
+				getCards(player,target){
+					let cards=target.getHistory('useCard',evt=>{
+						return evt.cards&&evt.cards.filterInD('d').some(card=>get.name(card,false)=='sha')&&target.getHistory('sourceDamage',evtx=>{
+							return evtx.card&&evtx.card==evt.card;
+						}).length;
+					}).reduce((list,evt)=>list.addArray(evt.cards.filterInD('d').filter(card=>get.name(card,false)=='sha')),[]);
+					if(cards.length){
+						const history=player.actionHistory;
+						for(let i=history.length-1;i>=0;i--){
+							for(let evt of history[i].gain){
+								if(evt.getParent().name=='twdengjian'){
+									const card=evt.cards[0];
+									cards=cards.filter(cardx=>get.color(cardx)!=get.color(card));
+									if(!cards.length) break;
+								}
+							}
+							if(history[i].isRound) break;
+						}
+					}
+					return cards;
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const cards=lib.skill.twdengjian.getCards(player,trigger.player);
+					const {result:{bool}}=await player.chooseToDiscard(get.prompt('twdengjian'),'he')
+					.set('prompt2','弃置一张牌并随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】')
+					.set('ai',card=>7-get.value(card))
+					.set('logSkill','twdengjian');
+					if(bool) player.gain(cards.randomGet(),'gain2').gaintag.add('twdengjianx');
+				},
+				group:'twdengjian_buff',
+				subSkill:{
+					ban:{charlotte:true},
+					buff:{
+						mod:{
+							aiOrder:function(player,card,num){
+								if(get.itemtype(card)=='card'&&card.hasGaintag('twdengjianx')) return num+0.1;
+							},
+						},
+						audio:'twdengjian',
+						trigger:{player:'useCard1'},
+						filter(event,player){
+							return event.cards&&event.cards.length==1&&player.getHistory('lose',evt=>{
+								if(evt.getParent()!=event) return false;
+								for(var i in evt.gaintag_map){
+									if(evt.gaintag_map[i].includes('twdengjianx')) return true;
+								}
+								return false;
+							}).length&&event.addCount!==false;
+						},
+						forced:true,
+						locked:false,
+						async content(event,trigger,player){
+							trigger.addCount=false;
+							if(player.stat[player.stat.length-1].card.sha>0) player.stat[player.stat.length-1].card.sha--;
+							game.log(trigger.card,'不计入次数限制');
+						},
+					},
+				},
+			},
+			twdengjianx:{},
+			twxinshou:{
+				audio:2,
+				trigger:{player:'useCard'},
+				filter(event,player){
+					if(event.card.name!='sha') return false;
+					const goon=(!player.getHistory('useCard',evt=>{
+						return evt!=event&&evt.card.name=='sha'&&get.color(evt.card)==get.color(event.card);
+					}).length&&player.isPhaseUsing());
+					if(!player.hasSkill('twxinshou_0')) return goon;
+					if(!player.hasSkill('twxinshou_1')) return goon&&game.hasPlayer(target=>target!=player);
+					return !player.hasSkill('twdengjian_ban')&&game.hasPlayer(target=>{
+						if(target==player) return false;
+						return !target.hasSkill('twdengjian',null,false,false);
+					})&&player.hasSkill('twdengjian',null,false,false);
+				},
+				direct:true,
+				async content(event,trigger,player){
+					if(player.hasSkill('twxinshou_0')&&player.hasSkill('twxinshou_1')){
+						const {result:{bool,targets}}=await player.chooseTarget((card,player,target)=>{
+							return target!=player&&!target.hasSkill('twdengjian',null,false,false);
+						}).set('ai',target=>{
+							const player=get.event('player');
+							if(get.attitude(player,target)>0){
+								if(target.isTurnedOver()) return 0;
+								const card=new lib.element.VCard({name:'sha'});
+								if(game.hasPlayer(aim=>{
+									return target.canUse(card,target)&&get.effect(aim,card,target,player)>0&&get.effect(aim,card,target,target)>0;
+								})) return target.countCards('h')-3;
+								return 0;
+							}
+							return 0;
+						})
+						.set('prompt',get.prompt('twxinshou'))
+						.set('prompt2','令【登剑】失效并令一名其他角色获得【登剑】，你的下个回合开始时，其失去【登剑】，若其这期间使用【杀】造成过伤害，则你结束【登剑】的失效状态')
+						if(bool){
+							const target=targets[0];
+							player.logSkill('twxinshou',target);
+							player.addSkill('twdengjian_ban');
+							target.addAdditionalSkill('twxinshou_'+player.playerid,'twdengjian');
+							player.popup('登剑');
+							target.popup('登剑');
+							game.log(player,'将','#g【登剑】','传授给了',target);
+							game.log(player,'的','#g【登剑】','被失效了');
+							player.when('phaseBegin').then(()=>{
+								target.removeAdditionalSkill('twxinshou_'+player.playerid);
+								const history=game.getAllGlobalHistory('everything');
+								for(let i=history.length-1;i>=0;i--){
+									const evt=history[i];
+									if(evt.name=='damage'&&evt.card&&evt.source&&evt.card.name=='sha'&&evt.source==target){
+										player.popup('洗具');
+										player.removeSkill('twdengjian_ban');
+										game.log(player,'结束了','#g【登剑】','的失效状态');
+										return;
+									}
+									if(evt==evtx) break;
+								}
+								player.popup('杯具');
+							}).vars({target:target,evtx:event});
+						}
+					}
+					else{
+						let choice=[],choiceList=['摸一张牌','交给一名其他角色一张牌',];
+						if(!player.hasSkill('twxinshou_0')) choice.push('摸牌');
+						else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
+						if(!player.hasSkill('twxinshou_1')&&game.hasPlayer(target=>target!=player)) choice.push('给牌');
+						else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
+						const {result:{control}}=await player.chooseControl(choice,'cancel2')
+						.set('prompt',get.prompt('twxinshou')).set('choiceList',choiceList)
+						.set('ai',()=>{
+							if(get.event('controls').includes('摸牌')) return '摸牌';
+							const player=get.event('player');
+							return (game.hasPlayer(target=>{
+								if(target==player) return false;
+								if(player.countCards('he',card=>card.name=='du')&&get.attitude(player,target)<=0) return true;
+								if(player.countCards('he',card=>get.value(card,player)<0&&get.attitude(player,target)*get.value(card,target)>0)) return true;
+								return get.attitude(player,target)>0;
+							})&&get.event('controls').includes('给牌'))?'给牌':'cancel2';
+						});
+						if(control=='cancel2') return;
+						player.logSkill('twxinshou');
+						if(control=='摸牌'){
+							player.addTempSkill('twxinshou_0');
+							player.draw();
+						}
+						if(control=='给牌'){
+							player.addTempSkill('twxinshou_1');
+							const {result:{bool,targets}}=await player.chooseTarget('交给一名其他角色一张牌',lib.filter.notMe,true).set('ai',target=>{
+								const player=get.event('player'),att=get.attitude(player,target);
+								if(player.countCards('he',card=>card.name=='du')) return -att;
+								let cards=player.getCards('he',card=>get.value(card,player)<0);
+								if(cards.length){
+									cards.sort((a,b)=>get.value(a,player)-get.value(b,player));
+									return get.value(cards[0],target)*att;
+								}
+								return att;
+							});
+							if(bool){
+								const target=targets[0];
+								player.line(target);
+								player.chooseToGive(target,'he',true);
+							}
+						}
+					}
+				},
+				subSkill:{
+					'0':{charlotte:true},
+					'1':{charlotte:true},
+				},
+			},
 			//石韬
 			twjieqiu:{
 				audio:2,
@@ -14845,6 +15025,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.twzhenliang) return '转换技。阴：出牌阶段限一次。你可以弃置一张牌并对攻击范围内的一名角色造成1点伤害。<span class="bluetext">阳：当你或你攻击范围内的一名角色于你的回合外受到伤害时，你可以弃置一张牌令此伤害-1。然后若你以此法弃置的牌颜色与“任”的颜色相同，你摸一张牌。</span>';
 				return '转换技。<span class="bluetext">阴：出牌阶段限一次。你可以弃置一张牌并对攻击范围内的一名角色造成1点伤害。</span>阳：当你或你攻击范围内的一名角色于你的回合外受到伤害时，你可以弃置一张牌令此伤害-1。<span class="bluetext">然后若你以此法弃置的牌颜色与“任”的颜色相同，你摸一张牌。</span>';
 			},
+			twdengjian:function(player){
+				let str='①其他角色的弃牌阶段结束时，你可以弃置一张牌并随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】，称为“剑法”。';
+				if(player.hasSkill('twdengjian_ban')) str='<span style="opacity:0.5">'+str+'</span>';
+				str+='②你使用“剑法”牌不计入次数限制。';
+				return str;
+			},
 		},
 		translate:{
 			tw_beimihu:'TW卑弥呼',
@@ -15491,6 +15677,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twjieqiu_info:'出牌阶段限一次，你可以选择一名装备区没有废除栏的其他角色，废除其所有装备栏，然后其摸X张牌（X为其废除装备栏前的装备区牌数）。其下个弃牌阶段结束时，其恢复等同于其弃置牌数的装备栏；其下个回合结束时，若其仍有已废除的装备栏，则你执行一个额外回合（每轮限一次）。',
 			twenchou:'恩仇',
 			twenchou_info:'出牌阶段限一次，你可以观看一名存在废除装备栏的其他角色的手牌并获得其中一张牌，然后你恢复其一个装备栏。',
+			xia_shie:'史阿',
+			twdengjian:'登剑',
+			twdengjianx:'剑法',
+			twdengjian_info:'①其他角色的弃牌阶段结束时，你可以弃置一张牌并随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】，称为“剑法”。②你使用“剑法”牌不计入次数限制。',
+			twxinshou:'心授',
+			twxinshou_info:'当你于出牌阶段使用【杀】时，若此【杀】与你本回合使用的所有其他【杀】的颜色均不相同，则你可以选择执行以下一项本回合未执行过的项：⒈摸一张牌；⒉交给一名其他角色一张牌。若这两项本回合均已被选择过，则你可以令〖登剑①〗失效并令一名其他角色获得〖登剑〗，你的下个回合开始时，其失去〖登剑〗，若其这期间使用【杀】造成过伤害，则你结束〖登剑①〗的失效状态',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',

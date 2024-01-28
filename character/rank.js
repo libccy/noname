@@ -1358,6 +1358,7 @@ window.noname_character_rank={
 		'ol_lingtong',
 		'jsrg_liuyong',
 		'jsrg_sunjun',
+		'xia_shie',
 	],
 	bm:[
 		'diy_xizhenxihong',
