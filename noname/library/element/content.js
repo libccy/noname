@@ -17,7 +17,7 @@ export const Content = {
 		event.gaintag.forEach(tag => player.addGaintag(showingCards, tag));
 		if (!(event.cards = showingCards.filter(showingCard => !shown.includes(showingCard))).length) return;
 		game.log(player, '明置了', event.cards);
-		if (event.animate != false) player.$give(event.cards, player, false);
+		//if (event.animate != false) player.$give(event.cards, player, false);
 		event.trigger('addShownCardsAfter');
 	},
 	//隐藏明置手牌
@@ -39,7 +39,7 @@ export const Content = {
 		hidingCards.removeArray(player.getShownCards());
 		if (!hidingCards.length) return;
 		game.log(player, '取消明置了', event.cards = hidingCards);
-		if (event.animate != false) player.$give(hidingCards, player, false);
+		//if (event.animate != false) player.$give(hidingCards, player, false);
 		event.trigger('hideShownCardsAfter');
 	},
 	//Execute the delay card effect
