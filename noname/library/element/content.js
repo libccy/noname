@@ -17,7 +17,7 @@ export const Content = {
 		event.gaintag.forEach(tag => player.addGaintag(showingCards, tag));
 		if (!(event.cards = showingCards.filter(showingCard => !shown.includes(showingCard))).length) return;
 		game.log(player, '明置了', event.cards);
-		if (event.animate != false) player.$give(event.cards, player, false);
+		//if (event.animate != false) player.$give(event.cards, player, false);
 		event.trigger('addShownCardsAfter');
 	},
 	//隐藏明置手牌
@@ -39,7 +39,7 @@ export const Content = {
 		hidingCards.removeArray(player.getShownCards());
 		if (!hidingCards.length) return;
 		game.log(player, '取消明置了', event.cards = hidingCards);
-		if (event.animate != false) player.$give(hidingCards, player, false);
+		//if (event.animate != false) player.$give(hidingCards, player, false);
 		event.trigger('hideShownCardsAfter');
 	},
 	//Execute the delay card effect
@@ -2776,6 +2776,23 @@ export const Content = {
 		if (!event.logged) {
 			game.log(player, '进入了出牌阶段');
 			event.logged = true;
+			const stat = player.getStat();
+			for (let i in stat.skill) {
+				let bool = false;
+				const info = lib.skill[i];
+				if (!info) continue;
+				if (info.enable != undefined) {
+					if (typeof info.enable == 'string' && info.enable == 'phaseUse') bool = true;
+					else if (typeof info.enable == 'object' && info.enable.includes('phaseUse')) bool = true;
+				}
+				if (bool) stat.skill[i] = 0;
+			}
+			for (let i in stat.card) {
+				let bool = false;
+				const info = lib.card[i];
+				if (!info) continue;
+				if (info.updateUsable == 'phaseUse') stat.card[i] = 0;
+			}
 		}
 		var next = player.chooseToUse();
 		if (!lib.config.show_phaseuse_prompt) {
@@ -2792,24 +2809,6 @@ export const Content = {
 				delete ui.tempnowuxie;
 			}
 		});
-		"step 2";
-		var stat = player.getStat();
-		for (var i in stat.skill) {
-			var bool = false;
-			var info = lib.skill[i];
-			if (!info) continue;
-			if (info.enable != undefined) {
-				if (typeof info.enable == 'string' && info.enable == 'phaseUse') bool = true;
-				else if (typeof info.enable == 'object' && info.enable.includes('phaseUse')) bool = true;
-			}
-			if (bool) stat.skill[i] = 0;
-		}
-		for (var i in stat.card) {
-			var bool = false;
-			var info = lib.card[i];
-			if (!info) continue;
-			if (info.updateUsable == 'phaseUse') stat.card[i] = 0;
-		}
 	},
 	phaseDiscard: function () {
 		"step 0";

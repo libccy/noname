@@ -49,6 +49,7 @@ window.noname_character_rank={
 		'key_iriya',
 	],
 	ap:[
+		'xia_guanyu',
 		'gjqt_aruan',
 		'gjqt_cenying',
 		'gjqt_ouyangshaogong',
@@ -131,8 +132,10 @@ window.noname_character_rank={
 		'mb_chengui',
 		'jsrg_guozhao',
 		'sb_caopi',
+		'xia_yuzhenzi',
 	],
 	a:[
+		'xia_shitao',
 		'diy_zaozhirenjun',
 		'gjqt_fanglansheng',
 		'gjqt_fengqingxue',
@@ -361,6 +364,7 @@ window.noname_character_rank={
 		'shen_lusu',
 	],
 	am:[
+		'clan_wuqiao',
 		'muludawang',
 		'diy_caiwenji',
 		'diy_liuyan',
@@ -659,6 +663,7 @@ window.noname_character_rank={
 		'jsrg_simayi',
 		'jsrg_zhaoyun',
 		'jsrg_zhangxuan',
+		'sb_xunyu',
 	],
 	bp:[
 		'xin_huojun',
@@ -1038,6 +1043,7 @@ window.noname_character_rank={
 		'jsrg_weiwenzhugezhi',
 	],
 	b:[
+		'ol_sb_guanyu',
 		'liyi',
 		'diy_feishi',
 		'diy_liufu',
@@ -1354,6 +1360,7 @@ window.noname_character_rank={
 		'ol_lingtong',
 		'jsrg_liuyong',
 		'jsrg_sunjun',
+		'xia_shie',
 	],
 	bm:[
 		'diy_xizhenxihong',
@@ -1655,6 +1662,8 @@ window.noname_character_rank={
 	],
 	rarity:{
 		legend:[
+			'xia_yuzhenzi',
+			'xia_guanyu',
 			'swd_muyun',
 			'swd_zhaoyun',
 			'swd_septem',
@@ -1965,6 +1974,7 @@ window.noname_character_rank={
 			'xushi',
 			'machao',
 			'sunce',
+			're_sunce',
 			're_wangyun',
 			'zuoci',
 			'xuyou',
@@ -2109,8 +2119,10 @@ window.noname_character_rank={
 			'ol_jianyong',
 			'ol_sb_jiangwei',
 			'dc_sb_zhouyu',
+			'xia_shitao',
 		],
 		rare:[
+			'clan_wuqiao',
 			'xin_huojun',
 			'muludawang',
 			'mb_huban',
@@ -2585,10 +2597,10 @@ window.noname_character_rank={
 			'dc_sb_lusu',
 		],
 		junk:[
+			'ol_sb_guanyu',
 			'sunshao',
 			'ol_guohuai',
 			'gongsunzan',
-			're_sunce',
 			'chengpu',
 			'zangba',
 			'tianfeng',

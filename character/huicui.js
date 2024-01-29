@@ -4847,7 +4847,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var d1=true;
 						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false
 						for(var target of trigger.targets){
-							if(!target.mayHaveShan(player,'use')||trigger.player.hasSkillTag('directHit_ai',true,{
+							if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+								return i.hasGaintag('sha_notshan');
+							}))||trigger.player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:trigger.card,
 							},true)){
@@ -6906,7 +6908,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.target=lib.skill.dczecai.getMax();
 					var str='令一名其他角色于本轮内获得〖集智〗';
 					if(event.target&&event.target!=player) str+=('；若选择的目标为'+get.translation(event.target)+'，则其获得一个额外的回合');
-					player.chooseTarget(lib.filter.notMe,get.prompt('dczecai'),str).set('maximum',event.target).set('ai',function(card,player,target){
+					player.chooseTarget(lib.filter.notMe,get.prompt('dczecai'),str).set('maximum',event.target).set('ai',function(target){
 						if(target!=_status.event.maximum) return 0;
 						return get.attitude(_status.event.player,target);
 					});
@@ -8029,48 +8031,55 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseZhunbeiBegin'},
 				prompt2:function(event,player){
-					return '展示牌堆顶的'+get.cnNumber(3+player.countMark('chenjian'))+'张牌。然后你可依次执行以下两项中的任意项：⒈弃置一张牌，然后令一名角色获得与你弃置牌花色相同的牌。⒉使用其中剩余的一张牌。若你执行了所有选项，则你获得一枚“陈见”，然后重铸所有手牌。';
+					return '展示牌堆顶的'+get.cnNumber(3+player.countMark('chenjian'))+'张牌，然后执行以下一至两项：⒈弃置一张牌，然后令一名角色获得与你弃置牌花色相同的牌。⒉使用其中剩余的一张牌。若你执行了所有选项，则你获得一枚“陈见”并重铸所有手牌';
 				},
 				content:function(){
 					'step 0'
 					var cards=get.cards(3+player.countMark('chenjian'));
 					event.cards=cards;
-					game.cardsGotoOrdering(cards);
-					game.log(player,'展示了',event.cards);
-					event.videoId=lib.status.videoId++;
-					game.broadcastAll(function(player,id,cards){
-						var str=get.translation(player)+'发动了【陈见】';
-						var dialog=ui.create.dialog(str,cards);
-						dialog.videoId=id;
-					},player,event.videoId,event.cards);
-					game.addVideo('showCards',player,[get.translation(player)+'发动了【陈见】',get.cardsInfo(event.cards)]);
-					game.delay(2);
+					player.showCards(cards,get.translation(player)+'发动了【陈见】');
 					'step 1'
-					if(!player.countCards('he')){
-						game.broadcastAll('closeDialog',event.videoId);
-						game.addVideo('cardDialog',null,event.videoId);
-						event.goto(4);
-					}
-					else{
-						player.chooseToDiscard('he').set('prompt',false).set('ai',function(card){
-							var cards=_status.event.getParent().cards,val=-get.value(card),suit=get.suit(card);
-							for(var i of cards){
-								if(get.suit(i,false)==suit) val+=get.value(i,'raw');
-							}
-							return val;
-						});
-						var func=function(id){
-							var dialog=get.idDialog(id);
-							if(dialog) dialog.content.firstChild.innerHTML='是否弃置一张牌？';
-						};
-						if(player==game.me) func(event.videoId);
-						else if(player.isOnline()) player.send(func,event.videoId);
-					}
+					var list=[];
+					if(player.countCards('he',i=>{
+						return lib.filter.cardDiscardable(i,player,'chenjian');
+					})) list.push('选项一');
+					if(event.cards.some(i=>{
+						return player.hasUseTarget(i);
+					})) list.push('选项二');
+					if(list.length===1) event._result={control:list[0]};
+					else if(list.length>1) player.chooseControl(list).set('choiceList',[
+						'弃置一张牌，然后令一名角色获得与你弃置牌花色相同的牌',
+						'使用'+get.translation(event.cards)+'中的一张牌'
+					]).set('prompt','陈见：请选择一项').set('ai',()=>{
+						let player=_status.event.player,cards=_status.event.getParent().cards;
+						if(cards.some(i=>{
+							return player.getUseValue(i)>0;
+						})) return '选项二';
+						return '选项一';
+					});
+					else event.finish();
 					'step 2'
-					game.broadcastAll('closeDialog',event.videoId);
-					game.addVideo('cardDialog',null,event.videoId);
+					event.goon=0;
+					event.choosed=result.control;
+					if(result.control==='cancel2') event.finish();
+					else if(result.control==='选项二') event.goto(6);
+					'step 3'
+					if(player.countCards('he',i=>{
+						return lib.filter.cardDiscardable(i,player,'chenjian');
+					})) player.chooseToDiscard('he',!event.goon).set('ai',function(card){
+						let evt=_status.event.getParent(),
+							val=event.goon&&evt.player.countMark('chenjian')<2?0:-get.value(card),
+							suit=get.suit(card);
+						for(let i of evt.cards){
+							if(get.suit(i,false)==suit) val+=get.value(i,'raw');
+						}
+						return val;
+					}).set('prompt','陈见：'+(event.goon?'是否':'请')+'弃置一张牌，然后令一名角色获得'+get.translation(event.cards)+'中花色与之相同的牌'+(event.goon?'？':''));
+					else if(event.choosed==='选项一') event.goto(6);
+					else event.finish();
+					'step 4'
 					if(result.bool){
-						event.goon1=true;
+						event.goon++;
 						var suit=get.suit(result.cards[0],player);
 						var cards2=event.cards.filter(function(i){
 							return get.suit(i,false)==suit;
@@ -8085,31 +8094,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return att;
 							});
 						}
-						else event.goto(4);
+						else if(event.choosed==='选项一') event.goto(6);
+						else event.goto(8);
 					}
-					else event.goto(4);
-					'step 3'
+					else event.finish();
+					'step 5'
 					if(result.bool){
 						var target=result.targets[0];
 						player.line(target,'green');
 						target.gain(event.cards2,'gain2');
 						event.cards.removeArray(event.cards2);
 					}
-					'step 4'
+					if(event.choosed==='选项二') event.goto(8);
+					'step 6'
 					var cards2=cards.filter(function(i){
 						return player.hasUseTarget(i);
 					});
-					if(cards2.length) player.chooseButton(['是否使用其中的一张牌？',cards2]).set('ai',function(button){
+					if(cards2.length) player.chooseButton(['陈见：'+(event.goon?'是否':'请')+'使用其中一张牌'+(event.goon?'？':''),cards2],!event.goon).set('ai',function(button){
 						return player.getUseValue(button.link);
 					});
+					else if(event.choosed==='选项二') event.goto(3);
 					else event.finish();
-					'step 5'
+					'step 7'
 					if(result.bool){
 						player.chooseUseTarget(true,result.links[0],false);
-						event.goon2=true;
+						event.cards.removeArray(result.links);
+						event.goon+=2;
+						if(event.choosed==='选项二') event.goto(3);
 					}
-					'step 6'
-					if(event.goon1&&event.goon2){
+					else event.finish();
+					'step 8'
+					if(event.goon>2){
 						if(player.countMark('chenjian')<2) player.addMark('chenjian',1,false);
 						player.recast(player.getCards('h',lib.filter.cardRecastable));
 					}
@@ -11113,7 +11128,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								let ph=player.countCards('h');
 								if(game.hasPlayer(i=>{
 									if(!player.canUse('sha',i,true,true)||get.effect(i,{name:'sha'},player,player)<=0) return false;
-									return !ph||!i.mayHaveShan(player,'use');
+									return !ph||!i.mayHaveShan(player,'use',i.getCards(i=>{
+										return i.hasGaintag('sha_notshan');
+									}));
 								})) return 1;
 							}
 							return 0;
@@ -11323,7 +11340,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shezang_info:'每轮限一次。当你或你回合内的其他角色进入濒死状态时，你可以从牌堆中获得每种花色的牌各一张。',
 			tengyin:'滕胤',
 			chenjian:'陈见',
-			chenjian_info:'准备阶段，你可展示牌堆顶的3+X张牌（X为你“陈见”标记的数量且至多为2）。然后你可依次执行以下两项中的任意项：⒈弃置一张牌，然后令一名角色获得与你弃置牌花色相同的牌。⒉使用其中剩余的一张牌。若你执行了所有选项，则你获得一枚“陈见”，然后重铸所有手牌。',
+			chenjian_info:'准备阶段，你可展示牌堆顶的3+X张牌（X为你“陈见”标记的数量且至多为2），然后执行以下一至两项：⒈弃置一张牌，然后令一名角色获得与你弃置牌花色相同的牌。⒉使用其中剩余的一张牌。若你执行了所有选项，则你获得一枚“陈见”并重铸所有手牌。',
 			xixiu:'皙秀',
 			xixiu_info:'锁定技。①当你成为其他角色使用牌的目标时，若你的装备区内有和此牌花色相同的牌，则你摸一张牌。②若你装备区内的牌数为1，则其他角色不能弃置你装备区内的牌。',
 			zhangyao:'张媱',

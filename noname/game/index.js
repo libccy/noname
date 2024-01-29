@@ -42,6 +42,18 @@ export class Game extends Uninstantable {
 	static roundNumber = 0;
 	static shuffleNumber = 0;
 	static promises = GamePromises;
+	/**
+	 * @type { string }
+	 */
+	static layout;
+	/**
+	 * @type { Player }
+	 */
+	static me;
+	/**
+	 * @type { boolean }
+	 */
+	static chess;
 	static globalEventHandlers = new class {
 		constructor() {
 			this._handlers = {};
@@ -3699,7 +3711,7 @@ export class Game extends Uninstantable {
 	/**
 	 * @param { string } type 
 	 * @param { Player } player 
-	 * @param { any } content 
+	 * @param { any } [content] 
 	 * @returns 
 	 */
 	static addVideo(type, player, content) {
@@ -4687,9 +4699,9 @@ export class Game extends Uninstantable {
 	/**
 	 * @overload
 	 * @param { Card | string } name 
-	 * @param { string } suit 
-	 * @param { number } number 
-	 * @param { string } nature 
+	 * @param { string } [suit] 
+	 * @param { number | string } [number] 
+	 * @param { string } [nature] 
 	 */
 	static createCard(name, suit, number, nature) {
 		if (typeof name == 'object') {
@@ -8486,6 +8498,18 @@ export class Game extends Uninstantable {
 			list.remove(current.group);
 			return true;
 		});
+	}
+	/**
+	 * 此函数用于计算函数的时间消耗。
+	 * @param {function} 测试的函数
+	 * @returns {number} 消耗的时间
+	 */
+	static testRunCost(func){
+		let time = Date.now();
+		func();
+		let past = Date.now() - time;
+		console.log(past);
+		return past;
 	}
 	/**
 	 * 此方法用于对所有targets按顺序执行一个async函数。

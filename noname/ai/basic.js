@@ -5,6 +5,7 @@ import { UI as ui } from '../ui/index.js';
 import { Library as lib } from '../library/index.js';
 import { GNC as gnc } from '../gnc/index.js';
 import { Uninstantable } from "../util/index.js";
+import { CacheContext } from '../library/cache/cacheContext.js';
 
 export class Basic extends Uninstantable {
 	/**
@@ -84,11 +85,13 @@ export class Basic extends Uninstantable {
 			if (range[1] <= -1) {
 				if (ui.selected.cards.length == 0) return true;
 				j = 0;
+				CacheContext.setCacheContext(new CacheContext());
 				for (i = 0; i < ui.selected.cards.length; i++) {
 					effect = check(ui.selected.cards[i]);
 					if (effect < 0) j -= Math.sqrt(-effect);
 					else j += Math.sqrt(effect);
 				}
+				CacheContext.removeCacheContext();
 				return (j > 0);
 			}
 			cards = get.selectableCards();
@@ -105,6 +108,7 @@ export class Basic extends Uninstantable {
 			// 	return (check(b,cards2)-check(a,cards2));
 			// });
 			var ix = 0;
+			CacheContext.setCacheContext(new CacheContext());
 			var checkix = check(cards[0], cards2);
 			for (i = 1; i < cards.length; i++) {
 				var checkixtmp = check(cards[i], cards2);
@@ -115,9 +119,11 @@ export class Basic extends Uninstantable {
 			}
 			if (check(cards[ix]) <= 0) {
 				if (!forced || ok) {
+					CacheContext.removeCacheContext();
 					return ok;
 				}
 			}
+			CacheContext.removeCacheContext();
 			if (typeof cards[ix] == 'string') {
 				ui.click.skill(cards[ix]);
 				var info = get.info(event.skill);
@@ -161,11 +167,13 @@ export class Basic extends Uninstantable {
 			}
 			if (range[1] <= -1) {
 				j = 0;
+				CacheContext.setCacheContext(new CacheContext());
 				for (i = 0; i < ui.selected.targets.length; i++) {
 					effect = check(ui.selected.targets[i]);
 					if (effect < 0) j -= Math.sqrt(-effect);
 					else j += Math.sqrt(effect);
 				}
+				CacheContext.removeCacheContext();
 				return (j > 0);
 			}
 			else if (range[1] == 0) {
@@ -180,6 +188,7 @@ export class Basic extends Uninstantable {
 			// 	return check(b)-check(a);
 			// });
 			let ix = 0;
+			CacheContext.setCacheContext(new CacheContext());
 			let checkix = check(targets[0], targets2);
 			for (i = 1; i < targets.length; i++) {
 				let checkixtmp = check(targets[i], targets2);
@@ -190,9 +199,11 @@ export class Basic extends Uninstantable {
 			}
 			if (check(targets[ix]) <= 0) {
 				if (!forced || ok) {
+					CacheContext.removeCacheContext();
 					return ok;
 				}
 			}
+			CacheContext.removeCacheContext();
 			targets[ix].classList.add('selected');
 			ui.selected.targets.add(targets[ix]);
 			game.check();

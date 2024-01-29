@@ -19,6 +19,7 @@ app
 app.html
 ehthumbs.db
 extension
+Home
 jsconfig.json
 localStorage.json
 main.js

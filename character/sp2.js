@@ -5030,7 +5030,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								})) return 3;
 								return Math.sqrt(target.countCards('he'));
 							}
-							if(target.mayHaveShan(player,'use')&&player.countCards('hs',function(card){
+							if(target.mayHaveShan(player,'use',target.getCards(i=>{
+								return i.hasGaintag('sha_notshan');
+							}))&&player.countCards('hs',function(card){
 								return !ui.selected.cards.includes(card)&&get.name(card)=='sha'&&player.canUse(card,target)&&get.effect(target,card,player,player)!=0;
 							})) return -Math.sqrt(Math.abs(get.attitude(player,target)))/2;
 							return 0.1;
@@ -5362,7 +5364,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('mouni2');
 					player.chooseTarget(get.prompt2('mouni'),lib.filter.notMe).set('ai',function(target){
 						var player=_status.event.player,cards=player.getCards('h','sha');
-						if(get.attitude(player,target)>=0||!player.canUse(cards[0],target,false)||(!player.hasJudge('lebu')&&target.mayHaveShan(player,'use')&&!player.hasSkillTag('directHit_ai',true,{
+						if(get.attitude(player,target)>=0||!player.canUse(cards[0],target,false)||(!player.hasJudge('lebu')&&target.mayHaveShan(player,'use',target.getCards(i=>{
+							return i.hasGaintag('sha_notshan');
+						}))&&!player.hasSkillTag('directHit_ai',true,{
 							target:target,
 							card:cards[0],
 						},true))) return 0;
@@ -11139,7 +11143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcbenshi_info:'锁定技。①你的攻击范围+1。②你的攻击范围基数不受装备区内武器牌的影响。③由你使用的【杀】的牌面信息中的“使用目标”产生的规则改为“攻击范围内的所有角色”。',
 			sunhuan:'孙桓',
 			dcniji:'逆击',
-			dcniji_info:'①当你成为非装备牌的目标后，你可以摸一张牌。②一名角色的结束阶段，你可以使用一张“逆击”牌，然后弃置所有“逆击”牌。',
+			dcniji_info:'①当你成为非装备牌的目标后，你可以摸一张牌，称为“逆击”。②一名角色的结束阶段，你可以使用一张“逆击”牌，然后弃置所有“逆击”牌。',
 			//dc_fuwan:'新杀伏完',
 			//dc_fuwan_prefix:'新杀',
 			//dc_fuwan_ab:'伏完',

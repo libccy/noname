@@ -3812,7 +3812,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},'he');
 				},
 				complexCard:true,
-				selectCard:[1,4],
+				selectCard:[1,Infinity],
 				position:'he',
 				filterCard:true,
 				check:function(card){
@@ -9518,7 +9518,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(att<=0) return att;
 						if(target.hasSkillTag('nodamage')) return 0.01*att;
 						if(target.getEquip('tengjia')||target.getEquip('renwang')) return 0.2*att;
-						if(target.getEquip('bugua')) return 0.3*att;
+						if(target.getEquip('bagua')) return 0.3*att;
 						if(target.getEquip(2)) return att/2;
 						return 1.2*att;
 					});
@@ -14006,7 +14006,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjijiao_info:'限定技。出牌阶段，你可以令一名角色获得所有弃牌堆中你于本局游戏内使用或弃置过的普通锦囊牌，且这些牌不能被【无懈可击】响应。一名角色的回合结束后，若本回合牌堆洗过牌或有角色死亡，你重置〖继椒〗。',
 			duanqiaoxiao:'段巧笑',
 			dccaizhuang:'彩妆',
-			dccaizhuang_info:'出牌阶段限一次。你可以弃置任意张牌。然后若你手牌中的花色数小于你以此法弃置的牌数，你摸一张牌并重复此流程。',
+			dccaizhuang_info:'出牌阶段限一次，你可以弃置任意张牌。然后若你手牌中的花色数小于你以此法弃置的牌数，你摸一张牌并重复此流程。',
 			dchuayi:'华衣',
 			dchuayi_info:'结束阶段，你可以判定，然后你获得如下效果直到你下回合开始时：红色，一名角色的回合结束时，你摸一张牌；黑色，当你受到伤害后，你摸两张牌。',
 			wu_zhugeliang:'武诸葛亮',

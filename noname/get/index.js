@@ -5,6 +5,7 @@ import { Library as lib } from '../library/index.js';
 import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 import { GNC as gnc } from '../gnc/index.js';
+import { CacheContext } from "../library/cache/cacheContext.js";
 
 import { Is } from "./is.js";
 
@@ -157,7 +158,11 @@ export class Get extends Uninstantable {
 	 *
 	 * 获取一张装备牌实际占用的装备栏(君曹操六龙)
 	 *
-	 * 用法同get.subtype，返回数组
+	 * 用法同{@link subtype}，返回数组
+	 * 
+	 * @param { string | Card | VCard | CardBaseUIData } obj 
+	 * @param { false | Player } [player] 
+	 * @returns { string[] }
 	 */
 	static subtypes(obj, player) {
 		if (typeof obj == 'string') obj = { name: obj };
@@ -1312,7 +1317,7 @@ export class Get extends Uninstantable {
 	}
 	static infoTargets(infos) { return Array.from(infos || []).map(info => game.playerMap[info]); }
 	static cardInfo(card) { return [card.suit, card.number, card.name, card.nature]; }
-	static cardsInfo(cards) { return Array.from(cards || []).map(get.cardInfo); }
+	static cardsInfo(cards = []) { return Array.from(cards).map(get.cardInfo); }
 	static infoCard(info) {
 		var card = ui.create.card();
 		if (info[0]) {
@@ -1361,16 +1366,29 @@ export class Get extends Uninstantable {
 			if (func._filter_args) {
 				return '_noname_func:' + JSON.stringify(get.stringifiedResult(func._filter_args, 3));
 			}
-			return '_noname_func:' + func.toString();
+			const str = func.toString();
+			// js内置的函数
+			if ((/\{\s*\[native code\]\s*\}/).test(str)) return '_noname_func:function () {}';
+			return '_noname_func:' + str;
 		}
 		return '';
 	}
 	static infoFuncOL(info) {
-		var func;
+		let func;
 		const str = info.slice(13).trim();
 		try {
+			// js内置的函数
+			if ((/\{\s*\[native code\]\s*\}/).test(str)) return function () {};
+			// 一般fun和数组形式
 			if (str.startsWith("function") || str.startsWith("(")) eval(`func=(${str});`);
-			else eval(`func=(function ${str});`);
+			// 其他奇形怪状的fun
+			else {
+				try {
+					eval(`func = ${str}`);
+				} catch {
+					eval(`let obj = {${str}}; func = obj[Object.keys(obj)[0]]`);
+				}
+			}
 		} catch (e) {
 			console.error(`${e} in \n${str}`);
 			return function () {};
@@ -1702,6 +1720,12 @@ export class Get extends Uninstantable {
 		return lib.card[name].type;
 	}
 	static type2(card, player) { return get.type(card, 'trick', player); }
+	/**
+	 * 
+	 * @param { string | Card | VCard | CardBaseUIData } obj 
+	 * @param { false | Player } [player] 
+	 * @returns { string }
+	 */
 	static subtype(obj, player) {
 		if (typeof obj == 'string') obj = { name: obj };
 		if (typeof obj != 'object') return;
@@ -1717,9 +1741,9 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 *
-	 * @param {Card | VCard} card
-	 * @param {false | Player} [player]
-	 * @returns {string}
+	 * @param { Card | VCard | CardBaseUIData } card
+	 * @param { false | Player } [player]
+	 * @returns { string }
 	 */
 	static name(card, player) {
 		if (get.itemtype(player) == 'player' || (player !== false && get.position(card) == 'h')) {
@@ -1955,6 +1979,17 @@ export class Get extends Uninstantable {
 		else if (method == 'unchecked') return n;
 		return Math.max(1, n);
 	}
+	/**
+	 * @overload
+	 * @param { string } item 
+	 * @returns { Skill }
+	 */
+	/**
+	 * @overload
+	 * @param { Card | VCard | CardBaseUIData } item 
+	 * @param { Player | false } [player]
+	 * @returns { any }
+	 */
 	static info(item, player) {
 		if (typeof item == 'string') {
 			return lib.skill[item];
@@ -2229,6 +2264,19 @@ export class Get extends Uninstantable {
 		return result;
 	}
 	/**
+	 * 遍历子元素
+	 * @param {HTMLElement} node 
+	 * @returns {Iterable<HTMLElement>} 迭代器
+	 */
+	static *iterableChildNodes(node){
+		for(let i=0;i<arguments.length;i++){
+			let arg = arguments[i];
+			for(let j=0;j<arg.childElementCount;j++){
+				yield arg.childNodes[j];
+			}
+		}
+	}
+	/**
 	 * @param {((a: Button, b: Button) => number)} [sort] 排序函数
 	 * @returns { Button[] }
 	 */
@@ -2461,8 +2509,22 @@ export class Get extends Uninstantable {
 		return num;
 	}
 	static owner(card, method) {
-		return game.players.concat(game.dead).find(current =>
-			current.getCards("hejsx").includes(card) || (current.judging[0] == card && method != "judge"));
+		return game.players.concat(game.dead).find(current=>{
+			if(current.judging[0] == card && method != "judge")return true;
+			let parent = card.parentNode;
+			if(parent == current.node.handcards1 || parent == current.node.handcards2){
+				return !card.classList.contains('removing');
+			}else if(parent == current.node.equips){
+				return !card.classListContains('removing','feichu','emptyequip');
+			}else if(parent == current.node.judges){
+				return !card.classListContains('removing','feichu');
+			}else if(parent == current.node.expansions){
+				return !card.classListContains('removing');
+			}
+			return false;
+		});
+		//return game.players.concat(game.dead).find(current =>
+		//	current.getCards("hejsx").includes(card) || (current.judging[0] == card && method != "judge"));
 	}
 	static noSelected() { return ui.selected.buttons.length + ui.selected.cards.length + ui.selected.targets.length == 0; }
 	static population(identity) {
@@ -4026,13 +4088,10 @@ export class Get extends Uninstantable {
 		if (aii && aii.value) value = aii.value;
 		else if (aii && aii.basic) value = aii.basic.value;
 		if (player == undefined || get.itemtype(player) != 'player') player = _status.event.player;
+		let cache = CacheContext.requireCacheContext();
+		player = cache.delegate(player);
 		var geti = function () {
-			var num = 0, i;
-			var cards = player.getCards('hs', card.name);
-			if (cards.includes(card)) {
-				return cards.indexOf(card);
-			}
-			return cards.length;
+			return player.getCardIndex('hs',card.name,card,5);
 		};
 		if (typeof value == 'function') {
 			result = value(card, player, geti(), method);
@@ -4104,7 +4163,15 @@ export class Get extends Uninstantable {
 		}
 		return 1;
 	}
+	static cacheOrder(item){
+		let cache = CacheContext.getCacheContext();
+		if(cache){
+			return cache.get.order(item);
+		}
+		return get.order(item);
+	}
 	static order(item) {
+		let cache = CacheContext.requireCacheContext();
 		var info = get.info(item);
 		if (!info) return -1;
 		var aii = info.ai;
@@ -4114,10 +4181,10 @@ export class Get extends Uninstantable {
 		if (order == undefined) return -1;
 		var num = order;
 		if (typeof (order) == 'function') {
-			num = order(item, _status.event.player);
+			num = order(item, cache.delegate(_status.event.player));
 		}
 		if (typeof item == 'object' && _status.event.player) {
-			var player = _status.event.player;
+			var player = cache.delegate(_status.event.player);
 			num = game.checkMod(player, item, num, 'aiOrder', player);
 		}
 		return num;
@@ -4138,6 +4205,13 @@ export class Get extends Uninstantable {
 			}
 		}
 		return result;
+	}
+	static cacheEffectUse(target, card, player, player2, isLink){
+		let cache = CacheContext.getCacheContext();
+		if(cache){
+			return cache.get.effect_use(target,card,player,player2,isLink);
+		}
+		return get.effect_use(target,card,player,player2,isLink);
 	}
 	static effect_use(target, card, player, player2, isLink) {
 		var event = _status.event;
@@ -4292,20 +4366,21 @@ export class Get extends Uninstantable {
 				}
 				if (target.hp == 1) result2 *= 2.5;
 				if (target.hp == 2) result2 *= 1.8;
-				if (target.countCards('h') == 0) {
+				let countTargetCards = target.cacheCountCards('h');
+				if (countTargetCards == 0) {
 					if (get.tag(card, 'respondSha') || get.tag(card, 'respondShan')) {
 						result2 *= 1.7;
 					}
 					else {
 						result2 *= 1.5;
 					}
-				}
-				if (target.countCards('h') == 1) result2 *= 1.3;
-				if (target.countCards('h') == 2) result2 *= 1.1;
-				if (target.countCards('h') > 3) result2 *= 0.5;
+				}else if (countTargetCards == 1) result2 *= 1.3;
+				else if (countTargetCards == 2) result2 *= 1.1;
+				else if (countTargetCards >= 3) result2 *= 0.5;
+
 				if (target.hp == 4) result2 *= 0.9;
-				if (target.hp == 5) result2 *= 0.8;
-				if (target.hp > 5) result2 *= 0.6;
+				else if (target.hp == 5) result2 *= 0.8;
+				else if (target.hp > 5) result2 *= 0.6;
 			}
 		}
 		else {
@@ -4333,6 +4408,13 @@ export class Get extends Uninstantable {
 			}
 		}
 		return final;
+	}
+	static cacheEffect(target, card, player, player2, isLink){
+		let cache = CacheContext.getCacheContext();
+		if(cache){
+			return cache.get.effect(target,card,player,player2,isLink);
+		}
+		return get.effect(target,card,player,player2,isLink);
 	}
 	static effect(target, card, player, player2, isLink) {
 		var event = _status.event;
@@ -4466,7 +4548,8 @@ export class Get extends Uninstantable {
 				// *** continue here ***
 				if (target.hp == 1) result2 *= 2.5;
 				if (target.hp == 2) result2 *= 1.8;
-				if (target.countCards('h') == 0) {
+				let targetCountCards = target.cacheCountCards('h');
+				if (targetCountCards == 0) {
 					if (get.tag(card, 'respondSha') || get.tag(card, 'respondShan')) {
 						result2 *= 1.7;
 					}
@@ -4474,12 +4557,12 @@ export class Get extends Uninstantable {
 						result2 *= 1.5;
 					}
 				}
-				if (target.countCards('h') == 1) result2 *= 1.3;
-				if (target.countCards('h') == 2) result2 *= 1.1;
-				if (target.countCards('h') > 3) result2 *= 0.5;
+				if (targetCountCards == 1) result2 *= 1.3;
+				else if (targetCountCards == 2) result2 *= 1.1;
+				else if (targetCountCards > 3) result2 *= 0.5;
 				if (target.hp == 4) result2 *= 0.9;
-				if (target.hp == 5) result2 *= 0.8;
-				if (target.hp > 5) result2 *= 0.6;
+				else if (target.hp == 5) result2 *= 0.8;
+				else if (target.hp > 5) result2 *= 0.6;
 			}
 		}
 		else {
