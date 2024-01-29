@@ -2,8 +2,8 @@ window.noname_update={
 	version:'1.10.7',
 	update:'1.10.6.2',
 	changeLog:[
-		'整合@PZ157 @nonameShijian @universe-st @mengxinzxz @copcap 的Pull Request',
-		'OL族吴乔、谋关羽；手杀谋荀彧；海外服侠关羽、石韬、史阿',
+		'整合@PZ157 @nonameShijian @universe-st @mengxinzxz @copcap @Tipx-L 的Pull Request',
+		'OL族吴乔、谋关羽；手杀谋荀彧；海外服侠关羽、石韬、史阿、玉真子',
 		'其他AI优化与bug修复',
 	],
 	files:[
@@ -40,6 +40,7 @@ window.noname_update={
 		'noname/get/index.js',
 
 		'noname/library/index.js',
+		'noname/library/update-urls.js',
 
 		'noname/library/cache/cacheContext.js',
 		'noname/library/cache/childNodesWatcher.js',

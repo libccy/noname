@@ -19,6 +19,7 @@ window.noname_source_list=[
 	'noname/init/polyfill.js',
 	'noname/library/index.js',
 	'noname/library/path.js',
+	'noname/library/update-urls.js',
 	'noname/library/announce/index.d.ts',
 	'noname/library/announce/index.js',
 	'noname/library/cache/cacheContext.js',
