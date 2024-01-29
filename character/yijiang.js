@@ -2228,7 +2228,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							case 2:{
 								var num=1.3;
 								if(event.card.name=='sha'&&event.targets.filter(function(current){
-									if(current.mayHaveShan(player,'use',current.getCards(i=>{
+									if(current.mayHaveShan(player,'use',current.getCards('h',i=>{
 										return i.hasGaintag('sha_notshan');
 									}))&&get.attitude(player,current)<=0){
 										if(current.hasSkillTag('useShan')) num=1.9;

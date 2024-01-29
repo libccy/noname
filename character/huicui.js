@@ -11109,7 +11109,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								let ph=player.countCards('h');
 								if(game.hasPlayer(i=>{
 									if(!player.canUse('sha',i,true,true)||get.effect(i,{name:'sha'},player,player)<=0) return false;
-									return !ph||!i.mayHaveShan(player,'use',i.getCards(i=>{
+									return !ph||!i.mayHaveShan(player,'use',i.getCards('h',i=>{
 										return i.hasGaintag('sha_notshan');
 									}));
 								})) return 1;

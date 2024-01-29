@@ -235,7 +235,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(get.cardtag(card,'yingbian_hit')){
 							hit=true;
 							if(targets.some(target=>{
-								return target.mayHaveShan(viewer,'use',target.getCards(i=>{
+								return target.mayHaveShan(viewer,'use',target.getCards('h',i=>{
 									return i.hasGaintag('sha_notshan');
 								}))&&get.attitude(viewer,target)<0&&get.damageEffect(target,player,viewer,get.natureList(card))>0;
 							})) base+=5;
@@ -247,7 +247,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 						if(get.cardtag(card,'yingbian_damage')){
 							if(targets.some(target=>{
-								return get.attitude(player,target)<0&&(hit||!target.mayHaveShan(viewer,'use',target.getCards(i=>{
+								return get.attitude(player,target)<0&&(hit||!target.mayHaveShan(viewer,'use',target.getCards('h',i=>{
 									return i.hasGaintag('sha_notshan');
 								}))||player.hasSkillTag('directHit_ai',true,{
 								target:target,
@@ -309,7 +309,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(!player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:card,
-							},true)) odds-=0.7*target.mayHaveShan(player,'use',target.getCards(i=>{
+							},true)) odds-=0.7*target.mayHaveShan(player,'use',target.getCards('h',i=>{
 								return i.hasGaintag('sha_notshan');
 							}),'odds');
 							_status.event.putTempCache('sha_result','eff',{
