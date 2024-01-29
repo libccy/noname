@@ -48,6 +48,44 @@ export function canUseHttpProtocol() {
 	return false;
 }
 
+/**
+ * 传递升级完成的信息
+ * @returns { string | void } 返回一个网址
+ */
+export function sendUpdate() {
+	// 手机端
+	if (window.cordova) {
+		// 直接确定包名
+		if (nonameInitialized && nonameInitialized.includes('com.noname.shijian')) {
+			// 给诗笺版apk的java层传递升级完成的信息
+			// @ts-ignore
+			return window.noname_shijianInterfaces.xxx() + '?sendUpdate=true';
+		}
+	}
+	// 电脑端
+	else if (typeof window.require == 'function' && typeof window.process == 'object') {
+		// 从json判断版本号
+		const fs = require('fs');
+		const path = require('path');
+		if (fs.existsSync(path.join(__dirname, 'package.json'))) {
+			// @ts-ignore
+			const json = require('./package.json');
+			// 诗笺电脑版的判断
+			if (json && Number(json.installerVersion) >= 1.7) {
+				fs.writeFileSync(path.join(__dirname, 'Home', 'saveProtocol.txt'), '');
+				// 启动http
+				const cp = require('child_process');
+				cp.exec(`start /min ${__dirname}\\noname-server.exe -platform=electron`, (err, stdout, stderr) => { });
+				return `http://localhost:8089/app.html?sendUpdate=true`;
+			}
+		}
+	}
+	// 浏览器端
+	else {
+		return location.href;
+	}
+}
+
 // 无名杀，启动！
 export async function boot() {
 	// 不想看，反正别动
