@@ -509,14 +509,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						mod:{
 							attackRange(player,num){
-								const sum=player.getCards('e',card=>get.subtype(card)=='equip1').reduce((sum,card)=>{
-									const info=get.info(card);
-									if(info&&info.distance&&info.distance.attackFrom){
-										return sum+info.distance.attackFrom;
-									}
-									return sum;
-								},0);
-								if(sum) return num+sum;
+								return num-player.getEquipRange();
 							},
 						},
 						trigger:{
@@ -533,8 +526,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						popup:false,
 						firstDo:true,
 						async content(event,trigger,player){
-							await player.enableSkill('twhuajing_blocker');
-							await player.disableSkill('twhuajing_blocker',lib.skill.twhuajing.getSkills(player));
+							player.enableSkill('twhuajing_blocker');
+							player.disableSkill('twhuajing_blocker',lib.skill.twhuajing.getSkills(player));
 						},
 						ai:{unequip_equip1:true},
 					},
@@ -568,7 +561,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const skills=player.getHistory('custom',evt=>{
 							return evt.twhuajing_skills;
 						}).reduce((list,evt)=>list.addArray(evt.twhuajing_skills),[]).filter(skill=>player.hasMark(skill));
-						var choiceList=skills.map(i=>{
+						let choiceList=skills.map(i=>{
 							return '<div class="skill">【'+get.translation(lib.translate[i+'_ab']||get.translation(i).slice(0,2))+'】</div>' +
 								'<div>'+get.skillInfoTranslation(i,player)+'</div>';
 						});
