@@ -853,7 +853,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						equipSkill:true,
 						trigger:{player:['shaMiss','eventNeutralized']},
 						filter:function(event,player){
-							if(!player.hasEmptySlot(1)||!lib.card.guanshi) return false;
+							if(!player.hasEmptySlot(1)||!lib.card.guanshi||player.hasSkillTag('unequip_equip1')) return false;
 							if(event.type!='card'||event.card.name!='sha'||!event.target.isIn()) return false;
 							return player.countCards('he')>=2;
 						},
@@ -889,7 +889,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							directHit_ai:true,
 							skillTagFilter:function(player,tag,arg){
-								if(player._olzhanjin_guanshi_temp||!player.hasEmptySlot(1)||!lib.card.guanshi) return;
+								if(player._olzhanjin_guanshi_temp||!player.hasEmptySlot(1)||!lib.card.guanshi||player.hasSkillTag('unequip_equip1')) return;
 								player._guanshi_temp=true;
 								var bool=(get.attitude(player,arg.target)<0&&arg.card&&arg.card.name=='sha'&&player.countCards('he',card=>{
 									return card!=arg.card&&(!arg.card.cards||!arg.card.cards.includes(card))&&get.value(card)<5;
@@ -899,6 +899,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							effect:{
 								target:function(card,player,target){
+									if(player.hasSkillTag('unequip_equip1')) return;
 									if(player==target&&get.subtype(card)=='equip1'){
 										if(get.equipValue(card)<=get.equipValue({name:'guanshi'})) return 0;
 									}
