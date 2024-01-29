@@ -30,11 +30,14 @@ export function canUseHttpProtocol() {
 		}
 		// 电脑端
 		else if (typeof window.require == 'function' && typeof window.process == 'object') {
-			try {
-				require('express');
-				return true;
-			} catch {
-				return false;
+			// 从json判断版本号
+			const fs = require('fs');
+			const path = require('path');
+			if (fs.existsSync(path.join(__dirname, 'package.json'))) {
+				// @ts-ignore
+				const json = require('./package.json');
+				// 诗笺电脑版的判断
+				return json && Number(json.installerVersion) >= 1.7;
 			}
 		}
 		// 浏览器端
