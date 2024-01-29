@@ -59,7 +59,7 @@ export function sendUpdate() {
 		if (nonameInitialized && nonameInitialized.includes('com.noname.shijian')) {
 			// 给诗笺版apk的java层传递升级完成的信息
 			// @ts-ignore
-			return window.noname_shijianInterfaces.xxx() + '?sendUpdate=true';
+			return window.noname_shijianInterfaces.sendUpdate() + '?sendUpdate=true';
 		}
 	}
 	// 电脑端
