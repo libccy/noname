@@ -22,7 +22,7 @@ export function canUseHttpProtocol() {
 		// 手机端
 		if (window.cordova) {
 			// 直接确定包名
-			if (nonameInitialized.includes('com.noname.shijian')) {
+			if (nonameInitialized.endsWith('com.noname.shijian/')) {
 				// 每个app自定义能升级的渠道，比如判断版本
 				// @ts-ignore
 				return window.noname_shijianInterfaces.getApkVersion() >= 16000;
