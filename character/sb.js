@@ -66,7 +66,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.countPlayer(current=>lib.skill.sbquhu.filterTarget(null,player,current))>1;
 				},
 				filterTarget(card,player,target){
-					return player!=target&&target.countCards('he');
+					return player!=target&&target.countCards('he')>0;
 				},
 				selectTarget:2,
 				multitarget:true,
@@ -374,7 +374,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.logSkill('sbjieming',target);
 					await target.draw(3);
 					num=Math.max(1,player.getDamagedHp());
-					const {result:{bool:bool2,cards}}=await target.chooseToDiscard('节命：是否弃置任意张牌？',`若你本次弃置的牌数小于${get.cnNumber(num)}张，${get.translation(player)}失去1点体力。`,[1,Infinity]).set('ai',card=>{
+					const {result:{bool:bool2,cards}}=await target.chooseToDiscard('节命：是否弃置任意张牌？',`若你本次弃置的牌数小于${get.cnNumber(num)}张，${get.translation(player)}失去1点体力。`,[1,Infinity],'he').set('ai',card=>{
 						if(get.event('nope')) return 0;
 						if(ui.selected.cards.length>=get.event('num')) return 0;
 						return 5.5-get.value(card);

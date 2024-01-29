@@ -100,20 +100,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter(event,player){
 					const num=player.countCards('he');
 					return game.hasPlayer(current=>{
+						if(current==player) return false;
 						const total=current.countCards('ej');
-						return total>0&&num>=total;
+						return total>0&&num>total;
 					});
 				},
 				filterCard:true,
-				selectCard:[1,Infinity],
+				selectCard(){
+					return [1,Math.max(...game.filterPlayer(i=>i!=get.player()).map(i=>i.countCards('ej')))+1];
+				},
 				check(card){
 					return 7-get.value(card);
 				},
 				filterTarget(card,player,target){
-					return ui.selected.cards.length==target.countCards('ej')&&player!=target;
+					const num=target.countCards('ej');
+					if(!num) return false;
+					return ui.selected.cards.length==num+1&&player!=target;
 				},
 				filterOk(){
-					return ui.selected.cards.length==ui.selected.targets[0].countCards('ej');
+					return ui.selected.cards.length==ui.selected.targets[0].countCards('ej')+1;
 				},
 				position:'he',
 				lose:false,
@@ -130,7 +135,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target(player,target){
 							let eff=0;
-							if(ui.selected.cards.length) eff-=ui.selected.cards.map(card=>get.value(card)).reduce((p,c)=>p+c,0);
+							if(ui.selected.cards.length) eff=ui.selected.cards.map(card=>get.value(card)).reduce((p,c)=>p+c,0);
+							if(player.hasSkill('zhimeng')) eff*=1+get.sgnAttitude(player,target)*0.15;
 							const es=target.getCards('e'),js=target.getCards('j');
 							es.forEach(card=>{
 								eff-=get.value(card,target);
@@ -245,7 +251,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const {result}=await next;
 					if(!result.bool) return;
 					player.logSkill('tamo');
-					console.log(result.moved)
 					const resultList=result.moved[0].map(info=>{
 						return parseInt(info.split('|')[0]);
 					});
@@ -253,11 +258,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const cmp=(a,b)=>{
 						return resultList.indexOf(a)-resultList.indexOf(b);
 					}
-					for(let i of toSortPlayers){
-						for(let j of toSortPlayers){
-							if(cmp(i.getSeatNum(),j.getSeatNum())<0){
-								toSwapList.push([i,j]);
-								[i,j]=[j,i];
+					for(let i=0;i<toSortPlayers.length;i++){
+						for(let j=0;j<toSortPlayers.length;j++){
+							if(cmp(toSortPlayers[i].getSeatNum(),toSortPlayers[j].getSeatNum())<0){
+								toSwapList.push([toSortPlayers[i],toSortPlayers[j]]);
+								[toSortPlayers[i],toSortPlayers[j]]=[toSortPlayers[j],toSortPlayers[i]];
 							}
 						}
 					}
@@ -8299,7 +8304,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_lusu:'神鲁肃',
 			shen_lusu_prefix:'神',
 			dingzhou:'定州',
-			dingzhou_info:'出牌阶段限一次。你可以交给一名角色X张牌，然后你获得其装备区和判定区里的所有牌（X为其装备区与判定区里的牌数之和）。',
+			dingzhou_info:'出牌阶段限一次。你可以将X张牌交给一名场上有牌的角色，然后你获得其场上的所有牌（X为其场上的牌数+1）。',
 			tamo:'榻谟',
 			tamo_info:'游戏开始时，你可以重新分配除主公外所有角色的座次。',
 			zhimeng:'智盟',
