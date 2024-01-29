@@ -11142,7 +11142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!target.isHealthy()) club+=2;
 								if(!club&&!spade) return 1;
 								if(name==='sha'){
-									if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+									if(!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 										return i.hasGaintag('sha_notshan');
 									}))) return;
 								}

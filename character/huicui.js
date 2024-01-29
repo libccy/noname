@@ -4843,26 +4843,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard('he',get.prompt('dccuijin',target),'弃置一张牌并令'+get.translation(trigger.player)+'使用的【杀】伤害+1，但若其未造成伤害，则你摸一张牌并对其造成1点伤害。').set('ai',function(card){
 						if(_status.event.goon) return 7-get.value(card);
 						return 0;
-					}).set('goon',function(){
-						var d1=true;
-						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false
-						for(var target of trigger.targets){
-							if(!target.mayHaveShan(player,'use',target.getCards(i=>{
-								return i.hasGaintag('sha_notshan');
-							}))||trigger.player.hasSkillTag('directHit_ai',true,{
-								target:target,
-								card:trigger.card,
-							},true)){
-								if(!target.hasSkill('gangzhi')) d1=false;
-								if(!target.hasSkillTag('filterDamage',null,{
-									player:trigger.player,
-									card:trigger.card,
-								})&&get.attitude(player,target)<0) return true;
-							}
-						}
-						if(d1) return get.damageEffect(trigger.player,player,player)>0;
-						return false;
-					}()).logSkill=['dccuijin',target];
+					}).set('goon',lib.skill.cuijin.checkx(trigger,player)).logSkill=['dccuijin',target];
 					'step 1'
 					if(result.bool){
 						if(typeof trigger.baseDamage!='number') trigger.baseDamage=1;
@@ -11128,7 +11109,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								let ph=player.countCards('h');
 								if(game.hasPlayer(i=>{
 									if(!player.canUse('sha',i,true,true)||get.effect(i,{name:'sha'},player,player)<=0) return false;
-									return !ph||!i.mayHaveShan(player,'use',i.getCards(i=>{
+									return !ph||!i.mayHaveShan(player,'use',i.getCards('h',i=>{
 										return i.hasGaintag('sha_notshan');
 									}));
 								})) return 1;

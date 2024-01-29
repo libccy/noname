@@ -5479,7 +5479,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!player.hasSkillTag('directHit_ai',true,{
 								target:target,
 								card:card,
-							},true)) odds-=0.7*target.mayHaveShan(player,'use',target.getCards(i=>{
+							},true)) odds-=0.7*target.mayHaveShan(player,'use',target.getCards('h',i=>{
 								return i.hasGaintag('sha_notshan');
 							}),'odds');
 							_status.event.putTempCache('sha_result','eff',{
@@ -7275,7 +7275,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						else{
 							var target=trigger.target;
-							if(trigger.targets.length>1||target.mayHaveShan(player,'use',target.getCards(i=>{
+							if(trigger.targets.length>1||target.mayHaveShan(player,'use',target.getCards('h',i=>{
 								return i.hasGaintag('sha_notshan');
 							}))) return 0;
 						}
@@ -14777,7 +14777,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else if(get.tag(card,'respondShan')>0){
 								if(current<0&&used==target.getAttackRange()-1){
 									if(card.name==='sha'){
-										if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+										if(!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 											return i.hasGaintag('sha_notshan');
 										}))) return;
 									}

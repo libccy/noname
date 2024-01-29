@@ -4270,7 +4270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							var eff=get.effect(target,{name:'sha',nature:'fire'},player,target)/30;
-							if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+							if(!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 								return i.hasGaintag('sha_notshan');
 							}))) eff*=2;
 							var del=target.countCards('h')-player.countCards('h')+1.5;
@@ -7124,7 +7124,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(_status.event.all) return 1;
 						if(ui.selected.buttons.length) return 0;
 						return Math.random();
-					}).set('all',!target.mayHaveShan(player,'use',target.getCards(i=>{
+					}).set('all',!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 						return i.hasGaintag('sha_notshan');
 					}))&&Math.random()<0.75).set('forceAuto',true);
 					'step 1'

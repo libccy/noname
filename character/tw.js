@@ -1095,7 +1095,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('goon',function(){
 						var d1=true;
 						if(player.hasSkill('jueqing')||player.hasSkill('gangzhi')) d1=false;
-						if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+						if(!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 							return i.hasGaintag('sha_notshan');
 						}))||player.hasSkillTag('directHit_ai',true,{
 							target:target,
@@ -3697,7 +3697,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					expose:0.2,
 					result:{
 						target:function(player,target){
-							if(target.countCards('h')<=target.hp&&!target.mayHaveShan(player,'use',target.getCards(i=>{
+							if(target.countCards('h')<=target.hp&&!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 								return i.hasGaintag('sha_notshan');
 							}))&&get.effect(target,{name:'sha',isCard:true},player,player)>0) return -1;
 							else if(target.countCards('h')>target.hp&&target.hp>2&&target.hasShan()) return 1;
@@ -7273,7 +7273,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var player=_status.event.player;
 						if(player.hp+player.countCards('hs',{name:['tao','jiu']})<=1) return -1;
 						var num=1;
-						if((!target.mayHaveShan(player,'use',target.getCards(i=>{
+						if((!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 							return i.hasGaintag('sha_notshan');
 						}))||player.hasSkillTag('directHit_ai',true,{
 							target:target,
@@ -11796,7 +11796,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var d1=true;
 								if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false;
 								for(var target of trigger.targets){
-									if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+									if(!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 										return i.hasGaintag('sha_notshan');
 									}))||trigger.player.hasSkillTag('directHit_ai',true,{
 										target:target,
@@ -13986,6 +13986,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return event.card.name=='sha'&&(event.player==player||player.inRange(event.player))&&player.countCards('he')>0;
 				},
+				checkx(event,player){
+					let d1=true,e=false;
+					if(event.player.hasSkill('jueqing')||event.player.hasSkill('gangzhi')) d1=false;
+					for(let tar of event.targets){
+						if(!tar.mayHaveShan(player,'use',tar.getCards('h',i=>{
+							return i.hasGaintag('sha_notshan');
+						}))||event.player.hasSkillTag('directHit_ai',true,{
+							target:tar,
+							card:event.card,
+						},true)){
+							if(!tar.hasSkill('gangzhi')) d1=false;
+							if(!tar.hasSkillTag('filterDamage',null,{
+								player:event.player,
+								card:event.card,
+							})){
+								let att=get.attitude(_status.event.player,tar);
+								if(att>0) return false;
+								if(att<0) e=true;
+							}
+						}
+					}
+					if(e) return true;
+					if(d1) return get.damageEffect(event.player,player,_status.event.player)>0;
+					return false;
+				},
 				content:function(){
 					'step 0'
 					if(player!=game.me&&!player.isOnline()) game.delayx();
@@ -13994,26 +14019,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseToDiscard('he',get.prompt('cuijin',target),'弃置一张牌并令'+get.translation(trigger.player)+'使用的【杀】伤害+1，但若其未造成伤害，则你对其造成1点伤害。').set('ai',function(card){
 						if(_status.event.goon) return 7-get.value(card);
 						return 0;
-					}).set('goon',function(){
-						var d1=true;
-						if(trigger.player.hasSkill('jueqing')||trigger.player.hasSkill('gangzhi')) d1=false
-						for(var target of trigger.targets){
-							if(!target.mayHaveShan(player,'use',target.getCards(i=>{
-								return i.hasGaintag('sha_notshan');
-							}))||trigger.player.hasSkillTag('directHit_ai',true,{
-								target:target,
-								card:trigger.card,
-							},true)){
-								if(!target.hasSkill('gangzhi')) d1=false;
-								if(!target.hasSkillTag('filterDamage',null,{
-									player:trigger.player,
-									card:trigger.card,
-								})&&get.attitude(player,target)<0) return true;
-							}
-						}
-						if(d1) return get.damageEffect(trigger.player,player,player)>0;
-						return false;
-					}()).logSkill=['cuijin',target];
+					}).set('goon',lib.skill.cuijin.checkx(trigger,player)).logSkill=['cuijin',target];
 					'step 1'
 					if(result.bool){
 						if(typeof trigger.baseDamage!='number') trigger.baseDamage=1;

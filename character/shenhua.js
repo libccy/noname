@@ -3676,7 +3676,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					effect:{
 						target:function(card,player,target,current){
-							if(typeof card==='object'&&get.name(card)==='sha'&&target.mayHaveShan(player,'use',target.getCards(i=>{
+							if(typeof card==='object'&&get.name(card)==='sha'&&target.mayHaveShan(player,'use',target.getCards('h',i=>{
 								return i.hasGaintag('sha_notshan');
 							}))) return [0.6,0.75];
 							if(!target.hasFriend()&&!player.hasUnknown()) return;
@@ -6221,7 +6221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(!target.isHealthy()) club+=2;
 								if(!club&&!spade) return 1;
 								if(card.name==='sha'){
-									if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+									if(!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 										return i.hasGaintag('sha_notshan');
 									}))) return;
 								}
@@ -7209,7 +7209,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return get.attitude(target,current)<0&&get.damageEffect(current,target,target,'thunder')>0;
 							})){
 								if(card.name==='sha'){
-									if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+									if(!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 										return i.hasGaintag('sha_notshan');
 									}))) return;
 								}
