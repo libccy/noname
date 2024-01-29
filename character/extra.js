@@ -235,14 +235,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					next.set('processAI',list=>{
 						const listx=list[0][1][0];
 						const me=listx.find(info=>parseInt(info.split('|')[0])==get.player().getSeatNum());
-						listx.remove(me);
 						listx.randomSort();
-						listx.unshift(me);
+						if(me){
+							listx.remove(me);
+							listx.unshift(me);
+						}
 						return [listx];
 					});
 					const {result}=await next;
 					if(!result.bool) return;
 					player.logSkill('tamo');
+					console.log(result.moved)
 					const resultList=result.moved[0].map(info=>{
 						return parseInt(info.split('|')[0]);
 					});
