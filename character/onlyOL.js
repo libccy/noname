@@ -69,13 +69,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				onChooseToUse(event){
 					if(!game.online&&!event.olsbguidao_num){
-						const player=event.player,history=player.getHistory('lose',evt=>{
-							return evt.getParent(2).name=='recast'&&evt.getParent(3).name=='olsbguidao';
-						});
+						const player=event.player,history=player.getHistory('custom',evt=>evt.olsbguidao_num);
 						if(!history.length) event.set('olsbguidao_num',1);
 						else{
 							const evt=history[history.length-1];
-							event.set('olsbguidao_num',evt.cards.filter(card=>get.name(card,player)=='sha').length+1);
+							event.set('olsbguidao_num',evt.olsbguidao_num);
 						}
 					}
 				},
@@ -108,6 +106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				async content(event,trigger,player){
 					const target=event.target,cards=event.cards;
+					player.getHistory('custom').push({olsbguidao_num:cards.filter(card=>get.name(card,player)=='sha').length+1});
 					const card=new lib.element.VCard({name:'juedou',storage:{olsbguidao:true}});
 					await player.recast(cards);
 					player.addTempSkill('olsbguidao_buff');
@@ -492,7 +491,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kunfenx_info:'结束阶段开始时，你可以失去1点体力，然后摸两张牌。',
 			ol_sb_guanyu:'OL谋关羽',
 			ol_sb_guanyu_prefix:'OL谋',
-			olsbfumeng:'赋梦',
+			olsbfumeng:'赴梦',
 			olsbfumeng_info:'一轮游戏开始时，你可以令任意张手牌的牌名视为【杀】。',
 			olsbguidao:'归刀',
 			olsbguidao_info:'出牌阶段，你可以重铸两张牌并视为使用一张【决斗】（重铸的【杀】数须比本回合上次发动〖归刀〗重铸的【杀】数多）。目标角色受到此牌伤害时，其须猜测你手牌中牌名为【杀】的牌数量多还是牌名不为【杀】的牌数多，若其猜错，则此【决斗】对其造成的伤害+1。',
