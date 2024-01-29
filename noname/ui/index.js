@@ -14732,6 +14732,6 @@ export class UI extends Uninstantable {
 	static updateRoundNumber(roundNumber, cardPileNumber) {
 		if (ui.cardPileNumber) ui.cardPileNumber.innerHTML = `${roundNumber}轮 剩余牌: ${cardPileNumber}`;
 	}
-};
+}
 
 export const ui = UI;

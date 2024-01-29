@@ -22,17 +22,15 @@ import { Announce } from "./announce/index.js";
 import { Channel } from "./channel/index.js";
 import { Experimental } from "./experimental/index.js";
 import * as Element from "./element/index.js";
+import { updateURLs } from "./update-urls.js";
 
 
 export class Library extends Uninstantable {
 	static configprefix = 'noname_0.9_';
 	static versionOL = 27;
-	static updateURLS = {
-		coding: 'https://gitcode.net/sinat_33405273/noname/-/raw/',
-		github: 'https://raw.githubusercontent.com/libccy/noname',
-	};
-	static updateURL = 'https://raw.githubusercontent.com/libccy/noname';
-	static mirrorURL = 'https://gitcode.net/sinat_33405273/noname/-/raw/';
+	static updateURLS = updateURLs;
+	static updateURL = updateURLs.github;
+	static mirrorURL = updateURLs.coding;
 	static hallURL = '47.99.105.222';
 	static assetURL = assetURL;
 	static userAgent = userAgent;
@@ -1124,7 +1122,7 @@ export class Library extends Uninstantable {
 					init: 'coding',
 					unfrequent: true,
 					item: {
-						coding: 'CSDN',
+						coding: 'URC',
 						github: 'GitHub',
 					},
 					onclick: function (item) {
@@ -11287,7 +11285,6 @@ export class Library extends Uninstantable {
 			charlotte: true,
 			priority: -100,
 			lastDo: true,
-			silent: true,
 			content: function () {
 				player.removeSkill('counttrigger');
 				delete player.storage.counttrigger;
