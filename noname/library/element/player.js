@@ -654,7 +654,14 @@ export class Player extends HTMLDivElement {
 	 * @param { (card: Card) => boolean } [filter] 
 	 */
 	getKnownCards(other = _status.event.player, filter = card => true) {
-		if (!other) other = this;
+		if (!other) {
+			if (other === null) console.trace(`getKnownCards的other参数不应传入null,可以用void 0或undefined占位`);
+			other = _status.event.player || this;
+		}
+		if (!filter) {
+			if (other === null) console.trace(`getKnownCards的filter参数不应传入null,可以用void 0或undefined占位`);
+			filter = card => true;
+		}
 		return this.getCards('h', card => {
 			return card.isKnownBy(other) && filter(card);
 		});
@@ -664,6 +671,10 @@ export class Player extends HTMLDivElement {
 	 * @param { Player } [other] 
 	 */
 	isAllCardsKnown(other = _status.event.player) {
+		if (!other) {
+			if (other === null) console.trace(`isAllCardsKnown的other参数不应传入null,可以用void 0或undefined占位`);
+			other = _status.event.player || this;
+		}
 		if (!other) other = this;
 		return this.countCards('h', card => {
 			return !card.isKnownBy(other);
@@ -675,7 +686,14 @@ export class Player extends HTMLDivElement {
 	 * @param { (card: Card) => boolean } [filter]  
 	 */
 	hasKnownCards(other = _status.event.player, filter = card => true) {
-		if (!other) other = this;
+		if (!other) {
+			if (other === null) console.trace(`hasKnownCards的other参数不应传入null,可以用void 0或undefined占位`);
+			other = _status.event.player || this;
+		}
+		if (!filter) {
+			if (other === null) console.trace(`hasKnownCards的filter参数不应传入null,可以用void 0或undefined占位`);
+			filter = card => true;
+		}
 		return this.countCards('h', card => {
 			return card.isKnownBy(other) && filter(card);
 		}) > 0;
@@ -808,10 +826,16 @@ export class Player extends HTMLDivElement {
 		if (cards && !isArray) recast.cards = [cards];
 		else if (isArray && cards.length) recast.cards = cards;
 		else _status.event.next.remove(recast);
-		if (typeof recastingLose != 'function') recastingLose = (player, cards) => player.loseToDiscardpile(cards).log = false;
+		if (typeof recastingLose != 'function') {
+			if (recastingLose === null) console.trace(`recast的recastingLose参数不应传入null,可以用void 0或undefined占位`);
+			recastingLose = (player, cards) => player.loseToDiscardpile(cards).log = false;
+		}
 		recast.recastingLose = recastingLose;
 		recast.recastingLosingEvents = [];
-		if (typeof recastingGain != 'function') recastingGain = (player, cards) => player.draw(cards.length).log = false;
+		if (typeof recastingGain != 'function') {
+			if (recastingLose === null) console.trace(`recast的recastingGain参数不应传入null,可以用void 0或undefined占位`);
+			recastingGain = (player, cards) => player.draw(cards.length).log = false;
+		}
 		recast.recastingGain = recastingGain;
 		recast.recastingGainingEvents = [];
 		recast.setContent('recast');

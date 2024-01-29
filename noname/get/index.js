@@ -265,8 +265,13 @@ export class Get extends Uninstantable {
 		}
 		return null;
 	}
+	/**
+	 * @param { string } skill 
+	 * @param { Player } player 
+	 * @returns { string[] }
+	 */
 	static skillCategoriesOf(skill, player) {
-		var list = [], info = get.info(skill);
+		const list = [], info = get.info(skill);
 		if (!info) return list;
 		if (get.is.locked(skill, player)) list.add('锁定技');
 		if (info.zhuSkill) list.add('主公技');
