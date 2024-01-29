@@ -25,7 +25,7 @@ export function canUseHttpProtocol() {
 			if (nonameInitialized.includes('com.noname.shijian')) {
 				// 每个app自定义能升级的渠道，比如判断版本
 				// @ts-ignore
-				window.noname_shijianInterfaces.getApkVersion() >= 16000;
+				return window.noname_shijianInterfaces.getApkVersion() >= 16000;
 			}
 		}
 		// 电脑端
