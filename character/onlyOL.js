@@ -28,11 +28,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'roundStart'},
 				filter(event,player){
-					return player.countCards('h');
+					return player.countCards('h',card=>{
+						if(_status.connectMode) return true;
+						return get.name(card,player)!='sha';
+					});
 				},
 				direct:true,
 				async content(event,trigger,player){
-					const {result:{bool,cards}}=await player.chooseCard(get.prompt2('olsbfumeng'),[1,Infinity]).set('ai',card=>{
+					const {result:{bool,cards}}=await player.chooseCard(get.prompt2('olsbfumeng'),[1,Infinity],(card,player)=>{
+						return get.name(card,player)!='sha';
+					}).set('ai',card=>{
 						const player=get.event('player');
 						if(player.hasSkill('olsbfumeng')) return 7-get.value(card);
 						return 4.5-get.value(card);
@@ -131,7 +136,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						trigger:{global:'damageBegin3'},
 						filter(event,player){
-							return event.card&&event.source&&event.card.storage&&event.card.storage.olsbguidao&&event.source==player;
+							if(!event.card||!event.card.storage||!event.card.storage.olsbguidao) return false;
+							if(!event.source||event.source!=player) return false;
+							const evt=event.getParent('useCard');
+							return evt.player==player&&evt.targets.includes(event.player);
 						},
 						forced:true,
 						popup:false,
