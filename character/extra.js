@@ -7616,15 +7616,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.chooseTarget(get.prompt('drlt_jieying'),"将“营”交给一名角色；其摸牌阶段多摸一张牌，出牌阶段使用【杀】的次数上限+1且手牌上限+1。该角色回合结束后，其移去“营”标记，然后你获得其所有手牌。",function(card,player,target){
 								return target!=player;
 							}).ai=function(target){
-								if(get.attitude(player,target)>0)
-								return 0.1;
-								if(get.attitude(player,target)<1&&(target.isTurnedOver()||target.countCards('h')<1))
-								return 0.2;
-									if(get.attitude(player,target)<1&&target.countCards('h')>0&&target.countCards('j',{name:'lebu'})>0)
-								return target.countCards('h')*0.8+target.getHandcardLimit()*0.7+2;
-								if(get.attitude(player,target)<1&&target.countCards('h')>0)
-								return target.countCards('h')*0.8+target.getHandcardLimit()*0.7;
-								return 1;
+								let th=target.countCards('h'),att=get.attitude(_status.event.player,target);
+								for(let i in target.skills){
+									let info=get.info(i);
+									if(info&&info.shaRelated) return Math.abs(att);
+								}
+								if(att>0){
+									if(th>3&&target.hp>2) return 0.6*th;
+								}
+								if(att<1){
+									if(target.countCards('j',{name:'lebu'})) return 1+Math.min((1.5+th)*0.8,target.getHandcardLimit()*0.7);
+									if(!th||target.getEquip('zhangba')||target.getEquip('guanshi')) return 0;
+									if(!target.inRange(player)||player.countCards('hs',{name:'shan'})>1) return Math.min((1+th)*0.3,target.getHandcardLimit()*0.2);
+								}
+								return 0;
 							};
 							'step 1'
 							if(result.bool){
@@ -7636,6 +7641,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								target.addMark('drlt_jieying_mark',mark);
 							}
 						},
+						ai:{
+							effect:{
+								player(card,player,target){
+									if(get.name(card)==='lebu'&&get.attitude(player,target)<0) return 1+Math.min((target.countCards('h')+1.5)*0.8,target.getHandcardLimit()*0.7);
+								}
+							}
+						}
 					},
 					'3':{
 						audio:'drlt_jieying',
