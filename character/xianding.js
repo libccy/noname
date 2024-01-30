@@ -3833,27 +3833,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					cache={no:true};
 					_status.event.putTempCache('dccaizhuang','dsuits',cache);
 					let player=_status.event.player,suits={};
+					lib.suit.forEach(i=>{
+						suits[i]=0;
+					});
 					player.getCards('h',i=>{
 						let suit=get.suit(i);
-						if(suits[suit]) suits[suit]++;
-						else suits[suit]=1;
+						if(lib.suit.includes(suit)) suits[suit]++;
 					});
-					const sortedEntries=Object.entries(suits).sort((a,b)=>b[1]-a[1]);
-					let sortedSuits=Object.fromEntries(sortedEntries);
+					let sortedSuits=Object.fromEntries(Object.entries(suits).sort((a,b)=>b[1]-a[1]));
 					let dis=0,idx=0,dsuits=0,leave=0;
 					for(let i in sortedSuits){
 						idx++;
 						if(!sortedSuits[i]) continue;
-						if(idx>2||sortedSuits[i]<3){
-							cache[i]=sortedSuits[i];
-							dis+=sortedSuits[i];
-							suits[i]=0;
-						}
-						else{
-							cache[i]++;
-							dis++;
-							suits[i]--;
-						}
+						let num=1;
+						if(idx>2||sortedSuits[i]<3) num=sortedSuits[i];
+						cache[i]=num;
+						dis+=num;
+						suits[i]-=num;
 						dsuits++;
 					}
 					for(let i in suits){
@@ -3868,7 +3864,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					});
 					let draw=0,e=[0,1,4/3,2,4];
-					dsuits=Math.min(4,dsuits);
 					if(dsuits<=leave) return false;
 					do{
 						draw+=e[dsuits--];
