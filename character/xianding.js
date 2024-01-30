@@ -9492,11 +9492,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return true;
 					});
 					next.set('processAI',function(list){
-						var cards=list[0][1].slice(0).sort(function(a,b){
-							if(b.name=='sha') return 1;
-							return get.value(b)-get.value(a);
+						let cards=list[0][1].slice(0),player=_status.event.player;
+						cards.sort((a,b)=>{
+							return get.value(b,player)-get.value(a,player);
 						});
-						return [cards,cards.splice(0,_status.event.player.getDamagedHp())];
+						if(!player.storage.juetao&&player.hasSkill('juetao')&&player.hasSha()){
+							let gain,bottom,pai=cards.filter(card=>card.name!=='sha');
+							pai.sort((a,b)=>{
+								return get.value(b,player)-get.value(a,player);
+							});
+							gain=pai.splice(0,player.getDamagedHp());
+							bottom=pai;
+							return [bottom, gain];
+						}
+						return [cards,cards.splice(0,player.getDamagedHp())];
 					});
 					'step 1'
 					game.broadcastAll('closeDialog',event.videoId);
