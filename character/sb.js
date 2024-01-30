@@ -1391,7 +1391,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						replace:{
 							button:function(button){
-								const event=get.event();
+								const event=get.event(),sum=event.sum;
 								if(!event.isMine()) return;
 								if(button.classList.contains('selectable')==false) return;
 								if(ui.selected.buttons.length>=sum) return false;
@@ -1413,7 +1413,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								game.check();
 							},
 						}
-					});
+					}).set('sum',sum)
 					if(result.bool){
 						var names=result.links.map(link=>link[2]);
 						storage[0]-=names.length;

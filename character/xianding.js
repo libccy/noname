@@ -214,7 +214,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							cards=ui.selected.cards.concat(player.getExpansions('dclingxi')),
 							suit=get.suit(card,false);
 						if(_status.event.suits.length<4) _status.event.suits.add(get.suit(ui.selected.cards.at(-1),false));
-						if(_status.event.name==='phaseUseEnd'){
+						if(_status.event.triggerName==='phaseUseEnd'){
 							if(_status.event.suits.includes(suit)) return (dis?10:3)-get.useful(card);
 							return (dis?6:1)-get.useful(card);
 						}
@@ -245,7 +245,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							suits.add(get.suit(i,false));
 						});
 						return suits;
-					})()).set('name',event.triggername);
+					})()).set('triggerName',event.triggername);
 					if(result.bool){
 						player.logSkill('dclingxi');
 						player.addToExpansion(result.cards,player,'give').gaintag.add('dclingxi');
