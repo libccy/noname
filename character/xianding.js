@@ -3816,25 +3816,90 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				position:'he',
 				filterCard:true,
 				check:function(card){
-					var player=_status.event.player;
-					var suit=get.suit(card);
-					if(get.position(card)!='h'&&player.countCards('h',{suit:suit})==1) return 0.1;
-					if(!player.hasCard(cardx=>cardx!=card&&get.suit(cardx)==suit)) return 7.5-get.value(card);
-					return 6-get.value(card);
+					let cache=lib.skill.dccaizhuang.tempCache();
+					if(!cache||cache.no) return 0;
+					let player=_status.event.player,suit=get.suit(card);
+					if(ui.selected.cards.filter(i=>{
+						return get.suit(i)===suit;
+					}).length<(cache[suit]||0)){
+						if(get.position(card)==='h') return 15-get.value(card);
+						return 9-get.value(card);
+					}
+					return 0;
+				},
+				tempCache(){
+					let cache=_status.event.getTempCache('dccaizhuang','dsuits');
+					if(cache) return cache;
+					cache={no:true};
+					_status.event.putTempCache('dccaizhuang','dsuits',cache);
+					let player=_status.event.player,suits={};
+					player.getCards('h',i=>{
+						let suit=get.suit(i);
+						if(suits[suit]) suits[suit]++;
+						else suits[suit]=1;
+					});
+					const sortedEntries=Object.entries(suits).sort((a,b)=>b[1]-a[1]);
+					let sortedSuits=Object.fromEntries(sortedEntries);
+					let dis=0,idx=0,dsuits=0,leave=0;
+					for(let i in sortedSuits){
+						idx++;
+						if(!sortedSuits[i]) continue;
+						if(idx>2||sortedSuits[i]<3){
+							cache[i]=sortedSuits[i];
+							dis+=sortedSuits[i];
+							suits[i]=0;
+						}
+						else{
+							cache[i]++;
+							dis++;
+							suits[i]--;
+						}
+						dsuits++;
+					}
+					for(let i in suits){
+						if(suits[i]) leave++;
+					}
+					player.getCards('e',i=>{
+						let suit=get.suit(i);
+						if(!cache[suit]){
+							dsuits++;
+							cache[suit]=1;
+							dis++;
+						}
+					});
+					let draw=0,e=[0,1,4/3,2,4];
+					dsuits=Math.min(4,dsuits);
+					if(dsuits<=leave) return false;
+					do{
+						draw+=e[dsuits--];
+					}while(dsuits>leave);
+					if(draw>dis){
+						delete cache.no;
+						_status.event.putTempCache('dccaizhuang','dsuits',cache);
+						return cache;
+					}
+					return false;
 				},
 				content:function(){
 					'step 0'
 					var suits=[];
+					cards.forEach(i=>{
+						if(suits.length>=4) return;
+						let suit=get.suit(i,player);
+						if(lib.suit.includes(suit)) suits.add(suit);
+					});
+					event.num=suits.length;
+					'step 1'
+					var suits=[];
 					player.countCards('h',card=>{
 						if(suits.length>=4) return;
 						var suit=get.suit(card);
-						if(!lib.suit.includes(suit)) return;
-						suits.add(suit);
+						if(lib.suit.includes(suit)) suits.add(suit);
 					});
-					if(suits.length>=cards.length) event.finish();
-					'step 1'
+					if(suits.length>=event.num) event.finish();
+					'step 2'
 					player.draw();
-					event.goto(0);
+					event.goto(1);
 				},
 				ai:{
 					order:2,
@@ -14006,7 +14071,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjijiao_info:'限定技。出牌阶段，你可以令一名角色获得所有弃牌堆中你于本局游戏内使用或弃置过的普通锦囊牌，且这些牌不能被【无懈可击】响应。一名角色的回合结束后，若本回合牌堆洗过牌或有角色死亡，你重置〖继椒〗。',
 			duanqiaoxiao:'段巧笑',
 			dccaizhuang:'彩妆',
-			dccaizhuang_info:'出牌阶段限一次，你可以弃置任意张牌。然后若你手牌中的花色数小于你以此法弃置的牌数，你摸一张牌并重复此流程。',
+			dccaizhuang_info:'出牌阶段限一次，你可以弃置任意张牌。然后若你手牌中的花色数小于你以此法弃置的牌的花色数，你摸一张牌并重复此流程。',
 			dchuayi:'华衣',
 			dchuayi_info:'结束阶段，你可以判定，然后你获得如下效果直到你下回合开始时：红色，一名角色的回合结束时，你摸一张牌；黑色，当你受到伤害后，你摸两张牌。',
 			wu_zhugeliang:'武诸葛亮',
