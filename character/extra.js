@@ -7558,6 +7558,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return current.hasSkill('drlt_jieying');
 						});
 					},
+					aiOrder(player,card,num){
+						if(player.hasMark('drlt_jieying_mark')&&game.hasPlayer(current=>{
+							return current.hasSkill('drlt_jieying')&&get.attitude(player,current)<=0;
+						})) return Math.max(num,0)+1;
+					}
 				},
 				audio:'drlt_jieying',
 				trigger:{
@@ -7577,8 +7582,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					nokeep:true,
 					skillTagFilter(player){
-						if(!player.hasMark('drlt_jieying_mark')) return false;
-					},
+						return player.hasMark('drlt_jieying_mark')&&game.hasPlayer(current=>{
+							return current.hasSkill('drlt_jieying')&&get.attitude(player,current)<=0;
+						});
+					}
 				},
 			},
 			'drlt_jieying':{
