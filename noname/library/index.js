@@ -9669,7 +9669,10 @@ export class Library extends Uninstantable {
 		 * @param { boolean } [strict]
 		 */
 		cardRecastable: (card, player = get.owner(card), source, strict) => {
-			// if (typeof player == 'undefined') player = get.owner(card);
+			if (!player) {
+				if (player === null) console.trace(`cardRecastable的player参数不应传入null,可以用void 0或undefined占位`);
+				player = get.owner(card);
+			}
 			const mod = game.checkMod(card, player, source, 'unchanged', 'cardRecastable', player);
 			if (!mod) return false;
 			if (strict && mod == 'unchanged') {

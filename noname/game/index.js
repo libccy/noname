@@ -7860,7 +7860,7 @@ export class Game extends Uninstantable {
 	/**
 	 * 
 	 * @param { string } storeName 
-	 * @param { string } [query] 
+	 * @param { string | null } [query] 
 	 * @param { Function } [onSuccess] 
 	 * @param { Function } [onError] 
 	 */

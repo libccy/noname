@@ -86,6 +86,23 @@ new Promise(resolve => {
 		exit()
 	}
 	else {
+		// 在http环境下修改__dirname
+		if (location.protocol.startsWith('http') &&
+			typeof window.require == 'function' &&
+			typeof window.process == 'object' &&
+			typeof window.__dirname == 'string' &&
+			window.__dirname.endsWith('electron.asar\\renderer')) {
+			const path = require('path');
+			window.__dirname = path.join(path.resolve(), 'resources/app');
+			// @ts-ignore
+			window.require = function (moduleId) {
+				try {
+					return module.require(moduleId);
+				} catch {
+					return module.require(path.join(window.__dirname, moduleId));
+				}	
+			};
+		}
 		const script = document.createElement('script')
 		script.type = "module";
 		script.src = `${assetURL}game/entry.js`;
