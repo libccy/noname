@@ -8329,10 +8329,6 @@ export class Player extends HTMLDivElement {
 		return false;
 	}
 	hasSkillTag(tag, hidden, arg, globalskill) {
-		let cache = CacheContext.getCacheContext();
-		if(!cache){
-			cache = new CacheContext();
-		}
 		var skills = this.getSkills(hidden);
 		if (globalskill) {
 			skills.addArray(lib.skill.global);
@@ -8342,7 +8338,7 @@ export class Player extends HTMLDivElement {
 			var info = lib.skill[skills[i]];
 			if (info && info.ai) {
 				if (info.ai.skillTagFilter && info.ai[tag] &&
-					info.ai.skillTagFilter(cache.delegate(this), tag, arg) === false) continue;
+					info.ai.skillTagFilter(this, tag, arg) === false) continue;
 				if (typeof info.ai[tag] == 'string') {
 					if (info.ai[tag] == arg) return true;
 				}
