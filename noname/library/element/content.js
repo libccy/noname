@@ -8114,10 +8114,12 @@ export const Content = {
 	},
 	addJudge: function () {
 		"step 0";
+		const cardName = typeof card == 'string' ? card : card.name , cardInfo = lib.card[cardName];
 		if (cards) {
 			var owner = get.owner(cards[0]);
 			if (owner) {
-				event.relatedLose = owner.lose(cards, 'visible', ui.special).set('getlx', false);
+				event.relatedLose = owner.lose(cards, ui.special).set('getlx', false);
+				if (cardInfo && !cardInfo.blankCard) event.relatedLose.set('visible',true);
 			}
 			else if (get.position(cards[0]) == 'c') event.updatePile = true;
 		}
