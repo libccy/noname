@@ -9,12 +9,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_jianyong:['male','shu',3,['olqiaoshui','jyzongshi'],['tempname:re_jianyong','die_audio:re_jianyong']],
 			ol_lingtong:['male','wu',4,['olxuanfeng'],['die_audio:re_lingtong']],
 			ol_sb_guanyu:['male','shu',4,['olsbfumeng','olsbguidao']],
+			ol_sb_taishici:['male','wu',4,['olsbdulie','olsbdouchan']],
 		},
 		characterSort:{
 			onlyOL:{
 				onlyOL_yijiang1:['ol_jianyong','ol_lingtong'],
 				onlyOL_yijiang2:['ol_caozhang'],
-				onlyOL_sb:['ol_sb_jiangwei','ol_sb_guanyu'],
+				onlyOL_sb:['ol_sb_jiangwei','ol_sb_guanyu','ol_sb_taishici'],
 			},
 		},
 		characterIntro:{
@@ -22,6 +23,55 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterReplace:{
 		},
 		skill:{
+			//OL谋太史慈
+			olsbdulie:{
+				audio:2,
+				trigger:{target:'useCardToTarget'},
+				filter(event,player){
+					if(event.player==player||!event.isFirstTarget||event.targets.length!=1) return false;
+					if(player.getAttackRange()<=0) return;
+					return ['basic','trick'].includes(get.type(event.card));
+				},
+				prompt2(event,player){
+					return '令'+get.translation(event.card)+'额外结算一次，此牌结算完毕后，你摸等同于你攻击范围的牌';
+				},
+				check(event,player){
+					const num=Math.min(5,player.getAttackRange());
+					if(get.effect(player,event.card,event.player,player)>0) return true;
+					if(event.card.name=='guohe'||event.card.name=='shunshou'||event.card.name=='zhujinqiyuan') return num>(event.effectCount||0);
+					if(!get.tag(event.card,'damage')) return true;
+					return num>1;
+				},
+				usable:1,
+				async content(event,trigger,player){
+					trigger.getParent().effectCount++;
+					player.when({global:'useCardAfter'})
+					.filter(evt=>evt==trigger.getParent())
+					.then(()=>{
+						const num=Math.min(5,player.getAttackRange());
+						if(num) player.draw(num);
+					});
+				},
+			},
+			olsbdouchan:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				forced:true,
+				async content(event,trigger,player){
+					const card=get.cardPile2(card=>card.name=='juedou');
+					if(card) player.gain(card,'gain2');
+					else if(player.countMark('olsbdouchan')<game.players.length+game.dead.length) player.addMark('olsbdouchan',1,false);
+				},
+				mod:{
+					attackRange(player,num){
+						return num+player.countMark('olsbdouchan');
+					},
+					cardUsable(card,player,num){
+						if(card.name=='sha') return num+player.countMark('olsbdouchan');
+					},
+				},
+				intro:{content:'<li>攻击距离+#<br><li>使用【杀】的次数上限+#'},
+			},
 			//OL谋关羽
 			//可以和手杀谋关羽组成卧龙凤雏了
 			olsbfumeng:{
@@ -503,6 +553,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olsbfumeng_info:'一轮游戏开始时，你可以令任意张手牌的牌名视为【杀】。',
 			olsbguidao:'归刀',
 			olsbguidao_info:'出牌阶段，你可以重铸两张牌并视为使用一张【决斗】（重铸的【杀】数须比本回合上次发动〖归刀〗重铸的【杀】数多）。目标角色受到此牌伤害时，其须猜测你手牌中牌名为【杀】的牌数量多还是牌名不为【杀】的牌数多，若其猜错，则此【决斗】对其造成的伤害+1。',
+			ol_sb_taishici:'OL谋太史慈',
+			ol_sb_taishici_prefix:'OL谋',
+			olsbdulie:'笃烈',
+			olsbdulie_info:'每回合限一次，当你成为其他角色使用基本牌或普通锦囊牌的目标时，你可以令此牌额外结算一次。若如此做，此牌结算完毕后，你摸X张牌（X为你的攻击范围且至多为5）。',
+			olsbdouchan:'斗缠',
+			olsbdouchan_info:'锁定技，准备阶段，你从牌堆中获得一张【决斗】，若牌堆没有【决斗】，则你的攻击范围和出牌阶段使用【杀】的次数上限+1（增加次数不超过游戏人数）。',
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',

@@ -664,6 +664,7 @@ window.noname_character_rank={
 		'jsrg_zhaoyun',
 		'jsrg_zhangxuan',
 		'sb_xunyu',
+		'ol_sb_taishici',
 	],
 	bp:[
 		'xin_huojun',
@@ -2122,6 +2123,7 @@ window.noname_character_rank={
 			'xia_shitao',
 		],
 		rare:[
+			'ol_sb_taishici',
 			'clan_wuqiao',
 			'xin_huojun',
 			'muludawang',
