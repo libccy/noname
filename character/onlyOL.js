@@ -49,7 +49,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					.filter(evt=>evt==trigger.getParent())
 					.then(()=>{
 						const num=Math.min(5,player.getAttackRange());
-						if(num) player.draw(num);
+						if(num>0) player.draw(num);
 					});
 				},
 			},
