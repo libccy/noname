@@ -1585,7 +1585,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.logSkill('dcmanzhi',target);
 					if(result.control=='选项一'){
 						player.addTempSkill('dcmanzhi_1');
-						target.chooseCard(2,'he','蛮智：请交给'+get.translation(player)+'两张牌');
+						target.chooseCard(2,'he','蛮智：请交给'+get.translation(player)+'两张牌',true);
 					}
 					else{
 						player.addTempSkill('dcmanzhi_2');

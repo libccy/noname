@@ -2897,7 +2897,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:'useCardToPlayered',
 				},
 				filter:function(event,player){
-					return event.isFirstTarget&&event.targets.length>player.getHp();
+					return event.isFirstTarget&&event.targets.length>=player.getHp();
 				},
 				direct:true,
 				usable:1,
@@ -10770,6 +10770,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						target.line(player);
+						if(player!==target&&(get.mode()!=='identity'||target.identity!=='nei')) target.addExpose(0.15);
 						player.draw();
 					}
 					if(num<targets.length) event.goto(1);
@@ -10784,6 +10785,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.line(target,'green');
+						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.15);
 						target.damage();
 					}
 					else event.finish();
@@ -10798,6 +10800,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.line(target);
+						if(player!==target&&(get.mode()!=='identity'||player.identity!=='nei')) player.addExpose(0.1);
 						target.draw();
 					}
 				},
@@ -26975,7 +26978,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olweifu:'威抚',
 			olweifu_info:'出牌阶段，你可以弃置一张牌并判定。你本回合下次使用与结果类型相同的牌无距离限制，且可以额外指定一个目标。若你弃置的牌与判定牌类型相同，你摸一张牌。',
 			olkuansai:'款塞',
-			olkuansai_info:'每回合限一次，当一张牌指定第一个目标后，若目标数大于你的体力值，你可以令其中一个目标选择一项：1.交给你一张牌；2.令你回复1点体力。',
+			olkuansai_info:'每回合限一次，当一张牌指定第一个目标后，若目标数不小于你的体力值，你可以令其中一个目标选择一项：1.交给你一张牌；2.令你回复1点体力。',
 			ol_luyusheng:'OL陆郁生',
 			ol_luyusheng_prefix:'OL',
 			olcangxin:'藏心',

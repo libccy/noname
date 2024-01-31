@@ -4437,6 +4437,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=target;
 						player.logSkill('nsfeixiong',target);
+						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.2);
 						player.chooseToCompare(target);
 					}
 					else event.finish();
