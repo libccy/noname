@@ -24763,12 +24763,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player:'enterGame',
 						},
 						filter:function(event,player){
+							if(player.countMark('xinfu_xionghuo')>=3) return false;
 							return event.name!='phase'||game.phaseNumber==0;
 						},
 						forced:true,
 						locked:false,
 						content:function(){
-							player.addMark('xinfu_xionghuo',3);
+							player.addMark('xinfu_xionghuo',3-player.countMark('xinfu_xionghuo'));
 						},
 					},
 					damage:{
@@ -24856,13 +24857,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'dying'},
 				filter:function(event,player){
-					return event.player!=player;
+					if(event.player==player) return false;
+					const bool1=(!player.hasSkill('xinfu_xionghuo')||player.countMark('xinfu_xionghuo')<3);
+					const bool2=(event.player.hp<0&&get.itemtype(event.parent.cards)=='cards'&&event.parent.cards.some(card=>get.position(card,true)=='o'));
+					return bool1||bool2;
 				},
 				forced:true,
 				content:function(){
-					if(player.countMark('xinfu_xionghuo')<3) player.addMark('xinfu_xionghuo',1);
-					if(trigger.player.hp<0&&get.itemtype(trigger.parent.cards)=='cards'&&get.position(trigger.parent.cards[0],true)=='o'){
-						player.gain(trigger.parent.cards,'gain2');
+					if(!player.hasSkill('xinfu_xionghuo')||player.countMark('xinfu_xionghuo')<3) player.addMark('xinfu_xionghuo',1);
+					if(trigger.player.hp<0&&get.itemtype(trigger.parent.cards)=='cards'&&trigger.parent.cards.some(card=>get.position(card,true)=='o')){
+						player.gain(trigger.parent.cards.filter(card=>get.position(card,true)=='o'),'gain2');
 					}
 				},
 			},
