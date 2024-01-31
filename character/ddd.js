@@ -4372,7 +4372,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						prompt:(event)=>('是否将【兵粮寸断】转移给'+get.translation(event.player)+'？'),
 						check(event,player){
 							return player.hasCard(card=>{
-								return (card.viewAs||card.name)=='bingliang'&&event.player.canAddJudge(card)&&get.effect(event.player,card,player,player)>=0;
+								return (card.viewAs||card.name)=='bingliang'&&event.player.canAddJudge(card)&&get.effect(event.player,new lib.element.VCard({
+									name:'bingliang',
+									cards:[card]
+								}),player,_status.event.player)>=0;
 							},'j');
 						},
 						content(){

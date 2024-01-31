@@ -6945,7 +6945,7 @@ export class Player extends HTMLDivElement {
 			cache = new CacheContext();
 		}
 		for (var i = 0; i < targets.length; i++) {
-			if (cache.delegate(player).canUse(card, targets[i], distance, includecard)) {
+			if (player.canUse(card, targets[i], distance, includecard)) {
 				var eff = cache.get.effect(targets[i], card, player, player);
 				value.push(eff);
 			}

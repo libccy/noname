@@ -159,9 +159,9 @@ export class Get extends Uninstantable {
 	 * 获取一张装备牌实际占用的装备栏(君曹操六龙)
 	 *
 	 * 用法同{@link subtype}，返回数组
-	 * 
-	 * @param { string | Card | VCard | CardBaseUIData } obj 
-	 * @param { false | Player } [player] 
+	 *
+	 * @param { string | Card | VCard | CardBaseUIData } obj
+	 * @param { false | Player } [player]
 	 * @returns { string[] }
 	 */
 	static subtypes(obj, player) {
@@ -266,8 +266,8 @@ export class Get extends Uninstantable {
 		return null;
 	}
 	/**
-	 * @param { string } skill 
-	 * @param { Player } player 
+	 * @param { string } skill
+	 * @param { Player } player
 	 * @returns { string[] }
 	 */
 	static skillCategoriesOf(skill, player) {
@@ -1726,9 +1726,9 @@ export class Get extends Uninstantable {
 	}
 	static type2(card, player) { return get.type(card, 'trick', player); }
 	/**
-	 * 
-	 * @param { string | Card | VCard | CardBaseUIData } obj 
-	 * @param { false | Player } [player] 
+	 *
+	 * @param { string | Card | VCard | CardBaseUIData } obj
+	 * @param { false | Player } [player]
 	 * @returns { string }
 	 */
 	static subtype(obj, player) {
@@ -1986,12 +1986,12 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * @overload
-	 * @param { string } item 
+	 * @param { string } item
 	 * @returns { Skill }
 	 */
 	/**
 	 * @overload
-	 * @param { Card | VCard | CardBaseUIData } item 
+	 * @param { Card | VCard | CardBaseUIData } item
 	 * @param { Player | false } [player]
 	 * @returns { any }
 	 */
@@ -2270,7 +2270,7 @@ export class Get extends Uninstantable {
 	}
 	/**
 	 * 遍历子元素
-	 * @param {HTMLElement} node 
+	 * @param {HTMLElement} node
 	 * @returns {Iterable<HTMLElement>} 迭代器
 	 */
 	static *iterableChildNodes(node){
@@ -4093,8 +4093,6 @@ export class Get extends Uninstantable {
 		if (aii && aii.value) value = aii.value;
 		else if (aii && aii.basic) value = aii.basic.value;
 		if (player == undefined || get.itemtype(player) != 'player') player = _status.event.player;
-		let cache = CacheContext.requireCacheContext();
-		player = cache.delegate(player);
 		var geti = function () {
 			return player.getCardIndex('hs',card.name,card,5);
 		};
@@ -4105,7 +4103,7 @@ export class Get extends Uninstantable {
 		if (Array.isArray(value)) {
 			if (method == 'raw') result = value[0];
 			var num = geti();
-			if (num < value.length) result = value[num];
+			if (num < value.length) result = value[Math.max(0,num)];
 			else result = value[value.length - 1];
 		}
 		result = game.checkMod(player, card, result, 'aiValue', player);
@@ -4186,10 +4184,10 @@ export class Get extends Uninstantable {
 		if (order == undefined) return -1;
 		var num = order;
 		if (typeof (order) == 'function') {
-			num = order(item, cache.delegate(_status.event.player));
+			num = order(item, _status.event.player);
 		}
 		if (typeof item == 'object' && _status.event.player) {
-			var player = cache.delegate(_status.event.player);
+			var player = _status.event.player;
 			num = game.checkMod(player, item, num, 'aiOrder', player);
 		}
 		return num;

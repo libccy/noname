@@ -10770,6 +10770,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						target.line(player);
+						if(player!==target&&(get.mode()!=='identity'||target.identity!=='nei')) target.addExpose(0.15);
 						player.draw();
 					}
 					if(num<targets.length) event.goto(1);
@@ -10784,6 +10785,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.line(target,'green');
+						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.15);
 						target.damage();
 					}
 					else event.finish();
@@ -10798,6 +10800,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.line(target);
+						if(player!==target&&(get.mode()!=='identity'||player.identity!=='nei')) player.addExpose(0.1);
 						target.draw();
 					}
 				},
