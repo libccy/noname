@@ -339,14 +339,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}).set('list',[-num1,player.getDamagedHp()]);
 						}
 						if(result.index==0){
-							if(num1<0) player.drawTo(player.getHandcardLimit());
-							else player.chooseToDiscard(num1,'h',true);
+							if(num1<0) yield player.drawTo(player.getHandcardLimit());
+							else yield player.chooseToDiscard(num1,'h',true);
 						}
 						else{
-							player.recover(player.maxHp-player.hp);
+							yield player.recover(player.maxHp-player.hp);
 						}
 					}
-					player.when('olsbranjiAfter').then(()=>player.addSkill('olsbranji_norecover'));
+					player.addSkill('olsbranji_norecover');
 					player.when({source:'dieAfter'}).then(()=>player.removeSkill('olsbranji_norecover'));
 				},
 				derivation:['kunfenx','zhaxiang'],
