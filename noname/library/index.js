@@ -13100,6 +13100,12 @@ export class Library extends Uninstantable {
 			 * @returns {string}
 			 */
 			getSpan: () => `${get.prefixSpan('新杀')}${get.prefixSpan('谋')}`
+		}],
+		['经典神', {
+			/**
+			 * @returns {string}
+			 */
+			getSpan: () => `${get.prefixSpan('经典')}${get.prefixSpan('神')}`
 		}]
 	]);
 	static groupnature = {

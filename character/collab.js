@@ -4,8 +4,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'collab',
 		connect:true,
 		character:{
+			dc_zhaoyun:['male','shen',1,['boss_juejing','dclonghun','dczhanjiang'],['shu','InitFilter:noZhuHp:noZhuSkill']],
 			dc_sunce:['male','wu',4,['dcshuangbi']],
-			nezha:['male','qun',2,['dcsantou','dcfaqi']],
+			nezha:['male','qun',3,['dcsantou','dcfaqi'],['InitFilter:noZhuHp']],
 			dc_caocao:['male','wei',4,['dcjianxiong']],
 			dc_liubei:['male','shu',4,['dcrende']],
 			dc_sunquan:['male','wu',4,['dczhiheng']],
@@ -39,6 +40,130 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//新InitFilter测试高达一号
+			//打赢复活赛的牢达[哭]
+			dclonghun:{
+				audio:'longhun',
+				enable:['chooseToUse','chooseToRespond'],
+				prompt:'将♦牌当做火【杀】，♥牌当做【桃】，♣牌当做【闪】，♠牌当做【无懈可击】使用或打出',
+				viewAs(cards,player){
+					var name=false;
+					var nature=null;
+					switch(get.suit(cards[0],player)){
+						case 'club':name='shan';break;
+						case 'diamond':name='sha';nature='fire';break;
+						case 'spade':name='wuxie';break;
+						case 'heart':name='tao';break;
+					}
+					if(name) return {name:name,nature:nature};
+					return null;
+				},
+				check(card){
+					var player=_status.event.player;
+					if(_status.event.type=='phase'){
+						var max=0;
+						var name2;
+						var list=['sha','tao'];
+						var map={sha:'diamond',tao:'heart'}
+						for(var i=0;i<list.length;i++){
+							var name=list[i];
+							if(player.countCards('hes',function(card){
+								return (name!='sha'||get.value(card)<5)&&get.suit(card,player)==map[name];
+							})>0&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
+								var temp=get.order({name:name,nature:name=='sha'?'fire':null});
+								if(temp>max){
+									max=temp;
+									name2=map[name];
+								}
+							}
+						}
+						if(name2==get.suit(card,player)) return (name2=='diamond'?(5-get.value(card)):20-get.value(card));
+						return 0;
+					}
+					return 1;
+				},
+				position:'hes',
+				filterCard(card,player,event){
+					event=event||_status.event;
+					var filter=event._backup.filterCard;
+					var name=get.suit(card,player);
+					if(name=='club'&&filter({name:'shan',cards:[card]},player,event)) return true;
+					if(name=='diamond'&&filter({name:'sha',cards:[card],nature:'fire'},player,event)) return true;
+					if(name=='spade'&&filter({name:'wuxie',cards:[card]},player,event)) return true;
+					if(name=='heart'&&filter({name:'tao',cards:[card]},player,event)) return true;
+					return false;
+				},
+				filter(event,player){
+					if(player.countMark('dclonghun')>=20) return false;
+					var filter=event.filterCard;
+					if(filter({name:'sha',nature:'fire'},player,event)&&player.countCards('hes',{suit:'diamond'})) return true;
+					if(filter({name:'shan'},player,event)&&player.countCards('hes',{suit:'club'})) return true;
+					if(filter({name:'tao'},player,event)&&player.countCards('hes',{suit:'heart'})) return true;
+					if(filter({name:'wuxie'},player,event)&&player.countCards('hes',{suit:'spade'})) return true;
+					return false;
+				},
+				precontent(){
+					if(!player.hasMark('dclonghun')){
+						player.when({global:'phaseAfter'}).then(()=>player.removeMark('dclonghun',player.countMark('dclonghun'),false));
+					}
+					player.addMark('dclonghun',1,false);
+				},
+				ai:{
+					respondSha:true,
+					respondShan:true,
+					skillTagFilter(player,tag){
+						if(player.countMark('dclonghun')>=20) return false;
+						var name;
+						switch(tag){
+							case 'respondSha':name='diamond';break;
+							case 'respondShan':name='club';break;
+							case 'save':name='heart';break;
+						}
+						if(!player.countCards('hes',{suit:name})) return false;
+					},
+					order(item,player){
+						if(player&&_status.event.type=='phase'){
+							var max=0;
+							var list=['sha','tao'];
+							var map={sha:'diamond',tao:'heart'}
+							for(var i=0;i<list.length;i++){
+								var name=list[i];
+								if(player.countCards('hes',function(card){
+									return (name!='sha'||get.value(card)<5)&&get.suit(card,player)==map[name];
+								})>0&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
+									var temp=get.order({name:name,nature:name=='sha'?'fire':null});
+									if(temp>max) max=temp;
+								}
+							}
+							max/=1.1;
+							return max;
+						}
+						return 2;
+					},
+				},
+				hiddenCard(player,name){
+					if(player.countMark('dclonghun')>=20) return false;
+					if(name=='wuxie'&&_status.connectMode&&player.countCards('hes')>0) return true;
+					if(name=='wuxie') return player.countCards('hes',{suit:'spade'})>0;
+					if(name=='tao') return player.countCards('hes',{suit:'heart'})>0;
+				},
+			},
+			dczhanjiang:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				filter(event,player){
+					return game.hasPlayer(target=>{
+						return target.countCards('ej',card=>get.name(card,false)=='qinggang'||gat.name(card,get.owner(card))=='qinggang');
+					});
+				},
+				content(){
+					let cards=[],targets=game.filterPlayer(target=>{
+						return target.countCards('ej',card=>get.name(card,false)=='qinggang'||gat.name(card,get.owner(card))=='qinggang');
+					});
+					targets.forEach(target=>cards.addArray(target.getCards('ej',card=>get.name(card,false)=='qinggang'||gat.name(card,get.owner(card))=='qinggang')));
+					player.gain(cards,'give');
+				},
+			},
 			//孙策
 			//双壁=100%技能周瑜+100%原画孙策
 			dcshuangbi:{
@@ -1853,6 +1978,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_sunce_prefix:'经典',
 			dcshuangbi:'双壁',
 			dcshuangbi_info:'出牌阶段限一次，你可以选择一项：①摸X张牌，本回合手牌上限+X；②弃置至多X张牌，随机对其他角色造成等量火焰伤害；③视为使用X张火【杀】或【火攻】。（X为场上存活角色数）',
+			dc_zhaoyun:'经典神赵云',
+			dc_zhaoyun_prefix:'经典神',
+			dclonghun:'龙魂',
+			dclonghun_info:'每回合限20次，你可以将你的牌按下列规则使用或打出：红桃当【桃】，方块当火【杀】，梅花当【闪】，黑桃当【无懈可击】。',
+			dczhanjiang:'斩将',
+			dczhanjiang_info:'准备阶段，若场上有【青釭剑】，则你可以获得之。',
 
 			collab_olympic:'OL·伦敦奥运会',
 			collab_tongque:'OL·铜雀台',
