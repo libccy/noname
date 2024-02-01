@@ -136,6 +136,7 @@ window.noname_character_rank={
 		'xia_yuzhenzi',
 	],
 	a:[
+		'star_yuanshao',
 		'xia_shitao',
 		'diy_zaozhirenjun',
 		'gjqt_fanglansheng',
@@ -1857,6 +1858,7 @@ window.noname_character_rank={
 			'caoxian',
 		],
 		epic:[
+			'star_yuanshao',
 			'yue_xiaoqiao',
 			'mb_chengui',
 			'ol_pengyang',
