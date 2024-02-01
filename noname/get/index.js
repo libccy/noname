@@ -540,6 +540,13 @@ export class Get extends Uninstantable {
 		}
 		return info;
 	}
+	static characterInitFilter(name) {
+		const info = get.character(name);
+		if (!info || !info[4]) return [];
+		const filter = info[4].find(tag => tag.startsWith('InitFilter'));
+		if (!filter) return [];
+		return filter.split(':').slice(1);
+	}
 	static characterIntro(name) {
 		if (lib.characterIntro[name]) return lib.characterIntro[name];
 		var tags = get.character(name, 4);

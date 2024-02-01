@@ -8321,6 +8321,18 @@ export class Player extends HTMLDivElement {
 		if (mode == 'versus' && (_status.mode == 'four' || _status.mode == 'guandu')) return true;
 		return false;
 	}
+	isInitFilter(tag) {
+		const player = this;
+		for (const name of [player.name, player.name1, player.name2]) {
+			if (name && lib.character[name]) {
+				const filter = get.characterInitFilter(name);
+				if (!filter.includes(tag)) continue;
+				if (lib.characterInitFilter[name] && lib.characterInitFilter[name](tag) === false) continue;
+				return true;
+			}
+		}
+		return false;
+	}
 	hasZhuSkill(skill, player) {
 		if (!this.hasSkill(skill)) return false;
 		if (player) {
