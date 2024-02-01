@@ -43,7 +43,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//新InitFilter测试高达一号
 			//打赢复活赛的牢达[哭]
 			dclonghun:{
-				audio:'longhun',
+				audio:2,
 				enable:['chooseToUse','chooseToRespond'],
 				prompt:'将♦牌当做火【杀】，♥牌当做【桃】，♣牌当做【闪】，♠牌当做【无懈可击】使用或打出',
 				viewAs(cards,player){
