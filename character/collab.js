@@ -247,7 +247,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'damageBegin4'},
 				forced:true,
-				group:'dcsantou_gain',
 				*content(event,map){
 					var player=map.player,trigger=map.trigger;
 					var source=trigger.source;
@@ -267,26 +266,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(trigger.card&&get.color(trigger.card)=='red') lose=true;
 					}
 					if(lose) player.loseHp();
-				},
-				subSkill:{
-					gain:{
-						audio:'dcsantou',
-						trigger:{
-							global:'phaseBefore',
-							player:'enterGame',
-						},
-						forced:true,
-						filter(event,player){
-							if(player.maxHp>=3) return false;
-							return (event.name!='phase'||game.phaseNumber==0);
-						},
-						*content(event,map){
-							var player=map.player;
-							yield player.gainMaxHp(3-player.maxHp);
-							var num=3-player.getHp(true);
-							if(num>0) player.recover(num);
-						}
-					}
 				},
 				ai:{
 					filterDamage:true,
@@ -1970,7 +1949,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhiheng_info:'①出牌阶段限一次。你可以弃置任意张牌并摸等量的牌，若你在发动〖制衡〗时弃置了所有手牌，则你多摸一张牌。②每回合每名角色限一次。当你对其他角色造成伤害后，你令〖制衡①〗于此回合发动次数上限+1。',
 			nezha:'哪吒',
 			dcsantou:'三头',
-			dcsantou_info:'锁定技。①当你受到伤害时，防止之，然后若以下有条件成立，你失去1点体力：1.你于本回合此前以此法防止过该伤害来源的伤害，且你的体力值不小于3；2.本次伤害为属性伤害，且你的体力值为2；3.本次伤害的渠道为红色的牌，且你的体力值为1。②游戏开始时，若你的体力上限小于3，你将体力上限加至3并将体力回复至3。',
+			dcsantou_info:'锁定技，当你受到伤害时，防止之，然后若以下有条件成立，你失去1点体力：1.你于本回合此前以此法防止过该伤害来源的伤害，且你的体力值不小于3；2.本次伤害为属性伤害，且你的体力值为2；3.本次伤害的渠道为红色的牌，且你的体力值为1。',
 			dcfaqi:'法器',
 			dcfaqi_info:'当你于出牌阶段使用装备牌结算结束后，你视为使用一张本回合未以此法使用过的普通锦囊牌。',
 			dc_sunce:'经典孙策',
