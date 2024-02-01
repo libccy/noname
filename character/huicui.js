@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			kongrong:['male','qun',3,['dckrmingshi','lirang']],
 			dc_sp_menghuo:['male','qun',4,['dcmanwang']],
 			dc_lingcao:['male','wu','4/5',['dcdufeng']],
 			yue_xiaoqiao:['female','wu',3,['dcqiqin','dcweiwan']],
@@ -98,7 +99,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			huicui:{
 				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong','xiahoujie','dc_caiyang','zhoushan'],
-				sp_caizijiaren:['re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
+				sp_caizijiaren:['kongrong','re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
 				sp_zhilan:['liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen','dc_lingcao'],
 				sp_guixin:['re_kanze','re_chendeng','caimaozhangyun','dc_lvkuanglvxiang','dc_gaolan','yinfuren','chengui','chenjiao','dc_sp_jiaxu','qinlang','dc_dongzhao'],
 				sp_daihan:['mamidi','dc_jiling','zhangxun','dc_yuejiu','wanglie','leibo','qiaorui','dongwan','yuanyin'],
@@ -113,6 +114,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//孔融
+			dckrmingshi:{
+				audio:'kongrong',
+				trigger:{player:'damageBegin4'},
+				filter(event,player){
+					return event.source&&event.source.countCards('h')>player.countCards('h');
+				},
+				forced:true,
+				logTarget:'source',
+				async content(event,trigger,player){
+					const target=trigger.source;
+					const {result:{bool}}=await target.chooseToDiscard('名士：弃置一张手牌，或防止对'+get.translation(player)+'造成的伤害').set('ai',card=>{
+						if(get.event('goon')) return 0;
+						return 6-get.value(card);
+					}).set('goon',get.damageEffect(player,target,target)<=0);
+					if(!bool) trigger.decrease('num');
+				},
+				ai:{
+					effect:{
+						target_use(card,player,target,current){
+							if(get.tag(card,'damage')&&target!=player){
+								if(_status.event.name=='dckrmingshi') return;
+								if(get.attitude(player,target)>0&&current<0) return 'zerotarget';
+								var bs=player.getCards('h');
+								bs.remove(card);
+								if(card.cards) bs.removeArray(card.cards);
+								else bs.removeArray(ui.selected.cards);
+								if(bs.length>target.countCards('h')){
+									if(bs.some(bsi=>get.value(bsi)<7)) return [1,0,1,-0.5];
+									return [1,0,0.3,0];
+								}
+								return [1,0,1,-0.5];
+							}
+						},
+					},
+				},
+			},
 			//新服SP孟获
 			dcmanwang:{
 				audio:'spmanwang',
@@ -11715,6 +11753,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcmanwang_info:'出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：⒈获得〖叛侵〗。⒉摸一张牌。⒊回复1点体力。⒋摸两张牌并失去〖叛侵〗。',
 			dcpanqin:'叛侵',
 			dcpanqin_info:'出牌阶段或弃牌阶段结束时，你可将你于本阶段内弃置且位于弃牌堆的所有牌当做【南蛮入侵】使用。然后若此牌被使用时对应的实体牌数不大于此牌的目标数，则你执行并移除〖蛮王〗中的最后一个选项，然后加1点体力上限并回复1点体力。',
+			kongrong:'孔融',
+			dckrmingshi:'名士',
+			dckrmingshi_info:'锁定技，当你受到其他角色造成的伤害时，若其手牌数大于你，则其需弃置一张手牌，否则此伤害-1。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',

@@ -47,6 +47,7 @@ window.noname_character_rank={
 		'sb_machao',
 		'dc_zhouxuān',
 		'key_iriya',
+		'dc_zhaoyun',
 	],
 	ap:[
 		'xia_guanyu',
@@ -1364,6 +1365,7 @@ window.noname_character_rank={
 		'xia_shie',
 	],
 	bm:[
+		'kongrong',
 		'diy_xizhenxihong',
 		'ns_nanhua_left',
 		'ns_nanhua_right',
@@ -1663,6 +1665,11 @@ window.noname_character_rank={
 	],
 	rarity:{
 		legend:[
+			'dc_zhaoyun',
+			'dc_caocao',
+			'dc_liubei',
+			'dc_sunquan',
+			'dc_sunce',
 			'xia_yuzhenzi',
 			'xia_guanyu',
 			'swd_muyun',
