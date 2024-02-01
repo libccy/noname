@@ -278,15 +278,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						discard:false,
 						lose:false,
 						delay:false,
+						usable:1,
 						async content(event,trigger,player){
 							const target=event.target,info=get.info('starzongshi');
 							await player.give(event.cards,target);
-							let {result:{bool}}= await target.chooseCard(info.position)
-							.set('prompt',get.prompt2('starzongshi')).set('ai',card=>info.check(card));
-							if(bool){
-								result.skill='starzongshi';
-								player.useResult(result,event);
-							}
+							const {result:{bool,cards}}= await target.chooseCard(info.position).set('ai',card=>info.check(card))
+							.set('prompt',get.prompt('starzongshi')).set('prompt2',lib.translate.starzongshi_info.slice(8).slice(0,-1));
+							if(bool) target.useResult({skill:'starzongshi',cards:cards},event);
 						},
 						ai:{
 							order:9,
