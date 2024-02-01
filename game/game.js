@@ -100,8 +100,23 @@ new Promise(resolve => {
 					return module.require(moduleId);
 				} catch {
 					return module.require(path.join(window.__dirname, moduleId));
-				}	
+				}
 			};
+		}
+		if (location.protocol.startsWith('http') && 'serviceWorker' in navigator) {
+			let scope = window.location.protocol + '//' + window.location.host + '/';
+			navigator.serviceWorker.register(`${scope}service-worker.js`, {
+				updateViaCache: "all",
+				scope,
+			}).then(registration => {
+				navigator.serviceWorker.addEventListener('message', e => {
+					console.log(e);
+				});
+				registration.update();
+				// console.log(`set scope: ${scope}, service worker instance:`, registration);
+			}).catch(e => {
+				console.log('serviceWorker加载失败: ', e);
+			});
 		}
 		const script = document.createElement('script')
 		script.type = "module";
