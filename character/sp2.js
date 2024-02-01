@@ -161,7 +161,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const cards=player.getCards('h',card=>{
 						const type=get.type(card,player);
 						if(type!='basic'&&type!='trick') return false;
-						return player.hasUseTarget(card);
+						return player.hasUseTarget(card,true,true);
 					});
 					if(!cards.length) return false;
 					return cards.some(card=>{
@@ -174,7 +174,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const cards=player.getCards('h',card=>{
 						const type=get.type(card,player);
 						if(type!='basic'&&type!='trick') return false;
-						return player.hasUseTarget(card);
+						return player.hasUseTarget(card,true,true);
 					});
 					if(!cards.includes(card)) return false;
 					const cardss=player.getCards('h',cardx=>card!=cardx&&get.suit(card,player)==get.suit(cardx,player));
@@ -219,7 +219,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const player=get.event('player'),card=get.event('playerx');
 						return get.effect(target,card,player,player);
 					});
-					if(bool) player.useCard(cardx,cards,targets.sortBySeat(),false);
+					if(bool) player.useCard(cardx,cards,targets.sortBySeat());
 				},
 				ai:{
 					order:9,
@@ -11394,7 +11394,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starxiaoyan:'硝焰',
 			starxiaoyan_info:'锁定技，游戏开始时，你对所有其他角色各造成1点火属性伤害，然后这些角色可依次交给你一张牌并回复1点体力。',
 			starzongshi:'纵势',
-			starzongshi_info:'出牌阶段，你可以展示一张基本牌或普通锦囊牌，然后你将手牌中所有与此牌花色相同的其他牌当作此牌使用，且此牌至多指定转化牌数的目标。',
+			starzongshi_info:'出牌阶段，你可以展示一张可展示目标的基本牌或普通锦囊牌，然后你将手牌中所有与此牌花色相同的其他牌当作此牌使用，且此牌至多指定转化牌数的目标。',
 			starjiaowang:'骄妄',
 			starjiaowang_info:'锁定技，非首轮游戏开始时，若上一轮没有角色因〖硝焰〗死亡，则你失去1点体力并发动〖硝焰〗。',
 			staraoshi:'傲势',
