@@ -193,13 +193,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const cards=player.getCards('h',cardx=>card!=cardx&&get.suit(card,player)==get.suit(cardx,player));
 					let targets=game.filterPlayer(target=>player.canUse(card,target)&&get.effect(target,card,player,player)>0);
 					const max=range[1],max2=Math.min(cards.length,targets.length);
-					if(max>=max2) return 0;
+					if(max>max2) return 0;
 					targets=targets.sort((a,b)=>get.effect(b,card,player,player)-get.effect(a,card,player,player)).slice(0,max2);
 					const sum=targets.reduce((num,target)=>num+get.effect(target,card,player,player),0);
 					if(max==-1){
 						if(game.filterPlayer(target=>{
 							return player.canUse(card,target);
-						}).reduce((num,target)=>num+get.effect(target,card,player,player),0)>=sum) return 0;
+						}).reduce((num,target)=>num+get.effect(target,card,player,player),0)>sum) return 0;
 					}
 					return sum;
 				},
