@@ -38,15 +38,29 @@ function generateImportFunction(type, pathParser) {
 			await game.import(type,createEmptyExtension(name));
 			return;
 		}
-		const path = pathParser(name);
+		let path = pathParser(name);
 		// 通过浏览器自带的script标签导入可直接获取报错信息，且不会影响JS运行
 		// 此时代码内容也将缓存在浏览器中，故再次import后将不会重新执行代码内容（测试下来如此）
-		const [status, script] = await new Promise((resolve) => {
-			const script = document.createElement('script');
-			script.type = 'module';
-			script.src = `${lib.assetURL}noname/init/${path}`;
-			script.onerror = () => resolve(['error', script]);
-			script.onload = () => resolve(['ok', script]);
+		const [status, script] = await new Promise(resolve => {
+			const createScript = () => {
+				const script = document.createElement('script');
+				script.type = 'module';
+				script.src = `${lib.assetURL}noname/init/${path}`;
+				script.onload = () => resolve(['ok', script]);
+				return script;
+			};
+			let script = createScript();
+			script.onerror = () => {
+				if (path.endsWith('.js')) {
+					path = path.slice(0, -3) + '.ts';
+					script.remove();
+					let ts = createScript();
+					ts.onerror = () => resolve(['error', ts]);
+					document.head.appendChild(ts);
+				} else {
+					resolve(['error', script]);
+				}
+			};
 			document.head.appendChild(script);
 		});
 		script.remove();
