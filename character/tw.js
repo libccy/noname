@@ -4554,8 +4554,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.directHit.addArray(game.players);
 							var info=get.info(trigger.card);
 							if(info.allowMultiple==false) event.finish();
-							else if(trigger.targets&&!info.multitarget){
-								if(!game.hasPlayer(function(current){
+							else if(trigger.targets){
+								if(!info.multitarget&&!game.hasPlayer(function(current){
 									return !trigger.targets.includes(current)&&lib.filter.targetEnabled2(trigger.card,player,current);
 								})) event.finish();
 							}
