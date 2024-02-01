@@ -94,7 +94,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				filter(event,player){
-					if(player.countMark('dclonghun')>=20) return false;
 					var filter=event.filterCard;
 					if(filter({name:'sha',nature:'fire'},player,event)&&player.countCards('hes',{suit:'diamond'})) return true;
 					if(filter({name:'shan'},player,event)&&player.countCards('hes',{suit:'club'})) return true;
@@ -102,17 +101,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(filter({name:'wuxie'},player,event)&&player.countCards('hes',{suit:'spade'})) return true;
 					return false;
 				},
-				precontent(){
-					if(!player.hasMark('dclonghun')){
-						player.when({global:'phaseAfter'}).then(()=>player.removeMark('dclonghun',player.countMark('dclonghun'),false));
-					}
-					player.addMark('dclonghun',1,false);
-				},
+				usable:20,
 				ai:{
 					respondSha:true,
 					respondShan:true,
 					skillTagFilter(player,tag){
-						if(player.countMark('dclonghun')>=20) return false;
+						if((player.getStat('skill').dclonghun||0)>=20) return false;
 						var name;
 						switch(tag){
 							case 'respondSha':name='diamond';break;
@@ -142,7 +136,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				hiddenCard(player,name){
-					if(player.countMark('dclonghun')>=20) return false;
+					if((player.getStat('skill').dclonghun||0)>=20) return false;
 					if(name=='wuxie'&&_status.connectMode&&player.countCards('hes')>0) return true;
 					if(name=='wuxie') return player.countCards('hes',{suit:'spade'})>0;
 					if(name=='tao') return player.countCards('hes',{suit:'heart'})>0;
