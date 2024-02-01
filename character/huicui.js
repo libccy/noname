@@ -5041,7 +5041,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(effect>0) return '选项二';
 							}
 						}else{
-							loses.forEach(i=>effect-=get.effect(i,{name:'losehp'},player,player));
+							loses.forEach(i=>effect+=get.effect(i,{name:'losehp'},player,player));
 							recovers.forEach(i=>effect+=get.recoverEffect(i,player,player));
 							if(effect>0) return '选项二';
 							return '选项一';
