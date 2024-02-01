@@ -153,14 +153,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseZhunbeiBegin'},
 				filter(event,player){
 					return game.hasPlayer(target=>{
-						return target.countCards('ej',card=>get.name(card,false)=='qinggang'||gat.name(card,get.owner(card))=='qinggang');
+						return target.countCards('ej',card=>get.name(card,false)=='qinggang'||get.name(card,get.owner(card))=='qinggang');
 					});
 				},
 				content(){
 					let cards=[],targets=game.filterPlayer(target=>{
-						return target.countCards('ej',card=>get.name(card,false)=='qinggang'||gat.name(card,get.owner(card))=='qinggang');
+						return target.countCards('ej',card=>get.name(card,false)=='qinggang'||get.name(card,get.owner(card))=='qinggang');
 					});
-					targets.forEach(target=>cards.addArray(target.getCards('ej',card=>get.name(card,false)=='qinggang'||gat.name(card,get.owner(card))=='qinggang')));
+					targets.forEach(target=>cards.addArray(target.getCards('ej',card=>get.name(card,false)=='qinggang'||get.name(card,get.owner(card))=='qinggang')));
 					player.gain(cards,'give');
 				},
 			},
