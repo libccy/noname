@@ -116,7 +116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		skill:{
 			//孔融
 			dckrmingshi:{
-				audio:'kongrong',
+				audio:'mingshi',
 				trigger:{player:'damageBegin4'},
 				filter(event,player){
 					return event.source&&event.source.countCards('h')>player.countCards('h');
