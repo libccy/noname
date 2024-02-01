@@ -111,7 +111,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_xuzhou:['re_taoqian','caosong','zhangmiao','qiuliju'],
 				sp_zhongyuan:['re_hucheer','re_zoushi','caoanmin','re_dongcheng'],
 				sp_xiaohu:['haomeng','yanfuren','yanrou','dc_zhuling'],
-				sp_star:['star_caoren','star_yuanshu','star_dongzhuo'],
+				sp_star:['star_caoren','star_yuanshu','star_dongzhuo','star_yuanshao'],
 				mini_qixian:['mp_liuling'],
 				sp_decade:['caobuxing','re_maliang','dc_jikang'],
 			}
