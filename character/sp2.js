@@ -282,7 +282,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						async content(event,trigger,player){
 							const target=event.target,info=get.info('starzongshi');
 							await player.give(event.cards,target);
-							const {result:{bool,cards}}= await target.chooseCard(info.position).set('ai',card=>info.check(card))
+							const {result:{bool,cards}}= await target.chooseCard(info.position,(card,player)=>{
+								return get.event('info').filterCard(card,player);
+							}).set('info',info).set('ai',card=>get.event('info').check(card)).set('selectCard',[1,2]).set('complexCard',true)
 							.set('prompt',get.prompt('starzongshi')).set('prompt2',lib.translate.starzongshi_info.slice(8).slice(0,-1));
 							if(bool) target.useResult({skill:'starzongshi',cards:cards},event);
 						},
