@@ -180,11 +180,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mod:{
 							targetEnabled(card,player,target){
 								const list=lib.skill.dczixi.zixiList;
-								if(card.name.indexOf('dczixi_')==0){
-									const name=card.name.slice('dczixi_'.length);
-									if(list.includes(name)&&target.hasJudge(name)) return false;
+								const name=(typeof card=='string')?card:(card.viewAs?card.viewAs:card.name);
+								if(name.indexOf('dczixi_')==0){
+									const namex=name.slice('dczixi_'.length);
+									if(list.includes(namex)&&target.hasJudge(namex)) return false;
 								}
-								else if(list.includes(card.name)&&target.hasJudge('dczixi_'+card.name)) return false;
+								else if(list.includes(name)&&target.hasJudge('dczixi_'+name)) return false;
 							},
 						},
 						ai:{
