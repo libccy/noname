@@ -126,7 +126,7 @@ window.noname_character_rank={
 		'db_key_liyingxia',
 		'key_kiyu',
 		'jsrg_pangtong',
-		'star_caoren',
+		'star_dongzhuo',
 		'clan_xunyou',
 		'caoxian',
 		'sb_guanyu',
@@ -136,6 +136,7 @@ window.noname_character_rank={
 		'xia_yuzhenzi',
 	],
 	a:[
+		'star_caoren',
 		'star_yuanshao',
 		'xia_shitao',
 		'diy_zaozhirenjun',
@@ -1667,6 +1668,7 @@ window.noname_character_rank={
 	],
 	rarity:{
 		legend:[
+			'star_caoren',
 			'dc_zhaoyun',
 			'dc_caocao',
 			'dc_liubei',
@@ -2123,7 +2125,7 @@ window.noname_character_rank={
 			'key_kotomi',
 			'db_key_liyingxia',
 			'key_iriya',
-			'star_caoren',
+			'star_dongzhuo',
 			'star_yuanshu',
 			'clan_xunyou',
 			'lvboshe',
