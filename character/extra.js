@@ -8139,7 +8139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			boss_zhaoyun_prefix:'神',
 			boss_juejing:'绝境',
 			boss_juejing2:'绝境',
-			boss_juejing_info:'锁定技，摸牌阶段开始前，你跳过此阶段。当你得到牌/失去手牌后，若你的手牌数大于4/小于4，则你将手牌摸至4张/弃置至4张。',
+			boss_juejing_info:'锁定技，摸牌阶段开始前，你跳过此阶段。当你得到牌/失去手牌后，若你的手牌数大于4/小于4，则你将手牌弃置至4张/摸至4张。',
 			zhanjiang:'斩将',
 			zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之。',
 			shen_guojia:'神郭嘉',
