@@ -36,6 +36,7 @@ var pinyin_dict_polyphone = {
 	"赵累": " lèi",
 	"夏侯令女": " hóu lìng nǚ",
 	"马日磾": " mì dī",
+	"史阿": " ē",
 	
 	"凯撒": " sà",
 	
