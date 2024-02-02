@@ -4357,7 +4357,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			boss_juejing:{
 				audio:'juejing',
-				audioname:['dc_zhaoyun'],
+				audioname2:{
+					dc_zhaoyun:'dcjuejing',
+				},
 				trigger:{player:'phaseDrawBefore'},
 				forced:true,
 				content(){
@@ -4371,7 +4373,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			boss_juejing2:{
 				audio:'juejing',
-				audioname:['dc_zhaoyun'],
+				audioname2:{
+					dc_zhaoyun:'dcjuejing',
+				},
 				trigger:{
 					player:'loseAfter',
 					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
@@ -4394,6 +4398,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else player.chooseToDiscard('h',true,-num);
 				},
 			},
+			dcjuejing:{audio:2},
 			meihun:{
 				audio:2,
 				trigger:{
