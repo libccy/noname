@@ -29,14 +29,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				filter(event,player){
 					return get.inpileVCardList(info=>{
-						return get.type(info[2])=='basic';
+						const name=info[2];
+						if(name!='sha'&&name!='jiu') return false;
+						return get.type(name)=='basic';
 					}).some(card=>player.hasCard(cardx=>event.filterCard({name:card[2],nature:card[3],cards:[cardx]},player,event),'hes'));
 				},
 				usable:1,
 				chooseButton:{
 					dialog(event,player){
 						const list=get.inpileVCardList(info=>{
-							return get.type(info[2])=='basic';
+							const name=info[2];
+							if(name!='sha'&&name!='jiu') return false;
+							return get.type(name)=='basic';
 						}).filter(card=>player.hasCard(cardx=>event.filterCard({name:card[2],nature:card[3],cards:[cardx]},player,event),'hes'));
 						return ui.create.dialog('威临',[list,'vcard']);
 					},
@@ -95,19 +99,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				hiddenCard(player,name){
-					if(!lib.inpile.includes(name)) return false;
+					if(!lib.inpile.includes(name)||name!='jiu') return false;
 					return get.type(name)=='basic'&&!player.getStat('skill').olsbweilin&&player.countCards('hes');
 				},
 				ai:{
 					fireAttack:true,
 					respondSha:true,
-					respondShan:true,
 					skillTagFilter(player){
 						if(player.getStat('skill').olsbweilin||!player.countCards('hes')) return false;
 					},
 					order(item,player){
-						if(player&&_status.event.type=='phase'){
-							let max=0,names=get.inpileVCardList(info=>get.type(info[2])=='basic');
+						if(player&&_status.event.type=='phase'&&player.hasValueTarget({name:'sha'},true,true)){
+							let max=0,names=get.inpileVCardList(info=>{
+								const name=info[2];
+								if(name!='sha'&&name!='jiu') return false;
+								return get.type(name)=='basic';
+							});
 							names=names.map(namex=>{return {name:namex[2],nature:namex[3]}});
 							names.forEach(card=>{
 								if(player.getUseValue(card)>0){
@@ -120,7 +127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(temp>max) max=temp;
 								}
 							});
-							if(max>0) max+=3;
+							if(max>0) max+=15;
 							return max;
 						}
 						return 0.5;
@@ -719,7 +726,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olsbdouchan:'斗缠',
 			olsbdouchan_info:'锁定技，准备阶段，你从牌堆中获得一张【决斗】，若牌堆没有【决斗】，则你的攻击范围和出牌阶段使用【杀】的次数上限+1（增加次数不超过游戏人数）。',
 			olsbweilin:'威临',
-			olsbweilin_info:'每回合限一次，你可以将一张牌当作任意基本牌使用，且你以此法使用的牌指定最后一个目标后，你令所有目标角色本回合与此牌颜色相同的手牌均视为【杀】。',
+			olsbweilin_info:'每回合限一次，你可以将一张牌当作任意【杀】或【酒】使用，且你以此法使用的牌指定最后一个目标后，你令所有目标角色本回合与此牌颜色相同的手牌均视为【杀】。',
 			olsbduoshou:'夺首',
 			olsbduoshou_info:'锁定技。①你每回合使用的第一张红色牌无距离限制。②你每回合使用的第一张基本牌不计入使用次数。③你每回合第一次造成伤害后，你摸一张牌。',
 
