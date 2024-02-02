@@ -387,7 +387,7 @@ export class GameEvent {
 		}
 	}
 	getTrigger() {
-		return this.getParent('arrangeTrigger')._trigger;
+		return this.getParent(e => e._trigger, false, true)._trigger;
 	}
 	getRand(name) {
 		if (name) {
