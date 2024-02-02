@@ -108,6 +108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_gaoshan:['wanglang','liuhui','zhangjian'],
 				sp2_wumiao:['wu_zhugeliang','wu_luxun'],
 				sp2_mouding:['dc_sb_lusu','dc_sb_zhouyu'],
+				xianding_waitforsort:[],
 			}
 		},
 		skill:{
@@ -14234,6 +14235,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp2_gaoshan:'高山仰止',
 			sp2_qifu:'祈福',
 			sp2_mouding:'谋定天下',
+			xianding_waitforsort:'等待分包',
 		},
 	};
 });

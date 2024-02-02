@@ -17,6 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				old_sp:['old_shixie',"panfeng","old_wanglang","old_maliang","old_zhangxingcai","old_wangyun",'old_dingfeng','old_guanyinping'],
 				old_yingbian:['junk_simayi','old_yangyan','old_yangzhi'],
 				old_mobile:["old_caochun"],
+				old_waitforsort:[],
 			},
 		},
 		character:{
@@ -1227,6 +1228,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_sp:'SP',
 			old_yingbian:'文德武备',
 			old_mobile:'移动版',
+			old_waitforsort:'等待分包',
 		}
 	};
 });

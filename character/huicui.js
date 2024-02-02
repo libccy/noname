@@ -112,6 +112,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen','dc_jiachong'],
 				sp_yijun:['gongsundu','mengyou','dc_sp_menghuo'],
 				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong','yue_xiaoqiao','yue_daqiao'],
+				huicui_waitforsort:[],
 			}
 		},
 		skill:{
@@ -11895,6 +11896,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_raoting:'绕庭之鸦',
 			sp_yijun:'异军突起',
 			sp_zhengyin:'正音雅乐',
+			huicui_waitforsort:'等待分包',
 		},
 	};
 });

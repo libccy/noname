@@ -16,6 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				offline_piracyK:['pk_sp_duyu'],
 				offline_vtuber:['vtb_xiaosha','vtb_xiaoshan','vtb_xiaotao','vtb_xiaole','vtb_xiaojiu'],
 				//offline_others:[""],
+				offline_waitforsort:[],
 			},
 		},
 		character:{
@@ -6819,6 +6820,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			offline_vtuber:'天书乱斗·虚拟偶像',
 			offline_piracyK:'官盗K系列',
 			offline_others:'线下其他系列',
+			offline_waitforsort:'等待分包',
 		},
 	};
 });

@@ -16,6 +16,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				refresh_yijiang5:['re_zhangyi','re_quancong','re_caoxiu','re_sunxiu','re_gongsunyuan','re_guotufengji','re_xiahoushi','re_liuchen','re_zhuzhi','re_caorui','re_zhongyao'],
 				refresh_yijiang6:['re_guohuanghou','re_sundeng'],
 				refresh_xinghuo:['xin_zhangliang','re_zhugedan','re_simalang','re_duji','dc_gongsunzan','re_sp_taishici','re_caiyong','re_mazhong','re_wenpin','re_jsp_huangyueying'],
+				refresh_waitforsort:[],
 			},
 		},
 		connect:true,
@@ -15580,6 +15581,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refresh_yijiang5:'界限突破·将5',
 			refresh_yijiang6:'界限突破·原6',
 			refresh_xinghuo:'界限突破·星火',
+			refresh_waitforsort:'等待分包',
 		},
 	};
 });

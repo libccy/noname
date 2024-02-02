@@ -42,6 +42,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				collab_duanwu:['sunwukong','longwang','taoshen'],
 				collab_decade:['libai','xiaoyuehankehan','zhutiexiong','wu_zhutiexiong'],
 				collab_remake:['dc_caocao','dc_liubei','dc_sunquan','nezha','dc_sunce','dc_zhaoyun'],
+				collab_waitforsort:[],
 			},
 		},
 		skill:{
@@ -1968,6 +1969,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			collab_duanwu:'新服·端午畅玩',
 			collab_decade:'新服·创玩节',
 			collab_remake:'新服·共创武将',
+			collab_waitforsort:'等待分包',
 		},
 	};
 });

@@ -17,6 +17,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				tw_mobile2:['tw_chengpu','tw_guohuai','old_quancong','tw_caoxiu','tw_guanqiujian','tw_re_fazheng','tw_madai','tw_zhangfei','tw_guyong','tw_handang','tw_xuezong','tw_yl_luzhi'],
 				tw_yijiang:['tw_caoang','tw_caohong','tw_zumao','tw_dingfeng','tw_maliang','tw_xiahouba'],
 				tw_english:['kaisa'],
+				tw_waitforsort:[],
 			},
 		},
 		character:{
@@ -16035,6 +16036,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_mobile2:'海外服·异构',
 			tw_yijiang:'一将成名TW',
 			tw_english:'英文版',
+			tw_waitforsort:'等待分包',
 		},
 		pinyins:{
 			凯撒:['Caesar'],

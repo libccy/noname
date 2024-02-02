@@ -23,6 +23,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mobile_yijiang67:["re_jikang"],
 				mobile_changshi:['scs_zhangrang','scs_zhaozhong','scs_sunzhang','scs_bilan','scs_xiayun','scs_hankui','scs_lisong','scs_duangui','scs_guosheng','scs_gaowang'],
 				mobile_sp:["old_yuanshu","re_wangyun","re_baosanniang","re_weiwenzhugezhi","re_zhanggong","re_xugong","re_heqi","liuzan","xin_hansui",'mb_sunluyu'],
+				mobile_waitforsort:[],
 			},
 		},
 		character:{
@@ -16546,6 +16547,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mobile_default:'袖里乾坤',
 			mobile_others:'其他',
 			mobile_changshi:'十常侍单体',
+			mobile_waitforsort:'等待分包',
 		}
 	};
 });
