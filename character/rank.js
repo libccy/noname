@@ -1008,6 +1008,7 @@ window.noname_character_rank={
 		'tw_gongsunfan',
 		'yue_caiwenji',
 		'yue_xiaoqiao',
+		'yue_daqiao',
 		'vtb_xiaole',
 		'vtb_xiaojiu',
 		'ol_zhangzhang',
@@ -1860,6 +1861,7 @@ window.noname_character_rank={
 		epic:[
 			'star_yuanshao',
 			'yue_xiaoqiao',
+			'yue_daqiao',
 			'mb_chengui',
 			'ol_pengyang',
 			'ol_luyusheng',

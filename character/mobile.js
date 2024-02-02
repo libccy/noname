@@ -15646,7 +15646,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'你随机弃置其装备区的一张牌',
 					'令其摸一张牌',
 				][['豹','鹰','熊','兔'].indexOf(zhoufa)];
-				return str;
+				return str+'。';
 			},
 		},
 		perfectPair:{

@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			yue_daqiao:['female','wu',3,['dcqiqin','dczixi']],
 			kongrong:['male','qun',3,['dckrmingshi','lirang']],
 			dc_sp_menghuo:['male','qun',4,['dcmanwang']],
 			dc_lingcao:['male','wu','4/5',['dcdufeng']],
@@ -110,10 +111,129 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_jishi:['dc_jiben','zhenghun','dc_sunhanhua','liuchongluojun'],
 				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen','dc_jiachong'],
 				sp_yijun:['gongsundu','mengyou','dc_sp_menghuo'],
-				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong','yue_xiaoqiao'],
+				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong','yue_xiaoqiao','yue_daqiao'],
 			}
 		},
 		skill:{
+			//乐大乔
+			dczixi:{
+				init(){
+					game.addGlobalSkill('dczixi_judge');
+					game.broadcastAll((list)=>{
+						list.forEach(name=>{
+							const namex='dczixi_'+name;
+							if(!lib.card[namex]){
+								lib.card[namex]={
+									type:'special_delay',
+									fullskin:true,
+									noEffect:true,
+									wuxieable:false,
+								};
+								lib.card[namex].cardimage=name;
+								lib.translate[namex]=lib.translate[name]+'·姊希';
+								lib.translate[namex+'_info']='由【姊希】技能创造的无效果【'+lib.translate[name]+'】';
+							}
+						});
+					},lib.skill.dczixi.zixiList);
+				},
+				audio:2,
+				trigger:{player:['phaseUseBegin','phaseUseEnd']},
+				filter(event,player){
+					return player.countCards('h',card=>{
+						return card.hasGaintag('dcqiqin_tag')&&lib.skill.dczixi.zixiList.some(name=>{
+							return game.hasPlayer(target=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
+						});
+					});
+				},
+				zixiList:['lebu','bingliang','shandian'],
+				direct:true,
+				async content(event,trigger,player){
+					const {result:{bool,cards}}=await player.chooseCard(get.prompt('dczixi'),'将一张“琴”置于一名角色的判定区',(card,player)=>{
+						return card.hasGaintag('dcqiqin_tag')&&lib.skill.dczixi.zixiList.some(name=>{
+							return game.hasPlayer(target=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
+						});
+					}).set('ai',card=>7-get.value(card));
+					if(bool){
+						const card=cards.slice()[0];
+						const {result:{bool,targets}}=await player.chooseTarget('请选择'+get.translation(card)+'置入的目标',(cardx,player,target)=>{
+							return lib.skill.dczixi.zixiList.some(name=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[get.event('card')])));
+						},true).set('ai',target=>{
+							const player=get.event('player'),card=get.event('card');
+							if(player.hasCard(cardx=>cardx!=card&&player.hasValueTarget(cardx,true,true),'hs')&&game.hasPlayer(current=>{
+								return get.attitude(player,target)<0&&lib.skill.dczixi.zixiList.some(name=>current.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
+							})) return -target.countCards('j')-1;
+							return target.countCards('j')+1;
+						}).set('card',card);
+						if(bool){
+							const target=targets[0];
+							const name=lib.skill.dczixi.zixiList.filter(name=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card]))).randomGet();
+							player.logSkill('dczixi',target);
+							player.$give(card,target,false);
+							await game.asyncDelay(0.5);
+							target.addJudge({name:'dczixi_'+name},[card]);
+						}
+					}
+				},
+				group:'dczixi_effect',
+				subSkill:{
+					judge:{
+						mod:{
+							targetEnabled(card,player,target){
+								const list=lib.skill.dczixi.zixiList;
+								if(!list.includes(card.name)&&!list.includes('dczixi_'+card.name)) return;
+								if(card.name.indexOf('dczixi_')==0){
+									if(target.hasJudge(card.name.slice('dczixi_'.length))) return false;
+								}
+								else if(target.hasJudge('dczixi_'+card.name)) return false;
+							},
+						},
+						ai:{
+							threaten(player,target){
+								if(!player.hasSkill('dczixi')||![1,2,3].includes(target.countCards('j'))) return;
+								return 3+target.countCards('j');
+							},
+						},
+					},
+					effect:{
+						audio:'dczixi',
+						trigger:{player:'useCardToTargeted'},
+						filter(event,player){
+							return event.isFirstTarget&&event.targets.length==1&&[1,2,3].includes(event.target.countCards('j'))&&(get.type(event.card)=='basic'||get.type(event.card)=='trick');
+						},
+						prompt2(event,player){
+							const target=event.target,str=get.translation(target);
+							return [
+								'令'+get.translation(event.card)+'对'+str+'额外结算一次',
+								'摸两张牌',
+								'弃置'+str+'判定区里的所有牌，后对其造成3点伤害',
+							][target.countCards('j')-1];
+						},
+						check(event,player){
+							const target=event.target,num=target.countCards('j');
+							if(num==2) return true;
+							if(num==1) return get.effect(target,event.card,player,player)>0;
+							return get.attitude(player,target)<0&&get.damageEffect(target,player,player)>0;
+						},
+						logTarget:'target',
+						async content(event,trigger,player){
+							const target=trigger.target,num=target.countCards('j');
+							switch(num){
+								case 1:
+									trigger.getParent().effectCount++;
+									game.log(trigger.card,'额外结算一次');
+									break;
+								case 2:
+									player.draw(2);
+									break;
+								case 3:
+									target.discard(target.getCards('j')).discarder=player;
+									target.damage(3);
+									break;
+							}
+						},
+					},
+				},
+			},
 			//孔融
 			dckrmingshi:{
 				audio:'mingshi',
@@ -11756,6 +11876,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kongrong:'孔融',
 			dckrmingshi:'名士',
 			dckrmingshi_info:'锁定技，当你受到其他角色造成的伤害时，若其手牌数大于你，则其需弃置一张手牌，否则此伤害-1。',
+			yue_daqiao:'乐大乔',
+			yue_daqiao_prefix:'乐',
+			dczixi:'姊希',
+			dczixi_info:'①出牌阶段开始和结束时，你可以将一张“琴”当作随机无效果的【乐不思蜀】、【兵粮寸断】或【闪电】置于一名角色的判定区。②当你使用基本牌或普通锦囊牌指定唯一目标后，你可根据其判定区内的牌数执行对应项：1.令此牌对其额外结算一次；2.摸两张牌；3.弃置其判定区所有牌，对其造成3点伤害。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
