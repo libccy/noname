@@ -11,11 +11,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				offline_yijiang:['ol_xinxianying'],
 				offline_luanwu:["ns_lijue","ns_zhangji","ns_fanchou"],
 				offline_yongjian:["ns_chendao","yj_caoang","yj_caocao",'yj_liru','yj_caohong','yj_zhangfei','yongjian_ganning','yj_dongzhuo','yj_xuyou','yj_jiaxu','yj_zhenji'],
-				offline_piracyE:['shen_jiaxu','pe_wangyun','pe_zhonghui','pe_sunchen','pe_mengda','pe_wenqin','ns_caoanmin','jiangfei','chendong','jiangqing','zy_kongrong','jiling','tianfeng','mateng'],
+				offline_piracyE:['shen_jiaxu','pe_wangyun','pe_zhonghui','pe_sunchen','pe_mengda','pe_wenqin','ns_caoanmin','jiangfei','chendong','jiangqing','kongrong','jiling','tianfeng','mateng'],
 				offline_piracyS:['ns_jiaxu','longyufei','ps_guanyu','ps1059_guojia','ps2070_guojia','ps2063_zhaoyun','ps2067_zhaoyun','ps1062_zhouyu','ps2080_zhouyu','ps_caozhi','ps_jin_simayi','ps_caopi','ps_simayi','ps2068_simayi','ps_machao','ps_zhugeliang','ps2066_zhugeliang','ps_jiaxu','ps_lvbu','ps_shen_machao','jsp_liubei'],
 				offline_piracyK:['pk_sp_duyu'],
 				offline_vtuber:['vtb_xiaosha','vtb_xiaoshan','vtb_xiaotao','vtb_xiaole','vtb_xiaojiu'],
 				//offline_others:[""],
+				offline_waitforsort:[],
 			},
 		},
 		character:{
@@ -33,7 +34,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mateng:['male','qun',4,['mashu','xiongyi']],
 			tianfeng:['male','qun',3,['sijian','gzsuishi']],
 			jiling:['male','qun',4,['shuangren']],
-			zy_kongrong:['male','qun',3,['zymingshi','lirang']],
+			kongrong:['male','qun',3,['zymingshi','lirang']],
 			chendong:['male','wu',4,['duanxie','fenming']],
 			jiangqing:['male','wu',4,['zyshangyi']],
 			jiangfei:['male','shu',3,['reshengxi','shoucheng']],
@@ -6802,8 +6803,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianfeng_prefix:'战役篇',
 			jiling:'战役篇纪灵',
 			jiling_prefix:'战役篇',
-			zy_kongrong:'战役篇孔融',
-			zy_kongrong_prefix:'战役篇',
+			kongrong:'战役篇孔融',
+			kongrong_prefix:'战役篇',
 			mateng:'战役篇马腾',
 			mateng_prefix:'战役篇',
 
@@ -6819,6 +6820,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			offline_vtuber:'天书乱斗·虚拟偶像',
 			offline_piracyK:'官盗K系列',
 			offline_others:'线下其他系列',
+			offline_waitforsort:'等待分包',
 		},
 	};
 });

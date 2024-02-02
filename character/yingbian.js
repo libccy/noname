@@ -35,6 +35,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				yingbian_pack3:['jin_simazhao','jin_wangyuanji','duyu','weiguan','xuangongzhu'],
 				yingbian_pack4:['zhongyan','xinchang','jin_jiachong','wangxiang'],
 				yingbian_pack5:['yangyan','yangzhi'],
+				yingbian_waitforsort:[],
 			},
 		},
 		skill:{
@@ -3990,6 +3991,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yingbian_pack3:'文德武备·果',
 			yingbian_pack4:'文德武备·戒',
 			yingbian_pack5:'文德武备·约',
+			yingbian_waitforsort:'等待分包',
 		},
 	};
 });

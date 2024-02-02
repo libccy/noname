@@ -15,6 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				yijiang_2017:['xinxianying','jikang','wuxian','qinmi','xuezong','xushi','caiyong','caojie'],
 				yijiang_2022:['lukai','kebineng','zhugeshang','liwan','wuanguo','hanlong','yj_sufei','yj_qiaozhou'],
 				yijiang_2023:['xiahoumao','chenshi','sunli','feiyao'],
+				yijiang_waitforsort:[],
 			},
 		},
 		character:{
@@ -14619,6 +14620,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yijiang_2017:'原创设计2017',
 			yijiang_2022:'原创设计2022',
 			yijiang_2023:'一将成名2023',
+			yijiang_waitforsort:'等待分包',
 		},
 	};
 });

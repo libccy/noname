@@ -20,6 +20,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_mobileren:['shen_huatuo','shen_lusu'],
 				extra_tw:['tw_shen_guanyu','tw_shen_lvmeng'],
 				extra_offline:['shen_diaochan','boss_zhaoyun','shen_dianwei','le_shen_jiaxu'],
+				extra_waitforsort:[],
 			},
 		},
 		character:{
@@ -4357,9 +4358,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			boss_juejing:{
 				audio:'juejing',
-				audioname2:{
-					dc_zhaoyun:'dcjuejing',
-				},
 				trigger:{player:'phaseDrawBefore'},
 				forced:true,
 				content(){
@@ -4373,9 +4371,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			boss_juejing2:{
 				audio:'juejing',
-				audioname2:{
-					dc_zhaoyun:'dcjuejing',
-				},
 				trigger:{
 					player:'loseAfter',
 					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
@@ -4398,7 +4393,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else player.chooseToDiscard('h',true,-num);
 				},
 			},
-			dcjuejing:{audio:2},
 			meihun:{
 				audio:2,
 				trigger:{
@@ -6774,7 +6768,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinlonghun:{
 				audio:'longhun',
 				enable:['chooseToUse','chooseToRespond'],
-				prompt:'将♦手牌当做火【杀】，♥手牌当做【桃】，♣手牌当做【闪】，♠手牌当做【无懈可击】使用或打出',
+				prompt:'将♦牌当做杀，♥牌当做桃，♣牌当做闪，♠牌当做无懈可击使用或打出',
 				viewAs(cards,player){
 					var name=false;
 					var nature=null;
@@ -6796,7 +6790,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var map={sha:'diamond',tao:'heart'}
 						for(var i=0;i<list.length;i++){
 							var name=list[i];
-							if(player.countCards('hs',function(card){
+							if(player.countCards('hes',function(card){
 								return (name!='sha'||get.value(card)<5)&&get.suit(card,player)==map[name];
 							})>0&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
 								var temp=get.order({name:name,nature:name=='sha'?'fire':null});
@@ -6811,7 +6805,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return 1;
 				},
-				position:'hs',
+				position:'hes',
 				filterCard(card,player,event){
 					event=event||_status.event;
 					var filter=event._backup.filterCard;
@@ -6824,10 +6818,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter(event,player){
 					var filter=event.filterCard;
-					if(filter({name:'sha',nature:'fire'},player,event)&&player.countCards('hs',{suit:'diamond'})) return true;
-					if(filter({name:'shan'},player,event)&&player.countCards('hs',{suit:'club'})) return true;
-					if(filter({name:'tao'},player,event)&&player.countCards('hs',{suit:'heart'})) return true;
-					if(filter({name:'wuxie'},player,event)&&player.countCards('hs',{suit:'spade'})) return true;
+					if(filter({name:'sha',nature:'fire'},player,event)&&player.countCards('hes',{suit:'diamond'})) return true;
+					if(filter({name:'shan'},player,event)&&player.countCards('hes',{suit:'club'})) return true;
+					if(filter({name:'tao'},player,event)&&player.countCards('hes',{suit:'heart'})) return true;
+					if(filter({name:'wuxie'},player,event)&&player.countCards('hes',{suit:'spade'})) return true;
 					return false;
 				},
 				precontent(){
@@ -6844,7 +6838,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							case 'respondShan':name='club';break;
 							case 'save':name='heart';break;
 						}
-						if(!player.countCards('hs',{suit:name})) return false;
+						if(!player.countCards('hes',{suit:name})) return false;
 					},
 					order(item,player){
 						if(player&&_status.event.type=='phase'){
@@ -6853,7 +6847,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var map={sha:'diamond',tao:'heart'}
 							for(var i=0;i<list.length;i++){
 								var name=list[i];
-								if(player.countCards('hs',function(card){
+								if(player.countCards('hes',function(card){
 									return (name!='sha'||get.value(card)<5)&&get.suit(card,player)==map[name];
 								})>0&&player.getUseValue({name:name,nature:name=='sha'?'fire':null})>0){
 									var temp=get.order({name:name,nature:name=='sha'?'fire':null});
@@ -6867,9 +6861,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				hiddenCard(player,name){
-					if(name=='wuxie'&&_status.connectMode&&player.countCards('hs')>0) return true;
-					if(name=='wuxie') return player.countCards('hs',{suit:'spade'})>0;
-					if(name=='tao') return player.countCards('hs',{suit:'heart'})>0;
+					if(name=='wuxie'&&_status.connectMode&&player.countCards('hes')>0) return true;
+					if(name=='wuxie') return player.countCards('hes',{suit:'spade'})>0;
+					if(name=='tao') return player.countCards('hes',{suit:'heart'})>0;
 				},
 			},
 			xinjuejing:{
@@ -8035,7 +8029,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			relonghun:'龙魂',
 			relonghun_info:'你可以将同花色的一至两张牌按下列规则使用或打出：红桃当【桃】，方块当火【杀】，梅花当【闪】，黑桃当普【无懈可击】。若你以此法使用了两张红色牌，则此牌回复值或伤害值+1。若你以此法使用了两张黑色牌，则你弃置当前回合角色一张牌。',
 			xinlonghun:'龙魂',
-			xinlonghun_info:'你可以将你的手牌按下列规则使用或打出：红桃当【桃】，方块当火【杀】，梅花当【闪】，黑桃当【无懈可击】。',
+			xinlonghun_info:'你可以将你的牌按下列规则使用或打出：红桃当【桃】，方块当火【杀】，梅花当【闪】，黑桃当普【无懈可击】。',
 			longhun:'龙魂',
 			longhun1:'龙魂♥︎',
 			longhun2:'龙魂♦︎',
@@ -8146,7 +8140,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			boss_zhaoyun_prefix:'神',
 			boss_juejing:'绝境',
 			boss_juejing2:'绝境',
-			boss_juejing_info:'锁定技，摸牌阶段开始前，你跳过此阶段。当你得到牌/失去手牌后，若你的手牌数大于4/小于4，则你将手牌弃置至4张/摸至4张。',
+			boss_juejing_info:'锁定技，摸牌阶段开始前，你跳过此阶段。当你得到牌/失去手牌后，若你的手牌数大于4/小于4，则你将手牌摸至4张/弃置至4张。',
 			zhanjiang:'斩将',
 			zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之。',
 			shen_guojia:'神郭嘉',
@@ -8350,6 +8344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			extra_offline:'神话再临·线下',
 			extra_decade:'神·武',
 			extra_tw:'海外服神将',
+			extra_waitforsort:'等待分包',
 		},
 	};
 });

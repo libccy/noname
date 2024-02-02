@@ -9,6 +9,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				standard_2013:['old_re_lidian',"huaxiong","re_yuanshu"],
 				standard_2019:["gongsunzan","xf_yiji"],
 				standard_2023:["std_panfeng",'ganfuren'],
+				standard_waitforsort:[],
 			},
 		},
 		character:{
@@ -2551,6 +2552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			standard_2013:"2013版标准包",
 			standard_2019:"2019版标准包",
 			standard_2023:"2023版标准包",
+			standard_waitforsort:'等待分包',
 		},
 	};
 });

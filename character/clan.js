@@ -31,6 +31,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				clan_han:['clan_hanshao','clan_hanrong'],
 				clan_wang:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun'],
 				clan_zhong:['clan_zhongyan','clan_zhonghui','clan_zhongyu'],
+				clan_waitforsort:[],
 			},
 		},
 		skill:{
@@ -2763,6 +2764,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_han:'颍川·韩氏',
 			clan_wang:'太原·王氏',
 			clan_zhong:'颍川·钟氏',
+			clan_waitforsort:'等待分包',
 		},
 	};
 });

@@ -4,8 +4,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
-			yue_daqiao:['female','wu',3,['dcqiqin','dczixi']],
-			kongrong:['male','qun',3,['dckrmingshi','lirang']],
 			dc_sp_menghuo:['male','qun',4,['dcmanwang']],
 			dc_lingcao:['male','wu','4/5',['dcdufeng']],
 			yue_xiaoqiao:['female','wu',3,['dcqiqin','dcweiwan']],
@@ -100,7 +98,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			huicui:{
 				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong','xiahoujie','dc_caiyang','zhoushan'],
-				sp_caizijiaren:['kongrong','re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
+				sp_caizijiaren:['re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
 				sp_zhilan:['liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen','dc_lingcao'],
 				sp_guixin:['re_kanze','re_chendeng','caimaozhangyun','dc_lvkuanglvxiang','dc_gaolan','yinfuren','chengui','chenjiao','dc_sp_jiaxu','qinlang','dc_dongzhao'],
 				sp_daihan:['mamidi','dc_jiling','zhangxun','dc_yuejiu','wanglie','leibo','qiaorui','dongwan','yuanyin'],
@@ -111,167 +109,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_jishi:['dc_jiben','zhenghun','dc_sunhanhua','liuchongluojun'],
 				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen','dc_jiachong'],
 				sp_yijun:['gongsundu','mengyou','dc_sp_menghuo'],
-				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong','yue_xiaoqiao','yue_daqiao'],
+				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong','yue_xiaoqiao'],
+				huicui_waitforsort:[],
 			}
 		},
 		skill:{
-			//乐大乔
-			dczixi:{
-				init(){
-					game.addGlobalSkill('dczixi_judge');
-					game.broadcastAll((list)=>{
-						list.forEach(name=>{
-							const namex='dczixi_'+name;
-							if(!lib.card[namex]){
-								lib.card[namex]={
-									type:'special_delay',
-									fullskin:true,
-									noEffect:true,
-									wuxieable:false,
-								};
-								lib.card[namex].cardimage=name;
-								lib.translate[namex]=lib.translate[name]+'·姊希';
-								lib.translate[namex+'_info']='由【姊希】技能创造的无效果【'+lib.translate[name]+'】';
-							}
-						});
-					},lib.skill.dczixi.zixiList);
-				},
-				audio:2,
-				trigger:{player:['phaseUseBegin','phaseUseEnd']},
-				filter(event,player){
-					return player.countCards('h',card=>{
-						return card.hasGaintag('dcqiqin_tag')&&lib.skill.dczixi.zixiList.some(name=>{
-							return game.hasPlayer(target=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
-						});
-					});
-				},
-				zixiList:['lebu','bingliang','shandian'],
-				direct:true,
-				async content(event,trigger,player){
-					const {result:{bool,cards}}=await player.chooseCard(get.prompt('dczixi'),'将一张“琴”置于一名角色的判定区',(card,player)=>{
-						return card.hasGaintag('dcqiqin_tag')&&lib.skill.dczixi.zixiList.some(name=>{
-							return game.hasPlayer(target=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
-						});
-					}).set('ai',card=>7-get.value(card));
-					if(bool){
-						const card=cards.slice()[0];
-						const {result:{bool,targets}}=await player.chooseTarget('请选择'+get.translation(card)+'置入的目标',(cardx,player,target)=>{
-							return lib.skill.dczixi.zixiList.some(name=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[get.event('card')])));
-						},true).set('ai',target=>{
-							const player=get.event('player'),card=get.event('card');
-							if(player.hasCard(cardx=>cardx!=card&&player.hasValueTarget(cardx,true,true),'hs')&&game.hasPlayer(current=>{
-								return get.attitude(player,target)<0&&lib.skill.dczixi.zixiList.some(name=>current.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
-							})) return -target.countCards('j')-1;
-							return target.countCards('j')+1;
-						}).set('card',card);
-						if(bool){
-							const target=targets[0];
-							const name=lib.skill.dczixi.zixiList.filter(name=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card]))).randomGet();
-							player.logSkill('dczixi',target);
-							player.$give(card,target,false);
-							await game.asyncDelay(0.5);
-							target.addJudge({name:'dczixi_'+name},[card]);
-						}
-					}
-				},
-				group:'dczixi_effect',
-				subSkill:{
-					judge:{
-						mod:{
-							targetEnabled(card,player,target){
-								const list=lib.skill.dczixi.zixiList;
-								const name=(typeof card=='string')?card:(card.viewAs?card.viewAs:card.name);
-								if(name.indexOf('dczixi_')==0){
-									const namex=name.slice('dczixi_'.length);
-									if(list.includes(namex)&&target.hasJudge(namex)) return false;
-								}
-								else if(list.includes(name)&&target.hasJudge('dczixi_'+name)) return false;
-							},
-						},
-						ai:{
-							threaten(player,target){
-								if(!player.hasSkill('dczixi')||![1,2,3].includes(target.countCards('j'))) return;
-								return 3+target.countCards('j');
-							},
-						},
-					},
-					effect:{
-						audio:'dczixi',
-						trigger:{player:'useCardToTargeted'},
-						filter(event,player){
-							return event.isFirstTarget&&event.targets.length==1&&[1,2,3].includes(event.target.countCards('j'))&&(get.type(event.card)=='basic'||get.type(event.card)=='trick');
-						},
-						prompt2(event,player){
-							const target=event.target,str=get.translation(target);
-							return [
-								'令'+get.translation(event.card)+'对'+str+'额外结算一次',
-								'摸两张牌',
-								'弃置'+str+'判定区里的所有牌，后对其造成3点伤害',
-							][target.countCards('j')-1];
-						},
-						check(event,player){
-							const target=event.target,num=target.countCards('j');
-							if(num==2) return true;
-							if(num==1) return get.effect(target,event.card,player,player)>0;
-							return get.attitude(player,target)<0&&get.damageEffect(target,player,player)>0;
-						},
-						logTarget:'target',
-						async content(event,trigger,player){
-							const target=trigger.target,num=target.countCards('j');
-							switch(num){
-								case 1:
-									trigger.getParent().effectCount++;
-									game.log(trigger.card,'额外结算一次');
-									break;
-								case 2:
-									player.draw(2);
-									break;
-								case 3:
-									target.discard(target.getCards('j')).discarder=player;
-									target.damage(3);
-									break;
-							}
-						},
-					},
-				},
-			},
-			//孔融
-			dckrmingshi:{
-				audio:'mingshi',
-				trigger:{player:'damageBegin4'},
-				filter(event,player){
-					return event.source&&event.source.countCards('h')>player.countCards('h');
-				},
-				forced:true,
-				logTarget:'source',
-				async content(event,trigger,player){
-					const target=trigger.source;
-					const {result:{bool}}=await target.chooseToDiscard('名士：弃置一张手牌，或防止对'+get.translation(player)+'造成的伤害').set('ai',card=>{
-						if(get.event('goon')) return 0;
-						return 6-get.value(card);
-					}).set('goon',get.damageEffect(player,target,target)<=0);
-					if(!bool) trigger.decrease('num');
-				},
-				ai:{
-					effect:{
-						target_use(card,player,target,current){
-							if(get.tag(card,'damage')&&target!=player){
-								if(_status.event.name=='dckrmingshi') return;
-								if(get.attitude(player,target)>0&&current<0) return 'zerotarget';
-								var bs=player.getCards('h');
-								bs.remove(card);
-								if(card.cards) bs.removeArray(card.cards);
-								else bs.removeArray(ui.selected.cards);
-								if(bs.length>target.countCards('h')){
-									if(bs.some(bsi=>get.value(bsi)<7)) return [1,0,1,-0.5];
-									return [1,0,0.3,0];
-								}
-								return [1,0,1,-0.5];
-							}
-						},
-					},
-				},
-			},
 			//新服SP孟获
 			dcmanwang:{
 				audio:'spmanwang',
@@ -11874,13 +11716,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcmanwang_info:'出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：⒈获得〖叛侵〗。⒉摸一张牌。⒊回复1点体力。⒋摸两张牌并失去〖叛侵〗。',
 			dcpanqin:'叛侵',
 			dcpanqin_info:'出牌阶段或弃牌阶段结束时，你可将你于本阶段内弃置且位于弃牌堆的所有牌当做【南蛮入侵】使用。然后若此牌被使用时对应的实体牌数不大于此牌的目标数，则你执行并移除〖蛮王〗中的最后一个选项，然后加1点体力上限并回复1点体力。',
-			kongrong:'孔融',
-			dckrmingshi:'名士',
-			dckrmingshi_info:'锁定技，当你受到其他角色造成的伤害时，若其手牌数大于你，则其需弃置一张手牌，否则此伤害-1。',
-			yue_daqiao:'乐大乔',
-			yue_daqiao_prefix:'乐',
-			dczixi:'姊希',
-			dczixi_info:'①出牌阶段开始和结束时，你可以将一张“琴”当作随机无效果的【乐不思蜀】、【兵粮寸断】或【闪电】置于一名角色的判定区。②当你使用基本牌或普通锦囊牌指定唯一目标后，你可根据其判定区内的牌数执行对应项：1.令此牌对其额外结算一次；2.摸两张牌；3.弃置其判定区所有牌，对其造成3点伤害。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
@@ -11895,6 +11730,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_raoting:'绕庭之鸦',
 			sp_yijun:'异军突起',
 			sp_zhengyin:'正音雅乐',
+			huicui_waitforsort:'等待分包',
 		},
 	};
 });

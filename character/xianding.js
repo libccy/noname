@@ -108,6 +108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_gaoshan:['wanglang','liuhui','zhangjian'],
 				sp2_wumiao:['wu_zhugeliang','wu_luxun'],
 				sp2_mouding:['dc_sb_lusu','dc_sb_zhouyu'],
+				xianding_waitforsort:[],
 			}
 		},
 		skill:{
@@ -2926,10 +2927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					if(event.targets.length!=1||!player.hasHistory('lose',evt=>{
-						if(evt.getParent()!=event) return false;
-						return event.cards.every(card=>evt.hs.includes(card));
-					})) return false;
+					if(event.targets.length!=1) return false;
 					if(!['basic','trick'].includes(get.type(event.card,false))) return false;
 					if(event.getParent(2).name=='dcchanjuan') return false;
 					return !player.storage.dcchanjuan[event.card.name]||player.storage.dcchanjuan[event.card.name]<2;
@@ -14097,8 +14095,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjiudun:'酒遁',
 			dcjiudun_info:'①以你为目标的【酒】（使用方法①）的作用效果改为“目标对应的角色使用的下一张【杀】的伤害基数+1”。②当你成为其他角色使用黑色牌的目标后，若你：未处于【酒】状态，你可以摸一张牌并视为使用一张【酒】；处于【酒】状态，你可以弃置一张手牌令此牌对你无效。',
 			ganfurenmifuren:'甘夫人糜夫人',
-			dcchanjuan:'婵娟',
-			dcchanjuan_info:'每种牌名限两次。当你使用手牌中仅指定单一目标的【杀】或普通锦囊牌结算结束后，你可以视为使用一张名称和属性均相同的牌。若这两张牌指定的目标完全相同，你摸一张牌。',
+			dcchanjuan:'双姝',
+			dcchanjuan_info:'每种牌名限两次。当你使用仅指定单一目标的【杀】或普通锦囊牌结算结束后，你可以视为使用一张名称和属性均相同的牌。若这两张牌指定的目标完全相同，你摸一张牌。',
 			dcxunbie:'殉别',
 			dcxunbie_info:'限定技。当你进入濒死状态时，你可以将此武将牌替换为“甘夫人”或“糜夫人”（不能选择已在场上的武将）。然后回复至1点体力并防止所有伤害直到当前回合结束。',
 			dc_mifuren:'糜夫人',
@@ -14234,6 +14232,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp2_gaoshan:'高山仰止',
 			sp2_qifu:'祈福',
 			sp2_mouding:'谋定天下',
+			xianding_waitforsort:'等待分包',
 		},
 	};
 });
