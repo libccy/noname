@@ -32,22 +32,22 @@ self.addEventListener('fetch', event => {
 	// @ts-ignore
 	event.respondWith(
 		res.then(res => {
-			if (res.status != 200) {
-				return res;
-			} else {
-				console.log('正在编译', request.url);
-				return res.text().then(text => {
-					const js = ts.transpile(text, { module: ts.ModuleKind.ES2015 });
-					const rep = new Response(new Blob([js], { type: "text/javascript" }), {
-						status: 200,
-						statusText: "OK",
-						headers: new Headers({
-							"Content-Type": "text/javascript"
-						}),
-					});
-					return rep;
-				})
-			}
+			if (res.status != 200) return res;
+			console.log('正在编译', request.url);
+			return res.text().then(text => {
+				const js = ts.transpile(text, {
+					module: ts.ModuleKind.ES2015,
+					inlineSourceMap: true
+				}, request.url);
+				const rep = new Response(new Blob([js], { type: "text/javascript" }), {
+					status: 200,
+					statusText: "OK",
+					headers: new Headers({
+						"Content-Type": "text/javascript"
+					}),
+				});
+				return rep;
+			})
 		})
 		.catch(e => {
 			console.log(e);
