@@ -51,6 +51,7 @@ export class Library extends Uninstantable {
 	static characterFilter = {};
 	static characterSort = {};
 	static characterReplace = {};
+	static characterInitFilter = {};
 	static characterGuozhanFilter = ["mode_guozhan"];
 	static dynamicTranslate = {};
 	static cardPack = {};
@@ -13099,6 +13100,12 @@ export class Library extends Uninstantable {
 			 * @returns {string}
 			 */
 			getSpan: () => `${get.prefixSpan('新杀')}${get.prefixSpan('谋')}`
+		}],
+		['经典神', {
+			/**
+			 * @returns {string}
+			 */
+			getSpan: () => `${get.prefixSpan('经典')}${get.prefixSpan('神')}`
 		}]
 	]);
 	static groupnature = {
@@ -13153,6 +13160,10 @@ export class Library extends Uninstantable {
 	];
 	static other = {
 		ignore: () => void 0
+	};
+	static InitFilter = {
+		'noZhuHp': '做主公不增加体力上限',
+		'noZhuSkill': '做主公不获得飞扬跋扈',
 	};
 }
 

@@ -540,6 +540,13 @@ export class Get extends Uninstantable {
 		}
 		return info;
 	}
+	static characterInitFilter(name) {
+		const info = get.character(name);
+		if (!info || !info[4]) return [];
+		const filter = info[4].find(tag => tag.startsWith('InitFilter'));
+		if (!filter) return [];
+		return filter.split(':').slice(1);
+	}
 	static characterIntro(name) {
 		if (lib.characterIntro[name]) return lib.characterIntro[name];
 		var tags = get.character(name, 4);
@@ -2854,6 +2861,15 @@ export class Get extends Uninstantable {
 				uiintro.addText(get.colorspan(lib.characterTitle[node.name]));
 			}
 
+			if (get.characterInitFilter(node.name)) {
+				const initFilters = get.characterInitFilter(node.name).filter(tag => {
+					if (!lib.characterInitFilter[node.name]) return true;
+					return lib.characterInitFilter[node.name](tag) !== false;
+				});
+				const str = initFilters.reduce((strx, stry) => strx + lib.InitFilter[stry] + '<br>').slice(0, -4);
+				uiintro.addText(str);
+			}
+
 			if (!node.noclick) {
 				const allShown = (node.isUnderControl() || (!game.observe && game.me && game.me.hasSkillTag('viewHandcard', null, node, true)));
 				const shownHs = node.getShownCards();
@@ -3591,6 +3607,15 @@ export class Get extends Uninstantable {
 
 			if (lib.characterTitle[node.link]) {
 				uiintro.addText(get.colorspan(lib.characterTitle[node.link]));
+			}
+
+			if (get.characterInitFilter(node.link)) {
+				const initFilters = get.characterInitFilter(node.link).filter(tag => {
+					if (!lib.characterInitFilter[node.link]) return true;
+					return lib.characterInitFilter[node.link](tag) !== false;
+				});
+				const str = initFilters.reduce((strx, stry) => strx + lib.InitFilter[stry] + '<br>', '').slice(0, -4);
+				uiintro.addText(str);
 			}
 
 			if (node._banning) {

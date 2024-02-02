@@ -2433,6 +2433,10 @@ export const Content = {
 	 */
 	phase: function () {
 		'step 0';
+		//规则集中的“回合开始后③（处理“游戏开始时”的时机）”
+		//提前phaseBefore时机解决“游戏开始时”时机和“一轮开始时”先后
+		event.trigger('phaseBefore');
+		'step 1';
 		//初始化阶段列表
 		if (!event.phaseList) {
 			event.phaseList = ['phaseZhunbei', 'phaseJudge', 'phaseDraw', 'phaseUse', 'phaseDiscard', 'phaseJieshu'];
@@ -2491,12 +2495,9 @@ export const Content = {
 		if (isRound) {
 			game.getGlobalHistory().isRound = true;
 		}
-		'step 1';
+		'step 2';
 		//规则集中的“回合开始后②（1v1武将登场专用）”
 		event.trigger('phaseBeforeStart');
-		'step 2';
-		//规则集中的“回合开始后③（处理“游戏开始时”的时机）”
-		event.trigger('phaseBefore');
 		'step 3';
 		//规则集中的“回合开始后④（卑弥呼〖纵傀〗的时机）”
 		event.trigger('phaseBeforeEnd');

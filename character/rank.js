@@ -47,6 +47,7 @@ window.noname_character_rank={
 		'sb_machao',
 		'dc_zhouxuān',
 		'key_iriya',
+		'dc_zhaoyun',
 	],
 	ap:[
 		'xia_guanyu',
@@ -125,7 +126,7 @@ window.noname_character_rank={
 		'db_key_liyingxia',
 		'key_kiyu',
 		'jsrg_pangtong',
-		'star_caoren',
+		'star_dongzhuo',
 		'clan_xunyou',
 		'caoxian',
 		'sb_guanyu',
@@ -135,6 +136,8 @@ window.noname_character_rank={
 		'xia_yuzhenzi',
 	],
 	a:[
+		'star_caoren',
+		'star_yuanshao',
 		'xia_shitao',
 		'diy_zaozhirenjun',
 		'gjqt_fanglansheng',
@@ -1006,6 +1009,7 @@ window.noname_character_rank={
 		'tw_gongsunfan',
 		'yue_caiwenji',
 		'yue_xiaoqiao',
+		'yue_daqiao',
 		'vtb_xiaole',
 		'vtb_xiaojiu',
 		'ol_zhangzhang',
@@ -1364,6 +1368,7 @@ window.noname_character_rank={
 		'xia_shie',
 	],
 	bm:[
+		'kongrong',
 		'diy_xizhenxihong',
 		'ns_nanhua_left',
 		'ns_nanhua_right',
@@ -1663,6 +1668,12 @@ window.noname_character_rank={
 	],
 	rarity:{
 		legend:[
+			'star_caoren',
+			'dc_zhaoyun',
+			'dc_caocao',
+			'dc_liubei',
+			'dc_sunquan',
+			'dc_sunce',
 			'xia_yuzhenzi',
 			'xia_guanyu',
 			'swd_muyun',
@@ -1850,7 +1861,9 @@ window.noname_character_rank={
 			'caoxian',
 		],
 		epic:[
+			'star_yuanshao',
 			'yue_xiaoqiao',
+			'yue_daqiao',
 			'mb_chengui',
 			'ol_pengyang',
 			'ol_luyusheng',
@@ -2112,7 +2125,7 @@ window.noname_character_rank={
 			'key_kotomi',
 			'db_key_liyingxia',
 			'key_iriya',
-			'star_caoren',
+			'star_dongzhuo',
 			'star_yuanshu',
 			'clan_xunyou',
 			'lvboshe',
