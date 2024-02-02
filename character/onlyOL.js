@@ -105,7 +105,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					fireAttack:true,
 					respondSha:true,
-					skillTagFilter(player){
+					skillTagFilter(player,tag,arg){
+						if(arg=='respond') return false;
 						if(player.getStat('skill').olsbweilin||!player.countCards('hes')) return false;
 					},
 					order(item,player){
