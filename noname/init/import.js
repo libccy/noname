@@ -73,9 +73,9 @@ function generateImportFunction(type, pathParser) {
 }
 
 async function createEmptyExtension(name){
-	const extensionInfo = await import(`../../extension/${name}/info.json`,{assert:{type:'json'}})
+	const extensionInfo = await lib.init.promises.json(`${lib.assetURL}extension/${name}/info.json`)//await import(`../../extension/${name}/info.json`,{assert:{type:'json'}})
 	.then(info=>{
-		return info.default;
+		return info;
 	},()=>{
 		return {
 			name:name,
