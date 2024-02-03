@@ -96,7 +96,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_chunyuqiong:['male','qun',4,['recangchu','reliangying','reshishou']],
 			xingdaorong:['male','qun','4/6',['xuxie']],
 			re_panfeng:['male','qun',4,['xinkuangfu']],
-			dc_jiangfei:['male','shu',3,['dcshengxi','dcshoucheng']],
+			jiangfei:['male','shu',3,['dcshengxi','dcshoucheng']],
 		},
 		characterSort:{
 			huicui:{
@@ -108,7 +108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_jianghu:['guanning','huzhao','dc_huangchengyan','mengjie'],
 				sp_zongheng:['huaxin','luyusheng','re_xunchen','re_miheng','fengxi','re_dengzhi','dc_yanghu','zongyu'],
 				sp_taiping:['guanhai','liupi','peiyuanshao','zhangchu','zhangkai','dc_zhangmancheng'],
-				sp_yanhan:['dc_liuba','dc_huangquan','furongfuqian','xianglang','dc_huojun','gaoxiang','dc_wuban','dc_jiangfei'],
+				sp_yanhan:['dc_liuba','dc_huangquan','furongfuqian','xianglang','dc_huojun','gaoxiang','dc_wuban','jiangfei'],
 				sp_jishi:['dc_jiben','zhenghun','dc_sunhanhua','liuchongluojun'],
 				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen','dc_jiachong'],
 				sp_yijun:['gongsundu','mengyou','dc_sp_menghuo'],
@@ -117,77 +117,54 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			dcshengxi:{
-				audio:2,
+				inherit:'reshengxi',
 				trigger:{player:'phaseDiscardEnd'},
-				filter(event,player){
-					return !player.getStat('damage');
-				},
-				frequent:true,
-				content(){
-					player.draw(2);
-				},
 			},
 			dcshoucheng:{
-				audio:2,
-				init(player){
-					game.addGlobalSkill('dcshoucheng_draw',player);
-				},
+				audio:'shoucheng',
+				global:'dcshoucheng_ai',
 				trigger:{
 					global:['equipAfter','addJudgeAfter','loseAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				filter(event,player){
-					return game.hasPlayer(function(current){
-						if(current==_status.currentPhase) return false;
+					const target=_status.currentPhase;
+					return game.hasPlayer(current=>{
+						if(target&&current==target) return false;
 						let evt=event.getl(current);
 						return evt&&evt.hs&&evt.hs.length&&current.countCards('h')==0;
 					});
 				},
 				direct:true,
-				content(){
-					"step 0"
-					event.list=game.filterPlayer(current=>{
-						if(current==_status.currentPhase) return false;
+				async content(event,trigger,player){
+					const targetx=_status.currentPhase;
+					const targets=game.filterPlayer(current=>{
+						if(targetx&&current==targetx) return false;
 						let evt=trigger.getl(current);
 						return evt&&evt.hs&&evt.hs.length&&current.countCards('h')==0;
-					}).sortBySeat(_status.currentPhase);
-					"step 1"
-					var target=event.list.shift();
-					event.target=target;
-					if(target.isIn()) player.chooseBool(get.prompt2('dcshoucheng',target)).set('ai',function(){
-						return get.attitude(_status.event.player,_status.event.getParent().target)>0;
-					});
-					else event.goto(3);
-					"step 2"
-					if(result.bool){
-						player.logSkill(event.name,target);
-						if(player!==target&&(get.mode()!=='identity'||player.identity!=='nei')) player.addExpose(0.2);
-						target.draw(2);
+					}).sortBySeat(targetx||player);
+					for(const target of targets){
+						if(!target.isIn()) continue;
+						const {result:{bool}}=await player.chooseBool(get.prompt2('dcshoucheng',target)).set('choice',get.attitude(player,target)>0);
+						if(bool){
+							player.logSkill('dcshoucheng',target);
+							if(target!=player) player.addExpose(0.2);
+							target.draw(2);
+						}
 					}
-					"step 3"
-					if(event.list.length) event.goto(1);
 				},
 				ai:{
 					threaten(player,target){
 						return Math.sqrt(game.countPlayer(i=>{
 							return get.attitude(target,i)>0;
 						}));
-					}
+					},
 				},
 				subSkill:{
-					draw:{
-						trigger:{player:'dieAfter'},
-						filter(event,player){
-							return !game.hasPlayer(current=>{
-								return current.hasSkill('dcshoucheng');
-							},true);
-						},
-						content(){
-							game.removeGlobalSkill('dcshoucheng_draw');
-						},
+					ai:{
 						ai:{
 							noh:true,
 							skillTagFilter(player,tag,arg){
-								if(player.countCards('h')!==1) return false;
+								if(player.countCards('h')!=1||(_status.currentPhase&&_status.currentPhase==player)) return false;
 								return game.hasPlayer(current=>{
 									return current.hasSkill('dcshoucheng')&&get.attitude(current,player)>0;
 								});
@@ -11991,12 +11968,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yue_daqiao_prefix:'乐',
 			dczixi:'姊希',
 			dczixi_info:'①出牌阶段开始和结束时，你可以将一张“琴”当作一张无效果的【乐不思蜀】、【兵粮寸断】或【闪电】置于一名角色的判定区。②当你使用基本牌或普通锦囊牌指定唯一目标后，你可根据其判定区内的牌数执行对应项：1.令此牌对其额外结算一次；2.摸两张牌；3.弃置其判定区所有牌，对其造成3点伤害。',
-			dc_jiangfei:'新杀蒋琬费祎',
-			dc_jiangfei_prefix:'新杀',
+			jiangfei:'蒋琬费祎',
 			dcshengxi:'生息',
 			dcshengxi_info:'弃牌阶段结束时，若你本回合未造成过伤害，你可以摸两张牌。',
 			dcshoucheng:'守成',
-			dcshoucheng_info:'一名角色于其回合外失去最后的手牌时，你可令其摸两张牌。',
+			dcshoucheng_info:'一名角色于其回合外失去最后的手牌后，你可令其摸两张牌。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
