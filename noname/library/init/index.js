@@ -781,4 +781,14 @@ export class LibInit extends Uninstantable {
 		}
 		return str;
 	}
+
+	/**
+	 * 在返回当前加载的esm模块相对位置。
+	 * @param {*} url 传入import.meta.url 
+	 */
+	static getCurrentFileLocation(url){
+		let head = window.location.href.slice(0,window.location.href.lastIndexOf('/')+1);
+		let ret = url.replace(head,'');
+		return decodeURIComponent(ret);
+	}
 }
