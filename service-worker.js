@@ -37,6 +37,7 @@ self.addEventListener('fetch', event => {
 			return res.text().then(text => {
 				const js = ts.transpile(text, {
 					module: ts.ModuleKind.ES2015,
+					target: ts.ScriptTarget.ES2019,
 					inlineSourceMap: true
 				}, request.url);
 				const rep = new Response(new Blob([js], { type: "text/javascript" }), {
