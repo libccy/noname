@@ -121,7 +121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function*(event,map){
 					var player=map.player,trigger=map.trigger;
-					if(!trigger.card||!trigger.cards.length){
+					if(!trigger.card||!trigger.cards||!trigger.cards.length){
 						trigger.num++;
 						event.finish();
 						return;
