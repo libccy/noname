@@ -2862,10 +2862,14 @@ class Create extends Uninstantable {
 							}
 						}
 						if (list2.length) {
+							var boolx=false;
+							for(var i=0;i<list2.length;i++){
+								if(!listb.contains(list2[i])) boolx=true;
+							}
 							var cfgnodeY={
 								name:'等待分包',
 								_name:'others',
-								init:true,
+								init:boolx,
 								onclick:function(bool){
 									var banned=[];
 									if(connectMenu){
