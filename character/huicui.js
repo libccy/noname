@@ -148,29 +148,58 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				zixiList:['lebu','bingliang','shandian'],
 				direct:true,
 				async content(event,trigger,player){
-					const {result:{bool,cards}}=await player.chooseCard(get.prompt('dczixi'),'将一张“琴”置于一名角色的判定区',(card,player)=>{
+					const names=lib.skill.dczixi.zixiList.filter(name=>{
+						return player.countCards('h',card=>{
+							return card.hasGaintag('dcqiqin_tag')&&game.hasPlayer(target=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
+						});
+					});
+					let map={};
+					for(const name of names){
+						map[get.translation(name)]=name;
+					}
+					const {result:{bool,links}}=await player.chooseButton(2,[
+						'###'+get.prompt('dczixi')+'###将一张“琴”以你选择的牌名置于一名角色的判定区',
+						player.getCards('h'),
+						[Object.keys(map),'tdnodes'],
+					]).set('filterButton',button=>{
+						const type=typeof button.link,card=button.link;
+						if(ui.selected.buttons.length&&type==typeof ui.selected.buttons[0].link) return false;
+						if(type=='string') return true;
 						return card.hasGaintag('dcqiqin_tag')&&lib.skill.dczixi.zixiList.some(name=>{
 							return game.hasPlayer(target=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
 						});
-					}).set('ai',card=>7-get.value(card));
+					}).set('ai',button=>{
+						const player=get.event('player'),list=Object.keys(get.event('map'));
+						if(typeof button.link=='string'){
+							const card=player.getCards('h',card=>{
+								if(get.value(card)>=7) return false;
+								return card.hasGaintag('dcqiqin_tag')&&game.hasPlayer(target=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
+							}).sort((a,b)=>get.value(a)-get.value(b))[0];
+							if(game.hasPlayer(current=>{
+								return get.attitude(player,current)<0&&lib.skill.dczixi.zixiList.some(name=>current.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
+							})) return list.indexOf(button.link)+1;
+							return 1/(list.indexOf(button.link)+1);
+						}
+						return 7-get.value(button.link);
+					}).set('map',map);
 					if(bool){
-						const card=cards.slice()[0];
-						const {result:{bool,targets}}=await player.chooseTarget('请选择'+get.translation(card)+'置入的目标',(cardx,player,target)=>{
-							return lib.skill.dczixi.zixiList.some(name=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[get.event('card')])));
+						const name=links.find(i=>typeof i=='string'),card=links.find(j=>j!=name);
+						const cardname=map[name];
+						const {result:{bool,targets}}=await player.chooseTarget('请选择【'+name+'（'+get.translation(card)+'）】置入的目标',(cardx,player,target)=>{
+							return target.canAddJudge(get.autoViewAs({name:'dczixi_'+get.event('name')},[get.event('card')]));
 						},true).set('ai',target=>{
 							const player=get.event('player'),card=get.event('card');
-							if(player.hasCard(cardx=>cardx!=card&&player.hasValueTarget(cardx,true,true),'hs')&&game.hasPlayer(current=>{
-								return get.attitude(player,target)<0&&lib.skill.dczixi.zixiList.some(name=>current.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
+							if(game.hasPlayer(current=>{
+								return get.attitude(player,current)<0&&current.canAddJudge(get.autoViewAs({name:'dczixi_'+get.event('name')},[card]));
 							})) return -target.countCards('j')-1;
 							return target.countCards('j')+1;
-						}).set('card',card);
+						}).set('card',card).set('name',cardname);
 						if(bool){
 							const target=targets[0];
-							const name=lib.skill.dczixi.zixiList.filter(name=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card]))).randomGet();
 							player.logSkill('dczixi',target);
 							player.$give(card,target,false);
 							await game.asyncDelay(0.5);
-							target.addJudge({name:'dczixi_'+name},[card]);
+							target.addJudge({name:'dczixi_'+cardname},[card]);
 						}
 					}
 				},
@@ -11880,7 +11909,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yue_daqiao:'乐大乔',
 			yue_daqiao_prefix:'乐',
 			dczixi:'姊希',
-			dczixi_info:'①出牌阶段开始和结束时，你可以将一张“琴”当作随机无效果的【乐不思蜀】、【兵粮寸断】或【闪电】置于一名角色的判定区。②当你使用基本牌或普通锦囊牌指定唯一目标后，你可根据其判定区内的牌数执行对应项：1.令此牌对其额外结算一次；2.摸两张牌；3.弃置其判定区所有牌，对其造成3点伤害。',
+			dczixi_info:'①出牌阶段开始和结束时，你可以将一张“琴”当作一张无效果的【乐不思蜀】、【兵粮寸断】或【闪电】置于一名角色的判定区。②当你使用基本牌或普通锦囊牌指定唯一目标后，你可根据其判定区内的牌数执行对应项：1.令此牌对其额外结算一次；2.摸两张牌；3.弃置其判定区所有牌，对其造成3点伤害。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
