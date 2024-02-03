@@ -3247,6 +3247,8 @@ export class Player extends HTMLDivElement {
 		if(arg2){
 			if(typeof arg2 == 'string'){
 				filter = card=>(getCardName(card) == arg2);
+			}else if(Array.isArray(arg2)){
+				filter = card=>arg2.includes(getCardName(card));
 			}else if(typeof arg2 == 'object'){
 				filter = card=>{
 					for (let j in arg2) {
@@ -3355,13 +3357,6 @@ export class Player extends HTMLDivElement {
 		}
 		return list;
 	}
-	cacheCountCards(arg1){
-		let cache = CacheContext.getCacheContext();
-		if(cache){
-			return cache.delegate(this).countCards(arg1);
-		}
-		return this.countCards(arg1);
-	}
 	countCards(arg1, arg2) {
 		let count = 0;
 		for(let item of this.iterableGetCards(arg1,arg2)){
@@ -3398,19 +3393,15 @@ export class Player extends HTMLDivElement {
 		}
 		return skills;
 	}
-	getModableSkills(useCache) {
-		var func = function (player) {
-			var skills = player.getSkills().concat(lib.skill.global);
-			game.expandSkills(skills);
-			skills = skills.filter(function (skill) {
-				var info = get.info(skill);
-				return info && info.mod;
-			});
-			skills.sort((a, b) => get.priority(a) - get.priority(b));
-			return skills;
-		};
-		if (!useCache) return func(this);
-		return game.callFuncUseStepCache("player.getModableSkills", func, [this]);
+	getModableSkills() {
+		var skills = this.getSkills().concat(lib.skill.global);
+		game.expandSkills(skills);
+		skills = skills.filter(function (skill) {
+			var info = get.info(skill);
+			return info && info.mod;
+		});
+		skills.sort((a, b) => get.priority(a) - get.priority(b));
+		return skills;
 	}
 	getSkills(arg2, arg3, arg4) {
 		var skills = this.skills.slice(0);
@@ -4760,9 +4751,6 @@ export class Player extends HTMLDivElement {
 			}
 		});
 	}
-	cacheSupportFunction(){
-		return ['hasCard','hasValueTarget','getCardIndex','countCards','getSkills','getUseValue','canUse'];
-	}
 	moveCard() {
 		var next = game.createEvent('moveCard');
 		next.player = this;
@@ -4830,7 +4818,7 @@ export class Player extends HTMLDivElement {
 				this.logSkill(event.logSkill);
 			}
 			else if (Array.isArray(event.logSkill)) {
-				this.logSkill.apply(this, event.logSkill);
+				this.logSkill.call(this,...event.logSkill);
 			}
 		}
 		if (result.card || !result.skill) {
@@ -6914,8 +6902,47 @@ export class Player extends HTMLDivElement {
 			return player.canUse(card, current, distance, includecard);
 		});
 	}
-	hasValueTarget() {
-		return this.getUseValue.apply(this, arguments) > 0;
+	hasValueTarget(card, distance, includecard) {
+		if (typeof (card) == 'string') {
+			card = { name: card, isCard: true };
+		}
+		var player = this;
+		var targets = game.filterPlayer();
+		var value = [];
+		var min = 0;
+		var info = get.info(card);
+		if (!info || info.notarget) return false;
+		var range;
+		var select = get.copy(info.selectTarget);
+		if (select == undefined) {
+			if (info.filterTarget == undefined) return true;
+			range = [1, 1];
+		}
+		else if (typeof select == 'number') range = [select, select];
+		else if (get.itemtype(select) == 'select') range = select;
+		else if (typeof select == 'function') range = select(card, player);
+		if (info.singleCard) range = [1, 1];
+		game.checkMod(card, player, range, 'selectTarget', player);
+		if (!range) return false;
+
+		let cache = CacheContext.requireCacheContext();
+		for (var i = 0; i < targets.length; i++) {
+			if (player.canUse(card, targets[i], distance, includecard)) {
+				var eff = cache.get.effect(targets[i], card, player, player);
+				if(range[1]!=-1 && eff > 0){
+					return true;
+				}
+				value.push(eff);
+			}
+		}
+		value.sort(function (a, b) {
+			return b - a;
+		});
+		for (var i = 0; i < value.length; i++) {
+			if (i == range[1] || range[1] != -1 && value[i] <= 0) break;
+			min += value[i];
+		}
+		return min > 0;
 	}
 	getUseValue(card, distance, includecard) {
 		if (typeof (card) == 'string') {
@@ -6940,10 +6967,7 @@ export class Player extends HTMLDivElement {
 		game.checkMod(card, player, range, 'selectTarget', player);
 		if (!range) return 0;
 
-		let cache = CacheContext.getCacheContext();
-		if(!cache){
-			cache = new CacheContext();
-		}
+		let cache = CacheContext.requireCacheContext();
 		for (var i = 0; i < targets.length; i++) {
 			if (player.canUse(card, targets[i], distance, includecard)) {
 				var eff = cache.get.effect(targets[i], card, player, player);
@@ -8076,7 +8100,7 @@ export class Player extends HTMLDivElement {
 		return targets;
 	}
 	isEnemyOf() {
-		return !this.isFriendOf.apply(this, arguments);
+		return !this.isFriendOf.call(this,...arguments);
 	}
 	isFriendOf(player) {
 		if (get.mode() == 'guozhan') {
@@ -10154,3 +10178,6 @@ export class Player extends HTMLDivElement {
 		}
 	}
 }
+
+CacheContext.inject(Player.prototype,
+	['hasCard','hasValueTarget','getModableSkills','getCardIndex','countCards','getSkills','getUseValue','canUse']);

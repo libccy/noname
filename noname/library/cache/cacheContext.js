@@ -12,7 +12,12 @@ export class CacheContext{
         this.lib = this.createCacheProxy(Library);
         this.game = this.createCacheProxy(Game);
         this.get = this.createCacheProxy(Get);
-        this.sourceMap = {};
+        this.sourceMap = new Map();
+        this.storageMap = new Map();
+    }
+
+    static setInCacheEnvironment(cache){
+        _status.cacheEnvironment = cache;
     }
 
     static setCacheContext(context){
@@ -36,14 +41,43 @@ export class CacheContext{
     }
 
     delegate(source){
-        if(source === null || source === undefined)return null;
-        if(typeof source.getCacheKey !== 'function')return source;
-        let cacheKey = source.getCacheKey();
-        if(this.sourceMap[cacheKey]){
-            return this.sourceMap[cacheKey];
+        if(source === null || source === undefined)return source;
+        if(source._cacheDelegateSource)return source;
+        let proxy = this.sourceMap.get(source);
+        if(proxy){
+            return proxy;
         }
-        this.sourceMap[cacheKey] = this.createCacheProxy(source);
-        return this.sourceMap[cacheKey];
+        proxy = this.createCacheProxy(source);
+        this.sourceMap.set(source,proxy);
+        return proxy;
+    }
+
+    static inject(source,methods){
+        if(source == null || source === undefined)return null;
+        for(let method of methods){
+            let func = source[method];
+            if(typeof func != 'function')continue;
+            source[method] = function(){
+                try{
+                    if(!_status.cacheEnvironment){
+                        return func.call(this,...arguments);
+                    }
+                    return CacheContext
+                    .getCacheValueFromObject(CacheContext.requireCacheContext().requireStorage(this),method,arguments,this,func);
+                }catch(e){
+                    return func.call(this,...arguments);
+                }
+            }
+        }
+    }
+
+    requireStorage(obj){
+        let storage = this.storageMap.get(obj);
+        if(!storage){
+            storage = {};
+            this.storageMap.set(obj,storage);
+        }
+        return storage;
     }
 
     /**
@@ -56,6 +90,7 @@ export class CacheContext{
         const cacheStorage = {};
         return new Proxy(delegateObject,{
             get:(target,key)=>{
+                if(key == '_cacheDelegateSource')return delegateObject;
                 let value = target[key];
                 if(key.indexOf('cache') == 0){
                     return value;
@@ -73,7 +108,7 @@ export class CacheContext{
                                 return CacheContext
                                 .getCacheValueFromObject(cacheStorage,key,arguments,target);
                             }catch(e){
-                                return value.apply(target,arguments);
+                                return value.call(target,...arguments);
                             }
                         };
                         cacheFuncObj[key] = wrapFunc;
@@ -85,16 +120,18 @@ export class CacheContext{
         });
     }
 
-    static getCacheValueFromObject(storage,key,params,source){
+    static getCacheValueFromObject(storage,key,params,source,func){
         let cache = storage;
         let funcCache = CacheContext.ensureMember(cache,key);
         let cacheKey = CacheContext.wrapParametersToCacheKey(params);
         let ret = funcCache[cacheKey];
         if(ret === undefined){
-            ret = source[key](...params);
+            ret = ((typeof func == 'function')?func:source[key]).call(source,...params);
             funcCache[cacheKey] = ret;
+            //console.log('缓存未命中!'+key+":"+cacheKey+":"+params.length+":ret:"+ret);
+        }else{
+            //console.log(key+":"+cacheKey+":"+params.length+":ret:"+ret);
         }
-        //console.log(key+":"+cacheKey+":"+params.length+":ret:"+ret);
         return ret;
     }
 
