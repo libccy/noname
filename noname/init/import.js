@@ -35,7 +35,7 @@ export const importMode = generateImportFunction('mode', (name) => `../../mode/$
 function generateImportFunction(type, pathParser) {
 	return async (name) => {
 		if(type == 'extension' && !game.hasExtension(name) && !lib.config.all.stockextension.includes(name)){
-			await game.import(type,createEmptyExtension(name));
+			await game.import(type,await createEmptyExtension(name));
 			return;
 		}
 		let path = pathParser(name);
@@ -72,8 +72,21 @@ function generateImportFunction(type, pathParser) {
 	}
 }
 
-function createEmptyExtension(name){
-	return {name:name,content:function(config,pack){},precontent:function(){},config:{},help:{},package:{
+async function createEmptyExtension(name){
+	const extensionInfo = await import(`../../extension/${name}/info.json`,{assert:{type:'json'}})
+	.then(info=>{
+		return info.default;
+	},()=>{
+		return {
+			name:name,
+			intro:`扩展<b>《${name}》</b>尚未开启，请开启后查看信息。（建议扩展添加info.json以在关闭时查看信息）`,
+			author:"未知",
+			diskURL:"",
+			forumURL:"",
+			version:"1.0",
+		};
+	});
+	return {name:extensionInfo.name,content:function(config,pack){},precontent:function(){},config:{},help:{},package:{
 		character:{
 			character:{
 			},
@@ -93,10 +106,10 @@ function createEmptyExtension(name){
 			translate:{
 			},
 		},
-		intro:`扩展《${name}》尚未开启，请开启后查看信息。`,
-		author:"未知",
-		diskURL:"",
-		forumURL:"",
-		version:"1.0",
+		intro:extensionInfo.intro?extensionInfo.intro.replace("${assetURL}",lib.assetURL):"",
+		author:extensionInfo.author,
+		diskURL:extensionInfo.diskURL,
+		forumURL:extensionInfo.forumURL,
+		version:extensionInfo.version,
 	},files:{"character":[],"card":[],"skill":[],"audio":[]}}
 }
