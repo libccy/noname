@@ -7496,7 +7496,7 @@ export class Game extends Uninstantable {
 		const argumentArray = Array.from(arguments), name = argumentArray[argumentArray.length - 2];
 		let skills = argumentArray[argumentArray.length - 1];
 		if (typeof skills.getModableSkills == 'function') {
-			skills = skills.getModableSkills(_status.event.useCache === true);
+			skills = skills.getModableSkills();
 		} else if (typeof skills.getSkills == 'function') {
 			skills = skills.getSkills().concat(lib.skill.global);
 			game.expandSkills(skills);
@@ -7510,8 +7510,8 @@ export class Game extends Uninstantable {
 		skills.forEach(value => {
 			var mod = get.info(value).mod[name];
 			if (!mod) return;
-			const result = mod.apply(this, arg);
-			if (typeof arg[arg.length - 1] != 'object' && result != undefined) arg[arg.length - 1] = result;
+			const result = mod.call(this,...arg);
+			if (result != undefined && typeof arg[arg.length - 1] != 'object') arg[arg.length - 1] = result;
 		});
 		return arg[arg.length - 1];
 	}

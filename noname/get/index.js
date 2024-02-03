@@ -2866,8 +2866,10 @@ export class Get extends Uninstantable {
 					if (!lib.characterInitFilter[node.name]) return true;
 					return lib.characterInitFilter[node.name](tag) !== false;
 				});
-				const str = initFilters.reduce((strx, stry) => strx + lib.InitFilter[stry] + '<br>').slice(0, -4);
-				uiintro.addText(str);
+				if(initFilters.length){
+					const str = initFilters.reduce((strx, stry) => strx + lib.InitFilter[stry] + '<br>').slice(0, -4);
+					uiintro.addText(str);
+				}
 			}
 
 			if (!node.noclick) {
@@ -4028,7 +4030,7 @@ export class Get extends Uninstantable {
 		if (!from || !to) return 0;
 		from = from._trueMe || from;
 		arguments[0] = from;
-		var att = get.rawAttitude.apply(this, arguments);
+		var att = CacheContext.requireCacheContext().get.rawAttitude.apply(this, arguments);
 		if (from.isMad()) att = -att;
 		if (to.isMad() && att > 0) {
 			if (to.identity == 'zhu') {
@@ -4192,11 +4194,8 @@ export class Get extends Uninstantable {
 		return 1;
 	}
 	static cacheOrder(item){
-		let cache = CacheContext.getCacheContext();
-		if(cache){
-			return cache.get.order(item);
-		}
-		return get.order(item);
+		let cache = CacheContext.requireCacheContext();
+		return cache.get.order(item);
 	}
 	static order(item) {
 		let cache = CacheContext.requireCacheContext();
@@ -4235,13 +4234,11 @@ export class Get extends Uninstantable {
 		return result;
 	}
 	static cacheEffectUse(target, card, player, player2, isLink){
-		let cache = CacheContext.getCacheContext();
-		if(cache){
-			return cache.get.effect_use(target,card,player,player2,isLink);
-		}
-		return get.effect_use(target,card,player,player2,isLink);
+		let cache = CacheContext.requireCacheContext();
+		return cache.get.effect_use(target,card,player,player2,isLink);
 	}
 	static effect_use(target, card, player, player2, isLink) {
+		let cache = CacheContext.requireCacheContext();
 		var event = _status.event;
 		var eventskill = null;
 		if (player == undefined) player = _status.event.player;
@@ -4262,7 +4259,7 @@ export class Get extends Uninstantable {
 			info.changeTarget(player, targets);
 			var eff = 0;
 			for (var i of targets) {
-				eff += get.effect(i, card, player, player2, isLink);
+				eff += cache.get.effect(i, card, player, player2, isLink);
 			}
 			return eff;
 		}
@@ -4280,10 +4277,10 @@ export class Get extends Uninstantable {
 		for (var i = 0; i < skills1.length; i++) {
 			temp1 = get.info(skills1[i]).ai;
 			if (temp1 && typeof temp1.effect == 'object' && typeof temp1.effect.player_use == 'function') {
-				temp1 = temp1.effect.player_use(card, player, target, result1, isLink);
+				temp1 = cache.delegate(temp1.effect).player_use(card, player, target, result1, isLink);
 			}
 			else if (temp1 && typeof temp1.effect == 'object' && typeof temp1.effect.player == 'function') {
-				temp1 = temp1.effect.player(card, player, target, result1, isLink);
+				temp1 = cache.delegate(temp1.effect).player(card, player, target, result1, isLink);
 			}
 			else temp1 = undefined;
 			if (typeof temp1 == 'object') {
@@ -4323,7 +4320,7 @@ export class Get extends Uninstantable {
 						target: target,
 						skill: skills2[i],
 						isLink: isLink,
-					})) temp2 = temp2.effect(card, player, target, result2, isLink);
+					})) temp2 = cache.delegate(temp2).effect(card, player, target, result2, isLink);
 					else temp2 = undefined;
 				}
 				else if (temp2 && typeof temp2.effect == 'object' && typeof temp2.effect.target_use == 'function') {
@@ -4332,7 +4329,7 @@ export class Get extends Uninstantable {
 						target: target,
 						skill: skills2[i],
 						isLink: isLink,
-					})) temp2 = temp2.effect.target_use(card, player, target, result2, isLink);
+					})) temp2 = cache.delegate(temp2.effect).target_use(card, player, target, result2, isLink);
 					else temp2 = undefined;
 				}
 				else if (temp2 && typeof temp2.effect == 'object' && typeof temp2.effect.target == 'function') {
@@ -4341,7 +4338,7 @@ export class Get extends Uninstantable {
 						target: target,
 						skill: skills2[i],
 						isLink: isLink,
-					})) temp2 = temp2.effect.target(card, player, target, result2, isLink);
+					})) temp2 = cache.delegate(temp2.effect).target(card, player, target, result2, isLink);
 					else temp2 = undefined;
 				}
 				else temp2 = undefined;
@@ -4386,7 +4383,7 @@ export class Get extends Uninstantable {
 			result2 += temp02;
 			result1 += temp01;
 			if (typeof card == 'object' && !result.ignoreStatus) {
-				if (get.attitude(player, target) < 0) {
+				if (cache.get.attitude(player, target) < 0) {
 					result2 *= Math.sqrt(threaten);
 				}
 				else {
@@ -4394,7 +4391,7 @@ export class Get extends Uninstantable {
 				}
 				if (target.hp == 1) result2 *= 2.5;
 				if (target.hp == 2) result2 *= 1.8;
-				let countTargetCards = target.cacheCountCards('h');
+				let countTargetCards = target.countCards('h');
 				if (countTargetCards == 0) {
 					if (get.tag(card, 'respondSha') || get.tag(card, 'respondShan')) {
 						result2 *= 1.7;
@@ -4419,32 +4416,30 @@ export class Get extends Uninstantable {
 		if (zerotarget) result2 = 0;
 		var final = 0;
 		if (player2) {
-			final = (result1 * get.attitude(player2, player) + (target ? result2 * get.attitude(player2, target) : 0));
+			final = (result1 * cache.get.attitude(player2, player) + (target ? result2 * cache.get.attitude(player2, target) : 0));
 		}
-		else final = (result1 * get.attitude(player, player) + (target ? result2 * get.attitude(player, target) : 0));
+		else final = (result1 * cache.get.attitude(player, player) + (target ? result2 * cache.get.attitude(player, target) : 0));
 		if (!isLink && get.tag(card, 'natureDamage') && !zerotarget) {
 			var info = get.info(card);
 			if (!info || !info.ai || !info.ai.canLink) {
 				if (target.isLinked()) game.players.forEach(function (current) {
-					if (current != target && current.isLinked()) final += get.effect(current, card, player, player2, true);
+					if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, true);
 				});
 			}
 			else if (info.ai.canLink(player, target, card)) {
 				game.players.forEach(function (current) {
-					if (current != target && current.isLinked()) final += get.effect(current, card, player, player2, true);
+					if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, true);
 				});
 			}
 		}
 		return final;
 	}
 	static cacheEffect(target, card, player, player2, isLink){
-		let cache = CacheContext.getCacheContext();
-		if(cache){
-			return cache.get.effect(target,card,player,player2,isLink);
-		}
-		return get.effect(target,card,player,player2,isLink);
+		let cache = CacheContext.requireCacheContext();
+		return cache.get.effect(target,card,player,player2,isLink);
 	}
 	static effect(target, card, player, player2, isLink) {
+		let cache = CacheContext.requireCacheContext();
 		var event = _status.event;
 		var eventskill = null;
 		if (player == undefined) player = _status.event.player;
@@ -4505,7 +4500,7 @@ export class Get extends Uninstantable {
 			game.expandSkills(skills2);
 			for (var i = 0; i < skills2.length; i++) {
 				temp2 = get.info(skills2[i]).ai;
-				if (temp2 && temp2.threaten) temp3 = temp2.threaten;
+				if (temp2 && temp2.threaten) temp3 = cache.delegate(temp2).threaten;
 				else temp3 = undefined;
 				if (temp2 && typeof temp2.effect == 'function') {
 					if (!player.hasSkillTag('ignoreSkill', true, {
@@ -4513,7 +4508,7 @@ export class Get extends Uninstantable {
 						target: target,
 						skill: skills2[i],
 						isLink: isLink,
-					})) temp2 = temp2.effect(card, player, target, result2, isLink);
+					})) temp2 = cache.delegate(temp2).effect(card, player, target, result2, isLink);
 					else temp2 = undefined;
 				}
 				else if (temp2 && typeof temp2.effect == 'object' && typeof temp2.effect.target == 'function') {
@@ -4522,7 +4517,7 @@ export class Get extends Uninstantable {
 						target: target,
 						skill: skills2[i],
 						isLink: isLink,
-					})) temp2 = temp2.effect.target(card, player, target, result2, isLink);
+					})) temp2 = cache.delegate(temp2.effect).target(card, player, target, result2, isLink);
 					else temp2 = undefined;
 				}
 				else temp2 = undefined;
@@ -4567,7 +4562,7 @@ export class Get extends Uninstantable {
 			result2 += temp02;
 			result1 += temp01;
 			if (typeof card == 'object' && !result.ignoreStatus) {
-				if (get.attitude(player, target) < 0) {
+				if (cache.get.attitude(player, target) < 0) {
 					result2 *= Math.sqrt(threaten);
 				}
 				else {
@@ -4576,7 +4571,7 @@ export class Get extends Uninstantable {
 				// *** continue here ***
 				if (target.hp == 1) result2 *= 2.5;
 				if (target.hp == 2) result2 *= 1.8;
-				let targetCountCards = target.cacheCountCards('h');
+				let targetCountCards = target.countCards('h');
 				if (targetCountCards == 0) {
 					if (get.tag(card, 'respondSha') || get.tag(card, 'respondShan')) {
 						result2 *= 1.7;
@@ -4601,19 +4596,19 @@ export class Get extends Uninstantable {
 		if (zerotarget) result2 = 0;
 		var final = 0;
 		if (player2) {
-			final = (result1 * get.attitude(player2, player) + (target ? result2 * get.attitude(player2, target) : 0));
+			final = (result1 * cache.get.attitude(player2, player) + (target ? result2 * cache.get.attitude(player2, target) : 0));
 		}
-		else final = (result1 * get.attitude(player, player) + (target ? result2 * get.attitude(player, target) : 0));
+		else final = (result1 * cache.get.attitude(player, player) + (target ? result2 * cache.get.attitude(player, target) : 0));
 		if (!isLink && get.tag(card, 'natureDamage') && !zerotarget) {
 			var info = get.info(card);
 			if (!info || !info.ai || !info.ai.canLink) {
 				if (target.isLinked()) game.players.forEach(function (current) {
-					if (current != target && current.isLinked()) final += get.effect(current, card, player, player2, true);
+					if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, true);
 				});
 			}
 			else if (info.ai.canLink(player, target, card)) {
 				game.players.forEach(function (current) {
-					if (current != target && current.isLinked()) final += get.effect(current, card, player, player2, true);
+					if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, true);
 				});
 			}
 		}
