@@ -2577,7 +2577,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.list.includes(target.countCards('h'))) event.goto(2);
 				},
 				ai:{
-					combo:'olguangshu',
+					combo:'olgangshu',
 					maixie:true,
 				},
 			},
