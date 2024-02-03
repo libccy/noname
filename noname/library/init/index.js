@@ -708,7 +708,11 @@ export class LibInit extends Uninstantable {
 		}
 		else if (typeof func == 'object') {
 			for (var i in func) {
-				if (Object.prototype.hasOwnProperty.call(func, i)) {
+				if(typeof func[i] == 'function'){
+					let checkObject = {};
+					checkObject[i] = func[i];
+					return eval(`(function(){return ${get.stringify(checkObject)};})()`)[i];
+				}else{
 					func[i] = lib.init.eval(func[i]);
 				}
 			}
