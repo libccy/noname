@@ -161,7 +161,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const cards=player.getCards('h',card=>{
 						const type=get.type(card,player);
 						if(type!='basic'&&type!='trick') return false;
-						return player.hasUseTarget(card,true,true);
+						return lib.filter.cardUsable(card,player)&&game.hasPlayer(target=>{
+							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
+						});
 					});
 					if(!cards.length) return false;
 					return cards.some(card=>{
@@ -169,12 +171,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return cardss.length&&!cardss.some(cardx=>!game.checkMod(cardx,player,'unchanged','cardEnabled2',player));
 					});
 				},
-				filterCard(card,player,target){
+				filterCard(card,player){
 					if(ui.selected.cards.length) return false;
 					const cards=player.getCards('h',card=>{
 						const type=get.type(card,player);
 						if(type!='basic'&&type!='trick') return false;
-						return player.hasUseTarget(card,true,true);
+						return lib.filter.cardUsable(card,player)&&game.hasPlayer(target=>{
+							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
+						});
 					});
 					if(!cards.includes(card)) return false;
 					const cardss=player.getCards('h',cardx=>card!=cardx&&get.suit(card,player)==get.suit(cardx,player));
@@ -191,14 +195,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else if(typeof select=='function') range=select(card,player);
 					game.checkMod(card,player,range,'selectTarget',player);
 					const cards=player.getCards('h',cardx=>card!=cardx&&get.suit(card,player)==get.suit(cardx,player));
-					let targets=game.filterPlayer(target=>lib.filter.targetEnabled2(get.event('cardx'),player,target)&&lib.filter.targetInRange(get.event('cardx'),player,target)&&get.effect(target,card,player,player)>0);
+					let targets=game.filterPlayer(target=>lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target)&&get.effect(target,card,player,player)>0);
 					const max=range[1],max2=Math.min(cards.length,targets.length);
 					if(max>max2) return 0;
 					targets=targets.sort((a,b)=>get.effect(b,card,player,player)-get.effect(a,card,player,player)).slice(0,max2);
 					const sum=targets.reduce((num,target)=>num+get.effect(target,card,player,player),0);
 					if(max==-1){
 						if(game.filterPlayer(target=>{
-							return lib.filter.targetEnabled2(get.event('cardx'),player,target)&&lib.filter.targetInRange(get.event('cardx'),player,target);
+							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
 						}).reduce((num,target)=>num+get.effect(target,card,player,player),0)>sum) return 0;
 					}
 					return sum;
