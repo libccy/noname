@@ -159,6 +159,8 @@ var pinyin_dict_polyphone = {
 	"血殇": "xuè ",
 	"血池": "xuè ",
 	"越行": " xíng",
+	"侠行": " xíng",
+	"枭行": " xíng",
 	"劫行": " xíng",
 	"割发": " fà",
 	"落梅": "luò ",
