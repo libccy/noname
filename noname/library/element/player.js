@@ -6929,7 +6929,7 @@ export class Player extends HTMLDivElement {
 		for (var i = 0; i < targets.length; i++) {
 			if (player.canUse(card, targets[i], distance, includecard)) {
 				var eff = cache.get.effect(targets[i], card, player, player);
-				if(range[1]!=-1 && eff > 0){
+				if(range[1]==1 && eff > 0){
 					return true;
 				}
 				value.push(eff);
