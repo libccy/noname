@@ -107,9 +107,9 @@ async function createEmptyExtension(name){
 			},
 		},
 		intro:extensionInfo.intro?extensionInfo.intro.replace("${assetURL}",lib.assetURL):"",
-		author:extensionInfo.author,
-		diskURL:extensionInfo.diskURL,
-		forumURL:extensionInfo.forumURL,
-		version:extensionInfo.version,
+		author:extensionInfo.author?extensionInfo.author:"未知",
+		diskURL:extensionInfo.diskURL?extensionInfo.diskURL:"",
+		forumURL:extensionInfo.forumURL?extensionInfo.forumURL:"",
+		version:extensionInfo.version?extensionInfo.version:"1.0.0",
 	},files:{"character":[],"card":[],"skill":[],"audio":[]}}
 }
