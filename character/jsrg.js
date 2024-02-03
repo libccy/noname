@@ -6852,19 +6852,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 6'
 					if(result.bool&&result.links.length){
 						var link=result.links[0];
-						if(get.position(link)=='h'){
-							event.targets[1].gain(link);
-						}
-						else if(get.position(link)=='e'){
-							event.targets[1].equip(link);
-						}
-						else if(link.viewAs){
-							event.targets[1].addJudge({name:link.viewAs},[link]);
-						}
+						if(get.position(link)=='h') event.targets[1].gain(link,event.targets[0],'giveAuto');
 						else{
-							event.targets[1].addJudge(link);
+							event.targets[0].$give(link,event.targets[1],false);
+							if(get.position(link)=='e') event.targets[1].equip(link);
+							else if(link.viewAs) event.targets[1].addJudge({name:link.viewAs},[link]);
+							else event.targets[1].addJudge(link);
 						}
-						event.targets[0].$give(link,event.targets[1],false);
 						game.log(event.targets[0],'的',get.position(link)=='h'?'一张手牌':link,'被移动给了',event.targets[1]);
 						game.delay();
 					}
