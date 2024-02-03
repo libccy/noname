@@ -3398,7 +3398,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						marktext:'装',
 						mark:true,
 						intro:{
-							content:'有装备牌进入你的装备时，可弃置一名其他角色的一张牌',
+							content:'有装备牌进入你的装备区时，可弃置一名其他角色的一张牌',
 						},
 						trigger:{player:'equipAfter'},
 						filter:function(event,player){
