@@ -161,7 +161,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const cards=player.getCards('h',card=>{
 						const type=get.type(card,player);
 						if(type!='basic'&&type!='trick') return false;
-						return player.hasUseTarget(card,true,true);
+						return lib.filter.cardUsable(card,player)&&game.hasPlayer(target=>{
+							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
+						});
 					});
 					if(!cards.length) return false;
 					return cards.some(card=>{
@@ -169,12 +171,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return cardss.length&&!cardss.some(cardx=>!game.checkMod(cardx,player,'unchanged','cardEnabled2',player));
 					});
 				},
-				filterCard(card,player,target){
+				filterCard(card,player){
 					if(ui.selected.cards.length) return false;
 					const cards=player.getCards('h',card=>{
 						const type=get.type(card,player);
 						if(type!='basic'&&type!='trick') return false;
-						return player.hasUseTarget(card,true,true);
+						return lib.filter.cardUsable(card,player)&&game.hasPlayer(target=>{
+							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
+						});
 					});
 					if(!cards.includes(card)) return false;
 					const cardss=player.getCards('h',cardx=>card!=cardx&&get.suit(card,player)==get.suit(cardx,player));
@@ -191,14 +195,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else if(typeof select=='function') range=select(card,player);
 					game.checkMod(card,player,range,'selectTarget',player);
 					const cards=player.getCards('h',cardx=>card!=cardx&&get.suit(card,player)==get.suit(cardx,player));
-					let targets=game.filterPlayer(target=>player.canUse(card,target)&&get.effect(target,card,player,player)>0);
+					let targets=game.filterPlayer(target=>lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target)&&get.effect(target,card,player,player)>0);
 					const max=range[1],max2=Math.min(cards.length,targets.length);
 					if(max>max2) return 0;
 					targets=targets.sort((a,b)=>get.effect(b,card,player,player)-get.effect(a,card,player,player)).slice(0,max2);
 					const sum=targets.reduce((num,target)=>num+get.effect(target,card,player,player),0);
 					if(max==-1){
 						if(game.filterPlayer(target=>{
-							return player.canUse(card,target);
+							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
 						}).reduce((num,target)=>num+get.effect(target,card,player,player),0)>sum) return 0;
 					}
 					return sum;
@@ -212,11 +216,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					await player.showCards([card],get.translation(player)+'发动了【纵势】');
 					const cardx=new lib.element.VCard({name:get.name(card,player),nature:get.nature(card,player),cards:cards});
 					const {result:{bool,targets}}=await player.chooseTarget((card,player,target)=>{
-						return player.canUse(get.event('cardx'),target);
+						//return player.canUse(get.event('cardx'),target);
+						return lib.filter.targetEnabled2(get.event('cardx'),player,target)&&lib.filter.targetInRange(get.event('cardx'),player,target);
 					},true).set('cardx',cardx).set('selectTarget',[1,cards.length])
 					.set('prompt','请选择'+(game.hasNature(cardx)?get.translation(get.nature(cardx)):'')+'【'+get.translation(cardx)+'】（'+get.translation(cards)+'）的目标')
 					.set('ai',target=>{
-						const player=get.event('player'),card=get.event('playerx');
+						const player=get.event('player'),card=get.event('cardx');
 						return get.effect(target,card,player,player);
 					});
 					if(bool) player.useCard(cardx,cards,targets.sortBySeat());
@@ -8724,7 +8729,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.expandSkills(list2);
 							for(var k=0;k<list2.length;k++){
 								var info=lib.skill[list2[k]];
-								if(!info||!info.trigger||!info.trigger.player||info.silent||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
+								if(!info||!info.trigger||!info.trigger.player||info.silent||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill||(info.zhuSkill&&!player.isZhu2())) continue;
 								if(info.trigger.player==name2||Array.isArray(info.trigger.player)&&info.trigger.player.includes(name2)){
 									if(info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
 									if(info.init) continue;
@@ -8804,7 +8809,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.expandSkills(list2);
 							for(var k=0;k<list2.length;k++){
 								var info=lib.skill[list2[k]];
-								if(!info||!info.enable||info.charlotte||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
+								if(!info||!info.enable||info.charlotte||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill||(info.zhuSkill&&!player.isZhu2())) continue;
 								if((info.enable=='phaseUse'||(Array.isArray(info.enable)&&info.enable.includes('phaseUse')))||(info.enable=='chooseToUse'||(Array.isArray(info.enable)&&info.enable.includes('chooseToUse')))){
 									if(info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
 									if(info.init||info.onChooseToUse) continue;
