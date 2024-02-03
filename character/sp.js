@@ -25142,19 +25142,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								skill.removeMark('lianhuan',source,player,true);
 							});
 						},
-						ai:{
-							order:1,
-							fireAttack:true,
-							result:{
-								//等PZ157来写
-								/*target:function(player,target){
-									if(target.hasSkillTag('nofire')) return 0;
-									if(lib.config.mode=='versus') return -1;
-									if(player.hasUnknown()) return 0;
-									return get.damageEffect(target,player);
-								}*/
-							}
-						}
 					},
 				},
 			},

@@ -6379,32 +6379,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yeyan:{
 				unique:true,
-				forceDie:true,
-				enable:'phaseUse',
+				limited:true,
 				audio:3,
-				animationColor:'metal',
-				skillAnimation:'legend',
+				enable:'phaseUse',
+				filterCard(card,player){
+					return !ui.selected.cards.some(cardx=>get.suit(cardx,player)==get.suit(card,player));
+				},
+				selectCard:[0,4],
 				filterTarget(card,player,target){
 					var length=ui.selected.cards.length;
-					return (length==0||length==4);
+					return length==0||length==4;
 				},
-				filterCard(card){
-					var suit=get.suit(card);
-					for(var i=0;i<ui.selected.cards.length;i++){
-						if(get.suit(ui.selected.cards[i])==suit) return false;
-					}
-					return true;
-				},
-				complexCard:true,
-				limited:true,
-				selectCard:[0,4],
-				line:'fire',
-				check (){return -1},
 				selectTarget(){
 					if(ui.selected.cards.length==4) return [1,2];
 					if(ui.selected.cards.length==0) return [1,3];
 					game.uncheck('target');
 					return [1,3];
+				},
+				complexCard:true,
+				complexSelect:true,
+				line:'fire',
+				forceDie:true,
+				animationColor:'metal',
+				skillAnimation:'legend',
+				check(card){
+					if(!lib.skill.yeyan.getBigFire(get.event('player'))) return -1;
+					return 1/(get.value(card)||0.5);
 				},
 				multitarget:true,
 				multiline:true,
@@ -6452,17 +6452,42 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					targets[0].damage('fire',result.control=="2点"?2:3,'nocard');
 				},
 				ai:{
-					order:1,
+					order(item,player){
+						return lib.skill.yeyan.getBigFire(player)?10:1;
+					},
 					fireAttack:true,
 					result:{
 						target(player,target){
-							if(target.hasSkillTag('nofire')) return 0;
-							if(lib.config.mode=='versus') return -1;
 							if(player.hasUnknown()) return 0;
-							return get.damageEffect(target,player);
+							const att=get.sgn(get.attitude(player,target));
+							const targets=game.filterPlayer(target=>get.damageEffect(target,player,player,'fire')&&(!lib.skill.yeyan.getBigFire(player)||(target.hp<=3&&!target.hasSkillTag('filterDamage',null,{player:player}))));
+							if(!targets.includes(target)) return 0;
+							if(lib.skill.yeyan.getBigFire(player)){
+								if(ui.selected.targets.length) return 0;
+								if(!(targets.length==1||(att<0&&target.identity&&target.identity.indexOf('zhu')!=-1))) return 0;
+							}
+							return att*get.damageEffect(target,player,player,'fire');
 						}
 					}
-				}
+				},
+				getBigFire(player){
+					if(player.getDiscardableCards(player,'h').reduce((list,card)=>list.add(get.suit(card,player)),[]).length<4) return false;
+					const targets=game.filterPlayer(target=>get.damageEffect(target,player,player,'fire')&&target.hp<=3&&!target.hasSkillTag('filterDamage',null,{player:player}));
+					if(!targets.length) return false;
+					if(targets.length==1||targets.some(target=>get.attitude(player,target)<0&&target.identity&&target.identity.indexOf('zhu')!=-1)){
+						let suits=player.getDiscardableCards(player,'h').reduce((map,card)=>{
+							const suit=get.suit(card,player);
+							if(!map[suit]) map[suit]=[];
+							return map;
+						},{}),cards=[];
+						Object.keys(suits).forEach(i=>{
+							suits[i].addArray(player.getDiscardableCards(player,'h').filter(card=>get.suit(card)==i));
+							cards.add(suits[i].sort((a,b)=>get.value(a)-get.value(b))[0]);
+						});
+						return player.hp+player.countCards('h',card=>!cards.includes(card)&&player.canSaveCard(card,player))-3>0;
+					}
+					return false;
+				},
 			},
 			longhun:{
 				audio:4,
@@ -8146,7 +8171,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			boss_zhaoyun_prefix:'神',
 			boss_juejing:'绝境',
 			boss_juejing2:'绝境',
-			boss_juejing_info:'锁定技，摸牌阶段开始前，你跳过此阶段。当你得到牌/失去手牌后，若你的手牌数大于4/小于4，则你将手牌弃置至4张/摸至4张。',
+			boss_juejing_info:'锁定技，摸牌阶段开始前，你跳过此阶段。当你得到牌/失去手牌后，若你的手牌数大于4/小于4，则你将手牌摸至4张/弃置至4张。',
 			zhanjiang:'斩将',
 			zhanjiang_info:'准备阶段开始时，如果其他角色的装备区内有【青釭剑】，你可以获得之。',
 			shen_guojia:'神郭嘉',
