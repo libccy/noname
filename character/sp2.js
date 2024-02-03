@@ -8729,7 +8729,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.expandSkills(list2);
 							for(var k=0;k<list2.length;k++){
 								var info=lib.skill[list2[k]];
-								if(!info||!info.trigger||!info.trigger.player||info.silent||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
+								if(!info||!info.trigger||!info.trigger.player||info.silent||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill||(info.zhuSkill&&!player.isZhu2())) continue;
 								if(info.trigger.player==name2||Array.isArray(info.trigger.player)&&info.trigger.player.includes(name2)){
 									if(info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
 									if(info.init) continue;
@@ -8809,7 +8809,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.expandSkills(list2);
 							for(var k=0;k<list2.length;k++){
 								var info=lib.skill[list2[k]];
-								if(!info||!info.enable||info.charlotte||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill) continue;
+								if(!info||!info.enable||info.charlotte||info.limited||info.juexingji||info.zhuanhuanji||info.hiddenSkill||info.dutySkill||(info.zhuSkill&&!player.isZhu2())) continue;
 								if((info.enable=='phaseUse'||(Array.isArray(info.enable)&&info.enable.includes('phaseUse')))||(info.enable=='chooseToUse'||(Array.isArray(info.enable)&&info.enable.includes('chooseToUse')))){
 									if(info.ai&&(info.ai.combo||info.ai.notemp||info.ai.neg)) continue;
 									if(info.init||info.onChooseToUse) continue;
