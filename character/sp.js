@@ -22982,36 +22982,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseJieshuBegin'},
 				filter:function(event,player){
-					return event.player.isIn()&&event.player!=player&&player.countCards('h',function(card){
-						if(_status.connectMode) return true;
-						return get.type(card)=='basic';
-					});
+					return event.player.isIn()&&event.player!=player&&player.countCards('h');
 				},
 				direct:true,
 				content:function(){
 					"step 0"
-					var nono=(Math.abs(get.attitude(player,trigger.player))<3);
-					if(get.damageEffect(trigger.player,player,player)<=0){
-						nono=true;
-					}
-					var next=player.chooseToDiscard(get.prompt('xiaoguo',trigger.player),{type:'basic'});
+					var next=player.chooseToDiscard(get.prompt('xiaoguo',trigger.player));
 					next.set('ai',function(card){
-						if(_status.event.nono) return 0;
-						return 8-get.useful(card);
+						return _status.event.eff-get.useful(card);
 					});
 					next.set('logSkill',['xiaoguo',trigger.player]);
-					next.set('nono',nono);
+					next.set('eff',function(){
+						if(trigger.player.hasSkillTag('noe')) return get.attitude(_status.event.player,trigger.player);
+						return get.damageEffect(trigger.player,player,_status.event.player);
+					}());
 					"step 1"
 					if(result.bool){
-						var nono=(get.damageEffect(trigger.player,player,trigger.player)>=0);
 						if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.15);
 						trigger.player.chooseToDiscard('he','弃置一张装备牌并令'+get.translation(player)+'摸一张牌，或受到1点伤害',{type:'equip'}).set('ai',function(card){
-							if(_status.event.nono){
-								return 0;
-							}
-							if(_status.event.player.hp==1) return 10-get.value(card);
-							return 9-get.value(card);
-						}).set('nono',nono);
+							if(_status.event.damage>0) return 0;
+							if(_status.event.noe) return 12-get.value(card);
+							return 2*_status.event.damage-get.value(card);
+						}).set('damage',get.damageEffect(trigger.player,player,trigger.player)).set('noe',trigger.player.hasSkillTag('noe'));
 					}
 					else{
 						event.finish();
@@ -26489,7 +26481,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guixiu_info:'当你成为【杀】的目标后，若你的手牌数小于体力值，则你可以摸一张牌。',
 			fenming_info:'结束阶段开始时，若你处于横置状态，你可以弃置所有处于横置状态的角色的各一张牌。',
 			duanxie_info:'出牌阶段限一次，你可以令至多X名其他角色横置（X为你已损失的体力值且至少为1），然后你横置。',
-			xiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌，然后你摸一张牌；2.受到你对其造成的1点伤害。',
+			xiaoguo_info:'其他角色的结束阶段开始时，你可以弃置一张手牌，令该角色选择一项：1.弃置一张装备牌，然后你摸一张牌；2.受到你对其造成的1点伤害。',
 			sijian_info:'当你失去最后的手牌时，你可以弃置一名其他角色的一张牌。',
 			suishi_info:'当其他角色进入濒死状态时，伤害来源可以令你摸一张牌；当其他角色死亡时，伤害来源可以令你失去1点体力。',
 			quji_info:'出牌阶段限一次，你可以弃置X张牌（X为你已损失的体力值），然后令至多X名已受伤的角色各回复1点体力。若你以此法弃置的牌中有黑色牌，你失去1点体力。',
