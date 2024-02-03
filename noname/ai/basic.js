@@ -24,15 +24,21 @@ export class Basic extends Uninstantable {
 			if (ui.selected.buttons.length >= range[0]) {
 				ok = true;
 			}
+			CacheContext.setCacheContext(new CacheContext());
+			CacheContext.setInCacheEnvironment(true);
 			if (range[1] <= -1) {
 				j = 0;
 				for (i = 0; i < ui.selected.buttons.length; i++) {
 					j += check(ui.selected.buttons[i]);
 				}
+				CacheContext.setInCacheEnvironment(false);
+				CacheContext.removeCacheContext();
 				return (j > 0);
 			}
 			buttons = get.selectableButtons();
 			if (buttons.length == 0) {
+				CacheContext.setInCacheEnvironment(false);
+				CacheContext.removeCacheContext();
 				return ok;
 			}
 			buttons2 = buttons.slice(0);
@@ -50,9 +56,13 @@ export class Basic extends Uninstantable {
 			// });
 			if (check(buttons[ix]) <= 0) {
 				if (!forced || ok) {
+					CacheContext.setInCacheEnvironment(false);
+					CacheContext.removeCacheContext();
 					return ok;
 				}
 			}
+			CacheContext.setInCacheEnvironment(false);
+			CacheContext.removeCacheContext();
 			buttons[ix].classList.add('selected');
 			ui.selected.buttons.add(buttons[ix]);
 			game.check();
