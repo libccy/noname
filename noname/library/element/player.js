@@ -3249,6 +3249,7 @@ export class Player extends HTMLDivElement {
 				filter = card=>(getCardName(card) == arg2);
 			}else if(typeof arg2 == 'object'){
 				filter = card=>{
+					if(Array.isArray(arg2)) return arg2.includes(getCardName(card));
 					for (let j in arg2) {
 						var value;
 						if (j == 'type' || j == 'subtype' || j == 'color' || j == 'suit' || j == 'number') {
