@@ -221,7 +221,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},true).set('cardx',cardx).set('selectTarget',[1,cards.length])
 					.set('prompt','请选择'+(game.hasNature(cardx)?get.translation(get.nature(cardx)):'')+'【'+get.translation(cardx)+'】（'+get.translation(cards)+'）的目标')
 					.set('ai',target=>{
-						const player=get.event('player'),card=get.event('playerx');
+						const player=get.event('player'),card=get.event('cardx');
 						return get.effect(target,card,player,player);
 					});
 					if(bool) player.useCard(cardx,cards,targets.sortBySeat());
