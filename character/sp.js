@@ -18,7 +18,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				sp_others:["hanba","caiyang"],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','liyi'],
 			},
 		},
 		characterFilter:{
@@ -27056,7 +27055,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sp_guozhan:"国战",
 			sp_guozhan2:"国战移植",
 			sp_others:"其他",
-			sp_waitforsort:'等待分包',
 		}
 	};
 });

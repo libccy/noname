@@ -54,7 +54,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sb_tong:['liucheng','sp_yangwan','sb_xiahoushi','sb_zhangfei','sb_zhaoyun','sb_sunce','sb_zhurong','sb_xiaoqiao'],
 				sb_yu:['sb_yujin','sb_lvmeng','sb_huangzhong','sb_huanggai','sb_zhouyu','sb_caoren','sb_ganning','sb_yl_luzhi','sb_huangyueying'],
 				sb_neng:['sb_huaxiong','sb_sunshangxiang','sb_jiangwei','sb_yuanshao','sb_menghuo','sb_guanyu'],
-				sb_waitforsort:['sb_xunyu'],
 			}
 		},
 		skill:{
@@ -6734,7 +6733,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_tong:'谋攻篇·同',
 			sb_yu:'谋攻篇·虞',
 			sb_neng:'谋攻篇·能',
-			sb_waitforsort:'等待分包',
 		},
 	};
 });
