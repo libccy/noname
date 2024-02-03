@@ -11,7 +11,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				shenhua_shan:['dengai','zhanghe','liushan','jiangwei','zhangzhang','sunce','caiwenji','zuoci'],
 				shenhua_yin:['wangji','kuailiangkuaiyue','yanyan','wangping','sunliang','luji','xuyou','yl_luzhi'],
 				shenhua_lei:['haozhao','guanqiujian','chendao','zhugezhan','lukang','zhoufei','zhangxiu','yl_yuanshu'],
-				shenhua_waitforsort:[],
 			},
 		},
 		character:{
@@ -8151,7 +8150,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shenhua_shan:'神话再临·山',
 			shenhua_yin:'神话再临·阴',
 			shenhua_lei:'神话再临·雷',
-			shenhua_waitforsort:'等待分包',
 		},
 	};
 });
