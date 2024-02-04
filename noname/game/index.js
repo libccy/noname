@@ -1782,6 +1782,9 @@ export class Game extends Uninstantable {
 			object = await (gnc.is.generatorFunc(object) ? gnc.of(object) : object)(lib, game, ui, get, ai, _status);
 			noEval = true;
 		}
+		if(object.closeSyntaxCheck){
+			noEval = true;
+		}
 		const name = object.name, extensionName = `extension_${name}`, extensionMenu = lib.extensionMenu[extensionName] = {
 			enable: {
 				name: '开启',

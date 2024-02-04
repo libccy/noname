@@ -3398,7 +3398,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						marktext:'装',
 						mark:true,
 						intro:{
-							content:'有装备牌进汝你的装备时，可弃置一名其他角色的一张牌',
+							content:'有装备牌进入你的装备区时，可弃置一名其他角色的一张牌',
 						},
 						trigger:{player:'equipAfter'},
 						filter:function(event,player){
@@ -11401,7 +11401,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starzongshi:'纵势',
 			starzongshi_info:'出牌阶段，你可以展示一张可展示目标的基本牌或普通锦囊牌，然后你将手牌中所有与此牌花色相同的其他牌当作此牌使用，且此牌至多指定转化牌数的目标。',
 			starjiaowang:'骄妄',
-			starjiaowang_info:'锁定技，非首轮游戏开始时，若上一轮没有角色因〖硝焰〗死亡，则你失去1点体力并发动〖硝焰〗。',
+			starjiaowang_info:'锁定技，非首轮游戏开始时，若上一轮没有角色死亡（因〖硝焰〗死亡的角色除外），则你失去1点体力并发动〖硝焰〗。',
 			staraoshi:'傲势',
 			staraoshi_info:'主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张手牌，然后你可以发动一次〖纵势〗。',
 

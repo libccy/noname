@@ -86,21 +86,50 @@ new Promise(resolve => {
 		exit()
 	}
 	else {
-		// 在http环境下修改__dirname
-		if (location.protocol.startsWith('http') &&
-			typeof window.require == 'function' &&
+		// node环境下
+		if (typeof window.require == 'function' &&
 			typeof window.process == 'object' &&
-			typeof window.__dirname == 'string' &&
-			window.__dirname.endsWith('electron.asar\\renderer')) {
-			const path = require('path');
-			window.__dirname = path.join(path.resolve(), 'resources/app');
-			// @ts-ignore
-			window.require = function (moduleId) {
-				try {
-					return module.require(moduleId);
-				} catch {
-					return module.require(path.join(window.__dirname, moduleId));
+			typeof window.__dirname == 'string') {
+			// 在http环境下修改__dirname和require的逻辑
+			if (location.protocol.startsWith('http') &&
+				window.__dirname.endsWith('electron.asar\\renderer')) {
+				const path = require('path');
+				window.__dirname = path.join(path.resolve(), 'resources/app');
+				const oldData = Object.entries(window.require);
+				// @ts-ignore
+				window.require = function (moduleId) {
+					try {
+						return module.require(moduleId);
+					} catch {
+						return module.require(path.join(window.__dirname, moduleId));
+					}
+				};
+				oldData.forEach(([key, value]) => {
+					window.require[key] = value;
+				});
+			}
+			// 增加导入ts的逻辑
+			window.require.extensions['.ts'] = function (module, filename) {
+				// @ts-ignore
+				const _compile = module._compile;
+				// @ts-ignore
+				module._compile = function (code, fileName) {
+					/**
+					 * @type { import('typescript') }
+					 */
+					// @ts-ignore
+					const ts = require('./game/typescript.js');
+					// 使用ts compiler对ts文件进行编译
+					const result = ts.transpile(code, {
+						module: ts.ModuleKind.CommonJS,
+						target: ts.ScriptTarget.ES2019,
+						inlineSourceMap: true
+					}, fileName);
+					// 使用默认的js编译函数获取返回值
+					return _compile.call(this, result, fileName);
 				}
+				// @ts-ignore
+				module._compile(require('fs').readFileSync(filename, 'utf8'), filename);
 			};
 		}
 		if (location.protocol.startsWith('http') && 'serviceWorker' in navigator) {

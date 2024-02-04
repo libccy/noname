@@ -96,6 +96,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_chunyuqiong:['male','qun',4,['recangchu','reliangying','reshishou']],
 			xingdaorong:['male','qun','4/6',['xuxie']],
 			re_panfeng:['male','qun',4,['xinkuangfu']],
+			jiangfei:['male','shu',3,['dcshengxi','dcshoucheng']],
 		},
 		characterSort:{
 			huicui:{
@@ -107,7 +108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_jianghu:['guanning','huzhao','dc_huangchengyan','mengjie'],
 				sp_zongheng:['huaxin','luyusheng','re_xunchen','re_miheng','fengxi','re_dengzhi','dc_yanghu','zongyu'],
 				sp_taiping:['guanhai','liupi','peiyuanshao','zhangchu','zhangkai','dc_zhangmancheng'],
-				sp_yanhan:['dc_liuba','dc_huangquan','furongfuqian','xianglang','dc_huojun','gaoxiang','dc_wuban'],
+				sp_yanhan:['dc_liuba','dc_huangquan','furongfuqian','xianglang','dc_huojun','gaoxiang','dc_wuban','jiangfei'],
 				sp_jishi:['dc_jiben','zhenghun','dc_sunhanhua','liuchongluojun'],
 				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen','dc_jiachong'],
 				sp_yijun:['gongsundu','mengyou','dc_sp_menghuo'],
@@ -115,6 +116,63 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			dcshengxi:{
+				inherit:'reshengxi',
+				trigger:{player:'phaseDiscardEnd'},
+			},
+			dcshoucheng:{
+				audio:'shoucheng',
+				global:'dcshoucheng_ai',
+				trigger:{
+					global:['equipAfter','addJudgeAfter','loseAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+				},
+				filter(event,player){
+					const target=_status.currentPhase;
+					return game.hasPlayer(current=>{
+						if(target&&current==target) return false;
+						let evt=event.getl(current);
+						return evt&&evt.hs&&evt.hs.length&&current.countCards('h')==0;
+					});
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const targetx=_status.currentPhase;
+					const targets=game.filterPlayer(current=>{
+						if(targetx&&current==targetx) return false;
+						let evt=trigger.getl(current);
+						return evt&&evt.hs&&evt.hs.length&&current.countCards('h')==0;
+					}).sortBySeat(targetx||player);
+					for(const target of targets){
+						if(!target.isIn()) continue;
+						const {result:{bool}}=await player.chooseBool(get.prompt2('dcshoucheng',target)).set('choice',get.attitude(player,target)>0);
+						if(bool){
+							player.logSkill('dcshoucheng',target);
+							if(target!=player) player.addExpose(0.2);
+							target.draw(2);
+						}
+					}
+				},
+				ai:{
+					threaten(player,target){
+						return Math.sqrt(game.countPlayer(i=>{
+							return get.attitude(target,i)>0;
+						}));
+					},
+				},
+				subSkill:{
+					ai:{
+						ai:{
+							noh:true,
+							skillTagFilter(player,tag,arg){
+								if(player.countCards('h')!=1||(_status.currentPhase&&_status.currentPhase==player)) return false;
+								return game.hasPlayer(current=>{
+									return current.hasSkill('dcshoucheng')&&get.attitude(current,player)>0;
+								});
+							}
+						}
+					}
+				}
+			},
 			//乐大乔
 			dczixi:{
 				init(){
@@ -11437,7 +11495,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinkuangfu_info:'出牌阶段限一次，你可选择：1，弃置装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】造成伤害，你摸两张牌。2，弃置一名其他角色装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】未造成伤害，你弃置两张手牌。',
 			xingdaorong:'邢道荣',
 			xuxie:'虚猲',
-			xuxie_info:'出牌阶段开始时，你可以减1点体力上限并选择所有与你距离为1的角色，弃置这些角色的各一张牌或令这些角色各摸一张牌。出牌阶段结束时，若你的体力上限不为全场最多，则你加1点体力上限，然后回复1点体力或摸两张牌。',
+			xuxie_info:'出牌阶段开始时，你可以减1点体力上限并选择所有距离1以内的角色，弃置这些角色的各一张牌或令这些角色各摸一张牌。出牌阶段结束时，若你的体力上限不为全场最多，则你加1点体力上限，然后回复1点体力或摸两张牌。',
 			caoxing:'曹性',
 			cxliushi:'流矢',
 			cxliushi2:'流矢',
@@ -11910,6 +11968,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yue_daqiao_prefix:'乐',
 			dczixi:'姊希',
 			dczixi_info:'①出牌阶段开始和结束时，你可以将一张“琴”当作一张无效果的【乐不思蜀】、【兵粮寸断】或【闪电】置于一名角色的判定区。②当你使用基本牌或普通锦囊牌指定唯一目标后，你可根据其判定区内的牌数执行对应项：1.令此牌对其额外结算一次；2.摸两张牌；3.弃置其判定区所有牌，对其造成3点伤害。',
+			jiangfei:'蒋琬费祎',
+			dcshengxi:'生息',
+			dcshengxi_info:'弃牌阶段结束时，若你本回合未造成过伤害，你可以摸两张牌。',
+			dcshoucheng:'守成',
+			dcshoucheng_info:'一名角色于其回合外失去最后的手牌后，你可令其摸两张牌。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',

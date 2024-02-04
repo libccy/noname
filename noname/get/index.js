@@ -3622,8 +3622,10 @@ export class Get extends Uninstantable {
 					if (!lib.characterInitFilter[node.link]) return true;
 					return lib.characterInitFilter[node.link](tag) !== false;
 				});
-				const str = initFilters.reduce((strx, stry) => strx + lib.InitFilter[stry] + '<br>', '').slice(0, -4);
-				uiintro.addText(str);
+				if(initFilters.length){
+					const str = initFilters.reduce((strx, stry) => strx + lib.InitFilter[stry] + '<br>', '').slice(0, -4);
+					uiintro.addText(str);
+				}
 			}
 
 			if (node._banning) {
