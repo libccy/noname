@@ -719,6 +719,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filterTarget(card,player,target){
 					return target.countCards('h');
 				},
+				usable:1,
 				selectTarget:[1,Infinity],
 				multitarget:true,
 				multiline:true,
