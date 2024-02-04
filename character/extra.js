@@ -982,10 +982,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var list=result.links;
-						game.addVideo('skill',player,['qiexie',[list]])
-						game.broadcastAll(function(list){
+						game.addVideo('skill',player,['qiexie',[list]]);
+						_status.characterlist.removeArray(list);
+						game.broadcastAll(function(player,list){
+							player.tempname.addArray(list);
 							for(var name of list) lib.skill.qiexie.createCard(name);
-						},list);
+						},player,list);
 						var cards=list.map(function(name){
 							var card=game.createCard('qiexie_'+name,'none',get.infoMaxHp(lib.character[name][2]));
 							return card;
@@ -1138,6 +1140,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									card._destroy=true;
 									game.log(card,'被放回武将牌堆');
 									var name=card.name.slice(7);
+									if(player.tempname&&player.tempname.includes(name)){
+										game.broadcastAll((player,name)=>{
+											player.tempname.remove(name);
+										},player,name);
+									}
 									if(lib.character[name]) _status.characterlist.add(name);
 								}
 							}
