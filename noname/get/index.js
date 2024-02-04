@@ -2867,7 +2867,7 @@ export class Get extends Uninstantable {
 					return lib.characterInitFilter[node.name](tag) !== false;
 				});
 				if(initFilters.length){
-					const str = initFilters.reduce((strx, stry) => strx + lib.InitFilter[stry] + '<br>').slice(0, -4);
+					const str = initFilters.reduce((strx, stry) => strx + lib.InitFilter[stry] + '<br>', '').slice(0, -4);
 					uiintro.addText(str);
 				}
 			}
