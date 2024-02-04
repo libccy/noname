@@ -6892,7 +6892,11 @@ export class Player extends HTMLDivElement {
 		var info = get.info(card);
 		if (info.multicheck && !info.multicheck(card, this)) return false;
 		if (!lib.filter.cardEnabled(card, this)) return false;
-		if (includecard && !lib.filter.cardUsable(card, this)) return false;
+		if (includecard){
+			let evt = includecard;
+			if(typeof evt !== 'object') evt = _status.event.getParent('chooseToUse');
+			if(!lib.filter.cardUsable(card, this, evt)) return false;
+		}
 		if (distance !== false && !lib.filter.targetInRange(card, this, target)) return false;
 		return lib.filter[includecard ? 'targetEnabledx' : 'targetEnabled'](card, this, target);
 	}

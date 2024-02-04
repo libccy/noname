@@ -1049,7 +1049,8 @@ export const Content = {
 			card.cards = cards.slice(0);
 			event.card = card;
 		}
-		if (!lib.filter.cardEnabled(card, player) || (event.addCount !== false && !lib.filter.cardUsable(card, player))) {
+		if (!lib.filter.cardEnabled(card, player) || event.addCount !== false &&
+			!lib.filter.cardUsable(card, player, event.getParent('chooseToUse'))) {
 			event.result = { bool: false };
 			event.finish();
 			return;

@@ -9967,11 +9967,12 @@ export class Library extends Uninstantable {
 				return filterTarget(card, player, current);
 			});
 		},
-		targetEnabledx: function (card, player, target) {
+		targetEnabledx: function (card, player, target, event) {
 			if (!card) return false;
 			if (!target || !target.isIn()) return false;
-			var event = _status.event;
-			if (event._backup && event._backup.filterCard == lib.filter.filterCard && (!lib.filter.cardEnabled(card, player, event) || !lib.filter.cardUsable(card, player, event))) return false;
+			if(typeof event !== 'object') event = _status.event.getParent('chooseToUse');
+			if (event._backup && event._backup.filterCard == lib.filter.filterCard &&
+				(!lib.filter.cardEnabled(card, player, event) || !lib.filter.cardUsable(card, player, event))) return false;
 			if (event.addCount_extra) {
 				if (!lib.filter.cardUsable2(card, player) && !game.checkMod(card, player, target, false, 'cardUsableTarget', player)) return false;
 			}
