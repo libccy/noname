@@ -3365,9 +3365,10 @@ export class Player extends HTMLDivElement {
 		return count;
 	}
 	getCardIndex(arg1,name,card,max){
+		let cache = CacheContext.requireCacheContext();
 		let count = 0;
 		for(let item of this.iterableGetCards(arg1)){
-			if(get.name(item) == name){
+			if(cache.get.name(item) == name){
 				if(card == item){
 					return count;
 				}

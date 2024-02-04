@@ -1665,6 +1665,7 @@ export class Get extends Uninstantable {
 	 * @returns { 'event' }
 	 */
 	static itemtype(obj) {
+		if (obj instanceof lib.element.Card) return 'card';//将最常用的判断放在最前，以提升效率。
 		if (typeof obj == 'string') {
 			if (obj.length <= 5) {
 				let bool = true;
@@ -1693,7 +1694,6 @@ export class Get extends Uninstantable {
 			}
 		}
 		if (obj instanceof lib.element.Button || obj instanceof HTMLDivElement && obj.classList.contains('button') ) return 'button';
-		if (obj instanceof lib.element.Card) return 'card';
 		if (obj instanceof lib.element.Player) return 'player';
 		if (obj instanceof lib.element.Dialog) return 'dialog';
 		if (obj instanceof lib.element.GameEvent ||
@@ -2065,10 +2065,10 @@ export class Get extends Uninstantable {
 	static position(card, ordering) {
 		if (get.itemtype(card) == 'player') return parseInt(card.dataset.position);
 		if (card.timeout && card.destiny && card.destiny.classList) {
+			if (card.destiny.classList.contains('handcards')) return card.classList.contains('glows') ? 's' : 'h';
 			if (card.destiny.classList.contains('equips')) return 'e';
 			if (card.destiny.classList.contains('judges')) return 'j';
 			if (card.destiny.classList.contains('expansions')) return 'x';
-			if (card.destiny.classList.contains('handcards')) return card.classList.contains('glows') ? 's' : 'h';
 			if (card.destiny.id == 'cardPile') return 'c';
 			if (card.destiny.id == 'discardPile') return 'd';
 			if (card.destiny.id == 'special') return 's';
@@ -2076,10 +2076,10 @@ export class Get extends Uninstantable {
 			return null;
 		}
 		if (!card.parentNode || !card.parentNode.classList) return;
+		if (card.parentNode.classList.contains('handcards')) return card.classList.contains('glows') ? 's' : 'h';
 		if (card.parentNode.classList.contains('equips')) return 'e';
 		if (card.parentNode.classList.contains('judges')) return 'j';
 		if (card.parentNode.classList.contains('expansions')) return 'x';
-		if (card.parentNode.classList.contains('handcards')) return card.classList.contains('glows') ? 's' : 'h';
 		if (card.parentNode.id == 'cardPile') return 'c';
 		if (card.parentNode.id == 'discardPile') return 'd';
 		if (card.parentNode.id == 'special') return 's';
@@ -2283,9 +2283,12 @@ export class Get extends Uninstantable {
 	static *iterableChildNodes(node){
 		for(let i=0;i<arguments.length;i++){
 			let arg = arguments[i];
-			for(let j=0;j<arg.childElementCount;j++){
-				yield arg.childNodes[j];
+			for(const item of arg.childNodes){
+				yield item;
 			}
+			// for(let j=0;j<arg.childElementCount;j++){
+			// 	yield arg.childNodes[j];
+			// }
 		}
 	}
 	/**
@@ -4105,13 +4108,14 @@ export class Get extends Uninstantable {
 		return 10 - get.useful(card);
 	}
 	static value(card, player, method) {
+		let cache = CacheContext.requireCacheContext();
 		var result = 0;
 		var value;
 		if (Array.isArray(card)) {
 			if (!card.length) return 0;
 			value = 0;
 			for (var i = 0; i < card.length; i++) {
-				value += get.value(card[i], player, method);
+				value += cache.get.value(card[i], player, method);
 			}
 			return value / Math.sqrt(card.length);
 		}
@@ -4119,11 +4123,17 @@ export class Get extends Uninstantable {
 			return card._modValue(player, method);
 		}
 		var aii = get.info(card).ai;
-		if (aii && aii.value) value = aii.value;
-		else if (aii && aii.basic) value = aii.basic.value;
+		if (aii && aii.value){
+			value = cache.delegate(aii).value;
+		}
+		else if (aii && aii.basic){
+			value = cache.delegate(aii.basic).value;
+		} 
 		if (player == undefined || get.itemtype(player) != 'player') player = _status.event.player;
+		let cachei = null;
 		var geti = function () {
-			return player.getCardIndex('hs',card.name,card,5);
+			if(cachei !== null)cachei = player.getCardIndex('hs',card.name,card,5);
+			return cachei;
 		};
 		if (typeof value == 'function') {
 			result = value(card, player, geti(), method);
@@ -4158,8 +4168,10 @@ export class Get extends Uninstantable {
 		return Math.max(0, value1 - value2) / 5;
 	}
 	static equipValue(card, player) {
-		if (player == undefined || get.itemtype(player) != 'player') player = get.owner(card);
-		if (player == undefined || get.itemtype(player) != 'player') player = _status.event.player;
+		if (player == undefined || get.itemtype(player) != 'player') {
+			player = get.owner(card);
+			if (player == undefined || get.itemtype(player) != 'player') player = _status.event.player;
+		}
 		var info = get.info(card);
 		if (!info.ai) return 0;
 		var value = info.ai.equipValue;
@@ -4201,12 +4213,12 @@ export class Get extends Uninstantable {
 	}
 	static order(item) {
 		let cache = CacheContext.requireCacheContext();
-		var info = get.info(item);
+		var info = cache.get.info(item);
 		if (!info) return -1;
 		var aii = info.ai;
 		var order;
-		if (aii && aii.order) order = aii.order;
-		else if (aii && aii.basic) order = aii.basic.order;
+		if (aii && aii.order) order = cache.delegate(aii).order;
+		else if (aii && aii.basic) order = cache.delegate(aii.basic).order;
 		if (order == undefined) return -1;
 		var num = order;
 		if (typeof (order) == 'function') {

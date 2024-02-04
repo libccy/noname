@@ -1,4 +1,7 @@
 'use strict';
+
+import { CacheContext } from "../noname/library/cache/cacheContext";
+
 game.import('card',function(lib,game,ui,get,ai,_status){
 	return {
 		name:'standard',
@@ -271,10 +274,11 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						value:[5,3,1],
 					},
 					order:function(item,player){
+						let cache = CacheContext.requireCacheContext();
 						if(player.hasSkillTag('presha',true,null,true)) return 10;
-						if(typeof item==='object'&&game.hasNature(item,'linked')){
+						if(typeof item==='object'&&cache.game.hasNature(item,'linked')){
 							if(game.hasPlayer(function(current){
-								return current!=player&&lib.card.sha.ai.canLink(player,current,item)&&player.canUse(item,current,null,true)&&get.effect(current,item,player,player)>0;
+								return current!=player&&lib.card.sha.ai.canLink(player,current,item)&&player.canUse(item,current,null,true)&&cache.get.effect(current,item,player,player)>0;
 							})&&game.countPlayer(function(current){
 								return current.isLinked()&&get.damageEffect(current,player,player,get.nature(item))>0;
 							})>1) return 3.1;
