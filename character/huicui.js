@@ -164,7 +164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							noh:true,
 							skillTagFilter(player,tag,arg){
-								if(player.countCards('h')!=1||(_status.currentPhase&&_status.currentPhase==player)) return false;
+								if(player===_status.currentPhase||player.countCards('h')!=1) return false;
 								return game.hasPlayer(current=>{
 									return current.hasSkill('dcshoucheng')&&get.attitude(current,player)>0;
 								});
