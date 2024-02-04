@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				sp_others:["hanba","caiyang"],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','liyi'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','liyi','tianchou'],
 			},
 		},
 		characterFilter:{
@@ -30,6 +30,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			tianchou:['male','qun',4,['olshandao']],
 			liyi:['male','wu',4,['olchanshuang','olzhanjin']],
 			caoyu:['male','wei',3,['olgongjie','olxiangxv','olxiangzuo']],
 			ol_liwan:['female','wei',3,['ollianju','olsilv']],
@@ -203,6 +204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luzhi:['male','wei',3,['qingzhong','weijing']]
 		},
 		characterIntro:{
+			tianchou:'田畴（169年或170年-214年或216年），字子泰，东汉右北平郡无终人，东汉末年隐士。田畴好文习武。汉初平年间，其受刘虞派遣去长安，呈送指控公孙赞奏章，献帝大悦，封为骑都尉，田畴不受。携诏返回时，刘虞已被公孙所杀，田畴到刘墓祭拜，被公孙所提，不久释放。田畴回故乡后率家族及随从数百人隐居徐无山，致力农桑，数年间增至5000家。制定法条，兴建学校，一时民风良好，乌桓、鲜卑纷纷与其结交。汉建安二十年（207年），曹操北征乌桓，田畴请为向导。上徐无山、出卢龙、过平冈、登白狼堆、至柳城，曹军大胜，封田畴为亭侯，坚辞不受。曹念田功，四次封赏，终不受，乃拜为议郎。建安二十一年（216年），田畴去世。',
 			liyi:'李异（生卒年不详），三国时期东吴将领。建安末，与谢旌率水陆三千，击破刘备军将领詹晏、陈凤。刘备领兵攻孙权时，李异与陆逊等人屯巫、秭归，为蜀将所破。黄武元年（222年），陆逊破刘备于猇亭，李异追踪蜀军，屯驻南山。清代学者赵一清认为此李异与刘璋部将李异为同一人。',
 			caoyu:'曹宇（？－278年），字彭祖，沛国谯县（今安徽亳州）人。三国时期魏国宗室，魏武帝曹操与环夫人之子，邓哀王曹冲同母兄弟。太和六年，封为燕王。魏明帝病危，欲以大将军辅政，不果。其子常道乡公曹奂，是魏国末代皇帝，史称魏元帝。晋朝建立后，降封燕公。咸宁四年（278年），曹宇去世。',
 			zhangyan:'张燕，本姓褚，生卒年不详，常山真定（今河北正定南）人，东汉末年黑山军首领。张燕剽捍，敏捷过人，军中称为“飞燕”。官渡之战时投降曹操，被任命为平北将军，封安国亭侯。死后其子张方袭爵。',
@@ -707,6 +709,57 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//田畴
+			olshandao:{
+				audio:2,
+				enable:'phaseUse',
+				filter(event,player){
+					return game.hasPlayer(target=>lib.skill.olshandao.filterTarget(null,player,target));
+				},
+				filterTarget(card,player,target){
+					return target.countCards('h');
+				},
+				usable:1,
+				selectTarget:[1,Infinity],
+				multitarget:true,
+				multiline:true,
+				async content(event,trigger,player){
+					const wugu=new lib.element.VCard({name:'wugu'});
+					const wanjian=new lib.element.VCard({name:'wanjian'});
+					const targets=game.filterPlayer(target=>{
+						if(target==player) return false;
+						return !event.targets.includes(target)&&player.canUse(wanjian,target,false);
+					}),targetx=event.targets.sortBySeat();
+					let dialog=['将这些角色的各一张牌置于牌堆顶，然后视为对这些角色使用【五谷丰登】'];
+					for(const target of targetx){
+						const name=(target==player?'你':get.translation(target));
+						if(target.countCards('h')){
+							dialog.add('<div class="text center">'+name+'的手牌区</div>');
+							if(player.hasSkillTag('viewHandcard',null,target,true)||player==target) dialog.push(target.getCards('h'));
+							else dialog.push([target.getCards('h'),'blank']);
+						}
+						if(target.countCards('e')) dialog.addArray(['<div class="text center">'+name+'的装备区</div>',target.getCards('e')]);
+					}
+					const {result:{bool,links}}=await player.chooseButton(dialog,event.targets.length,true).set('filterButton',button=>{
+						return !ui.selected.buttons.some(but=>get.owner(but.link)==get.owner(button.link));
+					}).set('ai',button=>1/(get.value(button.link,get.owner(button.link))||0.5));
+					if(bool){
+						const cards=links.sort((a,b)=>targetx.indexOf(get.owner(a))-targetx.indexOf(get.owner(b)));
+						for(const card of cards){
+							const target=get.owner(card);
+							target.$throw(1,1000);
+							await target.lose([card],ui.cardPile,'insert');
+						}
+						const targety=targetx.filter(target=>player.canUse(wugu,target,false));
+						if(targety.length) await player.useCard(wugu,targety,false);
+						if(targets.length) await player.useCard(wanjian,targets,false);
+					}
+				},
+				ai:{
+					order:9,
+					result:{target:1},
+				},
+			},
 			//李异
 			olchanshuang:{
 				audio:2,
@@ -27031,8 +27084,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olchanshuang:'缠双',
 			olchanshuang_info:'①出牌阶段限一次，你可以选择一名其他角色。你与其依次选择〖缠双③〗的一项，然后你与其依次执行各自选择的项。②结束阶段，若X大于0，你执行〖缠双③〗的前X项（X为你本回合以任意形式执行过的〖缠双③〗的选项数）。③选项：1.重铸一张牌；2.使用一张【杀】；3.弃置两张牌。',
 			olzhanjin:'蘸金',
-			olzhanjin_guanshi:'贯石斧(蘸金)',
 			olzhanjin_info:'锁定技，若你有空置的武器栏，则你视为装备【贯石斧】。',
+			tianchou:'田畴',
+			olshandao:'善刀',
+			olshandao_info:'出牌阶段限一次，你可以选择任意名角色，你选择这些角色的各一张牌，依次将这些牌放置到牌堆顶，然后你视为对这些角色使用【五谷丰登】，然后你视为对这些角色外的所有其他角色使用【万箭齐发】。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
