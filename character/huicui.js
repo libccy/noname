@@ -187,18 +187,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							noh:true,
 							skillTagFilter(player,tag,arg){
-								if(player===_status.currentPhase||player.countCards('h')!==1) return false;
+								if(player.countCards('h')!==1) return false;
 								return game.hasPlayer(current=>{
 									return current.hasSkill('dcshoucheng')&&get.attitude(current,player)>0;
 								});
-							},
-							effect:{
-								target(card,player,target){
-									if(target===_status.currentPhase||target.countCards('h')!==1||!game.hasPlayer(current=>{
-										return current.hasSkill('dcshoucheng')&&get.attitude(current,target)>0;
-									})) return;
-									if(get.tag(card,'lose')||get.tag(card,'discard')) return [1,1.6];
-								}
 							}
 						}
 					}
