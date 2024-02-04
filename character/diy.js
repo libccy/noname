@@ -19107,6 +19107,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			冈崎汐:['Okazaki','Ushio'],
 			神山识:['Kamiyama','Shiki'],
 			佐藤雏:['Satou','Hina'],
+			篝:['Kagari'],
 		},
 	};
 });
