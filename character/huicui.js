@@ -241,8 +241,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 7-get.value(button.link);
 					}).set('map',map);
 					if(bool){
-						const name=links.find(i=>typeof i=='string'),card=links.find(j=>j!=name);
-						const cardname=map[name];
+						const name=links.find(i=>typeof i=='string'),card=links.find(j=>j!=name),cardname=map[name];
 						const {result:{bool,targets}}=await player.chooseTarget('请选择【'+name+'（'+get.translation(card)+'）】置入的目标',(cardx,player,target)=>{
 							return target.canAddJudge(get.autoViewAs({name:'dczixi_'+get.event('name')},[get.event('card')]));
 						},true).set('ai',target=>{
@@ -293,7 +292,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return [
 								'令'+get.translation(event.card)+'对'+str+'额外结算一次',
 								'摸两张牌',
-								'弃置'+str+'判定区里的所有牌，后对其造成3点伤害',
+								'弃置'+str+'判定区里的所有牌，对其造成3点伤害',
 							][target.countCards('j')-1];
 						},
 						check(event,player){
@@ -516,11 +515,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audioname:['yue_daqiao'],
 						trigger:{player:'phaseZhunbeiBegin'},
 						filter:function(event,player){
-							return player.getStorage('dcqiqin').filterInD('d').length;
+							const targets=game.players.slice().concat(game.dead);
+							return targets.some(target=>target.getStorage('dcqiqin').filterInD('d').length);
 						},
 						forced:true,
 						content:function(){
-							player.gain(player.getStorage('dcqiqin').filterInD('d'),'gain2').gaintag.add('dcqiqin_tag');
+							const targets=game.players.slice().concat(game.dead);
+							const cards=targets.reduce((list,target)=>list.addArray(target.getStorage('dcqiqin').filterInD('d')),[]);
+							player.gain(cards,'gain2').gaintag.add('dcqiqin_tag');
 						},
 					},
 				},
@@ -11948,7 +11950,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yue_xiaoqiao_prefix:'乐',
 			dcqiqin:'绮琴',
 			dcqiqin_tag:'琴',
-			dcqiqin_info:'锁定技。①游戏开始时，你将所有手牌标记为“琴”。②你的“琴”牌不计入手牌上限。③准备阶段，你获得弃牌堆中所有你标记过的“琴”牌。',
+			dcqiqin_info:'锁定技。①游戏开始时，你将所有手牌标记为“琴”。②你的“琴”牌不计入手牌上限。③准备阶段，你获得位于弃牌堆的所有“琴”。',
 			dcweiwan:'媦婉',
 			dcweiwan_info:'出牌阶段限一次，你可以弃置一张“琴”并随机获得一名其他角色区域内花色与此牌不相同的牌各一张，若你获得了：一张牌，其失去1点体力；两张牌，本回合你对其使用牌无距离和次数限制；三张牌，本回合你不能对其使用牌。',
 			dc_lingcao:'新杀凌操',
