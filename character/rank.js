@@ -668,6 +668,7 @@ window.noname_character_rank={
 		'jsrg_zhangxuan',
 		'sb_xunyu',
 		'ol_sb_taishici',
+		'tianchou',
 	],
 	bp:[
 		'xin_huojun',
@@ -1861,6 +1862,7 @@ window.noname_character_rank={
 			'caoxian',
 		],
 		epic:[
+			'tianchou',
 			'star_yuanshao',
 			'yue_xiaoqiao',
 			'yue_daqiao',

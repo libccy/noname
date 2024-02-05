@@ -2231,46 +2231,52 @@ export class Get extends Uninstantable {
 			default: return num.toString();
 		}
 	}
-	static cnNumber(num, two) {
-		if (num == Infinity) return '∞';
-		if (typeof num != 'number' && typeof num != 'string') return num;
+	static cnNumber(num, ordinal) {
 		if (isNaN(num)) return '';
 		let numStr = num.toString();
+		if (num === 'Infinity') return '∞';
+		if (num === '-Infinity') return '-∞';
 		if (!/^\d+$/.test(numStr)) return num;
 
 		const chars = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
 		const units = ['', '十', '百', '千'];
 
 		if (numStr.length <= 2) {//两位数以下单独处理保证效率
-			if (numStr.length == 1) return !two && num == 2 ? '两' : chars[num];
-			return (numStr[0] == '1' ? '' : chars[numStr[0]]) + '十' + (numStr[1] == '0' ? '' : chars[numStr[1]]);
+			if (numStr.length === 1) return !ordinal && num === 2 ? '两' : chars[num];
+			return `${numStr[0] === '1' ? '' : chars[numStr[0]]}十${numStr[1] === '0' ? '' : chars[numStr[1]]}`;
 		}
 
 		numStr = numStr.replace(/(?=(\d{4})+$)/g, ',').split(',').filter(Boolean);
-		const handleZero = str => str.replace(/零{2,}/g, '零').replace(/零+$/g, '');
+		const handleZero = str => str.replace(/零{2,}/g, '零').replace(/(?<=.+)零+$/g, '');
 		const _transform = str => {
-			if (str === '0000') return '零';
-			if (!two && str === '2') return '两';
+			if (str === '2' && !ordinal) return '两';
 			let result = '';
 			for (let i = 0; i < str.length; i++) {
-				let char = chars[+str[i]];
-				const unitIndex = str.length - 1 - i;
-				let unit = units[unitIndex];
-				if (!two && char === '二' && unitIndex > 1) char = '两';
+				const part = str[str.length - 1 - i];
+				let char = chars[+part];
+				let unit = units[i];
 				if (char === '零') unit = '';
-				result += char + unit;
+				else if (char === '一' && i === 1) char = '';
+				else if (char === '二' && i > 1 && !ordinal) char = '两';
+				result = char + unit + result;
 			}
 			result = handleZero(result);
 			return result;
 		};
 		let result = '';
+		let tempYi = '';
 		for (let i = 0; i < numStr.length; i++) {
-			const part = numStr[i];
+			const part = numStr[numStr.length - 1 - i];
 			let char = _transform(part);
-			const unitIndex = numStr.length - 1 - i;
-			let unit = unitIndex % 2 ? '万' : '亿'.repeat(unitIndex / 2);
-			if (char === '零') unit = '';
-			result += char + unit;
+			let unit = '';
+			if (i % 2) {
+				[unit, tempYi] = ['万' + tempYi, ''];
+				if (char === '零') unit = '';
+			} else {
+				unit = '亿'.repeat(i / 2);
+				if (char === '零') [unit, tempYi] = ['', unit];
+			}
+			result = char + unit + result;
 		}
 		result = handleZero(result);
 		return result;
@@ -2867,7 +2873,7 @@ export class Get extends Uninstantable {
 					return lib.characterInitFilter[node.name](tag) !== false;
 				});
 				if(initFilters.length){
-					const str = initFilters.reduce((strx, stry) => strx + lib.InitFilter[stry] + '<br>').slice(0, -4);
+					const str = initFilters.reduce((strx, stry) => strx + lib.InitFilter[stry] + '<br>', '').slice(0, -4);
 					uiintro.addText(str);
 				}
 			}
