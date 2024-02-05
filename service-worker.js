@@ -30,8 +30,6 @@ self.addEventListener('fetch', event => {
 	if (request.url.endsWith('.d.ts')) return;
 	if (request.url.endsWith('.json')) {
 		// @ts-ignore
-		console.log(event.request.headers.get('origin'));
-		// @ts-ignore
 		if (!event.request.headers.get('origin')) return;
 	}
 	// 请求ts文件
