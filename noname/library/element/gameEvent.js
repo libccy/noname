@@ -66,6 +66,111 @@ export class GameEvent {
 		return new GameEvent().finish().toPromise();
 	}
 	/**
+	 * @type { Player }
+	 */
+	// @ts-ignore
+	source;
+	/**
+	 * @type { Player }
+	 */
+	// @ts-ignore
+	player;
+	/**
+	 * @type { Player }
+	 */
+	// @ts-ignore
+	target;
+	/**
+	 * @type { Player[] }
+	 */
+	// @ts-ignore
+	targets;
+	/**
+	 * @type { Card }
+	 */
+	// @ts-ignore
+	card;
+	/**
+	 * @type { Card[] }
+	 */
+	// @ts-ignore
+	cards;
+	/**
+	 * @type { string }
+	 */
+	skill;
+	/**
+	 * @type { boolean }
+	 */
+	forced;
+	/**
+	 * @type { number }
+	 */
+	num;
+	/**
+	 * @type { GameEvent }
+	 */
+	// @ts-ignore
+	_trigger;
+	/**
+	 * @type { Result }
+	 */
+	_result;
+	/**
+	 * @type { number }
+	 */
+	// @ts-ignore
+	baseDamage;
+	/**
+	 * @type { Player }
+	 */
+	// @ts-ignore
+	customSource;
+	/**
+	 * @type { number }
+	 */
+	// @ts-ignore
+	extraDamage;
+	/**
+	 * @type { string }
+	 */
+	// @ts-ignore
+	nature;
+	/**
+	 * @type { boolean }
+	 */
+	// @ts-ignore
+	notrigger;
+	/**
+	 * @type { number }
+	 */
+	// @ts-ignore
+	original_num;
+	/**
+	 * @type { boolean }
+	 */
+	// @ts-ignore
+	unreal;
+	/**
+	 * @type { Button[] }
+	 */
+	// @ts-ignore
+	excludeButton;
+	/**
+	 * @type { Result }
+	 */
+	// @ts-ignore
+	result;
+	/**
+	 * @type { GameEventPromise | void | null }
+	 */
+	// @ts-ignore
+	parent;
+	/**
+	 * @type { string }
+	 */
+	name;
+	/**
 	 * @param {keyof this} key
 	 * @param {number} [value]
 	 * @param {number} [baseValue]
@@ -760,107 +865,5 @@ export class GameEvent {
 			this.#promise = new lib.element.GameEventPromise(this);
 		}
 		return this.#promise;
-	}
-	/**
-	 * @returns {never}
-	 */
-	typeAnnotation() {
-		/**
-		 * @type { Player }
-		*/
-		// @ts-ignore
-		this.source;
-		/**
-		 * @type { Player }
-		 */
-		// @ts-ignore
-		this.player;
-		/**
-		 * @type { Player }
-		 */
-		// @ts-ignore
-		this.target;
-		/**
-		 * @type { Player[] }
-		 */
-		// @ts-ignore
-		this.targets;
-		/**
-		 * @type { Card }
-		 */
-		// @ts-ignore
-		this.card;
-		/**
-		 * @type { Card[] }
-		 */
-		// @ts-ignore
-		this.cards;
-		/**
-		 * @type { string }
-		 */
-		this.skill;
-		/**
-		 * @type { boolean }
-		 */
-		this.forced;
-		/**
-		 * @type { number }
-		 */
-		this.num;
-		/**
-		 * @type { GameEvent }
-		 */
-		// @ts-ignore
-		this._trigger;
-		/**
-		 * @type { Record<string, any> }
-		 */
-		this._result;
-		/**
-		 * @type { number }
-		 */
-		// @ts-ignore
-		this.baseDamage;
-		/**
-		 * @type { Player }
-		 */
-		// @ts-ignore
-		this.customSource;
-		/**
-		 * @type { number }
-		 */
-		// @ts-ignore
-		this.extraDamage;
-		/**
-		 * @type { string }
-		 */
-		// @ts-ignore
-		this.nature;
-		/**
-		 * @type { boolean }
-		 */
-		// @ts-ignore
-		this.notrigger;
-		/**
-		 * @type { number }
-		 */
-		// @ts-ignore
-		this.original_num;
-		/**
-		 * @type { boolean }
-		 */
-		// @ts-ignore
-		this.unreal;
-		/**
-		 * @type { Button[] }
-		 */
-		// @ts-ignore
-		this.excludeButton;
-		/**
-		 * @type { Result }
-		 */
-		// @ts-ignore
-		this.result;
-		throw new Error('Do not call this method');
 	}
 }
