@@ -8217,9 +8217,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					buff:{
 						charlotte:true,
 						mark:true,
-						marktext:" +4 ",
+						marktext:" + ",
 						intro:{
-							content:"本回合手牌上限+4且使用牌无次数限制",
+							content:"本回合手牌上限+#且使用牌无次数限制",
 						},
 						mod:{
 							maxHandcard:function(player,num){
@@ -8234,7 +8234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					debuff:{
 						charlotte:true,
 						mark:true,
-						marktext:" -4 ",
+						marktext:" - ",
 						intro:{
 							content:"本回合手牌上限-#且不能使用基本牌",
 						},
