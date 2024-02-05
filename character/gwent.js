@@ -81,6 +81,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gw_luoqi:'是个爱国者…还是个货真价实的王八蛋。',
 			gw_yioufeisi:'国王还是乞丐，两者有何区别，人类少一个算一个',
 		},
+		/** @type { importCharacterConfig['skill'] } */
 		skill:{
 			sqlongyin:{
 				trigger:{player:'phaseBeginStart'},

@@ -115,6 +115,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong','yue_xiaoqiao','yue_daqiao'],
 			}
 		},
+		/** @type { importCharacterConfig['skill'] } */
 		skill:{
 			dcshengxi:{
 				inherit:'reshengxi',
@@ -201,7 +202,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return card.hasGaintag('dcqiqin_tag')&&lib.skill.dczixi.zixiList.some(name=>{
 							return game.hasPlayer(target=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
 						});
-					});
+					})>0;
 				},
 				zixiList:['lebu','bingliang','shandian'],
 				direct:true,
