@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		character:{
 			yue_daqiao:['female','wu',3,['dcqiqin','dczixi']],
-			kongrong:['male','qun',3,['dckrmingshi','lirang']],
+			dc_kongrong:['male','qun',3,['dckrmingshi','lirang']],
 			dc_sp_menghuo:['male','qun',4,['dcmanwang']],
 			dc_lingcao:['male','wu','4/5',['dcdufeng']],
 			yue_xiaoqiao:['female','wu',3,['dcqiqin','dcweiwan']],
@@ -336,7 +336,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.event('goon')) return 0;
 						return 6-get.value(card);
 					}).set('goon',get.damageEffect(player,target,target)<=0);
-					if(!bool) trigger.decrease('num');
+					if(!bool) trigger.cancel();
 				},
 				ai:{
 					effect:{
@@ -11963,7 +11963,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcmanwang_info:'出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：⒈获得〖叛侵〗。⒉摸一张牌。⒊回复1点体力。⒋摸两张牌并失去〖叛侵〗。',
 			dcpanqin:'叛侵',
 			dcpanqin_info:'出牌阶段或弃牌阶段结束时，你可将你于本阶段内弃置且位于弃牌堆的所有牌当做【南蛮入侵】使用。然后若此牌被使用时对应的实体牌数不大于此牌的目标数，则你执行并移除〖蛮王〗中的最后一个选项，然后加1点体力上限并回复1点体力。',
-			kongrong:'孔融',
+			dc_kongrong:'孔融',
 			dckrmingshi:'名士',
 			dckrmingshi_info:'锁定技，当你受到其他角色造成的伤害时，若其手牌数大于你，则其需弃置一张手牌，否则此伤害-1。',
 			yue_daqiao:'乐大乔',
