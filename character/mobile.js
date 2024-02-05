@@ -7523,6 +7523,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//钟会
 			requanji:{
 				audio:2,
+				mod:{
+					aiOrder:(player,card,num)=>{
+						if(num<=0||typeof card!=='object'||!player.isPhaseUsing()||!player.hasSkill('zili')||player.needsToDiscard()) return num;
+						if(player.getExpansions('quanji').length<3&&player.getUseValue(card)<Math.min(4,player.hp*player.hp/4)) return 0;
+					}
+				},
 				trigger:{player:['damageEnd','phaseUseEnd']},
 				frequent:true,
 				locked:false,

@@ -5699,10 +5699,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mod:{
 					aiOrder:(player,card,num)=>{
 						if(num<=0||typeof card!=='object'||!player.isPhaseUsing()) return num;
-						if(player.awakenedSkills.includes('sbaiyin')){
+						if(player.hasSkill('sbaiyin')){
+							if(player.countMark('renjie')<4&&player.getUseValue(card)<Math.min(4,player.hp*player.hp/4)) return 0;
+						}
+						else if(player.hasSkill('jilue')){
 							if(player.countMark('renjie')<3&&player.getUseValue(card)<Math.min(1.8,0.18*player.hp*player.hp)) return 0;
 						}
-						else if(player.countMark('renjie')<4&&player.getUseValue(card)<Math.min(4,player.hp*player.hp/4)) return 0;
 					}
 				},
 				trigger:{

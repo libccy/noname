@@ -9970,8 +9970,10 @@ export class Library extends Uninstantable {
 		targetEnabledx: function (card, player, target) {
 			if (!card) return false;
 			if (!target || !target.isIn()) return false;
-			var event = _status.event;
-			if (event._backup && event._backup.filterCard == lib.filter.filterCard && (!lib.filter.cardEnabled(card, player, event) || !lib.filter.cardUsable(card, player, event))) return false;
+			let event = _status.event, evt = event.getParent('chooseToUse');
+			if(get.itemtype(evt) !== 'event') evt = event;
+			if (event._backup && event._backup.filterCard == lib.filter.filterCard &&
+				(!lib.filter.cardEnabled(card, player, event) || !lib.filter.cardUsable(card, player, evt))) return false;
 			if (event.addCount_extra) {
 				if (!lib.filter.cardUsable2(card, player) && !game.checkMod(card, player, target, false, 'cardUsableTarget', player)) return false;
 			}

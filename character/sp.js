@@ -22765,6 +22765,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['liushan']
 			},
 			shoucheng:{
+				init(player){
+					game.addGlobalSkill('shoucheng_draw',player);
+				},
 				trigger:{
 					global:['equipAfter','addJudgeAfter','loseAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
@@ -22796,6 +22799,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 2"
 					if(result.bool){
 						player.logSkill(event.name,target);
+						if(player!==target&&(get.mode()!=='identity'||player.identity!=='nei')) player.addExpose(0.15);
 						target.draw();
 					}
 					"step 3"
@@ -22803,8 +22807,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					threaten:1.3,
-					expose:0.2,
-					noh:true,
+				},
+				subSkill:{
+					draw:{
+						trigger:{player:'dieAfter'},
+						filter(event,player){
+							return !game.hasPlayer(current=>{
+								return current.hasSkill('shoucheng');
+							},true);
+						},
+						content(){
+							game.removeGlobalSkill('shoucheng_draw');
+						},
+						ai:{
+							noh:true,
+							skillTagFilter(player,tag,arg){
+								if(player===_status.currentPhase||player.countCards('h')!==1) return false;
+								return game.hasPlayer(current=>{
+									return current.hasSkill('shoucheng')&&player.isFriendOf(current);
+								});
+							}
+						}
+					}
 				}
 			},
 			hengzheng:{
