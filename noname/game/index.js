@@ -5695,10 +5695,21 @@ export class Game extends Uninstantable {
 				event.content(event, trigger, player).then(() => {
 					// 其实这个if几乎一定执行了
 					if (game.executingAsyncEventMap.has(event.toEvent())) {
-						game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
-							event.finish();
-							resolve();
-						}));
+						if (!game.executingAsyncEventMap.get(_status.event.toEvent())) {
+							console.warn(`game.executingAsyncEventMap中包括了event，但不包括_status.event！`);
+							console.log('event :>> ', event.toEvent());
+							console.log('_status.event :>> ', _status.event.toEvent());
+							// debugger;
+							game.executingAsyncEventMap.set(event.toEvent(), game.executingAsyncEventMap.get(event.toEvent()).then(() => {
+								event.finish();
+								resolve();
+							}));
+						} else {
+							game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+								event.finish();
+								resolve();
+							}));
+						}
 					} else {
 						event.finish();
 						resolve();
