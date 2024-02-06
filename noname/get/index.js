@@ -4201,11 +4201,11 @@ export class Get extends Uninstantable {
 		}
 		return 1;
 	}
-	static cacheOrder(item){
+	static cacheOrder(item, player){
 		let cache = CacheContext.requireCacheContext();
-		return cache.get.order(item);
+		return cache.get.order(item, player);
 	}
-	static order(item) {
+	static order(item, player) {
 		let cache = CacheContext.requireCacheContext();
 		var info = get.info(item);
 		if (!info) return -1;
@@ -4214,13 +4214,12 @@ export class Get extends Uninstantable {
 		if (aii && aii.order) order = aii.order;
 		else if (aii && aii.basic) order = aii.basic.order;
 		if (order == undefined) return -1;
-		var num = order;
+		var num = order, target = (player || _status.event.player);
 		if (typeof (order) == 'function') {
-			num = order(item, _status.event.player);
+			num = order(item, target);
 		}
-		if (typeof item == 'object' && _status.event.player) {
-			var player = _status.event.player;
-			num = game.checkMod(player, item, num, 'aiOrder', player);
+		if (typeof item == 'object' && target) {
+			num = game.checkMod(target, item, num, 'aiOrder', target);
 		}
 		return num;
 	}
