@@ -6059,6 +6059,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.finish();
 							trigger.untrigger(true);
 							trigger._triggered=5;
+							game.players.slice().concat(game.dead).forEach(current=>{
+								current.getHistory().isSkipped=true;
+								current.getStat().isSkipped=true;
+							});
 							var evt=player.insertPhase();
 							delete evt.skill;
 							game.broadcastAll(function(player){
@@ -6140,18 +6144,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhanmeng:{
 				audio:2,
 				trigger:{player:'useCard'},
-				filter:function(event,player){
+				filter(event,player){
 					return !player.hasSkill('dczhanmeng_choice1')||!player.hasSkill('dczhanmeng_choice2')||
 						!player.hasSkill('dczhanmeng_choice0')&&!game.hasPlayer2(current=>{
-							var history=current.actionHistory;
+							const history=current.actionHistory;
 							if(history.length<2) return false;
-							var list=history[history.length-2].useCard.map(evt=>evt.card.name);
-							if(list.includes(event.card.name)) return true;
+							for(let i=history.length-2;i>=0;i--){
+								if(history[i].isSkipped) continue;
+								const list=history[i].useCard.map(evt=>evt.card.name);
+								return list.includes(event.card.name);
+							}
 							return false;
-						});
+						},true);
 				},
 				direct:true,
-				content:function(){
+				content(){
 					'step 0'
 					var list=[];
 					var choiceList=[
@@ -6162,10 +6169,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var used=game.hasPlayer2(current=>{
 						var history=current.actionHistory;
 						if(history.length<2) return false;
-						var list=history[history.length-2].useCard.map(evt=>evt.card.name);
-						if(list.includes(trigger.card.name)) return true;
+						for(let i=history.length-2;i>=0;i--){
+							if(history[i].isSkipped) continue;
+							const list=history[i].useCard.map(evt=>evt.card.name);
+							return list.includes(trigger.card.name);
+						}
 						return false;
-					});
+					},true);
 					if(!player.hasSkill('dczhanmeng_choice0')&&!used) list.push('选项一');
 					else choiceList[0]='<span style="opacity:0.5; ">'+choiceList[0]+(used?'（同名牌被使用过）':'（已选择）')+'</span>';
 					if(!player.hasSkill('dczhanmeng_choice1')) list.push('选项二');
@@ -6244,7 +6254,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						forced:true,
 						popup:false,
-						filter:function(event,player,name){
+						silent:true,
+						filter(event,player,name){
 							var history=player.actionHistory;
 							if(history.length<2) return false;
 							var list=history[history.length-2].useCard;
@@ -6258,7 +6269,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return false;
 						},
-						content:function(){
+						content(){
 							if(event.triggername!='phaseBeginStart'){
 								player.logSkill('dczhanmeng_delay');
 								var card=get.cardPile2(card=>{
@@ -7006,7 +7017,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:'phaseBegin',
 				},
 				filter:function(event,player){
-					return event.player.phaseNumber==1&&lib.skill.dctongguan.derivation.some(i=>{
+					return event.player.getAllHistory().filter(history=>{
+						return history.isMe&&!history.isSkipped;
+					}).indexOf(event.player.getHistory())===0&&lib.skill.dctongguan.derivation.some(i=>{
 						return (player.getStorage('dctongguan')[i]||0)<2;
 					});
 				},
