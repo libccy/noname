@@ -11004,83 +11004,58 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			reliangying:{
 				audio:2,
 				trigger:{player:'phaseDiscardBegin'},
+				filter(event,player){
+					return player.hasMark('recangchu');
+				},
 				direct:true,
-				content:function(){
-					'step 0'
-					var map={};
-					var list=[];
-					for(var i=1;i<=player.countMark('recangchu');i++){
-						var cn=get.cnNumber(i,true);
-						map[cn]=i;
-						list.push(cn);
-					}
-					list.push('cancel2');
-					event.map=map;
-					player.chooseControl(list).set('prompt',get.prompt('reliangying')).set('prompt2','摸至多'+get.cnNumber(player.countMark('recangchu'))+'张牌，然后交给等量的角色各一张牌').set('ai',function(){
-						var player=_status.event.player;
-						var num=Math.min(player.countMark('recangchu'),game.countPlayer(function(current){
-							return get.attitude(player,current)>0;
-						}));
-						if(num>0) return get.cnNumber(num,true);
+				async content(event,trigger,player){
+					const draws=Array.from({length:player.countMark('recangchu')}).map((_,i)=>get.cnNumber(i+1)+'张');
+					const {result:{control}}=await player.chooseControl(draws,'cancel2').set('prompt',get.prompt('reliangying'))
+					.set('prompt2','摸至多'+get.cnNumber(player.countMark('recangchu'))+'张牌，然后交给等量的角色各一张牌').set('ai',()=>{
+						const player=get.event('player');
+						const num=Math.min(player.countMark('recangchu'),game.countPlayer(current=>get.attitude(player,current)>0));
+						if(num>0) return get.cnNumber(num)+'张';
 						return 'cancel2';
 					});
-					'step 1'
-					if(result.control=='cancel2'){event.finish();return;}
-					player.logSkill('reliangying');
-					var num=event.map[result.control]||1;
-					event.num=num;
-					player.draw(num);
-					'step 2'
-					var num=Math.min(event.num,player.countCards('he'),game.countPlayer(function(target){
-						return target!=player;
-					}));
-					if(num){
-						player.chooseCardTarget({
-							prompt:'将'+get.cnNumber(num)+'张牌交给其他角色',
-							prompt2:'操作提示：先按顺序选中所有要给出的牌，然后再按顺序选择等量的目标角色。可少选一张牌，并将此牌留给自己',
-							selectCard:[num-1,num],
-							selectTarget:function(){
-								return ui.selected.cards.length;
-							},
-							filterTarget:function(card,player,target){
-								return target!=player;
-							},
-							filterOk:function(){
-								return ui.selected.cards.length==ui.selected.targets.length;
-							},
-							complexSelect:true,
-							position:'he',
-							ai1:function(card){
-								if(game.countPlayer(function(current){
-									return target!=_status.event.player&&get.attitude(_status.event.player,target)>0;
-								})<=ui.selected.cards.length) return 0;
-								if(card.name=='shan') return 1;
-								return Math.random();
-							},
-							ai2:function(target){
-								if(!target) return 1;
-								return Math.sqrt(5-Math.min(4,target.countCards('h')))*get.attitude(_status.event.player,target);
-							},
-							forced:true,
-						});
-					}
-					else event.finish();
-					'step 3'
-					if(result.bool&&result.cards.length>0){
-						var list=[];
-						for(var i=0;i<result.targets.length;i++){
-							var target=result.targets[i];
-							var card=result.cards[i];
-							list.push([target,card]);
-							player.line(target);
+					if(control!='cancel2'){
+						player.logSkill('reliangying');
+						const num=draws.indexOf(control)+1,max=Math.min(num,player.countCards('he'),game.countPlayer(target=>target!=player));
+						await player.draw(num);
+						let list=[];
+						while(max-list.length>0){
+							const {result:{bool,cards,targets}}=await player.chooseCardTarget({
+								prompt:'粮营：将'+get.cnNumber(max-1)+'至'+get.cnNumber(max)+'张牌交给其他角色',
+								position:'he',
+								animate:false,
+								filterCard(card,player){
+									return !get.event('list').some(list=>list[1]==card);
+								},
+								filterTarget(card,player,target){
+									return target!=player&&!get.event('list').some(list=>list[0]==target);
+								},
+								ai1(card){
+									if(card.name=='shan') return 1;
+									return Math.random();
+								},
+								ai2(target){
+									return get.attitude(get.event('player'),target);
+								},
+							}).set('list',list).set('forced',max-list.length>1);
+							if(bool){
+								list.push([targets[0],cards[0]]);
+								player.addGaintag(cards,'olsujian_given');
+							}
+							else break;
 						}
-						game.loseAsync({
-							gain_list:list,
-							player:player,
-							cards:result.cards,
-							giver:player,
-							animate:'giveAuto',
-						}).setContent('gaincardMultiple');
+						if(list.length){
+							await game.loseAsync({
+								gain_list:list,
+								player:player,
+								cards:list.slice().map(list=>list[1]),
+								giver:player,
+								animate:'giveAuto',
+							}).setContent('gaincardMultiple');
+						}
 					}
 				},
 			},

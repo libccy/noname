@@ -8098,57 +8098,48 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			sushou:{
+				audio:2,
 				trigger:{player:'phaseDiscardBegin'},
 				frequent:true,
-				audio:2,
-				content:function(){
-					'step 0'
-					player.draw(1+player.countMark('cangchu'));
-					'step 1'
-					var num=Math.min(player.countCards('h'),game.countPlayer(function(target){
-						return target!=player&&target.isFriendOf(player);
-					}));
+				async content(event,trigger,player){
+					await player.draw(1+player.countMark('cangchu'));
+					const num=Math.min(player.countCards('h'),player.countCards('he'),game.countPlayer(target=>target!=player&&target.isFriendOf(player)));
 					if(num){
-						player.chooseCardTarget({
-							prompt:'是否将任意张手牌交给其他己方角色？',
-							prompt2:'操作提示：先按顺序选中所有要给出的手牌，然后再按顺序选择等量的目标角色',
-							selectCard:[1,num],
-							selectTarget:function(){
-								return ui.selected.cards.length;
-							},
-							filterTarget:function(card,player,target){
-								return target!=player&&target.isFriendOf(player);
-							},
-							complexSelect:true,
-							filterOk:function(){
-								return ui.selected.cards.length==ui.selected.targets.length;
-							},
-							ai1:function(card){
-								if(card.name=='shan') return 1;
-								return Math.random();
-							},
-							ai2:function(target){
-								return Math.sqrt(5-Math.max(4,target.countCards('h')))*get.attitude(_status.event.player,target);
-							},
-						});
-					}
-					else event.finish();
-					'step 2'
-					if(result.bool&&result.cards.length>0){
-						var list=[];
-						for(var i=0;i<result.targets.length;i++){
-							var target=result.targets[i];
-							var card=result.cards[i];
-							list.push([target,card]);
-							player.line(target);
+						let list=[];
+						while(num-list.length>0){
+							const {result:{bool,targets,cards}}=await player.chooseCardTarget({
+								prompt:'宿守：你可以交给友方角色各一张牌',
+								position:'he',
+								animate:false,
+								filterCard(card,player){
+									return !get.event('list').some(list=>list[1]==card);
+								},
+								filterTarget(card,player,target){
+									return target!=player&&target.isFriendOf(player)&&!get.event('list').some(list=>list[0]==target);
+								},
+								ai1(card){
+									if(card.name=='shan') return 1;
+									return Math.random();
+								},
+								ai2(target){
+									return get.attitude(get.event('player'),target);
+								},
+							}).set('list',list);
+							if(bool){
+								list.push([targets[0],cards[0]]);
+								player.addGaintag(cards,'olsujian_given');
+							}
+							else break;
 						}
-						game.loseAsync({
-							gain_list:list,
-							player:player,
-							cards:result.cards,
-							giver:player,
-							animate:'giveAuto',
-						}).setContent('gaincardMultiple');
+						if(list.length){
+							await game.loseAsync({
+								gain_list:list,
+								player:player,
+								cards:list.slice().map(list=>list[1]),
+								giver:player,
+								animate:'giveAuto',
+							}).setContent('gaincardMultiple');
+						}
 					}
 				},
 			},
