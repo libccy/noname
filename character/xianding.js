@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			bailingjun:['female','wei',3,['dclinghui','dcxiace','dcyuxin']],
 			dc_qinghegongzhu:['female','wei',3,['dczhangji','dczengou']],
 			caoxian:['female','wei',3,['dclingxi','dczhifou']],
 			dc_sb_zhouyu:['male','wu',4,['dcsbronghuo','dcsbyingmou']],
@@ -101,7 +102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue','caoxian','dc_qinghegongzhu'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan','caoyi'],
 				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
-				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli'],
+				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli','bailingjun'],
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi','dc_xujing'],
 				sp2_qifu:['dc_guansuo','xin_baosanniang','dc_zhaoxiang'],
@@ -111,6 +112,99 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//柏灵筠
+			dclinghui:{
+				audio:2,
+				trigger:{global:'phaseJieshuBegin'},
+				filter(event,player){
+					if(_status.currentPhase===player) return true;
+					return game.getGlobalHistory('everything',evt=>evt.name=='dying').length;
+				},
+				frequent:true,
+				async content(event,trigger,player){
+					let cards=get.cards(3,true);
+					const {result:{bool,links}}=await player.chooseButton(['灵慧：是否使用其中的一张牌并获得其余牌？',cards]).set('ai',button=>{
+						return get.event('player').getUseValue(button.link);
+					});
+					if(bool){
+						const card=links[0];
+						cards.remove(card);
+						player.$gain2(card,false);
+						await game.asyncDelayx();
+						await player.chooseUseTarget(true,card,false);
+						if(cards.length) await player.gain(cards,'gain2');
+					}
+				},
+			},
+			dcxiace:{
+				audio:2,
+				trigger:{
+					player:'damageEnd',
+					source:'damageSource',
+				},
+				filter(event,player){
+					const bool1=(event.player==player&&!player.hasHistory('custom',evt=>evt.dcxiace=='player')&&game.hasPlayer(target=>target!=player&&!target.hasSkill('fengyin')));
+					const bool2=(event.source&&event.source==player&&!player.hasHistory('custom',evt=>evt.dcxiace=='source')&&player.isDamaged()&&player.countCards('he',card=>{
+						if(_status.connectMode&&get.position(card)=='h') return true;
+						return lib.filter.cardDiscardable(card,player);
+					}));
+					return bool1||bool2;
+				},
+				async content(event,trigger,player){
+					if(trigger.player==player&&!player.hasHistory('custom',evt=>evt.dcxiace=='player')&&game.hasPlayer(target=>target!=player&&!target.hasSkill('fengyin'))){
+						const {result:{bool,targets}}=await player.chooseTarget((card,player,target)=>{
+							return target!=player&&!target.hasSkill('fengyin');
+						}).set('prompt',get.prompt('dcxiace')).set('prompt2','令一名其他角色的非锁定技于本回合失效')
+						.set('ai',target=>{
+							const player=get.event('player');
+							return -get.sgn(get.attitude(player,target))*(target.getSkills(null,false,false).filter(skill=>{
+								return !get.is.locked(skill);
+							}).length+1)*(target===_status.currentPhase?10:1);
+						});
+						if(bool){
+							const target=targets[0];
+							player.logSkill('dcxiace',target);
+							player.getHistory('custom').push({dcxiace:'player'});
+							target.addTempSkill('fengyin');
+						}
+					}
+					if(trigger.source&&trigger.source==player&&!player.hasHistory('custom',evt=>evt.dcxiace=='source')&&player.isDamaged()&&player.countCards('he',card=>{
+						if(_status.connectMode&&get.position(card)=='h') return true;
+						return lib.filter.cardDiscardable(card,player);
+					})&&player.hasSkill('dcxiace')){
+						const {result:{bool}}=await player.chooseToDiscard('he',get.prompt('dcxiace'),'弃置一张牌并回复1点体力').set('ai',card=>{
+							const player=get.event('player');
+							if(get.recoverEffect(player,player,player)<=0) return 0;
+							return 7-get.value(card);
+						}).set('logSkill','dcxiace');
+						if(bool){
+							player.getHistory('custom').push({dcxiace:'source'});
+							await player.recover();
+						}
+					}
+				},
+			},
+			dcyuxin:{
+				unique:true,
+				limited:true,
+				audio:2,
+				trigger:{global:'dying'},
+				filter(event,player){
+					return event.player.hp<(event.player==player?1:player.getHp());
+				},
+				prompt2(event,player){
+					return '令其将体力值回复至'+(event.player==player?1:player.getHp())+'点';
+				},
+				check(event,player){
+					if(get.recoverEffect(event.player,player,player)<=0) return false;
+					return lib.skill.luanfeng.check(event,player);
+				},
+				logTarget:'player',
+				async content(event,trigger,player){
+					player.awakenSkill('dcyuxin');
+					trigger.player.recover((trigger.player==player?1:player.getHp())-trigger.player.hp);
+				},
+			},
 			//清河公主
 			dczhangji:{
 				audio:2,
@@ -13555,6 +13649,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterIntro:{
+			bailingjun:'柏灵筠，女，是电视剧《大军师司马懿之军师联盟》、《虎啸龙吟》中的主要角色之一，由张钧甯饰演。20岁，是曹丕赏赐司马懿的美人，也是曹丕的眼线，被送入司马府中为妾室。柔弱美貌、心机极深。',
 			caoxian:'曹宪（生卒年不详），女，沛国谯县（今安徽省亳州市）人。东汉末年历史人物，汉献帝刘协嫔妃，魏武帝曹操女儿。建安十八年，嫁给汉献帝刘协，受封为贵人。黄初元年（220年），兄弟曹丕称帝后，汉献帝成为山阳公，不知所终。',
 			zhangjian:'张臶（136年－240年），字子明，钜鹿人。汉末三国时期隐士、音乐家，精通谶纬之学。张臶生活的年代从东汉一直到曹魏齐王时期，受到朝廷多次征召，一直回避，不愿做官。他活了一百零五岁，是三国时期有可靠记载的最长寿的人之一。',
 			puyuan:'蒲元是三国时蜀汉杰出的工匠。为诸葛亮造刀三千口，并且制作木牛流马。后来姜维为他写过两部传记《蒲元传》《蒲元别传》。',
@@ -14237,6 +14332,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhangji_info:'锁定技，一名角色使用多目标牌时，若你是此牌的目标之一，则你先结算此牌的效果，然后你摸X张牌（X为此牌的其他目标数）。',
 			dczengou:'谮构',
 			dczengou_info:'出牌阶段限一次，你可以将至多体力上限张牌称为“谮构”交给一名其他角色并摸等量张牌。若如此做，其下次体力值增加或使用牌结算完毕后，其展示所有手牌，然后失去Y点体力（Y为其手牌中的“谮构”牌数）。',
+			bailingjun:'柏灵筠',
+			dclinghui:'灵慧',
+			dclinghui_info:'一名角色的结束阶段，若当前回合角色为你或本回合有角色进入过濒死状态，则你可以观看牌堆顶的三张牌，然后你可以使用其中一张牌并获得剩余牌。',
+			dcxiace:'黠策',
+			dcxiace_info:'每回合每项各限一次。当你造成/受到伤害后，你可以弃置一张牌并回复1点体力/令一名其他角色的非锁定技于本回合失效。',
+			dcyuxin:'御心',
+			dcyuxin_info:'限定技，一名角色进入濒死状态时，你可以令其将体力回复至X点（X为1，若该角色不为你则X为你的体力值）。',
 
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',

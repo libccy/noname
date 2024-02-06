@@ -368,6 +368,7 @@ window.noname_character_rank={
 		'shen_lusu',
 	],
 	am:[
+		'bailingjun',
 		'clan_wuqiao',
 		'muludawang',
 		'diy_caiwenji',
@@ -2137,6 +2138,7 @@ window.noname_character_rank={
 			'ol_sb_jiangwei',
 			'dc_sb_zhouyu',
 			'xia_shitao',
+			'bailingjun',
 		],
 		rare:[
 			'ol_sb_taishici',
