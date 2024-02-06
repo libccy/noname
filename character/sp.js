@@ -724,7 +724,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return storage.some(target=>event.getg(target).length)&&storage.some(target=>target.hasCard(card=>lib.filter.canBeGained(card,target,player),'he'));
 					}
 					if(!game.hasPlayer(target=>!storage.includes(target)&&target!=player)) return false;
-					if(event.name=='damage'&&player.getHistory('damage').indexOf(event)!=0) return false;
+					if(event.name=='damage'&&player.getAllHistory('damage').indexOf(event)!=0) return false;
 					return event.name!='phase'||game.phaseNumber==0;
 				},
 				forced:true,
@@ -753,6 +753,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{used:{charlotte:true}},
 				intro:{content:'已选择$为目标'},
+				ai:{
+					expose:0.3,
+				},
 			},
 			olchongshen:{
 				audio:2,
