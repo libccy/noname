@@ -4208,7 +4208,7 @@ export class Get extends Uninstantable {
 	/**
 	 * @returns { number }
 	 */
-	static order(item, player) {
+	static order(item, player = get.player() || game.me) {
 		let cache = CacheContext.requireCacheContext();
 		var info = get.info(item);
 		if (!info) return -1;
