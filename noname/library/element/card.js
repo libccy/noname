@@ -21,7 +21,7 @@ export class Card extends HTMLDivElement {
 		 */
 		// @ts-ignore
 		const card = ui.create.div('.card', position);
-		Object.setPrototypeOf(card, Card.prototype);
+		Object.setPrototypeOf(card, (lib.element.Card || Card).prototype);
 		// @ts-ignore
 		card._args = [position];
 		return card;

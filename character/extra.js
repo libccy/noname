@@ -90,7 +90,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return mode=='identity'&&_status.mode!='purple';
 			},
 		},
-		/** @type { SMap<Skill> } */
+		/** @type { importCharacterConfig['skill'] } */
 		skill:{
 			//神鲁肃
 			dingzhou:{

@@ -23,7 +23,7 @@ export class Player extends HTMLDivElement {
 		 */
 		// @ts-ignore
 		const player = ui.create.div('.player', position);
-		Object.setPrototypeOf(player, Player.prototype);
+		Object.setPrototypeOf(player, (lib.element.Player || Player).prototype);
 		// @ts-ignore
 		player._args = [position];
 		return player;
