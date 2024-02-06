@@ -138,7 +138,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					if(types.length){
 						const {result:{control}}=await player.chooseControl(types).set('ai',()=>{
-							const player=get.event('player'),types=get.event('types').slice();
+							const player=get.event('player'),types=get.event('controls').slice();
 							return types.sort((a,b)=>{
 								const getNum=(type)=>{
 									const cards=player.getDiscardableCards(player,'h').filter(card=>get.type2(card)==type);
