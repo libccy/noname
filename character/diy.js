@@ -19048,7 +19048,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			多鲁基:['Dorj'],
 			来谷唯湖:['Kurugaya','Yuiko'],
 			直枝理树:['Naoe','Riki'],
-			高桥久子:['Takahashi','Hisako'],
+			渕田久子:['Fuchita','Hisako'],
 			日向秀树:['Hinata','Hideki'],
 			野田:['Noda'],
 			冈崎朋也:['Okazaki','Tomoya'],
