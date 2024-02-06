@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			dc_liuli:['male','shu',4,['dcfuli','dcdehua']],
 			yue_daqiao:['female','wu',3,['dcqiqin','dczixi']],
 			kongrong:['male','qun',3,['dckrmingshi','lirang']],
 			dc_sp_menghuo:['male','qun',4,['dcmanwang']],
@@ -102,7 +103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huicui:{
 				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong','xiahoujie','dc_caiyang','zhoushan'],
 				sp_caizijiaren:['kongrong','re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
-				sp_zhilan:['liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen','dc_lingcao'],
+				sp_zhilan:['dc_liuli','liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen','dc_lingcao'],
 				sp_guixin:['re_kanze','re_chendeng','caimaozhangyun','dc_lvkuanglvxiang','dc_gaolan','yinfuren','chengui','chenjiao','dc_sp_jiaxu','qinlang','dc_dongzhao'],
 				sp_daihan:['mamidi','dc_jiling','zhangxun','dc_yuejiu','wanglie','leibo','qiaorui','dongwan','yuanyin'],
 				sp_jianghu:['guanning','huzhao','dc_huangchengyan','mengjie'],
@@ -116,6 +117,156 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//刘理
+			dcfuli:{
+				audio:2,
+				enable:'phaseUse',
+				filter(event,player){
+					return player.getDiscardableCards(player,'h').some(card=>!player.getStorage('dcfuli').includes(get.type2(card)));
+				},
+				async content(event,trigger,player){
+					await player.showHandcards(get.translation(player)+'发动了【抚黎】');
+					const types=player.getDiscardableCards(player,'h').filter(card=>{
+						return !player.getStorage('dcfuli').includes(get.type2(card));
+					}).reduce((list,card)=>list.add(get.type2(card)),[]).sort((a,b)=>{
+						const getNum=(type)=>{
+							let num=['basic','trick','equip'].indexOf(type);
+							if(num==-1) num=3;
+							return num;
+						};
+						return getNum(a)-getNum(b);
+					});
+					if(types.length){
+						const {result:{control}}=await player.chooseControl(types).set('ai',()=>{
+							const player=get.event('player'),types=get.event('types').slice();
+							return types.sort((a,b)=>{
+								const getNum=(type)=>{
+									const cards=player.getDiscardableCards(player,'h').filter(card=>get.type2(card)==type);
+									const countCards=(target,player,cards)=>{
+										return target.countCards('h')-(target==player?cards.length:0);
+									};
+									const max=game.findPlayer(target=>{
+										return !game.hasPlayer(target2=>{
+											return countCards(target2,player,cards)>countCards(target,player,cards);
+										});
+									}).countCards('h');
+									return Math.min(max,cards.reduce((sum,card)=>sum+get.cardNameLength(card),0))/cards.length;
+								};
+								return getNum(b)-getNum(a);
+							})[0];
+						}).set('prompt','弃置一种类别的所有手牌，然后摸这些牌的名字字数之和的牌');
+						if(control){
+							if(!player.storage.dcfuli){
+								player.when({global:'phaseAfter'}).then(()=>delete player.storage.dcfuli);
+							}
+							player.markAuto('dcfuli',[control]);
+							const cards=player.getDiscardableCards(player,'h').filter(card=>get.type2(card)==control);
+							await player.discard(cards);
+							const max=game.findPlayer(target=>target.isMaxHandcard()).countCards('h');
+							const num=Math.min(max,cards.reduce((sum,card)=>sum+get.cardNameLength(card),0));
+							if(num) await player.draw(num);
+							if(cards.some(card=>card.name!='shandian'&&get.tag(card,'damage'))){
+								const {result:{bool,targets}}=await player.chooseTarget('抚黎：是否令一名角色的攻击范围-1直到你的下个回合开始？')
+								.set('ai',target=>{
+									const player=get.event('player'),num=target.getAttackRange();
+									return -get.sgn(get.attitude(player,target))*(target.getAttackRange()+(num<=0?(-num+0.5):num));
+								});
+								if(bool){
+									const target=targets[0];
+									player.line(target);
+									target.addSkill('dcfuli_range');
+									target.addMark('dcfuli_range',1,false);
+									player.when('phaseBegin').then(()=>{
+										target.removeMark('dcfuli_range',1,false);
+										if(!target.hasMark('dcfuli_range')) target.removeSkill('dcfuli_range');
+									}).vars({target:target});
+								}
+							}
+						}
+					}
+				},
+				ai:{
+					order:1,
+					result:{
+						player(player){
+							const types=player.getDiscardableCards(player,'h').filter(card=>!player.getStorage('dcfuli').includes(get.type2(card)));
+							if(!types.some(type=>{
+								const cards=player.getDiscardableCards(player,'h').filter(card=>get.type2(card)==type);
+								const countCards=(target,player,cards)=>{
+									return target.countCards('h')-(target==player?cards.length:0);
+								};
+								return !game.filterPlayer(target=>{
+									return !game.hasPlayer(target2=>{
+										return countCards(target2,player,cards)>countCards(target,player,cards);
+									});
+								}).includes(player);
+							})) return 0;
+							return 1;
+						},
+					},
+				},
+				subSkill:{
+					range:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							attackRange(player,num){
+								return num-player.countMark('dcfuli_range');
+							},
+						},
+						marktext:' - ',
+						intro:{content:'攻击范围-#'},
+					},
+				},
+			},
+			dcdehua:{
+				audio:2,
+				trigger:{global:'roundStart'},
+				forced:true,
+				async content(event,trigger,player){
+					const list=lib.inpile.filter(name=>{
+						if(name=='shandian') return false;
+						const card=new lib.element.VCard({name:name});
+						return get.tag(card,'damage')&&player.hasUseTarget(card);
+					});
+					if(list.length){
+						const {result:{bool,links}}=await player.chooseButton(['###德化###<div class="text center">视为使用一张仍可以使用的伤害类卡牌</div>',[list,'vcard']],true).set('ai',button=>get.event('player').getUseValue({name:button.link[2]},null,true));
+						if(bool){
+							const name=links[0][2],card=new lib.element.VCard({name:name});
+							await player.chooseUseTarget(card,true);
+							player.markAuto('dcdehua',[name]);
+						}
+					}
+					if(!lib.inpile.some(name=>{
+						if(name=='shandian') return false;
+						const card=new lib.element.VCard({name:name});
+						return get.tag(card,'damage')&&!player.getStorage('dcdehua').includes(name);
+					})) player.removeSkillLog('dcdehua');
+				},
+				mod:{
+					maxHandcard(player,num){
+						return num+player.getStorage('dcdehua').length;
+					},
+					cardEnabled(card,player){
+						if(player.getStorage('dcdehua').includes(card.name)&&(get.position(card)=='h'||card.cards&&card.cards.some(i=>get.position(i)=='h'))) return false;
+					},
+					cardSavable(card,player){
+						if(player.getStorage('dcdehua').includes(card.name)&&(get.position(card)=='h'||card.cards&&card.cards.some(i=>get.position(i)=='h'))) return false;
+					},
+					aiValue(player,card){
+						if(player.getStorage('dcdehua').includes(get.name(card))) return 0;
+					},
+					aiUseful(){
+						return lib.skill.dcdehua.mod.aiValue.apply(this,arguments);
+					},
+				},
+				intro:{
+					content(storage){
+						return '<li>手牌上限+'+storage.length+'<br><li>不能从手牌中使用'+get.translation(storage);
+					},
+				},
+			},
+			//蒋琬费祎
 			dcshengxi:{
 				inherit:'reshengxi',
 				trigger:{player:'phaseDiscardEnd'},
@@ -216,7 +367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						map[get.translation(name)]=name;
 					}
 					const {result:{bool,links}}=await player.chooseButton(2,[
-						'###'+get.prompt('dczixi')+'###将一张“琴”以你选择的牌名置于一名角色的判定区',
+						'###'+get.prompt('dczixi')+'###<div class="text center">将一张“琴”以你选择的牌名置于一名角色的判定区</div>',
 						player.getCards('h'),
 						[Object.keys(map),'tdnodes'],
 					]).set('filterButton',button=>{
@@ -11950,6 +12101,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshengxi_info:'弃牌阶段结束时，若你本回合未造成过伤害，你可以摸两张牌。',
 			dcshoucheng:'守成',
 			dcshoucheng_info:'一名角色于其回合外失去最后的手牌后，你可令其摸两张牌。',
+			dc_liuli:'刘理',
+			dcfuli:'抚黎',
+			dcfuli_info:'出牌阶段，你可以展示手牌并弃置一种类别的所有手牌（每种类别每回合限一次），然后摸X张牌（X为这些卡牌的牌名字数和且X至多为场上手牌数最多的角色的手牌数）。若你因此弃置了伤害类卡牌，则你可以选择一名角色，令其攻击范围-1直到你的下个回合开始。',
+			dcdehua:'德化',
+			dcdehua_info:'锁定技，一轮游戏开始时，若你有可以使用的伤害类牌牌名，你选择其中一个牌名并视为使用之，然后你不能从手牌中使用此牌名的牌，然后若你已选择过所有的伤害类牌牌名，你失去〖德化〗。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
