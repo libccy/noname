@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			zhugemengxue:['female','wei',3,['dcjichun','dchanying']],
 			bailingjun:['female','wei',3,['dclinghui','dcxiace','dcyuxin']],
 			dc_qinghegongzhu:['female','wei',3,['dczhangji','dczengou']],
 			caoxian:['female','wei',3,['dclingxi','dczhifou']],
@@ -99,7 +100,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji'],
 				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie'],
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
-				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue','caoxian','dc_qinghegongzhu'],
+				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue','caoxian','dc_qinghegongzhu','zhugemengxue'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan','caoyi'],
 				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli','bailingjun'],
@@ -112,6 +113,95 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//诸葛梦雪
+			dcjichun:{
+				audio:2,
+				enable:'phaseUse',
+				filter(event,player){
+					return player.countCards('he',card=>lib.skill.dcjichun.filterCard(card,player));
+				},
+				filterCard(card,player){
+					if(!get.cardNameLength(card)||ui.selected.cards.length) return false;
+					if(game.hasPlayer(target=>{
+						return target.countCards('h')<player.countCards('h');
+					})) return true;
+					if(lib.filter.cardDiscardable(card,player)&&game.hasPlayer(target=>{
+						return target.countCards('h')>player.countCards('h')&&target.countDiscardableCards(player,'hej');
+					})) return true;
+					return false;
+				},
+				selectCard:[1,2],
+				filterTarget(cardx,player,target){
+					if(!ui.selected.cards.length) return false;
+					const card=ui.selected.cards[0];
+					if(target.countCards('h')<player.countCards('h')) return true;
+					if(lib.filter.cardDiscardable(card,player)&&target.countCards('h')>player.countCards('h')&&target.countDiscardableCards(player,'hej')) return true;
+					return false;
+				},
+				usable:1,
+				position:'he',
+				check(card){
+					return get.cardNameLength(card);
+				},
+				complexCard:true,
+				complexSelect:true,
+				lose:false,
+				discard:false,
+				delay:false,
+				targetprompt(){
+					const target=ui.selected.targets[0],player=get.event('player');
+					return target.countCards('h')<player.countCards('h')?'给牌摸牌':'双双弃牌';
+				},
+				async content(event,trigger,player){
+					const card=event.cards[0],target=event.target;
+					const num=get.cardNameLength(card);
+					await player.showCards([card],get.translation(player)+'发动了【寄春】');
+					if(target.countCards('h')<player.countCards('h')){
+						await player.give(card,target);
+						await player.draw(num);
+					}
+					else{
+						await player.discard(card);
+						await player.discardPlayerCard(target,'hej',[1,num]);
+					}
+				},
+				ai:{
+					order:7,
+					result:{
+						target(player,target){
+							return target.countCards('h')<player.countCards('h')?get.attitude(player,target):-get.effect(target,{name:'guohe'},player,player);
+						},
+					},
+				},
+			},
+			dchanying:{
+				audio:2,
+				trigger:{player:'phaseZhunbeiBegin'},
+				frequent:true,
+				async content(event,trigger,player){
+					const card=get.cardPile(card=>get.type(card)=='equip'&&!get.cardtag(card,'gifts'));
+					if(!card){
+						player.chat('无牌可得？！');
+						game.log('但是牌堆已经没有装备牌了！');
+						return;
+					}
+					await player.showCards([card],get.translation(player)+'发动了【寒英】');
+					if(game.hasPlayer(target=>target.countCards('h')==player.countCards('h')&&target.hasUseTarget(card))){
+						const {result:{bool,targets}}=await player.chooseTarget('请选择使用'+get.translation(card)+'的目标角色',(card,player,target)=>{
+							return target.countCards('h')==player.countCards('h')&&target.hasUseTarget(get.event('card'));
+						},true).set('ai',target=>get.effect(target,get.event('card'),target,get.event('player'))).set('card',card);
+						if(bool){
+							const target=targets[0];
+							player.line(target);
+							target.chooseUseTarget(card,true,'nopopup');
+						}
+					}
+					else{
+						player.chat('无人可装？！');
+						game.log('但是场上没有角色可以使用',card,'！');
+					}
+				},
+			},
 			//柏灵筠
 			dclinghui:{
 				audio:2,
@@ -13700,6 +13790,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tianshangyi:'田尚衣，一作陈尚衣，魏文帝曹丕宫中著名宫人。能歌善舞，一时冠绝于世，私以为比之汉宫飞燕也不遑多让。',
 			malingli:'马伶俐，游卡桌游原创角色，设定上为，马超之女，其身形虽娇小，却继承了马超英勇略带冲动的个性，活泼阳光，调皮伶俐，爱摆弄爆竹烟花一类的小器具，包包里经常放置用五色彩纸包装的小炸弹球。马伶俐从小跟随马超和马云騄学习战斗技巧，战斗力超强，坚强的意志和勇气也得到了提升，同时擅长马术，有一匹可爱的小白马伴随其身边。后马伶俐成年，嫁与刘备之子刘理，获封梁王妃。两人琴瑟相和，极为恩爱，常结伴出游，被人誉为天作之合。',
 			zhugeruoxue:'诸葛氏（“若雪”为网络小说虚构），诸葛亮的二姐，庞山民之妻。',
+			zhugemengxue:'诸葛氏（“梦雪”为网络小说虚构），诸葛亮的大姐。',
 			caoyi:'曹轶，游卡桌游旗下产品《三国杀》原创角色。设定上为曹纯所收养的孙女，从小受到曹纯的教导，在军营中长大，性情坚毅有担当，军事谋略丰富，战斗能力超强。曹轶喜欢美食，特别是甜食，并且擅长制作各种点心。她身边跟随的雪白小老虎是曹纯在她及笄时送的生辰礼物，希望她如小老虎一样，英勇无畏。曹轶与曹婴交好，两人以姐妹相称。曹轶成年后继承祖父衣钵，接手精锐部队“虎豹骑”，成为新的虎豹骑的统领者。',
 		},
 		characterTitle:{
@@ -14339,6 +14430,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcxiace_info:'每回合每项各限一次。当你造成/受到伤害后，你可以弃置一张牌并回复1点体力/令一名其他角色的非锁定技于本回合失效。',
 			dcyuxin:'御心',
 			dcyuxin_info:'限定技，一名角色进入濒死状态时，你可以令其将体力回复至X点（X为1，若该角色不为你则X为你的体力值）。',
+			zhugemengxue:'诸葛梦雪',
+			dcjichun:'寄春',
+			dcjichun_info:'出牌阶段限一次，你可以展示一张手牌并选择一项：①将此牌交给一名手牌数小于你的角色，然后摸X张牌。②弃置此牌并弃置一名手牌数大于你的角色区域里至多X张牌。（X为此牌牌名字数）',
+			dchanying:'寒英',
+			dchanying_info:'准备阶段，你可以展示牌堆里的一张非赠物装备牌，然后令一名手牌数等于你的角色使用此牌。',
 
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
