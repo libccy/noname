@@ -18080,7 +18080,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_doruji:'多鲁基',
 			key_yuiko:'来谷唯湖',
 			key_riki:'直枝理树'/*+'子'*/,
-			key_hisako:'高桥久子',
+			key_hisako:'渕田久子',
 			key_hinata:'日向秀树',
 			key_noda:'野田',
 			key_tomoya:'冈崎朋也',
