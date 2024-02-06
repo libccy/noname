@@ -102,7 +102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			huicui:{
 				sp_baigei:['re_panfeng','xingdaorong','caoxing','re_chunyuqiong','xiahoujie','dc_caiyang','zhoushan'],
-				sp_caizijiaren:['kongrong','re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
+				sp_caizijiaren:['dc_kongrong','re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
 				sp_zhilan:['dc_liuli','liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen','dc_lingcao'],
 				sp_guixin:['re_kanze','re_chendeng','caimaozhangyun','dc_lvkuanglvxiang','dc_gaolan','yinfuren','chengui','chenjiao','dc_sp_jiaxu','qinlang','dc_dongzhao'],
 				sp_daihan:['mamidi','dc_jiling','zhangxun','dc_yuejiu','wanglie','leibo','qiaorui','dongwan','yuanyin'],
