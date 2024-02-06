@@ -663,6 +663,7 @@ window.noname_character_rank={
 		'dc_guansuo',
 		'dc_dongzhao',
 		'zhugeruoxue',
+		'zhugemengxue',
 		'dc_sb_lusu',
 		'mb_huban',
 		'jsrg_simayi',
@@ -2144,6 +2145,7 @@ window.noname_character_rank={
 			'bailingjun',
 		],
 		rare:[
+			'zhugemengxue',
 			'ol_sb_taishici',
 			'clan_wuqiao',
 			'xin_huojun',
