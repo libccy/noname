@@ -1049,6 +1049,7 @@ window.noname_character_rank={
 		'jsrg_gaoxiang',
 		'jsrg_sunlubansunluyu',
 		'jsrg_weiwenzhugezhi',
+		'shen_xuzhu',
 	],
 	b:[
 		'ol_sb_guanyu',
@@ -1563,6 +1564,7 @@ window.noname_character_rank={
 		'jsrg_xugong',
 		'old_xiaoqiao',
 		'old_guanyu',
+		'dc_kongrong',
 	],
 	c:[
 		'xiahoudun',

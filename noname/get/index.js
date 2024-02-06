@@ -2041,14 +2041,14 @@ export class Get extends Uninstantable {
 		return card;
 	}
 	/**
-	 * @template T
+	 * @overload
+	 * @returns {GameEvent}
+	 */
+	/**
+	 * @template { keyof GameEvent } T
 	 * @overload
 	 * @param {T} key
 	 * @returns {GameEvent[T]}
-	 */
-	/**
-	 * @overload
-	 * @returns {GameEvent}
 	 */
 	static event(key) { return key ? _status.event[key] : _status.event; }
 	static player() { return _status.event.player; }
@@ -4205,8 +4205,10 @@ export class Get extends Uninstantable {
 		let cache = CacheContext.requireCacheContext();
 		return cache.get.order(item);
 	}
+	/**
+	 * @returns { number }
+	 */
 	static order(item, player) {
-		player = (player || _status.event.player);
 		let cache = CacheContext.requireCacheContext();
 		var info = get.info(item);
 		if (!info) return -1;

@@ -31,7 +31,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mb_chengui:['male','qun',3,['guimou','zhouxian']],
 			mb_huban:['male','wei',4,['mbyilie']],
 			mb_xianglang:['male','shu',3,['naxue','yijie']],
-			yanxiang:['male','qun',3,['kujian','twruilian'],['character:tw_yanxiang','die_audio:tw_yanxiang']],
+			yanxiang:['male','qun',3,['kujian','twruilian'],['die_audio:tw_yanxiang']],
 			mb_sunluyu:['female','wu',3,['mbmeibu','mbmumu']],
 			xin_wuban:['male','shu',4,['xinjintao'],['clan:陈留吴氏','character:wuban']],
 			baoxin:['male','qun',4,['mutao','yimou'],['die_audio:tw_baoxin']],

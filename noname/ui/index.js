@@ -1,4 +1,4 @@
-import { Uninstantable } from "../util/index.js";
+import { Uninstantable, nonameInitialized } from "../util/index.js";
 import { Library as lib } from '../library/index.js';
 import { Game as game } from "../game/index.js";
 import { Get as get } from "../get/index.js";
@@ -2111,7 +2111,7 @@ class Create extends Uninstantable {
 													if (directoryList.length) {
 														var dir = directoryList.shift();
 														var filelist = directories[dir];
-														window.resolveLocalFileSystemURL(lib.assetURL + dir, function (entry) {
+														window.resolveLocalFileSystemURL(nonameInitialized + dir, function (entry) {
 															var writeFile = function () {
 																if (filelist.length) {
 																	var filename = filelist.shift();
@@ -2202,7 +2202,7 @@ class Create extends Uninstantable {
 							unlink();
 						}
 						else {
-							window.resolveLocalFileSystemURL(lib.assetURL + page.currentpath, function (entry) {
+							window.resolveLocalFileSystemURL(nonameInitialized + page.currentpath, function (entry) {
 								var unlink = function () {
 									if (selected.length) {
 										entry.getFile(selected.shift().filename, { create: false }, function (fileEntry) {
@@ -2257,7 +2257,7 @@ class Create extends Uninstantable {
 									}
 								}
 								else {
-									window.resolveLocalFileSystemURL(lib.assetURL + this.path, function (entry) {
+									window.resolveLocalFileSystemURL(nonameInitialized + this.path, function (entry) {
 										entry.removeRecursively(function () {
 											enterDirectory(page, page.currentpath);
 										});
@@ -2369,7 +2369,7 @@ class Create extends Uninstantable {
 								lib.node.fs.mkdir(__dirname + '/' + path + '/' + str, refresh);
 							}
 							else {
-								window.resolveLocalFileSystemURL(lib.assetURL + path, function (entry) {
+								window.resolveLocalFileSystemURL(nonameInitialized + path, function (entry) {
 									entry.getDirectory(str, { create: true }, refresh);
 								});
 							}
@@ -4327,7 +4327,7 @@ class Create extends Uninstantable {
 										var url = lib.assetURL + 'extension/' + name + '/' + file;
 										createButton(i, url);
 										if (lib.device == 'ios' || lib.device == 'android') {
-											window.resolveLocalFileSystemURL(lib.assetURL + 'extension/' + name, function (entry) {
+											window.resolveLocalFileSystemURL(nonameInitialized + 'extension/' + name, function (entry) {
 												entry.getFile(file, {}, function (fileEntry) {
 													fileEntry.file(function (fileToLoad) {
 														var fileReader = new FileReader();
@@ -4863,7 +4863,7 @@ class Create extends Uninstantable {
 										var url = lib.assetURL + 'extension/' + name + '/' + file;
 										createButton(i, url, fullskin);
 										if (lib.device == 'ios' || lib.device == 'android') {
-											window.resolveLocalFileSystemURL(lib.assetURL + 'extension/' + name, function (entry) {
+											window.resolveLocalFileSystemURL(nonameInitialized + 'extension/' + name, function (entry) {
 												entry.getFile(file, {}, function (fileEntry) {
 													fileEntry.file(function (fileToLoad) {
 														var fileReader = new FileReader();

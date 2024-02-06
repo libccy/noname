@@ -547,6 +547,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_chihaya:['key_sakuya'],
 			key_lucia:['key_shizuru'],
 		},
+		/** @type { importCharacterConfig['skill'] } */
 		skill:{
 			//伊吹风子
 			fuuko_xingdiao:{
