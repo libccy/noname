@@ -293,6 +293,7 @@ window.noname_character_rank={
 		're_nanhualaoxian',
 		'fuqian',
 		'liuyong',
+		'dc_liuli',
 		'sunhanhua',
 		're_pangdegong',
 		're_fengfangnv',
@@ -367,6 +368,7 @@ window.noname_character_rank={
 		'shen_lusu',
 	],
 	am:[
+		'bailingjun',
 		'clan_wuqiao',
 		'muludawang',
 		'diy_caiwenji',
@@ -2138,6 +2140,7 @@ window.noname_character_rank={
 			'ol_sb_jiangwei',
 			'dc_sb_zhouyu',
 			'xia_shitao',
+			'bailingjun',
 		],
 		rare:[
 			'ol_sb_taishici',
@@ -2471,6 +2474,7 @@ window.noname_character_rank={
 			'yangzhi',
 			'zuofen',
 			'liuyong',
+			'dc_liuli',
 			'zhangning',
 			'wanniangongzhu',
 			're_xunchen',

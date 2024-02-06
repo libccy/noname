@@ -44,7 +44,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_pengyang:['male','shu',3,['olqifan','oltuishi','nzry_cunmu']],
 			ol_qianzhao:['male','wei',4,['olweifu','olkuansai']],
 			niujin:['male','wei',4,['olcuorui','liewei']],
-			hejin:['male','qun',4,['olmouzhu','olyanhuo']],
+			hejin:['male','qun',4,['mouzhu','olyanhuo']],
 			hansui:['male','qun',4,['olniluan','olxiaoxi']],
 			duanjiong:['male','qun',4,['olsaogu']],
 			ol_zhouqun:['male','shu',4,['oltianhou','olchenshuo']],
@@ -717,7 +717,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.hasPlayer(target=>lib.skill.olshandao.filterTarget(null,player,target));
 				},
 				filterTarget(card,player,target){
-					return target.countCards('h');
+					return target.countCards('he');
 				},
 				usable:1,
 				selectTarget:[1,Infinity],
