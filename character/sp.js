@@ -717,7 +717,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.hasPlayer(target=>lib.skill.olshandao.filterTarget(null,player,target));
 				},
 				filterTarget(card,player,target){
-					return target.countCards('h');
+					return target.countCards('he');
 				},
 				usable:1,
 				selectTarget:[1,Infinity],
