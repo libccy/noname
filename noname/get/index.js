@@ -4205,7 +4205,8 @@ export class Get extends Uninstantable {
 		let cache = CacheContext.requireCacheContext();
 		return cache.get.order(item);
 	}
-	static order(item) {
+	static order(item, player) {
+		player = (player || _status.event.player);
 		let cache = CacheContext.requireCacheContext();
 		var info = get.info(item);
 		if (!info) return -1;
@@ -4216,10 +4217,9 @@ export class Get extends Uninstantable {
 		if (order == undefined) return -1;
 		var num = order;
 		if (typeof (order) == 'function') {
-			num = order(item, _status.event.player);
+			num = order(item, player);
 		}
-		if (typeof item == 'object' && _status.event.player) {
-			var player = _status.event.player;
+		if (typeof item == 'object' && player) {
 			num = game.checkMod(player, item, num, 'aiOrder', player);
 		}
 		return num;
