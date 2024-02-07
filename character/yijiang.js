@@ -6750,6 +6750,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinxianzhen2:{
 				audio:'xianzhen',
+				audioname2:{
+					ol_gaoshun:'rexianzhen',
+				},
 				mod:{
 					targetInRange:function(card,player,target){
 						if(target==player.storage.xinxianzhen) return true;

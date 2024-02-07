@@ -1462,6 +1462,7 @@ window.noname_character_rank={
 		'ol_dengai',
 		're_wuguotai',
 		're_gaoshun',
+		'ol_gaoshun',
 		're_caozhi',
 		're_lingtong',
 		'xin_xusheng',

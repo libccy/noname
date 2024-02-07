@@ -4059,23 +4059,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			decadejinjiu:{
 				global:'decadejinjiu_global',
 				mod:{
-					cardname:function(card){
+					cardname(card){
 						if(card.name=='jiu') return 'sha';
 					},
-					cardnumber:function(card){
+					cardnumber(card){
 						if(card.name=='jiu') return 13;
 					},
 				},
+				audio:2,
+				audioname2:{
+					ol_gaoshun:'rejinjiu',
+				},
+				trigger:{player:['useCard1','respond']},
+				filter(event,player){
+					return event.card.name=='sha'&&!event.skill&&event.cards&&event.cards.length==1&&event.cards[0].name=='jiu';
+				},
+				forced:true,
+				firstDo:true,
+				content(){},
 				subSkill:{
 					global:{
 						mod:{
-							cardEnabled:function(card,player){
+							cardEnabled(card,player){
 								if(card.name=='jiu'){
 									var source=_status.currentPhase;
 									if(source&&source!=player&&source.hasSkill('decadejinjiu')) return false;
 								}
 							},
-							cardSavable:function(card,player){
+							cardSavable(card,player){
 								if(card.name=='jiu'){
 									var source=_status.currentPhase;
 									if(source&&source!=player&&source.hasSkill('decadejinjiu')) return false;
