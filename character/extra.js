@@ -71,7 +71,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterReplace:{
 			shen_zhangliao:['ol_zhangliao','shen_zhangliao'],
-			shen_zhaoyun:['shen_zhaoyun','old_shen_zhaoyun','boss_zhaoyun'],
+			shen_zhaoyun:['shen_zhaoyun','dc_zhaoyun','old_shen_zhaoyun','boss_zhaoyun'],
 			shen_guanyu:['shen_guanyu','tw_shen_guanyu'],
 			shen_sunquan:['shen_sunquan','junk_sunquan'],
 			shen_lvmeng:['shen_lvmeng','tw_shen_lvmeng'],
