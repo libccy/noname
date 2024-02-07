@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		character:{
 			zhugemengxue:['female','wei',3,['dcjichun','dchanying']],
-			bailingjun:['female','wei',3,['dclinghui','dcxiace','dcyuxin']],
+			bailingyun:['female','wei',3,['dclinghui','dcxiace','dcyuxin']],
 			dc_qinghegongzhu:['female','wei',3,['dczhangji','dczengou']],
 			caoxian:['female','wei',3,['dclingxi','dczhifou']],
 			dc_sb_zhouyu:['male','wu',4,['dcsbronghuo','dcsbyingmou']],
@@ -103,7 +103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue','caoxian','dc_qinghegongzhu','zhugemengxue'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan','caoyi'],
 				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
-				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli','bailingjun'],
+				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli','bailingyun'],
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi','dc_xujing'],
 				sp2_qifu:['dc_guansuo','xin_baosanniang','dc_zhaoxiang'],
@@ -3207,7 +3207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.reinit('ganfurenmifuren',character,false);
 					'step 2'
 					player.recover(1-player.hp);
-					player.addTempSkill('dcxunbie_muteki');
+					player.addTempSkill('dcxunbie_muteki',{player:'phaseAfter'});
 				},
 				subSkill:{
 					muteki:{
@@ -3220,7 +3220,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.cancel();
 						},
 						mark:true,
-						intro:{content:'防止本回合受到的所有伤害'},
+						intro:{content:'防止受到的所有伤害直到我的回合结束'},
 						ai:{
 							nofire:true,
 							nothunder:true,
@@ -6059,6 +6059,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.finish();
 							trigger.untrigger(true);
 							trigger._triggered=5;
+							game.players.slice().concat(game.dead).forEach(current=>{
+								current.getHistory().isSkipped=true;
+								current.getStat().isSkipped=true;
+							});
 							var evt=player.insertPhase();
 							delete evt.skill;
 							game.broadcastAll(function(player){
@@ -6140,18 +6144,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhanmeng:{
 				audio:2,
 				trigger:{player:'useCard'},
-				filter:function(event,player){
+				filter(event,player){
 					return !player.hasSkill('dczhanmeng_choice1')||!player.hasSkill('dczhanmeng_choice2')||
 						!player.hasSkill('dczhanmeng_choice0')&&!game.hasPlayer2(current=>{
-							var history=current.actionHistory;
+							const history=current.actionHistory;
 							if(history.length<2) return false;
-							var list=history[history.length-2].useCard.map(evt=>evt.card.name);
-							if(list.includes(event.card.name)) return true;
+							for(let i=history.length-2;i>=0;i--){
+								if(history[i].isSkipped) continue;
+								const list=history[i].useCard.map(evt=>evt.card.name);
+								return list.includes(event.card.name);
+							}
 							return false;
-						});
+						},true);
 				},
 				direct:true,
-				content:function(){
+				content(){
 					'step 0'
 					var list=[];
 					var choiceList=[
@@ -6162,10 +6169,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var used=game.hasPlayer2(current=>{
 						var history=current.actionHistory;
 						if(history.length<2) return false;
-						var list=history[history.length-2].useCard.map(evt=>evt.card.name);
-						if(list.includes(trigger.card.name)) return true;
+						for(let i=history.length-2;i>=0;i--){
+							if(history[i].isSkipped) continue;
+							const list=history[i].useCard.map(evt=>evt.card.name);
+							return list.includes(trigger.card.name);
+						}
 						return false;
-					});
+					},true);
 					if(!player.hasSkill('dczhanmeng_choice0')&&!used) list.push('选项一');
 					else choiceList[0]='<span style="opacity:0.5; ">'+choiceList[0]+(used?'（同名牌被使用过）':'（已选择）')+'</span>';
 					if(!player.hasSkill('dczhanmeng_choice1')) list.push('选项二');
@@ -6244,7 +6254,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						forced:true,
 						popup:false,
-						filter:function(event,player,name){
+						silent:true,
+						filter(event,player,name){
 							var history=player.actionHistory;
 							if(history.length<2) return false;
 							var list=history[history.length-2].useCard;
@@ -6258,7 +6269,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return false;
 						},
-						content:function(){
+						content(){
 							if(event.triggername!='phaseBeginStart'){
 								player.logSkill('dczhanmeng_delay');
 								var card=get.cardPile2(card=>{
@@ -7006,7 +7017,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:'phaseBegin',
 				},
 				filter:function(event,player){
-					return event.player.phaseNumber==1&&lib.skill.dctongguan.derivation.some(i=>{
+					return event.player.getAllHistory().filter(history=>{
+						return history.isMe&&!history.isSkipped;
+					}).indexOf(event.player.getHistory())===0&&lib.skill.dctongguan.derivation.some(i=>{
 						return (player.getStorage('dctongguan')[i]||0)<2;
 					});
 				},
@@ -13739,7 +13752,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterIntro:{
-			bailingjun:'柏灵筠，女，是电视剧《大军师司马懿之军师联盟》、《虎啸龙吟》中的主要角色之一，由张钧甯饰演。20岁，是曹丕赏赐司马懿的美人，也是曹丕的眼线，被送入司马府中为妾室。柔弱美貌、心机极深。',
+			bailingyun:'柏灵筠，女，是电视剧《大军师司马懿之军师联盟》、《虎啸龙吟》中的主要角色之一，由张钧甯饰演。20岁，是曹丕赏赐司马懿的美人，也是曹丕的眼线，被送入司马府中为妾室。柔弱美貌、心机极深。',
 			caoxian:'曹宪（生卒年不详），女，沛国谯县（今安徽省亳州市）人。东汉末年历史人物，汉献帝刘协嫔妃，魏武帝曹操女儿。建安十八年，嫁给汉献帝刘协，受封为贵人。黄初元年（220年），兄弟曹丕称帝后，汉献帝成为山阳公，不知所终。',
 			zhangjian:'张臶（136年－240年），字子明，钜鹿人。汉末三国时期隐士、音乐家，精通谶纬之学。张臶生活的年代从东汉一直到曹魏齐王时期，受到朝廷多次征召，一直回避，不愿做官。他活了一百零五岁，是三国时期有可靠记载的最长寿的人之一。',
 			puyuan:'蒲元是三国时蜀汉杰出的工匠。为诸葛亮造刀三千口，并且制作木牛流马。后来姜维为他写过两部传记《蒲元传》《蒲元别传》。',
@@ -14305,7 +14318,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcchanjuan:'婵娟',
 			dcchanjuan_info:'每种牌名限两次。当你使用手牌中仅指定单一目标的【杀】或普通锦囊牌结算结束后，你可以视为使用一张名称和属性均相同的牌。若这两张牌指定的目标完全相同，你摸一张牌。',
 			dcxunbie:'殉别',
-			dcxunbie_info:'限定技。当你进入濒死状态时，你可以将此武将牌替换为“甘夫人”或“糜夫人”（不能选择已在场上的武将）。然后回复至1点体力并防止所有伤害直到当前回合结束。',
+			dcxunbie_info:'限定技。当你进入濒死状态时，你可以将此武将牌替换为“甘夫人”或“糜夫人”（不能选择已在场上的武将）。然后回复至1点体力并防止所有伤害直到你的下一个回合结束。',
 			dc_mifuren:'糜夫人',
 			dcguixiu:'闺秀',
 			dcguixiu_info:'锁定技。①回合开始时，若你于本局游戏未发动过〖闺秀①〗，你摸两张牌。②当你发动〖存嗣〗后，你回复1点体力。',
@@ -14423,7 +14436,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhangji_info:'锁定技，一名角色使用多目标牌时，若你是此牌的目标之一，则你先结算此牌的效果，然后你摸X张牌（X为此牌的其他目标数）。',
 			dczengou:'谮构',
 			dczengou_info:'出牌阶段限一次，你可以将至多体力上限张牌称为“谮构”交给一名其他角色并摸等量张牌。若如此做，其下次体力值增加或使用牌结算完毕后，其展示所有手牌，然后失去Y点体力（Y为其手牌中的“谮构”牌数）。',
-			bailingjun:'柏灵筠',
+			bailingyun:'柏灵筠',
 			dclinghui:'灵慧',
 			dclinghui_info:'一名角色的结束阶段，若当前回合角色为你或本回合有角色进入过濒死状态，则你可以观看牌堆顶的三张牌，然后你可以使用其中一张牌并获得剩余牌。',
 			dcxiace:'黠策',

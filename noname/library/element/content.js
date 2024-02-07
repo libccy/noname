@@ -1043,7 +1043,8 @@ export const Content = {
 	},
 	chooseUseTarget: function () {
 		'step 0';
-		if (get.is.object(card) && !event.viewAs) card.isCard = true;
+		debugger
+		if (get.is.object(card) && event.viewAs === false) card.isCard = true;
 		if (cards && get.itemtype(card) != 'card') {
 			card = get.copy(card);
 			card.cards = cards.slice(0);
@@ -8118,6 +8119,7 @@ export const Content = {
 	},
 	addJudge: function () {
 		"step 0";
+		debugger
 		const cardName = typeof card == 'string' ? card : card.name , cardInfo = lib.card[cardName];
 		if (cards) {
 			var owner = get.owner(cards[0]);

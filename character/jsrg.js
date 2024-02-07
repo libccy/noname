@@ -1045,6 +1045,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return `令${get.translation(event.card)}不计入次数限制，且你获得${get.translation(event.target)}一张牌，然后其可以令你本回合至其的距离+2`;
 				},
 				group:'jsrgeqian_prepare',
+				logTarget:'target',
 				async content(event,trigger,player){
 					if(trigger.addCount!==false){
 						trigger.addCount=false;
@@ -1071,14 +1072,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						direct:true,
 						async content(event,trigger,player){
-							while(true){
+							while(player.countCards('h')>0){
 								const {result:{bool,cards}}=await player.chooseCard(get.prompt('jsrgeqian'),'你可以蓄谋任意次').set('ai',card=>{
 									const player=get.player();
 									if(player.hasValueTarget(card)) return player.getUseValue(card);
 									return 0;
 								});
 								if(!bool) break;
-								player.addJudge({name:'xumou_jsrg'},cards);
+								await player.addJudge({name:'xumou_jsrg'},cards);
 							}
 						},
 					},

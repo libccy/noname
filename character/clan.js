@@ -1059,7 +1059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										var owner=_status.event.getParent().owner;
 										if(owner) owner.$throw(card.cards);
 									});
-									if(card.name!=cardx.name||!get.is.sameNature(card,cardx)) next.viewAs=true;
+									if(card.name===cardx.name&&get.is.sameNature(card,cardx,true)) next.viewAs=false;
 									var owner=get.owner(card);
 									if(owner!=player&&get.position(card)=='h'){
 										next.throw=false;

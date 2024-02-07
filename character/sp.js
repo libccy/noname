@@ -724,7 +724,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return storage.some(target=>event.getg(target).length)&&storage.some(target=>target.hasCard(card=>lib.filter.canBeGained(card,target,player),'he'));
 					}
 					if(!game.hasPlayer(target=>!storage.includes(target)&&target!=player)) return false;
-					if(event.name=='damage'&&player.getHistory('damage').indexOf(event)!=0) return false;
+					if(event.name=='damage'&&player.getAllHistory('damage').indexOf(event)!=0) return false;
 					return event.name!='phase'||game.phaseNumber==0;
 				},
 				forced:true,
@@ -755,6 +755,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{used:{charlotte:true}},
 				intro:{content:'已选择$为目标'},
+				ai:{
+					expose:0.3,
+				},
 			},
 			olchongshen:{
 				audio:2,
@@ -7059,8 +7062,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										}
 										else{
 											event.cancel();
-											event.getParent().set('olbixin',true);
+											// event.getParent().set('olbixin',true);
 											event.getParent().goto(0);
+											delete event.getParent().openskilldialog;
 										}
 									},
 								}
@@ -25999,7 +26003,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangchengyan:['huangchengyan','dc_huangchengyan'],
 			puyuan:['ol_puyuan','puyuan'],
 			huangzu:['huangzu','dc_huangzu'],
-			huojun:['huojun','dc_huojun','tw_huojun'],
+			huojun:['huojun','dc_huojun','xin_huojun','tw_huojun'],
 			zhaoyǎn:['zhaoyǎn','dc_zhaoyǎn'],
 			furong:['ol_furong','furong','tw_furong'],
 			daxiaoqiao:['daxiaoqiao','dc_daxiaoqiao','tw_daxiaoqiao'],

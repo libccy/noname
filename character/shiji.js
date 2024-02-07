@@ -6532,7 +6532,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiaogong:['qiaogong','tw_qiaogong'],
 			sp_chendong:['sp_chendong','tw_chendong','chendong'],
 			sp_jiangqing:['sp_jiangqing','tw_jiangqing','jiangqing'],
-            kongrong:['sp_kongrong','jsrg_kongrong','kongrong','zy_kongrong'],
+            kongrong:['dc_kongrong','sp_kongrong','jsrg_kongrong','kongrong'],
 			dc_mifuren:['dc_mifuren','sp_mifuren'],
 		},
 		translate:{
