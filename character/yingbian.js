@@ -3774,7 +3774,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterReplace:{
 			yanghu:['jin_yanghu','dc_yanghu','sp_yanghu'],
-			jiachong:['jin_jiachong','jiachong'],
+			jiachong:['dc_jiachong','jin_jiachong','jiachong'],
 			yangyan:['yangyan','old_yangyan'],
 			yangzhi:['yangzhi','old_yangzhi'],
 		},
