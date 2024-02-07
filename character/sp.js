@@ -7060,8 +7060,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										}
 										else{
 											event.cancel();
-											event.getParent().set('olbixin',true);
+											// event.getParent().set('olbixin',true);
 											event.getParent().goto(0);
+											delete event.getParent().openskilldialog;
 										}
 									},
 								}
