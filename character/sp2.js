@@ -9961,7 +9961,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.directindex=result.index;
 					}
 					if(event.directindex==1){
-						target.chooseUseTarget({name:'sha'},cards,true,false).viewAs=true;
+						target.chooseUseTarget({name:'sha'},cards,true,false).viewAs=false;
 					}
 					else{
 						target.chooseUseTarget(card,true,false,'nodistance');
