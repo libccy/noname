@@ -3207,7 +3207,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.reinit('ganfurenmifuren',character,false);
 					'step 2'
 					player.recover(1-player.hp);
-					player.addTempSkill('dcxunbie_muteki');
+					player.addTempSkill('dcxunbie_muteki',{player:'phaseAfter'});
 				},
 				subSkill:{
 					muteki:{
@@ -3220,7 +3220,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							trigger.cancel();
 						},
 						mark:true,
-						intro:{content:'防止本回合受到的所有伤害'},
+						intro:{content:'防止受到的所有伤害直到我的回合结束'},
 						ai:{
 							nofire:true,
 							nothunder:true,
@@ -14318,7 +14318,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcchanjuan:'婵娟',
 			dcchanjuan_info:'每种牌名限两次。当你使用手牌中仅指定单一目标的【杀】或普通锦囊牌结算结束后，你可以视为使用一张名称和属性均相同的牌。若这两张牌指定的目标完全相同，你摸一张牌。',
 			dcxunbie:'殉别',
-			dcxunbie_info:'限定技。当你进入濒死状态时，你可以将此武将牌替换为“甘夫人”或“糜夫人”（不能选择已在场上的武将）。然后回复至1点体力并防止所有伤害直到当前回合结束。',
+			dcxunbie_info:'限定技。当你进入濒死状态时，你可以将此武将牌替换为“甘夫人”或“糜夫人”（不能选择已在场上的武将）。然后回复至1点体力并防止所有伤害直到你的下一个回合结束。',
 			dc_mifuren:'糜夫人',
 			dcguixiu:'闺秀',
 			dcguixiu_info:'锁定技。①回合开始时，若你于本局游戏未发动过〖闺秀①〗，你摸两张牌。②当你发动〖存嗣〗后，你回复1点体力。',
