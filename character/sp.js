@@ -26001,7 +26001,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huangchengyan:['huangchengyan','dc_huangchengyan'],
 			puyuan:['ol_puyuan','puyuan'],
 			huangzu:['huangzu','dc_huangzu'],
-			huojun:['huojun','dc_huojun','tw_huojun'],
+			huojun:['huojun','dc_huojun','xin_huojun','tw_huojun'],
 			zhaoyǎn:['zhaoyǎn','dc_zhaoyǎn'],
 			furong:['ol_furong','furong','tw_furong'],
 			daxiaoqiao:['daxiaoqiao','dc_daxiaoqiao','tw_daxiaoqiao'],

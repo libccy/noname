@@ -11625,6 +11625,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gaoxiang:['gaoxiang','jsrg_gaoxiang'],
 			lingcao:['lingcao','dc_lingcao'],
 			sp_menghuo:['sp_menghuo','dc_sp_menghuo'],
+			sunchen:['dc_sunchen','ps_sunchen'],
 		},
 		translate:{
 			re_panfeng:'潘凤',
