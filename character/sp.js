@@ -733,9 +733,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const target=player.getStorage('olqingyuan').filter(target=>target.hasCard(card=>lib.filter.canBeGained(card,target,player),'he')).randomGet();
 						player.line(target);
 						player.addTempSkill('olqingyuan_used');
-						player.gain(target.getCards('he',card=>{
-							return lib.filter.canBeGained(card,target,player);
-						}).randomGet(),target,'giveAuto');
+						player.gainPlayerCard(target,'he',true);
 					}
 					else{
 						const {result:{bool,targets}}=await player.chooseTarget((card,player,target)=>{
@@ -27245,7 +27243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olshandao_info:'出牌阶段限一次，你可以选择任意名角色，你选择这些角色的各一张牌，依次将这些牌放置到牌堆顶，然后你视为对这些角色使用【五谷丰登】，然后你视为对这些角色外的所有其他角色使用【万箭齐发】。',
 			ol_hujinding:'胡金定',
 			olqingyuan:'轻缘',
-			olqingyuan_info:'锁定技。①游戏开始时，或当你于本局游戏首次受到伤害后，你选择一名未以此法选择过的其他角色。②每回合限一次，你发动〖轻缘①〗选择过的角色得到牌后，你随机获得其中一名角色的随机一张牌。',
+			olqingyuan_info:'锁定技。①游戏开始时，或当你于本局游戏首次受到伤害后，你选择一名未以此法选择过的其他角色。②每回合限一次，你发动〖轻缘①〗选择过的角色得到牌后，你随机获得其中一名角色的一张牌。',
 			olchongshen:'重身',
 			olchongshen_info:'你可以将本轮得到的手牌当作【闪】使用，且这些牌不计入你的手牌上限。',
 
