@@ -136,17 +136,27 @@ new Promise(resolve => {
 		}
 		if (location.protocol.startsWith('http') && 'serviceWorker' in navigator) {
 			let scope = window.location.protocol + '//' + window.location.host + '/';
-			navigator.serviceWorker.register(`${scope}service-worker.js`, {
-				updateViaCache: "all",
-				scope,
-			}).then(registration => {
-				navigator.serviceWorker.addEventListener('message', e => {
-					console.log(e);
+			navigator.serviceWorker.getRegistrations().then(registrations => {
+				let findServiceWorker = false;
+				for (let registration of registrations) {
+					if (registration && registration.active && registration.active.scriptURL == `${scope}service-worker.js`) {
+						findServiceWorker = true;
+					}
+				}
+				navigator.serviceWorker.register(`${scope}service-worker.js`, {
+					updateViaCache: "all",
+					scope,
+				}).then(registration => {
+					// 初次加载worker，需要重新启动一次
+					if (!findServiceWorker) location.reload();
+					navigator.serviceWorker.addEventListener('message', e => {
+						console.log(e);
+					});
+					registration.update();
+					// console.log(`set scope: ${scope}, service worker instance:`, registration);
+				}).catch(e => {
+					console.log('serviceWorker加载失败: ', e);
 				});
-				registration.update();
-				// console.log(`set scope: ${scope}, service worker instance:`, registration);
-			}).catch(e => {
-				console.log('serviceWorker加载失败: ', e);
 			});
 		}
 		const script = document.createElement('script')
