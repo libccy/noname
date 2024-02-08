@@ -125,6 +125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter(event,player){
 					return player.getDiscardableCards(player,'h').some(card=>!player.getStorage('dcfuli').includes(get.type2(card)));
 				},
+				usable:1,
 				async content(event,trigger,player){
 					await player.showHandcards(get.translation(player)+'发动了【抚黎】');
 					const getNum=(type)=>{
@@ -12113,7 +12114,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshoucheng_info:'一名角色于其回合外失去最后的手牌后，你可令其摸两张牌。',
 			dc_liuli:'刘理',
 			dcfuli:'抚黎',
-			dcfuli_info:'出牌阶段，你可以展示手牌并弃置一种类别的所有手牌（每种类别每回合限一次），然后摸X张牌（X为这些牌的牌名字数和且X至多为场上手牌数最多的角色的手牌数）。若你因此弃置了伤害类卡牌，则你可以选择一名角色，令其攻击范围-1直到你的下个回合开始。',
+			dcfuli_info:'出牌阶段限一次，你可以展示手牌并弃置一种类别的所有手牌（每种类别每回合限一次），然后摸X张牌（X为这些牌的牌名字数和且X至多为场上手牌数最多的角色的手牌数）。若你因此弃置了伤害类卡牌，则你可以选择一名角色，令其攻击范围-1直到你的下个回合开始。',
 			dcdehua:'德化',
 			dcdehua_info:'锁定技。①一轮游戏开始时，若有你可以使用的非延时类伤害类牌的牌名，你选择其中一个并视为使用之，然后你不能从手牌中使用此牌名的牌，然后若你已选择过所有的伤害类牌牌名，你失去〖德化〗。②你的手牌上限+Y（Y为你〖德化①〗选择过的牌名数）。',
 

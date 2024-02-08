@@ -213,7 +213,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				frequent:true,
 				async content(event,trigger,player){
 					let cards=get.cards(3,true);
-					const {result:{bool,links}}=await player.chooseButton(['灵慧：是否使用其中的一张牌并获得其余牌？',cards]).set('ai',button=>{
+					const {result:{bool,links}}=await player.chooseButton(['灵慧：是否使用其中的一张牌并随机获得其中一张剩余牌？',cards]).set('ai',button=>{
 						return get.event('player').getUseValue(button.link);
 					});
 					if(bool){
@@ -222,7 +222,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.$gain2(card,false);
 						await game.asyncDelayx();
 						await player.chooseUseTarget(true,card,false);
-						if(cards.length) await player.gain(cards,'gain2');
+						if(cards.length) await player.gain(cards.randomGet(),'gain2');
 					}
 				},
 			},
@@ -14438,7 +14438,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczengou_info:'出牌阶段限一次，你可以将至多体力上限张牌称为“谮构”交给一名其他角色并摸等量张牌。若如此做，其下次体力值增加或使用牌结算完毕后，其展示所有手牌，然后失去Y点体力（Y为其手牌中的“谮构”牌数）。',
 			bailingyun:'柏灵筠',
 			dclinghui:'灵慧',
-			dclinghui_info:'一名角色的结束阶段，若当前回合角色为你或本回合有角色进入过濒死状态，则你可以观看牌堆顶的三张牌，然后你可以使用其中一张牌并获得剩余牌。',
+			dclinghui_info:'一名角色的结束阶段，若当前回合角色为你或本回合有角色进入过濒死状态，则你可以观看牌堆顶的三张牌，然后你可以使用其中一张牌并随机获得其中一张剩余牌。',
 			dcxiace:'黠策',
 			dcxiace_info:'每回合每项各限一次。当你造成/受到伤害后，你可以弃置一张牌并回复1点体力/令一名其他角色的非锁定技于本回合失效。',
 			dcyuxin:'御心',
