@@ -9400,7 +9400,14 @@ export class Library extends Uninstantable {
 		charge: '蓄力值',
 		expandedSlots: '扩展装备栏',
 		stratagem_fury: '怒气',
-		_stratagem_add_buff: '强化'
+		_stratagem_add_buff: '强化',
+
+		phaseZhunbei: '准备阶段',
+		phaseJudge: '判定阶段',
+		phaseDraw: '摸牌阶段',
+		phaseUse: '出牌阶段',
+		phaseDiscard: '弃牌阶段',
+		phaseJieshu: '结束阶段',
 	};
 
 	static experimental = Experimental
@@ -13164,8 +13171,8 @@ export class Library extends Uninstantable {
 		ignore: () => void 0
 	};
 	static InitFilter = {
-		'noZhuHp': '做主公不增加体力上限',
-		'noZhuSkill': '做主公不获得飞扬跋扈',
+		'noZhuHp': '不享受主公的额外体力上限',
+		'noZhuSkill': '不享受地主的额外技能',
 	};
 }
 

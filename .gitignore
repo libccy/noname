@@ -1,3 +1,5 @@
+audio/*.TXT
+image/*.TXT
 !extension/boss
 !extension/cardpile
 !extension/coin
