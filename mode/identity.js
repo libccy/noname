@@ -911,7 +911,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(!player.isInitFilter('noZhuHp')){
 								player.hp++;
 								player.maxHp++;
-								player.$update();
+								player.update();
 							}
 						}
 					});
@@ -936,7 +936,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(!lib.playerOL[i].isInitFilter('noZhuHp')){
 									lib.playerOL[i].hp++;
 									lib.playerOL[i].maxHp++;
-									lib.playerOL[i].$update();
+									lib.playerOL[i].update();
 								}
 							}
 						}
@@ -1393,7 +1393,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(!player.isInitFilter('noZhuHp')){
 								player.hp++;
 								player.maxHp++;
-								player.$update();
+								player.update();
 							}
 						}
 					}
@@ -1423,7 +1423,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(!player.isInitFilter('noZhuHp')){
 								player.hp++;
 								player.maxHp++;
-								player.$update();
+								player.update();
 							}
 						}
 					}
@@ -2114,7 +2114,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(!game.me.isInitFilter('noZhuHp')){
 							game.me.hp++;
 							game.me.maxHp++;
-							game.me.$update();
+							game.me.update();
 						}
 					}
 					for(var i=0;i<game.players.length;i++){
