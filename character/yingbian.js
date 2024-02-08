@@ -121,7 +121,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				content:function*(event,map){
 					var player=map.player,trigger=map.trigger;
-					if(!trigger.card||!trigger.cards.length){
+					if(!trigger.card||!trigger.cards||!trigger.cards.length){
 						trigger.num++;
 						event.finish();
 						return;
@@ -273,12 +273,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				ai:{
-					order:function(item,player){
-						return 10;
-					},
+					order:10,
 					respondShan:true,
 					respondSha:true,
-					skillTagFilter:function(player,tag){
+					skillTagFilter:function(player,tag,arg){
+						if(arg=='respond') return false;
 						var hs=player.getCards('h');
 						if(hs.length!=Math.max(0,hs.length)) return false;
 						if(hs.length>1){

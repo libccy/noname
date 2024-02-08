@@ -4372,7 +4372,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						prompt:(event)=>('是否将【兵粮寸断】转移给'+get.translation(event.player)+'？'),
 						check(event,player){
 							return player.hasCard(card=>{
-								return (card.viewAs||card.name)=='bingliang'&&event.player.canAddJudge(card)&&get.effect(event.player,card,player,player)>=0;
+								return (card.viewAs||card.name)=='bingliang'&&event.player.canAddJudge(card)&&get.effect(event.player,new lib.element.VCard({
+									name:'bingliang',
+									cards:[card]
+								}),player,_status.event.player)>=0;
 							},'j');
 						},
 						content(){
@@ -4569,7 +4572,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const skills=player.getStockSkills(true,true).filter(skill=>{
 						return !player.hasSkill(skill,null,false,false);
 					});
-					return skills.length;
+					return skills.length>0;
 				},
 				filter_old(event,player){
 					var evt=event.getParent();
@@ -4674,7 +4677,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'phaseUseBegin'},
 				filter(event,player){
-					return player.countCards('h')&&event.player!=player;
+					return player.countCards('h')>0&&event.player!=player;
 				},
 				direct:true,
 				content(){
@@ -4788,7 +4791,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardAfter'},
 				filter(event,player){
-					return event.cards.filterInD('od').length&&get.color(event.card)=='red';
+					return event.cards.filterInD('od').length>0&&get.color(event.card)=='red';
 				},
 				content(){
 					'step 0'

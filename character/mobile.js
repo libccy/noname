@@ -31,7 +31,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mb_chengui:['male','qun',3,['guimou','zhouxian']],
 			mb_huban:['male','wei',4,['mbyilie']],
 			mb_xianglang:['male','shu',3,['naxue','yijie']],
-			yanxiang:['male','qun',3,['kujian','twruilian'],['character:tw_yanxiang','die_audio:tw_yanxiang']],
+			yanxiang:['male','qun',3,['kujian','twruilian'],['die_audio:tw_yanxiang']],
 			mb_sunluyu:['female','wu',3,['mbmeibu','mbmumu']],
 			xin_wuban:['male','shu',4,['xinjintao'],['clan:陈留吴氏','character:wuban']],
 			baoxin:['male','qun',4,['mutao','yimou'],['die_audio:tw_baoxin']],
@@ -7523,6 +7523,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//钟会
 			requanji:{
 				audio:2,
+				mod:{
+					aiOrder:(player,card,num)=>{
+						if(num<=0||typeof card!=='object'||!player.isPhaseUsing()||!player.hasSkill('zili')||player.needsToDiscard()) return num;
+						if(player.getExpansions('quanji').length<3&&player.getUseValue(card)<Math.min(4,player.hp*player.hp/4)) return 0;
+					}
+				},
 				trigger:{player:['damageEnd','phaseUseEnd']},
 				frequent:true,
 				locked:false,
@@ -9137,7 +9143,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					]).set('ai',function(){
 						var target=_status.event.getTrigger().target;
 						var player=_status.event.player;
-						var num=target.mayHaveShan(player,'use',target.getCards(i=>{
+						var num=target.mayHaveShan(player,'use',target.getCards('h',i=>{
 							return i.hasGaintag('sha_notshan');
 						}))?0:1;
 						if(get.attitude(player,target)>0) num=1-num;
@@ -15646,7 +15652,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'你随机弃置其装备区的一张牌',
 					'令其摸一张牌',
 				][['豹','鹰','熊','兔'].indexOf(zhoufa)];
-				return str;
+				return str+'。';
 			},
 		},
 		perfectPair:{

@@ -86,6 +86,79 @@ new Promise(resolve => {
 		exit()
 	}
 	else {
+		// node环境下
+		if (typeof window.require == 'function' &&
+			typeof window.process == 'object' &&
+			typeof window.__dirname == 'string') {
+			// 在http环境下修改__dirname和require的逻辑
+			if (location.protocol.startsWith('http') &&
+				window.__dirname.endsWith('electron.asar\\renderer')) {
+				const path = require('path');
+				window.__dirname = path.join(path.resolve(), 'resources/app');
+				const oldData = Object.entries(window.require);
+				// @ts-ignore
+				window.require = function (moduleId) {
+					try {
+						return module.require(moduleId);
+					} catch {
+						return module.require(path.join(window.__dirname, moduleId));
+					}
+				};
+				oldData.forEach(([key, value]) => {
+					window.require[key] = value;
+				});
+			}
+			// 增加导入ts的逻辑
+			window.require.extensions['.ts'] = function (module, filename) {
+				// @ts-ignore
+				const _compile = module._compile;
+				// @ts-ignore
+				module._compile = function (code, fileName) {
+					/**
+					 * @type { import('typescript') }
+					 */
+					// @ts-ignore
+					const ts = require('./game/typescript.js');
+					// 使用ts compiler对ts文件进行编译
+					const result = ts.transpile(code, {
+						module: ts.ModuleKind.CommonJS,
+						target: ts.ScriptTarget.ES2019,
+						inlineSourceMap: true,
+						resolveJsonModule: true,
+						esModuleInterop: true,
+					}, fileName);
+					// 使用默认的js编译函数获取返回值
+					return _compile.call(this, result, fileName);
+				}
+				// @ts-ignore
+				module._compile(require('fs').readFileSync(filename, 'utf8'), filename);
+			};
+		}
+		if (location.protocol.startsWith('http') && 'serviceWorker' in navigator) {
+			let scope = window.location.protocol + '//' + window.location.host + '/';
+			navigator.serviceWorker.getRegistrations().then(registrations => {
+				let findServiceWorker = false;
+				for (let registration of registrations) {
+					if (registration && registration.active && registration.active.scriptURL == `${scope}service-worker.js`) {
+						findServiceWorker = true;
+					}
+				}
+				navigator.serviceWorker.register(`${scope}service-worker.js`, {
+					updateViaCache: "all",
+					scope,
+				}).then(registration => {
+					// 初次加载worker，需要重新启动一次
+					if (!findServiceWorker) location.reload();
+					navigator.serviceWorker.addEventListener('message', e => {
+						console.log(e);
+					});
+					registration.update();
+					// console.log(`set scope: ${scope}, service worker instance:`, registration);
+				}).catch(e => {
+					console.log('serviceWorker加载失败: ', e);
+				});
+			});
+		}
 		const script = document.createElement('script')
 		script.type = "module";
 		script.src = `${assetURL}game/entry.js`;

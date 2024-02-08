@@ -2228,7 +2228,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							case 2:{
 								var num=1.3;
 								if(event.card.name=='sha'&&event.targets.filter(function(current){
-									if(current.mayHaveShan(player,'use',current.getCards(i=>{
+									if(current.mayHaveShan(player,'use',current.getCards('h',i=>{
 										return i.hasGaintag('sha_notshan');
 									}))&&get.attitude(player,current)<=0){
 										if(current.hasSkillTag('useShan')) num=1.9;
@@ -6750,6 +6750,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xinxianzhen2:{
 				audio:'xianzhen',
+				audioname2:{
+					ol_gaoshun:'rexianzhen',
+				},
 				mod:{
 					targetInRange:function(card,player,target){
 						if(target==player.storage.xinxianzhen) return true;
@@ -13912,7 +13915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xusheng:['xusheng','xin_xusheng','re_xusheng','old_xusheng'],
 			wuguotai:['wuguotai','xin_wuguotai','re_wuguotai'],
 			lingtong:['lingtong','xin_lingtong','ol_lingtong','re_lingtong','old_lingtong'],
-			gaoshun:['gaoshun','xin_gaoshun','re_gaoshun','old_gaoshun'],
+			gaoshun:['gaoshun','xin_gaoshun','ol_gaoshun','re_gaoshun','old_gaoshun'],
 			zhonghui:['zhonghui','xin_zhonghui','re_zhonghui','old_zhonghui','pe_zhonghui'],
 			wangyi:['wangyi','re_wangyi','old_wangyi'],
 			caozhang:['caozhang','ol_caozhang','re_caozhang','xin_caozhang'],

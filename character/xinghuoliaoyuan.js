@@ -452,7 +452,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				skillAnimation:true,
 				animationColor:'gray',
-				marktext:"登",
 				content:function (){
 					"step 0"
 					player.awakenSkill('xinfu_denglou');

@@ -22,19 +22,22 @@ export function canUseHttpProtocol() {
 		// 手机端
 		if (window.cordova) {
 			// 直接确定包名
-			if (nonameInitialized.includes('com.noname.shijian')) {
+			if (nonameInitialized.endsWith('com.noname.shijian/')) {
 				// 每个app自定义能升级的渠道，比如判断版本
 				// @ts-ignore
-				window.noname_shijianInterfaces.getApkVersion() >= 16000;
+				return window.noname_shijianInterfaces.getApkVersion() >= 16000;
 			}
 		}
 		// 电脑端
 		else if (typeof window.require == 'function' && typeof window.process == 'object') {
-			try {
-				require('express');
-				return true;
-			} catch {
-				return false;
+			// 从json判断版本号
+			const fs = require('fs');
+			const path = require('path');
+			if (fs.existsSync(path.join(__dirname, 'package.json'))) {
+				// @ts-ignore
+				const json = require('./package.json');
+				// 诗笺电脑版的判断
+				return json && Number(json.installerVersion) >= 1.7;
 			}
 		}
 		// 浏览器端
@@ -43,6 +46,44 @@ export function canUseHttpProtocol() {
 		}
 	}
 	return false;
+}
+
+/**
+ * 传递升级完成的信息
+ * @returns { string | void } 返回一个网址
+ */
+export function sendUpdate() {
+	// 手机端
+	if (window.cordova) {
+		// 直接确定包名
+		if (nonameInitialized && nonameInitialized.includes('com.noname.shijian')) {
+			// 给诗笺版apk的java层传递升级完成的信息
+			// @ts-ignore
+			return window.noname_shijianInterfaces.sendUpdate() + '?sendUpdate=true';
+		}
+	}
+	// 电脑端
+	else if (typeof window.require == 'function' && typeof window.process == 'object') {
+		// 从json判断版本号
+		const fs = require('fs');
+		const path = require('path');
+		if (fs.existsSync(path.join(__dirname, 'package.json'))) {
+			// @ts-ignore
+			const json = require('./package.json');
+			// 诗笺电脑版的判断
+			if (json && Number(json.installerVersion) >= 1.7) {
+				fs.writeFileSync(path.join(__dirname, 'Home', 'saveProtocol.txt'), '');
+				// 启动http
+				const cp = require('child_process');
+				cp.exec(`start /min ${__dirname}\\noname-server.exe -platform=electron`, (err, stdout, stderr) => { });
+				return `http://localhost:8089/app.html?sendUpdate=true`;
+			}
+		}
+	}
+	// 浏览器端
+	else {
+		return location.href;
+	}
 }
 
 // 无名杀，启动！

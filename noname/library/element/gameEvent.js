@@ -66,6 +66,111 @@ export class GameEvent {
 		return new GameEvent().finish().toPromise();
 	}
 	/**
+	 * @type { Player }
+	 */
+	// @ts-ignore
+	source;
+	/**
+	 * @type { Player }
+	 */
+	// @ts-ignore
+	player;
+	/**
+	 * @type { Player }
+	 */
+	// @ts-ignore
+	target;
+	/**
+	 * @type { Player[] }
+	 */
+	// @ts-ignore
+	targets;
+	/**
+	 * @type { Card }
+	 */
+	// @ts-ignore
+	card;
+	/**
+	 * @type { Card[] }
+	 */
+	// @ts-ignore
+	cards;
+	/**
+	 * @type { string }
+	 */
+	skill;
+	/**
+	 * @type { boolean }
+	 */
+	forced;
+	/**
+	 * @type { number }
+	 */
+	num;
+	/**
+	 * @type { GameEvent }
+	 */
+	// @ts-ignore
+	_trigger;
+	/**
+	 * @type { Result }
+	 */
+	_result;
+	/**
+	 * @type { number }
+	 */
+	// @ts-ignore
+	baseDamage;
+	/**
+	 * @type { Player }
+	 */
+	// @ts-ignore
+	customSource;
+	/**
+	 * @type { number }
+	 */
+	// @ts-ignore
+	extraDamage;
+	/**
+	 * @type { string }
+	 */
+	// @ts-ignore
+	nature;
+	/**
+	 * @type { boolean }
+	 */
+	// @ts-ignore
+	notrigger;
+	/**
+	 * @type { number }
+	 */
+	// @ts-ignore
+	original_num;
+	/**
+	 * @type { boolean }
+	 */
+	// @ts-ignore
+	unreal;
+	/**
+	 * @type { Button[] }
+	 */
+	// @ts-ignore
+	excludeButton;
+	/**
+	 * @type { Result }
+	 */
+	// @ts-ignore
+	result;
+	/**
+	 * @type { GameEventPromise | void | null }
+	 */
+	// @ts-ignore
+	parent;
+	/**
+	 * @type { string }
+	 */
+	name;
+	/**
 	 * @param {keyof this} key
 	 * @param {number} [value]
 	 * @param {number} [baseValue]
@@ -364,30 +469,25 @@ export class GameEvent {
 	 */
 	getParent(level = 1, forced, includeSelf) {
 		let event = this;
+		let i = 0;
 		const toreturn = forced ? null : {};
-		if (!includeSelf || typeof level === 'number') {
-			if (event._modparent && game.online) event = event._modparent;
-			else event = this.parent;
-		}
-		if (typeof level === 'number') {
-			for (let i = 1; i < level; i++) {
-				if (!event) return toreturn;
-				event = event.parent;
-			}
-			return event;
-		}
 		const historys = [];
-		const filter = typeof level === 'function' ? level : evt => evt.name === level;
+		const filter =
+			typeof level === 'function' ? level : 
+			typeof level === 'number' ? evt => i === level :
+			evt => evt.name === level;
 		while (true) {
 			if (!event) return toreturn;
 			historys.push(event);
-			if (filter(event)) return event;
-			event = event.parent;
+			if (filter(event) && (includeSelf || i !== 0)) return event;
+			if (game.online && event._modparent) event = event._modparent;
+			else event = event.parent;
 			if (historys.includes(event)) return toreturn;
+			i++;
 		}
 	}
 	getTrigger() {
-		return this.getParent('arrangeTrigger')._trigger;
+		return this.getParent(e => e._trigger, false, true)._trigger;
 	}
 	getRand(name) {
 		if (name) {
@@ -765,107 +865,5 @@ export class GameEvent {
 			this.#promise = new lib.element.GameEventPromise(this);
 		}
 		return this.#promise;
-	}
-	/**
-	 * @returns {never}
-	 */
-	typeAnnotation() {
-		/**
-		 * @type { Player }
-		*/
-		// @ts-ignore
-		this.source;
-		/**
-		 * @type { Player }
-		 */
-		// @ts-ignore
-		this.player;
-		/**
-		 * @type { Player }
-		 */
-		// @ts-ignore
-		this.target;
-		/**
-		 * @type { Player[] }
-		 */
-		// @ts-ignore
-		this.targets;
-		/**
-		 * @type { Card }
-		 */
-		// @ts-ignore
-		this.card;
-		/**
-		 * @type { Card[] }
-		 */
-		// @ts-ignore
-		this.cards;
-		/**
-		 * @type { string }
-		 */
-		this.skill;
-		/**
-		 * @type { boolean }
-		 */
-		this.forced;
-		/**
-		 * @type { number }
-		 */
-		this.num;
-		/**
-		 * @type { GameEvent }
-		 */
-		// @ts-ignore
-		this._trigger;
-		/**
-		 * @type { Record<string, any> }
-		 */
-		this._result;
-		/**
-		 * @type { number }
-		 */
-		// @ts-ignore
-		this.baseDamage;
-		/**
-		 * @type { Player }
-		 */
-		// @ts-ignore
-		this.customSource;
-		/**
-		 * @type { number }
-		 */
-		// @ts-ignore
-		this.extraDamage;
-		/**
-		 * @type { string }
-		 */
-		// @ts-ignore
-		this.nature;
-		/**
-		 * @type { boolean }
-		 */
-		// @ts-ignore
-		this.notrigger;
-		/**
-		 * @type { number }
-		 */
-		// @ts-ignore
-		this.original_num;
-		/**
-		 * @type { boolean }
-		 */
-		// @ts-ignore
-		this.unreal;
-		/**
-		 * @type { Button[] }
-		 */
-		// @ts-ignore
-		this.excludeButton;
-		/**
-		 * @type { Result }
-		 */
-		// @ts-ignore
-		this.result;
-		throw new Error('Do not call this method');
 	}
 }

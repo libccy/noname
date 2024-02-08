@@ -547,6 +547,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_chihaya:['key_sakuya'],
 			key_lucia:['key_shizuru'],
 		},
+		/** @type { importCharacterConfig['skill'] } */
 		skill:{
 			//伊吹风子
 			fuuko_xingdiao:{
@@ -3516,7 +3517,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list.remove(player.storage.kyou_zhidian);
 							player.chooseControl(list).set('prompt','掷典：请为'+get.translation(trigger.card)+'选择一种效果').set('choice',function(){
 								if(list.includes('不计入次数')&&player.hasSha()) return '不计入次数';
-								if(list.includes('不可被响应')&&trigger.target.mayHaveShan(player,'use',trigger.target.getCards(i=>{
+								if(list.includes('不可被响应')&&trigger.target.mayHaveShan(player,'use',trigger.target.getCards('h',i=>{
 									return i.hasGaintag('sha_notshan');
 								}))) return '不可被响应';
 								if(list.includes('伤害+1')) return '伤害+1';
@@ -18080,7 +18081,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			key_doruji:'多鲁基',
 			key_yuiko:'来谷唯湖',
 			key_riki:'直枝理树'/*+'子'*/,
-			key_hisako:'高桥久子',
+			key_hisako:'渕田久子',
 			key_hinata:'日向秀树',
 			key_noda:'野田',
 			key_tomoya:'冈崎朋也',
@@ -19048,7 +19049,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			多鲁基:['Dorj'],
 			来谷唯湖:['Kurugaya','Yuiko'],
 			直枝理树:['Naoe','Riki'],
-			高桥久子:['Takahashi','Hisako'],
+			渕田久子:['Fuchita','Hisako'],
 			日向秀树:['Hinata','Hideki'],
 			野田:['Noda'],
 			冈崎朋也:['Okazaki','Tomoya'],
@@ -19107,6 +19108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			冈崎汐:['Okazaki','Ushio'],
 			神山识:['Kamiyama','Shiki'],
 			佐藤雏:['Satou','Hina'],
+			篝:['Kagari'],
 		},
 	};
 });

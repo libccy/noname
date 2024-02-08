@@ -1043,13 +1043,16 @@ export const Content = {
 	},
 	chooseUseTarget: function () {
 		'step 0';
-		if (get.is.object(card) && !event.viewAs) card.isCard = true;
+		if (get.is.object(card) && event.viewAs === false) card.isCard = true;
 		if (cards && get.itemtype(card) != 'card') {
 			card = get.copy(card);
 			card.cards = cards.slice(0);
 			event.card = card;
 		}
-		if (!lib.filter.cardEnabled(card, player) || (event.addCount !== false && !lib.filter.cardUsable(card, player))) {
+		let evt = event.getParent('chooseToUse');
+		if (get.itemtype(evt) !== 'event') evt = event;
+		if (!lib.filter.cardEnabled(card, player) || event.addCount !== false &&
+			!lib.filter.cardUsable(card, player, evt)) {
 			event.result = { bool: false };
 			event.finish();
 			return;
@@ -2433,6 +2436,10 @@ export const Content = {
 	 */
 	phase: function () {
 		'step 0';
+		//规则集中的“回合开始后③（处理“游戏开始时”的时机）”
+		//提前phaseBefore时机解决“游戏开始时”时机和“一轮开始时”先后
+		event.trigger('phaseBefore');
+		'step 1';
 		//初始化阶段列表
 		if (!event.phaseList) {
 			event.phaseList = ['phaseZhunbei', 'phaseJudge', 'phaseDraw', 'phaseUse', 'phaseDiscard', 'phaseJieshu'];
@@ -2491,12 +2498,9 @@ export const Content = {
 		if (isRound) {
 			game.getGlobalHistory().isRound = true;
 		}
-		'step 1';
+		'step 2';
 		//规则集中的“回合开始后②（1v1武将登场专用）”
 		event.trigger('phaseBeforeStart');
-		'step 2';
-		//规则集中的“回合开始后③（处理“游戏开始时”的时机）”
-		event.trigger('phaseBefore');
 		'step 3';
 		//规则集中的“回合开始后④（卑弥呼〖纵傀〗的时机）”
 		event.trigger('phaseBeforeEnd');
@@ -8114,10 +8118,12 @@ export const Content = {
 	},
 	addJudge: function () {
 		"step 0";
+		const cardName = typeof card == 'string' ? card : card.name , cardInfo = lib.card[cardName];
 		if (cards) {
 			var owner = get.owner(cards[0]);
 			if (owner) {
-				event.relatedLose = owner.lose(cards, 'visible', ui.special).set('getlx', false);
+				event.relatedLose = owner.lose(cards, ui.special).set('getlx', false);
+				if (cardInfo && !cardInfo.blankCard) event.relatedLose.set('visible',true);
 			}
 			else if (get.position(cards[0]) == 'c') event.updatePile = true;
 		}

@@ -1045,6 +1045,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return `令${get.translation(event.card)}不计入次数限制，且你获得${get.translation(event.target)}一张牌，然后其可以令你本回合至其的距离+2`;
 				},
 				group:'jsrgeqian_prepare',
+				logTarget:'target',
 				async content(event,trigger,player){
 					if(trigger.addCount!==false){
 						trigger.addCount=false;
@@ -1071,14 +1072,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						direct:true,
 						async content(event,trigger,player){
-							while(true){
+							while(player.countCards('h')>0){
 								const {result:{bool,cards}}=await player.chooseCard(get.prompt('jsrgeqian'),'你可以蓄谋任意次').set('ai',card=>{
 									const player=get.player();
 									if(player.hasValueTarget(card)) return player.getUseValue(card);
 									return 0;
 								});
 								if(!bool) break;
-								player.addJudge({name:'xumou_jsrg'},cards);
+								await player.addJudge({name:'xumou_jsrg'},cards);
 							}
 						},
 					},
@@ -4270,7 +4271,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							var eff=get.effect(target,{name:'sha',nature:'fire'},player,target)/30;
-							if(!target.mayHaveShan(player,'use',target.getCards(i=>{
+							if(!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 								return i.hasGaintag('sha_notshan');
 							}))) eff*=2;
 							var del=target.countCards('h')-player.countCards('h')+1.5;
@@ -6852,19 +6853,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 6'
 					if(result.bool&&result.links.length){
 						var link=result.links[0];
-						if(get.position(link)=='h'){
-							event.targets[1].gain(link);
-						}
-						else if(get.position(link)=='e'){
-							event.targets[1].equip(link);
-						}
-						else if(link.viewAs){
-							event.targets[1].addJudge({name:link.viewAs},[link]);
-						}
+						if(get.position(link)=='h') event.targets[1].gain(link,event.targets[0],'giveAuto');
 						else{
-							event.targets[1].addJudge(link);
+							event.targets[0].$give(link,event.targets[1],false);
+							if(get.position(link)=='e') event.targets[1].equip(link);
+							else if(link.viewAs) event.targets[1].addJudge({name:link.viewAs},[link]);
+							else event.targets[1].addJudge(link);
 						}
-						event.targets[0].$give(link,event.targets[1],false);
 						game.log(event.targets[0],'的',get.position(link)=='h'?'一张手牌':link,'被移动给了',event.targets[1]);
 						game.delay();
 					}
@@ -7124,7 +7119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(_status.event.all) return 1;
 						if(ui.selected.buttons.length) return 0;
 						return Math.random();
-					}).set('all',!target.mayHaveShan(player,'use',target.getCards(i=>{
+					}).set('all',!target.mayHaveShan(player,'use',target.getCards('h',i=>{
 						return i.hasGaintag('sha_notshan');
 					}))&&Math.random()<0.75).set('forceAuto',true);
 					'step 1'

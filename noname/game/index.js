@@ -16,7 +16,7 @@ import { Library as lib } from '../library/index.js';
 import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 import { GNC as gnc } from '../gnc/index.js';
-import { userAgent, Uninstantable, GeneratorFunction, AsyncFunction, delay } from "../util/index.js";
+import { userAgent, Uninstantable, GeneratorFunction, AsyncFunction, delay, nonameInitialized } from "../util/index.js";
 
 import { DynamicStyle } from "./dynamic-style/index.js";
 import { GamePromises } from "./promises.js";
@@ -1782,6 +1782,9 @@ export class Game extends Uninstantable {
 			object = await (gnc.is.generatorFunc(object) ? gnc.of(object) : object)(lib, game, ui, get, ai, _status);
 			noEval = true;
 		}
+		if(object.closeSyntaxCheck){
+			noEval = true;
+		}
 		const name = object.name, extensionName = `extension_${name}`, extensionMenu = lib.extensionMenu[extensionName] = {
 			enable: {
 				name: '开启',
@@ -1898,7 +1901,7 @@ export class Game extends Uninstantable {
 	 */
 	static createDir(directory, successCallback, errorCallback) {
 		const paths = directory.split('/').reverse();
-		if (window.resolveLocalFileSystemURL) return new Promise((resolve, reject) => window.resolveLocalFileSystemURL(lib.assetURL, resolve, reject)).then(directoryEntry => {
+		if (window.resolveLocalFileSystemURL) return new Promise((resolve, reject) => window.resolveLocalFileSystemURL(nonameInitialized, resolve, reject)).then(directoryEntry => {
 			const redo = entry => new Promise((resolve, reject) => entry.getDirectory(paths.pop(), {
 				create: true
 			}, resolve, reject)).then(resolvedDirectoryEntry => {
@@ -2025,7 +2028,7 @@ export class Game extends Uninstantable {
 					}
 					game.ensureDirectory(`extension/${extensionName}`).then(writeFile).catch(UHP);
 				}
-				else new Promise((resolve, reject) => window.resolveLocalFileSystemURL(lib.assetURL, resolve, reject)).then(directoryEntry => new Promise((resolve, reject) => directoryEntry.getDirectory(`extension/${extensionName}`, {
+				else new Promise((resolve, reject) => window.resolveLocalFileSystemURL(nonameInitialized, resolve, reject)).then(directoryEntry => new Promise((resolve, reject) => directoryEntry.getDirectory(`extension/${extensionName}`, {
 					create: true
 				}, resolve, reject))).then(directoryEntry => {
 					//扩展文件夹
@@ -4674,9 +4677,9 @@ export class Game extends Uninstantable {
 			deleteFolderRecursive(`${__dirname}/extension/${extensionName}`);
 		}
 			catch (error) {
-				console.log(error);
+				console.error(error);
 			}
-		else new Promise((resolve, reject) => window.resolveLocalFileSystemURL(`${lib.assetURL}extension/${extensionName}`, resolve, reject)).then(directoryEntry => directoryEntry.removeRecursively());
+		else new Promise((resolve, reject) => window.resolveLocalFileSystemURL(`${nonameInitialized}extension/${extensionName}`, resolve, reject)).then(directoryEntry => directoryEntry.removeRecursively());
 	}
 	static addRecentCharacter() {
 		let list = get.config('recentCharacter') || [];
@@ -5427,10 +5430,13 @@ export class Game extends Uninstantable {
 	 */
 	static executingAsyncEventMap = new Map();
 	/**
+	 * @type { GameEventPromise[] }
+	 */
+	static belongAsyncEventList = [];
+	/**
 	 * @param { GameEventPromise } [belongAsyncEvent]
 	 */
 	static async loop(belongAsyncEvent) {
-		if (!game.belongAsyncEventList) game.belongAsyncEventList = [];
 		if (belongAsyncEvent) {
 			game.belongAsyncEventList.push(belongAsyncEvent);
 		} else if (game.belongAsyncEventList.length) {
@@ -5636,10 +5642,21 @@ export class Game extends Uninstantable {
 				run(event).then(() => {
 					// 其实这个if几乎一定执行了
 					if (game.executingAsyncEventMap.has(event.toEvent())) {
-						game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
-							event.finish();
-							resolve();
-						}));
+						if (!game.executingAsyncEventMap.get(_status.event.toEvent())) {
+							console.warn(`game.executingAsyncEventMap中包括了event，但不包括_status.event！`);
+							console.log('event :>> ', event.toEvent());
+							console.log('_status.event :>> ', _status.event.toEvent());
+							// debugger;
+							game.executingAsyncEventMap.set(event.toEvent(), game.executingAsyncEventMap.get(event.toEvent()).then(() => {
+								event.finish();
+								resolve();
+							}));
+						} else {
+							game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+								event.finish();
+								resolve();
+							}));
+						}
 					} else {
 						event.finish();
 						resolve();
@@ -5678,10 +5695,21 @@ export class Game extends Uninstantable {
 				event.content(event, trigger, player).then(() => {
 					// 其实这个if几乎一定执行了
 					if (game.executingAsyncEventMap.has(event.toEvent())) {
-						game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
-							event.finish();
-							resolve();
-						}));
+						if (!game.executingAsyncEventMap.get(_status.event.toEvent())) {
+							console.warn(`game.executingAsyncEventMap中包括了event，但不包括_status.event！`);
+							console.log('event :>> ', event.toEvent());
+							console.log('_status.event :>> ', _status.event.toEvent());
+							// debugger;
+							game.executingAsyncEventMap.set(event.toEvent(), game.executingAsyncEventMap.get(event.toEvent()).then(() => {
+								event.finish();
+								resolve();
+							}));
+						} else {
+							game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+								event.finish();
+								resolve();
+							}));
+						}
 					} else {
 						event.finish();
 						resolve();
@@ -7496,7 +7524,7 @@ export class Game extends Uninstantable {
 		const argumentArray = Array.from(arguments), name = argumentArray[argumentArray.length - 2];
 		let skills = argumentArray[argumentArray.length - 1];
 		if (typeof skills.getModableSkills == 'function') {
-			skills = skills.getModableSkills(_status.event.useCache === true);
+			skills = skills.getModableSkills();
 		} else if (typeof skills.getSkills == 'function') {
 			skills = skills.getSkills().concat(lib.skill.global);
 			game.expandSkills(skills);
@@ -7510,8 +7538,8 @@ export class Game extends Uninstantable {
 		skills.forEach(value => {
 			var mod = get.info(value).mod[name];
 			if (!mod) return;
-			const result = mod.apply(this, arg);
-			if (typeof arg[arg.length - 1] != 'object' && result != undefined) arg[arg.length - 1] = result;
+			const result = mod.call(this,...arg);
+			if (result != undefined && typeof arg[arg.length - 1] != 'object') arg[arg.length - 1] = result;
 		});
 		return arg[arg.length - 1];
 	}
@@ -7860,7 +7888,7 @@ export class Game extends Uninstantable {
 	/**
 	 * 
 	 * @param { string } storeName 
-	 * @param { string } [query] 
+	 * @param { string | null } [query] 
 	 * @param { Function } [onSuccess] 
 	 * @param { Function } [onError] 
 	 */
@@ -8119,7 +8147,7 @@ export class Game extends Uninstantable {
 	/**
 	 * @param { string } key 
 	 * @param { * } [value] 
-	 * @param { string } [local] 
+	 * @param { string | boolean } [local] 
 	 * @param { Function } [callback] 
 	 */
 	static saveConfig(key, value, local, callback) {

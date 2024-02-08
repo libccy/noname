@@ -33,6 +33,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				clan_zhong:['clan_zhongyan','clan_zhonghui','clan_zhongyu'],
 			},
 		},
+		/** @type { importCharacterConfig['skill'] } */
 		skill:{
 			//族吴乔
 			clanqiajue:{
@@ -42,7 +43,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countCards('he',card=>{
 						if(_status.connectMode&&get.position(card)=='h') return true;
 						return get.color(card,player)=='black'&&lib.filter.cardDiscardable(card,player);
-					});
+					})>0;
 				},
 				direct:true,
 				async content(event,trigger,player){
@@ -1058,7 +1059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										var owner=_status.event.getParent().owner;
 										if(owner) owner.$throw(card.cards);
 									});
-									if(card.name!=cardx.name||!get.is.sameNature(card,cardx)) next.viewAs=true;
+									if(card.name===cardx.name&&get.is.sameNature(card,cardx,true)) next.viewAs=false;
 									var owner=get.owner(card);
 									if(owner!=player&&get.position(card)=='h'){
 										next.throw=false;
