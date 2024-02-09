@@ -1367,7 +1367,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yangfan:{
 				trigger:{player:'useCard'},
 				forced:true,
-				filter:(event,player)=>get.type(event.card)!='equip'&&player.hasCard(card=>get.color(card)==get.color(trigger.card)&&player.canRecast(card),'h'),
+				filter:(event,player)=>get.type(event.card)!='equip'&&player.hasCard(card=>get.color(card)==get.color(event.card)&&player.canRecast(card),'h'),
 				content(){
 					'step 0'
 					var cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card)&&player.canRecast(card));
