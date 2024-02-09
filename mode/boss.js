@@ -915,7 +915,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				boss_huatuo:['male','shen',6,['chulao','mazui','boss_shengshou','guizhen','wuqin'],['qun','boss','bossallowed'],'wu'],
 				boss_dongzhuo:['male','shen',20,['jiuchi','boss_qiangzheng','boss_baolin'],['qun','boss','bossallowed'],'shu'],
 
-				"boss_sunce":["male","shen","1/8",["boss_jiang","boss_hunzi","boss_hunyou","boss_taoni"],['qun','boss','bossallowed'],'wu'],
+				"boss_sunce":["male","shen","1/8",["boss_jiang","boss_hunzi","boss_hunyou","boss_taoni"],['qun','boss','bossallowed','InitFilter:noZhuHp:noZhuSkill'],'wu'],
 
 				// boss_nianshou:['male','shen',Infinity,['boss_nianrui','boss_qixiang','boss_damagecount'],['boss'],'shu'],
 				// boss_yuji:['male','qun',8,[],['boss','bossallowed'],'nei'],

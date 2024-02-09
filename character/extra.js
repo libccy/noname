@@ -176,6 +176,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				onChooseToUse(event){
 					if(!game.online&&!event.zhuangpo_cards){
 						event.set('zhuangpo_cards',event.player.getCards('hes',card=>{
+							if(get.name(card,event.player)=='sha') return true;
 							const str=lib.skill.shencai.getStr(card);
 							return str.includes('【杀】');
 						}));
@@ -8541,7 +8542,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhengqing:'争擎',
 			zhengqing_info:'锁定技。一轮游戏开始时，你移去所有角色的“擎”标记，令上一轮于一回合内造成伤害值最多的角色各获得X枚“擎”，且你与这些角色各摸一张牌（X为这些角色该回合内造成的伤害值）。若该角色为你且本次获得的“擎”数为本局游戏最多的一次，你改为摸X张牌（至多摸五张）。',
 			zhuangpo:'壮魄',
-			zhuangpo_info:'你可以将牌面信息中包含“【杀】”的牌当【决斗】使用，然后你获得如下效果：1.当此【决斗】指定目标后，若你有“擎”，你可以移去任意枚“擎”，令目标角色弃置等量的牌；2.当你造成渠道为此牌的伤害时，若此牌的所有目标角色中存在有“擎”的角色，此伤害+1。',
+			zhuangpo_info:'你可以将牌名为【杀】或牌面信息中包含“【杀】”的牌当【决斗】使用，然后你获得如下效果：1.当此【决斗】指定目标后，若你有“擎”，你可以移去任意枚“擎”，令目标角色弃置等量的牌；2.当你造成渠道为此牌的伤害时，若此牌的所有目标角色中存在有“擎”的角色，此伤害+1。',
 			
 
 			extra_feng:'神话再临·风',
