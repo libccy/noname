@@ -174,39 +174,52 @@ export async function boot() {
 		const { nodeReady } = await import('./node.js');
 		nodeReady();
 	}
-	// 手机平台已在别处判断
-	else if (!Reflect.has(lib, 'device')) {
-		Reflect.set(lib, 'path', (await import('../library/path.js')).default);
-		//为其他自定义平台提供文件读写函数赋值的一种方式。
-		//但这种方式只允许修改game的文件读写函数。
-		if (typeof window.initReadWriteFunction == 'function') {
-			const g = {};
-			const ReadWriteFunctionName = ['download', 'readFile', 'readFileAsText', 'writeFile', 'removeFile', 'getFileList', 'ensureDirectory', 'createDir'];
-			ReadWriteFunctionName.forEach(prop => {
-				Object.defineProperty(g, prop, {
-					configurable: true,
-					get() { return undefined; },
-					set(newValue) {
-						if (typeof newValue == 'function') {
-							delete g[prop];
-							g[prop] = game[prop] = newValue;
-						}
-					}
-				});
-			});
-			// @ts-ignore
-			await window.initReadWriteFunction(g).catch(e => {
-				console.error('文件读写函数初始化失败:', e);
-			});
+	else {
+		Reflect.set(lib, 'path', (await import('../library/path.js')).default)
+		if (Reflect.has(lib, 'device')) {
+			const script = document.createElement('script')
+			script.src = 'cordova.js'
+			document.body.appendChild(script)
+			await new Promise((resolve) => {
+				document.addEventListener('deviceready', async () => {
+					const { cordovaReady } = await import('./cordova.js')
+					await cordovaReady()
+					resolve(void 0)
+				})
+			})
 		}
-		window.onbeforeunload = function () {
-			if (config.get('confirm_exit') && !_status.reloading) {
-				return '是否离开游戏？';
+		else {
+			//为其他自定义平台提供文件读写函数赋值的一种方式。
+			//但这种方式只允许修改game的文件读写函数。
+			if (typeof window.initReadWriteFunction == 'function') {
+				const g = {}
+				const ReadWriteFunctionName = ['download', 'readFile', 'readFileAsText', 'writeFile', 'removeFile', 'getFileList', 'ensureDirectory', 'createDir']
+				ReadWriteFunctionName.forEach(prop => {
+					Object.defineProperty(g, prop, {
+						configurable: true,
+						get() { return undefined },
+						set(newValue) {
+							if (typeof newValue == 'function') {
+								delete g[prop]
+								g[prop] = game[prop] = newValue
+							}
+						}
+					})
+				})
+				// @ts-ignore
+				await window.initReadWriteFunction(g).catch(e => {
+					console.error('文件读写函数初始化失败:', e)
+				})
 			}
-			else {
-				return null;
+			window.onbeforeunload = function () {
+				if (config.get('confirm_exit') && !_status.reloading) {
+					return '是否离开游戏？'
+				}
+				else {
+					return null
+				}
 			}
-		};
+		}
 	}
 
 	const loadCssPromise = loadCss();
@@ -534,6 +547,8 @@ export async function boot() {
 		document.addEventListener('touchmove', ui.click.windowtouchmove);
 	}
 
+	await waitDomLoad;
+
 	const stylesLoaded = await Promise.all(stylesLoading);
 	const stylesLength = Math.min(stylesName.length, stylesLoaded.length);
 	for (let i = 0; i < stylesLength; ++i) {
@@ -653,7 +668,6 @@ export async function boot() {
 		delete _status.importing;
 	}
 
-	await waitDomLoad;
 	await onload(resetGameTimeout);
 }
 
@@ -782,28 +796,15 @@ async function loadCss() {
 	});
 }
 
+/**
+ * `window.onload`触发时执行的函数
+ *
+ * 目前无任何内容，预防以后出现需要的情况
+ *
+ * @deprecated
+ * @return {Promise<void>}
+ */
 async function onWindowReady() {
-	if (Reflect.has(lib, 'device')) {
-		var script = document.createElement('script');
-		script.src = 'cordova.js';
-		document.body.appendChild(script);
-		await new Promise((resolve) => {
-			document.addEventListener('deviceready', async () => {
-				const { cordovaReady } = await import('./cordova.js');
-				await cordovaReady();
-				resolve(void 0);
-			});
-		});
-	}
-	/*
-	if (_status.packLoaded) {
-		delete _status.packLoaded;
-		lib.init.onload();
-	}
-	else {
-		_status.windowLoaded = true;
-	}
-	*/
 }
 
 function setBackground() {
