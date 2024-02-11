@@ -8144,7 +8144,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//曹宪曹华
 			huamu:{
-				audio:2,
+				audio:6,
 				trigger:{player:'useCardAfter'},
 				locked:false,
 				filter:function(event,player){
