@@ -1169,14 +1169,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return _status.currentPhase;
 				},
 				prompt2:function(event,player){
-					const num=player.hasSkill('dccaisi_more')?2:1;
+					const num=player.countMark('dccaisi_more')+1;
 					return `从${player==_status.currentPhase?'牌堆':'弃牌'}堆中随机获得${get.cnNumber(num)}张非基本牌`;
 				},
 				content:function*(event,map){
 					const player=map.player,trigger=map.trigger;
 					const position=player==_status.currentPhase?'cardPile':'discardPile';
-					let cards=[],num=player.hasSkill('dccaisi_more')?2:1;
-					player.removeSkill('dccaisi_more');
+					let cards=[],num=player.countMark('dccaisi_more')+1;
 					while(num>0){
 						num--;
 						let card=get[position](card=>get.type(card)!='basic'&&!cards.includes(card));
@@ -1189,8 +1188,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.log(`但是${position=='discardPile'?'弃':''}牌堆里没有非基本牌！`);
 					}
 					player.addTempSkill('dccaisi_more');
+					player.addMark('dccaisi_more',1,false);
 				},
-				subSkill:{more:{charlotte:true}},
+				subSkill:{more:{charlotte:true,onremove:true}},
 			},
 			dczhuoli:{
 				audio:2,
@@ -12055,7 +12055,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshizong_info:'当你需要使用一张基本牌时，你可以交给一名其他角色X张牌，然后其可以将一张牌置于牌堆底，视为你使用之。若其不为当前回合角色，此技能失效直到回合结束（X为你本回合发动〖恃纵〗的次数）。',
 			pangshanmin:'庞山民',
 			dccaisi:'才思',
-			dccaisi_info:'当你于回合内/回合外使用基本牌结算结束后，若你本回合以此法得到的牌数小于你的体力上限，你可以从牌堆/弃牌堆随机获得一张非基本牌，然后本回合下次发动此技能获得的牌数+1。',
+			dccaisi_info:'当你于回合内/回合外使用基本牌结算结束后，若你本回合以此法得到的牌数小于你的体力上限，你可以从牌堆/弃牌堆随机获得一张非基本牌，然后本回合发动此技能获得的牌数+1。',
 			dczhuoli:'擢吏',
 			dczhuoli_info:'锁定技。一名角色的回合结束时，若你本回合使用或获得的牌数大于体力值，你加1点体力上限（不能超过存活角色数），回复1点体力。',
 			yue_caiyong:'乐蔡邕',

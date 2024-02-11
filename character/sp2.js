@@ -162,7 +162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const type=get.type(card,player);
 						if(type!='basic'&&type!='trick') return false;
 						return lib.filter.cardUsable(card,player)&&game.hasPlayer(target=>{
-							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
+							return lib.filter.targetEnabled2(card,player,target)/*&&lib.filter.targetInRange(card,player,target)*/;
 						});
 					});
 					if(!cards.length) return false;
@@ -177,7 +177,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const type=get.type(card,player);
 						if(type!='basic'&&type!='trick') return false;
 						return lib.filter.cardUsable(card,player)&&game.hasPlayer(target=>{
-							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
+							return lib.filter.targetEnabled2(card,player,target)/*&&lib.filter.targetInRange(card,player,target)*/;
 						});
 					});
 					if(!cards.includes(card)) return false;
@@ -195,14 +195,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else if(typeof select=='function') range=select(card,player);
 					game.checkMod(card,player,range,'selectTarget',player);
 					const cards=player.getCards('h',cardx=>card!=cardx&&get.suit(card,player)==get.suit(cardx,player));
-					let targets=game.filterPlayer(target=>lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target)&&get.effect(target,card,player,player)>0);
+					let targets=game.filterPlayer(target=>lib.filter.targetEnabled2(card,player,target)/*&&lib.filter.targetInRange(card,player,target)*/&&get.effect(target,card,player,player)>0);
 					const max=range[1],max2=Math.min(cards.length,targets.length);
 					if(max>max2) return 0;
 					targets=targets.sort((a,b)=>get.effect(b,card,player,player)-get.effect(a,card,player,player)).slice(0,max2);
 					const sum=targets.reduce((num,target)=>num+get.effect(target,card,player,player),0);
 					if(max==-1){
 						if(game.filterPlayer(target=>{
-							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
+							return lib.filter.targetEnabled2(card,player,target)/*&&lib.filter.targetInRange(card,player,target)*/;
 						}).reduce((num,target)=>num+get.effect(target,card,player,player),0)>sum) return 0;
 					}
 					return sum;
@@ -217,7 +217,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const cardx=new lib.element.VCard({name:get.name(card,player),nature:get.nature(card,player),cards:cards});
 					const {result:{bool,targets}}=await player.chooseTarget((card,player,target)=>{
 						//return player.canUse(get.event('cardx'),target);
-						return lib.filter.targetEnabled2(get.event('cardx'),player,target)&&lib.filter.targetInRange(get.event('cardx'),player,target);
+						return lib.filter.targetEnabled2(get.event('cardx'),player,target)/*&&lib.filter.targetInRange(get.event('cardx'),player,target)*/;
 					},true).set('cardx',cardx).set('selectTarget',[1,cards.length])
 					.set('prompt','请选择'+(game.hasNature(cardx)?get.translation(get.nature(cardx)):'')+'【'+get.translation(cardx)+'】（'+get.translation(cards)+'）的目标')
 					.set('ai',target=>{
@@ -11391,7 +11391,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starxiaoyan:'硝焰',
 			starxiaoyan_info:'锁定技，游戏开始时，你对所有其他角色各造成1点火属性伤害，然后这些角色可依次交给你一张牌并回复1点体力。',
 			starzongshi:'纵势',
-			starzongshi_info:'出牌阶段，你可以展示一张可展示目标的基本牌或普通锦囊牌，然后你将手牌中所有与此牌花色相同的其他牌当作此牌使用，且此牌至多指定转化牌数的目标。',
+			starzongshi_info:'出牌阶段，你可以展示一张可展示目标的基本牌或普通锦囊牌，然后你将手牌中所有与此牌花色相同的其他牌当作此牌使用（无距离限制），且此牌至多指定转化牌数的目标。',
 			starjiaowang:'骄妄',
 			starjiaowang_info:'锁定技，非首轮游戏开始时，若上一轮没有角色死亡（因〖硝焰〗死亡的角色除外），则你失去1点体力并发动〖硝焰〗。',
 			staraoshi:'傲势',
