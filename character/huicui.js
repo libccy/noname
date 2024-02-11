@@ -3029,11 +3029,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
-					if(player.getStorage('dcgue').includes(_status.currentPhase)) return false;
+					if(player.hasSkill('dcgue_blocker',null,null,false)) return false;
 					return name=='sha'||name=='shan';
 				},
 				filter:function(event,player){
-					//if(event.dcgue||event.type=='wuxie'||player==_status.currentPhase||player.getStorage('dcgue').includes(_status.currentPhase)) return false;
 					if(event.dcgue||event.type=='wuxie'||player==_status.currentPhase) return false;
 					if(!player.countCards('h')||player.hasSkill('dcgue_blocker',null,null,false)) return false;
 					for(var name of ['sha','shan']){
@@ -3077,7 +3076,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									delete evt.openskilldialog;
 									return;
 								}
-								//else player.markAuto('dcgue',[_status.currentPhase]);
 								game.delayx();
 							},
 						}
@@ -3087,14 +3085,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				subSkill:{blocker:{charlotte:true}},
-				//intro:{content:'已于$的回合发动过技能'},
 				ai:{
 					order:1,
 					respondSha:true,
 					respondShan:true,
-					skillTagFilter:function(player,tag,arg){
-						//if(player.getStorage('dcgue').includes(_status.currentPhase)) return false;
-						if(player.countCards('h',{name:['sha','shan']})>1) return false;
+					skillTagFilter:function(player){
+						if(player.hasSkill('dcgue_blocker',null,null,false)) return false;
 					},
 					result:{
 						player:function(player){
@@ -11983,7 +11979,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqinghuang_info:'出牌阶段开始时，你可以减1点体力上限，然后你于本回合发动〖踏寂〗时额外随机执行一种效果。',
 			dc_huojun:'霍峻',
 			dcgue:'孤扼',
-			dcgue_info:'每回合限一次。当你需要使用或打出【杀】或【闪】时，若你有手牌，你可以展示之。若其中【杀】和【闪】的数量之和不超过1，你视为使用或打出此牌。',
+			dcgue_info:'每回合限一次。当你需要于回合外使用或打出【杀】或【闪】时，若你有手牌，你可以展示之。若其中【杀】和【闪】的数量之和不超过1，你视为使用或打出此牌。',
 			dcsigong:'伺攻',
 			dcsigong_info:'其他角色的回合结束时，若其于本回合内使用牌被响应过，你可以将手牌摸至或弃置至1，视为对其使用一张需使用X张【闪】抵消的【杀】，且此【杀】的伤害基数+1（X为你以此法弃置的牌数且至少为1）。当你以此法造成伤害后，该技能于本轮失效。',
 			peiyuanshao:'裴元绍',
