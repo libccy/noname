@@ -7749,7 +7749,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guanqiujian:['guanqiujian','re_guanqiujian','tw_guanqiujian','old_guanqiujian'],
 			chendao:['chendao','ns_chendao','old_chendao'],
 			zhugezhan:['zhugezhan','old_zhugezhan'],
-			ol_lusu:['re_lusu','ol_lusu'],
+			ol_lusu:['re_lusu','ol_lusu','dc_sb_lusu'],
 			zhanghe:['zhanghe','re_zhanghe','sb_zhanghe'],
 			yl_luzhi:['yl_luzhi','sb_yl_luzhi','tw_yl_luzhi'],
 			sunliang:['sunliang','xin_sunliang'],
