@@ -123,7 +123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter(event,player){
-					return player.getDiscardableCards(player,'h').some(card=>!player.getStorage('dcfuli').includes(get.type2(card)));
+					return player.countDiscardableCards(player,'h');
 				},
 				usable:1,
 				async content(event,trigger,player){
@@ -133,11 +133,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(num===-1) num=3;
 						return num;
 					};
-					const types=player.getDiscardableCards(player,'h').filter(card=>{
-						return !player.getStorage('dcfuli').includes(get.type2(card));
-					}).reduce((list,card)=>list.add(get.type2(card)),[]).sort((a,b)=>{
-						return getNum(a)-getNum(b);
-					});
+					const types=player.getDiscardableCards(player,'h').reduce((list,card)=>{
+						return list.add(get.type2(card));
+					},[]).sort((a,b)=>getNum(a)-getNum(b));
 					if(types.length){
 						const {result:{control}}=await player.chooseControl(types).set('ai',()=>{
 							const player=get.event('player'),types=get.event('controls').slice();
@@ -158,10 +156,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							})[0];
 						}).set('prompt','弃置一种类别的所有手牌，然后摸这些牌的名字字数之和的牌');
 						if(control){
-							if(!player.storage.dcfuli){
-								player.when({global:'phaseAfter'}).then(()=>delete player.storage.dcfuli);
-							}
-							player.markAuto('dcfuli',[control]);
 							const cards=player.getDiscardableCards(player,'h').filter(card=>get.type2(card)==control);
 							await player.discard(cards);
 							const max=game.findPlayer(target=>target.isMaxHandcard()).countCards('h');
@@ -191,7 +185,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:1,
 					result:{
 						player(player){
-							const types=player.getDiscardableCards(player,'h').filter(card=>!player.getStorage('dcfuli').includes(get.type2(card)));
+							const types=player.getDiscardableCards(player,'h').reduce((list,card)=>{
+								return list.add(get.type2(card));
+							},[]);
 							if(!types.some(type=>{
 								const cards=player.getDiscardableCards(player,'h').filter(card=>get.type2(card)==type);
 								const countCards=(target,player,cards)=>{
@@ -12114,7 +12110,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshoucheng_info:'一名角色于其回合外失去最后的手牌后，你可令其摸两张牌。',
 			dc_liuli:'刘理',
 			dcfuli:'抚黎',
-			dcfuli_info:'出牌阶段限一次，你可以展示手牌并弃置一种类别的所有手牌（每种类别每回合限一次），然后摸X张牌（X为这些牌的牌名字数和且X至多为场上手牌数最多的角色的手牌数）。若你因此弃置了伤害类卡牌，则你可以选择一名角色，令其攻击范围-1直到你的下个回合开始。',
+			dcfuli_info:'出牌阶段限一次，你可以展示手牌并弃置一种类别的所有手牌，然后摸X张牌（X为这些牌的牌名字数和且X至多为场上手牌数最多的角色的手牌数）。若你因此弃置了伤害类卡牌，则你可以选择一名角色，令其攻击范围-1直到你的下个回合开始。',
 			dcdehua:'德化',
 			dcdehua_info:'锁定技。①一轮游戏开始时，若有你可以使用的非延时类伤害类牌的牌名，你选择其中一个并视为使用之，然后你不能从手牌中使用此牌名的牌，然后若你已选择过所有的伤害类牌牌名，你失去〖德化〗。②你的手牌上限+Y（Y为你〖德化①〗选择过的牌名数）。',
 
