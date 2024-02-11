@@ -212,7 +212,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				frequent:true,
 				async content(event,trigger,player){
-					let cards=get.cards(3,true);
+					let cards=get.cards(3);
 					const {result:{bool,links}}=await player.chooseButton(['灵慧：是否使用其中的一张牌并随机获得其中一张剩余牌？',cards]).set('ai',button=>{
 						return get.event('player').getUseValue(button.link);
 					});
@@ -224,6 +224,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						await player.chooseUseTarget(true,card,false);
 						if(cards.length) await player.gain(cards.randomGet(),'gain2');
 					}
+					if(cards.length){
+						for(let i=cards.length-1;i--;i>=0){
+							ui.cardPile.insertBefore(cards[i],ui.cardPile.firstChild);
+						}
+					}
+					game.updateRoundNumber();
 				},
 			},
 			dcxiace:{

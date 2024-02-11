@@ -123,7 +123,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter(event,player){
-					return player.getDiscardableCards(player,'h').some(card=>!player.getStorage('dcfuli').includes(get.type2(card)));
+					return player.countDiscardableCards(player,'h');
 				},
 				usable:1,
 				async content(event,trigger,player){
@@ -133,11 +133,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(num===-1) num=3;
 						return num;
 					};
-					const types=player.getDiscardableCards(player,'h').filter(card=>{
-						return !player.getStorage('dcfuli').includes(get.type2(card));
-					}).reduce((list,card)=>list.add(get.type2(card)),[]).sort((a,b)=>{
-						return getNum(a)-getNum(b);
-					});
+					const types=player.getDiscardableCards(player,'h').reduce((list,card)=>{
+						return list.add(get.type2(card));
+					},[]).sort((a,b)=>getNum(a)-getNum(b));
 					if(types.length){
 						const {result:{control}}=await player.chooseControl(types).set('ai',()=>{
 							const player=get.event('player'),types=get.event('controls').slice();
@@ -158,10 +156,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							})[0];
 						}).set('prompt','弃置一种类别的所有手牌，然后摸这些牌的名字字数之和的牌');
 						if(control){
-							if(!player.storage.dcfuli){
-								player.when({global:'phaseAfter'}).then(()=>delete player.storage.dcfuli);
-							}
-							player.markAuto('dcfuli',[control]);
 							const cards=player.getDiscardableCards(player,'h').filter(card=>get.type2(card)==control);
 							await player.discard(cards);
 							const max=game.findPlayer(target=>target.isMaxHandcard()).countCards('h');
@@ -191,7 +185,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:1,
 					result:{
 						player(player){
-							const types=player.getDiscardableCards(player,'h').filter(card=>!player.getStorage('dcfuli').includes(get.type2(card)));
+							const types=player.getDiscardableCards(player,'h').reduce((list,card)=>{
+								return list.add(get.type2(card));
+							},[]);
 							if(!types.some(type=>{
 								const cards=player.getDiscardableCards(player,'h').filter(card=>get.type2(card)==type);
 								const countCards=(target,player,cards)=>{
@@ -1173,14 +1169,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return _status.currentPhase;
 				},
 				prompt2:function(event,player){
-					const num=player.hasSkill('dccaisi_more')?2:1;
+					const num=player.countMark('dccaisi_more')+1;
 					return `从${player==_status.currentPhase?'牌堆':'弃牌'}堆中随机获得${get.cnNumber(num)}张非基本牌`;
 				},
 				content:function*(event,map){
 					const player=map.player,trigger=map.trigger;
 					const position=player==_status.currentPhase?'cardPile':'discardPile';
-					let cards=[],num=player.hasSkill('dccaisi_more')?2:1;
-					player.removeSkill('dccaisi_more');
+					let cards=[],num=player.countMark('dccaisi_more')+1;
 					while(num>0){
 						num--;
 						let card=get[position](card=>get.type(card)!='basic'&&!cards.includes(card));
@@ -1193,8 +1188,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.log(`但是${position=='discardPile'?'弃':''}牌堆里没有非基本牌！`);
 					}
 					player.addTempSkill('dccaisi_more');
+					player.addMark('dccaisi_more',1,false);
 				},
-				subSkill:{more:{charlotte:true}},
+				subSkill:{more:{charlotte:true,onremove:true}},
 			},
 			dczhuoli:{
 				audio:2,
@@ -3033,11 +3029,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:['chooseToUse','chooseToRespond'],
 				hiddenCard:function(player,name){
-					if(player.getStorage('dcgue').includes(_status.currentPhase)) return false;
+					if(player.hasSkill('dcgue_blocker',null,null,false)) return false;
 					return name=='sha'||name=='shan';
 				},
 				filter:function(event,player){
-					//if(event.dcgue||event.type=='wuxie'||player==_status.currentPhase||player.getStorage('dcgue').includes(_status.currentPhase)) return false;
 					if(event.dcgue||event.type=='wuxie'||player==_status.currentPhase) return false;
 					if(!player.countCards('h')||player.hasSkill('dcgue_blocker',null,null,false)) return false;
 					for(var name of ['sha','shan']){
@@ -3081,7 +3076,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									delete evt.openskilldialog;
 									return;
 								}
-								//else player.markAuto('dcgue',[_status.currentPhase]);
 								game.delayx();
 							},
 						}
@@ -3091,14 +3085,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				subSkill:{blocker:{charlotte:true}},
-				//intro:{content:'已于$的回合发动过技能'},
 				ai:{
 					order:1,
 					respondSha:true,
 					respondShan:true,
-					skillTagFilter:function(player,tag,arg){
-						//if(player.getStorage('dcgue').includes(_status.currentPhase)) return false;
-						if(player.countCards('h',{name:['sha','shan']})>1) return false;
+					skillTagFilter:function(player){
+						if(player.hasSkill('dcgue_blocker',null,null,false)) return false;
 					},
 					result:{
 						player:function(player){
@@ -11987,7 +11979,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqinghuang_info:'出牌阶段开始时，你可以减1点体力上限，然后你于本回合发动〖踏寂〗时额外随机执行一种效果。',
 			dc_huojun:'霍峻',
 			dcgue:'孤扼',
-			dcgue_info:'每回合限一次。当你需要使用或打出【杀】或【闪】时，若你有手牌，你可以展示之。若其中【杀】和【闪】的数量之和不超过1，你视为使用或打出此牌。',
+			dcgue_info:'每回合限一次。当你需要于回合外使用或打出【杀】或【闪】时，若你有手牌，你可以展示之。若其中【杀】和【闪】的数量之和不超过1，你视为使用或打出此牌。',
 			dcsigong:'伺攻',
 			dcsigong_info:'其他角色的回合结束时，若其于本回合内使用牌被响应过，你可以将手牌摸至或弃置至1，视为对其使用一张需使用X张【闪】抵消的【杀】，且此【杀】的伤害基数+1（X为你以此法弃置的牌数且至少为1）。当你以此法造成伤害后，该技能于本轮失效。',
 			peiyuanshao:'裴元绍',
@@ -12063,7 +12055,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshizong_info:'当你需要使用一张基本牌时，你可以交给一名其他角色X张牌，然后其可以将一张牌置于牌堆底，视为你使用之。若其不为当前回合角色，此技能失效直到回合结束（X为你本回合发动〖恃纵〗的次数）。',
 			pangshanmin:'庞山民',
 			dccaisi:'才思',
-			dccaisi_info:'当你于回合内/回合外使用基本牌结算结束后，若你本回合以此法得到的牌数小于你的体力上限，你可以从牌堆/弃牌堆随机获得一张非基本牌，然后本回合下次发动此技能获得的牌数+1。',
+			dccaisi_info:'当你于回合内/回合外使用基本牌结算结束后，若你本回合以此法得到的牌数小于你的体力上限，你可以从牌堆/弃牌堆随机获得一张非基本牌，然后本回合发动此技能获得的牌数+1。',
 			dczhuoli:'擢吏',
 			dczhuoli_info:'锁定技。一名角色的回合结束时，若你本回合使用或获得的牌数大于体力值，你加1点体力上限（不能超过存活角色数），回复1点体力。',
 			yue_caiyong:'乐蔡邕',
@@ -12114,7 +12106,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshoucheng_info:'一名角色于其回合外失去最后的手牌后，你可令其摸两张牌。',
 			dc_liuli:'刘理',
 			dcfuli:'抚黎',
-			dcfuli_info:'出牌阶段限一次，你可以展示手牌并弃置一种类别的所有手牌（每种类别每回合限一次），然后摸X张牌（X为这些牌的牌名字数和且X至多为场上手牌数最多的角色的手牌数）。若你因此弃置了伤害类卡牌，则你可以选择一名角色，令其攻击范围-1直到你的下个回合开始。',
+			dcfuli_info:'出牌阶段限一次，你可以展示手牌并弃置一种类别的所有手牌，然后摸X张牌（X为这些牌的牌名字数和且X至多为场上手牌数最多的角色的手牌数）。若你因此弃置了伤害类卡牌，则你可以选择一名角色，令其攻击范围-1直到你的下个回合开始。',
 			dcdehua:'德化',
 			dcdehua_info:'锁定技。①一轮游戏开始时，若有你可以使用的非延时类伤害类牌的牌名，你选择其中一个并视为使用之，然后你不能从手牌中使用此牌名的牌，然后若你已选择过所有的伤害类牌牌名，你失去〖德化〗。②你的手牌上限+Y（Y为你〖德化①〗选择过的牌名数）。',
 
