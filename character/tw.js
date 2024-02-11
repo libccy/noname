@@ -2021,80 +2021,103 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			//刘繇
-			twniju: {
-				unique: true,
-				audio: 2,
-				zhuSkill: true,
-				trigger: { player: 'compare', target: 'compare' },
-				filter: function (event, player) {
-					return !event.iwhile && player.hasZhuSkill('twniju');
+			twniju:{
+				audio:2,
+				zhuSkill:true,
+				trigger:{
+					global:'compare',
 				},
-				direct: true,
-				content: function () {
-					'step 0'
-					var list = ['我加', '他加', '我减', '他减', 'cancel2'];
-					player.chooseControl(list).set('prompt', get.prompt2('twniju')).set('ai', function () { return ['我加', '他减'].randomGet() });
-					'step 1'
-					if (result.control != 'cancel2') {
-						player.logSkill('twniju');
-						var num = game.countPlayer(function (current) {
-							return current.group == 'qun';
-						});
-						event.num = num;
-						switch (result.control) {
-							case '我加':
-								player.popup('+', num);
-								if (player == trigger.player) {
-									trigger.num1 += num;
-									if (trigger.num1 > 13) trigger.num1 = 13;
+				priority:1,
+				filter(event,player){
+					if(!player.hasZhuSkill('twniju')) return false;
+					if(event.iwhile||(event.target&&event.compareMeanwhile)) return false;
+					return true;
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const num=game.countPlayer(current=>current.group==='qun');
+					const dialog=[
+						get.prompt('twniju'),
+						`<div class="text center">令一张拼点牌的点数+${num}或-${num}</div>`,
+						[[
+							['addNumber','增加'],
+							['subtractNumber','减少']
+						],'tdnodes'],
+					];
+					const lose_list=trigger.lose_list.slice().sort((a,b)=>lib.sort.seat(a[0],b[0]));
+					dialog.push(`<div class="text center">${lose_list.map(list=>{
+						return get.translation(list[0]);
+					}).join('　 / 　')}</div>`);
+					const cards=lose_list.map(list=>list[1]).flat();
+					dialog.push(cards);
+					const result=await player.chooseButton(dialog,2)
+						.set('filterButton',button=>{
+							const type=typeof button.link;
+							if(ui.selected.buttons.length&&type===typeof ui.selected.buttons[0].link) return false;
+							return true;
+						})
+						.forResult()
+					if(!result.bool) return;
+					const {links}=result;
+					if(typeof links[0]!=='string') links.reverse();
+					let [fn,card]=links;
+					const selectedPlayer=lose_list[cards.indexOf(card)][0];
+					player.logSkill('twniju',selectedPlayer);
+					selectedPlayer.addTempSkill('twniju_change');
+					if(!selectedPlayer.storage.twniju_change) selectedPlayer.storage.twniju_change=[];
+					selectedPlayer.storage.twniju_change.push([fn,num,card]);
+					player.when('chooseToCompareAfter')
+						.filter(evt=>evt===trigger)
+						.vars({
+							toDraw:num,
+						})
+						.then(()=>{
+							const num1=trigger.result.num1,num2=trigger.result.num2;
+							let bool=false;
+							if(typeof num1==='number'&&typeof num2==='number'){
+								if(num1===num2){
+									bool=true;
 								}
-								else {
-									trigger.num2 += num;
-									if (trigger.num2 > 13) trigger.num2 = 13;
+							}
+							else{
+								const num1List=num1.toUniqued();
+								const totalList=num1List.concat(num2).toUniqued();
+								if(totalList.length<num1List.length+num2.length){
+									bool=true;
 								}
-								game.log(player, '的拼点牌点数+', num);
-								break;
-							case '他加':
-								trigger.target.popup('+', num);
-								if (player == trigger.player) {
-									trigger.num2 += num;
-									if (trigger.num2 > 13) trigger.num2 = 13;
-								}
-								else {
-									trigger.num1 += num;
-									if (trigger.num1 > 13) trigger.num1 = 13;
-								}
-								game.log(trigger.target, '的拼点牌点数+', num);
-								break;
-							case '我减':
-								player.popup('-', num);
-								if (player == trigger.player) {
-									trigger.num1 -= num;
-									if (trigger.num1 < 1) trigger.num1 = 1;
-								}
-								else {
-									trigger.num2 -= num;
-									if (trigger.num2 < 1) trigger.num2 = 1;
-								}
-								game.log(player, '的拼点牌点数-', num);
-								break;
-							case '他减':
-								trigger.target.popup('-', num);
-								if (player == trigger.player) {
-									trigger.num2 -= num;
-									if (trigger.num2 < 1) trigger.num2 = 1;
-								}
-								else {
-									trigger.num1 -= num;
-									if (trigger.num1 < 1) trigger.num1 = 1;
-								}
-								game.log(trigger.target, '的拼点牌点数-', num);
-								break;
+							}
+							if(bool) player.draw(toDraw);
+						})
+				},
+				subSkill:{
+					change:{
+						trigger:{global:'compare'},
+						filter(event,player){
+							const storage=player.getStorage('twniju_change');
+							if(!storage.length) return false;
+							if((player!==event.player||event.iwhile)&&player!==event.target) return false;
+							return event.lose_list.some(list=>{
+								const cards=Array.isArray(list[1])?list[1]:[list[1]];
+								return list[0]===player&&storage.some(s=>cards.includes(s[2]));
+							});
+						},
+						charlotte:true,
+						forced:true,
+						silent:true,
+						async content(event,trigger,player){
+							const [fn,num]=player.getStorage('twniju_change').find(s=>{
+								return trigger.lose_list.some(list=>{
+									const cards=Array.isArray(list[1])?list[1]:[list[1]];
+									return list[0]===player&&cards.includes(s[2]);
+								});
+							});
+							const numId=player===trigger.player?'num1':'num2';
+							trigger[fn](numId,num);
+							if(trigger[numId]>13) trigger[numId]=13;
+							else if(trigger[numId]<1) trigger[numId]=1;
+							game.log(player,'的拼点牌点数',fn==='addNumber'?'+':'-',num);
 						}
-					}
-					else event.finish();
-					'step 2'
-					if (trigger.num1 == trigger.num2) player.draw(num);
+					},
 				},
 			},
 			//刘虞
@@ -15952,7 +15975,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twzhuiting:'坠廷',
 			twzhuiting_info:'主公技，当一张锦囊牌即将对你生效时，其他魏势力角色和群势力角色可将一张与此牌颜色相同的牌当作【无懈可击】使用。',
 			twniju:'逆拒',
-			twniju_info:'主公技，当你的拼点牌亮出后，你可以令其中一张拼点牌的点数+X或-X，然后若这两张牌的点数相等，你摸X张牌（X为场上群势力角色数）。',
+			twniju_info:'主公技。当你的拼点牌亮出后，你可以令本次拼点事件中的一张拼点牌的点数+X或-X。然后当本次拼点事件结束后，若有两张拼点牌的点数相等，你摸X张牌（X为场上群势力角色数）。',
 			ol_liuyu:'TW刘虞',
 			ol_liuyu_prefix:'TW',
 			twchongwang:'崇望',
