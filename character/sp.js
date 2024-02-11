@@ -7296,7 +7296,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							complexSelect:true,
 							ai1(card){
 								const player=get.event('player');
-								if(!game.hasPlayer(current=>current!=player&&get.attitude(player,current)>0&&!current.hasSkillTag('nogain'))) return -get.value(card);
+								if(!game.hasPlayer(current=>{
+									if(get.event('selectedTargets').includes(current)) return false;
+									return current!=player&&get.attitude(player,current)>0&&!current.hasSkillTag('nogain');
+								})) return -get.value(card);
 								return 4+((player.hasSkill('olmingzhe')&&get.color(card)=='red')?2:0)-Math.max(player.getUseValue(card),get.value(card,player));
 							},
 							ai2(target){
