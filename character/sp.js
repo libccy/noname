@@ -7273,63 +7273,50 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olhongyuan:{
 				audio:'hongyuan',
-				trigger:{
-					player:'gainAfter',
-					global:'loseAsyncAfter',
+				trigger:{player:'gainAfter',global:'loseAsyncAfter'},
+				filter(event,player){
+					if(!player.countCards('he')||player.hasSkill('olhongyuan_blocker',null,null,false)) return false;
+					return event.getg(player).length>=2;
 				},
-				direct:true,
-				filter:function(event,player){
-					var cards=event.getg(player);
-					return cards.length>=2&&!player.hasSkill('olhongyuan_blocker',null,null,false);
-				},
-				content:function(){
-					'step 0'
-					var max=Math.min(2,game.countPlayer()-1,player.countCards('he'));
-					player.chooseCardTarget({
-						prompt:get.prompt('olhongyuan'),
-						prompt2:'操作提示：按顺序选择任意张要交出的牌，并按任意顺序选择等量的获得牌的角色',
-						filterCard:true,
-						selectCard:[1,max],
-						position:'he',
-						filterTarget:lib.filter.notMe,
-						selectTarget:[1,max],
-						filterOk:function(){
-							return ui.selected.cards.length==ui.selected.targets.length;
-						},
-						ai1:function(card){
-							var player=_status.event.player;
-							var num=game.countPlayer(function(current){
-								return current!=player&&get.attitude(player,current)>0&&!current.hasSkillTag('nogain');
-							});
-							if(num<=ui.selected.cards.length) return -get.value(card);
-							if(!player.hasSkill('olmingzhe')) return 4-Math.max(player.getUseValue(card),get.value(card,player));
-							if(ui.selected.cards.length&&get.color(card)=='red') return 6-get.value(card);
-							return 4-Math.max(player.getUseValue(card),get.value(card,player));
-						},
-						ai2:function(target){
-							var player=_status.event.player,att=get.attitude(player,target);
-							var card=ui.selected.cards[ui.selected.targets.length];
-							if(!card) return att;
-							var val=get.value(card,target);
-							if(val<0) return -att*Math.sqrt(-val);
-							return att*Math.sqrt(val+2);
-						},
-					});
-					'step 1'
-					if(result.bool){
-						player.logSkill('olhongyuan',result.targets);
-						player.addTempSkill('olhongyuan_blocker',['phaseZhunbeiBefore','phaseJudgeBefore','phaseDrawBefore','phaseUseBefore','phaseDiscardBefore','phaseJieshuBefore','phaseBefore']);
-						var map=[];
-						for(var i=0;i<result.cards.length;i++){
-							map.push([result.targets[i],[result.cards[i]]]);
+				async content(event,trigger,player){
+					player.addTempSkill('olhongyuan_blocker',['phaseZhunbeiBefore','phaseJudgeBefore','phaseDrawBefore','phaseUseBefore','phaseDiscardBefore','phaseJieshuBefore','phaseBefore']);
+					let selectedTargets=[];
+					while(selectedTargets.length<2&&player.countCards('he')&&game.hasPlayer(target=>{
+						return target!=player&&!selectedTargets.includes(target);
+					})){
+						const {result:{bool,targets,cards}}=await player.chooseCardTarget({
+							prompt:'弘援：将一张牌交给一名其他角色',
+							filterCard:true,
+							position:'he',
+							filterTarget(card,player,target){
+								return target!=player&&!get.event('selectedTargets').includes(target);
+							},
+							complexCard:true,
+							complexTarget:true,
+							complexSelect:true,
+							ai1(card){
+								const player=get.event('player');
+								if(!game.hasPlayer(current=>{
+									if(get.event('selectedTargets').includes(current)) return false;
+									return current!=player&&get.attitude(player,current)>0&&!current.hasSkillTag('nogain');
+								})) return -get.value(card);
+								return 4+((player.hasSkill('olmingzhe')&&get.color(card)=='red')?2:0)-Math.max(player.getUseValue(card),get.value(card,player));
+							},
+							ai2(target){
+								const player=_status.event.player,att=get.attitude(player,target);
+								if(!ui.selected.cards.length) return att;
+								const card=ui.selected.cards[0],val=get.value(card,target);
+								if(val<0) return -att*Math.sqrt(-val);
+								return att*Math.sqrt(val+2);
+							},
+						}).set('selectedTargets',selectedTargets);
+						if(bool){
+							const target=targets[0];
+							selectedTargets.push(target);
+							player.line(target);
+							await player.give(cards,target);
 						}
-						game.loseAsync({
-							gain_list:map,
-							player:player,
-							cards:result.cards,
-							giver:player,
-							animate:'giveAuto',
-						}).setContent('gaincardMultiple');
+						else break;
 					}
 				},
 				ai:{threaten:0.8},
