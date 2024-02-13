@@ -490,6 +490,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=game.filterPlayer().reduce((list,target)=>list.add(target.group),[]);
 						list.sort((a,b)=>lib.group.indexOf(a)-lib.group.indexOf(b));
 						list.forEach(group=>lib.skill.starcanxi.create(group,player));
+						event.finish();
+						return;
 					}
 					'step 1'
 					var groups=player.getSkills().filter(skill=>skill.indexOf('starcanxi_')==0);
@@ -11372,7 +11374,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starcanxi_wangsheng:'妄生',
 			starcanxi_xiangsi:'向死',
 			starcanxi_cancel:'向死',
-			starcanxi_info:'锁定技。游戏开始时，你获得场上所有角色的势力对应的“玺角”标记，然后选择一个“玺角”对应势力并选择以下一项；一轮开始时，你选择一个“玺角”对应势力并选择以下一项：①妄生：本轮被选择势力角色每回合首次造成的伤害+1且计算与其他角色间的距离-1；②向死：本轮其他被选择势力角色每回合首次回复体力后失去1点体力且每回合对你使用的第一张牌无效。',
+			starcanxi_info:'锁定技。①游戏开始时，你获得场上所有角色的势力对应的“玺角”标记。②一轮游戏开始时，你选择一个“玺角”对应势力并选择以下一项：1.妄生：本轮被选择势力角色每回合首次造成的伤害+1且计算与其他角色间的距离-1；2.向死：本轮其他被选择势力角色每回合首次回复体力后失去1点体力且每回合对你使用的第一张牌无效。',
 			starpizhi:'圮秩',
 			starpizhi_info:'锁定技。①一名角色死亡后，若你拥有该角色对应的“玺角”标记且你本轮发动〖向死〗的势力与其相同，你失去之并摸X张牌。②结束阶段，你摸X张牌。（X为你本局游戏失去的“玺角”标记数）',
 			starzhonggu:'冢骨',
