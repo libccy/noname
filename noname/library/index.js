@@ -47,14 +47,37 @@ export class Library extends Uninstantable {
 	static connectBanned = [];
 	static characterIntro = {};
 	static characterTitle = {};
-	static characterPack = {};
+	static characterPack = new Proxy({}, {
+		set(target, prop, newValue) {
+			if (typeof prop == 'string') {
+				// 新增武将包，且不是“收藏”和“禁用”
+				if (!['mode_favourite', 'mode_banned'].includes(prop) && !Reflect.has(target, prop)) {
+					Promise.resolve().then(() => {
+						ui.updateCharacterPackMenu.forEach(fun => fun(prop));
+					});
+				}
+			}
+			return Reflect.set(target, prop, newValue);
+		}
+	});
 	static characterFilter = {};
 	static characterSort = {};
 	static characterReplace = {};
 	static characterInitFilter = {};
 	static characterGuozhanFilter = ["mode_guozhan"];
 	static dynamicTranslate = {};
-	static cardPack = {};
+	static cardPack = new Proxy({}, {
+		set(target, prop, newValue) {
+			if (typeof prop == 'string') {
+				if (!Reflect.has(target, prop)) {
+					Promise.resolve().then(() => {
+						ui.updateCardPackMenu.forEach(fun => fun(prop));
+					});
+				}
+			}
+			return Reflect.set(target, prop, newValue);
+		}
+	});
 	/**
 	 * @type { SMap<number> }
 	 */

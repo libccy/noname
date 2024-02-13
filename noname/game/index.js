@@ -4379,7 +4379,16 @@ export class Game extends Uninstantable {
 					}
 				}
 				if (lib[i][j] == undefined) {
-					lib[i][j] = pack[i][j];
+					// 判断扩展武将包是否开启
+					if (i == 'character') {
+						// if (!game.hasExtension(extname) || !game.hasExtensionLoaded(extname)) continue;
+						if (lib.config[`extension_${extname}_characters_enable`] === undefined) {
+							game.saveExtensionConfig(extname, 'characters_enable', true);
+						}
+						if (lib.config[`extension_${extname}_characters_enable`] === true) {
+							lib[i][j] = pack[i][j];
+						}
+					} else lib[i][j] = pack[i][j];
 				}
 			}
 		}
@@ -4482,7 +4491,18 @@ export class Game extends Uninstantable {
 						pack[i][j].audio = 'ext:' + extname + ':' + pack[i][j].audio;
 					}
 				}
-				if (lib[i][j] == undefined) lib[i][j] = pack[i][j];
+				if (lib[i][j] == undefined) {
+					// 判断扩展卡牌包是否开启
+					if (i == 'card') {
+						// if (!game.hasExtension(extname) || !game.hasExtensionLoaded(extname)) continue;
+						if (lib.config[`extension_${extname}_cards_enable`] === undefined) {
+							game.saveExtensionConfig(extname, 'cards_enable', true);
+						}
+						if (lib.config[`extension_${extname}_cards_enable`] === true) {
+							lib[i][j] = pack[i][j];
+						}
+					} else lib[i][j] = pack[i][j];
+				}
 			}
 		}
 	}
