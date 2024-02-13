@@ -1753,8 +1753,7 @@ export class Game extends Uninstantable {
 	static import(type, content, url) {
 		if (type == 'extension') {
 			const promise = game.loadExtension(content).then((name) => {
-				if (typeof _status.extensionLoaded == "undefined")
-					_status.extensionLoaded = [];
+				if (typeof _status.extensionLoaded == "undefined") _status.extensionLoaded = [];
 				_status.extensionLoaded.add(name);
 				return name;
 			});
