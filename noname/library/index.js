@@ -7883,7 +7883,11 @@ export class Library extends Uninstantable {
 								var icon = document.createElement("span");
 								var className = "cm-completionIcon cm-completionIcon-";
 								if (obj) {
-									const type = typeof obj[text];
+									// 解决访问caller报错等问题
+									let type;
+									try {
+										type = typeof obj[text];
+									} catch {}
 									if (type == 'function') {
 										className += 'function';
 									}

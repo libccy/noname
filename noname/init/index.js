@@ -301,8 +301,7 @@ export async function boot() {
 		}
 	}
 
-	if (!config.get('gameRecord'))
-		config.set('gameRecord', {});
+	if (!config.get('gameRecord')) config.set('gameRecord', {});
 	for (const name in pack.mode) {
 		if (config.get('hiddenModePack').indexOf(name) == -1) {
 			config.get('all').mode.push(name);
@@ -435,11 +434,8 @@ export async function boot() {
 				extensionlist.push(config.get('plays')[name]);
 			}
 		}
-		var alerted = false;
 		for (var name = 0; name < config.get('extensions').length; name++) {
 			if (Reflect.get(window, 'bannedExtensions').includes(config.get('extensions')[name])) {
-				//if(!alerted) alert('读取某些扩展时出现问题。');
-				alerted = true;
 				continue;
 			}
 			var extcontent = localStorage.getItem(lib.configprefix + 'extension_' + config.get('extensions')[name]);
@@ -462,11 +458,8 @@ export async function boot() {
 	}
 	else {
 		if (config.get('mode') != 'connect' || (!localStorage.getItem(lib.configprefix + 'directstart') && show_splash)) {
-			var alerted = false;
 			for (var name = 0; name < config.get('extensions').length; name++) {
 				if (Reflect.get(window, 'bannedExtensions').includes(config.get('extensions')[name])) {
-					//if(!alerted) alert('读取某些扩展时出现问题。');
-					alerted = true;
 					continue;
 				}
 				// @ts-ignore
