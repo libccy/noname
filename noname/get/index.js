@@ -2251,7 +2251,11 @@ export class Get extends Uninstantable {
 		}
 
 		numStr = numStr.replace(/(?=(\d{4})+$)/g, ',').split(',').filter(Boolean);
-		const handleZero = str => str.replace(/零{2,}/g, '零').replace(/(?<=.+)零+$/g, '');
+		const handleZero = str => {
+			let result = str.replace(/零{2,}/g, '零');
+			if (result.length > 1) replace(/零+$/g, '');
+			return result;
+		};
 		const _transform = str => {
 			if (str === '2' && !ordinal) return '两';
 			let result = '';
