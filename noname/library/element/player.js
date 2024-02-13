@@ -7189,6 +7189,22 @@ export class Player extends HTMLDivElement {
 		}
 		return skill;
 	}
+	addSkills(skill){
+		if(!skill) return;
+		return this.changeSkills(Array.isArray(skill) ? skill : [skill], []);
+	}
+	removeSkills(skill){
+		if(!skill) return;
+		return this.changeSkills([], Array.isArray(skill) ? skill : [skill]);
+	}
+	changeSkills(addSkill = [], removeSkill = []){
+		const next = game.createEvent('changeSkills', false);
+		next.player = this;
+		next.addSkill = addSkill.unique();
+		next.removeSkill = removeSkill.unique();
+		next.setContent('changeSkills');
+		return next;
+	}
 	addSkill(skill, checkConflict, nobroadcast, addToSkills) {
 		if (Array.isArray(skill)) {
 			_status.event.clearStepCache();

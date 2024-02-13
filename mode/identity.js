@@ -2785,7 +2785,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								return info&&info.zhuSkill;
 							});
 							if(skills.length){
-								for(var i of skills) player.addSkillLog(i);
+								player.addSkills(skills);
 							}
 							game.zhu.node.identity.classList.remove('guessing');
 							if(lib.config.animation&&!lib.config.low_performance) game.zhu.$legend();
@@ -2800,7 +2800,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},game.zhu);
 						game.delay(2);
 						game.zhu.playerfocus(1000);
-						_status.event.trigger('zhuUpdate');
 					}
 
 					if(!_status.over){

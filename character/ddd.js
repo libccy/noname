@@ -4610,7 +4610,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 2'
 					var skill=result.control;
-					player.addSkillLog(skill);
+					player.addSkills(skill);
 				},
 				content_old(){
 					'step 0'
@@ -4648,9 +4648,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.draw(3);
 						}
 						else event.finish();
-						for(var i of skills){
-							player.addSkillLog(i);
-						}
+						player.addSkills(skills);
 					}
 					else event.finish();
 					'step 2'

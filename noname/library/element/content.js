@@ -11,6 +11,26 @@ export const Content = {
 	emptyEvent: () => {
 		event.trigger(event.name);
 	},
+	//变更技能
+	changeSkills: async function (event,trigger,player) {
+		//去重检查
+		event.addSkill.unique();
+		event.removeSkill.unique();
+		const duplicatedSkills = event.addSkill.filter(skill => event.removeSkill.includes(skill));
+		if(duplicatedSkills.length){
+			event.addSkill.removeArray(duplicatedSkills);
+			event.removeSkill.removeArray(duplicatedSkills);
+		}
+		if(!event.addSkill.length&&!event.removeSkill.length) return;
+		//手动触发时机
+		await event.trigger('changeSkillsBefore');
+		await event.trigger('changeSkillsBegin');
+		//处理失去和获得的技能
+		if(event.addSkill.length) player.addSkillLog(event.addSkill);
+		if(event.removeSkill.length) player.removeSkillLog(event.removeSkill);
+		await event.trigger('changeSkillsEnd');
+		await event.trigger('changeSkillsAfter');
+	},
 	//增加明置手牌
 	addShownCards: () => {
 		const hs = player.getCards('h'), showingCards = event._cards.filter(showingCard => hs.includes(showingCard)), shown = player.getShownCards();

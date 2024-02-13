@@ -3498,9 +3498,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					player.recover();
 					'step 1'
-					player.addSkillLog('rejijiang');
-					'step 2'
-					if(player.isZhu2()) event.trigger('zhuUpdate');
+					player.addSkills('rejijiang');
 				}
 			},
 			qiaobian:{

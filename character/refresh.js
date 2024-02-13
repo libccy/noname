@@ -10115,10 +10115,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					'step 1'
 					if(player.hp<3) player.recover(3-player.hp);
-					player.addSkillLog('sishu');
-					player.addSkillLog('rejijiang');
-					'step 2'
-					if(player.isZhu2()) event.trigger('zhuUpdate');
+					player.addSkills(['sishu', 'rejijiang']);
 				}
 			},
 			olfangquan:{

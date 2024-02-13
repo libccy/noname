@@ -18535,16 +18535,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				charlotte:true,
 			},
 			weidi:{
-				trigger:{global:['gameStart','zhuUpdate']},
-				forced:true,
-				audio:2,
-				filter:function(event,player){
-					var mode=get.mode();
-					return (mode=='identity'||(mode=='versus'&&_status.mode=='four'));
-				},
-				content:function(){
-					var list=[];
-					var zhu=get.zhu(player);
+				init(player){
+					const list=[];
+					const zhu=get.zhu(player);
 					if(zhu&&zhu!=player&&zhu.skills){
 						for(var i=0;i<zhu.skills.length;i++){
 							if(lib.skill[zhu.skills[i]]&&lib.skill[zhu.skills[i]].zhuSkill){
@@ -18562,6 +18555,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							info.audioname2.yuanshu='weidi';
 						}
 					},list);
+				},
+				trigger:{global:['gameStart','changeSkills']},
+				forced:true,
+				audio:2,
+				filter:function(event,player){
+					const mode = get.mode();
+					if (mode != 'identity' && (mode != 'versus' || _status.mode != 'four')) return false;
+					const zhu = get.zhu(player);
+					if (!zhu || zhu == player) return false;
+					if(event.name == 'gameStart') return true;
+					return event.player == zhu && (event.addSkill.some(skill => {
+						return lib.skill[skill] && lib.skill[skill].zhuSkill;
+					}) || event.addSkill.some(skill => {
+						return lib.skill[skill] && lib.skill[skill].zhuSkill;
+					}));
+				},
+				async content (event, trigger, player) {
+					lib.skill.weidi.init(player);
 				}
 			},
 			zhenlue:{
@@ -18694,9 +18705,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return info&&info.zhuSkill;
 						});
 						if(skills.length){
-							for(var i of skills) target.addSkillLog(i);
+							target.addSkills(skills);
 						}
-						if(target.isZhu2()) event.trigger('zhuUpdate');
 					}
 				},
 				ai:{expose:0.2},
