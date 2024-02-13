@@ -51,16 +51,18 @@ function generateImportFunction(type, pathParser) {
 			};
 			let script = createScript();
 			script.onerror = (e) => {
-				if (path.endsWith('.js')) {
+				if (path.endsWith('.js') && window.isSecureContext) {
 					path = path.slice(0, -3) + '.ts';
 					script.remove();
 					let ts = createScript();
 					ts.onerror = (e2) => {
-						console.error(`扩展《${name}》加载失败`,e,e2);
-						let remove = confirm(`扩展《${name}》加载失败，是否移除此扩展？此操作不会移除目录下的文件。`);
-						if(remove){
-							lib.config.extensions.remove(name);
-							game.saveConfig('extensions',lib.config.extensions);
+						if (lib.path.basename(path) === 'extension.js' && lib.path.dirname(path).endsWith('/extension')) {
+							console.error(`扩展《${name}》加载失败`, e, e2);
+							let remove = confirm(`扩展《${name}》加载失败，是否移除此扩展？此操作不会移除目录下的文件。`);
+							if (remove) {
+								lib.config.extensions.remove(name);
+								game.saveConfig('extensions', lib.config.extensions);
+							}
 						}
 						resolve(['error', ts]);
 					}
