@@ -56,28 +56,35 @@ new Promise(resolve => {
 
 	/**
 	 *
-	 * @returns {["firefox" | "chrome" | "safari" | "other", number]}
+	 * @returns {["firefox" | "chrome" | "safari" | "other", number, number, number]}
 	 */
 	function coreInfo() {
-		const regex = /(firefox|chrome|safari)\/([\d.]+)/;
-		let result;
-		if (!(result = userAgent.match(regex))) return ["other", NaN];
+		const regex = /(firefox|chrome|safari)\/(\d+(?:\.\d+)+)/
+		let result
+		if (!(result = userAgent.match(regex))) return ["other", NaN, NaN, NaN]
+		if (result[1] != "safari") {
+			const [major, minor, patch] = result[2].split(".")
 		// @ts-ignore
-		if (result[1] !== "safari") return [result[1], parseInt(result[2])];
-		result = userAgent.match(/version\/([\d.]+).*safari/);
+			return [result[1], parseInt(major), parseInt(minor), parseInt(patch)]
+		}
+		result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/)
 		// @ts-ignore
-		return ["safari", parseInt(result[1])];
+		const [major, minor, patch] = result[1].split(".")
+		return ["safari", parseInt(major), parseInt(minor), parseInt(patch)]
 	}
-	const [core, version] = coreInfo();
+	const [core, major, minor, patch] = coreInfo();
 	const supportMap = {
-		"firefox": 60,
-		"chrome": 61,
-		// 因为coreInfo不考虑子版本，故就强行只能以11运行
-		"safari": 11
+		"firefox": [60, 0, 0],
+		"chrome": [61, 0, 0],
+		"safari": [14, 5, 0]
 	}
+	const versions = [major, minor, patch]
 
-	if (core in supportMap && supportMap[core] > version) {
-		const tip = '检测到您的浏览器内核版本无法支持ES Module，请立即升级浏览器或手机webview内核！';
+	// current是需求的版本号，versions[index]是浏览器环境本身的版本号
+	// 如果current > versions[index]，即当前版本的浏览器版本号达不到要求的版本号，则可判定当前版本无法支持
+	// 如果versions[index]为NaN，必然返回false；由于ua信息不可能存在主版本号NaN的情况，故不必考虑次版本号/修补版本号并不存在的情况
+	if (core in supportMap && supportMap[core].some((current, index) => current > versions[index])) {
+		const tip = '检测到您的浏览器内核版本无法支持当前无名杀所需的功能，请立即升级浏览器或手机webview内核！';
 		console.error(tip);
 		const redirect_tip = `您使用的浏览器或无名杀客户端内核版本过低，已经无法正常运行无名杀！\n目前使用的浏览器UA信息为：\n${userAgent}\n点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。\n稍后您的无名杀将自动退出（可能的话）`;
 		if (confirm(redirect_tip)) {

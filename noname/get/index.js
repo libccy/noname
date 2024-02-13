@@ -18,15 +18,19 @@ export class Get extends Uninstantable {
 	 *
 	 * > 其他后续或许会增加，但`IE`永无可能
 	 *
-	 * @returns {["firefox" | "chrome" | "safari" | "other", number]}
+	 * @returns {["firefox" | "chrome" | "safari" | "other", number, number, number]}
 	 */
 	static coreInfo() {
-		const regex = /(firefox|chrome|safari)\/([\d.]+)/;
-		let result;
-		if (!(result = userAgent.match(regex))) return ["other", NaN];
-		if (result[1] != "safari") return [result[1], parseInt(result[2])];
-		result = userAgent.match(/version\/([\d.]+).*safari/);
-		return ["safari", parseInt(result[1])];
+		const regex = /(firefox|chrome|safari)\/(\d+(?:\.\d+)+)/
+		let result
+		if (!(result = userAgent.match(regex))) return ["other", NaN, NaN, NaN]
+		if (result[1] != "safari") {
+			const [major, minor, patch] = result[2].split(".")
+			return [result[1], parseInt(major), parseInt(minor), parseInt(patch)]
+		}
+		result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/)
+		const [major, minor, patch] = result[1].split(".")
+		return ["safari", parseInt(major), parseInt(minor), parseInt(patch)]
 	}
 	/**
 	 * 返回 VCard[] 形式的所有牌，用于印卡将遍历
