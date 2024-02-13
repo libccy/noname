@@ -867,7 +867,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('dezhang');
 					player.loseMaxHp();
-					player.addSkill('weishu');
+					player.addSkills('weishu');
 				},
 			},
 			weishu:{
@@ -3445,7 +3445,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('zhaotao');
 					player.loseMaxHp();
-					player.addSkillLog('pozhu');
+					player.addSkills('pozhu');
 				},
 				derivation:'pozhu',
 			},

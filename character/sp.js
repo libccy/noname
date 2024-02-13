@@ -18556,7 +18556,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},list);
 				},
-				trigger:{global:['gameStart','changeSkills']},
+				trigger:{global:['gameStart','changeSkillsAfter']},
 				forced:true,
 				audio:2,
 				filter:function(event,player){
@@ -18573,7 +18573,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				async content (event, trigger, player) {
 					lib.skill.weidi.init(player);
-				}
+				},
 			},
 			zhenlue:{
 				audio:2,

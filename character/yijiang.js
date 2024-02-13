@@ -3026,7 +3026,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=target;
 						player.line(target,'thunder');
-						target.addSkill('new_canyun');
+						target.addSkills('new_canyun');
 						target.discardPlayerCard('是否弃置自己区域内的一张梅花牌，获得技能〖绝响〗？',target,'hej').set('ai',function(card){
 							if(get.position(card)=='j') return 100+get.value(card);
 							return 100-get.value(card);
@@ -3036,7 +3036,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					"step 3"
-					if(result.bool) target.addSkill('new_juexiang');
+					if(result.bool) target.addSkills('new_juexiang');
 				},
 			},
 			"new_canyun":{
@@ -4013,7 +4013,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0]
 						player.logSkill('juexiang',target);
-						target.addSkill(lib.skill.juexiang.derivation.randomGet());
+						target.addSkills(lib.skill.juexiang.derivation.randomGet());
 						target.addTempSkill('juexiang_club',{player:'phaseZhunbeiBegin'});
 					}
 				},
@@ -10927,14 +10927,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
+					player.awakenSkill('zili');
 					player.chooseDrawRecover(2,true,function(event,player){
 						if(player.hp==1&&player.isDamaged()) return 'recover_hp';
 						return 'draw_card';
 					});
 					"step 1"
 					player.loseMaxHp();
-					player.addSkill('paiyi');
-					player.awakenSkill('zili');
+					player.addSkills('paiyi');
 				}
 			},
 			paiyi:{
@@ -13721,8 +13721,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.removeSkill('zquanji');
 					player.removeSkill('zzhenggong');
 					game.log(player,'失去了技能','#g【权计】、【争功】');
-					player.addSkillLog('zyexin');
-					player.addSkillLog('zzili');
+					player.addSkills(['zyexin','zzili']);
 				}
 			},
 			zyexin:{
@@ -13780,10 +13779,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.getExpansions('zyexin').length>=4;
 				},
 				forced:true,
-				content:function(){
+				async content(e,t,player){
 					player.awakenSkill('zzili');
 					player.loseMaxHp();
-					player.addSkill('zpaiyi');
+					player.addSkills('zpaiyi');
 				},
 				// intro:{
 				// 	content:'limited'

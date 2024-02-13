@@ -6029,9 +6029,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('dcmoucheng');
-					player.removeSkill('dclianji');
-					game.log(player,'失去了技能','#g【连计】');
-					player.addSkillLog('xinjingong');
+					player.changeSkills(['xinjingong'],['dclianji']);
 				},
 			},
 			//周宣
@@ -6462,8 +6460,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								var target=result.targets[0];
 								player.logSkill('dclianzhi_reproach',target);
-								player.addSkillLog('dcshouze');
-								target.addSkillLog('dcshouze');
+								player.addSkills('dcshouze');
+								target.addSkills('dcshouze');
 								target.addMark('dclingfang',Math.max(1,player.countMark('dclingfang')));
 							}
 						},
@@ -7494,7 +7492,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var targets=lib.skill.dcyaoyi.logTarget().sortBySeat();
-					for(var target of targets) target.addSkill('dcshoutan');
+					for(var target of targets) target.addSkills('dcshoutan');
 					game.delayx();
 				},
 				global:'dcyaoyi_blocker',
@@ -8247,8 +8245,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					var map=event.result||result;
 					if(map.skills&&map.skills.length){
-						player.removeSkill('dchuishu');
-						for(var i of map.skills) player.addSkillLog(i);
+						//player.removeSkill('dchuishu');
+						//for(var i of map.skills) player.addSkillLog(i);
+						player.changeSkills(map.skills, ['dchuishu']);
 						player.markAuto('zhuSkill_dcligong',map.skills);
 					}
 					else{
@@ -9377,8 +9376,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						targets.sortBySeat();
 						player.logSkill('dcpijing',targets);
 						game.countPlayer(function(current){
-							if(!targets.includes(current)) current.removeSkill('dczimu');
-							else current.addSkill('dczimu');
+							if(!targets.includes(current)) current.removeSkills('dczimu');
+							else current.addSkills('dczimu');
 						});
 						game.delayx();
 					}
@@ -9580,7 +9579,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return info&&!info.charlotte;
 					});
 					if(skills.length){
-						for(var i of skills) player.addSkillLog(i);
+						//for(var i of skills) player.addSkillLog(i);
+						player.addSkills(skills);
 					}
 					player.removeSkill('xiaowu');
 					var num=player.countMark('shawu');
@@ -9611,7 +9611,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var target=result.targets[0];
 								player.awakenSkill('huaping');
 								player.logSkill('huaping_give',target);
-								target.addSkill('shawu');
+								target.addSkills('shawu');
 								var num=player.countMark('shawu');
 								if(num>0){
 									player.removeMark('shawu',num);
@@ -10445,7 +10445,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.reinit('re_sunyi','xushi',false);
 					}
 					else{
-						player.addSkillLog('olhunzi');
+						player.addSkills('olhunzi');
 						event.goto(2);
 					}
 					'step 1'
@@ -10689,8 +10689,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('mengqing');
 					player.gainMaxHp(3);
 					player.recover(3);
-					player.removeSkill('zhukou');
-					player.addSkill('yuyun');
+					//player.removeSkill('zhukou');
+					//player.addSkill('yuyun');
+					player.changeSkills(['yuyun'],['zhukou']);
 				},
 				derivation:'yuyun',
 			},
@@ -12065,7 +12066,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.logSkill('dushi',target);
 						target.markSkill('dushi');
-						target.addSkillLog('dushi');
+						target.addSkills('dushi');
 					}
 				},
 				intro:{content:'您已经获得弘农王的诅咒'},
@@ -12403,7 +12404,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('choujue');
 					player.storage.choujue=true;
 					player.loseMaxHp();
-					player.addSkill('beishui');
+					player.addSkills('beishui');
 				},
 			},
 			beishui:{
@@ -12425,7 +12426,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('beishui');
 					player.storage.beishui=true;
 					player.loseMaxHp();
-					player.addSkill('qingjiao');
+					player.addSkills('qingjiao');
 				},
 			},
 			qingjiao:{
@@ -12699,9 +12700,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.line(target,'fire');
-						player.addSkill('hmxili');
-						target.addSkill('hmxili');
-						player.removeSkill('mansi');
+						player.addSkills(['hmxili'],['mansi']);
+						target.addSkills('hmxili');
 					}
 				},
 			},

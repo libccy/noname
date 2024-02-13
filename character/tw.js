@@ -2569,7 +2569,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return info&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte;
 					});
 					if(skills.length){
-						for(var i of skills) player.addSkillLog(i);
+						//for(var i of skills) player.addSkillLog(i);
+						player.addSkills(skills);
 						player.markAuto('twduoren',skills);
 						game.broadcastAll(function(list){
 							game.expandSkills(list);
@@ -3235,7 +3236,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.logSkill('twjuntun',target);
-						target.addSkillLog('twxiongjun');
+						target.addSkills('twxiongjun');
 						if(target!=player) player.addExpose(0.25);
 					}
 				},
@@ -4313,7 +4314,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('twmibei');
 					player.logSkill('twmibei_achieve');
 					game.log(player,'成功完成使命');
-					player.addSkillLog('twmouli');
+					player.addSkils('twmouli');
 				},
 				intro:{content:'已使用牌名：$'},
 				subSkill:{
@@ -5324,7 +5325,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.awakenSkill('twneirao');
-					player.removeSkill('twjiekuang');
+					player.removeSkills('twjiekuang');
 					game.log(player,'失去了技能','#g【竭匡】');
 					'step 1'
 					var num=player.countCards('he'),cards=[];
@@ -5337,7 +5338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					if(cards.length) player.gain(cards,'gain2');
 					'step 2'
-					player.addSkillLog('twluanlve');
+					player.addSkills('twluanlve');
 				},
 			},
 			twluanlve:{
@@ -6830,12 +6831,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.gain(gains,'gain2');
 					}
 					'step 3'
-					player.addSkillLog('twqingce');
+					player.addSkills('twqingce');
 					player.chooseBool('是否减1点体力上限并获得〖扫讨〗？').set('ai',()=>_status.event.bool).set('bool',player.isDamaged()&&player.countCards('h')>=3?(Math.random()<0.5?true:false):false);
 					'step 4'
 					if(result.bool){
 						player.loseMaxHp();
-						player.addSkillLog('twsaotao');
+						player.addSkills('twsaotao');
 						game.delayx();
 					}
 				},
@@ -8584,7 +8585,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					targets.sortBySeat();
-					for(var i of targets) i.addSkillLog('twgonghuan');
+					for(var i of targets) i.addSkills('twgonghuan');
 				},
 				derivation:'twgonghuan',
 				ai:{
@@ -11534,10 +11535,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:()=>game.filterPlayer().sortBySeat(),
 				content:function(){
 					'step 0'
-					game.countPlayer(function(current){
-						current.addSkill('twfeifu');
+					game.filterPlayer().sortBySeat().forEach(function(current){
+						current.addSkills('twfeifu');
 					});
-					game.log(player,'令所有其他角色获得了技能','#g【非服】')
+					//game.log(player,'令所有其他角色获得了技能','#g【非服】')
 					game.delayx();
 					'step 1'
 					player.chooseTarget('是否减1点体力上限，并令一名其他角色获得技能【复纂】？',lib.filter.notMe).set('ai',function(target){
@@ -11551,7 +11552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.loseMaxHp();
 						var target=result.targets[0];
 						player.line(target,'fire');
-						target.addSkillLog('twfuzuan');
+						target.addSkills('twfuzuan');
 						game.delayx();
 					}
 				},
@@ -12041,7 +12042,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('choice',skills.sort((a,b)=>(map[b](target,player)||0.5)-(map[a](target,player)||0.5))[0]);
 					'step 1'
 					var skill=result.control;
-					player.addSkillLog(skill);
+					player.addSkills(skill);
 					event.twbudao_skill=skill;
 					player.chooseTarget(lib.filter.notMe,'是否令一名其他角色也获得【'+get.translation(skill)+'】？').set('ai',function(target){
 						var player=_status.event.player;
@@ -12053,7 +12054,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						event.target=target;
 						player.line(target,'green');
-						target.addSkillLog(event.twbudao_skill);
+						target.addSkills(event.twbudao_skill);
 						var cards=target.getCards('he');
 						if(!cards.length) event.finish();
 						else if(cards.length==1) event._result={bool:true,cards:cards};
@@ -12573,7 +12574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.logSkill('twlingfa');
 								player.removeSkill('twlingfa');
 								game.log(player,'失去了技能','#g【令法】');
-								player.addSkillLog('twzhian');
+								player.addSkills('twzhian');
 								break;
 						}
 					}
@@ -13076,7 +13077,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var info=get.info(skill);
 							return info&&info.zhuSkill;
 						});
-						for(var i of skills) target.addSkillLog(i);
+						target.addSkills(skills);
+						//for(var i of skills) target.addSkillLog(i);
 					}
 				},
 			},
@@ -13470,7 +13472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.disableJudge();
 					player.markAuto('twjuezhu_restore',[[target,result.control]]);
 					player.addSkill('twjuezhu_restore');
-					target.addSkill('feiying');
+					target.addSkills('feiying');
 				},
 				subSkill:{
 					restore:{
@@ -13931,7 +13933,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var name=result.links[0];
 						player.flashAvatar('twhuashen',name);
 						game.log(player,'获得了','#y'+get.translation(name),'的所有技能');
-						player.addSkill(lib.character[name][3])
+						player.addSkills(lib.character[name][3])
 					}
 					'step 2'
 					var num=event.num-player.maxHp;
