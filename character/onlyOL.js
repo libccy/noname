@@ -519,11 +519,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var trigger=map.trigger;
 					player.awakenSkill('olsbranji');
 					var num=lib.skill.olsbranji.getNum(trigger,player);
+					const skills = [];
 					if(num>=player.getHp()){
-						player.addSkillLog('kunfen');
+						skills.push('kunfen');
 						player.storage.kunfen=true;
 					}
-					if(num<=player.getHp()) player.addSkillLog('zhaxiang');
+					if(num<=player.getHp()) skills.push('zhaxiang');
+					player.addSkills(skills);
 					if(player.countCards('h')!=player.getHandcardLimit()||player.isDamaged()){
 						var result,num1=player.countCards('h')-player.getHandcardLimit();
 						if(!num1) result={index:1};

@@ -1075,7 +1075,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('pksanchen');
 					player.gainMaxHp();
 					player.recover();
-					player.addSkillLog('pkmiewu');
+					player.addSkills('pkmiewu');
 				},
 				ai:{
 					combo:'wuku',

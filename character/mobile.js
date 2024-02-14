@@ -6783,7 +6783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('moucuan');
 					player.loseMaxHp();
-					player.addSkill('binghuo');
+					player.addSkills('binghuo');
 				},
 				ai:{combo:'jibing'},
 			},
@@ -9902,7 +9902,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return info&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte;
 					});
 					if(skills.length){
-						for(var i of skills) player.addSkillLog(i);
+						player.addSkills(skills);
 						game.broadcastAll(function(list){
 							game.expandSkills(list);
 							for(var i of list){
@@ -9943,7 +9943,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return list.randomGet();
 					});
 					'step 1'
-					player.addSkillLog(result.control);
+					player.addSkills(result.control);
 					game.broadcastAll(function(skill){
 						var list=[skill];game.expandSkills(list);
 						for(var i of list){
@@ -11584,8 +11584,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.gain(gains,'gain2');
 					}
 					'step 3'
-					player.addSkill('reqingce');
-					game.log(player,'获得了技能','#g【清侧】');
+					player.addSkills('reqingce');
 					player.loseMaxHp();
 				},
 			},
@@ -12960,8 +12959,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						player.line(trigger.source,'fire');
-						trigger.source.addSkillLog('new_rewusheng');
-						trigger.source.addSkillLog('redangxian');
+						trigger.source.addSkills(['new_rewusheng','redangxian']);
 					}
 				},
 			},
@@ -13110,8 +13108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'thunder',
 				content:function(){
 					player.awakenSkill('remoucheng');
-					player.removeSkill('relianji');
-					player.addSkill('jingong');
+					player.changeSkills(['jingong','relianji']);
 					player.gainMaxHp();
 					player.recover();
 				},

@@ -3965,9 +3965,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('jsrgzhasi');
 					trigger.cancel();
-					player.removeSkill('jsrgzhiheng');
-					game.log(player,'失去了技能','#g【猘横】');
-					player.addSkillLog('rezhiheng');
+					player.removeSkill();
+					player.changeSkills(['rezhiheng'],['jsrgzhiheng']);
 					player.addSkill('jsrgzhasi_undist');
 				},
 				derivation:'rezhiheng',
@@ -7652,8 +7651,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('jsrghuilie');
 					player.loseMaxHp();
 					'step 1'
-					player.addSkillLog('jsrgpingrong');
-					player.addSkillLog('feiying');
+					player.addSkills(['jsrgpingrong','feiying']);
 				}
 			},
 			jsrgpingrong:{

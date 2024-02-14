@@ -1629,7 +1629,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('dcqijing');
 					player.loseMaxHp();
-					player.addSkillLog('dccuixin');
+					player.addSkills('dccuixin');
 					'step 1'
 					if(game.countPlayer()>2){
 						if(player==trigger.player&&!trigger.skill){
@@ -3250,7 +3250,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						skills.add(fullskills.randomRemove(1)[0]);
 					}
 					for(var i of skills){
-						player.addSkillLog(i);
+						player.addSkills(i);
 					}
 					player.markAuto('yuheng',skills);
 				},
@@ -4108,7 +4108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content(){
 							game.log(player,'成功完成使命');
 							player.awakenSkill('tspowei');
-							player.addSkillLog('shenzhu');
+							player.addSkills('shenzhu');
 						},
 					},
 					fail:{
@@ -4350,7 +4350,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.line(target,'green');
 						target.storage.zuoxing=player;
-						target.addSkill('zuoxing');
+						target.addSkills('zuoxing');
 					}
 				},
 				derivation:'zuoxing',
@@ -4771,7 +4771,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(lib.character[target.name]) list.addArray(lib.character[target.name][3]);
 						if(lib.character[target.name1]) list.addArray(lib.character[target.name1][3]);
 						if(lib.character[target.name2]) list.addArray(lib.character[target.name2][3]);
-						player.addSkill(list);
+						player.addSkills(list);
 						game.broadcastAll(function(list){
 							lib.character.key_shiki[3].addArray(list);
 							game.expandSkills(list);
@@ -5094,8 +5094,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content(){
 					player.awakenSkill(event.name);
-					player.addSkill('tianxing');
-					player.addSkill('new_rejianxiong');
+					player.addSkills(['tianxing','new_rejianxiong']);
 					player.loseMaxHp();
 					player.gain(player.getExpansions('chuyuan'),'gain2','fromStorage');
 				},
@@ -5126,7 +5125,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return 'rerende';
 					});
 					'step 2'
-					player.addSkillLog(result.control);
+					player.addSkills(result.control);
 				},
 			},
 			olzhiti:{
@@ -5901,9 +5900,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.countMark('renjie')>=4;
 				},
 				content(){
-					player.loseMaxHp();
-					player.addSkill('jilue');
 					player.awakenSkill('sbaiyin');
+					player.loseMaxHp();
+					player.addSkills('jilue');
 				},
 				derivation:['jilue','reguicai','fangzhu','rejizhi','rezhiheng','rewansha'],
 			},

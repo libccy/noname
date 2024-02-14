@@ -12,7 +12,7 @@ export const Content = {
 		event.trigger(event.name);
 	},
 	//变更技能
-	changeSkills: async function (event,trigger,player) {
+	async changeSkills (event,trigger,player) {
 		//去重检查
 		event.addSkill.unique();
 		event.removeSkill.unique();
@@ -26,8 +26,14 @@ export const Content = {
 		await event.trigger('changeSkillsBefore');
 		await event.trigger('changeSkillsBegin');
 		//处理失去和获得的技能
-		if(event.addSkill.length) player.addSkillLog(event.addSkill);
-		if(event.removeSkill.length) player.removeSkillLog(event.removeSkill);
+		if(event.$handle){
+			event.$handle(player,event.addSkill,event.removeSkill,event);
+		}
+		else{
+			if(event.addSkill.length) player.addSkillLog(event.addSkill);
+			if(event.removeSkill.length) player.removeSkillLog(event.removeSkill);
+		}
+		//手动触发时机
 		await event.trigger('changeSkillsEnd');
 		await event.trigger('changeSkillsAfter');
 	},
