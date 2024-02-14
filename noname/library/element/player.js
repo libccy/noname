@@ -2949,9 +2949,8 @@ export class Player extends HTMLDivElement {
 			numh = arguments[0];
 		}
 		if (numh >= 10) {
-			numh = numh.toString();
 			this.node.count.dataset.condition = 'low';
-			this.node.count.innerHTML = numh[0] + '<br>' + numh[1];
+			this.node.count.innerHTML = Array.from(numh.toString()).join('<br>');
 		}
 		else {
 			if (numh > 5) {
