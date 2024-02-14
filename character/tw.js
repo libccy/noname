@@ -2594,10 +2594,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						locked:false,
 						content:function(){
-							for(var i of player.getStorage('twduoren')){
-								player.removeSkill(i);
-								game.log(player,'失去了技能','#g【'+get.translation(i)+'】');
-							}
+							player.removeSkills(player.getStorage('twduoren'));
 							delete player.storage.twduoren;
 						}
 					}
@@ -5326,7 +5323,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.awakenSkill('twneirao');
 					player.removeSkills('twjiekuang');
-					game.log(player,'失去了技能','#g【竭匡】');
 					'step 1'
 					var num=player.countCards('he'),cards=[];
 					player.discard(player.getCards('he'));
@@ -8580,8 +8576,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				multiline:true,
 				content:function(){
 					'step 0'
-					game.countPlayer(function(current){
-						current.removeSkill('twgonghuan');
+					game.filterPlayer().sortBySeat().forEach(function(current){
+						current.removeSkills('twgonghuan');
 					});
 					'step 1'
 					targets.sortBySeat();
@@ -12572,9 +12568,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								break;
 							default:
 								player.logSkill('twlingfa');
-								player.removeSkill('twlingfa');
-								game.log(player,'失去了技能','#g【令法】');
-								player.addSkills('twzhian');
+								player.addSkills(['twzhian'],['twlingfa']);
 								break;
 						}
 					}

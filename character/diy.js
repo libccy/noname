@@ -5258,9 +5258,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				charlotte:true,
-				content(){
+				async content(event,trigger,player){
 					player.removeSkill('hiroto_huyu2');
-					player.removeSkill('hiroto_zonglve');
+					await player.removeSkills('hiroto_zonglve');
 					player.removeGaintag('hiroto_huyu2');
 					var target=player.storage.hiroto_huyu2;
 					if(target&&target.isIn()){
@@ -6352,7 +6352,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('godan_xiaoyuan');
 					player.loseMaxHp(3);
 					player.draw(3);
-					player.removeSkill('godan_feiqu');
+					player.removeSkills('godan_feiqu');
 				},
 			},
 			abyusa_jueqing:{
@@ -10670,7 +10670,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.getParent(2).name=='komari_xueshang'&&event.getParent(2).player==player;
 				},
 				content(){
-					player.removeSkill('komari_xueshang');
+					player.removeSkills('komari_xueshang');
 					player.gainMaxHp(true);
 					player.recover();
 				},
@@ -17664,7 +17664,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.draw(skills.length);
 							player.changeSkills([],skills).set('$handle',(player,addSkills,removeSkills)=>{
 								game.log(player,'失去了以下技能：','#g'+get.translation(removeSkills));
-								player.removeAdditionalSkill('junkyuheng');
+								for(let skill of removeSkills) player.removeAdditionalSkill('junkyuheng',skill);
 							});
 						},
 					},

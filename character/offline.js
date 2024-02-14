@@ -5324,7 +5324,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.storage.suiren=true;
 						player.awakenSkill('suiren');
 						player.logSkill('suiren',result.targets);
-						player.removeSkill('reyicong');
+						player.removeSkills('reyicong');
 						player.gainMaxHp();
 						player.recover();
 						result.targets[0].draw(3);

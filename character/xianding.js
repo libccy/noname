@@ -8120,7 +8120,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					player.recover();
 					'step 1'
-					player.removeSkill('dcyishu');
+					player.removeSkills('dcyishu');
 					'step 2'
 					var list;
 					if(_status.characterlist){
@@ -9407,7 +9407,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					'step 1'
-					player.removeSkill('dczimu');
+					player.removeSkills('dczimu');
 					if(event.delay) game.delayx();
 				},
 				marktext:'牧',
@@ -9582,7 +9582,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						//for(var i of skills) player.addSkillLog(i);
 						player.addSkills(skills);
 					}
-					player.removeSkill('xiaowu');
+					player.removeSkills('xiaowu');
 					var num=player.countMark('shawu');
 					if(num>0){
 						player.removeMark('shawu',num);

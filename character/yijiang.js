@@ -3590,7 +3590,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					if(result.bool&&result.autochoose&&result.cards.length==result.rawcards.length){
-						player.removeSkill('jiexun');
+						player.removeSkills('jiexun');
 						player.addSkill('funan_jiexun');
 					}
 				}
@@ -8142,7 +8142,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var es=target.getCards('e');
 						target.give(es,player,'give');
-						player.removeSkill('yanzhu');
+						player.removeSkills('yanzhu');
 					}
 					else{
 						target.chooseToDiscard(true,'he');
@@ -13718,10 +13718,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('zbaijiang');
 					player.gainMaxHp();
-					player.removeSkill('zquanji');
-					player.removeSkill('zzhenggong');
-					game.log(player,'失去了技能','#g【权计】、【争功】');
-					player.addSkills(['zyexin','zzili']);
+					player.changeSkills(['zyexin','zzili'],['zquanji','zzhenggong']);
 				}
 			},
 			zyexin:{

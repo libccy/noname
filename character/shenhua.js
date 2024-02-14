@@ -2647,13 +2647,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			"nzry_shenshi1":{
+			nzry_shenshi1:{
 				audio:2,
 				trigger:{
 					global:'phaseJieshuBegin',
 				},
 				forced:true,
 				popup:false,
+				charlotte:true,
 				filter:function(event,player){
 					return player.storage.nzry_shenshi1!=undefined&&player.storage.nzry_shenshi2!=undefined;
 				},

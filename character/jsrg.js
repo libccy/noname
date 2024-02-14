@@ -1204,7 +1204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(bool){
 							player.logSkill('jsrgfangjie');
 							await player.discard(links);
-							player.removeSkillLog('jsrgfangjie');
+							player.removeSkills('jsrgfangjie');
 						}
 					}
 				},
@@ -3965,7 +3965,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('jsrgzhasi');
 					trigger.cancel();
-					player.removeSkill();
 					player.changeSkills(['rezhiheng'],['jsrgzhiheng']);
 					player.addSkill('jsrgzhasi_undist');
 				},
@@ -6271,8 +6270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger.targets.forEach(i=>i.removeSkill('huogong2'));
 					}
 					else{
-						player.removeSkill('jsrgguanhuo');
-						game.log(player,'失去了技能','#g【观火】');
+						player.removeSkills('jsrgguanhuo');
 					}
 				},
 				ai:{

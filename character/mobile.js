@@ -5907,7 +5907,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var es=target.getCards('e');
 						target.give(es,player,'give');
-						player.removeSkill('mobileyanzhu');
+						player.removeSkills('mobileyanzhu');
 						player.storage.mobileyanzhu=true;
 						player.popup('兴学');
 						game.log(player,'修改了技能','#g【兴学】');
@@ -9896,7 +9896,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('requanfeng');
-					player.removeSkill('hongyi');
+					player.removeSkills('hongyi');
 					var skills=trigger.player.getStockSkills('仲村由理','天下第一').filter(function(skill){
 						var info=get.info(skill);
 						return info&&!info.hiddenSkill&&!info.zhuSkill&&!info.charlotte;

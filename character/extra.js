@@ -997,12 +997,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var target=trigger.player;
 					player.awakenSkill('jxzhaoluan');
 					trigger.cancel();
-					target.getSkills(null,false,false).forEach(skill=>{
+					const skills = target.getSkills(null,false,false).filter(skill=>{
 						var info=get.info(skill);
 						if(info&&!info.charlotte&&!get.is.locked(skill)){
-							target.removeSkill(skill);
+							return true;
 						}
 					});
+					if(skills.length) yield target.removeSkills(skills);
 					yield target.gainMaxHp(3);
 					var num=3-target.getHp(true);
 					if(num>0) yield target.recover(num);
@@ -3198,7 +3199,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return info&&!info.charlotte&&!get.is.locked(i);
 					});
 					if(skills.length){
-						for(var i of skills) player.removeSkill(i);
+						player.removeSkills(skills);
 					}
 					//初始化技能库
 					var list1=['dili_shengzhi','dili_chigang','dili_qionglan','dili_quandao','dili_jiaohui','dili_yuanlv'];
@@ -3439,10 +3440,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},'请选择火【杀】的目标（'+(event.num==9?'⑨':event.num)+'/9）',false);
 					'step 2'
 					if(result.bool&&event.num<9) event.goto(1);
-					else{
-						player.removeSkill('jiufa');
-						player.addSkill('pingxiang_effect');
-					}
+					else player.removeSkills('jiufa');
+					'step 3'
+					player.addSkill('pingxiang_effect');
 				},
 				ai:{
 					order(){
@@ -5116,7 +5116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 					player.gain(player.getExpansions('chuyuan'),'gain2','fromStorage');
 					"step 1"
-					player.removeSkill('chuyuan');
+					player.removeSkills('chuyuan');
 					player.chooseControl('rerende','rezhiheng','olluanji','caopi_xingdong').set('prompt','选择获得一个技能').set('ai',function(){
 						var player=_status.event.player;
 						if(!player.hasSkill('luanji')&&!player.hasSkill('olluanji')&&player.getUseValue({name:'wanjian'})>4) return 'olluanji';
@@ -7532,7 +7532,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				content(){
-					player.removeSkill(player.storage.drlt_duorui[0]);
+					player.removeSkills(player.storage.drlt_duorui[0]);
 					delete player.storage.drlt_duorui_player;
 					player.storage.drlt_duorui=[];
 				},

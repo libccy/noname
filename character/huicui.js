@@ -246,7 +246,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.type(name)==='delay') return false;
 						const card=new lib.element.VCard({name:name});
 						return get.tag(card,'damage')&&!player.getStorage('dcdehua').includes(name);
-					})) player.removeSkillLog('dcdehua');
+					})) player.removeSkills('dcdehua');
 				},
 				mod:{
 					maxHandcard(player,num){

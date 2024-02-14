@@ -781,7 +781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						animationColor:'thunder',
 						async content(event,trigger,player){
 							player.awakenSkill('sbsongwei_delete');
-							event.target.removeSkillLog(event.target.getStockSkills(false,true));
+							event.target.removeSkills(event.target.getStockSkills(false,true));
 						},
 						ai:{
 							order:13,
@@ -3652,8 +3652,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.recover(3);
 					'step 1'
-					player.removeSkill('sbrende');
-					game.log(player,'失去了技能','#g【'+get.translation('sbrende')+'】');
+					player.removeSkills('sbrende');
 					game.delayx();
 				},
 				ai:{

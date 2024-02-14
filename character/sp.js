@@ -5854,9 +5854,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								});
 							}
 							'step 1'
-							player.removeSkill(result.control);
-							player.popup(result.control);
-							game.log(player,'失去了技能','#g【'+get.translation(result.control)+'】');
+							player.removeSkills(result.control);
 						}
 					}
 				},
@@ -23557,7 +23555,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					"step 0"
-					player.removeSkill('huxiao');
+					player.removeSkills('huxiao');
 					player.gainMaxHp();
 					"step 1"
 					player.recover();
@@ -23644,7 +23642,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'orange',
 				content:function(){
 					'step 0'
-					player.removeSkill('oldhuxiao');
+					player.removeSkills('oldhuxiao');
 					player.gainMaxHp();
 					'step 1'
 					player.recover();

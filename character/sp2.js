@@ -6476,7 +6476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.discard(result.cards).delay=false;
 						player.line2(game.filterPlayer(function(current){
 							if(current.hasSkill('panshi')){
-								current.removeSkill('panshi');
+								current.removeSkills('panshi');
 								return true;
 							}
 						}).concat(result.targets),'green');
@@ -6738,7 +6738,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				onremove:function(player){
 					delete player.storage.zhihu_mark;
-					player.removeSkill('zhihu');
+					player.removeSkills('zhihu');
 				},
 				trigger:{global:'phaseBeginStart'},
 				firstDo:true,
