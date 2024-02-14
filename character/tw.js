@@ -1452,7 +1452,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									cardx._cardid=card.cardid;
 									return cardx;
 								});
-								player.directgains(cardsx,null,'twxinghan');
+								player.directgains(cardsx,null,'twxinghan_tag');
 								player.addSkill('twxinghan_in');
 							}
 							else player.removeSkill('twxinghan_in');
@@ -1470,7 +1470,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						silent:true,
 						content:function(){
 							'step 0'
-							var cards2=player.getCards('s',card=>card.hasGaintag('twxinghan'));
+							var cards2=player.getCards('s',card=>card.hasGaintag('twxinghan_tag'));
 							if(player.isOnline2()){
 								player.send(function(cards,player){
 									cards.forEach(i=>i.delete());
@@ -1487,10 +1487,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								cardx._cardid=card.cardid;
 								return cardx;
 							});
-							player.directgains(cardsx,null,'twxinghan');
+							player.directgains(cardsx,null,'twxinghan_tag');
 						},
 						onremove:function(player){
-							var cards2=player.getCards('s',card=>card.hasGaintag('twxinghan'));
+							var cards2=player.getCards('s',card=>card.hasGaintag('twxinghan_tag'));
 							if(player.isOnline2()){
 								player.send(function(cards,player){
 									cards.forEach(i=>i.delete());
@@ -1506,7 +1506,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						trigger:{player:['useCardBefore','respondBefore']},
 						filter:function(event,player){
-							var cards=player.getCards('s',card=>card.hasGaintag('twxinghan')&&card._cardid);
+							var cards=player.getCards('s',card=>card.hasGaintag('twxinghan_tag')&&card._cardid);
 							return event.cards&&event.cards.some(card=>{
 								return cards.includes(card);
 							});
@@ -1515,7 +1515,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						popup:false,
 						firstDo:true,
 						content:function(){
-							var idList=player.getCards('s',card=>card.hasGaintag('twxinghan')).map(i=>i._cardid);
+							var idList=player.getCards('s',card=>card.hasGaintag('twxinghan_tag')).map(i=>i._cardid);
 							var cards=player.getExpansions('twshenyi');
 							var cards2=[];
 							for(var card of trigger.cards){
@@ -16011,6 +16011,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twshenyi_info:'每回合限一次，当你或你攻击范围内的一名角色于一回合内首次受到伤害后，你可以声明一种基本牌或锦囊牌（每种牌名限一次），然后从牌堆中将一张同名牌（若没有同名牌则改为同类型的牌）称为“侠义”置于武将牌上。若受伤角色不为你，则你可以将任意张手牌交给其，且当其失去一张你以此法交给其的牌后，你摸一张牌。',
 			twxinghan:'兴汉',
 			twxinghan_info:'①你的回合外或你处于濒死状态时，你可以如手牌般使用或打出“侠义”牌。②准备阶段，若“侠义”牌数大于存活角色数，则你可以依次使用其中所有可以使用的牌。然后你获得如下效果：回合结束时，你弃置所有手牌并失去X点体力（X为你的体力值-1且X至少为1）。',
+			twxinghan_tag:'侠义',
 			xia_guanyu:'侠关羽',
 			xia_guanyu_prefix:'侠',
 			twzhongyi:'忠义',
