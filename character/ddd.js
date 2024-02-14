@@ -2812,8 +2812,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								});
 							}
 							else{
-								game.log(player,'失去了技能','#g【齐策】');
-								player.removeSkill('dddqice');
+								player.removeSkills('dddqice');
 								event.finish();
 							}
 							'step 1'
@@ -3165,8 +3164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						if(!targets.includes(player)) player.loseMaxHp();
 						if(targets.length==1){
-							player.removeSkill('dddxiaheng');
-							game.log(player,'失去了技能','#g【侠横】');
+							player.removeSkills('dddxiaheng');
 						}
 					}
 					'step 5'
@@ -3272,8 +3270,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).setContent('gaincardMultiple');
 					if(!lose) event.finish();
 					'step 5'
-					player.removeSkill('dddfengzheng');
-					game.log(player,'失去了技能','#g【丰政】');
+					player.removeSkills('dddfengzheng');
 				},
 				subSkill:{
 					global:{
@@ -4435,8 +4432,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						// 	return event.source&&event.source.isIn()&&event.source.getEquips(1).length>0;
 						// },
 						content(){
-							player.removeSkill('dddxiaoxing');
-							game.log(player,'失去了技能','#g【枭行】');
+							player.removeSkills('dddxiaoxing');
 						},
 						content_old(){
 							'step 0'
@@ -4448,8 +4444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								trigger.source.logSkill('dddxiaoxing',player);
 								trigger.source.disableEquip(1);
-								player.removeSkill('dddxiaoxing');
-								game.log(player,'失去了技能','#g【枭行】');
+								player.removeSkills('dddxiaoxing');
 							}
 						}
 					}
@@ -4541,8 +4536,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.gain(cards,'log');
 					}
 					'step 5'
-					player.removeSkill('dddlangzhi');
-					game.log(player,'失去了技能','#g【狼志】');
+					player.removeSkills('dddlangzhi');
 					event.finish();
 					'step 6'
 					game.broadcastAll('closeDialog',event.videoId);
@@ -4652,8 +4646,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					player.removeSkill('dddfuyi');
-					game.log(player,'失去了技能','#g【附义】');
+					player.removeSkills('dddfuyi');
 				},
 				subSkill:{
 					sha:{
@@ -5288,8 +5281,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else event.finish();
 					'step 3'
 					if(target.isIn()){event.finish(); return};
-					player.removeSkill('dddbailei');
-					game.log(player,'失去了技能','#g【拜泪】');
+					player.removeSkills('dddbailei');
 				},
 				subSkill:{
 					animate:{
