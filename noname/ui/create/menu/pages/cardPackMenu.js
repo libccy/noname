@@ -641,8 +641,10 @@ export const cardPackMenu = function (connectMenu) {
 	return function (packName) {
 		// 判断菜单栏有没有加载过这个卡牌包
 		if ([...start.firstChild.children].map(node => node.mode).includes(packName)) return;
-		// 单机模式下显示不在lib.config.all.cards里的卡牌包
-		if (!lib.config.all.cards.includes(packName)) createModeConfig(packName, start.firstChild);
-		if (connectMenu) lib.connectCardPack.add(packName);
+		// 显示不是无名杀自带的卡牌包
+		if (!lib.connectCardPack.includes(packName) && !lib.config.all.cards.includes(packName)) {
+			createModeConfig(packName, start.firstChild, node1);
+			if (connectMenu) lib.connectCardPack.add(packName);
+		}
 	}
 };
