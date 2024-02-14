@@ -4468,20 +4468,22 @@ export class Game extends Uninstantable {
 					if (pack[i][j].audio == true) {
 						pack[i][j].audio = 'ext:' + extname;
 					}
-					if (pack[i][j].fullskin) {
-						if (_status.evaluatingExtension) {
-							pack[i][j].image = 'db:extension-' + extname + ':' + j + '.png';
+					if(!pack[i][j].image){
+						if (pack[i][j].fullskin) {
+							if (_status.evaluatingExtension) {
+								pack[i][j].image = 'db:extension-' + extname + ':' + j + '.png';
+							}
+							else {
+								pack[i][j].image = 'ext:' + extname + '/' + j + '.png';
+							}
 						}
-						else {
-							pack[i][j].image = 'ext:' + extname + '/' + j + '.png';
-						}
-					}
-					else if (pack[i][j].fullimage) {
-						if (_status.evaluatingExtension) {
-							pack[i][j].image = 'db:extension-' + extname + ':' + j + '.jpg';
-						}
-						else {
-							pack[i][j].image = 'ext:' + extname + '/' + j + '.jpg';
+						else if (pack[i][j].fullimage) {
+							if (_status.evaluatingExtension) {
+								pack[i][j].image = 'db:extension-' + extname + ':' + j + '.jpg';
+							}
+							else {
+								pack[i][j].image = 'ext:' + extname + '/' + j + '.jpg';
+							}
 						}
 					}
 					lib.cardPack[packname].push(j);
