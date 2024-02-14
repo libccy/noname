@@ -16,7 +16,7 @@ import {
 	createMenu,
 	createConfig
 } from "../index.js";
-import { ui, game, get, lib, _status } from "../../../../../noname.js";
+import { ui, game, get ,ai ,lib, _status } from "../../../../../noname.js";
 
 export const otherMenu = function (connectMenu) {
 	if (connectMenu) return;

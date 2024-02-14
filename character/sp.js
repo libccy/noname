@@ -3989,7 +3989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						isCard:true,
 					};
 					if(target.hasUseTarget(card,true)){
-						target.chooseUseTarget(card,true);
+						target.chooseUseTarget(card,true,false);
 					}
 				},
 				ai:{
