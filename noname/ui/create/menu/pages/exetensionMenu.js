@@ -1551,7 +1551,7 @@ export const extensionMenu = function (connectMenu) {
 					}
 					else {
 						if (!window.CodeMirror) {
-							import('../../game/codemirror.js').then(() => {
+							import('../../../../../game/codemirror.js').then(() => {
 								lib.codeMirrorReady(node, editor);
 							});
 							lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
@@ -1989,7 +1989,7 @@ export const extensionMenu = function (connectMenu) {
 					}
 					else {
 						if (!window.CodeMirror) {
-							import('../../game/codemirror.js').then(() => {
+							import('../../../../../game/codemirror.js').then(() => {
 								lib.codeMirrorReady(node, editor);
 							});
 							lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
@@ -2369,7 +2369,7 @@ export const extensionMenu = function (connectMenu) {
 					}
 					else {
 						if (!window.CodeMirror) {
-							import('../../game/codemirror.js').then(() => {
+							import('../../../../../game/codemirror.js').then(() => {
 								lib.codeMirrorReady(node, this.editor);
 							});
 							lib.init.css(lib.assetURL + 'layout/default', 'codemirror');
