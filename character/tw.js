@@ -1288,7 +1288,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=get.inpileVCardList(info=>{
 						return ['basic','trick','delay'].includes(info[0])&&!player.getStorage('twshenyi').includes(info[2]);
 					});
-					var dialog=[`###${get.prompt('twshenyi',trigger.player)}###<div class="text center">从牌堆中将一张牌作为“侠义”置于武将牌上${player!=trigger.player&&player.countCards('h')?'，然后将所有手牌交给其':''}</div>`,[list,'vcard']];
+					var dialog=[`###${get.prompt('twshenyi',trigger.player)}###<div class="text center">从牌堆中将一张牌作为“侠义”置于武将牌上${player!=trigger.player&&player.countCards('h')?'，然后将任意张手牌交给其':''}</div>`,[list,'vcard']];
 					var result=yield player.chooseButton(dialog).set('ai',function(button){
 						var trigger=_status.event.getTrigger();
 						var player=_status.event.player,name=button.link[2];
