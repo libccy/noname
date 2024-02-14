@@ -2103,8 +2103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const cards=player.getEquips(1);
 					if(cards.length) player.discard(cards);
 					player.loseMaxHp();
-					player.addSkill('mashu');
-					player.addSkill('shenji');
+					player.addSkills(['mashu','shenji']);
 				},
 				derivation:['mashu','shenji'],
 			},

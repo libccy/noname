@@ -7200,8 +7200,8 @@ export class Player extends HTMLDivElement {
 	changeSkills(addSkill = [], removeSkill = []){
 		const next = game.createEvent('changeSkills', false);
 		next.player = this;
-		next.addSkill = addSkill.unique();
-		next.removeSkill = removeSkill.unique();
+		next.addSkill = addSkill.slice(0).unique();
+		next.removeSkill = removeSkill.slice(0).unique();
 		next.setContent('changeSkills');
 		return next;
 	}

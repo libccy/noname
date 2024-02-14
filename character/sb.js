@@ -552,8 +552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 													game.log(player,'选择了',target2);
 													const skills=target2.getStockSkills(true,true);
 													const skills2=player.getStockSkills(true,true);
-													player.addSkillLog(skills);
-													player.removeSkillLog(skills2);
+													player.changeSkills(skills,skills2);
 												}
 										}
 									},
@@ -1254,8 +1253,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(player.name2&&get.character(player.name2)[3].includes('sbhuoji')) list.add(player.name2);
 							if(list.length) list.forEach(name=>player.reinit(name,'sb_zhugeliang'));
 							else{
-								player.removeSkill(['sbhuoji','sbkanpo']);
-								player.addSkill(['sbguanxing','sbkongcheng']);
+								player.changeSKills(['sbguanxing','sbkongcheng'],['sbhuoji','sbkanpo']);
 							}
 						},
 					},
@@ -2302,8 +2300,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					player.draw(3);
 					'step 3'
-					player.addSkillLog('sbyingzi');
-					player.addSkillLog('gzyinghun');
+					player.addSkills(['sbyingzi','gzyinghun']);
 				},
 				ai:{
 					threaten:function(player,target){
@@ -5914,7 +5911,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('sbdujiang');
-					player.addSkillLog('sbduojing');
+					player.addSkills('sbduojing');
 					player.storage.sbkeji=true;
 				}
 			},

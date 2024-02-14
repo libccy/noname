@@ -667,7 +667,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.gain(gains,'gain2','log');
 					}
 					'step 2'
-					player.addSkill('qingce');
+					player.addSkills('qingce');
 					game.log(player,'获得了技能','#g【清侧】');
 					player.loseMaxHp();
 				},
@@ -808,7 +808,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.gain(gains,'gain2','log');
 					}
 					'step 2'
-					player.addSkillLog('drlt_qingce');
+					player.addSkills('drlt_qingce');
 					player.loseMaxHp();
 				},
 			},
@@ -1209,8 +1209,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					var num=player.maxHp-player.countCards('h');
 					if(num>0) player.draw(num);
-					player.removeSkill('drlt_jueyan');
-					player.addSkill('drlt_huairou');
+					player.changeSkills(['drlt_huairou'],['drlt_jueyan']);
 				},
 			},
 			"drlt_huairou":{
@@ -3345,10 +3344,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseDrawRecover(2,true);
 					"step 1"
 					player.loseMaxHp();
-					player.storage.zhiji=true;
-					if(player.hp>player.maxHp) player.hp=player.maxHp;
-					player.update();
-					player.addSkill('reguanxing');
+					player.addSkills('reguanxing');
 				}
 			},
 			xiangle:{
@@ -3724,7 +3720,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('zaoxian');
 					player.loseMaxHp();
-					player.addSkill('jixi');
+					player.addSkills('jixi');
 				}
 			},
 			jixi:{
@@ -3818,12 +3814,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				//priority:3,
 				content:function(){
-					player.loseMaxHp();
-					player.addSkill('reyingzi');
-					player.addSkill('gzyinghun');
-					game.log(player,'获得了技能','#g【英姿】和【英魂】')
 					player.awakenSkill(event.name);
-					player.storage[event.name]=true;
+					player.loseMaxHp();
+					player.addSkills(['reyingzi','gzyinghun']);
 				},
 				ai:{
 					threaten:function(player,target){
@@ -7650,7 +7643,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else{
 						event.betrayer.popup('质疑错误','fire');
-						event.betrayer.addSkillLog('chanyuan');
+						event.betrayer.addSkills('chanyuan');
 					}
 					'step 7'
 					game.delay(2);

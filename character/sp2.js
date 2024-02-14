@@ -921,7 +921,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if (result.bool) {
 						var target = result.targets[0];
 						player.line(target, 'thunder');
-						target.addSkillLog('dccanyun');
+						target.addSkills('dccanyun');
 					}
 				},
 			},
@@ -1174,14 +1174,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return player.countCards('h')>player.hp;
 				},
-				content:function(){
-					'step 0'
-					player.loseMaxHp();
-					'step 1'
-					player.recover(player.maxHp-player.hp);
-					player.addSkill('mashu');
-					player.addSkill('dcnuchen');
+				async content(event, trigger, player){
 					player.awakenSkill('dcdanji');
+					await player.loseMaxHp();
+					await player.recover(player.maxHp-player.hp);
+					await player.addSkills(['mashu','dcnuchen']);
 				},
 				ai:{
 					maixie:true,
@@ -1877,9 +1874,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.num2=target.countCards('e');
 					if(event.num2==4&&num!=4){
 						player.trySkillAnimate('dccuichuan_animate','dccuichuan_animate',player.checkShow('dccuichuan'));
-						player.removeSkill('dccuichuan');
-						game.log(player,'失去了技能','#g【榱椽】');
-						player.addSkillLog('dczuojian');
+						//player.removeSkill('dccuichuan');
+						//game.log(player,'失去了技能','#g【榱椽】');
+						player.changeSkills(['dczuojian'],['dccuichuan']);
 						target.insertPhase();
 						game.delayx();
 					}
@@ -4164,12 +4161,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.awakenSkill('chuanshu');
 						player.logSkill('chuanshu',target);
-						target.addSkillLog('chaofeng');
+						target.addSkills('chaofeng');
 						if(player.isDead()) event.finish();
 					}
 					else event.finish();
 					'step 2'
-					for(var i of lib.skill.chuanshu.derivation) player.addSkillLog(i);
+					player.addSkills(lib.skill.chuanshu.derivation);
 				},
 				derivation:['ollongdan','drlt_congjian','chuanyun'],
 			},
@@ -5661,8 +5658,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover(num);
 					}
 					'step 2'
-					player.removeSkill('mouni');
-					player.addSkill('zhangu');
+					//player.removeSkill('mouni');
+					player.changeSkills(['zhangu'],['mouni']);
 				},
 			},
 			zhangu:{
@@ -6443,7 +6440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.logSkill('cixiao',target);
-						target.addSkill('panshi');
+						target.addSkills('panshi');
 					}
 					event.finish();
 					'step 2'
@@ -6483,7 +6480,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return true;
 							}
 						}).concat(result.targets),'green');
-						target.addSkill('panshi');
+						target.addSkills('panshi');
 					}
 					else event.finish();
 					'step 4'
@@ -6573,7 +6570,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('decadexushen');
-					player.addSkill('decadezhennan');
+					player.addSkills('decadezhennan');
 					player.addTempSkill('decadexushen2');
 					trigger.decadexushen=true;
 					player.recover();
@@ -6697,35 +6694,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			yujuex:{
 				audio:'yujue',
-				content:function(){
-					'step 0'
-					player.disableEquip(lib.skill.yujue_backup.position);
-					'step 1'
+				async content(event,trigger,player){
+					await player.disableEquip(lib.skill.yujue_backup.position);
 					if(player.isIn()&&game.hasPlayer(function(current){
 						return current!=player&&current.countCards('h');
 					})){
-						player.chooseTarget(true,'选择一名角色交给你一张牌并获得技能〖执笏〗',function(card,player,target){
+						const result = await player.chooseTarget(true,'选择一名角色交给你一张牌并获得技能〖执笏〗',function(card,player,target){
 							if(player==target) return false;
 							return target.countCards('h')>0;
 						}).set('ai',function(target){
 							return get.attitude(_status.event.player,target)*target.countCards('h');
-						});
-					}
-					else event.finish();
-					'step 2'
-					if(result.bool){
-						var target=result.targets[0];
-						event.target=target;
-						player.line(target);
-						target.chooseCard('h',true,'交给'+get.translation(player)+'一张手牌');
-					}
-					else event.finish();
-					'step 3'
-					if(result.bool&&result.cards&&result.cards.length){
-						target.give(result.cards,player);
-						target.storage.zhihu_mark=player;
-						target.addSkill('zhihu');
-						target.addSkill('zhihu_mark');
+						}).forResult();
+						if(result.bool){
+							var target=result.targets[0];
+							event.target=target;
+							player.line(target);
+							const result2 = await target.chooseCard('h',true,'交给'+get.translation(player)+'一张手牌').forResult();
+							if(result2.bool&&result2.cards&&result2.cards.length){
+								await target.give(result2.cards,player);
+								target.storage.zhihu_mark=player;
+								await target.addSkills('zhihu');
+								target.addSkill('zhihu_mark');
+							}
+						}
 					}
 				},
 			},
@@ -9431,8 +9422,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.line(list[i],'green');
 						}
 					}
-					player.removeSkill('guju');
-					player.addSkill('bmcanshi');
+					//player.removeSkill('guju');
+					player.changeSkills(['bmcanshi'],['guju']);
 				}
 			},
 			bmcanshi:{
