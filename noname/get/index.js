@@ -4664,7 +4664,7 @@ export class Get extends Uninstantable {
 	 */
 	static dynamicVariable(source){
 		if(typeof source == 'function'){
-			return source.call(null,...(arguments.slice(1)));
+			return source.call(null,...(Array.from(arguments).slice(1)));
 		}
 		return source;
 	}
