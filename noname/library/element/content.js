@@ -8123,7 +8123,10 @@ export const Content = {
 			var owner = get.owner(cards[0]);
 			if (owner) {
 				event.relatedLose = owner.lose(cards, ui.special).set('getlx', false);
-				if (cardInfo && !cardInfo.blankCard) event.relatedLose.set('visible',true);
+				if (cardInfo && !cardInfo.blankCard) {
+					event.relatedLose.set('visible', true);
+					event.set('visible', true);
+				}
 			}
 			else if (get.position(cards[0]) == 'c') event.updatePile = true;
 		}
