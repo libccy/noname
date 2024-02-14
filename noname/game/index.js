@@ -8428,8 +8428,10 @@ export class Game extends Uninstantable {
 		return skills.addArray(skills.reduce((previousValue, currentValue) => {
 			const info = get.info(currentValue);
 			if (info) {
-				if (Array.isArray(info.group)) previousValue.push(...info.group);
-				else if (info.group) previousValue.push(info.group);
+				if (info.group) {
+					const adds = Array.isArray(info.group) ? info.group : [info.group];
+					previousValue.push(adds.filter(i => lib.skill[i]));
+				}
 			}
 			else console.log(currentValue);
 			return previousValue;
