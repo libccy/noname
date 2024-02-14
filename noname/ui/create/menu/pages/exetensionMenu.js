@@ -16,7 +16,7 @@ import {
 	createMenu,
 	createConfig
 } from "../index.js";
-import { ui, game, get, lib, _status } from "../../../../../noname.js";
+import { ui, game, get, ai, lib, _status } from "../../../../../noname.js";
 import { nonameInitialized } from "../../../../util/index.js";
 
 export const extensionMenu = function (connectMenu) {
