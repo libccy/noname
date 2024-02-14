@@ -1556,6 +1556,33 @@ export class Player extends HTMLDivElement {
 		return savable;
 	}
 	/**
+	 * @param { String } from
+	 * @param { String } to
+	 * @returns { GameEventPromise }
+	 */
+	reinitCharacter(from, to){
+		const rawPairs = [this.name1];
+		if (this.name2) rawPairs.push(this.name2);
+		for (let i=0; i<rawPairs.length; i++){
+			if (rawPairs[i] == from) {
+				rawPairs[i] = to;
+				break;
+			}
+		}
+		return this.changeCharacter(rawPairs);
+	}
+	/**
+	 * @param { String[] } newPairs
+	 * @returns { GameEventPromise }
+	 */
+	changeCharacter(newPairs){
+		const next = game.createEvent('changeCharacter');
+		next.player = this;
+		next.newPairs = newPairs;
+		next.setContent('changeCharacter');
+		return next;
+	}
+	/**
 	 * @param { 0 | 1 | 2 } num
 	 * @param { false } [log]
 	 */
@@ -2367,64 +2394,63 @@ export class Player extends HTMLDivElement {
 		else {
 			return this;
 		}
-		if (online) {
-			return;
-		}
-		for (var i = 0; i < info1[3].length; i++) {
-			this.removeSkill(info1[3][i]);
-		}
-		for (var i = 0; i < info2[3].length; i++) {
-			var info = get.info(info2[3][i]);
-			if (info && info.zhuSkill && !this.isZhu2()) continue;
-			this.addSkill(info2[3][i]);
-		}
-		if (Array.isArray(maxHp)) {
-			this.maxHp = maxHp[1];
-			this.hp = maxHp[0];
-		}
-		else {
-			var num;
-			if (maxHp === false) {
-				num = 0;
+		if (!online) {
+			for (var i = 0; i < info1[3].length; i++) {
+				this.removeSkill(info1[3][i]);
+			}
+			for (var i = 0; i < info2[3].length; i++) {
+				var info = get.info(info2[3][i]);
+				if (info && info.zhuSkill && !this.isZhu2()) continue;
+				this.addSkill(info2[3][i]);
+			}
+			if (Array.isArray(maxHp)) {
+				this.maxHp = maxHp[1];
+				this.hp = maxHp[0];
 			}
 			else {
-				if (typeof maxHp != 'number') {
-					maxHp = get.infoMaxHp(info2[2]);
+				var num;
+				if (maxHp === false) {
+					num = 0;
 				}
-				num = maxHp - get.infoMaxHp(info1[2]);
-			}
-			if (typeof this.singleHp == 'boolean') {
-				if (num % 2 != 0) {
-					if (this.singleHp) {
-						this.maxHp += (num + 1) / 2;
-						this.singleHp = false;
+				else {
+					if (typeof maxHp != 'number') {
+						maxHp = get.infoMaxHp(info2[2]);
+					}
+					num = maxHp - get.infoMaxHp(info1[2]);
+				}
+				if (typeof this.singleHp == 'boolean') {
+					if (num % 2 != 0) {
+						if (this.singleHp) {
+							this.maxHp += (num + 1) / 2;
+							this.singleHp = false;
+						}
+						else {
+							this.maxHp += (num - 1) / 2;
+							this.singleHp = true;
+							if (!game.online) {
+								this.doubleDraw();
+							}
+						}
 					}
 					else {
-						this.maxHp += (num - 1) / 2;
-						this.singleHp = true;
-						if (!game.online) {
-							this.doubleDraw();
-						}
+						this.maxHp += num / 2;
 					}
 				}
 				else {
-					this.maxHp += num / 2;
+					this.maxHp += num;
 				}
 			}
-			else {
-				this.maxHp += num;
-			}
+			game.broadcast(function (player, from, to, skills) {
+				player.reinit(from, to, null, true);
+				player.applySkills(skills);
+			}, this, from, to, get.skillState(this));
+			game.addVideo('reinit3', this, {
+				from: from,
+				to: to,
+				hp: this.maxHp,
+				avatar2: this.name2 == to
+			});
 		}
-		game.broadcast(function (player, from, to, skills) {
-			player.reinit(from, to, null, true);
-			player.applySkills(skills);
-		}, this, from, to, get.skillState(this));
-		game.addVideo('reinit3', this, {
-			from: from,
-			to: to,
-			hp: this.maxHp,
-			avatar2: this.name2 == to
-		});
 
 		this.$reinit(from, to, maxHp, online);
 		this.update();

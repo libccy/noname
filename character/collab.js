@@ -618,7 +618,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addMark('dcbianzhuang',1,false);
 						if(player.countMark('dcbianzhuang')>2){
 							player.storage.dcbianzhuang_inited=true;
-							player.reinit('zhutiexiong','wu_zhutiexiong');
+							player.reinitCharacter('zhutiexiong','wu_zhutiexiong');
 						}
 					}
 				},

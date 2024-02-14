@@ -11,25 +11,49 @@ export const Content = {
 	emptyEvent: () => {
 		event.trigger(event.name);
 	},
+	//变更武将牌
+	async changeCharacter(event,trigger,player) {
+		const rawPairs = [player.name1];
+		if (player.name2) rawPairs.push(player.name2);
+		event.rawPairs = rawPairs;
+		const newPairs = event.newPairs;
+		const removeSkills = [], addSkills = [];
+		//变更前后数量相同的情况
+		if (rawPairs.length == newPairs.length){
+			for (let i = 0; i<Math.min(2, rawPairs.length); i++){
+				let rawName = rawPairs[i], newName = newPairs[i];
+				if (rawName != newName && lib.character[rawName] && lib.character[newName]) {
+					game.log(player, '将', `#b${get.translation(rawName)}`, '变更为了', `#b${get.translation(newName)}`)
+					game.broadcastAll((player, rawName, newName)=>{
+						player.reinit(rawName, newName, null, true);
+					},player, rawName, newName);
+					removeSkills.addArray(lib.character[rawName][3]);
+					addSkills.addArray(lib.character[newName][3])
+				}
+			}
+		}
+		//变更一下获得前后的技能
+		player.changeSkills(addSkills, removeSkills);
+	},
 	//变更技能
 	async changeSkills (event,trigger,player) {
 		//去重检查
 		event.addSkill.unique();
 		event.removeSkill.unique();
 		const duplicatedSkills = event.addSkill.filter(skill => event.removeSkill.includes(skill));
-		if(duplicatedSkills.length){
+		if (duplicatedSkills.length) {
 			event.addSkill.removeArray(duplicatedSkills);
 			event.removeSkill.removeArray(duplicatedSkills);
 		}
-		if(!event.addSkill.length&&!event.removeSkill.length) return;
+		if (!event.addSkill.length&&!event.removeSkill.length) return;
 		//手动触发时机
 		await event.trigger('changeSkillsBefore');
 		await event.trigger('changeSkillsBegin');
 		//处理失去和获得的技能
-		if(event.$handle){
-			event.$handle(player,event.addSkill,event.removeSkill,event);
+		if (event.$handle) {
+			event.$handle(player, event.addSkill, event.removeSkill, event);
 		}
-		else{
+		else {
 			if(event.addSkill.length) player.addSkillLog(event.addSkill);
 			if(event.removeSkill.length) player.removeSkillLog(event.removeSkill);
 		}
