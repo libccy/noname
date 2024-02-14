@@ -2253,7 +2253,7 @@ export class Get extends Uninstantable {
 		numStr = numStr.replace(/(?=(\d{4})+$)/g, ',').split(',').filter(Boolean);
 		const handleZero = str => {
 			let result = str.replace(/零{2,}/g, '零');
-			if (result.length > 1) replace(/零+$/g, '');
+			if (result.length > 1) result = result.replace(/零+$/g, '');
 			return result;
 		};
 		const _transform = str => {
