@@ -4625,7 +4625,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content(){
 					'step 0'
 					player.awakenSkill('yukito_yaxiang');
-					player.reinit('key_yukito','key_crow');
+					player.reinitCharacter('key_yukito', 'key_crow', false);
 					'step 1'
 					if(target.hp<3) target.recover(3-target.hp);
 					'step 2'
@@ -7815,9 +7815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover(num);
 					player.draw(num);
 					if(_status.characterlist&&_status.characterlist.includes('key_midori')){
-						player.reinit('key_mio','key_midori',false);
-						_status.characterlist.remove('key_midori');
-						_status.characterlist.add('key_mio');
+						player.reinitCharacter('key_mio','key_midori', false);
 					}
 				},
 			},
@@ -7890,9 +7888,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover(num);
 					player.draw(num);
 					if(_status.characterlist&&_status.characterlist.includes('key_mio')){
-						player.reinit('key_midori','key_mio',false);
-						_status.characterlist.remove('key_mio');
-						_status.characterlist.add('key_midori');
+						player.reinitCharacter('key_midori', 'key_mio', false);
 					}
 				},
 			},
@@ -10754,7 +10750,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content(){
 					'step 0'
 					player.awakenSkill('umi_qihuan');
-					player.reinit('key_umi','key_umi2');
+					player.reinitCharacter('key_umi', 'key_umi2', false);
 					player.recover(game.countGroup()||1);
 					if(!game.dead.length) event.finish();
 					'step 1'

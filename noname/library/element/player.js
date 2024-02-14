@@ -1560,7 +1560,7 @@ export class Player extends HTMLDivElement {
 	 * @param { String } to
 	 * @returns { GameEventPromise }
 	 */
-	reinitCharacter(from, to){
+	reinitCharacter(from, to, log = true){
 		const rawPairs = [this.name1];
 		if (this.name2) rawPairs.push(this.name2);
 		for (let i=0; i<rawPairs.length; i++){
@@ -1569,16 +1569,27 @@ export class Player extends HTMLDivElement {
 				break;
 			}
 		}
-		return this.changeCharacter(rawPairs);
+		return this.changeCharacter(rawPairs, log);
 	}
 	/**
 	 * @param { String[] } newPairs
 	 * @returns { GameEventPromise }
 	 */
-	changeCharacter(newPairs){
+	changeCharacter(newPairs, log = true){
+		if (!Array.isArray(newPairs)){
+			console.warn(`警告：Player[${this.name}].changeCharacter填写了一个错误的参数:`,newPairs);
+			return;
+		}
+		for(let name of newPairs){
+			if(!lib.character[name]){
+				console.warn(`警告：Player[${this.name}]试图将武将牌变更为不存在的武将:`,name);
+				return;
+			}
+		}
 		const next = game.createEvent('changeCharacter');
 		next.player = this;
 		next.newPairs = newPairs;
+		next.log = log;
 		next.setContent('changeCharacter');
 		return next;
 	}

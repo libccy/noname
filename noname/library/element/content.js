@@ -14,23 +14,33 @@ export const Content = {
 	//变更武将牌
 	async changeCharacter(event,trigger,player) {
 		const rawPairs = [player.name1];
-		if (player.name2) rawPairs.push(player.name2);
+		if (player.name2 && lib.character[player.name2]) rawPairs.push(player.name2);
 		event.rawPairs = rawPairs;
 		const newPairs = event.newPairs;
+		for(let name of newPairs){
+			if(!lib.character[name]){
+				console.warn(`警告：Player[${player.name}]试图将武将牌变更为不存在的武将“${name}”`);
+				return;
+			}
+		}
 		const removeSkills = [], addSkills = [];
 		//变更前后数量相同的情况
 		if (rawPairs.length == newPairs.length){
 			for (let i = 0; i<Math.min(2, rawPairs.length); i++){
 				let rawName = rawPairs[i], newName = newPairs[i];
 				if (rawName != newName && lib.character[rawName] && lib.character[newName]) {
-					game.log(player, '将', `#b${get.translation(rawName)}`, '变更为了', `#b${get.translation(newName)}`)
+					if(event.log !== false) game.log(player, '将', `#b${get.translation(rawName)}`, '变更为了', `#b${get.translation(newName)}`)
 					game.broadcastAll((player, rawName, newName)=>{
 						player.reinit(rawName, newName, null, true);
 					},player, rawName, newName);
 					removeSkills.addArray(lib.character[rawName][3]);
-					addSkills.addArray(lib.character[newName][3])
+					addSkills.addArray(lib.character[newName][3]);
 				}
 			}
+		}
+		if(_status.characterlist){
+			_status.characterlist.removeArray(newPairs);
+			_status.characterlist.addArray(rawPairs);
 		}
 		//变更一下获得前后的技能
 		player.changeSkills(addSkills, removeSkills);
@@ -54,8 +64,18 @@ export const Content = {
 			event.$handle(player, event.addSkill, event.removeSkill, event);
 		}
 		else {
-			if(event.addSkill.length) player.addSkillLog(event.addSkill);
-			if(event.removeSkill.length) player.removeSkillLog(event.removeSkill);
+			if(event.addSkill.length){
+				player.addSkill(event.addSkill);
+				game.log(player, '获得了技能', ...event.addSkill.map(i => {
+					return '#g【' + get.translation(i) + '】';
+				}));
+			}
+			if(event.removeSkill.length){
+				player.removeSkill(event.removeSkill);
+				game.log(player, '失去了技能', ...event.removeSkill.map(i => {
+					return '#g【' + get.translation(i) + '】';
+				}));
+			}
 		}
 		//手动触发时机
 		await event.trigger('changeSkillsEnd');
