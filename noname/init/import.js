@@ -39,6 +39,13 @@ function generateImportFunction(type, pathParser) {
 			await game.import(type, await createEmptyExtension(name));
 			return;
 		}
+		if(type == 'mode' && lib.mode[name] && lib.mode[name].fromextension){
+			let loadModeMethod = lib.init['setMode_'+name];
+			if(typeof loadModeMethod === 'function'){
+				await Promise.resolve(loadModeMethod());
+				return;
+			}
+		}
 		let path = pathParser(name);
 		// 通过浏览器自带的script标签导入可直接获取报错信息，且不会影响JS运行
 		// 此时代码内容也将缓存在浏览器中，故再次import后将不会重新执行代码内容（测试下来如此）
