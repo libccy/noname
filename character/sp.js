@@ -26010,6 +26010,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fanjiangzhangda:['fanjiangzhangda','jsrg_fanjiangzhangda'],
 			simalang:['re_simalang','simalang'],
 			zhugedan:['re_zhugedan','zhugedan'],
+			zhangren:['jsrg_zhangren','zhangren'],
+			wenqin:['ol_wenqin','pe_wenqin'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",

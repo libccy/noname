@@ -77,6 +77,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_lvmeng:['shen_lvmeng','tw_shen_lvmeng'],
 			shen_machao:['shen_machao','ps_shen_machao'],
 			shen_jiaxu:['le_shen_jiaxu','shen_jiaxu'],
+			shen_caocao:['shen_caocao','old_caocao'],
 		},
 		characterFilter:{
 			shen_diaochan(mode){
