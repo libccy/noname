@@ -19,7 +19,7 @@ export const Content = {
 		const newPairs = event.newPairs;
 		for(let name of newPairs){
 			if(!lib.character[name]){
-				console.warn(`警告：Player[${player.name}]试图将武将牌变更为不存在的武将“${name}”`);
+				console.warn(`警告：Player[${player.name}]试图将武将牌变更为不存在的武将`,name);
 				return;
 			}
 		}
