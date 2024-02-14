@@ -314,7 +314,7 @@ export class Create extends Uninstantable {
 			}
 			else bg = ui.create.div(node);
 			node.classList.add('tempimage');
-			let img = lib.card[cardName].image;
+			let img = get.dynamicVariable(lib.card[cardName].image,card);
 			if (img) {
 				if (img.startsWith('db:')) {
 					img = img.slice(3);
@@ -342,7 +342,7 @@ export class Create extends Uninstantable {
 					}
 				}
 			}
-			else if (lib.card[cardName].image == 'background') {
+			else if (get.dynamicVariable(lib.card[cardName].image,card) == 'background') {
 				if (cardNature) bg.setBackground(cardName + '_' + cardNature, 'card');
 				else bg.setBackground(cardName, 'card');
 			}
@@ -356,12 +356,12 @@ export class Create extends Uninstantable {
 						bg.setBackgroundDB(img);
 					}
 				}
-				else if (lib.card[cardName].image) {
-					if (lib.card[cardName].image.startsWith('character:')) {
-						bg.setBackground(lib.card[cardName].image.slice(10), 'character');
+				else if (get.dynamicVariable(lib.card[cardName].image,card)) {
+					if (get.dynamicVariable(lib.card[cardName].image,card).startsWith('character:')) {
+						bg.setBackground(get.dynamicVariable(lib.card[cardName].image,card).slice(10), 'character');
 					}
 					else {
-						bg.setBackground(lib.card[cardName].image);
+						bg.setBackground(get.dynamicVariable(lib.card[cardName].image,card));
 					}
 				}
 				else {
@@ -374,11 +374,11 @@ export class Create extends Uninstantable {
 					}
 				}
 			}
-			else if (lib.card[cardName].image == 'card') {
+			else if (get.dynamicVariable(lib.card[cardName].image,card) == 'card') {
 				if (cardNature) bg.setBackground(cardName + '_' + cardNature, 'card');
 				else bg.setBackground(cardName, 'card');
 			}
-			else if (typeof lib.card[cardName].image == 'string' && !lib.card[cardName].fullskin) {
+			else if (typeof get.dynamicVariable(lib.card[cardName].image,card) == 'string' && !lib.card[cardName].fullskin) {
 				if (img) {
 					if (img.startsWith('ext:')) {
 						bg.setBackgroundImage(img.replace(/^ext:/, 'extension/'));
@@ -389,7 +389,7 @@ export class Create extends Uninstantable {
 					}
 				}
 				else {
-					bg.setBackground(lib.card[cardName].image);
+					bg.setBackground(get.dynamicVariable(lib.card[cardName].image,card));
 				}
 			}
 			else {

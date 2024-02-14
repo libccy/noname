@@ -4657,6 +4657,17 @@ export class Get extends Uninstantable {
 		if (eff > 0 && target.hujia > 0) return eff / 1.3;
 		return eff;
 	}
+	/**
+	 * 
+	 * @param {any} source 如果参数是function，执行此函数并返回结果，传参为此方法剩余的参数。如果参数不是function，直接返回结果。
+	 * @returns 返回的结果
+	 */
+	static dynamicVariable(source){
+		if(typeof source == 'function'){
+			return source.call(...(arguments.slice(1)));
+		}
+		return source;
+	}
 	static recoverEffect(target, player, viewer) {
 		if (target.hp == target.maxHp) return 0;
 		if (!player) {
