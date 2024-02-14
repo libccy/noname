@@ -2238,8 +2238,8 @@ export class Get extends Uninstantable {
 	static cnNumber(num, ordinal) {
 		if (isNaN(num)) return '';
 		let numStr = num.toString();
-		if (num === 'Infinity') return '∞';
-		if (num === '-Infinity') return '-∞';
+		if (numStr === 'Infinity') return '∞';
+		if (numStr === '-Infinity') return '-∞';
 		if (!/^\d+$/.test(numStr)) return num;
 
 		const chars = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
