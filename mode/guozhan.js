@@ -2169,7 +2169,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					else{
-						target.addSkillLog(result.control);
+						target.addSkills(result.control);
 						target.line(player);
 						player.recover(player.maxHp-player.hp);
 					}
@@ -3914,7 +3914,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.logSkill('gzlianyou',target);
-						target.addSkillLog('gzxinghuo');
+						target.addSkills('gzxinghuo');
 						game.delayx();
 					}
 				},
@@ -10828,8 +10828,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(list.length){
 						player.gain(list,'gain2');
 						if(list.length>=3&&player.hasStockSkill('lianzi')){
-							player.removeSkill('lianzi');
-							player.addSkill('gzzhiheng');
+							player.changeSkills(['gzzhiheng'],['lianzi']);
 						}
 					}
 				},
@@ -11997,9 +11996,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.recover(2-player.hp);
 					}
 					'step 2'
-					player.removeSkill('shouyue');
 					player.removeSkill('wuhujiangdaqi');
-					player.addSkill('rerende');
+					player.changeSkills(['rerende'],['shouyue']);
 				},
 				ai:{
 					order:1,
@@ -12420,7 +12418,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						player.removeCharacter(1);
 					}
 					'step 1'
-					target.addSkill('gzyongjue');
+					target.addSkills('gzyongjue');
 					if(target!=player){
 						target.draw(2);
 					}
@@ -12504,11 +12502,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.removeCharacter(1);
 					'step 1'
-					player.removeSkill('baoling');
+					player.removeSkills('baoling');
 					player.gainMaxHp(3,true);
 					'step 2'
 					player.recover(3);
-					player.addSkill('benghuai');
+					player.addSkills('benghuai');
 				},
 				derivation:'benghuai'
 			},
@@ -15523,7 +15521,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(event.hidden) game.log(player,'替换了副将','#g'+get.translation(player.name2));
 					else game.log(player,'将副将从','#g'+get.translation(player.name2),'变更为','#g'+get.translation(name));
 					player.viceChanged=true;
-					player.reinit(player.name2,name,false);
+					player.reinitCharacter(player.name2,name,false);
 				},
 				changeVice:function(){
 					'step 0'
@@ -15579,7 +15577,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(event.hidden) game.log(player,'替换了副将','#g'+get.translation(player.name2));
 					else game.log(player,'将副将从','#g'+get.translation(player.name2),'变更为','#g'+get.translation(name));
 					player.viceChanged=true;
-					player.reinit(player.name2,name,false);
+					player.reinitCharacter(player.name2,name,false);
 				},
 				/*----分界线----*/
 				mayChangeVice:function(){

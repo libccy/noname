@@ -1774,12 +1774,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.awakenSkill('tomoyo_zhengfeng');
 							player.loseMaxHp();
 							'step 1'
-							player.removeSkill('tomoyo_wuwei');
+							player.removeSkills('tomoyo_wuwei');
 							'step 2'
 							player.draw(2);
 							player.recover();
 							'step 3'
-							player.addSkill('tomoyo_changshi');
+							player.addSkills('tomoyo_changshi');
 						},
 					},
 				},
@@ -2195,12 +2195,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				multiline:true,
 				line:{color:[253, 153, 182]},
 				content(){
-					game.countPlayer(function(current){
+					game.filterPlayer().sortBySeat().forEach(function(current){
 						if(!targets.includes(current)){
-							current.removeSkill('seira_yinyuan');
+							current.removeSkills('seira_yinyuan');
 						}
 						else{
-							current.addSkillLog('seira_yinyuan');
+							current.addSkills('seira_yinyuan');
 						}
 					});
 					game.delayx();
@@ -2350,7 +2350,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.draw(2);
 							player.markAuto('nsxingyun',[lib.skill.nsxingyun.getSixiang(trigger.card)]);
 							'step 1'
-							if(player.getStorage('nsxingyun').length>=4) player.addSkillLog('bazhen');
+							if(player.getStorage('nsxingyun').length>=4) player.addSkills('bazhen');
 						},
 					},
 					round:{
@@ -3416,8 +3416,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(owner&&owner!=player) owner.give(card,player);
 							'step 1'
 							if(player.hp<player.maxHp) player.recover(player.maxHp-player.hp);
-							player.removeSkill('mia_shihui');
-							player.addSkill('mia_fengfa');
+							player.changeSkills(['mia_fengfa'],['mia_shihui']);
 						},
 					},
 					fail:{
@@ -3841,7 +3840,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.storage.tenzen_lingyu=true;
 					player.loseMaxHp();
 					if(player.isHealthy()) player.draw(2);
-					player.addSkill('tenzen_tianquan');
+					player.addSkills('tenzen_tianquan');
 				},
 			},
 			tenzen_tianquan:{
@@ -4626,14 +4625,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content(){
 					'step 0'
 					player.awakenSkill('yukito_yaxiang');
-					player.reinit('key_yukito','key_crow');
+					player.reinitCharacter('key_yukito', 'key_crow', false);
 					'step 1'
 					if(target.hp<3) target.recover(3-target.hp);
 					'step 2'
 					var cards=target.getCards('j');
 					if(cards.length) target.discard(cards);
 					'step 3'
-					target.addSkill('misuzu_zhongyuan');
+					target.addSkills('misuzu_zhongyuan');
 				},
 				derivation:'misuzu_zhongyuan',
 				ai:{
@@ -4860,7 +4859,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content(){
 					player._chihaya_liewu=true;
 					player.loseMaxHp(4);
-					player.addSkill('chihaya_huairou');
+					player.addSkills('chihaya_huairou');
 				},
 			},
 			chihaya_huairou:{
@@ -5248,7 +5247,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('hiroto_huyu',target);
 						target.give(result.cards,player);
 						player.storage.hiroto_huyu2=target;
-						player.addSkill('hiroto_zonglve');
+						player.addSkills('hiroto_zonglve');
 						player.addSkill('hiroto_huyu2');
 					}
 				},
@@ -5259,9 +5258,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				popup:false,
 				charlotte:true,
-				content(){
+				async content(event,trigger,player){
 					player.removeSkill('hiroto_huyu2');
-					player.removeSkill('hiroto_zonglve');
+					await player.removeSkills('hiroto_zonglve');
 					player.removeGaintag('hiroto_huyu2');
 					var target=player.storage.hiroto_huyu2;
 					if(target&&target.isIn()){
@@ -5348,8 +5347,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content(){
 					player.awakenSkill('hiroto_tuolao');
 					player.draw(3);
-					player.removeSkill('hiroto_huyu');
-					player.addSkill('hiroto_zonglve');
+					player.changeSkills(['hiroto_zonglve'],['hiroto_huyu']);
 				},
 			},
 			shizuku_sizhi:{
@@ -5711,7 +5709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover();
 						var list=['umi_chaofan','ao_xishi','tsumugi_mugyu','kamome_jieban'];
 						var skill=list.randomGet();
-						player.addSkillLog(skill);
+						player.addSkills(skill);
 						player.flashAvatar('shiroha_jiezhao','key_'+skill.split('_')[0]);
 					}
 				},
@@ -6286,8 +6284,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return info&&info.charlotte==true;
 						});
 						if(skills.length){
-							target.removeSkill(skills);
-							player.addSkill(skills);
+							target.removeSkills(skills);
+							player.addSkills(skills);
 							lib.translate.yuu_lveduo_info=lib.translate.yuu_lveduo_full_info;
 						}
 						if(target.name=='key_yusa'){
@@ -6354,7 +6352,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('godan_xiaoyuan');
 					player.loseMaxHp(3);
 					player.draw(3);
-					player.removeSkill('godan_feiqu');
+					player.removeSkills('godan_feiqu');
 				},
 			},
 			abyusa_jueqing:{
@@ -6882,7 +6880,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(cards.length) player.discard(cards);
 					player.removeSkill('kud_qiaoshou_equip');
 					player.draw(cards.length);
-					player.addSkill('kud_chongzhen');
+					player.addSkills('kud_chongzhen');
 					'step 1'
 					var num=2-player.hp;
 					if(num) player.recover(num);
@@ -7817,9 +7815,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover(num);
 					player.draw(num);
 					if(_status.characterlist&&_status.characterlist.includes('key_midori')){
-						player.reinit('key_mio','key_midori',false);
-						_status.characterlist.remove('key_midori');
-						_status.characterlist.add('key_mio');
+						player.reinitCharacter('key_mio','key_midori', false);
 					}
 				},
 			},
@@ -7892,9 +7888,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover(num);
 					player.draw(num);
 					if(_status.characterlist&&_status.characterlist.includes('key_mio')){
-						player.reinit('key_midori','key_mio',false);
-						_status.characterlist.remove('key_mio');
-						_status.characterlist.add('key_midori');
+						player.reinitCharacter('key_midori', 'key_mio', false);
 					}
 				},
 			},
@@ -8043,10 +8037,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				animationColor:'orange',
 				content(){
 					player.awakenSkill('yuzuru_deyi');
-					player.removeSkill('yuzuru_wuxin');
-					player.addSkillLog('yuzuru_kunfen');
-					player.addSkillLog('yuzuru_quji');
-					player.addSkillLog('yuzuru_wangsheng');
+					player.changeSkills(['yuzuru_kunfen','yuzuru_quji','yuzuru_wangsheng'],['yuzuru_wuxin']);
 					player.loseMaxHp();
 					player.recover();
 				},
@@ -8243,8 +8234,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content(){
 					player.awakenSkill('ao_shixin');
-					player.removeSkill('ao_kuihun');
-					player.addSkill('ao_diegui');
+					player.changeSkills(['ao_diegui'],['ao_kuihun']);
 					player.gainMaxHp();
 					player.recover();
 				},
@@ -8872,10 +8862,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content(){
 					player.awakenSkill('riki_mengzhong');
-					player.removeSkill('riki_spwenji');
+					player.removeSkills('riki_spwenji');
 					player.gainMaxHp();
 					player.recover();
-					player.addSkill('riki_chongzhen');
+					player.addSkills('riki_chongzhen');
 				},
 			},
 			riki_chongzhen:{
@@ -10035,7 +10025,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content(){
 					player.awakenSkill('yui_takaramono');
-					player.addSkill('yui_yinhang');
+					player.addSkills('yui_yinhang');
 					player.storage._ichiban_no_takaramono=true;
 					player.gainMaxHp();
 					player.recover();
@@ -10676,7 +10666,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.getParent(2).name=='komari_xueshang'&&event.getParent(2).player==player;
 				},
 				content(){
-					player.removeSkill('komari_xueshang');
+					player.removeSkills('komari_xueshang');
 					player.gainMaxHp(true);
 					player.recover();
 				},
@@ -10760,7 +10750,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content(){
 					'step 0'
 					player.awakenSkill('umi_qihuan');
-					player.reinit('key_umi','key_umi2');
+					player.reinitCharacter('key_umi', 'key_umi2', false);
 					player.recover(game.countGroup()||1);
 					if(!game.dead.length) event.finish();
 					'step 1'
@@ -10806,8 +10796,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.chooseControl(list).set('prompt','选择获得一个技能');
 					}
 					'step 4'
-					player.addSkill(result.control,get.groupnature(event.temp.group)||'key');
-					player.addSkill(result.control);
+					//player.addSkills(result.control,get.groupnature(event.temp.group)||'key');
+					player.addSkills(result.control);
 					var info=get.info(result.control);
 					if(info.zhuSkill){
 						if(!player.storage.zhuSkill_umi_qihuan) player.storage.zhuSkill_umi_qihuan=[];
@@ -17649,8 +17639,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var skills=lib.skill.junkyuheng.derivation.randomGets(result.cards.length);
-						player.addAdditionalSkill('junkyuheng',skills);
-						game.log(player,'获得了以下技能：','#g'+get.translation(skills));
+						player.changeSkills(skills,[]).set('$handle',(player,skills)=>{
+							player.addAdditionalSkill('junkyuheng',skills);
+							game.log(player,'获得了以下技能：','#g'+get.translation(skills));
+						});
 					}
 				},
 				group:'junkyuheng_remove',
@@ -17664,22 +17656,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return player.additionalSkills.junkyuheng&&player.additionalSkills.junkyuheng.length>0;
 						},
 						content(){
-							player.draw(player.additionalSkills.junkyuheng.length);
-							game.log(player,'失去了以下技能：','#g'+get.translation(player.additionalSkills.junkyuheng));
-							player.removeAdditionalSkill('junkyuheng');
+							const skills = player.additionalSkills.junkyuheng;
+							player.draw(skills.length);
+							player.changeSkills([],skills).set('$handle',(player,addSkills,removeSkills)=>{
+								game.log(player,'失去了以下技能：','#g'+get.translation(removeSkills));
+								for(let skill of removeSkills) player.removeAdditionalSkill('junkyuheng',skill);
+							});
 						},
 					},
 				},
 			},
 			junkdili:{
 				audio:'dili',
-				trigger:{player:'logSkill'},
+				trigger:{player:'changeSkillsAfter'},
 				forced:true,
 				juexingji:true,
 				skillAnimation:true,
 				animationColor:'wood',
 				filter(event,player){
-					if(event.skill!='junkyuheng') return false;
+					if(!event.addSkill.length) return false;
 					var skills=player.getSkills(null,false,false).filter(function(i){
 						var info=get.info(i);
 						return info&&!info.charlotte;
@@ -17734,12 +17729,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var skills=result.links;
 						game.log(player,'失去了以下技能：','#g'+get.translation(skills));
-						player.removeSkill(skills.slice(0));
+						player.removeSkills(skills.slice(0));
 					}
 					var list=lib.skill.junkdili.derivation;
-					for(var i=0;i<Math.min(skills.length,list.length);i++){
-						player.addSkillLog(list[i]);
-					}
+					list=list.slice(0,Math.min(skills.length,list.length));
+					player.addSkills(list);
 				},
 				derivation:['junkshengzhi','junkquandao','junkchigang'],
 			},
@@ -18952,7 +18946,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junkyuheng:'驭衡',
 			junkyuheng_info:'锁定技。①回合开始时，你须弃置任意张花色不同的牌，从<span style="font-family: yuanli">东吴命运线·改</span>中随机获得等量的技能。②回合结束时，你失去所有因〖驭衡①〗获得的技能，然后摸等量的牌。',
 			junkdili:'帝力',
-			junkdili_info:'觉醒技。当你发动〖驭衡①〗后，若你拥有的技能数大于你的体力上限，则你减1点体力上限，选择失去任意个其他技能，然后获得以下技能中的前等量个：〖圣质〗/〖权道〗/〖持纲〗。',
+			junkdili_info:'觉醒技。当你获得技能后，若你拥有的技能数大于你的体力上限，则你减1点体力上限，选择失去任意个其他技能，然后获得以下技能中的前等量个：〖圣质〗/〖权道〗/〖持纲〗。',
 			junkshengzhi:'圣质',
 			junkshengzhi_info:'锁定技。当你发动非锁定技后，你令你本回合使用的下一张牌无距离和次数限制。',
 			junkquandao:'权道',

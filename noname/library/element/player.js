@@ -1556,6 +1556,44 @@ export class Player extends HTMLDivElement {
 		return savable;
 	}
 	/**
+	 * @param { String } from
+	 * @param { String } to
+	 * @returns { GameEventPromise }
+	 */
+	reinitCharacter(from, to, log = true){
+		const rawPairs = [this.name1];
+		if (this.name2) rawPairs.push(this.name2);
+		for (let i=0; i<rawPairs.length; i++){
+			if (rawPairs[i] == from) {
+				rawPairs[i] = to;
+				break;
+			}
+		}
+		return this.changeCharacter(rawPairs, log);
+	}
+	/**
+	 * @param { String[] } newPairs
+	 * @returns { GameEventPromise }
+	 */
+	changeCharacter(newPairs, log = true){
+		if (!Array.isArray(newPairs)){
+			console.warn(`警告：Player[${this.name}].changeCharacter填写了一个错误的参数:`,newPairs);
+			return;
+		}
+		for(let name of newPairs){
+			if(!lib.character[name]){
+				console.warn(`警告：Player[${this.name}]试图将武将牌变更为不存在的武将:`,name);
+				return;
+			}
+		}
+		const next = game.createEvent('changeCharacter');
+		next.player = this;
+		next.newPairs = newPairs;
+		next.log = log;
+		next.setContent('changeCharacter');
+		return next;
+	}
+	/**
 	 * @param { 0 | 1 | 2 } num
 	 * @param { false } [log]
 	 */
@@ -2344,6 +2382,69 @@ export class Player extends HTMLDivElement {
 		this.firstChild.innerHTML = str;
 		return this;
 	}
+	reinit2(newPairs) {
+		const player = this;
+		game.broadcast((player, newPairs) => {
+			player.reinit2(newPairs);
+		}, this, newPairs);
+		const rawPairs = [this.name1];
+		if (this.name2 && lib.character[this.name2]) rawPairs.push(this.name2);
+		//单将变单将 & 双将变双将
+		if (rawPairs.length == newPairs.length){
+			for (let i = 0; i<Math.min(2, rawPairs.length); i++){
+				let rawName = rawPairs[i], newName = newPairs[i];
+				if (rawName != newName && lib.character[rawName] && lib.character[newName]) {
+					player.reinit(rawName, newName, null, true);
+				}
+			}
+		}
+		//单将变双将
+		else if (rawPairs.length == 1 && newPairs.length == 2){
+			player.name1 = newPairs[0];
+			player.name2 = newPairs[1];
+			player.$reinit12(newPairs);
+		}
+		//双将变单将
+		else if (rawPairs.length == 2 && newPairs.length == 1){
+			player.name1 = newPairs[0];
+			delete player.name2;
+			player.$reinit21(newPairs);
+		}
+		//修改性别
+		if (!player.isUnseen(1)) {
+			player.name = player.name1;
+			player.sex = get.character(player.name1)[0];
+		}
+		else if (!player.isUnseen(2)) {
+			player.name = player.name2;
+			player.sex = get.character(player.name2)[0];
+		}
+	}
+	$reinit12(newPairs) {
+		const player = this;
+		player.node.avatar.setBackground(newPairs[0], 'character');
+		player.node.name.innerHTML = get.slimName(newPairs[0]);
+		player.name2 = newPairs[1];
+		player.classList.add('fullskin2');
+		player.node.avatar2.classList.remove('hidden');
+		player.node.avatar2.setBackground(newPairs[1],'character');
+		player.node.name2.innerHTML = get.slimName(newPairs[1]);
+		if (player == game.me && ui.fakeme) {
+			ui.fakeme.style.backgroundImage = player.node.avatar.style.backgroundImage;
+		}
+	}
+	$reinit21(newPairs) {
+		const player = this, name = newPairs[0];
+		player.smoothAvatar(false);
+		player.node.avatar.setBackground(name,'character');
+		player.node.name.innerHTML = get.slimName(name);
+		player.classList.remove('fullskin2');
+		player.node.avatar2.classList.add('hidden');
+		player.node.name2.innerHTML = '';
+		if (player==game.me&&ui.fakeme) {
+			ui.fakeme.style.backgroundImage=player.node.avatar.style.backgroundImage;
+		}
+	}
 	reinit(from, to, maxHp, online) {
 		var info1 = lib.character[from];
 		var info2 = lib.character[to];
@@ -2367,65 +2468,63 @@ export class Player extends HTMLDivElement {
 		else {
 			return this;
 		}
-		if (online) {
-			return;
-		}
-		for (var i = 0; i < info1[3].length; i++) {
-			this.removeSkill(info1[3][i]);
-		}
-		for (var i = 0; i < info2[3].length; i++) {
-			var info = get.info(info2[3][i]);
-			if (info && info.zhuSkill && !this.isZhu2()) continue;
-			this.addSkill(info2[3][i]);
-		}
-		if (Array.isArray(maxHp)) {
-			this.maxHp = maxHp[1];
-			this.hp = maxHp[0];
-		}
-		else {
-			var num;
-			if (maxHp === false) {
-				num = 0;
+		if (!online) {
+			for (var i = 0; i < info1[3].length; i++) {
+				this.removeSkill(info1[3][i]);
+			}
+			for (var i = 0; i < info2[3].length; i++) {
+				var info = get.info(info2[3][i]);
+				if (info && info.zhuSkill && !this.isZhu2()) continue;
+				this.addSkill(info2[3][i]);
+			}
+			if (Array.isArray(maxHp)) {
+				this.maxHp = maxHp[1];
+				this.hp = maxHp[0];
 			}
 			else {
-				if (typeof maxHp != 'number') {
-					maxHp = get.infoMaxHp(info2[2]);
+				var num;
+				if (maxHp === false) {
+					num = 0;
 				}
-				num = maxHp - get.infoMaxHp(info1[2]);
-			}
-			if (typeof this.singleHp == 'boolean') {
-				if (num % 2 != 0) {
-					if (this.singleHp) {
-						this.maxHp += (num + 1) / 2;
-						this.singleHp = false;
+				else {
+					if (typeof maxHp != 'number') {
+						maxHp = get.infoMaxHp(info2[2]);
+					}
+					num = maxHp - get.infoMaxHp(info1[2]);
+				}
+				if (typeof this.singleHp == 'boolean') {
+					if (num % 2 != 0) {
+						if (this.singleHp) {
+							this.maxHp += (num + 1) / 2;
+							this.singleHp = false;
+						}
+						else {
+							this.maxHp += (num - 1) / 2;
+							this.singleHp = true;
+							if (!game.online) {
+								this.doubleDraw();
+							}
+						}
 					}
 					else {
-						this.maxHp += (num - 1) / 2;
-						this.singleHp = true;
-						if (!game.online) {
-							this.doubleDraw();
-						}
+						this.maxHp += num / 2;
 					}
 				}
 				else {
-					this.maxHp += num / 2;
+					this.maxHp += num;
 				}
 			}
-			else {
-				this.maxHp += num;
-			}
+			game.broadcast(function (player, from, to, skills) {
+				player.reinit(from, to, null, true);
+				player.applySkills(skills);
+			}, this, from, to, get.skillState(this));
 		}
-		game.broadcast(function (player, from, to, skills) {
-			player.reinit(from, to, null, true);
-			player.applySkills(skills);
-		}, this, from, to, get.skillState(this));
 		game.addVideo('reinit3', this, {
 			from: from,
 			to: to,
 			hp: this.maxHp,
 			avatar2: this.name2 == to
 		});
-
 		this.$reinit(from, to, maxHp, online);
 		this.update();
 	}
@@ -7187,6 +7286,26 @@ export class Player extends HTMLDivElement {
 			if (!player.hasSkill(skill, true)) player.removeSkill(skill);
 		}
 		return skill;
+	}
+	addSkills(skill){
+		if(!skill) return;
+		return this.changeSkills(Array.isArray(skill) ? skill : [skill], []);
+	}
+	removeSkills(skill){
+		if(!skill) return;
+		return this.changeSkills([], Array.isArray(skill) ? skill : [skill]);
+	}
+	changeSkills(addSkill = [], removeSkill = []){
+		const next = game.createEvent('changeSkills', false);
+		next.player = this;
+		if(!Array.isArray(addSkill) || !Array.isArray(removeSkill)){
+			console.warn(`警告：Player[${this.name}].changeSkills的参数错误，应当为数组形式。`);
+			return;
+		}
+		next.addSkill = addSkill.slice(0).unique();
+		next.removeSkill = removeSkill.slice(0).unique();
+		next.setContent('changeSkills');
+		return next;
 	}
 	addSkill(skill, checkConflict, nobroadcast, addToSkills) {
 		if (Array.isArray(skill)) {
