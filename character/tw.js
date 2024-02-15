@@ -1096,7 +1096,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=['cancel2'];
 					var choiceList=[
 						'令此【杀】可以额外指定一个目标',
-						'弃置其一张手牌，若此【杀】造成伤害，则你摸一张牌且本阶段可以额外使用一张【杀】',
+						'弃置'+get.translation(target)+'一张手牌，若此【杀】造成伤害，则你摸一张牌且本阶段可以额外使用一张【杀】',
 					];
 					if(target.countCards('h')) list.unshift('其弃置');
 					else choiceList[1]='<span style="opacity:0.5">'+choiceList[1]+'</span>';
@@ -1129,10 +1129,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(d1) return get.damageEffect(player,player,player)>0;
 						return false;
-					}());
+					}()).set('prompt','护众：是否摸一张牌并执行其中一项？');
 					'step 1'
 					if(result.control!='cancel2'){
 						player.logSkill('twhuzhong',target);
+						player.draw();
 						if(result.control=='其弃置'){
 							player.discardPlayerCard(target,'h',true);
 							player.when('useCardAfter').filter(evt=>evt==trigger.getParent()).then(()=>{
@@ -1144,19 +1145,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							event.finish();
 						}
-						else{
-							player.chooseTarget('请选择'+get.translation(trigger.card)+'的额外目标',function(card,player,target){
-								var trigger=_status.event.getTrigger();
-								return !trigger.targets.includes(target)&&player.canUse(trigger.card,target);
-							}).set('ai',function(target){
-								var player=_status.event.player;
-								var trigger=_status.event.getTrigger();
-								return get.effect(target,trigger.card,player,player);
-							});
-						}
 					}
 					else event.finish();
 					'step 2'
+					player.chooseTarget('请选择'+get.translation(trigger.card)+'的额外目标',function(card,player,target){
+						var trigger=_status.event.getTrigger();
+						return !trigger.targets.includes(target)&&player.canUse(trigger.card,target);
+					}).set('ai',function(target){
+						var player=_status.event.player;
+						var trigger=_status.event.getTrigger();
+						return get.effect(target,trigger.card,player,player);
+					});
+					'step 3'
 					if(result.bool){
 						player.line(result.targets);
 						trigger.getParent().targets.addArray(result.targets);
@@ -1180,7 +1180,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageBegin2',player:'damageBegin4'},
 				filter:function(event,player,name){
 					if(name=='damageBegin2'){
-						return !event.hasNature()&&player.countCards('h')>event.player.countCards('h');
+						return !event.hasNature()&&player.countCards('h')>=event.player.countCards('h');
 					}
 					return event.hasNature();
 				},
@@ -15995,9 +15995,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twdanlie_info:'①出牌阶段限一次。你可以与至多三名其他角色共同拼点。若你赢，你对没赢的角色依次造成1点伤害；若你没赢，你失去1点体力。②你的拼点牌点数+X（X为你已损失的体力值）。',
 			xia_zhangwei:'张葳',
 			twhuzhong:'护众',
-			twhuzhong_info:'当你于出牌阶段使用无属性【杀】指定唯一目标角色时，你可以选择一项：①为此牌额外选择一个目标；②弃置其一张手牌，此牌结算完毕后，若此牌造成过伤害，则你摸一张牌且本阶段可以额外使用一张【杀】。',
+			twhuzhong_info:'当你于出牌阶段使用无属性【杀】指定唯一目标角色时，你可以摸一张牌并选择一项：①为此牌额外选择一个目标；②弃置其一张手牌，此牌结算完毕后，若此牌造成过伤害，则你摸一张牌且本阶段可以额外使用一张【杀】。',
 			twfenwang:'焚亡',
-			twfenwang_info:'锁定技。①当你受到属性伤害时，你须弃置一张牌或令此伤害+1。②当你对其他角色造成非属性伤害时，若你的手牌数大于其，则此伤害+1。',
+			twfenwang_info:'锁定技。①当你受到属性伤害时，你须弃置一张牌或令此伤害+1。②当你对其他角色造成非属性伤害时，若你的手牌数大于等于其，则此伤害+1。',
 			xia_xiahousone:'夏侯子萼',
 			twchengxi:'承袭',
 			twchengxi_info:'出牌阶段每名角色限一次，你可以摸一张牌并与一名其他角色拼点。若你赢，你使用的下一张基本牌或非延时锦囊牌结算完毕后，你视为对原目标使用一张无次数限制的同名牌；若你没赢，其视为对你使用一张无距离限制的【杀】。',
