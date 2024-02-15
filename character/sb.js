@@ -552,8 +552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 													game.log(player,'选择了',target2);
 													const skills=target2.getStockSkills(true,true);
 													const skills2=player.getStockSkills(true,true);
-													player.addSkillLog(skills);
-													player.removeSkillLog(skills2);
+													player.changeSkills(skills,skills2);
 												}
 										}
 									},
@@ -782,7 +781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						animationColor:'thunder',
 						async content(event,trigger,player){
 							player.awakenSkill('sbsongwei_delete');
-							event.target.removeSkillLog(event.target.getStockSkills(false,true));
+							event.target.removeSkills(event.target.getStockSkills(false,true));
 						},
 						ai:{
 							order:13,
@@ -1245,17 +1244,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						locked:false,
 						skillAnimation:true,
 						animationColor:'fire',
-						content:function(){
+						async content(event,trigger,player){
 							player.awakenSkill('sbhuoji');
 							game.log(player,'成功完成使命');
-							var list=[];
-							if(player.name&&get.character(player.name)[3].includes('sbhuoji')) list.add(player.name);
-							if(player.name1&&get.character(player.name1)[3].includes('sbhuoji')) list.add(player.name1);
-							if(player.name2&&get.character(player.name2)[3].includes('sbhuoji')) list.add(player.name2);
-							if(list.length) list.forEach(name=>player.reinit(name,'sb_zhugeliang'));
+							if (get.character(player.name1)[3].includes('sbhuoji')) {
+								player.reinitCharacter(player.name1, 'sb_zhugeliang', false);
+							}
+							else if (player.name2&&get.character(player.name2)[3].includes('sbhuoji')) {
+								player.reinitCharacter(player.name2, 'sb_zhugeliang', false);
+							}
 							else{
-								player.removeSkill(['sbhuoji','sbkanpo']);
-								player.addSkill(['sbguanxing','sbkongcheng']);
+								player.changeSKills(['sbguanxing','sbkongcheng'],['sbhuoji','sbkanpo']);
 							}
 						},
 					},
@@ -2302,8 +2301,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					player.draw(3);
 					'step 3'
-					player.addSkillLog('sbyingzi');
-					player.addSkillLog('gzyinghun');
+					player.addSkills(['sbyingzi','gzyinghun']);
 				},
 				ai:{
 					threaten:function(player,target){
@@ -3655,8 +3653,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.recover(3);
 					'step 1'
-					player.removeSkill('sbrende');
-					game.log(player,'失去了技能','#g【'+get.translation('sbrende')+'】');
+					player.removeSkills('sbrende');
 					game.delayx();
 				},
 				ai:{
@@ -5914,7 +5911,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('sbdujiang');
-					player.addSkillLog('sbduojing');
+					player.addSkills('sbduojing');
 					player.storage.sbkeji=true;
 				}
 			},

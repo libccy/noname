@@ -559,8 +559,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					player.drawTo(player.maxHp);
 					'step 2'
-					player.addSkillLog('benghuai');
-					player.addSkillLog('reweizhong');
+					player.addSkills(['benghuai','reweizhong']);
 				}
 			},
 			reweizhong:{
@@ -3861,7 +3860,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('xsqianxin');
 					player.loseMaxHp();
-					player.addSkill('rejianyan');
+					player.addSkills('rejianyan');
 				},
 				derivation:'rejianyan',
 			},
@@ -5588,7 +5587,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.recover();
 					player.draw(2);
 					player.loseMaxHp();
-					player.addSkill('xinpaiyi');
+					player.addSkills('xinpaiyi');
 				},
 			},
 			xinpaiyi:{
@@ -6102,8 +6101,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseDrawRecover(2,true);
 					"step 1"
 					player.loseMaxHp();
-					player.storage.olzhiji=true;
-					player.addSkill('reguanxing');
+					player.addSkills('reguanxing');
 				}
 			},
 			//界郭图张嶷
@@ -7733,7 +7731,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					player.awakenSkill('olzaoxian');
 					player.loseMaxHp();
-					player.addSkill('jixi');
+					player.addSkills('jixi');
 					player.insertPhase();
 				}
 			},
@@ -9603,7 +9601,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ['olhuoji','bazhen'].randomGet();
 					};
 					'step 6'
-					player.addSkillLog(result.control);
+					player.addSkills(result.control);
 				},
 				derivation:['bazhen','olhuoji','olkanpo'],
 				ai:{
@@ -10115,10 +10113,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					'step 1'
 					if(player.hp<3) player.recover(3-player.hp);
-					player.addSkillLog('sishu');
-					player.addSkillLog('rejijiang');
-					'step 2'
-					if(player.isZhu2()) event.trigger('zhuUpdate');
+					player.addSkills(['sishu', 'rejijiang']);
 				}
 			},
 			olfangquan:{
@@ -10276,14 +10271,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audioname:['re_sunyi'],
 				inherit:'hunzi',
 				content:function(){
+					player.awakenSkill(event.name);
 					player.loseMaxHp();
 					//player.recover();
-					player.addSkill('reyingzi');
-					player.addSkill('gzyinghun');
+					player.addSkills(['reyingzi','gzyinghun']);
 					player.addTempSkill('olhunzi_effect');
-					game.log(player,'获得了技能','#g【英姿】','和','#g【英魂】');
-					player.awakenSkill(event.name);
-					player.storage[event.name]=true;
 				},
 				subSkill:{
 					effect:{
@@ -11038,7 +11030,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(!result.bool) target.loseHp();
 					'step 2'
-					target.addSkillLog('rechanyuan');
+					target.addSkills('rechanyuan');
 					if(targets.length) event.goto(0);
 				},
 			},
@@ -13158,7 +13150,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('qinxue');
 					player.loseMaxHp();
 					player.chooseDrawRecover(2,true);
-					player.addSkill('gongxin');
+					player.addSkills('gongxin');
 				}
 			},
 			qingjian:{
@@ -14028,7 +14020,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('qianxin');
-					player.addSkill('jianyan');
+					player.addSkills('jianyan');
 					player.loseMaxHp();
 				}
 			},

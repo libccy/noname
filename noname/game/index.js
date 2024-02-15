@@ -1644,7 +1644,7 @@ export class Game extends Uninstantable {
 				return;
 			}
 		}
-		const audio = lib.card[card.name].audio;
+		const audio = get.dynamicVariable(lib.card[card.name].audio,card,sex);
 		if (typeof audio == 'string') {
 			const audioInfo = audio.split(':');
 			if (audio.startsWith('db:')) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`, audioInfo[2], `${card.name}_${sex}.${audioInfo[3] || 'mp3'}`);
