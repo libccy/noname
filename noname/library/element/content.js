@@ -19,31 +19,69 @@ export const Content = {
 		const newPairs = event.newPairs;
 		for(let name of newPairs){
 			if(!lib.character[name]){
-				console.warn(`警告：Player[${player.name}]试图将武将牌变更为不存在的武将`,name);
+				console.warn(`警告：Player[${player.name}]试图将武将牌变更为不存在的武将:`,name);
 				return;
 			}
 		}
 		const removeSkills = [], addSkills = [];
-		//变更前后数量相同的情况
-		if (rawPairs.length == newPairs.length){
-			for (let i = 0; i<Math.min(2, rawPairs.length); i++){
-				let rawName = rawPairs[i], newName = newPairs[i];
-				if (rawName != newName && lib.character[rawName] && lib.character[newName]) {
-					if(event.log !== false) game.log(player, '将', `#b${get.translation(rawName)}`, '变更为了', `#b${get.translation(newName)}`)
-					game.broadcastAll((player, rawName, newName)=>{
-						player.reinit(rawName, newName, null, true);
-					},player, rawName, newName);
-					removeSkills.addArray(lib.character[rawName][3]);
-					addSkills.addArray(lib.character[newName][3]);
+		//进行Log
+		if(event.log !== false) {
+			//变更前后数量相同的情况
+			if (rawPairs.length == newPairs.length){
+				for (let i = 0; i<Math.min(2, rawPairs.length); i++){
+					let rawName = rawPairs[i], newName = newPairs[i];
+					if (rawName != newName) {
+						game.log(player, `将${i == 0 ? '主' : '副'}将从`, `#b${get.translation(rawName)}`, '变更为了', `#b${get.translation(newName)}`);
+					}
 				}
 			}
+			else if (rawPairs.length == 1 && newPairs.length == 2){
+				game.log(player,'将单将', `#b${get.translation(rawPairs[0])}`, '变更为了双将', `#b${get.translation(newPairs[0])}+${get.translation(newPairs[1])}`);
+			}
+			else if (rawPairs.length == 2 && newPairs.length == 1){
+				game.log(player,'将双将', `#b${get.translation(rawPairs[0])}+${get.translation(rawPairs[1])}`, '变更为了单将', `#b${get.translation(newPairs[0])}`);
+			}
 		}
-		if(_status.characterlist){
+		//确定要失去和获得的技能
+		//失去技能时全部失去，但获得技能时，非主公角色不能获得主公技。
+		rawPairs.forEach(name => {
+			removeSkills.addArray(lib.character[name][3]);
+		})
+		newPairs.forEach(name => {
+			addSkills.addArray(lib.character[name][3].filter(skill => {
+				const info = get.info(skill);
+				if (!info || (info.zhuSkill && !player.isZhu2())) return false;
+				return true;
+			}));
+		})
+		//实际变更武将牌
+		player.reinit2(newPairs);
+		//操作武将牌堆
+		if (_status.characterlist) {
 			_status.characterlist.removeArray(newPairs);
 			_status.characterlist.addArray(rawPairs);
 		}
 		//变更一下获得前后的技能
-		player.changeSkills(addSkills, removeSkills);
+		await player.changeSkills(addSkills, removeSkills);
+		//变更角色的所属势力。如果新将是双势力，重选一下势力。
+		if(event.changeGroup !== false){
+			let newGroups = [];
+			if (!player.isUnseen(1)) {
+				newGroups = (get.is.double(player.name1, true) || [get.character(player.name1, 1)]);
+			}
+			else if (player.name2 && !player.isUnseen(2)) {
+				newGroups = (get.is.double(player.name2, true) || [get.character(player.name2, 1)]);
+			}
+			if (newGroups.length > 1) {
+				const newGroup = await player.chooseControl(newGroups).set('prompt','请选择一个新的势力').forResult('control');
+				if (newGroup != player.group) {
+					await player.changeGroup(newGroup);
+				}
+			}
+			else if(newGroups.length == 1 && newGroups[0] != player.group){
+				await player.changeGroup(newGroups[0]);
+			}
+		}
 	},
 	//变更技能
 	async changeSkills (event,trigger,player) {

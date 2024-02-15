@@ -2382,6 +2382,69 @@ export class Player extends HTMLDivElement {
 		this.firstChild.innerHTML = str;
 		return this;
 	}
+	reinit2(newPairs) {
+		const player = this;
+		game.broadcast((player, newPairs) => {
+			player.reinit2(newPairs);
+		}, this, newPairs);
+		const rawPairs = [this.name1];
+		if (this.name2 && lib.character[this.name2]) rawPairs.push(this.name2);
+		//单将变单将 & 双将变双将
+		if (rawPairs.length == newPairs.length){
+			for (let i = 0; i<Math.min(2, rawPairs.length); i++){
+				let rawName = rawPairs[i], newName = newPairs[i];
+				if (rawName != newName && lib.character[rawName] && lib.character[newName]) {
+					player.reinit(rawName, newName, null, true);
+				}
+			}
+		}
+		//单将变双将
+		else if (rawPairs.length == 1 && newPairs.length == 2){
+			player.name1 = newPairs[0];
+			player.name2 = newPairs[1];
+			player.$reinit12(newPairs);
+		}
+		//双将变单将
+		else if (rawPairs.length == 2 && newPairs.length == 1){
+			player.name1 = newPairs[0];
+			delete player.name2;
+			player.$reinit21(newPairs);
+		}
+		//修改性别
+		if (!player.isUnseen(1)) {
+			player.name = player.name1;
+			player.sex = get.character(player.name1)[0];
+		}
+		else if (!player.isUnseen(2)) {
+			player.name = player.name2;
+			player.sex = get.character(player.name2)[0];
+		}
+	}
+	$reinit12(newPairs) {
+		const player = this;
+		player.node.avatar.setBackground(newPairs[0], 'character');
+		player.node.name.innerHTML = get.slimName(newPairs[0]);
+		player.name2 = newPairs[1];
+		player.classList.add('fullskin2');
+		player.node.avatar2.classList.remove('hidden');
+		player.node.avatar2.setBackground(newPairs[1],'character');
+		player.node.name2.innerHTML = get.slimName(newPairs[1]);
+		if (player == game.me && ui.fakeme) {
+			ui.fakeme.style.backgroundImage = player.node.avatar.style.backgroundImage;
+		}
+	}
+	$reinit21(newPairs) {
+		const player = this, name = newPairs[0];
+		player.smoothAvatar(false);
+		player.node.avatar.setBackground(name,'character');
+		player.node.name.innerHTML = get.slimName(name);
+		player.classList.remove('fullskin2');
+		player.node.avatar2.classList.add('hidden');
+		player.node.name2.innerHTML = '';
+		if (player==game.me&&ui.fakeme) {
+			ui.fakeme.style.backgroundImage=player.node.avatar.style.backgroundImage;
+		}
+	}
 	reinit(from, to, maxHp, online) {
 		var info1 = lib.character[from];
 		var info2 = lib.character[to];
@@ -2455,14 +2518,13 @@ export class Player extends HTMLDivElement {
 				player.reinit(from, to, null, true);
 				player.applySkills(skills);
 			}, this, from, to, get.skillState(this));
-			game.addVideo('reinit3', this, {
-				from: from,
-				to: to,
-				hp: this.maxHp,
-				avatar2: this.name2 == to
-			});
 		}
-
+		game.addVideo('reinit3', this, {
+			from: from,
+			to: to,
+			hp: this.maxHp,
+			avatar2: this.name2 == to
+		});
 		this.$reinit(from, to, maxHp, online);
 		this.update();
 	}
@@ -7237,6 +7299,10 @@ export class Player extends HTMLDivElement {
 	changeSkills(addSkill = [], removeSkill = []){
 		const next = game.createEvent('changeSkills', false);
 		next.player = this;
+		if(!Array.isArray(addSkill) || !Array.isArray(removeSkill)){
+			console.warn(`警告：Player[${this.name}].changeSkills的参数错误，应当为数组形式。`);
+			return;
+		}
 		next.addSkill = addSkill.slice(0).unique();
 		next.removeSkill = removeSkill.slice(0).unique();
 		next.setContent('changeSkills');
