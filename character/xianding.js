@@ -3208,9 +3208,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!_status.characterlist){
 						lib.skill.pingjian.initList();
 					}
-					_status.characterlist.remove(character);
-					_status.characterlist.add('ganfurenmifuren');
-					player.reinit('ganfurenmifuren',character,false);
+					player.reinitCharacter('ganfurenmifuren',character);
 					'step 2'
 					player.recover(1-player.hp);
 					player.addTempSkill('dcxunbie_muteki',{player:'phaseAfter'});
@@ -10426,37 +10424,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player!=event.dying) return false;
 					return true;
 				},
-				content:function(){
+				async content(event,trigger,player){
 					'step 0'
 					player.awakenSkill('syxiongyi');
 					if(!_status.characterlist){
 						lib.skill.pingjian.initList();
 					}
-					event.hp=1-player.hp;
 					if(_status.characterlist.includes('xushi')){
-						if(player.name1=='re_sunyi'||player.name2=='re_sunyi') event._result={control:'re_sunyi'};
-						else if(player.name2!=undefined){
-							player.chooseControl(player.name1,player.name2).set('prompt','请选择要更换的武将牌');
+						if (player.name2&&get.character(player.name2)[3].includes('syxiongyi')) {
+							await player.reinitCharacter(player.name2, 'xushi');
 						}
-						else event._result={control:player.name1};
-						hp+=2;
-						_status.characterlist.remove('xushi');
-						_status.characterlist.add('re_sunyi');
-						player.reinit('re_sunyi','xushi',false);
+						else {
+							await player.reinitCharacter(player.name1, 'xushi');
+						}
+						if(player.hp<3) await player.recover(3-player.hp);
 					}
 					else{
-						player.addSkills('olhunzi');
-						event.goto(2);
+						await player.addSkills('olhunzi');
+						if(player.hp<1) await player.recover(1-player.hp);
 					}
-					'step 1'
-					event.hp+=2;
-					var name=result.control;
-					_status.characterlist.remove('xushi');
-					_status.characterlist.add(name);
-					player.reinit(name,'xushi',false);
-					'step 2'
-					var hp=event.hp;
-					if(hp>0) player.recover(hp);
 				},
 				ai:{
 					order:1,

@@ -1852,8 +1852,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						event.target=target;
-						var num=target.maxHp;
-						event.num=num;
 						player.logSkill('skill_zhangji_B',target);
 						var list=[];
 						for(var i=0;i<_status.characterlist.length;i++){
@@ -1872,10 +1870,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						event.character=result.links[0];
-						if(target.name2!=undefined) target.chooseControl(target.name,target.name2).set('prompt','请选择要更换的武将牌').set('ai',function(){
+						if(target.name2!=undefined) target.chooseControl(target.name1,target.name2).set('prompt','请选择要更换的武将牌').set('ai',function(){
 							return lib.skill.skill_zhangji_B.getNum(target.name)<lib.skill.skill_zhangji_B.getNum(target.name2)?target.name:target.name2;
 						});
-						else result.control=target.name;
+						else result.control=target.name1;
 					}
 					else{
 						target.chat('拒绝');
@@ -1883,10 +1881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.finish();
 					}
 					'step 3'
-					if(result.control==target.name) target.changeGroup('wei',false);
-					game.log(target,'将','#g'+get.translation(result.control),'替换为了','#g'+get.translation(event.character));
-					target.reinit(result.control,event.character,false);
-					target.maxHp=num;
+					target.reinitCharacter(result.control,event.character);
 					target.update();
 				},
 				subSkill:{
@@ -12611,12 +12606,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 4'
-					target.reinit(result.control,'guansuo');
-					if(target.name=='guansuo'&&target.group!='shu') target.changeGroup('shu');
-					if(_status.characterlist){
-						_status.characterlist.add(result.control);
-						_status.characterlist.remove('guansuo');
-					}
+					target.reinitCharacter(result.control,'guansuo');
 				},
 			},
 			olzhennan:{
@@ -17528,11 +17518,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('fuhan');
 					'step 1'
 					event.num=Math.min(event.num,8);
-					player.reinit('zhaoxiang',result.links[0],false);
-					if(_status.characterlist){
-						_status.characterlist.add('zhaoxiang');
-						_status.characterlist.remove(result.links[0]);
-					}
+					player.reinitCharacter('zhaoxiang',result.links[0]);
 					'step 2'
 					var num=event.num-player.maxHp;
 					if(num>0) player.gainMaxHp(num);
@@ -25520,16 +25506,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.awakenSkill('xinfu_xushen');
 						player.logSkill('xinfu_xushen',trigger.source);
 						if(trigger.source.name2!=undefined){
-							trigger.source.chooseControl(trigger.source.name,trigger.source.name2).set('prompt','请选择要更换的武将牌');
-						}else event._result={control:trigger.source.name};
+							trigger.source.chooseControl(trigger.source.name1,trigger.source.name2).set('prompt','请选择要更换的武将牌');
+						}else event._result={control:trigger.source.name1};
 					}
 					else event.finish();
 					"step 2"
-					trigger.source.reinit(result.control,'guansuo');
-					if(_status.characterlist){
-						_status.characterlist.add(result.control);
-						_status.characterlist.remove('guansuo');
-					}
+					trigger.source.reinitCharacter(result.control,'guansuo');
 					player.recover();
 					player.addSkills('xinfu_zhennan');
 				},

@@ -1244,14 +1244,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						locked:false,
 						skillAnimation:true,
 						animationColor:'fire',
-						content:function(){
+						async content(event,trigger,player){
 							player.awakenSkill('sbhuoji');
 							game.log(player,'成功完成使命');
-							var list=[];
-							if(player.name&&get.character(player.name)[3].includes('sbhuoji')) list.add(player.name);
-							if(player.name1&&get.character(player.name1)[3].includes('sbhuoji')) list.add(player.name1);
-							if(player.name2&&get.character(player.name2)[3].includes('sbhuoji')) list.add(player.name2);
-							if(list.length) list.forEach(name=>player.reinit(name,'sb_zhugeliang'));
+							if (get.character(player.name1)[3].includes('sbhuoji')) {
+								player.reinitCharacter(player.name1, 'sb_zhugeliang', false);
+							}
+							else if (player.name2&&get.character(player.name2)[3].includes('sbhuoji')) {
+								player.reinitCharacter(player.name2, 'sb_zhugeliang', false);
+							}
 							else{
 								player.changeSKills(['sbguanxing','sbkongcheng'],['sbhuoji','sbkanpo']);
 							}

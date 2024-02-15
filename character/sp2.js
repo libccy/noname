@@ -6605,16 +6605,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(target.name2!=undefined){
 							target.chooseControl(target.name1,target.name2).set('prompt','请选择要更换的武将牌');
 						}
-						else event._result={control:target.name};
+						else event._result={control:target.name1};
 					}
 					else event.goto(4);
 					'step 3'
-					target.reinit(result.control,'dc_guansuo');
-					if(target.name=='dc_guansuo'&&target.group!='shu') target.changeGroup('shu');
-					if(_status.characterlist){
-						_status.characterlist.add(result.control);
-						_status.characterlist.remove('dc_guansuo');
-					}
+					target.reinitCharacter(result.control,'dc_guansuo');
 					'step 4'
 					target.draw(3);
 				},
