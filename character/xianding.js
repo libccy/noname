@@ -5313,11 +5313,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).set('lose_list',lose_list).forResult();
 						if (result.bool) {
 							const target = result.targets[0];
-							const cards = await player.choosePlayerCard(target, true, 'hej', [1,num], `选择弃置${get.translation(target)}区域内的牌`, (button) => {
-								const card = button.link, target = _status.event.target;
+							const cards = await player.choosePlayerCard(target, true, 'hej', [1,num], `选择弃置${get.translation(target)}区域内的牌`).set('filterButton',(button) => {
+								const card = button.link, target = _status.event.target, player = get.player();
 								const discarded = _status.event.lose_list.find(item => item[0] == target);
 								if (discarded && discarded[1].includes(card)) return false;
-								return lib.filter.canBeDiscarded(card,player,target,'dcluochong');
+								return lib.filter.canBeDiscarded(card, player, target,'dcluochong');
 							}).set('lose_list',lose_list).set('ai', button => {
 								if (ui.selected.buttons.length>0) return false;
 								var val = get.buttonValue(button);
