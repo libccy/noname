@@ -6480,11 +6480,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						};
 						if(trigger.result.judge>0){
 							trigger.result.bool=true;
-							trigger.player.popup('洗具');
+							trigger.player.popup('改命成功');
 						}
 						if(trigger.result.judge<0){
 							trigger.result.bool=false;
-							trigger.player.popup('杯具');
+							trigger.player.popup('改命失败');
 						}
 						game.log(trigger.player,'的判定结果为',card);
 						trigger.direct=true;
