@@ -5,12 +5,12 @@ var ts;
 importScripts('./game/typescript.js');
 // @ts-ignore
 if (typeof ts != 'undefined') {
-	console.log(ts);
+	console.log(`ts loaded`);
 } else {
 	console.log(`ts undefined`);
 }
 
-console.log('version 2.2');
+console.log('serviceWorker version 2.2');
 
 self.addEventListener("install", (event) => {
 	// The promise that skipWaiting() returns can be safely ignored.

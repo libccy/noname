@@ -181,7 +181,6 @@ new Promise(resolve => {
 					let findServiceWorker = registrations.find(registration => {
 						return registration && registration.active && registration.active.scriptURL == `${scope}service-worker.js`;
 					});
-					console.log(registrations);
 					try {
 						const registration_1 = await navigator.serviceWorker.register(`${scope}service-worker.js`, {
 							updateViaCache: "all",
