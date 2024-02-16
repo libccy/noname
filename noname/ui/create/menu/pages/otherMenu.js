@@ -1157,20 +1157,20 @@ export const otherMenu = function (connectMenu) {
 			 * @type { (value:string)=>any }
 			 */
 			const fun = (new Function('window', `
-								const _status=window._status;
-								const lib=window.lib;
-								const game=window.game;
-								const ui=window.ui;
-								const get=window.get;
-								const ai=window.ai;
-								const cheat=window.lib.cheat;
-								//使用正则匹配绝大多数的普通obj对象，避免解析成代码块。
-								const reg=${/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/};
-								return function(value){ 
-									"use strict";
-									return eval(reg.test(value)?('('+value+')'):value);
-								}
-							`))(proxyWindow);
+				const _status=window._status;
+				const lib=window.lib;
+				const game=window.game;
+				const ui=window.ui;
+				const get=window.get;
+				const ai=window.ai;
+				const cheat=window.lib.cheat;
+				//使用正则匹配绝大多数的普通obj对象，避免解析成代码块。
+				const reg=${/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/};
+				return function(value){ 
+					"use strict";
+					return eval(reg.test(value)?('('+value+')'):value);
+				}
+			`))(proxyWindow);
 			const runCommand = () => {
 				if (text2.value && !['up', 'down'].includes(text2.value)) {
 					logindex = -1;
