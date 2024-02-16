@@ -5942,7 +5942,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'shuangxiong1',
 			},
 			shuangxiong1:{
-				audio:true,
+				audio:"shuangxiong",
 				audioname:['re_yanwen'],
 				trigger:{player:'phaseDrawBegin1'},
 				check:function(event,player){
@@ -5968,7 +5968,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shuangxiong2:{
 				charlotte:true,
 				onremove:true,
-				audio:true,
+				audio:"shuangxiong",
 				audioname:['re_yanwen'],
 				enable:'chooseToUse',
 				viewAs:{name:'juedou'},
