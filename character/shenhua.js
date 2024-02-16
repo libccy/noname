@@ -5940,10 +5940,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				audioname:['re_yanwen'],
 				group:'shuangxiong1',
+				subSkill:{
+					re_yanwen1:{audio:true},
+					re_yanwen2:{audio:true},
+				},
 			},
 			shuangxiong1:{
-				audio:"shuangxiong",
-				audioname:['re_yanwen'],
+				audio:true,
 				trigger:{player:'phaseDrawBegin1'},
 				check:function(event,player){
 					if(player.countCards('h')>player.hp) return true;
@@ -5968,8 +5971,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shuangxiong2:{
 				charlotte:true,
 				onremove:true,
-				audio:"shuangxiong",
-				audioname:['re_yanwen'],
+				audio:true,
+				audioname2:{
+					re_yanwen:'shuangxiong_re_yanwen2',
+				},
 				enable:'chooseToUse',
 				viewAs:{name:'juedou'},
 				position:'hs',
