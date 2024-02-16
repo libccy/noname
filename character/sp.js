@@ -779,7 +779,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:2,
 					respondShan:true,
 					skillTagFilter(player,tag,arg){
-						if(arg=='respond'||!player.countCards('h',card=>card.hasGaintag('olchongshen'))) return false;
+						if(arg=='respond'||!player.countCards('h',card=>_status.connectMode||card.hasGaintag('olchongshen'))) return false;
 					},
 					effect:{
 						target(card,player,target,current){
@@ -790,8 +790,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'olchongshen_mark',
 				mod:{
 					aiValue(player,card,num){
-						if(get.name(card)!='shan'&&!card.hasGaintag('olchongshen')) return;
-						var cards=player.getCards('hs',card=>get.name(card)=='shan'||card.hasGaintag('olchongshen'));
+						if(get.name(card)!='shan'&&(get.itemtype(card)=='card'&&!card.hasGaintag('olchongshen'))) return;
+						let cards=player.getCards('hs',card=>get.name(card)=='shan'||card.hasGaintag('olchongshen'));
 						cards.sort((a,b)=>(get.name(b)=='shan'?1:2)-(get.name(a)=='shan'?1:2));
 						const geti=()=>{
 							if(cards.includes(card)) return cards.indexOf(card);

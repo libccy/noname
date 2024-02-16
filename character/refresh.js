@@ -11445,11 +11445,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['reshuangxiong1',"reshuangxiong2"],
 			},
 			reshuangxiong1:{
-				audio:"shuangxiong",
-				audioname:['re_yanwen'],
-				trigger:{
-					player:"phaseDrawBegin1",
+				audio:"shuangxiong1",
+				audioname2:{
+					re_yanwen:'shuangxiong_re_yanwen1',
 				},
+				trigger:{player:"phaseDrawBegin1"},
 				check:function (event,player){
 					if(player.countCards('h')>player.hp) return true;
 					if(player.countCards('h')>3) return true;

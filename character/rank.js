@@ -308,6 +308,7 @@ window.noname_character_rank={
 		'wanglie',
 		'zhaozhi',
 		'shen_zhangjiao',
+		'junk_zhangjiao',
 		'tw_jiangji',
 		'tw_niufudongxie',
 		'tw_shen_lvmeng',
@@ -2672,6 +2673,7 @@ window.noname_character_rank={
 			're_caorui',
 			'junk_xuyou',
 			're_zhongyao',
+			'junk_zhangjiao',
 		],
 	}
 };

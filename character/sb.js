@@ -1254,7 +1254,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.reinitCharacter(player.name2, 'sb_zhugeliang', false);
 							}
 							else{
-								player.changeSKills(['sbguanxing','sbkongcheng'],['sbhuoji','sbkanpo']);
+								player.changeSkills(['sbguanxing','sbkongcheng'],['sbhuoji','sbkanpo']);
 							}
 						},
 					},
