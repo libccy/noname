@@ -144,12 +144,9 @@ new Promise(resolve => {
 		if (location.protocol.startsWith('http') && 'serviceWorker' in navigator) {
 			let scope = window.location.protocol + '//' + window.location.host + '/';
 			navigator.serviceWorker.getRegistrations().then(registrations => {
-				let findServiceWorker = false;
-				for (let registration of registrations) {
-					if (registration && registration.active && registration.active.scriptURL == `${scope}service-worker.js`) {
-						findServiceWorker = true;
-					}
-				}
+				let findServiceWorker = registrations.find(registration => {
+					return registration && registration.active && registration.active.scriptURL == `${scope}service-worker.js`;
+				})
 				navigator.serviceWorker.register(`${scope}service-worker.js`, {
 					updateViaCache: "all",
 					scope,
