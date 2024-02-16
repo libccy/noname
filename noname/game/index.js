@@ -4634,6 +4634,9 @@ export class Game extends Uninstantable {
 	 * @param { string } extensionName
 	 */
 	static hasExtension(extensionName) {
+		if (typeof lib.config[`extension_${extensionName}_enable`] != 'boolean') {
+			game.saveExtensionConfig(extensionName, 'enable', true);
+		}
 		return this.hasExtensionInstalled(extensionName) && lib.config[`extension_${extensionName}_enable`];
 	}
 	/**
