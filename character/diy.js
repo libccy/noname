@@ -17639,10 +17639,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(result.bool){
 						var skills=lib.skill.junkyuheng.derivation.randomGets(result.cards.length);
-						player.changeSkills(skills,[]).set('$handle',(player,skills)=>{
-							player.addAdditionalSkill('junkyuheng',skills);
-							game.log(player,'获得了以下技能：','#g'+get.translation(skills));
-						});
+						player.addAdditionalSkills('junkyuheng',skills);
 					}
 				},
 				group:'junkyuheng_remove',
@@ -17655,13 +17652,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter(event,player){
 							return player.additionalSkills.junkyuheng&&player.additionalSkills.junkyuheng.length>0;
 						},
-						content(){
+						async content(event,trigger,player){
 							const skills = player.additionalSkills.junkyuheng;
-							player.draw(skills.length);
-							player.changeSkills([],skills).set('$handle',(player,addSkills,removeSkills)=>{
-								game.log(player,'失去了以下技能：','#g'+get.translation(removeSkills));
-								for(let skill of removeSkills) player.removeAdditionalSkill('junkyuheng',skill);
-							});
+							await player.draw(skills.length);
+							await player.removeAdditionalSkills('junkyuheng');
 						},
 					},
 				},
@@ -17728,7 +17722,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.bool){
 						var skills=result.links;
-						game.log(player,'失去了以下技能：','#g'+get.translation(skills));
 						player.removeSkills(skills.slice(0));
 					}
 					var list=lib.skill.junkdili.derivation;

@@ -602,7 +602,7 @@ export class Player extends HTMLDivElement {
 				scope = _scope;
 				if (skill.contentFuns.length > 0) createContent();
 				return this;
-			}
+			},
 		};
 	}
 	/**
@@ -7377,35 +7377,64 @@ export class Player extends HTMLDivElement {
 		if (checkConflict) this.checkConflict();
 		return skill;
 	}
-	addAdditionalSkill(skill, skills, keep) {
-		if (this.additionalSkills[skill]) {
-			if (keep) {
-				if (typeof this.additionalSkills[skill] == 'string') {
-					this.additionalSkills[skill] = [this.additionalSkills[skill]];
+	addAdditionalSkills(skill, skillsToAdd, keep) {
+		if (typeof skillsToAdd == 'string') skillsToAdd = [skillsToAdd];
+		if(!Array.isArray(skillsToAdd)){
+			console.warn(`警告：Player[${this.name}].addAdditionalSkills的参数错误，应当为技能字符串或数组:`,skillsToAdd);
+		}
+		const skillsToRemove = [];
+		//如果不需要保留原本的additionalSkills，则判断要移除的技能，并移除这些技能
+		if (!keep) {
+			skillsToRemove.addArray(this.getRemovableAdditionalSkills(skill));
+		}
+		//创建对应的addSkills的事件
+		return this.changeSkills(skillsToAdd, skillsToRemove).set('$handle', function(player, skillsToAdd, skillsToRemove){
+			//先失去先前获得的衍生技能
+			if (skillsToRemove.length>0) {
+				game.log(player, '失去了技能', ...skillsToRemove.map(i => {
+					return '#g【' + get.translation(i) + '】';
+				}));
+				player.removeSkill(skillsToRemove);
+			}
+			//再获得新的衍生技能
+			if (skillsToAdd.length>0) {
+				game.log(player, '获得了技能', ...skillsToAdd.map(i => {
+					return '#g【' + get.translation(i) + '】';
+				}));
+				if (!Array.isArray(player.additionalSkills[skill])) player.additionalSkills[skill] = [];
+				for (var i = 0; i < skillsToAdd.length; i++) {
+					player.addSkill(skillsToAdd[i], null, true, true);
+					player.additionalSkills[skill].push(skillsToAdd[i]);
 				}
+				player.checkConflict();
 			}
-			else {
-				this.removeAdditionalSkill(skill);
-				this.additionalSkills[skill] = [];
-			}
+			_status.event.clearStepCache();
+		});
+	}
+	addAdditionalSkill(skill, skillsToAdd, keep) {
+		if (typeof skillsToAdd == 'string') skillsToAdd = [skillsToAdd];
+		if(!Array.isArray(skillsToAdd)){
+			console.warn(`警告：Player[${this.name}].addAdditionalSkill的参数错误，应当为技能字符串或数组:`,skillsToAdd);
 		}
-		else {
-			this.additionalSkills[skill] = [];
+		const skillsToRemove = [];
+		//如果不需要保留原本的additionalSkills，则判断要移除的技能，并移除这些技能
+		if (!keep) {
+			skillsToRemove.addArray(this.getRemovableAdditionalSkills(skill));
 		}
-		if (typeof skills == 'string') {
-			skills = [skills];
+		this.removeSkill(skillsToRemove);
+		//然后处理获得技能的操作
+		if (!Array.isArray(this.additionalSkills[skill])) this.additionalSkills[skill] = [];
+		for (var i = 0; i < skillsToAdd.length; i++) {
+			this.addSkill(skillsToAdd[i], null, true, true);
+			this.additionalSkills[skill].push(skillsToAdd[i]);
 		}
-		for (var i = 0; i < skills.length; i++) {
-			this.addSkill(skills[i], null, true, true);
-			//this.skills.remove(skills[i]);
-			this.additionalSkills[skill].push(skills[i]);
-		}
+		
 		this.checkConflict();
 		_status.event.clearStepCache();
 		return this;
 	}
-	removeAdditionalSkill(skill, target) {
-		const player = this;
+	getRemovableAdditionalSkills(skill, target){
+		const player = this, removableSkills = [];
 		if (this.additionalSkills[skill]) {
 			const additionalSkills = this.additionalSkills[skill];
 			const hasAnotherSKill = function (skillkey, skill) {
@@ -7417,23 +7446,37 @@ export class Player extends HTMLDivElement {
 			};
 			if (Array.isArray(additionalSkills) && typeof target == 'string') {
 				if (additionalSkills.includes(target)) {
-					additionalSkills.remove(target);
-					if (!hasAnotherSKill(skill, target)) this.removeSkill(target);
+					removableSkills.push(target);
 				}
 			}
 			else {
-				delete this.additionalSkills[skill];
-				if (typeof additionalSkills == 'string') {
-					if (!hasAnotherSKill(skill, additionalSkills)) this.removeSkill(additionalSkills);
-				}
-				else if (Array.isArray(additionalSkills)) {
-					const skillsToRemove = additionalSkills.filter(target => !hasAnotherSKill(skill, target));
-					this.removeSkill(skillsToRemove);
+				if (Array.isArray(additionalSkills)) {
+					removableSkills.addArray(additionalSkills.filter(target => !hasAnotherSKill(skill, target)));
 				}
 			}
 		}
+		return removableSkills;
+	}
+	removeAdditionalSkill(skill, target) {
+		const player = this, skills = this.getRemovableAdditionalSkills(skill, target);
+		if(skills.length){
+			player.removeSkill(skills);
+			if (player.additionalSkills[skill]&&player.additionalSkills[skill].length) delete player.additionalSkills[skill];
+		}
 		_status.event.clearStepCache();
 		return this;
+	}
+	removeAdditionalSkills(skill, target) {
+		const player = this, skills = this.getRemovableAdditionalSkills(skill, target);
+		if(skills.length){
+			return player.changeSkills([], skills).set('$handle', function(player, addSkills, removeSkills){
+				game.log(player, '失去了技能', ...removeSkills.map(i => {
+					return '#g【' + get.translation(i) + '】';
+				}));
+				player.removeSkill(skills);
+				if (player.additionalSkills[skill]&&player.additionalSkills[skill].length) delete player.additionalSkills[skill];
+			});
+		}
 	}
 	awakenSkill(skill, nounmark) {
 		if (!nounmark) this.unmarkSkill(skill);
@@ -7673,6 +7716,37 @@ export class Player extends HTMLDivElement {
 			this.enableSkill(skill + '_awake');
 		}
 		return skill;
+	}
+	addTempSkills(skillsToAdd, expire, checkConflict){
+		//请注意，该方法的底层实现并非tempSkill，而是additionalSkills和player.when！
+		if (typeof skillsToAdd == 'string') skillsToAdd = [skillsToAdd];
+		if(!Array.isArray(skillsToAdd) || !skillsToAdd.length){
+			console.warn(`警告：Player[${this.name}].addAdditionalSkills的参数错误，应当为技能字符串或非空数组:`,skillsToAdd);
+		}
+		//确定技能要被移除的时机
+		if (!expire) expire = { global: ['phaseAfter', 'phaseBeforeStart'] };
+		else if (typeof expire == 'string' || Array.isArray(expire)) expire = { global: expire };
+		this.changeSkills(skillsToAdd, []).set('$handle', function(player, addSkills, removeSkills){
+			if(addSkills.length){
+				game.log(player, '获得了技能', ...addSkills.map(i => {
+					return '#g【' + get.translation(i) + '】';
+				}));
+				let skillName;
+				//生成该TempSkills对应的ID
+				do {
+					skillName = 'player_tempSkills_' + Math.random().toString(36).slice(-8);
+				} while (player.additionalSkills[skillName] != null);
+				player.addAdditionalSkill(skillName, skillsToAdd);
+				player.when(expire).assign({
+					firstDo: true,
+					priority: Infinity,
+				}).vars({
+					skillName
+				}).then(() => {
+					player.removeAdditionalSkills(skillName);
+				});
+			}
+		});
 	}
 	addTempSkill(skill, expire, checkConflict) {
 		if (Array.isArray(skill)) {
