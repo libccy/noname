@@ -62,9 +62,7 @@ boot().then(() => {
 					const thisWindow = remote.getCurrentWindow();
 					thisWindow.loadURL(url);
 				} else {
-					setTimeout(() => {
-						location.href = url;
-					}, 1000);
+					location.href = url;
 				}
 			}
 		}
