@@ -191,6 +191,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junk_lidian:['male','wei',3,['xunxun','junkwangxi']],
 			junk_duanwei:['male','qun',4,['junklangmie']],
 			junk_xuyou:["male","qun",3,["nzry_chenglve","junkshicai","nzry_cunmu"]],
+			junk_zhangjiao:['male','shen',3,['yizhao','junksijun','tianjie'],['qun','die_audio:shen_zhangjiao']],
 		},
 		characterFilter:{
 			key_jojiro(mode){
@@ -225,7 +226,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				diy_default:["diy_yuji","diy_caiwenji","diy_lukang","diy_zhenji","old_majun"],
 				diy_noname:['noname'],
 				diy_key:["key_lucia","key_kyousuke","key_yuri","key_haruko","key_umi","key_rei","key_komari","key_yukine","key_yusa","key_misa","key_masato","key_iwasawa","key_kengo","key_yoshino","key_yui","key_tsumugi","key_saya","key_harukakanata","key_inari","key_shiina","key_sunohara","key_rin","key_sasami","key_akane","key_doruji","key_yuiko","key_riki","key_hisako","key_hinata","key_noda","key_tomoya","key_nagisa","key_ayato","key_ao","key_yuzuru","sp_key_kanade","key_mio","key_midori","key_kyoko","key_shizuru","key_shiorimiyuki","key_miki","key_shiori","key_kaori","sp_key_yuri","key_akiko","key_abyusa","key_godan","key_yuu","key_ryoichi","key_kotori","key_jojiro","key_shiroha","key_shizuku","key_hiroto","key_sakuya","key_youta","key_rumi","key_chihaya","key_yukito","key_asara","key_kotomi","key_mia","key_kano","db_key_liyingxia","key_erika","key_satomi","key_iriya","key_fuuko"],
-				diy_trashbin:['old_jiakui','ol_guohuai','junk_zhangrang','old_bulianshi','junk_sunquan','ol_maliang','junk_liubei','junk_huangyueying','junk_lidian','junk_duanwei','junk_xuyou'],
+				diy_trashbin:['junk_zhangjiao','old_jiakui','ol_guohuai','junk_zhangrang','old_bulianshi','junk_sunquan','ol_maliang','junk_liubei','junk_huangyueying','junk_lidian','junk_duanwei','junk_xuyou'],
 			},
 		},
 		characterIntro:{
@@ -12354,6 +12355,52 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.num++;
 				},
 			},
+			//OL神张角
+			junksijun:{
+				audio:'sijun',
+				inherit:'sijun',
+				check(event,player){
+					return ui.cardPile.childNodes.length;
+				},
+				async content(event,trigger,player){
+					player.removeMark('yizhao',player.countMark('yizhao'));
+					const pile=Array.from(ui.cardPile.childNodes);
+					if(pile.length){
+						const max=max=Math.pow(2,Math.min(100,pile.length));
+						let bool=false,index,cards=[];
+						for(let i=0;i<max;i++){
+							let num=0;
+							index=i.toString(2);
+							while(index.length<pile.length){
+								index=('0'+index);
+							}
+							for(var k=0;k<index.length;k++){
+								if(index[k]=='1') num+=get.number(pile[k]);
+								if(num>36) break;
+							}
+							if(num==36){
+								bool=true;
+								break;
+							}
+						}
+						if(bool){
+							for(let k=0;k<index.length;k++){
+								if(index[k]=='1') cards.push(pile[k]);
+							}
+							await player.gain(cards,'gain2');
+						}
+						else{
+							let total=0;
+							for(const card of pile){
+								total+=get.number(card);
+								cards.push(card);
+								if(total>=36) break;
+							}
+						}
+						if(cards.length) await player.gain(cards,'gain2');
+					}
+				},
+			},
 			//手杀削弱版许攸
 			junkshicai:{
 				audio:'nzry_shicai_2',
@@ -19002,6 +19049,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_duji:'画饼杜畿',
 			ns_duji_prefix:'画饼',
 			ns_duji_ab:'杜畿',
+			junk_zhangjiao:'OL神张角',
+			junk_zhangjiao_prefix:'OL神',
+			junksijun:'肆军',
+			junksijun_info:'准备阶段，若“黄”数大于牌堆的牌数，你可以移去所有“黄”，然后从牌堆中随机获得任意张点数之和为36的牌（若牌堆没有点数和为36的组合则获得牌堆顶点数和刚好超过36的牌组）。',
 
 			diy_tieba:'吧友设计',
 			diy_xushi:'玩点论杀·虚实篇',

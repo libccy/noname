@@ -78,6 +78,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_machao:['shen_machao','ps_shen_machao'],
 			shen_jiaxu:['le_shen_jiaxu','shen_jiaxu'],
 			shen_caocao:['shen_caocao','old_caocao'],
+			shen_zhangjiao:['shen_zhangjiao','junk_zhangjiao'],
 		},
 		characterFilter:{
 			shen_diaochan(mode){
@@ -1933,7 +1934,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter(event,player){
 					return player.countMark('yizhao')>ui.cardPile.childNodes.length;
 				},
-				check:()=>true,
+				check(event,player){
+					return ui.cardPile.childNodes.length;
+				},
 				content(){
 					'step 0'
 					player.removeMark('yizhao',player.countMark('yizhao'));
