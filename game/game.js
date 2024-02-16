@@ -43,14 +43,27 @@ new Promise(resolve => {
 		}
 	};
 
+	// 这个弹窗，在升级到http协议下的客户端不应该进行提示。
 	if (!localStorage.getItem('gplv3_noname_alerted')) {
-		if (confirm('①无名杀是一款基于GPLv3协议的开源软件！\n你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的拓展。\n点击“确定”即代表您认可并接受GPLv3协议↓️\nhttps://www.gnu.org/licenses/gpl-3.0.html\n②无名杀官方发布地址仅有GitHub仓库！\n其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！')) {
-			// @ts-ignore
-			localStorage.setItem('gplv3_noname_alerted', true);
-		}
-		else {
-			exit();
-		}
+		const nonameInitialized = localStorage.getItem('noname_inited');
+		const callback = () => {
+			if (confirm('①无名杀是一款基于GPLv3协议的开源软件！\n你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的拓展。\n点击“确定”即代表您认可并接受GPLv3协议↓️\nhttps://www.gnu.org/licenses/gpl-3.0.html\n②无名杀官方发布地址仅有GitHub仓库！\n其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！')) {
+				// @ts-ignore
+				localStorage.setItem('gplv3_noname_alerted', true);
+			}
+			else {
+				exit();
+			}
+		};
+		if (location.protocol.startsWith('http')) {
+			if (!nonameInitialized || nonameInitialized.length == 0) {
+				callback();
+			} else {
+				// @ts-ignore
+				localStorage.setItem('gplv3_noname_alerted', true);
+			}
+		} else callback();
+		
 	}
 	window['b' + 'ann' + 'e' + 'dE' + 'x' + 'ten' + 's' + 'i' + 'o' + 'ns'] = ['\u4fa0\u4e49', '\u5168\u6559\u7a0b'];
 
