@@ -4180,6 +4180,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							owned:{}
 						};
 					}
+					player.when('dieBegin').then(()=>{
+						const name=player.name?player.name:player.name1;
+						if(name){
+							const sex=get.character(name,0);
+							const group=get.character(name,1);
+							if(player.sex!=sex){
+								game.broadcastAll((player,sex)=>{
+									player.sex=sex;
+								},player,sex);
+								game.log(player,'将性别变为了','#y'+get.translation(sex)+'性');
+							}
+							if(player.group!=group) player.changeGroup(group);
+						}
+					});
 				},
 				intro:{
 					content:function(storage,player){
@@ -4455,10 +4469,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						player.storage.huashen.current2=skill;
 						if(!player.additionalSkills.huashen||!player.additionalSkills.huashen.includes(skill)){
-							player.addAdditionalSkill('huashen',skill);
+							player.addAdditionalSkills('huashen',skill);
 							player.flashAvatar('huashen',character);
-							game.log(player,'获得了技能','#g【'+get.translation(skill)+'】');
-							player.popup(skill);
 							player.syncStorage('huashen');
 							player.updateMarks('huashen');
 							// lib.skill.rehuashen.createAudio(character,skill,'zuoci');
