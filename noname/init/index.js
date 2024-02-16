@@ -846,9 +846,9 @@ async function setOnError() {
 
 	if (promiseErrorHandler.onLoad) await promiseErrorHandler.onLoad();
 
-	window.addEventListener("unhandledrejection", async (event) => {
+	window.onunhandledrejection = async (event) => {
 		if (promiseErrorHandler.onHandle) await promiseErrorHandler.onHandle(event);
-	});
+	};
 
 	window.onerror = function (msg, src, line, column, err) {
 		if (promiseErrorHandler.onErrorPrepare) promiseErrorHandler.onErrorPrepare();

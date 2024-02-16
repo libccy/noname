@@ -141,7 +141,7 @@ new Promise(resolve => {
 				module._compile(require('fs').readFileSync(filename, 'utf8'), filename);
 			};
 		}
-		if (location.protocol.startsWith('http') && 'serviceWorker' in navigator) {
+		if (window.isSecureContext && 'serviceWorker' in navigator) {
 			let scope = window.location.protocol + '//' + window.location.host + '/';
 			navigator.serviceWorker.getRegistrations().then(registrations => {
 				let findServiceWorker = registrations.find(registration => {
