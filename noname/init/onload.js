@@ -587,7 +587,11 @@ export async function onload(resetGameTimeout) {
 					_status.extension = lib.extensions[i][0];
 					_status.evaluatingExtension = lib.extensions[i][3];
 					if (typeof lib.extensions[i][1] == "function")
-						await (gnc.is.coroutine(lib.extensions[i][1]) ? gnc.of(lib.extensions[i][1]) : lib.extensions[i][1]).call(lib.extensions[i], lib.extensions[i][2], lib.extensions[i][4]);
+					    try{
+						    await (gnc.is.coroutine(lib.extensions[i][1]) ? gnc.of(lib.extensions[i][1]) : lib.extensions[i][1]).call(lib.extensions[i], lib.extensions[i][2], lib.extensions[i][4]);
+						}catch(e){
+						    alert(`扩展${lib.extensions[i][0]}载入失败\ncontentError\n${decodeURI(e.stack)}`);
+						}
 					if (lib.extensions[i][4]) {
 						if (lib.extensions[i][4].character) {
 							for (var j in lib.extensions[i][4].character.character) {
