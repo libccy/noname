@@ -1321,31 +1321,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const event=get.event();
 						const controls=[link=>{
 							const evt=get.event();
-							if(link=='cancel2') ui.click.cancel();
-							else{
-								if(evt.dialog&&evt.dialog.buttons){
-									for(let i=0;i<evt.dialog.buttons.length;i++){
-										const button=evt.dialog.buttons[i];
-										button.classList.remove('selectable');
-										button.classList.remove('selected');
-										const counterNode=button.querySelector('.caption');
-										if(counterNode){
-											counterNode.childNodes[0].innerHTML=``;
-										}
+							if(evt.dialog&&evt.dialog.buttons){
+								for(let i=0;i<evt.dialog.buttons.length;i++){
+									const button=evt.dialog.buttons[i];
+									button.classList.remove('selectable');
+									button.classList.remove('selected');
+									const counterNode=button.querySelector('.caption');
+									if(counterNode){
+										counterNode.childNodes[0].innerHTML=``;
 									}
-									ui.selected.buttons.length=0;
-									game.check();
 								}
-								return;
+								ui.selected.buttons.length=0;
+								game.check();
 							}
+							return;
 						}];
-						event.controls=['清除选择','cancel2'].map(control=>{
-							return ui.create.control(controls.concat(control=='清除选择'?[control,'stayleft']:control));
-						});
+						event.controls=[ui.create.control(controls.concat(['清除选择','stayleft']))];
 					};
 					if(event.isMine()) func();
 					else if(event.isOnline()) event.player.send(func);
-					var result=yield player.chooseButton(['看破：是否记录至多'+get.cnNumber(sum)+'个牌名？',[list,'vcard']],[1,sum],true).set('ai',function(button){
+					var result=yield player.chooseButton(['看破：是否记录至多'+get.cnNumber(sum)+'个牌名？',[list,'vcard']],[1,sum],false).set('ai',function(button){
 						if(ui.selected.buttons.length>=Math.max(3,game.countPlayer()/2)) return 0;
 						switch(button.link[2]){
 							case 'wuxie':return 5+Math.random();
@@ -1385,7 +1380,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 								if(!ui.selected.buttons.length){
 									const evt=event.parent;
-									if(evt.controls) evt.controls[0].hide();
+									if(evt.controls) evt.controls[0].classList.add('disabled');
 								}
 							},
 						},
@@ -1409,7 +1404,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									counterNode.style.bottom='2px';
 								}
 								const evt=event.parent;
-								if(evt.controls) evt.controls[0].show();
+								if(evt.controls) evt.controls[0].classList.remove('disabled');
 								game.check();
 							},
 						}

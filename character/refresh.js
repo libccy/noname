@@ -11445,7 +11445,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['reshuangxiong1',"reshuangxiong2"],
 			},
 			reshuangxiong1:{
-				audio:"shuangxiong1",
+				audio:"shuangxiong",
 				audioname:['re_yanwen'],
 				trigger:{
 					player:"phaseDrawBegin1",

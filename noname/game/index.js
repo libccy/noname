@@ -1880,11 +1880,17 @@ export class Game extends Uninstantable {
 				help: help,
 				config: objectConfig
 			}
-			if (precontent) {
-				_status.extension = name;
-				await (gnc.is.generatorFunc(precontent) ? gnc.of(precontent) : precontent).call(object, config);
-				delete _status.extension;
+			try{
+    			if (precontent) {
+    				_status.extension = name;
+    				
+    				await (gnc.is.generatorFunc(precontent) ? gnc.of(precontent) : precontent).call(object, config);
+    				delete _status.extension;
+    			}
+			}catch(e1){
+			    alert(`加载《${name}》扩展的precontent时出错。\n${decodeURI(e1.stack)}`);
 			}
+			
 			if (content) lib.extensions.push([name, content, config, _status.evaluatingExtension, objectPackage || {}]);
 		}
 		catch (e) {
