@@ -3340,14 +3340,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addTempSkill('yanxi2');
 					var card2=result.links[0];
 					if(card2==card){
-						player.popup('洗具');
+						player.popup('猜对了');
 						cards.remove(card2);
 						player.$gain2(cards);
 						player.gain(cards,'log').gaintag.add('yanxi');
 						player.gain(card,target,'bySelf','give').gaintag.add('yanxi');
 					}
 					else{
-						player.popup('杯具');
+						player.popup('猜错了');
 						player.gain(card2,'gain2').gaintag.add('yanxi');
 					}
 				},
