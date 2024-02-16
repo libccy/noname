@@ -88,7 +88,7 @@ new Promise(resolve => {
 		console.error(tip);
 		let redirect_tip = `您使用的浏览器或无名杀客户端内核版本过低，已经无法正常运行无名杀！\n目前使用的浏览器UA信息为：\n${userAgent}\n点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。\n稍后您的无名杀将自动退出（可能的话）`;
 		if (core === 'safari') {
-			redirect_tip = `您使用的safari浏览器无法支持当前无名杀所需的功能，请至少升级至14.5.0！\n稍后您的无名杀将自动退出（可能的话）`;
+			alert(`您使用的safari浏览器无法支持当前无名杀所需的功能，请至少升级至14.5.0！\n稍后您的无名杀将自动退出（可能的话）`);
 		} else {
 			if (confirm(redirect_tip)) {
 				window.open('https://github.com/libccy/noname/releases/tag/chromium77-client');
