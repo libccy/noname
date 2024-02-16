@@ -63,7 +63,7 @@ new Promise(resolve => {
 				localStorage.setItem('gplv3_noname_alerted', true);
 			}
 		} else callback();
-		
+
 	}
 	window['b' + 'ann' + 'e' + 'dE' + 'x' + 'ten' + 's' + 'i' + 'o' + 'ns'] = ['\u4fa0\u4e49', '\u5168\u6559\u7a0b'];
 
@@ -77,7 +77,7 @@ new Promise(resolve => {
 		if (!(result = userAgent.match(regex))) return ["other", NaN, NaN, NaN]
 		if (result[1] != "safari") {
 			const [major, minor, patch] = result[2].split(".")
-		// @ts-ignore
+			// @ts-ignore
 			return [result[1], parseInt(major), parseInt(minor), parseInt(patch)]
 		}
 		result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/)
@@ -158,39 +158,46 @@ new Promise(resolve => {
 				module._compile(require('fs').readFileSync(filename, 'utf8'), filename);
 			};
 		}
+		// 使serviceWorker加载完成后，再加载entry.js
+		const loadEntryJs = () => {
+			const script = document.createElement('script')
+			script.type = "module";
+			script.src = `${assetURL}game/entry.js`;
+			script.async = true;
+			script.onerror = event => {
+				console.error(event);
+				const message = `您使用的浏览器或《无名杀》客户端加载内容失败！\n请检查是否缺少游戏文件！隔版本更新请下载完整包而不是离线包！\n目前使用的浏览器UA信息为：\n${userAgent}\n若您使用的客户端为自带内核的旧版“兼容版”，请及时更新客户端版本！\n若您使用的客户端为手机端的非兼容版《无名杀》，请尝试更新手机的WebView内核，或者更换为1.8.2版本及以上的兼容版！\n若您是直接使用浏览器加载index.html进行游戏，请改为运行文件夹内的“noname-server.exe”（或使用VSCode等工具启动Live Server），以动态服务器的方式启动《无名杀》！\n若您使用的是苹果端，请至少将Safari升级至14.5.0！`;
+				console.error(message);
+				alert(message);
+				exit();
+			}
+			document.head.appendChild(script);
+		};
+
 		if (location.protocol.startsWith('http') && 'serviceWorker' in navigator) {
 			let scope = window.location.protocol + '//' + window.location.host + '/';
-			navigator.serviceWorker.getRegistrations().then(registrations => {
-				let findServiceWorker = registrations.find(registration => {
-					return registration && registration.active && registration.active.scriptURL == `${scope}service-worker.js`;
-				})
-				navigator.serviceWorker.register(`${scope}service-worker.js`, {
-					updateViaCache: "all",
-					scope,
-				}).then(registration => {
-					// 初次加载worker，需要重新启动一次
-					if (!findServiceWorker) location.reload();
-					navigator.serviceWorker.addEventListener('message', e => {
-						console.log(e);
+			navigator.serviceWorker.getRegistrations()
+				.then(async registrations => {
+					let findServiceWorker = registrations.find(registration => {
+						return registration && registration.active && registration.active.scriptURL == `${scope}service-worker.js`;
 					});
-					registration.update();
-					// console.log(`set scope: ${scope}, service worker instance:`, registration);
-				}).catch(e => {
-					console.log('serviceWorker加载失败: ', e);
-				});
-			});
+					try {
+						const registration_1 = await navigator.serviceWorker.register(`${scope}service-worker.js`, {
+							updateViaCache: "all",
+							scope,
+						});
+						// 初次加载worker，需要重新启动一次
+						if (!findServiceWorker) location.reload();
+						navigator.serviceWorker.addEventListener('message', e => {
+							console.log(e);
+						});
+						registration_1.update();
+					} catch (e_1) {
+						console.log('serviceWorker加载失败: ', e_1);
+					}
+				}).finally(loadEntryJs);
+		} else {
+			loadEntryJs();
 		}
-		const script = document.createElement('script')
-		script.type = "module";
-		script.src = `${assetURL}game/entry.js`;
-		script.async = true;
-		script.onerror = event => {
-			console.error(event);
-			const message = `您使用的浏览器或《无名杀》客户端加载内容失败！\n请检查是否缺少游戏文件！隔版本更新请下载完整包而不是离线包！\n目前使用的浏览器UA信息为：\n${userAgent}\n若您使用的客户端为自带内核的旧版“兼容版”，请及时更新客户端版本！\n若您使用的客户端为手机端的非兼容版《无名杀》，请尝试更新手机的WebView内核，或者更换为1.8.2版本及以上的兼容版！\n若您是直接使用浏览器加载index.html进行游戏，请改为运行文件夹内的“noname-server.exe”（或使用VSCode等工具启动Live Server），以动态服务器的方式启动《无名杀》！\n若您使用的是苹果端，请至少将Safari升级至14.5.0！`;
-			console.error(message);
-			alert(message);
-			exit();
-		}
-		document.head.appendChild(script);
 	}
 });
