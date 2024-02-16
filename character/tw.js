@@ -3725,7 +3725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					})){
 						player.line(target);
 						target.markAuto('twlinglu',[player]);
-						target.addAdditionalSkill('twkunsi_temp','twlinglu');
+						target.addAdditionalSkills('twkunsi_temp','twlinglu');
 						player.markAuto('twkunsi_clear',[target]);
 						player.addTempSkill('twkunsi_clear',{player:'phaseBegin'});
 					}

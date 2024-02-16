@@ -5914,7 +5914,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							delete player._mouduan_mark;
 						}
 					},player);
-					player.removeAdditionalSkill('mouduan');
+					player.removeAdditionalSkills('mouduan');
 				},
 				trigger:{player:'loseEnd'},
 				forced:true,
@@ -5930,7 +5930,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player._mouduan_mark.firstChild.innerHTML='文';
 						player._mouduan_mark.info.content='拥有技能【英姿】、【克己】';
 					},player);
-					player.addAdditionalSkill('mouduan',['yingzi','keji']);
+					player.addAdditionalSkills('mouduan',['yingzi','keji']);
 				},
 				group:'mouduan2'
 			},
@@ -5956,7 +5956,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player._mouduan_mark.firstChild.innerHTML='武';
 							player._mouduan_mark.info.content='拥有技能【激昂】、【谦逊】';
 						},player);
-						player.addAdditionalSkill('mouduan',['jiang','qianxun']);
+						player.addAdditionalSkills('mouduan',['jiang','qianxun']);
 					}
 				}
 			},

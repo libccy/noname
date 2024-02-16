@@ -4239,9 +4239,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var skill=result.control;
 					if(skill!='cancel2'){
 						event.skills.remove(skill);
-						target.addAdditionalSkill('jinghe_'+player.playerid,skill);
+						target.addAdditionalSkills('jinghe_'+player.playerid,skill);
 						target.popup(skill);
-						game.log(target,'获得了技能','#g【'+get.translation(skill)+'】');
 					}
 					if(event.num<event.targets.length) event.goto(1);
 					if(target!=game.me&&!target.isOnline2()) game.delayx();
@@ -4258,7 +4257,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					clear:{
 						onremove:function(player){
 							game.countPlayer(function(current){
-								current.removeAdditionalSkill('jinghe_'+player.playerid);
+								current.removeAdditionalSkills('jinghe_'+player.playerid);
 							});
 						},
 					},

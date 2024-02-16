@@ -1722,9 +1722,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else event.finish();
 							'step 2'
 							target.line(player);
-							player.addTempSkill(result.control,'phaseUseEnd');
+							player.addTempSkills(result.control,'phaseUseEnd');
 							player.popup(result.control);
-							game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
 						},
 						ai:{
 							order:function(item,player){

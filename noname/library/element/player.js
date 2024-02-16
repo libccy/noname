@@ -7296,12 +7296,13 @@ export class Player extends HTMLDivElement {
 		return this.changeSkills([], Array.isArray(skill) ? skill : [skill]);
 	}
 	changeSkills(addSkill = [], removeSkill = []){
-		const next = game.createEvent('changeSkills', false);
-		next.player = this;
 		if(!Array.isArray(addSkill) || !Array.isArray(removeSkill)){
 			console.warn(`警告：Player[${this.name}].changeSkills的参数错误，应当为数组形式。`);
 			return;
 		}
+		const next = game.createEvent('changeSkills', false);
+		next.player = this;
+		next.forceDie = true;
 		next.addSkill = addSkill.slice(0).unique();
 		next.removeSkill = removeSkill.slice(0).unique();
 		next.setContent('changeSkills');
@@ -7710,14 +7711,14 @@ export class Player extends HTMLDivElement {
 				}
 				this.removeSkillTrigger(skill);
 				if (!info.keepSkill) {
-					this.removeAdditionalSkill(skill);
+					this.removeAdditionalSkills(skill);
 				}
 			}
 			this.enableSkill(skill + '_awake');
 		}
 		return skill;
 	}
-	addTempSkills(skillsToAdd, expire, checkConflict){
+	addTempSkills(skillsToAdd, expire){
 		//请注意，该方法的底层实现并非tempSkill，而是additionalSkills和player.when！
 		if (typeof skillsToAdd == 'string') skillsToAdd = [skillsToAdd];
 		if(!Array.isArray(skillsToAdd) || !skillsToAdd.length){
@@ -7726,7 +7727,7 @@ export class Player extends HTMLDivElement {
 		//确定技能要被移除的时机
 		if (!expire) expire = { global: ['phaseAfter', 'phaseBeforeStart'] };
 		else if (typeof expire == 'string' || Array.isArray(expire)) expire = { global: expire };
-		this.changeSkills(skillsToAdd, []).set('$handle', function(player, addSkills, removeSkills){
+		return this.changeSkills(skillsToAdd, []).set('$handle', function(player, addSkills, removeSkills){
 			if(addSkills.length){
 				game.log(player, '获得了技能', ...addSkills.map(i => {
 					return '#g【' + get.translation(i) + '】';

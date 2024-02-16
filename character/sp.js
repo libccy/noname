@@ -14530,7 +14530,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return -1;
 					};
 					'step 1'
-					if(result.bool) trigger.player.addTempSkill('yuxu');
+					if(result.bool) trigger.player.addTempSkills('yuxu');
 				},
 				ai:{
 					expose:0.25,

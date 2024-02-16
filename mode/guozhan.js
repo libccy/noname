@@ -1050,9 +1050,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0],skill=event.skill;
 						player.line(target);
 						player.addTempSkill('gzrejinghe_clear',{player:'phaseBegin'});
-						target.addAdditionalSkill('gzrejinghe_'+player.playerid,skill);
+						target.addAdditionalSkills('gzrejinghe_'+player.playerid,skill);
 						target.popup(skill);
-						game.log(target,'获得了技能','#g【'+get.translation(skill)+'】');
 					}
 				},
 				intro:{
@@ -1084,7 +1083,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					clear:{
 						onremove:function(player){
 							game.countPlayer(function(current){
-								current.removeAdditionalSkill('gzrejinghe_'+player.playerid);
+								current.removeAdditionalSkills('gzrejinghe_'+player.playerid);
 							});
 						},
 					},
@@ -2833,8 +2832,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					else player.chooseControl(skills).set('prompt','选择获得一个技能直到回合结束');
 					'step 2'
 					var skill=result.control;
-					player.addTempSkill(skill);
-					game.log(player,'获得了技能','#g【'+get.translation(skill)+'】');
+					player.addTempSkills(skill);
+					player.popup(skill);
 				},
 				derivation:['gzqice','tiaoxin','gzzhiheng','new_chuli','gzsanchen'],
 				ai:{
@@ -4037,9 +4036,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var skill=result.control;
 					if(skill!='cancel2'){
 						event.skills.remove(skill);
-						target.addAdditionalSkill('gzjinghe_'+player.playerid,skill);
+						target.addAdditionalSkills('gzjinghe_'+player.playerid,skill);
 						target.popup(skill);
-						game.log(target,'获得了技能','#g【'+get.translation(skill)+'】');
 					}
 					if(event.num<event.targets.length) event.goto(1);
 					if(target!=game.me&&!target.isOnline2()) game.delayx();
@@ -4056,7 +4054,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					clear:{
 						onremove:function(player){
 							game.countPlayer(function(current){
-								current.removeAdditionalSkill('gzjinghe_'+player.playerid);
+								current.removeAdditionalSkills('gzjinghe_'+player.playerid);
 							});
 						},
 					},
@@ -5549,7 +5547,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return player.countMark('gzsuzhi_count')<3;
 				},
 				content:function(){
-					player.addTempSkill('gzfankui',{player:'phaseBegin'});
+					player.addTempSkills('gzfankui',{player:'phaseBegin'});
 				},
 				group:['gzsuzhi_damage','gzsuzhi_draw','gzsuzhi_gain'],
 				preHidden:['gzsuzhi_damage','gzsuzhi_draw','gzsuzhi_gain'],
@@ -9745,8 +9743,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				//priority:3,
 				content:function(){
-					player.addTempSkill('baka_yingzi','phaseAfter');
-					player.addTempSkill('baka_yinghun','phaseAfter');
+					player.addTempSkills(['baka_yingzi','baka_yinghun']);
 				},
 				ai:{
 					threaten:function(player,target){

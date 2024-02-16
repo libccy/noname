@@ -2029,7 +2029,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return lib.filter.canBeDiscarded(card,player,target);
 					},'e')){
 						player.discardPlayerCard(target,'e',true);
-						target.addAdditionalSkill('jsrgqingzi_'+player.playerid,'xinshensu');
+						target.addAdditionalSkills('jsrgqingzi_'+player.playerid,'xinshensu');
 						player.markAuto('jsrgqingzi_clear',[target]);
 					}
 					event.num++;

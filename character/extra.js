@@ -5543,7 +5543,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content(){
 					player.removeMark('baonu',2);
-					player.addTempSkill('wushuang');
+					player.addTempSkills('wushuang');
 					player.popup('无双');
 					game.log(player,'获得了技能','#g【无双】');
 					target.addTempSkill('ol_wuqian_targeted');

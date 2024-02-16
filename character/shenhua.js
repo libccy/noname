@@ -1137,7 +1137,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.addTempSkill('drlt_jueyan2');
 							break;
 						case 'equip5':
-							player.addTempSkill('rejizhi');
+							player.addTempSkills('rejizhi');
 							break;
 					}
 				},

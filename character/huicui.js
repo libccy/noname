@@ -6439,7 +6439,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									var pos=lib.skill.midu_backup.equip;
 									if(pos<=0) player.enableJudge();
 									else player.enableEquip(pos);
-									player.addTempSkill('rehuomo',{player:'phaseBegin'});
+									player.addTempSkills('rehuomo',{player:'phaseBegin'});
 								},
 							}
 						}
@@ -7151,7 +7151,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var info=get.info(i);
 						return info&&!get.is.locked(i)&&!info.limited&&!info.juexingji&&!info.zhuSkill&&!info.charlotte;
 					});
-					target.addAdditionalSkill('dcjiezhen_blocker','bazhen');
+					target.addAdditionalSkills('dcjiezhen_blocker','bazhen');
 					target.addSkill('dcjiezhen_blocker');
 					target.markAuto('dcjiezhen_blocker',skills);
 					player.addSkill('dcjiezhen_clear');
@@ -7297,7 +7297,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.awakenSkill('dczecai');
 						var target=result.targets[0];
 						player.logSkill('dczecai',target);
-						target.addAdditionalSkill('dczecai_effect','rejizhi');
+						target.addAdditionalSkills('dczecai_effect','rejizhi');
 						target.addTempSkill('dczecai_effect','roundStart');
 						if(target==event.target){
 							var evt=trigger._trigger;
