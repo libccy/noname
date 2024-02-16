@@ -86,11 +86,15 @@ new Promise(resolve => {
 	if (core in supportMap && supportMap[core].some((current, index) => current > versions[index])) {
 		const tip = '检测到您的浏览器内核版本无法支持当前无名杀所需的功能，请立即升级浏览器或手机webview内核！';
 		console.error(tip);
-		const redirect_tip = `您使用的浏览器或无名杀客户端内核版本过低，已经无法正常运行无名杀！\n目前使用的浏览器UA信息为：\n${userAgent}\n点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。\n稍后您的无名杀将自动退出（可能的话）`;
-		if (confirm(redirect_tip)) {
-			window.open('https://github.com/libccy/noname/releases/tag/chromium77-client');
+		let redirect_tip = `您使用的浏览器或无名杀客户端内核版本过低，已经无法正常运行无名杀！\n目前使用的浏览器UA信息为：\n${userAgent}\n点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。\n稍后您的无名杀将自动退出（可能的话）`;
+		if (core === 'safari') {
+			redirect_tip = `您使用的safari浏览器无法支持当前无名杀所需的功能，请至少升级至14.5.0！\n稍后您的无名杀将自动退出（可能的话）`;
+		} else {
+			if (confirm(redirect_tip)) {
+				window.open('https://github.com/libccy/noname/releases/tag/chromium77-client');
+			}
 		}
-		exit()
+		exit();
 	}
 	else {
 		// node环境下
@@ -141,7 +145,7 @@ new Promise(resolve => {
 				module._compile(require('fs').readFileSync(filename, 'utf8'), filename);
 			};
 		}
-		if (window.isSecureContext && 'serviceWorker' in navigator) {
+		if (location.protocol.startsWith('http') && 'serviceWorker' in navigator) {
 			let scope = window.location.protocol + '//' + window.location.host + '/';
 			navigator.serviceWorker.getRegistrations().then(registrations => {
 				let findServiceWorker = registrations.find(registration => {
@@ -169,7 +173,7 @@ new Promise(resolve => {
 		script.async = true;
 		script.onerror = event => {
 			console.error(event);
-			const message = `您使用的浏览器或《无名杀》客户端加载内容失败！\n目前使用的浏览器UA信息为：\n${userAgent}\n若您使用的客户端为自带内核的旧版“兼容版”，请及时更新客户端版本！\n若您使用的客户端为手机端的非兼容版《无名杀》，请尝试更新手机的WebView内核，或者更换为1.8.2版本及以上的兼容版！\n若您是直接使用浏览器加载index.html进行游戏，请改为运行文件夹内的“noname-server.exe”（或使用VSCode等工具启动Live Server），以动态服务器的方式启动《无名杀》！`;
+			const message = `您使用的浏览器或《无名杀》客户端加载内容失败！\n请检查是否缺少游戏文件！隔版本更新请下载完整包而不是离线包！\n目前使用的浏览器UA信息为：\n${userAgent}\n若您使用的客户端为自带内核的旧版“兼容版”，请及时更新客户端版本！\n若您使用的客户端为手机端的非兼容版《无名杀》，请尝试更新手机的WebView内核，或者更换为1.8.2版本及以上的兼容版！\n若您是直接使用浏览器加载index.html进行游戏，请改为运行文件夹内的“noname-server.exe”（或使用VSCode等工具启动Live Server），以动态服务器的方式启动《无名杀》！\n若您使用的是苹果端，请至少将Safari升级至14.5.0！`;
 			console.error(message);
 			alert(message);
 			exit();

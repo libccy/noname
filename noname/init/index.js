@@ -18,6 +18,8 @@ import { onload } from './onload.js';
 export function canUseHttpProtocol() {
 	// 如果是http了就不用
 	if (location.protocol.startsWith('http')) return false;
+	// 首次启动不更新(即还没进行过新手教程)
+	if (!lib.config.new_tutorial) return false;
 	if (typeof nonameInitialized == 'string') {
 		// 手机端
 		if (window.cordova) {
