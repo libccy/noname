@@ -774,7 +774,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',
-			onlyOL_sb:'OL专属·上兵伐谋',
+			onlyOL_sb:'OL专属·谋武将',
 		},
 	};
 });
