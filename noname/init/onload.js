@@ -590,7 +590,7 @@ export async function onload(resetGameTimeout) {
 					    try{
 						    await (gnc.is.coroutine(lib.extensions[i][1]) ? gnc.of(lib.extensions[i][1]) : lib.extensions[i][1]).call(lib.extensions[i], lib.extensions[i][2], lib.extensions[i][4]);
 						}catch(e){
-						    alert(`加载《${name}》扩展的content时出错。\n${decodeURI(e.stack)}`);
+						    alert(`加载《${lib.extensions[i][0]}》扩展的content时出错。\n${decodeURI(e.stack)}`);
 						}
 					if (lib.extensions[i][4]) {
 						if (lib.extensions[i][4].character) {
