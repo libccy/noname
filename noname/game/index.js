@@ -1644,7 +1644,7 @@ export class Game extends Uninstantable {
 				return;
 			}
 		}
-		const audio = lib.card[card.name].audio;
+		const audio = get.dynamicVariable(lib.card[card.name].audio,card,sex);
 		if (typeof audio == 'string') {
 			const audioInfo = audio.split(':');
 			if (audio.startsWith('db:')) game.playAudio(`${audioInfo[0]}:${audioInfo[1]}`, audioInfo[2], `${card.name}_${sex}.${audioInfo[3] || 'mp3'}`);
@@ -1753,8 +1753,7 @@ export class Game extends Uninstantable {
 	static import(type, content, url) {
 		if (type == 'extension') {
 			const promise = game.loadExtension(content).then((name) => {
-				if (typeof _status.extensionLoaded == "undefined")
-					_status.extensionLoaded = [];
+				if (typeof _status.extensionLoaded == "undefined") _status.extensionLoaded = [];
 				_status.extensionLoaded.add(name);
 				return name;
 			});
@@ -1881,11 +1880,18 @@ export class Game extends Uninstantable {
 				help: help,
 				config: objectConfig
 			}
-			if (precontent) {
-				_status.extension = name;
-				await (gnc.is.generatorFunc(precontent) ? gnc.of(precontent) : precontent).call(object, config);
-				delete _status.extension;
+			try{
+    			if (precontent) {
+    				_status.extension = name;
+    				
+    				await (gnc.is.generatorFunc(precontent) ? gnc.of(precontent) : precontent).call(object, config);
+    				delete _status.extension;
+    			}
+			}catch(e1){
+				console.log(`加载《${name}》扩展的precontent时出现错误。`,e1);
+				if(!lib.config.extension_alert) alert(`加载《${name}》扩展的precontent时出现错误。\n该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。\n${decodeURI(e1.stack)}`);
 			}
+			
 			if (content) lib.extensions.push([name, content, config, _status.evaluatingExtension, objectPackage || {}]);
 		}
 		catch (e) {
@@ -4380,7 +4386,16 @@ export class Game extends Uninstantable {
 					}
 				}
 				if (lib[i][j] == undefined) {
-					lib[i][j] = pack[i][j];
+					// 判断扩展武将包是否开启
+					if (i == 'character') {
+						// if (!game.hasExtension(extname) || !game.hasExtensionLoaded(extname)) continue;
+						if (lib.config[`extension_${extname}_characters_enable`] === undefined) {
+							game.saveExtensionConfig(extname, 'characters_enable', true);
+						}
+						if (lib.config[`extension_${extname}_characters_enable`] === true) {
+							lib[i][j] = pack[i][j];
+						}
+					} else lib[i][j] = pack[i][j];
 				}
 			}
 		}
@@ -4460,20 +4475,22 @@ export class Game extends Uninstantable {
 					if (pack[i][j].audio == true) {
 						pack[i][j].audio = 'ext:' + extname;
 					}
-					if (pack[i][j].fullskin) {
-						if (_status.evaluatingExtension) {
-							pack[i][j].image = 'db:extension-' + extname + ':' + j + '.png';
+					if(!pack[i][j].image){
+						if (pack[i][j].fullskin) {
+							if (_status.evaluatingExtension) {
+								pack[i][j].image = 'db:extension-' + extname + ':' + j + '.png';
+							}
+							else {
+								pack[i][j].image = 'ext:' + extname + '/' + j + '.png';
+							}
 						}
-						else {
-							pack[i][j].image = 'ext:' + extname + '/' + j + '.png';
-						}
-					}
-					else if (pack[i][j].fullimage) {
-						if (_status.evaluatingExtension) {
-							pack[i][j].image = 'db:extension-' + extname + ':' + j + '.jpg';
-						}
-						else {
-							pack[i][j].image = 'ext:' + extname + '/' + j + '.jpg';
+						else if (pack[i][j].fullimage) {
+							if (_status.evaluatingExtension) {
+								pack[i][j].image = 'db:extension-' + extname + ':' + j + '.jpg';
+							}
+							else {
+								pack[i][j].image = 'ext:' + extname + '/' + j + '.jpg';
+							}
 						}
 					}
 					lib.cardPack[packname].push(j);
@@ -4483,7 +4500,18 @@ export class Game extends Uninstantable {
 						pack[i][j].audio = 'ext:' + extname + ':' + pack[i][j].audio;
 					}
 				}
-				if (lib[i][j] == undefined) lib[i][j] = pack[i][j];
+				if (lib[i][j] == undefined) {
+					// 判断扩展卡牌包是否开启
+					if (i == 'card') {
+						// if (!game.hasExtension(extname) || !game.hasExtensionLoaded(extname)) continue;
+						if (lib.config[`extension_${extname}_cards_enable`] === undefined) {
+							game.saveExtensionConfig(extname, 'cards_enable', true);
+						}
+						if (lib.config[`extension_${extname}_cards_enable`] === true) {
+							lib[i][j] = pack[i][j];
+						}
+					} else lib[i][j] = pack[i][j];
+				}
 			}
 		}
 	}
@@ -4613,6 +4641,9 @@ export class Game extends Uninstantable {
 	 * @param { string } extensionName
 	 */
 	static hasExtension(extensionName) {
+		if (typeof lib.config[`extension_${extensionName}_enable`] != 'boolean') {
+			game.saveExtensionConfig(extensionName, 'enable', true);
+		}
 		return this.hasExtensionInstalled(extensionName) && lib.config[`extension_${extensionName}_enable`];
 	}
 	/**
@@ -8407,8 +8438,10 @@ export class Game extends Uninstantable {
 		return skills.addArray(skills.reduce((previousValue, currentValue) => {
 			const info = get.info(currentValue);
 			if (info) {
-				if (Array.isArray(info.group)) previousValue.push(...info.group);
-				else if (info.group) previousValue.push(info.group);
+				if (info.group) {
+					const adds = (Array.isArray(info.group) ? info.group : [info.group]).filter(i => lib.skill[i]);
+					previousValue.push(...adds);
+				}
 			}
 			else console.log(currentValue);
 			return previousValue;

@@ -47,14 +47,37 @@ export class Library extends Uninstantable {
 	static connectBanned = [];
 	static characterIntro = {};
 	static characterTitle = {};
-	static characterPack = {};
+	static characterPack = new Proxy({}, {
+		set(target, prop, newValue) {
+			if (typeof prop == 'string') {
+				// 新增武将包，且不是“收藏”和“禁用”
+				if (!['mode_favourite', 'mode_banned'].includes(prop) && !Reflect.has(target, prop)) {
+					Promise.resolve().then(() => {
+						ui.updateCharacterPackMenu.forEach(fun => fun(prop));
+					});
+				}
+			}
+			return Reflect.set(target, prop, newValue);
+		}
+	});
 	static characterFilter = {};
 	static characterSort = {};
 	static characterReplace = {};
 	static characterInitFilter = {};
 	static characterGuozhanFilter = ["mode_guozhan"];
 	static dynamicTranslate = {};
-	static cardPack = {};
+	static cardPack = new Proxy({}, {
+		set(target, prop, newValue) {
+			if (typeof prop == 'string') {
+				if (!Reflect.has(target, prop)) {
+					Promise.resolve().then(() => {
+						ui.updateCardPackMenu.forEach(fun => fun(prop));
+					});
+				}
+			}
+			return Reflect.set(target, prop, newValue);
+		}
+	});
 	/**
 	 * @type { SMap<number> }
 	 */
@@ -1109,9 +1132,15 @@ export class Library extends Uninstantable {
 					},
 					unfrequent: true,
 				},
+				extension_alert: {
+					name: '无视扩展报错',
+					init: false,
+					unfrequent: true,
+				},
 				fuck_sojson: {
 					name: '检测加密扩展',
 					init: false,
+					unfrequent: true,
 				},
 				errstop: {
 					name: '出错时停止游戏',
@@ -7883,7 +7912,11 @@ export class Library extends Uninstantable {
 								var icon = document.createElement("span");
 								var className = "cm-completionIcon cm-completionIcon-";
 								if (obj) {
-									const type = typeof obj[text];
+									// 解决访问caller报错等问题
+									let type;
+									try {
+										type = typeof obj[text];
+									} catch {}
 									if (type == 'function') {
 										className += 'function';
 									}

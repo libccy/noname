@@ -1,28 +1,26 @@
 window.noname_update={
-	version:'1.10.7.1',
-	update:'1.10.7',
+	version:'1.10.8',
+	update:'1.10.7.1',
 	changeLog:[
-		'整合@PZ157 @nonameShijian @copcap @mengxinzxz @lieren2023 @kuangshen04 @universe-st 的Pull Request',
-		'OL族吴乔、谋关羽；手杀谋荀彧；海外服侠关羽、石韬、史阿、玉真子',
+		'整合@mengxinzxz @Rintim @universe-st @nonameShijian @kuangshen04 @copcap @lieren2023 @7754496 的Pull Request',
+		'“获得技能时/失去技能时”的新时机',
 		'其他AI优化与bug修复',
 	],
 	files:[
-		'card/guozhan.js',
-		'card/standard.js',
-		'card/yongjian.js',
+		'card/swd.js',
+		'card/yunchou.js',
 
 		'character/clan.js',
 		'character/collab.js',
 		'character/ddd.js',
 		'character/diy.js',
 		'character/extra.js',
-		'character/gujian.js',
 		'character/gwent.js',
-		'character/hearth.js',
 		'character/huicui.js',
 		'character/jsrg.js',
 		'character/mobile.js',
 		'character/offline.js',
+		'character/old.js',
 		'character/onlyOL.js',
 		'character/rank.js',
 		'character/refresh.js',
@@ -40,43 +38,44 @@ window.noname_update={
 
 		'game/entry.js',
 		'game/game.js',
-		'game/pinyinjs.js',
 
-		'mode/doudizhu.js',
+		'mode/boss.js',
 		'mode/guozhan.js',
 		'mode/identity.js',
 		'mode/versus.js',
 
-		'noname/ai/basic.js',
-
 		'noname/game/index.js',
-		'noname/game/promises.js',
 
 		'noname/get/index.js',
 
+		'noname/init/cordova.js',
 		'noname/init/import.js',
 		'noname/init/index.js',
-		'noname/init/polyfill.js',
+		'noname/init/onload.js',
 
 		'noname/library/index.js',
 
-		'noname/library/cache/cacheContext.js',
-
-		'noname/library/element/button.js',
 		'noname/library/element/card.js',
 		'noname/library/element/content.js',
-		'noname/library/element/contents.js',
-		'noname/library/element/control.js',
-		'noname/library/element/dialog.js',
 		'noname/library/element/gameEvent.js',
-		'noname/library/element/gameEventPromise.js',
 		'noname/library/element/player.js',
 
 		'noname/library/init/index.js',
 
 		'noname/ui/index.js',
 
-		'noname/util/index.js',
+		'noname/ui/click/index.js',
+
+		'noname/ui/create/index.js',
+		
+		'noname/ui/create/menu/index.js',
+
+		'noname/ui/create/menu/pages/cardPackMenu.js',
+		'noname/ui/create/menu/pages/characterPackMenu.js',
+		'noname/ui/create/menu/pages/extensionMenu.js',
+		'noname/ui/create/menu/pages/optionsMenu.js',
+		'noname/ui/create/menu/pages/otherMenu.js',
+		'noname/ui/create/menu/pages/startMenu.js',
 
 		'service-worker.js',
 	]

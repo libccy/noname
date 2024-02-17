@@ -2103,8 +2103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const cards=player.getEquips(1);
 					if(cards.length) player.discard(cards);
 					player.loseMaxHp();
-					player.addSkill('mashu');
-					player.addSkill('shenji');
+					player.addSkills(['mashu','shenji']);
 				},
 				derivation:['mashu','shenji'],
 			},
@@ -2349,7 +2348,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugeliang:['zhugeliang','re_zhugeliang','sb_zhugeliang','ps2066_zhugeliang','ps_zhugeliang'],
 			huangyueying:['huangyueying','re_huangyueying','junk_huangyueying','sb_huangyueying'],
 			sunquan:['sunquan','re_sunquan','sb_sunquan','dc_sunquan'],
-			zhouyu:['zhouyu','re_zhouyu','sb_zhouyu','ps1062_zhouyu','ps2080_zhouyu'],
+			zhouyu:['zhouyu','re_zhouyu','dc_sb_zhouyu','sb_zhouyu','ps1062_zhouyu','ps2080_zhouyu'],
 			luxun:['luxun','re_luxun','jsrg_luxun'],
 			lvmeng:['lvmeng','re_lvmeng','sb_lvmeng'],
 			huanggai:['huanggai','re_huanggai','sb_huanggai'],

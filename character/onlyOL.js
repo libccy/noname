@@ -519,11 +519,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var trigger=map.trigger;
 					player.awakenSkill('olsbranji');
 					var num=lib.skill.olsbranji.getNum(trigger,player);
+					const skills = [];
 					if(num>=player.getHp()){
-						player.addSkillLog('kunfen');
+						skills.push('kunfen');
 						player.storage.kunfen=true;
 					}
-					if(num<=player.getHp()) player.addSkillLog('zhaxiang');
+					if(num<=player.getHp()) skills.push('zhaxiang');
+					player.addSkills(skills);
 					if(player.countCards('h')!=player.getHandcardLimit()||player.isDamaged()){
 						var result,num1=player.countCards('h')-player.getHandcardLimit();
 						if(!num1) result={index:1};
@@ -772,7 +774,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',
-			onlyOL_sb:'OL专属·上兵伐谋',
+			onlyOL_sb:'OL专属·谋武将',
 		},
 	};
 });

@@ -212,8 +212,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				frequent:true,
 				async content(event,trigger,player){
-					let cards=get.cards(3,true);
-					const {result:{bool,links}}=await player.chooseButton(['灵慧：是否使用其中的一张牌并获得其余牌？',cards]).set('ai',button=>{
+					let cards=get.cards(3);
+					const {result:{bool,links}}=await player.chooseButton(['灵慧：是否使用其中的一张牌并随机获得其中一张剩余牌？',cards]).set('ai',button=>{
 						return get.event('player').getUseValue(button.link);
 					});
 					if(bool){
@@ -222,8 +222,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.$gain2(card,false);
 						await game.asyncDelayx();
 						await player.chooseUseTarget(true,card,false);
-						if(cards.length) await player.gain(cards,'gain2');
+						if(cards.length) await player.gain(cards.randomGet(),'gain2');
 					}
+					if(cards.length){
+						for(let i=cards.length-1;i--;i>=0){
+							ui.cardPile.insertBefore(cards[i],ui.cardPile.firstChild);
+						}
+					}
+					game.updateRoundNumber();
 				},
 			},
 			dcxiace:{
@@ -3202,9 +3208,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!_status.characterlist){
 						lib.skill.pingjian.initList();
 					}
-					_status.characterlist.remove(character);
-					_status.characterlist.add('ganfurenmifuren');
-					player.reinit('ganfurenmifuren',character,false);
+					player.reinitCharacter('ganfurenmifuren',character);
 					'step 2'
 					player.recover(1-player.hp);
 					player.addTempSkill('dcxunbie_muteki',{player:'phaseAfter'});
@@ -5309,11 +5313,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}).set('lose_list',lose_list).forResult();
 						if (result.bool) {
 							const target = result.targets[0];
-							const cards = await player.choosePlayerCard(target, true, 'hej', [1,num], `选择弃置${get.translation(target)}区域内的牌`, (button) => {
-								const card = button.link, target = _status.event.target;
+							const cards = await player.choosePlayerCard(target, true, 'hej', [1,num], `选择弃置${get.translation(target)}区域内的牌`).set('filterButton',(button) => {
+								const card = button.link, target = _status.event.target, player = get.player();
 								const discarded = _status.event.lose_list.find(item => item[0] == target);
 								if (discarded && discarded[1].includes(card)) return false;
-								return lib.filter.canBeDiscarded(card,player,target,'dcluochong');
+								return lib.filter.canBeDiscarded(card, player, target,'dcluochong');
 							}).set('lose_list',lose_list).set('ai', button => {
 								if (ui.selected.buttons.length>0) return false;
 								var val = get.buttonValue(button);
@@ -6023,9 +6027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					player.awakenSkill('dcmoucheng');
-					player.removeSkill('dclianji');
-					game.log(player,'失去了技能','#g【连计】');
-					player.addSkillLog('xinjingong');
+					player.changeSkills(['xinjingong'],['dclianji']);
 				},
 			},
 			//周宣
@@ -6456,8 +6458,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool){
 								var target=result.targets[0];
 								player.logSkill('dclianzhi_reproach',target);
-								player.addSkillLog('dcshouze');
-								target.addSkillLog('dcshouze');
+								player.addSkills('dcshouze');
+								target.addSkills('dcshouze');
 								target.addMark('dclingfang',Math.max(1,player.countMark('dclingfang')));
 							}
 						},
@@ -7488,7 +7490,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					var targets=lib.skill.dcyaoyi.logTarget().sortBySeat();
-					for(var target of targets) target.addSkill('dcshoutan');
+					for(var target of targets) target.addSkills('dcshoutan');
 					game.delayx();
 				},
 				global:'dcyaoyi_blocker',
@@ -8116,7 +8118,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.gainMaxHp();
 					player.recover();
 					'step 1'
-					player.removeSkill('dcyishu');
+					player.removeSkills('dcyishu');
 					'step 2'
 					var list;
 					if(_status.characterlist){
@@ -8241,8 +8243,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					var map=event.result||result;
 					if(map.skills&&map.skills.length){
-						player.removeSkill('dchuishu');
-						for(var i of map.skills) player.addSkillLog(i);
+						//player.removeSkill('dchuishu');
+						//for(var i of map.skills) player.addSkillLog(i);
+						player.changeSkills(map.skills, ['dchuishu']);
 						player.markAuto('zhuSkill_dcligong',map.skills);
 					}
 					else{
@@ -9371,8 +9374,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						targets.sortBySeat();
 						player.logSkill('dcpijing',targets);
 						game.countPlayer(function(current){
-							if(!targets.includes(current)) current.removeSkill('dczimu');
-							else current.addSkill('dczimu');
+							if(!targets.includes(current)) current.removeSkills('dczimu');
+							else current.addSkills('dczimu');
 						});
 						game.delayx();
 					}
@@ -9402,7 +9405,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					'step 1'
-					player.removeSkill('dczimu');
+					player.removeSkills('dczimu');
 					if(event.delay) game.delayx();
 				},
 				marktext:'牧',
@@ -9574,9 +9577,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return info&&!info.charlotte;
 					});
 					if(skills.length){
-						for(var i of skills) player.addSkillLog(i);
+						//for(var i of skills) player.addSkillLog(i);
+						player.addSkills(skills);
 					}
-					player.removeSkill('xiaowu');
+					player.removeSkills('xiaowu');
 					var num=player.countMark('shawu');
 					if(num>0){
 						player.removeMark('shawu',num);
@@ -9605,7 +9609,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var target=result.targets[0];
 								player.awakenSkill('huaping');
 								player.logSkill('huaping_give',target);
-								target.addSkill('shawu');
+								target.addSkills('shawu');
 								var num=player.countMark('shawu');
 								if(num>0){
 									player.removeMark('shawu',num);
@@ -10420,37 +10424,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player!=event.dying) return false;
 					return true;
 				},
-				content:function(){
+				async content(event,trigger,player){
 					'step 0'
 					player.awakenSkill('syxiongyi');
 					if(!_status.characterlist){
 						lib.skill.pingjian.initList();
 					}
-					event.hp=1-player.hp;
 					if(_status.characterlist.includes('xushi')){
-						if(player.name1=='re_sunyi'||player.name2=='re_sunyi') event._result={control:'re_sunyi'};
-						else if(player.name2!=undefined){
-							player.chooseControl(player.name1,player.name2).set('prompt','请选择要更换的武将牌');
+						if (player.name2&&get.character(player.name2)[3].includes('syxiongyi')) {
+							await player.reinitCharacter(player.name2, 'xushi');
 						}
-						else event._result={control:player.name1};
-						hp+=2;
-						_status.characterlist.remove('xushi');
-						_status.characterlist.add('re_sunyi');
-						player.reinit('re_sunyi','xushi',false);
+						else {
+							await player.reinitCharacter(player.name1, 'xushi');
+						}
+						if(player.hp<3) await player.recover(3-player.hp);
 					}
 					else{
-						player.addSkillLog('olhunzi');
-						event.goto(2);
+						await player.addSkills('olhunzi');
+						if(player.hp<1) await player.recover(1-player.hp);
 					}
-					'step 1'
-					event.hp+=2;
-					var name=result.control;
-					_status.characterlist.remove('xushi');
-					_status.characterlist.add(name);
-					player.reinit(name,'xushi',false);
-					'step 2'
-					var hp=event.hp;
-					if(hp>0) player.recover(hp);
 				},
 				ai:{
 					order:1,
@@ -10683,8 +10675,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('mengqing');
 					player.gainMaxHp(3);
 					player.recover(3);
-					player.removeSkill('zhukou');
-					player.addSkill('yuyun');
+					//player.removeSkill('zhukou');
+					//player.addSkill('yuyun');
+					player.changeSkills(['yuyun'],['zhukou']);
 				},
 				derivation:'yuyun',
 			},
@@ -12059,7 +12052,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.logSkill('dushi',target);
 						target.markSkill('dushi');
-						target.addSkillLog('dushi');
+						target.addSkills('dushi');
 					}
 				},
 				intro:{content:'您已经获得弘农王的诅咒'},
@@ -12397,7 +12390,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('choujue');
 					player.storage.choujue=true;
 					player.loseMaxHp();
-					player.addSkill('beishui');
+					player.addSkills('beishui');
 				},
 			},
 			beishui:{
@@ -12419,7 +12412,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('beishui');
 					player.storage.beishui=true;
 					player.loseMaxHp();
-					player.addSkill('qingjiao');
+					player.addSkills('qingjiao');
 				},
 			},
 			qingjiao:{
@@ -12693,9 +12686,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.line(target,'fire');
-						player.addSkill('hmxili');
-						target.addSkill('hmxili');
-						player.removeSkill('mansi');
+						player.addSkills(['hmxili'],['mansi']);
+						target.addSkills('hmxili');
 					}
 				},
 			},
@@ -14438,7 +14430,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczengou_info:'出牌阶段限一次，你可以将至多体力上限张牌称为“谮构”交给一名其他角色并摸等量张牌。若如此做，其下次体力值增加或使用牌结算完毕后，其展示所有手牌，然后失去Y点体力（Y为其手牌中的“谮构”牌数）。',
 			bailingyun:'柏灵筠',
 			dclinghui:'灵慧',
-			dclinghui_info:'一名角色的结束阶段，若当前回合角色为你或本回合有角色进入过濒死状态，则你可以观看牌堆顶的三张牌，然后你可以使用其中一张牌并获得剩余牌。',
+			dclinghui_info:'一名角色的结束阶段，若当前回合角色为你或本回合有角色进入过濒死状态，则你可以观看牌堆顶的三张牌，然后你可以使用其中一张牌并随机获得其中一张剩余牌。',
 			dcxiace:'黠策',
 			dcxiace_info:'每回合每项各限一次。当你造成/受到伤害后，你可以弃置一张牌并回复1点体力/令一名其他角色的非锁定技于本回合失效。',
 			dcyuxin:'御心',
