@@ -25,7 +25,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ddd_liuhong:['male','qun',4,['dddshixing','ddddanggu','dddfuzong'],['zhu']],
 			ddd_xiahouxuan:['male','wei',3,['dddlanghuai','dddxuanlun']],
 			ddd_zhangkai:['male','qun','3/4',['dddjiexing','dddbailei']],
-			ddd_liangxi:['male','wei',3,['dddtongyu']],
+			ddd_liangxi:['male','wei',4,['dddtongyu']],
 			ddd_wangkanglvkai:['male','shu',4,['dddbingjian']],
 			// ddd_sunliang:['male','wu',3,['ddddiedang','dddanliu','dddguiying'],['zhu']],
 			ddd_lie:['female','wu',3,['dddyeshen','dddqiaoduan']],
