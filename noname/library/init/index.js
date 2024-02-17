@@ -712,7 +712,10 @@ export class LibInit extends Uninstantable {
 							result: result
 						});
 						var res = gen.next((lastEvent && (typeof lastEvent == 'object') && ("result" in lastEvent)) ? lastEvent.result : lastEvent);
-						if (res.done) return event.finish();
+						if (res.done){
+							gen = null;
+							return event.finish();
+						}
 						var currentResult = res.value;
 						// TODO: use `event.debugger` to replace source
 						if (typeof currentResult == "function") yield currentResult;
