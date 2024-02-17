@@ -12366,7 +12366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.removeMark('yizhao',player.countMark('yizhao'));
 					const pile=Array.from(ui.cardPile.childNodes);
 					if(pile.length){
-						const max=max=Math.pow(2,Math.min(100,pile.length));
+						const max=Math.pow(2,Math.min(100,pile.length));
 						let bool=false,index,cards=[];
 						for(let i=0;i<max;i++){
 							let num=0;
