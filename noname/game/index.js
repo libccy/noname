@@ -1888,7 +1888,8 @@ export class Game extends Uninstantable {
     				delete _status.extension;
     			}
 			}catch(e1){
-			    alert(`加载《${name}》扩展的precontent时出错。\n${decodeURI(e1.stack)}`);
+				console.log(`加载《${name}》扩展的precontent时出现错误。`,e1);
+			    if(!lib.config.extension_alert) alert(`加载《${name}》扩展的precontent时出现错误。\n该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。\n${decodeURI(e1.stack)}`);
 			}
 			
 			if (content) lib.extensions.push([name, content, config, _status.evaluatingExtension, objectPackage || {}]);

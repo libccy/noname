@@ -1132,9 +1132,15 @@ export class Library extends Uninstantable {
 					},
 					unfrequent: true,
 				},
+				extension_alert: {
+					name: '无视扩展报错',
+					init: false,
+					unfrequent: true,
+				},
 				fuck_sojson: {
 					name: '检测加密扩展',
 					init: false,
+					unfrequent: true,
 				},
 				errstop: {
 					name: '出错时停止游戏',
