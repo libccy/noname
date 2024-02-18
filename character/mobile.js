@@ -1170,7 +1170,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=trigger.player;
 						var card=result.cards[0];
 						player.line(target,'green');
-						target.addTempSkill('mbzhixi','phaseUseAfter');
+						target.addTempSkills('mbzhixi','phaseUseAfter');
 						if(card.name!='sha'&&get.type(card)!='trick'&&get.color(card)!='black'){
 							target.addTempSkill('new_meibu_range','phaseUseAfter');
 							target.markAuto('new_meibu_range',player);

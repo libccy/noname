@@ -1673,9 +1673,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 1'
-					player.addTempSkill(result.control,'phaseUseEnd');
+					player.addTempSkills(result.control,'phaseUseEnd');
 					player.popup(result.control);
-					game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
+					// game.log(player,'获得了','#g【'+get.translation(result.control)+'】');
 				},
 				ai:{threaten:0.9},
 				subSkill:{
@@ -3407,13 +3407,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(list.length==result.cards.length){
 							target.draw();
 							player.getStat('skill').sanchen--;
-							if(get.mode()=='guozhan') player.addTempSkill('pozhu');
+							if(get.mode()=='guozhan') player.addTempSkills('pozhu');
 						}
 					}
 					else{
 						target.draw();
 						player.getStat('skill').sanchen--;
-						if(get.mode()=='guozhan') player.addTempSkill('pozhu');
+						if(get.mode()=='guozhan') player.addTempSkills('pozhu');
 					}
 				},
 				ai:{

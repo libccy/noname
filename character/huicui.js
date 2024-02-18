@@ -10548,7 +10548,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target,'green');
 						player.markAuto('remeibu_gain',[get.suit(card,player)]);
 						player.addTempSkill('remeibu_gain');
-						target.addTempSkill('rezhixi','phaseUseEnd');
+						target.addTempSkills('rezhixi','phaseUseEnd');
 					}
 				},
 				ai:{

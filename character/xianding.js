@@ -13440,7 +13440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								});
 								if(card) cards2.push(card);
 							}
-							player.addTempSkill(skill);
+							player.addTempSkills(skill);
 							if(cards2.length) player.gain(cards2,'gain2','log');
 						},
 					},

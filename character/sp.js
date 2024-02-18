@@ -10564,7 +10564,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content:function(){
 							var target=trigger.getParent().target;
 							trigger.num=Math.max(1,target.getAllHistory('useCard',(evt)=>evt.card.name=='sha').length);
-							target.addTempSkill('juesheng',{player:'phaseAfter'});
+							target.addTempSkills('juesheng',{player:'phaseAfter'});
 						},
 					},
 				},
@@ -15289,7 +15289,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=trigger.player;
 						var card=result.cards[0];
 						player.line(target,'green');
-						target.addTempSkill('new_zhixi','phaseUseAfter');
+						target.addTempSkills('new_zhixi','phaseUseAfter');
 						if(card.name!='sha'&&get.type(card)!='trick'&&get.color(card)!='black'){
 							target.addTempSkill('new_meibu_range','phaseUseAfter');
 							target.markAuto('new_meibu_range',player);
@@ -17663,7 +17663,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					var map=event.result||result;
 					if(map&&map.skills&&map.skills.length){
-						player.addSkils(map.skills);
+						player.addSkills(map.skills);
 					}
 					game.broadcastAll(function(list){
 						game.expandSkills(list);
