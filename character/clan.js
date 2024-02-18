@@ -102,7 +102,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!player.hasSkill('qice')){
 								player.addTempSkills('qice','roundStart');
 								player.popup('奇策');
-								game.log(player,'获得了技能','#g【奇策】');
+								// game.log(player,'获得了技能','#g【奇策】');
 							}
 							event.goto(2);
 						}
