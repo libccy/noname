@@ -721,7 +721,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const storage=player.getStorage('olqingyuan');
 					if(event.name=='gain'||event.name=='loseAsync'){
 						if(player.hasSkill('olqingyuan_used')) return false;
-						return storage.some(target=>event.getg(target).length)&&storage.some(target=>target.hasCard(card=>lib.filter.canBeGained(card,target,player),'he'));
+						return storage.some(target=>event.getg(target).length)&&storage.some(target=>target.hasCard(card=>lib.filter.canBeGained(card,target,player),'h'));
 					}
 					if(!game.hasPlayer(target=>!storage.includes(target)&&target!=player)) return false;
 					if(event.name=='damage'&&player.getAllHistory('damage').indexOf(event)!=0) return false;
@@ -730,23 +730,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				async content(event,trigger,player){
 					if(trigger.name=='gain'||trigger.name=='loseAsync'){
-						const target=player.getStorage('olqingyuan').filter(target=>target.hasCard(card=>lib.filter.canBeGained(card,target,player),'he')).randomGet();
+						const target=player.getStorage('olqingyuan').filter(target=>target.hasCard(card=>lib.filter.canBeGained(card,target,player),'h')).randomGet();
 						player.line(target);
 						player.addTempSkill('olqingyuan_used');
-						player.gain(target.getCards('he',card=>{
+						player.gain(target.getCards('h',card=>{
 							return lib.filter.canBeGained(card,target,player);
 						}).randomGet(),target,'giveAuto');
 					}
 					else{
-						const {result:{bool,targets}}=await player.chooseTarget((card,player,target)=>{
+						const filterTarget=(card,player,target)=>{
 							return target!=player&&!player.getStorage('olqingyuan').includes(target);
-						},true).set('prompt2','每回合限一次，当你以此法选择的角色获得牌后，你随机获得其中一名角色的一张牌')
+						},targetsx=game.filterPlayer(current=>filterTarget(null,player,current));
+						let result;
+						if(targetsx.length==1) result={bool:true,targets:targetsx};
+						else result=await player.chooseTarget(filterTarget,true).set('prompt2','每回合限一次，当你以此法选择的角色获得牌后，你随机获得其中一名角色的一张手牌')
 						.set('prompt','请选择【轻缘】的目标').set('ai',target=>{
 							const player=get.event('player');
 							return get.effect(target,new lib.element.VCard({name:'shunshou_copy2'}),player,player);
-						});
-						if(bool){
-							const target=targets[0];
+						})
+						.forResult();
+						if(result.bool){
+							const target=result.targets[0];
 							player.line(target);
 							game.log(player,'选择了',target);
 							player.markAuto('olqingyuan',[target]);
@@ -764,14 +768,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				enable:'chooseToUse',
 				filterCard(card){
-					return get.itemtype(card)=='card'&&card.hasGaintag('olchongshen');
+					return get.itemtype(card)=='card'&&card.hasGaintag('olchongshen')&&get.color(card)=='red';
 				},
 				position:'h',
 				viewAs:{name:'shan'},
 				viewAsFilter(player){
-					if(!player.countCards('h',card=>card.hasGaintag('olchongshen'))) return false;
+					if(!player.countCards('h',card=>card.hasGaintag('olchongshen')&&get.color(card)=='red')) return false;
 				},
-				prompt:'将本轮得到的牌当作【闪】使用',
+				prompt:'将本轮得到的红色牌当作【闪】使用',
 				check(card){
 					return 7-get.value(card);
 				},
@@ -779,7 +783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:2,
 					respondShan:true,
 					skillTagFilter(player,tag,arg){
-						if(arg=='respond'||!player.countCards('h',card=>_status.connectMode||card.hasGaintag('olchongshen'))) return false;
+						if(arg=='respond'||!player.countCards('h',card=>_status.connectMode||card.hasGaintag('olchongshen')&&get.color(card)=='red')) return false;
 					},
 					effect:{
 						target(card,player,target,current){
@@ -790,7 +794,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'olchongshen_mark',
 				mod:{
 					aiValue(player,card,num){
-						if(get.name(card)!='shan'&&(get.itemtype(card)=='card'&&!card.hasGaintag('olchongshen'))) return;
+						if(get.name(card)!='shan'&&(get.itemtype(card)=='card'&&(!card.hasGaintag('olchongshen')||get.color(card)!='red'))) return;
 						let cards=player.getCards('hs',card=>get.name(card)=='shan'||card.hasGaintag('olchongshen'));
 						cards.sort((a,b)=>(get.name(b)=='shan'?1:2)-(get.name(a)=='shan'?1:2));
 						const geti=()=>{
@@ -803,12 +807,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					aiUseful(){
 						return lib.skill.olchongshen.mod.aiValue.apply(this,arguments);
 					},
-					ignoredHandcard(card,player){
-						if(card.hasGaintag('olchongshen')) return true;
-					},
-					cardDiscardable(card,player,name){
-						if(name=='phaseDiscard'&&card.hasGaintag('olchongshen')) return false;
-					},
+					// ignoredHandcard(card,player){
+					// 	if(card.hasGaintag('olchongshen')) return true;
+					// },
+					// cardDiscardable(card,player,name){
+					// 	if(name=='phaseDiscard'&&card.hasGaintag('olchongshen')) return false;
+					// },
 				},
 				init(player){
 					if(game.phaseNumber>0){
@@ -27213,9 +27217,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olshandao_info:'出牌阶段限一次，你可以选择任意名角色，你选择这些角色的各一张牌，依次将这些牌放置到牌堆顶，然后你视为对这些角色使用【五谷丰登】，然后你视为对这些角色外的所有其他角色使用【万箭齐发】。',
 			ol_hujinding:'胡金定',
 			olqingyuan:'轻缘',
-			olqingyuan_info:'锁定技。①游戏开始时，或当你于本局游戏首次受到伤害后，你选择一名未以此法选择过的其他角色。②每回合限一次，你发动〖轻缘①〗选择过的角色得到牌后，你随机获得其中一名角色的随机一张牌。',
+			olqingyuan_info:'锁定技。①游戏开始时，或当你于本局游戏首次受到伤害后，你选择一名未以此法选择过的其他角色。②每回合限一次，你发动〖轻缘①〗选择过的角色得到牌后，你随机获得其中一名角色的随机一张手牌。',
 			olchongshen:'重身',
-			olchongshen_info:'你可以将本轮得到的手牌当作【闪】使用，且这些牌不计入你的手牌上限。',
+			olchongshen_info:'你可以将本轮得到的红色手牌当作【闪】使用。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
