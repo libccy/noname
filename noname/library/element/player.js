@@ -7823,7 +7823,7 @@ export class Player extends HTMLDivElement {
 				this.removeAdditionalSkill(i);
 			}
 		}
-		this[all ? 'removeSkill' : 'removeSkillLog'](list);
+		this[all ? 'removeSkill' : 'removeSkills'](list);
 		this.checkConflict();
 		this.checkMarks();
 		return list;
