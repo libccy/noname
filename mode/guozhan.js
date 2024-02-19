@@ -8692,12 +8692,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(event.current&&event.current.isAlive()){
 						event.showCharacter=false;
 						var choiceList=['执行该军令，增加1点体力上限，然后回复1点体力','不执行该军令'];
-						if(event.current.isFriendOf(player)) event.current.chooseJunlingControl(player,event.junling,targets).set('prompt','将略').set('choiceList',choiceList).set('ai',function(){return 0});
+						if(event.current.isFriendOf(player)) event.current.chooseJunlingControl(player,event.junling,targets).set('prompt','将略').set('choiceList',choiceList).set('ai',function(){if(event.junling=='junling6'&&(event.current.countCards('h')>3||event.current.countCards('e')>2)) return 1;
+return event.junling=='junling5'?1:0;});
 						else if((event.filterName(event.current.name1)||event.filterName(event.current.name2))&&event.current.wontYe(player.identity)){
 							event.showCharacter=true;
 							choiceList[0]='明置一张武将牌以'+choiceList[0];
 							choiceList[1]='不明置武将牌且'+choiceList[1];
-							event.current.chooseJunlingControl(player,event.junling,targets).set('prompt','将略').set('choiceList',choiceList).set('ai',function(){return 0});
+							event.current.chooseJunlingControl(player,event.junling,targets).set('prompt','将略').set('choiceList',choiceList).set('ai',function(){if(event.junling=='junling6'&&(event.current.countCards('h')>3||event.current.countCards('e')>2)) return 1;
+return event.junling=='junling5'?1:0;});
 						}
 						else event.current.chooseJunlingControl(player,event.junling,targets).set('prompt','将略').set('controls',['ok']);
 					}
