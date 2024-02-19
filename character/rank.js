@@ -673,6 +673,7 @@ window.noname_character_rank={
 		'sb_xunyu',
 		'ol_sb_taishici',
 		'tianchou',
+		'ol_sb_guanyu',
 	],
 	bp:[
 		'xin_huojun',
@@ -1055,7 +1056,7 @@ window.noname_character_rank={
 		'shen_xuzhu',
 	],
 	b:[
-		'ol_sb_guanyu',
+		'junk_guanyu',
 		'liyi',
 		'diy_feishi',
 		'diy_liufu',
@@ -2627,6 +2628,7 @@ window.noname_character_rank={
 		],
 		junk:[
 			'ol_sb_guanyu',
+			'junk_guanyu',
 			'sunshao',
 			'ol_guohuai',
 			'gongsunzan',
