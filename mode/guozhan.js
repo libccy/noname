@@ -11030,9 +11030,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(result.control!='cancel2'){
 						var skill='jiahe_'+result.control;
-						player.addTempSkill(skill);
+						player.addTempSkills(skill);
 						if(!event.done) player.logSkill('jiahe_put');
-						game.log(player,'获得了技能','【'+get.translation(skill)+'】');
+						// game.log(player,'获得了技能','【'+get.translation(skill)+'】');
 						if(event.num>=5&&!event.done){
 							event.done=true;
 							event.goto(1);

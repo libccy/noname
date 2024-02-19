@@ -1257,9 +1257,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							for(var target of game.filterPlayer()){
 								if(user==target) continue;
 								var targetsx=[user,target];
-								targetsx.forEach(i=>i.addSkill('dcbeini_fengyin'));
+								targetsx.forEach(i=>i.addSkill('dcbeini_fengyin2'));
 								var effx=get.effect(target,sha,user,player);
-								targetsx.forEach(i=>i.removeSkill('dcbeini_fengyin'));
+								targetsx.forEach(i=>i.removeSkill('dcbeini_fengyin2'));
 								if(user==player) effx+=1;
 								if(get.attitude(player,user)>0) effx-=0.1;
 								if(effx>eff){
@@ -1289,6 +1289,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					fengyin:{
+						inherit:'fengyin',
+					},
+					fengyin2:{
 						inherit:'fengyin',
 					},
 				}
@@ -10548,7 +10551,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target,'green');
 						player.markAuto('remeibu_gain',[get.suit(card,player)]);
 						player.addTempSkill('remeibu_gain');
-						target.addTempSkill('rezhixi','phaseUseEnd');
+						target.addTempSkills('rezhixi','phaseUseEnd');
 					}
 				},
 				ai:{

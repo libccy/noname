@@ -4334,7 +4334,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.awakenSkill('twmibei');
 					player.logSkill('twmibei_achieve');
 					game.log(player,'成功完成使命');
-					player.addSkils('twmouli');
+					player.addSkills('twmouli');
 				},
 				intro:{content:'已使用牌名：$'},
 				subSkill:{
