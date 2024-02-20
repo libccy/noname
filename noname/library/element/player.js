@@ -7305,7 +7305,7 @@ export class Player extends HTMLDivElement {
 		next.forceDie = true;
 		next.addSkill = addSkill.slice(0).unique();
 		next.removeSkill = removeSkill.slice(0).unique();
-		next.setContent('changeSkills');
+		next.setContents('changeSkills');
 		return next;
 	}
 	addSkill(skill, checkConflict, nobroadcast, addToSkills) {
