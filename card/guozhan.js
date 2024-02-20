@@ -678,7 +678,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 									list.push('摸'+(num-i)+'回'+i);
 								}
 								target.chooseControl(list).set('prompt','请分配自己的摸牌数和回复量').ai=function(){
-									return Math.min(_status.event.player.getDamagedHp(),list.length)-1;
+									return 0;
 								};
 							}
 						}
@@ -697,7 +697,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
-					order:3,
+					order:6,
 					value:4,
 					useful:2,
 					result:{
