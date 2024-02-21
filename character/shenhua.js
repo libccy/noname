@@ -7736,7 +7736,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			pangtong:['pangtong','ol_pangtong','re_pangtong','sb_pangtong'],
 			re_jsp_pangtong:['re_jsp_pangtong','jsrg_pangtong','sp_pangtong'],
 			taishici:['taishici','re_taishici','ol_sb_taishici'],
-			re_yuanshao:['re_yuanshao','ol_yuanshao','xin_yuanshao','sb_yuanshao'],
+			re_yuanshao:['re_yuanshao','ol_yuanshao','xin_yuanshao','ol_sb_yuanshao','sb_yuanshao'],
 			pangde:['re_pangde','ol_pangde','pangde'],
 			yanwen:['yanwen','ol_yanwen','re_yanwen'],
 			caopi:['caopi','re_caopi','ps_caopi','sb_caopi'],
