@@ -137,6 +137,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					wuxie:function(target,card,player,viewer){
+                                                         if(get.mode()=='guozhan'){
+						                if(!_status._aozhan){
+                                                                       if(!player.isMajor()){
+                                                                                  if(!viewer.isMajor()) return 0;
+                                                                                          }
+                                                                            }
+                                                       }
+					},
 					order:3,
 					value:9,
 					useful:6,
@@ -194,6 +203,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					wuxie:function(target,card,player,viewer){
+                                                         if(get.mode()=='guozhan'){
+						                if(!_status._aozhan){
+                                                                       if(!player.isMajor()){
+                                                                                  if(!viewer.isMajor()) return 0;
+                                                                                          }
+                                                                            }
+                                                       }
+					},
 					order:6,
 					value:9,
 					useful:6,
@@ -697,6 +715,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				ai:{
+					wuxie:function(target,card,player,viewer){
+                                                         if(get.mode()=='guozhan'){
+						                if(!_status._aozhan){
+                                                                       if(!player.isMajor()){
+                                                                                  if(!viewer.isMajor()) return 0;
+                                                                                          }
+                                                                            }
+                                                       }
+					},
 					order:6,
 					value:4,
 					useful:2,
@@ -947,6 +974,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.draw(3);
 				},
 				ai:{
+					wuxie:function(target,card,player,viewer){
+                                                         if(get.mode()=='guozhan'){
+						                if(!_status._aozhan){
+                                                                       if(!player.isMajor()){
+                                                                                  if(!viewer.isMajor()) return 0;
+                                                                                          }
+                                                                            }
+                                                       }
+					},
 					basic:{
 						useful:4,
 						value:8,
