@@ -105,6 +105,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return !event.targets.includes(target)&&player.canUse(event.card,target,false);
 					})&&event.isFirstTarget;
 				},
+				check(event,player){
+					const targets=game.filterPlayer(target=>player.canUse(event.card,target,false));
+					const num1=event.targets.reduce((sum,target)=>sum+get.effect(target,event.card,player,player),0);
+					const num2=targets.reduce((sum,target)=>sum+get.effect(target,event.card,player,player),0);
+					if(num2>=num1) return true;
+					let num=(event.baseDamage||1);
+					if(event.extraDamage) num+=event.extraDamage;
+					let extra_num=0;
+					for(const target of targets){
+						if(target.mayHaveShan(player,'use',target.getCards('h',i=>{
+							return i.hasGaintag('sha_notshan');
+						}))&&!player.hasSkillTag('directHit_ai',true,{
+							target:target,
+							card:event.card,
+						},true)){
+							if(player.hasSkill('jueqing')||target.hasSkill('gangzhi')) extra_num--;
+							else if(target.hasSkillTag('filterDamage',null,{
+								player:event.player,
+								card:event.card,
+							})) extra_num++;
+						}
+						else extra_num+=num;
+					}
+					const sum=targets.length+extra_num;
+					return num2+(sum>player.countCards('h')?Math.min(5,sum):0)+(sum>player.getHp()?num2:0)>=num1;
+				},
 				async content(event,trigger,player){
 					player.addTempSkill('olsbshenli_used','phaseUseAfter');
 					trigger.getParent().targets.addArray(game.filterPlayer(target=>{
@@ -126,7 +152,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{used:{charlotte:true}},
 			},
 			olsbyufeng:{
-				audio:2,
+				audio:1,
 				trigger:{
 					global:'phaseBefore',
 					player:'enterGame',
@@ -146,6 +172,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					sizhaojian:{
 						equipSkill:true,
+						mod:{
+							aiOrder(player,card,num){
+								if(card.name=='sha'&&typeof get.number(card)=='number') return num+get.number(card)/114514;
+							},
+						},
 						trigger:{player:'useCardToPlayered'},
 						filter(event,player){
 							return event.card.name=='sha'&&typeof get.number(event.card)=='number';
