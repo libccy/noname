@@ -29,7 +29,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xin_huojun:['male','shu',4,['sidai','jieyu'],['character:tw_huojun','die_audio:tw_huojun']],
 			muludawang:['male','qun','3/3/1',['shoufa','zhoulin','yuxiang']],
 			mb_chengui:['male','qun',3,['guimou','zhouxian']],
-			mb_huban:['male','wei',4,['mbyilie']],
+			mb_huban:['male','wei',3,['mbyilie']],
 			mb_xianglang:['male','shu',3,['naxue','yijie']],
 			yanxiang:['male','qun',3,['kujian','twruilian'],['die_audio:tw_yanxiang']],
 			mb_sunluyu:['female','wu',3,['mbmeibu','mbmumu']],
@@ -687,7 +687,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					targets=targets.filter(target=>target!=player&&target.countCards('h'));
 					if(targets.length){
-						var result=yield player.chooseTarget('请选择【诡谋】的目标','观看一名可选择的角色的手牌并选择其中至多三张牌，然后你可以将其中至多两张牌交给另一名其他角色，然后弃置剩余的牌',(card,player,target)=>{
+						var result=yield player.chooseTarget('请选择【诡谋】的目标','观看一名可选择的角色的手牌并选择其中至多两张牌，然后你可以将其中至多一张牌交给另一名其他角色，然后弃置剩余的牌',(card,player,target)=>{
 							return _status.event.targets.includes(target)&&target.countCards('h');
 						},true).set('ai',target=>{
 							return Math.sqrt(Math.min(3,target.countCards('h')))*get.effect(target,{name:'guohe_copy2'},player,player);
@@ -696,12 +696,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var target=result.targets[0];
 							player.logSkill('guimou',target);
 							player.addExpose(0.3);
-							var result2=yield player.choosePlayerCard(target,'h','visible','<div class="text center">选择其中至多三张牌，然后你可以将其中至多两张牌交给另一名其他角色，然后弃置剩余的牌</div>',[1,3],true).set('ai',button=>get.value(button.link));
+							var result2=yield player.choosePlayerCard(target,'h','visible','<div class="text center">选择其中至多两张牌，然后你可以将其中至多一张牌交给另一名其他角色，然后弃置剩余的牌</div>',[1,2],true).set('ai',button=>get.value(button.link));
 							if(result2.bool){
 								var cards=result2.links.slice();
 								var result3;
 								if(!game.hasPlayer(targetx=>targetx!=player&&targetx!=target)) result3={bool:false};
-								else result3=yield player.chooseCardButton('是否将其中至多两张牌交给另一名其他角色',cards,[1,Math.min(2,cards.length)]).set('ai',button=>{
+								else result3=yield player.chooseCardButton('是否将其中至多一张牌交给另一名其他角色',cards).set('ai',button=>{
 									var player=_status.event.player;
 									if(!game.hasPlayer(target=>target!=player&&target!=_status.event.target&&get.attitude(player,target)>0)) return 0;
 									return get.value(button.link,_status.event.player);
@@ -870,7 +870,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				content:function*(event,map){
 					var player=map.player,trigger=map.trigger,target=trigger.player;
-					var cards=get.cards(2);
+					var cards=get.cards(3);
+					yield game.cardsDiscard(cards);
 					player.showCards(cards,get.translation(player)+'发动了【州贤】');
 					var result=yield target.chooseToDiscard('he','州贤：弃置一张其中有的类别的牌，或令此牌对'+get.translation(player)+'无效',(card,player)=>{
 						return _status.event.cards.some(cardx=>get.type2(cardx)==get.type2(card));
@@ -956,15 +957,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbyilie3:{
 				audio:'mbyilie',
 				trigger:{player:'phaseEnd'},
-				filter:function(event,player){
-					return player.countMark('mbyilie');
-				},
+				//filter:function(event,player){
+				//	return player.countMark('mbyilie');
+				//},
 				forced:true,
 				content:function(){
+					'step 0'
+					player.draw();
+					'step 1'
 					var num=player.countMark('mbyilie');
-					player.draw(num);
-					player.loseHp(num);
-					player.removeMark('mbyilie',num);
+					if(num){
+						player.loseHp(num);
+						player.removeMark('mbyilie',num);
+					}
 				},
 			},
 			//向朗
@@ -16507,15 +16512,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mb_chengui:'手杀陈珪',
 			mb_chengui_prefix:'手杀',
 			guimou:'诡谋',
-			guimou_info:'锁定技。游戏开始时/回合结束时，你随机/须选择以下一项直到你的下个准备阶段：①记录场上期间角色使用牌数；②记录期间场上角色弃置牌数；③记录期间场上角色获得牌数。准备阶段，你可以选择一名场上对应记录数值最少的其他角色，观看其手牌并选择其中至多三张牌，然后你可以将其中至多两张牌交给另一名其他角色，然后弃置其余牌。',
+			guimou_info:'锁定技。游戏开始时/回合结束时，你随机/须选择以下一项直到你的下个准备阶段：①记录场上期间角色使用牌数；②记录期间场上角色弃置牌数；③记录期间场上角色获得牌数。准备阶段，你可以选择一名场上对应记录数值最少的其他角色，观看其手牌并选择其中至多两张牌，然后你可以将其中至多一张牌交给另一名其他角色，然后弃置其余牌。',
 			zhouxian:'州贤',
-			zhouxian_info:'锁定技。当你成为其他角色使用的伤害类卡牌的目标后，你亮出牌堆顶的两张牌，然后其须选择一项：①弃置一张与亮出牌之一类别相同的牌；②令此牌对你无效。',
+			zhouxian_info:'锁定技。当你成为其他角色使用的伤害类卡牌的目标后，你亮出牌堆顶的三张牌，然后其须选择一项：①弃置一张与亮出牌之一类别相同的牌；②令此牌对你无效。',
 			mb_huban:'手杀胡班',
 			mb_huban_prefix:'手杀',
 			mbyilie:'义烈',
 			mbyilie2:'义烈',
 			mbyilie3:'义烈',
-			mbyilie_info:'锁定技。①游戏开始时，你选择一名其他角色，然后你获得以下效果：其受到伤害时，若你的“烈”标记数小于2，则你获得等同于伤害值的“烈”标记，然后防止此伤害；其对其他角色造成伤害后，你回复1点体力。②结束阶段，若你有“烈”标记，你摸X张牌并失去X点体力，然后移去所有“烈”标记（X为你拥有的“烈”标记数）。',
+			mbyilie_info:'锁定技。①游戏开始时，你选择一名其他角色，然后你获得以下效果：其受到伤害时，若你没有“烈”，则你获得等同于伤害值的“烈”，然后防止此伤害；其对其他角色造成伤害后，你回复1点体力。②结束阶段，你摸一张牌并失去X点体力，然后移去所有“烈”（X为你拥有的“烈”标记数）。',
 			muludawang:'木鹿大王',
 			shoufa:'兽法',
 			shoufa_info:'当你受到伤害后/于一回合首次造成伤害后，你可以选择一名与你距离大于/不大于2的角色，令其随机执行以下一项：豹，令其受到1点无来源伤害；鹰，你随机获得其一张牌；熊，你随机弃置其装备区的一张牌；兔，令其摸一张牌。',
