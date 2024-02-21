@@ -7192,6 +7192,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						mark:true,
 						marktext:'阵',
 						intro:{
+							markcount:()=>0,
 							content:function(storage,player,skill){
 								if(storage.length) return '失效技能：'+get.translation(storage);
 								return '无失效技能';
@@ -7303,7 +7304,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.addAdditionalSkills('dczecai_effect','rejizhi');
 						target.addTempSkill('dczecai_effect','roundStart');
 						if(target==event.target){
-							var evt=trigger._trigger;
+							var evt=trigger;
 							target.insertPhase();
 							if(evt.player!=target&&!evt._finished){
 								evt.finish();

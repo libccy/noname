@@ -480,7 +480,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return game.getGlobalHistory('cardMove',function(evt){
 								if(evt.name!='lose'||event!=evt.getParent()) return false;
 								for(var i in evt.gaintag_map){
-									if(evt.gaintag_map[i].includes('dclingxi')) return evt.player==player;
+									if(evt.gaintag_map[i].includes('dclingxi')&&evt.player==player) return true;
 								}
 								return false;
 							}).length;

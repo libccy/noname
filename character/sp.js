@@ -1081,7 +1081,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							directHit_ai:true,
 							skillTagFilter:function(player,tag,arg){
 								if(player._olzhanjin_guanshi_temp||!player.hasEmptySlot(1)||!lib.card.guanshi||player.hasSkillTag('unequip_equip1')) return;
-								player._guanshi_temp=true;
+								player._olzhanjin_guanshi_temp=true;
 								var bool=(get.attitude(player,arg.target)<0&&arg.card&&arg.card.name=='sha'&&player.countCards('he',card=>{
 									return card!=arg.card&&(!arg.card.cards||!arg.card.cards.includes(card))&&get.value(card)<5;
 								})>1);
