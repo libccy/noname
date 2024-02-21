@@ -26,6 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		card:{
 			sizhaojian:{
+				derivation:'ol_sb_yuanshao',
 				fullskin:true,
 				type:'equip',
 				subtype:'equip1',
