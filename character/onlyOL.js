@@ -52,8 +52,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const {result:{bool,cards,targets}}=await player.chooseCardTarget({
 						prompt:get.prompt('olsbhetao'),
 						filterCard(card,player){
-							return get.color(card)==get.color(get.event().getTrigger().card);
+							return get.color(card)==get.color(get.event().getTrigger().card)&&lib.filter.cardDiscardable(card,player);
 						},
+						position:'he',
 						filterTarget(card,player,target){
 							return get.event().getTrigger().targets.includes(target);
 						},
