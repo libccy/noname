@@ -84,6 +84,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					ai:{
 						effect:{
 							player(card,player){
+								if(!game.hasPlayer(target=>{
+									return target.hasSkill('olsbhetao')&&(get.attitude(player,target)<0||get.attitude(target,player)<0);
+								})) return;
 								const select=get.copy(get.info(card).selectTarget);
 								let range;
 								if(select==undefined) range=[1,1];
