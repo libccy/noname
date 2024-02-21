@@ -891,7 +891,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								bs.remove(card);
 								if(card.cards) bs.removeArray(card.cards);
 								else bs.removeArray(ui.selected.cards);
-								var cardx=Array.from(ui.cardPile.childNodes).slice(0,2);
+								var cardx=Array.from(ui.cardPile.childNodes).slice(0,3);
 								bs=bs.filter(i=>cardx.some(j=>get.type2(j)==get.type2(i)));
 								if(!bs.length) return 'zerotarget';
 								if(bs.length<=2){
@@ -16520,7 +16520,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mbyilie:'义烈',
 			mbyilie2:'义烈',
 			mbyilie3:'义烈',
-			mbyilie_info:'锁定技。①游戏开始时，你选择一名其他角色，然后你获得以下效果：其受到伤害时，若你没有“烈”，则你获得等同于伤害值的“烈”，然后防止此伤害；其对其他角色造成伤害后，你回复1点体力。②结束阶段，你摸一张牌并失去X点体力，然后移去所有“烈”（X为你拥有的“烈”标记数）。',
+			mbyilie_info:'锁定技。①游戏开始时，你选择一名其他角色，然后你获得以下效果：其受到伤害时，若你没有“烈”，则你获得等同于伤害值的“烈”标记，然后防止此伤害；其对其他角色造成伤害后，你回复1点体力。②结束阶段，你摸一张牌并失去X点体力，然后移去所有“烈”（X为你拥有的“烈”标记数）。',
 			muludawang:'木鹿大王',
 			shoufa:'兽法',
 			shoufa_info:'当你受到伤害后/于一回合首次造成伤害后，你可以选择一名与你距离大于/不大于2的角色，令其随机执行以下一项：豹，令其受到1点无来源伤害；鹰，你随机获得其一张牌；熊，你随机弃置其装备区的一张牌；兔，令其摸一张牌。',
