@@ -241,7 +241,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const card=get.cardPile('sizhaojian','field');
 					if(!card||!player.canEquip(card,true)) return false;
 					return game.hasPlayer(target=>{
-						if(target.group!='qun') return false;
+						if(target==player||target.group!='qun') return false;
 						const evt=event.getl(target);
 						return evt&&evt.player==target&&evt.es&&evt.es.length>0;
 					});
@@ -250,7 +250,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				zhuSkill:true,
 				async content(event,trigger,player){
 					const targets=game.filterPlayer(target=>{
-						if(target.group!='qun') return false;
+						if(target==player||target.group!='qun') return false;
 						const evt=trigger.getl(target);
 						return evt&&evt.player==target&&evt.es&&evt.es.length>0;
 					}).sortBySeat();
