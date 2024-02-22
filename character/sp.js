@@ -17663,7 +17663,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					var map=event.result||result;
 					if(map&&map.skills&&map.skills.length){
-						player.addSkils(map.skills);
+						player.addSkills(map.skills);
 					}
 					game.broadcastAll(function(list){
 						game.expandSkills(list);
