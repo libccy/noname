@@ -146,7 +146,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					},
-					order:3,
+					order:4,
 					value:9,
 					useful:6,
 					tag:{
@@ -845,7 +845,16 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.addTempSkill('diaohulishan');
 				},
 				ai:{
-					order:10,
+					order:function(){
+						var player=_status.currentPhase;
+						if(player.hasCard(function(card){
+							return get.name(card)=='gz_haolingtianxia'||get.name(card)=='gz_guguoanbang'||get.name(card)=='gz_kefuzhongyuan'||get.name(card)=='wuzhong'||get.name(card)=='yuanjiao'||get.name(card)=='lianjunshengyan'||get.name(card)=='lulitongxin'||get.name(card)=='yiyi';
+					})) return 3.5;
+						if(player.hasCard(function(card){
+							return get.name(card)=='taoyuan';
+					})) return get.order({name:'taoyuan'})-1;            
+						return 9.5;
+                    },
 					value:4,
 					useful:[2,1],
 					wuxie:function(){
