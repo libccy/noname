@@ -852,9 +852,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						},'hs')) return 3.5;
 						if(player.hasCard(function(card){
 							return get.name(card)=='taoyuan';
-						},'hs')) return get.order({name:'taoyuan'},player)-1;            
+						},'hs')) return get.order({name:'taoyuan'},player)-1;
 						return 9.5;
-                    },
+					},
 					value:4,
 					useful:[2,1],
 					wuxie:function(){
