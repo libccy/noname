@@ -6,9 +6,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			sp:{
 				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
-				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong','caoxi'],
+				sp_sibi:["yangxiu","chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong','caoxi','tianchou'],
 				sp_tianzhu:['liyi','zhangyan','niujin','hejin','hansui',"wutugu","yanbaihu","shamoke","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna",'ol_wenqin'],
-				sp_nvshi:['ol_dingshangwan',"lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu',"daxiaoqiao","jin_guohuai"],
+				sp_nvshi:['ol_dingshangwan',"lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu',"daxiaoqiao","jin_guohuai",'ol_hujinding'],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','zhangzhi','lushi'],
 				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
 				sp_liesi:['lvboshe','mizhu','weizi','ol_liuba','zhangshiping'],
@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				sp_others:["hanba","caiyang"],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','tianchou','ol_hujinding'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu'],
 			},
 		},
 		characterFilter:{
@@ -21660,13 +21660,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				content:function(){
-					"step 0"
-					if(player.storage.kunfen||
-					(get.mode()=='guozhan'&&player.hiddenSkills.includes('kunfen'))){
-						if(!player.storage.kunfen){
-							event.skillHidden=true;
-						}
-						player.chooseBool(get.prompt('kunfen'),'结束阶段开始时，你可以失去1点体力，然后摸两张牌。').set('ai',function(){
+					'step 0'
+					if(player.storage.kunfen||(get.mode()=='guozhan'&&player.hiddenSkills.includes('kunfen'))){
+						if(!player.storage.kunfen) event.skillHidden=true;
+						player.chooseBool(get.prompt('kunfen'),'失去1点体力，然后摸两张牌').set('ai',function(){
 							var player=_status.event.player;
 							if(player.hp>3) return true;
 							if(player.hp==3&&player.countCards('h')<3) return true;
@@ -21674,23 +21671,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return false;
 						});
 					}
-					else{
-						event.forced=true;
-					}
-					"step 1"
-					if(event.forced||result.bool){
+					else event._result={bool:true};
+					'step 1'
+					if(result.bool){
 						player.logSkill('kunfen');
 						player.loseHp();
 					}
-					else{
-						event.finish();
-					}
-					"step 2"
+					else event.finish();
+					'step 2'
 					player.draw(2);
 				},
-				ai:{
-					threaten:1.5
-				}
+				ai:{threaten:1.5},
 			},
 			fengliang:{
 				skillAnimation:true,
@@ -21714,6 +21705,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover(2-player.hp);
 					}
 					"step 2"
+					player.storage.kunfen=true;
 					player.addSkills('oltiaoxin');
 				},
 			},

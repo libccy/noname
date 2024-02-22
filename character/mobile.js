@@ -4534,13 +4534,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forceDie:true,
 						filter:function(event,player){
 							if(event.name=='die') return true;
-							if(!lib.skill.yijin.getKane(event.player).length) return false;
-							if(event.player.additionalSkills['yijin_'+player.playerid]){
-								return true;
-							}
-							return false;
+							return lib.skill.yijin.getKane(event.player).length&&event.player.additionalSkills['yijin_'+player.playerid];
 						},
 						content:function(){
+							'step 0'
 							if(trigger.name=='die'){
 								game.countPlayer(current=>{
 									var skills=current.additionalSkills['yijin_'+player.playerid];
@@ -4551,16 +4548,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										}
 									}
 								});
+								event.finish();
+								return;
 							}
 							else {
-								var skills=trigger.player.additionalSkills['yijin_'+player.playerid];
-								trigger.player.removeAdditionalSkill('yijin_'+player.playerid);
-								for(var i of skills){
-									trigger.player.removeMark(i,1);
-									trigger.player.removeSkill(i);
-								}
+								const skills=trigger.player.additionalSkills['yijin_'+player.playerid];
+								for(const mark of skills) trigger.player.removeMark(mark,1);
 							}
-						}
+							'step 1'
+							trigger.player.removeAdditionalSkill('yijin_'+player.playerid);
+						},
 					},
 					wushi:{
 						charlotte:true,

@@ -3874,7 +3874,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					player.recover();
 					player.draw();
-					const skills = player.getStockSkills(true,true).forEach(stockSkill=>{
+					'step 3'
+					const skills = player.getStockSkills(true,true).filter(stockSkill=>{
 						if(player.hasSkill(stockSkill)) return;
 						var info=get.info(stockSkill);
 						if(!info||!info.zhuSkill) return;
