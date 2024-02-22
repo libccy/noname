@@ -622,11 +622,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					order:7.5,
 					value:4,
 					useful:2,
-					wuxie:function(target,card,player,viewer){
-						if(get.mode()=='guozhan'){
-							if(viewer.isFriendOf(player)&&viewer.identity!='ye') return 0;
-						}
-					},
 					result:{
 						target:function(player,target){
 							if(get.mode()=='versus'){
