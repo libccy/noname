@@ -21660,13 +21660,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				content:function(){
-					"step 0"
-					if(player.storage.kunfen||
-					(get.mode()=='guozhan'&&player.hiddenSkills.includes('kunfen'))){
-						if(!player.storage.kunfen){
-							event.skillHidden=true;
-						}
-						player.chooseBool(get.prompt('kunfen'),'结束阶段开始时，你可以失去1点体力，然后摸两张牌。').set('ai',function(){
+					'step 0'
+					if(player.storage.kunfen||(get.mode()=='guozhan'&&player.hiddenSkills.includes('kunfen'))){
+						if(!player.storage.kunfen) event.skillHidden=true;
+						player.chooseBool(get.prompt('kunfen'),'失去1点体力，然后摸两张牌').set('ai',function(){
 							var player=_status.event.player;
 							if(player.hp>3) return true;
 							if(player.hp==3&&player.countCards('h')<3) return true;
@@ -21674,23 +21671,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return false;
 						});
 					}
-					else{
-						event.forced=true;
-					}
-					"step 1"
-					if(event.forced||result.bool){
+					else event._result={bool:true};
+					'step 1'
+					if(result.bool){
 						player.logSkill('kunfen');
 						player.loseHp();
 					}
-					else{
-						event.finish();
-					}
-					"step 2"
+					else event.finish();
+					'step 2'
 					player.draw(2);
 				},
-				ai:{
-					threaten:1.5
-				}
+				ai:{threaten:1.5},
 			},
 			fengliang:{
 				skillAnimation:true,
@@ -21714,6 +21705,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.recover(2-player.hp);
 					}
 					"step 2"
+					player.storage.kunfen=true;
 					player.addSkills('oltiaoxin');
 				},
 			},
