@@ -154,6 +154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					});
 				},
+				ai:{threaten:3.5},
 				subSkill:{used:{charlotte:true}},
 			},
 			olsbyufeng:{
@@ -163,12 +164,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'enterGame',
 				},
 				filter(event,player){
-					if(get.cardPile('sizhaojian','field')) return false;
+					if(get.cardPile('sizhaojian','field')||lib.inpile.includes('sizhaojian')) return false;
 					return (event.name!='phase'||game.phaseNumber==0)&&player.hasEquipableSlot(1);
 				},
 				forced:true,
 				locked:false,
 				async content(event,trigger,player){
+					game.broadcastAll(()=>lib.inpile.add('sizhaojian'));
 					const card=game.createCard2('sizhaojian','diamond',6);
 					player.$gain2(card,false);
 					game.delayx();
@@ -224,11 +226,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						popup:false,
 						firstDo:true,
 						content(){
-							let storage=player.storage.olsbyufeng_block;
-							for(let i=0;i<storage.length;i++){
-								if(storage[i][0]==trigger.card) storage.splice(i--,1);
-							}
-							if(!storage.length) player.removeSkill('olsbyufeng_block');
+							player.unmarkAuto('olsbyufeng_block',[trigger.card]);
+							if(!player.getStorage('olsbyufeng_block').length) player.removeSkill('olsbyufeng_block');
 						},
 					},
 				},
@@ -238,7 +237,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:['loseAfter','equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter']},
 				filter(event,player){
-					if(player.getEquips(1).length||player.getEquip('sizhaojian')) return false;
+					if(!player.hasEquipableSlot(1)||player.getEquip('sizhaojian')) return false;
 					const card=get.cardPile('sizhaojian','field');
 					if(!card||!player.canEquip(card,true)) return false;
 					return game.hasPlayer(target=>{
@@ -266,6 +265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
+				ai:{combo:'olsbyufeng'},
 			},
 			//界高顺
 			olxianzhen:{
@@ -1027,7 +1027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sizhaojian:'思召剑',
 			sizhaojian_info:'当你使用有点数的【杀】指定目标后，你令目标角色只能使用有点数且点数大于等于此【杀】的【闪】响应此牌。',
 			olsbshishou:'士首',
-			olsbshishou_info:'主公技，其他群势力角色失去装备区的牌后，若你的装备区中没有【思召剑】，若【思召剑】存在于场上/牌堆/弃牌堆中，其可令你将【思召剑】置入装备区。',
+			olsbshishou_info:'主公技，其他群势力角色失去装备区的牌后，若你的装备区中没有【思召剑】，且【思召剑】存在于场上/牌堆/弃牌堆中，其可令你将【思召剑】置入装备区。',
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',
