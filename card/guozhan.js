@@ -845,14 +845,14 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.addTempSkill('diaohulishan');
 				},
 				ai:{
-					order:function(){
-						var player=_status.currentPhase;
+					order:function(item, player){
+						if(!player) player=get.player();
 						if(player.hasCard(function(card){
-							return get.name(card)=='gz_haolingtianxia'||get.name(card)=='gz_guguoanbang'||get.name(card)=='gz_kefuzhongyuan'||get.name(card)=='wuzhong'||get.name(card)=='yuanjiao'||get.name(card)=='lianjunshengyan'||get.name(card)=='lulitongxin'||get.name(card)=='yiyi';
-					})) return 3.5;
+							return ['gz_haolingtianxia','gz_guguoanbang','gz_kefuzhongyuan','wuzhong','yuanjiao','lianjunshengyan','lulitongxin','yiyi'].includes(get.name(card));
+						},'hs')) return 3.5;
 						if(player.hasCard(function(card){
 							return get.name(card)=='taoyuan';
-					})) return get.order({name:'taoyuan'})-1;            
+						},'hs')) return get.order({name:'taoyuan'},player)-1;            
 						return 9.5;
                     },
 					value:4,
