@@ -1145,6 +1145,15 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.draw(2);
 				},
 				ai:{
+					wuxie:function(target,card,player,viewer){
+						if(get.mode()=='guozhan'){
+							if(!_status._aozhan){
+								if(!player.isMajor()){
+									if(!viewer.isMajor()) return 0;
+								}
+							}
+						}
+					},
 					basic:{
 						order:7.2,
 						useful:4.5,
