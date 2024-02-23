@@ -402,7 +402,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				gz_zhonghui:['male','ye',4,['gzquanji','gzpaiyi'],['gzskin']],
 				gz_simazhao:['male','ye',3,['gzzhaoxin','gzsuzhi'],['gzskin']],
-				gz_gongsunyuan:['male','ye',4,['gzhuaiyi','gzzisui'],['gzskin']],
+				gz_gongsunyuan:['male','ye',4,['gzrehuaiyi','gzrezisui'],['gzskin']],
 				gz_sunchen:['male','ye',4,['gzshilu','gzxiongnve']],
 				gz_tangzi:['male','wu',4,['gzxingzhao'],['doublegroup:wei:wu','gzskin']],
 				gz_mengda:['male','wei',4,['qiuan','liangfan'],['doublegroup:wei:shu']],
@@ -411,7 +411,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_shixie:['male','qun',3,['gzbiluan','gzrelixia'],['doublegroup:wu:qun','gzskin']],
 				gz_zhanglu:['male','qun',3,['gzrebushi','gzremidao'],['doublegroup:wei:qun','gzskin']],
 				gz_dongzhao:['male','wei',3,['quanjin','zaoyun']],
-				gz_re_xushu:['male','shu',4,['gzzhuhai','gzpozhen','gzjiancai'],['gzskin']],
+				gz_re_xushu:['male','shu',4,['gzqiance','gzjujian'],['gzskin']],
 				gz_wujing:['male','wu',4,['donggui','fengyang'],['gzskin']],
 				gz_yanbaihu:['male','qun',4,['gzzhidao','gzyjili'],['gzskin']],
 				gz_xuyou:['male','wei',3,['gzchenglve','gzshicai'],['doublegroup:wei:qun','gzskin']],
@@ -516,7 +516,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_bianfuren:['female','wei',3,['wanwei','gzyuejian']],
 				gz_xunyou:['male','wei',3,['gzqice','zhiyu'],['gzskin']],
 				gz_lingtong:['male','wu',4,['xuanlve','yongjin'],['gzskin']],
-				gz_lvfan:['male','wu',3,['xindiaodu','gzdiancai']],
+				gz_lvfan:['male','wu',3,['gzdiaodu','gzdiancai']],
 				gz_masu:['male','shu',3,['gzsanyao','gzzhiman'],['gzskin']],
 				gz_shamoke:['male','shu',4,['gzjili'],['gzskin']],
 
