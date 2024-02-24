@@ -12062,7 +12062,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(get.type(he[i])=='equip'){
 							var subtype=get.subtype(he[i]);
-							if(subtype=='equip3'||subtype=='equip4'){
+							if(subtype=='equip3'||subtype=='equip4'||subtype=='equip6'){
 								num++;
 							}
 						}
@@ -12078,7 +12078,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(get.type(he[i])=='equip'){
 							var subtype=get.subtype(he[i]);
-							if(subtype=='equip3'||subtype=='equip4'){
+							if(subtype=='equip3'||subtype=='equip4'||subtype=='equip6'){
 								list.push(he[i]);
 							}
 						}
@@ -13879,7 +13879,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var card=result.cards[0];
 						if(get.position(card)=='d'){
-							if(get.subtype(card)=='equip3'||get.subtype(card)=='equip4'){
+							if(get.subtype(card)=='equip3'||get.subtype(card)=='equip4'||get.subtype(card)=='equip6'){
 								player.gain(card,player,'gain2');
 							}
 						}
@@ -13902,7 +13902,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var card=result.cards[0];
 						if(get.position(card)=='d'){
-							if(get.subtype(card)=='equip3'||get.subtype(card)=='equip4'){
+							if(get.subtype(card)=='equip3'||get.subtype(card)=='equip4'||get.subtype(card)=='equip6'){
 								player.gain(card,player,'gain2');
 							}
 						}
