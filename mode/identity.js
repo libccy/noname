@@ -2752,7 +2752,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.countPlayer(function(current){
 							var identity=current.identity.slice(1);
 							if(identity!='Zhu'){
-								if(current.identity.indexOf('r')==0)	red.push(current);
+								if(current.identity.indexOf('r')==0) red.push(current);
 								else blue.push(current);
 							}
 						});

@@ -317,7 +317,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(player.hasSkill('gzzongyu')) return 9;
 						if(game.hasPlayer(function(current){
 							return current.hasSkill('gzzongyu')&&get.attitude(player,current)<=0;
-						}))	return 1;
+						})) return 1;
 						return 7.2;
 					},
 					basic:{

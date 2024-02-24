@@ -8347,7 +8347,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.value(button.link,_status.event.getTrigger().target);
 						});
 					}
-					if(draw)	event.draw=true;
+					if(draw) event.draw=true;
 					'step 3'
 					if(event.equip&&result.links&&result.links.length){
 						trigger.target.loseToDiscardpile(result.links);
@@ -8523,7 +8523,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.discardPlayerCard(trigger.target,get.prompt('rejianchu',trigger.target)).set('ai',function(button){
 						if(!_status.event.att) return 0;
 						if(get.position(button.link)=='e'){
-							if(get.subtype(button.link)=='equip2')	return 2*get.value(button.link);
+							if(get.subtype(button.link)=='equip2') return 2*get.value(button.link);
 							return get.value(button.link);
 						}
 						return 1;

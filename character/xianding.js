@@ -3374,7 +3374,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var choices=['选项二'];
 						var choiceList=[
 							'令'+get.translation(target)+'回复1点体力',
-							'你于'+get.translation(target)+'各摸一张牌'
+							'你与'+get.translation(target)+'各摸一张牌'
 						];
 						if(target.isDamaged()) choices.unshift('选项一');
 						else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';

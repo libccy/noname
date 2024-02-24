@@ -5870,7 +5870,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter(event,player){
 					var list=['wei','shu','wu','qun','key','jin'];
 					for(var i in list){
-						if(player.hasMark('kotori_yumo_'+list[i]))	return true;
+						if(player.hasMark('kotori_yumo_'+list[i])) return true;
 					}
 					return false;
 				},
@@ -5879,7 +5879,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var list=['wei','shu','wu','qun','key','jin'];
 					var list2=[];
 					for(var i of list){
-						if(player.hasMark('kotori_yumo_'+i))	list2.push('kotori_skill_'+i);
+						if(player.hasMark('kotori_yumo_'+i)) list2.push('kotori_skill_'+i);
 					}
 					list2.push('cancel2');
 					player.chooseControl(list2).set('prompt','###是否发动【驭魔】？###弃置对应的标记并获得下列技能中的一个，或点取消，不获得技能').set('choice',function(){
@@ -6090,7 +6090,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=['wei','shu','wu','qun','key','jin'];
 						var list2=[];
 						for(var i of list){
-							if(player.hasMark('kotori_yumo_'+i)&&!player.getStorage('kotori_huazhan2').includes('kotori_yumo_'+i))	list2.push('kotori_yumo_'+i);
+							if(player.hasMark('kotori_yumo_'+i)&&!player.getStorage('kotori_huazhan2').includes('kotori_yumo_'+i)) list2.push('kotori_yumo_'+i);
 						}
 						list2.push('cancel2');
 						return list2;
@@ -6100,7 +6100,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=['wei','shu','wu','qun','key','jin'];
 						var list2=[];
 						for(var i of list){
-							if(player.hasMark('kotori_yumo_'+i)&&!player.getStorage('kotori_huazhan2').includes('kotori_yumo_'+i))	list2.push('kotori_yumo_'+i);
+							if(player.hasMark('kotori_yumo_'+i)&&!player.getStorage('kotori_huazhan2').includes('kotori_yumo_'+i)) list2.push('kotori_yumo_'+i);
 						}
 						if(list2.includes('kotori_yumo_wei')) return 'kotori_yumo_wei';
 						if(list2.includes('kotori_yumo_wu')) return 'kotori_yumo_wu';
