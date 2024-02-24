@@ -150,10 +150,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						check(card){
 							const player=get.player();
 							if(get.type(card)==='equip'){
-								if(player.countCards('he',{subtype:get.subtype(card)})>1){
-									return 11-get.equipValue(card);
+								const subtype=get.subtype(card);
+								let valueFix=0;
+								if(game.hasPlayer(current=>{
+									if(current==player||!current.hasSkill('dcshiju')) return false;
+									if(current.hasUseTarget(card)&&!player.countEmptySlot(subtype)) return true;
+								})) valueFix+=5;
+								if(player.countCards('he',{subtype})>1){
+									return valueFix+12-get.equipValue(card);
 								}
-								return 6-get.value(card);
+								return valueFix+6-get.value(card);
 							}
 							return 4-get.value(card);
 						},
@@ -177,9 +183,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const count=target.countCards('e');
 							if(count>0){
 								player.addTempSkill('dcshiju_range');
-								player.addMark('dcshiju_range',count);
+								player.addMark('dcshiju_range',count,false);
 								if(target.hasHistory('lose',evt=>{
-									return evt.getParent().name==='equip'&&evt.getParent(4)===event&&evt.es&&evt.es.length>0;
+									return evt.getParent().name==='equip'&&evt.getParent(5)===event&&evt.es&&evt.es.length>0;
 								})){
 									for(const current of [player,target]) await current.draw(2);
 								}
@@ -190,8 +196,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							result:{
 								target(player,target){
 									const card=ui.selected.cards[0];
-									if(card&&get.type(card)!=='equip') return get.value(card,target)/5;
-									return 0;
+									if(!card) return;
+									if(target.hasSkillTag('nogain')&&get.type(card)!='equip') return 0;
+									if(card.name=='du'&&target.hasSkillTag('nodu')) return 0;
+									if(get.value(card)<0) return -5;
+									const nh=target.countCards('h');
+									return Math.max(1,5-nh);
 								},
 							},
 						},
@@ -232,11 +242,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						})
 						.set('targets',targets)
 						.set('toFriends',(()=>{
-							if(player.hasSkill('dcyingshi_choice1')||player.countCards('e')<2) return true;
-							if(!player.hasSkill('dcyingshi_choice1')&&get.tag(event.card,'norepeat')) return true;
-							if(targets.some(current=>{
+							const isPositive=targets.some(current=>{
 								return get.effect(current,event.card,event.player,player)>0;
-							})) return true;
+							}),isNegative=targets.some(current=>{
+								return get.effect(current,event.card,event.player,player)<-5;
+							});
+							if((player.hasSkill('dcyingshi_choice1')||player.countCards('e')<2)&&isNegative) return true;
+							if(!player.hasSkill('dcyingshi_choice1')&&(get.tag(event.card,'norepeat')&&isNegative||isPositive)) return true;
 							return false;
 						})())
 						.set('ai',target=>{
@@ -252,10 +264,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					const {costResult:{targets}}=event,target=targets[0];
 					let bool;
-					if([1,2].every(i=>!player.hasSkill(`dcyingshi_choice${i}`))){
-						const count=player.countCards('e');
+					if(!player.hasSkill(`dcyingshi_choice2`)){
+						const count=player.countCards('e'),forced=player.hasSkill('dcyingshi_choice1');
 						if(count>0){
-							bool=await target.chooseToDiscard(`${get.translation(player)}对你发动了【应时】`,`是否弃置${get.cnNumber(count)}张牌，令${get.translation(trigger.card)}对你无效？或点击“取消”，令此牌对你额外结算一次。`,count).set('ai',card=>{
+							const prompt=`###${get.translation(player)}对你发动了【应时】###${forced?'请':'是否'}弃置${get.cnNumber(count)}张牌，令${get.translation(trigger.card)}对你无效${forced?'。':'？或点击“取消”，令其与此牌结算后视为对你使用一张同名牌。'}`;
+							bool=await target.chooseToDiscard(prompt,count,forced,'he').set('ai',card=>{
 								if(get.event('goon')) return 5.5-get.value(card);
 								return 0;
 							}).set('goon',!get.tag(trigger.card,'norepeat')&&get.effect(target,trigger.card,trigger.player,target)<-5).forResultBool();
