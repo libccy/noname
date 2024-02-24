@@ -2227,17 +2227,33 @@ export const Content = {
 			else str = get.prompt(event.skill, null, player);
 			if (typeof str == 'function') str = str(trigger, player);
 
-			var next = player.chooseBool(str);
-			if (event.frequentSkill) next.set('frequentSkill', event.skill);
+			const { costContent } = info;
+			let next;
+			if (costContent) {
+				event.modifiedCostContent = true;
+				next = costContent(trigger, player);
+				if (!next.prompt) get.evtprompt(next, str);
+			}
+			else{
+				next = player.chooseBool(str);
+				if (event.frequentSkill) next.set('frequentSkill', event.skill);
+			}
 			next.set('forceDie', true);
 			next.set('includeOut', true);
-			next.ai = () => !check || check(trigger, player);
+			if (!next.ai){
+				if(!event.modifiedCostContent) next.set('ai', () => !check || check(trigger, player));
+				else{
+					next.set('ai', check);
+				}
+			}
 
-			if (typeof info.prompt2 == 'function') next.set('prompt2', info.prompt2(trigger, player));
-			else if (typeof info.prompt2 == 'string') next.set('prompt2', info.prompt2);
-			else if (info.prompt2 != false) {
-				if (lib.dynamicTranslate[event.skill]) next.set('prompt2', lib.dynamicTranslate[event.skill](player, event.skill));
-				else if (lib.translate[event.skill + '_info']) next.set('prompt2', lib.translate[event.skill + '_info']);
+			if (!next.prompt2) {
+				if (typeof info.prompt2 == 'function') next.set('prompt2', info.prompt2(trigger, player));
+				else if (typeof info.prompt2 == 'string') next.set('prompt2', info.prompt2);
+				else if (info.prompt2 != false) {
+					if (lib.dynamicTranslate[event.skill]) next.set('prompt2', lib.dynamicTranslate[event.skill](player, event.skill));
+					else if (lib.translate[event.skill + '_info']) next.set('prompt2', lib.translate[event.skill + '_info']);
+				}
 			}
 
 			if (trigger.skillwarn) {
@@ -2261,13 +2277,16 @@ export const Content = {
 			return event.finish();
 		}
 		if (info.popup != false && !info.direct) {
+			let logTarget = info.logTarget;
+			if (result.targets && result.targets.length) logTarget = result.targets;
+			else if (typeof info.logTarget == 'string') logTarget = trigger[info.logTarget];
+			else if (typeof info.logTarget == 'function') logTarget = info.logTarget(trigger, player);
 			if (info.popup) {
 				player.popup(info.popup);
 				game.log(player, '发动了', '【' + get.skillTranslation(event.skill, player) + '】');
 			}
-			else if (!info.logTarget || info.logLine === false) player.logSkill(event.skill, false, info.line);
-			else if (typeof info.logTarget == 'string') player.logSkill(event.skill, trigger[info.logTarget], info.line);
-			else if (typeof info.logTarget == 'function') player.logSkill(event.skill, info.logTarget(trigger, player), info.line);
+			else if (!logTarget || info.logLine === false) player.logSkill(event.skill, false, info.line);
+			else player.logSkill(event.skill, logTarget, info.line);
 		}
 		var next = game.createEvent(event.skill);
 		if (typeof info.usable == 'number') {
@@ -2279,6 +2298,7 @@ export const Content = {
 		next.player = player;
 		next._trigger = trigger;
 		next.triggername = event.triggername;
+		next.costResult = result;
 
 		// if ("contents" in info && Array.isArray(info.contents)) {
 		// 	next.setContents(info.contents);
