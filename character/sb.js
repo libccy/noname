@@ -904,7 +904,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(card.name=='sha'&&typeof player.storage.sbwusheng_effect[target.playerid]=='number') return true;
 							},
 							cardUsableTarget:function(card,player,target){
-								if(card.name=='sha'&&typeof player.storage.sbwusheng_effect[target.playerid]=='number') return true;
+								if(card.name!=='sha'||typeof player.storage.sbwusheng_effect[target.playerid]!=='number') return;
+								return player.storage.sbwusheng_effect[target.playerid]<3;
 							},
 							playerEnabled:function(card,player,target){
 								if(card.name!='sha'||typeof player.storage.sbwusheng_effect[target.playerid]!='number') return;

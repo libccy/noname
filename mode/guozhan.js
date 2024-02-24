@@ -1666,7 +1666,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var cards=[];
 					//因为是线下武将 所以同一张牌重复进入只算一张
 					game.getGlobalHistory('cardMove',function(evt){
-						if(evt.name=='cardsDiscard'||(evt.name=='lose'&&evt.position==ui.discardPile))	cards.addArray(evt.cards);
+						if(evt.name=='cardsDiscard'||(evt.name=='lose'&&evt.position==ui.discardPile)) cards.addArray(evt.cards);
 					});
 					return cards.length;
 				},
