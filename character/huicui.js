@@ -7309,7 +7309,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(evt.player!=target&&!evt._finished){
 								evt.finish();
 								evt._triggered=5;
-								evt.player.insertPhase();
+								var evtx=evt.player.insertPhase();
+								delete evtx.skill;
 							}
 						}
 					}
