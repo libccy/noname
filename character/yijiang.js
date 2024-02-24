@@ -9538,6 +9538,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'fuhun2'
 			},
 			fuhun2:{
+				audio:'fuhun',
+				audioname:['re_guanzhang'],
 				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){

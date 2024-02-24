@@ -205,8 +205,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								let evt=_status.event;
 								if(evt.name!='chooseToUse') evt=evt.getParent('chooseToUse');
 								if(!evt||!evt.respondTo||!storage.includes(evt.respondTo[1])) return;
-								const num=get.number(card);
-								if(typeof num!='number'||num<get.number(evt.respondTo[1])) return false;
+								const num=get.number(card,player);
+								if(!(typeof num!='number'||num>=get.number(evt.respondTo[1]))) return false;
 							},
 						},
 						onremove(player){
@@ -237,7 +237,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:['loseAfter','equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter']},
 				filter(event,player){
-					if(!player.hasEquipableSlot(1)||player.getEquip('sizhaojian')) return false;
+					if(!player.hasEquipableSlot(1)||player.getEquip(1)||player.getEquip('sizhaojian')) return false;
 					const card=get.cardPile('sizhaojian','field');
 					if(!card||!player.canEquip(card,true)) return false;
 					return game.hasPlayer(target=>{
@@ -1025,9 +1025,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olsbyufeng_block:'思召剑',
 			olsbyufeng_info:'游戏开始时，若【思召剑】未加入本局游戏，若你可装备【思召剑】，则你将【思召剑】置入装备区。',
 			sizhaojian:'思召剑',
-			sizhaojian_info:'当你使用有点数的【杀】指定目标后，你令目标角色只能使用有点数且点数大于等于此【杀】的【闪】响应此牌。',
+			sizhaojian_info:'当你使用有点数的【杀】指定目标后，你令目标角色只能使用无点数或点数大于等于此【杀】的【闪】响应此牌。',
 			olsbshishou:'士首',
-			olsbshishou_info:'主公技，其他群势力角色失去装备区的牌后，若你的装备区中没有【思召剑】，且【思召剑】存在于场上/牌堆/弃牌堆中，其可令你将【思召剑】置入装备区。',
+			olsbshishou_info:'主公技，其他群势力角色失去装备区的牌后，若你的装备区中没有武器牌，且【思召剑】存在于场上/牌堆/弃牌堆中，其可令你将【思召剑】置入装备区。',
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',

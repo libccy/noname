@@ -7462,7 +7462,7 @@ export class Player extends HTMLDivElement {
 		const player = this, skills = this.getRemovableAdditionalSkills(skill, target);
 		if(skills.length){
 			player.removeSkill(skills);
-			if (player.additionalSkills[skill]&&player.additionalSkills[skill].length) delete player.additionalSkills[skill];
+			if (player.additionalSkills[skill]&&!player.additionalSkills[skill].length) delete player.additionalSkills[skill];
 		}
 		_status.event.clearStepCache();
 		return this;
@@ -7475,7 +7475,7 @@ export class Player extends HTMLDivElement {
 					return '#g【' + get.translation(i) + '】';
 				}));
 				player.removeSkill(skills);
-				if (player.additionalSkills[skill]&&player.additionalSkills[skill].length) delete player.additionalSkills[skill];
+				if (player.additionalSkills[skill]&&!player.additionalSkills[skill].length) delete player.additionalSkills[skill];
 			});
 		}
 	}
