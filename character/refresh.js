@@ -8922,7 +8922,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageBegin1'},
 				forced:true,
 				audio:'paoxiao',
-				audioname:['re_zhangfei','guanzhang','xiahouba'],
+				audioname:['re_zhangfei','guanzhang','xiahouba','re_guanzhang'],
 				filter:function(event,player){
 					return event.card&&event.card.name=='sha'&&player.countMark('olpaoxiao2')>0;
 				},
