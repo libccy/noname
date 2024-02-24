@@ -503,6 +503,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(eff>0) return 'take_damage';
 						if(player.hasSkillTag('noe')) return 'discard_card';
 						if(!eff) return 'take_damage';
+						if(player.hp==1&&player.hasCard((card)=>get.name(card)=='huxinjing','e')) return 'take_damage';
 						if(player.isDamaged()&&player.hasCard((card)=>get.name(card)=='baiyin'&&get.recoverEffect(player,player,_status.event.player)>0,'e')) return 'discard_card';
 						if(player.hasCard((card)=>get.value(card,player)<=0,'e')&&!player.hasCard((card)=>get.value(card,player)>Math.max(7,12-player.hp),'e')) return 'discard_card';
 						if(player.hp>2&&player.countCards('e')>2||player.hp>1&&player.countCards('e')>3) return 'take_damage';
