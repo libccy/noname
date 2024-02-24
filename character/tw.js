@@ -15338,7 +15338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_caocao:['tw_caocao','jsrg_caocao','yj_caocao'],
 			mateng:['tw_mateng','mateng'],
 			xiahouen:['tw_xiahouen','jsrg_xiahouen'],
-			jiangji:['tw_jiangji','jiangji'],
+			jiangji:['dc_jiangji','tw_jiangji','jiangji'],
 			baoxin:['tw_baoxin','baoxin'],
 			yanxiang:['yanxiang','tw_yanxiang'],
 			liwei:['liwei','tw_liwei'],
