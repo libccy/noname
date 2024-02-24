@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			gongsunxiu:['male','qun',4,['dcgangu','dckuizhen']],
 			dc_liuli:['male','shu',3,['dcfuli','dcdehua']],
 			yue_daqiao:['female','wu',3,['dcqiqin','dczixi']],
 			dc_kongrong:['male','qun',3,['dckrmingshi','lirang']],
@@ -112,12 +113,89 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_yanhan:['dc_liuba','dc_huangquan','furongfuqian','xianglang','dc_huojun','gaoxiang','dc_wuban','jiangfei'],
 				sp_jishi:['dc_jiben','zhenghun','dc_sunhanhua','liuchongluojun'],
 				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen','dc_jiachong'],
-				sp_yijun:['gongsundu','mengyou','dc_sp_menghuo'],
+				sp_yijun:['gongsundu','mengyou','dc_sp_menghuo','gongsunxiu'],
 				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong','yue_xiaoqiao','yue_daqiao'],
 			}
 		},
 		/** @type { importCharacterConfig['skill'] } */
 		skill:{
+			//公孙修
+			dcgangu:{
+				audio:2,
+				trigger:{global:'loseHpAfter'},
+				filter(event,player){
+					return event.player!==player;
+				},
+				usable:1,
+				forced:true,
+				async content(event,trigger,player){
+					await player.draw(2);
+					await player.loseHp();
+				},
+			},
+			dckuizhen:{
+				audio:2,
+				enable:'phaseUse',
+				filter(event,player){
+					return game.hasPlayer(current=>{
+						return lib.skill.dckuizhen.filterTarget(null,player,current);
+					});
+				},
+				filterTarget(card,player,target){
+					return target.countCards('h')>player.countCards('h')||target.getHp()>player.getHp();
+				},
+				usable:1,
+				forced:true,
+				async content(event,trigger,player){
+					const {target}=event,juedou=new lib.element.VCard({name:'juedou'});
+					if(target.canUse(juedou,player,false)){
+						await target.useCard(juedou,player,'noai');
+					}
+					if(player.hasHistory('damage',evt=>{
+						return evt.getParent(3)===event;
+					})){
+						await player.viewHandcards(target);
+						const shas=target.getGainableCards(player,'h').filter(card=>get.name(card)==='sha');
+						if(shas.length){
+							player.addTempSkill('dckuizhen_effect');
+							await player.gain(shas,'give',target).gaintag.add('dckuizhen');
+						}
+					}
+					else{
+						await target.loseHp();
+					}
+				},
+				subSkill:{
+					effect:{
+						trigger:{player:'useCard1'},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						charlotte:true,
+						filter:function(event,player){
+							if(event.addCount===false) return false;
+							return player.hasHistory('lose',evt=>{
+								if(evt.getParent()!=event) return false;
+								for(const i in evt.gaintag_map){
+									if(evt.gaintag_map[i].includes('dckuizhen')) return true;
+								}
+								return false;
+							});
+						},
+						async content(event,trigger,player){
+							trigger.addCount=false;
+							var stat=player.getStat().card,name=trigger.card.name;
+							if(typeof stat[name]=='number') stat[name]--;
+						},
+						mod:{
+							cardUsable(card){
+								if(!card.cards) return;
+								if(card.cards.some(card=>card.hasGaintag('dckuizhen'))) return Infinity;
+							},
+						},
+					}
+				}
+			},
 			//刘理
 			dcfuli:{
 				audio:2,
@@ -11552,6 +11630,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yuechen:'乐綝（195~257年），字号不详，阳平郡卫国县（今河南省清丰县）人。三国时期曹魏将领，右将军乐进的儿子。果毅坚毅，袭封广昌亭侯，累迁扬州刺史。甘露二年，为叛乱的征东大将军诸葛诞所杀，追赠卫尉。',
 			kuaiqi:'蒯祺（?~219年），南郡中卢人，荆州望族子弟，与荆州牧刘表帐下谋士蒯良、蒯越为同族，东汉末年房陵太守。建安二十四年（219年），汉中王刘备遣宜都太守孟达从秭归北攻房陵，蒯祺于战斗中被孟达所部士兵所杀。清朝任兆麟《心斋十种》中的《襄阳记》辑本引用《万历襄阳府志》“（蒯）钦从祖祺妇，即诸葛孔明之姊也”，称蒯祺娶故兖州泰山郡丞诸葛珪长女，即他是知名政治家、蜀汉丞相诸葛亮的姐夫。但在任兆麟之前的《襄阳记》辑本中，并没有这一条。',
 			pangshanmin:'庞山民，荆州襄阳人，三国时期曹魏大臣。庞山民出身荆州庞氏，为隐士庞德公之子、凤雏庞统的堂兄，娶诸葛亮二姐诸葛氏（“若雪”为网络小说虚构）为妻。后出仕曹魏，历任黄门、吏部郎等职。',
+			gongsunxiu:'公孙修（？－238），三国时期人物，公孙渊之子。景初元年（237年），魏明帝曹叡派出幽州刺史毌丘俭攻打公孙渊，久战不利回师。公孙渊即自立为燕王，改元绍汉，引诱鲜卑侵扰北方，背叛曹魏。景初二年（238年）春，曹魏又派司马懿和高句丽国王高位宫率军攻打公孙渊，围城日久，公孙渊粮尽之后，与儿子公孙修一起出逃后被擒获，父子二人同时被斩首示众。',
 		},
 		characterTitle:{
 		},
@@ -12111,6 +12190,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcfuli_info:'出牌阶段限一次，你可以展示手牌并弃置一种类别的所有手牌，然后摸X张牌（X为这些牌的牌名字数和且X至多为场上手牌数最多的角色的手牌数）。若你因此弃置了伤害类卡牌，则你可以选择一名角色，令其攻击范围-1直到你的下个回合开始。',
 			dcdehua:'德化',
 			dcdehua_info:'锁定技。①一轮游戏开始时，若有你可以使用的非延时类伤害类牌的牌名，你选择其中一个并视为使用之，然后你不能从手牌中使用此牌名的牌，然后若你已选择过所有的伤害类牌牌名，你失去〖德化〗。②你的手牌上限+Y（Y为你〖德化①〗选择过的牌名数）。',
+			gongsunxiu:'公孙修',
+			dcgangu:'干蛊',
+			dcgangu_info:'锁定技。每回合限一次。当其他角色失去体力后，你摸两张牌，然后失去1点体力。',
+			dckuizhen:'溃阵',
+			dckuizhen_info:'出牌阶段限一次。你可以令一名手牌数或体力值大于你的角色视为对你使用一张【决斗】。若你：受到渠道为此牌的伤害，你观看其手牌并获得其中所有的【杀】（你使用以此法得到的牌无任何次数限制）；未受到渠道为此牌的伤害，其失去1点体力。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
