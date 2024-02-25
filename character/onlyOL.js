@@ -65,7 +65,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const player=get.event('player'),trigger=get.event().getTrigger();
 							if(trigger.card.name=='tiesuo'){
 								const att=get.attitude(player,target);
-								return get.agn(att)*(2+get.sgn(att));
+								return get.sgn(att)*(2+get.sgn(att));
 							}
 							const sum=trigger.targets.reduce((i,j)=>i+get.effect(j,trigger.card,trigger.player,player),0);
 							return get.effect(target,trigger.card,trigger.player,player)*2-sum;
@@ -150,7 +150,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(bool) player.draw(Math.min(5,sum));
 						if(goon){
 							const targets=game.filterPlayer(target=>trigger.targets.includes(target))
-							if(targets.length) player.useCard(trigger.card,targets,false); 
+							if(targets.length) player.useCard(trigger.card,targets,false);
 						}
 					});
 				},

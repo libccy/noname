@@ -1244,6 +1244,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						},
 						charlotte:true,
+						onremove:true,
 						mod:{
 							maxHandcard(player,num){
 								return num-player.countMark('jsrgzhaotu_handcard');
@@ -1255,8 +1256,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:5,
 					result:{
 						target(player,target){
-							if(player.hasSkill('jsrgjingju')||player.hasZhuSkill('jsrgweizhui')) return get.attitude(player,target);
-							return -1;
+							let dis=target.needsToDiscard(2,null,true)+0.5;
+							if(dis>0) return dis;
+							if(player.hasSkill('jsrgjingju')&&player.hasZhuSkill('jsrgweizhui')&&get.attitude(player,target)>0) return game.countPlayer(current=>{
+								if(current===player||current===target||current.group!=='wei') return false;
+								return player.hasZhuSkill('jsrgweizhui',current)&&get.attitude(player,current)>0;
+							});
+							return dis;
 						},
 					},
 				},
@@ -1283,8 +1289,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('惊惧',[vcards,'vcard'],'hidden');
 					},
 					check:function(button){
+						let player=_status.event.player;
 						if(get.event().getParent().type!='phase') return 1;
-						return get.player().getUseValue({name:button.link[2],nature:button.link[3]});
+						return get.player().getUseValue({name:button.link[2],nature:button.link[3]})+game.countPlayer(current=>{
+							if(current===player||current.group!=='wei') return false;
+							return player.hasZhuSkill('jsrgweizhui',current)&&get.attitude(player,current)>0;
+						});
 					},
 					backup:function(links,player){
 						return {
@@ -1373,7 +1383,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return player.canUse(get.autoViewAs({name:'guohe'},[card]),get.event('target'));
 					}).set('target',player).set('ai',card=>{
 						if(get.effect(get.event('target'),get.autoViewAs({name:'guohe'},[card]),player)<=0) return 0;
-						return 6-get.value(card);
+						return 7-get.value(card);
 					});
 					if(bool){
 						trigger.player.logSkill('jsrgweizhui',player);
