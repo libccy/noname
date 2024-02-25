@@ -155,7 +155,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						next.set('useShan',(()=>{
 							if(target.hasSkillTag('noShan',null,event)) return false;
 							if(target.hasSkillTag('useShan',null,event)) return true;
-							if(event.baseDamage+event.extraDamage<=0 || target.isLink()&&game.hasNature(event.card)&&get.attitude(target,player._trueMe||player)>0) return false;
+							if(event.baseDamage+event.extraDamage<=0 || target.isLinked()&&game.hasNature(event.card)&&get.attitude(target,player._trueMe||player)>0) return false;
 							if(event.shanRequired>1&&target.mayHaveShan(target,'use',null,'count')<event.shanRequired-(event.shanIgnored||0)) return false;
 							if(event.baseDamage+event.extraDamage>=target.hp+
 								((player.hasSkillTag('jueqing',false,target)||target.hasSkill('gangzhi'))?target.hujia:0)) return true;
