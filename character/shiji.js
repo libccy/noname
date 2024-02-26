@@ -6527,11 +6527,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuzhang:['liuzhang','tw_liuzhang'],
 			chenzhen:['sp_chenzhen','tw_chenzhen'],
 			feiyi:['ol_feiyi','feiyi','tw_feiyi'],
-			wangling:['wangling','tw_wangling'],
+			wangling:['dc_wangling','wangling','tw_wangling'],
 			qiaogong:['qiaogong','tw_qiaogong'],
 			sp_chendong:['sp_chendong','tw_chendong','chendong'],
 			sp_jiangqing:['sp_jiangqing','tw_jiangqing','jiangqing'],
-            kongrong:['dc_kongrong','sp_kongrong','jsrg_kongrong','kongrong'],
+			kongrong:['dc_kongrong','sp_kongrong','jsrg_kongrong','kongrong'],
 			dc_mifuren:['dc_mifuren','sp_mifuren'],
 		},
 		translate:{

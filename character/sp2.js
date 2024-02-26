@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			dc_wangling:['male','wei',4,['dcjichou','dcmouli']],
 			star_yuanshao:['male','qun',4,['starxiaoyan','starzongshi','starjiaowang','staraoshi'],['zhu']],
 			star_dongzhuo:['male','qun',5,['starweilin','starzhangrong','starhaoshou'],['zhu']],
 			star_yuanshu:['male','qun',4,['starcanxi','starpizhi','starzhonggu'],['zhu']],
@@ -113,10 +114,143 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_xiaohu:['haomeng','yanfuren','yanrou','dc_zhuling'],
 				sp_star:['star_caoren','star_yuanshu','star_dongzhuo','star_yuanshao'],
 				mini_qixian:['mp_liuling'],
-				sp_decade:['caobuxing','re_maliang','dc_jikang'],
+				sp_decade:['caobuxing','re_maliang','dc_jikang','dc_wangling'],
 			}
 		},
 		skill:{
+			//王凌
+			dcjichou:{
+				audio:2,
+				trigger:{player:'phaseUseEnd'},
+				filter(event,player){
+					const evts=player.getHistory('useCard',evt=>evt.getParent('phaseUse')===event);
+					const names=evts.map(evt=>evt.card.name).unique();
+					return evts.length>0&&evts.length===names.length&&evts.some(evt=>evt.cards.some(card=>get.position(card)==='d'));
+				},
+				async content(event,trigger,player){
+					const cards=[];
+					player.checkHistory('useCard',evt=>{
+						if(evt.getParent('phaseUse')!==trigger) return;
+						cards.addArray(evt.cards.filterInD('d'));
+					});
+					const num=Math.min(cards.length,game.countPlayer());
+					if(_status.connectMode) game.broadcastAll(()=>{_status.noclearcountdown=true});
+					const [bool,links]=await player.chooseButton([
+						`集筹：将${num<cards.length?'至多'+get.cnNumber(num)+'张牌':'任意张牌'}交给等量角色`,
+						cards
+					])
+						.set('selectButton',[1,num])
+						.set('population',[
+							game.countPlayer(current=>get.attitude(player,current)>0),
+							game.countPlayer(current=>get.attitude(player,current)<0)
+						])
+						.set('ai',button=>{
+							const card=button.link,population=get.event('population');
+							if(ui.selected.buttons.length>population[0]+population[1]) return 0;
+							if(ui.selected.buttons.length>get.event('population')[0]) return 2-get.value(card);
+							return 2+get.value(card);
+						})
+						.forResult('bool','links');
+						if(bool){
+							const [bool,targets]=await player.chooseTarget(
+								`集筹：请选择${get.cnNumber(links.length)}名角色`,
+								`操作提示：请按照顺序选择要交给牌的目标，令这些角色按顺序获得这些牌：${get.translation(links)}`,
+								true,
+								links.length,
+							)
+								.set('values',links.map(i=>get.value(i)))
+								.set('ai',target=>{
+									const att=get.attitude(get.player(),target);
+									const chosenNum=ui.selected.targets.length,values=get.event('values');
+									if(values[chosenNum]>0) return att;
+									return 0.01-att;
+								})
+								.forResult('bool','targets');
+							if(_status.connectMode){game.broadcastAll(()=>{delete _status.noclearcountdown;game.stopCountChoose()})}
+							if(bool){
+								const gain_list=[],givenCards=[];
+								targets.forEach((target,i)=>{
+									player.line(target,'green');
+									gain_list.push([target,links[i]]);
+									givenCards.push(links[i]);
+									game.log(player,'将',links[i],'交给了',target);
+								});
+								event.getParent().set('givenCards',givenCards);
+								await game.loseAsync({
+									gain_list,
+									player:player,
+									cards:givenCards,
+									giver:player,
+									animate:'gain2',
+								}).setContent('gaincardMultiple');
+								const toDraw=player.getAllHistory('useSkill',evt=>{
+									const evtx=evt.event;
+									return evt.skill==='dcjichou'&&evtx.givenCards&&evtx.givenCards.length;
+								})[0].event.givenCards.length;
+								await game.asyncDelayx();
+								await player.draw(toDraw);
+							}
+						}
+						if(_status.connectMode){game.broadcastAll(()=>{delete _status.noclearcountdown;game.stopCountChoose()})}
+				},
+			},
+			dcmouli:{
+				audio:2,
+				trigger:{player:'phaseEnd'},
+				filter(event,player){
+					const names=[];
+					player.checkAllHistory('useSkill',evt=>{
+						if(evt.skill!=='dcjichou') return;
+						const evtx=evt.event;
+						if(evtx.givenCards) names.addArray(evtx.givenCards.map(card=>get.name(card,false)));
+					});
+					return names.length>=5;
+				},
+				forced:true,
+				juexingji:true,
+				skillAnimation:true,
+				animationColor:'water',
+				derivation:['dczifu'],
+				async content(event,trigger,player){
+					player.awakenSkill('dcmouli');
+					await player.gainMaxHp();
+					await player.recover();
+					await player.addSkills('dczifu');
+				},
+			},
+			dczifu:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				forced:true,
+				async content(event,trigger,player){
+					const maxLimit=Math.min(5,player.maxHp);
+					let count=player.countCards('h');
+					if(count<maxLimit){
+						await player.draw(maxLimit-count);
+					}
+					if(!player.hasHistory('gain',evt=>evt.getParent(2)===event)) return;
+					count=player.countCards('h');
+					const toKeepCount=player.getCards('h').map(card=>get.name(card)).unique();
+					if(count>toKeepCount){
+						const [bool,cards]=await player.chooseCard('自缚：选择要保留的手牌','选择不同牌名的手牌各一张，然后弃置其余手牌',toKeepCount)
+							.set('filterCard',card=>{
+								if(!ui.selected.cards.length) return true;
+								const name=get.name(card,player);
+								if(ui.selected.cards.some(card=>get.name(card,player)===name)) return false;
+								return true;
+							})
+							.set('complexCard',true)
+							.set('ai',get.value)
+							.forResult('bool','cards');
+						if(!bool) return;
+						const toDiscard=player.getCards('h').removeArray(cards);
+						if(toDiscard.length) player.discard(toDiscard);
+					}
+				},
+				ai:{
+					halfneg:true,
+				},
+			},
 			//星袁绍
 			starxiaoyan:{
 				audio:2,
@@ -11383,6 +11517,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starjiaowang_info:'锁定技，非首轮游戏开始时，若上一轮没有角色死亡（因〖硝焰〗死亡的角色除外），则你失去1点体力并发动〖硝焰〗。',
 			staraoshi:'傲势',
 			staraoshi_info:'主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张手牌，然后你可以发动一次〖纵势〗。',
+			dc_wangling:'王凌',
+			dcjichou:'集筹',
+			dcjichou_info:'出牌阶段结束时，若你于此阶段使用过牌且这些牌的牌名均不同，你可以观看位于弃牌堆中的这些牌，选择任意张牌并选择等量角色，将这些牌交给这些角色各一张，然后你摸X张牌（X为你本局游戏首次发动〖集筹〗给出的牌数）。',
+			dcmouli:'谋立',
+			dcmouli_info:'觉醒技。回合结束时，若你因〖集筹〗给出的牌的牌名总数不小于5，你加1点体力上限并回复1点体力，然后获得〖自缚〗。',
+			dczifu:'自缚',
+			dczifu_info:'锁定技。出牌阶段开始时，你将手牌摸至体力上限（至多摸至五张）。若你以此法得到牌，你须选择手牌中不同牌名的牌各一张，然后弃置其余的手牌。',
 
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",
