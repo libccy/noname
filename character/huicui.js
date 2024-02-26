@@ -1366,12 +1366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return 1/(1.1+Math.max(-1,get.value(card)));
 							},
 							ai2:function(target){
-								const att=get.attitude(get.player(),target);
-								const value=ui.selected.cards.map(card=>get.value(card)).reduce((p,c)=>{
-									return p+c;
-								},0);
-								if(value>0||player.getHp()<=1) return att;
-								return -att;
+								return get.attitude(get.player(),target);
 							},
 							precontent:function*(event,map){
 								var player=map.player,target=event.result.targets[0];
