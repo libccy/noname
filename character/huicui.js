@@ -310,7 +310,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							sishiList
 						})
 						.then(()=>{
-							'step 0';
 							const lose_list=[],players=game.filterPlayer();
 							players.forEach(current=>{
 								const cards=current.getCards('hej').filter(card=>sishiList.includes(card));
@@ -322,7 +321,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(lose_list.length){
 								game.loseAsync({lose_list}).setContent('chooseToCompareLose');
 							}
-							'step 1';
+						})
+						.then(()=>{
 							game.cardsGotoSpecial(sishiList);
 							game.log(sishiList,'被移出了游戏');
 						});
