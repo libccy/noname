@@ -1309,7 +1309,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								'step 0'
 								player.moveCard(`惊惧：将其他角色判定区里的牌移动至你的判定区`,game.filterPlayer(i=>i!=player),player,card=>{
 									return get.position(card)=='j';
-								}).set('forced',player===game.me).set('logSkill','jsrgjingju');
+								}).set('logSkill','jsrgjingju');
 								'step 1'
 								if(result.bool){
 									delete event.result.skill;
