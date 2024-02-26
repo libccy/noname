@@ -226,6 +226,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				ai:{
+					threaten:3,
+				},
 			},
 			dczhenrao:{
 				audio:2,
@@ -266,6 +269,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:'已以此法对$造成过伤害',
 					onunmark:true,
+				},
+				ai:{
+					expose:0.2,
+					threaten:3,
 				},
 			},
 			dcchenlve:{
@@ -330,6 +337,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.cardsDiscard(sishiList);
 							game.log(sishiList,'被置入了弃牌堆');
 						});
+				},
+				ai:{
+					order:0.5,
+					result:{
+						player(player){
+							if(player.getHp(true)>1&&player.countCards('he')>1) return 0;
+							if(!player.isDamaged()&&(player.countCards('h')>1||player.countCards('e')>0)) return 0;
+							return 13;
+						}
+					},
 				},
 			},
 			//蒋济
