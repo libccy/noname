@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'huicui',
 		connect:true,
 		character:{
+			dc_simashi:['male','wei',3,['dcsanshi','dczhenrao','dcchenlve']],
 			dc_jiangji:['male','wei',3,['dcshiju','dcyingshi']],
 			gongsunxiu:['male','qun',4,['dcgangu','dckuizhen']],
 			dc_liuli:['male','shu',3,['dcfuli','dcdehua']],
@@ -116,11 +117,221 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_raoting:['dc_huanghao','dc_sunziliufang','dc_sunchen','dc_jiachong'],
 				sp_yijun:['gongsundu','mengyou','dc_sp_menghuo','gongsunxiu'],
 				sp_zhengyin:['yue_caiwenji','yue_zhoufei','yue_caiyong','yue_xiaoqiao','yue_daqiao'],
-				sp_zhonghu:['dc_jiangji'],
+				sp_zhonghu:['dc_jiangji','dc_simashi'],
 			}
 		},
 		/** @type { importCharacterConfig['skill'] } */
 		skill:{
+			//司马师
+			dcsanshi:{
+				audio:2,
+				trigger:{global:'roundStart'},
+				forced:true,
+				filter(event,player){
+					return game.roundNumber===1;
+				},
+				group:['dcsanshi_gain','dcsanshi_directHit'],
+				async content(event,trigger,player){
+					const recordedNumbers=[];
+					let num=get.rand(0,ui.cardPile.childNodes.length-1);
+					for(let i=0;i<ui.cardPile.childNodes.length;i++){
+						let j=i+num;
+						if(j>=ui.cardPile.childNodes.length) j-=ui.cardPile.childNodes.length;
+						const card=ui.cardPile.childNodes[j],number=get.number(card,false);
+						if(!recordedNumbers.includes(number)){
+							recordedNumbers.add(number);
+							card.storage.dcsanshi=true;
+							num=get.rand(0,ui.cardPile.childNodes.length-1);
+						}
+					}
+					player.addSkill('dcsanshi_mark');
+				},
+				subSkill:{
+					gain:{
+						audio:'dcsanshi',
+						trigger:{global:'phaseEnd'},
+						filter(event,player){
+							return game.hasGlobalHistory('cardMove',evt=>{
+								if(evt.name=='lose'){
+									if(evt.position!==ui.discardPile) return false;
+								}
+								else if(evt.name!=='cardsDiscard') return false;
+								if(lib.skill.dcsanshi_gain.notUseOrRespond(evt,player)){
+									return evt.cards.some(card=>{
+										return card.storage.dcsanshi&&get.position(card)==='d';
+									});
+								}
+								return false;
+							});
+						},
+						forced:true,
+						notUseOrRespond(event,player){
+							if(event.name==='cardsDiscard') return false;
+							const evtx=event.getParent();
+							if(evtx.name==='orderingDiscard') return false;
+							const evt2=(evtx.relatedEvent||evtx.getParent());
+							return !['useCard','respond'].includes(evt2.name)||evt2.player!==player;
+						},
+						async content(event,trigger,player){
+							const cards=[];
+							game.checkGlobalHistory('cardMove',evt=>{
+								if(evt.name=='lose'){
+									if(evt.position!==ui.discardPile) return false;
+								}
+								else if(evt.name!=='cardsDiscard') return false;
+								if(lib.skill.dcsanshi_gain.notUseOrRespond(evt,player)){
+									cards.addArray(evt.cards.filter(card=>{
+										return card.storage.dcsanshi&&get.position(card)==='d';
+									}));
+								}
+							});
+							if(cards.length) player.gain(cards,'gain2');
+						}
+					},
+					directHit:{
+						audio:'dcsanshi',
+						trigger:{player:'useCard'},
+						forced:true,
+						filter(event,player){
+							return event.cards&&event.cards.some(card=>{
+								return card.storage.dcsanshi;
+							});
+						},
+						async content(event,trigger,player){
+							trigger.directHit.addArray(game.filterPlayer());
+							game.log(trigger.card,'不可被响应');
+						},
+					},
+					mark:{
+						trigger:{
+							player:'gainEnd',
+							global:'loseAsyncEnd',
+						},
+						forced:true,
+						popup:false,
+						silent:true,
+						lastDo:true,
+						filter(event,player){
+							if(!['dcsanshi','dcchenlve'].every(skill=>player.hasSkill(skill,null,false,false))) return false;
+							const cards=event.getg(player);
+							if(!cards.length) return false;
+							return cards.some(card=>card.storage.dcsanshi);
+						},
+						async content(event,trigger,player){
+							var cards=trigger.getg(player);
+							if(cards.length){
+								cards=cards.filter(card=>card.storage.dcsanshi);
+								player.addGaintag(cards,'dcsanshi_tag');
+							}
+						},
+					},
+				},
+			},
+			dczhenrao:{
+				audio:2,
+				trigger:{global:'useCardToPlayered'},
+				filter(event,player){
+					if((()=>{
+						if(event.player===player){
+							if(!event.isFirstTarget) return false;
+							return event.targets.some(target=>target!==player);
+						}
+						return event.target===player;
+					})()){
+						return event.targets.concat(event.player).some(target=>{
+							return target.countCards('h')>player.countCards('h')&&!player.getStorage('dczhenrao').includes(target);
+						});
+					}
+					return false;
+				},
+				costContent(event,player){
+					return player.chooseTarget((card,player,target)=>{
+						return get.event('targets').includes(target);
+					})
+						.set('targets',event.targets.concat(event.player).filter(target=>target.countCards('h')>player.countCards('h')))
+						.set('ai',target=>{
+							const player=get.player();
+							return get.damageEffect(target,player,player);
+						})
+				},
+				async content(event,trigger,player){
+					const {costResult}=event,target=costResult.targets[0];
+					await target.damage();
+					await game.asyncDelayx();
+					if(!player.storage.dczhenrao){
+						player.when({global:'phaseAfter'}).then(()=>player.unmarkSkill('dczhenrao'));
+					}
+					player.markAuto('dczhenrao',target);
+				},
+				intro:{
+					content:'已以此法对$造成过伤害',
+					onunmark:true,
+				},
+			},
+			dcchenlve:{
+				audio:2,
+				enable:'phaseUse',
+				limited:true,
+				skillAnimation:true,
+				animationColor:'thunder',
+				filterCard:()=>false,
+				selectCard:[-2,-1],
+				async content(event,trigger,player){
+					player.awakenSkill('dcchenlve');
+					const cards=['cardPile','discardPile'].map(pos=>Array.from(ui[pos].childNodes)).flat();
+					const sishiList=[];
+					const isSishi=card=>card.storage.dcsanshi;
+					const lose_list=[],players=game.filterPlayer();
+					players.forEach(current=>{
+						const pos='ej'+(current===player?'h':'');
+						const sishis=current.getCards(pos,isSishi);
+						if(sishis.length>0){
+							current.$throw(sishis);
+							lose_list.push([current,sishis]);
+							sishiList.addArray(sishis);
+						}
+					});
+					if(lose_list.length){
+						await game.loseAsync({lose_list}).setContent('chooseToCompareLose');
+					}
+					sishiList.addArray(cards.filter(isSishi));
+					if(lose_list.length) await game.asyncDelayx();
+					player.gain(sishiList,'gain2');
+					player.when('phaseEnd')
+						.filter(evt=>evt===event.getParent('phase'))
+						.vars({
+							sishiList
+						})
+						.then(()=>{
+							'step 0';
+							const lose_list=[],players=game.filterPlayer();
+							players.forEach(current=>{
+								const cards=current.getCards('hej').filter(card=>sishiList.includes(card));
+								if(cards.length>0){
+									current.$throw(cards);
+									lose_list.push([current,cards]);
+								}
+							});
+							if(lose_list.length){
+								game.loseAsync({lose_list}).setContent('chooseToCompareLose');
+							}
+							'step 1';
+							game.cardsGotoSpecial(sishiList);
+							game.log(sishiList,'被移出了游戏');
+						});
+					player.when('die')
+						.vars({
+							sishiList
+						})
+						.assign({
+							forceDie:true,
+						})
+						.then(()=>{
+							game.cardsDiscard(sishiList);
+							game.log(sishiList,'被置入了弃牌堆');
+						});
+				},
+			},
 			//蒋济
 			dcshiju:{
 				audio:2,
@@ -12397,6 +12608,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshiju_info:'其他角色的出牌阶段限一次。其可以交给你一张牌，若此牌为装备牌，你可以使用之，然后其本回合攻击范围+X（X为你装备区里的牌数）。若你以此法替换了装备，你与其各摸两张牌。',
 			dcyingshi:'应时',
 			dcyingshi_info:'每回合每项各限一次。当你使用普通锦囊牌指定第一个目标后，若有目标不为本回合第一次成为牌的目标，则你可以令其选择一项：⒈令你于此牌结算结束后视为对其使用一张与此牌牌名相同的牌；⒉弃置X张牌，此牌对其无效（X为你装备区里的牌数）。',
+			dc_simashi:'司马师',
+			dcsanshi:'散士',
+			dcsanshi_tag:'死士',
+			dcsanshi_info:'锁定技。①第一轮游戏开始时，你令系统将牌堆中每个点数的随机一张牌永久标记为“死士”（“死士”对你可见）。②一名角色的回合结束时，若本回合有“死士”不因你使用或打出而进入弃牌堆，你于弃牌堆中获得这些牌。③你使用“死士”不能被响应。',
+			dczhenrao:'震扰',
+			dczhenrao_info:'每回合每名角色限一次。当你使用牌指定第一个目标后，若目标角色包含其他角色，或当其他角色使用牌指定你为目标后，你可以选择手牌数大于你的其中一个目标或此牌的使用者，然后对其造成1点伤害。',
+			dcchenlve:'沉略',
+			dcchenlve_info:'限定技。出牌阶段，你可以将牌堆、弃牌堆、场上及其他角色的手牌区里的所有“死士”置入处理区，然后你获得这些牌。若如此做，你获得如下效果：1.此回合结束时，你将这些牌移出游戏；2.当你死亡时，你将所有以此法移出游戏的“死士”置入弃牌堆。',
 
 			sp_baigei:'无双上将',
 			sp_caizijiaren:'才子佳人',
