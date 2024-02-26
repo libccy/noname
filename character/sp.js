@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				sp_others:["hanba","caiyang"],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','guotu'],
 			},
 		},
 		characterFilter:{
@@ -30,6 +30,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			guotu:['male','qun',3,['olqushi','olweijie']],
 			ol_hujinding:['female','shu',3,['olqingyuan','olchongshen']],
 			tianchou:['male','qun',4,['olshandao']],
 			liyi:['male','wu',4,['olchanshuang','olzhanjin']],
@@ -205,6 +206,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luzhi:['male','wei',3,['qingzhong','weijing']]
 		},
 		characterIntro:{
+			guotu:'郭图（？－205年），字公则，颍川（治今河南省禹州市）人。东汉末年袁绍帐下谋士。韩馥统冀州时，郭图与荀谌等人奉袁绍之命，说服韩馥让位。袁绍统一河北后，郭图与审配等人力劝袁绍统率大军攻打曹操。袁绍死后，袁尚继位。郭图与辛评为袁谭效力，挑唆袁谭攻击袁尚。建安十年（205年），郭图和袁谭一同被曹操所杀。',
 			tianchou:'田畴（169年或170年-214年或216年），字子泰，东汉右北平郡无终人，东汉末年隐士。田畴好文习武。汉初平年间，其受刘虞派遣去长安，呈送指控公孙赞奏章，献帝大悦，封为骑都尉，田畴不受。携诏返回时，刘虞已被公孙所杀，田畴到刘墓祭拜，被公孙所提，不久释放。田畴回故乡后率家族及随从数百人隐居徐无山，致力农桑，数年间增至5000家。制定法条，兴建学校，一时民风良好，乌桓、鲜卑纷纷与其结交。汉建安二十年（207年），曹操北征乌桓，田畴请为向导。上徐无山、出卢龙、过平冈、登白狼堆、至柳城，曹军大胜，封田畴为亭侯，坚辞不受。曹念田功，四次封赏，终不受，乃拜为议郎。建安二十一年（216年），田畴去世。',
 			liyi:'李异（生卒年不详），三国时期东吴将领。建安末，与谢旌率水陆三千，击破刘备军将领詹晏、陈凤。刘备领兵攻孙权时，李异与陆逊等人屯巫、秭归，为蜀将所破。黄武元年（222年），陆逊破刘备于猇亭，李异追踪蜀军，屯驻南山。清代学者赵一清认为此李异与刘璋部将李异为同一人。',
 			caoyu:'曹宇（？－278年），字彭祖，沛国谯县（今安徽亳州）人。三国时期魏国宗室，魏武帝曹操与环夫人之子，邓哀王曹冲同母兄弟。太和六年，封为燕王。魏明帝病危，欲以大将军辅政，不果。其子常道乡公曹奂，是魏国末代皇帝，史称魏元帝。晋朝建立后，降封燕公。咸宁四年（278年），曹宇去世。',
@@ -710,6 +712,185 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//郭图
+			olqushi:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				delay:false,
+				async content(event,trigger,player){
+					await player.draw();
+					if(player.countCards('h')&&game.hasPlayer(target=>target!=player)){
+						const {result:{bool,targets,cards}}=await player.chooseCardTarget({
+							forced:true,
+							prompt:'将一张手牌作为“趋”扣置于其他角色的武将牌上',
+							filterTarget:lib.filter.notMe,
+							filterCard:true,
+							position:'h',
+							ai1(card){
+								if(get.type(card,false)=='equip') return 1-get.value(card);
+								return 7-get.value(card);
+							},
+							ai2(target){
+								const att=get.sgn(get.sgn(get.attitude(get.event('player'),target))+0.5);
+								return (target.countCards('h')+1)*att;
+							},
+						});
+						if(bool){
+							const target=targets[0];
+							target.addSkill('olqushi_effect');
+							target.markAuto('olqushi_effect',[player]);
+							game.log(player,'将一张牌扣置于',target,'的武将牌上');
+							target.addToExpansion(cards,player,'giveAuto').gaintag.add('olqushi_effect');
+						}
+					}
+				},
+				ai:{
+					order:1,
+					result:{player:1},
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove(player,skill){
+							delete player.storage[skill];
+							const cards=player.getExpansions(skill);
+							if(cards.length) player.loseToDiscardpile(cards);
+						},
+						marktext:'趋',
+						intro:{
+							content:'expansion',
+							markcount:'expansion',
+							mark(dialog,storage,player){
+								return '共扣置'+get.cnNumber(player.getExpansions('olqushi_effect').length)+'张“趋”';
+							},
+						},
+						trigger:{player:'phaseJieshuBegin'},
+						forced:true,
+						popup:false,
+						async content(event,trigger,player){
+							const cards=player.getExpansions('olqushi_effect');
+							if(cards.length){
+								await player.loseToDiscardpile(cards);
+								const targets=player.getStorage('olqushi_effect').filter(i=>{
+									return i.isIn();
+								}).sortBySeat();
+								const num=Math.min(player.getHistory('useCard',evt=>{
+									return evt.targets&&evt.targets.length;
+								}).reduce((sum,evt)=>{
+									return sum+evt.targets.length
+								},0),5);
+								if(targets.length&&player.getHistory('useCard',evt=>{
+									return cards.some(card=>get.type2(card)==get.type2(evt.card));
+								}).length&&num){
+									for(const target of targets) await target.draw(num);
+								}
+							}
+							player.removeSkill('olqushi_effect');
+						},
+					},
+				},
+			},
+			olweijie:{
+				audio:2,
+				enable:['chooseToUse','chooseToRespond'],
+				filter(event,player){
+					if(!game.hasPlayer(target=>{
+						return get.distance(player,target)==1&&target.countCards('h');
+					})||_status.currentPhase===player||event.olweijie) return false;
+					return get.inpileVCardList(info=>{
+						const name=info[2];
+						return get.type(name)=='basic';
+					}).some(card=>event.filterCard({name:card[2],nature:card[3]},player,event));
+				},
+				chooseButton:{
+					dialog(event,player){
+						const list=get.inpileVCardList(info=>{
+							const name=info[2];
+							return get.type(name)=='basic';
+						}).filter(card=>event.filterCard({name:card[2],nature:card[3]},player,event));
+						return ui.create.dialog('诿解',[list,'vcard']);
+					},
+					filter(button,player){
+						return get.event().getParent().filterCard({name:button.link[2],nature:button.link[3]},player,_status.event.getParent());
+					},
+					check(button){
+						if(get.event().getParent().type!='phase') return 1;
+						return get.event('player').getUseValue({name:button.link[2],nature:button.link[3]});
+					},
+					backup(links,player){
+						return {
+							viewAs:{
+								name:links[0][2],
+								nature:links[0][3],
+							},
+							filterCard:()=>false,
+							selectCard:-1,
+							*precontent(event,map){
+								delete event.result.skill;
+								const player=map.player;
+								let stop=false;
+								const result=yield player.chooseTarget('请选择一名距离为1的角色','弃置其一张手牌，若此牌牌名为【'+get.translation(event.result.card.name)+'】，则视为你使用/打出之',(card,player,target)=>{
+									return get.distance(player,target)==1&&target.countCards('h');
+								}).set('ai',target=>1-get.sgn(get.attitude(get.event('player'),target)));
+								if(result.bool){
+									const target=result.targets[0];
+									player.logSkill('olweijie',target);
+									player.tempBanSkill('olweijie',null,false);
+									const result2=yield player.discardPlayerCard(target,'h',true).set('prompt2','若弃置的牌名为【'+get.translation(event.result.card.name)+'】，则视为你使用/打出之').set('ai',button=>{
+										if(button.link.isKnownBy(get.event('player'))&&button.link.name==get.event('namex')) return 114514;
+										return 1+Math.random();
+									}).set('namex',event.result.card.name);
+									if(result2.bool){
+										const card=result2.cards[0];
+										if(get.name(card,target)==event.result.card.name){
+											player.popup('洗具');
+											stop=true;
+										}
+										else player.popup('杯具');
+									}
+								}
+								if(!stop){
+									const evt=event.getParent();
+									evt.set('olweijie',true);
+									evt.goto(0);
+									delete evt.openskilldialog;
+									return;
+								}
+							},
+						}
+					},
+					prompt(links,player){
+						const nature=(get.translation(links[0][3])||'');
+						const name='【'+get.translation(links[0][2])+'】';
+						return '弃置距离为1的一名角色的一张手牌，若此牌牌名为'+name+'，则你视为使用'+nature+name;
+					},
+				},
+				ai:{
+					order:10,
+					respondSha:true,
+					respondShan:true,
+					skillTagFilter(player,tag){
+						const name=(tag=='respondSha'?'sha':'shan');
+						return lib.skill.olweijie.hiddenCard(player,name);
+					},
+					result:{
+						player(player){
+							if(_status.event.dying&&get.attitude(player,_status.event.dying)<=0) return 0;
+							return game.hasPlayer(target=>{
+								if(get.attitude(player,target)>0) return false;
+								return get.distance(player,target)==1&&target.countCards('h');
+							})?1:0;
+						},
+					},
+				},
+				hiddenCard(player,name){
+					if(!lib.inpile.includes(name)) return false;
+					return get.type(name)=='basic'&&game.hasPlayer(target=>{
+						return get.distance(player,target)==1&&target.countCards('h');
+					});
+				},
+			},
 			//胡金定
 			olqingyuan:{
 				audio:2,
@@ -27212,6 +27393,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olqingyuan_info:'锁定技。①游戏开始时，或当你于本局游戏首次受到伤害后，你选择一名未以此法选择过的其他角色。②每回合限一次，你发动〖轻缘①〗选择过的角色得到牌后，你随机获得其中一名角色的随机一张手牌。',
 			olchongshen:'重身',
 			olchongshen_info:'你可以将本轮得到的红色手牌当作【闪】使用。',
+			guotu:'郭图',
+			olqushi:'趋势',
+			olqushi_info:'出牌阶段限一次，你可以摸一张牌，然后将一张手牌扣置于一名其他角色的武将牌上，称为“趋”。目标角色于其结束阶段移去武将牌上的所有“趋”，若其于本回合使用过与“趋”相同类别的牌，则你摸X张牌（X为其本回合使用牌指定过的目标数之和且至多为5）。',
+			olweijie:'诿解',
+			olweijie_info:'每回合限一次，你的回合外，当你需要使用或打出一张基本牌时，你可以弃置距离为1的一名角色的一张手牌，若此牌牌名与你需要使用或打出的牌的牌名相同，则视为你使用或打出之。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
