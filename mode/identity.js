@@ -3623,7 +3623,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									}
 									if(fan){
 										if(to.hp>1&&to.hp>fan.hp&&to.countCards('he')>fan.countCards('he')){
-											return -3;
+											return -1.7;
 										}
 									}
 									return 0;
