@@ -885,7 +885,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				hiddenCard(player,name){
-					if(!lib.inpile.includes(name)) return false;
+					if(!lib.inpile.includes(name)||_status.currentPhase===player||player.isTempBanned('olweijie')) return false;
 					return get.type(name)=='basic'&&game.hasPlayer(target=>{
 						return get.distance(player,target)==1&&target.countCards('h');
 					});
