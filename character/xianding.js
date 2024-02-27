@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			huzun:['male','wei',4,['dczhantao','dcanjing']],
 			zhugemengxue:['female','wei',3,['dcjichun','dchanying']],
 			bailingyun:['female','wei',3,['dclinghui','dcxiace','dcyuxin']],
 			dc_qinghegongzhu:['female','wei',3,['dczhangji','dczengou']],
@@ -95,7 +96,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			xianding:{
-				sp2_huben:['wangshuang','wenyang','re_liuzan','dc_huangzu','wulan','leitong','chentai','dc_duyu','dc_wangjun','dc_xiahouba','old_huangfusong'],
+				sp2_huben:['wangshuang','wenyang','re_liuzan','dc_huangzu','wulan','leitong','chentai','dc_duyu','dc_wangjun','dc_xiahouba','old_huangfusong','huzun'],
 				sp2_shengun:["puyuan","guanlu","gexuan",'wufan','re_zhangbao','dukui','zhaozhi','zhujianping','dc_zhouxuān','zerong'],
 				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji'],
 				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie'],
@@ -113,6 +114,63 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//胡遵
+			dczhantao:{
+				audio:2,
+				trigger:{global:'damageEnd'},
+				filter(event,player){
+					return event.source&&event.source!=player&&event.player.isIn();
+				},
+				check(event,player){
+					if(!event.source.isIn()||!event.card||typeof get.number(event.card)!=='number') return 0;
+					return get.effect(event.source,{name:'sha'},player,player)>=0;
+				},
+				logTarget:'player',
+				async content(event,trigger,player){
+					player.judge(card=>{
+						const evt=get.event().getParent().getTrigger();
+						if(!evt.source.isIn()||!evt.card||typeof get.number(evt.card)!=='number') return 0;
+						if(get.number(card)>get.number(evt.card)) return 1.5;
+						return 0;
+					}).set('judge2',r=>r.bool).set('callback',()=>{
+						const evt=event.getParent(2).getTrigger();
+						if(!evt.source.isIn()||!evt.card||typeof get.number(evt.card)!=='number') return;
+						if(event.judgeResult.number>get.number(evt.card)){
+							const sha=new lib.element.VCard({name:'sha'}),target=evt.source;
+							if(player.canUse(sha,target,false,false)){
+								player.useCard(sha,target,false);
+							}
+						}
+					})
+				}
+			},
+			dcanjing:{
+				audio:2,
+				trigger:{source:'damageSource'},
+				filter(event,player){
+					return game.hasPlayer(current=>current.isDamaged());
+				},
+				usable:1,
+				async content(event,trigger,player){
+					const maxCount=player.getAllHistory('useSkill',evt=>evt.skill==='dcanjing').length+1;
+					const result=await player.chooseTarget(get.prompt2('dcanjing'),(card,player,target)=>target.isDamaged(),[1,maxCount])
+						.set('ai',target=>{
+							return get.attitude(get.player(),target)>0;
+						})
+						.forResult();
+					if(!result.bool) return;
+					const targets=result.targets.slice();
+					targets.sortBySeat(_status.currentPhase);
+					player.logSkill('dcanjing',targets);
+					for(const target of targets) await target.draw();
+					const minHp=targets.map(i=>i.getHp()).sort((a,b)=>a-b)[0];
+					await game.asyncDelayx();
+					for(const target of targets){
+						if(!target.isIn()) continue;
+						if(target.getHp()===minHp) await target.recover();
+					}
+				}
+			},
 			//诸葛梦雪
 			dcjichun:{
 				audio:2,
@@ -13806,6 +13864,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugeruoxue:'诸葛氏（“若雪”为网络小说虚构），诸葛亮的二姐，庞山民之妻。',
 			zhugemengxue:'诸葛氏（“梦雪”为网络小说虚构），诸葛亮的大姐。',
 			caoyi:'曹轶，游卡桌游旗下产品《三国杀》原创角色。设定上为曹纯所收养的孙女，从小受到曹纯的教导，在军营中长大，性情坚毅有担当，军事谋略丰富，战斗能力超强。曹轶喜欢美食，特别是甜食，并且擅长制作各种点心。她身边跟随的雪白小老虎是曹纯在她及笄时送的生辰礼物，希望她如小老虎一样，英勇无畏。曹轶与曹婴交好，两人以姐妹相称。曹轶成年后继承祖父衣钵，接手精锐部队“虎豹骑”，成为新的虎豹骑的统领者。',
+			huzun:'胡遵（？～256年），安定临泾（今甘肃省镇原县）人，三国时期曹魏大臣，官至卫将军，封阴密侯。出身安定胡氏。历任征东将军、征东大将军、卫将军等职。早年由张既征辟。后追随司马懿，参与平定匈奴胡薄居姿职叛乱、抵御诸葛亮北伐、平定公孙渊叛乱。嘉平四年（252年），作为曹魏三征之一的征东将军，主持征讨东吴，被诸葛恪击败。正元元年（255年）参与平定淮南三叛的第二叛毌丘俭、文钦之乱，事后升任卫将军。甘露元年（256年）秋七月己卯去世，追赠车骑将军。',
 		},
 		characterTitle:{
 			// wulan:'#b对决限定武将',
@@ -14449,6 +14508,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjichun_info:'出牌阶段限一次，你可以展示一张手牌并选择一项：①将此牌交给一名手牌数小于你的角色，然后摸X张牌。②弃置此牌并弃置一名手牌数大于你的角色区域里至多X张牌。（X为此牌牌名字数）',
 			dchanying:'寒英',
 			dchanying_info:'准备阶段，你可以展示牌堆里的一张非赠物装备牌，然后令一名手牌数等于你的角色使用此牌。',
+			huzun:'胡遵',
+			dczhantao:'斩涛',
+			dczhantao_info:'当你或你攻击范围内的角色受到伤害后，若你不为伤害来源，你可以判定，若造成此伤害的渠道为牌且此牌有点数且判定结果点数大于此牌的点数，你视为对来源使用一张【杀】。',
+			dcanjing:'安境',
+			dcanjing_info:'每回合限一次。当你造成伤害后，你可以令至多X名已受伤的角色各摸一张牌，然后其中体力值最少的角色回复1点体力（X为你本局游戏发动〖安境〗的次数）。',
 
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',

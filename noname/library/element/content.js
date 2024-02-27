@@ -2247,6 +2247,7 @@ export const Content = {
 		}
 		"step 2";
 		var info = get.info(event.skill);
+		if (result && result.control) result.bool = !result.control.includes('cancel');
 		if (!result || !result.bool) return;
 		var autodelay = info.autodelay;
 		if (typeof autodelay == 'function') autodelay = autodelay(trigger, player);

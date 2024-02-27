@@ -135,6 +135,7 @@ window.noname_character_rank={
 		'jsrg_guozhao',
 		'sb_caopi',
 		'xia_yuzhenzi',
+		'dc_simashi',
 	],
 	a:[
 		'star_caoren',
@@ -368,6 +369,8 @@ window.noname_character_rank={
 		'dc_lingcao',
 		'jsrg_zhugeliang',
 		'shen_lusu',
+		'huzun',
+		'star_zhangchunhua',
 	],
 	am:[
 		'bailingyun',
@@ -675,6 +678,7 @@ window.noname_character_rank={
 		'ol_sb_taishici',
 		'tianchou',
 		'ol_sb_guanyu',
+		'gongsunxiu',
 	],
 	bp:[
 		'xin_huojun',
@@ -1055,6 +1059,8 @@ window.noname_character_rank={
 		'jsrg_sunlubansunluyu',
 		'jsrg_weiwenzhugezhi',
 		'shen_xuzhu',
+		'dc_jiangji',
+		'dc_wangling',
 	],
 	b:[
 		'junk_guanyu',
