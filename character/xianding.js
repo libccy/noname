@@ -150,17 +150,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter(event,player){
 					return game.hasPlayer(current=>current.isDamaged());
 				},
-				costContent(event,player){
-					const maxCount=player.getAllHistory('useSkill',evt=>evt.skill==='dcanjing').length+1;
-					return player.chooseTarget((card,player,target)=>target.isDamaged(),[1,maxCount]);
-				},
-				check(target){
-					return get.attitude(get.player(),target)>0;
-				},
 				usable:1,
 				async content(event,trigger,player){
-					const {costResult:{targets}}=event;
+					const maxCount=player.getAllHistory('useSkill',evt=>evt.skill==='dcanjing').length+1;
+					const result=await player.chooseTarget(get.prompt2('dcanjing'),(card,player,target)=>target.isDamaged(),[1,maxCount])
+						.set('ai',target=>{
+							return get.attitude(get.player(),target)>0;
+						})
+						.forResult();
+					if(!result.bool) return;
+					const targets=result.targets.slice();
 					targets.sortBySeat(_status.currentPhase);
+					player.logSkill('dcanjing',targets);
 					for(const target of targets) await target.draw();
 					const minHp=targets.map(i=>i.getHp()).sort((a,b)=>a-b)[0];
 					await game.asyncDelayx();

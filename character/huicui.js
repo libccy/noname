@@ -248,18 +248,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
-				costContent(event,player){
-					return player.chooseTarget((card,player,target)=>{
+				direct:true,
+				async content(event,trigger,player){
+					const result=await player.chooseTarget(get.prompt('dczhenrao'),'对一名可选角色造成1点伤害',(card,player,target)=>{
 						return get.event('targets').includes(target);
 					})
-						.set('targets',event.targets.concat(event.player).filter(target=>target.countCards('h')>player.countCards('h')))
+						.set('targets',trigger.targets.concat(trigger.player).filter(target=>target.countCards('h')>player.countCards('h')))
 						.set('ai',target=>{
 							const player=get.player();
 							return get.damageEffect(target,player,player);
 						})
-				},
-				async content(event,trigger,player){
-					const {costResult}=event,target=costResult.targets[0];
+						.forResult();
+					if(!result.bool) return;
+					const target=result.targets[0];
+					player.logSkill('dczhenrao',target);
 					await target.damage();
 					await game.asyncDelayx();
 					if(!player.storage.dczhenrao){
@@ -592,25 +594,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return evts.some(evt=>evt.targets.includes(target));
 					});
 				},
-				costContent(event,player){
-					const evt=event.getParent();
+				direct:true,
+				async content(event,trigger,player){
+					const evt=trigger.getParent();
 					const evts=game.getGlobalHistory('useCard',null,evt).slice().remove(evt);
-					const targets=event.targets.filter(target=>{
+					const chooseableTargets=trigger.targets.filter(target=>{
 						return evts.some(evt=>evt.targets.includes(target));
 					});
-					return player.chooseTarget()
+					const result=await player.chooseTarget()
+						.set('prompt',get.prompt('dcyingshi'))
+						.set('prompt2',`令一名可选角色选择本回合未被选择过的一项：⒈令你于此牌结算结束后视为对其使用一张${get.translation(trigger.card.name)}；⒉弃置${get.cnNumber(player.countCards('e'))}张牌，此牌对其无效。`)
 						.set('filterTarget',(card,player,target)=>{
 							return get.event('targets').includes(target);
 						})
-						.set('targets',targets)
+						.set('targets',chooseableTargets)
 						.set('toFriends',(()=>{
-							const isPositive=targets.some(current=>{
-								return get.effect(current,event.card,event.player,player)>0;
-							}),isNegative=targets.some(current=>{
-								return get.effect(current,event.card,event.player,player)<-5;
+							const isPositive=chooseableTargets.some(current=>{
+								return get.effect(current,trigger.card,trigger.player,player)>0;
+							}),isNegative=chooseableTargets.some(current=>{
+								return get.effect(current,trigger.card,trigger.player,player)<-5;
 							});
 							if((player.hasSkill('dcyingshi_choice1')||player.countCards('e')<2)&&isNegative) return true;
-							if(!player.hasSkill('dcyingshi_choice1')&&(get.tag(event.card,'norepeat')&&isNegative||isPositive)) return true;
+							if(!player.hasSkill('dcyingshi_choice1')&&(get.tag(trigger.card,'norepeat')&&isNegative||isPositive)) return true;
 							return false;
 						})())
 						.set('ai',target=>{
@@ -621,10 +626,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							if(player.hasSkill('dcyingshi_choice1')&&!count) return 0;
 							return -get.attitude(player,target);
-						});
-				},
-				async content(event,trigger,player){
-					const {costResult:{targets}}=event,target=targets[0];
+						})
+						.forResult();
+					if(!result.bool) return;
+					const target=result.targets[0];
+					player.logSkill('dcyingshi',target);
 					let bool;
 					if(!player.hasSkill(`dcyingshi_choice2`)){
 						const count=player.countCards('e'),forced=player.hasSkill('dcyingshi_choice1');
