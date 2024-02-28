@@ -2031,7 +2031,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter(event,player){
 					if(!player.hasZhuSkill('twniju')) return false;
 					if(event.iwhile||(event.target&&event.compareMeanwhile)) return false;
-					return true;
+					const participant=[event.player];
+					if(event.targets) participant.addArray(event.targets);
+					else participant.add(event.target);
+					return participant.includes(player);
 				},
 				direct:true,
 				async content(event,trigger,player){
