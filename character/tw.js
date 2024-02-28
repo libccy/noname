@@ -575,7 +575,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							target.addTempSkill(control,{player:'phaseAfter'});
 							target.addTempSkill('twhuajing_blocker',{player:'phaseAfter'});
 							target.getHistory('custom').push({twhuajing_skills:[control]});
-							await player.draw();
+							await player.draw(2);
 						}
 					}
 				},
@@ -610,14 +610,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return cards;
 				},
-				direct:true,
+				//direct:true,
+				frequent:true,
 				async content(event,trigger,player){
 					const cards=lib.skill.twdengjian.getCards(player,trigger.player);
-					const {result:{bool}}=await player.chooseToDiscard(get.prompt('twdengjian'),'he')
+					/*const {result:{bool}}=await player.chooseToDiscard(get.prompt('twdengjian'),'he')
 					.set('prompt2','弃置一张牌并随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】')
 					.set('ai',card=>7-get.value(card))
 					.set('logSkill','twdengjian');
-					if(bool) player.gain(cards.randomGet(),'gain2').gaintag.add('twdengjianx');
+					if(bool) */player.gain(cards.randomGet(),'gain2').gaintag.add('twdengjianx');
 				},
 				group:'twdengjian_buff',
 				subSkill:{
@@ -898,7 +899,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				async content(event,trigger,player){
-					const num=player.getHistory('sourceDamage',evt=>evt.card&&evt.card==trigger.card).reduce((sum,evt)=>sum+evt.num,0);
+					//const num=player.getHistory('sourceDamage',evt=>evt.card&&evt.card==trigger.card).reduce((sum,evt)=>sum+evt.num,0);
+					const num=game.countPlayer2(target=>{
+						return target.hasHistory('damage',evt=>{
+							return evt.card&&evt.card==trigger.card;
+						});
+					});
 					const num2=1+player.getAllHistory('custom',evt=>evt.twzhongyi).length;
 					let choice=['摸牌'],choiceList=['摸'+get.cnNumber(num)+'张牌'];
 					if(player.isDamaged()){
@@ -973,9 +979,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{global:'phaseEnd'},
 						filter(event,player){
 							const card=new lib.element.VCard({name:'sha'});
-							return player.hasUseTarget(card)&&player.getHistory('useSkill',evt=>{
+							return player.hasUseTarget(card)&&/*player.getHistory('useSkill',evt=>{
 								return evt.skill=='twchue_gain';
-							}).length&&player.getHp()&&player.countMark('twchue')>=player.getHp();
+							}).length&&player.getHp()&&*/player.countMark('twchue')>=player.getHp();
 						},
 						check(event,player){
 							return player.hasValueTarget(new lib.element.VCard({name:'sha'}));
@@ -15367,7 +15373,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return '转换技。<span class="bluetext">阴：出牌阶段限一次。你可以弃置一张牌并对攻击范围内的一名角色造成1点伤害。</span>阳：当你或你攻击范围内的一名角色于你的回合外受到伤害时，你可以弃置一张牌令此伤害-1。<span class="bluetext">然后若你以此法弃置的牌颜色与“任”的颜色相同，你摸一张牌。</span>';
 			},
 			twdengjian:function(player){
-				let str='①其他角色的弃牌阶段结束时，你可以弃置一张牌并随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】，称为“剑法”。';
+				let str='①其他角色的弃牌阶段结束时，你可以随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】，称为“剑法”。';
 				if(player.hasSkill('twdengjian_ban')) str='<span style="opacity:0.5">'+str+'</span>';
 				str+='②你使用“剑法”牌不计入次数限制。';
 				return str;
@@ -16011,9 +16017,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xia_guanyu:'侠关羽',
 			xia_guanyu_prefix:'侠',
 			twzhongyi:'忠义',
-			twzhongyi_info:'锁定技。①你使用【杀】无距离限制。②当你使用【杀】结算完毕后，你选择一项：⒈摸X张牌；⒉回复X点体力；⒊背水：失去Y点体力，依次执行以上两项（X为此牌造成的伤害值，Y为你本局游戏此前选择此项的次数+1）。',
+			twzhongyi_info:'锁定技。①你使用【杀】无距离限制。②当你使用【杀】结算完毕后，你选择一项：⒈摸X张牌；⒉回复X点体力；⒊背水：失去Y点体力，依次执行以上两项（X为受到此牌造成的伤害的角色数，Y为你本局游戏选择此项的次数）。',
 			twchue:'除恶',
-			twchue_info:'①当你使用【杀】指定唯一目标时，你可以失去1点体力，为此牌额外指定Z个目标。②当你受到伤害或失去体力后，你摸一张牌并获得1个“勇”标记。③回合结束时，若你本回合发动过〖除恶②〗，则你可以失去Z个“勇”标记，视为使用一张伤害+1且可以额外指定Z个目标的【杀】。（Z为你的体力值）',
+			twchue_info:'①当你使用【杀】指定唯一目标时，若场上存在可称为此【杀】目标的非目标角色，则你可以失去1点体力，为此牌额外指定Z个目标。②当你受到伤害或失去体力后，你摸一张牌并获得1个“勇”标记。③回合结束时，若你的“勇”标记数大于等于Z，则你可以失去Z个“勇”标记，视为使用一张伤害+1且可以额外指定Z个目标的【杀】。（Z为你的体力值）',
 			xia_shitao:'石韬',
 			twjieqiu:'劫囚',
 			twjieqiu_info:'出牌阶段限一次，你可以选择一名装备区没有废除栏的其他角色，废除其所有装备栏，然后其摸X张牌（X为其废除装备栏前的装备区牌数），直到其恢复所有装备栏前：其弃牌阶段结束时，其恢复等同于其弃置牌数的装备栏；其回合结束时，若其仍有已废除的装备栏，则你执行一个额外回合（每轮限一次）。',
@@ -16022,7 +16028,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xia_shie:'史阿',
 			twdengjian:'登剑',
 			twdengjianx:'剑法',
-			twdengjian_info:'①其他角色的弃牌阶段结束时，你可以弃置一张牌并随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】，称为“剑法”。②你使用“剑法”牌不计入次数限制。',
+			twdengjian_info:'①其他角色的弃牌阶段结束时，你可以随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】，称为“剑法”。②你使用“剑法”牌不计入次数限制。',
 			twxinshou:'心授',
 			twxinshou_info:'①当你于出牌阶段使用【杀】时，若此【杀】与你本回合使用的所有其他【杀】的颜色均不相同，则你可以选择执行以下一项本回合未执行过的项：⒈摸一张牌；⒉交给一名其他角色一张牌。②当你使用【杀】时，若〖心授①〗的两项本回合均已被你选择过，则你可以令〖登剑①〗失效并令一名其他角色获得〖登剑〗，你的下个回合开始时，其失去〖登剑〗，若其这期间使用【杀】造成过伤害，则你结束〖登剑①〗的失效状态。',
 			xia_yuzhenzi:'玉真子',
@@ -16041,7 +16047,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twhuajing_gong:'弓',
 			twhuajing_gong_info:'当你使用【杀】造成伤害后，你随机弃置受伤角色装备区里的一张牌。',
 			twtianshou:'天授',
-			twtianshou_info:'锁定技，回合结束时，若你本回合使用【杀】造成过伤害，且你拥有本回合获得过效果的“武”标记，则你须将其中一个“武”标记交给一名其他角色并令其获得此标记的效果直到其回合结束，然后你摸一张牌。',
+			twtianshou_info:'锁定技，回合结束时，若你本回合使用【杀】造成过伤害，且你拥有本回合获得过效果的“武”标记，则你须将其中一个“武”标记交给一名其他角色并令其获得此标记的效果直到其回合结束，然后你摸两张牌。',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',

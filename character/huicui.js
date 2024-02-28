@@ -4982,7 +4982,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource',
 					player:'damageEnd',
 				},
-				usable:1,
+				usable:2,
 				logTarget:'source',
 				check:function(event,player){
 					if(typeof player.storage.dchaochong!='number'||player.storage.dchaochong==0) return true;
@@ -12574,7 +12574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dchaochong:'昊宠',
 			dchaochong_info:'当你使用牌后，你可以将手牌摸至或弃置至你的手牌上限数（至多摸五张）。然后若你以此法：得到牌，你的手牌上限-1；失去牌，你的手牌上限+1。',
 			dcjinjin:'矜谨',
-			dcjinjin_info:'每回合限一次。当你造成或受到伤害后，你可以重置因〖昊宠〗增加或减少的手牌上限，令伤害来源弃置至多X张牌，然后你摸Y张牌（X为你以此法变化的手牌上限且至少为1，Y为X减其以此法弃置的牌数）。',
+			dcjinjin_info:'每回合限两次。当你造成或受到伤害后，你可以重置因〖昊宠〗增加或减少的手牌上限，令伤害来源弃置至多X张牌，然后你摸Y张牌（X为你以此法变化的手牌上限且至少为1，Y为X减其以此法弃置的牌数）。',
 			xianglang:'向朗',
 			dckanji:'勘集',
 			dckanji_info:'出牌阶段限两次。你可以展示所有手牌，若花色均不同，你摸两张牌。然后若你的手牌因此包含了四种花色，你跳过下一个弃牌阶段。',
@@ -12761,7 +12761,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshiju_info:'其他角色的出牌阶段限一次。其可以交给你一张牌，若此牌为装备牌，你可以使用之，然后其本回合攻击范围+X（X为你装备区里的牌数）。若你以此法替换了装备，你与其各摸两张牌。',
 			dcyingshi:'应时',
 			dcyingshi_info:'每回合每项各限一次。当你使用普通锦囊牌指定第一个目标后，若有目标不为本回合第一次成为牌的目标，则你可以令其选择一项：⒈令你于此牌结算结束后视为对其使用一张与此牌牌名相同的牌；⒉弃置X张牌，此牌对其无效（X为你装备区里的牌数）。',
-			dc_wangling:'王凌',
+			dc_wangling:'王淩',
 			dcjichou:'集筹',
 			dcjichou_info:'出牌阶段结束时，若你于此阶段使用过牌且这些牌的牌名均不同，你可以观看位于弃牌堆中的这些牌，选择任意张牌并选择等量角色，将这些牌交给这些角色各一张，然后你摸X张牌（X为你本局游戏首次发动〖集筹〗给出的牌数）。',
 			dcmouli:'谋立',

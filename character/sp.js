@@ -119,7 +119,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			jianggan:["male","wei",3,["weicheng","daoshu"]],
 
-			caoying:["female","wei",4,["xinfu_lingren","xinfu_fujian"],[]],
+			caoying:["female","wei",4,["xinfu_lingren","fujian"],[]],
 			simahui:["male","qun",3,["jianjie","xinfu_chenghao","xinfu_yinshi"],[]],
 			baosanniang:["female","shu",4,["olwuniang","olxushen"],[]],
 
@@ -16955,7 +16955,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{global:'phaseEnd'},
 				forced:true,
 				charlotte:true,
-				filter:function(event,player){
+				filterx:function(event,player){
 					if(!event.player.countMark('rehengjiang2')) return false;
 					if(event.player.hasHistory('lose',function(evt){
 						return evt.type=='discard'&&evt.cards2.length>0&&evt.getParent('phaseDiscard').player==event.player;
@@ -16964,10 +16964,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				logTarget:'player',
 				content:function(){
-					var num=player.getHistory('useSkill',function(evt){
-						return evt.skill=='rehengjiang'&&evt.targets.includes(trigger.player);
-					}).length;
-					if(num>0) player.draw(num);
+					if(lib.skill.rehengjiang3.filterx(trigger,player)){
+						var num=player.getHistory('useSkill',function(evt){
+							return evt.skill=='rehengjiang'&&evt.targets.includes(trigger.player);
+						}).length;
+						if(num>0) player.draw(num);
+					}
+					else player.draw();
 				},
 			},
 			shuangren:{
@@ -24891,20 +24894,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else trigger.player.discard(event.card);
 				}
 			},
-			"xinfu_lingren":{
-				usable:1,
+			xinfu_lingren:{
 				audio:2,
 				trigger:{
 					player:"useCardToPlayered",
 				},
-				direct:true,
 				filter:function(event,player){
 					if(event.getParent().triggeredTargets3.length>1) return false;
-					if(!player.isPhaseUsing()) return false;
 					if(!['basic','trick'].includes(get.type(event.card))) return false;
 					if(get.tag(event.card,'damage')) return true;
 					return false;
 				},
+				usable:1,
+				direct:true,
 				content:function(){
 					'step 0'
 					player.chooseTarget(get.prompt('xinfu_lingren'),'选择一名目标角色并猜测其手牌构成',function(card,player,target){
@@ -25049,6 +25051,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.log(player,'观看了',target,'的部分手牌');
 						player.chooseControl('ok').set('dialog',content);
 					}
+				},
+			},
+			fujian:{
+				audio:'xinfu_fujian',
+				trigger:{player:['phaseZhunbeiBegin','phaseJieshuBegin']},
+				filter(event,player){
+					return game.hasPlayer(target=>target!=player&&target.countCards('h')&&!target.isMaxHandcard());
+				},
+				forced:true,
+				async content(event,trigger,player){
+					const target=game.filterPlayer(target=>{
+						return target!=player&&target.countCards('h')&&!target.isMaxHandcard();
+					}).randomGet();
+					player.line(target);
+					game.log(player,'观看了',target,'的手牌');
+					player.viewHandcards(target);
 				},
 			},
 			xinfu_xionghuo:{
@@ -26167,7 +26185,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
-			"xinfu_lingren_info":"每回合限一次。当你于出牌阶段内使用带有「伤害」标签的基本牌或普通锦囊牌指定目标后，你可以猜测其中的一个目标的手牌中是否有基本牌，锦囊牌或装备牌。若你猜中的项目数：≥1，此牌对该角色的伤害+1；≥2，你摸两张牌；≥3，你获得技能〖奸雄〗和〖行殇〗直到你的下回合开始。",
+			"xinfu_lingren_info":"每回合限一次。当你使用带有「伤害」标签的基本牌或普通锦囊牌指定目标后，你可以猜测其中的一个目标的手牌中是否有基本牌，锦囊牌或装备牌。若你猜中的项目数：≥1，此牌对该角色的伤害+1；≥2，你摸两张牌；≥3，你获得技能〖奸雄〗和〖行殇〗直到你的下回合开始。",
 			"lingren_adddamage":"凌人",
 			"lingren_adddamage_info":"",
 			"lingren_jianxiong":"奸雄",
@@ -26175,7 +26193,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"lingren_xingshang":"行殇",
 			"lingren_xingshang_info":"当有角色死亡后，你可以选择一项：1.回复1点体力。2.获得该角色的所有牌。",
 			"xinfu_fujian":"伏间",
-			"xinfu_fujian_info":"锁定技，结束阶段开始时，你观看一名随机的其他角色的随机X张手牌。(X为场上手牌最少的角色的手牌数)",
+			"xinfu_fujian_info":"锁定技，结束阶段，你观看一名随机的其他角色的随机X张手牌。（X为场上手牌最少的角色的手牌数）",
+			fujian:'伏间',
+			fujian_info:'锁定技，准备阶段和结束阶段，你随机观看一名手牌数不为全场最多的其他角色的张手牌。',
 			xinfu_xionghuo:'凶镬',
 			xinfu_xionghuo_info:'游戏开始时，你获得3个“暴戾”标记（标记上限为3）。出牌阶段，你可以交给一名其他角色一个“暴戾”标记。当你对有“暴戾”标记的其他角色造成伤害时，此伤害+1。有“暴戾”标记的其他角色的出牌阶段开始时，其移去所有“暴戾”标记并随机执行一项：1.受到1点火焰伤害且本回合不能对你使用【杀】；2.失去1点体力且本回合手牌上限-1；3.你随机获得其一张手牌和一张装备区的牌。',
 			xinfu_shajue:'杀绝',
@@ -26487,7 +26507,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rehengjiang:'横江',
 			rehengjiang2:'横江',
 			rehengjiang3:'横江',
-			rehengjiang_info:'当你受到1点伤害后，你可以令当前回合角色本回合的手牌上限-1。然后若其弃牌阶段内没有弃牌，则你摸X张牌（X为你本回合内对其发动过〖横江〗的次数）。',
+			rehengjiang_info:'当你受到1点伤害后，你可以令当前回合角色本回合的手牌上限-1。然后若其弃牌阶段内有/没有弃牌，则你摸一/X张牌（X为你本回合内对其发动过〖横江〗的次数）。',
 			shuangren:'双刃',
 			shuangren_info:'出牌阶段开始时，你可以与一名角色拼点。若你赢，你视为对其或与其势力相同的另一名角色使用一张【杀】（不计入出牌阶段的次数限制）；若你没赢，你本回合内不能对其他角色使用牌。',
 			xiashu:'下书',
