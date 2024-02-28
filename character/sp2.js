@@ -137,9 +137,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:9,
 					result:{
 						target(player,target){
+							if(player.getHp()+player.countCards('hs',card=>player.canSaveCard(card,player))<=1) return 0;
 							const num=get.sgn(get.attitude(player,target));
 							if(num*get.damageEffect(target,player,player)>0) return num*get.damageEffect(target,player,player);
-							if(target==player&&player.getHp()>1) return 0.00001;
+							if(target==player) return 0.00001;
 							return 0;
 						},
 					},
