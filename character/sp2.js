@@ -38,7 +38,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinping:['male','qun',3,['fuyuan','zhongjie','yongdi']],
 			zhangning:['female','qun',3,['tianze','difa']],
 			tongyuan:['male','qun',4,['chaofeng','chuanshu']],
-			sp_mifangfushiren:['male','shu',4,['dcmffengshi']],
+			sp_mifangfushiren:['male','shu',4,['fengshi']],
 			re_nanhualaoxian:['male','qun',4,['gongxiu','jinghe']],
 			dufuren:['female','wei',3,['yise','shunshi']],
 			caoanmin:['male','wei',4,['xianwei']],
@@ -10725,6 +10725,83 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			//糜芳傅士仁
+			fengshi:{
+				audio:'mffengshi',
+				audioname:['sp_mifangfushiren'],
+				trigger:{player:'useCardToPlayered'},
+				filter(event,player){
+					if(!event.isFirstTarget) return false;
+					return event.targets.some(target=>{
+						return player.countCards('h')>target.countCards('h')&&target.countCards('he')>0&&player.hasCard(card=>{
+							return lib.filter.cardDiscardable(card,player,'fengshi');
+						},'he');
+					});
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const targetx=trigger.targets.filter(target=>{
+						return player.countCards('h')>target.countCards('h')&&target.countCards('he')>0&&player.hasCard(card=>{
+							return lib.filter.cardDiscardable(card,player,'fengshi');
+						},'he');
+					});
+					if(targetx.length==1){
+						const aim=targetx[0],info=get.info('dcmffengshi');
+						const {result:{bool}}=await player.chooseBool(get.prompt('fengshi',targets[0]),info.prompt2({card:trigger.card,target:aim},player)).set('choice',info.check({card:trigger.card,target:aim},player));
+					}
+					else{
+						const {result:{bool,targets}}=await player.chooseTarget(get.prompt('fengshi'),'弃置你与一名目标角色的各一张牌，然后令'+get.translation(event.card)+'对其造成的伤害+1',(card,player,target)=>{
+							const targets=get.event().getTrigger().targets;
+							if(!targets.includes(target)) return false;
+							return player.countCards('h')>target.countCards('h')&&target.countCards('he')>0&&player.hasCard(card=>{
+								return lib.filter.cardDiscardable(card,player,'fengshi');
+							},'he');
+						}).set('ai',target=>{
+							const player=get.event('player');
+							const card=get.event().getTrigger().card;
+							if(!get.info('dcmffengshi').check({card:card,target:target})) return 0;
+							return get.effect(target,{name:'guohe_copy2'},player,player);
+						});
+					}
+					if(bool){
+						const target=(targets?targets[0]:aim);
+						player.logSkill('fengshi',target);
+						player.chooseToDiscard('he',true);
+						player.discardPlayerCard(target,'he',true);
+						if(get.tag(trigger.card,'damage')){
+							var id=target.playerid;
+							var map=trigger.getParent().customArgs;
+							if(!map[id]) map[id]={};
+							if(typeof map[id].extraDamage!='number') map[id].extraDamage=0;
+							map[id].extraDamage++;
+						}
+					}
+				},
+				group:'fengshi_target',
+				subSkill:{
+					target:{
+						inherit:'dcmffengshi',
+						trigger:{target:'useCardToTargeted'},
+						filter(event,player){
+							if(event.player==event.target) return false;
+							return event.player.countCards('h')>event.target.countCards('h')&&event.target.countCards('he')>0&&player.hasCard(card=>{
+								return lib.filter.cardDiscardable(card,player,'fengshi');
+							},'he');
+						},
+						content(){
+							var target=lib.skill.dcmffengshi.logTarget(trigger,player);
+							player.chooseToDiscard('he',true);
+							player.discardPlayerCard(target,'he',true);
+							if(get.tag(trigger.card,'damage')){
+								var id=player.playerid;
+								var map=trigger.getParent().customArgs;
+								if(!map[id]) map[id]={};
+								if(typeof map[id].extraDamage!='number') map[id].extraDamage=0;
+								map[id].extraDamage++;
+							}
+						},
+					},
+				},
+			},
 			dcmffengshi:{
 				audio:'mffengshi',
 				audioname:['sp_mifangfushiren'],
@@ -11349,6 +11426,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mffengshi_info:'当你使用牌指定唯一目标后，或成为其他角色使用牌的唯一目标后，若此牌使用者的手牌数大于此牌目标的手牌数，则此牌的使用者可令你弃置自己和对方的各一张牌，并令此牌的伤害值+1。',
 			dcmffengshi:'锋势',
 			dcmffengshi_info:'当你使用牌指定唯一目标后，或成为其他角色使用牌的唯一目标后，若此牌使用者的手牌数大于此牌目标的手牌数，则你可弃置自己和对方的各一张牌，并令此牌的伤害值+1。',
+			fengshi:'锋势',
+			fengshi_info:'当你使用牌指定第一个目标后，你可弃置你与其中一名手牌数小于你的目标角色和对方的各一张牌，并令此牌对其造成的伤害+1；当你称为其他角色使用牌的目标后，你可以弃置你与其的各一张牌，并令此牌对你造成的伤害+1。',
 			tongyuan:'童渊',
 			chaofeng:'朝凤',
 			chaofeng_info:'出牌阶段限一次。当你造成伤害时，你可以弃置一张牌，然后摸一张牌。若此伤害的渠道为牌且你弃置的牌：与此牌颜色相同，则你改为摸两张牌；与此牌类型相同，则此伤害+1。',

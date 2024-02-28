@@ -4982,7 +4982,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					source:'damageSource',
 					player:'damageEnd',
 				},
-				usable:1,
+				usable:2,
 				logTarget:'source',
 				check:function(event,player){
 					if(typeof player.storage.dchaochong!='number'||player.storage.dchaochong==0) return true;
@@ -12574,7 +12574,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dchaochong:'昊宠',
 			dchaochong_info:'当你使用牌后，你可以将手牌摸至或弃置至你的手牌上限数（至多摸五张）。然后若你以此法：得到牌，你的手牌上限-1；失去牌，你的手牌上限+1。',
 			dcjinjin:'矜谨',
-			dcjinjin_info:'每回合限一次。当你造成或受到伤害后，你可以重置因〖昊宠〗增加或减少的手牌上限，令伤害来源弃置至多X张牌，然后你摸Y张牌（X为你以此法变化的手牌上限且至少为1，Y为X减其以此法弃置的牌数）。',
+			dcjinjin_info:'每回合限两次。当你造成或受到伤害后，你可以重置因〖昊宠〗增加或减少的手牌上限，令伤害来源弃置至多X张牌，然后你摸Y张牌（X为你以此法变化的手牌上限且至少为1，Y为X减其以此法弃置的牌数）。',
 			xianglang:'向朗',
 			dckanji:'勘集',
 			dckanji_info:'出牌阶段限两次。你可以展示所有手牌，若花色均不同，你摸两张牌。然后若你的手牌因此包含了四种花色，你跳过下一个弃牌阶段。',
