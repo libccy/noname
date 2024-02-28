@@ -26253,7 +26253,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			mifuren:'糜夫人',
 			sp_dongzhuo:'SP董卓',
 			sp_dongzhuo_prefix:'SP',
-			gz_chendong:'陈武董袭',
 			gz_jiangfei:'蒋琬费祎',
 			gz_jiangqing:'蒋钦',
 			hetaihou:'何太后',

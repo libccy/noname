@@ -1647,6 +1647,7 @@ window.noname_character_rank={
 		'sb_yl_luzhi',
 	],
 	d:[
+		'chendong',
 		'lvmeng',
 		'huaxiong',
 		'gongsunzan',

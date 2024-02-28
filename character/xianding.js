@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			chendong:['male','wu',4,['dcduanxie','fenming']],
 			lvfan:['male','wu',3,['diaodu','diancai']],
 			cuimao:['male','wei',3,['zhengbi','fengying']],
 			huzun:['male','wei',4,['dczhantao','dcanjing']],
@@ -98,7 +99,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			xianding:{
-				sp2_huben:['wangshuang','wenyang','re_liuzan','dc_huangzu','wulan','leitong','chentai','dc_duyu','dc_wangjun','dc_xiahouba','old_huangfusong','huzun'],
+				sp2_huben:['chendong','wangshuang','wenyang','re_liuzan','dc_huangzu','wulan','leitong','chentai','dc_duyu','dc_wangjun','dc_xiahouba','old_huangfusong','huzun'],
 				sp2_shengun:["puyuan","guanlu","gexuan",'wufan','re_zhangbao','dukui','zhaozhi','zhujianping','dc_zhouxuān','zerong'],
 				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji','cuimao'],
 				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie'],
@@ -116,6 +117,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//陈武董袭
+			dcduanxie:{
+				audio:'duanxie',
+				inherit:'duanxie',
+				selectTarget:1,
+			},
 			//吕范
 			diaodu:{
 				audio:2,
@@ -14676,6 +14683,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diaodu_info:'出牌阶段开始时，或当你发动〖典财〗后，你可以获得一名距离不大于1的一名角色A装备区里的一张牌，然后你将此牌交给另一名角色B，然后B选择是否使用此牌，若B使用/不使用，则你/B摸一张牌。',
 			diancai:'典财',
 			diancai_info:'其他角色的出牌阶段结束时，若你于此阶段失去了至少X张牌，则你可以将手牌摸至体力上限（X为你的体力值且X至多为5）。',
+			chendong:'陈武董袭',
+			dcduanxie:'断绁',
+			dcduanxie_info:'出牌阶段限一次，你可以令一名其他角色横置，然后你横置。',
 
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
