@@ -3675,7 +3675,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(event.dcgue||event.type=='wuxie'||player==_status.currentPhase) return false;
-					if(!player.countCards('h')||player.hasSkill('dcgue_blocker',null,null,false)) return false;
+					if(player.hasSkill('dcgue_blocker',null,null,false)) return false;
 					for(var name of ['sha','shan']){
 						if(event.filterCard({name:name,isCard:true},player,event)) return true;
 					}
@@ -3707,7 +3707,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								'step 0'
 								player.logSkill('dcgue');
 								player.addTempSkill('dcgue_blocker');
-								player.showHandcards();
+								if(player.countCards('h')) player.showHandcards();
 								delete event.result.skill;
 								'step 1'
 								if(player.countCards('h',{name:['sha','shan']})>1){
@@ -3722,7 +3722,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					prompt:function(links,player){
-						return '展示所有手牌'+(player.countCards('h',{name:['sha','shan']})<=1?'，然后视为使用【'+get.translation(links[0][2])+'】':'');
+						return (player.countCards?'展示所有手牌':'')+(player.countCards('h',{name:['sha','shan']})<=1?'，然后视为使用【'+get.translation(links[0][2])+'】':'');
 					}
 				},
 				subSkill:{blocker:{charlotte:true}},
@@ -5871,16 +5871,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dccuijin:{
 				audio:2,
 				trigger:{global:'useCard'},
-				direct:true,
 				filter:function(event,player){
-					return event.card.name=='sha'&&(event.player==player||player.inRange(event.player))&&player.countCards('he')>0;
+					return (event.card.name=='sha'||event.card.name=='juedou')&&(event.player==player||player.inRange(event.player))&&player.countCards('he')>0;
 				},
+				direct:true,
 				content:function(){
 					'step 0'
 					if(player!=game.me&&!player.isOnline()) game.delayx();
 					var target=trigger.player;
 					event.target=target;
-					player.chooseToDiscard('he',get.prompt('dccuijin',target),'弃置一张牌并令'+get.translation(trigger.player)+'使用的【杀】伤害+1，但若其未造成伤害，则你摸一张牌并对其造成1点伤害。').set('ai',function(card){
+					player.chooseToDiscard('he',get.prompt('dccuijin',target),'弃置一张牌并令'+get.translation(trigger.player)+'使用的【杀】伤害+1，但若其未造成伤害，则你摸两张牌并对其造成1点伤害。').set('ai',function(card){
 						if(_status.event.goon) return 7-get.value(card);
 						return 0;
 					}).set('goon',lib.skill.cuijin.checkx(trigger,player)).logSkill=['dccuijin',target];
@@ -5938,7 +5938,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								})){
 									player.logSkill('dccuijin_damage',source);
 									player.storage.dccuijin_map[card.cardid].remove(target);
-									player.draw();
+									player.draw(2);
 									if(source&&source.isIn()){
 										player.line(trigger.player,'green');
 										trigger.player.damage();
@@ -12523,7 +12523,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcanliao_info:'出牌阶段限X次（X为群势力角色数）。你可以重铸一名角色的一张牌。',
 			dc_yuejiu:'乐就',
 			dccuijin:'催进',
-			dccuijin_info:'当你或你攻击范围内的角色使用【杀】时，你可以弃置一张牌，令此【杀】的伤害基数+1。然后当此杀被目标角色抵消或无效或防止伤害后，你摸一张牌，对使用者造成1点伤害。',
+			dccuijin_info:'当你或你攻击范围内的角色使用【杀】或【决斗】时，你可以弃置一张牌，令此【杀】的伤害基数+1。然后当此牌被目标角色抵消或无效或防止伤害后，你摸两张牌并对使用者造成1点伤害。',
 			panghui:'庞会',
 			dcyiyong:'异勇',
 			dcyiyong_info:'当你对其他角色造成伤害时，若你有牌，你可以与其同时弃置至少一张牌。若你以此法弃置的牌的点数之和：不大于其，你摸X张牌；不小于其，此伤害+1（X为其以此法弃置的牌数）。',
@@ -12621,7 +12621,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqinghuang_info:'出牌阶段开始时，你可以减1点体力上限，然后你于本回合发动〖踏寂〗时额外随机执行一种效果。',
 			dc_huojun:'霍峻',
 			dcgue:'孤扼',
-			dcgue_info:'每回合限一次。当你需要于回合外使用或打出【杀】或【闪】时，若你有手牌，你可以展示之。若其中【杀】和【闪】的数量之和不超过1，你视为使用或打出此牌。',
+			dcgue_info:'每回合限一次。当你需要于回合外使用或打出【杀】或【闪】时，你可以发动此技能：你展示所有手牌，若其中【杀】和【闪】的数量之和不超过1，你视为使用或打出此牌。',
 			dcsigong:'伺攻',
 			dcsigong_info:'其他角色的回合结束时，若其于本回合内使用牌被响应过，你可以将手牌摸至或弃置至1，视为对其使用一张需使用X张【闪】抵消的【杀】，且此【杀】的伤害基数+1（X为你以此法弃置的牌数且至少为1）。当你以此法造成伤害后，该技能于本轮失效。',
 			peiyuanshao:'裴元绍',
