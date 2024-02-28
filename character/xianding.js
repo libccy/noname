@@ -119,7 +119,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'damageEnd'},
 				filter(event,player){
-					return event.source&&event.source!=player&&event.player.isIn();
+					if(!event.player.isIn()||(event.player!==player&&!player.inRange(event.player))) return false;
+					return event.source&&event.source!=player;
 				},
 				check(event,player){
 					if(!event.source.isIn()||!event.card||typeof get.number(event.card)!=='number') return 0;
@@ -128,12 +129,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				logTarget:'player',
 				async content(event,trigger,player){
 					player.judge(card=>{
-						const evt=get.event().getParent().getTrigger();
+						const evt=get.event().getParent(get.event('eventName')).getTrigger();
 						if(!evt.source.isIn()||!evt.card||typeof get.number(evt.card)!=='number') return 0;
 						if(get.number(card)>get.number(evt.card)) return 1.5;
 						return 0;
 					}).set('judge2',r=>r.bool).set('callback',()=>{
-						const evt=event.getParent(2).getTrigger();
+						const evtx=event.getParent();
+						const evt=event.getParent(evtx.eventName).getTrigger();
 						if(!evt.source.isIn()||!evt.card||typeof get.number(evt.card)!=='number') return;
 						if(event.judgeResult.number>get.number(evt.card)){
 							const sha=new lib.element.VCard({name:'sha'}),target=evt.source;
@@ -142,6 +144,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					})
+					.set('eventName',event.name)
 				}
 			},
 			dcanjing:{
@@ -151,6 +154,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.hasPlayer(current=>current.isDamaged());
 				},
 				usable:1,
+				direct:true,
 				async content(event,trigger,player){
 					const maxCount=player.getAllHistory('useSkill',evt=>evt.skill==='dcanjing').length+1;
 					const result=await player.chooseTarget(get.prompt2('dcanjing'),(card,player,target)=>target.isDamaged(),[1,maxCount])
@@ -158,7 +162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.attitude(get.player(),target)>0;
 						})
 						.forResult();
-					if(!result.bool) return;
+					if(!result.bool) return player.storage.counttrigger.dcanjing--;
 					const targets=result.targets.slice();
 					targets.sortBySeat(_status.currentPhase);
 					player.logSkill('dcanjing',targets);
