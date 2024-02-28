@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			liqueguosi:['male','qun',4,['xiongsuan']],
 			star_zhangchunhua:['female','wei',3,['starliangyan','starminghui']],
 			star_yuanshao:['male','qun',4,['starxiaoyan','starzongshi','starjiaowang','staraoshi'],['zhu']],
 			star_dongzhuo:['male','qun',5,['starweilin','starzhangrong','starhaoshou'],['zhu']],
@@ -97,7 +98,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			sp2:{
-				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi","duanwei","liangxing","zhangheng",'tangji','niufu','dongxie'],
+				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi","duanwei","liangxing","zhangheng",'tangji','niufu','dongxie','liqueguosi'],
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
 				sp_longzhou:["xf_tangzi","xf_huangquan","xf_sufei","sp_liuqi"],
 				sp_zizouqi:["mangyachang","xugong","zhangchangpu"],
@@ -118,6 +119,32 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//李傕郭汜
+			xiongsuan:{
+				audio:2,
+				enable:'phaseUse',
+				filterTarget:true,
+				filterCard:lib.filter.cardDiscardable,
+				position:'h',
+				usable:1,
+				async content(event,trigger,player){
+					const target=event.target;
+					await target.damage();
+					await player.draw(3);
+					if(target!=player) await player.loseHp();
+				},
+				ai:{
+					order:9,
+					result:{
+						target(player,target){
+							const num=get.sgn(get.attitude(player,target));
+							if(num*get.damageEffect(target,player,player)>0) return num*get.damageEffect(target,player,player);
+							if(target==player&&player.getHp()>1) return 0.00001;
+							return 0;
+						},
+					},
+				},
+			},
 			//张春华
 			starliangyan:{
 				audio:2,
@@ -11605,6 +11632,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starliangyan_info:'出牌阶段限一次。你可以选择一名其他角色，你摸/弃置至多两张牌，令其弃置/摸等量的牌。然后若你与其手牌数相同，以此法摸牌的角色跳过其下一个弃牌阶段。',
 			starminghui:'明慧',
 			starminghui_info:'一名角色的回合结束时，若你的手牌数：最少，你可以视为使用一张无距离限制的【杀】；最多，你可以将手牌弃置至你手牌数不为最多，然后令一名角色回复1点体力。',
+			liqueguosi:'李傕郭汜',
+			xiongsuan:'凶算',
+			xiongsuan_info:'出牌阶段限一次，你可以弃置一张手牌并对一名角色造成1点伤害，然后你摸三张牌。若该角色不为你，你失去1点体力。',
 
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

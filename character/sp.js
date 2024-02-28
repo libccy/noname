@@ -10,7 +10,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_tianzhu:['liyi','zhangyan','niujin','hejin','hansui',"wutugu","yanbaihu","shamoke","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna",'ol_wenqin'],
 				sp_nvshi:['ol_dingshangwan',"lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu',"daxiaoqiao","jin_guohuai",'ol_hujinding'],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','zhangzhi','lushi'],
-				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","zangba","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
+				sp_huben:['duanjiong','ol_mengda',"caohong","xiahouba","zhugeke","zumao","wenpin","litong","mazhong","heqi","quyi","luzhi","yuejin","dingfeng","wuyan","ol_zhuling","tianyu","huojun",'zhaoyǎn','dengzhong','ol_furong','macheng','ol_zhangyì','ol_zhujun','maxiumatie','luoxian','ol_huban','haopu','ol_qianzhao'],
 				sp_liesi:['lvboshe','mizhu','weizi','ol_liuba','zhangshiping'],
 				sp_default:["sp_diaochan","sp_zhaoyun","sp_sunshangxiang","sp_caoren","sp_jiangwei","sp_machao","sp_caiwenji","jsp_guanyu","jsp_huangyueying","sp_pangde","sp_jiaxu","yuanshu",'sp_zhangliao','sp_ol_zhanghe','sp_menghuo'],
 				sp_qifu:['ol_feiyi',"caoying",'panshu',"caochun","yuantanyuanshang",'caoshuang','wolongfengchu','guansuo','baosanniang','fengfangnv','jin_zhouchu'],
@@ -186,16 +186,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			kanze:['male','wu',3,['xiashu','kuanshi']],
 			heqi:['male','wu',4,['olqizhou','olshanxi']],
 
-			//mifuren:['female','shu',3,['guixiu','cunsi']],
 			yuejin:['male','wei',4,['xiaoguo']],
 			sp_dongzhuo:['male','qun',5,['hengzheng']],
 			hetaihou:['female','qun',3,['zhendu','qiluan']],
 			dingfeng:['male','wu',4,['reduanbing','refenxun']],
 			shamoke:['male','shu',4,['gzjili']],
-			//liqueguosi:['male','qun',4,['xiongsuan']],
-			//cuimao:['male','wei',3,['zhengbi','fengying']],
 
-			zangba:['male','wei',4,['rehengjiang']],
 			zhangren:['male','qun',4,['chuanxin','zfengshi']],
 
 			wangyun:['male','qun',4,['xinlianji','xinmoucheng'],['clan:太原王氏']],
@@ -15142,21 +15138,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				}
 			},
-			xiongsuan:{
-				audio:2,
-			},
-			diancai:{
-				audio:2,
-			},
-			diaodu:{
-				audio:2,
-			},
-			zhengbi:{
-				audio:2,
-			},
-			fengying:{
-				audio:2,
-			},
 			//新服曹笨
 			xinshanjia:{
 				group:["xinshanjia_count"],
@@ -26338,9 +26319,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			bianfuren:'卞夫人',
 			ol_bianfuren:'卞夫人',
 			shamoke:'沙摩柯',
-			lvfan:'吕范',
-			liqueguosi:'李傕郭汜',
-			cuimao:'崔琰毛玠',
 
 			caoying:"曹婴",
 			simahui:"司马徽",
@@ -26438,16 +26416,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wanwei_info:'当你因被其他角色获得或弃置而失去牌时，你可以改为自己选择失去的牌。',
 			gzjili:'蒺藜',
 			gzjili_info:'当你于一回合内使用或打出第X张牌时，你可以摸X张牌（X为你的攻击范围）。',
-			xiongsuan:'凶算',
-			xiongsuan_info:'限定技，出牌阶段，你可以弃置一张手牌并选择一名角色，对其造成1点伤害，然后你摸三张牌。若该角色有已发动的限定技，则你选择其中一个限定技。此回合结束后，视为该限定技未发动过。',
-			diaodu:"调度",
-			diaodu_info:"当你使用装备牌时，你可以摸一张牌；出牌阶段开始时，你可以获得一名其他角色装备区里的一张牌，然后你可以将此牌交给另一名角色。",
-			diancai:'典财',
-			diancai_info:'其他角色的出牌阶段结束时，若你于此阶段失去了X张或更多的牌，则你可以将手牌摸至体力上限。（X为你的体力值）',
-			zhengbi:'征辟',
-			zhengbi_info:'出牌阶段开始时，你可以选择一项：选择一名未受伤的其他角色，你对其使用的牌无距离限制且不计入使用次数直到回合结束；或将一张基本牌交给一名其他角色，然后其交给你一张非基本牌或两张基本牌。',
-			fengying:'奉迎',
-			fengying_info:'限定技，出牌阶段，你可以弃置所有手牌。若如此做，你可以令等量的角色将手牌摸至X张(X为其体力上限且至多为5)。然后，你结束出牌阶段，并在当前回合结束后进行一个新的回合。',
 
 			qingzhong:'清忠',
 			qingzhong_info:'出牌阶段开始时，你可以摸两张牌，若如此做，此阶段结束时，你与手牌数最少的角色交换手牌。',
