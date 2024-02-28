@@ -225,7 +225,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										return 0;
 									}).set('prompt','征辟：交给'+get.translation(player)+'…</div>');
 									const check=(control=='一张非基本牌');
-									await target.chooseToGive('he',(check?1:2),{type:(check?['trick','delay','equip']:'basic')},true).set('prompt','征辟：交给'+get.translation(player)+control);
+									await target.chooseToGive('he',(check?1:2),{type:(check?['trick','delay','equip']:'basic')},player,true).set('prompt','征辟：交给'+get.translation(player)+control);
 								}
 								else if(target.countCards('h')) await target.give(target.getCards('h'),player);
 							}
