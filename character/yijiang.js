@@ -654,7 +654,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.addTempSkill('shiming_round','roundStart');
-					var cards=get.cards(2);
+					var cards=get.cards(3);
 					player.chooseButton(['识命：是否将其中一张置于牌堆底？',cards.slice(0)]).set('ai',button=>{
 						var att=_status.event.att,damage=_status.event.damage,val=get.value(button.link,_status.event.player);
 						if(att>0&&damage<0||att<=0&&damage>0) return 6-val;
@@ -713,6 +713,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('jiangxi');
 						event.logged=true;
 						player.removeSkill('shiming_round');
+						player.draw();
 					}
 					'step 2'
 					if(!game.hasPlayer2(current=>current.getHistory('damage').length>0)){
@@ -14578,9 +14579,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shuojian_info:'出牌阶段限三次。你可以交给一名其他角色一张牌，其选择一项：1.令你摸X张牌并弃置X-1张牌；2.视为使用X张【过河拆桥】，然后此技能本回合失效（X为此技能本阶段剩余发动次数+1）。',
 			yj_qiaozhou:'谯周',
 			shiming:'识命',
-			shiming_info:'每轮限一次。一名角色的摸牌阶段，你可以观看牌堆顶的两张牌，并可以将其中一张置于牌堆底。然后该角色可以改为对自己造成1点伤害，然后从牌堆底摸三张牌。',
+			shiming_info:'每轮限一次。一名角色的摸牌阶段，你可以观看牌堆顶的三张牌，并可以将其中一张置于牌堆底。然后该角色可以改为对自己造成1点伤害，然后从牌堆底摸三张牌。',
 			jiangxi:'将息',
-			jiangxi_info:'一名角色的回合结束时，若一号位于此回合内进入过濒死状态或未受到过伤害，你可以重置〖识命〗；若所有角色均未受到过伤害，你可以与当前回合角色各摸一张牌。',
+			jiangxi_info:'一名角色的回合结束时，若一号位于此回合内进入过濒死状态或未受到过伤害，你可以重置〖识命〗并摸一张牌；若所有角色均未受到过伤害，你可以与当前回合角色各摸一张牌。',
 			hanlong:'韩龙',
 			duwang:'独往',
 			duwang_info:'锁定技。①游戏开始时，你从牌堆顶将五张不为【杀】的牌置于武将牌上，称为“刺”。②若你有牌名不为【杀】“刺”，你至其他角色或其他角色至你的距离+1。',

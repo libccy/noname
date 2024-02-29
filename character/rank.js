@@ -922,6 +922,9 @@ window.noname_character_rank={
 		'tw_mayunlu',
 		'tw_hucheer',
 		'sp_lvfan',
+		'lvfan',
+		'cuimao',
+		'liqueguosi',
 		're_chendeng',
 		'wuyan',
 		'wangyue',
@@ -1644,6 +1647,7 @@ window.noname_character_rank={
 		'sb_yl_luzhi',
 	],
 	d:[
+		'chendong',
 		'lvmeng',
 		'huaxiong',
 		'gongsunzan',
