@@ -3829,16 +3829,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.hasPlayer(i=>i!=player);
 				},
 				content:function*(event,map){
-					var player=map.player,trigger=map.trigger;
-					var targets=game.filterPlayer(i=>i!=player);
+					var player=map.player,trigger=map.trigger, targets=game.filterPlayer(i=>i!=player);
+					var shas=player.mayHaveSha(target,'use',null,'count')-player.getCardUsable('sha',true);
 					for(var target of targets){
 						var att=get.attitude(target,player);
 						var result=yield target.chooseCard('he',`负山：是否交给${get.translation(player)}一张牌？`,`若如此做，其此阶段使用【杀】的次数上限+1`).set('att',att).set('ai',card=>{
 							if(!get.event('goon')) return -get.value(card);
 							var isSha=get.name(card,get.event('target'))=='sha';
 							if(get.event('att')<0) return (isSha?0:5)-get.value(card);
-							return (isSha?10:5.5)-get.value(card);
-						}).set('goon',att>0&&player.countCards('sha')>player.getCardUsable('sha',true)||att<0&&!player.hasSkill('jsrgfushan_sha')).set('target',player);
+							return (isSha?10:0)-get.value(card);
+						}).set('goon',att>0&&shas>=0||att<0&&target.hp>player.getCardUsable('sha',true)&&shas<-1/Math.max(1,player.hp)).set('target',player);
 						if(result.bool){
 							target.give(result.cards,player);
 							target.line(player);

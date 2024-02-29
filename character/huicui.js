@@ -5881,7 +5881,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player!=game.me&&!player.isOnline()) game.delayx();
 					var target=trigger.player;
 					event.target=target;
-					player.chooseToDiscard('he',get.prompt('dccuijin',target),'弃置一张牌并令'+get.translation(trigger.player)+'使用的【杀】伤害+1，但若其未造成伤害，则你摸两张牌并对其造成1点伤害。').set('ai',function(card){
+					player.chooseToDiscard('he',get.prompt('dccuijin',target),'弃置一张牌并令'+get.translation(trigger.player)+'使用的'+get.translation(trigger.card)+'伤害+1，但若其未造成伤害，则你摸两张牌并对其造成1点伤害。').set('ai',function(card){
 						if(_status.event.goon) return 7-get.value(card);
 						return 0;
 					}).set('goon',lib.skill.cuijin.checkx(trigger,player)).logSkill=['dccuijin',target];
@@ -12524,7 +12524,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcanliao_info:'出牌阶段限X次（X为群势力角色数）。你可以重铸一名角色的一张牌。',
 			dc_yuejiu:'乐就',
 			dccuijin:'催进',
-			dccuijin_info:'当你或你攻击范围内的角色使用【杀】或【决斗】时，你可以弃置一张牌，令此【杀】的伤害基数+1。然后当此牌被目标角色抵消或无效或防止伤害后，你摸两张牌并对使用者造成1点伤害。',
+			dccuijin_info:'当你或你攻击范围内的角色使用【杀】或【决斗】时，你可以弃置一张牌，令此牌的伤害基数+1。然后当此牌被目标角色抵消或无效或防止伤害后，你摸两张牌并对使用者造成1点伤害。',
 			panghui:'庞会',
 			dcyiyong:'异勇',
 			dcyiyong_info:'当你对其他角色造成伤害时，若你有牌，你可以与其同时弃置至少一张牌。若你以此法弃置的牌的点数之和：不大于其，你摸X张牌；不小于其，此伤害+1（X为其以此法弃置的牌数）。',

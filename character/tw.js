@@ -4685,27 +4685,75 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					game.addVideo('delay',null,2);
 					'step 1'
 					var list=['basic','trick','equip'].filter(type=>cards.some(card=>get.type2(card)==type));
+					let fs=game.filterPlayer(i=>get.attitude(_status.event.player,i)>0).sort((a,b)=>{
+							if(a===player){//尽量把player往前放
+								if(a.hp<b.hp) return 1;
+								return -1;
+							}
+							if(b===player){
+								if(b.hp<a.hp) return -1;
+								return 1;
+							}
+							return b.hp-a.hp;
+						}),
+						es=game.filterPlayer(i=>get.attitude(_status.event.player,i)<0).sort((a,b)=>a.hp-b.hp),
+						types=list.map(type=>{
+							let num=0;
+							for(let i of event.cards){
+								if(get.type2(i)==type) num++;
+							}
+							return [type,num];
+						}).sort((a,b)=>b[1]-a[1]);
+					event.tempCache={
+						max:-Infinity,
+						tars:[]
+					};
+					for(let idx=0;idx<types.length;idx++){
+						let f,e,temp=0,tars=[],type=types[idx][1];
+						if(es.length*3>=type){//都分给敌人
+							e=-type;
+							while(temp<es.length&&temp<type){
+								e+=10/(2+es[temp].hp);
+								tars.push(es[temp]);
+								temp++;
+							}
+							if(e>event.tempCache.max){
+								event.tempCache.type=types[idx][0];
+								event.tempCache.max=e;
+								event.tempCache.tars=tars.slice(0);
+								delete event.tempCache.more;
+							}
+						}
+						if(fs.length*3>=type){//都分给队友
+							tars=[];
+							f=type-10/(2+fs[0].hp);
+							temp=type-Math.max(3,type);//让血厚的尽可能多拿
+							if(temp){
+								if(fs.length<3){
+									tars.push(fs[1]);
+									if(temp>=3) f-=10/(2+fs[1].hp);
+								}
+								else{
+									if(player!==fs[0]){
+										tars.push(player);
+										temp-=Math.max(2,temp);
+									}
+									if(temp) tars.addArray(fs.filter(i=>fs[0]!==i&&player!==i).sort((a,b)=>{
+										return get.attitude(_status.event.player,b)-get.attitude(_status.event.player,a);
+									}).slice(temp<3?-1:-2));
+								}
+							}
+							if(f>event.tempCache.max){
+								event.tempCache.type=types[idx][0];
+								event.tempCache.max=f;
+								event.tempCache.more=fs[0];
+								event.tempCache.tars=tars.slice(0);
+							}
+						}
+					}
 					player.chooseControl(list).set('ai',function(){
-						var listy=['basic','trick','equip'],listz=[0,0,0];
-						var num=0,numx=0,num2=0,numx2=0;
-						for(var i of _status.event.getParent().cards){
-							for(var j=0;j<2;j++){
-								if(get.type2(i)==listy[j]) listz[j]++;
-							}
-						}
-						for(var k=0;k<2;k++){
-							if(listz[k]>num){
-								num=listz[k];
-								numx=k;
-							}
-							if(listz[k]<num2){
-								num2=listz[k];
-								numx2=k;
-							}
-						}
-						if(!_status.event.player.hasFriend()&&player.hp>2) return listy[numx2];
-						return listy[numx];
-					});
+						return _status.event.type;
+					}).set('type',event.tempCache.type);
 					'step 2'
 					game.broadcastAll('closeDialog',event.videoId);
 					event.cardsx=[];
@@ -4723,7 +4771,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					if(event.cardsx.length>1){
 						player.chooseCardButton('兴乱：请选择要分配的牌',true,event.cardsx,[1,Math.min(3,event.cardsx.length)]).set('ai',function(button){
-							if(ui.selected.buttons.length==0) return 1;
+							if(ui.selected.buttons.length==0) return get.buttonValue(button);
 							return 0;
 						});
 					}
@@ -4742,18 +4790,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var togive=_status.event.getParent().togive;
 							return (map[target.playerid]||[]).length+togive.length<=3;
 						}).set('ai',function(target){
-							var player=_status.event.player,att=get.attitude(player,target);
-							var map=_status.event.getParent().given_map;
-							var togive=_status.event.getParent().togive;
-							var num=(map[player.playerid]||[]).length,num2=(map[target.playerid]||[]).length;
-							var value=_status.event.value,eff=get.effect(target,{name:'losehp'},player,player);
-							if(num2+togive.length==num&&player!=target) return value*Math.sign(att)+eff+1000;
-							else{
-								if(value<0) return -att+1000;
-								else if(att>0) return 1.5*att/(1+target.countCards('h'))+(player==target?eff/3:0)+1000;
-								else return att/100+1000;
+							let targets=_status.event.targets,att=get.attitude(_status.event.player,target);
+							if(targets.length){
+								if(targets.includes(target)) return Math.max(1,att*_status.event.value);
+								return 0;
 							}
-						}).set('value',cards.reduce((p,c)=>p+get.value(c,player,'raw'),0));
+							return att*_status.event.value;
+						}).set('value',cards.reduce((p,c)=>p+get.value(c,player,'raw'),0)).set('more',event.tempCache.more).set('targets',function(){
+							let arr=[],arr2=[];
+							if(event.tempCache.more&&(event.given_map[event.tempCache.more.playerid]||[]).length+cards.length<=3) return [event.tempCache.more];
+							for(let cur of event.tempCache.tars){
+								let map=(event.given_map[cur.playerid]||[]).length;
+								if(map+cards.length<=3){
+									if(map) arr2.push(cur);
+									else arr.push(cur);
+								}
+							}
+							if(arr.length) return arr;
+							return arr2;
+						}());
 					}
 					'step 5'
 					if(result.bool){
