@@ -2783,7 +2783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.num=player.countMark('xintaoluan2');
 					player.chooseTarget(true,function(card,player,target){
 						return target!=player;
-					},'滔乱<br><br><div class="text center">令一名其他角色选择一项：1.交给你'+get.cnNumber(event.num)+'张与你以此法使用的牌类别相同的牌；2.你失去'+get.cnNumber(event.num)+'点体力').set('ai',function(target){
+					},'滔乱<br><br><div class="text center">令一名其他角色选择一项：1.交给你'+get.cnNumber(event.num)+'张与你以此法使用的牌类别不同的牌；2.你失去'+get.cnNumber(event.num)+'点体力').set('ai',function(target){
 						var player=_status.event.player;
 						if(get.attitude(player,target)>0){
 							if(get.attitude(target,player)>0){
@@ -5355,7 +5355,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(true,function(card,player,target){
 						return target!=player;
-					},'滔乱<br><br><div class="text center">令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别相同的牌；2.你失去1点体力').set('ai',function(target){
+					},'滔乱<br><br><div class="text center">令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别不同的牌；2.你失去1点体力').set('ai',function(target){
 						var player=_status.event.player;
 						if(get.attitude(player,target)>0){
 							if(get.attitude(target,player)>0){
