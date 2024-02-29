@@ -208,7 +208,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.when('phaseUseEnd').filter(evt=>evt==trigger).then(()=>{
 								if(target.isIn()&&target.getHistory('gain',evt=>evt.getParent('phaseUse')==trigger).length){
 									player.line(target);
-									let num=(target.countGainableCards(player,'h')>0)+(target.countCardsGainableCards(player,'e')>0);
+									let num=(target.countGainableCards(player,'h')>0)+(target.countGainableCards(player,'e')>0);
 									if(num){
 										player.gainPlayerCard(target,num,'he',true).set('filterButton',button=>{
 											return !ui.selected.buttons.some(but=>get.position(button.link)==get.position(but.link));
