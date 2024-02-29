@@ -543,7 +543,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						'令其摸一张牌',
 					][['豹','鹰','熊','兔'].indexOf(zhoufa)]:'令其随机执行一个效果';
 					const {result:{bool,targets}}=await player.chooseTarget(get.prompt('shoufa'),'选择一名距离'+(event.triggername=='damageEnd'?'':'不')+'大于2的角色，'+str,(card,player,target)=>{
-						const name=_status.event.name;
+						const name=_status.event.triggername;
 						if(name=='damageEnd'&&get.distance(player,target)<=2) return false;
 						if(name=='damageSource'&&get.distance(player,target)>2) return false;
 						const zhoufa=player.storage.zhoulin_zhoufa;
@@ -570,7 +570,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							case '兔':
 								return get.effect(target,{name:'draw'},player,player);
 						}
-					}).set('name',event.triggername);
+					}).set('triggername',event.triggername);
 					if(!bool) return;
 					const target=targets[0];
 					player.logSkill('shoufa',target);

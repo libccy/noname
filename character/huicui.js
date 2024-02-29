@@ -1043,14 +1043,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(bool){
 						const name=links.find(i=>typeof i=='string'),card=links.find(j=>j!=name),cardname=map[name];
 						const {result:{bool,targets}}=await player.chooseTarget('请选择【'+name+'（'+get.translation(card)+'）】置入的目标',(cardx,player,target)=>{
-							return target.canAddJudge(get.autoViewAs({name:'dczixi_'+get.event('name')},[get.event('card')]));
+							return target.canAddJudge(get.autoViewAs({name:'dczixi_'+get.event('cardname')},[get.event('card')]));
 						},true).set('ai',target=>{
 							const player=get.event('player'),card=get.event('card');
 							if(game.hasPlayer(current=>{
-								return get.attitude(player,current)<0&&current.canAddJudge(get.autoViewAs({name:'dczixi_'+get.event('name')},[card]));
+								return get.attitude(player,current)<0&&current.canAddJudge(get.autoViewAs({name:'dczixi_'+get.event('cardname')},[card]));
 							})) return -target.countCards('j')-1;
 							return target.countCards('j')+1;
-						}).set('card',card).set('name',cardname);
+						}).set('card',card).set('cardname',cardname);
 						if(bool){
 							const target=targets[0];
 							player.logSkill('dczixi',target);
