@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'sp2',
 		connect:true,
 		character:{
+			liqueguosi:['male','qun',4,['xiongsuan']],
 			star_zhangchunhua:['female','wei',3,['starliangyan','starminghui']],
 			star_yuanshao:['male','qun',4,['starxiaoyan','starzongshi','starjiaowang','staraoshi'],['zhu']],
 			star_dongzhuo:['male','qun',5,['starweilin','starzhangrong','starhaoshou'],['zhu']],
@@ -97,7 +98,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			sp2:{
-				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi","duanwei","liangxing","zhangheng",'tangji','niufu','dongxie'],
+				sp_whlw:["xurong","lijue","zhangji","fanchou","guosi","duanwei","liangxing","zhangheng",'tangji','niufu','dongxie','liqueguosi'],
 				sp_zlzy:["zhangqiying","lvkai","zhanggong","weiwenzhugezhi","beimihu"],
 				sp_longzhou:["xf_tangzi","xf_huangquan","xf_sufei","sp_liuqi"],
 				sp_zizouqi:["mangyachang","xugong","zhangchangpu"],
@@ -118,6 +119,33 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//李傕郭汜
+			xiongsuan:{
+				audio:2,
+				enable:'phaseUse',
+				filterTarget:true,
+				filterCard:lib.filter.cardDiscardable,
+				position:'h',
+				usable:1,
+				async content(event,trigger,player){
+					const target=event.target;
+					await target.damage();
+					await player.draw(3);
+					if(target!=player) await player.loseHp();
+				},
+				ai:{
+					order:9,
+					result:{
+						target(player,target){
+							if(player.getHp()+player.countCards('hs',card=>player.canSaveCard(card,player))<=1) return 0;
+							const num=get.sgn(get.attitude(player,target));
+							if(num*get.damageEffect(target,player,player)>0) return num*get.damageEffect(target,player,player);
+							if(target==player) return 0.00001;
+							return 0;
+						},
+					},
+				},
+			},
 			//张春华
 			starliangyan:{
 				audio:2,
@@ -10739,34 +10767,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				direct:true,
 				async content(event,trigger,player){
-					const targetx=trigger.targets.filter(target=>{
+					const {result:{bool,targets}}=await player.chooseTarget(get.prompt('fengshi'),'弃置你与一名目标角色的各一张牌，然后令'+get.translation(event.card)+'对其造成的伤害+1',(card,player,target)=>{
+						const targets=get.event().getTrigger().targets;
+						if(!targets.includes(target)) return false;
 						return player.countCards('h')>target.countCards('h')&&target.countCards('he')>0&&player.hasCard(card=>{
 							return lib.filter.cardDiscardable(card,player,'fengshi');
 						},'he');
+					}).set('ai',target=>{
+						const player=get.event('player');
+						const card=get.event().getTrigger().card;
+						if(!get.info('dcmffengshi').check({card:card,target:target})) return 0;
+						return get.effect(target,{name:'guohe_copy2'},player,player);
 					});
-					if(targetx.length==1){
-						const aim=targetx[0],info=get.info('dcmffengshi');
-						const {result:{bool}}=await player.chooseBool(get.prompt('fengshi',targets[0]),info.prompt2({card:trigger.card,target:aim},player)).set('choice',info.check({card:trigger.card,target:aim},player));
-					}
-					else{
-						const {result:{bool,targets}}=await player.chooseTarget(get.prompt('fengshi'),'弃置你与一名目标角色的各一张牌，然后令'+get.translation(event.card)+'对其造成的伤害+1',(card,player,target)=>{
-							const targets=get.event().getTrigger().targets;
-							if(!targets.includes(target)) return false;
-							return player.countCards('h')>target.countCards('h')&&target.countCards('he')>0&&player.hasCard(card=>{
-								return lib.filter.cardDiscardable(card,player,'fengshi');
-							},'he');
-						}).set('ai',target=>{
-							const player=get.event('player');
-							const card=get.event().getTrigger().card;
-							if(!get.info('dcmffengshi').check({card:card,target:target})) return 0;
-							return get.effect(target,{name:'guohe_copy2'},player,player);
-						});
-					}
 					if(bool){
-						const target=(targets?targets[0]:aim);
+						const target=targets[0];
 						player.logSkill('fengshi',target);
-						player.chooseToDiscard('he',true);
-						player.discardPlayerCard(target,'he',true);
+						await player.chooseToDiscard('he',true);
+						await player.discardPlayerCard(target,'he',true);
 						if(get.tag(trigger.card,'damage')){
 							var id=target.playerid;
 							var map=trigger.getParent().customArgs;
@@ -10783,14 +10800,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{target:'useCardToTargeted'},
 						filter(event,player){
 							if(event.player==event.target) return false;
-							return event.player.countCards('h')>event.target.countCards('h')&&event.target.countCards('he')>0&&player.hasCard(card=>{
+							return event.player.countCards('h')>player.countCards('h')&&event.player.countCards('he')>0&&player.hasCard(card=>{
 								return lib.filter.cardDiscardable(card,player,'fengshi');
 							},'he');
 						},
-						content(){
-							var target=lib.skill.dcmffengshi.logTarget(trigger,player);
-							player.chooseToDiscard('he',true);
-							player.discardPlayerCard(target,'he',true);
+						async content(event,trigger,player){
+							const target=trigger.player;
+							await player.chooseToDiscard('he',true);
+							await player.discardPlayerCard(target,'he',true);
 							if(get.tag(trigger.card,'damage')){
 								var id=player.playerid;
 								var map=trigger.getParent().customArgs;
@@ -10827,7 +10844,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(viewer==player){
 						if(get.attitude(viewer,target)>=0) return false;
 						if(player.countCards('he',(card)=>get.value(card,player)<5)) return true;
-						var card=_status.event.getTrigger().card;
+						var card=get.event().getTrigger().card;
 						if((get.tag(card,'damage')||target.countCards('he',(card)=>get.value(card,target)>6))&&player.countCards('he',(card)=>get.value(card,player)<7)) return true;
 						return false;
 					}
@@ -11427,7 +11444,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcmffengshi:'锋势',
 			dcmffengshi_info:'当你使用牌指定唯一目标后，或成为其他角色使用牌的唯一目标后，若此牌使用者的手牌数大于此牌目标的手牌数，则你可弃置自己和对方的各一张牌，并令此牌的伤害值+1。',
 			fengshi:'锋势',
-			fengshi_info:'当你使用牌指定第一个目标后，你可弃置你与其中一名手牌数小于你的目标角色和对方的各一张牌，并令此牌对其造成的伤害+1；当你称为其他角色使用牌的目标后，你可以弃置你与其的各一张牌，并令此牌对你造成的伤害+1。',
+			fengshi_info:'当你使用牌指定第一个目标后，你可弃置你与其中一名手牌数小于你的目标角色的各一张牌，并令此牌对其造成的伤害+1；当你成为其他角色使用牌的目标后，若你的手牌数小于其，则你可以弃置你与其的各一张牌，并令此牌对你造成的伤害+1。',
 			tongyuan:'童渊',
 			chaofeng:'朝凤',
 			chaofeng_info:'出牌阶段限一次。当你造成伤害时，你可以弃置一张牌，然后摸一张牌。若此伤害的渠道为牌且你弃置的牌：与此牌颜色相同，则你改为摸两张牌；与此牌类型相同，则此伤害+1。',
@@ -11616,6 +11633,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			starliangyan_info:'出牌阶段限一次。你可以选择一名其他角色，你摸/弃置至多两张牌，令其弃置/摸等量的牌。然后若你与其手牌数相同，以此法摸牌的角色跳过其下一个弃牌阶段。',
 			starminghui:'明慧',
 			starminghui_info:'一名角色的回合结束时，若你的手牌数：最少，你可以视为使用一张无距离限制的【杀】；最多，你可以将手牌弃置至你手牌数不为最多，然后令一名角色回复1点体力。',
+			liqueguosi:'李傕郭汜',
+			xiongsuan:'凶算',
+			xiongsuan_info:'出牌阶段限一次，你可以弃置一张手牌并对一名角色造成1点伤害，然后你摸三张牌。若该角色不为你，你失去1点体力。',
 
 			sp_whlw:"文和乱武",
 			sp_zlzy:"逐鹿中原",

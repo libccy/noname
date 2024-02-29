@@ -14038,22 +14038,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					let d1=true,e=false;
 					if(event.player.hasSkill('jueqing')||event.player.hasSkill('gangzhi')) d1=false;
 					for(let tar of event.targets){
-						if(!tar.mayHaveShan(player,'use',tar.getCards('h',i=>{
-							return i.hasGaintag('sha_notshan');
-						}))||event.player.hasSkillTag('directHit_ai',true,{
-							target:tar,
-							card:event.card,
-						},true)){
-							if(!tar.hasSkill('gangzhi')) d1=false;
-							if(!tar.hasSkillTag('filterDamage',null,{
-								player:event.player,
+						if(event.card.name=='sha'){
+							if(!tar.mayHaveShan(player,'use',tar.getCards('h',i=>{
+								return i.hasGaintag('sha_notshan');
+							}))||event.player.hasSkillTag('directHit_ai',true,{
+								target:tar,
 								card:event.card,
-							})){
-								let att=get.attitude(_status.event.player,tar);
-								if(att>0) return false;
-								if(att<0) e=true;
+							},true)){
+								if(!tar.hasSkill('gangzhi')) d1=false;
+								if(!tar.hasSkillTag('filterDamage',null,{
+									player:event.player,
+									card:event.card,
+								})){
+									let att=get.attitude(_status.event.player,tar);
+									if(att>0) return false;
+									if(att<0) e=true;
+								}
 							}
 						}
+						else e=true;
 					}
 					if(e) return true;
 					if(d1) return get.damageEffect(event.player,player,_status.event.player)>0;

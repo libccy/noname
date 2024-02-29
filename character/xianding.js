@@ -4,6 +4,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			chendong:['male','wu',4,['dcduanxie','fenming']],
+			lvfan:['male','wu',3,['diaodu','diancai']],
+			cuimao:['male','wei',3,['zhengbi','fengying']],
 			huzun:['male','wei',4,['dczhantao','dcanjing']],
 			zhugemengxue:['female','wei',3,['dcjichun','dchanying']],
 			bailingyun:['female','wei',3,['dclinghui','dcxiace','dcyuxin']],
@@ -96,16 +99,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			xianding:{
-				sp2_huben:['wangshuang','wenyang','re_liuzan','dc_huangzu','wulan','leitong','chentai','dc_duyu','dc_wangjun','dc_xiahouba','old_huangfusong','huzun'],
+				sp2_huben:['chendong','wangshuang','wenyang','re_liuzan','dc_huangzu','wulan','leitong','chentai','dc_duyu','dc_wangjun','dc_xiahouba','old_huangfusong','huzun'],
 				sp2_shengun:["puyuan","guanlu","gexuan",'wufan','re_zhangbao','dukui','zhaozhi','zhujianping','dc_zhouxuān','zerong'],
-				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji'],
+				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji','cuimao'],
 				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie'],
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue','caoxian','dc_qinghegongzhu','zhugemengxue'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan','caoyi'],
 				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli','bailingyun'],
-				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng'],
+				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng','lvfan'],
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi','dc_xujing'],
 				sp2_qifu:['dc_guansuo','xin_baosanniang','dc_zhaoxiang'],
 				sp2_gaoshan:['wanglang','liuhui','zhangjian'],
@@ -114,6 +117,158 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			}
 		},
 		skill:{
+			//陈武董袭
+			dcduanxie:{
+				audio:'duanxie',
+				inherit:'duanxie',
+				selectTarget:1,
+			},
+			//吕范
+			diaodu:{
+				audio:2,
+				trigger:{player:['phaseUseBegin','logSkill']},
+				filter(event,player){
+					if(event.name=='logSkill'&&event.skill!='diancai') return false;
+					return game.hasPlayer(target=>{
+						return get.distance(player,target)<=1&&target.countGainableCards(player,'e');
+					});
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const {result:{bool,targets}}=await player.chooseTarget(get.prompt2('diaodu'),(card,player,target)=>{
+						return get.distance(player,target)<=1&&target.countGainableCards(player,'e');
+					}).set('ai',target=>{
+						const player=get.event('player'),att=get.attitude(player,target);
+						let num=0;
+						if(target.hasSkill('gzxiaoji')) num+=2.5;
+						if(target.isDamaged()&&target.getEquip('baiyin')) num+=2.5;
+						if(target.hasSkill('xuanlve')) num+=2;
+						return get.sgn(att)*num+(target==player?1:0);
+					});
+					if(bool){
+						const aim=targets[0];
+						player.logSkill('diaodu',aim);
+						const {result:{bool,cards}}=await player.gainPlayerCard(aim,'e',true);
+						if(bool&&game.hasPlayer(target=>target!=aim)){
+							const card=cards[0];
+							const {result:{bool,targets}}=await player.chooseTarget('调度：将'+get.translation(card)+'交给另一名角色',(card,player,target)=>{
+								return target!=get.event('aim');
+							},true).set('ai',target=>{
+								const player=get.event('player');
+								return att=get.attitude(player,target);
+							}).set('aim',aim);
+							if(bool&&get.owner(card)==player){
+								const target=targets[0];
+								player.line(target,'green');
+								await player.give([card],target);
+								if(get.owner(card)==target){
+									const {result:{bool}}=await target.chooseUseTarget(card);
+									if(bool) await player.draw();
+									else await target.draw();
+								}
+							}
+						}
+					}
+				},
+			},
+			diancai:{
+				audio:2,
+				inherit:'mbdiancai',
+				filter(event,player){
+					if(!player.getHp()||_status.currentPhase===player) return false;
+					let num=player.getHistory('lose',evt=>{
+						return evt.cards2&&evt.cards2.length&&evt.getParent('phaseUse')==event;
+					}).reduce((sum,evt)=>{
+						return sum+evt.cards2.length;
+					},0);
+					return num>=Math.min(5,player.getHp());
+				},
+			},
+			//崔琰毛玠
+			zhengbi:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				filter(event,player){
+					return game.hasPlayer(target=>target!=player);
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const {result:{bool,targets}}=await player.chooseTarget(get.prompt2('zhengbi'),lib.filter.notMe).set('ai',target=>{
+						const player=get.event('player');
+						return -get.attitude(player,target)*target.countCards('he');
+					});
+					if(bool){
+						const target=targets[0],str=get.translation(target);
+						player.logSkill('zhengbi',target);
+						let choiceList=['此阶段结束时，若'+str+'本阶段获得过牌，则你获得其手牌区和装备区各一张牌'];
+						if(player.countCards('h',{type:'basic'})) choiceList.push('交给'+str+'一张基本牌，然后其交给你一张非基本牌或两张基本牌');
+						const {result:{index}}=await player.chooseControl().set('choiceList',choiceList).set('ai',()=>get.event('controls').length-1);
+						if(index==0){
+							player.line(target);
+							player.when('phaseUseEnd').filter(evt=>evt==trigger).then(()=>{
+								if(target.isIn()&&target.getHistory('gain',evt=>evt.getParent('phaseUse')==trigger).length){
+									player.line(target);
+									let num=(target.countGainableCards(player,'h')>0)+(target.countCardsGainableCards(player,'e')>0);
+									if(num){
+										player.gainPlayerCard(target,num,'he',true).set('filterButton',button=>{
+											return !ui.selected.buttons.some(but=>get.position(button.link)==get.position(but.link));
+										});
+									}
+								}
+							}).vars({target:target});
+						}
+						else{
+							const {result:{bool}}=await player.chooseToGive(target,{type:'basic'},true).set('prompt','征辟：交给'+str+'一张基本牌');
+							if(bool){
+								let choices=[];
+								if(target.countCards('he',{type:['trick','delay','equip']})) choices.push('一张非基本牌');
+								if(target.countCards('h',{type:'basic'})>1) choices.push('两张基本牌');
+								if(choices.length){
+									const {result:{control}}=await target.chooseControl(choices).set('ai',function(event,player){
+										if(choices.length>1){
+											if(player.countCards('he',{type:['trick','delay','equip']},function(card){return get.value(card)<7})) return 0;
+											return 1;
+										}
+										return 0;
+									}).set('prompt','征辟：交给'+get.translation(player)+'…</div>');
+									const check=(control=='一张非基本牌');
+									await target.chooseToGive('he',(check?1:2),{type:(check?['trick','delay','equip']:'basic')},player,true).set('prompt','征辟：交给'+get.translation(player)+control);
+								}
+								else if(target.countCards('h')) await target.give(target.getCards('h'),player);
+							}
+						}
+					}
+				},
+			},
+			fengying:{
+				unique:true,
+				limited:true,
+				audio:2,
+				enable:'phaseUse',
+				filter(event,player){
+					return player.countCards('h')&&player.countCards('h')==player.countDiscardableCards(player,'h');
+				},
+				skillAnimation:true,
+				animationColor:'thunder',
+				async content(event,trigger,player){
+					player.awakenSkill('fengying');
+					await player.discard(player.getCards('h'));
+					const evt=player.insertPhase();
+					player.when('phaseBegin').filter(evtx=>evtx==evt).then(()=>{
+						if(player.isMinHp()&&player.maxHp>0&&player.countCards('h')<player.maxHp){
+							player.drawTo(player.maxHp);
+						}
+					})
+				},
+				ai:{
+					order:0.0001,
+					result:{
+						player(player){
+							return player.isMinHp()?1:0;
+						},
+					},
+				},
+			},
 			//胡遵
 			dczhantao:{
 				audio:2,
@@ -13815,6 +13970,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		characterIntro:{
+			cuimao:'请分别查看“崔琰”和“毛玠”的武将介绍。',
 			bailingyun:'柏灵筠，女，是电视剧《大军师司马懿之军师联盟》、《虎啸龙吟》中的主要角色之一，由张钧甯饰演。20岁，是曹丕赏赐司马懿的美人，也是曹丕的眼线，被送入司马府中为妾室。柔弱美貌、心机极深。',
 			caoxian:'曹宪（生卒年不详），女，沛国谯县（今安徽省亳州市）人。东汉末年历史人物，汉献帝刘协嫔妃，魏武帝曹操女儿。建安十八年，嫁给汉献帝刘协，受封为贵人。黄初元年（220年），兄弟曹丕称帝后，汉献帝成为山阳公，不知所终。',
 			zhangjian:'张臶（136年－240年），字子明，钜鹿人。汉末三国时期隐士、音乐家，精通谶纬之学。张臶生活的年代从东汉一直到曹魏齐王时期，受到朝廷多次征召，一直回避，不愿做官。他活了一百零五岁，是三国时期有可靠记载的最长寿的人之一。',
@@ -14517,6 +14673,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczhantao_info:'当你或你攻击范围内的角色受到伤害后，若你不为伤害来源，你可以判定，若造成此伤害的渠道为牌且此牌有点数且判定结果点数大于此牌的点数，你视为对来源使用一张【杀】。',
 			dcanjing:'安境',
 			dcanjing_info:'每回合限一次。当你造成伤害后，你可以令至多X名已受伤的角色各摸一张牌，然后其中体力值最少的角色回复1点体力（X为你本局游戏发动〖安境〗的次数）。',
+			cuimao:'崔琰毛玠',
+			zhengbi:'征辟',
+			zhengbi_info:'出牌阶段开始时，你可以选择一名其他角色并选择一项：①本阶段结束时，若其本阶段得到过牌，则你获得其手牌区和装备区各一张牌；②将一张基本牌交给该角色，然后其交给你一张非基本牌或两张基本牌。',
+			fengying:'奉迎',
+			fengying_info:'限定技，出牌阶段，你可以弃置所有手牌。若如此做，你于本回合结束后进行一个额外回合，此额外回合开始时，若你的体力值为全场最低，则你将手牌数摸至体力上限。',
+			lvfan:'吕范',
+			diaodu:'调度',
+			diaodu_info:'出牌阶段开始时，或当你发动〖典财〗后，你可以获得一名距离不大于1的一名角色A装备区里的一张牌，然后你将此牌交给另一名角色B，然后B选择是否使用此牌，若B使用/不使用，则你/B摸一张牌。',
+			diancai:'典财',
+			diancai_info:'其他角色的出牌阶段结束时，若你于此阶段失去了至少X张牌，则你可以将手牌摸至体力上限（X为你的体力值且X至多为5）。',
+			chendong:'陈武董袭',
+			dcduanxie:'断绁',
+			dcduanxie_info:'出牌阶段限一次，你可以令一名其他角色横置，然后你横置。',
 
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',

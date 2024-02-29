@@ -1421,20 +1421,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				marktext:'破',
 				intro:{
-					markcount:function(storage,player){
-						if(player.isUnderControl(true)) return storage[1].length;
-						return '?';
+					markcount:function(storage){
+						return storage[1].length;
 					},
 					mark:function(dialog,content,player){
-						if(player.isUnderControl(true)){
-							const storage=player.getStorage('sbkanpo');
-							const sum=storage[0];
-							const names=storage[1];
-							dialog.addText('剩余可记录'+sum+'次牌名');
-							if(names.length){
-								dialog.addText('已记录牌名：');
-								dialog.addSmall([names,'vcard']);
-							}
+						const storage=player.getStorage('sbkanpo');
+						const sum=storage[0];
+						const names=storage[1];
+						dialog.addText('剩余可记录'+sum+'次牌名');
+						if(player.isUnderControl(true)&&names.length){
+							dialog.addText('当前记录牌名：');
+							dialog.addSmall([names,'vcard']);
 						}
 					},
 				},
