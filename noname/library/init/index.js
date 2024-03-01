@@ -696,7 +696,7 @@ export class LibInit extends Uninstantable {
 			case "function":
 				if (gnc.is.generatorFunc(item)) {
 					// let gen, lastEvent;
-					return function* (event, step, source, player, target, targets, card, cards, skill, forced, num, trigger, result, _status, lib, game, ui, get, ai) {
+					let content = function* (event, step, source, player, target, targets, card, cards, skill, forced, num, trigger, result, _status, lib, game, ui, get, ai) {
 						event.step = NaN;
 						if (!this.gen) this.gen = item(event, {
 							event,
@@ -739,6 +739,8 @@ export class LibInit extends Uninstantable {
 						gen: null,
 						last: undefined
 					})
+					content._gen = true
+					return content
 				} else if (item._parsed) return item;
 			// falls through
 			default:
