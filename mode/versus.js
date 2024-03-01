@@ -2632,7 +2632,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						game.falseZhu.init('re_caocao');
-						game.trueZhu.init('ol_yuanshao');
+						game.trueZhu.init('ol_sb_yuanshao');
 						game.trueZhu.hp++;
 						game.trueZhu.maxHp++;
 						game.falseZhu.hp++;
@@ -2715,7 +2715,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					lib.init.onfree();
 					ui.arena.classList.add('choose-character');
 					game.falseZhu.init('re_caocao');
-					game.trueZhu.init('ol_yuanshao');
+					game.trueZhu.init('ol_sb_yuanshao');
 					game.trueZhu.hp++;
 					game.trueZhu.maxHp++;
 					game.falseZhu.hp++;
