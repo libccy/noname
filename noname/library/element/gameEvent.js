@@ -409,7 +409,18 @@ export class GameEvent {
 				catch {
 					throw new Error(`Content ${item} may not exist.\nlib.element.content[${item}] = ${lib.element.content[item]}`);
 				}
-				this.content = lib.element.content[item];
+
+				if (typeof lib.element.content[item] === "undefined")
+					throw new Error(`Cannot find lib.element.content[${item}]`)
+				// Generator的状态重置
+				else if (lib.element.content[item]._gen) {
+					this.content = lib.element.content[item].bind({
+						gen: null,
+						last: undefined
+					})
+				} else {
+					this.content = lib.element.content[item];
+				}
 				break;
 		}
 		return this;
