@@ -133,6 +133,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const selected=player.getStorage('dcsbquanmou_selected');
 					return !selected.includes(target)&&player.inRange(target)&&target.countCards('he')>0;
 				},
+				prompt(){
+					const player = get.player();
+					if(player.storage.dcsbquanmou) return '转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。';
+					return '转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。当你于本阶段内下次对其造成伤害时，取消之。';
+				},
 				async content(event,trigger,player){
 					const target = event.targets[0];
 					player.changeZhuanhuanji('dcsbquanmou');
@@ -146,10 +151,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.addAdditionalSkill(`${key}_${player.playerid}`, `${key}_mark`);
 					}
 				},
+				ai:{
+					order:9,
+					result:{
+						player:1,
+						target:function(player,target){
+							if(!player.storage.dcsbquanmou) return 1.2;
+							return -0.2;
+						},
+					},
+				},
 				onremove:true,
 				mark:true,
 				intro:{
-					content:'ces'
+					content:(storage)=>{
+						if(storage) return '转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。';
+						return '转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。当你于本阶段内下次对其造成伤害时，取消之。';
+					}
 				},
 				subSkill:{
 					true:{
@@ -168,6 +186,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(game.hasPlayer(current => (current != player && current != target))){
 								const result = await player.chooseTarget([1,3], `权谋：是否对${get.translation(target)}之外的至多三名其他角色各造成1点伤害？`, (card, player, target)=>{
 									return target != player && target != get.event().getTrigger().player;
+								}).set('ai',target => {
+									const player = get.player();
+									return get.damageEffect(target, player, player);
 								}).forResult();
 								if (result.bool) {
 									await player.logSkill('dcsbquanmou', result.targets);
@@ -194,6 +215,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							content:()=>{
 								return `当你下次受到${get.translation(_status.currentPhase)}造成的伤害后，其可以对除你之外的至多三名其他角色各造成1点伤害。`
 							},
+						},
+						ai:{
+							threaten:2.5,
 						},
 					},
 					false:{
@@ -226,6 +250,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							name:'权谋 - 阴',
 							content:()=>{
 								return `当你下次受到${get.translation(_status.currentPhase)}造成的伤害时，防止此伤害。`
+							},
+						},
+						ai:{
+							filterDamage:true,
+							skillTagFilter(player,tag,arg){
+								return (arg&&arg.player&&arg.player.hasSkill('dcsbquanmou_false'));
 							},
 						},
 					},
@@ -14328,6 +14358,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(storage) str+='</span>';
 				return str;
 			},
+			dcsbquanmou:function(player){
+				if(player.storage.dcsbquanmou) return '转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。阴：当你于本阶段内下次对其造成伤害时，取消之；<span class="bluetext">阳：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。</span>';
+				return '转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。<span class="bluetext">阴：当你于本阶段内下次对其造成伤害时，取消之；</span>阳：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。';
+			}
 		},
 		characterReplace:{
 			wenyang:['wenyang','db_wenyang','diy_wenyang'],
@@ -14896,7 +14930,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dc_sb_simayi:'新杀谋司马懿',
 			dc_sb_simayi_prefix:'新杀谋',
 			dcsbquanmou:'权谋',
-			dcsbquanmou_info:'转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。阴：当你于本阶段内下次对其造成伤害时，取消之；阳：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。}',
+			dcsbquanmou_info:'转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。阴：当你于本阶段内下次对其造成伤害时，取消之；阳：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。',
 			dcsbpingliao:'平辽',
 			dcsbpingliao_info:'锁定技。当你声明使用【杀】时，你令此【杀】的目标对其他角色不可见，且你令攻击范围内的其他角色依次选择是否打出一张红色基本牌。所有角色选择完成后，此牌的目标角色中没有以此法打出牌的角色本回合内无法使用或打出手牌；若有不为此牌目标的角色以此法打出了牌，则你摸两张牌，且你本回合使用【杀】的次数上限+1。',
 
