@@ -12912,7 +12912,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.line(target,'fire');
-						player.addSkills(['hmxili'],['mansi']);
+						player.changeSkills(['hmxili'],['mansi']);
 						target.addSkills('hmxili');
 					}
 				},
