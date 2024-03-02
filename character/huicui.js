@@ -295,13 +295,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const color=get.color(event.card);
 					if(!['black','red'].includes(color)) return false;
 					const damage=event.target.getAllHistory('sourceDamage',evt=>evt.player==player).length;
-					return damage==(color=='black');
+					return Math.min(1,damage)==(color=='black');
 				},
 				check(event,player){
 					const color=get.color(event.card);
 					if(color=='red') return get.attitude(player,event.target)>0;
 					if(player.getHp()+player.countCards('hs',card=>player.canSaveCard(card,player))<=1) return false;
 					return get.effect(player,{name:'losehp'},player,player)>=get.effect(event.target,{name:'losehp'},player,player);
+				},
+				prompt2(event,player){
+					return '与'+get.translation(event.target)+'各'+(get.color(event.card)=='black'?'失去1点体力':'摸一张牌');
 				},
 				logTarget:'target',
 				async content(event,trigger,player){
