@@ -5024,7 +5024,10 @@ export class Player extends HTMLDivElement {
 				this.ai.tempIgnore.add(next.targets[i]);
 			}
 		}
-		if (typeof this.logAi == 'function' && !next.noai && !get.info(next.card).noai) {
+		if (typeof this.logAi == 'function' && !next.noai && !get.info(next.card).noai && !this.hasSkillTag(this, true, {
+			card: next.card,
+			targets: next.targets,
+		}, true)) {
 			var postAi = get.info(next.card).postAi;
 			if (postAi && postAi(next.targets)) {
 				next.postAi = true;
