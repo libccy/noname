@@ -148,10 +148,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					const {result:{control}}=await player.chooseControl(choices).set('choiceList',choiceList).set('ai',()=>{
 						const player=get.event('player'),num=get.event('num'),info=get.info('dcjianzhuan').choices;
-						let choices=get.event('controls').slice(),map=get.event('map'),mapx={};
-						for(const i in map) mapx[map[i]]=i;
-						return mapx[choices.sort((a,b)=>info[b].ai_effect(player,num)-info[a].ai_effect(player,num))[0]];
-					}).set('num',num).set('map',map);
+						let choices=get.event('controls').slice(),map=get.event('map')
+						return choices.sort((a,b)=>info[map[b]].ai_effect(player,num)-info[map[a]].ai_effect(player,num))[0];
+					}).set('num',num).set('map',map).set('prompt','渐专：请选择一项执行');
 					if(control){
 						if(!player.storage.dcjianzhuan_used){
 							player.when('phaseUseAfter').then(()=>delete player.storage.dcjianzhuan_used);
