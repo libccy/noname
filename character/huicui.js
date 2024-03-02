@@ -260,7 +260,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dcfanshi:{
 				unique:true,
-				audio:true,
+				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				filter(event,player){
 					return 4-player.getStorage('dcjianzhuan').length<2;
