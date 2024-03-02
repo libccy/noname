@@ -203,7 +203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								current.removeAdditionalSkill(`${skill}_${player.playerid}`);
 							});
 							delete player.storage[skill];
-							delete player.storage.dcquanmou_selected;
+							delete player.storage.dcsbquanmou_selected;
 						},
 					},
 					true_mark:{
@@ -239,7 +239,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								current.removeAdditionalSkill(`${skill}_${player.playerid}`);
 							});
 							delete player.storage[skill];
-							delete player.storage.dcquanmou_selected;
+							delete player.storage.dcsbquanmou_selected;
 						},
 					},
 					false_mark:{
