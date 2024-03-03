@@ -150,7 +150,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				filter:function(event,player){
 					if(!player.hasCard(card=>get.suit(card)=='club','sh')) return false;
-					return (event.type=='phase'||event.filterCard({name:'tiesuo'},player,event));
+					return (event.type=='phase'||event.filterCard(get.autoViewAs({name:'tiesuo'},'unsure'),player,event));
 				},
 				position:'hs',
 				filterCard:function(card,player,event){
@@ -7425,10 +7425,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.countCards('hs')) return false;
 					for(var i of lib.inpile){
 						var type=get.type(i);
-						if((type=='basic'||type=='trick')&&event.filterCard({name:i},player,event)) return true;
+						if((type=='basic'||type=='trick')&&event.filterCard(get.autoViewAs({name:i},'unsure'),player,event)) return true;
 						if(i=='sha'){
 							for(var j of lib.inpile_nature){
-								if(event.filterCard({name:i,nature:j},player,event)) return true;
+								if(event.filterCard(get.autoViewAs({name:i,nature:j},'unsure'),player,event)) return true;
 							}
 						}
 					}
@@ -7438,11 +7438,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					dialog:function(event,player){
 						var list=[];
 						for(var i of lib.inpile){
-							if(event.type!='phase') if(!event.filterCard({name:i},player,event)) continue;
+							if(event.type!='phase') if(!event.filterCard(get.autoViewAs({name:i},'unsure'),player,event)) continue;
 							var type=get.type(i);
 							if(type=='basic'||type=='trick') list.push([type,'',i]);
 							if(i=='sha'){
-								if(event.type!='phase') if(!event.filterCard({name:i,nature:j},player,event)) continue;
+								if(event.type!='phase') if(!event.filterCard(get.autoViewAs({name:i,nature:j},'unsure'),player,event)) continue;
 								for(var j of lib.inpile_nature) list.push(['基本','','sha',j]);
 							}
 						}
