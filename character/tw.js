@@ -9548,8 +9548,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					const names=[];
-					if(event.filterCard({name:'sha'},player,event)) names.push('shan');
-					if(event.filterCard({name:'shan'},player,event)) names.push('sha');
+					if(event.filterCard(get.autoViewAs({name:'sha'},'unsure'),player,event)) names.push('shan');
+					if(event.filterCard(get.autoViewAs({name:'shan'},'unsure'),player,event)) names.push('sha');
 					return names.length>0&&player.hasCard(function(card){
 						return names.includes(get.name(card));
 					},'hs');
@@ -11293,10 +11293,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i of lib.inpile){
 						if(i=='wuxie') continue;
 						var type=get.type(i);
-						if((type=='basic'||type=='trick')&&event.filterCard({name:i},player,event)) return true;
+						if((type=='basic'||type=='trick')&&event.filterCard({name:i,isCard:true},player,event)) return true;
 						if(i=='sha'){
 							for(var j of lib.inpile_nature){
-								if(event.filterCard({name:i,nature:j},player,event)) return true;
+								if(event.filterCard({name:i,nature:j,isCard:true},player,event)) return true;
 							}
 						}
 					}
