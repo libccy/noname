@@ -9511,7 +9511,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.type=='wuxie'||!player.countCards('hse',{suit:'diamond'})) return false;
 					for(var i=0;i<lib.inpile.length;i++){
 						var name=lib.inpile[i];
-						if(name!='du'&&name!='shan'&&get.type(name)=='basic'&&event.filterCard(get.autoViewAs({name:name},'unsure'),player,event)) return true;
+						if(name!='du'&&get.type(name)=='basic'&&event.filterCard(get.autoViewAs({name:name},'unsure'),player,event)) return true;
 					}
 					return false;
 				},
@@ -9520,7 +9520,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=[];
 						for(var i=0;i<lib.inpile.length;i++){
 							var name=lib.inpile[i];
-							if(name=='du'||name=='shan') continue;
+							if(name=='du') continue;
 							if(name=='sha'){
 								list.push(['基本','','sha']);
 								for(var j of lib.inpile_nature) list.push(['基本','',name,j]);
@@ -9532,7 +9532,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('摆尾',[list,'vcard'],'hidden');
 					},
 					filter(button,player){
-						return _status.event.getParent().filterCard({name:button.link[2]},player,_status.event.getParent());
+						return _status.event.getParent().filterCard(get.autoViewAs({name:button.link[2]},'unsure'),player,_status.event.getParent());
 					},
 					check(button){
 						if(_status.event.getParent().type=='phase'){
@@ -9585,27 +9585,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return tag=='fireAttack'||player.countCards('he',{suit:'diamond'})>0;
 					},
 				},
-				group:['inari_baiwei_shan','inari_baiwei_draw'],
-			},
-			inari_baiwei_shan:{
-				prompt:'将一张♦牌当做闪使用或打出',
-				enable:['chooseToRespond','chooseToUse'],
-				viewAs:{name:'shan'},
-				selectCard:1,
-				filterCard:{suit:'diamond'},
-				popname:true,
-				check(card){
-					return 1/Math.max(0.1,get.value(card));
-				},
-				position:'hse',
-				ai:{
-					order:10,
-					result:{player:1},
-					respondShan:true,
-					skillTagFilter(player){
-						return player.countCards('hse',{suit:'diamond'})>0;
-					},
-				},
+				group:['inari_baiwei_draw'],
 			},
 			inari_baiwei_draw:{
 				trigger:{player:['useCardAfter','respondAfter']},
