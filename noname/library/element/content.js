@@ -97,7 +97,7 @@ export const Content = {
 			event.addSkill.removeArray(duplicatedSkills);
 			event.removeSkill.removeArray(duplicatedSkills);
 		}
-		if (!event.addSkill.length&&!event.removeSkill.length) return;
+		//if (!event.addSkill.length&&!event.removeSkill.length) return;
 		//手动触发时机
 		await event.trigger('changeSkillsBefore');
 		await event.trigger('changeSkillsBegin');

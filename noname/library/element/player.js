@@ -7465,6 +7465,22 @@ export class Player extends HTMLDivElement {
 		_status.event.clearStepCache();
 		return this;
 	}
+	$removeAdditionalSkills(skill, target){
+		const additionalSkills = this.additionalSkills[skill];
+		if (Array.isArray(additionalSkills)) {
+			if (typeof target === 'string') {
+				if (additionalSkills.includes(target)) {
+					additionalSkills.remove(target);
+					if (!additionalSkills.length) {
+						delete this.additionalSkills[skill];
+					}
+				}
+			}
+			else {
+				delete this.additionalSkills[skill];
+			}
+		}
+	}
 	getRemovableAdditionalSkills(skill, target){
 		const player = this, removableSkills = [];
 		if (this.additionalSkills[skill]) {
@@ -7493,22 +7509,22 @@ export class Player extends HTMLDivElement {
 		const player = this, skills = this.getRemovableAdditionalSkills(skill, target);
 		if(skills.length){
 			player.removeSkill(skills);
-			if (player.additionalSkills[skill]&&!player.additionalSkills[skill].length) delete player.additionalSkills[skill];
 		}
+		player.$removeAdditionalSkills(skill, target);
 		_status.event.clearStepCache();
 		return this;
 	}
 	removeAdditionalSkills(skill, target) {
 		const player = this, skills = this.getRemovableAdditionalSkills(skill, target);
-		if(skills.length){
-			return player.changeSkills([], skills).set('$handle', function(player, addSkills, removeSkills){
+		return player.changeSkills([], skills).set('$handle', function(player, addSkills, removeSkills){
+			if(removeSkills.length>0){
 				game.log(player, '失去了技能', ...removeSkills.map(i => {
 					return '#g【' + get.translation(i) + '】';
 				}));
-				player.removeSkill(skills);
-				if (player.additionalSkills[skill]&&!player.additionalSkills[skill].length) delete player.additionalSkills[skill];
-			});
-		}
+				player.removeSkill(removeSkills);
+			}
+			player.$removeAdditionalSkills(skill, target);
+		});
 	}
 	awakenSkill(skill, nounmark) {
 		if (!nounmark) this.unmarkSkill(skill);
