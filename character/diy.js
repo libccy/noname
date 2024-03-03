@@ -1909,6 +1909,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!Array.isArray(list)||typeof num!='number'||list.length<=num) return false;
 							var card=get.copy(list[num]);
 							delete card.isCard;
+							card=get.autoViewAs(card,'unsure');
 							if(event.filterCard(card,player,event)) return true;
 							return false;
 						},
@@ -2266,10 +2267,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for(var i of lib.inpile){
 						var type=lib.skill.nsxingyun.getSixiang(i);
 						if(!type||list.includes(type)) continue;
-						if(event.filterCard({name:i},player,event)) return true;
+						if(event.filterCard(get.autoViewAs({name:i},'unsure'),player,event)) return true;
 						if(i=='sha'){
 							for(var j of lib.inpile_nature){
-								if(event.filterCard({name:i,nature:j},player,event)) return true;
+								if(event.filterCard(get.autoViewAs({name:i,nature:j},'unsure'),player,event)) return true;
 							}
 						}
 					}
@@ -9508,7 +9509,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(event.type=='wuxie'||!player.countCards('hse',{suit:'diamond'})) return false;
 					for(var i=0;i<lib.inpile.length;i++){
 						var name=lib.inpile[i];
-						if(name!='du'&&name!='shan'&&get.type(name)=='basic'&&event.filterCard({name:name},player,event)) return true;
+						if(name!='du'&&name!='shan'&&get.type(name)=='basic'&&event.filterCard(get.autoViewAs({name:name},'unsure'),player,event)) return true;
 					}
 					return false;
 				},

@@ -8885,7 +8885,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.hasCard((card)=>(get.type(card)!='basic'),'ehs')) return false;
 					for(var i of list){
 						var type=get.type2(i,false);
-						if((type=='basic'||type=='trick')&&event.filterCard({name:i},player,event)) return true;
+						if((type=='basic'||type=='trick')&&event.filterCard(get.autoViewAs({name:i},'unsure'),player,event)) return true;
 					}
 					return false;
 				},
@@ -8896,7 +8896,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list2=[];
 						for(var i of list){
 							var type=get.type2(i,false);
-							if((type=='basic'||type=='trick')&&event.filterCard({name:i},player,event)) list2.push([type,'',i]);
+							if((type=='basic'||type=='trick')&&event.filterCard(get.autoViewAs({name:i},'unsure'),player,event)) list2.push([type,'',i]);
 						}
 						return ui.create.dialog('浮萍',[list2,'vcard']);
 					},
@@ -8912,7 +8912,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							popname:true,
 							viewAs:{
 								name:links[0][2],
-								isCard:true,
 							},
 							check:function(card){
 								return 8-get.value(card);

@@ -2385,8 +2385,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							else wuxie=true;
 						}
 					}
-					if(shan&&event.filterCard({name:'shan'},player,event)) return true;
-					if(wuxie&&event.filterCard({name:'wuxie'},player,event)) return true;
+					if(shan&&event.filterCard(get.autoViewAs({name:'shan'},'unsure'),player,event)) return true;
+					if(wuxie&&event.filterCard(get.autoViewAs({name:'wuxie'},'unsure'),player,event)) return true;
 					return false;
 				},
 				hiddenCard (player,name){

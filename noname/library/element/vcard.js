@@ -79,7 +79,7 @@ export class VCard {
 					if (!this.nature) this.nature = get.nature(this);
 				}
 			}
-			else if(numberOrCards === 'unsure') {
+			else if(numberOrCards === 'unsure' && !this.isCard) {
 				if(!this.suit) this.suit = 'unsure';
 				if(!this.color) this.color = 'unsure';
 				if(!this.number) this.number = 'unsure';
