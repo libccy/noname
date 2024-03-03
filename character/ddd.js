@@ -4815,17 +4815,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							cardEnabled(card,player){
 								if(!player.storage['dddlianer_ceiling']) return;
 								var num=get.number(card);
-								if(typeof num!='number'||player.storage['dddlianer_ceiling']<=num) return false;
+								if(num!='unsure'&&(typeof num!='number'||player.storage['dddlianer_ceiling']<=num)) return false;
 							},
 							cardRespondable(card,player){
 								if(!player.storage['dddlianer_ceiling']) return;
 								var num=get.number(card);
-								if(typeof num!='number'||player.storage['dddlianer_ceiling']<=num) return false;
+								if(num!='unsure'&&(typeof num!='number'||player.storage['dddlianer_ceiling']<=num)) return false;
 							},
 							cardSavable(card,player){
 								if(!player.storage['dddlianer_ceiling']) return;
 								var num=get.number(card);
-								if(typeof num!='number'||player.storage['dddlianer_ceiling']<=num) return false;
+								if(num!='unsure'&&(typeof num!='number'||player.storage['dddlianer_ceiling']<=num)) return false;
 							},
 						}
 					}

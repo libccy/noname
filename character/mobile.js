@@ -3108,7 +3108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							cardEnabled:function(card,player){
 								if(!player.storage.scschihe_blocker) return;
 								var suit=get.suit(card);
-								if(suit=='none') return;
+								if(suit=='none'||suit=='unsure') return;
 								var evt=_status.event;
 								if(evt.name!='chooseToUse') evt=evt.getParent('chooseToUse');
 								if(!evt||!evt.respondTo||evt.respondTo[1].name!='sha') return;
@@ -5625,7 +5625,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var evt=lib.skill.dcjianying.getLastUsed(player);
 							if(!evt||!evt.card) return;
 							var num1=get.number(card),num2=get.number(evt.card);
-							if(typeof num1=='number'&&typeof num2=='number'&&num1%num2==0) return Infinity;
+							if(num1==='unsure'||typeof num1=='number'&&typeof num2=='number'&&num1%num2==0) return Infinity;
 						}
 					},
 					aiOrder:function(player,card,num){
@@ -5633,7 +5633,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var evt=lib.skill.dcjianying.getLastUsed(player);
 							if(!evt||!evt.card) return;
 							var num1=get.number(card),num2=num2=get.number(evt.card);
-							if(typeof num1=='number'&&typeof num2=='number'&&num2%num1==0) return num+5;
+							if(num1==='unsure'||typeof num1=='number'&&typeof num2=='number'&&num2%num1==0) return num+5;
 						}
 					},
 				},

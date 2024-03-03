@@ -1566,10 +1566,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					targetInRange:function(card,player){
-						if(get.color(card)=='none') return true;
+						const color = get.color(card);
+						if (color === 'none' || color === 'unsure') return true;
 					},
 					cardUsable:function(card){
-						if(get.color(card)=='none') return Infinity;
+						const color = get.color(card);
+						if (color === 'none' || color === 'unsure') return Infinity;
 					},
 				}
 			},
@@ -6400,10 +6402,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					targetInRange:function(card){
-						if(get.color(card)=='black') return true;
+						const color = get.color(card);
+						if (color === 'black' || color === 'unsure') return true;
 					},
 					cardUsable:function(card){
-						if(get.color(card)=='black') return Infinity;
+						const color = get.color(card);
+						if (color === 'black' || color === 'unsure') return Infinity;
 					},
 				},
 			},

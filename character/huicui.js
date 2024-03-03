@@ -11057,11 +11057,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			zhente2:{
 				mod:{
-					cardEnabled:function(card,player){
-						if(player.getStorage('zhente2').includes(get.color(card))) return false;
+					cardEnabled(card, player) {
+						const color = get.color(card);
+						if (color != 'unsure' && player.getStorage('zhente2').includes(color)) return false;
 					},
-					cardSavable:function(card,player){
-						if(player.getStorage('zhente2').includes(get.color(card))) return false;
+					cardSavable(card,player) {
+						const color = get.color(card);
+						if (color != 'unsure' && player.getStorage('zhente2').includes(color)) return false;
 					},
 				},
 				charlotte:true,

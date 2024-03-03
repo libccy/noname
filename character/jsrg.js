@@ -508,13 +508,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						onremove:true,
 						mod:{
 							cardEnabled:function(card,player){
-								if(player.getStorage('jsrgfumou_forbid').includes(get.color(card))) return false;
+								const color = get.color(card);
+								if (color != 'unsure' && player.getStorage('jsrgfumou_forbid').includes(color)) return false;
 							},
 							cardRespondable:function(card,player){
-								if(player.getStorage('jsrgfumou_forbid').includes(get.color(card))) return false;
+								const color = get.color(card);
+								if (color != 'unsure' && player.getStorage('jsrgfumou_forbid').includes(color)) return false;
 							},
 							cardSavable:function(card,player){
-								if(player.getStorage('jsrgfumou_forbid').includes(get.color(card))) return false;
+								const color = get.color(card);
+								if (color != 'unsure' && player.getStorage('jsrgfumou_forbid').includes(color)) return false;
 							},
 						},
 						mark:true,

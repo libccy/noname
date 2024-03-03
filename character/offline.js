@@ -6095,10 +6095,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					cardRespondable:function(card,player){
-						if(card.name=='shan'&&get.suit(card)!='heart') return false;
+						if(card.name=='shan'){
+							const suit=get.suit(card);
+							if(suit!='heart'&&suit!='unsure') return false;
+						}
 					},
 					cardEnabled:function(card,player){
-						if(card.name=='shan'&&get.suit(card)!='heart') return false;
+						if(card.name=='shan'){
+							const suit=get.suit(card);
+							if(suit!='heart'&&suit!='unsure') return false;
+						}
 					},
 				}
 			},

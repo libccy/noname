@@ -1875,7 +1875,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twgongxin2:{
 				mod:{
 					cardEnabled2(card,player){
-						if(player.getStorage('twgongxin2').includes(get.color(card))) return false;
+						const color = get.color(card);
+						if(color!='unsure' && player.getStorage('twgongxin2').includes(color)) return false;
 					},
 				},
 				charlotte:true,
@@ -2266,10 +2267,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(lib.skill.xunshi.isXunshi(card)) return 'none';
 					},
 					targetInRange(card){
-						if(get.color(card)=='none') return true;
+						const suit = get.color(card);
+						if (suit=='none' || suit=='unsure') return true;
 					},
 					cardUsable(card){
-						if(get.color(card)=='none') return Infinity;
+						const suit = get.color(card);
+						if (suit=='none' || suit=='unsure') return Infinity;
 					},
 				},
 				isXunshi(card){
@@ -2343,10 +2346,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.suit(card)=='heart') return false;
 					},
 					targetInRange(card){
-						if(get.suit(card)=='heart') return true;
+						if(card.name === 'sha'){
+							const suit = get.suit(card);
+							if (suit === 'heart' || suit === 'unsure') return true;
+						}
 					},
 					cardUsable(card){
-						if(card.name=='sha'&&get.suit(card)=='heart') return Infinity;
+						if(card.name === 'sha'){
+							const suit = get.suit(card);
+							if (suit === 'heart' || suit === 'unsure') return Infinity;
+						}
 					}
 				},
 				audio:'wushen',
@@ -6164,10 +6173,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(get.suit(card)=='heart') return false;
 					},
 					targetInRange(card){
-						if(get.suit(card)=='heart') return true;
+						if(card.name === 'sha'){
+							const suit = get.suit(card);
+							if (suit === 'heart' || suit === 'unsure') return true;
+						}
 					},
 					cardUsable(card){
-						if(card.name=='sha'&&get.suit(card)=='heart') return Infinity;
+						if(card.name === 'sha'){
+							const suit = get.suit(card);
+							if (suit === 'heart' || suit === 'unsure') return Infinity;
+						}
 					}
 				},
 				audio:2,

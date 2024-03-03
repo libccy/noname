@@ -1505,8 +1505,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					unlimit:{
 						mod:{
 							cardUsable:function(card,player){
-								var list=lib.skill.lkbushi.getBushi(player);
-								if(list[0]==get.suit(card)) return Infinity;
+								const list = lib.skill.lkbushi.getBushi(player), suit = get.suit(card);
+								if (suit === 'unsure' || list[0] === suit) return Infinity;
 							},
 						},
 						trigger:{player:'useCard1'},

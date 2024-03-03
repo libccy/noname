@@ -22865,10 +22865,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiangwu3:{
 				mod:{
 					targetInRange:function(card,player){
-						if(_status.currentPhase==player&&card.name=='sha'&&get.number(card)<player.storage.qiangwu) return true;
+						if (card.name == 'sha') {
+							const num = get.number(card);
+							if (num == 'unsure' || num < player.storage.qiangwu) return true;
+						}
 					},
 					cardUsable:function(card,player){
-						if(_status.currentPhase==player&&card.name=='sha'&&get.number(card)>player.storage.qiangwu) return Infinity;
+						if (card.name == 'sha') {
+							const num = get.number(card);
+							if (num == 'unsure' || num > player.storage.qiangwu) return true;
+						}
 					}
 				},
 				trigger:{player:'useCard1'},

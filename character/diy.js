@@ -8203,15 +8203,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				mod:{
 					targetInRange(card,player){
-						var list=player.getExpansions('ao_diegui');
-						for(var i=0;i<list.length;i++){
-							if(get.suit(list[i],false)==get.suit(card,false)) return true;
+						const cardSuit = get.suit(card,false);
+						const list = player.getExpansions('ao_diegui');
+						for(let i = 0; i < list.length; i++){
+							if(cardSuit==='unsure'||get.suit(list[i],false)===cardSuit) return true;
 						}
 					},
 					cardUsable(card,player){
-						var list=player.getExpansions('ao_diegui');
-						for(var i=0;i<list.length;i++){
-							if(get.suit(list[i],false)==get.suit(card,false)) return Infinity;
+						const cardSuit = get.suit(card,false);
+						const list = player.getExpansions('ao_diegui');
+						for(let i = 0; i < list.length; i++){
+							if(cardSuit==='unsure'||get.suit(list[i],false)===cardSuit) return Infinity;
 						}
 					},
 					maxHandcard(player,num){

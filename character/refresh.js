@@ -6758,7 +6758,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return Infinity;
 					},
 					cardUsable:function(card,player){
-						if(card.name=='sha'&&player.storage.xingongji2.includes(get.suit(card))) return Infinity;
+						if(card.name=='sha'){
+							const suit = get.suit(card);
+							return suit === 'unsure' || player.storage.xingongji2.includes(suit);
+						}
 					},
 					aiOrder:function(player,card,num){
 						if(get.name(card)=='sha'&&!player.storage.xingongji2.includes(get.suit(card))) return num+1;
