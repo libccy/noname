@@ -205,8 +205,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								let evt=_status.event;
 								if(evt.name!='chooseToUse') evt=evt.getParent('chooseToUse');
 								if(!evt||!evt.respondTo||!storage.includes(evt.respondTo[1])) return;
-								const num=get.number(card,player);
-								if(!(typeof num!='number'||num>=get.number(evt.respondTo[1]))) return false;
+								const num = get.number(card);
+								if(num!='unsure' && (typeof num!='number' || num<=get.number(evt.respondTo[1]))) return false;
 							},
 						},
 						onremove(player){

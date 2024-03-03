@@ -281,11 +281,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for (let target of targets) {
 						if (target.isIn() && player.inRange(target)) {
 							const result = await target.chooseToRespond(prompt, (card,player)=>{
-								return get.type(card) == 'basic' && get.color(card) != 'black';
-							}).set('filterOk', ()=>{
-								const card = get.card();
-								if (card && get.color(card)!='red') return false;
-								return true;
+								if (get.type(card) !== 'basic') return false;
+								const color = get.color(card);
+								return (color == 'red' || color == 'unsure');
 							}).set('ai',card => {
 								const player = get.player(), event = get.event();
 								const source = event.getParent().player;

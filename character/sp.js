@@ -23889,7 +23889,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					if(event.responded||player==_status.currentPhase||event.aocai) return false;
 					for(var i of lib.inpile){
-						if(get.type(i)=='basic'&&event.filterCard({name:i},player,event)) return true;
+						if(get.type(i)=='basic'&&event.filterCard(get.autoViewAs({name:i},'unsure'),player,event)) return true;
 					}
 					return false;
 				},

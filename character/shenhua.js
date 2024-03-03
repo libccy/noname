@@ -2259,16 +2259,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"nzry_chenglve1":{
 				mod:{
 					cardUsable:function(card,player){
-						var cards=player.storage.nzry_chenglve1;
-						for(var i=0;i<cards.length;i++){
-							if(cards[i]==get.suit(card)) return Infinity;
-						}
+						const suit = get.suit(card);
+						if (suit == 'unsure' || player.getStorage('nzry_chenglve1').includes(suit)) return Infinity;
 					},
 					targetInRange:function(card,player){
-						var cards=player.storage.nzry_chenglve1;
-						for(var i=0;i<cards.length;i++){
-							if(cards[i]==get.suit(card)) return true;
-						}
+						const suit = get.suit(card);
+						if (suit == 'unsure' || player.getStorage('nzry_chenglve1').includes(suit)) return true;
 					}
 				},
 				onremove:true,

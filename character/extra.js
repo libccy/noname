@@ -6875,13 +6875,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					//获取卡牌花色
 					var name=get.suit(card,player);
 					//如果这张牌是梅花并且当前时机能够使用/打出闪 那么这张牌可以选择
-					if(name=='club'&&filter({name:'shan'},player,event)) return true;
+					if(name=='club'&&filter(get.autoViewAs({name:'shan'},'unsure'),player,event)) return true;
 					//如果这张牌是方片并且当前时机能够使用/打出火杀 那么这张牌可以选择
-					if(name=='diamond'&&filter({name:'sha',nature:'fire'},player,event)) return true;
+					if(name=='diamond'&&filter(get.autoViewAs({name:'sha',nature:'fire'},'unsure'),player,event)) return true;
 					//如果这张牌是黑桃并且当前时机能够使用/打出无懈 那么这张牌可以选择
-					if(name=='spade'&&filter({name:'wuxie'},player,event)) return true;
+					if(name=='spade'&&filter(get.autoViewAs({name:'wuxie'},'unsure'),player,event)) return true;
 					//如果这张牌是红桃并且当前时机能够使用/打出桃 那么这张牌可以选择
-					if(name=='heart'&&filter({name:'tao'},player,event)) return true;
+					if(name=='heart'&&filter(get.autoViewAs({name:'tao'},'unsure'),player,event)) return true;
 					//上述条件都不满足 那么就不能选择这张牌
 					return false;
 				},
