@@ -464,6 +464,7 @@ export class GameEvent {
 		return this;
 	}
 	resume() {
+		delete this._buttonChoice;
 		delete this._cardChoice;
 		delete this._targetChoice;
 		delete this._skillChoice;
@@ -538,6 +539,7 @@ export class GameEvent {
 			complexSelect: this.complexSelect,
 			complexCard: this.complexCard,
 			complexTarget: this.complexTarget,
+			_buttonChoice: this._buttonChoice,
 			_cardChoice: this._cardChoice,
 			_targetChoice: this._targetChoice,
 			_skillChoice: this._skillChoice,
@@ -641,6 +643,7 @@ export class GameEvent {
 			}
 			delete this.fakeforce;
 		}
+		delete this._buttonChoice;
 		delete this._cardChoice;
 		delete this._targetChoice;
 		delete this._skillChoice;
@@ -663,6 +666,7 @@ export class GameEvent {
 			this.complexTarget = this._backup.complexTarget;
 			this.ai1 = this._backup.ai1;
 			this.ai2 = this._backup.ai2;
+			this._buttonChoice = this._backup._buttonChoice;
 			this._cardChoice = this._backup._cardChoice;
 			this._targetChoice = this._backup._targetChoice;
 			this._skillChoice = this._backup._skillChoice;
