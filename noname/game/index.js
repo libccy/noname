@@ -5874,7 +5874,7 @@ export class Game extends Uninstantable {
 			return false;
 		}
 
-		const useCache = !lib.config.compatiblemode && !event.skill
+		const useCache = !lib.config.compatiblemode && !event.skill && !event.multitarget
 			&& ['button', 'card', 'target'].every(type => {
 				if (!event[`filter${uppercaseType(type)}`]) return true;
 				// if (typeof event[`select${uppercaseType(type)}`] === 'function') return false;
