@@ -13435,8 +13435,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.draw();
 					'step 1'
 					var next=player.chooseTarget().set('ai',function(target){
-						var player=_status.event.player;
-						return get.damageEffect(target,player,player)
+						let player=_status.event.player;
+						if(target.hasSkillTag('filterDamage',null,{
+							player:player
+						},true)) return get.damageEffect(target,player,player);
+						return 2*get.damageEffect(target,player,player);
 					});
 					if(!['identity','guozhan'].includes(get.mode())){
 						next.set('prompt','选择一名体力值最大的敌方角色，对其造成2点伤害');
@@ -13464,9 +13467,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					result:{
 						target:function(player,target){
-							if(!['identity','guozhan'].includes(get.mode())) return 1;
-							var target=game.filterPlayer(i=>i!=player).sort((a,b)=>b.hp-a.hp)[0];
-							return target&&get.damageEffect(target,player,player)>0?1:0;
+							let es;
+							if(['identity','guozhan'].includes(get.mode())) es=game.hasPlayer(i=>{
+								return i!=player&&!game.hasPlayer(j=>{
+									return player!==j&&j.hp>i.hp;
+								})&&get.attitude(player,i)<0;
+							});
+							else es=game.hasPlayer(i=>{
+								return i.isEnemyOf(player)&&!game.hasPlayer(j=>{
+									return j.hp>i.hp&&j.isEnemyOf(player);
+								})&&get.attitude(player,i)<0;
+							});
+							if(es) return 2;
+							return -1.5;
 						},
 					},
 					order:12,
@@ -13475,26 +13488,38 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					dying:{
 						trigger:{global:'dying'},
-						forced:true,
-						popup:false,
 						filter:function(event,player){
-							var evt=event.getParent(2);
-							if(!evt||evt.name!='kuiji_content'||evt.player!=player) return false;
-							var list=game.filterPlayer(function(current){
-								return current.isFriendOf(player);
-							}).sort(function(a,b){
-								return a.hp-b.hp;
-							});
-							return (list.length==1||list[0].hp<list[1].hp)&&list[0].isDamaged();
+							let evt=event.getParent(2);
+							return evt&&evt.name=='kuiji';
 						},
+						locked:true,
+						direct:true,
 						content:function(){
-							var list=game.filterPlayer(function(current){
-								return current.isFriendOf(player);
-							}).sort(function(a,b){
-								return a.hp-b.hp;
-							})[0];
-							player.logSkill('kuiji',list);
-							list.recover();
+							'step 0'
+							var list;
+							if(['identity','guozhan'].includes(get.mode())) list=game.filterPlayer(current=>{
+								return current!==trigger.player&&!game.hasPlayer(i=>{
+									return trigger.player!==i&&i.hp<current.hp;
+								});
+							}).filter(i=>i.isDamaged());
+							else list=game.filterPlayer(current=>{
+								return current.isFriendOf(player)&&!game.hasPlayer(i=>{
+									return i.hp<current.hp&&i.isFriendOf(player);
+								});
+							}).filter(i=>i.isDamaged());
+							if(list.length>1) player.chooseTarget('溃击：选择一名角色回复1点体力',(card,player,target)=>{
+								return _status.event.list.includes(target);
+							},true).set('list',list).set('ai',target=>{
+								return get.recoverEffect(target,player,_status.event.player);
+							});
+							else if(list.length) event._result={bool:true,targets:list};
+							else event._result={bool:false};
+							'step 1'
+							if(result.bool){
+								let target=result.targets[0];
+								player.logSkill('kuiji',target);
+								target.recover();
+							}
 						},
 					},
 				},
