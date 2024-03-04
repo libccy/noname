@@ -154,10 +154,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					result:{
-						player:1,
+						player:function(player,target){
+							if(player.storage.dcsbquanmou) return 1;
+							return 1+game.countPlayer(i=>player!==i&&target!==i&&!i.hasSkill('false_mark')&&get.attitude(player,i)<0);
+						},
 						target:function(player,target){
-							if(!player.storage.dcsbquanmou) return 1.2;
-							return -0.2;
+							let res=target.hasSkillTag('noh')?0:-1;
+							if(player.storage.dcsbquanmou) return res+0.6;
+							return res;
 						},
 					},
 				},
@@ -218,6 +222,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						ai:{
 							threaten:2.5,
+							effect:{
+								target(card,player,target){
+									if(get.tag(card,'damage')&&player&&player.hasSkill('dcsbquanmou_true')){
+										let tars=game.countPlayer(i=>player!==i&&target!==i&&get.damageEffect(i,player,player)>0);
+										return [1,0,1,6*Math.min(3,tars)/(3+Math.pow(target.countCards('h'),2))];
+									}
+								}
+							}
 						},
 					},
 					false:{
@@ -253,10 +265,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 						},
 						ai:{
-							filterDamage:true,
+							nodamage:true,
+							nofire:true,
+							nothunder:true,
 							skillTagFilter(player,tag,arg){
 								return (arg&&arg.player&&arg.player.hasSkill('dcsbquanmou_false'));
 							},
+							effect:{
+								target(card,player,target){
+									if(get.tag(card,'damage')&&player&&player.hasSkill('dcsbquanmou_false')) return 'zeroplayertarget';
+								}
+							}
 						},
 					},
 				},

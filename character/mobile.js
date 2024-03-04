@@ -5733,7 +5733,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var num=0;
 					for(var i of cards) num+=get.number(i,player);
 					num=num%13;
-                    if(num==0) num=13;
+					if(num==0) num=13;
 					var card=get.cardPile2(function(card){
 						return get.number(card,false)==num;
 					});
@@ -14293,34 +14293,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					if(!player.storage.yizan&&player.countCards('hes')<2) return false;
-                    if(!player.hasCard(function(card){
-                        return get.type(card)=='basic';
-                    },'hs')) return false;
-                    for(var name of lib.inpile){
-                        if(get.type(name)!='basic') continue;
-                        if(event.filterCard(get.autoViewAs({name},'unsure'),player,event)) return true;
-                        if(name=='sha'){
-                            for(var nature of lib.inpile_nature){
-                                if(event.filterCard(get.autoViewAs({name,nature},'unsure'),player,event)) return true;
-                            }
-                        }
-                    }
+					if(!player.hasCard(function(card){
+						return get.type(card)=='basic';
+					},'hs')) return false;
+					for(var name of lib.inpile){
+						if(get.type(name)!='basic') continue;
+						if(event.filterCard(get.autoViewAs({name},'unsure'),player,event)) return true;
+						if(name=='sha'){
+							for(var nature of lib.inpile_nature){
+								if(event.filterCard(get.autoViewAs({name,nature},'unsure'),player,event)) return true;
+							}
+						}
+					}
 					return false;
 				},
 				chooseButton:{
 					dialog:function(event,player){
 						var list=[];
-                        for(var name of lib.inpile){
-                            if(get.type(name)!='basic') continue;
-                            if(event.filterCard(get.autoViewAs({name},'unsure'),player,event)){
-                                list.push(['基本','',name]);
-                            }
-                            if(name=='sha'){
-                                for(var nature of lib.inpile_nature){
-                                    if(event.filterCard(get.autoViewAs({name,nature},'unsure'),player,event)) list.push(['基本','','sha',nature]);
-                                }
-                            }
-                        }
+						for(var name of lib.inpile){
+							if(get.type(name)!='basic') continue;
+							if(event.filterCard(get.autoViewAs({name},'unsure'),player,event)){
+								list.push(['基本','',name]);
+							}
+							if(name=='sha'){
+								for(var nature of lib.inpile_nature){
+									if(event.filterCard(get.autoViewAs({name,nature},'unsure'),player,event)) list.push(['基本','','sha',nature]);
+								}
+							}
+						}
 						return ui.create.dialog('翊赞',[list,'vcard'],'hidden');
 					},
 					check:function(button){
@@ -15664,7 +15664,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunru:['dc_sunru','sunru'],
 			liuye:['dc_liuye','liuye'],
 			zhaotongzhaoguang:['dc_zhaotongzhaoguang','zhaotongzhaoguang'],
-            yangbiao:['yangbiao','dc_yangbiao','jsrg_yangbiao'],
+			yangbiao:['yangbiao','dc_yangbiao','jsrg_yangbiao'],
 			qiaozhou:['yj_qiaozhou','qiaozhou'],
 			sunhanhua:['dc_sunhanhua','sunhanhua'],
 			zhoubuyi:['zhoubuyi','yj_zhoubuyi'],

@@ -1830,7 +1830,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					let result;
 					if(_status.connectMode) game.broadcastAll(()=>{_status.noclearcountdown=true});
 					if(choices.length==1) result={control:choices[0]};
-                    else result=yield player.chooseControl(choices,'cancel2').set('choiceList',choiceList).set('prompt',get.prompt('dcxunjie')).set('ai',()=>{
+					else result=yield player.chooseControl(choices,'cancel2').set('choiceList',choiceList).set('prompt',get.prompt('dcxunjie')).set('ai',()=>{
 						return get.event('choice');
 					}).set('choice',(()=>{
 						const getValue=(index,target)=>{
