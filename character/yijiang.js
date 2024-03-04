@@ -1505,8 +1505,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					unlimit:{
 						mod:{
 							cardUsable:function(card,player){
-								var list=lib.skill.lkbushi.getBushi(player);
-								if(list[0]==get.suit(card)) return Infinity;
+								const list = lib.skill.lkbushi.getBushi(player), suit = get.suit(card);
+								if (suit === 'unsure' || list[0] === suit) return Infinity;
 							},
 						},
 						trigger:{player:'useCard1'},
@@ -2673,7 +2673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'taoluan',
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return !player.hasSkill('xintaoluan3')&&player.countCards('hes',card=>lib.inpile.some(name=>{
+					return !player.hasSkill('xintaoluan3')&&player.hasCard(card=>lib.inpile.some(name=>{
 						if(player.getStorage('xintaoluan').includes(name)) return false;
 						if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
 						if(event.filterCard({name:name,isCard:true,cards:[card]},player,event)) return true;
@@ -2683,7 +2683,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						return false;
-					}))>0&&!_status.dying.length;
+					},'hes'))>0&&!_status.dying.length;
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -5255,7 +5255,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return !player.hasSkill('taoluan3')&&player.countCards('hes',card=>lib.inpile.some(name=>{
+					return !player.hasSkill('taoluan3')&&player.hasCard(card=>lib.inpile.some(name=>{
 						if(player.getStorage('taoluan').includes(name)) return false;
 						if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
 						if(event.filterCard({name:name,isCard:true,cards:[card]},player,event)) return true;
@@ -5265,7 +5265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						return false;
-					}))>0;
+					},'hes'))>0;
 				},
 				onremove:true,
 				chooseButton:{

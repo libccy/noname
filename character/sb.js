@@ -828,7 +828,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return name=='sha'&&player.countCards('hs');
 						},
 						filter:function(event,player){
-							return event.filterCard({name:'sha'},player,event)||lib.inpile_nature.some(nature=>event.filterCard({name:'sha',nature:nature},player,event));
+							return event.filterCard(get.autoViewAs({name:'sha'},'unsure'),player,event)||lib.inpile_nature.some(nature=>event.filterCard(get.autoViewAs({name:'sha',nature},'unsure'),player,event));
 						},
 						chooseButton:{
 							dialog:function(event,player){
@@ -3763,10 +3763,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!marked&&name!='sha'&&name!='shan') continue;
 						if(get.type(name)!='basic') continue;
 						if(player.hasCard(lib.skill.sblongdan.getFilter(name,player),'hs')){
-							if(event.filterCard({name:name},player,event)) return true;
+							if(event.filterCard(get.autoViewAs({name},'unsure'),player,event)) return true;
 							if(marked&&name=='sha'){
 								for(var nature of lib.inpile_nature){
-									if(event.filterCard({name:name,nature:nature},player,event)) return true;
+									if(event.filterCard(get.autoViewAs({name,nature},'unsure'),player,event)) return true;
 								}
 							}
 						}
@@ -3781,10 +3781,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!marked&&name!='sha'&&name!='shan') continue;
 							if(get.type(name)!='basic') continue;
 							if(player.hasCard(lib.skill.sblongdan.getFilter(name,player),'hs')){
-								if(event.filterCard({name:name},player,event)) list.push(['基本','',name]);
+								if(event.filterCard(get.autoViewAs({name},'unsure'),player,event)) list.push(['基本','',name]);
 									if(marked&&name=='sha'){
 									for(var nature of lib.inpile_nature){
-										if(event.filterCard({name:name,nature:nature},player,event)) list.push(['基本','',name,nature])
+										if(event.filterCard(get.autoViewAs({name,nature},'unsure'),player,event)) list.push(['基本','',name,nature])
 									}
 								}
 							}

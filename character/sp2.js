@@ -874,16 +874,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				filter:function(event,player){
-					if(!event.filterCard({name:'sha'},player,event)&&!event.filterCard({name:'wuxie'},player,event)) return false;
-					return player.countCards('hs',card=>{
-						return !player.getStorage('starlifeng_count').includes(get.color(card,player))||_status.connectMode;
-					});
+					if(!event.filterCard(get.autoViewAs({name:'sha'},'unsure'),player,event)&&!event.filterCard(get.autoViewAs({name:'wuxie'},'unsure'),player,event)) return false;
+					return player.hasCard(card=>{
+						return !player.getStorage('starlifeng_count').includes(get.color(card,player));
+					},'hs');
 				},
 				chooseButton:{
 					dialog:function(event,player){
 						var list=[];
-						if(event.filterCard({name:'sha'},player,event)) list.push(['基本','','sha']);
-						if(event.filterCard({name:'wuxie'},player,event)) list.push(['锦囊','','wuxie']);
+						if(event.filterCard(get.autoViewAs({name:'sha'},'unsure'),player,event)) list.push(['基本','','sha']);
+						if(event.filterCard(get.autoViewAs({name:'wuxie'},'unsure'),player,event)) list.push(['锦囊','','wuxie']);
 						return ui.create.dialog('砺锋',[list,'vcard']);
 					},
 					check:function(button){
@@ -1566,10 +1566,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				mod:{
 					targetInRange:function(card,player){
-						if(get.color(card)=='none') return true;
+						const color = get.color(card);
+						if (color === 'none' || color === 'unsure') return true;
 					},
 					cardUsable:function(card){
-						if(get.color(card)=='none') return Infinity;
+						const color = get.color(card);
+						if (color === 'none' || color === 'unsure') return Infinity;
 					},
 				}
 			},
@@ -6400,10 +6402,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					targetInRange:function(card){
-						if(get.color(card)=='black') return true;
+						const color = get.color(card);
+						if (color === 'black' || color === 'unsure') return true;
 					},
 					cardUsable:function(card){
-						if(get.color(card)=='black') return Infinity;
+						const color = get.color(card);
+						if (color === 'black' || color === 'unsure') return Infinity;
 					},
 				},
 			},

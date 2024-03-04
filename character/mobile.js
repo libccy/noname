@@ -3108,7 +3108,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							cardEnabled:function(card,player){
 								if(!player.storage.scschihe_blocker) return;
 								var suit=get.suit(card);
-								if(suit=='none') return;
+								if(suit=='none'||suit=='unsure') return;
 								var evt=_status.event;
 								if(evt.name!='chooseToUse') evt=evt.getParent('chooseToUse');
 								if(!evt||!evt.respondTo||evt.respondTo[1].name!='sha') return;
@@ -3222,10 +3222,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					var filter=event.filterCard;
-					if(filter({name:'sha',nature:'fire'},player,event)&&player.countCards('hes',{suit:'diamond'})) return true;
-					if(filter({name:'shan'},player,event)&&player.countCards('hes',{suit:'club'})) return true;
-					if(filter({name:'tao'},player,event)&&player.countCards('hes',{suit:'heart'})) return true;
-					if(filter({name:'wuxie'},player,event)&&player.countCards('hes',{suit:'spade'})) return true;
+					if(filter(get.autoViewAs({name:'sha',nature:'fire'},'unsure'),player,event)&&player.countCards('hes',{suit:'diamond'})) return true;
+					if(filter(get.autoViewAs({name:'shan'},'unsure'),player,event)&&player.countCards('hes',{suit:'club'})) return true;
+					if(filter(get.autoViewAs({name:'tao'},'unsure'),player,event)&&player.countCards('hes',{suit:'heart'})) return true;
+					if(filter(get.autoViewAs({name:'wuxie'},'unsure'),player,event)&&player.countCards('hes',{suit:'spade'})) return true;
 					return false;
 				},
 				precontent:function(){
@@ -3399,10 +3399,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filter:function(event,player){
 					var filter=event.filterCard;
-					if(filter({name:'sha',nature:'fire'},player,event)&&player.countCards('hes',{suit:'diamond'})) return true;
-					if(filter({name:'shan'},player,event)&&player.countCards('hes',{suit:'club'})) return true;
-					if(filter({name:'tao'},player,event)&&player.countCards('hes',{suit:'heart'})) return true;
-					if(filter({name:'wuxie'},player,event)&&player.countCards('hes',{suit:'spade'})) return true;
+					if(filter(get.autoViewAs({name:'sha',nature:'fire'},'unsure'),player,event)&&player.countCards('hes',{suit:'diamond'})) return true;
+					if(filter(get.autoViewAs({name:'shan'},'unsure'),player,event)&&player.countCards('hes',{suit:'club'})) return true;
+					if(filter(get.autoViewAs({name:'tao'},'unsure'),player,event)&&player.countCards('hes',{suit:'heart'})) return true;
+					if(filter(get.autoViewAs({name:'wuxie'},'unsure'),player,event)&&player.countCards('hes',{suit:'spade'})) return true;
 					return false;
 				},
 				precontent:function(){
@@ -5625,7 +5625,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var evt=lib.skill.dcjianying.getLastUsed(player);
 							if(!evt||!evt.card) return;
 							var num1=get.number(card),num2=get.number(evt.card);
-							if(typeof num1=='number'&&typeof num2=='number'&&num1%num2==0) return Infinity;
+							if(num1==='unsure'||typeof num1=='number'&&typeof num2=='number'&&num1%num2==0) return Infinity;
 						}
 					},
 					aiOrder:function(player,card,num){
@@ -5633,7 +5633,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							var evt=lib.skill.dcjianying.getLastUsed(player);
 							if(!evt||!evt.card) return;
 							var num1=get.number(card),num2=num2=get.number(evt.card);
-							if(typeof num1=='number'&&typeof num2=='number'&&num2%num1==0) return num+5;
+							if(num1==='unsure'||typeof num1=='number'&&typeof num2=='number'&&num2%num1==0) return num+5;
 						}
 					},
 				},
@@ -6634,19 +6634,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:['chooseToUse','chooseToRespond'],
 				filter:function(event,player){
-					return player.getExpansions('jibing').length>0&&(event.filterCard({name:'sha'},player,event)||event.filterCard({name:'shan'},player,event));
+					return player.getExpansions('jibing').length>0&&(event.filterCard(get.autoViewAs({name:'sha'},'unsure'),player,event)||event.filterCard(get.autoViewAs({name:'shan'},'unsure'),player,event));
 				},
 				chooseButton:{
 					dialog:function(event,player){
 						var dialog=ui.create.dialog('集兵','hidden');
-						if(event.filterCard({name:'sha'},player,event)&&event.filterCard({name:'shan'},player,event)){
+						if(event.filterCard(get.autoViewAs({name:'sha'},'unsure'),player,event)&&event.filterCard(get.autoViewAs({name:'shan'},'unsure'),player,event)){
 							dialog._chooseButton=2;
 							var list=['sha','shan'];
 							dialog.add([list.map(i=>{
 								return [i,get.translation(i)];
 							}),'tdnodes']);
 						}
-						else dialog._cardName=event.filterCard({name:'sha'},player,event)?'sha':'shan';
+						else dialog._cardName=event.filterCard(get.autoViewAs({name:'sha'},'unsure'),player,event)?'sha':'shan';
 						dialog.add(player.getExpansions('jibing'));
 						return dialog;
 					},
@@ -13279,7 +13279,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},'hs')) return false;
 					for(var name of lib.inpile){
 						if(get.type(name)!='basic') continue;
-						if(event.filterCard({name:name},player,event)) return true;
+						if(event.filterCard(get.autoViewAs({name},'unsure'),player,event)) return true;
 					}
 					return false;
 				},
@@ -13288,7 +13288,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=[];
 						for(var name of lib.inpile){
 							if(get.type(name)!='basic') continue;
-							if(event.filterCard({name:name},player,event)) list.push(['基本','',name]);
+							if(event.filterCard(get.autoViewAs({name},'unsure'),player,event)) list.push(['基本','',name]);
 							if(name!='sha') continue;
 							for(var j of lib.inpile_nature){
 								if(event.filterCard({name:name,nature:j},player,event)) list.push(['基本','','sha',j]);
@@ -14298,10 +14298,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                     },'hs')) return false;
                     for(var name of lib.inpile){
                         if(get.type(name)!='basic') continue;
-                        if(event.filterCard({name:name},player,event)) return true;
+                        if(event.filterCard(get.autoViewAs({name},'unsure'),player,event)) return true;
                         if(name=='sha'){
                             for(var nature of lib.inpile_nature){
-                                if(event.filterCard({name:'sha',nature:nature},player,event)) return true;
+                                if(event.filterCard(get.autoViewAs({name,nature},'unsure'),player,event)) return true;
                             }
                         }
                     }
@@ -14312,12 +14312,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var list=[];
                         for(var name of lib.inpile){
                             if(get.type(name)!='basic') continue;
-                            if(event.filterCard({name:name},player,event)){
+                            if(event.filterCard(get.autoViewAs({name},'unsure'),player,event)){
                                 list.push(['基本','',name]);
                             }
                             if(name=='sha'){
                                 for(var nature of lib.inpile_nature){
-                                    if(event.filterCard({name:name,nature:nature},player,event)) list.push(['基本','','sha',nature]);
+                                    if(event.filterCard(get.autoViewAs({name,nature},'unsure'),player,event)) list.push(['基本','','sha',nature]);
                                 }
                             }
                         }

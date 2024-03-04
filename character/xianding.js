@@ -281,11 +281,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					for (let target of targets) {
 						if (target.isIn() && player.inRange(target)) {
 							const result = await target.chooseToRespond(prompt, (card,player)=>{
-								return get.type(card) == 'basic' && get.color(card) != 'black';
-							}).set('filterOk', ()=>{
-								const card = get.card();
-								if (card && get.color(card)!='red') return false;
-								return true;
+								if (get.type(card) !== 'basic') return false;
+								const color = get.color(card);
+								return (color == 'red' || color == 'unsure');
 							}).set('ai',card => {
 								const player = get.player(), event = get.event();
 								const source = event.getParent().player;
@@ -3917,7 +3915,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							})) return false;
 							var storage=player.getStorage('dczhaowen_viewed');
 							for(var i of lib.inpile){
-								if(!storage.includes(i)&&get.type(i)=='trick'&&event.filterCard({name:i},player,event)) return true;
+								if(!storage.includes(i)&&get.type(i)=='trick'&&event.filterCard(get.autoViewAs({name:i},'unsure'),player,event)) return true;
 							}
 							return false;
 						},
@@ -3929,7 +3927,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var storage=player.getStorage('dczhaowen_viewed');
 								var list=[];
 								for(var i of lib.inpile){
-									if(!storage.includes(i)&&get.type(i)=='trick'&&event.filterCard({name:i},player,event)){
+									if(!storage.includes(i)&&get.type(i)=='trick'&&event.filterCard(get.autoViewAs({name:i},'unsure'),player,event)){
 										list.push(['锦囊','',i]);
 									}
 								}
@@ -6964,7 +6962,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!storage.length) return false;
 					var storage2=player.getStorage('dcfengying_used')
 					return storage.some(name=>{
-						return !storage2.includes(name)&&event.filterCard({name:name},player,event);
+						return !storage2.includes(name)&&event.filterCard(get.autoViewAs({name},'unsure'),player,event);
 					});
 				},
 				hiddenCard:function(player,name){
@@ -6984,7 +6982,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					filter:function(button,player){
 						var card={name:button.link[2],storage:{dcfengying:true}};
 						if(player.getStorage('dcfengying_used').includes(card.name)) return false;
-						return _status.event.getParent().filterCard(card,player,_status.event.getParent());
+						return _status.event.getParent().filterCard(get.autoViewAs(card,'unsure'),player,_status.event.getParent());
 					},
 					check:function(button){
 						var player=_status.event.player;
@@ -12704,13 +12702,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					filter:function(button,player){
 						var evt=_status.event.getParent();
 						if(evt&&typeof evt.filterCard=='function') return evt.filterCard({name:button.link[2]},player,evt);
-						return lib.filter.filterCard({name:button.link[2]},player,_status.event.getParent());
+						return lib.filter.filterCard({name:button.link[2],isCard:true},player,_status.event.getParent());
 					},
 					check:function(button){
 						var player=_status.event.player;
 						if(player.countCards('h',button.link[2])) return 0;
 						if(_status.event.getParent().type!='phase'&&!_status.event.getParent().lvli6) return 1;
-						return player.getUseValue({name:button.link[2]});
+						return player.getUseValue({name:button.link[2],isCard:true});
 					},
 					backup:function(links,player){
 						return {
