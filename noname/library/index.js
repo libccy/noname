@@ -328,6 +328,8 @@ export class Library extends Uninstantable {
 		//game.check美化
 		checkBegin: [],
 		checkEnd: [],
+		uncheckBegin: [],
+		uncheckEnd: [],
 	};
 
 	/**

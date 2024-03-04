@@ -6113,48 +6113,49 @@ export class Game extends Uninstantable {
 		}
 	}
 	static uncheck(...args) {
-		let i, j;
+		const event = _status.event;
+		const players = game.players.slice();
+		if (_status.event.deadTarget) players.addArray(game.dead);
+		game.callHook("uncheckBegin", [event]);
 		if (game.chess) {
 			let shadows = ui.chessContainer.getElementsByClassName('playergrid temp');
-			while (shadows.length) {
-				shadows[0].remove();
-			}
+			while (shadows.length) shadows[0].remove();
 		}
-		if ((args.length == 0 || args.includes('card')) && _status.event.player) {
-			let cards = _status.event.player.getCards('hejsx');
-			for (j = 0; j < cards.length; j++) {
-				cards[j].classList.remove('selected');
-				cards[j].classList.remove('selectable');
-				if (cards[j]._tempName) {
-					cards[j]._tempName.delete();
-					delete cards[j]._tempName;
-				}
-				cards[j].updateTransform();
-			}
-			ui.selected.cards.length = 0;
-			_status.event.player.node.equips.classList.remove('popequip');
-		}
-		let players = game.players.slice(0);
-		if (_status.event.deadTarget) players.addArray(game.dead);
-		if ((args.length == 0 || args.includes('target'))) {
-			for (j = 0; j < players.length; j++) {
-				players[j].classList.remove('selected');
-				players[j].classList.remove('selectable');
-				if (players[j].instance) {
-					players[j].instance.classList.remove('selected');
-					players[j].instance.classList.remove('selectable');
-				}
-			}
-			ui.selected.targets.length = 0;
-		}
-		if ((args.length == 0 || args.includes('button')) && _status.event.dialog && _status.event.dialog.buttons) {
-			for (let j = 0; j < _status.event.dialog.buttons.length; j++) {
-				_status.event.dialog.buttons[j].classList.remove('selectable');
-				_status.event.dialog.buttons[j].classList.remove('selected');
-			}
+		if (args.length === 0) args = ['button', 'card', 'target'];
+		_status.event.player.node.equips.classList.remove('popequip');
+
+		if (args.includes('button') && event.dialog && event.dialog.buttons) {
+			event.dialog.buttons.forEach(button => {
+				button.classList.remove('selectable');
+				button.classList.remove('selected');
+			});
 			ui.selected.buttons.length = 0;
 		}
-		if (args.length == 0) {
+		if (args.includes('card') && event.player) {
+			const cards = event.player.getCards('hejsx');
+			cards.forEach(card => {
+				card.classList.remove('selected');
+				card.classList.remove('selectable');
+				if (card._tempName) {
+					card._tempName.delete();
+					delete card._tempName;
+				}
+				card.updateTransform();
+			});
+			ui.selected.cards.length = 0;
+		}
+		if (args.includes('target')) {
+			players.forEach(target => {
+				target.classList.remove('selected');
+				target.classList.remove('selectable');
+				if (target.instance) {
+					target.instance.classList.remove('selected');
+					target.instance.classList.remove('selectable');
+				}
+			});
+			ui.selected.targets.length = 0;
+		}
+		if (args.length === 3) {
 			ui.arena.classList.remove('selecting');
 			ui.arena.classList.remove('tempnoe');
 			_status.imchoosing = false;
@@ -6162,20 +6163,16 @@ export class Game extends Uninstantable {
 			_status.mousedragging = null;
 			_status.mousedragorigin = null;
 
-			while (ui.touchlines.length) {
-				ui.touchlines.shift().delete();
-			}
+			ui.touchlines.forEach(i => i.delete());
+			ui.touchlines.length = 0;
 		}
 		ui.canvas.width = ui.arena.offsetWidth;
 		ui.canvas.height = ui.arena.offsetHeight;
-		for (let i = 0; i < players.length; i++) {
-			players[i].unprompt();
-		}
-		for (let i = 0; i < _status.dragline.length; i++) {
-			if (_status.dragline[i]) _status.dragline[i].remove();
-		}
-		ui.arena.classList.remove('dragging');
+		players.forEach(i => i.unprompt());
+		_status.dragline.forEach(i => i && i.remove());
 		_status.dragline.length = 0;
+		ui.arena.classList.remove('dragging');
+		game.callHook("uncheckEnd", [event]);
 	}
 	/**
 	 * @param { Player } player1 
