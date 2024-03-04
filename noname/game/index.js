@@ -6022,7 +6022,6 @@ export class Game extends Uninstantable {
 			const players = game.players.slice();
 			if (event.deadTarget) players.addArray(game.dead);
 			const cards = player.getCards(event.position);
-			const range = get.select(event.selectCard);
 			const isSelectable = card => {
 				if (card.classList.contains('uncheck')) return false;
 				if (player.isOut()) return false;
