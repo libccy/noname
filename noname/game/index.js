@@ -5875,15 +5875,16 @@ export class Game extends Uninstantable {
 		const useCache = !lib.config.compatiblemode && !event.skill
 			&& ['button', 'card', 'target'].every(type => {
 				if (!event[`filter${uppercaseType(type)}`]) return true;
-				if (typeof event[`select${uppercaseType(type)}`] === 'function') return false;
+				// if (typeof event[`select${uppercaseType(type)}`] === 'function') return false;
 				if (get.select(event[`select${uppercaseType(type)}`])[1] < 0) return false;
+				if (type === "button") type = "select";
 				return !event[`complex${uppercaseType(type)}`];
 			});
 
 		['button', 'card', 'target'].forEach(type => {
 			if (!event[`filter${uppercaseType(type)}`]) return;
-			if (!ok) game.uncheck(type, useCache);
-			else ({ ok, auto = auto } = game.Check[type](event));
+			if (!ok) game.uncheck(type);
+			else ({ ok, auto = auto } = game.Check[type](event, useCache));
 		});
 
 		game.Check.skill(event);
@@ -5954,9 +5955,9 @@ export class Game extends Uninstantable {
 				if (!event[`_${type}Choice`]) event[`_${type}Choice`] = {};
 				const cacheId = Object.keys(ui.selected).reduce((result, Type) => {
 					if (Type === type + 's') return result;
-					Type = Type.slice(0, -1);
-					if (Type === "target") Type = "player";
-					return ui.selected[i].reduce((t, i) => t ^= i[`${Type}id`], result);
+					let idType = Type.slice(0, -1);
+					if (idType === "target") idType = "player";
+					return ui.selected[Type].reduce((t, i) => t ^= i[`${idType}id`], result);
 				}, 0);
 				if (!event[`_${type}Choice`][cacheId]) {
 					event[`_${type}Choice`][cacheId] = [];
