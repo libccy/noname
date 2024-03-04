@@ -30,13 +30,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip1',
-				onLose(){
-					if(!lib.card.sizhaojian.inShanShanFestival()){
-						card.fix();
-						card.remove();
-						card.destroyed=true;
-						game.log(card,'被销毁了');
-					}
+				get destroy(){
+					return !lib.card.sizhaojian.inShanShanFestival();
 				},
 				inShanShanFestival(){
 					//闪闪节外离开装备区会销毁
