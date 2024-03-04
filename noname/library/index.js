@@ -146,6 +146,11 @@ export class Library extends Uninstantable {
 	}
 
 	//函数钩子
+	/**
+	 * 你可以往这里加入{钩子名:函数数组}，并在数组里增加你的自定义函数
+	 * 这样当某个地方调用game.callHook(钩子名,[...函数参数])时，就会按顺序将对应数组中的每个函数运行一遍（传参为callHook的第二个参数）。
+	 * 你可以将hook机制类比为event.trigger()，但是这里只能放同步代码
+	 */
 	static hooks = {
 		// 本体势力的颜色
 		addGroup: [(id, _short, _name, config) => {
