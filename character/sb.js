@@ -1141,7 +1141,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							});
 							if(!target){
 								event.finish();
-                                return;
+								return;
 							}
 							event.target=target;
 							player.logSkill('sbqicai_gain',target);

@@ -13963,7 +13963,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chengong:['chengong','re_chengong','sb_chengong'],
 			xunyou:['xunyou','re_xunyou'],
 			xuezong:['xuezong','tw_xuezong'],
-            huanghao:['huanghao','dc_huanghao','old_huanghao'],
+			huanghao:['huanghao','dc_huanghao','old_huanghao'],
 			caorui:['caorui','re_caorui','old_caorui'],
 			sunziliufang:['sunziliufang','dc_sunziliufang'],
 			liyan:['liyan','old_liyan'],
