@@ -5861,6 +5861,8 @@ export class Game extends Uninstantable {
 	 * @param { GameEventPromise } [event] 
 	 */
 	static check(event = _status.event) {
+		game.callHook("checkBegin", [event]);
+		
 		event._checked = true;
 		let ok = true, auto = true, auto_confirm = lib.config.auto_confirm;
 		const player = event.player;
@@ -5890,7 +5892,7 @@ export class Game extends Uninstantable {
 		game.Check.skill(event);
 
 		player.node.equips.classList.remove('popequip');
-		if (event.filterCard && lib.config.popequip && get.is.phoneLayout() &&
+		if (event.filterCard && lib.config.popequip && !_status.nopopequip && get.is.phoneLayout() &&
 			typeof event.position === 'string' && event.position.includes('e') &&
 			player.node.equips.querySelector('.card.selectable')) {
 			player.node.equips.classList.add('popequip');
@@ -5927,6 +5929,7 @@ export class Game extends Uninstantable {
 		}
 
 		if (event.isMine()) game.Check.confirm(event, { ok, auto, auto_confirm });
+
 		// if (ui.confirm && ui.confirm.lastChild.link == 'cancel') {
 		// 	if (_status.event.type == 'phase' && !_status.event.skill) {
 		// 		ui.confirm.lastChild.innerHTML = '结束';
@@ -5935,6 +5938,8 @@ export class Game extends Uninstantable {
 		// 		ui.confirm.lastChild.innerHTML = '取消';
 		// 	}
 		// }
+		
+		game.callHook("checkEnd", [event]);
 		return ok;
 	}
 	static Check = class extends Uninstantable {
@@ -5953,12 +5958,12 @@ export class Game extends Uninstantable {
 
 			if (useCache) {
 				if (!event[`_${type}Choice`]) event[`_${type}Choice`] = {};
-				const cacheId = Object.keys(ui.selected).reduce((result, Type) => {
-					if (Type === type + 's') return result;
-					let idType = Type.slice(0, -1);
-					if (idType === "target") idType = "player";
-					return ui.selected[Type].reduce((t, i) => t ^= i[`${idType}id`], result);
-				}, 0);
+				let cacheId = 0;
+				for (let Type of ['button', 'card', 'target']) {
+					if (type === Type) break;
+					if (Type === "target") Type = "player";
+					ui.selected[`${Type}s`].forEach(i => cacheId ^= i[`${Type}id`]);
+				}
 				if (!event[`_${type}Choice`][cacheId]) {
 					event[`_${type}Choice`][cacheId] = [];
 					firstCheck = true;
@@ -6017,7 +6022,6 @@ export class Game extends Uninstantable {
 			const players = game.players.slice();
 			if (event.deadTarget) players.addArray(game.dead);
 			const cards = player.getCards(event.position);
-			let firstCheck = false;
 			const range = get.select(event.selectCard);
 			const isSelectable = card => {
 				if (card.classList.contains('uncheck')) return false;

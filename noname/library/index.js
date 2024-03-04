@@ -325,6 +325,9 @@ export class Library extends Uninstantable {
 				game.dynamicStyle.addObject(result2);
 			}
 		}],
+		//game.check美化
+		checkBegin: [],
+		checkEnd: [],
 	};
 
 	/**
