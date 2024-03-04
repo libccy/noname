@@ -4546,6 +4546,7 @@ export const Content = {
 			event.dialog.style.display = '';
 			event.dialog.open();
 		}
+		if (['chooseCharacter', 'chooseButtonOL'].includes(event.getParent().name)) event.complexSelect = true;
 		var filterButton = event.filterButton || function () { return true; };
 		var selectButton = get.select(event.selectButton);
 		var buttons = event.dialog.buttons;

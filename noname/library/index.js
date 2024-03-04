@@ -8794,6 +8794,7 @@ export class Library extends Uninstantable {
 				game.me.actused = -99;
 			}
 			ui.updatehl();
+			delete _status.event._buttonChoice;
 			delete _status.event._cardChoice;
 			delete _status.event._targetChoice;
 			delete _status.event._skillChoice;
@@ -8811,6 +8812,7 @@ export class Library extends Uninstantable {
 				game.me.actused = -99;
 			}
 			ui.updatehl();
+			delete _status.event._buttonChoice;
 			delete _status.event._cardChoice;
 			delete _status.event._targetChoice;
 			delete _status.event._skillChoice;
@@ -9009,6 +9011,7 @@ export class Library extends Uninstantable {
 			const card = lib.cheat.gn(name);
 			if (!card) return;
 			target.node.handcards1.appendChild(card);
+			delete _status.event._buttonChoice;
 			delete _status.event._cardChoice;
 			delete _status.event._targetChoice;
 			delete _status.event._skillChoice;
@@ -9124,6 +9127,7 @@ export class Library extends Uninstantable {
 			for (let i = 0; i < num; i++) {
 				const card = cards[i];
 				game.me.node.handcards1.appendChild(card);
+				delete _status.event._buttonChoice;
 				delete _status.event._cardChoice;
 				delete _status.event._targetChoice;
 				delete _status.event._skillChoice;
@@ -9140,6 +9144,7 @@ export class Library extends Uninstantable {
 			for (var i = 0; i < args.length; i++) {
 				game.me.addSkill(args[i], true);
 			}
+			delete _status.event._buttonChoice;
 			delete _status.event._cardChoice;
 			delete _status.event._targetChoice;
 			delete _status.event._skillChoice;
@@ -9797,6 +9802,51 @@ export class Library extends Uninstantable {
 						if (skills.includes(skill)) return false;
 					}
 				}
+			}
+			return true;
+		},
+		/**
+		 *
+		 * @param {GameEvent} event
+		 * @param {Player} player
+		 * @param {string} skill
+		 * @returns {boolean}
+		 */
+		filterEnable: function (event, player, skill) {
+			const info = get.info(skill);
+			if (!info) {
+				console.error(new ReferenceError('缺少info的技能:', skill));
+				return false;
+			}
+			// if (!game.expandSkills(player.getSkills('invisible').concat(lib.skill.global)).includes(skill)) return false;
+			if (!game.expandSkills(player.getSkills(false).concat(lib.skill.global)).includes(skill)) {//hiddenSkills
+				if (player.hasSkillTag('nomingzhi', false, null, true)) return false;
+				if (get.mode() !== 'guozhan') return false;
+				if (info.noHidden) return false;
+			}
+			const checkEnable = enable => {
+				if (typeof enable === 'function') return enable(event);
+				if (Array.isArray(enable)) return enable.some(i => checkEnable(i));
+				if (enable === 'phaseUse') return event.type === 'phase';
+				if (typeof enable === 'string') return enable === event.name;
+				return false;
+			}
+			if (!checkEnable(info.enable)) return false;
+			if (info.filter && !info.filter(event, player)) return false;
+			if (info.viewAs && typeof info.viewAs !== 'function') {
+				if (info.viewAsFilter && info.viewAsFilter(player) === false) return false;
+				if (event.filterCard && !event.filterCard(get.autoViewAs(info.viewAs, 'unsure'), player, event)) return false;
+			}
+			if (info.usable && get.skillCount(skill) >= info.usable) return false;
+			if (info.chooseButton && _status.event.noButton) return false;
+			if (info.round && (info.round - (game.roundNumber - player.storage[skill + '_roundcount']) > 0)) return false;
+			for (const item in player.storage) {
+				if (!item.startsWith('temp_ban_')) continue;
+				if (player.storage[item] !== true) continue;
+				const skillName = item.slice(9);
+				if (!lib.skill[skillName]) continue;
+				const skills = game.expandSkills([skillName]);
+				if (skills.includes(skill)) return false;
 			}
 			return true;
 		},
