@@ -17709,9 +17709,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'orange',
 				forceunique:true,
-				//filter:function(event,player){
-				//	return player.storage.fanghun2>0;
-				//},
+				filter:function(event,player){
+					return player.storage.fanghun2>0;
+				},
 				prompt:function(event,player){
 					var num=Math.max(2,player.storage.fanghun2||0);
 					num=Math.min(num,8);
