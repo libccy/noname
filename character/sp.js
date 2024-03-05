@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				sp_others:["hanba","caiyang"],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','liupan'],
 			},
 		},
 		characterFilter:{
@@ -30,6 +30,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			liupan:['male','qun',4,['olpijing']],
 			guotu:['male','qun',3,['olqushi','olweijie']],
 			ol_hujinding:['female','shu',3,['olqingyuan','olchongshen']],
 			tianchou:['male','qun',4,['olshandao']],
@@ -202,6 +203,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luzhi:['male','wei',3,['qingzhong','weijing']]
 		},
 		characterIntro:{
+			liupan:'刘磐（生卒年不详），山阳高平人，荆州牧刘表从子。与南阳人黄忠共守长沙攸县。为人骁勇，数次为寇于艾、西安诸县。江东孙策于是分海昏、建昌为左右六县，以东莱太史慈为建昌都尉，治海昏，并督诸将共拒刘磐。于是刘磐绝迹不复为寇。',
 			guotu:'郭图（？－205年），字公则，颍川（治今河南省禹州市）人。东汉末年袁绍帐下谋士。韩馥统冀州时，郭图与荀谌等人奉袁绍之命，说服韩馥让位。袁绍统一河北后，郭图与审配等人力劝袁绍统率大军攻打曹操。袁绍死后，袁尚继位。郭图与辛评为袁谭效力，挑唆袁谭攻击袁尚。建安十年（205年），郭图和袁谭一同被曹操所杀。',
 			tianchou:'田畴（169年或170年-214年或216年），字子泰，东汉右北平郡无终人，东汉末年隐士。田畴好文习武。汉初平年间，其受刘虞派遣去长安，呈送指控公孙赞奏章，献帝大悦，封为骑都尉，田畴不受。携诏返回时，刘虞已被公孙所杀，田畴到刘墓祭拜，被公孙所提，不久释放。田畴回故乡后率家族及随从数百人隐居徐无山，致力农桑，数年间增至5000家。制定法条，兴建学校，一时民风良好，乌桓、鲜卑纷纷与其结交。汉建安二十年（207年），曹操北征乌桓，田畴请为向导。上徐无山、出卢龙、过平冈、登白狼堆、至柳城，曹军大胜，封田畴为亭侯，坚辞不受。曹念田功，四次封赏，终不受，乃拜为议郎。建安二十一年（216年），田畴去世。',
 			liyi:'李异（生卒年不详），三国时期东吴将领。建安末，与谢旌率水陆三千，击破刘备军将领詹晏、陈凤。刘备领兵攻孙权时，李异与陆逊等人屯巫、秭归，为蜀将所破。黄武元年（222年），陆逊破刘备于猇亭，李异追踪蜀军，屯驻南山。清代学者赵一清认为此李异与刘璋部将李异为同一人。',
@@ -708,6 +710,80 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//刘磐
+			olpijing:{
+				audio:2,
+				trigger:{player:'useCardToPlayered'},
+				filter(event,player){
+					if(!game.hasPlayer(target=>target!=player&&!event.targets.includes(target)&&lib.filter.targetEnabled2(event.card,player,target)&&lib.filter.targetInRange(event.card,player,target))) return false;
+					return get.color(event.card)=='black'&&(event.card.name=='sha'||get.type(event.card)=='trick')&&event.targets.length==1;
+				},
+				usable:1,
+				direct:true,
+				locked:false,
+				async content(event,trigger,player){
+					const num=Math.max(1,player.getDamagedHp());
+					const {result:{bool,targets}}=await player.chooseTarget(get.prompt('olpijing'),[1,num],(card,player,target)=>{
+						const trigger=get.event().getTrigger();
+						return target!=player&&!trigger.targets.includes(target)&&lib.filter.targetEnabled2(trigger.card,player,target)&&lib.filter.targetInRange(trigger.card,player,target);
+					}).set('ai',target=>{
+						const player=get.event('player'),trigger=get.event().getTrigger();
+						return get.effect(target,trigger.card,player,player)*(target.getStorage('olpijing_effect').includes(player)?2:1)+get.effect(target,{name:'shunshou_copy2'},player,player);
+					}).set('prompt2','令至多'+get.cnNumber(num)+'名角色成为'+get.translation(trigger.card)+'的目标并交给你一张牌');
+					if(bool){
+						player.logSkill('olpijing',targets);
+						trigger.targets.addArray(targets);
+						for(const target of targets){
+							target.addSkill('olpijing_effect');
+							target.markAuto('olpijing_effect',[player]);
+							await target.chooseToGive(player,'he',true,'披荆：交给'+get.translation(player)+'一张牌');
+						}
+					}
+					else player.storage.counttrigger.olpijing--;
+				},
+				mod:{
+					aiOrder(player,card,num){
+						if(!(card.name=='sha'||get.type(card)=='trick')||get.color(card)!='black') return;
+						const info=get.info(card);
+						if(info&&!info.notarget&&(info.toself||info.singleCard||!info.selectTarget||info.selectTarget==1)&&game.countPlayer(target=>{
+							if(get.effect(target,card,player,player)<=0) return false;
+							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
+						})>1) return num+0.01;
+					},
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove:true,
+						intro:{content:'使用的下一张基本牌或普通锦囊牌指定唯一目标时，可指定$为额外目标或摸一张牌'},
+						trigger:{player:'useCardToPlayer'},
+						filter(event,player){
+							return (get.type(event.card)=='basic'||get.type(event.card)=='trick')&&event.targets.length==1;
+						},
+						forced:true,
+						popup:false,
+						async content(event,trigger,player){
+							const storage=player.getStorage('olpijing_effect');
+							player.removeSkill('olpijing_effect');
+							const {result:{bool,targets}}=await player.chooseTarget('披荆：请选择此牌的额外目标',[1,storage.length],(card,player,target)=>{
+								const trigger=get.event().getTrigger();
+								return !trigger.targets.includes(target)&&get.event('storage').includes(target)&&lib.filter.targetEnabled2(trigger.card,player,target)&&lib.filter.targetInRange(trigger.card,player,target);
+							}).set('prompt2','不选择的角色视为你选择摸牌项').set('ai',target=>{
+								const player=get.event('player'),trigger=get.event().getTrigger();
+								return get.effect(target,trigger.card,player,player)-get.effect(player,{name:'draw'},player,player);
+							}).set('storage',storage);
+							if(bool){
+								player.line(targets);
+								trigger.targets.addArray(targets);
+								if(storage.length-targets.length>0){
+									player.draw(storage.length-targets.length);
+								}
+							}
+							else player.draw(storage.length);
+						},
+					},
+				},
+			},
 			//郭图
 			olqushi:{
 				audio:2,
@@ -14050,6 +14126,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=result.cards;
 					target.addToExpansion(cards,player,'give').gaintag.add('zlshoufu2');
 					player.line(target,'green');
+					if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.12);
 					target.addSkill('zlshoufu2');
 					'step 3'
 					game.delayx();
@@ -27392,6 +27469,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olqushi_info:'出牌阶段限一次，你可以摸一张牌，然后将一张手牌扣置于一名其他角色的武将牌上，称为“趋”。目标角色于其结束阶段移去武将牌上的所有“趋”，若其于本回合使用过与“趋”相同类别的牌，则你摸X张牌（X为其本回合使用牌指定过的目标数之和且至多为5）。',
 			olweijie:'诿解',
 			olweijie_info:'每回合限一次，你的回合外，当你需要使用或打出一张基本牌时，你可以弃置距离为1的一名角色的一张手牌，若此牌牌名与你需要使用或打出的牌的牌名相同，则视为你使用或打出之。',
+			liupan:'刘磐',
+			olpijing:'披荆',
+			olpijing_info:'每回合限一次，当你使用黑色【杀】或黑色普通锦囊牌指定唯一目标后，你可以令至多X名其他角色成为此牌的额外目标并依次交给你一张牌（X为你已损失的体力值且X至少为1）。这些角色下次使用基本牌或普通锦囊牌指定唯一目标时，其可令你成为此牌的额外目标或摸一张牌。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

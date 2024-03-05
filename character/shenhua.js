@@ -7640,7 +7640,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 3'
 					game.delayx();
 					game.broadcastAll(function(onEnd){
-                        _status.event.onEnd01=onEnd;
+						_status.event.onEnd01=onEnd;
 						if(_status.guhuoNode) _status.guhuoNode.listenTransition(onEnd,300);
 					},event.onEnd01);
 					'step 4'

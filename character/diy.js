@@ -14594,7 +14594,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.current.needsToDiscard()){
 							att=1;
 						}
-						player.chooseControlList(['令'+name+'摸一张牌展示','令'+name+'手牌上永久+1','弃置一张牌并令'+name+'获得一张本回进入弃牌堆的牌'],function(){
+						player.chooseControlList(['令'+name+'摸一张牌展示','令'+name+'手牌上永久+1','弃置一张牌并令'+name+'获得一张本回合进入弃牌堆的牌'],function(){
 							return _status.event.att;
 						}).set('att',att);
 					}

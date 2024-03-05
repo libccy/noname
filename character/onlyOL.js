@@ -30,6 +30,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				fullskin:true,
 				type:'equip',
 				subtype:'equip1',
+				get destroy(){
+					return !lib.card.sizhaojian.inShanShanFestival();
+				},
+				inShanShanFestival(){
+					//闪闪节外离开装备区会销毁
+					const date=new Date();
+					return date.getMonth()+1==3&&date.getDate()>=2&&date.getDate()<=15;
+				},
 				distance:{attackFrom:-1},
 				ai:{basic:{equipValue:7}},
 				skills:['olsbyufeng_sizhaojian'],
@@ -164,16 +172,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:'enterGame',
 				},
 				filter(event,player){
-					if(get.cardPile('sizhaojian','field')||lib.inpile.includes('sizhaojian')) return false;
-					return (event.name!='phase'||game.phaseNumber==0)&&player.hasEquipableSlot(1);
+					const card=get.cardPile('sizhaojian','field')||game.createCard2('sizhaojian','diamond',6);
+					return (event.name!='phase'||game.phaseNumber==0)&&player.canEquip(card,true);
 				},
 				forced:true,
 				locked:false,
 				async content(event,trigger,player){
-					game.broadcastAll(()=>lib.inpile.add('sizhaojian'));
-					const card=game.createCard2('sizhaojian','diamond',6);
-					player.$gain2(card,false);
-					game.delayx();
+					if(lib.card.sizhaojian.inShanShanFestival()){
+						game.broadcastAll(()=>lib.inpile.add('sizhaojian'));
+					}
+					const card=get.cardPile('sizhaojian','field')||game.createCard2('sizhaojian','diamond',6);
+					if(get.owner(card)) get.owner(card).$give(card,player,false);
+					else{
+						player.$gain2(card,false);
+						game.delayx();
+					}
 					player.equip(card);
 				},
 				subSkill:{
@@ -205,8 +218,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								let evt=_status.event;
 								if(evt.name!='chooseToUse') evt=evt.getParent('chooseToUse');
 								if(!evt||!evt.respondTo||!storage.includes(evt.respondTo[1])) return;
-								const num = get.number(card);
-								if(num!='unsure' && (typeof num!='number' || num<=get.number(evt.respondTo[1]))) return false;
+								const num=get.number(card);
+								if(num!='unsure'&&typeof num=='number'&&num<get.number(evt.respondTo[1])) return false;
 							},
 						},
 						onremove(player){
@@ -237,9 +250,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:['loseAfter','equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter']},
 				filter(event,player){
-					if(!player.hasEquipableSlot(1)||player.getEquip(1)||player.getEquip('sizhaojian')) return false;
-					const card=get.cardPile('sizhaojian','field');
-					if(!card||!player.canEquip(card,true)) return false;
+					if(player.getEquip(1)) return false;
+					const card=get.cardPile('sizhaojian','field')||game.createCard2('sizhaojian','diamond',6);
+					if(!player.canEquip(card,true)) return false;
 					return game.hasPlayer(target=>{
 						if(target==player||target.group!='qun') return false;
 						const evt=event.getl(target);
@@ -254,12 +267,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const evt=trigger.getl(target);
 						return evt&&evt.player==target&&evt.es&&evt.es.length>0;
 					}).sortBySeat();
-					const card=get.cardPile('sizhaojian','field');
+					const card=get.cardPile('sizhaojian','field')||game.createCard2('sizhaojian','diamond',6);
 					for(const target of targets){
 						const {result:{bool}}=await target.chooseBool(get.prompt('olsbshishou',player),'将'+get.translation(card)+'置入'+get.translation(player)+'的装备区中').set('choice',get.attitude(target,player)>0);
 						if(bool){
 							target.logSkill('olsbshishou',player);
 							if(get.owner(card)) get.owner(card).$give(card,player,false);
+							else{
+								player.$gain2(card,false);
+								game.delayx();
+							}
 							player.equip(card);
 							break;
 						}
@@ -1027,11 +1044,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olsbyufeng:'玉锋',
 			olsbyufeng_sizhaojian:'思召剑',
 			olsbyufeng_block:'思召剑',
-			olsbyufeng_info:'游戏开始时，若【思召剑】未加入本局游戏，若你可装备【思召剑】，则你将【思召剑】置入装备区。',
+			olsbyufeng_info:'游戏开始时，你将【思召剑】置入装备区。',
 			sizhaojian:'思召剑',
 			sizhaojian_info:'当你使用有点数的【杀】指定目标后，你令目标角色只能使用无点数或点数大于等于此【杀】的【闪】响应此牌。',
+			sizhaojian_append:'<span class="text" style="font-family: yuanli">【思召剑】于闪闪节（3月2日-3月15日）外离开装备区后，销毁此牌</span>',
 			olsbshishou:'士首',
-			olsbshishou_info:'主公技，其他群势力角色失去装备区的牌后，若你的装备区中没有武器牌，且【思召剑】存在于场上/牌堆/弃牌堆中，其可令你将【思召剑】置入装备区。',
+			olsbshishou_info:'主公技，其他群势力角色失去装备区的牌后，若你的装备区中没有武器牌，其可将【思召剑】置入你的装备区。',
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',
