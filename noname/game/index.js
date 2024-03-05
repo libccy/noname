@@ -5926,8 +5926,9 @@ export class Game extends Uninstantable {
 			});
 		}
 
+		ok = ok && (!event.filterOk || event.filterOk());
 		let confirm = '';
-		if (ok && (!event.filterOk || event.filterOk())) confirm += 'o';
+		if (ok) confirm += 'o';
 		if (!event.forced && !event.fakeforce && get.noSelected()) confirm += 'c';
 		if (event.isMine()) game.Check.confirm(event, confirm);
 
