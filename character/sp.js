@@ -14116,6 +14116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=result.cards;
 					target.addToExpansion(cards,player,'give').gaintag.add('zlshoufu2');
 					player.line(target,'green');
+					if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.12);
 					target.addSkill('zlshoufu2');
 					'step 3'
 					game.delayx();
