@@ -715,7 +715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardToPlayered'},
 				filter(event,player){
-					if(!game.hasPlayer(target=>target!=player&&!event.targets.includes(target)&&lib.filter.targetEnabled2(event.card,player,target))) return false;
+					if(!game.hasPlayer(target=>target!=player&&!event.targets.includes(target)&&lib.filter.targetEnabled2(event.card,player,target)&&lib.filter.targetInRange(event.card,player,target))) return false;
 					return get.color(event.card)=='black'&&(event.card.name=='sha'||get.type(event.card)=='trick')&&event.targets.length==1;
 				},
 				usable:1,
@@ -725,7 +725,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const num=Math.max(1,player.getDamagedHp());
 					const {result:{bool,targets}}=await player.chooseTarget(get.prompt('olpijing'),[1,num],(card,player,target)=>{
 						const trigger=get.event().getTrigger();
-						return target!=player&&!trigger.targets.includes(target)&&lib.filter.targetEnabled2(trigger.card,player,target);
+						return target!=player&&!trigger.targets.includes(target)&&lib.filter.targetEnabled2(trigger.card,player,target)&&lib.filter.targetInRange(trigger.card,player,target);
 					}).set('ai',target=>{
 						const player=get.event('player'),trigger=get.event().getTrigger();
 						return get.effect(target,trigger.card,player,player)*(target.getStorage('olpijing_effect').includes(player)?2:1)+get.effect(target,{name:'shunshou_copy2'},player,player);
@@ -740,6 +740,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else player.storage.counttrigger.olpijing--;
+				},
+				mod:{
+					aiOrder(player,card,num){
+						if(!(card.name=='sha'||get.type(card)=='trick')||get.color(card)!='black') return;
+						const info=get.info(card);
+						if(info&&!info.notarget&&(info.toself||info.singleCard||!info.selectTarget||info.selectTarget==1)&&game.countPlayer(target=>{
+							if(get.effect(target,card,player,player)<=0) return false;
+							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
+						})>1) return num+0.01;
+					},
 				},
 				subSkill:{
 					effect:{
@@ -757,7 +767,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.removeSkill('olpijing_effect');
 							const {result:{bool,targets}}=await player.chooseTarget('披荆：请选择此牌的额外目标',[1,storage.length],(card,player,target)=>{
 								const trigger=get.event().getTrigger();
-								return !trigger.targets.includes(target)&&get.event('storage').includes(target)&&lib.filter.targetEnabled2(trigger.card,player,target);
+								return !trigger.targets.includes(target)&&get.event('storage').includes(target)&&lib.filter.targetEnabled2(trigger.card,player,target)&&lib.filter.targetInRange(trigger.card,player,target);
 							}).set('prompt2','不选择的角色视为你选择摸牌项').set('ai',target=>{
 								const player=get.event('player'),trigger=get.event().getTrigger();
 								return get.effect(target,trigger.card,player,player)-get.effect(player,{name:'draw'},player,player);
