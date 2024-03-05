@@ -3,7 +3,7 @@ import { Uninstantable } from "../../util/index.js";
 import { menu } from "./menu/index.js";
 import { cardPackMenu } from "./menu/pages/cardPackMenu.js";
 import { characterPackMenu } from "./menu/pages/characterPackMenu.js";
-import { extensionMenu } from "./menu/pages/exetensionMenu.js";
+import { extensionMenu } from "./menu/pages/extensionMenu.js";
 import { optionsMenu } from "./menu/pages/optionsMenu.js";
 import { otherMenu } from "./menu/pages/otherMenu.js";
 import { startMenu } from "./menu/pages/startMenu.js";
