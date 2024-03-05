@@ -332,7 +332,20 @@ export class Library extends Uninstantable {
 		}],
 		//game.check
 		checkBegin: [],
-		checkEnd: [],
+		checkEnd: [
+			function autoConfirm(event, { ok, auto, auto_confirm }) {
+				if (!event.isMine()) return;
+				const skillinfo = get.info(event.skill) || {};
+				if (ok && auto && (auto_confirm || skillinfo.direct) && !_status.touchnocheck
+					&& !_status.mousedown && (!_status.mousedragging || !_status.mouseleft)) {
+					if (ui.confirm) ui.confirm.close();
+					if (event.skillDialog === true) event.skillDialog = false;
+					ui.click.ok();
+					_status.mousedragging = null;
+					if (skillinfo.preservecancel) ui.create.confirm('c');
+				}
+			}
+		],
 		checkButton: [],
 		checkCard: [
 			function updateTempname(card, event) {

@@ -5932,17 +5932,7 @@ export class Game extends Uninstantable {
 		if (!event.forced && !event.fakeforce && get.noSelected()) confirm += 'c';
 		if (event.isMine()) game.Check.confirm(event, confirm);
 
-		game.callHook("checkEnd", [event]);
-
-		if (event.isMine() && confirm.includes('o')
-			&& auto && (auto_confirm || skillinfo.direct) && !_status.touchnocheck
-			&& !_status.mousedown && (!_status.mousedragging || !_status.mouseleft)) {
-			if (ui.confirm) ui.confirm.close();
-			if (event.skillDialog === true) event.skillDialog = false;
-			ui.click.ok();
-			_status.mousedragging = null;
-			if (skillinfo.preservecancel) ui.create.confirm('c');
-		}
+		game.callHook("checkEnd", [event, { ok, auto, auto_confirm }]);
 
 		// if (ui.confirm && ui.confirm.lastChild.link == 'cancel') {
 		// 	if (_status.event.type == 'phase' && !_status.event.skill) {
