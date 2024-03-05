@@ -6403,7 +6403,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return !player.hasHistory('useSkill',function(evt){
 								return evt.skill=='twshuangren';
 							})&&!player.hasHistory('sourceDamage',function(evt){
-								return evt.card.name=='sha';
+								return evt.card&&evt.card.name=='sha';
 							});
 						},
 						direct:true,
