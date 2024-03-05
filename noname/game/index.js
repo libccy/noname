@@ -1881,12 +1881,12 @@ export class Game extends Uninstantable {
 				config: objectConfig
 			}
 			try{
-    			if (precontent) {
-    				_status.extension = name;
-    				
-    				await (gnc.is.generatorFunc(precontent) ? gnc.of(precontent) : precontent).call(object, config);
-    				delete _status.extension;
-    			}
+				if (precontent) {
+					_status.extension = name;
+					
+					await (gnc.is.generatorFunc(precontent) ? gnc.of(precontent) : precontent).call(object, config);
+					delete _status.extension;
+				}
 			}catch(e1){
 				console.log(`加载《${name}》扩展的precontent时出现错误。`,e1);
 				if(!lib.config.extension_alert) alert(`加载《${name}》扩展的precontent时出现错误。\n该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。\n${decodeURI(e1.stack)}`);
@@ -5891,19 +5891,10 @@ export class Game extends Uninstantable {
 
 		game.Check.skill(event);
 
-		player.node.equips.classList.remove('popequip');
-		if (event.filterCard && lib.config.popequip && !_status.nopopequip && get.is.phoneLayout() &&
-			typeof event.position === 'string' && event.position.includes('e') &&
-			player.node.equips.querySelector('.card.selectable')) {
-			player.node.equips.classList.add('popequip');
-			auto_confirm = false;
-		}
-
-
 		_status.multitarget = false;
-		const skillinfo = get.info(_status.event.skill);
+		const skillinfo = get.info(event.skill)||{};
 		if (_status.event.multitarget) _status.multitarget = true;
-		else if (_status.event.name === 'chooseToUse' && skillinfo) {
+		else if (_status.event.name === 'chooseToUse') {
 			if (skillinfo.multitarget && !skillinfo.multiline) _status.multitarget = true;
 			if (skillinfo.viewAs && typeof skillinfo.viewAs !== 'function') {
 				const cardinfo = get.info(get.card());
@@ -5913,6 +5904,13 @@ export class Game extends Uninstantable {
 			}
 		}
 
+		player.node.equips.classList.remove('popequip');
+		if (event.filterCard && lib.config.popequip && !_status.nopopequip && get.is.phoneLayout() &&
+			typeof event.position === 'string' && event.position.includes('e') &&
+			player.node.equips.querySelector('.card.selectable')) {
+			player.node.equips.classList.add('popequip');
+			auto_confirm = false;
+		}
 
 		if (event.isMine() && game.chess && get.config('show_distance') && game.me) {
 			const players = game.players.slice();
@@ -5928,7 +5926,22 @@ export class Game extends Uninstantable {
 			});
 		}
 
-		if (event.isMine()) game.Check.confirm(event, { ok, auto, auto_confirm });
+		let confirm = '';
+		if (ok && (!event.filterOk || event.filterOk())) confirm += 'o';
+		if (!event.forced && !event.fakeforce && get.noSelected()) confirm += 'c';
+		if (event.isMine()) game.Check.confirm(event, confirm);
+
+		game.callHook("checkEnd", [event]);
+
+		if (event.isMine() && confirm.includes('o')
+			&& auto && (auto_confirm || skillinfo.direct) && !_status.touchnocheck
+			&& !_status.mousedown && (!_status.mousedragging || !_status.mouseleft)) {
+			if (ui.confirm) ui.confirm.close();
+			if (event.skillDialog === true) event.skillDialog = false;
+			ui.click.ok();
+			_status.mousedragging = null;
+			if (skillinfo.preservecancel) ui.create.confirm('c');
+		}
 
 		// if (ui.confirm && ui.confirm.lastChild.link == 'cancel') {
 		// 	if (_status.event.type == 'phase' && !_status.event.skill) {
@@ -5938,12 +5951,10 @@ export class Game extends Uninstantable {
 		// 		ui.confirm.lastChild.innerHTML = '取消';
 		// 	}
 		// }
-		
-		game.callHook("checkEnd", [event]);
 		return ok;
 	}
 	static Check = class extends Uninstantable {
-		static processSelection({ type, items, event, useCache, isSelectable, custom }) {
+		static processSelection({ type, items, event, useCache, isSelectable }) {
 			let ok = true, auto;
 			let selectableItems = false;
 			const uppercaseType = (type) => type[0].toUpperCase() + type.slice(1);
@@ -5997,7 +6008,7 @@ export class Game extends Uninstantable {
 				if (item.classList.contains('selectable')) selectableItems = true;
 				else if (item.classList.contains('selected')) item.classList.add('selectable');
 
-				if (custom) custom(item);
+				game.callHook(`check${uppercaseType(type)}`, [item, event]);
 			});
 
 			if (event[`${type}Required`] && uiSelected.length === 0) ok = false;
@@ -6010,7 +6021,7 @@ export class Game extends Uninstantable {
 		static button(event, useCache) {
 			const player = event.player;
 			const buttons = event.dialog.buttons;
-			const isSelectable = button => {
+			const isSelectable = (button, event) => {
 				if (!lib.filter.buttonIncluded(button)) return false;
 				if (button.classList.contains('unselectable')) return false;
 				return event.filterButton(button, player);
@@ -6019,21 +6030,14 @@ export class Game extends Uninstantable {
 		}
 		static card(event, useCache) {
 			const player = event.player;
-			const players = game.players.slice();
-			if (event.deadTarget) players.addArray(game.dead);
 			const cards = player.getCards(event.position);
-			const isSelectable = card => {
+			const isSelectable = (card, event) => {
 				if (card.classList.contains('uncheck')) return false;
 				if (player.isOut()) return false;
 				if (!lib.filter.cardRespondable(card, player)) return false;
 				return event.filterCard(card, player);
 			}
-			const custom = lib.config.cardtempname === 'off' ? null : card => {
-				if (get.name(card) === card.name && get.is.sameNature(get.nature(card), card.nature, true)) return;
-				const node = ui.create.cardTempName(card);
-				if (lib.config.cardtempname !== 'default') node.classList.remove('vertical');
-			}
-			return game.Check.processSelection({ type: 'card', items: cards, event, useCache, isSelectable, custom });
+			return game.Check.processSelection({ type: 'card', items: cards, event, useCache, isSelectable });
 		}
 		static target(event, useCache) {
 			const player = event.player;
@@ -6045,17 +6049,7 @@ export class Game extends Uninstantable {
 				if (target.isOut()) return false;
 				return event.filterTarget(card, player, target);
 			}
-			const custom = target => {
-				if (!target.instance) return;
-				['selected', 'selectable'].forEach(className => {
-					if (target.classList.contains(className)) {
-						target.instance.classList.add(className);
-					} else {
-						target.instance.classList.remove(className);
-					}
-				});
-			}
-			return game.Check.processSelection({ type: 'target', items: targets, event, useCache, isSelectable, custom });
+			return game.Check.processSelection({ type: 'target', items: targets, event, useCache, isSelectable });
 		}
 		static skill(event) {
 			if (ui.skills) ui.skills.close();
@@ -6081,53 +6075,36 @@ export class Game extends Uninstantable {
 			if (globalSkills.length) ui.create.skills2(globalSkills);
 			if (equipSkills.length) ui.create.skills3(equipSkills);
 		}
-		static confirm(event, { ok, auto, auto_confirm }) {
-			const skillinfo = get.info(event.skill) || {};
-			if (ok && (!event.filterOk || event.filterOk())
-				&& auto && (auto_confirm || skillinfo.direct)
-				&& (!_status.mousedragging || !_status.mouseleft) && !_status.mousedown && !_status.touchnocheck) {
-				if (ui.confirm && !skillinfo.preservecancel) {
-					ui.confirm.close();
-				}
-				if (!ui.confirm && skillinfo.preservecancel) {
-					ui.create.confirm('c');
-				}
-				if (event.skillDialog === true) event.skillDialog = false;
-				ui.click.ok();
-				_status.mousedragging = null;
+		static confirm(event, confirm) {
+			ui.arena.classList.add('selecting');
+			if (event.filterTarget && (!event.filterCard || !event.position || (typeof event.position == 'string' && !event.position.includes('e')))) {
+				ui.arena.classList.add('tempnoe');
 			}
-			else {
-				ui.arena.classList.add('selecting');
-				if (event.filterTarget && (!event.filterCard || !event.position || (typeof event.position == 'string' && !event.position.includes('e')))) {
-					ui.arena.classList.add('tempnoe');
-				}
-				game.countChoose();
-				if (!_status.noconfirm && !_status.event.noconfirm
-					&& (_status.mouseleft || !_status.mousedown)) {
-					let str = '';
-					if (ok && (!event.filterOk || event.filterOk())) str += 'o';
-					if (!event.forced && !event.fakeforce && get.noSelected()) str += 'c';
-					ui.create.confirm(str);
-				}
+			game.countChoose();
+			if (!_status.noconfirm && !_status.event.noconfirm && (_status.mouseleft || !_status.mousedown)) {
+				ui.create.confirm(confirm);
 			}
 		}
 	}
 	static uncheck(...args) {
+		if (args.length === 0) args = ['button', 'card', 'target'];
 		const event = _status.event;
 		const players = game.players.slice();
 		if (_status.event.deadTarget) players.addArray(game.dead);
-		game.callHook("uncheckBegin", [event]);
+
+		game.callHook("uncheckBegin", [event, args]);
+
 		if (game.chess) {
-			let shadows = ui.chessContainer.getElementsByClassName('playergrid temp');
-			while (shadows.length) shadows[0].remove();
+			const shadows = Array.from(ui.chessContainer.querySelectorAll('.playergrid.temp'));
+			shadows.forEach(i => i.remove());
 		}
-		if (args.length === 0) args = ['button', 'card', 'target'];
-		_status.event.player.node.equips.classList.remove('popequip');
+		if(event.player) event.player.node.equips.classList.remove('popequip');
 
 		if (args.includes('button') && event.dialog && event.dialog.buttons) {
 			event.dialog.buttons.forEach(button => {
 				button.classList.remove('selectable');
 				button.classList.remove('selected');
+				game.callHook("uncheckButton", [button, event]);
 			});
 			ui.selected.buttons.length = 0;
 		}
@@ -6136,11 +6113,8 @@ export class Game extends Uninstantable {
 			cards.forEach(card => {
 				card.classList.remove('selected');
 				card.classList.remove('selectable');
-				if (card._tempName) {
-					card._tempName.delete();
-					delete card._tempName;
-				}
-				card.updateTransform();
+				card.updateTransform(false);
+				game.callHook("uncheckCard", [card, event]);
 			});
 			ui.selected.cards.length = 0;
 		}
@@ -6148,10 +6122,7 @@ export class Game extends Uninstantable {
 			players.forEach(target => {
 				target.classList.remove('selected');
 				target.classList.remove('selectable');
-				if (target.instance) {
-					target.instance.classList.remove('selected');
-					target.instance.classList.remove('selectable');
-				}
+				game.callHook("uncheckTarget", [target, event]);
 			});
 			ui.selected.targets.length = 0;
 		}
@@ -6172,7 +6143,8 @@ export class Game extends Uninstantable {
 		_status.dragline.forEach(i => i && i.remove());
 		_status.dragline.length = 0;
 		ui.arena.classList.remove('dragging');
-		game.callHook("uncheckEnd", [event]);
+
+		game.callHook("uncheckEnd", [event, args]);
 	}
 	/**
 	 * @param { Player } player1 

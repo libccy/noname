@@ -330,11 +330,47 @@ export class Library extends Uninstantable {
 				game.dynamicStyle.addObject(result2);
 			}
 		}],
-		//game.check美化
+		//game.check
 		checkBegin: [],
 		checkEnd: [],
+		checkButton: [],
+		checkCard: [
+			function updateTempname(card, event) {
+				if (lib.config.cardtempname === 'off') return;
+				if (get.name(card) === card.name && get.is.sameNature(get.nature(card), card.nature, true)) return;
+				const node = ui.create.cardTempName(card);
+				if (lib.config.cardtempname !== 'default') node.classList.remove('vertical');
+			},
+		],
+		checkTarget: [
+			function updateInstance(target, event) {
+				if (!target.instance) return;
+				['selected', 'selectable'].forEach(className => {
+					if (target.classList.contains(className)) {
+						target.instance.classList.add(className);
+					} else {
+						target.instance.classList.remove(className);
+					}
+				});
+			},
+		],
 		uncheckBegin: [],
 		uncheckEnd: [],
+		uncheckButton: [],
+		uncheckCard: [
+			function removeTempname(card, event) {
+				if (!card._tempName) return;
+				card._tempName.delete();
+				delete card._tempName;
+			},
+		],
+		uncheckTarget: [
+			function removeInstance(target, event) {
+				if (!target.instance) return;
+				target.instance.classList.remove('selected');
+				target.instance.classList.remove('selectable');
+			},
+		],
 	};
 
 	/**
@@ -7926,7 +7962,9 @@ export class Library extends Uninstantable {
 									let type;
 									try {
 										type = typeof obj[text];
-									} catch {}
+									} catch {
+										void 0;
+									}
 									if (type == 'function') {
 										className += 'function';
 									}
