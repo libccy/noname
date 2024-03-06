@@ -338,7 +338,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					ignoreLogAI:true,
 					skillTagFilter:function(player,tag,args){
 						if(args){
-							return args.card&&get.name(arg.card)=='sha';
+							return args.card&&get.name(args.card)=='sha';
 						}
 					},
 				},
