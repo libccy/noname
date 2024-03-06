@@ -131,7 +131,7 @@ export class Is extends Uninstantable {
 	 * @param { Card | VCard } card
 	 */
 	// @ts-ignore
-	static vituralCard(card) {
+	static virtualCard(card) {
 		return card.isCard && (!("cards" in card) || !Array.isArray(card.cards) || card.cards.length === 0);
 	}
 	/**
