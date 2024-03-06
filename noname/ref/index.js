@@ -460,8 +460,8 @@ export class Instructions {
 					el[parentKey] = el.parentNode;
 					// 如果状态从false改回true，那应该执行以下代码:
 					// el.parentElement.insertBefore(el, child);
-					// 所以要保存的是el的父元素，和前一个兄弟节点
-					// 但是前一个兄弟节点也有可能被m-if指令指定不渲染。
+					// 所以要保存的是el的父元素，和后一个兄弟节点
+					// 但是后一个兄弟节点也有可能被m-if指令指定不渲染。
 					// 所以要保存其所有兄弟元素(顺序)
 					// 用节点而不是元素的话，会有部分问题
 					// @ts-ignore
