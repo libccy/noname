@@ -38,7 +38,7 @@ export class RefImpl {
 	static executionList = [];
 	[Symbol.toPrimitive]() {
 		if (RefImpl.recordExecution === true) {
-			RefImpl.executionList.push(this);
+			RefImpl.executionList.add(this);
 		}
 		if (this.#value instanceof Number) {
 			return Number(this.#value);
@@ -56,6 +56,9 @@ export class RefImpl {
 		this.#value = this.createProxy(value);
 	}
 	get value() {
+		if (RefImpl.recordExecution === true) {
+			RefImpl.executionList.add(this);
+		}
 		return this.#value;
 	}
 	set value(newVal) {
@@ -106,8 +109,21 @@ export class RefImpl {
 		if (!this.#boundDomList.includes(bound)) {
 			this.#boundDomList.push(bound);
 		}
-		if (Array.isArray(props)) bound.props = Array.from(new Set(bound.props.concat(props)));
-		if (Array.isArray(attrs)) bound.attrs = Array.from(new Set(bound.attrs.concat(attrs)));
+		if (!Array.isArray(bound.props)) bound.props = [];
+		if (Array.isArray(props)) {
+			bound.props.push(...props.filter(({ key }) => {
+				// 有相同监听的属性，就不继续监听了
+				return !bound.props.find(({ key: key2 }) => key == key2);
+			}));
+			
+		}
+		if (!Array.isArray(bound.attrs)) bound.attrs = [];
+		if (Array.isArray(attrs)) {
+			bound.attrs.push(...attrs.filter(({ key }) => {
+				// 有相同监听的属性，就不继续监听了
+				return !bound.attrs.find(({ key: key2 }) => key == key2);
+			}));
+		}
 	}
 	updateDom() {
 		this.#boundDomList.forEach(({ element, props, attrs }) => {
@@ -116,6 +132,12 @@ export class RefImpl {
 				if (!['innerText', 'innerHTML'].includes(key)) {
 					// @ts-ignore
 					element[key] = evaluateJavascript(value);
+					// 如果需要更新指令相关信息
+					if (typeof key == 'string' && key.startsWith('instructions:')) {
+						const instructions = key.slice(13);
+						// 解析指令
+						Instructions.parse(element, evaluateJavascript, instructions);
+					}
 				} else {
 					// @ts-ignore
 					element[key] = value.replaceAll(/\{\{(.+?)\}\}/g, (_, str) => {
@@ -127,10 +149,35 @@ export class RefImpl {
 					});
 				}
 			});
-			attrs.forEach(({ key, value, evaluateJavascript }) => element.setAttribute(key, evaluateJavascript(value)));
+			attrs.forEach(({ key, value, evaluateJavascript }) => {
+				element.setAttribute(key, evaluateJavascript(value));
+				// 如果需要更新指令相关信息
+				// @ts-ignore
+				if (Instructions.initial.includes(key) || Instructions.custom.includes(key)) {
+					Instructions.parse(element, evaluateJavascript, key);
+				}
+			});
 		});
 	}
 }
+
+/**
+ * 对于模板字符串中的html，css代码进行代码提示，可以在vscode安装“Inline HTML”扩展
+ * 
+ * 噢，手机用mt写代码的可以省省略过这个了。因为mt没代码提示。
+ * 
+ * 另外提醒一点，这个用法里输入\t\n是不能自动解析的，得用html的那种
+ * 
+ * @param { TemplateStringsArray } strings
+ * @param { ...any } values
+ */
+export const html = (strings, ...values) => String.raw({ raw: strings }, ...values);
+
+/**
+ * @param { TemplateStringsArray } strings 
+ * @param { ...any } values 
+ */
+export const css = (strings, ...values) => String.raw({ raw: strings }, ...values);
 
 window.mold = {
 	templateMap: new Map(),
@@ -150,6 +197,7 @@ window.mold = {
 };
 
 /**
+ * 优先编译Template元素内的元素，然后再渲染到真实dom中。
  * @param { HTMLTemplateElement | HTMLElement } el
  * @param { (str: string) => any } evaluateJavascript 
  */
@@ -207,10 +255,15 @@ export function compileDom(el, evaluateJavascript) {
 		const evaluateNames = attrNames.filter(n => n.startsWith(':'));
 		if (evaluateNames.length > 0) {
 			evaluateNames.forEach(name => {
-				const val = el.getAttribute(name);
+				/** 
+				 * 原字符串 
+				 * @type { string }
+				 **/
+				// @ts-ignore
+				let val = el.getAttribute(name);
+				if (val === '' || val === name) val = 'true';
 				RefImpl.recordExecution = true;
 				RefImpl.executionList.length = 0;
-				// @ts-ignore
 				const getVal = evaluateJavascript(val);
 				if (!(getVal instanceof RefImpl)) {
 					if (RefImpl.executionList.length > 0) {
@@ -242,6 +295,13 @@ export function compileDom(el, evaluateJavascript) {
 				RefImpl.executionList.length = 0;
 			});
 		}
+
+		// 处理内置指令
+		Instructions.initial.forEach(instructions => {
+			if (attrNames.includes(instructions)) {
+				Instructions.parse(el, evaluateJavascript, instructions);
+			}
+		});
 
 		if (el.innerHTML.length > 0) {
 			const oldVal = el.innerHTML;
@@ -275,9 +335,145 @@ export function compileDom(el, evaluateJavascript) {
 				return getVal;
 			});
 		}
+
 		if (el.children) {
 			// @ts-ignore
 			[...el.children].forEach(ele => compileDom(ele, evaluateJavascript));
 		}
 	}
 };
+
+/**
+ * 指令类
+ * 
+ * 负责解析内置指令，和注册自定义指令
+ */
+export class Instructions {
+	/**
+	 * 内置指令数组
+	 * @type { ['m-show', 'm-if'] }
+	 */
+	static initial = ['m-show', 'm-if'];
+
+	/**
+	 * 自定义指令数组
+	 * @type { string[] }
+	 */
+	static custom = [];
+
+	/**
+	 * @template { typeof Instructions['initial'] } T
+	 * @template { typeof Instructions['custom'] } U
+	 * @param { HTMLElement } el
+	 * @param { (str: string) => any } evaluateJavascript 
+	 * @param { T[number] | U[number] } instructions
+	 * 
+	 */
+	static parse(el, evaluateJavascript, instructions) {
+		// 首先，指令是存在于html标签属性中的
+		// 而且编译后，需要移除。
+		// 不同的指令，需要做的功能需要提取出来
+		const instructionsKey = `instructions:${instructions}`;
+		/** 
+		 * 原字符串 
+		 * @type { string }
+		 **/
+		// @ts-ignore
+		let val = el.getAttribute(instructions) || el[instructionsKey];
+		if (val === '' || val === instructions) val = 'true';
+		RefImpl.recordExecution = true;
+		RefImpl.executionList.length = 0;
+		/**
+		 * 默认执行
+		 */
+		const defaultExecution = () => {
+			const getVal = evaluateJavascript(val);
+			if (!(getVal instanceof RefImpl)) {
+				if (RefImpl.executionList.length > 0) {
+					RefImpl.executionList.forEach(ref => {
+						ref.use(el, {
+							props: [{
+								key: instructionsKey,
+								// @ts-ignore
+								value: val,
+								evaluateJavascript,
+							}],
+						});
+					});
+				}
+				el[instructionsKey] = getVal;
+			} else {
+				getVal.use(el, {
+					props: [{
+						key: instructionsKey,
+						// @ts-ignore
+						value: val,
+						evaluateJavascript,
+					}],
+				});
+				el[instructionsKey] = evaluateJavascript(getVal.value);
+			}
+			return el[instructionsKey];
+		};
+		switch (instructions) {
+			case 'm-show': {
+				// m-show的值如果是true就显示元素，否则隐藏
+				const result = defaultExecution();
+				if (result == true) {
+					el.style.display = '';
+				} else {
+					el.style.display = 'none';
+				}
+				break;
+			}
+			case 'm-if': {
+				// m-if的值如果是true就渲染元素
+				// 否则移除并且检测下一个元素是否带有m-else或m-else-if
+				// 并执行相关判断
+				const result = defaultExecution();
+				const parentKey = `instructions-${instructions}-parent:${instructions}`;
+				const siblingKey = `instructions-${instructions}-sibling:${instructions}`;
+				// 更新父节点信息
+				if (el[parentKey] && el.parentNode && el[parentKey] != el.parentNode) {
+					el[parentKey] = el.parentNode;
+				}
+				// 渲染节点
+				if (result == true) {
+					// 如果有记录的父节点
+					if (el[parentKey]) {
+						el[parentKey].insertBefore(el, el[siblingKey].filter(child => {
+							// 排除不处于父节点的兄弟节点
+							return child.parentElement == el[parentKey] || child == el;
+						}).find((_, index, arr) => {
+							return index > arr.indexOf(el);
+						}));
+					}
+					// 处理m-else-if和m-else
+				}
+				// 移除节点
+				else {
+					if (el.parentNode) el.parentNode.removeChild(el);
+					// 处理m-else-if和m-else
+				}
+				// 如果节点在dom中(先渲染，再刷新)
+				if (el.parentNode) {
+					el[parentKey] = el.parentNode;
+					// 如果状态从false改回true，那应该执行以下代码:
+					// el.parentElement.insertBefore(el, child);
+					// 所以要保存的是el的父元素，和前一个兄弟节点
+					// 但是前一个兄弟节点也有可能被m-if指令指定不渲染。
+					// 所以要保存其所有兄弟元素(顺序)
+					// 用节点而不是元素的话，会有部分问题
+					// @ts-ignore
+					el[siblingKey] = Array.from(el.parentNode.children);
+				}
+				break;
+			}
+			default:
+				break;
+		}
+		el.removeAttribute(instructions);
+		RefImpl.recordExecution = false;
+		RefImpl.executionList.length = 0;
+	}
+}
