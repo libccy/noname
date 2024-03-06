@@ -3151,6 +3151,7 @@ export const Content = {
 						next.set('ai', info.chooseButton.check || function () { return 1; });
 						next.set('filterButton', info.chooseButton.filter || function () { return true; });
 						next.set('selectButton', info.chooseButton.select || 1);
+						next.set('complexSelect', info.chooseButton.complexSelect !== false);
 						next.set('filterOk', info.chooseButton.filterOk || (() => true));
 						if (event.id) next._parent_id = event.id;
 						next.type = 'chooseToUse_button';
@@ -4546,7 +4547,7 @@ export const Content = {
 			event.dialog.style.display = '';
 			event.dialog.open();
 		}
-		if (['chooseCharacter', 'chooseButtonOL'].includes(event.getParent().name)) event.complexSelect = true;
+		// if (['chooseCharacter', 'chooseButtonOL'].includes(event.getParent().name)) event.complexSelect = true;
 		var filterButton = event.filterButton || function () { return true; };
 		var selectButton = get.select(event.selectButton);
 		var buttons = event.dialog.buttons;
