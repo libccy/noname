@@ -11710,7 +11710,7 @@ export class Library extends Uninstantable {
 			lose: false,
 			delay: false,
 			content: () => {
-				player.recast(cards, null, (player, cards) => {
+				player.recast(cards, void 0, (player, cards) => {
 					var numberOfCardsToDraw = cards.length;
 					cards.forEach(value => {
 						if (lib.config.mode == 'stone' && _status.mode == 'deck' && !player.isMin() && get.type(value).startsWith('stone')) {
