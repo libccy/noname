@@ -816,24 +816,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter:function(event,player){
-					return player.storage.drlt_zhenrong&&player.storage.drlt_zhenrong.length>0;
+					return player.getExpansions('drlt_zhenrong').length>0;
 				},
 				filterTarget:function(card,player,target){
 					return target.countDiscardableCards(player,'ej')>0;
 				},
 				content:function(){
 					'step 0'
-					player.chooseCardButton(player.storage.drlt_zhenrong,1,'请选择需要弃置的“荣”',true).ai=function(button){
+					player.chooseCardButton(player.getExpansions('drlt_zhenrong'),1,'请选择需要弃置的“荣”',true).ai=function(button){
 						return 6-get.value(button.link);
 					};
 					'step 1'
 					if(result.bool){
 						var cards=result.links;
-						for(var i=0;i<cards.length;i++){
-							player.storage.drlt_zhenrong.remove(cards[i]);
-						}
-						player.syncStorage('drlt_zhenrong');
-						player.$throw(cards);
+						player.loseToDiscardpile(cards);
 						player.discardPlayerCard(target,'ej',1,true);
 					}
 				},
