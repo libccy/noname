@@ -2055,8 +2055,11 @@ export class Player extends HTMLDivElement {
 		return true;
 	}
 	$disableJudge() {
-		game.addVideo('$disableJudge', this);
 		this.storage._disableJudge = true;
+		for (let i = 0; i < this.node.judges.childNodes.length; i++) {
+			if (this.node.judges.childNodes[i].classList.contains('feichu')) return;
+		}
+		game.addVideo('$disableJudge', this);
 		var card = game.createCard('disable_judge', '', '');
 		card.fix();
 		card.classList.add('feichu');
