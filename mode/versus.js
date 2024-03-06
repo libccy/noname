@@ -2640,6 +2640,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						game.trueZhu.update();
 						game.falseZhu.update();
 						ui.arena.classList.add('choose-character');
+						/*
 						if(get.is.phoneLayout()){
 							ui.guanduInfo=ui.create.div('.touchinfo.left',ui.window);
 						}
@@ -2647,6 +2648,29 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							ui.guanduInfo=ui.create.div(ui.gameinfo);
 						}
 						ui.guanduInfo.innerHTML='当前事件：'+get.translation(evt);
+						*/
+						const showGuanduEvent=function(evt){
+							if(ui['GuanduEvent_'+evt]) return;
+							ui['GuanduEvent_'+evt]=ui.create.system(get.translation(evt),null,true);
+							lib.setPopped(ui['GuanduEvent_'+evt],function(){
+								var uiintro=ui.create.dialog('hidden');
+								uiintro.add(get.translation(evt));
+								uiintro.add('<div class="text center">'+get.translation(evt+'_info')+'</div>');
+								var ul=uiintro.querySelector('ul');
+								if(ul) ul.style.width='180px';
+								uiintro.add(ui.create.div('.placeholder'));
+								return uiintro;
+							},250);
+						};
+						for(const i in lib.playerOL){
+							const target=lib.playerOL[i];
+							if(target==game.me){
+								showGuanduEvent(evt);
+							}
+							else if(target.isOnline2()){
+								target.send(showGuanduEvent,evt);
+							}
+						}
 						if(lib.config.background_speak) game.playAudio('skill',evt);
 						var dialog=ui.create.dialog('本局特殊事件：'+get.translation(evt));
 						dialog.addText(get.translation(evt+'_info'),false);
@@ -2725,6 +2749,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var evt_list=[['huoshaowuchao','chunyuqiong'],['liangcaokuifa','sp_xuyou'],['zhanyanliangzhuwenchou','jsp_guanyu'],['shishengshibai','re_guojia'],['xutuhuanjin','yj_jushou'],['liangjunxiangchi','yj_jushou'],['jianshoudaiyuan','tianfeng'],['yiruoshengqiang','re_caocao'],['shichongerjiao','sp_xuyou']].randomGet();
 					var evt=evt_list[0],character=evt_list[1];
 					game.addGlobalSkill(evt);
+					const showGuanduEvent=function(evt){
+						if(ui['GuanduEvent_'+evt]) return;
+						ui['GuanduEvent_'+evt]=ui.create.system(get.translation(evt),null,true);
+						lib.setPopped(ui['GuanduEvent_'+evt],function(){
+							var uiintro=ui.create.dialog('hidden');
+							uiintro.add(get.translation(evt));
+							uiintro.add('<div class="text center">'+get.translation(evt+'_info')+'</div>');
+							var ul=uiintro.querySelector('ul');
+							if(ul) ul.style.width='180px';
+							uiintro.add(ui.create.div('.placeholder'));
+							return uiintro;
+						},250);
+					};
+					showGuanduEvent(evt);
+					/*
 					game.broadcastAll(function(evt){
 						if(get.is.phoneLayout()){
 							ui.guanduInfo=ui.create.div('.touchinfo.left',ui.window);
@@ -2735,6 +2774,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(lib.config.background_speak) game.playAudio('skill',evt);
 						ui.guanduInfo.innerHTML='当前事件：'+get.translation(evt);
 					},evt);
+					*/
 					game.me.chooseControl('ok').set('dialog',['###本局特殊事件：'+get.translation(evt)+'###'+get.translation(evt+'_info'),[[character],'character']]);
 					'step 1'
 					event.falseList=['ol_xiahouyuan','litong','zangba','manchong','xunyu','re_guojia','re_zhangliao','xuhuang','caohong','jsp_guanyu','hanhaoshihuan','caoren','yujin','liuye','chengyu','xunyou','zhangxiu','sp_jiaxu'].filter(function(name){
