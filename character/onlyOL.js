@@ -71,12 +71,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						ai2(target){
 							const player=get.event('player'),trigger=get.event().getTrigger();
-							if(trigger.card.name=='tiesuo'){
-								const att=get.attitude(player,target);
-								return get.sgn(att)*(2+get.sgn(att));
-							}
+							const att=get.attitude(player,target),eff=get.effect(target,trigger.card,trigger.player,player);
+							if(trigger.card.name=='tiesuo') return eff>0?0:get.sgn(att)*(2+get.sgn(att));
 							const sum=trigger.targets.reduce((i,j)=>i+get.effect(j,trigger.card,trigger.player,player),0);
-							return get.effect(target,trigger.card,trigger.player,player)*2-sum;
+							return get.sgn(att)*(eff*2-sum);
 						},
 					}).set('prompt2','弃置一张'+get.translation(get.color(trigger.card))+'牌，令'+get.translation(trigger.card)+'改为对其中一个目标结算两次');
 					if(bool){
@@ -95,7 +93,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player(card,player){
 								if(!game.hasPlayer(target=>{
 									return target.hasSkill('olsbhetao')&&(get.attitude(player,target)<0||get.attitude(target,player)<0);
-								})) return;
+								})||game.countPlayer(target=>{
+									return player.canUse(card,target);
+								})<2) return;
 								const select=get.copy(get.info(card).selectTarget);
 								let range;
 								if(select==undefined) range=[1,1];
@@ -103,7 +103,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								else if(get.itemtype(select)=='select') range=select;
 								else if(typeof select=='function') range=select(card,player);
 								game.checkMod(card,player,range,'selectTarget',player);
-								if(range[1]==-1||range[1]>1) return 'zeroplayertarget';
+								if(range[1]==-1||(range[1]>1&&ui.selected.targets&&ui.selected.targets.length)) return 'zeroplayertarget';
 							},
 						},
 					},
