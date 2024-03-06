@@ -917,10 +917,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(result2.bool){
 										const card=result2.cards[0];
 										if(get.name(card,target)==event.result.card.name){
-											player.popup('洗具');
+											player.popup('诿解成功');
 											stop=true;
 										}
-										else player.popup('杯具');
+										else player.popup('诿解失败');
 									}
 								}
 								if(!stop){
@@ -27468,7 +27468,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olqushi:'趋势',
 			olqushi_info:'出牌阶段限一次，你可以摸一张牌，然后将一张手牌扣置于一名其他角色的武将牌上，称为“趋”。目标角色于其结束阶段移去武将牌上的所有“趋”，若其于本回合使用过与“趋”相同类别的牌，则你摸X张牌（X为其本回合使用牌指定过的目标数之和且至多为5）。',
 			olweijie:'诿解',
-			olweijie_info:'每回合限一次，你的回合外，当你需要使用或打出一张基本牌时，你可以弃置距离为1的一名角色的一张手牌，若此牌牌名与你需要使用或打出的牌的牌名相同，则视为你使用或打出之。',
+			olweijie_info:'回合外每名角色的回合限一次，当你需要使用或打出一张基本牌时，你可以弃置距离为1的一名角色的一张手牌，若此牌牌名与你需要使用或打出的牌的牌名相同，则视为你使用或打出之。',
 			liupan:'刘磐',
 			olpijing:'披荆',
 			olpijing_info:'每回合限一次，当你使用黑色【杀】或黑色普通锦囊牌指定唯一目标后，你可以令至多X名其他角色成为此牌的额外目标并依次交给你一张牌（X为你已损失的体力值且X至少为1）。这些角色下次使用基本牌或普通锦囊牌指定唯一目标时，其可令你成为此牌的额外目标或摸一张牌。',
