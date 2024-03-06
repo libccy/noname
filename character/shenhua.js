@@ -7289,6 +7289,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				}
 			},
+			// 蛊惑（guhuo）技能错误，请勿引用
+			/*
 			guhuo:{
 				enable:'phaseUse',
 				usable:1,
@@ -7357,6 +7359,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					threaten:1.6,
 				}
 			},
+			*/
 			huangtian:{
 				unique:true,
 				audio:'huangtian2',
