@@ -225,7 +225,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							effect:{
 								target(card,player,target){
 									if(get.tag(card,'damage')&&player&&player.hasSkill('dcsbquanmou_true')){
-										let tars=game.countPlayer(i=>player!==i&&target!==i&&get.damageEffect(i,player,player)>0);
+										let tars=game.countPlayer(i=>player!==i&&target!==i&&get.attitude(player,target)<0&&!target.hasSkill('dcsbquanmou_false_mark'));
 										return [1,0,1,6*Math.min(3,tars)/(3+Math.pow(target.countCards('h'),2))];
 									}
 								}
