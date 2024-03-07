@@ -146,6 +146,11 @@ export class Library extends Uninstantable {
 	}
 
 	//函数钩子
+	/**
+	 * 你可以往这里加入{钩子名:函数数组}，并在数组里增加你的自定义函数
+	 * 这样当某个地方调用game.callHook(钩子名,[...函数参数])时，就会按顺序将对应数组中的每个函数运行一遍（传参为callHook的第二个参数）。
+	 * 你可以将hook机制类比为event.trigger()，但是这里只能放同步代码
+	 */
 	static hooks = {
 		// 本体势力的颜色
 		addGroup: [(id, _short, _name, config) => {
@@ -325,6 +330,60 @@ export class Library extends Uninstantable {
 				game.dynamicStyle.addObject(result2);
 			}
 		}],
+		//game.check
+		checkBegin: [],
+		checkEnd: [
+			function autoConfirm(event, { ok, auto, auto_confirm }) {
+				if (!event.isMine()) return;
+				const skillinfo = get.info(event.skill) || {};
+				if (ok && auto && (auto_confirm || skillinfo.direct) && !_status.touchnocheck
+					&& !_status.mousedown && (!_status.mousedragging || !_status.mouseleft)) {
+					if (ui.confirm) ui.confirm.close();
+					if (event.skillDialog === true) event.skillDialog = false;
+					ui.click.ok();
+					_status.mousedragging = null;
+					if (skillinfo.preservecancel) ui.create.confirm('c');
+				}
+			}
+		],
+		checkButton: [],
+		checkCard: [
+			function updateTempname(card, event) {
+				if (lib.config.cardtempname === 'off') return;
+				if (get.name(card) === card.name && get.is.sameNature(get.nature(card), card.nature, true)) return;
+				const node = ui.create.cardTempName(card);
+				if (lib.config.cardtempname !== 'default') node.classList.remove('vertical');
+			},
+		],
+		checkTarget: [
+			function updateInstance(target, event) {
+				if (!target.instance) return;
+				['selected', 'selectable'].forEach(className => {
+					if (target.classList.contains(className)) {
+						target.instance.classList.add(className);
+					} else {
+						target.instance.classList.remove(className);
+					}
+				});
+			},
+		],
+		uncheckBegin: [],
+		uncheckEnd: [],
+		uncheckButton: [],
+		uncheckCard: [
+			function removeTempname(card, event) {
+				if (!card._tempName) return;
+				card._tempName.delete();
+				delete card._tempName;
+			},
+		],
+		uncheckTarget: [
+			function removeInstance(target, event) {
+				if (!target.instance) return;
+				target.instance.classList.remove('selected');
+				target.instance.classList.remove('selectable');
+			},
+		],
 	};
 
 	/**
@@ -7916,7 +7975,9 @@ export class Library extends Uninstantable {
 									let type;
 									try {
 										type = typeof obj[text];
-									} catch {}
+									} catch {
+										void 0;
+									}
 									if (type == 'function') {
 										className += 'function';
 									}
@@ -8794,6 +8855,7 @@ export class Library extends Uninstantable {
 				game.me.actused = -99;
 			}
 			ui.updatehl();
+			delete _status.event._buttonChoice;
 			delete _status.event._cardChoice;
 			delete _status.event._targetChoice;
 			delete _status.event._skillChoice;
@@ -8811,6 +8873,7 @@ export class Library extends Uninstantable {
 				game.me.actused = -99;
 			}
 			ui.updatehl();
+			delete _status.event._buttonChoice;
 			delete _status.event._cardChoice;
 			delete _status.event._targetChoice;
 			delete _status.event._skillChoice;
@@ -9009,6 +9072,7 @@ export class Library extends Uninstantable {
 			const card = lib.cheat.gn(name);
 			if (!card) return;
 			target.node.handcards1.appendChild(card);
+			delete _status.event._buttonChoice;
 			delete _status.event._cardChoice;
 			delete _status.event._targetChoice;
 			delete _status.event._skillChoice;
@@ -9124,6 +9188,7 @@ export class Library extends Uninstantable {
 			for (let i = 0; i < num; i++) {
 				const card = cards[i];
 				game.me.node.handcards1.appendChild(card);
+				delete _status.event._buttonChoice;
 				delete _status.event._cardChoice;
 				delete _status.event._targetChoice;
 				delete _status.event._skillChoice;
@@ -9140,6 +9205,7 @@ export class Library extends Uninstantable {
 			for (var i = 0; i < args.length; i++) {
 				game.me.addSkill(args[i], true);
 			}
+			delete _status.event._buttonChoice;
 			delete _status.event._cardChoice;
 			delete _status.event._targetChoice;
 			delete _status.event._skillChoice;
@@ -9797,6 +9863,51 @@ export class Library extends Uninstantable {
 						if (skills.includes(skill)) return false;
 					}
 				}
+			}
+			return true;
+		},
+		/**
+		 *
+		 * @param {GameEvent} event
+		 * @param {Player} player
+		 * @param {string} skill
+		 * @returns {boolean}
+		 */
+		filterEnable: function (event, player, skill) {
+			const info = get.info(skill);
+			if (!info) {
+				console.error(new ReferenceError('缺少info的技能:', skill));
+				return false;
+			}
+			// if (!game.expandSkills(player.getSkills('invisible').concat(lib.skill.global)).includes(skill)) return false;
+			if (!game.expandSkills(player.getSkills(false).concat(lib.skill.global)).includes(skill)) {//hiddenSkills
+				if (player.hasSkillTag('nomingzhi', false, null, true)) return false;
+				if (get.mode() !== 'guozhan') return false;
+				if (info.noHidden) return false;
+			}
+			const checkEnable = enable => {
+				if (typeof enable === 'function') return enable(event);
+				if (Array.isArray(enable)) return enable.some(i => checkEnable(i));
+				if (enable === 'phaseUse') return event.type === 'phase';
+				if (typeof enable === 'string') return enable === event.name;
+				return false;
+			}
+			if (!checkEnable(info.enable)) return false;
+			if (info.filter && !info.filter(event, player)) return false;
+			if (info.viewAs && typeof info.viewAs !== 'function') {
+				if (info.viewAsFilter && info.viewAsFilter(player) === false) return false;
+				if (event.filterCard && !event.filterCard(get.autoViewAs(info.viewAs, 'unsure'), player, event)) return false;
+			}
+			if (info.usable && get.skillCount(skill) >= info.usable) return false;
+			if (info.chooseButton && _status.event.noButton) return false;
+			if (info.round && (info.round - (game.roundNumber - player.storage[skill + '_roundcount']) > 0)) return false;
+			for (const item in player.storage) {
+				if (!item.startsWith('temp_ban_')) continue;
+				if (player.storage[item] !== true) continue;
+				const skillName = item.slice(9);
+				if (!lib.skill[skillName]) continue;
+				const skills = game.expandSkills([skillName]);
+				if (skills.includes(skill)) return false;
 			}
 			return true;
 		},
@@ -11599,7 +11710,7 @@ export class Library extends Uninstantable {
 			lose: false,
 			delay: false,
 			content: () => {
-				player.recast(cards, null, (player, cards) => {
+				player.recast(cards, void 0, (player, cards) => {
 					var numberOfCardsToDraw = cards.length;
 					cards.forEach(value => {
 						if (lib.config.mode == 'stone' && _status.mode == 'deck' && !player.isMin() && get.type(value).startsWith('stone')) {
@@ -13148,6 +13259,12 @@ export class Library extends Uninstantable {
 			 * @returns {string}
 			 */
 			getSpan: () => `${get.prefixSpan('经典')}${get.prefixSpan('神')}`
+		}],
+		['旧谋', {
+			/**
+			 * @returns {string}
+			 */
+			getSpan: () => `${get.prefixSpan('旧')}${get.prefixSpan('谋')}`
 		}]
 	]);
 	static groupnature = {

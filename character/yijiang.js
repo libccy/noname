@@ -654,7 +654,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					player.addTempSkill('shiming_round','roundStart');
-					var cards=get.cards(2);
+					var cards=get.cards(3);
 					player.chooseButton(['识命：是否将其中一张置于牌堆底？',cards.slice(0)]).set('ai',button=>{
 						var att=_status.event.att,damage=_status.event.damage,val=get.value(button.link,_status.event.player);
 						if(att>0&&damage<0||att<=0&&damage>0) return 6-val;
@@ -713,6 +713,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('jiangxi');
 						event.logged=true;
 						player.removeSkill('shiming_round');
+						player.draw();
 					}
 					'step 2'
 					if(!game.hasPlayer2(current=>current.getHistory('damage').length>0)){
@@ -1504,8 +1505,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					unlimit:{
 						mod:{
 							cardUsable:function(card,player){
-								var list=lib.skill.lkbushi.getBushi(player);
-								if(list[0]==get.suit(card)) return Infinity;
+								const list = lib.skill.lkbushi.getBushi(player), suit = get.suit(card);
+								if (suit === 'unsure' || list[0] === suit) return Infinity;
 							},
 						},
 						trigger:{player:'useCard1'},
@@ -2029,8 +2030,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					player.gain(cards,'gain2');
 					if(get.color(cards[0])!=get.color(cards[1])){
-						player.addTempSkill('wusheng');
-						player.addTempSkill('paoxiao');
+						player.addTempSkills(['wusheng','paoxiao']);
 					}
 				},
 				derivation:['wusheng','paoxiao'],
@@ -2673,7 +2673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'taoluan',
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return !player.hasSkill('xintaoluan3')&&player.countCards('hes',card=>lib.inpile.some(name=>{
+					return !player.hasSkill('xintaoluan3')&&player.hasCard(card=>lib.inpile.some(name=>{
 						if(player.getStorage('xintaoluan').includes(name)) return false;
 						if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
 						if(event.filterCard({name:name,isCard:true,cards:[card]},player,event)) return true;
@@ -2683,7 +2683,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						return false;
-					}))>0&&!_status.dying.length;
+					},'hes'))>0&&!_status.dying.length;
 				},
 				chooseButton:{
 					dialog:function(event,player){
@@ -2783,7 +2783,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.num=player.countMark('xintaoluan2');
 					player.chooseTarget(true,function(card,player,target){
 						return target!=player;
-					},'滔乱<br><br><div class="text center">令一名其他角色选择一项：1.交给你'+get.cnNumber(event.num)+'张与你以此法使用的牌类别相同的牌；2.你失去'+get.cnNumber(event.num)+'点体力').set('ai',function(target){
+					},'滔乱<br><br><div class="text center">令一名其他角色选择一项：1.交给你'+get.cnNumber(event.num)+'张与你以此法使用的牌类别不同的牌；2.你失去'+get.cnNumber(event.num)+'点体力').set('ai',function(target){
 						var player=_status.event.player;
 						if(get.attitude(player,target)>0){
 							if(get.attitude(target,player)>0){
@@ -5255,7 +5255,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				filter:function(event,player){
-					return !player.hasSkill('taoluan3')&&player.countCards('hes',card=>lib.inpile.some(name=>{
+					return !player.hasSkill('taoluan3')&&player.hasCard(card=>lib.inpile.some(name=>{
 						if(player.getStorage('taoluan').includes(name)) return false;
 						if(get.type(name)!='basic'&&get.type(name)!='trick') return false;
 						if(event.filterCard({name:name,isCard:true,cards:[card]},player,event)) return true;
@@ -5265,7 +5265,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						return false;
-					}))>0;
+					},'hes'))>0;
 				},
 				onremove:true,
 				chooseButton:{
@@ -5355,7 +5355,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(true,function(card,player,target){
 						return target!=player;
-					},'滔乱<br><br><div class="text center">令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别相同的牌；2.你失去1点体力').set('ai',function(target){
+					},'滔乱<br><br><div class="text center">令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别不同的牌；2.你失去1点体力').set('ai',function(target){
 						var player=_status.event.player;
 						if(get.attitude(player,target)>0){
 							if(get.attitude(target,player)>0){
@@ -9539,16 +9539,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:'fuhun2'
 			},
 			fuhun2:{
+				audio:'fuhun',
+				audioname:['re_guanzhang'],
 				trigger:{source:'damageSource'},
 				forced:true,
 				filter:function(event,player){
-					if(player.hasSkill('fuhun3')) return false;
+					if(['new_rewusheng','olpaoxiao'].every(skill=>player.hasSkill(skill,null,false,false))) return false;
 					return event.getParent().skill=='fuhun';
 				},
 				content:function(){
-					player.addTempSkill('new_rewusheng');
-					player.addTempSkill('olpaoxiao');
-					player.addTempSkill('fuhun3');
+					player.addTempSkills(['new_rewusheng','olpaoxiao']);
+					// player.addTempSkill('fuhun3');
 				}
 			},
 			fuhun3:{},
@@ -13962,7 +13963,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			chengong:['chengong','re_chengong','sb_chengong'],
 			xunyou:['xunyou','re_xunyou'],
 			xuezong:['xuezong','tw_xuezong'],
-            huanghao:['huanghao','dc_huanghao','old_huanghao'],
+			huanghao:['huanghao','dc_huanghao','old_huanghao'],
 			caorui:['caorui','re_caorui','old_caorui'],
 			sunziliufang:['sunziliufang','dc_sunziliufang'],
 			liyan:['liyan','old_liyan'],
@@ -14328,7 +14329,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinxuanhuo_info:'摸牌阶段开始时，你可以改为令一名其他角色摸两张牌，然后该角色需对其攻击范围内你选择的另一名角色使用一张【杀】，否则你获得其两张牌。',
 			fuhun:'父魂',
 			fuhun2:'父魂',
-			fuhun_info:'你可以将两张手牌当做【杀】使用或打出；出牌阶段，若你以此法使用的【杀】造成了伤害，你获得技能〖武圣〗和〖咆哮〗直到回合结束。',
+			fuhun_info:'你可以将两张手牌当做【杀】使用或打出；当你于出牌阶段以此法使用的【杀】造成伤害后，你获得〖武圣〗和〖咆哮〗直到回合结束。',
 			yuce:'御策',
 			yuce_info:'当你受到伤害后，你可以展示一张手牌，并令伤害来源选择一项：弃置一张与此牌类型不同的手牌，或令你回复1点体力。',
 			xiansi:'陷嗣',
@@ -14528,7 +14529,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldmiji:'秘计',
 			oldmiji_info:'准备/结束阶段开始时，若你已受伤，你可以判定，若判定结果为黑色，你观看牌堆顶的X张牌（X为你已损失的体力值），然后将这些牌交给一名角色。',
 			old_fuhun:'父魂',
-			old_fuhun_info:'摸牌阶段开始时，你可以放弃摸牌，改为从牌堆顶亮出两张牌并获得之，若亮出的牌颜色不同，你获得技能“武圣”、“咆哮”，直到回合结束。',
+			old_fuhun_info:'摸牌阶段开始时，你可以放弃摸牌，改为从牌堆顶亮出两张牌并获得之，若亮出的牌颜色不同，你获得〖武圣〗和〖咆哮〗直到回合结束。',
 			rejueqing:'绝情',
 			rejueqing_info:'当你对其他角色造成伤害时，你可以令此伤害值+X。若如此做，你失去X点体力并修改〖绝情〗（X为伤害值）。',
 			rejueqing_1st:'绝情',
@@ -14578,9 +14579,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shuojian_info:'出牌阶段限三次。你可以交给一名其他角色一张牌，其选择一项：1.令你摸X张牌并弃置X-1张牌；2.视为使用X张【过河拆桥】，然后此技能本回合失效（X为此技能本阶段剩余发动次数+1）。',
 			yj_qiaozhou:'谯周',
 			shiming:'识命',
-			shiming_info:'每轮限一次。一名角色的摸牌阶段，你可以观看牌堆顶的两张牌，并可以将其中一张置于牌堆底。然后该角色可以改为对自己造成1点伤害，然后从牌堆底摸三张牌。',
+			shiming_info:'每轮限一次。一名角色的摸牌阶段，你可以观看牌堆顶的三张牌，并可以将其中一张置于牌堆底。然后该角色可以改为对自己造成1点伤害，然后从牌堆底摸三张牌。',
 			jiangxi:'将息',
-			jiangxi_info:'一名角色的回合结束时，若一号位于此回合内进入过濒死状态或未受到过伤害，你可以重置〖识命〗；若所有角色均未受到过伤害，你可以与当前回合角色各摸一张牌。',
+			jiangxi_info:'一名角色的回合结束时，若一号位于此回合内进入过濒死状态或未受到过伤害，你可以重置〖识命〗并摸一张牌；若所有角色均未受到过伤害，你可以与当前回合角色各摸一张牌。',
 			hanlong:'韩龙',
 			duwang:'独往',
 			duwang_info:'锁定技。①游戏开始时，你从牌堆顶将五张不为【杀】的牌置于武将牌上，称为“刺”。②若你有牌名不为【杀】“刺”，你至其他角色或其他角色至你的距离+1。',
