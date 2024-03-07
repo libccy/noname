@@ -830,7 +830,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								const getNum=function(card){
 									if(get.info('xunshi').isXunshi(card)) return get.effect(game.filterPlayer(target=>{
 										return player.canUse(card,target,true,true);
-									}).sort((a,b)=>get.effect(b,card,player,player)-get.effect(a,card,player,player)),card,player,player);
+									}).sort((a,b)=>get.effect(b,card,player,player)-get.effect(a,card,player,player))[0],card,player,player);
 									return player.getUseValue(card,true,true);
 								};
 								return (getNum(b)||0)-(getNum(a)||0);
