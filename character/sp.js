@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				sp_others:["hanba","caiyang"],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','liupan'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','liupan','ol_lukai'],
 			},
 		},
 		characterFilter:{
@@ -30,6 +30,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			ol_lukai:['male','wu',3,['olxuanzhu','oljiane']],
 			liupan:['male','qun',4,['olpijing']],
 			guotu:['male','qun',3,['olqushi','olweijie']],
 			ol_hujinding:['female','shu',3,['olqingyuan','olchongshen']],
@@ -710,6 +711,226 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//陆凯
+			olxuanzhu:{
+				mark:true,
+				marktext:'☯',
+				zhuanhuanji:true,
+				intro:{
+					content(storage){
+						if(storage) return '每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用任意普通锦囊牌（须指定目标且仅指定一个目标）。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
+						return '每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用任意基本牌。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
+					},
+				},
+				audio:2,
+				enable:'chooseToUse',
+				filter(event,player){
+					if(!player.countCards('he')||event.type=='wuxie') return false;
+					return get.inpileVCardList(info=>{
+						const name=info[2],type=get.type(name),infox=get.info({name:name});
+						if(type!='basic'&&type!='trick') return false;
+						if(type=='trick'&&(!infox||!infox.filterTarget)) return false;
+						return (type!='basic')==(player.storage.olxuanzhu||false);
+					}).some(card=>event.filterCard({name:card[2],nature:card[3]},player,event));
+				},
+				usable:1,
+				chooseButton:{
+					dialog(event,player){
+						const list=get.inpileVCardList(info=>{
+							const name=info[2],type=get.type(name),infox=get.info({name:name});
+							if(type!='basic'&&type!='trick') return false;
+							if(type=='trick'&&(!infox||!infox.filterTarget)) return false;
+							return (type!='basic')==(player.storage.olxuanzhu||false);
+						}).filter(card=>event.filterCard({name:card[2],nature:card[3]},player,event));
+						return ui.create.dialog('玄注',[list,'vcard']);
+					},
+					check(button){
+						if(get.event().getParent().type!='phase') return 1;
+						return get.event('player').getUseValue({name:button.link[2],nature:button.link[3]});
+					},
+					backup(links,player){
+						let next={
+							audio:'olxuanzhu',
+							filterCard:true,
+							popname:true,
+							check(card){
+								return 1/(get.value(card)||0.5);
+							},
+							position:'he',
+							ignoreMod:true,
+							precontent(){
+								const cards=event.result.cards.slice();
+								player.addToExpansion(cards,player,'give').gaintag.add('olxuanzhu');
+								const viewAs={name:event.result.card.name,nature:event.result.card.nature};
+								event.result.card=viewAs;event.result.cards=[];
+								player.when('useCardAfter').filter(evt=>evt.skill=='olxuanzhu_backup').then(()=>{
+									const card=cards[0];
+									if(get.type(card)!='equip') player.chooseToDiscard('he',true);
+									else{
+										const cardx=player.getExpansions('olxuanzhu');
+										if(cardx.length){
+											player.loseToDiscardpile(cardx);
+											player.draw(cardx.length);
+										}
+									}
+								}).vars({cards:cards});
+							},
+							onuse(result,player){
+								player.changeZhuanhuanji('olxuanzhu');
+							},
+						};
+						const viewAs={
+							name:links[0][2],
+							nature:links[0][3],
+							suit:'none',
+							number:null,
+							isCard:true,
+						};
+						next.viewAs=viewAs;
+						if(get.info('xunshi').isXunshi(viewAs)){
+							next.filterTarget=function(card,player,target){
+								const info=get.info(card);
+								if(info.changeTarget){
+									let targets=[target];
+									info.changeTarget(player,targets);
+									if(targets.length>1) return false;
+								}
+								return lib.filter.filterTarget(card,player,target);
+							};
+							next.selectTarget=1;
+						}
+						return next;
+					},
+					prompt(links,player){
+						const viewAs={
+							name:links[0][2],
+							nature:links[0][3],
+							suit:'none',
+							number:null,
+							isCard:true,
+						};
+						const str='将一张牌称为“玄”置于武将牌上，然后视为使用'+(get.translation(links[0][3])||'')+'【'+get.translation(links[0][2])+'】';
+						return str+(get.info('xunshi').isXunshi(viewAs)?'（仅能指定一个目标）':'');
+					},
+				},
+				hiddenCard(player,name){
+					if(!lib.inpile.includes(name)||player.getStat('skill').olxuanzhu||!player.countCards('he')) return false;
+					return get.inpileVCardList(info=>{
+						const name=info[2],type=get.type(name),infox=get.info({name:name});
+						if(type!='basic'&&type!='trick') return false;
+						if(type=='trick'&&(!infox||!infox.filterTarget)) return false;
+						return (type!='basic')==(player.storage.olxuanzhu||false);
+					}).map(card=>card[2]).includes(name);
+				},
+				ai:{
+					order(item,player){
+						if(player&&get.event().type=='phase'){
+							let list=get.inpileVCardList(info=>{
+								const name=info[2],type=get.type(name),infox=get.info({name:name});
+								if(type!='basic'&&type!='trick') return false;
+								if(type=='trick'&&(!infox||!infox.filterTarget)) return false;
+								return (type!='basic')==(player.storage.olxuanzhu||false);
+							}).map(card=>{return {name:card[2],nature:card[3]}}).filter(card=>player.getUseValue(card,true,true)>0);
+							if(!list.length) return 0;
+							list.sort((a,b)=>{
+								const getNum=function(card){
+									if(get.info('xunshi').isXunshi(card)) return get.effect(game.filterPlayer(target=>{
+										return player.canUse(card,target,true,true);
+									}).sort((a,b)=>get.effect(b,card,player,player)-get.effect(a,card,player,player)),card,player,player);
+									return player.getUseValue(card,true,true);
+								};
+								return (getNum(b)||0)-(getNum(a)||0);
+							});
+							return get.order(list[0],player)*0.99;
+						}
+						return 0.001;
+					},
+					respondSha:true,
+					respondShan:true,
+					skillTagFilter(player,tag,arg){
+						if(arg=='respond') return false;
+						const name=(tag=='respondSha'?'sha':'shan');
+						return get.info('olxuanzhu').hiddenCard(player,name);
+					},
+					result:{player:1},
+				},
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+				onremove(player,skill){
+					const cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				subSkill:{backup:{}},
+			},
+			oljiane:{
+				audio:2,
+				trigger:{player:['shaDamage','useCardToEnd']},
+				filter(event,player,name){
+					if(event.type!='card'||!event.target||!event.target.isIn()||event.target==player) return false;
+					if(name=='shaDamage') return true;
+					return event.card.name!='sha'&&!event.getParent()._neutralized;
+				},
+				logTarget:'target',
+				forced:true,
+				async content(event,trigger,player){
+					trigger.target.addTempSkill('oljiane_neutralized');
+				},
+				group:'oljiane_neutralize',
+				global:'oljiane_ai',
+				subSkill:{
+					neutralize:{
+						audio:'oljiane',
+						trigger:{
+							target:'shaMiss',
+							global:'eventNeutralized',
+						},
+						filter(event,player,name){
+							if(event.type!='card') return false;
+							return name=='shaMiss'||event._neutralize_event.player==player;
+						},
+						forced:true,
+						async content(event,trigger,player){
+							player.addTempSkill('oljiane_nouse');
+						},
+					},
+					ai:{
+						ai:{
+							directHit_ai:true,
+							skillTagFilter(player,tag,arg){
+								if(!arg||!arg.target||!arg.target.hasSkill('oljiane_neutralized')) return false;
+							},
+						},
+					},
+					neutralized:{
+						charlotte:true,
+						mark:true,
+						marktext:'牌',
+						intro:{content:'本回合无法抵消牌'},
+						trigger:{global:'useCard'},
+						forced:true,
+						popup:false,
+						async content(event,trigger,player){
+							const id=player.playerid;
+							const map=trigger.customArgs;
+							if(!map[id]) map[id]={};
+							map[id].directHit2=true;
+						},
+						mod:{
+							wuxieJudgeEnabled:()=>false,
+							wuxieEnabled:()=>false,
+						},
+					},
+					nouse:{
+						charlotte:true,
+						mark:true,
+						marktext:'<span style="text-decoration: line-through;">牌</span>',
+						intro:{content:'本回合无法成为牌的目标'},
+						mod:{targetEnabled:()=>false},
+					},
+				},
+			},
 			//刘磐
 			olpijing:{
 				audio:2,
@@ -26184,6 +26405,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				str+='然后若没有角色因此【杀】死亡，你移除本次被选择的项。';
 				return str;
 			},
+			olxuanzhu(player){
+				if(player.storage.olxuanzhu) return '转换技，每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用：阴，任意基本牌；<span class="bluetext">阳，任意普通锦囊牌（须指定目标且仅指定一个目标）</span>。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
+				return '转换技，每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用：<span class="bluetext">阴，任意基本牌</span>；阳，任意普通锦囊牌（须指定目标且仅指定一个目标）。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
+			},
 		},
 		characterReplace:{
 			guanyinping:['guanyinping','old_guanyinping'],
@@ -26247,6 +26472,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugedan:['re_zhugedan','zhugedan'],
 			zhangren:['jsrg_zhangren','zhangren'],
 			wenqin:['ol_wenqin','pe_wenqin'],
+			lukai:['ol_lukai','lukai'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -27472,6 +27698,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liupan:'刘磐',
 			olpijing:'披荆',
 			olpijing_info:'每回合限一次，当你使用黑色【杀】或黑色普通锦囊牌指定唯一目标后，你可以令至多X名其他角色成为此牌的额外目标并依次交给你一张牌（X为你已损失的体力值且X至少为1）。这些角色下次使用基本牌或普通锦囊牌指定唯一目标时，其可令你成为此牌的额外目标或摸一张牌。',
+			ol_lukai:'OL陆凯',
+			ol_lukai_prefix:'OL',
+			olxuanzhu:'玄注',
+			olxuanzhu_info:'转换技，每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用：阴，任意基本牌；阳，任意普通锦囊牌（须指定目标且仅指定一个目标）。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。',
+			oljiane:'謇谔',
+			oljiane_info:'锁定技。①当你对其他角色使用的牌生效后，其本回合无法抵消牌。②当你抵消牌后，你本回合无法成为牌的目标。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
