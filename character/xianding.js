@@ -429,7 +429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				inherit:'mbdiancai',
 				filter(event,player){
-					if(!player.getHp()||_status.currentPhase===player) return false;
+					if(_status.currentPhase===player) return false;
 					let num=player.getHistory('lose',evt=>{
 						return evt.cards2&&evt.cards2.length&&evt.getParent('phaseUse')==event;
 					}).reduce((sum,evt)=>{
