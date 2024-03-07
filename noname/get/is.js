@@ -132,7 +132,7 @@ export class Is extends Uninstantable {
 	 */
 	// @ts-ignore
 	static virtualCard(card) {
-		return card.isCard && (!("cards" in card) || !Array.isArray(card.cards) || card.cards.length === 0);
+		return (!("cards" in card) || !Array.isArray(card.cards) || card.cards.length === 0);
 	}
 	/**
 	 * 是否是转化牌
