@@ -128,12 +128,15 @@ export class RefImpl {
 			props.forEach(({ key, value, evaluateJavascript }) => {
 				// @ts-ignore
 				if (!['innerText', 'innerHTML'].includes(key)) {
-					// 此处得判断是否是ref
-					const result = evaluateJavascript(value);
-					if (result instanceof RefImpl) {
-						element[key] = result.value;
-					} else {
-						element[key] = result;
+					// 更新prop信息,但m-for除外
+					if (key != 'instructions:m-for') {
+						// 此处得判断是否是ref
+						const result = evaluateJavascript(value);
+						if (result instanceof RefImpl) {
+							element[key] = result.value;
+						} else {
+							element[key] = result;
+						}
 					}
 					// 如果需要更新指令相关信息
 					if (typeof key == 'string' && key.startsWith('instructions:')) {
@@ -231,7 +234,8 @@ export function compiler(el, evaluateJavascript) {
 						el[siblingKey].splice(index, 0, el);
 					}
 				}
-			} else if (el['instructions:m-else-if'] || el['instructions:m-else']) {
+			}
+			else if (el['instructions:m-else-if'] || el['instructions:m-else']) {
 				/** @type { HTMLElement } 绑定的m-if元素 */
 				const firstIfElement = el[unionKey];
 				firstIfElement[parentKey] = el.parentElement;
@@ -244,6 +248,14 @@ export function compiler(el, evaluateJavascript) {
 						firstIfElement[siblingKey].splice(index, 0, firstIfElement);
 					}
 				}
+			} 
+			else if (el['instructions-m-for-source:m-for']) {
+				const sourceElement = el['instructions-m-for-source:m-for'];
+				sourceElement[`instructions-m-for-parent:m-for`] = el.parentElement;
+				const siblingKey = `instructions-m-for-sibling:m-for`;
+				const arr = sourceElement[siblingKey] || Array.from(el.parentElement.childNodes);
+				arr[arr.indexOf(el)] = sourceElement;
+				sourceElement[siblingKey] = [...new Set(arr)];
 			}
 			if (el.children) {
 				// @ts-ignore
@@ -683,88 +695,168 @@ export class Instructions {
 			}
 			case 'm-for': {
 				// 期望的绑定值类型：Array | Object | number | string | Iterable
+				// 需要特殊处理，所以不使用defaultExecution函数
+				// 给编译出的元素指定el
+				const sourceKey = `instructions-${instructions}-source:${instructions}`;
+				// 记录兄弟节点
+				const siblingKey = `instructions-${instructions}-sibling:${instructions}`;
+				// 记录父元素位置
+				const parentKey = `instructions-${instructions}-parent:${instructions}`;
+				// 其所渲染的所有元素
+				const childKey = `instructions-${instructions}-childKey:${instructions}`;
 				// 初始处理
 				if (el.hasAttribute(instructions)) {
-					// 需要特殊处理，所以不使用defaultExecution函数
-					const key = `instructions:${instructions}`;
-					/**
-					 * 原字符串 
-					 * @type { string }
-					 **/
-					let val = el.getAttribute(instructions) || el[key];
-					if (val === '' || val === instructions) val = 'true';
-					// 有多个“ in ”也是不允许的
-					if (!val.includes(' in ') || val.lastIndexOf(' in ') != val.indexOf(' in ')) {
-						throw new TypeError('m-for使用格式错误: ' + val);
-					}
-					val = val.trim();
-					/** 要进行遍历的变量名称 */
-					let list, item, index, objIndex;
-					const indexOfInKeyWord = val.lastIndexOf(' in ');
-					// 如果是以括号形式写的
-					if (val.startsWith('(')) {
-						/** 去除括号后的数组 */
-						let item_index = val.match("\\((.+?)\\)")[1];// item,index
-						[item, index, objIndex] = item_index.split(',');
-					}
-					// 没有括号，那就只有一个item变量
-					else {
-						item = val.slice(0, indexOfInKeyWord);
-					}
-					list = val.slice(indexOfInKeyWord + ' in '.length);
-					if (typeof item == 'string') item = item.trim();
-					if (typeof index == 'string') index = index.trim();
-					if (typeof objIndex == 'string') objIndex = objIndex.trim();
-					if (typeof list == 'string') list = list.trim();
-					/** 要进行遍历的变量 */
-					let dataList = evaluateJavascript(list);
-					if (dataList instanceof RefImpl) {
-						dataList = dataList.value;
-					}
-					if (Array.isArray(dataList)) {
+					if (!el[childKey]) el[childKey] = [];
+					execution(el);
+				}
+				// 从保存的数据处理
+				else {
+					// 移除已经渲染的元素
+					el[childKey].forEach(ele => {
+						if (ele.parentNode) ele.parentNode.removeChild(ele);
+					});
+					let doc = document.implementation.createHTMLDocument('');
+					doc.body.innerHTML = el[instructionsKey];
+					const resolvingElement = doc.body.firstChild;
+					if (!resolvingElement[childKey]) resolvingElement[childKey] = [];
+					if (el[parentKey]) resolvingElement[parentKey] = el[parentKey];
+					if (el[siblingKey]) resolvingElement[siblingKey] = el[siblingKey];
+					resolvingElement[sourceKey] = el;
+					execution(resolvingElement, false);
+				}
+				
+				function execution(el, record = true) {
+					if (el.hasAttribute(instructions)) {
+						// 储存其本身的outerHTML，数据变动后重新解析
+						// 因为解析后，其的其他标签属性会丢失
+						if (!el[instructionsKey]) el[instructionsKey] = el.outerHTML;
 						/**
-						 * <div v-for="(item, index) in items">{{ item }}</div>
-						 * 
-						 * items.length个<div>{{ item }}</div>，然后用item和index做其他事
-						 */
-						const fun = evaluateJavascript(`
-							(function (el, list, compiler) {
-								/** 模板 */
-								const fragment = document.createDocumentFragment();
-								for (let i = 0; i < list.length; i++) {
-									// 创建数据
-									const ${item} = list[i];
-									const ${index} = i;
-									// 创建dom
-									let doc = document.implementation.createHTMLDocument('');
-									doc.body.innerHTML = el.outerHTML;
-									const li = doc.body.firstChild;
-									doc = null;
-									// 移除m-for标签属性
-									li.removeAttribute('m-for');
-									fragment.appendChild(li);
-									// 编译dom
-									compiler(li, str => eval(str));
-								}
-								return fragment;
+						 * 原字符串 
+						 * @type { string }
+						 **/
+						let val = el.getAttribute(instructions);
+						if (val === '' || val === instructions) val = 'true';
+						// 有多个“ in ”也是不允许的
+						if (!val.includes(' in ') || val.lastIndexOf(' in ') != val.indexOf(' in ')) {
+							throw new TypeError('m-for使用格式错误: ' + val);
+						}
+						val = val.trim();
+						/** 要进行遍历的变量名称 */
+						let list, item, index, objIndex;
+						const indexOfInKeyWord = val.lastIndexOf(' in ');
+						// 如果是以括号形式写的
+						if (val.startsWith('(')) {
+							/** 去除括号后的数组 */
+							let item_index = val.match("\\((.+?)\\)")[1];// item,index
+							[item, index, objIndex] = item_index.split(',');
+						}
+						// 没有括号，那就只有一个item变量
+						else {
+							item = val.slice(0, indexOfInKeyWord);
+						}
+						list = val.slice(indexOfInKeyWord + ' in '.length);
+						if (typeof item == 'string') item = item.trim();
+						if (typeof index == 'string') index = index.trim();
+						if (typeof objIndex == 'string') objIndex = objIndex.trim();
+						if (typeof list == 'string') list = list.trim();
+						/** 要进行遍历的变量 */
+						let dataList = evaluateJavascript(list);
+						// 绑定
+						if (dataList instanceof RefImpl) {
+							if (record) dataList.use(el, {
+								props: [{
+									key: instructionsKey,
+									value: el[instructionsKey],
+									evaluateJavascript,
+								}],
 							});
-						`);
-						const fragment = fun(el, dataList, compiler);
-						el.parentNode.replaceChild(fragment, el);
-					}
-					else if (typeof dataList == 'number' || dataList instanceof Number) {
+							// 解包
+							dataList = dataList.value;
+						} else {
+							if (record && RefImpl.executionList.length > 0) {
+								RefImpl.executionList.forEach(ref => {
+									ref.use(el, {
+										props: [{
+											key: instructionsKey,
+											value: el[key],
+											evaluateJavascript,
+										}],
+									});
+								});
+							}
+						}
+						if (Array.isArray(dataList)) {
+							/**
+							 * <div v-for="(item, index) in items">{{ item }}</div>
+							 * 
+							 * items.length个<div>{{ item }}</div>，然后用item和index做其他事
+							 */
+							const fun = evaluateJavascript(`
+								(function (el, list, compiler) {
+									/** 模板 */
+									const fragment = document.createDocumentFragment();
+									for (let i = 0; i < list.length; i++) {
+										// 创建数据(考虑变量不存在的情况)
+										${item !== undefined ? ('const ' + item + ' = list[i];') : ''}
+										${index !== undefined ? ('const ' + index + ' = i;') : ''}
+										// 创建dom
+										let doc = document.implementation.createHTMLDocument('');
+										doc.body.innerHTML = el.outerHTML;
+										const li = doc.body.firstChild;
+										doc = null;
+										// 移除m-for标签属性
+										li.removeAttribute('m-for');
+										fragment.appendChild(li);
+										// 编译dom
+										compiler(li, str => eval(str));
+									}
+									return fragment;
+								});
+							`);
+							/** @type { DocumentFragment } */
+							const fragment = fun(el, dataList, compiler);
+							[...fragment.children].forEach(e => {
+								if (!el[sourceKey]) {
+									e[sourceKey] = el;
+									el[childKey].push(e);
+								} else {
+									e[sourceKey] = el[sourceKey];
+									el[sourceKey][childKey].push(e);
+								}
+							});
+							if (el[parentKey]) {
+								const insertBeforeElement = el[siblingKey].filter(child => {
+									// 排除不处于父节点的兄弟节点
+									if (child.parentElement == el[parentKey]) return true;
+									if (!el[sourceKey]) {
+										return child == el;
+									} else {
+										return child == el[sourceKey];
+									}
+								}).find((_, index, arr) => {
+									// 此处el并不是原先的el
+									if (!el[sourceKey]) {
+										return index > arr.indexOf(el);
+									} else {
+										return index > arr.indexOf(el[sourceKey]);
+									}
+								}) || null;
+								el[parentKey].insertBefore(fragment, insertBeforeElement);
+							} else if (el.parentNode) el.parentNode.replaceChild(fragment, el);
+						}
+						else if (typeof dataList == 'number' || dataList instanceof Number) {
 
-					}
-					else if (typeof dataList == 'string' || dataList instanceof String) {
-						
-					}
-					else if (dataList && dataList.constructor === Object) {
+						}
+						else if (typeof dataList == 'string' || dataList instanceof String) {
 
-					}
-					else if (dataList && typeof dataList[Symbol.iterator]) {
+						}
+						else if (dataList && dataList.constructor === Object) {
 
+						}
+						else if (dataList && typeof dataList[Symbol.iterator]) {
+
+						}
 					}
-					el.removeAttribute(instructions);
 				}
 				break;
 			}
