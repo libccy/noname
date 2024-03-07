@@ -214,20 +214,36 @@ export function compileDom(el, evaluateJavascript) {
 		const target = el.parentElement;
 		target.appendChild(content);
 		target.removeChild(el);
-
+		
 		// 刷新m-if指向的parent元素
 		const parentKey = `instructions-m-if-parent:m-if`;
 		const siblingKey = `instructions-m-if-sibling:m-if`;
+		const unionKey = `instructions-m-if-union:m-if`;
 		function updateParentKey(el) {
 			if (el['instructions:m-if']) {
 				el[parentKey] = el.parentElement;
-				el[siblingKey] = Array.from(el.parentElement.children);
+				el[siblingKey] = Array.from(el.parentElement.childNodes);
+				if (!el[siblingKey].includes(el)) {
+					const index = el[siblingKey].findIndex(e => {
+						return el[unionKey].includes(e);
+					});
+					if (index > -1) {
+						el[siblingKey].splice(index, 0, el);
+					}
+				}
 			} else if (el['instructions:m-else-if'] || el['instructions:m-else']) {
-				const unionKey = `instructions-m-if-union:m-if`;
 				/** @type { HTMLElement } 绑定的m-if元素 */
 				const firstIfElement = el[unionKey];
 				firstIfElement[parentKey] = el.parentElement;
-				firstIfElement[siblingKey] = Array.from(el.parentElement.children);
+				firstIfElement[siblingKey] = Array.from(el.parentElement.childNodes);
+				if (!firstIfElement[siblingKey].includes(firstIfElement)) {
+					const index = firstIfElement[siblingKey].findIndex(e => {
+						return firstIfElement[unionKey].includes(e);
+					});
+					if (index > -1) {
+						firstIfElement[siblingKey].splice(index, 0, firstIfElement);
+					}
+				}
 			}
 			if (el.children) {
 				// @ts-ignore
@@ -235,6 +251,7 @@ export function compileDom(el, evaluateJavascript) {
 			}
 		}
 		updateParentKey(target);
+
 	} else {
 		const attrNames = el.getAttributeNames();
 
@@ -322,6 +339,14 @@ export function compileDom(el, evaluateJavascript) {
 		// 处理内置指令
 		Instructions.initial.forEach(instructions => {
 			if (attrNames.includes(instructions)) {
+				if (instructions == 'm-if') {
+					// 刷新m-if指向的parent元素
+					const parentKey = `instructions-m-if-parent:m-if`;
+					const siblingKey = `instructions-m-if-sibling:m-if`;
+					// 初始指向Template
+					el[parentKey] = el.parentNode;
+					el[siblingKey] = Array.from(el[parentKey].childNodes);
+				}
 				Instructions.parse(el, evaluateJavascript, instructions);
 			}
 		});
@@ -374,9 +399,9 @@ export function compileDom(el, evaluateJavascript) {
 export class Instructions {
 	/**
 	 * 内置指令数组
-	 * @type { ['m-if', 'm-else-if', 'm-else', 'm-show'] }
+	 * @type { ['m-if', 'm-else-if', 'm-else', 'm-for', 'm-show'] }
 	 */
-	static initial = ['m-if', 'm-else-if', 'm-else', 'm-show'];
+	static initial = ['m-if', 'm-else-if', 'm-else', 'm-for', 'm-show'];
 
 	/**
 	 * 自定义指令数组
@@ -533,16 +558,16 @@ export class Instructions {
 					}
 				}
 				// 如果节点在dom中(先渲染，再刷新)
+				const oldParentNode = el[parentKey];
 				if (el.parentNode) {
 					el[parentKey] = el.parentNode;
 					// 如果状态从false改回true，那应该执行以下代码:
 					// el.parentElement.insertBefore(el, child);
-					// 所以要保存的是el的父元素，和后一个兄弟节点
+					// 所以要保存的是el的父节点，和后一个兄弟节点
 					// 但是后一个兄弟节点也有可能被m-if指令指定不渲染。
-					// 所以要保存其所有兄弟元素(顺序)
-					// 用节点而不是元素的话，会有部分问题
+					// 所以要保存其所有兄弟节点(顺序)
 					// @ts-ignore
-					el[siblingKey] = Array.from(el.parentNode.children);
+					if (oldParentNode != el.parentNode) el[siblingKey] = Array.from(el.parentNode.childNodes);
 				}
 				break;
 			}
@@ -649,6 +674,10 @@ export class Instructions {
 							if (ele.parentNode) ele.parentNode.removeChild(ele);
 						});
 				}
+				break;
+			}
+			case 'm-for': {
+				
 				break;
 			}
 			default:
