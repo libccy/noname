@@ -6,4 +6,4 @@ export { Library as lib } from './noname/library/index.js';
 export { status as _status } from './noname/status/index.js';
 export { UI as ui } from './noname/ui/index.js';
 export { boot } from './noname/init/index.js';
-export { ref, compiler } from './noname/ref/index.js';
+export { ref, RefImpl, compiler, Instructions, html, css } from './noname/ref/index.js';
