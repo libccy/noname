@@ -78,7 +78,6 @@ export class RefImpl {
 				if (typeof value == 'function') {
 					value = value.bind(target);
 				}
-				// console.log('get', target, prop, value);
 				if (Object(value) !== value && Boolean(value)) {
 					return new Proxy(value, handler);
 				}
@@ -86,7 +85,6 @@ export class RefImpl {
 			},
 			set: (target, prop, newVal, receiver) => {
 				const oldVal = Reflect.get(target, prop);
-				// console.log('set', target, prop, oldVal, newVal);
 				const result = Reflect.set(target, prop, newVal, receiver);
 				// 更新视图
 				if (oldVal != newVal) {
@@ -130,8 +128,13 @@ export class RefImpl {
 			props.forEach(({ key, value, evaluateJavascript }) => {
 				// @ts-ignore
 				if (!['innerText', 'innerHTML'].includes(key)) {
-					// @ts-ignore
-					element[key] = evaluateJavascript(value);
+					// 此处得判断是否是ref
+					const result = evaluateJavascript(value);
+					if (result instanceof RefImpl) {
+						element[key] = result.value;
+					} else {
+						element[key] = result;
+					}
 					// 如果需要更新指令相关信息
 					if (typeof key == 'string' && key.startsWith('instructions:')) {
 						const instructions = key.slice(13);
@@ -208,10 +211,30 @@ export function compileDom(el, evaluateJavascript) {
 			// @ts-ignore
 			[...content.children].forEach(ele => compileDom(ele, evaluateJavascript));
 		}
-		// @ts-ignore
-		el.parentElement.appendChild(content);
-		// @ts-ignore
-		el.parentElement.removeChild(el);
+		const target = el.parentElement;
+		target.appendChild(content);
+		target.removeChild(el);
+
+		// 刷新m-if指向的parent元素
+		const parentKey = `instructions-m-if-parent:m-if`;
+		const siblingKey = `instructions-m-if-sibling:m-if`;
+		function updateParentKey(el) {
+			if (el['instructions:m-if']) {
+				el[parentKey] = el.parentElement;
+				el[siblingKey] = Array.from(el.parentElement.children);
+			} else if (el['instructions:m-else-if'] || el['instructions:m-else']) {
+				const unionKey = `instructions-m-if-union:m-if`;
+				/** @type { HTMLElement } 绑定的m-if元素 */
+				const firstIfElement = el[unionKey];
+				firstIfElement[parentKey] = el.parentElement;
+				firstIfElement[siblingKey] = Array.from(el.parentElement.children);
+			}
+			if (el.children) {
+				// @ts-ignore
+				[...el.children].forEach(ele => updateParentKey(ele));
+			}
+		}
+		updateParentKey(target);
 	} else {
 		const attrNames = el.getAttributeNames();
 
@@ -351,9 +374,9 @@ export function compileDom(el, evaluateJavascript) {
 export class Instructions {
 	/**
 	 * 内置指令数组
-	 * @type { ['m-show', 'm-if'] }
+	 * @type { ['m-if', 'm-else-if', 'm-else', 'm-show'] }
 	 */
-	static initial = ['m-show', 'm-if'];
+	static initial = ['m-if', 'm-else-if', 'm-else', 'm-show'];
 
 	/**
 	 * 自定义指令数组
@@ -374,26 +397,28 @@ export class Instructions {
 		// 而且编译后，需要移除。
 		// 不同的指令，需要做的功能需要提取出来
 		const instructionsKey = `instructions:${instructions}`;
-		/** 
-		 * 原字符串 
-		 * @type { string }
-		 **/
-		// @ts-ignore
-		let val = el.getAttribute(instructions) || el[instructionsKey];
-		if (val === '' || val === instructions) val = 'true';
 		RefImpl.recordExecution = true;
 		RefImpl.executionList.length = 0;
 		/**
 		 * 默认执行
+		 * @param { HTMLElement } [ele] 限定执行的元素，默认为el
+		 * @param { string } [instru]
 		 */
-		const defaultExecution = () => {
+		const defaultExecution = (ele = el, instru = instructions) => {
+			const key = `instructions:${instru}`;
+			/**
+			 * 原字符串 
+			 * @type { string }
+			 **/
+			let val = ele.getAttribute(instru) || ele[key];
+			if (val === '' || val === instru) val = 'true';
 			const getVal = evaluateJavascript(val);
 			if (!(getVal instanceof RefImpl)) {
 				if (RefImpl.executionList.length > 0) {
 					RefImpl.executionList.forEach(ref => {
-						ref.use(el, {
+						ref.use(ele, {
 							props: [{
-								key: instructionsKey,
+								key: key,
 								// @ts-ignore
 								value: val,
 								evaluateJavascript,
@@ -401,19 +426,19 @@ export class Instructions {
 						});
 					});
 				}
-				el[instructionsKey] = getVal;
+				ele[key] = getVal;
 			} else {
-				getVal.use(el, {
+				getVal.use(ele, {
 					props: [{
-						key: instructionsKey,
+						key: key,
 						// @ts-ignore
 						value: val,
 						evaluateJavascript,
 					}],
 				});
-				el[instructionsKey] = evaluateJavascript(getVal.value);
+				ele[key] = evaluateJavascript(getVal.value);
 			}
-			return el[instructionsKey];
+			return ele[key];
 		};
 		switch (instructions) {
 			case 'm-show': {
@@ -433,7 +458,32 @@ export class Instructions {
 				const result = defaultExecution();
 				const parentKey = `instructions-${instructions}-parent:${instructions}`;
 				const siblingKey = `instructions-${instructions}-sibling:${instructions}`;
-				// 更新父节点信息
+				const unionKey = `instructions-${instructions}-union:${instructions}`;
+				// 第一次渲染之前，要获取其下一个元素是否有m-else-if或者m-else指令
+				// 三者只能显示一个元素
+				// m-else-if可以绑定另一个变量，而m-else不绑定变量
+				if (!el[unionKey]) {
+					el[unionKey] = [];
+					let nextElement = el.nextElementSibling;
+					if (nextElement) while (nextElement.hasAttribute('m-else-if') || nextElement.hasAttribute('m-else')) {
+						if (nextElement.hasAttribute('m-else-if') && nextElement.hasAttribute('m-else')) {
+							throw new TypeError('m-else-if和m-else指令不能出现在同一标签中');
+						}
+						el[unionKey].push(nextElement);
+						nextElement[unionKey] = el;
+						if (nextElement.hasAttribute('m-else-if')) {
+							defaultExecution(nextElement, 'm-else-if');
+							nextElement.removeAttribute('m-else-if');
+						}
+						if (nextElement.hasAttribute('m-else')) {
+							defaultExecution(nextElement, 'm-else');
+							nextElement.removeAttribute('m-else');
+						}
+						nextElement = nextElement.nextElementSibling;
+						if (!nextElement) break;
+					}
+				}
+				// 更新记录的父节点信息
 				if (el[parentKey] && el.parentNode && el[parentKey] != el.parentNode) {
 					el[parentKey] = el.parentNode;
 				}
@@ -446,14 +496,41 @@ export class Instructions {
 							return child.parentElement == el[parentKey] || child == el;
 						}).find((_, index, arr) => {
 							return index > arr.indexOf(el);
-						}));
+						}) || null);
 					}
 					// 处理m-else-if和m-else
+					if (Array.isArray(el[unionKey])) {
+						el[unionKey].forEach(ele => {
+							if (ele.parentNode) ele.parentNode.removeChild(ele);
+						});
+					}
 				}
 				// 移除节点
 				else {
 					if (el.parentNode) el.parentNode.removeChild(el);
 					// 处理m-else-if和m-else
+					if (Array.isArray(el[unionKey])) {
+						const displayElement = el[unionKey].find(ele => {
+							return ele['instructions:m-else-if'] == true || ele['instructions:m-else'] == true;
+						});
+						if (displayElement) {
+							// 根据m-if指令元素的位置去显示
+							if (el[parentKey] && !el[parentKey].contains(displayElement)) {
+								const insertBeforeElement = el[siblingKey].filter(child => {
+									// 排除不处于父节点的兄弟节点
+									return child.parentElement == el[parentKey] || child == el;
+								}).find((_, index, arr) => {
+									return index > arr.indexOf(el);
+								}) || null;
+								el[parentKey].insertBefore(displayElement, insertBeforeElement);
+							}
+						}
+						el[unionKey]
+							.filter(ele => ele != displayElement)
+							.forEach(ele => {
+								if (ele.parentNode) ele.parentNode.removeChild(ele);
+							});
+					}
 				}
 				// 如果节点在dom中(先渲染，再刷新)
 				if (el.parentNode) {
@@ -466,6 +543,111 @@ export class Instructions {
 					// 用节点而不是元素的话，会有部分问题
 					// @ts-ignore
 					el[siblingKey] = Array.from(el.parentNode.children);
+				}
+				break;
+			}
+			case 'm-else-if': {
+				const unionKey = `instructions-m-if-union:m-if`;
+				const parentKey = `instructions-m-if-parent:m-if`;
+				const siblingKey = `instructions-m-if-sibling:m-if`;
+				if (el.hasAttribute('m-else-if') || !el[unionKey]) {
+					throw new TypeError('m-else-if指令不能单独出现');
+				}
+				/** @type { HTMLElement } 绑定的m-if元素 */
+				const firstIfElement = el[unionKey];
+				// 更新绑定的m-if元素父节点信息
+				if (firstIfElement[parentKey] && firstIfElement.parentNode && firstIfElement[parentKey] != firstIfElement.parentNode) {
+					firstIfElement[parentKey] = firstIfElement.parentNode;
+				}
+				const unionElements = [firstIfElement, ...firstIfElement[unionKey]];
+
+				const result = el[instructionsKey];
+				if (Array.isArray(firstIfElement[unionKey])) {
+					if (result == true) {
+						// m-else-if的状态改为true后，需要判断m-if，或者前置m-else-if
+						const displayElement = unionElements.find(ele => {
+							return ele['instructions:m-if'] == true ||
+								ele['instructions:m-else-if'] == true ||
+								ele['instructions:m-else'] == true;
+						});
+						if (displayElement) {
+							if (firstIfElement[parentKey] && !firstIfElement[parentKey].contains(displayElement)) {
+								const insertBeforeElement = firstIfElement[siblingKey].filter(child => {
+									// 排除不处于父节点的兄弟节点
+									return child.parentElement == firstIfElement[parentKey] || child == firstIfElement;
+								}).find((_, index, arr) => {
+									return index > arr.indexOf(firstIfElement);
+								}) || null;
+								firstIfElement[parentKey].insertBefore(displayElement, insertBeforeElement);
+							}
+						}
+						unionElements.filter(ele => ele != displayElement)
+							.forEach(ele => {
+								if (ele.parentNode) ele.parentNode.removeChild(ele);
+							});
+					} else {
+						// 进行下一个m-else-if或者m-else判断
+						const displayElement = unionElements.find((ele, index, array) => {
+							// 虽然是寻找下一个，但是还是得首先判断最初绑定m-if的元素
+							// 如果是true那其他的不显示，只显示绑定m-if的元素
+							if (ele['instructions:m-if'] == true) return true;
+							// 这个元素的下一个m-else-if或m-else元素
+							if (array.indexOf(el) >= index) return false;
+							return ele['instructions:m-else-if'] == true ||
+								ele['instructions:m-else'] == true;
+						});
+						if (displayElement) {
+							if (firstIfElement[parentKey] && !firstIfElement[parentKey].contains(displayElement)) {
+								const insertBeforeElement = firstIfElement[siblingKey].filter(child => {
+									// 排除不处于父节点的兄弟节点
+									return child.parentElement == firstIfElement[parentKey] || child == firstIfElement;
+								}).find((_, index, arr) => {
+									return index > arr.indexOf(firstIfElement);
+								}) || null;
+								firstIfElement[parentKey].insertBefore(displayElement, insertBeforeElement);
+							}
+						}
+						unionElements.filter(ele => ele != displayElement)
+							.forEach(ele => {
+								if (ele.parentNode) ele.parentNode.removeChild(ele);
+							});
+					}
+				}
+				break;
+			}
+			case 'm-else': {
+				const unionKey = `instructions-m-if-union:m-if`;
+				const parentKey = `instructions-m-if-parent:m-if`;
+				const siblingKey = `instructions-m-if-sibling:m-if`;
+				if (el.hasAttribute('m-else') || !el[unionKey]) {
+					throw new TypeError('m-else指令不能单独出现');
+				}
+				/** @type { HTMLElement } 绑定的m-if元素 */
+				const firstIfElement = el[unionKey];
+				// 更新绑定的m-if元素父节点信息
+				if (firstIfElement[parentKey] && firstIfElement.parentNode && firstIfElement[parentKey] != firstIfElement.parentNode) {
+					firstIfElement[parentKey] = firstIfElement.parentNode;
+				}
+				const unionElements = [firstIfElement, ...firstIfElement[unionKey]];
+				// m-else一定为true
+				if (Array.isArray(firstIfElement[unionKey])) {
+					// 默认为el
+					const displayElement = unionElements.find(ele => {
+						return ele['instructions:m-if'] == true || ele['instructions:m-else-if'] == true || ele == el;
+					});
+					if (firstIfElement[parentKey] && !firstIfElement[parentKey].contains(displayElement)) {
+						const insertBeforeElement = firstIfElement[siblingKey].filter(child => {
+							// 排除不处于父节点的兄弟节点
+							return child.parentElement == firstIfElement[parentKey] || child == firstIfElement;
+						}).find((_, index, arr) => {
+							return index > arr.indexOf(firstIfElement);
+						}) || null;
+						firstIfElement[parentKey].insertBefore(displayElement, insertBeforeElement);
+					}
+					unionElements.filter(ele => ele != displayElement)
+						.forEach(ele => {
+							if (ele.parentNode) ele.parentNode.removeChild(ele);
+						});
 				}
 				break;
 			}
