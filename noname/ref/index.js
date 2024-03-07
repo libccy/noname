@@ -78,7 +78,7 @@ export class RefImpl {
 				if (typeof value == 'function') {
 					value = value.bind(target);
 				}
-				if (Object(value) !== value && Boolean(value)) {
+				if (Object(value) === value && Boolean(value)) {
 					return new Proxy(value, handler);
 				}
 				return value;
@@ -195,7 +195,7 @@ window.mold = {
 			obj.evaluateJavascript = evaluateJavascript;
 		}
 		// @ts-ignore
-		compileDom(this.templateMap.get(url).template, evaluateJavascript);
+		compiler(this.templateMap.get(url).template, evaluateJavascript);
 	},
 };
 
@@ -204,12 +204,12 @@ window.mold = {
  * @param { HTMLTemplateElement | HTMLElement } el
  * @param { (str: string) => any } evaluateJavascript 
  */
-export function compileDom(el, evaluateJavascript) {
+export function compiler(el, evaluateJavascript) {
 	if (el instanceof HTMLTemplateElement) {
 		const { content } = el;
 		if (content.children) {
 			// @ts-ignore
-			[...content.children].forEach(ele => compileDom(ele, evaluateJavascript));
+			[...content.children].forEach(ele => compiler(ele, evaluateJavascript));
 		}
 		const target = el.parentElement;
 		target.appendChild(content);
@@ -254,6 +254,22 @@ export function compileDom(el, evaluateJavascript) {
 
 	} else {
 		const attrNames = el.getAttributeNames();
+
+		// 优先处理内置指令
+		// 内置指令中优先处理m-for
+		Instructions.initial.forEach(instructions => {
+			if (attrNames.includes(instructions)) {
+				if (instructions == 'm-if') {
+					// 刷新m-if指向的parent元素
+					const parentKey = `instructions-m-if-parent:m-if`;
+					const siblingKey = `instructions-m-if-sibling:m-if`;
+					// 初始指向Template
+					el[parentKey] = el.parentNode;
+					el[siblingKey] = Array.from(el[parentKey].childNodes);
+				}
+				Instructions.parse(el, evaluateJavascript, instructions);
+			}
+		});
 
 		// 处理@xx的事件
 		const names = attrNames.filter(n => n.startsWith('@'));
@@ -336,39 +352,16 @@ export function compileDom(el, evaluateJavascript) {
 			});
 		}
 
-		// 处理内置指令
-		Instructions.initial.forEach(instructions => {
-			if (attrNames.includes(instructions)) {
-				if (instructions == 'm-if') {
-					// 刷新m-if指向的parent元素
-					const parentKey = `instructions-m-if-parent:m-if`;
-					const siblingKey = `instructions-m-if-sibling:m-if`;
-					// 初始指向Template
-					el[parentKey] = el.parentNode;
-					el[siblingKey] = Array.from(el[parentKey].childNodes);
-				}
-				Instructions.parse(el, evaluateJavascript, instructions);
-			}
-		});
-
 		if (el.innerHTML.length > 0) {
 			const oldVal = el.innerHTML;
 			el.innerHTML = oldVal.replace(/\{\{(.+?)\}\}/g, (_, str) => {
 				RefImpl.recordExecution = true;
 				RefImpl.executionList.length = 0;
-				const getVal = evaluateJavascript(str);
-				if (getVal instanceof RefImpl) {
-					getVal.use(el, {
-						props: [{
-							key: 'innerHTML',
-							// @ts-ignore
-							value: oldVal,
-							evaluateJavascript,
-						}],
-					});
-				} else if (RefImpl.executionList.length > 0) {
-					RefImpl.executionList.forEach(ref => {
-						ref.use(el, {
+				let getVal;
+				try {
+					getVal = evaluateJavascript(str);
+					if (getVal instanceof RefImpl) {
+						getVal.use(el, {
 							props: [{
 								key: 'innerHTML',
 								// @ts-ignore
@@ -376,7 +369,20 @@ export function compileDom(el, evaluateJavascript) {
 								evaluateJavascript,
 							}],
 						});
-					});
+					} else if (RefImpl.executionList.length > 0) {
+						RefImpl.executionList.forEach(ref => {
+							ref.use(el, {
+								props: [{
+									key: 'innerHTML',
+									// @ts-ignore
+									value: oldVal,
+									evaluateJavascript,
+								}],
+							});
+						});
+					}
+				} catch {
+					getVal = str;
 				}
 				RefImpl.recordExecution = false;
 				RefImpl.executionList.length = 0;
@@ -386,7 +392,7 @@ export function compileDom(el, evaluateJavascript) {
 
 		if (el.children) {
 			// @ts-ignore
-			[...el.children].forEach(ele => compileDom(ele, evaluateJavascript));
+			[...el.children].forEach(ele => compiler(ele, evaluateJavascript));
 		}
 	}
 };
@@ -399,9 +405,9 @@ export function compileDom(el, evaluateJavascript) {
 export class Instructions {
 	/**
 	 * 内置指令数组
-	 * @type { ['m-if', 'm-else-if', 'm-else', 'm-for', 'm-show'] }
+	 * @type { ['m-for', 'm-if', 'm-else-if', 'm-else', 'm-show'] }
 	 */
-	static initial = ['m-if', 'm-else-if', 'm-else', 'm-for', 'm-show'];
+	static initial = ['m-for', 'm-if', 'm-else-if', 'm-else', 'm-show'];
 
 	/**
 	 * 自定义指令数组
@@ -415,7 +421,6 @@ export class Instructions {
 	 * @param { HTMLElement } el
 	 * @param { (str: string) => any } evaluateJavascript 
 	 * @param { T[number] | U[number] } instructions
-	 * 
 	 */
 	static parse(el, evaluateJavascript, instructions) {
 		// 首先，指令是存在于html标签属性中的
@@ -677,7 +682,90 @@ export class Instructions {
 				break;
 			}
 			case 'm-for': {
-				
+				// 期望的绑定值类型：Array | Object | number | string | Iterable
+				// 初始处理
+				if (el.hasAttribute(instructions)) {
+					// 需要特殊处理，所以不使用defaultExecution函数
+					const key = `instructions:${instructions}`;
+					/**
+					 * 原字符串 
+					 * @type { string }
+					 **/
+					let val = el.getAttribute(instructions) || el[key];
+					if (val === '' || val === instructions) val = 'true';
+					// 有多个“ in ”也是不允许的
+					if (!val.includes(' in ') || val.lastIndexOf(' in ') != val.indexOf(' in ')) {
+						throw new TypeError('m-for使用格式错误: ' + val);
+					}
+					val = val.trim();
+					/** 要进行遍历的变量名称 */
+					let list, item, index, objIndex;
+					const indexOfInKeyWord = val.lastIndexOf(' in ');
+					// 如果是以括号形式写的
+					if (val.startsWith('(')) {
+						/** 去除括号后的数组 */
+						let item_index = val.match("\\((.+?)\\)")[1];// item,index
+						[item, index, objIndex] = item_index.split(',');
+					}
+					// 没有括号，那就只有一个item变量
+					else {
+						item = val.slice(0, indexOfInKeyWord);
+					}
+					list = val.slice(indexOfInKeyWord + ' in '.length);
+					if (typeof item == 'string') item = item.trim();
+					if (typeof index == 'string') index = index.trim();
+					if (typeof objIndex == 'string') objIndex = objIndex.trim();
+					if (typeof list == 'string') list = list.trim();
+					/** 要进行遍历的变量 */
+					let dataList = evaluateJavascript(list);
+					if (dataList instanceof RefImpl) {
+						dataList = dataList.value;
+					}
+					if (Array.isArray(dataList)) {
+						/**
+						 * <div v-for="(item, index) in items">{{ item }}</div>
+						 * 
+						 * items.length个<div>{{ item }}</div>，然后用item和index做其他事
+						 */
+						const fun = evaluateJavascript(`
+							(function (el, list, compiler) {
+								/** 模板 */
+								const fragment = document.createDocumentFragment();
+								for (let i = 0; i < list.length; i++) {
+									// 创建数据
+									const ${item} = list[i];
+									const ${index} = i;
+									// 创建dom
+									let doc = document.implementation.createHTMLDocument('');
+									doc.body.innerHTML = el.outerHTML;
+									const li = doc.body.firstChild;
+									doc = null;
+									// 移除m-for标签属性
+									li.removeAttribute('m-for');
+									fragment.appendChild(li);
+									// 编译dom
+									compiler(li, str => eval(str));
+								}
+								return fragment;
+							});
+						`);
+						const fragment = fun(el, dataList, compiler);
+						el.parentNode.replaceChild(fragment, el);
+					}
+					else if (typeof dataList == 'number' || dataList instanceof Number) {
+
+					}
+					else if (typeof dataList == 'string' || dataList instanceof String) {
+						
+					}
+					else if (dataList && dataList.constructor === Object) {
+
+					}
+					else if (dataList && typeof dataList[Symbol.iterator]) {
+
+					}
+					el.removeAttribute(instructions);
+				}
 				break;
 			}
 			default:
