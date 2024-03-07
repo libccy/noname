@@ -409,12 +409,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return target!=get.event('aim');
 							},true).set('ai',target=>{
 								const player=get.event('player');
-								return att=get.attitude(player,target);
+								return get.attitude(player,target);
 							}).set('aim',aim);
 							if(bool&&get.owner(card)==player){
 								const target=targets[0];
 								player.line(target,'green');
-								await player.give([card],target);
+								if(target!=player) await player.give([card],target);
 								if(get.owner(card)==target){
 									const {result:{bool}}=await target.chooseUseTarget(card);
 									if(bool) await player.draw();
@@ -429,7 +429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				inherit:'mbdiancai',
 				filter(event,player){
-					if(!player.getHp()||_status.currentPhase===player) return false;
+					if(_status.currentPhase===player) return false;
 					let num=player.getHistory('lose',evt=>{
 						return evt.cards2&&evt.cards2.length&&evt.getParent('phaseUse')==event;
 					}).reduce((sum,evt)=>{
