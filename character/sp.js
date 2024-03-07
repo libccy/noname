@@ -854,7 +854,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 					result:{player:1},
 				},
-				marktext:'玄',
 				intro:{
 					content:'expansion',
 					markcount:'expansion',
@@ -869,7 +868,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:['shaDamage','useCardToEnd']},
 				filter(event,player,name){
-					if(event.type!='card'||!event.target||event.target==player) return false;
+					if(event.type!='card'||!event.target||!event.target.isIn()||event.target==player) return false;
 					if(name=='shaDamage') return true;
 					return event.card.name!='sha'&&!event.getParent()._neutralized;
 				},
