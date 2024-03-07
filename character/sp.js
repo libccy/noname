@@ -716,12 +716,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				mark:true,
 				marktext:'☯',
 				zhuanhuanji:true,
-				intro:{
-					content(storage){
-						if(storage) return '每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用任意普通锦囊牌（须指定目标且仅指定一个目标）。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
-						return '每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用任意基本牌。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
-					},
-				},
 				audio:2,
 				enable:'chooseToUse',
 				filter(event,player){
@@ -855,8 +849,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{player:1},
 				},
 				intro:{
-					content:'expansion',
 					markcount:'expansion',
+					mark(dialog,storage,player){
+						const cards=player.getExpansions('olxuanzhu');
+						if(cards.length) dialog.addSmall(player.getExpansions('olxuanzhu'));
+						dialog.addText((()=>{
+							if(storage) return '每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用任意普通锦囊牌（须指定目标且仅指定一个目标）。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
+							return '每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用任意基本牌。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
+						})(storage));
+					},
 				},
 				onremove(player,skill){
 					const cards=player.getExpansions(skill);
