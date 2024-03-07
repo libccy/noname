@@ -775,6 +775,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									}
 								}).vars({cards:cards});
 							},
+							onuse(result,player){
+								player.changeZhuanhuanji('olxuanzhu');
+							},
 						};
 						const viewAs={
 							name:links[0][2],
@@ -811,7 +814,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 				hiddenCard(player,name){
-					if(!lib.inpile.includes(name)||player.getStat('skill').olsbweilin||!player.countCards('he')) return false;
+					if(!lib.inpile.includes(name)||player.getStat('skill').olxuanzhu||!player.countCards('he')) return false;
 					return get.inpileVCardList(info=>{
 						const name=info[2],type=get.type(name),infox=get.info({name:name});
 						if(type!='basic'&&type!='trick') return false;
@@ -920,7 +923,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							wuxieEnabled:()=>false,
 						},
 					},
-					neuse:{
+					nouse:{
 						charlotte:true,
 						mark:true,
 						marktext:'<span style="text-decoration: line-through;">牌</span>',
