@@ -810,7 +810,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							isCard:true,
 						};
 						const str='将一张牌称为“玄”置于武将牌上，然后视为使用'+(get.translation(links[0][3])||'')+'【'+get.translation(links[0][2])+'】';
-						return str+(get.info('xunshi').isXunshi(viewAs)=='trick'?'（仅能指定一个目标）':'');
+						return str+(get.info('xunshi').isXunshi(viewAs)?'（仅能指定一个目标）':'');
 					},
 				},
 				hiddenCard(player,name){
