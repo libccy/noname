@@ -95,7 +95,7 @@ self.addEventListener('fetch', event => {
 							const script = document.createElement('script');
 							script.setAttribute('type', 'module');
 							let scriptText = '';
-							const insertEnd = '\\nwindow.mold.registerEvaluate(import.meta.url, str => eval(str));';
+							const insertEnd = '\\nwindow.mold.registerEvaluate(import.meta.url, eval_str => eval(eval_str));';
 							if (scripts[0]) {
 								if (typeof ts != 'undefined' && scripts[0].setAttribute('lang') === 'ts') {
 									scriptText = ts.transpile(scripts[0].innerText + insertEnd, {

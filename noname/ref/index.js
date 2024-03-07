@@ -63,7 +63,7 @@ export class RefImpl {
 	}
 	set value(newVal) {
 		// 更新视图
-		if (this.#value != newVal) {
+		if (this.#value != newVal || this.#value.constructor != Object(newVal).constructor) {
 			this.#value = this.createProxy(newVal);
 			this.updateDom();
 		}
@@ -75,11 +75,14 @@ export class RefImpl {
 		const handler = {
 			get(target, prop) {
 				let value = Reflect.get(target, prop);
-				if (typeof value == 'function') {
-					value = value.bind(target);
-				}
-				if (Object(value) === value && Boolean(value)) {
-					return new Proxy(value, handler);
+				// 不代理构造函数
+				if (prop != 'constructor') {
+					if (typeof value == 'function') {
+						value = value.bind(target);
+					}
+					if (Object(value) === value && Boolean(value)) {
+						return new Proxy(value, handler);
+					}
 				}
 				return value;
 			},
@@ -87,7 +90,7 @@ export class RefImpl {
 				const oldVal = Reflect.get(target, prop);
 				const result = Reflect.set(target, prop, newVal, receiver);
 				// 更新视图
-				if (oldVal != newVal) {
+				if (oldVal != newVal || Object(oldVal).constructor != Object(newVal).constructor) {
 					this.updateDom();
 				}
 				return result;
@@ -785,77 +788,170 @@ export class Instructions {
 								});
 							}
 						}
+						/**
+						 * <div v-for="(item, index) in items">{{ item }}</div>
+						 * 
+						 * items.length个<div>{{ item }}</div>，然后用item和index做其他事
+						 */
+						let fun;
 						if (Array.isArray(dataList)) {
-							/**
-							 * <div v-for="(item, index) in items">{{ item }}</div>
-							 * 
-							 * items.length个<div>{{ item }}</div>，然后用item和index做其他事
-							 */
-							const fun = evaluateJavascript(`
-								(function (el, list, compiler) {
+							fun = evaluateJavascript(`
+								(function (_el, _list, _compiler) {
 									/** 模板 */
-									const fragment = document.createDocumentFragment();
-									for (let i = 0; i < list.length; i++) {
+									const _fragment = document.createDocumentFragment();
+									for (let _i = 0; _i < _list.length; _i++) {
 										// 创建数据(考虑变量不存在的情况)
-										${item !== undefined ? ('const ' + item + ' = list[i];') : ''}
-										${index !== undefined ? ('const ' + index + ' = i;') : ''}
+										${item !== undefined ? ('const ' + item + ' = _list[_i];') : ''}
+										${index !== undefined ? ('const ' + index + ' = _i;') : ''}
 										// 创建dom
-										let doc = document.implementation.createHTMLDocument('');
-										doc.body.innerHTML = el.outerHTML;
-										const li = doc.body.firstChild;
-										doc = null;
+										let _doc = document.implementation.createHTMLDocument('');
+										_doc.body.innerHTML = _el.outerHTML;
+										const _li = _doc.body.firstChild;
+										_doc = null;
 										// 移除m-for标签属性
-										li.removeAttribute('m-for');
-										fragment.appendChild(li);
+										_li.removeAttribute('m-for');
+										_fragment.appendChild(_li);
 										// 编译dom
-										compiler(li, str => eval(str));
+										_compiler(_li, _str => eval(_str));
 									}
-									return fragment;
+									return _fragment;
 								});
 							`);
-							/** @type { DocumentFragment } */
-							const fragment = fun(el, dataList, compiler);
-							[...fragment.children].forEach(e => {
-								if (!el[sourceKey]) {
-									e[sourceKey] = el;
-									el[childKey].push(e);
-								} else {
-									e[sourceKey] = el[sourceKey];
-									el[sourceKey][childKey].push(e);
-								}
-							});
-							if (el[parentKey]) {
-								const insertBeforeElement = el[siblingKey].filter(child => {
-									// 排除不处于父节点的兄弟节点
-									if (child.parentElement == el[parentKey]) return true;
-									if (!el[sourceKey]) {
-										return child == el;
-									} else {
-										return child == el[sourceKey];
-									}
-								}).find((_, index, arr) => {
-									// 此处el并不是原先的el
-									if (!el[sourceKey]) {
-										return index > arr.indexOf(el);
-									} else {
-										return index > arr.indexOf(el[sourceKey]);
-									}
-								}) || null;
-								el[parentKey].insertBefore(fragment, insertBeforeElement);
-							} else if (el.parentNode) el.parentNode.replaceChild(fragment, el);
 						}
 						else if (typeof dataList == 'number' || dataList instanceof Number) {
-
+							fun = evaluateJavascript(`
+								(function (_el, _number, _compiler) {
+									/** 模板 */
+									const _fragment = document.createDocumentFragment();
+									for (let _i = 0; _i < _number; _i++) {
+										// 创建数据(考虑变量不存在的情况)
+										${item !== undefined ? ('const ' + item + ' = _i;') : ''}
+										// 创建dom
+										let _doc = document.implementation.createHTMLDocument('');
+										_doc.body.innerHTML = _el.outerHTML;
+										const _li = _doc.body.firstChild;
+										_doc = null;
+										// 移除m-for标签属性
+										_li.removeAttribute('m-for');
+										_fragment.appendChild(_li);
+										// 编译dom
+										_compiler(_li, _str => eval(_str));
+									}
+									return _fragment;
+								});
+							`);
 						}
 						else if (typeof dataList == 'string' || dataList instanceof String) {
-
+							fun = evaluateJavascript(`
+								(function (_el, _string, _compiler) {
+									/** 模板 */
+									const _fragment = document.createDocumentFragment();
+									for (let _i = 0; _i < _string.length; _i++) {
+										// 创建数据(考虑变量不存在的情况)
+										${item !== undefined ? ('const ' + item + ' = _string[_i];') : ''}
+										${index !== undefined ? ('const ' + index + ' = _i;') : ''}
+										// 创建dom
+										let _doc = document.implementation.createHTMLDocument('');
+										_doc.body.innerHTML = _el.outerHTML;
+										const _li = _doc.body.firstChild;
+										_doc = null;
+										// 移除m-for标签属性
+										_li.removeAttribute('m-for');
+										_fragment.appendChild(_li);
+										// 编译dom
+										compiler(_li, _str => eval(_str));
+									}
+									return _fragment;
+								});
+							`);
 						}
 						else if (dataList && dataList.constructor === Object) {
-
+							fun = evaluateJavascript(`
+								(function (_el, _obj, _compiler) {
+									/** 模板 */
+									const _fragment = document.createDocumentFragment();
+									const _entries = Object.entries(_obj);
+									for (let _i = 0; _i < _entries.length; _i++) {
+										// 创建数据(考虑变量不存在的情况)
+										// value
+										${item !== undefined ? ('const ' + item + ' = _entries[_i][1];') : ''}
+										// key
+										${index !== undefined ? ('const ' + index + ' = _entries[_i][0];') : ''}
+										// index
+										${objIndex !== undefined ? ('const ' + objIndex + ' = _i;') : ''}
+										// 创建dom
+										let _doc = document.implementation.createHTMLDocument('');
+										_doc.body.innerHTML = _el.outerHTML;
+										const _li = _doc.body.firstChild;
+										_doc = null;
+										// 移除m-for标签属性
+										_li.removeAttribute('m-for');
+										_fragment.appendChild(_li);
+										// 编译dom
+										compiler(_li, _str => eval(_str));
+									}
+									return _fragment;
+								});
+							`);
 						}
 						else if (dataList && typeof dataList[Symbol.iterator]) {
-
+							fun = evaluateJavascript(`
+								(function (_el, _obj, _compiler) {
+									/** 模板 */
+									const _fragment = document.createDocumentFragment();
+									let _i = 0;
+									for (const _value of _obj) {
+										// 创建数据(考虑变量不存在的情况)
+										${item !== undefined ? ('const ' + item + ' = _value[1];') : ''}
+										${index !== undefined ? ('const ' + index + ' = _value[0];') : ''}
+										${objIndex !== undefined ? ('const ' + objIndex + ' = _i;') : ''}
+										// 创建dom
+										let _doc = document.implementation.createHTMLDocument('');
+										_doc.body.innerHTML = _el.outerHTML;
+										const _li = _doc.body.firstChild;
+										_doc = null;
+										// 移除m-for标签属性
+										_li.removeAttribute('m-for');
+										_fragment.appendChild(_li);
+										// 编译dom
+										_compiler(_li, _str => eval(_str));
+										_i++;
+									}
+									return _fragment;
+								});
+							`);
 						}
+						if (typeof fun != 'function') throw new TypeError('未识别的m-for语法');
+						/** @type { DocumentFragment } */
+						const fragment = fun(el, dataList, compiler);
+						[...fragment.children].forEach(e => {
+							if (!el[sourceKey]) {
+								e[sourceKey] = el;
+								el[childKey].push(e);
+							} else {
+								e[sourceKey] = el[sourceKey];
+								el[sourceKey][childKey].push(e);
+							}
+						});
+						if (el[parentKey]) {
+							const insertBeforeElement = el[siblingKey].filter(child => {
+								// 排除不处于父节点的兄弟节点
+								if (child.parentElement == el[parentKey]) return true;
+								if (!el[sourceKey]) {
+									return child == el;
+								} else {
+									return child == el[sourceKey];
+								}
+							}).find((_, index, arr) => {
+								// 此处el并不是原先的el
+								if (!el[sourceKey]) {
+									return index > arr.indexOf(el);
+								} else {
+									return index > arr.indexOf(el[sourceKey]);
+								}
+							}) || null;
+							el[parentKey].insertBefore(fragment, insertBeforeElement);
+						} else if (el.parentNode) el.parentNode.replaceChild(fragment, el);
 					}
 				}
 				break;
