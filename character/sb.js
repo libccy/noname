@@ -936,8 +936,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbyijue:{
 				audio:2,
-				trigger:{source:'damageBegin2'},
+				trigger:{global:'damageBegin4'},
 				filter:function(event,player){
+					if(!event.source||event.source!=player||event.player==player) return false;
 					return event.num>=event.player.hp&&!player.getStorage('sbyijue').includes(event.player);
 				},
 				forced:true,
@@ -6703,7 +6704,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbwusheng_info:'你可以将一张手牌当作任意【杀】使用或打出。出牌阶段开始时，你可以选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸一张牌，对其使用三张【杀】后不能对其使用【杀】。',
 			sbwusheng_info_identity:'你可以将一张手牌当作任意【杀】使用或打出。出牌阶段开始时，你可以选择一名非主公的其他角色，本阶段对其使用【杀】无距离和次数限制，使用【杀】指定其为目标后摸两张牌，对其使用三张【杀】后不能对其使用【杀】。',
 			sbyijue:'义绝',
-			sbyijue_info:'锁定技，每名角色每局游戏限一次，当你对一名角色造成大于等于其体力值的伤害时，你防止此伤害，且本回合你使用牌指定其为目标时，此牌对其无效。',
+			sbyijue_info:'锁定技，每名角色每局游戏限一次，一名其他角色受到你对其造成的大于等于其体力值的伤害时，你防止此伤害，且本回合你使用牌指定其为目标时，此牌对其无效。',
 			sb_caopi:'谋曹丕',
 			sb_caopi_prefix:'谋',
 			sbxingshang:'行殇',
