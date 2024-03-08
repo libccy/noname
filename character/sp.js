@@ -3248,11 +3248,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				hiddenCard:function(player,name){
-					if(name!='wuxie'&&lib.inpile.includes(name)&&lib.skill.olqifan.getNum()) return true;
+					if(name!='wuxie'&&lib.inpile.includes(name)) return true;
 				},
 				getNum:()=>game.getGlobalHistory('useCard').reduce((list,evt)=>list.add(get.type2(evt.card)),[]).length,
 				filter:function(event,player){
-					if(event.responded||event.type=='wuxie'||event.olqifan||!lib.skill.olqifan.getNum()) return false;
+					if(event.responded||event.type=='wuxie'||event.olqifan) return false;
 					for(var i of lib.inpile){
 						if(i!='wuxie'&&event.filterCard(get.autoViewAs({name:i},'unsure'),player,event)) return true;
 					}
@@ -3263,7 +3263,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var evt=event.getParent(2);
 					evt.set('olqifan',true);
-					var cards=get.bottomCards(lib.skill.olqifan.getNum(),true);
+					var cards=get.bottomCards(lib.skill.olqifan.getNum()+1,true);
 					var aozhan=player.hasSkill('aozhan');
 					player.chooseButton(['嚣翻：选择要使用的牌',cards]).set('filterButton',function(button){
 						return _status.event.cards.includes(button.link);
@@ -27627,7 +27627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_pengyang:'OL彭羕',
 			ol_pengyang_prefix:'OL',
 			olqifan:'嚣翻',
-			olqifan_info:'当你需要使用不为【无懈可击】的牌时，你可以观看牌堆底的X张牌并使用其中的一张。此牌结算结束时，你依次弃置以下前X个区域中的所有牌：⒈判定区、⒉装备区、⒊手牌区（X为本回合使用过的牌中包含的类型数）。',
+			olqifan_info:'当你需要使用不为【无懈可击】的牌时，你可以观看牌堆底的X+1张牌并使用其中的一张。此牌结算结束时，你依次弃置以下前X个区域中的所有牌：⒈判定区、⒉装备区、⒊手牌区（X为本回合使用过的牌中包含的类型数）。',
 			oltuishi:'侻失',
 			oltuishi_info:'锁定技。①你不能使用【无懈可击】。②当你使用点数为字母的牌时，你令此牌无效并摸一张牌，且你对手牌数小于你的角色使用的下一张牌无距离和次数限制。',
 			ol_tw_zhangji:'张既',
