@@ -146,6 +146,11 @@ export class Library extends Uninstantable {
 	}
 
 	//函数钩子
+	/**
+	 * 你可以往这里加入{钩子名:函数数组}，并在数组里增加你的自定义函数
+	 * 这样当某个地方调用game.callHook(钩子名,[...函数参数])时，就会按顺序将对应数组中的每个函数运行一遍（传参为callHook的第二个参数）。
+	 * 你可以将hook机制类比为event.trigger()，但是这里只能放同步代码
+	 */
 	static hooks = {
 		// 本体势力的颜色
 		addGroup: [(id, _short, _name, config) => {
@@ -325,9 +330,60 @@ export class Library extends Uninstantable {
 				game.dynamicStyle.addObject(result2);
 			}
 		}],
-		//game.check美化
+		//game.check
 		checkBegin: [],
-		checkEnd: [],
+		checkEnd: [
+			function autoConfirm(event, { ok, auto, auto_confirm }) {
+				if (!event.isMine()) return;
+				const skillinfo = get.info(event.skill) || {};
+				if (ok && auto && (auto_confirm || skillinfo.direct) && !_status.touchnocheck
+					&& !_status.mousedown && (!_status.mousedragging || !_status.mouseleft)) {
+					if (ui.confirm) ui.confirm.close();
+					if (event.skillDialog === true) event.skillDialog = false;
+					ui.click.ok();
+					_status.mousedragging = null;
+					if (skillinfo.preservecancel) ui.create.confirm('c');
+				}
+			}
+		],
+		checkButton: [],
+		checkCard: [
+			function updateTempname(card, event) {
+				if (lib.config.cardtempname === 'off') return;
+				if (get.name(card) === card.name && get.is.sameNature(get.nature(card), card.nature, true)) return;
+				const node = ui.create.cardTempName(card);
+				if (lib.config.cardtempname !== 'default') node.classList.remove('vertical');
+			},
+		],
+		checkTarget: [
+			function updateInstance(target, event) {
+				if (!target.instance) return;
+				['selected', 'selectable'].forEach(className => {
+					if (target.classList.contains(className)) {
+						target.instance.classList.add(className);
+					} else {
+						target.instance.classList.remove(className);
+					}
+				});
+			},
+		],
+		uncheckBegin: [],
+		uncheckEnd: [],
+		uncheckButton: [],
+		uncheckCard: [
+			function removeTempname(card, event) {
+				if (!card._tempName) return;
+				card._tempName.delete();
+				delete card._tempName;
+			},
+		],
+		uncheckTarget: [
+			function removeInstance(target, event) {
+				if (!target.instance) return;
+				target.instance.classList.remove('selected');
+				target.instance.classList.remove('selectable');
+			},
+		],
 	};
 
 	/**
@@ -7919,7 +7975,9 @@ export class Library extends Uninstantable {
 									let type;
 									try {
 										type = typeof obj[text];
-									} catch {}
+									} catch {
+										void 0;
+									}
 									if (type == 'function') {
 										className += 'function';
 									}
@@ -11652,7 +11710,7 @@ export class Library extends Uninstantable {
 			lose: false,
 			delay: false,
 			content: () => {
-				player.recast(cards, null, (player, cards) => {
+				player.recast(cards, void 0, (player, cards) => {
 					var numberOfCardsToDraw = cards.length;
 					cards.forEach(value => {
 						if (lib.config.mode == 'stone' && _status.mode == 'deck' && !player.isMin() && get.type(value).startsWith('stone')) {

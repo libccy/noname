@@ -3445,15 +3445,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								else{
 									switch(type){
 										case 'basic':
-											if(sha>0&&get.name(card)=='sha'){
+											if(sha>0&&get.name(i)=='sha'){
 												sha--;
 												var add=3;
-												if(!player.hasValueTarget(card)&&player.hasValueTarget(card,false)) add+=player.getUseValue(card,false);
+												if(!player.hasValueTarget(i)&&player.hasValueTarget(i,false)) add+=player.getUseValue(i,false);
 												eff+=add;
 											}
 											break
 										case 'trick':
-											if(player.hasValueTarget(card)) eff+=6;
+											if(player.hasValueTarget(i)) eff+=6;
 											break;
 										case 'equip':
 											if(player.hasValueTarget({name:'guohe_copy2'})) eff+=player.getUseValue({name:'guohe_copy2'});
@@ -3470,15 +3470,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(type==control) continue;
 									switch(type){
 										case 'basic':
-											if(sha>0&&get.name(card)=='sha'){
+											if(sha>0&&get.name(i)=='sha'){
 												sha--;
 												var add=3;
-												if(!player.hasValueTarget(card)&&player.hasValueTarget(card,false)) add+=player.getUseValue(card,false);
+												if(!player.hasValueTarget(i)&&player.hasValueTarget(i,false)) add+=player.getUseValue(i,false);
 												eff+=add;
 											}
 											break
 										case 'trick':
-											if(player.hasValueTarget(card)) eff+=6;
+											if(player.hasValueTarget(i)) eff+=6;
 											break;
 										case 'equip':
 											if(player.hasValueTarget({name:'guohe_copy2'})) eff+=player.getUseValue({name:'guohe_copy2'});

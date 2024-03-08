@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				sp_others:["hanba","caiyang"],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','liupan','ol_lukai'],
 			},
 		},
 		characterFilter:{
@@ -30,6 +30,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			ol_lukai:['male','wu',3,['olxuanzhu','oljiane']],
+			liupan:['male','qun',4,['olpijing']],
 			guotu:['male','qun',3,['olqushi','olweijie']],
 			ol_hujinding:['female','shu',3,['olqingyuan','olchongshen']],
 			tianchou:['male','qun',4,['olshandao']],
@@ -202,6 +204,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			luzhi:['male','wei',3,['qingzhong','weijing']]
 		},
 		characterIntro:{
+			liupan:'刘磐（生卒年不详），山阳高平人，荆州牧刘表从子。与南阳人黄忠共守长沙攸县。为人骁勇，数次为寇于艾、西安诸县。江东孙策于是分海昏、建昌为左右六县，以东莱太史慈为建昌都尉，治海昏，并督诸将共拒刘磐。于是刘磐绝迹不复为寇。',
 			guotu:'郭图（？－205年），字公则，颍川（治今河南省禹州市）人。东汉末年袁绍帐下谋士。韩馥统冀州时，郭图与荀谌等人奉袁绍之命，说服韩馥让位。袁绍统一河北后，郭图与审配等人力劝袁绍统率大军攻打曹操。袁绍死后，袁尚继位。郭图与辛评为袁谭效力，挑唆袁谭攻击袁尚。建安十年（205年），郭图和袁谭一同被曹操所杀。',
 			tianchou:'田畴（169年或170年-214年或216年），字子泰，东汉右北平郡无终人，东汉末年隐士。田畴好文习武。汉初平年间，其受刘虞派遣去长安，呈送指控公孙赞奏章，献帝大悦，封为骑都尉，田畴不受。携诏返回时，刘虞已被公孙所杀，田畴到刘墓祭拜，被公孙所提，不久释放。田畴回故乡后率家族及随从数百人隐居徐无山，致力农桑，数年间增至5000家。制定法条，兴建学校，一时民风良好，乌桓、鲜卑纷纷与其结交。汉建安二十年（207年），曹操北征乌桓，田畴请为向导。上徐无山、出卢龙、过平冈、登白狼堆、至柳城，曹军大胜，封田畴为亭侯，坚辞不受。曹念田功，四次封赏，终不受，乃拜为议郎。建安二十一年（216年），田畴去世。',
 			liyi:'李异（生卒年不详），三国时期东吴将领。建安末，与谢旌率水陆三千，击破刘备军将领詹晏、陈凤。刘备领兵攻孙权时，李异与陆逊等人屯巫、秭归，为蜀将所破。黄武元年（222年），陆逊破刘备于猇亭，李异追踪蜀军，屯驻南山。清代学者赵一清认为此李异与刘璋部将李异为同一人。',
@@ -708,6 +711,301 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//陆凯
+			olxuanzhu:{
+				mark:true,
+				marktext:'☯',
+				zhuanhuanji:true,
+				audio:2,
+				enable:'chooseToUse',
+				filter(event,player){
+					if(!player.countCards('he')||event.type=='wuxie') return false;
+					return get.inpileVCardList(info=>{
+						const name=info[2],type=get.type(name),infox=get.info({name:name});
+						if(type!='basic'&&type!='trick') return false;
+						if(type=='trick'&&(!infox||!infox.filterTarget)) return false;
+						return (type!='basic')==(player.storage.olxuanzhu||false);
+					}).some(card=>event.filterCard({name:card[2],nature:card[3]},player,event));
+				},
+				usable:1,
+				chooseButton:{
+					dialog(event,player){
+						const list=get.inpileVCardList(info=>{
+							const name=info[2],type=get.type(name),infox=get.info({name:name});
+							if(type!='basic'&&type!='trick') return false;
+							if(type=='trick'&&(!infox||!infox.filterTarget)) return false;
+							return (type!='basic')==(player.storage.olxuanzhu||false);
+						}).filter(card=>event.filterCard({name:card[2],nature:card[3]},player,event));
+						return ui.create.dialog('玄注',[list,'vcard']);
+					},
+					check(button){
+						if(get.event().getParent().type!='phase') return 1;
+						return get.event('player').getUseValue({name:button.link[2],nature:button.link[3]});
+					},
+					backup(links,player){
+						let next={
+							audio:'olxuanzhu',
+							filterCard:true,
+							popname:true,
+							check(card){
+								return 1/(get.value(card)||0.5);
+							},
+							position:'he',
+							ignoreMod:true,
+							precontent(){
+								const cards=event.result.cards.slice();
+								player.addToExpansion(cards,player,'give').gaintag.add('olxuanzhu');
+								const viewAs={name:event.result.card.name,nature:event.result.card.nature};
+								event.result.card=viewAs;event.result.cards=[];
+								player.when('useCardAfter').filter(evt=>evt.skill=='olxuanzhu_backup').then(()=>{
+									const card=cards[0];
+									if(get.type(card)!='equip') player.chooseToDiscard('he',true);
+									else{
+										const cardx=player.getExpansions('olxuanzhu');
+										if(cardx.length){
+											player.loseToDiscardpile(cardx);
+											player.draw(cardx.length);
+										}
+									}
+								}).vars({cards:cards});
+							},
+							onuse(result,player){
+								player.changeZhuanhuanji('olxuanzhu');
+							},
+						};
+						const viewAs={
+							name:links[0][2],
+							nature:links[0][3],
+							suit:'none',
+							number:null,
+							isCard:true,
+						};
+						next.viewAs=viewAs;
+						if(get.info('xunshi').isXunshi(viewAs)){
+							next.filterTarget=function(card,player,target){
+								const info=get.info(card);
+								if(info.changeTarget){
+									let targets=[target];
+									info.changeTarget(player,targets);
+									if(targets.length>1) return false;
+								}
+								return lib.filter.filterTarget(card,player,target);
+							};
+							next.selectTarget=1;
+						}
+						return next;
+					},
+					prompt(links,player){
+						const viewAs={
+							name:links[0][2],
+							nature:links[0][3],
+							suit:'none',
+							number:null,
+							isCard:true,
+						};
+						const str='将一张牌称为“玄”置于武将牌上，然后视为使用'+(get.translation(links[0][3])||'')+'【'+get.translation(links[0][2])+'】';
+						return str+(get.info('xunshi').isXunshi(viewAs)?'（仅能指定一个目标）':'');
+					},
+				},
+				hiddenCard(player,name){
+					if(!lib.inpile.includes(name)||player.getStat('skill').olxuanzhu||!player.countCards('he')) return false;
+					return get.inpileVCardList(info=>{
+						const name=info[2],type=get.type(name),infox=get.info({name:name});
+						if(type!='basic'&&type!='trick') return false;
+						if(type=='trick'&&(!infox||!infox.filterTarget)) return false;
+						return (type!='basic')==(player.storage.olxuanzhu||false);
+					}).map(card=>card[2]).includes(name);
+				},
+				ai:{
+					order(item,player){
+						if(player&&get.event().type=='phase'){
+							let list=get.inpileVCardList(info=>{
+								const name=info[2],type=get.type(name),infox=get.info({name:name});
+								if(type!='basic'&&type!='trick') return false;
+								if(type=='trick'&&(!infox||!infox.filterTarget)) return false;
+								return (type!='basic')==(player.storage.olxuanzhu||false);
+							}).map(card=>{return {name:card[2],nature:card[3]}}).filter(card=>player.getUseValue(card,true,true)>0);
+							if(!list.length) return 0;
+							list.sort((a,b)=>{
+								const getNum=function(card){
+									if(get.info('xunshi').isXunshi(card)) return get.effect(game.filterPlayer(target=>{
+										return player.canUse(card,target,true,true);
+									}).sort((a,b)=>get.effect(b,card,player,player)-get.effect(a,card,player,player))[0],card,player,player);
+									return player.getUseValue(card,true,true);
+								};
+								return (getNum(b)||0)-(getNum(a)||0);
+							});
+							return get.order(list[0],player)*0.99;
+						}
+						return 0.001;
+					},
+					respondSha:true,
+					respondShan:true,
+					skillTagFilter(player,tag,arg){
+						if(arg=='respond') return false;
+						const name=(tag=='respondSha'?'sha':'shan');
+						return get.info('olxuanzhu').hiddenCard(player,name);
+					},
+					result:{player:1},
+				},
+				intro:{
+					markcount:'expansion',
+					mark(dialog,storage,player){
+						const cards=player.getExpansions('olxuanzhu');
+						if(cards.length) dialog.addSmall(player.getExpansions('olxuanzhu'));
+						dialog.addText((()=>{
+							if(storage) return '每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用任意普通锦囊牌（须指定目标且仅指定一个目标）。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
+							return '每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用任意基本牌。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
+						})(storage));
+					},
+				},
+				onremove(player,skill){
+					const cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				subSkill:{backup:{}},
+			},
+			oljiane:{
+				audio:2,
+				trigger:{player:['shaDamage','useCardToEnd']},
+				filter(event,player,name){
+					if(event.type!='card'||!event.target||!event.target.isIn()||event.target==player) return false;
+					if(name=='shaDamage') return true;
+					return event.card.name!='sha'&&!event.getParent()._neutralized;
+				},
+				logTarget:'target',
+				forced:true,
+				async content(event,trigger,player){
+					trigger.target.addTempSkill('oljiane_neutralized');
+				},
+				group:'oljiane_neutralize',
+				global:'oljiane_ai',
+				subSkill:{
+					neutralize:{
+						audio:'oljiane',
+						trigger:{
+							target:'shaMiss',
+							global:'eventNeutralized',
+						},
+						filter(event,player,name){
+							if(event.type!='card') return false;
+							return name=='shaMiss'||event._neutralize_event.player==player;
+						},
+						forced:true,
+						async content(event,trigger,player){
+							player.addTempSkill('oljiane_nouse');
+						},
+					},
+					ai:{
+						ai:{
+							directHit_ai:true,
+							skillTagFilter(player,tag,arg){
+								if(!arg||!arg.target||!arg.target.hasSkill('oljiane_neutralized')) return false;
+							},
+						},
+					},
+					neutralized:{
+						charlotte:true,
+						mark:true,
+						marktext:'牌',
+						intro:{content:'本回合无法抵消牌'},
+						trigger:{global:'useCard'},
+						forced:true,
+						popup:false,
+						async content(event,trigger,player){
+							const id=player.playerid;
+							const map=trigger.customArgs;
+							if(!map[id]) map[id]={};
+							map[id].directHit2=true;
+						},
+						mod:{
+							wuxieJudgeEnabled:()=>false,
+							wuxieEnabled:()=>false,
+						},
+					},
+					nouse:{
+						charlotte:true,
+						mark:true,
+						marktext:'<span style="text-decoration: line-through;">牌</span>',
+						intro:{content:'本回合无法成为牌的目标'},
+						mod:{targetEnabled:()=>false},
+					},
+				},
+			},
+			//刘磐
+			olpijing:{
+				audio:2,
+				trigger:{player:'useCardToPlayered'},
+				filter(event,player){
+					if(!game.hasPlayer(target=>target!=player&&!event.targets.includes(target)&&lib.filter.targetEnabled2(event.card,player,target)&&lib.filter.targetInRange(event.card,player,target))) return false;
+					return get.color(event.card)=='black'&&(event.card.name=='sha'||get.type(event.card)=='trick')&&event.targets.length==1;
+				},
+				usable:1,
+				direct:true,
+				locked:false,
+				async content(event,trigger,player){
+					const num=Math.max(1,player.getDamagedHp());
+					const {result:{bool,targets}}=await player.chooseTarget(get.prompt('olpijing'),[1,num],(card,player,target)=>{
+						const trigger=get.event().getTrigger();
+						return target!=player&&!trigger.targets.includes(target)&&lib.filter.targetEnabled2(trigger.card,player,target)&&lib.filter.targetInRange(trigger.card,player,target);
+					}).set('ai',target=>{
+						const player=get.event('player'),trigger=get.event().getTrigger();
+						return get.effect(target,trigger.card,player,player)*(target.getStorage('olpijing_effect').includes(player)?2:1)+get.effect(target,{name:'shunshou_copy2'},player,player);
+					}).set('prompt2','令至多'+get.cnNumber(num)+'名角色成为'+get.translation(trigger.card)+'的目标并交给你一张牌');
+					if(bool){
+						player.logSkill('olpijing',targets);
+						trigger.targets.addArray(targets);
+						for(const target of targets){
+							target.addSkill('olpijing_effect');
+							target.markAuto('olpijing_effect',[player]);
+							await target.chooseToGive(player,'he',true,'披荆：交给'+get.translation(player)+'一张牌');
+						}
+					}
+					else player.storage.counttrigger.olpijing--;
+				},
+				mod:{
+					aiOrder(player,card,num){
+						if(!(card.name=='sha'||get.type(card)=='trick')||get.color(card)!='black') return;
+						const info=get.info(card);
+						if(info&&!info.notarget&&(info.toself||info.singleCard||!info.selectTarget||info.selectTarget==1)&&game.countPlayer(target=>{
+							if(get.effect(target,card,player,player)<=0) return false;
+							return lib.filter.targetEnabled2(card,player,target)&&lib.filter.targetInRange(card,player,target);
+						})>1) return num+0.01;
+					},
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove:true,
+						intro:{content:'使用的下一张基本牌或普通锦囊牌指定唯一目标时，可指定$为额外目标或摸一张牌'},
+						trigger:{player:'useCardToPlayer'},
+						filter(event,player){
+							return (get.type(event.card)=='basic'||get.type(event.card)=='trick')&&event.targets.length==1;
+						},
+						forced:true,
+						popup:false,
+						async content(event,trigger,player){
+							const storage=player.getStorage('olpijing_effect');
+							player.removeSkill('olpijing_effect');
+							const {result:{bool,targets}}=await player.chooseTarget('披荆：请选择此牌的额外目标',[1,storage.length],(card,player,target)=>{
+								const trigger=get.event().getTrigger();
+								return !trigger.targets.includes(target)&&get.event('storage').includes(target)&&lib.filter.targetEnabled2(trigger.card,player,target)&&lib.filter.targetInRange(trigger.card,player,target);
+							}).set('prompt2','不选择的角色视为你选择摸牌项').set('ai',target=>{
+								const player=get.event('player'),trigger=get.event().getTrigger();
+								return get.effect(target,trigger.card,player,player)-get.effect(player,{name:'draw'},player,player);
+							}).set('storage',storage);
+							if(bool){
+								player.line(targets);
+								trigger.targets.addArray(targets);
+								if(storage.length-targets.length>0){
+									player.draw(storage.length-targets.length);
+								}
+							}
+							else player.draw(storage.length);
+						},
+					},
+				},
+			},
 			//郭图
 			olqushi:{
 				audio:2,
@@ -841,10 +1139,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(result2.bool){
 										const card=result2.cards[0];
 										if(get.name(card,target)==event.result.card.name){
-											player.popup('洗具');
+											player.popup('诿解成功');
 											stop=true;
 										}
-										else player.popup('杯具');
+										else player.popup('诿解失败');
 									}
 								}
 								if(!stop){
@@ -2950,11 +3248,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				hiddenCard:function(player,name){
-					if(name!='wuxie'&&lib.inpile.includes(name)&&lib.skill.olqifan.getNum()) return true;
+					if(name!='wuxie'&&lib.inpile.includes(name)) return true;
 				},
 				getNum:()=>game.getGlobalHistory('useCard').reduce((list,evt)=>list.add(get.type2(evt.card)),[]).length,
 				filter:function(event,player){
-					if(event.responded||event.type=='wuxie'||event.olqifan||!lib.skill.olqifan.getNum()) return false;
+					if(event.responded||event.type=='wuxie'||event.olqifan) return false;
 					for(var i of lib.inpile){
 						if(i!='wuxie'&&event.filterCard(get.autoViewAs({name:i},'unsure'),player,event)) return true;
 					}
@@ -2965,7 +3263,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var evt=event.getParent(2);
 					evt.set('olqifan',true);
-					var cards=get.bottomCards(lib.skill.olqifan.getNum(),true);
+					var cards=get.bottomCards(lib.skill.olqifan.getNum()+1,true);
 					var aozhan=player.hasSkill('aozhan');
 					player.chooseButton(['嚣翻：选择要使用的牌',cards]).set('filterButton',function(button){
 						return _status.event.cards.includes(button.link);
@@ -14050,6 +14348,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var cards=result.cards;
 					target.addToExpansion(cards,player,'give').gaintag.add('zlshoufu2');
 					player.line(target,'green');
+					if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.12);
 					target.addSkill('zlshoufu2');
 					'step 3'
 					game.delayx();
@@ -17632,9 +17931,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				skillAnimation:true,
 				animationColor:'orange',
 				forceunique:true,
-				//filter:function(event,player){
-				//	return player.storage.fanghun2>0;
-				//},
+				filter:function(event,player){
+					return player.storage.fanghun2>0;
+				},
 				prompt:function(event,player){
 					var num=Math.max(2,player.storage.fanghun2||0);
 					num=Math.min(num,8);
@@ -26107,6 +26406,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				str+='然后若没有角色因此【杀】死亡，你移除本次被选择的项。';
 				return str;
 			},
+			olxuanzhu(player){
+				if(player.storage.olxuanzhu) return '转换技，每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用：阴，任意基本牌；<span class="bluetext">阳，任意普通锦囊牌（须指定目标且仅指定一个目标）</span>。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
+				return '转换技，每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用：<span class="bluetext">阴，任意基本牌</span>；阳，任意普通锦囊牌（须指定目标且仅指定一个目标）。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
+			},
 		},
 		characterReplace:{
 			guanyinping:['guanyinping','old_guanyinping'],
@@ -26170,6 +26473,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhugedan:['re_zhugedan','zhugedan'],
 			zhangren:['jsrg_zhangren','zhangren'],
 			wenqin:['ol_wenqin','pe_wenqin'],
+			lukai:['ol_lukai','lukai'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -27323,7 +27627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_pengyang:'OL彭羕',
 			ol_pengyang_prefix:'OL',
 			olqifan:'嚣翻',
-			olqifan_info:'当你需要使用不为【无懈可击】的牌时，你可以观看牌堆底的X张牌并使用其中的一张。此牌结算结束时，你依次弃置以下前X个区域中的所有牌：⒈判定区、⒉装备区、⒊手牌区（X为本回合使用过的牌中包含的类型数）。',
+			olqifan_info:'当你需要使用不为【无懈可击】的牌时，你可以观看牌堆底的X+1张牌并使用其中的一张。此牌结算结束时，你依次弃置以下前X个区域中的所有牌：⒈判定区、⒉装备区、⒊手牌区（X为本回合使用过的牌中包含的类型数）。',
 			oltuishi:'侻失',
 			oltuishi_info:'锁定技。①你不能使用【无懈可击】。②当你使用点数为字母的牌时，你令此牌无效并摸一张牌，且你对手牌数小于你的角色使用的下一张牌无距离和次数限制。',
 			ol_tw_zhangji:'张既',
@@ -27391,7 +27695,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olqushi:'趋势',
 			olqushi_info:'出牌阶段限一次，你可以摸一张牌，然后将一张手牌扣置于一名其他角色的武将牌上，称为“趋”。目标角色于其结束阶段移去武将牌上的所有“趋”，若其于本回合使用过与“趋”相同类别的牌，则你摸X张牌（X为其本回合使用牌指定过的目标数之和且至多为5）。',
 			olweijie:'诿解',
-			olweijie_info:'每回合限一次，你的回合外，当你需要使用或打出一张基本牌时，你可以弃置距离为1的一名角色的一张手牌，若此牌牌名与你需要使用或打出的牌的牌名相同，则视为你使用或打出之。',
+			olweijie_info:'回合外每名角色的回合限一次，当你需要使用或打出一张基本牌时，你可以弃置距离为1的一名角色的一张手牌，若此牌牌名与你需要使用或打出的牌的牌名相同，则视为你使用或打出之。',
+			liupan:'刘磐',
+			olpijing:'披荆',
+			olpijing_info:'每回合限一次，当你使用黑色【杀】或黑色普通锦囊牌指定唯一目标后，你可以令至多X名其他角色成为此牌的额外目标并依次交给你一张牌（X为你已损失的体力值且X至少为1）。这些角色下次使用基本牌或普通锦囊牌指定唯一目标时，其可令你成为此牌的额外目标或摸一张牌。',
+			ol_lukai:'OL陆凯',
+			ol_lukai_prefix:'OL',
+			olxuanzhu:'玄注',
+			olxuanzhu_info:'转换技，每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用：阴，任意基本牌；阳，任意普通锦囊牌（须指定目标且仅指定一个目标）。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。',
+			oljiane:'謇谔',
+			oljiane_info:'锁定技。①当你对其他角色使用的牌生效后，其本回合无法抵消牌。②当你抵消牌后，你本回合无法成为牌的目标。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',

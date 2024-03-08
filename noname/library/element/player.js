@@ -2055,8 +2055,11 @@ export class Player extends HTMLDivElement {
 		return true;
 	}
 	$disableJudge() {
-		game.addVideo('$disableJudge', this);
 		this.storage._disableJudge = true;
+		for (let i = 0; i < this.node.judges.childNodes.length; i++) {
+			if (this.node.judges.childNodes[i].classList.contains('feichu')) return;
+		}
+		game.addVideo('$disableJudge', this);
 		var card = game.createCard('disable_judge', '', '');
 		card.fix();
 		card.classList.add('feichu');
@@ -4267,7 +4270,8 @@ export class Player extends HTMLDivElement {
 		var next = game.createEvent('chooseButton');
 		for (var i = 0; i < arguments.length; i++) {
 			if (typeof arguments[i] == 'boolean') {
-				next.forced = arguments[i];
+				if (!next.forced) next.forced = arguments[i];
+				else next.complexSelect = arguments[i];
 			}
 			else if (get.itemtype(arguments[i]) == 'dialog') {
 				next.dialog = arguments[i];
@@ -4293,6 +4297,7 @@ export class Player extends HTMLDivElement {
 		if (next.filterButton == undefined) next.filterButton = lib.filter.filterButton;
 		if (next.selectButton == undefined) next.selectButton = [1, 1];
 		if (next.ai == undefined) next.ai = function () { return 1; };
+		if (next.complexSelect !== false) next.complexSelect = true;
 		next.setContent('chooseButton');
 		next._args = Array.from(arguments);
 		next.forceDie = true;

@@ -6403,7 +6403,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return !player.hasHistory('useSkill',function(evt){
 								return evt.skill=='twshuangren';
 							})&&!player.hasHistory('sourceDamage',function(evt){
-								return evt.card.name=='sha';
+								return evt.card&&evt.card.name=='sha';
 							});
 						},
 						direct:true,
@@ -15889,7 +15889,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twkujian_info:'出牌阶段限一次。你可以将至多三张手牌交给一名其他角色，称为“谏”，你获得以下效果：当其他角色使用或打出牌后，若其中有“谏”，你与其各摸一张牌；当其他角色不因使用或打出而失去牌后，若其中有“谏”，你与其各弃置一张牌。',
 			twruilian:'睿敛',
 			twruilian2:'睿敛',
-			twruilian_info:'一轮游戏开始时，你可以选择一名角色。其下回合结束时，若其本回弃置过至少两张其的牌，你可以选择其本回合弃置过的一种类别，你与其各从弃牌堆中获得一张此类别的牌。',
+			twruilian_info:'一轮游戏开始时，你可以选择一名角色。其下回合结束时，若其本回合弃置过至少两张牌，你可以选择其本回合弃置过的一种类别，你与其各从弃牌堆中获得一张此类别的牌。',
 			tw_xiahouen:'夏侯恩',
 			twfujian:'负剑',
 			twfujian_info:'锁定技。①游戏开始时或准备阶段，若你的装备区里没有武器牌，你随机将牌堆中的一张武器牌置入装备区。②当你于回合外失去武器牌后，你失去1点体力。',

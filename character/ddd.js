@@ -2031,7 +2031,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(trigger.targets&&trigger.targets.length){
 								let result=yield player.chooseControl(['额外结算','摸一张牌']).set('prompt','实荐：请选择一项').set('prompt2',`令${get.translation(trigger.card)}额外结算一次，或摸一张牌`).set('ai',()=>{
 									return get.event('choice');
-								}).set('choice',['basic','trick'].includes(get.type(trigger.card))&&trigger.targets.map(i=>get.effect(i,trigger.card,target,player)).reduce((p,c)=>p+c,0)>=5?0:1);
+								}).set('choice',function(){
+									if(trigger.card.name==='tiesuo'||!['basic','trick'].includes(get.type(trigger.card))) return 1;
+									if(trigger.targets.reduce((p,c)=>{
+										return p+get.effect(c,trigger.card,target,_status.event.player);
+									},0)>=get.effect(player,{name:'draw'},player,_status.event.player)) return 0;
+									return 1;
+								}());
 								if(result.index==0){
 									trigger.getParent().effectCount++;
 									game.log(player,'令',trigger.card,'额外结算一次');
