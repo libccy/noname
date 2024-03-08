@@ -17352,14 +17352,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			kuanshi2:{
-				/*mark:'character',
+				mark:true,
 				intro:{
 					content:'下一次受到超过1点的伤害时，防止此伤害，然后$跳过下个回合的摸牌阶段'
-				},*/
+				},
 				trigger:{player:'damageBegin4'},
 				forced:true,
 				filter:function(event,player){
 					return event.num>1;
+				},
+				logTarget:function(event,player){
+					return player.storage.kuanshi2;
 				},
 				//priority:-11,
 				content:function(){
@@ -26792,7 +26795,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiashu_info:'出牌阶段开始时，你可以将所有手牌交给一名其他角色，然后该角色亮出任意数量的手牌（至少一张）。你选择一项：1.获得其亮出的手牌；2.获得其未亮出的手牌。',
 			kuanshi:'宽释',
 			kuanshi2:'宽释',
-			kuanshi_info:'结束阶段，你可以选择一名角色。直到你的下回合开始，该角色第一次受到大于1的伤害时，防止此伤害，然后你跳过下个回合的摸牌阶段。',
+			kuanshi_info:'结束阶段，你可以选择一名角色。直到你的下回合开始，该角色下一次受到超过1点的伤害时，防止此伤害，然后你跳过下个回合的摸牌阶段。',
 			bingzheng:'秉正',
 			bingzheng_info:'出牌阶段结束时，你可以令手牌数不等于体力值的一名角色弃置一张手牌或摸一张牌。然后若其手牌数等于体力值，你摸一张牌，且可以交给该角色一张牌。',
 			sheyan:'舍宴',

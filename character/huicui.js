@@ -10744,35 +10744,51 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					'step 1'
 					if(result.bool){
+						var target=result.targets[0];
 						player.logSkill('rekuanshi');
-						player.addTempSkill('rekuanshi_effect',{player:'phaseBegin'});
-						player.storage.rekuanshi_effect=result.targets[0];
+						target.storage.rekuanshi2=player;
+						target.addSkill('rekuanshi2');
 						game.delayx();
 					}
 				},
+			},
+			rekuanshi2:{
+				audio:'kuanshi',
+				mark:true,
+				intro:{
+					content:'每回合限一次，当你于一回合内受到第2点伤害后，你回复1点体力。'
+				},
+				trigger:{global:'damageEnd'},
+				forced:true,
+				charlotte:true,
+				logTarget:function(event,player){
+					return player.storage.rekuanshi2;
+				},
+				usable:1,
+				filter:function(event,player){
+					if(event.player.isHealthy()) return false;
+					var history=event.player.getHistory('damage',null,event),num=0;
+					for(var i of history) num+=i.num;
+					return num>1&&(num-event.num)<2;
+				},
+				content:function(){
+					trigger.player.recover();
+				},
+				group:'rekuanshi2_remove',
+				onremove:true,
 				subSkill:{
-					effect:{
-						audio:'kuanshi',
-						mark:true,
-						intro:{
-							content:'每回合限一次，当$于一回合内受到第2点伤害后，其回复1点体力。'
-						},
-						trigger:{global:'damageEnd'},
+					remove:{
+						trigger:{global:['phaseZhunbeiBegin','dieAfter']},
 						forced:true,
-						charlotte:true,
-						logTarget:'player',
-						usable:1,
+						popup:false,
 						filter:function(event,player){
-							if(event.player!=player.storage.rekuanshi_effect||event.player.isHealthy()) return false;
-							var history=event.player.getHistory('damage',null,event),num=0;
-							for(var i of history) num+=i.num;
-							return num>1&&(num-event.num)<2;
+							return event.player==player.storage.rekuanshi2;
 						},
 						content:function(){
-							trigger.player.recover();
+							player.removeSkill('rekuanshi2');
 						}
-					},
-				},
+					}
+				}
 			},
 			//吕玲绮
 			guowu:{
@@ -12608,6 +12624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			llqshenwei_info:'锁定技，摸牌阶段开始时，你令额定摸牌数+2；你的手牌上限+2。',
 			re_kanze:'阚泽',
 			rekuanshi:'宽释',
+			rekuanshi2:'宽释',
 			rekuanshi_info:'结束阶段，你可以选择一名角色。你获得如下效果直到你下回合开始：每回合限一次，当其于一回合内受到第2点伤害后，其回复1点体力。',
 			liuyong:'刘永',
 			zhuning:'诛佞',
