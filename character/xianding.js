@@ -225,7 +225,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							effect:{
 								target(card,player,target){
 									if(get.tag(card,'damage')&&player&&player.hasSkill('dcsbquanmou_true')){
-										let tars=game.countPlayer(i=>player!==i&&target!==i&&get.damageEffect(i,player,player)>0);
+										let tars=game.countPlayer(i=>player!==i&&target!==i&&get.attitude(player,target)<0&&!target.hasSkill('dcsbquanmou_false_mark'));
 										return [1,0,1,6*Math.min(3,tars)/(3+Math.pow(target.countCards('h'),2))];
 									}
 								}
@@ -409,12 +409,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return target!=get.event('aim');
 							},true).set('ai',target=>{
 								const player=get.event('player');
-								return att=get.attitude(player,target);
+								return get.attitude(player,target);
 							}).set('aim',aim);
 							if(bool&&get.owner(card)==player){
 								const target=targets[0];
 								player.line(target,'green');
-								await player.give([card],target);
+								if(target!=player) await player.give([card],target);
 								if(get.owner(card)==target){
 									const {result:{bool}}=await target.chooseUseTarget(card);
 									if(bool) await player.draw();
@@ -429,7 +429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				inherit:'mbdiancai',
 				filter(event,player){
-					if(!player.getHp()||_status.currentPhase===player) return false;
+					if(_status.currentPhase===player) return false;
 					let num=player.getHistory('lose',evt=>{
 						return evt.cards2&&evt.cards2.length&&evt.getParent('phaseUse')==event;
 					}).reduce((sum,evt)=>{
