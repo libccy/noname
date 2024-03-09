@@ -435,7 +435,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					judgeEvent.judge2=result=>result.bool;
 					const {result:{judge}}=await judgeEvent;
 					if(judge<2) return;
-					const {result:{bool:chooseToDiscardResultBool}}=await player.chooseToDiscard(2).set('ai',card=>{
+					const {result:{bool:chooseToDiscardResultBool}}=await event.target.chooseToDiscard(2).set('ai',card=>{
 						if(card.name=='tao') return -10;
 						if(card.name=='jiu'&&_status.event.player.hp==1) return -10;
 						return get.unuseful(card)+2.5*(5-get.owner(card).hp);
