@@ -2510,13 +2510,16 @@ export class Player extends HTMLDivElement {
 		}
 		if (this.name2 == from) {
 			this.name2 = to;
+			this.skin.name2 = to;
 		}
 		else if (this.name == from || this.name1 == from) {
 			if (this.name1 == from) {
 				this.name1 = to;
+				this.skin.name = to;
 			}
 			if (!this.isUnseen(1)) {
 				this.name = to;
+				if (this.skin.name != to) this.skin.name = to;
 				this.sex = info2[0];
 			}
 		}
