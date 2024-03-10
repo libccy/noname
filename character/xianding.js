@@ -7936,8 +7936,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				getZhuanhuanji:function(player,bool){
 					var skills=player.getSkills(null,false,false).filter(function(i){
-						var info=get.info(i);
-						return info&&!info.charlotte&&info.zhuanhuanji;
+						const list=get.skillCategoriesOf(i);
+						return !list.includes('Charlotte')&&list.includes('转换技');
 					});
 					if(!bool) return skills;
 					if(!skills.length) return 'none';
