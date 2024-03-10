@@ -2335,16 +2335,25 @@ export class Player extends HTMLDivElement {
 				if ((get.character(this[i], 3) || []).includes(skill)) {
 					const name = (i == 'name2' ? 'name2' : 'name');
 					if (this.skin[name] != character) {
-						game.broadcastAll((player, name, character, list) => {
-							player.tempname.remove(player.skin[name]);
+						const origin = this.skin[name];
+						game.broadcastAll((player, name, character, list, origin) => {
+							player.tempname.remove(origin);
 							player.tempname.add(character);
 							player.skin[name] = character;
 							const goon = (!lib.character[character]);
 							if (goon) lib.character[character] = ['', '', 0, [], (list.find(i => i[0] == character) || [character, []])[1]];
+							player.smoothAvatar(name == 'name2');
 							player.node['avatar' + name.slice(4)].setBackground(character, 'character');
 							player.node['avatar' + name.slice(4)].show();
 							if (goon) delete lib.character[character];
-						}, this, name, character, list);
+						}, this, name, character, list, origin);
+						game.addVideo('changeSkin', this, {
+							from: origin,
+							to: character,
+							name: name,
+							list: list,
+							avatar2: name == 'name2',
+						});
 					}
 				}
 			}
