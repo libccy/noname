@@ -1200,22 +1200,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dczixi:{
 				init(){
 					game.addGlobalSkill('dczixi_judge');
-					game.broadcastAll((list)=>{
-						list.forEach(name=>{
-							const namex='dczixi_'+name;
-							if(!lib.card[namex]){
-								lib.card[namex]={
-									type:'special_delay',
-									fullskin:true,
-									noEffect:true,
-									wuxieable:false,
-								};
-								lib.card[namex].cardimage=name;
-								lib.translate[namex]=lib.translate[name]+'·姊希';
-								lib.translate[namex+'_info']='由【姊希】技能创造的无效果【'+lib.translate[name]+'】';
-							}
-						});
-					},lib.skill.dczixi.zixiList);
+					game.broadcastAll(()=>lib.skill.dczixi.video());
+				},
+				video(){
+					const list=lib.skill.dczixi.zixiList;
+					for(const name of list){
+						const namex='dczixi_'+name;
+						if(!lib.card[namex]){
+							lib.card[namex]={
+								type:'special_delay',
+								fullskin:true,
+								noEffect:true,
+								wuxieable:false,
+							};
+							lib.card[namex].cardimage=name;
+							lib.translate[namex]=lib.translate[name]+'·姊希';
+							lib.translate[namex+'_info']='由【姊希】技能创造的无效果【'+lib.translate[name]+'】';
+						}
+					}
 				},
 				audio:2,
 				trigger:{player:['phaseUseBegin','phaseUseEnd']},
@@ -1229,6 +1231,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				zixiList:['lebu','bingliang','shandian'],
 				direct:true,
 				async content(event,trigger,player){
+					game.addVideo('skill',player,['dczixi',[]]);
 					const names=lib.skill.dczixi.zixiList.filter(name=>{
 						return player.countCards('h',card=>{
 							return card.hasGaintag('dcqiqin_tag')&&game.hasPlayer(target=>target.canAddJudge(get.autoViewAs({name:'dczixi_'+name},[card])));
