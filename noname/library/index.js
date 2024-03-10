@@ -63,6 +63,7 @@ export class Library extends Uninstantable {
 	static characterFilter = {};
 	static characterSort = {};
 	static characterReplace = {};
+	static characterSubstitute = {};
 	static characterInitFilter = {};
 	static characterGuozhanFilter = ["mode_guozhan"];
 	static dynamicTranslate = {};

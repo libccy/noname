@@ -2128,6 +2128,10 @@ export class Player extends HTMLDivElement {
 		this.name = character;
 		this.name1 = character;
 		this.tempname = [];
+		this.skin = {
+			name: character,
+			name2: character2,
+		};
 		this.sex = info[0];
 		this.group = info[1];
 		this.hp = hp1;
@@ -2310,6 +2314,42 @@ export class Player extends HTMLDivElement {
 
 		return this;
 	}
+	/**
+	 * 换肤换音：想要支持某个武将更换皮肤，必须在lib.character.characterSubstitute中存在该武将的id（以下以name代指武将id，character代指换肤图片名）
+	 * 
+	 * 如果换肤换音引用本体的image/character素材作为更换的皮肤且不需要使用本体audio/die以外的地方的配音，则你无需在characterSubstitute中书写关于此皮肤的信息
+	 * 
+	 * 如果lib.character[character]不存在，且想引用其他路径的图片素材或阵亡素材，请以[character,[]]的形式写入lib.character.characterSubstitute[name]中，第二个数组填入形式同lib.character[4]的书写形式
+	 * 
+	 * @param { string | string }
+	 */
+	changeSkin(skill, character) {
+		if (!skill || !character) {
+			console.log('error: no sourceSkill or character to changeSkin', get.translation(this));
+			return;
+		}
+		for (const i of ['name', 'name1', 'name2']) {
+			if (i == 'name1' && this.name === this.name1) continue;
+			const list = lib.characterSubstitute[this[i]];
+			if (this[i] && list) {
+				if ((get.character(this[i], 3) || []).includes(skill)) {
+					const name = (i == 'name2' ? 'name2' : 'name');
+					if (this.skin[name] != character) {
+						game.broadcastAll((player, name, character, list) => {
+							player.tempname.remove(player.skin[name]);
+							player.tempname.add(character);
+							player.skin[name] = character;
+							const goon = (!lib.character[character]);
+							if (goon) lib.character[character] = ['', '', 0, [], (list.find(i => i[0] == character) || [character, []])[1]];
+							player.node['avatar' + name.slice(4)].setBackground(character, 'character');
+							player.node['avatar' + name.slice(4)].show();
+							if (goon) delete lib.character[character];
+						}, this, name, character, list);
+					}
+				}
+			}
+		}
+	}
 	initOL(name, character) {
 		this.node.avatar.setBackground(character, 'character');
 		this.node.avatar.show();
@@ -2470,13 +2510,16 @@ export class Player extends HTMLDivElement {
 		}
 		if (this.name2 == from) {
 			this.name2 = to;
+			this.skin.name2 = to;
 		}
 		else if (this.name == from || this.name1 == from) {
 			if (this.name1 == from) {
 				this.name1 = to;
+				this.skin.name = to;
 			}
 			if (!this.isUnseen(1)) {
 				this.name = to;
+				if (this.skin.name != to) this.skin.name = to;
 				this.sex = info2[0];
 			}
 		}
@@ -2568,6 +2611,7 @@ export class Player extends HTMLDivElement {
 		delete this.name;
 		delete this.name1;
 		delete this.tempname;
+		delete this.skin;
 		delete this.sex;
 		delete this.group;
 		delete this.hp;
