@@ -117,10 +117,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_mouding:['dc_sb_lusu','dc_sb_zhouyu','dc_sb_simayi'],
 			}
 		},
+		characterSubstitute:{
+			dc_sb_simayi:[
+			],
+		},
 		skill:{
 			//谋司马懿
 			dcsbquanmou:{
 				audio:2,
+				audioname:['dc_sb_simayi_shadow'],
 				zhuanhuanji:true,
 				marktext:'☯',
 				enable:'phaseUse',
@@ -141,6 +146,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					const target = event.targets[0];
 					player.changeZhuanhuanji('dcsbquanmou');
+					player.changeSkin('dcsbquanmou','dc_sb_simayi'+(player.storage.dcsbquanmou?'_shadow':''));
 					player.markAuto('dcsbquanmou_selected', [target]);
 					const cards = await target.chooseCard('he', true, `选择交给${get.translation(player)}一张牌`).forResultCards();
 					if (cards && cards.length) {

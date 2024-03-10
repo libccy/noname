@@ -10,7 +10,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_guanyu:['male','shu',4,['sbwusheng','sbyijue']],
 			sb_huangyueying:['female','shu',3,['sbjizhi','sbqicai']],
 			sb_sp_zhugeliang:['male','shu',3,['sbhuoji','sbkanpo']],
-			sb_zhugeliang:['male','shu',3,['sbguanxing','sbkongcheng']],
 			sb_zhanghe:['male','wei',4,['sbqiaobian']],
 			sb_yujin:['male','wei',4,['sbxiayuan','sbjieyue']],
 			sb_huaxiong:['male','qun','3/4/1',['new_reyaowu','sbyangwei']],
@@ -49,13 +48,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		characterSort:{
 			sb:{
-				sb_zhi:['sb_sunquan','sb_zhouyu','sb_zhangjiao','sb_caocao','sb_zhenji','sb_liubei','sb_daqiao','sb_liubiao','sb_sp_zhugeliang','sb_zhugeliang'],
+				sb_zhi:['sb_sunquan','sb_zhouyu','sb_zhangjiao','sb_caocao','sb_zhenji','sb_liubei','sb_daqiao','sb_liubiao','sb_sp_zhugeliang'],
 				sb_shi:['sb_xuhuang','sb_machao','sb_fazheng','sb_chengong','sb_diaochan','sb_pangtong','sb_zhanghe','sb_caopi'],
 				sb_tong:['liucheng','sp_yangwan','sb_xiahoushi','sb_zhangfei','sb_zhaoyun','sb_sunce','sb_zhurong','sb_xiaoqiao'],
 				sb_yu:['sb_yujin','sb_lvmeng','sb_huangzhong','sb_huanggai','sb_zhouyu','sb_caoren','sb_ganning','sb_yl_luzhi','sb_huangyueying'],
 				sb_neng:['sb_huaxiong','sb_sunshangxiang','sb_jiangwei','sb_yuanshao','sb_menghuo','sb_guanyu'],
 				sb_waitforsort:['sb_xunyu'],
 			}
+		},
+		characterSubstitute:{
+			sb_sp_zhugeliang:[
+			],
 		},
 		skill:{
 			//荀彧
@@ -1249,15 +1252,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						async content(event,trigger,player){
 							player.awakenSkill('sbhuoji');
 							game.log(player,'成功完成使命');
-							if (get.character(player.name1)[3].includes('sbhuoji')) {
-								player.reinitCharacter(player.name1, 'sb_zhugeliang', false);
-							}
-							else if (player.name2&&get.character(player.name2)[3].includes('sbhuoji')) {
-								player.reinitCharacter(player.name2, 'sb_zhugeliang', false);
-							}
-							else{
-								player.changeSkills(['sbguanxing','sbkongcheng'],['sbhuoji','sbkanpo']);
-							}
+							player.changeSkin('sbhuoji','sb_zhugeliang');
+							player.changeSkills(['sbguanxing','sbkongcheng'],['sbhuoji','sbkanpo']);
 						},
 					},
 					fail:{
@@ -6676,10 +6672,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbtianxiang:'天香',
 			sbtianxiang_info_identity:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸等量的牌。',
 			sbtianxiang_info:'①出牌阶段限三次，你可以交给一名没有“天香”标记的其他角色一张红色牌，然后令其获得此牌花色的“天香”标记。②当你受到伤害时，你可以移去一名角色的“天香”标记，若此“天香”标记为：红桃，你防止此伤害，其受到伤害来源对其造成的1点伤害（若没有伤害来源则改为无来源伤害）；方片，其交给你两张牌。③准备阶段，你移去场上所有的“天香”标记，然后摸X张牌（X为移去的“天香”标记数+2）。',
-			sb_sp_zhugeliang:'谋卧龙',
+			sb_sp_zhugeliang:'谋诸葛亮',
 			sb_sp_zhugeliang_prefix:'谋',
-			sb_zhugeliang:'谋诸葛亮',
-			sb_zhugeliang_prefix:'谋',
 			sbhuoji:'火计',
 			sbhuoji_info:'使命技。①使命：出牌阶段限一次。你可以对一名其他角色造成1点火焰伤害，然后你对所有与其势力相同的不为其的其他角色各造成1点火焰伤害。②成功：准备阶段，若你本局游戏已造成的火焰伤害不小于本局游戏总角色数，则你失去〖火计〗和〖看破〗，然后获得〖观星〗和〖空城〗。③失败：使命成功前进入濒死状态。',
 			sbkanpo:'看破',
