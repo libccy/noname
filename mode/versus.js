@@ -2793,47 +2793,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					lib.init.onfree();
 					ui.arena.classList.add('choose-character');
-					var evt_list=[['huoshaowuchao','chunyuqiong'],['liangcaokuifa','sp_xuyou'],['zhanyanliangzhuwenchou','jsp_guanyu'],['shishengshibai','re_guojia'],['xutuhuanjin','yj_jushou'],['liangjunxiangchi','yj_jushou'],['jianshoudaiyuan','tianfeng'],['yiruoshengqiang','re_caocao'],['shichongerjiao','sp_xuyou']].randomGet();
-					var evt=evt_list[0],character=evt_list[1];
-					game.addGlobalSkill(evt);
-					const showGuanduEvent=function(evt){
-						if(ui['GuanduEvent_'+evt]) return;
-						ui['GuanduEvent_'+evt]=ui.create.system(get.translation(evt),null,true);
-						lib.setPopped(ui['GuanduEvent_'+evt],function(){
-							var uiintro=ui.create.dialog('hidden');
-							uiintro.add(get.translation(evt));
-							uiintro.add('<div class="text center">'+get.translation(evt+'_info')+'</div>');
-							var ul=uiintro.querySelector('ul');
-							if(ul) ul.style.width='180px';
-							uiintro.add(ui.create.div('.placeholder'));
-							return uiintro;
-						},250);
-					};
-					showGuanduEvent(evt);
-					game.broadcastAll(function(evt){
-						if(lib.config.background_speak) game.playAudio('skill',evt);
-						if(evt=='shishengshibai'){
-							ui.guanduInfo=get.is.phoneLayout()?ui.create.div('.touchinfo.left',ui.window):ui.create.div(ui.gameinfo);
-							ui.guanduInfo.innerHTML='十胜十败（0）';
-						}
-					},evt);
-					game.me.chooseControl('ok').set('dialog',['###本局特殊事件：'+get.translation(evt)+'###'+get.translation(evt+'_info'),[[character],'character']]);
-					'step 1'
-					game.falseZhu.chooseButton(['请选择你的武将牌',[['caocao'],'characterx']],true);
-					'step 2'
-					event.falseZhu_choice = result.links[0];
-					game.trueZhu.chooseButton(['请选择你的武将牌',[['re_yuanshao'],'characterx']],true);
-					'step 3'
-					event.trueZhu_choice = result.links[0];
-					game.falseZhu.init(event.falseZhu_choice);
-					game.trueZhu.init(event.trueZhu_choice);
-					game.trueZhu.hp++;
-					game.trueZhu.maxHp++;
-					game.falseZhu.hp++;
-					game.falseZhu.maxHp++;
-					game.trueZhu.update();
-					game.falseZhu.update();
-					'step 4'
+					const side=game.me.side.toString();
+					event.friendSide=side;event.enemySide=(side=='true'?'false':'true');
+					event.zhuList=[['caocao'],['re_yuanshao']];
 					event.falseList=['xiahouyuan','litong','zangba','manchong','xunyu','guojia','zhangliao','xuhuang','caohong','jsp_guanyu','hanhaoshihuan','caoren','yujin','liuye','chengyu','xunyou','zhangxiu','sp_jiaxu'].filter(function(name){
 						if(lib.characterReplace[name]){
 							let goon = false;
@@ -2868,20 +2830,80 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						return false;
 					});
-					'step 5'
-					if(game.me.identity!='zhu'){
-						event.choose_me=true;
-						game.me.chooseButton(['请选择你的武将牌',[event[game.me.side+'List'].randomRemove(2),'characterx']],true);
-					}
-					'step 6'
-					if(event.choose_me) game.me.init(result.links[0]);
-					game.countPlayer(function(current){
-						if(current!=game.me&&current.identity=='zhong'){
-							let choice = event[current.side+'List'].randomRemove(2)[0];
-							if(lib.characterReplace[choice]) choice = lib.characterReplace[choice].randomGet();
+					'step 1'
+					game[event.enemySide+'Zhu'].chooseButton(['请选择你的武将牌',[event.zhuList[event.enemySide=='true'?1:0],'characterx']],true);
+					'step 2'
+					game[event.enemySide+'Zhu'].init(result.links[0]);
+					game[event.enemySide+'Zhu'].maxHp++;
+					game[event.enemySide+'Zhu'].hp++;
+					game[event.enemySide+'Zhu'].update();
+					'step 3'
+					game.countPlayer(current=>{
+						if(current.side.toString()==event.enemySide&&current.identity=='zhong'){
+							let choice=event[event.enemySide+'List'].randomRemove(2)[0];
+							if(lib.characterReplace[choice]) choice=lib.characterReplace[choice].randomGet();
 							current.init(choice);
 						}
 					});
+					'step 4'
+					var evt_list=[['huoshaowuchao','chunyuqiong'],['liangcaokuifa','sp_xuyou'],['zhanyanliangzhuwenchou','jsp_guanyu'],['shishengshibai','re_guojia'],['xutuhuanjin','yj_jushou'],['liangjunxiangchi','yj_jushou'],['jianshoudaiyuan','tianfeng'],['yiruoshengqiang','re_caocao'],['shichongerjiao','sp_xuyou']].randomGet();
+					var evt=evt_list[0],character=evt_list[1];
+					game.addGlobalSkill(evt);
+					const showGuanduEvent=function(evt){
+						if(ui['GuanduEvent_'+evt]) return;
+						ui['GuanduEvent_'+evt]=ui.create.system(get.translation(evt),null,true);
+						lib.setPopped(ui['GuanduEvent_'+evt],function(){
+							var uiintro=ui.create.dialog('hidden');
+							uiintro.add(get.translation(evt));
+							uiintro.add('<div class="text center">'+get.translation(evt+'_info')+'</div>');
+							var ul=uiintro.querySelector('ul');
+							if(ul) ul.style.width='180px';
+							uiintro.add(ui.create.div('.placeholder'));
+							return uiintro;
+						},250);
+					};
+					showGuanduEvent(evt);
+					game.broadcastAll(function(evt){
+						if(lib.config.background_speak) game.playAudio('skill',evt);
+						if(evt=='shishengshibai'){
+							ui.guanduInfo=get.is.phoneLayout()?ui.create.div('.touchinfo.left',ui.window):ui.create.div(ui.gameinfo);
+							ui.guanduInfo.innerHTML='十胜十败（0）';
+						}
+					},evt);
+					game.me.chooseControl('ok').set('dialog',['###本局特殊事件：'+get.translation(evt)+'###'+get.translation(evt+'_info'),[[character],'character']]);
+					'step 5'
+					game[event.friendSide+'Zhu'].chooseButton(['请选择你的武将牌',[event.zhuList[event.friendSide=='true'?1:0],'characterx']],true);
+					'step 6'
+					if(game[event.friendSide+'Zhu']==game.me){
+						game[event.friendSide+'Zhu'].init(result.links[0]);
+						game[event.friendSide+'Zhu'].maxHp++;
+						game[event.friendSide+'Zhu'].hp++;
+						game[event.friendSide+'Zhu'].update();
+					}
+					else event.zhuChoice=result.links[0];
+					'step 7'
+					if(game.me.identity!='zhu'){
+						event.choose_me=true;
+						game.me.chooseButton(['请选择你的武将牌',[event[event.friendSide+'List'].randomRemove(2),'characterx']],true);
+					}
+					'step 8'
+					if(event.choose_me) game.me.init(result.links[0]);
+					game.countPlayer(function(current){
+						if(current!=game.me&&current.side.toString()==event.friendSide){
+							if(current.identity=='zhong'){
+								let choice=event[event.friendSide+'List'].randomRemove(2)[0];
+								if(lib.characterReplace[choice]) choice = lib.characterReplace[choice].randomGet();
+								current.init(choice);
+							}
+							else{
+								current.init(event.zhuChoice);
+								current.maxHp++;
+								current.hp++;
+								current.update();
+							}
+						}
+					});
+					'step 9'
 					setTimeout(function(){
 						ui.arena.classList.remove('choose-character');
 					},500);
@@ -4906,14 +4928,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				enable: ['chooseToUse', 'chooseToRespond'],
 				position: 'hs',
 				prompt: '将【杀】当作【闪】，或将【闪】当作的【杀】使用或打出，然后你的下个弃牌阶段的手牌上限-1',
-				viewAs: function(cards, player) {
-					var name = false;
+				viewAs:function(cards,player){
 					if(cards.length){
-						switch (get.name(cards[0], player)) {
-							case 'sha': name = 'shan'; break;
-							case 'shan': name = 'sha'; break;
+						var name=false;
+						switch(get.name(cards[0],player)){
+							case 'sha':name='shan';break;
+							case 'shan':name='sha';break;
 						}
-						if (name) return { name: name };
+						if(name) return {name:name};
 					}
 					return null;
 				},
@@ -4974,7 +4996,15 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						if (!player.countCards('hs', name)) return false;
 					},
-					order: 0.01,
+					order:function(item,player){
+						if(player&&_status.event.type=='phase'){
+							if(player.countCards('hs','shan')&&player.getUseValue({name:'sha'})>0){
+								return get.order({name:'sha'},player)*0.99;
+							}
+							return 0;
+						}
+						return 0.001;
+					},
 				},
 				subSkill: {
 					less: {
