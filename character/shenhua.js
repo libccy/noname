@@ -162,7 +162,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						if(game.checkMod(card,player,'unchanged','cardEnabled2',player)===false) return false;
 						const cardx=get.autoViewAs({name:'tiesuo'},[card]);
-						return event._backup.filterCard(cardx,player,target);
+						return event._backup.filterCard(cardx,player,event);
 					}
 				},
 				filterTarget:function(fuck,player,target){
