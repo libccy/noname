@@ -2360,7 +2360,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			diaochan:['diaochan','re_diaochan','sb_diaochan'],
 			huatuo:['huatuo','re_huatuo','old_huatuo'],
 			huaxiong:['huaxiong','re_huaxiong','old_huaxiong','sb_huaxiong','ol_huaxiong'],
-			yuanshu:['yuanshu','re_yuanshu','yl_yuanshu','old_yuanshu','ol_yuanshu'],
+			yuanshu:['yuanshu','re_yuanshu','yl_yuanshu','old_yuanshu','ol_yuanshu','star_yuanshu'],
 			gongsunzan:['gongsunzan','re_gongsunzan','dc_gongsunzan','xin_gongsunzan'],
 			re_lidian:['re_lidian','old_re_lidian','junk_lidian'],
 		},

@@ -13973,7 +13973,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sundeng:['sundeng','re_sundeng','ns_sundeng'],
 			caiyong:['caiyong','re_caiyong'],
 			chengong:['chengong','re_chengong','sb_chengong'],
-			xunyou:['xunyou','re_xunyou'],
+			xunyou:['xunyou','re_xunyou','clan_xunyou'],
 			xuezong:['xuezong','tw_xuezong'],
 			huanghao:['huanghao','dc_huanghao','old_huanghao'],
 			caorui:['caorui','re_caorui','old_caorui'],
@@ -13982,6 +13982,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangsong:['zhangsong','re_zhangsong'],
 			zhongyao:['zhongyao','re_zhongyao'],
 			liwan:['ol_liwan','liwan'],
+			wuxian:['wuxian','clan_wuxian'],
 		},
 		translate:{
 			old_huaxiong:'将华雄',

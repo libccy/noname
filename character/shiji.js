@@ -5793,13 +5793,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						for(var i=0;i<lib.inpile.length;i++){
 							var name=lib.inpile[i];
 							if(name=='sha'){
-								if(event.filterCard(get.autoViewAs({name:name},'unsure'),player,event)) list.push(['基本','','sha']);
+								if(event.filterCard(get.autoViewAs({name},'unsure'),player,event)) list.push(['基本','','sha']);
 								for(var nature of lib.inpile_nature){
-									if(event.filterCard(get.autoViewAs({name:name,nature:nature},'unsure'),player,event)) list.push(['基本','','sha',j]);
+									if(event.filterCard(get.autoViewAs({name,nature},'unsure'),player,event)) list.push(['基本','','sha',nature]);
 								}
 							}
-							else if(get.type2(name)=='trick'&&event.filterCard(get.autoViewAs({name:name},'unsure'),player,event)) list.push(['锦囊','',name]);
-							else if(get.type(name)=='basic'&&event.filterCard(get.autoViewAs({name:name},'unsure'),player,event)) list.push(['基本','',name]);
+							else if(get.type2(name)=='trick'&&event.filterCard(get.autoViewAs({name},'unsure'),player,event)) list.push(['锦囊','',name]);
+							else if(get.type(name)=='basic'&&event.filterCard(get.autoViewAs({name},'unsure'),player,event)) list.push(['基本','',name]);
 						}
 						return ui.create.dialog('灭吴',[list,'vcard']);
 					},
@@ -6513,7 +6513,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterReplace:{
 			wangcan:['wangcan','sp_wangcan','tw_wangcan'],
 			sunshao:['sunshao','sp_sunshao'],
-			xunchen:['xunchen','re_xunchen','sp_xunchen','tw_xunchen'],
+			xunchen:['xunchen','re_xunchen','sp_xunchen','tw_xunchen','clan_xunchen'],
 			xinpi:['xinpi','sp_xinpi'],
 			duyu:['duyu','dc_duyu','sp_duyu','pk_sp_duyu'],
 			zhangwen:['zhangwen','sp_zhangwen'],
@@ -6527,7 +6527,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuzhang:['liuzhang','tw_liuzhang'],
 			chenzhen:['sp_chenzhen','tw_chenzhen'],
 			feiyi:['ol_feiyi','feiyi','tw_feiyi'],
-			wangling:['dc_wangling','wangling','tw_wangling'],
+			wangling:['dc_wangling','wangling','tw_wangling','clan_wangling'],
 			qiaogong:['qiaogong','tw_qiaogong'],
 			sp_chendong:['sp_chendong','tw_chendong','chendong'],
 			sp_jiangqing:['sp_jiangqing','tw_jiangqing','jiangqing'],

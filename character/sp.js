@@ -26385,7 +26385,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sunluyu:['sunluyu','re_sunluyu','mb_sunluyu'],
 			jin_simazhao:['jin_simazhao','simazhao','sp_simazhao'],
 			jin_wangyuanji:['jin_wangyuanji','wangyuanji','sp_wangyuanji'],
-			wangyun:['wangyun','dc_wangyun','re_wangyun','jsrg_wangyun','old_wangyun','pe_wangyun'],
+			wangyun:['clan_wangyun','wangyun','dc_wangyun','re_wangyun','jsrg_wangyun','old_wangyun','pe_wangyun'],
 			zhangliang:['xin_zhangliang','re_zhangliang','zhangliang'],
 			lingju:['lingju','old_lingju'],
 			guansuo:['guansuo','dc_guansuo'],

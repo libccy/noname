@@ -6118,9 +6118,12 @@ export class Library extends Uninstantable {
 					}
 					if (config.connect_versus_mode == '2v2' || config.connect_versus_mode == '3v3') {
 						map.connect_replace_handcard.show();
+						if(config.connect_versus_mode == '2v2') map.connect_olfeiyang_four.show();
+						else map.connect_olfeiyang_four.hide();
 					}
 					else {
 						map.connect_replace_handcard.hide();
+						map.connect_olfeiyang_four.hide();
 					}
 				},
 				connect_versus_mode: {
