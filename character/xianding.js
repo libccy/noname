@@ -3369,8 +3369,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(['equip','delay'].includes(get.type(card))&&player.hasValueTarget(card)&&choices.includes('场上')) return '场上';
 							var val=get.value(card);
 							var next=_status.currentPhase;
-							if(trigger.name=='damage') next=next.getNext();
-							if(get.attitude(player,next)>0&&val>=6||get.attitude(player,next)<0&&val<=4.5) return '牌堆顶';
+							if(next){
+								if(trigger.name=='damage') next=next.getNext();
+								if(get.attitude(player,next)>0&&val>=6||get.attitude(player,next)<0&&val<=4.5) return '牌堆顶';
+							}
 							return '牌堆底';
 						}());
 					}
