@@ -181,8 +181,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					true:{
-						audio:'dcsbquanmou',
 						charlotte:true,
+						audio:'dcsbquanmou',
+						audioname:['dc_sb_simayi_shadow'],
 						trigger:{source:'damageSource'},
 						forced:true,
 						popup:false,
@@ -239,8 +240,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					false:{
-						audio:'dcsbquanmou',
 						charlotte:true,
+						audio:'dcsbquanmou',
+						audioname:['dc_sb_simayi_shadow'],
 						trigger:{source:'damageBegin2'},
 						forced:true,
 						filter(event,player){
@@ -288,6 +290,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			dcsbpingliao:{
 				audio:2,
+				audioname:['dc_sb_simayi_shadow'],
 				trigger:{player:'useCard0'},
 				forced:true,
 				filter(event,player){
