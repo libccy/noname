@@ -8782,10 +8782,10 @@ export class Player extends HTMLDivElement {
 		if (this.hasSkillTag('respondSha', true, respond ? 'respond' : 'use', true)) return true;
 		return this.hasUsableCard('sha');
 	}
-	hasShan() {
+	hasShan(respond) {
 		if (this.countCards('hs', 'shan')) return true;
 		if (this.countCards('hs', 'hufu')) return true;
-		if (this.hasSkillTag('respondShan', true, null, true)) return true;
+		if (this.hasSkillTag('respondShan', true, respond ? 'respond' : 'use', true)) return true;
 		return this.hasUsableCard('shan');
 	}
 	mayHaveSha(viewer, type, ignore, rvt) {
