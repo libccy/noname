@@ -10294,9 +10294,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseTarget(get.prompt2('juetao'),lib.filter.notMe).set('ai',function(target){
 						let att=-get.attitude(_status.event.player,target);
 						if(att<=0) return att;
-						if(target.hasSkillTag('nodamage')) return 0.01*att;
-						if(target.getEquip('tengjia')||target.getEquip('renwang')) return 0.2*att;
-						if(target.getEquip('bagua')) return 0.3*att;
+						if(target.hasSkillTag('nodamage')||target.getEquip('qimenbagua')) return 0.01*att;
+						if(target.getEquip('tengjia')||target.getEquip('renwang')) return 0.3*att;
+						if(target.getEquip('rewrite_tengjia')||target.getEquip('rewrite_renwang')) return 0.2*att;
+						if(target.hasSkillTag('freeShan',false,{
+							player:_status.event.player
+						},true)) return 0.3*att;
 						if(target.getEquip(2)) return att/2;
 						return 1.2*att;
 					});
