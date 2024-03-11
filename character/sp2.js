@@ -11053,7 +11053,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jin_simashi:['dc_simashi','jin_simashi','simashi'],
 			jin_yanghuiyu:['jin_yanghuiyu','yanghuiyu'],
 			taoqian:['re_taoqian','taoqian'],
-			sp_liubei:['jsrg_liubei','sp_liubei'],
+			jsp_liubei:['jsrg_liubei','jsp_liubei'],
 			dongcheng:['re_dongcheng','dongcheng'],
 			hucheer:['re_hucheer','hucheer','tw_hucheer'],
 			nanhualaoxian:['re_nanhualaoxian','nanhualaoxian','jsrg_nanhualaoxian'],
