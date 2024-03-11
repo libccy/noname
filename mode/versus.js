@@ -4908,11 +4908,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				prompt: '将【杀】当作【闪】，或将【闪】当作的【杀】使用或打出，然后你的下个弃牌阶段的手牌上限-1',
 				viewAs: function(cards, player) {
 					var name = false;
-					switch (get.name(cards[0], player)) {
-						case 'sha': name = 'shan'; break;
-						case 'shan': name = 'sha'; break;
+					if(cards.length){
+						switch (get.name(cards[0], player)) {
+							case 'sha': name = 'shan'; break;
+							case 'shan': name = 'sha'; break;
+						}
+						if (name) return { name: name };
 					}
-					if (name) return { name: name };
 					return null;
 				},
 				onuse: function(links, player) {
