@@ -11541,13 +11541,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				filterTarget:function(card,player,target){
 					return target.getSkills(null,false,false).filter(function(i){
-						return get.is.zhuanhuanji(i,current);
+						return get.is.zhuanhuanji(i,target);
 					}).length>0;
 				},
 				content:function(){
 					'step 0'
 					var list=target.getSkills(null,false,false).filter(function(i){
-						return get.is.zhuanhuanji(i,current);
+						return get.is.zhuanhuanji(i,target);
 					});
 					if(list.length==1){
 						event._result={control:list[0]};
