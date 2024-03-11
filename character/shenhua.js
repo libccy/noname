@@ -1389,7 +1389,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					order:13,
 					result:{
 						target:(player,target)=>{
-							if(target.getEquip('bagua')||target.getEquip('rewrite_bagua')) return 0;
 							let hs=player.countCards('h',card=>{
 								if(!get.tag(card,'damage')||get.effect(target,card,player,player)<=0) return 0;
 								if(get.name(card,player)==='sha'){
@@ -5435,6 +5434,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				ai:{
 					respondShan:true,
+					freeShan:true,
+					skillTagFilter(player,tag,arg){
+						if(tag!=='respondShan'&&tag!=='freeShan') return;
+						if(!player.hasEmptySlot(2)||player.hasSkillTag('unequip2')) return false;
+						if(!arg||!arg.player) return true;
+						if(arg.player.hasSkillTag('unequip',false,{
+							target:player
+						})||arg.player.hasSkillTag('unequip_ai',false,{
+							target:player
+						})) return false;
+						return true;
+					},
 					effect:{
 						target:function(card,player,target){
 							if(player==target&&get.subtype(card)=='equip2'){

@@ -2351,7 +2351,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					result:{
 						target:function(player,target){
 							if(player.getStorage('dclvecheng_xiongluan').includes(target)) return 0;
-							if(target.getEquip('bagua')||target.getEquip('rewrite_bagua')) return -0.6;
+							if(target.hasSkillTag('freeShan',false,{
+								player:player
+							},true)) return -0.6;
 							var hs=player.countCards('h',card=>{
 								if(!player.canUse(card,target)) return false;
 								return get.name(card)=='sha'&&get.effect(target,card,player,player)>0;

@@ -2413,9 +2413,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					directHit_ai:true,
 					skillTagFilter:function(player,tag,arg){
-						if(!arg||!arg.card||!arg.target||(arg.card.name!='sha'&&arg.card.name!='juedou')) return false;
+						if(tag!=='directHit_ai'||!arg||!arg.card||!arg.target||(arg.card.name!='sha'&&arg.card.name!='juedou')) return false;
 						if(player.storage.counttrigger&&player.storage.counttrigger.dbquedi&&player.storage.counttrigger.dbquedi>0) return false;
-						if(arg.target.countCards('h')==1&&(arg.card.name!='sha'||!arg.target.getEquip('bagua')||player.hasSkillTag('unequip',false,{
+						if(arg.target.countCards('h')==1&&(arg.card.name!='sha'||!arg.target.hasSkillTag('freeShan',false,{
+							player:player,
+							card:arg.card
+						})||player.hasSkillTag('unequip',false,{
 							name:arg.card?arg.card.name:null,
 							target:arg.target,
 							card:arg.card

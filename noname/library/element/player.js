@@ -2316,11 +2316,11 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 换肤换音：想要支持某个武将更换皮肤，必须在lib.character.characterSubstitute中存在该武将的id（以下以name代指武将id，character代指换肤图片名）
-	 * 
+	 *
 	 * 如果换肤换音引用本体的image/character素材作为更换的皮肤且不需要使用本体audio/die以外的地方的配音，则你无需在characterSubstitute中书写关于此皮肤的信息
-	 * 
+	 *
 	 * 如果lib.character[character]不存在，且想引用其他路径的图片素材或阵亡素材，请以[character,[]]的形式写入lib.character.characterSubstitute[name]中，第二个数组填入形式同lib.character[4]的书写形式
-	 * 
+	 *
 	 * @param { string | string }
 	 */
 	changeSkin(skill, character) {
@@ -7518,7 +7518,7 @@ export class Player extends HTMLDivElement {
 			this.addSkill(skillsToAdd[i], null, true, true);
 			this.additionalSkills[skill].push(skillsToAdd[i]);
 		}
-		
+
 		this.checkConflict();
 		_status.event.clearStepCache();
 		return this;
@@ -8791,10 +8791,10 @@ export class Player extends HTMLDivElement {
 		if (this.hasSkillTag('respondSha', true, respond ? 'respond' : 'use', true)) return true;
 		return this.hasUsableCard('sha');
 	}
-	hasShan() {
+	hasShan(respond) {
 		if (this.countCards('hs', 'shan')) return true;
 		if (this.countCards('hs', 'hufu')) return true;
-		if (this.hasSkillTag('respondShan', true, null, true)) return true;
+		if (this.hasSkillTag('respondShan', true, respond ? 'respond' : 'use', true)) return true;
 		return this.hasUsableCard('shan');
 	}
 	mayHaveSha(viewer, type, ignore, rvt) {
@@ -8843,7 +8843,7 @@ export class Player extends HTMLDivElement {
 	}
 	mayHaveShan(viewer, type, ignore, rvt) {
 		/**
-		 * type: skill tag type 'use', 'respond'
+		 * type: skill tag type 'use', 'respond' or object
 		 * ignore: ignore cards, ui.selected.cards added
 		 * rvt: return value type 'count', 'odds', 'bool'(default)
 		 */
