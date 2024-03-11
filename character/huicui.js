@@ -200,6 +200,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 1;
 						},
 						async content(player,num=1){
+							if(!player.hasCard(lib.filter.cardRecastable,'he')) return;
 							const {result:{bool,cards}}=await player.chooseCard('重铸'+num+'张牌','he',num,lib.filter.cardRecastable,true).set('ai',lib.skill.zhiheng.check);
 							if(bool) await player.recast(cards);
 						},
@@ -304,9 +305,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!player.getStorage('dcjianzhuan').includes(i)) choices.push(i);
 					}
 					if(choices.length){
-						const choice=choices.randomGet();
-						for(let i=1;i<=3;i++){
-							await info[choice].content(player,1);
+						for(const choice of choices){
+							for(let i=1;i<=3;i++){
+								await info[choice].content(player,1);
+							}
 						}
 					}
 					await player.gainMaxHp(2);
