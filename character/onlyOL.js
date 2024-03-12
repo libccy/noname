@@ -12,11 +12,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_sb_taishici:['male','wu',4,['olsbdulie','olsbdouchan']],
 			ol_gaoshun:['male','qun',4,['olxianzhen','decadejinjiu'],['die_audio:re_gaoshun']],
 			ol_sb_yuanshao:['male','qun',4,['olsbhetao','olsbshenli','olsbyufeng','olsbshishou'],['zhu']],
+			ol_yufan:['male','wu',3,['olzongxuan','olzhiyan'],['tempname:re_yufan','die_audio:re_yufan']],
 		},
 		characterSort:{
 			onlyOL:{
 				onlyOL_yijiang1:['ol_jianyong','ol_lingtong','ol_gaoshun'],
 				onlyOL_yijiang2:['ol_caozhang'],
+				onlyOL_yijiang3:['ol_yufan'],
 				onlyOL_sb:['ol_sb_jiangwei','ol_sb_guanyu','ol_sb_taishici','ol_sb_yuanshao'],
 			},
 		},
@@ -48,6 +50,90 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//虞翻
+			olzongxuan:{
+				audio:'rezongxuan',
+				trigger:{global:['loseAfter','loseAsyncAfter']},
+				filter(event,player){
+					if(event.type!='discard'||event.getlx===false) return false;
+					return get.info('olzongxuan').getCards(event,player).length;
+				},
+				check(event,player){
+					if(event.getParent(3).name!='phaseDiscard') return false;
+					const cards=get.info('olzongxuan').getCards(event,player);
+					return game.hasPlayer(target=>{
+						if(cards.some(i=>get.type(i,target)=='equip')&&(get.attitude(player,target)>0||get.recoverEffect(target,player,player)>0)) return true;
+						if(cards.some(i=>get.type(i,target)!='equip')&&target.getHp()>=player.getHp()&&get.effect(target,{name:'losehp'},player,player)>0) return true;
+						return false;
+					});
+				},
+				async content(event,trigger,player){
+					const {result:{bool,moved}}=await player.chooseToMove('纵玄：将任意张牌置于牌堆顶',true).set('list',[
+						['本次弃置的牌',get.info('olzongxuan').getCards(trigger,player)],
+						['牌堆顶'],
+					]).set('filterOk',moved=>moved[1].length).set('processAI',list=>{
+						const player=get.event('player');
+						const cards=list[0][1].slice(),cards2=cards.filter(card=>{
+							return game.hasPlayer(target=>{
+								if(get.type(card,target)=='equip'&&(get.attitude(player,target)>0||get.recoverEffect(target,player,player)>0)) return true;
+								if(get.type(card,target)!='equip'&&target.getHp()>=player.getHp()&&get.effect(target,{name:'losehp'},player,player)>0) return true;
+								return false;
+							});
+						}),cards3=(cards2.length?cards2.randomGet():cards.randomGet());
+						return [[],[cards3]];
+					});
+					if(bool){
+						let cards=moved[1].slice();
+						game.log(player,'将',cards,'置于了牌堆顶');
+						while(cards.length){
+							ui.cardPile.insertBefore(cards.pop().fix(),ui.cardPile.firstChild);
+						}
+					}
+				},
+				getCards(event,player){
+					let cards=[];
+					for(const target of [player,player.getPrevious()]){
+						const evt=event.getl(target);
+						if(evt&&evt.cards2&&evt.cards2.some(i=>get.position(i)=='d')) cards.addArray(evt.cards2.filter(i=>get.position(i)=='d'));
+					}
+					return cards;
+				},
+			},
+			olzhiyan:{
+				audio:'zhiyan',
+				audioname:['re_yufan'],
+				trigger:{global:'phaseJieshuBegin'},
+				filter(event,player){
+					return event.player==player||event.player==player.getPrevious();
+				},
+				direct:true,
+				async content(event,trigger,player){
+					const {result:{bool,targets}}=await player.chooseTarget(get.prompt2('olzhiyan')).set('ai',target=>{
+						const player=get.event('player'),cards=get.event('cards');
+						if(!cards.length) return 0;
+						const card=cards[0];
+						if(get.type(card,target)=='equip'&&(get.attitude(player,target)>0||get.recoverEffect(target,player,player)>0)) return get.recoverEffect(target,player,player)+get.attitude(player,target);
+						if(get.type(card,target)!='equip'&&target.getHp()>=player.getHp()&&get.effect(target,{name:'losehp'},player,player)>0) return get.effect(target,{name:'losehp'},player,player);
+						return 0;
+					}).set('cards',Array.from(ui.cardPile.childNodes||[])||[]);
+					if(bool){
+						const target=targets[0];
+						player.logSkill('olzhiyan',target);
+						const {result}=await target.draw('visible');
+						if(result){
+							const card=result[0];
+							if(get.type(card,target)=='equip'){
+								if(target.getCards('h').includes(card)&&target.hasUseTarget(card)){
+									const {result:{bool}}=await target.chooseUseTarget(card,true,'nopopup');
+									if(bool) await target.recover();
+								}
+							}
+							else if(target.getHp()>=player.getHp()) await target.loseHp();
+						}
+					}
+				},
+				ai:{expose:0.2},
+			},
 			//OL谋袁绍
 			//真·四世三公——袁神，启动
 			olsbhetao:{
@@ -1067,6 +1153,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sizhaojian_append:'<span class="text" style="font-family: yuanli">【思召剑】于闪闪节（3月2日-3月15日）外离开装备区后，销毁此牌</span>',
 			olsbshishou:'士首',
 			olsbshishou_info:'主公技，其他群势力角色失去装备区的牌后，若你的装备区中没有武器牌，其可将【思召剑】置入你的装备区。',
+			ol_yufan:'OL界虞翻',
+			ol_yufan_prefix:'OL界',
+			olzongxuan:'纵玄',
+			olzongxuan_info:'当你或你的上家因弃置而失去牌后，你可以将处于弃牌堆的这些牌中的任意牌以任意顺序置于牌堆顶。',
+			olzhiyan:'直言',
+			olzhiyan_info:'你或你的上家的结束阶段，你可以令一名角色正面朝上摸一张牌，然后若此牌：为装备牌，则其使用此牌并回复1点体力；不为装备牌且其体力值大于等于你，则其失去1点体力。',
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',
