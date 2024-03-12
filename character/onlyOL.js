@@ -13,11 +13,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_gaoshun:['male','qun',4,['olxianzhen','decadejinjiu'],['die_audio:re_gaoshun']],
 			ol_sb_yuanshao:['male','qun',4,['olsbhetao','olsbshenli','olsbyufeng','olsbshishou'],['zhu']],
 			ol_yufan:['male','wu',3,['olzongxuan','olzhiyan'],['tempname:re_yufan','die_audio:re_yufan']],
+			ol_chengpu:['male','wu',4,['ollihuo','olchunlao'],['tempname:xin_chengpu','die_audio:xin_chengpu']],
 		},
 		characterSort:{
 			onlyOL:{
 				onlyOL_yijiang1:['ol_jianyong','ol_lingtong','ol_gaoshun'],
-				onlyOL_yijiang2:['ol_caozhang'],
+				onlyOL_yijiang2:['ol_caozhang','ol_chengpu'],
 				onlyOL_yijiang3:['ol_yufan'],
 				onlyOL_sb:['ol_sb_jiangwei','ol_sb_guanyu','ol_sb_taishici','ol_sb_yuanshao'],
 			},
@@ -50,6 +51,142 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//程普
+			ollihuo:{
+				audio:'relihuo',
+				trigger:{player:'useCard1'},
+				filter(event,player){
+					return event.card.name=='sha'&&!game.hasNature(event.card,'fire');
+				},
+				check(event,player){
+					let card=new lib.element.VCard(get.copy(event.card));
+					game.setNature(card,'fire');
+					const eff1=event.targets.reduce((sum,target)=>{
+						return sum+get.effect(target,event.card,player,player);
+					},0);
+					let targets=event.targets.slice();
+					if(get.info('lihuo2').filter(event,player)){
+						let targetx=game.filterPlayer(target=>{
+							return !targets.includes(target)&&player.canUse(card,target)&&get.effect(target,card,player,player)>0;
+						});
+						if(targetx.length) targets.add(targetx.sort((a,b)=>{
+							return get.effect(b,card,player,player)-get.effect(a,card,player,player);
+						})[0]);
+					}
+					const eff2=targets.reduce((sum,target)=>{
+						return sum+get.effect(target,card,player,player);
+					},0);
+					return eff2>eff1;
+				},
+				content(){
+					game.log(player,'将',trigger.card,'改为了火属性');
+					game.setNature(trigger.card,'fire');
+					player.when('useCardAfter').filter(evt=>evt==trigger).then(()=>{
+						if(game.hasPlayer2(target=>{
+							return target.getHistory('damage',evt=>evt.card&&evt.card==trigger.card).length;
+						})){
+							player.chooseToDiscard('he','疠火：弃置一张牌，或失去1点体力').set('ai',card=>{
+								const player=get.event('player');
+								if((get.name(card)=='tao'||get.name(card)=='jiu')&&lib.filter.cardSavable(card,player,player)) return -1;
+								if(player.hp<=1){
+									if(cards.length<player.getEnemies().length&&player.hasCard((cardx)=>{
+										return (get.name(cardx)=='tao'||get.name(cardx)=='jiu')&&lib.filter.cardSavable(cardx,player,player);
+									},'hs')) return 7-get.value(card);
+									return -1;
+								}
+								return 24-5*cards.length-2*Math.min(4,player.getHp())-get.value(card);
+							});
+						}
+						else event.finish();
+					}).then(()=>{
+						if(!result.bool) player.loseHp();
+					});
+				},
+				ai:{fireAttack:true},
+				group:'ollihuo_add',
+				subSkill:{
+					add:{
+						inherit:'lihuo2',
+						async content(event,trigger,player){
+							const {result:{bool,targets}}=await player.chooseTarget(get.prompt('ollihuo'),'为'+get.translation(trigger.card)+'增加一个目标',(card,player,target)=>{
+								const trigger=get.event().getTrigger();
+								return !trigger.targets.includes(target)&&player.canUse(trigger.card,target);
+							}).set('card',trigger.card).set('ai',target=>{
+								const player=get.event('player'),trigger=get.event().getTrigger();
+								return get.effect(target,trigger.card,player,player);
+							});
+							if(bool){
+								player.logSkill('ollihuo',targets);
+								trigger.targets.addArray(targets);
+							}
+						},
+					},
+				},
+			},
+			olchunlao:{
+				audio:'chunlao',
+				audioname:['xin_chengpu'],
+				trigger:{
+					player:'loseAfter',
+					global:'loseAsyncAfter',
+				},
+				filter(event,player){
+					if(event.type!='discard'||event.getlx===false) return false;
+					const evt=event.getl(player);
+					return evt&&evt.cards2&&evt.cards2.some(i=>i.name=='sha'&&get.position(i)=='d');
+				},
+				forced:true,
+				locked:false,
+				content(){
+					const evt=trigger.getl(player);
+					player.addToExpansion(evt.cards2.filter(i=>i.name=='sha'&&get.position(i)=='d'),'gain2').gaintag.add('olchunlao');
+				},
+				ai:{
+					effect:{
+						player(card,player,target){
+							if(_status.currentPhase!=player) return;
+							if(card.name=='sha'&&!player.getExpansions('olchunlao').length&&target.hp>1){
+								return 'zeroplayertarget';
+							}
+						},
+					},
+				},
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+				onremove(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				group:'olchunlao_save',
+				subSkill:{
+					save:{
+						inherit:'chunlao2',
+						filter(event,player){
+							return event.type=='dying'&&event.dying&&event.dying.hp<=0&&player.getExpansions('olchunlao').length;
+						},
+						async content(event,trigger,player){
+							const target=event.targets[0];
+							const {result:{bool,links}}=await player.chooseCardButton(get.translation('olchunlao'),player.getExpansions('olchunlao'),true);
+							if(bool){
+								player.logSkill('olchunlao',target);
+								await player.loseToDiscardpile(links);
+								event.type='dying';
+								await target.useCard({name:'jiu',isCard:true},target);
+							}
+						},
+						ai:{
+							save:true,
+							skillTagFilter(player){
+								return player.getExpansions('olchunlao').length;
+							},
+							order:6,
+							result:{target:1},
+						},
+					},
+				},
+			},
 			//虞翻
 			olzongxuan:{
 				audio:'rezongxuan',
@@ -1156,9 +1293,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_yufan:'OL界虞翻',
 			ol_yufan_prefix:'OL界',
 			olzongxuan:'纵玄',
-			olzongxuan_info:'当你或你的上家因弃置而失去牌后，你可以将处于弃牌堆的这些牌中的任意牌以任意顺序置于牌堆顶。',
+			olzongxuan_info:'当你或你的上家因弃置而失去牌后，你可以将位于弃牌堆的这些牌中的任意牌以任意顺序置于牌堆顶。',
 			olzhiyan:'直言',
 			olzhiyan_info:'你或你的上家的结束阶段，你可以令一名角色正面朝上摸一张牌，然后若此牌：为装备牌，则其使用此牌并回复1点体力；不为装备牌且其体力值大于等于你，则其失去1点体力。',
+			ol_chengpu:'OL界程普',
+			ol_chengpu_prefix:'OL界',
+			ollihuo:'疠火',
+			ollihuo_info:'①你使用的非火【杀】可以改为火【杀】，若如此做，此牌结算完毕后，若此牌造成过伤害，则你弃置一张牌或失去1点体力。②你使用火【杀】可以额外指定一个目标。',
+			olchunlao:'醇醪',
+			olchunlao_info:'①当你的【杀】因弃置进入弃牌堆后，你将位于弃牌堆的这些牌称为“醇”置于武将牌上。②一名角色处于濒死状态时，你可以将一张“醇”置入弃牌堆，然后令其视为使用一张【酒】。',
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',

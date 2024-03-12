@@ -2684,6 +2684,8 @@ export class Player extends HTMLDivElement {
 		this.node.hp.show();
 		this.classList.remove('unseen');
 		this.classList.remove('unseen2');
+		this.classList.remove('unseen_show');
+		this.classList.remove('unseen2_show');
 
 		this.node.identity.style.backgroundColor = '';
 		this.node.intro.innerHTML = '';
