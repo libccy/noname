@@ -2070,7 +2070,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const {links}=result;
 					if(typeof links[0]!=='string') links.reverse();
 					let [fn,card]=links;
-					const selectedPlayer=lose_list[cards.indexOf(card)][0];
+					const selectedPlayer=lose_list.find(item=>{
+						if(Array.isArray(item[1])) return item[1].includes(card);
+						return item[1]==card;
+					})[0];
 					player.logSkill('twniju',selectedPlayer);
 					selectedPlayer.addTempSkill('twniju_change');
 					if(!selectedPlayer.storage.twniju_change) selectedPlayer.storage.twniju_change=[];
