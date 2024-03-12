@@ -2873,7 +2873,7 @@ div:not(.handcards)>.card>.info>span,
 }
 
 .player>.unseen_show>.avatar,
-.player>.unseen2_show_v>.avatar2 {
+.player>.unseen2_show>.avatar2 {
 	opacity: 0;
 }
 
@@ -2881,8 +2881,6 @@ div:not(.handcards)>.card>.info>span,
 #arena:not(.observe) .player:not([data-position='0']).unseen2_show>.avatar2 {
 	opacity: 1 !important;
 	background-image:url('../../image/character/hidden_image.jpg') !important;
-	background-position-x: 50% !important;
-	background-size: cover !important;
 }
 
 .player>.name_seat {
