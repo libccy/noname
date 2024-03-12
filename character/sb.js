@@ -342,6 +342,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						async content(event,trigger,player){
 							if (_status.connectMode) game.broadcastAll(() => { _status.noclearcountdown = true });
 							const given_map = {};
+							event.given_map = given_map;
 							const expansions = player.getExpansions('sbqingjian');
 							let result;
 							while (true) {
@@ -358,8 +359,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								result = await player.chooseTarget(`选择一名角色获得${get.translation(toGive)}`, expansions.length === 1).set('ai', target => {
 									const att = get.attitude(get.player(), target);
 									if (get.event('toEnemy')) return Math.max(0.01, 100 - att);
-									else if (att > 0) return Math.max(0.1, att / (1 + target.countCards('h') + (get.event().getParent().given_map[target.playerid] || 0)));
-									else return Math.max(0.01, (100 + att) / 100);
+									else if (att > 0) return Math.max(0.1, att / Math.sqrt(1 + target.countCards('h') + (get.event().getParent().given_map[target.playerid] || 0)));
+									else return Math.max(0.01, (100 + att) / 200);
 								}).set('toEnemy', get.value(toGive[0], player, 'raw') < 0).forResult();
 								if (result.bool) {
 									expansions.removeArray(toGive);
