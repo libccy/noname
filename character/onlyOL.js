@@ -139,7 +139,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				locked:false,
 				content(){
 					const evt=trigger.getl(player);
-					player.addToExpansion(trigger.cards2.some(i=>i.name=='sha'&&get.position(i)=='d'),'gain2').gaintag.add('olchunlao');
+					player.addToExpansion(evt.cards2.filter(i=>i.name=='sha'&&get.position(i)=='d'),'gain2').gaintag.add('olchunlao');
 				},
 				ai:{
 					effect:{
@@ -167,6 +167,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return event.type=='dying'&&event.dying&&event.dying.hp<=0&&player.getExpansions('olchunlao').length;
 						},
 						async content(event,trigger,player){
+							const target=event.targets[0];
 							const {result:{bool,links}}=await player.chooseCardButton(get.translation('olchunlao'),player.getExpansions('olchunlao'),true);
 							if(bool){
 								player.logSkill('olchunlao',target);
