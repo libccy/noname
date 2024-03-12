@@ -291,7 +291,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcsbpingliao:{
 				audio:2,
 				audioname:['dc_sb_simayi_shadow'],
-				trigger:{player:'useCard0'},
+				trigger:{player:'useCard'},
 				forced:true,
 				filter(event,player){
 					return event.card.name=='sha';
@@ -300,7 +300,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return game.filterPlayer(current=>player.inRange(current));
 				},
 				async content(event, trigger, player) {
-					trigger.hideTargets = true;
 					const unrespondedTargets = [];
 					const respondedTargets = [];
 					let nonnonTargetResponded = false;
@@ -322,8 +321,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									})) return get.order(card);
 									return -1;
 								}
-								//先用随机数凑合一下 等157优化
-								return event.getRand('dcsbpingliao') > 0.5 ? 0 : get.order(card);
+								//如果自己没有其他的闪桃就不响应
+								else {
+									const needsTao = (player.hp <= 1);
+									const shanAndTao = player.getCards('hs', card=>{
+										const name = get.name(card);
+										return name == 'shan' || (needsTao && name == 'shan');
+									});
+									shanAndTao.remove(card);
+									if(card.cards) shanAndTao.removeArray(card.cards);
+									if(!shanAndTao.length) return 0;
+								}
+								return event.getRand('dcsbpingliao') > (1 / Math.max(1,player.hp)) ? 0 : get.order(card);
 							}).set('respondedTargets', respondedTargets).forResult();
 							if (result.bool) {
 								respondedTargets.push(target);
@@ -351,7 +360,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 				},
+				group:'dcsbpingliao_hide',
 				subSkill:{
+					hide:{
+						trigger:{player:'useCard0'},
+						forced:true,
+						filter(event,player){
+							return event.card.name=='sha';
+						},
+						async content(event, trigger, player){
+							trigger.hideTargets = true;
+							game.log(player,'隐藏了',trigger.card,'的目标');
+						},
+					},
 					buff:{
 						onremove:true,
 						charlotte:true,
