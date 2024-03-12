@@ -1651,6 +1651,7 @@ export class Player extends HTMLDivElement {
 				this.sex = lib.character[this.name][0];
 				if (this.group == 'unknown') this.group = lib.character[this.name][1];
 				this.classList.remove('unseen');
+				this.classList.remove('unseen_show');
 				break;
 			case 1:
 				if (log !== false) game.log(this, '展示了副将', '#b' + this.name2);
@@ -1658,6 +1659,7 @@ export class Player extends HTMLDivElement {
 				if (this.sex == 'unknown') this.sex = lib.character[this.name2][0];
 				if (this.name.startsWith('unknown')) this.name = this.name2;
 				this.classList.remove('unseen2');
+				this.classList.remove('unseen2_show');
 				break;
 			case 2:
 				if (log !== false) {
@@ -1671,6 +1673,8 @@ export class Player extends HTMLDivElement {
 				if (this.group == 'unknown') this.group = lib.character[this.name][1];
 				this.classList.remove('unseen');
 				this.classList.remove('unseen2');
+				this.classList.remove('unseen_show');
+				this.classList.remove('unseen2_show');
 				break;
 		}
 		if (!this.isUnseen(2)) {
@@ -2283,6 +2287,7 @@ export class Player extends HTMLDivElement {
 			this.node.name.classList.add('long');
 		}
 		if (info[4].includes('hiddenSkill') && !this.noclick) {
+			if (!_status.video && get.mode() != 'guozhan') this.classList.add('unseen_show');
 			this.classList.add(_status.video ? 'unseen_v' : 'unseen');
 			if (!this.node.name_seat && !_status.video) {
 				this.node.name_seat = ui.create.div('.name.name_seat', get.verticalStr(get.translation(this.name)), this);
@@ -2304,6 +2309,7 @@ export class Player extends HTMLDivElement {
 
 			this.node.count.classList.add('p2');
 			if (info2[4].includes('hiddenSkill') && !this.noclick) {
+				if (!_status.video && get.mode() != 'guozhan') this.classList.add('unseen2_show');
 				this.classList.add(_status.video ? 'unseen2_v' : 'unseen2');
 			}
 			this.node.name2.innerHTML = get.slimName(character2);
