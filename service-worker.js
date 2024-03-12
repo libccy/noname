@@ -96,7 +96,7 @@ self.addEventListener('fetch', event => {
 					const scopeId = `data-v-${id}`;
 					// 后续处理sourceMap合并
 					const { descriptor } = sfc.parse(text, { filename: request.url, sourceMap: true });
-					console.log({ descriptor });
+					// console.log({ descriptor });
 					const hasScoped = descriptor.styles.some((s) => s.scoped);
 					// 编译 script，因为可能有 script setup，还要进行 css 变量注入
 					const script = sfc.compileScript(descriptor, {
