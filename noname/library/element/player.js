@@ -2099,6 +2099,7 @@ export class Player extends HTMLDivElement {
 	}
 	//原有函数
 	init(character, character2, skill, update) {
+		let hidden = false;
 		if (typeof character == 'string' && !lib.character[character]) {
 			lib.character[character] = get.character(character);
 		}
@@ -2154,7 +2155,7 @@ export class Player extends HTMLDivElement {
 			skills = [];
 			this.name = 'unknown';
 			this.sex = 'male';
-			this.storage.nohp = true;
+			hidden = true;
 			skills.add('g_hidden_ai');
 		}
 		if (character2 && lib.character[character2]) {
@@ -2208,17 +2209,19 @@ export class Player extends HTMLDivElement {
 			if (info2[4].includes('hiddenSkill') && !this.noclick) {
 				if (!this.hiddenSkills) this.hiddenSkills = [];
 				this.hiddenSkills.addArray(info2[3]);
-				this.storage.nohp = true;
+				hidden = true;
 				skills.add('g_hidden_ai');
 			}
 			else skills = skills.concat(info2[3]);
 		}
-		if (this.storage.nohp) {
+		if (this.storage.nohp || hidden) {
 			this.storage.rawHp = this.hp;
 			this.storage.rawMaxHp = this.maxHp;
 			this.hp = 1;
 			this.maxHp = 1;
-			this.node.hp.hide();
+			if (this.storage.nohp) {
+				this.node.hp.hide();
+			}
 		}
 		if (skill != false) {
 			skills = skills.filter(skill => {
@@ -3050,20 +3053,22 @@ export class Player extends HTMLDivElement {
 			}
 		}
 		if (!this.storage.nohp) {
-			if (this.maxHp == Infinity) {
+			const hidden = (this.classList.contains('unseen_show') || this.classList.contains('unseen2_show'));
+			const maxHp = (hidden ? 1 : this.maxHp);
+			if (maxHp == Infinity) {
 				hp.innerHTML = '∞';
 			}
-			else if (game.layout == 'default' && this.maxHp > 14) {
-				hp.innerHTML = this.hp + '/' + this.maxHp;
+			else if (game.layout == 'default' && maxHp > 14) {
+				hp.innerHTML = this.hp + '/' + maxHp;
 				hp.classList.add('text');
 			}
 			else if (get.is.newLayout() &&
 				(
-					this.maxHp > 9 ||
-					(this.maxHp > 5 && this.classList.contains('minskin')) ||
-					((game.layout == 'mobile' || game.layout == 'long') && this.dataset.position == 0 && this.maxHp > 7)
+					maxHp > 9 ||
+					(maxHp > 5 && this.classList.contains('minskin')) ||
+					((game.layout == 'mobile' || game.layout == 'long') && this.dataset.position == 0 && maxHp > 7)
 				)) {
-				hp.innerHTML = this.hp + '<br>/<br>' + this.maxHp + '<div></div>';
+				hp.innerHTML = this.hp + '<br>/<br>' + maxHp + '<div></div>';
 				if (this.hp == 0) {
 					hp.lastChild.classList.add('lost');
 				}
@@ -3074,16 +3079,16 @@ export class Player extends HTMLDivElement {
 				hp.innerHTML = '';
 				hp.classList.remove('text');
 				hp.classList.remove('textstyle');
-				while (this.maxHp > hp.childNodes.length) {
+				while (maxHp > hp.childNodes.length) {
 					ui.create.div(hp);
 				}
-				while (Math.max(0, this.maxHp) < hp.childNodes.length) {
+				while (Math.max(0, maxHp) < hp.childNodes.length) {
 					hp.removeChild(hp.lastChild);
 				}
-				for (var i = 0; i < this.maxHp; i++) {
+				for (var i = 0; i < maxHp; i++) {
 					var index = i;
 					if (get.is.newLayout()) {
-						index = this.maxHp - i - 1;
+						index = maxHp - i - 1;
 					}
 					if (i < this.hp) {
 						hp.childNodes[index].classList.remove('lost');
@@ -3092,23 +3097,26 @@ export class Player extends HTMLDivElement {
 						hp.childNodes[index].classList.add('lost');
 					}
 				}
-				// if(this.maxHp==9){
+				// if(maxHp==9){
 				// 	hp.classList.add('long');
 				// }
 				// else{
 				// 	hp.classList.remove('long');
 				// }
 			}
-			if (hp.classList.contains('room')) {
+			if (hidden) {
+				hp.dataset.condition = 'hidden';
+			}
+			else if (hp.classList.contains('room')) {
 				hp.dataset.condition = 'high';
 			}
 			else if (this.hp == 0) {
 				hp.dataset.condition = '';
 			}
-			else if (this.hp > Math.round(this.maxHp / 2) || this.hp === this.maxHp) {
+			else if (this.hp > Math.round(maxHp / 2) || this.hp === maxHp) {
 				hp.dataset.condition = 'high';
 			}
-			else if (this.hp > Math.floor(this.maxHp / 3)) {
+			else if (this.hp > Math.floor(maxHp / 3)) {
 				hp.dataset.condition = 'mid';
 			}
 			else {
