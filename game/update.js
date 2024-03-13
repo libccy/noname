@@ -1,6 +1,6 @@
 window.noname_update={
-	version:'1.10.9',
-	update:'1.10.8',
+	version:'1.10.10',
+	update:'1.10.9',
 	changeLog:[
 		'整合@kuangshen04 @mengxinzxz @lieren2023 @nonameShijian @PZ157 @XboxSoldier @universe-st @copcap 的Pull Request',
 		'OL界程普、界虞翻',
