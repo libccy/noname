@@ -3262,6 +3262,7 @@ export class Player extends HTMLDivElement {
 				num = this.storage[i].length;
 			}
 			if (num) {
+				if (num == Infinity) num = '∞';
 				if (!this.marks[i].markcount) {
 					this.marks[i].markcount = ui.create.div('.markcount.menubutton', this.marks[i]);
 				}
