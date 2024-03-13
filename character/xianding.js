@@ -5415,7 +5415,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				frequent:true,
 				filter:function(event,player,name){
-					if(player==_status.currentPhase) return (name=='logSkill'&&event.skill=='dcliying'&&player.getExpansions('dcwangyuan').length<game.countPlayer());
+					if(player==_status.currentPhase) return (name=='logSkill'&&event.skill=='dcliying'&&player.getExpansions('dcwangyuan').length<game.countPlayer2());
 					if(name=='logSkill') return false;
 					if(player.getExpansions('dcwangyuan').length>=game.countPlayer()) return false;
 					if(event.name=='gain'&&event.player==player) return false;
