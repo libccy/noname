@@ -2329,10 +2329,12 @@ export const Content = {
 		next.skillHidden = event.skillHidden;
 		if (info.forceDie) next.forceDie = true;
 		if (info.forceOut) next.includeOut = true;
-		//语法糖部分
-		if ('cost_data' in result) next.cost_data = result.cost_data;
+		//传入数据
 		if (get.itemtype(targets) == 'players') next.targets = targets.slice(0);
 		if (get.itemtype(result.cards) === 'cards') next.cards = result.cards.slice(0);
+		//语法糖部分
+		if ('cost_data' in result) next.cost_data = result.cost_data;
+		next.indexedData = event.indexedData;
 		"step 4";
 		if (!player._hookTrigger) return;
 		if (player._hookTrigger.some(i => {
