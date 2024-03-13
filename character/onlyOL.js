@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_gaoshun:['male','qun',4,['olxianzhen','decadejinjiu'],['die_audio:re_gaoshun']],
 			ol_sb_yuanshao:['male','qun',4,['olsbhetao','olsbshenli','olsbyufeng','olsbshishou'],['zhu']],
 			ol_yufan:['male','wu',3,['olzongxuan','olzhiyan'],['tempname:re_yufan','die_audio:re_yufan']],
-			ol_chengpu:['male','wu',4,['ollihuo','olchunlao'],['tempname:xin_chengpu','die_audio:xin_chengpu']],
+			ol_chengpu:['male','wu',4,['dclihuo','olchunlao'],['tempname:xin_chengpu','die_audio:xin_chengpu']],
 		},
 		characterSort:{
 			onlyOL:{
@@ -52,7 +52,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			//程普
-			ollihuo:{
+			dclihuo:{
 				audio:'relihuo',
 				trigger:{player:'useCard1'},
 				filter(event,player){
@@ -103,12 +103,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				ai:{fireAttack:true},
-				group:'ollihuo_add',
+				group:'dclihuo_add',
 				subSkill:{
 					add:{
 						inherit:'lihuo2',
 						async content(event,trigger,player){
-							const {result:{bool,targets}}=await player.chooseTarget(get.prompt('ollihuo'),'为'+get.translation(trigger.card)+'增加一个目标',(card,player,target)=>{
+							const {result:{bool,targets}}=await player.chooseTarget(get.prompt('dclihuo'),'为'+get.translation(trigger.card)+'增加一个目标',(card,player,target)=>{
 								const trigger=get.event().getTrigger();
 								return !trigger.targets.includes(target)&&player.canUse(trigger.card,target);
 							}).set('card',trigger.card).set('ai',target=>{
@@ -116,7 +116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return get.effect(target,trigger.card,player,player);
 							});
 							if(bool){
-								player.logSkill('ollihuo',targets);
+								player.logSkill('dclihuo',targets);
 								trigger.targets.addArray(targets);
 							}
 						},
@@ -1301,8 +1301,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olzhiyan_info:'你或你的上家的结束阶段，你可以令一名角色正面朝上摸一张牌，然后若此牌：为装备牌，则其使用此牌并回复1点体力；不为装备牌且其体力值大于等于你，则其失去1点体力。',
 			ol_chengpu:'OL界程普',
 			ol_chengpu_prefix:'OL界',
-			ollihuo:'疠火',
-			ollihuo_info:'①你使用的非火【杀】可以改为火【杀】，若如此做，此牌结算完毕后，若此牌造成过伤害，则你弃置一张牌或失去1点体力。②你使用火【杀】可以额外指定一个目标。',
+			dclihuo:'疠火',
+			dclihuo_info:'①你使用的非火【杀】可以改为火【杀】，若如此做，此牌结算完毕后，若此牌造成过伤害，则你弃置一张牌或失去1点体力。②你使用火【杀】可以额外指定一个目标。',
 			olchunlao:'醇醪',
 			olchunlao_info:'①当你的【杀】因弃置进入弃牌堆后，你将位于弃牌堆的这些牌称为“醇”置于武将牌上。②一名角色处于濒死状态时，你可以将一张“醇”置入弃牌堆，然后令其视为使用一张【酒】。',
 
