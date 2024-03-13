@@ -63,6 +63,7 @@ export class Library extends Uninstantable {
 	static characterFilter = {};
 	static characterSort = {};
 	static characterReplace = {};
+	static characterSubstitute = {};
 	static characterInitFilter = {};
 	static characterGuozhanFilter = ["mode_guozhan"];
 	static dynamicTranslate = {};
@@ -6117,9 +6118,12 @@ export class Library extends Uninstantable {
 					}
 					if (config.connect_versus_mode == '2v2' || config.connect_versus_mode == '3v3') {
 						map.connect_replace_handcard.show();
+						if(config.connect_versus_mode == '2v2') map.connect_olfeiyang_four.show();
+						else map.connect_olfeiyang_four.hide();
 					}
 					else {
 						map.connect_replace_handcard.hide();
+						map.connect_olfeiyang_four.hide();
 					}
 				},
 				connect_versus_mode: {
@@ -10326,13 +10330,24 @@ export class Library extends Uninstantable {
 			};
 			const del = groupSort(a) - groupSort(b);
 			if (del != 0) return del;
-			let aa = a, bb = b;
-			if (a.includes('_')) {
-				a = a.slice(a.indexOf('_') + 1);
+			var aa = a, bb = b;
+			var firstUnderscoreIndexA = a.indexOf('_');
+			var firstUnderscoreIndexB = b.indexOf('_');
+			var secondUnderscoreIndexA = firstUnderscoreIndexA != -1 ? a.indexOf('_', firstUnderscoreIndexA + 1) : -1;
+			var secondUnderscoreIndexB = firstUnderscoreIndexB != -1 ? b.indexOf('_', firstUnderscoreIndexB + 1) : -1;
+			
+			if (secondUnderscoreIndexA != -1) {
+				a = a.slice(secondUnderscoreIndexA + 1);
+			} else if (firstUnderscoreIndexA != -1) {
+				a = a.slice(firstUnderscoreIndexA + 1);
 			}
-			if (b.includes('_')) {
-				b = b.slice(b.indexOf('_') + 1);
+			
+			if (secondUnderscoreIndexB != -1) {
+				b = b.slice(secondUnderscoreIndexB + 1);
+			} else if (firstUnderscoreIndexB != -1) {
+				b = b.slice(firstUnderscoreIndexB + 1);
 			}
+			
 			if (a != b) {
 				return a > b ? 1 : -1;
 			}
@@ -10355,12 +10370,23 @@ export class Library extends Uninstantable {
 			var del = typeSort(a) - typeSort(b);
 			if (del != 0) return del;
 			var aa = a, bb = b;
-			if (a.includes('_')) {
-				a = a.slice(a.indexOf('_') + 1);
+			var firstUnderscoreIndexA = a.indexOf('_');
+			var firstUnderscoreIndexB = b.indexOf('_');
+			var secondUnderscoreIndexA = firstUnderscoreIndexA != -1 ? a.indexOf('_', firstUnderscoreIndexA + 1) : -1;
+			var secondUnderscoreIndexB = firstUnderscoreIndexB != -1 ? b.indexOf('_', firstUnderscoreIndexB + 1) : -1;
+			
+			if (secondUnderscoreIndexA != -1) {
+				a = a.slice(secondUnderscoreIndexA + 1);
+			} else if (firstUnderscoreIndexA != -1) {
+				a = a.slice(firstUnderscoreIndexA + 1);
 			}
-			if (b.includes('_')) {
-				b = b.slice(b.indexOf('_') + 1);
+			
+			if (secondUnderscoreIndexB != -1) {
+				b = b.slice(secondUnderscoreIndexB + 1);
+			} else if (firstUnderscoreIndexB != -1) {
+				b = b.slice(firstUnderscoreIndexB + 1);
 			}
+			
 			if (a != b) {
 				return a > b ? 1 : -1;
 			}
@@ -10400,12 +10426,23 @@ export class Library extends Uninstantable {
 		},
 		capt: function (a, b) {
 			var aa = a, bb = b;
-			if (aa.includes('_')) {
-				aa = aa.slice(aa.indexOf('_') + 1);
+			var firstUnderscoreIndexAA = aa.indexOf('_');
+			var firstUnderscoreIndexBB = bb.indexOf('_');
+			var secondUnderscoreIndexAA = firstUnderscoreIndexAA != -1 ? aa.indexOf('_', firstUnderscoreIndexAA + 1) : -1;
+			var secondUnderscoreIndexBB = firstUnderscoreIndexBB != -1 ? bb.indexOf('_', firstUnderscoreIndexBB + 1) : -1;
+			
+			if (secondUnderscoreIndexAA != -1) {
+				aa = aa.slice(secondUnderscoreIndexAA + 1);
+			} else if (firstUnderscoreIndexAA != -1) {
+				aa = aa.slice(firstUnderscoreIndexAA + 1);
 			}
-			if (bb.includes('_')) {
-				bb = bb.slice(bb.indexOf('_') + 1);
+			
+			if (secondUnderscoreIndexBB != -1) {
+				bb = bb.slice(secondUnderscoreIndexBB + 1);
+			} else if (firstUnderscoreIndexBB != -1) {
+				bb = bb.slice(firstUnderscoreIndexBB + 1);
 			}
+			
 			if (aa != bb) {
 				return aa > bb ? 1 : -1;
 			}

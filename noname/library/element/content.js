@@ -2890,35 +2890,40 @@ export const Content = {
 	},
 	phaseUse: function () {
 		"step 0";
+		const stat = player.getStat();
+		for (let i in stat.skill) {
+			let bool = false;
+			const info = lib.skill[i];
+			if (!info) continue;
+			if (info.enable != undefined) {
+				if (typeof info.enable == 'string' && info.enable == 'phaseUse') bool = true;
+				else if (typeof info.enable == 'object' && info.enable.includes('phaseUse')) bool = true;
+			}
+			if (bool) stat.skill[i] = 0;
+		}
+		for (let i in stat.card) {
+			let bool = false;
+			const info = lib.card[i];
+			if (!info) continue;
+			if (info.updateUsable == 'phaseUse') stat.card[i] = 0;
+		}
+		"step 1";
+		event.trigger('phaseUseBefore');
+		"step 2";
+		event.trigger('phaseUseBegin');
+		"step 3";
 		if (!event.logged) {
 			game.log(player, '进入了出牌阶段');
 			event.logged = true;
-			const stat = player.getStat();
-			for (let i in stat.skill) {
-				let bool = false;
-				const info = lib.skill[i];
-				if (!info) continue;
-				if (info.enable != undefined) {
-					if (typeof info.enable == 'string' && info.enable == 'phaseUse') bool = true;
-					else if (typeof info.enable == 'object' && info.enable.includes('phaseUse')) bool = true;
-				}
-				if (bool) stat.skill[i] = 0;
-			}
-			for (let i in stat.card) {
-				let bool = false;
-				const info = lib.card[i];
-				if (!info) continue;
-				if (info.updateUsable == 'phaseUse') stat.card[i] = 0;
-			}
 		}
 		var next = player.chooseToUse();
 		if (!lib.config.show_phaseuse_prompt) {
 			next.set('prompt', false);
 		}
 		next.set('type', 'phase');
-		"step 1";
+		"step 4";
 		if (result.bool && !event.skipped) {
-			event.goto(0);
+			event.goto(3);
 		}
 		game.broadcastAll(function () {
 			if (ui.tempnowuxie) {
@@ -2926,6 +2931,10 @@ export const Content = {
 				delete ui.tempnowuxie;
 			}
 		});
+		"step 5";
+		event.trigger('phaseUseEnd');
+		"step 6";
+		event.trigger('phaseUseAfter');
 	},
 	phaseDiscard: function () {
 		"step 0";
@@ -8092,8 +8101,11 @@ export const Content = {
 			_status.dying.remove(player);
 
 			if (lib.config.background_speak) {
-				if (lib.character[player.name] && lib.character[player.name][4].some(tag => /^die:.+$/.test(tag))) {
-					var tag = lib.character[player.name][4].find(tag => /^die:.+$/.test(tag));
+				const name = (player.skin.name || player.name);
+				const goon = (!lib.character[name]);
+				if (goon) lib.character[name] = ['', '', 0, [], ((lib.characterSubstitute[player.name] || []).find(i => i[0] == name) || [name, []])[1]];
+				if (lib.character[name][4].some(tag => /^die:.+$/.test(tag))) {
+					var tag = lib.character[name][4].find(tag => /^die:.+$/.test(tag));
 					var reg = new RegExp("^ext:(.+)?/");
 					var match = tag.match(/^die:(.+)$/);
 					if (match) {
@@ -8102,16 +8114,17 @@ export const Content = {
 						game.playAudio(path);
 					}
 				}
-				else if (lib.character[player.name] && lib.character[player.name][4].some(tag => tag.startsWith('die_audio'))) {
-					var tag = lib.character[player.name][4].find(tag => tag.startsWith('die_audio'));
+				else if (lib.character[name][4].some(tag => tag.startsWith('die_audio'))) {
+					var tag = lib.character[name][4].find(tag => tag.startsWith('die_audio'));
 					var list = tag.split(':').slice(1);
-					game.playAudio('die', list.length ? list[0] : player.name);
+					game.playAudio('die', list.length ? list[0] : name);
 				}
 				else {
-					game.playAudio('die', player.name, function () {
-						game.playAudio('die', player.name.slice(player.name.indexOf('_') + 1));
+					game.playAudio('die', name, function () {
+						game.playAudio('die', name.slice(name.indexOf('_') + 1));
 					});
 				}
+				if (goon) delete lib.character[name];
 			}
 		}, player);
 

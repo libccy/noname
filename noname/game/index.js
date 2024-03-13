@@ -2721,6 +2721,18 @@ export class Game extends Uninstantable {
 				}
 			}
 		},
+		changeSkin: function (player, map) {
+			if (!player || !map) return;
+			player.tempname.remove(map.from);
+			player.tempname.add(map.to);
+			player.skin[name] = map.to;
+			const goon = (!lib.character[map.to]);
+			if (goon) lib.character[map.to] = ['', '', 0, [], (map.list.find(i => i[0] == map.to) || [map.to, []])[1]];
+			player.smoothAvatar(map.avatar2);
+			player.node['avatar' + map.name.slice(4)].setBackground(map.to, 'character');
+			player.node['avatar' + map.name.slice(4)].show();
+			if (goon) delete lib.character[map.to];
+		},
 		skill: function (player, content) {
 			if (typeof content == 'string') {
 				if (lib.skill[content]) lib.skill[content].video(player);
@@ -5874,17 +5886,18 @@ export class Game extends Uninstantable {
 			return false;
 		}
 
-		const useCache = !lib.config.compatiblemode && !event.skill && !event.multitarget
-			&& ['button', 'card', 'target'].every(type => {
-				if (!event[`filter${uppercaseType(type)}`]) return true;
-				// if (typeof event[`select${uppercaseType(type)}`] === 'function') return false;
-				if (get.select(event[`select${uppercaseType(type)}`])[1] < 0) return false;
-				if (type === "button") type = "select";
-				return !event[`complex${uppercaseType(type)}`];
-			});
+		let useCache = !lib.config.compatiblemode && !event.skill && !event.multitarget;
+		const filterCache = type => {
+			if (get.select(event[`select${uppercaseType(type)}`])[1] < 0) return false;
+			const cardinfo = get.info(get.card() || {});
+			if (cardinfo && cardinfo.complexTarget) return false;
+			if (type === "button") type = "select";
+			return !event[`complex${uppercaseType(type)}`];
+		};
 
 		['button', 'card', 'target'].forEach(type => {
 			if (!event[`filter${uppercaseType(type)}`]) return;
+			if (!filterCache(type)) useCache = false;
 			if (!ok) game.uncheck(type);
 			else ({ ok, auto = auto } = game.Check[type](event, useCache));
 		});

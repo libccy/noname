@@ -2070,7 +2070,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const {links}=result;
 					if(typeof links[0]!=='string') links.reverse();
 					let [fn,card]=links;
-					const selectedPlayer=lose_list[cards.indexOf(card)][0];
+					const selectedPlayer=lose_list.find(item=>{
+						if(Array.isArray(item[1])) return item[1].includes(card);
+						return item[1]==card;
+					})[0];
 					player.logSkill('twniju',selectedPlayer);
 					selectedPlayer.addTempSkill('twniju_change');
 					if(!selectedPlayer.storage.twniju_change) selectedPlayer.storage.twniju_change=[];
@@ -11535,22 +11538,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
 						return current.getSkills(null,false,false).filter(function(i){
-							var info=get.info(i);
-							return info&&info.zhuanhuanji;
+							return get.is.zhuanhuanji(i,current);
 						}).length>0;
 					});
 				},
 				filterTarget:function(card,player,target){
 					return target.getSkills(null,false,false).filter(function(i){
-						var info=get.info(i);
-						return info&&info.zhuanhuanji;
+						return get.is.zhuanhuanji(i,target);
 					}).length>0;
 				},
 				content:function(){
 					'step 0'
 					var list=target.getSkills(null,false,false).filter(function(i){
-						var info=get.info(i);
-						return info&&info.zhuanhuanji;
+						return get.is.zhuanhuanji(i,target);
 					});
 					if(list.length==1){
 						event._result={control:list[0]};
@@ -11584,8 +11584,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						filter:function(event,player){
 							return game.hasPlayer(function(current){
 								return current.getSkills(null,false,false).filter(function(i){
-									var info=get.info(i);
-									return info&&info.zhuanhuanji;
+									return get.is.zhuanhuanji(i,current);
 								}).length>0;
 							});
 						},
