@@ -477,7 +477,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				async content(event,trigger,player){
 					const result=await player.chooseTarget(get.prompt('dczhenrao'),'对一名可选角色造成1点伤害',(card,player,target)=>{
-						return get.event('targets').includes(target);
+						return get.event('targets').includes(target)&&!player.getStorage('dczhenrao').includes(target);
 					})
 						.set('targets',trigger.targets.concat(trigger.player).filter(target=>target.countCards('h')>player.countCards('h')))
 						.set('ai',target=>{
