@@ -17,6 +17,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			liuyao:["male","qun",4,["xinfu_kannan",'twniju'],['zhu']],
 			liuyan:["male","qun",3,["xinfu_tushe","xinfu_limu"]],
 		},
+		characterSort:{
+			xinghuoliaoyuan:{
+				// xinghuoliaoyuan_tianfu:[],
+				xinghuoliaoyuan_tianliang:['duji','liuyan','yanjun'],
+				xinghuoliaoyuan_tianji:['panjun','wangcan'],
+				xinghuoliaoyuan_tiantong:['re_jsp_pangtong','sp_taishici'],
+				xinghuoliaoyuan_tianxiang:['lvdai','zhoufang','liuyao'],
+				xinghuoliaoyuan_qisha:['lvqian','re_zhangliang'],
+			},
+		},
 		characterIntro:{
 			wangcan:"王粲（177年－217年2月17日），字仲宣。山阳郡高平县（今山东微山两城镇）人。东汉末年文学家，“建安七子”之一，太尉王龚曾孙、司空王畅之孙。",
 			re_jsp_pangtong:"庞统，字士元，襄阳（治今湖北襄阳）人。三国时刘备帐下谋士，官拜军师中郎将。才智与诸葛亮齐名，人称“凤雏”。在进围雒县时，统率众攻城，不幸被流矢击中去世，时年三十六岁。追赐统为关内侯，谥曰靖侯。庞统死后，葬于落凤庞统墓坡。",
@@ -1730,6 +1740,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_limu_info":"出牌阶段，你可以将一张♦牌当做【乐不思蜀】对自己使用，然后回复1点体力。只要你的判定区内有牌，你对攻击范围内的其他角色使用牌便没有次数和距离限制。",
 			xinyingshi:'应势',
 			xinyingshi_info:'出牌阶段开始时，若场上所有角色的武将牌上均没有“酬”，则你可以将任意张牌置于一名角色的武将牌上，称为“酬”。若如此做：当有角色使用牌对有“酬”的角色造成伤害后，其可以获得一张“酬”，并获得牌堆中所有与“酬”花色点数均相同的牌；有“酬”的角色死亡时，你获得其所有“酬”。',
+			
+			xinghuoliaoyuan_tianfu:'天府',
+			xinghuoliaoyuan_tianliang:'天梁',
+			xinghuoliaoyuan_tianji:'天机',
+			xinghuoliaoyuan_tiantong:'天同',
+			xinghuoliaoyuan_tianxiang:'天相',
+			xinghuoliaoyuan_qisha:'七杀',
 		},
 	};
 });
