@@ -248,9 +248,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const {result:{bool,targets}}=await player.chooseTarget(get.prompt2('olzhiyan')).set('ai',target=>{
 						const player=get.event('player'),cards=get.event('cards');
 						if(!cards.length) return 0;
-						const card=cards[0];
-						if(get.type(card,target)=='equip'&&(get.attitude(player,target)>0||get.recoverEffect(target,player,player)>0)) return get.recoverEffect(target,player,player)+get.attitude(player,target);
-						if(get.type(card,target)!='equip'&&target.getHp()>=player.getHp()&&get.effect(target,{name:'losehp'},player,player)>0) return get.effect(target,{name:'losehp'},player,player);
+						const card=cards[0],att=get.attitude(player,target);
+						if(get.type(card,target)=='equip'&&(get.attitude(player,target)>0||get.recoverEffect(target,player,player)>0)) return get.recoverEffect(target,player,player)*20+att/114514;
+						if(get.type(card,target)!='equip'){
+							if(target.getHp()>=player.getHp()) return get.effect(target,{name:'losehp'},player,player)*20-att/114514;
+							return get.effect(target,{name:'draw'},player,player);
+						}
 						return 0;
 					}).set('cards',Array.from(ui.cardPile.childNodes||[])||[]);
 					if(bool){
@@ -1305,6 +1308,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',
+			onlyOL_yijiang3:'OL专属·将3',
 			onlyOL_sb:'OL专属·上兵伐谋',
 		},
 	};
