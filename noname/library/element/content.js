@@ -2198,7 +2198,7 @@ export const Content = {
 		game.expandSkills(invisible);
 		if (hidden.includes(event.skill)) {
 			if (!info.silent && player.hasSkillTag('nomingzhi', false, null, true)) event.finish();
-			else if (!info.direct) event.trigger('triggerHidden');
+			else if (!info.direct && typeof info.cost !== 'function') event.trigger('triggerHidden');
 			else event.skillHidden = true;
 		}
 		else if (invisible.includes(event.skill)) event.trigger('triggerInvisible');
@@ -2226,7 +2226,7 @@ export const Content = {
 			event._result = { bool: true };
 			event._direct = true;
 		}
-		else if(info.cost){
+		else if(typeof info.cost === 'function'){
 			if (checkFrequent(info)) event.frequentSkill = true;
 			if (player.isUnderControl()) game.swapPlayerAuto(player);
 			//创建cost事件
