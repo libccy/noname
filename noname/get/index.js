@@ -323,21 +323,23 @@ export class Get extends Uninstantable {
 	static infoHp(hp) {
 		if (typeof hp == 'number') return hp;
 		else if (typeof hp == 'string' && hp.includes('/')) {
-			return parseInt(hp.split('/')[0]);
+			const num = hp.split('/')[0];
+			if (num) return num == 'Infinity' ? Infinity : parseInt(num);
 		}
 		return 0;
 	}
 	static infoMaxHp(hp) {
 		if (typeof hp == 'number') return hp;
 		else if (typeof hp == 'string' && hp.includes('/')) {
-			return parseInt(hp.split('/')[1]);
+			const num = hp.split('/')[1];
+			if (num) return num == 'Infinity' ? Infinity : parseInt(num);
 		}
 		return 0;
 	}
 	static infoHujia(hp) {
 		if (typeof hp == 'string' && hp.includes('/')) {
-			var splited = hp.split('/');
-			if (splited.length > 2) return parseInt(splited[2]);
+			const num = hp.split('/')[2];
+			if (num) return num == 'Infinity' ? Infinity : parseInt(num);
 		}
 		return 0;
 	}
