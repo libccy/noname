@@ -2306,12 +2306,10 @@ export const Content = {
 			targets = [targets];
 		}
 		if (info.popup != false && !info.direct) {
-			if (info.popup) {
-				player.popup(info.popup);
-				game.log(player, '发动了', '【' + get.skillTranslation(event.skill, player) + '】');
-			}
-			if (info.logLine === false) player.logSkill(event.skill, false, info.line);
-			else player.logSkill(event.skill, targets, info.line);
+			let popup_info = event.skill;
+			if(typeof info.popup === 'string') popup_info = [event.skill, info.popup];
+			if (info.logLine === false) player.logSkill(popup_info, false, info.line);
+			else player.logSkill(popup_info, targets, info.line);
 		}
 		var next = game.createEvent(event.skill);
 		if (typeof info.usable == 'number') {

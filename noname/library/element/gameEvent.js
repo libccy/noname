@@ -333,10 +333,10 @@ export class GameEvent {
 		this.untrigger(arg1, arg2);
 		this.finish();
 		if (notrigger != 'notrigger') {
-			this.trigger(this.name + 'Cancelled');
 			if (this.player && lib.phaseName.includes(this.name)) this.player.getHistory('skipped').add(this.name);
+			return this.trigger(this.name + 'Cancelled');
 		}
-		return this;
+		return null;
 	}
 	neutralize(event) {
 		this.untrigger();
