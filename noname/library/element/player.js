@@ -4188,7 +4188,8 @@ export class Player extends HTMLDivElement {
 				next.filterCard = get.filter(arguments[i]);
 			}
 			else if (typeof arguments[i] == 'string') {
-				get.evtprompt(next, arguments[i]);
+				if (arguments[i]=='chooseonly') next.chooseonly=true;
+				else get.evtprompt(next, arguments[i]);
 			}
 			if (arguments[i] === null) {
 				for (var i = 0; i < arguments.length; i++) {

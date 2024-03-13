@@ -2176,10 +2176,10 @@ export const Content = {
 					event.doing.doneList.push(event.current);
 					event.doing.todoList.remove(event.current);
 					const result = await game.createTrigger(event.triggername, event.current.skill, event.current.player, trigger, event.current.indexedData).forResult();
-					if (result === 'cancelled'){
+					if (get.itemtype(event.doing.player) === 'player' && result === 'cancelled'){
 						for (let i = 0; i < event.doing.todoList.length; i++) {
 							if (event.current.skill === event.doing.todoList[i].skill) {
-								event.doing.todoList.splice(i--, 1);
+								event.doing.doneList.push(event.doing.todoList.splice(i--, 1)[0]);
 							}
 						}
 					}
@@ -2209,7 +2209,10 @@ export const Content = {
 		"step 1";
 		if (event.cancelled) return event.finish();
 		var info = get.info(event.skill);
-		if (event.revealed || info.forced) return;
+		if (event.revealed || info.forced) {
+			event._result = { bool: true };
+			return;
+		}
 		const checkFrequent = function (info) {
 			if (player.hasSkillTag('nofrequent', false, event.skill)) return false;
 			if (typeof info.frequent == 'boolean') return info.frequent;
@@ -3760,7 +3763,7 @@ export const Content = {
 				player.logSkill.apply(player, event.logSkill);
 			}
 		}
-		if (!game.online) {
+		if (!game.online && !event.chooseonly) {
 			if (typeof event.delay == 'boolean') {
 				event.done = player.discard(event.result.cards).set('delay', event.delay);
 			}

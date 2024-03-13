@@ -1479,30 +1479,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			minagi_huanliu:{
 				trigger:{player:'phaseZhunbeiBegin'},
-				direct:true,
+				async cost(event,trigger,player){
+					event.result = await player.chooseTarget(lib.filter.notMe,get.prompt('minagi_huanliu'),'和一名其他角色进行“协力”，并获得“远野小满”的所有对应技能').set('ai',function(target){
+						return get.threaten(target)*Math.sqrt(1+target.countCards('h'))*((target.isTurnedOver()||target.hasJudge('lebu'))?0.1:1);
+					}).forResult();
+				},
 				content(){
 					'step 0'
-					player.chooseTarget(lib.filter.notMe,get.prompt('minagi_huanliu'),'和一名其他角色进行“协力”，并获得“远野小满”的所有对应技能').set('ai',function(target){
-						return get.threaten(target)*Math.sqrt(1+target.countCards('h'))*((target.isTurnedOver()||target.hasJudge('lebu'))?0.1:1);
+					var target=result.targets[0];
+					player.logSkill('minagi_huanliu',target);
+					player.chooseCooperationFor(target,'minagi_huanliu').set('ai',function(button){
+						var base=0;
+						switch(button.link){
+							case 'cooperation_damage':base=0.1;break;
+							case 'cooperation_draw':base=0.6;break;
+							case 'cooperation_discard':base=0.1;break;
+							case 'cooperation_use':base=0.3;break;
+						}
+						return base+Math.random();
 					});
+					player.addAdditionalSkill('cooperation',['minagi_huanliu_effect','michiru_sheyuan']);
 					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
-						player.logSkill('minagi_huanliu',target);
-						player.chooseCooperationFor(target,'minagi_huanliu').set('ai',function(button){
-							var base=0;
-							switch(button.link){
-								case 'cooperation_damage':base=0.1;break;
-								case 'cooperation_draw':base=0.6;break;
-								case 'cooperation_discard':base=0.1;break;
-								case 'cooperation_use':base=0.3;break;
-							}
-							return base+Math.random();
-						});
-						player.addAdditionalSkill('cooperation',['minagi_huanliu_effect','michiru_sheyuan']);
-					}
-					else event.finish();
-					'step 2'
 					game.delayx();
 				},
 				subSkill:{
@@ -1671,6 +1668,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					combo:{
 						trigger:{global:'useCardAfter'},
 						direct:true,
+						//chooseToUse类技能暂时没办法改
 						filter(event,player){
 							return event.card.name=='shan'&&player.inRangeOf(event.player)&&player.canUse('sha',event.player,false);
 						},
@@ -1686,13 +1684,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tomoyo_zhengfeng:{
 				dutySkill:true,
 				trigger:{player:'phaseZhunbeiBegin'},
-				direct:true,
 				filter(event,player){
 					return game.hasPlayer((current)=>player.inRange(current));
 				},
-				content(){
-					'step 0'
-					player.chooseTarget(get.prompt('tomoyo_zhengfeng'),'令一名攻击范围内的角色进行判定。其于你的下回合开始前使用与判定结果颜色相同的牌时，你摸一张牌。',function(card,player,target){
+				async cost(event, trigger, player){
+					event.result = await player.chooseTarget(get.prompt('tomoyo_zhengfeng'),'令一名攻击范围内的角色进行判定。其于你的下回合开始前使用与判定结果颜色相同的牌时，你摸一张牌。',function(card,player,target){
 						return player.inRange(target);
 					}).set('ai',function(target){
 						var player=_status.event.player;
@@ -1700,15 +1696,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var hs=target.countCards('h'),thr=get.threaten(target);
 						if(target.hasJudge('lebu')) return 0;
 						return Math.sqrt(1+hs)*Math.sqrt(Math.max(1,1+thr));
-					});
+					}).forResult()
+				},
+				content(){
+					'step 0'
+					var target = targets[0];
+					event.target = target;
+					target.judge();
 					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
-						event.target=target;
-						player.logSkill('tomoyo_zhengfeng',target);
-						target.judge();
-					}
-					'step 2'
 					player.addTempSkill('tomoyo_zhengfeng_tomoyo',{player:'phaseBeginStart'});
 					player.markAuto('tomoyo_zhengfeng_tomoyo',[{
 						target:target,
@@ -1852,22 +1847,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return evt.getParent('phaseUse')==event;
 					});
 				},
-				direct:true,
-				content(){
-					'step 0'
-					var history=player.getHistory('useCard',function(evt){
+				async cost(event, trigger, player){
+					const history=player.getHistory('useCard',function(evt){
 						var type=get.type(evt.card);
 						if(type!='basic'&&type!='trick') return false;
 						return evt.getParent('phaseUse')==trigger;
 					});
-					var list=[];
-					event.list=list;
+					const list=[];
 					for(var i=0;i<Math.min(history.length,3);i++){
 						var card=history[i].card;
 						list.push({name:card.name,isCard:true});
 						if(card.nature) list[i].nature=card.nature;
 					}
-					player.chooseTarget(
+					const {result} = await player.chooseTarget(
 						get.prompt('kiyu_rexianyu'),
 						'将以下使用结果告知于一名其他角色：'+get.translation(list),
 						function(card,player,target){
@@ -1876,19 +1868,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					).set('ai',function(target){
 						return get.attitude(_status.event.player,target)*get.threaten(target)*Math.sqrt(1+target.countCards('h'))*((target.isTurnedOver()||target.hasJudge('lebu'))?0.1:1);
 					});
-					'step 1'
 					if(result.bool){
-						player.addTempSkill('kiyu_rexianyu_round','roundStart');
-						var tabito=result.targets[0];
-						player.logSkill('kiyu_rexianyu',tabito);
-						game.delayx();
-						tabito.storage.kiyu_rexianyu_lastrun=event.list;
-						tabito.storage.amamiya_kiyu=player;
-						tabito.addTempSkill('kiyu_rexianyu_lastrun',{
-							player:['phaseUseAfter'],
-							global:['roundStart'],
-						});
+						event.result = {
+							bool: result.bool,
+							targets: result.targets,
+							cost_data: {list},
+						}
 					}
+				},
+				async content(event, trigger, player){
+					player.addTempSkill('kiyu_rexianyu_round','roundStart');
+					const tabito = targets[0];
+					tabito.storage.kiyu_rexianyu_lastrun = event.cost_data.list;
+					tabito.storage.amamiya_kiyu = player;
+					tabito.addTempSkill('kiyu_rexianyu_lastrun',{
+						player:['phaseUseAfter'],
+						global:['roundStart'],
+					});
+					game.asyncDelayx();
 				},
 				subSkill:{
 					round:{charlotte:true},
@@ -2364,18 +2361,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			nshanlang:{
 				trigger:{player:'phaseZhunbeiBegin'},
-				direct:true,
 				filter(event,player){
 					return player.countCards('h')>0&&game.hasPlayer(
 						(current)=>player!=current&&player.canCompare(current)
 					);
 				},
-				content(){
-					'step 0'
-					var goon=player.hasCard(function(card){
+				async cost(event, trigger, player){
+					const goon=player.hasCard(function(card){
 						return get.value(card)<=7;
 					},'h');
-					player.chooseTarget([1,3],get.prompt('nshanlang'),'和至多三名角色进行拼点',function(card,player,target){
+					event.result = await player.chooseTarget([1,3],get.prompt('nshanlang'),'和至多三名角色进行拼点',function(card,player,target){
 						return target!=player&&player.canCompare(target);
 					}).set('ai',function(target){
 						if(!_status.event.goon) return false;
@@ -2383,21 +2378,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(att>=0) return 0;
 						if(target.hasSkillTag('noh')) att/=3;
 						return -att/Math.sqrt(target.countCards('h'));
-					}).set('goon',goon);
+					}).set('goon',goon).forResult();
+				},
+				content(){
+					'step 0'
+					event.max_num=0;
+					targets.sortBySeat();
+					player.chooseToCompare(targets).callback=lib.skill.nshanlang.callback;
 					'step 1'
-					if(result.bool){
-						event.max_num=0;
-						var targets=result.targets.sortBySeat();
-						player.logSkill('nshanlang',targets);
-						player.chooseToCompare(targets).callback=lib.skill.nshanlang.callback;
-					}
-					else event.finish();
-					'step 2'
 					if(event.target){
 						player.chooseBool('是否令'+get.translation(target)+'获得一张牌？').set('goon',get.attitude(player,target)>0).set('ai',()=>_status.event.goon);
 					}
 					else event.finish();
-					'step 3'
+					'step 2'
 					if(result.bool){
 						var card=get.cardPile2(function(card){
 							return !lib.skill.nsxingyun.getSixiang(card);
@@ -2446,7 +2439,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					effect:{
 						trigger:{player:'phaseDiscardEnd'},
 						charlotte:true,
-						direct:true,
+						popup:false,
 						filter(event,player){
 							return player.hasHistory('lose',function(evt){
 								if(evt.type!='discard'||evt.getParent('phaseDiscard')!=event) return false;
@@ -2675,19 +2668,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			nsshizui:{
 				trigger:{target:'useCardToTargeted'},
 				usable:1,
-				direct:true,
 				filter(event,player){
 					var type=get.type(event.card,null,false);
 					return (type=='basic'||type=='trick')&&player.countCards('he')>0&&player.hasUseTarget({name:'jiu'},null,true);
 				},
-				content(){
-					'step 0'
+				async cost(event,trigger,player){
 					var suit=get.suit(trigger.card),cards=trigger.cards.filterInD();
 					var str='弃置一张牌并视为使用一张【酒】';
 					if(lib.suit.includes(suit)) str+=('；若弃置'+get.translation(suit)+'牌，则'+get.translation(trigger.card)+'对你无效');
 					if(cards.length) str+=('；若弃置♣牌则获得'+get.translation(cards));
 					str+='。';
-					var next=player.chooseToDiscard('he',get.prompt('nsshizui'),str);
+					var next=player.chooseToDiscard('he', get.prompt('nsshizui'), str, 'chooseonly');
 					next.set('val1',cards.length?get.value(cards,player):0);
 					next.set('val2',-get.effect(player,trigger.card,trigger.player,player));
 					next.set('suit',suit);
@@ -2696,17 +2687,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(suit=='club') base+=_status.event.val1;
 						if(suit==_status.event.suit) base+=_status.event.val2;
 						return base-get.value(card);
-					}).logSkill='nsshizui';
+					});
+					event.result = await next.forResult();
+				},
+				content(){
+					'step 0'
+					event.suit1=get.suit(cards[0],player);
+					player.discard(cards);
+					player.chooseUseTarget('jiu',true);
 					'step 1'
-					if(result.bool){
-						event.suit1=get.suit(result.cards[0],player);
-						player.chooseUseTarget('jiu',true);
-					}
-					else{
-						player.storage.counttrigger.nsshizui--;
-						event.finish();
-					}
-					'step 2'
 					var suit1=event.suit1,suit2=get.suit(trigger.card,false);
 					if(suit1==suit2&&lib.suit.includes(suit1)) trigger.excluded.add(player);
 					if(suit1=='club'){

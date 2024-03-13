@@ -791,7 +791,7 @@ export class GameEvent {
 
 					const info = lib.skill[skill];
 					const list = info.firstDo ? firstDo.todoList : info.lastDo ? lastDo.todoList : this.todoList;
-					if(info.getIndex){
+					if (typeof info.getIndex === 'function') {
 						const indexedResult = info.getIndex(event, player, name);
 						if(Array.isArray(indexedResult)){
 							indexedResult.forEach(indexedData => {
