@@ -2330,19 +2330,32 @@ export class Player extends HTMLDivElement {
 	 *
 	 * 如果lib.character[character]不存在，且想引用其他路径的图片素材或阵亡素材，请以[character,[]]的形式写入lib.character.characterSubstitute[name]中，第二个数组填入形式同lib.character[4]的书写形式
 	 *
-	 * @param { string | string }
+	 * @param { string | object | function } map
+	 * @param { string } character
 	 */
-	changeSkin(skill, character) {
-		if (!skill || !character) {
-			console.log('error: no sourceSkill or character to changeSkin', get.translation(this));
+	changeSkin(map, character) {
+		if (!map || !character) {
+			console.warn('error: no sourceMap or character to changeSkin', get.translation(this));
 			return;
+		}
+		if (typeof map == 'string') {
+			map = { skill: map };
 		}
 		for (const i of ['name', 'name1', 'name2']) {
 			if (i == 'name1' && this.name === this.name1) continue;
 			const list = lib.characterSubstitute[this[i]];
 			if (this[i] && list) {
-				if ((get.character(this[i], 3) || []).includes(skill)) {
-					const name = (i == 'name2' ? 'name2' : 'name');
+				const name = (i == 'name2' ? 'name2' : 'name');
+				if ((() => {
+					if (typeof map == 'function') {
+						return map(this, name);
+					}
+					if (typeof map.skill == 'string' && (get.character(this[i], 3) || []).includes(map.skill)) return true;
+					if (typeof map.characterName == 'string' && this[i] == map.characterName) return true;
+					if (typeof map.characterSkinName == 'string' && this.skin[name] == map.characterSkinName) return true;
+					if (typeof map.source == 'string' && name == map.source) return true;
+					return false;
+				})()) {
 					if (this.skin[name] != character) {
 						const origin = this.skin[name];
 						game.broadcastAll((player, name, character, list, origin) => {
