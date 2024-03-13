@@ -2134,7 +2134,9 @@ export const Content = {
 			event.doing = doingList.shift();
 			while(true){
 				if (trigger.filterStop && trigger.filterStop()) return;
-				const usableSkills = event.doing.todoList.filter(info => lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill));
+				const usableSkills = event.doing.todoList.filter(info => {
+					return lib.filter.filterTrigger(trigger, info.player, event.triggername, info.skill, info.indexedData);
+				});
 				if (usableSkills.length == 0){
 					break;
 				}
@@ -2155,25 +2157,32 @@ export const Content = {
 							event.current = silentSkill;
 						}
 						else {
-							const currentChoice = event.choice[0];
-							if (event.choice.length == 1) {
+							const currentChoice = event.choice[0], skillsToChoose = event.choice.map(i => i.skill).unique();
+							if (event.choice.length === 1 || skillsToChoose.length === 1) {
 								event.current = currentChoice;
 							}
 							else{
-								const currentPlayer = currentChoice.player , skillsToChoose = event.choice.map(i => i.skill);
+								const currentPlayer = currentChoice.player;
 								const next = currentPlayer.chooseControl(skillsToChoose);
 								next.set('prompt', '选择下一个触发的技能');
 								next.set('forceDie', true);
 								next.set('arrangeSkill', true);
 								next.set('includeOut', true);
 								const {result} = await next;
-								event.current = event.doing.todoList.find(info => info.skill == result.control);
+								event.current = usableSkills.find(info => info.skill == result.control);
 							}
 						}
 					}
 					event.doing.doneList.push(event.current);
 					event.doing.todoList.remove(event.current);
-					await game.createTrigger(event.triggername, event.current.skill, event.current.player, trigger);
+					const result = await game.createTrigger(event.triggername, event.current.skill, event.current.player, trigger, event.current.indexedData).forResult();
+					if (result === 'cancelled'){
+						for (let i = 0; i < event.doing.todoList.length; i++) {
+							if (event.current.skill === event.doing.todoList[i].skill) {
+								event.doing.todoList.splice(i--, 1);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -2214,6 +2223,24 @@ export const Content = {
 			event._result = { bool: true };
 			event._direct = true;
 		}
+		else if(info.cost){
+			if (checkFrequent(info)) event.frequentSkill = true;
+			if (player.isUnderControl()) game.swapPlayerAuto(player);
+			//创建cost事件
+			var next = game.createEvent(`${event.skill}_cost`);
+			next.player = player;
+			if (event.frequentSkill) next.set('frequentSkill', event.skill);
+			next.set('forceDie', true);
+			next.set('includeOut', true);
+			next._trigger = trigger;
+			next.triggername = event.triggername;
+			next.skillHidden = event.skillHidden;
+			next.indexedData = event.indexedData;
+			if (info.forceDie) next.forceDie = true;
+			if (info.forceOut) next.includeOut = true;
+			next.skill = event.skill;
+			next.setContent(info.cost);
+		}
 		else {
 			if (checkFrequent(info)) event.frequentSkill = true;
 			var str;
@@ -2221,19 +2248,19 @@ export const Content = {
 			if (info.prompt) str = info.prompt;
 			else if (typeof info.logTarget == 'string') str = get.prompt(event.skill, trigger[info.logTarget], player);
 			else if (typeof info.logTarget == 'function') {
-				const logTarget = info.logTarget(trigger, player);
+				const logTarget = info.logTarget(trigger, player, event.triggername, event.indexedData);
 				if (get.itemtype(logTarget).startsWith('player')) str = get.prompt(event.skill, logTarget, player);
 			}
 			else str = get.prompt(event.skill, null, player);
-			if (typeof str == 'function') str = str(trigger, player);
+			if (typeof str == 'function') str = str(trigger, player, event.triggername, event.indexedData);
 
 			var next = player.chooseBool(str);
 			if (event.frequentSkill) next.set('frequentSkill', event.skill);
 			next.set('forceDie', true);
 			next.set('includeOut', true);
-			next.ai = () => !check || check(trigger, player);
+			next.ai = () => !check || check(trigger, player, event.triggername, event.indexedData);
 
-			if (typeof info.prompt2 == 'function') next.set('prompt2', info.prompt2(trigger, player));
+			if (typeof info.prompt2 == 'function') next.set('prompt2', info.prompt2(trigger, player, event.triggername, event.indexedData));
 			else if (typeof info.prompt2 == 'string') next.set('prompt2', info.prompt2);
 			else if (info.prompt2 != false) {
 				if (lib.dynamicTranslate[event.skill]) next.set('prompt2', lib.dynamicTranslate[event.skill](player, event.skill));
@@ -2257,18 +2284,31 @@ export const Content = {
 		}
 		"step 3";
 		var info = get.info(event.skill);
-		if (result && result.bool == false) {
+		if (!result || !result.bool) {
 			if (info.oncancel) info.oncancel(trigger, player);
+			if (event.indexedData === true) {
+				event.result = 'cancelled';
+			}
 			return event.finish();
+		}
+		let targets = null;
+		if (result.targets && result.targets.length > 0) {
+			targets = result.targets.slice(0);
+		}
+		else if (info.logTarget) {
+			if (typeof info.logTarget === 'string') targets = trigger[info.logTarget];
+			else if (typeof info.logTarget === 'function') targets = info.logTarget(trigger, player, event.triggername, event.indexedData);
+		}
+		if (get.itemtype(targets) === 'player'){
+			targets = [targets];
 		}
 		if (info.popup != false && !info.direct) {
 			if (info.popup) {
 				player.popup(info.popup);
 				game.log(player, '发动了', '【' + get.skillTranslation(event.skill, player) + '】');
 			}
-			else if (!info.logTarget || info.logLine === false) player.logSkill(event.skill, false, info.line);
-			else if (typeof info.logTarget == 'string') player.logSkill(event.skill, trigger[info.logTarget], info.line);
-			else if (typeof info.logTarget == 'function') player.logSkill(event.skill, info.logTarget(trigger, player), info.line);
+			if (info.logLine === false) player.logSkill(event.skill, false, info.line);
+			else player.logSkill(event.skill, targets, info.line);
 		}
 		var next = game.createEvent(event.skill);
 		if (typeof info.usable == 'number') {
@@ -2280,7 +2320,6 @@ export const Content = {
 		next.player = player;
 		next._trigger = trigger;
 		next.triggername = event.triggername;
-
 		// if ("contents" in info && Array.isArray(info.contents)) {
 		// 	next.setContents(info.contents);
 		// } else {
@@ -2290,6 +2329,10 @@ export const Content = {
 		next.skillHidden = event.skillHidden;
 		if (info.forceDie) next.forceDie = true;
 		if (info.forceOut) next.includeOut = true;
+		//语法糖部分
+		if ('cost_data' in result) next.cost_data = result.cost_data;
+		if (get.itemtype(targets) == 'players') next.targets = targets.slice(0);
+		if (get.itemtype(result.cards) === 'cards') next.cards = result.cards.slice(0);
 		"step 4";
 		if (!player._hookTrigger) return;
 		if (player._hookTrigger.some(i => {

@@ -4302,7 +4302,7 @@ export class Game extends Uninstantable {
 	 * @param { GameEventPromise } event 
 	 * @returns { GameEventPromise }
 	 */
-	static createTrigger(name, skill, player, event) {
+	static createTrigger(name, skill, player, event, indexedData) {
 		let info = get.info(skill);
 		if (!info) return false;
 		if ((player.isOut() || player.removed) && !info.forceOut) return;
@@ -4314,6 +4314,7 @@ export class Game extends Uninstantable {
 		next.forceDie = true;
 		next.includeOut = true;
 		next._trigger = event;
+		next.indexedData = indexedData;
 		next.setContent('createTrigger');
 		return next;
 	}

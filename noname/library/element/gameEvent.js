@@ -791,11 +791,36 @@ export class GameEvent {
 
 					const info = lib.skill[skill];
 					const list = info.firstDo ? firstDo.todoList : info.lastDo ? lastDo.todoList : this.todoList;
-					list.push({
-						skill: skill,
-						player: this.player,
-						priority: get.priority(skill),
-					});
+					if(info.getIndex){
+						const indexedResult = info.getIndex(event, player, name);
+						if(Array.isArray(indexedResult)){
+							indexedResult.forEach(indexedData => {
+								list.push({
+									skill: skill,
+									player: this.player,
+									priority: get.priority(skill),
+									indexedData,
+								})
+							});
+						}
+						else if (typeof indexedResult === 'number' && indexedResult>0){
+							for(let i = 0; i < indexedResult; i++){
+								list.push({
+									skill: skill,
+									player: this.player,
+									priority: get.priority(skill),
+									indexedData: true,
+								})
+							}
+						}
+					}
+					else{
+						list.push({
+							skill: skill,
+							player: this.player,
+							priority: get.priority(skill),
+						});
+					}
 					if (typeof list.player == 'string') list.sort((a, b) => (b.priority - a.priority) || (playerMap.indexOf(a) - playerMap.indexOf(b)));
 					else list.sort((a, b) => b.priority - a.priority);
 					allbool = true;
