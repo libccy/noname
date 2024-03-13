@@ -2890,35 +2890,40 @@ export const Content = {
 	},
 	phaseUse: function () {
 		"step 0";
+		const stat = player.getStat();
+		for (let i in stat.skill) {
+			let bool = false;
+			const info = lib.skill[i];
+			if (!info) continue;
+			if (info.enable != undefined) {
+				if (typeof info.enable == 'string' && info.enable == 'phaseUse') bool = true;
+				else if (typeof info.enable == 'object' && info.enable.includes('phaseUse')) bool = true;
+			}
+			if (bool) stat.skill[i] = 0;
+		}
+		for (let i in stat.card) {
+			let bool = false;
+			const info = lib.card[i];
+			if (!info) continue;
+			if (info.updateUsable == 'phaseUse') stat.card[i] = 0;
+		}
+		"step 1";
+		event.trigger('phaseUseBefore');
+		"step 2";
+		event.trigger('phaseUseBegin');
+		"step 3";
 		if (!event.logged) {
 			game.log(player, '进入了出牌阶段');
 			event.logged = true;
-			const stat = player.getStat();
-			for (let i in stat.skill) {
-				let bool = false;
-				const info = lib.skill[i];
-				if (!info) continue;
-				if (info.enable != undefined) {
-					if (typeof info.enable == 'string' && info.enable == 'phaseUse') bool = true;
-					else if (typeof info.enable == 'object' && info.enable.includes('phaseUse')) bool = true;
-				}
-				if (bool) stat.skill[i] = 0;
-			}
-			for (let i in stat.card) {
-				let bool = false;
-				const info = lib.card[i];
-				if (!info) continue;
-				if (info.updateUsable == 'phaseUse') stat.card[i] = 0;
-			}
 		}
 		var next = player.chooseToUse();
 		if (!lib.config.show_phaseuse_prompt) {
 			next.set('prompt', false);
 		}
 		next.set('type', 'phase');
-		"step 1";
+		"step 4";
 		if (result.bool && !event.skipped) {
-			event.goto(0);
+			event.goto(3);
 		}
 		game.broadcastAll(function () {
 			if (ui.tempnowuxie) {
@@ -2926,6 +2931,10 @@ export const Content = {
 				delete ui.tempnowuxie;
 			}
 		});
+		"step 5";
+		event.trigger('phaseUseEnd');
+		"step 6";
+		event.trigger('phaseUseAfter');
 	},
 	phaseDiscard: function () {
 		"step 0";

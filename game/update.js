@@ -43,6 +43,8 @@ window.noname_update={
 		'game/pinyinjs.js',
 		'game/vue.esm-browser.js',
 
+		'layout/default/layout.css',
+
 		'mode/boss.js',
 		'mode/versus.js',
 

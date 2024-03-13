@@ -2365,6 +2365,31 @@ export class Player extends HTMLDivElement {
 			}
 		}
 	}
+	changeSkinByName(character, index){
+		const name = (index == 2 ? 'name2' : 'name');
+		const list = lib.characterSubstitute[this[name]];
+		if (list && lib.characterSubstitute[this[name]]) {
+			const origin = this.skin[name];
+			game.broadcastAll((player, name, character, list, origin) => {
+				player.tempname.remove(origin);
+				player.tempname.add(character);
+				player.skin[name] = character;
+				const goon = (!lib.character[character]);
+				if (goon) lib.character[character] = ['', '', 0, [], (list.find(i => i[0] == character) || [character, []])[1]];
+				player.smoothAvatar(name == 'name2');
+				player.node['avatar' + name.slice(4)].setBackground(character, 'character');
+				player.node['avatar' + name.slice(4)].show();
+				if (goon) delete lib.character[character];
+			}, this, name, character, list, origin);
+			game.addVideo('changeSkin', this, {
+				from: origin,
+				to: character,
+				name: name,
+				list: list,
+				avatar2: name == 'name2',
+			});
+		}
+	}
 	initOL(name, character) {
 		this.node.avatar.setBackground(character, 'character');
 		this.node.avatar.show();
@@ -3949,7 +3974,7 @@ export class Player extends HTMLDivElement {
 		return next;
 	}
 	phaseUse() {
-		var next = game.createEvent('phaseUse');
+		var next = game.createEvent('phaseUse', false);
 		next.player = this;
 		next.setContent('phaseUse');
 		return next;
