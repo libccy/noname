@@ -3069,7 +3069,7 @@ export class Player extends HTMLDivElement {
 			const hidden = (this.classList.contains('unseen_show') || this.classList.contains('unseen2_show'));
 			const maxHp = (hidden ? 1 : this.maxHp);
 			if (maxHp == Infinity) {
-				hp.innerHTML = '∞';
+				hp.innerHTML = (this.hp == Infinity ? '∞' : (this.hp + '<br>/<br>' + '∞' + '<div></div>'));
 			}
 			else if (game.layout == 'default' && maxHp > 14) {
 				hp.innerHTML = this.hp + '/' + maxHp;
