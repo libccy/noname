@@ -6589,7 +6589,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				locked:false,
 				filter:function(event,player){
-					return player.hasSkill('splveying',null,false,false)&&(get.type(event.card)=='trick'&&!get.tag(event.card,'damage'))&&player.countMark('splveying')>1;
+					return player.hasSkill('splveying',null,null,false)&&(get.type(event.card)=='trick'&&!get.tag(event.card,'damage'))&&player.countMark('splveying')>1;
 				},
 				content:function(){
 					player.removeMark('splveying',2);
