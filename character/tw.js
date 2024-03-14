@@ -689,13 +689,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const target=targets[0];
 							player.logSkill('twxinshou',target);
 							player.addSkill('twdengjian_ban');
-							target.addAdditionalSkill('twxinshou_'+player.playerid,'twdengjian');
+							target.addAdditionalSkills('twxinshou_'+player.playerid,'twdengjian');
 							player.popup('登剑');
 							target.popup('登剑');
 							game.log(player,'将','#g【登剑】','传授给了',target);
 							game.log(player,'的','#g【登剑】','被失效了');
 							player.when('phaseBegin').then(()=>{
-								target.removeAdditionalSkill('twxinshou_'+player.playerid);
+								target.removeAdditionalSkills('twxinshou_'+player.playerid);
+							}).then(()=>{
 								const history=game.getAllGlobalHistory('everything');
 								for(let i=history.length-1;i>=0;i--){
 									const evt=history[i];
@@ -708,6 +709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(evt==evtx) break;
 								}
 								player.popup('杯具');
+								player.chat('剑法废掉了...');
 							}).vars({target:target,evtx:event});
 						}
 					}
@@ -733,7 +735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('twxinshou');
 						if(control=='摸牌'){
 							player.addTempSkill('twxinshou_0');
-							player.draw();
+							await player.draw();
 						}
 						if(control=='给牌'){
 							player.addTempSkill('twxinshou_1');
@@ -750,7 +752,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(bool){
 								const target=targets[0];
 								player.line(target);
-								player.chooseToGive(target,'he',true);
+								await player.chooseToGive(target,'he',true);
 							}
 						}
 					}
@@ -780,7 +782,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					target.disableEquip(disables);
-					if(num) target.draw(num);
+					if(num) await target.draw(num);
 					target.addSkill('twjieqiu_buff');
 					target.markAuto('twjieqiu_buff',[player]);
 					target.when('enableEquipEnd')
@@ -823,7 +825,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								[transList,'tdnodes'],
 							],num,true).set('map',map)
 							.set('ai',button=>['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2);
-							if(bool) player.enableEquip(links.slice().map(i=>map[i]));
+							if(bool) await player.enableEquip(links.slice().map(i=>map[i]));
 						},
 						group:['twjieqiu_end'],
 					},
@@ -877,7 +879,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						[transList,'tdnodes'],
 					],true).set('map',map)
 					.set('ai',button=>1/(['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2));
-					if(bool) target.enableEquip(links.slice().map(i=>map[i]));
+					if(bool) await target.enableEquip(links.slice().map(i=>map[i]));
 				},
 				ai:{
 					order:9,
