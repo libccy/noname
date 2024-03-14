@@ -12797,6 +12797,11 @@ return event.junling=='junling5'?1:0;});
 				inherit:'xiaoji',
 				audio:'xiaoji',
 				preHidden:true,
+				getIndex(event, player){
+					const evt=event.getl(player);
+					if (evt && evt.player === player && evt.es) return 1;
+					return false;
+				},
 				content:function(){
 					player.draw(player==_status.currentPhase?1:3);
 				}

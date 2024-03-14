@@ -1760,23 +1760,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
 				},
 				frequent:true,
-				filter(event,player){
+				getIndex(event, player){
 					const evt=event.getl(player);
-					return evt&&evt.player==player&&evt.es&&evt.es.length>0;
+					if (evt && evt.player === player && evt.es) return evt.es.length;
+					return false;
 				},
 				async content(event,trigger,player){
-					event.count=trigger.getl(player).es.length;
-					while(event.count-->0){
-						player.draw(2);
-						if(!event.count||!player.hasSkill(event.name)) break;
-						if(!get.is.blocked(event.name,player)){
-							const chooseBoolEvent=player.chooseBool(get.prompt2('xiaoji')).set('frequentSkill','xiaoji');
-							chooseBoolEvent.ai=lib.filter.all;
-							const {result:{bool}}=await chooseBoolEvent;
-							if(bool) player.logSkill('xiaoji');
-							else break;
-						}
-					}
+					player.draw(2);
 				},
 				ai:{
 					noe:true,
