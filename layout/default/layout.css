@@ -2688,6 +2688,12 @@ div:not(.handcards)>.card>.info>span,
 	background: rgba(63, 119, 173,1);
 	border: 1px solid rgba(63, 119, 173, 1);
 }
+.hp[data-condition="hidden"]>div:not(.lost):not(.shield) {
+	background-image:url('../../theme/style/hp/image/hidden_hp.png') !important;
+	width: 12px;
+	height: 12px;
+	background-size: 100% 100%;
+}
 .hp[data-condition="high"]>div:not(.lost):not(.shield) {
 	background: rgba(57, 123, 4,1);
 	border: 1px solid rgba(39, 79, 7, 1);
