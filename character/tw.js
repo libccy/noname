@@ -663,14 +663,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.hasSkill('twxinshou_1')) return goon&&game.hasPlayer(target=>target!=player);
 					return !player.hasSkill('twdengjian_ban')&&game.hasPlayer(target=>{
 						if(target==player) return false;
-						return !target.hasSkill('twdengjian',null,false,false);
-					})&&player.hasSkill('twdengjian',null,false,false);
+						return !target.hasSkill('twdengjian',null,null,false);
+					})&&player.hasSkill('twdengjian',null,null,false);
 				},
 				direct:true,
 				async content(event,trigger,player){
 					if(player.hasSkill('twxinshou_0')&&player.hasSkill('twxinshou_1')){
 						const {result:{bool,targets}}=await player.chooseTarget((card,player,target)=>{
-							return target!=player&&!target.hasSkill('twdengjian',null,false,false);
+							return target!=player&&!target.hasSkill('twdengjian',null,null,false);
 						}).set('ai',target=>{
 							const player=get.event('player');
 							if(get.attitude(player,target)>0){

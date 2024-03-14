@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				sp_others:["hanba","caiyang"],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','liupan','ol_lukai'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','liupan','ol_lukai','ol_liupi'],
 			},
 		},
 		characterFilter:{
@@ -30,6 +30,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			ol_liupi:['male','qun',4,['olyicheng']],
 			ol_lukai:['male','wu',3,['olxuanzhu','oljiane']],
 			liupan:['male','qun',4,['olpijing']],
 			guotu:['male','qun',3,['olqushi','olweijie']],
@@ -711,6 +712,85 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//刘辟
+			olyicheng:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				async content(event,trigger,player){
+					let cards=get.cards(3);
+					await game.cardsGotoOrdering(cards);
+					await player.showCards(cards,get.translation(player)+'发动了【易城】');
+					if(player.countCards('h')){
+						const sum=cards.reduce((num,card)=>num+get.number(card),0);
+						const {result:{bool,moved}}=await player.chooseToMove('易城：请选择你要交换的牌').set('list',[
+							['牌堆顶',cards,list=>{
+								const sum2=list.reduce((num,card)=>num+get.number(card,false),0);
+								return '牌堆顶（现'+sum2+{'0':'=','-1':'<','1':'>'}[get.sgn(sum2-sum).toString()]+'原'+sum+'）';
+							}],
+							['手牌',player.getCards('h')],
+						]).set('filterOk',moved=>moved[1].some(i=>!get.owner(i))).set('processAI',list=>{
+							const player=get.event('player'),limit=Math.min(3,player.countCards('h'));
+							let cards=list[0][1].slice(),hs=player.getCards('h');
+							if(cards.reduce((num,card)=>num+get.value(card),0)>player.getCards('h').reduce((num,card)=>num+get.value(card),0)){
+								cards.sort((a,b)=>get.number(a)-get.number(b));
+								hs.sort((a,b)=>get.number(b)-get.number(a));
+								let cards2=cards.slice(0,limit),hs2=hs.slice(0,limit);
+								if(hs2.reduce((num,card)=>num+get.number(card),0)>cards2.reduce((num,card)=>num+get.number(card),0)){
+									cards.removeArray(cards2);hs.removeArray(hs2);
+									return [cards.concat(hs2),hs.concat(cards2)];
+								}
+								return [cards,hs];
+							}
+							else{
+								cards.sort((a,b)=>get.value(b)-get.value(a));
+								hs.sort((a,b)=>get.value(a)-get.value(b));
+								let cards2=cards.slice(0,limit),hs2=hs.slice(0,limit),list=[cards,hs];
+								for(let i=0;i<limit;i++){
+									if(get.value(cards2[i])>get.value(hs2[i])){
+										const change=[cards2[i],hs2[i]];
+										cards[i]=change[1];hs[i]=change[0];
+									}
+									else break;
+								}
+								return list;
+							}
+						});
+						if(bool){
+							const puts=player.getCards('h',i=>moved[0].includes(i));
+							const gains=cards.filter(i=>moved[1].includes(i));
+							if(puts.length&&gains.length){
+								player.$throw(puts,1000);
+								await player.lose(puts,ui.special);
+								await player.gain(gains,'gain2');
+								cards=moved[0].slice();
+								await player.showCards(cards,get.translation(player)+'【易城】第一次交换后');
+								if(cards.reduce((num,card)=>num+get.number(card),0)>sum&&player.countCards('h')){
+									const {result:{bool}}=await player.chooseBool('易城：是否使用全部手牌交换'+get.translation(cards)+'？').set('choice',(()=>{
+										return cards.reduce((num,card)=>num+get.value(card),0)>player.getCards('h').reduce((num,card)=>num+get.value(card),0);
+									})());
+									if(bool){
+										const hs=player.getCards('h');
+										player.$throw(hs,1000);
+										await player.lose(hs,ui.special);
+										await player.gain(cards,'gain2');
+										cards=hs.slice();
+										await player.showCards(cards,get.translation(player)+'【易城】第二次交换后');
+									}
+								}
+							}
+						}
+						if(cards.length){
+							await game.cardsDiscard(cards);
+							//game.log(cards,'被置入了弃牌堆');
+						}
+					}
+				},
+				ai:{
+					order:9,
+					result:{player:1},
+				},
+			},
 			//陆凯
 			olxuanzhu:{
 				mark:true,
@@ -26433,6 +26513,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhangren:['jsrg_zhangren','zhangren'],
 			wenqin:['ol_wenqin','pe_wenqin'],
 			lukai:['ol_lukai','lukai'],
+			liupi:['ol_liupi','liupi'],
 		},
 		translate:{
 			"xinfu_lingren":"凌人",
@@ -27663,6 +27744,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olxuanzhu_info:'转换技，每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用：阴，任意基本牌；阳，任意普通锦囊牌（须指定目标且仅指定一个目标）。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。',
 			oljiane:'謇谔',
 			oljiane_info:'锁定技。①当你对其他角色使用的牌生效后，其本回合无法抵消牌。②当你抵消牌后，你本回合无法成为牌的目标。',
+			ol_liupi:'刘辟',
+			olyicheng:'易城',
+			olyicheng_info:'出牌阶段限一次，你可以亮出牌堆顶的三张牌，然后你可以以任意手牌交换这些牌，若这三张牌的点数和因此增加，则你可以选择用所有手牌交换这三张牌。',
 
 			sp_tianji:'天极·皇室宗亲',
 			sp_sibi:'四弼·辅国文曲',
