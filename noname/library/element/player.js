@@ -371,6 +371,7 @@ export class Player extends HTMLDivElement {
 	 * ```
 	 */
 	when() {
+		const player = this;
 		if (!_status.postReconnect.player_when) _status.postReconnect.player_when = [
 			function (map) {
 				"use strict";
@@ -386,7 +387,13 @@ export class Player extends HTMLDivElement {
 		];
 		let triggerNames = Array.from(arguments);
 		let trigger;
+		let instantlyAdd = true;
 		if (triggerNames.length == 0) throw 'player.when的参数数量应大于0';
+		//从triggerNames中取出instantlyAdd的部分
+		if (triggerNames.includes(false)) {
+			instantlyAdd = false;
+			triggerNames.remove(false);
+		}
 		// add other triggerNames
 		// arguments.length = 1
 		if (triggerNames.length == 1) {
@@ -506,7 +513,7 @@ export class Player extends HTMLDivElement {
 				}
 			});
 		}, skillName);
-		this.addSkill(skillName);
+		if (instantlyAdd !== false) this.addSkill(skillName);
 		_status.postReconnect.player_when[1][skillName] = true;
 		return {
 			/**
@@ -603,6 +610,14 @@ export class Player extends HTMLDivElement {
 				if (skill.contentFuns.length > 0) createContent();
 				return this;
 			},
+			/**
+			 * 获得技能
+			 * 如果instantlyAdd为false，则需要以此法获得技能
+			 **/
+			finish() {
+				player.addSkill(skillName);
+				return this;
+			}
 		};
 	}
 	/**
@@ -4188,7 +4203,8 @@ export class Player extends HTMLDivElement {
 				next.filterCard = get.filter(arguments[i]);
 			}
 			else if (typeof arguments[i] == 'string') {
-				get.evtprompt(next, arguments[i]);
+				if (arguments[i]=='chooseonly') next.chooseonly=true;
+				else get.evtprompt(next, arguments[i]);
 			}
 			if (arguments[i] === null) {
 				for (var i = 0; i < arguments.length; i++) {
@@ -7876,14 +7892,14 @@ export class Player extends HTMLDivElement {
 					skillName = 'player_tempSkills_' + Math.random().toString(36).slice(-8);
 				} while (player.additionalSkills[skillName] != null);
 				player.addAdditionalSkill(skillName, skillsToAdd);
-				player.when(expire).assign({
+				player.when(expire,false).assign({
 					firstDo: true,
 					priority: Infinity,
 				}).vars({
 					skillName
 				}).then(() => {
 					player.removeAdditionalSkills(skillName);
-				});
+				}).finish();
 			}
 		});
 	}
@@ -7926,13 +7942,13 @@ export class Player extends HTMLDivElement {
 
 			if (!expire) expire = { global: ['phaseAfter', 'phaseBeforeStart'] };
 			else if (typeof expire == 'string' || Array.isArray(expire)) expire = { global: expire };
-			this.when(expire).assign({
+			this.when(expire,false).assign({
 				firstDo: true,
 			}).vars({
 				bannedSkill: skill,
 			}).then(() => {
 				delete player.storage[`temp_ban_${bannedSkill}`];
-			});
+			}).finish();
 		}
 		return skill;
 	}

@@ -9830,7 +9830,7 @@ export class Library extends Uninstantable {
 		 * @param {string} skill
 		 * @returns {boolean}
 		 */
-		filterTrigger: function (event, player, triggername, skill) {
+		filterTrigger: function (event, player, triggername, skill, indexedData) {
 			if (player._hookTrigger && player._hookTrigger.some(i => {
 				const info = lib.skill[i].hookTrigger;
 				return info && info.block && info.block(event, player, triggername, skill);
@@ -9853,7 +9853,7 @@ export class Library extends Uninstantable {
 				if (Array.isArray(info.trigger[role])) return info.trigger[role].includes(triggername);
 				return info.trigger[role] == triggername;
 			})) return false;
-			if (info.filter && !info.filter(event, player, triggername)) return false;
+			if (info.filter && !info.filter(event, player, triggername, indexedData)) return false;
 			if (event._notrigger.includes(player) && !lib.skill.global.includes(skill)) return false;
 			if (typeof info.usable == 'number' && player.hasSkill('counttrigger') &&
 				player.storage.counttrigger && player.storage.counttrigger[skill] >= info.usable) return false;
@@ -10396,7 +10396,7 @@ export class Library extends Uninstantable {
 			return (Math.random() - 0.5);
 		},
 		seat: function (a, b) {
-			var player = lib.tempSortSeat || _status.event.player;
+			var player = lib.tempSortSeat || _status.event.player || game.me || game.players[0];
 			var delta = get.distance(player, a, 'absolute') - get.distance(player, b, 'absolute');
 			if (delta) return delta;
 			delta = parseInt(a.dataset.position) - parseInt(b.dataset.position);
