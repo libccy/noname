@@ -16673,8 +16673,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_liru_prefix:'手杀界',
 			re_chenqun:'手杀界陈群',
 			re_chenqun_prefix:'手杀界',
-			old_yuanshu:'手杀界袁术',
-			old_yuanshu_prefix:'手杀界',
 			re_liru:'手杀界李儒',
 			re_liru_prefix:'手杀界',
 			re_chenqun:'手杀界陈群',
