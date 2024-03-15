@@ -46,7 +46,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lvboshe:['male','qun',4,['olfushi','oldongdao']],
 			ol_luyusheng:['female','wu',3,['olcangxin','olrunwei']],
 			caoxi:['male','wei',3,['olgangshu','oljianxuan']],
-			ol_pengyang:['male','shu',3,['olqifan','oltuishi','nzry_cunmu']],
+			ol_pengyang:['male','shu',3,['olxiaofan','oltuishi','nzry_cunmu']],
 			ol_qianzhao:['male','wei',4,['olweifu','olkuansai']],
 			niujin:['male','wei',4,['olcuorui','liewei']],
 			hejin:['male','qun',4,['mouzhu','olyanhuo']],
@@ -2537,8 +2537,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				check:function(card){
 					var player=_status.event.player;
-					if(player.hasSkill('hezhong')){
-						if(player.countCards('h')-ui.selected.cards.length>1) return 1/(get.value(card)||0.5);
+					if(player.hasSkill('hezhong')&&(!(player.hasSkill('hezhong_0')&&player.hasSkill('hezhong_1')))){
+						if(player.countCards('h')-ui.selected.cards.length>2) return 1/(get.value(card)||0.5);
 						return 0;
 					}
 					if(ui.selected.cards.length<player.countCards('h')/2) return 5-get.value(card);
@@ -2558,7 +2558,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					player.chooseToDiscard('h','宴如：弃置至少一半手牌',[Math.floor(player.countCards('h')/2),Infinity],true).set('ai',card=>{
 						var player=_status.event.player;
-						if(player.hasSkill('hezhong')&&player.countCards('h')-ui.selected.cards.length>1) return 1/(get.value(card)||0.5);
+						if(player.hasSkill('hezhong')&&(!(player.hasSkill('hezhong_0')&&player.hasSkill('hezhong_1')))&&player.countCards('h')-ui.selected.cards.length>2) return 1/(get.value(card)||0.5);
 						if(!player.hasSkill('hezhong')&&ui.selected.cards.length<Math.floor(player.countCards('h')/2)) return 1/(get.value(card)||0.5);
 						return 0;
 					});
@@ -3324,15 +3324,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			//OL彭羕
-			olqifan:{
+			olxiaofan:{
 				audio:2,
 				enable:'chooseToUse',
 				hiddenCard:function(player,name){
 					if(name!='wuxie'&&lib.inpile.includes(name)) return true;
 				},
-				getNum:()=>game.getGlobalHistory('useCard').reduce((list,evt)=>list.add(get.type2(evt.card)),[]).length,
+				getNum:(player)=>player.getHistory('useCard').reduce((list,evt)=>list.add(get.type2(evt.card)),[]).length,
 				filter:function(event,player){
-					if(event.responded||event.type=='wuxie'||event.olqifan) return false;
+					if(event.responded||event.type=='wuxie'||event.olxiaofan) return false;
 					for(var i of lib.inpile){
 						if(i!='wuxie'&&event.filterCard(get.autoViewAs({name:i},'unsure'),player,event)) return true;
 					}
@@ -3342,8 +3342,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var evt=event.getParent(2);
-					evt.set('olqifan',true);
-					var cards=get.bottomCards(lib.skill.olqifan.getNum()+1,true);
+					evt.set('olxiaofan',true);
+					var cards=get.bottomCards(lib.skill.olxiaofan.getNum(player)+1,true);
 					var aozhan=player.hasSkill('aozhan');
 					player.chooseButton(['嚣翻：选择要使用的牌',cards]).set('filterButton',function(button){
 						return _status.event.cards.includes(button.link);
@@ -3380,11 +3380,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},evt.player,evt)?'sha':'shan';
 						}
 						game.broadcastAll(function(result,name){
-							lib.skill.olqifan_backup.viewAs={name:name,cards:[result],isCard:true};
+							lib.skill.olxiaofan_backup.viewAs={name:name,cards:[result],isCard:true};
 						},card,name);
-						evt.set('_backupevent','olqifan_backup');
+						evt.set('_backupevent','olxiaofan_backup');
 						evt.set('openskilldialog',('请选择'+get.translation(card)+'的目标'))
-						evt.backup('olqifan_backup');
+						evt.backup('olxiaofan_backup');
 					}
 					evt.goto(0);
 				},
@@ -3406,8 +3406,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 			},
-			olqifan_backup:{
-				sourceSkill:'olqifan',
+			olxiaofan_backup:{
+				sourceSkill:'olxiaofan',
 				precontent:function(){
 					delete event.result.skill;
 					var name=event.result.card.name,cards=event.result.card.cards.slice(0);
@@ -3418,9 +3418,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					event.result.card=card;
 					var id=get.id();
 					player.when('chooseToUseAfter').filter((evt)=>evt==event.getParent()).then(()=>{
-						var num=lib.skill.olqifan.getNum(),pos=('jeh').slice(0,num);
+						var num=lib.skill.olxiaofan.getNum(player),pos=('jeh').slice(0,num);
 						if(num>0&&player.countCards(pos)>0){
-							event.maxNum=Math.min(3,lib.skill.olqifan.getNum());
+							event.maxNum=Math.min(3,num);
 							event.num=0;
 						}
 						else event.finish();
@@ -3490,7 +3490,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'useCard1'},
 						filter:function(event,player){
 							if(!event.targets||!event.targets.length) return false;
-							return event.targets.some(target=>player.countCards('h')+event.cards.length>target.countCards('h'));
+							let num=0;
+							if(event.cards&&event.cards.length){
+								const history=player.getHistory('lose',evt=>{
+									if(evt.getParent()!=event) return false;
+									return event.cards.some(card=>evt.hs.includes(card));
+								});
+								if(history.length) num+=event.cards.filter(card=>history[0].hs.includes(card)).length;
+							}
+							return event.targets.some(target=>player.countCards('h')+num>target.countCards('h')+(target==player?num:0));
 						},
 						forced:true,
 						popup:false,
@@ -18754,8 +18762,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player){
 					var num;
 					var mode=get.mode();
-					if(mode=='identity'){
-						if(_status.mode=='purple') num=player.getEnemies().length;
+					if(mode=='identity'||mode=='doudizhu'){
+						if(mode=='identity'&&_status.mode=='purple') num=player.getEnemies().length;
 						else num=get.population('fan');
 					}
 					else if(mode=='versus'){
@@ -26879,6 +26887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hongde_info:'当你一次获得或失去至少两张牌后，你可以令一名其他角色摸一张牌。',
 			dingpan:'定叛',
 			dingpan_info_identity:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。（X为场上存活的反贼数）',
+			dingpan_info_doudizhu:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。（X为场上存活的农民数）',
 			dingpan_info_versus_two:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。（X为场上存活的最大阵营角色数）',
 			dingpan_info_versus:'出牌阶段限X次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。（X为场上存活的敌方角色数）',
 			dingpan_info:'出牌阶段限一次，你可以令一名装备区里有牌的角色摸一张牌，然后其选择一项：1.令你弃置其装备区里的一张牌；2.获得其装备区里的所有牌，若如此做，你对其造成1点伤害。',
@@ -27665,8 +27674,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oljianxuan:'谏旋',
 			oljianxuan_info:'当你受到伤害后，你可以令一名角色摸一张牌，然后若其手牌数等于你〖刚述①〗中的任意一项对应的数值，其重复此流程。',
 			ol_pengyang:'彭羕',
-			olqifan:'嚣翻',
-			olqifan_info:'当你需要使用不为【无懈可击】的牌时，你可以观看牌堆底的X+1张牌并使用其中的一张。此牌结算结束时，你依次弃置以下前X个区域中的所有牌：⒈判定区、⒉装备区、⒊手牌区（X为本回合使用过的牌中包含的类型数）。',
+			olxiaofan:'嚣翻',
+			olxiaofan_info:'当你需要使用不为【无懈可击】的牌时，你可以观看牌堆底的X+1张牌并使用其中的一张。此牌结算结束时，你依次弃置以下前X个区域中的所有牌：⒈判定区、⒉装备区、⒊手牌区（X为本回合你使用过的牌中包含的类型数）。',
 			oltuishi:'侻失',
 			oltuishi_info:'锁定技。①你不能使用【无懈可击】。②当你使用点数为字母的牌时，你令此牌无效并摸一张牌，且你对手牌数小于你的角色使用的下一张牌无距离和次数限制。',
 			ol_tw_zhangji:'张既',
