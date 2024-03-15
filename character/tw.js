@@ -13536,7 +13536,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					player.chooseTarget(get.prompt2('twjuezhu'),[1,2],function(card,player,target){
 						return !ui.selected.targets.length&&!target.hasSkill('feiying');
-					}).set('promptbar','none').set('ai',function(target){
+					}).set('multitarget',true).set('promptbar','none').set('ai',function(target){
 						if(player.hasUnknown()) return false;
 						return get.attitude(player,target);
 					});
