@@ -663,14 +663,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.hasSkill('twxinshou_1')) return goon&&game.hasPlayer(target=>target!=player);
 					return !player.hasSkill('twdengjian_ban')&&game.hasPlayer(target=>{
 						if(target==player) return false;
-						return !target.hasSkill('twdengjian',null,false,false);
-					})&&player.hasSkill('twdengjian',null,false,false);
+						return !target.hasSkill('twdengjian',null,null,false);
+					})&&player.hasSkill('twdengjian',null,null,false);
 				},
 				direct:true,
 				async content(event,trigger,player){
 					if(player.hasSkill('twxinshou_0')&&player.hasSkill('twxinshou_1')){
 						const {result:{bool,targets}}=await player.chooseTarget((card,player,target)=>{
-							return target!=player&&!target.hasSkill('twdengjian',null,false,false);
+							return target!=player&&!target.hasSkill('twdengjian',null,null,false);
 						}).set('ai',target=>{
 							const player=get.event('player');
 							if(get.attitude(player,target)>0){
@@ -689,13 +689,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const target=targets[0];
 							player.logSkill('twxinshou',target);
 							player.addSkill('twdengjian_ban');
-							target.addAdditionalSkill('twxinshou_'+player.playerid,'twdengjian');
+							target.addAdditionalSkills('twxinshou_'+player.playerid,'twdengjian');
 							player.popup('登剑');
 							target.popup('登剑');
 							game.log(player,'将','#g【登剑】','传授给了',target);
 							game.log(player,'的','#g【登剑】','被失效了');
 							player.when('phaseBegin').then(()=>{
-								target.removeAdditionalSkill('twxinshou_'+player.playerid);
+								target.removeAdditionalSkills('twxinshou_'+player.playerid);
+							}).then(()=>{
 								const history=game.getAllGlobalHistory('everything');
 								for(let i=history.length-1;i>=0;i--){
 									const evt=history[i];
@@ -708,6 +709,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(evt==evtx) break;
 								}
 								player.popup('杯具');
+								player.chat('剑法废掉了...');
 							}).vars({target:target,evtx:event});
 						}
 					}
@@ -733,7 +735,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('twxinshou');
 						if(control=='摸牌'){
 							player.addTempSkill('twxinshou_0');
-							player.draw();
+							await player.draw();
 						}
 						if(control=='给牌'){
 							player.addTempSkill('twxinshou_1');
@@ -750,7 +752,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(bool){
 								const target=targets[0];
 								player.line(target);
-								player.chooseToGive(target,'he',true);
+								await player.chooseToGive(target,'he',true);
 							}
 						}
 					}
@@ -780,7 +782,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					target.disableEquip(disables);
-					if(num) target.draw(num);
+					if(num) await target.draw(num);
 					target.addSkill('twjieqiu_buff');
 					target.markAuto('twjieqiu_buff',[player]);
 					target.when('enableEquipEnd')
@@ -823,7 +825,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								[transList,'tdnodes'],
 							],num,true).set('map',map)
 							.set('ai',button=>['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2);
-							if(bool) player.enableEquip(links.slice().map(i=>map[i]));
+							if(bool) await player.enableEquip(links.slice().map(i=>map[i]));
 						},
 						group:['twjieqiu_end'],
 					},
@@ -877,7 +879,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						[transList,'tdnodes'],
 					],true).set('map',map)
 					.set('ai',button=>1/(['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2));
-					if(bool) target.enableEquip(links.slice().map(i=>map[i]));
+					if(bool) await target.enableEquip(links.slice().map(i=>map[i]));
 				},
 				ai:{
 					order:9,
@@ -15597,7 +15599,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twfengji:'蜂集',
 			twfengji_info:'出牌阶段开始时，若你没有“示”，则你可以将一张牌作为“示”置于武将牌上并施法：从牌堆中获得X张与“示”牌名相同的牌，然后移去“示”。',
 			twyiju:'蚁聚',
-			twyiju_info:'非锁定技。若你的武将牌上有“示”，则：①你使用【杀】的次数上限和攻击范围的基数改为你的体力值。②当你受到伤害时，你移去“示”，且令此伤害+1。',
+			twyiju_info:'若你的武将牌上有“示”，则：①你使用【杀】的次数上限和攻击范围的基数改为你的体力值。②当你受到伤害时，你移去“示”，且令此伤害+1。',
 			twbudao:'布道',
 			twbudao_info:'限定技。准备阶段，你可减1点体力上限，回复1点体力并选择获得一个〖布道〗技能池里的技能（三选一）。然后你可以令一名其他角色也获得此技能并交给你一张牌。',
 			twzhouhu:'咒护',

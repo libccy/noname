@@ -12797,6 +12797,11 @@ return event.junling=='junling5'?1:0;});
 				inherit:'xiaoji',
 				audio:'xiaoji',
 				preHidden:true,
+				getIndex(event, player){
+					const evt=event.getl(player);
+					if (evt && evt.player === player && evt.es) return 1;
+					return false;
+				},
 				content:function(){
 					player.draw(player==_status.currentPhase?1:3);
 				}
@@ -13131,7 +13136,7 @@ return event.junling=='junling5'?1:0;});
 						}
 						var info=get.info(trigger.skill);
 						var next=player.chooseBool('是否明置'+get.translation(event.name)+'以发动【'+get.translation(trigger.skill)+'】？');
-						next.set('yes',!info.check||info.check(trigger._trigger,player));
+						next.set('yes',!info.check||info.check(trigger._trigger,player,trigger.triggername,trigger.indexedData));
 						next.set('hsskill',trigger.skill);
 						next.set('ai',nai);
 					}

@@ -371,6 +371,7 @@ export class Player extends HTMLDivElement {
 	 * ```
 	 */
 	when() {
+		const player = this;
 		if (!_status.postReconnect.player_when) _status.postReconnect.player_when = [
 			function (map) {
 				"use strict";
@@ -386,7 +387,13 @@ export class Player extends HTMLDivElement {
 		];
 		let triggerNames = Array.from(arguments);
 		let trigger;
+		let instantlyAdd = true;
 		if (triggerNames.length == 0) throw 'player.when的参数数量应大于0';
+		//从triggerNames中取出instantlyAdd的部分
+		if (triggerNames.includes(false)) {
+			instantlyAdd = false;
+			triggerNames.remove(false);
+		}
 		// add other triggerNames
 		// arguments.length = 1
 		if (triggerNames.length == 1) {
@@ -506,7 +513,7 @@ export class Player extends HTMLDivElement {
 				}
 			});
 		}, skillName);
-		this.addSkill(skillName);
+		if (instantlyAdd !== false) this.addSkill(skillName);
 		_status.postReconnect.player_when[1][skillName] = true;
 		return {
 			/**
@@ -603,6 +610,14 @@ export class Player extends HTMLDivElement {
 				if (skill.contentFuns.length > 0) createContent();
 				return this;
 			},
+			/**
+			 * 获得技能
+			 * 如果instantlyAdd为false，则需要以此法获得技能
+			 **/
+			finish() {
+				player.addSkill(skillName);
+				return this;
+			}
 		};
 	}
 	/**
@@ -2099,6 +2114,7 @@ export class Player extends HTMLDivElement {
 	}
 	//原有函数
 	init(character, character2, skill, update) {
+		let hidden = false;
 		if (typeof character == 'string' && !lib.character[character]) {
 			lib.character[character] = get.character(character);
 		}
@@ -2154,7 +2170,7 @@ export class Player extends HTMLDivElement {
 			skills = [];
 			this.name = 'unknown';
 			this.sex = 'male';
-			this.storage.nohp = true;
+			hidden = true;
 			skills.add('g_hidden_ai');
 		}
 		if (character2 && lib.character[character2]) {
@@ -2208,17 +2224,19 @@ export class Player extends HTMLDivElement {
 			if (info2[4].includes('hiddenSkill') && !this.noclick) {
 				if (!this.hiddenSkills) this.hiddenSkills = [];
 				this.hiddenSkills.addArray(info2[3]);
-				this.storage.nohp = true;
+				hidden = true;
 				skills.add('g_hidden_ai');
 			}
 			else skills = skills.concat(info2[3]);
 		}
-		if (this.storage.nohp) {
+		if (this.storage.nohp || hidden) {
 			this.storage.rawHp = this.hp;
 			this.storage.rawMaxHp = this.maxHp;
 			this.hp = 1;
 			this.maxHp = 1;
-			this.node.hp.hide();
+			if (this.storage.nohp) {
+				this.node.hp.hide();
+			}
 		}
 		if (skill != false) {
 			skills = skills.filter(skill => {
@@ -2327,19 +2345,32 @@ export class Player extends HTMLDivElement {
 	 *
 	 * 如果lib.character[character]不存在，且想引用其他路径的图片素材或阵亡素材，请以[character,[]]的形式写入lib.character.characterSubstitute[name]中，第二个数组填入形式同lib.character[4]的书写形式
 	 *
-	 * @param { string | string }
+	 * @param { string | object | function } map
+	 * @param { string } character
 	 */
-	changeSkin(skill, character) {
-		if (!skill || !character) {
-			console.log('error: no sourceSkill or character to changeSkin', get.translation(this));
+	changeSkin(map, character) {
+		if (!map || !character) {
+			console.warn('error: no sourceMap or character to changeSkin', get.translation(this));
 			return;
+		}
+		if (typeof map == 'string') {
+			map = { skill: map };
 		}
 		for (const i of ['name', 'name1', 'name2']) {
 			if (i == 'name1' && this.name === this.name1) continue;
 			const list = lib.characterSubstitute[this[i]];
 			if (this[i] && list) {
-				if ((get.character(this[i], 3) || []).includes(skill)) {
-					const name = (i == 'name2' ? 'name2' : 'name');
+				const name = (i == 'name2' ? 'name2' : 'name');
+				if ((() => {
+					if (typeof map == 'function') {
+						return map(this, name);
+					}
+					if (typeof map.skill == 'string' && (get.character(this[i], 3) || []).includes(map.skill)) return true;
+					if (typeof map.characterName == 'string' && this[i] == map.characterName) return true;
+					if (typeof map.characterSkinName == 'string' && this.skin[name] == map.characterSkinName) return true;
+					if (typeof map.source == 'string' && name == map.source) return true;
+					return false;
+				})()) {
 					if (this.skin[name] != character) {
 						const origin = this.skin[name];
 						game.broadcastAll((player, name, character, list, origin) => {
@@ -3075,20 +3106,22 @@ export class Player extends HTMLDivElement {
 			}
 		}
 		if (!this.storage.nohp) {
-			if (this.maxHp == Infinity) {
-				hp.innerHTML = '∞';
+			const hidden = (this.classList.contains('unseen_show') || this.classList.contains('unseen2_show'));
+			const maxHp = (hidden ? 1 : this.maxHp);
+			if (maxHp == Infinity) {
+				hp.innerHTML = (this.hp == Infinity ? '∞' : (this.hp + '<br>/<br>' + '∞' + '<div></div>'));
 			}
-			else if (game.layout == 'default' && this.maxHp > 14) {
-				hp.innerHTML = this.hp + '/' + this.maxHp;
+			else if (game.layout == 'default' && maxHp > 14) {
+				hp.innerHTML = this.hp + '/' + maxHp;
 				hp.classList.add('text');
 			}
 			else if (get.is.newLayout() &&
 				(
-					this.maxHp > 9 ||
-					(this.maxHp > 5 && this.classList.contains('minskin')) ||
-					((game.layout == 'mobile' || game.layout == 'long') && this.dataset.position == 0 && this.maxHp > 7)
+					maxHp > 9 ||
+					(maxHp > 5 && this.classList.contains('minskin')) ||
+					((game.layout == 'mobile' || game.layout == 'long') && this.dataset.position == 0 && maxHp > 7)
 				)) {
-				hp.innerHTML = this.hp + '<br>/<br>' + this.maxHp + '<div></div>';
+				hp.innerHTML = this.hp + '<br>/<br>' + maxHp + '<div></div>';
 				if (this.hp == 0) {
 					hp.lastChild.classList.add('lost');
 				}
@@ -3099,16 +3132,16 @@ export class Player extends HTMLDivElement {
 				hp.innerHTML = '';
 				hp.classList.remove('text');
 				hp.classList.remove('textstyle');
-				while (this.maxHp > hp.childNodes.length) {
+				while (maxHp > hp.childNodes.length) {
 					ui.create.div(hp);
 				}
-				while (Math.max(0, this.maxHp) < hp.childNodes.length) {
+				while (Math.max(0, maxHp) < hp.childNodes.length) {
 					hp.removeChild(hp.lastChild);
 				}
-				for (var i = 0; i < this.maxHp; i++) {
+				for (var i = 0; i < maxHp; i++) {
 					var index = i;
 					if (get.is.newLayout()) {
-						index = this.maxHp - i - 1;
+						index = maxHp - i - 1;
 					}
 					if (i < this.hp) {
 						hp.childNodes[index].classList.remove('lost');
@@ -3117,23 +3150,26 @@ export class Player extends HTMLDivElement {
 						hp.childNodes[index].classList.add('lost');
 					}
 				}
-				// if(this.maxHp==9){
+				// if(maxHp==9){
 				// 	hp.classList.add('long');
 				// }
 				// else{
 				// 	hp.classList.remove('long');
 				// }
 			}
-			if (hp.classList.contains('room')) {
+			if (hidden) {
+				hp.dataset.condition = 'hidden';
+			}
+			else if (hp.classList.contains('room')) {
 				hp.dataset.condition = 'high';
 			}
 			else if (this.hp == 0) {
 				hp.dataset.condition = '';
 			}
-			else if (this.hp > Math.round(this.maxHp / 2) || this.hp === this.maxHp) {
+			else if (this.hp > Math.round(maxHp / 2) || this.hp === maxHp) {
 				hp.dataset.condition = 'high';
 			}
-			else if (this.hp > Math.floor(this.maxHp / 3)) {
+			else if (this.hp > Math.floor(maxHp / 3)) {
 				hp.dataset.condition = 'mid';
 			}
 			else {
@@ -3266,6 +3302,7 @@ export class Player extends HTMLDivElement {
 				num = this.storage[i].length;
 			}
 			if (num) {
+				if (num == Infinity) num = '∞';
 				if (!this.marks[i].markcount) {
 					this.marks[i].markcount = ui.create.div('.markcount.menubutton', this.marks[i]);
 				}
@@ -4188,7 +4225,8 @@ export class Player extends HTMLDivElement {
 				next.filterCard = get.filter(arguments[i]);
 			}
 			else if (typeof arguments[i] == 'string') {
-				get.evtprompt(next, arguments[i]);
+				if (arguments[i]=='chooseonly') next.chooseonly=true;
+				else get.evtprompt(next, arguments[i]);
 			}
 			if (arguments[i] === null) {
 				for (var i = 0; i < arguments.length; i++) {
@@ -7876,14 +7914,14 @@ export class Player extends HTMLDivElement {
 					skillName = 'player_tempSkills_' + Math.random().toString(36).slice(-8);
 				} while (player.additionalSkills[skillName] != null);
 				player.addAdditionalSkill(skillName, skillsToAdd);
-				player.when(expire).assign({
+				player.when(expire,false).assign({
 					firstDo: true,
 					priority: Infinity,
 				}).vars({
 					skillName
 				}).then(() => {
 					player.removeAdditionalSkills(skillName);
-				});
+				}).finish();
 			}
 		});
 	}
@@ -7926,13 +7964,13 @@ export class Player extends HTMLDivElement {
 
 			if (!expire) expire = { global: ['phaseAfter', 'phaseBeforeStart'] };
 			else if (typeof expire == 'string' || Array.isArray(expire)) expire = { global: expire };
-			this.when(expire).assign({
+			this.when(expire,false).assign({
 				firstDo: true,
 			}).vars({
 				bannedSkill: skill,
 			}).then(() => {
 				delete player.storage[`temp_ban_${bannedSkill}`];
-			});
+			}).finish();
 		}
 		return skill;
 	}

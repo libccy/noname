@@ -477,7 +477,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				async content(event,trigger,player){
 					const result=await player.chooseTarget(get.prompt('dczhenrao'),'对一名可选角色造成1点伤害',(card,player,target)=>{
-						return get.event('targets').includes(target);
+						return get.event('targets').includes(target)&&!player.getStorage('dczhenrao').includes(target);
 					})
 						.set('targets',trigger.targets.concat(trigger.player).filter(target=>target.countCards('h')>player.countCards('h')))
 						.set('ai',target=>{
@@ -2032,13 +2032,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardAfter'},
 				filter:function(event,player){
-					if(get.type(event.card)!='basic') return false;
-					if(player.getHistory('gain',evt=>{
-						return evt.getParent().name==='dccaisi';
-					}).reduce((num,evt)=>{
-						return num+evt.cards.length;
-					},0)>player.maxHp) return false;
-					return _status.currentPhase;
+					return get.type(event.card)=='basic'&&_status.currentPhase;
 				},
 				prompt2:function(event,player){
 					const num=player.countMark('dccaisi_more')+1;
@@ -2054,13 +2048,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(card) cards.add(card);
 						else break;
 					}
-					if(cards.length) player.gain(cards,'gain2');
+					if(cards.length) yield player.gain(cards,'gain2');
 					else{
 						player.chat('没有非基本牌…');
 						game.log(`但是${position=='discardPile'?'弃':''}牌堆里没有非基本牌！`);
 					}
-					player.addTempSkill('dccaisi_more');
-					player.addMark('dccaisi_more',1,false);
+					const sum=player.getHistory('useSkill',evt=>evt.skill=='dccaisi').length;
+					if(sum<player.maxHp){
+						player.addTempSkill('dccaisi_more');
+						player.addMark('dccaisi_more',1,false);
+					}
+					else player.tempBanSkill('dccaisi');
 				},
 				subSkill:{more:{charlotte:true,onremove:true}},
 			},
@@ -2073,10 +2071,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function*(event,map){
 					const player=map.player;
-					if(player.maxHp<game.countPlayer()){
+					if(player.maxHp<game.countPlayer2()){
 						yield player.gainMaxHp();
 					}
-					player.recover();
+					yield player.recover();
 				}
 			},
 			//魏贾充
@@ -12803,7 +12801,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcjianshu_info:'出牌阶段限一次。你可以将一张黑色手牌交给一名其他角色，并选择另一名其他角色，你令前者与后者拼点。赢的角色随机弃置一张牌，没赢的角色失去1点体力。若有角色因此死亡，你令你〖间书〗于此阶段发动的次数上限+1。',
 			dcyongdi:'拥嫡',
 			dcyongdi_info:'限定技。出牌阶段，你可以选择一名男性角色，若其：体力上限最少，其加1点体力上限；体力值最少，其回复1点体力；手牌数最少，其摸X张牌（X为其体力上限且至多为5）。',
-			liupi:'刘辟',
+			liupi:'新杀刘辟',
+			liupi_prefix:'新杀',
 			dcjuying:'踞营',
 			dcjuying_info:'出牌阶段结束时，若你于此阶段内使用【杀】的次数未达到上限，你可以选择任意项：1.下回合使用【杀】的次数上限+1；2.本回合手牌上限+2；3.摸三张牌。若你选择的项数超过了你的体力值，你弃置一张牌。',
 			dc_huanghao:'新杀黄皓',
@@ -12954,9 +12953,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcshizong_info:'当你需要使用一张基本牌时，你可以交给一名其他角色X张牌，然后其可以将一张牌置于牌堆底，视为你使用之。若其不为当前回合角色，此技能失效直到回合结束（X为你本回合发动〖恃纵〗的次数）。',
 			pangshanmin:'庞山民',
 			dccaisi:'才思',
-			dccaisi_info:'当你于回合内/回合外使用基本牌结算结束后，若你本回合以此法得到的牌数小于你的体力上限，你可以从牌堆/弃牌堆随机获得一张非基本牌，然后本回合发动此技能获得的牌数+1。',
+			dccaisi_info:'当你于回合内/回合外使用基本牌结算结束后，你可以从牌堆/弃牌堆随机获得一张非基本牌，然后若你本回合发动此技能的次数：小于你的体力上限，本回合你发动此技能获得的牌数+1；大于等于你的体力上限，本回合此技能失效。',
 			dczhuoli:'擢吏',
-			dczhuoli_info:'锁定技。一名角色的回合结束时，若你本回合使用或获得的牌数大于体力值，你加1点体力上限（不能超过存活角色数），回复1点体力。',
+			dczhuoli_info:'锁定技。一名角色的回合结束时，若你本回合使用或获得的牌数大于体力值，你加1点体力上限（不能超过游戏人数），回复1点体力。',
 			yue_caiyong:'乐蔡邕',
 			yue_caiyong_prefix:'乐',
 			dcjiaowei:'焦尾',
