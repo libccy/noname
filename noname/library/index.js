@@ -10546,18 +10546,21 @@ export class Library extends Uninstantable {
 				}), player, _status.event) && player.storage.stratagem_fury >= cost.get(availableName));
 			},
 			viewAs: (cards, player) => {
-				const cardName = get.name(cards[0], player);
-				return cardName ? new lib.element.VCard({
-					name: cardName,
-					nature: get.nature(cards[0], player),
-					suit: get.suit(cards[0], player),
-					number: get.number(cards[0], player),
-					isCard: true,
-					cards: [cards[0]],
-					storage: {
-						stratagem_buffed: 1
-					}
-				}) : new lib.element.VCard();
+				if(cards.length){
+					const cardName = get.name(cards[0], player);
+					return cardName ? new lib.element.VCard({
+						name: cardName,
+						nature: get.nature(cards[0], player),
+						suit: get.suit(cards[0], player),
+						number: get.number(cards[0], player),
+						isCard: true,
+						cards: [cards[0]],
+						storage: {
+							stratagem_buffed: 1
+						}
+					}) : new lib.element.VCard();
+				}
+				return null;
 			},
 			prompt: () => {
 				const span = document.createElement('span');
