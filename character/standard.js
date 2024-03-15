@@ -2479,7 +2479,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinqicai_info:'锁定技，你使用锦囊牌无距离限制。',
 			xinqicai_info_alter:'锁定技，你使用的锦囊牌无距离限制，你装备区内的牌不能被弃置。',
 			qicai_info:'锁定技，你使用锦囊牌无距离限制。',
-			zhiheng_info:'出牌阶段一次，你可以弃置任意张牌，然后摸等量的牌。',
+			zhiheng_info:'出牌阶段限一次，你可以弃置任意张牌，然后摸等量的牌。',
 			xinzhiheng:'制衡',
 			xinzhiheng_info:'出牌阶段限1次，你可以弃置任意张牌并摸等量的牌。',
 			xinzhiheng_info_alter:'出牌阶段限1次，你可以弃置任意张牌并摸等量的牌，如果在发动制衡时弃置了所有手牌，你额外摸一张牌。',
