@@ -26,7 +26,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
-			yangfeng:['male','shu',4,['mbxuetu','mbweiming']],
+			yangfeng:['male','qun',4,['mbxuetu','mbweiming']],
 			xin_huojun:['male','shu',4,['sidai','jieyu'],['character:tw_huojun','die_audio:tw_huojun']],
 			muludawang:['male','qun','3/3/1',['shoufa','zhoulin','yuxiang']],
 			mb_chengui:['male','qun',3,['guimou','zhouxian']],
@@ -399,6 +399,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			//杨奉
 			mbxuetu:{
 				audio:2,
+				audioname:['re_yangfeng'],
 				enable:'phaseUse',
 				usable:2,
 				filter(event,player){
@@ -528,41 +529,45 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			mbweiming:{
-				audio:2,
-				trigger:{
-					player:'phaseUseBegin',
-				},
-				filter(event,player){
-					return game.hasPlayer(current => {
-						return !player.getStorage('mbweiming').includes(current);
-					});
-				},
+				audio:3,
 				dutySkill:true,
-				forced:true,
-				direct:true,
-				group:['mbweiming_achieve', 'mbweiming_fail'],
-				async content(event, trigger, player){
-					const targets = await player.chooseTarget('威命：记录一名未记录过的角色','当你杀死没有被记录过的角色后，则〖威命〗使命成功；如果在你杀死这些角色中的一名之前，有被记录过的角色死亡，则你〖威命〗使命失败。',true)
-						.set('filterTarget', (card, player, target) => {
-							return !player.getStorage('mbweiming').includes(target);
-						})
-						.set('ai', target => {
-							if (target === player) return 1;
-							return 1 + Math.sqrt(Math.abs(get.attitude(player, target))) * Math.abs(get.threaten(target)) / Math.sqrt(target.getHp() + 1) / Math.sqrt(target.countCards('hes') + 1);
-						})
-						.forResultTargets();
-					if (targets && targets.length > 0) {
-						const target = targets[0];
-						player.logSkill('mbweiming', target);
-						player.markAuto('mbweiming', target);
-					}
-				},
+				locked:true,
+				group:['mbweiming_achieve', 'mbweiming_fail','mbweiming_effect'],
 				intro:{
 					content: '已记录$',
 				},
 				subSkill: {
+					effect:{
+						audio:'mbweiming1.mp3',
+						trigger:{
+							player:'phaseUseBegin',
+						},
+						filter(event,player){
+							return game.hasPlayer(current => {
+								return !player.getStorage('mbweiming').includes(current);
+							});
+						},
+						forced:true,
+						direct:true,
+						async content(event, trigger, player){
+							const targets = await player.chooseTarget('威命：记录一名未记录过的角色','当你杀死没有被记录过的角色后，则〖威命〗使命成功；如果在你杀死这些角色中的一名之前，有被记录过的角色死亡，则你〖威命〗使命失败。',true)
+								.set('filterTarget', (card, player, target) => {
+									return !player.getStorage('mbweiming').includes(target);
+								})
+								.set('ai', target => {
+									if (target === player) return 1;
+									return 1 + Math.sqrt(Math.abs(get.attitude(player, target))) * Math.abs(get.threaten(target)) / Math.sqrt(target.getHp() + 1) / Math.sqrt(target.countCards('hes') + 1);
+								})
+								.forResultTargets();
+							if (targets && targets.length > 0) {
+								const target = targets[0];
+								player.logSkill('mbweiming_effect', target);
+								player.markAuto('mbweiming', target);
+							}
+						},
+					},
 					achieve: {
-						audio:'mbweiming',
+						audio:'mbweiming2.mp3',
 						trigger:{
 							source:'dieAfter',
 						},
@@ -582,7 +587,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					fail: {
-						audio:'mbweiming',
+						audio:'mbweiming3.mp3',
 						trigger:{
 							global:'dieAfter',
 						},
@@ -595,6 +600,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.log(player,'使命失败');
 							player.awakenSkill('mbweiming');
 							player.storage.mbxuetu_status = 2;
+							game.broadcastAll(player=>{
+								player.tempname.add('re_yangfeng');
+							},player);
 							await game.asyncDelayx();
 						}
 					},
