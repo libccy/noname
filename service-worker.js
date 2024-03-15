@@ -114,7 +114,13 @@ self.addEventListener('fetch', event => {
 					vueFileMap.set(
 						request.url + '?type=script',
 						// 重写 default
-						sfc.rewriteDefault(script.content, "__sfc_main__")
+						sfc.rewriteDefault(script.attrs && script.attrs.lang == 'ts' ? ts.transpile(script.content, {
+							module: ts.ModuleKind.ES2015,
+							target: ts.ScriptTarget.ES2019,
+							inlineSourceMap: true,
+							resolveJsonModule: true,
+							esModuleInterop: true,
+						}, request.url + '?type=script') : script.content, "__sfc_main__")
 							.replace(`const __sfc_main__`, `export const __sfc_main__`)
 							// import vue重新指向
 							.replaceAll(`from "vue"`, `from "/game/vue.esm-browser.js"`)
