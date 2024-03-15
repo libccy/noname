@@ -707,7 +707,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return target!=player&&target.countCards('h');
 					},targets=game.filterPlayer(target=>filterTarget(null,player,target));
 					if(targets.length<=sum) result={bool:true,targets:targets};
-					else result=await player.chooseTarget('请选择【败族】的目标','令你和这些角色同时弃置一张手牌，然后你对与你弃置牌类别相同的角色各造成1点伤害',filterTarget,num,true).set('ai',target=>{
+					else result=await player.chooseTarget('请选择【败族】的目标','令你和这些角色同时弃置一张手牌，然后你对与你弃置牌类别相同的角色各造成1点伤害',filterTarget,sum,true).set('ai',target=>{
 						const player=get.event('player');
 						return get.effect(target,{name:'guohe_copy2'},target,player)+get.damageEffect(target,player,player);
 					});
