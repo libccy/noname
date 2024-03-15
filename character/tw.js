@@ -5,7 +5,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		connect:true,
 		characterSort:{
 			tw:{
-				tw_sp:['tw_zhangzhao','tw_zhanghong','tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong','tw_tianyu','jiachong','duosidawang','wuban','yuejiu','tw_caocao','tw_zhangmancheng','tw_caozhao','tw_wangchang','tw_puyangxing','tw_jiangji','tw_niujin','tw_xiahouen','tw_xiahoushang','tw_zhangji','tw_zhangnan','tw_fengxí','tw_furong','tw_liwei','tw_yangyi','tw_daxiaoqiao','tw_dengzhi','tw_baoxin','tw_bingyuan','tw_fanchou','tw_haomeng','tw_huchuquan','tw_jianshuo','tw_jiling','tw_liufuren','tw_liuzhang','tw_mateng','tw_niufudongxie','tw_qiaorui','tw_weixu','tw_yanxiang','tw_yufuluo','tw_zhangning','tw_dengzhi','tw_yangyi','tw_yangang','tw_gongsunfan'],
+				tw_sp:['tw_yanliang','tw_wenchou','tw_yuantan','tw_zhangzhao','tw_zhanghong','tw_fuwan','tw_yujin','tw_zhaoxiang','tw_hucheer','tw_hejin','tw_mayunlu','tw_re_caohong','tw_zangba','tw_liuhong','tw_tianyu','jiachong','duosidawang','wuban','yuejiu','tw_caocao','tw_zhangmancheng','tw_caozhao','tw_wangchang','tw_puyangxing','tw_jiangji','tw_niujin','tw_xiahouen','tw_xiahoushang','tw_zhangji','tw_zhangnan','tw_fengxí','tw_furong','tw_liwei','tw_yangyi','tw_daxiaoqiao','tw_dengzhi','tw_baoxin','tw_bingyuan','tw_fanchou','tw_haomeng','tw_huchuquan','tw_jianshuo','tw_jiling','tw_liufuren','tw_liuzhang','tw_mateng','tw_niufudongxie','tw_qiaorui','tw_weixu','tw_yanxiang','tw_yufuluo','tw_zhangning','tw_dengzhi','tw_yangyi','tw_yangang','tw_gongsunfan'],
 				tw_yunchouzhi:['tw_wangcan','tw_dongzhao','tw_bianfuren','tw_feiyi','tw_chenzhen','tw_xunchen'],
 				tw_yunchouxin:['tw_wangling','tw_huojun','tw_wujing','tw_zhouchu'],
 				tw_yunchouren:['tw_xujing','tw_qiaogong'],
@@ -20,6 +20,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			tw_yanliang:['male','qun',4,['twduwang','twylyanshi']],
+			tw_wenchou:['male','qun',4,['twjuexing','twxiayong']],
+			tw_yuantan:['male','qun',4,['twqiaosi','twbaizu']],
 			xia_yuzhenzi:['male','qun',3,['twhuajing','twtianshou']],
 			xia_shie:['male','wei',4,['twdengjian','twxinshou']],
 			xia_shitao:['male','qun',4,['twjieqiu','twenchou']],
@@ -291,6 +294,455 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//颜良文丑，但是颜良+文丑
+			twduwang:{
+				audio:3,
+				dutySkill:true,
+				derivation:'twxiayong',
+				global:'twduwang_global',
+				group:['twduwang_effect','twduwang_achieve','twduwang_fail'],
+				subSkill:{
+					effect:{
+						audio:'twduwang1.mp3',
+						trigger:{player:'phaseUseBegin'},
+						filter(event,player){
+							return game.hasPlayer(target=>{
+								return target!=player&&target.hasCard(card=>{
+									if(get.position(card)=='h') return true;
+									return target.canUse(get.autoViewAs({name:'juedou'},[card]),player,false);
+								},'he');
+							});
+						},
+						direct:true,
+						async content(event,trigger,player){
+							let {result:{bool,targets}}=await player.chooseTarget([1,3],(_,player,target)=>{
+								return target!=player&&target.hasCard(card=>{
+									if(get.position(card)=='h') return true;
+									return target.canUse(get.autoViewAs({name:'juedou'},[card]),player,false);
+								},'he');
+							}).set('prompt',get.prompt('twduwang')).set('ai',target=>{
+								const player=get.event('player');
+								const num=game.countPlayer(current=>{
+									return current!=player&&current.hasCard(card=>{
+										if(get.position(card)=='h') return true;
+										return current.canUse(get.autoViewAs({name:'juedou'},[card]),player,false);
+									},'he')&&get.effect(current,{name:'guohe_copy2'},current,player)+get.effect(player,{name:'juedou'},current,player)>0;
+								});
+								return (Math.min(num,3)+1)*get.effect(player,{name:'draw'},player,player)+get.effect(target,{name:'guohe_copy2'},target,player)+get.effect(player,{name:'juedou'},target,player);
+							}).set('prompt2','选择至多三名其他角色并摸选择角色数+1的牌，然后这些角色须将一张牌当作【决斗】对你使用');
+							if(bool){
+								targets=targets.sortBySeat();
+								player.logSkill('twduwang_effect',targets);
+								await player.draw(targets.length+1);
+								for(const target of targets){
+									if(!target.hasCard(card=>{
+										return target.canUse(get.autoViewAs({name:'juedou'},[card]),player,false);
+									},'he')) continue;
+									await target.chooseToUse()
+									.set('forced',true)
+									.set('openskilldialog','独往：将一张牌当作【决斗】对'+get.translation(player)+'使用')
+									.set('norestore',true)
+									.set('_backupevent','twduwang_backup')
+									.set('targetRequired',true)
+									.set('complexSelect',true)
+									.set('custom',{
+										add:{},
+										replace:{window:function(){}}
+									})
+									.backup('twduwang_backup')
+									.set('filterTarget',function(card,player,target){
+										if(target!=_status.event.sourcex&&!ui.selected.targets.includes(_status.event.sourcex)) return false;
+										return lib.filter.targetEnabled.apply(this,arguments);
+									})
+									.set('sourcex',player)
+									.set('addCount',false);
+								}
+							}
+						},
+					},
+					backup:{
+						viewAs:{name:'juedou'},
+						position:'he',
+						check(card){
+							if(get.name(card)=='sha') return 5-get.value(card);
+							return 8-get.value(card);
+						},
+					},
+					achieve:{
+						audio:'twduwang2.mp3',
+						trigger:{player:'phaseZhunbeiBegin'},
+						filter(event,player){
+							const history=player.actionHistory;
+							if(history.length<2) return false;
+							for(let i=history.length-2;i>=0;i--){
+								if(history[i].isMe){
+									let num=history[i].useCard.filter(evt=>{
+										return evt.card.name=='juedou';
+									}).length,targets=game.players.slice().concat(game.dead.slice());
+									for(const target of targets){
+										num+=target.getHistory('useCard',evt=>{
+											return evt.card.name=='juedou'&&evt.targets&&evt.targets.includes(player);
+										}).length;
+									}
+									return num>=(targets.length<4?3:4);
+								}
+							}
+							return false;
+						},
+						forced:true,
+						skillAnimation:true,
+						animationColor:'metal',
+						async content(event,trigger,player){
+							player.awakenSkill('twduwang');
+							game.log(player,'完成使命');
+							const {result:{index}}=await player.chooseControl().set('choiceList',[
+								'获得技能【狭勇】',
+								//'重置【独往】和【延势】，删除【独往】的使命失败分支，获得【延势】的屠战效果',
+								'重置【独往】和【延势】，删除【独往】的使命失败分支',
+							]).set('prompt','独往：请选择一项').set('ai',()=>{
+								const player=get.event('player'),num=game.countPlayer(current=>{
+									return current!=player&&current.hasCard(card=>{
+										if(get.position(card)=='h') return true;
+										return current.canUse(get.autoViewAs({name:'juedou'},[card]),player,false);
+									},'he')&&get.effect(current,{name:'guohe_copy2'},current,player)+get.effect(player,{name:'juedou'},current,player);
+								});
+								return Math.max(0,Math.min(2,num)-1);
+							});
+							if(index==0) await player.addSkills('twxiayong');
+							else{
+								player.restoreSkill('twduwang');
+								player.restoreSkill('twylyanshi');
+								player.storage.twduwang_fail=true;
+							}
+						},
+					},
+					fail:{
+						audio:'twduwang3.mp3',
+						trigger:{player:'die'},
+						forceDie:true,
+						filter(event,player){
+							return !player.storage.twduwang_fail;
+						},
+						forced:true,
+						content(){
+							player.awakenSkill('twduwang');
+							game.log(player,'使命失败');
+						},
+					},
+					global:{
+						mod:{
+							cardSavable(card,player,target){
+								if(card.name=='tao'&&target!=player&&target.hasSkill('twduwang')&&!target.storage.twduwang_fail) return false;
+							},
+						},
+						audio:'twduwang3.mp3',
+						trigger:{player:'dying'},
+						filter(event,player){
+							return player.hasSkill('twduwang')&&!player.storage.twduwang_fail;
+						},
+						forced:true,
+						content(){},
+					},
+				},
+			},
+			twylyanshi:{
+				audio:2,
+				enable:['chooseToUse','chooseToRespond'],
+				filter(event,player){
+					return ['juedou','binglinchengxiax'].concat(get.zhinangs()).some(name=>{
+						const info={name:name};
+						return get.info(info)&&player.hasCard(card=>{
+							return get.name(card)=='sha'&&event.filterCard({name:name,cards:[card]},player,event);
+						},'hs');
+					});
+				},
+				limited:true,
+				skillAnimation:true,
+				animationColor:'fire',
+				chooseButton:{
+					dialog(event,player){
+						const list=['juedou','binglinchengxiax'].concat(get.zhinangs()).filter(name=>{
+							const info={name:name};
+							return get.info(info)&&player.hasCard(card=>{
+								return get.name(card)=='sha'&&event.filterCard({name:name,cards:[card]},player,event);
+							},'hs');
+						}).map(name=>[get.translation(get.type(name)),'',name]);
+						return ui.create.dialog('延势',[list,'vcard']);
+					},
+					check(button){
+						return get.event('player').getUseValue({name:button.link[2]});
+					},
+					backup(links,player){
+						return {
+							audio:'twylyanshi',
+							filterCard(card,player){
+								return get.name(card)=='sha';
+							},
+							popname:true,
+							check(card){
+								return 5-get.value(card);
+							},
+							position:'hs',
+							viewAs:{name:links[0][2]},
+							precontent(){
+								delete event.result.skill;
+								player.logSkill('twylyanshi');
+								player.awakenSkill('twylyanshi');
+							},
+						}
+					},
+					prompt(links,player){
+						return '将一张【杀】当作'+'【'+get.translation(links[0][2])+'】使用';
+					}
+				},
+				subSkill:{backup:{}},
+				hiddenCard(player,name){
+					if(player.awakenedSkills.includes('twylyanshi')||!player.countCards('hs',card=>_status.connectMode||get.name(card)=='sha')) return false;
+					return ['juedou','binglinchengxiax'].concat(get.zhinangs()).includes(name);
+				},
+				ai:{
+					order(item,player){
+						if(!player||_status.event.type!='phase') return 0.001;
+						let max=0,names=['juedou','binglinchengxiax'].concat(get.zhinangs()).filter(name=>{
+							const info={name:name};
+							return get.info(info)&&player.hasCard(card=>{
+								return get.name(card)=='sha'&&player.hasValueTarget(get.autoViewAs(info,[card]),true,true);
+							},'hs');
+						});
+						if(!names.length) return 0;
+						names=names.map(namex=>{return {name:namex}});
+						names.forEach(card=>{
+							if(player.getUseValue(card)>0){
+								let temp=get.order(card);
+								if(temp>max) max=temp;
+							}
+						});
+						if(max>0) max+=0.3;
+						return max;
+					},
+					result:{player:1},
+				},
+			},
+			twjuexing:{
+				audio:2,
+				enable:'phaseUse',
+				filter(event,player){
+					return game.hasPlayer(target=>get.info('twjuexing').filterTarget(null,player,target));
+				},
+				filterTarget(_,player,target){
+					const card=new lib.element.VCard({name:'juedou'});
+					return target!=player&&player.canUse(card,target);
+				},
+				usable:1,
+				async content(event,trigger,player){
+					const target=event.target;
+					const card=new lib.element.VCard({name:'juedou'});
+					player.when({global:'juedouBegin'}).filter(evt=>evt.getParent(2)==event)
+					.vars({target:target}).then(()=>{
+						player.addSkill('twjuexing_buff');
+						target.addSkill('twjuexing_buff');
+					}).then(()=>{
+						let list=[];
+						for(const i of [player,target]){
+							if(i.isIn()&&i.countCards('h')){
+								list.push([i,i.getCards('h')]);
+							}
+						}
+						if(list.length){
+							game.loseAsync({
+								lose_list:list,
+								log:true,
+								animate:'giveAuto',
+								gaintag:['twjuexing_buff'],
+							}).setContent(get.info('sbquhu').addToExpansionMultiple);
+						}
+					}).then(()=>{
+						if(player.getHp()) player.draw(player.getHp(),(target.getHp()?'nodelay':'')).gaintag=['twjuexing'];
+						if(target.getHp()) target.draw(target.getHp()).gaintag=['twjuexing'];
+					});
+					player.when({global:'useCardAfter'}).filter(evtx=>evtx.getParent()==event)
+					.vars({target:target}).then(()=>{
+						let list=[];
+						for(const i of [player,target]){
+							if(i.isIn()&&i.hasCard(card=>card.hasGaintag('twjuexing'),'h')){
+								list.push([i,i.getCards('h',card=>card.hasGaintag('twjuexing'))]);
+							}
+						}
+						if(list.length){
+							game.loseAsync({lose_list:list}).setContent('discardMultiple');
+						}
+					}).then(()=>{
+						let listx=[];
+						for(const i of [player,target]){
+							if(i.isIn()&&i.getExpansions('twjuexing_buff').length){
+								listx.push([i,i.getExpansions('twjuexing_buff')]);
+							}
+						}
+						if(listx.length){
+							game.loseAsync({gain_list:listx,animate:'gain2'}).setContent('gaincardMultiple');
+						}
+					}).then(()=>{
+						player.removeSkill('twjuexing_buff');
+						target.removeSkill('twjuexing_buff');
+					});
+					await player.useCard(card,target,false);
+				},
+				ai:{
+					order:1,
+					result:{
+						target(player,target){
+							return get.sgn(get.attitude(player,target))*get.effect(target,{name:'juedou'},player,player)*((player.getHp()+1)/(target.getHp()+1));
+						},
+					},
+				},
+				subSkill:{
+					tuzhan:{
+						charlotte:true,
+						onremove:true,
+						marktext:'战',
+						intro:{content:'因【绝行】摸牌时，摸牌数+#'},
+						trigger:{player:'drawBegin'},
+						filter(event,player){
+							return (event.gaintag||[]).includes('twjuexing');
+						},
+						forced:true,
+						popup:false,
+						content(){
+							player.popup('屠战');
+							game.log(player,'触发了','#g【绝行】','的','#y屠战','效果');
+							trigger.num++;
+						},
+					},
+					buff:{
+						charlotte:true,
+						onremove(player,skill){
+							const cards=player.getExpansions(skill);
+							if(cards.length) player.gain(cards,'gain2');
+						},
+						intro:{
+							markcount:'expansion',
+							mark(dialog,_,player){
+								var cards=player.getExpansions('twjuexing_buff');
+								if(player.isUnderControl(true)) dialog.addAuto(cards);
+								else return '共有'+get.cnNumber(cards.length)+'张牌';
+							},
+						},
+					},
+				},
+			},
+			twxiayong:{
+				audio:2,
+				audioname:['tw_yanliang'],
+				trigger:{global:'damageBegin2'},
+				filter(event,player){
+					if(event.getParent().type!='card'||event.card.name!='juedou'||!event.player.isIn()) return false;
+					const evt=game.getGlobalHistory('useCard',evt=>evt.card==event.card)[0];
+					return evt&&evt.player!=event.player&&(event.player!=player||player.countCards('h'));
+				},
+				forced:true,
+				logTarget:'player',
+				content(){
+					trigger.player==player?player.chooseToDiscard('h',true):trigger.num++;
+				},
+			},
+			//袁谭
+			twqiaosi:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				filter(event,player){
+					return get.info('twqiaosi').getCards(player).length;
+				},
+				check(event,player){
+					const cards=get.info('twqiaosi').getCards(player);
+					if(cards.reduce((sum,card)=>sum+get.value(card),0)) return false;
+					if(cards.length>=player.getHp()||cards.some(card=>get.name(card,player)=='tao'||get.name(card,player)=='jiu')) return true;
+					return player.getHp()>2&&cards.length>1;
+				},
+				prompt2(event,player){
+					const cards=get.info('twqiaosi').getCards(player);
+					let str='获得'+get.translation(cards);
+					if(cards.length<player.getHp()) str+='，然后你失去1点体力';
+					return str;
+				},
+				async content(event,trigger,player){
+					const cards=get.info('twqiaosi').getCards(player);
+					await player.gain(cards,'gain2');
+					if(cards.length<player.getHp()) await player.loseHp();
+				},
+				getCards(player){
+					let cards=[],targets=game.players.slice().concat(game.dead.slice());
+					for(const target of targets){
+						if(target==player) continue;
+						const history=target.getHistory('lose',evt=>evt.position==ui.discardPile);
+						if(history.length){
+							for(const evt of history) cards.addArray(evt.cards2.filterInD('d'));
+						}
+					}
+					const historyx=game.getGlobalHistory('cardMove',evt=>{
+						if(evt.name!='cardsDiscard') return false;
+						const evtx=evt.getParent();
+						if(evtx.name!='orderingDiscard') return false;
+						const evt2=(evtx.relatedEvent||evtx.getParent());
+						if(evt2.name=='phaseJudge'||evt2.player==player) return false;
+						return evt.cards.filterInD('d').length;
+					});
+					if(historyx.length){
+						for(const evtx of historyx) cards.addArray(evtx.cards.filterInD('d'));
+					}
+					return cards;
+				},
+			},
+			twbaizu:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				filter(event,player){
+					return player.isDamaged()&&player.countCards('h')&&game.hasPlayer(target=>{
+						return target!=player&&target.countCards('h');
+					})&&(player.getHp()+player.countMark('twbaizu_tuzhan'));
+				},
+				forced:true,
+				async content(event,trigger,player){
+					const sum=player.getHp()+player.countMark('twbaizu_tuzhan');
+					let result,filterTarget=(_,player,target)=>{
+						return target!=player&&target.countCards('h');
+					},targets=game.filterPlayer(target=>filterTarget(null,player,target));
+					if(targets.length<=sum) result={bool:true,targets:targets};
+					else result=await player.chooseTarget('请选择【败族】的目标','令你和这些角色同时弃置一张手牌，然后你对与你弃置牌类别相同的角色各造成1点伤害',filterTarget,num,true).set('ai',target=>{
+						const player=get.event('player');
+						return get.effect(target,{name:'guohe_copy2'},target,player)+get.damageEffect(target,player,player);
+					});
+					if(result.bool){
+						targets=result.targets.sortBySeat();
+						player.line(targets);
+						let list=[player].concat(targets).filter(target=>target.countDiscardableCards(target,'h'));
+						if(list.length){
+							let discards=[];
+							const {result}=await player.chooseCardOL(list,'败族：弃置一张手牌',(card,player)=>{
+								return lib.filter.cardDiscardable(card,player);
+							},true).set('ai',get.unuseful);
+							if(result){
+								for(let i=0;i<result.length;i++){
+									discards.push([list[i],result[i].cards]);
+								}
+								await game.loseAsync({lose_list:discards}).setContent('discardMultiple');
+								list=list.filter(i=>get.type2(result[0].cards[0])==get.type2(result[list.indexOf(i)].cards[0]));
+								if(list.length){
+									player.line(list);
+									for(const i of list) await i.damage();
+								}
+							}
+						}
+					}
+				},
+				subSkill:{
+					tuzhan:{
+						charlotte:true,
+						onremove:true,
+						marktext:'战',
+						intro:{content:'【败族】目标选择数+#'},
+					},
+				},
+			},
 			//玉真子
 			twhuajing:{
 				audio:2,
@@ -15443,6 +15895,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				str+='②你使用“剑法”牌不计入次数限制。';
 				return str;
 			},
+			twduwang(player){
+				let str='使命技。使命：出牌阶段开始时，你可以选择至多三名其他角色并摸X张牌（X为选择角色数+1），然后这些角色依次将一张牌当作【决斗】对你使用。成功：准备阶段，若你上回合使用和成为【决斗】的次数和不小于4（若游戏总人数小于4则改为3），你选择一项：①获得技能〖狭勇〗；②重置〖独往〗和〖延势〗并删除〖独往〗的使命失败分支。';
+				if(player.storage.twduwang_fail) str+='<span style="text-decoration: line-through; ">';
+				str+='失败：当你进入濒死状态时，其他角色不能对你使用【桃】，当你死亡时，使命失败。';
+				if(player.storage.twduwang_fail) str+='</span>';
+				return str;
+			},
 		},
 		translate:{
 			tw_beimihu:'TW卑弥呼',
@@ -16113,6 +16572,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twhuajing_gong_info:'当你使用【杀】造成伤害后，你随机弃置受伤角色装备区里的一张牌。',
 			twtianshou:'天授',
 			twtianshou_info:'锁定技，回合结束时，若你本回合使用【杀】造成过伤害，且你拥有本回合获得过效果的“武”标记，则你须将其中一个“武”标记交给一名其他角色并令其获得此标记的效果直到其回合结束，然后你摸两张牌。',
+			tw_yanliang:'颜良',
+			tw_wenchou:'文丑',
+			tw_yuantan:'袁谭',
+			twduwang:'独往',
+			twduwang_info:'使命技。使命：出牌阶段开始时，你可以选择至多三名其他角色并摸X张牌（X为选择角色数+1），然后这些角色依次将一张牌当作【决斗】对你使用。成功：准备阶段，若你上回合使用和成为【决斗】的次数和不小于4（若游戏总人数小于4则改为3），你选择一项：①获得技能〖狭勇〗；②重置〖独往〗和〖延势〗并删除〖独往〗的使命失败分支。失败：当你进入濒死状态时，其他角色不能对你使用【桃】，当你死亡时，使命失败。',
+			twylyanshi:'延势',
+			twylyanshi_info:'限定技，你可以将一张【杀】当作【决斗】、【兵临城下】或任意智囊牌使用或打出。',
+			twjuexing:'绝行',
+			twjuexing_info:'出牌阶段限一次，你可以视为对一名其他角色使用【决斗】。此【决斗】生效时，你与其将所有手牌扣置于武将牌上，然后各摸等同于当前体力值的牌，此牌结算完毕后，你与其弃置本次以此法摸的牌，然后获得扣置于武将牌上的牌。屠战：当你因〖绝行〗摸牌时，摸牌数+1。',
+			twxiayong:'狭勇',
+			twxiayong_info:'锁定技，当你使用的【决斗】对其他角色造成伤害时，或其他角色使用【决斗】对你造成伤害时，若受伤角色为/不为你，则你弃置一张牌/此伤害+1。',
+			twqiaosi:'峭嗣',
+			twqiaosi_info:'结束阶段，你可以获得其他角色本回合从其手牌区和装备区进入弃牌堆的牌，然后若你以此法获得的牌数小于你的体力值，则你失去1点体力。',
+			twbaizu:'败族',
+			twbaizu_info:'锁定技，结束阶段，若你已受伤且你有手牌，则你须选择X名有手牌的其他角色（X为你的体力值），你与这些角色同时弃置一张手牌，然后你对与你弃置牌类别相同的所有角色各造成1点伤害。屠战：〖败族〗目标选择数+1。',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',

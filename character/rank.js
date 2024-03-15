@@ -374,6 +374,9 @@ window.noname_character_rank={
 		'star_zhangchunhua',
 	],
 	am:[
+		'tw_yanliang',
+		'tw_wenchou',
+		'tw_yuantan',
 		'bailingyun',
 		'clan_wuqiao',
 		'muludawang',
@@ -2174,6 +2177,9 @@ window.noname_character_rank={
 			'dc_sb_simayi',
 		],
 		rare:[
+			'tw_yanliang',
+			'tw_wenchou',
+			'tw_yuantan',
 			'zhugemengxue',
 			'ol_sb_taishici',
 			'clan_wuqiao',
