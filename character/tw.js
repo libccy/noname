@@ -397,7 +397,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							game.log(player,'完成使命');
 							const {result:{index}}=await player.chooseControl().set('choiceList',[
 								'获得技能【狭勇】',
-								//'重置【独往】和【延势】，删除【独往】的使命失败分支，获得【延势】的屠战效果',
+								//'重置【独往】和【延势】，删除【独往】的使命失败分支，获得【延势】的历战效果',
 								'重置【独往】和【延势】，删除【独往】的使命失败分支',
 							]).set('prompt','独往：请选择一项').set('ai',()=>{
 								const player=get.event('player'),num=game.countPlayer(current=>{
@@ -608,8 +608,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						popup:false,
 						content(){
-							player.popup('屠战');
-							game.log(player,'触发了','#g【绝行】','的','#y屠战','效果');
+							player.popup('历战');
+							game.log(player,'触发了','#g【绝行】','的','#y历战','效果');
 							trigger.num++;
 						},
 					},
@@ -16580,13 +16580,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twylyanshi:'延势',
 			twylyanshi_info:'限定技，你可以将一张【杀】当作【决斗】、【兵临城下】或任意智囊牌使用或打出。',
 			twjuexing:'绝行',
-			twjuexing_info:'出牌阶段限一次，你可以视为对一名其他角色使用【决斗】。此【决斗】生效时，你与其将所有手牌扣置于武将牌上，然后各摸等同于当前体力值的牌，此牌结算完毕后，你与其弃置本次以此法摸的牌，然后获得扣置于武将牌上的牌。屠战：当你因〖绝行〗摸牌时，摸牌数+1。',
+			twjuexing_info:'出牌阶段限一次，你可以视为对一名其他角色使用【决斗】。此【决斗】生效时，你与其将所有手牌扣置于武将牌上，然后各摸等同于当前体力值的牌，此牌结算完毕后，你与其弃置本次以此法摸的牌，然后获得扣置于武将牌上的牌。历战：当你因〖绝行〗摸牌时，摸牌数+1。',
 			twxiayong:'狭勇',
 			twxiayong_info:'锁定技，当你使用的【决斗】对其他角色造成伤害时，或其他角色使用【决斗】对你造成伤害时，若受伤角色为/不为你，则你弃置一张牌/此伤害+1。',
 			twqiaosi:'峭嗣',
 			twqiaosi_info:'结束阶段，你可以获得其他角色本回合从其手牌区和装备区进入弃牌堆的牌，然后若你以此法获得的牌数小于你的体力值，则你失去1点体力。',
 			twbaizu:'败族',
-			twbaizu_info:'锁定技，结束阶段，若你已受伤且你有手牌，则你须选择X名有手牌的其他角色（X为你的体力值），你与这些角色同时弃置一张手牌，然后你对与你弃置牌类别相同的所有角色各造成1点伤害。屠战：〖败族〗目标选择数+1。',
+			twbaizu_info:'锁定技，结束阶段，若你已受伤且你有手牌，则你须选择X名有手牌的其他角色（X为你的体力值），你与这些角色同时弃置一张手牌，然后你对与你弃置牌类别相同的所有角色各造成1点伤害。历战：〖败族〗目标选择数+1。',
 
 			tw_mobile:'海外服·稀有专属',
 			tw_yunchouzhi:'运筹帷幄·智',
