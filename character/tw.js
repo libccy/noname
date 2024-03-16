@@ -313,9 +313,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								},'he');
 							});
 						},
-						direct:true,
-						async content(event,trigger,player){
-							let {result:{bool,targets}}=await player.chooseTarget([1,3],(_,player,target)=>{
+						async cost(event,trigger,player){
+							let {result}=await player.chooseTarget([1,3],(_,player,target)=>{
 								return target!=player&&target.hasCard(card=>{
 									if(get.position(card)=='h') return true;
 									return target.canUse(get.autoViewAs({name:'juedou'},[card]),player,false);
@@ -330,33 +329,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								});
 								return (Math.min(num,3)+1)*get.effect(player,{name:'draw'},player,player)+get.effect(target,{name:'guohe_copy2'},target,player)+get.effect(player,{name:'juedou'},target,player);
 							}).set('prompt2','选择至多三名其他角色并摸选择角色数+1的牌，然后这些角色须将一张牌当作【决斗】对你使用');
-							if(bool){
-								targets=targets.sortBySeat();
-								player.logSkill('twduwang_effect',targets);
-								await player.draw(targets.length+1);
-								for(const target of targets){
-									if(!target.hasCard(card=>{
-										return target.canUse(get.autoViewAs({name:'juedou'},[card]),player,false);
-									},'he')) continue;
-									await target.chooseToUse()
-									.set('forced',true)
-									.set('openskilldialog','独往：将一张牌当作【决斗】对'+get.translation(player)+'使用')
-									.set('norestore',true)
-									.set('_backupevent','twduwang_backup')
-									.set('targetRequired',true)
-									.set('complexSelect',true)
-									.set('custom',{
-										add:{},
-										replace:{window:function(){}}
-									})
-									.backup('twduwang_backup')
-									.set('filterTarget',function(card,player,target){
-										if(target!=_status.event.sourcex&&!ui.selected.targets.includes(_status.event.sourcex)) return false;
-										return lib.filter.targetEnabled.apply(this,arguments);
-									})
-									.set('sourcex',player)
-									.set('addCount',false);
-								}
+							if(result.bool) result.targets.sortBySeat();
+							event.result=result;
+						},
+						async content(event,trigger,player){
+							const targets=event.targets;
+							player.logSkill('twduwang_effect',targets);
+							await player.draw(targets.length+1);
+							for(const target of targets){
+								if(!target.hasCard(card=>{
+									return target.canUse(get.autoViewAs({name:'juedou'},[card]),player,false);
+								},'he')) continue;
+								await target.chooseToUse()
+								.set('forced',true)
+								.set('openskilldialog','独往：将一张牌当作【决斗】对'+get.translation(player)+'使用')
+								.set('norestore',true)
+								.set('_backupevent','twduwang_backup')
+								.set('targetRequired',true)
+								.set('complexSelect',true)
+								.set('custom',{
+									add:{},
+									replace:{window:function(){}}
+								})
+								.backup('twduwang_backup')
+								.set('filterTarget',function(card,player,target){
+									if(target!=_status.event.sourcex&&!ui.selected.targets.includes(_status.event.sourcex)) return false;
+									return lib.filter.targetEnabled.apply(this,arguments);
+								})
+								.set('sourcex',player)
+								.set('addCount',false);
 							}
 						},
 					},
