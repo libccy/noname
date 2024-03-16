@@ -1416,7 +1416,7 @@ export class Create extends Uninstantable {
 			Object.keys(lib.characterPack).filter(key=>{
 				if(key.indexOf('mode_extension')!=0)return false;
 				const extName = key.slice(15);
-				if (!game.hasExtension(extName) || !game.hasExtensionLoaded(extName)) return false;
+				//if (!game.hasExtension(extName) || !game.hasExtensionLoaded(extName)) return false;
 				return lib.config[`extension_${extName}_characters_enable`] === true;
 			}).forEach(key=>packlist.add(key));
 			for (var i = 0; i < packlist.length; i++) {
