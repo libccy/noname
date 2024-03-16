@@ -7714,6 +7714,7 @@ export class Library extends Uninstantable {
 			'<li>搏击：若一名角色拥有带有“搏击”的技能，则当该搏击技能触发时，若本次技能的目标角色在你攻击范围内，且你在其攻击范围内，则你执行技能主体效果时，同时额外执行“搏击”后的额外效果。' +
 			'<li>游击：若一名角色拥有带有“游击”的技能，则当该游击技能执行至“游击”处时，若本次技能的目标角色在你的攻击范围内，且你不在其攻击范围内，则你可以执行“游击”后的额外效果。' +
 			'<li>激昂：一名角色发动“昂扬技”标签技能后，此技能失效，直至从此刻至满足此技能“激昂”条件后。' +
+			'<li>历战：对一个技能效果的升级/修改（可叠加）。' +
 			''
 	};
 	/**
@@ -10545,18 +10546,21 @@ export class Library extends Uninstantable {
 				}), player, _status.event) && player.storage.stratagem_fury >= cost.get(availableName));
 			},
 			viewAs: (cards, player) => {
-				const cardName = get.name(cards[0], player);
-				return cardName ? new lib.element.VCard({
-					name: cardName,
-					nature: get.nature(cards[0], player),
-					suit: get.suit(cards[0], player),
-					number: get.number(cards[0], player),
-					isCard: true,
-					cards: [cards[0]],
-					storage: {
-						stratagem_buffed: 1
-					}
-				}) : new lib.element.VCard();
+				if(cards.length){
+					const cardName = get.name(cards[0], player);
+					return cardName ? new lib.element.VCard({
+						name: cardName,
+						nature: get.nature(cards[0], player),
+						suit: get.suit(cards[0], player),
+						number: get.number(cards[0], player),
+						isCard: true,
+						cards: [cards[0]],
+						storage: {
+							stratagem_buffed: 1
+						}
+					}) : new lib.element.VCard();
+				}
+				return null;
 			},
 			prompt: () => {
 				const span = document.createElement('span');
