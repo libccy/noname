@@ -9305,7 +9305,7 @@ return event.junling=='junling5'?1:0;});
 					}
 					event.target.addTempSkill('qingcheng_ai');
 					if(get.type(cards[0])=='equip'&&!event.done){
-					player.chooseTarget('是否暗置一名武将牌均为暗置的角色的一张武将牌？',function(card,player,target){
+					player.chooseTarget('是否暗置一名武将牌均为明置的角色的一张武将牌？',function(card,player,target){
 						return target!=player&&!target.isUnseen(2);
 					}).set('ai',function(target){
 						return -get.attitude(_status.event.player,target);
@@ -12797,11 +12797,6 @@ return event.junling=='junling5'?1:0;});
 				inherit:'xiaoji',
 				audio:'xiaoji',
 				preHidden:true,
-				getIndex(event, player){
-					const evt=event.getl(player);
-					if (evt && evt.player === player && evt.es) return 1;
-					return false;
-				},
 				content:function(){
 					player.draw(player==_status.currentPhase?1:3);
 				}
