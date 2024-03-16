@@ -638,7 +638,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter(event,player){
 					if(event.getParent().type!='card'||event.card.name!='juedou'||!event.player.isIn()) return false;
 					const evt=game.getGlobalHistory('useCard',evt=>evt.card==event.card)[0];
-					return evt&&evt.player!=event.player&&[evt.player,event.player].includes(player)&&(event.player!=player||player.countCards('h'));
+					if(evt&&evt.targets&&(event.player!=player||player.countCards('h'))){
+						if(evt.player==player){
+							return evt.targets.includes(event.player)&&event.player!=player;
+						}
+						return evt.targets.includes(player)&&evt.player!=player;
+					}
+					return false;
 				},
 				forced:true,
 				logTarget:'player',
