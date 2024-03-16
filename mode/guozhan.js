@@ -12799,7 +12799,7 @@ return event.junling=='junling5'?1:0;});
 				preHidden:true,
 				getIndex(event, player){
 					const evt=event.getl(player);
-					if (evt && evt.player === player && evt.es) return 1;
+					if (evt && evt.player === player && evt.es && evt.es.length) return 1;
 					return false;
 				},
 				content:function(){
