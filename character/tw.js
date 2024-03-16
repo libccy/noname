@@ -844,6 +844,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.addTempSkill('twhuajing_blocker');
 							player.getHistory('custom').push({twhuajing_skills:gainSkills});
 						},
+						ai:{
+							order:12,
+							result:{
+								player(player){
+									return player.countCards('hs',card=>{
+										return get.name(card)=='sha'&&player.hasValueTarget(card,false,true);
+									});
+								},
+							},
+						},
 					},
 					jian:{
 						charlotte:true,
@@ -1088,14 +1098,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					.set('prompt2','弃置一张牌并随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】')
 					.set('ai',card=>7-get.value(card))
 					.set('logSkill','twdengjian');
-					if(bool) */player.gain(cards.randomGet(),'gain2').gaintag.add('twdengjianx');
+					if(bool) */await player.gain(cards.randomGet(),'gain2').gaintag.add('twdengjianx');
 				},
 				group:'twdengjian_buff',
 				subSkill:{
 					ban:{charlotte:true},
 					buff:{
 						mod:{
-							aiOrder:function(player,card,num){
+							aiOrder(player,card,num){
 								if(get.itemtype(card)=='card'&&card.hasGaintag('twdengjianx')) return num+0.1;
 							},
 						},
@@ -1154,7 +1164,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 0;
 						})
 						.set('prompt',get.prompt('twxinshou'))
-						.set('prompt2','令【登剑】失效并令一名其他角色获得【登剑】，你的下个回合开始时，其失去【登剑】，若其这期间使用【杀】造成过伤害，则你结束【登剑】的失效状态')
+						.set('prompt2','令【登剑】失效并令一名其他角色获得【登剑】，你的下个回合开始时，其失去【登剑】，若其这期间使用【杀】造成过伤害，则你结束【登剑】的失效状态');
 						if(bool){
 							const target=targets[0];
 							player.logSkill('twxinshou',target);
@@ -1184,7 +1194,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						let choice=[],choiceList=['摸一张牌','交给一名其他角色一张牌',];
+						let choice=[],choiceList=['摸一张牌','交给一名其他角色一张牌'];
 						if(!player.hasSkill('twxinshou_0')) choice.push('摸牌');
 						else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
 						if(!player.hasSkill('twxinshou_1')&&game.hasPlayer(target=>target!=player)) choice.push('给牌');
@@ -1325,11 +1335,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twenchou:{
 				audio:2,
 				enable:'phaseUse',
-				filter:function(event,player){
+				filter(event,player){
 					return game.hasPlayer(current=>lib.skill.twenchou.filterTarget(null,player,current));
 				},
 				position:'he',
-				filterTarget:function(card,player,target){
+				filterTarget(card,player,target){
 					return target!=player&&target.countCards('h')&&target.hasDisabledSlot();
 				},
 				usable:1,
