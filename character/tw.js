@@ -396,11 +396,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						async content(event,trigger,player){
 							player.awakenSkill('twduwang');
 							game.log(player,'完成使命');
-							const {result:{index}}=await player.chooseControl().set('choiceList',[
+							let result;
+							if(player.hasSkill('twxiayong',null,false,false)) result={index:1};
+							else result=await player.chooseControl().set('choiceList',[
 								'获得技能【狭勇】',
 								//'重置【独往】和【延势】，删除【独往】的使命失败分支，获得【延势】的历战效果',
 								'重置【独往】和【延势】，删除【独往】的使命失败分支',
 							]).set('prompt','独往：请选择一项').set('ai',()=>{
+								/*
 								const player=get.event('player'),num=game.countPlayer(current=>{
 									return current!=player&&current.hasCard(card=>{
 										if(get.position(card)=='h') return true;
@@ -408,12 +411,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									},'he')&&get.effect(current,{name:'guohe_copy2'},current,player)+get.effect(player,{name:'juedou'},current,player);
 								});
 								return Math.max(0,Math.min(2,num)-1);
-							});
-							if(index==0) await player.addSkills('twxiayong');
+								*/
+								return 1;
+							}).forResult();
+							if(result.index==0) await player.addSkills('twxiayong');
 							else{
-								player.restoreSkill('twduwang');
-								player.restoreSkill('twylyanshi');
+								for(const skill of ['twduwang','twylyanshi']){
+									if(player.awakenedSkills.includes(skill)){
+										player.restoreSkill(skill);
+										player.popup(skill);
+										game.log(player,'重置了技能','#g【'+get.translation(skill)+'】');
+									}
+								}
 								player.storage.twduwang_fail=true;
+								game.log(player,'修改了技能','#g【独往】');
 							}
 						},
 					},
