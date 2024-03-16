@@ -579,7 +579,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 						if(listx.length){
-							game.loseAsync({gain_list:listx,animate:'gain2'}).setContent('gaincardMultiple');
+							game.loseAsync({gain_list:listx,animate:'draw'}).setContent('gaincardMultiple');
 						}
 					}).then(()=>{
 						player.removeSkill('twjuexing_buff');
