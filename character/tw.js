@@ -381,7 +381,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										return evt.card.name=='juedou';
 									}).length,targets=game.players.slice().concat(game.dead.slice());
 									for(const target of targets){
-										num+=target.getHistory('useCard',evt=>{
+										num+=target.actionHistory[i].useCard.filter(evt=>{
 											return evt.card.name=='juedou'&&evt.targets&&evt.targets.includes(player);
 										}).length;
 									}
