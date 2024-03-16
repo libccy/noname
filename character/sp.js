@@ -18230,6 +18230,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return get.info('ollongdan').ai.skillTagFilter(player,tag);
 							},
 							order:function(item,player){
+								if(!player||!player.storage) return;
 								const awakened=Object.keys(player.storage).some(i=>typeof i=='string'&&i.indexOf('fuhan')!=-1);
 								if(player&&_status.event.type=='phase'){
 									var max=0;

@@ -9901,7 +9901,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(th>0){
 						event.num=Math.ceil(th/2);
 						var list=[
-							'本回合不能使用或打出手牌，然后'+str+'摸两张牌',
+							'本回合不能使用手牌，然后'+str+'摸两张牌',
 							'展示所有手牌，并将其中一种花色的所有牌交给'+str,
 							'弃置'+get.cnNumber(event.num)+'张手牌',
 						];
@@ -9944,10 +9944,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					block:{
 						mark:true,
-						intro:{content:'不能使用或打出手牌'},
+						intro:{content:'不能使用手牌'},
 						charlotte:true,
 						mod:{
-							cardEnabled2:function(card){
+							cardEnabled:function(card){
+								if(get.position(card)=='h') return false;
+							},
+							cardSavable:function(card){
 								if(get.position(card)=='h') return false;
 							},
 						},
