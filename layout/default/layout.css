@@ -2693,6 +2693,7 @@ div:not(.handcards)>.card>.info>span,
 	width: 12px;
 	height: 12px;
 	background-size: 100% 100%;
+	box-shadow: none;
 }
 .hp[data-condition="high"]>div:not(.lost):not(.shield) {
 	background: rgba(57, 123, 4,1);
