@@ -212,7 +212,15 @@ export class Game extends Uninstantable {
 		return id;
 	}
 	/**
+	 * @typedef {import("../library/hooks/interface.js").NonameHookType} NonameHookType
+	 */
+	/**
 	 * 通用的调用钩子函数
+	 * 
+	 * @template {NonameHookType} HookType
+	 * @template {keyof HookType} Name
+	 * @param {Name} name
+	 * @param {Parameters<HookType[Name]>} args 
 	 */
 	static callHook(name, args) {
 		const callHook = () => {
@@ -5946,7 +5954,7 @@ export class Game extends Uninstantable {
 		if (!event.forced && !event.fakeforce && get.noSelected()) confirm += 'c';
 		if (event.isMine()) game.Check.confirm(event, confirm);
 
-		game.callHook("checkEnd", [event, { ok, auto, auto_confirm }]);
+		game.callHook("checkEnd", [event, { ok, auto, auto_confirm, autoConfirm: auto_confirm }]);
 
 		// if (ui.confirm && ui.confirm.lastChild.link == 'cancel') {
 		// 	if (_status.event.type == 'phase' && !_status.event.skill) {

@@ -1533,7 +1533,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				group:['sbhuoji_fire','sbhuoji_achieve','sbhuoji_fail','sbhuoji_mark'],
 				subSkill:{
 					fire:{
-						audio:'sbhuoji1',
+						audio:'sbhuoji1.mp3',
 						enable:'phaseUse',
 						filterTarget:lib.filter.notMe,
 						prompt:'选择一名其他角色，对其与其势力相同的所有其他角色各造成1点火属性伤害',
@@ -1568,7 +1568,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					achieve:{
-						audio:'sbhuoji2',
+						audio:'sbhuoji2.mp3',
 						trigger:{player:'phaseZhunbeiBegin'},
 						filter:function(event,player){
 							return player.getAllHistory('sourceDamage',evt=>evt.hasNature('fire')).reduce((num,evt)=>num+evt.num,0)>=game.players.length+game.dead.length;
@@ -1585,7 +1585,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 					fail:{
-						audio:'sbhuoji3',
+						audio:'sbhuoji3.mp3',
 						trigger:{player:'dying'},
 						forced:true,
 						locked:false,
@@ -1615,9 +1615,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
-			sbhuoji1:{audio:true},
-			sbhuoji2:{audio:true},
-			sbhuoji3:{audio:true},
 			sbkanpo:{
 				init:function(player){
 					if(!player.storage.sbkanpo){
@@ -6589,7 +6586,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				locked:false,
 				filter:function(event,player){
-					return player.hasSkill('splveying',null,false,false)&&(get.type(event.card)=='trick'&&!get.tag(event.card,'damage'))&&player.countMark('splveying')>1;
+					return player.hasSkill('splveying',null,null,false)&&(get.type(event.card)=='trick'&&!get.tag(event.card,'damage'))&&player.countMark('splveying')>1;
 				},
 				content:function(){
 					player.removeMark('splveying',2);

@@ -2273,7 +2273,7 @@ export class Get extends Uninstantable {
 				let char = chars[+part];
 				let unit = units[i];
 				if (char === '零') unit = '';
-				else if (char === '一' && i === 1) char = '';
+				else if (char === '一' && i === 1 && str.length === 2) char = '';
 				else if (char === '二' && i > 1 && !ordinal) char = '两';
 				result = char + unit + result;
 			}

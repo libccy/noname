@@ -5569,37 +5569,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			qinqing:{
 				audio:2,
-				mode:['identity','versus'],
+				mode:['identity','versus','doudizhu'],
 				available:function(mode){
 					if(mode=='versus'&&_status.mode!='four') return false;
 					if(mode=='identity'&&_status.mode=='purple') return false;
 				},
+				getZhu:(player)=>{
+					if(get.mode=='doudizhu') return game.findPlayer(i=>i.identity=='zhu');
+					return get.zhu(player);
+				},
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
 				filter:function(event,player){
-					var zhu=get.zhu(player);
-					if(!zhu||!zhu.isZhu) return false;
+					var zhu=get.info('qinqing').getZhu(player);
+					if(!zhu||(get.mode!='doudizhu'&&!zhu.isZhu)) return false;
 					return game.hasPlayer(function(current){
 						return current!=zhu&&current.inRange(zhu);
 					});
 				},
 				content:function(){
 					'step 0'
+					event.zhu=get.info('qinqing').getZhu(player);
 					player.chooseTarget(get.prompt2('qinqing'),[1,Infinity],function(card,player,target){
-						var zhu=get.zhu(player);
+						var zhu=get.event('zhu');
 						if(target==zhu) return false;
 						return target.inRange(zhu);
 					}).set('ai',function(target){
-						var he=target.countCards('he')
+						var he=target.countCards('he');
+						var zhu=get.event('zhu');
 						if(get.attitude(_status.event.player,target)>0){
 							if(he==0) return 1;
-							if(target.countCards('h')>get.zhu(player).countCards('h')) return 1;
+							if(target.countCards('h')>zhu.countCards('h')) return 1;
 						}
 						else{
 							if(he>0) return 1;
 						}
 						return 0;
-					});
+					}).set('zhu',event.zhu);
 					'step 1'
 					if(result.bool){
 						event.targets=result.targets.slice(0).sortBySeat();
@@ -5620,9 +5626,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					'step 3'
 					var num=0;
-					var zhu=get.zhu(player);
-					if(zhu){
-						var nh=zhu.countCards('h');
+					if(event.zhu){
+						var nh=event.zhu.countCards('h');
 						for(var i=0;i<event.list.length;i++){
 							if(event.list[i].countCards('h')>nh){
 								num++;
@@ -14151,6 +14156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jiyu_info:'出牌阶段限一次，你可以令一名角色弃置一张手牌。若如此做，你不能使用与之相同花色的牌，直到回合结束。若其以此法弃置的牌为黑桃，你翻面并令其失去1点体力。若你有未被〖讥谀〗限制的手牌，则你可以继续发动此技能，但不能选择本回合已经选择过的目标。',
 			qinqing:'寝情',
 			qinqing_info:'结束阶段，你可以选择任意名攻击范围内含有主公的角色，然后弃置这些角色各一张牌并令其摸一张牌（无牌则不弃），若如此做，你摸X张牌（X为其中手牌比主公多的角色数）。',
+			qinqing_info_doudizhu:'结束阶段，你可以选择任意名攻击范围内含有地主的角色，然后弃置这些角色各一张牌并令其摸一张牌（无牌则不弃），若如此做，你摸X张牌（X为其中手牌比地主多的角色数）。',
 			huisheng:'贿生',
 			huisheng_info:'当你受到其他角色对你造成的伤害时，你可以令其观看你任意数量的牌并令其选择一项：1.获得这些牌中的一张，防止此伤害，然后你不能再对其发动〖贿生〗；2.弃置等量的牌。',
 			jishe:'极奢',
