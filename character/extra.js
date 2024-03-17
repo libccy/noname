@@ -2118,6 +2118,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else if(lib.translate[name+'_info']){
 						str+=(''+lib.translate[name+'_info']+'|');
 					}
+					if(lib.translate[name+'_append']){
+						str+=(''+lib.translate[name+'_append']+'|');
+					}
 					if(get.is.yingbianConditional(node)){
 						const yingbianEffects=get.yingbianEffects(node);
 						if(!yingbianEffects.length){
