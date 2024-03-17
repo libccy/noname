@@ -1,18 +1,13 @@
 import { NonameHook } from "./hook.js"
+import { defaultAssemblys } from "../assembly/index.js"
 
 export const defaultHooks = {
 	addGroup: new NonameHook("addGroup"),
 	addNature: new NonameHook("addNature"),
 
-	checkBegin: new NonameHook("checkBegin"),
-	checkCard: new NonameHook("checkCard"),
-	checkTarget: new NonameHook("checkTarget"),
-	checkButton: new NonameHook("checkButton"),
-	checkEnd: new NonameHook("checkEnd"),
+	...defaultAssemblys
+}
 
-	uncheckBegin: new NonameHook("uncheckBegin"),
-	uncheckCard: new NonameHook("uncheckCard"),
-	uncheckTarget: new NonameHook("uncheckTarget"),
-	uncheckButton: new NonameHook("uncheckButton"),
-	uncheckEnd: new NonameHook("uncheckEnd")
+export {
+	NonameHook
 }

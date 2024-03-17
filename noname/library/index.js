@@ -24,6 +24,7 @@ import { Experimental } from "./experimental/index.js";
 import * as Element from "./element/index.js";
 import { updateURLs } from "./update-urls.js";
 import { defaultHooks } from "./hooks/index.js"
+import { freezeButExtensible } from "../util/index.js"
 
 
 export class Library extends Uninstantable {
@@ -153,7 +154,7 @@ export class Library extends Uninstantable {
 	 * 这样当某个地方调用game.callHook(钩子名,[...函数参数])时，就会按顺序将对应数组中的每个函数运行一遍（传参为callHook的第二个参数）。
 	 * 你可以将hook机制类比为event.trigger()，但是这里只能放同步代码
 	 */
-	static hooks = { ...defaultHooks };
+	static hooks = freezeButExtensible({ ...defaultHooks });
 
 	/**
 	 * **无名杀频道推送机制**

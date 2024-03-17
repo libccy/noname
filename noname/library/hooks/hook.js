@@ -3,49 +3,35 @@ import * as buildin from "./buildin.js"
 /**
  * @template {import("./interface.js").NonameHookType} HookType
  * @template {keyof HookType} Name
+ * @extends {Array<HookType[Name]>}
  */
-export class NonameHook {
+export class NonameHook extends Array {
 	/**
 	 * @type {Name}
 	 */
 	#name
 
 	/**
-	 * @type {HookType[Name][]}
-	 */
-	#methodList
-
-	/**
 	 * 
 	 * @param {Name} name 
 	 */
 	constructor(name) {
+		super()
 		this.#name = name
-		this.#methodList = (name in buildin) ? [...buildin[name]] : []
+
+		if (name in buildin) {
+			// @ts-ignore
+			for (const item of buildin[name]) {
+				this.push(item)
+			}
+		}
+	}
+
+	static get [Symbol.species]() {
+		return Array
 	}
 
 	get name() {
 		return this.#name
-	}
-
-	/**
-	 * 
-	 * @param {HookType[Name]} method 
-	 */
-	add(method) {
-		return this.#methodList.add(method)
-	}
-
-	/**
-	 * 
-	 * @param {HookType[Name]} method 
-	 */
-	push(method) {
-		return this.#methodList.push(method)
-	}
-
-
-	*[Symbol.iterator]() {
-		yield* this.#methodList
 	}
 }
