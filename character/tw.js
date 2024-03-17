@@ -298,7 +298,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twduwang:{
 				audio:3,
 				dutySkill:true,
-				derivation:'twxiayong',
+				derivation:['twxiayong','twylyanshix'],
 				global:'twduwang_global',
 				group:['twduwang_effect','twduwang_achieve','twduwang_fail'],
 				subSkill:{
@@ -364,6 +364,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:{
 						viewAs:{name:'juedou'},
 						position:'he',
+						filterCard:true,
 						check(card){
 							if(get.name(card)=='sha') return 5-get.value(card);
 							return 8-get.value(card);
@@ -396,35 +397,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						async content(event,trigger,player){
 							player.awakenSkill('twduwang');
 							game.log(player,'完成使命');
-							let result;
-							if(player.hasSkill('twxiayong',null,false,false)) result={index:1};
+							let result,bool1=(player.hasSkill('twxiayong',null,false,false)),bool2=(!player.awakenedSkills.includes('twylyanshi')&&player.storage.twduwang_ylyanshi);
+							if(bool1&&bool2) result={index:2};
+							else if(bool1) result={index:1};
+							else if(bool2) result={index:0};
 							else result=await player.chooseControl().set('choiceList',[
 								'获得技能【狭勇】',
-								//'重置【独往】和【延势】，删除【独往】的使命失败分支，获得【延势】的历战效果',
-								'重置【独往】和【延势】，删除【独往】的使命失败分支',
+								'重置【延势】，获得【延势】的历战效果',
 							]).set('prompt','独往：请选择一项').set('ai',()=>{
-								/*
 								const player=get.event('player'),num=game.countPlayer(current=>{
 									return current!=player&&current.hasCard(card=>{
 										if(get.position(card)=='h') return true;
 										return current.canUse(get.autoViewAs({name:'juedou'},[card]),player,false);
 									},'he')&&get.effect(current,{name:'guohe_copy2'},current,player)+get.effect(player,{name:'juedou'},current,player);
 								});
-								return Math.max(0,Math.min(2,num)-1);
-								*/
-								return 1;
+								return num>=2?0:1;
 							}).forResult();
 							if(result.index==0) await player.addSkills('twxiayong');
-							else{
-								for(const skill of ['twduwang','twylyanshi']){
-									if(player.awakenedSkills.includes(skill)){
-										player.restoreSkill(skill);
-										player.popup(skill);
-										game.log(player,'重置了技能','#g【'+get.translation(skill)+'】');
-									}
+							if(result.index==1){
+								player.popup('twylyanshi');
+								if(player.awakenedSkills.includes('twylyanshi')){
+									player.restoreSkill('twylyanshi');
+									game.log(player,'重置了技能','#g【延势】');
 								}
-								player.storage.twduwang_fail=true;
-								game.log(player,'修改了技能','#g【独往】');
+								if(!player.storage.twduwang_ylyanshi){
+									player.storage.twduwang_ylyanshi=true;
+									game.log(player,'修改了技能','#g【延势】');
+								}
+							}
+							else{
+								if(player.awakenedSkills.includes('twduwang')){
+									player.restoreSkill('twduwang');
+									game.log(player,'重置了技能','#g【独往】');
+								}
+								if(!player.storage.twduwang_fail){
+									player.storage.twduwang_fail=true;
+									game.log(player,'修改了技能','#g【独往】');
+								}
 							}
 						},
 					},
@@ -500,6 +509,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								delete event.result.skill;
 								player.logSkill('twylyanshi');
 								player.awakenSkill('twylyanshi');
+								if(player.storage.twduwang_ylyanshi){
+									player.when({global:'phaseEnd'}).then(()=>{
+										if(player.awakenedSkills.includes('twylyanshi')){
+											player.popup('历战');
+											player.restoreSkill('twylyanshi');
+											game.log(player,'触发了','#g【延势】','的','#y历战','效果');
+										}
+									});
+								}
 							},
 						}
 					},
@@ -598,6 +616,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.removeSkill('twjuexing_buff');
 					});
 					await player.useCard(card,target,false);
+					player.when({global:'phaseEnd'}).then(()=>{
+						player.popup('历战');
+						player.addSkill('twjuexing_tuzhan');
+						player.addMark('twjuexing_tuzhan',1,false);
+						game.log(player,'触发了','#g【绝行】','的','#y历战','效果');
+					});
 				},
 				ai:{
 					order:1,
@@ -615,6 +639,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{content:'因【绝行】摸牌时，摸牌数+#'},
 						trigger:{player:'drawBegin'},
 						filter(event,player){
+							if(!player.hasMark('twjuexing_tuzhan')) return false;
 							return (event.gaintag||[]).includes('twjuexing');
 						},
 						forced:true,
@@ -622,7 +647,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						content(){
 							player.popup('历战');
 							game.log(player,'触发了','#g【绝行】','的','#y历战','效果');
-							trigger.num++;
+							trigger.num+=player.countMark('twjuexing_tuzhan');
 						},
 					},
 					buff:{
@@ -751,6 +776,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					}
+					player.when({global:'phaseEnd'}).then(()=>{
+						player.popup('历战');
+						player.addSkill('twbaizu_tuzhan');
+						player.addMark('twbaizu_tuzhan',1,false);
+						game.log(player,'触发了','#g【败族】','的','#y历战','效果');
+					});
 				},
 				subSkill:{
 					tuzhan:{
@@ -843,6 +874,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.addTempSkill(gainSkills);
 							player.addTempSkill('twhuajing_blocker');
 							player.getHistory('custom').push({twhuajing_skills:gainSkills});
+						},
+						ai:{
+							order:12,
+							result:{
+								player(player){
+									return player.countCards('hs',card=>{
+										return get.name(card)=='sha'&&player.hasValueTarget(card,false,true);
+									});
+								},
+							},
 						},
 					},
 					jian:{
@@ -1088,14 +1129,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					.set('prompt2','弃置一张牌并随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】')
 					.set('ai',card=>7-get.value(card))
 					.set('logSkill','twdengjian');
-					if(bool) */player.gain(cards.randomGet(),'gain2').gaintag.add('twdengjianx');
+					if(bool) */await player.gain(cards.randomGet(),'gain2').gaintag.add('twdengjianx');
 				},
 				group:'twdengjian_buff',
 				subSkill:{
 					ban:{charlotte:true},
 					buff:{
 						mod:{
-							aiOrder:function(player,card,num){
+							aiOrder(player,card,num){
 								if(get.itemtype(card)=='card'&&card.hasGaintag('twdengjianx')) return num+0.1;
 							},
 						},
@@ -1154,7 +1195,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return 0;
 						})
 						.set('prompt',get.prompt('twxinshou'))
-						.set('prompt2','令【登剑】失效并令一名其他角色获得【登剑】，你的下个回合开始时，其失去【登剑】，若其这期间使用【杀】造成过伤害，则你结束【登剑】的失效状态')
+						.set('prompt2','令【登剑】失效并令一名其他角色获得【登剑】，你的下个回合开始时，其失去【登剑】，若其这期间使用【杀】造成过伤害，则你结束【登剑】的失效状态');
 						if(bool){
 							const target=targets[0];
 							player.logSkill('twxinshou',target);
@@ -1184,7 +1225,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 					else{
-						let choice=[],choiceList=['摸一张牌','交给一名其他角色一张牌',];
+						let choice=[],choiceList=['摸一张牌','交给一名其他角色一张牌'];
 						if(!player.hasSkill('twxinshou_0')) choice.push('摸牌');
 						else choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
 						if(!player.hasSkill('twxinshou_1')&&game.hasPlayer(target=>target!=player)) choice.push('给牌');
@@ -1325,11 +1366,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twenchou:{
 				audio:2,
 				enable:'phaseUse',
-				filter:function(event,player){
+				filter(event,player){
 					return game.hasPlayer(current=>lib.skill.twenchou.filterTarget(null,player,current));
 				},
 				position:'he',
-				filterTarget:function(card,player,target){
+				filterTarget(card,player,target){
 					return target!=player&&target.countCards('h')&&target.hasDisabledSlot();
 				},
 				usable:1,
@@ -15952,6 +15993,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(player.storage.twduwang_fail) str+='</span>';
 				return str;
 			},
+			twylyanshi(player){
+				return lib.translate[(player.storage.twduwang_ylyanshi?'twylyanshix':'twylyanshi')+'_info'];
+			},
 		},
 		translate:{
 			tw_beimihu:'TW卑弥呼',
@@ -16626,9 +16670,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			tw_wenchou:'文丑',
 			tw_yuantan:'袁谭',
 			twduwang:'独往',
-			twduwang_info:'使命技。使命：出牌阶段开始时，你可以选择至多三名其他角色并摸X张牌（X为选择角色数+1），然后这些角色依次将一张牌当作【决斗】对你使用。成功：准备阶段，若你上回合使用和成为【决斗】的次数和不小于4（若游戏总人数小于4则改为3），你选择一项：①获得技能〖狭勇〗；②重置〖独往〗和〖延势〗并删除〖独往〗的使命失败分支。失败：当你进入濒死状态时，其他角色不能对你使用【桃】，当你死亡时，使命失败。',
+			twduwang_info:'使命技。使命：出牌阶段开始时，你可以选择至多三名其他角色并摸X张牌（X为选择角色数+1），然后这些角色依次将一张牌当作【决斗】对你使用。成功：准备阶段，若你上回合使用和成为【决斗】的次数和不小于4（若游戏总人数小于4则改为3），你选择一项，然后重置〖独往〗并删除〖独往〗的使命失败分支：①获得技能〖狭勇〗；②重置〖延势〗并修改〖延势〗（令〖延势〗获得历战效果）。失败：当你进入濒死状态时，其他角色不能对你使用【桃】，当你死亡时，使命失败。',
 			twylyanshi:'延势',
 			twylyanshi_info:'限定技，你可以将一张【杀】当作【决斗】、【兵临城下】或任意智囊牌使用或打出。',
+			twylyanshix:'延势·改',
+			twylyanshix_info:'限定技，你可以将一张【杀】当作【决斗】、【兵临城下】或任意智囊牌使用或打出。历战：重置〖延势〗。',
 			twjuexing:'绝行',
 			twjuexing_info:'出牌阶段限一次，你可以视为对一名其他角色使用【决斗】。此【决斗】生效时，你与其将所有手牌扣置于武将牌上，然后各摸等同于当前体力值的牌，此牌结算完毕后，你与其弃置本次以此法摸的牌，然后获得扣置于武将牌上的牌。历战：当你因〖绝行〗摸牌时，摸牌数+1。',
 			twxiayong:'狭勇',
