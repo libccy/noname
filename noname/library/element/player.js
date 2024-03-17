@@ -2028,44 +2028,28 @@ export class Player extends HTMLDivElement {
 		next.setContent('chooseToPSS');
 		return next;
 	}
-	chooseToEnable() {
+	/**
+	 * @param { Player } source
+	 */
+	chooseToEnable(source) {
 		var next = game.createEvent('chooseToEnable');
 		next.player = this;
+		next.source=source;
+		if(!source)next.source=this;
 		next.setContent('chooseToEnable');
 		return next;
 	}
 	/**
 	 * @param { boolean } [horse]
+	 * @param { Player } source
 	 */
-	chooseToDisable(horse) {
+	chooseToDisable(horse, source) {
 		var next = game.createEvent('chooseToDisable');
 		next.player = this;
+		next.source=source;
+		if(!source)next.source=this;
 		if (horse==true) next.horse = true;
 		next.setContent('chooseToDisable');
-		return next;
-	}
-	/**
-	 * @param { Player } target
-	 */
-	enablePlayerEquip(target){
-		if(!target)return;
-		var next = game.createEvent('enablePlayerEquip');
-		next.player = this;
-		next.target = target;
-		next.setContent('enablePlayerEquip');
-		return next;
-	}
-		/**
-	 * @param { boolean } [horse]
-	 * @param { Player } target
-	 */
-	disablePlayerEquip(horse, target){
-		if(!target)return;
-		var next = game.createEvent('disablePlayerEquip');
-		next.player = this;
-		next.target = target;
-		if (horse==true) next.horse = true;
-		next.setContent('disablePlayerEquip');
 		return next;
 	}
 	/**

@@ -1544,8 +1544,8 @@ export const Content = {
 		else {
 			list.sort();
 			event.list = list;
-			var next = player.chooseControl(list);
-			next.set('prompt', '请选择恢复一个装备栏');
+			var next = source.chooseControl(list);
+			next.set('prompt', '请选择恢复', player, '的一个装备栏');
 			if (!event.ai) event.ai = function (event, player, list) {
 				return list.randomGet();
 			};
@@ -1577,8 +1577,8 @@ export const Content = {
 		else {
 			list.sort();
 			event.list = list;
-			var next = player.chooseControl(list);
-			next.set('prompt', '请选择废除一个装备栏');
+			var next = source.chooseControl(list);
+			next.set('prompt', '请选择废除', player, '的一个装备栏');
 			if (!event.ai) event.ai = function (event, player, list) {
 				return list.randomGet();
 			};
@@ -1593,70 +1593,6 @@ export const Content = {
 			player.disableEquip(3, 4);
 		}
 		else player.disableEquip(result.control);
-	},
-	enablePlayerEquip: function(){
-		'step 0';
-		var list = [];
-		for (var i = 1; i <= 5; i++) {
-			if (target.hasDisabledSlot(i)) list.push('equip' + i);
-		}
-		if (!list.length) event.finish();
-		else if (list.length == 1) {
-			event.list = list;
-			event._result = { control: list[0] };
-		}
-		else {
-			list.sort();
-			event.list = list;
-			var next = player.chooseControl(list);
-			next.set('prompt', '请选择', target, '恢复一个装备栏');
-			if (!event.ai) event.ai = function (event, player, list) {
-				return list.randomGet();
-			};
-			event.ai = event.ai(event.getParent(), player, list);
-			next.ai = function () {
-				return event.ai;
-			};
-		}
-		'step 1';
-		event.result = { control: result.control };
-		target.enableEquip(result.control);
-	},
-	disablePlayerEquip: function(){
-		'step 0';
-		var list = [];
-		for (var i = 1; i <= 5; i++) {
-			if (target.hasEnabledSlot(i)) list.push('equip' + i);
-		}
-		if (event.horse) {
-			if (list.includes('equip3') && (get.is.mountCombined() || list.includes('equip4'))) list.push('equip3_4');
-			list.remove('equip3');
-			list.remove('equip4');
-		}
-		if (!list.length) event.finish();
-		else if (list.length == 1) {
-			event.list = list;
-			event._result = { control: list[0] };
-		}
-		else {
-			list.sort();
-			event.list = list;
-			var next = player.chooseControl(list);
-			next.set('prompt', '请选择', target,'废除一个装备栏');
-			if (!event.ai) event.ai = function (event, player, list) {
-				return list.randomGet();
-			};
-			event.ai = event.ai(event.getParent(), player, list);
-			next.ai = function () {
-				return event.ai;
-			};
-		}
-		'step 1';
-		event.result = { control: result.control };
-		if (result.control == 'equip3_4') {
-			target.disableEquip(3, 4);
-		}
-		else target.disableEquip(result.control);
 	},
 	swapEquip: function () {
 		"step 0";
