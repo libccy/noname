@@ -1542,8 +1542,6 @@ export const Content = {
 			event._result = { control: list[0] };
 		}
 		else {
-			list.sort();
-			event.list = list;
 			var next = source.chooseControl(list);
 			next.set('prompt', '请选择恢复', player, '的一个装备栏');
 			if (!event.ai) event.ai = function (event, player, list) {
