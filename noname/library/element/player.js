@@ -2040,8 +2040,32 @@ export class Player extends HTMLDivElement {
 	chooseToDisable(horse) {
 		var next = game.createEvent('chooseToDisable');
 		next.player = this;
-		if (horse) next.horse = true;
+		if (horse==true) next.horse = true;
 		next.setContent('chooseToDisable');
+		return next;
+	}
+	/**
+	 * @param { Player } target
+	 */
+	enablePlayerEquip(target){
+		if(!target)return;
+		var next = game.createEvent('enablePlayerEquip');
+		next.player = this;
+		next.target = target;
+		next.setContent('enablePlayerEquip');
+		return next;
+	}
+		/**
+	 * @param { boolean } [horse]
+	 * @param { Player } target
+	 */
+	disablePlayerEquip(horse, target){
+		if(!target)return;
+		var next = game.createEvent('disablePlayerEquip');
+		next.player = this;
+		next.target = target;
+		if (horse==true) next.horse = true;
+		next.setContent('disablePlayerEquip');
 		return next;
 	}
 	/**
