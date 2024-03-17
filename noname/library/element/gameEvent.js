@@ -750,6 +750,7 @@ export class GameEvent {
 		if ((this.name === 'gain' || this.name === 'lose') && !_status.gameDrawed) return;
 		if (name === 'gameDrawEnd') _status.gameDrawed = true;
 		if (name === 'gameStart') {
+			lib.announce.publish("Noname.Game.Event.GameStart", {});
 			lib.announce.publish('gameStart', {});
 			if (_status.brawl && _status.brawl.gameStart) _status.brawl.gameStart();
 			if (lib.config.show_cardpile) ui.cardPileButton.style.display = '';
