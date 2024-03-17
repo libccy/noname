@@ -1864,24 +1864,40 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * @param { string } name
+	 * @param { string } type
 	 */
-	hasUsableCard(name) {
-		if (this.countCards('hs', name)) return true;
-		const skills = this.getSkills('invisible').concat(lib.skill.global);
+	hasUsableCard(name, type) {
+		if (typeof type !== 'string') type = type ? 'limit' : 'all';
+		if (this.hasCard(i => {
+			if (get.name(i, this) !== name) return false;
+			if (type === 'all') return true;
+			let event = _status.event, evt = event.getParent('chooseToUse');
+			if (get.itemtype(evt) !== 'event') evt = event;
+			if (type === 'respond') return lib.filter.cardRespondable(i, this, evt);
+			return lib.filter.cardEnabled(i, this, type === 'limit' ? evt : 'forceEnable');
+		}, 'hs')) return true;
+		const skills = this.getSkills('invisible').concat(lib.skill.global), str = 'respond' + name[0].toUpperCase() + name.slice(1);
 		game.expandSkills(skills);
 		for (let i = 0; i < skills.length; i++) {
-			const ifo = get.info(skills[i]);
-			if (ifo.viewAs && typeof ifo.viewAs != 'function' && typeof ifo.viewAs != 'string' && ifo.viewAs.name == name) {
-				if (!ifo.viewAsFilter || ifo.viewAsFilter(this) !== false) {
-					return true;
-				}
+			const ifo = get.info(skills[i]), hiddenCard = ifo.hiddenCard;
+			if (ifo.viewAs && typeof ifo.viewAs !== 'function' && typeof ifo.viewAs !== 'string' && ifo.viewAs.name === name) {
+				if (!ifo.viewAsFilter || ifo.viewAsFilter(this) !== false) return true;
 			}
-			else {
-				const hiddenCard = get.info(skills[i]).hiddenCard;
-				if (typeof hiddenCard == 'function' && hiddenCard(this, name)) {
-					return true;
-				}
+			else if (typeof hiddenCard == 'function') {
+				if (hiddenCard(this, name)) return true;
 			}
+			/*else if (ifo.ai && ifo.ai[str]) {
+				if (ifo.ai.skillTagFilter) {
+					if ((type === 'respond' || type === 'all')&& ifo.ai.skillTagFilter(this, str, 'respond') !== false) return true;
+					if (type !== 'respond' && ifo.ai.skillTagFilter(this, str, 'use') !== false) return true;
+					continue;
+				}
+				if (type === 'all') return true;
+				if (typeof ifo.ai[str] === 'string') {
+					if (ifo.ai[str] === 'use' || type === 'respond' && ifo.ai[str] === type) return true;
+				}
+				else return true;
+			}*/
 		}
 	}
 	/**
@@ -8859,14 +8875,20 @@ export class Player extends HTMLDivElement {
 		if (this.countCards('hs', 'sha')) return true;
 		if (this.countCards('hs', 'hufu')) return true;
 		if (!noauto && this.countCards('hs', 'yuchanqian')) return true;
-		if (this.hasSkillTag('respondSha', true, respond ? 'respond' : 'use', true)) return true;
-		return this.hasUsableCard('sha');
+		let tag = respond;
+		if (typeof tag !== 'string') tag = respond ? 'respond' : 'use';
+		if (this.hasSkillTag('respondSha', true, tag, true)) return true;
+		if (typeof respond !== 'string') respond = respond ? 'respond' : 'all';
+		return this.hasUsableCard('sha', respond);
 	}
 	hasShan(respond) {
 		if (this.countCards('hs', 'shan')) return true;
 		if (this.countCards('hs', 'hufu')) return true;
-		if (this.hasSkillTag('respondShan', true, respond ? 'respond' : 'use', true)) return true;
-		return this.hasUsableCard('shan');
+		let tag = respond;
+		if (typeof tag !== 'string') tag = respond ? 'respond' : 'use';
+		if (this.hasSkillTag('respondShan', true, tag, true)) return true;
+		if (typeof respond !== 'string') respond = respond ? 'respond' : 'all';
+		return this.hasUsableCard('shan', respond);
 	}
 	mayHaveSha(viewer, type, ignore, rvt) {
 		/**
