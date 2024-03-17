@@ -407,7 +407,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:[6,1],
 					useful:[3,1],
 					tag:{
-						draw:1
+						draw:3
 					},
 					result:{
 						target:function(player,target){
@@ -551,7 +551,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						}
 					},
 					tag:{
-						draw:1,
+						draw:1.2,
 						recover:0.5
 					}
 				}
