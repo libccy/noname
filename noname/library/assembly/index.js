@@ -122,7 +122,7 @@ export class NonameAssembly extends Array {
 	}
 }
 
-export const defaultAssemblys = {
+export const defaultHookcompatition = {
 	checkBegin: new NonameAssembly("checkBegin"),
 	checkCard: new NonameAssembly("checkCard"),
 	checkTarget: new NonameAssembly("checkTarget"),
@@ -134,4 +134,8 @@ export const defaultAssemblys = {
 	uncheckTarget: new NonameAssembly("uncheckTarget"),
 	uncheckButton: new NonameAssembly("uncheckButton"),
 	uncheckEnd: new NonameAssembly("uncheckEnd")
+}
+
+export const defaultAssemblys = {
+	...defaultHookcompatition
 }
