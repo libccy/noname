@@ -18318,8 +18318,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return get.info('ollongdan').ai.skillTagFilter(player,tag);
 							},
 							order:function(item,player){
+								if(!player||!player.storage){
+									player=_status.event.player;
+									if(!player||!player.storage) return 0;
+									if(Object.keys(player.storage).some(i=>{
+										return typeof i=='string'&&i.indexOf('fuhan')!=-1;
+									})) return 4;
+									return 1;
+								}
 								const awakened=Object.keys(player.storage).some(i=>typeof i=='string'&&i.indexOf('fuhan')!=-1);
-								if(player&&_status.event.type=='phase'){
+								if(_status.event.type=='phase'){
 									var max=0;
 									var list=['sha','tao','jiu'];
 									var map={sha:'shan',tao:'jiu',jiu:'tao'}
@@ -18333,7 +18341,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(max>0) max+=(awakened?0.3:-0.3);
 									return max;
 								}
-								if(!player) player=_status.event.player;
 								return awakened?4:1;
 							},
 						},

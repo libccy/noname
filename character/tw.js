@@ -2319,6 +2319,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			twchungang:{
 				audio:2,
+				init: ()=>{
+					game.addGlobalSkill('twchungang_global');
+				},
+				onremove: player => {
+					if (!game.hasPlayer(i => {
+						return player !== i && i.hasSkill('twchungang');
+					}, true)) game.removeGlobalSkill('twchungang_global');
+				},
 				trigger:{global:['gainAfter','loseAsyncAfter']},
 				filter:function(event,player){
 					var evt=event.getParent('phaseDraw');
@@ -2340,10 +2348,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						i.chooseToDiscard('he',true);
 					}
 				},
-				ai:{
-					//能和一技能有配合，但仍旧搅shi棍技能
-					threaten:3,
-				},
+				subSkill: {
+					global: {
+						trigger: {
+							player: 'dieAfter'
+						},
+						filter(event, player) {
+							return !game.hasPlayer(i => i.hasSkill('twchungang'), true)
+						},
+						silent: true,
+						forceDie: true,
+						charlotte: true,
+						content() {
+							game.removeGlobalSkill('twchungang_global');
+						},
+						ai: {
+							effect: {
+								target(card, player, target) {
+									if ((get.tag(card, 'gain') || 0) < 2 && (get.tag(card, 'draw') || 0) < 2) return;
+									let evt = _status.event.getParent('phaseDraw'), dis = game.countPlayer(i => {
+										return target !== i && i.hasSkill('twchungang');
+									});
+									if (!dis || evt && evt.player === target) return;
+									return [1, -dis];
+								}
+							}
+						}
+					}
+				}
 			},
 			//海外主公技
 			//张鲁
