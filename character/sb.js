@@ -999,7 +999,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return {
 							num:links[0],
 							audio:'sbfangzhu',
-							filterTarget:lib.filter.notMe,
+							filterTarget(card,player,target){
+								if(target==player) return false;
+								if(lib.skill.sbfangzhu_backup.num==4) return !target.hasSkill('sbfangzhu_ban');
+								return true;
+							},
 							async content(event,trigger,player){
 								const target=event.target;
 								const num=lib.skill.sbfangzhu_backup.num;
