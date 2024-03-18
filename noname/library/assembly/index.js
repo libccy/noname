@@ -59,9 +59,12 @@ export class NonameAssembly extends Array {
 			name = content.name
 		}
 		if (typeof content !== "function") throw new Error("you can't add a non-function to assembly.")
-		if (typeof name !== "string" || name.length === 0) throw new Error("you can't add a anonymous function to assembly.")
+		// if (typeof name !== "string" || name.length === 0) throw new Error("you can't add a anonymous function to assembly.")
 
-		if (!this.has(name)) {
+		if (typeof name !== "string" || name.length === 0) {
+			Array.prototype.add.call(this, content)
+		}
+		else if (!this.has(name)) {
 			this.#record.set(name, this.length)
 			Array.prototype.push.call(this, content)
 		}
@@ -119,7 +122,7 @@ export class NonameAssembly extends Array {
 	}
 }
 
-export const defaultAssemblys = {
+export const defaultHookcompatition = {
 	checkBegin: new NonameAssembly("checkBegin"),
 	checkCard: new NonameAssembly("checkCard"),
 	checkTarget: new NonameAssembly("checkTarget"),
@@ -131,4 +134,8 @@ export const defaultAssemblys = {
 	uncheckTarget: new NonameAssembly("uncheckTarget"),
 	uncheckButton: new NonameAssembly("uncheckButton"),
 	uncheckEnd: new NonameAssembly("uncheckEnd")
+}
+
+export const defaultAssemblys = {
+	...defaultHookcompatition
 }
