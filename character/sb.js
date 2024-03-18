@@ -754,12 +754,61 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					content:'mark',
 				},
 				ai:{threaten:2.5},
+				getNum(num){
+					if(typeof num!='number'||Array.from({length:8}).map((_,i)=>i+1).includes(num)) return 0;
+					return [1,2,3,4,2,2,3,3][num-1];
+				},
+				getEffect(player,num){
+					if(!player||typeof num!='number') return 0;
+					switch(num){
+						//行殇四个选项
+						case 1://-1，重置武将牌
+							if(game.hasPlayer(target=>{
+								return get.attitude(player,target)>0&&target.isTurnedOver();
+							})) return 10;
+							return 0;
+						case 2://-2，摸min(5,max(1,阵亡角色数))的牌
+							return Math.min(5,(Math.max(1,game.dead.length)));
+						case 3://-3，加上限加血+复原装备栏
+							if(!game.hasPlayer(target=>{
+								return get.attitude(player,target)>0&&target.maxHp<10;
+							})) return 0;
+							return 2+(game.hasPlayer(target=>{
+									return get.attitude(player,target)>0&&target.hasDisabledSlot();
+							})?1:0);
+						case 4://-4，劝封/化萍
+							return 0;
+						//放逐四个选项
+						case 5://-2，白板到结束
+							if(game.hasPlayer(target=>{
+								if(target.hasSkill('sbfangzhu_ban')||target.hasSkill('fengyin')||target.hasSkill('baiban')) return false;
+								return get.attitude(player,target)<0&&['name','name1','name2'].reduce((sum,name)=>{
+									if(target[name]&&(name!='name1'||target.name!=target.name1)){
+										if(get.character(target[name])) sum+get.rank(target[name],true);
+									}
+									return sum;
+								},0)>5;
+							})) return 6;
+							return 0;
+						case 6://-2，强命到结束
+							return 0;
+						case 7://-3，翻面
+							if(game.hasPlayer(target=>{
+								return get.attitude(player,target)<0&&!target.isTurnedOver();
+							})) return 8;
+							return 0;
+						case 8://-3，定向鸡肋
+							return 0;
+						default://其他
+							return 0;
+					}
+				},
 				group:'sbxingshang_use',
 				subSkill:{
 					use:{
 						audio:'sbxingshang',
 						enable:'phaseUse',
-						filter:function(event,player){
+						filter(event,player){
 							return game.hasPlayer(target=>{
 								if(player.countMark('sbxingshang')>1) return true;
 								return player.countMark('sbxingshang')&&(target.isLinked()||target.isTurnedOver());
@@ -767,7 +816,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						usable:1,
 						chooseButton:{
-							dialog:function(){
+							dialog(){
 								var dialog=ui.create.dialog(
 									'行殇：请选择你要执行的一项',
 									[[
@@ -783,7 +832,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								);
 								return dialog;
 							},
-							filter:function(button,player){
+							filter(button,player){
 								if(button.link>player.countMark('sbxingshang')) return false;
 								switch(button.link){
 									case 1:
@@ -796,39 +845,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										return game.dead.length;
 								}
 							},
-							check:function(button){
-								let player=_status.event.player;
-								switch(button.link){
-									case 1:
-										return game.filterPlayer(current=>get.attitude(player,current)>0).reduce((list,target)=>{
-											let num=0;
-											if(target.isLinked()) num+=0.5;
-											if(target.isTurnedOver()) num+=10;
-											list.push(num);
-											return list;
-										},[]).sort((a,b)=>b-a)[0];
-									case 2:
-										return Math.min(5,Math.max(1,game.dead.length));
-									case 3:
-										return game.filterPlayer().reduce((list,target)=>{
-											list.push(get.recoverEffect(target,player,player));
-											return list;
-										},[]).sort((a,b)=>b-a)[0];
-									case 4:
-										return game.dead.reduce((list,target)=>{
-											let num=0;
-											if(target.name&&lib.character[target.name]) num+=get.rank(target.name,true);
-											if(target.name2&&lib.character[target.name2]) num+=get.rank(target.name2,true);
-											list.push(num);
-											return list;
-										},[]).sort((a,b)=>b-a)[0];
-								}
+							check(button){
+								const player=get.event('player'),info=get.info('sbxingshang');
+								let list=Array.from({length:4}).map((_,i)=>i+1);
+								list=list.filter(num=>player.countMark('sbxingshang')>=info.getNum(num));
+								const num=list.sort((a,b)=>info.getEffect(player,b)-info.getEffect(player,a))[0];
+								return (button.link==num)?10:0;
 							},
-							backup:function(links,player){
+							backup(links,player){
 								return {
 									num:links[0],
 									audio:'sbxingshang',
-									filterTarget:function(card,player,target){
+									filterTarget(card,player,target){
 										switch(lib.skill.sbxingshang_use_backup.num){
 											case 1:
 												return target=>target.isLinked()||target.isTurnedOver();
@@ -889,17 +917,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									},
 									ai:{
 										result:{
-											target:function(player,target){
+											target(player,target){
 												switch(lib.skill.sbxingshang_use_backup.num){
 													case 1:
 														let num=0;
-														if(target.isLinked()) num+=0.5;
+														if(target.isLinked()&&!target.hasSkill('nzry_jieying')) num+=0.5;
 														if(target.isTurnedOver()) num+=10;
 														return num;
 													case 2:
-														return 1;
+														return get.effect(target,{name:'draw'},player,player);
 													case 3:
-														return get.recoverEffect(target,player,player);
+														return Math.max(0,get.recoverEffect(target,player,player))+get.attitude(player,target);
 													case 4:
 														return 1;
 												}
@@ -908,21 +936,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									},
 								}
 							},
-							prompt:function(links,player){
+							prompt(links,player){
+								const str='###行殇###';
 								switch(links[0]){
 									case 1:
-										return '复原一名角色的武将牌';
+										return str+'复原一名角色的武将牌';
 									case 2:
-										return '令一名角色摸'+get.cnNumber(Math.min(5,Math.max(1,game.dead.length)))+'张牌';
+										return str+'令一名角色摸'+get.cnNumber(Math.min(5,Math.max(1,game.dead.length)))+'张牌';
 									case 3:
-										return '令一名体力上限小于10的角色加1点体力上限并回复1点体力，然后随机恢复一个被废除的装备栏';
+										return str+'令一名体力上限小于10的角色加1点体力上限并回复1点体力，然后随机恢复一个被废除的装备栏';
 									case 4:
-										return '获得一名已阵亡角色的所有技能，然后失去武将牌上的所有技能';
+										return str+'获得一名已阵亡角色的所有技能，然后失去武将牌上的所有技能';
 								}
 							}
 						},
 						ai:{
-							order:9,
+							order(_,player){
+								const info=get.info('sbxingshang');
+								const goon=(player.hasSkill('sbfangzhu')&&!player.getStat('skill').sbfangzhu);
+								let list=Array.from({length:goon?8:4}).map((_,i)=>i+1);
+								list=list.filter(num=>player.countMark('sbxingshang')>=info.getNum(num));
+								list.sort((a,b)=>info.getEffect(player,b)-info.getEffect(player,a));
+								return (Array.from({length:4}).map((_,i)=>i+1).includes(list[0])&&info.getEffect(player,list[0])>0)?1:0;
+							},
 							result:{player:1},
 						},
 					},
@@ -932,12 +968,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbfangzhu:{
 				audio:2,
 				enable:'phaseUse',
-				filter:function(event,player){
+				filter(event,player){
 					return player.countMark('sbxingshang')>1;
 				},
 				usable:1,
 				chooseButton:{
-					dialog:function(){
+					dialog(){
 						var dialog=ui.create.dialog('放逐：请选择你要执行的一项','hidden');
 						dialog.add([[
 							[1,'移去2个“颂”标记，令一名其他角色的非Charlotte技能失效直到其回合结束'],
@@ -947,36 +983,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						],'textbutton']);
 						return dialog;
 					},
-					filter:function(button,player){
+					filter(button,player){
 						if(button.link>2&&player.countMark('sbxingshang')<3) return false;
 						if(button.link==4) return game.hasPlayer(target=>target!=player&&!target.hasSkill('sbfangzhu_ban'));
 						return true;
 					},
-					check:function(button){
-						let player=_status.event.player;
-						switch(button.link){
-							case 1:
-								return game.filterPlayer(current=>get.attitude(player,current)<0).reduce((list,target)=>{
-									let num=0;
-									if(target.name&&lib.character[target.name]) num+=get.rank(target.name,true);
-									if(target.name2&&lib.character[target.name2]) num+=get.rank(target.name2,true);
-									list.push(num);
-									return list;
-								},[]).sort((a,b)=>b-a)[0];
-							case 2:
-								return 0;
-							case 3:
-								return game.filterPlayer(target=>target!=player&&!target.hasSkill('sbfangzhu_ban')).reduce((list,target)=>{
-									if(get.attitude(player,target)>0&&target.isTurnedOver()) list.push(10*target.countCards('hs')+1);
-									else if(get.attitude(player,target)<0&&!target.isTurnedOver()) list.push(5*target.countCards('hs')+1);
-									else list.push(0);
-									return list;
-								},[]).sort((a,b)=>b-a)[0];
-							case 4:
-								return 0;
-						}
+					check(button){
+						const player=get.event('player'),info=get.info('sbxingshang');
+						let list=Array.from({length:4}).map((_,i)=>i+1);
+						list=list.filter(num=>player.countMark('sbxingshang')>=info.getNum(num+4));
+						const num=list.sort((a,b)=>info.getEffect(player,b+4)-info.getEffect(player,a+4))[0]-4;
+						return (button.link==num)?10:0;
 					},
-					backup:function(links,player){
+					backup(links,player){
 						return {
 							num:links[0],
 							audio:'sbfangzhu',
@@ -1008,7 +1027,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							ai:{
 								result:{
-									target:function(player,target){
+									target(player,target){
 										switch(lib.skill.sbfangzhu_backup.num){
 											case 1:
 												let num=0;
@@ -1029,21 +1048,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 						}
 					},
-					prompt:function(links,player){
+					prompt(links,player){
+						const str='###放逐###';
 						switch(links[0]){
 							case 1:
-								return '移去2个“颂”标记，令一名其他角色的非Charlotte技能失效直到其回合结束';
+								return str+'移去2个“颂”标记，令一名其他角色的非Charlotte技能失效直到其回合结束';
 							case 2:
-								return '移去2个“颂”标记，令一名其他角色不能响应除其外的角色使用的牌直到其回合结束';
+								return str+'移去2个“颂”标记，令一名其他角色不能响应除其外的角色使用的牌直到其回合结束';
 							case 3:
-								return '移去3个“颂”标记，令一名其他角色将武将牌翻面';
+								return str+'移去3个“颂”标记，令一名其他角色将武将牌翻面';
 							case 4:
-								return '移去3个“颂”标记，令一名其他角色只能使用你选择的一种类型的牌直到其回合结束';
+								return str+'移去3个“颂”标记，令一名其他角色只能使用你选择的一种类型的牌直到其回合结束';
 						}
 					}
 				},
 				ai:{
-					order:9,
+					order(_,player){
+						const info=get.info('sbxingshang');
+						const goon=(player.hasSkill('sbxingshang')&&!player.getStat('skill').sbxingshang_use);
+						let list=Array.from({length:goon?8:4}).map((_,i)=>i+(goon?1:5));
+						list=list.filter(num=>player.countMark('sbxingshang')>=info.getNum(num));
+						list.sort((a,b)=>info.getEffect(player,b)-info.getEffect(player,a));
+						return (Array.from({length:4}).map((_,i)=>i+5).includes(list[0])&&info.getEffect(player,list[0])>0)?1:0;
+					},
 					result:{player:1},
 				},
 				subSkill:{
@@ -1054,7 +1081,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						marktext:'禁',
 						intro:{content:'不能响应其他角色使用的牌'},
 						trigger:{global:'useCard1'},
-						filter:function(event,player){
+						filter(event,player){
 							return event.player!=player;
 						},
 						forced:true,
@@ -1073,10 +1100,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							content:'只能使用$牌',
 						},
 						mod:{
-							cardEnabled:function(card,player){
+							cardEnabled(card,player){
 								if(!player.getStorage('sbfangzhu_ban').includes(get.type2(card))) return false;
 							},
-							cardSavable:function(card,player){
+							cardSavable(card,player){
 								if(!player.getStorage('sbfangzhu_ban').includes(get.type2(card))) return false;
 							},
 						},
@@ -1089,7 +1116,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.addSkill('sbsongwei_delete');
 				},
 				trigger:{player:'phaseUseBegin'},
-				filter:function(event,player){
+				filter(event,player){
 					return game.hasPlayer(target=>target.group=='wei'&&target!=player);
 				},
 				zhuSkill:true,
@@ -1102,10 +1129,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					delete:{
 						audio:'sbsongwei',
 						enable:'phaseUse',
-						filter:function(event,player){
+						filter(event,player){
 							return game.hasPlayer(target=>lib.skill.sbsongwei.subSkill.delete.filterTarget(null,player,target));
 						},
-						filterTarget:function(card,player,target){
+						filterTarget(card,player,target){
 							return target!=player&&target.group=='wei'&&target.getStockSkills(false,true).length;
 						},
 						skillAnimation:true,
@@ -1117,7 +1144,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							order:13,
 							result:{
-								target:function(player,target){
+								target(player,target){
 									return -target.getStockSkills(false,true).length;
 								},
 							},
