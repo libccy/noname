@@ -2494,7 +2494,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			icesha_skill:{
 				inherit:'hanbing_skill',
-				trigger:{source:'damageBegin2'},
+				trigger:{source:'damageBegin3'},
 				equipSkill:false,
 				ruleSkill:true,
 				filter:function(event){

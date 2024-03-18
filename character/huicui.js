@@ -5337,10 +5337,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				check:function(event,player){
 					var num=player.getDamagedHp()-1;
 					if(num<=0) return false;
-					var list=game.filterPlayer().map(target=>{
-						return get.attitude(player,target)*Math.pow(Math.max(0,target.maxHp-target.countCards('h')-1),2);
-					}).sort((a,b)=>b-a);
-					return list.slice(0,num).reduce((p,c)=>p+c,0)>0;
+					return game.hasPlayer(target=>{
+						return get.attitude(player,target)>0&&target.maxHp-target.countCards('h')>1;
+					});
 				},
 				content:function(){
 					'step 0'
@@ -5348,7 +5347,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var num=player.getDamagedHp();
 					if(!player.isIn()||!num) event.finish();
-					else player.chooseTarget('御关：令'+get.cnNumber(num)+'名角色将手牌摸至体力上限',Math.min(game.countPlayer(),num),true).set('ai',target=>{
+					else player.chooseTarget('御关：令'+get.cnNumber(num)+'名角色将手牌摸至体力上限',Math.min(game.countPlayer(),[1,num]),true).set('ai',target=>{
 						return get.attitude(_status.event.player,target)*Math.max(0.1,target.maxHp-target.countCards('h'));
 					});
 					'step 2'
@@ -12716,7 +12715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xingchong:'幸宠',
 			xingchong_info:'一轮游戏开始时，你可声明两个自然数X和Y，且(X+Y)≤min(5, 你的体力上限)。你摸X张牌并展示Y张手牌。若如此做，当你于本轮内失去一张以此法展示的牌后，你摸两张牌。',
 			liunian:'流年',
-			liunian_info:'锁定技。回合结束时，若本回合内进行了本次游戏的第一次洗牌，则你加1点体力上限；若本回合内进行了本次游戏的第二次洗牌，则你于本回合结束时回复1点体力，且本局游戏内的手牌上限+10。',
+			liunian_info:'锁定技。一名角色的回合结束时，若本回合内进行了本次游戏的第一次洗牌，则你加1点体力上限；若本回合内进行了本次游戏的第二次洗牌，则你于本回合结束时回复1点体力，且本局游戏内的手牌上限+10。',
 			caimaozhangyun:'蔡瑁张允',
 			lianzhou:'连舟',
 			lianzhou_info:'锁定技。准备阶段，你横置你的武将牌。然后你可横置任意名体力值等于你的角色。',
@@ -12828,7 +12827,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcxuewei:'血卫',
 			dcxuewei_info:'结束阶段，你可以选择一名体力值不大于你的角色，然后你获得如下效果直到你的下回合开始时：当其受到伤害时，防止此伤害，然后你失去1点体力，你与其各摸一张牌（若该角色为你，则改为你摸一张牌）。',
 			dcyuguan:'御关',
-			dcyuguan_info:'一名角色的回合结束时，若你已损失的体力值为全场最多，你可以减1点体力上限，然后令X名角色将手牌摸至体力上限（X为你已损失的体力值）。',
+			dcyuguan_info:'一名角色的回合结束时，若你已损失的体力值为全场最多，你可以减1点体力上限，然后令至多X名角色将手牌摸至体力上限（X为你已损失的体力值）。',
 			qinlang:'秦朗',
 			dchaochong:'昊宠',
 			dchaochong_info:'当你使用牌后，你可以将手牌摸至或弃置至你的手牌上限数（至多摸五张）。然后若你以此法：得到牌，你的手牌上限-1；失去牌，你的手牌上限+1。',
