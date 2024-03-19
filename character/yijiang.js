@@ -11813,7 +11813,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			miji:{
 				audio:2,
-				audioname:['re_wangyi'],
+				audioname:['re_wangyi','ol_wangyi'],
 				locked:false,
 				mod:{
 					aiOrder:function(player,card,num){
@@ -13931,7 +13931,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lingtong:['lingtong','xin_lingtong','ol_lingtong','re_lingtong','old_lingtong'],
 			gaoshun:['gaoshun','xin_gaoshun','ol_gaoshun','re_gaoshun','sb_gaoshun','old_gaoshun'],
 			zhonghui:['zhonghui','xin_zhonghui','re_zhonghui','old_zhonghui','pe_zhonghui'],
-			wangyi:['wangyi','re_wangyi','old_wangyi'],
+			wangyi:['wangyi','ol_wangyi','re_wangyi','old_wangyi'],
 			caozhang:['caozhang','ol_caozhang','re_caozhang','xin_caozhang'],
 			guanzhang:['guanzhang','re_guanzhang','old_guanzhang'],
 			madai:['old_madai','re_madai','tw_madai','madai'],
