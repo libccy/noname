@@ -907,11 +907,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const goon1=player.countCards('h',card=>get.name(card,player)=='sha')>=player.countCards('h',card=>get.name(card,player)!='sha');
 							const goon2=player.countCards('h',card=>get.name(card,player)!='sha')>=player.countCards('h',card=>get.name(card,player)=='sha');
 							if((goon1&&control=='【杀】更多')||(goon2&&control=='非【杀】更多')){
-								target.popup('判断正确','wood');
+								target.popup('洗具');
 								game.log(target,'猜测','#g正确');
 							}
 							else{
-								target.popup('判断错误','fire');
+								target.popup('杯具');
 								game.log(target,'猜测','#y错误');
 								trigger.increase('num');
 							}
