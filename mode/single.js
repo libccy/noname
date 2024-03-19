@@ -439,6 +439,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					var list=_status.characterChoice[game.me.enemy.identity].randomRemove(1);
 					game.me.enemy.init(list[0]);
 					[game.me,game.me.enemy].forEach(current=>{
+						if(current.storage.nohp||lib.character[current.name1][4].includes('hiddenSkill')&&!current.noclick){
+							current.storage.rawHp=1;
+							current.storage.rawMaxHp=1;
+						}
 						current.hp=10;
 						current.maxHp=10;
 						current.hujia=0;
@@ -806,6 +810,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						_status.characterChoice[current.identity].removeArray(result[i]);
 						if(!current.name){
 							current.init(result[i][0]);
+							if(current.storage.nohp||lib.character[current.name1][4].includes('hiddenSkill')&&!current.noclick){
+								current.storage.rawHp=1;
+								current.storage.rawMaxHp=1;
+							}
 							current.hp=10;
 							current.maxHp=10;
 							current.hujia=0;
@@ -817,6 +825,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							const current=lib.playerOL[i];
 							if(!current.name){
 								current.init(result[i][0]);
+								if(current.storage.nohp||lib.character[current.name1][4].includes('hiddenSkill')&&!current.noclick){
+									current.storage.rawHp=1;
+									current.storage.rawMaxHp=1;
+								}
 								current.hp=10;
 								current.maxHp=10;
 								current.hujia=0;
