@@ -14172,6 +14172,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				distance:{attackFrom:-2},
 				skills:['pyzhuren_heart'],
+				onDestroy(card){
+					if(_status.pyzhuren&&_status.pyzhuren[card.name]){
+						delete _status.pyzhuren[card.name];
+					}
+				},
 				ai:{
 					basic:{
 						equipValue:4
@@ -14185,6 +14190,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				distance:{attackFrom:-1},
 				skills:['pyzhuren_diamond'],
+				onDestroy(card){
+					if(_status.pyzhuren&&_status.pyzhuren[card.name]){
+						delete _status.pyzhuren[card.name];
+					}
+				},
 				ai:{
 					basic:{
 						equipValue:3
@@ -14198,6 +14208,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				distance:{attackFrom:-1},
 				skills:['pyzhuren_club'],
+				onDestroy(card){
+					if(_status.pyzhuren&&_status.pyzhuren[card.name]){
+						delete _status.pyzhuren[card.name];
+					}
+				},
 				ai:{
 					basic:{
 						equipValue:5
@@ -14223,6 +14238,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				type:'equip',
 				subtype:'equip1',
 				skills:['pyzhuren_spade'],
+				onDestroy(card){
+					if(_status.pyzhuren&&_status.pyzhuren[card.name]){
+						delete _status.pyzhuren[card.name];
+					}
+				},
 				ai:{
 					basic:{
 						equipValue:3
@@ -14236,6 +14256,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subtype:'equip1',
 				distance:{attackFrom:-3},
 				skills:['pyzhuren_shandian'],
+				onDestroy(card){
+					if(_status.pyzhuren&&_status.pyzhuren[card.name]){
+						delete _status.pyzhuren[card.name];
+					}
+				},
 				ai:{
 					basic:{
 						equipValue:3
