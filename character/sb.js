@@ -856,6 +856,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return {
 									num:links[0],
 									audio:'sbxingshang',
+									filterCard:()=>false,
+									selectCard:-1,
 									filterTarget(card,player,target){
 										switch(lib.skill.sbxingshang_use_backup.num){
 											case 1:
@@ -999,6 +1001,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return {
 							num:links[0],
 							audio:'sbfangzhu',
+							filterCard:()=>false,
+							selectCard:-1,
 							filterTarget(card,player,target){
 								if(target==player) return false;
 								if(lib.skill.sbfangzhu_backup.num==4) return !target.hasSkill('sbfangzhu_ban');
