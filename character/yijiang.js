@@ -498,14 +498,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var count=trigger.player.countCards('h',card=>get.type2(card)==type);
 					var guessedNum=event.guessedNum;
 					if(count==guessedNum){
-						player.popup('猜测正确','wood');
+						player.popup('洗具');
 						game.log(player,'猜测','#g正确');
 						if(player.countMark('zhenfeng')<5) player.addMark('zhenfeng',1,false);
 						player.draw(player.countMark('zhenfeng'));
 						if(player.canUse('sha',trigger.player,false)) player.useCard({name:'sha',isCard:true},trigger.player);
 					}
 					else{
-						player.popup('猜测错误','fire');
+						player.popup('杯具');
 						game.log(player,'猜测','#y错误');
 						player.clearMark('zhenfeng');
 						if(Math.abs(count-guessedNum)>1&&trigger.player.canUse('sha',player,false)){
