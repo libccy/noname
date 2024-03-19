@@ -3420,7 +3420,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.itemtype(player.storage.mia_qianmeng)=='card';
 						},
 						async cost(event, trigger, player){
-							event.result = await 
+							event.result = await
 							player.chooseTarget(get.prompt('mia_qianmeng'),'令一名角色获得牌堆中所有点数为'+player.storage.mia_qianmeng.number+'的牌',lib.filter.notMe).forResult();
 						},
 						async content(event, trigger, player){
@@ -6689,7 +6689,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var next=get.copy(lib.skill.kud_qiaoshou_backupx);
 						next.cardname=links[0][2];
 						return next;
-				},
+					},
 					prompt(links){
 						return '将一张手牌置于武将牌上，然后视为装备'+get.translation(links[0][2]);
 					},
@@ -9357,7 +9357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if (result.bool) event.result = {
 						bool: true,
 						cards: result.links,
-					} 
+					}
 				},
 				logTarget: 'player',
 				async content(event, trigger, player){

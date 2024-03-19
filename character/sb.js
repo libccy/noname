@@ -915,24 +915,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 												}
 										}
 									},
-									ai:{
-										result:{
-											target(player,target){
-												switch(lib.skill.sbxingshang_use_backup.num){
-													case 1:
-														let num=0;
-														if(target.isLinked()&&!target.hasSkill('nzry_jieying')) num+=0.5;
-														if(target.isTurnedOver()) num+=10;
-														return num;
-													case 2:
-														return get.effect(target,{name:'draw'},player,player);
-													case 3:
-														return Math.max(0,get.recoverEffect(target,player,player))+get.attitude(player,target);
-													case 4:
-														return 1;
-												}
-											},
-										},
+									ai1:()=>true,
+									ai2:(target)=>{
+										let player = _status.event.player;
+										switch(lib.skill.sbxingshang_use_backup.num){
+											case 1:
+												let num=0;
+												if(target.isLinked()&&!target.hasSkill('nzry_jieying')) num+=0.5;
+												if(target.isTurnedOver()) num+=10;
+												return num;
+											case 2:
+												return get.effect(target,{name:'draw'},player,player);
+											case 3:
+												return Math.max(0,get.recoverEffect(target,player,player))+get.attitude(player,target);
+											case 4:
+												return 1;
+										}
 									},
 								}
 							},
@@ -1029,26 +1027,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										}
 								}
 							},
-							ai:{
-								result:{
-									target(player,target){
-										switch(lib.skill.sbfangzhu_backup.num){
-											case 1:
-												let num=0;
-												if(target.name&&lib.character[target.name]) num+=get.rank(target.name,true);
-												if(target.name2&&lib.character[target.name2]) num+=get.rank(target.name2,true);
-												return num;
-											case 2:
-												return 0;
-											case 3:
-												if(get.attitude(player,target)>0&&target.isTurnedOver()) return 10*target.countCards('hs')+1;
-												if(get.attitude(player,target)<0&&!target.isTurnedOver()) return -5*target.countCards('hs')+1;
-												return 0;
-											case 4:
-												return 0;
-										}
-									},
-								},
+							ai1:()=>true,
+							ai2:(target)=>{
+								let player = _status.event.player;
+								switch(lib.skill.sbfangzhu_backup.num){
+									case 1:
+										let num=0;
+										if(target.name&&lib.character[target.name]) num+=get.rank(target.name,true);
+										if(target.name2&&lib.character[target.name2]) num+=get.rank(target.name2,true);
+										return num;
+									case 2:
+										return 0;
+									case 3:
+										if(get.attitude(player,target)>0&&target.isTurnedOver()) return 10*target.countCards('hs')+1;
+										if(get.attitude(player,target)<0&&!target.isTurnedOver()) return -5*target.countCards('hs')+1;
+										return 0;
+									case 4:
+										return 0;
+								}
 							},
 						}
 					},
@@ -1116,9 +1112,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbsongwei:{
 				audio:2,
-				init:(player)=>{
-					player.addSkill('sbsongwei_delete');
-				},
 				trigger:{player:'phaseUseBegin'},
 				filter(event,player){
 					return game.hasPlayer(target=>target.group=='wei'&&target!=player);
@@ -1129,6 +1122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					player.addMark('sbxingshang',game.countPlayer(target=>target.group=='wei'&&target!=player));
 				},
+				group:'sbsongwei_delete',
 				subSkill:{
 					delete:{
 						audio:'sbsongwei',
