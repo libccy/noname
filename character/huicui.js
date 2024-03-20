@@ -9946,11 +9946,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						intro:{content:'不能使用手牌'},
 						charlotte:true,
 						mod:{
-							cardEnabled:function(card){
-								if(get.position(card)=='h') return false;
+							cardEnabled:function(card,player){
+								let hs=player.getCards('h'),cards=[card];
+								if(Array.isArray(card.cards)) cards.addArray(card.cards);
+								for(let i of cards){
+									if(hs.includes(i)) return false;
+								}
 							},
-							cardSavable:function(card){
-								if(get.position(card)=='h') return false;
+							cardSavable:function(card,player){
+								let hs=player.getCards('h'),cards=[card];
+								if(Array.isArray(card.cards)) cards.addArray(card.cards);
+								for(let i of cards){
+									if(hs.includes(i)) return false;
+								}
 							},
 						},
 					},
