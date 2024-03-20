@@ -1142,9 +1142,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbsongwei:{
 				audio:2,
-				init:(player)=>{
-					player.addSkill('sbsongwei_delete');
-				},
 				trigger:{player:'phaseUseBegin'},
 				filter(event,player){
 					if(player.countMark('sbxingshang')>=get.info('sbxingshang').getLimit) return false;
@@ -1156,12 +1153,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					player.addMark('sbxingshang',Math.min(get.info('sbxingshang').getLimit-player.countMark('sbxingshang'),game.countPlayer(target=>target.group=='wei'&&target!=player)));
 				},
+				group:'sbsongwei_delete',
 				subSkill:{
 					delete:{
 						audio:'sbsongwei',
 						enable:'phaseUse',
 						filter(event,player){
-							if(!player.hasSkill('sbsongwei')) return false;
+							if(player.storage.sbsongwei_delete) return false;
 							return game.hasPlayer(target=>lib.skill.sbsongwei.subSkill.delete.filterTarget(null,player,target));
 						},
 						filterTarget(card,player,target){
@@ -1170,6 +1168,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						skillAnimation:true,
 						animationColor:'thunder',
 						async content(event,trigger,player){
+							player.storage.sbsongwei_delete=true;
 							player.awakenSkill('sbsongwei_delete');
 							event.target.removeSkills(event.target.getStockSkills(false,true));
 						},
