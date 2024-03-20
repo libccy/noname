@@ -761,7 +761,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{threaten:2.5},
 				getLimit:9,
 				getNum(num){
-					if(typeof num!='number'||Array.from({length:9}).map((_,i)=>i+1).includes(num)) return 0;
+					if(typeof num!='number'||!Array.from({length:9}).map((_,i)=>i+1).includes(num)) return 0;
 					return [1,2,3,4,1,2,2,3,3][num-1];
 				},
 				getEffect(player,num){
@@ -988,9 +988,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						dialog.add([[
 							[1,'移去1个“颂”标记，令一名其他角色于手牌中只能使用装备牌直到其回合结束'],
 							[2,'移去2个“颂”标记，令一名其他角色的非Charlotte技能失效直到其回合结束'],
-							[2,'移去2个“颂”标记，令一名其他角色不能响应除其外的角色使用的牌直到其回合结束'],
-							[3,'移去3个“颂”标记，令一名其他角色将武将牌翻面'],
-							[4,'移去3个“颂”标记，令一名其他角色于手牌中只能使用装备牌直到其回合结束']
+							[3,'移去2个“颂”标记，令一名其他角色不能响应除其外的角色使用的牌直到其回合结束'],
+							[4,'移去3个“颂”标记，令一名其他角色将武将牌翻面'],
+							[5,'移去3个“颂”标记，令一名其他角色于手牌中只能使用装备牌直到其回合结束']
 						],'textbutton']);
 						return dialog;
 					},
