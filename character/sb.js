@@ -1132,6 +1132,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						audio:'sbsongwei',
 						enable:'phaseUse',
 						filter(event,player){
+							if(player.storage.sbsongwei_delete) return false;
 							return game.hasPlayer(target=>lib.skill.sbsongwei.subSkill.delete.filterTarget(null,player,target));
 						},
 						filterTarget(card,player,target){
@@ -1140,6 +1141,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						skillAnimation:true,
 						animationColor:'thunder',
 						async content(event,trigger,player){
+							player.storage.sbsongwei_delete=true;
 							player.awakenSkill('sbsongwei_delete');
 							event.target.removeSkills(event.target.getStockSkills(false,true));
 						},
