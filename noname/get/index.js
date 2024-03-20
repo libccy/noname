@@ -1021,6 +1021,7 @@ export class Get extends Uninstantable {
 				case 'normal': return '新１ｖ１';
 				case 'changban': return '血战长坂坡';
 				case 'dianjiang': return '点将单挑';
+				case 'wuxianhuoli': return '无限火力';
 			}
 		}
 		if (config.mode == 'identity') {

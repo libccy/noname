@@ -1922,9 +1922,12 @@ export const Content = {
 		}
 		while (player != end);
 		event.changeCard = get.config('change_card');
-		if (_status.connectMode || (lib.config.mode == 'doudizhu' && _status.mode == 'online') || lib.config.mode != 'identity' && lib.config.mode != 'guozhan' && lib.config.mode != 'doudizhu') {
-			event.changeCard = 'disabled';
-		}
+		if (_status.connectMode || 
+			(lib.config.mode == 'single' && _status.mode != 'wuxianhuoli') || 
+			(lib.config.mode == 'doudizhu' && _status.mode == 'online') || 
+			lib.config.mode != 'identity' && lib.config.mode != 'guozhan' && lib.config.mode != 'doudizhu' && lib.config.mode != 'single') {
+				event.changeCard = 'disabled';
+			}
 		"step 1";
 		if (event.changeCard != 'disabled' && !_status.auto) {
 			event.dialog = ui.create.dialog('是否使用手气卡？');

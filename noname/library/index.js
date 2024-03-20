@@ -6933,9 +6933,11 @@ export class Library extends Uninstantable {
 						normal: '新1v1',
 						dianjiang: '点将单挑',
 						changban: '血战长坂坡',
+						wuxianhuoli: '无限火力',
 					},
 					restart: true,
 					frequent: true,
+					intro: '血战长坂坡和无限火力模式详见帮助',
 				},
 				connect_enable_jin: {
 					name: '启用晋势力武将',
@@ -6943,12 +6945,24 @@ export class Library extends Uninstantable {
 					restart: true,
 					frequent: true,
 				},
+				connect_change_card: {
+					name: '启用手气卡',
+					init: false,
+					frequent: true,
+					restart: true,
+				},
 				update: function (config, map) {
 					if (config.connect_single_mode != 'normal') {
 						map.connect_enable_jin.hide();
 					}
 					else {
 						map.connect_enable_jin.show();
+					}
+					if (config.connect_single_mode != 'wuxianhuoli') {
+						map.connect_change_card.hide();
+					}
+					else {
+						map.connect_change_card.show();
 					}
 				},
 			},
@@ -6960,9 +6974,11 @@ export class Library extends Uninstantable {
 						normal: '新1v1',
 						dianjiang: '点将单挑',
 						changban: '血战长坂坡',
+						wuxianhuoli: '无限火力',
 					},
 					restart: true,
 					frequent: true,
+					intro: '血战长坂坡和无限火力模式详见帮助',
 				},
 				enable_jin: {
 					name: '启用晋势力武将',
@@ -6970,12 +6986,28 @@ export class Library extends Uninstantable {
 					restart: true,
 					frequent: true,
 				},
+				change_card: {
+					name: '开启手气卡',
+					init: 'disabled',
+					item: {
+						disabled: '禁用',
+						once: '一次',
+						twice: '两次',
+						unlimited: '无限',
+					}
+				},
 				update: function (config, map) {
 					if (config.single_mode != 'normal') {
 						map.enable_jin.hide();
 					}
 					else {
 						map.enable_jin.show();
+					}
+					if (config.single_mode != 'wuxianhuoli') {
+						map.change_card.hide();
+					}
+					else {
+						map.change_card.show();
 					}
 				},
 			}
