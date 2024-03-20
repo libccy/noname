@@ -11813,7 +11813,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			miji:{
 				audio:2,
-				audioname:['re_wangyi','ol_wangyi'],
+				audioname:['re_wangyi'],
 				locked:false,
 				mod:{
 					aiOrder:function(player,card,num){
