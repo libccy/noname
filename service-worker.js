@@ -60,9 +60,9 @@ self.addEventListener('fetch', event => {
 		event.respondWith(rep);
 		return;
 	}
-	if (!['.ts', '.json', '.vue'].some(ext => request.url.endsWith(ext))) return;
+	if (!['.ts', '.json', '.vue', 'css'].some(ext => request.url.endsWith(ext))) return;
 	if (request.url.endsWith('.d.ts')) return;
-	if (request.url.endsWith('.json')) {
+	if (request.url.endsWith('.json') || request.url.endsWith('css')) {
 		// @ts-ignore
 		if (!event.request.headers.get('origin')) return;
 	}
@@ -82,7 +82,7 @@ self.addEventListener('fetch', event => {
 			return res.text().then(text => {
 				let js;
 				if (request.url.endsWith('.json')) {
-					js = `export default ${text}`;
+					js = `export default ${ text }`;
 				} else if (request.url.endsWith('.ts')) {
 					js = ts.transpile(text, {
 						module: ts.ModuleKind.ES2015,
@@ -93,7 +93,7 @@ self.addEventListener('fetch', event => {
 					}, request.url);
 				} else if (request.url.endsWith('.vue')) {
 					const id = Date.now().toString();
-					const scopeId = `data-v-${id}`;
+					const scopeId = `data-v-${ id }`;
 					// 后续处理sourceMap合并
 					const { descriptor } = sfc.parse(text, { filename: request.url, sourceMap: true });
 					// console.log({ descriptor });
@@ -126,8 +126,8 @@ self.addEventListener('fetch', event => {
 							.replaceAll(`from "vue"`, `from "/game/vue.esm-browser.js"`)
 							.replaceAll(`from 'vue'`, `from '/game/vue.esm-browser.js'`)
 					);
-					codeList.push(`import { __sfc_main__ } from '${request.url}?type=script'`);
-					codeList.push(`__sfc_main__.__scopeId = '${scopeId}'`);
+					codeList.push(`import { __sfc_main__ } from '${ request.url }?type=script'`);
+					codeList.push(`__sfc_main__.__scopeId = '${ scopeId }'`);
 
 					// 编译模板，转换成 render 函数
 					const template = sfc.compileTemplate({
@@ -146,7 +146,7 @@ self.addEventListener('fetch', event => {
 						.replaceAll(`from 'vue'`, `from '/game/vue.esm-browser.js'`)
 					);
 					
-					codeList.push(`import { render } from '${request.url}?type=template'`);
+					codeList.push(`import { render } from '${ request.url }?type=template'`);
 					codeList.push(`__sfc_main__.render = render;`);
 					codeList.push(`export default __sfc_main__;`);
 					// 一个 Vue 文件，可能有多个 style 标签
@@ -159,11 +159,19 @@ self.addEventListener('fetch', event => {
 							scoped: styleBlock.scoped,
 						});
 						const varName = `el${ styleIndex }`;
-						const styleDOM = `let ${ varName } = document.createElement('style');\n${ varName }.innerHTML =  \`${styleCode.code}\`;\ndocument.body.append(${ varName });`;
+						const styleDOM = `let ${ varName } = document.createElement('style');\n${ varName }.innerHTML =  \`${ styleCode.code }\`;\ndocument.body.append(${ varName });`;
 						codeList.push(styleDOM);
 					}
 					js = codeList.join('\n');
 					// console.log(js);
+				} else if (request.url.endsWith('css')) {
+					const id = Date.now().toString();
+					const scopeId = `data-v-${ id }`;
+					js = `const style = document.createElement('style');
+					style.setAttribute('type', 'text/css');
+					style.setAttribute('data-vue-dev-id', \`${ scopeId }\`);
+					style.textContent = ${ JSON.stringify(text) };
+					document.head.appendChild(style);`;
 				}
 				const rep = new Response(new Blob([js], { type: "text/javascript" }), {
 					status: 200,
