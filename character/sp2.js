@@ -6599,16 +6599,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					if(!game.hasPlayer(function(current){
-						return current.hasSkill('cixiao_yizi');
+						return current.hasSkill('panshi');
 					})) return true;
 					return player.countCards('he')>=1&&game.hasPlayer(function(current){
-						return current!=player&&!current.hasSkill('cixiao_yizi');
+						return current!=player&&!current.hasSkill('panshi');
 					});
 				},
 				content:function(){
 					'step 0'
 					if(game.hasPlayer(function(current){
-						return current.hasSkill('cixiao_yizi');
+						return current.hasSkill('panshi');
 					})) event.goto(2);
 					else player.chooseTarget(lib.filter.notMe,get.prompt('cixiao'),'令一名其他角色获得「义子」标记').set('ai',function(target){
 						var player=_status.event.player;
@@ -6619,19 +6619,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.logSkill('cixiao',target);
-						target.addSkills('cixiao_yizi');
+						target.addSkills('panshi');
 					}
 					event.finish();
 					'step 2'
 					var list=game.filterPlayer(function(current){
-						return current.hasSkill('cixiao_yizi');
+						return current.hasSkill('panshi');
 					});
 					player.chooseCardTarget({
 						prompt:get.prompt('cixiao'),
 						prompt2:('弃置一张牌并将'+get.translation(list)+'的「义子」标记转移给其他角色'),
 						position:'he',
 						filterTarget:function(card,player,target){
-							return player!=target&&!target.hasSkill('cixiao_yizi');
+							return player!=target&&!target.hasSkill('panshi');
 						},
 						filterCard:lib.filter.cardDiscardable,
 						ai1:function(card){
@@ -6654,12 +6654,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('cixiao');
 						player.discard(result.cards).delay=false;
 						player.line2(game.filterPlayer(function(current){
-							if(current.hasSkill('cixiao_yizi')){
-								current.removeSkills('cixiao_yizi');
+							if(current.hasSkill('panshi')){
+								current.removeSkills('panshi');
 								return true;
 							}
 						}).concat(result.targets),'green');
-						target.addSkills('cixiao_yizi');
+						target.addSkills('panshi');
 					}
 					else event.finish();
 					'step 4'
@@ -6667,18 +6667,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				derivation:'panshi',
 				ai:{threaten:8},
-				subSkill: {
-					yizi: {
-						mark: true,
-						charlotte: true,
-						marktext: '子',
-						intro: {
-							name: '义子',
-							content: '具有〖叛弑〗'
-						},
-						group: 'panshi'
-					}
-				}
 			},
 			panshi:{
 				trigger:{player:'phaseZhunbeiBegin'},
@@ -6713,6 +6701,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.line(target);
 						player.give(result.cards,target);
 					}
+				},
+				mark:true,
+				marktext:'子',
+				intro:{
+					name:'义子',
+					content:'我是儿子',
 				},
 				group:'panshi_damage',
 			},

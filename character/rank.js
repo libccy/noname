@@ -1076,6 +1076,8 @@ window.noname_character_rank={
 		'yangfeng',
 		'sb_xiahoudun',
 		'sb_gaoshun',
+		're_wangyi',
+		'ol_wangyi',
 	],
 	b:[
 		'junk_guanyu',
@@ -2177,6 +2179,8 @@ window.noname_character_rank={
 			'dc_sb_simayi',
 		],
 		rare:[
+			're_wangyi',
+			'ol_wangyi',
 			'tw_yanliang',
 			'tw_wenchou',
 			'tw_yuantan',

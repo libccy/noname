@@ -1219,10 +1219,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(result2.bool){
 										const card=result2.cards[0];
 										if(get.name(card,target)==event.result.card.name){
-											player.popup('诿解成功');
+											player.popup('洗具');
 											stop=true;
 										}
-										else player.popup('诿解失败');
+										else player.popup('杯具');
 									}
 								}
 								if(!stop){
@@ -16624,7 +16624,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return get.subtype(card)=='equip1';
 					});
 					if(!equip1){
-						player.popup('连计失败');
+						player.popup('杯具');
 						game.log('牌堆中无装备');
 						event.finish();
 						return;

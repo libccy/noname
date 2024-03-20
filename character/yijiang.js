@@ -498,14 +498,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var count=trigger.player.countCards('h',card=>get.type2(card)==type);
 					var guessedNum=event.guessedNum;
 					if(count==guessedNum){
-						player.popup('猜测正确','wood');
+						player.popup('洗具');
 						game.log(player,'猜测','#g正确');
 						if(player.countMark('zhenfeng')<5) player.addMark('zhenfeng',1,false);
 						player.draw(player.countMark('zhenfeng'));
 						if(player.canUse('sha',trigger.player,false)) player.useCard({name:'sha',isCard:true},trigger.player);
 					}
 					else{
-						player.popup('猜测错误','fire');
+						player.popup('杯具');
 						game.log(player,'猜测','#y错误');
 						player.clearMark('zhenfeng');
 						if(Math.abs(count-guessedNum)>1&&trigger.player.canUse('sha',player,false)){
@@ -13931,7 +13931,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			lingtong:['lingtong','xin_lingtong','ol_lingtong','re_lingtong','old_lingtong'],
 			gaoshun:['gaoshun','xin_gaoshun','ol_gaoshun','re_gaoshun','sb_gaoshun','old_gaoshun'],
 			zhonghui:['zhonghui','xin_zhonghui','re_zhonghui','old_zhonghui','pe_zhonghui'],
-			wangyi:['wangyi','re_wangyi','old_wangyi'],
+			wangyi:['wangyi','ol_wangyi','re_wangyi','old_wangyi'],
 			caozhang:['caozhang','ol_caozhang','re_caozhang','xin_caozhang'],
 			guanzhang:['guanzhang','re_guanzhang','old_guanzhang'],
 			madai:['old_madai','re_madai','tw_madai','madai'],
