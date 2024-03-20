@@ -1365,7 +1365,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player:["useCardAfter","respond"],
 				},
 				filter:function (event,player){
-					if(get.itemtype(event.cards)!='cards') return false;
+					if(get.itemtype(event.cards)!=='cards'||!game.hasPlayer(current=>{
+						if(current===player) return false;
+						return current.getHp()>player.getHp()||current.countCards('h')>player.countCards('h');
+					})) return false;
 					for(var i=0;i<event.cards.length;i++){
 						if(event.cards[i].isInPile()){
 							return true;
@@ -1373,35 +1376,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return false;
 				},
-				direct:true,
-				content:function (){
-					'step 0'
-					player.chooseTarget(get.prompt2('xinfu_xunxian'),function(card,player,target){
-						if(target==player) return false;
-						return target.countCards('h')>player.countCards('h')||Math.max(0,target.hp)>Math.max(0,player.hp);
-					}).set('ai',function(target){
+				async cost(event, trigger, player){
+					event.result = await player.chooseTarget(get.prompt2('xinfu_xunxian'),(card,player,target)=>{
+						if(target===player) return false;
+						return target.getHp()>player.getHp()||target.countCards('h')>player.countCards('h');
+					}).set('ai',(target)=>{
 						let att=get.attitude(_status.event.player,target),name=_status.event.cards[0].name;
 						if(att<3) return 0;
 						if(target.hasJudge('lebu')) att/=5;
 						if(name==='sha'&&target.hasSha()) att/=5;
 						if(name==='wuxie'&&target.needsToDiscard(_status.event.cards)) att/=5;
 						return att/(1+get.distance(player,target,'absolute'));
-					}).set('cards',trigger.cards);
-					'step 1'
-					if(result.bool){
-						var list=[];
-						for(var i=0;i<trigger.cards.length;i++){
-							if(trigger.cards[i].isInPile()){
-								list.push(trigger.cards[i]);
-							}
+					}).set('cards',trigger.cards).forResult();
+				},
+				async content(event, trigger, player){
+					let list=[];
+					for(let i=0;i<trigger.cards.length;i++){
+						if(trigger.cards[i].isInPile()){
+							list.push(trigger.cards[i]);
 						}
-						player.logSkill('xinfu_xunxian',result.targets[0]);
-						result.targets[0].gain(list,'gain2').giver=player;
 					}
-				},
-				ai:{
-					expose:0.3,
-				},
+					if(get.mode()!=='identity'||player.identity!=='nei') player.addExpose(0.2);
+					event.targets[0].gain(list,'gain2').giver=player;
+				}
 			},
 			"xinfu_kannan":{
 				audio:2,
@@ -1740,7 +1737,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"xinfu_limu_info":"出牌阶段，你可以将一张♦牌当做【乐不思蜀】对自己使用，然后回复1点体力。只要你的判定区内有牌，你对攻击范围内的其他角色使用牌便没有次数和距离限制。",
 			xinyingshi:'应势',
 			xinyingshi_info:'出牌阶段开始时，若场上所有角色的武将牌上均没有“酬”，则你可以将任意张牌置于一名角色的武将牌上，称为“酬”。若如此做：当有角色使用牌对有“酬”的角色造成伤害后，其可以获得一张“酬”，并获得牌堆中所有与“酬”花色点数均相同的牌；有“酬”的角色死亡时，你获得其所有“酬”。',
-			
+
 			xinghuoliaoyuan_tianfu:'天府',
 			xinghuoliaoyuan_tianliang:'天梁',
 			xinghuoliaoyuan_tianji:'天机',
