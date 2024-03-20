@@ -1542,8 +1542,8 @@ export const Content = {
 			event._result = { control: list[0] };
 		}
 		else {
-			var next = player.chooseControl(list);
-			next.set('prompt', '请选择恢复一个装备栏');
+			var next = source.chooseControl(list);
+			next.set('prompt', '请选择恢复'+get.translation(player.name)+'的一个装备栏');
 			if (!event.ai) event.ai = function (event, player, list) {
 				return list.randomGet();
 			};
@@ -1575,8 +1575,8 @@ export const Content = {
 		else {
 			list.sort();
 			event.list = list;
-			var next = player.chooseControl(list);
-			next.set('prompt', '请选择废除一个装备栏');
+			var next = source.chooseControl(list);
+			next.set('prompt', '请选择废除'+get.translation(player.name)+'的一个装备栏');
 			if (!event.ai) event.ai = function (event, player, list) {
 				return list.randomGet();
 			};
