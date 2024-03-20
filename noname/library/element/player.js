@@ -2046,17 +2046,29 @@ export class Player extends HTMLDivElement {
 	}
 	chooseToEnable() {
 		var next = game.createEvent('chooseToEnable');
+		for (var i = 0; i < arguments.length; i++) {
+			if (get.itemtype(arguments[i]) == 'player') {
+				next.source = arguments[i];
+			}
+		}
+		if (next.source == undefined) next.source = this;
 		next.player = this;
 		next.setContent('chooseToEnable');
 		return next;
 	}
-	/**
-	 * @param { boolean } [horse]
-	 */
-	chooseToDisable(horse) {
+	chooseToDisable() {
 		var next = game.createEvent('chooseToDisable');
+		for (var i = 0; i < arguments.length; i++) {
+			if (get.itemtype(arguments[i]) == 'player') {
+				next.source = arguments[i];
+			} 
+			else if(typeof arguments[i] == 'boolean' ){
+				next.horse = arguments[i];
+			}
+		}
+		if (next.horse == undefined) next.horse = false;
+		if (next.source == undefined) next.source = this;
 		next.player = this;
-		if (horse) next.horse = true;
 		next.setContent('chooseToDisable');
 		return next;
 	}
