@@ -17765,7 +17765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseButton(2,[
 						'蛮智：请选择让下列等式成立的A与B的值',
 						'<div class="text center">目标等式</div>',
-						`0.5 × A² + 2.5 × B - ${game.roundNumber} = ${game.countPlayer()}`,
+						`0.5 × A<sup>2</sup> + 2.5 × B - ${game.roundNumber} = ${game.countPlayer()}`,
 						'<div class="text center">A的可选值</div>',
 						[nums.map(i=>{
 							return [
@@ -17803,7 +17803,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(i[0]=='A') a=parseInt(i.slice(2));
 							else b=parseInt(i.slice(2));
 						}
-						equals=`0.5×${a}²+2.5×${b}-${game.roundNumber}=${game.countPlayer()}`;
+						equals=`0.5×${a}<sup>2</sup>+2.5×${b}-${game.roundNumber}=${game.countPlayer()}`;
 						player.logSkill('nsmanzhi');
 						player.chat(equals);
 						game.log(player,'的计算结果为',equals);
@@ -18889,7 +18889,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_mengyou_prefix:'数学',
 			ns_mengyou_ab:'孟优',
 			nsmanzhi:'蛮智',
-			nsmanzhi_info:'准备阶段或结束阶段开始时，你可以将场上出现的数字代入等式中的A和B。若此等式成立，你摸Y张牌。（等式为Y=0.5A²+2.5B-X，其中X为游戏轮数，Y为存活人数）',
+			nsmanzhi_info:'准备阶段或结束阶段开始时，你可以将场上出现的数字代入等式中的A和B。若此等式成立，你摸Y张牌。（等式为Y=0.5A<sup>2</sup>+2.5B-X，其中X为游戏轮数，Y为存活人数）',
 			ns_chengpu:'铁索程普',
 			ns_chengpu_prefix:'铁索',
 			ns_chengpu_ab:'程普',
