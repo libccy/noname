@@ -743,7 +743,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:['die','damageEnd']},
 				filter(event,player){
-					if(player.countMark('sbxingshang')>=get.info('sbxngshang').getLimit) return false;
+					if(player.countMark('sbxingshang')>=get.info('sbxingshang').getLimit) return false;
 					return event.name=='die'||!player.getHistory('custom',evt=>evt.sbxingshang).length;
 				},
 				usable:1,
@@ -834,7 +834,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								var dialog=ui.create.dialog('行殇：请选择你要执行的一项','hidden');
 								dialog.add([[
 									[1,'移去1个“颂”标记，复原一名角色的武将牌'],
-									[2,'移去2个“颂”标记，令一名角色摸'+get,cnNumber(Math.min(5,Math.max(1,game.dead.length)))+'张牌'],
+									[2,'移去2个“颂”标记，令一名角色摸'+get.cnNumber(Math.min(5,Math.max(1,game.dead.length)))+'张牌'],
 									[2,'移去3个“颂”标记，令一名体力上限小于10的角色加1点体力上限并回复1点体力，然后随机恢复一个被废除的装备栏'],
 									[3,'移去4个“颂”标记，获得一名已阵亡角色的所有技能，然后失去〖行殇〗〖放逐〗〖颂威〗'],
 								],'textbutton']);
@@ -1147,14 +1147,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				trigger:{player:'phaseUseBegin'},
 				filter(event,player){
-					if(player.countMark('sbxingshang')>=get.info('sbxngshang').getLimit) return false;
+					if(player.countMark('sbxingshang')>=get.info('sbxingshang').getLimit) return false;
 					return game.hasPlayer(target=>target.group=='wei'&&target!=player);
 				},
 				zhuSkill:true,
 				forced:true,
 				locked:false,
 				async content(event,trigger,player){
-					player.addMark('sbxingshang',Math.min(get.info('sbxngshang').getLimit-player.countMark('sbxingshang'),game.countPlayer(target=>target.group=='wei'&&target!=player)));
+					player.addMark('sbxingshang',Math.min(get.info('sbxingshang').getLimit-player.countMark('sbxingshang'),game.countPlayer(target=>target.group=='wei'&&target!=player)));
 				},
 				subSkill:{
 					delete:{
