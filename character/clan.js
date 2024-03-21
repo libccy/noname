@@ -473,11 +473,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'damageEnd',source:'damageSource'},
 				filter(event,player){
 					if(!event.card||player.isLinked()) return false;
-					const history=game.checkGlobalHistory('damage',evt=>{
-						if(!evt.card) return false;
+					if(game.getGlobalHistory('everything',evt=>{
+						if(evt.name!='damage'||!evt.card) return false;
 						return evt.player==player||(evt.source&&evt.source==player);
-					});
-					if(history.indexOf(event)!=0) return false;
+					}).indexOf(event)!=0) return false;
 					var num=get.cardNameLength(event.card);
 					return typeof num=='number'&&num>0&&player.countCards('he')>0;
 				},
