@@ -1396,7 +1396,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						charlotte:true,
 						trigger:{global:'damageSource'},
 						filter:function(event,player){
-							if(event.getParent().type!='card') return false;
+							if(!event.source||event.getParent().type!='card') return false;
 							if(event.source.isHealthy()||event.card.name!='sha') return false;
 							return event.getParent(4).name=='dcsbmengmou'&&event.getParent(4).player==player;
 						},
@@ -7968,8 +7968,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				getZhuanhuanji:function(player,bool){
 					var skills=player.getSkills(null,false,false).filter(function(i){
-						const list=get.skillCategoriesOf(i);
-						return !list.includes('Charlotte')&&list.includes('转换技');
+						return get.is.zhuanhuanji(i,player);
 					});
 					if(!bool) return skills;
 					if(!skills.length) return 'none';
@@ -7981,7 +7980,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				getState:function(player,skill){
 					var info=get.info(skill),zhuanhuan=info.zhuanhuanji;
-					if(zhuanhuan=='number') return (player.countMark(skill)%2==1);
+					if(zhuanhuan&&zhuanhuan=='number') return (player.countMark(skill)%2==1);
 					return Boolean(player.storage[skill]);
 				},
 				trigger:{
