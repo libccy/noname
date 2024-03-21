@@ -62,7 +62,7 @@ export class NonameAssembly extends Array {
 		// if (typeof name !== "string" || name.length === 0) throw new Error("you can't add a anonymous function to assembly.")
 
 		if (typeof name !== "string" || name.length === 0) {
-			Array.prototype.add.call(this, content)
+			if (!this.includes(content)) Array.prototype.push.call(this, content)
 		}
 		else if (!this.has(name)) {
 			this.#record.set(name, this.length)
