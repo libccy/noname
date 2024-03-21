@@ -459,7 +459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								delete player.storage.mbxuetu_used;
 							});
 						}
-						player.markAuto('mbxuetu_used', storage);
+						player.markAuto('mbxuetu_used',[status===0?storage:(!event.cards.length)]);
 						if (status === 0 && !storage || status === 1 && event.cards.length) {
 							await target.recover();
 						}
