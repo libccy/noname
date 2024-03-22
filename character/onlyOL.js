@@ -62,6 +62,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					await player.loseHp();
 					player.removeSkill('zhenlie_lose');
 					trigger.getParent().excluded.add(player);
+					if(!player.isIn()) return;
 					const goon=target.hasCard(card=>{
 						if(get.position(card)=='h') return true;
 						return lib.filter.canBeGained(card,player,target);
