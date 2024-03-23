@@ -316,7 +316,7 @@ export class LibInit extends Uninstantable {
 				if (typeof onerror == 'function') onerror(new Error(oReq.statusText || oReq.status));
 				return;
 			}
-			onload(result);
+			onload.call(oReq, result);
 		});
 		if (typeof onerror == 'function') oReq.addEventListener("error", onerror);
 		oReq.open("GET", sScriptURL);
