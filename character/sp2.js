@@ -6739,7 +6739,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.num++;
-					if(trigger.source.name.indexOf('lvbu')!=-1) trigger.source.storage.panshi='大丈夫生居天地之间，岂能郁郁久居人下';// 彩蛋
+					if(trigger.source.name.indexOf('lvbu')!=-1) trigger.source.storage.panshi='吾堂堂丈夫，安肯为汝子乎！';// 彩蛋
 					var evt=event.getParent('phaseUse');
 					if(evt&&evt.player==player) evt.skipped=true;
 				},
