@@ -322,24 +322,46 @@ export class Get extends Uninstantable {
 	}
 	static infoHp(hp) {
 		if (typeof hp == 'number') return hp;
-		else if (typeof hp == 'string' && hp.includes('/')) {
-			const num = hp.split('/')[0];
-			if (num) return num == 'Infinity' ? Infinity : parseInt(num);
+		else if (typeof hp == 'string') {
+			if (hp.includes('/')) {
+				const num = hp.split('/')[0];
+				if (num) {
+					if (num == 'Infinity' || num == '∞') {
+						return Infinity;
+					} else {
+						return parseInt(num);
+					}
+				}
+			} else if (hp == 'Infinity' || hp == '∞') return Infinity;
 		}
 		return 0;
 	}
 	static infoMaxHp(hp) {
 		if (typeof hp == 'number') return hp;
-		else if (typeof hp == 'string' && hp.includes('/')) {
-			const num = hp.split('/')[1];
-			if (num) return num == 'Infinity' ? Infinity : parseInt(num);
+		else if (typeof hp == 'string') {
+			if (hp.includes('/')) {
+				const num = hp.split('/')[1];
+				if (num) {
+					if (num == 'Infinity' || num == '∞') {
+						return Infinity;
+					} else {
+						return parseInt(num);
+					}
+				}
+			} else if (hp == 'Infinity' || hp == '∞') return Infinity;
 		}
 		return 0;
 	}
 	static infoHujia(hp) {
 		if (typeof hp == 'string' && hp.includes('/')) {
 			const num = hp.split('/')[2];
-			if (num) return num == 'Infinity' ? Infinity : parseInt(num);
+			if (num) {
+				if (num == 'Infinity' || num == '∞') {
+					return Infinity;
+				} else {
+					return parseInt(num);
+				}
+			}
 		}
 		return 0;
 	}
