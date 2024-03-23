@@ -6620,6 +6620,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.logSkill('cixiao',target);
 						target.addSkills('panshi');
+						// 彩蛋
+						var str;
+						if(target.name.indexOf('lvbu')!=-1){
+							str='公若不弃，布愿拜为义父';
+						} else if(target.sex=='male'){
+							str='我是'+get.translation(player)+'的义子';
+						} else if(target.sex=='female'){
+							str='我是'+get.translation(player)+'的义女';
+						} else str='我们是'+get.translation(player)+'的义子和义女';
+						target.storage.panshi=str;
 					}
 					event.finish();
 					'step 2'
@@ -6660,6 +6670,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}).concat(result.targets),'green');
 						target.addSkills('panshi');
+						// 彩蛋
+						var str;
+						if(target.name.indexOf('lvbu')!=-1){
+							str='公若不弃，布愿拜为义父';
+						} else if(target.sex=='male'){
+							str='我是'+get.translation(player)+'的义子';
+						} else if(target.sex=='female'){
+							str='我是'+get.translation(player)+'的义女';
+						} else str='我们是'+get.translation(player)+'的义子和义女';
+						target.storage.panshi=str;
 					}
 					else event.finish();
 					'step 4'
@@ -6706,7 +6726,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:'子',
 				intro:{
 					name:'义子',
-					content:'我是儿子',
+					content:'$',
 				},
 				group:'panshi_damage',
 			},
