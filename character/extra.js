@@ -357,7 +357,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								node.link=item;
 
 								const func=function(node,item){
-									if(item!='unknown') node.setBackground(item,'character');
+									const currentPlayer=game.findPlayer(current=>current.getSeatNum()==seat);
+									if(currentPlayer.classList.contains('unseen_show')) node.setBackground('hidden_image','character');
+									else if(item!='unknown') node.setBackground(item,'character');
 									if(node.node){
 										node.node.name.remove();
 										node.node.hp.remove();
@@ -370,7 +372,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										group:ui.create.div('.identity',node),
 										intro:ui.create.div('.intro',node),
 									};
-									const currentPlayer=game.findPlayer(current=>current.getSeatNum()==seat);
 									const infoitem=[currentPlayer.sex,currentPlayer.group,`${currentPlayer.hp}/${currentPlayer.maxHp}/${currentPlayer.hujia}`];
 									node.node.name.innerHTML=get.slimName(item);
 									if(lib.config.buttoncharacter_style=='default'||lib.config.buttoncharacter_style=='simple'){
