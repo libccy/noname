@@ -6620,16 +6620,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var target=result.targets[0];
 						player.logSkill('cixiao',target);
 						target.addSkills('panshi');
-						// 彩蛋
-						var str;
-						if(target.name.indexOf('lvbu')!=-1){
-							str='公若不弃，布愿拜为义父';
-						} else if(target.sex=='male'){
-							str='我是'+get.translation(player)+'的义子';
-						} else if(target.sex=='female'){
-							str='我是'+get.translation(player)+'的义女';
-						} else str='我们是'+get.translation(player)+'的义子和义女';
-						target.storage.panshi=str;
 					}
 					event.finish();
 					'step 2'
@@ -6670,16 +6660,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}).concat(result.targets),'green');
 						target.addSkills('panshi');
-						// 彩蛋
-						var str;
-						if(target.name.indexOf('lvbu')!=-1){
-							str='公若不弃，布愿拜为义父';
-						} else if(target.sex=='male'){
-							str='我是'+get.translation(player)+'的义子';
-						} else if(target.sex=='female'){
-							str='我是'+get.translation(player)+'的义女';
-						} else str='我们是'+get.translation(player)+'的义子和义女';
-						target.storage.panshi=str;
 					}
 					else event.finish();
 					'step 4'
@@ -6726,7 +6706,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				marktext:'子',
 				intro:{
 					name:'义子',
-					content:'$',
+					//content:'我是儿子',
+					//R·I·P——永远怀念：被棘手砍掉的“我是儿子”
+					content(_,player){
+						const targets=game.filterPlayer2(target=>target.hasSkill('cixiao',null,null,false)).sortBySeat(player);
+						if(!targets.length) return '我义父呢？！';
+						if(['name','name1','name2'].some(name=>{
+							if(!player[name]||!get.character(player[name])||typeof get.translation(player[name])!='string') return false;
+							return player[name].includes('lvbu')&&get.translation(player[name]).includes('吕布');
+						})) return '公若不弃，布愿拜为义父';
+						return '我是'+get.translation(targets)+'的'+((player)=>{
+							switch(player.sex){
+								case 'female':
+									return '义女';
+								case 'double':
+									return '义子义女';
+								default:
+									return '义子';
+							}
+						})(player);
+					},
 				},
 				group:'panshi_damage',
 			},

@@ -1637,21 +1637,21 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(player.hasSkill('dddzhengjun_hp')) return false;
 						return event.player.getHp()==player.getHp();
 					}
+					const info=get.info('dddzhengjun');
+					const hs_check=info.hs_check,es_check=info.es_check;
 					return game.hasPlayer(target=>{
-						if(event.getg&&event.getg(target)&&event.getg(target).length){
-							return !player.hasSkill('dddzhengjun_hs')&&target.countCards('h')==player.countCards('h');
-						}
+						if(event.getg&&event.getg(target)&&event.getg(target).length&&hs_check(player,target)) return true;
 						const evt=event.getl(target);
-						if(evt){
-							if(evt.hs&&evt.hs.length){
-								return !player.hasSkill('dddzhengjun_hs')&&target.countCards('h')==player.countCards('h');
-							}
-							if(evt.es&&evt.es.length){
-								return !player.hasSkill('dddzhengjun_es')&&target.countCards('e')==player.countCards('e')&&player.canMoveCard(null,true,target);
-							}
-						}
-						return false;
+						if(evt&&evt.hs&&evt.hs.length&&hs_check(player,target)) return true;
+						if(event.name=='equip'&&event.player==target&&(!evt||evt.cards.length!=1)&&es_check) return true;
+						return evt&&evt.es&&evt.es.length&&es_check;
 					});
+				},
+				hs_check(player,target){
+					return !player.hasSkill('dddzhengjun_hs')&&target.countCards('h')==player.countCards('h');
+				},
+				es_check(player,target){
+					return !player.hasSkill('dddzhengjun_hs')&&target.countCards('h')==player.countCards('h');
 				},
 				async cost(event,trigger,player){
 					if(trigger.name=='damage'||trigger.name=='loseHp'||trigger.name=='recover'){
@@ -1674,25 +1674,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						let map={};
 						const hs_targets=game.filterPlayer(target=>{
-							if(trigger.getg&&trigger.getg(target)&&trigger.getg(target).length){
-								return !player.hasSkill('dddzhengjun_hs')&&target.countCards('h')==player.countCards('h');
-							}
+							if(!get.info('dddzhengjun').hs_check) return false;
+							if(trigger.getg&&trigger.getg(target)&&trigger.getg(target).length) return true;
 							const evt=trigger.getl(target);
-							if(evt){
-								if(evt.es&&evt.es.length){
-									return !player.hasSkill('dddzhengjun_es')&&target.countCards('e')==player.countCards('e')&&player.canMoveCard(null,true,target);
-								}
-							}
-							return false;
+							return evt&&evt.hs&&evt.hs.length;
 						});
 						const es_targets=game.filterPlayer(target=>{
+							if(!get.info('dddzhengjun').es_check) return false;
 							const evt=trigger.getl(target);
-							if(evt){
-								if(evt.es&&evt.es.length){
-									return !player.hasSkill('dddzhengjun_es')&&target.countCards('e')==player.countCards('e')&&player.canMoveCard(null,true,target);
-								}
-							}
-							return false;
+							if(trigger.name=='equip'&&trigger.player==target&&(!evt||evt.cards.length!=1)) return true;
+							return evt&&evt.es&&evt.es.length;
 						});
 						if(hs_targets.length){
 							let target;
