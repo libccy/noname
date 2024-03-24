@@ -949,13 +949,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								const str='###行殇###';
 								switch(links[0]){
 									case 1:
-										return str+'复原一名角色的武将牌';
+										return str+'移去2个“颂”标记，复原一名角色的武将牌';
 									case 2:
-										return str+'令一名角色摸'+get.cnNumber(Math.min(5,Math.max(1,game.dead.length)))+'张牌';
+										return str+'移去2个“颂”标记，令一名角色摸'+get.cnNumber(Math.min(5,Math.max(1,game.dead.length)))+'张牌';
 									case 3:
-										return str+'令一名体力上限小于10的角色加1点体力上限并回复1点体力，然后随机恢复一个被废除的装备栏';
+										return str+'移去5个“颂”标记，令一名体力上限小于10的角色加1点体力上限并回复1点体力，然后随机恢复一个被废除的装备栏';
 									case 4:
-										return str+'获得一名已阵亡角色的所有技能，然后失去武将牌上的所有技能';
+										return str+'移去5个“颂”标记，获得一名已阵亡角色的所有技能，然后失去武将牌上的所有技能';
 								}
 							}
 						},
