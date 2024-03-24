@@ -746,11 +746,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player.countMark('sbxingshang')>=get.info('sbxingshang').getLimit) return false;
 					return event.name=='die'||!player.getHistory('custom',evt=>evt.sbxingshang).length;
 				},
-				usable:1,
 				forced:true,
 				locked:false,
 				async content(event,trigger,player){
-					player.addMark('sbxingshang',1);
+					player.addMark('sbxingshang',Math.min(2,get.info('sbxingshang').getLimit-player.countMark('sbxingshang')));
 					if(trigger.name=='damage') player.getHistory('custom').push({sbxingshang:true});
 				},
 				marktext:'颂',
@@ -762,27 +761,27 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				getLimit:9,
 				getNum(num){
 					if(typeof num!='number'||!Array.from({length:9}).map((_,i)=>i+1).includes(num)) return 0;
-					return [1,2,3,4,1,2,2,3,3][num-1];
+					return [2,2,5,5,1,2,2,3,3][num-1];
 				},
 				getEffect(player,num){
 					if(!player||typeof num!='number') return 0;
 					switch(num){
 						//行殇选项
-						case 1://-1，重置武将牌
+						case 1://-2，重置武将牌
 							if(game.hasPlayer(target=>{
 								return get.attitude(player,target)>0&&target.isTurnedOver();
 							})) return 10;
 							return 0;
 						case 2://-2，摸min(5,max(1,阵亡角色数))的牌
 							return Math.min(5,(Math.max(1,game.dead.length)));
-						case 3://-3，加上限加血+复原装备栏
+						case 3://-5，加上限加血+复原装备栏
 							if(!game.hasPlayer(target=>{
 								return get.attitude(player,target)>0&&target.maxHp<10;
 							})) return 0;
 							return 5+(game.hasPlayer(target=>{
 									return get.attitude(player,target)>0&&target.hasDisabledSlot();
 							})?1:0);
-						case 4://-4，劝封/化萍
+						case 4://-5，劝封/化萍
 							return 0;
 						//放逐选项
 						case 5://-1，封印基本牌外的手牌
@@ -828,20 +827,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								return player.countMark('sbxingshang')&&(target.isLinked()||target.isTurnedOver());
 							});
 						},
-						usable:1,
+						usable:2,
 						chooseButton:{
 							dialog(){
 								var dialog=ui.create.dialog('行殇：请选择你要执行的一项','hidden');
 								dialog.add([[
-									[1,'移去1个“颂”标记，复原一名角色的武将牌'],
+									[1,'移去2个“颂”标记，复原一名角色的武将牌'],
 									[2,'移去2个“颂”标记，令一名角色摸'+get.cnNumber(Math.min(5,Math.max(1,game.dead.length)))+'张牌'],
-									[3,'移去3个“颂”标记，令一名体力上限小于10的角色加1点体力上限并回复1点体力，然后随机恢复一个被废除的装备栏'],
-									[4,'移去4个“颂”标记，获得一名已阵亡角色的所有技能，然后失去〖行殇〗〖放逐〗〖颂威〗'],
+									[3,'移去5个“颂”标记，令一名体力上限小于10的角色加1点体力上限并回复1点体力，然后随机恢复一个被废除的装备栏'],
+									[4,'移去5个“颂”标记，获得一名已阵亡角色的所有技能，然后失去〖行殇〗〖放逐〗〖颂威〗'],
 								],'textbutton']);
 								return dialog;
 							},
 							filter(button,player){
-								if(button.link>player.countMark('sbxingshang')) return false;
+								if(player.countMark('sbxingshang')<get.info('sbxingshang').getNum(button.link)) return false;
 								switch(button.link){
 									case 1:
 										return game.hasPlayer(target=>target.isLinked()||target.isTurnedOver());
@@ -963,7 +962,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						ai:{
 							order(_,player){
 								const info=get.info('sbxingshang');
-								const goon=(player.hasSkill('sbfangzhu')&&!player.getStat('skill').sbfangzhu);
+								const goon=(player.hasSkill('sbfangzhu')&&(player.getStat('skill').sbfangzhu||0)<(get.info('sbfangzhu').usable||Infinity));
 								let list=Array.from({length:goon?9:4}).map((_,i)=>i+1);
 								list=list.filter(num=>player.countMark('sbxingshang')>=info.getNum(num));
 								list.sort((a,b)=>info.getEffect(player,b)-info.getEffect(player,a));
@@ -1088,7 +1087,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order(_,player){
 						const info=get.info('sbxingshang');
-						const goon=(player.hasSkill('sbxingshang')&&!player.getStat('skill').sbxingshang_use);
+						const goon=(player.hasSkill('sbxingshang')&&(player.getStat('skill').sbxingshang_use||0)<(info.subSkill.use.usable||Infinity));
 						let list=Array.from({length:goon?9:5}).map((_,i)=>i+(goon?1:5));
 						list=list.filter(num=>player.countMark('sbxingshang')>=info.getNum(num));
 						list.sort((a,b)=>info.getEffect(player,b)-info.getEffect(player,a));
@@ -7086,7 +7085,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sb_caopi:'谋曹丕',
 			sb_caopi_prefix:'谋',
 			sbxingshang:'行殇',
-			sbxingshang_info:'①当一名角色受到伤害后（每回合限一次）或死亡时，你获得1个“颂”标记（你至多拥有9个“颂”标记）。②出牌阶段限一次，你可以：1.移去1个“颂”标记，令一名角色复原武将牌；2.移去2个“颂”标记，令一名角色摸X张牌（X为场上阵亡角色数，且X至少为1，至多为5）；3.移去3个“颂”标记，令一名体力上限小于10的角色加1点体力上限，回复1点体力，随机恢复一个已废除的装备栏；4.移去4个“颂”标记，获得一名阵亡角色武将牌上的所有技能，然后你失去〖行殇〗〖放逐〗〖颂威〗。',
+			sbxingshang_info:'①当一名角色受到伤害后（每回合限一次）或死亡时，你获得2个“颂”标记（你至多拥有9个“颂”标记）。②出牌阶段限两次，你可以：1.移去2个“颂”标记，令一名角色复原武将牌；2.移去2个“颂”标记，令一名角色摸X张牌（X为场上阵亡角色数，且X至少为1，至多为5）；3.移去5个“颂”标记，令一名体力上限小于10的角色加1点体力上限，回复1点体力，随机恢复一个已废除的装备栏；4.移去5个“颂”标记，获得一名阵亡角色武将牌上的所有技能，然后你失去〖行殇〗〖放逐〗〖颂威〗。',
 			sbfangzhu:'放逐',
 			sbfangzhu_info:'出牌阶段限一次，你可以：1.移去1个“颂”标记，令一名其他角色于手牌中只能使用基本牌直到其回合结束；2.移去2个“颂”标记，令一名其他角色的非Charlotte技能失效直到其回合结束；3.移去2个“颂”标记，令一名其他角色不能响应除其以外的角色使用的牌直到其回合结束；4.移去3个“颂”标记，令一名其他角色将武将牌翻面；5.移去3个“颂”标记，令一名其他角色于手牌中只能使用装备牌直到其回合结束。',
 			sbsongwei:'颂威',
