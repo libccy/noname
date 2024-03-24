@@ -5942,6 +5942,10 @@ export class Player extends HTMLDivElement {
 		next.num = num;
 		next.player = this;
 		if (next.num == undefined) next.num = 1;
+		if (next.num <= 0) {
+			_status.event.next.remove(next);
+			next.resolve();
+		}
 		next.setContent('loseHp');
 		return next;
 	}
