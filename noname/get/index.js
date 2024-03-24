@@ -29,6 +29,7 @@ export class Get extends Uninstantable {
 			return [result[1], parseInt(major), parseInt(minor), parseInt(patch)]
 		}
 		result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/)
+		if (!result) return ["other", NaN, NaN, NaN]
 		const [major, minor, patch] = result[1].split(".")
 		return ["safari", parseInt(major), parseInt(minor), parseInt(patch)]
 	}

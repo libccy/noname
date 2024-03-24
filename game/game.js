@@ -80,15 +80,27 @@ new Promise(resolve => {
 			// @ts-ignore
 			return [result[1], parseInt(major), parseInt(minor), parseInt(patch)]
 		}
-		result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/)
+		// 以下是所有Safari平台的判断方法
+		// macOS以及以桌面显示的移动端则直接判断
+		if (/macintosh/.test(userAgent)) {
+			result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/)
+			if (!result) return ["other", NaN, NaN, NaN]
+		}
+		// 不然则通过OS后面的版本号来获取内容
+		else {
+			let safariRegex = /(?:iphone|ipad); cpu (?:iphone )?os (\d+(?:_\d+)+)/
+			result = userAgent.match(safariRegex)
+			if (!result) return ["other", NaN, NaN, NaN]
+		}
+		// result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/)
 		// @ts-ignore
 		const [major, minor, patch] = result[1].split(".")
 		return ["safari", parseInt(major), parseInt(minor), parseInt(patch)]
 	}
 	const [core, major, minor, patch] = coreInfo();
 	const supportMap = {
-		"firefox": [60, 0, 0],
-		"chrome": [61, 0, 0],
+		"firefox": [77, 0, 0],
+		"chrome": [77, 0, 0],
 		"safari": [14, 5, 0]
 	}
 	const versions = [major, minor, patch]
