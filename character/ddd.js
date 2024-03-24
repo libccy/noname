@@ -1651,7 +1651,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return !player.hasSkill('dddzhengjun_hs')&&target.countCards('h')==player.countCards('h');
 				},
 				es_check(player,target){
-					return !player.hasSkill('dddzhengjun_hs')&&target.countCards('h')==player.countCards('h');
+					return !player.hasSkill('dddzhengjun_es')&&target.countCards('e')==player.countCards('e');
 				},
 				async cost(event,trigger,player){
 					if(trigger.name=='damage'||trigger.name=='loseHp'||trigger.name=='recover'){
