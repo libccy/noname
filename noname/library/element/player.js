@@ -4790,7 +4790,8 @@ export class Player extends HTMLDivElement {
 				next.selectButton = arguments[i];
 			}
 			else if (typeof arguments[i] == 'boolean') {
-				next.forced = arguments[i];
+				if (!next.forced) next.forced = arguments[i];
+				else next.complexSelect = arguments[i];
 			}
 			else if (get.itemtype(arguments[i]) == 'position') {
 				next.position = arguments[i];
@@ -4817,6 +4818,7 @@ export class Player extends HTMLDivElement {
 			if (get.attitude(_status.event.player, get.owner(button.link)) > 0) return -val;
 			return val;
 		};
+		if (next.complexSelect !== false) next.complexSelect = true;
 		next.setContent('choosePlayerCard');
 		next._args = Array.from(arguments);
 		return next;
@@ -4835,7 +4837,8 @@ export class Player extends HTMLDivElement {
 				next.selectButton = arguments[i];
 			}
 			else if (typeof arguments[i] == 'boolean') {
-				next.forced = arguments[i];
+				if (!next.forced) next.forced = arguments[i];
+				else next.complexSelect = arguments[i];
 			}
 			else if (get.itemtype(arguments[i]) == 'position') {
 				next.position = arguments[i];
@@ -4862,6 +4865,7 @@ export class Player extends HTMLDivElement {
 			if (get.attitude(_status.event.player, get.owner(button.link)) > 0) return -val;
 			return val;
 		};
+		if (next.complexSelect !== false) next.complexSelect = true;
 		next.setContent('discardPlayerCard');
 		next._args = Array.from(arguments);
 		return next;
@@ -4880,7 +4884,8 @@ export class Player extends HTMLDivElement {
 				next.selectButton = arguments[i];
 			}
 			else if (typeof arguments[i] == 'boolean') {
-				next.forced = arguments[i];
+				if (!next.forced) next.forced = arguments[i];
+				else next.complexSelect = arguments[i];
 			}
 			else if (get.itemtype(arguments[i]) == 'position') {
 				next.position = arguments[i];
@@ -4910,6 +4915,7 @@ export class Player extends HTMLDivElement {
 			if (get.attitude(_status.event.player, get.owner(button.link)) > 0) return -val;
 			return val;
 		};
+		if (next.complexSelect !== false) next.complexSelect = true;
 		next.setContent('gainPlayerCard');
 		next._args = Array.from(arguments);
 		return next;
