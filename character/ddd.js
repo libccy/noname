@@ -1643,8 +1643,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(event.getg&&event.getg(target)&&event.getg(target).length&&hs_check(player,target)) return true;
 						const evt=event.getl(target);
 						if(evt&&evt.hs&&evt.hs.length&&hs_check(player,target)) return true;
-						if(event.name=='equip'&&event.player==target&&(!evt||evt.cards.length!=1)&&es_check) return true;
-						return evt&&evt.es&&evt.es.length&&es_check;
+						if(event.name=='equip'&&event.player==target&&(!evt||evt.cards.length!=1)&&es_check(player,target)) return true;
+						return evt&&evt.es&&evt.es.length&&es_check(player,target);
 					});
 				},
 				hs_check(player,target){
@@ -1674,13 +1674,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else{
 						let map={};
 						const hs_targets=game.filterPlayer(target=>{
-							if(!get.info('dddzhengjun').hs_check) return false;
+							if(!get.info('dddzhengjun').hs_check(player,target)) return false;
 							if(trigger.getg&&trigger.getg(target)&&trigger.getg(target).length) return true;
 							const evt=trigger.getl(target);
 							return evt&&evt.hs&&evt.hs.length;
 						});
 						const es_targets=game.filterPlayer(target=>{
-							if(!get.info('dddzhengjun').es_check) return false;
+							if(!get.info('dddzhengjun').es_check(player,target)) return false;
 							const evt=trigger.getl(target);
 							if(trigger.name=='equip'&&trigger.player==target&&(!evt||evt.cards.length!=1)) return true;
 							return evt&&evt.es&&evt.es.length;
