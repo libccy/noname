@@ -7955,8 +7955,10 @@ export const Content = {
 				game.playAudio('effect', 'loseHp');
 			}
 		});
-		game.log(player, '失去了' + get.cnNumber(num) + '点体力');
-		player.changeHp(-num);
+		if (num > 0) {
+			game.log(player, '失去了' + get.cnNumber(num) + '点体力');
+			player.changeHp(-num);
+		}
 		"step 1";
 		if (player.hp <= 0 && !event.nodying) {
 			game.delayx();
