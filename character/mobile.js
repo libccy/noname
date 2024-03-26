@@ -718,7 +718,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(gains.length) player.gain(gains.randomGets(Math.min(gains.length,num)),'gain2');
 				},
 				getNum:function(player,event){
-					let num=3;
+					let num=(get.mode()=='identity'?3:4);
 					const history=game.getAllGlobalHistory('everything');
 					for(let i=history.length-1;i>=0;i--){
 						const evt=history[i];
@@ -16763,7 +16763,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sidai:'伺怠',
 			sidai_info:'限定技，出牌阶段，你可以将手牌区内的所有基本牌当做【杀】使用。若此牌对应的实体牌中：包含【闪】，则目标角色成为此牌的目标后，需弃置一张基本牌，否则不可响应此牌；包含【桃】，则当目标角色受到此牌的伤害后，其减1点体力上限。',
 			jieyu:'竭御',
-			jieyu_info:'结束阶段，你可以从弃牌堆中获得共X张不同牌名的基本牌（X为3-你上次发动〖竭御〗至今你成为其他角色使用伤害类卡牌目标的次数，且X至少为1）。',
+			jieyu_info:'结束阶段，你可以从弃牌堆中获得共X张不同牌名的基本牌（X为4-你上次发动〖竭御〗至今你成为其他角色使用伤害类卡牌目标的次数，且X至少为1）。',
+			jieyu_info_identity:'结束阶段，你可以从弃牌堆中获得共X张不同牌名的基本牌（X为3-你上次发动〖竭御〗至今你成为其他角色使用伤害类卡牌目标的次数，且X至少为1）。',
 			yangfeng:'杨奉',
 			mbxuetu:'血途',
 			mbxuetu_info:'转换技。出牌阶段限一次，阴：你可以弃置一张牌，然后令一名角色回复1点体力；阳：你可以失去1点体力，然后令一名角色摸两张牌。',
