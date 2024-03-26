@@ -5932,6 +5932,8 @@ export class Player extends HTMLDivElement {
 		next.filterStop = function(){
 			if (this.num <= 0 || this.player.isHealthy()){
 				delete this.filterStop;
+				this.finish();
+				this._triggered = null;
 				return true;
 			}
 		}
