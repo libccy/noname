@@ -7922,20 +7922,20 @@ export const Content = {
 		if (!event.notrigger) event.trigger('damageSource');
 	},
 	recover: function () {
-		if (lib.config.background_audio) {
-			game.playAudio('effect', 'recover');
-		}
-		game.broadcast(function () {
-			if (lib.config.background_audio) {
-				game.playAudio('effect', 'recover');
-			}
-		});
 		if (num > player.maxHp - player.hp) {
 			num = player.maxHp - player.hp;
 			event.num = num;
 		}
 		if (num > 0) {
-			player.changeHp(num, false);
+			delete event.filterStop();
+			if (lib.config.background_audio) {
+				game.playAudio('effect', 'recover');
+			}
+			game.broadcast(function () {
+				if (lib.config.background_audio) {
+					game.playAudio('effect', 'recover');
+				}
+			});
 			game.broadcastAll(function (player) {
 				if (lib.config.animation && !lib.config.low_performance) {
 					player.$recover();
@@ -7943,10 +7943,18 @@ export const Content = {
 			}, player);
 			player.$damagepop(num, 'wood');
 			game.log(player, '回复了' + get.cnNumber(num) + '点体力');
+			
+			player.changeHp(num, false);
 		}
+		else event._triggered = null;
 	},
 	loseHp: function () {
 		"step 0";
+		if (event.num <= 0){
+			event.finish();
+			event._triggered = null;
+			return;
+		}
 		if (lib.config.background_audio) {
 			game.playAudio('effect', 'loseHp');
 		}

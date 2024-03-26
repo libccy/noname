@@ -5929,9 +5929,11 @@ export class Player extends HTMLDivElement {
 		if (next.cards == undefined && !nocard) next.cards = event.cards;
 		if (next.source == undefined && !nosource) next.source = event.customSource || event.player;
 		if (next.num == undefined) next.num = (event.baseDamage || 1) + (event.extraDamage || 0);
-		if (next.num <= 0) {
-			_status.event.next.remove(next);
-			next.resolve();
+		next.filterStop = function(){
+			if (this.num <= 0 || this.player.isHealthy()){
+				delete this.filterStop;
+				return true;
+			}
 		}
 		next.setContent('recover');
 		return next;
@@ -5949,6 +5951,14 @@ export class Player extends HTMLDivElement {
 		next.player = this;
 		if (next.num == undefined) next.num = 1;
 		next.setContent('loseHp');
+		next.filterStop = function(){
+			if (this.num <= 0){
+				delete this.filterStop;
+				this.finish();
+				this._triggered = null;
+				return true;
+			}
+		}
 		return next;
 	}
 	loseMaxHp() {
