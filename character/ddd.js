@@ -1689,12 +1689,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							let target;
 							if(hs_targets.length==1) target=hs_targets[0];
 							else{
-								target=await player.chooseTarget(get.prompt('dddzhengjun'),'令其中一名角色摸一张牌或弃置一张牌',(card,player,target)=>{
+								let targets=await player.chooseTarget(get.prompt('dddzhengjun'),'令其中一名角色摸一张牌或弃置一张牌',(card,player,target)=>{
 									return get.event('targets').includes(target);
 								}).set('ai',target=>{
 									const player=get.event('player');
 									return Math.max(get.effect(target,{name:'guohe_copy2'},target,player),get.effect(target,{name:'draw'},player,player));
-								}).set('targets',hs_targets).forResultTargets()[0];
+								}).set('targets',hs_targets).forResultTargets();
+								if(targets&&targets.length) target=targets[0];
 							}
 							if(target){
 								let list=['摸牌'];
@@ -1722,12 +1723,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(bool) target=hs_targets[0];
 							}
 							else{
-								target=await player.chooseTarget(get.prompt('dddzhengjun'),'移动其中一名角色的一张装备牌',(card,player,target)=>{
+								let targets=await player.chooseTarget(get.prompt('dddzhengjun'),'移动其中一名角色的一张装备牌',(card,player,target)=>{
 									return get.event('targets').includes(target);
 								}).set('ai',target=>{
 									const player=get.event('player');
 									return player.canMoveCard(true,true,target)?(1+Math.random()):0;
-								}).set('targets',es_targets).forResultTargets()[0];
+								}).set('targets',es_targets).forResultTargets();
+								if(targets&&targets.length) target=targets[0];
 							}
 							if(target){
 								map.es_target=target;
