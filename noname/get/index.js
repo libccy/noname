@@ -4415,18 +4415,13 @@ export class Get extends Uninstantable {
 					zeroplayer = true;
 					zerotarget = true;
 				}
-				if (typeof temp3 == 'function' && temp3(player, target) != undefined) {
-					threaten *= temp3(player, target);
+				if (typeof temp3 == 'object') {
+					temp3 = temp3.target;
 				}
-				else if (typeof temp3 == 'object') {
-					if (typeof temp3.target == 'number') {
-						threaten *= temp3;
-					}
-					else if (typeof temp3.target == 'function' && temp3(player, target) != undefined) {
-						threaten *= temp3(player, target);
-					}
+				if (typeof temp3 == 'function') {
+					temp3 = temp3(player, target);
 				}
-				else if (typeof temp3 == 'number') {
+				if (typeof temp3 == 'number') {
 					threaten *= temp3;
 				}
 			}
