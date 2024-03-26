@@ -7927,7 +7927,7 @@ export const Content = {
 			event.num = num;
 		}
 		if (num > 0) {
-			delete event.filterStop();
+			delete event.filterStop;
 			if (lib.config.background_audio) {
 				game.playAudio('effect', 'recover');
 			}
