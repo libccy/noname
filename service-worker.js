@@ -1,39 +1,39 @@
 /**
+ * @type { ServiceWorkerGlobalScope } 提供ServiceWorker的代码提示
+ */
+// @ts-ignore
+var self = globalThis;
+// 以副作用导入typescript，以保证require也可以同步使用
+import './game/typescript.js';
+/**
  * @type { import('typescript') }
  */
-var ts;
-importScripts('./game/typescript.js');
-/**
- * @type { import('./game/compiler-sfc.browser.js') }
- */
-var sfc;
-importScripts('./game/compiler-sfc.browser.js');
-// @ts-ignore
+var ts = globalThis.ts;
+// sfc以正常的esmodule使用
+import * as sfc from './game/compiler-sfc.esm-browser.js';
 if (typeof ts != 'undefined') {
-	console.log(`ts loaded`);
+	console.log(`ts loaded`, ts.version);
 } else {
-	console.log(`ts undefined`);
+	console.error(`ts undefined`);
 }
-// @ts-ignore
+
 if (typeof sfc != 'undefined') {
-	console.log(`sfc loaded`);
+	console.log(`sfc loaded`, sfc.version);
 	sfc.registerTS(() => ts);
 } else {
-	console.log(`sfc undefined`);
+	console.error(`sfc undefined`);
 }
 
 console.log('serviceWorker version 2.3');
 
 self.addEventListener("install", (event) => {
 	// The promise that skipWaiting() returns can be safely ignored.
-	// @ts-ignore
 	self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
 	// 当一个 service worker 被初始注册时，页面在下次加载之前不会使用它。 claim() 方法会立即控制这些页面
-	// @ts-ignore
-	event.waitUntil(clients.claim());
+	event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('message', event => {
@@ -46,7 +46,6 @@ self.addEventListener('message', event => {
 const vueFileMap = new Map();
 
 self.addEventListener('fetch', event => {
-	// @ts-ignore
 	const request = event.request;
 	if (typeof request.url != 'string') return console.log(request);
 	if (vueFileMap.has(request.url)) {
@@ -63,10 +62,9 @@ self.addEventListener('fetch', event => {
 	if (!['.ts', '.json', '.vue', 'css'].some(ext => request.url.endsWith(ext))) return;
 	if (request.url.endsWith('.d.ts')) return;
 	if (request.url.endsWith('.json') || request.url.endsWith('css')) {
-		// @ts-ignore
 		if (!event.request.headers.get('origin')) return;
 	}
-	// 请求ts文件
+	// 请求原文件
 	const res = fetch(request.url, {
 		method: request.method,
 		mode: "no-cors",
@@ -74,18 +72,19 @@ self.addEventListener('fetch', event => {
 			"Content-Type": "text/plain"
 		}),
 	});
-	// @ts-ignore
+	// 修改请求结果
 	event.respondWith(
 		res.then(res => {
 			if (res.status != 200) return res;
 			console.log('正在编译', request.url);
 			return res.text().then(text => {
-				let js;
+				let js = '';
 				if (request.url.endsWith('.json')) {
 					js = `export default ${ text }`;
 				} else if (request.url.endsWith('.ts')) {
 					js = ts.transpile(text, {
 						module: ts.ModuleKind.ES2015,
+						//@todo: ES2019 -> ES2020
 						target: ts.ScriptTarget.ES2019,
 						inlineSourceMap: true,
 						resolveJsonModule: true,
@@ -97,7 +96,7 @@ self.addEventListener('fetch', event => {
 					// 后续处理sourceMap合并
 					const { descriptor } = sfc.parse(text, { filename: request.url, sourceMap: true });
 					// console.log({ descriptor });
-					const hasScoped = descriptor.styles.some((s) => s.scoped);
+					const hasScoped = descriptor.styles.some(s => s.scoped);
 					// 编译 script，因为可能有 script setup，还要进行 css 变量注入
 					const script = sfc.compileScript(descriptor, {
 						id: scopeId,
@@ -111,11 +110,21 @@ self.addEventListener('fetch', event => {
 					});
 					// 用于存放代码，最后 join('\n') 合并成一份完整代码
 					const codeList = [];
+
+					// 保存url并且拼接参数
+					const url = new URL(request.url);
+					const scriptSearchParams = new URLSearchParams(url.search.slice(1));
+					scriptSearchParams.append('type', 'script');
+
+					const templateSearchParams = new URLSearchParams(url.search.slice(1));
+					templateSearchParams.append('type', 'template');
+
 					vueFileMap.set(
-						request.url + '?type=script',
+						url.origin + url.pathname + '?' + scriptSearchParams.toString(),
 						// 重写 default
 						sfc.rewriteDefault(script.attrs && script.attrs.lang == 'ts' ? ts.transpile(script.content, {
 							module: ts.ModuleKind.ES2015,
+							//@todo: ES2019 -> ES2020
 							target: ts.ScriptTarget.ES2019,
 							inlineSourceMap: true,
 							resolveJsonModule: true,
@@ -126,12 +135,13 @@ self.addEventListener('fetch', event => {
 							.replaceAll(`from "vue"`, `from "/game/vue.esm-browser.js"`)
 							.replaceAll(`from 'vue'`, `from '/game/vue.esm-browser.js'`)
 					);
+
 					codeList.push(`import { __sfc_main__ } from '${ request.url }?type=script'`);
 					codeList.push(`__sfc_main__.__scopeId = '${ scopeId }'`);
 
 					// 编译模板，转换成 render 函数
 					const template = sfc.compileTemplate({
-						source: descriptor.template.content,
+						source: descriptor.template ? descriptor.template.content : '',
 						filename: request.url, // 用于错误提示
 						id: scopeId,
 						scoped: hasScoped,
@@ -140,7 +150,9 @@ self.addEventListener('fetch', event => {
 						}
 					});
 
-					vueFileMap.set(request.url + '?type=template', template.code
+					vueFileMap.set(
+						url.origin + url.pathname + '?' + templateSearchParams.toString(),
+						template.code
 						// .replace(`function render(_ctx, _cache) {`, str => str + 'console.log(_ctx);')
 						.replaceAll(`from "vue"`, `from "/game/vue.esm-browser.js"`)
 						.replaceAll(`from 'vue'`, `from '/game/vue.esm-browser.js'`)
@@ -180,11 +192,12 @@ self.addEventListener('fetch', event => {
 						"Content-Type": "text/javascript"
 					}),
 				});
+				console.log(request.url, '编译成功');
 				return rep;
 			})
 		})
 		.catch(e => {
-			console.log(e);
+			console.error(request.url, '编译失败: ', e);
 			throw e;
 		})
 	);

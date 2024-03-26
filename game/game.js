@@ -203,15 +203,23 @@ new Promise(resolve => {
 					});
 					try {
 						const registration_1 = await navigator.serviceWorker.register(`${scope}service-worker.js`, {
+							type: 'module',
 							updateViaCache: "all",
 							scope,
 						});
 						// 初次加载worker，需要重新启动一次
 						if (!findServiceWorker) location.reload();
+						// 接收消息，暂时没用到
 						navigator.serviceWorker.addEventListener('message', e => {
 							console.log(e);
 						});
-						registration_1.update().catch(console.error);
+						registration_1.update().catch(e => console.error('worker update失败', e));
+						if (!sessionStorage.getItem('canUseTs')) {
+							await import('./canUse.ts').then(({ text }) => console.log(text)).catch(() => {
+								sessionStorage.setItem('canUseTs', '1');
+								location.reload();
+							});
+						}
 					} catch (e_1) {
 						console.log('serviceWorker加载失败: ', e_1);
 					}
