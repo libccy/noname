@@ -129,14 +129,14 @@ self.addEventListener('fetch', event => {
 							inlineSourceMap: true,
 							resolveJsonModule: true,
 							esModuleInterop: true,
-						}, request.url + '?type=script') : script.content, "__sfc_main__")
+						}, url.origin + url.pathname + '?' + scriptSearchParams.toString()) : script.content, "__sfc_main__")
 							.replace(`const __sfc_main__`, `export const __sfc_main__`)
 							// import vue重新指向
 							.replaceAll(`from "vue"`, `from "/game/vue.esm-browser.js"`)
 							.replaceAll(`from 'vue'`, `from '/game/vue.esm-browser.js'`)
 					);
 
-					codeList.push(`import { __sfc_main__ } from '${ request.url }?type=script'`);
+					codeList.push(`import { __sfc_main__ } from '${ url.origin + url.pathname + '?' + scriptSearchParams.toString() }'`);
 					codeList.push(`__sfc_main__.__scopeId = '${ scopeId }'`);
 
 					// 编译模板，转换成 render 函数
@@ -158,7 +158,7 @@ self.addEventListener('fetch', event => {
 						.replaceAll(`from 'vue'`, `from '/game/vue.esm-browser.js'`)
 					);
 					
-					codeList.push(`import { render } from '${ request.url }?type=template'`);
+					codeList.push(`import { render } from '${ url.origin + url.pathname + '?' + templateSearchParams.toString() }'`);
 					codeList.push(`__sfc_main__.render = render;`);
 					codeList.push(`export default __sfc_main__;`);
 					// 一个 Vue 文件，可能有多个 style 标签
