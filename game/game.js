@@ -166,6 +166,7 @@ new Promise(resolve => {
 					// 使用ts compiler对ts文件进行编译
 					const result = ts.transpile(code, {
 						module: ts.ModuleKind.CommonJS,
+						//@todo: ES2019 -> ES2020
 						target: ts.ScriptTarget.ES2019,
 						inlineSourceMap: true,
 						resolveJsonModule: true,
