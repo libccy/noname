@@ -1356,7 +1356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olkanpo:{
 				audio:'rekanpo',
-				audioname:['ol_sp_zhugeliang'],
+				audioname:['ol_sp_zhugeliang','ol_pangtong'],
 				trigger:{player:'useCard'},
 				forced:true,
 				locked:false,
