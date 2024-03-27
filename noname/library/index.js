@@ -11303,7 +11303,10 @@ export class Library extends Uninstantable {
 				}
 			}
 		},
-		_recovercheck: {
+		/**
+		 * @deprecated
+		 */
+		/*_recovercheck: {
 			trigger: { player: 'recoverBefore' },
 			forced: true,
 			priority: 100,
@@ -11316,7 +11319,7 @@ export class Library extends Uninstantable {
 			content: function () {
 				trigger.cancel();
 			},
-		},
+		},*/
 		/**
 		 * @deprecated
 		 */
