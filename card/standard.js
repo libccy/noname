@@ -1535,7 +1535,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if (get.damageEffect(target, player, target) >= 0) return 0;
 							let pd = get.damageEffect(player, target, player), att = get.attitude(player, target);
 							if (att > 0 && get.damageEffect(target, player, player) > pd) return 0;
-							let ts = target.mayHaveSha(player, 'respond', null, 'count'), ps = player.mayHaveSha(player, 'respond', null, 'count');
+							let ts = target.mayHaveSha(player, 'respond', null, 'count'), ps = player.mayHaveSha(player, 'respond', player.getCards('h', i => {
+								return card === i || card.cards && card.cards.includes(i) || ui.selected.cards.includes(i);
+							}), 'count');
 							if (ts < 1 && ts << 3 < Math.pow(player.hp, 2)) return 0;
 							if (att > 0) {
 								if (ts < 1) return 0;
@@ -1554,7 +1556,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if (td >= 0) return td / get.attitude(target, target);
 							let pd = get.damageEffect(player, target, player), att = get.attitude(player, target);
 							if (att > 0 && get.damageEffect(target, player, player) > pd) return -2;
-							let ts = target.mayHaveSha(player, 'respond', null, 'count'), ps = player.mayHaveSha(player, 'respond', null, 'count');
+							let ts = target.mayHaveSha(player, 'respond', null, 'count'), ps = player.mayHaveSha(player, 'respond', player.getCards('h', i => {
+								return card === i || card.cards && card.cards.includes(i) || ui.selected.cards.includes(i);
+							}), 'count');
 							if (ts < 1) return -1.5;
 							if (att > 0) return -2;
 							if (ts - ps < 1) return -2 - ts;
