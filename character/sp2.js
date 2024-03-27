@@ -6738,7 +6738,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.num++;
-					if(trigger.source.name.indexOf('lvbu')!=-1) trigger.source.storage.panshi='吾堂堂丈夫，安肯为汝子乎！';// 彩蛋
+					if(['name','name1','name2'].some(name=>{
+						if(!player[name]||!get.character(player[name])||typeof get.translation(player[name])!='string') return false;
+						return player[name].includes('lvbu')&&get.translation(player[name]).includes('吕布');
+					})) player.chat('吾堂堂丈夫，安肯为汝子乎！');
 					var evt=event.getParent('phaseUse');
 					if(evt&&evt.player==player) evt.skipped=true;
 				},
