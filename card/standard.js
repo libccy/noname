@@ -469,13 +469,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 2;
 						},
 						target_use:(player,target,card)=>{
-							if(!player.isPhaseUsing()||player.hasSkillTag('nokeep',true,{
-								card:card,
-								target:target
-							},true)) return 2;
 							let mode = get.mode(),
 								taos = player.getCards('hs',i=>get.name(i)==='tao'&&lib.filter.cardEnabled(i,target,'forceEnable'));
-							if(target.hp>0){
+							if(target!==_status.event.dying){
+								if(!player.isPhaseUsing() || player.hasSkillTag('nokeep',true,{
+									card:card,
+									target:target
+								},true)) return 2;
 								let min = 7.2-4*player.hp/player.maxHp,
 									nd = player.needsToDiscard(0,(i,player)=>{
 										return !player.canIgnoreHandcard(i)&&(taos.includes(i)||get.value(i)>=min);
