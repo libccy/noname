@@ -41,15 +41,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'phaseUse',
 				filter(event,player){
-					const cards=player.getCards('h',card=>player.canRecast(card));
-					return player.hasCard(card=>{
-						return cards.includes(card)&&cards.filter(i=>i.name==card.name).length>1;
-					},'h');
+					return player.hasCard(card=>get.info('clanlilun').filterCard(card,player),'h');
 				},
 				filterCard(card,player){
 					if(player.getStorage('clanlilun').includes(card.name)) return false;
 					if(ui.selected.cards.length&&ui.selected.cards[0].name!=card.name) return false;
-					const cards=player.getCards('h',cardx=>player.canRecast(card));
+					const cards=player.getCards('h',cardx=>player.canRecast(cardx));
 					return cards.includes(card)&&cards.filter(i=>i.name==card.name).length>1;
 				},
 				selectCard:2,
