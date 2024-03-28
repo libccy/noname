@@ -23,18 +23,177 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_wanglun:['male','jin',3,['clanqiuxin','clanjianyuan','clanzhongliu'],['clan:太原王氏']],
 			clan_xunyou:['male','wei',3,['clanbaichu','clandaojie'],['clan:颍川荀氏']],
 			clan_wuqiao:['male','jin',4,['clanqiajue','clanmuyin'],['clan:陈留吴氏']],
+			clan_wangguang:['male','wei',3,['clanlilun','clanjianji','clanzhongliu'],['clan:太原王氏']],
 		},
 		characterSort:{
 			clan:{
 				clan_wu:['clan_wuxian','clan_wuban','clan_wukuang','clan_wuqiao'],
 				clan_xun:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan','clan_xunyou'],
 				clan_han:['clan_hanshao','clan_hanrong'],
-				clan_wang:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun'],
+				clan_wang:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun','clan_wangguang'],
 				clan_zhong:['clan_zhongyan','clan_zhonghui','clan_zhongyu'],
 			},
 		},
 		/** @type { importCharacterConfig['skill'] } */
 		skill:{
+			//族贝斯塔[doge]
+			clanlilun:{
+				audio:2,
+				enable:'phaseUse',
+				filter(event,player){
+					const cards=player.getCards('h',card=>player.canRecast(card));
+					return player.hasCard(card=>{
+						return cards.includes(card)&&cards.filter(i=>i.name==card.name).length>1;
+					},'h');
+				},
+				filterCard(card,player){
+					if(player.getStorage('clanlilun').includes(card.name)) return false;
+					if(ui.selected.cards.length&&ui.selected.cards[0].name!=card.name) return false;
+					const cards=player.getCards('h',cardx=>player.canRecast(card));
+					return cards.includes(card)&&cards.filter(i=>i.name==card.name).length>1;
+				},
+				selectCard:2,
+				position:'h',
+				check(card){
+					const player=get.event('player');
+					const value=function(card,player){
+						const num=player.getUseValue(card);
+						return num>0?(num+(1/(get.value(card)||0.5))+7):7-get.value(card);
+					};
+					if(ui.selected.cards.length&&value(card,player)<value(ui.selected.cards[0],player)) return 20-get.value(card);
+					return value(card,player);
+				},
+				complexCard:true,
+				discard:false,
+				lose:false,
+				delay:0,
+				usable:1,
+				async content(event,trigger,player){
+					await player.recast(event.cards);
+					if(!player.storage.clanlilun){
+						player.when({global:'phaseAfter'}).then(()=>delete player.storage.clanlilun);
+					}
+					player.markAuto('clanlilun',event.cards.slice().map(card=>card.name));
+					const cards=event.cards.filterInD('d');
+					if(cards.some(card=>player.hasUseTarget(card))){
+						const {result:{bool,links}}=await player.chooseButton(['离论：是否使用其中的一张牌？',cards]).set('filterButton',button=>{
+							return get.event('player').hasUseTarget(button.link);
+						}).set('ai',button=>{
+							return get.event('player').getUseValue(button.link);
+						});
+						if(bool){
+							const card=links[0];
+							player.$gain2(card,false);
+							await game.asyncDelayx();
+							await player.chooseUseTarget(true,card,false);
+						}
+					}
+				},
+				intro:{content:'本回合已重铸过$'},
+				ai:{
+					order(item,player){
+						let cards=player.getCards('h',card=>get.info('clanlilun').filterCard(card,player)&&player.getUseValue(card)>0);
+						cards=cards.filter(card=>cards.filter(i=>i.name==card.name).length>1);
+						if(!cards.length) return 1;
+						cards.sort((a,b)=>get.order(b)-get.order(a));
+						return get.order(cards[0])-0.001;
+					},
+					result:{player:1},
+				},
+			},
+			clanjianji:{
+				unique:true,
+				limited:true,
+				audio:2,
+				trigger:{global:'phaseJieshuBegin'},
+				filter(event,player){
+					if(!event.player.isIn()) return false;
+					const targets=game.filterPlayer(target=>{
+						return event.player.getPrevious()==target||event.player.getNext()==target;
+					});
+					if(!targets.length) return false;
+					const card=new lib.element.VCard({name:'sha'});
+					return !targets.some(target=>{
+						return target.getHistory('useCard').length;
+					})||(player.hasUseTarget(card)&&!targets.some(target=>{
+						return game.hasPlayer2(current=>{
+							return current.getHistory('useCard',evt=>{
+								return evt.targets&&evt.targets.includes(target);
+							}).length;
+						});
+					}));
+				},
+				skillAnimation:true,
+				animationColor:'watar',
+				prompt2(event,player){
+					let str='';
+					const card=new lib.element.VCard({name:'sha'});
+					const targets=game.filterPlayer(target=>{
+						return event.player.getPrevious()==target||event.player.getNext()==target;
+					}),bool=(!targets.some(target=>{
+						return target.getHistory('useCard').length;
+					})),goon=(player.hasUseTarget(card)&&!targets.some(target=>{
+						return game.hasPlayer2(current=>{
+							return current.getHistory('useCard',evt=>{
+								return evt.targets&&evt.targets.includes(target);
+							}).length;
+						});
+					}));
+					if(bool){
+						if(goon) str+='你可以';
+						str+='与'+get.translation(get.translation(event.player))+'各摸一张牌';
+					}
+					if(goon){
+						if(bool) str+='，然后你可以';
+						str+='视为使用一张【杀】';
+					}
+					return str;
+				},
+				check(event,player){
+					const card=new lib.element.VCard({name:'sha'});
+					const targets=game.filterPlayer(target=>{
+						return event.player.getPrevious()==target||event.player.getNext()==target;
+					}),bool=(!targets.some(target=>{
+						return target.getHistory('useCard').length;
+					})),goon=(player.hasUseTarget(card)&&!targets.some(target=>{
+						return game.hasPlayer2(current=>{
+							return current.getHistory('useCard',evt=>{
+								return evt.targets&&evt.targets.includes(target);
+							}).length;
+						});
+					}));
+					return (bool&&(get.attitude(player,event.player)>0||event.player.countCards('h')>player.countCards('h')))||(goon&&player.hasValueTarget(card));
+				},
+				logTarget:'player',
+				async content(event,trigger,player){
+					player.awakenSkill('clanjianji');
+					const card=new lib.element.VCard({name:'sha'});
+					const targets=game.filterPlayer(target=>{
+						return trigger.player.getPrevious()==target||trigger.player.getNext()==target;
+					}),boolx=(!targets.some(target=>{
+						return target.getHistory('useCard').length;
+					})),goon=(player.hasUseTarget(card)&&!targets.some(target=>{
+						return game.hasPlayer2(current=>{
+							return current.getHistory('useCard',evt=>{
+								return evt.targets&&evt.targets.includes(target);
+							}).length;
+						});
+					}));
+					if(boolx){
+						let draw=false;
+						if(goon){
+							const {result:{bool}}=await player.chooseBool('是否与'+get.translation(trigger.player)+'各摸一张牌？').set('choice',get.attitude(player,trigger.player)>0||trigger.player.countCards('h')>player.countCards('h'));
+							if(bool) draw=true;
+						}
+						else draw=true;
+						if(draw){
+							await player.draw('nodelay');
+							await trigger.player.draw();
+						}
+					}
+					if(goon) await player.chooseUseTarget(card,false,!boolx);
+				},
+			},
 			//族吴乔
 			clanqiajue:{
 				audio:2,
@@ -1236,7 +1395,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clanzhongliu:{
 				audio:2,
-				audioname:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun'],
+				audioname:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun','clan_wangguang'],
 				trigger:{player:'useCard'},
 				forced:true,
 				clanSkill:true,
@@ -2627,6 +2786,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhongyu:'钟毓（？-263年），字稚叔，颍川长社（今河南长葛市）人。三国时期魏国大臣，太傅钟繇之子、司徒钟会之兄。出身颍川钟氏，机灵敏捷，有其父之遗风。十四岁时，起家散骑侍郎。太和初年，迁黄门侍郎，袭封定陵县侯。正始年间，拜散骑常侍，迁魏郡太守，入为侍中、御史中丞、廷尉 [5] 。随平诸葛诞的淮南叛乱，拜青州刺史、后将军，都督徐州、荆州诸军事。景元四年（263年），去世，追赠车骑将军，谥号为惠，著有文集五卷（见《隋书·经籍志》及《两唐书·经籍志》），传于世。',
 			wanglun:'王沦（233年－257年）字太冲，出身太原晋阳王姓世族（今山西省太原市），王昶三子，王浑、王深之弟，王湛之兄。醇粹简远，崇尚老庄之学，心思平淡。二十多时被举荐为孝廉，没有前往，后任大将军参军。257年，诸葛诞不满司马氏篡权而在寿春起义，王沦跟随司马昭征讨，遭遇疾疫去世，时年二十五，时人惜之，司马昭为他流泪。其兄著诔文《表德论》，表述其德行，说“因为畏惧帝王的典章制度，不能写墓志铭，于是撰写过往的事迹，刻在墓的背面。”',
 			wuqiao:'吴乔，西晋人物，蜀车骑将军吴懿之孙。李雄建立成汉政权，他沦落益州，长达三十年，始终不向李雄屈服。',
+			clan_wangguang:'王广，三国时期曹魏太原祁县人，哲学家。东汉司徒王允从孙，魏太尉王凌之子。有志尚学，官至尚书。魏时随父亲在朝作官，屯骑校尉，机智有谋。当得知司马懿篡夺曹魏政权时，王凌与外甥令狐愚合谋立楚王为魏主，王广劝其父不可，王凌没有接受儿子的谏言，结果计谋泄而被害。',
 		},
 		dynamicTranslate:{
 			clanlianzhu(player){
@@ -2757,6 +2917,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_wuqiao:'族吴乔',
 			clanqiajue:'跒倔',
 			clanqiajue_info:'摸牌阶段开始时，你可以弃置一张黑色牌。若如此做，此阶段结束时，你展示手牌，若这些牌的点数和大于30，你的手牌上限-2，否则你执行一个额外的摸牌阶段。',
+			clan_wangguang:'族王广',
+			clan_wangguang_prefix:'族',
+			clanlilun:'离论',
+			clanlilun_info:'出牌阶段限一次，你可以重铸两张手牌（不能是你本回合以此法重铸过的牌名的牌），然后使用其中的一张牌。',
+			clanjianji:'见机',
+			clanjianji_info:'限定技，一名角色的结束阶段，若其上下家均未于本回合：使用过牌，则你可以与其各摸一张牌；成为过牌的目标，则你可以视为使用一张【杀】。',
 
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',
