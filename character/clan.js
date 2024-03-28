@@ -68,7 +68,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					await player.recast(event.cards);
 					if(!player.storage.clanlilun){
-						player.when({global:'phaseAfter'}).then(()=>delete player.storage.clanlilun);
+						player.when({global:'phaseAfter'}).then(()=>{
+							player.unmarkSkill('clanlilun');
+							delete player.storage.clanlilun;
+						});
 					}
 					player.markAuto('clanlilun',event.cards.slice().map(card=>card.name));
 					const cards=event.cards.filterInD('d');
@@ -86,6 +89,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
+				onremove:true,
 				intro:{content:'本回合已重铸过$'},
 				ai:{
 					order(item,player){
