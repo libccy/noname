@@ -2735,7 +2735,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbguose:{
 				audio:2,
 				enable:'phaseUse',
-				usable:4,
+				get usable(){
+					return get.mode()=='identity'?4:2;
+				},
 				discard:false,
 				lose:false,
 				delay:false,
@@ -7024,7 +7026,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sbzhiba_info:'主公技，限定技。当你进入濒死状态时，你可以回复X-1点体力并修改〖激昂③〗为“出牌阶段限X次”（X为场上其他吴势力角色数+1）。然后其他吴势力角色依次受到1点无来源伤害，且当有角色因此死亡后，你摸三张牌。',
 			sb_daqiao:'谋大乔',
 			sbguose:'国色',
-			sbguose_info:'出牌阶段限四次。你可以选择一项：1.将一张♦牌当【乐不思蜀】使用；2.弃置场上一张【乐不思蜀】。然后你摸一张牌。',
+			sbguose_info:'出牌阶段限两次，你可以将一张♦牌当【乐不思蜀】使用或弃置场上一张【乐不思蜀】，然后你摸一张牌。',
+			sbguose_info_identity:'出牌阶段限四次，你可以将一张♦牌当【乐不思蜀】使用或弃置场上一张【乐不思蜀】，然后你摸一张牌。',
 			sbliuli:'流离',
 			sbliuli_info:'当你成为【杀】的目标时，你可以弃置一张牌并选择你攻击范围内的一名不为此【杀】使用者的角色，将此【杀】转移给该角色。若你以此法弃置了♥牌，则你可以令一名不为此【杀】使用者的其他角色获得“流离”标记，且移去场上所有其他的“流离”（每回合限一次）。有“流离”的角色回合开始时，其移去其“流离”并执行一个额外的出牌阶段。',
 			sb_liubiao:'谋刘表',
