@@ -2268,7 +2268,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 2'
-					target.chooseBool('是否受到'+get.translation(target)+'造成的1点火焰伤害，令其跳过一个阶段？').set('ai',()=>_status.event.choice).set('choice',get.damageEffect(target,player,target)>=-5);
+					target.chooseBool('是否受到'+get.translation(player)+'造成的1点火焰伤害，令其跳过一个阶段？').set('ai',()=>_status.event.choice).set('choice',get.damageEffect(target,player,target)>=-5);
 					'step 3'
 					if(result.bool){
 						player.line(target);
