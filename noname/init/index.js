@@ -19,7 +19,7 @@ export function canUseHttpProtocol() {
 	// 如果是http了就不用
 	if (location.protocol.startsWith('http')) return false;
 	// 首次启动不更新(即还没进行过新手教程)
-	if (!lib.config.new_tutorial) return false;
+	if (!config.get('new_tutorial')) return false;
 	if (typeof nonameInitialized == 'string') {
 		// 手机端
 		if (window.cordova) {
@@ -134,18 +134,6 @@ export async function boot() {
 	setWindowListener();
 	const promiseErrorHandler = await setOnError();
 
-	// 无名杀更新日志
-	if (window.noname_update) {
-		Reflect.set(lib, 'version', window.noname_update.version);
-		lib.changeLog = window.noname_update.changeLog;
-		if (window.noname_update.players) {
-			lib.changeLog.push('players://' + JSON.stringify(window.noname_update.players));
-		}
-		if (window.noname_update.cards) {
-			lib.changeLog.push('cards://' + JSON.stringify(window.noname_update.cards));
-		}
-		delete window.noname_update;
-	}
 	// 确认手机端平台
 	const noname_inited = localStorage.getItem('noname_inited');
 	if (noname_inited && noname_inited !== 'nodejs') {
@@ -498,6 +486,39 @@ export async function boot() {
 	}
 	delete _status.htmlbg;
 
+	// 无名杀更新日志
+	if (window.noname_update) {
+		Reflect.set(lib, 'version', window.noname_update.version);
+		// 更全面的更新内容
+		if (config.get(`version_description_v${window.noname_update.version}`)) {
+			try {
+				const description = config.get(`version_description_v${window.noname_update.version}`);
+				const html = String.raw;
+				lib.changeLog.push(
+					html`
+						<div style="position: relative;width:50px;height:50px;border-radius:50px;background-image:url('${description.author.avatar_url}');background-size:cover;vertical-align:middle;"></div>
+						${description.author.login}于${description.published_at}发布
+					`.trim(),
+					description.body.replaceAll('\n', '<br/>')
+				);
+			} catch (e) {
+				console.error(e);
+				lib.changeLog.push(...window.noname_update.changeLog);
+			}
+		}
+		// 原更新内容
+		else {
+			lib.changeLog.push(...window.noname_update.changeLog);
+		}
+		if (window.noname_update.players) {
+			lib.changeLog.push('players://' + JSON.stringify(window.noname_update.players));
+		}
+		if (window.noname_update.cards) {
+			lib.changeLog.push('cards://' + JSON.stringify(window.noname_update.cards));
+		}
+		delete window.noname_update;
+	}
+
 	// 虽然但是，我就暴露个import，应该没啥问题
 	Reflect.set(window, 'game', {
 		import: game.import.bind(null)
@@ -715,6 +736,7 @@ async function loadConfig() {
 	Reflect.set(lib, 'config', Reflect.get(window, 'config'));
 	Reflect.set(lib, 'configOL', {});
 	Reflect.deleteProperty(window, 'config');
+
 	let result;
 	if (localStorage.getItem(`${lib.configprefix}nodb`))
 		Reflect.set(window, 'nodb', true);
