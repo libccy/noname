@@ -53,10 +53,13 @@ export class Get extends Uninstantable {
 		return list;
 	}
 	/**
-	 * 根据座次数n（从0开始）获取对应的“n+1号位”翻译
-	 * @param {number} seat
+	 * 根据(Player的)座次数n（从1开始）获取对应的“n号位”翻译
+	 * @param {number | Player} seat
 	 */
-	static seatTranslation(seat) { return `${get.cnNumber(seat + 1, true)}号位`; }
+	static seatTranslation(seat) {
+		if (get.itemtype(seat) === 'player') seat = seat.getSeatNum();
+		return `${get.cnNumber(seat, true)}号位`;
+	}
 	/**
 	 * @param {number} numberOfPlayers
 	 * @returns {string[]}
@@ -4685,7 +4688,7 @@ export class Get extends Uninstantable {
 		return eff;
 	}
 	/**
-	 * 
+	 *
 	 * @param {any} source 如果参数是function，执行此函数并返回结果，传参为此方法剩余的参数。如果参数不是function，直接返回结果。
 	 * @returns 返回的结果
 	 */

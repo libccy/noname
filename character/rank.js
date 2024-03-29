@@ -684,6 +684,8 @@ window.noname_character_rank={
 		'ol_sb_guanyu',
 		'gongsunxiu',
 		'dc_caoshuang',
+		'clan_wangling',
+		'clan_wangguang',
 	],
 	bp:[
 		'xin_huojun',
@@ -2657,6 +2659,7 @@ window.noname_character_rank={
 			'furongfuqian',
 			'zhenghun',
 			'clan_wangling',
+			'clan_wangguang',
 			'clan_wangyun',
 			'quhuang',
 			'ol_wenqin',
