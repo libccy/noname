@@ -3272,7 +3272,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else player.addTempSkill('piaoping_blocker');
 				},
-				intro:{name2:'栗',content:'mark'},
+				init(player){
+					player.addMark('tuoxian',1,false);
+				},
+				intro:{name2:'栗',content:'剩余可用#次'},
 			},
 			chuaili:{
 				audio:2,
@@ -3288,8 +3291,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.changeZhuanhuanji('piaoping');
 					}
 					else{
-						player.addMark('tuoxian',1);
-						player.addTempSkill('chuaili_blocker');
+						player.addMark('tuoxian',1,false);
+						if(player.countCards('tuoxian')>3) player.addTempSkill('chuaili_blocker');
 					}
 					game.delayx();
 				},
@@ -6738,7 +6741,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.num++;
-					if(trigger.source.name.indexOf('lvbu')!=-1) trigger.source.storage.panshi='吾堂堂丈夫，安肯为汝子乎！';// 彩蛋
+					if(['name','name1','name2'].some(name=>{
+						if(!player[name]||!get.character(player[name])||typeof get.translation(player[name])!='string') return false;
+						return player[name].includes('lvbu')&&get.translation(player[name]).includes('吕布');
+					})) player.chat('吾堂堂丈夫，安肯为汝子乎！');
 					var evt=event.getParent('phaseUse');
 					if(evt&&evt.player==player) evt.skipped=true;
 				},
@@ -11040,9 +11046,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return '转换技，锁定技。当你使用一张牌时，<span class="bluetext">阴：你摸X张牌。</span>阳：你弃置X张牌。（X为你本阶段内发动过〖漂萍〗的次数且至多等于你的体力值）';
 			},
 			chuaili:function(player){
-				if(!player.hasSkill('piaoping',null,null,false)) return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；处于阴状态，则你获得一枚“栗”，且令〖惴栗〗于本回合内失效。';
-				if(player.storage.piaoping) return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：<span class="bluetext">处于阳状态，则你将〖漂萍〗转换至阴状态；</span>处于阴状态，则你获得一枚“栗”，且令〖惴栗〗于本回合内失效。';
-				return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；<span class="bluetext">处于阴状态，则你获得一枚“栗”，且令〖惴栗〗于本回合内失效。</span>';
+				if(!player.hasSkill('piaoping',null,null,false)) return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；处于阴状态，则你令〖托献〗发动次数+1，然后若〖托献〗发动次数大于3，则〖惴栗〗于本回合内失效。';
+				if(player.storage.piaoping) return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：<span class="bluetext">处于阳状态，则你将〖漂萍〗转换至阴状态；</span>处于阴状态，则你令〖托献〗发动次数+1，然后若〖托献〗发动次数大于3，则〖惴栗〗于本回合内失效。';
+				return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；<span class="bluetext">处于阴状态，则你令〖托献〗发动次数+1，然后若〖托献〗发动次数大于3，则〖惴栗〗于本回合内失效。</span>';
 			},
 			dcdouzhen:function(player){
 				var str='锁定技。①转换技。你的回合内，';
@@ -11526,9 +11532,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			piaoping:'漂萍',
 			piaoping_info:'转换技，锁定技。当你使用一张牌时，阴：你摸X张牌。阳：你弃置X张牌。（X为你本阶段内发动过〖漂萍〗的次数且至多等于你的体力值）',
 			tuoxian:'托献',
-			tuoxian_info:'当你因执行〖漂萍〗的效果而弃置牌后，你可以弃置一枚“栗”并令一名其他角色获得这些牌，然后令该角色选择一项：⒈弃置区域内等量的牌。⒉令你的〖漂萍〗失效直到回合结束。',
+			tuoxian_info:'每局游戏限一次。当你因执行〖漂萍〗的效果而弃置牌后，你可令一名其他角色获得这些牌，然后令该角色选择一项：⒈弃置区域内等量的牌。⒉令你的〖漂萍〗失效直到回合结束。',
 			chuaili:'惴栗',
-			chuaili_info:'锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；处于阴状态，则你获得一枚“栗”，且令〖惴栗〗于本回合内失效。',
+			chuaili_info:'锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；处于阴状态，则你令〖托献〗发动次数+1，然后若〖托献〗发动次数大于3，则〖惴栗〗于本回合内失效。',
 			fengfang:'冯方',
 			dcditing:'谛听',
 			dcditing_info:'其他角色的出牌阶段开始时，若你在该角色的攻击范围内，则你可以观看其的X张手牌（X为你的体力值）并选择其中一张，且获得如下效果：①当其使用对应实体牌包含此牌的牌指定你为目标后，你令此牌对你无效。②当其使用对应实体牌包含此牌的牌结算结束后，若你不是此牌的目标，则你摸两张牌。③其出牌阶段结束时，若此牌位于其的手牌区，则你获得此牌。',

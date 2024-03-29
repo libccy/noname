@@ -1282,14 +1282,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				zhuanhuanji:true,
 				intro:{
 					content:function(storage){
-						if(!storage) return '每回合限一次，当你得到其他角色的牌后，或其他角色得到你的牌后，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力。（X为你的体力值）'
-						return '每回合限一次，当你得到其他角色的牌后，或其他角色得到你的牌后，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力值，Y为X-其打出【杀】数）';
+						if(!storage) return '每回合限一次，当你得到其他角色的牌后，或其他角色得到你的牌后，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力。（X为你的体力上限）';
+						return '每回合限一次，当你得到其他角色的牌后，或其他角色得到你的牌后，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力上限，Y为X-其打出【杀】数）';
 					},
 				},
 				audio:2,
 				trigger:{global:['gainAfter','loseAsyncAfter']},
 				filter:function(event,player){
-					if(!player.getHp()) return false;
+					if(typeof player.maxHp!='number'||player.maxHp<=0) return false;
 					if(event.name=='loseAsync'&&event.type!='gain') return false;
 					if(player.hasSkill('dcsbmengmou_true')&&player.hasSkill('dcsbmengmou_false')) return false;
 					var cards1=event.getl(player).cards2,cards2=event.getg(player);
@@ -1308,7 +1308,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var player=map.player,trigger=map.trigger;
 					var storage=player.storage.dcsbmengmou;
 					player.addTempSkill('dcsbmengmou_effect','dcsbmengmouAfter');
-					var targets=[],num=player.getHp();
+					var targets=[],num=player.maxHp;
 					var cards1=trigger.getl(player).cards2;
 					var cards2=trigger.getg(player);
 					targets.addArray(game.filterPlayer(function(current){
@@ -1525,14 +1525,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
 				direct:true,
-				filter:function(event,player){
-					return game.hasPlayer(current=>current.countCards('e'));
-				},
 				content:function*(event,map){
 					const player=map.player;
-					let result=yield player.chooseTarget(get.prompt('dcnuanhui'),'选择一名装备区有牌的角色，该角色可以依次使用X张基本牌（X为其装备区牌数）。',(card,player,target)=>{
-						return target.countCards('e');
-					}).set('ai',target=>{
+					let result=yield player.chooseTarget(get.prompt('dcnuanhui'),'选择一名装备区有牌的角色，该角色可以依次使用X张基本牌（X为其装备区牌数）。').set('ai',target=>{
 						return get.event('aiTarget')==target?10:0;
 					}).set('aiTarget',(()=>{
 						const player=get.player();
@@ -1544,7 +1539,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.attitude(player,target)<=0) return -1;
 							const toUse=[];
 							const hp=target.hp;
-							let eff=0,count=target.countCards('e');
+							let eff=0,count=Math.max(1,target.countCards('e'));
 							while(count--){
 								target.hp=Math.min(target.maxHp,target.hp+toUse.filter(card=>card.name=='tao').length);
 								const listx=list.map(info=>{
@@ -1570,11 +1565,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							return eff;
 						}
-						const playerList=game.filterPlayer(current=>{
-							return current.countCards('e');
-						}).map(current=>[current,getUseValue(current)]).sort((a,b)=>{
-							return b[1]-a[1];
-						});
+						const playerList=game.filterPlayer().map(current=>[current,getUseValue(current)]).sort((a,b)=>b[1]-a[1]);
 						if(playerList[0][1]<=0) return null;
 						return playerList[0][0];
 					})());
@@ -1582,8 +1573,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const target=result.targets[0];
 					player.logSkill('dcnuanhui',target);
 					if(!target.isUnderControl(true)&&!target.isOnline()) game.delayx();
-					const total=target.countCards('e');
-					let count=0,forced=false;
+					const total=Math.max(1,target.countCards('e'));
+					let count=0,forced=false,used=[],discard=false;
 					while(count<total){
 						const basicList=get.inpileVCardList(info=>{
 							return info[0]=='basic'&&target.hasUseTarget({name:info[2],nature:info[3],isCard:true});
@@ -1602,10 +1593,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						forced=true;
 						const card=new lib.element.VCard({name:result.links[0][2],nature:result.links[0][3],isCard:true});
-						yield target.chooseUseTarget(card,true,false);
+						const result=yield target.chooseUseTarget(card,true,false);
+						if(!discard&&result.bool){
+							if(used.includes(result.links[0][2])) discard=true;
+							else used.add(result.links[0][2]);
+						}
 						count++;
 					}
-					if(count>1){
+					if(discard){
 						const cards=target.getCards('e',card=>{
 							return lib.filter.cardDiscardable(card,target,'dcnuanhui');
 						});
@@ -14445,7 +14440,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				if(storage) str+='<span class="bluetext">';
 				str+='阳，你可令该角色打出至多X张【杀】，然后其失去Y点体力。';
 				if(storage) str+='</span>';
-				str+='（X为你的体力值，Y为X-其打出【杀】数）';
+				str+='（X为你的体力上限，Y为X-其打出【杀】数）';
 				return str;
 			},
 			dcsbyingmou:function(player){
@@ -14969,7 +14964,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcqiongying:'琼英',
 			dcqiongying_info:'出牌阶段限一次。你可以移动场上的一张牌，然后你弃置一张与此牌花色相同的手牌（若没有该花色的手牌则改为展示所有手牌）。',
 			dcnuanhui:'暖惠',
-			dcnuanhui_info:'结束阶段，你可以选择一名装备区有牌的角色，其可以视为依次使用X张基本牌（X为其装备区牌数）。若其以此法使用了至少两张牌，其弃置装备区里的所有牌。',
+			dcnuanhui_info:'结束阶段，你可以选择一名装备区有牌的角色，其可以视为依次使用X张基本牌（X为其装备区牌数且至少为1）。若其此次以此法使用了同名牌，其弃置装备区里的所有牌。',
 			zhangjian:'张臶',
 			dc_zj_a:'技能',
 			dc_zj_a_info:'锁定技。当你受到牌造成的伤害时，若此牌有点数，则你将此伤害值改为此牌点数，否则你防止此伤害。',
@@ -14980,7 +14975,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcsbmingshi:'明势',
 			dcsbmingshi_info:'摸牌阶段，你可以多摸两张牌，然后展示三张牌并令一名其他角色选择获得其中的一张牌。',
 			dcsbmengmou:'盟谋',
-			dcsbmengmou_info:'转换技，每回合每项各限一次，当你得到其他角色的牌后，或其他角色得到你的牌后：阴，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力；阳，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力值，Y为X-其打出【杀】数）',
+			dcsbmengmou_info:'转换技，每回合每项各限一次，当你得到其他角色的牌后，或其他角色得到你的牌后：阴，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力；阳，你可令该角色打出至多X张【杀】，然后其失去Y点体力。（X为你的体力上限，Y为X-其打出【杀】数）',
 			dc_sb_zhouyu:'新杀谋周瑜',
 			dc_sb_zhouyu_prefix:'新杀谋',
 			dcsbronghuo:'融火',
