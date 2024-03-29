@@ -4761,7 +4761,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.goto(2);
 					}
 					else{
-						var choices=['〇','一','二'];
+						var choices=['零','一','二'];
 						player.chooseControl(choices).set('prompt','镇荧：请选择要将手牌调整至的张数').set('ai',()=>{
 							return [0,1,2].randomGet();
 						});
