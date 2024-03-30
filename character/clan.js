@@ -1240,8 +1240,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 						}
 					},
-					prompt(result){
-						if(result.index>0) return '点击“确定”以观看牌堆顶牌';
+					prompt(result,player){
+						if(!player.storage.clanguangu) return '点击“确定”以观看牌堆顶牌';
 						return '观骨：选择观看牌的目标';
 					},
 				},

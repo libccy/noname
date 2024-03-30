@@ -5448,40 +5448,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return true;
 				},
-				direct:true,
-				content:function(){
-					"step 0"
-					if(lib.skill.rebingyi.filtery(player)) event.draw=true;
-					if(lib.skill.rebingyi.filterx(player)){
-						player.chooseTarget(get.prompt('xinbingyi'),'展示所有手牌，并选择至多'+get.cnNumber(player.countCards('h'))+'名角色各摸一张牌',[0,player.countCards('h')],function(card,player,target){
-							return true;
-						}).set('ai',function(target){
-							return get.attitude(_status.event.player,target);
-						});
+				async cost(event, trigger, player){
+					const selfDraw = lib.skill.rebingyi.filtery(player), asyncDraw = lib.skill.rebingyi.filterx(player);
+					if (asyncDraw) {
+						const num = player.countCards('h');
+						const result = await player.chooseTarget(
+							get.prompt('xinbingyi'),
+							`展示所有手牌，并选择至多${get.cnNumber(num)}名角色各摸一张牌${selfDraw ? '' : '，然后你摸一张牌'}`,
+							[0,num]
+						).set('ai', function(target){
+							return get.attitude(get.player(), target);
+						}).forResult();
+						if(result.bool) event.result = {
+							bool: result.bool,
+							cost_data: {
+								asyncDraw,
+								selfDraw,
+								targets: result.targets
+							},
+						}
 					}
-					else player.chooseBool(get.prompt('bingyi'),'展示所有手牌').ai=function(){return false};
-					"step 1"
-					if(result.bool){
-						player.logSkill('rebingyi');
-						player.showHandcards(get.translation(player)+'发动了【秉壹】');
-						event.targets=result.targets;
+					else {
+						event.result = await player.chooseBool(get.prompt('bingyi'),`展示所有手牌${selfDraw ? '' : '，然后你摸一张牌'}`)
+							.set('choice', selfDraw)
+							.set('ai',()=>get.event().choice)
+							.forResult();
+						event.result.cost_data = {selfDraw};
 					}
-					else{
-						event.finish();
-					}
-					"step 2"
-					if(targets&&targets.length){
-						player.line(targets,'green');
-						targets.sortBySeat();
+				},
+				async content(event, trigger, player){
+					await player.showHandcards(get.translation(player)+'发动了【秉壹】')
+					const data = event.cost_data;
+					if (data.asyncDraw && data.targets && data.targets.length){
+						const targets = data.targets.sortBySeat();
 						game.asyncDraw(targets);
 					}
-					else event.finish();
-					if(event.draw){
+					if (data.selfDraw) {
 						player.draw();
-						event.finish();
 					}
-					"step 3"
-					game.delayx();
 				},
 			},
 			//钟会

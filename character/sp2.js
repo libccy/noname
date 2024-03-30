@@ -261,6 +261,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const num=player.countCards('h');
 					if(player.isMaxHandcard()&&num>0){
 						const maxNum=game.findPlayer(current=>{
+							if(current===player) return false;
 							return !game.hasPlayer(current2=>{
 								if(current2===player) return false;
 								return current2.countCards('h')>current.countCards('h');
@@ -11408,7 +11409,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			recuorui:'摧锐',
 			recuorui_info:'限定技，出牌阶段，你可以依次获得至多X名角色的各一张手牌（X为你的体力值）。',
 			reliewei:'裂围',
-			reliewei_info:'每回合限Y次，当有角色于你的回合内进入濒死状态时，你可以摸一张牌（Y为你的体力值，若当前回合角色为你，则Y为Infinity）。',
+			reliewei_info:'每回合限Y次，当有角色进入濒死状态时，你可以摸一张牌（Y为你的体力值，若当前回合角色为你，则Y为Infinity）。',
 			duanwei:'段煨',
 			langmie:'狼灭',
 			langmie_damage:'狼灭',
