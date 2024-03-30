@@ -164,6 +164,7 @@ export const cardPackMenu = function (connectMenu) {
 
 	var createModeConfig = function (mode, position) {
 		var info = lib.cardPack[mode];
+		let cardPack = lib.cardPackInfo[mode];
 		var page = ui.create.div('');
 		var node = ui.create.div('.menubutton.large', lib.translate[mode + '_card_config'], position, clickMode);
 		if (node.innerHTML.length >= 5) {
@@ -237,7 +238,7 @@ export const cardPackMenu = function (connectMenu) {
 				})(),
 				onclick: togglePack
 			});
-			if (!mode.startsWith('mode_')) {
+			if (!mode.startsWith('mode_') || (cardPack && cardPack.closeable)) {
 				page.appendChild(cfgnode);
 			}
 			else {
