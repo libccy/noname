@@ -3099,7 +3099,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.hu=hu;
 					}
 					'step 1'
-					if(!event.card.destroyed){
+					if(!event.card._selfDestroyed){
 						event.hu.storage.shouna.push(event.card);
 						player.updateMarks();
 					}

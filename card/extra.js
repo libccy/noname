@@ -577,7 +577,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.loseToSpecial(cards,'muniu');
 					"step 1"
 					for(var i=0;i<cards.length;i++){
-						if(cards[i].destroyed||!cards[i].hasGaintag('muniu')||get.position(cards[i])!='s'){
+						if(cards[i]._selfDestroyed||!cards[i].hasGaintag('muniu')||get.position(cards[i])!='s'){
 							cards[i].remove();
 							cards.splice(i--,1);
 						}
