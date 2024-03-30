@@ -17676,22 +17676,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				forced:true,
 				filter(event,player){
-					return event.card.name=='sha'||get.type(event.card,null,false)=='trick';
+					return event.card.name=='sha' || get.type(event.card,null,false)=='trick';
 				},
-				content(){
-					'step 0'
-					var filter1=function(card){
-						return get.name(card)=='sha';
-					},filter2=function(card){
-						return get.type(card)=='trick';
-					};
-					var num1=player.countCards('h',filter1),num2=player.countCards('h',filter2);
-					if(num1!=num2){
-						var delta=num1-num2;
-						player.chooseToDiscard('h',true,Math.abs(delta),delta>0?filter1:filter2,'驭衡：请弃置'+get.cnNumber(Math.abs(delta))+'张'+(delta>0?'【杀】':'普通锦囊牌'));
+				async content(event, trigger, player){
+					const cards1 = player.getCards('h', card => get.name(card) === 'sha'), cards2 = player.getCards('h', card => get.type(card) === 'trick');
+					if (cards1.length !== cards2.length){
+						const num = cards1.length - cards2.length, cards = num > 0 ? cards1 : cards2;
+						let i = 0;
+						cards.forEach(card => {
+							if (i < Math.abs(num) && lib.filter.cardDiscardable(card, player, 'junkquandao')) i++;
+						});
+						if (i > 0) {
+							await player.chooseToDiscard(i, true,
+								`权道：请弃置${ get.cnNumber(i) }张${ num > 0 ? '杀' : '普通锦囊牌' }`,
+								num > 0 ? (card => get.name(card) === 'sha') : (card => get.type(card) === 'trick'))
+						}
 					}
-					'step 1'
-					player.draw();
+					await player.draw();
 				},
 			},
 			junkchigang:{
@@ -18847,7 +18848,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junkshengzhi:'圣质',
 			junkshengzhi_info:'锁定技。当你发动非锁定技后，你令你本回合使用的下一张牌无距离和次数限制。',
 			junkquandao:'权道',
-			junkquandao_info:'锁定技。当你使用【杀】或普通锦囊牌时，若你手牌中的【杀】或普通锦囊牌的数量之差X不为0，则你弃置X张数量较多的一种牌，然后你摸一张牌。',
+			junkquandao_info:'锁定技。当你使用【杀】或普通锦囊牌时，{若你手牌中的【杀】或普通锦囊牌的数量之差X不为0，则你弃置X张数量较多的一种牌}，然后你摸一张牌。',
 			junkchigang:'持纲',
 			junkchigang_info:'转换技，锁定技。判定阶段开始前，你取消此阶段。然后你获得一个额外的：阴，摸牌阶段；阳，出牌阶段。',
 			junkrende:'仁德',
