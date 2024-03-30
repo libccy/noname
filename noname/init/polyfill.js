@@ -100,6 +100,7 @@ Reflect.defineProperty(HTMLDivElement.prototype, 'setBackground', {
 		subfolder = subfolder || 'default';
 		if (type) {
 			let dbimage = null, extimage = null, modeimage = null, nameinfo, gzbool = false;
+			let extraImage = null;
 			const mode = get.mode();
 			if (type == 'character') {
 				if (lib.characterPack[`mode_${mode}`] && lib.characterPack[`mode_${mode}`][name]) {
@@ -121,8 +122,9 @@ Reflect.defineProperty(HTMLDivElement.prototype, 'setBackground', {
 				else {
 					nameinfo = get.character(name);
 				}
+				extraImage = get.characterExtraInfo(name,'replaceAvatar');
 			}
-			if (!modeimage && nameinfo && nameinfo[4]) for (const value of nameinfo[4]) {
+			if (!extraImage && !modeimage && nameinfo && nameinfo[4]) for (const value of nameinfo[4]) {
 				if (value.startsWith('ext:')) {
 					extimage = value;
 					break;
@@ -140,7 +142,11 @@ Reflect.defineProperty(HTMLDivElement.prototype, 'setBackground', {
 					break;
 				}
 			}
-			if (extimage) src = extimage.replace(/^ext:/, 'extension/');
+			if(extraImage){
+				if(extraImage.indexOf('ext:') == 0)extraImage = extraImage.replace(/^ext:/, 'extension/');
+				src = extraImage;
+			}
+			else if (extimage) src = extimage.replace(/^ext:/, 'extension/');
 			else if (dbimage) {
 				this.setBackgroundDB(dbimage.slice(3));
 				return this;

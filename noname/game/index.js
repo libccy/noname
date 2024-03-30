@@ -1486,7 +1486,10 @@ export class Game extends Uninstantable {
 				console.error(new ReferenceError(`parseSkillAudio: Cannot find ${skill} in lib.skill`));
 				return parseAudio(skill, options, [true, 2]);
 			}
-
+			let audioReplace = get.characterExtraInfo(getName(i=>true),'skillAudioReplace');
+			if(audioReplace && audioReplace[skill]){
+				info = audioReplace[skill];
+			}
 			const { audioname, history } = options;
 			history.unshift(skill);
 			let audioInfo = info.audio;

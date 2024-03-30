@@ -571,6 +571,27 @@ export class Get extends Uninstantable {
 		}
 		return info;
 	}
+	/**
+	 * 获取角色的附加信息。
+	 * 附加信息有三种配置方法：1、在character[4]中添加key:value。2、在lib.characterExtraInfo中添加。
+	 * @param {string} 角色ID
+	 * @param {string} key 键名。
+	 * @returns 
+	 */
+	static characterExtraInfo(name,key){
+		let extraInfo = lib.characterExtraInfo[name];
+		let ret = extraInfo[key];
+		if(ret !== undefined){
+			return ret;
+		}
+		let info4 = get.character(name,4);
+		for(let info of info4){
+			if(typeof info == 'string' && info.indexOf(`${key}:`) == 0){
+				return info.replace(`${key}:`,"");
+			}
+		}
+		return;
+	}
 	static characterInitFilter(name) {
 		const info = get.character(name);
 		if (!info || !info[4]) return [];

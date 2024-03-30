@@ -8161,7 +8161,14 @@ export const Content = {
 				const name = (player.skin.name || player.name);
 				const goon = (!lib.character[name]);
 				if (goon) lib.character[name] = ['', '', 0, [], ((lib.characterSubstitute[player.name] || []).find(i => i[0] == name) || [name, []])[1]];
-				if (lib.character[name][4].some(tag => /^die:.+$/.test(tag))) {
+				let audioReplace = get.characterExtraInfo(name,'dieAudioReplace');
+				if(audioReplace){
+					if(audioReplace.indexOf('ext:') == 0){
+						var reg = new RegExp("^ext:(.+)?/");
+						audioReplace = audioReplace.replace(reg, (_o, p) => `../extension/${p}/`);
+					}
+					game.playAudio(audioReplace);
+				}else if (lib.character[name][4].some(tag => /^die:.+$/.test(tag))) {
 					var tag = lib.character[name][4].find(tag => /^die:.+$/.test(tag));
 					var reg = new RegExp("^ext:(.+)?/");
 					var match = tag.match(/^die:(.+)$/);

@@ -69,6 +69,7 @@ export class Library extends Uninstantable {
 	static characterInitFilter = {};
 	static characterGuozhanFilter = ["mode_guozhan"];
 	static dynamicTranslate = {};
+	static characterExtraInfo = {};
 	static cardPack = new Proxy({}, {
 		set(target, prop, newValue) {
 			if (typeof prop == 'string') {
