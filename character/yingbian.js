@@ -2692,24 +2692,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						game.updateRoundNumber();
 					}
 				},
-				group:'xinquanbian_count',
+				//group:'xinquanbian_count',
+				init:(player,skill)=>player.addSkill('xinquanbian_count'),
+				onremove:(player,skill)=>player.removeSkill('xinquanbian_count'),
 			},
 			xinquanbian_count:{
-				trigger:{player:'useCard1'},
+				trigger:{
+					player:['useCard0','phaseUseBefore','phaseUseAfter']
+				},
 				silent:true,
 				firstDo:true,
+				charlotte:true,
 				filter:function(event,player){
+					if (event.name === 'phaseUse') return true;
 					return player.isPhaseUsing()&&lib.skill.quanbian.hasHand(event)&&get.type(event.card)!='equip';
 				},
 				content:function(){
 					var stat=player.getStat('skill');
-					if(!stat.quanbian) stat.quanbian=0;
-					stat.quanbian++;
+					if (this.trigger.name === 'phaseUse') {
+						delete stat.xinquanbian;
+					}
+					else{
+						if(!stat.xinquanbian) stat.xinquanbian=0;
+						stat.xinquanbian++;
+					}
 				},
 				mod:{
 					cardEnabled2:function(card,player){
 						var stat=player.getStat('skill');
-						if(stat.quanbian&&stat.quanbian>=player.maxHp&&get.position(card)=='h'&&get.type(card,player)!='equip') return false;
+						if(stat.xinquanbian&&stat.xinquanbian>=player.maxHp&&get.position(card)=='h'&&get.type(card,player)!='equip') return false;
 					},
 				},
 			},
