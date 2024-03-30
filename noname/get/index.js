@@ -580,9 +580,11 @@ export class Get extends Uninstantable {
 	 */
 	static characterExtraInfo(name,key){
 		let extraInfo = lib.characterExtraInfo[name];
-		let ret = extraInfo[key];
-		if(ret !== undefined){
-			return ret;
+		if(extraInfo){
+			let ret = extraInfo[key];
+			if(ret !== undefined){
+				return ret;
+			}
 		}
 		let info4 = get.character(name,4);
 		for(let info of info4){
