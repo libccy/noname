@@ -81,6 +81,7 @@ export class Library extends Uninstantable {
 			return Reflect.set(target, prop, newValue);
 		}
 	});
+	static cardPackInfo = {};
 	/**
 	 * @type { SMap<number> }
 	 */

@@ -4482,6 +4482,7 @@ export class Game extends Uninstantable {
 		packagename = packagename || extname;
 		let packname = 'mode_extension_' + packagename;
 		lib.cardPack[packname] = [];
+		lib.cardPackInfo[packname] = pack;
 		lib.translate[packname + '_card_config'] = packagename;
 		for (let i in pack) {
 			if (i == 'mode' || i == 'forbid') continue;
