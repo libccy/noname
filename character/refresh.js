@@ -11748,7 +11748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.num-=res.length
 						if(!event.given_map[target]) event.given_map[target]=[];
 						event.given_map[target].addArray(res);
-						if(event.num>0) event.goto(2);
+						if(event.num>0) event.goto(1);
 					}
 					else if(event.num==2){
 						if(_status.connectMode){

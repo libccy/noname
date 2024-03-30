@@ -11831,36 +11831,63 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return player.hp<player.maxHp;
 				},
 				content:function(){
-					"step 0"
-					event.num=player.getDamagedHp();
+					'step 0'
+					event.num = player.getDamagedHp();
 					player.draw(event.num);
-					"step 1"
-					var check=player.countCards('h')-event.num;
+					if(_status.connectMode) game.broadcastAll(function(){_status.noclearcountdown=true});
+					event.given_map = {};
+					event._forcing = false;
+					'step 1'
 					player.chooseCardTarget({
-						selectCard:event.num,
-						filterTarget:function(card,player,target){
-							return player!=target;
+						filterCard(card){
+							return get.itemtype(card)=='card'&&!card.hasGaintag('miji_tag');
 						},
-						ai1:function(card){
-							var player=_status.event.player;
-							if(player.maxHp-player.hp==1&&card.name=='du') return 30;
-							var check=_status.event.check;
-							if(check<1) return 0;
-							if(player.hp>1&&check<2) return 0;
-							return get.unuseful(card)+9;
+						filterTarget: lib.filter.notMe,
+						selectCard: [1,event.num],
+						prompt:'请选择要分配的卡牌和目标',
+						forced: event._forcing,
+						ai1(card){
+							//if(!ui.selected.cards.length) return 1;
+							return 0;
 						},
-						ai2:function(target){
-							var att=get.attitude(_status.event.player,target);
-							if(ui.selected.cards.length==1&&ui.selected.cards[0].name=='du') return 1-att;
-							return att-2;
+						ai2(target){
+							return 0;
+							//wait for PZ157 to change
+							var player=_status.event.player,card=ui.selected.cards[0];
+							var val=target.getUseValue(card);
+							if(val>0) return val*get.attitude(player,target)*2;
+							return get.value(card,target)*get.attitude(player,target);
 						},
-						prompt:'将'+get.cnNumber(event.num)+'张手牌交给一名其他角色',
-					}).set('check',check);
-					"step 2"
+					});
+					'step 2'
 					if(result.bool){
-						player.give(result.cards,result.targets[0]);
-						player.line(result.targets,'green');
+						event._forcing = true;
+						var res=result.cards,target=result.targets[0].playerid;
+						player.addGaintag(res,'miji_tag');
+						event.num-=res.length;
+						if(!event.given_map[target]) event.given_map[target]=[];
+						event.given_map[target].addArray(res);
+						if(event.num>0) event.goto(1);
 					}
+					'step 3'
+					if(_status.connectMode){
+						game.broadcastAll(function(){delete _status.noclearcountdown;game.stopCountChoose()});
+					}
+					var map=[],cards=[];
+					for(var i in event.given_map){
+						var source=(_status.connectMode?lib.playerOL:game.playerMap)[i];
+						player.line(source,'green');
+						if(player!==source&&(get.mode()!=='identity'||player.identity!=='nei')) player.addExpose(0.18);
+						map.push([source,event.given_map[i]]);
+						cards.addArray(event.given_map[i]);
+					}
+					game.loseAsync({
+						gain_list:map,
+						player:player,
+						cards:cards,
+						giver:player,
+						animate:'giveAuto',
+					}).setContent('gaincardMultiple');
 				},
 				ai:{
 					threaten:function(player,target){
@@ -14443,6 +14470,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			oldrenxin:'仁心',
 			zhenlie:'贞烈',
 			miji:'秘计',
+			miji_tag:'已分配',
 			zhiyan:'直言',
 			zongxuan:'纵玄',
 			anxu:'安恤',
@@ -14503,7 +14531,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			old_anxu_info:'出牌阶段限一次，你可以选择两名手牌数不同的其他角色，令其中手牌少的角色获得手牌多的角色的一张手牌并展示之。然后若此牌不为黑桃，则你摸一张牌。',
 			zongxuan_info:'当你的牌因弃置而进入弃牌堆后，你可以将其按任意顺序置于牌堆顶。',
 			zhiyan_info:'结束阶段，你可以令一名角色摸一张牌并展示之，若为装备牌，其使用此牌并回复1点体力。',
-			miji_info:'结束阶段，若你已受伤，则可以摸X张牌，然后可以将等量的牌交给一名其他角色（X为你已损失的体力值）。',
+			miji_info:'结束阶段，若你已受伤，则可以摸X张牌，然后可以将等量的牌交给其他角色（X为你已损失的体力值）。',
 			zhenlie_info:'当你成为其他角色使用【杀】或普通锦囊牌的目标后，你可以失去1点体力并令此牌对你无效，然后弃置对方一张牌。',
 			chengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于13的牌。',
 			oldchengxiang_info:'当你受到伤害后，你可以亮出牌堆顶的四张牌。然后获得其中任意数量点数之和不大于12的牌。',
