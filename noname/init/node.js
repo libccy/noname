@@ -4,6 +4,7 @@ import { Library as lib } from '../library/index.js';
 import { Game as game } from '../game/index.js';
 import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
+import { checkVersion } from '../library/update.js';
 
 export function nodeReady() {
 	const versions = window.process.versions;
@@ -155,7 +156,7 @@ export function nodeReady() {
 				else resolve();
 			}))).then(() => access(path, directory, createDirectory), console.log);
 		};
-		return new Promise(resolve => {
+		new Promise(resolve => {
 			const createDirectory = () => {
 				if (directoryList.length) access('', directoryList.pop().split('/').reverse(), createDirectory);
 				else {
@@ -165,6 +166,72 @@ export function nodeReady() {
 			};
 			createDirectory();
 		});
+	};
+	game.createDir = (directory, successCallback, errorCallback) => {
+		if (lib.node.fs.existsSync(target)) {
+			if (typeof errorCallback == 'function') {
+				errorCallback(new Error(`${target}已存在`))
+			}
+		} else if (checkVersion(process.versions.node, '10.12.0') > -1) {
+			lib.node.fs.mkdir(lib.node.path.join(__dirname, directory), { recursive: true }, e => {
+				if (e) {
+					if (typeof errorCallback == 'function') errorCallback(e);
+				} else {
+					if (typeof successCallback == 'function') successCallback(e)
+				}
+			});
+		} else {
+			const paths = directory.split('/').reverse();
+			let path = __dirname;
+			const redo = () => {
+				path += `/${paths.pop()}`;
+				return new Promise(resolve => lib.node.fs.exists(path, resolve)).then(exists => {
+					//不存在此目录
+					if (!exists) return new Promise(resolve => lib.node.fs.mkdir(path, resolve));
+				}).then(() => {
+					if (paths.length) return redo();
+					if (typeof successCallback == 'function') successCallback();
+				}).catch(reason => {
+					if (typeof errorCallback != 'function') return Promise.reject(reason);
+					errorCallback(reason);
+				});
+			};
+			redo();
+		}
+	};
+	game.removeDir = (directory, successCallback, errorCallback) => {
+		const target = `${__dirname}/${directory}`;
+		if (!lib.node.fs.existsSync(target)) {
+			if (typeof errorCallback == 'function') {
+				errorCallback(new Error(`${target}不存在`))
+			}
+		} else if (!lib.node.fs.lstatSync(target).isDirectory()) { 
+			if (typeof errorCallback == 'function') {
+				errorCallback(new Error(`${target}不是文件夹`))
+			}
+		} else if (checkVersion(process.versions.node, '12.10.0') > -1) {
+			lib.node.fs.rmdir(target, { recursive: true }, e => {
+				if (e) {
+					if (typeof errorCallback == 'function') errorCallback(e);
+				} else {
+					if (typeof successCallback == 'function') successCallback(e)
+				}
+			});
+		} else {
+			const deleteFolderRecursive = path => {
+				if (!lib.node.fs.existsSync(path)) return;
+				lib.node.fs.readdirSync(path).forEach(file => {
+					const currentPath = `${path}/${file}`;
+					if (lib.node.fs.lstatSync(currentPath).isDirectory()) deleteFolderRecursive(currentPath);
+					else lib.node.fs.unlinkSync(currentPath);
+				});
+				lib.node.fs.rmdirSync(path);
+				if (path === target && typeof successCallback == 'function') {
+					successCallback();
+				}
+			};
+			deleteFolderRecursive(target);
+		}
 	};
 	if (ui.updateUpdate) {
 		ui.updateUpdate();

@@ -1909,38 +1909,50 @@ export class Game extends Uninstantable {
 		return name;
 	}
 	/**
-	 * @param { string } directory 
-	 * @param { Function } [successCallback] 
-	 * @param { Function } [errorCallback]
+	 * 下载文件
+	 * @type { (url: string, folder: string, onsuccess?: Function, onerror?: (e: Error) => void) => void, dev?: 'nodev', onprogress?: Function) => void }
 	 */
-	static createDir(directory, successCallback, errorCallback) {
-		const paths = directory.split('/').reverse();
-		if (window.resolveLocalFileSystemURL) return new Promise((resolve, reject) => window.resolveLocalFileSystemURL(nonameInitialized, resolve, reject)).then(directoryEntry => {
-			const redo = entry => new Promise((resolve, reject) => entry.getDirectory(paths.pop(), {
-				create: true
-			}, resolve, reject)).then(resolvedDirectoryEntry => {
-				if (paths.length) return redo(resolvedDirectoryEntry);
-				if (typeof successCallback == 'function') successCallback();
-			});
-			return redo(directoryEntry);
-		}, reason => {
-			if (typeof errorCallback != 'function') return Promise.reject(reason);
-			errorCallback(reason);
-		});
-		const fs = require("fs");
-		let path = __dirname;
-		const redo = () => {
-			path += `/${paths.pop()}`;
-			return new Promise(resolve => fs.exists(path, resolve)).then(exists => {
-				//不存在此目录
-				if (!exists) return new Promise(resolve => fs.mkdir(path, resolve));
-			}).then(() => {
-				if (paths.length) return redo();
-				if (typeof successCallback == 'function') successCallback();
-			});
-		};
-		return redo();
-	}
+	static download;
+	/**
+	 * 读取文件为arraybuffer
+	 * @type { (filename: string, callback?: (data: Buffer | ArrayBuffer) => any, onerror?: (e: Error) => void) => void }
+	 */
+	static readFile;
+	/**
+	 * 读取文件为文本
+	 * @type { (filename: string, callback?: (data: string) => any, onerror?: (e: Error) => void) => void }
+	 */
+	static readFileAsText;
+	/**
+	 * 将数据写入文件
+	 * @type { (data: File | ArrayBuffer, path: string, name: string, callback?: (e: Error) => void) => void }
+	 */
+	static writeFile;
+	/**
+	 * 移除文件
+	 * @type { (filename: string, callback?: (e: Error) => void) => void }
+	 */
+	static removeFile;
+	/**
+	 * 获取文件列表
+	 * @type { (dir: string, success: (folders: string[], files: string[]) => any, failure: (e: Error) => void) => void }
+	 */
+	static getFileList;
+	/**
+	 * 按路径依次创建文件夹
+	 * @type { (list: string | string[], callback: Function, file?: boolean) => void }
+	 */
+	static ensureDirectory;
+	/**
+	 * 创建文件夹
+	 * @type { (directory: string, successCallback?: Function, errorCallback?: Function) => void }
+	 */
+	static createDir;
+	/**
+	 * 删除文件夹
+	 * @type { (directory: string, successCallback?: Function, errorCallback?: Function) => void }
+	 */
+	static removeDir;
 	static async importExtension(data, finishLoad, exportExtension, extensionPackage) {
 		//by 来瓶可乐加冰、Rintim、Tipx-L
 		if (!window.JSZip)
@@ -4717,22 +4729,7 @@ export class Game extends Uninstantable {
 			game.saveConfigValue('extensionInfo');
 		}
 		if (!game.download || keepFile) return;
-		if (lib.node && lib.node.fs) try {
-			const deleteFolderRecursive = path => {
-				if (!lib.node.fs.existsSync(path)) return;
-				lib.node.fs.readdirSync(path).forEach((file, index) => {
-					const currentPath = `${path}/${file}`;
-					if (lib.node.fs.lstatSync(currentPath).isDirectory()) deleteFolderRecursive(currentPath);
-					else lib.node.fs.unlinkSync(currentPath);
-				});
-				lib.node.fs.rmdirSync(path);
-			};
-			deleteFolderRecursive(`${__dirname}/extension/${extensionName}`);
-		}
-			catch (error) {
-				console.error(error);
-			}
-		else new Promise((resolve, reject) => window.resolveLocalFileSystemURL(`${nonameInitialized}extension/${extensionName}`, resolve, reject)).then(directoryEntry => directoryEntry.removeRecursively());
+		game.promises.removeDir(`${nonameInitialized}extension/${extensionName}`).catch(console.error);
 	}
 	static addRecentCharacter() {
 		let list = get.config('recentCharacter') || [];

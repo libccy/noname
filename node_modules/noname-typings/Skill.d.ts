@@ -55,7 +55,7 @@ declare interface SkillHookTrigger {
 	 * 
 	 * 在logSkill中执行，每次触发logSkill都会触发
 	 */
-	log?: ThreeParmFun<Player, string, Target[], void>;
+	log?: ThreeParmFun<Player, string, Player[], void>;
 }
 
 /** mod的配置 */
@@ -219,7 +219,7 @@ declare interface Mod {
 	 * @param player 
 	 * @param result 
 	 */
-	judge?(player: Player, result: JudgeResultData);
+	judge?(player: Player, result: Result);
 
 	//2020-2-23版本：
 	/** 
@@ -402,7 +402,7 @@ declare interface Skill {
 	 * 
 	 * 目前可知，其相关使用方法：after,block,log【目前只有于国战方法中，应该是作为全局执行方法的一种简约写法，实用不大】
 	 */
-	hookTrigger?: HookTrigger;
+	hookTrigger?: SkillHookTrigger;
 
 	/** 同时机技能发动的优先度 */
 	priority?: number;
@@ -442,7 +442,7 @@ declare interface Skill {
 	 * 
 	 * 若该属性值是“check”，则调用当前技能得check方法检测
 	 */
-	frequent?: boolean | string | TwoParmFun<Trigger, Player, number | boolean>;
+	frequent?: boolean | string | TwoParmFun<SkillTrigger, Player, number | boolean>;
 	/** 
 	 * 此技能是否可以被设置为自动发动2 
 	 * 
@@ -458,7 +458,7 @@ declare interface Skill {
 	 * 
 	 * 可以影响技能触发响应时间（主要影响loop之间的时间,即game.delayx的调用情况）
 	 */
-	autodelay?: boolean | number | TwoParmFun<Trigger, Player, number>;
+	autodelay?: boolean | number | TwoParmFun<SkillTrigger, Player, number>;
 	/** 第一时刻执行？（将发动顺序前置到列表前） */
 	firstDo?: boolean;
 	/** 最后一刻做？（将发动顺序置于列表后方） */
@@ -743,10 +743,10 @@ declare interface Skill {
 	/** 标记显示内容 */
 	intro?: {
 		/** 自定义mark弹窗的显示内容 */
-		mark?: ThreeParmFun<Dialog, GameStorageItem, Player, string | void>;
+		mark?: ThreeParmFun<Dialog, any, Player, string | void>;
 		/** 用于info.mark为“character”，添加，移除标记时，log显示的标记名（好像意义不大） */
-		name?: string | TwoParmFun<GameStorageItem, Player, string>;
-		name2?: string | TwoParmFun<GameStorageItem, Player, string>;
+		name?: string | TwoParmFun<any, Player, string>;
+		name2?: string | TwoParmFun<any, Player, string>;
 		/** 
 		 * 标记显示内容？
 		 * 为cards时显示标记内的牌.
@@ -793,13 +793,13 @@ declare interface Skill {
 		 * 
 		 * 也可以是个自定义的方法
 		 */
-		content?: string | ((storage: GameStorageItem, player: Player, skill: string) => string | void);
+		content?: string | ((storage: any, player: Player, skill: string) => string | void);
 		/** 
 		 * 标记数
 		 * 
 		 * 主要在player.updateMark时使用，实际顶替this.storage[i+'_markcount']获取标记数 
 		 */
-		markcount?: number | TwoParmFun<GameStorageItem, Player, number | string> | string;
+		markcount?: number | TwoParmFun<any, Player, number | string> | string;
 		/** 是否不启用技能标记计数 */
 		nocount?: boolean;
 		/**
@@ -811,7 +811,7 @@ declare interface Skill {
 		 * 
 		 * 注：该参数原本只在把整个标记移除时执行，后续可能自己扩展；
 		 */
-		onunmark?: TwoParmFun<GameStorageItem, Player, void> | string | boolean;
+		onunmark?: TwoParmFun<any, Player, void> | string | boolean;
 		// id?:string; //id名字需带“subplayer”，用于特殊模式显示信息用
 	};
 
@@ -843,7 +843,7 @@ declare interface Skill {
 	 * 
 	 * chooseToUse：常用于“濒死使用”/打出使用
 	 */
-	enable?: string | string[] | OneParmFun<Trigger, boolean>;
+	enable?: string | string[] | OneParmFun<SkillTrigger, boolean>;
 	/**
 	 * 是否显示弹出该技能使用卡牌的文字
 	 * 
@@ -881,7 +881,7 @@ declare interface Skill {
 	 * @param result 
 	 * @param player 
 	 */
-	onuse?(result: BaseCommonResultData, player: Player): void;
+	onuse?(result: Result, player: Player): void;
 	/**
 	 * 选择按钮（牌）
 	 * 
@@ -940,7 +940,7 @@ declare interface Skill {
 	 * 
 	 * 若不是字符串，则执行该方法
 	 */
-	prepare?: string | ((cards: Card[], player: Player, targets: Target[]) => string | void);
+	prepare?: string | ((cards: Card[], player: Player, targets: Player[]) => string | void);
 	/** 在lose事件中使用，触发执行“lose_卡牌名”事件的content */
 	onLose?: OldContentFuncByAll | OldContentFuncByAll[];
 	/**
@@ -1025,7 +1025,7 @@ declare interface Skill {
 	 * 例子：
 	 * targetprompt:['出杀','出闪'],依次就是你点击第一个角色后在其旁边显示出杀，第二个角色显示出闪
 	 */
-	targetprompt?: string | string[] | OneParmFun<Target, string>;
+	targetprompt?: string | string[] | OneParmFun<Player, string>;
 	/**
 	 * 是否每个目标都结算一次(多个目标)
 	 * 
@@ -1164,7 +1164,7 @@ declare interface Skill {
 	 * 
 	 * 注：即触发技能/主动发动技能的提示描述信息；
 	 */
-	prompt?: string | TwoParmFun<Trigger, Player, String>;
+	prompt?: string | TwoParmFun<SkillTrigger, Player, String>;
 	//| TwoParmFun<Trigger, Player, String> | TwoParmFun<Links, Player, string> //好像没见到用
 	/**
 	 * 二次提示
@@ -1175,13 +1175,13 @@ declare interface Skill {
 	 * 
 	 * 注：即发动技能时，prompt提示下的提示（默认显示技能描述）；
 	 */
-	prompt2?: string | TwoParmFun<Trigger, Player, String> | boolean;
+	prompt2?: string | TwoParmFun<SkillTrigger, Player, String> | boolean;
 	/** 
 	 * 在ui.click.skill中使用，若当前event.skillDialog不存在，可以用该方法生成的文本的dialog作为skillDialog；
 	 * 
 	 * 若没有该方法，可以使用翻译中该技能的info信息代替。
 	 */
-	promptfunc?: TwoParmFun<Trigger, Player, String>;
+	promptfunc?: TwoParmFun<SkillTrigger, Player, String>;
 	/** 表示这次描述非常长(涉及用了h5文本)，设置为true，重新执行ui.update()，设置skillDialog.forcebutton为true */
 	longprompt?: boolean;
 
@@ -1365,9 +1365,7 @@ declare interface Skill {
 	 * 
 	 * 无参，简洁写法；
 	 */
-	check?: (card: Card) => number | boolean | void;
-	check?: (event: GameEventPromise, player: Player) => number | boolean | void;
-	check?: () => number | boolean | void;
+	check?: ((card: Card) => number | boolean | void) | ((event: GameEventPromise, player: Player) => number | boolean | void) | (() => number | boolean | void);
 	// check?(...any:any):number|boolean;
 	// /** ai用于检测的方法：用于主动使用触发技能 */
 	// check?(card:Card):number|boolean;
@@ -1600,7 +1598,7 @@ declare interface SkillAI {
 	 * 嘲讽值：
 	 * 嘲讽值越大的角色越容易遭受到敌方的攻击,默认为1,一般在0~4中取值即可(缔盟threaten值为3)
 	 */
-	threaten?: number | ((player: Player, target: Target) => number | void);
+	threaten?: number | ((player: Player, target: Player) => number | void);
 	/**
 	 * 态度：
 	 * 态度只由identity决定。不同身份对不同身份的att不同。
@@ -1766,7 +1764,7 @@ declare interface SkillAI {
 		/** 该牌的使用价值 */
 		value?: SAAType<number> | FourParmFun<Card, Player, number, any, SAAType<number>>;
 
-		[key: string]: SAAType<number> | string | Function;
+		[key: string]: any;
 	};
 
 	//ai的tag【可用于标记卡牌的属性】
@@ -1811,7 +1809,7 @@ declare interface SkillAI {
 		/** 【装备替换价值】 */
 		valueswap?: CardTagType;
 
-		[key: string]: CardTagType;
+		[key: string]: CardTagType | void;
 	}
 
 	/**
@@ -1830,3 +1828,101 @@ declare interface SkillAI {
 
 /** 卡牌的tag的类型，注：作为方法的第二参数很少用上（一般用于二级类型判断） */
 type CardTagType = number | TwoParmFun<Card, string, boolean | number> | OneParmFun<Card, boolean | number>;
+
+/** 
+ * 选择按钮配置 
+ * 
+ * 时机：chooseToUse
+ * 
+ * 当你在选择使用时，选择的是技能，若技能有chooseButton设置，则执行player.chooseButton方法:
+ * 
+ * 以下则为调用该chooseButton的相关参数：
+ * 
+ * 将操作返回的“视为”结果卡牌，通过event.backup通过视为卡牌的操作，重新操作该操作（一个绕的逻辑）；
+ * 
+ * 其实质：是一种视为技的操作，弥补一些视为使用某些xxx锦囊时的复杂操作；
+ * 
+ * 在backup执行方法无法触发通信的原因：
+	苏婆玛丽奥  11:50:33
+	主机不需要执行
+	这玩意是直接客机执行的
+	执行完了 把总的结果和生成的backup技能发过去；
+	即chooseButton的所有方法都是交给客机执行的，主机只负责获取返回的backup信息；
+
+ * 当前使用范围：
+ * 
+ * chooseToUse
+ * 
+ * chooseToRespond 【v1.9.106】
+ */
+interface ChooseButtonConfigData {
+	//player.chooseButton的参数：
+	/** 
+	 * 选择内容的面板
+	 * 
+	 * 需要操作的内容，在这里创建；
+	 * 
+	 * 返回传递给player.chooseButton的参数；
+	 * 
+	 * 其中参数event,为当前chooseToUse事件
+	 */
+	dialog?(event: GameEvent, player: Player): Dialog;
+	/**
+	 * 卡牌选择条件
+	 * 
+	 * 既player.chooseButton的filterButton
+	 * @param button 
+	 * @param player 
+	 */
+	filter?(button: Button, player: Player): void;
+	/**
+	 * ai如何选牌
+	 * 
+	 * 既player.chooseButton的ai
+	 * @param button 
+	 */
+	check?(button: Button): number;
+	/** 
+	 * 选择数目，默认为1
+	 * 
+	 * 既player.chooseButton的selectButton
+	 */
+	select?: number;
+
+	//成功选择操作后的内容：
+	/**
+	 * 返回“视为”部分（即当作该选择为视为的操作逻辑）
+	 * 
+	 * 将该返回内容给event.backup，视为当前返回的信息条件作为使用；
+	 * 
+	 * @param links result.links（由get.links获得，一般是指当前面板上的所有可选择按钮的link数据,一般为卡牌信息）
+	 * @param player 
+	 */
+	backup?(links: Result['links'], player: Player): Skill;
+	/**
+	 * 选择时弹出的提示
+	 * @param links result.links（由get.links获得，一般是指当前面板上的所有可选择按钮的link数据,一般为卡牌信息）
+	 * @param player 
+	 */
+	prompt?(links: Result['links'], player: Player): string;
+
+	/**
+	 * 进行额外的选择时：
+	 * 【v1.9.105】
+	 * 
+	 * 在chooseButton类出牌阶段技能中调用chooseControl函数而不是chooseButton函数进行第一段选择
+	 * 
+	 * 注1：使用参考  例：神户小鸟【花绽】
+	 * ；
+	 * 注2：生成中所有选项，记得加上cancel2！
+	 * 
+	 * 注3：其选择结果在：result.control
+	 * 
+	 * 注4：返回的结果是提供给player.chooseControl方法的参数列表；
+	 * 
+	 * 注5：默认是使用配置的dialog方法，返回的dialog，若设有该参数配置，则优先使用它返回的参数列表，从而构建的control；
+	 * @param event 
+	 * @param player 
+	 */
+	chooseControl?(event: GameEvent, player: Player): string[];
+}

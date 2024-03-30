@@ -183,7 +183,7 @@ export async function boot() {
 			//但这种方式只允许修改game的文件读写函数。
 			if (typeof window.initReadWriteFunction == 'function') {
 				const g = {}
-				const ReadWriteFunctionName = ['download', 'readFile', 'readFileAsText', 'writeFile', 'removeFile', 'getFileList', 'ensureDirectory', 'createDir']
+				const ReadWriteFunctionName = ['download', 'readFile', 'readFileAsText', 'writeFile', 'removeFile', 'getFileList', 'ensureDirectory', 'createDir', 'removeDir']
 				ReadWriteFunctionName.forEach(prop => {
 					Object.defineProperty(g, prop, {
 						configurable: true,
@@ -494,12 +494,17 @@ export async function boot() {
 			try {
 				const description = config.get(`version_description_v${window.noname_update.version}`);
 				const html = String.raw;
+				// 匹配[xx](url)的格式
+				const regex = /\[([^\]]*)\]\(([^)]+)\)/g;
 				lib.changeLog.push(
 					html`
 						<div style="position: relative;width:50px;height:50px;border-radius:50px;background-image:url('${description.author.avatar_url}');background-size:cover;vertical-align:middle;"></div>
 						${description.author.login}于${description.published_at}发布
 					`.trim(),
-					description.body.replaceAll('\n', '<br/>')
+					description.body.replaceAll('\n', '<br/>').replace(regex, function (match, p1, p2) {
+						// p1 是链接文本，p2 是链接地址
+						return `<a href="${p2}">${p1}</a>`;
+					})
 				);
 			} catch (e) {
 				console.error(e);
