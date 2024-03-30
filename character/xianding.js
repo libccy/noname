@@ -10225,8 +10225,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							pai.sort((a,b)=>{
 								return get.value(b,player)-get.value(a,player);
 							});
-							gain=pai.splice(0,player.getDamagedHp());
-							bottom=pai;
+							gain = pai.splice(0,player.getDamagedHp());
+							bottom = cards.slice(0);
+							bottom.removeArray(gain);
 							return [bottom, gain];
 						}
 						return [cards,cards.splice(0,player.getDamagedHp())];

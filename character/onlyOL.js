@@ -1366,7 +1366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_sb_taishici:'OL谋太史慈',
 			ol_sb_taishici_prefix:'OL谋',
 			olsbdulie:'笃烈',
-			olsbdulie_info:'每回合限一次，当你成为其他角色使用基本牌或普通锦囊牌的目标时，你可以令此牌额外结算一次。若如此做，此牌结算完毕后，你摸X张牌（X为你的攻击范围且至多为5）。',
+			olsbdulie_info:'每回合限一次，当你成为其他角色使用基本牌或普通锦囊牌的唯一目标时，你可以令此牌额外结算一次。若如此做，此牌结算完毕后，你摸X张牌（X为你的攻击范围且至多为5）。',
 			olsbdouchan:'斗缠',
 			olsbdouchan_info:'锁定技，准备阶段，你从牌堆中获得一张【决斗】，若牌堆没有【决斗】，则你的攻击范围和出牌阶段使用【杀】的次数上限+1（增加次数不超过游戏人数）。',
 			olsbweilin:'威临',

@@ -2859,7 +2859,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.logSkill('dcmanzhi',target);
 					if(result.control=='选项一'){
 						player.addTempSkill('dcmanzhi_1');
-						target.chooseCard(2,'he','蛮智：请交给'+get.translation(player)+'两张牌',true);
+						target.chooseCard(Math.min(2,target.countCards('he')),'he','蛮智：请交给'+get.translation(player)+'两张牌',true);
 					}
 					else{
 						player.addTempSkill('dcmanzhi_2');
@@ -12544,7 +12544,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			recangchu:'仓储',
 			recangchu2:'仓储',
 			recangchu3:'仓储',
-			recangchu_info:'锁定技，游戏开始时，你获得3个“粮”。你的手牌上限+X（X为“粮”数）。当你于回合外得到牌后，你获得一个“粮”。（你的“粮”数不能超过存活角色数）',
+			recangchu_info:'锁定技。①游戏开始时，你获得3个“粮”。你的手牌上限+X（X为“粮”数）。②每回合限一次，当你于回合外得到牌后，你获得一个“粮”。（你的“粮”数不能超过存活角色数）',
 			reliangying:'粮营',
 			reliangying_info:'弃牌阶段开始时，你可以摸至多X张牌，然后交给等量的角色各一张牌。（X为你的“粮”数）',
 			reshishou:'失守',
