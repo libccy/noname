@@ -5572,3 +5572,20 @@ div[data-decoration="bronze"]::after{
 * {
 	scrollbar-width: none;
 }
+/* 更新进度条 */
+progress.progress {
+	width: 75%;
+	height: 10px;
+	border: 2px solid;
+	border-radius: 15px;
+	vertical-align: middle;
+	-webkit-appearance: none;
+}
+progress.progress::-webkit-progress-bar {
+	background: rgb(239, 239, 239);
+	border-radius: 0.2rem;
+}
+progress.progress::-webkit-progress-value {
+	border-radius: 0.2rem;
+	background: rgb(0, 117, 255);
+}
