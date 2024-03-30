@@ -4474,7 +4474,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 										}
 									}
 									return Math.random();
-								});
+								}).set('complexTarget', true);
 							}
 							'step 1'
 							if(result.bool){

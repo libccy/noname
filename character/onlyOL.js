@@ -817,8 +817,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(get.type(trigger.card)=='basic'&&player.getHistory('useCard',evt=>get.type(evt.card)=='basic').indexOf(trigger)==0){
 							game.log(trigger.card,'不计入次数上限');
-							trigger.addCount=false;
-							if(player.stat[player.stat.length-1].card.sha>0) player.stat[player.stat.length-1].card.sha--;
+							if (trigger.addCount !== false) {
+								trigger.addCount=false;
+								const stat = player.stat[player.stat.length-1].card;
+								if (typeof stat[trigger.card.name] === 'number') stat[trigger.card.name]--;
+							}
 						}
 					}
 				},
