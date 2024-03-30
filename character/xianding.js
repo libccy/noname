@@ -3765,7 +3765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					rec:{
 						audio:'guixiu',
 						trigger:{
-							player:'logSkill',
+							player:'useSkillAfter',
 						},
 						forced:true,
 						filter:function(event,player){
