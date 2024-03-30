@@ -2985,6 +2985,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				forceLoad:true,
+				forceDie:true,
 				content:function(){
 					'step 0'
 					delete event.wuxieresult;

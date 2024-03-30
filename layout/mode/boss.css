@@ -57,6 +57,7 @@
 
 #bosslist>.player .identity {
 	align-items: flex-start;
+	width: min-content;
 }
 
 #bosslist>.player .identity>div {
