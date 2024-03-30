@@ -68,6 +68,95 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			['spade',2,'bagua'],
 			['club',2,'renwang'],
 		],
+		singlePile_wuxianhuoli:[
+			['heart',1,'wanjian'],
+			['heart',2,'shan'],
+			['heart',2,'huogong'],
+			['heart',3,'tao'],
+			['heart',3,'huogong'],
+			['heart',4,'tao'],
+			['heart',4,'sha','fire'],
+			['heart',6,'tao'],
+			['heart',7,'sha','fire'],
+			['heart',7,'wuzhong'],
+			['heart',8,'wuzhong'],
+			['heart',9,'wuzhong'],
+			['heart',10,'sha'],
+			['heart',10,'sha'],
+			['heart',10,'sha','fire'],
+			['heart',12,'guohe'],
+			['heart',12,'shandian'],
+			['heart',13,'shan'],
+
+			['diamond',1,'juedou'],
+			['diamond',1,'zhuge'],
+			['diamond',1,'zhuque'],
+			['diamond',3,'shunshou'],
+			['diamond',4,'shunshou'],
+			['diamond',5,'guanshi'],
+			['diamond',6,'sha'],
+			['diamond',6,'shan'],
+			['diamond',7,'sha'],
+			['diamond',7,'shan'],
+			['diamond',8,'sha'],
+			['diamond',8,'shan'],
+			['diamond',9,'sha'],
+			['diamond',9,'shan'],
+			['diamond',9,'jiu'],
+			['diamond',10,'shan'],
+			['diamond',11,'shan'],
+			['diamond',12,'tao'],
+			['diamond',12,'wuxie'],
+			['diamond',12,'huogong'],
+
+			['club',1,'juedou'],
+			['club',1,'baiyin'],
+			['club',2,'sha'],
+			['club',2,'bagua'],
+			['club',2,'renwang'],
+			['club',3,'sha'],
+			['club',3,'guohe'],
+			['club',4,'sha'],
+			['club',5,'sha'],
+			['club',5,'sha','thunder'],
+			['club',6,'sha'],
+			['club',6,'sha','thunder'],
+			['club',7,'sha'],
+			['club',7,'sha','thunder'],
+			['club',7,'nanman'],
+			['club',8,'sha'],
+			['club',9,'sha'],
+			['club',9,'jiu'],
+			['club',12,'wuxie'],
+			['club',13,'wuxie'],
+
+			['spade',1,'juedou'],
+			['spade',1,'guding'],
+			['spade',2,'cixiong'],
+			['spade',2,'hanbing'],
+			['spade',2,'tengjia'],
+			['spade',3,'shunshou'],
+			['spade',4,'sha','thunder'],
+			['spade',4,'guohe'],
+			['spade',4,'shunshou'],
+			['spade',5,'sha','thunder'],
+			['spade',5,'qinglong'],
+			['spade',6,'sha','thunder'],
+			['spade',6,'qinggang'],
+			['spade',7,'sha'],
+			['spade',7,'sha','thunder'],
+			['spade',8,'sha'],
+			['spade',8,'sha'],
+			['spade',8,'sha','thunder'],
+			['spade',9,'sha'],
+			['spade',9,'jiu'],
+			['spade',10,'sha'],
+			['spade',10,'bingliang'],
+			['spade',11,'wuxie'],
+			['spade',12,'guohe'],
+			['spade',12,'zhangba'],
+			['spade',13,'nanman'],
+		],
 		characterSingle:{
 			caocao:['male','wei',4,['jianxiong'],['zhu']],
 			simayi:['male','wei',3,['fankui','guicai']],
@@ -209,6 +298,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			}
 			else if(_status.mode=='wuxianhuoli'){
 				var list=[];
+				lib.card.list=lib.singlePile_wuxianhuoli.slice(0);
+				game.fixedPile=true;
 				if(_status.connectMode) list=get.charactersOL();
 				else{
 					var list=[];
@@ -462,7 +553,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							ui.wuxianhuoliInfo=ui.create.system('无限火力·信息',null,true);
 							ui.wuxianhuoliInfo.currentProgress=0;
 							ui.wuxianhuoliInfo.currentLevel=0;
-							lib.setPopped(ui.wuxianhuoliInfo,()=>{ 
+							lib.setPopped(ui.wuxianhuoliInfo,()=>{
 								var uiintro=ui.create.dialog('hidden');
 								uiintro.add(`<div class="text center" style="font-size:18px"><b>任务列表</b></div>`);
 								if(typeof _status.wuxianhuoliLevel!=='number'){
@@ -855,7 +946,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							ui.wuxianhuoliInfo=ui.create.system('无限火力·信息',null,true);
 							ui.wuxianhuoliInfo.currentProgress=0;
 							ui.wuxianhuoliInfo.currentLevel=0;
-							lib.setPopped(ui.wuxianhuoliInfo,()=>{ 
+							lib.setPopped(ui.wuxianhuoliInfo,()=>{
 								var uiintro=ui.create.dialog('hidden');
 								uiintro.add(`<div class="text center" style="font-size:18px"><b>任务列表</b></div>`);
 								if(typeof _status.wuxianhuoliLevel!=='number'){
