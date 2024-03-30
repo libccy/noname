@@ -648,7 +648,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player){
 						var muniu=player.getEquip('muniu');
-						if(!muniu||!muniu.cards||!muniu.cards.length) return '共有〇张牌';
+						if(!muniu||!muniu.cards||!muniu.cards.length) return '共有零张牌';
 						if(player.isUnderControl(true)){
 							return get.translation(muniu.cards);
 						}
@@ -658,7 +658,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					mark:function(dialog,storage,player){
 						var muniu=player.getEquip('muniu');
-						if(!muniu||!muniu.cards||!muniu.cards.length) return '共有〇张牌';
+						if(!muniu||!muniu.cards||!muniu.cards.length) return '共有零张牌';
 						if(player.isUnderControl(true)){
 							dialog.addAuto(muniu.cards);
 						}
