@@ -200,10 +200,14 @@ export async function cordovaReady() {
 		});
 	};
 	game.removeDir = (directory, successCallback, errorCallback) => {
-		new Promise((resolve, reject) => {
-			window.cordova.file
-			window.resolveLocalFileSystemURL(`${nonameInitialized}${directory}`, resolve, reject);
-		}).then((directoryEntry) => directoryEntry.removeRecursively(successCallback, errorCallback));
+		window.resolveLocalFileSystemURL(`${nonameInitialized}${directory}`, directoryEntry => {
+			directoryEntry.removeRecursively(() => {
+				if (typeof successCallback == 'function') successCallback();
+			});
+		}, e => {
+			if (typeof errorCallback == 'function') errorCallback(e);
+			else throw e;
+		});
 	};
 	if (ui.updateUpdate) {
 		ui.updateUpdate();

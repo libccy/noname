@@ -176,6 +176,7 @@ export function nodeReady() {
 			lib.node.fs.mkdir(lib.node.path.join(__dirname, directory), { recursive: true }, e => {
 				if (e) {
 					if (typeof errorCallback == 'function') errorCallback(e);
+					else throw e;
 				} else {
 					if (typeof successCallback == 'function') successCallback(e)
 				}
@@ -184,17 +185,19 @@ export function nodeReady() {
 			const paths = directory.split('/').reverse();
 			let path = __dirname;
 			const redo = () => {
-				path += `/${paths.pop()}`;
-				return new Promise(resolve => lib.node.fs.exists(path, resolve)).then(exists => {
-					//不存在此目录
-					if (!exists) return new Promise(resolve => lib.node.fs.mkdir(path, resolve));
-				}).then(() => {
+				path = lib.node.path.join(path, paths.pop());
+				const exists = lib.node.fs.existsSync(path);
+				const callback = e => {
+					if (e) {
+						if (typeof errorCallback != 'function') throw e;
+						errorCallback(e);
+						return;
+					}
 					if (paths.length) return redo();
 					if (typeof successCallback == 'function') successCallback();
-				}).catch(reason => {
-					if (typeof errorCallback != 'function') return Promise.reject(reason);
-					errorCallback(reason);
-				});
+				};
+				if (!exists) lib.node.fs.mkdir(path, callback);
+				else callback();
 			};
 			redo();
 		}
@@ -213,8 +216,9 @@ export function nodeReady() {
 			lib.node.fs.rmdir(target, { recursive: true }, e => {
 				if (e) {
 					if (typeof errorCallback == 'function') errorCallback(e);
+					else throw e;
 				} else {
-					if (typeof successCallback == 'function') successCallback(e)
+					if (typeof successCallback == 'function') successCallback()
 				}
 			});
 		} else {
@@ -230,7 +234,12 @@ export function nodeReady() {
 					successCallback();
 				}
 			};
-			deleteFolderRecursive(target);
+			try {
+				deleteFolderRecursive(target);
+			} catch (e) {
+				if (typeof errorCallback == 'function') errorCallback(e);
+				else throw e;
+			}
 		}
 	};
 	if (ui.updateUpdate) {
