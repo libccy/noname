@@ -165,6 +165,7 @@ export const cardPackMenu = function (connectMenu) {
 	var createModeConfig = function (mode, position) {
 		var info = lib.cardPack[mode];
 		let cardPack = lib.cardPackInfo[mode];
+		if (!lib.cardPile[mode] && cardPack && cardPack.list && Array.isArray(cardPack.list)) lib.cardPile[mode]=cardPack.list;
 		var page = ui.create.div('');
 		var node = ui.create.div('.menubutton.large', lib.translate[mode + '_card_config'], position, clickMode);
 		if (node.innerHTML.length >= 5) {
@@ -303,7 +304,7 @@ export const cardPackMenu = function (connectMenu) {
 					game.saveConfig('hiddenCardPack', lib.config.hiddenCardPack);
 				});
 			}
-			if (!mode.startsWith('mode_') && lib.cardPile[mode]) {
+			if ((!mode.startsWith('mode_') || (cardPack && cardPack.closeable)) && lib.cardPile[mode]) {
 				var cardpileNodes = [];
 				var cardpileexpanded = false;
 				if (!lib.config.bannedpile[mode]) {
