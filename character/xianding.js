@@ -1527,7 +1527,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				content:function*(event,map){
 					const player=map.player;
-					let result=yield player.chooseTarget(get.prompt('dcnuanhui'),'选择一名装备区有牌的角色，该角色可以依次使用X张基本牌（X为其装备区牌数）。').set('ai',target=>{
+					let result=yield player.chooseTarget(get.prompt('dcnuanhui'),'选择一名装备区有牌的角色，该角色可以依次使用X张基本牌（X为其装备区牌数且至少为1）').set('ai',target=>{
 						return get.event('aiTarget')==target?10:0;
 					}).set('aiTarget',(()=>{
 						const player=get.player();
@@ -1584,7 +1584,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							break;
 						}
 						const str=forced?'视为使用一张基本牌':'是否视为使用一张基本牌？';
-						result=yield target.chooseButton([str,[basicList,'vcard']],forced).set('ai',button=>{
+						const result=yield target.chooseButton([str,[basicList,'vcard']],forced).set('ai',button=>{
 							return get.player().getUseValue({name:button.link[2],nature:button.link[3],isCard:true});
 						});
 						if(!result.bool){
@@ -1593,8 +1593,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						forced=true;
 						const card=new lib.element.VCard({name:result.links[0][2],nature:result.links[0][3],isCard:true});
-						const result=yield target.chooseUseTarget(card,true,false);
-						if(!discard&&result.bool){
+						const result2=yield target.chooseUseTarget(card,true,false);
+						if(!discard&&result2.bool){
 							if(used.includes(result.links[0][2])) discard=true;
 							else used.add(result.links[0][2]);
 						}
