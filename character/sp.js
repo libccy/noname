@@ -3038,6 +3038,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olcangxin:{
 				audio:2,
 				trigger:{player:'damageBegin4'},
+				filter(event,player){
+					return game.getGlobalHistory('everything',evt=>{
+						return evt.name=='damage'&&evt.player==player;
+					},event).indexOf(event)==0;
+				},
 				checkx:function(event,player){
 					var target=event.source;
 					return get.damageEffect(player,target,target)<=0;
@@ -3046,17 +3051,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					var cards=get.bottomCards(3,true);
-					player.chooseButton(['###藏心：请选择要弃置的牌###若以此法弃置了红桃牌，则防止此伤害',cards],[1,cards.length],true).set('ai',function(button){
+					player.chooseButton(['###藏心：请选择要弃置的牌###若以此法弃置了红桃牌，则减少弃置红桃牌数的伤害',cards],[1,cards.length],true).set('ai',function(button){
 						if(!_status.event.bool&&get.suit(button.link,false)=='heart') return 0;
 						if(get.suit(button.link,false)!='heart') return 1;
-						if(!ui.selected.buttons.some(but=>get.suit(but.link,false)=='heart')) return 1;
+						const num=get.event().getTrigger().num;
+						if(num>ui.selected.buttons.filter(but=>get.suit(but.link,false)=='heart').length) return 1;
 						return 0;
 					}).set('bool',lib.skill.olcangxin.checkx(trigger,player));
 					'step 1'
 					if(result.bool){
 						player.$throw(result.links,1000);
 						game.cardsDiscard(result.links);
-						if(result.links.some(card=>get.suit(card,false)=='heart')) trigger.cancel();
+						const num=result.links.filter(card=>get.suit(card,false)=='heart').length;
+						if(num) trigger.num-=Math.min(trigger.num,num);
 					}
 					else event.finish();
 					'step 2'
@@ -27676,7 +27683,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_luyusheng:'OL陆郁生',
 			ol_luyusheng_prefix:'OL',
 			olcangxin:'藏心',
-			olcangxin_info:'锁定技。①当你受到伤害时，你观看牌堆底的三张牌并弃置其中任意张牌，若你以此法弃置了红桃牌，则防止此伤害。②摸牌阶段开始时，你展示牌堆底的三张牌，然后摸X张牌（X为其中红桃牌的数量）。',
+			olcangxin_info:'锁定技。①当你每回合第一次受到伤害时，你观看牌堆底的三张牌并弃置其中任意张牌，然后此伤害-X。②摸牌阶段开始时，你展示牌堆底的三张牌，然后摸X张牌（X为其中红桃牌的数量）。',
 			olrunwei:'润微',
 			olrunwei_info:'其他角色的弃牌阶段开始时，若其已受伤，则你可以选择一项：①令其弃置一张牌，其本回合手牌上限+1；②令其摸一张牌，其本回合手牌上限-1。',
 			caoxi:'曹羲',
