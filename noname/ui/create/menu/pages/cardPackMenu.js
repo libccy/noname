@@ -644,7 +644,9 @@ export const cardPackMenu = function (connectMenu) {
 		if ([...start.firstChild.children].map(node => node.mode).includes(packName)) return;
 		// 显示不是无名杀自带的卡牌包
 		if (!lib.connectCardPack.includes(packName) && !lib.config.all.cards.includes(packName)) {
-			createModeConfig(packName, start.firstChild, node1);
+			if (!(connectMenu && ['mode_derivation', 'mode_banned'].includes(packName))) {
+				createModeConfig(packName, start.firstChild, node1);
+			}
 			if (connectMenu) lib.connectCardPack.add(packName);
 		}
 	}

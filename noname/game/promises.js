@@ -100,4 +100,9 @@ export class GamePromises extends Uninstantable {
 			});
 		}));
 	}
+	static removeDir(directory) {
+		return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
+			game.removeDir(directory, resolve, reject);
+		}));
+	}
 }
