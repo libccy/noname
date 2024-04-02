@@ -168,17 +168,18 @@ export function nodeReady() {
 		});
 	};
 	game.createDir = (directory, successCallback, errorCallback) => {
+		const target = lib.node.path.join(__dirname, directory);
 		if (lib.node.fs.existsSync(target)) {
 			if (typeof errorCallback == 'function') {
 				errorCallback(new Error(`${target}已存在`))
 			}
 		} else if (checkVersion(process.versions.node, '10.12.0') > -1) {
-			lib.node.fs.mkdir(lib.node.path.join(__dirname, directory), { recursive: true }, e => {
+			lib.node.fs.mkdir(target, { recursive: true }, e => {
 				if (e) {
 					if (typeof errorCallback == 'function') errorCallback(e);
 					else throw e;
 				} else {
-					if (typeof successCallback == 'function') successCallback(e)
+					if (typeof successCallback == 'function') successCallback();
 				}
 			});
 		} else {
@@ -203,7 +204,7 @@ export function nodeReady() {
 		}
 	};
 	game.removeDir = (directory, successCallback, errorCallback) => {
-		const target = `${__dirname}/${directory}`;
+		const target = lib.node.path.join(__dirname, directory);
 		if (!lib.node.fs.existsSync(target)) {
 			if (typeof errorCallback == 'function') {
 				errorCallback(new Error(`${target}不存在`))
@@ -218,7 +219,7 @@ export function nodeReady() {
 					if (typeof errorCallback == 'function') errorCallback(e);
 					else throw e;
 				} else {
-					if (typeof successCallback == 'function') successCallback()
+					if (typeof successCallback == 'function') successCallback();
 				}
 			});
 		} else {
