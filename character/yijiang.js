@@ -11837,6 +11837,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(_status.connectMode) game.broadcastAll(function(){_status.noclearcountdown=true});
 					event.given_map = {};
 					event._forcing = false;
+					event.aicheck = function () {
+						let res = {
+							bool: true,
+							cards: []
+						}, cards = player.getCards('he'), tars = game.filterPlayer(i => player !== i);
+						cards.forEach(i => {
+							let o = get.value(i, player), max = o, temp, t;
+							tars.forEach(tar => {
+								temp = get.value(i, tar);
+								if (temp > max) {
+									max = temp;
+									t = tar;
+								}
+							});
+							if (t) res.cards.push([i, t, max - o]);
+						});
+						if (res.cards.length < event.num) res.bool = false;
+						else if (res.cards.length > event.num) res.cards.sort((a, b) => {
+							return b[2] - a[2];
+						}).slice(0, event.num);
+						return res;
+					}();
 					'step 1'
 					player.chooseCardTarget({
 						filterCard(card){
@@ -11847,17 +11869,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						prompt:'请选择要分配的卡牌和目标',
 						forced: event._forcing,
 						ai1(card){
-							//if(!ui.selected.cards.length) return 1;
+							if (!_status.event.res.bool || ui.selected.cards.length) return 0;
+							for (let arr of _status.event.res.cards) {
+								if (arr[0] === card) return arr[2];
+							}
 							return 0;
 						},
 						ai2(target){
-							return 0;
-							//wait for PZ157 to change
-							var player=_status.event.player,card=ui.selected.cards[0];
-							var val=target.getUseValue(card);
+							let card = ui.selected.cards[0];
+							for (let arr of _status.event.res.cards) {
+								if (arr[0] === card) return get.attitude(player, target);
+							}
+							let val=target.getUseValue(card);
 							if(val>0) return val*get.attitude(player,target)*2;
 							return get.value(card,target)*get.attitude(player,target);
 						},
+						res: event.aicheck
 					});
 					'step 2'
 					if(result.bool){
