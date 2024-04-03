@@ -1125,7 +1125,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						audio:'fakeyigui',
 						trigger:{player:'showCharacterAfter'},
 						filter(event,player){
-							return event.toShow.includes('gz_zuoci')&&!player.storage.fakeyigui_init;
+							if(!event.toShow.some(i=>get.character(i,3).includes('fakeyigui'))) return false;
+							return game.getAllGlobalHistory('everything',evt=>{
+								return evt.name=='showCharacter'&&evt.toShow.some(i=>get.character(i,3).includes('fakeyigui'));
+							},event).indexOf(event)==0;
 						},
 						forced:true,
 						locked:false,
@@ -1692,6 +1695,381 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					const target=event.targets[0];
 					await target.chooseDrawRecover(2,'举荐：摸两张牌或回复1点体力',true);
 					await target.mayChangeVice();
+				},
+			},
+			fakexibing:{
+				audio:'xibing',
+				inherit:'xibing',
+				content(){
+					'step 0'
+					var num=trigger.player.hp-trigger.player.countCards('h');
+					if(num>0) trigger.player.draw(num);
+					'step 1'
+					trigger.player.addTempSkill('xibing2');
+					player._xibing=true;
+					if(get.mode()!='guozhan'||player.isUnseen(2)||trigger.player.isUnseen(2)) event.finish();
+					'step 2'
+					var target=trigger.player;
+					var players1=[player.name1,player.name2];
+					var players2=[target.name1,target.name2];
+					player.chooseButton(2,[
+						'是否暗置自己和'+get.translation(target)+'的各一张武将牌？',
+						'<div class="text center">你的武将牌</div>',
+						[players1,'character'],
+						'<div class="text center">'+get.translation(target)+'的武将牌</div>',
+						[players2,'character'],
+					]).set('players',players1).set('complexSelect',true).set('filterButton',function(button){
+						return !get.is.jun(button.link)&&(ui.selected.buttons.length==0)==(_status.event.players.includes(button.link));
+					});
+					'step 3'
+					if(result.bool){
+						var target=trigger.player;
+						player.hideCharacter(player.name1==result.links[0]?0:1);
+						target.hideCharacter(target.name1==result.links[1]?0:1);
+						player.addTempSkill('xibing3');
+						target.addTempSkill('xibing3');
+					}
+				},
+			},
+			fakechengshang:{
+				audio:'chengshang',
+				trigger:{player:'useCardAfter'},
+				filter(event,player){
+					if(!lib.suit.includes(get.suit(event.card,false))||typeof get.number(event.card)!='number') return false;
+					if(player.getHistory('sourceDamage',evt=>{
+						return evt.card==event.card;
+					}).length) return false;
+					const phsu=event.getParent('phaseUse');
+					if(!phsu||phsu.player!=player) return false;
+					return event.targets.some(i=>i.isEnemyOf(player));
+				},
+				preHidden:true,
+				async content(event,trigger,player){
+					await player.draw();
+					player.tempBanSkill('fakechengshang','phaseUseAfter',false);
+					player.addTempSkill('fakechengshang_effect');
+					player.markAuto('fakechengshang_effect',[[get.suit(trigger.card),get.number(trigger.card),trigger.card.name]]);
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove:true,
+						hiddenCard(player,name){
+							const type=get.type(name);
+							if(type!='basic'&&type!='trick') return false;
+							const storage=player.getStorage('fakechengshang_effect');
+							return lib.card.list.some(list=>{
+								return name==list[2]&&storage.some(card=>{
+									return card[0]==list[0]&&card[1]==list[1]&&card[2]!=list[2];
+								});
+							});
+						},
+						audio:'chengshang',
+						enable:'phaseUse',
+						chooseButton:{
+							dialog(event,player){
+								const storage=player.getStorage('fakechengshang_effect');
+								const list=lib.card.list.filter(list=>{
+									const type=get.type(card[2]);
+									if(type!='basic'&&type!='trick') return false;
+									return storage.some(card=>card[0]==list[0]&&card[1]==list[1]&&card[2]!=list[2]);
+								}).map(card=>[get.translation(type),'',card[2],card[3]]);
+								return ui.create.dialog('承赏',[list,'vcard']);
+							},
+							filter(button,player){
+								return get.event().getParent().filterCard({name:button.link[2],nature:button.link[3]},player,event);
+							},
+							check(button){
+								const player=get.event('player');
+								const card={name:button.link[2],nature:button.link[3]};
+								if(player.countCards('hes',cardx=>cardx.name==card.name)) return 0;
+								return player.getUseValue(card);
+							},
+							backup(links,player){
+								return {
+									audio:'chengshang',
+									filterCard:true,
+									position:'hs',
+									popname:true,
+									precontent(){
+										player.logSkill('fakechengshang_effect');
+										delete event.result.skill;
+										const cardx=event.result.card;
+										const removes=player.getStorage('fakechengshang_effect').filter(card=>{
+											return lib.card.list.some(list=>{
+												return cardx.name==list[2]&&card[0]==list[0]&&card[1]==list[1]&&card[2]!=list[2];
+											});
+										});
+										player.unmarkAuto('fakechengshang_effect',removes);
+									},
+									viewAs:{
+										name:links[0][2],
+										nature:links[0][3],
+									},
+								}
+							},
+							prompt(links,player){
+								return '将一张手牌当作'+(get.translation(links[0][3])||'')+get.translation(links[0][2])+'使用';
+							},
+						},
+					},
+				},
+			},
+			fakezhente:{
+				audio:'zhente',
+				inherit:'zhente',
+				filter(event,player){
+					var color=get.color(event.card),type=get.type(event.card);
+					if(player==event.player||event.player.isDead()||color=='none') return false;
+					return type=='trick'||(type=='basic'&&color=='black');
+				},
+			},
+			fakezhiwei:{
+				audio:'zhiwei',
+				inherit:'zhiwei',
+				content(){
+					'step 0'
+					player.chooseTarget('请选择【至微】的目标',true,lib.filter.notMe).set('ai',target=>{
+						var att=get.attitude(_status.event.player,target);
+						if(att>0) return 1+att;
+						return Math.random();
+					}).set('prompt2',lib.translate.fakezhiwei_info);
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('fakezhiwei',target);
+						player.storage.fakezhiwei_effect=target;
+						player.addSkill('fakezhiwei_effect');
+					}
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove:true,
+						audio:'zhiwei',
+						trigger:{player:'hideCharacterBefore'},
+						filter(event,player){
+							return get.character(event.toHide,3).includes('fakezhiwei');
+						},
+						forced:true,
+						content(){
+							trigger.cancel();
+						},
+						mark:'character',
+						intro:{content:'已选择$'},
+						group:['fakezhiwei_draw','fakezhiwei_discard','fakezhiwei_gain','fakezhiwei_clear'],
+					},
+					draw:{
+						audio:'zhiwei',
+						trigger:{global:'damageSource'},
+						forced:true,
+						filter(event,player){
+							return event.source==player.storage.fakezhiwei_effect;
+						},
+						logTarget:'source',
+						content(){
+							player.draw();
+						},
+					},
+					discard:{
+						audio:'zhiwei',
+						trigger:{global:'damageEnd'},
+						forced:true,
+						filter(event,player){
+							return event.player==player.storage.fakezhiwei_effect&&player.hasCard(card=>{
+								return _status.connectMode||lib.filter.cardDiscardable(card,player);
+							},'h');
+						},
+						logTarget:'player',
+						content(){
+							player.chooseToDiscard('h',true);
+						},
+					},
+					gain:{
+						audio:'zhiwei',
+						trigger:{
+							player:'loseAfter',
+							global:'loseAsyncAfter',
+						},
+						forced:true,
+						filter(event,player){
+							if(event.type!='discard'||event.getlx===false||event.getParent('phaseDiscard').player!=player||!player.storage.fakezhiwei_effect||!player.storage.fakezhiwei_effect.isIn()) return false;
+							var evt=event.getl(player);
+							return evt&&evt.cards2.filterInD('d').length>0;
+						},
+						logTarget(event,player){
+							return player.storage.fakezhiwei_effect;
+						},
+						content(){
+							if(trigger.delay===false) game.delay();
+							player.storage.fakezhiwei_effect.gain(trigger.getl(player).cards2.filterInD('d'),'gain2');
+						},
+					},
+					clear:{
+						audio:'zhiwei',
+						trigger:{
+							global:'die',
+							player:['hideCharacterEnd','removeCharacterEnd'],
+						},
+						forced:true,
+						filter(event,player){
+							if(event.name=='die') return event.player==player.storage.fakezhiwei_effect;
+							if(event.name=='removeCharacter') return get.character(event.toRemove,3).includes('fakezhiwei');
+							return get.character(event.toHide,3).includes('fakezhiwei');
+						},
+						content(){
+							'step 0'
+							player.removeSkill('fakezhiwei_effect');
+							if(trigger.name!='die') event.finish();
+							'step 1'
+							if(get.character(player.name1,3).includes('fakezhiwei')) player.hideCharacter(0);
+							if(get.character(player.name2,3).includes('fakezhiwei')) player.hideCharacter(1);
+						},
+					},
+				},
+			},
+			fakekuangcai:{
+				inherit:'gzrekuangcai',
+				content(){
+					const goon=Boolean(player.getHistory('useCard').length);
+					get.info('rekuangcai').change(player,goon?-1:1);
+					player.when({global:'phaseAfter'}).then(()=>{
+						get.info('rekuangcai').change(player,goon?1:-1);
+					}).vars({goon:goon});
+				},
+			},
+			faketunchu:{
+				audio:'tunchu',
+				trigger:{player:'phaseDrawBegin2'},
+				filter(event,player){
+					return !event.numFixed;
+				},
+				check(event,player){
+					return player.countCards('h')<=2;
+				},
+				locked:false,
+				preHidden:true,
+				content(){
+					trigger.num+=2;
+					player.when(['phaseDrawEnd','phaseDrawSkipped','phaseDrawCancelled'])
+					.filter(evt=>evt==trigger)
+					.then(()=>{
+						var nh=player.countCards('h');
+						if(nh){
+							player.chooseCard('h',[1,Math.min(nh,2)],'将至多两张手牌置于你的武将牌上',true).set('ai',card=>{
+								return 7.5-get.value(card);
+							});
+						}
+						else{
+							player.addTempSkill('faketunchu_effect');
+							event.finish();
+						}
+					})
+					.then(()=>{
+						if(result.bool) player.addToExpansion(result.cards,player,'giveAuto').gaintag.add('faketunchu');
+					})
+					.then(()=>{
+						player.addTempSkill('faketunchu_effect');
+					});
+				},
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+				marktext:'粮',
+				onremove(player,skill){
+					var cards=player.getExpansions(skill);
+					if(cards.length) player.loseToDiscardpile(cards);
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						mod:{
+							cardEnabled(card,player){
+								if(card.name=='sha') return false;
+							},
+						},
+						mark:true,
+						intro:{content:'本回合不能使用【杀】'},
+					},
+				},
+			},
+			fakeshuliang:{
+				audio:'shuliang',
+				trigger:{global:'phaseJieshuBegin'},
+				direct:true,
+				filter(event,player){
+					if(!event.player.isFriendOf(player)) return false;
+					return event.player.isIn()&&get.distance(player,event.player)<=player.getExpansions('faketunchu').length;
+				},
+				async cost(event,trigger,player){
+					const {result:{bool,links}}=await player.chooseButton([get.prompt2('fakeshuliang',trigger.player),player.getExpansions('faketunchu')]).set('ai',button=>{
+						if(get.attitude(get.event('player'),get.event().getTrigger().player)<=0) return 0;
+						return 1+Math.random();
+					});
+					event.result={bool:bool,cards:links,targets:[trigger.player]};
+				},
+				content(){
+					player.loseToDiscardpile(event.cards);
+					trigger.player.draw(2);
+				},
+				ai:{combo:'faketunchu'},
+			},
+			fakedujin:{
+				audio:'dujin',
+				inherit:'dujin',
+				filter(event,player){
+					return player.countCards('e')&&!event.numFixed;
+				},
+				content(){
+					trigger.num+=Math.ceil(player.countCards('e')/2);
+				},
+				group:'fakedujin_first',
+				subSkill:{
+					first:{
+						audio:'dujin',
+						trigger:{player:'showCharacterEnd'},
+						filter(event,player){
+							if(game.getAllGlobalHistory('everything',evt=>{
+								return evt.name=='showCharacter'&&evt.toShow.some(i=>get.character(i,3).includes('fakedujin'));
+							},event).indexOf(event)!=0) return false;
+							return game.getAllGlobalHistory('everything',evt=>{
+								return evt.name=='showCharacter'&&evt.player.isFriendOf(player);
+							})[0].player==player;
+						},
+						forced:true,
+						locked:false,
+						content(){
+							player.addMark('xianqu_mark',1);
+						},
+					},
+				},
+			},
+			fakeguishu:{
+				inherit:'hmkguishu',
+				usable:1,
+			},
+			fakeyuanyu:{
+				inherit:'hmkyuanyu',
+				filter(event,player){
+					if(event.num<=0||!event.source) return false;
+					return !event.source.inRange(player);
+				},
+				content(){
+					trigger.num--;
+				},
+				ai:{
+					effect:{
+						target(card,player,target){
+							if(player.hasSkillTag('jueqing',false,target)) return;
+							if(player.inRange(target)) return;
+							const num=get.tag(card,'damage');
+							if(num){
+								if(num>1) return 0.5;
+								return 'zeroplayertarget';
+							}
+						},
+					},
 				},
 			},
 			//国战典藏2023补充
@@ -16104,6 +16482,24 @@ return event.junling=='junling5'?1:0;});
 			fakezisui_info:'锁定技。①一名角色被你移除副将后，你将被移除的武将牌称为“异”置于武将牌上。②摸牌阶段，你多摸X张牌。③结束阶段，若X大于你的体力上限，你死亡。（X为你武将牌上的“异”数）',
 			fakejujian:'举荐',
 			fakejujian_info:'副将技。①此武将牌计算体力上限时减少半个阴阳鱼。②结束阶段，你可以弃置一张非基本牌并选择一名友方角色，令其选择摸两张牌或回复1点体力，然后其可以变更副将。',
+			fakexibing:'息兵',
+			fakexibing_info:'当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至体力值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。',
+			fakezhente:'贞特',
+			fakezhente_info:'每回合限一次，当你成为其他角色使用普通锦囊牌或黑色基本牌的目标后，你可令使用者选择一项：1.本回合不能再使用与此牌颜色相同的牌；2.令此牌对你无效。',
+			fakezhiwei:'至微',
+			fakezhiwei_info:'你明置此武将牌时，选择一名其他角色。该角色造成伤害后，你摸一张牌，该角色受到伤害后，你随机弃置一张手牌。你弃牌阶段弃置的牌均被该角色获得。该角色死亡时，若你的两个武将牌均明置，你暗置此武将牌。若该角色未死亡，则此武将牌被暗置前，取消之。',
+			fakekuangcai:'狂才',
+			fakekuangcai_info:'锁定技，你于回合内使用牌无距离和次数限制；弃牌阶段开始时，若你本回合内：未使用过牌，则你本回合手牌上限+1；使用过牌但未造成过伤害，则你本回合手牌上限-1。',
+			faketunchu:'屯储',
+			faketunchu_info:'摸牌阶段，你可以额外摸两张牌，然后你将一至两张牌称为“粮”置于武将牌上。若如此做，你本回合不能使用【杀】。',
+			fakeshuliang:'输粮',
+			fakeshuliang_info:'友方角色的结束阶段，若你与其的距离不大于你武将牌上的“粮”数，则你可以移去一张“粮”，然后令其摸两张牌。',
+			fakedujin:'独进',
+			fakedujin_info:'①摸牌阶段，你可以额外摸X张牌（X为你装备区的牌数的一半，向上取整）。②当你首次明置此武将牌时，若你为你们势力第一个明置武将牌的角色，则你获得1个“先驱”标记。',
+			fakeguishu:'鬼术',
+			fakeguishu_info:'出牌阶段限一次，你可以将一张黑桃手牌当作【知己知彼】或【远交近攻】使用。若你本局游戏内已经发动过了〖鬼术〗，则你必须选择与上次不同的选项。',
+			fakeyuanyu:'远域',
+			fakeyuanyu_info:'锁定技，当你受到伤害时，若你不在伤害来源的攻击范围内，则防止此伤害。',
 
 			guozhan_default:"国战标准",
 			guozhan_zhen:"君临天下·阵",
@@ -16530,10 +16926,45 @@ return event.junling=='junling5'?1:0;});
 		element:{
 			content:{
 				hideCharacter:function(){
-					'step 0'
-					event.trigger('hideCharacterEnd');
-					'step 1'
-					event.trigger('hideCharacterAfter');
+					game.addVideo('hideCharacter',player,num);
+					var skills;
+					switch(num){
+						case 0:
+						if(log!==false) game.log(player,'暗置了主将'+get.translation(player.name1));
+						skills=lib.character[player.name1][3];
+						player.name=player.name2;
+						player.sex=lib.character[player.name2][0];
+						player.classList.add('unseen');
+						break;
+						case 1:
+						if(log!==false) game.log(player,'暗置了副将'+get.translation(player.name2));
+						skills=lib.character[player.name2][3];
+						player.classList.add('unseen2');
+						break;
+					}
+					game.broadcast(function(player,name,sex,num,skills){
+						player.name=name;
+						player.sex=sex;
+						switch(num){
+							case 0:player.classList.add('unseen');break;
+							case 1:player.classList.add('unseen2');break;
+						}
+						for(var i=0;i<skills.length;i++){
+							if(!player.skills.includes(skills[i])) continue;
+							player.hiddenSkills.add(skills[i]);
+							player.skills.remove(skills[i]);
+						}
+					},player,player.name,player.sex,num,skills);
+					for(var i=0;i<skills.length;i++){
+						if(!player.skills.includes(skills[i])) continue;
+						player.hiddenSkills.add(skills[i]);
+						var info=get.info(skills[i]);
+						if(info.ondisable&&info.onremove){
+							info.onremove(player);
+						}
+						player.skills.remove(skills[i]);
+					}
+					player.checkConflict();
 				},
 				chooseJunlingFor:function(){
 					'step 0'
@@ -16999,54 +17430,11 @@ return event.junling=='junling5'?1:0;});
 					this.update();
 				},
 				hideCharacter:function(num,log){
-					if(this.isUnseen(2)){
-						return;
-					}
-					game.addVideo('hideCharacter',this,num);
-					var toHide;
-					var skills;
-					switch(num){
-						case 0:
-						if(log!==false) game.log(this,'暗置了主将'+get.translation(this.name1));
-						toHide=this.name1;
-						skills=lib.character[this.name1][3];
-						this.name=this.name2;
-						this.sex=lib.character[this.name2][0];
-						this.classList.add('unseen');
-						break;
-						case 1:
-						if(log!==false) game.log(this,'暗置了副将'+get.translation(this.name2));
-						toHide=this.name2;
-						skills=lib.character[this.name2][3];
-						this.classList.add('unseen2');
-						break;
-					}
-					game.broadcast(function(player,name,sex,num,skills){
-						player.name=name;
-						player.sex=sex;
-						switch(num){
-							case 0:player.classList.add('unseen');break;
-							case 1:player.classList.add('unseen2');break;
-						}
-						for(var i=0;i<skills.length;i++){
-							if(!player.skills.includes(skills[i])) continue;
-							player.hiddenSkills.add(skills[i]);
-							player.skills.remove(skills[i]);
-						}
-					},this,this.name,this.sex,num,skills);
-					for(var i=0;i<skills.length;i++){
-						if(!this.skills.includes(skills[i])) continue;
-						this.hiddenSkills.add(skills[i]);
-						var info=get.info(skills[i]);
-						if(info.ondisable&&info.onremove){
-							info.onremove(this);
-						}
-						this.skills.remove(skills[i]);
-					}
-					this.checkConflict();
-					var next=game.createEvent('hideCharacter',false);
+					if(this.isUnseen(2)) return;
+					var name=this['name'+(num+1)];
+					var next=game.createEvent('hideCharacter');
 					next.player=this;
-					next.toHide=toHide;
+					next.toHide=name;
 					next.setContent('hideCharacter');
 					return next;
 				},
