@@ -157,11 +157,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.hasSkillTag('useShan',null,event)) return true;
 							if(target.isLinked()&&game.hasNature(event.card)&&get.attitude(target,player._trueMe||player)>0) return false;
 							if(event.baseDamage+event.extraDamage<=0&&!game.hasNature(event.card,'ice')) return false;
-							if(target.hasSkillTag('freeShan',false,event,true)) return true;
-							if(event.shanRequired>1&&target.mayHaveShan(target,'use',null,'count')<event.shanRequired-(event.shanIgnored||0)) return false;
 							if(event.baseDamage+event.extraDamage>=target.hp+
 								((player.hasSkillTag('jueqing',false,target)||target.hasSkill('gangzhi'))?target.hujia:0)) return true;
 							if(!game.hasNature(event.card,'ice')&&get.damageEffect(target,player,target,get.nature(event.card))>=0) return false;
+							if(event.shanRequired>1&&target.mayHaveShan(target,'use',null,'count')<event.shanRequired-(event.shanIgnored||0)) return false;
 							return true;
 						})());
 						//next.autochoose=lib.filter.autoRespondShan;
@@ -2911,14 +2910,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				audio:true,
 				check:function(event,player){
-					if(event&&(event.ai||event.ai1)){
-						var ai=event.ai||event.ai1;
+					if(!event) return true;
+					if(event.ai){
+						var ai=event.ai;
 						var tmp=_status.event;
 						_status.event=event;
 						var result=ai({name:'shan'},_status.event.player,event);
 						_status.event=tmp;
 						return result>0;
 					}
+					let evt=event.getParent();
+					if(player.hasSkillTag('noShan',null,evt)) return false;
+					if(!evt||!evt.card||!evt.player||player.hasSkillTag('useShan',null,evt)) return true;
+					if(evt.card&&evt.player&&player.isLinked()&&game.hasNature(evt.card)&&get.attitude(player,evt.player._trueMe||evt.player)>0) return false;
 					return true;
 				},
 				content:function(){
@@ -2942,8 +2946,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(player.hasSkillTag('unequip2')) return false;
 						if(!arg||!arg.player) return true;
 						if(arg.player.hasSkillTag('unequip',false,{
-							target:player
-						})||arg.player.hasSkillTag('unequip_ai',false,{
 							target:player
 						})) return false;
 						return true;
