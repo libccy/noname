@@ -1513,7 +1513,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return ui.create.dialog('###怀异###'+get.translation('fakehuaiyi_info'));
 					},
 					chooseControl(event,player){
-						var list=[],map={'h':'手牌区','e':'装备区','j':'判定区'};
+						let list=[],map={'h':'手牌区','e':'装备区','j':'判定区'};
 						list.addArray(['h','e','j'].filter(pos=>{
 							return player.getCards(pos).every(card=>lib.filter.cardDiscardable(card,player));
 						}).map(i=>map[i]));
@@ -2149,6 +2149,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				forced:true,
 				locked:false,
+				preHidden:true,
 				async cost(event,trigger,player){
 					const filterTarget=(card,player,target)=>{
 						return target!=player&&target.isMaxHandcard();
@@ -2394,6 +2395,244 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						firstDo:true,
 						content(){
 							player[(trigger.name=='hideCharacter'?'un':'')+'markSkill']('fakejuzhan');
+						},
+					},
+				},
+			},
+			fakedanshou:{
+				audio:'mobiledanshou',
+				trigger:{global:'phaseZhunbeiBegin'},
+				filter(event,player){
+					return ['h','e','j'].some(pos=>player.getCards(pos).every(card=>lib.filter.cardDiscardable(card,player)));
+				},
+				async cost(event,trigger,player){
+					let list=[],map={'h':'手牌区','e':'装备区','j':'判定区'};
+					list.addArray(['h','e','j'].filter(pos=>{
+						return player.getCards(pos).every(card=>lib.filter.cardDiscardable(card,player));
+					}).map(i=>map[i]));
+					list.push('cancel2');
+					const {result:{control}}=await player.chooseControl(list).set('prompt',get.prompt2('fakedanshou',trigger.player)).set('ai',()=>{
+						const player=get.event().player,controls=get.event().controls.slice();
+						if(controls.includes('判定区')) return '判定区';
+						if(controls.includes('装备区')&&player.countCards('e')<3) return '装备区';
+						if(controls.includes('手牌区')&&player.countCards('e')<5) return '手牌区';
+						return 'cancel2';
+					});
+					event.result={bool:(control!='cancel2'),cost_data:control};
+				},
+				round:1,
+				logTarget:'player',
+				async content(event,trigger,player){
+					player.popup(event.cost_data);
+					await player.discard(player.getCards({'手牌区':'h','装备区':'e','判定区':'j'}[event.cost_data]));
+					player.addTempSkill('fakedanshou_effect');
+					player.addMark('fakedanshou_effect',1,false);
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove(player){
+							delete player.storage.fakedanshou_effect;
+							delete player._fakedanshou_effect;
+						},
+						audio:'mobiledanshou',
+						trigger:{global:['phaseJudgeBegin','phaseDrawBegin','phaseUseBegin','phaseDiscardBegin']},
+						async cost(event,trigger,player){
+							const {result:{control}}=await player.chooseControl('摸牌','增加摸牌数').set('prompt','胆守：请选择一项').set('ai',()=>{
+								const player=get.event().player,trigger=get.event().getTrigger();
+								if(trigger.name=='phaseJudge') return '增加摸牌数';
+								if(trigger.name=='phaseDiscard') return '摸牌';
+								if(trigger.name=='phaseDraw'){
+									if(get.damageEffect(trigger.player,player,player)>0){
+										player._fakedanshou_effect=true;
+										return '增加摸牌数';
+									}
+								}
+								return player._fakedanshou_effect?'增加摸牌数':'摸牌';
+							});
+							event.result={bool:true,cost_data:control};
+						},
+						logTarget:'player',
+						async content(event,trigger,player){
+							if(event.cost_data=='增加摸牌数'){
+								player.addMark('fakedanshou_effect',1,false);
+							}
+							else{
+								const num=player.countMark('fakedanshou_effect');
+								await player.draw(num);
+								if(num>=4){
+									const {result:{bool}}=await player.chooseBool('胆守：是否对'+get.translation(trigger.player)+'造成1点伤害？').set('choice',get.damageEffect(trigger.player,player,player)>0);
+									if(bool){
+										player.line(trigger.player);
+										await trigger.player.damage();
+									}
+								}
+							}
+						},
+					},
+				},
+			},
+			fakexunxi:{
+				trigger:{global:'showCharacterEnd'},
+				filter(event,player){
+					const card=new lib.element.VCard({name:'sha'});
+					return event.player!=player&&event.player!=_status.currentPhase&&player.canUse(card,event.player,false);
+				},
+				check(event,player){
+					const card=new lib.element.VCard({name:'sha'});
+					return get.effect(event.player,card,player,player)>0;
+				},
+				logTarget:'player',
+				async content(event,trigger,player){
+					const card=new lib.element.VCard({name:'sha'});
+					await player.useCard(card,trigger.player,false);
+				},
+			},
+			fakehuanjia:{
+				trigger:{
+					player:'useCardToPlayered',
+					target:'useCardToTargeted',
+				},
+				filter(event,player){
+					if(event.card.name!='sha') return false;
+					if(event.target==player){
+						if(player.getStorage('fakehuanjia_used').includes(2)) return false;
+						return event.player.getEquips(2).length;
+					}
+					if(event.targets.length!=1) return false;
+					if(player.getStorage('fakehuanjia_used').includes(1)) return false;
+					return event.target.getEquips(1).length;
+				},
+				logTarget(event,player){
+					return event.target==player?event.player:event.target;
+				},
+				forced:true,
+				async content(event,trigger,player){
+					player.addTempSkill('fakehuanjia_used');
+					if(trigger.target==player){
+						player.markAuto('fakehuanjia_used',[2]);
+						if(!player.getEquips(2).length&&player.hasEmptySlot(2)){
+							player.addSkill('fakehuanjia_equip2');
+							player.markAuto('fakehuanjia_equip2',[trigger.player]);
+							player.when({global:'phaseAfter',player:['equipEnd','disableEquipEnd','die']})
+							.filter((evt,player)=>{
+								if(evt.name=='phase'||evt.name=='die') return true;
+								if(evt.name=='discardEquip') return !player.hasEmptySlot(2);
+								return get.type(evt.card)=='equip2';
+							})
+							.then(()=>player.removeSkill('fakehuanjia_equip2'));
+							const cards=trigger.player.getEquips(2);
+							if(cards.length){
+								const skills=cards.reduce((list,card)=>{
+									if(get.info(card)&&get.info(card).skills) list.addArray(get.info(card).skills);
+									return list;
+								},[]);
+								if(skills.length) player.addAdditionalSkill('fakehuanjia_equip2',skills);
+							}
+						}
+					}
+					else{
+						player.markAuto('fakehuanjia_used',[1]);
+						if(!player.getEquips(1).length&&player.hasEmptySlot(1)){
+							player.addSkill('fakehuanjia_equip1');
+							player.markAuto('fakehuanjia_equip1',[trigger.target]);
+							player.when({global:'phaseAfter',player:['equipEnd','disableEquipEnd','die']})
+							.filter((evt,player)=>{
+								if(evt.name=='phase'||evt.name=='die') return true;
+								if(evt.name=='discardEquip') return !player.hasEmptySlot(1);
+								return get.type(evt.card)=='equip1';
+							})
+							.then(()=>player.removeSkill('fakehuanjia_equip1'));
+							const cards=trigger.target.getEquips(1);
+							if(cards.length){
+								const skills=cards.reduce((list,card)=>{
+									if(get.info(card)&&get.info(card).skills) list.addArray(get.info(card).skills);
+									return list;
+								},[]);
+								if(skills.length) player.addAdditionalSkill('fakehuanjia_equip1',skills);
+							}
+						}
+					}
+				},
+				subSkill:{
+					used:{
+						charlotte:true,
+						onremove:true,
+					},
+					equip1:{
+						charlotte:true,
+						onremove:true,
+						mark:true,
+						marktext:'攻',
+						mod:{
+							attackRange(player,num){
+								const targets=player.getStorage('fakehuanjia_equip1').filter(i=>i.isIn());
+								return num+targets.reduce((sum,target)=>{
+									return sum+target.getEquipRange();
+								},0);
+							},
+						},
+						intro:{content:'视为装备$的武器'},
+						trigger:{global:['loseAfter','equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter','die']},
+						filter(event,player){
+							return game.hasPlayer(target=>{
+								if(!player.getStorage('fakehuanjia_equip1').includes(target)) return false;
+								if(event.name=='die'&&event.player==target) return true;
+								if(event.name=='equip'&&event.player==target) return get.subtype(event.card)=='equip1';
+								const evt=event.getl(target);
+								return evt&&evt.player==target&&evt.es&&evt.es.some(i=>get.subtype(i)=='equip1');
+							});
+						},
+						forced:true,
+						popup:false,
+						content(){
+							const targets=player.getStorage('fakehuanjia_equip1').filter(i=>i.isIn());
+							const skills=targets.reduce((list,target)=>{
+								const cards=target.getEquips(1);
+								if(cards.length){
+									const skills=cards.reduce((listx,card)=>{
+										if(get.info(card)&&get.info(card).skills) listx.addArray(get.info(card).skills);
+										return listx;
+									},[]);
+									if(skills.length) list.addArray(skills);
+								}
+								return list;
+							},[]);
+							player.addAdditionalSkill('fakehuanjia_equip1',skills);
+						},
+					},
+					equip2:{
+						charlotte:true,
+						onremove:true,
+						mark:true,
+						marktext:'防',
+						intro:{content:'视为装备$的防具'},
+						trigger:{global:['loseAfter','equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter','die']},
+						filter(event,player){
+							return game.hasPlayer(target=>{
+								if(!player.getStorage('fakehuanjia_equip2').includes(target)) return false;
+								if(event.name=='die'&&event.player==target) return true;
+								if(event.name=='equip'&&event.player==target) return get.subtype(event.card)=='equip2';
+								const evt=event.getl(target);
+								return evt&&evt.player==target&&evt.es&&evt.es.some(i=>get.subtype(i)=='equip2');
+							});
+						},
+						forced:true,
+						popup:false,
+						content(){
+							const targets=player.getStorage('fakehuanjia_equip2').filter(i=>i.isIn());
+							const skills=targets.reduce((list,target)=>{
+								const cards=target.getEquips(2);
+								if(cards.length){
+									const skills=cards.reduce((listx,card)=>{
+										if(get.info(card)&&get.info(card).skills) listx.addArray(get.info(card).skills);
+										return listx;
+									},[]);
+									if(skills.length) list.addArray(skills);
+								}
+								return list;
+							},[]);
+							player.addAdditionalSkill('fakehuanjia_equip2',skills);
 						},
 					},
 				},
@@ -16846,6 +17085,12 @@ return event.junling=='junling5'?1:0;});
 			fakejinqu_info:'结束阶段，你可以摸两张牌，然后你将手牌弃置至X张（X为你本回合发动过〖奇制〗的次数）。',
 			fakejuzhan:'拒战',
 			fakejuzhan_info:'转换技。阴：当你成为【杀】的目标后，你可以与使用者各摸X张牌，然后若使用者的武将牌均明置，则你可以暗置其一张武将牌，且其本回合不能明置此武将牌。阳，当你使用【杀】指定目标后，你可以获得目标角色的X张牌，然后若你的武将牌均明置，则其可以暗置此武将牌，且你本回合不能明置此武将牌。（X为使用者已损失的体力值且X至少为1）',
+			fakedanshou:'胆守',
+			fakedanshou_info:'每轮限一次，一名角色的准备阶段，你可以弃置一个区域的所有牌。若如此做，本回合其每个阶段开始时（准备阶段和结束阶段除外），你摸一张牌或令本回合以此法摸牌数+1，然后若你选择了摸牌且你本次至少摸了四张牌，则你可以对其造成1点伤害。',
+			fakexunxi:'迅析',
+			fakexunxi_info:'其他角色于回合外明置武将牌时，你可以视为对其使用一张【杀】（无距离限制）。',
+			fakehuanjia:'擐甲',
+			fakehuanjia_info:'锁定技，每回合每项各限一次。①当你成为【杀】的目标后，本回合你视为装备此牌使用者的防具，直到你的装备区中有防具。②当你使用【杀】指定唯一目标后，本回合你视为装备目标角色的武器，直到你的装备区中有武器。',
 
 			guozhan_default:"国战标准",
 			guozhan_zhen:"君临天下·阵",
