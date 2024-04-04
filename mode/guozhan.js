@@ -44,8 +44,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			for(var i in lib.character){
 				if(lib.character[i][1]=='shen'){
 					if(lib.character[i][4]){
-						var group=lib.character[i][4].find(group=>lib.group.includes(group)||group=='key');
-						if(group) lib.character[i][1]=group;
+						var group=lib.character[i][4].find(group=>lib.group.includes(group)||group=='key'||group.startsWith('gzgroup:'));
+						if(group){
+							if(group.startsWith('gzgroup:')) lib.character[i][1]=group.slice(8);
+							else lib.character[i][1]=group;
+						}
 						else lib.character[i][1]='qun';
 					}
 					else lib.character[i][1]='qun';
@@ -85,7 +88,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					case 'yingbian':
 						lib.card.list=lib.guozhanPile_yingbian.slice(0);
 						delete lib.translate.shuiyanqijunx_info_guozhan;
-						lib.translate.gzwanyi_info='出牌阶段每项各限一次。你可以将一张带有“应变”标签的牌当做【逐近弃远】/【洞烛先机】/【水淹七军】/【出其不意】使用。';
 						break;
 					case 'normal':lib.card.list=lib.guozhanPile.slice(0);break;
 				}
@@ -115,7 +117,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					case 'yingbian':
 						lib.card.list=lib.guozhanPile_yingbian.slice(0);
 						delete lib.translate.shuiyanqijunx_info_guozhan;
-						lib.translate.gzwanyi_info='出牌阶段每项各限一次。你可以将一张带有“应变”标签的牌当做【逐近弃远】/【洞烛先机】/【水淹七军】/【出其不意】使用。'
 						break;
 					default:lib.card.list=lib.guozhanPile.slice(0);break;
 				}
@@ -17168,6 +17169,7 @@ return event.junling=='junling5'?1:0;});
 			gzcaiyuan_info:'锁定技。结束阶段开始时，若你的手牌数大于本回合开始时的手牌数，则你摸两张牌或回复1点体力。',
 			gzwanyi:'婉嫕',
 			gzwanyi_info:'出牌阶段每项各限一次。你可以将一张带有“合纵”标签的牌当做【联军盛宴】/【火烧连营】/【挟天子以令诸侯】/【戮力同心】使用。',
+			gzwanyi_info_yingbian:'出牌阶段每项各限一次。你可以将一张带有“应变”标签的牌当做【逐近弃远】/【洞烛先机】/【水淹七军】/【出其不意】使用。',
 			gzmaihuo:'埋祸',
 			gzmaihuo_info:'限定技。当有己方角色成为【杀】的目标时，你可以取消此【杀】的所有目标。然后此【杀】的使用者下回合开始时，其视为对你使用一张【杀】。若此【杀】对你造成伤害，则你防止此伤害，摸两张牌并移除此武将牌（若此武将牌为副将则改为变更副将）。',
 			gzzhenxi:'震袭',
