@@ -144,8 +144,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					for(var i in lib.character){
 						if(lib.character[i][1]=='shen'){
 							if(lib.character[i][4]){
-								var group=lib.character[i][4].find(group=>lib.group.includes(group)||group=='key');
-								if(group) lib.character[i][1]=group;
+								var group=lib.character[i][4].find(group=>lib.group.includes(group)||group=='key'||group.startsWith('gzgroup:'));
+								if(group){
+									if(group.startsWith('gzgroup:')) lib.character[i][1]=group.slice(8);
+									else lib.character[i][1]=group;
+								}
 								else lib.character[i][1]='qun';
 							}
 							else lib.character[i][1]='qun';
@@ -600,7 +603,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_gaoshun:['male','qun',4,['fakexunxi','fakehuanjia']],
 				gz_jin_jiachong:['male','jin',3,['fakexiongshu','fakejianhui']],
 				gz_jin_yanghu:['male','jin',4,['fakechongxin','fakeweirong']],
-			}
+			},
 		},
 		skill:{
 			//官盗2023
