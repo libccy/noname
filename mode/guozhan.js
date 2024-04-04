@@ -2045,6 +2045,75 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			fakezhufu:{
+				audio:'spwuku',
+				enable:'phaseUse',
+				filter(event,player){
+					return player.hasCard(card=>{
+						return get.info('fakezhufu').filterCard(card,player);
+					},'he');
+				},
+				filterCard(card,player){
+					return lib.filter.cardDiscardable(card,player)&&!player.getStorage('fakezhufu_effect').includes(get.suit(card));
+				},
+				position:'he',
+				check(card){
+					const player=get.event('player');
+					if(player.hasUseTarget(card,true,true)) return 0;
+					return 5+3*Math.random()-get.value(card);
+				},
+				async content(event,trigger,player){
+					const suit=get.suit(event.cards[0],player);
+					player.addTempSkill('fakezhufu_effect','phaseUseAfter');
+					player.markAuto('fakezhufu_effect',[[suit,false]]);
+				},
+				ai:{
+					order:7,
+					result:{player:1},
+				},
+				subSkill:{
+					effect:{
+						charlotte:true,
+						onremove:true,
+						intro:{
+							content(storage){
+								const suitStorage=storage.slice().sort((a,b)=>lib.suit.indexOf(a[0])-lib.suit.indexOf(b[0]));
+								const suits=suitStorage.reduce((str,list)=>str+get.translation(list[0]),'');
+								const usedSuits=suitStorage.filter(list=>list[1]).reduce((str,list)=>str+get.translation(list[0]),'');
+								let str='';
+								str+='<li>已弃置过的花色：';
+								str+=suits;
+								if(used.length){
+									str+='<br><li>已触发过的花色：';
+									str+=usedSuits;
+								}
+								return str;
+							},
+						},
+						audio:'spwuku',
+						trigger:{player:'yingbian'},
+						filter(event,player){
+							return player.getStorage('fakezhufu_effect').some(list=>!list[1]);
+						},
+						forced:true,
+						content(){
+							if(!Array.isArray(trigger.temporaryYingbian)) trigger.temporaryYingbian=[];
+							trigger.forceYingbian=true
+							trigger.temporaryYingbian.addArray(player.getStorage('fakezhufu_effect').filter(list=>{
+								return !list[1];
+							}).map(list=>{
+								return get.info('fakezhufu').YingBianMap[list[0]];
+							}));
+						},
+					},
+				},
+				YingBianMap:{
+					'heart':'yingbian_zhuzhan',
+					'diamond':'yingbian_fujia',
+					'spade':'yingbian_canqu',
+					'club':'yingbian_kongchao',
+				},
+			},
 			fakeguishu:{
 				inherit:'hmkguishu',
 				usable:1,
@@ -2068,6 +2137,263 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(num>1) return 0.5;
 								return 'zeroplayertarget';
 							}
+						},
+					},
+				},
+			},
+			fakemibei:{
+				audio:'mibei',
+				trigger:{player:'phaseZhunbeiBegin'},
+				filter(event,player){
+					return !player.isMaxHandcard();
+				},
+				forced:true,
+				locked:false,
+				async cost(event,trigger,player){
+					const filterTarget=(card,player,target)=>{
+						return target!=player&&target.isMaxHandcard();
+					},targetx=game.filterPlayer(current=>filterTarget(null,player,current));
+					if(targetx.length==1) event.result={bool:true,targets:targetx};
+					else event.result=await player.chooseTarget(filterTarget,true)
+					.set('prompt2',lib.translate.fakemibei_info)
+					.set('prompt','请选择【秘备】的目标').set('ai',target=>{
+						const player=get.event('player');
+						return get.attitude(player,target);
+					}).forResult();
+				},
+				async content(event,trigger,player){
+					const target=event.targets[0];
+					const {result:{junling,targets}}=await target.chooseJunlingFor(player);
+					const {result:{index}}=await player.chooseJunlingControl(target,junling,targets).set('prompt','秘备：是否执行军令？');
+					if(index==0) await player.carryOutJunling(target,junling,targets);
+				},
+				group:'fakemibei_junling',
+				subSkill:{
+					junling:{
+						audio:'mibei',
+						trigger:{player:['carryOutJunlingEnd','chooseJunlingControlEnd']},
+						filter(event,player){
+							if(event.name=='carryOutJunling'){
+								return event.source.countCards('h')>player.countCards('h');
+							}
+							return event.index==1&&player.countCards('h');
+						},
+						forced:true,
+						locked:false,
+						async content(event,trigger,player){
+							if(trigger.name=='carryOutJunling'){
+								const num=Math.min(5,trigger.source.countCards('h')-player.countCards('h'));
+								await player.draw(num);
+							}
+							else{
+								const {result:{bool,cards}}=await player.chooseCard('秘备：展示一至三张手牌，本回合你可以将其中一张牌当作另一张基本牌或普通锦囊牌使用一次',[1,3],true).set('ai',card=>{
+									const player=get.event('player'),goon=_status.currentPhase==player;
+									if(goon) return player.getUseValue(card)/get.value(card);
+									return get.value(card);
+								});
+								if(bool){
+									await player.showCards(cards,get.translation(player)+'发动了【秘备】');
+									player.addGaintag(cards,'fakemibei_effect');
+									player.addTempSkill('fakemibei_effect');
+								}
+							}
+						},
+					},
+					effect:{
+						charlotte:true,
+						onremove(player){
+							player.removeGaintag('fakemibei_effect');
+						},
+						hiddenCard(player,name){
+							const cards=player.getCards('h',card=>card.hasGaintag('fakemibei_effect'));
+							if(cards.length<2) return false;
+							const type=get.type(name);
+							if(type!='basic'&&type!='trick') return false;
+							return cards.slice().map(i=>i.name).includes(name);
+						},
+						audio:'mibei',
+						enable:'phaseUse',
+						chooseButton:{
+							dialog(event,player){
+								const list=player.getCards('h',card=>{
+									const type=get.type(card);
+									if(type!='basic'&&type!='trick') return false;
+									return card.hasGaintag('fakemibei_effect');
+								}).sort((a,b)=>{
+									return lib.inpile.indexOf(a.name)+get.natureList(a,false).reduce((sum,nature)=>{
+										return sum+lib.inpile_nature.indexOf(nature);
+									},0)-lib.inpile.indexOf(b.name)-get.natureList(b,false).reduce((sum,nature)=>{
+										return sum+lib.inpile_nature.indexOf(nature);
+									},0);
+								}).slice().map(card=>[get.translation(type),'',card[2],card[3]]);
+								return ui.create.dialog('秘备',[list,'vcard']);
+							},
+							filter(button,player){
+								return get.event().getParent().filterCard({name:button.link[2],nature:button.link[3]},player,event);
+							},
+							check(button){
+								const player=get.event('player');
+								const card={name:button.link[2],nature:button.link[3]};
+								if(player.countCards('hes',cardx=>cardx.name==card.name)) return 0;
+								return player.getUseValue(card);
+							},
+							backup(links,player){
+								return {
+									audio:'chengshang',
+									filterCard(card,player){
+										const cardx=get.info('fakemibei_effect_backup').viewAs;
+										if(cardx.name==card.name&&cardx.nature==card.nature) return false;
+										return card.hasGaintag('fakemibei_effect');
+									},
+									position:'h',
+									popname:true,
+									precontent(){
+										player.logSkill('fakemibei_effect');
+										delete event.result.skill;
+										player.tempBanSkill('fakemibei_effect',null,false);
+									},
+									viewAs:{
+										name:links[0][2],
+										nature:links[0][3],
+									},
+								}
+							},
+							prompt(links,player){
+								return '将一张“秘备”牌当作'+(get.translation(links[0][3])||'')+get.translation(links[0][2])+'使用';
+							},
+						},
+					},
+				},
+			},
+			fakeqizhi:{
+				audio:'qizhi',
+				inherit:'qizhi',
+				trigger:{player:'useCard'},
+				filter(event,player){
+					if(!event.targets||!event.targets.length) return false;
+					if(_status.currentPhase!=player) return false;
+					if(get.type(event.card)=='equip') return false;
+					return game.hasPlayer(target=>!event.targets.includes(target)&&target.countCards('he')>0);
+				},
+				direct:false,
+				async cost(event,trigger,player){
+					event.result=await player.chooseTarget(get.prompt2('fakeqizhi'),(card,player,target)=>{
+						return !get.event().getTrigger().targets.includes(target)&&target.countCards('he')>0;
+					}).set('ai',target=>{
+						const player=get.event('player');
+						if(target==player) return 2;
+						if(get.attitude(player,target)<=0) return 1;
+						return 0.5;
+					}).forResult();
+				},
+				async content(event,trigger,player){
+					const target=event.targets[0];
+					const {result:{bool,cards}}=await player.discardPlayerCard(target,'he',true);
+					if(get.is.yingbianConditional(trigger.card)&&bool){
+						if(cards.some(i=>get.suit(i,target)==get.suit(trigger.card))){
+							player.when('yingbian')
+							.filter(evt=>evt.card==trigger.card)
+							.then(()=>trigger.forceYingbian=true);
+						}
+					}
+				},
+			},
+			fakejinqu:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				check(event,player){
+					return player.getHistory('useSkill',evt=>{
+						return evt.skill=='fakeqizhi';
+					}).length>=player.countCards('h');
+				},
+				prompt2(event,player){
+					const num=player.getHistory('useSkill',evt=>evt.skill=='fakeqizhi').length;
+					return '摸两张牌，然后将手牌弃置至'+get.cnNumber(num)+'张';
+				},
+				content(){
+					'step 0'
+					player.draw(2);
+					'step 1'
+					var dh=player.countCards('h')-player.getHistory('useSkill',evt=>{
+						return evt.skill=='fakeqizhi';
+					}).length;
+					if(dh>0) player.chooseToDiscard(dh,true);
+				},
+				ai:{combo:'fakeqizhi'},
+			},
+			fakejuzhan:{
+				zhuanhuanji:true,
+				locked:false,
+				marktext:'☯',
+				intro:{
+					content(storage){
+						if(storage) return '当你使用【杀】指定目标后，你可以获得其X张牌，然后若你的武将牌均明置，则其可以暗置此武将牌，且你本回合不能明置此武将牌（X为你已损失的体力值且至少为1）';
+						return '当你成为【杀】的目标后，你可以与其各摸X张牌，然后其武将牌均明置，则你可以暗置其一张武将牌，且其本回合不能明置此武将牌（X为其已损失的体力值且至少为1）';
+					},
+				},
+				audio:'nzry_juzhan_1',
+				trigger:{
+					player:'useCardToPlayered',
+					target:'useCardToTargeted',
+				},
+				filter(event,player){
+					const storage=player.storage.fakejuzhan;
+					if((event.player==player)!=Boolean(storage)) return false;
+					if(storage&&!event.target.countCards('he')) return false;
+					return true;
+				},
+				logTarget(event,player){
+					const storage=player.storage.fakejuzhan;
+					return event[Boolean(storage)?'target':'player'];
+				},
+				async content(event,trigger,player){
+					const storage=player.storage.fakejuzhan;
+					player.changeZhuanhuanji('fakejuzhan');
+					const target=trigger[Boolean(storage)?'target':'player'];
+					const num=Math.max(target.getDamagedHp(),1);
+					if(!storage){
+						await player.draw(num,'nodelay');
+						await target.draw(num);
+						if(!target.isUnseen(2)){
+							const {result:{bool,links}}=await player.chooseButton([
+								'拒战：是否暗置'+get.translation(target)+'的一张武将牌？',
+								'<div class="text center">'+get.translation(target)+'的武将牌</div>',
+								[[target.name1,target.name2],'character'],
+							]).set('filterButton',button=>!get.is.jun(button.link));
+							if(bool){
+								await target.hideCharacter(target.name1==links[0]?0:1);
+								target.addTempSkill('donggui2');
+							}
+						}
+					}
+					else{
+						await player.gainPlayerCard(target,num,'he',true);
+						const names=[player.name1,player.name2].filter(i=>{
+							return get.character(i,3).includes('fakejuzhan');
+						});
+						if(!player.isUnseen(2)&&names.length){
+							const {result:{bool,links}}=await target.chooseBool('拒战：是否暗置'+get.translation(player)+'的'+(names.includes(player.name1)?'主将':'')+(names.length>1?'和':'')+(names.includes(player.name2)?'副将':'')+'?');
+							if(bool){
+								if(names.includes(player.name1)) await player.hideCharacter(0);
+								if(names.includes(player.name2)) await player.hideCharacter(1);
+								player.addTempSkill('donggui2');
+							}
+						}
+					}
+				},
+				group:'fakejuzhan_mark',
+				subSkill:{
+					mark:{
+						charlotte:true,
+						trigger:{player:['hideCharacterEnd','showCharacterEnd']},
+						filter(event,player){
+							return get.character(event[event.name=='hideCharacter'?'toHide':'toShow'],3).includes('fakejuzhan');
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content(){
+							player[(trigger.name=='hideCharacter'?'un':'')+'markSkill']('fakejuzhan');
 						},
 					},
 				},
@@ -15819,6 +16145,16 @@ return event.junling=='junling5'?1:0;});
 			gzshiyong:function(player){
 				return player.awakenedSkills.includes('gzyaowu')?lib.translate.gzshiyongx_info:lib.translate.gzshiyong_info;
 			},
+			fakejuzhan(player){
+				let str='转换技。',storage=player.storage.fakejuzhan;
+				if(!storage) str+='<span class="bluetext">';
+				str+='阴：当你成为【杀】的目标后，你可以与使用者各摸X张牌，然后若使用者的武将牌均明置，则你可以暗置其一张武将牌，且其本回合不能明置此武将牌。';
+				if(!storage) str+='</span>';
+				if(storage) str+='<span class="bluetext">';
+				str+='阳，当你使用【杀】指定目标后，你可以获得目标角色的X张牌，然后若你的武将牌均明置，则其可以暗置此武将牌，且你本回合不能明置此武将牌。';
+				if(storage) str+='</span>';
+				return str+'（X为使用者已损失的体力值且X至少为1）';
+			},
 		},
 		translate:{
 			ye:'野',
@@ -16496,10 +16832,20 @@ return event.junling=='junling5'?1:0;});
 			fakeshuliang_info:'友方角色的结束阶段，若你与其的距离不大于你武将牌上的“粮”数，则你可以移去一张“粮”，然后令其摸两张牌。',
 			fakedujin:'独进',
 			fakedujin_info:'①摸牌阶段，你可以额外摸X张牌（X为你装备区的牌数的一半，向上取整）。②当你首次明置此武将牌时，若你为你们势力第一个明置武将牌的角色，则你获得1个“先驱”标记。',
+			fakezhufu:'注傅',
+			fakezhufu_info:'出牌阶段，你可以弃置一张本阶段未以此法弃置过的花色的牌，然后根据此牌的花色为你使用的下一张牌添加对应的应变效果（无视条件触发）：红桃——助战；方片——富甲；黑桃——残躯；草花——空巢。',
 			fakeguishu:'鬼术',
 			fakeguishu_info:'出牌阶段限一次，你可以将一张黑桃手牌当作【知己知彼】或【远交近攻】使用。若你本局游戏内已经发动过了〖鬼术〗，则你必须选择与上次不同的选项。',
 			fakeyuanyu:'远域',
 			fakeyuanyu_info:'锁定技，当你受到伤害时，若你不在伤害来源的攻击范围内，则防止此伤害。',
+			fakemibei:'秘备',
+			fakemibei_info:'①准备阶段，若你的手牌数不为全场最多，则你须选择一名手牌数为全场最多的角色，令其对你发起军令。②当你执行军令后，你将手牌数摸至与发起者相同（至多摸五张）。③当你拒绝执行军令后，你展示一至三张牌，然后你本回合可以将其中一张牌当作另一张基本牌或非延时锦囊牌使用一次。',
+			fakeqizhi:'奇制',
+			fakeqizhi_info:'当你于回合内使用非装备牌A时，你可以弃置不是此牌目标的一名角色的一张牌B，然后其摸一张牌。若A具有应变效果，且A和B的花色相同，则你无视条件触发A的应变效果。',
+			fakejinqu:'进趋',
+			fakejinqu_info:'结束阶段，你可以摸两张牌，然后你将手牌弃置至X张（X为你本回合发动过〖奇制〗的次数）。',
+			fakejuzhan:'拒战',
+			fakejuzhan_info:'转换技。阴：当你成为【杀】的目标后，你可以与使用者各摸X张牌，然后若使用者的武将牌均明置，则你可以暗置其一张武将牌，且其本回合不能明置此武将牌。阳，当你使用【杀】指定目标后，你可以获得目标角色的X张牌，然后若你的武将牌均明置，则其可以暗置此武将牌，且你本回合不能明置此武将牌。（X为使用者已损失的体力值且X至少为1）',
 
 			guozhan_default:"国战标准",
 			guozhan_zhen:"君临天下·阵",
