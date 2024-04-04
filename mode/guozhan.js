@@ -406,7 +406,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				gz_zhonghui:['male','ye',4,['fakequanji','fakepaiyi'],['gzskin']],
 				gz_simazhao:['male','ye',3,['gzzhaoxin','gzsuzhi'],['gzskin']],
-				gz_gongsunyuan:['male','ye',4,['fakehuaiyi','fakezisui'],['gzskin']],
+				gz_gongsunyuan:['male','ye',4,['gzrehuaiyi','gzrezisui'],['gzskin']],
 				gz_sunchen:['male','ye',4,['fakeshilu','fakexiongnve']],
 				gz_tangzi:['male','wu',4,['gzxingzhao'],['doublegroup:wei:wu','gzskin']],
 				gz_mengda:['male','wei',4,['qiuan','liangfan'],['doublegroup:wei:shu']],
