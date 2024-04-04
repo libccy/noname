@@ -623,12 +623,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						if(effect<=0&&!cards.length) return 0;
 						if(ui.selected.cards.length>cards.length-(effect<=0?1:0)) return 0;
 						return 1/(get.value(card)||0.5);
-					}).set('logSkill',['fakexiaoguo',trigger.player]).setHiddenSkill('fakexiaoguo');
+					}).set('logSkill',['fakexiaoguo',trigger.player]).setHiddenSkill('fakexiaoguo').forResult();
 				},
 				preHidden:true,
 				async content(event,trigger,player){
 					const num=trigger.player.countCards('e'),num2=event.cards.length;
-					const {result:{bool,cards}}=await player.chooseToDiscard(trigger.player,'e',num2,true);
+					await player.chooseToDiscard(trigger.player,'e',num2,true);
 					if(num2>num) trigger.player.damage();
 				},
 			},
@@ -17839,7 +17839,7 @@ return event.junling=='junling5'?1:0;});
 			content:{
 				hideCharacter:function(){
 					game.addVideo('hideCharacter',player,num);
-					var skills;
+					var skills,log=event.log;
 					switch(num){
 						case 0:
 						if(log!==false) game.log(player,'暗置了主将'+get.translation(player.name1));
@@ -18347,6 +18347,8 @@ return event.junling=='junling5'?1:0;});
 					var next=game.createEvent('hideCharacter');
 					next.player=this;
 					next.toHide=name;
+					next.num=num;
+					next.log=log;
 					next.setContent('hideCharacter');
 					return next;
 				},
