@@ -1755,6 +1755,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(!phsu||phsu.player!=player) return false;
 					return event.targets.some(i=>i.isEnemyOf(player));
 				},
+				usable:1,
 				preHidden:true,
 				async content(event,trigger,player){
 					await player.draw();
@@ -17301,6 +17302,8 @@ return event.junling=='junling5'?1:0;});
 			fakejujian_info:'副将技。①此武将牌计算体力上限时减少半个阴阳鱼。②结束阶段，你可以弃置一张非基本牌并选择一名友方角色，令其选择摸两张牌或回复1点体力，然后其可以变更副将。',
 			fakexibing:'息兵',
 			fakexibing_info:'当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至体力值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。',
+			fakechengshang:'承赏',
+			fakechengshang_info:'出牌阶段限一次，当你使用存在花色和点数且指定了其他势力角色为目标的牌结算完毕后，若你未因此牌造成过伤害，则你可以摸一张牌，然后本阶段你可以将一张手牌当作初始游戏牌堆中与此牌花色和点数相同的另一张基本牌或普通锦囊牌使用一次。',
 			fakezhente:'贞特',
 			fakezhente_info:'每回合限一次，当你成为其他角色使用普通锦囊牌或黑色基本牌的目标后，你可令使用者选择一项：1.本回合不能再使用与此牌颜色相同的牌；2.令此牌对你无效。',
 			fakezhiwei:'至微',
@@ -17345,6 +17348,7 @@ return event.junling=='junling5'?1:0;});
 			gz_xin_zhuran:'朱然',
 			gz_jin_jiachong:'贾充',
 			gz_jin_yanghu:'羊祜',
+			gz_wangling:'王淩',
 
 			guozhan_default:"国战标准",
 			guozhan_zhen:"君临天下·阵",
