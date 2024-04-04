@@ -3201,7 +3201,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				subSkill:{
 					draw:{
-						audio:'fakeqimei',
+						audio:'qimei',
 						charlotte:true,
 						forced:true,
 						popup:false,
@@ -3243,7 +3243,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						intro:{content:'已和$组成齐眉组合'},
 					},
 					hp:{
-						audio:'fakeqimei',
+						audio:'qimei',
 						trigger:{global:'changeHp'},
 						charlotte:true,
 						forced:true,
