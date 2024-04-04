@@ -571,14 +571,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_zhangxiu:['male','qun',4,['gzfudi','gzcongjian'],['gzskin']],
 				gz_jun_caocao:['male','wei',4,['jianan','huibian','gzzongyu','wuziliangjiangdao'],[]],
 
-				gz_jin_zhangchunhua:['female','jin',3,['gzhuishi','gzqingleng']],
+				gz_jin_zhangchunhua:['female','jin',3,['gzhuishi','fakeqingleng']],
 				gz_jin_simayi:['male','jin',3,['fakequanbian','smyyingshi','fakezhouting']],
 				gz_jin_wangyuanji:['female','jin',3,['yanxi']],
 				gz_jin_simazhao:['male','jin',3,['zhaoran','gzchoufa']],
 				gz_jin_xiahouhui:['female','jin',3,['jyishi','shiduo']],
 				gz_jin_simashi:['male','jin',5,['gzyimie','gztairan']],
 				gz_duyu:['male','jin',4,['gzsanchen','gzpozhu']],
-				gz_zhanghuyuechen:['male','jin',4,['xijue']],
+				gz_zhanghuyuechen:['male','jin',4,['fakexijue']],
 				gz_jin_yanghuiyu:['female','jin',3,['ciwei','gzcaiyuan']],
 				gz_simazhou:['male','jin',4,['recaiwang','naxiang']],
 				gz_shibao:['male','jin',4,['gzzhuosheng']],
@@ -586,7 +586,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_zhongyan:['female','jin',3,['gzbolan','yifa']],
 				gz_yangyan:['female','jin',3,['gzxuanbei','xianwan']],
 				gz_zuofen:['female','jin',3,['gzzhaosong','gzlisi']],
-				gz_xuangongzhu:['female','jin',3,['qimei','ybzhuiji']],
+				gz_xuangongzhu:['female','jin',3,['fakeqimei','ybzhuiji']],
 				gz_xinchang:['male','jin',3,['canmou','congjian']],
 				gz_yangzhi:['female','jin',3,['gzwanyi','gzmaihuo']],
 
@@ -648,7 +648,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					const num=trigger.player.countCards('e'),num2=event.cards.length;
 					await player.chooseToDiscard(trigger.player,'e',num2,true);
-					if(num2>num) trigger.player.damage();
+					if(num2>num) await trigger.player.damage();
 				},
 			},
 			fakeduanbing:{
@@ -3026,6 +3026,239 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						async content(event,trigger,player){
 							await event.targets[0].changeVice();
+						},
+					},
+				},
+			},
+			fakeqingleng:{
+				audio:'qingleng',
+				trigger:{global:'phaseEnd'},
+				filter(event,player){
+					var target=event.player;
+					return target!=player&&target.isIn()&&!target.isUnseen(2)&&player.countCards('he')&&player.canUse({name:'sha',nature:'ice'},target,false);
+				},
+				direct:true,
+				preHidden:true,
+				async content(event,trigger,player){
+					const target=trigger.player;
+					const {result:{bool}}=await player.chooseToUse()
+					.set('openskilldialog',get.prompt2('fakeqingleng',target))
+					.set('norestore',true).set('_backupevent','fakeqingleng_backup')
+					.set('custom',{
+						add:{},
+						replace:{window:function(){}}
+					}).set('targetRequired',true).set('complexSelect',true)
+					.set('filterTarget',function(card,player,target){
+						if(target!=_status.event.sourcex&&!ui.selected.targets.includes(_status.event.sourcex)) return false;
+						return lib.filter.targetEnabled.apply(this,arguments);
+					}).set('sourcex',target).set('addCount',false)
+					.backup('fakeqingleng_backup').set('logSkill',['fakeqingleng',target]);
+					if(bool&&!player.getHistory('sourceDamage',evt=>{
+						return evt.getParent(4)==event;
+					}).length){
+						const {result:{bool,links}}=await player.chooseButton([
+							'清冷：暗置'+get.translation(target)+'的一张武将牌',
+							'<div class="text center">'+get.translation(target)+'的武将牌</div>',
+							[[target.name1,target.name2],'character'],
+						],true).set('filterButton',button=>!get.is.jun(button.link));
+						if(bool){
+							player.addSkill('fakeqingleng_effect');
+							if(player.getStorage('fakeqingleng_effect').some(list=>list[0]==target)){
+								player.storage.fakeqingleng_effect.indexOf(player.getStorage('fakeqingleng_effect').find(list=>list[0]==target))[1].addArray(links);
+							}
+							else player.markAuto('fakeqingleng_effect',[[target,links[0]]]);
+							target.when(['phaseBegin','die'])
+							.vars({target:player}).then(()=>{
+								const removes=target.getStorage('fakeqingleng_effect').filter(list=>list[0]==player);
+								target.unmarkAuto('fakeqingleng_effect',removes);
+								if(!target.getStorage('fakeqingleng_effect').length){
+									target.removeSkill('fakeqingleng_effect');
+								}
+							});
+							await target.hideCharacter(target.name1==links[0]?0:1);
+						}
+					}
+				},
+				subSkill:{
+					backup:{
+						filterCard:true,
+						check(card){
+							return 7.5-get.value(card);
+						},
+						position:'he',
+						popname:true,
+						viewAs:{name:'sha',nature:'ice'},
+						precontent(){
+							delete event.result.skill;
+						},
+					},
+					effect:{
+						charlotte:true,
+						onremove:true,
+						intro:{
+							content(storage){
+								return '•'+storage.map(list=>{
+									return get.translation(list[0])+'明置'+get.translation(list[1])+'后，对其造成1点伤害';
+								}).join('<br>•');
+							},
+						},
+						audio:'qingleng',
+						trigger:{global:'showCharacterEnd'},
+						filter(event,player){
+							const list=player.getStorage('fakeqingleng_effect').find(list=>list[0]==event.player);
+							return list&&list[1].includes(event.toShow);
+						},
+						forced:true,
+						logTarget:'player',
+						content(){
+							trigger.player.damage();
+						},
+					},
+				},
+			},
+			fakexijue:{
+				audio:'xijue',
+				trigger:{player:'showCharacterEnd'},
+				filter(event,player){
+					return game.getAllGlobalHistory('everything',evt=>{
+						return evt.name=='showCharacter'&&evt.toShow.some(i=>get.character(i,3).includes('fakexijue'));
+					},event).indexOf(event)==0;
+				},
+				forced:true,
+				popup:false,
+				preHidden:['xijue_tuxi','fakexijue_xiaoguo'],
+				content(){
+					player.addMark('xijue',2);
+				},
+				derivation:['xijue_tuxi','fakexijue_xiaoguo'],
+				group:['fakexijue_effect','xijue_tuxi','fakexijue_xiaoguo'],
+				subSkill:{
+					effect:{
+						audio:'xijue',
+						trigger:{player:['phaseDrawBegin2','phaseEnd']},
+						filter(event,player){
+							if(event.name=='phaseDraw') return !event.numFixed;
+							return player.getHistory('sourceDamage').length;
+						},
+						forced:true,
+						popup:false,
+						content(){
+							if(trigger.name=='phaseDraw') trigger.num=Math.min(player.countMark('xijue'),player.maxHp);
+							else player.addMark('xijue',1);
+						},
+					},
+					xiaoguo:{
+						audio:'xijue_xiaoguo',
+						trigger:{global:'phaseZhunbeiBegin'},
+						filter(event,player){
+							if(!player.hasMark('xijue')) return false;
+							return event.player!=player&&player.countCards('h',card=>{
+								if(_status.connectMode) return true;
+								return get.type(card)=='basic'&&lib.filter.cardDiscardable(card,player);
+							});
+						},
+						async cost(event,trigger,player){
+							event.result=await player.chooseToDiscard(get.prompt('fakexijue_xiaoguo',trigger.player),(card,player)=>{
+								return get.type(card)=='basic';
+							},[1,Math.min(player.countMark('xijue'),player.maxHp)]).set('complexSelect',true).set('ai',card=>{
+								const player=get.event('player'),target=get.event().getTrigger().player;
+								const effect=get.damageEffect(target,player,player);
+								const cards=target.getCards('e',card=>get.attitude(player,target)*get.value(card,target)<0);
+								if(effect<=0&&!cards.length) return 0;
+								if(ui.selected.cards.length>cards.length-(effect<=0?1:0)) return 0;
+								return 1/(get.value(card)||0.5);
+							}).set('logSkill',['fakexiaoguo',trigger.player]).setHiddenSkill('fakexijue_xiaoguo').forResult();
+						},
+						preHidden:true,
+						async content(event,trigger,player){
+							const num=trigger.player.countCards('e'),num2=event.cards.length;
+							await player.chooseToDiscard(trigger.player,'e',num2,true);
+							if(num2>num) await trigger.player.damage();
+							player.removeMark('xijue',1);
+						},
+					},
+				},
+			},
+			fakeqimei:{
+				audio:'qimei',
+				trigger:{player:'phaseZhunbeiBegin'},
+				direct:true,
+				preHidden:true,
+				content(){
+					'step 0'
+					player.chooseTarget(get.prompt('fakeqimei'),'选择一名其他角色并获得“齐眉”效果',lib.filter.notMe).set('ai',target=>{
+						var player=_status.event.player;
+						return get.attitude(player,target)/(Math.abs(player.countCards('h')+2-target.countCards('h'))+1)
+					}).setHiddenSkill('fakeqimei');
+					'step 1'
+					if(result.bool){
+						var target=result.targets[0];
+						player.logSkill('fakeqimei',target);
+						player.addTempSkill('fakeqimei_draw');
+						player.storage.fakeqimei_draw=target;
+						game.delayx();
+					}
+				},
+				subSkill:{
+					draw:{
+						audio:'fakeqimei',
+						charlotte:true,
+						forced:true,
+						popup:false,
+						trigger:{global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','loseAfter','addToExpansionAfter']},
+						filter(event,player){
+							var target=player.storage.fakeqimei_draw;
+							if(!target||!target.isIn()) return false;
+							if(player.countCards('h')!=target.countCards('h')) return false;
+							var hasChange=function(event,player){
+								var gain=0,lose=0;
+								if(event.getg) gain=event.getg(player).length;
+								if(event.getl) lose=event.getl(player).hs.length;
+								return gain!=lose;
+							};
+							return (hasChange(event,player)&&target.isDamaged())||(hasChange(event,target)&&player.isDamaged());
+						},
+						content(){
+							'step 0'
+							if(trigger.delay===false) game.delayx();
+							'step 1'
+							var target=player.storage.fakeqimei_draw;
+							player.logSkill('fakeqimei_draw',target);
+							var drawer=[];
+							var hasChange=function(event,player){
+								var gain=0,lose=0;
+								if(event.getg) gain=event.getg(player).length;
+								if(event.getl) lose=event.getl(player).hs.length;
+								return gain!=lose;
+							};
+							if(hasChange(trigger,player)) drawer.push(target);
+							if(hasChange(trigger,target)) drawer.push(player);
+							for(const i of drawers){
+								if(i.isDamaged()) i.recover();
+							}
+						},
+						group:'fakeqimei_hp',
+						onremove:true,
+						mark:'character',
+						intro:{content:'已和$组成齐眉组合'},
+					},
+					hp:{
+						audio:'fakeqimei',
+						trigger:{global:'changeHp'},
+						charlotte:true,
+						forced:true,
+						logTarget(event,player){
+							return player.storage.fakeqimei_draw;
+						},
+						filter(event,player){
+							var target=player.storage.fakeqimei_draw;
+							if(!target||!target.isIn()) return false;
+							if(player!=event.player&&target!=event.player) return false;
+							return player.hp==target.hp;
+						},
+						content(){
+							game.delayx();
+							(player==trigger.player?player.storage.fakeqimei_draw:player).draw();
 						},
 					},
 				},
@@ -17299,7 +17532,7 @@ return event.junling=='junling5'?1:0;});
 			gzhuishi:'慧识',
 			gzhuishi_info:'摸牌阶段，你可以放弃摸牌，改为观看牌堆顶的X张牌，获得其中的一半（向下取整），然后将其余牌置入牌堆底。（X为弃牌堆顶的两张牌的名称字数之和）',
 			gzqingleng:'清冷',
-			gzqingleng_info:'一名角色的回合结束时，若其有未明置的，则你可将一张牌当无距离限制的冰属性【杀】对其使用；若其所有武将牌均未明置，则你摸一张牌。',
+			gzqingleng_info:'一名角色的回合结束时，若其有未明置的武将牌，则你可将一张牌当无距离限制的冰属性【杀】对其使用；若其所有武将牌均未明置，则你摸一张牌。',
 			gzchoufa:'筹伐',
 			gzchoufa_info:'出牌阶段限一次，你可展示一名其他角色的一张手牌A。你令其所有类型与A不同的手牌的牌名均视为【杀】且均视为无属性直到本回合结束。',
 			gzbolan:'博览',
@@ -17509,6 +17742,14 @@ return event.junling=='junling5'?1:0;});
 			fakequanbian_info:'当你于回合内使用或打出牌时，你可以将一张手牌与牌堆顶X张牌的其中一张进行交换（X为你的体力上限）。',
 			fakezhouting:'骤霆',
 			fakezhouting_info:'限定技，出牌阶段，你可以依次使用牌堆顶X张牌中所有可以使用的牌，然后获得其中不能使用的牌，然后若有角色因此死亡，则你重置〖骤霆〗（X为你的体力上限）。',
+			fakeqingleng:'清冷',
+			fakeqingleng_info:'其他角色的结束阶段，若其武将牌均明置，则你可以将一张牌当作冰【杀】对其使用（无距离限制）。然后若此牌未对其造成伤害，则你暗置其一张武将牌，且直到其下个回合开始，其明置此武将牌时，你对其造成1点伤害。',
+			fakexijue:'袭爵',
+			fakexijue_info:'①当你首次明置此武将牌时，你获得2枚“爵”标记。②回合结束时，若你本回合造成过伤害，则你获得1枚“爵”标记。③你可以于合适的时机发动〖突袭〗或〖骁果〗（至多弃置X张基本牌），然后移去1枚“爵”标记。④摸牌阶段，你改为摸X张牌。（X为你的“爵”标记数，且X至多为你的体力上限）',
+			fakexijue_xiaoguo:'骁果',
+			fakexijue_xiaoguo_info:'一名其他角色的准备阶段，你可以弃置至多X张基本牌（X为你的“爵”标记数，且X至多为你的体力上限），然后弃置其装备区等量的牌，若其装备区的牌数小于你弃置的牌数，则你对其造成1点伤害。',
+			fakeqimei:'齐眉',
+			fakeqimei_info:'准备阶段，你可以选择一名其他角色。若如此做，直到回合结束：当你或其获得牌/失去手牌后，若你与其手牌数相等，则另一名角色回复1点体力；当你或其的体力值变化后，若你与其体力值相等，则另一名角色摸一张牌。',
 
 			guozhan_default:"国战标准",
 			guozhan_zhen:"君临天下·阵",
