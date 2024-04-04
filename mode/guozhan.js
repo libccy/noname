@@ -308,6 +308,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_re_yuanshao','gz_yuanshu','gz_hetaihou',
 				'gz_jin_simashi','gz_sp_duyu','gz_shibao',
 				'gz_gongsunyuan','gz_panjun','gz_re_nanhualaoxian',
+				'gz_wangji','gz_xin_zhuran','gz_jin_jiachong',
+				'gz_jin_yanghu',
 			],
 			'6':[
 				'gz_zhenji','gz_guojia','gz_yujin',
@@ -318,6 +320,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_liuba','gz_zhouyi','gz_re_xunchen',
 				'gz_fuwan','gz_zhugejin','gz_yangxiu',
 				'gz_yangyan','gz_tw_tianyu','gz_yangwan',
+				'gz_wangling',
 			],
 			'5':[
 				'gz_zhangliao','gz_caocao','gz_xuhuang',
@@ -327,12 +330,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_zhanghuyuechen','gz_re_xushu','gz_mifangfushiren',
 				'gz_huangzu','gz_weiguan','gz_miheng',
 				'gz_wenqin','gz_zumao','gz_xuangongzhu',
-				'gz_tw_xiahoushang'
+				'gz_tw_xiahoushang',
 			],
 			'4':[
 				'gz_dianwei','gz_dengai','gz_xunyu',
 				'gz_madai','gz_liubei','gz_mifuren',
-				'gz_wuguotai','gz_luxun','gz_taishici',
+				'gz_wuguotai','gz_luxun','gz_re_taishici',
 				'gz_zhangjiao','gz_pangde','gz_liuqi',
 				'gz_jin_zhangchunhua','gz_zongyu','gz_shixie',
 				'gz_jin_yanghuiyu','gz_tangzi','gz_yanbaihu',
@@ -346,7 +349,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_zhangzhang','gz_lvmeng','gz_huanggai',
 				'gz_jiling','gz_lvbu','gz_dongzhuo',
 				'gz_jin_xiahouhui','gz_simazhou','gz_zhanglu',
-				'gz_chendao','gz_yangzhi','gz_old_huaxiong'
+				'gz_chendao','gz_yangzhi','gz_old_huaxiong',
+				'gz_gaoshun',
 			],
 			'2':[
 				'gz_cuimao','gz_xiahouyuan','gz_caohong',
@@ -360,12 +364,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_menghuo','gz_ganfuren','gz_guanyu',
 				'gz_lukang','gz_jiangqing','gz_chendong',
 				'gz_zoushi','gz_panfeng','gz_tianfeng',
-				'gz_sufei',
+				'gz_sufei','gz_yanyan',
 			],
 		},
 		characterSort:{
 			mode_guozhan:{
-				guozhan_default:["gz_caocao","gz_simayi","gz_xiahoudun","gz_zhangliao","gz_xuzhu","gz_guojia","gz_zhenji","gz_xiahouyuan","gz_zhanghe","gz_xuhuang","gz_caoren","gz_dianwei","gz_xunyu","gz_caopi","gz_yuejin","gz_liubei","gz_guanyu","gz_zhangfei","gz_zhugeliang","gz_zhaoyun","gz_machao","gz_huangyueying","gz_huangzhong","gz_weiyan","gz_pangtong","gz_sp_zhugeliang","gz_liushan","gz_menghuo","gz_zhurong","gz_ganfuren","gz_sunquan","gz_ganning","gz_lvmeng","gz_huanggai","gz_zhouyu","gz_daqiao","gz_luxun","gz_sunshangxiang","gz_sunjian","gz_xiaoqiao","gz_taishici","gz_zhoutai","gz_re_lusu","gz_zhangzhang","gz_dingfeng","gz_huatuo","gz_lvbu","gz_diaochan","gz_re_yuanshao","gz_yanwen","gz_jiaxu","gz_pangde","gz_zhangjiao","gz_caiwenji","gz_mateng","gz_kongrong","gz_jiling","gz_tianfeng","gz_panfeng","gz_zoushi",],
+				guozhan_default:["gz_caocao","gz_simayi","gz_xiahoudun","gz_zhangliao","gz_xuzhu","gz_guojia","gz_zhenji","gz_xiahouyuan","gz_zhanghe","gz_xuhuang","gz_caoren","gz_dianwei","gz_xunyu","gz_caopi","gz_yuejin","gz_liubei","gz_guanyu","gz_zhangfei","gz_zhugeliang","gz_zhaoyun","gz_machao","gz_huangyueying","gz_huangzhong","gz_weiyan","gz_pangtong","gz_sp_zhugeliang","gz_liushan","gz_menghuo","gz_zhurong","gz_ganfuren","gz_sunquan","gz_ganning","gz_lvmeng","gz_huanggai","gz_zhouyu","gz_daqiao","gz_luxun","gz_sunshangxiang","gz_sunjian","gz_xiaoqiao","gz_re_taishici","gz_zhoutai","gz_re_lusu","gz_zhangzhang","gz_dingfeng","gz_huatuo","gz_lvbu","gz_diaochan","gz_re_yuanshao","gz_yanwen","gz_jiaxu","gz_pangde","gz_zhangjiao","gz_caiwenji","gz_mateng","gz_kongrong","gz_jiling","gz_tianfeng","gz_panfeng","gz_zoushi",],
 				guozhan_zhen:["gz_dengai","gz_caohong","gz_jiangfei","gz_jiangwei","gz_xusheng","gz_jiangqing","gz_hetaihou","gz_yuji"],
 				guozhan_shi:["gz_re_lidian","gz_zangba","gz_madai","gz_mifuren","gz_sunce","gz_chendong","gz_sp_dongzhuo","gz_zhangren"],
 				guozhan_bian:["gz_liqueguosi","gz_zuoci","gz_bianfuren","gz_xunyou","gz_lingtong","gz_lvfan","gz_masu","gz_shamoke",],
@@ -375,8 +379,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				guozhan_double:['gz_tangzi','gz_liuqi','gz_mengda','gz_mifangfushiren','gz_zhanglu','gz_shixie','gz_xuyou','gz_xiahouba','gz_panjun','gz_xf_sufei','gz_wenqin','gz_pengyang'],
 				guozhan_yexinjia:['gz_zhonghui','gz_simazhao','gz_gongsunyuan','gz_sunchen'],
 				guozhan_jin:['gz_jin_simayi','gz_jin_simazhao','gz_jin_simashi','gz_jin_zhangchunhua','gz_jin_wangyuanji','gz_jin_xiahouhui','gz_duyu','gz_zhanghuyuechen','gz_jin_yanghuiyu','gz_simazhou','gz_shibao','gz_weiguan','gz_zhongyan','gz_yangyan','gz_zuofen','gz_xinchang','gz_xuangongzhu','gz_yangzhi'],
-				guozhan_zongheng:['gz_huaxin','gz_luyusheng','gz_zongyu','gz_miheng','gz_fengxi','gz_dengzhi','gz_re_xunchen','gz_dc_yanghu'],
-				guozhan_decade:['gz_jianggan',"gz_zhouyi","gz_lvlingqi","gz_yangwan"],
+				guozhan_zongheng:['gz_jianggan','gz_huaxin','gz_luyusheng','gz_zongyu','gz_miheng','gz_fengxi','gz_dengzhi','gz_re_xunchen','gz_dc_yanghu'],
+				guozhan_decade:["gz_zhouyi","gz_lvlingqi","gz_yangwan",'gz_wangling','gz_wangji','gz_yanyan','gz_xin_zhuran','gz_gaoshun','gz_jin_jiachong','gz_jin_yanghu'],
 				guozhan_mobile:["gz_lingcao","gz_lifeng","gz_sp_duyu"],
 				guozhan_qunxiong:['gz_xf_huangquan','gz_guohuai','gz_guanqiujian','gz_zhujun','gz_chengong','gz_re_xugong'],
 				guozhan_tw:['gz_yangxiu','gz_tw_tianyu','gz_tw_xiahoushang','gz_liaohua','gz_chendao','gz_zhugejin','gz_zumao','gz_fuwan','gz_tw_liufuren','gz_old_huaxiong'],
@@ -400,10 +404,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_shibing1key:['male','key',0,[],['unseen']],
 				gz_shibing2key:['female','key',0,[],['unseen']],
 
-				gz_zhonghui:['male','ye',4,['gzquanji','gzpaiyi'],['gzskin']],
+				gz_zhonghui:['male','ye',4,['fakequanji','fakepaiyi'],['gzskin']],
 				gz_simazhao:['male','ye',3,['gzzhaoxin','gzsuzhi'],['gzskin']],
-				gz_gongsunyuan:['male','ye',4,['gzhuaiyi','gzzisui'],['gzskin']],
-				gz_sunchen:['male','ye',4,['gzshilu','gzxiongnve']],
+				gz_gongsunyuan:['male','ye',4,['fakehuaiyi','fakezisui'],['gzskin']],
+				gz_sunchen:['male','ye',4,['fakeshilu','fakexiongnve']],
 				gz_tangzi:['male','wu',4,['gzxingzhao'],['doublegroup:wei:wu','gzskin']],
 				gz_mengda:['male','wei',4,['qiuan','liangfan'],['doublegroup:wei:shu']],
 				gz_liuqi:['male','qun',3,['gzwenji','gztunjiang'],['doublegroup:shu:qun','gzskin']],
@@ -425,21 +429,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_pengyang:['male','shu',3,['gztongling','gzjinyu'],['doublegroup:shu:qun','gzskin']],
 				gz_zhuling:['male','wei',4,['gzjuejue','gzfangyuan'],['gzskin']],
 
-				gz_caocao:['male','wei',4,['jianxiong']],
+				gz_caocao:['male','wei',4,['rejianxiong']],
 				gz_simayi:['male','wei',3,['fankui','guicai']],
 				gz_xiahoudun:['male','wei',4,['reganglie']],
 				gz_zhangliao:['male','wei',4,['new_retuxi']],
 				gz_xuzhu:['male','wei',4,['gzluoyi']],
 				gz_guojia:['male','wei',3,['tiandu','gzyiji'],['gzskin']],
 				gz_zhenji:['female','wei',3,['luoshen','qingguo'],['gzskin']],
-				gz_xiahouyuan:['male','wei',5,['gzshensu'],['gzskin']],
+				gz_xiahouyuan:['male','wei',4,['gzshensu'],['gzskin']],
 				gz_zhanghe:['male','wei',4,['qiaobian']],
 				gz_xuhuang:['male','wei',4,['new_duanliang']],
 				gz_caoren:['male','wei',4,['gzjushou']],
-				gz_dianwei:['male','wei',4,['gzqiangxi'],['gzskin']],
+				gz_dianwei:['male','wei',5,['reqiangxi'],['gzskin']],
 				gz_xunyu:['male','wei',3,['quhu','gzjieming']],
 				gz_caopi:['male','wei',3,['xingshang','gzfangzhu'],['gzskin']],
-				gz_yuejin:['male','wei',4,['gzxiaoguo'],['gzskin']],
+				gz_yuejin:['male','wei',4,['fakexiaoguo'],['gzskin']],
 
 				gz_liubei:['male','shu',4,['rerende']],
 				gz_guanyu:['male','shu',5,['new_rewusheng'],['gzskin']],
@@ -464,21 +468,21 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_huanggai:['male','wu',4,['new_kurou']],
 				gz_zhouyu:['male','wu',3,['reyingzi','refanjian'],['gzskin']],
 				gz_daqiao:['female','wu',3,['guose','liuli']],
-				gz_luxun:['male','wu',3,['gzqianxun','duoshi'],['gzskin']],
+				gz_luxun:['male','wu',3,['gzqianxun','fakeduoshi'],['gzskin']],
 				gz_sunshangxiang:['female','wu',3,['jieyin','gzxiaoji'],['gzskin']],
 				gz_sunjian:['male','wu',5,['yinghun'],['gzskin']],
 				gz_xiaoqiao:['female','wu',3,['gztianxiang','gzhongyan'],['gzskin']],
-				gz_taishici:['male','wu',4,['tianyi']],
+				gz_re_taishici:['male','wu',4,['tianyi','fakehanzhan']],
 				gz_zhoutai:['male','wu',4,['buqu','new_fenji']],
 				gz_re_lusu:['male','wu',3,['haoshi','dimeng']],
 				gz_zhangzhang:['male','wu',3,['zhijian','guzheng']],
-				gz_dingfeng:['male','wu',4,['reduanbing','refenxun'],['gzskin']],
+				gz_dingfeng:['male','wu',4,['fakeduanbing','fenxun'],['gzskin']],
 
 				gz_huatuo:['male','qun',3,['new_chuli','jijiu']],
 				gz_lvbu:['male','qun',5,['gzwushuang'],['gzskin']],
 				gz_diaochan:['female','qun',3,['lijian','biyue'],['gzskin']],
 				gz_re_yuanshao:['male','qun',4,['new_luanji'],['gzskin']],
-				gz_yanwen:['male','qun',4,['shuangxiong']],
+				gz_yanwen:['male','qun',4,['fakeshuangxiong']],
 				gz_jiaxu:['male','qun',3,['wansha','luanwu','gzweimu'],['gzskin']],
 				gz_pangde:['male','qun',4,['mashu','jianchu']],
 				gz_zhangjiao:['male','qun',3,['leiji','guidao']],
@@ -492,9 +496,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				gz_dengai:['male','wei',4,['tuntian','ziliang','gzjixi'],['gzskin','die_audio']],
 				gz_caohong:['male','wei',4,['gzhuyuan','heyi'],['gzskin']],
-				gz_jiangfei:['male','shu',3,['reshengxi','gzshoucheng']],
+				gz_jiangfei:['male','shu',3,['shengxi','gzshoucheng']],
 				gz_jiangwei:['male','shu',4,['tiaoxin','yizhi','tianfu'],['gzskin']],
-				gz_xusheng:['male','wu',4,['gzyicheng'],['gzskin']],
+				gz_xusheng:['male','wu',4,['fakeyicheng'],['gzskin']],
 				gz_jiangqing:['male','wu',4,['gzshangyi','niaoxiang']],
 				gz_hetaihou:['female','qun',3,['zhendu','qiluan'],['gzskin']],
 
@@ -503,8 +507,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_madai:['male','shu',4,['mashu2','qianxi'],['gzskin']],
 				gz_mifuren:['female','shu',3,['gzguixiu','gzcunsi']],
 				gz_sunce:['male','wu',4,['jiang','yingyang','baka_hunshang'],['gzskin']],
-				gz_chendong:['male','wu',4,['duanxie','fenming']],
-				gz_sp_dongzhuo:['male','qun',4,['hengzheng','baoling']],
+				gz_chendong:['male','wu',4,['duanxie','fakefenming']],
+				gz_sp_dongzhuo:['male','qun',4,['hengzheng','fakebaoling']],
 				gz_zhangren:['male','qun',4,['chuanxin','fengshi']],
 
 				gz_jun_liubei:['male','shu',4,['zhangwu','jizhao','shouyue','wuhujiangdaqi']],
@@ -512,23 +516,23 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_jun_sunquan:['male','wu',4,['jiahe','lianzi','jubao','yuanjiangfenghuotu']],
 
 				gz_liqueguosi:['male','qun',4,['gzxiongsuan']],
-				gz_zuoci:['male','qun',3,['yigui','jihun'],['gzskin']],
+				gz_zuoci:['male','qun',3,['fakeyigui','fakejihun'],['gzskin']],
 				gz_bianfuren:['female','wei',3,['wanwei','gzyuejian']],
 				gz_xunyou:['male','wei',3,['gzqice','zhiyu'],['gzskin']],
 				gz_lingtong:['male','wu',4,['xuanlve','yongjin'],['gzskin']],
-				gz_lvfan:['male','wu',3,['xindiaodu','gzdiancai']],
+				gz_lvfan:['male','wu',3,['gzdiaodu','gzdiancai']],
 				gz_masu:['male','shu',3,['gzsanyao','gzzhiman'],['gzskin']],
 				gz_shamoke:['male','shu',4,['gzjili'],['gzskin']],
 
-				gz_lingcao:['male','wu',4,['dujin']],
-				gz_lifeng:['male','shu',3,['tunchu','shuliang']],
-				gz_beimihu:["female","qun",3,["hmkguishu","hmkyuanyu"]],
+				gz_lingcao:['male','wu',4,['fakedujin']],
+				gz_lifeng:['male','shu',3,['faketunchu','fakeshuliang']],
+				gz_beimihu:["female","qun",3,["fakeguishu","fakeyuanyu"]],
 				gz_jianggan:["male","wei",3,["weicheng","daoshu"]],
 				gz_sp_duyu:['male','qun',4,['spwuku','spmiewu']],
-				gz_huaxin:['male','wei',3,['wanggui','xibing']],
-				gz_luyusheng:['female','wu',3,['zhente','zhiwei']],
-				gz_zongyu:['male','shu',3,['zyqiao','chengshang']],
-				gz_miheng:['male','qun',3,['gzrekuangcai','gzshejian'],['gzskin']],
+				gz_huaxin:['male','wei',3,['wanggui','fakexibing']],
+				gz_luyusheng:['female','wu',3,['fakezhente','fakezhiwei']],
+				gz_zongyu:['male','shu',3,['zyqiao','fakechengshang']],
+				gz_miheng:['male','qun',3,['fakekuangcai','gzshejian'],['gzskin']],
 				gz_fengxi:['male','wu',3,['gzyusui','gzboyan'],['gzskin']],
 				gz_dengzhi:['male','shu',3,['gzjianliang','gzweimeng'],['gzskin']],
 				gz_re_nanhualaoxian:['male','qun',3,['gzgongxiu','gztaidan','gzrejinghe']],
@@ -542,7 +546,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_wangping:['male','shu',4,['jianglue'],['gzskin']],
 				gz_fazheng:['male','shu',3,['gzxuanhuo','gzenyuan'],['gzskin']],
 				gz_wuguotai:['female','wu',3,['gzbuyi','ganlu'],['gzskin']],
-				gz_lukang:['male','wu',3,['keshou','zhuwei'],['gzskin']],
+				gz_lukang:['male','wu',3,['fakejueyan','keshou'],['gzskin']],
 				gz_yuanshu:['male','qun',4,['gzweidi','gzyongsi'],['gzskin']],
 				gz_zhangxiu:['male','qun',4,['gzfudi','gzcongjian'],['gzskin']],
 				gz_jun_caocao:['male','wei',4,['jianan','huibian','gzzongyu','wuziliangjiangdao'],[]],
@@ -587,6 +591,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_yangwan:['female','shu',3,['gzyouyan','gzzhuihuan'],['gzskin']],
 
 				gz_key_ushio:['female','key',3,['ushio_huanxin','ushio_xilv'],['doublegroup:key:wei:shu:wu:qun:jin']],
+
+				gz_wangling:['male','wei',4,['fakemibei']],
+				gz_wangji:['male','wei',3,['fakeqizhi','fakejinqu']],
+				gz_yanyan:['male','shu',4,['fakejuzhan']],
+				gz_xin_zhuran:['male','wu',3,['fakedanshou']],
+				gz_gaoshun:['male','qun',4,['fakexunxi','fakehuanjia']],
+				gz_jin_jiachong:['male','jin',3,['fakexiongshu','fakejianhui']],
+				gz_jin_yanghu:['male','jin',4,['fakechongxin','fakeweirong']],
 			}
 		},
 		skill:{
@@ -10433,12 +10445,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						event.finish();
 						return;
 					}
-					var skills=['new_retuxi','qiaobian','gzxiaoguo','gzjieyue','new_duanliang'];
+					var skills=['new_retuxi','qiaobian','fakexiaoguo','gzjieyue','new_duanliang'];
 					game.countPlayer(function(current){
 							if(current==player) return;
 							if(current.hasSkill('new_retuxi')) skills.remove('new_retuxi');
 							if(current.hasSkill('qiaobian')) skills.remove('qiaobian');
-							if(current.hasSkill('gzxiaoguo')) skills.remove('gzxiaoguo');
+							if(current.hasSkill('fakexiaoguo')) skills.remove('fakexiaoguo');
 							if(current.hasSkill('gzjieyue')) skills.remove('gzjieyue');
 							if(current.hasSkill('new_duanliang')) skills.remove('new_duanliang');
 					});
@@ -13262,7 +13274,7 @@ return event.junling=='junling5'?1:0;});
 					if(event.num>=1&&!player.hasSkill('jiahe_reyingzi')) list.push('reyingzi');
 					if(event.num>=2&&!player.hasSkill('jiahe_haoshi')) list.push('haoshi');
 					if(event.num>=3&&!player.hasSkill('jiahe_shelie')) list.push('shelie');
-					if(event.num>=4&&!player.hasSkill('jiahe_duoshi')) list.push('duoshi');
+					if(event.num>=4&&!player.hasSkill('jiahe_duoshi')) list.push('fakeduoshi');
 					if(!list.length){
 						event.finish();
 						return;
@@ -13295,14 +13307,14 @@ return event.junling=='junling5'?1:0;});
 						if(controls.includes('reyingzi')){
 							return 'reyingzi';
 						}
-						if(controls.includes('duoshi')){
-							return 'duoshi';
+						if(controls.includes('fakeduoshi')){
+							return 'fakeduoshi';
 						}
 						return controls.randomGet();
 					});
 					'step 2'
 					if(result.control!='cancel2'){
-						var skill='jiahe_'+result.control;
+						var skill=(result.control!='fakeduoshi'?'jiahe_':'')+result.control;
 						player.addTempSkills(skill);
 						if(!event.done) player.logSkill('jiahe_put');
 						// game.log(player,'获得了技能','【'+get.translation(skill)+'】');
@@ -17329,6 +17341,10 @@ return event.junling=='junling5'?1:0;});
 			fakechongxin_info:'出牌阶段限一次，你可以选择一名与你势力不同的角色，视为你使用一张指定你与其为目标的【知己知彼】。',
 			fakeweirong:'卫戎',
 			fakeweirong_info:'转换技，每轮限一次，出牌阶段。阴：你可以弃置X张牌，然后当你于本轮不因此法得到牌后，你摸一张牌。阳：你可以摸X张牌，然后当你于本轮不因此法失去牌后，你弃置一张牌。（X为你上一轮以此法摸和弃置的牌数之和，且X至少为1，至多为你的体力上限）',
+			gz_re_taishici:'太史慈',
+			gz_xin_zhuran:'朱然',
+			gz_jin_jiachong:'贾充',
+			gz_jin_yanghu:'羊祜',
 
 			guozhan_default:"国战标准",
 			guozhan_zhen:"君临天下·阵",
