@@ -128,7 +128,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'roundStart'},
 				filter(event,player){
-					return game.hasPlayer(current=>current!=player)&&player.getHp()>0;
+					return game.hasPlayer(current=>current!=player&&current.countCards('h'))&&player.getHp()>0;
 				},
 				forced:true,
 				group:['dczhimin_mark','dczhimin_draw'],
