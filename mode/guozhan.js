@@ -88,6 +88,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					case 'yingbian':
 						lib.card.list=lib.guozhanPile_yingbian.slice(0);
 						delete lib.translate.shuiyanqijunx_info_guozhan;
+						const pack=lib.yingbian_guozhan;
+						for(const i in pack){
+							if(!pack[i][4]) pack[i][4]=[];
+							lib.character[i]=pack[i];
+							lib.characterPack.mode_guozhan[i]=pack[i];
+							if(!lib.translate[i]) lib.translate[i]=lib.translate[i.slice(3)];
+						}
 						break;
 					case 'normal':lib.card.list=lib.guozhanPile.slice(0);break;
 				}
@@ -124,14 +131,19 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				game.broadcastAll((mode,separatism)=>{
 					_status.mode=mode;
 					if(separatism) _status.separatism=true;
+					var pack=lib.characterPack.mode_guozhan;
 					if(mode=='yingbian'){
 						delete lib.translate.shuiyanqijunx_info_guozhan;
+						const pack2=lib.yingbian_guozhan;
+						for(const i in pack2){
+							if(!pack2[i][4]) pack2[i][4]=[];
+							pack[i]=pack2[i];
+						}
 					}
 					for(var i=0;i<game.players.length;i++){
 						game.players[i].node.name.hide();
 						game.players[i].node.name2.hide();
 					}
-					var pack=lib.characterPack.mode_guozhan;
 					for(var i in pack){
 						lib.character[i]=pack[i];
 						if(!lib.character[i][4]){
@@ -370,6 +382,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				'gz_zoushi','gz_panfeng','gz_tianfeng',
 				'gz_sufei','gz_yanyan',
 			],
+		},
+		yingbian_guozhan:{
+			gz_sp_duyu:['male','qun',4,['fakezhufu']],
 		},
 		characterSort:{
 			mode_guozhan:{
