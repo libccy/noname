@@ -2637,6 +2637,226 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},
 				},
 			},
+			fakexiongshu:{
+				audio:'xiongshu',
+				trigger:{global:'useCardToPlayered'},
+				filter(event,player){
+					if(!event.isFirstTarget) return false;
+					if(event.player==player&&game.countPlayer()<2) return false;
+					if(event.player!=player&&!player.countDiscardableCards(player,'he')) return false;
+					return event.card.name=='sha'||(get.type(event.card)=='trick'&&get.tag(event.card,'damage'));
+				},
+				check(event,player){
+					if(event.player==player){
+						if(event.targets.some(i=>i.hasSkill('gzduanchang'))) return true;
+						return !event.targets.some(i=>i.getHp()==1&&!i.hasSkill('gzbuqu')&&i.isEnemyOf(player));
+					}
+					if(event.targets.some(i=>i.hasSkill('gzduanchang'))) return false;
+					return event.targets.some(i=>i.getHp()==1&&!i.hasSkill('gzbuqu')&&i.isEnemyOf(player));
+				},
+				usable:1,
+				async content(event,trigger,player){
+					if(trigger.player==player){
+						await player.draw();
+						const {result:{bool,targets}}=await player.chooseTarget('令一名其他角色成为'+get.translation(trigger.card)+'的伤害来源',true,lib.filter.notMe).set('ai',target=>{
+							const player=get.event('player'),targets=get.event().getTrigger().targets;
+							const goon=(player.hasSkill('fakejianhui')&&targets.some(i=>i!=target&&i.isFriendOf(target)));
+							return targets.reduce((sum,i)=>sum+get.damageEffect(i,target,player),0)*(goon?3:1);
+						});
+						if(bool){
+							const target=targets[0];
+							player.line(target);
+							game.log(target,'成为了',trigger.card,'的伤害来源');
+							trigger.getParent().customArgs.default.customSource=target;
+						}
+					}
+					else{
+						await player.chooseToDiscard('he',true);
+						game.log(player,'成为了',trigger.card,'的伤害来源');
+						trigger.getParent().customArgs.default.customSource=player;
+					}
+				},
+			},
+			fakejianhui:{
+				audio:'jianhui',
+				trigger:{global:'damageSource'},
+				filter(event,player){
+					if(!event.source||!event.player||!event.source.isIn()||!event.player.isIn()) return false;
+					return event.source.isFriendOf(event.player)&&[event.source,event.player].some(target=>target.countCards('he'));
+				},
+				async cost(event,player){
+					event.result=await player.chooseTarget(get.prompt('fakejianhui'),(card,player,target)=>{
+						const trigger=get.event().getTrigger();
+						if(!(trigger.source==target&&trigger.player==target)) return false;
+						if(!ui.selected.targets.length) return true;
+						return target.countCards('he');
+					},2).set('targetprompt',['摸牌','拆牌']).set('ai',target=>{
+						const player=get.event('player'),trigger=get.event().getTrigger();
+						const source=trigger.source,playerx=trigger.player;
+						const min=-Math.min(get.effect(source,{name:'draw'},player,player),get.effect(playerx,{name:'draw'},player,player));
+						const max=Math.max(get.effect(source,{name:'guohe_copy'},player,player),get.effect(playerx,{name:'guohe_copy'},player,player));
+						if(min>max) return 0;
+						if(!ui.selected.targets.length) return -1/Math.min(get.effect(target,{name:'draw'},player,player),-0.001);
+						return get.effect(target,{name:'guohe_copy'},player,player);
+					}).set('complexSelect',true).set('complexTarget',true).forResult();
+				},
+				popup:false,
+				async content(event,trigger,player){
+					player.logSkill('fakejianhui',event.targets,false);
+					player.line2(event.targets);
+					await event.targets[0].draw();
+					await player.discardPlayerCard(event.targets[1],'he',true);
+				},
+			},
+			fakechongxin:{
+				audio:'chongxin',
+				enable:'phaseUse',
+				filter(event,player){
+					const card=new lib.element.VCard({name:'yiyi'});
+					return lib.filter.targetEnabled2(card,player,player)&&game.hasPlayer(target=>{
+						return lib.filter.targetEnabled2(card,player,target)&&target.isEnemyOf(player);
+					});
+				},
+				filterTarget(cardx,player,target){
+					const card=new lib.element.VCard({name:'yiyi'});
+					return lib.filter.targetEnabled2(card,player,target)&&target.isEnemyOf(player);
+				},
+				usable:1,
+				async content(event,trigger,player){
+					const card=new lib.element.VCard({name:'yiyi'});
+					await player.useCard(card,[player].concat(event.targets),false);
+				},
+				ai:{
+					order(item,player){
+						return get.order({name:'yiyi'},player)+0.1;
+					},
+					result:{
+						target(player,target){
+							const card=new lib.element.VCard({name:'yiyi'});
+							const num=get.sgn(get.attitude(player,target));
+							return num*(get.effect(player,card,player,player)-get.effect(target,card,player,player));
+						},
+					},
+				},
+			},
+			fakeweirong:{
+				zhuanhuanji:true,
+				locked:false,
+				marktext:'☯',
+				intro:{
+					content(storage){
+						if(storage) return '出牌阶段，你可以摸X张牌，然后当你于本轮不因此法失去牌后，你弃置一张牌。（X为你上一轮以此法摸和弃置的牌数之和，且X至少为1，至多为你的体力上限）';
+						return '出牌阶段，你可以弃置X张牌，然后当你于本轮不因此法得到牌后，你摸一张牌。（X为你上一轮以此法摸和弃置的牌数之和，且X至少为1，至多为你的体力上限）';
+					},
+				},
+				audio:'weishu',
+				enable:'phaseUse',
+				filter(event,player){
+					if(!get.info('fakeweirong').getNum(player)) return false;
+					const storage=player.storage.fakeweirong;
+					return storage||player.countCards('he',card=>lib.filter.cardDiscardable)>=get.info('fakeweirong').getNum(player);
+				},
+				filterCard(card,player){
+					return !Boolean(player.storage.fakeweirong)&&lib.filter.cardDiscardable(card,player);
+				},
+				selectCard(){
+					const player=get.event('player');
+					return player.storage.fakeweirong?-1:get.info('fakeweirong').getNum(player);
+				},
+				check(card){
+					return 7.5-get.value(card);
+				},
+				prompt(){
+					const player=get.event('player');
+					const num=get.info('fakeweirong').getNum(player);
+					if(player.storage.fakeweirong) return '摸张'+get.cnNumber(num)+'牌，然后当你于本轮不因此法失去牌后，你弃置一张牌';
+					return '弃置张'+get.cnNumber(num)+'牌，然后当你于本轮不因此法得到牌后，你摸一张牌';
+				},
+				round:1,
+				async content(event,trigger,player){
+					const storage=player.storage.fakeweirong;
+					player.changeZhuanhuanji('fakeweirong');
+					if(storage) await player.draw(get.info('fakeweirong').getNum(player));
+					player.addTempSkill('fakeweirong_'+(storage?'lose':'gain'),'roundStart');
+				},
+				ai:{
+					order(item,player){
+						const storage=player.storage.fakeweirong;
+						return storage?0.01:9;
+					},
+					result:{player:1},
+				},
+				group:'fakeweirong_mark',
+				subSkill:{
+					mark:{
+						charlotte:true,
+						trigger:{player:['hideCharacterEnd','showCharacterEnd']},
+						filter(event,player){
+							return get.character(event[event.name=='hideCharacter'?'toHide':'toShow'],3).includes('fakeweirong');
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content(){
+							player[(trigger.name=='hideCharacter'?'un':'')+'markSkill']('fakeweirong');
+						},
+					},
+					gain:{
+						charlotte:true,
+						mark:true,
+						marktext:'↑',
+						intro:{content:'不因此法得到牌后，你摸一张牌'},
+						audio:'weishu',
+						trigger:{player:'gainAfter',global:'loseAsyncAfter'},
+						filter(event,player){
+							if(!event.getg||!event.getg(player).length) return false;
+							return event.getParent(2).name!='fakeweirong_gain';
+						},
+						forced:true,
+						content(){
+							player.draw();
+						},
+					},
+					lose:{
+						charlotte:true,
+						mark:true,
+						marktext:'↓',
+						intro:{content:'不因此法失去牌后，你弃置一张牌'},
+						trigger:{player:'loseAfter',global:'loseAsyncAfter'},
+						filter(event,player){
+							if(!player.countCards('he')) return false;
+							const evt=event.getl(player);
+							if(!evt||!evt.cards2||!evt.cards2.length) return false;
+							return event.getParent(3).name!='weishu_discard';
+						},
+						forced:true,
+						content(){
+							player.chooseToDiscard('he',true);
+						},
+					},
+				},
+				getNum(player){
+					let num=0,count=false;
+					const history=player.actionHistory;
+					for(let i=history.length-1;i>=0;i--){
+						if(history[i].isRound){
+							if(!count){
+								count=true;
+								continue;
+							}
+							else break;
+						}
+						if(!count) continue;
+						const allHistory=history[i].gain.filter(evt=>{
+							return evt.getParent(2).name=='fakeweirong'||evt.getParent(2).name=='fakeweirong_gain';
+						}).slice().concat(history[i].lose.filter(evt=>{
+							return evt.getParent(2).skill=='fakeweirong'||evt.getParent(3).name=='fakeweirong_lose';
+						}));
+						for(const evt of allHistory) num+=evt.cards.length;
+					}
+					return Math.max(1,Math.min(player.maxHp,num));
+				},
+			},
 			//国战典藏2023补充
 			//吕范
 			gzdiaodu:{
@@ -16394,6 +16614,16 @@ return event.junling=='junling5'?1:0;});
 				if(storage) str+='</span>';
 				return str+'（X为使用者已损失的体力值且X至少为1）';
 			},
+			fakeweirong(player){
+				let str='转换技，每轮限一次，出牌阶段。',storage=player.storage.fakeweirong;
+				if(!storage) str+='<span class="bluetext">';
+				str+='阴：你可以弃置X张牌，然后当你于本轮不因此法得到牌后，你摸一张牌。';
+				if(!storage) str+='</span>';
+				if(storage) str+='<span class="bluetext">';
+				str+='阳：你可以摸X张牌，然后当你于本轮不因此法失去牌后，你弃置一张牌。';
+				if(storage) str+='</span>';
+				return str+'（X为你上一轮以此法摸和弃置的牌数之和，且X至少为1，至多为你的体力上限）';
+			},
 		},
 		translate:{
 			ye:'野',
@@ -17091,6 +17321,14 @@ return event.junling=='junling5'?1:0;});
 			fakexunxi_info:'其他角色于回合外明置武将牌时，你可以视为对其使用一张【杀】（无距离限制）。',
 			fakehuanjia:'擐甲',
 			fakehuanjia_info:'锁定技，每回合每项各限一次。①当你成为【杀】的目标后，本回合你视为装备此牌使用者的防具，直到你的装备区中有防具。②当你使用【杀】指定唯一目标后，本回合你视为装备目标角色的武器，直到你的装备区中有武器。',
+			fakexiongshu:'凶竖',
+			fakexiongshu_info:'每回合限一次，一名角色使用【杀】或伤害类锦囊牌指定第一个目标后，若你为/不为此牌使用者，则你可以摸一张牌并令一名其他角色成为此牌的伤害来源/弃置一张牌并成为此牌的伤害来源。',
+			fakejianhui:'奸回',
+			fakejianhui_info:'当一名角色受到其势力相同的另一名角色造成的伤害后，你可以令其中一名角色摸一张牌，然后弃置其中另一名角色的一张牌。',
+			fakechongxin:'崇信',
+			fakechongxin_info:'出牌阶段限一次，你可以选择一名与你势力不同的角色，视为你使用一张指定你与其为目标的【知己知彼】。',
+			fakeweirong:'卫戎',
+			fakeweirong_info:'转换技，每轮限一次，出牌阶段。阴：你可以弃置X张牌，然后当你于本轮不因此法得到牌后，你摸一张牌。阳：你可以摸X张牌，然后当你于本轮不因此法失去牌后，你弃置一张牌。（X为你上一轮以此法摸和弃置的牌数之和，且X至少为1，至多为你的体力上限）',
 
 			guozhan_default:"国战标准",
 			guozhan_zhen:"君临天下·阵",
