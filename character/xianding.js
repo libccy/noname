@@ -97,14 +97,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			gexuan:['male','wu',3,['gxlianhua','zhafu']],
 			leitong:['male','shu',4,['kuiji']],
 			wulan:['male','shu',4,['wlcuorui']],
-			caofang: ['male', 'wei', 4, ['caojujian', 'zhimin'], ['zhu']],
+			dc_caofang: ['male', 'wei', 4, ['caofang_jujian', 'zhimin'], ['zhu']],
 		},
 		characterSort:{
 			xianding:{
 				sp2_huben:['chendong','wangshuang','wenyang','re_liuzan','dc_huangzu','wulan','leitong','chentai','dc_duyu','dc_wangjun','dc_xiahouba','old_huangfusong','huzun'],
 				sp2_shengun:["puyuan","guanlu","gexuan",'wufan','re_zhangbao','dukui','zhaozhi','zhujianping','dc_zhouxuān','zerong'],
 				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji','cuimao'],
-				sp2_huangjia:['caofang','caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie'],
+				sp2_huangjia:['dc_caofang','caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie'],
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue','caoxian','dc_qinghegongzhu','zhugemengxue'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan','caoyi'],
@@ -124,7 +124,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		skill:{
 			//曹芳
-			caojujian: {
+			caofang_jujian: {
 				subSkill: {
 					"1": {
 						sub: true,
@@ -15179,13 +15179,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcsbquanmou_info:'转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。阴：当你于本阶段内下次对其造成伤害时，取消之；阳：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。',
 			dcsbpingliao:'平辽',
 			dcsbpingliao_info:'锁定技。当你声明使用【杀】时，你令此【杀】的目标对其他角色不可见，且你令攻击范围内的其他角色依次选择是否打出一张红色基本牌。所有角色选择完成后，此牌的目标角色中没有以此法打出牌的角色本回合内无法使用或打出手牌；若有不为此牌目标的角色以此法打出了牌，则你摸两张牌，且你本回合使用【杀】的次数上限+1。',
-			caofang: '曹芳',
+			dc_caofang: '曹芳',
 			zhimin: "置民",
 			"zhimin_info": "锁定技，每轮开始时，选择至多x名其他角色，然后你随机获得这些角色点数最小的一张手牌（X为当前体力）。 你回合外获得的手牌增加“民”标记，你失去“民”牌后将手牌摸至体力上限。",
 			"zhimin_tag": "民",
 			"zhimin_tag_info": "",
-			caojujian: "拒谏",
-			"caojujian_info": "主公技，出牌阶段限一次，你可令一名其他魏势力角色摸一张牌，若如此做，则本轮内其使用普通锦囊牌对你无效。",
+			caofang_jujian: "拒谏",
+			"caofang_jujian_info": "主公技，出牌阶段限一次，你可令一名其他魏势力角色摸一张牌，若如此做，则本轮内其使用普通锦囊牌对你无效。",
 
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
