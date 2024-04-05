@@ -2248,11 +2248,12 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 									},0)-lib.inpile.indexOf(b.name)-get.natureList(b,false).reduce((sum,nature)=>{
 										return sum+lib.inpile_nature.indexOf(nature);
 									},0);
-								}).slice().map(card=>[get.translation(type),'',card[2],card[3]]);
+								}).slice().map(card=>[get.translation(get.type(card)),'',card.name,card.nature]);
 								return ui.create.dialog('秘备',[list,'vcard']);
 							},
 							filter(button,player){
-								return get.event().getParent().filterCard({name:button.link[2],nature:button.link[3]},player,event);
+								const event=get.event().getParent();
+								return event.filterCard({name:button.link[2],nature:button.link[3]},player,event);
 							},
 							check(button){
 								const player=get.event('player');
