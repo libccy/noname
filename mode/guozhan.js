@@ -451,7 +451,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_pengyang:['male','shu',3,['gztongling','gzjinyu'],['doublegroup:shu:qun','gzskin']],
 				gz_zhuling:['male','wei',4,['gzjuejue','gzfangyuan'],['gzskin']],
 
-				gz_caocao:['male','wei',4,['rejianxiong']],
+				gz_caocao:['male','wei',4,['rejianxiong_old']],
 				gz_simayi:['male','wei',3,['fankui','guicai']],
 				gz_xiahoudun:['male','wei',4,['reganglie']],
 				gz_zhangliao:['male','wei',4,['new_retuxi']],
