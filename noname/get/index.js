@@ -57,8 +57,8 @@ export class Get extends Uninstantable {
 	 * @param {number | Player} seat
 	 */
 	static seatTranslation(seat) {
-		if (get.itemtype(seat) === 'player') seat = seat.getSeatNum();
-		return `${get.cnNumber(seat, true)}号位`;
+		if (get.itemtype(seat) === 'player') seat = seat.getSeatNum() - 1;
+		return `${get.cnNumber(seat + 1, true)}号位`;
 	}
 	/**
 	 * @param {number} numberOfPlayers
