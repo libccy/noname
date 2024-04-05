@@ -385,7 +385,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 		},
 		yingbian_guozhan:{
 			gz_sp_duyu:['male','qun',4,['fakezhufu']],
+			gz_wangji:['male','wei',3,['fakeqizhi','fakejinqu']],
 			gz_yangyan:['female','jin',3,['fakexuanbei','xianwan']],
+			gz_shibao:['male','jin',4,['fakezhuosheng','fakejuhou']],
 		},
 		characterSort:{
 			mode_guozhan:{
@@ -580,14 +582,14 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_duyu:['male','jin',4,['gzsanchen','gzpozhu']],
 				gz_zhanghuyuechen:['male','jin',4,['fakexijue']],
 				gz_jin_yanghuiyu:['female','jin',3,['fakeciwei','fakehuirong']],
-				gz_simazhou:['male','jin',4,['recaiwang','naxiang']],
+				gz_simazhou:['male','jin',4,['caiwang','gznaxiang']],
 				gz_shibao:['male','jin',4,['gzzhuosheng']],
 				gz_weiguan:['male','jin',3,['zhongyun','shenpin']],
 				gz_zhongyan:['female','jin',3,['gzbolan','yifa']],
 				gz_yangyan:['female','jin',3,['gzxuanbei','xianwan']],
 				gz_zuofen:['female','jin',3,['gzzhaosong','gzlisi']],
 				gz_xuangongzhu:['female','jin',3,['fakeqimei','ybzhuiji']],
-				gz_xinchang:['male','jin',3,['canmou','congjian']],
+				gz_xinchang:['male','jin',3,['fakecanmou','congjian']],
 				gz_yangzhi:['female','jin',3,['gzwanyi','gzmaihuo']],
 
 				gz_liaohua:['male','shu',4,['gzdangxian']],
@@ -613,7 +615,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				gz_key_ushio:['female','key',3,['ushio_huanxin','ushio_xilv'],['doublegroup:key:wei:shu:wu:qun:jin']],
 
 				gz_wangling:['male','wei',4,['fakemibei']],
-				gz_wangji:['male','wei',3,['fakeqizhi','fakejinqu']],
 				gz_yanyan:['male','shu',4,['fakejuzhan']],
 				gz_xin_zhuran:['male','wu',3,['fakedanshou']],
 				gz_gaoshun:['male','qun',4,['fakexunxi','fakehuanjia']],
@@ -3534,6 +3535,222 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+			},
+			fakecanmou:{
+				audio:'canmou',
+				trigger:{global:'useCardToPlayer'},
+				direct:true,
+				filter(event,player){
+					if(!event.player.isMaxHandcard(true)||!event.isFirstTarget||get.type(event.card)!='trick') return false;
+					if(event.targets.length>1&&!player.getStorage('fakecanmou_used').includes('-')) return true;
+					return get.info('fakecanmou').filter_add(event,player);
+				},
+				filter_add(event,player){
+					var info=get.info(event.card);
+					if(info.allowMultiple==false) return false;
+					if(event.targets&&!info.multitarget&&!player.getStorage('fakecanmou_used').includes('+')){
+						if(game.hasPlayer(current=>{
+							return !event.targets.includes(current)&&lib.filter.targetEnabled2(event.card,event.player,current);
+						})) return true;
+					}
+					return false;
+				},
+				async cost(event,trigger,player){
+					let str='',goon=get.info('fakecanmou').filter_add(event,player),bool=(trigger.targets.length>1&&!player.getStorage('fakecanmou_used').includes('-'));
+					if(goon) str+='增加';
+					if(goon&&bool) str='或';
+					if(bool) str+='减少';
+					event.result=await player.chooseTarget(get.prompt('fakecanmou'),(card,player,target)=>{
+						const trigger=get.event().getTrigger();
+						if(trigger.targets.length>1&&!player.getStorage('fakecanmou_used').includes('-')&&trigger.targets.includes(target)) return true;
+						return !player.getStorage('fakecanmou_used').includes('+')&&!trigger.targets.includes(target)&&lib.filter.targetEnabled2(trigger.card,trigger.player,target);
+					}).set('prompt2','为'+get.translation(trigger.card)+str+'一个目标').set('ai',target=>{
+						const player=get.event('player'),trigger=get.event().getTrigger();
+						return get.effect(target,trigger.card,trigger.player,player)*(trigger.targets.includes(target)?-1:1);
+					}).setHiddenSkill('fakecanmou').forResult();
+				},
+				preHidden:true,
+				async content(event,trigger,player){
+					const target=event.targets[0],goon=trigger.targets.includes(target);
+					player.addTempSkill('fakecanmou_used');
+					player.markAuto('fakecanmou_used',[goon?'-':'+']);
+					if(goon){
+						trigger.targets.remove(target);
+						game.log(target,'被',player,'移除了目标');
+					}
+					else{
+						trigger.targets.add(target);
+						game.log(target,'成为了',trigger.card,'移除了目标');
+					}
+				},
+				subSkill:{used:{charlotte:true,onremove:true}},
+			},
+			fakezhuosheng:{
+				hiddenCard(player,name){
+					return player.countCards('hs')>1&&get.type(name)=='basic'&&lib.inpile.includes(name)&&!player.getStorage('fakezhuosheng_count').includes(name);
+				},
+				audio:'zhuosheng',
+				enable:'chooseToUse',
+				filter(event,player){
+					if(event.type=='wuxie') return false;
+					if(player.countCards('hs')<2) return false;
+					return get.inpileVCardList(info=>{
+						const name=info[2];
+						return !player.getStorage('fakezhuosheng_count').includes(name)&&get.type(name)=='basic';
+					}).some(card=>event.filterCard({name:card[2],nature:card[3]},player,event));
+				},
+				chooseButton:{
+					dialog(event,player){
+						var list=get.inpileVCardList(info=>{
+							const name=info[2];
+							return !player.getStorage('fakezhuosheng_count').includes(name)&&get.type(name)=='basic';
+						}).filter(card=>event.filterCard({name:card[2],nature:card[3]},player,event));
+						return ui.create.dialog('擢升',[list,'vcard'],'hidden');
+					},
+					check(button){
+						var player=_status.event.player;
+						var evt=_status.event.getParent();
+						var name=button.link[2],card={name:name,nature:button.link[3]};
+						if(name=='shan') return 2;
+						if(evt.type=='dying'){
+							if(get.attitude(player,evt.dying)<2) return 0;
+							if(name=='jiu') return 2.1;
+							return 1.9;
+						}
+						if(evt.type=='phase'){
+							if(button.link[2]=='jiu'){
+								if(player.getUseValue({name:'jiu'})<=0) return 0;
+								var cards=player.getCards('hs',cardx=>get.value(cardx)<8);
+								cards.sort((a,b)=>get.value(a)-get.value(b));
+								if(cards.some(cardx=>get.name(cardx)=='sha'&&!cards.slice(0,2).includes(cardx))) return player.getUseValue({name:'jiu'});
+								return 0;
+							}
+							return player.getUseValue(card)/4;
+						}
+						return 1;
+					},
+					backup(links,player){
+						return {
+							audio:'zhuosheng',
+							filterCard:true,
+							selectCard:[2,Infinity],
+							position:'hs',
+							complexCard:true,
+							check(card){
+								if(ui.selected.cards.length>=2) return 0;
+								return 8-get.value(card);
+							},
+							popname:true,
+							viewAs:{
+								name:links[0][2],
+								nature:links[0][3],
+							},
+							precontent(){
+								var name=event.result.card.name;
+								player.addTempSkill('fakezhuosheng_count');
+								player.markAuto('fakezhuosheng_count',[name]);
+								player.when('yingbian')
+								.filter(evt=>evt.skill=='fakezhuosheng_backup')
+								.then(()=>{
+									if(trigger.cards&&trigger.cards.length){
+										let cards=trigger.cards.slice();
+										cards=cards.filter(i=>get.is.yingbian(i));
+										if(cards.length){
+											if(!Array.isArray(trigger.temporaryYingbian)) trigger.temporaryYingbian=[];
+											trigger.temporaryYingbian.add('force');
+											trigger.temporaryYingbian.addArray(Array.from(lib.yingbian.effect.keys()).filter(value=>{
+												return cards.some(card=>get.cardtag(card,`yingbian_${value}`));
+											}));
+										}
+									}
+								});
+							},
+						}
+					},
+					prompt(links,player){
+						var name=links[0][2];
+						var nature=links[0][3];
+						return '将至少两张手牌当作'+(get.translation(nature)||'')+get.translation(name)+'使用';
+					},
+				},
+				ai:{
+					order(item,player){
+						if(player&&_status.event.type=='phase'){
+							var add=false,max=0;
+							var names=lib.inpile.filter(name=>get.type(name)=='basic'&&!player.getStorage('fakezhuosheng_count').includes(name));
+							if(names.includes('sha')) add=true;
+							names=names.map(namex=>{return {name:namex}});
+							if(add) lib.inpile_nature.forEach(nature=>names.push({name:'sha',nature:nature}));
+							names.forEach(card=>{
+								if(player.getUseValue(card)>0){
+									var temp=get.order(card);
+									if(card.name=='jiu'){
+										var cards=player.getCards('hs',cardx=>get.value(cardx)<8);
+										cards.sort((a,b)=>get.value(a)-get.value(b));
+										if(!cards.some(cardx=>get.name(cardx)=='sha'&&!cards.slice(0,2).includes(cardx))) temp=0;
+									}
+									if(temp>max) max=temp;
+								}
+							});
+							if(max>0) max-=0.001;
+							return max;
+						}
+						return 0.5;
+					},
+					respondShan:true,
+					respondSha:true,
+					fireAttack:true,
+					skillTagFilter(player,tag,arg){
+						if(arg=='respond') return false;
+						const name=(tag=='respondShan'?'shan':'sha');
+						return get.info('fakezhuosheng').hiddenCard(player,name);
+					},
+					result:{
+						player(player){
+							if(_status.event.dying) return get.attitude(player,_status.event.dying);
+							return 1;
+						},
+					},
+				},
+				subSkill:{
+					count:{charlotte:true,onremove:true},
+					backup:{},
+				},
+			},
+			fakejuhou:{
+				zhenfa:'inline',
+				trigger:{global:'useCardToTargeted'},
+				filter(event,player){
+					return (event.card.name=='sha'||get.type(event.card)=='trick')&&event.target.inline(player);
+				},
+				logTarget:'target',
+				async content(event,trigger,player){
+					const target=trigger.target;
+					const {result:{bool,cards}}=await target.chooseCard('he',[1,Infinity],'是否将任意张牌置于武将牌上？').set('ai',card=>{
+						const trigger=get.event().getTrigger(),player=trigger.target;
+						if(card.name=='baiyin'&&get.position(card)=='e'&&player.isDamaged()&&get.recoverEffect(player,player,player)>0) return 1;
+						if(['guohe','shunshou','zhujinqiyuan','chuqibuyi','huogong'].includes(trigger.card.name)&&get.effect(player,trigger.card,trigger.player,player)<0) return 1;
+						return 0;
+					});
+					if(bool){
+						target.addToExpansion(cards,'giveAuto',target).gaintag.add('fakejuhou');
+						target.addSkill('fakejuhou');
+						target.when({global:'useCardAfter'})
+						.filter(evt=>evt==trigger.getParent())
+						.then(()=>{
+							const cards=player.getExpansions('fakejuhou');
+							if(cards.length) player.gain(cards,'gain2');
+						});
+					}
+				},
+				intro:{
+					content:'expansion',
+					markcount:'expansion',
+				},
+			},
+			gznaxiang:{
+				audio:'naxiang',
+				inherit:'naxiang',
 			},
 			//国战典藏2023补充
 			//吕范
@@ -18032,6 +18249,14 @@ return event.junling=='junling5'?1:0;});
 			fakeyanxi_info:'出牌阶段限一次，你可以展示一名其他角色的一张手牌和牌堆顶的两张牌，然后你获得其中一种颜色或类别的所有牌且本回合手牌上限+X（X为你获得的牌数），然后其获得剩余的牌。',
 			fakeshiren:'识人',
 			fakeshiren_info:'①当你受到伤害时，若此武将牌未明置过，则你可以明置此武将牌并防止此伤害。②当你首次明置此武将牌时，你可以发动一次〖宴戏〗。',
+			fakecanmou:'参谋',
+			fakecanmou_info:'每回合每项限一次，一名角色使用普通锦囊牌指定第一个目标时，若其手牌数为全场唯一最多，则你可以为此牌增加或减少一个目标（目标数至少为1）。',
+			fakezhuosheng:'擢升',
+			fakezhuosheng_info:'每回合每种牌名限一次，你可以将至少两张手牌当作任意基本牌使用，若你以此法使用的牌中包含具有应变效果的牌，则你令此牌无视条件获得对应的应变效果。',
+			fakejuhou:'拒后',
+			fakejuhou_info:'阵法技，与你处于同一队列的角色成为【杀】或普通锦囊牌的目标后，你可以令其将任意张牌置于其武将牌上，然后其于此牌结算完毕后获得这些牌。',
+			gznaxiang:'纳降',
+			gznaxiang_info:'锁定技，当你受到其他角色造成的伤害后，或你对其他角色造成伤害后，你对其发动〖才望〗时的“弃置”改为“获得”直到你的下回合开始。',
 
 			guozhan_default:"国战标准",
 			guozhan_zhen:"君临天下·阵",
