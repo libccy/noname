@@ -1195,9 +1195,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							],[1,2]).set('ai',button=>{
 								const getNum=(character)=>{
 									return game.countPlayer(target=>{
-										var group=get.character(target,1);
+										const group=get.character(character,1);
 										if(group=='ye'||target.identity==group) return true;
-										var double=get.is.double(i,true);
+										const double=get.is.double(character,true);
 										if(double&&double.includes(target.identity)) return true;
 									})+1;
 								};
@@ -1302,65 +1302,53 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				enable:'phaseUse',
 				filterTarget:true,
 				usable:1,
-				content(){
-					'step 0'
-					player.chooseJunlingFor(target);
-					'step 1'
-					event.junling=result.junling;
-					event.targets=result.targets;
-					const str=get.translation(player),num=get.cnNumber(player.getExpansions('fakequanji').length);
-					target.chooseJunlingControl(player,result.junling,result.targets).set('prompt','排异').set('choiceList',[
-						'执行此军令，然后'+str+'摸'+num+'张牌并将一张“权”置入弃牌堆',
-						'不执行此军令，然后'+str+'可以对至多'+num+'名与你势力相同的角色各造成1点伤害并移去等量的“权”',
-					]).set('ai',()=>{
-						const all=player.getExpansions('fakequanji').length;
-						const effect=get.junlingEffect(player,result.junling,target,result.targets,target);
-						const eff1=(effect-get.effect(player,{name:'draw'},player,target)*all);
-						const eff2=((source,player,num)=>{
-							let targets=game.filterPlayer(current=>{
-								return current.isFriendOf(player)&&get.damageEffect(current,source,source)>0&&get.damageEffect(current,source,player)<0;
-							}).sort((a,b)=>{
-								return (get.damageEffect(b,source,source)>0-get.damageEffect(b,source,player))-(get.damageEffect(a,source,source)>0-get.damageEffect(a,source,player));
-							}).slice(0,num);
-							return targets.reduce((sum,target)=>{
-								return sum+(get.damageEffect(target,source,source)-get.damageEffect(target,source,player))/2;
-							},0);
-						})(player,target,all);
-						return Math.max(0,get.sgn(eff1-eff2));
-					});
-					'step 2'
-					const cards=player.getExpansions('fakequanji');
-					if(result.index==0){
-						target.carryOutJunling(player,event.junling,targets);
-						player.draw(cards.length);
-						player.chooseButton(['排异：请移去一张“权”',cards],true);
-					}
-					else{
-						player.chooseTarget('排异：是否对至多'+get.cnNumber(cards.length)+'名与'+get.translation(target)+'势力相同的角色各造成1点伤害并移去等量的“权”？',(card,player,target)=>{
-							return target.isFriendOf(get.event('target'));
-						},[1,cards.length]).set('target',target).set('ai',target=>{
-							return get.damageEffect(target,get.event('player'),get.event('player'));
+				async content(event,trigger,player){
+					const target=event.target;
+					const {result:{junling,targets}}=await player.chooseJunlingFor(target);
+					if(junling){
+						const str=get.translation(player),num=get.cnNumber(player.getExpansions('fakequanji').length);
+						const {result:{index}}=await target.chooseJunlingControl(player,junling,targets).set('prompt','排异').set('choiceList',[
+							'执行此军令，然后'+str+'摸'+num+'张牌并将一张“权”置入弃牌堆',
+							'不执行此军令，然后'+str+'可以对至多'+num+'名与你势力相同的角色各造成1点伤害并移去等量的“权”',
+						]).set('ai',()=>{
+							const all=player.getExpansions('fakequanji').length;
+							const effect=get.junlingEffect(player,junling,target,targets,target);
+							const eff1=(effect-get.effect(player,{name:'draw'},player,target)*all);
+							const eff2=((source,player,num)=>{
+								let targets=game.filterPlayer(current=>{
+									return current.isFriendOf(player)&&get.damageEffect(current,source,source)>0&&get.damageEffect(current,source,player)<0;
+								}).sort((a,b)=>{
+									return (get.damageEffect(b,source,source)>0-get.damageEffect(b,source,player))-(get.damageEffect(a,source,source)>0-get.damageEffect(a,source,player));
+								}).slice(0,num);
+								return targets.reduce((sum,target)=>{
+									return sum+(get.damageEffect(target,source,source)-get.damageEffect(target,source,player))/2;
+								},0);
+							})(player,target,all);
+							return Math.max(0,get.sgn(eff1-eff2));
 						});
-					}
-					'step 3'
-					if(result.bool){
-						if(result.links){
-							player.loseToDiscardpile(result.links);
-							event.finish();
+						const cards=player.getExpansions('fakequanji');
+						if(index==0){
+							await target.carryOutJunling(player,junling,targets);
+							if(cards.length){
+								await player.draw(cards.length);
+								const {result:{bool,links}}=await player.chooseButton(['排异：请移去一张“权”',cards],true);
+								if(bool) await player.loseToDiscardpile(links);
+							}
 						}
-						else{
-							const cards=player.getExpansions('fakequanji');
-							const targets=result.targets.sortBySeat();
-							player.line(targets);
-							for(const i of targets) i.damage();
-							if(cards.length<=targets.length) event._result={bool:true,links:cards};
-							else player.chooseButton(['排异：请移去'+get.cnNumber(targets.length)+'张“权”',cards],targets.length,true);
+						else if(cards.length){
+							const {result}=await player.chooseTarget('排异：是否对至多'+get.cnNumber(cards.length)+'名与'+get.translation(target)+'势力相同的角色各造成1点伤害并移去等量的“权”？',(card,player,target)=>{
+								return target.isFriendOf(get.event('target'));
+							},[1,cards.length]).set('target',target).set('ai',target=>{
+								return get.damageEffect(target,get.event('player'),get.event('player'));
+							});
+							if(result.bool){
+								const targetx=result.targets.sortBySeat();
+								player.line(targetx);
+								for(const i of targetx) await i.damage();
+								const {result:{bool,links}}=await player.chooseButton(['排异：请移去'+get.cnNumber(targetx.length)+'张“权”',cards],targetx.length,true);
+								if(bool) await player.loseToDiscardpile(links);
+							}
 						}
-					}
-					else event.finish();
-					'step 4'
-					if(result.bool){
-						player.loseToDiscardpile(result.links);
 					}
 				},
 				ai:{
@@ -2372,6 +2360,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					target:'useCardToTargeted',
 				},
 				filter(event,player){
+					if(event.card.name!='sha') return false;
 					const storage=player.storage.fakejuzhan;
 					if((event.player==player)!=Boolean(storage)) return false;
 					if(storage&&!event.target.countCards('he')) return false;
@@ -3052,7 +3041,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					.set('filterTarget',function(card,player,target){
 						if(target!=_status.event.sourcex&&!ui.selected.targets.includes(_status.event.sourcex)) return false;
 						return lib.filter.targetEnabled.apply(this,arguments);
-					}).set('sourcex',target).set('addCount',false)
+					}).set('sourcex',target).set('addCount',false).set('hiddenSkill','fakeqingleng')
 					.backup('fakeqingleng_backup').set('logSkill',['fakeqingleng',target]);
 					if(bool&&!player.getHistory('sourceDamage',evt=>{
 						return evt.getParent(4)==event;
@@ -3431,6 +3420,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filterTarget(card,player,target){
 					return target!=player&&target.countCards('h');
 				},
+				usable:1,
 				async content(event,trigger,player){
 					const target=event.target,str=get.translation(target);
 					const {result:{bool,links}}=await player.choosePlayerCard(target,'宴戏：展示'+str+'的一张手牌','h',true);
