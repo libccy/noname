@@ -3233,7 +3233,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							};
 							if(hasChange(trigger,player)) drawer.push(target);
 							if(hasChange(trigger,target)) drawer.push(player);
-							for(const i of drawers){
+							for(const i of drawer){
 								if(i.isDamaged()) i.recover();
 							}
 						},
