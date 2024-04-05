@@ -7228,11 +7228,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:false,
 				check:function(card){
 					var player=_status.event.player;
-					if(!player.storage.jueyong||player.storage.jueyong[0].length<Math.max(1,player.getDamagedHp())||!player.storage.jueyong[0].filter(function(card){
-						return get.effect(player,card,player.storage.jueyong[1][player.storage.jueyong[0].indexOf(card)],player)<0;
-					}).length||(player.hp<=1&&!player.storage.jueyong[0].filter(function(card){
+					if(!player.storage.jueyong||!player.storage.jueyong[0].length||player.hp<=1&&!player.storage.jueyong[0].some(function(card){
 						return get.tag(card,'damage')>0;
-					}).length)) return -1;
+					})||!player.storage.jueyong[0].some(function(card){
+						return get.effect(player,card,player.storage.jueyong[1][player.storage.jueyong[0].indexOf(card)],player)<0;
+					})) return -1;
 					return 20-get.value(card);
 				},
 				content:function(){
