@@ -3267,7 +3267,7 @@ export const Content = {
 			event.result._sendskill = event._sendskill;
 		}
 		if ((!event.result || !event.result.bool || event.result._noHidingTimer) && (event.result.skill || event.logSkill)) {
-			var info = get.info(event.result.skill || event.logSkill);
+			var info = get.info(event.result.skill || (Array.isArray(event.logSkill) ? event.logSkill[0] : event.logSkill));
 			if (info.direct && !info.clearTime) {
 				_status.noclearcountdown = 'direct';
 			}
@@ -3454,11 +3454,11 @@ export const Content = {
 			if (event.result._sendskill) {
 				lib.skill[event.result._sendskill[0]] = event.result._sendskill[1];
 			}
-			var info = get.info(event.result.skill);
 			if (event.onresult) {
 				event.onresult(event.result);
 			}
 			if ((!event.result || !event.result.bool || event.result._noHidingTimer) && (event.result.skill || event.logSkill)) {
+				var info = get.info(event.result.skill || (Array.isArray(event.logSkill) ? event.logSkill[0] : event.logSkill));
 				if (info.direct && !info.clearTime) {
 					_status.noclearcountdown = 'direct';
 				}
