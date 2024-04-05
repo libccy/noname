@@ -1201,13 +1201,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								};
 								return game.countPlayer()-getNum(button.link);
 							});
-							event.result={bool:bool,cards:links};
+							event.result={bool:bool,cost_data:links};
 						},
 						async content(event,trigger,player){
-							player.unmarkAuto('fakeyigui',event.cards);
-							_status.characterlist.addArray(event.cards);
-							game.log(player,'移除了'+get.cnNumber(event.cards.length)+'张','#g“魂”');
-							get.info('fakeyigui').gainHun(player,event.cards.length);
+							player.unmarkAuto('fakeyigui',event.cost_data);
+							_status.characterlist.addArray(event.cost_data);
+							game.log(player,'移除了'+get.cnNumber(event.cost_data.length)+'张','#g“魂”');
+							get.info('fakeyigui').gainHun(player,event.cost_data.length);
 						},
 					},
 				},
@@ -2717,9 +2717,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return event.source.isFriendOf(event.player)&&[event.source,event.player].some(target=>target.countCards('he'));
 				},
 				async cost(event,trigger,player){
-					event.result=await player.chooseTarget(get.prompt('fakejianhui'),(card,player,target)=>{
+					event.result=await player.chooseTarget(get.prompt2('fakejianhui'),(card,player,target)=>{
 						const trigger=get.event().getTrigger();
-						if(!(trigger.source==target&&trigger.player==target)) return false;
+						if(!(trigger.source==target||trigger.player==target)) return false;
 						if(!ui.selected.targets.length) return true;
 						return target.countCards('he');
 					},2).set('targetprompt',['摸牌','拆牌']).set('ai',target=>{
