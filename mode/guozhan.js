@@ -645,6 +645,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return 1/(get.value(card)||0.5);
 					}).set('logSkill',['fakexiaoguo',trigger.player]).setHiddenSkill('fakexiaoguo').forResult();
 				},
+				popup:false,
 				preHidden:true,
 				async content(event,trigger,player){
 					const num=trigger.player.countCards('e'),num2=event.cards.length;
@@ -3165,9 +3166,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(effect<=0&&!cards.length) return 0;
 								if(ui.selected.cards.length>cards.length-(effect<=0?1:0)) return 0;
 								return 1/(get.value(card)||0.5);
-							}).set('logSkill',['fakexiaoguo',trigger.player]).setHiddenSkill('fakexijue_xiaoguo').forResult();
+							}).set('logSkill',['fakexijue_xiaoguo',trigger.player]).setHiddenSkill('fakexijue_xiaoguo').forResult();
 						},
 						preHidden:true,
+						popup:false,
 						async content(event,trigger,player){
 							const num=trigger.player.countCards('e'),num2=event.cards.length;
 							await player.chooseToDiscard(trigger.player,'e',num2,true);
