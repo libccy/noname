@@ -1270,7 +1270,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				inherit:'gzquanji',
 				filter(event,player,name){
 					return !player.hasHistory('useSkill',evt=>{
-						return evt.skill=='gzquanji'&&evt.event.triggername==name;
+						return evt.skill=='fakequanji'&&evt.event.triggername==name;
 					});
 				},
 				content(){
