@@ -136,12 +136,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					result:{
+						player(player,target){
+							let res=2*get.effect(player,{name:'draw',player,player});
+							if(player!==target) res+=get.effect(player,{name:'losehp'},player,player);
+							return res;
+						},
 						target(player,target){
-							if(player.getHp()+player.countCards('hs',card=>player.canSaveCard(card,player))<=1) return 0;
-							const num=get.sgn(get.attitude(player,target));
-							if(num*get.damageEffect(target,player,player)>0) return num*get.damageEffect(target,player,player);
-							if(target==player) return 0.00001;
-							return 0;
+							return get.damageEffect(target,player,target);
 						},
 					},
 				},
@@ -292,7 +293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				
+
 			},
 			//星袁绍
 			starxiaoyan:{
