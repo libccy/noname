@@ -634,7 +634,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					});
 				},
 				async cost(event,trigger,player){
-					event.result=await player.chooseToDiscard(get.prompt('fakexiaoguo',trigger.player),(card,player)=>{
+					event.result=await player.chooseToDiscard(get.prompt2('fakexiaoguo',trigger.player),(card,player)=>{
 						return get.type(card)=='basic';
 					},[1,Infinity]).set('complexSelect',true).set('ai',card=>{
 						const player=get.event('player'),target=get.event().getTrigger().player;
@@ -3157,7 +3157,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							});
 						},
 						async cost(event,trigger,player){
-							event.result=await player.chooseToDiscard(get.prompt('fakexijue_xiaoguo',trigger.player),(card,player)=>{
+							event.result=await player.chooseToDiscard(get.prompt2('fakexijue_xiaoguo',trigger.player),(card,player)=>{
 								return get.type(card)=='basic';
 							},[1,Math.min(player.countMark('xijue'),player.maxHp)]).set('complexSelect',true).set('ai',card=>{
 								const player=get.event('player'),target=get.event().getTrigger().player;
