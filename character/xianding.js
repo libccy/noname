@@ -9529,7 +9529,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(changed2.includes(from.link)) return true;
 							return changed.includes(to.link);
 						});
+						next.set('max',Math.min(hs.length,ts.length,player.getDamagedHp()));
 						next.set('processAI',function(list){
+							if(_status.event.max){
+								let gain=list[0][1].sort((a,b)=>{
+									return player.getUseValue(b,null,true)-player.getUseValue(a,null,true);
+								}).slice(0,_status.event.max),give=list[1][1].sort((a,b)=>{
+									return get.value(a,player)-get.value(b,player);
+								}).slice(0,_status.event.max);
+								for(let i of gain){
+									if(get.value(i,player)<get.value(give[0],player)) continue;
+									let j=give.shift();
+									list[0][1].remove(i);
+									list[0][1].push(j);
+									list[1][1].remove(j);
+									list[1][1].push(i);
+									if(!give.length) break;
+								}
+							}
 							return [list[0][1],list[1][1]];
 						});
 					}

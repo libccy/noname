@@ -2295,7 +2295,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.distance(player,current)>1;
 						})) return false;
 						if(tag=='directHit_ai') return arg.card.name=='sha';
-						if(arg.card.name!='sha'&&arg.card.name!='chuqibuyi') return false;
+						if(!arg||!arg.card||arg.card.name!='sha'&&arg.card.name!='chuqibuyi') return false;
 						var card=arg.target.getEquip(2);
 						if(card&&card.name.indexOf('bagua')!=-1) return true;
 						if(player._xinbenxi_ai) return false;
