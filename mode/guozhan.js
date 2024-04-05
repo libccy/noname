@@ -649,7 +649,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				preHidden:true,
 				async content(event,trigger,player){
 					const num=trigger.player.countCards('e'),num2=event.cards.length;
-					await player.chooseToDiscard(trigger.player,'e',num2,true);
+					await player.discardPlayerCard(trigger.player,'e',num2,true);
 					if(num2>num) await trigger.player.damage();
 				},
 			},
@@ -866,6 +866,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return target.isLinked();
 				},
 				selectTarget:-1,
+				usable:1,
 				async content(event,trigger,player){
 					for(const target of event.targets){
 						if(player==target) await player.chooseToDiscard(true,'he');
@@ -3172,7 +3173,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						popup:false,
 						async content(event,trigger,player){
 							const num=trigger.player.countCards('e'),num2=event.cards.length;
-							await player.chooseToDiscard(trigger.player,'e',num2,true);
+							await player.discardPlayerCard(trigger.player,'e',num2,true);
 							if(num2>num) await trigger.player.damage();
 							player.removeMark('xijue',1);
 						},
