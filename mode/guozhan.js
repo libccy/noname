@@ -972,7 +972,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					const storage=player.getStorage('fakeyigui');
 					if(!storage.length) return false;
 					if(event.type=='dying'){
-						if((!event.filterCard({name:'tao'},player,event)||storage.used.includes('basic'))&&(!event.filterCard({name:'jiu'},player,event)||storage.used.includes('basic'))) return false;
+						if(player.getStorage('fakeyigui2').includes('basic')) return false;
+						if(!event.filterCard({name:'tao'},player,event)&&!event.filterCard({name:'jiu'},player,event)) return false;
 						const target=event.dying;
 						return target.identity=='unknown'||target.identity=='ye'||storage.some(i=>{
 							var group=get.character(i,1);
@@ -990,7 +991,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						dialog.add([player.getStorage('fakeyigui'),'character']);
 						const list=get.inpileVCardList(info=>{
 							const name=info[2];
-							return get.type(name)=='basic'||get.type(card)=='trick';
+							if(player.getStorage('fakeyigui2').includes(get.type(name))) return false;
+							return get.type(name)=='basic'||get.type(name)=='trick';
 						});
 						dialog.add([list,'vcard']);
 						return dialog;
@@ -3537,14 +3539,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			fakecanmou:{
 				audio:'canmou',
 				trigger:{global:'useCardToPlayer'},
-				direct:true,
 				filter(event,player){
 					if(!event.player.isMaxHandcard(true)||!event.isFirstTarget||get.type(event.card)!='trick') return false;
 					if(event.targets.length>1&&!player.getStorage('fakecanmou_used').includes('-')) return true;
 					return get.info('fakecanmou').filter_add(event,player);
 				},
 				filter_add(event,player){
-					var info=get.info(event.card);
+					const info=get.info(event.card);
 					if(info.allowMultiple==false) return false;
 					if(event.targets&&!info.multitarget&&!player.getStorage('fakecanmou_used').includes('+')){
 						if(game.hasPlayer(current=>{
@@ -3554,7 +3555,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				async cost(event,trigger,player){
-					let str='',goon=get.info('fakecanmou').filter_add(event,player),bool=(trigger.targets.length>1&&!player.getStorage('fakecanmou_used').includes('-'));
+					let str='',goon=get.info('fakecanmou').filter_add(trigger,player),bool=(trigger.targets.length>1&&!player.getStorage('fakecanmou_used').includes('-'));
 					if(goon) str+='增加';
 					if(goon&&bool) str='或';
 					if(bool) str+='减少';
