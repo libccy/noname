@@ -616,7 +616,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				gz_wangling:['male','wei',4,['fakemibei']],
 				gz_yanyan:['male','shu',4,['fakejuzhan']],
-				gz_xin_zhuran:['male','wu',3,['fakedanshou']],
+				gz_xin_zhuran:['male','wu',4,['fakedanshou']],
 				gz_gaoshun:['male','qun',4,['fakexunxi','fakehuanjia']],
 				gz_jin_jiachong:['male','jin',3,['fakexiongshu','fakejianhui']],
 				gz_jin_yanghu:['male','jin',4,['fakechongxin','fakeweirong']],
