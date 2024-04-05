@@ -2602,8 +2602,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(!player.getStorage('fakehuanjia_equip1').includes(target)) return false;
 								if(event.name=='die'&&event.player==target) return true;
 								if(event.name=='equip'&&event.player==target) return get.subtype(event.card)=='equip1';
-								const evt=event.getl(target);
-								return evt&&evt.player==target&&evt.es&&evt.es.some(i=>get.subtype(i)=='equip1');
+								if(event.getl){
+									const evt=event.getl(target);
+									return evt&&evt.player==target&&evt.es&&evt.es.some(i=>get.subtype(i)=='equip1');
+								}
+								return false;
 							});
 						},
 						forced:true,
@@ -2636,8 +2639,11 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(!player.getStorage('fakehuanjia_equip2').includes(target)) return false;
 								if(event.name=='die'&&event.player==target) return true;
 								if(event.name=='equip'&&event.player==target) return get.subtype(event.card)=='equip2';
-								const evt=event.getl(target);
-								return evt&&evt.player==target&&evt.es&&evt.es.some(i=>get.subtype(i)=='equip2');
+								if(event.getl){
+									const evt=event.getl(target);
+									return evt&&evt.player==target&&evt.es&&evt.es.some(i=>get.subtype(i)=='equip2');
+								}
+								return false;
 							});
 						},
 						forced:true,
@@ -3052,6 +3058,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							[[target.name1,target.name2],'character'],
 						],true).set('filterButton',button=>!get.is.jun(button.link));
 						if(bool){
+							player.line(target);
 							player.addSkill('fakeqingleng_effect');
 							if(player.getStorage('fakeqingleng_effect').some(list=>list[0]==target)){
 								player.storage.fakeqingleng_effect.indexOf(player.getStorage('fakeqingleng_effect').find(list=>list[0]==target))[1].addArray(links);
