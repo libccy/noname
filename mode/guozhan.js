@@ -867,6 +867,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				selectTarget:-1,
 				usable:1,
+				multiline:true,
+				multitarget:true,
 				async content(event,trigger,player){
 					for(const target of event.targets){
 						if(player==target) await player.chooseToDiscard(true,'he');
