@@ -2334,7 +2334,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			fakejinqu:{
-				audio:2,
+				audio:'jinqu',
 				trigger:{player:'phaseJieshuBegin'},
 				check(event,player){
 					return player.getHistory('useSkill',evt=>{
