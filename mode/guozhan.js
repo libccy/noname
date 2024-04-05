@@ -1166,7 +1166,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						locked:false,
 						content(){
-							player.storage.fakeyigui_init=true;
 							get.info('fakeyigui').gainHun(player,2);
 						},
 					},
@@ -1182,6 +1181,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				group:'fakejihun_zhiheng',
 				subSkill:{
 					zhiheng:{
+						audio:'jihun',
 						trigger:{player:'phaseZhunbeiBegin'},
 						filter(event,player){
 							return player.getStorage('fakeyigui').length;
@@ -1279,8 +1279,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var hs=player.getCards('he');
 					if(hs.length>0){
-						if(hs.length<=num) event._result={bool:true,cards:hs};
-						else player.chooseCard('he',true,'选择'+get.cnNumber(num)+'张牌作为“权”',num);
+						if(hs.length<=event.num) event._result={bool:true,cards:hs};
+						else player.chooseCard('he',true,'选择'+get.cnNumber(event.num)+'张牌作为“权”',event.num);
 					}
 					else event.finish();
 					'step 2'
@@ -2181,9 +2181,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				filter(event,player){
 					return !player.isMaxHandcard();
 				},
-				forced:true,
-				locked:false,
-				preHidden:true,
 				async cost(event,trigger,player){
 					const filterTarget=(card,player,target)=>{
 						return target!=player&&target.isMaxHandcard();
@@ -2196,6 +2193,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						return get.attitude(player,target);
 					}).forResult();
 				},
+				preHidden:true,
 				async content(event,trigger,player){
 					const target=event.targets[0];
 					const {result:{junling,targets}}=await target.chooseJunlingFor(player);
@@ -2211,7 +2209,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(event.name=='carryOutJunling'){
 								return event.source.countCards('h')>player.countCards('h');
 							}
-							return event.index==1&&player.countCards('h');
+							return event.result.index==1&&player.countCards('h');
 						},
 						forced:true,
 						locked:false,
@@ -2718,7 +2716,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					if(!event.source||!event.player||!event.source.isIn()||!event.player.isIn()) return false;
 					return event.source.isFriendOf(event.player)&&[event.source,event.player].some(target=>target.countCards('he'));
 				},
-				async cost(event,player){
+				async cost(event,trigger,player){
 					event.result=await player.chooseTarget(get.prompt('fakejianhui'),(card,player,target)=>{
 						const trigger=get.event().getTrigger();
 						if(!(trigger.source==target&&trigger.player==target)) return false;
@@ -3240,7 +3238,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						group:'fakeqimei_hp',
 						onremove:true,
-						mark:'character',
+						mark:true,
 						intro:{content:'已和$组成齐眉组合'},
 					},
 					hp:{
