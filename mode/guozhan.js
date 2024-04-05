@@ -573,13 +573,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 
 				gz_jin_zhangchunhua:['female','jin',3,['gzhuishi','fakeqingleng']],
 				gz_jin_simayi:['male','jin',3,['fakequanbian','smyyingshi','fakezhouting']],
-				gz_jin_wangyuanji:['female','jin',3,['yanxi']],
+				gz_jin_wangyuanji:['female','jin',3,['fakeyanxi','fakeshiren']],
 				gz_jin_simazhao:['male','jin',3,['zhaoran','gzchoufa']],
-				gz_jin_xiahouhui:['female','jin',3,['jyishi','shiduo']],
+				gz_jin_xiahouhui:['female','jin',3,['fakebaoqie','jyishi','shiduo']],
 				gz_jin_simashi:['male','jin',5,['gzyimie','gztairan']],
 				gz_duyu:['male','jin',4,['gzsanchen','gzpozhu']],
 				gz_zhanghuyuechen:['male','jin',4,['fakexijue']],
-				gz_jin_yanghuiyu:['female','jin',3,['ciwei','gzcaiyuan']],
+				gz_jin_yanghuiyu:['female','jin',3,['fakeciwei','fakehuirong']],
 				gz_simazhou:['male','jin',4,['recaiwang','naxiang']],
 				gz_shibao:['male','jin',4,['gzzhuosheng']],
 				gz_weiguan:['male','jin',3,['zhongyun','shenpin']],
@@ -1159,7 +1159,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						filter(event,player){
 							if(!event.toShow.some(i=>get.character(i,3).includes('fakeyigui'))) return false;
 							return game.getAllGlobalHistory('everything',evt=>{
-								return evt.name=='showCharacter'&&evt.toShow.some(i=>get.character(i,3).includes('fakeyigui'));
+								return evt.name=='showCharacter'&&evt.player==player&&evt.toShow.some(i=>get.character(i,3).includes('fakeyigui'));
 							},event).indexOf(event)==0;
 						},
 						forced:true,
@@ -2064,7 +2064,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						trigger:{player:'showCharacterEnd'},
 						filter(event,player){
 							if(game.getAllGlobalHistory('everything',evt=>{
-								return evt.name=='showCharacter'&&evt.toShow.some(i=>get.character(i,3).includes('fakedujin'));
+								return evt.name=='showCharacter'&&evt.player==player&&evt.toShow.some(i=>get.character(i,3).includes('fakedujin'));
 							},event).indexOf(event)!=0) return false;
 							return game.getAllGlobalHistory('everything',evt=>{
 								return evt.name=='showCharacter'&&evt.player.isFriendOf(player);
@@ -2969,7 +2969,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'showCharacterEnd'},
 				filter(event,player){
 					return game.getAllGlobalHistory('everything',evt=>{
-						return evt.name=='showCharacter'&&evt.toShow.some(i=>get.character(i,3).includes('fakexuanbei'));
+						return evt.name=='showCharacter'&&evt.player==player&&evt.toShow.some(i=>get.character(i,3).includes('fakexuanbei'));
 					},event).indexOf(event)==0;
 				},
 				forced:true,
@@ -3121,7 +3121,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'showCharacterEnd'},
 				filter(event,player){
 					return game.getAllGlobalHistory('everything',evt=>{
-						return evt.name=='showCharacter'&&evt.toShow.some(i=>get.character(i,3).includes('fakexijue'));
+						return evt.name=='showCharacter'&&evt.player==player&&evt.toShow.some(i=>get.character(i,3).includes('fakexijue'));
 					},event).indexOf(event)==0;
 				},
 				forced:true,
@@ -3259,6 +3259,278 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						content(){
 							game.delayx();
 							(player==trigger.player?player.storage.fakeqimei_draw:player).draw();
+						},
+					},
+				},
+			},
+			fakebaoqie:{
+				audio:'baoqie',
+				trigger:{player:'showCharacterEnd'},
+				filter(event,player){
+					if(!game.hasPlayer(target=>{
+						return target.getGainableCards(player,'e').some(card=>get.subtype(card)=='equip5');
+					})) return false;
+					return game.getAllGlobalHistory('everything',evt=>{
+						return evt.name=='showCharacter'&&evt.player==player&&evt.toShow.some(i=>get.character(i,3).includes('fakebaoqie'));
+					},event).indexOf(event)==0;
+				},
+				async cost(event,trigger,player){
+					event.result=await player.chooseTarget(get.prompt('fakebaoqie'),'获得一名角色的宝物牌，然后你可以使用此牌',(card,player,target)=>{
+						return target.getGainableCards(player,'e').some(card=>get.subtype(card)=='equip5');
+					}).set('ai',target=>{
+						const player=get.event('player');
+						return -get.sgn(get.attitude(player,target))*target.getGainableCards(player,'e').filter(card=>{
+							return get.subtype(card)=='equip5';
+						}).reduce((sum,card)=>sum+get.value(card,target),0);
+					}).forResult();
+				},
+				async content(event,trigger,player){
+					const target=event.targets[0];
+					let cards=target.getGainableCards(player,'e').filter(card=>get.subtype(card)=='equip5');
+					await player.gain(cards,target,'giveAuto');
+					cards=cards.filter(i=>get.owner(i)==player&&get.position(i)=='h'&&player.hasUseTarget(i));
+					if(cards.length){
+						const {result:{bool,links}}=await player.chooseButton(['宝箧：是否使用其中一张宝物牌？',cards]).set('ai',button=>{
+							return get.equipValue(button.link,get.event('player'));
+						});
+						if(bool) await player.chooseUseTarget(card,true);
+					}
+				},
+				ai:{mingzhi_no:true},
+				group:'fakebaoqie_damage',
+				subSkill:{
+					damage:{
+						audio:'baoqie',
+						trigger:{player:'damageBegin4'},
+						filter(event,player){
+							if(!player.getStockSkills(true,true,true).includes('fakebaoqie')) return false;
+							return !game.getAllGlobalHistory('everything',evt=>{
+								return evt.name=='showCharacter'&&evt.player==player&&evt.toShow.some(i=>get.character(i,3).includes('fakebaoqie'));
+							}).length;
+						},
+						check(event,player){
+							return !event.source||get.damageEffect(player,event.source,player)<0;
+						},
+						prompt:'宝箧：是否明置此武将牌并防止此伤害？',
+						content(){
+							trigger.cancel();
+						},
+					},
+				},
+			},
+			fakeciwei:{
+				audio:'ciwei',
+				trigger:{global:'useCard'},
+				filter(event,player){
+					if(event.all_excluded||event.player==player||!player.countCards('he')) return false;
+					return event.player.getHistory('useCard').indexOf(event)%2==1;
+				},
+				async cost(event,trigger,player){
+					let str='弃置一张牌，取消'+get.translation(trigger.card)+'的所有目标';
+					if(get.type(trigger.card)=='equip') str+='，然后你获得此牌且你可以使用之';
+					event.result=await player.chooseToDiscard(get.prompt('fakeciwei',trigger.player),str,'he').set('ai',card=>{
+						return (_status.event.goon/1.4)-get.value(card);
+					}).set('goon',function(){
+						if(!trigger.targets.length) return -get.attitude(player,trigger.player);
+						var num=0;
+						for(var i of trigger.targets){
+							num-=get.effect(i,trigger.card,trigger.player,player);
+						}
+						return num;
+					}()).setHiddenSkill('fakeciwei').set('logSkill',['fakeciwei',trigger.player]).forResult();
+				},
+				preHidden:true,
+				popup:false,
+				async content(event,trigger,player){
+					trigger.targets.length=0;
+					trigger.all_excluded=true;
+					if(get.type(trigger.card)=='equip'&&!get.owner(trigger.card)){
+						await player.gain(trigger.card,'gain2');
+						if(get.owner(trigger.card)==player&&player.hasUseTarget(trigger.card)){
+							await player.chooseUseTarget(trigger.card);
+						}
+					}
+				},
+				global:'fakeciwei_ai',
+				subSkill:{
+					ai:{
+						mod:{
+							aiOrder(player,card,num){
+								if(!player.getHistory('useCard').length%2||!game.hasPlayer(current=>{
+									return current!=player&&(get.realAttitude||get.attitude)(current,player)<0&&current.hasSkill('fakeciwei')&&current.countCards('he')>0;
+								})) return;
+								if(!player._fakeciwei_temp){
+									player._fakeciwei_temp=true;
+									num/=Math.max(1,player.getUseValue(card));
+								}
+								delete player._fakeciwei_temp;
+								return num;
+							},
+						},
+					},
+				},
+			},
+			fakehuirong:{
+				audio:'huirong',
+				trigger:{player:'showCharacterEnd'},
+				filter(event,player){
+					if(!game.hasPlayer(target=>{
+						return target.countCards('h')!=target.getHp();
+					})) return false;
+					return game.getAllGlobalHistory('everything',evt=>{
+						return evt.name=='showCharacter'&&evt.player==player&&evt.toShow.some(i=>get.character(i,3).includes('fakehuirong'));
+					},event).indexOf(event)==0;
+				},
+				async cost(event,trigger,player){
+					event.result=await player.chooseTarget(get.prompt('fakehuirong'),'令一名角色将手牌数摸至/弃置至与其体力值相同',(card,player,target)=>{
+						return target.countCards('h')!=target.getHp();
+					}).set('ai',target=>{
+						const att=get.attitude(get.event('player'),target);
+						const num=target.countCards('h');
+						if(num>target.hp) return -att*(num-target.getHp());
+						return att*Math.max(0,target.getHp()-target.countCards('h'));
+					}).forResult();
+				},
+				preHidden:true,
+				content(){
+					const target=event.targets[0];
+					if(target.countCards('h')<target.getHp()) target.drawTo(target.getHp());
+					else target.chooseToDiscard('h',true,target.countCards('h')-target.getHp());
+				},
+				ai:{mingzhi_no:true},
+				group:'fakehuirong_damage',
+				subSkill:{
+					damage:{
+						audio:'huirong',
+						trigger:{player:'damageBegin4'},
+						filter(event,player){
+							if(!player.getStockSkills(true,true,true).includes('fakehuirong')) return false;
+							return !game.getAllGlobalHistory('everything',evt=>{
+								return evt.name=='showCharacter'&&evt.player==player&&evt.toShow.some(i=>get.character(i,3).includes('fakehuirong'));
+							}).length;
+						},
+						check(event,player){
+							return !event.source||get.damageEffect(player,event.source,player)<0;
+						},
+						prompt:'慧容：是否明置此武将牌并防止此伤害？',
+						content(){
+							trigger.cancel();
+						},
+					},
+				},
+			},
+			fakeyanxi:{
+				audio:'yanxi',
+				enable:'phaseUse',
+				filter(event,player){
+					return game.hasPlayer(target=>{
+						return get.info('fakeyanxi').filterTarget(null,player,target);
+					});
+				},
+				filterTarget(card,player,target){
+					return target!=player&&target.countCards('h');
+				},
+				async content(event,trigger,player){
+					const target=event.target,str=get.translation(target);
+					const {result:{bool,links}}=await player.choosePlayerCard(target,'宴戏：展示'+str+'的一张手牌','h',true);
+					if(bool){
+						let cards=get.cards(2),gains=[];
+						await game.cardsGotoOrdering(cards);
+						cards=links.slice().concat(cards);
+						await player.showCards(cards,get.translation(player)+'发动了【宴戏】');
+						for(const card of cards){
+							gains.unshift(get.color(card));
+							gains.add(get.type2(card));
+						}
+						gains=gains.unique().map(i=>i=='none'?'none2':i);
+						const {result:{control}}=await player.chooseControl(gains).set('cards',cards).set('ai',()=>{
+							const player=get.event('player'),cards=get.event('cards'),getNum=function(cards,control,player){
+								cards=cards.filter(i=>get.type2(i)==control||get.color(i)==control);
+								return cards.reduce((sum,card)=>sum+get.value(card,player),0);
+							};
+							let controls=get.event('controls').slice().map(i=>i=='none2'?'none':i);
+							controls.sort((a,b)=>getNum(cards,b,player)-getNum(cards,a,player));
+							return controls[0]=='none'?'none2':controls[0];
+						}).set('dialog',['获得其中一种颜色或类别的所有牌，然后'+str+'获得剩余牌','hidden',cards]);
+						if(control){
+							const choice=(control=='none2'?'none':control);
+							gains=cards.filter(i=>get.type2(i)==choice||get.color(i)==choice);
+							const num=gains.length;
+							cards.removeArray(gains);
+							if(gains.includes(links[0])){
+								gains.removeArray(links);
+								await player.gain(links,target,'give','bySelf');
+							}
+							if(gains.length) await player.gain(gains,'gain2');
+							player.addTempSkill('fakeyanxi_maxHand');
+							player.addMark('fakeyanxi_maxHand',num,false);
+							cards=cards.filter(i=>!links.includes(i));
+							if(cards.length) await target.gain(cards,'gain2');
+						}
+					}
+				},
+				ai:{
+					order:9,
+					result:{
+						target(player,target){
+							return [-1,1,2][get.sgn(get.attitude(player,target))+1]/target.countCards('h');
+						},
+					},
+				},
+				subSkill:{
+					maxHand:{
+						charlotte:true,
+						onremove:true,
+						intro:{content:'手牌上限+#'},
+						mod:{
+							maxHandcard(player,num){
+								return num+player.countMark('fakeyanxi_maxHand');
+							},
+						},
+					},
+				},
+			},
+			fakeshiren:{
+				audio:'shiren',
+				trigger:{player:'showCharacterEnd'},
+				filter(event,player){
+					if(!game.hasPlayer(target=>{
+						return get.info('fakeyanxi').filterTarget(null,player,target);
+					})) return false;
+					return game.getAllGlobalHistory('everything',evt=>{
+						return evt.name=='showCharacter'&&evt.player==player&&evt.toShow.some(i=>get.character(i,3).includes('fakeshiren'));
+					},event).indexOf(event)==0;
+				},
+				async cost(event,trigger,player){
+					event.result=await player.chooseTarget(get.prompt('fakeshiren'),'发动一次【宴戏】',(card,player,target)=>{
+						return get.info('fakeyanxi').filterTarget(null,player,target);
+					}).set('ai',target=>{
+						const player=get.event('player');
+						return -get.sgn(get.attitude(player,target))*get.info('fakeyanxi').ai.result.target(player,target);
+					}).forResult();
+				},
+				async content(event,trigger,player){
+					const target=event.targets[0];
+					player.useResult({skill:'fakeyanxi',target:target,targets:[target]},event);
+				},
+				ai:{mingzhi_no:true},
+				group:'fakeshiren_damage',
+				subSkill:{
+					damage:{
+						audio:'shiren',
+						trigger:{player:'damageBegin4'},
+						filter(event,player){
+							if(!player.getStockSkills(true,true,true).includes('fakeshiren')) return false;
+							return !game.getAllGlobalHistory('everything',evt=>{
+								return evt.name=='showCharacter'&&evt.player==player&&evt.toShow.some(i=>get.character(i,3).includes('fakeshiren'));
+							}).length;
+						},
+						check(event,player){
+							return !event.source||get.damageEffect(player,event.source,player)<0;
+						},
+						prompt:'识人：是否明置此武将牌并防止此伤害？',
+						content(){
+							trigger.cancel();
 						},
 					},
 				},
@@ -17750,6 +18022,16 @@ return event.junling=='junling5'?1:0;});
 			fakexijue_xiaoguo_info:'一名其他角色的准备阶段，你可以弃置至多X张基本牌（X为你的“爵”标记数，且X至多为你的体力上限），然后弃置其装备区等量的牌，若其装备区的牌数小于你弃置的牌数，则你对其造成1点伤害。',
 			fakeqimei:'齐眉',
 			fakeqimei_info:'准备阶段，你可以选择一名其他角色。若如此做，直到回合结束：当你或其获得牌/失去手牌后，若你与其手牌数相等，则另一名角色回复1点体力；当你或其的体力值变化后，若你与其体力值相等，则另一名角色摸一张牌。',
+			fakebaoqie:'宝箧',
+			fakebaoqie_info:'①当你受到伤害时，若此武将牌未明置过，则你可以明置此武将牌并防止此伤害。②当你首次明置此武将牌时，你可以获得一名角色的宝物牌，然后你可以使用其中的一张牌。',
+			fakeciwei:'慈威',
+			fakeciwei_info:'其他角色于一回合内使用第偶数张牌时，你可以弃置一张牌并取消此牌的所有目标，然后若此牌为装备牌，你可以获得之且你可以使用之。',
+			fakehuirong:'慧容',
+			fakehuirong_info:'①当你受到伤害时，若此武将牌未明置过，则你可以明置此武将牌并防止此伤害。②当你首次明置此武将牌时，你可以令一名角色将手牌数调整至其体力值。',
+			fakeyanxi:'宴戏',
+			fakeyanxi_info:'出牌阶段限一次，你可以展示一名其他角色的一张手牌和牌堆顶的两张牌，然后你获得其中一种颜色或类别的所有牌且本回合手牌上限+X（X为你获得的牌数），然后其获得剩余的牌。',
+			fakeshiren:'识人',
+			fakeshiren_info:'①当你受到伤害时，若此武将牌未明置过，则你可以明置此武将牌并防止此伤害。②当你首次明置此武将牌时，你可以发动一次〖宴戏〗。',
 
 			guozhan_default:"国战标准",
 			guozhan_zhen:"君临天下·阵",
