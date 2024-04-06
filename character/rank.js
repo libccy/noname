@@ -137,6 +137,7 @@ window.noname_character_rank={
 		'xia_yuzhenzi',
 		'dc_simashi',
 		'dc_sb_simayi',
+		'caofang',
 	],
 	a:[
 		'star_caoren',
@@ -2179,6 +2180,7 @@ window.noname_character_rank={
 			'xia_shitao',
 			'bailingyun',
 			'dc_sb_simayi',
+			'caofang',
 		],
 		rare:[
 			're_wangyi',

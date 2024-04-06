@@ -13572,7 +13572,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rejianxiong_old:{
-				audio:2,
+				audio:'rejianxiong',
 				trigger:{player:'damageEnd'},
 				direct:true,
 				content:function(){
@@ -15581,6 +15581,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_lidian_prefix:'界',
 			re_xushu:'界徐庶',
 			re_xushu_prefix:'界',
+			rejianxiong_old:'奸雄',
+			rejianxiong_old_info:'当你受到伤害后，你可以摸一张牌或获得对你造成伤害的牌。',
 
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

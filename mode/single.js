@@ -362,6 +362,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			if(_status.connectMode&&lib.configOL.change_card) game.replaceHandcards(game.players.slice(0));
 			'step 4'
 			game.phaseLoop(game.zhu);
+			game.countPlayer(current=>current.showGiveup(),true);
 		},
 		game:{
 			canReplaceViewpoint:()=>true,
@@ -550,7 +551,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						ui.wuxianhuoliProgress.innerHTML='任务进度(0/3)';
 						const showTasks=()=>{
 							if(ui.wuxianhuoliInfo) return;
-							ui.wuxianhuoliInfo=ui.create.system('无限火力·信息',null,true);
+							ui.wuxianhuoliInfo=ui.create.system('无限火力',null,true);
 							ui.wuxianhuoliInfo.currentProgress=0;
 							ui.wuxianhuoliInfo.currentLevel=0;
 							lib.setPopped(ui.wuxianhuoliInfo,()=>{
@@ -943,7 +944,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						ui.wuxianhuoliProgress.innerHTML='任务进度(0/3)';
 						const showTasks=()=>{
 							if(ui.wuxianhuoliInfo) return;
-							ui.wuxianhuoliInfo=ui.create.system('无限火力·信息',null,true);
+							ui.wuxianhuoliInfo=ui.create.system('无限火力',null,true);
 							ui.wuxianhuoliInfo.currentProgress=0;
 							ui.wuxianhuoliInfo.currentLevel=0;
 							lib.setPopped(ui.wuxianhuoliInfo,()=>{
