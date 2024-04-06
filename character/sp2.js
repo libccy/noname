@@ -718,8 +718,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				create:function(group,player){
-					if(!lib.skill['starcanxi_'+group]){
-						lib.skill['starcanxi_'+group]={
+					const skill='starcanxi_'+group;
+					get.info('starcanxi').createSkill(skill);
+					if(!_status.postReconnect.starcanxi){
+						_status.postReconnect.starcanxi=[get.info('starcanxi').createSkill,[]];
+					}
+					_status.postReconnect.starcanxi[1].add(skill);
+					player.addSkill(skill);
+				},
+				createSkill(skill){
+					if(!lib.skill[skill]) game.broadcastAll(skill=>{
+						const group=skill.slice('starcanxi_'.length);
+						lib.skill[skill]={
 							mark:true,
 							charlotte:true,
 							onremove:function(player){
@@ -727,11 +737,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							intro:{content:'玉玺的一角'},
 						};
-						lib.translate['starcanxi_'+group]='残玺·'+get.translation(group+'2');
-						lib.skill['starcanxi_'+group].marktext=get.translation(group);
-						lib.translate['starcanxi_'+group+'_bg']=get.translation(group);
-					}
-					player.addSkill('starcanxi_'+group);
+						lib.translate[skill]='残玺·'+get.translation(group+'2');
+						lib.skill[skill].marktext=get.translation(group);
+						lib.translate[skill+'_bg']=get.translation(group);
+					},skill);
 				},
 				subSkill:{
 					wangsheng:{
