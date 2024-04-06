@@ -4660,26 +4660,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'xinfu_xingluan',
 				usable:1,
 				trigger:{player:'useCardAfter'},
-				direct:true,
 				filter:function(event,player){
 					return player.isPhaseUsing();
 				},
-				content:function(){
-					'step 0'
-					var list=['观看牌堆中两张点数为6的牌并获得其中一张'];
-					event.addIndex=1;
-					var bool2=false,bool3=game.hasPlayer(function(current){
-						if(current!=player&&current.countCards('he')>0) bool2=true;
+				async cost(event, trigger, player){
+					const choiceList = [
+						'观看牌堆中两张点数为6的牌并获得其中一张',
+						'令一名其他角色弃置一张点数为6的牌或交给你一张牌',
+						'获得场上一张点数为6的牌'
+					], choices = ['选项一'];
+					if (game.hasPlayer(current => (current != player && current.countCards('he') > 0))) {
+						choices.push('选项二');
+					}
+					else {
+						choiceList[1] = `<span style="opacity:0.5">${ choiceList[1] }</span>`;
+					}
+					if (game.hasPlayer(current => {
 						return current.hasCard(function(card){
 							return get.number(card)==6&&lib.filter.canBeGained(card,current,player);
 						},'ej');
-					});
-					if(bool2){
-						event.addIndex=0;
-						list.push('令一名其他角色弃置一张点数为6的牌或交给你一张牌');
+					})) {
+						choices.push('选项三');
 					}
-					if(bool3) list.push('获得场上一张点数为6的牌');
-					player.chooseControl('cancel2').set('choiceList',list).set('prompt',get.prompt('xinxingluan')).set('ai',function(){
+					else {
+						choiceList[2] = `<span style="opacity:0.5">${ choiceList[2] }</span>`;
+					}
+					const result = await player.chooseControl(choices, 'cancel2')
+						.set('choiceList',choiceList).set('prompt',get.prompt('xinxingluan'))
+						.set('ai',function(){
 						var player=_status.event.player;
 						if(game.hasPlayer(function(current){
 							if(current==player) return false;
@@ -4687,26 +4695,57 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return current.hasCard(function(card){
 								return get.number(card)==6&&lib.filter.canBeGained(card,current,player)&&get.sgn(get.useful(card,current))==att;
 							},'ej');
-						})) return 2-_status.event.getParent().addIndex;
+						})) return '选项三';
 						if(game.hasPlayer(function(target){
 							if(target==player) return false;
 							var att=get.attitude(player,target);
 							return att<0&&target.countCards('he')>0&&!target.hasCard(function(card){
 								return get.value(card,target)<=0;
 							},'he');
-						})) return 1;
-						return 0;
-					});
-					'step 1'
-					if(result.control!='cancel2'){
-						if(result.index==0){
-							player.logSkill('xinxingluan');
+						})) return '选项二';
+						return '选项一';
+					}).forResult();
+					if (result.control !== 'cancel2') {
+						const results = {bool: true, cost_data: {index: choices.indexOf(result.control)}};
+						if(results.cost_data.index === 1) {
+							const {targets} = await player.chooseTarget('令一名其他角色弃置一张点数为6的牌，否则交给你一张牌',true,function(card,player,current){
+								return current!=player&&current.countCards('he')>0;
+							}).set('ai',function(target){
+								var player=_status.event.player,att=get.attitude(player,target);
+								if(att>=0) return 0;
+								if(!target.hasCard(function(card){
+									return get.value(card,target)<=0;
+								},'he')) return -att/Math.sqrt(target.countCards('he'));
+								return 0;
+							}).forResult();
+							results.targets = targets;
 						}
-						else if(result.index+event.addIndex==1) event.goto(6);
-						else event.goto(4);
+						else if(results.cost_data.index === 2){
+							const {targets} = await player.chooseTarget('获得一名角色装备区或判定区内点数为6的牌',true,function(card,player,current){
+								return current.hasCard(function(card){
+									return get.number(card)==6&&lib.filter.canBeGained(card,current,player);
+								},'ej');
+							}).set('ai',function(target){
+								var player=_status.event.player,att=-get.sgn(get.attitude(player,target)-0.1),max=0,ej=target.getCards('ej',function(card){
+									return get.number(card)==6&&lib.filter.canBeGained(card,target,player);
+								});
+								for(var i of ej){
+									var num=get.useful(i,target)*att;
+									if(num>max) max=num;
+									return max;
+								}
+							}).forResult();
+							results.targets = targets;
+						}
+						event.result = results;
 					}
-					else event.finish();
-					'step 2'
+				},
+				content:function(){
+					'step 0'
+					var result = event.cost_data;
+					if(result.index === 1) event.goto(4);
+					else if(result.index === 2) event.goto(3);
+					'step 1'
 					var cards=[];
 					while(cards.length<2){
 						var card=get.cardPile2(function(card){
@@ -4725,62 +4764,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else player.chooseButton(['兴乱：选择获得其中一张',cards],true).set('ai',function(button){
 						return get.value(button.link,_status.event.player);
 					});
-					'step 3'
+					'step 2'
 					if(result.bool){
 						player.gain(result.links,'gain2');
 					}
 					event.finish();
-					'step 4'
-					player.chooseTarget('获得一名角色装备区或判定区内点数为6的牌',true,function(card,player,current){
-						return current.hasCard(function(card){
-							return get.number(card)==6&&lib.filter.canBeGained(card,current,player);
-						},'ej');
-					}).set('ai',function(target){
-						var player=_status.event.player,att=-get.sgn(get.attitude(player,target)-0.1),max=0,ej=target.getCards('ej',function(card){
-							return get.number(card)==6&&lib.filter.canBeGained(card,target,player);
-						});
-						for(var i of ej){
-							var num=get.useful(i,target)*att;
-							if(num>max) max=num;
-							return max;
-						}
+					'step 3'
+					var target=targets[0];
+					player.gainPlayerCard(target,'ej',true).set('filterButton',function(button){
+						return get.number(button.link)==6;
 					});
-					'step 5'
-					if(result.bool){
-						var target=result.targets[0];
-						player.logSkill('xinxingluan',target);
-						player.gainPlayerCard(target,'ej',true).set('filterButton',function(button){
-							return get.number(button.link)==6;
-						});
-					}
 					event.finish();
-					'step 6'
-					if(!game.hasPlayer(current=>current!=player)) event.finish();
-					else player.chooseTarget('令一名其他角色弃置一张点数为6的牌，否则交给你一张牌',true,function(card,player,current){
-						return current!=player&&current.countCards('he')>0;
-					}).set('ai',function(target){
-						var player=_status.event.player,att=get.attitude(player,target);
-						if(att>=0) return 0;
-						if(!target.hasCard(function(card){
-							return get.value(card,target)<=0;
-						},'he')) return -att/Math.sqrt(target.countCards('he'));
-						return 0;
-					});
-					'step 7'
-					if(result.bool){
-						var target=result.targets[0];
-						event.target=target;
-						player.logSkill('xinxingluan',target);
-						target.chooseToDiscard('he','弃置一张点数为6的牌，否则交给'+get.translation(player)+'一张牌',function(card){
-							return get.number(card)==6;
-						}).ai=(card)=>(8-get.value(card));
-					}
-					'step 8'
+					'step 4'
+					var target=targets[0];
+					event.target=target;
+					target.chooseToDiscard('he','弃置一张点数为6的牌，否则交给'+get.translation(player)+'一张牌',function(card){
+						return get.number(card)==6;
+					}).ai=(card)=>(8-get.value(card));
+					'step 5'
 					if(!result.bool){
 						target.chooseCard('he',true,'交给'+get.translation(player)+'一张牌');
 					}
 					else event.finish();
-					'step 9'
+					'step 6'
 					if(result.bool) target.give(result.cards,player,'giveAuto');
 				},
 			},
