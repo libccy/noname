@@ -1747,11 +1747,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var {result:{bool,cards}}=await player.chooseToGive(get.prompt2('olxiangzuo',target),[1,num],'he').set('ai',card=>{
 						var player=_status.event.player,target=_status.event.target;
 						if(player.getHistory('useSkill',evt=>{
-							return (evt.skill=='olgongjie'||evt.skill=='olxiangxv')&&evt.targets.includes(target);
+							return evt.skill=='olgongjie'&&evt.targets.includes(target);
+						}).length&&player.getHistory('useSkill',evt=>{
+							return evt.skill=='olxiangxv'&&evt.targets.includes(target);
 						}).length){
 							if(get.attitude(player,target)>0) return 1;
 							if(player.canSaveCard(card,player)) return 0;
-							if(ui.selected.cards.length+player.hp==player.maxHp) return 0;
+							if(ui.selected.cards.length+player.hp>=player.maxHp) return 0;
 							return 20-get.value(card);
 						}
 						else{
@@ -1762,7 +1764,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!bool) return;
 					player.awakenSkill('olxiangzuo');
 					if(player.getHistory('useSkill',evt=>{
-						return (evt.skill=='olgongjie'||evt.skill=='olxiangxv')&&evt.targets.includes(target);
+						return evt.skill=='olgongjie'&&evt.targets.includes(target);
+					}).length&&player.getHistory('useSkill',evt=>{
+						return evt.skill=='olxiangxv'&&evt.targets.includes(target);
 					}).length) player.recover(cards.length);
 				},
 			},
@@ -27741,7 +27745,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olxiangxv:'相胥',
 			olxiangxv_info:'当你的手牌数变为全场最少时，你可以获得以下效果：本回合结束时，将手牌数调整至与当前回合角色手牌数相同（至多摸至五张）。',
 			olxiangzuo:'襄胙',
-			olxiangzuo_info:'限定技，当你进入濒死状态时，你可以交给当前回合角色任意张牌，若如此做，若你本回合已对其发动过〖恭节〗或〖相胥〗，你回复等量的体力。',
+			olxiangzuo_info:'限定技，当你进入濒死状态时，你可以交给当前回合角色任意张牌，若如此做，若你本回合已对其发动过〖恭节〗和〖相胥〗，你回复等量的体力。',
 			liyi:'李异',
 			olchanshuang:'缠双',
 			olchanshuang_info:'①出牌阶段限一次，你可以选择一名其他角色。你与其依次选择〖缠双③〗的一项，然后你与其依次执行各自选择的项。②结束阶段，若X大于0，你执行〖缠双③〗的前X项（X为你本回合以任意形式执行过的〖缠双③〗的选项数）。③选项：1.重铸一张牌；2.使用一张【杀】；3.弃置两张牌。',

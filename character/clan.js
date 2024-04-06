@@ -2480,6 +2480,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clandianzhan:{
 				audio:2,
+				intro:{
+					content:'已使用过的花色：$',
+					onunmark:true
+				},
 				trigger:{player:'useCardAfter'},
 				forced:true,
 				filter(event,player){
@@ -2498,13 +2502,50 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content(){
 					'step 0'
-					if(trigger.targets&&trigger.targets.length==1){
+					if(trigger.targets&&trigger.targets.length==1&&!trigger.targets[0].isLinked()){
 						trigger.targets[0].link(true);
+						event.link=true;
 					}
 					var cards=player.getCards('h',card=>get.suit(card)==get.suit(trigger.card)&&player.canRecast(card));
-					if(cards.length>0) player.recast(cards);
+					if(cards.length>0){
+						player.recast(cards);
+						event.recast=true;
+					}
 					'step 1'
-					player.draw();
+					if(event.link&&event.recast) player.draw();
+				},
+				group:['clandianzhan_count','clandianzhan_clear'],
+				subSkill:{
+					count:{
+						trigger:{player:'useCardAfter'},
+						filter(event,player){
+							let suit=get.suit(event.card);
+							return lib.suits.includes(suit)&&!player.getStorage('clandianzhan').includes(suit);
+						},
+						silent:true,
+						charlotte:true,
+						content(){
+							player.storage.clandianzhan=[];
+							for(let i=player.actionHistory.length-1; i>=0; i--){
+								let history=player.actionHistory[i].useCard;
+								for(let evt of history){
+									player.storage.clandianzhan.add(get.suit(evt.card));
+								}
+								if(player.actionHistory[i].isRound) break;
+							}
+							player.markSkill('clandianzhan');
+						},
+						sub:true
+					},
+					clear:{
+						trigger:{global:'roundStart'},
+						silent:true,
+						charlotte:true,
+						content(){
+							player.unmarkSkill('clandianzhan');
+						},
+						sub:true
+					}
 				}
 			},
 			clanhuanyin:{
@@ -2845,7 +2886,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanlieshi:'烈誓',
 			clanlieshi_info:'出牌阶段，你可以选择一项：1.废除判定区并受到你造成的1点火焰伤害；2.弃置所有【闪】；3.弃置所有【杀】。然后令一名其他角色从你未选择的选项中选择一项。',
 			clandianzhan:'点盏',
-			clandianzhan_info:'锁定技。当你每轮第一次使用一种花色的牌后：若此牌的目标数为1，你横置此牌目标；若你有此花色的手牌，你重铸这些牌。然后你摸一张牌。',
+			clandianzhan_info:'锁定技。当你每轮第一次使用一种花色的牌后：若此牌的目标数为1且目标未横置，你横置此牌目标；若你有此花色的手牌，你重铸这些牌。均执行后你摸一张牌。',
 			clanhuanyin:'还阴',
 			clanhuanyin_info:'锁定技。当你进入濒死状态时，将手牌补至四张。',
 			clan_xunchen:'族荀谌',

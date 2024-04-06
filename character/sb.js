@@ -4064,38 +4064,28 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var next=player.chooseTarget(get.prompt2('sbjijiang'),2);
 					next.set('filterTarget',(card,player,target)=>{
-						if(!ui.selected.targets.length) return true;
+						if(!ui.selected.targets.length) return target.group=='shu'&&target.hp>=player.hp&&target!=player;
 						var current=ui.selected.targets[0];
-						if(current.group=='shu'&&current.hp>=player.hp&&current!=player){
-							return current.inRange(target);
-						}
-						else{
-							return target.group=='shu'&&target.hp>=player.hp&&target.inRange(current)&&target!=player;
-						}
-					})
-					next.set('targetprompt',target=>{
-						var player=_status.event.player;
-						if(target.group=='shu'&&target.hp>=player.hp&&target!=player&&!ui.selected.targets.some(i=>{
-							return i!=target&&i.hp>=player.hp&&i.group=='shu';
-						})) return '进行选择';
-						return '出杀对象';
+						return current.inRange(target);
 					});
+					next.set('targetprompt',['进行选择','出杀对象']);
+					next.set('multitarget',true);
 					next.set('ai',target=>{
 						var player=_status.event.player;
 						if(ui.selected.targets.length){
 							var current=ui.selected.targets[0];
-							if(current.group=='shu'&&current.hp>=player.hp&&current!=player){
-								return -get.attitude(player,target);
-							}
-							return Math.abs(get.attitude(player,current));
+							return get.effect(target,new lib.element.VCard({name:'sha'}),current,player);
 						}
-						else{
-							if(target.group=='shu'&&target.hp>=player.hp&&target!=player&&game.hasPlayer(current=>{
-								return get.attitude(player,current)<0;
-							})) return 10;
-							return 1;
+						let curs=game.filterPlayer(current=>{
+							return target!==current&&target.inRange(current)&&target.canUse({name:'sha',isCard:true},current,false);
+						});
+						if(!curs.length){
+							let att=get.attitude(player,target);
+							if(att>=0) return 0;
+							return -att*get.threaten(target,player);
 						}
-					})
+						return curs.reduce((max,i)=>Math.max(max,get.effect(i,new lib.element.VCard({name:'sha'}),target,player)),-1);
+					});
 					'step 1'
 					if(result.bool){
 						var targets=result.targets;
@@ -4107,7 +4097,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'视为对'+get.translation(targets[1])+'使用一张【杀】',
 							'你的下一个出牌阶段开始前，跳过此阶段'
 						];
-						targets[0].chooseControl().set('choiceList',choiceList).set('ai',()=>{
+						if(!targets[0].canUse({name:'sha',isCard:true},targets[1],false)) event._result={index:1};
+						else targets[0].chooseControl().set('choiceList',choiceList).set('ai',()=>{
 							return _status.event.choice;
 						}).set('choice',get.effect(targets[1],{name:'sha'},targets[0],targets[0])>get.effect(targets[0],{name:'lebu'},targets[0],targets[0])?0:1);
 					}
