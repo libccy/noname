@@ -123,6 +123,22 @@ export class UI extends Uninstantable {
 	 * @type {() => void}
 	 */
 	static updateVideoMenu;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	static menuContainer;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	static auto;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	static wuxie;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	static tempnowuxie;
 	static refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}
