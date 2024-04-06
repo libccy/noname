@@ -5441,8 +5441,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!arg||!arg.player) return true;
 						if(arg.player.hasSkillTag('unequip',false,{
 							target:player
-						})||arg.player.hasSkillTag('unequip_ai',false,{
-							target:player
 						})) return false;
 						return true;
 					},

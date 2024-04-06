@@ -4,6 +4,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		name:'xianding',
 		connect:true,
 		character:{
+			caofang:['male','wei',4,['dczhimin','dcjujian'],['zhu']],
 			dc_sb_simayi:['male','wei',3,['dcsbquanmou','dcsbpingliao']],
 			chendong:['male','wu',4,['dcduanxie','fenming']],
 			lvfan:['male','wu',3,['diaodu','diancai']],
@@ -103,7 +104,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp2_huben:['chendong','wangshuang','wenyang','re_liuzan','dc_huangzu','wulan','leitong','chentai','dc_duyu','dc_wangjun','dc_xiahouba','old_huangfusong','huzun'],
 				sp2_shengun:["puyuan","guanlu","gexuan",'wufan','re_zhangbao','dukui','zhaozhi','zhujianping','dc_zhouxuān','zerong'],
 				sp2_bizhe:['dc_luotong','dc_wangchang','chengbing','dc_yangbiao','ruanji','cuimao'],
-				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie'],
+				sp2_huangjia:['caomao','liubian','dc_liuyu','quanhuijie','dingshangwan','yuanji','xielingyu','sunyu','ganfurenmifuren','dc_ganfuren','dc_mifuren','dc_shixie','caofang'],
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue','caoxian','dc_qinghegongzhu','zhugemengxue'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan','caoyi'],
@@ -122,6 +123,143 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			],
 		},
 		skill:{
+			//曹芳
+			dczhimin:{
+				audio:2,
+				trigger:{global:'roundStart'},
+				filter(event,player){
+					return game.hasPlayer(current=>current!=player&&current.countCards('h'))&&player.getHp()>0;
+				},
+				forced:true,
+				group:['dczhimin_mark','dczhimin_draw'],
+				async content(event,trigger,player){
+					const targets = await player.chooseTarget(`置民：请选择至多${get.cnNumber(player.getHp())}名其他角色`, '你获得这些角色各自手牌中的随机一张点数最小的牌', (card, player, target) => {
+						return target !== player && target.countCards('h');
+					}, [1, player.getHp()], true).set('ai', target => {
+						const player = get.player();
+						return get.effect(target, {name:'shunshou_copy', position: 'h'}, player, player) + 0.1;
+					}).forResultTargets();
+					if (!targets || !targets.length) return;
+					targets.sortBySeat(trigger.player);
+					player.line(targets, 'thunder');
+					const toGain = [];
+					for (const target of targets) {
+						const cards = target.getCards('h'), minNumber = cards.map(card => get.number(card)).sort((a, b) => a - b)[0];
+						const gainableCards = cards.filter(card => {
+							return get.number(card) === minNumber && lib.filter.canBeGained(card, player, target);
+						}).randomSort();
+						toGain.push(gainableCards[0]);
+					}
+					if (toGain.length) await player.gain(toGain, 'giveAuto');
+					await game.asyncDelayx();
+				},
+				ai:{
+					threaten:5.8,
+				},
+				mod:{
+					aiOrder(player,card,num){
+						if(num>0&&get.itemtype(card)==='card'&&card.hasGaintag('dczhimin_tag')&&player.countCards('h',cardx=>{
+							return cardx.hasGaintag('dczhimin_tag')&&cardx!==card;
+						})<player.maxHp) return num/10;
+					}
+				},
+				subSkill:{
+					mark:{
+						audio:'dczhimin',
+						trigger:{
+							player:'gainAfter',
+							global:'loseAsyncAfter',
+						},
+						forced:true,
+						filter(event,player){
+							if(_status.currentPhase===player||!event.getg(player).some(card=>get.position(card)==='h'&&get.owner(card)===player)) return false;
+							return true;
+						},
+						async content(event,trigger,player){
+							player.addGaintag(trigger.getg(player).filter(card=>get.position(card)==='h'&&get.owner(card)===player), 'dczhimin_tag');
+						},
+					},
+					draw:{
+						audio:'dczhimin',
+						trigger:{
+							player:'loseAfter',
+							global:['equipAfter','addJudgeAfter','gainAfter','loseAsyncAfter','addToExpansionAfter'],
+						},
+						forced:true,
+						filter(event,player){
+							const evt=event.getl(player);
+							if(!evt.hs.length) return false;
+							return Object.values(evt.gaintag_map).flat().includes('dczhimin_tag');
+						},
+						async content(event,trigger,player){
+							const count = player.maxHp - player.countCards('h');
+							if (count <= 0) return;
+							await player.draw(count);
+						}
+					},
+				},
+			},
+			dcjujian:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				zhuSkill:true,
+				filter(event,player){
+					return game.hasPlayer(current=>{
+						return player.hasZhuSkill('dcjujian',current)&&current.group==='wei'&&current!==player;
+					});
+				},
+				filterTarget(_,player,target){
+					return player.hasZhuSkill('dcjujian',target)&&target.group==='wei'&&target!==player;
+				},
+				async content(event,trigger,player){
+					const target = event.targets[0];
+					await target.draw();
+					target.addTempSkill('dcjujian_forbid', 'roundStart');
+					target.markAuto('dcjujian_forbid', player);
+				},
+				ai:{
+					result:{
+						target(player,target){
+							const num=target.countCards('hs',card=>{
+								return get.type(card)=='trick'&&target.canUse(card,player)&&get.effect(player,card,target,player)<-2;
+							}),att=get.attitude(player,target);
+							if(att<0) return -0.74*num;
+							return 1.5;
+						},
+					},
+				},
+				subSkill:{
+					forbid:{
+						audio:'dcjujian',
+						trigger:{
+							player:'useCardToBefore',
+						},
+						filter(event,player){
+							if(get.type(event.card)!=='trick') return false;
+							return player.getStorage('dcjujian_forbid').includes(event.target);
+						},
+						forced:true,
+						charlotte:true,
+						onremove:true,
+						direct:true,
+						async content(event,trigger,player){
+							await trigger.target.logSkill('dcjujian_forbid', player);
+							trigger.cancel();
+						},
+						intro:{
+							content:'使用普通锦囊牌对$无效',
+						},
+						ai:{
+							effect:{
+								player(card,player,target,current){
+									if(get.type(card)=='trick'&&player.getStorage('dcjujian_forbid').includes(target)) return 'zeroplayertarget';
+								},
+							},
+						},
+					},
+				},
+			},
 			//谋司马懿
 			dcsbquanmou:{
 				audio:2,
@@ -9529,7 +9667,24 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(changed2.includes(from.link)) return true;
 							return changed.includes(to.link);
 						});
+						next.set('max',Math.min(hs.length,ts.length,player.getDamagedHp()));
 						next.set('processAI',function(list){
+							if(_status.event.max){
+								let gain=list[0][1].sort((a,b)=>{
+									return player.getUseValue(b,null,true)-player.getUseValue(a,null,true);
+								}).slice(0,_status.event.max),give=list[1][1].sort((a,b)=>{
+									return get.value(a,player)-get.value(b,player);
+								}).slice(0,_status.event.max);
+								for(let i of gain){
+									if(get.value(i,player)<get.value(give[0],player)) continue;
+									let j=give.shift();
+									list[0][1].remove(i);
+									list[0][1].push(j);
+									list[1][1].remove(j);
+									list[1][1].push(i);
+									if(!give.length) break;
+								}
+							}
 							return [list[0][1],list[1][1]];
 						});
 					}
@@ -14472,6 +14627,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			guozhao:['guozhao','xin_guozhao','jsrg_guozhao'],
 			dingshangwan:['dingshangwan','ol_dingshangwan'],
 			qinghegongzhu:['qinghegongzhu','dc_qinghegongzhu'],
+			caofang:['caofang','jsrg_caofang'],
 		},
 		translate:{
 			puyuan:'蒲元',
@@ -15030,6 +15186,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcsbquanmou_info:'转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。阴：当你于本阶段内下次对其造成伤害时，取消之；阳：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。',
 			dcsbpingliao:'平辽',
 			dcsbpingliao_info:'锁定技。当你声明使用【杀】时，你令此【杀】的目标对其他角色不可见，且你令攻击范围内的其他角色依次选择是否打出一张红色基本牌。所有角色选择完成后，此牌的目标角色中没有以此法打出牌的角色本回合内无法使用或打出手牌；若有不为此牌目标的角色以此法打出了牌，则你摸两张牌，且你本回合使用【杀】的次数上限+1。',
+			caofang:'曹芳',
+			dczhimin:'置民',
+			dczhimin_tag:'民',
+			dczhimin_info:'锁定技。①一轮游戏开始时，你选择至多X名其他角色（X为你的体力值），获得这些角色各自手牌中的随机一张点数最小的牌。②当你于你的回合外得到牌后，你将这些牌标记为“民”。③当你失去“民”后，你将手牌补至体力上限。',
+			dcjujian:'拒谏',	
+			dcjujian_info:'主公技。出牌阶段限一次，你可以令一名其他魏势力角色摸一张牌，然后你令其于本轮内使用的普通锦囊牌对你无效。',
 
 			sp2_yinyu:'隐山之玉',
 			sp2_huben:'百战虎贲',
