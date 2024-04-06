@@ -49,6 +49,10 @@ export const status = {
 	 * @type { boolean | void }
 	 */
 	touchconfirmed: undefined,
+	/**
+	 * @type { boolean | void }
+	 */
+	connectMode: undefined,
 };
 
 export const _status = status;

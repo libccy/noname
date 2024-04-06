@@ -292,7 +292,7 @@ export async function getRepoFilesList(path = '', branch, options = { username: 
 
 /**
  * 
- * 获取仓库指定分支和指定目录内的所有文件和目录
+ * 获取仓库指定分支和指定目录内的所有文件(包含子目录的文件)
  * @param { string } [path = ''] 路径名称(可放参数)
  * @param { string } [branch = ''] 仓库分支名称
  * @param { Object } options
@@ -335,7 +335,7 @@ export async function flattenRepositoryFiles(path = '', branch, options = { user
 
 	// 返回不含文件夹的扁平化文件列表
 	return allFiles;
-}
+};
 
 /**
  * 请求一个文件而不是直接储存为文件

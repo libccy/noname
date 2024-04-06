@@ -6,11 +6,12 @@ import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 import { GNC as gnc } from '../gnc/index.js';
 import { CacheContext } from "../library/cache/cacheContext.js";
-
 import { Is } from "./is.js";
+import { Promises } from "./promises.js";
 
 export class Get extends Uninstantable {
 	static is = Is;
+	static promises = Promises;
 	/**
 	 * 获取当前内核版本信息
 	 *
@@ -627,6 +628,9 @@ export class Get extends Uninstantable {
 	}
 	static sort(arr, method, arg) { return method == "seat" ? arr.sortBySeat(arg) : void 0; }
 	static sortSeat(arr, target) { return arr.sortBySeat(target); }
+	/**
+	 * @param { (zip: JSZip) => any } callback
+	 */
 	static zip(callback) {
 		if (!window.JSZip) {
 			lib.init.js(lib.assetURL + 'game', 'jszip', function () {
@@ -4748,5 +4752,6 @@ export class Get extends Uninstantable {
 export const get = Get;
 
 export {
-	Is
+	Is,
+	Promises
 };

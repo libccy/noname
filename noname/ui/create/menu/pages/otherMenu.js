@@ -29,7 +29,7 @@ import {
 	gainAuthorization
 } from "../../../../library/update.js"
 
-export const otherMenu = function (connectMenu) {
+export const otherMenu = function (/** @type { boolean | undefined } */ connectMenu) {
 	if (connectMenu) return;
 	/**
 	 * 由于联机模式会创建第二个菜单，所以需要缓存一下可变的变量
@@ -147,7 +147,18 @@ export const otherMenu = function (connectMenu) {
 		li3.style.whiteSpace = 'nowrap';
 		li3.style.display = 'none';// coding
 
-		var checkVersionButton, checkAssetButton, checkDevVersionButton/*, button4, button5*/;
+		/**
+		 * @type {HTMLButtonElement}
+		 */
+		var checkVersionButton;
+		/**
+		 * @type {HTMLButtonElement}
+		 */
+		var checkAssetButton;
+		/**
+		 * @type {HTMLButtonElement}
+		 */
+		var checkDevVersionButton;
 		
 		game.checkForUpdate = async function (forcecheck, dev) {
 			if (!dev && checkVersionButton.disabled) {
@@ -236,8 +247,14 @@ export const otherMenu = function (connectMenu) {
 						refresh();
 					}
 				}
+				/**
+				 * @param {{ assets: any; author?: { login: string; avatar_url: string; html_url: string; }; body?: string; html_url?: string; name: any; published_at?: string; zipball_url: any; }} description
+				 */
 				function download(description) {
 					const progress = createProgress('正在更新' + description.name, 1, description.name + '.zip');
+					/**
+					 * @type {progress}
+					 */
 					let unZipProgress;
 					let url = description.zipball_url;
 					if (Array.isArray(description.assets) && description.assets.length > 0) {
@@ -262,8 +279,8 @@ export const otherMenu = function (connectMenu) {
 						progress.setProgressValue(received);
 					}).then(async blob => {
 						progress.remove();
-						await import('../../../../../game/jszip.js');
-						const zip = new window.JSZip().load(await blob.arrayBuffer());
+						const zip = await get.promises.zip();
+						zip.load(await blob.arrayBuffer());
 						const entries = Object.entries(zip.files);
 						let root;
 						const hiddenFileFlags = ['.', '_'];
@@ -317,11 +334,13 @@ export const otherMenu = function (connectMenu) {
 								});
 						}
 						unZipProgress.remove();
-						// await import('../../../../../game/update.js');
-						// if (Array.isArray(window.noname_asset_list)) {
-						// 	game.saveConfig('asset_version', window.noname_asset_list[0]);
-						// 	delete window.noname_asset_list;
-						// }
+						if (url === description.zipball_url) {
+							await lib.init.promises.js('game', 'update.js');
+							if (Array.isArray(window.noname_asset_list)) {
+								game.saveConfig('asset_version', window.noname_asset_list[0]);
+								delete window.noname_asset_list;
+							}
+						}
 						if (confirm('更新完成，是否重启？')) {
 							game.reload();
 						}
@@ -397,18 +416,14 @@ export const otherMenu = function (connectMenu) {
 					})
 				}).then(async blob => {
 					progress.remove();
-					await import('../../../../../game/jszip.js');
-					const zip = new window.JSZip().load(await blob.arrayBuffer());
+					const zip = await get.promises.zip();
+					zip.load(await blob.arrayBuffer());
 					const entries = Object.entries(zip.files);
 					let root;
 					const hiddenFileFlags = ['.', '_'];
 					unZipProgress = createProgress('正在解压' + progress.getFileName(), entries.length);
 					let i = 0;
 					for (const [key, value] of entries) {
-						// 第一个是文件夹的话，就是根文件夹
-						// if (i == 0 && value.dir && !description.name.includes('noname.core.zip')) {
-						// 	root = key;
-						// }
 						unZipProgress.setProgressValue(i++);
 						const fileName = typeof root == 'string' && key.startsWith(root) ? key.replace(root, '') : key;
 						if (hiddenFileFlags.includes(fileName[0])) continue;
@@ -422,11 +437,11 @@ export const otherMenu = function (connectMenu) {
 						await game.promises.writeFile(value.asArrayBuffer(), path, name);
 					}
 					unZipProgress.remove();
-					// await import('../../../../../game/update.js');
-					// if (Array.isArray(window.noname_asset_list)) {
-					// 	game.saveConfig('asset_version', window.noname_asset_list[0]);
-					// 	delete window.noname_asset_list;
-					// }
+					await lib.init.promises.js('game', 'update.js');
+					if (Array.isArray(window.noname_asset_list)) {
+						game.saveConfig('asset_version', window.noname_asset_list[0]);
+						delete window.noname_asset_list;
+					}
 					if (confirm('更新完成，是否重启？')) {
 						game.reload();
 					}
@@ -459,6 +474,8 @@ export const otherMenu = function (connectMenu) {
 		// }
 
 		(function () {
+			/** @type { HTMLParagraphElement } */
+			// @ts-ignore
 			var updatep1 = li1.querySelector('p');
 			var updatep2 = li2;
 			var updatep3 = li3;

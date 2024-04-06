@@ -123,36 +123,38 @@ export class Library extends Uninstantable {
 	 */
 	static tempSortSeat;
 	/**
-	* @returns { never }
-	*/
-	static typeAnnotation() {
-		/**
-		 * @type { Videos[] }
-		 */
-		// @ts-ignore
-		this.videos;
-		/**
-		 * @type { {
-		 * 	fs: typeof import("fs"),
-		 *  path: typeof import("path"),
-		 *  debug: () => void,
-		 *  clients: Element.Client[],
-		 *  banned:[],
-		 *  observing:[],
-		 *  torespond:{},
-		 *  torespondtimeout:{},
-		 * } }
-		 */
-		// @ts-ignore
-		this.node;
-		/**
-		 * @type { { [key: string]: string } }
-		 */
-		// @ts-ignore
-		this.playerOL;
-		throw new Error('Do not call this method');
-	}
-
+	 * @type { 'android' | 'ios' | undefined }
+	 */
+	static device;
+	/**
+	 * @type { string }
+	 */
+	static version;
+	/**
+	 * @type { Videos[] }
+	 */
+	static videos;
+	/**
+	 * @type { {
+	 * 	fs: typeof import("fs"),
+	 *  path: typeof import("path"),
+	 *  debug: () => void,
+	 *  clients: Element.Client[],
+	 *  banned:[],
+	 *  observing:[],
+	 *  torespond:{},
+	 *  torespondtimeout:{},
+	 * } }
+	 */
+	static node;
+	/**
+	 * @type { { [key: string]: string } }
+	 */
+	static playerOL;
+	/**
+	 * @type { IDBRequest<IDBDatabase> }
+	 */
+	static db;
 	//函数钩子
 	/**
 	 * 你可以往这里加入{钩子名:函数数组}，并在数组里增加你的自定义函数

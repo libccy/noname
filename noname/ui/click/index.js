@@ -2,6 +2,14 @@ import { ui, game, get, lib, _status } from "../../../noname.js";
 import { Uninstantable } from "../../util/index.js";
 
 export class Click extends Uninstantable {
+	/**
+	 * @type {() => void}
+	 */
+	static consoleMenu;
+	/**
+	 * @type {(arg0: string) => void}
+	 */
+	static menuTab;
 	static identitycircle() {
 		var list = [];
 		this.classList.toggle('transparent');
