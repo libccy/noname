@@ -6,11 +6,12 @@ import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 import { GNC as gnc } from '../gnc/index.js';
 import { CacheContext } from "../library/cache/cacheContext.js";
-
 import { Is } from "./is.js";
+import { Promises } from "./promises.js";
 
 export class Get extends Uninstantable {
 	static is = Is;
+	static promises = Promises;
 	/**
 	 * 获取当前内核版本信息
 	 *
@@ -627,6 +628,9 @@ export class Get extends Uninstantable {
 	}
 	static sort(arr, method, arg) { return method == "seat" ? arr.sortBySeat(arg) : void 0; }
 	static sortSeat(arr, target) { return arr.sortBySeat(target); }
+	/**
+	 * @param { (zip: JSZip) => any } callback
+	 */
 	static zip(callback) {
 		if (!window.JSZip) {
 			lib.init.js(lib.assetURL + 'game', 'jszip', function () {
@@ -735,7 +739,10 @@ export class Get extends Uninstantable {
 		toc = get.utc();
 		console.log('time2: ' + (toc - tic));
 	}
-	static stringify(obj, level) {
+	/**
+	 * @param {any} obj
+	 */
+	static stringify(obj, level = 0) {
 		level = level || 0;
 		let indent = '';
 		let str;
@@ -745,10 +752,14 @@ export class Get extends Uninstantable {
 		if (get.objtype(obj) == 'object' || obj instanceof lib.element.GameEventPromise) {
 			str = '{\n';
 			for (let i in obj) {
+				/**
+				 * @type {string}
+				 */
 				let insertDefaultString;
 				let insertFunctionString = indent + '    ' + get.stringify(obj[i], level + 1) + ',\n';
-				let parseFunction = i => {
+				let parseFunction = (/** @type {string} */ i) => {
 					// let string = obj[i].toString();
+					i = i.replaceAll('$', '\\$');
 					let execResult;
 					if (obj[i] instanceof GeneratorFunction) {
 						// *content(){}
@@ -4748,5 +4759,6 @@ export class Get extends Uninstantable {
 export const get = Get;
 
 export {
-	Is
+	Is,
+	Promises
 };

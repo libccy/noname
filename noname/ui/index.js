@@ -107,6 +107,22 @@ export class UI extends Uninstantable {
 	 * @type { ((packName: string) => void)[] }
 	 */
 	static updateCardPackMenu = [];
+	/**
+	 * @type { HTMLDivElement } 挑战模式下正在操作的角色
+	 */
+	static mebg;
+	/**
+	 * @type { Function | undefined } 
+	 */
+	static updateUpdate;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	static commandnode;
+	/**
+	 * @type {() => void}
+	 */
+	static updateVideoMenu;
 	static refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}

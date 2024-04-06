@@ -1910,55 +1910,60 @@ export class Game extends Uninstantable {
 	}
 	/**
 	 * 下载文件
-	 * @type { (url: string, folder: string, onsuccess?: Function, onerror?: (e: Error) => void) => void, dev?: 'nodev', onprogress?: Function) => void }
+	 * @type { undefined | ((url: string, folder: string, onsuccess?: Function, onerror?: (e: Error) => void) => void, dev?: 'nodev', onprogress?: Function) => void) }
 	 */
 	static download;
 	/**
 	 * 读取文件为arraybuffer
-	 * @type { (filename: string, callback?: (data: Buffer | ArrayBuffer) => any, onerror?: (e: Error) => void) => void }
+	 * @type { undefined | ((filename: string, callback?: (data: Buffer | ArrayBuffer) => any, onerror?: (e: Error) => void) => void) }
 	 */
 	static readFile;
 	/**
 	 * 读取文件为文本
-	 * @type { (filename: string, callback?: (data: string) => any, onerror?: (e: Error) => void) => void }
+	 * @type { undefined | ((filename: string, callback?: (data: string) => any, onerror?: (e: Error) => void) => void) }
 	 */
 	static readFileAsText;
 	/**
 	 * 将数据写入文件
-	 * @type { (data: File | ArrayBuffer, path: string, name: string, callback?: (e: Error) => void) => void }
+	 * @type { undefined | ((data: File | ArrayBuffer, path: string, name: string, callback?: (e: Error) => void) => void) }
 	 */
 	static writeFile;
 	/**
 	 * 移除文件
-	 * @type { (filename: string, callback?: (e: Error) => void) => void }
+	 * @type { undefined | ((filename: string, callback?: (e: Error) => void) => void) }
 	 */
 	static removeFile;
 	/**
 	 * 获取文件列表
-	 * @type { (dir: string, success: (folders: string[], files: string[]) => any, failure: (e: Error) => void) => void }
+	 * @type { undefined | ((dir: string, success: (folders: string[], files: string[]) => any, failure: (e: Error) => void) => void) }
 	 */
 	static getFileList;
 	/**
 	 * 按路径依次创建文件夹
-	 * @type { (list: string | string[], callback: Function, file?: boolean) => void }
+	 * @type { undefined | ((list: string | string[], callback: Function, file?: boolean) => void) }
 	 */
 	static ensureDirectory;
 	/**
 	 * 创建文件夹
-	 * @type { (directory: string, successCallback?: Function, errorCallback?: Function) => void }
+	 * @type { undefined | ((directory: string, successCallback?: Function, errorCallback?: Function) => void) }
 	 */
 	static createDir;
 	/**
 	 * 删除文件夹
-	 * @type { (directory: string, successCallback?: Function, errorCallback?: Function) => void }
+	 * @type { undefined | ((directory: string, successCallback?: Function, errorCallback?: Function) => void) }
 	 */
 	static removeDir;
+	/**
+	 * @type { (forcecheck?: boolean | null, dev?: boolean) => Promise<any> } 
+	 */
+	static checkForUpdate;
+	/**
+	 * @type { () => Promise<any> } 
+	 */
+	static checkForAssetUpdate;
 	static async importExtension(data, finishLoad, exportExtension, extensionPackage) {
-		//by 来瓶可乐加冰、Rintim、Tipx-L
-		if (!window.JSZip)
-			await new Promise((resolve, reject) => lib.init.js(`${lib.assetURL}game`, "jszip", resolve, reject));
-
-		const zip = new JSZip();
+		//by 来瓶可乐加冰、Rintim、Tipx-L、诗笺
+		const zip = await get.promises.zip();
 		if (get.objtype(data) == 'object') {
 			//导出
 			const _filelist = data._filelist, filelist2 = _filelist || [];

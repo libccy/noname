@@ -5565,11 +5565,12 @@ div[data-decoration="bronze"]::after{
 	}
 }
 /*--------其它--------*/
-::-webkit-scrollbar {
+/* 解放下拉框滚动条！ */
+:not(select)::-webkit-scrollbar {
 	display: none;
 }
-/* 火狐隐藏滚动条 */
-* {
+/* 火狐和chrome120+隐藏滚动条 */
+:not(select) {
 	scrollbar-width: none;
 }
 /* 更新进度条 */
