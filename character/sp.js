@@ -11537,12 +11537,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else event.finish();
 					'step 5'
-					player.chooseTarget('是否令一名手牌数小于自己的目标角色摸一张牌？',function(card,player,target){
-						return _status.event.getParent().targets.includes(target)&&target.countCards('h')<player.countCards('h');
-					}).set('ai',function(target){
-						var player=_status.event.player;
-						return get.attitude(player,target);
-					});
+					var ph = player.countCards('h');
+					if(ph>0&&targets.some(target=>target.isIn()&&target.countCards('h')<ph)){
+						player.chooseTarget('请选择一名手牌数小于自己的目标角色，令其摸一张牌',function(card,player,target){
+							return _status.event.getParent().targets.includes(target)&&target.countCards('h')<player.countCards('h');
+						}).set('ai',function(target){
+							var player=_status.event.player;
+							return get.attitude(player,target);
+						});
+					}
 					'step 6'
 					if(result.bool){
 						var target=result.targets[0];
@@ -27397,7 +27400,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spolzhouxuan_info:'①弃牌阶段开始时，你可将任意张置于武将牌上，称为“旋”（你至多拥有五张“旋”）。②当你使用牌时，你随机将一张“旋”置入弃牌堆，然后摸一张牌（若你的手牌数不为全场唯一最多则额外摸X张牌，X为“旋”数）。③出牌阶段结束时，你将所有“旋”置入弃牌堆。',
 			wuyan:'吾彦',
 			lanjiang:'澜疆',
-			lanjiang_info:'结束阶段，你可以选择所有手牌数不小于你的角色。这些角色依次选择是否令你摸一张牌。然后你可以对其中一名手牌数等于你的角色造成1点伤害，随后可以令其中一名手牌数小于你的角色摸一张牌。',
+			lanjiang_info:'结束阶段，你可以选择所有手牌数不小于你的角色。这些角色依次选择是否令你摸一张牌。然后你可以对其中一名手牌数等于你的角色造成1点伤害，随后令其中一名手牌数小于你的角色摸一张牌。',
 			ol_zhuling:'OL朱灵',
 			ol_zhuling_prefix:'OL',
 			jixian:'急陷',

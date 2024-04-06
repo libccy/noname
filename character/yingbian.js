@@ -2328,40 +2328,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xianzhu:{
 				trigger:{player:'phaseUseBegin'},
-				direct:true,
 				locked:true,
 				filter:function(event,player){
 					return player.getExpansions('qiaoyan').length>0;
 				},
-				content:function(){
-					'step 0'
-					event.cards=player.getExpansions('qiaoyan');
-					player.chooseTarget(true,'请选择【献珠】的目标','将'+get.translation(event.cards)+'交给一名角色。若该角色不为你自己，则你令其视为对其攻击范围内的另一名角色使用【杀】').set('ai',function(target){
+				async cost(event, trigger, player){
+					event.cards = player.getExpansions('qiaoyan');
+					event.result = await player.chooseTarget(true,'请选择【献珠】的目标','将'+get.translation(event.cards)+'交给一名角色。若该角色不为你自己，则你令其视为对其攻击范围内的另一名角色使用【杀】').set('ai',function(target){
 						var player=_status.event.player;
 						var eff=get.sgn(get.attitude(player,target))*get.value(_status.event.getParent().cards[0],target);
 						if(player!=target) eff+=Math.max.apply(null,game.filterPlayer(function(current){
-							if(current!=target&&target.inRange(current)&&target.canUse('sha',current)) return true;
+							if(current!=target&&player.inRange(current)&&target.canUse('sha',current,false)) return true;
 						}).map(function(current){
 							return get.effect(current,{name:'sha'},target,player);
 						}));
 						return eff;
-					});
+					}).forResult();
+				},
+				content:function(){
+					'step 0'
+					event.cards = player.getExpansions('qiaoyan');
+					event.target = targets[0]; 
 					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
-						event.target=target;
-						player.logSkill('xianzhu',target);
-						player.give(cards,target,'give');
-					}
-					else event.finish();
+					player.give(cards,target,'give');
 					'step 2'
 					if(player!=target&&target.isIn()&&player.isIn()&&game.hasPlayer(function(current){
-						return current!=target&&target.inRange(current)&&target.canUse('sha',current);
+						return current!=target&&player.inRange(current)&&target.canUse('sha',current,false);
 					})){
 						var str=get.translation(target);
-						player.chooseTarget(true,'选择'+str+'攻击范围内的一名角色，视为'+str+'对其使用【杀】',function(card,player,target){
+						player.chooseTarget(true,'选择攻击范围内的一名角色，视为'+str+'对其使用【杀】',function(card,player,target){
 							var source=_status.event.target;
-							return source.inRange(target)&&source.canUse('sha',target);
+							return player.inRange(target)&&source.canUse('sha', target, false);
 						}).set('target',target).set('ai',function(target){
 							var evt=_status.event;
 							return get.effect(target,{name:'sha'},evt.target,evt.player)
@@ -3992,7 +3989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiaoyan:'巧言',
 			qiaoyan_info:'锁定技，当你于回合外受到其他角色造成的伤害时，若你：有“珠”，则你令伤害来源获得“珠”；没有“珠”，则你防止此伤害，然后摸一张牌，并将一张牌正面朝上置于武将牌上，称为“珠”。',
 			xianzhu:'献珠',
-			xianzhu_info:'锁定技，出牌阶段开始时，你令一名角色A获得“珠”。若A不为你自己，则你选择A攻击范围内的一名角色B，视为A对B使用一张【杀】。',
+			xianzhu_info:'锁定技，出牌阶段开始时，你令一名角色A获得“珠”。若A不为你自己，则你选择你攻击范围内的一名角色B，视为A对B使用一张【杀】。',
 			chengjichengcui:'成济成倅',
 			oltousui:'透髓',
 			oltousui_info:'你可以将任意张牌置于牌堆底，视为使用一张需使用等量张【闪】抵消的【杀】。',

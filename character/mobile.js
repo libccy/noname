@@ -3829,7 +3829,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:1,
 					threaten:1.14,
-					unequip:true,
 					unequip_ai:true,
 					skillTagFilter:function(player,tag,arg){
 						if(arg&&arg.name=='sha'&&arg.card&&arg.card.storage&&arg.card.storage.mbguli) return true;
@@ -3856,8 +3855,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.loseHp();
 							'step 1'
 							player.drawTo(player.maxHp);
-						}
-					}
+						},
+						group:'mbguli_unequip',
+					},
+					unequip:{
+						trigger:{
+							player:'useCardToPlayered',
+						},
+						filter:function({card}){
+							return card.name=='sha' && card.storage && card.storage.mbguli;
+						},
+						forced:true,
+						popup:false,
+						logTarget:'target',
+						content:function(){
+							trigger.target.addTempSkill('qinggang2');
+							trigger.target.storage.qinggang2.add(trigger.card);
+							trigger.target.markSkill('qinggang2');
+						},
+					},
 				},
 			},
 			mbaosi:{
