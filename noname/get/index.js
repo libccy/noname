@@ -739,7 +739,10 @@ export class Get extends Uninstantable {
 		toc = get.utc();
 		console.log('time2: ' + (toc - tic));
 	}
-	static stringify(obj, level) {
+	/**
+	 * @param {any} obj
+	 */
+	static stringify(obj, level = 0) {
 		level = level || 0;
 		let indent = '';
 		let str;
@@ -749,10 +752,14 @@ export class Get extends Uninstantable {
 		if (get.objtype(obj) == 'object' || obj instanceof lib.element.GameEventPromise) {
 			str = '{\n';
 			for (let i in obj) {
+				/**
+				 * @type {string}
+				 */
 				let insertDefaultString;
 				let insertFunctionString = indent + '    ' + get.stringify(obj[i], level + 1) + ',\n';
-				let parseFunction = i => {
+				let parseFunction = (/** @type {string} */ i) => {
 					// let string = obj[i].toString();
+					i = i.replaceAll('$', '\\$');
 					let execResult;
 					if (obj[i] instanceof GeneratorFunction) {
 						// *content(){}
