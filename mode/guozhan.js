@@ -2834,8 +2834,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				prompt(){
 					const player=get.event('player');
 					const num=get.info('fakeweirong').getNum(player);
-					if(player.storage.fakeweirong) return '摸张'+get.cnNumber(num)+'牌，然后当你于本轮不因此法失去牌后，你弃置一张牌';
-					return '弃置张'+get.cnNumber(num)+'牌，然后当你于本轮不因此法得到牌后，你摸一张牌';
+					if(player.storage.fakeweirong) return '摸'+get.cnNumber(num)+'张牌，然后当你于本轮不因此法失去牌后，你弃置一张牌';
+					return '弃置'+get.cnNumber(num)+'张牌，然后当你于本轮不因此法得到牌后，你摸一张牌';
 				},
 				round:1,
 				async content(event,trigger,player){
