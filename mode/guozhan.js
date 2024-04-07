@@ -2892,7 +2892,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(!player.countCards('he')) return false;
 							const evt=event.getl(player);
 							if(!evt||!evt.cards2||!evt.cards2.length) return false;
-							return event.getParent(3).name!='weishu_discard';
+							return event.getParent(3).name!='fakeweirong_lose';
 						},
 						forced:true,
 						content(){
