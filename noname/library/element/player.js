@@ -1179,6 +1179,47 @@ export class Player extends HTMLDivElement {
 		return next;
 	}
 	/**
+	 * 移除扩展装备区（同时移除多余装备）
+	 *
+	 * 参数：扩展来源角色（不写默认当前事件角色），扩展区域（数字/区域字符串/数组，可以写多个，重复扩展）
+	 *（参数与expandEquip对齐，另外可以追加prompt指定弃置对话框的标题）
+	 */
+	removeExpandEquip() {
+		var next = game.createEvent('removeExpandEquip');
+		next.player = this;
+		next.slots = [];
+		for (var i = 0; i < arguments.length; i++) {
+			if (get.itemtype(arguments[i]) == 'player') {
+				next.source = arguments[i];
+			}
+			else if (Array.isArray(arguments[i])) {
+				for (var arg of arguments[i]) {
+					if (typeof arg == 'string') {
+						if (arg.startsWith('equip') && parseInt(arg.slice(5)) > 0) next.slots.push(arg);
+						else next.prompt = arg;
+					}
+					else if (typeof arg == 'number') {
+						next.slots.push('equip' + arg);
+					}
+				}
+			}
+			else if (typeof arguments[i] == 'string') {
+				if (arguments[i].startsWith('equip') && parseInt(arguments[i].slice(5)) > 0) next.slots.push(arguments[i]);
+				else next.prompt = arg;
+			}
+			else if (typeof arguments[i] == 'number') {
+				next.slots.push('equip' + arguments[i]);
+			}
+		}
+		if (!next.source) next.source = _status.event.player;
+		if (!next.slots.length) {
+			_status.event.next.remove(next);
+			next.resolve();
+		}
+		next.setContent('removeExpandEquip');
+		return next;
+	}
+	/**
 	 * 判断判定区是否被废除
 	 */
 	isDisabledJudge() {
