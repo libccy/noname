@@ -1,5 +1,11 @@
 Forked from: https://github.com/libccy/noname
 
+## 一键安装
+参见 https://hub.docker.com/repository/docker/hsiaoshun/noname/general
+```bash
+docker run -d --name sgs -p 80:80 -p 8080:8080 --restart unless-stopped hsiaoshun/noname:latest
+```
+
 ## 动机
 为了在家庭局域网部署一个三国杀服务器，在家里供人家游戏，将无名杀Docker化，使得其易于部署，部署者不需要懂得相关知识。
 
