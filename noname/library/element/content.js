@@ -379,6 +379,91 @@ export const Content = {
 		}
 		player.$syncExpand();
 	},
+	removeExpandEquip: function () {
+		'step 0'
+		if (!player.expandedSlots || !event.slots.length) return;
+		const slotMap = {};
+		event.slots.forEach(s => {
+			if (s in slotMap) slotMap[s]++;
+			else slotMap[s] = 1;
+		});
+		const slots = Object.keys(slotMap).sort();
+		var combinedRemoved = false;
+		var dialog = null;
+		var discardTypes = {};
+		for (var slot of slots) {
+			var subtype = slot;
+			var count;
+			if (get.is.mountCombined() && (slot == 'equip3' || slot == 'equip4')) {
+				if (combinedRemoved) continue;
+				else {
+					combinedRemoved = true;
+					slot = 'equip3';
+					subtype = 'equip3_4';
+					count = Math.max(slotMap['equip3'] || 0, slotMap['equip4'] || 0);
+				}
+			}
+			else count = slotMap[slot];
+			if (typeof player.expandedSlots[slot] != 'number' || player.expandedSlots[slot] <= 0) {
+				continue;
+			}
+			else {
+				var cards, discards;
+				if (subtype.endsWith('3_4')) cards = player.getCards('e', { subtype: ['equip3', 'equip4'] });
+				else cards = player.getCards('e', { subtype: subtype });
+				count = Math.min(count, player.expandedSlots[slot]);
+				game.log(player, '失去了' + get.cnNumber(count) + '个额外的', '#g' + get.translation(subtype) + '栏');
+				player.expandedSlots[slot] -= count;
+				discards = cards.length - player.expandedSlots[slot] - 1;
+				if (discards > 0) {
+					if (!dialog) {
+						dialog = ui.create.dialog('hidden', 'forcebutton');
+						dialog.add(event.prompt || '请选择要弃置的装备');
+					}
+					dialog.addText(get.translation(subtype) + '栏');
+					dialog.addText('需要弃置' + get.cnNumber(discards) + '张牌');
+					dialog.add(cards);
+					dialog.buttons.forEach(b => {
+						if (!b._extraInfo)
+							b._extraInfo = { subtype, discards };
+					});
+					discardTypes[subtype] = discards;
+				}
+			}
+		}
+		if (Object.values(player.expandedSlots).some(v => {
+			return typeof v == 'number' && v > 0;
+		})) player.$syncExpand();
+		else player.unmarkSkill('expandedSlots');
+		if (!dialog) event.finish();
+		else {
+			const next = player.chooseButton(dialog, true, [1, Infinity]);
+			next.set('complexSelect', true);
+			next.set('filterButton', (button) => {
+				var info = button._extraInfo;
+				var selected = ui.selected.buttons;
+				return selected.filter(b => {
+					return b._extraInfo.subtype == info.subtype;
+				}).length < info.discards || selected.includes(button);
+			});
+			next.set('filterOk', () => {
+				var selected = ui.selected.buttons;
+				for (let st in discardTypes) {
+					if (selected.filter(b => {
+						return b._extraInfo.subtype == st;
+					}).length < discardTypes[st])
+						return false;
+				}
+				return true;
+			});
+		}
+		'step 1'
+		const source = event.source || player;
+		const next = player.discard(source, result.links);
+		if (player != source) next.notBySelf = true;
+		next.discarder = source;
+		event.done = next;
+	},
 	//选择顶装备要顶的牌
 	replaceEquip: function () {
 		'step 0';
