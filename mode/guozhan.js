@@ -388,6 +388,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gz_wangji:['male','wei',3,['fakeqizhi','fakejinqu']],
 			gz_yangyan:['female','jin',3,['fakexuanbei','xianwan']],
 			gz_shibao:['male','jin',4,['fakezhuosheng','fakejuhou']],
+			gz_simazhou:['male','jin',4,['fakecaiwang','fakenaxiang']],
 		},
 		characterSort:{
 			mode_guozhan:{
@@ -973,10 +974,10 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				enable:'chooseToUse',
 				filter(event,player){
 					if(event.type=='wuxie'||event.type=='respondShan') return false;
-					const storage=player.getStorage('fakeyigui');
-					if(!storage.length) return false;
+					const storage=player.getStorage('fakeyigui'),storage2=player.getStorage('fakeyigui2');
+					if(!storage.length||storage2.length>1) return false;
 					if(event.type=='dying'){
-						if(player.getStorage('fakeyigui2').includes('basic')) return false;
+						if(storage2.includes('basic')) return false;
 						if(!event.filterCard({name:'tao'},player,event)&&!event.filterCard({name:'jiu'},player,event)) return false;
 						const target=event.dying;
 						return target.identity=='unknown'||target.identity=='ye'||storage.some(i=>{
@@ -986,7 +987,37 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							if(double&&double.includes(target.identity)) return true;
 						});
 					}
-					return true;
+					return get.inpileVCardList(info=>{
+						const name=info[2];
+						if(storage2.includes(get.type(name))) return false;
+						return get.type(name)=='basic'||get.type(name)=='trick';
+					}).some(cardx=>{
+						const card={name:cardx[2],nature:cardx[3]},info=get.info(card);
+						return storage.some(character=>{
+							if(!lib.filter.filterCard(card,player,event)) return false;
+							if(event.filterCard&&!event.filterCard(card,player,event)) return false;
+							const group=get.character(character,1),double=get.is.double(character,true);
+							if(info.changeTarget){
+								const list=game.filterPlayer(current=>player.canUse(card,current));
+								for(let i=0;i<list.length;i++){
+									let giveup=false,targets=[list[i]];
+									info.changeTarget(player,targets);
+									for(let j=0;j<targets.length;j++){
+										if(group!='ye'&&targets[j].identity!='unknown'&&targets[j].identity!='ye'&&targets[j].identity!=group&&(!double||!double.includes(targets[j].identity))){
+											giveup=true;
+											break;
+										}
+									}
+									if(giveup) continue;
+									if(!giveup) return true;
+								}
+								return false;
+							}
+							return game.hasPlayer(current=>{
+								return event.filterTarget(card,player,current)&&(group=='ye'||current.identity=='unknown'||current.identity=='ye'||current.identity==group||(double&&double.includes(current.identity)));
+							});
+						});
+					});
 				},
 				chooseButton:{
 					select:2,
@@ -2715,7 +2746,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				audio:'jianhui',
 				trigger:{global:'damageSource'},
 				filter(event,player){
-					if(!event.source||!event.player||!event.source.isIn()||!event.player.isIn()) return false;
+					if(!event.source||!event.player||!event.source.isIn()||!event.player.isIn()||event.source==event.player) return false;
 					return event.source.isFriendOf(event.player)&&[event.source,event.player].some(target=>target.countCards('he'));
 				},
 				async cost(event,trigger,player){
@@ -3753,6 +3784,264 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			gznaxiang:{
 				audio:'naxiang',
 				inherit:'naxiang',
+			},
+			fakecaiwang:{
+				audio:'caiwang',
+				trigger:{player:'loseAfter'},
+				filter(event,player){
+					const evt=event.getParent(2);
+					if(evt.name!='yingbianZhuzhan') return false;
+					const color=(get.color(evt.card)==get.color(event.cards[0])).toString();
+					if(color=='true'&&!game.hasPlayer(target=>{
+						return target!=player&&target.countCards('he');
+					})) return false;
+					return !player.getStorage('fakecaiwang_used').includes(color);
+				},
+				async cost(event,trigger,player){
+					const color=(get.color(trigger.getParent(2).card)==get.color(trigger.cards[0])).toString();
+					if(color=='false'){
+						//event.result=await player.chooseBool(get.prompt('fakecaiwang'),'摸一张牌').forResult();
+						event.result={bool:true};
+					}
+					else{
+						event.result=await player.chooseTarget(get.prompt('fakecaiwang'),'弃置一名其他角色的一张牌',(card,player,target)=>{
+							return target!=player&&target.countCards('he');
+						}).set('ai',target=>{
+							const player=get.event('player');
+							return get.effect(target,{name:'guohe_copy2'},player,player);
+						}).forResult();
+					}
+				},
+				async content(event,trigger,player){
+					const color=(get.color(trigger.getParent(2).card)==get.color(trigger.cards[0])).toString();
+					player.addTempSkill('fakecaiwang_used');
+					player.markAuto('fakecaiwang_used',[color]);
+					if(color=='false') await player.draw();
+					else await player.discardPlayerCard(event.targets[0],'he',true);
+				},
+				group:'fakecaiwang_zhuzhan',
+				subSkill:{
+					used:{
+						charlotte:true,
+						onremove:true,
+					},
+					zhuzhan:{
+						trigger:{player:'yingbianZhuzhanBegin'},
+						forced:true,
+						locked:false,
+						popup:false,
+						firstDo:true,
+						content(){
+							trigger.setContent(get.info('fakecaiwang').yingbian);
+						},
+					},
+				},
+				yingbian(){
+					'step 0';
+					event._global_waiting = true;
+					event.send = (player, card, source, targets, id, id2, yingbianZhuzhanAI, skillState) => {
+						if (skillState) player.applySkills(skillState);
+						var type = get.type2(card), str = get.translation(source);
+						if (targets && targets.length) str += `对${get.translation(targets)}`;
+						str += `使用了${get.translation(card)}，是否弃置一张${get.translation(type)}为其助战？`;
+						player.chooseCard({
+							filterCard: (card, player) => get.type2(card) == type && lib.filter.cardDiscardable(card, player),
+							prompt: str,
+							position: 'h',
+							_global_waiting: true,
+							id: id,
+							id2: id2,
+							ai: typeof yingbianZhuzhanAI == 'function' ? yingbianZhuzhanAI(player, card, source, targets) : cardx => {
+								var info = get.info(card);
+								if (info && info.ai && info.ai.yingbian) {
+									var ai = info.ai.yingbian(card, source, targets, player);
+									if (!ai) return 0;
+									return ai - get.value(cardx);
+								}
+								else if (get.attitude(player, source) <= 0) return 0;
+								return 5 - get.value(cardx);
+							}
+						});
+						if (!game.online) return;
+						_status.event._resultid = id;
+						game.resume();
+					};
+					'step 1';
+					var type = get.type2(card);
+					event.list = game.filterPlayer(current => current.countCards('h') && (_status.connectMode || current.hasCard(cardx => get.type2(cardx) == type, 'h'))).sortBySeat(_status.currentPhase || player);
+					event.id = get.id();
+					'step 2';
+					if (!event.list.length) event.finish();
+					else if (_status.connectMode && (event.list[0].isOnline() || event.list[0] == game.me)) event.goto(4);
+					else event.send(event.current = event.list.shift(), event.card, player, trigger.targets, event.id, trigger.parent.id, trigger.yingbianZhuzhanAI);
+					'step 3';
+					if (result.bool) {
+						event.zhuzhanresult = event.current;
+						event.zhuzhanresult2 = result;
+						if (event.current != game.me) game.delayx();
+						event.goto(8);
+					}
+					else event.goto(2);
+					'step 4';
+					var id = event.id, sendback = (result, player) => {
+						if (result && result.id == id && !event.zhuzhanresult && result.bool) {
+							event.zhuzhanresult = player;
+							event.zhuzhanresult2 = result;
+							game.broadcast('cancel', id);
+							if (_status.event.id == id && _status.event.name == 'chooseCard' && _status.paused) return () => {
+								event.resultOL = _status.event.resultOL;
+								ui.click.cancel();
+								if (ui.confirm) ui.confirm.close();
+							};
+						}
+						else if (_status.event.id == id && _status.event.name == 'chooseCard' && _status.paused) return () => event.resultOL = _status.event.resultOL;
+					}, withme = false, withol = false, list = event.list;
+					for (var i = 0; i < list.length; i++) {
+						var current = list[i];
+						if (current.isOnline()) {
+							withol = true;
+							current.wait(sendback);
+							current.send(event.send, current, event.card, player, trigger.targets, event.id, trigger.parent.id, trigger.yingbianZhuzhanAI, get.skillState(current));
+							list.splice(i--, 1);
+						}
+						else if (current == game.me) {
+							withme = true;
+							event.send(current, event.card, player, trigger.targets, event.id, trigger.parent.id, trigger.yingbianZhuzhanAI);
+							list.splice(i--, 1);
+						}
+					}
+					if (!withme) event.goto(6);
+					if (_status.connectMode && (withme || withol)) game.players.forEach(value => {
+						if (value != player) value.showTimer();
+					});
+					event.withol = withol;
+					'step 5';
+					if (!result || !result.bool || event.zhuzhanresult) return;
+					game.broadcast('cancel', event.id);
+					event.zhuzhanresult = game.me;
+					event.zhuzhanresult2 = result;
+					'step 6';
+					if (event.withol && !event.resultOL) game.pause();
+					'step 7';
+					game.players.forEach(value => value.hideTimer());
+					'step 8';
+					if (event.zhuzhanresult) {
+						var target = event.zhuzhanresult;
+						if(target==player&&player.hasSkill('fakecaiwang')) player.logSkill('fakecaiwang');
+						target.line(player, 'green');
+						target.discard(event.zhuzhanresult2.cards).discarder = target;
+						if (typeof event.afterYingbianZhuzhan == 'function') event.afterYingbianZhuzhan(event, trigger);
+						var yingbianCondition = event.name.slice(8).toLowerCase(), yingbianConditionTag = `yingbian_${yingbianCondition}_tag`;
+						target.popup(yingbianConditionTag, lib.yingbian.condition.color.get(yingbianCondition));
+						game.log(target, '响应了', '<span class="bluetext">' + (target==player?'自己':get.translation(player)) + '</span>', '发起的', yingbianConditionTag);
+						target.addExpose(0.2);
+						event.result = {
+							bool: true
+						};
+					}
+					else event.result = {
+						bool: false
+					};
+				},
+			},
+			fakenaxiang:{
+				audio:'naxiang',
+				trigger:{
+					source:'damageSource',
+					player:'damageEnd',
+				},
+				filter(event,player){
+					if(!event.source||!event.player||!event.source.isIn()||!event.player.isIn()||!event.source.isEnemyOf(event.player)) return false;
+					return !player.getStorage('fakenaxiang').includes(get.info('fakenaxiang').logTarget(event,player));
+				},
+				logTarget(event,player){
+					return event.source==player?event.player:event.source;
+				},
+				forced:true,
+				async content(event,trigger,player){
+					const target=get.info('fakenaxiang').logTarget(trigger,player);
+					const {result:{junling,targets}}=await player.chooseJunlingFor(target);
+					const {result:{index}}=await target.chooseJunlingControl(player,junling,targets).set('prompt','纳降：是否执行军令？');
+					if(index==0) await target.carryOutJunling(player,junling,targets);
+					else{
+						if(!player.storage.fakenaxiang){
+							player.when(['phaseBegin','die']).then(()=>{
+								player.unmarkSkill('fakenaxiang');
+								delete player.storage.fakenaxiang;
+							});
+						}
+						player.markAuto('fakenaxiang',[target]);
+					}
+				},
+				onremove:true,
+				marktext:'<span style="text-decoration: line-through;">降</span>',
+				intro:{content:'无法对$发动【纳降】'},
+				group:['fakenaxiang_discard','fakenaxiang_yingbian'],
+				subSkill:{
+					discard:{
+						trigger:{player:'chooseCardBegin'},
+						filter(event,player){
+							return event.getParent().name=='yingbianZhuzhan';
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content(){
+							trigger.filterCard=lib.filter.cardDiscardable;
+						},
+					},
+					yingbian:{
+						trigger:{player:'yingbian'},
+						filter(event,player){
+							if(event.card.yingbian) return false;
+							const temporaryYingbian=event.temporaryYingbian||[],card=event.card;
+							if(temporaryYingbian.includes('force')||get.cardtag(card,'yingbian_force')) return true;
+							return get.yingbianConditions(event.card).length;
+						},
+						forced:true,
+						popup:false,
+						firstDo:true,
+						content(){
+							'step 0'
+							trigger.card.yingbian=true;
+							event.card=trigger.card;
+							event.temporaryYingbian=(trigger.temporaryYingbian||[]);
+							if(event.temporaryYingbian.includes('force')||get.cardtag(event.card,'yingbian_force')||trigger.forceYingbian||player.hasSkillTag('forceYingbian')){
+								player.popup('yingbian_force_tag',lib.yingbian.condition.color.get('force'));
+								game.log(player,'触发了',event.card,'的应变条件');
+								event._result={bool:true};
+							}
+							else{
+								trigger.yingbianZhuzhanAI=(player,card,source,targets)=>cardx=>{
+									if(get.attitude(player,source)<=0) return 0;
+									var info=get.info(card),num=0;
+									if(info&&info.ai&&info.ai.yingbian){
+										var ai=info.ai.yingbian(card,source,targets,player);
+										if(ai) num=ai;
+									}
+									return Math.max(num,6)-get.value(cardx);
+								};
+								lib.yingbian.condition.complex.get('zhuzhan')(trigger);
+							}
+							'step 1'
+							if(!result.bool) return;
+							var yingbianEffectExecuted=false;
+							lib.yingbian.effect.forEach((value,key)=>{
+								if(!event.temporaryYingbian.includes(key)&&!get.cardtag(card,`yingbian_${key}`)) return;
+								game.yingbianEffect(trigger,value);
+								if(!yingbianEffectExecuted) yingbianEffectExecuted=true;
+							});
+							if(!yingbianEffectExecuted){
+								var defaultYingbianEffect=get.defaultYingbianEffect(card);
+								if(lib.yingbian.effect.has(defaultYingbianEffect)){
+									game.yingbianEffect(trigger,lib.yingbian.effect.get(defaultYingbianEffect));
+									if(!yingbianEffectExecuted) yingbianEffectExecuted=true;
+								}
+							}
+							if(yingbianEffectExecuted) player.addTempSkill('yingbian_changeTarget');
+						},
+					},
+				},
 			},
 			//国战典藏2023补充
 			//吕范
@@ -18220,7 +18509,7 @@ return event.junling=='junling5'?1:0;});
 			fakejianhui:'奸回',
 			fakejianhui_info:'当一名角色受到其势力相同的另一名角色造成的伤害后，你可以令其中一名角色摸一张牌，然后弃置其中另一名角色的一张牌。',
 			fakechongxin:'崇信',
-			fakechongxin_info:'出牌阶段限一次，你可以选择一名与你势力不同的角色，视为你使用一张指定你与其为目标的【知己知彼】。',
+			fakechongxin_info:'出牌阶段限一次，你可以选择一名与你势力不同的角色，视为你使用一张指定你与其为目标的【以逸待劳】。',
 			fakeweirong:'卫戎',
 			fakeweirong_info:'转换技，每轮限一次，出牌阶段。阴：你可以弃置X张牌，然后当你于本轮不因此法得到牌后，你摸一张牌。阳：你可以摸X张牌，然后当你于本轮不因此法失去牌后，你弃置一张牌。（X为你上一轮以此法摸和弃置的牌数之和，且X至少为1，至多为你的体力上限）',
 			gz_re_taishici:'太史慈',
@@ -18259,6 +18548,10 @@ return event.junling=='junling5'?1:0;});
 			fakejuhou_info:'阵法技，与你处于同一队列的角色成为【杀】或普通锦囊牌的目标后，你可以令其将任意张牌置于其武将牌上，然后其于此牌结算完毕后获得这些牌。',
 			gznaxiang:'纳降',
 			gznaxiang_info:'锁定技，当你受到其他角色造成的伤害后，或你对其他角色造成伤害后，你对其发动〖才望〗时的“弃置”改为“获得”直到你的下回合开始。',
+			fakecaiwang:'才望',
+			fakecaiwang_info:'①你可以助战自己。②每回合每项各限一次，当你响应助战后，若你弃置的牌和被强化的牌：颜色相同，你可以弃置一名其他角色的一张牌；颜色不同，你摸一张牌。',
+			fakenaxiang:'纳降',
+			fakenaxiang_info:'锁定技。①当你对与你势力不同的角色造成伤害后，或受到与你势力不同的角色对你造成的伤害后。你对其发起军令，若其不执行，则你不能对其发动〖纳降①〗直到你的下个回合开始。②你响应助战弃牌无类别限制，且你触发具有应变的卡牌的条件均视为助战。',
 
 			guozhan_default:"国战标准",
 			guozhan_zhen:"君临天下·阵",
@@ -18287,12 +18580,12 @@ return event.junling=='junling5'?1:0;});
 			['spade',2,'heiguangkai'],
 			['spade',2,'cixiong'],
 			['spade',2,'taigongyinfu'],
-			['spade',3,'zhujinqiyuan',null,['yingbian_zhuzhan']],
+			['spade',3,'zhujinqiyuan',null,['yingbian_zhuzhan','yingbian_add']],
 			['spade',3,'huoshaolianying'],
-			['spade',3,'shuiyanqijunx',null,['yingbian_zhuzhan']],
+			['spade',3,'shuiyanqijunx',null,['yingbian_zhuzhan','yingbian_add']],
 			['spade',4,'guohe'],
 			['spade',4,'sha'],
-			['spade',4,'shuiyanqijunx',null,['yingbian_zhuzhan']],
+			['spade',4,'shuiyanqijunx',null,['yingbian_zhuzhan','yingbian_add']],
 			['spade',5,'jueying'],
 			['spade',5,'qinglong'],
 			['spade',5,'sha'],
@@ -18310,16 +18603,16 @@ return event.junling=='junling5'?1:0;});
 			['spade',9,'sha'],
 			['spade',10,'bingliang'],
 			['spade',10,'sha','thunder'],
-			['spade',10,'sha',null,['yingbian_canqu']],
-			['spade',11,'wuxie',null,['yingbian_kongchao']],
-			['spade',11,'sha',null,['yingbian_canqu']],
+			['spade',10,'sha',null,['yingbian_canqu','yingbian_add']],
+			['spade',11,'wuxie',null,['yingbian_kongchao','yingbian_draw']],
+			['spade',11,'sha',null,['yingbian_canqu','yingbian_add']],
 			['spade',11,'sha','thunder'],
 			['spade',12,'zhangba'],
 			['spade',12,'lulitongxin'],
 			['spade',12,'tiesuo'],
 			['spade',13,'wutiesuolian'],
 			['spade',13,'wuxie'],
-			['spade',13,'nanman',null,['yingbian_fujia']],
+			['spade',13,'nanman',null,['yingbian_fujia','yingbian_remove']],
 			//草花普通
 			['club',1,'juedou'],
 			['club',1,'yuxi'],
@@ -18331,20 +18624,20 @@ return event.junling=='junling5'?1:0;});
 			['club',3,'sha'],
 			['club',3,'chiling'],
 			['club',3,'zhibi'],
-			['club',4,'sha',null,['yingbian_kongchao']],
+			['club',4,'sha',null,['yingbian_kongchao','yingbian_add']],
 			['club',4,'sha','thunder'],
 			['club',4,'zhibi'],
-			['club',5,'sha',null,['yingbian_kongchao']],
+			['club',5,'sha',null,['yingbian_kongchao','yingbian_add']],
 			['club',5,'sha','thunder'],
 			['club',5,'tongque'],
 			['club',6,'sha','thunder'],
-			['club',6,'sha',null,['yingbian_kongchao']],
+			['club',6,'sha',null,['yingbian_kongchao','yingbian_add']],
 			['club',6,'lebu'],
 			['club',7,'sha','thunder'],
 			['club',7,'sha'],
-			['club',7,'nanman',null,['yingbian_fujia']],
+			['club',7,'nanman',null,['yingbian_fujia','yingbian_remove']],
 			['club',8,'sha','thunder'],
-			['club',8,'sha',null,['yingbian_canqu']],
+			['club',8,'sha',null,['yingbian_canqu','yingbian_add']],
 			['club',8,'sha'],
 			['club',9,'sha'],
 			['club',9,'jiu'],
@@ -18355,8 +18648,8 @@ return event.junling=='junling5'?1:0;});
 			['club',11,'sha'],
 			['club',11,'huoshaolianying'],
 			['club',11,'sha'],
-			['club',12,'zhujinqiyuan',null,['yingbian_zhuzhan']],
-			['club',12,'jiedao',null,['yingbian_fujia']],
+			['club',12,'zhujinqiyuan',null,['yingbian_zhuzhan','yingbian_add']],
+			['club',12,'jiedao',null,['yingbian_fujia','yingbian_hit']],
 			['club',12,'tiesuo'],
 			['club',13,'tiesuo'],
 			['club',13,'wuxie',null,['guo']],
@@ -18366,20 +18659,20 @@ return event.junling=='junling5'?1:0;});
 			['heart',1,'taoyuan'],
 			['heart',1,'lianjunshengyan'],
 			['heart',2,'shan'],
-			['heart',2,'chuqibuyi',null,['yingbian_zhuzhan']],
+			['heart',2,'chuqibuyi',null,['yingbian_zhuzhan','yingbian_add']],
 			['heart',2,'diaohulishan'],
-			['heart',3,'chuqibuyi',null,['yingbian_zhuzhan']],
+			['heart',3,'chuqibuyi',null,['yingbian_zhuzhan','yingbian_add']],
 			['heart',3,'wugu'],
 			['heart',3,'jingfanma'],
 			['heart',4,'tao'],
-			['heart',4,'sha','fire',['yingbian_canqu']],
+			['heart',4,'sha','fire',['yingbian_canqu','yingbian_damage']],
 			['heart',4,'shan'],
 			['heart',5,'qilin'],
 			['heart',5,'chitu'],
-			['heart',5,'shan',null,['yingbian_kongchao']],
+			['heart',5,'shan',null,['yingbian_kongchao','yingbian_draw']],
 			['heart',6,'lebu'],
 			['heart',6,'tao'],
-			['heart',6,'shan',null,['yingbian_kongchao']],
+			['heart',6,'shan',null,['yingbian_kongchao','yingbian_draw']],
 			['heart',7,'tao'],
 			['heart',7,'dongzhuxianji'],
 			['heart',7,'shan'],
@@ -18394,13 +18687,13 @@ return event.junling=='junling5'?1:0;});
 			['heart',10,'sha'],
 			['heart',11,'yiyi'],
 			['heart',11,'tao'],
-			['heart',11,'sha',null,['yingbian_zhuzhan']],
+			['heart',11,'sha',null,['yingbian_zhuzhan','yingbian_add']],
 			['heart',12,'tao'],
 			['heart',12,'sha'],
 			['heart',12,'huoshaolianying'],
 			['heart',13,'zhuahuang'],
 			['heart',13,'shan'],
-			['heart',13,'huogong',null,['yingbian_zhuzhan']],
+			['heart',13,'huogong',null,['yingbian_zhuzhan','yingbian_add']],
 			//方片普通
 			['diamond',1,'wuxinghelingshan'],
 			['diamond',1,'zhuge'],
@@ -18412,19 +18705,19 @@ return event.junling=='junling5'?1:0;});
 			['diamond',3,'shan'],
 			['diamond',3,'tao'],
 			['diamond',4,'yiyi'],
-			['diamond',4,'sha','fire',['yingbian_canqu']],
-			['diamond',4,'sha','fire',['yingbian_zhuzhan']],
+			['diamond',4,'sha','fire',['yingbian_canqu','yingbian_damage']],
+			['diamond',4,'sha','fire',['yingbian_zhuzhan','yingbian_add']],
 			['diamond',5,'guanshi'],
 			['diamond',5,'sha','fire'],
 			['diamond',5,'muniu'],
 			['diamond',6,'wuliu'],
 			['diamond',6,'shan'],
 			['diamond',6,'shan'],
-			['diamond',7,'shan',null,['yingbian_kongchao']],
-			['diamond',7,'shan',null,['yingbian_kongchao']],
+			['diamond',7,'shan',null,['yingbian_kongchao','yingbian_draw']],
+			['diamond',7,'shan',null,['yingbian_kongchao','yingbian_draw']],
 			['diamond',7,'shan'],
-			['diamond',8,'shan',null,['yingbian_kongchao']],
-			['diamond',8,'shan',null,['yingbian_kongchao']],
+			['diamond',8,'shan',null,['yingbian_kongchao','yingbian_draw']],
+			['diamond',8,'shan',null,['yingbian_kongchao','yingbian_draw']],
 			['diamond',8,'sha','fire'],
 			['diamond',9,'jiu'],
 			['diamond',9,'shan'],
