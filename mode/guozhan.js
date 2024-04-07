@@ -2887,6 +2887,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						mark:true,
 						marktext:'↓',
 						intro:{content:'不因此法失去牌后，你弃置一张牌'},
+						audio:'weishu',
 						trigger:{player:'loseAfter',global:'loseAsyncAfter'},
 						filter(event,player){
 							if(!player.countCards('he')) return false;
