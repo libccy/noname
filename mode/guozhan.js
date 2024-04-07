@@ -3015,7 +3015,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					effect:{
 						charlotte:true,
 						mark:true,
-						intro:{content:'使用应变牌时直接获得强化，使用合纵牌时摸一张牌。'},
+						intro:{content:'使用应变牌时直接获得强化'},
 					},
 					give:{
 						audio:'xuanbei',
@@ -18522,6 +18522,8 @@ return event.junling=='junling5'?1:0;});
 			fakequanbian_info:'当你于回合内使用或打出牌时，你可以将一张手牌与牌堆顶X张牌的其中一张进行交换（X为你的体力上限）。',
 			fakezhouting:'骤霆',
 			fakezhouting_info:'限定技，出牌阶段，你可以依次使用牌堆顶X张牌中所有可以使用的牌，然后获得其中不能使用的牌，然后若有角色因此死亡，则你重置〖骤霆〗（X为你的体力上限）。',
+			fakexuanbei:'选备',
+			fakexuanbei_info:'①当你首次明置此武将牌时，你摸两张牌，且你本回合内使用带有“应变”标签的牌时直接强化。②每回合限一次，当你使用带有“应变”标签的牌结算完毕后，你可以令一名其他角色获得此牌对应的所有实体牌。③当你死亡时，你可以令一名其他角色变更副将。',
 			fakeqingleng:'清冷',
 			fakeqingleng_info:'其他角色的结束阶段，若其武将牌均明置，则你可以将一张牌当作冰【杀】对其使用（无距离限制）。然后若此牌未对其造成伤害，则你暗置其一张武将牌，且直到其下个回合开始，其明置此武将牌时，你对其造成1点伤害。',
 			fakexijue:'袭爵',
