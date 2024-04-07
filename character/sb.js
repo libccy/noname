@@ -4052,7 +4052,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseUseEnd'},
 				zhuSkill:true,
 				unique:true,
-				direct:true,
+				popup:false,
 				filter:function(event,player){
 					if(!player.hasZhuSkill('sbjijiang')) return false;
 					return game.hasPlayer(current=>{
@@ -4060,17 +4060,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return game.hasPlayer(currentx=>current.inRange(currentx));
 					});
 				},
-				content:function(){
-					'step 0'
-					var next=player.chooseTarget(get.prompt2('sbjijiang'),2);
-					next.set('filterTarget',(card,player,target)=>{
+				async cost(event,trigger,player){
+					event.result=await player.chooseTarget(get.prompt2('sbjijiang'),2).set('filterTarget',(card,player,target)=>{
 						if(!ui.selected.targets.length) return target.group=='shu'&&target.hp>=player.hp&&target!=player;
 						var current=ui.selected.targets[0];
 						return current.inRange(target);
-					});
-					next.set('targetprompt',['进行选择','出杀对象']);
-					next.set('multitarget',true);
-					next.set('ai',target=>{
+					}).set('targetprompt',['进行选择','出杀对象']).set('multitarget',true).set('ai',target=>{
 						var player=_status.event.player;
 						if(ui.selected.targets.length){
 							var current=ui.selected.targets[0];
@@ -4085,25 +4080,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return -att*get.threaten(target,player);
 						}
 						return curs.reduce((max,i)=>Math.max(max,get.effect(i,new lib.element.VCard({name:'sha'}),target,player)),-1);
-					});
-					'step 1'
-					if(result.bool){
-						var targets=result.targets;
-						event.targets=targets;
-						if(targets[0].group!='shu'||targets[0].hp<player.hp||targets[0]==player) targets.reverse();
-						player.logSkill('sbjijiang',targets,false);
-						player.line2(targets);
-						var choiceList=[
-							'视为对'+get.translation(targets[1])+'使用一张【杀】',
-							'你的下一个出牌阶段开始前，跳过此阶段'
-						];
-						if(!targets[0].canUse({name:'sha',isCard:true},targets[1],false)) event._result={index:1};
-						else targets[0].chooseControl().set('choiceList',choiceList).set('ai',()=>{
-							return _status.event.choice;
-						}).set('choice',get.effect(targets[1],{name:'sha'},targets[0],targets[0])>get.effect(targets[0],{name:'lebu'},targets[0],targets[0])?0:1);
-					}
-					else event.finish();
-					'step 2'
+					}).forResult();
+				},
+				async content(event,trigger,player){
+					let targets=event.targets;
+					player.logSkill('sbjijiang',targets,false);
+					player.line2(targets);
+					var choiceList=[
+						'视为对'+get.translation(targets[1])+'使用一张【杀】',
+						'你的下一个出牌阶段开始前，跳过此阶段'
+					],result;
+					if(!targets[0].canUse({name:'sha',isCard:true},targets[1],false)) result={index:1};
+					else result=await targets[0].chooseControl().set('choiceList',choiceList).set('ai',()=>{
+						return _status.event.choice;
+					}).set('choice',get.effect(targets[1],{name:'sha'},targets[0],targets[0])>get.effect(targets[0],{name:'lebu'},targets[0],targets[0])?0:1).forResult();
 					if(result.index==0){
 						targets[0].useCard({name:'sha',isCard:true},targets[1],false);
 					}
