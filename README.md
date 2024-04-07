@@ -9,10 +9,10 @@ docker run -d --name sgs -p 80:80 -p 8080:8080 --restart unless-stopped hsiaoshu
 ## 动机
 为了在家庭局域网部署一个三国杀服务器，在家里供人家游戏，将无名杀Docker化，使得其易于部署，部署者不需要懂得相关知识。
 
-## Docker化无名杀
+## Docker化 无名杀
 这个仓库将原有的无名杀Docker化，使得更容易部署web端游戏，联机服务器也在同一IP地址。
 
-## 使用方法
+## 镜像Build
 ```bash
 docker build -t sgs:latest .
 docker run --rm --name sgs -p 80:80 -p 8080:8080 sgs:latest
