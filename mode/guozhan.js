@@ -2056,20 +2056,22 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			fakeshuliang:{
 				audio:'shuliang',
 				trigger:{global:'phaseJieshuBegin'},
-				direct:true,
 				filter(event,player){
-					if(!event.player.isFriendOf(player)) return false;
-					return event.player.isIn()&&get.distance(player,event.player)<=player.getExpansions('faketunchu').length;
+					const num=player.getExpansions('faketunchu').length;
+					if(!num||!event.player.isFriendOf(player)) return false;
+					return event.player.isIn()&&get.distance(player,event.player)<=num;
 				},
 				async cost(event,trigger,player){
 					const {result:{bool,links}}=await player.chooseButton([get.prompt2('fakeshuliang',trigger.player),player.getExpansions('faketunchu')]).set('ai',button=>{
 						if(get.attitude(get.event('player'),get.event().getTrigger().player)<=0) return 0;
 						return 1+Math.random();
-					});
-					event.result={bool:bool,cards:links,targets:[trigger.player]};
+					}).set('hiddenSkill','fakeshuliang');
+					event.result={bool:bool,cost_data:links};
 				},
+				preHidden:true,
+				logTarget:'player',
 				content(){
-					player.loseToDiscardpile(event.cards);
+					player.loseToDiscardpile(event.cost_data);
 					trigger.player.draw(2);
 				},
 				ai:{combo:'faketunchu'},
