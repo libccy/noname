@@ -379,8 +379,7 @@ export const Content = {
 		}
 		player.$syncExpand();
 	},
-	removeExpandEquip: function () {
-		'step 0'
+	removeExpandEquip: async (event, trigger, player) {
 		if (!player.expandedSlots || !event.slots.length) return;
 		const slotMap = {};
 		event.slots.forEach(s => {
@@ -394,13 +393,13 @@ export const Content = {
 		for (var slot of slots) {
 			var subtype = slot;
 			var count;
-			if (get.is.mountCombined() && (slot == 'equip3' || slot == 'equip4')) {
+			if (get.is.mountCombined() && (slot == 'equip3' || slot == 'equip4' || slot == 'equip3_4')) {
 				if (combinedRemoved) continue;
 				else {
 					combinedRemoved = true;
 					slot = 'equip3';
 					subtype = 'equip3_4';
-					count = Math.max(slotMap['equip3'] || 0, slotMap['equip4'] || 0);
+					count = Math.max(slotMap['equip3'] || 0, slotMap['equip4'] || 0, slotMap['equip3_4'] || 0);
 				}
 			}
 			else count = slotMap[slot];
@@ -435,8 +434,7 @@ export const Content = {
 			return typeof v == 'number' && v > 0;
 		})) player.$syncExpand();
 		else player.unmarkSkill('expandedSlots');
-		if (!dialog) event.finish();
-		else {
+		if (dialog) {
 			const next = player.chooseButton(dialog, true, [1, Infinity]);
 			next.set('complexSelect', true);
 			next.set('filterButton', (button) => {
@@ -456,13 +454,13 @@ export const Content = {
 				}
 				return true;
 			});
+			const links = await next.forResultLinks();
+			const source = event.source || player;
+			const next = player.discard(source, links);
+			if (player != source) next.notBySelf = true;
+			next.discarder = source;
+			event.done = next;
 		}
-		'step 1'
-		const source = event.source || player;
-		const next = player.discard(source, result.links);
-		if (player != source) next.notBySelf = true;
-		next.discarder = source;
-		event.done = next;
 	},
 	//选择顶装备要顶的牌
 	replaceEquip: function () {
