@@ -2628,7 +2628,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								if(same.length){
 									for(var suit of suits){
 										if(same.some(card=>get.suit(card,false)==suit)){
-											list.push([get.type(name),get.translation(suit),name,undefined,suit]);
+											list.push([suit,'',name,undefined,suit]);
 										}
 									}
 								}
@@ -2637,7 +2637,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									if(same.length){
 										for(var suit of suits){
 											if(same.some(card=>get.suit(card,false)==suit)){
-												list.push([get.type(name),get.translation(suit),name,nature,suit]);
+												list.push([suit,'',name,nature,suit]);
 											}
 										}
 									}
