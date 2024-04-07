@@ -360,9 +360,6 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				return;
 			}
 			else if (game.download) {
-				// if (!confirm('请保证一小时内没有进行过素材和游戏更新，否则会请求失败，是否继续？')) {
-				// 	return;
-				// }
 				if (!localStorage.getItem('noname_authorization') && !sessionStorage.getItem('noname_authorization')) {
 					if (confirm('素材更新或许会直接超过每小时的访问限制，是否输入您github的token以解除访问每小时60次的限制？')) await gainAuthorization();
 				}
@@ -372,9 +369,24 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 					checkAssetButton.innerHTML = '检查素材更新';
 					checkAssetButton.disabled = false;
 				}
-				// 暂定更新这四个文件夹
-				const assetDirs = ['audio', 'font', 'image', 'theme'];
+				const assetDirs = [];
+				if (lib.config.asset_font) {
+					assetDirs.push('font');
+				}
+				if (lib.config.asset_audio) {
+					assetDirs.push('audio');
+				}
+				if (lib.config.asset_image) {
+					assetDirs.push('image');
+				}
 				const files = await Promise.all(assetDirs.map(dir => flattenRepositoryFiles(dir)));
+				assetDirs.forEach((value, index) => {
+					const arr = files[index];
+					const size = arr.reduce((previous, current) => {
+						return previous + current.size;
+					}, 0);
+					game.saveConfig(`asset_${value}_size`, parseSize(size));
+				});
 				/**
 				 * @param { any[] } arr 
 				 * @param { Function } predicate 
@@ -389,55 +401,10 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				const result = await asyncFilter(files.flat(), async v => {
 					return v.size != (await game.promises.readFile(v.path)).length;
 				}).then(arr => arr.map(v => v.path));
-				console.log(result);
-				const progress = createProgress('正在更新素材包.zip');
-				/**
-				 * @type {progress}
-				 */
-				let unZipProgress;
-				request('noname.unitedrhythmized.club/api', (receivedBytes, total, filename) => {
-					if (typeof filename == 'string') {
-						progress.setFileName(filename);
-					}
-					let received = 0, max = 0;
-					if (total) {
-						max = +(total / (1024 * 1024)).toFixed(1)
-					} else {
-						max = 1000;
-					}
-					received = +(receivedBytes / (1024 * 1024)).toFixed(1);
-					if (received > max) max = received;
-					progress.setProgressMax(max);
-					progress.setProgressValue(received);
-				}, {
-					method: 'post',
-					body: JSON.stringify({
-						fileList: result
-					})
-				}).then(async blob => {
-					progress.remove();
-					const zip = await get.promises.zip();
-					zip.load(await blob.arrayBuffer());
-					const entries = Object.entries(zip.files);
-					let root;
-					const hiddenFileFlags = ['.', '_'];
-					unZipProgress = createProgress('正在解压' + progress.getFileName(), entries.length);
-					let i = 0;
-					for (const [key, value] of entries) {
-						unZipProgress.setProgressValue(i++);
-						const fileName = typeof root == 'string' && key.startsWith(root) ? key.replace(root, '') : key;
-						if (hiddenFileFlags.includes(fileName[0])) continue;
-						if (value.dir) {
-							await game.promises.createDir(fileName);
-							continue;
-						}
-						unZipProgress.setFileName(fileName);
-						const [path, name] = [fileName.split('/').slice(0, -1).join('/'), fileName.split('/').slice(-1).join('/')];
-						game.print(`${fileName}(${i}/${entries.length})`);
-						await game.promises.writeFile(value.asArrayBuffer(), path, name);
-					}
-					unZipProgress.remove();
-					await lib.init.promises.js('game', 'update.js');
+				console.log('需要更新的文件有:', result);
+				game.print('需要更新的文件有:', result);
+				const finish = async () => {
+					await lib.init.promises.js('game', 'asset.js');
 					if (Array.isArray(window.noname_asset_list)) {
 						game.saveConfig('asset_version', window.noname_asset_list[0]);
 						delete window.noname_asset_list;
@@ -446,12 +413,65 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 						game.reload();
 					}
 					refresh();
-				}).catch(e => {
-					if (progress.parentNode) progress.remove();
-					if (unZipProgress && unZipProgress.parentNode) unZipProgress.remove();
-					refresh();
-					throw e;
-				});
+				};
+				if (result.length > 0) {
+					const progress = createProgress('正在更新素材包.zip');
+					/**
+					 * @type {progress}
+					 */
+					let unZipProgress;
+					request('noname.unitedrhythmized.club/api', (receivedBytes, total, filename) => {
+						if (typeof filename == 'string') {
+							progress.setFileName(filename);
+						}
+						let received = 0, max = 0;
+						if (total) {
+							max = +(total / (1024 * 1024)).toFixed(1)
+						} else {
+							max = 1000;
+						}
+						received = +(receivedBytes / (1024 * 1024)).toFixed(1);
+						if (received > max) max = received;
+						progress.setProgressMax(max);
+						progress.setProgressValue(received);
+					}, {
+						method: 'post',
+						body: JSON.stringify({
+							fileList: result.concat('game/asset.js')
+						})
+					}).then(async blob => {
+						progress.remove();
+						const zip = await get.promises.zip();
+						zip.load(await blob.arrayBuffer());
+						const entries = Object.entries(zip.files);
+						let root;
+						const hiddenFileFlags = ['.', '_'];
+						unZipProgress = createProgress('正在解压' + progress.getFileName(), entries.length);
+						let i = 0;
+						for (const [key, value] of entries) {
+							unZipProgress.setProgressValue(i++);
+							const fileName = typeof root == 'string' && key.startsWith(root) ? key.replace(root, '') : key;
+							if (hiddenFileFlags.includes(fileName[0])) continue;
+							if (value.dir) {
+								await game.promises.createDir(fileName);
+								continue;
+							}
+							unZipProgress.setFileName(fileName);
+							const [path, name] = [fileName.split('/').slice(0, -1).join('/'), fileName.split('/').slice(-1).join('/')];
+							game.print(`${fileName}(${i}/${entries.length})`);
+							await game.promises.writeFile(value.asArrayBuffer(), path, name);
+						}
+						unZipProgress.remove();
+						await finish();
+					}).catch(e => {
+						if (progress.parentNode) progress.remove();
+						if (unZipProgress && unZipProgress.parentNode) unZipProgress.remove();
+						refresh();
+						throw e;
+					});
+				} else {
+					await finish();
+				}
 			}
 			else {
 				alert('此版本不支持游戏内更新素材，请手动更新');
@@ -563,11 +583,11 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 			if (!this.classList.toggle('on')) {
 				game.saveConfig('asset_toggle_off', true);
 				[
-					span2, span2_br, span2_check,
+					/* span2, span2_br, span2_check,*/
 					span3, span3_br, span3_check,
 					span4, span4_br, span4_check,
 					span5, span5_br, span5_check,
-					span6, span6_br, span6_check,
+					/* span6, span6_br, span6_check,*/
 				].forEach(item => HTMLDivElement.prototype.css.call(item, {
 					display: 'none'
 				}));
@@ -575,11 +595,11 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 			else {
 				game.saveConfig('asset_toggle_off');
 				[
-					span2, span2_br, span2_check,
+					/* span2, span2_br, span2_check,*/
 					span3, span3_br, span3_check,
 					span4, span4_br, span4_check,
 					span5, span5_br, span5_check,
-					span6, span6_br, span6_check,
+					/* span6, span6_br, span6_check,*/
 				].forEach(item => HTMLDivElement.prototype.css.call(item, {
 					display: ''
 				}));
@@ -588,24 +608,11 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 		span1.listen(span1.toggle);
 		li2.lastChild.appendChild(span1);
 
-		var span6_br = ui.create.node('br');
-		li2.lastChild.appendChild(span6_br);
+		// var span6_br = ui.create.node('br');
+		// li2.lastChild.appendChild(span6_br);
+		// var span2_br = ui.create.node('br');
 
-		var span5 = ui.create.div('', '图片素材（精简，126MB）');
-		span5.style.fontSize = 'small';
-		span5.style.lineHeight = '16px';
-		var span5_check = document.createElement('input');
-		span5_check.type = 'checkbox';
-		span5_check.style.marginLeft = '5px';
-		if (lib.config.asset_image) {
-			span5_check.checked = true;
-		}
-		span5_check.onchange = function () {
-			game.saveConfig('asset_image', this.checked);
-		};
-		var span2_br = ui.create.node('br');
-
-		var span4 = ui.create.div('', '字体素材（48MB）');
+		var span4 = ui.create.div('', `字体素材（${ lib.config.asset_font_size || '23.4MB' }）`);
 		span4.style.fontSize = 'small';
 		span4.style.lineHeight = '16px';
 		li2.lastChild.appendChild(span4);
@@ -622,7 +629,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 		var span3_br = ui.create.node('br');
 		li2.lastChild.appendChild(span3_br);
 
-		var span3 = ui.create.div('', '音效素材（125MB）');
+		var span3 = ui.create.div('', `音效素材（${ lib.config.asset_audio_size || '350MB' }）`);
 		span3.style.fontSize = 'small';
 		span3.style.lineHeight = '16px';
 		li2.lastChild.appendChild(span3);
@@ -639,49 +646,60 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 		var span4_br = ui.create.node('br');
 		li2.lastChild.appendChild(span4_br);
 
-		var span2 = ui.create.div('', '皮肤素材（351MB）');
-		span2.style.fontSize = 'small';
-		span2.style.lineHeight = '16px';
-		li2.lastChild.appendChild(span2);
-		var span2_check = document.createElement('input');
-		span2_check.type = 'checkbox';
-		span2_check.style.marginLeft = '5px';
-		if (lib.config.asset_skin) {
-			span2_check.checked = true;
+		// var span2 = ui.create.div('', '皮肤素材（351MB）');
+		// span2.style.fontSize = 'small';
+		// span2.style.lineHeight = '16px';
+		// li2.lastChild.appendChild(span2);
+		// var span2_check = document.createElement('input');
+		// span2_check.type = 'checkbox';
+		// span2_check.style.marginLeft = '5px';
+		// if (lib.config.asset_skin) {
+		// 	span2_check.checked = true;
+		// }
+		// span2_check.onchange = function () {
+		// 	game.saveConfig('asset_skin', this.checked);
+		// };
+		// li2.lastChild.appendChild(span2_check);
+		var span5 = ui.create.div('', `图片素材（${lib.config.asset_image_size || '363MB'}）`);
+		span5.style.fontSize = 'small';
+		span5.style.lineHeight = '16px';
+		li2.lastChild.appendChild(span5);
+		var span5_check = document.createElement('input');
+		span5_check.type = 'checkbox';
+		span5_check.style.marginLeft = '5px';
+		if (lib.config.asset_image) {
+			span5_check.checked = true;
 		}
-		span2_check.onchange = function () {
-			game.saveConfig('asset_skin', this.checked);
+		span5_check.onchange = function () {
+			// @ts-ignore
+			game.saveConfig('asset_image', this.checked);
 		};
-		li2.lastChild.appendChild(span2_check);
+		li2.lastChild.appendChild(span5_check);
 		var span5_br = ui.create.node('br');
 		li2.lastChild.appendChild(span5_br);
+		// li2.lastChild.appendChild(span2_br);
 
-
-		li2.lastChild.appendChild(span5);
-		li2.lastChild.appendChild(span5_check);
-		li2.lastChild.appendChild(span2_br);
-
-		var span6 = ui.create.div('', '图片素材（完整，203MB）');
-		span6.style.fontSize = 'small';
-		span6.style.lineHeight = '16px';
-		li2.lastChild.appendChild(span6);
-		var span6_check = document.createElement('input');
-		span6_check.type = 'checkbox';
-		span6_check.style.marginLeft = '5px';
-		if (lib.config.asset_full) {
-			span6_check.checked = true;
-		}
-		span6_check.onchange = function () {
-			game.saveConfig('asset_full', this.checked);
-		};
-		li2.lastChild.appendChild(span6_check);
+		// var span6 = ui.create.div('', '图片素材（完整，203MB）');
+		// span6.style.fontSize = 'small';
+		// span6.style.lineHeight = '16px';
+		// li2.lastChild.appendChild(span6);
+		// var span6_check = document.createElement('input');
+		// span6_check.type = 'checkbox';
+		// span6_check.style.marginLeft = '5px';
+		// if (lib.config.asset_full) {
+		// 	span6_check.checked = true;
+		// }
+		// span6_check.onchange = function () {
+		// 	game.saveConfig('asset_full', this.checked);
+		// };
+		// li2.lastChild.appendChild(span6_check);
 		
 		[
-			span2, span2_br, span2_check,
+			/* span2, span2_br, span2_check,*/
 			span3, span3_br, span3_check,
 			span4, span4_br, span4_check,
 			span5, span5_br, span5_check,
-			span6, span6_br, span6_check,
+			/* span6, span6_br, span6_check,*/
 		].forEach(item => HTMLDivElement.prototype.css.call(item, {
 			display: 'none'
 		}));
