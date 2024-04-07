@@ -13573,6 +13573,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rejianxiong_old:{
 				audio:'rejianxiong',
+				audioname2:{
+					gz_caocao:'jianxiong',
+				},
 				trigger:{player:'damageEnd'},
 				direct:true,
 				content:function(){
