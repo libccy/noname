@@ -94,23 +94,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				enable:'chooseToUse',
 				hiddenCard(player,name){
-					if((get.event(`clanshengmo_${player.playerid}_enabled_names`)||[]).includes(name)&&(get.event('clanshengmo_cards')||[]).length>0) return true;
+					if(get.type(name)!='basic') return false;
+					if(!player.getStorage('clanshengmo').includes(name)&&(get.event('clanshengmo_cards')||[]).length>0) return true;
 				},
 				filter(event,player){
 					if(event.responded) return false;
-					const names=get.event(`clanshengmo_${player.playerid}_enabled_names`)||[],cards=get.event('clanshengmo_cards')||[];
+					const names=lib.inpile.filter(name=>get.type(name)=='basic'&&!player.getStorage('clanshengmo').includes(name)),cards=get.event('clanshengmo_cards')||[];
 					return cards.length>0&&names.some(name=>{
 						return event.filterCard({name,isCard:true},player,event);
 					});
 				},
 				onChooseToUse(event){
 					if(game.online) return;
-					const player=event.player,propName=`clanshengmo_${player.playerid}_enabled_names`;
-					if(!event[propName]){
-						event.set(propName,lib.inpile.filter(name=>get.type(name)=='basic').removeArray(player.getAllHistory('useCard',evt=>{
-							return evt.card.storage&&evt.card.storage.clanshengmo;
-						}).map(evt=>get.name(evt.card,false))));
-					}
 					if(!event.clanshengmo_cards){
 						let cards=[];
 						game.checkGlobalHistory('cardMove',evt=>{
@@ -127,7 +122,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				async content(event,trigger,player){
 					const evt = event.getParent(2);
-					const names = evt[`clanshengmo_${player.playerid}_enabled_names`], cards = evt.clanshengmo_cards;
+					const names = lib.inpile.filter(name => get.type(name) == 'basic' && !player.getStorage('clanshengmo').includes(name)), cards = evt.clanshengmo_cards;
 					const links = await player.chooseButton(['剩墨：获得其中一张牌', cards], true).set('ai', button => {
 						return get.value(button.link);
 					}).forResultLinks();
@@ -171,11 +166,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					});
 					evt.goto(0);
 				},
+				marktext:'墨',
+				intro:{
+					content:'已以此法使用过$'
+				},
 				subSkill:{
 					backup:{
 						precontent(){
 							delete event.result.skill;
 							event.result.card.storage.clanshengmo = true;
+							player.markAuto('clanshengmo',event.result.card.name);
 							player.gain(lib.skill.clanshengmo_backup.cardToGain, 'gain2');
 						},
 						filterCard:()=>false,
