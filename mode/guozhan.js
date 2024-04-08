@@ -4246,7 +4246,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				},
 				preHidden:true,
 				async cost(event,trigger,player){
-					event.result=await player.chooseCard(get.prompt('fakekeshou'),'弃置两张颜色相同的牌，令即将受到的伤害-1','he',2,card=>{
+					event.result=await player.chooseToDiscard(get.prompt('fakekeshou'),'弃置两张颜色相同的牌，令即将受到的伤害-1','he',2,card=>{
 						return !ui.selected.cards.length||get.color(card)==get.color(ui.selected.cards[0]);
 					}).set('logSkill','fakekeshou').set('complexCard',true).set('ai',card=>{
 						if(!_status.event.check) return 0;
