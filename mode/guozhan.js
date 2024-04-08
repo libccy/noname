@@ -2114,27 +2114,112 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},'he');
 				},
 				filterCard(card,player){
+					if(!lib.suit.includes(get.suit(card))) return false;
 					return lib.filter.cardDiscardable(card,player)&&!player.getStorage('fakezhufu_effect').includes(get.suit(card));
 				},
 				position:'he',
-				/*
 				check(card){
 					const player=get.event('player');
-					if(player.hasUseTarget(card,true,true)) return 0;
-					return 5+3*Math.random()-get.value(card);
+					let cards=player.getCards('hs',card=>player.hasValueTarget(card,true,true));
+					let discards=player.getCards('he',card=>get.info('fakezhufu').filterCard(card,player));
+					for(let i=1;i<discards.length;i++){
+						if(discards.slice(0,i).some(card=>get.suit(card)==get.suit(discards[i]))) discards.splice(i--,1);
+					}
+					cards.removeArray(discards);
+					if(!cards.length||!discards.length) return 0;
+					cards.sort((a,b)=>{
+						return (player.getUseValue(b,true,true)>0?get.order(b):0)-(player.getUseValue(a,true,true)>0?get.order(a):0);
+					});
+					const cardx=cards[0];
+					if(get.order(cardx,player)>0&&discards.includes(card)){
+						if((get.suit(card)=='heart'&&get.type(cardx)!='equip'&&(function(card,player){
+							const num=get.info('fakezhufu').getMaxUseTarget(card,player);
+							return num!=-1&&game.countPlayer(target=>player.canUse(card,target,true,true)&&get.effect(target,card,player,player)>0)>num;
+						}(cardx,player))&&game.hasPlayer(target=>{
+							return target.isFriendOf(player)&&target.hasCard(cardy=>{
+								return lib.filter.cardDiscardable(cardy,target)&&get.type2(cardy)==get.type2(cardx);
+							},'h');
+						}))||(get.suit(card)=='diamond'&&get.type(cardx)!='equip'&&!game.hasPlayer(target=>{
+							return target.countCards('h')>player.countCards('h')-(get.position(card)=='h'?1:0)-(get.position(cardx)=='h'?1:0);
+						}))||(get.suit(card)=='spade'&&player.getHp()==1)||(get.suit(card)=='club'&&get.tag(cardx,'damage')&&player.countCards('h')-(get.position(card)=='h'?1:0)-(get.position(cardx)=='h'?1:0)==0)) return 1/(getvalue(card)||0.5);
+					}
+					return 0;
 				},
-				*/
 				async content(event,trigger,player){
 					const suit=get.suit(event.cards[0],player);
 					player.addTempSkill('fakezhufu_effect','phaseUseAfter');
 					player.markAuto('fakezhufu_effect',[[suit,false]]);
 				},
-				/*
 				ai:{
-					order:7,
-					result:{player:1},
+					order(item,player){
+						let cards=player.getCards('hs',card=>player.hasValueTarget(card,true,true));
+						let discards=player.getCards('he',card=>get.info('fakezhufu').filterCard(card,player));
+						for(let i=1;i<discards.length;i++){
+							if(discards.slice(0,i).some(card=>get.suit(card)==get.suit(discards[i]))) discards.splice(i--,1);
+						}
+						cards.removeArray(discards);
+						if(!cards.length||!discards.length) return 0;
+						cards.sort((a,b)=>{
+							return (player.getUseValue(b,true,true)>0?get.order(b):0)-(player.getUseValue(a,true,true)>0?get.order(a):0);
+						});
+						const cardx=cards[0];
+						return (get.order(cardx,player)>0&&((discards.some(card=>{
+							return get.suit(card)=='heart';
+						})&&get.type(cardx)!='equip'&&(function(card,player){
+							const num=get.info('fakezhufu').getMaxUseTarget(card,player);
+							return num!=-1&&game.countPlayer(target=>player.canUse(card,target,true,true)&&get.effect(target,card,player,player)>0)>num;
+						}(cardx,player))&&game.hasPlayer(target=>{
+							return target.isFriendOf(player)&&target.hasCard(cardy=>{
+								return lib.filter.cardDiscardable(cardy,target)&&get.type2(cardy)==get.type2(cardx);
+							},'h');
+						}))||(get.type(cardx)!='equip'&&discards.some(card=>{
+							return get.suit(card)=='diamond'&&!game.hasPlayer(target=>{
+								return target.countCards('h')>player.countCards('h')-(get.position(card)=='h'?1:0)-(get.position(cardx)=='h'?1:0);
+							});
+						}))||(discards.some(card=>{
+							return get.suit(card)=='spade';
+						})&&player.getHp()==1)||(get.tag(cardx,'damage')&&discards.some(card=>{
+							return get.suit(card)=='club'&&player.countCards('h')-(get.position(card)=='h'?1:0)-(get.position(cardx)=='h'?1:0)==0;
+						}))))?(get.order(cardx,player)+0.00001):0;
+					},
+					result:{
+						player(player,target){
+							let cards=player.getCards('hs',card=>player.hasValueTarget(card,true,true));
+							let discards=player.getCards('he',card=>get.info('fakezhufu').filterCard(card,player));
+							discards=discards.sort((a,b)=>get.value(a)-get.value(b));
+							for(let i=1;i<discards.length;i++){
+								if(discards.slice(0,i).some(card=>get.suit(card)==get.suit(discards[i]))) discards.splice(i--,1);
+							}
+							cards.removeArray(discards);
+							if(!cards.length||!discards.length) return 0;
+							if((discards.some(card=>{
+								return get.suit(card)=='heart';
+							})&&cards.some(card=>{
+								return get.type(card)!='equip'&&(function(card,player){
+									const num=get.info('fakezhufu').getMaxUseTarget(card,player);
+									return num!=-1&&game.countPlayer(target=>player.canUse(card,target,true,true)&&get.effect(target,card,player,player)>0)>num;
+								}(card,player))&&game.hasPlayer(target=>{
+									return target.isFriendOf(player)&&target.hasCard(cardx=>{
+										return lib.filter.cardDiscardable(cardx,target)&&get.type2(cardx)==get.type2(card);
+									},'h');
+								});
+							}))||discards.some(card=>{
+								return get.suit(card)=='diamond'&&cards.some(cardx=>{
+									return get.type(cardx)!='equip'&&!game.hasPlayer(target=>{
+										return target.countCards('h')>player.countCards('h')-(get.position(card)=='h'?1:0)-(get.position(cardx)=='h'?1:0);
+									});
+								});
+							})||(discards.some(card=>{
+								return get.suit(card)=='spade';
+							})&&player.getHp()==1)||discards.some(card=>{
+								return get.suit(card)=='club'&&cards.some(cardx=>{
+									return get.tag(cardx,'damage')&&player.countCards('h')-(get.position(card)=='h'?1:0)-(get.position(cardx)=='h'?1:0)==0;
+								});
+							})) return 1;
+							return 0;
+						},
+					},
 				},
-				*/
 				subSkill:{
 					effect:{
 						charlotte:true,
@@ -2211,6 +2296,16 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					'diamond':['fujia','hit'],
 					'spade':['canqu','draw'],
 					'club':['kongchao','damage'],
+				},
+				getMaxUseTarget(card,player){
+					let range;
+					const select=get.copy(get.info(card).selectTarget);
+					if(select==undefined) range=[1,1];
+					else if(typeof select=='number') range=[select,select];
+					else if(get.itemtype(select)=='select') range=select;
+					else if(typeof select=='function') range=select(card,player);
+					game.checkMod(card,player,range,'selectTarget',player);
+					return range;
 				},
 			},
 			fakeguishu:{
