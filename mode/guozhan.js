@@ -1449,7 +1449,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						}
 						if(goon){
 							event.tochange.push(_status.characterlist[i]);
-							if(event.tochange.length==event.num) break;
 						}
 					}
 					event.tochange=event.tochange.filter(character=>{
@@ -1457,7 +1456,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						const doublex=get.is.double(character,true);
 						const group=(doublex?doublex:[get.character(character,1)]);
 						return !group.some(j=>groups.includes(j));
-					});
+					}).randomGets(event.num);
 					if(!event.tochange.length) event.finish();
 					else{
 						if(event.tochange.length==1) event._result={
@@ -3330,7 +3329,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						const {result:{bool,links}}=await player.chooseButton(['宝箧：是否使用其中一张宝物牌？',cards]).set('ai',button=>{
 							return get.equipValue(button.link,get.event('player'));
 						});
-						if(bool) await player.chooseUseTarget(card,true);
+						if(bool) await player.chooseUseTarget(links[0],true);
 					}
 				},
 				ai:{mingzhi_no:true},
@@ -18462,7 +18461,7 @@ return event.junling=='junling5'?1:0;});
 			fakepaiyi:'排异',
 			fakepaiyi_info:'出牌阶段限一次，你可以选择一名角色，然后选择一个军令令其选择是否执行。若其执行，则你摸X张牌，然后将一张“权”置入弃牌堆；若其不执行，则你可以对至多X名与其势力相同的角色各造成1点伤害，然后将等量的“权”置入弃牌堆。（X为你武将牌上的“权”数）',
 			fakeshilu:'嗜戮',
-			fakeshilu_info:'①出牌阶段结束时，若你有副将且本阶段未发动过副将武将牌上的非锁定技，则你更换副将并将原副将称为“戮”置于武将牌上。②准备阶段，你弃置X张手牌，然后摸X张牌（X为你武将牌上的“戮”数，少牌全弃，无牌不弃）。',
+			fakeshilu_info:'①出牌阶段结束时，若你有副将且本阶段未发动过副将武将牌上的非锁定技，则你更换副将至你武将牌上的“戮”未包含的势力并将原副将称为“戮”置于武将牌上。②准备阶段，你弃置X张手牌，然后摸X张牌（X为你武将牌上的“戮”数，少牌全弃，无牌不弃）。',
 			fakexiongnve:'凶虐',
 			fakexiongnve_info:'①当你使用【杀】造成伤害时或受到【杀】造成的伤害时，若你武将牌上的“戮”包含伤害来源的势力，则你令此伤害+1。②当你受到不为【杀】造成的伤害时，若你武将牌上的“戮”包含伤害来源的势力，则此伤害-1。',
 			fakehuaiyi:'怀异',
