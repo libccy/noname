@@ -2328,7 +2328,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			fakeqizhi:{
 				audio:'qizhi',
 				inherit:'qizhi',
-				trigger:{player:'useCard'},
+				trigger:{player:'useCard1'},
 				filter(event,player){
 					if(!event.targets||!event.targets.length) return false;
 					if(_status.currentPhase!=player) return false;
@@ -2349,11 +2349,9 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					const target=event.targets[0];
 					const {result:{bool,cards}}=await player.discardPlayerCard(target,'he',true);
-					if(get.is.yingbianConditional(trigger.card)&&bool){
+					if(get.yingbianConditions(trigger.card).length&&bool){
 						if(cards.some(i=>get.suit(i,target)==get.suit(trigger.card))){
-							player.when('yingbian')
-							.filter(evt=>evt.card==trigger.card)
-							.then(()=>trigger.forceYingbian=true);
+							trigger.forceYingbian=true;
 						}
 					}
 				},
@@ -18495,7 +18493,7 @@ return event.junling=='junling5'?1:0;});
 			fakemibei:'秘备',
 			fakemibei_info:'①准备阶段，若你的手牌数不为全场最多，则你须选择一名手牌数为全场最多的角色，令其对你发起军令。②当你执行军令后，你将手牌数摸至与发起者相同（至多摸五张）。③当你拒绝执行军令后，你展示一至三张牌，然后你本回合可以将其中一张牌当作另一张基本牌或非延时锦囊牌使用一次。',
 			fakeqizhi:'奇制',
-			fakeqizhi_info:'当你于回合内使用非装备牌A时，你可以弃置不是此牌目标的一名角色的一张牌B，然后其摸一张牌。若A具有应变效果，且A和B的花色相同，则你无视条件触发A的应变效果。',
+			fakeqizhi_info:'当你于回合内声明使用非装备牌A时，你可以弃置不是此牌目标的一名角色的一张牌B，然后其摸一张牌。若A具有应变效果，且A和B的花色相同，则你无视条件触发A的应变效果。',
 			fakejinqu:'进趋',
 			fakejinqu_info:'结束阶段，你可以摸两张牌，然后你将手牌弃置至X张（X为你本回合发动过〖奇制〗的次数）。',
 			fakejuzhan:'拒战',
