@@ -8116,6 +8116,44 @@ export class Player extends HTMLDivElement {
 			}
 		}
 	}
+	/**
+	 * 快速获取一名角色当前轮次/前X轮次的历史
+	 *
+	 * 第一个参数填写获取的动作
+	 *
+	 * 第二个参数填写获取历史的筛选条件
+	 *
+	 * 第三个参数填写数字（不填默认为0），获取上X轮的历史（X为0则为本轮历史），第四个参数若为true，则获取从上X轮开始至现在
+	 *
+	 * 第四个参数若为true，则获取从上X轮开始至现在所有符合条件的历史
+	 *
+	 * 第五个参数填写event，获取此event之前所有符合条件的历史
+	 *
+	 * @param { string | function | number | boolean | object } map
+	 */
+	getRoundHistory(key, filter, num, keep, last) {
+		if (!num) num = 0;
+		const player = this;
+		let evts = [], history = player.actionHistory;
+		for (let i = history.length - 1; i >= 0; i--) {
+			if (keep === true || num == 0) {
+				let currentHistory = history[i];
+				if (key) currentHistory = currentHistory[key];
+				if (filter) currentHistory = currentHistory.filter(filter);
+				evts.addArray(currentHistory.reverse());
+			}
+			if (history[i].isRound) {
+				if (num > 0) num--;
+				else break;
+			}
+		}
+		evts.reverse();
+		if (last && evts.includes(last)) {
+			const lastIndex = evts.indexOf(last);
+			return evts.filter(evt => evts.indexOf(evt) <= lastIndex);
+		}
+		return evts;
+	}
 	getHistory(key, filter, last) {
 		if (!key) return this.actionHistory[this.actionHistory.length - 1];
 		if (!filter) return this.actionHistory[this.actionHistory.length - 1][key];

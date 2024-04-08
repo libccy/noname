@@ -575,21 +575,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content(){
 					'step 0'
 					player.unmarkSkill('clanyuzhi');
-					var num1=0,num2=0,num3=0,bool=true;
-					var history=player.actionHistory;
-					for(var i=history.length-2;i>=0;i--){
-						for(var evt of history[i].gain){
-							if(evt.getParent().name=='draw'&&evt.getParent(2).name=='clanyuzhi'){
-								if(bool) num1+=evt.cards.length;
-								else num2+=evt.cards.length;
-							}
-						}
-						if(bool) num3+=history[i].useCard.length;
-						if(history[i].isRound){
-							if(bool) bool=false;
-							else break;
-						}
-					}
+					var num1=player.getRoundHistory('gain',evt=>{
+						return evt.getParent().name=='draw'&&evt.getParent(2).name=='clanyuzhi';
+					},1).reduce((sum,evt)=>sum+evt.cards.length,0);
+					var num2=player.getRoundHistory('gain',evt=>{
+						return evt.getParent().name=='draw'&&evt.getParent(2).name=='clanyuzhi';
+					},2).reduce((sum,evt)=>sum+evt.cards.length,0);
+					var num3=player.getRoundHistory('useCard',evt=>{
+						return evt.cards&&evt.cards.length;
+					},1).reduce((sum,evt)=>sum+evt.cards.length,0);
 					event.num1=num1;
 					if(num1>0&&(num2>0&&num1>num2)||num1>num3){
 						player.logSkill('clanyuzhi');
@@ -607,15 +601,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 2'
 					if(!player.countCards('h')) event.finish();
 					'step 3'
-					player.chooseToDiscard('迂志：请弃置一张手牌','摸此牌牌名字数的牌。下一轮开始时，若本轮你使用的牌数或上一轮你以此法摸的牌数小于此牌牌名字数，则你失去1点体力。',true,function(card,player){
+					player.chooseCard('迂志：请展示一张手牌','摸此牌牌名字数的牌。下一轮开始时，若本轮你使用的牌数或上一轮你以此法摸的牌数小于此牌牌名字数，则你失去1点体力。',function(card,player){
 						var num=get.cardNameLength(card);
 						return typeof num=='number'&&num>0;
-					}).set('logSkill','clanyuzhi').set('ai',function(card){
+					},true).set('logSkill','clanyuzhi').set('ai',function(card){
 						if(_status.event.dying&&_status.event.num>0&&get.cardNameLength(card)>_status.event.num) return 1/get.cardNameLength(card);//怂
 						return get.cardNameLength(card);//勇
 					}).set('dying',player.hp+player.countCards('hs',{name:['tao','jiu']})<1).set('num',event.num1);
 					'step 4'
 					if(result.bool){
+						player.logSkill('clanyuzhi');
+						player.showCards(result.cards,get.translation(player)+'发动了【迂志】');
 						player.draw(get.cardNameLength(result.cards[0]));
 						player.storage.clanyuzhi=get.cardNameLength(result.cards[0]);
 						player.markSkill('clanyuzhi');
@@ -632,7 +628,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'damageEnd',source:'damageSource'},
 				filter(event,player){
-					if(!event.card||player.isLinked()) return false;
+					if(!event.card/*||player.isLinked()*/) return false;
 					if(game.getGlobalHistory('everything',evt=>{
 						if(evt.name!='damage'||!evt.card) return false;
 						return evt.player==player||(evt.source&&evt.source==player);
@@ -645,7 +641,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 0'
 					var num=get.cardNameLength(trigger.card),str='';
 					if(player.getDamagedHp()>0) str+=('并摸'+get.cnNumber(player.getDamagedHp())+'张牌');
-					player.chooseToDiscard(get.prompt('clanxieshu'),'横置武将牌，弃置'+get.cnNumber(num)+'张牌'+str,'he',num).set('ai',function(card){
+					player.chooseToDiscard(get.prompt('clanxieshu'),/*'横置武将牌，'+*/'弃置'+get.cnNumber(num)+'张牌'+str,'he',num).set('ai',function(card){
 						var player=_status.event.player;
 						var num=_status.event.num;
 						var num2=player.getDamagedHp();
@@ -655,7 +651,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}).set('num',num).logSkill='clanxieshu';
 					'step 1'
 					if(result.bool){
-						player.link(true);
+						//player.link(true);
 						if(player.getDamagedHp()>0) player.draw(player.getDamagedHp());
 					}
 				},
@@ -1989,16 +1985,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				forced:true,
 				filter(event,player){
 					if(!game.hasPlayer(current=>current!=player)) return false;
-					var card=event.card,type=get.type2(card);
-					for(var i=player.actionHistory.length-1; i>=0; i--){
-						var history=player.actionHistory[i].useCard;
-						for(var evt of history){
-							if(evt==event) continue;
-							if(get.type2(evt.card)==type) return false;
-						}
-						if(player.actionHistory[i].isRound) break;
-					}
-					return true;
+					const type=get.type2(event.card);
+					return player.getRoundHistory('useCard',evt=>get.type2(evt.card)==type).indexOf(event)==0;
 				},
 				getNum(player){
 					return (player.countCards('ej')>0)+(player.isDamaged())+(Math.max(0,player.hp)<player.countCards('h'));
@@ -2482,23 +2470,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				intro:{
 					content:'已使用过的花色：$',
-					onunmark:true
+					onunmark:true,
 				},
 				trigger:{player:'useCardAfter'},
 				forced:true,
 				filter(event,player){
 					if(!lib.suit.includes(get.suit(event.card))) return false;
-					var card=event.card,suit=get.suit(card);
-					for(var i=player.actionHistory.length-1; i>=0; i--){
-						var history=player.actionHistory[i].useCard;
-						for(var evt of history){
-							if(evt==event) continue;
-							if(get.suit(evt.card)==suit) return false;
-						}
-						if(player.actionHistory[i].isRound) break;
-					}
-					return event.targets&&event.targets.length==1&&!event.targets[0].isLinked()||
-						player.hasCard(card=>get.suit(card)==get.suit(event.card)&&player.canRecast(card),'h');
+					const suit=get.suit(event.card);
+					if(player.getRoundHistory('useCard',evt=>get.suit(evt.card)==type).indexOf(event)!=0) return false;
+					return event.targets&&event.targets.length==1&&!event.targets[0].isLinked()||player.hasCard(card=>get.suit(card)==get.suit(event.card)&&player.canRecast(card),'h');
 				},
 				content(){
 					'step 0'
@@ -2514,37 +2494,49 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					if(event.link&&event.recast) player.draw();
 				},
-				group:['clandianzhan_count','clandianzhan_clear'],
+				group:'clandianzhan_count',
 				subSkill:{
 					count:{
+						charlotte:true,
 						trigger:{player:'useCardAfter'},
 						filter(event,player){
 							let suit=get.suit(event.card);
 							return lib.suits.includes(suit)&&!player.getStorage('clandianzhan').includes(suit);
 						},
+						forced:true,
 						silent:true,
-						charlotte:true,
 						content(){
-							player.storage.clandianzhan=[];
-							for(let i=player.actionHistory.length-1; i>=0; i--){
-								let history=player.actionHistory[i].useCard;
-								for(let evt of history){
-									player.storage.clandianzhan.add(get.suit(evt.card));
-								}
-								if(player.actionHistory[i].isRound) break;
+							let suits=player.getRoundHistory('useCard',evt=>{
+								return lib.suits.includes(get.suit(evt.card));
+							}).reduce((list,evt)=>{
+								return list.add(get.suit(evt.card));
+							},[]).sort((a,b)=>lib.suits.indexOf(a)-lib.suits.indexOf(b));
+							if(!player.storage.clandianzhan){
+								player.when({global:'roundStart'}).then(()=>{
+									delete player.storage.clandianzhan;
+									player.unmarkSkill('clandianzhan');
+								});
 							}
+							player.storage.clandianzhan=suits;
 							player.markSkill('clandianzhan');
 						},
-						sub:true
 					},
-					clear:{
-						trigger:{global:'roundStart'},
-						silent:true,
-						charlotte:true,
-						content(){
-							player.unmarkSkill('clandianzhan');
-						},
-						sub:true
+				},
+				init(player){
+					let suits=player.getRoundHistory('useCard',evt=>{
+						return lib.suits.includes(get.suit(evt.card));
+					}).reduce((list,evt)=>{
+						return list.add(get.suit(evt.card));
+					},[]).sort((a,b)=>lib.suits.indexOf(a)-lib.suits.indexOf(b));
+					if(suits.length){
+						if(!player.storage.clandianzhan){
+							player.when({global:'roundStart'}).then(()=>{
+								delete player.storage.clandianzhan;
+								player.unmarkSkill('clandianzhan');
+							});
+						}
+						player.storage.clandianzhan=suits;
+						player.markSkill('clandianzhan');
 					}
 				}
 			},
@@ -2940,9 +2932,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanchenya_info:'当一名角色发动“出牌阶段限一次”的技能后，你可以令其重铸任意张牌名字数为X的牌（X为其手牌数）。',
 			clan_zhonghui:'族钟会',
 			clanyuzhi:'迂志',
-			clanyuzhi_info:'锁定技。新的一轮开始时，你依次执行以下项：①若你上一轮使用的牌数或你上上轮因〖迂志〗摸的牌数小于你上轮因〖迂志〗摸的牌数，你失去1点体力或失去〖保族〗。②你弃置一张手牌，然后摸X张牌（X为此牌牌名字数）。',
+			clanyuzhi_info:'锁定技。新的一轮开始时，你依次执行以下项：①若你上一轮使用的牌数或你上上轮因〖迂志〗摸的牌数小于你上轮因〖迂志〗摸的牌数，你失去1点体力或失去〖保族〗。②你展示一张手牌，然后摸X张牌（X为此牌牌名字数）。',
 			clanxieshu:'挟术',
-			clanxieshu_info:'当你每回合首次因牌造成或受到伤害后，你可以横置武将牌，然后弃置Y张牌并摸你已损失体力值张牌（Y为此牌牌名字数）。',
+			clanxieshu_info:'当你每回合首次因牌造成或受到伤害后，你可以弃置Y张牌并摸你已损失体力值张牌（Y为此牌牌名字数）。',
 			clan_zhongyu:'族钟毓',
 			clanjiejian:'捷谏',
 			clanjiejian_info:'当你于一回合使用第X张牌指定第一个目标后，若此牌不为装备牌，则你可以令一名目标角色摸X张牌。（X为此牌牌名字数）',
