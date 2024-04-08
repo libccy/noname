@@ -1093,7 +1093,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'phaseJieshuBegin'},
 				prompt2:function(event,player){
 					var str='获得技能';
-					var num=lib.skill.olsbranji.getNum(event,player);
+					var num=lib.skill.olsbranji.getNum(player);
 					if(num>=player.getHp()) str+='【困奋】';
 					if(num==player.getHp()) str+='和';
 					if(num<=player.getHp()) str+='【诈降】';
@@ -1109,7 +1109,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return str;
 				},
 				check:function(event,player){
-					var num=lib.skill.olsbranji.getNum(event,player);
+					var num=lib.skill.olsbranji.getNum(player);
 					if(num==player.getHp()) return true;
 					return player.getHandcardLimit()-player.countCards('h')>=3||player.getDamagedHp()>=2;
 				},
@@ -1120,7 +1120,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					var player=map.player;
 					var trigger=map.trigger;
 					player.awakenSkill('olsbranji');
-					var num=lib.skill.olsbranji.getNum(trigger,player);
+					var num=lib.skill.olsbranji.getNum(player);
 					const skills = [];
 					if(num>=player.getHp()){
 						skills.push('kunfen');
@@ -1159,8 +1159,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				getList:function(event){
 					return event.getParent().phaseList.map(list=>list.split('|')[0]);
 				},
-				getNum:function(event,player){
-					return lib.skill.olsbranji.getList(event).slice(0,event.getParent().num).filter(name=>player.getHistory('useCard',evt=>evt.getParent(name).name==name).length).length;
+				getNum:function(player){
+					return player.getHistory('useCard',evt=>{
+						return lib.phaseName.some(name=>{
+							return evt.getParent(name).name==name;
+						});
+					}).reduce((list,evt)=>{
+						return list.add(evt.getParent(lib.phaseName.find(name=>evt.getParent(name).name==name)));
+					},[]).length;
 				},
 				subSkill:{
 					norecover:{

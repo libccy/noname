@@ -2117,20 +2117,24 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					return lib.filter.cardDiscardable(card,player)&&!player.getStorage('fakezhufu_effect').includes(get.suit(card));
 				},
 				position:'he',
+				/*
 				check(card){
 					const player=get.event('player');
 					if(player.hasUseTarget(card,true,true)) return 0;
 					return 5+3*Math.random()-get.value(card);
 				},
+				*/
 				async content(event,trigger,player){
 					const suit=get.suit(event.cards[0],player);
 					player.addTempSkill('fakezhufu_effect','phaseUseAfter');
 					player.markAuto('fakezhufu_effect',[[suit,false]]);
 				},
+				/*
 				ai:{
 					order:7,
 					result:{player:1},
 				},
+				*/
 				subSkill:{
 					effect:{
 						charlotte:true,
@@ -2143,7 +2147,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								let str='';
 								str+='<li>已弃置过的花色：';
 								str+=suits;
-								if(used.length){
+								if(usedSuits.length){
 									str+='<br><li>已触发过的花色：';
 									str+=usedSuits;
 								}
@@ -2156,22 +2160,57 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 							return player.getStorage('fakezhufu_effect').some(list=>!list[1]);
 						},
 						forced:true,
-						content(){
-							const list=player.getStorage('fakezhufu_effect').filter(list=>!list[1]);
-							for(const i of list){
-								player.storage.fakezhufu_effect[player.getStorage('fakezhufu_effect').indexOf(i)][1]=true;
+						firstDo:true,
+						async content(event,trigger,player){
+							const list=player.getStorage('fakezhufu_effect').filter(i=>!i[1]);
+							const forced=(function(trigger,player){
+								if(trigger.forceYingbian||player.hasSkillTag('forceYingbian')) return true;
+								const list=(trigger.temporaryYingbian||[]);
+								return list.includes('force')||get.cardtag(trigger.card,'yingbian_force');
+							}(trigger,player));
+							if(forced){
+								player.popup('yingbian_force_tag',lib.yingbian.condition.color.get('force'));
+								game.log(player,'触发了','#g【注傅】','为',trigger.card,'添加的应变条件');
 							}
-							if(!Array.isArray(trigger.temporaryYingbian)) trigger.temporaryYingbian=[];
-							trigger.forceYingbian=true
-							trigger.temporaryYingbian.addArray(list.map(i=>get.info('fakezhufu').YingBianMap[i[0]]));
+							const hasYingBian=(trigger.temporaryYingbian||[]),map=get.info('fakezhufu').YingBianMap;
+							for(const j of list){
+								player.storage.fakezhufu_effect[player.getStorage('fakezhufu_effect').indexOf(j)][1]=true;
+								const tag=map[j[0]][0],eff=map[j[0]][1];
+								if(get.cardtag(trigger.card,`yingbian_${tag}`)) continue;
+								if(j[0]=='heart'){
+									if(!forced&&!hasYingBian.includes('add')){
+										const {result}=await lib.yingbian.condition.complex.get('zhuzhan')(trigger);
+										if(result.bool){
+											game.log(player,'触发了','#g【注傅】','为',trigger.card,'添加的应变条件（','#g'+get.translation(j[0]),'）');
+											trigger.yingbian_addTarget=true;
+											player.addTempSkill('yingbian_changeTarget');
+										}
+									}
+									else{
+										if(!forced){
+											game.log(player,'触发了','#g【注傅】','为',trigger.card,'添加的应变条件（','#g'+get.translation(j[0]),'）');
+										}
+										trigger.yingbian_addTarget=true;
+										player.addTempSkill('yingbian_changeTarget');
+									}
+								}
+								else{
+									const goon=(hasYingBian.includes(eff)||lib.yingbian.condition.simple.get(tag)(trigger));
+									if(!forced&&goon){
+										player.popup('yingbian_force_tag',lib.yingbian.condition.color.get(eff));
+										game.log(player,'触发了','#g【注傅】','为',trigger.card,'添加的应变条件（','#g'+get.translation(j[0]),'）');
+									}
+									if(forced||goon) await game.yingbianEffect(trigger,lib.yingbian.effect.get(eff));
+								}
+							}
 						},
 					},
 				},
 				YingBianMap:{
-					'heart':'yingbian_zhuzhan',
-					'diamond':'yingbian_fujia',
-					'spade':'yingbian_canqu',
-					'club':'yingbian_kongchao',
+					'heart':['zhuzhan','add'],
+					'diamond':['fujia','hit'],
+					'spade':['canqu','draw'],
+					'club':['kongchao','damage'],
 				},
 			},
 			fakeguishu:{
@@ -2349,7 +2388,8 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					const target=event.targets[0];
 					const {result:{bool,cards}}=await player.discardPlayerCard(target,'he',true);
-					if(get.yingbianConditions(trigger.card).length&&bool){
+					if(bool){
+						await target.draw();
 						if(cards.some(i=>get.suit(i,target)==get.suit(trigger.card))){
 							trigger.forceYingbian=true;
 						}
@@ -18485,7 +18525,7 @@ return event.junling=='junling5'?1:0;});
 			fakedujin:'独进',
 			fakedujin_info:'①摸牌阶段，你可以额外摸X张牌（X为你装备区的牌数的一半，向上取整）。②当你首次明置此武将牌时，若你为你们势力第一个明置武将牌的角色，则你获得1个“先驱”标记。',
 			fakezhufu:'注傅',
-			fakezhufu_info:'出牌阶段，你可以弃置一张本阶段未以此法弃置过的花色的牌，然后根据此牌的花色为你使用的下一张牌添加对应的应变效果（无视条件触发）：红桃——助战；方片——富甲；黑桃——残躯；草花——空巢。',
+			fakezhufu_info:'出牌阶段，你可以弃置一张本阶段未以此法弃置过的花色的牌，然后根据此牌的花色为你使用的下一张牌添加对应的应变效果：红桃，助战、目标+1；方片，富甲、不可被响应；黑桃，残躯、摸一张牌；草花，空巢、伤害+1。',
 			fakeguishu:'鬼术',
 			fakeguishu_info:'出牌阶段限一次，你可以将一张黑桃手牌当作【知己知彼】或【远交近攻】使用。若你本局游戏内已经发动过了〖鬼术〗，则你必须选择与上次不同的选项。',
 			fakeyuanyu:'远域',
