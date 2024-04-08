@@ -2157,13 +2157,13 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						content(){
+							const list=player.getStorage('fakezhufu_effect').filter(list=>!list[1]);
+							for(const i of list){
+								player.storage.fakezhufu_effect[player.getStorage('fakezhufu_effect').indexOf(i)][1]=true;
+							}
 							if(!Array.isArray(trigger.temporaryYingbian)) trigger.temporaryYingbian=[];
 							trigger.forceYingbian=true
-							trigger.temporaryYingbian.addArray(player.getStorage('fakezhufu_effect').filter(list=>{
-								return !list[1];
-							}).map(list=>{
-								return get.info('fakezhufu').YingBianMap[list[0]];
-							}));
+							trigger.temporaryYingbian.addArray(list.map(i=>get.info('fakezhufu').YingBianMap[i[0]]));
 						},
 					},
 				},
