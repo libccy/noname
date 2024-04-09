@@ -1,0 +1,16 @@
+{
+    "name": "noname",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "dependencies": {
+        "options": "^0.0.6",
+        "ultron": "^1.0.2",
+        "ws": "^1.1.5",
+        "express": "^4.19.2"
+    },
+    "scripts": {
+        "start": "node index.js",
+        "server": "node server.js"
+    }
+}
