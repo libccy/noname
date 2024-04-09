@@ -6,7 +6,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterSort:{
 			sp:{
 				sp_tianji:["sunhao","liuxie","caoang","hetaihou","sunluyu",'ol_wangrong',"zuofen","ol_bianfuren","qinghegongzhu","tengfanglan","ruiji",'caoxiancaohua'],
-				sp_sibi:["yangxiu",'guotu',"chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong','caoxi','tianchou'],
+				sp_sibi:['ol_lukai',"yangxiu",'guotu',"chenlin","chengyu","shixie","fuwan","wangyun","zhugejin","simalang","maliang","buzhi","dongyun","kanze","sunqian","xizhicai","sunshao",'duxi',"jianggan",'ol_dengzhi','ol_yangyi','ol_dongzhao','ol_chendeng','jin_yanghu','wangyan','xiahouxuan','quhuang','zhanghua','wangguan','sunhong','caoxi','tianchou'],
 				sp_tianzhu:['liyi','zhangyan','niujin','hejin','hansui',"wutugu","yanbaihu","shamoke","zhugedan",'huangzu','gaogan',"tadun","fanjiangzhangda","ahuinan","dongtuna",'ol_wenqin'],
 				sp_nvshi:['ol_dingshangwan',"lingju","guanyinping","zhangxingcai","mayunlu","dongbai","zhaoxiang",'ol_zhangchangpu',"daxiaoqiao","jin_guohuai",'ol_hujinding'],
 				sp_shaowei:["simahui","zhangbao","zhanglu","zhugeguo","xujing","zhangling",'huangchengyan','zhangzhi','lushi'],
@@ -18,7 +18,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_zhongdan:["cuiyan","huangfusong"],
 				sp_guozhan2:["sp_dongzhuo","liqueguosi","zhangren"],
 				sp_others:["hanba","caiyang"],
-				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','liupan','ol_lukai','ol_liupi'],
+				sp_waitforsort:['ol_luyusheng','ol_pengyang','ol_tw_zhangji','ol_liwan','ol_liuyan','caoyu','liupan','ol_liupi'],
 			},
 		},
 		characterFilter:{
@@ -3473,13 +3473,26 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return order;
 					},
 				},
-				trigger:{player:'useCard'},
-				filter:function(event){
+				trigger:{player:['useCard','useCardAfter']},
+				filter:function(event,player,name){
+					if(name=='useCardAfter'){
+						if(player.isTempBanned('olxiaofan')) return false;
+						return player.getHistory('useCard',evt=>{
+							return !player.getHistory('sourceDamage',evt2=>{
+								return evt2.card&&evt2.card==evt.card;
+							}).length&&get.tag(evt.card,'damage');
+						}).indexOf(event)>=2;
+					}
 					return [1,11,12,13].includes(get.number(event.card));
 				},
 				forced:true,
 				content:function(){
 					'step 0'
+					if(event.triggername=='useCardAfter'){
+						player.tempBanSkill('olxiaofan');
+						event.finish();
+						return;
+					}
 					trigger.targets.length=0;
 					trigger.all_excluded=true;
 					game.log(trigger.card,'被无效了');
@@ -27700,7 +27713,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olxiaofan:'嚣翻',
 			olxiaofan_info:'当你需要使用不为【无懈可击】的牌时，你可以观看牌堆底的X+1张牌并使用其中的一张。此牌结算结束时，你依次弃置以下前X个区域中的所有牌：⒈判定区、⒉装备区、⒊手牌区（X为本回合你使用过的牌中包含的类型数）。',
 			oltuishi:'侻失',
-			oltuishi_info:'锁定技。①你不能使用【无懈可击】。②当你使用点数为字母的牌时，你令此牌无效并摸一张牌，且你对手牌数小于你的角色使用的下一张牌无距离和次数限制。',
+			oltuishi_info:'锁定技。①你不能使用【无懈可击】。②当你使用点数为字母的牌时，你令此牌无效并摸一张牌，且你对手牌数小于你的角色使用的下一张牌无距离和次数限制。③当你使用伤害类卡牌结算完毕后，若此牌为你本回合使用的第三张或以上未造成伤害的卡牌，则你令本回合〖器翻〗失效。',
 			ol_tw_zhangji:'张既',
 			skill_zhangji_A:'技能',
 			skill_zhangji_A_info:'出牌阶段限X次（X为你的体力值），当你使用牌指定一名其他角色为目标后，你可以观看其手牌，然后你选择一项：<br>1.弃置其一张牌，然后若弃置的牌是能造成火焰伤害的牌，你摸一张牌。<br>2.重铸其手牌中的所有【杀】和【决斗】。<br>3.若其没有【闪】，你与其互相对对方造成1点伤害。',
