@@ -441,13 +441,13 @@ export async function boot() {
 				//lib.init.onload=backup_onload;
 				_status.evaluatingExtension = false;
 			}
-			else if (config.get('mode') != 'connect' || (!localStorage.getItem(lib.configprefix + 'directstart') && show_splash)) {
+			else if (!localStorage.getItem(lib.configprefix + 'directstart') && show_splash) {
 				extensionlist.push(config.get('extensions')[name]);
 			}
 		}
 	}
 	else {
-		if (config.get('mode') != 'connect' || (!localStorage.getItem(lib.configprefix + 'directstart') && show_splash)) {
+		if (!localStorage.getItem(lib.configprefix + 'directstart') && show_splash) {
 			for (var name = 0; name < config.get('extensions').length; name++) {
 				if (Reflect.get(window, 'bannedExtensions').includes(config.get('extensions')[name])) {
 					continue;
@@ -576,7 +576,7 @@ export async function boot() {
 		Reflect.get(ui, 'css')[stylesName[i]] = stylesLoaded[i];
 	}
 
-	if (extensionlist.length && (config.get('mode') != 'connect' || show_splash)) {
+	if (extensionlist.length) {
 		_status.extensionLoading = [];
 		_status.extensionLoaded = [];
 
