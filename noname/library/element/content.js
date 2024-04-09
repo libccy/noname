@@ -1542,8 +1542,8 @@ export const Content = {
 			event._result = { control: list[0] };
 		}
 		else {
-			var next = player.chooseControl(list);
-			next.set('prompt', '请选择恢复一个装备栏');
+			var next = source.chooseControl(list);
+			next.set('prompt', '请选择恢复'+get.translation(player.name)+'的一个装备栏');
 			if (!event.ai) event.ai = function (event, player, list) {
 				return list.randomGet();
 			};
@@ -1575,8 +1575,8 @@ export const Content = {
 		else {
 			list.sort();
 			event.list = list;
-			var next = player.chooseControl(list);
-			next.set('prompt', '请选择废除一个装备栏');
+			var next = source.chooseControl(list);
+			next.set('prompt', '请选择废除'+get.translation(player.name)+'的一个装备栏');
 			if (!event.ai) event.ai = function (event, player, list) {
 				return list.randomGet();
 			};
@@ -1922,9 +1922,12 @@ export const Content = {
 		}
 		while (player != end);
 		event.changeCard = get.config('change_card');
-		if (_status.connectMode || (lib.config.mode == 'doudizhu' && _status.mode == 'online') || lib.config.mode != 'identity' && lib.config.mode != 'guozhan' && lib.config.mode != 'doudizhu') {
-			event.changeCard = 'disabled';
-		}
+		if (_status.connectMode || 
+			(lib.config.mode == 'single' && _status.mode != 'wuxianhuoli') || 
+			(lib.config.mode == 'doudizhu' && _status.mode == 'online') || 
+			lib.config.mode != 'identity' && lib.config.mode != 'guozhan' && lib.config.mode != 'doudizhu' && lib.config.mode != 'single') {
+				event.changeCard = 'disabled';
+			}
 		"step 1";
 		if (event.changeCard != 'disabled' && !_status.auto) {
 			event.dialog = ui.create.dialog('是否使用手气卡？');
@@ -3264,7 +3267,7 @@ export const Content = {
 			event.result._sendskill = event._sendskill;
 		}
 		if ((!event.result || !event.result.bool || event.result._noHidingTimer) && (event.result.skill || event.logSkill)) {
-			var info = get.info(event.result.skill || event.logSkill);
+			var info = get.info(event.result.skill || (Array.isArray(event.logSkill) ? event.logSkill[0] : event.logSkill));
 			if (info.direct && !info.clearTime) {
 				_status.noclearcountdown = 'direct';
 			}
@@ -3451,11 +3454,11 @@ export const Content = {
 			if (event.result._sendskill) {
 				lib.skill[event.result._sendskill[0]] = event.result._sendskill[1];
 			}
-			var info = get.info(event.result.skill);
 			if (event.onresult) {
 				event.onresult(event.result);
 			}
 			if ((!event.result || !event.result.bool || event.result._noHidingTimer) && (event.result.skill || event.logSkill)) {
+				var info = get.info(event.result.skill || (Array.isArray(event.logSkill) ? event.logSkill[0] : event.logSkill));
 				if (info.direct && !info.clearTime) {
 					_status.noclearcountdown = 'direct';
 				}
@@ -7919,20 +7922,20 @@ export const Content = {
 		if (!event.notrigger) event.trigger('damageSource');
 	},
 	recover: function () {
-		if (lib.config.background_audio) {
-			game.playAudio('effect', 'recover');
-		}
-		game.broadcast(function () {
-			if (lib.config.background_audio) {
-				game.playAudio('effect', 'recover');
-			}
-		});
 		if (num > player.maxHp - player.hp) {
 			num = player.maxHp - player.hp;
 			event.num = num;
 		}
 		if (num > 0) {
-			player.changeHp(num, false);
+			delete event.filterStop;
+			if (lib.config.background_audio) {
+				game.playAudio('effect', 'recover');
+			}
+			game.broadcast(function () {
+				if (lib.config.background_audio) {
+					game.playAudio('effect', 'recover');
+				}
+			});
 			game.broadcastAll(function (player) {
 				if (lib.config.animation && !lib.config.low_performance) {
 					player.$recover();
@@ -7940,10 +7943,18 @@ export const Content = {
 			}, player);
 			player.$damagepop(num, 'wood');
 			game.log(player, '回复了' + get.cnNumber(num) + '点体力');
+			
+			player.changeHp(num, false);
 		}
+		else event._triggered = null;
 	},
 	loseHp: function () {
 		"step 0";
+		if (event.num <= 0){
+			event.finish();
+			event._triggered = null;
+			return;
+		}
 		if (lib.config.background_audio) {
 			game.playAudio('effect', 'loseHp');
 		}

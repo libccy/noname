@@ -6,11 +6,12 @@ import { status as _status } from '../status/index.js';
 import { UI as ui } from '../ui/index.js';
 import { GNC as gnc } from '../gnc/index.js';
 import { CacheContext } from "../library/cache/cacheContext.js";
-
 import { Is } from "./is.js";
+import { Promises } from "./promises.js";
 
 export class Get extends Uninstantable {
 	static is = Is;
+	static promises = Promises;
 	/**
 	 * 获取当前内核版本信息
 	 *
@@ -53,10 +54,13 @@ export class Get extends Uninstantable {
 		return list;
 	}
 	/**
-	 * 根据座次数n（从0开始）获取对应的“n+1号位”翻译
-	 * @param {number} seat
+	 * 根据(Player的)座次数n（从1开始）获取对应的“n号位”翻译
+	 * @param {number | Player} seat
 	 */
-	static seatTranslation(seat) { return `${get.cnNumber(seat + 1, true)}号位`; }
+	static seatTranslation(seat) {
+		if (get.itemtype(seat) === 'player') seat = seat.getSeatNum() - 1;
+		return `${get.cnNumber(seat + 1, true)}号位`;
+	}
 	/**
 	 * @param {number} numberOfPlayers
 	 * @returns {string[]}
@@ -322,24 +326,46 @@ export class Get extends Uninstantable {
 	}
 	static infoHp(hp) {
 		if (typeof hp == 'number') return hp;
-		else if (typeof hp == 'string' && hp.includes('/')) {
-			const num = hp.split('/')[0];
-			if (num) return num == 'Infinity' ? Infinity : parseInt(num);
+		else if (typeof hp == 'string') {
+			if (hp.includes('/')) {
+				const num = hp.split('/')[0];
+				if (num) {
+					if (num == 'Infinity' || num == '∞') {
+						return Infinity;
+					} else {
+						return parseInt(num);
+					}
+				}
+			} else if (hp == 'Infinity' || hp == '∞') return Infinity;
 		}
 		return 0;
 	}
 	static infoMaxHp(hp) {
 		if (typeof hp == 'number') return hp;
-		else if (typeof hp == 'string' && hp.includes('/')) {
-			const num = hp.split('/')[1];
-			if (num) return num == 'Infinity' ? Infinity : parseInt(num);
+		else if (typeof hp == 'string') {
+			if (hp.includes('/')) {
+				const num = hp.split('/')[1];
+				if (num) {
+					if (num == 'Infinity' || num == '∞') {
+						return Infinity;
+					} else {
+						return parseInt(num);
+					}
+				}
+			} else if (hp == 'Infinity' || hp == '∞') return Infinity;
 		}
 		return 0;
 	}
 	static infoHujia(hp) {
 		if (typeof hp == 'string' && hp.includes('/')) {
 			const num = hp.split('/')[2];
-			if (num) return num == 'Infinity' ? Infinity : parseInt(num);
+			if (num) {
+				if (num == 'Infinity' || num == '∞') {
+					return Infinity;
+				} else {
+					return parseInt(num);
+				}
+			}
 		}
 		return 0;
 	}
@@ -602,6 +628,9 @@ export class Get extends Uninstantable {
 	}
 	static sort(arr, method, arg) { return method == "seat" ? arr.sortBySeat(arg) : void 0; }
 	static sortSeat(arr, target) { return arr.sortBySeat(target); }
+	/**
+	 * @param { (zip: JSZip) => any } callback
+	 */
 	static zip(callback) {
 		if (!window.JSZip) {
 			lib.init.js(lib.assetURL + 'game', 'jszip', function () {
@@ -710,7 +739,10 @@ export class Get extends Uninstantable {
 		toc = get.utc();
 		console.log('time2: ' + (toc - tic));
 	}
-	static stringify(obj, level) {
+	/**
+	 * @param {any} obj
+	 */
+	static stringify(obj, level = 0) {
 		level = level || 0;
 		let indent = '';
 		let str;
@@ -720,10 +752,14 @@ export class Get extends Uninstantable {
 		if (get.objtype(obj) == 'object' || obj instanceof lib.element.GameEventPromise) {
 			str = '{\n';
 			for (let i in obj) {
+				/**
+				 * @type {string}
+				 */
 				let insertDefaultString;
 				let insertFunctionString = indent + '    ' + get.stringify(obj[i], level + 1) + ',\n';
-				let parseFunction = i => {
+				let parseFunction = (/** @type {string} */ i) => {
 					// let string = obj[i].toString();
+					i = i.replaceAll('$', '\\$');
 					let execResult;
 					if (obj[i] instanceof GeneratorFunction) {
 						// *content(){}
@@ -1021,6 +1057,7 @@ export class Get extends Uninstantable {
 				case 'normal': return '新１ｖ１';
 				case 'changban': return '血战长坂坡';
 				case 'dianjiang': return '点将单挑';
+				case 'wuxianhuoli': return '无限火力';
 			}
 		}
 		if (config.mode == 'identity') {
@@ -4392,18 +4429,13 @@ export class Get extends Uninstantable {
 					zeroplayer = true;
 					zerotarget = true;
 				}
-				if (typeof temp3 == 'function' && temp3(player, target) != undefined) {
-					threaten *= temp3(player, target);
+				if (typeof temp3 == 'object') {
+					temp3 = temp3.target;
 				}
-				else if (typeof temp3 == 'object') {
-					if (typeof temp3.target == 'number') {
-						threaten *= temp3;
-					}
-					else if (typeof temp3.target == 'function' && temp3(player, target) != undefined) {
-						threaten *= temp3(player, target);
-					}
+				if (typeof temp3 == 'function') {
+					temp3 = temp3(player, target);
 				}
-				else if (typeof temp3 == 'number') {
+				if (typeof temp3 == 'number') {
 					threaten *= temp3;
 				}
 			}
@@ -4667,7 +4699,7 @@ export class Get extends Uninstantable {
 		return eff;
 	}
 	/**
-	 * 
+	 *
 	 * @param {any} source 如果参数是function，执行此函数并返回结果，传参为此方法剩余的参数。如果参数不是function，直接返回结果。
 	 * @returns 返回的结果
 	 */
@@ -4727,5 +4759,6 @@ export class Get extends Uninstantable {
 export const get = Get;
 
 export {
-	Is
+	Is,
+	Promises
 };

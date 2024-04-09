@@ -183,6 +183,32 @@ export async function cordovaReady() {
 			createDirectory();
 		}, reject));
 	};
+	game.createDir = (directory, successCallback, errorCallback) => {
+		const paths = directory.split('/').reverse();
+		new Promise((resolve, reject) => window.resolveLocalFileSystemURL(nonameInitialized, resolve, reject))
+			.then(directoryEntry => {
+				const redo = entry => new Promise((resolve, reject) => entry.getDirectory(paths.pop(), {
+					create: true
+				}, resolve, reject)).then(resolvedDirectoryEntry => {
+					if (paths.length) return redo(resolvedDirectoryEntry);
+					if (typeof successCallback == 'function') successCallback();
+				});
+				return redo(directoryEntry);
+		}, reason => {
+			if (typeof errorCallback != 'function') return Promise.reject(reason);
+			errorCallback(reason);
+		});
+	};
+	game.removeDir = (directory, successCallback, errorCallback) => {
+		window.resolveLocalFileSystemURL(`${nonameInitialized}${directory}`, directoryEntry => {
+			directoryEntry.removeRecursively(() => {
+				if (typeof successCallback == 'function') successCallback();
+			});
+		}, e => {
+			if (typeof errorCallback == 'function') errorCallback(e);
+			else throw e;
+		});
+	};
 	if (ui.updateUpdate) {
 		ui.updateUpdate();
 	}

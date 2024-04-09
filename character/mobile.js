@@ -459,7 +459,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								delete player.storage.mbxuetu_used;
 							});
 						}
-						player.markAuto('mbxuetu_used', storage);
+						player.markAuto('mbxuetu_used',[status===0?storage:(!event.cards.length)]);
 						if (status === 0 && !storage || status === 1 && event.cards.length) {
 							await target.recover();
 						}
@@ -718,7 +718,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(gains.length) player.gain(gains.randomGets(Math.min(gains.length,num)),'gain2');
 				},
 				getNum:function(player,event){
-					let num=3;
+					let num=(get.mode()=='identity'?3:4);
 					const history=game.getAllGlobalHistory('everything');
 					for(let i=history.length-1;i>=0;i--){
 						const evt=history[i];
@@ -743,8 +743,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter:function(event,player,name){
 					if(name=='damageSource'&&player.getHistory('sourceDamage').indexOf(event)!=0) return false;
 					return game.hasPlayer(target=>{
-						if(name=='damageEnd') return get.distance(player,target)>2;
-						return get.distance(player,target)<=2;
+						if(get.mode()!='doudizhu'){
+							if(name=='damageEnd'&&get.distance(player,target)<=2) return false;
+							if(name=='damageSource'&&get.distance(player,target)>2) return false;
+						}
+						const zhoufa=player.storage.zhoulin_zhoufa;
+						if(!zhoufa) return true;
+						if(zhoufa=='豹'||zhoufa=='兔') return true;
+						if(zhoufa=='鹰') return target.countCards('he');
+						return target.countDiscardableCards(player,'e');
 					});
 				},
 				direct:true,
@@ -756,10 +763,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						'你随机弃置其装备区的一张牌',
 						'令其摸一张牌',
 					][['豹','鹰','熊','兔'].indexOf(zhoufa)]:'令其随机执行一个效果';
-					const {result:{bool,targets}}=await player.chooseTarget(get.prompt('shoufa'),'选择一名距离'+(event.triggername=='damageEnd'?'':'不')+'大于2的角色，'+str,(card,player,target)=>{
+					const nodoudizhu=(get.mode()=='doudizhu'?'':('距离'+(event.triggername=='damageEnd'?'':'不')+'大于2的'));
+					const {result:{bool,targets}}=await player.chooseTarget(get.prompt('shoufa'),'选择一名'+nodoudizhu+'角色，'+str,(card,player,target)=>{
 						const name=_status.event.triggername;
-						if(name=='damageEnd'&&get.distance(player,target)<=2) return false;
-						if(name=='damageSource'&&get.distance(player,target)>2) return false;
+						if(get.mode()!='doudizhu'){
+							if(name=='damageEnd'&&get.distance(player,target)<=2) return false;
+							if(name=='damageSource'&&get.distance(player,target)>2) return false;
+						}
 						const zhoufa=player.storage.zhoulin_zhoufa;
 						if(!zhoufa) return true;
 						if(zhoufa=='豹'||zhoufa=='兔') return true;
@@ -3819,7 +3829,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:1,
 					threaten:1.14,
-					unequip:true,
 					unequip_ai:true,
 					skillTagFilter:function(player,tag,arg){
 						if(arg&&arg.name=='sha'&&arg.card&&arg.card.storage&&arg.card.storage.mbguli) return true;
@@ -3846,8 +3855,25 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.loseHp();
 							'step 1'
 							player.drawTo(player.maxHp);
-						}
-					}
+						},
+						group:'mbguli_unequip',
+					},
+					unequip:{
+						trigger:{
+							player:'useCardToPlayered',
+						},
+						filter:function({card}){
+							return card.name=='sha' && card.storage && card.storage.mbguli;
+						},
+						forced:true,
+						popup:false,
+						logTarget:'target',
+						content:function(){
+							trigger.target.addTempSkill('qinggang2');
+							trigger.target.storage.qinggang2.add(trigger.card);
+							trigger.target.markSkill('qinggang2');
+						},
+					},
 				},
 			},
 			mbaosi:{
@@ -7218,11 +7244,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				delay:false,
 				check:function(card){
 					var player=_status.event.player;
-					if(!player.storage.jueyong||player.storage.jueyong[0].length<Math.max(1,player.getDamagedHp())||!player.storage.jueyong[0].filter(function(card){
-						return get.effect(player,card,player.storage.jueyong[1][player.storage.jueyong[0].indexOf(card)],player)<0;
-					}).length||(player.hp<=1&&!player.storage.jueyong[0].filter(function(card){
+					if(!player.storage.jueyong||!player.storage.jueyong[0].length||player.hp<=1&&!player.storage.jueyong[0].some(function(card){
 						return get.tag(card,'damage')>0;
-					}).length)) return -1;
+					})||!player.storage.jueyong[0].some(function(card){
+						return get.effect(player,card,player.storage.jueyong[1][player.storage.jueyong[0].indexOf(card)],player)<0;
+					})) return -1;
 					return 20-get.value(card);
 				},
 				content:function(){
@@ -15848,8 +15874,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			shoufa:function(player){
 				const zhoufa=player.storage.zhoulin_zhoufa;
-				if(!zhoufa) return '当你受到伤害后/于一回合首次造成伤害后，你可以选择一名与你距离大于/不大于2的角色，令其随机执行以下一项：豹，令其受到1点无来源伤害；鹰，你随机获得其一张牌；熊，你随机弃置其装备区的一张牌；兔，令其摸一张牌。';
-				let str='当你受到伤害后/于一回合首次造成伤害后，你可以选择一名与你距离大于/不大于2的角色，';
+				const nodoudizhu=(get.mode()=='doudizhu'?'':'与你距离大于/不大于2的');
+				if(!zhoufa) return '当你受到伤害后/于一回合首次造成伤害后，你可以选择一名'+nodoudizhu+'角色，令其随机执行以下一项：豹，令其受到1点无来源伤害；鹰，你随机获得其一张牌；熊，你随机弃置其装备区的一张牌；兔，令其摸一张牌。';
+				let str='当你受到伤害后/于一回合首次造成伤害后，你可以选择一名'+nodoudizhu+'角色，';
 				str+=[
 					'令其受到1点无来源伤害',
 					'你随机获得其一张牌',
@@ -16742,6 +16769,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			muludawang:'木鹿大王',
 			shoufa:'兽法',
 			shoufa_info:'当你受到伤害后/于一回合首次造成伤害后，你可以选择一名与你距离大于/不大于2的角色，令其随机执行以下一项：豹，令其受到1点无来源伤害；鹰，你随机获得其一张牌；熊，你随机弃置其装备区的一张牌；兔，令其摸一张牌。',
+			shoufa_info_doudizhu:'当你受到伤害后/于一回合首次造成伤害后，你可以选择一名角色，令其随机执行以下一项：豹，令其受到1点无来源伤害；鹰，你随机获得其一张牌；熊，你随机弃置其装备区的一张牌；兔，令其摸一张牌。',
 			yuxiang:'御象',
 			yuxiang_info:'锁定技，若你有护甲值，则：①你计算与其他角色的距离-1，其他角色计算与你的距离+1；②当你受到火焰伤害时，此伤害+1。',
 			zhoulin:'咒鳞',
@@ -16751,7 +16779,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			sidai:'伺怠',
 			sidai_info:'限定技，出牌阶段，你可以将手牌区内的所有基本牌当做【杀】使用。若此牌对应的实体牌中：包含【闪】，则目标角色成为此牌的目标后，需弃置一张基本牌，否则不可响应此牌；包含【桃】，则当目标角色受到此牌的伤害后，其减1点体力上限。',
 			jieyu:'竭御',
-			jieyu_info:'结束阶段，你可以从弃牌堆中获得共X张不同牌名的基本牌（X为3-你上次发动〖竭御〗至今你成为其他角色使用伤害类卡牌目标的次数，且X至少为1）。',
+			jieyu_info:'结束阶段，你可以从弃牌堆中获得共X张不同牌名的基本牌（X为4-你上次发动〖竭御〗至今你成为其他角色使用伤害类卡牌目标的次数，且X至少为1）。',
+			jieyu_info_identity:'结束阶段，你可以从弃牌堆中获得共X张不同牌名的基本牌（X为3-你上次发动〖竭御〗至今你成为其他角色使用伤害类卡牌目标的次数，且X至少为1）。',
 			yangfeng:'杨奉',
 			mbxuetu:'血途',
 			mbxuetu_info:'转换技。出牌阶段限一次，阴：你可以弃置一张牌，然后令一名角色回复1点体力；阳：你可以失去1点体力，然后令一名角色摸两张牌。',

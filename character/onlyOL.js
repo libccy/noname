@@ -14,11 +14,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_sb_yuanshao:['male','qun',4,['olsbhetao','olsbshenli','olsbyufeng','olsbshishou'],['zhu']],
 			ol_yufan:['male','wu',3,['olzongxuan','olzhiyan'],['tempname:re_yufan','die_audio:re_yufan']],
 			ol_chengpu:['male','wu',4,['dclihuo','olchunlao'],['tempname:xin_chengpu','die_audio:xin_chengpu']],
+			ol_wangyi:['female','wei',3,['olzhenlie','olmiji']],
 		},
 		characterSort:{
 			onlyOL:{
 				onlyOL_yijiang1:['ol_jianyong','ol_lingtong','ol_gaoshun'],
-				onlyOL_yijiang2:['ol_caozhang','ol_chengpu'],
+				onlyOL_yijiang2:['ol_caozhang','ol_chengpu','ol_wangyi'],
 				onlyOL_yijiang3:['ol_yufan'],
 				onlyOL_sb:['ol_sb_jiangwei','ol_sb_guanyu','ol_sb_taishici','ol_sb_yuanshao'],
 			},
@@ -51,6 +52,101 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		skill:{
+			//王异
+			olzhenlie:{
+				audio:2,
+				inherit:'zhenlie',
+				async content(event,trigger,player){
+					const target=trigger.player;
+					if(get.attitude(player,target)<0&&target.countDiscardableCards(player,'he')) player.addTempSkill('zhenlie_lose');
+					await player.loseHp();
+					player.removeSkill('zhenlie_lose');
+					trigger.getParent().excluded.add(player);
+					if(!player.isIn()) return;
+					const goon=target.hasCard(card=>{
+						if(get.position(card)=='h') return true;
+						return lib.filter.canBeGained(card,player,target);
+					},'he');
+					if(goon||player.isDamaged()){
+						let result;
+						if(goon&&player.isDamaged()) result=await player.chooseControl().set('choiceList',[
+							'获得'+get.translation(target)+'的一张牌',
+							'发动一次〖秘计〗',
+						]).set('ai',()=>{
+							const player=get.event('player'),target=get.event().getTrigger().player;
+							return get.effect(target,{name:'shunshou_copy2'},player,player)>get.effect(player,{name:'draw'},player,player)*player.getDamagedHp()?0:1
+						}).forResult();
+						else result={index:goon?0:1};
+						if(result.index==0){
+							await player.gainPlayerCard(target,'he',true);
+						}
+						else{
+							await player.useSkill('olmiji');
+						}
+					}
+				},
+			},
+			olmiji:{
+				audio:2,
+				trigger:{player:'phaseJieshuBegin'},
+				filter(event,player){
+					return player.isDamaged();
+				},
+				async content(event,trigger,player){
+					let num=player.getDamagedHp();
+					await player.draw(num);
+					if(player.countCards('he')&&game.hasPlayer(target=>target!=player)){
+						if(_status.connectMode) game.broadcastAll(()=>_status.noclearcountdown=true);
+						let given_map=[];
+						while(num>0&&player.hasCard(card=>!card.hasGaintag('olsujian_given'),'he')){
+							const {result:{bool,cards,targets}}=await player.chooseCardTarget({
+								filterCard(card,player){
+									return !card.hasGaintag('olsujian_given');
+								},
+								selectCard:[1,num],
+								position:'he',
+								filterTarget:lib.filter.notMe,
+								prompt:'秘计：请选择要分配的卡牌和目标',
+								prompt2:'（还可分配'+num+'张）',
+								ai1(card){
+									return (!ui.selected.cards.length&&card.name=='du')?1:0;
+								},
+								ai2(target){
+									const player=get.event('player');
+									const card=ui.selected.cards[0];
+									if(card) return get.value(card,target)*get.attitude(player,target);
+									return 0;
+								},
+							});
+							if(bool){
+								num-=cards.length;
+								const target=targets[0];
+								if(given_map.some(i=>i[0]==target)){
+									given_map[given_map.indexOf(given_map.find(i=>i[0]==target))][1].addArray(cards);
+								}
+								else given_map.push([target,cards]);
+								player.addGaintag(cards,'olsujian_given');
+							}
+							else break;
+						}
+						if(_status.connectMode){
+							game.broadcastAll(()=>{
+								delete _status.noclearcountdown;
+								game.stopCountChoose();
+							});
+						}
+						if(given_map.length){
+							await game.loseAsync({
+								gain_list:given_map,
+								player:player,
+								cards:given_map.slice().map(list=>list[1]),
+								giver:player,
+								animate:'giveAuto',
+							}).setContent('gaincardMultiple');
+						}
+					}
+				},
+			},
 			//程普
 			dclihuo:{
 				audio:'relihuo',
@@ -721,8 +817,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 						if(get.type(trigger.card)=='basic'&&player.getHistory('useCard',evt=>get.type(evt.card)=='basic').indexOf(trigger)==0){
 							game.log(trigger.card,'不计入次数上限');
-							trigger.addCount=false;
-							if(player.stat[player.stat.length-1].card.sha>0) player.stat[player.stat.length-1].card.sha--;
+							if (trigger.addCount !== false) {
+								trigger.addCount=false;
+								const stat = player.stat[player.stat.length-1].card;
+								if (typeof stat[trigger.card.name] === 'number') stat[trigger.card.name]--;
+							}
 						}
 					}
 				},
@@ -907,11 +1006,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const goon1=player.countCards('h',card=>get.name(card,player)=='sha')>=player.countCards('h',card=>get.name(card,player)!='sha');
 							const goon2=player.countCards('h',card=>get.name(card,player)!='sha')>=player.countCards('h',card=>get.name(card,player)=='sha');
 							if((goon1&&control=='【杀】更多')||(goon2&&control=='非【杀】更多')){
-								target.popup('判断正确','wood');
+								target.popup('洗具');
 								game.log(target,'猜测','#g正确');
 							}
 							else{
-								target.popup('判断错误','fire');
+								target.popup('杯具');
 								game.log(target,'猜测','#y错误');
 								trigger.increase('num');
 							}
@@ -1267,7 +1366,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_sb_taishici:'OL谋太史慈',
 			ol_sb_taishici_prefix:'OL谋',
 			olsbdulie:'笃烈',
-			olsbdulie_info:'每回合限一次，当你成为其他角色使用基本牌或普通锦囊牌的目标时，你可以令此牌额外结算一次。若如此做，此牌结算完毕后，你摸X张牌（X为你的攻击范围且至多为5）。',
+			olsbdulie_info:'每回合限一次，当你成为其他角色使用基本牌或普通锦囊牌的唯一目标时，你可以令此牌额外结算一次。若如此做，此牌结算完毕后，你摸X张牌（X为你的攻击范围且至多为5）。',
 			olsbdouchan:'斗缠',
 			olsbdouchan_info:'锁定技，准备阶段，你从牌堆中获得一张【决斗】，若牌堆没有【决斗】，则你的攻击范围和出牌阶段使用【杀】的次数上限+1（增加次数不超过游戏人数）。',
 			olsbweilin:'威临',
@@ -1305,6 +1404,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclihuo_info:'①你使用的非火【杀】可以改为火【杀】，若如此做，此牌结算完毕后，若此牌造成过伤害，则你弃置一张牌或失去1点体力。②你使用火【杀】可以额外指定一个目标。',
 			olchunlao:'醇醪',
 			olchunlao_info:'①当你的【杀】因弃置进入弃牌堆后，你将位于弃牌堆的这些牌称为“醇”置于武将牌上。②一名角色处于濒死状态时，你可以将一张“醇”置入弃牌堆，然后令其视为使用一张【酒】。',
+			ol_wangyi:'OL界王异',
+			ol_wangyi_prefix:'OL界',
+			olzhenlie:'贞烈',
+			olzhenlie_info:'当你成为其他角色使用【杀】或普通锦囊牌的目标后，你可以失去1点体力并令此牌对你无效，然后你选择一项：①获得使用者的一张牌；②发动一次〖秘计〗。',
+			olmiji:'秘计',
+			olmiji_info:'结束阶段，若你已受伤，则你可以摸X张牌，然后你可以将至多X张牌任意分配给其他角色（X为你已损失的体力值）。',
 
 			onlyOL_yijiang1:'OL专属·将1',
 			onlyOL_yijiang2:'OL专属·将2',

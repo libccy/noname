@@ -10,6 +10,10 @@ import { startMenu } from "./menu/pages/startMenu.js";
 
 export class Create extends Uninstantable {
 	/**
+	 * @type {(video: Videos, before: boolean) => void}
+	 */
+	static videoNode;
+	/**
 	 * 创建身份牌实例
 	 */
 	static identityCard(identity, position, noclick) {

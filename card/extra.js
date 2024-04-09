@@ -577,7 +577,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.loseToSpecial(cards,'muniu');
 					"step 1"
 					for(var i=0;i<cards.length;i++){
-						if(cards[i].destroyed||!cards[i].hasGaintag('muniu')||get.position(cards[i])!='s'){
+						if(cards[i]._selfDestroyed||!cards[i].hasGaintag('muniu')||get.position(cards[i])!='s'){
 							cards[i].remove();
 							cards.splice(i--,1);
 						}
@@ -648,7 +648,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				intro:{
 					content:function(storage,player){
 						var muniu=player.getEquip('muniu');
-						if(!muniu||!muniu.cards||!muniu.cards.length) return '共有〇张牌';
+						if(!muniu||!muniu.cards||!muniu.cards.length) return '共有零张牌';
 						if(player.isUnderControl(true)){
 							return get.translation(muniu.cards);
 						}
@@ -658,7 +658,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					},
 					mark:function(dialog,storage,player){
 						var muniu=player.getEquip('muniu');
-						if(!muniu||!muniu.cards||!muniu.cards.length) return '共有〇张牌';
+						if(!muniu||!muniu.cards||!muniu.cards.length) return '共有零张牌';
 						if(player.isUnderControl(true)){
 							dialog.addAuto(muniu.cards);
 						}

@@ -137,6 +137,7 @@ window.noname_character_rank={
 		'xia_yuzhenzi',
 		'dc_simashi',
 		'dc_sb_simayi',
+		'caofang',
 	],
 	a:[
 		'star_caoren',
@@ -684,6 +685,8 @@ window.noname_character_rank={
 		'ol_sb_guanyu',
 		'gongsunxiu',
 		'dc_caoshuang',
+		'clan_wangling',
+		'clan_wangguang',
 	],
 	bp:[
 		'xin_huojun',
@@ -1076,6 +1079,8 @@ window.noname_character_rank={
 		'yangfeng',
 		'sb_xiahoudun',
 		'sb_gaoshun',
+		're_wangyi',
+		'ol_wangyi',
 	],
 	b:[
 		'junk_guanyu',
@@ -2175,8 +2180,11 @@ window.noname_character_rank={
 			'xia_shitao',
 			'bailingyun',
 			'dc_sb_simayi',
+			'caofang',
 		],
 		rare:[
+			're_wangyi',
+			'ol_wangyi',
 			'tw_yanliang',
 			'tw_wenchou',
 			'tw_yuantan',
@@ -2653,6 +2661,7 @@ window.noname_character_rank={
 			'furongfuqian',
 			'zhenghun',
 			'clan_wangling',
+			'clan_wangguang',
 			'clan_wangyun',
 			'quhuang',
 			'ol_wenqin',

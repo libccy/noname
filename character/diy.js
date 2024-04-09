@@ -3420,7 +3420,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return get.itemtype(player.storage.mia_qianmeng)=='card';
 						},
 						async cost(event, trigger, player){
-							event.result = await 
+							event.result = await
 							player.chooseTarget(get.prompt('mia_qianmeng'),'令一名角色获得牌堆中所有点数为'+player.storage.mia_qianmeng.number+'的牌',lib.filter.notMe).forResult();
 						},
 						async content(event, trigger, player){
@@ -6689,7 +6689,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						var next=get.copy(lib.skill.kud_qiaoshou_backupx);
 						next.cardname=links[0][2];
 						return next;
-				},
+					},
 					prompt(links){
 						return '将一张手牌置于武将牌上，然后视为装备'+get.translation(links[0][2]);
 					},
@@ -9357,7 +9357,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if (result.bool) event.result = {
 						bool: true,
 						cards: result.links,
-					} 
+					}
 				},
 				logTarget: 'player',
 				async content(event, trigger, player){
@@ -17676,22 +17676,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:'useCard'},
 				forced:true,
 				filter(event,player){
-					return event.card.name=='sha'||get.type(event.card,null,false)=='trick';
+					return event.card.name=='sha' || get.type(event.card,null,false)=='trick';
 				},
-				content(){
-					'step 0'
-					var filter1=function(card){
-						return get.name(card)=='sha';
-					},filter2=function(card){
-						return get.type(card)=='trick';
-					};
-					var num1=player.countCards('h',filter1),num2=player.countCards('h',filter2);
-					if(num1!=num2){
-						var delta=num1-num2;
-						player.chooseToDiscard('h',true,Math.abs(delta),delta>0?filter1:filter2,'驭衡：请弃置'+get.cnNumber(Math.abs(delta))+'张'+(delta>0?'【杀】':'普通锦囊牌'));
+				async content(event, trigger, player){
+					const cards1 = player.getCards('h', card => get.name(card) === 'sha'), cards2 = player.getCards('h', card => get.type(card) === 'trick');
+					if (cards1.length !== cards2.length){
+						const num = cards1.length - cards2.length, cards = num > 0 ? cards1 : cards2;
+						let i = 0;
+						cards.forEach(card => {
+							if (i < Math.abs(num) && lib.filter.cardDiscardable(card, player, 'junkquandao')) i++;
+						});
+						if (i > 0) {
+							await player.chooseToDiscard(i, true,
+								`权道：请弃置${ get.cnNumber(i) }张${ num > 0 ? '杀' : '普通锦囊牌' }`,
+								num > 0 ? (card => get.name(card) === 'sha') : (card => get.type(card) === 'trick'))
+						}
 					}
-					'step 1'
-					player.draw();
+					await player.draw();
 				},
 			},
 			junkchigang:{
@@ -17765,7 +17766,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseButton(2,[
 						'蛮智：请选择让下列等式成立的A与B的值',
 						'<div class="text center">目标等式</div>',
-						`0.5 × A² + 2.5 × B - ${game.roundNumber} = ${game.countPlayer()}`,
+						`0.5 × A<sup>2</sup> + 2.5 × B - ${game.roundNumber} = ${game.countPlayer()}`,
 						'<div class="text center">A的可选值</div>',
 						[nums.map(i=>{
 							return [
@@ -17803,7 +17804,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(i[0]=='A') a=parseInt(i.slice(2));
 							else b=parseInt(i.slice(2));
 						}
-						equals=`0.5×${a}²+2.5×${b}-${game.roundNumber}=${game.countPlayer()}`;
+						equals=`0.5×${a}<sup>2</sup>+2.5×${b}-${game.roundNumber}=${game.countPlayer()}`;
 						player.logSkill('nsmanzhi');
 						player.chat(equals);
 						game.log(player,'的计算结果为',equals);
@@ -18847,7 +18848,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			junkshengzhi:'圣质',
 			junkshengzhi_info:'锁定技。当你发动非锁定技后，你令你本回合使用的下一张牌无距离和次数限制。',
 			junkquandao:'权道',
-			junkquandao_info:'锁定技。当你使用【杀】或普通锦囊牌时，若你手牌中的【杀】或普通锦囊牌的数量之差X不为0，则你弃置X张数量较多的一种牌，然后你摸一张牌。',
+			junkquandao_info:'锁定技。当你使用【杀】或普通锦囊牌时，{若你手牌中的【杀】或普通锦囊牌的数量之差X不为0，则你弃置X张数量较多的一种牌}，然后你摸一张牌。',
 			junkchigang:'持纲',
 			junkchigang_info:'转换技，锁定技。判定阶段开始前，你取消此阶段。然后你获得一个额外的：阴，摸牌阶段；阳，出牌阶段。',
 			junkrende:'仁德',
@@ -18889,7 +18890,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ns_mengyou_prefix:'数学',
 			ns_mengyou_ab:'孟优',
 			nsmanzhi:'蛮智',
-			nsmanzhi_info:'准备阶段或结束阶段开始时，你可以将场上出现的数字代入等式中的A和B。若此等式成立，你摸Y张牌。（等式为Y=0.5A²+2.5B-X，其中X为游戏轮数，Y为存活人数）',
+			nsmanzhi_info:'准备阶段或结束阶段开始时，你可以将场上出现的数字代入等式中的A和B。若此等式成立，你摸Y张牌。（等式为Y=0.5A<sup>2</sup>+2.5B-X，其中X为游戏轮数，Y为存活人数）',
 			ns_chengpu:'铁索程普',
 			ns_chengpu_prefix:'铁索',
 			ns_chengpu_ab:'程普',

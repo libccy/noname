@@ -2046,17 +2046,29 @@ export class Player extends HTMLDivElement {
 	}
 	chooseToEnable() {
 		var next = game.createEvent('chooseToEnable');
+		for (var i = 0; i < arguments.length; i++) {
+			if (get.itemtype(arguments[i]) == 'player') {
+				next.source = arguments[i];
+			}
+		}
+		if (next.source == undefined) next.source = this;
 		next.player = this;
 		next.setContent('chooseToEnable');
 		return next;
 	}
-	/**
-	 * @param { boolean } [horse]
-	 */
-	chooseToDisable(horse) {
+	chooseToDisable() {
 		var next = game.createEvent('chooseToDisable');
+		for (var i = 0; i < arguments.length; i++) {
+			if (get.itemtype(arguments[i]) == 'player') {
+				next.source = arguments[i];
+			} 
+			else if(typeof arguments[i] == 'boolean' ){
+				next.horse = arguments[i];
+			}
+		}
+		if (next.horse == undefined) next.horse = false;
+		if (next.source == undefined) next.source = this;
 		next.player = this;
-		if (horse) next.horse = true;
 		next.setContent('chooseToDisable');
 		return next;
 	}
@@ -4778,7 +4790,8 @@ export class Player extends HTMLDivElement {
 				next.selectButton = arguments[i];
 			}
 			else if (typeof arguments[i] == 'boolean') {
-				next.forced = arguments[i];
+				if (!next.forced) next.forced = arguments[i];
+				else next.complexSelect = arguments[i];
 			}
 			else if (get.itemtype(arguments[i]) == 'position') {
 				next.position = arguments[i];
@@ -4805,6 +4818,7 @@ export class Player extends HTMLDivElement {
 			if (get.attitude(_status.event.player, get.owner(button.link)) > 0) return -val;
 			return val;
 		};
+		if (next.complexSelect !== false) next.complexSelect = true;
 		next.setContent('choosePlayerCard');
 		next._args = Array.from(arguments);
 		return next;
@@ -4823,7 +4837,8 @@ export class Player extends HTMLDivElement {
 				next.selectButton = arguments[i];
 			}
 			else if (typeof arguments[i] == 'boolean') {
-				next.forced = arguments[i];
+				if (!next.forced) next.forced = arguments[i];
+				else next.complexSelect = arguments[i];
 			}
 			else if (get.itemtype(arguments[i]) == 'position') {
 				next.position = arguments[i];
@@ -4850,6 +4865,7 @@ export class Player extends HTMLDivElement {
 			if (get.attitude(_status.event.player, get.owner(button.link)) > 0) return -val;
 			return val;
 		};
+		if (next.complexSelect !== false) next.complexSelect = true;
 		next.setContent('discardPlayerCard');
 		next._args = Array.from(arguments);
 		return next;
@@ -4868,7 +4884,8 @@ export class Player extends HTMLDivElement {
 				next.selectButton = arguments[i];
 			}
 			else if (typeof arguments[i] == 'boolean') {
-				next.forced = arguments[i];
+				if (!next.forced) next.forced = arguments[i];
+				else next.complexSelect = arguments[i];
 			}
 			else if (get.itemtype(arguments[i]) == 'position') {
 				next.position = arguments[i];
@@ -4898,6 +4915,7 @@ export class Player extends HTMLDivElement {
 			if (get.attitude(_status.event.player, get.owner(button.link)) > 0) return -val;
 			return val;
 		};
+		if (next.complexSelect !== false) next.complexSelect = true;
 		next.setContent('gainPlayerCard');
 		next._args = Array.from(arguments);
 		return next;
@@ -5231,7 +5249,6 @@ export class Player extends HTMLDivElement {
 	}
 	drawTo(num, args) {
 		var num2 = num - this.countCards('h');
-		if (!num2) return;
 		var next = this.draw(num2);
 		if (Array.isArray(args)) {
 			for (var i = 0; i < args.length; i++) {
@@ -5911,16 +5928,23 @@ export class Player extends HTMLDivElement {
 		if (next.cards == undefined && !nocard) next.cards = event.cards;
 		if (next.source == undefined && !nosource) next.source = event.customSource || event.player;
 		if (next.num == undefined) next.num = (event.baseDamage || 1) + (event.extraDamage || 0);
-		if (next.num <= 0) {
-			_status.event.next.remove(next);
-			next.resolve();
+		next.filterStop = function(){
+			if (this.num <= 0 || this.player.isHealthy()){
+				delete this.filterStop;
+				this.finish();
+				this._triggered = null;
+				return true;
+			}
 		}
 		next.setContent('recover');
 		return next;
 	}
 	doubleDraw() {
-		if (get.is.changban()) return;
 		var next = game.createEvent('doubleDraw');
+		if (get.is.changban()) {
+			_status.event.next.remove(next);
+			next.resolve();
+		}		
 		next.player = this;
 		next.setContent('doubleDraw');
 		return next;
@@ -5931,6 +5955,14 @@ export class Player extends HTMLDivElement {
 		next.player = this;
 		if (next.num == undefined) next.num = 1;
 		next.setContent('loseHp');
+		next.filterStop = function(){
+			if (this.num <= 0){
+				delete this.filterStop;
+				this.finish();
+				this._triggered = null;
+				return true;
+			}
+		}
 		return next;
 	}
 	loseMaxHp() {
@@ -6391,18 +6423,24 @@ export class Player extends HTMLDivElement {
 		return next;
 	}
 	turnOver(bool) {
-		if (typeof bool == 'boolean') {
-			if (bool) {
-				if (this.isTurnedOver()) return;
-			}
-			else {
-				if (!this.isTurnedOver()) return;
-			}
-		}
 		var next = game.createEvent('turnOver');
 		next.player = this;
 		next.includeOut = true;
 		next.setContent('turnOver');
+		if (typeof bool == 'boolean') {
+			if (bool) {
+				if (this.isTurnedOver()){
+					_status.event.next.remove(next);
+					next.resolve();
+				}
+			}
+			else {
+				if (!this.isTurnedOver()){
+					_status.event.next.remove(next);
+					next.resolve();
+				}
+			}
+		}
 		return next;
 	}
 	out(skill) {
@@ -6453,17 +6491,23 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	link(bool) {
-		if (typeof bool == 'boolean') {
-			if (bool) {
-				if (this.isLinked()) return;
-			}
-			else {
-				if (!this.isLinked()) return;
-			}
-		}
 		var next = game.createEvent('link');
 		next.player = this;
 		next.setContent('link');
+		if (typeof bool == 'boolean') {
+			if (bool) {
+				if (this.isLinked()){
+					_status.event.next.remove(next);
+					next.resolve();
+				}
+			}
+			else {
+				if (!this.isLinked()){
+					_status.event.next.remove(next);
+					next.resolve();
+				}
+			}
+		}
 		return next;
 	}
 	skip(name) {
@@ -7347,11 +7391,14 @@ export class Player extends HTMLDivElement {
 		return next;
 	}
 	exitSubPlayer(remove) {
-		if (!this.hasSkill('subplayer')) return;
 		var next = game.createEvent('exitSubPlayer');
 		next.player = this;
 		next.remove = remove;
 		next.setContent('exitSubPlayer');
+		if (!this.hasSkill('subplayer')) {
+			_status.event.next.remove(next);
+			next.resolve();
+		}
 		return next;
 	}
 	getSubPlayers(tag) {

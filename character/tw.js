@@ -693,31 +693,46 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twxiayong:{
 				audio:2,
 				audioname:['tw_yanliang'],
-				trigger:{global:'damageBegin1'},
-				filter(event,player){
-					if(event.getParent().type!='card'||event.card.name!='juedou'||!event.player.isIn()) return false;
-					const evt=game.getGlobalHistory('useCard',evt=>evt.card==event.card)[0];
-					if(evt&&evt.targets&&(event.player!=player||player.countCards('h'))){
-						if(evt.player==player){
-							return evt.targets.includes(event.player)&&event.player!=player;
-						}
-						return evt.targets.includes(player)&&evt.player!=player;
-					}
-					return false;
+				locked:true,
+				group:'twxiayong_effect',
+				subSkill:{
+					effect:{
+						trigger:{global:'damageBegin1'},
+						filter(event,player){
+							if(event.getParent().type!='card'||event.card.name!='juedou'||!event.player.isIn()) return false;
+							const evt=game.getGlobalHistory('useCard',evt=>evt.card==event.card)[0];
+							if(evt&&evt.targets&&(event.player!=player||player.countCards('h'))){
+								if(evt.player==player){
+									return evt.targets.includes(event.player)&&event.player!=player;
+								}
+								return evt.targets.includes(player)&&evt.player!=player;
+							}
+							return false;
+						},
+						forced:true,
+						popup:false,
+						async content(event,trigger,player){
+							player.logSkill('twxiayong'+(trigger.player===player?'1':'2'),trigger.player);
+							if(trigger.player===player){
+								const cards=player.getCards('h',card=>{
+									return lib.filter.cardDiscardable(card,player,'twxiayong');
+								});
+								if(cards.length>0) player.discard(cards.randomGet());
+							}
+							else{
+								trigger.increase('num');
+							}
+						},
+					},
 				},
-				forced:true,
-				logTarget:'player',
-				async content(event,trigger,player){
-					if(trigger.player===player){
-						const cards=player.getCards('h',card=>{
-							return lib.filter.cardDiscardable(card,player,'twxiayong');
-						});
-						if(cards.length>0) player.discard(cards.randomGet());
-					}
-					else{
-						trigger.increase('num');
-					}
-				},
+			},
+			twxiayong1:{
+				audio:true,
+				audioname:['tw_yanliang'],
+				sourceSkill:'twxiayong',
+			},
+			twxiayong2:{
+				inherit:'twxiayong1',
 			},
 			//袁谭
 			twqiaosi:{
@@ -1374,7 +1389,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							const {result:{bool,links}}=await player.chooseButton([
 								'劫囚：请选择你要恢复的装备栏',
 								[transList,'tdnodes'],
-							],num,true).set('map',map)
+							],Math.min(transList.length,num),true).set('map',map)
 							.set('ai',button=>['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2);
 							if(bool) await player.enableEquip(links.slice().map(i=>map[i]));
 						},
@@ -10594,6 +10609,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								card:trigger.card,
 							})) damageNum=1;
 							var yimie=function(){
+								if(damageNum==1) return false;
 								var hit=true;
 								if(get.type(trigger.card)=='trick'&&trigger.player.countCards('hs',{name:'wuxie'})) hit=false;
 								if(trigger.card.name=='huogong'&&trigger.player.countCards('h',function(card){

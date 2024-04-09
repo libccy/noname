@@ -5441,8 +5441,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!arg||!arg.player) return true;
 						if(arg.player.hasSkillTag('unequip',false,{
 							target:player
-						})||arg.player.hasSkillTag('unequip_ai',false,{
-							target:player
 						})) return false;
 						return true;
 					},
@@ -6208,8 +6206,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					if(result.suit=='club'){
-						event.target.damage('thunder');
 						player.recover();
+						event.target.damage('thunder');
 					}
 					else if(result.suit=='spade'){
 						event.target.damage(2,'thunder');
@@ -8048,7 +8046,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quhu_info:'出牌阶段限一次，你可以与一名体力值大于你的角色拼点，若你赢，则该角色对其攻击范围内另一名由你指定的角色造成1点伤害。若你没赢，该角色对你造成1点伤害。',
 			jieming_info:'当你受到1点伤害后，你可令一名角色将手牌摸至X张（X为其体力上限且至多为5）。',
 			qiangxi_info:'出牌阶段限一次，你可以失去1点体力或弃置一张武器牌，然后对你攻击范围内的一名其他角色造成1点伤害。',
-			qiangxix_info:'出牌阶段限两次，你可以失去1点体力或弃置一张武器牌，然后一名本阶段内未成为过〖强袭〗的目标的其他角色造成1点伤害。',
+			qiangxix_info:'出牌阶段限两次，你可以失去1点体力或弃置一张武器牌，然后对一名本阶段内未成为过〖强袭〗的目标的其他角色造成1点伤害。',
 			tianyi_info:'出牌阶段限一次，你可以和一名其他角色拼点。若你赢，你获得以下技能效果直到回合结束：你使用【杀】没有距离限制；可额外使用一张【杀】；使用【杀】时可额外指定一个目标。若你没赢，你不能使用【杀】直到回合结束。',
 			shuangxiong_info:'摸牌阶段，你可以改为进行一次判定：你获得此判定牌，且你可以于此回合内将任意一张与此判定牌不同颜色的手牌当做【决斗】使用。',
 			luanji_info:'出牌阶段，你可以将任意两张相同花色的手牌当做【万箭齐发】使用。',
@@ -8113,7 +8111,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xinkuanggu_info:'当你造成1点伤害后，若受伤角色受到此伤害时你与其的距离不大于1，则你可以回复1点体力或摸一张牌。',
 			xinliegong_info:'①你使用【杀】可以选择你距离不大于此【杀】点数的角色为目标。②当你使用【杀】指定一个目标后，你可以根据下列条件执行相应的效果：1.其手牌数小于等于你的手牌数，此【杀】不可被响应，2.其体力值大于等于你的体力值，此【杀】伤害+1。',
 			jiewei_info:'当你的武将牌翻面后，你可以摸一张牌。然后你可以使用一张锦囊牌或装备牌，并可以在此牌结算后弃置场上一张同类型的牌。',
-			releiji_info:'当你使用或打出一张【闪】时，你可令一名其他角色进行一次判定：若结果为梅花，其受到1点雷电伤害，然后你回复1点体力；若结果为黑桃，其受到2点雷电伤害。',
+			releiji_info:'当你使用或打出一张【闪】时，你可令一名其他角色进行一次判定：若结果为梅花，你回复1点体力，并对其造成1点雷电伤害；若结果为黑桃，你对其造成2点雷电伤害。',
 			tiangong_info:'锁定技，你防止即将受到的雷电伤害。每当你造成雷电伤害时，你摸一张牌。',
 			shensu_info:'你可以跳过判定阶段和摸牌阶段，或跳过出牌阶段并弃置一张装备牌。若如此做，则你可以视为对任意一名角色使用一张无距离限制的【杀】。',
 			jushou_info:'结束阶段，你可以摸三张牌并翻面。',

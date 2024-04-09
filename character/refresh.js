@@ -1356,7 +1356,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			olkanpo:{
 				audio:'rekanpo',
-				audioname:['ol_sp_zhugeliang'],
+				audioname:['ol_sp_zhugeliang','ol_pangtong'],
 				trigger:{player:'useCard'},
 				forced:true,
 				locked:false,
@@ -5448,40 +5448,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					return true;
 				},
-				direct:true,
-				content:function(){
-					"step 0"
-					if(lib.skill.rebingyi.filtery(player)) event.draw=true;
-					if(lib.skill.rebingyi.filterx(player)){
-						player.chooseTarget(get.prompt('xinbingyi'),'展示所有手牌，并选择至多'+get.cnNumber(player.countCards('h'))+'名角色各摸一张牌',[0,player.countCards('h')],function(card,player,target){
-							return true;
-						}).set('ai',function(target){
-							return get.attitude(_status.event.player,target);
-						});
+				async cost(event, trigger, player){
+					const selfDraw = lib.skill.rebingyi.filtery(player), asyncDraw = lib.skill.rebingyi.filterx(player);
+					if (asyncDraw) {
+						const num = player.countCards('h');
+						const result = await player.chooseTarget(
+							get.prompt('xinbingyi'),
+							`展示所有手牌，并选择至多${get.cnNumber(num)}名角色各摸一张牌${selfDraw ? '' : '，然后你摸一张牌'}`,
+							[0,num]
+						).set('ai', function(target){
+							return get.attitude(get.player(), target);
+						}).forResult();
+						if(result.bool) event.result = {
+							bool: result.bool,
+							cost_data: {
+								asyncDraw,
+								selfDraw,
+								targets: result.targets
+							},
+						}
 					}
-					else player.chooseBool(get.prompt('bingyi'),'展示所有手牌').ai=function(){return false};
-					"step 1"
-					if(result.bool){
-						player.logSkill('rebingyi');
-						player.showHandcards(get.translation(player)+'发动了【秉壹】');
-						event.targets=result.targets;
+					else {
+						event.result = await player.chooseBool(get.prompt('bingyi'),`展示所有手牌${selfDraw ? '' : '，然后你摸一张牌'}`)
+							.set('choice', selfDraw)
+							.set('ai',()=>get.event().choice)
+							.forResult();
+						event.result.cost_data = {selfDraw};
 					}
-					else{
-						event.finish();
-					}
-					"step 2"
-					if(targets&&targets.length){
-						player.line(targets,'green');
-						targets.sortBySeat();
+				},
+				async content(event, trigger, player){
+					await player.showHandcards(get.translation(player)+'发动了【秉壹】')
+					const data = event.cost_data;
+					if (data.asyncDraw && data.targets && data.targets.length){
+						const targets = data.targets.sortBySeat();
 						game.asyncDraw(targets);
 					}
-					else event.finish();
-					if(event.draw){
+					if (data.selfDraw) {
 						player.draw();
-						event.finish();
 					}
-					"step 3"
-					game.delayx();
 				},
 			},
 			//钟会
@@ -11744,7 +11748,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						event.num-=res.length
 						if(!event.given_map[target]) event.given_map[target]=[];
 						event.given_map[target].addArray(res);
-						if(event.num>0) event.goto(2);
+						if(event.num>0) event.goto(1);
 					}
 					else if(event.num==2){
 						if(_status.connectMode){
@@ -13568,42 +13572,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rejianxiong_old:{
-				audio:2,
+				audio:'rejianxiong',
+				audioname2:{
+					gz_caocao:'jianxiong',
+				},
 				trigger:{player:'damageEnd'},
-				direct:true,
-				content:function(){
-					"step 0"
-					if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0],true)=='o'){
-						player.chooseControl('rejianxiong_mopai','rejianxiong_napai','cancel2').set('prompt',get.prompt('rejianxiong')).ai=function(){
-							var trigger=_status.event.getTrigger();
-							if(trigger.cards.length==1&&trigger.cards[0].name=='sha') return 0;
-							return 1;
-						};
+				async cost(event,trigger,player){
+					let list=['摸牌'];
+					if(get.itemtype(trigger.cards)=='cards'&&trigger.cards.filterInD().length){
+						list.push('拿牌');
 					}
-					else{
-						player.chooseControl('rejianxiong_mopai','cancel2').set('prompt',get.prompt('rejianxiong'));
-					}
-					"step 1"
-					if(result.control=='rejianxiong_napai'){
-						player.logSkill('rejianxiong');
-						player.gain(trigger.cards);
-						player.$gain2(trigger.cards);
-					}
-					else if(result.control=='rejianxiong_mopai'){
-						player.logSkill('rejianxiong');
-						player.draw();
-					}
+					list.push('cancel2');
+					const {result:{control}}=await player.chooseControl(list).set('prompt',get.prompt2('rejianxiong_old')).set('ai',()=>{
+						const player=get.event('player'),trigger=get.event().getTrigger();
+						const cards=trigger.cards.filterInD();
+						if(get.event().controls.includes('拿牌')){
+							if(cards.reduce((sum,card)=>{
+								return sum+(card.name=='du'?-1:1);
+							},0)>1||player.getUseValue(cards[0])>6) return '拿牌';
+						}
+						return '摸牌';
+					});
+					event.result={bool:(control!='cancel2'),cost_data:control};
+				},
+				async content(event,trigger,player){
+					if(event.cost_data=='摸牌') await player.draw();
+					else await player.gain(trigger.cards.filterInD(),'gain2');
 				},
 				ai:{
 					maixie:true,
 					maixie_hp:true,
 					effect:{
-						target:function(card,player,target){
+						target(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
 							if(get.tag(card,'damage')&&player!=target) return [1,0.6];
-						}
-					}
-				}
+						},
+					},
+				},
 			},
 			reyiji:{
 				audio:2,
@@ -15452,7 +15457,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcmieji:'灭计',
 			dcmieji_info:'出牌阶段限一次，你可以展示一张武器牌或黑色锦囊牌。你将此牌置于牌堆顶，然后令一名有手牌的其他角色选择一项：⒈弃置一张锦囊牌；⒉依次弃置两张非锦囊牌。',
 			dcfencheng:'焚城',
-			dcfencheng_info:'限定技。出牌阶段，你可以指定一名其他角色，令从其开始的其他角色依次选择一项：⒈弃置至少X张牌（X为上一名角色弃置的牌数+1）。⒉你对其造成2点伤害。',
+			dcfencheng_info:'限定技。出牌阶段，你可以指定一名其他角色，令从其开始的其他角色依次选择一项：⒈弃置至少X张牌（X为上一名角色弃置的牌数+1）。⒉你对其造成2点火焰伤害。',
 			oljiang:'激昂',
 			oljiang_info:'①当你使用【决斗】或红色【杀】指定第一个目标后，或成为【决斗】或红色【杀】的目标后，你可以摸一张牌。②当有【决斗】或红色【杀】于每回合内首次因弃置而进入弃牌堆后，你可以失去1点体力并获得这些牌。',
 			re_xunyou:'界荀攸',
@@ -15577,6 +15582,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_lidian_prefix:'界',
 			re_xushu:'界徐庶',
 			re_xushu_prefix:'界',
+			rejianxiong_old:'奸雄',
+			rejianxiong_old_info:'当你受到伤害后，你可以摸一张牌或获得对你造成伤害的牌。',
 
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

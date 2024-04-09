@@ -157,11 +157,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.hasSkillTag('useShan',null,event)) return true;
 							if(target.isLinked()&&game.hasNature(event.card)&&get.attitude(target,player._trueMe||player)>0) return false;
 							if(event.baseDamage+event.extraDamage<=0&&!game.hasNature(event.card,'ice')) return false;
-							if(target.hasSkillTag('freeShan',false,event,true)) return true;
-							if(event.shanRequired>1&&target.mayHaveShan(target,'use',null,'count')<event.shanRequired-(event.shanIgnored||0)) return false;
 							if(event.baseDamage+event.extraDamage>=target.hp+
 								((player.hasSkillTag('jueqing',false,target)||target.hasSkill('gangzhi'))?target.hujia:0)) return true;
 							if(!game.hasNature(event.card,'ice')&&get.damageEffect(target,player,target,get.nature(event.card))>=0) return false;
+							if(event.shanRequired>1&&target.mayHaveShan(target,'use',null,'count')<event.shanRequired-(event.shanIgnored||0)) return false;
 							return true;
 						})());
 						//next.autochoose=lib.filter.autoRespondShan;
@@ -469,14 +468,13 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							return 2;
 						},
 						target_use:(player,target,card)=>{
-							if(player===_status.currentPhase&&player.hasSkillTag('nokeep',true,{
-								card:card,
-								target:target
-							},true)) return 2;
 							let mode = get.mode(),
 								taos = player.getCards('hs',i=>get.name(i)==='tao'&&lib.filter.cardEnabled(i,target,'forceEnable'));
-							if(target.hp>0){
-								if(!player.isPhaseUsing()) return 0;
+							if(target!==_status.event.dying){
+								if(!player.isPhaseUsing() || player.hasSkillTag('nokeep',true,{
+									card:card,
+									target:target
+								},true)) return 2;
 								let min = 7.2-4*player.hp/player.maxHp,
 									nd = player.needsToDiscard(0,(i,player)=>{
 										return !player.canIgnoreHandcard(i)&&(taos.includes(i)||get.value(i)>=min);
@@ -1536,7 +1534,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if (get.damageEffect(target, player, target) >= 0) return 0;
 							let pd = get.damageEffect(player, target, player), att = get.attitude(player, target);
 							if (att > 0 && get.damageEffect(target, player, player) > pd) return 0;
-							let ts = target.mayHaveSha(player, 'respond', null, 'count'), ps = player.mayHaveSha(player, 'respond', null, 'count');
+							let ts = target.mayHaveSha(player, 'respond', null, 'count'), ps = player.mayHaveSha(player, 'respond', player.getCards('h', i => {
+								return card === i || card.cards && card.cards.includes(i) || ui.selected.cards.includes(i);
+							}), 'count');
 							if (ts < 1 && ts << 3 < Math.pow(player.hp, 2)) return 0;
 							if (att > 0) {
 								if (ts < 1) return 0;
@@ -1555,7 +1555,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if (td >= 0) return td / get.attitude(target, target);
 							let pd = get.damageEffect(player, target, player), att = get.attitude(player, target);
 							if (att > 0 && get.damageEffect(target, player, player) > pd) return -2;
-							let ts = target.mayHaveSha(player, 'respond', null, 'count'), ps = player.mayHaveSha(player, 'respond', null, 'count');
+							let ts = target.mayHaveSha(player, 'respond', null, 'count'), ps = player.mayHaveSha(player, 'respond', player.getCards('h', i => {
+								return card === i || card.cards && card.cards.includes(i) || ui.selected.cards.includes(i);
+							}), 'count');
 							if (ts < 1) return -1.5;
 							if (att > 0) return -2;
 							if (ts - ps < 1) return -2 - ts;
@@ -2494,7 +2496,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			},
 			icesha_skill:{
 				inherit:'hanbing_skill',
-				trigger:{source:'damageBegin2'},
+				trigger:{source:'damageBegin3'},
 				equipSkill:false,
 				ruleSkill:true,
 				filter:function(event){
@@ -2908,14 +2910,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				audio:true,
 				check:function(event,player){
-					if(event&&(event.ai||event.ai1)){
-						var ai=event.ai||event.ai1;
+					if(!event) return true;
+					if(event.ai){
+						var ai=event.ai;
 						var tmp=_status.event;
 						_status.event=event;
 						var result=ai({name:'shan'},_status.event.player,event);
 						_status.event=tmp;
 						return result>0;
 					}
+					let evt=event.getParent();
+					if(player.hasSkillTag('noShan',null,evt)) return false;
+					if(!evt||!evt.card||!evt.player||player.hasSkillTag('useShan',null,evt)) return true;
+					if(evt.card&&evt.player&&player.isLinked()&&game.hasNature(evt.card)&&get.attitude(player,evt.player._trueMe||evt.player)>0) return false;
 					return true;
 				},
 				content:function(){
@@ -2939,8 +2946,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(player.hasSkillTag('unequip2')) return false;
 						if(!arg||!arg.player) return true;
 						if(arg.player.hasSkillTag('unequip',false,{
-							target:player
-						})||arg.player.hasSkillTag('unequip_ai',false,{
 							target:player
 						})) return false;
 						return true;
@@ -2982,6 +2987,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					return true;
 				},
 				forceLoad:true,
+				forceDie:true,
 				content:function(){
 					'step 0'
 					delete event.wuxieresult;

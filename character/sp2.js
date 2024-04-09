@@ -136,12 +136,13 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				ai:{
 					order:9,
 					result:{
+						player(player,target){
+							let res=2*get.effect(player,{name:'draw',player,player});
+							if(player!==target) res+=get.effect(player,{name:'losehp'},player,player);
+							return res;
+						},
 						target(player,target){
-							if(player.getHp()+player.countCards('hs',card=>player.canSaveCard(card,player))<=1) return 0;
-							const num=get.sgn(get.attitude(player,target));
-							if(num*get.damageEffect(target,player,player)>0) return num*get.damageEffect(target,player,player);
-							if(target==player) return 0.00001;
-							return 0;
+							return get.damageEffect(target,player,target);
 						},
 					},
 				},
@@ -261,6 +262,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const num=player.countCards('h');
 					if(player.isMaxHandcard()&&num>0){
 						const maxNum=game.findPlayer(current=>{
+							if(current===player) return false;
 							return !game.hasPlayer(current2=>{
 								if(current2===player) return false;
 								return current2.countCards('h')>current.countCards('h');
@@ -291,7 +293,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						}
 					}
 				},
-				
+
 			},
 			//星袁绍
 			starxiaoyan:{
@@ -716,8 +718,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 				},
 				create:function(group,player){
-					if(!lib.skill['starcanxi_'+group]){
-						lib.skill['starcanxi_'+group]={
+					const skill='starcanxi_'+group;
+					get.info('starcanxi').createSkill(skill);
+					if(!_status.postReconnect.starcanxi){
+						_status.postReconnect.starcanxi=[get.info('starcanxi').createSkill,[]];
+					}
+					_status.postReconnect.starcanxi[1].add(skill);
+					player.addSkill(skill);
+				},
+				createSkill(skill){
+					if(!lib.skill[skill]) game.broadcastAll(skill=>{
+						const group=skill.slice('starcanxi_'.length);
+						lib.skill[skill]={
 							mark:true,
 							charlotte:true,
 							onremove:function(player){
@@ -725,11 +737,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							},
 							intro:{content:'玉玺的一角'},
 						};
-						lib.translate['starcanxi_'+group]='残玺·'+get.translation(group+'2');
-						lib.skill['starcanxi_'+group].marktext=get.translation(group);
-						lib.translate['starcanxi_'+group+'_bg']=get.translation(group);
-					}
-					player.addSkill('starcanxi_'+group);
+						lib.translate[skill]='残玺·'+get.translation(group+'2');
+						lib.skill[skill].marktext=get.translation(group);
+						lib.translate[skill+'_bg']=get.translation(group);
+					},skill);
 				},
 				subSkill:{
 					wangsheng:{
@@ -3272,7 +3283,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					}
 					else player.addTempSkill('piaoping_blocker');
 				},
-				intro:{name2:'栗',content:'mark'},
+				init(player){
+					player.addMark('tuoxian',1,false);
+				},
+				intro:{name2:'栗',content:'剩余可用#次'},
 			},
 			chuaili:{
 				audio:2,
@@ -3288,8 +3302,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.changeZhuanhuanji('piaoping');
 					}
 					else{
-						player.addMark('tuoxian',1);
-						player.addTempSkill('chuaili_blocker');
+						player.addMark('tuoxian',1,false);
+						if(player.countCards('tuoxian')>3) player.addTempSkill('chuaili_blocker');
 					}
 					game.delayx();
 				},
@@ -4655,26 +4669,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:'xinfu_xingluan',
 				usable:1,
 				trigger:{player:'useCardAfter'},
-				direct:true,
 				filter:function(event,player){
 					return player.isPhaseUsing();
 				},
-				content:function(){
-					'step 0'
-					var list=['观看牌堆中两张点数为6的牌并获得其中一张'];
-					event.addIndex=1;
-					var bool2=false,bool3=game.hasPlayer(function(current){
-						if(current!=player&&current.countCards('he')>0) bool2=true;
+				async cost(event, trigger, player){
+					const choiceList = [
+						'观看牌堆中两张点数为6的牌并获得其中一张',
+						'令一名其他角色弃置一张点数为6的牌或交给你一张牌',
+						'获得场上一张点数为6的牌'
+					], choices = ['选项一'];
+					if (game.hasPlayer(current => (current != player && current.countCards('he') > 0))) {
+						choices.push('选项二');
+					}
+					else {
+						choiceList[1] = `<span style="opacity:0.5">${ choiceList[1] }</span>`;
+					}
+					if (game.hasPlayer(current => {
 						return current.hasCard(function(card){
 							return get.number(card)==6&&lib.filter.canBeGained(card,current,player);
 						},'ej');
-					});
-					if(bool2){
-						event.addIndex=0;
-						list.push('令一名其他角色弃置一张点数为6的牌或交给你一张牌');
+					})) {
+						choices.push('选项三');
 					}
-					if(bool3) list.push('获得场上一张点数为6的牌');
-					player.chooseControl('cancel2').set('choiceList',list).set('prompt',get.prompt('xinxingluan')).set('ai',function(){
+					else {
+						choiceList[2] = `<span style="opacity:0.5">${ choiceList[2] }</span>`;
+					}
+					const result = await player.chooseControl(choices, 'cancel2')
+						.set('choiceList',choiceList).set('prompt',get.prompt('xinxingluan'))
+						.set('ai',function(){
 						var player=_status.event.player;
 						if(game.hasPlayer(function(current){
 							if(current==player) return false;
@@ -4682,26 +4704,57 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							return current.hasCard(function(card){
 								return get.number(card)==6&&lib.filter.canBeGained(card,current,player)&&get.sgn(get.useful(card,current))==att;
 							},'ej');
-						})) return 2-_status.event.getParent().addIndex;
+						})) return '选项三';
 						if(game.hasPlayer(function(target){
 							if(target==player) return false;
 							var att=get.attitude(player,target);
 							return att<0&&target.countCards('he')>0&&!target.hasCard(function(card){
 								return get.value(card,target)<=0;
 							},'he');
-						})) return 1;
-						return 0;
-					});
-					'step 1'
-					if(result.control!='cancel2'){
-						if(result.index==0){
-							player.logSkill('xinxingluan');
+						})) return '选项二';
+						return '选项一';
+					}).forResult();
+					if (result.control !== 'cancel2') {
+						const results = {bool: true, cost_data: {index: choices.indexOf(result.control)}};
+						if(results.cost_data.index === 1) {
+							const {targets} = await player.chooseTarget('令一名其他角色弃置一张点数为6的牌，否则交给你一张牌',true,function(card,player,current){
+								return current!=player&&current.countCards('he')>0;
+							}).set('ai',function(target){
+								var player=_status.event.player,att=get.attitude(player,target);
+								if(att>=0) return 0;
+								if(!target.hasCard(function(card){
+									return get.value(card,target)<=0;
+								},'he')) return -att/Math.sqrt(target.countCards('he'));
+								return 0;
+							}).forResult();
+							results.targets = targets;
 						}
-						else if(result.index+event.addIndex==1) event.goto(6);
-						else event.goto(4);
+						else if(results.cost_data.index === 2){
+							const {targets} = await player.chooseTarget('获得一名角色装备区或判定区内点数为6的牌',true,function(card,player,current){
+								return current.hasCard(function(card){
+									return get.number(card)==6&&lib.filter.canBeGained(card,current,player);
+								},'ej');
+							}).set('ai',function(target){
+								var player=_status.event.player,att=-get.sgn(get.attitude(player,target)-0.1),max=0,ej=target.getCards('ej',function(card){
+									return get.number(card)==6&&lib.filter.canBeGained(card,target,player);
+								});
+								for(var i of ej){
+									var num=get.useful(i,target)*att;
+									if(num>max) max=num;
+									return max;
+								}
+							}).forResult();
+							results.targets = targets;
+						}
+						event.result = results;
 					}
-					else event.finish();
-					'step 2'
+				},
+				content:function(){
+					'step 0'
+					var result = event.cost_data;
+					if(result.index === 1) event.goto(4);
+					else if(result.index === 2) event.goto(3);
+					'step 1'
 					var cards=[];
 					while(cards.length<2){
 						var card=get.cardPile2(function(card){
@@ -4720,62 +4773,29 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					else player.chooseButton(['兴乱：选择获得其中一张',cards],true).set('ai',function(button){
 						return get.value(button.link,_status.event.player);
 					});
-					'step 3'
+					'step 2'
 					if(result.bool){
 						player.gain(result.links,'gain2');
 					}
 					event.finish();
-					'step 4'
-					player.chooseTarget('获得一名角色装备区或判定区内点数为6的牌',true,function(card,player,current){
-						return current.hasCard(function(card){
-							return get.number(card)==6&&lib.filter.canBeGained(card,current,player);
-						},'ej');
-					}).set('ai',function(target){
-						var player=_status.event.player,att=-get.sgn(get.attitude(player,target)-0.1),max=0,ej=target.getCards('ej',function(card){
-							return get.number(card)==6&&lib.filter.canBeGained(card,target,player);
-						});
-						for(var i of ej){
-							var num=get.useful(i,target)*att;
-							if(num>max) max=num;
-							return max;
-						}
+					'step 3'
+					var target=targets[0];
+					player.gainPlayerCard(target,'ej',true).set('filterButton',function(button){
+						return get.number(button.link)==6;
 					});
-					'step 5'
-					if(result.bool){
-						var target=result.targets[0];
-						player.logSkill('xinxingluan',target);
-						player.gainPlayerCard(target,'ej',true).set('filterButton',function(button){
-							return get.number(button.link)==6;
-						});
-					}
 					event.finish();
-					'step 6'
-					if(!game.hasPlayer(current=>current!=player)) event.finish();
-					else player.chooseTarget('令一名其他角色弃置一张点数为6的牌，否则交给你一张牌',true,function(card,player,current){
-						return current!=player&&current.countCards('he')>0;
-					}).set('ai',function(target){
-						var player=_status.event.player,att=get.attitude(player,target);
-						if(att>=0) return 0;
-						if(!target.hasCard(function(card){
-							return get.value(card,target)<=0;
-						},'he')) return -att/Math.sqrt(target.countCards('he'));
-						return 0;
-					});
-					'step 7'
-					if(result.bool){
-						var target=result.targets[0];
-						event.target=target;
-						player.logSkill('xinxingluan',target);
-						target.chooseToDiscard('he','弃置一张点数为6的牌，否则交给'+get.translation(player)+'一张牌',function(card){
-							return get.number(card)==6;
-						}).ai=(card)=>(8-get.value(card));
-					}
-					'step 8'
+					'step 4'
+					var target=targets[0];
+					event.target=target;
+					target.chooseToDiscard('he','弃置一张点数为6的牌，否则交给'+get.translation(player)+'一张牌',function(card){
+						return get.number(card)==6;
+					}).ai=(card)=>(8-get.value(card));
+					'step 5'
 					if(!result.bool){
 						target.chooseCard('he',true,'交给'+get.translation(player)+'一张牌');
 					}
 					else event.finish();
-					'step 9'
+					'step 6'
 					if(result.bool) target.give(result.cards,player,'giveAuto');
 				},
 			},
@@ -6599,16 +6619,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				filter:function(event,player){
 					if(!game.hasPlayer(function(current){
-						return current.hasSkill('cixiao_yizi');
+						return current.hasSkill('panshi');
 					})) return true;
 					return player.countCards('he')>=1&&game.hasPlayer(function(current){
-						return current!=player&&!current.hasSkill('cixiao_yizi');
+						return current!=player&&!current.hasSkill('panshi');
 					});
 				},
 				content:function(){
 					'step 0'
 					if(game.hasPlayer(function(current){
-						return current.hasSkill('cixiao_yizi');
+						return current.hasSkill('panshi');
 					})) event.goto(2);
 					else player.chooseTarget(lib.filter.notMe,get.prompt('cixiao'),'令一名其他角色获得「义子」标记').set('ai',function(target){
 						var player=_status.event.player;
@@ -6619,19 +6639,19 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(result.bool){
 						var target=result.targets[0];
 						player.logSkill('cixiao',target);
-						target.addSkills('cixiao_yizi');
+						target.addSkills('panshi');
 					}
 					event.finish();
 					'step 2'
 					var list=game.filterPlayer(function(current){
-						return current.hasSkill('cixiao_yizi');
+						return current.hasSkill('panshi');
 					});
 					player.chooseCardTarget({
 						prompt:get.prompt('cixiao'),
 						prompt2:('弃置一张牌并将'+get.translation(list)+'的「义子」标记转移给其他角色'),
 						position:'he',
 						filterTarget:function(card,player,target){
-							return player!=target&&!target.hasSkill('cixiao_yizi');
+							return player!=target&&!target.hasSkill('panshi');
 						},
 						filterCard:lib.filter.cardDiscardable,
 						ai1:function(card){
@@ -6654,12 +6674,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.logSkill('cixiao');
 						player.discard(result.cards).delay=false;
 						player.line2(game.filterPlayer(function(current){
-							if(current.hasSkill('cixiao_yizi')){
-								current.removeSkills('cixiao_yizi');
+							if(current.hasSkill('panshi')){
+								current.removeSkills('panshi');
 								return true;
 							}
 						}).concat(result.targets),'green');
-						target.addSkills('cixiao_yizi');
+						target.addSkills('panshi');
 					}
 					else event.finish();
 					'step 4'
@@ -6667,18 +6687,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				derivation:'panshi',
 				ai:{threaten:8},
-				subSkill: {
-					yizi: {
-						mark: true,
-						charlotte: true,
-						marktext: '子',
-						intro: {
-							name: '义子',
-							content: '具有〖叛弑〗'
-						},
-						group: 'panshi'
-					}
-				}
 			},
 			panshi:{
 				trigger:{player:'phaseZhunbeiBegin'},
@@ -6714,6 +6722,31 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.give(result.cards,target);
 					}
 				},
+				mark:true,
+				marktext:'子',
+				intro:{
+					name:'义子',
+					//content:'我是儿子',
+					//R·I·P——永远怀念：被棘手砍掉的“我是儿子”
+					content(_,player){
+						const targets=game.filterPlayer2(target=>target.hasSkill('cixiao',null,null,false)).sortBySeat(player);
+						if(!targets.length) return '我义父呢？！';
+						if(['name','name1','name2'].some(name=>{
+							if(!player[name]||!get.character(player[name])||typeof get.translation(player[name])!='string') return false;
+							return player[name].includes('lvbu')&&get.translation(player[name]).includes('吕布');
+						})) return '公若不弃，布愿拜为义父';
+						return '我是'+get.translation(targets)+'的'+((player)=>{
+							switch(player.sex){
+								case 'female':
+									return '义女';
+								case 'double':
+									return '义子义女';
+								default:
+									return '义子';
+							}
+						})(player);
+					},
+				},
 				group:'panshi_damage',
 			},
 			panshi_damage:{
@@ -6725,6 +6758,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					trigger.num++;
+					if(['name','name1','name2'].some(name=>{
+						if(!player[name]||!get.character(player[name])||typeof get.translation(player[name])!='string') return false;
+						return player[name].includes('lvbu')&&get.translation(player[name]).includes('吕布');
+					})) player.chat('吾堂堂丈夫，安肯为汝子乎！');
 					var evt=event.getParent('phaseUse');
 					if(evt&&evt.player==player) evt.skipped=true;
 				},
@@ -11026,9 +11063,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				return '转换技，锁定技。当你使用一张牌时，<span class="bluetext">阴：你摸X张牌。</span>阳：你弃置X张牌。（X为你本阶段内发动过〖漂萍〗的次数且至多等于你的体力值）';
 			},
 			chuaili:function(player){
-				if(!player.hasSkill('piaoping',null,null,false)) return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；处于阴状态，则你获得一枚“栗”，且令〖惴栗〗于本回合内失效。';
-				if(player.storage.piaoping) return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：<span class="bluetext">处于阳状态，则你将〖漂萍〗转换至阴状态；</span>处于阴状态，则你获得一枚“栗”，且令〖惴栗〗于本回合内失效。';
-				return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；<span class="bluetext">处于阴状态，则你获得一枚“栗”，且令〖惴栗〗于本回合内失效。</span>';
+				if(!player.hasSkill('piaoping',null,null,false)) return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；处于阴状态，则你令〖托献〗发动次数+1，然后若〖托献〗发动次数大于3，则〖惴栗〗于本回合内失效。';
+				if(player.storage.piaoping) return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：<span class="bluetext">处于阳状态，则你将〖漂萍〗转换至阴状态；</span>处于阴状态，则你令〖托献〗发动次数+1，然后若〖托献〗发动次数大于3，则〖惴栗〗于本回合内失效。';
+				return '锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；<span class="bluetext">处于阴状态，则你令〖托献〗发动次数+1，然后若〖托献〗发动次数大于3，则〖惴栗〗于本回合内失效。</span>';
 			},
 			dcdouzhen:function(player){
 				var str='锁定技。①转换技。你的回合内，';
@@ -11388,7 +11425,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			recuorui:'摧锐',
 			recuorui_info:'限定技，出牌阶段，你可以依次获得至多X名角色的各一张手牌（X为你的体力值）。',
 			reliewei:'裂围',
-			reliewei_info:'每回合限Y次，当有角色于你的回合内进入濒死状态时，你可以摸一张牌（Y为你的体力值，若当前回合角色为你，则Y为Infinity）。',
+			reliewei_info:'每回合限Y次，当有角色进入濒死状态时，你可以摸一张牌（Y为你的体力值，若当前回合角色为你，则Y为Infinity）。',
 			duanwei:'段煨',
 			langmie:'狼灭',
 			langmie_damage:'狼灭',
@@ -11484,7 +11521,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			quanjiu_info:'锁定技。①你手牌区中的【酒】的牌名视为【杀】。②你使用对应的实体牌为一张【酒】的非转化【杀】不计入次数限制。',
 			re_pangdegong:'庞德公',
 			heqia:'和洽',
-			heqia_info:'出牌阶段开始时，你可选择一项：①将任意张牌交给一名其他角色。②令一名有手牌的其他角色交给你任意张牌。然后以此法得到牌的角色可以视为使用一张基本牌，且当其声明使用此牌后，可以为此牌增加至至多X个目标（X为以此法移动的牌数）。',
+			heqia_info:'出牌阶段开始时，你可选择一项：①将任意张牌交给一名其他角色。②令一名有手牌的其他角色交给你任意张牌。然后以此法得到牌的角色可以将一张手牌当作任意基本牌使用，且当其声明使用此牌后，可以为此牌增加至至多X个目标（X为以此法移动的牌数）。',
 			yinyi:'隐逸',
 			yinyi_info:'锁定技。每回合限一次，当你受到非属性伤害时，若你的手牌数和体力值与伤害来源均不相同，则你防止此伤害。',
 			haomeng:'郝萌',
@@ -11492,7 +11529,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			xiongmang_info:'你可将任意张花色各不相同的手牌当做目标数上限为X的【杀】使用（X为此【杀】对应的实体牌数）。此【杀】使用结算结束后，若你未造成过渠道为此牌的伤害，则你减1点体力上限。',
 			yanfuren:'严夫人',
 			channi:'谗逆',
-			channi_info:'出牌阶段限一次。你可将任意张手牌交给一名其他角色，然后其可以将等量的手牌当做【决斗】使用。若其因此【决斗】造成了伤害，则其摸X张牌（X为此【决斗】对应的实体牌数）。若其因此【决斗】受到过伤害，则你弃置所有手牌。',
+			channi_info:'出牌阶段限一次。你可将任意张手牌交给一名其他角色，然后其可以将至多等量的手牌当做【决斗】使用。若其因此【决斗】造成了伤害，则其摸X张牌（X为此【决斗】对应的实体牌数）。若其因此【决斗】受到过伤害，则你弃置所有手牌。',
 			nifu:'匿伏',
 			nifu_info:'锁定技。一名角色的回合结束时，你将手牌摸至或弃置至三张。',
 			licaiwei:'李采薇',
@@ -11512,9 +11549,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			piaoping:'漂萍',
 			piaoping_info:'转换技，锁定技。当你使用一张牌时，阴：你摸X张牌。阳：你弃置X张牌。（X为你本阶段内发动过〖漂萍〗的次数且至多等于你的体力值）',
 			tuoxian:'托献',
-			tuoxian_info:'当你因执行〖漂萍〗的效果而弃置牌后，你可以弃置一枚“栗”并令一名其他角色获得这些牌，然后令该角色选择一项：⒈弃置区域内等量的牌。⒉令你的〖漂萍〗失效直到回合结束。',
+			tuoxian_info:'每局游戏限一次。当你因执行〖漂萍〗的效果而弃置牌后，你可令一名其他角色获得这些牌，然后令该角色选择一项：⒈弃置区域内等量的牌。⒉令你的〖漂萍〗失效直到回合结束。',
 			chuaili:'惴栗',
-			chuaili_info:'锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；处于阴状态，则你获得一枚“栗”，且令〖惴栗〗于本回合内失效。',
+			chuaili_info:'锁定技。当你成为其他角色使用黑色牌的目标后，若你的〖漂萍〗：处于阳状态，则你将〖漂萍〗转换至阴状态；处于阴状态，则你令〖托献〗发动次数+1，然后若〖托献〗发动次数大于3，则〖惴栗〗于本回合内失效。',
 			fengfang:'冯方',
 			dcditing:'谛听',
 			dcditing_info:'其他角色的出牌阶段开始时，若你在该角色的攻击范围内，则你可以观看其的X张手牌（X为你的体力值）并选择其中一张，且获得如下效果：①当其使用对应实体牌包含此牌的牌指定你为目标后，你令此牌对你无效。②当其使用对应实体牌包含此牌的牌结算结束后，若你不是此牌的目标，则你摸两张牌。③其出牌阶段结束时，若此牌位于其的手牌区，则你获得此牌。',

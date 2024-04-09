@@ -4,6 +4,7 @@ import { userAgent } from "../noname/util/index.js";
 
 const coreAndVersion = get.coreInfo();
 const core = coreAndVersion[0], version = coreAndVersion[1];
+//@todo: 77 -> 80
 if (core === 'chrome' && !isNaN(version) && version < 77) {
 	const tip = '检测到您的浏览器内核版本小于77，请及时升级浏览器或手机webview内核！';
 	console.warn(tip);

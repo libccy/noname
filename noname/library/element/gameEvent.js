@@ -171,6 +171,10 @@ export class GameEvent {
 	 */
 	name;
 	/**
+	 * @type { Function | void | null }
+	 */
+	filterStop;
+	/**
 	 * @param {keyof this} key
 	 * @param {number} [value]
 	 * @param {number} [baseValue]
@@ -750,6 +754,7 @@ export class GameEvent {
 		if ((this.name === 'gain' || this.name === 'lose') && !_status.gameDrawed) return;
 		if (name === 'gameDrawEnd') _status.gameDrawed = true;
 		if (name === 'gameStart') {
+			lib.announce.publish("Noname.Game.Event.GameStart", {});
 			lib.announce.publish('gameStart', {});
 			if (_status.brawl && _status.brawl.gameStart) _status.brawl.gameStart();
 			if (lib.config.show_cardpile) ui.cardPileButton.style.display = '';
@@ -759,6 +764,7 @@ export class GameEvent {
 		if (!lib.hookmap[name] && !lib.config.compatiblemode) return;
 		if (!game.players || !game.players.length) return;
 		const event = this;
+		if (event.filterStop && event.filterStop()) return;
 		let start = [_status.currentPhase, event.source, event.player, game.me, game.players[0]].find(i => get.itemtype(i) == 'player');
 		if (!start) return;
 		if (!game.players.includes(start) && !game.dead.includes(start)) start = game.findNext(start);

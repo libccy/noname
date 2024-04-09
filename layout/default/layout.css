@@ -5565,10 +5565,28 @@ div[data-decoration="bronze"]::after{
 	}
 }
 /*--------其它--------*/
-::-webkit-scrollbar {
+/* 解放下拉框滚动条！ */
+:not(select)::-webkit-scrollbar {
 	display: none;
 }
-/* 火狐隐藏滚动条 */
-* {
+/* 火狐和chrome120+隐藏滚动条 */
+:not(select) {
 	scrollbar-width: none;
+}
+/* 更新进度条 */
+progress.progress {
+	width: 75%;
+	height: 10px;
+	border: 2px solid;
+	border-radius: 15px;
+	vertical-align: middle;
+	-webkit-appearance: none;
+}
+progress.progress::-webkit-progress-bar {
+	background: rgb(239, 239, 239);
+	border-radius: 0.2rem;
+}
+progress.progress::-webkit-progress-value {
+	border-radius: 0.2rem;
+	background: rgb(0, 117, 255);
 }
