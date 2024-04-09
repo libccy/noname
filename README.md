@@ -1,7 +1,7 @@
 Forked from: https://github.com/libccy/noname
 
 ## 一键安装
-参见 https://hub.docker.com/repository/docker/hsiaoshun/noname/general
+参见 https://hub.docker.com/r/hsiaoshun/noname
 ```bash
 docker run -d --name sgs -p 80:80 -p 8080:8080 --restart unless-stopped hsiaoshun/noname:latest
 ```
