@@ -3476,7 +3476,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{player:['useCard','useCardAfter']},
 				filter:function(event,player,name){
 					if(name=='useCardAfter'){
-						if(player.isTempBanned('olqifan')) return false;
+						if(player.isTempBanned('olxiaofan')) return false;
 						return player.getHistory('useCard',evt=>{
 							return !player.getHistory('sourceDamage',evt2=>{
 								return evt2.card&&evt2.card==evt.card;
@@ -3489,7 +3489,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					'step 0'
 					if(event.triggername=='useCardAfter'){
-						player.tempBanSkill('olqifan');
+						player.tempBanSkill('olxiaofan');
 						event.finish();
 						return;
 					}
