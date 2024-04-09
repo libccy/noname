@@ -3129,7 +3129,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_wangmingshan:'族王明山',
 			clan_wangmingshan_prefix:'族',
 			clantanque:'弹雀',
-			clantanque_info:'每回合限一次。当你使用牌结算结束后，你可以对一名体力值为X且不为0的角色造成1点伤害（X为此牌点数与你上一张使用的牌的点数之差）',
+			clantanque_info:'每回合限一次。当你使用牌结算结束后，你可以对一名体力值为X且不为0的角色造成1点伤害（X为此牌点数与你上一张使用的牌的点数之差）。',
 			clanshengmo:'剩墨',
 			clanshengmo_info:'当你需要使用一张未以此法使用过的基本牌时，你可以获得一张于本回合进入弃牌堆且点数不为这些牌中最大且不为这些牌中最小的牌，视为你使用需要使用的牌。',
 
