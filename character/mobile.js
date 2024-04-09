@@ -1084,7 +1084,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const target = event.target;
 					const delt = target.getHp(true) - 1, num = Math.abs(delt);
 					await target[delt > 0 ? 'loseHp' : 'recover'](num);
-					if (num > 0) await target.changeHujia(num);
+					if (num > 0) await target.changeHujia(num, null ,true);
 				},
 				async contentAfter(event,trigger,player){
 					game.addGlobalSkill('mbjuejin_xiangsicunwei');
