@@ -982,6 +982,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbfangzhu:{
 				audio:2,
+				audioname:['mb_caomao'],
 				enable:'phaseUse',
 				filter(event,player){
 					return player.hasMark('sbxingshang');
@@ -1019,6 +1020,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return {
 							num:links[0],
 							audio:'sbfangzhu',
+							audioname:['mb_caomao'],
 							filterCard:()=>false,
 							selectCard:-1,
 							filterTarget(card,player,target){
@@ -4981,6 +4983,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			sbqingzheng:{
 				audio:2,
+				audioname:['mb_caomao'],
 				trigger:{player:'phaseUseBegin'},
 				filter:function(event,player){
 					return player.countCards('h')>0;

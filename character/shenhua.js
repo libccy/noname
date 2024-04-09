@@ -7759,7 +7759,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zuoci:['zuoci','re_zuoci'],
 			caiwenji:['caiwenji','ol_caiwenji','re_caiwenji'],
 			xuyou:['xuyou','sp_xuyou','jsrg_xuyou','yj_xuyou','junk_xuyou'],
-			guanqiujian:['guanqiujian','re_guanqiujian','tw_guanqiujian','old_guanqiujian'],
+			guanqiujian:['guanqiujian','re_guanqiujian','tw_guanqiujian','mb_sp_guanqiujian','old_guanqiujian'],
 			chendao:['chendao','ns_chendao','old_chendao'],
 			zhugezhan:['zhugezhan','old_zhugezhan'],
 			ol_lusu:['re_lusu','ol_lusu','dc_sb_lusu'],
