@@ -24,18 +24,178 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clan_xunyou:['male','wei',3,['clanbaichu','clandaojie'],['clan:颍川荀氏']],
 			clan_wuqiao:['male','jin',4,['clanqiajue','clanmuyin'],['clan:陈留吴氏']],
 			clan_wangguang:['male','wei',3,['clanlilun','clanjianji','clanzhongliu'],['clan:太原王氏']],
+			clan_wangmingshan:['male','wei',3,['clantanque','clanshengmo','clanzhongliu'],['clan:太原王氏']],
 		},
 		characterSort:{
 			clan:{
 				clan_wu:['clan_wuxian','clan_wuban','clan_wukuang','clan_wuqiao'],
 				clan_xun:['clan_xunshu','clan_xunchen','clan_xuncai','clan_xuncan','clan_xunyou'],
 				clan_han:['clan_hanshao','clan_hanrong'],
-				clan_wang:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun','clan_wangguang'],
+				clan_wang:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun','clan_wangguang','clan_wangmingshan'],
 				clan_zhong:['clan_zhongyan','clan_zhonghui','clan_zhongyu'],
 			},
 		},
 		/** @type { importCharacterConfig['skill'] } */
 		skill:{
+			//族王明山
+			clantanque:{
+				audio:2,
+				trigger:{player:'useCardAfter'},
+				usable:1,
+				filter(event,player){
+					const evt=lib.skill.dcjianying.getLastUsed(player,event);
+					if(!evt||!evt.card) return false;
+					const curCard=event.card,prevCard=evt.card;
+					const curNum=get.number(curCard),prevNum=get.number(prevCard);
+					if(typeof curNum!='number'||typeof prevNum!='number') return false;
+					const delNum=Math.abs(curNum-prevNum);
+					if(delNum===0) return false;
+					return game.hasPlayer(current=>{
+						return current.getHp()===delNum;
+					});
+				},
+				locked:false,
+				async cost(event,trigger,player){
+					const evt=lib.skill.dcjianying.getLastUsed(player,trigger);
+					const curCard=trigger.card,prevCard=evt.card;
+					const curNum=get.number(curCard),prevNum=get.number(prevCard);
+					const delNum=Math.abs(curNum-prevNum);
+					event.result=await player.chooseTarget(get.prompt('clantanque'),`对一名体力值为${delNum}的角色造成1点伤害`,(card,player,target)=>{
+						return target.getHp()===get.event('delNum');
+					}).set('delNum',delNum).set('ai',target=>{
+						return get.damageEffect(target,get.player(),get.player());
+					}).forResult();
+				},
+				async content(event,trigger,player){
+					const target=event.targets[0];
+					await target.damage();
+					await game.asyncDelayx();
+				},
+				mod:{
+					aiOrder(player,card,num){
+						if(typeof card!='object') return;
+						const evt=lib.skill.dcjianying.getLastUsed(player);
+						if(!evt||!evt.card) return;
+						const curNum=get.number(card),prevNum=get.number(evt.card);
+						if(typeof curNum!='number'||typeof prevNum!='number') return;
+						const pairs=game.filterPlayer().map(current=>{
+							return [current.getHp(),get.damageEffect(current,player,player)];
+						}).filter(pair=>pair[1]>0);
+						if(!pairs.length) return;
+						const delNum=Math.abs(curNum-prevNum);
+						for(const [hp,eff] of pairs){
+							if(hp!=delNum) continue;
+							return num+10+(pairs.filter(pair=>pair[0]===hp).sort((a,b)=>b[1]-a[1])[0][1])/20;
+						}
+					},
+				}
+			},
+			clanshengmo:{
+				audio:2,
+				enable:'chooseToUse',
+				hiddenCard(player,name){
+					if(get.type(name)!='basic') return false;
+					if(!player.getStorage('clanshengmo').includes(name)&&(get.event('clanshengmo_cards')||[]).length>0) return true;
+				},
+				filter(event,player){
+					if(event.responded) return false;
+					const names=lib.inpile.filter(name=>get.type(name)=='basic'&&!player.getStorage('clanshengmo').includes(name)),cards=get.event('clanshengmo_cards')||[];
+					return cards.length>0&&names.some(name=>{
+						return event.filterCard({name,isCard:true},player,event);
+					});
+				},
+				onChooseToUse(event){
+					if(game.online) return;
+					if(!event.clanshengmo_cards){
+						let cards=[];
+						game.checkGlobalHistory('cardMove',evt=>{
+							if(evt.name!='cardsDiscard'&&(evt.name!='lose'||evt.position!=ui.discardPile)) return;
+							cards.addArray(evt.cards.filter(card=>get.position(card,true)=='d'));
+						});
+						const numbers=cards.map(card=>get.number(card,false)).unique();
+						const [min,max]=[Math.min(...numbers),Math.max(...numbers)];
+						event.set('clanshengmo_cards',cards.filter(card=>{
+							const num=get.number(card,false);
+							return num>min&&num<max;
+						}));
+					}
+				},
+				async content(event,trigger,player){
+					const evt = event.getParent(2);
+					const names = lib.inpile.filter(name => get.type(name) == 'basic' && !player.getStorage('clanshengmo').includes(name)), cards = evt.clanshengmo_cards;
+					const links = await player.chooseButton(['剩墨：获得其中一张牌', cards], true).set('ai', button => {
+						return get.value(button.link);
+					}).forResultLinks();
+					if (!links || !links.length) return;
+					const list = [];
+					for (const name of names) {
+						const card = { name, isCard: true };
+						if (evt.filterCard(card, player, evt)) {
+							list.push(['基本', '', name]);
+						}
+						if (name == 'sha') {
+							for (const nature of lib.inpile_nature) {
+								card.nature = nature;
+								if (evt.filterCard(card, player, evt)) {
+									list.push(['基本', '', name, nature]);
+								}
+							}
+						}
+					}
+					if (!list.length) return;
+					const links2 = await player.chooseButton(['视为使用一张未以此法使用过的基本牌', [list, 'vcard']], true).set('ai', button => {
+						return get.player().getUseValue(button.link) + 1;
+					}).forResultLinks();
+					const name = links2[0][2], nature = links2[0][3];
+					game.broadcastAll((name, nature, toGain) => {
+						lib.skill.clanshengmo_backup.viewAs = {
+							name,
+							nature,
+							isCard: true,
+						};
+						lib.skill.clanshengmo_backup.prompt = `选择${get.translation(nature)}【${get.translation(name)}】的目标`;
+						lib.skill.clanshengmo_backup.cardToGain = toGain;
+					}, name, nature, links[0]);
+					evt.set('_backupevent', 'clanshengmo_backup');
+					evt.backup('clanshengmo_backup');
+					evt.set('openskilldialog', `选择${get.translation(nature)}【${get.translation(name)}】的目标`);
+					evt.set('norestore', true);
+					evt.set('custom', {
+						add: {},
+						replace: { window() { } }
+					});
+					evt.goto(0);
+				},
+				marktext:'墨',
+				intro:{
+					content:'已以此法使用过$'
+				},
+				subSkill:{
+					backup:{
+						precontent(){
+							delete event.result.skill;
+							event.result.card.storage.clanshengmo = true;
+							player.markAuto('clanshengmo',event.result.card.name);
+							player.gain(lib.skill.clanshengmo_backup.cardToGain, 'gain2');
+						},
+						filterCard:()=>false,
+						selectCard:-1,
+					},
+				},
+				ai:{
+					order:3,
+					result:{
+						player(player){
+							if(get.event().dying) return get.attitude(player, get.event().dying);
+							if(get.event().type!='phase') return 1;
+							const names=get.event(`clanshengmo_${player.playerid}_enabled_names`);
+							return names.some(name=>{
+								return player.getUseValue({name})>0;
+							});
+						}
+					}
+				}
+			},
 			//族贝斯塔[doge]
 			clanlilun:{
 				audio:2,
@@ -1392,7 +1552,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			clanzhongliu:{
 				audio:2,
-				audioname:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun','clan_wangguang'],
+				audioname:['clan_wangling','clan_wangyun','clan_wanghun','clan_wanglun','clan_wangguang','clan_wangmingshan'],
 				trigger:{player:'useCard'},
 				forced:true,
 				clanSkill:true,
@@ -2821,6 +2981,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			wanglun:'王沦（233年－257年）字太冲，出身太原晋阳王姓世族（今山西省太原市），王昶三子，王浑、王深之弟，王湛之兄。醇粹简远，崇尚老庄之学，心思平淡。二十多时被举荐为孝廉，没有前往，后任大将军参军。257年，诸葛诞不满司马氏篡权而在寿春起义，王沦跟随司马昭征讨，遭遇疾疫去世，时年二十五，时人惜之，司马昭为他流泪。其兄著诔文《表德论》，表述其德行，说“因为畏惧帝王的典章制度，不能写墓志铭，于是撰写过往的事迹，刻在墓的背面。”',
 			wuqiao:'吴乔，西晋人物，蜀车骑将军吴懿之孙。李雄建立成汉政权，他沦落益州，长达三十年，始终不向李雄屈服。',
 			clan_wangguang:'王广，三国时期曹魏太原祁县人，哲学家。东汉司徒王允从孙，魏太尉王凌之子。有志尚学，官至尚书。魏时随父亲在朝作官，屯骑校尉，机智有谋。当得知司马懿篡夺曹魏政权时，王凌与外甥令狐愚合谋立楚王为魏主，王广劝其父不可，王凌没有接受儿子的谏言，结果计谋泄而被害。',
+			wangmingshan:'王明山，王凌的小儿子，太原祁（今山西省祁县）人，三国魏书法家，最知名善画，多技艺，人得其书，皆以为法。太尉王凌参与谋划废立，事情泄露，被太傅司马懿领兵平定。',
 		},
 		dynamicTranslate:{
 			clanlianzhu(player){
@@ -2957,6 +3118,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanlilun_info:'出牌阶段限一次，你可以重铸两张手牌（不能是你本回合以此法重铸过的牌名的牌），然后使用其中的一张牌。',
 			clanjianji:'见机',
 			clanjianji_info:'限定技，一名角色的结束阶段，若其上下家均未于本回合：使用过牌，则你可以与其各摸一张牌；成为过牌的目标，则你可以视为使用一张【杀】。',
+			clan_wangmingshan:'族王明山',
+			clan_wangmingshan_prefix:'族',
+			clantanque:'弹雀',
+			clantanque_info:'每回合限一次。当你使用牌结算结束后，你可以对一名体力值为X且不为0的角色造成1点伤害（X为此牌点数与你上一张使用的牌的点数之差）。',
+			clanshengmo:'剩墨',
+			clanshengmo_info:'当你需要使用一张未以此法使用过的基本牌时，你可以获得一张于本回合进入弃牌堆且点数不为这些牌中最大且不为这些牌中最小的牌，视为你使用需要使用的牌。',
 
 			clan_wu:'陈留·吴氏',
 			clan_xun:'颍川·荀氏',

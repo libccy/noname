@@ -1402,6 +1402,7 @@ window.noname_character_rank={
 		'jsrg_liuyong',
 		'jsrg_sunjun',
 		'xia_shie',
+		'clan_wangmingshan',
 	],
 	bm:[
 		'kongrong',
@@ -2670,6 +2671,7 @@ window.noname_character_rank={
 			'ol_dingshangwan',
 			'ol_liwan',
 			'dc_sb_lusu',
+			'clan_wangmingshan',
 		],
 		junk:[
 			'ol_sb_guanyu',

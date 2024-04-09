@@ -369,7 +369,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:{
 						viewAs:{name:'juedou'},
 						position:'he',
-						filterCard:true,
+						filterCard(card,player){
+							const cardx=get.autoViewAs({name:'juedou'},[card]);
+							return lib.filter.targetEnabledx(cardx,player,get.event('sourcex'));
+						},
 						check(card){
 							if(get.name(card)=='sha') return 5-get.value(card);
 							return 8-get.value(card);
