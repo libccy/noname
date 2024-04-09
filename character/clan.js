@@ -2477,7 +2477,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				filter(event,player){
 					if(!lib.suit.includes(get.suit(event.card))) return false;
 					const suit=get.suit(event.card);
-					if(player.getRoundHistory('useCard',evt=>get.suit(evt.card)==type).indexOf(event)!=0) return false;
+					if(player.getRoundHistory('useCard',evt=>get.suit(evt.card)==suit).indexOf(event)!=0) return false;
 					return event.targets&&event.targets.length==1&&!event.targets[0].isLinked()||player.hasCard(card=>get.suit(card)==get.suit(event.card)&&player.canRecast(card),'h');
 				},
 				content(){
