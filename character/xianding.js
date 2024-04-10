@@ -14628,6 +14628,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dingshangwan:['dingshangwan','ol_dingshangwan'],
 			qinghegongzhu:['qinghegongzhu','dc_qinghegongzhu'],
 			caofang:['caofang','jsrg_caofang'],
+			caomao:['caomao','mb_caomao'],
 		},
 		translate:{
 			puyuan:'蒲元',
