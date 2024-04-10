@@ -766,6 +766,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return current!==player&&current.group==='wei'&&player.hasZhuSkill('mbweitong',current);
 					});
 				},
+				zhuSkill:true,
 				forced:true,
 				locked:false,
 				async content(event,trigger,player){
