@@ -41,6 +41,18 @@ export const status = {
 	 * @type { string | void }
 	 */
 	extension: undefined,
+	/**
+	 * @type { boolean | void }
+	 */
+	dragged: undefined,
+	/**
+	 * @type { boolean | void }
+	 */
+	touchconfirmed: undefined,
+	/**
+	 * @type { boolean | void }
+	 */
+	connectMode: undefined,
 };
 
 export const _status = status;

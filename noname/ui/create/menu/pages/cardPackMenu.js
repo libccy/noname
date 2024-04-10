@@ -164,6 +164,8 @@ export const cardPackMenu = function (connectMenu) {
 
 	var createModeConfig = function (mode, position) {
 		var info = lib.cardPack[mode];
+		let cardPack = lib.cardPackInfo[mode];
+		if (!lib.cardPile[mode] && cardPack && cardPack.list && Array.isArray(cardPack.list)) lib.cardPile[mode]=cardPack.list;
 		var page = ui.create.div('');
 		var node = ui.create.div('.menubutton.large', lib.translate[mode + '_card_config'], position, clickMode);
 		if (node.innerHTML.length >= 5) {
@@ -237,7 +239,7 @@ export const cardPackMenu = function (connectMenu) {
 				})(),
 				onclick: togglePack
 			});
-			if (!mode.startsWith('mode_')) {
+			if (!mode.startsWith('mode_') || (cardPack && cardPack.closeable)) {
 				page.appendChild(cfgnode);
 			}
 			else {
@@ -302,7 +304,7 @@ export const cardPackMenu = function (connectMenu) {
 					game.saveConfig('hiddenCardPack', lib.config.hiddenCardPack);
 				});
 			}
-			if (!mode.startsWith('mode_') && lib.cardPile[mode]) {
+			if ((!mode.startsWith('mode_') || (cardPack && cardPack.closeable)) && lib.cardPile[mode]) {
 				var cardpileNodes = [];
 				var cardpileexpanded = false;
 				if (!lib.config.bannedpile[mode]) {
@@ -643,7 +645,9 @@ export const cardPackMenu = function (connectMenu) {
 		if ([...start.firstChild.children].map(node => node.mode).includes(packName)) return;
 		// 显示不是无名杀自带的卡牌包
 		if (!lib.connectCardPack.includes(packName) && !lib.config.all.cards.includes(packName)) {
-			createModeConfig(packName, start.firstChild, node1);
+			if (!(connectMenu && ['mode_derivation', 'mode_banned'].includes(packName))) {
+				createModeConfig(packName, start.firstChild, node1);
+			}
 			if (connectMenu) lib.connectCardPack.add(packName);
 		}
 	}

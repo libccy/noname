@@ -1089,7 +1089,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					value:7,
 					useful:1,
 					tag:{
-						draw:2
+						gain:1
 					},
 					result:{
 						target:function(player,target){
@@ -2418,7 +2418,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(card&&card.storage.shouna&&card.storage.shouna.length){
 							return '共有'+get.cnNumber(card.storage.shouna.length)+'张牌';
 						}
-						return '共有〇张牌';
+						return '共有零张牌';
 					},
 					mark:function(dialog,storage,player){
 						var card=player.getEquip('lianyaohu');
@@ -2426,7 +2426,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							dialog.addAuto(card.storage.shouna);
 						}
 						else{
-							return '共有〇张牌';
+							return '共有零张牌';
 						}
 					},
 					markcount:function(storage,player){
@@ -3099,7 +3099,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						event.hu=hu;
 					}
 					'step 1'
-					if(!event.card.destroyed){
+					if(!event.card._selfDestroyed){
 						event.hu.storage.shouna.push(event.card);
 						player.updateMarks();
 					}
@@ -4588,7 +4588,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				content:function(){
 					"step 0"
 					if(event.isMine()){
-						event.longfan=ui.create.control('〇','〇','〇','〇',function(){
+						event.longfan=ui.create.control('零','零','零','零',function(){
 							event.longfan.status--;
 						});
 						event.longfan.status=4;

@@ -7,12 +7,6 @@ export class GamePromises extends Uninstantable {
 	 *
 	 * 注: 由于参数列表是随意的，在这里我准备限制一下这个函数的参数顺序
 	 *
-	 * @type {{
-	 *  (title: string): Promise<string | false>;
-	 *	(title: string, forced: true): Promise<string>;
-	 *	(alertOption: 'alert', title: string): Promise<true>;
-	 * }}
-	 *
 	 * @param { string } [title] 设置prompt标题与input内容
 	 * @param { boolean } [forced] 为true的话将没有"取消按钮"
 	 * @param { string } alertOption 设置prompt是否模拟alert
@@ -24,6 +18,18 @@ export class GamePromises extends Uninstantable {
 	 * game.promises.prompt('###prompt标题###input初始内容').then(value => console.log(value));
 	 * ```
 	 * @returns { Promise<string> }
+	 */
+	/**
+	 * @overload
+	 * @param { string } title
+	 * @returns { Promise<string | false> }
+	 */
+	/**
+	 * @overload
+	 * @param { string } title
+	 * @param { boolean } [forced]
+	 * @returns { Promise<string> }
+	 * 
 	 */
 	// @ts-ignore
 	static prompt(alertOption, title, forced) {
@@ -98,6 +104,11 @@ export class GamePromises extends Uninstantable {
 				if (err) reject(err);
 				else resolve();
 			});
+		}));
+	}
+	static removeDir(directory) {
+		return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
+			game.removeDir(directory, resolve, reject);
 		}));
 	}
 }

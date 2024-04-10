@@ -23,6 +23,8 @@ import { Channel } from "./channel/index.js";
 import { Experimental } from "./experimental/index.js";
 import * as Element from "./element/index.js";
 import { updateURLs } from "./update-urls.js";
+import { defaultHooks } from "./hooks/index.js"
+import { freezeButExtensible } from "../util/index.js"
 
 
 export class Library extends Uninstantable {
@@ -79,6 +81,7 @@ export class Library extends Uninstantable {
 			return Reflect.set(target, prop, newValue);
 		}
 	});
+	static cardPackInfo = {};
 	/**
 	 * @type { SMap<number> }
 	 */
@@ -116,276 +119,49 @@ export class Library extends Uninstantable {
 	static cardType = {};
 	static hook = { globalskill: {} };
 	/**
-	* @returns { never }
-	*/
-	static typeAnnotation() {
-		/**
-		 * @type { Videos[] }
-		 */
-		// @ts-ignore
-		this.videos;
-		/**
-		 * @type { {
-		 * 	fs: typeof import("fs"),
-		 *  path: typeof import("path"),
-		 *  debug: () => void,
-		 *  clients: Element.Client[],
-		 *  banned:[],
-		 *  observing:[],
-		 *  torespond:{},
-		 *  torespondtimeout:{},
-		 * } }
-		 */
-		// @ts-ignore
-		this.node;
-		/**
-		 * @type { { [key: string]: string } }
-		 */
-		// @ts-ignore
-		this.playerOL;
-		throw new Error('Do not call this method');
-	}
-
+	 *  @type { Player | undefined }
+	 */
+	static tempSortSeat;
+	/**
+	 * @type { 'android' | 'ios' | undefined }
+	 */
+	static device;
+	/**
+	 * @type { string }
+	 */
+	static version;
+	/**
+	 * @type { Videos[] }
+	 */
+	static videos;
+	/**
+	 * @type { {
+	 * 	fs: typeof import("fs"),
+	 *  path: typeof import("path"),
+	 *  debug: () => void,
+	 *  clients: Element.Client[],
+	 *  banned:[],
+	 *  observing:[],
+	 *  torespond:{},
+	 *  torespondtimeout:{},
+	 * } }
+	 */
+	static node;
+	/**
+	 * @type { { [key: string]: string } }
+	 */
+	static playerOL;
+	/**
+	 * @type { IDBRequest<IDBDatabase> }
+	 */
+	static db;
 	//函数钩子
 	/**
 	 * 你可以往这里加入{钩子名:函数数组}，并在数组里增加你的自定义函数
 	 * 这样当某个地方调用game.callHook(钩子名,[...函数参数])时，就会按顺序将对应数组中的每个函数运行一遍（传参为callHook的第二个参数）。
 	 * 你可以将hook机制类比为event.trigger()，但是这里只能放同步代码
 	 */
-	static hooks = {
-		// 本体势力的颜色
-		addGroup: [(id, _short, _name, config) => {
-			if ("color" in config && config.color != null) {
-				let color1, color2, color3, color4;
-				if (typeof config.color == "string" && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(config.color)) {
-					let c1 = parseInt(`0x${config.color.slice(1, 3)}`);
-					let c2 = parseInt(`0x${config.color.slice(3, 5)}`);
-					let c3 = parseInt(`0x${config.color.slice(5, 7)}`);
-					color1 = color2 = color3 = color4 = [c1, c2, c3, 1];
-				}
-				else if (Array.isArray(config.color) && config.color.length == 4) {
-					if (config.color.every(item => Array.isArray(item))) {
-						color1 = config.color[0];
-						color2 = config.color[1];
-						color3 = config.color[2];
-						color4 = config.color[3];
-					}
-					else color1 = color2 = color3 = color4 = config.color;
-				}
-				if (color1 && color2 && color3 && color4) {
-					const cs = lib.linq.cselector;
-					const g1 = cs.group(
-						cs.of(
-							cs.class("player ", "identity"),
-							cs.isAttr("data-color", `"${id}"`)
-						),
-						cs.of(
-							"div",
-							cs.isAttr("data-nature", `"${id}"`)
-						),
-						cs.of(
-							"span",
-							cs.isAttr("data-nature", `"${id}"`)
-						)
-					);
-					const g2 = cs.group(
-						cs.of(
-							"div",
-							cs.isAttr("data-nature", `"${id}m"`)
-						),
-						cs.of(
-							"span",
-							cs.isAttr("data-nature", `"${id}m"`)
-						)
-					);
-					const g3 = cs.group(
-						cs.of(
-							"div",
-							cs.isAttr("data-nature", `"${id}mm"`)
-						),
-						cs.of(
-							"span",
-							cs.isAttr("data-nature", `"${id}mm"`)
-						)
-					);
-					let result = {};
-					result[g1] = {
-						textShadow: cs.group(
-							"black 0 0 1px",
-							`rgba(${color1.join()}) 0 0 2px`,
-							`rgba(${color2.join()}) 0 0 5px`,
-							`rgba(${color3.join()}) 0 0 10px`,
-							`rgba(${color4.join()}) 0 0 10px`
-						)
-					};
-					result[g2] = {
-						textShadow: cs.group(
-							"black 0 0 1px",
-							`rgba(${color1.join()}) 0 0 2px`,
-							`rgba(${color2.join()}) 0 0 5px`,
-							`rgba(${color3.join()}) 0 0 5px`,
-							`rgba(${color4.join()}) 0 0 5px`,
-							"black 0 0 1px"
-						)
-					};
-					result[g3] = {
-						textShadow: cs.group(
-							"black 0 0 1px",
-							`rgba(${color1.join()}) 0 0 2px`,
-							`rgba(${color2.join()}) 0 0 2px`,
-							`rgba(${color3.join()}) 0 0 2px`,
-							`rgba(${color4.join()}) 0 0 2px`,
-							"black 0 0 1px"
-						)
-					};
-					game.dynamicStyle.addObject(result);
-					lib.groupnature[id] = id;
-				}
-			}
-			if (typeof config.image == 'string') Object.defineProperty(lib.card, `group_${id}`, {
-				configurable: true,
-				enumerable: false,
-				writable: true,
-				value: {
-					fullskin: true,
-					image: config.image
-				}
-			});
-		}],
-		//增加新属性杀
-		addNature: [(nature, _translation, config) => {
-			if (typeof config != 'object') config = {};
-			let linked = config.linked, order = config.order, background = config.background, lineColor = config.lineColor;
-			if (typeof linked != 'boolean') linked = true;
-			if (typeof order != 'number') order = 0;
-			if (typeof background != 'string') background = '';
-			if (!Array.isArray(lineColor) || lineColor.length != 3) lineColor = [];
-			else if (background.startsWith('ext:')) {
-				background = background.replace(/^ext:/, 'extension/');
-			}
-			if (linked) lib.linked.add(nature);
-			if (lineColor.length) lib.lineColor.set(nature, lineColor);
-			lib.nature.set(nature, order);
-			if (background.length > 0) lib.natureBg.set(nature, background);
-			if (config.audio) {
-				for (let key in config.audio) {
-					if (!lib.natureAudio[key]) {
-						lib.natureAudio[key] = config.audio[key];
-					} else {
-						for (let key2 in config.audio[key]) {
-							lib.natureAudio[key][key2] = config.audio[key][key2];
-						}
-					}
-				}
-			}
-
-			let color1, color2;
-			if (typeof config.color == "string" && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(config.color)) {
-				let c1 = parseInt(`0x${item[1].slice(1, 3)}`);
-				let c2 = parseInt(`0x${item[1].slice(3, 5)}`);
-				let c3 = parseInt(`0x${item[1].slice(5, 7)}`);
-				color1 = color2 = [c1, c2, c3, 1];
-			}
-			else if (Array.isArray(config.color) && config.color.length >= 2 && config.color.length <= 4) {
-				if (config.color.every(item => Array.isArray(item))) {
-					color1 = config.color[0];
-					color2 = config.color[1];
-				}
-				else {
-					let color = config.color.slice();
-					if (color.length == 3) color.push(1);
-					color1 = color2 = color;
-				}
-			}
-			if (color1 && color2) {
-				const cs = lib.linq.cselector;
-				const g1 = cs.group(
-					cs.of(
-						cs.class("card", "fullskin", `${nature}`),
-						'>',
-						cs.class("name")
-					)
-				);
-				let result = {};
-				result[g1] = {
-					color: `rgba(${color1.join()})`,
-					border: cs.merge(
-						'1px',
-						'solid',
-						`rgba(${color2.join()})`
-					),
-				};
-				game.dynamicStyle.addObject(result);
-
-				const g2 = cs.group(
-					cs.of(
-						cs.class("tempname", `${nature}`),
-						':not([data-nature])>',
-						cs.class("span")
-					)
-				);
-				let result2 = {};
-				result2[g2] = {
-					color: `rgba(${color1.join()})`,
-				};
-				game.dynamicStyle.addObject(result2);
-			}
-		}],
-		//game.check
-		checkBegin: [],
-		checkEnd: [
-			function autoConfirm(event, { ok, auto, auto_confirm }) {
-				if (!event.isMine()) return;
-				const skillinfo = get.info(event.skill) || {};
-				if (ok && auto && (auto_confirm || skillinfo.direct) && !_status.touchnocheck
-					&& !_status.mousedown && (!_status.mousedragging || !_status.mouseleft)) {
-					if (ui.confirm) ui.confirm.close();
-					if (event.skillDialog === true) event.skillDialog = false;
-					ui.click.ok();
-					_status.mousedragging = null;
-					if (skillinfo.preservecancel) ui.create.confirm('c');
-				}
-			}
-		],
-		checkButton: [],
-		checkCard: [
-			function updateTempname(card, event) {
-				if (lib.config.cardtempname === 'off') return;
-				if (get.name(card) === card.name && get.is.sameNature(get.nature(card), card.nature, true)) return;
-				const node = ui.create.cardTempName(card);
-				if (lib.config.cardtempname !== 'default') node.classList.remove('vertical');
-			},
-		],
-		checkTarget: [
-			function updateInstance(target, event) {
-				if (!target.instance) return;
-				['selected', 'selectable'].forEach(className => {
-					if (target.classList.contains(className)) {
-						target.instance.classList.add(className);
-					} else {
-						target.instance.classList.remove(className);
-					}
-				});
-			},
-		],
-		uncheckBegin: [],
-		uncheckEnd: [],
-		uncheckButton: [],
-		uncheckCard: [
-			function removeTempname(card, event) {
-				if (!card._tempName) return;
-				card._tempName.delete();
-				delete card._tempName;
-			},
-		],
-		uncheckTarget: [
-			function removeInstance(target, event) {
-				if (!target.instance) return;
-				target.instance.classList.remove('selected');
-				target.instance.classList.remove('selectable');
-			},
-		],
-	};
+	static hooks = freezeButExtensible({ ...defaultHooks });
 
 	/**
 	 * **无名杀频道推送机制**
@@ -782,7 +558,7 @@ export class Library extends Uninstantable {
 					name: '流畅模式',
 					init: false,
 					intro: '减少部分游戏特效，提高游戏速度',
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('low_performance', bool);
 						if (bool) {
 							ui.window.classList.add('low_performance');
@@ -796,7 +572,7 @@ export class Library extends Uninstantable {
 					name: '兼容模式',
 					init: false,
 					intro: '开启兼容模式可防止扩展使游戏卡死并提高对旧扩展的兼容性，但对游戏速度有一定影响，若无不稳定或不兼容的扩展建议关闭',
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('compatiblemode', bool);
 						if (bool) {
 							ui.window.classList.add('compatiblemode');
@@ -817,7 +593,7 @@ export class Library extends Uninstantable {
 					init: false,
 					unfrequent: true,
 					intro: '防止屏幕自动关闭<br>注：旧版本通过NoSleep.js实现的屏幕常亮可能会影响外置音频的音量',
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('keep_awake', bool);
 						if (bool) {
 							if (window.plugins && window.plugins.insomnia) window.plugins.insomnia.keepAwake();
@@ -911,7 +687,7 @@ export class Library extends Uninstantable {
 					restart: true,
 					unfrequent: true,
 					intro: '开启后可使触屏设备反应更快，但无法使用鼠标操作',
-					onclick: function (bool) {
+					onclick(bool) {
 						if (get.is.nomenu('touchscreen', bool)) return false;
 						game.saveConfig('touchscreen', bool);
 					}
@@ -935,7 +711,7 @@ export class Library extends Uninstantable {
 						chat: '显示聊天',
 						off: '关闭',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						if (get.is.nomenu('swipe_down', item)) return false;
 						game.saveConfig('swipe_down', item);
 					}
@@ -953,7 +729,7 @@ export class Library extends Uninstantable {
 						chat: '显示聊天',
 						off: '关闭',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						if (get.is.nomenu('swipe_up', item)) return false;
 						game.saveConfig('swipe_up', item);
 					}
@@ -971,7 +747,7 @@ export class Library extends Uninstantable {
 						chat: '显示聊天',
 						off: '关闭',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						if (get.is.nomenu('swipe_left', item)) return false;
 						game.saveConfig('swipe_left', item);
 					}
@@ -989,7 +765,7 @@ export class Library extends Uninstantable {
 						chat: '显示聊天',
 						off: '关闭',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						if (get.is.nomenu('swipe_right', item)) return false;
 						game.saveConfig('swipe_right', item);
 					}
@@ -1005,7 +781,7 @@ export class Library extends Uninstantable {
 						pause: '切换暂停',
 						auto: '切换托管'
 					},
-					onclick: function (item) {
+					onclick(item) {
 						if (get.is.nomenu('round_menu_func', item)) return false;
 						game.saveConfig('round_menu_func', item);
 					},
@@ -1054,7 +830,7 @@ export class Library extends Uninstantable {
 						config: '选项',
 						auto: '托管',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						if (get.is.nomenu('right_click', item)) return false;
 						game.saveConfig('right_click', item);
 					}
@@ -1130,7 +906,7 @@ export class Library extends Uninstantable {
 						20000: '20秒',
 						60000: '60秒'
 					},
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('max_loadtime', item);
 						if (item == '5000') {
 							localStorage.removeItem(lib.configprefix + 'loadtime');
@@ -1145,7 +921,7 @@ export class Library extends Uninstantable {
 					init: true,
 					unfrequent: true,
 					intro: '开启后滚轮可使手牌横向滚动，在mac等可横向滚动的设备上建议关闭',
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('mousewheel', bool);
 						if (lib.config.touchscreen) return;
 						if (lib.config.mousewheel) {
@@ -1174,7 +950,7 @@ export class Library extends Uninstantable {
 					name: '开发者模式',
 					intro: '开启后可使用浏览器控制台控制游戏，同时可更新到开发版',
 					init: false,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('dev', bool);
 						if (_status.connectMode) return;
 						if (bool) {
@@ -1215,7 +991,7 @@ export class Library extends Uninstantable {
 						coding: 'URC',
 						github: 'GitHub',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('update_link', item);
 						lib.updateURL = lib.updateURLS[item] || lib.updateURLS.coding;
 					},
@@ -1231,7 +1007,7 @@ export class Library extends Uninstantable {
 					name: '添加获取扩展地址',
 					clear: true,
 					unfrequent: true,
-					onclick: function () {
+					onclick() {
 						game.prompt('请输入地址名称', function (str) {
 							if (str) {
 								var map = lib.config.extension_sources;
@@ -1279,7 +1055,7 @@ export class Library extends Uninstantable {
 					name: '删除当前扩展地址',
 					clear: true,
 					unfrequent: true,
-					onclick: function () {
+					onclick() {
 						var bool = false, map = lib.config.extension_sources;
 						for (var i in map) {
 							if (i != lib.config.extension_source) {
@@ -1612,7 +1388,7 @@ export class Library extends Uninstantable {
 							}
 						}
 					},
-					onclick: function (layout) {
+					onclick(layout) {
 						if (lib.layoutfixed.includes(lib.config.mode)) {
 							game.saveConfig('layout', layout);
 						}
@@ -1653,7 +1429,7 @@ export class Library extends Uninstantable {
 				//      			'7':'七人',
 				//      			'8':'八人',
 				//     },
-				//     onclick:function(item){
+				//     onclick(item){
 				//      			game.saveConfig('fewplayer',item);
 				//      			if(ui.arena) ui.arena.setNumber(ui.arena.dataset.number);
 				//     }
@@ -1667,7 +1443,7 @@ export class Library extends Uninstantable {
 						default: '中',
 						long: '高',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('player_height', item);
 						ui.arena.dataset.player_height = item;
 					}
@@ -1681,7 +1457,7 @@ export class Library extends Uninstantable {
 						default: '中',
 						long: '高',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('player_height_nova', item);
 						// if(item=='auto'){
 						// 	if(parseInt(ui.arena.dataset.number)>=7){
@@ -1703,7 +1479,7 @@ export class Library extends Uninstantable {
 				// 		blue:'蓝色',
 				// 		black:'黑色',
 				// 	},
-				// 	onclick:function(color){
+				// 	onclick(color){
 				// 		game.saveConfig('background_color_music',color);
 				// 		document.body.dataset.background_color_music=color;
 				// 	}
@@ -1715,7 +1491,7 @@ export class Library extends Uninstantable {
 				// 		blue:'蓝色',
 				// 		black:'黑色',
 				// 	},
-				// 	onclick:function(color){
+				// 	onclick(color){
 				// 		game.saveConfig('background_color_wood',color);
 				// 		document.body.dataset.background_color_wood=color;
 				// 	}
@@ -1727,7 +1503,7 @@ export class Library extends Uninstantable {
 				// 		blue:'蓝色',
 				// 		black:'黑色',
 				// 	},
-				// 	onclick:function(color){
+				// 	onclick(color){
 				// 		game.saveConfig('theme_color_music',color);
 				// 		document.body.dataset.theme_color_music=color;
 				// 	}
@@ -1748,7 +1524,7 @@ export class Library extends Uninstantable {
 						eeebig: '180%',
 						eeeebig: '200%',
 					},
-					onclick: function (zoom) {
+					onclick(zoom) {
 						game.saveConfig('ui_zoom', zoom);
 						switch (zoom) {
 							case 'esmall': zoom = 0.8; break;
@@ -1871,7 +1647,7 @@ export class Library extends Uninstantable {
 							node.style.backgroundSize = 'cover';
 						}
 					},
-					onclick: function (background, node) {
+					onclick(background, node) {
 						if (node && node.firstChild) {
 							var menu = node.parentNode;
 							if (node.firstChild.innerHTML == get.verticalStr('隐藏')) {
@@ -1927,7 +1703,7 @@ export class Library extends Uninstantable {
 				image_background_random: {
 					name: '随机背景',
 					init: false,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('image_background_random', bool);
 						lib.init.background();
 					}
@@ -1935,7 +1711,7 @@ export class Library extends Uninstantable {
 				image_background_blur: {
 					name: '背景模糊',
 					init: false,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('image_background_blur', bool);
 						if (lib.config.image_background_blur) {
 							ui.background.style.filter = 'blur(8px)';
@@ -1952,7 +1728,7 @@ export class Library extends Uninstantable {
 				phonelayout: {
 					name: '触屏布局',
 					init: false,
-					onclick: function (bool) {
+					onclick(bool) {
 						if (get.is.nomenu('phonelayout', bool)) return false;
 						game.saveConfig('phonelayout', bool);
 						if (get.is.phoneLayout()) {
@@ -1981,7 +1757,7 @@ export class Library extends Uninstantable {
 						'300000': '五分钟',
 					},
 					intro: '游戏每进行一段时间自动为一个随机角色更换皮肤',
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('change_skin_auto', item);
 						clearTimeout(_status.skintimeout);
 						if (item != 'off') {
@@ -2084,7 +1860,7 @@ export class Library extends Uninstantable {
 							});
 						}
 					},
-					onclick: function (layout) {
+					onclick(layout) {
 						game.saveConfig('card_style', layout);
 						var style = ui.css.card_style;
 						ui.css.card_style = lib.init.css(lib.assetURL + 'theme/style/card', lib.config.card_style);
@@ -2215,7 +1991,7 @@ export class Library extends Uninstantable {
 							});
 						}
 					},
-					onclick: function (layout) {
+					onclick(layout) {
 						game.saveConfig('cardback_style', layout);
 						var style = ui.css.cardback_style;
 						ui.css.cardback_style = lib.init.css(lib.assetURL + 'theme/style/cardback', lib.config.cardback_style);
@@ -2370,7 +2146,7 @@ export class Library extends Uninstantable {
 							getDB(1);
 						}
 					},
-					onclick: function (layout) {
+					onclick(layout) {
 						game.saveConfig('hp_style', layout);
 						var style = ui.css.hp_style;
 						ui.css.hp_style = lib.init.css(lib.assetURL + 'theme/style/hp', lib.config.hp_style);
@@ -2528,7 +2304,7 @@ export class Library extends Uninstantable {
 							});
 						}
 					},
-					onclick: function (layout) {
+					onclick(layout) {
 						game.saveConfig('player_style', layout);
 						if (ui.css.player_stylesheet) {
 							ui.css.player_stylesheet.remove();
@@ -2654,7 +2430,7 @@ export class Library extends Uninstantable {
 							});
 						}
 					},
-					onclick: function (layout) {
+					onclick(layout) {
 						game.saveConfig('border_style', layout);
 						if (ui.css.border_stylesheet) {
 							ui.css.border_stylesheet.remove();
@@ -2724,7 +2500,7 @@ export class Library extends Uninstantable {
 						normal: '中',
 						wide: '宽'
 					},
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('player_border', item);
 						if (item != 'wide' || game.layout == 'long' || game.layout == 'long2') {
 							ui.arena.classList.add('slim_player');
@@ -2840,7 +2616,7 @@ export class Library extends Uninstantable {
 							});
 						}
 					},
-					onclick: function (layout) {
+					onclick(layout) {
 						game.saveConfig('menu_style', layout);
 						if (ui.css.menu_stylesheet) {
 							ui.css.menu_stylesheet.remove();
@@ -2955,7 +2731,7 @@ export class Library extends Uninstantable {
 							});
 						}
 					},
-					onclick: function (layout) {
+					onclick(layout) {
 						game.saveConfig('control_style', layout);
 						if (ui.css.control_stylesheet) {
 							ui.css.control_stylesheet.remove();
@@ -2995,7 +2771,7 @@ export class Library extends Uninstantable {
 					name: '自定义按钮高度',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						if (bool !== 'skip') {
 							game.saveConfig('custom_button', bool);
 						}
@@ -3042,7 +2818,7 @@ export class Library extends Uninstantable {
 						'5x': '5px',
 					},
 					unfrequent: true,
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('custom_button_system_top', item);
 						lib.configMenu.appearence.config.custom_button.onclick('skip');
 					}
@@ -3064,7 +2840,7 @@ export class Library extends Uninstantable {
 						'5x': '5px',
 					},
 					unfrequent: true,
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('custom_button_system_bottom', item);
 						lib.configMenu.appearence.config.custom_button.onclick('skip');
 					}
@@ -3086,7 +2862,7 @@ export class Library extends Uninstantable {
 						'5x': '5px',
 					},
 					unfrequent: true,
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('custom_button_control_top', item);
 						lib.configMenu.appearence.config.custom_button.onclick('skip');
 					}
@@ -3108,7 +2884,7 @@ export class Library extends Uninstantable {
 						'5x': '5px',
 					},
 					unfrequent: true,
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('custom_button_control_bottom', item);
 						lib.configMenu.appearence.config.custom_button.onclick('skip');
 					}
@@ -3123,7 +2899,7 @@ export class Library extends Uninstantable {
 						increase: '增大',
 					},
 					unfrequent: true,
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('radius_size', item);
 						ui.window.dataset.radius_size = item;
 					}
@@ -3139,7 +2915,7 @@ export class Library extends Uninstantable {
 						green: '绿色',
 						purple: '紫色',
 					},
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('glow_phase', bool);
 						lib.init.cssstyles();
 					}
@@ -3172,7 +2948,7 @@ export class Library extends Uninstantable {
 					intro: '在暂停或打开菜单时开启模糊效果',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('blur_ui', bool);
 						if (bool) {
 							ui.window.classList.add('blur_ui');
@@ -3187,7 +2963,7 @@ export class Library extends Uninstantable {
 					intro: '为游戏主题打开玻璃效果（手机暂不支持）',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('glass_ui', bool);
 						if (bool) {
 							ui.window.classList.add('glass_ui');
@@ -3252,7 +3028,7 @@ export class Library extends Uninstantable {
 						shake: '抖动',
 					},
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('target_shake', bool);
 						ui.arena.dataset.target_shake = bool;
 					}
@@ -3262,7 +3038,7 @@ export class Library extends Uninstantable {
 					intro: '角色被翻面时显示“翻面”',
 					init: true,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('turned_style', bool);
 						if (bool) {
 							ui.arena.classList.remove('hide_turned');
@@ -3282,7 +3058,7 @@ export class Library extends Uninstantable {
 						rotate: '横置',
 						mark: '标记'
 					},
-					onclick: function (style) {
+					onclick(style) {
 						var list = [];
 						for (var i = 0; i < game.players.length; i++) {
 							if (game.players[i].isLinked()) {
@@ -3318,7 +3094,7 @@ export class Library extends Uninstantable {
 						default: '默认',
 						oblong: '长方',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						var linked = false;
 						if (game.me && game.me.isLinked()) {
 							linked = true;
@@ -3355,7 +3131,7 @@ export class Library extends Uninstantable {
 						image: '图片',
 						off: '禁用',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('cardtempname', item);
 						if (!game.me || !game.me.getCards) return;
 						var hs = game.me.getCards('h');
@@ -3383,7 +3159,7 @@ export class Library extends Uninstantable {
 						image:'图片',
 						text:'文字',
 					},
-					onclick:function(item){
+					onclick(item){
 						game.saveConfig('textequip',item);
 						if(item=='text'&&(game.layout=='long'||game.layout=='mobile')){
 							ui.arena.classList.add('textequip');
@@ -3422,7 +3198,7 @@ export class Library extends Uninstantable {
 						auto: '自动',
 						pointer: '固定'
 					},
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('cursor_style', item);
 						if (item == 'pointer') {
 							ui.window.classList.add('nopointer');
@@ -3443,7 +3219,7 @@ export class Library extends Uninstantable {
 						}
 						node.style.fontSize = '20px';
 					},
-					onclick: function (font) {
+					onclick(font) {
 						game.saveConfig('name_font', font);
 						lib.init.cssstyles();
 					}
@@ -3459,7 +3235,7 @@ export class Library extends Uninstantable {
 						}
 						node.style.fontSize = '20px';
 					},
-					onclick: function (font) {
+					onclick(font) {
 						game.saveConfig('identity_font', font);
 						lib.init.cssstyles();
 					}
@@ -3475,7 +3251,7 @@ export class Library extends Uninstantable {
 						}
 						node.style.fontSize = '20px';
 					},
-					onclick: function (font) {
+					onclick(font) {
 						game.saveConfig('cardtext_font', font);
 						lib.init.cssstyles();
 					}
@@ -3494,7 +3270,7 @@ export class Library extends Uninstantable {
 						}
 						node.style.fontSize = '20px';
 					},
-					onclick: function (font) {
+					onclick(font) {
 						game.saveConfig('global_font', font);
 						lib.init.cssstyles();
 					}
@@ -3504,7 +3280,7 @@ export class Library extends Uninstantable {
 					init: true,
 					unfrequent: true,
 					intro: '使用全角字符的花色替代系统自带的花色（重启游戏后生效）',
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('suits_font', bool);
 					}
 				},
@@ -3700,7 +3476,7 @@ export class Library extends Uninstantable {
 						left: '靠左',
 						right: '靠右',
 					},
-					onclick: function (bool) {
+					onclick(bool) {
 						if (lib.config.show_history == 'right') ui.window.addTempClass('rightbar2');
 						game.saveConfig('show_history', bool);
 						if (_status.video || !_status.prepareArena) return;
@@ -3734,7 +3510,7 @@ export class Library extends Uninstantable {
 						center: '居中',
 						right: '靠右',
 					},
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_log', bool);
 						if (lib.config.show_log != 'off') {
 							ui.arenalog.style.display = '';
@@ -3763,7 +3539,7 @@ export class Library extends Uninstantable {
 					intro: '在屏幕顶部显示当前时间',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_time', bool);
 						if (bool) {
 							ui.time.style.display = '';
@@ -3778,7 +3554,7 @@ export class Library extends Uninstantable {
 					intro: '在触屏按钮处显示当前时间',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_time2', bool);
 						if (bool) {
 							ui.roundmenu.classList.add('clock');
@@ -3796,7 +3572,7 @@ export class Library extends Uninstantable {
 						none: '默认',
 						simple: '简约',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('watchface', item);
 						ui.roundmenu.dataset.watchface = item;
 					}
@@ -3810,7 +3586,7 @@ export class Library extends Uninstantable {
 					name: '显示状态栏',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_statusbar', bool);
 						if (window.StatusBar && lib.device == 'android') {
 							if (bool) {
@@ -3834,7 +3610,7 @@ export class Library extends Uninstantable {
 						auto: '自动',
 						off: '关闭'
 					},
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_statusbar_ios', bool);
 						if (window.StatusBar && lib.device == 'ios') {
 							if (bool != 'off' && bool != 'auto') {
@@ -3902,7 +3678,7 @@ export class Library extends Uninstantable {
 					name: '显示触屏按钮',
 					init: true,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						if (get.is.nomenu('show_round_menu', bool)) return false;
 						game.saveConfig('show_round_menu', bool);
 						if (bool && ui.roundmenu) {
@@ -3919,7 +3695,7 @@ export class Library extends Uninstantable {
 					intro: '重新开始后触屏按钮将保存的上一局的位置',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('remember_round_button', bool);
 						if (!bool) {
 							ui.click.resetround();
@@ -3931,7 +3707,7 @@ export class Library extends Uninstantable {
 					intro: '移动对话框后新的对话框也将在移动后的位置显示',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('remember_dialog', bool);
 						if (!bool) {
 							if (ui.dialog) {
@@ -3954,7 +3730,7 @@ export class Library extends Uninstantable {
 					name: '堆叠对话框虚化',
 					init: false,
 					intro: '当具有static属性的对话框堆叠（如五谷丰登对话框中提示无懈可击）时，将后方的对话框变为半透明',
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('transparent_dialog', bool);
 						if (bool) {
 							for (var i = 0; i < ui.dialogs.length; i++) {
@@ -3977,7 +3753,7 @@ export class Library extends Uninstantable {
 					init: false,
 					intro: '仅供娱乐，重启后生效',
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_rarity', bool);
 					}
 				},
@@ -4073,7 +3849,7 @@ export class Library extends Uninstantable {
 					name: '显示角色名称',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_name', bool);
 						if (bool) {
 							ui.arena.classList.remove('hide_name');
@@ -4099,7 +3875,7 @@ export class Library extends Uninstantable {
 					name: '显示重来按钮',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_replay', bool);
 						if (lib.config.show_replay) {
 							ui.replay.style.display = '';
@@ -4113,7 +3889,7 @@ export class Library extends Uninstantable {
 					name: '显示身份按钮',
 					init: true,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_playerids', bool);
 						if (lib.config.show_playerids) {
 							ui.playerids.style.display = '';
@@ -4127,7 +3903,7 @@ export class Library extends Uninstantable {
 					name: '显示整理手牌按钮',
 					init: true,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_sortcard', bool);
 						if (lib.config.show_sortcard) {
 							ui.sortCard.style.display = '';
@@ -4141,7 +3917,7 @@ export class Library extends Uninstantable {
 					name: '显示暂停按钮',
 					init: true,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_pause', bool);
 						if (lib.config.show_pause) {
 							ui.pause.style.display = '';
@@ -4155,7 +3931,7 @@ export class Library extends Uninstantable {
 					name: '显示托管按钮',
 					init: true,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_auto', bool);
 						if (lib.config.show_auto) {
 							ui.auto.style.display = '';
@@ -4169,7 +3945,7 @@ export class Library extends Uninstantable {
 					name: '显示音量按钮',
 					init: true,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_volumn', bool);
 						if (lib.config.show_volumn) {
 							ui.volumn.style.display = '';
@@ -4183,7 +3959,7 @@ export class Library extends Uninstantable {
 					name: '显示牌堆按钮',
 					init: true,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_cardpile', bool);
 						if (bool) {
 							ui.cardPileButton.style.display = '';
@@ -4197,7 +3973,7 @@ export class Library extends Uninstantable {
 					name: '显示剩余牌数',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_cardpile_number', bool);
 						if (bool) {
 							ui.cardPileNumber.style.display = '';
@@ -4211,7 +3987,7 @@ export class Library extends Uninstantable {
 					name: '显示手牌按钮',
 					init: true,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_handcardbutton', bool);
 					}
 				},
@@ -4219,7 +3995,7 @@ export class Library extends Uninstantable {
 					name: '显示投降按钮',
 					init: true,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_giveup', bool);
 					}
 				},
@@ -4228,7 +4004,7 @@ export class Library extends Uninstantable {
 					intro: '在右上角显示不询问无懈',
 					init: false,
 					unfrequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('show_wuxie', bool);
 						if (lib.config.show_wuxie) {
 							ui.wuxie.style.display = '';
@@ -4362,7 +4138,7 @@ export class Library extends Uninstantable {
 					item: {
 						music_default: '默认',
 					},
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('background_music', item);
 						game.playBackgroundMusic();
 					}
@@ -4403,7 +4179,7 @@ export class Library extends Uninstantable {
 						'7': '七',
 						'8': '八',
 					},
-					onclick: function (volume) {
+					onclick(volume) {
 						game.saveConfig('volumn_audio', parseInt(volume));
 					}
 				},
@@ -4421,7 +4197,7 @@ export class Library extends Uninstantable {
 						'7': '七',
 						'8': '八',
 					},
-					onclick: function (volume) {
+					onclick(volume) {
 						game.saveConfig('volumn_background', parseInt(volume));
 						ui.backgroundMusic.volume = volume / 8;
 					}
@@ -4429,7 +4205,7 @@ export class Library extends Uninstantable {
 				clear_background_music: {
 					name: '清除自定义背景音乐',
 					clear: true,
-					onclick: function () {
+					onclick() {
 						if (confirm('是否清除已导入的所有自定义背景音乐？（该操作不可撤销！）')) {
 							for (var i in lib.config.customBackgroundMusic) {
 								lib.config.all.background_music.remove(i);
@@ -4479,7 +4255,7 @@ export class Library extends Uninstantable {
 			config: {
 				// reset_database:{
 				// 	name:'重置游戏',
-				// 	onclick:function(){
+				// 	onclick(){
 				// 		var node=this;
 				// 		if(node._clearing){
 				// 			if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
@@ -4503,7 +4279,7 @@ export class Library extends Uninstantable {
 				// },
 				reset_game: {
 					name: '重置游戏设置',
-					onclick: function () {
+					onclick() {
 						var node = this;
 						if (node._clearing) {
 							var noname_inited = localStorage.getItem('noname_inited');
@@ -4537,7 +4313,7 @@ export class Library extends Uninstantable {
 				},
 				reset_hiddenpack: {
 					name: '重置隐藏内容',
-					onclick: function () {
+					onclick() {
 						if (this.firstChild.innerHTML != '已重置') {
 							this.firstChild.innerHTML = '已重置';
 							game.saveConfig('hiddenModePack', []);
@@ -4560,7 +4336,7 @@ export class Library extends Uninstantable {
 				},
 				reset_tutorial: {
 					name: '重置新手向导',
-					onclick: function () {
+					onclick() {
 						if (this.firstChild.innerHTML != '已重置') {
 							this.firstChild.innerHTML = '已重置';
 							game.saveConfig('new_tutorial', false);
@@ -4576,7 +4352,7 @@ export class Library extends Uninstantable {
 				},
 				import_data: {
 					name: '导入游戏设置',
-					onclick: function () {
+					onclick() {
 						ui.import_data_button.classList.toggle('hidden');
 					},
 					clear: true
@@ -4589,7 +4365,7 @@ export class Library extends Uninstantable {
 				},
 				export_data: {
 					name: '导出游戏设置',
-					onclick: function () {
+					onclick() {
 						var data;
 						var export_data = function (data) {
 							game.export(lib.init.encode(JSON.stringify(data)), '无名杀 - 数据 - ' + (new Date()).toLocaleString());
@@ -4619,7 +4395,7 @@ export class Library extends Uninstantable {
 				},
 				redownload_game: {
 					name: '重新下载游戏',
-					onclick: function () {
+					onclick() {
 						var node = this;
 						if (node._clearing) {
 							localStorage.removeItem('noname_inited');
@@ -4651,7 +4427,7 @@ export class Library extends Uninstantable {
 				}
 				// trim_game:{
 				// 	name:'隐藏非官方扩展包',
-				// 	onclick:function(){
+				// 	onclick(){
 				// 		if(this.innerHTML!='已隐藏'){
 				// 			this.innerHTML='已隐藏';
 				//      						 var pack=lib.config.all.cards.slice(0);
@@ -4827,7 +4603,7 @@ export class Library extends Uninstantable {
 			hide: {
 				name: '隐藏此扩展',
 				clear: true,
-				onclick: function () {
+				onclick() {
 					if (this.firstChild.innerHTML == '隐藏此扩展') {
 						this.firstChild.innerHTML = '此扩展将在重启后隐藏';
 						lib.config.hiddenPlayPack.add('cardpile');
@@ -4894,7 +4670,7 @@ export class Library extends Uninstantable {
 			hide: {
 				name: '隐藏此扩展',
 				clear: true,
-				onclick: function () {
+				onclick() {
 					if (this.firstChild.innerHTML == '隐藏此扩展') {
 						this.firstChild.innerHTML = '此扩展将在重启后隐藏';
 						lib.config.hiddenPlayPack.add('boss');
@@ -4935,7 +4711,7 @@ export class Library extends Uninstantable {
 			hide: {
 				name: '隐藏此扩展',
 				clear: true,
-				onclick: function () {
+				onclick() {
 					if (this.firstChild.innerHTML == '隐藏此扩展') {
 						this.firstChild.innerHTML = '此扩展将在重启后隐藏';
 						lib.config.hiddenPlayPack.add('wuxing');
@@ -4957,7 +4733,7 @@ export class Library extends Uninstantable {
 				name: '开启',
 				init: false,
 				restart: true,
-				onclick: function (bool) {
+				onclick(bool) {
 					if (bool) {
 						lib.config.plays.add('coin');
 					}
@@ -4979,7 +4755,7 @@ export class Library extends Uninstantable {
 					symbol: '符号',
 					text: '文字'
 				},
-				onclick: function (item) {
+				onclick(item) {
 					game.saveConfig('coin_display_playpackconfig', item);
 					if (game.changeCoin) game.changeCoin(0);
 				}
@@ -4987,7 +4763,7 @@ export class Library extends Uninstantable {
 			canvas: {
 				name: '特效置顶',
 				init: false,
-				onclick: function (bool) {
+				onclick(bool) {
 					game.saveConfig('coin_canvas_playpackconfig', bool);
 					if (bool) {
 						ui.window.classList.add('canvas_top');
@@ -5000,7 +4776,7 @@ export class Library extends Uninstantable {
 			hide: {
 				name: '隐藏此扩展',
 				clear: true,
-				onclick: function () {
+				onclick() {
 					if (this.firstChild.innerHTML == '隐藏此扩展') {
 						this.firstChild.innerHTML = '此扩展将在重启后隐藏';
 						lib.config.hiddenPlayPack.add('coin');
@@ -5441,7 +5217,7 @@ export class Library extends Uninstantable {
 						always: '始终'
 					},
 					init: 'off',
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('auto_identity', bool, this._link.config.mode);
 						if (get.config('identity_mode') == 'zhong') return;
 						var num;
@@ -5482,7 +5258,7 @@ export class Library extends Uninstantable {
 				free_choose: {
 					name: '自由选将',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('free_choose', bool, this._link.config.mode);
 						if (get.mode() != this._link.config.mode || !_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (!ui.cheat2 && get.config('free_choose')) ui.create.cheat2();
@@ -5495,7 +5271,7 @@ export class Library extends Uninstantable {
 				change_identity: {
 					name: '自由选择身份和座位',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('change_identity', bool, this._link.config.mode);
 						if (get.mode() != 'identity' || !_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						var dialog;
@@ -5511,7 +5287,7 @@ export class Library extends Uninstantable {
 				change_choice: {
 					name: '开启换将卡',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('change_choice', bool, this._link.config.mode);
 						if (get.mode() != 'identity' || !_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (!ui.cheat && get.config('change_choice')) ui.create.cheat();
@@ -5547,7 +5323,7 @@ export class Library extends Uninstantable {
 				continue_game: {
 					name: '显示再战',
 					init: false,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('continue_game', bool, this._link.config.mode);
 						if (get.config('continue_game') && get.mode() == 'identity') {
 							if (!ui.continue_game && _status.over && !_status.brawl && !game.no_continue_game) {
@@ -5564,7 +5340,7 @@ export class Library extends Uninstantable {
 				dierestart: {
 					name: '死亡后显示重来',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('dierestart', bool, this._link.config.mode);
 						if (get.config('dierestart') && get.mode() == 'identity') {
 							if (!ui.restart && game.me.isDead() && !_status.connectMode) {
@@ -5580,7 +5356,7 @@ export class Library extends Uninstantable {
 				revive: {
 					name: '死亡后显示复活',
 					init: false,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('revive', bool, this._link.config.mode);
 						if (get.config('revive') && get.mode() == 'identity') {
 							if (!ui.revive && game.me.isDead()) {
@@ -5909,7 +5685,7 @@ export class Library extends Uninstantable {
 						random: '随机播放',
 					},
 					init: 'rewrite',
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('aozhan_bgm', item, this._link.config.mode);
 						if (_status._aozhan == true) game.playBackgroundMusic();
 					},
@@ -5976,7 +5752,7 @@ export class Library extends Uninstantable {
 				free_choose: {
 					name: '自由选将',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('free_choose', bool, this._link.config.mode);
 						if (get.mode() != this._link.config.mode || !_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (!ui.cheat2 && get.config('free_choose')) ui.create.cheat2();
@@ -5995,7 +5771,7 @@ export class Library extends Uninstantable {
 				change_identity: {
 					name: '自由选择座位',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('change_identity', bool, this._link.config.mode);
 						if (get.mode() != 'guozhan' || !_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						var dialog;
@@ -6011,7 +5787,7 @@ export class Library extends Uninstantable {
 				change_choice: {
 					name: '开启换将卡',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('change_choice', bool, this._link.config.mode);
 						if (get.mode() != 'guozhan' || !_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (!ui.cheat && get.config('change_choice')) ui.create.cheat();
@@ -6035,7 +5811,7 @@ export class Library extends Uninstantable {
 					name: '显示再战',
 					init: true,
 					intro: '游戏结束后可选择用相同的武将再进行一局游戏',
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('continue_game', bool, this._link.config.mode);
 						if (get.config('continue_game') && get.mode() == 'guozhan') {
 							if (!ui.continue_game && _status.over && !_status.brawl && !game.no_continue_game) {
@@ -6051,7 +5827,7 @@ export class Library extends Uninstantable {
 				dierestart: {
 					name: '死亡后显示重来',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('dierestart', bool, this._link.config.mode);
 						if (get.config('dierestart') && get.mode() == 'guozhan') {
 							if (!ui.restart && game.me.isDead() && !_status.connectMode) {
@@ -6067,7 +5843,7 @@ export class Library extends Uninstantable {
 				revive: {
 					name: '死亡后显示复活',
 					init: false,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('revive', bool, this._link.config.mode);
 						if (get.config('revive') && get.mode() == 'guozhan') {
 							if (!ui.revive && game.me.isDead()) {
@@ -6360,7 +6136,7 @@ export class Library extends Uninstantable {
 					name: '自由选将',
 					init: true,
 					frequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('free_choose', bool, this._link.config.mode);
 						if (!ui.create.cheat2) return;
 						if (get.mode() != this._link.config.mode || !_status.event.getParent().showConfig && !_status.event.showConfig) return;
@@ -6378,7 +6154,7 @@ export class Library extends Uninstantable {
 				change_identity: {
 					name: '自由选择座位',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('change_identity', bool, this._link.config.mode);
 						if (!_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (_status.mode == 'four') {
@@ -6413,7 +6189,7 @@ export class Library extends Uninstantable {
 				change_choice: {
 					name: '开启换将卡',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('change_choice', bool, this._link.config.mode);
 						if (!_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (!ui.cheat && get.config('change_choice')) ui.create.cheat();
@@ -6474,7 +6250,7 @@ export class Library extends Uninstantable {
 				// },
 				ladder_reset: {
 					name: '重置天梯数据',
-					onclick: function () {
+					onclick() {
 						var node = this;
 						if (node._clearing) {
 							game.save('ladder', {
@@ -6505,7 +6281,7 @@ export class Library extends Uninstantable {
 				edit_character_three: {
 					name: '编辑统率将池',
 					clear: true,
-					onclick: function () {
+					onclick() {
 						if (get.mode() != 'versus') {
 							alert('请进入对决模式，然后再编辑将池');
 							return;
@@ -6589,7 +6365,7 @@ export class Library extends Uninstantable {
 					name: '重置统率将池',
 					intro: '将统率三军模式下的将池重置为默认将池',
 					clear: true,
-					onclick: function () {
+					onclick() {
 						if (confirm('该操作不可撤销！是否清除统率三军模式的自定义将池，并将其重置为默认将池？')) {
 							game.saveConfig('character_three', null, 'versus');
 							alert('将池已重置');
@@ -6599,7 +6375,7 @@ export class Library extends Uninstantable {
 				edit_character_four: {
 					name: '编辑4v4将池',
 					clear: true,
-					onclick: function () {
+					onclick() {
 						if (get.mode() != 'versus') {
 							alert('请进入对决模式，然后再编辑将池');
 							return;
@@ -6683,7 +6459,7 @@ export class Library extends Uninstantable {
 					name: '重置4v4将池',
 					intro: '将4v4模式下的将池重置为默认将池',
 					clear: true,
-					onclick: function () {
+					onclick() {
 						if (confirm('该操作不可撤销！是否清除4v4模式的自定义将池，并将其重置为默认将池？')) {
 							game.saveConfig('character_four', null, 'versus');
 							alert('将池已重置');
@@ -6705,7 +6481,7 @@ export class Library extends Uninstantable {
 					init: 'caocao',
 					item: {},
 					frequent: true,
-					onclick: function (item) {
+					onclick(item) {
 						game.saveConfig('connect_avatar', item);
 						game.saveConfig('connect_avatar', item, 'connect');
 					}
@@ -6719,7 +6495,7 @@ export class Library extends Uninstantable {
 					name: '联机大厅按钮',
 					init: true,
 					frequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('hall_button', bool, 'connect');
 						if (ui.hall_button) {
 							if (bool) {
@@ -6752,7 +6528,7 @@ export class Library extends Uninstantable {
 					name: '自由选将',
 					init: true,
 					frequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('free_choose', bool, this._link.config.mode);
 						if (get.mode() != this._link.config.mode || !_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (!ui.cheat2 && get.config('free_choose')) ui.create.cheat2();
@@ -6765,7 +6541,7 @@ export class Library extends Uninstantable {
 				change_choice: {
 					name: '开启换将卡',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('change_choice', bool, this._link.config.mode);
 						if (!_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (!ui.cheat && get.config('change_choice')) ui.create.cheat();
@@ -6780,7 +6556,7 @@ export class Library extends Uninstantable {
 					name: '单人控制',
 					init: true,
 					frequent: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('single_control', bool, this._link.config.mode);
 						if (ui.single_swap && game.me != game.boss) {
 							if (bool) {
@@ -6923,7 +6699,7 @@ export class Library extends Uninstantable {
 				free_choose: {
 					name: '自由选将',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('free_choose', bool, this._link.config.mode);
 						if (get.mode() != this._link.config.mode || !_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (!ui.cheat2 && get.config('free_choose')) ui.create.cheat2();
@@ -6936,7 +6712,7 @@ export class Library extends Uninstantable {
 				change_identity: {
 					name: '自由选择身份和座位',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('change_identity', bool, this._link.config.mode);
 						if (!_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						var dialog;
@@ -6952,7 +6728,7 @@ export class Library extends Uninstantable {
 				change_choice: {
 					name: '开启换将卡',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('change_choice', bool, this._link.config.mode);
 						if (!_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (!ui.cheat && get.config('change_choice')) ui.create.cheat();
@@ -6975,7 +6751,7 @@ export class Library extends Uninstantable {
 				continue_game: {
 					name: '显示再战',
 					init: false,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('continue_game', bool, this._link.config.mode);
 						if (get.config('continue_game')) {
 							if (!ui.continue_game && _status.over && !_status.brawl && !game.no_continue_game) {
@@ -6992,7 +6768,7 @@ export class Library extends Uninstantable {
 				dierestart: {
 					name: '死亡后显示重来',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('dierestart', bool, this._link.config.mode);
 						if (get.config('dierestart')) {
 							if (!ui.restart && game.me.isDead() && !_status.connectMode) {
@@ -7008,7 +6784,7 @@ export class Library extends Uninstantable {
 				revive: {
 					name: '死亡后显示复活',
 					init: false,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('revive', bool, this._link.config.mode);
 						if (get.config('revive')) {
 							if (!ui.revive && game.me.isDead()) {
@@ -7050,7 +6826,7 @@ export class Library extends Uninstantable {
 				edit_character: {
 					name: '编辑将池',
 					clear: true,
-					onclick: function () {
+					onclick() {
 						if (get.mode() != 'doudizhu') {
 							alert('请进入斗地主模式，然后再编辑将池');
 							return;
@@ -7145,7 +6921,7 @@ export class Library extends Uninstantable {
 					name: '重置将池',
 					intro: '将智斗三国模式下的将池重置为默认将池',
 					clear: true,
-					onclick: function () {
+					onclick() {
 						if (confirm('该操作不可撤销！是否清除智斗三国模式的自定义将池，并将其重置为默认将池？')) {
 							game.saveConfig('character_online', null, 'doudizhu');
 							alert('将池已重置');
@@ -7164,9 +6940,11 @@ export class Library extends Uninstantable {
 						normal: '新1v1',
 						dianjiang: '点将单挑',
 						changban: '血战长坂坡',
+						wuxianhuoli: '无限火力',
 					},
 					restart: true,
 					frequent: true,
+					intro: '血战长坂坡和无限火力模式详见帮助',
 				},
 				connect_enable_jin: {
 					name: '启用晋势力武将',
@@ -7174,12 +6952,24 @@ export class Library extends Uninstantable {
 					restart: true,
 					frequent: true,
 				},
+				connect_change_card: {
+					name: '启用手气卡',
+					init: false,
+					frequent: true,
+					restart: true,
+				},
 				update: function (config, map) {
 					if (config.connect_single_mode != 'normal') {
 						map.connect_enable_jin.hide();
 					}
 					else {
 						map.connect_enable_jin.show();
+					}
+					if (config.connect_single_mode != 'wuxianhuoli') {
+						map.connect_change_card.hide();
+					}
+					else {
+						map.connect_change_card.show();
 					}
 				},
 			},
@@ -7191,9 +6981,11 @@ export class Library extends Uninstantable {
 						normal: '新1v1',
 						dianjiang: '点将单挑',
 						changban: '血战长坂坡',
+						wuxianhuoli: '无限火力',
 					},
 					restart: true,
 					frequent: true,
+					intro: '血战长坂坡和无限火力模式详见帮助',
 				},
 				enable_jin: {
 					name: '启用晋势力武将',
@@ -7201,12 +6993,28 @@ export class Library extends Uninstantable {
 					restart: true,
 					frequent: true,
 				},
+				change_card: {
+					name: '开启手气卡',
+					init: 'disabled',
+					item: {
+						disabled: '禁用',
+						once: '一次',
+						twice: '两次',
+						unlimited: '无限',
+					}
+				},
 				update: function (config, map) {
 					if (config.single_mode != 'normal') {
 						map.enable_jin.hide();
 					}
 					else {
 						map.enable_jin.show();
+					}
+					if (config.single_mode != 'wuxianhuoli') {
+						map.change_card.hide();
+					}
+					else {
+						map.change_card.show();
 					}
 				},
 			}
@@ -7275,7 +7083,7 @@ export class Library extends Uninstantable {
 				chess_leader_allcharacter: {
 					name: '启用全部角色',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						if (confirm('调整该设置将清除所有进度，是否继续？')) {
 							for (var i = 1; i < 6; i++) game.save('save' + i, null, 'chess');
 							game.saveConfig('chess_leader_allcharacter', bool, 'chess');
@@ -7287,7 +7095,7 @@ export class Library extends Uninstantable {
 				},
 				chess_leader_clear: {
 					name: '清除进度',
-					onclick: function () {
+					onclick() {
 						var node = this;
 						if (node._clearing) {
 							for (var i = 1; i < 6; i++) game.save('save' + i, null, 'chess');
@@ -7354,7 +7162,7 @@ export class Library extends Uninstantable {
 				free_choose: {
 					name: '自由选将',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('free_choose', bool, this._link.config.mode);
 						if (get.mode() != this._link.config.mode || !_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (!ui.cheat2 && get.config('free_choose')) ui.create.cheat2();
@@ -7367,7 +7175,7 @@ export class Library extends Uninstantable {
 				change_choice: {
 					name: '开启换将卡',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('change_choice', bool, this._link.config.mode);
 						if (!_status.event.getParent().showConfig && !_status.event.showConfig) return;
 						if (!ui.cheat && get.config('change_choice')) ui.create.cheat();
@@ -7601,7 +7409,7 @@ export class Library extends Uninstantable {
 						'8': '八人',
 						'10': '十人',
 					},
-					onclick: function (num) {
+					onclick(num) {
 						game.saveConfig('battle_number', num, this._link.config.mode);
 						if (_status.connectMode) return;
 						if (!_status.event.getParent().showConfig && !_status.event.showConfig) return;
@@ -7636,7 +7444,7 @@ export class Library extends Uninstantable {
 				free_choose: {
 					name: '自由选将',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('free_choose', bool, this._link.config.mode);
 						if (_status.connectMode) return;
 						if (get.mode() != this._link.config.mode || !_status.event.getParent().showConfig && !_status.event.showConfig) return;
@@ -7650,7 +7458,7 @@ export class Library extends Uninstantable {
 				change_choice: {
 					name: '开启换将卡',
 					init: true,
-					onclick: function (bool) {
+					onclick(bool) {
 						game.saveConfig('change_choice', bool, this._link.config.mode);
 						if (_status.connectMode) return;
 						if (!_status.event.getParent().showConfig && !_status.event.showConfig) return;
@@ -7714,6 +7522,7 @@ export class Library extends Uninstantable {
 			'<li>搏击：若一名角色拥有带有“搏击”的技能，则当该搏击技能触发时，若本次技能的目标角色在你攻击范围内，且你在其攻击范围内，则你执行技能主体效果时，同时额外执行“搏击”后的额外效果。' +
 			'<li>游击：若一名角色拥有带有“游击”的技能，则当该游击技能执行至“游击”处时，若本次技能的目标角色在你的攻击范围内，且你不在其攻击范围内，则你可以执行“游击”后的额外效果。' +
 			'<li>激昂：一名角色发动“昂扬技”标签技能后，此技能失效，直至从此刻至满足此技能“激昂”条件后。' +
+			'<li>历战：一名角色的回合结束时，若本回合发动过拥有历战效果的技能，则对此技能效果的进行等同于发动次数的永久可叠加式升级或修改。' +
 			''
 	};
 	/**
@@ -9830,7 +9639,7 @@ export class Library extends Uninstantable {
 		 * @param {string} skill
 		 * @returns {boolean}
 		 */
-		filterTrigger: function (event, player, triggername, skill) {
+		filterTrigger: function (event, player, triggername, skill, indexedData) {
 			if (player._hookTrigger && player._hookTrigger.some(i => {
 				const info = lib.skill[i].hookTrigger;
 				return info && info.block && info.block(event, player, triggername, skill);
@@ -9853,7 +9662,7 @@ export class Library extends Uninstantable {
 				if (Array.isArray(info.trigger[role])) return info.trigger[role].includes(triggername);
 				return info.trigger[role] == triggername;
 			})) return false;
-			if (info.filter && !info.filter(event, player, triggername)) return false;
+			if (info.filter && !info.filter(event, player, triggername, indexedData)) return false;
 			if (event._notrigger.includes(player) && !lib.skill.global.includes(skill)) return false;
 			if (typeof info.usable == 'number' && player.hasSkill('counttrigger') &&
 				player.storage.counttrigger && player.storage.counttrigger[skill] >= info.usable) return false;
@@ -10396,7 +10205,7 @@ export class Library extends Uninstantable {
 			return (Math.random() - 0.5);
 		},
 		seat: function (a, b) {
-			var player = lib.tempSortSeat || _status.event.player;
+			var player = lib.tempSortSeat || _status.event.player || game.me || game.players[0];
 			var delta = get.distance(player, a, 'absolute') - get.distance(player, b, 'absolute');
 			if (delta) return delta;
 			delta = parseInt(a.dataset.position) - parseInt(b.dataset.position);
@@ -10545,18 +10354,21 @@ export class Library extends Uninstantable {
 				}), player, _status.event) && player.storage.stratagem_fury >= cost.get(availableName));
 			},
 			viewAs: (cards, player) => {
-				const cardName = get.name(cards[0], player);
-				return cardName ? new lib.element.VCard({
-					name: cardName,
-					nature: get.nature(cards[0], player),
-					suit: get.suit(cards[0], player),
-					number: get.number(cards[0], player),
-					isCard: true,
-					cards: [cards[0]],
-					storage: {
-						stratagem_buffed: 1
-					}
-				}) : new lib.element.VCard();
+				if(cards.length){
+					const cardName = get.name(cards[0], player);
+					return cardName ? new lib.element.VCard({
+						name: cardName,
+						nature: get.nature(cards[0], player),
+						suit: get.suit(cards[0], player),
+						number: get.number(cards[0], player),
+						isCard: true,
+						cards: [cards[0]],
+						storage: {
+							stratagem_buffed: 1
+						}
+					}) : new lib.element.VCard();
+				}
+				return null;
 			},
 			prompt: () => {
 				const span = document.createElement('span');
@@ -11498,7 +11310,10 @@ export class Library extends Uninstantable {
 				}
 			}
 		},
-		_recovercheck: {
+		/**
+		 * @deprecated
+		 */
+		/*_recovercheck: {
 			trigger: { player: 'recoverBefore' },
 			forced: true,
 			priority: 100,
@@ -11511,7 +11326,7 @@ export class Library extends Uninstantable {
 			content: function () {
 				trigger.cancel();
 			},
-		},
+		},*/
 		/**
 		 * @deprecated
 		 */
@@ -11868,7 +11683,8 @@ export class Library extends Uninstantable {
 	static cardPile = {};
 	static message = {
 		server: {
-			init: function (version, config, banned_info) {
+			/** @this { any } */
+			init(version, config, banned_info) {
 				if (lib.node.banned.includes(banned_info)) {
 					this.send('denied', 'banned');
 				}
@@ -11934,13 +11750,15 @@ export class Library extends Uninstantable {
 					this.send('init', this.id, lib.configOL, game.ip, window.isNonameServer, game.roomId);
 				}
 			},
-			inited: function () {
+			/** @this { any } */
+			inited() {
 				this.inited = true;
 				if (_status.waitingForPlayer) {
 					game.updateWaiting();
 				}
 			},
-			reinited: function () {
+			/** @this { any } */
+			reinited() {
 				this.inited = true;
 			},
 			result: function (result) {

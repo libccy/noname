@@ -2688,6 +2688,13 @@ div:not(.handcards)>.card>.info>span,
 	background: rgba(63, 119, 173,1);
 	border: 1px solid rgba(63, 119, 173, 1);
 }
+.hp[data-condition="hidden"]>div:not(.lost):not(.shield) {
+	background-image:url('../../theme/style/hp/image/hidden_hp.png') !important;
+	width: 12px;
+	height: 12px;
+	background-size: 100% 100%;
+	box-shadow: none;
+}
 .hp[data-condition="high"]>div:not(.lost):not(.shield) {
 	background: rgba(57, 123, 4,1);
 	border: 1px solid rgba(39, 79, 7, 1);
@@ -5558,10 +5565,28 @@ div[data-decoration="bronze"]::after{
 	}
 }
 /*--------其它--------*/
-::-webkit-scrollbar {
+/* 解放下拉框滚动条！ */
+:not(select)::-webkit-scrollbar {
 	display: none;
 }
-/* 火狐隐藏滚动条 */
-* {
+/* 火狐和chrome120+隐藏滚动条 */
+:not(select) {
 	scrollbar-width: none;
+}
+/* 更新进度条 */
+progress.progress {
+	width: 75%;
+	height: 10px;
+	border: 2px solid;
+	border-radius: 15px;
+	vertical-align: middle;
+	-webkit-appearance: none;
+}
+progress.progress::-webkit-progress-bar {
+	background: rgb(239, 239, 239);
+	border-radius: 0.2rem;
+}
+progress.progress::-webkit-progress-value {
+	border-radius: 0.2rem;
+	background: rgb(0, 117, 255);
 }

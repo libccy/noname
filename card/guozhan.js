@@ -435,7 +435,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					player.logSkill('taipingyaoshu');
 					player.draw(2);
 					'step 1'
-					if(player.hp>1||get.mode()=='guozhan') player.loseHp();
+					if(player.hp>1) player.loseHp();
 				}
 			},
 			yuxi:{
@@ -1095,30 +1095,42 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					target.chooseToDiscard(2,'he',true).ai=get.disvalue;
 				},
 				ai:{
-					wuxie:function(){
+					wuxie: function () {
 						return 0;
 					},
-					basic:{
-						useful:3,
-						value:3,
-						order:5
+					basic: {
+						order: 9,
+						useful: 1.5,
+						value: 3
 					},
-					result:{
-						target:function(player,target){
-							var hs=target.getCards('h');
-							if(hs.length<=1){
-								if(target==player&&(hs.length==0||hs[0].name=='yiyi')){
-									return 0;
+					result: {
+						target(player, target) {
+							let i,
+								add = 0,
+								y = 1,
+								tars = 0;
+							if (!ui.selected.cards) y = 0;
+							if (ui.selected.targets) tars = 0.01 * ui.selected.targets.length;
+							else tars = 0;
+							if (target == player) i = player.countCards('h', function (card) {
+								if (y > 0 && ui.selected.cards.includes(card)) return false;
+								if (!y && get.name(card) === 'yiyi') {
+									y = -1;
+									return false;
 								}
-								return 0.3;
-							}
-							return Math.sqrt(target.countCards('he'));
-						},
+								return true;
+							});
+							else i = target.countCards('he');
+							if (target.hasSkillTag('noh')) add++;
+							return add + Math.sqrt(i / 3.6 + tars) / 2;
+						}
 					},
-					tag:{
-						loseCard:1,
-						discard:1,
-						norepeat:1
+					tag: {
+						draw: 2,
+						loseCard: 2,
+						discard: 2,
+						multitarget: true,
+						norepeat: 1
 					}
 				},
 			},
@@ -1843,7 +1855,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 			feilongduofeng_info:'①当你使用【杀】指定目标后，你可令目标角色弃置一张牌。②当你因使用【杀】而令其他角色进入濒死状态时，你可以获得其一张手牌。',
 			taipingyaoshu:'太平要术',
 			taipingyaoshu_info:'锁定技。①当你即将受到属性伤害时，取消之。②你的手牌上限+X（X为场上势力数-1）。③当你失去装备区里的【太平要术】时，你摸两张牌，然后若你的体力值大于1，你失去1点体力。',
-			taipingyaoshu_info_guozhan:'锁定技。①当你即将受到属性伤害时，取消之。②你的手牌上限+X（X为与你势力相同的角色数）。③当你失去装备区里的【太平要术】时，你摸两张牌，然后你失去1点体力。',
+			taipingyaoshu_info_guozhan:'锁定技。①当你即将受到属性伤害时，取消之。②你的手牌上限+X（X为与你势力相同的角色数）。③当你失去装备区里的【太平要术】时，你摸两张牌，然后若你的体力值大于1，你失去1点体力。',
 			yuxi_skill:'玉玺',
 			yuxi_skill2:'玉玺',
 			yuxi:'玉玺',

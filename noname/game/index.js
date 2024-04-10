@@ -212,7 +212,15 @@ export class Game extends Uninstantable {
 		return id;
 	}
 	/**
+	 * @typedef {import("../library/hooks/interface.js").NonameHookType} NonameHookType
+	 */
+	/**
 	 * 通用的调用钩子函数
+	 * 
+	 * @template {NonameHookType} HookType
+	 * @template {keyof HookType} Name
+	 * @param {Name} name
+	 * @param {Parameters<HookType[Name]>} args 
 	 */
 	static callHook(name, args) {
 		const callHook = () => {
@@ -1901,44 +1909,61 @@ export class Game extends Uninstantable {
 		return name;
 	}
 	/**
-	 * @param { string } directory 
-	 * @param { Function } [successCallback] 
-	 * @param { Function } [errorCallback]
+	 * 下载文件
+	 * @type { undefined | ((url: string, folder: string, onsuccess?: Function, onerror?: (e: Error) => void) => void, dev?: 'nodev', onprogress?: Function) => void) }
 	 */
-	static createDir(directory, successCallback, errorCallback) {
-		const paths = directory.split('/').reverse();
-		if (window.resolveLocalFileSystemURL) return new Promise((resolve, reject) => window.resolveLocalFileSystemURL(nonameInitialized, resolve, reject)).then(directoryEntry => {
-			const redo = entry => new Promise((resolve, reject) => entry.getDirectory(paths.pop(), {
-				create: true
-			}, resolve, reject)).then(resolvedDirectoryEntry => {
-				if (paths.length) return redo(resolvedDirectoryEntry);
-				if (typeof successCallback == 'function') successCallback();
-			});
-			return redo(directoryEntry);
-		}, reason => {
-			if (typeof errorCallback != 'function') return Promise.reject(reason);
-			errorCallback(reason);
-		});
-		const fs = require("fs");
-		let path = __dirname;
-		const redo = () => {
-			path += `/${paths.pop()}`;
-			return new Promise(resolve => fs.exists(path, resolve)).then(exists => {
-				//不存在此目录
-				if (!exists) return new Promise(resolve => fs.mkdir(path, resolve));
-			}).then(() => {
-				if (paths.length) return redo();
-				if (typeof successCallback == 'function') successCallback();
-			});
-		};
-		return redo();
-	}
+	static download;
+	/**
+	 * 读取文件为arraybuffer
+	 * @type { undefined | ((filename: string, callback?: (data: Buffer | ArrayBuffer) => any, onerror?: (e: Error) => void) => void) }
+	 */
+	static readFile;
+	/**
+	 * 读取文件为文本
+	 * @type { undefined | ((filename: string, callback?: (data: string) => any, onerror?: (e: Error) => void) => void) }
+	 */
+	static readFileAsText;
+	/**
+	 * 将数据写入文件
+	 * @type { undefined | ((data: File | ArrayBuffer, path: string, name: string, callback?: (e: Error) => void) => void) }
+	 */
+	static writeFile;
+	/**
+	 * 移除文件
+	 * @type { undefined | ((filename: string, callback?: (e: Error) => void) => void) }
+	 */
+	static removeFile;
+	/**
+	 * 获取文件列表
+	 * @type { undefined | ((dir: string, success: (folders: string[], files: string[]) => any, failure: (e: Error) => void) => void) }
+	 */
+	static getFileList;
+	/**
+	 * 按路径依次创建文件夹
+	 * @type { undefined | ((list: string | string[], callback: Function, file?: boolean) => void) }
+	 */
+	static ensureDirectory;
+	/**
+	 * 创建文件夹
+	 * @type { undefined | ((directory: string, successCallback?: Function, errorCallback?: Function) => void) }
+	 */
+	static createDir;
+	/**
+	 * 删除文件夹
+	 * @type { undefined | ((directory: string, successCallback?: Function, errorCallback?: Function) => void) }
+	 */
+	static removeDir;
+	/**
+	 * @type { (forcecheck?: boolean | null, dev?: boolean) => Promise<any> } 
+	 */
+	static checkForUpdate;
+	/**
+	 * @type { () => Promise<any> } 
+	 */
+	static checkForAssetUpdate;
 	static async importExtension(data, finishLoad, exportExtension, extensionPackage) {
-		//by 来瓶可乐加冰、Rintim、Tipx-L
-		if (!window.JSZip)
-			await new Promise((resolve, reject) => lib.init.js(`${lib.assetURL}game`, "jszip", resolve, reject));
-
-		const zip = new JSZip();
+		//by 来瓶可乐加冰、Rintim、Tipx-L、诗笺
+		const zip = await get.promises.zip();
 		if (get.objtype(data) == 'object') {
 			//导出
 			const _filelist = data._filelist, filelist2 = _filelist || [];
@@ -4302,7 +4327,7 @@ export class Game extends Uninstantable {
 	 * @param { GameEventPromise } event 
 	 * @returns { GameEventPromise }
 	 */
-	static createTrigger(name, skill, player, event) {
+	static createTrigger(name, skill, player, event, indexedData) {
 		let info = get.info(skill);
 		if (!info) return false;
 		if ((player.isOut() || player.removed) && !info.forceOut) return;
@@ -4314,6 +4339,7 @@ export class Game extends Uninstantable {
 		next.forceDie = true;
 		next.includeOut = true;
 		next._trigger = event;
+		next.indexedData = indexedData;
 		next.setContent('createTrigger');
 		return next;
 	}
@@ -4473,6 +4499,7 @@ export class Game extends Uninstantable {
 		packagename = packagename || extname;
 		let packname = 'mode_extension_' + packagename;
 		lib.cardPack[packname] = [];
+		lib.cardPackInfo[packname] = pack;
 		lib.translate[packname + '_card_config'] = packagename;
 		for (let i in pack) {
 			if (i == 'mode' || i == 'forbid') continue;
@@ -4707,22 +4734,7 @@ export class Game extends Uninstantable {
 			game.saveConfigValue('extensionInfo');
 		}
 		if (!game.download || keepFile) return;
-		if (lib.node && lib.node.fs) try {
-			const deleteFolderRecursive = path => {
-				if (!lib.node.fs.existsSync(path)) return;
-				lib.node.fs.readdirSync(path).forEach((file, index) => {
-					const currentPath = `${path}/${file}`;
-					if (lib.node.fs.lstatSync(currentPath).isDirectory()) deleteFolderRecursive(currentPath);
-					else lib.node.fs.unlinkSync(currentPath);
-				});
-				lib.node.fs.rmdirSync(path);
-			};
-			deleteFolderRecursive(`${__dirname}/extension/${extensionName}`);
-		}
-			catch (error) {
-				console.error(error);
-			}
-		else new Promise((resolve, reject) => window.resolveLocalFileSystemURL(`${nonameInitialized}extension/${extensionName}`, resolve, reject)).then(directoryEntry => directoryEntry.removeRecursively());
+		game.promises.removeDir(`${nonameInitialized}extension/${extensionName}`).catch(console.error);
 	}
 	static addRecentCharacter() {
 		let list = get.config('recentCharacter') || [];
@@ -5945,7 +5957,7 @@ export class Game extends Uninstantable {
 		if (!event.forced && !event.fakeforce && get.noSelected()) confirm += 'c';
 		if (event.isMine()) game.Check.confirm(event, confirm);
 
-		game.callHook("checkEnd", [event, { ok, auto, auto_confirm }]);
+		game.callHook("checkEnd", [event, { ok, auto, auto_confirm, autoConfirm: auto_confirm }]);
 
 		// if (ui.confirm && ui.confirm.lastChild.link == 'cancel') {
 		// 	if (_status.event.type == 'phase' && !_status.event.skill) {

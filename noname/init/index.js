@@ -19,7 +19,7 @@ export function canUseHttpProtocol() {
 	// 如果是http了就不用
 	if (location.protocol.startsWith('http')) return false;
 	// 首次启动不更新(即还没进行过新手教程)
-	if (!lib.config.new_tutorial) return false;
+	if (!config.get('new_tutorial')) return false;
 	if (typeof nonameInitialized == 'string') {
 		// 手机端
 		if (window.cordova) {
@@ -110,9 +110,9 @@ export async function boot() {
 	// 现在不暴露到全局变量里了，直接传给onload
 	const resetGameTimeout = setTimeout(lib.init.reset, configLoadTime ? parseInt(configLoadTime) : 10000);
 
-	if (Reflect.has(window, 'cordovaLoadTimeout')) {
-		clearTimeout(Reflect.get(window, 'cordovaLoadTimeout'));
-		Reflect.deleteProperty(window, 'cordovaLoadTimeout');
+	if (typeof window.cordovaLoadTimeout != 'undefined') {
+		clearTimeout(window.cordovaLoadTimeout);
+		delete window.cordovaLoadTimeout;
 	}
 
 	for (const link of document.head.querySelectorAll('link')) {
@@ -134,18 +134,6 @@ export async function boot() {
 	setWindowListener();
 	const promiseErrorHandler = await setOnError();
 
-	// 无名杀更新日志
-	if (window.noname_update) {
-		Reflect.set(lib, 'version', window.noname_update.version);
-		lib.changeLog = window.noname_update.changeLog;
-		if (window.noname_update.players) {
-			lib.changeLog.push('players://' + JSON.stringify(window.noname_update.players));
-		}
-		if (window.noname_update.cards) {
-			lib.changeLog.push('cards://' + JSON.stringify(window.noname_update.cards));
-		}
-		delete window.noname_update;
-	}
 	// 确认手机端平台
 	const noname_inited = localStorage.getItem('noname_inited');
 	if (noname_inited && noname_inited !== 'nodejs') {
@@ -178,7 +166,7 @@ export async function boot() {
 	}
 	else {
 		Reflect.set(lib, 'path', (await import('../library/path.js')).default)
-		if (Reflect.has(lib, 'device')) {
+		if (typeof lib.device != 'undefined') {
 			const script = document.createElement('script')
 			script.src = 'cordova.js'
 			document.body.appendChild(script)
@@ -195,7 +183,7 @@ export async function boot() {
 			//但这种方式只允许修改game的文件读写函数。
 			if (typeof window.initReadWriteFunction == 'function') {
 				const g = {}
-				const ReadWriteFunctionName = ['download', 'readFile', 'readFileAsText', 'writeFile', 'removeFile', 'getFileList', 'ensureDirectory', 'createDir']
+				const ReadWriteFunctionName = ['download', 'readFile', 'readFileAsText', 'writeFile', 'removeFile', 'getFileList', 'ensureDirectory', 'createDir', 'removeDir']
 				ReadWriteFunctionName.forEach(prop => {
 					Object.defineProperty(g, prop, {
 						configurable: true,
@@ -330,7 +318,7 @@ export async function boot() {
 		lib.configMenu.appearence.config.image_background.item.default = '默认';
 	}
 	if (pack.music) {
-		if (Reflect.has(lib, 'device') || typeof window.require === 'function') {
+		if (typeof lib.device != 'undefined' || typeof window.require === 'function') {
 			lib.configMenu.audio.config.background_music.item.music_custom = '自定义音乐';
 		}
 		config.get('all').background_music = ['music_default'];
@@ -381,7 +369,7 @@ export async function boot() {
 	if ('ontouchstart' in document) {
 		if (!config.get('totouched')) {
 			game.saveConfig('totouched', true);
-			if (Reflect.has(lib, 'device')) {
+			if (typeof lib.device != 'undefined') {
 				game.saveConfig('low_performance', true);
 				game.saveConfig('confirm_exit', true);
 				game.saveConfig('touchscreen', true);
@@ -453,20 +441,18 @@ export async function boot() {
 				//lib.init.onload=backup_onload;
 				_status.evaluatingExtension = false;
 			}
-			else if (config.get('mode') != 'connect' || (!localStorage.getItem(lib.configprefix + 'directstart') && show_splash)) {
+			else {
 				extensionlist.push(config.get('extensions')[name]);
 			}
 		}
 	}
 	else {
-		if (config.get('mode') != 'connect' || (!localStorage.getItem(lib.configprefix + 'directstart') && show_splash)) {
-			for (var name = 0; name < config.get('extensions').length; name++) {
-				if (Reflect.get(window, 'bannedExtensions').includes(config.get('extensions')[name])) {
-					continue;
-				}
-				// @ts-ignore
-				game.import('extension', { name: config.get('extensions')[name] });
+		for (var name = 0; name < config.get('extensions').length; name++) {
+			if (Reflect.get(window, 'bannedExtensions').includes(config.get('extensions')[name])) {
+				continue;
 			}
+			// @ts-ignore
+			game.import('extension', { name: config.get('extensions')[name] });
 		}
 	}
 
@@ -497,6 +483,44 @@ export async function boot() {
 		lib.init.background();
 	}
 	delete _status.htmlbg;
+
+	// 无名杀更新日志
+	if (window.noname_update) {
+		Reflect.set(lib, 'version', window.noname_update.version);
+		// 更全面的更新内容
+		if (config.get(`version_description_v${window.noname_update.version}`)) {
+			try {
+				const description = config.get(`version_description_v${window.noname_update.version}`);
+				const html = String.raw;
+				// 匹配[xx](url)的格式
+				const regex = /\[([^\]]*)\]\(([^)]+)\)/g;
+				lib.changeLog.push(
+					html`
+						<div style="position: relative;width:50px;height:50px;border-radius:50px;background-image:url('${description.author.avatar_url}');background-size:cover;vertical-align:middle;"></div>
+						${description.author.login}于${description.published_at}发布
+					`.trim(),
+					description.body.replaceAll('\n', '<br/>').replace(regex, function (match, p1, p2) {
+						// p1 是链接文本，p2 是链接地址
+						return `<a href="${p2}">${p1}</a>`;
+					})
+				);
+			} catch (e) {
+				console.error(e);
+				lib.changeLog.push(...window.noname_update.changeLog);
+			}
+		}
+		// 原更新内容
+		else {
+			lib.changeLog.push(...window.noname_update.changeLog);
+		}
+		if (window.noname_update.players) {
+			lib.changeLog.push('players://' + JSON.stringify(window.noname_update.players));
+		}
+		if (window.noname_update.cards) {
+			lib.changeLog.push('cards://' + JSON.stringify(window.noname_update.cards));
+		}
+		delete window.noname_update;
+	}
 
 	// 虽然但是，我就暴露个import，应该没啥问题
 	Reflect.set(window, 'game', {
@@ -550,7 +574,7 @@ export async function boot() {
 		Reflect.get(ui, 'css')[stylesName[i]] = stylesLoaded[i];
 	}
 
-	if (extensionlist.length && (config.get('mode') != 'connect' || show_splash)) {
+	if (extensionlist.length) {
 		_status.extensionLoading = [];
 		_status.extensionLoaded = [];
 
@@ -715,6 +739,7 @@ async function loadConfig() {
 	Reflect.set(lib, 'config', Reflect.get(window, 'config'));
 	Reflect.set(lib, 'configOL', {});
 	Reflect.deleteProperty(window, 'config');
+
 	let result;
 	if (localStorage.getItem(`${lib.configprefix}nodb`))
 		Reflect.set(window, 'nodb', true);
@@ -861,7 +886,7 @@ async function setOnError() {
 		if (tip) str += `\n错误提示: ${tip}`;
 		str += `\n行号: ${line}`;
 		str += `\n列号: ${column}`;
-		const version = Reflect.has(lib, 'version') ? Reflect.get(lib, 'version') : '';
+		const version = typeof lib.version != 'undefined' ? lib.version : '';
 		const reg = /[^\d.]/;
 		const match = version.match(reg) != null;
 		str += '\n' + `${match ? '游戏' : '无名杀'}版本: ${version || '未知版本'}`;
@@ -968,7 +993,7 @@ async function setOnError() {
 
 function setWindowListener() {
 	window.onkeydown = function (e) {
-		if (!Reflect.has(ui, 'menuContainer') || !Reflect.get(ui, 'menuContainer').classList.contains('hidden')) {
+		if (typeof ui.menuContainer == 'undefined' || !ui.menuContainer.classList.contains('hidden')) {
 			if (e.keyCode == 116 || ((e.ctrlKey || e.metaKey) && e.keyCode == 82)) {
 				if (e.shiftKey) {
 					if (confirm('是否重置游戏？')) {
@@ -991,15 +1016,15 @@ function setWindowListener() {
 				}
 			}
 			else if (e.keyCode == 83 && (e.ctrlKey || e.metaKey)) {
-				if (Reflect.has(window, 'saveNonameInput')) {
-					Reflect.get(window, 'saveNonameInput')();
+				if (typeof window.saveNonameInput == 'function') {
+					window.saveNonameInput();
 				}
 				e.preventDefault();
 				e.stopPropagation();
 				return false;
 			}
-			else if (e.keyCode == 74 && (e.ctrlKey || e.metaKey) && Reflect.has(lib, 'node')) {
-				Reflect.get(lib, 'node').debug();
+			else if (e.keyCode == 74 && (e.ctrlKey || e.metaKey) && typeof lib.node != 'undefined') {
+				lib.node.debug();
 			}
 		}
 		else {
@@ -1010,7 +1035,7 @@ function setWindowListener() {
 				dialogs[i].delete();
 			}
 			if (e.keyCode == 32) {
-				var node = Reflect.get(ui, 'window').querySelector('pausedbg');
+				var node = ui.window.querySelector('pausedbg');
 				if (node) {
 					node.click();
 				}
@@ -1019,15 +1044,14 @@ function setWindowListener() {
 				}
 			}
 			else if (e.keyCode == 65) {
-				if (Reflect.has(ui, 'auto'))
-					Reflect.get(ui, 'auto').click();
+				if (typeof ui.auto != 'undefined') ui.auto.click();
 			}
 			else if (e.keyCode == 87) {
-				if (Reflect.has(ui, 'wuxie') && Reflect.get(ui, 'wuxie').style.display != 'none') {
-					Reflect.get(ui, 'wuxie').classList.toggle('glow');
+				if (typeof ui.wuxie != 'undefined' && ui.wuxie.style.display != 'none') {
+					ui.wuxie.classList.toggle('glow');
 				}
-				else if (Reflect.has(ui, 'tempnowuxie')) {
-					Reflect.get(ui, 'tempnowuxie').classList.toggle('glow');
+				else if (typeof ui.tempnowuxie != 'undefined') {
+					ui.tempnowuxie.classList.toggle('glow');
 				}
 			}
 			else if (e.keyCode == 116 || ((e.ctrlKey || e.metaKey) && e.keyCode == 82)) {
@@ -1056,8 +1080,8 @@ function setWindowListener() {
 				e.stopPropagation();
 				return false;
 			}
-			else if (e.keyCode == 74 && (e.ctrlKey || e.metaKey) && Reflect.has(lib, 'node')) {
-				Reflect.get(lib, 'node').debug();
+			else if (e.keyCode == 74 && (e.ctrlKey || e.metaKey) && typeof lib.node != 'undefined') {
+				lib.node.debug();
 			}
 			// else if(e.keyCode==27){
 			// 	if(!ui.arena.classList.contains('paused')) ui.click.config();
