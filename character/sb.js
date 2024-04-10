@@ -887,7 +887,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									async content(event,trigger,player){
 										const target=event.targets[0];
 										const num=lib.skill.sbxingshang_use_backup.num;
-										player.removeMark('sbxingshang',num);
+										player.removeMark('sbxingshang',get.info('sbxingshang').getNum(num));
 										switch(num){
 											case 1:
 												if(target.isLinked()) target.link(false);
