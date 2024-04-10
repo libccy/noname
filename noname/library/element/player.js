@@ -5825,7 +5825,7 @@ export class Player extends HTMLDivElement {
 		};
 		return next;
 	}
-	recover() {
+	recover() { 
 		var next = game.createEvent('recover');
 		next.player = this;
 		var nocard, nosource;
@@ -5863,6 +5863,19 @@ export class Player extends HTMLDivElement {
 		}
 		next.setContent('recover');
 		return next;
+	}
+	recoverTo() {
+		const newArguments = [];
+		let num = 1;
+		for (var i = 0; i < arguments.length; i++) {
+			if (typeof arguments[i] === 'number') {
+				num = arguments[i] - this.getHp(true);
+				newArguments.push(num);
+			} else {
+				newArguments.push(arguments[i]);
+			} 
+		} 
+		if (num > 0) return this.recover(...newArguments);  
 	}
 	doubleDraw() {
 		if (get.is.changban()) return;
