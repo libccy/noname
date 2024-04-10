@@ -5939,6 +5939,19 @@ export class Player extends HTMLDivElement {
 		next.setContent('recover');
 		return next;
 	}
+	recoverTo() {
+		const newArguments = [];
+		let num = 1;
+		for (var i = 0; i < arguments.length; i++) {
+			if (typeof arguments[i] === 'number') {
+				num = arguments[i] - this.getHp(true);
+				newArguments.push(num);
+			} else {
+				newArguments.push(arguments[i]);
+			} 
+		} 
+		if (num > 0) return this.recover(...newArguments);  
+	}
 	doubleDraw() {
 		var next = game.createEvent('doubleDraw');
 		if (get.is.changban()) {
