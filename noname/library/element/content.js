@@ -5349,8 +5349,12 @@ export const Content = {
 		if (event.prompt2) {
 			event.dialog.addText(event.prompt2);
 		}
-		var expand_length = 0;
-		var directh = (!lib.config.unauto_choose && !event.complexSelect);
+		let expand_length = 0;
+		const cs = target.getCards(event.position);
+		const select = get.select(event.selectButton);
+		const directFilter = (event.forced && typeof event.filterOk != 'function' && typeof event.selectButton != 'function' && event.filterButton == lib.filter.all);
+		let directh = (!lib.config.unauto_choose && !event.isOnline() && select[0] == select[1] && (!event.complexSelect || select[1] === 1));
+		
 		for (var i = 0; i < event.position.length; i++) {
 			if (event.position[i] == 'h') {
 				var hs = target.getCards('h');
@@ -5431,9 +5435,7 @@ export const Content = {
 		if (event.dialog.buttons.length == 0) {
 			event.finish();
 			return;
-		} var directFilter = (event.forced && typeof event.filterOk != 'function' && typeof event.selectButton != 'function' && event.filterButton == lib.filter.all);
-		var cs = target.getCards(event.position);
-		var select = get.select(event.selectButton);
+		}
 		if (directFilter && select[0] >= cs.length) {
 			event.result = {
 				bool: true,
@@ -5441,7 +5443,7 @@ export const Content = {
 				links: cs
 			};
 		}
-		else if (directFilter && directh && !event.isOnline() && select[0] == select[1]) {
+		else if (directFilter && directh) {
 			event.result = {
 				bool: true,
 				buttons: event.dialog.buttons.randomGets(select[0]),
@@ -5524,8 +5526,12 @@ export const Content = {
 		if (event.prompt2) {
 			event.dialog.addText(event.prompt2);
 		}
-		var directh = (!lib.config.unauto_choose && !event.complexSelect);
-		var expand_length = 0;
+		let expand_length = 0;
+		const cs = target.getCards(event.position);
+		const select = get.select(event.selectButton);
+		const directFilter = (event.forced && typeof event.filterOk != 'function' && typeof event.selectButton != 'function' && event.filterButton == lib.filter.all);
+		let directh = (!lib.config.unauto_choose && !event.isOnline() && select[0] == select[1] && (!event.complexSelect || select[1] === 1));
+
 		for (var i = 0; i < event.position.length; i++) {
 			if (event.position[i] == 'h') {
 				var hs = target.getDiscardableCards(player, 'h');
@@ -5607,9 +5613,6 @@ export const Content = {
 			event.finish();
 			return;
 		}
-		var directFilter = (event.forced && typeof event.filterOk != 'function' && typeof event.selectButton != 'function' && event.filterButton == lib.filter.all);
-		var cs = target.getCards(event.position);
-		var select = get.select(event.selectButton);
 		if (directFilter && select[0] >= cs.length) {
 			event.result = {
 				bool: true,
@@ -5617,7 +5620,7 @@ export const Content = {
 				links: cs
 			};
 		}
-		else if (directFilter && directh && !event.isOnline() && select[0] == select[1]) {
+		else if (directFilter && directh) {
 			event.result = {
 				bool: true,
 				buttons: event.dialog.buttons.randomGets(select[0]),
@@ -5724,8 +5727,12 @@ export const Content = {
 		if (event.prompt2) {
 			event.dialog.addText(event.prompt2);
 		}
-		var expand_length = 0;
-		var directh = (!lib.config.unauto_choose && !event.complexSelect);
+		let expand_length = 0;
+		const cs = target.getCards(event.position);
+		const select = get.select(event.selectButton);
+		const directFilter = (event.forced && typeof event.filterOk != 'function' && typeof event.selectButton != 'function' && event.filterButton == lib.filter.all);
+		let directh = (!lib.config.unauto_choose && !event.isOnline() && select[0] == select[1] && (!event.complexSelect || select[1] === 1));
+
 		for (var i = 0; i < event.position.length; i++) {
 			if (event.position[i] == 'h') {
 				var hs = target.getGainableCards(player, 'h');
@@ -5808,9 +5815,6 @@ export const Content = {
 			event.finish();
 			return;
 		}
-		var cs = target.getCards(event.position);
-		var select = get.select(event.selectButton);
-		var directFilter = (event.forced && typeof event.filterOk != 'function' && typeof event.selectButton != 'function' && event.filterButton == lib.filter.all);
 		if (directFilter && select[0] >= cs.length) {
 			event.result = {
 				bool: true,
@@ -5818,7 +5822,7 @@ export const Content = {
 				links: cs
 			};
 		}
-		else if (directFilter && directh && !event.isOnline() && select[0] == select[1]) {
+		else if (directFilter && directh) {
 			event.result = {
 				bool: true,
 				buttons: event.dialog.buttons.randomGets(select[0]),
