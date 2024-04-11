@@ -1970,8 +1970,8 @@ export class Player extends HTMLDivElement {
 				m += info.globalTo;
 				n += info.globalTo;
 			}
-			if (info.attaclTo) {
-				m += info.attaclTo;
+			if (info.attackTo) {
+				m += info.attackTo;
 			}
 		}
 		return m <= range;
