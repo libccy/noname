@@ -2012,8 +2012,8 @@ export class Get extends Uninstantable {
 			if (info.globalTo) {
 				n += info.globalTo;
 			}
-			if (info.attaclTo) {
-				m += info.attaclTo;
+			if (info.attackTo) {
+				m += info.attackTo;
 			}
 		}
 		if (method == 'attack') {
@@ -2026,8 +2026,8 @@ export class Get extends Uninstantable {
 			// for(let i=0;i<equips2.length;i++){
 			// 	let info=get.info(equips2[i]).distance;
 			// 	if(!info) continue;
-			// 	if(info.attaclTo){
-			// 		m+=info.attaclTo;
+			// 	if(info.attackTo){
+			// 		m+=info.attackTo;
 			// 	}
 			// }
 			// return n;
