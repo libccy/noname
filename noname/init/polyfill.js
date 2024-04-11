@@ -1,8 +1,8 @@
-import { Get as get } from '../get/index.js';
-import { Library as lib } from '../library/index.js';
-import { Game as game } from '../game/index.js';
-import { status as _status } from '../status/index.js';
-import { UI as ui } from '../ui/index.js';
+import { get } from '../get/index.js';
+import { lib } from '../library/index.js';
+import { game } from '../game/index.js';
+import { _status } from '../status/index.js';
+import { ui } from '../ui/index.js';
 
 // 废弃覆盖原型的HTMLDivElement.prototype.animate
 // 改为HTMLDivElement.prototype.addTempClass

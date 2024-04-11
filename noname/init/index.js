@@ -1,16 +1,14 @@
 
-import { AI as ai } from '../ai/index.js';
-import { Get as get } from '../get/index.js';
-import { Library as lib } from '../library/index.js';
-import { Game as game } from '../game/index.js';
-import { status as _status } from '../status/index.js';
-import { UI as ui } from '../ui/index.js';
-
+import { ai } from '../ai/index.js';
+import { get } from '../get/index.js';
+import { lib } from '../library/index.js';
+import { game } from '../game/index.js';
+import { _status } from '../status/index.js';
+import { ui } from '../ui/index.js';
+import { gnc } from '../gnc/index.js';
 import { userAgent, nonameInitialized } from '../util/index.js';
 import * as config from '../util/config.js';
 import { promiseErrorHandlerMap } from '../util/browser.js';
-import { gnc } from '../gnc/index.js';
-
 import { importCardPack, importCharacterPack, importExtension, importMode } from './import.js';
 import { onload } from './onload.js';
 
