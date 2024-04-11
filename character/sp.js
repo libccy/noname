@@ -58,7 +58,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			ol_mengda:['male','shu',4,['olgoude']],
 			ol_wanglang:['male','wei',3,['gushe','oljici']],
 			ol_liuyan:['male','qun','4/6',['olpianan','olyinji','olkuisi']],
-			lushi:['female','qun',3,['olzhuyan','olleijie']],
+			lushi:['female','qun',3,['olzhuyan','releijie']],
 			zhangshiping:['male','shu',3,['olhongji','olxinggu']],
 			sunhong:['male','wu',3,['olxianbi','olzenrun']],
 			luoxian:['male','shu',4,['oldaili']],
@@ -5280,7 +5280,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					record:{
 						trigger:{
-							global:['phaseZhunbeiAfter','phaseBefore','enterGame'],
+							global:['phaseJieshuAfter','phaseBefore','enterGame'],
 						},
 						lastDo:true,
 						charlotte:true,
@@ -5349,6 +5349,49 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						target.damage(2,'thunder');
 					}
 				}
+			},
+			releijie:{
+				audio:'olleijie',
+				enable:'phaseUse',
+				filterTarget:true,
+				usable:1,
+				async content(event,trigger,player){
+					const target=event.target,result=await target.judge(card=>{
+						var number=get.number(card);
+						if(get.suit(card)=='spade'&&number>=2&&number<=9) return -4;
+						return 2;
+					}).set('judge2',result=>{
+						return result.bool===false?true:false;
+					}).forResult();
+					if(result.bool) await target.draw(2);
+					else{
+						const card=new lib.element.VCard({name:'sha',nature:'thunder'});
+						if(player.canUse(card,target,false)){
+							for(let i=1;i<=2;i++){
+								await player.useCard(card,target,false);
+							}
+						}
+					}
+				},
+				ai:{
+					order:1,
+					result:{
+						target(player,target){
+							let sgn=0,eff=0,num=get.attitude(player,target);
+							const card=new lib.element.VCard({name:'sha',nature:'thunder'});
+							game.countPlayer(current=>{
+								if(!current.hasSkillTag('rejudge')) return;
+								sgn=get.sgnAttitude(player,current);
+							});
+							if(sgn>0&&player.canUse(card,target,false)){
+								eff+=get.effect(target,card,player,player)*2;
+								return eff*get.sgn(num);
+							}
+							else if(sgn==0) return num*get.sgn(num);
+							return 0;
+						},
+					},
+				},
 			},
 			//张世平
 			olhongji:{
@@ -27637,9 +27680,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olxinggu_info:'①游戏开始时，你将牌堆中的三张坐骑牌扣置于武将牌上。②结束阶段，你可以将一张〖行贾①〗牌置于一名其他角色的装备区，然后你从牌堆获得一张♦牌。',
 			lushi:'卢氏',
 			olzhuyan:'驻颜',
-			olzhuyan_info:'每名角色每项各限一次。结束阶段，你可以令一名角色将以下一项调整至与其上一个准备阶段结束后相同：1.体力值；2.手牌数（体力值至多失去至1，手牌数至多摸至5；若其未执行过准备阶段则改为游戏开始时）。',
+			olzhuyan_info:'每名角色每项各限一次。结束阶段，你可以令一名角色将以下一项调整至与其上一个结束阶段结束后相同：1.体力值；2.手牌数（体力值至多失去至1，手牌数至多摸至5；若其未执行过准备阶段则改为游戏开始时）。',
 			olleijie:'雷劫',
 			olleijie_info:'准备阶段，你可以令一名角色判定，若结果为♠2~9，其受到2点雷电伤害，否则其摸两张牌。',
+			releijie:'雷劫',
+			releijie_info:'出牌阶段限一次，你可以令一名角色判定，若结果为黑桃2~9，则你视为依次对其使用两张雷【杀】，否则其摸两张牌。',
 			ol_liuyan:'OL刘焉',
 			ol_liuyan_prefix:'OL',
 			olpianan:'偏安',
