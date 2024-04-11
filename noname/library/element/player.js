@@ -1970,8 +1970,8 @@ export class Player extends HTMLDivElement {
 				m += info.globalTo;
 				n += info.globalTo;
 			}
-			if (info.attaclTo) {
-				m += info.attaclTo;
+			if (info.attackTo) {
+				m += info.attackTo;
 			}
 		}
 		return m <= range;
@@ -5938,6 +5938,19 @@ export class Player extends HTMLDivElement {
 		}
 		next.setContent('recover');
 		return next;
+	}
+	recoverTo() {
+		const newArguments = [];
+		let num = 1;
+		for (let i = 0; i < arguments.length; i++) {
+			if (typeof arguments[i] === 'number') {
+				num = arguments[i] - this.getHp(true);
+				newArguments.push(num);
+			} else {
+				newArguments.push(arguments[i]);
+			} 
+		} 
+		return this.recover(...newArguments);  
 	}
 	doubleDraw() {
 		var next = game.createEvent('doubleDraw');

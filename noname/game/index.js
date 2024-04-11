@@ -4657,8 +4657,14 @@ export class Game {
 	}
 	/**
 	 * @param { string } skill 
+	 * @param { lib.element.Player } player 
 	 */
-	removeGlobalSkill(skill) {
+	removeGlobalSkill(skill, player) {
+		const players = lib.skill.globalmap[skill];
+		if(player && Array.isArray(players)) {
+			lib.skill.globalmap[skill].remove(player);
+			if(players.length) return;
+		}
 		lib.skill.global.remove(skill);
 		delete lib.skill.globalmap[skill];
 		for (let i in lib.hook.globalskill) {
