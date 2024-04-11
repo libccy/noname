@@ -1,20 +1,18 @@
-import { userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../util/index.js";
-import { AI as ai } from '../ai/index.js';
-import { Game as game } from '../game/index.js';
-import { Library as lib } from '../library/index.js';
-import { status as _status } from '../status/index.js';
-import { UI as ui } from '../ui/index.js';
-import { GNC as gnc } from '../gnc/index.js';
-import { Get as get } from "./index.js";
+import { userAgent } from "../util/index.js";
+import { game } from '../game/index.js';
+import { lib } from '../library/index.js';
+import { _status } from '../status/index.js';
+import { ui } from '../ui/index.js';
+import { get } from "./index.js";
 
-export class Is extends Uninstantable {
+export class Is {
 	/**
 	 * 判断是否为进攻坐骑
 	 * @param { Card | VCard } card
 	 * @param { false | Player } [player]
 	 * @returns { boolean }
 	 */
-	static attackingMount(card, player) {
+	attackingMount(card, player) {
 		const subtype = get.subtype(card, player);
 		if (subtype == 'equip4') return true;
 		else if (subtype == 'equip6') {
@@ -30,7 +28,7 @@ export class Is extends Uninstantable {
 	 * @param { false | Player } [player]
 	 * @returns { boolean }
 	 */
-	static defendingMount(card, player) {
+	defendingMount(card, player) {
 		const subtype = get.subtype(card, player);
 		if (subtype == 'equip3') return true;
 		else if (subtype == 'equip6') {
@@ -44,7 +42,7 @@ export class Is extends Uninstantable {
 	 * 判断坐骑栏是否被合并
 	 * @returns { boolean }
 	 */
-	static mountCombined() {
+	mountCombined() {
 		if (lib.configOL.mount_combine) {
 			return lib.configOL.mount_combine;
 		}
@@ -58,7 +56,7 @@ export class Is extends Uninstantable {
 	 * @param {...} infos 要判断的属性列表
 	 * @param {boolean} every 是否判断每一个传入的属性是否完全相同而不是存在部分相同
 	 */
-	static sameNature() {
+	sameNature() {
 		let processedArguments = [], every = false;
 		Array.from(arguments).forEach(argument => {
 			if (typeof argument == 'boolean') every = argument;
@@ -90,7 +88,7 @@ export class Is extends Uninstantable {
 	 * @param ...infos 要判断的属性列表
 	 * @param every {boolean} 是否判断每一个传入的属性是否完全不同而不是存在部分不同
 	 */
-	static differentNature() {
+	differentNature() {
 		let processedArguments = [], every = false;
 		Array.from(arguments).forEach(argument => {
 			if (typeof argument == 'boolean') every = argument;
@@ -121,7 +119,7 @@ export class Is extends Uninstantable {
 	 * 判断一张牌是否为明置手牌
 	 * @param { Card } card
 	 */
-	static shownCard(card) {
+	shownCard(card) {
 		if (!card) return false;
 		const gaintag = card.gaintag;
 		return Array.isArray(gaintag) && gaintag.some(tag => tag.startsWith('visible_'));
@@ -131,7 +129,7 @@ export class Is extends Uninstantable {
 	 * @param { Card | VCard } card
 	 */
 	// @ts-ignore
-	static virtualCard(card) {
+	virtualCard(card) {
 		return (!("cards" in card) || !Array.isArray(card.cards) || card.cards.length === 0);
 	}
 	/**
@@ -139,7 +137,7 @@ export class Is extends Uninstantable {
 	 * @param { Card | VCard } card
 	 */
 	// @ts-ignore
-	static convertedCard(card) {
+	convertedCard(card) {
 		return !card.isCard && ("cards" in card) && Array.isArray(card.cards) && card.cards.length > 0;
 	}
 	/**
@@ -147,7 +145,7 @@ export class Is extends Uninstantable {
 	 * @param { Card | VCard } card
 	 */
 	// @ts-ignore
-	static ordinaryCard(card) {
+	ordinaryCard(card) {
 		return card.isCard && ("cards" in card) && Array.isArray(card.cards) && card.cards.length === 1
 	}
 	/**
@@ -155,7 +153,7 @@ export class Is extends Uninstantable {
 	 * @param { string } str1
 	 * @param { string } str2
 	 */
-	static yayun(str1, str2) {
+	yayun(str1, str2) {
 		if (str1 == str2) return true;
 		let pinyin1 = get.pinyin(str1, false), pinyin2 = get.pinyin(str2, false);
 		if (!pinyin1.length || !pinyin2.length) return false;
@@ -168,7 +166,7 @@ export class Is extends Uninstantable {
 	 * @param { Player } player 玩家
 	 * @returns
 	 */
-	static blocked(skill, player) {
+	blocked(skill, player) {
 		if (!player.storage.skill_blocker || !player.storage.skill_blocker.length) return false;
 		for (let i of player.storage.skill_blocker) {
 			if (lib.skill[i] && lib.skill[i].skillBlocker && lib.skill[i].skillBlocker(skill, player)) return true;
@@ -181,7 +179,7 @@ export class Is extends Uninstantable {
 	 * @param { string[] } array
 	 * @returns { boolean | string[] }
 	 */
-	static double(name, array) {
+	double(name, array) {
 		const extraInformations = get.character(name, 4);
 		if (!extraInformations) return false;
 		for (const extraInformation of extraInformations) {
@@ -196,11 +194,11 @@ export class Is extends Uninstantable {
 	 * 检测此牌是否具有应变条件
 	 * @param { Card | VCard } card
 	 */
-	static yingbianConditional(card) { return get.is.complexlyYingbianConditional(card) || get.is.simplyYingbianConditional(card) }
+	yingbianConditional(card) { return get.is.complexlyYingbianConditional(card) || get.is.simplyYingbianConditional(card) }
 	/**
 	 * @param { Card | VCard } card
 	 */
-	static complexlyYingbianConditional(card) {
+	complexlyYingbianConditional(card) {
 		for (const key of lib.yingbian.condition.complex.keys()) {
 			if (get.cardtag(card, `yingbian_${key}`)) return true;
 		}
@@ -209,7 +207,7 @@ export class Is extends Uninstantable {
 	/**
 	 * @param { Card | VCard } card
 	 */
-	static simplyYingbianConditional(card) {
+	simplyYingbianConditional(card) {
 		for (const key of lib.yingbian.condition.simple.keys()) {
 			if (get.cardtag(card, `yingbian_${key}`)) return true;
 		}
@@ -222,7 +220,7 @@ export class Is extends Uninstantable {
 	 *
 	 * @param { Card | VCard } card
 	 */
-	static yingbianEffective(card) {
+	yingbianEffective(card) {
 		for (const key of lib.yingbian.effect.keys()) {
 			if (get.cardtag(card, `yingbian_${key}`)) return true;
 		}
@@ -231,11 +229,11 @@ export class Is extends Uninstantable {
 	/**
 	 * @param { Card | VCard } card
 	 */
-	static yingbian(card) { return get.is.yingbianConditional(card) || get.is.yingbianEffective(card) }
+	yingbian(card) { return get.is.yingbianConditional(card) || get.is.yingbianEffective(card) }
 	/**
 	 * @param { string } [substring]
 	 */
-	static emoji(substring) {
+	emoji(substring) {
 		if (substring) {
 			const reg = new RegExp("[~#^$@%&!?%*]", 'g');
 			if (substring.match(reg)) {
@@ -284,23 +282,23 @@ export class Is extends Uninstantable {
 	/**
 	 * @param { string } str
 	 */
-	static banWords(str) { return get.is.emoji(str) || window.bannedKeyWords.some(item => str.includes(item)) }
+	banWords(str) { return get.is.emoji(str) || window.bannedKeyWords.some(item => str.includes(item)) }
 	/**
 	 * @param { GameEventPromise } event
 	 */
 	// @ts-ignore
-	static converted(event) { return !(event.card && event.card.isCard) }
-	static safari() { return userAgent.indexOf('safari') != -1 && userAgent.indexOf('chrome') == -1 }
+	converted(event) { return !(event.card && event.card.isCard) }
+	safari() { return userAgent.indexOf('safari') != -1 && userAgent.indexOf('chrome') == -1 }
 	/**
 	 * @param { (Card | VCard)[]} cards
 	 */
 	// @ts-ignore
-	static freePosition(cards) { return !cards.some(card => !card.hasPosition || card.hasPosition()) }
+	freePosition(cards) { return !cards.some(card => !card.hasPosition || card.hasPosition()) }
 	/**
 	 * @param { string } name
 	 * @param { boolean } item
 	 */
-	static nomenu(name, item) {
+	nomenu(name, item) {
 		const menus = ['system', 'menu'];
 		const configs = {
 			show_round_menu: lib.config.show_round_menu,
@@ -334,7 +332,7 @@ export class Is extends Uninstantable {
 		}
 		return true;
 	}
-	static altered(skillName) { return false; }
+	altered(skillName) { return false; }
 	/*
 	 skill=>{
 	 return false;
@@ -346,25 +344,25 @@ export class Is extends Uninstantable {
 	 * @param { any } obj
 	 * @returns { boolean }
 	 */
-	static node(obj) {
+	node(obj) {
 		return Object.prototype.toString.call(obj).startsWith('[object HTML');
 	}
 	/**
 	 * @param { any } obj
 	 */
-	static div(obj) { return Object.prototype.toString.call(obj) === '[object HTMLDivElement]' }
+	div(obj) { return Object.prototype.toString.call(obj) === '[object HTMLDivElement]' }
 	/**
 	 * @param { any } obj
 	 */
-	static map(obj) { return Object.prototype.toString.call(obj) === '[object Map]' }
+	map(obj) { return Object.prototype.toString.call(obj) === '[object Map]' }
 	/**
 	 * @param { any } obj
 	 */
-	static set(obj) { return Object.prototype.toString.call(obj) === '[object Set]' }
+	set(obj) { return Object.prototype.toString.call(obj) === '[object Set]' }
 	/**
 	 * @param { any } obj
 	 */
-	static object(obj) { return Object.prototype.toString.call(obj) === '[object Object]' }
+	object(obj) { return Object.prototype.toString.call(obj) === '[object Object]' }
 	/**
 	 * @overload
 	 * @param { Function } func
@@ -375,7 +373,7 @@ export class Is extends Uninstantable {
 	 * @param { number | [number, number] } func
 	 * @returns { boolean }
 	 */
-	static singleSelect(func) {
+	singleSelect(func) {
 		if (typeof func == 'function') return false;
 		const select = get.select(func);
 		return select[0] == 1 && select[1] == 1;
@@ -383,7 +381,7 @@ export class Is extends Uninstantable {
 	/**
 	 * @param { string | Player } name
 	 */
-	static jun(name) {
+	jun(name) {
 		if (get.mode() == 'guozhan') {
 			if (name instanceof lib.element.Player) {
 				if (name.isUnseen && name.isUnseen(0)) return false;
@@ -395,23 +393,23 @@ export class Is extends Uninstantable {
 		}
 		return false;
 	}
-	static versus() { return !_status.connectMode && get.mode() == 'versus' && _status.mode == 'three' }
-	static changban() { return get.mode() == 'single' && _status.mode == 'changban' }
-	static single() { return get.mode() == 'single' && _status.mode == 'normal' }
+	versus() { return !_status.connectMode && get.mode() == 'versus' && _status.mode == 'three' }
+	changban() { return get.mode() == 'single' && _status.mode == 'changban' }
+	single() { return get.mode() == 'single' && _status.mode == 'normal' }
 	/**
 	 * @param { Player } [player]
 	 */
-	static mobileMe(player) { return (game.layout == 'mobile' || game.layout == 'long') && !game.chess && player && player.dataset.position == '0' }
-	static newLayout() { return game.layout != 'default' }
-	static phoneLayout() {
+	mobileMe(player) { return (game.layout == 'mobile' || game.layout == 'long') && !game.chess && player && player.dataset.position == '0' }
+	newLayout() { return game.layout != 'default' }
+	phoneLayout() {
 		if (!lib.config.phonelayout) return false;
 		return (game.layout == 'mobile' || game.layout == 'long' || game.layout == 'long2' || game.layout == 'nova');
 	}
-	static singleHandcard() { return game.singleHandcard || game.layout == 'mobile' || game.layout == 'long' || game.layout == 'long2' || game.layout == 'nova' }
+	singleHandcard() { return game.singleHandcard || game.layout == 'mobile' || game.layout == 'long' || game.layout == 'long2' || game.layout == 'nova' }
 	/**
 	 * @param { Player } player
 	 */
-	static linked2(player) {
+	linked2(player) {
 		if (game.chess) return true;
 		if (lib.config.link_style2 != 'rotate') return true;
 		// if(game.chess) return false;
@@ -424,17 +422,17 @@ export class Is extends Uninstantable {
 	/**
 	 * @param { {} } obj
 	 */
-	static empty(obj) { return Object.keys(obj).length == 0 }
+	empty(obj) { return Object.keys(obj).length == 0 }
 	/**
 	 * @param { string } str
 	 */
-	static pos(str) { return str == 'h' || str == 'e' || str == 'j' || str == 'he' || str == 'hj' || str == 'ej' || str == 'hej' }
+	pos(str) { return str == 'h' || str == 'e' || str == 'j' || str == 'he' || str == 'hj' || str == 'ej' || str == 'hej' }
 	/**
 	 * @param { string } skill
 	 * @param { Player } player
 	 * @returns
 	 */
-	static locked(skill, player) {
+	locked(skill, player) {
 		const info = lib.skill[skill];
 		if (typeof info.locked == 'function') return info.locked(skill, player);
 		if (info.locked == false) return false;
@@ -448,7 +446,7 @@ export class Is extends Uninstantable {
 	 * @param { Player } player
 	 * @returns
 	 */
-	static zhuanhuanji(skill, player) {
+	zhuanhuanji(skill, player) {
 		const info = lib.skill[skill], { zhuanhuanji } = info;
 		if ('zhuanhuanji2' in info) {
 			const { zhuanhuanji2 } = info;

@@ -1,27 +1,26 @@
-import { nonameInitialized, assetURL, userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../../util/index.js";
-import { AI as ai } from '../../ai/index.js'
-import { Get as get } from '../../get/index.js'
-import { Game, Game as game } from '../../game/index.js'
-import { Library as lib } from "../index.js"
-import { status as _status } from '../../status/index.js'
-import { UI as ui } from '../../ui/index.js'
-import { GNC as gnc } from '../../gnc/index.js'
+import { GeneratorFunction } from "../../util/index.js";
+import { get } from '../../get/index.js'
+import { game } from '../../game/index.js'
+import { lib } from "../index.js"
+import { _status } from '../../status/index.js'
+import { ui } from '../../ui/index.js'
+import { gnc } from '../../gnc/index.js'
 
 import { LibInitPromises } from "./promises.js"
 import { GameEvent } from "../element/gameEvent.js"
 import { GameEventPromise } from "../element/gameEventPromise.js"
 
-export class LibInit extends Uninstantable {
+export class LibInit {
 	/**
 	 * 部分函数的Promise版本
 	 */
-	static promises = LibInitPromises
+	promises = new LibInitPromises()
 
-	static init() {
+	init() {
 		throw new Error('lib.init.init is moved to noname/init')
 	}
 
-	static reset() {
+	reset() {
 		if (window.inSplash) return;
 		if (window.resetExtension) {
 			if (confirm('游戏似乎未正常载入，有可能因为部分扩展未正常载入，或者因为部分扩展未载入完毕。\n是否禁用扩展并重新打开？')) {
@@ -83,11 +82,11 @@ export class LibInit extends Uninstantable {
 	}
 
 	// 现在改lib.init.onload的都给我无报错被创
-	static async onload() {
+	async onload() {
 		throw new Error('lib.init.onload is moved to noname/init/onload')
 	}
 
-	static startOnline() {
+	startOnline() {
 		'step 0'
 		event._resultid = null;
 		event._result = null;
@@ -102,7 +101,7 @@ export class LibInit extends Uninstantable {
 		event.goto(0);
 	}
 
-	static onfree() {
+	onfree() {
 		if (lib.onfree) {
 			clearTimeout(window.resetGameTimeout);
 			delete window.resetGameTimeout;
@@ -131,7 +130,7 @@ export class LibInit extends Uninstantable {
 		}
 	}
 
-	static connection(ws) {
+	connection(ws) {
 		const client = new lib.element.Client(ws);
 		lib.node.clients.push(client);
 		if (window.isNonameServer) {
@@ -162,7 +161,7 @@ export class LibInit extends Uninstantable {
 		client.send('opened');
 	}
 
-	static sheet() {
+	sheet() {
 		var style = document.createElement('style');
 		document.head.appendChild(style);
 		for (var i = 0; i < arguments.length; i++) {
@@ -173,7 +172,7 @@ export class LibInit extends Uninstantable {
 		return style;
 	}
 
-	static css(path, file, before) {
+	css(path, file, before) {
 		const style = document.createElement("link");
 		style.rel = "stylesheet";
 		if (path) {
@@ -195,7 +194,7 @@ export class LibInit extends Uninstantable {
 	//在扩展的precontent中调用，用于加载扩展必需的JS文件。
 	//If any of the parameters is an Array, corresponding files will be loaded in order
 	//如果任意参数为数组，则按顺序加载加载相应的文件
-	static jsForExtension(path, file, onLoad, onError) {
+	jsForExtension(path, file, onLoad, onError) {
 		if (!_status.javaScriptExtensions) _status.javaScriptExtensions = [];
 		_status.javaScriptExtensions.push({
 			path: path,
@@ -205,7 +204,7 @@ export class LibInit extends Uninstantable {
 		});
 	}
 
-	static js(path, file, onLoad, onError) {
+	js(path, file, onLoad, onError) {
 		if (path[path.length - 1] == '/') path = path.slice(0, path.length - 1);
 		if (path == `${lib.assetURL}mode` && lib.config.all.stockmode.indexOf(file) == -1) {
 			lib.genAwait(lib.init[`setMode_${file}`]()).then(onLoad);
@@ -243,7 +242,7 @@ export class LibInit extends Uninstantable {
 	 * 同步lib.init.js
 	 * @returns { void }
 	 */
-	static jsSync(path, file, onLoad, onError) {
+	jsSync(path, file, onLoad, onError) {
 		if (lib.assetURL.length == 0 && location.origin == 'file://' && typeof game.readFile == 'undefined') {
 			const e = new Error('浏览器file协议下无法使用此api，请在http/https协议下使用此api');
 			if (typeof onError == 'function') onError(e);
@@ -292,7 +291,7 @@ export class LibInit extends Uninstantable {
 		xmlHttpRequest.send();
 	}
 
-	static req(str, onload, onerror, master) {
+	req(str, onload, onerror, master) {
 		let sScriptURL;
 		if (str.startsWith('http')) sScriptURL = str;
 		else if (str.startsWith('local:')) {
@@ -326,7 +325,7 @@ export class LibInit extends Uninstantable {
 	/**
 	 * 同步lib.init.req
 	 */
-	static reqSync(str, onload, onerror, master) {
+	reqSync(str, onload, onerror, master) {
 		let sScriptURL;
 		if (str.startsWith('http')) sScriptURL = str;
 		else if (str.startsWith('local:')) {
@@ -358,7 +357,7 @@ export class LibInit extends Uninstantable {
 		if (typeof onload !== 'function') return oReq.responseText;
 	}
 
-	static json(url, onload, onerror) {
+	json(url, onload, onerror) {
 		const oReq = new XMLHttpRequest();
 		if (typeof onload == 'function') oReq.addEventListener("load", () => {
 			if (![0, 200].includes(oReq.status)) {
@@ -385,7 +384,7 @@ export class LibInit extends Uninstantable {
 	/**
 	 * 同步lib.init.json
 	 */
-	static jsonSync(url, onload, onerror) {
+	jsonSync(url, onload, onerror) {
 		if (lib.assetURL.length == 0 && location.origin == 'file://' && typeof game.readFile == 'undefined') {
 			const e = new Error('浏览器file协议下无法使用此api，请在http/https协议下使用此api');
 			if (typeof onerror == 'function') onerror(e);
@@ -415,7 +414,7 @@ export class LibInit extends Uninstantable {
 		oReq.send();
 	}
 
-	static cssstyles() {
+	cssstyles() {
 		if (ui.css.styles) {
 			ui.css.styles.remove();
 		}
@@ -438,7 +437,7 @@ export class LibInit extends Uninstantable {
 		}
 	}
 
-	static layout(layout, nosave) {
+	layout(layout, nosave) {
 		const loadingScreen = ui.create.div('.loading-screen', document.body), loadingScreenStyle = loadingScreen.style;
 		loadingScreenStyle.animationDuration = '1s';
 		loadingScreenStyle.animationFillMode = 'forwards';
@@ -558,7 +557,7 @@ export class LibInit extends Uninstantable {
 		});
 	}
 
-	static background() {
+	background() {
 		if (lib.config.image_background_random) {
 			var list = [];
 			for (var i in lib.configMenu.appearence.config.image_background.item) {
@@ -585,7 +584,7 @@ export class LibInit extends Uninstantable {
 	 * @param {Function} [scope] 作用域
 	 * @returns 
 	 */
-	static parsex(item, scope) {
+	parsex(item, scope) {
 		//by 诗笺、Tipx-L
 		/**
 		 * @param {Function} func 
@@ -748,7 +747,7 @@ export class LibInit extends Uninstantable {
 		}
 	}
 
-	static eval(func) {
+	eval(func) {
 		if (typeof func == 'function') {
 			return eval('(' + func.toString() + ')');
 		}
@@ -768,7 +767,7 @@ export class LibInit extends Uninstantable {
 		return func;
 	}
 
-	static encode(strUni) {
+	encode(strUni) {
 		var strUtf = strUni.replace(
 			/[\u0080-\u07ff]/g, function (c) {
 				var cc = c.charCodeAt(0);
@@ -782,7 +781,7 @@ export class LibInit extends Uninstantable {
 		return btoa(strUtf);
 	}
 
-	static decode(str) {
+	decode(str) {
 		var strUtf = atob(str);
 		var strUni = strUtf.replace(
 			/[\u00e0-\u00ef][\u0080-\u00bf][\u0080-\u00bf]/g, function (c) {
@@ -797,7 +796,7 @@ export class LibInit extends Uninstantable {
 		return strUni;
 	}
 
-	static stringify(obj) {
+	stringify(obj) {
 		var str = '{'
 		for (var i in obj) {
 			str += '"' + i + '":'
@@ -816,7 +815,7 @@ export class LibInit extends Uninstantable {
 		return str;
 	}
 
-	static stringifySkill(obj) {
+	stringifySkill(obj) {
 		var str = '';
 		for (var i in obj) {
 			str += i + ':'
@@ -838,7 +837,7 @@ export class LibInit extends Uninstantable {
 	 * 在返回当前加载的esm模块相对位置。
 	 * @param {*} url 传入import.meta.url 
 	 */
-	static getCurrentFileLocation(url){
+	getCurrentFileLocation(url){
 		let head = window.location.href.slice(0,window.location.href.lastIndexOf('/')+1);
 		let ret = url.replace(head,'');
 		return decodeURIComponent(ret);

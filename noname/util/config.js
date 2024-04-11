@@ -1,4 +1,4 @@
-import { Library as lib } from "../library/index.js";
+import { lib } from "../library/index.js";
 
 /**
  * @param {string} name 

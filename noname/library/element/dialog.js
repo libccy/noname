@@ -1,9 +1,7 @@
-import { AI as ai } from '../../ai/index.js';
-import { Get as get } from '../../get/index.js';
-import { Game as game } from '../../game/index.js';
-import { Library as lib } from "../index.js";
-import { status as _status } from '../../status/index.js';
-import { UI as ui } from '../../ui/index.js';
+import { get } from '../../get/index.js';
+import { lib } from "../index.js";
+import {  _status } from '../../status/index.js';
+import { ui } from '../../ui/index.js';
 
 export class Dialog extends HTMLDivElement {
 	/** @type { HTMLDivElement } */

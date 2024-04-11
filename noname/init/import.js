@@ -1,4 +1,4 @@
-import { Game as game } from '../game/index.js';
+import { game } from '../game/index.js';
 import { lib } from '../library/index.js';
 
 /**

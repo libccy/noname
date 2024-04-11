@@ -1,16 +1,19 @@
-import { ui, game, get, lib, _status } from "../../../noname.js";
-import { Uninstantable } from "../../util/index.js";
+import { ui } from '../index.js';
+import { lib } from '../../library/index.js';
+import { game } from "../../game/index.js";
+import { get } from "../../get/index.js";
+import { _status } from "../../status/index.js";
 
-export class Click extends Uninstantable {
+export class Click {
 	/**
 	 * @type {() => void}
 	 */
-	static consoleMenu;
+	consoleMenu;
 	/**
 	 * @type {(arg0: string) => void}
 	 */
-	static menuTab;
-	static identitycircle() {
+	menuTab;
+	identitycircle() {
 		var list = [];
 		this.classList.toggle('transparent');
 		for (var i = 0; i < this.parentNode.childNodes.length; i++) {
@@ -35,7 +38,7 @@ export class Click extends Uninstantable {
 		}
 		this._source._guozhanguess = list;
 	}
-	static connectEvents() {
+	connectEvents() {
 		if (this.info) {
 			var button = this;
 			var layer = ui.create.div('.poplayer', ui.window);
@@ -317,7 +320,7 @@ export class Click extends Uninstantable {
 			};
 		}
 	}
-	static connectClients() {
+	connectClients() {
 		if (this.info) {
 			var button = this;
 			var layer = ui.create.div('.poplayer', ui.window);
@@ -432,7 +435,7 @@ export class Click extends Uninstantable {
 			};
 		}
 	}
-	static autoskin() {
+	autoskin() {
 		if (!lib.config.change_skin) return;
 		var players = game.filterPlayer();
 		var change = function (player, num, callback) {
@@ -485,7 +488,7 @@ export class Click extends Uninstantable {
 		};
 		autoskin();
 	}
-	static skin(avatar, name, callback) {
+	skin(avatar, name, callback) {
 		var num = 1;
 		if (name.startsWith('gz_')) {
 			name = name.slice(3);
@@ -530,7 +533,7 @@ export class Click extends Uninstantable {
 		};
 		img.src = lib.assetURL + 'image/skin/' + name + '/' + num + '.jpg';
 	}
-	static touchpop(forced) {
+	touchpop(forced) {
 		if (lib.config.touchscreen || forced) {
 			_status.touchpopping = true;
 			clearTimeout(_status.touchpoppingtimeout);
@@ -539,7 +542,7 @@ export class Click extends Uninstantable {
 			}, 600);
 		}
 	}
-	static exit() {
+	exit() {
 		if (game.servermode && lib.config.reconnect_info && _status.over) {
 			if (!_status.roomtimeout) {
 				lib.config.reconnect_info[2] = game.roomId;
@@ -566,7 +569,7 @@ export class Click extends Uninstantable {
 			game.reload();
 		}
 	}
-	static shortcut(show) {
+	shortcut(show) {
 		if (show === false) {
 			ui.shortcut.classList.add('hidden');
 		}
@@ -600,7 +603,7 @@ export class Click extends Uninstantable {
 			ui.window.classList.add('shortcutpaused');
 		}
 	}
-	static favouriteCharacter(e) {
+	favouriteCharacter(e) {
 		if (typeof this.link == 'string') {
 			if (this.innerHTML == '添加收藏') {
 				this.innerHTML = '移除收藏';
@@ -653,7 +656,7 @@ export class Click extends Uninstantable {
 		}
 		e.stopPropagation();
 	}
-	static buttonnameenter() {
+	buttonnameenter() {
 		if (this.buttonscrollinterval) {
 			clearInterval(this.buttonscrollinterval);
 		}
@@ -677,7 +680,7 @@ export class Click extends Uninstantable {
 			}, 16);
 		}
 	}
-	static buttonnameleave() {
+	buttonnameleave() {
 		if (this.buttonscrollinterval) {
 			clearInterval(this.buttonscrollinterval);
 		}
@@ -695,7 +698,7 @@ export class Click extends Uninstantable {
 			}, 16);
 		}
 	}
-	static dragtouchdialog(e) {
+	dragtouchdialog(e) {
 		if (e.touches.length > 1 &&
 			!this.classList.contains('popped') &&
 			!this.classList.contains('fixed')) {
@@ -712,7 +715,7 @@ export class Click extends Uninstantable {
 			e.stopPropagation();
 		}
 	}
-	static identity(e) {
+	identity(e) {
 		if (_status.dragged) return;
 		_status.clicked = true;
 		if (!game.getIdentityList) return;
@@ -835,7 +838,7 @@ export class Click extends Uninstantable {
 			// }
 		}
 	}
-	static identity2() {
+	identity2() {
 		if (_status.clickingidentity) {
 			_status.clicked = true;
 			var player = _status.clickingidentity[0];
@@ -849,7 +852,7 @@ export class Click extends Uninstantable {
 			delete _status.clickingidentity;
 		}
 	}
-	static roundmenu() {
+	roundmenu() {
 		game.closeConnectMenu();
 		switch (lib.config.round_menu_func) {
 			case 'system':
@@ -877,7 +880,7 @@ export class Click extends Uninstantable {
 		}
 		_status.clicked = true;
 	}
-	static pausehistory() {
+	pausehistory() {
 		if (!lib.config.auto_popped_history) return;
 		if (!ui.sidebar.childNodes.length) return;
 		var uiintro = ui.create.dialog('hidden');
@@ -885,7 +888,7 @@ export class Click extends Uninstantable {
 		uiintro.add(ui.sidebar);
 		return uiintro;
 	}
-	static pauseconfig() {
+	pauseconfig() {
 		if (!lib.config.auto_popped_config) return;
 		if (get.is.phoneLayout()) return;
 		var uiintro = ui.create.dialog('hidden');
@@ -919,7 +922,7 @@ export class Click extends Uninstantable {
 
 		return uiintro;
 	}
-	static cardPileButton() {
+	cardPileButton() {
 		var uiintro = ui.create.dialog('hidden');
 		uiintro.listen(function (e) {
 			e.stopPropagation();
@@ -948,7 +951,7 @@ export class Click extends Uninstantable {
 		}
 		return uiintro;
 	}
-	static chat() {
+	chat() {
 		ui.system1.classList.add('shown');
 		ui.system2.classList.add('shown');
 
@@ -1170,7 +1173,7 @@ export class Click extends Uninstantable {
 		list3.scrollTop = list1.scrollHeight;
 		return uiintro;
 	}
-	static volumn() {
+	volumn() {
 		var uiintro = ui.create.dialog('hidden');
 		uiintro.listen(function (e) {
 			e.stopPropagation();
@@ -1209,7 +1212,7 @@ export class Click extends Uninstantable {
 		uiintro.add(ui.create.div('.placeholder'));
 		return uiintro;
 	}
-	static volumn_background(e) {
+	volumn_background(e) {
 		if (_status.dragged) return;
 		var volume = this.link;
 		if (volume === 1 && lib.config.volumn_background === 1) {
@@ -1227,7 +1230,7 @@ export class Click extends Uninstantable {
 		}
 		e.stopPropagation();
 	}
-	static volumn_audio(e) {
+	volumn_audio(e) {
 		if (_status.dragged) return;
 		var volume = this.link;
 		if (volume === 1 && lib.config.volumn_audio === 1) {
@@ -1244,7 +1247,7 @@ export class Click extends Uninstantable {
 		}
 		e.stopPropagation();
 	}
-	static hoverpopped() {
+	hoverpopped() {
 		if (this._uiintro) {
 			return;
 		}
@@ -1322,10 +1325,10 @@ export class Click extends Uninstantable {
 			uiintro.addEventListener('click', clicklayer);
 		}
 	}
-	static hoverpopped_leave() {
+	hoverpopped_leave() {
 		this._poppedalready = false;
 	}
-	static leavehoverpopped() {
+	leavehoverpopped() {
 		if (_status.dragged) return;
 		if (this.classList.contains('noleave')) return;
 		this.delete();
@@ -1339,7 +1342,7 @@ export class Click extends Uninstantable {
 		}, 500);
 
 	}
-	static dierevive() {
+	dierevive() {
 		if (game.me.isDead()) {
 			game.me.revive(Math.max(1, game.me.maxHp));
 			game.me.draw(2);
@@ -1351,7 +1354,7 @@ export class Click extends Uninstantable {
 			}
 		}
 	}
-	static dieswap() {
+	dieswap() {
 		if (game.me.isDead()) {
 			_status.clicked = true;
 			var i, translation, intro, str;
@@ -1388,15 +1391,15 @@ export class Click extends Uninstantable {
 			}
 		}
 	}
-	static dieswap2() {
+	dieswap2() {
 		if (_status.dragged) return;
 		game.swapPlayer(this.link);
 	}
-	static touchconfirm() {
+	touchconfirm() {
 		_status.touchconfirmed = true;
 		document.removeEventListener('touchstart', ui.click.touchconfirm);
 	}
-	static windowtouchstart(e) {
+	windowtouchstart(e) {
 		if (window.inSplash) return;
 		if (e.touches[0] && lib.config.swipe && e.touches.length < 2) {
 			_status._swipeorigin = {
@@ -1409,7 +1412,7 @@ export class Click extends Uninstantable {
 		// 	_status.forcetouchinterval=setInterval(ui.click.forcetouch,30);
 		// }
 	}
-	static windowtouchmove(e) {
+	windowtouchmove(e) {
 		e.preventDefault();
 		if (window.inSplash) return;
 		if (_status.draggingroundmenu) {
@@ -1618,7 +1621,7 @@ export class Click extends Uninstantable {
 			_status.dragstatuschanged = null;
 		}
 	}
-	static windowtouchend(e) {
+	windowtouchend(e) {
 		delete _status.force;
 		// if(_status.forcetouchinterval){
 		// 	clearInterval(_status.forcetouchinterval);
@@ -1770,7 +1773,7 @@ export class Click extends Uninstantable {
 		_status.dragged = false;
 		_status.clicked = false;
 	}
-	static checkroundtranslate(translate) {
+	checkroundtranslate(translate) {
 		var translate = translate || ui.roundmenu._dragtransform;
 		if (translate[1] + ui.roundmenu._position[1] + 50 + ui.arena.offsetTop > ui.window.offsetHeight) {
 			translate[1] = ui.window.offsetHeight - (ui.roundmenu._position[1] + 50) - ui.arena.offsetTop;
@@ -1786,7 +1789,7 @@ export class Click extends Uninstantable {
 		}
 		ui.roundmenu.style.transform = 'translate(' + translate[0] + 'px,' + translate[1] + 'px)';
 	}
-	static checkdialogtranslate(translate, dialog) {
+	checkdialogtranslate(translate, dialog) {
 		var translate = translate || dialog._dragtransform;
 		if (Math.sqrt(translate[0] * translate[0] + translate[1] * translate[1]) < 10) {
 			translate[0] = 0;
@@ -1794,10 +1797,10 @@ export class Click extends Uninstantable {
 		}
 		dialog.style.transform = 'translate(' + translate[0] + 'px,' + translate[1] + 'px)';
 	}
-	static windowmousewheel(e) {
+	windowmousewheel(e) {
 		_status.tempunpopup = e;
 	}
-	static windowmousemove(e) {
+	windowmousemove(e) {
 		if (window.inSplash) return;
 		if (_status.tempunpopup) {
 			if (get.evtDistance(_status.tempunpopup, e) > 5) {
@@ -2030,7 +2033,7 @@ export class Click extends Uninstantable {
 			}
 		}
 	}
-	static windowmousedown(e) {
+	windowmousedown(e) {
 		if (window.inSplash) return;
 		if (!ui.window) return;
 		if (e.button == 2) return;
@@ -2095,7 +2098,7 @@ export class Click extends Uninstantable {
 			item = item.parentNode;
 		}
 	}
-	static cardtouchstart(e) {
+	cardtouchstart(e) {
 		if (e.touches.length != 1) return;
 		if (!lib.config.enable_drag) return;
 		if (!this.parentNode) return;
@@ -2111,7 +2114,7 @@ export class Click extends Uninstantable {
 			};
 		}
 	}
-	static cardtouchmove(e) {
+	cardtouchmove(e) {
 		ui.click.longpresscancel.call(this);
 		if (this._waitingfordrag) {
 			var drag = this._waitingfordrag;
@@ -2129,7 +2132,7 @@ export class Click extends Uninstantable {
 			delete this._waitingfordrag;
 		}
 	}
-	static windowmouseup(e) {
+	windowmouseup(e) {
 		delete _status.force;
 		// if(_status.forcetouchinterval){
 		// 	clearInterval(_status.forcetouchinterval);
@@ -2218,7 +2221,7 @@ export class Click extends Uninstantable {
 			ui.arena.classList.remove('dragging');
 		}
 	}
-	static mousemove() {
+	mousemove() {
 		if (!lib.config.hover_handcard && this.parentNode && this.parentNode.parentNode == ui.me) {
 			return;
 		}
@@ -2226,38 +2229,38 @@ export class Click extends Uninstantable {
 			_status.currentmouseenter = this;
 		}
 	}
-	static mouseenter() {
+	mouseenter() {
 		if (!lib.config.hover_handcard && this.parentNode && this.parentNode.parentNode == ui.me) {
 			return;
 		}
 		_status.currentmouseenter = this;
 	}
-	static mouseleave() {
+	mouseleave() {
 		ui.click.mouseentercancel();
 		if (_status.currentmouseenter == this) {
 			_status.currentmouseenter = null;
 		}
 		this._mouseentercreated = false;
 	}
-	static mousedown() {
+	mousedown() {
 		ui.click.mouseentercancel();
 		if (_status.currentmouseenter == this) {
 			_status.currentmouseenter = null;
 		}
 		this._mouseentercreated = true;
 	}
-	static mouseentercancel() {
+	mouseentercancel() {
 		if (_status._mouseentertimeout) {
 			clearTimeout(_status._mouseentertimeout);
 			delete _status._mouseentertimeout;
 		}
 	}
-	static hoverplayer(e) {
+	hoverplayer(e) {
 		var node = get.nodeintro(this, true);
 		if (node) node.style.zIndex = 21;
 		return node;
 	}
-	static longpressdown(e) {
+	longpressdown(e) {
 		if (_status.longpressed) return;
 		if (this._longpresstimeout) {
 			clearTimeout(this._longpresstimeout);
@@ -2274,7 +2277,7 @@ export class Click extends Uninstantable {
 		// }
 		_status.longpressing = this;
 	}
-	static longpresscallback() {
+	longpresscallback() {
 		if (!_status.longpressing) return;
 		var node = _status.longpressing;
 		var func = node._longpresscallback;
@@ -2304,7 +2307,7 @@ export class Click extends Uninstantable {
 			ui.click.touchpop();
 		}
 	}
-	static longpresscancel() {
+	longpresscancel() {
 		if (this._longpresstimeout) {
 			clearTimeout(this._longpresstimeout);
 			delete this._longpresstimeout;
@@ -2314,7 +2317,7 @@ export class Click extends Uninstantable {
 			delete _status.longpressing;
 		}
 	}
-	static window() {
+	window() {
 		var clicked = _status.clicked;
 		var dialogtouched = false;
 		if (_status.dialogtouched) {
@@ -2403,7 +2406,7 @@ export class Click extends Uninstantable {
 			_status.event.custom.add.window(clicked);
 		}
 	}
-	static toggle() {
+	toggle() {
 		if (_status.dragged) return;
 		if (this.parentNode.classList.contains('disabled')) return;
 		_status.tempunpop = true;
@@ -2418,7 +2421,7 @@ export class Click extends Uninstantable {
 			if (this.additionalCommand) this.additionalCommand(true, this.parentNode);
 		}
 	}
-	static editor() {
+	editor() {
 		if (_status.dragged) return;
 		if (_status.editing) return;
 		_status.clicked = true;
@@ -2426,7 +2429,7 @@ export class Click extends Uninstantable {
 		_status.editing = this;
 		if (this.additionalCommand) this.additionalCommand(this);
 	}
-	static switcher() {
+	switcher() {
 		if (_status.dragged) return;
 		if (this.parentNode.classList.contains('disabled')) return;
 		if (_status.choosing) return;
@@ -2449,7 +2452,7 @@ export class Click extends Uninstantable {
 			}, 500);
 		}
 	}
-	static choice() {
+	choice() {
 		if (_status.dragged) return;
 		if (!_status.choosing) return;
 		_status.choosing.link = this.link;
@@ -2462,7 +2465,7 @@ export class Click extends Uninstantable {
 			this.parentNode.parentNode.querySelector('.toggle').additionalCommand(this.link, this.parentNode.parentNode);
 		}
 	}
-	static button() {
+	button() {
 		if (_status.dragged) return;
 		if (_status.clicked) return;
 		if (_status.tempNoButton) return;
@@ -2494,7 +2497,7 @@ export class Click extends Uninstantable {
 		}
 		game.check();
 	}
-	static touchintro() {
+	touchintro() {
 		var rect = this.getBoundingClientRect();
 		ui.click.touchpop();
 		ui.click.intro.call(this, {
@@ -2503,7 +2506,7 @@ export class Click extends Uninstantable {
 		});
 		_status.clicked = false;
 	}
-	static card() {
+	card() {
 		delete this._waitingfordrag;
 		if (_status.dragged) return;
 		if (_status.clicked) return;
@@ -2570,7 +2573,7 @@ export class Click extends Uninstantable {
 			});
 		}
 	}
-	static avatar() {
+	avatar() {
 		if (!lib.config.doubleclick_intro) return;
 		if (this.parentNode.isUnseen(0)) return;
 		if (!lib.character[this.parentNode.name]) return;
@@ -2589,7 +2592,7 @@ export class Click extends Uninstantable {
 		game.pause2();
 		ui.click.charactercard(player.name1 || player.name, null, null, true, this);
 	}
-	static avatar2() {
+	avatar2() {
 		if (!lib.config.doubleclick_intro) return;
 		if (this.parentNode.classList.contains('unseen2')) return;
 		if (!lib.character[this.parentNode.name2]) return;
@@ -2608,7 +2611,7 @@ export class Click extends Uninstantable {
 		game.pause2();
 		ui.click.charactercard(player.name2, null, null, true, this);
 	}
-	static connectroom(e) {
+	connectroom(e) {
 		if (_status.dragged) return;
 		if (_status.clicked) return;
 		if (ui.intro) return;
@@ -2639,10 +2642,10 @@ export class Click extends Uninstantable {
 			}
 		}
 	}
-	static player() {
+	player() {
 		return ui.click.target.apply(this, arguments);
 	}
-	static target(e) {
+	target(e) {
 		if (_status.dragged) return;
 		if (_status.clicked) return;
 		if (ui.intro) return;
@@ -2750,12 +2753,12 @@ export class Click extends Uninstantable {
 		}
 		game.check();
 	}
-	static control2() {
+	control2() {
 		if (this.childNodes.length == 1 && !this._doubleclick) {
 			ui.click.control.call(this.firstChild);
 		}
 	}
-	static control() {
+	control() {
 		if (_status.dragged) return;
 		if (ui.control.classList.contains('hidden')) return;
 		var node = this.parentNode;
@@ -2803,7 +2806,7 @@ export class Click extends Uninstantable {
 			game.resume();
 		}
 	}
-	static dialogcontrol() {
+	dialogcontrol() {
 		_status.event.result = {
 			buttons: ui.selected.buttons.slice(0),
 			cards: ui.selected.cards.slice(0),
@@ -2813,7 +2816,7 @@ export class Click extends Uninstantable {
 		};
 		game.resume();
 	}
-	static skill(skill) {
+	skill(skill) {
 		var info = get.info(skill);
 		var event = _status.event;
 		event.backup(skill);
@@ -2860,7 +2863,7 @@ export class Click extends Uninstantable {
 			}
 		}
 	}
-	static ok(node) {
+	ok(node) {
 		const gameEvent = get.event(), custom = gameEvent.custom, replaceConfirm = custom.replace.confirm;
 		if (replaceConfirm) {
 			replaceConfirm(true);
@@ -2911,7 +2914,7 @@ export class Click extends Uninstantable {
 		if (addConfirm) addConfirm(true);
 		game.resume();
 	}
-	static cancel(node) {
+	cancel(node) {
 		var event = _status.event;
 		if (event.custom.replace.confirm) {
 			event.custom.replace.confirm(false); return;
@@ -2952,7 +2955,7 @@ export class Click extends Uninstantable {
 		}
 		game.resume();
 	}
-	static logv(e) {
+	logv(e) {
 		if (_status.currentlogv) {
 			if (_status.currentlogv == this) return;
 			if (_status.logvtimeout) {
@@ -2972,7 +2975,7 @@ export class Click extends Uninstantable {
 			ui.click.intro.call(this, e);
 		}
 	}
-	static logvleave() {
+	logvleave() {
 		if (_status.currentlogv == this) {
 			setTimeout(function () {
 				delete _status.currentlogv;
@@ -2986,7 +2989,7 @@ export class Click extends Uninstantable {
 			delete this.logvtimeout;
 		}
 	}
-	static charactercard(name, sourcenode, noedit, resume, avatar) {
+	charactercard(name, sourcenode, noedit, resume, avatar) {
 		if (_status.dragged) return;
 		if (lib.config.theme != 'simple') {
 			ui.window.classList.add('shortcutpaused');
@@ -3518,7 +3521,7 @@ export class Click extends Uninstantable {
 		layer.addEventListener(lib.config.touchscreen ? 'touchend' : 'click', clicklayer);
 		ui.window.appendChild(layer);
 	}
-	static intro(e) {
+	intro(e) {
 		if (_status.dragged) return;
 		_status.clicked = true;
 		if (this.classList.contains('player') && !this.name) {
@@ -3616,7 +3619,7 @@ export class Click extends Uninstantable {
 		game.pause2();
 		return uiintro;
 	}
-	static intro2() {
+	intro2() {
 		if (ui.intro) {
 			ui.intro.close();
 			if (ui.intro.source == this) {
@@ -3627,7 +3630,7 @@ export class Click extends Uninstantable {
 			}
 		}
 	}
-	static auto() {
+	auto() {
 		if (!ui || !ui.auto || ui.auto.classList.contains('hidden') && arguments[0] !== 'forced') return;
 		if (_status.paused2) return;
 		ui.click.shortcut(false);
@@ -3679,7 +3682,7 @@ export class Click extends Uninstantable {
 			}
 		}
 	}
-	static wuxie() {
+	wuxie() {
 		if (this.classList.contains('hidden')) return;
 		this.classList.toggle('glow');
 		if (this.classList.contains('glow') && _status.event.type == 'wuxie' &&
@@ -3687,7 +3690,7 @@ export class Click extends Uninstantable {
 			ui.click.cancel(ui.confirm.lastChild);
 		}
 	}
-	static tempnowuxie() {
+	tempnowuxie() {
 		if (this.classList.contains('hidden')) return;
 		this.classList.toggle('glow');
 		if (this.classList.contains('glow') && _status.event.type == 'wuxie' &&
@@ -3701,7 +3704,7 @@ export class Click extends Uninstantable {
 			ui.click.cancel(ui.confirm.lastChild);
 		}
 	}
-	static pause() {
+	pause() {
 		if (_status.paused2 || _status.pausing || _status.nopause || !ui.pause) return;
 		if (!_status.video) {
 			if (ui.pause.classList.contains('hidden')) return;
@@ -3730,7 +3733,7 @@ export class Click extends Uninstantable {
 			game.onpause();
 		}
 	}
-	static resume(e) {
+	resume(e) {
 		if (_status.pausing) return;
 		if (_status.dragged) return;
 		if (_status.clicked) return;
@@ -3747,7 +3750,7 @@ export class Click extends Uninstantable {
 		}
 		return false;
 	}
-	static config() {
+	config() {
 		if (!ui.click.configMenu) return;
 		if (_status.paused2) _status.config2 = false;
 		else _status.config2 = true;
@@ -3758,7 +3761,7 @@ export class Click extends Uninstantable {
 		ui.system1.classList.remove('shown');
 		ui.system2.classList.remove('shown');
 	}
-	static swap() {
+	swap() {
 		if (_status.dragged) return;
 		if (this.classList.contains('dead')) return;
 		if (_status.over) return;
@@ -3766,7 +3769,7 @@ export class Click extends Uninstantable {
 		if (ui.wuxie) ui.wuxie.show();
 		game.swapPlayer(this);
 	}
-	static mousewheel(evt) {
+	mousewheel(evt) {
 		if (this.firstChild && this.firstChild.classList.contains('handcards') &&
 			!this.classList.contains('scrollh')) return;
 		var node = this;
@@ -3794,16 +3797,16 @@ export class Click extends Uninstantable {
 			}, 16);
 		}
 	}
-	static touchStart(e) {
+	touchStart(e) {
 		this.startX = e.touches[0].clientX / game.documentZoom;
 		this.startY = e.touches[0].clientY / game.documentZoom;
 		_status.dragged = false;
 	}
-	static dialogtouchStart(e) {
+	dialogtouchStart(e) {
 		ui.click.touchStart.call(this, e);
 		_status.dialogtouched = true;
 	}
-	static touchScroll(e) {
+	touchScroll(e) {
 		if (_status.mousedragging) return;
 		if (_status.draggingtouchdialog) return;
 		if (!_status.dragged) {
@@ -3823,7 +3826,7 @@ export class Click extends Uninstantable {
 			e.stopPropagation();
 		}
 	}
-	static autoskill(bool, node) {
+	autoskill(bool, node) {
 		var list = lib.config.autoskilllist;
 		if (bool) {
 			list.remove(node.link);
@@ -3833,10 +3836,10 @@ export class Click extends Uninstantable {
 		}
 		game.saveConfig('autoskilllist', list);
 	}
-	static skillbutton() {
+	skillbutton() {
 		this.func(this.link);
 	}
-	static autoskill2(e) {
+	autoskill2(e) {
 		this.classList.toggle('on');
 		var list = [];
 		if (lib.skill[this.link].frequent) {
@@ -3859,7 +3862,7 @@ export class Click extends Uninstantable {
 		ui.click.touchpop();
 		e.stopPropagation();
 	}
-	static hiddenskill(e) {
+	hiddenskill(e) {
 		this.classList.toggle('on');
 		var hidden = lib.skill[this.link].preHidden;
 		if (Array.isArray(hidden)) {
@@ -3879,7 +3882,7 @@ export class Click extends Uninstantable {
 		ui.click.touchpop();
 		e.stopPropagation();
 	}
-	static rightplayer(e) {
+	rightplayer(e) {
 		if (this._nopup) return false;
 		if (_status.clickedplayer) {
 			return false;
@@ -3896,7 +3899,7 @@ export class Click extends Uninstantable {
 		ui.click.longpresscancel.call(this);
 		return false;
 	}
-	static right(e) {
+	right(e) {
 		if (window.inSplash) return false;
 		if (lib.config.touchscreen) return;
 		if (_status.noright) {
