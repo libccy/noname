@@ -1718,56 +1718,86 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				usable:1,
 				logTarget:()=>_status.currentPhase,
 				async content(event,trigger,player){
-					player.when({global:'phaseEnd'}).then(()=>{
+					player.when({global:'phaseEnd'})
+					.then(()=>{
 						if(target&&target.isIn()){
 							var num=target.countCards('h')-player.countCards('h');
 							if(num){
 								if(num>0){
 									if(player.countCards('h')<5) player.draw(Math.min(5-player.countCards('h'),num));
+									event.finish();
 								}
 								else player.chooseToDiscard(-num,'h',true);
 							}
+							else event.finish();
 						}
-					}).vars({target:_status.currentPhase});
+						else event.finish();
+					})
+					.then(()=>{
+						if(result.bool&&result.cards.length>1){
+							if(player.isDamaged()) player.recover();
+						}
+					})
+					.vars({target:_status.currentPhase});
 				},
 			},
 			olxiangzuo:{
 				audio:2,
 				trigger:{player:'dying'},
 				filter(event,player){
-					if(!_status.currentPhase||!_status.currentPhase.isIn()) return false;
-					return player.countCards('he');
+					return player.countCards('he')&&game.hasPlayer(target=>target!=player);
 				},
-				direct:true,
+				async cost(event,trigger,player){
+					event.result=await player.chooseCardTarget({
+						prompt:get.prompt2('olxiangzuo'),
+						filterCard:true,
+						selectCard:[1,Infinity],
+						filterTarget:lib.filter.notMe,
+						complexCard:true,
+						complexTarget:true,
+						complexSelect:true,
+						ai1(card){
+							const player=get.event('player');
+							if(!ui.selected.targets.length) return 0;
+							const target=ui.selected.targets[0];
+							if(player.getHistory('useSkill',evt=>{
+								return evt.skill=='olgongjie'&&(evt.targets||[evt.target]).includes(target);
+							}).length&&player.getHistory('useSkill',evt=>{
+								return evt.skill=='olxiangxv'&&(evt.targets||[evt.target]).includes(target);
+							}).length){
+								if(get.attitude(player,target)>0) return 1;
+								if(player.canSaveCard(card,player)) return 0;
+								if(ui.selected.cards.length+player.hp>=player.maxHp) return 0;
+								return 20-get.value(card);
+							}
+							if(get.attitude(player,target)>0&&!player.countCards('he',cardx=>player.canSaveCard(cardx,player))) return 1;
+							return 0;
+						},
+						ai2(target){
+							const player=get.event('player');
+							const goon=(player.getHistory('useSkill',evt=>{
+								return evt.skill=='olgongjie'&&(evt.targets||[evt.target]).includes(target);
+							}).length&&player.getHistory('useSkill',evt=>{
+								return evt.skill=='olxiangxv'&&(evt.targets||[evt.target]).includes(target);
+							}).length),att=get.attitude(player,target);
+							if(goon) return 5*att;
+							if(!!player.countCards('he',cardx=>player.canSaveCard(cardx,player))) return att;
+							return 0;
+						},
+					}).forResult();
+				},
 				limited:true,
 				skillAnimation:true,
 				animationColor:'water',
 				async content(event,trigger,player){
-					var target=_status.currentPhase,num=player.countCards('he');
-					var {result:{bool,cards}}=await player.chooseToGive(get.prompt2('olxiangzuo',target),[1,num],'he').set('ai',card=>{
-						var player=_status.event.player,target=_status.event.target;
-						if(player.getHistory('useSkill',evt=>{
-							return evt.skill=='olgongjie'&&evt.targets.includes(target);
-						}).length&&player.getHistory('useSkill',evt=>{
-							return evt.skill=='olxiangxv'&&evt.targets.includes(target);
-						}).length){
-							if(get.attitude(player,target)>0) return 1;
-							if(player.canSaveCard(card,player)) return 0;
-							if(ui.selected.cards.length+player.hp>=player.maxHp) return 0;
-							return 20-get.value(card);
-						}
-						else{
-							if(get.attitude(player,target)>0&&!player.countCards('he',cardx=>player.canSaveCard(cardx,player))) return 1;
-							return 0;
-						}
-					}).set('target',target).set('complexCard',true).set('logSkill',['olxiangzuo',target]);
-					if(!bool) return;
+					const target=event.targets[0],cards=event.cards;
 					player.awakenSkill('olxiangzuo');
+					await player.give(cards,target);
 					if(player.getHistory('useSkill',evt=>{
 						return evt.skill=='olgongjie'&&evt.targets.includes(target);
 					}).length&&player.getHistory('useSkill',evt=>{
 						return evt.skill=='olxiangxv'&&evt.targets.includes(target);
-					}).length) player.recover(cards.length);
+					}).length) await player.recover(cards.length);
 				},
 			},
 			//OL飞扬
@@ -27804,9 +27834,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			olgongjie:'恭节',
 			olgongjie_info:'每轮的首个回合开始时，你可以令任意名角色获得你的一张牌，然后你摸X张牌（X为你本次失去的花色数）。',
 			olxiangxv:'相胥',
-			olxiangxv_info:'当你的手牌数变为全场最少时，你可以获得以下效果：本回合结束时，将手牌数调整至与当前回合角色手牌数相同（至多摸至五张）。',
+			olxiangxv_info:'当你的手牌数变为全场最少时，你可以获得以下效果：本回合结束时，将手牌数调整至与当前回合角色手牌数相同（至多摸至五张），然后若你以此法弃置了至少两张手牌，则你回复1点体力。',
 			olxiangzuo:'襄胙',
-			olxiangzuo_info:'限定技，当你进入濒死状态时，你可以交给当前回合角色任意张牌，若如此做，若你本回合已对其发动过〖恭节〗和〖相胥〗，你回复等量的体力。',
+			olxiangzuo_info:'限定技，当你进入濒死状态时，你可以交给一名其他角色任意张牌，然后若你本回合已对其发动过〖恭节〗和〖相胥〗，你回复等量的体力。',
 			liyi:'李异',
 			olchanshuang:'缠双',
 			olchanshuang_info:'①出牌阶段限一次，你可以选择一名其他角色。你与其依次选择〖缠双③〗的一项，然后你与其依次执行各自选择的项。②结束阶段，若X大于0，你执行〖缠双③〗的前X项（X为你本回合以任意形式执行过的〖缠双③〗的选项数）。③选项：1.重铸一张牌；2.使用一张【杀】；3.弃置两张牌。',
