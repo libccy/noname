@@ -5,6 +5,14 @@ Forked from: https://github.com/libccy/noname
 ```bash
 docker run -d --name sgs -p 80:80 -p 8080:8080 --restart unless-stopped hsiaoshun/noname:latest
 ```
+安装以后，访问你的docker服务器的IP即可开启三国杀，需要联机时，也填入docker所在的服务器IP。
+此种方式的好处在于跟家人用iPhone/Android/电脑/iPad/Android平板等等都可以一起联机。
+
+### 示例
+例如：你的Docker所在的服务器是`192.168.1.15`，那么安装完成后，用浏览器访问 http://192.168.1.15 即可打开三国杀。
+
+### 跟家人联机：
+点击联机，地址填入 `192.168.1.15` 或者完整使用地址（推荐） `ws://192.168.1.15:8080` 即可联机。
 
 ## 动机
 为了在家庭局域网部署一个三国杀服务器，在家里供人家游戏，将无名杀Docker化，使得其易于部署，部署者不需要懂得相关知识。
