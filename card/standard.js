@@ -1588,7 +1588,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					let pos=get.is.single()?'he':'hej';
-					if(target.countGainableCards(player,pos)) player.gainPlayerCard(pos, target, true).set('target',target).set('ai',lib.card.shunshou.ai.button);
+					if(target.countGainableCards(player,pos)) player.gainPlayerCard(pos, target, true).set('target',target).set("complexSelect",false).set('ai',lib.card.shunshou.ai.button);
 				},
 				ai:{
 					wuxie:function(target,card,player,viewer){
@@ -1863,7 +1863,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						pos='hej';
 						vis=undefined;
 					}
-					if(target.countDiscardableCards(player,pos)) player.discardPlayerCard(pos, target, true, vis).set('target',target).set('ai',lib.card.guohe.ai.button);
+					if(target.countDiscardableCards(player,pos)) player.discardPlayerCard(pos, target, true, vis).set('target',target).set("complexSelect",false).set('ai',lib.card.guohe.ai.button);
 				},
 				ai:{
 					wuxie:(target,card,player,viewer,status)=>{
