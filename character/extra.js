@@ -7595,70 +7595,65 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			drlt_zhiti:{
 				audio:2,
 				locked:true,
-				group:["drlt_zhiti_1","drlt_zhiti_2","drlt_zhiti_3","drlt_zhiti_4","drlt_zhiti_5"],
+				group:['drlt_zhiti_damage','drlt_zhiti_compare','drlt_zhiti_juedou'],
 				global:'g_drlt_zhiti',
 				subSkill:{
-					'1':{
-						audio:"drlt_zhiti",
-						trigger:{
-							global:'juedouAfter'
-						},
-						forced:true,
-						filter(event,player){
-							return event.targets&&event.targets.includes(player)&&event.turn!=player&&player.hasDisabledSlot();
-						},
-						content(){
-							player.chooseToEnable();
-						},
-					},
-					'2':{
+					juedou:{
 						audio:"drlt_zhiti",
 						trigger:{
 							player:'juedouAfter',
+							target:'juedouAfter',
 						},
-						forced:true,
-						filter(event,player){
-							return event.turn!=player&&player.hasDisabledSlot();
-						},
-						content(){
-							player.chooseToEnable();
-						},
-					},
-					'3':{
-						audio:"drlt_zhiti",
-						trigger:{
-							player:'chooseToCompareAfter'
-						},
-						forced:true,
-						filter(event,player){
-							return event.result.bool==true&&player.hasDisabledSlot();
-						},
-						content(){
-							'step 0'
-							player.chooseToEnable();
-						},
-					},
-					'4':{
-						audio:"drlt_zhiti",
-						trigger:{
-							global:'chooseToCompareAfter'
-						},
-						forced:true,
-						filter(event,player){
-							return (event.targets!=undefined&&event.targets.includes(player)||event.target==player)&&event.result.bool==false&&player.hasDisabledSlot();
+						forced: true,
+						filter(event,player) {
+							if (event.turn === player || !player.hasDisabledSlot()) return false;
+							const opposite = (event.player === player ? event.target : event.player);
+							return opposite && opposite.isIn() && opposite.inRangeOf(player);
 						},
 						content(){
 							player.chooseToEnable();
 						},
 					},
-					'5':{
+					compare:{
 						audio:"drlt_zhiti",
 						trigger:{
-							player:['damageEnd']
+							player:['chooseToCompareAfter','compareMultipleAfter'],
+							target:['chooseToCompareAfter','compareMultipleAfter']
+						},
+						filter(event,player){
+							if (event.preserve || !player.hasDisabledSlot()) return false;
+							let opposite;
+							if (player === event.player){
+								if (event.num1 > event.num2){
+									opposite = event.target;
+								}
+								else {
+									return false;
+								}
+							}
+							else{
+								if (event.num1 < event.num2){
+									opposite = event.player;
+								}
+								else{
+									return false;
+								}
+							}
+							return opposite && opposite.isIn() && opposite.inRangeOf(player);
 						},
 						forced:true,
-						filter(event,player){
-							return player.hasDisabledSlot();
+						content(){
+							player.chooseToEnable();
+						},
+					},
+					damage:{
+						audio:'drlt_zhiti',
+						trigger:{player:'damageEnd'},
+						forced:true,
+						filter(event,player) {
+							if (!player.hasDisabledSlot()) return false;
+							const opposite = event.source;
+							return opposite && opposite.isIn() && opposite.inRangeOf(player);
 						},
 						content(){
 							player.chooseToEnable();
@@ -7669,9 +7664,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			g_drlt_zhiti:{
 				mod:{
 					maxHandcard (player,num){
-						if(player.maxHp>player.hp&&game.countPlayer(function(current){
+						if(player.isDamaged()) return num-game.countPlayer(function(current){
 							return current!=player&&current.hasSkill('drlt_zhiti')&&current.inRange(player);
-						})) return num-1;
+						});
 					},
 				},
 			},
@@ -8242,7 +8237,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			"drlt_duorui":"夺锐",
 			"drlt_duorui_info":"当你于出牌阶段内对一名其他角色造成伤害后，你可以废除你装备区内的一个装备栏（若已全部废除则可以跳过此步骤），然后获得该角色的一个技能直到其的下回合结束或其死亡(觉醒技，限定技，主公技，隐匿技，使命技等特殊技能除外)。若如此做，该角色该技能失效且你不能再发动〖夺锐〗直到你失去以此法获得的技能。",
 			"drlt_zhiti":"止啼",
-			"drlt_zhiti_info":"锁定技，你攻击范围内已受伤的其他角色手牌上限-1；当你拼点或【决斗】胜利，或受到伤害后，你恢复一个装备栏。",
+			"drlt_zhiti_info":"锁定技。①你攻击范围内已受伤的其他角色手牌上限-1；②当你拼点或【决斗】胜利/或受到伤害后，若对方/伤害来源在你的攻击范围内，则你恢复一个装备栏。",
 
 			shen_zhaoyun:'神赵云',
 			shen_zhaoyun_prefix:'神',
