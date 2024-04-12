@@ -1711,7 +1711,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							'step 3'
 							if(result.bool){
 								target.recast(result.cards);
-								if(get.color(cards[0])!=get.color(result.cards[0])) lib.skill.chenliuwushi.change(target,-1);
+								if(get.color(cards[0])===get.color(result.cards[0])) lib.skill.chenliuwushi.change(target,1);
 							}
 							event.finish();
 							'step 4'
@@ -1744,7 +1744,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(result.bool) cards.push(result.card);
 							if(targets.length>0) event.goto(6);
 							'step 8'
-							if(cards.length>1&&get.color(cards)!='none') lib.skill.chenliuwushi.change(target,1);
+							if (cards.length > 1) {
+								const color = get.color(cards[0], false);
+								if (color != 'none') {
+									for (let i = 1; i < cards.length; i++) {
+										const color2 = get.color(cards[i], false);
+										if (color !== color2 && color2 !== 'none') {
+											lib.skill.chenliuwushi.change(target, -1);
+											break;
+										}
+									}
+								}
+							}
 						},
 						ai:{
 							order:4.1,
@@ -3068,7 +3079,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanhuanjia_info:'出牌阶段结束时，你可以与一名角色拼点。赢的角色可以使用一张拼点牌。然后若此牌：未造成过伤害，你获得另一张拼点牌；造成过伤害，你失去一个技能。',
 			clan_wukuang:'族吴匡',
 			clanlianzhu:'联诛',
-			clanlianzhu_info:'转换技。每名角色Ａ的出牌阶段限一次。阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色不同，则你的手牌上限-1；阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色相同，则你的手牌上限+1。',
+			clanlianzhu_info:'转换技。每名角色Ａ的出牌阶段限一次。阴：Ａ可以重铸一张牌，然后你可以重铸一张牌。若这两张牌颜色相同，则你的手牌上限+1；阳：Ａ可以令你选择一名在你或Ａ攻击范围内的另一名其他角色Ｂ，然后Ａ和你可依次选择是否对Ｂ使用一张【杀】。若这两张【杀】颜色不同，则你的手牌上限-1。',
 			clan_wangling:'族王淩',
 			clanbolong:'驳龙',
 			clanbolong_info:'出牌阶段限一次。你可以令一名其他角色选择一项：1.你交给其一张牌，然后视为对其使用一张雷【杀】；2.交给你等同于你手牌数的牌，然后视为对你使用一张【酒】。',

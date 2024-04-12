@@ -111,8 +111,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				sp_caizijiaren:['dc_kongrong','re_dongbai','re_sunluyu','heyan','zhaoyan','wangtao','wangyue','zhangxuan','tengyin','zhangyao','xiahoulingnv','dc_sunru','pangshanmin','kuaiqi'],
 				sp_zhilan:['dc_liuli','liuyong','wanniangongzhu','zhanghu','lvlingqi','tenggongzhu','panghui','dc_zhaotongzhaoguang','yuantanyuanxiyuanshang','yuechen','dc_lingcao'],
 				sp_guixin:['zangba','re_kanze','re_chendeng','caimaozhangyun','dc_lvkuanglvxiang','dc_gaolan','yinfuren','chengui','chenjiao','dc_sp_jiaxu','qinlang','dc_dongzhao'],
-				sp_daihan:['mamidi','dc_jiling','zhangxun','dc_yuejiu','wanglie','leibo','qiaorui','dongwan','yuanyin'],
-				sp_jianghu:['guanning','huzhao','dc_huangchengyan','mengjie'],
+				sp_daihan:['mamidi','dc_jiling','zhangxun','dc_yuejiu','leibo','qiaorui','dongwan','yuanyin'],
+				sp_jianghu:['guanning','huzhao','dc_huangchengyan','mengjie','wanglie'],
 				sp_zongheng:['huaxin','luyusheng','re_xunchen','re_miheng','fengxi','re_dengzhi','dc_yanghu','zongyu'],
 				sp_taiping:['guanhai','liupi','peiyuanshao','zhangchu','zhangkai','dc_zhangmancheng'],
 				sp_yanhan:['dc_liuba','dc_huangquan','furongfuqian','xianglang','dc_huojun','gaoxiang','dc_wuban','jiangfei'],
@@ -6705,7 +6705,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{global:'useCardAfter'},
 				forced:true,
-				locked:false,
 				filter:function(event,player){
 					return get.type(event.card,null,false)=='equip'&&event.player.isMaxEquip();
 				},
@@ -9546,7 +9545,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.chooseControl(lib.suit,'cancel2').set('prompt',get.prompt('huguan',trigger.player)).set('prompt2','令某种花色的手牌不计入其本回合的手牌上限').set('ai',function(){
 						var player=_status.event.player,target=_status.event.getTrigger().player,att=get.attitude(player,target);
 						if(att <= 0){
-							if (!player.hasSkill('yaopei') || player.hasAllHistory('useSkill',function(evt){
+							if (!player.hasSkill('yaopei') || player.hasHistory('useSkill',function(evt){
 								return evt.skill=='huguan'&&evt.targets.includes(target);
 							}) || target.needsToDiscard() - target.needsToDiscard(-target.countCards('h') / 4) > (att>-2?1.6:1)) return 'cancel2';
 						}
@@ -12537,7 +12536,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		translate:{
 			re_panfeng:'潘凤',
 			xinkuangfu:'狂斧',
-			xinkuangfu_info:'出牌阶段限一次，你可选择：1，弃置装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】造成伤害，你摸两张牌。2，弃置一名其他角色装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】未造成伤害，你弃置两张手牌。',
+			xinkuangfu_info:'出牌阶段限一次，你可选择：1，弃置装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】造成伤害，你摸两张牌。2，弃置一名其他角色装备区里的一张牌，你使用无对应实体牌的普【杀】。若此【杀】未造成伤害，你弃置两张手牌。（均无距离和次数限制）',
 			xingdaorong:'邢道荣',
 			xuxie:'虚猲',
 			xuxie_info:'出牌阶段开始时，你可以减1点体力上限并选择所有距离1以内的角色，弃置这些角色的各一张牌或令这些角色各摸一张牌。出牌阶段结束时，若你的体力上限不为全场最多，则你加1点体力上限，然后回复1点体力或摸两张牌。',
@@ -12601,7 +12600,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huguan:'护关',
 			huguan_info:'一名角色于出牌阶段内使用第一张牌时，若此牌为红色，则你可以声明一种花色。该花色的牌不计入其本回合的手牌上限。',
 			yaopei:'摇佩',
-			yaopei_info:'其他角色的弃牌阶段结束时，若你本局游戏内对其发动过〖护关〗，则你可以弃置一张与其于此阶段弃置的牌花色均不相同的牌。然后你选择一项：①其摸两张牌，你回复1点体力。②其回复1点体力，你摸两张牌。',
+			yaopei_info:'其他角色的弃牌阶段结束时，若你本回合内对其发动过〖护关〗，则你可以弃置一张与其于此阶段弃置的牌花色均不相同的牌。然后你选择一项：①其摸两张牌，你回复1点体力。②其回复1点体力，你摸两张牌。',
 			mingluan:'鸣鸾',
 			mingluan_info:'其他角色的结束阶段开始时，若有角色于本回合内回复过体力，则你可以弃置任意张牌，然后摸X张牌（X为当前角色的手牌数，且至多摸至5张）。',
 			zhangxuan:'张嫙',
@@ -12654,8 +12653,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhtongyuan_info:'锁定技。①当你使用红色锦囊牌后，你于〖摧坚〗后增加“若其手牌中没有【闪】，则你摸两张牌”；②当你使用或打出红色基本牌后，你删除〖摧坚〗中的“，然后你交给其等量的牌”。③当你使用红色的普通锦囊牌/基本牌时，若你已发动过〖摧坚①〗和〖摧坚②〗，则此牌不可被响应/可额外增加一个目标。',
 			lvlingqi:'吕玲绮',
 			guowu:'帼舞',
-			guowu_info:'出牌阶段开始时，你可以展示全部手牌，根据你展示的类型数，你获得对应效果：至少一类，从弃牌堆获得一张【杀】；至少两类，此阶段使用牌无距离限制；至少三类，此阶段使用【杀】或普通锦囊牌可以多指定两个目标。',
-			guowu_info_guozhan:'出牌阶段开始时，你可以展示全部手牌，根据你展示的类型数，你获得对应效果：至少一类，从弃牌堆获得一张【杀】；至少两类，此阶段使用牌无距离限制；至少三类，此阶段使用【杀】可以多指定两个目标。',
+			guowu_info:'出牌阶段开始时，你可以展示全部手牌，根据你展示的类型数，你获得对应效果：至少一类，从弃牌堆获得一张【杀】；至少两类，此阶段使用牌无距离限制；至少三类，此阶段使用【杀】或普通锦囊牌可以多指定至多两个目标。',
+			guowu_info_guozhan:'出牌阶段开始时，你可以展示全部手牌，根据你展示的类型数，你获得对应效果：至少一类，从弃牌堆获得一张【杀】；至少两类，此阶段使用牌无距离限制；至少三类，此阶段使用【杀】可以多指定至多两个目标。',
 			zhuangrong:'妆戎',
 			zhuangrong_info:'觉醒技，一名角色的回合结束时，若你的体力值或手牌数为1，你减1点体力上限并回复体力至上限，将手牌摸至体力上限，然后获得〖神威〗和〖无双〗。',
 			llqshenwei:'神威',
@@ -12676,7 +12675,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			anyong_info:'当一名角色于其回合内第一次对另一名其他角色造成伤害后，若伤害值为1，则你可弃置一张牌，并对受伤角色造成1点伤害。',
 			wanniangongzhu:'万年公主',
 			zhenge:'枕戈',
-			zhenge_info:'准备阶段，你可以选择一名角色。该角色本局游戏的攻击范围+1（至多+5）。然后若所有其他角色都在该角色的攻击范围内，则你可以令其视为对另一名角色使用一张【杀】。',
+			zhenge_info:'准备阶段，你可以选择一名角色。该角色本局游戏的攻击范围+1（至多+5）。然后若除其外的所有角色都在该角色的攻击范围内，则你可以令其视为对另一名角色使用一张【杀】。',
 			xinghan:'兴汉',
 			xinghan_info:'锁定技，每回合的第一张【杀】造成伤害后，若此【杀】的使用者成为过〖枕戈〗的目标，则你摸一张牌。若你的手牌数不是全场唯一最多的，则改为摸X张牌（X为该角色的攻击范围且最多为5）。',
 			re_chendeng:'陈登',
@@ -12782,7 +12781,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyingtu:'营图',
 			dcyingtu_info:'每回合限一次。当你的上家/下家于摸牌阶段外得到牌后，你可以获得其一张牌，然后将一张牌交给你的下家/上家。若你给出的牌为装备牌，则其使用之。',
 			dccongshi:'从势',
-			dccongshi_info:'一名角色使用的装备牌结算结束后，若其装备区内的牌数为全场最多，则你摸一张牌。',
+			dccongshi_info:'锁定技。一名角色使用的装备牌结算结束后，若其装备区内的牌数为全场最多，则你摸一张牌。',
 			wanglie:'王烈',
 			dcchongwang:'崇望',
 			dcchongwang_info:'其他角色使用基本牌或普通锦囊牌时，若你是本局游戏内上一张被使用的牌的使用者，则你可以选择一项：⒈令其于此牌结算结束后收回此牌对应的所有实体牌；⒉取消此牌的所有目标。',
