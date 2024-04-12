@@ -3551,56 +3551,56 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			dcrihui:{
-				audio:2,
-				trigger:{player:'useCardAfter'},
-				usable:1,
-				filter:function(event,player){
-					if(!event.targets||event.targets.length!=1||event.targets[0]==player) return false;
-					var card=event.card;
-					var target=event.targets[0];
-					var marked=target.hasMark('dcjizhong');
-					return (get.type(card)=='trick'||get.color(card)=='black'&&get.type(card)=='basic')&&
-						(marked||!marked&&game.hasPlayer(current=>current.hasMark('dcjizhong')));
+				audio: 2,
+				trigger: { player: 'useCardAfter' },
+				usable: 1,
+				filter: function (event, player) {
+					if (!event.targets || event.targets.length != 1 || event.targets[0] == player) return false;
+					var card = event.card;
+					var target = event.targets[0];
+					var marked = target.hasMark('dcjizhong');
+					return (get.type(card) == 'trick' || get.color(card) == 'black' && get.type(card) == 'basic') &&
+						(marked || !marked && game.hasPlayer(current => current.hasMark('dcjizhong')));
 				},
-				direct:true,
-				content:function(){
-					'step 0'
-					var target=trigger.targets[0];
-					var card={name:trigger.card.name,nature:trigger.card.nature,isCard:true};
-					event.target=target;
-					event.card=card;
-					if(target.hasMark('dcjizhong')) player.gainPlayerCard(get.prompt('dcrihui',target),target,'hej').set('logSkill',['dcrihui',target]);
-					else{
-						player.chooseBool(get.prompt('dcrihui',target),'令所有有“信众”的角色依次视为对其使用一张'+get.translation(card)).set('ai',()=>{
-							return _status.event.bool;
-						}).set('bool',function(){
-							var eff=0;
-							game.countPlayer(current=>{
-								if(!current.hasMark('dcjizhong')) return;
-								eff+=get.effect(target,card,current,player);
-							});
-							return eff>0;
-						}());
+				logTarget: event => event.targets[0],
+				prompt2(event, player) {
+					const target = event.targets[0];
+					if (target.hasMark('dcjizhong')) return '获得该角色区域内的一张牌';
+					else {
+						const card = { name: event.card.name, nature: event.card.nature, isCard: true };
+						return '令所有有“信众”的角色依次视为对其使用一张' + get.translation(card);
 					}
-					'step 1'
-					if(!result.bool){
-						player.storage.counttrigger.dcrihui--;
-						event.finish();
-						return;
+				},
+				check(event, player) {
+					const target = event.targets[0];
+					if (target.hasMark('dcjizhong')) {
+						return get.effect(target, { name: 'shunshou_copy' }, event, player) > 0;
 					}
-					if(target.hasMark('dcjizhong')) event.finish();
-					else{
-						player.logSkill('dcrihui',target);
-						event.targets=game.filterPlayer(current=>current.hasMark('dcjizhong'));
-						event.targets.sortBySeat(_status.currentPhase);
+					else {
+						const card = { name: event.card.name, nature: event.card.nature, isCard: true };
+						let eff = 0;
+						game.countPlayer(current => {
+							if (!current.hasMark('dcjizhong') || !current.canUse(card, player, false)) return;
+							eff += get.effect(target, card, current, player);
+						});
+						return eff > 0;
 					}
-					'step 2'
-					var current=event.targets.shift();
-					if(current.canUse(card,target,false)){
-						current.useCard(card,target,false);
+				},
+				async content(event, trigger, player) {
+					const target = trigger.targets[0];
+					if (target.hasMark('dcjizhong')) {
+						await player.gainPlayerCard(target, 'hej', true)
 					}
-					if(event.targets.length) event.redo();
-				}
+					else {
+						const card = { name: trigger.card.name, nature: trigger.card.nature, isCard: true };
+						const targets = game.filterPlayer(current => current.hasMark('dcjizhong')).sortBySeat(_status.currentPhase);
+						for (const current of targets) {
+							if (target.isIn() && current.isIn() && current.canUse(card, target, false)) {
+								await current.useCard(card, target, false);
+							}
+						}
+					}
+				},
 			},
 			dcguangshi:{
 				audio:2,
@@ -5104,29 +5104,23 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{target:'useCardToTargeted'},
 				usable:2,
-				direct:true,
 				filter:function(event,player){
 					return event.player!=player&&(get.type(event.card)=='trick'||event.card.name=='sha')&&player.countCards('he')>1;
 				},
-				content:function(){
-					'step 0'
-					var str='，若重铸的牌中没有'+get.translation(get.type2(trigger.card))+'牌，你于'+get.translation(trigger.cards)+'进入弃牌堆后获得之';
-					player.chooseCard(get.prompt('dcqianzheng'),'重铸两张牌'+(trigger.cards.length?str:'')+'。',2,'he',lib.filter.cardRecastable).set('ai',card=>{
-						var val=get.value(card);
-						if(get.type2(card)==_status.event.type) val+=0.5;
-						return 6-val;
-					}).set('type',get.type2(trigger.card));
-					'step 1'
-					if(result.bool){
-						var cards=result.cards;
-						player.logSkill('dcqianzheng');
-						player.recast(cards);
-						if(cards.every(card=>get.type2(card)!=get.type2(trigger.card))){
-							trigger.getParent().dcqianzheng=true;
-							player.addTempSkill('dcqianzheng_gain');
-						}
+				async cost(event, trigger, player) {
+					const str = '，若重铸的牌中没有' + get.translation(get.type2(trigger.card)) + '牌，你于' + get.translation(trigger.cards) + '进入弃牌堆后获得之';
+					event.result = await player.chooseCard(get.prompt('dcqianzheng'), '重铸两张牌' + (trigger.cards.length ? str : '') + '。', 2, 'he', lib.filter.cardRecastable).set('ai', card => {
+						var val = get.value(card);
+						if (get.type2(card) == _status.event.type) val += 0.5;
+						return 6 - val;
+					}).set('type', get.type2(trigger.card)).forResult();
+				},
+				async content(event, trigger, player) {
+					if (event.cards.every(card => get.type2(card) != get.type2(trigger.card))) {
+						trigger.getParent().dcqianzheng = true;
+						player.addTempSkill('dcqianzheng_gain');
 					}
-					else player.storage.counttrigger.dcqianzheng--;
+					await player.recast(event.cards);
 				},
 				subSkill:{
 					gain:{
@@ -6254,24 +6248,22 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return event.player!=player&&get.color(event.card)=='black';
 				},
 				usable:2,
-				direct:true,
-				content:function(){
-					'step 0'
-					if(player.countCards('h')<player.hp){
-						player.chooseBool(get.prompt('dcqingyan'),'将手牌摸至体力上限（摸'+get.cnNumber(player.maxHp-player.countCards('h'))+'张牌）').set('ai',()=>1);
-					}else{
-						player.chooseToDiscard(get.prompt('dcqingyan'),'弃置一张手牌令你的手牌上限+1').set('ai',card=>6-get.value(card)).set('logSkill','dcqingyan');
+				async cost(event, trigger, player) {
+					if (player.countCards('h') < player.hp) {
+						event.result = await player.chooseBool(get.prompt('dcqingyan'), '将手牌摸至体力上限（摸' + get.cnNumber(player.maxHp - player.countCards('h')) + '张牌）').set('ai', () => 1).forResult();
 					}
-					'step 1'
-					if(result.bool){
-						if(result.cards&&result.cards.length){
-							lib.skill.dcxieshou.change(player,1);
-						}else{
-							player.logSkill('dcqingyan');
-							player.drawTo(player.maxHp);
-						}
-					} else player.storage.counttrigger.dcqingyan--;
-				}
+					else {
+						event.result = await player.chooseToDiscard(get.prompt('dcqingyan'), '弃置一张手牌令你的手牌上限+1', 'chooseonly').set('ai', card => 6 - get.value(card)).forResult();
+					}
+				},
+				async content(event, trigger, player) {
+					if (event.cards && event.cards.length) {
+						await player.dicard(cards);
+						lib.skill.dcxieshou.change(player, 1);
+					} else {
+						player.drawTo(player.maxHp);
+					}
+				},
 			},
 			dcqizi:{
 				mod:{
@@ -6633,8 +6625,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					global:['gainAfter','loseAsyncAfter'],
 				},
 				usable:1,
-				filter:function(event,player){
-					return lib.skill.dcyingtu.filterx(event,player,player.getNext())||lib.skill.dcyingtu.filterx(event,player,player.getPrevious());
+				getIndex(event, player){
+					var targets=[];
+					if(lib.skill.dcyingtu.filterx(event,player,player.getNext())) targets.add(player.getNext());
+					if(lib.skill.dcyingtu.filterx(event,player,player.getPrevious())) targets.add(player.getPrevious());
+					return targets.sortBySeat(_status.currentPhase);
 				},
 				filterx:function(event,player,target){
 					var evt=event.getParent('phaseDraw');
@@ -6643,41 +6638,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return lib.filter.canBeGained(card,target,player)
 					},'he');
 				},
-				logTarget:'player',
-				direct:true,
-				checkx:function(player,source){
+				logTarget(event, player, triggername, target){
+					return target;
+				},
+				check(event, player, triggername, source){
 					var target=(source==player.getNext()?player.getPrevious():player.getNext());
 					return Math.min(0,get.attitude(player,target))>=get.attitude(player,source);
 				},
+				prompt2:'获得该角色的一张牌，然后将一张牌交给该角色的对位角色。若你给出的是装备牌，则其使用其得到的牌。',
 				content:function(){
 					'step 0'
-					var targets=[];
-					event.targets=targets;
-					if(lib.skill.dcyingtu.filterx(trigger,player,player.getNext())) targets.add(player.getNext());
-					if(lib.skill.dcyingtu.filterx(trigger,player,player.getPrevious())) targets.add(player.getPrevious());
-					'step 1'
-					var target=targets.shift();
+					var target=event.targets[0];
 					event.target=target;
-					player.chooseBool(
-						get.prompt('dcyingtu',target),
-						'获得该角色的一张牌，然后将一张牌交给该角色的对位角色。若你给出的是装备牌，则其使用其得到的牌。'
-					).set('goon',lib.skill.dcyingtu.checkx(player,target)).set('ai',function(){
-						return _status.event.goon;
-					});
-					'step 2'
-					if(result.bool){
-						player.logSkill('dcyingtu',target);
-						var next=game.createEvent('dcyingtu_insert');
-						next.player=player;
-						next.target=target;
-						next.setContent(lib.skill.dcyingtu.contentx);
-						event.finish();
-					}
-					else if(targets.length>0) event.goto(1);
-					else player.storage.counttrigger.dcyingtu--;
-				},
-				contentx:function(){
-					'step 0'
 					event.side=(target==player.getPrevious()?'getNext':'getPrevious');
 					player.gainPlayerCard(target,true,'he');
 					'step 1'
@@ -10395,34 +10367,35 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			rewangzu:{
 				audio:2,
 				trigger:{player:'damageBegin1'},
-				direct:true,
 				filter:function(event,player){
 					return event.source&&player!=event.source&&player.hasCard((card)=>lib.filter.cardDiscardable(card,player,'rewangzu'),'h');
 				},
 				usable:1,
-				content:function(){
+				async cost(event, trigger, player) {
 					'step 0'
-					var num=player.getFriends().length;
-					if(!game.hasPlayer(function(current){
-						return current!=player&&current.getFriends().length>num;
-					})){
-						player.chooseToDiscard('h',get.prompt('rewangzu'),'弃置一张牌并令伤害-1').set('ai',function(card){
-							return 7-get.value(card);
-						}).logSkill='rewangzu';
+					var num = player.getFriends().length;
+					if (!game.hasPlayer(function (current) {
+						return current != player && current.getFriends().length > num;
+					})) {
+						player.chooseToDiscard('h', get.prompt('rewangzu'), '弃置一张牌并令伤害-1', 'chooseonly').set('ai', function (card) {
+							return 7 - get.value(card);
+						});
 					}
-					else{
-						player.chooseBool(get.prompt('rewangzu'),'随机弃置一张牌并令伤害-1');
+					else {
+						player.chooseBool(get.prompt('rewangzu'), '随机弃置一张牌并令伤害-1');
 					}
 					'step 1'
-					if(result.bool){
-						trigger.num--;
-						if(!result.cards||!result.cards.length){
-							player.logSkill('rewangzu');
-							var cards=player.getCards('h',(card)=>lib.filter.cardDiscardable(card,player,'rewangzu'));
-							if(cards.length) player.discard(cards.randomGet());
-						}
+					event.result = result;
+				},
+				async content(event, trigger, player) {
+					trigger.num--;
+					if (!event.cards || !event.cards.length) {
+						const cards = player.getCards('h', (card) => lib.filter.cardDiscardable(card, player, 'rewangzu'));
+						if (cards.length) player.discard(cards.randomGet());
 					}
-					else player.storage.counttrigger.rewangzu--;
+					else {
+						player.discard(event.cards);
+					}
 				},
 			},
 			//万年公主
@@ -11237,59 +11210,50 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			spwanggui:{
 				audio:'wanggui',
 				trigger:{source:'damageSource'},
-				direct:true,
 				usable:1,
 				filter:function(event,player){
 					return game.hasPlayer(function(current){
 						return current.group!=player.group;
 					});
 				},
-				content:function(){
-					'step 0'
-					player.chooseTarget(get.prompt('spwanggui'),'对一名势力不同的其他角色造成1点伤害',function(card,player,target){
+				async cost(event, trigger, player){
+					event.result = await player.chooseTarget(get.prompt('spwanggui'),'对一名势力不同的其他角色造成1点伤害',function(card,player,target){
 						return target.group!=player.group;
 					}).set('ai',function(target){
 						var player=_status.event.player;
 						return get.damageEffect(target,player,player);
-					});
-					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
-						player.logSkill('spwanggui',target);
-						target.damage();
-					}
-					else player.storage.counttrigger.spwanggui--;
+					}).forResult();
+				},
+				async content(event, trigger, player){
+					const target = event.targets[0];
+					target.damage();
 				},
 				group:'spwanggui_draw',
 				subSkill:{
 					draw:{
 						trigger:{player:'damageEnd'},
-						direct:true,
-						content:function(){
-							'step 0'
-							player.chooseTarget(get.prompt('spwanggui'),'令自己摸一张牌，或和一名势力相同的其他角色各摸一张牌',function(card,player,target){
+						async cost(event, trigger, player){
+							event.result = await player.chooseTarget(get.prompt('spwanggui'),'令自己摸一张牌，或和一名势力相同的其他角色各摸一张牌',function(card,player,target){
 								return target.group==player.group;
 							}).set('ai',function(target){
 								var player=_status.event.player,att=get.attitude(player,target);
 								if(target!=player) att*=2;
 								if(target.hasSkillTag('nogain')) att/=1.7;
 								return att;
-							});
-							'step 1'
-							if(result.bool){
-								var target=result.targets[0];
-								player.logSkill('spwanggui',target);
-								if(player==target){
-									player.draw();
-									event.finish();
-								}
-								else{
-									var list=[player,target].sortBySeat();
-									game.asyncDraw(list);
-								}
+							}).forResult();
+						},
+						content:function(){
+							'step 0'
+							var target=targets[0];
+							if(player==target){
+								player.draw();
+								event.finish();
 							}
-							else event.finish();
-							'step 2'
+							else{
+								var list=[player,target].sortBySeat();
+								game.asyncDraw(list);
+							}
+							'step 1'
 							game.delayx();
 						},
 					},
