@@ -17285,8 +17285,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							}
 							if(list.length){
 								var skill=list.randomGet();
-								trigger.player.popup(skill);
-								trigger.player.disableSkill('chuanxin_disable',skill,true);
+								trigger.player.removeSkills(skill)
 							}
 						}
 						else{
