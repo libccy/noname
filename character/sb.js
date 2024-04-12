@@ -429,6 +429,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						animate:'giveAuto',
 						gaintag:['sbquhu'],
 					}).setContent(lib.skill.sbquhu.addToExpansionMultiple);
+					debugger
 					await game.asyncDelay(1.5);
 					const isMin=minLength>myCards.length;
 					const sortedList=lose_list.filter(list=>list[0]!=player).sort((a,b)=>{
@@ -544,7 +545,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						return;
 					}
 					"step 2";
+					var loopedCount=0,mapLength=Object.keys(event.gaining_map).length;
 					for(var j in event.gaining_map){
+						loopedCount++;
 						var map={};
 						var player=(_status.connectMode?lib.playerOL:game.playerMap)[j],cards=event.gaining_map[j];
 						var hs=player.getCards('x');
@@ -567,20 +570,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							player.$draw(cards.length);
 							if(event.log) game.log(player,'将',get.cnNumber(cards.length),'张牌置于了武将牌上');
 							game.pause();
-							setTimeout((player,cards)=>{
+							setTimeout((player,cards,resume)=>{
 								player.$addToExpansion(cards,null,event.gaintag);
 								for(var i of event.gaintag) player.markSkill(i);
-								game.resume();
-							},get.delayx(500,500),player,cards);
+								if(resume) game.resume();
+							},get.delayx(500,500),player,cards,loopedCount===mapLength);
 						}
 						else if(event.animate=='gain'){
 							player.$gain(cards,false);
 							game.pause();
-							setTimeout((player,cards)=>{
+							setTimeout((player,cards,resume)=>{
 								player.$addToExpansion(cards,null,event.gaintag);
 								for(var i of event.gaintag) player.markSkill(i);
-								game.resume();
-							},get.delayx(700,700),player,cards);
+								if(resume) game.resume();
+							},get.delayx(700,700),player,cards,loopedCount===mapLength);
 						}
 						else if(event.animate=='gain2'||event.animate=='draw2'){
 							var gain2t=300;
@@ -588,11 +591,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								gain2t=500;
 							}
 							game.pause();
-							setTimeout((player,cards)=>{
+							setTimeout((player,cards,resume)=>{
 								player.$addToExpansion(cards,null,event.gaintag);
 								for(var i of event.gaintag) player.markSkill(i);
-								game.resume();
-							},get.delayx(gain2t,gain2t),player,cards);
+								if(resume) game.resume();
+							},get.delayx(gain2t,gain2t),player,cards,loopedCount===mapLength);
 						}
 						else if(event.animate=='give'||event.animate=='giveAuto'){
 							var evtmap=event.losing_map;
@@ -632,20 +635,20 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								}
 							}
 							game.pause();
-							setTimeout((player,cards)=>{
+							setTimeout((player,cards,resume)=>{
 								player.$addToExpansion(cards,null,event.gaintag);
 								for(var i of event.gaintag) player.markSkill(i);
-								game.resume();
-							},get.delayx(500,500),player,cards);
+								if(resume) game.resume();
+							},get.delayx(500,500),player,cards,loopedCount===mapLength);
 						}
 						else if(typeof event.animate=='function'){
 							var time=event.animate(event);
 							game.pause();
-							setTimeout((player,cards)=>{
+							setTimeout((player,cards,resume)=>{
 								player.$addToExpansion(cards,null,event.gaintag);
 								for(var i of event.gaintag) player.markSkill(i);
-								game.resume();
-							},get.delayx(time,time),player,cards);
+								if(resume) game.resume();
+							},get.delayx(time,time),player,cards,loopedCount===mapLength);
 						}
 						else{
 							player.$addToExpansion(cards,null,event.gaintag);
