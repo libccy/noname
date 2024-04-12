@@ -196,7 +196,7 @@ Reflect.defineProperty(HTMLDivElement.prototype, 'setBackground', {
 		this.style.backgroundSize = 'cover';
 		if (type === 'character') {
 			const nameinfo = get.character(name);
-			const sex = nameinfo ? nameinfo[0] : 'male';
+			const sex = nameinfo && ['male', 'female', 'double'].includes(nameinfo[0]) ? nameinfo[0] : 'male';
 			this.setBackgroundImage([
 				src,
 				`${lib.characterDefaultPicturePath}${sex}${ext}`
