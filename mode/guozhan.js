@@ -4209,7 +4209,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 				async content(event,trigger,player){
 					const card=event.cards[0],target=event.targets[0];
 					if(target!=player) player.$give(card,target,false);
-					await target.equip(thisCard);
+					await target.equip(card);
 				},
 				group:'fakehuyuan_discard',
 				subSkill:{

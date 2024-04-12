@@ -1288,7 +1288,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'useCardToPlayered'},
 				filter:function(event,player){
-					return event.isFirstTarget;
+					return event.isFirstTarget && event.targets.some(target => target != player);
 				},
 				usable:1,
 				direct:true,
@@ -1985,42 +1985,59 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(!event.source||!event.source.isIn()) return false;
 							return event.player.getExpansions('dcxiaoyin').length;
 						},
-						direct:true,
-						content:function*(event,map){
-							var player=map.player,trigger=map.trigger;
-							var source=trigger.source,target=trigger.player;
-							var cards=target.getExpansions('dcxiaoyin');
-							if(trigger.hasNature('fire')){
-								var types=cards.map(i=>get.type2(i,false));
-								var str=get.translation(types).replace(/(.*)、/, '$1或');
-								var result=yield source.chooseCard(`硝引：是否弃置一张${str}牌？`,`若如此做，将${get.translation(target)}的所有“硝引”牌置入弃牌堆，令你对其造成的伤害+1`,'he',function(card,player){
-									if(!get.event('types').includes(get.type2(card))) return false;
-									return lib.filter.cardDiscardable.apply(this,arguments);
-								}).set('types',types).set('ai',card=>{
-									if(get.event('goon')) return 7-get.value(card);
+						//direct:true,
+						async cost(event, trigger, player){
+							const source = trigger.source, target = trigger.player;
+							const cards = target.getExpansions('dcxiaoyin');
+							if (trigger.hasNature('fire')) {
+								const types = cards.map(i => get.type2(i, false));
+								const str = get.translation(types).replace(/(.*)、/, '$1或');
+								event.result = await source.chooseCard(`硝引：是否弃置一张${str}牌？`, `若如此做，将${get.translation(target)}的对应的“硝引”牌置入弃牌堆，令你对其造成的伤害+1`, 'he', function (card, player) {
+									if (!get.event('types').includes(get.type2(card))) return false;
+									return lib.filter.cardDiscardable.apply(this, arguments);
+								}).set('types', types).set('ai', card => {
+									if (get.event('goon')) return 7 - get.value(card);
 									return 0;
-								}).set('goon',get.damageEffect(target,player,player,'fire')>0&&get.attitude(player,target)<=0);
-								if(result.bool){
-									player.logSkill('dcxiaoyin_damage',source);
-									source.line(target,'fire');
-									source.discard(result.cards).discarder=source;
-									game.delayex();
-									target.loseToDiscardpile(cards);
-									trigger.addNumber('num',1);
-								}
+								}).set('goon', get.damageEffect(target, player, player, 'fire') > 0 && get.attitude(player, target) <= 0).forResult();
 							}
-							else{
-								var result=yield source.chooseBool(`###是否响应${get.translation(player)}的【硝引】？###获得${get.translation(target)}的“硝引”牌（${get.translation(cards)}），然后将你对其造成的此次伤害改为火焰伤害。`).set('choice',(()=>{
-									if(get.damageEffect(target,source,source,'fire')<get.damageEffect(target,source,source)-5) return false;
-									if(cards.map(i=>get.value(i)).reduce((p,c)=>p+c,0)>0) return true;
+							else {
+								event.result = await source.chooseBool(`###是否响应${get.translation(player)}的【硝引】？###获得${get.translation(target)}的一张“硝引”牌（${get.translation(cards)}），然后将你对其造成的此次伤害改为火焰伤害。`).set('choice', (() => {
+									if (get.damageEffect(target, source, source, 'fire') < get.damageEffect(target, source, source) - 5) return false;
+									if (cards.map(i => get.value(i)).reduce((p, c) => p + c, 0) > 0) return true;
 									return false;
-								})());
-								if(result.bool){
-									player.logSkill('dcxiaoyin_damage',source);
-									source.line(target,'fire');
-									source.gain(cards,target,'give');
-									game.setNature(trigger,'fire');
+								})()).forResult();
+							}
+						},
+						async content(event, trigger, player){
+							const source = trigger.source, target = trigger.player;
+							if (trigger.hasNature('fire')) {
+								source.line(target, 'fire');
+								const type = get.type2(event.cards[0]);
+								await source.discard(event.cards).set('discarder', source);
+								//await game.asyncDelayx();
+								const cardsToDiscard = target.getExpansions('dcxiaoyin').filter(card => get.type2(card, false) === type);
+								if (cardsToDiscard.length === 1) await target.loseToDiscardpile(cardsToDiscard);
+								else if (cardsToDiscard.length > 1) {
+									const result = await source.chooseButton([
+										`请选择移去${get.translation(source)}的一张“硝引”牌`,
+										cardsToDiscard
+									], true).forResult();
+									await target.loseToDiscardpile(result.links);
 								}
+								trigger.addNumber('num', 1);
+							}
+							else {
+								source.line(target, 'fire');
+								const cards = target.getExpansions('dcxiaoyin');
+								if (cards.length === 1) await source.gain(cards, target, 'give');
+								else if (cards.length > 1) {
+									const result = await source.chooseButton([
+										`请选择获得${get.translation(source)}的一张“硝引”牌`,
+										cards
+									], true).forResult();
+									await source.gain(result.links, target, 'give');
+								}
+								game.setNature(trigger, 'fire');
 							}
 						},
 					},
@@ -14806,7 +14823,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhushi_info:'主公技。每回合限一次，其他魏势力角色于回合内回复体力时，其可令你摸一张牌。',
 			laiyinger:'来莺儿',
 			xiaowu:'绡舞',
-			xiaowu_info:'出牌阶段限一次，你可以选择任意名座位连续且包含你的上家/下家的角色。这些角色依次选择一项：⒈令你摸一张牌；⒉其摸一张牌。然后若选择选项一的角色数大于选项二的角色数，则你获得一枚“沙”；若选择选项二的角色数大于选项一的角色数，则你对这些角色依次造成1点伤害。',
+			xiaowu_info:'出牌阶段限一次，你可以选择任意名座位连续且包含你的上家/下家的其他角色。这些角色依次选择一项：⒈令你摸一张牌；⒉其摸一张牌。然后若选择选项一的角色数大于选项二的角色数，则你获得一枚“沙”；若选择选项二的角色数大于选项一的角色数，则你对这些角色依次造成1点伤害。',
 			huaping:'化萍',
 			huaping_info:'限定技。①一名其他角色死亡时，你可获得其当前拥有的所有不带有「Charlotte」标签的技能，然后你失去〖绡舞〗，移去所有“沙”并摸等量的牌。②当你死亡时，你可令一名其他角色获得〖沙舞〗和你的所有“沙”。',
 			shawu:'沙舞',
@@ -14916,7 +14933,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcmengchi:'蒙斥',
 			dcmengchi_info:'锁定技。若你未于当前回合得到过牌：你不能使用牌；当你横置前，取消之；当你受到无属性伤害后，回复1点体力。',
 			dcfangdu:'芳妒',
-			dcfangdu_info:'锁定技。当你于回合外受到伤害后，若此次伤害为你于本回合受到的：第一次无属性伤害，你回复1点体力；第一次属性伤害，你随机获得伤害来源的一张牌。',
+			dcfangdu_info:'锁定技。当你于回合外受到伤害后，若此次伤害为你于本回合受到的：第一次无属性伤害，你回复1点体力；第一次属性伤害，你随机获得伤害来源的一张手牌。',
 			dcjiexing:'节行',
 			dcjiexing_info:'当你受到伤害后、失去体力后或回复体力后，你可以摸一张牌，且此牌不计入本回合的手牌上限。',
 			dongguiren:'董贵人',
@@ -15110,7 +15127,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dclima:'骊马',
 			dclima_info:'锁定技。你计算至其他角色的距离-X（X为场上的坐骑牌数且至少为1）。',
 			dcxiaoyin:'硝引',
-			dcxiaoyin_info:'①准备阶段，你可以亮出牌堆顶的Y张牌（Y为你距离1以内的角色数），获得其中的红色牌，将其中任意张黑色牌置于等量名座次连续的其他角色的武将牌上，称为“硝引”。②当一名有“硝引”牌的角色受到伤害时，若此伤害为：火焰伤害，来源可以弃置一张其“硝引”牌包含的类型的牌，将其“硝引”置入弃牌堆，令此伤害+1；非火焰伤害，来源可以获得其“硝引”牌，将此伤害改为火焰伤害。',
+			dcxiaoyin_info:'①准备阶段，你可以亮出牌堆顶的Y张牌（Y为你距离1以内的角色数），获得其中的红色牌，将其中任意张黑色牌置于等量名座次连续的其他角色的武将牌上，称为“硝引”。②当一名有“硝引”牌的角色受到伤害时，若此伤害为：火焰伤害，来源可以弃置其“硝引”牌包含的类型的牌，将一张对应的“硝引”置入弃牌堆，令此伤害+1；非火焰伤害，来源可以获得一张“硝引”牌，将此伤害改为火焰伤害。',
 			dchuahuo:'花火',
 			dchuahuo_info:'出牌阶段限一次。你可以将一张红色手牌当不计入次数的火【杀】使用。然后当你使用此牌指定第一个目标后，若目标角色有“硝引”牌，你可以将此【杀】的目标改为所有有“硝引”牌的角色。',
 			caoyi:'曹轶',
@@ -15139,7 +15156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcsbronghuo:'融火',
 			dcsbronghuo_info:'锁定技，当你使用火【杀】或【火攻】时，此牌伤害基值改为场上势力数。',
 			dcsbyingmou:'英谋',
-			dcsbyingmou_info:'转换技，每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色：阴，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】；阳，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌（若其没有可使用的牌则将手牌数弃至与你相同）。',
+			dcsbyingmou_info:'转换技，每回合限一次，当你使用牌指定其他角色为目标后，你可以选择一名目标角色：阴，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】；阳，令一名手牌数为全场最大的角色对其使用手牌中所有的【杀】和伤害类锦囊牌（若其没有可使用的牌则将手牌数弃至与你相同）。',
 			caoxian:'曹宪',
 			dclingxi:'灵犀',
 			dclingxi_info:'出牌阶段开始和结束时，你可以将至多X张牌称为“翼”置于你的武将牌上（X为你的体力上限）。当你失去武将牌上的“翼”时，你将手牌数调整至Y张（Y为你武将牌上的“翼”所含有的花色数的两倍）。',

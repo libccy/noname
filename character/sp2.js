@@ -3865,7 +3865,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						charlotte:true,
 						filter:function(event,player){
-							return event.skill=='xiongmang'&&!player.hasHistory('sourceDamage',function(evt){
+							return player.maxHp>1&&event.skill=='xiongmang'&&!player.hasHistory('sourceDamage',function(evt){
 								return evt.card==event.card;
 							});
 						},
@@ -4289,18 +4289,18 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				trigger:{source:'damageBegin1'},
 				direct:true,
 				filter:function(event,player){
-					return player.countCards('he')>0&&player.isPhaseUsing()&&!player.hasSkill('chaofeng2');
+					return player.countCards('h')>0&&player.isPhaseUsing()&&!player.hasSkill('chaofeng2');
 				},
 				content:function(){
 					'step 0'
-					var str='弃置一张牌并摸一张牌',color,type;
+					var str='弃置一张手牌并摸一张牌',color,type;
 					if(trigger.card){
 						type=get.type2(trigger.card,false);
 						color=get.color(trigger.card,false);
 						if(color!='none') str+='；若弃置'+get.translation(color)+'牌则改为摸两张牌';
 						if(type) str+='；若弃置类型为'+get.translation(type)+'的牌则伤害+1';
 					}
-					var next=player.chooseToDiscard('he',get.prompt('chaofeng',trigger.player),str);
+					var next=player.chooseToDiscard('h',get.prompt('chaofeng',trigger.player),str);
 					next.set('ai',function(card){
 						var player=_status.event.player,att=_status.event.att;
 						var val=4.2-get.value(card);
@@ -6243,7 +6243,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				direct:true,
 				charlotte:true,
 				filter:function(event,player){
-					if(player!=_status.currentPhase) return false;
+					if(player!=_status.currentPhase||event.targets.length!=1) return false;
 					var card=event.card;
 					if(card.name!='sha'&&get.type(card)!='trick')return false;
 					var info=get.info(card);
@@ -11389,7 +11389,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			hfjieying:'节应',
 			hfjieying2:'节应',
 			hfjieying3:'节应',
-			hfjieying_info:'结束阶段，你可以选择一名其他角色，该角色下回合使用【杀】或普通锦囊牌无距离限制且可多指定一个目标，且当其造成伤害后，其无法再使用牌直到回合结束。',
+			hfjieying_info:'结束阶段，你可以选择一名其他角色，该角色下回合使用目标数为1的【杀】或普通锦囊牌无距离限制且可多指定一个目标，且当其造成伤害后，其无法再使用牌直到回合结束。',
 			weipo:'危迫',
 			weipo_info:'锁定技，其他角色使用【杀】或普通锦囊牌指定你为目标后，若你的手牌数小于X，则你将手牌摸至X张，并记录摸牌事件结算后的手牌数Y。此牌结算结束后，若你的手牌数小于Y，则你将一张手牌交给此牌的使用者，且此技能失效直到你的下回合开始。（X为你的体力上限且至多为5）',
 			zhaozhong:'赵忠',
@@ -11499,7 +11499,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			fengshi_info:'当你使用牌指定第一个目标后，你可弃置你与其中一名手牌数小于你的目标角色的各一张牌，并令此牌对其造成的伤害+1；当你成为其他角色使用牌的目标后，若你的手牌数小于其，则你可以弃置你与其的各一张牌，并令此牌对你造成的伤害+1。',
 			tongyuan:'童渊',
 			chaofeng:'朝凤',
-			chaofeng_info:'出牌阶段限一次。当你造成伤害时，你可以弃置一张牌，然后摸一张牌。若此伤害的渠道为牌且你弃置的牌：与此牌颜色相同，则你改为摸两张牌；与此牌类型相同，则此伤害+1。',
+			chaofeng_info:'出牌阶段限一次。当你造成伤害时，你可以弃置一张手牌，然后摸一张牌。若此伤害的渠道为牌且你弃置的牌：与此牌颜色相同，则你改为摸两张牌；与此牌类型相同，则此伤害+1。',
 			chuanshu:'传术',
 			chuanshu_info:'限定技。准备阶段，若你已受伤；或当你死亡时，你可令一名其他角色获得〖朝凤〗。然后你获得〖龙胆〗、〖从谏〗和〖穿云〗。',
 			chuanyun:'穿云',
@@ -11526,7 +11526,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yinyi_info:'锁定技。每回合限一次，当你受到非属性伤害时，若你的手牌数和体力值与伤害来源均不相同，则你防止此伤害。',
 			haomeng:'郝萌',
 			xiongmang:'雄莽',
-			xiongmang_info:'你可将任意张花色各不相同的手牌当做目标数上限为X的【杀】使用（X为此【杀】对应的实体牌数）。此【杀】使用结算结束后，若你未造成过渠道为此牌的伤害，则你减1点体力上限。',
+			xiongmang_info:'你可将任意张花色各不相同的手牌当做目标数上限为X的【杀】使用（X为此【杀】对应的实体牌数）。此【杀】使用结算结束后，若你未造成过渠道为此牌的伤害且体力上限大于1，则你减1点体力上限。',
 			yanfuren:'严夫人',
 			channi:'谗逆',
 			channi_info:'出牌阶段限一次。你可将任意张手牌交给一名其他角色，然后其可以将至多等量的手牌当做【决斗】使用。若其因此【决斗】造成了伤害，则其摸X张牌（X为此【决斗】对应的实体牌数）。若其因此【决斗】受到过伤害，则你弃置所有手牌。',
@@ -11572,7 +11572,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcruizhan:'锐战',
 			dcruizhan_info:'其他角色的准备阶段开始时，若其的手牌数不小于其体力值，则你可以和其拼点。若你赢或拼点牌中有【杀】，则你视为对其使用一张【杀】。然后若此【杀】造成了伤害且以上两个条件均被满足，则你获得其一张牌。',
 			dcshilie:'示烈',
-			dcshilie_info:'①出牌阶段限一次。你可以选择一项：⒈回复1点体力，将两张牌置于武将牌上作为“示烈”。若“示烈”牌数大于存活人数，则你将最早的多余牌置入弃牌堆；⒉失去1点体力，获得两张“示烈”牌。（满血则不回血，无牌则不移动）②当你死亡时，你可以将所有“示烈”牌交给一名其他角色。',
+			dcshilie_info:'①出牌阶段限一次。你可以选择一项：⒈回复1点体力，将两张牌置于武将牌上作为“示烈”。若“示烈”牌数大于存活人数，则你将最早的多余牌置入弃牌堆；⒉失去1点体力，获得两张“示烈”牌。（满血则不回血，无牌则不移动）②当你死亡时，你可以将所有“示烈”牌交给一名不为伤害来源的其他角色。',
 			dc_zhaoyǎn:'赵俨',
 			dcfuning:'抚宁',
 			dcfuning_info:'当你使用牌时，你可以摸两张牌，然后弃置X张牌（X为你本回合内发动过〖抚宁〗的次数）。',

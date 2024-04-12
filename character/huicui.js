@@ -393,11 +393,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 						forced:true,
 						notUseOrRespond(event,player){
-							if(event.name==='cardsDiscard') return false;
-							const evtx=event.getParent();
-							if(evtx.name==='orderingDiscard') return false;
-							const evt2=(evtx.relatedEvent||evtx.getParent());
-							return !['useCard','respond'].includes(evt2.name)||evt2.player!==player;
+							if (event.name !== 'cardsDiscard') return true;
+							const evtx = event.getParent();
+							if (evtx.name !== 'orderingDiscard') return true;
+							const evt2 = (evtx.relatedEvent || evtx.getParent());
+							return !['useCard', 'respond'].includes(evt2.name) || evt2.player !== player;
 						},
 						async content(event,trigger,player){
 							const cards=[];
@@ -5347,7 +5347,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					'step 1'
 					var num=player.getDamagedHp();
 					if(!player.isIn()||!num) event.finish();
-					else player.chooseTarget('御关：令'+get.cnNumber(num)+'名角色将手牌摸至体力上限',Math.min(game.countPlayer(),[1,num]),true).set('ai',target=>{
+					else player.chooseTarget('御关：令至多'+get.cnNumber(num)+'名角色将手牌摸至体力上限',Math.min(game.countPlayer(),[1,num]),true).set('ai',target=>{
 						return get.attitude(_status.event.player,target)*Math.max(0.1,target.maxHp-target.countCards('h'));
 					});
 					'step 2'
@@ -6872,8 +6872,17 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					disable:{
 						charlotte:true,
 						mod:{
-							cardEnabled2:function(card){
-								if(get.position(card)=='h') return false;
+							cardEnabled(card, player){
+								if (card.cards) {
+									const hs = player.getCards('h');
+									if (card.cards.some(card => hs.includes(card))) return false;
+								}
+							},
+							cardSavable(card, player){
+								if (card.cards) {
+									const hs = player.getCards('h');
+									if (card.cards.some(card => hs.includes(card))) return false;
+								}
 							},
 						},
 						mark:true,
@@ -10284,46 +10293,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(player==event.player||event.targets.length!=1) return false;
 					return player.countCards('h')>=2;
 				},
-				direct:true,
 				usable:2,
-				content:function(){
-					'step 0'
-					player.chooseToDiscard('he',[2,Infinity],get.prompt('reshejian',trigger.player),'<div class="text center">弃置至少两张手牌，然后选择一项：<br>⒈弃置其等量的牌。⒉对其造成1点伤害。</div>').set('ai',function(card){
-						if(_status.event.goon&&ui.selected.cards.length<2) return 5.6-get.value(card);
+				async cost(event, trigger, player) {
+					event.result = await player.chooseToDiscard('he', [2, Infinity], get.prompt('reshejian', trigger.player), '<div class="text center">弃置至少两张手牌，然后选择一项：<br>⒈弃置其等量的牌。⒉对其造成1点伤害。</div>').set('ai', function (card) {
+						if (_status.event.goon && ui.selected.cards.length < 2) return 5.6 - get.value(card);
 						return 0;
-					}).set('goon',function(){
-						var target=trigger.player;
-						if(get.damageEffect(target,player,player)>0) return true;
-						if(target.countCards('he',function(card){
-							return get.value(card,target)>6;
-						})>=2) return true;
+					}, 'chooseonly').set('goon', function () {
+						var target = trigger.player;
+						if (get.damageEffect(target, player, player) > 0) return true;
+						if (target.countCards('he', function (card) {
+							return get.value(card, target) > 6;
+						}) >= 2) return true;
 						return false;
-					}()).logSkill=['reshejian',trigger.player];
+					}()).forResult();
+				},
+				logTarget: 'player',
+				content: function () {
+					'step 0'
+					player.discard(cards);
 					'step 1'
-					if(!result.bool){
-						player.storage.counttrigger.reshejian--;
-						event.finish();
-						return;
-					}
-					var num=result.cards.length;
-					event.num=num;
-					var target=trigger.player,str=get.translation(target);
-					event.target=target;
-					if(!target.isIn()) event.finish();
-					else if(!target.hasCard(function(card){
-						return lib.filter.canBeDiscarded(card,player,target);
-					},'he')) event._result={index:1};
-					else player.chooseControl().set('choiceList',[
-						'弃置'+str+'的'+get.cnNumber(num)+'张牌',
-						'对'+str+'造成1点伤害',
-					]).set('ai',function(){
-						var player=_status.event.player;
-						var eff0=get.effect(target,{name:'guohe_copy2'},player,player)*Math.min(1.7,target.countCards('he'));
-						var eff1=get.damageEffect(target,player,player);
-						return eff0>eff1?0:1;
+					var num = cards.length;
+					event.num = num;
+					var target = targets[0], str = get.translation(target);
+					event.target = target;
+					if (!target.isIn()) event.finish();
+					else if (!target.hasCard(function (card) {
+						return lib.filter.canBeDiscarded(card, player, target);
+					}, 'he')) event._result = { index: 1 };
+					else player.chooseControl().set('choiceList', [
+						'弃置' + str + '的' + get.cnNumber(num) + '张牌',
+						'对' + str + '造成1点伤害',
+					]).set('ai', function () {
+						var player = _status.event.player;
+						var eff0 = get.effect(target, { name: 'guohe_copy2' }, player, player) * Math.min(1.7, target.countCards('he'));
+						var eff1 = get.damageEffect(target, player, player);
+						return eff0 > eff1 ? 0 : 1;
 					});
 					'step 2'
-					if(result.index==0) player.discardPlayerCard(target,num,true,'he');
+					if (result.index == 0) player.discardPlayerCard(target, num, true, 'he');
 					else target.damage();
 				},
 			},
@@ -12666,7 +12673,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			refenglve:'锋略',
 			refenglve_info:'出牌阶段限一次，你可以和一名其他角色进行拼点。若你赢，其将区域内的两张牌交给你；若平局，则你令此技能于本阶段内的发动次数上限+1；若你输，其获得你的拼点牌。',
 			anyong:'暗涌',
-			anyong_info:'当一名角色于其回合内第一次对其他角色造成伤害后，若伤害值为1，则你可弃置一张牌，并对受伤角色造成1点伤害。',
+			anyong_info:'当一名角色于其回合内第一次对另一名其他角色造成伤害后，若伤害值为1，则你可弃置一张牌，并对受伤角色造成1点伤害。',
 			wanniangongzhu:'万年公主',
 			zhenge:'枕戈',
 			zhenge_info:'准备阶段，你可以选择一名角色。该角色本局游戏的攻击范围+1（至多+5）。然后若所有其他角色都在该角色的攻击范围内，则你可以令其视为对另一名角色使用一张【杀】。',
@@ -12682,8 +12689,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_miheng:'祢衡',
 			rekuangcai:'狂才',
 			rekuangcai_info:'锁定技。①你于回合内使用牌无距离和次数限制。②弃牌阶段开始时，若你本回合内：未使用过牌，则你本局游戏的手牌上限+1；使用过牌但未造成过伤害，则你本局游戏的手牌上限-1。③结束阶段开始时，你摸X张牌（X为你本回合内造成的伤害且至多为5）。',
-			reshejian:'舌箭',
-			reshejian_info:'当你成为其他角色使用牌的唯一目标后，你可以弃置至少两张手牌。若如此做，你选择一项：⒈弃置其等量的牌。⒉对其造成1点伤害。',
+			reshejian:'舌剑',
+			reshejian_info:'每回合限两次。当你成为其他角色使用牌的唯一目标后，你可以弃置至少两张手牌。若如此做，你选择一项：⒈弃置其等量的牌。⒉对其造成1点伤害。',
 			fengxi:'冯熙',
 			yusui:'玉碎',
 			yusui_info:'当你成为其他角色使用黑色牌的目标后，你可以失去1点体力，然后选择一项：⒈令其将手牌数弃置至与你相同；⒉令其失去Y点体力（Y为其的体力值减去你的体力值，不为正时不可选择）。',
@@ -12700,7 +12707,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhengding:'正订',
 			zhengding_info:'锁定技。当你于回合外使用或打出牌响应其他角色使用的牌时，若这两张牌颜色相同，则你加1点体力上限并回复1点体力。',
 			dc_jiben:'吉本',
-			xunli:'寻疠',
+			xunli:'询疠',
 			xunli_info:'锁定技。①当有黑色牌因弃置而进入弃牌堆后，若X大于0，则你将其中的X张牌置于武将牌上作为“疠”（X=min(这些牌的数量，9-Y)，Y=你的“疠”数）。②出牌阶段开始时，你可以用任意张黑色手牌交换等量的“疠”。',
 			zhishi:'指誓',
 			zhishi_info:'结束阶段，你可选择一名角色。当该角色于你的下回合开始前{成为【杀】的目标后或进入濒死状态时}，你可移去任意张“疠”，然后其摸等量的牌。',
@@ -12768,7 +12775,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcyongbi_info:'限定技。出牌阶段，你可以将所有手牌交给一名其他男性角色。你将〖媵予〗的发动时机改为“准备阶段和结束阶段开始时”。然后若这些牌中包含的花色数：大于1，则你与其本局游戏的手牌上限+2；大于2，则当你或其于本局游戏内受到大于1的伤害时，此伤害-1。',
 			dc_huangquan:'黄权',
 			dcquanjian:'劝谏',
-			dcquanjian_info:'出牌阶段每项各限一次。你可以选择一项流程并选择一名其他角色A：⒈令A对其攻击范围内的另一名角色B造成1点伤害。⒉令A将手牌数调整至手牌上限（至多摸至五张），且其本回合内不能使用或打出手牌。然后A选择一项：⒈执行此流程。⒉本回合下次受到的伤害+1。',
+			dcquanjian_info:'出牌阶段每项各限一次。你可以选择一项流程并选择一名其他角色A：⒈令A对其攻击范围内的另一名角色B造成1点伤害。⒉令A将手牌数调整至手牌上限（至多摸至五张），且其本回合内不能使用手牌。然后A选择一项：⒈执行此流程。⒉本回合下次受到的伤害+1。',
 			dctujue:'途绝',
 			dctujue_info:'限定技。当你进入濒死状态时，你可以将所有牌交给一名其他角色。然后你回复等量的体力并摸等量的牌。',
 			chengui:'陈珪',
