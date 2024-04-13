@@ -718,6 +718,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				subSkill:{
 					global:{
 						audio:'dcshiju',
+						forceaudio:true,
 						enable:'phaseUse',
 						usable:1,
 						filter(event,player){
