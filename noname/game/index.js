@@ -890,51 +890,29 @@ export class Game {
 	 * @param { Function } proceed 
 	 */
 	checkFileList(updates, proceed) {
+		if (!Array.isArray(updates) || !updates.length) proceed();
 		let n = updates.length;
-		if (!n) {
-			proceed(n);
-		}
 		for (let i = 0; i < updates.length; i++) {
 			if (lib.node && lib.node.fs) {
-				lib.node.fs.access(__dirname + '/' + updates[i], (function (entry) {
-					return function (err) {
-						if (!err) {
-							let stat = lib.node.fs.statSync(__dirname + '/' + entry);
-							if (stat.size == 0) {
-								// @ts-ignore
-								err = true;
-							}
-						}
-						if (err) {
-							n--;
-							if (n == 0) {
-								proceed();
-							}
-						}
-						else {
-							n--;
-							updates.remove(entry);
-							if (n == 0) {
-								proceed();
-							}
-						}
+				lib.node.fs.access(__dirname + '/' + updates[i], err => {
+					if (!err) {
+						let stat = lib.node.fs.statSync(__dirname + '/' + updates[i]);
+						// @ts-ignore
+						if (stat.size == 0) err = true;
 					}
-				}(updates[i])));
+					n--;
+					if (!err) updates.remove(updates[i]);
+					if (n == 0) proceed();
+				});
 			}
 			else {
-				window.resolveLocalFileSystemURL(nonameInitialized + updates[i], (function (name) {
-					return function (entry) {
-						n--;
-						updates.remove(name);
-						if (n == 0) {
-							proceed();
-						}
-					}
-				}(updates[i])), function () {
+				window.resolveLocalFileSystemURL(nonameInitialized + updates[i], () => {
 					n--;
-					if (n == 0) {
-						proceed();
-					}
+					updates.remove(updates[i]);
+					if (n == 0) proceed();
+				}, () => {
+					n--;
+					if (n == 0) proceed();
 				});
 			}
 		}
