@@ -202,10 +202,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                             content: "本回合内不能使用或打出$的牌",
                         },
                         sub: true,
-                        "_priority": 0,
                     },
                 },
-                "_priority": 0,
             },
 			junshen: {
                 mod: {
@@ -245,117 +243,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         }
                     },
                     respondSha: true,
-                    yingbian: function (card, player, targets, viewer) {
-                        if (get.attitude(viewer, player) <= 0) return 0;
-                        var base = 0, hit = false;
-                        if (get.cardtag(card, 'yingbian_hit')) {
-                            hit = true;
-                            if (targets.some(target => {
-                                return target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
-                                    return i.hasGaintag('sha_notshan');
-                                })) && get.attitude(viewer, target) < 0 && get.damageEffect(target, player, viewer, get.natureList(card)) > 0;
-                            })) base += 5;
-                        }
-                        if (get.cardtag(card, 'yingbian_add')) {
-                            if (game.hasPlayer(function (current) {
-                                return !targets.includes(current) && lib.filter.targetEnabled2(card, player, current) && get.effect(current, card, player, player) > 0;
-                            })) base += 5;
-                        }
-                        if (get.cardtag(card, 'yingbian_damage')) {
-                            if (targets.some(target => {
-                                return get.attitude(player, target) < 0 && (hit || !target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
-                                    return i.hasGaintag('sha_notshan');
-                                })) || player.hasSkillTag('directHit_ai', true, {
-                                    target: target,
-                                    card: card,
-                                }, true)) && !target.hasSkillTag('filterDamage', null, {
-                                    player: player,
-                                    card: card,
-                                    jiu: true,
-                                })
-                            })) base += 5;
-                        }
-                        return base;
-                    },
-                    canLink: function (player, target, card) {
-                        if (!target.isLinked() && !player.hasSkill('wutiesuolian_skill')) return false;
-                        if (player.hasSkill('jueqing') || player.hasSkill('gangzhi') || target.hasSkill('gangzhi')) return false;
-                        return true;
-                    },
-                    basic: {
-                        useful: [5, 3, 1],
-                        value: [5, 3, 1],
-                    },
-                    order(item, player) {
-                        let res = 3.2;
-                        if (player.hasSkillTag('presha', true, null, true)) res = 10;
-                        if (typeof item !== 'object' || !game.hasNature(item, 'linked') || game.countPlayer(cur => cur.isLinked()) < 2) return res;
-                        let uv = player.getUseValue(item, true);
-                        if (uv <= 0) return res;
-                        let temp = player.getUseValue('sha', true) - uv;
-                        if (temp < 0) return res + 0.15;
-                        if (temp > 0) return res - 0.15;
-                        return res;
-                    },
-                    result: {
-                        target: function (player, target, card, isLink) {
-                            let eff = -1.5, odds = 1.35, num = 1;
-                            if (isLink) {
-                                let cache = _status.event.getTempCache('sha_result', 'eff');
-                                if (typeof cache !== 'object' || cache.card !== get.translation(card)) return eff;
-                                if (cache.odds < 1.35 && cache.bool) return 1.35 * cache.eff;
-                                return cache.odds * cache.eff;
-                            }
-                            if (player.hasSkill('jiu') || player.hasSkillTag('damageBonus', true, {
-                                target: target,
-                                card: card
-                            })) {
-                                if (target.hasSkillTag('filterDamage', null, {
-                                    player: player,
-                                    card: card,
-                                    jiu: true,
-                                })) eff = -0.5;
-                                else {
-                                    num = 2;
-                                    if (get.attitude(player, target) > 0) eff = -7;
-                                    else eff = -4;
-                                }
-                            }
-                            if (!player.hasSkillTag('directHit_ai', true, {
-                                target: target,
-                                card: card,
-                            }, true)) odds -= 0.7 * target.mayHaveShan(player, 'use', target.getCards('h', i => {
-                                return i.hasGaintag('sha_notshan');
-                            }), 'odds');
-                            _status.event.putTempCache('sha_result', 'eff', {
-                                bool: target.hp > num && get.attitude(player, target) > 0,
-                                card: get.translation(card),
-                                eff: eff,
-                                odds: odds
-                            });
-                            return odds * eff;
-                        },
-                    },
-                    tag: {
-                        respond: 1,
-                        respondShan: 1,
-                        damage: function (card) {
-                            if (game.hasNature(card, 'poison')) return;
-                            return 1;
-                        },
-                        natureDamage: function (card) {
-                            if (game.hasNature(card, 'linked')) return 1;
-                        },
-                        fireDamage: function (card, nature) {
-                            if (game.hasNature(card, 'fire')) return 1;
-                        },
-                        thunderDamage: function (card, nature) {
-                            if (game.hasNature(card, 'thunder')) return 1;
-                        },
-                        poisonDamage: function (card, nature) {
-                            if (game.hasNature(card, 'poison')) return 1;
-                        },
-                    },
                 },
                 subSkill: {
                     1: {
