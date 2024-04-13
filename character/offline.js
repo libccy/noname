@@ -318,7 +318,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						choices.shift();
 						choiceList[0]='<span style="opacity:0.5">'+choiceList[0]+'</span>';
 					}
-					const {result:{control}}=await player.chooseControl(choices).set('choiceList',choiceList).set('prompt',get.prompt('draglizhong')).set('ai',()=>{
+					const {result:{control}}=await player.chooseControl(choices)
+					.set('prompt','###'+get.prompt('draglizhong')+'###选择首先执行的一项')
+					.set('choiceList',choiceList).set('ai',()=>{
 						return get.event('controls')[0];
 					});
 					event.result={bool:(control!='cancel2'),cost_data:control};
@@ -371,11 +373,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								break;
 							case '团体摸牌':
 								const {result}=await player.chooseTarget('厉战：令你或任意名装备区有牌的角色摸一张牌',(card,player,target)=>{
+									if(target!=player&&!target.countCards('e')) return false;
 									if(ui.selected.targets.length){
 										const choose=ui.selected.targets[0];
-										return choose!=player||choose.countCards('e');
+										if(choose==player&&!player.countCards('e')) return false;
 									}
-									return target==player||target.countCards('e');
+									return true;
 								},[1,Infinity]).set('multitarget',true).set('complexTarget',true).set('ai',target=>{
 									const player=get.event('player');
 									if(!player.countCards('e')){
@@ -391,7 +394,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									player.line(targets);
 									choices.addArray(targets);
 									for(let j=0;j<targets.length;j++){
-										targets[j].draw(j==targets.length-1?'nodelay':'');
+										await targets[j].draw('nodelay');
 									}
 									await game.asyncDelayx();
 								}
