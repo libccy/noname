@@ -686,7 +686,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			//曹髦　史?!
 			mbqianlong:{
-				audio:2,
+				audio:6,
 				trigger:{
 					player:['mbqianlong_beginAfter','mbqianlong_addAfter','mbweitongAfter'],
 				},
@@ -756,7 +756,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			mbweitong:{
-				audio:2,
+				audio:1,
 				trigger:{
 					global:'phaseBefore',
 					player:'enterGame',

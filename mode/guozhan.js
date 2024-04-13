@@ -3444,7 +3444,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					},event).indexOf(event)==0;
 				},
 				async cost(event,trigger,player){
-					event.result=await player.chooseTarget(get.prompt('fakebaoqie'),'获得一名角色的宝物牌，然后你可以使用此牌',(card,player,target)=>{
+					event.result=await player.chooseTarget(get.prompt('fakebaoqie'),'获得一名角色装备区里所有的宝物牌，然后你可以使用其中的一张牌',(card,player,target)=>{
 						return target.getGainableCards(player,'e').some(card=>get.subtype(card)=='equip5');
 					}).set('ai',target=>{
 						const player=get.event('player');
@@ -3459,7 +3459,7 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 					await player.gain(cards,target,'giveAuto');
 					cards=cards.filter(i=>get.owner(i)==player&&get.position(i)=='h'&&player.hasUseTarget(i));
 					if(cards.length){
-						const {result:{bool,links}}=await player.chooseButton(['宝箧：是否使用其中一张宝物牌？',cards]).set('ai',button=>{
+						const {result:{bool,links}}=await player.chooseButton(['宝箧：是否使用其中的一张宝物牌？',cards]).set('ai',button=>{
 							return get.equipValue(button.link,get.event('player'));
 						});
 						if(bool) await player.chooseUseTarget(links[0],true);
@@ -18778,7 +18778,7 @@ return event.junling=='junling5'?1:0;});
 			fakeqimei:'齐眉',
 			fakeqimei_info:'准备阶段，你可以选择一名其他角色。若如此做，直到回合结束：当你或其获得牌/失去手牌后，若你与其手牌数相等，则另一名角色回复1点体力；当你或其的体力值变化后，若你与其体力值相等，则另一名角色摸一张牌。',
 			fakebaoqie:'宝箧',
-			fakebaoqie_info:'①当你受到伤害时，若此武将牌未明置过，则你可以明置此武将牌并防止此伤害。②当你首次明置此武将牌时，你可以获得一名角色的宝物牌，然后你可以使用其中的一张牌。',
+			fakebaoqie_info:'①当你受到伤害时，若此武将牌未明置过，则你可以明置此武将牌并防止此伤害。②当你首次明置此武将牌时，你可以获得一名角色装备区里所有的宝物牌，然后你可以使用其中的一张牌。',
 			fakeciwei:'慈威',
 			fakeciwei_info:'其他角色于一回合内使用第偶数张牌时，你可以弃置一张牌并取消此牌的所有目标，然后若此牌为装备牌，你可以获得之且你可以使用之。',
 			fakehuirong:'慧容',
