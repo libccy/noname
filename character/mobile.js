@@ -756,7 +756,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				},
 			},
 			mbweitong:{
-				audio:2,
+				audio:1,
 				trigger:{
 					global:'phaseBefore',
 					player:'enterGame',
