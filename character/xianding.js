@@ -330,10 +330,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								cards = await target.chooseToGive(player, true).forResultCards();
 							}
 							const card = cards[0];
-							if (!target.storage.dcwuyou_transfer) target.storage.dcwuyou_transfer = {};
-							target.storage.dcwuyou_transfer[card.cardid] = viewAs;
-							target.addGaintag(cards, 'dcwuyou_transfer');
-							target.addSkill('dcwuyou_transfer');
+							if (player.getCards('h').contains(card)) {
+								if (!player.storage.dcwuyou_transfer) player.storage.dcwuyou_transfer = {};
+								player.storage.dcwuyou_transfer[card.cardid] = viewAs;
+								player.addGaintag(cards, 'dcwuyou_transfer');
+								player.addSkill('dcwuyou_transfer');
+							}
 						},
 						ai:{
 							order:10,
