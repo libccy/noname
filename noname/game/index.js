@@ -901,6 +901,7 @@ export class Game {
 						if (!err) {
 							let stat = lib.node.fs.statSync(__dirname + '/' + entry);
 							if (stat.size == 0) {
+								// @ts-ignore
 								err = true;
 							}
 						}
@@ -921,7 +922,7 @@ export class Game {
 				}(updates[i])));
 			}
 			else {
-				resolveLocalFileSystemURL(lib.assetURL + updates[i], (function (name) {
+				window.resolveLocalFileSystemURL(nonameInitialized + updates[i], (function (name) {
 					return function (entry) {
 						n--;
 						updates.remove(name);
@@ -939,7 +940,12 @@ export class Game {
 		}
 	}
 	/**
-	 * @param  {...(Player[] | Player)} args 
+	 * @overload
+	 * @param  {[Player[]]} args 
+	 */
+	/**
+	 * @overload
+	 * @param {Player[]} args 
 	 */
 	replaceHandcards(...args) {
 		var next = game.createEvent('replaceHandcards');

@@ -75,6 +75,11 @@ export class GameEvent {
 	// @ts-ignore
 	player;
 	/**
+	 * @type { Player[] }
+	 */
+	// @ts-ignore
+	players;
+	/**
 	 * @type { Player }
 	 */
 	// @ts-ignore
