@@ -13086,6 +13086,10 @@ export class Library extends Uninstantable {
 			nature: 'thundermm',
 			showName: '传',
 		}],
+		['龙', {
+			color: '#FF8000',
+			nature: 'thundermm',
+		}],
 		['将', {
 			nature: 'firemm',
 		}],
