@@ -781,9 +781,9 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							game.loseAsync({
 								lose_list:lose_list,
 							}).setContent('chooseToCompareLose');
-							if(cards2.length) game.cardsGotoOrdering(cards2);
-							game.delayex();
 						}
+						if(cards2.length) game.cardsGotoOrdering(cards2);
+						game.delayex();
 					}
 					else{
 						var num;
