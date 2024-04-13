@@ -176,7 +176,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                                 return att > 0 && p.countCards('h') > 2
                                 return att >= 0 && p.countCards('h') > 4
                                 return 8 - get.value(card);
-                            }).set('target', player);
+                            }).set();
                         if (!result2.bool && !p.hasSkill('fengyin')) p.addTempSkill('fengyin')
                         else p.showCards(result2.cards[0], get.translation(p) + '交给了' + get.translation(player) + '一张' + get.translation(result2.cards[0]))
                     }
