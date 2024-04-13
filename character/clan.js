@@ -189,9 +189,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.event().dying) return get.attitude(player, get.event().dying);
 							if(get.event().type!='phase') return 1;
 							const names=get.event(`clanshengmo_${player.playerid}_enabled_names`);
-							return names.some(name=>{
-								return player.getUseValue({name})>0;
-							});
+							if(Array.isArray(names)){
+								return names.some(name=>{
+									return player.getUseValue({name})>0;
+								});
+							}
+							return 0;
 						}
 					}
 				}
