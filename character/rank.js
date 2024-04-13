@@ -374,6 +374,7 @@ window.noname_character_rank={
 		'star_zhangchunhua',
 	],
 	am:[
+		'loong_guanyu',
 		'bailingyun',
 		'clan_wuqiao',
 		'muludawang',
