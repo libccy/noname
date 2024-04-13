@@ -6911,6 +6911,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			vtbmeiniang_info:'其他角色的出牌阶段开始时，你可以令其视为使用一张无次数限制且不计入次数的【酒】。',
 			vtbyaoli:'媱丽',
 			vtbyaoli_info:'其他角色于其出牌阶段内使用【酒】后，你可以令其于本回合内使用的下一张【杀】不能被响应且可以额外指定一个目标。',
+			loong_guanyu_prefix:'龙',
 			loong_guanyu:'龙关羽',
 			chaojue:"超绝",
             "chaojue_info":"准备阶段，你可以弃置一张手牌，令所有其他角色本回合不能使用或打出与此牌花色相同的牌，然后这些角色依次选择一项: 1.展示并交给你一张与此牌花色相同的手牌; 2.其本回合所有非锁定技失效。",
