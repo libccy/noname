@@ -8319,6 +8319,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					const num=Math.min(player.countCards('h'),player.countCards('he'),game.countPlayer(target=>target!=player&&target.isFriendOf(player)));
 					if(num){
 						let list=[];
+						if(_status.connectMode) game.broadcastAll(()=>_status.noclearcountdown=true);
 						while(num-list.length>0){
 							const {result:{bool,targets,cards}}=await player.chooseCardTarget({
 								prompt:'宿守：你可以交给友方角色各一张牌',
@@ -8343,6 +8344,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.addGaintag(cards,'olsujian_given');
 							}
 							else break;
+						}
+						if(_status.connectMode){
+							game.broadcastAll(()=>{
+								delete _status.noclearcountdown;
+								game.stopCountChoose();
+							});
 						}
 						if(list.length){
 							await game.loseAsync({

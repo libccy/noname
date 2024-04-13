@@ -12029,6 +12029,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						const num=draws.indexOf(control)+1,max=Math.min(num,player.countCards('he'),game.countPlayer(target=>target!=player));
 						await player.draw(num);
 						let list=[];
+						if(_status.connectMode) game.broadcastAll(()=>_status.noclearcountdown=true);
 						while(max-list.length>0){
 							const {result:{bool,cards,targets}}=await player.chooseCardTarget({
 								prompt:'粮营：将'+get.cnNumber(max-1)+'至'+get.cnNumber(max)+'张牌交给其他角色',
@@ -12053,6 +12054,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 								player.addGaintag(cards,'olsujian_given');
 							}
 							else break;
+						}
+						if(_status.connectMode){
+							game.broadcastAll(()=>{
+								delete _status.noclearcountdown;
+								game.stopCountChoose();
+							});
 						}
 						if(list.length){
 							await game.loseAsync({
