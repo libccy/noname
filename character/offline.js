@@ -15,7 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				offline_piracyS:['ns_jiaxu','longyufei','ps_guanyu','ps1059_guojia','ps2070_guojia','ps2063_zhaoyun','ps2067_zhaoyun','ps1062_zhouyu','ps2080_zhouyu','ps_caozhi','ps_jin_simayi','ps_caopi','ps_simayi','ps2068_simayi','ps_machao','ps_zhugeliang','ps2066_zhugeliang','ps_jiaxu','ps_lvbu','ps_shen_machao','jsp_liubei'],
 				offline_piracyK:['pk_sp_duyu'],
 				offline_vtuber:['vtb_xiaosha','vtb_xiaoshan','vtb_xiaotao','vtb_xiaole','vtb_xiaojiu'],
-				offline_loong:['loong_guangyu'],
+				offline_loong:['loong_guanyu'],
 				//offline_others:[""],
 			},
 		},
@@ -93,7 +93,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yj_caoang:['male','wei',4,['yjxuepin']],
 			ns_caoanmin:['male','wei',4,['nskuishe']],
 			jsp_liubei:['male','qun',4,['jsprende']],
-			loong_guangyu:['male','shu',4,['chaojue','junshen']],
+			loong_guanyu:['male','shu',4,['chaojue','junshen']],
 		},
 		characterIntro:{
 			huangjinleishi:"黄巾军中负责施法的女祭司二人组。",
@@ -156,6 +156,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                 trigger: {
                     player: "phaseUseBegin",
                 },
+				audio: 2,
                 direct: true,
                 async content(event, trigger, player) {
                     const { result } = await player.chooseToDiscard('h', get.prompt('chaojue'), '弃置一张手牌令所有其他角色不可使用或打出此花色的牌，且选择是否交给你牌').set('ai', function (card) {
@@ -361,6 +362,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
                         trigger: {
                             source: "damageBegin3",
                         },
+						audio: "junshen",
                         direct: true,
                         logTarget: "player",
                         filter: function (event, player) {
