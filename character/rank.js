@@ -138,6 +138,9 @@ window.noname_character_rank={
 		'dc_simashi',
 		'dc_sb_simayi',
 		'caofang',
+		'dc_shen_huatuo',
+		'sp_zhenji',
+		'wu_guanyu',
 	],
 	a:[
 		'star_caoren',
@@ -1905,6 +1908,7 @@ window.noname_character_rank={
 			'dc_guansuo',
 			'dc_xujing',
 			'caoxian',
+			'wu_guanyu',
 		],
 		epic:[
 			'dc_caoshuang',
@@ -2187,6 +2191,8 @@ window.noname_character_rank={
 			'dc_sb_simayi',
 			'caofang',
 			'mb_caomao',
+			'dc_shen_huatuo',
+			'sp_zhenji',
 		],
 		rare:[
 			're_wangyi',
