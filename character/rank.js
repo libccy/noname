@@ -377,6 +377,9 @@ window.noname_character_rank={
 		'huzun',
 		'star_zhangchunhua',
 		'mb_caomao',
+		'drag_guanyu',
+		'drag_caoren',
+		'drag_lvchang',
 	],
 	am:[
 		'tw_yanliang',
@@ -2193,8 +2196,11 @@ window.noname_character_rank={
 			'mb_caomao',
 			'dc_shen_huatuo',
 			'sp_zhenji',
+			'drag_guanyu',
+			'drag_caoren',
 		],
 		rare:[
+			'drag_lvchang',
 			're_wangyi',
 			'ol_wangyi',
 			'tw_yanliang',
