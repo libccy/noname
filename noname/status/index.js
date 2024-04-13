@@ -54,6 +54,22 @@ export class status {
 	 * @type { boolean | void }
 	 */
 	connectMode = undefined
+	/**
+	 * @type { boolean | void }
+	 */
+	importingExtension = undefined
+	/**
+	 * @type { Promise<any>[] | void }
+	 */
+	extensionLoaded = undefined
+	/**
+	 * @type { Promise<any>[] | void }
+	 */
+	extensionLoading = undefined
+	/**
+	 * @type { { [key: string]: Promise<any>[] } | void }
+	 */
+	importing = undefined
 };
 
 export let _status = new status();

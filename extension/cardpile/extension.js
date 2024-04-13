@@ -1,5 +1,5 @@
-'use strict';
-game.import('play',function(lib,game,ui,get,ai,_status){
+import { lib, game, ui, get, ai, _status } from '../../noname.js';
+game.import('play', function () {
 	return {
 		name:'cardpile',
 		arenaReady:function(){
