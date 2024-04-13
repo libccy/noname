@@ -2424,6 +2424,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						},
 					},
 				},
+				ai:{
+					combo:'twjichou'
+				}
 			},
 			//李遗
 			jiaohua:{
