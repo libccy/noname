@@ -133,7 +133,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					if(!player.hasCard(card=>{
 						return _status.connectMode||get.number(card)===2;
 					},'hes')) return false;
-					for(const name of ['shuiyanqijunx'].concat(lib.inpile)){
+					for(const name of ['shuiyanqijuny'].concat(lib.inpile)){
 						if(player.getStorage('dcjuewu_used').includes(name)) continue;
 						const card=get.autoViewAs({name},'unsure');
 						if(!get.tag(card,'damage')) continue;
@@ -161,7 +161,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						let list=get.inpileVCardList(info=>{
 							return get.tag({name:info[2]},'damage');
 						});
-						if(!list.some(info=>info[2]==='shuiyanqijunx')) list.add(['锦囊','','shuiyanqijunx']);
+						if(!list.some(info=>info[2]==='shuiyanqijuny')) list.add(['锦囊','','shuiyanqijuny']);
 						list=list.filter(info=>{
 							const name=info[2],nature=info[3];
 							if(player.getStorage('dcjuewu_used').includes(name)) return false;
@@ -14842,6 +14842,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		card:{
+			//武关羽的兵临城下水淹七军
+			shuiyanqijuny:{
+				audio:'shuiyanqijun',
+				fullskin:true,
+				cardimage:'shuiyanqijunx',
+				enable:true,
+				filterTarget:true,
+				type:'trick',
+				selectTarget:[1,2],
+				targetprompt:['受伤弃牌','受伤摸牌'],
+				contentBefore(){
+					var evt=event.getParent(),target=evt.stocktargets[0];
+					evt.shuiyanqijun_target=target;
+				},
+				content(){
+					target.damage('thunder');
+					if(target!=event.getParent().shuiyanqijun_target) target.draw();
+					else target.chooseToDiscard('he',true);
+				},
+				ai:{
+					order:6,
+					value:4,
+					useful:2,
+					tag:{
+						damage:1,
+						thunderDamage:1,
+						natureDamage:1,
+						loseCard:1,
+					},
+					result:{
+						target:function(player,target){
+							if(!ui.selected.targets.length) return -1.5;
+							return -0.5
+						}
+					}
+				}
+			},
 			pyzhuren_heart:{
 				fullskin:true,
 				derivation:'puyuan',
@@ -15730,6 +15767,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			dcwuyou_info:'①出牌阶段限一次。你可以选择一张手牌，从系统随机生成的五个非装备牌牌名中选择一个，令此牌的牌名与属性视为与你选择的相同。②其他角色的出牌阶段限一次。其可以交给你一张手牌，你从系统随机生成的五个非装备牌牌名中选择一个，然后交给其一张手牌，令此牌的牌名与属性视为与你选择的相同（一名角色使用〖武佑〗转化的牌无距离且无任何次数限制）。',
 			dcyixian:'义贤',
 			dcyixian_info:'限定技。出牌阶段，你可以选择一项：⒈获得场上的所有装备牌；⒉获得弃牌堆中的所有装备牌。然后你依次选择是否令被你以此法获得牌的角色摸X张牌并回复1点体力（X为其以此法失去的牌数）。',
+			shuiyanqijuny:'水淹七军',
+			shuiyanqijuny_info:'出牌阶段，对至多两名角色使用。目标角色受到1点雷属性伤害，然后若其：是此牌的使用者选择的第一个目标，其弃置一张牌；不是第一个目标，其摸一张牌。',
 			sp_zhenji:'SP甄宓',
 			sp_zhenji_prefix:'SP',
 			dcjijie:'己诫',
