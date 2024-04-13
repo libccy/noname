@@ -1974,6 +1974,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.addMark('nzry_huaiju',1);
 					target.addSkill('nzry_huaiju_ai');
 				},
+				ai:{
+					combo:'nzry_huaiju'
+				}
 			},
 			"nzry_zhenglun":{
 				audio:2,
@@ -1990,6 +1993,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.cancel();
 					player.addMark('nzry_huaiju',1);
 				},
+				ai:{
+					combo:'nzry_huaiju'
+				}
 			},
 			"nzry_kuizhu":{
 				audio:2,

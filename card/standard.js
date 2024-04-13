@@ -2735,7 +2735,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					next.set('ai',function(card){
 						var evt=_status.event.getTrigger();
 						if(get.attitude(evt.player,evt.target)<0){
-							if(player.needsToDiscard()) return 15-get.value(card);
+							if(evt.player.needsToDiscard()) return 15-get.value(card);
 							if(evt.baseDamage+evt.extraDamage>=Math.min(2,evt.target.hp)) return 8-get.value(card);
 							return 5-get.value(card);
 						}
