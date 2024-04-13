@@ -806,6 +806,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						player.addExpose(0.1);
 					}
 				},
+				ai:{
+					combo:'duwang'
+				},
 				subSkill:{
 					fullyReady:{
 						trigger:{global:'phaseEnd'},
@@ -10956,6 +10959,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					"step 1"
 					player.loseMaxHp();
 					player.addSkills('paiyi');
+				},
+				ai:{
+					combo:'quanji'
 				}
 			},
 			paiyi:{

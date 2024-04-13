@@ -1,11 +1,10 @@
 import { get } from "./index.js";
-import { Uninstantable } from "../util/index.js";
 
-export class Promises extends Uninstantable {
+export class Promises {
 	/**
 	 * @returns { Promise<JSZip> }
 	 */
-	static zip() {
+	zip() {
 		return new Promise(resolve => get.zip(resolve));
 	}
 }

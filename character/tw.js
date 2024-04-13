@@ -369,7 +369,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:{
 						viewAs:{name:'juedou'},
 						position:'he',
-						filterCard:true,
+						filterCard(card,player){
+							const cardx=get.autoViewAs({name:'juedou'},[card]);
+							return lib.filter.targetEnabledx(cardx,player,get.event('sourcex'));
+						},
 						check(card){
 							if(get.name(card)=='sha') return 5-get.value(card);
 							return 8-get.value(card);
@@ -712,7 +715,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						forced:true,
 						popup:false,
 						async content(event,trigger,player){
-							player.logSkill('twxiayong'+(trigger.player===player?'1':'2'),trigger.player);
+							await player.logSkill('twxiayong'+(trigger.player===player?'1':'2'),trigger.player);
 							if(trigger.player===player){
 								const cards=player.getCards('h',card=>{
 									return lib.filter.cardDiscardable(card,player,'twxiayong');
@@ -16738,6 +16741,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twjuexing:'绝行',
 			twjuexing_info:'出牌阶段限一次。你可以视为对一名其他角色使用一张【决斗】。此牌对一名角色生效时，你与其将所有手牌扣置于武将牌上，然后各摸等同于当前体力值的牌。此牌结算结束后，你与所有目标角色弃置本次以此法摸的牌，然后获得扣置于武将牌上的牌。历战：当你因〖绝行〗摸牌时，摸牌数+1。',
 			twxiayong:'狭勇',
+			twxiayong1:'狭勇',
+			twxiayong2:'狭勇',
 			twxiayong_info:'锁定技。当你使用的【决斗】或目标角色包括你的【决斗】造成伤害时，若受伤角色为你，则你随机弃置一张手牌；否则你令此伤害+1。',
 			twqiaosi:'峭嗣',
 			twqiaosi_info:'结束阶段，你可以获得由其他角色区域直接置入或经由处理区置入弃牌堆的所有牌，然后若你以此法获得的牌数小于你的体力值，则你失去1点体力。',

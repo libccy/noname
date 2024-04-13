@@ -1,13 +1,10 @@
 // @ts-nocheck
-import { AI as ai } from '../ai/index.js';
-import { Get as get } from '../get/index.js';
-import { Library as lib } from '../library/index.js';
-import { Game as game } from '../game/index.js';
-import { status as _status } from '../status/index.js';
-import { UI as ui } from '../ui/index.js';
-
-import { userAgent } from '../util/index.js';
-import * as config from '../util/config.js';
+import { ai } from '../ai/index.js';
+import { get } from '../get/index.js';
+import { lib } from '../library/index.js';
+import { game } from '../game/index.js';
+import { _status } from '../status/index.js';
+import { ui } from '../ui/index.js';
 import { gnc } from '../gnc/index.js';
 import { Mutex } from '../util/index.js';
 
@@ -675,33 +672,27 @@ export async function onload(resetGameTimeout) {
 			clickedNode = true;
 			lib.config.mode = this.link;
 			game.saveConfig('mode', this.link);
-			if (this.link === 'connect') {
-				localStorage.setItem(lib.configprefix + 'directstart', true);
-				game.reload();
+			if (game.layout != 'mobile' && lib.layoutfixed.indexOf(lib.config.mode) !== -1) {
+				game.layout = 'mobile';
+				ui.css.layout.href = lib.assetURL + 'layout/' + game.layout + '/layout.css';
 			}
-			else {
-				if (game.layout != 'mobile' && lib.layoutfixed.indexOf(lib.config.mode) !== -1) {
-					game.layout = 'mobile';
+			else if (game.layout == 'mobile' && lib.config.layout != 'mobile' && lib.layoutfixed.indexOf(lib.config.mode) === -1) {
+				game.layout = lib.config.layout;
+				if (game.layout == 'default') {
+					ui.css.layout.href = '';
+				}
+				else {
 					ui.css.layout.href = lib.assetURL + 'layout/' + game.layout + '/layout.css';
 				}
-				else if (game.layout == 'mobile' && lib.config.layout != 'mobile' && lib.layoutfixed.indexOf(lib.config.mode) === -1) {
-					game.layout = lib.config.layout;
-					if (game.layout == 'default') {
-						ui.css.layout.href = '';
-					}
-					else {
-						ui.css.layout.href = lib.assetURL + 'layout/' + game.layout + '/layout.css';
-					}
-				}
-				splash.delete(1000);
-				delete window.inSplash;
-				// 这不好删/m/，顺带lib.init.reset也不好删
-				window.resetGameTimeout = setTimeout(lib.init.reset, 10000);
-
-				this.listenTransition(function () {
-					lib.init.js(lib.assetURL + 'mode', lib.config.mode, proceed);
-				}, 500);
 			}
+			splash.delete(1000);
+			delete window.inSplash;
+			// 这不好删/m/，顺带lib.init.reset也不好删
+			window.resetGameTimeout = setTimeout(lib.init.reset, 10000);
+
+			this.listenTransition(function () {
+				lib.init.js(lib.assetURL + 'mode', lib.config.mode, proceed);
+			}, 500);
 		}
 		var downNode = function () {
 			this.classList.add('glow');

@@ -1,17 +1,15 @@
-import { userAgent, Uninstantable, GeneratorFunction, AsyncFunction } from "../util/index.js";
-import { AI as ai } from '../ai/index.js';
-import { Game as game } from '../game/index.js';
-import { Library as lib } from '../library/index.js';
-import { status as _status } from '../status/index.js';
-import { UI as ui } from '../ui/index.js';
-import { GNC as gnc } from '../gnc/index.js';
+import { userAgent, GeneratorFunction, AsyncFunction } from "../util/index.js";
+import { game } from '../game/index.js';
+import { lib } from '../library/index.js';
+import { _status } from '../status/index.js';
+import { ui } from '../ui/index.js';
 import { CacheContext } from "../library/cache/cacheContext.js";
 import { Is } from "./is.js";
 import { Promises } from "./promises.js";
 
-export class Get extends Uninstantable {
-	static is = Is;
-	static promises = Promises;
+export class Get {
+	is = new Is()
+	promises = new Promises()
 	/**
 	 * 获取当前内核版本信息
 	 *
@@ -21,7 +19,7 @@ export class Get extends Uninstantable {
 	 *
 	 * @returns {["firefox" | "chrome" | "safari" | "other", number, number, number]}
 	 */
-	static coreInfo() {
+	coreInfo() {
 		const regex = /(firefox|chrome|safari)\/(\d+(?:\.\d+)+)/
 		let result
 		if (!(result = userAgent.match(regex))) return ["other", NaN, NaN, NaN]
@@ -38,7 +36,7 @@ export class Get extends Uninstantable {
 	 * @param {Function} filter
 	 * @returns {string[][]}
 	 */
-	static inpileVCardList(filter) {
+	inpileVCardList(filter) {
 		let list = [];
 		for (const name of lib.inpile) {
 			const type = get.type(name);
@@ -57,7 +55,7 @@ export class Get extends Uninstantable {
 	 * 根据(Player的)座次数n（从1开始）获取对应的“n号位”翻译
 	 * @param {number | Player} seat
 	 */
-	static seatTranslation(seat) {
+	seatTranslation(seat) {
 		if (get.itemtype(seat) === 'player') seat = seat.getSeatNum() - 1;
 		return `${get.cnNumber(seat + 1, true)}号位`;
 	}
@@ -65,7 +63,7 @@ export class Get extends Uninstantable {
 	 * @param {number} numberOfPlayers
 	 * @returns {string[]}
 	 */
-	static identityList(numberOfPlayers) {
+	identityList(numberOfPlayers) {
 		const modeConfig = lib.config.mode_config;
 		if (modeConfig) {
 			const identityConfig = modeConfig.identity;
@@ -91,7 +89,7 @@ export class Get extends Uninstantable {
 	 *
 	 * 从Base64编码的八位字节流生成对象URL
 	 */
-	static objectURL(octetStream) {
+	objectURL(octetStream) {
 		const objectURLMap = lib.objectURL;
 		if (objectURLMap.has(octetStream)) return objectURLMap.get(octetStream);
 		const objectURL = URL.createObjectURL(new Blob([Uint8Array.from(atob(octetStream.replace(/^data:[\s\S]*\/[\s\S]*;base64,/, '')), character => character.charCodeAt())]));
@@ -103,7 +101,7 @@ export class Get extends Uninstantable {
 	 *
 	 * 获取此牌的字数
 	 */
-	static cardNameLength(card, player) {
+	cardNameLength(card, player) {
 		const actualCardName = lib.actualCardName, name = get.translation(typeof card == 'string' ? card : get.name(card, player));
 		return (actualCardName.has(name) ? actualCardName.get(name) : name).length;
 	}
@@ -114,12 +112,12 @@ export class Get extends Uninstantable {
 	 *
 	 * 获取（此牌的）应变条件
 	 */
-	static yingbianConditions(card) { return get.complexYingbianConditions(card).concat(get.simpleYingbianConditions(card)); }
-	static complexYingbianConditions(card) {
+	yingbianConditions(card) { return get.complexYingbianConditions(card).concat(get.simpleYingbianConditions(card)); }
+	complexYingbianConditions(card) {
 		const complexYingbianConditions = Array.from(lib.yingbian.condition.complex.keys());
 		return card ? complexYingbianConditions.filter(value => get.cardtag(card, `yingbian_${value}`)) : complexYingbianConditions;
 	}
-	static simpleYingbianConditions(card) {
+	simpleYingbianConditions(card) {
 		const simpleYingbianConditions = Array.from(lib.yingbian.condition.simple.keys());
 		return card ? simpleYingbianConditions.filter(value => get.cardtag(card, `yingbian_${value}`)) : simpleYingbianConditions;
 	}
@@ -128,7 +126,7 @@ export class Get extends Uninstantable {
 	 *
 	 * 获取（此牌的）应变效果
 	 */
-	static yingbianEffects(card) {
+	yingbianEffects(card) {
 		const yingbianEffects = Array.from(lib.yingbian.effect.keys());
 		return card ? yingbianEffects.filter(value => get.cardtag(card, `yingbian_${value}`)) : yingbianEffects;
 	}
@@ -137,14 +135,14 @@ export class Get extends Uninstantable {
 	 *
 	 * 获取此牌的默认应变效果
 	 */
-	static defaultYingbianEffect(card) {
+	defaultYingbianEffect(card) {
 		const info = get.info(card);
 		return info && info.defaultYingbianEffect || null;
 	}
 	/**
 	 * 优先度判断
 	 */
-	static priority(skill) {
+	priority(skill) {
 		const info = get.info(skill);
 		if (!info) return 0;
 		if ('_priority' in info) return info._priority;
@@ -172,7 +170,7 @@ export class Get extends Uninstantable {
 	 * @param { false | Player } [player]
 	 * @returns { string[] }
 	 */
-	static subtypes(obj, player) {
+	subtypes(obj, player) {
 		if (typeof obj == 'string') obj = { name: obj };
 		if (typeof obj != 'object') return;
 		var name = get.name(obj, player);
@@ -191,7 +189,7 @@ export class Get extends Uninstantable {
 	/**
 	 * @returns { string[] }
 	 */
-	static pinyin(chinese, withTone) {
+	pinyin(chinese, withTone) {
 		const pinyinUtilx = window.pinyinUtilx;
 		if (!pinyinUtilx) return [];
 		const pinyins = lib.pinyins;
@@ -201,7 +199,7 @@ export class Get extends Uninstantable {
 		}
 		return pinyinUtilx.getPinyin(chinese, null, withTone, true);
 	}
-	static yunmu(str) {
+	yunmu(str) {
 		//部分整体认读音节特化处理
 		const util = window.pinyinUtilx;
 		if (util && lib.pinyins._metadata.zhengtirendu.includes(util.removeTone(str))) {
@@ -233,7 +231,7 @@ export class Get extends Uninstantable {
 	/**
 	 * 用于将参数转换为字符串，作为缓存的key。
 	 */
-	static paramToCacheKey() {
+	paramToCacheKey() {
 		var str = "";
 		for (var arg of arguments) {
 			if (arg === null || arg === undefined) {
@@ -253,7 +251,7 @@ export class Get extends Uninstantable {
 		}
 		return str;
 	}
-	static yunjiao(str) {
+	yunjiao(str) {
 		const util = window.pinyinUtilx;
 		if (util) str = util.removeTone(str);
 		if (lib.pinyins._metadata.zhengtirendu.includes(str)) {
@@ -278,7 +276,7 @@ export class Get extends Uninstantable {
 	 * @param { Player } player
 	 * @returns { string[] }
 	 */
-	static skillCategoriesOf(skill, player) {
+	skillCategoriesOf(skill, player) {
 		const list = [], info = get.info(skill);
 		if (!info) return list;
 		if (get.is.locked(skill, player)) list.add('锁定技');
@@ -301,9 +299,9 @@ export class Get extends Uninstantable {
 		if (info.categories) list.addArray(info.categories(skill, player));
 		return list;
 	}
-	static numOf(obj, item) { return obj.filter(element => element == item).length; }
-	static connectNickname() { return typeof lib.config.connect_nickname == 'string' ? (lib.config.connect_nickname.slice(0, 12)) : "无名玩家"; }
-	static zhinangs(filter) {
+	numOf(obj, item) { return obj.filter(element => element == item).length; }
+	connectNickname() { return typeof lib.config.connect_nickname == 'string' ? (lib.config.connect_nickname.slice(0, 12)) : "无名玩家"; }
+	zhinangs(filter) {
 		var list = (_status.connectMode ? lib.configOL : lib.config).zhinang_tricks;
 		if (!list || !list.filter || !list.length) return get.inpile('trick', 'trick').randomGets(3);
 		if (filter === false) return list.slice(0);
@@ -311,7 +309,7 @@ export class Get extends Uninstantable {
 		if (list.length) return list;
 		return get.inpile('trick', 'trick').randomGets(3);
 	}
-	static sourceCharacter(str) {
+	sourceCharacter(str) {
 		if (str) {
 			for (var i in lib.characterReplace) {
 				if (lib.characterReplace[i].includes(str)) return i;
@@ -319,12 +317,12 @@ export class Get extends Uninstantable {
 		}
 		return str;
 	}
-	static isLuckyStar(player) {
+	isLuckyStar(player) {
 		if (player && player.hasSkillTag('luckyStar')) return true;
 		if (_status.connectMode) return false;
 		return (!player || player == game.me || player.isUnderControl()) && lib.config.lucky_star == true;
 	}
-	static infoHp(hp) {
+	infoHp(hp) {
 		if (typeof hp == 'number') return hp;
 		else if (typeof hp == 'string') {
 			if (hp.includes('/')) {
@@ -340,7 +338,7 @@ export class Get extends Uninstantable {
 		}
 		return 0;
 	}
-	static infoMaxHp(hp) {
+	infoMaxHp(hp) {
 		if (typeof hp == 'number') return hp;
 		else if (typeof hp == 'string') {
 			if (hp.includes('/')) {
@@ -356,7 +354,7 @@ export class Get extends Uninstantable {
 		}
 		return 0;
 	}
-	static infoHujia(hp) {
+	infoHujia(hp) {
 		if (typeof hp == 'string' && hp.includes('/')) {
 			const num = hp.split('/')[2];
 			if (num) {
@@ -369,7 +367,7 @@ export class Get extends Uninstantable {
 		}
 		return 0;
 	}
-	static bottomCards(num, putBack) {
+	bottomCards(num, putBack) {
 		if (_status.waitingForCards) {
 			ui.create.cards.apply(ui.create, _status.waitingForCards);
 			delete _status.waitingForCards;
@@ -400,13 +398,13 @@ export class Get extends Uninstantable {
 		if (card) return list[0];
 		return list;
 	}
-	static discarded() { return _status.discarded.filter(item => item.parentNode == ui.discardPile); }
-	static cardOffset() {
+	discarded() { return _status.discarded.filter(item => item.parentNode == ui.discardPile); }
+	cardOffset() {
 		var x = ui.arena.getBoundingClientRect();
 		var y = ui.window.getBoundingClientRect();
 		return -y.width / 2 + (x.left + x.width / 2);
 	}
-	static colorspan(str) {
+	colorspan(str) {
 		if (str[0] == '#') {
 			var color;
 			switch (str[1]) {
@@ -420,7 +418,7 @@ export class Get extends Uninstantable {
 		}
 		return str;
 	}
-	static evtprompt(next, str) {
+	evtprompt(next, str) {
 		if (next.prompt) {
 			next.set('prompt2', str);
 		}
@@ -435,11 +433,11 @@ export class Get extends Uninstantable {
 			}
 		}
 	}
-	static autoViewAs(card, cards) { return new lib.element.VCard(card, cards); }
+	autoViewAs(card, cards) { return new lib.element.VCard(card, cards); }
 	/**
 	 * @deprecated
 	 */
-	static _autoViewAs(card, cards) {
+	_autoViewAs(card, cards) {
 		var info = get.info(card);
 		if (info.autoViewAs) {
 			if (cards === false) {
@@ -492,7 +490,7 @@ export class Get extends Uninstantable {
 			return card;
 		}
 	}
-	static max(list, func, type) {
+	max(list, func, type) {
 		list = list.slice(0);
 		if (typeof func == 'string') {
 			var key = func;
@@ -519,7 +517,7 @@ export class Get extends Uninstantable {
 			return func(list[0]);
 		}
 	}
-	static min(list, func, type) {
+	min(list, func, type) {
 		list = list.slice(0);
 		if (typeof func == 'string') {
 			var key = func;
@@ -558,7 +556,7 @@ export class Get extends Uninstantable {
 	 * @param { T } num
 	 * @returns { Character[T] }
 	 */
-	static character(name, num) {
+	character(name, num) {
 		let info = lib.character[name];
 		if (!info) {
 			const pack = Object.keys(lib.characterPack).find(pack => name in lib.characterPack[pack]);
@@ -572,14 +570,14 @@ export class Get extends Uninstantable {
 		}
 		return info;
 	}
-	static characterInitFilter(name) {
+	characterInitFilter(name) {
 		const info = get.character(name);
 		if (!info || !info[4]) return [];
 		const filter = info[4].find(tag => tag.startsWith('InitFilter'));
 		if (!filter) return [];
 		return filter.split(':').slice(1);
 	}
-	static characterIntro(name) {
+	characterIntro(name) {
 		if (lib.characterIntro[name]) return lib.characterIntro[name];
 		var tags = get.character(name, 4);
 		if (tags) {
@@ -595,7 +593,7 @@ export class Get extends Uninstantable {
 		if (lib.characterIntro[name]) return lib.characterIntro[name];
 		return '暂无武将介绍';
 	}
-	static bordergroup(info, raw) {
+	bordergroup(info, raw) {
 		if (!Array.isArray(info)) {
 			info = lib.character[info];
 			if (!info) return '';
@@ -605,7 +603,7 @@ export class Get extends Uninstantable {
 		}
 		return raw ? '' : info[1] || '';
 	}
-	static groupnature(group, method) {
+	groupnature(group, method) {
 		var nature = lib.groupnature[group];
 		if (!nature) return '';
 		if (method == 'raw') {
@@ -613,12 +611,12 @@ export class Get extends Uninstantable {
 		}
 		return nature + 'mm';
 	}
-	static sgn(num) {
+	sgn(num) {
 		if (num > 0) return 1;
 		if (num < 0) return -1;
 		return 0;
 	}
-	static rand(num, num2) {
+	rand(num, num2) {
 		if (typeof num2 == 'number') {
 			return num + Math.floor(Math.random() * (num2 - num + 1));
 		}
@@ -626,12 +624,12 @@ export class Get extends Uninstantable {
 			return Math.floor(Math.random() * num);
 		}
 	}
-	static sort(arr, method, arg) { return method == "seat" ? arr.sortBySeat(arg) : void 0; }
-	static sortSeat(arr, target) { return arr.sortBySeat(target); }
+	sort(arr, method, arg) { return method == "seat" ? arr.sortBySeat(arg) : void 0; }
+	sortSeat(arr, target) { return arr.sortBySeat(target); }
 	/**
 	 * @param { (zip: JSZip) => any } callback
 	 */
-	static zip(callback) {
+	zip(callback) {
 		if (!window.JSZip) {
 			lib.init.js(lib.assetURL + 'game', 'jszip', function () {
 				callback(new JSZip());
@@ -641,7 +639,7 @@ export class Get extends Uninstantable {
 			callback(new JSZip());
 		}
 	}
-	static delayx(num, max) {
+	delayx(num, max) {
 		if (typeof num != 'number') num = 1;
 		if (typeof max != 'number') max = Infinity;
 		switch (lib.config.game_speed) {
@@ -653,7 +651,7 @@ export class Get extends Uninstantable {
 			default: return Math.min(max, num);
 		}
 	}
-	static prompt(skill, target, player) {
+	prompt(skill, target, player) {
 		player = player || _status.event.player;
 		if (target) {
 			var str = get.translation(target);
@@ -666,12 +664,12 @@ export class Get extends Uninstantable {
 			return '是否发动【' + get.skillTranslation(skill, player) + '】？';
 		}
 	}
-	static prompt2(skill, target, player) {
+	prompt2(skill, target, player) {
 		var str = get.prompt.apply(this, arguments);
 		if (!lib.translate[skill + '_info']) return str;
 		return '###' + str + '###' + lib.translate[skill + '_info'];
 	}
-	static url(master) {
+	url(master) {
 		var url = lib.config.updateURL || lib.updateURL;
 		if (url[url.length - 1] != '/') {
 			url += '/';
@@ -683,11 +681,11 @@ export class Get extends Uninstantable {
 			return url + 'v' + lib.version + '/';
 		}
 	}
-	static round(num, f) {
+	round(num, f) {
 		var round = Math.pow(10, f);
 		return Math.round(num * round) / round;
 	}
-	static playerNumber() {
+	playerNumber() {
 		var num;
 		if (_status.brawl && _status.brawl.playerNumber) {
 			num = _status.brawl.playerNumber;
@@ -697,7 +695,7 @@ export class Get extends Uninstantable {
 		}
 		return parseInt(num) || 2;
 	}
-	static benchmark(func1, func2, iteration, arg) {
+	benchmark(func1, func2, iteration, arg) {
 		var tic, toc;
 		var key1, key2;
 		if (!arg) arg = [];
@@ -742,7 +740,7 @@ export class Get extends Uninstantable {
 	/**
 	 * @param {any} obj
 	 */
-	static stringify(obj, level = 0) {
+	stringify(obj, level = 0) {
 		level = level || 0;
 		let indent = '';
 		let str;
@@ -862,7 +860,7 @@ export class Get extends Uninstantable {
 	 * @param {WeakMap<object, unknown>} [map] - 拷贝用的临时存储，用于处理循环引用（请勿自行赋值）
 	 * @returns {T} - 深拷贝后的对象，若传入值不是对象则为传入值
 	 */
-	static copy(obj, copyKeyDeep = false, map = new WeakMap()) {
+	copy(obj, copyKeyDeep = false, map = new WeakMap()) {
 		// 参考[这里](https://juejin.cn/post/7315612852890026021)实现深拷贝
 		// 不再判断是否能structuredClone是因为structuredClone会把Symbol给毙了
 		const getType = (obj) => Object.prototype.toString.call(obj);
@@ -941,7 +939,7 @@ export class Get extends Uninstantable {
 
 		return target;
 	}
-	static inpilefull(type) {
+	inpilefull(type) {
 		var list = [];
 		for (var i in lib.cardPile) {
 			for (var j = 0; j < lib.cardPile[i].length; j++) {
@@ -958,7 +956,7 @@ export class Get extends Uninstantable {
 		}
 		return list;
 	}
-	static inpile(type, filter) {
+	inpile(type, filter) {
 		var list = [];
 		if (filter == 'trick') {
 			for (var i = 0; i < lib.inpile.length; i++) {
@@ -985,8 +983,8 @@ export class Get extends Uninstantable {
 		}
 		return list;
 	}
-	static inpile2(type) { return get.inpile(type, 'trick'); }
-	static typeCard(type, filter) {
+	inpile2(type) { return get.inpile(type, 'trick'); }
+	typeCard(type, filter) {
 		var list = [];
 		for (var i in lib.card) {
 			if (lib.card[i].mode && lib.card[i].mode.includes(get.mode()) == false) continue;
@@ -1006,7 +1004,7 @@ export class Get extends Uninstantable {
 		}
 		return list;
 	}
-	static libCard(filter) {
+	libCard(filter) {
 		var list = [];
 		for (var i in lib.card) {
 			if (lib.card[i].mode && lib.card[i].mode.includes(get.mode()) == false) continue;
@@ -1020,7 +1018,7 @@ export class Get extends Uninstantable {
 		}
 		return list;
 	}
-	static ip() {
+	ip() {
 		if (!require) return '';
 		var interfaces = require('os').networkInterfaces();
 		for (var devName in interfaces) {
@@ -1033,7 +1031,7 @@ export class Get extends Uninstantable {
 			}
 		}
 	}
-	static modetrans(config, server) {
+	modetrans(config, server) {
 		if (config.mode == 'doudizhu') {
 			switch (config.doudizhu_mode) {
 				case 'kaihei': return '开黑斗地主';
@@ -1082,7 +1080,7 @@ export class Get extends Uninstantable {
 			return get.cnNumber(parseInt(config.number)) + '人' + get.translation(config.mode);
 		}
 	}
-	static charactersOL(func) {
+	charactersOL(func) {
 		var list = [];
 		var libCharacter = {};
 		for (var i = 0; i < lib.configOL.characterPack.length; i++) {
@@ -1099,16 +1097,16 @@ export class Get extends Uninstantable {
 		}
 		return list;
 	}
-	static trimip(str) {
+	trimip(str) {
 		var len = str.length - 5;
 		if (str.lastIndexOf(':8080') == len) {
 			str = str.slice(0, len);
 		}
 		return str;
 	}
-	static mode() { return lib[_status.connectMode ? 'configOL' : 'config'].mode; }
-	static idDialog(id) { return ui.dialogs.find(dialog => dialog.videoId == id) || null; }
-	static arenaState() {
+	mode() { return lib[_status.connectMode ? 'configOL' : 'config'].mode; }
+	idDialog(id) { return ui.dialogs.find(dialog => dialog.videoId == id) || null; }
+	arenaState() {
 		var state = {
 			number: ui.arena.dataset.number,
 			players: {},
@@ -1126,7 +1124,7 @@ export class Get extends Uninstantable {
 		}
 		return state;
 	}
-	static skillState(player) {
+	skillState(player) {
 		var skills = {
 			global: lib.skill.global
 		};
@@ -1153,8 +1151,8 @@ export class Get extends Uninstantable {
 		}
 		return skills;
 	}
-	static id() { return (Math.floor(1000000 + 9000000 * Math.random())).toString() + (10 + lib.status.globalId++); }
-	static zhu(player, skill, group) {
+	id() { return (Math.floor(1000000 + 9000000 * Math.random())).toString() + (10 + lib.status.globalId++); }
+	zhu(player, skill, group) {
 		if (typeof player == 'string') {
 			skill = player;
 			player = null;
@@ -1199,12 +1197,12 @@ export class Get extends Uninstantable {
 		}
 		return null;
 	}
-	static config(item, mode) {
+	config(item, mode) {
 		mode = mode || lib.config.mode;
 		if (!lib.config.mode_config[mode]) return;
 		return lib.config.mode_config[mode][item];
 	}
-	static coinCoeff(list) {
+	coinCoeff(list) {
 		var num = 0;
 		for (var i = 0; i < list.length; i++) {
 			var rank = get.rank(list[i]);
@@ -1223,7 +1221,7 @@ export class Get extends Uninstantable {
 		}
 		return num / list.length;
 	}
-	static rank(name, num) {
+	rank(name, num) {
 		if (typeof name == 'object' && name.name) {
 			name = name.name;
 		}
@@ -1269,7 +1267,7 @@ export class Get extends Uninstantable {
 		}
 		return num ? Math.round(9 * (num - 1) / 8 + 1) : 'x';
 	}
-	static skillRank(skill, type, grouped) {
+	skillRank(skill, type, grouped) {
 		var info = lib.skill[skill];
 		var player = _status.event.skillRankPlayer || _status.event.player;
 		if (!info) return 0;
@@ -1363,26 +1361,26 @@ export class Get extends Uninstantable {
 		}
 		return num;
 	}
-	static targetsInfo(targets) {
+	targetsInfo(targets) {
 		var info = [];
 		for (var i = 0; i < targets.length; i++) {
 			info.push(targets[i].dataset.position);
 		}
 		return info;
 	}
-	static infoTargets(infos) { return Array.from(infos || []).map(info => game.playerMap[info]); }
-	static cardInfo(card) { return [card.suit, card.number, card.name, card.nature]; }
-	static cardsInfo(cards = []) { return Array.from(cards).map(get.cardInfo); }
-	static infoCard(info) {
+	infoTargets(infos) { return Array.from(infos || []).map(info => game.playerMap[info]); }
+	cardInfo(card) { return [card.suit, card.number, card.name, card.nature]; }
+	cardsInfo(cards = []) { return Array.from(cards).map(get.cardInfo); }
+	infoCard(info) {
 		var card = ui.create.card();
 		if (info[0]) {
 			card.init(info);
 		}
 		return card;
 	}
-	static infoCards(infos) { return Array.from(infos || []).map(get.infoCard); }
-	static cardInfoOL(card) { return '_noname_card:' + JSON.stringify([card.cardid, card.suit, card.number, card.name, card.nature]); }
-	static infoCardOL(info) {
+	infoCards(infos) { return Array.from(infos || []).map(get.infoCard); }
+	cardInfoOL(card) { return '_noname_card:' + JSON.stringify([card.cardid, card.suit, card.number, card.name, card.nature]); }
+	infoCardOL(info) {
 		if (!lib.cardOL) return info;
 		var card;
 		try {
@@ -1410,13 +1408,13 @@ export class Get extends Uninstantable {
 		}
 		return card || info;
 	}
-	static cardsInfoOL(cards) { return Array.from(cards || []).map(get.cardInfoOL); }
-	static infoCardsOL(infos) { return Array.from(infos || []).map(get.infoCardOL); }
-	static playerInfoOL(player) { return '_noname_player:' + player.playerid; }
-	static infoPlayerOL(info) { return lib.playerOL ? (lib.playerOL[info.slice(15)] || info) : info; }
-	static playersInfoOL(players) { return Array.from(players || []).map(get.playerInfoOL); }
-	static infoPlayersOL(infos) { return Array.from(infos || []).map(get.infoPlayerOL); }
-	static funcInfoOL(func) {
+	cardsInfoOL(cards) { return Array.from(cards || []).map(get.cardInfoOL); }
+	infoCardsOL(infos) { return Array.from(infos || []).map(get.infoCardOL); }
+	playerInfoOL(player) { return '_noname_player:' + player.playerid; }
+	infoPlayerOL(info) { return lib.playerOL ? (lib.playerOL[info.slice(15)] || info) : info; }
+	playersInfoOL(players) { return Array.from(players || []).map(get.playerInfoOL); }
+	infoPlayersOL(infos) { return Array.from(infos || []).map(get.infoPlayerOL); }
+	funcInfoOL(func) {
 		if (typeof func == 'function') {
 			if (func._filter_args) {
 				return '_noname_func:' + JSON.stringify(get.stringifiedResult(func._filter_args, 3));
@@ -1428,7 +1426,7 @@ export class Get extends Uninstantable {
 		}
 		return '';
 	}
-	static infoFuncOL(info) {
+	infoFuncOL(info) {
 		let func;
 		const str = info.slice(13).trim();
 		try {
@@ -1453,7 +1451,7 @@ export class Get extends Uninstantable {
 		}
 		return func;
 	}
-	static eventInfoOL(item, level, noMore) {
+	eventInfoOL(item, level, noMore) {
 		return get.itemtype(item) == 'event' ? `_noname_event:${JSON.stringify(Object.entries(item).reduce((stringifying, entry) => {
 			const key = entry[0];
 			if (key == '_trigger') {
@@ -1466,7 +1464,7 @@ export class Get extends Uninstantable {
 	/**
 	 * @param {string} item
 	 */
-	static infoEventOL(item) {
+	infoEventOL(item) {
 		const evt = new lib.element.GameEvent();
 		try {
 			Object.entries(JSON.parse(item.slice(14))).forEach(entry => {
@@ -1479,7 +1477,7 @@ export class Get extends Uninstantable {
 		}
 		return evt || item;
 	}
-	static stringifiedResult(item, level, nomore) {
+	stringifiedResult(item, level, nomore) {
 		if (!item) return item;
 		if (typeof item == 'function') {
 			return get.funcInfoOL(item);
@@ -1529,7 +1527,7 @@ export class Get extends Uninstantable {
 			return item;
 		}
 	}
-	static parsedResult(item) {
+	parsedResult(item) {
 		if (!item) return item;
 		if (typeof item == 'string') {
 			if (item.startsWith('_noname_func:')) {
@@ -1569,11 +1567,11 @@ export class Get extends Uninstantable {
 			return item;
 		}
 	}
-	static verticalStr(str, sp) {
+	verticalStr(str, sp) {
 		if (typeof str != 'string') return '';
 		return Array.from(str).filter(value => value != '`').join('');
 	}
-	static numStr(num, method) {
+	numStr(num, method) {
 		if (num == Infinity) {
 			if (method == 'card') return get.selectableCards().length + ui.selected.cards.length;
 			if (method == 'target') return get.selectableTargets().length + ui.selected.targets.length;
@@ -1581,7 +1579,7 @@ export class Get extends Uninstantable {
 		}
 		return num.toString();
 	}
-	static rawName(str) {
+	rawName(str) {
 		let str2 = lib.translate[str];
 		if (lib.translate[str + '_ab']) str2 = lib.translate[str + '_ab'];
 		if (!str2) return '';
@@ -1593,7 +1591,7 @@ export class Get extends Uninstantable {
 	/**
 	 * 作用修改：只读前缀 不读_ab
 	 */
-	static rawName2(str) {
+	rawName2(str) {
 		let str2 = lib.translate[str];
 		if (!str2) return '';
 		if (lib.translate[str + '_prefix'] && str2.startsWith(lib.translate[str + '_prefix'])) {
@@ -1601,7 +1599,7 @@ export class Get extends Uninstantable {
 		}
 		return str2;
 	}
-	static slimNameHorizontal(str) {
+	slimNameHorizontal(str) {
 		const slimName = lib.translate[`${str}_ab`] || lib.translate[str];
 		if (!slimName) return '';
 		const prefix = lib.translate[`${str}_prefix`];
@@ -1617,7 +1615,7 @@ export class Get extends Uninstantable {
 	 * @param {string} name
 	 * @returns {string}
 	 */
-	static prefixSpan(prefix, name) {
+	prefixSpan(prefix, name) {
 		const config = lib.config.buttoncharacter_prefix;
 		if (config == 'off') return '';
 		if (config == 'simple') {
@@ -1637,8 +1635,8 @@ export class Get extends Uninstantable {
 		span.innerHTML = prefix;
 		return span.outerHTML;
 	}
-	static slimName(str) { return get.verticalStr(get.slimNameHorizontal(str), true); }
-	static time() {
+	slimName(str) { return get.verticalStr(get.slimNameHorizontal(str), true); }
+	time() {
 		if (lib.status.dateDelaying) {
 			return lib.getUTC(lib.status.dateDelaying) - lib.getUTC(lib.status.date) - lib.status.dateDelayed;
 		}
@@ -1646,13 +1644,13 @@ export class Get extends Uninstantable {
 			return lib.getUTC(new Date()) - lib.getUTC(lib.status.date) - lib.status.dateDelayed;
 		}
 	}
-	static utc() { return (new Date()).getTime(); }
-	static evtDistance(e1, e2) {
+	utc() { return (new Date()).getTime(); }
+	evtDistance(e1, e2) {
 		var dx = (e1.clientX - e2.clientX) / game.documentZoom;
 		var dy = (e1.clientY - e2.clientY) / game.documentZoom;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
-	static xyDistance(from, to) { return Math.sqrt((from[0] - to[0]) * (from[0] - to[0]) + (from[1] - to[1]) * (from[1] - to[1])); }
+	xyDistance(from, to) { return Math.sqrt((from[0] - to[0]) * (from[0] - to[0]) + (from[1] - to[1]) * (from[1] - to[1])); }
 	/**
 	 * @overload
 	 * @returns { void }
@@ -1707,7 +1705,7 @@ export class Get extends Uninstantable {
 	 * @param { GameEvent | GameEventPromise } obj
 	 * @returns { 'event' }
 	 */
-	static itemtype(obj) {
+	itemtype(obj) {
 		if (typeof obj == 'string') {
 			if (obj.length <= 5) {
 				let bool = true;
@@ -1747,13 +1745,13 @@ export class Get extends Uninstantable {
 		if (lib.experimental.symbol.itemType in obj)
 			return obj[lib.experimental.symbol.itemType];
 	}
-	static equipNum(card) {
+	equipNum(card) {
 		if (get.type(card) == 'equip') {
 			return parseInt(get.subtype(card)[5]);
 		}
 		return 0;
 	}
-	static objtype(obj) {
+	objtype(obj) {
 		if (Object.prototype.toString.call(obj) === '[object Array]') return 'array';
 		if (Object.prototype.toString.call(obj) === '[object Object]') return 'object';
 		if (Object.prototype.toString.call(obj) === '[object HTMLDivElement]') return 'div';
@@ -1763,7 +1761,7 @@ export class Get extends Uninstantable {
 		if (Object.prototype.toString.call(obj) === '[object HTMLBodyElement]') return 'td';
 		if (Object.prototype.toString.call(obj) === '[object DocumentFragment]') return 'fragment';
 	}
-	static type(obj, method, player) {
+	type(obj, method, player) {
 		if (typeof obj == 'string') obj = { name: obj };
 		if (typeof obj != 'object') return;
 		var name = get.name(obj, player);
@@ -1774,14 +1772,14 @@ export class Get extends Uninstantable {
 		if (method == 'trick' && lib.card[name].type == 'delay') return 'trick';
 		return lib.card[name].type;
 	}
-	static type2(card, player) { return get.type(card, 'trick', player); }
+	type2(card, player) { return get.type(card, 'trick', player); }
 	/**
 	 *
 	 * @param { string | Card | VCard | CardBaseUIData } obj
 	 * @param { false | Player } [player]
 	 * @returns { string }
 	 */
-	static subtype(obj, player) {
+	subtype(obj, player) {
 		if (typeof obj == 'string') obj = { name: obj };
 		if (typeof obj != 'object') return;
 		const name = get.name(obj, player);
@@ -1789,7 +1787,7 @@ export class Get extends Uninstantable {
 		let subtype = lib.card[name].subtype;
 		return subtype;
 	}
-	static equiptype(card, player) {
+	equiptype(card, player) {
 		var subtype = get.subtype(card, player);
 		if (subtype.startsWith('equip')) return parseInt(subtype[5]);
 		return 0;
@@ -1800,7 +1798,7 @@ export class Get extends Uninstantable {
 	 * @param { false | Player } [player]
 	 * @returns { string }
 	 */
-	static name(card, player) {
+	name(card, player) {
 		if (get.itemtype(player) == 'player' || (player !== false && get.position(card) == 'h')) {
 			var owner = player || get.owner(card);
 			if (owner) {
@@ -1814,7 +1812,7 @@ export class Get extends Uninstantable {
 	 * @param {false | Player} [player]
 	 * @returns {string}
 	 */
-	static suit(card, player) {
+	suit(card, player) {
 		if (typeof card !== 'object') return;
 		if (Array.isArray(card)) {
 			if (card.length == 1) return get.suit(card[0], player);
@@ -1839,7 +1837,7 @@ export class Get extends Uninstantable {
 	 * @param {false | Player} [player]
 	 * @returns {string}
 	 */
-	static color(card, player) {
+	color(card, player) {
 		if (typeof card !== 'object') return;
 		if (Array.isArray(card)) {
 			if (!card.length) return 'none';
@@ -1868,7 +1866,7 @@ export class Get extends Uninstantable {
 	 * @param {false | Player} [player]
 	 * @returns {number}
 	 */
-	static number(card, player) {
+	number(card, player) {
 		if (typeof card !== 'object') return;
 		//狗卡你是真敢出啊
 		var number = null;
@@ -1894,7 +1892,7 @@ export class Get extends Uninstantable {
 	 * @param {false | Player} [player]
 	 * @returns {string}
 	 */
-	static nature(card, player) {
+	nature(card, player) {
 		if (typeof card == 'string') return card.split(lib.natureSeparator).sort(lib.sort.nature).join(lib.natureSeparator);
 		if (Array.isArray(card)) return card.sort(lib.sort.nature).join(lib.natureSeparator);
 		var nature = card.nature;
@@ -1912,7 +1910,7 @@ export class Get extends Uninstantable {
 	 * @param {false | Player} [player]
 	 * @returns {string[]}
 	 */
-	static natureList(card, player) {
+	natureList(card, player) {
 		if (!card) return [];
 		if (get.itemtype(card) == 'natures') return card.split(lib.natureSeparator);
 		if (get.itemtype(card) == 'nature') return [card];
@@ -1920,7 +1918,7 @@ export class Get extends Uninstantable {
 		if (typeof natures != 'string') return [];
 		return natures.split(lib.natureSeparator);
 	}
-	static cards(num, putBack) {
+	cards(num, putBack) {
 		if (_status.waitingForCards) {
 			ui.create.cards.apply(ui.create, _status.waitingForCards);
 			delete _status.waitingForCards;
@@ -1951,12 +1949,12 @@ export class Get extends Uninstantable {
 		if (card) return list[0];
 		return list;
 	}
-	static judge(card) {
+	judge(card) {
 		const cardInfo = (card.viewAs ? lib.card[card.viewAs] : get.info(card));
 		return (cardInfo && cardInfo.judge) ? cardInfo.judge : ()=>0;
 	}
-	static judge2(card) { return card.viewAs ? lib.card[card.viewAs].judge2 : get.info(card).judge2; }
-	static distance(from, to, method) {
+	judge2(card) { return card.viewAs ? lib.card[card.viewAs].judge2 : get.info(card).judge2; }
+	distance(from, to, method) {
 		if (from == to) return 0;
 		if (!game.players.includes(from) && !game.dead.includes(from)) return Infinity;
 		if (!game.players.includes(to) && !game.dead.includes(to)) return Infinity;
@@ -2012,8 +2010,8 @@ export class Get extends Uninstantable {
 			if (info.globalTo) {
 				n += info.globalTo;
 			}
-			if (info.attaclTo) {
-				m += info.attaclTo;
+			if (info.attackTo) {
+				m += info.attackTo;
 			}
 		}
 		if (method == 'attack') {
@@ -2026,8 +2024,8 @@ export class Get extends Uninstantable {
 			// for(let i=0;i<equips2.length;i++){
 			// 	let info=get.info(equips2[i]).distance;
 			// 	if(!info) continue;
-			// 	if(info.attaclTo){
-			// 		m+=info.attaclTo;
+			// 	if(info.attackTo){
+			// 		m+=info.attackTo;
 			// 	}
 			// }
 			// return n;
@@ -2046,7 +2044,7 @@ export class Get extends Uninstantable {
 	 * @param { Player | false } [player]
 	 * @returns { any }
 	 */
-	static info(item, player) {
+	info(item, player) {
 		if (typeof item == 'string') {
 			return lib.skill[item];
 		}
@@ -2060,13 +2058,13 @@ export class Get extends Uninstantable {
 	 * @param { number | Select | (()=>Select) } [select]
 	 * @returns { Select }
 	 */
-	static select(select) {
+	select(select) {
 		if (typeof select == 'function') return get.select(select());
 		else if (typeof select == 'number') return [select, select];
 		else if (select && get.itemtype(select) == 'select') return select;
 		return [1, 1];
 	}
-	static card(original) {
+	card(original) {
 		if (_status.event.skill) {
 			var card = get.info(_status.event.skill).viewAs;
 			if (typeof card == 'function') card = card(ui.selected.cards, _status.event.player);
@@ -2094,9 +2092,9 @@ export class Get extends Uninstantable {
 	 * @param {T} key
 	 * @returns {GameEvent[T]}
 	 */
-	static event(key) { return key ? _status.event[key] : _status.event; }
-	static player() { return _status.event.player; }
-	static players(sort, dead, out) {
+	event(key) { return key ? _status.event[key] : _status.event; }
+	player() { return _status.event.player; }
+	players(sort, dead, out) {
 		var players = game.players.slice(0);
 		if (sort != false) {
 			if (typeof sort == 'function') players.sort(sort);
@@ -2106,7 +2104,7 @@ export class Get extends Uninstantable {
 		if (!out) players = players.filter(current => !current.isOut());
 		return players;
 	}
-	static position(card, ordering) {
+	position(card, ordering) {
 		if (get.itemtype(card) == 'player') return parseInt(card.dataset.position);
 		if (card.timeout && card.destiny && card.destiny.classList) {
 			if (card.destiny.classList.contains('equips')) return 'e';
@@ -2130,7 +2128,7 @@ export class Get extends Uninstantable {
 		if (card.parentNode.id == 'ordering') return ordering ? 'o' : 'd';
 		return null;
 	}
-	static skillTranslation(str, player) {
+	skillTranslation(str, player) {
 		var str2;
 		if (str.startsWith('re')) {
 			str2 = str.slice(2);
@@ -2154,7 +2152,7 @@ export class Get extends Uninstantable {
 		}
 		return get.translation(str);
 	}
-	static skillInfoTranslation(name, player) {
+	skillInfoTranslation(name, player) {
 		if (player && lib.dynamicTranslate[name]) return lib.dynamicTranslate[name](player, name);
 		var str = lib.translate[name + '_info'];
 		if (!str) return '';
@@ -2170,7 +2168,7 @@ export class Get extends Uninstantable {
 	/**
 	 * @returns {string}
 	 */
-	static translation(str, arg) {
+	translation(str, arg) {
 		if (str && typeof str == 'object' && (str.name || str._tempTranslate)) {
 			if (str._tempTranslate) return str._tempTranslate;
 			var str2;
@@ -2266,13 +2264,13 @@ export class Get extends Uninstantable {
 		}
 		return '';
 	}
-	static menuZoom(){
+	menuZoom(){
 		if(game.menuZoom === undefined || game.menuZoom === null){
 			return game.documentZoom;
 		}
 		return game.menuZoom;
 	}
-	static strNumber(num) {
+	strNumber(num) {
 		switch (num) {
 			case 1: return 'A';
 			case 11: return 'J';
@@ -2281,7 +2279,7 @@ export class Get extends Uninstantable {
 			default: return num.toString();
 		}
 	}
-	static cnNumber(num, ordinal) {
+	cnNumber(num, ordinal) {
 		if (isNaN(num)) return '';
 		let numStr = num.toString();
 		if (numStr === 'Infinity') return '∞';
@@ -2340,7 +2338,7 @@ export class Get extends Uninstantable {
 	 * @param {HTMLElement} node
 	 * @returns {Iterable<HTMLElement>} 迭代器
 	 */
-	static *iterableChildNodes(node){
+	*iterableChildNodes(node){
 		for(let i=0;i<arguments.length;i++){
 			let arg = arguments[i];
 			for(let j=0;j<arg.childElementCount;j++){
@@ -2352,7 +2350,7 @@ export class Get extends Uninstantable {
 	 * @param {((a: Button, b: Button) => number)} [sort] 排序函数
 	 * @returns { Button[] }
 	 */
-	static selectableButtons(sort) {
+	selectableButtons(sort) {
 		if (!_status.event.player) return [];
 		var buttons = _status.event.dialog.buttons;
 		var selectable = [];
@@ -2371,7 +2369,7 @@ export class Get extends Uninstantable {
 	 * @param {((a: Card, b: Card) => number)} [sort] 排序函数
 	 * @returns { Card[] }
 	 */
-	static selectableCards(sort) {
+	selectableCards(sort) {
 		if (!_status.event.player) return [];
 		var cards = _status.event.player.getCards('hes');
 		var selectable = [];
@@ -2389,7 +2387,7 @@ export class Get extends Uninstantable {
 	/**
 	 * @returns { string[] } 技能名数组
 	 */
-	static skills() {
+	skills() {
 		var skills = [];
 		if (ui.skills) {
 			skills = skills.concat(ui.skills.skills);
@@ -2402,7 +2400,7 @@ export class Get extends Uninstantable {
 		}
 		return skills;
 	}
-	static gainableSkills(func, player) {
+	gainableSkills(func, player) {
 		var list = [];
 		for (var i in lib.character) {
 			if (lib.filter.characterDisabled(i)) continue;
@@ -2424,7 +2422,7 @@ export class Get extends Uninstantable {
 		}
 		return list;
 	}
-	static gainableSkillsName(name, func) {
+	gainableSkillsName(name, func) {
 		var list = [];
 		if (name && lib.character[name]) {
 			if (lib.character[name][4]) {
@@ -2443,7 +2441,7 @@ export class Get extends Uninstantable {
 		}
 		return list;
 	}
-	static gainableCharacters(func) {
+	gainableCharacters(func) {
 		var list = [];
 		for (var i in lib.character) {
 			var info = lib.character[i];
@@ -2467,7 +2465,7 @@ export class Get extends Uninstantable {
 	 * @param {((a: Player, b: Player) => number)} [sort] 排序函数
 	 * @returns { Player[] }
 	 */
-	static selectableTargets(sort) {
+	selectableTargets(sort) {
 		var selectable = [];
 		var players = game.players.slice(0);
 		if (_status.event.deadTarget) players.addArray(game.dead);
@@ -2483,7 +2481,7 @@ export class Get extends Uninstantable {
 		}
 		return selectable;
 	}
-	static filter(filter, i) {
+	filter(filter, i) {
 		if (typeof filter == 'function') return filter;
 		if (i == undefined) i = 0;
 		var result = function () {
@@ -2556,7 +2554,7 @@ export class Get extends Uninstantable {
 		result._filter_args = [filter, i];
 		return result;
 	}
-	static cardCount(card, player) {
+	cardCount(card, player) {
 		var num;
 		if (player == undefined) player = _status.event.player;
 		if (card == true) {
@@ -2574,13 +2572,13 @@ export class Get extends Uninstantable {
 		if (num == undefined) return 0;
 		return num;
 	}
-	static skillCount(skill, player) {
+	skillCount(skill, player) {
 		if (player == undefined) player = _status.event.player;
 		var num = player.getStat('skill')[skill];
 		if (num == undefined) return 0;
 		return num;
 	}
-	static owner(card, method) {
+	owner(card, method) {
 		return game.players.concat(game.dead).find(current=>{
 			if(current.judging[0] == card && method != "judge")return true;
 			let parent = card.parentNode;
@@ -2598,13 +2596,13 @@ export class Get extends Uninstantable {
 		//return game.players.concat(game.dead).find(current =>
 		//	current.getCards("hejsx").includes(card) || (current.judging[0] == card && method != "judge"));
 	}
-	static noSelected() { return ui.selected.buttons.length + ui.selected.cards.length + ui.selected.targets.length == 0; }
-	static population(identity) {
+	noSelected() { return ui.selected.buttons.length + ui.selected.cards.length + ui.selected.targets.length == 0; }
+	population(identity) {
 		return identity == undefined ?
 			game.players.length + game.dead.length :
 			game.players.filter(current => current.identity == identity).length;
 	}
-	static totalPopulation(identity) {
+	totalPopulation(identity) {
 		return identity == undefined ?
 			game.players.length + game.dead.length :
 			game.players.concat(game.dead).filter(current => current.identity == identity).length;
@@ -2612,11 +2610,11 @@ export class Get extends Uninstantable {
 	/**
 	 * @param { Card | VCard } item
 	 */
-	static cardtag(item, tag) {
+	cardtag(item, tag) {
 		return (item.cardid && (get.itemtype(item) == 'card' || !item.cards || !item.cards.length || item.name == item.cards[0].name) && _status.cardtag && _status.cardtag[tag] && _status.cardtag[tag].includes(item.cardid))
 			|| (item.cardtags && item.cardtags.includes(tag));
 	}
-	static tag(item, tag, item2, bool) {
+	tag(item, tag, item2, bool) {
 		var result;
 		if (get.info(item, bool) && get.info(item, bool).ai && get.info(item, bool).ai.tag) {
 			result = get.info(item, bool).ai.tag[tag];
@@ -2624,7 +2622,7 @@ export class Get extends Uninstantable {
 		if (typeof result == 'function') return result(item, item2);
 		return result;
 	}
-	static sortCard(sort) {
+	sortCard(sort) {
 		var func;
 		if (sort == 'type_sort') {
 			func = function (card) {
@@ -2661,7 +2659,7 @@ export class Get extends Uninstantable {
 		}
 		return func;
 	}
-	static difficulty() {
+	difficulty() {
 		switch (get.config('difficulty')) {
 			case 'easy': return 1;
 			case 'normal': return 2;
@@ -2669,7 +2667,7 @@ export class Get extends Uninstantable {
 			default: return 1;
 		}
 	}
-	static cardPile(name, create) {
+	cardPile(name, create) {
 		var filter = function (card) {
 			if (typeof name == 'string') {
 				if (card.name == name) {
@@ -2720,9 +2718,9 @@ export class Get extends Uninstantable {
 		}
 		return null;
 	}
-	static cardPile2(name) { return get.cardPile(name, 'cardPile'); }
-	static discardPile(name) { return get.cardPile(name, 'discardPile'); }
-	static aiStrategy() {
+	cardPile2(name) { return get.cardPile(name, 'cardPile'); }
+	discardPile(name) { return get.cardPile(name, 'discardPile'); }
+	aiStrategy() {
 		switch (get.config('ai_strategy')) {
 			case 'ai_strategy_1': return 1;
 			case 'ai_strategy_2': return 2;
@@ -2733,7 +2731,7 @@ export class Get extends Uninstantable {
 			default: return 1;
 		}
 	}
-	static skillintro(name, learn, learn2) {
+	skillintro(name, learn, learn2) {
 		var str = '';
 		var infoitem = lib.character[name];
 		if (!infoitem) {
@@ -2761,7 +2759,7 @@ export class Get extends Uninstantable {
 		}
 		return str;
 	}
-	static intro(name) {
+	intro(name) {
 		var info = lib.character[name];
 		var str = '性别：' + get.translation(info[0]) + '<br/>';
 		str += '势力：' + get.translation(info[1]) + '<br/>';
@@ -2775,7 +2773,7 @@ export class Get extends Uninstantable {
 		}
 		return str;
 	}
-	static storageintro(type, content, player, dialog, skill) {
+	storageintro(type, content, player, dialog, skill) {
 		switch (type) {
 			case 'mark': {
 				if (content > 0) {
@@ -2883,7 +2881,7 @@ export class Get extends Uninstantable {
 			}
 		}
 	}
-	static nodeintro(node, simple, evt) {
+	nodeintro(node, simple, evt) {
 		var uiintro = ui.create.dialog('hidden', 'notouchscroll');
 		if (node.classList.contains('player') && !node.name) {
 			return uiintro;
@@ -3998,7 +3996,7 @@ export class Get extends Uninstantable {
 		}
 		return uiintro;
 	}
-	static linkintro(dialog, content, player) {
+	linkintro(dialog, content, player) {
 		dialog.content.firstChild.remove();
 		dialog.add('<div class="text center">已横置</div>');
 		var list = [];
@@ -4011,8 +4009,8 @@ export class Get extends Uninstantable {
 			dialog.add(list, true, true);
 		}
 	}
-	static groups() { return ['wei', 'shu', 'wu', 'qun', 'jin', 'western', 'key']; }
-	static types() {
+	groups() { return ['wei', 'shu', 'wu', 'qun', 'jin', 'western', 'key']; }
+	types() {
 		var types = [];
 		for (var i in lib.card) {
 			if (lib.card[i].mode && lib.card[i].mode.includes(lib.config.mode) == false) continue;
@@ -4024,14 +4022,14 @@ export class Get extends Uninstantable {
 		}
 		return types;
 	}
-	static links(buttons) {
+	links(buttons) {
 		var links = [];
 		for (var i = 0; i < buttons.length; i++) {
 			if (buttons[i].link != undefined) links.push(buttons[i].link);
 		}
 		return links;
 	}
-	static threaten(target, player, hp) {
+	threaten(target, player, hp) {
 		var threaten = 1;
 		var skills = target.getSkills();
 		if (!player && player !== false) {
@@ -4063,7 +4061,7 @@ export class Get extends Uninstantable {
 		}
 		return threaten;
 	}
-	static condition(player) {
+	condition(player) {
 		var num = player.hp;
 		if (num > 4) {
 			num = 4 + Math.sqrt(num - 4);
@@ -4088,7 +4086,7 @@ export class Get extends Uninstantable {
 		}
 		return num;
 	}
-	static attitude(from, to) {
+	attitude(from, to) {
 		if (!from || !to) return 0;
 		from = from._trueMe || from;
 		arguments[0] = from;
@@ -4114,10 +4112,10 @@ export class Get extends Uninstantable {
 		}
 		return att;
 	}
-	static sgnAttitude() {
+	sgnAttitude() {
 		return get.sgn(get.attitude.apply(this, arguments));
 	}
-	static useful_raw(card, player) {
+	useful_raw(card, player) {
 		if (get.position(card) == 'j') return -1;
 		if (get.position(card) == 'e') return get.equipValue(card);
 		if (card._modUseful) {
@@ -4152,19 +4150,19 @@ export class Get extends Uninstantable {
 		result = game.checkMod(player, card, result, 'aiUseful', player);
 		return result;
 	}
-	static useful(card, player) {
+	useful(card, player) {
 		if (_status.event.useCache) {
 			return game.callFuncUseStepCache("get.useful_raw", get.useful_raw, [card, player]);
 		}
 		return get.useful_raw(card, player);
 	}
-	static unuseful(card) { return -get.useful(card); }
-	static unuseful2(card) { return 10 - get.useful(card); }
-	static unuseful3(card) {
+	unuseful(card) { return -get.useful(card); }
+	unuseful2(card) { return 10 - get.useful(card); }
+	unuseful3(card) {
 		if (card.name == 'du') return 20;
 		return 10 - get.useful(card);
 	}
-	static value(card, player, method) {
+	value(card, player, method) {
 		var result = 0;
 		var value;
 		if (Array.isArray(card)) {
@@ -4198,7 +4196,7 @@ export class Get extends Uninstantable {
 		result = game.checkMod(player, card, result, 'aiValue', player);
 		return result;
 	}
-	static equipResult(player, target, name) {
+	equipResult(player, target, name) {
 		var card = get.card();
 		if (!card || card.name != name) {
 			card = { name: name };
@@ -4217,7 +4215,7 @@ export class Get extends Uninstantable {
 		}
 		return Math.max(0, value1 - value2) / 5;
 	}
-	static equipValue(card, player) {
+	equipValue(card, player) {
 		if (player == undefined || get.itemtype(player) != 'player') player = get.owner(card);
 		if (player == undefined || get.itemtype(player) != 'player') player = _status.event.player;
 		var info = get.info(card);
@@ -4233,7 +4231,7 @@ export class Get extends Uninstantable {
 		if (typeof value == 'function') return value(card, player, null, 'raw2');
 		return 0;
 	}
-	static equipValueNumber(card) {
+	equipValueNumber(card) {
 		var info = get.info(card);
 		if (info.ai) {
 			if (typeof info.ai.equipValue == 'number') return info.ai.equipValue;
@@ -4241,9 +4239,9 @@ export class Get extends Uninstantable {
 		}
 		return 0;
 	}
-	static disvalue(card, player) { return -get.value(card, player); }
-	static disvalue2(card, player) { return -get.value(card, player, 'raw'); }
-	static skillthreaten(skill, player, target) {
+	disvalue(card, player) { return -get.value(card, player); }
+	disvalue2(card, player) { return -get.value(card, player, 'raw'); }
+	skillthreaten(skill, player, target) {
 		if (!lib.skill[skill]) return 1;
 		if (!lib.skill[skill].ai) return 1;
 		var threaten = lib.skill[skill].ai.threaten;
@@ -4255,14 +4253,14 @@ export class Get extends Uninstantable {
 		}
 		return 1;
 	}
-	static cacheOrder(item){
+	cacheOrder(item){
 		let cache = CacheContext.requireCacheContext();
 		return cache.get.order(item);
 	}
 	/**
 	 * @returns { number }
 	 */
-	static order(item, player = get.player() || game.me) {
+	order(item, player = get.player() || game.me) {
 		let cache = CacheContext.requireCacheContext();
 		var info = get.info(item);
 		if (!info) return -1;
@@ -4280,7 +4278,7 @@ export class Get extends Uninstantable {
 		}
 		return num;
 	}
-	static result(item, skill) {
+	result(item, skill) {
 		var result;
 		var info = get.info(item);
 		if (info.ai) result = get.copy(info.ai.result);
@@ -4297,11 +4295,11 @@ export class Get extends Uninstantable {
 		}
 		return result;
 	}
-	static cacheEffectUse(target, card, player, player2, isLink){
+	cacheEffectUse(target, card, player, player2, isLink){
 		let cache = CacheContext.requireCacheContext();
 		return cache.get.effect_use(target,card,player,player2,isLink);
 	}
-	static effect_use(target, card, player, player2, isLink) {
+	effect_use(target, card, player, player2, isLink) {
 		let cache = CacheContext.requireCacheContext();
 		var event = _status.event;
 		var eventskill = null;
@@ -4493,11 +4491,11 @@ export class Get extends Uninstantable {
 		}
 		return final;
 	}
-	static cacheEffect(target, card, player, player2, isLink){
+	cacheEffect(target, card, player, player2, isLink){
 		let cache = CacheContext.requireCacheContext();
 		return cache.get.effect(target,card,player,player2,isLink);
 	}
-	static effect(target, card, player, player2, isLink) {
+	effect(target, card, player, player2, isLink) {
 		let cache = CacheContext.requireCacheContext();
 		var event = _status.event;
 		var eventskill = null;
@@ -4673,7 +4671,7 @@ export class Get extends Uninstantable {
 		}
 		return final;
 	}
-	static damageEffect(target, player, viewer, nature) {
+	damageEffect(target, player, viewer, nature) {
 		if (get.itemtype(nature) == 'natures') {
 			var natures = get.natureList(nature);
 			return natures.map(n => get.damageEffect(target, player, viewer, n)).reduce((p, c) => p + c, 0) / (natures.length || 1);
@@ -4703,13 +4701,13 @@ export class Get extends Uninstantable {
 	 * @param {any} source 如果参数是function，执行此函数并返回结果，传参为此方法剩余的参数。如果参数不是function，直接返回结果。
 	 * @returns 返回的结果
 	 */
-	static dynamicVariable(source){
+	dynamicVariable(source){
 		if(typeof source == 'function'){
 			return source.call(null,...(Array.from(arguments).slice(1)));
 		}
 		return source;
 	}
-	static recoverEffect(target, player, viewer) {
+	recoverEffect(target, player, viewer) {
 		if (target.hp == target.maxHp) return 0;
 		if (!player) {
 			player = target;
@@ -4719,7 +4717,7 @@ export class Get extends Uninstantable {
 		}
 		return get.effect(target, { name: 'recover' }, player, viewer);
 	}
-	static buttonValue(button) {
+	buttonValue(button) {
 		var card = button.link;
 		var player = get.owner(card);
 		if (!player) player = _status.event.player;
@@ -4753,10 +4751,19 @@ export class Get extends Uninstantable {
 			default: return 0.4;
 		}
 	}
-	static attitude2(to) { return get.attitude(_status.event.player, to); }
+	attitude2(to) { return get.attitude(_status.event.player, to); }
 }
 
-export const get = Get;
+export let get = new Get();
+/**
+ * @param { InstanceType<typeof Get> } [instance] 
+ */
+export let setGet = (instance) => {
+	get = instance || new Get();
+	if (lib.config.dev) {
+		window.get = get;
+	}
+};
 
 export {
 	Is,

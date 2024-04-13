@@ -1,14 +1,14 @@
-import { GeneratorFunction, Uninstantable } from "../util/index.js";
+import { GeneratorFunction } from "../util/index.js";
 import { Is } from "./is.js";
 
 // gnc: GeNCoroutine
-export class GNC extends Uninstantable {
+export class GNC {
 	/**
 	 * @param {GeneratorFunction} fn 
 	 * @returns 
 	 */
-	static of(fn) {
-		return Is.generatorFunc(fn) ?
+	of(fn) {
+		return this.is.generatorFunc(fn) ?
 			/**
 			 * @param {Parameters<typeof fn>} args
 			 * @returns {Promise<ReturnType<typeof fn>>}
@@ -45,7 +45,14 @@ export class GNC extends Uninstantable {
 				return new Promise(callback);
 			} : (() => { throw new TypeError("gnc.of needs a GeneratorFunction."); })();
 	}
-	static is = Is;
+	is = new Is();
 };
 
-export const gnc = GNC;
+export let gnc = new GNC();
+
+/**
+ * @param { InstanceType<typeof GNC> } [instance] 
+ */
+export let setGNC = (instance) => {
+	gnc = instance || new GNC();
+};

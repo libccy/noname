@@ -9,14 +9,13 @@
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
  * @typedef { InstanceType<typeof lib.element.Control> } Control
 */
-import { nonameInitialized, assetURL, userAgent, Uninstantable, GeneratorFunction, AsyncFunction, characterDefaultPicturePath } from "../util/index.js";
-import { AI as ai } from '../ai/index.js';
-import { Get as get } from '../get/index.js';
-import { Game as game } from '../game/index.js';
-import { status as _status } from '../status/index.js';
-import { UI as ui } from '../ui/index.js';
-import { GNC as gnc } from '../gnc/index.js';
-
+import { nonameInitialized, assetURL, userAgent, GeneratorFunction, AsyncFunction, characterDefaultPicturePath } from "../util/index.js";
+import { ai } from '../ai/index.js';
+import { get } from '../get/index.js';
+import { game } from '../game/index.js';
+import { _status } from '../status/index.js';
+import { ui } from '../ui/index.js';
+import { gnc } from '../gnc/index.js';
 import { LibInit } from "./init/index.js";
 import { Announce } from "./announce/index.js";
 import { Channel } from "./channel/index.js";
@@ -27,29 +26,29 @@ import { defaultHooks } from "./hooks/index.js"
 import { freezeButExtensible } from "../util/index.js"
 
 
-export class Library extends Uninstantable {
-	static configprefix = 'noname_0.9_';
-	static versionOL = 27;
-	static updateURLS = updateURLs;
-	static updateURL = updateURLs.github;
-	static mirrorURL = updateURLs.coding;
-	static hallURL = '47.99.105.222';
-	static assetURL = assetURL;
-	static userAgent = userAgent;
-	static characterDefaultPicturePath = characterDefaultPicturePath;
-	static compatibleEdition = Boolean(typeof nonameInitialized == 'string' && nonameInitialized.match(/\/(?:com\.widget|yuri\.nakamura)\.noname\//));
-	static changeLog = [];
-	static updates = [];
-	static canvasUpdates = [];
+export class Library {
+	configprefix = 'noname_0.9_';
+	versionOL = 27;
+	updateURLS = updateURLs;
+	updateURL = updateURLs.github;
+	mirrorURL = updateURLs.coding;
+	hallURL = '47.99.105.222';
+	assetURL = assetURL;
+	userAgent = userAgent;
+	characterDefaultPicturePath = characterDefaultPicturePath;
+	compatibleEdition = Boolean(typeof nonameInitialized == 'string' && nonameInitialized.match(/\/(?:com\.widget|yuri\.nakamura)\.noname\//));
+	changeLog = [];
+	updates = [];
+	canvasUpdates = [];
 	/**
 	 * @type { Video[] }
 	 */
-	static video = [];
-	static skilllist = [];
-	static connectBanned = [];
-	static characterIntro = {};
-	static characterTitle = {};
-	static characterPack = new Proxy({}, {
+	video = [];
+	skilllist = [];
+	connectBanned = [];
+	characterIntro = {};
+	characterTitle = {};
+	characterPack = new Proxy({}, {
 		set(target, prop, newValue) {
 			if (typeof prop == 'string') {
 				// 新增武将包，且不是“收藏”和“禁用”
@@ -62,14 +61,14 @@ export class Library extends Uninstantable {
 			return Reflect.set(target, prop, newValue);
 		}
 	});
-	static characterFilter = {};
-	static characterSort = {};
-	static characterReplace = {};
-	static characterSubstitute = {};
-	static characterInitFilter = {};
-	static characterGuozhanFilter = ["mode_guozhan"];
-	static dynamicTranslate = {};
-	static cardPack = new Proxy({}, {
+	characterFilter = {};
+	characterSort = {};
+	characterReplace = {};
+	characterSubstitute = {};
+	characterInitFilter = {};
+	characterGuozhanFilter = ["mode_guozhan"];
+	dynamicTranslate = {};
+	cardPack = new Proxy({}, {
 		set(target, prop, newValue) {
 			if (typeof prop == 'string') {
 				if (!Reflect.has(target, prop)) {
@@ -81,19 +80,19 @@ export class Library extends Uninstantable {
 			return Reflect.set(target, prop, newValue);
 		}
 	});
-	static cardPackInfo = {};
+	cardPackInfo = {};
 	/**
 	 * @type { SMap<number> }
 	 */
-	static skin = {};
-	static onresize = [];
-	static onphase = [];
-	static onwash = [];
-	static onover = [];
-	static ondb = [];
-	static ondb2 = [];
-	static chatHistory = [];
-	static emotionList = {
+	skin = {};
+	onresize = [];
+	onphase = [];
+	onwash = [];
+	onover = [];
+	ondb = [];
+	ondb2 = [];
+	chatHistory = [];
+	emotionList = {
 		xiaowu_emotion: 14,
 		xiaokuo_emotion: 8,
 		shibing_emotion: 15,
@@ -103,37 +102,37 @@ export class Library extends Uninstantable {
 		xiaotao_emotion: 20,
 		xiaojiu_emotion: 20,
 	};
-	static animate = {
+	animate = {
 		skill: {},
 		card: {},
 	};
-	static onload = [];
-	static onload2 = [];
-	static onprepare = [];
-	static arenaReady = [];
-	static onfree = [];
-	static inpile = [];
-	static inpile_nature = [];
-	static extensions = [];
-	static extensionPack = {};
-	static cardType = {};
-	static hook = { globalskill: {} };
+	onload = [];
+	onload2 = [];
+	onprepare = [];
+	arenaReady = [];
+	onfree = [];
+	inpile = [];
+	inpile_nature = [];
+	extensions = [];
+	extensionPack = {};
+	cardType = {};
+	hook = { globalskill: {} };
 	/**
 	 *  @type { Player | undefined }
 	 */
-	static tempSortSeat;
+	tempSortSeat;
 	/**
 	 * @type { 'android' | 'ios' | undefined }
 	 */
-	static device;
+	device;
 	/**
 	 * @type { string }
 	 */
-	static version;
+	version;
 	/**
 	 * @type { Videos[] }
 	 */
-	static videos;
+	videos;
 	/**
 	 * @type { {
 	 * 	fs: typeof import("fs"),
@@ -146,22 +145,22 @@ export class Library extends Uninstantable {
 	 *  torespondtimeout:{},
 	 * } }
 	 */
-	static node;
+	node;
 	/**
 	 * @type { { [key: string]: string } }
 	 */
-	static playerOL;
+	playerOL;
 	/**
 	 * @type { IDBRequest<IDBDatabase> }
 	 */
-	static db;
+	db;
 	//函数钩子
 	/**
 	 * 你可以往这里加入{钩子名:函数数组}，并在数组里增加你的自定义函数
 	 * 这样当某个地方调用game.callHook(钩子名,[...函数参数])时，就会按顺序将对应数组中的每个函数运行一遍（传参为callHook的第二个参数）。
 	 * 你可以将hook机制类比为event.trigger()，但是这里只能放同步代码
 	 */
-	static hooks = freezeButExtensible({ ...defaultHooks });
+	hooks = freezeButExtensible({ ...defaultHooks });
 
 	/**
 	 * **无名杀频道推送机制**
@@ -184,7 +183,7 @@ export class Library extends Uninstantable {
 	 * // 从某个角落向channel发消息，若无消息接收则等待
 	 * await channel.send(item);
 	 */
-	static channel = Channel;
+	channel = Channel;
 
 	/**
 	 * **无名杀消息推送库**
@@ -211,13 +210,13 @@ export class Library extends Uninstantable {
 	 * // 若此时乙扩展不想继续订阅`skinChange`事件，可以通过`unsubscribe`解除订阅
 	 * lib.announce.unsubscribe("skinChange", method);
 	 */
-	static announce = new Announce(new EventTarget(), new WeakMap());
+	announce = new Announce(new EventTarget(), new WeakMap());
 
-	static objectURL = new Map();
-	static hookmap = {};
-	static imported = {};
-	static layoutfixed = ['chess', 'tafang', 'stone'];
-	static pinyins = {
+	objectURL = new Map();
+	hookmap = {};
+	imported = {};
+	layoutfixed = ['chess', 'tafang', 'stone'];
+	pinyins = {
 		_metadata: {
 			shengmu: ['zh', 'ch', 'sh', 'b', 'p', 'm', 'f', 'd', 't', 'l', 'n', 'g', 'k', 'h', 'j', 'q', 'x', 'r', 'z', 'c', 's', 'y', 'w'],
 			special_shengmu: ['j', 'q', 'x', 'y'],
@@ -250,7 +249,7 @@ export class Library extends Uninstantable {
 	 *
 	 * 应变
 	 */
-	static yingbian = {
+	yingbian = {
 		condition: {
 			color: new Map([
 				['zhuzhan', 'wood'],
@@ -426,7 +425,7 @@ export class Library extends Uninstantable {
 	 *
 	 * 谋攻强化
 	 */
-	static stratagemBuff = {
+	stratagemBuff = {
 		cost: new Map([
 			['sha', 1],
 			['shan', 1],
@@ -516,11 +515,11 @@ export class Library extends Uninstantable {
 	 *
 	 * 实际的卡牌名称
 	 */
-	static actualCardName = new Map([
+	actualCardName = new Map([
 		['挟令', '挟天子以令诸侯'],
 		['霹雳投石车', '霹雳车']
 	]);
-	static characterDialogGroup = {
+	characterDialogGroup = {
 		'收藏': function (name, capt) {
 			return lib.config.favouriteCharacter.includes(name) ? capt : null;
 		},
@@ -529,7 +528,7 @@ export class Library extends Uninstantable {
 			return list.includes(name) ? capt : null;
 		}
 	};
-	static listenEnd(node) {
+	listenEnd(node) {
 		if (!node._listeningEnd) {
 			node._listeningEnd = true;
 			node.listenTransition(function () {
@@ -544,7 +543,7 @@ export class Library extends Uninstantable {
 			});
 		}
 	}
-	static configMenu = {
+	configMenu = {
 		general: {
 			name: '通用',
 			config: {
@@ -4480,7 +4479,7 @@ export class Library extends Uninstantable {
 			}
 		}
 	};
-	static extensionMenu = {
+	extensionMenu = {
 		cardpile: {
 			enable: {
 				name: '开启',
@@ -4794,7 +4793,7 @@ export class Library extends Uninstantable {
 			},
 		},
 	};
-	static mode = {
+	mode = {
 		identity: {
 			name: '身份',
 			connect: {
@@ -7482,7 +7481,7 @@ export class Library extends Uninstantable {
 			}
 		},
 	};
-	static status = {
+	status = {
 		running: false,
 		canvas: false,
 		time: 0,
@@ -7492,7 +7491,7 @@ export class Library extends Uninstantable {
 		videoId: 0,
 		globalId: 0,
 	};
-	static help = {
+	help = {
 		'关于游戏': '<div style="margin:10px">关于无名杀</div><ul style="margin-top:0"><li>无名杀官方发布地址仅有GitHub仓库！<br><a href="https://github.com/libccy/noname">点击前往Github仓库</a><br><li>无名杀基于GPLv3开源协议。<br><a href="https://www.gnu.org/licenses/gpl-3.0.html">点击查看GPLv3协议</a><br><li>其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！',
 		'游戏操作': '<ul><li>长按/鼠标悬停/右键单击显示信息。<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管。<li>键盘快捷键<br>' +
 			'<table><tr><td>A<td>切换托管<tr><td>W<td>切换不询问无懈<tr><td>空格<td>暂停</table><li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。</ul>',
@@ -7529,8 +7528,8 @@ export class Library extends Uninstantable {
 	 * @type {import('path')}
 	 */
 	// @ts-ignore
-	static path = {};
-	static getErrorTip(msg) {
+	path = {};
+	getErrorTip(msg) {
 		if (typeof msg != 'string') {
 			try {
 				msg = msg.toString();
@@ -7672,7 +7671,7 @@ export class Library extends Uninstantable {
 			return newMessage;
 		}
 	}
-	static codeMirrorReady(node, editor) {
+	codeMirrorReady(node, editor) {
 		ui.window.appendChild(node);
 		node.style.fontSize = 20 / game.documentZoom + 'px';
 		const mirror = window.CodeMirror(editor, {
@@ -7893,7 +7892,7 @@ export class Library extends Uninstantable {
 			return found.sort((a, b) => (a + '').localeCompare(b + ''));
 		}
 	}
-	static setIntro(node, func, left) {
+	setIntro(node, func, left) {
 		if (lib.config.touchscreen) {
 			if (left) {
 				node.listen(ui.click.touchintro);
@@ -7920,7 +7919,7 @@ export class Library extends Uninstantable {
 			node._customintro = func;
 		}
 	}
-	static setPopped(node, func, width, height, forceclick, paused2) {
+	setPopped(node, func, width, height, forceclick, paused2) {
 		node._poppedfunc = func;
 		node._poppedwidth = width;
 		node._poppedheight = height;
@@ -7938,7 +7937,7 @@ export class Library extends Uninstantable {
 			node._paused2 = true;
 		}
 	}
-	static placePoppedDialog(dialog, e) {
+	placePoppedDialog(dialog, e) {
 		if (dialog._place_text) {
 			if (dialog._place_text.firstChild.offsetWidth >= 190 || dialog._place_text.firstChild.offsetHeight >= 30) {
 				dialog._place_text.style.marginLeft = '14px';
@@ -7970,7 +7969,7 @@ export class Library extends Uninstantable {
 		}
 		dialog.style.top = idealtop + 'px';
 	}
-	static setHover(node, func, hoveration, width) {
+	setHover(node, func, hoveration, width) {
 		node._hoverfunc = func;
 		if (typeof hoveration == 'number') {
 			node._hoveration = hoveration;
@@ -7984,22 +7983,22 @@ export class Library extends Uninstantable {
 		node.addEventListener('mousemove', ui.click.mousemove);
 		return node;
 	}
-	static setScroll(node) {
+	setScroll(node) {
 		node.ontouchstart = ui.click.touchStart;
 		node.ontouchmove = ui.click.touchScroll;
 		node.style.webkitOverflowScrolling = 'touch';
 		return node;
 	}
-	static setMousewheel(node) {
+	setMousewheel(node) {
 		if (lib.config.mousewheel) node.onmousewheel = ui.click.mousewheel;
 	}
-	static setLongPress(node, func) {
+	setLongPress(node, func) {
 		node.addEventListener('touchstart', ui.click.longpressdown);
 		node.addEventListener('touchend', ui.click.longpresscancel);
 		node._longpresscallback = func;
 		return node;
 	}
-	static updateCanvas(time) {
+	updateCanvas(time) {
 		if (lib.canvasUpdates.length === 0) {
 			lib.status.canvas = false;
 			return false;
@@ -8025,7 +8024,7 @@ export class Library extends Uninstantable {
 			}
 		}
 	}
-	static run(time) {
+	run(time) {
 		lib.status.time = time;
 		for (var i = 0; i < lib.updates.length; i++) {
 			if (!('_time' in lib.updates[i])) {
@@ -8043,18 +8042,18 @@ export class Library extends Uninstantable {
 			lib.status.delayed = 0;
 		}
 	}
-	static getUTC(date) {
+	getUTC(date) {
 		return date.getTime();
 	}
-	static saveVideo() {
+	saveVideo() {
 		if (_status.videoToSave) {
 			game.export(lib.init.encode(JSON.stringify(_status.videoToSave)),
 				'无名杀 - 录像 - ' + _status.videoToSave.name[0] + ' - ' + _status.videoToSave.name[1]);
 		}
 	}
-	static genAsync(fn) { return gnc.of(fn); }
-	static genAwait(item) { return gnc.is.generator(item) ? gnc.of(function* () { for (const content of item) { yield content; } })() : Promise.resolve(item); }
-	static gnc = {
+	genAsync(fn) { return gnc.of(fn); }
+	genAwait(item) { return gnc.is.generator(item) ? gnc.of(function* () { for (const content of item) { yield content; } })() : Promise.resolve(item); }
+	gnc = {
 		of: fn => gnc.of(fn),
 		is: {
 			coroutine: item => gnc.is.coroutine(item),
@@ -8062,7 +8061,7 @@ export class Library extends Uninstantable {
 			generator: item => gnc.is.generator(item)
 		}
 	};
-	static comparator = {
+	comparator = {
 		equals: function () {
 			if (arguments.length == 0) return false;
 			if (arguments.length == 1) return true;
@@ -8095,7 +8094,7 @@ export class Library extends Uninstantable {
 			return true;
 		}
 	};
-	static creation = {
+	creation = {
 		get array() {
 			return [];
 		},
@@ -8109,7 +8108,7 @@ export class Library extends Uninstantable {
 			return "";
 		}
 	};
-	static linq = {
+	linq = {
 		cselector: {
 			hasAttr: name => `[${name}]`,
 			isAttr: (name, item) => `[${name}=${item}]`,
@@ -8214,8 +8213,8 @@ export class Library extends Uninstantable {
 			}
 		}
 	};
-	static init = LibInit;
-	static cheat = {
+	init = new LibInit();
+	cheat = {
 		/**
 		 * 将游戏内部的对象暴露到全局中
 		 *
@@ -9096,7 +9095,7 @@ export class Library extends Uninstantable {
 			game.zhu.update();
 		},
 	};
-	static translate = {
+	translate = {
 		flower: '鲜花',
 		egg: '鸡蛋',
 		wine: '酒杯',
@@ -9322,9 +9321,9 @@ export class Library extends Uninstantable {
 		phaseJieshu: '结束阶段',
 	};
 
-	static experimental = Experimental
+	experimental = Experimental
 
-	static element = {
+	element = {
 		content: Element.Content,
 		contents: Element.Contents,
 		Player: Element.Player,
@@ -9448,7 +9447,7 @@ export class Library extends Uninstantable {
 			return this.NodeWS.prototype;
 		}
 	};
-	static card = {
+	card = {
 		list: [],
 		cooperation_damage: {
 			fullskin: true,
@@ -9553,7 +9552,7 @@ export class Library extends Uninstantable {
 			fullimage: true,
 		},
 	};
-	static filter = {
+	filter = {
 		all: () => true,
 		none: () => false,
 		/**
@@ -10100,7 +10099,7 @@ export class Library extends Uninstantable {
 			}
 		}
 	};
-	static sort = {
+	sort = {
 		nature: function (a, b) {
 			return (lib.nature.get(b) || 0) - (lib.nature.get(a) || 0);
 		},
@@ -10276,7 +10275,7 @@ export class Library extends Uninstantable {
 	 * 	[key: string]: Skill;
 	 * }}
 	 */
-	static skill = {
+	skill = {
 		stratagem_fury: {
 			marktext: '🔥',
 			intro: {
@@ -11678,10 +11677,10 @@ export class Library extends Uninstantable {
 			}
 		}
 	};
-	static character = {};
-	static perfectPair = {};
-	static cardPile = {};
-	static message = {
+	character = {};
+	perfectPair = {};
+	cardPile = {};
+	message = {
 		server: {
 			/** @this { any } */
 			init(version, config, banned_info) {
@@ -12776,16 +12775,16 @@ export class Library extends Uninstantable {
 			}
 		}
 	};
-	static suit = ['club', 'spade', 'diamond', 'heart'];
-	static suits = ['club', 'spade', 'diamond', 'heart', 'none'];
-	static color = {
+	suit = ['club', 'spade', 'diamond', 'heart'];
+	suits = ['club', 'spade', 'diamond', 'heart', 'none'];
+	color = {
 		black: ['club', 'spade'],
 		red: ['diamond', 'heart'],
 		none: ['none'],
 	};
-	static group = ['wei', 'shu', 'wu', 'qun', 'jin', 'shen'];
+	group = ['wei', 'shu', 'wu', 'qun', 'jin', 'shen'];
 	//数值代表各元素在名称中排列的先后顺序
-	static nature = new Map([
+	nature = new Map([
 		['fire', 20],
 		['thunder', 30],
 		['kami', 60],
@@ -12793,7 +12792,7 @@ export class Library extends Uninstantable {
 		['stab', 10],
 		['poison', 50]
 	]);
-	static natureAudio = {
+	natureAudio = {
 		damage: {
 			'fire': 'default',//默认，即语音放置在audio/effect下，以damage_fire.mp3 damage_fire2.mp3命名。
 			'thunder': 'default',
@@ -12832,12 +12831,12 @@ export class Library extends Uninstantable {
 			*/
 		}
 	};
-	static linked = ['fire', 'thunder', 'kami', 'ice'];
-	static natureBg = new Map([
+	linked = ['fire', 'thunder', 'kami', 'ice'];
+	natureBg = new Map([
 		['stab', 'image/card/cisha.png']
 	]);
-	static natureSeparator = '|';
-	static namePrefix = new Map([
+	natureSeparator = '|';
+	namePrefix = new Map([
 		['界', {
 			color: '#fdd559',
 			nature: 'soilmm',
@@ -13120,9 +13119,15 @@ export class Library extends Uninstantable {
 			 * @returns {string}
 			 */
 			getSpan: () => `${get.prefixSpan('旧')}${get.prefixSpan('谋')}`
+		}],
+		['手杀神', {
+			/**
+			 * @returns {string}
+			 */
+			getSpan: () => `${get.prefixSpan('手杀')}${get.prefixSpan('神')}`
 		}]
 	]);
-	static groupnature = {
+	groupnature = {
 		shen: 'shen',
 		wei: 'water',
 		shu: 'soil',
@@ -13133,7 +13138,7 @@ export class Library extends Uninstantable {
 		jin: 'thunder',
 		ye: 'thunder',
 	};
-	static lineColor = new Map([
+	lineColor = new Map([
 		['fire', [255, 146, 68]],
 		['yellow', [255, 255, 122]],
 		['blue', [150, 202, 255]],
@@ -13146,8 +13151,8 @@ export class Library extends Uninstantable {
 		['brown', [195, 161, 223]],
 		['legend', [233, 131, 255]]
 	]);
-	static phaseName = ['phaseZhunbei', 'phaseJudge', 'phaseDraw', 'phaseUse', 'phaseDiscard', 'phaseJieshu'];
-	static quickVoice = [
+	phaseName = ['phaseZhunbei', 'phaseJudge', 'phaseDraw', 'phaseUse', 'phaseDiscard', 'phaseJieshu'];
+	quickVoice = [
 		'我从未见过如此厚颜无耻之人！',
 		'这波不亏',
 		'请收下我的膝盖',
@@ -13172,19 +13177,29 @@ export class Library extends Uninstantable {
 		'哥哥，交个朋友吧',
 		'妹子，交个朋友吧',
 	];
-	static other = {
+	other = {
 		ignore: () => void 0
 	};
-	static InitFilter = {
+	InitFilter = {
 		'noZhuHp': '不享受主公的额外体力上限',
 		'noZhuSkill': '不享受地主的额外技能',
 	};
 }
 
-Library.config = undefined;
-Library.configOL = undefined;
+Library.prototype.config = undefined;
+Library.prototype.configOL = undefined;
 
-export const lib = Library;
+export let lib = new Library();
+
+/**
+ * @param { InstanceType<typeof Library> } [instance] 
+ */
+export let setLibrary = (instance) => {
+	lib = instance || new Library();
+	if (lib.config.dev) {
+		window.lib = lib;
+	}
+};
 
 /**
  * @template T

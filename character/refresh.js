@@ -5593,6 +5593,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 					player.addSkills('xinpaiyi');
 				},
+				ai:{
+					combo:'xinquanji'
+				}
 			},
 			xinpaiyi:{
 				audio:2,
@@ -9325,6 +9328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rejiushi:{
 				audio:2,
+				audioname:['mb_caomao'],
 				group:['rejiushi1','rejiushi2','rejiushi3','rejiushi_gain'],
 				subfrequent:['gain'],
 				subSkill:{
@@ -9351,6 +9355,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				audio:'rejiushi',
+				audioname:['mb_caomao'],
 				enable:'chooseToUse',
 				filter:function(event,player){
 					if(player.classList.contains('turnedover')) return false;

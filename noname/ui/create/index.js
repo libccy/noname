@@ -1,5 +1,8 @@
-import { ui, game, get, lib, _status } from "../../../noname.js";
-import { Uninstantable } from "../../util/index.js";
+import { ui } from '../index.js';
+import { lib } from '../../library/index.js';
+import { game } from "../../game/index.js";
+import { get } from "../../get/index.js";
+import { _status } from "../../status/index.js";
 import { menu } from "./menu/index.js";
 import { cardPackMenu } from "./menu/pages/cardPackMenu.js";
 import { characterPackMenu } from "./menu/pages/characterPackMenu.js";
@@ -8,15 +11,15 @@ import { optionsMenu } from "./menu/pages/optionsMenu.js";
 import { otherMenu } from "./menu/pages/otherMenu.js";
 import { startMenu } from "./menu/pages/startMenu.js";
 
-export class Create extends Uninstantable {
+export class Create {
 	/**
 	 * @type {(video: Videos, before: boolean) => void}
 	 */
-	static videoNode;
+	videoNode;
 	/**
 	 * 创建身份牌实例
 	 */
-	static identityCard(identity, position, noclick) {
+	identityCard(identity, position, noclick) {
 		const card = ui.create.card(position, 'noclick', noclick);
 		card.removeEventListener(lib.config.touchscreen ? 'touchend' : 'click', ui.click.card);
 		card.classList.add('button');
@@ -36,7 +39,7 @@ export class Create extends Uninstantable {
 	/**
 	 * 让卡牌旋转
 	 */
-	static cardSpinning(card) {
+	cardSpinning(card) {
 		if (lib.config.cardback_style != 'default') {
 			card.style.transitionProperty = 'none';
 			ui.refresh(card);
@@ -71,7 +74,7 @@ export class Create extends Uninstantable {
 	/**
 	 * 旋转的身份牌！
 	 */
-	static spinningIdentityCard(identity, dialog) {
+	spinningIdentityCard(identity, dialog) {
 		const card = ui.create.identityCard(identity);
 		const buttons = ui.create.div('.buttons', dialog.content);
 		setTimeout(() => {
@@ -85,7 +88,7 @@ export class Create extends Uninstantable {
 	 * @param {HTMLDivElement} container 
 	 * @param {Function} saveInput 
 	 */
-	static editor(container, saveInput) {
+	editor(container, saveInput) {
 		const createList = [];
 		const containerDelete = container.delete;
 		const editorpage = ui.create.div(container);
@@ -269,7 +272,7 @@ export class Create extends Uninstantable {
 		const editor = ui.create.div(editorpage);
 		return editor;
 	}
-	static cardTempName(card, applyNode) {
+	cardTempName(card, applyNode) {
 		let getApplyNode = applyNode || card;
 		let cardName = get.name(card);
 		let cardNature = get.nature(card);
@@ -408,7 +411,7 @@ export class Create extends Uninstantable {
 		node.tempname = tempname;
 		return node;
 	}
-	static connectRooms(list) {
+	connectRooms(list) {
 		ui.rooms = [];
 		ui.roombase = ui.create.dialog();
 		ui.roombase.classList.add('fullwidth');
@@ -426,7 +429,7 @@ export class Create extends Uninstantable {
 			ui.rooms.push(player);
 		}
 	}
-	static rarity(button) {
+	rarity(button) {
 		var rarity = game.getRarity(button.link);
 		if (rarity != 'common' && lib.config.show_rarity) {
 			var intro = button.node.intro;
@@ -451,7 +454,7 @@ export class Create extends Uninstantable {
 			else button.node.group.style.backgroundColor=get.translation('weiColor');
 		}*/
 	}
-	static div() {
+	div() {
 		var str, innerHTML, position, position2, style, divposition, listen;
 		for (var i = 0; i < arguments.length; i++) {
 			if (typeof arguments[i] == 'string') {
@@ -501,7 +504,7 @@ export class Create extends Uninstantable {
 		if (listen) node.listen(listen);
 		return node;
 	}
-	static filediv() {
+	filediv() {
 		var args = Array.from(arguments);
 		var func = null;
 		for (var i = 0; i < args.length; i++) {
@@ -521,7 +524,7 @@ export class Create extends Uninstantable {
 		div.inputNode = input;
 		return div;
 	}
-	static node() {
+	node() {
 		var tagName, str, innerHTML, position, position2, style, divposition, listen;
 		for (var i = 0; i < arguments.length; i++) {
 			if (typeof arguments[i] == 'string') {
@@ -586,7 +589,7 @@ export class Create extends Uninstantable {
 		if (listen) node.onclick = listen;
 		return node;
 	}
-	static iframe(src) {
+	iframe(src) {
 		var layer = document.createElement('div');
 		layer.classList.add('poplayer');
 		layer.style.zIndex = '100';
@@ -618,7 +621,7 @@ export class Create extends Uninstantable {
 
 		ui.window.appendChild(layer);
 	}
-	static identitycircle(list, target) {
+	identitycircle(list, target) {
 		var container = ui.create.div('.identitycircle.menubg', target);
 		var circle = ui.create.div(container);
 		container.dataset.num = list.length;
@@ -639,17 +642,17 @@ export class Create extends Uninstantable {
 			sec2.style.transform = 'rotate(' + (deg1 + deg2) + 'deg)';
 		}
 	}
-	static chat() {
+	chat() {
 		var chat = ui.create.system('聊天', null, true);
 		ui.chatButton = chat;
 		lib.setPopped(chat, ui.click.chat, 220);
 	}
-	static exit() {
+	exit() {
 		if (!ui.exit) {
 			ui.exit = ui.create.control('退出房间', ui.click.exit);
 		}
 	}
-	static connecting(bool) {
+	connecting(bool) {
 		if (bool) {
 			ui.window.classList.remove('connecting');
 			if (ui.connecting) {
@@ -674,7 +677,7 @@ export class Create extends Uninstantable {
 			// },1000);
 		}
 	}
-	static roomInfo() {
+	roomInfo() {
 		var chat = ui.create.system(game.online ? '房间信息' : '房间设置', function () {
 			if (!game.online || game.onlinezhu) {
 				ui.click.connectMenu();
@@ -689,7 +692,7 @@ export class Create extends Uninstantable {
 			}
 		}, 180);
 	}
-	static templayer(time) {
+	templayer(time) {
 		if (typeof time != 'number' || isNaN(time) || time == Infinity) {
 			time = 500;
 		}
@@ -698,7 +701,7 @@ export class Create extends Uninstantable {
 			templayer.remove();
 		}, time);
 	}
-	static selectlist(list, init, position, onchange) {
+	selectlist(list, init, position, onchange) {
 		var select = document.createElement('select');
 		for (var i = 0; i < list.length; i++) {
 			var option = document.createElement('option');
@@ -724,20 +727,20 @@ export class Create extends Uninstantable {
 		return select;
 	}
 	/** 创建菜单 */
-	static menu = menu;
+	menu = menu;
 	/** 创建“开始”菜单 */
-	static startMenu = startMenu;
+	startMenu = startMenu;
 	/** 创建“选项”菜单 */
-	static optionsMenu = optionsMenu;
+	optionsMenu = optionsMenu;
 	/** 创建“武将”菜单 */
-	static characterPackMenu = characterPackMenu;
+	characterPackMenu = characterPackMenu;
 	/** 创建“卡牌”菜单 */
-	static cardPackMenu = cardPackMenu;
+	cardPackMenu = cardPackMenu;
 	/** 创建“扩展”菜单 */
-	static extensionMenu = extensionMenu;
+	extensionMenu = extensionMenu;
 	/** 创建“其他”菜单 */
-	static otherMenu = otherMenu;
-	static statictable() {
+	otherMenu = otherMenu;
+	statictable() {
 		var str, row, col, position, position2, fixed, style, divposition;
 		for (var i = 0; i < arguments.length; i++) {
 			if (typeof arguments[i] == 'string') str = arguments[i];
@@ -792,7 +795,7 @@ export class Create extends Uninstantable {
 		}
 		return node;
 	}
-	static giveup() {
+	giveup() {
 		if (ui.giveup) return;
 		if (!lib.config.show_giveup) return;
 		ui.giveup = ui.create.system('投降', function () {
@@ -814,7 +817,7 @@ export class Create extends Uninstantable {
 			}
 		}, true, true);
 	}
-	static groupControl(dialog) {
+	groupControl(dialog) {
 		return ui.create.control('wei', 'shu', 'wu', 'qun', 'jin', 'western', 'key', function (link, node) {
 			if (link == '全部') {
 				dialog.currentcapt = '';
@@ -857,14 +860,14 @@ export class Create extends Uninstantable {
 			}
 		});
 	}
-	static cardDialog() {
+	cardDialog() {
 		var args = ['thisiscard'];
 		for (var i = 0; i < arguments.length; i++) {
 			args.push(arguments[i]);
 		}
 		return ui.create.characterDialog.apply(this, args);
 	}
-	static characterDialog2(filter) {
+	characterDialog2(filter) {
 		var list = [];
 		for (var i in lib.character) {
 			if (lib.character[i][4].includes('minskin')) continue;
@@ -953,7 +956,7 @@ export class Create extends Uninstantable {
 		var node = ui.create.div('.dialogbutton.menubutton.large', '筛选', packnode);
 		return dialog;
 	}
-	static characterDialog() {
+	characterDialog() {
 		// if(lib.config.character_dialog_style=='newstyle'){
 		//     for(var i=0;i<arguments.length;i++){
 		//      			if(arguments[i]=='thisiscard'){
@@ -1631,19 +1634,19 @@ export class Create extends Uninstantable {
 
 		return dialog;
 	}
-	static dialog() {
+	dialog() {
 		let dialog = new lib.element.Dialog(...arguments);
 		if (!Array.from(arguments).includes('hidden')) {
 			dialog.open();
 		}
 		return dialog;
 	}
-	static line2() {
+	line2() {
 		var node = ui.create.line.apply(this, arguments);
 		node.classList.add('line2');
 		return node;
 	}
-	static line() {
+	line() {
 		var two = false, func;
 		var node = ui.create.div('.config');
 		for (var i = 0; i < arguments.length; i++) {
@@ -1661,7 +1664,7 @@ export class Create extends Uninstantable {
 		}
 		return node;
 	}
-	static switcher(name, current, current2) {
+	switcher(name, current, current2) {
 		var func;
 		var node = ui.create.div('.config');
 		ui.create.div(node).innerHTML = get.translation(name + '_config');
@@ -1697,15 +1700,15 @@ export class Create extends Uninstantable {
 		if (func) switcher.additionalCommand = func;
 		return node;
 	}
-	static caption(str, position) {
+	caption(str, position) {
 		var caption = ui.create.div('.caption', position);
 		caption.innerHTML = str;
 		return caption;
 	}
-	static control() {
+	control() {
 		return new lib.element.Control(...arguments);
 	}
-	static confirm(str, func) {
+	confirm(str, func) {
 		if (ui.confirm && ui.confirm.str == str) {
 			return;
 		}
@@ -1743,7 +1746,7 @@ export class Create extends Uninstantable {
 			else delete ui.confirm.custom;
 		}
 	}
-	static skills(skills) {
+	skills(skills) {
 		var i, same;
 		if (ui.skills) {
 			if (ui.skills.skills.length == skills.length && ui.skills.style.display != 'none') {
@@ -1777,7 +1780,7 @@ export class Create extends Uninstantable {
 		ui.skills.skills = skills;
 		return ui.skills;
 	}
-	static skills2(skills) {
+	skills2(skills) {
 		var i, same;
 		if (ui.skills2) {
 			if (ui.skills2.skills.length == skills.length && ui.skills2.style.display != 'none') {
@@ -1811,7 +1814,7 @@ export class Create extends Uninstantable {
 		ui.skills2.skills = skills;
 		return ui.skills2;
 	}
-	static skills3(skills) {
+	skills3(skills) {
 		var i, same;
 		if (ui.skills3) {
 			if (ui.skills3.skills.length == skills.length && ui.skills3.style.display != 'none') {
@@ -1845,7 +1848,7 @@ export class Create extends Uninstantable {
 		ui.skills3.skills = skills;
 		return ui.skills3;
 	}
-	static arena() {
+	arena() {
 		var i, j;
 		ui.window = ui.create.div('#window.hidden', document.body);
 		ui.create.div('#statusbg', document.body);
@@ -2497,7 +2500,7 @@ export class Create extends Uninstantable {
 			}, 500);
 		}
 	}
-	static system(str, func, right, before) {
+	system(str, func, right, before) {
 		var parent = right ? ui.system2 : ui.system1;
 		var node = ui.create.div();
 		if (before) {
@@ -2523,7 +2526,7 @@ export class Create extends Uninstantable {
 		}
 		return node;
 	}
-	static pause() {
+	pause() {
 		if (_status.pausing) return;
 		ui.click.shortcut(false);
 		var node = ui.create.div(".pausedbg", ui.window);
@@ -2564,7 +2567,7 @@ export class Create extends Uninstantable {
 		// });
 		return node;
 	}
-	static prebutton(item, type, position, noclick) {
+	prebutton(item, type, position, noclick) {
 		var node = ui.create.div(position);
 		node.style.display = 'none';
 		node.link = item;
@@ -2575,7 +2578,7 @@ export class Create extends Uninstantable {
 		_status.prebutton.push(node);
 		return node;
 	}
-	static buttonPresets = {
+	buttonPresets = {
 		/**
 		 * @returns { import("../library/index.js").Button }
 		 */
@@ -2837,8 +2840,8 @@ export class Create extends Uninstantable {
 			return node;
 		}
 	};
-	static button(item, type, position, noClick, button) { return new lib.element.Button(item, type, position, noClick, button); }
-	static buttons(list, type, position, noclick, zoom) {
+	button(item, type, position, noClick, button) { return new lib.element.Button(item, type, position, noClick, button); }
+	buttons(list, type, position, noclick, zoom) {
 		var buttons = [];
 		var pre = (typeof type == 'string' && type.slice(0, 3) == 'pre');
 		if (pre) {
@@ -2866,7 +2869,7 @@ export class Create extends Uninstantable {
 		if (position) position.appendChild(fragment);
 		return buttons;
 	}
-	static textbuttons(list, dialog, noclick) {
+	textbuttons(list, dialog, noclick) {
 		for (var item of list) {
 			var str, link;
 			if (Array.isArray(item)) {
@@ -2885,8 +2888,8 @@ export class Create extends Uninstantable {
 			dialog.buttons.add(next.firstChild);
 		}
 	}
-	static player(position, noclick) { return new lib.element.Player(position).build(noclick); }
-	static connectPlayers(ip) {
+	player(position, noclick) { return new lib.element.Player(position).build(noclick); }
+	connectPlayers(ip) {
 		ui.updateConnectPlayerPositions();
 		game.connectPlayers = [];
 		const configOL = lib.configOL;
@@ -2967,7 +2970,7 @@ export class Create extends Uninstantable {
 		ui.connectStartBar = bar;
 		ui.connectShareButton = shareButton;
 	}
-	static players(numberOfPlayers) {
+	players(numberOfPlayers) {
 		if (numberOfPlayers === 0) {
 			return;
 		}
@@ -3001,7 +3004,7 @@ export class Create extends Uninstantable {
 		players.forEach(player => ui.arena.appendChild(player));
 		return players;
 	}
-	static me(hasme) {
+	me(hasme) {
 		ui.mebg = ui.create.div('#mebg', ui.arena);
 		ui.me = ui.create.div('#me', ui.arena).addTempClass('start');
 		ui.handcards1Container = ui.create.div('#handcards1', ui.me);
@@ -3034,8 +3037,8 @@ export class Create extends Uninstantable {
 			// ui.updatehl();
 		}
 	}
-	static card(position, info, noclick) { return new lib.element.Card(position).build(info, noclick); }
-	static cardsAsync() {
+	card(position, info, noclick) { return new lib.element.Card(position).build(info, noclick); }
+	cardsAsync() {
 		if (lib.onfree) {
 			_status.waitingForCards = Array.from(arguments);
 			lib.onfree.push(function () {
@@ -3049,7 +3052,7 @@ export class Create extends Uninstantable {
 			ui.create.cards.apply(ui.create, arguments);
 		}
 	}
-	static cards(ordered) {
+	cards(ordered) {
 		if (_status.brawl) {
 			if (_status.brawl.cardPile) {
 				lib.card.list = _status.brawl.cardPile(lib.card.list);
