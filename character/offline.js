@@ -15,6 +15,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				offline_piracyS:['ns_jiaxu','longyufei','ps_guanyu','ps1059_guojia','ps2070_guojia','ps2063_zhaoyun','ps2067_zhaoyun','ps1062_zhouyu','ps2080_zhouyu','ps_caozhi','ps_jin_simayi','ps_caopi','ps_simayi','ps2068_simayi','ps_machao','ps_zhugeliang','ps2066_zhugeliang','ps_jiaxu','ps_lvbu','ps_shen_machao','jsp_liubei'],
 				offline_piracyK:['pk_sp_duyu'],
 				offline_vtuber:['vtb_xiaosha','vtb_xiaoshan','vtb_xiaotao','vtb_xiaole','vtb_xiaojiu'],
+				offline_loong:['loong_guangyu'],
 				//offline_others:[""],
 			},
 		},
@@ -92,6 +93,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			yj_caoang:['male','wei',4,['yjxuepin']],
 			ns_caoanmin:['male','wei',4,['nskuishe']],
 			jsp_liubei:['male','qun',4,['jsprende']],
+			loong_guangyu:['male','shu',4,['chaojue','junshen']],
 		},
 		characterIntro:{
 			huangjinleishi:"黄巾军中负责施法的女祭司二人组。",
@@ -149,6 +151,238 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		characterFilter:{
 		},
 		skill:{
+			//龙关羽
+			chaojue: {
+                trigger: {
+                    player: "phaseUseBegin",
+                },
+                direct: true,
+                async content(event, trigger, player) {
+                    const { result } = await player.chooseToDiscard('h', get.prompt('chaojue'), '弃置一张手牌令所有其他角色不可使用或打出此花色的牌，且选择是否交给你牌').set('ai', function (card) {
+                        var player = _status.event.player;
+                        return 7 - get.value(card, player);
+                    });
+                    if (!result.bool) return;
+                    player.logSkill('chaojue', game.filterPlayer().remove(player))
+                    for await (const p of game.players.filter(c => c != player)) {
+                        await p.addTempSkill('chaojue_ban');
+                        await p.markAuto('chaojue_ban', [get.suit(result.cards[0])]);
+                    }
+                    for await (const p of game.players.filter(c => c != player)) {
+                        const { result: result2 } = await p.chooseToGive('h', player, { suit: get.suit(result.cards[0]) }).set('prompt', '是否交给' + get.translation(player) + '一张花色为' + get.translation(get.suit(result.cards[0])) + '的手牌' + '？')
+                            .set('ai', card => {
+                                const att = get.attitude(p, player);
+                                return att > 0 && p.countCards('h') > 2
+                                return att >= 0 && p.countCards('h') > 4
+                                return 8 - get.value(card);
+                            }).set('target', player);
+                        if (!result2.bool && !p.hasSkill('fengyin')) p.addTempSkill('fengyin')
+                        else p.showCards(result2.cards[0], get.translation(p) + '交给了' + get.translation(player) + '一张' + get.translation(result2.cards[0]))
+                    }
+                },
+                subSkill: {
+                    ban: {
+                        onremove: true,
+                        charlotte: true,
+                        mod: {
+                            cardEnabled: function (card, player) {
+                                if (player.getStorage('chaojue_ban').includes(get.suit(card))) return false;
+                            },
+                            cardRespondable: function (card, player) {
+                                if (player.getStorage('chaojue_ban').includes(get.suit(card))) return false;
+                            },
+                            cardSavable: function (card, player) {
+                                if (player.getStorage('chaojue_ban').includes(get.suit(card))) return false;
+                            },
+                        },
+                        mark: true,
+                        marktext: "绝",
+                        intro: {
+                            content: "本回合内不能使用或打出$的牌",
+                        },
+                        sub: true,
+                        "_priority": 0,
+                    },
+                },
+                "_priority": 0,
+            },
+			junshen: {
+                mod: {
+                    selectTarget: function (card, player, range) {
+                        if (get.suit(card) == 'heart' && card.name == 'sha' && range[1] != -1) range[1]++;
+                    },
+                    targetInRange: function (card) {
+                        if (get.suit(card) == 'diamond' && card.name == 'sha') return true;
+                    },
+                },
+                group: ['junshen_1'],
+                audio: 2,
+                enable: ["chooseToRespond", "chooseToUse"],
+                filterCard(card, player) {
+                    return get.color(card) == 'red';
+                },
+                position: "hes",
+                viewAs: {
+                    name: "sha",
+                },
+                viewAsFilter(player) {
+                    if (!player.countCards('hes', { color: 'red' })) return false;
+                },
+                prompt: "将一张红色牌当杀使用或打出",
+                check(card) {
+                    const val = get.value(card);
+                    if (_status.event.name == 'chooseToRespond') return 1 / Math.max(0.1, val);
+                    return 5 - val;
+                },
+                ai: {
+                    skillTagFilter(player) {
+                        if (get.zhu(player, 'shouyue')) {
+                            if (!player.countCards('hes')) return false;
+                        }
+                        else {
+                            if (!player.countCards('hes', { color: 'red' })) return false;
+                        }
+                    },
+                    respondSha: true,
+                    yingbian: function (card, player, targets, viewer) {
+                        if (get.attitude(viewer, player) <= 0) return 0;
+                        var base = 0, hit = false;
+                        if (get.cardtag(card, 'yingbian_hit')) {
+                            hit = true;
+                            if (targets.some(target => {
+                                return target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
+                                    return i.hasGaintag('sha_notshan');
+                                })) && get.attitude(viewer, target) < 0 && get.damageEffect(target, player, viewer, get.natureList(card)) > 0;
+                            })) base += 5;
+                        }
+                        if (get.cardtag(card, 'yingbian_add')) {
+                            if (game.hasPlayer(function (current) {
+                                return !targets.includes(current) && lib.filter.targetEnabled2(card, player, current) && get.effect(current, card, player, player) > 0;
+                            })) base += 5;
+                        }
+                        if (get.cardtag(card, 'yingbian_damage')) {
+                            if (targets.some(target => {
+                                return get.attitude(player, target) < 0 && (hit || !target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
+                                    return i.hasGaintag('sha_notshan');
+                                })) || player.hasSkillTag('directHit_ai', true, {
+                                    target: target,
+                                    card: card,
+                                }, true)) && !target.hasSkillTag('filterDamage', null, {
+                                    player: player,
+                                    card: card,
+                                    jiu: true,
+                                })
+                            })) base += 5;
+                        }
+                        return base;
+                    },
+                    canLink: function (player, target, card) {
+                        if (!target.isLinked() && !player.hasSkill('wutiesuolian_skill')) return false;
+                        if (player.hasSkill('jueqing') || player.hasSkill('gangzhi') || target.hasSkill('gangzhi')) return false;
+                        return true;
+                    },
+                    basic: {
+                        useful: [5, 3, 1],
+                        value: [5, 3, 1],
+                    },
+                    order(item, player) {
+                        let res = 3.2;
+                        if (player.hasSkillTag('presha', true, null, true)) res = 10;
+                        if (typeof item !== 'object' || !game.hasNature(item, 'linked') || game.countPlayer(cur => cur.isLinked()) < 2) return res;
+                        let uv = player.getUseValue(item, true);
+                        if (uv <= 0) return res;
+                        let temp = player.getUseValue('sha', true) - uv;
+                        if (temp < 0) return res + 0.15;
+                        if (temp > 0) return res - 0.15;
+                        return res;
+                    },
+                    result: {
+                        target: function (player, target, card, isLink) {
+                            let eff = -1.5, odds = 1.35, num = 1;
+                            if (isLink) {
+                                let cache = _status.event.getTempCache('sha_result', 'eff');
+                                if (typeof cache !== 'object' || cache.card !== get.translation(card)) return eff;
+                                if (cache.odds < 1.35 && cache.bool) return 1.35 * cache.eff;
+                                return cache.odds * cache.eff;
+                            }
+                            if (player.hasSkill('jiu') || player.hasSkillTag('damageBonus', true, {
+                                target: target,
+                                card: card
+                            })) {
+                                if (target.hasSkillTag('filterDamage', null, {
+                                    player: player,
+                                    card: card,
+                                    jiu: true,
+                                })) eff = -0.5;
+                                else {
+                                    num = 2;
+                                    if (get.attitude(player, target) > 0) eff = -7;
+                                    else eff = -4;
+                                }
+                            }
+                            if (!player.hasSkillTag('directHit_ai', true, {
+                                target: target,
+                                card: card,
+                            }, true)) odds -= 0.7 * target.mayHaveShan(player, 'use', target.getCards('h', i => {
+                                return i.hasGaintag('sha_notshan');
+                            }), 'odds');
+                            _status.event.putTempCache('sha_result', 'eff', {
+                                bool: target.hp > num && get.attitude(player, target) > 0,
+                                card: get.translation(card),
+                                eff: eff,
+                                odds: odds
+                            });
+                            return odds * eff;
+                        },
+                    },
+                    tag: {
+                        respond: 1,
+                        respondShan: 1,
+                        damage: function (card) {
+                            if (game.hasNature(card, 'poison')) return;
+                            return 1;
+                        },
+                        natureDamage: function (card) {
+                            if (game.hasNature(card, 'linked')) return 1;
+                        },
+                        fireDamage: function (card, nature) {
+                            if (game.hasNature(card, 'fire')) return 1;
+                        },
+                        thunderDamage: function (card, nature) {
+                            if (game.hasNature(card, 'thunder')) return 1;
+                        },
+                        poisonDamage: function (card, nature) {
+                            if (game.hasNature(card, 'poison')) return 1;
+                        },
+                    },
+                },
+                subSkill: {
+                    1: {
+                        trigger: {
+                            source: "damageBegin3",
+                        },
+                        direct: true,
+                        logTarget: "player",
+                        filter: function (event, player) {
+                            return event.getParent(2).skill == 'junshen' && event.card.name == 'sha' && event.getParent().name == 'sha';
+                        },
+                        async content(event, trigger, player) {
+                            await player.logSkill('junshen', trigger.player)
+                            if (!trigger.player.countDiscardableCards(trigger.player, 'e')) {
+                                await trigger.num++;
+                                return
+                            }
+                            const { result } = await trigger.player.chooseControl().set('choiceList', ['此【杀】伤害+1', '弃置装备区所有牌']).set('ai', function () {
+                                if (trigger.player.countDiscardableCards(trigger.player, 'e')) return 1;
+                                return 0;
+                            });
+                            if (result.index == 0) trigger.num++;
+                            else trigger.player.discard(trigger.player.getCards('e'))
+                        },
+                        sub: true,
+                    },
+                },
+            },
 			//天书乱斗虚拟偶像线下化
 			//小杀
 			vtbguisha:{
@@ -6788,6 +7022,11 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			vtbmeiniang_info:'其他角色的出牌阶段开始时，你可以令其视为使用一张无次数限制且不计入次数的【酒】。',
 			vtbyaoli:'媱丽',
 			vtbyaoli_info:'其他角色于其出牌阶段内使用【酒】后，你可以令其于本回合内使用的下一张【杀】不能被响应且可以额外指定一个目标。',
+			loong_guanyu:'龙关羽',
+			chaojue:"超绝",
+            "chaojue_info":"准备阶段，你可以弃置一张手牌，令所有其他角色本回合不能使用或打出与此牌花色相同的牌，然后这些角色依次选择一项: 1.展示并交给你一张与此牌花色相同的手牌; 2.其本回合所有非锁定技失效。",
+            junshen:"军神",
+            "junshen_info":"你可以将一张红色牌当【杀】使用或打出。当你以此法使用的【杀】对一名角色造成伤害时，你可以令其选择一项: 1.弃置其装备区里的所有牌; 2.令此伤害+1。你使用方片【杀】无距离限制、红桃【杀】可以额外指定一个目标。",
 			old_machao:'J.SP马超',
 			old_machao_prefix:'J.SP',
 			jsp_caoren:'☆SP曹仁',
@@ -6820,6 +7059,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			offline_piracyS:'官盗S系列',
 			offline_vtuber:'天书乱斗·虚拟偶像',
 			offline_piracyK:'官盗K系列',
+			offline_loong:'龙起襄樊',
 			offline_others:'线下其他系列',
 		},
 	};
