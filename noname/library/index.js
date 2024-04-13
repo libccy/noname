@@ -13119,6 +13119,12 @@ export class Library {
 			 * @returns {string}
 			 */
 			getSpan: () => `${get.prefixSpan('旧')}${get.prefixSpan('谋')}`
+		}],
+		['手杀神', {
+			/**
+			 * @returns {string}
+			 */
+			getSpan: () => `${get.prefixSpan('手杀')}${get.prefixSpan('神')}`
 		}]
 	]);
 	groupnature = {

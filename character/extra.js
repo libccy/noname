@@ -13,7 +13,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				extra_yin:['shen_liubei','shen_luxun'],
 				extra_lei:['shen_ganning','shen_zhangliao'],
 				extra_key:['key_kagari','key_shiki','db_key_hina'],
-				extra_decade:['shen_jiangwei','shen_machao','shen_zhangfei','shen_zhangjiao','shen_dengai','shen_xuzhu'],
+				extra_decade:['shen_jiangwei','shen_machao','shen_zhangfei','shen_zhangjiao','shen_dengai','shen_xuzhu','dc_shen_huatuo'],
 				extra_ol:['ol_zhangliao','shen_caopi','shen_zhenji','shen_sunquan'],
 				extra_mobilezhi:['shen_guojia','shen_xunyu'],
 				extra_mobilexin:['shen_taishici','shen_sunce'],
@@ -23,6 +23,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 		},
 		character:{
+			dc_shen_huatuo:['male','shen',3,['jingyu','lvxin','huandao'],['qun']],
 			shen_xuzhu:['male','shen',5,['zhengqing','zhuangpo'],['wei']],
 			shen_lusu:['male','shen',3,['dingzhou','tamo','zhimeng'],['wu']],
 			shen_huatuo:['male','shen',3,['wuling','youyi'],['qun']],
@@ -79,6 +80,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			shen_jiaxu:['le_shen_jiaxu','shen_jiaxu'],
 			shen_caocao:['shen_caocao','old_caocao'],
 			shen_zhangjiao:['shen_zhangjiao','junk_zhangjiao'],
+			shen_huatuo:['dc_shen_huatuo','shen_huatuo'],
 		},
 		characterFilter:{
 			shen_diaochan(mode){
@@ -95,6 +97,217 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 		},
 		/** @type { importCharacterConfig['skill'] } */
 		skill:{
+			//十周年神华佗
+			jingyu:{
+				audio:2,
+				trigger:{
+					global:['useSkill','logSkillBegin','useCard','respond'],
+				},
+				filter(event,player){
+					if(['global','equip'].includes(event.type)) return false;
+					let skill=event.sourceSkill||event.skill;
+					if(!skill||skill==='jingyu') return false;
+					let info=get.info(skill);
+					while(true){
+						if(!info||info.charlotte) return false;
+						if(info&&!info.sourceSkill) break;
+						skill=info.sourceSkill;
+						info=get.info(skill);
+					}
+					return !player.getStorage('jingyu_used').includes(skill);
+				},
+				forced:true,
+				async content(event,trigger,player){
+					if (!player.storage.jingyu_used){
+						player.when({global:'roundStart'}).assign({
+							firstDo: true,
+						}).then(() => delete player.storage.jingyu_used);
+					}
+					player.markAuto('jingyu_used', trigger.sourceSkill || trigger.skill);
+					await player.draw();
+				},
+				ai:{
+					threaten:6,
+				},
+			},
+			lvxin:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				filterCard:true,
+				filterTarget:lib.filter.notMe,
+				delay:false,
+				discard:false,
+				lose:false,
+				async content(event,trigger,player){
+					const { target, cards } = event, round = Math.min(5, game.roundNumber);
+					const name = get.translation(target);
+					await player.give(cards, target);
+					const result = await player.chooseControl(['摸牌', '弃牌']).set('choiceList', [
+						`令${name}摸${get.cnNumber(round)}张牌`,
+						`令${name}随机弃置${get.cnNumber(round)}张手牌`
+					]).set('prompt', '滤心：请选择一项').forResult();
+					let cards2 = [];
+					if (result.index === 0) {
+						cards2 = await target.draw(round).forResult();
+					}
+					else {
+						const cards = target.getCards('h', card => {
+							return lib.filter.cardDiscardable(card, target, 'lvxin');
+						});
+						if (cards.length > 0){
+							const evt = await target.discard(cards.randomGets(round)).set('discarder', target);
+							cards2 = evt.done.cards2;
+						}
+					}
+					const cardName = get.name(cards[0], player);
+					if (cards2.some(card => {
+						return get.name(card, target) === cardName;
+					})) {
+						target.addSkill('lvxin_lose');
+						target.addMark('lvxin_lose', 1, false);
+					}
+				},
+				subSkill:{
+					lose:{
+						trigger:{
+							player:['useSkill','logSkillBegin','useCard','respond'],
+						},
+						filter(event,player){
+							if(['global','equip'].includes(event.type)) return false;
+							const skill=event.sourceSkill||event.skill;
+							const info=get.info(skill);
+							return info&&!info.charlotte;
+						},
+						forced:true,
+						onremove:true,
+						charlotte:true,
+						async content(event,trigger,player){
+							player.loseHp(player.countMark('lvxin_lose'));
+							player.removeSkill('lvxin_lose');
+						},
+						intro:{
+							content:'下次发动技能时失去#点体力',
+						},
+					}
+				}
+			},
+			huandao:{
+				audio:2,
+				enable:'phaseUse',
+				usable:1,
+				limited:true,
+				filterTarget:lib.filter.notMe,
+				skillAnimation:true,
+				animationColor:'metal',
+				async content(event,trigger,player){
+					player.awakenSkill('huandao');
+					const { target } = event;
+					await target.turnOver(false);
+					await target.link(false);
+					let names = [target.name1||target.name];
+					if (target.name2) names.add(target.name2);
+					names = names.map(name => get.rawName(name));
+					if (!_status.characterlist) lib.skill.pingjian.initList();
+					_status.characterlist.randomSort();
+					let ownedSkills = target.getSkills(null, false, false), ownedSkillsName = ownedSkills.map(skill => get.translation(skill));
+					let skillToGain = null;
+					outer: for (const name of _status.characterlist){
+						const info = lib.character[name];
+						if (!names.includes(get.rawName(name))) continue;
+						const skills = info[3].slice().randomSort();
+						while (skills.length) {
+							const skill = skills.shift(), skillName = get.translation(skill);
+							if (!ownedSkillsName.includes(skillName)) {
+								skillToGain = skill; 
+								break outer;
+							}
+						}
+					}
+					if (!skillToGain) return;
+					player.popup(skillToGain);
+					player.line(target, 'green');
+					let prompt2 = '若你选择是，则你于获得此技能后须失去一个其他技能。<br><br>';
+					if(lib.skill[skillToGain].nobracket){
+						prompt2 += `<div class="skilln">${get.translation(skillToGain)}</div><div><span style="font-family: yuanli">${get.skillInfoTranslation(skillToGain)}</span></div><br><br>`;
+					}
+					else{
+						const translation=lib.translate[skillToGain+'_ab'] || get.translation(skillToGain).slice(0, 2);
+						prompt2 += `<div class="skill">【${translation}】</div><div><span style="font-family: yuanli">${get.skillInfoTranslation(skillToGain)}</span></div><br><br>`;
+					}
+					const bool = await target.chooseBool(`寰道：是否获得技能〖${get.translation(skillToGain)}〗？`, prompt2)
+						.set('choice', (() => {
+							const rank = get.skillRank(skillToGain, 'inout') + 1;
+							return ownedSkills.some(skill => {
+								const info = get.info(skill);
+								if (info) {
+									if (target.awakenedSkills.includes(skill) && (info.limited || info.juexingji || info.dutySkill)) return true;
+									if (info.ai && (info.ai.neg || info.ai.halfneg)) return true;
+								}
+								return get.skillRank(skill, 'inout') < rank;
+							});
+						})())
+						.forResultBool();
+					if (!bool) {
+						target.chat('拒绝');
+						game.log(target, '拒绝获得技能', `#g【${get.translation(skillToGain)}】`)
+						await game.asyncDelay();
+						return;
+					}
+					await target.addSkills(skillToGain);
+					ownedSkills = target.getSkills(null, false, false).filter(skill => {
+						if (skill === skillToGain) return false;
+						const info = get.info(skill);
+						if(!info || info.charlotte || !get.skillInfoTranslation(skill, player).length) return false;
+						return true;
+					});
+					if (!ownedSkills) return;
+					const control = await target.chooseControl(ownedSkills).set('choiceList', ownedSkills.map(skill => {
+						return `<div class="skill">【${get.translation(lib.translate[skill + '_ab'] || get.translation(skill).slice(0, 2))}】</div><div>${get.skillInfoTranslation(skill, target)}</div>`;
+					})).set('displayIndex', false).set('prompt', '寰道：选择失去一个技能').set('ai', () => {
+						return get.event('choice');
+					}).set('choice', (() => {
+						const uselessSkills = ownedSkills.filter(skill => {
+							const info = get.info(skill);
+							if (!info) return false;
+							if (target.awakenedSkills.includes(skill) && (info.limited || info.juexingji || info.dutySkill)) return true;
+							if (info.ai && (info.ai.neg || info.ai.halfneg)) return true;
+							return false;
+						});
+						if (uselessSkills.length) return uselessSkills.randomGet();
+						return ownedSkills.sort((a, b) => {
+							return get.skillRank(a, 'inout') - get.skillRank(b, 'inout');
+						})[0];
+					})()).forResultControl();
+					await target.removeSkills(control);
+				},
+				ai:{
+					order:5,
+					result:{
+						target(player,target){
+							if(game.roundNumber*game.countPlayer()<=1.5*game.countPlayer2()/Math.sqrt(player.getDamagedHp()+1)) return 0;
+							const ownedSkills=target.getSkills(null,false,false).filter(skill=>{
+								const info=get.info(skill);
+								if(!info||info.charlotte||!get.skillInfoTranslation(skill,player).length) return false;
+								return true;
+							});
+							const uselessSkills=ownedSkills.filter(skill=>{
+								const info=get.info(skill);
+								if(!info) return false;
+								if(target.awakenedSkills.includes(skill)&&(info.limited||info.juexingji||info.dutySkill)) return true;
+								if(info.ai&&(info.ai.neg||info.ai.halfneg)) return true;
+								return false;
+							});
+							if(uselessSkills.length) return 3;
+							let names=[target.name1||target.name];
+							if(target.name2) names.add(target.name2);
+							names=names.map(name=>get.rawName(name));
+							if(_status.characterlist.some(name=>names.includes(get.rawName(name)))) return 1;
+							return 0;
+						},
+					},
+				},
+			},
 			//神许褚
 			zhengqing:{
 				audio:2,
@@ -8539,8 +8752,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jxlianpo_info:'锁定技。①若场上最大阵营为：反贼，其他角色的手牌上限-1，所有角色使用【杀】的次数上限和攻击范围+1；主忠，其他角色不能对其以外的角色使用【桃】。其他角色死亡后，若有多个最大阵营，来源摸两张牌并回复1点体力。②一轮游戏开始时，你展示一张未加入游戏或已死亡角色的身份牌，本轮视为该身份对应阵营的角色数+1。',
 			jxzhaoluan:'兆乱',
 			jxzhaoluan_info:'限定技。一名角色死亡前，若其此次进入过濒死状态，你可以取消之，令其加3点体力上限并失去所有非锁定技，回复体力至3点，摸四张牌。然后你获得如下效果：出牌阶段，你可以令一名成为过你〖兆乱〗目标的角色减1点体力上限，然后对一名此阶段未以此法选择过的角色造成1点伤害。',
-			shen_huatuo:'神华佗',
-			shen_huatuo_prefix:'神',
+			shen_huatuo:'手杀神华佗',
+			shen_huatuo_prefix:'手杀神',
 			wuling:'五灵',
 			wuling_info:'①出牌阶段限两次。你可以选择一名没有“五禽戏”的角色，按照你选择的顺序向其传授“五禽戏”，且其获得如下效果：其获得你选择的第一种“五禽戏”的效果，并在其每个准备阶段移除当前“五禽戏”的效果并切换为下一种。②当你死亡时，你令场上的角色失去你传授的“五禽戏”。',
 			wuling_wuqinxi:'五禽戏',
@@ -8566,6 +8779,14 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zhengqing_info:'锁定技。一轮游戏开始时，你移去所有角色的“擎”标记，令上一轮于一回合内造成伤害值最多的角色各获得X枚“擎”，且你与这些角色各摸一张牌（X为这些角色该回合内造成的伤害值）。若该角色为你且本次获得的“擎”数为本局游戏最多的一次，你改为摸X张牌（至多摸五张）。',
 			zhuangpo:'壮魄',
 			zhuangpo_info:'你可以将牌名为【杀】或牌面信息中包含“【杀】”的牌当【决斗】使用，然后你获得如下效果：1.当此【决斗】指定目标后，若你有“擎”，你可以移去任意枚“擎”，令目标角色弃置等量的牌；2.当你造成渠道为此牌的伤害时，若此牌的所有目标角色中存在有“擎”的角色，此伤害+1。',
+			dc_shen_huatuo:'神华佗',
+			dc_shen_huatuo_prefix:'神',
+			jingyu:'静域',
+			jingyu_info:'锁定技。每个技能每轮限一次，当一名角色发动不为〖静域〗的技能时，你摸一张牌。',
+			lvxin:'滤心',
+			lvxin_info:'出牌阶段限一次。你可以交给一名其他角色一张手牌并选择一项：⒈令其摸X张牌；⒉令其随机弃置X张手牌（X为游戏轮数，至多为5）。然后若其以此法得到/弃置了与你交给其的牌牌名相同的牌，其于其下次发动技能时回复/失去1点体力。',
+			huandao:'寰道',
+			huandao_info:'限定技。出牌阶段，你可以选择一名其他角色。你令其复原武将牌，系统随机生成一个与其同名的武将的武将牌上的一个与其拥有的技能均不同名的技能。其可以选择获得此技能，然后选择失去一个其他技能。',
 
 			extra_feng:'神话再临·风',
 			extra_huo:'神话再临·火',
