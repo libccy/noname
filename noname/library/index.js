@@ -13125,7 +13125,11 @@ export class Library {
 			 * @returns {string}
 			 */
 			getSpan: () => `${get.prefixSpan('手杀')}${get.prefixSpan('神')}`
-		}]
+		}],
+		['龙', {
+			color: '#ff0000',
+			nature: 'firemm',
+		}],
 	]);
 	groupnature = {
 		shen: 'shen',
