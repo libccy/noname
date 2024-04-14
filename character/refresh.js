@@ -4262,7 +4262,7 @@ game.import('character', function () {
 								}
 							}
 						}
-						return ui.create.dialog('惮心',[list,'vcard']);
+						return ui.create.dialog('矫诏',[list,'vcard']);
 					},
 					filter:function(button,player){
 						var card={name:button.link[2],nature:button.link[3]};
@@ -4381,7 +4381,9 @@ game.import('character', function () {
 								suit:cards[0].suit,
 								number:cards[0].number,
 							}),get.translation(event.target)+'声明了'+get.translation(chosen));
-							player.storage.rejiaozhao_viewas=fakecard;
+							game.broadcastAll((player,fakecard)=>{
+								player.storage.rejiaozhao_viewas=fakecard;
+							},player,fakecard);
 							cards[0].addGaintag('rejiaozhao')
 							player.addTempSkill('rejiaozhao_viewas','phaseUseEnd');
 						},
