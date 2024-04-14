@@ -2817,15 +2817,30 @@ game.import('character', function () {
 							});
 							return history.length&&history[history.length-1].card.name=='sha';
 						},
-						prompt2:(event)=>'令'+get.translation(event.player)+'本回合的手牌上限+1',
+						prompt2(event,player){
+							const target = event.player;
+							const history = target.getHistory('useCard', evt => {
+								return evt.getParent('phaseUse') === event;
+							});
+							const evt = history.lastItem, cards = evt.cards.filterInD('d');
+							let str = '令' + get.translation(target) + '本回合的手牌上限+1';
+							if (cards.length) str += `，然后你获得${get.translation(cards)}`;
+							str += '。';
+							return str;
+						},
 						check:function(event,player){
 							return get.attitude(player,event.player)>0;
 						},
-						content:function(){
-							var target=trigger.player;
+						async content(event,trigger,player){
+							const target = trigger.player;
 							target.addMark('dcchongyi_keep',1,false);
 							target.addTempSkill('dcchongyi_keep');
-							game.delayx();
+							const history = target.getHistory('useCard', evt => {
+								return evt.getParent('phaseUse') === trigger;
+							});
+							const evt = history.lastItem, cards = evt.cards.filterInD('d');
+							if (cards.length) await player.gain(cards, 'gain2');
+							else await game.asyncDelayx();
 						},
 					},
 					sha:{
@@ -11577,7 +11592,7 @@ game.import('character', function () {
 			xiongrao_info:'限定技。准备阶段开始时，你可以选择所有其他角色。这些角色本回合内所有不为锁定技、限定技、觉醒技的普通技能失效。然后你将体力上限增加至7点并摸X张牌（X为你以此法增加的体力上限数）。',
 			dc_huban:'胡班',
 			dcchongyi:'崇义',
-			dcchongyi_info:'①一名角色使用【杀】时，若此牌是其于当前出牌阶段内使用的第一张牌，则你可以令其摸两张牌，且其本回合使用【杀】的次数上限+1。②一名角色的出牌阶段结束时，若其于此阶段内使用的最后一张牌为【杀】，则你可以令其本回合的手牌上限+1。',
+			dcchongyi_info:'①一名角色使用【杀】时，若此牌是其于当前出牌阶段内使用的第一张牌，则你可以令其摸两张牌，且其本回合使用【杀】的次数上限+1。②一名角色的出牌阶段结束时，若其于此阶段内使用的最后一张牌为【杀】，则你可以令其本回合的手牌上限+1，然后你获得此【杀】。',
 			wangwei:'王威',
 			dcruizhan:'锐战',
 			dcruizhan_info:'其他角色的准备阶段开始时，若其的手牌数不小于其体力值，则你可以和其拼点。若你赢或拼点牌中有【杀】，则你视为对其使用一张【杀】。然后若此【杀】造成了伤害且以上两个条件均被满足，则你获得其一张牌。',
