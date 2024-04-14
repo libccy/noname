@@ -604,7 +604,7 @@ game.import('character', function () {
 				filter(event,player){
 					return (event.name!='phase'||game.phaseNumber==0)&&game.hasPlayer(current=>{
 						return current!==player&&current.hasEnabledSlot(1);
-					});
+					})&&get.mode()=='identity';
 				},
 				async cost(event,trigger,player){
 					event.result = await player.chooseTarget(get.prompt('mbcuizhen'), '废除至多两名其他角色的武器栏', [1, 2], (card, player, target) => {
@@ -17545,7 +17545,8 @@ game.import('character', function () {
 			mb_sp_guanqiujian:'SP毌丘俭',
 			mb_sp_guanqiujian_prefix:'SP',
 			mbcuizhen:'摧阵',
-			mbcuizhen_info:'①游戏开始时，你可以废除至多两名其他角色的武器栏。②当你于出牌阶段使用伤害类牌指定其他角色为目标后，若目标角色的手牌数不小于体力值，你可以废除其武器栏。③摸牌阶段，你令额定摸牌数+X（X为所有角色被废除的武器栏数之和，至多为2）。',
+			mbcuizhen_info_identity:'①游戏开始时，你可以废除至多两名其他角色的武器栏。②当你于出牌阶段使用伤害类牌指定其他角色为目标后，若目标角色的手牌数不小于体力值，你可以废除其武器栏。③摸牌阶段，你令额定摸牌数+X（X为所有角色被废除的武器栏数之和，至多为2）。',
+			mbcuizhen_info:'①当你于出牌阶段使用伤害类牌指定其他角色为目标后，若目标角色的手牌数不小于体力值，你可以废除其武器栏。②摸牌阶段，你令额定摸牌数+X（X为所有角色被废除的武器栏数之和，至多为2）。',
 			mbkuili:'溃离',
 			mbkuili_info:'锁定技。当你受到伤害后，你弃置等同于伤害值的手牌；若来源有被废除的武器栏，你令其恢复武器栏。',
 			mb_caomao:'手杀曹髦',
