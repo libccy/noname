@@ -15,7 +15,7 @@ game.import('character', function () {
 			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
 			//dc_fuwan:['male','qun',4,['dcmoukui']],
-			guānning:['male','shu',3,['dcxiuwen','dclongsong']],
+			guānning:['male','shu',3,['dcxiuwen','longsong']],
 			sunhuan:['male','wu',4,['dcniji']],
 			sunlang:['male','shu',4,['dctingxian','dcbenshi']],
 			shiyi:['male','wu',3,['dccuichuan','dczhengxu']],
@@ -1798,6 +1798,80 @@ game.import('character', function () {
 						},
 					}
 				}
+			},
+			longsong:{
+				audio:'dclongsong',
+				trigger:{player:'phaseUseBegin'},
+				filter(event,player){
+					return game.hasPlayer(target=>{
+						if(target==player) return false;
+						return target.hasCard(card=>{
+							if(get.position(card)=='h') return true;
+							return get.color(card)=='red'&&lib.filter.canBeGained(card,player,target);
+						},'he');
+					});
+				},
+				async cost(event,trigger,player){
+					const func=function(player){
+						game.countPlayer(target=>{
+							if(target!=player){
+								const skills=lib.skill.dclongsong.getSkills(target);
+								if(skills.length){
+									target.prompt(skills.map(i=>get.translation(i)).join('<br>'));
+								}
+							}
+						});
+					};
+					if(event.player==game.me) func(player);
+					else if(event.isOnline()) player.send(func,player);
+					event.result=await player.chooseTarget(get.prompt2('longsong'),(card,player,target)=>{
+						if(target==player) return false;
+						return target.hasCard(card=>{
+							if(get.position(card)=='h') return true;
+							return get.color(card)=='red'&&lib.filter.canBeGained(card,player,target);
+						},'he');
+					}).set('ai',target=>{
+						const player=get.event('player'),att=get.attitude(player,target);
+						if(att>0&&!target.getGainableCards(player,'he').some(card=>get.color(card)=='red')) return 0;
+						return lib.skill.dclongsong.getSkills(target).length+(att>0?0:Math.max(0,get.effect(target,{name:'shunshou_copy2'},player,player)));
+					}).forResult();
+				},
+				async content(event,trigger,player){
+					const target=event.targets[0],cards=target.getGainableCards(player,'he').filter(card=>get.color(card)=='red');
+					if(cards.length){
+						let dialog=['龙诵：获得'+get.translation(target)+'的一张红色牌'];
+						let cards1=cards.filter(i=>get.position(i)=='h'),cards2=cards.filter(i=>get.position(i)=='e');
+						if(cards1.length){
+							dialog.push('<div class="text center">手牌区</div>');
+							if(player.hasSkillTag('viewHandcard',null,target,true)) dialog.push(cards1);
+							else dialog.push([cards1.randomSort(),'blank']);
+						}
+						if(cards2.length){
+							dialog.push('<div class="text center">装备区</div>');
+							dialog.push(cards2);
+						}
+						const {result:{bool,links}}=await player.chooseButton(dialog,true).set('ai',button=>{
+							const player=get.event('player'),target=get.event().getParent().targets[0];
+							return get.value(card,player)*get.value(card,target)*(1+Math.random());
+						});
+						if(bool){
+							await player.gain(links,target,'giveAuto','bySelf');
+							const skills=lib.skill.dclongsong.getSkills(target);
+							if(skills.length){
+								if(!event.isMine()&&!event.isOnline()) await game.asyncDelayx();
+								for(const skill of skills){
+									player.popup(skill,'thunder');
+									await player.addTempSkills(skill,['phaseUseAfter','phaseAfter']);
+								}
+							}
+						}
+					}
+					else{
+						player.popup('杯具');
+						player.chat('无牌可得？！');
+						game.log('但是',target,'没有红色牌可被'+get.translation(player)+'获得！');
+					}
+				},
 			},
 			//伏完
 			dcmoukui:{
@@ -11644,6 +11718,8 @@ game.import('character', function () {
 			oldlongsong_info:'出牌阶段开始时，你可以将一张手牌交给一名其他角色。然后其须选择其所有的发动时机为出牌阶段内的空闲时间点且你至多能于此阶段发动一次的技能，其于此阶段这些技能失效，你获得这些技能。',
 			dclongsong:'龙诵',
 			dclongsong_info:'出牌阶段开始时，你可以将一张红色牌交给一名其他角色。然后其须选择其所有的发动时机包含“出牌阶段”的技能，其于此阶段这些技能失效，你获得这些技能且至多可以发动一次。',
+			longsong:'龙诵',
+			longsong_info:'出牌阶段开始时，你可以获得一名其他角色的一张红色牌，然后你本阶段视为拥有其所有的发动时机包含“出牌阶段”的技能。',
 			dc_mengda:'孟达',
 			dclibang:'利傍',
 			dclibang_info:'出牌阶段限一次。你可以弃置一张牌，正面向上获得两名其他角色的各一张牌。然后你判定，若结果与这两张牌的颜色均不同，你交给其中一名角色两张牌或失去1点体力，否则你获得判定牌并视为对其中一名角色使用一张【杀】。',
