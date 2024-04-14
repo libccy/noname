@@ -509,6 +509,7 @@ game.import('character', function () {
 					}).sortBySeat()];
 				},
 				filter(event,player,triggername,targets){
+					if(player.getStorage('dcjijie_used').includes(event.name=='recover'?'recover':'draw')) return false;
 					if(event.name==='recover') return targets[0]!==player&&_status.currentPhase!==targets[0]&&player.isDamaged();
 					return targets.some(current=>{
 						return current!==player&&_status.currentPhase!==current&&event.getg(current).length>0;
@@ -520,7 +521,9 @@ game.import('character', function () {
 					return targets;
 				},
 				async content(event,trigger,player){
+					player.addTempSkill('dcjijie_used');
 					if (trigger.name === 'recover') {
+						player.markAuto('dcjijie_used',['recover']);
 						await player.recover(trigger.num);
 					}
 					else{
@@ -528,8 +531,15 @@ game.import('character', function () {
 							if(current === player || _status.currentPhase === current) return 0;
 							return trigger.getg(current).length;
 						});
+						player.markAuto('dcjijie_used',['draw']);
 						await player.draw(count);
 					}
+				},
+				subSkill:{
+					used:{
+						charlotte:true,
+						onremove:true,
+					},
 				},
 			},
 			dchuiji:{
@@ -15774,7 +15784,7 @@ game.import('character', function () {
 			sp_zhenji:'SP甄宓',
 			sp_zhenji_prefix:'SP',
 			dcjijie:'己诫',
-			dcjijie_info:'锁定技。每回合限一次，当其他角色于其回合外得到牌后/回复体力后，你摸等量的牌/回复等量的体力。',
+			dcjijie_info:'锁定技。每回合每项各限一次，其他角色于其回合外得到牌后/回复体力后，你摸等量的牌/回复等量的体力。',
 			dchuiji:'惠济',
 			dchuiji_info:'出牌阶段限一次。你可以令一名角色摸两张牌或从牌堆中随机使用一张不为赠物的装备牌，然后若其手牌数不小于存活角色数，其视为使用一张【五谷丰登】。系统不于此牌使用准备工作结束时执行亮出牌堆顶的牌的动作，改为你令其将所有手牌置于处理区，然后令所有目标角色依次获得其中一张牌。当这些牌因执行【五谷丰登】的执行动作而置于弃牌堆后，你令其获得这些牌。',
 

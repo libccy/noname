@@ -1388,13 +1388,15 @@ game.import('character', function () {
 									}
 								}
 							}
+							let result;
 							const transList=list.map(i=>get.translation(i));
-							const {result:{bool,links}}=await player.chooseButton([
+							if(transList.length<=num) result={bool:true,links:transList};
+							else result=await player.chooseButton([
 								'劫囚：请选择你要恢复的装备栏',
 								[transList,'tdnodes'],
 							],Math.min(transList.length,num),true).set('map',map)
-							.set('ai',button=>['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2);
-							if(bool) await player.enableEquip(links.slice().map(i=>map[i]));
+							.set('ai',button=>['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2).forResult();
+							if(result.bool) await player.enableEquip(result.links.slice().map(i=>map[i]));
 						},
 						group:['twjieqiu_end'],
 					},
@@ -1442,13 +1444,15 @@ game.import('character', function () {
 							list.push('equip'+i);
 						}
 					}
+					let result;
 					const transList=list.map(i=>get.translation(i));
-					const {result:{bool,links}}=await player.chooseButton([
+					if(transList.length==1) result={bool:true,links:transList};
+					else result=await player.chooseButton([
 						'恩仇：请选择'+get.translation(target)+'要恢复的装备栏',
 						[transList,'tdnodes'],
 					],true).set('map',map)
-					.set('ai',button=>1/(['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2));
-					if(bool) await target.enableEquip(links.slice().map(i=>map[i]));
+					.set('ai',button=>1/(['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2)).forResult();
+					if(result.bool) await target.enableEquip(result.links.slice().map(i=>map[i]));
 				},
 				ai:{
 					order:9,
