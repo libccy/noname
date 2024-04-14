@@ -558,6 +558,7 @@ game.import('character', function () {
 							if(get.type(card)=='equip'&&player==target&&player==_status.currentPhase&&get.subtype(card)=='equip1') return [1,3];
 						},
 					},
+					combo:'xinfu_fangtong'
 				},
 				audio:2,
 				trigger:{
@@ -714,6 +715,9 @@ game.import('character', function () {
 					player.line(target,'thunder');
 					target.damage(3,'thunder');
 				},
+				ai:{
+					combo:'xinfu_jijun'
+				}
 			},
 			xinfu_weilu:{
 				audio:2,

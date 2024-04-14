@@ -15910,6 +15910,9 @@ game.import('character', function () {
 				},
 				derivation:['oltianxiang','liuli'],
 				locked:true,
+				ai:{
+					combo:'new_xingwu'
+				}
 			},
 			//新孙鲁育
 			"new_meibu":{
@@ -19523,6 +19526,9 @@ game.import('character', function () {
 					else{
 						player.getStat().skill.gushe--;
 					}
+				},
+				ai:{
+					combo:'gushe'
 				}
 			},
 			juesi:{
@@ -20441,6 +20447,9 @@ game.import('character', function () {
 			},
 			luoyan:{
 				group:['luoyan_tianxiang','luoyan_liuli'],
+				ai:{
+					combo:'xingwu'
+				}
 			},
 			xingwu:{
 				audio:2,
@@ -20595,7 +20604,8 @@ game.import('character', function () {
 					threaten:function(player,target){
 						if(target.getExpansions('yinbing').length) return 2;
 						return 1;
-					}
+					},
+					combo:'juedi'
 				},
 				subSkill:{
 					discard:{
@@ -20669,6 +20679,9 @@ game.import('character', function () {
 							target.draw(cards.length);
 						}
 					}
+				},
+				ai:{
+					combo:'yinbing'
 				}
 			},
 			meibu:{
@@ -20889,6 +20902,9 @@ game.import('character', function () {
 					player.awakenSkill('zhiri');
 					player.loseMaxHp();
 					player.storage.zhiri=true;
+				},
+				ai:{
+					combo:'fentian'
 				}
 			},
 			xintan:{
@@ -20914,7 +20930,8 @@ game.import('character', function () {
 					order:8,
 					result:{
 						target:-1
-					}
+					},
+					combo:'fentian'
 				}
 			},
 			danji:{
@@ -22826,6 +22843,9 @@ game.import('character', function () {
 					}
 					else trigger.player.markSkill('rezhoufu2');
 				},
+				ai:{
+					combo:'rezhoufu'
+				}
 			},
 			zhoufu:{
 				audio:2,
@@ -26215,7 +26235,10 @@ game.import('character', function () {
 						if(!player.hasMark('xinfu_falu_'+suit)) player.addMark('xinfu_falu_'+suit);
 					}
 				},
-				ai:{threaten:1.4},
+				ai:{
+					threaten:1.4,
+					combo:'xinfu_dianhua'
+				},
 			},
 			"xinfu_dianhua":{
 				trigger:{
@@ -26329,6 +26352,9 @@ game.import('character', function () {
 						player.gain(event.togain,'gain2');
 					}
 				},
+				ai:{
+					combo:'xinfu_dianhua'
+				}
 			},
 			"zhenyi_spade":{
 				trigger:{

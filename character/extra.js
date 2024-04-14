@@ -219,7 +219,7 @@ game.import('character', function () {
 						while (skills.length) {
 							const skill = skills.shift(), skillName = get.translation(skill);
 							if (!ownedSkillsName.includes(skillName)) {
-								skillToGain = skill; 
+								skillToGain = skill;
 								break outer;
 							}
 						}
@@ -5795,6 +5795,7 @@ game.import('character', function () {
 							return 0;
 						},
 					},
+					combo:'baonu'
 				},
 				global:'ol_wuqian_ai',
 				subSkill:{
@@ -5851,7 +5852,8 @@ game.import('character', function () {
 								return [0,-2];
 							}
 						}
-					}
+					},
+					neg:true
 				}
 			},
 			qinyin:{
@@ -6023,7 +6025,8 @@ game.import('character', function () {
 								}
 							});
 						}
-					}
+					},
+					combo:'baonu'
 				}
 			},
 			wuqian:{
@@ -6053,7 +6056,8 @@ game.import('character', function () {
 							}
 							return 0;
 						}
-					}
+					},
+					combo:'baonu'
 				}
 			},
 			renjie:{
@@ -6137,6 +6141,9 @@ game.import('character', function () {
 					player.addSkills('jilue');
 				},
 				derivation:['jilue','reguicai','fangzhu','rejizhi','rezhiheng','rewansha'],
+				ai:{
+					combo:'renjie'
+				}
 			},
 			jilue:{
 				unique:true,
@@ -7595,6 +7602,9 @@ game.import('character', function () {
 				content(){
 					player.addMark('nzry_junlve',trigger.num);
 				},
+				ai:{
+					combo:'nzry_cuike'
+				}
 			},
 			"nzry_cuike":{
 				audio:2,
@@ -7693,6 +7703,7 @@ game.import('character', function () {
 				ai:{
 					order:1,
 					fireAttack:true,
+					combo:'nzry_junlve',
 					result:{
 						target(player,target){
 							if(target.hasSkillTag('nofire')) return 0;

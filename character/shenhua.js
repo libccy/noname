@@ -732,6 +732,7 @@ game.import('character', function () {
 							return 0;
 						},
 					},
+					combo:'qingce'
 				},
 			},
 			//阴雷
@@ -3760,7 +3761,8 @@ game.import('character', function () {
 						player:function(player){
 							return player.getExpansions('tuntian').length-1;
 						}
-					}
+					},
+					combo:'tuntian'
 				}
 			},
 			jiang:{
