@@ -1,20 +1,16 @@
-import { Get as get } from '../get/index.js';
-import { Game as game } from '../game/index.js';
-import { status as _status } from '../status/index.js';
-import { UI as ui } from '../ui/index.js';
-import { Library as lib } from '../library/index.js';
-import { GNC as gnc } from '../gnc/index.js';
-import { Uninstantable } from "../util/index.js";
+import { get } from '../get/index.js';
+import { game } from '../game/index.js';
+import { _status } from '../status/index.js';
+import { ui } from '../ui/index.js';
 import { CacheContext } from '../library/cache/cacheContext.js';
-
-export class Basic extends Uninstantable {
+export class Basic {
 	/**
 	 * @param { (
 	 * 	button: Button, 
 	 * 	buttons?: Button[]
 	 * ) => number } check
 	 */
-	static chooseButton(check) {
+	chooseButton(check) {
 		const event = _status.event;
 		let i, j, range, buttons, buttons2;
 		let ok = false, forced = event.forced;
@@ -81,7 +77,7 @@ export class Basic extends Uninstantable {
 	 * ) => number } check
 	 * @returns { boolean | undefined }
 	 */
-	static chooseCard(check) {
+	chooseCard(check) {
 		const event = _status.event;
 		if (event.filterCard == undefined) return (check() > 0);
 		let i, j, range, cards, cards2, skills, effect;
@@ -144,7 +140,7 @@ export class Basic extends Uninstantable {
 				var info = get.info(event.skill);
 				if (info.filterCard) {
 					check = info.check || get.unuseful2;
-					return (Basic.chooseCard(check));
+					return (this.chooseCard(check));
 				}
 				else {
 					return true;
@@ -169,7 +165,7 @@ export class Basic extends Uninstantable {
 	 * targets?: Player[]
 	 * ) => number } check 
 	 */
-	static chooseTarget(check) {
+	chooseTarget(check) {
 		const event = _status.event;
 		if (event.filterTarget == undefined) return (check() > 0);
 		let i, j, range, targets, targets2, effect;

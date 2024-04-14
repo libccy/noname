@@ -1851,8 +1851,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 			binglin_neihong_info:'锁定技，当你杀死队友后，你所在的阵营视为游戏失败。',
 			baiyidujiang:'白衣渡江',
 			baiyidujiang_info:'出牌阶段，对地主使用。你选择一项：①令其将手牌数摸至全场最多。②令其将手牌数弃置至全场最少。',
-			shuiyanqijuny:'水淹七军',
-			shuiyanqijuny_info:'出牌阶段，对至多两名角色使用。目标角色受到1点雷属性伤害，然后若其：是此牌的使用者选择的第一个目标，其弃置一张牌；不是第一个目标，其摸一张牌。',
 			luojingxiashi:'落井下石',
 			luojingxiashi_info:'出牌阶段，对所有其他的已受伤角色使用。目标角色受到1点伤害。',
 			binglinchengxia:'兵临城下',
@@ -2783,41 +2781,6 @@ game.import('mode',function(lib,game,ui,get,ai,_status){
 								if(get.attitude(player,target)>0) return (num2-num)/1.2;
 							}
 							return 0;
-						}
-					}
-				}
-			},
-			shuiyanqijuny:{
-				fullskin:true,
-				cardimage:'shuiyanqijunx',
-				enable:true,
-				filterTarget:true,
-				type:'trick',
-				selectTarget:[1,2],
-				targetprompt:['受伤弃牌','受伤摸牌'],
-				contentBefore:function(){
-					var evt=event.getParent(),target=evt.stocktargets[0];
-					evt.shuiyanqijun_target=target;
-				},
-				content:function(){
-					target.damage('thunder');
-					if(target!=event.getParent().shuiyanqijun_target) target.draw();
-					else target.chooseToDiscard('he',true);
-				},
-				ai:{
-					order:6,
-					value:4,
-					useful:2,
-					tag:{
-						damage:1,
-						thunderDamage:1,
-						natureDamage:1,
-						loseCard:1,
-					},
-					result:{
-						target:function(player,target){
-							if(!ui.selected.targets.length) return -1.5;
-							return -0.5
 						}
 					}
 				}

@@ -1,11 +1,12 @@
-import { AI as ai } from '../../ai/index.js';
-import { Get as get } from '../../get/index.js';
-import { Game as game } from '../../game/index.js';
-import { Library as lib } from "../index.js";
-import { status as _status } from '../../status/index.js';
-import { UI as ui } from '../../ui/index.js';
-
+import { get } from '../../get/index.js';
+import { lib } from "../index.js";
+import { _status } from '../../status/index.js';
+import { ui } from '../../ui/index.js';
 export class Button extends HTMLDivElement {
+	/**
+	 * @type { string | undefined }
+	 */
+	buttonid;
 	/**
 	 * @param {{}} item
 	 * @param {keyof typeof ui.create.buttonPresets | ((item: {}, type: Function, position?: HTMLDivElement | DocumentFragment, noClick?: true, button?: Button) => Button)} type
@@ -37,7 +38,7 @@ export class Button extends HTMLDivElement {
 		} else {
 			console.error([item, type, position, noClick, button]);
 			throw 'button不合法';
-		}
+		};
 	}
 	exclude() {
 		if (_status.event.excludeButton == undefined) {

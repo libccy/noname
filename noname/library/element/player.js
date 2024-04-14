@@ -1,9 +1,9 @@
-import { AI as ai } from '../../ai/index.js';
-import { Get as get } from '../../get/index.js';
-import { Game as game } from '../../game/index.js';
-import { Library as lib } from "../index.js";
-import { status as _status } from '../../status/index.js';
-import { UI as ui } from '../../ui/index.js';
+import { ai } from '../../ai/index.js';
+import { get } from '../../get/index.js';
+import { game } from '../../game/index.js';
+import { lib } from "../index.js";
+import { _status } from '../../status/index.js';
+import { ui } from '../../ui/index.js';
 import { CacheContext } from '../cache/cacheContext.js';
 import { ChildNodesWatcher } from '../cache/childNodesWatcher.js';
 
@@ -1970,8 +1970,8 @@ export class Player extends HTMLDivElement {
 				m += info.globalTo;
 				n += info.globalTo;
 			}
-			if (info.attaclTo) {
-				m += info.attaclTo;
+			if (info.attackTo) {
+				m += info.attackTo;
 			}
 		}
 		return m <= range;
@@ -5249,7 +5249,6 @@ export class Player extends HTMLDivElement {
 	}
 	drawTo(num, args) {
 		var num2 = num - this.countCards('h');
-		if (!num2) return;
 		var next = this.draw(num2);
 		if (Array.isArray(args)) {
 			for (var i = 0; i < args.length; i++) {
@@ -5940,9 +5939,25 @@ export class Player extends HTMLDivElement {
 		next.setContent('recover');
 		return next;
 	}
+	recoverTo() {
+		const newArguments = [];
+		let num = 1;
+		for (let i = 0; i < arguments.length; i++) {
+			if (typeof arguments[i] === 'number') {
+				num = arguments[i] - this.getHp(true);
+				newArguments.push(num);
+			} else {
+				newArguments.push(arguments[i]);
+			} 
+		} 
+		return this.recover(...newArguments);  
+	}
 	doubleDraw() {
-		if (get.is.changban()) return;
 		var next = game.createEvent('doubleDraw');
+		if (get.is.changban()) {
+			_status.event.next.remove(next);
+			next.resolve();
+		}		
 		next.player = this;
 		next.setContent('doubleDraw');
 		return next;
@@ -6421,18 +6436,24 @@ export class Player extends HTMLDivElement {
 		return next;
 	}
 	turnOver(bool) {
-		if (typeof bool == 'boolean') {
-			if (bool) {
-				if (this.isTurnedOver()) return;
-			}
-			else {
-				if (!this.isTurnedOver()) return;
-			}
-		}
 		var next = game.createEvent('turnOver');
 		next.player = this;
 		next.includeOut = true;
 		next.setContent('turnOver');
+		if (typeof bool == 'boolean') {
+			if (bool) {
+				if (this.isTurnedOver()){
+					_status.event.next.remove(next);
+					next.resolve();
+				}
+			}
+			else {
+				if (!this.isTurnedOver()){
+					_status.event.next.remove(next);
+					next.resolve();
+				}
+			}
+		}
 		return next;
 	}
 	out(skill) {
@@ -6483,17 +6504,23 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	link(bool) {
-		if (typeof bool == 'boolean') {
-			if (bool) {
-				if (this.isLinked()) return;
-			}
-			else {
-				if (!this.isLinked()) return;
-			}
-		}
 		var next = game.createEvent('link');
 		next.player = this;
 		next.setContent('link');
+		if (typeof bool == 'boolean') {
+			if (bool) {
+				if (this.isLinked()){
+					_status.event.next.remove(next);
+					next.resolve();
+				}
+			}
+			else {
+				if (!this.isLinked()){
+					_status.event.next.remove(next);
+					next.resolve();
+				}
+			}
+		}
 		return next;
 	}
 	skip(name) {
@@ -7377,11 +7404,14 @@ export class Player extends HTMLDivElement {
 		return next;
 	}
 	exitSubPlayer(remove) {
-		if (!this.hasSkill('subplayer')) return;
 		var next = game.createEvent('exitSubPlayer');
 		next.player = this;
 		next.remove = remove;
 		next.setContent('exitSubPlayer');
+		if (!this.hasSkill('subplayer')) {
+			_status.event.next.remove(next);
+			next.resolve();
+		}
 		return next;
 	}
 	getSubPlayers(tag) {
@@ -8098,6 +8128,44 @@ export class Player extends HTMLDivElement {
 				}
 			}
 		}
+	}
+	/**
+	 * 快速获取一名角色当前轮次/前X轮次的历史
+	 *
+	 * 第一个参数填写获取的动作
+	 *
+	 * 第二个参数填写获取历史的筛选条件
+	 *
+	 * 第三个参数填写数字（不填默认为0），获取上X轮的历史（X为0则为本轮历史），第四个参数若为true，则获取从上X轮开始至现在
+	 *
+	 * 第四个参数若为true，则获取从上X轮开始至现在所有符合条件的历史
+	 *
+	 * 第五个参数填写event，获取此event之前所有符合条件的历史
+	 *
+	 * @param { string | function | number | boolean | object } map
+	 */
+	getRoundHistory(key, filter, num, keep, last) {
+		if (!num) num = 0;
+		const player = this;
+		let evts = [], history = player.actionHistory;
+		for (let i = history.length - 1; i >= 0; i--) {
+			if (keep === true || num == 0) {
+				let currentHistory = history[i];
+				if (key) currentHistory = currentHistory[key];
+				if (filter) currentHistory = currentHistory.filter(filter);
+				evts.addArray(currentHistory.reverse());
+			}
+			if (history[i].isRound) {
+				if (num > 0) num--;
+				else break;
+			}
+		}
+		evts.reverse();
+		if (last && evts.includes(last)) {
+			const lastIndex = evts.indexOf(last);
+			return evts.filter(evt => evts.indexOf(evt) <= lastIndex);
+		}
+		return evts;
 	}
 	getHistory(key, filter, last) {
 		if (!key) return this.actionHistory[this.actionHistory.length - 1];

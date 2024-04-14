@@ -1,5 +1,5 @@
-import { game } from '../noname.js';
-game.import('character',function(lib,game,ui,get,ai,_status){
+import { lib, game, ui, get, ai, _status } from '../noname.js';
+game.import('character', function () {
 	return {
 		name:'tw',
 		connect:true,
@@ -369,7 +369,10 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					backup:{
 						viewAs:{name:'juedou'},
 						position:'he',
-						filterCard:true,
+						filterCard(card,player){
+							const cardx=get.autoViewAs({name:'juedou'},[card]);
+							return lib.filter.targetEnabledx(cardx,player,get.event('sourcex'));
+						},
 						check(card){
 							if(get.name(card)=='sha') return 5-get.value(card);
 							return 8-get.value(card);
@@ -693,31 +696,46 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twxiayong:{
 				audio:2,
 				audioname:['tw_yanliang'],
-				trigger:{global:'damageBegin1'},
-				filter(event,player){
-					if(event.getParent().type!='card'||event.card.name!='juedou'||!event.player.isIn()) return false;
-					const evt=game.getGlobalHistory('useCard',evt=>evt.card==event.card)[0];
-					if(evt&&evt.targets&&(event.player!=player||player.countCards('h'))){
-						if(evt.player==player){
-							return evt.targets.includes(event.player)&&event.player!=player;
-						}
-						return evt.targets.includes(player)&&evt.player!=player;
-					}
-					return false;
+				locked:true,
+				group:'twxiayong_effect',
+				subSkill:{
+					effect:{
+						trigger:{global:'damageBegin1'},
+						filter(event,player){
+							if(event.getParent().type!='card'||event.card.name!='juedou'||!event.player.isIn()) return false;
+							const evt=game.getGlobalHistory('useCard',evt=>evt.card==event.card)[0];
+							if(evt&&evt.targets&&(event.player!=player||player.countCards('h'))){
+								if(evt.player==player){
+									return evt.targets.includes(event.player)&&event.player!=player;
+								}
+								return evt.targets.includes(player)&&evt.player!=player;
+							}
+							return false;
+						},
+						forced:true,
+						popup:false,
+						async content(event,trigger,player){
+							await player.logSkill('twxiayong'+(trigger.player===player?'1':'2'),trigger.player);
+							if(trigger.player===player){
+								const cards=player.getCards('h',card=>{
+									return lib.filter.cardDiscardable(card,player,'twxiayong');
+								});
+								if(cards.length>0) player.discard(cards.randomGet());
+							}
+							else{
+								trigger.increase('num');
+							}
+						},
+					},
 				},
-				forced:true,
-				logTarget:'player',
-				async content(event,trigger,player){
-					if(trigger.player===player){
-						const cards=player.getCards('h',card=>{
-							return lib.filter.cardDiscardable(card,player,'twxiayong');
-						});
-						if(cards.length>0) player.discard(cards.randomGet());
-					}
-					else{
-						trigger.increase('num');
-					}
-				},
+			},
+			twxiayong1:{
+				audio:true,
+				audioname:['tw_yanliang'],
+				sourceSkill:'twxiayong',
+			},
+			twxiayong2:{
+				inherit:'twxiayong1',
 			},
 			//袁谭
 			twqiaosi:{
@@ -1370,13 +1388,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 									}
 								}
 							}
+							let result;
 							const transList=list.map(i=>get.translation(i));
-							const {result:{bool,links}}=await player.chooseButton([
+							if(transList.length<=num) result={bool:true,links:transList};
+							else result=await player.chooseButton([
 								'劫囚：请选择你要恢复的装备栏',
 								[transList,'tdnodes'],
 							],Math.min(transList.length,num),true).set('map',map)
-							.set('ai',button=>['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2);
-							if(bool) await player.enableEquip(links.slice().map(i=>map[i]));
+							.set('ai',button=>['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2).forResult();
+							if(result.bool) await player.enableEquip(result.links.slice().map(i=>map[i]));
 						},
 						group:['twjieqiu_end'],
 					},
@@ -1424,13 +1444,15 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							list.push('equip'+i);
 						}
 					}
+					let result;
 					const transList=list.map(i=>get.translation(i));
-					const {result:{bool,links}}=await player.chooseButton([
+					if(transList.length==1) result={bool:true,links:transList};
+					else result=await player.chooseButton([
 						'恩仇：请选择'+get.translation(target)+'要恢复的装备栏',
 						[transList,'tdnodes'],
 					],true).set('map',map)
-					.set('ai',button=>1/(['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2));
-					if(bool) await target.enableEquip(links.slice().map(i=>map[i]));
+					.set('ai',button=>1/(['equip5','equip4','equip1','equip3','equip2'].indexOf(get.event('map')[button.link])+2)).forResult();
+					if(result.bool) await target.enableEquip(result.links.slice().map(i=>map[i]));
 				},
 				ai:{
 					order:9,
@@ -16723,6 +16745,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			twjuexing:'绝行',
 			twjuexing_info:'出牌阶段限一次。你可以视为对一名其他角色使用一张【决斗】。此牌对一名角色生效时，你与其将所有手牌扣置于武将牌上，然后各摸等同于当前体力值的牌。此牌结算结束后，你与所有目标角色弃置本次以此法摸的牌，然后获得扣置于武将牌上的牌。历战：当你因〖绝行〗摸牌时，摸牌数+1。',
 			twxiayong:'狭勇',
+			twxiayong1:'狭勇',
+			twxiayong2:'狭勇',
 			twxiayong_info:'锁定技。当你使用的【决斗】或目标角色包括你的【决斗】造成伤害时，若受伤角色为你，则你随机弃置一张手牌；否则你令此伤害+1。',
 			twqiaosi:'峭嗣',
 			twqiaosi_info:'结束阶段，你可以获得由其他角色区域直接置入或经由处理区置入弃牌堆的所有牌，然后若你以此法获得的牌数小于你的体力值，则你失去1点体力。',

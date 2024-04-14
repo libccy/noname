@@ -1,17 +1,17 @@
-import { Library } from "../index.js";
-import { Game } from "../../game/index.js";
-import { Get } from "../../get/index.js";
-import { status as _status } from "../../status/index.js";
+import { lib } from "../index.js";
+import { game } from "../../game/index.js";
+import { get } from "../../get/index.js";
+import { _status } from "../../status/index.js";
 import { hex_md5 } from "../crypt/md5.js";
 /**
  * 缓存上下文，用于在各种方法中暂时缓存值，以第一次获取的缓存值为准。
  */
-export class CacheContext{
+export class CacheContext {
     
     constructor(){
-        this.lib = this._createCacheProxy(Library);
-        this.game = this._createCacheProxy(Game);
-        this.get = this._createCacheProxy(Get);
+        this.lib = this._createCacheProxy(lib);
+        this.game = this._createCacheProxy(game);
+        this.get = this._createCacheProxy(get);
         this.sourceMap = new Map();
         this.storageMap = new Map();
     }

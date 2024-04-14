@@ -1,5 +1,5 @@
-import { game } from '../noname.js';
-game.import('character',function(lib,game,ui,get,ai,_status){
+import { lib, game, ui, get, ai, _status } from '../noname.js';
+game.import('character', function () {
 	return {
 		name:'refresh',
 		characterSort:{
@@ -5593,6 +5593,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					player.loseMaxHp();
 					player.addSkills('xinpaiyi');
 				},
+				ai:{
+					combo:'xinquanji'
+				}
 			},
 			xinpaiyi:{
 				audio:2,
@@ -9325,6 +9328,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			rejiushi:{
 				audio:2,
+				audioname:['mb_caomao'],
 				group:['rejiushi1','rejiushi2','rejiushi3','rejiushi_gain'],
 				subfrequent:['gain'],
 				subSkill:{
@@ -9351,6 +9355,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					return false;
 				},
 				audio:'rejiushi',
+				audioname:['mb_caomao'],
 				enable:'chooseToUse',
 				filter:function(event,player){
 					if(player.classList.contains('turnedover')) return false;
@@ -13572,42 +13577,43 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				}
 			},
 			rejianxiong_old:{
-				audio:2,
+				audio:'rejianxiong',
+				audioname2:{
+					gz_caocao:'jianxiong',
+				},
 				trigger:{player:'damageEnd'},
-				direct:true,
-				content:function(){
-					"step 0"
-					if(get.itemtype(trigger.cards)=='cards'&&get.position(trigger.cards[0],true)=='o'){
-						player.chooseControl('rejianxiong_mopai','rejianxiong_napai','cancel2').set('prompt',get.prompt('rejianxiong')).ai=function(){
-							var trigger=_status.event.getTrigger();
-							if(trigger.cards.length==1&&trigger.cards[0].name=='sha') return 0;
-							return 1;
-						};
+				async cost(event,trigger,player){
+					let list=['摸牌'];
+					if(get.itemtype(trigger.cards)=='cards'&&trigger.cards.filterInD().length){
+						list.push('拿牌');
 					}
-					else{
-						player.chooseControl('rejianxiong_mopai','cancel2').set('prompt',get.prompt('rejianxiong'));
-					}
-					"step 1"
-					if(result.control=='rejianxiong_napai'){
-						player.logSkill('rejianxiong');
-						player.gain(trigger.cards);
-						player.$gain2(trigger.cards);
-					}
-					else if(result.control=='rejianxiong_mopai'){
-						player.logSkill('rejianxiong');
-						player.draw();
-					}
+					list.push('cancel2');
+					const {result:{control}}=await player.chooseControl(list).set('prompt',get.prompt2('rejianxiong_old')).set('ai',()=>{
+						const player=get.event('player'),trigger=get.event().getTrigger();
+						const cards=trigger.cards.filterInD();
+						if(get.event().controls.includes('拿牌')){
+							if(cards.reduce((sum,card)=>{
+								return sum+(card.name=='du'?-1:1);
+							},0)>1||player.getUseValue(cards[0])>6) return '拿牌';
+						}
+						return '摸牌';
+					});
+					event.result={bool:(control!='cancel2'),cost_data:control};
+				},
+				async content(event,trigger,player){
+					if(event.cost_data=='摸牌') await player.draw();
+					else await player.gain(trigger.cards.filterInD(),'gain2');
 				},
 				ai:{
 					maixie:true,
 					maixie_hp:true,
 					effect:{
-						target:function(card,player,target){
+						target(card,player,target){
 							if(player.hasSkillTag('jueqing',false,target)) return [1,-1];
 							if(get.tag(card,'damage')&&player!=target) return [1,0.6];
-						}
-					}
-				}
+						},
+					},
+				},
 			},
 			reyiji:{
 				audio:2,
@@ -15581,6 +15587,8 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			re_lidian_prefix:'界',
 			re_xushu:'界徐庶',
 			re_xushu_prefix:'界',
+			rejianxiong_old:'奸雄',
+			rejianxiong_old_info:'当你受到伤害后，你可以摸一张牌或获得对你造成伤害的牌。',
 
 			refresh_standard:'界限突破·标',
 			refresh_feng:'界限突破·风',

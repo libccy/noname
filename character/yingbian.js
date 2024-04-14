@@ -1,5 +1,5 @@
-import { game } from '../noname.js';
-game.import('character',function(lib,game,ui,get,ai,_status){
+import { lib, game, ui, get, ai, _status } from '../noname.js';
+game.import('character', function () {
 	return {
 		name:'yingbian',
 		connect:true,
@@ -2328,40 +2328,37 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			},
 			xianzhu:{
 				trigger:{player:'phaseUseBegin'},
-				direct:true,
 				locked:true,
 				filter:function(event,player){
 					return player.getExpansions('qiaoyan').length>0;
 				},
-				content:function(){
-					'step 0'
-					event.cards=player.getExpansions('qiaoyan');
-					player.chooseTarget(true,'请选择【献珠】的目标','将'+get.translation(event.cards)+'交给一名角色。若该角色不为你自己，则你令其视为对其攻击范围内的另一名角色使用【杀】').set('ai',function(target){
+				async cost(event, trigger, player){
+					event.cards = player.getExpansions('qiaoyan');
+					event.result = await player.chooseTarget(true,'请选择【献珠】的目标','将'+get.translation(event.cards)+'交给一名角色。若该角色不为你自己，则你令其视为对其攻击范围内的另一名角色使用【杀】').set('ai',function(target){
 						var player=_status.event.player;
 						var eff=get.sgn(get.attitude(player,target))*get.value(_status.event.getParent().cards[0],target);
 						if(player!=target) eff+=Math.max.apply(null,game.filterPlayer(function(current){
-							if(current!=target&&target.inRange(current)&&target.canUse('sha',current)) return true;
+							if(current!=target&&player.inRange(current)&&target.canUse('sha',current,false)) return true;
 						}).map(function(current){
 							return get.effect(current,{name:'sha'},target,player);
 						}));
 						return eff;
-					});
+					}).forResult();
+				},
+				content:function(){
+					'step 0'
+					event.cards = player.getExpansions('qiaoyan');
+					event.target = targets[0]; 
 					'step 1'
-					if(result.bool){
-						var target=result.targets[0];
-						event.target=target;
-						player.logSkill('xianzhu',target);
-						player.give(cards,target,'give');
-					}
-					else event.finish();
+					player.give(cards,target,'give');
 					'step 2'
 					if(player!=target&&target.isIn()&&player.isIn()&&game.hasPlayer(function(current){
-						return current!=target&&target.inRange(current)&&target.canUse('sha',current);
+						return current!=target&&player.inRange(current)&&target.canUse('sha',current,false);
 					})){
 						var str=get.translation(target);
-						player.chooseTarget(true,'选择'+str+'攻击范围内的一名角色，视为'+str+'对其使用【杀】',function(card,player,target){
+						player.chooseTarget(true,'选择攻击范围内的一名角色，视为'+str+'对其使用【杀】',function(card,player,target){
 							var source=_status.event.target;
-							return source.inRange(target)&&source.canUse('sha',target);
+							return player.inRange(target)&&source.canUse('sha', target, false);
 						}).set('target',target).set('ai',function(target){
 							var evt=_status.event;
 							return get.effect(target,{name:'sha'},evt.target,evt.player)
@@ -3798,7 +3795,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			huishi:'慧识',
 			huishi_info:'摸牌阶段，你可以放弃摸牌，改为观看牌堆顶的X张牌，获得其中的一半（向下取整），然后将其余牌置入牌堆底。（X为牌堆数量的个位数）',
 			qingleng:'清冷',
-			qingleng_info:'一名角色的回合结束时，若其体力值与手牌数之和不小于X，则你可将一张牌当无距离限制的冰属性【杀】对其使用（X为牌堆数量的个位数）。若这是你本局游戏内首次其发动过此技能，则你摸一张牌。',
+			qingleng_info:'一名角色的回合结束时，若其体力值与手牌数之和不小于X，则你可将一张牌当无距离限制的冰属性【杀】对其使用（X为牌堆数量的个位数）。若这是你本局游戏内首次对其发动此技能，则你摸一张牌。',
 			xuanmu:'宣穆',
 			xuanmu2:'宣穆',
 			xuanmu_info:'锁定技，隐匿技。你于其他角色的回合登场时，防止你受到的伤害直到回合结束。',
@@ -3852,7 +3849,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			jin_xiahouhui:'晋夏侯徽',
 			jin_xiahouhui_prefix:'晋',
 			baoqie:'宝箧',
-			baoqie_info:'隐匿技，锁定技。你登场后，从牌堆中获得一张不为赠物的宝物牌。若此牌在你的手牌区内为宝物牌，则你可以使用此牌。',
+			baoqie_info:'隐匿技，锁定技。你登场后，从牌堆或弃牌堆中获得一张不为赠物的宝物牌。若此牌在你的手牌区内为宝物牌，则你可以使用此牌。',
 			jyishi:'宜室',
 			jyishi_info:'每回合限一次，当有其他角色于其出牌阶段内因弃置而失去手牌后，你可令其获得这些牌中位于弃牌堆的一张，然后你获得其余位于弃牌堆的牌。',
 			shiduo:'识度',
@@ -3992,7 +3989,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			qiaoyan:'巧言',
 			qiaoyan_info:'锁定技，当你于回合外受到其他角色造成的伤害时，若你：有“珠”，则你令伤害来源获得“珠”；没有“珠”，则你防止此伤害，然后摸一张牌，并将一张牌正面朝上置于武将牌上，称为“珠”。',
 			xianzhu:'献珠',
-			xianzhu_info:'锁定技，出牌阶段开始时，你令一名角色A获得“珠”。若A不为你自己，则你选择A攻击范围内的一名角色B，视为A对B使用一张【杀】。',
+			xianzhu_info:'锁定技，出牌阶段开始时，你令一名角色A获得“珠”。若A不为你自己，则你选择你攻击范围内的一名角色B，视为A对B使用一张【杀】。',
 			chengjichengcui:'成济成倅',
 			oltousui:'透髓',
 			oltousui_info:'你可以将任意张牌置于牌堆底，视为使用一张需使用等量张【闪】抵消的【杀】。',

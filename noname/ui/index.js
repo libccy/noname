@@ -1,25 +1,22 @@
-import { Uninstantable, nonameInitialized } from "../util/index.js";
-import { Library as lib } from '../library/index.js';
-import { Game as game } from "../game/index.js";
-import { Get as get } from "../get/index.js";
+import { lib } from '../library/index.js';
+import { game } from "../game/index.js";
+import { get } from "../get/index.js";
 import { _status } from "../status/index.js";
-import { GNC as gnc } from '../gnc/index.js';
-import { AI as ai } from "../ai/index.js";
 import { Click } from "./click/index.js";
 import { Create } from "./create/index.js";
 
-export class UI extends Uninstantable {
-	static updates = [];
-	static thrown = [];
-	static touchlines = [];
-	static todiscard = {};
+export class UI {
+	updates = [];
+	thrown = [];
+	touchlines = [];
+	todiscard = {};
 	/**
 	 * @type { HTMLStyleElement[] }
 	 */
-	static playerPositions = [];
-	static create = Create;
-	static click = Click;
-	static selected = {
+	playerPositions = [];
+	create = new Create();
+	click = new Click();
+	selected = {
 		/**
 		 * @type { Button[] }
 		 */
@@ -36,81 +33,113 @@ export class UI extends Uninstantable {
 	/**
 	 * @type { Dialog[] }
 	 */
-	static dialogs;
+	dialogs;
 	/**
 	 * @type { Dialog }
 	 */
-	static dialog;
+	dialog;
 	/**
 	 * @type { HTMLDivElement }
 	 */
-	static arena;
+	arena;
 	/**
 	 * @type { Control[] }
 	 */
-	static controls;
+	controls;
 	/**
 	 * @type { Control }
 	 */
-	static control;
+	control;
 	/**
 	 * @type { Control | undefined }
 	 */
-	static confirm;
+	confirm;
 	/**
 	 * @type { Control | undefined }
 	 */
-	static skills;
+	skills;
 	/**
 	 * @type { Control | undefined }
 	 */
-	static skills1;
+	skills1;
 	/**
 	 * @type { Control | undefined }
 	 */
-	static skills2;
+	skills2;
 	/**
 	 * @type { Control | undefined }
 	 */
-	static skills3;
+	skills3;
 	/**
 	 * @type { HTMLDivElement }
 	 */
-	static window;
+	window;
 	/**
 	 * @type { HTMLDivElement }
 	 */
-	static pause;
+	pause;
 	/**
 	 * @type { HTMLAudioElement }
 	 */
-	static backgroundMusic;
+	backgroundMusic;
 	/**
 	 * @type { HTMLDivElement }
 	 */
-	static special;
+	special;
 	/**
 	 * @type { HTMLDivElement }
 	 */
-	static fakeme;
+	fakeme;
 	/**
 	 * @type { HTMLDivElement }
 	 */
-	static chess;
+	chess;
 	/**
 	 * 手动在菜单栏中添加一个武将包的ui
 	 * @type { ((packName: string) => void)[] }
 	 */
-	static updateCharacterPackMenu = [];
+	updateCharacterPackMenu = [];
 	/**
 	 * 手动在菜单栏中添加一个卡牌包的ui
 	 * @type { ((packName: string) => void)[] }
 	 */
-	static updateCardPackMenu = [];
-	static refresh(node) {
+	updateCardPackMenu = [];
+	/**
+	 * @type { HTMLDivElement } 挑战模式下正在操作的角色
+	 */
+	mebg;
+	/**
+	 * @type { Function | undefined } 
+	 */
+	updateUpdate;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	commandnode;
+	/**
+	 * @type {() => void}
+	 */
+	updateVideoMenu;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	menuContainer;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	auto;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	wuxie;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	tempnowuxie;
+	refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}
-	static clear() {
+	clear() {
 		game.addVideo('uiClear');
 		var thrown = document.getElementsByClassName('thrown');
 		var nodes = [];
@@ -122,7 +151,7 @@ export class UI extends Uninstantable {
 			if (!nodes[i].fixed) nodes[i].delete();
 		}
 	}
-	static updatec() {
+	updatec() {
 		if (_status.noupdatec) return;
 		var length = 0, minoffset = -Infinity;
 		var controls = [];
@@ -249,7 +278,7 @@ export class UI extends Uninstantable {
 			}
 		}
 	}
-	static updatex() {
+	updatex() {
 		ui.update.apply(this, arguments);
 		ui.updatehl();
 		for (var i = 0; i < lib.onresize.length; i++) {
@@ -261,13 +290,13 @@ export class UI extends Uninstantable {
 		ui.updatez();
 		delete ui._updatexr;
 	}
-	static updatexr() {
+	updatexr() {
 		if (ui._updatexr) {
 			clearTimeout(ui._updatexr);
 		}
 		ui._updatexr = setTimeout(ui.updatex, 500);
 	}
-	static updatejm(player, nodes, start, inv) {
+	updatejm(player, nodes, start, inv) {
 		if (typeof start != 'number') {
 			start = 0;
 		}
@@ -298,7 +327,7 @@ export class UI extends Uninstantable {
 			}
 		}
 	}
-	static updatem(player) {
+	updatem(player) {
 		if (player) {
 			var start = 0;
 			if (!player.classList.contains('linked2') || !ui.arena.classList.contains('nolink')) {
@@ -312,7 +341,7 @@ export class UI extends Uninstantable {
 			}
 		}
 	}
-	static updatej(player) {
+	updatej(player) {
 		if (player) {
 			ui.updatejm(player, player.node.judges);
 		}
@@ -322,7 +351,7 @@ export class UI extends Uninstantable {
 			}
 		}
 	}
-	static updatehl() {
+	updatehl() {
 		if (!game.me) return;
 		if (!ui.handcards1Container || !ui.handcards2Container) return;
 		if (!ui.handcards1Container.childNodes.length) return;
@@ -425,7 +454,7 @@ export class UI extends Uninstantable {
 		}
 		ui.handcards2Container.firstChild.style.width = (offset2 * (hs2.length - 1) + 118) + 'px';
 	}
-	static updateh(compute) {
+	updateh(compute) {
 		if (!game.me) return;
 		if (!ui.handcards1Container) return;
 		if (lib.config.low_performance) {
@@ -442,7 +471,7 @@ export class UI extends Uninstantable {
 		ui.updatehx(game.me.node.handcards1);
 		ui.updatehx(game.me.node.handcards2);
 	}
-	static updatehx(node) {
+	updatehx(node) {
 		var width = node.parentNode._handcardsWidth;
 		var num = node.childElementCount - node.getElementsByClassName('removing').length;
 		node.classList.remove('fold0');
@@ -466,7 +495,7 @@ export class UI extends Uninstantable {
 			node.classList.add('fold0');
 		}
 	}
-	static updated() {
+	updated() {
 		if (document.documentElement.offsetWidth < 900 || document.documentElement.offsetHeight < 500) {
 			game.deviceZoom = Math.min(
 				Math.round(document.documentElement.offsetWidth / 98) / 10,
@@ -477,7 +506,7 @@ export class UI extends Uninstantable {
 			game.deviceZoom = 1;
 		}
 	}
-	static updatez() {
+	updatez() {
 		var width = document.documentElement.offsetWidth;
 		var height = document.documentElement.offsetHeight;
 		var zoom = game.documentZoom;
@@ -492,7 +521,7 @@ export class UI extends Uninstantable {
 			document.body.style.transform = '';
 		}
 	}
-	static update() {
+	update() {
 		for (var i = 0; i < ui.updates.length; i++) {
 			ui.updates[i]();
 		}
@@ -573,7 +602,7 @@ export class UI extends Uninstantable {
 			}
 		}
 	}
-	static recycle(node, key) {
+	recycle(node, key) {
 		if (!ui._recycle) ui._recycle = {};
 		if (typeof node == 'string') {
 			return ui._recycle[node];
@@ -585,7 +614,7 @@ export class UI extends Uninstantable {
 	 * @author Tipx-L
 	 * @param {number} [numberOfPlayers]
 	 */
-	static updateConnectPlayerPositions(numberOfPlayers) {
+	updateConnectPlayerPositions(numberOfPlayers) {
 		if (typeof numberOfPlayers != 'number') {
 			const configOL = lib.configOL;
 			numberOfPlayers = parseInt(configOL.player_number) || configOL.number;
@@ -635,7 +664,7 @@ export class UI extends Uninstantable {
 	 * @author Tipx-L
 	 * @param {number} [numberOfPlayers]
 	 */
-	static updatePlayerPositions(numberOfPlayers) {
+	updatePlayerPositions(numberOfPlayers) {
 		if (typeof numberOfPlayers != 'number') numberOfPlayers = ui.arena.dataset.number;
 		//当人数不超过8人时，还是用以前的布局
 		if (!numberOfPlayers || numberOfPlayers <= 8) return;
@@ -669,9 +698,19 @@ export class UI extends Uninstantable {
 			playerPositions.push(selector);
 		}
 	}
-	static updateRoundNumber(roundNumber, cardPileNumber) {
+	updateRoundNumber(roundNumber, cardPileNumber) {
 		if (ui.cardPileNumber) ui.cardPileNumber.innerHTML = `${roundNumber}轮 剩余牌: ${cardPileNumber}`;
 	}
 }
 
-export const ui = UI;
+export let ui = new UI();
+
+/**
+ * @param { InstanceType<typeof UI> } [instance] 
+ */
+export let setUI = (instance) => {
+	ui = instance || new UI();
+	if (lib.config.dev) {
+		window.ui = ui;
+	}
+};

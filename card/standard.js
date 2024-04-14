@@ -1,5 +1,5 @@
-'use strict';
-game.import('card',function(lib,game,ui,get,ai,_status){
+import { lib, game, ui, get, ai, _status } from '../noname.js';
+game.import('card', function () {
 	return {
 		name:'standard',
 		connect:true,
@@ -157,11 +157,10 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 							if(target.hasSkillTag('useShan',null,event)) return true;
 							if(target.isLinked()&&game.hasNature(event.card)&&get.attitude(target,player._trueMe||player)>0) return false;
 							if(event.baseDamage+event.extraDamage<=0&&!game.hasNature(event.card,'ice')) return false;
-							if(target.hasSkillTag('freeShan',false,event,true)) return true;
-							if(event.shanRequired>1&&target.mayHaveShan(target,'use',null,'count')<event.shanRequired-(event.shanIgnored||0)) return false;
 							if(event.baseDamage+event.extraDamage>=target.hp+
 								((player.hasSkillTag('jueqing',false,target)||target.hasSkill('gangzhi'))?target.hujia:0)) return true;
 							if(!game.hasNature(event.card,'ice')&&get.damageEffect(target,player,target,get.nature(event.card))>=0) return false;
+							if(event.shanRequired>1&&target.mayHaveShan(target,'use',null,'count')<event.shanRequired-(event.shanIgnored||0)) return false;
 							return true;
 						})());
 						//next.autochoose=lib.filter.autoRespondShan;
@@ -761,16 +760,43 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					}
 					"step 2"
 					ui.clear();
-					var num;
-					if(event.targets){
-						num=event.targets.length;
+					var cards;
+					if(card.storage&&Array.isArray(card.storage.fixedShownCards)){
+						cards=card.storage.fixedShownCards.slice();
+						var lose_list=[],cards2=[];
+						cards.forEach(card=>{
+							var owner=get.owner(card);
+							if(owner){
+								var arr=lose_list.find(i=>i[0]==owner);
+								if(arr) arr[1].push(card);
+								else lose_list.push([owner,[card]]);
+							}
+							else cards2.add(card);
+						});
+						if(lose_list.length){
+							lose_list.forEach(list=>{
+								list[0].$throw(list[1]);
+								game.log(list[0],'将',list[1],'置于了处理区');
+							})
+							game.loseAsync({
+								lose_list:lose_list,
+							}).setContent('chooseToCompareLose');
+						}
+						if(cards2.length) game.cardsGotoOrdering(cards2);
+						game.delayex();
 					}
 					else{
-						num=game.countPlayer();
+						var num;
+						if(event.targets){
+							num=event.targets.length;
+						}
+						else{
+							num=game.countPlayer();
+						}
+						if(card.storage&&typeof card.storage.extraCardsNum=='number') num+=card.storage.extraCardsNum;
+						cards=get.cards(num);
+						game.cardsGotoOrdering(cards).relatedEvent=event.getParent();
 					}
-					if(card.storage&&typeof card.storage.extraCardsNum=='number') num+=card.storage.extraCardsNum;
-					var cards=get.cards(num);
-					game.cardsGotoOrdering(cards).relatedEvent=event.getParent();
 					var dialog=ui.create.dialog('五谷丰登',cards,true);
 					_status.dieClose.push(dialog);
 					dialog.videoId=lib.status.videoId++;
@@ -1589,7 +1615,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				content:function(){
 					let pos=get.is.single()?'he':'hej';
-					if(target.countGainableCards(player,pos)) player.gainPlayerCard(pos, target, true).set('target',target).set('ai',lib.card.shunshou.ai.button);
+					if(target.countGainableCards(player,pos)) player.gainPlayerCard(pos, target, true).set('target',target).set("complexSelect",false).set('ai',lib.card.shunshou.ai.button);
 				},
 				ai:{
 					wuxie:function(target,card,player,viewer){
@@ -1864,7 +1890,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						pos='hej';
 						vis=undefined;
 					}
-					if(target.countDiscardableCards(player,pos)) player.discardPlayerCard(pos, target, true, vis).set('target',target).set('ai',lib.card.guohe.ai.button);
+					if(target.countDiscardableCards(player,pos)) player.discardPlayerCard(pos, target, true, vis).set('target',target).set("complexSelect",false).set('ai',lib.card.guohe.ai.button);
 				},
 				ai:{
 					wuxie:(target,card,player,viewer,status)=>{
@@ -2736,7 +2762,7 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 					next.set('ai',function(card){
 						var evt=_status.event.getTrigger();
 						if(get.attitude(evt.player,evt.target)<0){
-							if(player.needsToDiscard()) return 15-get.value(card);
+							if(evt.player.needsToDiscard()) return 15-get.value(card);
 							if(evt.baseDamage+evt.extraDamage>=Math.min(2,evt.target.hp)) return 8-get.value(card);
 							return 5-get.value(card);
 						}
@@ -2911,14 +2937,19 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 				},
 				audio:true,
 				check:function(event,player){
-					if(event&&(event.ai||event.ai1)){
-						var ai=event.ai||event.ai1;
+					if(!event) return true;
+					if(event.ai){
+						var ai=event.ai;
 						var tmp=_status.event;
 						_status.event=event;
 						var result=ai({name:'shan'},_status.event.player,event);
 						_status.event=tmp;
 						return result>0;
 					}
+					let evt=event.getParent();
+					if(player.hasSkillTag('noShan',null,evt)) return false;
+					if(!evt||!evt.card||!evt.player||player.hasSkillTag('useShan',null,evt)) return true;
+					if(evt.card&&evt.player&&player.isLinked()&&game.hasNature(evt.card)&&get.attitude(player,evt.player._trueMe||evt.player)>0) return false;
 					return true;
 				},
 				content:function(){
@@ -2942,8 +2973,6 @@ game.import('card',function(lib,game,ui,get,ai,_status){
 						if(player.hasSkillTag('unequip2')) return false;
 						if(!arg||!arg.player) return true;
 						if(arg.player.hasSkillTag('unequip',false,{
-							target:player
-						})||arg.player.hasSkillTag('unequip_ai',false,{
 							target:player
 						})) return false;
 						return true;

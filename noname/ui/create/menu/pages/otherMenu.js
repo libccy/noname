@@ -23,11 +23,13 @@ import {
 	getRepoTags,
 	getRepoTagDescription,
 	getRepoFilesList,
+	flattenRepositoryFiles,
 	request,
-	createProgress
+	createProgress,
+	gainAuthorization
 } from "../../../../library/update.js"
 
-export const otherMenu = function (connectMenu) {
+export const otherMenu = function (/** @type { boolean | undefined } */ connectMenu) {
 	if (connectMenu) return;
 	/**
 	 * 由于联机模式会创建第二个菜单，所以需要缓存一下可变的变量
@@ -145,7 +147,18 @@ export const otherMenu = function (connectMenu) {
 		li3.style.whiteSpace = 'nowrap';
 		li3.style.display = 'none';// coding
 
-		var checkVersionButton, checkAssetButton, checkDevVersionButton/*, button4, button5*/;
+		/**
+		 * @type {HTMLButtonElement}
+		 */
+		var checkVersionButton;
+		/**
+		 * @type {HTMLButtonElement}
+		 */
+		var checkAssetButton;
+		/**
+		 * @type {HTMLButtonElement}
+		 */
+		var checkDevVersionButton;
 		
 		game.checkForUpdate = async function (forcecheck, dev) {
 			if (!dev && checkVersionButton.disabled) {
@@ -224,16 +237,24 @@ export const otherMenu = function (connectMenu) {
 							refresh();
 						});
 				} else {
-					if (confirm('将要下载dev版本的完整包，是否继续?')) {
+					if (confirm('将要直接下载dev版本的完整包，是否继续?')) {
 						download({
 							name: 'noname-PR-Branch',
 							assets: [],
 							zipball_url: 'https://ghproxy.cc/https://github.com/libccy/noname/archive/PR-Branch.zip'
 						});
+					} else {
+						refresh();
 					}
 				}
+				/**
+				 * @param {{ assets: any; author?: { login: string; avatar_url: string; html_url: string; }; body?: string; html_url?: string; name: any; published_at?: string; zipball_url: any; }} description
+				 */
 				function download(description) {
 					const progress = createProgress('正在更新' + description.name, 1, description.name + '.zip');
+					/**
+					 * @type {progress}
+					 */
 					let unZipProgress;
 					let url = description.zipball_url;
 					if (Array.isArray(description.assets) && description.assets.length > 0) {
@@ -258,8 +279,8 @@ export const otherMenu = function (connectMenu) {
 						progress.setProgressValue(received);
 					}).then(async blob => {
 						progress.remove();
-						await import('../../../../../game/jszip.js');
-						const zip = new window.JSZip().load(await blob.arrayBuffer());
+						const zip = await get.promises.zip();
+						zip.load(await blob.arrayBuffer());
 						const entries = Object.entries(zip.files);
 						let root;
 						const hiddenFileFlags = ['.', '_'];
@@ -313,11 +334,13 @@ export const otherMenu = function (connectMenu) {
 								});
 						}
 						unZipProgress.remove();
-						// await import('../../../../../game/update.js');
-						// if (Array.isArray(window.noname_asset_list)) {
-						// 	game.saveConfig('asset_version', window.noname_asset_list[0]);
-						// 	delete window.noname_asset_list;
-						// }
+						if (url === description.zipball_url) {
+							await lib.init.promises.js('game', 'update.js');
+							if (Array.isArray(window.noname_asset_list)) {
+								game.saveConfig('asset_version', window.noname_asset_list[0]);
+								delete window.noname_asset_list;
+							}
+						}
 						if (confirm('更新完成，是否重启？')) {
 							game.reload();
 						}
@@ -332,167 +355,123 @@ export const otherMenu = function (connectMenu) {
 			}
 		};
 
-		game.checkForAssetUpdate = function (type) {
-			return alert('暂不支持更新素材，请点击检查游戏更新按钮下载完整包');
+		game.checkForAssetUpdate = async function () {
 			if (checkAssetButton.disabled) {
 				return;
 			}
 			else if (game.download) {
+				if (!localStorage.getItem('noname_authorization') && !sessionStorage.getItem('noname_authorization')) {
+					if (confirm('素材更新或许会直接超过每小时的访问限制，是否输入您github的token以解除访问每小时60次的限制？')) await gainAuthorization();
+				}
 				checkAssetButton.innerHTML = '正在检查更新';
 				checkAssetButton.disabled = true;
-				lib.init.req('game/asset.js', function () {
-					try {
-						eval(this.responseText);
-						if (!window.noname_asset_list || !window.noname_skin_list) {
-							throw ('err');
-						}
-					}
-					catch (e) {
-						alert('更新地址有误');
-						console.log(e);
-						return;
-					}
-
-					var updates = window.noname_asset_list;
-					delete window.noname_asset_list;
-					var skins = window.noname_skin_list;
-					delete window.noname_skin_list;
-					var asset_version = updates.shift();
-
-					var skipcharacter = [], skipcard = ['tiesuo_mark', 'shield'];
-					if (!lib.config.asset_full) {
-						for (var i = 0; i < lib.config.all.sgscharacters.length; i++) {
-							var pack = lib.characterPack[lib.config.all.sgscharacters[i]];
-							for (var j in pack) {
-								skipcharacter.add(j);
-							}
-						}
-						for (var i = 0; i < lib.config.all.sgscards.length; i++) {
-							var pack = lib.cardPack[lib.config.all.sgscards[i]];
-							if (pack) {
-								skipcard = skipcard.concat(pack);
-							}
-						}
-					}
-					for (var i = 0; i < updates.length; i++) {
-						switch (updates[i].slice(0, 5)) {
-							case 'image': {
-								if (!lib.config.asset_full) {
-									if (!lib.config.asset_image) {
-										updates.splice(i--, 1);
-									}
-									else {
-										if (updates[i].startsWith('image/character')) {
-											if (updates[i].indexOf('jun_') != 16 && updates[i].indexOf('gz_') != 16 && !skipcharacter.includes(updates[i].slice(16, updates[i].lastIndexOf('.')))) {
-												updates.splice(i--, 1);
-											}
-										}
-										else if (updates[i].startsWith('image/card')) {
-											let cardname = updates[i].slice(11, updates[i].lastIndexOf('.'));
-											if (lib.card[cardname] && !skipcard.includes(cardname)) {
-												updates.splice(i--, 1);
-											}
-										}
-										else if (updates[i].startsWith('image/mode/stone')) {
-											updates.splice(i--, 1);
-										}
-									}
-								}
-								break;
-							}
-							case 'audio': {
-								if (!lib.config.asset_audio) {
-									updates.splice(i--, 1);
-								}
-								break;
-							}
-							case 'font/': {
-								if (!lib.config.asset_font) {
-									updates.splice(i--, 1);
-								}
-							}
-						}
-					}
-					if (lib.config.asset_skin) {
-						for (var i in skins) {
-							for (var j = 1; j <= skins[i]; j++) {
-								updates.push('image/skin/' + i + '/' + j + '.jpg');
-							}
-						}
-					}
-					if (!ui.arena.classList.contains('menupaused')) {
-						ui.click.configMenu();
-						ui.click.menuTab('其它');
-					}
-
-					var proceed = function () {
-						if (updates.length == 0) {
-							game.print(updates);
-							game.saveConfig('asset_version', asset_version);
-							alert('素材已是最新');
-							checkAssetButton.disabled = false;
-							checkAssetButton.innerHTML = '检查素材更新';
-							return;
-						}
-						var p = checkAssetButton.parentNode;
-						checkAssetButton.remove();
-						var span = document.createElement('span');
-						span.style.whiteSpace = 'nowrap';
-						var n1 = 0;
-						var n2 = updates.length;
-						span.innerHTML = '正在下载素材（' + n1 + '/' + n2 + '）';
-						span1.remove();
-						span2.remove();
-						span2_check.remove();
-						span3.remove();
-						span3_check.remove();
-						span4.remove();
-						span4_check.remove();
-						span5.remove();
-						span5_check.remove();
-						span6.remove();
-						span6_check.remove();
-						span2_br.remove();
-						span3_br.remove();
-						span4_br.remove();
-						span5_br.remove();
-						span6_br.remove();
-						p.appendChild(span);
-
-						var br6 = ui.create.node('br');
-						var span7 = ui.create.div('.hrefnode', '详细信息');
-						span7.style.marginTop = '6px';
-						span7.listen(ui.click.consoleMenu);
-						p.appendChild(br6);
-						p.appendChild(span7);
-
-						var finish = function () {
-							if (n1 == n2) {
-								game.saveConfig('asset_version', asset_version);
-							}
-							span.innerHTML = '素材更新完毕（' + n1 + '/' + n2 + '）';
-							p.appendChild(document.createElement('br'));
-							var button = document.createElement('button');
-							button.innerHTML = '重新启动';
-							button.onclick = game.reload;
-							button.style.marginTop = '8px';
-							p.appendChild(button);
-						};
-						game.multiDownload(updates, function () {
-							n1++;
-							span.innerHTML = '正在下载素材（' + n1 + '/' + n2 + '）';
-						}, function (e) {
-							game.print('下载失败：' + e.source);
-						}, function () {
-							setTimeout(finish, 500);
-						});
-					};
-					game.checkFileList(updates, proceed);
-				}, function () {
-					alert('连接失败');
-					checkAssetButton.disabled = false;
+				function refresh() {
 					checkAssetButton.innerHTML = '检查素材更新';
-				}, true);
+					checkAssetButton.disabled = false;
+				}
+				const assetDirs = [];
+				if (lib.config.asset_font) {
+					assetDirs.push('font');
+				}
+				if (lib.config.asset_audio) {
+					assetDirs.push('audio');
+				}
+				if (lib.config.asset_image) {
+					assetDirs.push('image');
+				}
+				const files = await Promise.all(assetDirs.map(dir => flattenRepositoryFiles(dir)));
+				assetDirs.forEach((value, index) => {
+					const arr = files[index];
+					const size = arr.reduce((previous, current) => {
+						return previous + current.size;
+					}, 0);
+					game.saveConfig(`asset_${value}_size`, parseSize(size));
+				});
+				/**
+				 * @param { any[] } arr 
+				 * @param { Function } predicate 
+				 */
+				const asyncFilter = async (arr, predicate) => {
+					// @ts-ignore
+					const results = await Promise.all(arr.map(predicate));
+					// @ts-ignore
+					return arr.filter((_v, index) => results[index]);
+				}
+				// @ts-ignore
+				const result = await asyncFilter(files.flat(), async v => {
+					return v.size != (await game.promises.readFile(v.path)).length;
+				}).then(arr => arr.map(v => v.path));
+				console.log('需要更新的文件有:', result);
+				game.print('需要更新的文件有:', result);
+				const finish = async () => {
+					await lib.init.promises.js('game', 'asset.js');
+					if (Array.isArray(window.noname_asset_list)) {
+						game.saveConfig('asset_version', window.noname_asset_list[0]);
+						delete window.noname_asset_list;
+					}
+					if (confirm('更新完成，是否重启？')) {
+						game.reload();
+					}
+					refresh();
+				};
+				if (result.length > 0) {
+					const progress = createProgress('正在更新素材包.zip');
+					/**
+					 * @type {progress}
+					 */
+					let unZipProgress;
+					request('noname.unitedrhythmized.club/api', (receivedBytes, total, filename) => {
+						if (typeof filename == 'string') {
+							progress.setFileName(filename);
+						}
+						let received = 0, max = 0;
+						if (total) {
+							max = +(total / (1024 * 1024)).toFixed(1)
+						} else {
+							max = 1000;
+						}
+						received = +(receivedBytes / (1024 * 1024)).toFixed(1);
+						if (received > max) max = received;
+						progress.setProgressMax(max);
+						progress.setProgressValue(received);
+					}, {
+						method: 'post',
+						body: JSON.stringify({
+							fileList: result.concat('game/asset.js')
+						})
+					}).then(async blob => {
+						progress.remove();
+						const zip = await get.promises.zip();
+						zip.load(await blob.arrayBuffer());
+						const entries = Object.entries(zip.files);
+						let root;
+						const hiddenFileFlags = ['.', '_'];
+						unZipProgress = createProgress('正在解压' + progress.getFileName(), entries.length);
+						let i = 0;
+						for (const [key, value] of entries) {
+							unZipProgress.setProgressValue(i++);
+							const fileName = typeof root == 'string' && key.startsWith(root) ? key.replace(root, '') : key;
+							if (hiddenFileFlags.includes(fileName[0])) continue;
+							if (value.dir) {
+								await game.promises.createDir(fileName);
+								continue;
+							}
+							unZipProgress.setFileName(fileName);
+							const [path, name] = [fileName.split('/').slice(0, -1).join('/'), fileName.split('/').slice(-1).join('/')];
+							game.print(`${fileName}(${i}/${entries.length})`);
+							await game.promises.writeFile(value.asArrayBuffer(), path, name);
+						}
+						unZipProgress.remove();
+						await finish();
+					}).catch(e => {
+						if (progress.parentNode) progress.remove();
+						if (unZipProgress && unZipProgress.parentNode) unZipProgress.remove();
+						refresh();
+						throw e;
+					});
+				} else {
+					await finish();
+				}
 			}
 			else {
 				alert('此版本不支持游戏内更新素材，请手动更新');
@@ -501,7 +480,7 @@ export const otherMenu = function (connectMenu) {
 
 		checkVersionButton = document.createElement('button');
 		checkVersionButton.innerHTML = '检查游戏更新';
-		checkVersionButton.onclick = game.checkForUpdate;
+		checkVersionButton.onclick = () => game.checkForUpdate(null);
 		li1.lastChild.appendChild(checkVersionButton);
 
 		checkDevVersionButton = document.createElement('button');
@@ -515,6 +494,8 @@ export const otherMenu = function (connectMenu) {
 		// }
 
 		(function () {
+			/** @type { HTMLParagraphElement } */
+			// @ts-ignore
 			var updatep1 = li1.querySelector('p');
 			var updatep2 = li2;
 			var updatep3 = li3;
@@ -592,7 +573,7 @@ export const otherMenu = function (connectMenu) {
 
 		checkAssetButton = document.createElement('button');
 		checkAssetButton.innerHTML = '检查素材更新';
-		checkAssetButton.onclick = game.checkForAssetUpdate;
+		checkAssetButton.onclick = () => game.checkForAssetUpdate();
 		li2.lastChild.appendChild(checkAssetButton);
 
 		var span1 = ui.create.div('.config.more', '选项 <div>&gt;</div>');
@@ -602,11 +583,11 @@ export const otherMenu = function (connectMenu) {
 			if (!this.classList.toggle('on')) {
 				game.saveConfig('asset_toggle_off', true);
 				[
-					span2, span2_br, span2_check,
+					/* span2, span2_br, span2_check,*/
 					span3, span3_br, span3_check,
 					span4, span4_br, span4_check,
 					span5, span5_br, span5_check,
-					span6, span6_br, span6_check,
+					/* span6, span6_br, span6_check,*/
 				].forEach(item => HTMLDivElement.prototype.css.call(item, {
 					display: 'none'
 				}));
@@ -614,11 +595,11 @@ export const otherMenu = function (connectMenu) {
 			else {
 				game.saveConfig('asset_toggle_off');
 				[
-					span2, span2_br, span2_check,
+					/* span2, span2_br, span2_check,*/
 					span3, span3_br, span3_check,
 					span4, span4_br, span4_check,
 					span5, span5_br, span5_check,
-					span6, span6_br, span6_check,
+					/* span6, span6_br, span6_check,*/
 				].forEach(item => HTMLDivElement.prototype.css.call(item, {
 					display: ''
 				}));
@@ -627,24 +608,11 @@ export const otherMenu = function (connectMenu) {
 		span1.listen(span1.toggle);
 		li2.lastChild.appendChild(span1);
 
-		var span6_br = ui.create.node('br');
-		li2.lastChild.appendChild(span6_br);
+		// var span6_br = ui.create.node('br');
+		// li2.lastChild.appendChild(span6_br);
+		// var span2_br = ui.create.node('br');
 
-		var span5 = ui.create.div('', '图片素材（精简，126MB）');
-		span5.style.fontSize = 'small';
-		span5.style.lineHeight = '16px';
-		var span5_check = document.createElement('input');
-		span5_check.type = 'checkbox';
-		span5_check.style.marginLeft = '5px';
-		if (lib.config.asset_image) {
-			span5_check.checked = true;
-		}
-		span5_check.onchange = function () {
-			game.saveConfig('asset_image', this.checked);
-		};
-		var span2_br = ui.create.node('br');
-
-		var span4 = ui.create.div('', '字体素材（48MB）');
+		var span4 = ui.create.div('', `字体素材（${ lib.config.asset_font_size || '23.4MB' }）`);
 		span4.style.fontSize = 'small';
 		span4.style.lineHeight = '16px';
 		li2.lastChild.appendChild(span4);
@@ -661,7 +629,7 @@ export const otherMenu = function (connectMenu) {
 		var span3_br = ui.create.node('br');
 		li2.lastChild.appendChild(span3_br);
 
-		var span3 = ui.create.div('', '音效素材（125MB）');
+		var span3 = ui.create.div('', `音效素材（${ lib.config.asset_audio_size || '350MB' }）`);
 		span3.style.fontSize = 'small';
 		span3.style.lineHeight = '16px';
 		li2.lastChild.appendChild(span3);
@@ -678,49 +646,60 @@ export const otherMenu = function (connectMenu) {
 		var span4_br = ui.create.node('br');
 		li2.lastChild.appendChild(span4_br);
 
-		var span2 = ui.create.div('', '皮肤素材（351MB）');
-		span2.style.fontSize = 'small';
-		span2.style.lineHeight = '16px';
-		li2.lastChild.appendChild(span2);
-		var span2_check = document.createElement('input');
-		span2_check.type = 'checkbox';
-		span2_check.style.marginLeft = '5px';
-		if (lib.config.asset_skin) {
-			span2_check.checked = true;
+		// var span2 = ui.create.div('', '皮肤素材（351MB）');
+		// span2.style.fontSize = 'small';
+		// span2.style.lineHeight = '16px';
+		// li2.lastChild.appendChild(span2);
+		// var span2_check = document.createElement('input');
+		// span2_check.type = 'checkbox';
+		// span2_check.style.marginLeft = '5px';
+		// if (lib.config.asset_skin) {
+		// 	span2_check.checked = true;
+		// }
+		// span2_check.onchange = function () {
+		// 	game.saveConfig('asset_skin', this.checked);
+		// };
+		// li2.lastChild.appendChild(span2_check);
+		var span5 = ui.create.div('', `图片素材（${lib.config.asset_image_size || '363MB'}）`);
+		span5.style.fontSize = 'small';
+		span5.style.lineHeight = '16px';
+		li2.lastChild.appendChild(span5);
+		var span5_check = document.createElement('input');
+		span5_check.type = 'checkbox';
+		span5_check.style.marginLeft = '5px';
+		if (lib.config.asset_image) {
+			span5_check.checked = true;
 		}
-		span2_check.onchange = function () {
-			game.saveConfig('asset_skin', this.checked);
+		span5_check.onchange = function () {
+			// @ts-ignore
+			game.saveConfig('asset_image', this.checked);
 		};
-		li2.lastChild.appendChild(span2_check);
+		li2.lastChild.appendChild(span5_check);
 		var span5_br = ui.create.node('br');
 		li2.lastChild.appendChild(span5_br);
+		// li2.lastChild.appendChild(span2_br);
 
-
-		li2.lastChild.appendChild(span5);
-		li2.lastChild.appendChild(span5_check);
-		li2.lastChild.appendChild(span2_br);
-
-		var span6 = ui.create.div('', '图片素材（完整，203MB）');
-		span6.style.fontSize = 'small';
-		span6.style.lineHeight = '16px';
-		li2.lastChild.appendChild(span6);
-		var span6_check = document.createElement('input');
-		span6_check.type = 'checkbox';
-		span6_check.style.marginLeft = '5px';
-		if (lib.config.asset_full) {
-			span6_check.checked = true;
-		}
-		span6_check.onchange = function () {
-			game.saveConfig('asset_full', this.checked);
-		};
-		li2.lastChild.appendChild(span6_check);
+		// var span6 = ui.create.div('', '图片素材（完整，203MB）');
+		// span6.style.fontSize = 'small';
+		// span6.style.lineHeight = '16px';
+		// li2.lastChild.appendChild(span6);
+		// var span6_check = document.createElement('input');
+		// span6_check.type = 'checkbox';
+		// span6_check.style.marginLeft = '5px';
+		// if (lib.config.asset_full) {
+		// 	span6_check.checked = true;
+		// }
+		// span6_check.onchange = function () {
+		// 	game.saveConfig('asset_full', this.checked);
+		// };
+		// li2.lastChild.appendChild(span6_check);
 		
 		[
-			span2, span2_br, span2_check,
+			/* span2, span2_br, span2_check,*/
 			span3, span3_br, span3_check,
 			span4, span4_br, span4_check,
 			span5, span5_br, span5_check,
-			span6, span6_br, span6_check,
+			/* span6, span6_br, span6_check,*/
 		].forEach(item => HTMLDivElement.prototype.css.call(item, {
 			display: 'none'
 		}));

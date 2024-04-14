@@ -1,13 +1,12 @@
-import { AI as ai } from '../../ai/index.js';
-import { Get as get } from '../../get/index.js';
-import { Game as game } from '../../game/index.js';
-import { Library as lib } from "../index.js";
-import { status as _status } from '../../status/index.js';
-import { UI as ui } from '../../ui/index.js';
+import { get } from '../../get/index.js';
+import { game } from '../../game/index.js';
+import { lib } from "../index.js";
+import { _status } from '../../status/index.js';
+import { ui } from '../../ui/index.js';
 import { AsyncFunction } from '../../util/index.js';
 
 export class GameEvent {
-	/** @type { GameEventPromise } */
+	/** @type { this & import('./gameEventPromise.js').GameEventPromise } */
 	#promise;
 	/**
 	 * @param {string | GameEvent} [name]
@@ -75,6 +74,11 @@ export class GameEvent {
 	 */
 	// @ts-ignore
 	player;
+	/**
+	 * @type { Player[] }
+	 */
+	// @ts-ignore
+	players;
 	/**
 	 * @type { Player }
 	 */
@@ -478,7 +482,7 @@ export class GameEvent {
 	 * 获取事件的父节点。
 	 * 获取事件链上的指定事件。
 	 * 默认获取上一个父节点（核心）。
-	 * @param {number|string|(evt:gameEvent)=>boolean} [level=1] 获取深度（number）/指定名字（string）/指定特征（function）
+	 * @param {number|string|((evt:GameEvent)=>boolean)} [level=1] 获取深度（number）/指定名字（string）/指定特征（function）
 	 * @param {boolean} [forced] 若获取不到节点，默认返回{}，若forced为true则返回null
 	 * @param {boolean} [includeSelf] 若level不是数字，指定搜索时是否包含事件本身
 	 * @returns {GameEvent|{}|null}
@@ -904,11 +908,10 @@ export class GameEvent {
 	}
 	/**
 	 * 事件转为Promise化
-	 * 
-	 * @returns { GameEventPromise }
 	 */
 	toPromise() {
 		if (!this.#promise) {
+			// @ts-ignore
 			this.#promise = new lib.element.GameEventPromise(this);
 		}
 		return this.#promise;

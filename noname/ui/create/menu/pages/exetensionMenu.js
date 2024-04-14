@@ -419,7 +419,7 @@ export const extensionMenu = function (connectMenu) {
 					}
 					str += ',files:' + JSON.stringify(files);
 					str += '}';
-					var extension = { 'extension.js': 'game.import("extension",function(lib,game,ui,get,ai,_status){return ' + str + '})' };
+					var extension = { 'extension.js': 'import { lib, game, ui, get, ai, _status } from "../../noname.js";\ngame.import("extension",function(){\n\treturn ' + str + '\n});' };
 					for (var i in dash1.content.image) {
 						extension[i] = dash1.content.image[i];
 					}

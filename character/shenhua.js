@@ -1,5 +1,5 @@
-import { game } from '../noname.js';
-game.import('character',function(lib,game,ui,get,ai,_status){
+import { lib, game, ui, get, ai, _status } from '../noname.js';
+game.import('character', function () {
 	return {
 		name:'shenhua',
 		connect:true,
@@ -1974,6 +1974,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					target.addMark('nzry_huaiju',1);
 					target.addSkill('nzry_huaiju_ai');
 				},
+				ai:{
+					combo:'nzry_huaiju'
+				}
 			},
 			"nzry_zhenglun":{
 				audio:2,
@@ -1990,6 +1993,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					trigger.cancel();
 					player.addMark('nzry_huaiju',1);
 				},
+				ai:{
+					combo:'nzry_huaiju'
+				}
 			},
 			"nzry_kuizhu":{
 				audio:2,
@@ -5441,8 +5447,6 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 						if(!arg||!arg.player) return true;
 						if(arg.player.hasSkillTag('unequip',false,{
 							target:player
-						})||arg.player.hasSkillTag('unequip_ai',false,{
-							target:player
 						})) return false;
 						return true;
 					},
@@ -7761,7 +7765,7 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			zuoci:['zuoci','re_zuoci'],
 			caiwenji:['caiwenji','ol_caiwenji','re_caiwenji'],
 			xuyou:['xuyou','sp_xuyou','jsrg_xuyou','yj_xuyou','junk_xuyou'],
-			guanqiujian:['guanqiujian','re_guanqiujian','tw_guanqiujian','old_guanqiujian'],
+			guanqiujian:['guanqiujian','re_guanqiujian','tw_guanqiujian','mb_sp_guanqiujian','old_guanqiujian'],
 			chendao:['chendao','ns_chendao','old_chendao'],
 			zhugezhan:['zhugezhan','old_zhugezhan'],
 			ol_lusu:['re_lusu','ol_lusu','dc_sb_lusu'],
