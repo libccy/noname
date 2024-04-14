@@ -9659,6 +9659,9 @@ game.import('character', function () {
 				audio:2,
 				audioname:['tw_beimihu'],
 				group:['bmcanshi_add','bmcanshi_remove'],
+				ai:{
+					combo:'zongkui'
+				},
 				subSkill:{
 					add:{
 						audio:'bmcanshi',

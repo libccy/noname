@@ -1547,7 +1547,7 @@ game.import('character', function () {
 					player.addSkills('pkmiewu');
 				},
 				ai:{
-					combo:'wuku',
+					combo:'pkwuku',
 				},
 				derivation:'pkmiewu',
 			},
@@ -6207,6 +6207,9 @@ game.import('character', function () {
 						target.addToExpansion(card,target,'give').gaintag.add('junwei2');
 						target.addSkill('junwei2');
 					}
+				},
+				ai:{
+					combo:'yinling'
 				}
 			},
 			junwei2:{
@@ -6366,6 +6369,9 @@ game.import('character', function () {
 					else{
 						player.chooseUseTarget({name:'sha'},true,false,'nodistance');
 					}
+				},
+				ai:{
+					combo:'fenyong'
 				}
 			},
 			mouduan:{

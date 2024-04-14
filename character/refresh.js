@@ -5652,6 +5652,7 @@ game.import('character', function () {
 				ai:{
 					order:1,
 					result:{player:1},
+					combo:'xinquanji'
 				},
 				subSkill:{
 					0:{},

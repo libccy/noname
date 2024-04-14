@@ -2323,7 +2323,6 @@ game.import('character', function () {
 							if(arg.player.hasSkillTag('jueqing',false,player)) return false;
 						}
 					},
-					combo:'xianzhu',
 				},
 			},
 			xianzhu:{
@@ -2348,7 +2347,7 @@ game.import('character', function () {
 				content:function(){
 					'step 0'
 					event.cards = player.getExpansions('qiaoyan');
-					event.target = targets[0]; 
+					event.target = targets[0];
 					'step 1'
 					player.give(cards,target,'give');
 					'step 2'

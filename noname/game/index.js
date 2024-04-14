@@ -4751,7 +4751,7 @@ export class Game {
 			game.saveConfigValue('extensionInfo');
 		}
 		if (!game.download || keepFile) return;
-		game.promises.removeDir(`${nonameInitialized}extension/${extensionName}`).catch(console.error);
+		game.promises.removeDir(`extension/${extensionName}`).catch(console.error);
 	}
 	addRecentCharacter() {
 		let list = get.config('recentCharacter') || [];

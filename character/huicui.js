@@ -12191,6 +12191,9 @@ game.import('character', function () {
 					});
 					player.draw(num);
 				},
+				ai:{
+					combo:'cxliushi'
+				}
 			},
 			//说出吾名吓汝一跳
 			xuxie:{

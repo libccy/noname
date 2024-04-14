@@ -13926,6 +13926,9 @@ game.import('character', function () {
 					else event.finish();
 					'step 3'
 					if(result.bool) player.draw();
+				},
+				ai:{
+					combo:'zyexin'
 				}
 			}
 		},
