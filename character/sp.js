@@ -26248,7 +26248,7 @@ game.import('character', function () {
 				},
 				ai:{
 					threaten:1.4,
-					combo:'xinfu_dianhua'
+					combo:'xinfu_zhenyi'
 				},
 			},
 			"xinfu_dianhua":{
@@ -26327,6 +26327,7 @@ game.import('character', function () {
 					game.delayx();
 				},
 				ai:{
+					combo:'xinfu_falu',
 					threaten:2.2
 				},
 			},
@@ -26363,9 +26364,6 @@ game.import('character', function () {
 						player.gain(event.togain,'gain2');
 					}
 				},
-				ai:{
-					combo:'xinfu_dianhua'
-				}
 			},
 			"zhenyi_spade":{
 				trigger:{
