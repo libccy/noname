@@ -2983,7 +2983,7 @@ game.import('character', function () {
 						}
 						else{
 							player.damage();
-							player.draw(2);
+							player.draw();
 							event.finish();
 						}
 					}
@@ -17413,7 +17413,7 @@ game.import('character', function () {
 			xin_zhangyi:'手杀界张嶷',
 			xin_zhangyi_prefix:'手杀界',
 			xinwurong:'怃戎',
-			xinwurong_info:'出牌阶段限一次，你可以与一名其他角色进行谋弈：<br><li>若你选择“镇压”且其选择“反抗”，你对其造成1点伤害，然后你摸一张牌。<br><li>若你选择“安抚”且其选择“归顺”，其须交给你两张牌（若其手牌数不足两张，则改为令其跳过其下个摸牌阶段）。<br><li>若你选择“镇压”且其选择“归顺”，你获得其一张牌，然后你交给其两张牌。<br><li>若你选择“安抚”且其选择“反抗”，你受到1点伤害，然后你摸两张牌。',
+			xinwurong_info:'出牌阶段限一次，你可以与一名其他角色进行谋弈：<br><li>若你选择“镇压”且其选择“反抗”，你对其造成1点伤害，然后你摸一张牌。<br><li>若你选择“安抚”且其选择“归顺”，其须交给你两张牌（若其牌数不足两张，则改为令其跳过其下个摸牌阶段）。<br><li>若你选择“镇压”且其选择“归顺”，你获得其一张牌，然后你交给其两张牌。<br><li>若你选择“安抚”且其选择“反抗”，你受到1点伤害，然后你摸一张牌。',
 			xin_guozhao:'手杀郭照',
 			xin_guozhao_prefix:'手杀',
 			yichong:'易宠',
