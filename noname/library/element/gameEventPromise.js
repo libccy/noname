@@ -35,14 +35,11 @@ export class GameEventPromise extends Promise {
 	}
 	#event;
 	/**
-	 * @param { GameEvent | GameEventPromise } arg
+	 * @param { import('./gameEvent.js').GameEvent } arg
 	 */
 	constructor(arg) {
 		if (arg instanceof GameEventPromise)
 			throw new Error("GameEventPromise cannot copy.")
-		/**
-		 * @type {GameEvent}
-		 */
 		const event = arg;
 		super(resolve => {
 			// 设置为异步事件
@@ -165,45 +162,47 @@ export class GameEventPromise extends Promise {
 	}
 
 	/**
+	 * 获取 Result 对象中的信息。
+	 * @example 
+	 * ```js
+	// 示例 1：
+	const chooseCardResult = await player.chooseCard().forResult();
+	// 获取整个结果对象，然后访问如 chooseCardResult.cards 等属性
+	
+	// 示例 2：
+	const cards = await player.chooseCard().forResult('cards');
+	// 获取结果对象中 'cards' 属性的值
+	
+	// 示例 3：
+	const [success, cards, targets] = await player.chooseCardTarget().forResult('bool', 'cards', 'targets');
+	// 获取结果对象中多个属性的值
+	// - success 表示是否成功
+	// - cards 表示选择的卡片
+	// - targets 表示选择的目标
+	```
+	 * @template {keyof Result} T
+	 * @overload
+	 * @returns {Promise<Result>}
 	 * 
-	 * 直接获得result中的信息。
+	 * @overload
+	 * @param {T} param0
+	 * @returns {Promise<Exclude<Result[T], undefined>>}
 	 * 
-	 * 
-	 * @example
-	 * ①
-	 * let chooseCardResult = await player.chooseCard().forResult();
-	 * 选择的卡牌：chooseCardResult.cards
-	 * ②
-	 * let cards = await player.chooseCard().forResult('cards');
-	 * 选择的卡牌：cards
-	 * ③
-	 * let [success,cards,targets] = await player.chooseCardTarget().forResult('bool','cards','targets');
-	 * success:是否做出选择。
-	 * cards:选择的牌。
-	 * targets:选择的目标。
-	 * 
-	 * @returns {Promise} 返回的结果
+	 * @overload
+	 * @param { T[] } params
+	 * @returns { Promise<Exclude<Result[T], undefined>[]> }
 	 */
-	forResult(){
-		if(arguments.length == 0){
-			return this.then(event=>{
-				return Promise.resolve(event.result);
-			});
-		}else if(arguments.length == 1){
-			return this.then(event=>{
-				return Promise.resolve(event.result[arguments[0]]);
-			});
-		}else{
-			return this.then(event=>{
-				return Promise.resolve(Array.from(arguments).map(key=>event.result[key]));
-			});
+	forResult(...params){
+		if (params.length == 0) {
+			return this.then(({ result }) => result);
+		} else if (params.length == 1) {
+			return this.then(event => event.result[params[0]]);
+		} else {
+			return this.then(event => Array.from(params).map(key => event.result[key]));
 		}
 	}
-
 	/**
-	 * 返回result中的bool项。
-	 * 
-	 * @returns {Promise<boolean>} 返回的bool项
+	 * 返回result中的bool项
 	 */
 	forResultBool(){
 		return this.forResult('bool');
@@ -211,9 +210,6 @@ export class GameEventPromise extends Promise {
 
 	/**
 	 * 返回result中的targets项。
-	 * 
-	 * @returns {Promise<Player[]>} 返回的targets项。
-	 * 
 	 */
 	forResultTargets(){
 		return this.forResult('targets');
@@ -221,9 +217,6 @@ export class GameEventPromise extends Promise {
 
 	/**
 	 * 返回result中的cards项
-	 * 
-	 * @returns {Promise<Card[]>} 返回的cards项。
-	 * 
 	 */
 	forResultCards(){
 		return this.forResult('cards');
@@ -241,8 +234,6 @@ export class GameEventPromise extends Promise {
 
 	/**
 	 * 返回result中的control项。
-	 * 
-	 * @returns {Promise<string>} 返回的control项。
 	 */
 	forResultControl(){
 		return this.forResult('control');
@@ -250,8 +241,6 @@ export class GameEventPromise extends Promise {
 
 	/**
 	 * 返回result中的links项。
-	 * 
-	 * @returns {Promise<Array<any>>} 返回的links项。
 	 */
 	forResultLinks(){
 		return this.forResult('links');

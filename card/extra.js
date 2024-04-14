@@ -1,5 +1,5 @@
-'use strict';
-game.import('card',function(lib,game,ui,get,ai,_status){
+import { lib, game, ui, get, ai, _status } from '../noname.js';
+game.import('card',function(){
 	return {
 		name:'extra',
 		connect:true,

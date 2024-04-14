@@ -5,7 +5,7 @@
  * @typedef { InstanceType<typeof lib.element.Button> } Button
  * @typedef { InstanceType<typeof lib.element.Dialog> } Dialog
  * @typedef { InstanceType<typeof lib.element.GameEvent> } GameEvent
- * @typedef { InstanceType<typeof lib.element.GameEvent> & InstanceType<typeof lib.element.GameEventPromise> } GameEventPromise
+ * @typedef { GameEvent & InstanceType<typeof lib.element.GameEventPromise> } GameEventPromise
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
  * @typedef { InstanceType<typeof lib.element.Control> } Control
 */
@@ -9448,6 +9448,9 @@ export class Library {
 		}
 	};
 	card = {
+		/**
+		 * @type { [CardBaseUIData['suit'], CardBaseUIData['number'], string][] }
+		 */
 		list: [],
 		cooperation_damage: {
 			fullskin: true,

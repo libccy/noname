@@ -1,5 +1,5 @@
-import { game } from '../noname.js';
-game.import('character',function(lib,game,ui,get,ai,_status){
+import { lib, game, ui, get, ai, _status } from '../noname.js';
+game.import('character', function () {
 	return {
 		name:'xianjian',
 		character:{
