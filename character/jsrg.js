@@ -105,7 +105,7 @@ game.import('character', function () {
 						});
 						if(cards.length>0) player.loseToDiscardpile(cards);
 					}
-					else{
+					else if(event.addCount!==false){
 						player.addTempSkill('xumou_jsrg_temp','phaseChange');
 						player.markAuto('xumou_jsrg_temp',[event.cards[0].name])
 					}
@@ -1063,6 +1063,7 @@ game.import('character', function () {
 						var stat=player.getStat().card,name=trigger.card.name;
 						if(typeof stat[name]=='number') stat[name]--;
 					}
+					if(trigger.getParent(3).name=='xumou_jsrg') trigger.getParent(3).addCount=false;
 					await player.gainPlayerCard(trigger.target,'he',true);
 					const {result:{bool}}=await trigger.target.chooseBool(`是否令${get.translation(player)}至你的距离于本回合内+2？`).set('ai',()=>true);
 					if(bool){
