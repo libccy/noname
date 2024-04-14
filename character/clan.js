@@ -188,7 +188,7 @@ game.import('character',function(){
 						player(player){
 							if(get.event().dying) return get.attitude(player, get.event().dying);
 							if(get.event().type!='phase') return 1;
-							const names=get.event(`clanshengmo_${player.playerid}_enabled_names`);
+							const names=lib.inpile.filter(name=>get.type(name)=='basic'&&!player.getStorage('clanshengmo').includes(name));
 							if(Array.isArray(names)){
 								return names.some(name=>{
 									return player.getUseValue({name})>0;

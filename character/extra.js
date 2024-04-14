@@ -123,7 +123,13 @@ game.import('character', function () {
 							firstDo: true,
 						}).then(() => delete player.storage.jingyu_used);
 					}
-					player.markAuto('jingyu_used', trigger.sourceSkill || trigger.skill);
+					let skill = trigger.sourceSkill || trigger.skill, info = get.info(skill);
+					while (true) {
+						if (info && !info.sourceSkill) break;
+						skill = info.sourceSkill;
+						info = get.info(skill);
+					}
+					player.markAuto('jingyu_used', skill);
 					await player.draw();
 				},
 				ai:{
@@ -148,7 +154,8 @@ game.import('character', function () {
 						`令${name}随机弃置${get.cnNumber(round)}张手牌`
 					]).set('prompt', '滤心：请选择一项').forResult();
 					let cards2 = [];
-					if (result.index === 0) {
+					const makeDraw = result.index === 0;
+					if (makeDraw) {
 						cards2 = await target.draw(round).forResult();
 					}
 					else {
@@ -164,11 +171,33 @@ game.import('character', function () {
 					if (cards2.some(card => {
 						return get.name(card, target) === cardName;
 					})) {
-						target.addSkill('lvxin_lose');
-						target.addMark('lvxin_lose', 1, false);
+						const skillName = `lvxin_${makeDraw ? 'recover' : 'lose'}`;
+						target.addSkill(skillName);
+						target.addMark(skillName, 1, false);
 					}
 				},
 				subSkill:{
+					recover:{
+						trigger:{
+							player:['useSkill','logSkillBegin','useCard','respond'],
+						},
+						filter(event,player){
+							if(['global','equip'].includes(event.type)) return false;
+							const skill=event.sourceSkill||event.skill;
+							const info=get.info(skill);
+							return info&&!info.charlotte;
+						},
+						forced:true,
+						onremove:true,
+						charlotte:true,
+						async content(event,trigger,player){
+							player.loseHp(player.countMark('lvxin_recover'));
+							player.removeSkill('lvxin_recover');
+						},
+						intro:{
+							content:'下次发动技能时回复#点体力',
+						},
+					},
 					lose:{
 						trigger:{
 							player:['useSkill','logSkillBegin','useCard','respond'],
