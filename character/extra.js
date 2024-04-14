@@ -123,7 +123,13 @@ game.import('character', function () {
 							firstDo: true,
 						}).then(() => delete player.storage.jingyu_used);
 					}
-					player.markAuto('jingyu_used', trigger.sourceSkill || trigger.skill);
+					let skill = trigger.sourceSkill || trigger.skill, info = get.info(skill);
+					while (true) {
+						if (info && !info.sourceSkill) break;
+						skill = info.sourceSkill;
+						info = get.info(skill);
+					}
+					player.markAuto('jingyu_used', skill);
 					await player.draw();
 				},
 				ai:{
@@ -136,6 +142,17 @@ game.import('character', function () {
 				usable:1,
 				filterCard:true,
 				filterTarget:lib.filter.notMe,
+				check(card){
+					const round=game.roundNumber,player=get.player();
+					let valueFix = 0;
+					if(['sha','shan'].includes(get.name(card,false))) valueFix += 3;
+					if(round<=2&&player.hasCard(card=>{
+						return ['sha','shan'].includes(get.name(card))&&get.value(card)<=3;
+					})||game.hasPlayer(current=>{
+						return current!==player&&get.attitude(player,current)>0;
+					})) return 6-get.value(card)+valueFix;
+					return 4.5-get.value(card)+valueFix;
+				},
 				delay:false,
 				discard:false,
 				lose:false,
@@ -146,9 +163,12 @@ game.import('character', function () {
 					const result = await player.chooseControl(['摸牌', '弃牌']).set('choiceList', [
 						`令${name}摸${get.cnNumber(round)}张牌`,
 						`令${name}随机弃置${get.cnNumber(round)}张手牌`
-					]).set('prompt', '滤心：请选择一项').forResult();
+					]).set('prompt', '滤心：请选择一项').set('ai', () => {
+						return get.event('choice');
+					}).set('choice', get.attitude(player, target) > 0 ? '摸牌' : '弃牌').forResult();
 					let cards2 = [];
-					if (result.index === 0) {
+					const makeDraw = result.index === 0;
+					if (makeDraw) {
 						cards2 = await target.draw(round).forResult();
 					}
 					else {
@@ -164,11 +184,33 @@ game.import('character', function () {
 					if (cards2.some(card => {
 						return get.name(card, target) === cardName;
 					})) {
-						target.addSkill('lvxin_lose');
-						target.addMark('lvxin_lose', 1, false);
+						const skillName = `lvxin_${makeDraw ? 'recover' : 'lose'}`;
+						target.addSkill(skillName);
+						target.addMark(skillName, 1, false);
 					}
 				},
 				subSkill:{
+					recover:{
+						trigger:{
+							player:['useSkill','logSkillBegin','useCard','respond'],
+						},
+						filter(event,player){
+							if(['global','equip'].includes(event.type)) return false;
+							const skill=event.sourceSkill||event.skill;
+							const info=get.info(skill);
+							return info&&!info.charlotte;
+						},
+						forced:true,
+						onremove:true,
+						charlotte:true,
+						async content(event,trigger,player){
+							player.loseHp(player.countMark('lvxin_recover'));
+							player.removeSkill('lvxin_recover');
+						},
+						intro:{
+							content:'下次发动技能时回复#点体力',
+						},
+					},
 					lose:{
 						trigger:{
 							player:['useSkill','logSkillBegin','useCard','respond'],
@@ -188,6 +230,21 @@ game.import('character', function () {
 						},
 						intro:{
 							content:'下次发动技能时失去#点体力',
+						},
+					}
+				},
+				ai:{
+					order:5,
+					result:{
+						target(player,target){
+							const round=game.roundNumber;
+							if(round<=2&&target.countCards('h')>round*2&&player.getCards('h').some(card=>{
+								return ['sha','shan'].includes(get.name(card))&&get.value(card)<=3;
+							})) return 1;
+							if(get.attitude(player,target)>0){
+								return round+Math.sqrt(1+target.getDamagedHp());
+							}
+							return -(round+Math.sqrt(Math.max(0,2-target.getHp())));
 						},
 					}
 				}

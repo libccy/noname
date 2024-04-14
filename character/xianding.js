@@ -110,7 +110,7 @@ game.import('character', function () {
 				sp2_zhangtai:['guozhao','fanyufeng','ruanyu','yangwan','re_panshu'],
 				sp2_jinse:['caojinyu','re_sunyi','re_fengfangnv','caohua','laiyinger','zhangfen','zhugeruoxue','caoxian','dc_qinghegongzhu','zhugemengxue'],
 				sp2_yinyu:['zhouyi','luyi','sunlingluan','caoyi'],
-				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao'],
+				sp2_wangzhe:['dc_daxiaoqiao','dc_sp_machao','sp_zhenji'],
 				sp2_doukou:['re_xinxianying','huaman','xuelingyun','dc_ruiji','duanqiaoxiao','tianshangyi','malingli','bailingyun'],
 				sp2_jichu:['zhaoang','dc_liuye','dc_wangyun','yanghong','huanfan','xizheng','lvfan'],
 				sp2_yuxiu:['dongguiren','dc_tengfanglan','zhangjinyun','zhoubuyi','dc_xujing'],
@@ -330,7 +330,7 @@ game.import('character', function () {
 								cards = await target.chooseToGive(player, true).forResultCards();
 							}
 							const card = cards[0];
-							if (player.getCards('h').contains(card)) {
+							if (player.getCards('h').includes(card)) {
 								if (!player.storage.dcwuyou_transfer) player.storage.dcwuyou_transfer = {};
 								player.storage.dcwuyou_transfer[card.cardid] = viewAs;
 								player.addGaintag(cards, 'dcwuyou_transfer');
@@ -516,7 +516,6 @@ game.import('character', function () {
 					});
 				},
 				forced:true,
-				usable:1,
 				logTarget(event,player,triggername,targets){
 					return targets;
 				},
