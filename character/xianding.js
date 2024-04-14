@@ -596,7 +596,7 @@ game.import('character', function () {
 										await game.asyncDelayx();
 									}
 								}
-								if (target.countCards('h') < game.countPlayer()) return;
+								if (target.countCards('h') <= game.countPlayer()) return;
 								player.when({global: 'wuguRemained'}).filter(evt => {
 									return evt.getParent(3) === event;
 								}).vars({originalOwner: target}).then(() => {
