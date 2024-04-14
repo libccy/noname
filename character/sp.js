@@ -18183,6 +18183,9 @@ game.import('character', function () {
 					if(num>0) player.gainMaxHp(num);
 					else player.loseMaxHp(-num);
 					player.recover();
+				},
+				ai:{
+					combo:'fanghun'
 				}
 			},
 			refuhan:{
@@ -19422,6 +19425,9 @@ game.import('character', function () {
 					if(cards.length) player.gain(cards,'gain2');
 				},
 				group:'rejici2',
+				ai:{
+					combo:'regushe'
+				}
 			},
 			rejici2:{
 				audio:'jici',
@@ -22145,6 +22151,9 @@ game.import('character', function () {
 				unique:true,
 				zhuSkill:true,
 				locked:true,
+				ai:{
+					combo:'canshi'
+				}
 			},
 			canshi:{
 				audio:2,
@@ -22205,6 +22214,7 @@ game.import('character', function () {
 					trigger.num++;
 				},
 				ai:{
+					neg:true,
 					effect:{
 						target:function(card,player,target,current){
 							if(get.tag(card,'damage')&&target.countCards('h')==0) return [1,-2];
@@ -22276,6 +22286,7 @@ game.import('character', function () {
 					trigger.num++;
 				},
 				ai:{
+					neg:true,
 					effect:{
 						target:function(card,player,target,current){
 							if(card.name=='sha'&&target.countCards('h')==0) return [1,-2];

@@ -576,6 +576,7 @@ game.import('character', function () {
 							return 13;
 						}
 					},
+					combo:'dcsanshi'
 				},
 			},
 			//王凌
@@ -1640,6 +1641,7 @@ game.import('character', function () {
 							},0);
 						},
 					},
+					combo:'dcqiqin'
 				},
 				getWeiWanEffect:(player,cardx,target)=>{
 					const suit=get.suit(cardx,player);
@@ -3264,6 +3266,9 @@ game.import('character', function () {
 					player.addMark('dcgonghu_'+(trigger.name=='damage'?'damage':'basic'),1,false);
 					game.log(player,'修改了技能','#g【破锐】');
 				},
+				ai:{
+					combo:'dcporui'
+				},
 				subSkill:{
 					trick:{
 						audio:'dcgonghu',
@@ -3602,6 +3607,9 @@ game.import('character', function () {
 						}
 					}
 				},
+				ai:{
+					combo:'dcjizhong'
+				}
 			},
 			dcguangshi:{
 				audio:2,
@@ -3613,6 +3621,9 @@ game.import('character', function () {
 				content:function(){
 					player.draw(2);
 					player.loseHp();
+				},
+				ai:{
+					combo:'dcjizhong'
 				}
 			},
 			//董绾
@@ -4214,6 +4225,7 @@ game.import('character', function () {
 					player.addSkills(['dctaji','dcqinghuang']);
 				},
 				ai:{
+					combo:'dchuiling',
 					order:function(itemp,player){
 						if(player.hasCard(card=>{
 							return get.type(card)!='equip'&&player.getUseValue(card)>1;
@@ -4334,6 +4346,9 @@ game.import('character', function () {
 					player.loseMaxHp();
 					player.addTempSkill('dcqinghuang_add');
 					player.addMark('dcqinghuang_add',1,false);
+				},
+				ai:{
+					combo:'dctaji'
 				},
 				subSkill:{
 					add:{
@@ -4687,6 +4702,9 @@ game.import('character', function () {
 						player.gain(trigger.cards.filterInD('d'),'gain2');
 					}
 				},
+				ai:{
+					combo:'dcyinlu'
+				}
 			},
 			//孙资刘放
 			dcqinshen:{
@@ -5511,6 +5529,9 @@ game.import('character', function () {
 				content:function(){
 					player.draw(player.getHistory('useSkill',evt=>['yizan_use','yizan_use_backup'].includes(evt.sourceSkill||evt.skill)).length)
 				},
+				ai:{
+					combo:'yizan_use'
+				}
 			},
 			dclongyuan:{
 				audio:'xinfu_longyuan',
@@ -5532,6 +5553,9 @@ game.import('character', function () {
 					player.storage.yizan=true;
 				},
 				derivation:'yizan_rewrite',
+				ai:{
+					combo:'yizan_use'
+				}
 			},
 			//黄皓
 			dcqinqing:{
@@ -9260,6 +9284,9 @@ game.import('character', function () {
 						sub:true,
 					},
 				},
+				ai:{
+					combo:'yuanyu'
+				}
 			},
 			//滕胤
 			chenjian:{
@@ -11802,6 +11829,7 @@ game.import('character', function () {
 						if(player.countCards('h')>3||player==_status.currentPhase) return Math.max(o1,o2)+0.1;
 						return Math.min(o1,o2)-0.1;
 					},
+					combo:'dcmiyun',
 					respondSha:true,
 					respondShan:true,
 					skillTagFilter:function(player,tag,arg){
@@ -11956,6 +11984,9 @@ game.import('character', function () {
 				content:function(){
 					player.addTempSkill('zhuangdan_mark',{player:'phaseEnd'})
 				},
+				ai:{
+					combo:'zhuangdan'
+				}
 			},
 			zhuangdan_mark:{
 				mark:true,

@@ -1107,6 +1107,7 @@ game.import('character', function () {
 						return (Array.from({length:6}).map((_,i)=>i+5).includes(list[0])&&info.getEffect(player,list[0])>0)?1:0;
 					},
 					result:{player:1},
+					combo:'sbxingshang'
 				},
 				subSkill:{
 					backup:{},
@@ -2002,6 +2003,9 @@ game.import('character', function () {
 						});
 					}
 				},
+				ai:{
+					combo:'sbguanxing'
+				}
 			},
 			//卢植
 			sbzhenliang:{
@@ -3619,6 +3623,9 @@ game.import('character', function () {
 					if(result.bool) player.give(result.cards,target);
 					'step 3'
 					if(targets.length) event.goto(1);
+				},
+				ai:{
+					combo:'sbxuanhuo'
 				}
 			},
 			//姜维
@@ -4312,6 +4319,9 @@ game.import('character', function () {
 					},
 				},
 				derivation:'sblongdan_shabi',
+				ai:{
+					combo:'sblongdan'
+				}
 			},
 			//张飞
 			sbpaoxiao:{
@@ -5168,6 +5178,7 @@ game.import('character', function () {
 					target.damage('thunder');
 				},
 				ai:{
+					combo:'sbguidao',
 					order:9,
 					result:{
 						target:function(player,target){
@@ -5867,6 +5878,9 @@ game.import('character', function () {
 					name:'统业',
 					name2:'业',
 					content:'mark',
+				},
+				ai:{
+					combo:'sbzhiheng'
 				},
 				subSkill:{
 					broadcast:{

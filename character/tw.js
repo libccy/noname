@@ -2117,6 +2117,9 @@ game.import('character', function () {
 						},
 					},
 				},
+				ai:{
+					combo:'twshenyi'
+				}
 			},
 			//张纮
 			twquanqian:{
@@ -9476,7 +9479,10 @@ game.import('character', function () {
 						player.addTempSkill('twqiongji_silent');
 					}
 				},
-				ai:{combo:'twxiawei'},
+				ai:{
+					combo:'twxiawei',
+					halfneg:true
+				},
 				subSkill:{silent:{charlotte:true}},
 			},
 			//卞夫人
@@ -11410,6 +11416,9 @@ game.import('character', function () {
 						},
 					},
 				},
+				ai:{
+					combo:'twzhengjian'
+				}
 			},
 			//田豫
 			twzhenxi:{
@@ -12386,6 +12395,9 @@ game.import('character', function () {
 						},
 					},
 				},
+				ai:{
+					combo:'twjingce'
+				}
 			},
 			twlihuo:{
 				trigger:{player:'useCard1'},
@@ -14637,6 +14649,9 @@ game.import('character', function () {
 						player.gain(card,'gain2','log');
 					}
 				},
+				ai:{
+					combo:'refanghun'
+				}
 			},
 			twqueshi:{
 				trigger:{

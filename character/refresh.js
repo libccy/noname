@@ -13934,6 +13934,7 @@ game.import('character', function () {
 							return get.effect(player,{name:'losehp'},player,player);
 						}
 					},
+					neg:true
 				}
 			},
 			zhaxiang:{

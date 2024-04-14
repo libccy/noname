@@ -2140,6 +2140,7 @@ game.import('character', function () {
 					},
 				},
 				ai:{
+					combo:'psshiyin',
 					order:9.9,
 					result:{
 						player:function(player){
@@ -3372,6 +3373,9 @@ game.import('character', function () {
 						},
 					},
 				},
+				ai:{
+					combo:'zyshilu'
+				}
 			},
 			//孟达
 			qiuan:{
@@ -3389,6 +3393,9 @@ game.import('character', function () {
 					var cards=trigger.cards.filterInD();
 					player.addToExpansion('gain2',cards).gaintag.add('qiuan');
 					trigger.cancel();
+				},
+				ai:{
+					combo:'liangfan'
 				},
 				intro:{
 					content:'expansion',
@@ -3411,6 +3418,9 @@ game.import('character', function () {
 					'step 1'
 					player.loseHp();
 				},
+				ai:{
+					combo:'qiuan'
+				}
 			},
 			liangfan2:{
 				audio:'liangfan',
@@ -4059,6 +4069,9 @@ game.import('character', function () {
 						}
 					}
 				},
+				ai:{
+					neg:true
+				}
 			},
 			yjyongquan:{
 				audio:2,
