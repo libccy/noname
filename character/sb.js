@@ -429,7 +429,6 @@ game.import('character', function () {
 						animate:'giveAuto',
 						gaintag:['sbquhu'],
 					}).setContent(lib.skill.sbquhu.addToExpansionMultiple);
-					debugger
 					await game.asyncDelay(1.5);
 					const isMin=minLength>myCards.length;
 					const sortedList=lose_list.filter(list=>list[0]!=player).sort((a,b)=>{
