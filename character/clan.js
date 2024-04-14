@@ -189,9 +189,12 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 							if(get.event().dying) return get.attitude(player, get.event().dying);
 							if(get.event().type!='phase') return 1;
 							const names=get.event(`clanshengmo_${player.playerid}_enabled_names`);
-							return names.some(name=>{
-								return player.getUseValue({name})>0;
-							});
+							if(Array.isArray(names)){
+								return names.some(name=>{
+									return player.getUseValue({name})>0;
+								});
+							}
+							return 0;
 						}
 					}
 				}
@@ -735,6 +738,16 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				content(){
 					'step 0'
 					player.unmarkSkill('clanyuzhi');
+					if(player.countCards('h',card=>{
+						return card.hasGaintag('clanyuzhi')&&lib.filter.cardDiscardable(card,player);
+					})){
+						event.logged=true;
+						player.chooseToDiscard(player.countCards('h'),'h',(card,player)=>{
+							return card.hasGaintag('clanyuzhi');
+						},true).logSkill='clanyuzhi';
+					}
+					'step 1'
+					player.removeGaintag('clanyuzhi');
 					var num1=player.getRoundHistory('gain',evt=>{
 						return evt.getParent().name=='draw'&&evt.getParent(2).name=='clanyuzhi';
 					},1).reduce((sum,evt)=>sum+evt.cards.length,0);
@@ -746,32 +759,34 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 					},1).reduce((sum,evt)=>sum+evt.cards.length,0);
 					event.num1=num1;
 					if(num1>0&&(num2>0&&num1>num2)||num1>num3){
-						player.logSkill('clanyuzhi');
+						if(!event.logged) player.logSkill('clanyuzhi');
 						if(num2>0&&num1>num2) game.log(player,'的野心已开始膨胀','#y('+num1+'张>'+num2+'张)');
 						if(num1>num3) game.log(player,'的行动未达到野心','#y('+num3+'张<'+num1+'张)');
-						if(player.hasSkill('clanbaozu',null,false,false)) player.chooseBool('迂志：是否失去〖保族〗？','若选择“否”，则你失去1点体力').set('choice',player.awakenedSkills.includes('clanbaozu'));
+						if(player.hasSkill('clanbaozu',null,false,false)) player.chooseBool('迂志：是否失去〖保族〗？','若选择“否”，则你受到1点雷属性伤害').set('choice',player.awakenedSkills.includes('clanbaozu'));
 						else event._result={bool:false};
 					}
-					else event.goto(2);
-					'step 1'
+					else event.goto(3);
+					'step 2'
 					if(result.bool){
 						player.removeSkills('clanbaozu');
 					}
-					else player.loseHp();
-					'step 2'
-					if(!player.countCards('h')) event.finish();
+					else player.damage(1,'thunder');
 					'step 3'
-					player.chooseCard('迂志：请展示一张手牌','摸此牌牌名字数的牌。下一轮开始时，若本轮你使用的牌数或上一轮你以此法摸的牌数小于此牌牌名字数，则你失去1点体力。',function(card,player){
-						var num=get.cardNameLength(card);
-						return typeof num=='number'&&num>0;
-					},true).set('logSkill','clanyuzhi').set('ai',function(card){
-						if(_status.event.dying&&_status.event.num>0&&get.cardNameLength(card)>_status.event.num) return 1/get.cardNameLength(card);//怂
-						return get.cardNameLength(card);//勇
-					}).set('dying',player.hp+player.countCards('hs',{name:['tao','jiu']})<1).set('num',event.num1);
+					if(player.countCards('h')){
+						player.chooseCard('迂志：请展示一张手牌','摸此牌牌名字数的牌。下一轮开始时弃置此牌，若本轮你使用的牌数或上一轮你以此法摸的牌数小于此牌牌名字数，则你受到1点雷属性伤害或失去〖保族〗。',function(card,player){
+							var num=get.cardNameLength(card);
+							return typeof num=='number'&&num>0;
+						},true).set('ai',function(card){
+							if(_status.event.dying&&_status.event.num>0&&get.cardNameLength(card)>_status.event.num) return 1/get.cardNameLength(card);//怂
+							return get.cardNameLength(card);//勇
+						}).set('dying',player.hp+player.countCards('hs',{name:['tao','jiu']})<1).set('num',event.num1);
+					}
+					else event.finish();
 					'step 4'
 					if(result.bool){
 						player.logSkill('clanyuzhi');
 						player.showCards(result.cards,get.translation(player)+'发动了【迂志】');
+						player.addGaintag(result.cards,'clanyuzhi');
 						player.draw(get.cardNameLength(result.cards[0]));
 						player.storage.clanyuzhi=get.cardNameLength(result.cards[0]);
 						player.markSkill('clanyuzhi');
@@ -788,34 +803,44 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 				audio:2,
 				trigger:{player:'damageEnd',source:'damageSource'},
 				filter(event,player){
-					if(!event.card/*||player.isLinked()*/) return false;
-					if(game.getGlobalHistory('everything',evt=>{
-						if(evt.name!='damage'||!evt.card) return false;
-						return evt.player==player||(evt.source&&evt.source==player);
-					}).indexOf(event)!=0) return false;
+					if(!event.card||player.isLinked()) return false;
 					var num=get.cardNameLength(event.card);
 					return typeof num=='number'&&num>0&&player.countCards('he')>0;
 				},
-				direct:true,
-				content(){
-					'step 0'
+				async content(event,trigger,player){
 					var num=get.cardNameLength(trigger.card),str='';
-					if(player.getDamagedHp()>0) str+=('并摸'+get.cnNumber(player.getDamagedHp())+'张牌');
-					player.chooseToDiscard(get.prompt('clanxieshu'),/*'横置武将牌，'+*/'弃置'+get.cnNumber(num)+'张牌'+str,'he',num).set('ai',function(card){
+					if(player.getDamagedHp()>0) str+=('，然后摸'+get.cnNumber(player.getDamagedHp())+'张牌');
+					player.chooseToDiscard(get.prompt('clanxieshu'),'横置武将牌并弃置'+get.cnNumber(num)+'张牌'+str,'he',num).set('ai',function(card){
 						var player=_status.event.player;
 						var num=_status.event.num;
 						var num2=player.getDamagedHp();
+						if(!num2) return 0;
 						if(num<num2) return 8-get.value(card);
 						if(num==num2||num2>=(2+num-num2)) return lib.skill.zhiheng.check(card);
 						return 0;
-					}).set('num',num).logSkill='clanxieshu';
-					'step 1'
-					if(result.bool){
-						//player.link(true);
-						if(player.getDamagedHp()>0) player.draw(player.getDamagedHp());
-					}
+					}).set('num',num).set('logSkill','clanxieshu').forResult();
+				},
+				popup:false,
+				content(){
+					player.link(true);
+					if(player.getDamagedHp()>0) player.draw(player.getDamagedHp());
 				},
 				ai:{threaten:3},
+				group:'clanxieshu_ban',
+				subSkill:{
+					ban:{
+						audio:'clanxieshu',
+						trigger:{global:'dyingAfter'},
+						filter(event,player){
+							return !player.isTempBanned('clanxieshu');
+						},
+						forced:true,
+						locked:false,
+						content(){
+							player.tempBanSkill('clanxieshu');
+						},
+					},
+				},
 			},
 			//族王浑
 			clanfuxun:{
@@ -3104,9 +3129,9 @@ game.import('character',function(lib,game,ui,get,ai,_status){
 			clanchenya_info:'当一名角色发动“出牌阶段限一次”的技能后，你可以令其重铸任意张牌名字数为X的牌（X为其手牌数）。',
 			clan_zhonghui:'族钟会',
 			clanyuzhi:'迂志',
-			clanyuzhi_info:'锁定技。新的一轮开始时，你依次执行以下项：①若你上一轮使用的牌数或你上上轮因〖迂志〗摸的牌数小于你上轮因〖迂志〗摸的牌数，你失去1点体力或失去〖保族〗。②你展示一张手牌，然后摸X张牌（X为此牌牌名字数）。',
+			clanyuzhi_info:'锁定技。新的一轮开始时，你依次执行以下项：①你弃置上一轮因〖迂志〗展示的手牌，然后若你上一轮使用的牌数或你上上轮因〖迂志〗摸的牌数小于你上轮因〖迂志〗摸的牌数，你受到1点雷属性伤害或失去〖保族〗。②你展示一张手牌，然后摸X张牌（X为此牌牌名字数）。',
 			clanxieshu:'挟术',
-			clanxieshu_info:'当你每回合首次因牌造成或受到伤害后，你可以弃置Y张牌并摸你已损失体力值张牌（Y为此牌牌名字数）。',
+			clanxieshu_info:'①当你因牌造成或受到伤害后，你可以横置武将牌并弃置Y张牌，然后摸你已损失体力值张牌（Y为此牌牌名字数）。②一名角色的濒死状态结算完毕后，你令〖挟术〗于本回合失效。',
 			clan_zhongyu:'族钟毓',
 			clanjiejian:'捷谏',
 			clanjiejian_info:'当你于一回合使用第X张牌指定第一个目标后，若此牌不为装备牌，则你可以令一名目标角色摸X张牌。（X为此牌牌名字数）',
