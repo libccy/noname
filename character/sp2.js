@@ -8329,6 +8329,7 @@ game.import('character', function () {
 							}
 						}
 					},
+					combo:'liangying'
 				},
 			},
 			sushou:{
@@ -8419,6 +8420,9 @@ game.import('character', function () {
 					'step 1'
 					game.delay();
 				},
+				ai:{
+					combo:'cangchu'
+				}
 			},
 			liehou:{
 				enable:'phaseUse',

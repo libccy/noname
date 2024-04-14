@@ -4905,6 +4905,7 @@ game.import('character', function () {
 						player:1
 					},
 					threaten:1.4,
+					combo:'spdaming'
 				},
 				subSkill:{
 					backup:{},
