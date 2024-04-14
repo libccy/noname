@@ -781,8 +781,9 @@ game.import('character', function () {
 							}
 						}
 						if(cards.length){
-							await game.cardsDiscard(cards);
-							//game.log(cards,'被置入了弃牌堆');
+							for(let i=cards.length-1;i--;i>=0){
+								ui.cardPile.insertBefore(cards[i],ui.cardPile.firstChild);
+							}
 						}
 					}
 				},
