@@ -15,7 +15,7 @@ game.import('character', function () {
 			dc_jsp_guanyu:['male','wei',4,['new_rewusheng','dcdanji']],
 			dc_mengda:['male','wei',4,['dclibang','dcwujie']],
 			//dc_fuwan:['male','qun',4,['dcmoukui']],
-			guānning:['male','shu',3,['dcxiuwen','dclongsong']],
+			guānning:['male','shu',3,['dcxiuwen','longsong']],
 			sunhuan:['male','wu',4,['dcniji']],
 			sunlang:['male','shu',4,['dctingxian','dcbenshi']],
 			shiyi:['male','wu',3,['dccuichuan','dczhengxu']],
@@ -1798,6 +1798,80 @@ game.import('character', function () {
 						},
 					}
 				}
+			},
+			longsong:{
+				audio:'dclongsong',
+				trigger:{player:'phaseUseBegin'},
+				filter(event,player){
+					return game.hasPlayer(target=>{
+						if(target==player) return false;
+						return target.hasCard(card=>{
+							if(get.position(card)=='h') return true;
+							return get.color(card)=='red'&&lib.filter.canBeGained(card,player,target);
+						},'he');
+					});
+				},
+				async cost(event,trigger,player){
+					const func=function(player){
+						game.countPlayer(target=>{
+							if(target!=player){
+								const skills=lib.skill.dclongsong.getSkills(target);
+								if(skills.length){
+									target.prompt(skills.map(i=>get.translation(i)).join('<br>'));
+								}
+							}
+						});
+					};
+					if(event.player==game.me) func(player);
+					else if(event.isOnline()) player.send(func,player);
+					event.result=await player.chooseTarget(get.prompt2('longsong'),(card,player,target)=>{
+						if(target==player) return false;
+						return target.hasCard(card=>{
+							if(get.position(card)=='h') return true;
+							return get.color(card)=='red'&&lib.filter.canBeGained(card,player,target);
+						},'he');
+					}).set('ai',target=>{
+						const player=get.event('player'),att=get.attitude(player,target);
+						if(att>0&&!target.getGainableCards(player,'he').some(card=>get.color(card)=='red')) return 0;
+						return lib.skill.dclongsong.getSkills(target).length+(att>0?0:Math.max(0,get.effect(target,{name:'shunshou_copy2'},player,player)));
+					}).forResult();
+				},
+				async content(event,trigger,player){
+					const target=event.targets[0],cards=target.getGainableCards(player,'he').filter(card=>get.color(card)=='red');
+					if(cards.length){
+						let dialog=['龙诵：获得'+get.translation(target)+'的一张红色牌'];
+						let cards1=cards.filter(i=>get.position(i)=='h'),cards2=cards.filter(i=>get.position(i)=='e');
+						if(cards1.length){
+							dialog.push('<div class="text center">手牌区</div>');
+							if(player.hasSkillTag('viewHandcard',null,target,true)) dialog.push(cards1);
+							else dialog.push([cards1.randomSort(),'blank']);
+						}
+						if(cards2.length){
+							dialog.push('<div class="text center">装备区</div>');
+							dialog.push(cards2);
+						}
+						const {result:{bool,links}}=await player.chooseButton(dialog,true).set('ai',button=>{
+							const player=get.event('player'),target=get.event().getParent().targets[0];
+							return get.value(card,player)*get.value(card,target)*(1+Math.random());
+						});
+						if(bool){
+							await player.gain(links,target,'giveAuto','bySelf');
+							const skills=lib.skill.dclongsong.getSkills(target);
+							if(skills.length){
+								if(!event.isMine()&&!event.isOnline()) await game.asyncDelayx();
+								for(const skill of skills){
+									player.popup(skill,'thunder');
+									await player.addTempSkills(skill,['phaseUseAfter','phaseAfter']);
+								}
+							}
+						}
+					}
+					else{
+						player.popup('杯具');
+						player.chat('无牌可得？！');
+						game.log('但是',target,'没有红色牌可被'+get.translation(player)+'获得！');
+					}
+				},
 			},
 			//伏完
 			dcmoukui:{
@@ -7701,7 +7775,7 @@ game.import('character', function () {
 			mubing_rewrite:{
 				mark:true,
 				intro:{
-					content:'出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法得到的牌以任意方式交给其他角色。',
+					content:'出牌阶段开始时，你可以亮出牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法得到的牌以任意方式交给其他角色。',
 				},
 			},
 			diaoling:{
@@ -11080,8 +11154,8 @@ game.import('character', function () {
 		},
 		dynamicTranslate:{
 			mubing:function(player){
-				if(player.storage.mubing2) return '出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法得到的牌以任意方式交给其他角色。';
-				return '出牌阶段开始时，你可以展示牌堆顶的三张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。';
+				if(player.storage.mubing2) return '出牌阶段开始时，你可以亮出牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法得到的牌以任意方式交给其他角色。';
+				return '出牌阶段开始时，你可以亮出牌堆顶的三张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。';
 			},
 			piaoping:function(player){
 				if(player.storage.piaoping) return '转换技，锁定技。当你使用一张牌时，阴：你摸X张牌。<span class="bluetext">阳：你弃置X张牌。</span>（X为你本阶段内发动过〖漂萍〗的次数且至多等于你的体力值）';
@@ -11178,7 +11252,7 @@ game.import('character', function () {
 			"tanbei_effect2_info":"",
 
 			"xinfu_tunan":"图南",
-			"xinfu_tunan_info":"出牌阶段限一次，你可以展示牌堆顶的一张牌并选择一名其他角色，然后该角色选择一项：使用此牌（无距离限制）；或将此牌当普通【杀】使用。",
+			"xinfu_tunan_info":"出牌阶段限一次，你可以亮出牌堆顶的一张牌并选择一名其他角色，然后该角色选择一项：使用此牌（无距离限制）；或将此牌当普通【杀】使用。",
 			"xinfu_bijing":"闭境",
 			"xinfu_bijing_info":"结束阶段，你可以选择至多两张手牌并标记为“闭境”，然后你获得如下效果：1.其他角色的弃牌阶段开始时，若你于本回合内失去过“闭境”，其弃置两张牌；2.准备阶段，你重铸所有“闭境”牌。",
 			"xinfu_zhenxing":"镇行",
@@ -11325,13 +11399,13 @@ game.import('character', function () {
 			sp_zhangliao_prefix:'SP',
 			//这仨技能给SP仲村由理毫无违和感好吗！！！
 			mubing:'募兵',
-			mubing_info:'出牌阶段开始时，你可以展示牌堆顶的三张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。',
+			mubing_info:'出牌阶段开始时，你可以亮出牌堆顶的三张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。',
 			ziqu:'资取',
 			ziqu_info:'每名角色限一次，当你对有牌的其他角色造成伤害后，你可以防止此伤害。然后其将其点数最大的牌交给你。',
 			diaoling:'调令',
 			diaoling_info:'觉醒技，准备阶段，若你已因〖募兵〗获得了6张或更多的【杀】或武器牌或伤害锦囊牌，则你回复1点体力或摸两张牌，然后修改〖募兵〗。',
 			mubing_rewrite:'募兵·改',
-			mubing_rewrite_info:'出牌阶段开始时，你可以展示牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法得到的牌以任意方式交给其他角色。',
+			mubing_rewrite_info:'出牌阶段开始时，你可以亮出牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法得到的牌以任意方式交给其他角色。',
 			caobuxing:'曹不兴',
 			moying:'墨影',
 			moying_info:'每回合限一次，当你于回合外不因使用而失去单一一张锦囊牌或装备牌后，你可以选择一个花色和与此牌点数差绝对值不超过2的点数，然后获得牌堆中所有与此牌花色点数相同的牌。',
@@ -11400,7 +11474,7 @@ game.import('character', function () {
 			smyyingshi:'鹰视',
 			smyyingshi_info:'锁定技，出牌阶段，你可观看牌堆顶的X张牌（X为你的体力上限）。',
 			xiongzhi:'雄志',
-			xiongzhi_info:'限定技，出牌阶段，你可展示牌堆顶的一张牌并使用之。若如此做，你重复此流程，直到你以此法展示的牌无法使用。',
+			xiongzhi_info:'限定技，出牌阶段，你可亮出牌堆顶的一张牌并使用之。若如此做，你重复此流程，直到你以此法展示的牌无法使用。',
 			quanbian:'权变',
 			quanbian2:'权变',
 			quanbian_info:'当你于出牌阶段内使用/打出手牌时，若此牌有花色且你本回合内未使用/打出过该花色的其他手牌，则你可以选择一项：①摸一张牌。②将牌堆顶X张牌中的一张置于牌堆底（X为你的体力上限）。若你发动此技能，则你本回合内不能再使用与此牌花色相同的手牌。',
@@ -11644,6 +11718,8 @@ game.import('character', function () {
 			oldlongsong_info:'出牌阶段开始时，你可以将一张手牌交给一名其他角色。然后其须选择其所有的发动时机为出牌阶段内的空闲时间点且你至多能于此阶段发动一次的技能，其于此阶段这些技能失效，你获得这些技能。',
 			dclongsong:'龙诵',
 			dclongsong_info:'出牌阶段开始时，你可以将一张红色牌交给一名其他角色。然后其须选择其所有的发动时机包含“出牌阶段”的技能，其于此阶段这些技能失效，你获得这些技能且至多可以发动一次。',
+			longsong:'龙诵',
+			longsong_info:'出牌阶段开始时，你可以获得一名其他角色的一张红色牌，然后你本阶段视为拥有其所有的发动时机包含“出牌阶段”的技能。',
 			dc_mengda:'孟达',
 			dclibang:'利傍',
 			dclibang_info:'出牌阶段限一次。你可以弃置一张牌，正面向上获得两名其他角色的各一张牌。然后你判定，若结果与这两张牌的颜色均不同，你交给其中一名角色两张牌或失去1点体力，否则你获得判定牌并视为对其中一名角色使用一张【杀】。',

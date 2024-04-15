@@ -6582,7 +6582,7 @@ game.import('character', function () {
 			duoji:'夺冀',
 			duoji_info:'限定技，出牌阶段，你可弃置两张手牌并选择一名装备区有牌的其他角色。你获得其装备区里的所有牌。',
 			binglinchengxiax:'兵临城下',
-			binglinchengxiax_info:'出牌阶段，对一名其他角色使用。你展示牌堆顶的四张牌，依次对其使用其中所有的【杀】，然后将剩余的牌置于牌堆顶。',
+			binglinchengxiax_info:'出牌阶段，对一名其他角色使用。你亮出牌堆顶的四张牌，依次对其使用其中所有的【杀】，然后将剩余的牌置于牌堆顶。',
 			mjweipo:'危迫',
 			mjweipo_effect:'危迫',
 			mjweipo_remove:'危迫',

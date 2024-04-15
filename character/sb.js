@@ -6448,7 +6448,7 @@ game.import('character', function () {
 				prompt2:function(event,player){
 					var str='',storage=player.getStorage('sbliegong');
 					if(storage.length>1){
-						str+=('展示牌堆顶的'+get.cnNumber(storage.length-1)+'张牌并增加伤害；且');
+						str+=('亮出牌堆顶的'+get.cnNumber(storage.length-1)+'张牌并增加伤害；且');
 					}
 					str+=('令'+get.translation(event.target)+'不能使用花色为');
 					for(var i=0;i<storage.length;i++){
@@ -6483,9 +6483,9 @@ game.import('character', function () {
 						while(cards.length>0){
 							var card=cards.pop();
 							if(storage.includes(get.suit(card,false))) evt.baseDamage++;
-							ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
+							//ui.cardPile.insertBefore(card,ui.cardPile.firstChild);
 						}
-						game.updateRoundNumber();
+						//game.updateRoundNumber();
 					}
 					evt._sbliegong_player=player;
 					player.addTempSkill('sbliegong_clear');

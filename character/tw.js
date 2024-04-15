@@ -9498,7 +9498,7 @@ game.import('character', function () {
 					else if(event.player==player||!game.hasPlayer(function(current){
 						return current!=player&&current.maxHp>player.maxHp
 					})){
-						return '于当前回合的结束阶段获得牌堆顶的牌并展示牌堆底的牌，若展示的牌能被使用，你使用之';
+						return '于当前回合的结束阶段获得牌堆顶的牌并亮出牌堆底的牌，若展示的牌能被使用，你使用之';
 					}
 				},
 				content:function(){
@@ -9515,7 +9515,7 @@ game.import('character', function () {
 						audio:'wanwei',
 						charlotte:true,
 						trigger:{global:'phaseJieshuBegin'},
-						prompt2:'获得牌堆顶的牌并展示牌堆底的牌，若展示的牌能被使用，你使用之',
+						prompt2:'获得牌堆顶的牌并亮出牌堆底的牌，若展示的牌能被使用，你使用之',
 						content:function(){
 							'step 0'
 							var card=get.cards()[0];
@@ -16550,7 +16550,7 @@ game.import('character', function () {
 			tw_bianfuren:'TW卞夫人',
 			tw_bianfuren_prefix:'TW',
 			twwanwei:'挽危',
-			twwanwei_info:'每回合限一次。当一名体力值最小的角色受到伤害时：若该角色不为你，你可以防止此伤害，然后失去1点体力；若该角色为你，或你的体力上限最大，你可以于当前回合的结束阶段获得牌堆顶的牌并展示牌堆底的牌，若展示的牌能被使用，你使用之。',
+			twwanwei_info:'每回合限一次。当一名体力值最小的角色受到伤害时：若该角色不为你，你可以防止此伤害，然后失去1点体力；若该角色为你，或你的体力上限最大，你可以于当前回合的结束阶段获得牌堆顶的牌并亮出牌堆底的牌，若展示的牌能被使用，你使用之。',
 			twyuejian:'约俭',
 			twyuejian_info:'出牌阶段限一次。你可以将X张牌置于牌堆顶或牌堆底（X为你的手牌数减你的手牌上限且至少为1）。若你以此法失去的牌数：不小于3，你的体力上限+1；不小于2，你回复1点体力；不小于1，你的手牌上限+1。',
 			tw_chenzhen:'TW陈震',

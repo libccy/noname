@@ -589,7 +589,7 @@ game.import('character', function () {
 				logTarget:'player',
 				prompt2(event,player){
 					var num=player.countMark('dddyeshen');
-					var str='展示牌堆顶的'+get.cnNumber(3-num)+'张牌，然后其将其中的一张牌当作【铁索连环】使用或打出。';
+					var str='亮出牌堆底的'+get.cnNumber(3-num)+'张牌，然后其将其中的一张牌当作【铁索连环】使用或打出。';
 					if(num>=2) str+='然后你受到1点火属性伤害并重置此技能。';
 					return str;
 				},
