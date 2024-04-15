@@ -85,6 +85,11 @@ game.import('character', function () {
 		},
 		characterTitle:{
 		},
+		characterFilter:{
+			jsrg_jiangwei(mode){
+				return mode!=='guozhan';
+			},
+		},
 		perfectPair:{},
 		card:{
 			xumou_jsrg:{
@@ -371,7 +376,6 @@ game.import('character', function () {
 			},
 			//姜维
 			jsrgjinfa:{
-				forbid:['guozhan'],
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
@@ -4457,7 +4461,6 @@ game.import('character', function () {
 			},
 			//张郃
 			jsrgqiongtu:{
-				//forbid:['guozhan'],
 				audio:2,
 				enable:'chooseToUse',
 				groupSkill:true,
@@ -5315,7 +5318,6 @@ game.import('character', function () {
 			},
 			//张辽
 			jsrgzhengbing:{
-				//forbid:['guozhan'],
 				audio:2,
 				enable:'phaseUse',
 				usable:3,

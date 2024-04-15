@@ -28,6 +28,9 @@ game.import('character', function () {
 			ol_dongzhao:function(mode){
 				return mode=='identity'&&['normal','zhong'].includes(_status.mode);
 			},
+			ol_mengda(mode){
+				return mode!=='guozhan';
+			},
 		},
 		character:{
 			ol_liupi:['male','qun',4,['olyicheng']],
@@ -4865,7 +4868,6 @@ game.import('character', function () {
 			},
 			//OL孟达
 			olgoude:{
-				forbid:['guozhan'],
 				audio:2,
 				trigger:{
 					global:'phaseEnd',
