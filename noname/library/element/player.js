@@ -1608,7 +1608,7 @@ export class Player extends HTMLDivElement {
 		next.setContent(function () {
 			"step 0";
 			player.lose(cards, ui.special).set("getlx", false);
-			("step 1");
+			"step 1";
 			var cards = event.cards.slice(0);
 			cards.removeArray(player.getCards("hejsx"));
 			if (cards.length) target.directgains(cards, null, event.tag);
