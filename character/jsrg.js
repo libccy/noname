@@ -491,17 +491,17 @@ game.import("character", function () {
 				},
 			},
 			//姜维
-			jsrgjinfa:{
-				audio:2,
-				enable:'phaseUse',
-				usable:1,
-				filterCard:true,
-				position:'h',
-				discard:false,
-				lose:false,
-				delay:false,
-				check:function(){
-					return 1+Math.random();
+			jsrgjinfa: {
+				audio: 2,
+				enable: "phaseUse",
+				usable: 1,
+				filterCard: true,
+				position: "h",
+				discard: false,
+				lose: false,
+				delay: false,
+				check: function () {
+					return 1 + Math.random();
 				},
 				async content(event, trigger, player) {
 					await player.showCards(event.cards);
@@ -5481,15 +5481,15 @@ game.import("character", function () {
 				},
 			},
 			//张郃
-			jsrgqiongtu:{
-				audio:2,
-				enable:'chooseToUse',
-				groupSkill:true,
-				viewAs:{
-					name:'wuxie',
-					suit:'none',
-					number:null,
-					isCard:true,
+			jsrgqiongtu: {
+				audio: 2,
+				enable: "chooseToUse",
+				groupSkill: true,
+				viewAs: {
+					name: "wuxie",
+					suit: "none",
+					number: null,
+					isCard: true,
 				},
 				filter: function (event, player) {
 					if (!player.countCards("he", (card) => _status.connectMode || get.type(card) != "basic"))
@@ -6510,12 +6510,12 @@ game.import("character", function () {
 				},
 			},
 			//张辽
-			jsrgzhengbing:{
-				audio:2,
-				enable:'phaseUse',
-				usable:3,
-				filter:function(event,player){
-					return player.group=='qun';
+			jsrgzhengbing: {
+				audio: 2,
+				enable: "phaseUse",
+				usable: 3,
+				filter: function (event, player) {
+					return player.group == "qun";
 				},
 				filterCard: lib.filter.cardRecastable,
 				check: function (card) {

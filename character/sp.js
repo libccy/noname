@@ -6603,10 +6603,10 @@ game.import("character", function () {
 				},
 			},
 			//OL孟达
-			olgoude:{
-				audio:2,
-				trigger:{
-					global:'phaseEnd',
+			olgoude: {
+				audio: 2,
+				trigger: {
+					global: "phaseEnd",
 				},
 				filter: function (event, player) {
 					var list = [];
