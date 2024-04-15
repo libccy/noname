@@ -4,72 +4,64 @@ declare interface Array<T> {
      * @deprecated 已废弃，请使用includes
      */
     contains(item: T): boolean;
-    containsSome(...item: T): boolean;
-    containsAll(...item: T): boolean;
+    containsSome(...item: T[]): boolean;
+    containsAll(...item: T[]): boolean;
     /**
-     * 添加任意元素进数组中
+     * 将任意元素添加进数组中，若元素已经存在则不添加
      * @param args 
      * @returns 
-     * 1. 当添加成功时，返回此数组 
-     * 2. 添加失败(已有此元素)时返回false，若传入多个参数，且添加失败时，后面的元素不再进行添加操作
      */
-    add(...args: T[]): this | false;
+    add(...item: T[]): this;
     /**
-     * 添加一个数组的所有元素到该数组中(循环执行this.add)，此时参数arr中若有一个数组元素可能会出现bug
+     * 将一个数组的所有元素添加进数组中(循环执行this.add)，此时参数arr中若有一个数组元素可能会出现bug
      * @param arr 
      */
-    addArray(arr: T[]): this;
+    addArray(...arr: T[][]): this;
     /**
-     * 移除一个元素出该数组(该元素不能是数组)
+     * 将任意元素移出数组(该元素不能是数组)
      * @param item 
      * @returns 
-     * 1. 当移除成功时，返回此数组 
-     * 2. 移除失败(没有此元素)时返回false 
-     * 3. 传入参数为一个数组时，返回undefined
      */
-    remove(item: T): this | false;
-
-    remove(item: T[]): void;
+    remove(...item: T[]): this;
     /**
-     * 将一个数组的所有元素移除出该数组(循环执行this.remove)，此时参数arr中若有一个数组元素可能会出现bug
+     * 将一个数组的所有元素移出数组(循环执行this.remove)，此时参数arr中若有一个数组元素可能会出现bug
      * @param arr 
      */
-    removeArray(...arr: T[]): this;
+    removeArray(...arr: T[][]): this;
     /**
      * 随机获得该数组的一个元素
-     * @param args 设置需要排除掉的部分元素；
+     * @param excludes 需要排除的元素；
      */
-    randomGet(...args: T[]): T;
+    randomGet(...excludes: T[]): T;
     /**
-     * 随机移除数组的一个/多个元素
-     * @param num 若num为数字的情况下，则移除num个元素，否则移除一个
+     * 随机获取多个数组的元素，返回获取到的元素组成的数组
+     * @param num 获取的数量（默认为0）
+     */
+    randomGets(num?: number): T[];
+    /**
+     * 随机移除数组的一个元素，返回被移除的元素 （若数组无元素返回undefined）
+     */
+    randomRemove(): T | undefined;
+    /**
+     * 随机移除数组的多个元素，返回被移除元素组成的数组
+     * @param num 移除元素的个数
      * @returns 
-     * 1. 移除一个元素，只返回被移除的元素 
-     * 2. 移除多个元素，返回一个被移除元素组成的数组
-     * 3. 数组无元素返回undefined
      */
-    randomRemove(num?: number): T | T[];
-    randomRemove(num?: T): T | undefined;
+    randomRemove(num: number): T[];
     /**
-     * 随机重新排序数组（数组乱序）
+     * 将数组随机排序，改变原数组
      */
     randomSort(): this;
     /**
-     * 随机获取数组的元素
+     * 以目标玩家为起点，将数组按座位排序，改变原数组
      * 
-     * 返回的是一个重新整合的数组
-     * @param num 获取的数量, 不传参视为0
-     */
-    randomGets(num?: number): this;
-    /**
-     * 对所有玩家进行排序
+     * *只适用于玩家数组（使用lib.sort.seat方法）
      * 
-     * 其排序，使用的是lib.sort.seat方法，按座位排序
-     * @param target 目标玩家
+     * @param target 目标玩家（默认为一号位）
      */
-    sortBySeat(target?: Player): Player[];
+    sortBySeat(target?: Player): this;
     /**
-     * 将一个Array中所有位于处理区的卡牌过滤出来
+     * 将一个Array中所有位于处理区的卡牌过滤出来（只适用于卡牌数组）
      * 
      * 例：设一list为[c1,c2,c3,c4]，其中c1和c3是位于处理区的卡牌
      * 那么list.filterInD()得到的结果即为[c1,c3]
@@ -77,11 +69,11 @@ declare interface Array<T> {
      * 在1.9.97.8.1或更高的版本中: 
      * 可通过直接在括号中填写一个区域 来判断处于特定区域的卡牌 
      * 例：list.filterInD('h') 即判断数组中所有位于手牌区的卡牌
-     * @param poiston 指定的区域，默认是 'o'
+     * @param position 指定的区域，默认是 'o'
      */
-    filterInD(poiston?: "e" | "j" | "x" | "s" | "h" | "c" | "d" | "o"): Card[];
-    someInD(poiston?: "e" | "j" | "x" | "s" | "h" | "c" | "d" | "o"): boolean;
-    everyInD(poiston?: "e" | "j" | "x" | "s" | "h" | "c" | "d" | "o"): boolean;
+    filterInD(position?: "e" | "j" | "x" | "s" | "h" | "c" | "d" | "o"): this;
+    someInD(position?: "e" | "j" | "x" | "s" | "h" | "c" | "d" | "o"): boolean;
+    everyInD(position?: "e" | "j" | "x" | "s" | "h" | "c" | "d" | "o"): boolean;
 
     //关于处理区：
     /*
@@ -105,7 +97,13 @@ declare interface Array<T> {
      * 获取 item 在数组中出现的次数
      */
     numOf(item: T): number;
+    /**
+     * 将数组去重，改变原数组
+     */
     unique(): this;
+    /**
+     * 返回去重后的数组，不改变原数组
+     */
     toUniqued(): T[];
     maxBy(sortBy?: Function, filter?: typeof Array['prototype']['filter']): T;
     minBy(sortBy?: Function, filter?: typeof Array['prototype']['filter']): T;
