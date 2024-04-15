@@ -2984,9 +2984,6 @@ game.import("character", function () {
 						},
 					},
 				},
-				ai: {
-					combo: "nzry_zhenliang",
-				},
 			},
 			nzry_zhenliang: {
 				audio: "nzry_zhenliang_1",

@@ -896,6 +896,9 @@ game.import("character", function () {
 					await player.recover();
 					await player.addSkills("dczifu");
 				},
+				ai:{
+					combo:'dcjichou'
+				}
 			},
 			dczifu: {
 				audio: 2,

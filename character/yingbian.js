@@ -4313,7 +4313,10 @@ game.import("character", function () {
 					player.loseMaxHp();
 					player.addSkills("pozhu");
 				},
-				derivation: "pozhu",
+				derivation:'pozhu',
+				ai:{
+					combo:'sanchen'
+				}
 			},
 			pozhu: {
 				enable: "phaseUse",
