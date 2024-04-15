@@ -7597,14 +7597,15 @@ game.import("character", function () {
 				},
 			},
 			//孙尚香
-			sbjieyin: {
-				trigger: { player: "phaseUseBegin" },
-				forced: true,
-				locked: false,
-				dutySkill: true,
-				group: ["sbjieyin_init", "sbjieyin_fail"],
-				filter: function (event, player) {
-					return game.hasPlayer((current) => current.hasMark("sbjieyin_mark"));
+			sbjieyin:{
+				//forbid:['guozhan'],
+				trigger:{player:'phaseUseBegin'},
+				forced:true,
+				locked:false,
+				dutySkill:true,
+				group:['sbjieyin_init','sbjieyin_fail'],
+				filter:function(event,player){
+					return game.hasPlayer(current=>current.hasMark('sbjieyin_mark'));
 				},
 				content: function () {
 					"step 0";

@@ -19977,16 +19977,17 @@ game.import("character", function () {
 					},
 				},
 			},
-			renshe: {
-				audio: 2,
-				trigger: { player: "damageEnd" },
-				direct: true,
-				content: function () {
-					"step 0";
-					var choiceList = [
-						"将势力变更为场上现存的一个其他势力",
-						"令〖外使〗的发动次数+1直到下个出牌阶段结束",
-						"与另一名其他角色各摸一张牌",
+			renshe:{
+				forbid:['guozhan'],
+				audio:2,
+				trigger:{player:'damageEnd'},
+				direct:true,
+				content:function(){
+					'step 0'
+					var choiceList=[
+						'将势力变更为场上现存的一个其他势力',
+						'令〖外使〗的发动次数+1直到下个出牌阶段结束',
+						'与另一名其他角色各摸一张牌',
 					];
 					var controls = ["选项二"];
 					if (

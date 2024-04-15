@@ -226,11 +226,12 @@ game.import("character", function () {
 				},
 			},
 			//魏武帝
-			junkguixin: {
-				init: function () {
-					if (!_status.junkguixin) {
-						_status.junkguixin = [];
-						if (!_status.characterlist) {
+			junkguixin:{
+				forbid:['guozhan'],
+				init:function(){
+					if(!_status.junkguixin){
+						_status.junkguixin=[];
+						if(!_status.characterlist){
 							lib.skill.pingjian.initList();
 						}
 						for (const name of _status.characterlist) {
