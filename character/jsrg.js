@@ -371,6 +371,7 @@ game.import('character', function () {
 			},
 			//姜维
 			jsrgjinfa:{
+				forbid:['guozhan'],
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
@@ -4092,6 +4093,7 @@ game.import('character', function () {
 			},
 			//许攸
 			jsrglipan:{
+				forbid:['guozhan'],
 				audio:2,
 				trigger:{
 					player:'phaseEnd',
@@ -4328,6 +4330,7 @@ game.import('character', function () {
 			},
 			//吕布
 			jsrgwuchang:{
+				forbid:['guozhan'],
 				audio:2,
 				trigger:{
 					player:'gainAfter',
@@ -4454,6 +4457,7 @@ game.import('character', function () {
 			},
 			//张郃
 			jsrgqiongtu:{
+				//forbid:['guozhan'],
 				audio:2,
 				enable:'chooseToUse',
 				groupSkill:true,
@@ -5311,6 +5315,7 @@ game.import('character', function () {
 			},
 			//张辽
 			jsrgzhengbing:{
+				//forbid:['guozhan'],
 				audio:2,
 				enable:'phaseUse',
 				usable:3,

@@ -5995,6 +5995,7 @@ game.import('character', function () {
 			},
 			//孙尚香
 			sbjieyin:{
+				//forbid:['guozhan'],
 				trigger:{player:'phaseUseBegin'},
 				forced:true,
 				locked:false,

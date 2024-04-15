@@ -4865,6 +4865,7 @@ game.import('character', function () {
 			},
 			//OL孟达
 			olgoude:{
+				forbid:['guozhan'],
 				audio:2,
 				trigger:{
 					global:'phaseEnd',

@@ -15919,6 +15919,7 @@ game.import('character', function () {
 				}
 			},
 			renshe:{
+				forbid:['guozhan'],
 				audio:2,
 				trigger:{player:'damageEnd'},
 				direct:true,
