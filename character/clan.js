@@ -1468,6 +1468,9 @@ game.import('character',function(){
 					delete player.getStat().skill.clanguangu;
 					game.log(player,'重置了','#g【观骨】');
 				},
+				ai:{
+					combo:'clanguangu'
+				},
 				mod:{
 					aiOrder(player,card,num){
 						if(!player.hasSkill('clanguangu')||!player.getStat().skill.clanguangu) return;
@@ -2250,6 +2253,9 @@ game.import('character',function(){
 				},
 				content(){
 					player.recover();
+				},
+				ai:{
+					combo:'clansankuang'
 				}
 			},
 			//族荀淑

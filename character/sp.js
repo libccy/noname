@@ -18186,6 +18186,9 @@ game.import('character', function () {
 					if(num>0) player.gainMaxHp(num);
 					else player.loseMaxHp(-num);
 					player.recover();
+				},
+				ai:{
+					combo:'fanghun'
 				}
 			},
 			refuhan:{
@@ -19425,6 +19428,9 @@ game.import('character', function () {
 					if(cards.length) player.gain(cards,'gain2');
 				},
 				group:'rejici2',
+				ai:{
+					combo:'regushe'
+				}
 			},
 			rejici2:{
 				audio:'jici',
@@ -22148,6 +22154,9 @@ game.import('character', function () {
 				unique:true,
 				zhuSkill:true,
 				locked:true,
+				ai:{
+					combo:'canshi'
+				}
 			},
 			canshi:{
 				audio:2,
@@ -22208,6 +22217,7 @@ game.import('character', function () {
 					trigger.num++;
 				},
 				ai:{
+					neg:true,
 					effect:{
 						target:function(card,player,target,current){
 							if(get.tag(card,'damage')&&target.countCards('h')==0) return [1,-2];
@@ -22279,6 +22289,7 @@ game.import('character', function () {
 					trigger.num++;
 				},
 				ai:{
+					neg:true,
 					effect:{
 						target:function(card,player,target,current){
 							if(card.name=='sha'&&target.countCards('h')==0) return [1,-2];
@@ -26240,7 +26251,7 @@ game.import('character', function () {
 				},
 				ai:{
 					threaten:1.4,
-					combo:'xinfu_dianhua'
+					combo:'xinfu_zhenyi'
 				},
 			},
 			"xinfu_dianhua":{
@@ -26319,6 +26330,7 @@ game.import('character', function () {
 					game.delayx();
 				},
 				ai:{
+					combo:'xinfu_falu',
 					threaten:2.2
 				},
 			},
@@ -26355,9 +26367,6 @@ game.import('character', function () {
 						player.gain(event.togain,'gain2');
 					}
 				},
-				ai:{
-					combo:'xinfu_dianhua'
-				}
 			},
 			"zhenyi_spade":{
 				trigger:{

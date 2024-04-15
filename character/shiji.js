@@ -3040,7 +3040,7 @@ game.import('character', function () {
 					}
 				},
 				ai:{
-					combo:'xinmingshi',
+					combo:'xinlirang',
 					effect:{
 						target:function(card,player,target){
 							if(get.tag(card,'damage')&&target.hasMark('xinlirang')){
@@ -4498,6 +4498,9 @@ game.import('character', function () {
 						if(card) target.gain(card,'gain2');
 					}
 				},
+				ai:{
+					combo:'mjdingyi'
+				}
 			},
 			mjfubi:{
 				audio:'fubi',
@@ -4569,6 +4572,7 @@ game.import('character', function () {
 							return 2;
 						},
 					},
+					combo:'mjdingyi'
 				},
 				subSkill:{
 					round:{},

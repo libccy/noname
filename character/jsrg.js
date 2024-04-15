@@ -5906,6 +5906,9 @@ game.import('character', function () {
 						}
 					},
 				},
+				ai:{
+					combo:'sbyingmen'
+				}
 			},
 			jsrgchaozheng:{
 				audio:2,

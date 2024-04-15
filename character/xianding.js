@@ -596,7 +596,7 @@ game.import('character', function () {
 										await game.asyncDelayx();
 									}
 								}
-								if (target.countCards('h') <= game.countPlayer()) return;
+								if (target.countCards('h') < game.countPlayer()) return;
 								player.when({global: 'wuguRemained'}).filter(evt => {
 									return evt.getParent(3) === event;
 								}).vars({originalOwner: target}).then(() => {
@@ -1655,6 +1655,9 @@ game.import('character', function () {
 						},
 					},
 				},
+				ai:{
+					combo:'dczhifou'
+				}
 			},
 			dczhifou:{
 				audio:2,
@@ -1781,6 +1784,9 @@ game.import('character', function () {
 					'1':{charlotte:true},
 					'2':{charlotte:true},
 				},
+				ai:{
+					combo:'dclingxi'
+				}
 			},
 			//周瑜
 			//无 双 万 军 取 首
@@ -2823,6 +2829,7 @@ game.import('character', function () {
 					player.addTempSkill('dczhangcai_all',{player:'phaseBegin'});
 				},
 				ai:{
+					combo:'dczhangcai',
 					order:15,
 					result:{
 						player:function(player){
@@ -6102,6 +6109,9 @@ game.import('character', function () {
 					});
 					if(card) player.addToExpansion(card,'gain2').gaintag.add('dcwangyuan');
 				},
+				ai:{
+					combo:'dclingyin'
+				},
 				marktext:'妄',
 				intro:{
 					name:'妄(妄缘/铃音)',
@@ -7665,6 +7675,9 @@ game.import('character', function () {
 				content:function(){
 					player.addMark('dclingfang',1);
 				},
+				ai:{
+					combo:'dcfengying'
+				},
 				marktext:'绞',
 				intro:{
 					name:'绞',
@@ -7760,6 +7773,7 @@ game.import('character', function () {
 						}
 					},
 					threaten:2,
+					combo:'dclingfang'
 				},
 				subSkill:{
 					record:{
@@ -7805,6 +7819,9 @@ game.import('character', function () {
 					var card=get.discardPile(card=>get.color(card,false)=='black');
 					if(card) player.gain(card,'gain2');
 					player.loseHp();
+				},
+				ai:{
+					combo:'dclingfang'
 				}
 			},
 			//袁姬
@@ -8265,6 +8282,9 @@ game.import('character', function () {
 					else player.marks[name]=player.mark(name,info);
 					player.updateMarks();
 				},
+				ai:{
+					combo:'dcmengjie'
+				},
 				subSkill:{
 					forceFinish:{charlotte:true},
 					wuyong:{
@@ -8487,6 +8507,9 @@ game.import('character', function () {
 					}
 					game.delayx();
 					event.goto(1);
+				},
+				ai:{
+					combo:'dctongguan'
 				}
 			},
 			//刘晔
@@ -9285,7 +9308,7 @@ game.import('character', function () {
 				trigger:{player:'phaseZhunbeiBegin'},
 				forced:true,
 				filter:function(event,player){
-					if(!player.hasSkill('dcligong')) return false;
+					if(!player.hasSkill('dchuishu')) return false;
 					var list=lib.skill.dchuishu.getList(player);
 					for(var i of list){
 						if(i>=5) return true;
@@ -9434,6 +9457,9 @@ game.import('character', function () {
 						player.draw(3);
 					}
 				},
+				ai:{
+					combo:'dchuishu'
+				}
 			},
 			//杜夔
 			dcfanyin:{
@@ -9692,6 +9718,9 @@ game.import('character', function () {
 						lib.skill.dcwanglu.broadcast(player);
 					}
 				},
+				ai:{
+					combo:'dcwanglu'
+				}
 			},
 			dcchaixie:{
 				audio:2,
@@ -9725,6 +9754,9 @@ game.import('character', function () {
 					}
 					player.draw(num);
 				},
+				ai:{
+					combo:'dcwanglu'
+				}
 			},
 			dagongche_skill:{
 				trigger:{player:'phaseUseBegin'},
@@ -11543,6 +11575,7 @@ game.import('character', function () {
 							})) return [1,1];
 						},
 					},
+					combo:'xinzhoufu'
 				},
 			},
 			//孙翊

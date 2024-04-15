@@ -2946,6 +2946,9 @@ game.import('character', function () {
 						},
 					},
 				},
+				ai:{
+					combo:'yichong'
+				}
 			},
 			//张嶷
 			xinwurong:{
@@ -4902,6 +4905,7 @@ game.import('character', function () {
 						player:1
 					},
 					threaten:1.4,
+					combo:'spdaming'
 				},
 				subSkill:{
 					backup:{},
@@ -15400,6 +15404,9 @@ game.import('character', function () {
 					player.storage.yizan=true;
 				},
 				derivation:'yizan_rewrite',
+				ai:{
+					combo:'yizan_use'
+				}
 			},
 			xinfu_jingxie:{
 				audio:2,

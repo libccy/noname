@@ -2528,6 +2528,9 @@ game.import('character', function () {
 						},
 					},
 				},
+				ai:{
+					combo:'dcjinjian'
+				}
 			},
 			//赵俨
 			dcfuning:{
@@ -4588,6 +4591,9 @@ game.import('character', function () {
 					'step 2'
 					game.delayx();
 				},
+				ai:{
+					combo:'jinghe'
+				}
 			},
 			nhyinbing:{
 				trigger:{source:'damageBefore'},
@@ -8397,6 +8403,7 @@ game.import('character', function () {
 							}
 						}
 					},
+					combo:'liangying'
 				},
 			},
 			sushou:{
@@ -8487,6 +8494,9 @@ game.import('character', function () {
 					'step 1'
 					game.delay();
 				},
+				ai:{
+					combo:'cangchu'
+				}
 			},
 			liehou:{
 				enable:'phaseUse',
@@ -10082,6 +10092,7 @@ game.import('character', function () {
 					}
 				},
 				ai:{
+					combo:'xinfu_lveming',
 					order:function(){
 						var player=_status.event.player,num=0;
 						for(var i=1;i<6;i++){

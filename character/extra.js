@@ -1829,6 +1829,9 @@ game.import('character', function () {
 						},
 					},
 				},
+				ai:{
+					combo:'dcxianjin'
+				}
 			},
 			dcxianjin:{
 				init(player){
@@ -1886,6 +1889,9 @@ game.import('character', function () {
 						},
 					},
 				},
+				ai:{
+					combo:'dctuoyu'
+				}
 			},
 			dcqijing:{
 				derivation:'dccuixin',
@@ -1937,6 +1943,9 @@ game.import('character', function () {
 					'step 3'
 					player.insertPhase();
 				},
+				ai:{
+					combo:'dctuoyu'
+				}
 			},
 			dccuixin:{
 				audio:2,
@@ -3913,6 +3922,7 @@ game.import('character', function () {
 					skillTagFilter(player,tag,arg){
 						return arg&&arg.target&&arg.target.hasMark('yingba_mark')
 					},
+					combo:'yingba'
 				},
 				subSkill:{
 					usea:{
@@ -3959,6 +3969,7 @@ game.import('character', function () {
 					},
 				},
 				ai:{
+					combo:'yingba',
 					effect:{
 						target(card,player,target){
 							if(get.tag(card,'recover')&&_status.event.type=='phase'&&!player.needsToDiscard()) return 0.2;
@@ -5385,6 +5396,9 @@ game.import('character', function () {
 					player.loseMaxHp();
 					player.gain(player.getExpansions('chuyuan'),'gain2','fromStorage');
 				},
+				ai:{
+					combo:'chuyuan'
+				}
 			},
 			tianxing:{
 				audio:2,
@@ -5414,6 +5428,9 @@ game.import('character', function () {
 					'step 2'
 					player.addSkills(result.control);
 				},
+				ai:{
+					combo:'chuyuan'
+				}
 			},
 			olzhiti:{
 				audio:'drlt_zhiti',
