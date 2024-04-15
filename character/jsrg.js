@@ -160,29 +160,30 @@ game.import("character", function () {
 			jsrg_zhugeliang:
 				"建兴六年春，汉丞相诸葛亮使赵云、邓芝为先锋，马谡为副将拒箕谷，牵制曹真主力。自率三十万大军攻祁山，三郡叛魏应亮，关中响震。曹叡命张郃拒亮，亮使定军山降将姜维与郃战于街亭，张郃久攻不下。后曹真强攻赵云军，赵云死战，坚守箕谷，马谡、邓芝当场战死忠勇殉国。……既克张郃，曹真溃逃，曹叡弃守长安，迁都邺城。十月，司马懿击退孙权，回援曹真。而后三年，丞相所到之处，无不望风而降，皆箪食壶浆，以迎汉军。尽收豫、徐、兖、并之地，建兴十年春，司马懿父子三人死于诸葛武侯火计，同年，孙权上表称臣，至此四海清平，大汉一统。而后诸葛亮荐蒋琬为丞相，姜维为大将军，自回隆中归隐，后主挽留再三，皆不受。魏延亦辞官相随，侍奉左右。后主时有不决之事，便往隆中拜访相父，均未得面，童子答曰外出云游，遗数锦囊，拆而视之，皆治国之良策也。",
 		},
-		characterTitle: {},
-		perfectPair: {},
-		card: {
-			xumou_jsrg: {
-				type: "special_delay",
-				allowDuplicate: true,
-				blankCard: true,
-				fullimage: true,
-				wuxieable: false,
-				effect: function () {
-					"step 0";
-					var card = get.autoViewAs(event.cards[0]);
-					card.storage.xumou_jsrg = true;
-					player.chooseUseTarget(
-						card,
-						event.cards,
-						`蓄谋:是否使用${get.translation(card)}？`,
-						`请选择要使用的目标。若不使用此牌，则判定区内的所有“蓄谋”牌都将被置入弃牌堆。`
-					);
-					"step 1";
-					if (!result.bool) {
-						var cards = player.getCards("j", (card) => {
-							return (card.viewAs || card.name) == "xumou_jsrg";
+		characterTitle:{
+		},
+		characterFilter:{
+			jsrg_jiangwei(mode){
+				return mode!=='guozhan';
+			},
+		},
+		perfectPair:{},
+		card:{
+			xumou_jsrg:{
+				type:'special_delay',
+				allowDuplicate:true,
+				blankCard:true,
+				fullimage:true,
+				wuxieable:false,
+				effect:function(){
+					'step 0'
+					var card=get.autoViewAs(event.cards[0]);
+					card.storage.xumou_jsrg=true;
+					player.chooseUseTarget(card,event.cards,`蓄谋:是否使用${get.translation(card)}？`,`请选择要使用的目标。若不使用此牌，则判定区内的所有“蓄谋”牌都将被置入弃牌堆。`);
+					'step 1'
+					if(!result.bool){
+						var cards=player.getCards('j',card=>{
+							return (card.viewAs||card.name)=='xumou_jsrg';
 						});
 						if (cards.length > 0) player.loseToDiscardpile(cards);
 					} else {
@@ -487,7 +488,6 @@ game.import("character", function () {
 			},
 			//姜维
 			jsrgjinfa:{
-				forbid:['guozhan'],
 				audio:2,
 				enable:'phaseUse',
 				usable:1,
@@ -5478,7 +5478,6 @@ game.import("character", function () {
 			},
 			//张郃
 			jsrgqiongtu:{
-				//forbid:['guozhan'],
 				audio:2,
 				enable:'chooseToUse',
 				groupSkill:true,
@@ -6508,7 +6507,6 @@ game.import("character", function () {
 			},
 			//张辽
 			jsrgzhengbing:{
-				//forbid:['guozhan'],
 				audio:2,
 				enable:'phaseUse',
 				usable:3,

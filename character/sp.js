@@ -180,6 +180,9 @@ game.import("character", function () {
 			ol_dongzhao: function (mode) {
 				return mode == "identity" && ["normal", "zhong"].includes(_status.mode);
 			},
+			ol_mengda(mode){
+				return mode!=='guozhan';
+			},
 		},
 		character: {
 			ol_liupi: ["male", "qun", 4, ["olyicheng"]],
