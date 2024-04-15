@@ -202,14 +202,14 @@ export const Content = {
 			game.delay();
 			event.nojudge = true;
 		}
-		$!;
+		"step 1";
 		if (event.cancelled || event.nojudge) return;
 		var next = player.judge(card),
 			judge = event.judge;
 		if (typeof judge == "function") next.judge = judge;
 		var judge2 = event.judge2;
 		if (typeof judge2 == "function") next.judge2 = judge2;
-		$!;
+		"step 2";
 		if (event.excluded) delete event.excluded;
 		else {
 			var cardName = event.cardName;
@@ -261,7 +261,7 @@ export const Content = {
 	gift: () => {
 		"step 0";
 		event.num = 0;
-		$!;
+		"step 1";
 		if (num < cards.length) {
 			event.card = cards[num];
 			event.trigger("gift");
@@ -269,7 +269,7 @@ export const Content = {
 			game.delayx();
 			event.finish();
 		}
-		$!;
+		"step 2";
 		if (event.deniedGifts.includes(card)) {
 			game.log(target, "拒绝了", player, "赠予的", card);
 			event.trigger("giftDeny");
@@ -284,7 +284,7 @@ export const Content = {
 		if (get.type(card, false) == "equip") target.equip(card).log = false;
 		else target.gain(card, player).visible = true;
 		event.trigger("giftAccepted");
-		$!;
+		"step 3";
 		event.num++;
 		event.goto(1);
 	},
@@ -298,9 +298,9 @@ export const Content = {
 		event.recastingLose(player, cards);
 		event.trigger("recastingLost");
 		event.recastingLosingEvents.push(...event.next.filter((value) => value.name != "arrangeTrigger"));
-		$!;
+		"step 1";
 		event.trigger("recast");
-		$!;
+		"step 2";
 		if (typeof event.recastingGain != "function") return;
 		event.trigger("recastingGain");
 		event.recastingGain(player, cards);
@@ -323,7 +323,7 @@ export const Content = {
 		}
 		event.slotsx.sort();
 		if (!event.slots.length) event.finish();
-		$!;
+		"step 1";
 		var slot = event.slotsx[event.num];
 		var slot_key = slot;
 		var left = player.countEnabledSlot(slot),
@@ -385,9 +385,9 @@ export const Content = {
 				} else event.goto(3);
 			} else event.goto(3);
 		}
-		$!;
+		"step 2";
 		if (result.bool) event.cards.addArray(result.links);
-		$!;
+		"step 3";
 		event.num++;
 		if (event.num < event.slotsx.length) event.goto(1);
 		else {
@@ -470,7 +470,7 @@ export const Content = {
 				event.slotsx.sort();
 			}
 		} else event.goto(4);
-		$!;
+		"step 1";
 		var slot = event.slotsx[event.num];
 		var left = player.countEquipableSlot(slot),
 			lose;
@@ -519,12 +519,12 @@ export const Content = {
 				} else event.goto(3);
 			} else event.goto(3);
 		}
-		$!;
+		"step 2";
 		if (result.bool) event.cards.addArray(result.links);
-		$!;
+		"step 3";
 		event.num++;
 		if (event.num < event.slotsx.length) event.goto(1);
-		$!;
+		"step 4";
 		event.result = cards;
 	},
 	//装备牌
@@ -535,7 +535,7 @@ export const Content = {
 			event.owner = owner;
 			owner.lose(card, ui.special, "visible").set("type", "equip").set("getlx", false);
 		} else if (get.position(card) == "c") event.updatePile = true;
-		$!;
+		"step 1";
 		if (event.cancelled) {
 			event.finish();
 			return;
@@ -554,7 +554,7 @@ export const Content = {
 			game.delay(0, 300);
 			player.$draw(card);
 		}
-		$!;
+		"step 2";
 		if (card.clone) {
 			game.broadcast(
 				function (card, player) {
@@ -569,13 +569,13 @@ export const Content = {
 			game.addVideo("gain2", player, get.cardsInfo([card.clone]));
 		}
 		player.equiping = true;
-		$!;
+		"step 3";
 		var info = get.info(card, false);
 		var next = game.createEvent("replaceEquip");
 		next.player = player;
 		next.card = card;
 		next.setContent(info.replaceEquip || "replaceEquip");
-		$!;
+		"step 4";
 		var info = get.info(card, false);
 		if (get.itemtype(result) == "cards") {
 			player.lose(result, "visible").set("type", "equip").set("getlx", false).swapEquip = true;
@@ -584,7 +584,7 @@ export const Content = {
 			}
 			event.swapped = true;
 		}
-		$!;
+		"step 5";
 		if (get.itemtype(result) == "cards") {
 			for (let card of result) {
 				if (card.willBeDestroyed("discardPile", player, event)) {
@@ -592,7 +592,7 @@ export const Content = {
 				}
 			}
 		}
-		$!;
+		"step 6";
 		//if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
 		if (player.isMin() || !player.canEquip(card)) {
 			event.finish();
@@ -611,7 +611,7 @@ export const Content = {
 		game.addVideo("equip", player, get.cardInfo(card));
 		if (event.log != false) game.log(player, "装备了", card);
 		if (event.updatePile) game.updateRoundNumber();
-		$!;
+		"step 7";
 		var info = get.info(card, false);
 		if (info.onEquip && (!info.filterEquip || info.filterEquip(card, player))) {
 			if (Array.isArray(info.onEquip)) {
@@ -683,7 +683,7 @@ export const Content = {
 				);
 			next._args.remove("glow_result");
 		}
-		$!;
+		"step 1";
 		var red = [],
 			black = [];
 		event.videoId = lib.status.videoId++;
@@ -696,7 +696,7 @@ export const Content = {
 		event.red = red;
 		event.black = black;
 		event.trigger("debateShowOpinion");
-		$!;
+		"step 2";
 		var red = event.red,
 			black = event.black;
 		if (red.length) {
@@ -765,7 +765,7 @@ export const Content = {
 			black
 		);
 		game.delay(4);
-		$!;
+		"step 3";
 		game.broadcastAll("closeDialog", event.videoId);
 		var opinion = null;
 		if (event.red.length > event.black.length) opinion = "red";
@@ -784,7 +784,7 @@ export const Content = {
 			black: event.black,
 			targets: event.targets,
 		};
-		$!;
+		"step 4";
 		if (event.callback) {
 			var next = game.createEvent("debateCallback", false);
 			next.player = player;
@@ -808,7 +808,7 @@ export const Content = {
 					return Math.random();
 				}
 		);
-		$!;
+		"step 1";
 		if (result.bool) {
 			player.cooperationWith(target, result.links[0][2].slice(12), event.reason);
 		}
@@ -844,7 +844,7 @@ export const Content = {
 			event.videoId,
 			event.beatmap
 		);
-		$!;
+		"step 1";
 		var beatmap = event.beatmap;
 		if (event.isMine()) {
 			var timeleap = beatmap.timeleap.slice(0);
@@ -1166,7 +1166,7 @@ export const Content = {
 				);
 			}
 		}
-		$!;
+		"step 2";
 		game.broadcastAll(
 			function (id, time) {
 				if (_status.connectMode) lib.configOL.choose_timeout = time;
@@ -1328,7 +1328,7 @@ export const Content = {
 		} else {
 			event.result = "ai";
 		}
-		$!;
+		"step 1";
 		if (event.time)
 			game.broadcastAll(function (time) {
 				lib.configOL.choose_timeout = time;
@@ -1348,7 +1348,7 @@ export const Content = {
 	showCharacter: function () {
 		"step 0";
 		event.trigger("showCharacterEnd");
-		$!;
+		"step 1";
 		event.trigger("showCharacterAfter");
 		if (get.mode() == "identity" && player.isZhu) event.trigger("zhuUpdate");
 	},
@@ -1467,7 +1467,7 @@ export const Content = {
 			if (event.prompt2) next.set("prompt2", event.prompt2);
 			if (event.hsskill) next.setHiddenSkill(event.hsskill);
 		}
-		$!;
+		"step 1";
 		if (result.bool) {
 			event.result = {
 				bool: true,
@@ -1556,7 +1556,7 @@ export const Content = {
 					};
 				});
 		}
-		$!;
+		"step 1";
 		if (_status.connectMode) {
 			event.mes = result[player.playerid].links[0][2];
 			event.tes = result[target.playerid].links[0][2];
@@ -1576,7 +1576,7 @@ export const Content = {
 				true
 			).ai = event.ai;
 		}
-		$!;
+		"step 2";
 		event.mes = result.links[0][2];
 		target.chooseButton(
 			[
@@ -1591,9 +1591,9 @@ export const Content = {
 			],
 			true
 		).ai = event.ai;
-		$!;
+		"step 3";
 		event.tes = result.links[0][2];
-		$!;
+		"step 4";
 		game.broadcast(function () {
 			ui.arena.classList.add("thrownhighlight");
 		});
@@ -1603,7 +1603,7 @@ export const Content = {
 		game.log(target, "选择的策略为", "#g" + get.translation(event.tes));
 		game.log(player, "选择的策略为", "#g" + get.translation(event.mes));
 		game.delay(0, 1500);
-		$!;
+		"step 5";
 		var mes = event.mes.slice(6);
 		var tes = event.tes.slice(6);
 		var str;
@@ -1634,7 +1634,7 @@ export const Content = {
 			player
 		);
 		game.delay(2);
-		$!;
+		"step 6";
 		game.broadcastAll(function () {
 			ui.arena.classList.remove("thrownhighlight");
 		});
@@ -1697,7 +1697,7 @@ export const Content = {
 					};
 				});
 		}
-		$!;
+		"step 1";
 		if (_status.connectMode) {
 			event.mes = result[player.playerid].links[0][2];
 			event.tes = result[target.playerid].links[0][2];
@@ -1720,7 +1720,7 @@ export const Content = {
 				return 1 + Math.random();
 			};
 		}
-		$!;
+		"step 2";
 		event.mes = result.links[0][2];
 		target.chooseButton(
 			[
@@ -1738,9 +1738,9 @@ export const Content = {
 		).ai = function () {
 			return 1 + Math.random();
 		};
-		$!;
+		"step 3";
 		event.tes = result.links[0][2];
-		$!;
+		"step 4";
 		game.broadcast(function () {
 			ui.arena.classList.add("thrownhighlight");
 		});
@@ -1750,7 +1750,7 @@ export const Content = {
 		game.log(player, "选择的手势为", "#g" + get.translation(event.mes));
 		game.log(target, "选择的手势为", "#g" + get.translation(event.tes));
 		game.delay(0, 1500);
-		$!;
+		"step 5";
 		var mes = event.mes.slice(4);
 		var tes = event.tes.slice(4);
 		var str;
@@ -1783,7 +1783,7 @@ export const Content = {
 			}, 1000);
 		}, str);
 		game.delay(2);
-		$!;
+		"step 6";
 		game.broadcastAll(function () {
 			ui.arena.classList.remove("thrownhighlight");
 		});
@@ -1894,7 +1894,7 @@ export const Content = {
 				return event.ai;
 			};
 		}
-		$!;
+		"step 1";
 		event.result = { control: result.control };
 		player.enableEquip(result.control);
 	},
@@ -1928,7 +1928,7 @@ export const Content = {
 				return event.ai;
 			};
 		}
-		$!;
+		"step 1";
 		event.result = { control: result.control };
 		if (result.control == "equip3_4") {
 			player.disableEquip(3, 4);
@@ -1944,7 +1944,7 @@ export const Content = {
 			cards1: event.cards[0],
 			cards2: event.cards[1],
 		}).setContent("swapHandcardsx");
-		$!;
+		"step 1";
 		for (var i = 0; i < event.cards[1].length; i++) {
 			if (get.position(event.cards[1][i], true) == "o") player.equip(event.cards[1][i]);
 		}
@@ -1959,7 +1959,7 @@ export const Content = {
 		if (js.length) player.discard(js);
 		player.storage._disableJudge = true;
 		//player.markSkill('_disableJudge');
-		$!;
+		"step 1";
 		game.broadcastAll(function (player, card) {
 			player.$disableJudge();
 		}, player);
@@ -2046,7 +2046,7 @@ export const Content = {
 			game.addVideo("destroyLand");
 			ui.land.destroy();
 		}
-		$!;
+		"step 1";
 		event.trigger("phaseBeginStart");
 	},
 	toggleSubPlayer: function () {
@@ -2069,7 +2069,7 @@ export const Content = {
 				event.finish();
 			}
 		}
-		$!;
+		"step 1";
 		if (!event.directresult) {
 			if (result && result.bool && result.links[0]) {
 				event.directresult = result.links[0];
@@ -2127,13 +2127,13 @@ export const Content = {
 			}
 			player.addSkill(player.storage.subplayer.skills);
 		}
-		$!;
+		"step 1";
 		if (player.storage.subplayer) {
 			player.directgain(player.storage.subplayer.hs);
 			player.directequip(player.storage.subplayer.es);
 		}
 		player.removeSkill("subplayer");
-		$!;
+		"step 2";
 		if (event.remove) {
 			event.trigger("subPlayerDie");
 		}
@@ -2157,7 +2157,7 @@ export const Content = {
 				event.finish();
 			}
 		}
-		$!;
+		"step 1";
 		if (!event.directresult) {
 			if (result && result.bool && result.links[0]) {
 				event.directresult = result.links[0];
@@ -2188,13 +2188,13 @@ export const Content = {
 			if (cfg.hs.length) player.directgain(cfg.hs);
 			if (cfg.es.length) player.directequip(cfg.es);
 		}
-		$!;
+		"step 2";
 		game.delay();
 	},
 	addExtraTarget: function () {
 		"step 0";
 		event.num = 0;
-		$!;
+		"step 1";
 		var target = targets[num],
 			info = get.info(card);
 		if (target == event.target && event.addedTarget) {
@@ -2221,7 +2221,7 @@ export const Content = {
 			event.addedTargets[num] = false;
 			event._result = { bool: false };
 		}
-		$!;
+		"step 2";
 		if (result.bool) {
 			event.addedTargets[num] = result.targets[0];
 			player.line2([targets[num], result.targets[0]]);
@@ -2232,7 +2232,7 @@ export const Content = {
 	reverseOrder: function () {
 		"step 0";
 		game.delay();
-		$!;
+		"step 1";
 		var choice;
 		if (get.tag(card, "multineg")) {
 			choice = player.previous.side == player.side ? "逆时针" : "顺时针";
@@ -2246,7 +2246,7 @@ export const Content = {
 			.set("prompt", "选择" + get.translation(card) + "的结算方向")
 			.set("choice", choice)
 			.set("forceDie", true);
-		$!;
+		"step 2";
 		if (result && result.control == "顺时针") {
 			var evt = event.getParent(),
 				sorter = _status.currentPhase || player;
@@ -2301,7 +2301,7 @@ export const Content = {
 		) {
 			event.changeCard = "disabled";
 		}
-		$!;
+		"step 1";
 		if (event.changeCard != "disabled" && !_status.auto) {
 			event.dialog = ui.create.dialog("是否使用手气卡？");
 			ui.create.confirm("oc");
@@ -2312,7 +2312,7 @@ export const Content = {
 		} else {
 			event.finish();
 		}
-		$!;
+		"step 2";
 		if (event.changeCard == "once") {
 			event.changeCard = "disabled";
 		} else if (event.changeCard == "twice") {
@@ -2327,7 +2327,7 @@ export const Content = {
 			game.resume();
 		};
 		game.pause();
-		$!;
+		"step 3";
 		_status.imchoosing = false;
 		if (event.bool) {
 			if (game.changeCoin) {
@@ -2356,12 +2356,12 @@ export const Content = {
 			current = current.next;
 			num++;
 		}
-		$!;
+		"step 1";
 		for (var i = 0; i < lib.onphase.length; i++) {
 			lib.onphase[i]();
 		}
 		player.phase();
-		$!;
+		"step 2";
 		if (!game.players.includes(event.player.next)) {
 			event.player = game.findNext(event.player.next);
 		} else {
@@ -2379,7 +2379,7 @@ export const Content = {
 		} else {
 			event.finish();
 		}
-		$!;
+		"step 1";
 		if (!lib.config.dev) delete window.game;
 		var character = lib.imported.character;
 		var card = lib.imported.card;
@@ -2480,7 +2480,7 @@ export const Content = {
 		window.game = game;
 		lib.init.js(lib.assetURL + "mode", event.mode, game.resume);
 		game.pause();
-		$!;
+		"step 1";
 		if (!lib.config.dev) delete window.game;
 		event.result = lib.imported.mode[event.mode];
 		delete lib.imported.mode[event.mode];
@@ -2493,7 +2493,7 @@ export const Content = {
 		while (ui.dialogs.length) {
 			ui.dialogs[0].close();
 		}
-		$!;
+		"step 1";
 		if (event.bool != "noover") {
 			game.over(event.bool);
 		}
@@ -2595,7 +2595,7 @@ export const Content = {
 			})
 		)
 			event.finish();
-		$!;
+		"step 1";
 		if (event.cancelled) return event.finish();
 		var info = get.info(event.skill);
 		if (event.revealed || info.forced) {
@@ -2671,7 +2671,7 @@ export const Content = {
 				else next.set("prompt2", trigger.skillwarn);
 			}
 		}
-		$!;
+		"step 2";
 		var info = get.info(event.skill);
 		if (result && result.control) result.bool = !result.control.includes("cancel");
 		if (!result || !result.bool) return;
@@ -2681,7 +2681,7 @@ export const Content = {
 			if (typeof autodelay == "number") game.delayx(autodelay);
 			else game.delayx();
 		}
-		$!;
+		"step 3";
 		var info = get.info(event.skill);
 		if (!result || !result.bool) {
 			if (info.oncancel) info.oncancel(trigger, player);
@@ -2732,7 +2732,7 @@ export const Content = {
 		//语法糖部分
 		if ("cost_data" in result) next.cost_data = result.cost_data;
 		next.indexedData = event.indexedData;
-		$!;
+		"step 4";
 		if (!player._hookTrigger) return;
 		if (
 			player._hookTrigger.some((i) => {
@@ -2745,7 +2745,7 @@ export const Content = {
 	playVideoContent: function () {
 		"step 0";
 		game.delay(0, 500);
-		$!;
+		"step 1";
 		if (!game.chess) {
 			ui.control.innerHTML = "";
 			var nodes = [];
@@ -2826,7 +2826,7 @@ export const Content = {
 			game.playerMap = {};
 		}
 		game.finishCards();
-		$!;
+		"step 2";
 		if (event.video.length) {
 			var content = event.video.shift();
 			// console.log(content);
@@ -2904,7 +2904,7 @@ export const Content = {
 			document.querySelector("#server_status").innerHTML = "等待中";
 		}
 		game.pause();
-		$!;
+		"step 1";
 		_status.waitingForPlayer = false;
 		lib.configOL.gameStarted = true;
 		if (window.isNonameServer) {
@@ -2940,7 +2940,7 @@ export const Content = {
 		} else {
 			event.finish();
 		}
-		$!;
+		"step 1";
 		if (result && result.bool) {
 			var hs = game.me.getCards("h");
 			for (var i = 0; i < hs.length; i++) {
@@ -2986,11 +2986,11 @@ export const Content = {
 				game.me.wait(sendback);
 			}
 		}
-		$!;
+		"step 1";
 		if (event.withme) {
 			game.me.unwait(result);
 		}
-		$!;
+		"step 2";
 		if (event.withol && !event.resultOL) {
 			game.pause();
 		}
@@ -3003,7 +3003,7 @@ export const Content = {
 		//规则集中的“回合开始后③（处理“游戏开始时”的时机）”
 		//提前phaseBefore时机解决“游戏开始时”时机和“一轮开始时”先后
 		event.trigger("phaseBefore");
-		$!;
+		"step 1";
 		//初始化阶段列表
 		if (!event.phaseList) {
 			event.phaseList = [
@@ -3081,13 +3081,13 @@ export const Content = {
 		if (isRound) {
 			game.getGlobalHistory().isRound = true;
 		}
-		$!;
+		"step 2";
 		//规则集中的“回合开始后②（1v1武将登场专用）”
 		event.trigger("phaseBeforeStart");
-		$!;
+		"step 3";
 		//规则集中的“回合开始后④（卑弥呼〖纵傀〗的时机）”
 		event.trigger("phaseBeforeEnd");
-		$!;
+		"step 4";
 		//规则集中的“回合开始后⑤”，进行翻面检测
 		if (player.isTurnedOver() && !event._noTurnOver) {
 			event.cancel();
@@ -3104,7 +3104,7 @@ export const Content = {
 			player.getHistory().isMe = true;
 			player.getStat().isMe = true;
 		}
-		$!;
+		"step 5";
 		//规则集中的“回合开始后⑥”，更新“当前回合角色”
 		while (ui.dialogs.length) {
 			ui.dialogs[0].close();
@@ -3177,20 +3177,20 @@ export const Content = {
 			game.addVideo("destroyLand");
 			ui.land.destroy();
 		}
-		$!;
+		"step 6";
 		//规则集中的“回合开始后⑦”，国战武将明置武将牌
 		event.trigger("phaseBeginStart");
-		$!;
+		"step 7";
 		//规则集中的“回合开始后⑨”，进行当先，化身等操作
 		//没有⑧ 因为⑧用不到
 		event.trigger("phaseBegin");
 		//阶段部分
-		$!;
+		"step 8";
 		if (num < event.phaseList.length) {
 			//规则集中没有的新时机 可以用来插入额外阶段啥的
 			if (player.isIn()) event.trigger("phaseChange");
 		} else event.goto(11);
-		$!;
+		"step 9";
 		if (player.isIn() && num < event.phaseList.length) {
 			var phase = event.phaseList[num].split("|");
 			event.currentPhase = phase[0];
@@ -3209,7 +3209,7 @@ export const Content = {
 				}
 			}
 		}
-		$!;
+		"step 10";
 		if (event.currentPhase == "phaseUse") {
 			game.broadcastAll(function () {
 				if (ui.tempnowuxie) {
@@ -3220,7 +3220,7 @@ export const Content = {
 			delete player._noSkill;
 		}
 		event.num++;
-		$!;
+		"step 11";
 		if (event.num < event.phaseList.length) {
 			event.goto(8);
 		} else if (!event._phaseEndTriggered) {
@@ -3228,9 +3228,9 @@ export const Content = {
 			event.trigger("phaseEnd");
 			event.redo();
 		}
-		$!;
+		"step 12";
 		event.trigger("phaseAfter");
-		$!;
+		"step 13";
 		//删除当前回合角色 此时处于“不属于任何角色的回合”的阶段
 		game.broadcastAll(function (player) {
 			player.classList.remove("glow_phase");
@@ -3243,9 +3243,9 @@ export const Content = {
 	phase_old: function () {
 		"step 0";
 		player.phaseZhunbei();
-		$!;
+		"step 1";
 		player.phaseJudge();
-		$!;
+		"step 2";
 		player.phaseDraw();
 		if (!player.noPhaseDelay) {
 			if (player == game.me) {
@@ -3254,9 +3254,9 @@ export const Content = {
 				game.delayx();
 			}
 		}
-		$!;
+		"step 3";
 		player.phaseUse();
-		$!;
+		"step 4";
 		game.broadcastAll(function () {
 			if (ui.tempnowuxie) {
 				ui.tempnowuxie.close();
@@ -3267,7 +3267,7 @@ export const Content = {
 		if (!player.noPhaseDelay) game.delayx();
 		//delete player.using;
 		delete player._noSkill;
-		$!;
+		"step 5";
 		player.phaseJieshu();
 	},
 	phaseZhunbei: function () {
@@ -3279,7 +3279,7 @@ export const Content = {
 		game.log(player, "进入了判定阶段");
 		event.cards = player.getCards("j");
 		if (!event.cards.length) event.finish();
-		$!;
+		"step 1";
 		if (cards.length) {
 			event.card = cards.shift();
 			var cardName = event.card.viewAs || event.card.name,
@@ -3310,9 +3310,9 @@ export const Content = {
 				}
 			}
 		} else event.finish();
-		$!;
+		"step 2";
 		if (!event.cancelled && !event.nojudge) player.judge(event.card).set("type", "phase");
-		$!;
+		"step 3";
 		var name = event.card.viewAs || event.card.name;
 		if (event.excluded) {
 			delete event.excluded;
@@ -3344,9 +3344,9 @@ export const Content = {
 		"step 0";
 		game.log(player, "进入了摸牌阶段");
 		event.trigger("phaseDrawBegin1");
-		$!;
+		"step 1";
 		event.trigger("phaseDrawBegin2");
-		$!;
+		"step 2";
 		if (game.modPhaseDraw) {
 			game.modPhaseDraw(player, event.num);
 		} else {
@@ -3364,7 +3364,7 @@ export const Content = {
 				}
 			}
 		}
-		$!;
+		"step 3";
 		if (Array.isArray(result)) {
 			event.cards = result;
 		}
@@ -3388,11 +3388,11 @@ export const Content = {
 			if (!info) continue;
 			if (info.updateUsable == "phaseUse") stat.card[i] = 0;
 		}
-		$!;
+		"step 1";
 		event.trigger("phaseUseBefore");
-		$!;
+		"step 2";
 		event.trigger("phaseUseBegin");
-		$!;
+		"step 3";
 		if (!event.logged) {
 			game.log(player, "进入了出牌阶段");
 			event.logged = true;
@@ -3402,7 +3402,7 @@ export const Content = {
 			next.set("prompt", false);
 		}
 		next.set("type", "phase");
-		$!;
+		"step 4";
 		if (result.bool && !event.skipped) {
 			event.goto(3);
 		}
@@ -3412,9 +3412,9 @@ export const Content = {
 				delete ui.tempnowuxie;
 			}
 		});
-		$!;
+		"step 5";
 		event.trigger("phaseUseEnd");
-		$!;
+		"step 6";
 		event.trigger("phaseUseAfter");
 	},
 	phaseDiscard: function () {
@@ -3430,9 +3430,9 @@ export const Content = {
 			}, player);
 		}
 		event.trigger("phaseDiscard");
-		$!;
+		"step 1";
 		player.chooseToDiscard(num, true).set("useCache", true);
-		$!;
+		"step 2";
 		event.cards = result.cards;
 	},
 	phaseJieshu: function () {
@@ -3550,7 +3550,7 @@ export const Content = {
 		} else {
 			event.result = "ai";
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			var ok = game.check();
 			if (ok) {
@@ -3596,7 +3596,7 @@ export const Content = {
 				game.delayx();
 			}
 		}
-		$!;
+		"step 2";
 		if (event.endButton) {
 			event.endButton.close();
 			delete event.endButton;
@@ -3658,7 +3658,7 @@ export const Content = {
 				}
 			}
 		}
-		$!;
+		"step 3";
 		if (event.buttoned) {
 			if (result.bool || (result.control && result.control != "cancel2")) {
 				var info = get.info(event.buttoned).chooseButton;
@@ -3690,7 +3690,7 @@ export const Content = {
 			event.goto(0);
 			delete event.buttoned;
 		}
-		$!;
+		"step 4";
 		if (event._aiexcludeclear) {
 			delete event._aiexcludeclear;
 			event._aiexclude.length = 0;
@@ -3719,7 +3719,7 @@ export const Content = {
 		if (!_status.noclearcountdown) {
 			game.stopCountChoose();
 		}
-		$!;
+		"step 5";
 		if (event._result && event.result) {
 			event.result.result = event._result;
 		}
@@ -3768,7 +3768,7 @@ export const Content = {
 				event.result = "ai";
 			}
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			var ok = game.check();
 			if (ok) {
@@ -3814,7 +3814,7 @@ export const Content = {
 				game.delayx();
 			}
 		}
-		$!;
+		"step 2";
 		event.resume();
 		if (event.result) {
 			if (event.result._sendskill) {
@@ -3867,7 +3867,7 @@ export const Content = {
 				}
 			}
 		}
-		$!;
+		"step 3";
 		if (event.buttoned) {
 			if (result.bool || (result.control && result.control != "cancel2")) {
 				var info = get.info(event.buttoned).chooseButton;
@@ -3899,7 +3899,7 @@ export const Content = {
 			event.goto(0);
 			delete event.buttoned;
 		}
-		$!;
+		"step 4";
 		delete _status.noclearcountdown;
 		if (event.skillDialog && get.objtype(event.skillDialog) == "div") {
 			event.skillDialog.close();
@@ -4052,7 +4052,7 @@ export const Content = {
 		} else {
 			event.result = "ai";
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			game.check();
 			if ((ai.basic.chooseCard(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
@@ -4066,14 +4066,14 @@ export const Content = {
 				ui.click.cancel();
 			}
 		}
-		$!;
+		"step 2";
 		event.resume();
 		if (event.aiChoose) event.aiChoose.close();
 		if (event.glow_result && event.result.cards && !event.directresult) {
 			event.result.cards.forEach((i) => i.classList.add("glow"));
 		}
 		if (event.dialog) event.dialog.close();
-		$!;
+		"step 3";
 		if (event.result.bool && event.result.cards && !game.online) {
 			event.cards = event.result.cards.slice(0);
 			if (event.logSkill) {
@@ -4085,7 +4085,7 @@ export const Content = {
 				else game.delayx();
 			}
 		} else event.finish();
-		$!;
+		"step 4";
 		if (event.boolline) player.line(target, "green");
 		event.done = target.gain(event.cards, player);
 		event.done.giver = player;
@@ -4181,7 +4181,7 @@ export const Content = {
 				event.result = "ai";
 			}
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			game.check();
 			if ((ai.basic.chooseCard(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
@@ -4201,12 +4201,12 @@ export const Content = {
 				event.rangecards[i].recheck("chooseToDiscard");
 			}
 		}
-		$!;
+		"step 2";
 		event.resume();
 		if (event.promptdiscard) {
 			event.promptdiscard.close();
 		}
-		$!;
+		"step 3";
 		if (
 			event.result.bool &&
 			event.result.cards &&
@@ -4221,7 +4221,7 @@ export const Content = {
 				game.delayx();
 			}
 		}
-		$!;
+		"step 4";
 		if (event.logSkill && event.result.bool && !game.online) {
 			if (typeof event.logSkill == "string") {
 				player.logSkill(event.logSkill);
@@ -4247,7 +4247,7 @@ export const Content = {
 			event._lose = true;
 			player.lose(cards, ui.special).set("type", "gain").set("forceDie", true).set("getlx", false);
 		}
-		$!;
+		"step 1";
 		switch (event.animate) {
 			case "draw":
 				game.delay(0, get.delayx(500, 500));
@@ -4324,7 +4324,7 @@ export const Content = {
 				if (event.gaintag) next.gaintag.addArray(event.gaintag);
 			}
 		}
-		$!;
+		"step 2";
 		game.delayx();
 	},
 	discardMultiple: function () {
@@ -4394,7 +4394,7 @@ export const Content = {
 				}
 			}
 		}
-		$!;
+		"step 1";
 		if (event.delay != false) {
 			if (event.waitingForTransition) {
 				_status.waitingForTransition = event.waitingForTransition;
@@ -4430,7 +4430,7 @@ export const Content = {
 		}
 		game.log(player, "对", targets, "发起了共同拼点");
 		event.compareMeanwhile = true;
-		$!;
+		"step 1";
 		event._result = [];
 		event.list = targets.filter(function (current) {
 			return !event.fixedResult || !event.fixedResult[current.playerid];
@@ -4452,7 +4452,7 @@ export const Content = {
 				return { bool: true, cards: [hs[0]] };
 			};
 		}
-		$!;
+		"step 2";
 		var cards = [];
 		var lose_list = [];
 		if (event.fixedResult && event.fixedResult[player.playerid]) {
@@ -4505,9 +4505,9 @@ export const Content = {
 			num1: [],
 			num2: [],
 		};
-		$!;
+		"step 3";
 		event.trigger("compareCardShowBefore");
-		$!;
+		"step 4";
 		player.$compareMultiple(event.card1, targets, cards);
 		game.log(player, "的拼点牌为", event.card1);
 		event.cardlist.forEach((card, index) => {
@@ -4515,10 +4515,10 @@ export const Content = {
 		});
 		player.addTempClass("target");
 		game.delay(0, 1000);
-		$!;
+		"step 5";
 		event.target = null;
 		event.trigger("compare");
-		$!;
+		"step 6";
 		if (event.iwhile < targets.length) {
 			event.target = targets[event.iwhile];
 			event.target.addTempClass("target");
@@ -4531,7 +4531,7 @@ export const Content = {
 			game.delay(0, 1000);
 			event.goto(9);
 		}
-		$!;
+		"step 7";
 		event.result.num1[event.iwhile] = event.num1;
 		event.result.num2[event.iwhile] = event.num2;
 		var list = [
@@ -4546,10 +4546,10 @@ export const Content = {
 				event.winner = null;
 			}
 		}
-		$!;
+		"step 8";
 		event.iwhile++;
 		event.goto(6);
-		$!;
+		"step 9";
 		var player = event.tempplayer;
 		event.player = player;
 		delete event.tempplayer;
@@ -4575,9 +4575,9 @@ export const Content = {
 			}, str);
 		}
 		game.delay(3);
-		$!;
+		"step 10";
 		game.broadcastAll(ui.clear);
-		$!;
+		"step 11";
 		event.cards.add(event.card1);
 	},
 	chooseToCompareMultiple: function () {
@@ -4598,7 +4598,7 @@ export const Content = {
 			targets.sort(lib.sort.seat);
 		}
 		game.log(player, "对", targets, "发起拼点");
-		$!;
+		"step 1";
 		event._result = [];
 		event.list = targets.filter(function (current) {
 			return !event.fixedResult || !event.fixedResult[current.playerid];
@@ -4620,7 +4620,7 @@ export const Content = {
 				return { bool: true, cards: [hs[0]] };
 			};
 		}
-		$!;
+		"step 2";
 		var cards = [];
 		var lose_list = [];
 		if (event.fixedResult && event.fixedResult[player.playerid]) {
@@ -4669,11 +4669,11 @@ export const Content = {
 			num1: [],
 			num2: [],
 		};
-		$!;
+		"step 3";
 		event.trigger("compareCardShowBefore");
-		$!;
+		"step 4";
 		game.log(player, "的拼点牌为", event.card1);
-		$!;
+		"step 5";
 		if (event.iwhile < targets.length) {
 			event.target = targets[event.iwhile];
 			event.target.addTempClass("target");
@@ -4688,7 +4688,7 @@ export const Content = {
 		} else {
 			event.goto(9);
 		}
-		$!;
+		"step 6";
 		event.result.num1[event.iwhile] = event.num1;
 		event.result.num2[event.iwhile] = event.num2;
 		var str;
@@ -4714,7 +4714,7 @@ export const Content = {
 			}, 1000);
 		}, str);
 		game.delay(2);
-		$!;
+		"step 7";
 		if (event.callback) {
 			game.broadcastAll(
 				function (card1, card2) {
@@ -4734,11 +4734,11 @@ export const Content = {
 			next.setContent(event.callback);
 			event.compareMultiple = true;
 		}
-		$!;
+		"step 8";
 		game.broadcastAll(ui.clear);
 		event.iwhile++;
 		event.goto(5);
-		$!;
+		"step 9";
 		event.cards.add(event.card1);
 	},
 	chooseToCompare: function () {
@@ -4753,7 +4753,7 @@ export const Content = {
 		}
 		game.log(player, "对", target, "发起拼点");
 		event.lose_list = [];
-		$!;
+		"step 1";
 		var sendback = function () {
 			if (_status.event != event) {
 				return function () {
@@ -4791,7 +4791,7 @@ export const Content = {
 		} else {
 			event.localTarget = true;
 		}
-		$!;
+		"step 2";
 		if (event.localPlayer) {
 			if (result.skill && lib.skill[result.skill] && lib.skill[result.skill].onCompare) {
 				result.cards = lib.skill[result.skill].onCompare(player);
@@ -4803,7 +4803,7 @@ export const Content = {
 			target.chooseCard("请选择拼点牌", true).set("type", "compare").set("glow_result", true).ai =
 				event.ai;
 		}
-		$!;
+		"step 3";
 		if (event.localTarget) {
 			if (result.skill && lib.skill[result.skill] && lib.skill[result.skill].onCompare) {
 				target.logSkill(result.skill);
@@ -4814,7 +4814,7 @@ export const Content = {
 		if (!event.resultOL && event.ol) {
 			game.pause();
 		}
-		$!;
+		"step 4";
 		try {
 			if (!event.card1) {
 				if (
@@ -4859,9 +4859,9 @@ export const Content = {
 				lose_list: event.lose_list,
 			}).setContent("chooseToCompareLose");
 		}
-		$!;
+		"step 5";
 		event.trigger("compareCardShowBefore");
-		$!;
+		"step 6";
 		game.broadcast(function () {
 			ui.arena.classList.add("thrownhighlight");
 		});
@@ -4880,7 +4880,7 @@ export const Content = {
 		event.num2 = getNum(event.card2);
 		event.trigger("compare");
 		game.delay(0, 1500);
-		$!;
+		"step 7";
 		event.result = {
 			player: event.card1,
 			target: event.card2,
@@ -4915,7 +4915,7 @@ export const Content = {
 			}, 1000);
 		}, str);
 		game.delay(2);
-		$!;
+		"step 8";
 		if (typeof event.target.ai.shown == "number" && event.target.ai.shown <= 0.85 && event.addToAI) {
 			event.target.ai.shown += 0.1;
 		}
@@ -4988,7 +4988,7 @@ export const Content = {
 		} else {
 			event._result = event.skillai(list);
 		}
-		$!;
+		"step 1";
 		_status.imchoosing = false;
 		if (event.dialog) {
 			event.dialog.close();
@@ -5032,7 +5032,7 @@ export const Content = {
 		} else {
 			event.finish();
 		}
-		$!;
+		"step 1";
 		event.result = {
 			bool: result.bool,
 			card: null,
@@ -5127,7 +5127,7 @@ export const Content = {
 		if (event.onfree) {
 			lib.init.onfree();
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			if (event.processAI) {
 				event.result = event.processAI();
@@ -5172,29 +5172,29 @@ export const Content = {
 				}
 			}
 		}
-		$!;
+		"step 1";
 		if (event.list.length) {
 			event.target = event.list.shift();
 			event.target.chooseCard.apply(event.target, event._args).set(event._set);
 		} else {
 			event.goto(3);
 		}
-		$!;
+		"step 2";
 		event.target.unwait(result);
 		event.goto(1);
-		$!;
+		"step 3";
 		if (event.withme) {
 			game.me.chooseCard.apply(game.me, event._args).set(event._set);
 		} else {
 			event.goto(5);
 		}
-		$!;
+		"step 4";
 		game.me.unwait(result);
-		$!;
+		"step 5";
 		if (!event.resultOL) {
 			game.pause();
 		}
-		$!;
+		"step 6";
 		event.result = [];
 		for (var i = 0; i < event.targets.length; i++) {
 			event.result[i] = event.resultOL[event.targets[i].playerid] || {};
@@ -5203,7 +5203,7 @@ export const Content = {
 			}
 		}
 		event.finish();
-		$!;
+		"step 7";
 		if (event.list.length) {
 			event.target = event.list.shift();
 			event.target.chooseCard.apply(event.target, event._args).set(event._set);
@@ -5215,7 +5215,7 @@ export const Content = {
 			}
 			event.finish();
 		}
-		$!;
+		"step 8";
 		event.result[event.targets.indexOf(event.target)] = result;
 		event.goto(7);
 	},
@@ -5250,7 +5250,7 @@ export const Content = {
 				event.list.splice(i--, 1);
 			}
 		}
-		$!;
+		"step 1";
 		if (event.list.length) {
 			var current = event.list.shift();
 			event.target = current.shift();
@@ -5261,10 +5261,10 @@ export const Content = {
 		} else {
 			event.goto(3);
 		}
-		$!;
+		"step 2";
 		event.target.unwait(result);
 		event.goto(1);
-		$!;
+		"step 3";
 		if (event.last) {
 			var next = game.me.chooseButton.apply(game.me, event.last);
 			next.callback = event.callback;
@@ -5273,13 +5273,13 @@ export const Content = {
 		} else {
 			event.goto(5);
 		}
-		$!;
+		"step 4";
 		game.me.unwait(result);
-		$!;
+		"step 5";
 		if (!event.resultOL) {
 			game.pause();
 		}
-		$!;
+		"step 6";
 		/*game.broadcastAll(function(){
 			ui.arena.classList.remove('markhidden');
 		});*/
@@ -5343,7 +5343,7 @@ export const Content = {
 				event.result = "ai";
 			}
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			game.check();
 			if ((ai.basic.chooseCard(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
@@ -5358,7 +5358,7 @@ export const Content = {
 				ui.click.cancel();
 			}
 		}
-		$!;
+		"step 2";
 		event.resume();
 		if (event.glow_result && event.result.cards && !event.directresult) {
 			for (var i = 0; i < event.result.cards.length; i++) {
@@ -5412,7 +5412,7 @@ export const Content = {
 		} else {
 			event.result = "ai";
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			game.check();
 			if ((ai.basic.chooseTarget(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
@@ -5428,7 +5428,7 @@ export const Content = {
 		}
 		if (event.dialog) event.dialog.close();
 		event.resume();
-		$!;
+		"step 2";
 		if (event.onresult) {
 			event.onresult(event.result);
 		}
@@ -5460,7 +5460,7 @@ export const Content = {
 		} else {
 			event.result = "ai";
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			game.check();
 			if (ai.basic.chooseCard(event.ai1) || forced) {
@@ -5474,7 +5474,7 @@ export const Content = {
 				ui.click.cancel();
 			}
 		}
-		$!;
+		"step 2";
 		event.resume();
 		if (event.result.bool && event.animate !== false) {
 			for (var i = 0; i < event.result.targets.length; i++) {
@@ -5661,7 +5661,7 @@ export const Content = {
 		} else {
 			event.result = "ai";
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			event.result = {};
 			if (event.ai) {
@@ -5719,7 +5719,7 @@ export const Content = {
 		} else {
 			event.result = "ai";
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			if (event.ai) {
 				event.choice = event.ai(event.getParent(), player);
@@ -5779,7 +5779,7 @@ export const Content = {
 			});
 			next.set("choice", choice);
 		}
-		$!;
+		"step 1";
 		if (result.control != "cancel2") {
 			if (event.logSkill) {
 				if (typeof event.logSkill == "string") {
@@ -5951,7 +5951,7 @@ export const Content = {
 				event.result = "ai";
 			}
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			game.check();
 			if ((ai.basic.chooseButton(event.ai) || forced) && (!event.filterOk || event.filterOk()))
@@ -6141,7 +6141,7 @@ export const Content = {
 				event.result = "ai";
 			}
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			game.check();
 			if ((ai.basic.chooseButton(event.ai) || forced) && (!event.filterOk || event.filterOk()))
@@ -6149,7 +6149,7 @@ export const Content = {
 			else ui.click.cancel();
 		}
 		event.dialog.close();
-		$!;
+		"step 2";
 		event.resume();
 		setTimeout(function () {
 			ui.arena.classList.remove("discard-player-card");
@@ -6170,7 +6170,7 @@ export const Content = {
 			event.cards = cards;
 			event.trigger("rewriteDiscardResult");
 		}
-		$!;
+		"step 3";
 		if (event.boolline) {
 			player.line(target, "green");
 		}
@@ -6359,7 +6359,7 @@ export const Content = {
 				event.result = "ai";
 			}
 		}
-		$!;
+		"step 1";
 		if (event.result == "ai") {
 			game.check();
 			if ((ai.basic.chooseButton(event.ai) || forced) && (!event.filterOk || event.filterOk()))
@@ -6367,7 +6367,7 @@ export const Content = {
 			else ui.click.cancel();
 		}
 		event.dialog.close();
-		$!;
+		"step 2";
 		event.resume();
 		setTimeout(function () {
 			ui.arena.classList.remove("gain-player-card");
@@ -6375,7 +6375,7 @@ export const Content = {
 		if (game.online || !event.result.bool) {
 			event.finish();
 		}
-		$!;
+		"step 3";
 		if (event.logSkill && event.result.bool && !game.online) {
 			if (typeof event.logSkill == "string") {
 				player.logSkill(event.logSkill);
@@ -6390,7 +6390,7 @@ export const Content = {
 		event.result.cards = event.result.links.slice(0);
 		event.cards = cards;
 		event.trigger("rewriteGainResult");
-		$!;
+		"step 4";
 		if (event.boolline) {
 			player.line(target, "green");
 		}
@@ -6437,7 +6437,7 @@ export const Content = {
 		game.log(player, "展示了", cards);
 		game.addVideo("showCards", player, [str, get.cardsInfo(cards)]);
 		game.delayx(2);
-		$!;
+		"step 1";
 		game.broadcast("closeDialog", event.dialogid);
 		event.dialog.close();
 	},
@@ -6493,7 +6493,7 @@ export const Content = {
 		game.addCardKnower(cards, "everyone");
 		game.delayx(event.delay_time || 2.5);
 		game.addVideo("showCards", player, [event.str, get.cardsInfo(cards)]);
-		$!;
+		"step 1";
 		game.broadcast("closeDialog", event.dialogid);
 		event.dialog.close();
 	},
@@ -6520,7 +6520,7 @@ export const Content = {
 		} else {
 			event.finish();
 		}
-		$!;
+		"step 1";
 		event.result = "viewed";
 		_status.imchoosing = false;
 		event.choosing = false;
@@ -6668,7 +6668,7 @@ export const Content = {
 		next.set("custom", get.copy(event.custom));
 		if (event.prompt2) next.set("prompt2", event.prompt2);
 		if (event.forced) next.set("forced", true);
-		$!;
+		"step 1";
 		event.result = result;
 		if (result.bool) {
 			if (event.logSkill) player.logSkill(event.logSkill, result.targets, false);
@@ -6677,9 +6677,9 @@ export const Content = {
 		} else {
 			event.finish();
 		}
-		$!;
+		"step 2";
 		game.delay();
-		$!;
+		"step 3";
 		if (targets.length == 2) {
 			player
 				.choosePlayerCard(
@@ -6725,7 +6725,7 @@ export const Content = {
 		} else {
 			event.finish();
 		}
-		$!;
+		"step 4";
 		if (result.bool && result.links.length) {
 			var link = result.links[0];
 			if (get.position(link) == "e") {
@@ -6843,7 +6843,7 @@ export const Content = {
 			}
 		}
 		event.trigger("useCard0");
-		$!;
+		"step 1";
 		if (event.animate != false && event.line != false && !event.hideTargets) {
 			if (card.name == "wuxie" && event.getParent()._info_map) {
 				var evtmap = event.getParent()._info_map;
@@ -6929,11 +6929,11 @@ export const Content = {
 			game.logv(player, [card, cards], targets);
 		}
 		event.trigger("useCard1");
-		$!;
+		"step 2";
 		event.trigger("yingbian");
-		$!;
+		"step 3";
 		event.trigger("useCard2");
-		$!;
+		"step 4";
 		event.trigger("useCard");
 		event._oncancel = function () {
 			game.broadcastAll(function (id) {
@@ -6943,7 +6943,7 @@ export const Content = {
 				}
 			}, event.id);
 		};
-		$!;
+		"step 5";
 		event.sortTarget = function (animate, sort) {
 			var info = get.info(card, false);
 			if (num == 0 && targets.length > 1) {
@@ -6970,7 +6970,7 @@ export const Content = {
 			}
 			return null;
 		};
-		$!;
+		"step 6";
 		if (event.all_excluded) return;
 		if (!event.triggeredTargets1) event.triggeredTargets1 = [];
 		var target = event.getTriggerTarget(targets, event.triggeredTargets1);
@@ -6994,7 +6994,7 @@ export const Content = {
 			if (event.forceDie) next.forceDie = true;
 			event.redo();
 		}
-		$!;
+		"step 7";
 		if (event.all_excluded) return;
 		if (!event.triggeredTargets2) event.triggeredTargets2 = [];
 		var target = event.getTriggerTarget(targets, event.triggeredTargets2);
@@ -7018,7 +7018,7 @@ export const Content = {
 			if (event.forceDie) next.forceDie = true;
 			event.redo();
 		}
-		$!;
+		"step 8";
 		var info = get.info(card, false);
 		if (!info.nodelay && event.animate != false) {
 			if (event.delayx !== false) {
@@ -7030,7 +7030,7 @@ export const Content = {
 				}
 			}
 		}
-		$!;
+		"step 9";
 		if (event.all_excluded) return;
 		if (!event.triggeredTargets3) event.triggeredTargets3 = [];
 		var target = event.getTriggerTarget(targets, event.triggeredTargets3);
@@ -7054,7 +7054,7 @@ export const Content = {
 			if (event.forceDie) next.forceDie = true;
 			event.redo();
 		}
-		$!;
+		"step 10";
 		if (event.all_excluded) return;
 		if (!event.triggeredTargets4) event.triggeredTargets4 = [];
 		var target = event.getTriggerTarget(targets, event.triggeredTargets4);
@@ -7081,7 +7081,7 @@ export const Content = {
 			}
 			event.redo();
 		}
-		$!;
+		"step 11";
 		if (event.all_excluded) return;
 		event.effectedCount++;
 		event.num = 0;
@@ -7125,7 +7125,7 @@ export const Content = {
 			next.addedTargets = event.addedTargets;
 			if (event.forceDie) next.forceDie = true;
 		}
-		$!;
+		"step 12";
 		if (event.all_excluded) return;
 		var info = get.info(card, false);
 		if (num == 0 && targets.length > 1) {
@@ -7188,13 +7188,13 @@ export const Content = {
 				game.delayx(0.5);
 			}
 		}
-		$!;
+		"step 13";
 		if (event.all_excluded) return;
 		if (!get.info(event.card, false).multitarget && num < targets.length - 1 && !event.cancelled) {
 			event.num++;
 			event.goto(12);
 		}
-		$!;
+		"step 14";
 		if (event.all_excluded) return;
 		if (get.info(card, false).contentAfter) {
 			var next = game.createEvent(card.name + "ContentAfter");
@@ -7208,7 +7208,7 @@ export const Content = {
 			next.type = "postcard";
 			if (event.forceDie) next.forceDie = true;
 		}
-		$!;
+		"step 15";
 		if (event.all_excluded) return;
 		if (event.effectedCount < event.effectCount) {
 			if (document.getElementsByClassName("thrown").length) {
@@ -7216,7 +7216,7 @@ export const Content = {
 			}
 			event.goto(11);
 		}
-		$!;
+		"step 16";
 		if (event.postAi) {
 			event.player.logAi(event.targets, event.card);
 		}
@@ -7229,7 +7229,7 @@ export const Content = {
 		} else {
 			event.finish();
 		}
-		$!;
+		"step 17";
 		event._oncancel();
 	},
 	useSkill: function () {
@@ -7406,7 +7406,7 @@ export const Content = {
 		event.type = logInfo.type;
 		player.getHistory("useSkill").push(logInfo);
 		event.trigger("useSkill");
-		$!;
+		"step 1";
 		var info = get.info(event.skill);
 		if (info && info.contentBefore) {
 			var next = game.createEvent(event.skill + "ContentBefore");
@@ -7417,7 +7417,7 @@ export const Content = {
 			if (event.forceDie) next.forceDie = true;
 			if (event.includeOut) next.includeOut = true;
 		}
-		$!;
+		"step 2";
 		if (!event.skill) {
 			console.log("error: no skill", get.translation(event.player), event.player.getSkills());
 			if (event._skill) {
@@ -7483,7 +7483,7 @@ export const Content = {
 			event.num++;
 			event.redo();
 		}
-		$!;
+		"step 3";
 		var info = get.info(event.skill);
 		if (info && info.contentAfter) {
 			var next = game.createEvent(event.skill + "ContentAfter");
@@ -7494,7 +7494,7 @@ export const Content = {
 			if (event.forceDie) next.forceDie = true;
 			if (event.includeOut) next.includeOut = true;
 		}
-		$!;
+		"step 4";
 		if (player.getStat().allSkills > 200) {
 			player._noSkill = true;
 			console.log(player.name, event.skill);
@@ -7505,7 +7505,7 @@ export const Content = {
 		} else {
 			event.finish();
 		}
-		$!;
+		"step 5";
 		ui.clear();
 	},
 	draw: function () {
@@ -7571,7 +7571,7 @@ export const Content = {
 		event.done = player.lose(cards, event.position, "visible");
 		event.done.type = "discard";
 		if (event.discarder) event.done.discarder = event.discarder;
-		$!;
+		"step 1";
 		event.trigger("discard");
 	},
 	loseToDiscardpile: function () {
@@ -7583,7 +7583,7 @@ export const Content = {
 		if (!event.blank) next.visible = true;
 		next.type = "loseToDiscardpile";
 		event.done = next;
-		$!;
+		"step 1";
 		event.trigger("loseToDiscardpile");
 	},
 	respond: function () {
@@ -7668,7 +7668,7 @@ export const Content = {
 			}
 		}
 		event.trigger("respond");
-		$!;
+		"step 1";
 		game.delayx(0.5);
 	},
 	swapHandcards: function () {
@@ -7681,21 +7681,21 @@ export const Content = {
 			cards1: event.cards1,
 			cards2: event.cards2,
 		}).setContent("swapHandcardsx");
-		$!;
+		"step 1";
 		game.loseAsync({
 			gain_list: [
 				[player, event.cards2.filterInD()],
 				[target, event.cards1.filterInD()],
 			],
 		}).setContent("gaincardMultiple");
-		$!;
+		"step 2";
 		game.delayx();
 	},
 	swapHandcardsx: function () {
 		"step 0";
 		player.$giveAuto(event.cards1, target);
 		target.$giveAuto(event.cards2, player);
-		$!;
+		"step 1";
 		event.cards = event.cards1;
 		var next = player.lose(event.cards, ui.ordering);
 		next.getlx = false;
@@ -7705,7 +7705,7 @@ export const Content = {
 		} else {
 			next.delay = false;
 		}
-		$!;
+		"step 2";
 		event.cards = event.cards2;
 		var next = target.lose(event.cards, ui.ordering);
 		next.getlx = false;
@@ -7715,7 +7715,7 @@ export const Content = {
 		} else {
 			next.delay = false;
 		}
-		$!;
+		"step 3";
 		if (!event.delayed) game.delay();
 	},
 	gainMultiple: function () {
@@ -7723,12 +7723,12 @@ export const Content = {
 		event.delayed = false;
 		event.num = 0;
 		event.cards = [];
-		$!;
+		"step 1";
 		player
 			.gainPlayerCard(targets[num], event.position, true)
 			.set("boolline", false)
 			.set("delay", num == targets.length - 1);
-		$!;
+		"step 2";
 		if (result.bool) {
 			event.cards.addArray(result.cards);
 			if (num == targets.length - 1) event.delayed = true;
@@ -7737,7 +7737,7 @@ export const Content = {
 		if (event.num < targets.length) {
 			event.goto(1);
 		}
-		$!;
+		"step 3";
 		if (!event.delayed) game.delay();
 	},
 	gain: function () {
@@ -7772,7 +7772,7 @@ export const Content = {
 		} else {
 			event.finish();
 		}
-		$!;
+		"step 1";
 		for (var i = 0; i < cards.length; i++) {
 			if (cards[i].willBeDestroyed("handcard", player, event)) {
 				cards[i].selfDestroy(event);
@@ -7797,13 +7797,13 @@ export const Content = {
 		}
 		player.getHistory("gain").push(event);
 		//if(event.source&&event.delay!==false) game.delayx();
-		$!;
+		"step 2";
 		if (player.getStat().gain == undefined) {
 			player.getStat().gain = cards.length;
 		} else {
 			player.getStat().gain += cards.length;
 		}
-		$!;
+		"step 3";
 		var sort;
 		var frag1 = document.createDocumentFragment();
 		var frag2 = document.createDocumentFragment();
@@ -7945,7 +7945,7 @@ export const Content = {
 			broadcast();
 			event.finish();
 		}
-		$!;
+		"step 4";
 		game.delayx();
 		if (event.updatePile) game.updateRoundNumber();
 	},
@@ -7979,7 +7979,7 @@ export const Content = {
 		} else {
 			event.finish();
 		}
-		$!;
+		"step 1";
 		for (var i = 0; i < cards.length; i++) {
 			if (cards[i].willBeDestroyed("expansion", player, event)) {
 				cards[i].selfDestroy(event);
@@ -8000,7 +8000,7 @@ export const Content = {
 			event.finish();
 			return;
 		}
-		$!;
+		"step 2";
 		var hs = player.getCards("x");
 		for (var i = 0; i < cards.length; i++) {
 			if (hs.includes(cards[i])) {
@@ -8086,7 +8086,7 @@ export const Content = {
 			for (var i of event.gaintag) player.markSkill(i);
 			event.finish();
 		}
-		$!;
+		"step 4";
 		game.delayx();
 		if (event.updatePile) game.updateRoundNumber();
 	},
@@ -8147,7 +8147,7 @@ export const Content = {
 				}
 			}
 		}
-		$!;
+		"step 1";
 		event.gaintag_map = {};
 		var hs = [],
 			es = [],
@@ -8308,7 +8308,7 @@ export const Content = {
 				hcard.clearKnowers();
 			});
 		}
-		$!;
+		"step 2";
 		if (num < cards.length) {
 			if (event.es.includes(cards[num])) {
 				event.loseEquip = true;
@@ -8327,7 +8327,7 @@ export const Content = {
 			}
 			event.goto(4);
 		}
-		$!;
+		"step 3";
 		var info = get.info(cards[num]);
 		if (info.loseDelay != false && (player.isAlive() || info.forceDie)) {
 			player.popup(cards[num].name);
@@ -8350,7 +8350,7 @@ export const Content = {
 		}
 		event.num++;
 		event.goto(2);
-		$!;
+		"step 4";
 		if (event.toRenku) {
 			_status.renku.addArray(
 				cards.filter(function (card) {
@@ -8364,7 +8364,7 @@ export const Content = {
 			}
 			game.updateRenku();
 		}
-		$!;
+		"step 5";
 		var evt = event.getParent();
 		if (
 			evt.name != "discard" &&
@@ -8391,13 +8391,13 @@ export const Content = {
 			return;
 		}
 		event.trigger("damageBegin1");
-		$!;
+		"step 1";
 		event.trigger("damageBegin2");
-		$!;
+		"step 2";
 		event.trigger("damageBegin3");
-		$!;
+		"step 3";
 		event.trigger("damageBegin4");
-		$!;
+		"step 4";
 		//moved changeHujia to changeHp
 		if (player.hujia > 0 && !player.hasSkillTag("nohujia")) {
 			var damageAudioInfo = lib.natureAudio.hujia_damage[event.nature];
@@ -8484,7 +8484,7 @@ export const Content = {
 				event.trigger("damage");
 			}
 		}
-		$!;
+		"step 5";
 		if (player.hp <= 0 && player.isAlive() && !event.nodying) {
 			game.delayx();
 			event._dyinged = true;
@@ -8532,7 +8532,7 @@ export const Content = {
 				}
 			}
 		}
-		$!;
+		"step 6";
 		if (!event.notrigger) event.trigger("damageSource");
 	},
 	recover: function () {
@@ -8578,7 +8578,7 @@ export const Content = {
 		});
 		game.log(player, "失去了" + get.cnNumber(num) + "点体力");
 		player.changeHp(-num);
-		$!;
+		"step 1";
 		if (player.hp <= 0 && !event.nodying) {
 			game.delayx();
 			event._dyinged = true;
@@ -8588,7 +8588,7 @@ export const Content = {
 	doubleDraw: function () {
 		"step 0";
 		player.chooseBool("你的主副将体力上限之和是奇数，是否摸一张牌？");
-		$!;
+		"step 1";
 		if (result.bool) {
 			player.draw();
 		}
@@ -8599,7 +8599,7 @@ export const Content = {
 		player.maxHp -= num;
 		event.loseHp = Math.max(0, player.hp - player.maxHp);
 		player.update();
-		$!;
+		"step 1";
 		if (player.maxHp <= 0) {
 			player.die(event);
 		}
@@ -8686,7 +8686,7 @@ export const Content = {
 		}, _status.dying);
 		event.trigger("dying");
 		game.log(player, "濒死");
-		$!;
+		"step 1";
 		delete event.filterStop;
 		if (player.hp > 0 || event.nodying) {
 			_status.dying.remove(player);
@@ -8710,7 +8710,7 @@ export const Content = {
 			next.forceDie = true;
 			next.setContent(lib.skill._save.content);
 		}
-		$!;
+		"step 2";
 		_status.dying.remove(player);
 		game.broadcast(function (list) {
 			_status.dying = list;
@@ -8816,11 +8816,11 @@ export const Content = {
 		if (player.hp != 0) {
 			player.changeHp(0 - player.hp, false).forceDie = true;
 		}
-		$!;
+		"step 1";
 		if (player.dieAfter) player.dieAfter(source);
-		$!;
+		"step 2";
 		event.trigger("die");
-		$!;
+		"step 3";
 		if (player.isDead()) {
 			if (!game.reserveDead) {
 				for (var mark in player.marks) {
@@ -8870,9 +8870,9 @@ export const Content = {
 				//player.$throw(event.cards,1000);
 			}
 		}
-		$!;
+		"step 4";
 		if (player.dieAfter2) player.dieAfter2(source);
-		$!;
+		"step 5";
 		game.broadcastAll(function (player) {
 			if (game.online && player == game.me && !_status.over && !game.controlOver && !ui.exit) {
 				if (lib.mode[lib.configOL.mode].config.dierestart) {
@@ -8966,7 +8966,7 @@ export const Content = {
 				}
 			} else if (get.position(cards[0]) == "c") event.updatePile = true;
 		}
-		$!;
+		"step 1";
 		if (cards[0].willBeDestroyed("judge", player, event)) {
 			cards[0].selfDestroy(event);
 			event.finish();
@@ -9114,7 +9114,7 @@ export const Content = {
 		game.log(player, "进行" + event.judgestr + "判定，亮出的判定牌为", player.judging[0]);
 		game.delay(2);
 		if (!event.noJudgeTrigger) event.trigger("judge");
-		$!;
+		"step 1";
 		event.result = {
 			card: player.judging[0],
 			name: player.judging[0].name,
@@ -9246,7 +9246,7 @@ export const Content = {
 				bottom = cards;
 				return [top, bottom];
 			};
-		$!;
+		"step 1";
 		var top = result.moved[0];
 		var bottom = result.moved[1];
 		top.reverse();

@@ -91,7 +91,7 @@ export class LibInit {
 		event._resultid = null;
 		event._result = null;
 		game.pause();
-		$!;
+		"step 1";
 		if (result) {
 			if (event._resultid) {
 				result.id = event._resultid;
@@ -717,7 +717,7 @@ export class LibInit {
 				}
 			}
 			//func中要写步骤的话，必须要写step 0
-			if (str.indexOf$! == -1) {
+			if (str.indexOf("step 0") == -1) {
 				str = "{if(event.step==1) {event.finish();return;}\n" + str;
 			} else {
 				let skip = 0;
