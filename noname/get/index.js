@@ -3957,6 +3957,7 @@ export class Get extends Uninstantable {
 		if (lib.config.touchscreen) {
 			lib.setScroll(uiintro.contentContainer);
 		}
+		uiintro.style.width = '600px';
 		return uiintro;
 	}
 	static linkintro(dialog, content, player) {
