@@ -183,6 +183,9 @@ game.import("character", function () {
 			ol_mengda(mode) {
 				return mode !== "guozhan";
 			},
+			ol_mengda(mode){
+				return mode!=='guozhan';
+			},
 		},
 		character: {
 			ol_liupi: ["male", "qun", 4, ["olyicheng"]],

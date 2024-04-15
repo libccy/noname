@@ -899,6 +899,9 @@ game.import("character", function () {
 				ai: {
 					combo: "dcjichou",
 				},
+				ai:{
+					combo:'dcjichou'
+				}
 			},
 			dczifu: {
 				audio: 2,
