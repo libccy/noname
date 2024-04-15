@@ -8337,13 +8337,13 @@ game.import('character', function () {
 			xingbu:{
 				audio:2,
 				trigger:{player:'phaseJieshuBegin'},
-				prompt2:'展示牌堆顶的三张牌，并可以根据其中红色牌的数量，令一名其他角色获得一种效果',
+				prompt2:'亮出牌堆顶的三张牌，并可以根据其中红色牌的数量，令一名其他角色获得一种效果',
 				content:function(){
 					'step 0'
 					var cards=get.cards(3);
-					for(var i=cards.length-1;i--;i>=0){
-						ui.cardPile.insertBefore(cards[i],ui.cardPile.firstChild);
-					}
+					//for(var i=cards.length-1;i--;i>=0){
+					//	ui.cardPile.insertBefore(cards[i],ui.cardPile.firstChild);
+					//}
 					game.updateRoundNumber();
 					event.cards=cards;
 					//game.cardsGotoOrdering(cards);
@@ -16788,7 +16788,7 @@ game.import('character', function () {
 			"xinfu_jingxie2":"精械",
 			"xinfu_jingxie2_info":"",
 			"xinfu_qiaosi":"巧思",
-			"xinfu_qiaosi_info":"出牌阶段限一次，你可以投掷一枚六面骰子，展示牌堆顶的X张牌并获得之。然后，你选择一项：1.交给一名其他角色X张牌。2.弃置X张牌。（X为骰子的点数）",
+			"xinfu_qiaosi_info":"出牌阶段限一次，你可以投掷一枚六面骰子，亮出牌堆顶的X张牌并获得之。然后，你选择一项：1.交给一名其他角色X张牌。2.弃置X张牌。（X为骰子的点数）",
 			xin_xiahoudun:'手杀界夏侯惇',
 			xin_xiahoudun_prefix:'手杀界',
 			xinqingjian:'清俭',
@@ -17145,7 +17145,7 @@ game.import('character', function () {
 			zhiming:'知命',
 			zhiming_info:'准备阶段开始时或弃牌阶段结束时，你摸一张牌，然后可以将一张牌置于牌堆顶。',
 			xingbu:'星卜',
-			xingbu_info:'结束阶段，你可以展示牌堆顶的三张牌，然后你可以根据X值（X为这三张牌中红色牌的数量），令一名其他角色获得对应的效果直到其下回合结束：①三张：其摸牌阶段多摸两张牌，使用【杀】的次数上限+1。②两张：其使用【杀】的次数上限-1，跳过弃牌阶段。③小于两张：其于准备阶段开始时弃置一张手牌。',
+			xingbu_info:'结束阶段，你可以亮出牌堆顶的三张牌，然后你可以根据X值（X为这三张牌中红色牌的数量），令一名其他角色获得对应的效果直到其下回合结束：①三张：其摸牌阶段多摸两张牌，使用【杀】的次数上限+1。②两张：其使用【杀】的次数上限-1，跳过弃牌阶段。③小于两张：其于准备阶段开始时弃置一张手牌。',
 			xin_sunluban:'手杀界孙鲁班',
 			xin_sunluban_prefix:'手杀界',
 			xinzenhui:'谮毁',
