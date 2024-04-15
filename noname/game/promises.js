@@ -28,12 +28,12 @@ export class GamePromises {
 	 * @param { string } title
 	 * @param { boolean } [forced]
 	 * @returns { Promise<string> }
-	 * 
+	 *
 	 */
 	// @ts-ignore
 	prompt(alertOption, title, forced) {
 		return new Promise((resolve, reject) => {
-			if (alertOption !== 'alert') {
+			if (alertOption !== "alert") {
 				// @ts-ignore
 				forced = title || false;
 				title = alertOption;
@@ -55,7 +55,7 @@ export class GamePromises {
 	 */
 	alert(title) {
 		return new Promise((resolve, reject) => {
-			game.prompt(title, 'alert', resolve);
+			game.prompt(title, "alert", resolve);
 		});
 	}
 	// 读写函数promises化(不用考虑其对应函数是否存在)
@@ -78,10 +78,10 @@ export class GamePromises {
 		});
 	}
 	writeFile(data, path, name) {
-		return (new Promise((resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			// @ts-ignore
 			game.writeFile(data, path, name, resolve);
-		})).then(result => {
+		}).then((result) => {
 			return new Promise((resolve, reject) => {
 				if (result instanceof Error) {
 					reject(result);
@@ -104,18 +104,22 @@ export class GamePromises {
 		});
 	}
 	removeFile(filename) {
-		return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
-			// @ts-ignore
-			game.removeFile(filename, err => {
-				if (err) reject(err);
-				else resolve();
-			});
-		}));
+		return /** @type {Promise<void>} */ (
+			new Promise((resolve, reject) => {
+				// @ts-ignore
+				game.removeFile(filename, (err) => {
+					if (err) reject(err);
+					else resolve();
+				});
+			})
+		);
 	}
 	removeDir(directory) {
-		return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
-			// @ts-ignore
-			game.removeDir(directory, resolve, reject);
-		}));
+		return /** @type {Promise<void>} */ (
+			new Promise((resolve, reject) => {
+				// @ts-ignore
+				game.removeDir(directory, resolve, reject);
+			})
+		);
 	}
 }

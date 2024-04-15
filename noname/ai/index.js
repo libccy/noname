@@ -1,16 +1,16 @@
-import { get } from '../get/index.js';
-import { lib } from '../library/index.js';
-import { Basic } from './basic.js';
+import { get } from "../get/index.js";
+import { lib } from "../library/index.js";
+import { Basic } from "./basic.js";
 
 export class AI {
 	basic = new Basic();
 	get = get;
-};
+}
 
 export let ai = new AI();
 
 /**
- * @param { InstanceType<typeof AI> } [instance] 
+ * @param { InstanceType<typeof AI> } [instance]
  */
 export let setAI = (instance) => {
 	ai = instance || new AI();
@@ -19,6 +19,4 @@ export let setAI = (instance) => {
 	}
 };
 
-export {
-	Basic
-}
+export { Basic };

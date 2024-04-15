@@ -1,81 +1,83 @@
-import { lib } from "../library/index.js"
+import { lib } from "../library/index.js";
 
 export class status {
-	paused = false
-	paused2 = false
-	paused3 = false
-	over = false
-	clicked = false
-	auto = false
+	paused = false;
+	paused2 = false;
+	paused3 = false;
+	over = false;
+	clicked = false;
+	auto = false;
 	/**
 	 * @type { GameEventPromise }
 	 */
 	// @ts-ignore
-	event = null
-	ai = {}
-	lastdragchange = []
-	skillaudio = []
-	dieClose = []
-	dragline = []
-	dying = []
+	event = null;
+	ai = {};
+	lastdragchange = [];
+	skillaudio = [];
+	dieClose = [];
+	dragline = [];
+	dying = [];
 	/**
 	 * @type { GameHistory[] }
 	 */
-	globalHistory = [{
-		cardMove: [],
-		custom: [],
-		useCard: [],
-		changeHp: [],
-		everything: [],
-	}]
+	globalHistory = [
+		{
+			cardMove: [],
+			custom: [],
+			useCard: [],
+			changeHp: [],
+			everything: [],
+		},
+	];
 	cardtag = {
 		yingbian_zhuzhan: [],
 		yingbian_kongchao: [],
 		yingbian_fujia: [],
 		yingbian_canqu: [],
-		yingbian_force: []
-	}
-	renku = []
-	prehidden_skills = []
-	postReconnect = {}
+		yingbian_force: [],
+	};
+	renku = [];
+	prehidden_skills = [];
+	postReconnect = {};
 	/**
 	 * @type { string | void }
 	 */
-	extension = undefined
+	extension = undefined;
 	/**
 	 * @type { boolean | void }
 	 */
-	dragged = undefined
+	dragged = undefined;
 	/**
 	 * @type { boolean | void }
 	 */
-	touchconfirmed = undefined
+	touchconfirmed = undefined;
 	/**
 	 * @type { boolean | void }
 	 */
-	connectMode = undefined
+	connectMode = undefined;
 	/**
 	 * @type { boolean | void }
 	 */
-	importingExtension = undefined
+	importingExtension = undefined;
 	/**
 	 * @type { Promise<any>[] | void }
 	 */
-	extensionLoaded = undefined
+	extensionLoaded = undefined;
 	/**
 	 * @type { Promise<any>[] | void }
 	 */
-	extensionLoading = undefined
+	extensionLoading = undefined;
 	/**
 	 * @type { { [key: string]: Promise<any>[] } | void }
 	 */
-	importing = undefined
-};
+	importing = undefined;
+}
 
 export let _status = new status();
 
 /**
- * @param { InstanceType<typeof status> } [instance] 
+ * @param { InstanceType<typeof status> } [instance]
  */
 export let setStatus = (instance) => {
 	_status = instance || new status();

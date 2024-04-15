@@ -1,8 +1,8 @@
-import { get } from '../get/index.js';
-import { lib } from '../library/index.js';
-import { game } from '../game/index.js';
-import { _status } from '../status/index.js';
-import { ui } from '../ui/index.js';
+import { get } from "../get/index.js";
+import { lib } from "../library/index.js";
+import { game } from "../game/index.js";
+import { _status } from "../status/index.js";
+import { ui } from "../ui/index.js";
 
 // 废弃覆盖原型的HTMLDivElement.prototype.animate
 // 改为HTMLDivElement.prototype.addTempClass
@@ -11,12 +11,11 @@ import { ui } from '../ui/index.js';
  * @type { typeof HTMLDivElement['prototype']['animate'] }
  */
 HTMLDivElement.prototype.animate = function (keyframes, options) {
-	if (typeof keyframes == 'string') {
-		console.trace(this, '无名杀开发者修改的animate方法已废弃，请改为使用addTempClass方法');
+	if (typeof keyframes == "string") {
+		console.trace(this, "无名杀开发者修改的animate方法已废弃，请改为使用addTempClass方法");
 		// @ts-ignore
 		return HTMLDivElement.prototype.addTempClass.call(this, keyframes, options);
-	}
-	else return HTMLElement.prototype.animate.call(this, keyframes, options);
+	} else return HTMLElement.prototype.animate.call(this, keyframes, options);
 };
 
 /**
@@ -25,7 +24,7 @@ HTMLDivElement.prototype.animate = function (keyframes, options) {
  */
 HTMLDivElement.prototype.addTempClass = function (name, time = 1000) {
 	// @ts-ignore
-	let that = get.is.mobileMe(this) && name == 'target' ? ui.mebg : this;
+	let that = get.is.mobileMe(this) && name == "target" ? ui.mebg : this;
 	that.classList.add(name);
 	setTimeout(() => {
 		that.classList.remove(name);
@@ -37,7 +36,7 @@ HTMLDivElement.prototype.addTempClass = function (name, time = 1000) {
  * @type { typeof HTMLDivElement['prototype']['hide'] }
  */
 HTMLDivElement.prototype.hide = function () {
-	this.classList.add('hidden');
+	this.classList.add("hidden");
 	return this;
 };
 /**
@@ -45,7 +44,7 @@ HTMLDivElement.prototype.hide = function () {
  * @type { typeof HTMLDivElement['prototype']['unfocus'] }
  */
 HTMLDivElement.prototype.unfocus = function () {
-	if (lib.config.transparent_dialog) this.classList.add('transparent');
+	if (lib.config.transparent_dialog) this.classList.add("transparent");
 	return this;
 };
 /**
@@ -53,7 +52,7 @@ HTMLDivElement.prototype.unfocus = function () {
  * @type { typeof HTMLDivElement['prototype']['refocus'] }
  */
 HTMLDivElement.prototype.refocus = function () {
-	this.classList.remove('transparent');
+	this.classList.remove("transparent");
 	return this;
 };
 /**
@@ -61,7 +60,7 @@ HTMLDivElement.prototype.refocus = function () {
  * @type { typeof HTMLDivElement['prototype']['show'] }
  */
 HTMLDivElement.prototype.show = function () {
-	this.classList.remove('hidden');
+	this.classList.remove("hidden");
 	return this;
 };
 /**
@@ -74,16 +73,15 @@ HTMLDivElement.prototype.delete = function (time = 500, callback) {
 		delete this.timeout;
 	}
 	if (!this._listeningEnd || this._transitionEnded) {
-		if (typeof time != 'number') time = 500;
-		this.classList.add('removing');
+		if (typeof time != "number") time = 500;
+		this.classList.add("removing");
 		// @ts-ignore
 		this.timeout = setTimeout(() => {
 			this.remove();
-			this.classList.remove('removing');
-			if (typeof callback == 'function') callback();
+			this.classList.remove("removing");
+			if (typeof callback == "function") callback();
 		}, time);
-	}
-	else {
+	} else {
 		this._onEndDelete = true;
 	}
 	return this;
@@ -98,14 +96,14 @@ HTMLDivElement.prototype.goto = function (position, time) {
 		delete this.timeout;
 	}
 
-	if (typeof time != 'number') time = 500;
-	this.classList.add('removing');
+	if (typeof time != "number") time = 500;
+	this.classList.add("removing");
 	// @ts-ignore
 	this.timeout = setTimeout(() => {
 		if (!this._selfDestroyed) {
 			position.appendChild(this);
 		}
-		this.classList.remove('removing');
+		this.classList.remove("removing");
 		delete this.destiny;
 	}, time);
 	this.destiny = position;
@@ -119,10 +117,10 @@ HTMLDivElement.prototype.fix = function () {
 	clearTimeout(this.timeout);
 	delete this.timeout;
 	delete this.destiny;
-	this.classList.remove('removing');
+	this.classList.remove("removing");
 	return this;
 };
-Reflect.defineProperty(HTMLDivElement.prototype, 'setBackground', {
+Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
 	configurable: true,
 	enumerable: false,
 	writable: true,
@@ -133,86 +131,85 @@ Reflect.defineProperty(HTMLDivElement.prototype, 'setBackground', {
 	value: function (name, type, ext, subfolder) {
 		if (!name) return this;
 		let src;
-		if (ext == 'noskin') ext = '.jpg';
-		ext = ext || '.jpg';
-		subfolder = subfolder || 'default';
+		if (ext == "noskin") ext = ".jpg";
+		ext = ext || ".jpg";
+		subfolder = subfolder || "default";
 		if (type) {
-			let dbimage = null, extimage = null, modeimage = null, nameinfo, gzbool = false;
+			let dbimage = null,
+				extimage = null,
+				modeimage = null,
+				nameinfo,
+				gzbool = false;
 			const mode = get.mode();
-			if (type == 'character') {
+			if (type == "character") {
 				if (lib.characterPack[`mode_${mode}`] && lib.characterPack[`mode_${mode}`][name]) {
-					if (mode == 'guozhan') {
+					if (mode == "guozhan") {
 						nameinfo = lib.character[name];
-						if (name.startsWith('gz_shibing')) name = name.slice(3, 11);
+						if (name.startsWith("gz_shibing")) name = name.slice(3, 11);
 						else {
-							if (lib.config.mode_config.guozhan.guozhanSkin && lib.character[name] && lib.character[name][4].includes('gzskin')) gzbool = true;
+							if (
+								lib.config.mode_config.guozhan.guozhanSkin &&
+								lib.character[name] &&
+								lib.character[name][4].includes("gzskin")
+							)
+								gzbool = true;
 							name = name.slice(3);
 						}
-					}
-					else modeimage = mode;
-				}
-				else if (name.includes('::')) {
+					} else modeimage = mode;
+				} else if (name.includes("::")) {
 					// @ts-ignore
-					name = name.split('::');
+					name = name.split("::");
 					modeimage = name[0];
 					name = name[1];
-				}
-				else {
+				} else {
 					nameinfo = get.character(name);
 				}
 			}
-			if (!modeimage && nameinfo && nameinfo[4]) for (const value of nameinfo[4]) {
-				if (value.startsWith('ext:')) {
-					extimage = value;
-					break;
+			if (!modeimage && nameinfo && nameinfo[4])
+				for (const value of nameinfo[4]) {
+					if (value.startsWith("ext:")) {
+						extimage = value;
+						break;
+					} else if (value.startsWith("db:")) {
+						dbimage = value;
+						break;
+					} else if (value.startsWith("mode:")) {
+						modeimage = value.slice(5);
+						break;
+					} else if (value.startsWith("character:")) {
+						name = value.slice(10);
+						break;
+					}
 				}
-				else if (value.startsWith('db:')) {
-					dbimage = value;
-					break;
-				}
-				else if (value.startsWith('mode:')) {
-					modeimage = value.slice(5);
-					break;
-				}
-				else if (value.startsWith('character:')) {
-					name = value.slice(10);
-					break;
-				}
-			}
-			if (extimage) src = extimage.replace(/^ext:/, 'extension/');
+			if (extimage) src = extimage.replace(/^ext:/, "extension/");
 			else if (dbimage) {
 				this.setBackgroundDB(dbimage.slice(3));
 				return this;
-			}
-			else if (modeimage) src = `image/mode/${modeimage}/character/${name}${ext}`;
-			else if (type == 'character' && lib.config.skin[name] && arguments[2] != 'noskin') src = `image/skin/${name}/${lib.config.skin[name]}${ext}`;
-			else if (type == 'character') {
-				src = `image/character/${gzbool ? 'gz_' : ''}${name}${ext}`;
-			}
-			else src = `image/${type}/${subfolder}/${name}${ext}`;
-		}
-		else src = `image/${name}${ext}`;
-		this.style.backgroundPositionX = 'center';
-		this.style.backgroundSize = 'cover';
-		if (type === 'character') {
+			} else if (modeimage) src = `image/mode/${modeimage}/character/${name}${ext}`;
+			else if (type == "character" && lib.config.skin[name] && arguments[2] != "noskin")
+				src = `image/skin/${name}/${lib.config.skin[name]}${ext}`;
+			else if (type == "character") {
+				src = `image/character/${gzbool ? "gz_" : ""}${name}${ext}`;
+			} else src = `image/${type}/${subfolder}/${name}${ext}`;
+		} else src = `image/${name}${ext}`;
+		this.style.backgroundPositionX = "center";
+		this.style.backgroundSize = "cover";
+		if (type === "character") {
 			const nameinfo = get.character(name);
-			const sex = nameinfo && ['male', 'female', 'double'].includes(nameinfo[0]) ? nameinfo[0] : 'male';
-			this.setBackgroundImage([
-				src,
-				`${lib.characterDefaultPicturePath}${sex}${ext}`
-			]);
+			const sex = nameinfo && ["male", "female", "double"].includes(nameinfo[0]) ? nameinfo[0] : "male";
+			this.setBackgroundImage([src, `${lib.characterDefaultPicturePath}${sex}${ext}`]);
 		} else {
 			this.setBackgroundImage(src);
 		}
 		return this;
-	}
+	},
 });
 /**
  * @this HTMLDivElement
  * @type { typeof HTMLDivElement['prototype']['setBackgroundDB'] }
  */
 HTMLDivElement.prototype.setBackgroundDB = function (img) {
-	return game.getDB('image', img).then(src => {
+	return game.getDB("image", img).then((src) => {
 		this.style.backgroundImage = `url('${src}')`;
 		this.style.backgroundSize = "cover";
 		return this;
@@ -224,9 +221,11 @@ HTMLDivElement.prototype.setBackgroundDB = function (img) {
  */
 HTMLDivElement.prototype.setBackgroundImage = function (img) {
 	if (Array.isArray(img)) {
-		this.style.backgroundImage = img.unique().map(v => `url("${lib.assetURL}${v}")`).join(",");
-	}
-	else {
+		this.style.backgroundImage = img
+			.unique()
+			.map((v) => `url("${lib.assetURL}${v}")`)
+			.join(",");
+	} else {
 		this.style.backgroundImage = `url("${lib.assetURL}${img}")`;
 	}
 	return this;
@@ -237,25 +236,23 @@ HTMLDivElement.prototype.setBackgroundImage = function (img) {
  */
 HTMLDivElement.prototype.listen = function (func) {
 	if (lib.config.touchscreen) {
-		this.addEventListener('touchend', function (e) {
+		this.addEventListener("touchend", function (e) {
 			if (!_status.dragged) func.call(this, e);
 		});
 		/**
 		 * @this HTMLDivElement
-		 * @param { MouseEvent } e 
+		 * @param { MouseEvent } e
 		 */
 		const fallback = function (e) {
 			if (!_status.touchconfirmed) {
 				func.call(this, e);
+			} else {
+				this.removeEventListener("click", fallback);
 			}
-			else {
-				this.removeEventListener('click', fallback);
-			}
-		}
-		this.addEventListener('click', fallback);
-	}
-	else {
-		this.addEventListener('click', func);
+		};
+		this.addEventListener("click", fallback);
+	} else {
+		this.addEventListener("click", func);
 	}
 	return this;
 };
@@ -271,10 +268,10 @@ HTMLDivElement.prototype.listenTransition = function (func, time) {
 			func.call(this);
 		}
 		clearTimeout(timer);
-		this.removeEventListener('webkitTransitionEnd', callback);
+		this.removeEventListener("webkitTransitionEnd", callback);
 	};
 	const timer = setTimeout(callback, time || 1000);
-	this.addEventListener('webkitTransitionEnd', callback);
+	this.addEventListener("webkitTransitionEnd", callback);
 	// @ts-ignore
 	return timer;
 };
@@ -287,19 +284,17 @@ HTMLDivElement.prototype.setPosition = function () {
 	if (arguments.length == 4) {
 		position = [];
 		for (var i = 0; i < arguments.length; i++) position.push(arguments[i]);
-	}
-	else if (arguments.length == 1 && Array.isArray(arguments[0]) && arguments[0].length == 4) {
+	} else if (arguments.length == 1 && Array.isArray(arguments[0]) && arguments[0].length == 4) {
 		position = arguments[0];
-	}
-	else {
+	} else {
 		return this;
 	}
-	var top = 'calc(' + position[0] + '% ';
-	if (position[1] > 0) top += '+ ' + position[1] + 'px)';
-	else top += '- ' + Math.abs(position[1]) + 'px)';
-	var left = 'calc(' + position[2] + '% ';
-	if (position[3] > 0) left += '+ ' + position[3] + 'px)';
-	else left += '- ' + Math.abs(position[3]) + 'px)';
+	var top = "calc(" + position[0] + "% ";
+	if (position[1] > 0) top += "+ " + position[1] + "px)";
+	else top += "- " + Math.abs(position[1]) + "px)";
+	var left = "calc(" + position[2] + "% ";
+	if (position[3] > 0) left += "+ " + position[3] + "px)";
+	else left += "- " + Math.abs(position[3]) + "px)";
 	this.style.top = top;
 	this.style.left = left;
 	return this;
@@ -310,10 +305,9 @@ HTMLDivElement.prototype.setPosition = function () {
  */
 HTMLDivElement.prototype.css = function (style) {
 	for (var i in style) {
-		if (i == 'innerHTML' && typeof style['innerHTML'] == 'string') {
-			this.innerHTML = style['innerHTML'];
-		}
-		else {
+		if (i == "innerHTML" && typeof style["innerHTML"] == "string") {
+			this.innerHTML = style["innerHTML"];
+		} else {
 			this.style[i] = style[i];
 		}
 	}
@@ -335,41 +329,41 @@ HTMLTableElement.prototype.get = function (row, col) {
  * @type { typeof Map['prototype']['contains'] }
  */
 const mapHasFunc = function (item) {
-	console.trace(this, '已经从array改为map，请改为使用has方法');
+	console.trace(this, "已经从array改为map，请改为使用has方法");
 	return this.has(item);
-}
+};
 Object.defineProperty(Map.prototype, "contains", {
 	configurable: true,
 	enumerable: false,
 	writable: true,
-	value: mapHasFunc
+	value: mapHasFunc,
 });
 Object.defineProperty(Map.prototype, "includes", {
 	configurable: true,
 	enumerable: false,
 	writable: true,
-	value: mapHasFunc
+	value: mapHasFunc,
 });
 /**
  * @this Map<any, any>
  * @type { typeof Map['prototype']['add'] }
  */
 const mapAddFunc = function (item) {
-	console.trace(this, '已经从array改为map，请改为使用set方法');
+	console.trace(this, "已经从array改为map，请改为使用set方法");
 	this.set(item, 0);
 	return this;
-}
+};
 Object.defineProperty(Map.prototype, "add", {
 	configurable: true,
 	enumerable: false,
 	writable: true,
-	value: mapAddFunc
+	value: mapAddFunc,
 });
 Object.defineProperty(Map.prototype, "push", {
 	configurable: true,
 	enumerable: false,
 	writable: true,
-	value: mapAddFunc
+	value: mapAddFunc,
 });
 Object.defineProperty(Map.prototype, "addArray", {
 	configurable: true,
@@ -384,7 +378,7 @@ Object.defineProperty(Map.prototype, "addArray", {
 			this.add(arr[i]);
 		}
 		return this;
-	}
+	},
 });
 Object.defineProperty(Map.prototype, "remove", {
 	configurable: true,
@@ -395,10 +389,10 @@ Object.defineProperty(Map.prototype, "remove", {
 	 * @type { typeof Map['prototype']['remove'] }
 	 */
 	value: function (item) {
-		console.trace(this, '已经从array改为map，请改为使用delete方法');
+		console.trace(this, "已经从array改为map，请改为使用delete方法");
 		this.delete(item);
 		return this;
-	}
+	},
 });
 /*Map prototype end*/
 Object.defineProperty(Array.prototype, "filterInD", {
@@ -409,11 +403,11 @@ Object.defineProperty(Array.prototype, "filterInD", {
 	 * @this any[]
 	 * @type { typeof Array['prototype']['filterInD'] }
 	 */
-	value: function (pos = 'o') {
-		if (typeof pos != 'string') pos = 'o';
+	value: function (pos = "o") {
+		if (typeof pos != "string") pos = "o";
 		// @ts-ignore
-		return this.filter(card => pos.includes(get.position(card, true)));
-	}
+		return this.filter((card) => pos.includes(get.position(card, true)));
+	},
 });
 Object.defineProperty(Array.prototype, "someInD", {
 	configurable: true,
@@ -423,11 +417,11 @@ Object.defineProperty(Array.prototype, "someInD", {
 	 * @this any[]
 	 * @type { typeof Array['prototype']['someInD'] }
 	 */
-	value: function (pos = 'o') {
-		if (typeof pos != 'string') pos = 'o';
+	value: function (pos = "o") {
+		if (typeof pos != "string") pos = "o";
 		// @ts-ignore
-		return this.some(card => pos.includes(get.position(card, true)));
-	}
+		return this.some((card) => pos.includes(get.position(card, true)));
+	},
 });
 Object.defineProperty(Array.prototype, "everyInD", {
 	configurable: true,
@@ -437,14 +431,14 @@ Object.defineProperty(Array.prototype, "everyInD", {
 	 * @this any[]
 	 * @type { typeof Array['prototype']['everyInD'] }
 	 */
-	value: function (pos = 'o') {
-		if (typeof pos != 'string') pos = 'o';
+	value: function (pos = "o") {
+		if (typeof pos != "string") pos = "o";
 		// @ts-ignore
-		return this.every(card => pos.includes(get.position(card, true)));
-	}
+		return this.every((card) => pos.includes(get.position(card, true)));
+	},
 });
 /**
-*@legacy Use {@link Array#includes} instead.
+ *@legacy Use {@link Array#includes} instead.
  */
 Object.defineProperty(Array.prototype, "contains", {
 	configurable: true,
@@ -455,9 +449,9 @@ Object.defineProperty(Array.prototype, "contains", {
 	 * @type { typeof Array['prototype']['contains'] }
 	 */
 	value: function (...args) {
-		console.warn(this, 'Array的contains方法已废弃，请使用includes方法');
+		console.warn(this, "Array的contains方法已废弃，请使用includes方法");
 		return this.includes(...args);
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "containsSome", {
 	configurable: true,
@@ -468,8 +462,8 @@ Object.defineProperty(Array.prototype, "containsSome", {
 	 * @type { typeof Array['prototype']['containsSome'] }
 	 */
 	value: function () {
-		return Array.from(arguments).some(i => this.includes(i));
-	}
+		return Array.from(arguments).some((i) => this.includes(i));
+	},
 });
 Object.defineProperty(Array.prototype, "containsAll", {
 	configurable: true,
@@ -480,8 +474,8 @@ Object.defineProperty(Array.prototype, "containsAll", {
 	 * @type { typeof Array['prototype']['containsAll'] }
 	 */
 	value: function () {
-		return Array.from(arguments).every(i => this.includes(i));
-	}
+		return Array.from(arguments).every((i) => this.includes(i));
+	},
 });
 
 Object.defineProperty(Array.prototype, "add", {
@@ -498,7 +492,7 @@ Object.defineProperty(Array.prototype, "add", {
 			this.push(arg);
 		}
 		return this;
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "addArray", {
 	configurable: true,
@@ -513,7 +507,7 @@ Object.defineProperty(Array.prototype, "addArray", {
 			for (const item of arr) this.add(item);
 		}
 		return this;
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "remove", {
 	configurable: true,
@@ -526,8 +520,8 @@ Object.defineProperty(Array.prototype, "remove", {
 	value: function () {
 		for (const item of arguments) {
 			let pos = -1;
-			if (typeof item == 'number' && isNaN(item)) {
-				pos = this.findIndex(v => isNaN(v))
+			if (typeof item == "number" && isNaN(item)) {
+				pos = this.findIndex((v) => isNaN(v));
 			} else {
 				pos = this.indexOf(item);
 			}
@@ -535,7 +529,7 @@ Object.defineProperty(Array.prototype, "remove", {
 			this.splice(pos, 1);
 		}
 		return this;
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "removeArray", {
 	configurable: true,
@@ -549,7 +543,7 @@ Object.defineProperty(Array.prototype, "removeArray", {
 		// @ts-ignore
 		for (const i of Array.from(arguments)) this.remove(...i);
 		return this;
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "unique", {
 	configurable: true,
@@ -564,7 +558,7 @@ Object.defineProperty(Array.prototype, "unique", {
 		this.length = uniqueArray.length;
 		for (let i = 0; i < uniqueArray.length; i++) this[i] = uniqueArray[i];
 		return this;
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "toUniqued", {
 	configurable: true,
@@ -576,7 +570,7 @@ Object.defineProperty(Array.prototype, "toUniqued", {
 	 */
 	value: function () {
 		return [...new Set(this)];
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "randomGet", {
 	configurable: true,
@@ -590,7 +584,7 @@ Object.defineProperty(Array.prototype, "randomGet", {
 		let arr = this.slice(0);
 		arr.removeArray(Array.from(arguments));
 		return arr[Math.floor(Math.random() * arr.length)];
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "randomGets", {
 	configurable: true,
@@ -608,7 +602,7 @@ Object.defineProperty(Array.prototype, "randomGets", {
 			list.push(arr.splice(Math.floor(Math.random() * arr.length), 1)[0]);
 		}
 		return list;
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "randomRemove", {
 	configurable: true,
@@ -619,7 +613,7 @@ Object.defineProperty(Array.prototype, "randomRemove", {
 	 * @type { typeof Array['prototype']['randomRemove'] }
 	 */
 	value: function (num) {
-		if (typeof num == 'number') {
+		if (typeof num == "number") {
 			let list = [];
 			for (let i = 0; i < num; i++) {
 				if (!this.length) break;
@@ -628,7 +622,7 @@ Object.defineProperty(Array.prototype, "randomRemove", {
 			return list;
 		}
 		return this.splice(Math.floor(Math.random() * this.length), 1)[0];
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "randomSort", {
 	configurable: true,
@@ -647,7 +641,7 @@ Object.defineProperty(Array.prototype, "randomSort", {
 			this.push(list[i]);
 		}
 		return this;
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "sortBySeat", {
 	configurable: true,
@@ -662,10 +656,10 @@ Object.defineProperty(Array.prototype, "sortBySeat", {
 		this.sort(lib.sort.seat);
 		delete lib.tempSortSeat;
 		return this;
-	}
+	},
 });
 /**
-*@description 从数组中寻找某个特征最大的，且通过筛选的第一个元素
+ *@description 从数组中寻找某个特征最大的，且通过筛选的第一个元素
  */
 Object.defineProperty(Array.prototype, "maxBy", {
 	configurable: true,
@@ -677,10 +671,10 @@ Object.defineProperty(Array.prototype, "maxBy", {
 	 */
 	value: function (sortBy, filter) {
 		let list = this.filter(filter || (() => true));
-		if (sortBy && typeof sortBy == 'function') list.sort((a, b) => sortBy(a) - sortBy(b));
+		if (sortBy && typeof sortBy == "function") list.sort((a, b) => sortBy(a) - sortBy(b));
 		else list.sort();
 		return list[list.length - 1];
-	}
+	},
 });
 Object.defineProperty(Array.prototype, "minBy", {
 	configurable: true,
@@ -692,8 +686,8 @@ Object.defineProperty(Array.prototype, "minBy", {
 	 */
 	value: function (sortBy, filter) {
 		let list = this.filter(filter || (() => true));
-		if (sortBy && typeof sortBy == 'function') list.sort((a, b) => sortBy(a) - sortBy(b));
+		if (sortBy && typeof sortBy == "function") list.sort((a, b) => sortBy(a) - sortBy(b));
 		else list.sort();
 		return list[0];
-	}
+	},
 });
