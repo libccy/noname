@@ -3454,6 +3454,9 @@ game.import('character', function () {
 					player.addSkills('pozhu');
 				},
 				derivation:'pozhu',
+				ai:{
+					combo:'sanchen'
+				}
 			},
 			pozhu:{
 				enable:'phaseUse',
