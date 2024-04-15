@@ -1364,12 +1364,9 @@ game.import("character", function () {
 				async content(event, trigger, player) {
 					const target = event.target,
 						cards = event.cards;
-					player
-						.getHistory("custom")
-						.push({
-							olsbguidao_num:
-								cards.filter((card) => get.name(card, player) == "sha").length + 1,
-						});
+					player.getHistory("custom").push({
+						olsbguidao_num: cards.filter((card) => get.name(card, player) == "sha").length + 1,
+					});
 					const card = new lib.element.VCard({ name: "juedou", storage: { olsbguidao: true } });
 					await player.recast(cards);
 					player.addTempSkill("olsbguidao_buff");
@@ -1758,7 +1755,7 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					player.chooseToCompare(target);
-					("step 1");
+					"step 1";
 					if (result.bool) player.addTempSkill("qiaoshui3", { player: "phaseUseAfter" });
 					else {
 						player.addTempSkill("qiaoshui2");
@@ -1801,7 +1798,7 @@ game.import("character", function () {
 					"step 0";
 					event.count = 2;
 					event.logged = false;
-					("step 1");
+					"step 1";
 					player
 						.chooseTarget(
 							get.prompt("olxuanfeng"),
@@ -1814,7 +1811,7 @@ game.import("character", function () {
 						.set("ai", function (target) {
 							return -get.attitude(_status.event.player, target);
 						});
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						if (!event.logged) {
 							player.logSkill("olxuanfeng", result.targets);
@@ -1823,7 +1820,7 @@ game.import("character", function () {
 						player.discardPlayerCard(result.targets[0], "he", true);
 						event.count--;
 					} else event.finish();
-					("step 3");
+					"step 3";
 					if (event.count) event.goto(1);
 				},
 				ai: {

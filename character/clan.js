@@ -5,34 +5,10 @@ game.import("character", function () {
 		name: "clan",
 		connect: true,
 		character: {
-			clan_wuxian: [
-				"female",
-				"shu",
-				3,
-				["clanyirong", "clanguixiang", "clanmuyin"],
-				["clan:陈留吴氏"],
-			],
-			clan_wuban: [
-				"male",
-				"shu",
-				4,
-				["clanzhanding", "clanmuyin"],
-				["clan:陈留吴氏"],
-			],
-			clan_xunshu: [
-				"male",
-				"qun",
-				3,
-				["clanshenjun", "clanbalong", "clandaojie"],
-				["clan:颍川荀氏"],
-			],
-			clan_xunchen: [
-				"male",
-				"qun",
-				3,
-				["clansankuang", "clanbeishi", "clandaojie"],
-				["clan:颍川荀氏"],
-			],
+			clan_wuxian: ["female", "shu", 3, ["clanyirong", "clanguixiang", "clanmuyin"], ["clan:陈留吴氏"]],
+			clan_wuban: ["male", "shu", 4, ["clanzhanding", "clanmuyin"], ["clan:陈留吴氏"]],
+			clan_xunshu: ["male", "qun", 3, ["clanshenjun", "clanbalong", "clandaojie"], ["clan:颍川荀氏"]],
+			clan_xunchen: ["male", "qun", 3, ["clansankuang", "clanbeishi", "clandaojie"], ["clan:颍川荀氏"]],
 			clan_xuncai: [
 				"female",
 				"qun",
@@ -47,34 +23,10 @@ game.import("character", function () {
 				["clanyunshen", "clanshangshen", "clanfenchai", "clandaojie"],
 				["clan:颍川荀氏"],
 			],
-			clan_hanshao: [
-				"male",
-				"qun",
-				3,
-				["clanfangzhen", "clanliuju", "clanxumin"],
-				["clan:颍川韩氏"],
-			],
-			clan_hanrong: [
-				"male",
-				"qun",
-				3,
-				["clanlianhe", "clanhuanjia", "clanxumin"],
-				["clan:颍川韩氏"],
-			],
-			clan_wukuang: [
-				"male",
-				"qun",
-				4,
-				["clanlianzhu", "clanmuyin"],
-				["clan:陈留吴氏"],
-			],
-			clan_wangling: [
-				"male",
-				"wei",
-				4,
-				["clanbolong", "clanzhongliu"],
-				["clan:太原王氏"],
-			],
+			clan_hanshao: ["male", "qun", 3, ["clanfangzhen", "clanliuju", "clanxumin"], ["clan:颍川韩氏"]],
+			clan_hanrong: ["male", "qun", 3, ["clanlianhe", "clanhuanjia", "clanxumin"], ["clan:颍川韩氏"]],
+			clan_wukuang: ["male", "qun", 4, ["clanlianzhu", "clanmuyin"], ["clan:陈留吴氏"]],
+			clan_wangling: ["male", "wei", 4, ["clanbolong", "clanzhongliu"], ["clan:太原王氏"]],
 			clan_zhongyan: [
 				"female",
 				"jin",
@@ -89,13 +41,7 @@ game.import("character", function () {
 				["clanjiexuan", "clanmingjie", "clanzhongliu"],
 				["clan:太原王氏"],
 			],
-			clan_wanghun: [
-				"male",
-				"jin",
-				3,
-				["clanfuxun", "clanchenya", "clanzhongliu"],
-				["clan:太原王氏"],
-			],
+			clan_wanghun: ["male", "jin", 3, ["clanfuxun", "clanchenya", "clanzhongliu"], ["clan:太原王氏"]],
 			clan_zhonghui: [
 				"male",
 				"wei",
@@ -103,13 +49,7 @@ game.import("character", function () {
 				["clanyuzhi", "clanxieshu", "clanbaozu"],
 				["clan:颍川钟氏"],
 			],
-			clan_zhongyu: [
-				"male",
-				"wei",
-				3,
-				["clanjiejian", "clanhuanghan", "clanbaozu"],
-				["clan:颍川钟氏"],
-			],
+			clan_zhongyu: ["male", "wei", 3, ["clanjiejian", "clanhuanghan", "clanbaozu"], ["clan:颍川钟氏"]],
 			clan_wanglun: [
 				"male",
 				"jin",
@@ -117,20 +57,8 @@ game.import("character", function () {
 				["clanqiuxin", "clanjianyuan", "clanzhongliu"],
 				["clan:太原王氏"],
 			],
-			clan_xunyou: [
-				"male",
-				"wei",
-				3,
-				["clanbaichu", "clandaojie"],
-				["clan:颍川荀氏"],
-			],
-			clan_wuqiao: [
-				"male",
-				"jin",
-				4,
-				["clanqiajue", "clanmuyin"],
-				["clan:陈留吴氏"],
-			],
+			clan_xunyou: ["male", "wei", 3, ["clanbaichu", "clandaojie"], ["clan:颍川荀氏"]],
+			clan_wuqiao: ["male", "jin", 4, ["clanqiajue", "clanmuyin"], ["clan:陈留吴氏"]],
 			clan_wangguang: [
 				"male",
 				"wei",
@@ -148,19 +76,8 @@ game.import("character", function () {
 		},
 		characterSort: {
 			clan: {
-				clan_wu: [
-					"clan_wuxian",
-					"clan_wuban",
-					"clan_wukuang",
-					"clan_wuqiao",
-				],
-				clan_xun: [
-					"clan_xunshu",
-					"clan_xunchen",
-					"clan_xuncai",
-					"clan_xuncan",
-					"clan_xunyou",
-				],
+				clan_wu: ["clan_wuxian", "clan_wuban", "clan_wukuang", "clan_wuqiao"],
+				clan_xun: ["clan_xunshu", "clan_xunchen", "clan_xuncai", "clan_xuncan", "clan_xunyou"],
 				clan_han: ["clan_hanshao", "clan_hanrong"],
 				clan_wang: [
 					"clan_wangling",
@@ -187,8 +104,7 @@ game.import("character", function () {
 						prevCard = evt.card;
 					const curNum = get.number(curCard),
 						prevNum = get.number(prevCard);
-					if (typeof curNum != "number" || typeof prevNum != "number")
-						return false;
+					if (typeof curNum != "number" || typeof prevNum != "number") return false;
 					const delNum = Math.abs(curNum - prevNum);
 					if (delNum === 0) return false;
 					return game.hasPlayer((current) => {
@@ -197,10 +113,7 @@ game.import("character", function () {
 				},
 				locked: false,
 				async cost(event, trigger, player) {
-					const evt = lib.skill.dcjianying.getLastUsed(
-						player,
-						trigger
-					);
+					const evt = lib.skill.dcjianying.getLastUsed(player, trigger);
 					const curCard = trigger.card,
 						prevCard = evt.card;
 					const curNum = get.number(curCard),
@@ -216,11 +129,7 @@ game.import("character", function () {
 						)
 						.set("delNum", delNum)
 						.set("ai", (target) => {
-							return get.damageEffect(
-								target,
-								get.player(),
-								get.player()
-							);
+							return get.damageEffect(target, get.player(), get.player());
 						})
 						.forResult();
 				},
@@ -236,18 +145,11 @@ game.import("character", function () {
 						if (!evt || !evt.card) return;
 						const curNum = get.number(card),
 							prevNum = get.number(evt.card);
-						if (
-							typeof curNum != "number" ||
-							typeof prevNum != "number"
-						)
-							return;
+						if (typeof curNum != "number" || typeof prevNum != "number") return;
 						const pairs = game
 							.filterPlayer()
 							.map((current) => {
-								return [
-									current.getHp(),
-									get.damageEffect(current, player, player),
-								];
+								return [current.getHp(), get.damageEffect(current, player, player)];
 							})
 							.filter((pair) => pair[1] > 0);
 						if (!pairs.length) return;
@@ -257,10 +159,7 @@ game.import("character", function () {
 							return (
 								num +
 								10 +
-								pairs
-									.filter((pair) => pair[0] === hp)
-									.sort((a, b) => b[1] - a[1])[0][1] /
-									20
+								pairs.filter((pair) => pair[0] === hp).sort((a, b) => b[1] - a[1])[0][1] / 20
 							);
 						}
 					},
@@ -281,18 +180,13 @@ game.import("character", function () {
 					if (event.responded) return false;
 					const names = lib.inpile.filter(
 							(name) =>
-								get.type(name) == "basic" &&
-								!player.getStorage("clanshengmo").includes(name)
+								get.type(name) == "basic" && !player.getStorage("clanshengmo").includes(name)
 						),
 						cards = get.event("clanshengmo_cards") || [];
 					return (
 						cards.length > 0 &&
 						names.some((name) => {
-							return event.filterCard(
-								{ name, isCard: true },
-								player,
-								event
-							);
+							return event.filterCard({ name, isCard: true }, player, event);
 						})
 					);
 				},
@@ -303,23 +197,13 @@ game.import("character", function () {
 						game.checkGlobalHistory("cardMove", (evt) => {
 							if (
 								evt.name != "cardsDiscard" &&
-								(evt.name != "lose" ||
-									evt.position != ui.discardPile)
+								(evt.name != "lose" || evt.position != ui.discardPile)
 							)
 								return;
-							cards.addArray(
-								evt.cards.filter(
-									(card) => get.position(card, true) == "d"
-								)
-							);
+							cards.addArray(evt.cards.filter((card) => get.position(card, true) == "d"));
 						});
-						const numbers = cards
-							.map((card) => get.number(card, false))
-							.unique();
-						const [min, max] = [
-							Math.min(...numbers),
-							Math.max(...numbers),
-						];
+						const numbers = cards.map((card) => get.number(card, false)).unique();
+						const [min, max] = [Math.min(...numbers), Math.max(...numbers)];
 						event.set(
 							"clanshengmo_cards",
 							cards.filter((card) => {
@@ -333,8 +217,7 @@ game.import("character", function () {
 					const evt = event.getParent(2);
 					const names = lib.inpile.filter(
 							(name) =>
-								get.type(name) == "basic" &&
-								!player.getStorage("clanshengmo").includes(name)
+								get.type(name) == "basic" && !player.getStorage("clanshengmo").includes(name)
 						),
 						cards = evt.clanshengmo_cards;
 					const links = await player
@@ -361,13 +244,7 @@ game.import("character", function () {
 					}
 					if (!list.length) return;
 					const links2 = await player
-						.chooseButton(
-							[
-								"视为使用一张未以此法使用过的基本牌",
-								[list, "vcard"],
-							],
-							true
-						)
+						.chooseButton(["视为使用一张未以此法使用过的基本牌", [list, "vcard"]], true)
 						.set("ai", (button) => {
 							return get.player().getUseValue(button.link) + 1;
 						})
@@ -394,9 +271,7 @@ game.import("character", function () {
 					evt.backup("clanshengmo_backup");
 					evt.set(
 						"openskilldialog",
-						`选择${get.translation(nature)}【${get.translation(
-							name
-						)}】的目标`
+						`选择${get.translation(nature)}【${get.translation(name)}】的目标`
 					);
 					evt.set("norestore", true);
 					evt.set("custom", {
@@ -414,14 +289,8 @@ game.import("character", function () {
 						precontent() {
 							delete event.result.skill;
 							event.result.card.storage.clanshengmo = true;
-							player.markAuto(
-								"clanshengmo",
-								event.result.card.name
-							);
-							player.gain(
-								lib.skill.clanshengmo_backup.cardToGain,
-								"gain2"
-							);
+							player.markAuto("clanshengmo", event.result.card.name);
+							player.gain(lib.skill.clanshengmo_backup.cardToGain, "gain2");
 						},
 						filterCard: () => false,
 						selectCard: -1,
@@ -431,15 +300,12 @@ game.import("character", function () {
 					order: 3,
 					result: {
 						player(player) {
-							if (get.event().dying)
-								return get.attitude(player, get.event().dying);
+							if (get.event().dying) return get.attitude(player, get.event().dying);
 							if (get.event().type != "phase") return 1;
 							const names = lib.inpile.filter(
 								(name) =>
 									get.type(name) == "basic" &&
-									!player
-										.getStorage("clanshengmo")
-										.includes(name)
+									!player.getStorage("clanshengmo").includes(name)
 							);
 							if (Array.isArray(names)) {
 								return names.some((name) => {
@@ -456,27 +322,13 @@ game.import("character", function () {
 				audio: 2,
 				enable: "phaseUse",
 				filter(event, player) {
-					return player.hasCard(
-						(card) =>
-							get.info("clanlilun").filterCard(card, player),
-						"h"
-					);
+					return player.hasCard((card) => get.info("clanlilun").filterCard(card, player), "h");
 				},
 				filterCard(card, player) {
-					if (player.getStorage("clanlilun").includes(card.name))
-						return false;
-					if (
-						ui.selected.cards.length &&
-						ui.selected.cards[0].name != card.name
-					)
-						return false;
-					const cards = player.getCards("h", (cardx) =>
-						player.canRecast(cardx)
-					);
-					return (
-						cards.includes(card) &&
-						cards.filter((i) => i.name == card.name).length > 1
-					);
+					if (player.getStorage("clanlilun").includes(card.name)) return false;
+					if (ui.selected.cards.length && ui.selected.cards[0].name != card.name) return false;
+					const cards = player.getCards("h", (cardx) => player.canRecast(cardx));
+					return cards.includes(card) && cards.filter((i) => i.name == card.name).length > 1;
 				},
 				selectCard: 2,
 				position: "h",
@@ -484,15 +336,9 @@ game.import("character", function () {
 					const player = get.event("player");
 					const value = function (card, player) {
 						const num = player.getUseValue(card);
-						return num > 0
-							? num + 1 / (get.value(card) || 0.5) + 7
-							: 7 - get.value(card);
+						return num > 0 ? num + 1 / (get.value(card) || 0.5) + 7 : 7 - get.value(card);
 					};
-					if (
-						ui.selected.cards.length &&
-						value(card, player) <
-							value(ui.selected.cards[0], player)
-					)
+					if (ui.selected.cards.length && value(card, player) < value(ui.selected.cards[0], player))
 						return 20 - get.value(card);
 					return value(card, player);
 				},
@@ -518,19 +364,12 @@ game.import("character", function () {
 						const {
 							result: { bool, links },
 						} = await player
-							.chooseButton([
-								"离论：是否使用其中的一张牌？",
-								cards,
-							])
+							.chooseButton(["离论：是否使用其中的一张牌？", cards])
 							.set("filterButton", (button) => {
-								return get
-									.event("player")
-									.hasUseTarget(button.link);
+								return get.event("player").hasUseTarget(button.link);
 							})
 							.set("ai", (button) => {
-								return get
-									.event("player")
-									.getUseValue(button.link);
+								return get.event("player").getUseValue(button.link);
 							});
 						if (bool) {
 							const card = links[0];
@@ -547,16 +386,9 @@ game.import("character", function () {
 						let cards = player.getCards(
 							"h",
 							(card) =>
-								get
-									.info("clanlilun")
-									.filterCard(card, player) &&
-								player.getUseValue(card) > 0
+								get.info("clanlilun").filterCard(card, player) && player.getUseValue(card) > 0
 						);
-						cards = cards.filter(
-							(card) =>
-								cards.filter((i) => i.name == card.name)
-									.length > 1
-						);
+						cards = cards.filter((card) => cards.filter((i) => i.name == card.name).length > 1);
 						if (!cards.length) return 1;
 						cards.sort((a, b) => get.order(b) - get.order(a));
 						return get.order(cards[0]) - 0.001;
@@ -572,10 +404,7 @@ game.import("character", function () {
 				filter(event, player) {
 					if (!event.player.isIn()) return false;
 					const targets = game.filterPlayer((target) => {
-						return (
-							event.player.getPrevious() == target ||
-							event.player.getNext() == target
-						);
+						return event.player.getPrevious() == target || event.player.getNext() == target;
 					});
 					if (!targets.length) return false;
 					const card = new lib.element.VCard({ name: "sha" });
@@ -586,15 +415,9 @@ game.import("character", function () {
 						(player.hasUseTarget(card) &&
 							!targets.some((target) => {
 								return game.hasPlayer2((current) => {
-									return current.getHistory(
-										"useCard",
-										(evt) => {
-											return (
-												evt.targets &&
-												evt.targets.includes(target)
-											);
-										}
-									).length;
+									return current.getHistory("useCard", (evt) => {
+										return evt.targets && evt.targets.includes(target);
+									}).length;
 								});
 							}))
 					);
@@ -605,10 +428,7 @@ game.import("character", function () {
 					let str = "";
 					const card = new lib.element.VCard({ name: "sha" });
 					const targets = game.filterPlayer((target) => {
-							return (
-								event.player.getPrevious() == target ||
-								event.player.getNext() == target
-							);
+							return event.player.getPrevious() == target || event.player.getNext() == target;
 						}),
 						bool = !targets.some((target) => {
 							return target.getHistory("useCard").length;
@@ -617,23 +437,14 @@ game.import("character", function () {
 							player.hasUseTarget(card) &&
 							!targets.some((target) => {
 								return game.hasPlayer2((current) => {
-									return current.getHistory(
-										"useCard",
-										(evt) => {
-											return (
-												evt.targets &&
-												evt.targets.includes(target)
-											);
-										}
-									).length;
+									return current.getHistory("useCard", (evt) => {
+										return evt.targets && evt.targets.includes(target);
+									}).length;
 								});
 							});
 					if (bool) {
 						if (goon) str += "你可以";
-						str +=
-							"与" +
-							get.translation(get.translation(event.player)) +
-							"各摸一张牌";
+						str += "与" + get.translation(get.translation(event.player)) + "各摸一张牌";
 					}
 					if (goon) {
 						if (bool) str += "，然后你可以";
@@ -644,10 +455,7 @@ game.import("character", function () {
 				check(event, player) {
 					const card = new lib.element.VCard({ name: "sha" });
 					const targets = game.filterPlayer((target) => {
-							return (
-								event.player.getPrevious() == target ||
-								event.player.getNext() == target
-							);
+							return event.player.getPrevious() == target || event.player.getNext() == target;
 						}),
 						bool = !targets.some((target) => {
 							return target.getHistory("useCard").length;
@@ -656,22 +464,15 @@ game.import("character", function () {
 							player.hasUseTarget(card) &&
 							!targets.some((target) => {
 								return game.hasPlayer2((current) => {
-									return current.getHistory(
-										"useCard",
-										(evt) => {
-											return (
-												evt.targets &&
-												evt.targets.includes(target)
-											);
-										}
-									).length;
+									return current.getHistory("useCard", (evt) => {
+										return evt.targets && evt.targets.includes(target);
+									}).length;
 								});
 							});
 					return (
 						(bool &&
 							(get.attitude(player, event.player) > 0 ||
-								event.player.countCards("h") >
-									player.countCards("h"))) ||
+								event.player.countCards("h") > player.countCards("h"))) ||
 						(goon && player.hasValueTarget(card))
 					);
 				},
@@ -681,8 +482,7 @@ game.import("character", function () {
 					const card = new lib.element.VCard({ name: "sha" });
 					const targets = game.filterPlayer((target) => {
 							return (
-								trigger.player.getPrevious() == target ||
-								trigger.player.getNext() == target
+								trigger.player.getPrevious() == target || trigger.player.getNext() == target
 							);
 						}),
 						boolx = !targets.some((target) => {
@@ -692,15 +492,9 @@ game.import("character", function () {
 							player.hasUseTarget(card) &&
 							!targets.some((target) => {
 								return game.hasPlayer2((current) => {
-									return current.getHistory(
-										"useCard",
-										(evt) => {
-											return (
-												evt.targets &&
-												evt.targets.includes(target)
-											);
-										}
-									).length;
+									return current.getHistory("useCard", (evt) => {
+										return evt.targets && evt.targets.includes(target);
+									}).length;
 								});
 							});
 					if (boolx) {
@@ -709,16 +503,11 @@ game.import("character", function () {
 							const {
 								result: { bool },
 							} = await player
-								.chooseBool(
-									"是否与" +
-										get.translation(trigger.player) +
-										"各摸一张牌？"
-								)
+								.chooseBool("是否与" + get.translation(trigger.player) + "各摸一张牌？")
 								.set(
 									"choice",
 									get.attitude(player, trigger.player) > 0 ||
-										trigger.player.countCards("h") >
-											player.countCards("h")
+										trigger.player.countCards("h") > player.countCards("h")
 								);
 							if (bool) draw = true;
 						} else draw = true;
@@ -737,14 +526,9 @@ game.import("character", function () {
 				filter(event, player) {
 					return (
 						player.countCards("he", (card) => {
-							if (
-								_status.connectMode &&
-								get.position(card) == "h"
-							)
-								return true;
+							if (_status.connectMode && get.position(card) == "h") return true;
 							return (
-								get.color(card, player) == "black" &&
-								lib.filter.cardDiscardable(card, player)
+								get.color(card, player) == "black" && lib.filter.cardDiscardable(card, player)
 							);
 						}) > 0
 					);
@@ -756,69 +540,41 @@ game.import("character", function () {
 					} = await player
 						.chooseToDiscard((card, player) => {
 							return (
-								get.color(card, player) == "black" &&
-								lib.filter.cardDiscardable(card, player)
+								get.color(card, player) == "black" && lib.filter.cardDiscardable(card, player)
 							);
 						}, "he")
 						.set(
 							"prompt",
 							"当前手牌点数和为" +
-								player
-									.getCards("h")
-									.reduce(
-										(sum, card) => sum + get.number(card),
-										0
-									) +
+								player.getCards("h").reduce((sum, card) => sum + get.number(card), 0) +
 								"，" +
 								get.prompt("clanqiajue")
 						)
 						.set(
 							"prompt2",
 							lib.translate.clanqiajue_info
-								.slice(
-									lib.translate.clanqiajue_info.indexOf(
-										"弃置"
-									)
-								)
+								.slice(lib.translate.clanqiajue_info.indexOf("弃置"))
 								.slice(0, -1)
 						)
 						.set("ai", (card) => {
 							const player = get.event("player"),
 								goon = get.position(card) == "h";
-							let num = player
-								.getCards("h")
-								.reduce(
-									(sum, card) => sum + get.number(card),
-									0
-								);
-							if (num - (goon ? get.number(card) : 0) > 30)
-								return 0;
-							return goon
-								? get.number(card)
-								: 1 / (get.value(card) || 0.5);
+							let num = player.getCards("h").reduce((sum, card) => sum + get.number(card), 0);
+							if (num - (goon ? get.number(card) : 0) > 30) return 0;
+							return goon ? get.number(card) : 1 / (get.value(card) || 0.5);
 						})
 						.set("logSkill", "clanqiajue");
 					if (bool) {
 						player
 							.when({
-								player: [
-									"phaseDrawEnd",
-									"phaseDrawCancelled",
-									"phaseUseSkipped",
-								],
+								player: ["phaseDrawEnd", "phaseDrawCancelled", "phaseUseSkipped"],
 							})
 							.filter((evt) => evt == trigger)
 							.then(() => {
 								const cards = player.getCards("h"),
-									num = cards.reduce(
-										(sum, card) => sum + get.number(card),
-										0
-									);
+									num = cards.reduce((sum, card) => sum + get.number(card), 0);
 								if (cards.length)
-									player.showCards(
-										cards,
-										get.translation(player) + "【跒倔】展示"
-									);
+									player.showCards(cards, get.translation(player) + "【跒倔】展示");
 								if (num > 30) {
 									player.popup("杯具");
 									lib.skill.chenliuwushi.change(player, -2);
@@ -839,8 +595,7 @@ game.import("character", function () {
 				trigger: { player: "useCardAfter" },
 				filter(event, player) {
 					const storage = player.storage.clanbaichu || {};
-					if (Object.values(storage).includes(event.card.name))
-						return true;
+					if (Object.values(storage).includes(event.card.name)) return true;
 					const suit = get.suit(event.card);
 					if (suit == "none") return false;
 					if (!player.hasSkill("qice")) return true;
@@ -862,62 +617,35 @@ game.import("character", function () {
 							}
 							event.goto(2);
 						} else {
-							var list = lib.inpile.filter(
-								(name) => get.type(name) == "trick"
-							);
+							var list = lib.inpile.filter((name) => get.type(name) == "trick");
 							list.removeArray(Object.values(storage));
 							if (list.length > 0) {
-								var dialog = [
-									"百出：选择记录一种普通锦囊牌",
-									[list, "vcard"],
-								];
-								player
-									.chooseButton(dialog, true)
-									.set("ai", function (button) {
-										var player = _status.event.player,
-											name = button.link[2];
-										if (
-											name ==
-											_status.event.getTrigger().card.name
-										)
-											return 1919810;
-										if (name == "wuxie") return 114514;
-										return (
-											get.effect(
-												player,
-												{ name: name },
-												player,
-												player
-											) *
-											(1 + player.countCards("hs", name))
-										);
-									});
+								var dialog = ["百出：选择记录一种普通锦囊牌", [list, "vcard"]];
+								player.chooseButton(dialog, true).set("ai", function (button) {
+									var player = _status.event.player,
+										name = button.link[2];
+									if (name == _status.event.getTrigger().card.name) return 1919810;
+									if (name == "wuxie") return 114514;
+									return (
+										get.effect(player, { name: name }, player, player) *
+										(1 + player.countCards("hs", name))
+									);
+								});
 							} else event.goto(2);
 						}
 					} else event.goto(2);
-					("step 1");
+					"step 1";
 					if (result.bool) {
-						var key = `${get.suit(trigger.card)}+${get.type2(
-								trigger.card
-							)}`,
+						var key = `${get.suit(trigger.card)}+${get.type2(trigger.card)}`,
 							name = result.links[0][2];
-						if (!player.storage.clanbaichu)
-							player.storage.clanbaichu = {};
+						if (!player.storage.clanbaichu) player.storage.clanbaichu = {};
 						player.storage.clanbaichu[key] = name;
 						player.markSkill("clanbaichu");
-						game.log(
-							player,
-							"记录了",
-							"#y" + get.translation(name)
-						);
+						game.log(player, "记录了", "#y" + get.translation(name));
 						game.delayx();
 					}
-					("step 2");
-					if (
-						Object.values(player.getStorage("clanbaichu")).includes(
-							trigger.card.name
-						)
-					) {
+					"step 2";
+					if (Object.values(player.getStorage("clanbaichu")).includes(trigger.card.name)) {
 						player.chooseDrawRecover(true);
 					}
 				},
@@ -927,26 +655,16 @@ game.import("character", function () {
 					},
 					content(storage) {
 						if (!storage) return "当前暂无记录";
-						const keys = Object.keys(storage).map((i) =>
-							i.split("+")
-						);
+						const keys = Object.keys(storage).map((i) => i.split("+"));
 						keys.sort((a, b) => {
-							if (a[0] != b[0])
-								return (
-									lib.suit.indexOf(b[0]) -
-									lib.suit.indexOf(a[0])
-								);
+							if (a[0] != b[0]) return lib.suit.indexOf(b[0]) - lib.suit.indexOf(a[0]);
 							return lib.sort.name(a[1], b[1]);
 						});
 						return keys
 							.map((item) => {
-								return `<li>${get.translation(
-									item[0]
-								)}+${get.translation(
+								return `<li>${get.translation(item[0])}+${get.translation(
 									item[1]
-								)}:【${get.translation(
-									storage[item.join("+")]
-								)}】`;
+								)}:【${get.translation(storage[item.join("+")])}】`;
 							})
 							.join("<br>");
 					},
@@ -964,10 +682,8 @@ game.import("character", function () {
 					target
 						.chooseControl()
 						.set("choiceList", [
-							str +
-								"下次对你使用【杀】后，其视为对你使用任意普通锦囊牌",
-							str +
-								"下次对你使用任意普通锦囊牌后，其视为对你使用【杀】",
+							str + "下次对你使用【杀】后，其视为对你使用任意普通锦囊牌",
+							str + "下次对你使用任意普通锦囊牌后，其视为对你使用【杀】",
 						])
 						.set("ai", function () {
 							var target = _status.event.player;
@@ -978,31 +694,14 @@ game.import("character", function () {
 								player,
 								player
 							);
-							if (
-								!player.canUse(
-									get.autoViewAs({ name: "sha" }, []),
-									target
-								)
-							)
-								num1 = 0;
+							if (!player.canUse(get.autoViewAs({ name: "sha" }, []), target)) num1 = 0;
 							var num2 = 0;
 							for (var name of lib.inpile) {
 								if (get.type(name) != "trick") continue;
-								if (
-									!player.canUse(
-										get.autoViewAs({ name: name }, []),
-										target
-									)
-								)
-									continue;
+								if (!player.canUse(get.autoViewAs({ name: name }, []), target)) continue;
 								if (
 									num2 <
-									get.effect(
-										target,
-										get.autoViewAs({ name: name }, []),
-										player,
-										player
-									)
+									get.effect(target, get.autoViewAs({ name: name }, []), player, player)
 								)
 									num2 = get.effect(
 										target,
@@ -1014,21 +713,16 @@ game.import("character", function () {
 							return num1 >= num2 ? 1 : 0;
 						})
 						.set("target", player);
-					("step 1");
+					"step 1";
 					player.addSkill("clanqiuxin_effect");
-					player.markAuto("clanqiuxin_effect", [
-						[target, result.index],
-					]);
+					player.markAuto("clanqiuxin_effect", [[target, result.index]]);
 				},
 				ai: {
 					order: 9,
 					result: {
 						target(player, target) {
 							var cards = player.getCards("hs", (card) => {
-								if (
-									get.name(card, player) != "sha" &&
-									get.type(card, player) != "trick"
-								)
+								if (get.name(card, player) != "sha" && get.type(card, player) != "trick")
 									return false;
 								return player.hasValueTarget(card);
 							});
@@ -1036,12 +730,7 @@ game.import("character", function () {
 								cards.some(
 									(card) =>
 										player.canUse(card, target) &&
-										get.effect(
-											target,
-											card,
-											player,
-											player
-										) > 0
+										get.effect(target, card, player, player) > 0
 								)
 							) {
 								var att = get.attitude(player, target);
@@ -1083,27 +772,18 @@ game.import("character", function () {
 						},
 						trigger: { player: "useCardAfter" },
 						filter(event, player) {
-							if (!event.targets || !event.targets.length)
-								return false;
+							if (!event.targets || !event.targets.length) return false;
 							if (event.card.name == "sha")
 								return event.targets.some((target) => {
 									return player
 										.getStorage("clanqiuxin_effect")
-										.some(
-											(list) =>
-												list[0] == target &&
-												list[1] == 0
-										);
+										.some((list) => list[0] == target && list[1] == 0);
 								});
 							if (get.type(event.card) == "trick")
 								return event.targets.some((target) => {
 									return player
 										.getStorage("clanqiuxin_effect")
-										.some(
-											(list) =>
-												list[0] == target &&
-												list[1] == 1
-										);
+										.some((list) => list[0] == target && list[1] == 1);
 								});
 							return false;
 						},
@@ -1115,62 +795,31 @@ game.import("character", function () {
 							if (trigger.card.name == "sha")
 								list = player
 									.getStorage("clanqiuxin_effect")
-									.filter(
-										(listx) =>
-											trigger.targets.includes(
-												listx[0]
-											) && listx[1] == 0
-									);
+									.filter((listx) => trigger.targets.includes(listx[0]) && listx[1] == 0);
 							if (get.type(trigger.card) == "trick")
 								list = player
 									.getStorage("clanqiuxin_effect")
-									.filter(
-										(listx) =>
-											trigger.targets.includes(
-												listx[0]
-											) && listx[1] == 1
-									);
+									.filter((listx) => trigger.targets.includes(listx[0]) && listx[1] == 1);
 							player.unmarkAuto("clanqiuxin_effect", list);
 							var targets = list.map((listx) => listx[0]);
 							event.targets = targets;
-							("step 1");
+							"step 1";
 							var target = event.targets.shift();
 							event.target = target;
 							var list = [];
 							for (var name of lib.inpile) {
-								if (name != "sha" && get.type(name) != "trick")
-									continue;
-								if (
-									trigger.card.name == "sha" &&
-									get.type(name) != "trick"
-								)
-									continue;
-								if (
-									name == "sha" &&
-									get.type(trigger.card) != "trick"
-								)
-									continue;
-								if (
-									!player.canUse(
-										get.autoViewAs({ name: name }, []),
-										target
-									)
-								)
-									continue;
-								list.push([
-									get.translation(get.type(name)),
-									"",
-									name,
-								]);
+								if (name != "sha" && get.type(name) != "trick") continue;
+								if (trigger.card.name == "sha" && get.type(name) != "trick") continue;
+								if (name == "sha" && get.type(trigger.card) != "trick") continue;
+								if (!player.canUse(get.autoViewAs({ name: name }, []), target)) continue;
+								list.push([get.translation(get.type(name)), "", name]);
 							}
 							if (!list.length) event.goto(3);
 							else {
 								player
 									.chooseButton(
 										[
-											"求心：视为对" +
-												get.translation(target) +
-												"使用一张牌",
+											"求心：视为对" + get.translation(target) + "使用一张牌",
 											[list, "vcard"],
 										],
 										true
@@ -1190,7 +839,7 @@ game.import("character", function () {
 									})
 									.set("target", target);
 							}
-							("step 2");
+							"step 2";
 							if (result.bool) {
 								var card = {
 									name: result.links[0][2],
@@ -1198,11 +847,9 @@ game.import("character", function () {
 								};
 								player.useCard(card, target, false);
 							}
-							("step 3");
+							"step 3";
 							if (event.targets.length) event.goto(1);
-							else if (
-								!player.getStorage("clanqiuxin_effect").length
-							)
+							else if (!player.getStorage("clanqiuxin_effect").length)
 								player.removeSkill("clanqiuxin_effect");
 						},
 					},
@@ -1215,15 +862,10 @@ game.import("character", function () {
 						var evt = event.getParent(phase);
 						if (evt && evt.name == phase) {
 							if (
-								event.player.getHistory(
-									"useCard",
-									(evtx) => evtx.getParent(phase) == evt
-								).length
+								event.player.getHistory("useCard", (evtx) => evtx.getParent(phase) == evt)
+									.length
 							)
-								return lib.skill.clanchenya.filter(
-									event,
-									player
-								);
+								return lib.skill.clanchenya.filter(event, player);
 						}
 					}
 					return false;
@@ -1245,9 +887,7 @@ game.import("character", function () {
 							"是否重铸任意张牌名字数为" + num + "的牌？",
 							[1, Infinity],
 							"he",
-							(card, player) =>
-								_status.event.cards.includes(card) &&
-								player.canRecast(card)
+							(card, player) => _status.event.cards.includes(card) && player.canRecast(card)
 						)
 						.set("ai", (card) => {
 							var val = get.value(card);
@@ -1259,7 +899,7 @@ game.import("character", function () {
 								return get.cardNameLength(card) == num;
 							})
 						);
-					("step 1");
+					"step 1";
 					if (result.bool) trigger.player.recast(result.cards);
 				},
 			},
@@ -1268,14 +908,10 @@ game.import("character", function () {
 				audio: 2,
 				trigger: { player: "useCardToPlayered" },
 				filter(event, player) {
-					if (!event.isFirstTarget || get.type(event.card) == "equip")
-						return false;
+					if (!event.isFirstTarget || get.type(event.card) == "equip") return false;
 					return (
 						get.cardNameLength(event.card) ==
-						player
-							.getHistory("useCard")
-							.indexOf(event.getParent()) +
-							1
+						player.getHistory("useCard").indexOf(event.getParent()) + 1
 					);
 				},
 				direct: true,
@@ -1289,15 +925,11 @@ game.import("character", function () {
 							get.prompt("clanjiejian"),
 							"令一名目标角色摸" + get.cnNumber(num) + "张牌",
 							function (card, player, target) {
-								return _status.event
-									.getTrigger()
-									.targets.includes(target);
+								return _status.event.getTrigger().targets.includes(target);
 							}
 						)
-						.set("ai", (target) =>
-							get.attitude(_status.event.player, target)
-						);
-					("step 1");
+						.set("ai", (target) => get.attitude(_status.event.player, target));
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						player.logSkill("clanjiejian", target);
@@ -1314,33 +946,21 @@ game.import("character", function () {
 								player._clanjiejian_mod_temp ||
 								get.type(card) === "equip" ||
 								get.attitude(player, target) <= 0 ||
-								get.cardNameLength(card) !==
-									player.getHistory("useCard").length + 1
+								get.cardNameLength(card) !== player.getHistory("useCard").length + 1
 							)
 								return;
 							let targets = [target],
 								evt = _status.event.getParent("useCard");
 							targets.addArray(ui.selected.targets);
-							if (evt && evt.card == card)
-								targets.addArray(evt.targets);
-							return [
-								1,
-								(0.8 * get.cardNameLength(card)) /
-									targets.length,
-							];
+							if (evt && evt.card == card) targets.addArray(evt.targets);
+							return [1, (0.8 * get.cardNameLength(card)) / targets.length];
 						},
 					},
 				},
 				mod: {
 					aiOrder(player, card, num) {
-						if (
-							typeof card == "object" &&
-							get.type(card) !== "equip"
-						) {
-							let cs =
-								get.cardNameLength(card) -
-								player.getHistory("useCard").length -
-								1;
+						if (typeof card == "object" && get.type(card) !== "equip") {
+							let cs = get.cardNameLength(card) - player.getHistory("useCard").length - 1;
 							if (cs < 0) return num;
 							if (cs > 0) return num / 3;
 							player._clanjiejian_mod_temp = true;
@@ -1352,12 +972,7 @@ game.import("character", function () {
 									return false;
 								return (
 									get.effect(target, card, player, player) +
-										get.effect(
-											target,
-											{ name: "draw" },
-											player,
-											player
-										) >
+										get.effect(target, { name: "draw" }, player, player) >
 									0
 								);
 							});
@@ -1376,8 +991,7 @@ game.import("character", function () {
 					return typeof num == "number" && num > 0;
 				},
 				check(event, player) {
-					let num =
-						get.cardNameLength(event.card) - player.getDamagedHp();
+					let num = get.cardNameLength(event.card) - player.getDamagedHp();
 					if (num >= 0) return true;
 					if (num < -1) return false;
 					if (
@@ -1393,18 +1007,10 @@ game.import("character", function () {
 				content() {
 					"step 0";
 					player.draw(get.cardNameLength(trigger.card));
-					if (player.isDamaged())
-						player.chooseToDiscard(
-							player.getDamagedHp(),
-							"he",
-							true
-						);
-					("step 1");
+					if (player.isDamaged()) player.chooseToDiscard(player.getDamagedHp(), "he", true);
+					"step 1";
 					if (
-						player.getHistory(
-							"useSkill",
-							(evt) => evt.skill == "clanhuanghan"
-						).length > 1 &&
+						player.getHistory("useSkill", (evt) => evt.skill == "clanhuanghan").length > 1 &&
 						player.hasSkill("clanbaozu", null, false, false) &&
 						player.awakenedSkills.includes("clanbaozu")
 					) {
@@ -1417,14 +1023,9 @@ game.import("character", function () {
 					threaten: 3,
 					effect: {
 						target(card, player, target) {
-							if (
-								!get.tag(card, "damage") ||
-								player.hasSkillTag("jueqing", false, target)
-							)
+							if (!get.tag(card, "damage") || player.hasSkillTag("jueqing", false, target))
 								return;
-							let num =
-								get.cardNameLength(card) -
-								target.getDamagedHp();
+							let num = get.cardNameLength(card) - target.getDamagedHp();
 							if (num > 0) return [1, num + 0.1];
 						},
 					},
@@ -1446,10 +1047,7 @@ game.import("character", function () {
 					player.unmarkSkill("clanyuzhi");
 					if (
 						player.countCards("h", (card) => {
-							return (
-								card.hasGaintag("clanyuzhi") &&
-								lib.filter.cardDiscardable(card, player)
-							);
+							return card.hasGaintag("clanyuzhi") && lib.filter.cardDiscardable(card, player);
 						})
 					) {
 						event.logged = true;
@@ -1462,16 +1060,13 @@ game.import("character", function () {
 							true
 						).logSkill = "clanyuzhi";
 					}
-					("step 1");
+					"step 1";
 					player.removeGaintag("clanyuzhi");
 					var num1 = player
 						.getRoundHistory(
 							"gain",
 							(evt) => {
-								return (
-									evt.getParent().name == "draw" &&
-									evt.getParent(2).name == "clanyuzhi"
-								);
+								return evt.getParent().name == "draw" && evt.getParent(2).name == "clanyuzhi";
 							},
 							1
 						)
@@ -1480,10 +1075,7 @@ game.import("character", function () {
 						.getRoundHistory(
 							"gain",
 							(evt) => {
-								return (
-									evt.getParent().name == "draw" &&
-									evt.getParent(2).name == "clanyuzhi"
-								);
+								return evt.getParent().name == "draw" && evt.getParent(2).name == "clanyuzhi";
 							},
 							2
 						)
@@ -1501,34 +1093,20 @@ game.import("character", function () {
 					if ((num1 > 0 && num2 > 0 && num1 > num2) || num1 > num3) {
 						if (!event.logged) player.logSkill("clanyuzhi");
 						if (num2 > 0 && num1 > num2)
-							game.log(
-								player,
-								"的野心已开始膨胀",
-								"#y(" + num1 + "张>" + num2 + "张)"
-							);
+							game.log(player, "的野心已开始膨胀", "#y(" + num1 + "张>" + num2 + "张)");
 						if (num1 > num3)
-							game.log(
-								player,
-								"的行动未达到野心",
-								"#y(" + num3 + "张<" + num1 + "张)"
-							);
+							game.log(player, "的行动未达到野心", "#y(" + num3 + "张<" + num1 + "张)");
 						if (player.hasSkill("clanbaozu", null, false, false))
 							player
-								.chooseBool(
-									"迂志：是否失去〖保族〗？",
-									"若选择“否”，则你受到1点雷属性伤害"
-								)
-								.set(
-									"choice",
-									player.awakenedSkills.includes("clanbaozu")
-								);
+								.chooseBool("迂志：是否失去〖保族〗？", "若选择“否”，则你受到1点雷属性伤害")
+								.set("choice", player.awakenedSkills.includes("clanbaozu"));
 						else event._result = { bool: false };
 					} else event.goto(3);
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						player.removeSkills("clanbaozu");
 					} else player.damage(1, "thunder");
-					("step 3");
+					"step 3";
 					if (player.countCards("h")) {
 						player
 							.chooseCard(
@@ -1559,18 +1137,13 @@ game.import("character", function () {
 							)
 							.set("num", event.num1);
 					} else event.finish();
-					("step 4");
+					"step 4";
 					if (result.bool) {
 						player.logSkill("clanyuzhi");
-						player.showCards(
-							result.cards,
-							get.translation(player) + "发动了【迂志】"
-						);
+						player.showCards(result.cards, get.translation(player) + "发动了【迂志】");
 						player.addGaintag(result.cards, "clanyuzhi");
 						player.draw(get.cardNameLength(result.cards[0]));
-						player.storage.clanyuzhi = get.cardNameLength(
-							result.cards[0]
-						);
+						player.storage.clanyuzhi = get.cardNameLength(result.cards[0]);
 						player.markSkill("clanyuzhi");
 					}
 				},
@@ -1587,27 +1160,17 @@ game.import("character", function () {
 				filter(event, player) {
 					if (!event.card || player.isLinked()) return false;
 					var num = get.cardNameLength(event.card);
-					return (
-						typeof num == "number" &&
-						num > 0 &&
-						player.countCards("he") > 0
-					);
+					return typeof num == "number" && num > 0 && player.countCards("he") > 0;
 				},
 				async content(event, trigger, player) {
 					var num = get.cardNameLength(trigger.card),
 						str = "";
 					if (player.getDamagedHp() > 0)
-						str +=
-							"，然后摸" +
-							get.cnNumber(player.getDamagedHp()) +
-							"张牌";
+						str += "，然后摸" + get.cnNumber(player.getDamagedHp()) + "张牌";
 					player
 						.chooseToDiscard(
 							get.prompt("clanxieshu"),
-							"横置武将牌并弃置" +
-								get.cnNumber(num) +
-								"张牌" +
-								str,
+							"横置武将牌并弃置" + get.cnNumber(num) + "张牌" + str,
 							"he",
 							num
 						)
@@ -1617,8 +1180,7 @@ game.import("character", function () {
 							var num2 = player.getDamagedHp();
 							if (!num2) return 0;
 							if (num < num2) return 8 - get.value(card);
-							if (num == num2 || num2 >= 2 + num - num2)
-								return lib.skill.zhiheng.check(card);
+							if (num == num2 || num2 >= 2 + num - num2) return lib.skill.zhiheng.check(card);
 							return 0;
 						})
 						.set("num", num)
@@ -1628,8 +1190,7 @@ game.import("character", function () {
 				popup: false,
 				content() {
 					player.link(true);
-					if (player.getDamagedHp() > 0)
-						player.draw(player.getDamagedHp());
+					if (player.getDamagedHp() > 0) player.draw(player.getDamagedHp());
 				},
 				ai: { threaten: 3 },
 				group: "clanxieshu_ban",
@@ -1671,17 +1232,13 @@ game.import("character", function () {
 				delay: false,
 				selectCard() {
 					var player = _status.event.player;
-					if (
-						ui.selected.targets.length &&
-						!ui.selected.targets[0].countGainableCards(player, "h")
-					)
+					if (ui.selected.targets.length && !ui.selected.targets[0].countGainableCards(player, "h"))
 						return 1;
 					return [0, 1];
 				},
 				filterTarget(card, player, target) {
 					if (player == target) return false;
-					if (!ui.selected.cards.length)
-						return target.countGainableCards(player, "h") > 0;
+					if (!ui.selected.cards.length) return target.countGainableCards(player, "h") > 0;
 					return true;
 				},
 				check(card) {
@@ -1689,20 +1246,12 @@ game.import("character", function () {
 					var evtx = _status.event.getParent("phaseUse");
 					var targets = game.filterPlayer(
 						(target) =>
-							target != player &&
-							lib.skill.clanfuxun.ai.result.target(
-								player,
-								target
-							) != 0
+							target != player && lib.skill.clanfuxun.ai.result.target(player, target) != 0
 					);
 					targets.sort(
 						(a, b) =>
-							Math.abs(
-								lib.skill.clanfuxun.ai.result.target(player, b)
-							) -
-							Math.abs(
-								lib.skill.clanfuxun.ai.result.target(player, a)
-							)
+							Math.abs(lib.skill.clanfuxun.ai.result.target(player, b)) -
+							Math.abs(lib.skill.clanfuxun.ai.result.target(player, a))
 					);
 					if (evtx && targets.length) {
 						var target = targets[0];
@@ -1721,9 +1270,7 @@ game.import("character", function () {
 									evt.cards.length
 								);
 							}) &&
-							Math.abs(
-								player.countCards("h") - target.countCards("h")
-							) == 2
+							Math.abs(player.countCards("h") - target.countCards("h")) == 2
 						) {
 							if (player.countCards("h") > target.countCards("h"))
 								return 1 / (get.value(card) || 0.5);
@@ -1742,7 +1289,7 @@ game.import("character", function () {
 					} else {
 						player.gainPlayerCard(target, "h", true);
 					}
-					("step 1");
+					"step 1";
 					var evtx = event.getParent("phaseUse");
 					if (
 						player.countCards("h") == target.countCards("h") &&
@@ -1766,8 +1313,7 @@ game.import("character", function () {
 						var list = [];
 						for (var name of lib.inpile) {
 							if (get.type(name) != "basic") continue;
-							if (player.hasUseTarget({ name: name }))
-								list.push(["基本", "", name]);
+							if (player.hasUseTarget({ name: name })) list.push(["基本", "", name]);
 							if (name == "sha") {
 								for (var nature of lib.inpile_nature) {
 									if (
@@ -1782,10 +1328,7 @@ game.import("character", function () {
 						}
 						if (list.length) {
 							player
-								.chooseButton([
-									"是否将一张牌当做一种基本牌使用？",
-									[list, "vcard"],
-								])
+								.chooseButton(["是否将一张牌当做一种基本牌使用？", [list, "vcard"]])
 								.set("ai", (button) => {
 									return _status.event.player.getUseValue({
 										name: button.link[2],
@@ -1794,7 +1337,7 @@ game.import("character", function () {
 								});
 						} else event.finish();
 					} else event.finish();
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						var card = {
 							name: result.links[0][2],
@@ -1804,10 +1347,7 @@ game.import("character", function () {
 							lib.skill.clanfuxun_backup.viewAs = card;
 						}, card);
 						var next = player.chooseToUse();
-						next.set(
-							"openskilldialog",
-							"将一张牌当做" + get.translation(card) + "使用"
-						);
+						next.set("openskilldialog", "将一张牌当做" + get.translation(card) + "使用");
 						next.set("norestore", true);
 						next.set("addCount", false);
 						next.set("_backupevent", "clanfuxun_backup");
@@ -1823,33 +1363,24 @@ game.import("character", function () {
 						var evtx = _status.event.getParent("phaseUse");
 						if (
 							game.hasPlayer((current) => {
-								if (
-									current == player ||
-									!evtx ||
-									get.attitude(player, current) == 0
-								)
+								if (current == player || !evtx || get.attitude(player, current) == 0)
 									return false;
 								return (
 									!current.hasHistory("lose", (evt) => {
 										return (
-											evt.getParent(3).name !=
-												"clanfuxun" &&
+											evt.getParent(3).name != "clanfuxun" &&
 											evt.getParent("phaseUse") == evtx &&
 											evt.cards2.length
 										);
 									}) &&
 									!current.hasHistory("gain", (evt) => {
 										return (
-											evt.getParent().name !=
-												"clanfuxun" &&
+											evt.getParent().name != "clanfuxun" &&
 											evt.getParent("phaseUse") == evtx &&
 											evt.cards.length
 										);
 									}) &&
-									Math.abs(
-										player.countCards("h") -
-											current.countCards("h")
-									) == 2
+									Math.abs(player.countCards("h") - current.countCards("h")) == 2
 								);
 							})
 						)
@@ -1861,43 +1392,29 @@ game.import("character", function () {
 							var evtx = _status.event.getParent("phaseUse");
 							var num = get.sgn(get.attitude(player, target));
 							var targets = game.filterPlayer((current) => {
-								if (
-									current == player ||
-									!evtx ||
-									get.attitude(player, current) == 0
-								)
+								if (current == player || !evtx || get.attitude(player, current) == 0)
 									return false;
 								return (
 									!current.hasHistory("lose", (evt) => {
 										return (
-											evt.getParent(3).name !=
-												"clanfuxun" &&
+											evt.getParent(3).name != "clanfuxun" &&
 											evt.getParent("phaseUse") == evtx &&
 											evt.cards2.length
 										);
 									}) &&
 									!current.hasHistory("gain", (evt) => {
 										return (
-											evt.getParent().name !=
-												"clanfuxun" &&
+											evt.getParent().name != "clanfuxun" &&
 											evt.getParent("phaseUse") == evtx &&
 											evt.cards.length
 										);
 									}) &&
-									Math.abs(
-										player.countCards("h") -
-											current.countCards("h")
-									) == 2
+									Math.abs(player.countCards("h") - current.countCards("h")) == 2
 								);
 							});
 							if (targets.includes(target)) {
-								if (
-									player.countCards("h") <
-									target.countCards("h")
-								)
-									return (
-										get.sgn(num + 0.5) * Math.sqrt(2 - num)
-									);
+								if (player.countCards("h") < target.countCards("h"))
+									return get.sgn(num + 0.5) * Math.sqrt(2 - num);
 								else return num * (2 + num);
 							}
 							return get.sgn(num + 0.5) * (1 - num) * 0.25;
@@ -1914,10 +1431,7 @@ game.import("character", function () {
 						selectCard: 1,
 						check(card) {
 							var player = _status.event.player;
-							if (
-								player.hasSkill("clanzhongliu") &&
-								get.position(card) != "h"
-							)
+							if (player.hasSkill("clanzhongliu") && get.position(card) != "h")
 								return 10 - get.value(card);
 							return 5 - get.value(card);
 						},
@@ -1938,17 +1452,10 @@ game.import("character", function () {
 					var skill = event.sourceSkill || event.skill;
 					var info = get.info(skill);
 					if (info.charlotte) return false;
-					var translation = get.skillInfoTranslation(
-						skill,
-						event.player
-					);
+					var translation = get.skillInfoTranslation(skill, event.player);
 					if (!translation) return false;
 					var match = translation.match(/“?出牌阶段限一次/g);
-					if (
-						!match ||
-						match.every((value) => value != "出牌阶段限一次")
-					)
-						return false;
+					if (!match || match.every((value) => value != "出牌阶段限一次")) return false;
 					return event.player.countCards("h") > 0;
 				},
 				check(event, player) {
@@ -1963,9 +1470,7 @@ game.import("character", function () {
 							"是否重铸任意张牌名字数为" + num + "的牌？",
 							[1, Infinity],
 							"he",
-							(card, player) =>
-								_status.event.cards.includes(card) &&
-								player.canRecast(card)
+							(card, player) => _status.event.cards.includes(card) && player.canRecast(card)
 						)
 						.set("ai", (card) => {
 							var val = get.value(card);
@@ -1977,7 +1482,7 @@ game.import("character", function () {
 								return get.cardNameLength(card) == num;
 							})
 						);
-					("step 1");
+					"step 1";
 					if (result.bool) trigger.player.recast(result.cards);
 				},
 			},
@@ -1994,9 +1499,7 @@ game.import("character", function () {
 					content(storage) {
 						return (
 							"限定技，转换技。你可以将一张" +
-							((storage || 0) % 2
-								? "黑色牌当【过河拆桥】"
-								: "红色牌当【顺手牵羊】") +
+							((storage || 0) % 2 ? "黑色牌当【过河拆桥】" : "红色牌当【顺手牵羊】") +
 							"使用。"
 						);
 					},
@@ -2010,28 +1513,17 @@ game.import("character", function () {
 					var player = _status.event.player;
 					var storage = player.storage.clanjiexuan;
 					var name = (storage || 0) % 2 ? "guohe" : "shunshou";
-					var fix =
-						player.hasSkill("clanzhongliu") &&
-						get.position(card) != "h"
-							? 2
-							: 1;
-					return (
-						(get.value({ name: name }, player) - get.value(card)) *
-						fix
-					);
+					var fix = player.hasSkill("clanzhongliu") && get.position(card) != "h" ? 2 : 1;
+					return (get.value({ name: name }, player) - get.value(card)) * fix;
 				},
 				position: "hes",
 				filterCard(card, player) {
 					var storage = player.storage.clanjiexuan;
-					return (
-						get.color(card) ==
-						((storage || 0) % 2 ? "black" : "red")
-					);
+					return get.color(card) == ((storage || 0) % 2 ? "black" : "red");
 				},
 				prompt() {
 					var storage = _status.event.player.storage.clanjiexuan;
-					if ((storage || 0) % 2)
-						return "将一张黑色牌当【过河拆桥】使用";
+					if ((storage || 0) % 2) return "将一张黑色牌当【过河拆桥】使用";
 					return "将一张红色牌当【顺手牵羊】使用";
 				},
 				skillAnimation: true,
@@ -2092,39 +1584,18 @@ game.import("character", function () {
 					order: 10,
 					result: {
 						target(player, target) {
-							if (
-								player.hasSkill("clanzhongliu") ||
-								player.hp == 1
-							) {
+							if (player.hasSkill("clanzhongliu") || player.hp == 1) {
 								if (
 									!player.hasCard((card) => {
 										var info = get.info(card);
-										if (info.allowMultiple == false)
-											return false;
-										if (
-											!lib.filter.targetEnabled2(
-												card,
-												player,
-												target
-											)
-										)
-											return false;
+										if (info.allowMultiple == false) return false;
+										if (!lib.filter.targetEnabled2(card, player, target)) return false;
 										return game.hasPlayer((current) => {
 											return (
 												player.canUse(card, current) &&
-												get.effect(
-													current,
-													card,
-													player,
-													player
-												) > 0 &&
+												get.effect(current, card, player, player) > 0 &&
 												current != target &&
-												get.effect(
-													target,
-													card,
-													player,
-													player
-												) > 0
+												get.effect(target, card, player, player) > 0
 											);
 										});
 									}, "hs")
@@ -2134,32 +1605,14 @@ game.import("character", function () {
 								if (
 									player.countCards("hs", (card) => {
 										var info = get.info(card);
-										if (info.allowMultiple == false)
-											return false;
-										if (
-											!lib.filter.targetEnabled2(
-												card,
-												player,
-												target
-											)
-										)
-											return false;
+										if (info.allowMultiple == false) return false;
+										if (!lib.filter.targetEnabled2(card, player, target)) return false;
 										return game.hasPlayer((current) => {
 											return (
 												player.canUse(card, current) &&
-												get.effect(
-													current,
-													card,
-													player,
-													player
-												) > 0 &&
+												get.effect(current, card, player, player) > 0 &&
 												current != target &&
-												get.effect(
-													target,
-													card,
-													player,
-													player
-												) > 0
+												get.effect(target, card, player, player) > 0
 											);
 										});
 									}) < 3
@@ -2181,24 +1634,11 @@ game.import("character", function () {
 							if (info.allowMultiple == false) return false;
 							if (event.targets && !info.multitarget) {
 								return game.filterPlayer().some((current) => {
-									if (
-										!current.hasSkill(
-											"clanmingjie_" + player.playerid
-										)
-									)
-										return false;
+									if (!current.hasSkill("clanmingjie_" + player.playerid)) return false;
 									return (
 										!event.targets.includes(current) &&
-										lib.filter.targetEnabled2(
-											card,
-											player,
-											current
-										) &&
-										lib.filter.targetInRange(
-											card,
-											player,
-											current
-										)
+										lib.filter.targetEnabled2(card, player, current) &&
+										lib.filter.targetInRange(card, player, current)
 									);
 								});
 							}
@@ -2210,31 +1650,18 @@ game.import("character", function () {
 							player
 								.chooseTarget(
 									get.prompt("clanmingjie_effect"),
-									"令任意【铭戒】目标角色成为" +
-										get.translation(trigger.card) +
-										"的目标",
+									"令任意【铭戒】目标角色成为" + get.translation(trigger.card) + "的目标",
 									function (card, player, target) {
-										var trigger =
-											_status.event.getTrigger();
+										var trigger = _status.event.getTrigger();
 										if (
 											trigger.targets.includes(target) ||
 											!target.isIn() ||
-											!target.hasSkill(
-												"clanmingjie_" + player.playerid
-											)
+											!target.hasSkill("clanmingjie_" + player.playerid)
 										)
 											return false;
 										return (
-											lib.filter.targetEnabled2(
-												trigger.card,
-												player,
-												target
-											) &&
-											lib.filter.targetInRange(
-												trigger.card,
-												player,
-												target
-											)
+											lib.filter.targetEnabled2(trigger.card, player, target) &&
+											lib.filter.targetInRange(trigger.card, player, target)
 										);
 									},
 									[1, Infinity]
@@ -2242,24 +1669,14 @@ game.import("character", function () {
 								.set("ai", function (target) {
 									var player = _status.event.player;
 									var trigger = _status.event.getTrigger();
-									return get.effect(
-										target,
-										trigger.card,
-										player,
-										player
-									);
+									return get.effect(target, trigger.card, player, player);
 								});
-							("step 1");
+							"step 1";
 							if (result.bool) {
 								var targets = result.targets.sortBySeat();
 								player.logSkill("clanmingjie_effect", targets);
 								trigger.targets.addArray(targets);
-								game.log(
-									targets,
-									"成为了",
-									trigger.card,
-									"的额外目标"
-								);
+								game.log(targets, "成为了", trigger.card, "的额外目标");
 							}
 						},
 						group: "clanmingjie_targeted",
@@ -2268,46 +1685,26 @@ game.import("character", function () {
 						charlotte: true,
 						trigger: { global: "phaseEnd" },
 						filter(event, player) {
-							var cards = player
-								.getStorage("clanmingjie_record")
-								.slice();
+							var cards = player.getStorage("clanmingjie_record").slice();
 							cards = cards.filterInD("d");
 							if (!cards.length) return false;
-							var history = player.getHistory(
-								"useSkill",
-								(evt) => evt.skill == "clanmingjie"
-							);
+							var history = player.getHistory("useSkill", (evt) => evt.skill == "clanmingjie");
 							if (history.length) {
-								var targets = history.reduce(
-									(list, evt) => list.addArray(evt.targets),
-									[]
-								);
-								if (
-									event.player != player &&
-									targets.includes(event.player)
-								)
-									return true;
+								var targets = history.reduce((list, evt) => list.addArray(evt.targets), []);
+								if (event.player != player && targets.includes(event.player)) return true;
 							}
 							if (player.actionHistory.length >= 2) {
-								for (
-									var i = player.actionHistory.length - 2;
-									i >= 0;
-									i--
-								) {
+								for (var i = player.actionHistory.length - 2; i >= 0; i--) {
 									if (!player.actionHistory[i].isMe) continue;
-									var history2 = player.actionHistory[
-										i
-									].useSkill.filter(
+									var history2 = player.actionHistory[i].useSkill.filter(
 										(evt) => evt.skill == "clanmingjie"
 									);
 									if (history2.length) {
 										var targets2 = history2.reduce(
-											(list, evt) =>
-												list.addArray(evt.targets),
+											(list, evt) => list.addArray(evt.targets),
 											[]
 										);
-										if (targets2.includes(event.player))
-											return true;
+										if (targets2.includes(event.player)) return true;
 									}
 									break;
 								}
@@ -2318,25 +1715,19 @@ game.import("character", function () {
 						popup: false,
 						content() {
 							"step 0";
-							var cards = player
-								.getStorage("clanmingjie_record")
-								.slice();
+							var cards = player.getStorage("clanmingjie_record").slice();
 							cards = cards.filterInD("d");
 							event.cards = cards;
-							("step 1");
+							"step 1";
 							player
 								.chooseButton(["铭戒：是否使用这些牌？", cards])
 								.set("filterButton", (button) => {
-									return _status.event.player.hasUseTarget(
-										button.link
-									);
+									return _status.event.player.hasUseTarget(button.link);
 								})
 								.set("ai", (button) => {
-									return _status.event.player.getUseValue(
-										button.link
-									);
+									return _status.event.player.getUseValue(button.link);
 								});
-							("step 2");
+							"step 2";
 							if (result.bool) {
 								var card = result.links[0];
 								event.cards.remove(card);
@@ -2344,13 +1735,10 @@ game.import("character", function () {
 								game.delayx();
 								player.chooseUseTarget(card, true);
 							} else event.finish();
-							("step 3");
+							"step 3";
 							if (
 								event.cards.filter((card) => {
-									return (
-										get.position(card, true) == "d" &&
-										player.hasUseTarget(card)
-									);
+									return get.position(card, true) == "d" && player.hasUseTarget(card);
 								}).length
 							)
 								event.goto(1);
@@ -2359,12 +1747,7 @@ game.import("character", function () {
 					record: {
 						charlotte: true,
 						trigger: {
-							global: [
-								"shaMiss",
-								"eventNeutralized",
-								"useCard1",
-								"phaseAfter",
-							],
+							global: ["shaMiss", "eventNeutralized", "useCard1", "phaseAfter"],
 						},
 						filter(event, player) {
 							if (event.name == "useCard") {
@@ -2382,10 +1765,7 @@ game.import("character", function () {
 								delete player.storage.clanmingjie_record;
 								return;
 							}
-							player.markAuto(
-								"clanmingjie_record",
-								trigger.cards
-							);
+							player.markAuto("clanmingjie_record", trigger.cards);
 						},
 					},
 				},
@@ -2402,9 +1782,7 @@ game.import("character", function () {
 					content(storage) {
 						return (
 							"转换技。出牌阶段限一次，你可以观看" +
-							(storage
-								? "一名角色的至多四张手"
-								: "牌堆顶的至多四张") +
+							(storage ? "一名角色的至多四张手" : "牌堆顶的至多四张") +
 							"牌，然后可以使用其中的一张牌。"
 						);
 					},
@@ -2418,12 +1796,8 @@ game.import("character", function () {
 				},
 				chooseButton: {
 					dialog(event, player) {
-						var dialog = ui.create.dialog(
-							"观骨：选择观看牌堆的牌数",
-							"hidden"
-						);
-						if (player.storage.clanguangu)
-							dialog.forceDirect = true;
+						var dialog = ui.create.dialog("观骨：选择观看牌堆的牌数", "hidden");
+						if (player.storage.clanguangu) dialog.forceDirect = true;
 						return dialog;
 					},
 					chooseControl(event, player) {
@@ -2470,156 +1844,94 @@ game.import("character", function () {
 									var cards = get.cards(num);
 									event.cards = cards.slice(0);
 									while (cards.length)
-										ui.cardPile.insertBefore(
-											cards.pop().fix(),
-											ui.cardPile.firstChild
-										);
+										ui.cardPile.insertBefore(cards.pop().fix(), ui.cardPile.firstChild);
 									game.updateRoundNumber();
 									event.goto(2);
 								} else {
 									var ret;
-									if (!player.hasSkill("clanxiaoyong"))
-										ret = 4;
+									if (!player.hasSkill("clanxiaoyong")) ret = 4;
 									else {
 										var list = [4, 3, 2, 1];
 										player.getHistory("useCard", (evt) => {
-											var len = get.cardNameLength(
-												evt.card
-											);
+											var len = get.cardNameLength(evt.card);
 											list.remove(len);
 										});
 										if (list.length) ret = list[0];
 										else ret = 4;
 									}
 									player
-										.choosePlayerCard(
-											target,
-											"h",
-											true,
-											[1, 4]
-										)
+										.choosePlayerCard(target, "h", true, [1, 4])
 										.set(
 											"prompt",
-											"观骨：观看" +
-												get.translation(target) +
-												"的至多四张牌"
+											"观骨：观看" + get.translation(target) + "的至多四张牌"
 										)
 										.set("ai", (button) => {
-											if (
-												ui.selected.buttons.length >=
-												_status.event.num
-											)
-												return 0;
+											if (ui.selected.buttons.length >= _status.event.num) return 0;
 											return Math.random();
 										})
 										.set("num", ret);
 								}
-								("step 1");
+								"step 1";
 								if (result.bool) {
 									event.cards = result.links;
 								} else {
 									event.finish();
 								}
-								("step 2");
+								"step 2";
 								var count = cards.length;
 								event.getParent().viewedCount = count;
 								player
-									.chooseButton([
-										"观骨：是否使用其中一张牌？",
-										cards,
-									])
+									.chooseButton(["观骨：是否使用其中一张牌？", cards])
 									.set("filterButton", (button) => {
 										var player = _status.event.player;
 										var card = button.link;
 										var cardx = {
-											name: get.name(
-												card,
-												get.owner(card)
-											),
-											nature: get.nature(
-												card,
-												get.owner(card)
-											),
+											name: get.name(card, get.owner(card)),
+											nature: get.nature(card, get.owner(card)),
 											cards: [card],
 										};
-										return player.hasUseTarget(
-											cardx,
-											null,
-											false
-										);
+										return player.hasUseTarget(cardx, null, false);
 									})
 									.set("ai", (button) => {
 										var len = _status.event.len;
 										var card = button.link;
 										var fix = 1;
-										if (get.cardNameLength(card) == len)
-											fix = 2;
-										return (
-											fix *
-											_status.event.player.getUseValue(
-												card
-											)
-										);
+										if (get.cardNameLength(card) == len) fix = 2;
+										return fix * _status.event.player.getUseValue(card);
 									})
 									.set(
 										"len",
 										(function () {
-											if (
-												!player.hasSkill("clanxiaoyong")
-											)
-												return 0;
+											if (!player.hasSkill("clanxiaoyong")) return 0;
 											var list = [];
-											player.getHistory(
-												"useCard",
-												(evt) => {
-													var len =
-														get.cardNameLength(
-															evt.card
-														);
-													list.add(len);
-												}
-											);
-											if (!list.includes(count))
-												return count;
-											if (list.length)
-												return list.randomGet();
+											player.getHistory("useCard", (evt) => {
+												var len = get.cardNameLength(evt.card);
+												list.add(len);
+											});
+											if (!list.includes(count)) return count;
+											if (list.length) return list.randomGet();
 											return 4;
 										})()
 									);
-								("step 3");
+								"step 3";
 								if (result.bool) {
 									var card = result.links[0];
 									cards.remove(card);
 									var cardx = {
 										name: get.name(card, get.owner(card)),
-										nature: get.nature(
-											card,
-											get.owner(card)
-										),
+										nature: get.nature(card, get.owner(card)),
 										cards: [card],
 									};
 									var next = player
-										.chooseUseTarget(
-											cardx,
-											[card],
-											true,
-											false
-										)
+										.chooseUseTarget(cardx, [card], true, false)
 										.set("oncard", (card) => {
-											var owner =
-												_status.event.getParent().owner;
+											var owner = _status.event.getParent().owner;
 											if (owner) owner.$throw(card.cards);
 										});
-									if (
-										card.name === cardx.name &&
-										get.is.sameNature(card, cardx, true)
-									)
+									if (card.name === cardx.name && get.is.sameNature(card, cardx, true))
 										next.viewAs = false;
 									var owner = get.owner(card);
-									if (
-										owner != player &&
-										get.position(card) == "h"
-									) {
+									if (owner != player && get.position(card) == "h") {
 										next.throw = false;
 										next.set("owner", owner);
 									}
@@ -2629,20 +1941,14 @@ game.import("character", function () {
 								order: 10,
 								result: {
 									target(player, target) {
-										return (
-											-Math.min(
-												target.countCards("h"),
-												4
-											) / 2
-										);
+										return -Math.min(target.countCards("h"), 4) / 2;
 									},
 								},
 							},
 						};
 					},
 					prompt(result, player) {
-						if (!player.storage.clanguangu)
-							return "点击“确定”以观看牌堆顶牌";
+						if (!player.storage.clanguangu) return "点击“确定”以观看牌堆顶牌";
 						return "观骨：选择观看牌的目标";
 					},
 				},
@@ -2667,10 +1973,7 @@ game.import("character", function () {
 						player.hasHistory(
 							"useCard",
 							function (evt) {
-								return (
-									evt != event &&
-									get.cardNameLength(evt.card) == len
-								);
+								return evt != event && get.cardNameLength(evt.card) == len;
 							},
 							event
 						)
@@ -2705,11 +2008,7 @@ game.import("character", function () {
 				},
 				mod: {
 					aiOrder(player, card, num) {
-						if (
-							!player.hasSkill("clanguangu") ||
-							!player.getStat().skill.clanguangu
-						)
-							return;
+						if (!player.hasSkill("clanguangu") || !player.getStat().skill.clanguangu) return;
 						var history = player
 							.getAllHistory("useSkill", (evt) => {
 								return evt.skill == "clanguangu_backup";
@@ -2746,8 +2045,7 @@ game.import("character", function () {
 				animationColor: "water",
 				filter(event, player) {
 					return (
-						(event.player == player ||
-							event.player.hasClan("颍川钟氏")) &&
+						(event.player == player || event.player.hasClan("颍川钟氏")) &&
 						event.player.hp <= 0 &&
 						!event.player.isLinked()
 					);
@@ -2759,7 +2057,7 @@ game.import("character", function () {
 				content() {
 					"step 0";
 					player.awakenSkill("clanbaozu");
-					("step 1");
+					"step 1";
 					trigger.player.link(true);
 					trigger.player.recover();
 				},
@@ -2780,39 +2078,22 @@ game.import("character", function () {
 						"是否交给其" +
 						get.cnNumber(num) +
 						"张牌，然后视为你对其使用一张【酒】？或者点击“取消”，令其交给你一张牌，然后其视为对你使用一张雷【杀】。";
-					if (!num || target.countCards("he") < num)
-						event._result = { bool: false };
+					if (!num || target.countCards("he") < num) event._result = { bool: false };
 					else
 						target
-							.chooseCard(
-								get.translation(player) + "对你发动了【驳龙】",
-								str,
-								num,
-								"he"
-							)
+							.chooseCard(get.translation(player) + "对你发动了【驳龙】", str, num, "he")
 							.set("ai", (card) => {
 								if (_status.event.canGive)
 									return (
-										5 +
-										Math.max(
-											0,
-											3 - _status.event.player.hp
-										) /
-											1.5 -
-										get.value(card)
+										5 + Math.max(0, 3 - _status.event.player.hp) / 1.5 - get.value(card)
 									);
 								return 0;
 							})
 							.set(
 								"canGive",
 								(function () {
-									if (get.attitude(target, player) > 1)
-										return true;
-									if (
-										!player.hasSha() &&
-										player.countCards("h") <= 4
-									)
-										return true;
+									if (get.attitude(target, player) > 1) return true;
+									if (!player.hasSha() && player.countCards("h") <= 4) return true;
 									var sha = {
 										name: "sha",
 										nature: "thunder",
@@ -2821,22 +2102,9 @@ game.import("character", function () {
 									if (
 										game.hasPlayer((current) => {
 											return (
-												player.canUse(
-													sha,
-													current,
-													true,
-													true
-												) &&
-												get.effect(
-													current,
-													sha,
-													player,
-													target
-												) < 0 &&
-												!current.countCards("hs", [
-													"shan",
-													"caochuan",
-												])
+												player.canUse(sha, current, true, true) &&
+												get.effect(current, sha, player, target) < 0 &&
+												!current.countCards("hs", ["shan", "caochuan"])
 											);
 										})
 									)
@@ -2844,33 +2112,22 @@ game.import("character", function () {
 									return true;
 								})()
 							);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var cards = result.cards;
 						target.give(cards, player);
-						if (
-							lib.filter.targetEnabled2(
-								{ name: "jiu", isCard: true },
-								target,
-								player
-							)
-						)
-							target.useCard(
-								{ name: "jiu", isCard: true },
-								player,
-								false
-							);
+						if (lib.filter.targetEnabled2({ name: "jiu", isCard: true }, target, player))
+							target.useCard({ name: "jiu", isCard: true }, player, false);
 						event.finish();
 					} else {
 						player.chooseCard(
 							"驳龙：交给" + get.translation(target) + "一张牌",
-							get.translation(target) +
-								"拒绝给牌，请交给其一张牌然后视为对其使用一张雷【杀】",
+							get.translation(target) + "拒绝给牌，请交给其一张牌然后视为对其使用一张雷【杀】",
 							true,
 							"he"
 						);
 					}
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						var cards = result.cards;
 						player.give(cards, target);
@@ -2879,8 +2136,7 @@ game.import("character", function () {
 							nature: "thunder",
 							isCard: true,
 						};
-						if (player.canUse(sha, target, false, false))
-							player.useCard(sha, target, false);
+						if (player.canUse(sha, target, false, false)) player.useCard(sha, target, false);
 					}
 				},
 				ai: {
@@ -2894,13 +2150,7 @@ game.import("character", function () {
 								player.hasCard((card) => {
 									return (
 										get.value(card) < 5 &&
-										![
-											"shan",
-											"tao",
-											"jiu",
-											"wuxie",
-											"caochuan",
-										].includes(get.name(card))
+										!["shan", "tao", "jiu", "wuxie", "caochuan"].includes(get.name(card))
 									);
 								}, "he")
 							)
@@ -2926,12 +2176,9 @@ game.import("character", function () {
 				filter(event, player) {
 					if (!event.cards.length) return true;
 					return !game.hasPlayer2((current) => {
-						if (!current.hasClan("太原王氏") && current != player)
-							return false;
+						if (!current.hasClan("太原王氏") && current != player) return false;
 						return current.hasHistory("lose", (evt) => {
-							return (
-								evt.getParent() == event && evt.hs.length > 0
-							);
+							return evt.getParent() == event && evt.hs.length > 0;
 						});
 					});
 				},
@@ -2952,18 +2199,12 @@ game.import("character", function () {
 								delete player.storage.counttrigger[skill];
 								resetSkills.add(skill);
 							}
-							if (
-								typeof get.skillCount(skill) == "number" &&
-								get.skillCount(skill) >= 1
-							) {
+							if (typeof get.skillCount(skill) == "number" && get.skillCount(skill) >= 1) {
 								delete player.getStat("skill")[skill];
 								resetSkills.add(skill);
 							}
 						}
-						if (
-							info.round &&
-							player.storage[skill + "_roundcount"]
-						) {
+						if (info.round && player.storage[skill + "_roundcount"]) {
 							delete player.storage[skill + "_roundcount"];
 							resetSkills.add(skill);
 						}
@@ -3016,11 +2257,7 @@ game.import("character", function () {
 						enable: "phaseUse",
 						filter: (event, player) =>
 							game.hasPlayer((current) =>
-								lib.skill.clanlianzhu_global.filterTarget(
-									null,
-									player,
-									current
-								)
+								lib.skill.clanlianzhu_global.filterTarget(null, player, current)
 							),
 						filterCard: (card, player) =>
 							game.hasPlayer(
@@ -3040,26 +2277,15 @@ game.import("character", function () {
 								(!target.storage.clanlianzhu ||
 									(target.storage.clanlianzhu &&
 										game.hasPlayer((current) => {
-											if (
-												current == player ||
-												current == target
-											)
-												return false;
-											return (
-												current.inRangeOf(player) ||
-												current.inRangeOf(target)
-											);
+											if (current == player || current == target) return false;
+											return current.inRangeOf(player) || current.inRangeOf(target);
 										})))
 							);
 						},
 						selectTarget() {
 							var player = _status.event.player;
 							var count = game.countPlayer((current) =>
-								lib.skill.clanlianzhu_global.filterTarget(
-									null,
-									player,
-									current
-								)
+								lib.skill.clanlianzhu_global.filterTarget(null, player, current)
 							);
 							return count == 1 ? -1 : 1;
 						},
@@ -3087,21 +2313,13 @@ game.import("character", function () {
 									if (target.storage.clanlianzhu) {
 										if (
 											game.hasPlayer((current) => {
-												if (
-													current == player ||
-													current == target
-												)
-													return false;
-												return (
-													current.inRangeOf(player) ||
-													current.inRangeOf(target)
-												);
+												if (current == player || current == target) return false;
+												return current.inRangeOf(player) || current.inRangeOf(target);
 											})
 										)
 											kita.add(target);
 									} else {
-										if (player.countCards("he") > 0)
-											bocchi.add(target);
+										if (player.countCards("he") > 0) bocchi.add(target);
 									}
 								}
 							});
@@ -3130,52 +2348,32 @@ game.import("character", function () {
 						},
 						content() {
 							"step 0";
-							target.addTempSkill(
-								"clanlianzhu_targeted",
-								"phaseUseAfter"
-							);
+							target.addTempSkill("clanlianzhu_targeted", "phaseUseAfter");
 							if (target.storage.clanlianzhu) event.goto(4);
 							target.changeZhuanhuanji("clanlianzhu");
-							("step 1");
+							"step 1";
 							player.recast(cards);
-							("step 2");
-							if (
-								!target.countCards("he") &&
-								!_status.connectMode
-							)
+							"step 2";
+							if (!target.countCards("he") && !_status.connectMode)
 								event._result = { bool: false };
-							else
-								target.chooseCard(
-									"he",
-									"联诛：是否重铸一张牌？",
-									lib.filter.cardRecastable
-								);
-							("step 3");
+							else target.chooseCard("he", "联诛：是否重铸一张牌？", lib.filter.cardRecastable);
+							"step 3";
 							if (result.bool) {
 								target.recast(result.cards);
-								if (
-									get.color(cards[0]) ===
-									get.color(result.cards[0])
-								)
+								if (get.color(cards[0]) === get.color(result.cards[0]))
 									lib.skill.chenliuwushi.change(target, 1);
 							}
 							event.finish();
-							("step 4");
+							"step 4";
 							target
 								.chooseTarget(
 									"联诛：选择其与你使用【杀】的目标",
 									true,
 									(card, player, target) => {
-										if (
-											target == player ||
-											target == _status.event.sourcex
-										)
-											return false;
+										if (target == player || target == _status.event.sourcex) return false;
 										return (
 											target.inRangeOf(player) ||
-											target.inRangeOf(
-												_status.event.sourcex
-											)
+											target.inRangeOf(_status.event.sourcex)
 										);
 									}
 								)
@@ -3188,68 +2386,45 @@ game.import("character", function () {
 									);
 								})
 								.set("sourcex", player);
-							("step 5");
+							"step 5";
 							if (result.bool) {
 								var targetx = result.targets[0];
 								event.targetx = targetx;
 								target.line(targetx);
 								event.targets = [player, target];
 								event.cards = [];
-								if (!event.isMine() && !event.isOnline())
-									game.delayx();
+								if (!event.isMine() && !event.isOnline()) game.delayx();
 							} else event.finish();
-							("step 6");
+							"step 6";
 							var current = targets.shift();
 							current
 								.chooseToUse(function (card, player, event) {
 									if (get.name(card) != "sha") return false;
-									return lib.filter.filterCard.apply(
-										this,
-										arguments
-									);
-								}, "联诛：是否对" +
-									get.translation(event.targetx) +
-									"使用一张杀？")
+									return lib.filter.filterCard.apply(this, arguments);
+								}, "联诛：是否对" + get.translation(event.targetx) + "使用一张杀？")
 								.set("targetRequired", true)
 								.set("complexSelect", true)
-								.set(
-									"filterTarget",
-									function (card, player, target) {
-										if (
-											target != _status.event.sourcex &&
-											!ui.selected.targets.includes(
-												_status.event.sourcex
-											)
-										)
-											return false;
-										return lib.filter.targetEnabled.apply(
-											this,
-											arguments
-										);
-									}
-								)
+								.set("filterTarget", function (card, player, target) {
+									if (
+										target != _status.event.sourcex &&
+										!ui.selected.targets.includes(_status.event.sourcex)
+									)
+										return false;
+									return lib.filter.targetEnabled.apply(this, arguments);
+								})
 								.set("sourcex", event.targetx)
 								.set("addCount", false);
-							("step 7");
+							"step 7";
 							if (result.bool) cards.push(result.card);
 							if (targets.length > 0) event.goto(6);
-							("step 8");
+							"step 8";
 							if (cards.length > 1) {
 								const color = get.color(cards[0], false);
 								if (color != "none") {
 									for (let i = 1; i < cards.length; i++) {
-										const color2 = get.color(
-											cards[i],
-											false
-										);
-										if (
-											color !== color2 &&
-											color2 !== "none"
-										) {
-											lib.skill.chenliuwushi.change(
-												target,
-												-1
-											);
+										const color2 = get.color(cards[i], false);
+										if (color !== color2 && color2 !== "none") {
+											lib.skill.chenliuwushi.change(target, -1);
 											break;
 										}
 									}
@@ -3262,20 +2437,13 @@ game.import("character", function () {
 								player(player, target) {
 									if (
 										!target.storage.clanlianzhu &&
-										player.hasCard(
-											(card) => get.value(card) < 5,
-											"he"
-										)
+										player.hasCard((card) => get.value(card) < 5, "he")
 									)
 										return 1;
 									return 0;
 								},
 								target(player, target) {
-									if (
-										target.storage.clanlianzhu &&
-										player.hasSha()
-									)
-										return 1;
+									if (target.storage.clanlianzhu && player.hasSha()) return 1;
 									return 0;
 								},
 							},
@@ -3295,33 +2463,20 @@ game.import("character", function () {
 				content() {
 					"step 0";
 					player
-						.chooseTarget(
-							get.prompt2("clanfangzhen"),
-							(card, player, target) => {
-								return !target.isLinked();
-							}
-						)
+						.chooseTarget(get.prompt2("clanfangzhen"), (card, player, target) => {
+							return !target.isLinked();
+						})
 						.set("ai", (target) => {
 							var player = _status.event.player;
 							if (_status.event.goon && target != player) {
 								target.classList.add("linked");
 								target.classList.add("linked2");
 								try {
-									var cards = player.getCards(
-										"hs",
-										(cardx) => {
-											if (get.name(cardx) != "sha")
-												return false;
-											return game.hasNature(
-												cardx,
-												"linked"
-											);
-										}
-									);
-									cards.map((i) => [
-										i,
-										get.effect(target, i, player, player),
-									]);
+									var cards = player.getCards("hs", (cardx) => {
+										if (get.name(cardx) != "sha") return false;
+										return game.hasNature(cardx, "linked");
+									});
+									cards.map((i) => [i, get.effect(target, i, player, player)]);
 									cards.sort((a, b) => b[1] - a[1]);
 								} catch (e) {
 									target.classList.remove("linked");
@@ -3332,77 +2487,42 @@ game.import("character", function () {
 								var eff = cards[0][1];
 								if (eff > 0) return eff;
 								return Math.max(
-									2 *
-										get.effect(
-											target,
-											{ name: "draw" },
-											player,
-											player
-										) +
-										0.6 *
-											get.effect(
-												player,
-												{ name: "draw" },
-												player,
-												player
-											),
+									2 * get.effect(target, { name: "draw" }, player, player) +
+										0.6 * get.effect(player, { name: "draw" }, player, player),
 									get.recoverEffect(target, player, player)
 								);
 							}
 							return Math.max(
-								2 *
-									get.effect(
-										target,
-										{ name: "draw" },
-										player,
-										player
-									) +
-									0.6 *
-										get.effect(
-											player,
-											{ name: "draw" },
-											player,
-											player
-										),
+								2 * get.effect(target, { name: "draw" }, player, player) +
+									0.6 * get.effect(player, { name: "draw" }, player, player),
 								get.recoverEffect(target, player, player)
 							);
 						})
 						.set(
 							"goon",
 							player.countCards("hs", (card) => {
-								return (
-									get.name(card) == "jiu" &&
-									player.hasUseTarget(card)
-								);
+								return get.name(card) == "jiu" && player.hasUseTarget(card);
 							}) &&
 								player.countCards("hs", (card) => {
 									if (get.name(card) != "sha") return false;
 									return game.hasNature(card, "linked");
 								})
 						);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
 						player.logSkill("clanfangzhen", target);
 						player.addSkill("clanfangzhen_remove");
-						player.markAuto("clanfangzhen_remove", [
-							target.getSeatNum(),
-						]);
+						player.markAuto("clanfangzhen_remove", [target.getSeatNum()]);
 						target.link(true);
 						var choices = ["选项一"],
 							choiceList = [
-								"摸两张牌，然后交给" +
-									get.translation(target) +
-									"两张牌",
+								"摸两张牌，然后交给" + get.translation(target) + "两张牌",
 								"令" + get.translation(target) + "回复1点体力",
 							];
 						if (target.isDamaged()) choices.push("选项二");
-						else
-							choiceList[1] =
-								'<span style="opacity:0.5; ">' +
-								choiceList[1] +
-								"</span>";
+						else choiceList[1] = '<span style="opacity:0.5; ">' + choiceList[1] + "</span>";
 						player
 							.chooseControl(choices)
 							.set("prompt", "放赈：请选择一项")
@@ -3413,32 +2533,17 @@ game.import("character", function () {
 								if (!target.isDamaged()) return 0;
 								if (
 									get.attitude(player, target) <= 0 &&
-									player.countCards(
-										"he",
-										(card) => get.value(card) < 0
-									) >= 2
+									player.countCards("he", (card) => get.value(card) < 0) >= 2
 								)
 									return 0;
-								return 2 *
-									get.effect(
-										target,
-										{ name: "draw" },
-										player,
-										player
-									) +
-									0.6 *
-										get.effect(
-											player,
-											{ name: "draw" },
-											player,
-											player
-										) >
+								return 2 * get.effect(target, { name: "draw" }, player, player) +
+									0.6 * get.effect(player, { name: "draw" }, player, player) >
 									get.recoverEffect(target, player, player)
 									? 0
 									: 1;
 							});
 					} else event.finish();
-					("step 2");
+					"step 2";
 					if (result.control == "选项一") {
 						player.draw(2);
 						if (player == target) event.finish();
@@ -3446,7 +2551,7 @@ game.import("character", function () {
 						target.recover();
 						event.finish();
 					}
-					("step 3");
+					"step 3";
 					if (!player.countCards("he")) event.finish();
 					else if (player.countCards("he") <= 2)
 						event._result = {
@@ -3454,14 +2559,9 @@ game.import("character", function () {
 							cards: player.getCards("he"),
 						};
 					else {
-						player.chooseCard(
-							"放赈：交给" + get.translation(target) + "两张牌",
-							"he",
-							2,
-							true
-						);
+						player.chooseCard("放赈：交给" + get.translation(target) + "两张牌", "he", 2, true);
 					}
-					("step 4");
+					"step 4";
 					if (result.bool) {
 						player.give(result.cards, target);
 					}
@@ -3477,9 +2577,7 @@ game.import("character", function () {
 						locked: false,
 						charlotte: true,
 						filter(event, player) {
-							return player
-								.getStorage("clanfangzhen_remove")
-								.includes(game.roundNumber);
+							return player.getStorage("clanfangzhen_remove").includes(game.roundNumber);
 						},
 						content() {
 							player.removeSkills("clanfangzhen");
@@ -3491,9 +2589,7 @@ game.import("character", function () {
 				audio: 2,
 				trigger: { player: "phaseUseEnd" },
 				filter(event, player) {
-					return game.hasPlayer((current) =>
-						player.canCompare(current)
-					);
+					return game.hasPlayer((current) => player.canCompare(current));
 				},
 				direct: true,
 				content() {
@@ -3508,21 +2604,11 @@ game.import("character", function () {
 						)
 						.set("ai", (target) => {
 							var player = _status.event.player;
-							var ts = target
-								.getCards("h")
-								.sort((a, b) => get.number(a) - get.number(b));
+							var ts = target.getCards("h").sort((a, b) => get.number(a) - get.number(b));
 							if (get.attitude(player, target) < 0) {
-								var hs = player
-									.getCards("h")
-									.sort(
-										(a, b) => get.number(a) - get.number(b)
-									);
+								var hs = player.getCards("h").sort((a, b) => get.number(a) - get.number(b));
 								if (!hs.length || !ts.length) return 0;
-								if (
-									get.type(hs[0], null, false) == "basic" &&
-									get.value(hs[0]) > 6
-								)
-									return 0;
+								if (get.type(hs[0], null, false) == "basic" && get.value(hs[0]) > 6) return 0;
 								if (
 									get.number(hs[0]) < get.number(ts[0]) ||
 									get.type(hs[0], null, false) == "basic"
@@ -3532,14 +2618,14 @@ game.import("character", function () {
 							}
 							return get.type(ts[0]) != "basic";
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
 						player.logSkill("clanliuju", target);
 						player.chooseToCompare(target).set("small", true);
 					} else event.finish();
-					("step 2");
+					"step 2";
 					if (!result.tie) {
 						var loser = result.bool ? target : player;
 						var cards = [];
@@ -3555,39 +2641,25 @@ game.import("character", function () {
 								);
 						});
 						event.loser = loser;
-						event.distance = [
-							get.distance(player, target),
-							get.distance(target, player),
-						];
+						event.distance = [get.distance(player, target), get.distance(target, player)];
 						if (cards.length) event.cards = cards;
 						else event.finish();
 					} else event.finish();
-					("step 3");
+					"step 3";
 					var cardsx = cards.filter(
-						(i) =>
-							get.position(i, true) == "d" &&
-							event.loser.hasUseTarget(i)
+						(i) => get.position(i, true) == "d" && event.loser.hasUseTarget(i)
 					);
 					if (!cardsx.length) event.goto(6);
 					else
 						event.loser
-							.chooseButton([
-								"留驹：是否使用其中的一张牌？",
-								cardsx,
-							])
+							.chooseButton(["留驹：是否使用其中的一张牌？", cardsx])
 							.set("filterButton", (button) => {
-								return _status.event.player.hasUseTarget(
-									button.link
-								);
+								return _status.event.player.hasUseTarget(button.link);
 							})
 							.set("ai", (button) => {
-								return (
-									_status.event.player.getUseValue(
-										button.link
-									) + 0.1
-								);
+								return _status.event.player.getUseValue(button.link) + 0.1;
 							});
-					("step 4");
+					"step 4";
 					if (result.bool) {
 						var card = result.links[0];
 						event.cards.remove(card);
@@ -3595,16 +2667,13 @@ game.import("character", function () {
 						game.delayx();
 						event.loser.chooseUseTarget(true, card, false);
 					} else event.goto(6);
-					("step 5");
+					"step 5";
 					if (
-						cards.filter(
-							(i) =>
-								get.position(i, true) == "d" &&
-								event.loser.hasUseTarget(i)
-						).length
+						cards.filter((i) => get.position(i, true) == "d" && event.loser.hasUseTarget(i))
+							.length
 					)
 						event.goto(3);
-					("step 6");
+					"step 6";
 					if (
 						get.distance(player, target) != event.distance[0] ||
 						get.distance(target, player) != event.distance[1]
@@ -3655,22 +2724,15 @@ game.import("character", function () {
 				content() {
 					"step 0";
 					player
-						.chooseTarget(
-							get.prompt2("clanlianhe"),
-							2,
-							(card, player, target) => {
-								return !target.isLinked();
-							}
-						)
+						.chooseTarget(get.prompt2("clanlianhe"), 2, (card, player, target) => {
+							return !target.isLinked();
+						})
 						.set("ai", (target) => {
-							var att = get.attitude(
-								_status.event.player,
-								target
-							);
+							var att = get.attitude(_status.event.player, target);
 							if (att > 0) att /= 1.2;
 							return Math.abs(att);
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var targets = result.targets.sortBySeat();
 						targets.forEach((i) => i.link(true));
@@ -3688,45 +2750,35 @@ game.import("character", function () {
 						popup: false,
 						onremove: true,
 						filter(event, player) {
-							return player
-								.getStorage("clanlianhe_effect")
-								.includes(event.player);
+							return player.getStorage("clanlianhe_effect").includes(event.player);
 						},
 						marktext: "连",
 						intro: { content: "已选择目标：$" },
 						content() {
 							"step 0";
-							player.unmarkAuto("clanlianhe_effect", [
-								trigger.player,
-							]);
+							player.unmarkAuto("clanlianhe_effect", [trigger.player]);
 							if (trigger.name == "die") event.finish();
-							("step 1");
+							"step 1";
 							if (
 								trigger.player.hasHistory("gain", (evt) => {
 									return (
-										evt.getParent().name == "draw" &&
-										evt.getParent("phaseUse") == trigger
+										evt.getParent().name == "draw" && evt.getParent("phaseUse") == trigger
 									);
 								})
 							)
 								event.finish();
 							else {
-								player.logSkill(
-									"clanlianhe_effect",
-									trigger.player
-								);
+								player.logSkill("clanlianhe_effect", trigger.player);
 								var num = 0;
 								trigger.player.getHistory("gain", (evt) => {
-									if (evt.getParent("phaseUse") != trigger)
-										return false;
+									if (evt.getParent("phaseUse") != trigger) return false;
 									num += evt.cards.length;
 								});
 								num = Math.min(num, 3);
 								event.num = num;
 								if (num <= 1) event._result = { bool: false };
 								else {
-									var pos =
-										player == trigger.player ? "e" : "he";
+									var pos = player == trigger.player ? "e" : "he";
 									trigger.player
 										.chooseCard(
 											"连和：交给" +
@@ -3742,16 +2794,10 @@ game.import("character", function () {
 											if (_status.event.draw) return 0;
 											return 5 - get.value(card);
 										})
-										.set(
-											"draw",
-											get.attitude(
-												trigger.player,
-												player
-											) >= 0
-										);
+										.set("draw", get.attitude(trigger.player, player) >= 0);
 								}
 							}
-							("step 2");
+							"step 2";
 							if (result.bool) {
 								trigger.player.give(result.cards, player);
 							} else player.draw(num + 1);
@@ -3763,9 +2809,7 @@ game.import("character", function () {
 				audio: 2,
 				trigger: { player: "phaseUseEnd" },
 				filter(event, player) {
-					return game.hasPlayer((current) =>
-						player.canCompare(current)
-					);
+					return game.hasPlayer((current) => player.canCompare(current));
 				},
 				direct: true,
 				content() {
@@ -3781,16 +2825,8 @@ game.import("character", function () {
 						.set("ai", (target) => {
 							var player = _status.event.player;
 							if (get.attitude(player, target) <= 0) {
-								var hs = player
-									.getCards("h")
-									.sort(
-										(a, b) => get.number(b) - get.number(a)
-									);
-								var ts = target
-									.getCards("h")
-									.sort(
-										(a, b) => get.number(b) - get.number(a)
-									);
+								var hs = player.getCards("h").sort((a, b) => get.number(b) - get.number(a));
+								var ts = target.getCards("h").sort((a, b) => get.number(b) - get.number(a));
 								if (!hs.length || !ts.length) return 0;
 								if (
 									get.number(hs[0]) > get.number(ts[0]) &&
@@ -3802,60 +2838,42 @@ game.import("character", function () {
 							}
 							return 0;
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
 						player.logSkill("clanhuanjia", target);
 						player.chooseToCompare(target);
 					} else event.finish();
-					("step 2");
+					"step 2";
 					if (!result.tie) {
 						var winner = result.bool ? player : target;
 						var cards = [];
 						game.getGlobalHistory("cardMove", (evt) => {
-							if (evt.getParent(3) == event)
-								cards.addArray(evt.cards.filterInD("d"));
+							if (evt.getParent(3) == event) cards.addArray(evt.cards.filterInD("d"));
 						});
 						event.winner = winner;
 						if (cards.length) event.cards = cards;
 						else event.finish();
 					} else event.finish();
-					("step 3");
+					"step 3";
 					var cardsx = cards.filter(
-						(i) =>
-							get.position(i, true) == "d" &&
-							event.winner.hasUseTarget(i)
+						(i) => get.position(i, true) == "d" && event.winner.hasUseTarget(i)
 					);
 					if (!cardsx.length) event.goto(6);
 					else
 						event.winner
-							.chooseButton([
-								"缓颊：是否使用其中的一张牌？",
-								cardsx,
-							])
+							.chooseButton(["缓颊：是否使用其中的一张牌？", cardsx])
 							.set("filterButton", (button) => {
-								return _status.event.player.hasUseTarget(
-									button.link
-								);
+								return _status.event.player.hasUseTarget(button.link);
 							})
 							.set("ai", (button) => {
 								var damage = 1;
-								if (
-									_status.event.att > 2 &&
-									get.tag(button.link, "damage")
-								)
-									damage *= 2;
-								return (
-									_status.event.player.getUseValue(
-										button.link
-									) *
-										damage +
-									0.1
-								);
+								if (_status.event.att > 2 && get.tag(button.link, "damage")) damage *= 2;
+								return _status.event.player.getUseValue(button.link) * damage + 0.1;
 							})
 							.set("att", get.attitude(event.winner, player));
-					("step 4");
+					"step 4";
 					if (result.bool) {
 						var card = result.links[0];
 						event.card = card;
@@ -3864,7 +2882,7 @@ game.import("character", function () {
 						game.delayx();
 						event.winner.chooseUseTarget(true, card, false);
 					}
-					("step 5");
+					"step 5";
 					if (
 						game.hasPlayer2((current) => {
 							return current.hasHistory(
@@ -3873,18 +2891,11 @@ game.import("character", function () {
 							);
 						})
 					) {
-						var skills = player
-							.getSkills(null, false, false)
-							.filter((skill) => {
-								var info = get.info(skill);
-								if (
-									!info ||
-									get.is.empty(info) ||
-									info.charlotte
-								)
-									return false;
-								return true;
-							});
+						var skills = player.getSkills(null, false, false).filter((skill) => {
+							var info = get.info(skill);
+							if (!info || get.is.empty(info) || info.charlotte) return false;
+							return true;
+						});
 						player
 							.chooseControl(skills)
 							.set(
@@ -3893,8 +2904,7 @@ game.import("character", function () {
 									return (
 										'<div class="skill">【' +
 										get.translation(
-											lib.translate[i + "_ab"] ||
-												get.translation(i).slice(0, 2)
+											lib.translate[i + "_ab"] || get.translation(i).slice(0, 2)
 										) +
 										"】</div><div>" +
 										get.skillInfoTranslation(i, player) +
@@ -3907,23 +2917,12 @@ game.import("character", function () {
 							.set("ai", () => {
 								var choices = _status.event.controls.slice();
 								var value = (skill) =>
-									get.skillRank(skill, "in") +
-									get.skillRank(skill, "out");
-								choices = choices.map((skill) => [
-									skill,
-									value(skill),
-								]);
-								var list = choices.sort(
-									(a, b) => a[1] - b[1]
-								)[0];
+									get.skillRank(skill, "in") + get.skillRank(skill, "out");
+								choices = choices.map((skill) => [skill, value(skill)]);
+								var list = choices.sort((a, b) => a[1] - b[1])[0];
 								if (list[1] < 2) return list[0];
 								else {
-									if (
-										_status.event.controls.includes(
-											"clanxumin"
-										)
-									)
-										return "clanxumin";
+									if (_status.event.controls.includes("clanxumin")) return "clanxumin";
 									return list[0];
 								}
 							});
@@ -3931,7 +2930,7 @@ game.import("character", function () {
 						player.gain(cards, "gain2");
 						event.finish();
 					}
-					("step 6");
+					"step 6";
 					player.removeSkills(result.control);
 				},
 				ai: {
@@ -3945,15 +2944,11 @@ game.import("character", function () {
 				direct: true,
 				forced: true,
 				filter(event, player) {
-					if (!game.hasPlayer((current) => current != player))
-						return false;
+					if (!game.hasPlayer((current) => current != player)) return false;
 					const type = get.type2(event.card);
 					return (
 						player
-							.getRoundHistory(
-								"useCard",
-								(evt) => get.type2(evt.card) == type
-							)
+							.getRoundHistory("useCard", (evt) => get.type2(evt.card) == type)
 							.indexOf(event) == 0
 					);
 				},
@@ -3971,9 +2966,7 @@ game.import("character", function () {
 						.chooseTarget(
 							"三恇：选择一名其他角色",
 							"令其交给你至少X张牌" +
-								(cards.length
-									? "，然后其获得" + get.translation(cards)
-									: "") +
+								(cards.length ? "，然后其获得" + get.translation(cards) : "") +
 								"（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）",
 							true,
 							lib.filter.notMe
@@ -3983,10 +2976,7 @@ game.import("character", function () {
 								num = lib.skill.clansankuang.getNum(target);
 							if (num == 0) return att;
 							if (_status.event.goon) return -att;
-							return (
-								-Math.sqrt(Math.abs(att)) -
-								lib.skill.clansankuang.getNum(target)
-							);
+							return -Math.sqrt(Math.abs(att)) - lib.skill.clansankuang.getNum(target);
 						})
 						.set(
 							"goon",
@@ -3995,7 +2985,7 @@ game.import("character", function () {
 								trigger.cards.map((i) => get.value(i))
 							) <= 5 || trigger.cards.filterInD("oe").length == 0
 						);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0],
 							num = lib.skill.clansankuang.getNum(target),
@@ -4019,10 +3009,7 @@ game.import("character", function () {
 										? "是否交给" +
 												get.translation(player) +
 												"任意张牌" +
-												(cards.length
-													? "并获得" +
-													  get.translation(cards)
-													: "") +
+												(cards.length ? "并获得" + get.translation(cards) : "") +
 												"？"
 										: "交给" +
 												get.translation(player) +
@@ -4032,19 +3019,15 @@ game.import("character", function () {
 								);
 						}
 					} else event.finish();
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						var cards = result.cards;
 						target.give(cards, player);
 						game.delayx();
 					} else event.finish();
-					("step 3");
+					"step 3";
 					if (trigger.cards.filterInD().length)
-						target.gain(
-							trigger.cards.filterInD(),
-							"gain2",
-							"bySelf"
-						);
+						target.gain(trigger.cards.filterInD(), "gain2", "bySelf");
 					else if (trigger.cards.filterInD("e").length)
 						target.gain(
 							trigger.cards.filterInD("e"),
@@ -4055,12 +3038,7 @@ game.import("character", function () {
 				ai: {
 					reverseOrder: true,
 					skillTagFilter(player) {
-						if (
-							player.getHistory(
-								"useCard",
-								(evt) => get.type(evt.card) == "equip"
-							).length > 0
-						)
+						if (player.getHistory("useCard", (evt) => get.type(evt.card) == "equip").length > 0)
 							return false;
 					},
 					effect: {
@@ -4068,10 +3046,8 @@ game.import("character", function () {
 							if (
 								player == target &&
 								get.type(card) == "equip" &&
-								!player.getHistory(
-									"useCard",
-									(evt) => get.type(evt.card) == "equip"
-								).length == 0
+								!player.getHistory("useCard", (evt) => get.type(evt.card) == "equip")
+									.length == 0
 							)
 								return [1, 3];
 						},
@@ -4093,10 +3069,7 @@ game.import("character", function () {
 				},
 				forced: true,
 				filter(event, player) {
-					var history = player.getAllHistory(
-						"useSkill",
-						(evt) => evt.skill == "clansankuang"
-					);
+					var history = player.getAllHistory("useSkill", (evt) => evt.skill == "clansankuang");
 					if (!history.length) return false;
 					var target = history[0].targets[0];
 					if (target.countCards("h")) return false;
@@ -4120,40 +3093,29 @@ game.import("character", function () {
 				locked: false,
 				filter(event, player) {
 					return (
-						(event.card.name == "sha" ||
-							get.type(event.card) == "trick") &&
+						(event.card.name == "sha" || get.type(event.card) == "trick") &&
 						player.countCards("h", event.card.name) > 0
 					);
 				},
 				content() {
 					var cards = player.getCards("h", trigger.card.name);
-					player.showCards(
-						cards,
-						get.translation(player) + "发动了【神君】"
-					);
+					player.showCards(cards, get.translation(player) + "发动了【神君】");
 					player.markSkill("clanshenjun");
 					player.addGaintag(cards, "clanshenjun");
 					for (var name of lib.phaseName) {
 						var evt = _status.event.getParent(name);
 						if (!evt || evt.name != name) continue;
-						player.addTempSkill(
-							"clanshenjun_viewAs",
-							name + "After"
-						);
+						player.addTempSkill("clanshenjun_viewAs", name + "After");
 						break;
 					}
 				},
 				marktext: "君",
 				intro: {
 					markcount(storage, player) {
-						return player.countCards("h", (card) =>
-							card.hasGaintag("clanshenjun")
-						);
+						return player.countCards("h", (card) => card.hasGaintag("clanshenjun"));
 					},
 					mark(dialog, content, player) {
-						var cards = player.getCards("h", (card) =>
-							card.hasGaintag("clanshenjun")
-						);
+						var cards = player.getCards("h", (card) => card.hasGaintag("clanshenjun"));
 						if (cards.length) {
 							dialog.addAuto(cards);
 						} else return "无展示牌";
@@ -4172,19 +3134,13 @@ game.import("character", function () {
 							],
 						},
 						filter(event, player) {
-							return (
-								player.countCards("h", (card) =>
-									card.hasGaintag("clanshenjun")
-								) > 0
-							);
+							return player.countCards("h", (card) => card.hasGaintag("clanshenjun")) > 0;
 						},
 						forced: true,
 						charlotte: true,
 						content() {
 							"step 0";
-							var cards = player.getCards("h", (card) =>
-								card.hasGaintag("clanshenjun")
-							);
+							var cards = player.getCards("h", (card) => card.hasGaintag("clanshenjun"));
 							var list = [],
 								names = [];
 							for (var card of cards) {
@@ -4194,12 +3150,7 @@ game.import("character", function () {
 								if (nature && nature.length) {
 									namex += nature;
 									if (names.includes(namex)) continue;
-									list.push([
-										get.type(card),
-										"",
-										name,
-										nature,
-									]);
+									list.push([get.type(card), "", name, nature]);
 								} else {
 									if (names.includes(namex)) continue;
 									list.push([get.type(card), "", name]);
@@ -4207,9 +3158,7 @@ game.import("character", function () {
 								names.push(namex);
 							}
 							list.sort((a, b) => {
-								var del1 =
-									lib.inpile.indexOf(a[2]) -
-									lib.inpile.indexOf(b[2]);
+								var del1 = lib.inpile.indexOf(a[2]) - lib.inpile.indexOf(b[2]);
 								if (del1 != 0) return del1;
 								var a1 = 0,
 									b1 = 0;
@@ -4219,9 +3168,7 @@ game.import("character", function () {
 							});
 							player
 								.chooseButton([
-									"是否将" +
-										get.cnNumber(cards.length) +
-										"张牌当下列一张牌使用？",
+									"是否将" + get.cnNumber(cards.length) + "张牌当下列一张牌使用？",
 									[list, "vcard"],
 								])
 								.set("ai", function (button) {
@@ -4230,19 +3177,15 @@ game.import("character", function () {
 										nature: button.link[3],
 									});
 								});
-							("step 1");
+							"step 1";
 							if (result.bool) {
 								var name = result.links[0][2],
 									nature = result.links[0][3];
-								var cards = player.getCards("h", (card) =>
-									card.hasGaintag("clanshenjun")
-								);
+								var cards = player.getCards("h", (card) => card.hasGaintag("clanshenjun"));
 								game.broadcastAll(
 									function (num, card) {
-										lib.skill.clanshenjun_backup.selectCard =
-											num;
-										lib.skill.clanshenjun_backup.viewAs =
-											card;
+										lib.skill.clanshenjun_backup.selectCard = num;
+										lib.skill.clanshenjun_backup.viewAs = card;
 									},
 									cards.length,
 									{ name: name, nature: nature }
@@ -4290,12 +3233,7 @@ game.import("character", function () {
 				},
 				forced: true,
 				filter(event, player) {
-					if (
-						game.getGlobalHistory(
-							"changeHp",
-							(evt) => evt.player == player
-						).length != 1
-					)
+					if (game.getGlobalHistory("changeHp", (evt) => evt.player == player).length != 1)
 						return false;
 					var cards = player.getCards("h"),
 						map = {};
@@ -4310,15 +3248,10 @@ game.import("character", function () {
 						if (map[i] > 0) list.push([i, map[i]]);
 					}
 					list.sort((a, b) => b[1] - a[1]);
-					return (
-						list[0][0] == "trick" &&
-						(list.length == 1 || list[0][1] > list[1][1])
-					);
+					return list[0][0] == "trick" && (list.length == 1 || list[0][1] > list[1][1]);
 				},
 				content() {
-					player.showHandcards(
-						get.translation(player) + "发动了【八龙】"
-					);
+					player.showHandcards(get.translation(player) + "发动了【八龙】");
 					player.drawTo(game.countPlayer());
 				},
 			},
@@ -4333,7 +3266,7 @@ game.import("character", function () {
 				content() {
 					"step 0";
 					target.recover();
-					("step 1");
+					"step 1";
 					var name = get.translation(target);
 					player
 						.chooseControl()
@@ -4351,23 +3284,13 @@ game.import("character", function () {
 									nature: "ice",
 									isCard: true,
 								};
-								var eff = get.effect(
-										player,
-										card,
-										target,
-										player
-									),
-									eff2 = get.effect(
-										target,
-										card,
-										player,
-										player
-									);
+								var eff = get.effect(player, card, target, player),
+									eff2 = get.effect(target, card, player, player);
 								if (eff > eff2) return "选项一";
 								else return "选项二";
 							})()
 						);
-					("step 2");
+					"step 2";
 					var players = [target, player];
 					if (result.control == "选项二") players.reverse();
 					var card = { name: "sha", nature: "ice", isCard: true };
@@ -4403,8 +3326,7 @@ game.import("character", function () {
 				audio: 2,
 				trigger: { global: "damageEnd" },
 				filter(event, player) {
-					if (!event.hasNature() || !event.player.isIn())
-						return false;
+					if (!event.hasNature() || !event.player.isIn()) return false;
 					return (
 						game.countPlayer2((current) => {
 							return current.hasHistory("damage", (evt) => {
@@ -4436,12 +3358,7 @@ game.import("character", function () {
 						var info = get.info(skill);
 						if (!info || info.charlotte) return false;
 						if (targets && targets.length) {
-							if (
-								targets.filter((i) =>
-									player.differentSexFrom(i)
-								).length > 0
-							)
-								return true;
+							if (targets.filter((i) => player.differentSexFrom(i)).length > 0) return true;
 						}
 						return false;
 					});
@@ -4462,8 +3379,7 @@ game.import("character", function () {
 				onremove: true,
 				marktext: "钗",
 				intro: {
-					content: (storage, player) =>
-						"对象：" + get.translation(storage),
+					content: (storage, player) => "对象：" + get.translation(storage),
 				},
 				group: "clanfenchai_audio",
 				filter(event, player) {
@@ -4472,19 +3388,13 @@ game.import("character", function () {
 					if (!targets || !targets.length) return false;
 					var info = get.info(event.sourceSkill || event.skill);
 					if (!info || info.charlotte) return false;
-					if (player.getStorage("clanfenchai").length != 0)
-						return false;
-					return (
-						targets.filter((i) => player.differentSexFrom(i))
-							.length > 0
-					);
+					if (player.getStorage("clanfenchai").length != 0) return false;
+					return targets.filter((i) => player.differentSexFrom(i)).length > 0;
 				},
 				content() {
 					player.markAuto(
 						"clanfenchai",
-						trigger.targets.filter((i) =>
-							player.differentSexFrom(i)
-						)
+						trigger.targets.filter((i) => player.differentSexFrom(i))
 					);
 				},
 				subSkill: {
@@ -4501,17 +3411,10 @@ game.import("character", function () {
 				mod: {
 					suit(card, suit) {
 						var player = get.owner(card) || _status.event.player;
-						if (
-							!player ||
-							!player.judging ||
-							player.judging[0] != card
-						)
-							return;
+						if (!player || !player.judging || player.judging[0] != card) return;
 						var storage = player.getStorage("clanfenchai");
 						if (!storage.length) return;
-						return storage.filter((i) => i.isIn()).length > 0
-							? "heart"
-							: "spade";
+						return storage.filter((i) => i.isIn()).length > 0 ? "heart" : "spade";
 					},
 				},
 			},
@@ -4522,21 +3425,13 @@ game.import("character", function () {
 				filter(event, player) {
 					return (
 						!player.isDisabledJudge() ||
-						player.countCards("h", (card) =>
-							["sha", "shan"].includes(get.name(card))
-						) > 0
+						player.countCards("h", (card) => ["sha", "shan"].includes(get.name(card))) > 0
 					);
 				},
 				chooseButton: {
 					dialog(event, player) {
-						var dialog = ui.create.dialog(
-							"烈誓：选择一项",
-							"hidden"
-						);
-						dialog.add([
-							lib.skill.clanlieshi.choices.slice(),
-							"textbutton",
-						]);
+						var dialog = ui.create.dialog("烈誓：选择一项", "hidden");
+						dialog.add([lib.skill.clanlieshi.choices.slice(), "textbutton"]);
 						return dialog;
 					},
 					filter(button, player) {
@@ -4546,49 +3441,32 @@ game.import("character", function () {
 						return (
 							num > 0 &&
 							num ==
-								player
-									.getDiscardableCards(player, "h")
-									.filter((i) => get.name(i) == link).length
+								player.getDiscardableCards(player, "h").filter((i) => get.name(i) == link)
+									.length
 						);
 					},
 					check(button) {
 						var player = _status.event.player;
 						switch (button.link) {
 							case "damage":
+								if (get.damageEffect(player, player, player, "fire") >= 0) return 10;
 								if (
-									get.damageEffect(
-										player,
-										player,
-										player,
-										"fire"
-									) >= 0
-								)
-									return 10;
-								if (
-									player.hp >=
-										Math.max(
-											2,
-											3 - player.getFriends().length
-										) &&
+									player.hp >= Math.max(2, 3 - player.getFriends().length) &&
 									game.countPlayer(
 										(current) =>
 											get.attitude(player, current) < 0 &&
 											current.countCards("h", (card) =>
-												["sha", "shan"].includes(
-													get.name(card)
-												)
+												["sha", "shan"].includes(get.name(card))
 											)
 									)
 								)
 									return 0.8 + Math.random();
 								return 0;
 							case "shan":
-								if (player.countCards("h", "shan") == 1)
-									return 8 + Math.random();
+								if (player.countCards("h", "shan") == 1) return 8 + Math.random();
 								return 1 + Math.random();
 							case "sha":
-								if (player.countCards("h", "sha") == 1)
-									return 8 + Math.random();
+								if (player.countCards("h", "sha") == 1) return 8 + Math.random();
 								return 0.9 + Math.random();
 						}
 					},
@@ -4598,8 +3476,7 @@ game.import("character", function () {
 						return next;
 					},
 					prompt(links) {
-						if (links[0] == "damage")
-							return "废除判定区并受到1点火焰伤害";
+						if (links[0] == "damage") return "废除判定区并受到1点火焰伤害";
 						return "弃置所有【" + get.translation(links[0]) + "】";
 					},
 				},
@@ -4611,16 +3488,10 @@ game.import("character", function () {
 				ai: {
 					order(item, player) {
 						if (!player) return;
-						var eff = get.damageEffect(
-								player,
-								player,
-								player,
-								"fire"
-							),
+						var eff = get.damageEffect(player, player, player, "fire"),
 							disabled = !player.isDisabledJudge();
 						if (
-							(player.countCards("h", "sha") == 1 ||
-								player.countCards("h", "shan") == 1) &&
+							(player.countCards("h", "sha") == 1 || player.countCards("h", "shan") == 1) &&
 							eff < 0 &&
 							!disabled
 						)
@@ -4628,35 +3499,22 @@ game.import("character", function () {
 						else if (eff >= 0 && !disabled) return 5.8;
 						if (
 							!disabled &&
-							!player.countCards("h", (card) =>
-								["sha", "shan"].includes(get.name(card))
-							)
+							!player.countCards("h", (card) => ["sha", "shan"].includes(get.name(card)))
 						) {
 							if (
-								(!player.hasSkill("clanhuanyin") ||
-									!player.canSave(player)) &&
+								(!player.hasSkill("clanhuanyin") || !player.canSave(player)) &&
 								player.hp <= 1
 							)
 								return 0;
-							if (
-								player.canSave(player) &&
-								player.hp == 1 &&
-								player.countCards("h") <= 1
-							)
+							if (player.canSave(player) && player.hp == 1 && player.countCards("h") <= 1)
 								return 2.6;
 							if (
-								player.hp <
-									Math.max(
-										2,
-										3 - player.getFriends().length
-									) ||
+								player.hp < Math.max(2, 3 - player.getFriends().length) ||
 								!game.countPlayer(
 									(current) =>
 										get.attitude(player, current) < 0 &&
 										current.countCards("h", (card) =>
-											["sha", "shan"].includes(
-												get.name(card)
-											)
+											["sha", "shan"].includes(get.name(card))
 										)
 								)
 							)
@@ -4682,91 +3540,57 @@ game.import("character", function () {
 							event.choice = choice;
 							if (choice == "damage") {
 								player.damage("fire");
-								if (!player.isDisabledJudge())
-									player.disableJudge();
+								if (!player.isDisabledJudge()) player.disableJudge();
 							} else {
 								var cards = player.getCards("h", choice);
 								if (cards.length) player.discard(cards);
 							}
-							("step 1");
-							if (
-								!player.isIn() ||
-								!game.hasPlayer((current) => current != player)
-							)
+							"step 1";
+							if (!player.isIn() || !game.hasPlayer((current) => current != player))
 								event.finish();
 							else
 								player
-									.chooseTarget(
-										"烈誓：令一名其他角色选择另一项",
-										lib.filter.notMe,
-										true
-									)
+									.chooseTarget("烈誓：令一名其他角色选择另一项", lib.filter.notMe, true)
 									.set("ai", (target) => {
 										var player = _status.event.player,
-											chosen =
-												_status.event.getParent()
-													.choice,
+											chosen = _status.event.getParent().choice,
 											att = get.attitude(player, target);
 										if (chosen == "damage") {
 											if (att > 0) return 0;
 											return (
 												-att / 2 +
 												target.countCards("h", (card) =>
-													["sha", "shan"].includes(
-														get.name(card)
-													)
+													["sha", "shan"].includes(get.name(card))
 												)
 											);
 										}
-										return get.damageEffect(
-											target,
-											player,
-											player,
-											"fire"
-										);
+										return get.damageEffect(target, player, player, "fire");
 									});
-							("step 2");
+							"step 2";
 							if (result.bool) {
 								var target = result.targets[0];
 								event.target = target;
 								player.line(target, "fire");
 								var list = [],
 									choice = event.choice;
-								var choiceList =
-									lib.skill.clanlieshi.choices.slice();
-								choiceList = choiceList.map(
-									(link, ind, arr) => {
-										link = link[1];
-										var ok = true;
-										if (arr[ind][0] == choice) {
-											link +=
-												"（" +
-												get.translation(player) +
-												"已选）";
-											ok = false;
-										}
-										if (ind == 0) {
-											if (target.isDisabledJudge())
-												ok = false;
-										} else if (ind > 0) {
-											var name =
-												ind == 1 ? "shan" : "sha";
-											if (!target.countCards("h", name))
-												ok = false;
-										}
-										if (!ok)
-											link =
-												'<span style="opacity:0.5">' +
-												link +
-												"</span>";
-										else
-											list.push(
-												"选项" +
-													get.cnNumber(ind + 1, true)
-											);
-										return link;
+								var choiceList = lib.skill.clanlieshi.choices.slice();
+								choiceList = choiceList.map((link, ind, arr) => {
+									link = link[1];
+									var ok = true;
+									if (arr[ind][0] == choice) {
+										link += "（" + get.translation(player) + "已选）";
+										ok = false;
 									}
-								);
+									if (ind == 0) {
+										if (target.isDisabledJudge()) ok = false;
+									} else if (ind > 0) {
+										var name = ind == 1 ? "shan" : "sha";
+										if (!target.countCards("h", name)) ok = false;
+									}
+									if (!ok) link = '<span style="opacity:0.5">' + link + "</span>";
+									else list.push("选项" + get.cnNumber(ind + 1, true));
+									return link;
+								});
 								if (!list.length) {
 									game.log(target, "没有能执行的选项");
 									event.finish();
@@ -4776,71 +3600,43 @@ game.import("character", function () {
 									.chooseControl(list)
 									.set("choiceList", choiceList)
 									.set("ai", () => {
-										var controls =
-												_status.event.controls.slice(),
+										var controls = _status.event.controls.slice(),
 											player = _status.event.player,
-											user =
-												_status.event.getParent()
-													.player;
-										if (controls.length == 1)
-											return controls[0];
+											user = _status.event.getParent().player;
+										if (controls.length == 1) return controls[0];
 										if (
 											controls.includes("选项一") &&
-											get.damageEffect(
-												player,
-												user,
-												player,
-												"fire"
-											) >= 0
+											get.damageEffect(player, user, player, "fire") >= 0
 										)
 											return "选项一";
 										if (
 											controls.includes("选项一") &&
 											player.hp <= 2 &&
 											player.countCards("h", (card) =>
-												["sha", "shan"].includes(
-													get.name(card)
-												)
+												["sha", "shan"].includes(get.name(card))
 											) <= 3
 										)
 											controls.remove("选项一");
-										if (controls.length == 1)
-											return controls[0];
+										if (controls.length == 1) return controls[0];
 										if (
 											player
 												.getCards("h", "sha")
-												.reduce(
-													(p, c) =>
-														p +
-														get.value(c, player),
-													0
-												) >
+												.reduce((p, c) => p + get.value(c, player), 0) >
 											player
 												.getCards("h", "sha")
-												.reduce(
-													(p, c) =>
-														p +
-														get.value(c, player),
-													0
-												)
+												.reduce((p, c) => p + get.value(c, player), 0)
 										) {
-											if (controls.includes("选项三"))
-												return "选项三";
-										} else if (controls.includes("选项二"))
-											return "选项二";
+											if (controls.includes("选项三")) return "选项三";
+										} else if (controls.includes("选项二")) return "选项二";
 										return controls.randomGet();
 									});
 							} else event.finish();
-							("step 3");
+							"step 3";
 							if (result.control == "选项一") {
-								if (!target.isDisabledJudge())
-									target.disableJudge();
+								if (!target.isDisabledJudge()) target.disableJudge();
 								target.damage("fire");
 							} else {
-								var cards = target.getCards(
-									"h",
-									result.control == "选项二" ? "shan" : "sha"
-								);
+								var cards = target.getCards("h", result.control == "选项二" ? "shan" : "sha");
 								if (cards.length) target.discard(cards);
 							}
 						},
@@ -4860,46 +3656,33 @@ game.import("character", function () {
 					const suit = get.suit(event.card);
 					if (
 						player
-							.getRoundHistory(
-								"useCard",
-								(evt) => get.suit(evt.card) == suit
-							)
+							.getRoundHistory("useCard", (evt) => get.suit(evt.card) == suit)
 							.indexOf(event) != 0
 					)
 						return false;
 					return (
-						(event.targets &&
-							event.targets.length == 1 &&
-							!event.targets[0].isLinked()) ||
+						(event.targets && event.targets.length == 1 && !event.targets[0].isLinked()) ||
 						player.hasCard(
-							(card) =>
-								get.suit(card) == get.suit(event.card) &&
-								player.canRecast(card),
+							(card) => get.suit(card) == get.suit(event.card) && player.canRecast(card),
 							"h"
 						)
 					);
 				},
 				content() {
 					"step 0";
-					if (
-						trigger.targets &&
-						trigger.targets.length == 1 &&
-						!trigger.targets[0].isLinked()
-					) {
+					if (trigger.targets && trigger.targets.length == 1 && !trigger.targets[0].isLinked()) {
 						trigger.targets[0].link(true);
 						event.link = true;
 					}
 					var cards = player.getCards(
 						"h",
-						(card) =>
-							get.suit(card) == get.suit(trigger.card) &&
-							player.canRecast(card)
+						(card) => get.suit(card) == get.suit(trigger.card) && player.canRecast(card)
 					);
 					if (cards.length > 0) {
 						player.recast(cards);
 						event.recast = true;
 					}
-					("step 1");
+					"step 1";
 					if (event.link && event.recast) player.draw();
 				},
 				group: "clandianzhan_count",
@@ -4910,10 +3693,7 @@ game.import("character", function () {
 						filter(event, player) {
 							let suit = get.suit(event.card);
 							return (
-								lib.suits.includes(suit) &&
-								!player
-									.getStorage("clandianzhan")
-									.includes(suit)
+								lib.suits.includes(suit) && !player.getStorage("clandianzhan").includes(suit)
 							);
 						},
 						forced: true,
@@ -4921,25 +3701,17 @@ game.import("character", function () {
 						content() {
 							let suits = player
 								.getRoundHistory("useCard", (evt) => {
-									return lib.suits.includes(
-										get.suit(evt.card)
-									);
+									return lib.suits.includes(get.suit(evt.card));
 								})
 								.reduce((list, evt) => {
 									return list.add(get.suit(evt.card));
 								}, [])
-								.sort(
-									(a, b) =>
-										lib.suits.indexOf(a) -
-										lib.suits.indexOf(b)
-								);
+								.sort((a, b) => lib.suits.indexOf(a) - lib.suits.indexOf(b));
 							if (!player.storage.clandianzhan) {
-								player
-									.when({ global: "roundStart" })
-									.then(() => {
-										delete player.storage.clandianzhan;
-										player.unmarkSkill("clandianzhan");
-									});
+								player.when({ global: "roundStart" }).then(() => {
+									delete player.storage.clandianzhan;
+									player.unmarkSkill("clandianzhan");
+								});
 							}
 							player.storage.clandianzhan = suits;
 							player.markSkill("clandianzhan");
@@ -4954,10 +3726,7 @@ game.import("character", function () {
 						.reduce((list, evt) => {
 							return list.add(get.suit(evt.card));
 						}, [])
-						.sort(
-							(a, b) =>
-								lib.suits.indexOf(a) - lib.suits.indexOf(b)
-						);
+						.sort((a, b) => lib.suits.indexOf(a) - lib.suits.indexOf(b));
 					if (suits.length) {
 						if (!player.storage.clandianzhan) {
 							player.when({ global: "roundStart" }).then(() => {
@@ -4984,13 +3753,7 @@ game.import("character", function () {
 			},
 			clandaojie: {
 				audio: 2,
-				audioname: [
-					"clan_xunshu",
-					"clan_xunchen",
-					"clan_xuncai",
-					"clan_xuncan",
-					"clan_xunyou",
-				],
+				audioname: ["clan_xunshu", "clan_xunchen", "clan_xuncai", "clan_xuncan", "clan_xunyou"],
 				trigger: { player: "useCardAfter" },
 				filter(event, player) {
 					return (
@@ -5000,8 +3763,7 @@ game.import("character", function () {
 						player
 							.getHistory("useCard", (evt) => {
 								return (
-									get.type(evt.card, null, false) ==
-										"trick" && !get.tag(evt.card, "damage")
+									get.type(evt.card, null, false) == "trick" && !get.tag(evt.card, "damage")
 								);
 							})
 							.indexOf(event) == 0
@@ -5011,20 +3773,17 @@ game.import("character", function () {
 				clanSkill: true,
 				content() {
 					"step 0";
-					var skills = player
-						.getSkills(null, false, false)
-						.filter((skill) => {
-							var info = get.info(skill);
-							if (
-								!info ||
-								info.charlotte ||
-								!get.is.locked(skill) ||
-								get.skillInfoTranslation(skill, player)
-									.length == 0
-							)
-								return false;
-							return true;
-						});
+					var skills = player.getSkills(null, false, false).filter((skill) => {
+						var info = get.info(skill);
+						if (
+							!info ||
+							info.charlotte ||
+							!get.is.locked(skill) ||
+							get.skillInfoTranslation(skill, player).length == 0
+						)
+							return false;
+						return true;
+					});
 					player
 						.chooseControl(skills, "cancel2")
 						.set(
@@ -5033,8 +3792,7 @@ game.import("character", function () {
 								return (
 									'<div class="skill">【' +
 									get.translation(
-										lib.translate[i + "_ab"] ||
-											get.translation(i).slice(0, 2)
+										lib.translate[i + "_ab"] || get.translation(i).slice(0, 2)
 									) +
 									"】</div><div>" +
 									get.skillInfoTranslation(i, player) +
@@ -5043,10 +3801,7 @@ game.import("character", function () {
 							})
 						)
 						.set("displayIndex", false)
-						.set(
-							"prompt",
-							"蹈节：失去一个锁定技，或点“取消”失去1点体力"
-						)
+						.set("prompt", "蹈节：失去一个锁定技，或点“取消”失去1点体力")
 						.set("ai", () => {
 							var player = _status.event.player,
 								choices = _status.event.controls.slice();
@@ -5056,33 +3811,21 @@ game.import("character", function () {
 								return info.ai.neg || info.ai.halfneg;
 							});
 							if (negs.length) return negs.randomGet();
-							if (
-								get.effect(
-									player,
-									{ name: "losehp" },
-									player,
-									player
-								) >= 0
-							)
-								return "cancel2";
+							if (get.effect(player, { name: "losehp" }, player, player) >= 0) return "cancel2";
 							if (player.hp > 3) return "cancel2";
-							return Math.random() < 0.75
-								? "clandaojie"
-								: choices.randomGet();
+							return Math.random() < 0.75 ? "clandaojie" : choices.randomGet();
 						});
-					("step 1");
+					"step 1";
 					if (result.control != "cancel2") {
 						player.removeSkills(result.control);
 					} else {
 						player.loseHp();
 					}
-					("step 2");
+					"step 2";
 					var targets = game.filterPlayer(
-						(current) =>
-							current == player || current.hasClan("颍川荀氏")
+						(current) => current == player || current.hasClan("颍川荀氏")
 					);
-					if (targets.length == 1)
-						event._result = { bool: true, targets: targets };
+					if (targets.length == 1) event._result = { bool: true, targets: targets };
 					else
 						player
 							.chooseTarget(
@@ -5091,16 +3834,11 @@ game.import("character", function () {
 									"交给一名颍川荀氏角色",
 								true,
 								(card, player, target) => {
-									return (
-										target == player ||
-										target.hasClan("颍川荀氏")
-									);
+									return target == player || target.hasClan("颍川荀氏");
 								}
 							)
-							.set("ai", (target) =>
-								get.attitude(_status.event.player, target)
-							);
-					("step 3");
+							.set("ai", (target) => get.attitude(_status.event.player, target));
+					"step 3";
 					if (result.bool) {
 						var target = result.targets[0];
 						player.line(target, "green");
@@ -5143,17 +3881,13 @@ game.import("character", function () {
 						},
 						content() {
 							if (
-								player.hasHistory(
-									"sourceDamage",
-									function (evt) {
-										return evt.card == trigger.card;
-									}
-								)
+								player.hasHistory("sourceDamage", function (evt) {
+									return evt.card == trigger.card;
+								})
 							) {
 								var num1 = player.countCards("h"),
 									num2 = player.getHandcardLimit();
-								if (num1 < num2)
-									player.draw(Math.min(5, num2 - num1));
+								if (num1 < num2) player.draw(Math.min(5, num2 - num1));
 							} else if (trigger.addCount !== false) {
 								trigger.addCount = false;
 								player.getStat().card.sha--;
@@ -5198,8 +3932,7 @@ game.import("character", function () {
 				},
 				checkx(card) {
 					var num = 1;
-					if (_status.event.player.getUseValue(card, null, true) <= 0)
-						num = 1.5;
+					if (_status.event.player.getUseValue(card, null, true) <= 0) num = 1.5;
 					return (15 - get.value(card)) * num;
 				},
 				prompt() {
@@ -5208,15 +3941,9 @@ game.import("character", function () {
 						num2 = player.getHandcardLimit();
 					var str = '<span class="text center">';
 					if (num1 > num2) {
-						str +=
-							"弃置" +
-							get.cnNumber(num1 - num2) +
-							"张牌，然后手牌上限+1。";
+						str += "弃置" + get.cnNumber(num1 - num2) + "张牌，然后手牌上限+1。";
 					} else {
-						str +=
-							"摸" +
-							get.cnNumber(Math.min(8, num2 - num1)) +
-							"张牌，然后手牌上限-1。";
+						str += "摸" + get.cnNumber(Math.min(8, num2 - num1)) + "张牌，然后手牌上限-1。";
 					}
 					str += "<br>※当前手牌上限：" + num2;
 					var num3 = (_status.event.getParent().phaseIndex || 0) + 1;
@@ -5236,20 +3963,14 @@ game.import("character", function () {
 							num2 = player.getHandcardLimit();
 						if (num1 < num2) player.draw(Math.min(8, num2 - num1));
 					}
-					("step 1");
+					"step 1";
 					lib.skill.chenliuwushi.change(player, -1);
 				},
 				ai: {
 					order(item, player) {
 						var num = player.getHandcardLimit(),
-							numx =
-								(_status.event.getParent().phaseIndex || 0) + 1;
-						if (
-							num == 5 &&
-							numx == 4 &&
-							player.getStat("skill").clanyirong
-						)
-							return 0;
+							numx = (_status.event.getParent().phaseIndex || 0) + 1;
+						if (num == 5 && numx == 4 && player.getStat("skill").clanyirong) return 0;
 						if (
 							player.countCards("h") == num + 1 &&
 							num != 2 &&
@@ -5269,8 +3990,7 @@ game.import("character", function () {
 				},
 				forced: true,
 				filter(event, player) {
-					if (event.phaseList[event.num].startsWith("phaseUse"))
-						return false;
+					if (event.phaseList[event.num].startsWith("phaseUse")) return false;
 					var num1 = player.getHandcardLimit() - 1,
 						num2 = event.num;
 					return num1 == num2;
@@ -5283,27 +4003,18 @@ game.import("character", function () {
 			clanmuyin: {
 				audio: 2,
 				clanSkill: true,
-				audioname: [
-					"clan_wuxian",
-					"clan_wuban",
-					"clan_wukuang",
-					"clan_wuqiao",
-				],
+				audioname: ["clan_wuxian", "clan_wuban", "clan_wukuang", "clan_wuqiao"],
 				trigger: { player: "phaseBegin" },
 				isMax(player) {
 					var num = player.getHandcardLimit();
 					return !game.hasPlayer(function (current) {
-						return (
-							current != player &&
-							current.getHandcardLimit() > num
-						);
+						return current != player && current.getHandcardLimit() > num;
 					});
 				},
 				filter(event, player) {
 					return game.hasPlayer(function (current) {
 						return (
-							(current == player ||
-								current.hasClan("陈留吴氏")) &&
+							(current == player || current.hasClan("陈留吴氏")) &&
 							!lib.skill.clanmuyin.isMax(current)
 						);
 					});
@@ -5317,8 +4028,7 @@ game.import("character", function () {
 							"令一名陈留吴氏角色的手牌上限+1",
 							function (card, player, current) {
 								return (
-									(current == player ||
-										current.hasClan("陈留吴氏")) &&
+									(current == player || current.hasClan("陈留吴氏")) &&
 									!lib.skill.clanmuyin.isMax(current)
 								);
 							}
@@ -5326,7 +4036,7 @@ game.import("character", function () {
 						.set("ai", function (target) {
 							return get.attitude(_status.event.player, target);
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						player.logSkill("clanmuyin", target);
@@ -5340,11 +4050,9 @@ game.import("character", function () {
 				change(player, num) {
 					player.addSkill("chenliuwushi");
 					var info = player.storage;
-					if (typeof info.chenliuwushi != "number")
-						info.chenliuwushi = 0;
+					if (typeof info.chenliuwushi != "number") info.chenliuwushi = 0;
 					info.chenliuwushi += num;
-					if (info.chenliuwushi == 0)
-						player.unmarkSkill("chenliuwushi");
+					if (info.chenliuwushi == 0) player.unmarkSkill("chenliuwushi");
 					else player.markSkill("chenliuwushi");
 					if (num >= 0) game.log(player, "的手牌上限", "#y+" + num);
 					else game.log(player, "的手牌上限", "#g" + num);
@@ -5489,8 +4197,7 @@ game.import("character", function () {
 			clanliuju_info:
 				"出牌阶段结束时，你可以与一名角色A拼点，输的角色可以使用任意张拼点牌中的非基本牌。然后若你至A的距离或A至你的距离发生了变化，你重置〖恤民〗。",
 			clanxumin: "恤民",
-			clanxumin_info:
-				"宗族技，限定技。你可以将一张牌当做【五谷丰登】对任意名其他角色使用。",
+			clanxumin_info: "宗族技，限定技。你可以将一张牌当做【五谷丰登】对任意名其他角色使用。",
 			clan_hanrong: "族韩融",
 			clanlianhe: "连和",
 			clanlianhe_info:
@@ -5517,8 +4224,7 @@ game.import("character", function () {
 			clanxiaoyong_info:
 				"锁定技。当你于回合内首次使用字数为X的牌时，你重置〖观骨〗（X为你上次发动〖观骨〗观看的牌数）。",
 			clanbaozu: "保族",
-			clanbaozu_info:
-				"宗族技，限定技。当一名颍川钟氏角色进入濒死状态时，你可以令其横置并回复1点体力。",
+			clanbaozu_info: "宗族技，限定技。当一名颍川钟氏角色进入濒死状态时，你可以令其横置并回复1点体力。",
 			clan_wangyun: "族王允",
 			clanjiexuan: "解悬",
 			clanjiexuan_info:

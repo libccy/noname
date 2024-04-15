@@ -257,7 +257,7 @@ game.import("character", function () {
 						.chooseControl(controls)
 						.set("prompt", get.prompt2("junkguixin"))
 						.set("ai", () => (_status.event.controls.length == 3 ? "获得技能" : "cancel2"));
-					("step 1");
+					"step 1";
 					if (result.control != "cancel2") {
 						var next = game.createEvent("junkguixinx");
 						next.player = player;
@@ -286,7 +286,7 @@ game.import("character", function () {
 					player
 						.chooseButton(["归心：选择获得一个主公技", [list, "textbutton"]], true)
 						.set("ai", (button) => 1 + Math.random());
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						player.logSkill("junkguixin");
 						player.addSkills(result.links[0]);
@@ -302,7 +302,7 @@ game.import("character", function () {
 							true
 						)
 						.set("ai", (target) => 1 + Math.random());
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
@@ -314,7 +314,7 @@ game.import("character", function () {
 							.set("prompt", "请选择" + get.translation(target) + "变更的势力")
 							.set("ai", () => _status.event.controls.randomGet());
 					} else event.finish();
-					("step 2");
+					"step 2";
 					if (result.control) {
 						player.popup(get.translation(result.control + "2"));
 						target.changeGroup(result.control);
@@ -355,7 +355,7 @@ game.import("character", function () {
 							}
 							return 0;
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
@@ -366,7 +366,7 @@ game.import("character", function () {
 					} else {
 						event.finish();
 					}
-					("step 2");
+					"step 2";
 					var zhu = get.zhu(player);
 					if (zhu && zhu.isIn()) {
 						if (target.countCards("h") > zhu.countCards("h")) player.draw();
@@ -428,7 +428,7 @@ game.import("character", function () {
 						})
 						.set("goon", goon)
 						.set("att", att);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						player.logSkill("oldhuisheng", trigger.source);
 						game.delay();
@@ -456,7 +456,7 @@ game.import("character", function () {
 					} else {
 						event.finish();
 					}
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						var card = result.links[0];
 						trigger.source.gain(card, player, "giveAuto", "bySelf");
@@ -621,7 +621,7 @@ game.import("character", function () {
 							}
 							return 0;
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
@@ -629,7 +629,7 @@ game.import("character", function () {
 						player.give(player.getCards("h"), target);
 						trigger.cancel();
 					} else event.finish();
-					("step 2");
+					"step 2";
 					var evt = trigger.getParent("phase");
 					if (evt) {
 						game.log(player, "结束了回合");
@@ -643,7 +643,7 @@ game.import("character", function () {
 				phase: function () {
 					"step 0";
 					player.phaseUse();
-					("step 1");
+					"step 1";
 					game.broadcastAll(function () {
 						if (ui.tempnowuxie) {
 							ui.tempnowuxie.close();
@@ -986,7 +986,7 @@ game.import("character", function () {
 						}, 300);
 					};
 					if (!event.targets.length) event.goto(3);
-					("step 1");
+					"step 1";
 					event.target = event.targets.shift();
 					event.target
 						.chooseButton([event.prompt, [["reguhuo_ally", "reguhuo_betray"], "vcard"]], true)
@@ -1038,7 +1038,7 @@ game.import("character", function () {
 							}
 							return Math.random();
 						});
-					("step 2");
+					"step 2";
 					if (result.links[0][2] == "reguhuo_betray") {
 						target.addExpose(0.2);
 						game.log(target, "#y质疑");
@@ -1049,19 +1049,19 @@ game.import("character", function () {
 						target.popup("不质疑", "wood");
 					}
 					if (targets.length) event.goto(1);
-					("step 3");
+					"step 3";
 					game.delayx();
 					game.broadcastAll(function (onEnd) {
 						_status.event.onEnd01 = onEnd;
 						if (_status.old_guhuoNode) _status.old_guhuoNode.listenTransition(onEnd, 300);
 					}, event.onEnd01);
-					("step 4");
+					"step 4";
 					game.delay(2);
-					("step 5");
+					"step 5";
 					if (!event.betrayers.length) {
 						event.goto(7);
 					}
-					("step 6");
+					"step 6";
 					if (event.fake) {
 						for (var target of event.betrayers) {
 							target.popup("质疑正确", "wood");
@@ -1076,16 +1076,16 @@ game.import("character", function () {
 							event.goon = false;
 						}
 					}
-					("step 7");
+					"step 7";
 					if (!event.goon) {
 						game.log(player, "声明的", trigger.card, "作废了");
 						trigger.cancel();
 						trigger.getParent().goto(0);
 						trigger.line = false;
 					}
-					("step 8");
+					"step 8";
 					game.delay();
-					("step 9");
+					"step 9";
 					if (!event.goon) {
 						if (event.fake) game.asyncDraw(event.betrayers);
 						game.broadcastAll(ui.clear);
@@ -1113,7 +1113,7 @@ game.import("character", function () {
 					if (player.hasSkill("old_zuilun_h")) pos = "e";
 					if (player.hasSkill("old_zuilun_e")) pos = "h";
 					player.gainPlayerCard(target, pos, true);
-					("step 1");
+					"step 1";
 					if (result.bool && result.cards && result.cards.length) {
 						target.draw();
 						var pos = result.cards[0].original;
@@ -1215,7 +1215,7 @@ game.import("character", function () {
 						giver = targets[0];
 					}
 					gainner.gainPlayerCard(giver, "h", true).set("visible", true);
-					("step 1");
+					"step 1";
 					if (result.bool && result.links.length && get.suit(result.links[0]) != "spade") {
 						player.draw();
 					}
@@ -1293,7 +1293,7 @@ game.import("character", function () {
 								return get.effect(target, { name: "sha" }, player, player);
 							}
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						player.logSkill("oldxuanfeng", result.targets);
 						var target = result.targets[0];
@@ -1314,7 +1314,7 @@ game.import("character", function () {
 					} else {
 						event.finish();
 					}
-					("step 2");
+					"step 2";
 					var target = event.target;
 					if (result.control == "出杀") {
 						player.useCard({ name: "sha", isCard: true }, target, false).animate = false;

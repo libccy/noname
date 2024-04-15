@@ -123,7 +123,7 @@ game.import("character", function () {
 							}
 							return 0;
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						event.target = result.targets[0];
 						if (player.isUnderControl(true)) {
@@ -137,7 +137,7 @@ game.import("character", function () {
 					} else {
 						event.finish();
 					}
-					("step 2");
+					"step 2";
 					if (result.control && result.control != "cancel2") {
 						player.logSkill("mhuanyi");
 						player.storage.mhuanyi_target = [event.target, result.index];
@@ -219,7 +219,7 @@ game.import("character", function () {
 						}
 						return 0;
 					};
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						trigger.cancel();
 						player.chooseUseTarget(true, trigger.card);
@@ -303,7 +303,7 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					player.showHandcards();
-					("step 1");
+					"step 1";
 					if (lib.skill.msuoling.test(player)) {
 						var card = lib.skill.msuoling.getc(player);
 						card.classList.remove("glow");

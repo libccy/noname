@@ -179,7 +179,7 @@ game.import("character", function () {
 						`蓄谋:是否使用${get.translation(card)}？`,
 						`请选择要使用的目标。若不使用此牌，则判定区内的所有“蓄谋”牌都将被置入弃牌堆。`
 					);
-					("step 1");
+					"step 1";
 					if (!result.bool) {
 						var cards = player.getCards("j", (card) => {
 							return (card.viewAs || card.name) == "xumou_jsrg";
@@ -1631,7 +1631,7 @@ game.import("character", function () {
 										}
 									)
 									.set("logSkill", "jsrgjingju");
-								("step 1");
+								"step 1";
 								if (result.bool) {
 									delete event.result.skill;
 								} else {
@@ -1640,7 +1640,7 @@ game.import("character", function () {
 									delete event.getParent().openskilldialog;
 									event.finish();
 								}
-								("step 2");
+								"step 2";
 								game.delayx();
 							},
 						};
@@ -2497,7 +2497,7 @@ game.import("character", function () {
 								);
 							});
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var targets = result.targets.slice();
 						targets.sortBySeat();
@@ -2506,7 +2506,7 @@ game.import("character", function () {
 						player.logSkill("jsrgqingzi", targets);
 						player.addSkill("jsrgqingzi_clear");
 					} else event.finish();
-					("step 2");
+					"step 2";
 					var target = targets[num];
 					if (
 						target.hasCard((card) => {
@@ -2554,7 +2554,7 @@ game.import("character", function () {
 							}
 							if (trigger.name == "phase") event.targets = targets.slice(0).sortBySeat();
 							else event.targets = [trigger.player];
-							("step 1");
+							"step 1";
 							var target = targets.shift();
 							var storage = player.getStorage("jsrgqingzi_clear");
 							if (storage.includes(target)) {
@@ -2604,7 +2604,7 @@ game.import("character", function () {
 									}).length >= 2
 						)
 						.set("logSkill", ["jsrgdingce", target]);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						event.card = result.cards[0];
 						if (target.countDiscardableCards(player, "h")) {
@@ -2619,7 +2619,7 @@ game.import("character", function () {
 								}).set("color", get.color(event.card, false));
 						} else event.finish();
 					} else event.finish();
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						var card = result.cards[0];
 						if (get.color(event.card, false) == get.color(card, false)) {
@@ -2869,7 +2869,7 @@ game.import("character", function () {
 								}, 0)
 						)
 						.set("logSkill", "jsrgbaohe");
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var targets = game.filterPlayer((current) => {
 							return current.inRange(trigger.player) && player.canUse("sha", current, false);
@@ -2977,7 +2977,7 @@ game.import("character", function () {
 						giver: player,
 						animate: "giveAuto",
 					}).setContent("gaincardMultiple");
-					("step 1");
+					"step 1";
 					player.gain(lib.card.ying.getYing(2 * cards.length), "gain2");
 				},
 				ai: {
@@ -3152,7 +3152,7 @@ game.import("character", function () {
 								return info[0];
 							})()
 						);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						event.target = result.targets[0];
 						var cards = player.getExpansions("jsrgshacheng");
@@ -3167,7 +3167,7 @@ game.import("character", function () {
 						}
 						event.finish();
 					}
-					("step 2");
+					"step 2";
 					if (_status.connectMode) {
 						game.broadcastAll(function () {
 							delete _status.noclearcountdown;
@@ -3556,18 +3556,16 @@ game.import("character", function () {
 						return ui.create.dialog("摧锋", [list, "vcard"]);
 					},
 					filter: function (button, player) {
-						return _status.event
-							.getParent()
-							.filterCard(
-								{
-									name: button.link[2],
-									nature: button.link[3],
-									isCard: true,
-									storage: { jsrgcuifeng: true },
-								},
-								player,
-								_status.event.getParent()
-							);
+						return _status.event.getParent().filterCard(
+							{
+								name: button.link[2],
+								nature: button.link[3],
+								isCard: true,
+								storage: { jsrgcuifeng: true },
+							},
+							player,
+							_status.event.getParent()
+						);
 					},
 					check: function (button) {
 						var player = _status.event.player;
@@ -3932,7 +3930,7 @@ game.import("character", function () {
 								player.unmarkAuto("jsrgguiji_swapback", [trigger.player]);
 								event.finish();
 							}
-							("step 1");
+							"step 1";
 							if (result.bool) {
 								player.logSkill("jsrgguiji_swapback", trigger.player);
 								player.swapHandcards(trigger.player);
@@ -4278,7 +4276,7 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					event.num = 0;
-					("step 1");
+					"step 1";
 					player.chooseToCompare(target).set(
 						"small",
 						get.attitude(player, target) > 0 &&
@@ -4289,7 +4287,7 @@ game.import("character", function () {
 									return get.value(card) < 6;
 								}) <= 1)
 					);
-					("step 2");
+					"step 2";
 					if (result.winner != target) {
 						if (!player.canCompare(target)) event._result = { bool: false };
 						else
@@ -4303,7 +4301,7 @@ game.import("character", function () {
 						player.recover();
 						event.finish();
 					}
-					("step 3");
+					"step 3";
 					if (result.bool) {
 						event.goto(1);
 					}
@@ -4398,7 +4396,7 @@ game.import("character", function () {
 							return target == get.event("aiTarget") ? 10 : 0;
 						},
 					});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var cards = result.cards,
 							target = result.targets[0];
@@ -4691,7 +4689,7 @@ game.import("character", function () {
 							);
 						} else event.finish();
 					} else event.finish();
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						player.logSkill("jsrghujian");
 						player.line(target);
@@ -4999,7 +4997,7 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					event.targets = game.filterPlayer();
-					("step 1");
+					"step 1";
 					var target = event.targets.shift();
 					event.target = target;
 					if (!target) event.finish();
@@ -5031,7 +5029,7 @@ game.import("character", function () {
 							next.set("source", player);
 						}
 					}
-					("step 2");
+					"step 2";
 					delete player.storage.jsrgbashiing;
 					if (result.bool) {
 						event.finish();
@@ -5095,7 +5093,7 @@ game.import("character", function () {
 							return _status.event.choice;
 						})
 						.set("choice", maxGroup);
-					("step 1");
+					"step 1";
 					var group = result.control;
 					if (group == "cancel2") return;
 					player.logSkill("jsrglipan");
@@ -5129,7 +5127,7 @@ game.import("character", function () {
 							});
 							targets.sortBySeat();
 							event.targets = targets;
-							("step 1");
+							"step 1";
 							var target = targets.shift();
 							event.target = target;
 							if (target && target.isIn() && target.canUse({ name: "juedou" }, player)) {
@@ -5176,7 +5174,7 @@ game.import("character", function () {
 									},
 								});
 							}
-							("step 2");
+							"step 2";
 							if (result.bool) {
 								var cards = result.cards;
 								var cardx = get.autoViewAs({ name: "juedou" }, cards);
@@ -5211,7 +5209,7 @@ game.import("character", function () {
 					var num = player.countCards("h") - target.countCards("h");
 					if (num > 0)
 						player.chooseToDiscard(num, true, "轻袭：弃置" + get.cnNumber(num) + "张手牌");
-					("step 1");
+					"step 1";
 					var card = {
 						name: "sha",
 						nature: "stab",
@@ -5676,12 +5674,12 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					player.turnOver();
-					("step 1");
+					"step 1";
 					var targets = game.filterPlayer((current) => current != player && current.hasSex("male"));
 					event.targets = targets;
 					player.line(targets);
 					game.delayx();
-					("step 2");
+					"step 2";
 					var target = targets.shift();
 					event.target = target;
 					target
@@ -5700,19 +5698,19 @@ game.import("character", function () {
 								);
 							})()
 						);
-					("step 3");
+					"step 3";
 					if (result.bool) {
 						target.turnOver();
 					}
 					if (targets.length) event.goto(2);
-					("step 4");
+					"step 4";
 					var targets = game.filterPlayer((current) => {
 						return current == player || current.isTurnedOver();
 					});
 					event.targets = targets;
 					event.num = 0;
 					event.index = 0;
-					("step 5");
+					"step 5";
 					var target = targets[event.index];
 					if (target.isIn()) {
 						target.draw();
@@ -5720,7 +5718,7 @@ game.import("character", function () {
 					}
 					event.index++;
 					if (event.index >= targets.length) event.index = 0;
-					("step 6");
+					"step 6";
 					if (event.num >= game.countPlayer2((current) => current.hasSex("male"))) event.finish();
 					else event.goto(5);
 				},
@@ -5986,7 +5984,7 @@ game.import("character", function () {
 					var len = target.countCards("h");
 					num = Math.max(0, Math.min(len + num, 5) - len);
 					if (num > 0) target.draw(num);
-					("step 1");
+					"step 1";
 					var num = game.countPlayer((current) => {
 						return current.inRange(target);
 					});
@@ -6070,7 +6068,7 @@ game.import("character", function () {
 							});
 							return get.attitude(_status.event.player, target) * list[0][1] * sign - val;
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var targets = result.targets.slice();
 						targets.sortBySeat();
@@ -6113,7 +6111,7 @@ game.import("character", function () {
 								});
 						} else event._result = { bool: true, links: weapons };
 					} else event.finish();
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						var links = result.links;
 						var list = [];
@@ -6138,7 +6136,7 @@ game.import("character", function () {
 							cards2: event.cards[1],
 						}).setContent("swapHandcardsx");
 					} else event.finish();
-					("step 3");
+					"step 3";
 					for (var i = 0; i < event.cards[1].length; i++) {
 						if (get.position(event.cards[1][i], true) == "o")
 							event.players[0].equip(event.cards[1][i]);
@@ -6147,7 +6145,7 @@ game.import("character", function () {
 						if (get.position(event.cards[0][i], true) == "o")
 							event.players[1].equip(event.cards[0][i]);
 					}
-					("step 4");
+					"step 4";
 					var rangeList = targets.map((target) => {
 						return target.getAttackRange();
 					});
@@ -6242,7 +6240,7 @@ game.import("character", function () {
 							.set("ai", () => Math.random() + 1);
 					}
 					event.list = list;
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var name = result.links[0][2],
 							nature = result.links[0][3];
@@ -6301,7 +6299,7 @@ game.import("character", function () {
 						)
 							next.selectTarget = -1;
 					} else event.finish();
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						var cardx = result.cards[0];
 						var targets = result.targets || [];
@@ -6593,7 +6591,7 @@ game.import("character", function () {
 							var player = _status.event.player;
 							return get.effect(target, { name: "shunshou_copy2" }, player, player);
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var targets = result.targets.slice();
 						targets.sortBySeat();
@@ -6623,7 +6621,7 @@ game.import("character", function () {
 								return !target.getHistory("damage").length && target.isIn();
 							});
 							event.targets = targets.sortBySeat();
-							("step 1");
+							"step 1";
 							var target = targets.shift();
 							if (target.isIn() && player.countGainableCards(target, "he")) {
 								target.line(player);
@@ -6668,7 +6666,7 @@ game.import("character", function () {
 							return -att / Math.sqrt(target.countCards("hs") + 0.1);
 						})
 						.set("targetprompt", ["用牌无限制", "打你变疼"]);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var targets = result.targets;
 						player.logSkill("jsrgbiaozhao", targets);
@@ -6764,7 +6762,7 @@ game.import("character", function () {
 						var player = _status.event.player;
 						return -get.attitude(player, target);
 					});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						player.logSkill("jsrgyechou", target);
@@ -6836,7 +6834,7 @@ game.import("character", function () {
 							var player = _status.event.player;
 							return get.attitude(player, target) / Math.sqrt(target.countCards("hs") + 1);
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var targets = result.targets.slice();
 						targets.sortBySeat();
@@ -7068,7 +7066,7 @@ game.import("character", function () {
 						dialog.push([visitors, "character"]);
 						player.chooseButton(dialog, true);
 					}
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						lib.skill.sbyingmen.removeVisitors(result.links, player);
 						game.log(player, "移去了", "#y" + get.translation(result.links[0]));
@@ -7192,7 +7190,7 @@ game.import("character", function () {
 									}
 								}
 							}
-							("step 1");
+							"step 1";
 							if (result.bool) {
 								trigger.revealed = true;
 							} else {
@@ -7242,7 +7240,7 @@ game.import("character", function () {
 					player.awakenSkill("jsrgshenchong");
 					target.addSkillLog("jsrgfeiyang");
 					target.addSkillLog("jsrgbahu");
-					("step 1");
+					"step 1";
 					player.addSkill("jsrgshenchong_die");
 					player.markAuto("jsrgshenchong_die", [target]);
 				},
@@ -7320,7 +7318,7 @@ game.import("character", function () {
 								}, "j");
 							})()
 						);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						player.discardPlayerCard(player, "j", true);
 					}
@@ -7391,7 +7389,7 @@ game.import("character", function () {
 							var source = trigger.player;
 							event.source = source;
 							source.chooseBool("是否响应" + get.translation(player) + "的【聚敛】摸一张牌？");
-							("step 1");
+							"step 1";
 							if (result.bool) {
 								source.logSkill("jsrgjulian_draw", player);
 								source.draw();
@@ -7438,14 +7436,14 @@ game.import("character", function () {
 									return 2 - get.attitude(player, current) > 0;
 								})
 						);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						player.logSkill("jsrgzhaobing", result.targets);
 						event.targets = result.targets;
 						event.targets.sortBySeat();
 						player.chooseToDiscard(true, "h", player.countCards("h"));
 					} else event.finish();
-					("step 2");
+					"step 2";
 					var target = targets.shift();
 					event.target = target;
 					target
@@ -7460,7 +7458,7 @@ game.import("character", function () {
 							return 6 - get.value(card);
 						})
 						.set("goon", get.effect(target, { name: "losehp" }, target, target) >= 0);
-					("step 3");
+					"step 3";
 					if (result.bool) target.give(result.cards, player, true);
 					else target.loseHp();
 					if (targets.length) event.goto(2);
@@ -7487,7 +7485,7 @@ game.import("character", function () {
 						var player = _status.event.player;
 						return get.damageEffect(target, player, player);
 					});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
@@ -7496,7 +7494,7 @@ game.import("character", function () {
 						event.num = hs.length;
 						player.discard(hs);
 					} else event.finish();
-					("step 2");
+					"step 2";
 					target
 						.chooseToDiscard(
 							get.translation(player) + "对你发动了【诛宦】",
@@ -7514,7 +7512,7 @@ game.import("character", function () {
 							"goon",
 							target.hp <= 2 || get.attitude(target, player) >= 0 || player.isHealthy()
 						);
-					("step 3");
+					"step 3";
 					if (result.bool) {
 						target.loseHp();
 					} else {
@@ -7559,7 +7557,7 @@ game.import("character", function () {
 								get.effect(target, { name: "sha" }, player, target) < 0
 						)
 						.set("att", att);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						target.give(result.cards, player);
 						player.addTempSkill("jsrgpingtao_sha");
@@ -7613,7 +7611,7 @@ game.import("character", function () {
 						.set("max", trigger.target.countDiscardableCards(player, "he"))
 						.set("goon", get.attitude(player, trigger.target) < 0)
 						.set("logSkill", ["jsrgjuelie_discard", trigger.target]);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var num = result.cards.length;
 						if (trigger.target.countDiscardableCards(player, "he"))
@@ -7794,7 +7792,7 @@ game.import("character", function () {
 							return _status.event.goon;
 						})
 						.set("goon", goon);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						trigger.player.logSkill("jsrgjuxia", player);
 						trigger.excluded.add(player);
@@ -8050,7 +8048,7 @@ game.import("character", function () {
 								return list.randomGet();
 							})()
 						);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var visitor = result.links[0];
 						game.log(player, "从", "#y访客", "中移去了", "#g" + get.translation(visitor));
@@ -8129,7 +8127,7 @@ game.import("character", function () {
 							})
 							.set("goon", get.attitude(trigger.target, player) > 2);
 					}
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						if (!player.storage.jsrgshichong) {
 							player.logSkill("jsrgshichong", trigger.target);
@@ -8155,16 +8153,16 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					player.showCards(cards, get.translation(player) + "发动了【连诛】");
-					("step 1");
+					"step 1";
 					player.give(cards, target);
-					("step 2");
+					"step 2";
 					event.targets = game
 						.filterPlayer((current) => {
 							return current.group == target.group && current != player;
 						})
 						.sortBySeat();
 					game.delayx();
-					("step 3");
+					"step 3";
 					var target = targets.shift();
 					if (player.canUse("guohe", target)) {
 						player.useCard({ name: "guohe", isCard: true }, target);
@@ -8247,7 +8245,7 @@ game.import("character", function () {
 						content: function () {
 							"step 0";
 							event.cards = trigger.getl(player).es;
-							("step 1");
+							"step 1";
 							var card = cards.shift(),
 								subtypes = get.subtypes(card).filter((slot) => player.hasEnabledSlot(slot));
 							event.subtypes = subtypes;
@@ -8259,7 +8257,7 @@ game.import("character", function () {
 									)
 									.set("ai", () => 1);
 							} else event._result = { bool: false };
-							("step 2");
+							"step 2";
 							if (result.bool) {
 								player.logSkill("jsrgjuezhi_disable");
 								player.disableEquip(event.subtypes);
@@ -8281,7 +8279,7 @@ game.import("character", function () {
 						if (player.countCards("j")) return player == target ? 10 : 0.1;
 						return 6 - get.attitude(player, target);
 					});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
@@ -8310,7 +8308,7 @@ game.import("character", function () {
 						event.finish();
 						return;
 					}
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						event.finish();
 						return;
@@ -8371,7 +8369,7 @@ game.import("character", function () {
 						next.set("targetprompt", "移动目标");
 						next.set("prompt", "急召：是否移动" + get.translation(target) + "的一张牌？");
 					} else event.finish();
-					("step 3");
+					"step 3";
 					if (result.bool) {
 						var target2 = result.targets[0];
 						event.targets = [target, target2];
@@ -8379,9 +8377,9 @@ game.import("character", function () {
 					} else {
 						event.finish();
 					}
-					("step 4");
+					"step 4";
 					game.delay();
-					("step 5");
+					"step 5";
 					if (targets.length == 2) {
 						player
 							.choosePlayerCard(
@@ -8428,7 +8426,7 @@ game.import("character", function () {
 					} else {
 						event.finish();
 					}
-					("step 6");
+					"step 6";
 					if (result.bool && result.links.length) {
 						var link = result.links[0];
 						if (get.position(link) == "h")
@@ -8486,10 +8484,10 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					event.num = trigger.num;
-					("step 1");
+					"step 1";
 					event.num--;
 					if (player.canMoveCard()) player.moveCard(true);
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						var card = result.card;
 						var suit = get.suit(card, false);
@@ -8516,18 +8514,18 @@ game.import("character", function () {
 								.set("ai", get.buttonValue);
 						} else event._result = { bool: false };
 					}
-					("step 3");
+					"step 3";
 					if (result.bool) {
 						player.gain(result.links, "gain2");
 					}
-					("step 4");
+					"step 4";
 					if (event.num > 0 && player.hasSkill("jsrgrangjie")) {
 						player
 							.chooseBool(get.prompt2("jsrgrangjie"))
 							.set("ai", () => _status.event.bool)
 							.set("bool", lib.skill.jsrgrangjie.check(trigger, player));
 					} else event.finish();
-					("step 5");
+					"step 5";
 					if (result.bool) {
 						player.logSkill("jsrgrangjie");
 						event.goto(1);
@@ -8573,7 +8571,7 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					player.chooseToCompare(target);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						target.skip("phaseDraw");
 						target.addTempSkill("yizheng2", { player: "phaseDrawSkipped" });
@@ -8594,7 +8592,7 @@ game.import("character", function () {
 									: "cancel2"
 							);
 					}
-					("step 2");
+					"step 2";
 					if (result.control != "cancel2") {
 						var num = result.index + 1;
 						target.line(player);
@@ -8648,7 +8646,7 @@ game.import("character", function () {
 						})
 						.set("give", get.attitude(player, trigger.player) > 0)
 						.set("target", trigger.player);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						player.logSkill("jsrglirang", trigger.player);
 						var cards = result.cards;
@@ -8726,7 +8724,7 @@ game.import("character", function () {
 							get.damageEffect(player, trigger.source, target) >
 								get.damageEffect(target, trigger.source, target)
 						);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						target.logSkill("jsrgzhengyi", player);
 						trigger.cancel();
@@ -8778,7 +8776,7 @@ game.import("character", function () {
 							) && Math.random() < 0.75
 						)
 						.set("forceAuto", true);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var cards = result.cards;
 						target.showCards(
@@ -8915,7 +8913,7 @@ game.import("character", function () {
 					}
 					event.num = list.length;
 					player.discard(cards);
-					("step 1");
+					"step 1";
 					var target = _status.currentPhase;
 					if (target && target.isIn()) {
 						target.addTempSkill("jsrgjuxiang_sha");
@@ -8984,7 +8982,7 @@ game.import("character", function () {
 					trigger.cancel();
 					player.loseHp();
 					player.markAuto("jsrgjishan", [trigger.player]);
-					("step 1");
+					"step 1";
 					if (player.isIn() && trigger.player.isIn()) {
 						var targets = [player, trigger.player];
 						targets.sortBySeat(_status.currentPhase);
@@ -9025,7 +9023,7 @@ game.import("character", function () {
 										_status.event.player
 									);
 								});
-							("step 1");
+							"step 1";
 							if (result.bool) {
 								var target = result.targets[0];
 								player.logSkill("jsrgjishan_recover", target);
@@ -9172,7 +9170,7 @@ game.import("character", function () {
 							var player = _status.event.player;
 							return get.damageEffect(target, player, player);
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						player.logSkill("jsrgfayi", target);
@@ -9243,13 +9241,13 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					player.showHandcards();
-					("step 1");
+					"step 1";
 					if (player.countCards("h", { type: "basic" })) event.finish();
 					else
 						player
 							.chooseBool("图射：是否摸" + get.cnNumber(trigger.targets.length) + "张牌？")
 							.set("ai", () => 1);
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						player.draw(trigger.targets.length);
 					}
@@ -9332,7 +9330,7 @@ game.import("character", function () {
 						giver: player,
 						animate: "giveAuto",
 					}).setContent("gaincardMultiple");
-					("step 1");
+					"step 1";
 					player.addTempSkill("jsrgtongjue_blocker");
 					player.markAuto("jsrgtongjue_blocker", targets);
 				},
@@ -9379,7 +9377,7 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					player.draw();
-					("step 1");
+					"step 1";
 					var damaged = trigger.player.getHistory("sourceDamage").length > 0;
 					var num = damaged ? 1 : 2;
 					var targets = game.filterPlayer((current) => {
@@ -9401,7 +9399,7 @@ game.import("character", function () {
 								var att = get.attitude(_status.event.player, target);
 								return 100 - att;
 							});
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						var targets = result.targets;
 						player.line(targets);
@@ -9468,7 +9466,7 @@ game.import("character", function () {
 					"step 0";
 					player.awakenSkill("jsrghuilie");
 					player.loseMaxHp();
-					("step 1");
+					"step 1";
 					player.addSkills(["jsrgpingrong", "feiying"]);
 				},
 			},
@@ -9495,7 +9493,7 @@ game.import("character", function () {
 						.set("ai", (target) => {
 							return get.attitude(_status.event.player, target);
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						player.logSkill("jsrgpingrong", target);
@@ -9559,7 +9557,7 @@ game.import("character", function () {
 								get.attitude(_status.event.player, target)
 							);
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
@@ -9569,7 +9567,7 @@ game.import("character", function () {
 						}
 						event.card = game.createCard2("taipingyaoshu", "heart", 3);
 					} else event.finish();
-					("step 2");
+					"step 2";
 					if (card) target.equip(card);
 				},
 				subSkill: {
@@ -9660,7 +9658,7 @@ game.import("character", function () {
 								return "all";
 							})()
 						);
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var targets = result.targets;
 						targets.sortBySeat(_status.currentPhase);
@@ -9668,7 +9666,7 @@ game.import("character", function () {
 						player.logSkill("jsrgxundao", targets);
 						event.cards = [];
 					} else event.finish();
-					("step 2");
+					"step 2";
 					var target = targets.shift();
 					target
 						.chooseToDiscard(
@@ -9689,12 +9687,12 @@ game.import("character", function () {
 								return 0.01 - result;
 							}
 						});
-					("step 3");
+					"step 3";
 					if (result.bool) {
 						event.cards.addArray(result.cards);
 					}
 					if (targets.length) event.goto(2);
-					("step 4");
+					"step 4";
 					var cards = event.cards.filterInD("d");
 					if (cards.length) {
 						player
@@ -9703,13 +9701,13 @@ game.import("character", function () {
 								return trigger.judge(button.link);
 							});
 					} else event.finish();
-					("step 5");
+					"step 5";
 					if (result.bool) {
 						var card = result.links[0];
 						event.card = card;
 						game.cardsGotoOrdering(card).relatedEvent = trigger;
 					} else event.finish();
-					("step 6");
+					"step 6";
 					if (player.judging[0].clone) {
 						game.broadcastAll(
 							function (card, card2, player) {
@@ -9782,7 +9780,7 @@ game.import("character", function () {
 					if (event.triggername != "phaseJieshuBegin") return;
 					next.judge = (card) => -lib.card.shandian.judge(card) - 4;
 					next.judge2 = (result) => !lib.card.shandian.judge2(result);
-					("step 1");
+					"step 1";
 					var executeDelayCardEffect = event.executeDelayCardEffect;
 					if (!player.hasHistory("damage", (evt) => evt.getParent(2) == executeDelayCardEffect)) {
 						if (trigger.name == "phaseZhunbei") {
@@ -9799,7 +9797,7 @@ game.import("character", function () {
 								});
 						}
 					} else event.finish();
-					("step 2");
+					"step 2";
 					if (result.bool) {
 						var target = result.targets[0];
 						player.line(target);
