@@ -85,6 +85,11 @@ game.import('character', function () {
 		},
 		characterTitle:{
 		},
+		characterFilter:{
+			jsrg_jiangwei(mode){
+				return mode!=='guozhan';
+			},
+		},
 		perfectPair:{},
 		card:{
 			xumou_jsrg:{
@@ -4092,6 +4097,7 @@ game.import('character', function () {
 			},
 			//许攸
 			jsrglipan:{
+				forbid:['guozhan'],
 				audio:2,
 				trigger:{
 					player:'phaseEnd',
@@ -4328,6 +4334,7 @@ game.import('character', function () {
 			},
 			//吕布
 			jsrgwuchang:{
+				forbid:['guozhan'],
 				audio:2,
 				trigger:{
 					player:'gainAfter',

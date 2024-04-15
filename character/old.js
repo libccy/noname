@@ -152,6 +152,7 @@ game.import('character', function () {
 			},
 			//魏武帝
 			junkguixin:{
+				forbid:['guozhan'],
 				init:function(){
 					if(!_status.junkguixin){
 						_status.junkguixin=[];
