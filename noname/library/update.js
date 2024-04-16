@@ -1,4 +1,4 @@
-import { lib, ui, game } from '../../noname.js';
+import { lib, ui, game } from "../../noname.js";
 
 // https://github.com/libccy/noname/archive/refs/tags/v1.10.10.zip
 
@@ -7,28 +7,28 @@ import { lib, ui, game } from '../../noname.js';
  * X-RateLimit-Limit: 请求总量限制
  * X-RateLimit-Remaining: 剩余请求次数
  * X-RateLimit-Reset: 限制重置时间（UTC时间戳）
-*/   
+ */
 
 /** @type { HeadersInit } */
 const defaultHeaders = {
-	'Accept': 'application/vnd.github.v3+json',
+	Accept: "application/vnd.github.v3+json",
 	// 根据GitHub API的要求添加适当的认证头信息
 	// 如果公共仓库则无需认证，私有仓库需提供token
 	// 'Authorization': `token ${YOUR_GITHUB_PERSONAL_ACCESS_TOKEN}`
 };
 
-if (localStorage.getItem('noname_authorization')) {
-	defaultHeaders['Authorization'] = `token ${localStorage.getItem('noname_authorization')}`;
+if (localStorage.getItem("noname_authorization")) {
+	defaultHeaders["Authorization"] = `token ${localStorage.getItem("noname_authorization")}`;
 }
 
 export async function gainAuthorization() {
-	if (!localStorage.getItem('noname_authorization') && !sessionStorage.getItem('noname_authorization')) {
-		const result = await game.promises.prompt('请输入您github的token以解除访问每小时60次的限制');
-		if (typeof result == 'string') {
-			localStorage.setItem('noname_authorization', result);
-			defaultHeaders['Authorization'] = `token ${localStorage.getItem('noname_authorization')}`;
+	if (!localStorage.getItem("noname_authorization") && !sessionStorage.getItem("noname_authorization")) {
+		const result = await game.promises.prompt("请输入您github的token以解除访问每小时60次的限制");
+		if (typeof result == "string") {
+			localStorage.setItem("noname_authorization", result);
+			defaultHeaders["Authorization"] = `token ${localStorage.getItem("noname_authorization")}`;
 		} else {
-			sessionStorage.setItem('noname_authorization', "false");
+			sessionStorage.setItem("noname_authorization", "false");
 		}
 	}
 }
@@ -40,30 +40,34 @@ const defaultResponse = async (/** @type {Response} */ response) => {
 	console.log(`请求总量限制`, limit);
 	console.log(`剩余请求次数`, remaining);
 	// @ts-ignore
-	console.log(`限制重置时间`, (new Date(reset * 1000)).toLocaleString());
-	if (Number(remaining) === 0 && !sessionStorage.getItem('noname_authorization') && confirm(`您达到了每小时${limit}次的访问限制，是否输入您github的token以获取更高的请求总量限制`)) {
+	console.log(`限制重置时间`, new Date(reset * 1000).toLocaleString());
+	if (
+		Number(remaining) === 0 &&
+		!sessionStorage.getItem("noname_authorization") &&
+		confirm(`您达到了每小时${limit}次的访问限制，是否输入您github的token以获取更高的请求总量限制`)
+	) {
 		await gainAuthorization();
 	}
 };
 
 /**
  * 字节转换
- * @param { number } limit 
+ * @param { number } limit
  */
 export function parseSize(limit) {
 	let size = "";
 	if (limit < 1 * 1024) {
 		// 小于1KB，则转化成B
-		size = limit.toFixed(2) + "B"
+		size = limit.toFixed(2) + "B";
 	} else if (limit < 1 * 1024 * 1024) {
 		// 小于1MB，则转化成KB
-		size = (limit / 1024).toFixed(2) + "KB"
+		size = (limit / 1024).toFixed(2) + "KB";
 	} else if (limit < 1 * 1024 * 1024 * 1024) {
 		// 小于1GB，则转化成MB
-		size = (limit / (1024 * 1024)).toFixed(2) + "MB"
+		size = (limit / (1024 * 1024)).toFixed(2) + "MB";
 	} else {
 		// 其他转化成GB
-		size = (limit / (1024 * 1024 * 1024)).toFixed(2) + "GB"
+		size = (limit / (1024 * 1024 * 1024)).toFixed(2) + "GB";
 	}
 
 	// 转成字符串
@@ -77,34 +81,34 @@ export function parseSize(limit) {
 		return sizeStr.slice(0, index) + sizeStr.slice(index + 3, 2);
 	}
 	return size;
-};
+}
 
 /**
  * 对比版本号
- * @param { string } ver1 
- * @param { string } ver2 
+ * @param { string } ver1
+ * @param { string } ver2
  * @returns { -1 | 0 | 1 }
  */
 export function checkVersion(ver1, ver2) {
-	if (typeof ver1 !== 'string') ver1 = String(ver1);
-	if (typeof ver2 !== 'string') ver2 = String(ver2);
+	if (typeof ver1 !== "string") ver1 = String(ver1);
+	if (typeof ver2 !== "string") ver2 = String(ver2);
 
 	// 移除 'v' 开头
-	if (ver1.startsWith('v')) ver1 = ver1.slice(1);
-	if (ver2.startsWith('v')) ver2 = ver2.slice(1);
+	if (ver1.startsWith("v")) ver1 = ver1.slice(1);
+	if (ver2.startsWith("v")) ver2 = ver2.slice(1);
 
 	// 验证版本号格式
 	if (/[^0-9.-]/i.test(ver1) || /[^0-9.-]/i.test(ver2)) {
-		throw new Error('Invalid characters found in the version numbers');
+		throw new Error("Invalid characters found in the version numbers");
 	}
 
 	/** @param { string } str */
 	function* walk(str) {
-		let part = '';
+		let part = "";
 		for (const char of str) {
-			if (char === '.' || char === '-') {
+			if (char === "." || char === "-") {
 				if (part) yield Number(part);
-				part = '';
+				part = "";
 			} else {
 				part += char;
 			}
@@ -126,7 +130,7 @@ export function checkVersion(ver1, ver2) {
 		item2 = item2 === undefined ? 0 : item2;
 
 		if (isNaN(item1) || isNaN(item2)) {
-			throw new Error('Non-numeric part found in the version numbers');
+			throw new Error("Non-numeric part found in the version numbers");
 		} else if (item1 > item2) {
 			return 1;
 		} else if (item1 < item2) {
@@ -138,17 +142,17 @@ export function checkVersion(ver1, ver2) {
 
 	// 若正常遍历结束，说明版本号相等
 	return 0;
-};
+}
 
 /**
- * 
+ *
  * 获取指定仓库的tags
  * @param { Object } options
  * @param { string } [options.username = 'libccy'] 仓库拥有者
  * @param { string } [options.repository = 'noname'] 仓库名称
  * @param { string } [options.accessToken] 身份令牌
  * @returns { Promise<{ commit: { sha: string, url: string }, name: string, node_id: string, tarball_url: string, zipball_url: string }[]> }
- * 
+ *
  * @example
  * ```js
  * getRepoTags().then(tags => {
@@ -159,14 +163,14 @@ export function checkVersion(ver1, ver2) {
  * });
  * ```
  */
-export async function getRepoTags(options = { username: 'libccy', repository: 'noname' }) {
-	if (!localStorage.getItem('noname_authorization')) {
+export async function getRepoTags(options = { username: "libccy", repository: "noname" }) {
+	if (!localStorage.getItem("noname_authorization")) {
 		await gainAuthorization();
 	}
-	const { username = 'libccy', repository = 'noname', accessToken } = options;
+	const { username = "libccy", repository = "noname", accessToken } = options;
 	const headers = Object.assign({}, defaultHeaders);
 	if (accessToken) {
-		headers['Authorization'] = `token ${accessToken}`;
+		headers["Authorization"] = `token ${accessToken}`;
 	}
 	const url = `https://api.github.com/repos/${username}/${repository}/tags`;
 	const response = await fetch(url, { headers });
@@ -177,7 +181,7 @@ export async function getRepoTags(options = { username: 'libccy', repository: 'n
 	} else {
 		throw new Error(`Error fetching tags: ${response.statusText}`);
 	}
-};
+}
 
 /**
  * 获取指定仓库的指定tags的描述
@@ -194,14 +198,14 @@ export async function getRepoTags(options = { username: 'libccy', repository: 'n
  * ```
  */
 
-export async function getRepoTagDescription(tagName, options = { username: 'libccy', repository: 'noname' }) {
-	if (!localStorage.getItem('noname_authorization')) {
+export async function getRepoTagDescription(tagName, options = { username: "libccy", repository: "noname" }) {
+	if (!localStorage.getItem("noname_authorization")) {
 		await gainAuthorization();
 	}
-	const { username = 'libccy', repository = 'noname', accessToken } = options;
+	const { username = "libccy", repository = "noname", accessToken } = options;
 	const headers = Object.assign({}, defaultHeaders);
 	if (accessToken) {
-		headers['Authorization'] = `token ${accessToken}`;
+		headers["Authorization"] = `token ${accessToken}`;
 	}
 	const apiUrl = `https://api.github.com/repos/${username}/${repository}/releases/tags/${tagName}`;
 	const response = await fetch(apiUrl, { headers });
@@ -231,14 +235,14 @@ export async function getRepoTagDescription(tagName, options = { username: 'libc
 		/** @type { string } tag名称 */
 		name: releaseData.name,
 		/** 发布日期 */
-		published_at: (new Date(releaseData.published_at)).toLocaleString(),
+		published_at: new Date(releaseData.published_at).toLocaleString(),
 		/** @type { string } 下载地址 */
 		zipball_url: releaseData.zipball_url,
 	};
-};
+}
 
 /**
- * 
+ *
  * 获取仓库指定分支和指定目录内的所有文件和目录
  * @param { string } [path = ''] 路径名称(可放参数)
  * @param { string } [branch = ''] 仓库分支名称
@@ -254,23 +258,27 @@ export async function getRepoTagDescription(tagName, options = { username: 'libc
  * 	.catch(error => console.error('Failed to fetch files:', error));
  * ```
  */
-export async function getRepoFilesList(path = '', branch, options = { username: 'libccy', repository: 'noname' }) {
-	if (!localStorage.getItem('noname_authorization')) {
+export async function getRepoFilesList(
+	path = "",
+	branch,
+	options = { username: "libccy", repository: "noname" }
+) {
+	if (!localStorage.getItem("noname_authorization")) {
 		await gainAuthorization();
 	}
-	const { username = 'libccy', repository = 'noname', accessToken } = options;
+	const { username = "libccy", repository = "noname", accessToken } = options;
 	const headers = Object.assign({}, defaultHeaders);
 	if (accessToken) {
-		headers['Authorization'] = `token ${accessToken}`;
+		headers["Authorization"] = `token ${accessToken}`;
 	}
 	let url = `https://api.github.com/repos/${username}/${repository}/contents/${path}`;
-	if (typeof branch == 'string' && branch.length > 0) {
+	if (typeof branch == "string" && branch.length > 0) {
 		const pathURL = new URL(url);
 		const searchParams = new URLSearchParams(pathURL.search.slice(1));
-		if (searchParams.has('ref')) {
+		if (searchParams.has("ref")) {
 			throw new TypeError(`设置了branch参数后，不应在path参数内拼接ref`);
 		}
-		searchParams.append('ref', branch);
+		searchParams.append("ref", branch);
 		url = pathURL.origin + pathURL.pathname + "?" + searchParams.toString();
 	}
 	const response = await fetch(url, { headers });
@@ -286,12 +294,12 @@ export async function getRepoFilesList(path = '', branch, options = { username: 
 		path,
 		sha,
 		size,
-		type
+		type,
 	}));
-};
+}
 
 /**
- * 
+ *
  * 获取仓库指定分支和指定目录内的所有文件(包含子目录的文件)
  * @param { string } [path = ''] 路径名称(可放参数)
  * @param { string } [branch = ''] 仓库分支名称
@@ -307,7 +315,11 @@ export async function getRepoFilesList(path = '', branch, options = { username: 
  * 	.catch(error => console.error('Failed to fetch files:', error));
  * ```
  */
-export async function flattenRepositoryFiles(path = '', branch, options = { username: 'libccy', repository: 'noname' }) {
+export async function flattenRepositoryFiles(
+	path = "",
+	branch,
+	options = { username: "libccy", repository: "noname" }
+) {
 	/**
 	 * @type { { download_url: string, name: string, path: string, sha: string, size: number, type: 'file' }[] }
 	 */
@@ -318,9 +330,9 @@ export async function flattenRepositoryFiles(path = '', branch, options = { user
 	 */
 	async function traverseDirectory(contents) {
 		for (const item of contents) {
-			if (item.type === 'file') {
+			if (item.type === "file") {
 				flattenedFiles.push(item);
-			} else if (item.type === 'dir') {
+			} else if (item.type === "dir") {
 				// 获取子目录下的文件列表
 				const subDirFiles = await getRepoFilesList(item.path, branch, options);
 				// 递归处理子目录中的文件和子目录
@@ -335,30 +347,36 @@ export async function flattenRepositoryFiles(path = '', branch, options = { user
 
 	// 返回不含文件夹的扁平化文件列表
 	return allFiles;
-};
+}
 
 /**
  * 请求一个文件而不是直接储存为文件
- * @param { string } url 
- * @param { (receivedBytes: number, total?:number, filename?: string) => void } [onProgress] 
- * @param { RequestInit } [options={}] 
+ * @param { string } url
+ * @param { (receivedBytes: number, total?:number, filename?: string) => void } [onProgress]
+ * @param { RequestInit } [options={}]
  * @example
  * ```js
  * await getRepoTagDescription('v1.10.10').then(({ zipball_url }) => request(zipball_url));
  * ```
  */
 export async function request(url, onProgress, options = {}) {
-	const response = await fetch(url, Object.assign({
-		// 告诉服务器我们期望得到范围请求的支持
-		headers: { 'Range': 'bytes=0-' },
-	}, options));
+	const response = await fetch(
+		url,
+		Object.assign(
+			{
+				// 告诉服务器我们期望得到范围请求的支持
+				headers: { Range: "bytes=0-" },
+			},
+			options
+		)
+	);
 
 	if (!response.ok) {
 		throw new Error(`HTTP error! status: ${response.status}`);
 	}
 
 	// @ts-ignore
-	let total = parseInt(response.headers.get('Content-Length'), 10);
+	let total = parseInt(response.headers.get("Content-Length"), 10);
 	// 如果服务器未返回Content-Length，则无法准确计算进度
 	// @ts-ignore
 	if (isNaN(total)) total = null;
@@ -367,7 +385,7 @@ export async function request(url, onProgress, options = {}) {
 	let filename;
 	try {
 		// @ts-ignore
-		filename = response.headers.get('Content-Disposition').split(';')[1].split('=')[1];
+		filename = response.headers.get("Content-Disposition").split(";")[1].split("=")[1];
 	} catch {}
 	let receivedBytes = 0;
 	let chunks = [];
@@ -383,7 +401,7 @@ export async function request(url, onProgress, options = {}) {
 		chunks.push(value);
 		receivedBytes += value.length;
 
-		if (typeof onProgress == 'function') {
+		if (typeof onProgress == "function") {
 			if (total) {
 				const progress = (receivedBytes / total) * 100;
 				onProgress(receivedBytes, progress, filename);
@@ -397,99 +415,104 @@ export async function request(url, onProgress, options = {}) {
 	const blob = new Blob(chunks);
 
 	// 仅做演示，打印已合并的Blob大小
-	console.log(`Download completed. Total size: ${ parseSize(blob.size) }.`);
+	console.log(`Download completed. Total size: ${parseSize(blob.size)}.`);
 
 	return blob;
-};
+}
 
 /**
- * 
- * @param { string } [title] 
- * @param { string | number } [max] 
- * @param { string } [fileName] 
- * @param { string | number } [value] 
+ *
+ * @param { string } [title]
+ * @param { string | number } [max]
+ * @param { string } [fileName]
+ * @param { string | number } [value]
  * @returns { progress }
  */
 export function createProgress(title, max, fileName, value) {
 	/** @type { progress } */
 	// @ts-ignore
 	const parent = ui.create.div(ui.window, {
-		textAlign: 'center',
-		width: '300px',
-		height: '150px',
-		left: 'calc(50% - 150px)',
-		top: 'auto',
-		bottom: 'calc(50% - 75px)',
-		zIndex: '10',
-		boxShadow: 'rgb(0 0 0 / 40 %) 0 0 0 1px, rgb(0 0 0 / 20 %) 0 3px 10px',
-		backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4))',
-		borderRadius: '8px',
-		overflow: 'hidden scroll'
+		textAlign: "center",
+		width: "300px",
+		height: "150px",
+		left: "calc(50% - 150px)",
+		top: "auto",
+		bottom: "calc(50% - 75px)",
+		zIndex: "10",
+		boxShadow: "rgb(0 0 0 / 40 %) 0 0 0 1px, rgb(0 0 0 / 20 %) 0 3px 10px",
+		backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4))",
+		borderRadius: "8px",
+		overflow: "hidden scroll",
 	});
 
 	// 可拖动
-	parent.className = 'dialog';
+	parent.className = "dialog";
 
 	const container = ui.create.div(parent, {
-		position: 'absolute',
-		top: '0',
-		left: '0',
-		width: '100%',
-		height: '100%'
+		position: "absolute",
+		top: "0",
+		left: "0",
+		width: "100%",
+		height: "100%",
 	});
 
 	container.ontouchstart = ui.click.dialogtouchStart;
 	container.ontouchmove = ui.click.touchScroll;
 	// @ts-ignore
-	container.style.WebkitOverflowScrolling = 'touch';
+	container.style.WebkitOverflowScrolling = "touch";
 	parent.ontouchstart = ui.click.dragtouchdialog;
 
-	const caption = ui.create.div(container, '', title, {
-		position: 'relative',
-		paddingTop: '8px',
-		fontSize: '20px'
+	const caption = ui.create.div(container, "", title, {
+		position: "relative",
+		paddingTop: "8px",
+		fontSize: "20px",
 	});
 
-	ui.create.node('br', container);
+	ui.create.node("br", container);
 
 	const tip = ui.create.div(container, {
-		position: 'relative',
-		paddingTop: '8px',
-		fontSize: '20px',
-		width: '100%'
+		position: "relative",
+		paddingTop: "8px",
+		fontSize: "20px",
+		width: "100%",
 	});
 
-	const file = ui.create.node('span', tip, '', fileName);
-	file.style.width = file.style.maxWidth = '100%';
-	ui.create.node('br', tip);
-	const index = ui.create.node('span', tip, '', String(value || '0'));
-	ui.create.node('span', tip, '', '/');
-	const maxSpan = ui.create.node('span', tip, '', String(max || '未知'));
+	const file = ui.create.node("span", tip, "", fileName);
+	file.style.width = file.style.maxWidth = "100%";
+	ui.create.node("br", tip);
+	const index = ui.create.node("span", tip, "", String(value || "0"));
+	ui.create.node("span", tip, "", "/");
+	const maxSpan = ui.create.node("span", tip, "", String(max || "未知"));
 
-	ui.create.node('br', container);
+	ui.create.node("br", container);
 
-	const progress = ui.create.node('progress.progress', container);
-	progress.setAttribute('value', value || '0');
-	progress.setAttribute('max', max);
+	const progress = ui.create.node("progress.progress", container);
+	progress.setAttribute("value", value || "0");
+	progress.setAttribute("max", max);
 
 	parent.getTitle = () => caption.innerText;
-	parent.setTitle = title => caption.innerHTML = title;
+	parent.setTitle = (title) => (caption.innerHTML = title);
 	parent.getFileName = () => file.innerText;
-	parent.setFileName = name => file.innerHTML = name;
+	parent.setFileName = (name) => (file.innerHTML = name);
 	parent.getProgressValue = () => progress.value;
-	parent.setProgressValue = value => progress.value = index.innerHTML = value;
+	parent.setProgressValue = (value) => (progress.value = index.innerHTML = value);
 	parent.getProgressMax = () => progress.max;
-	parent.setProgressMax = max => progress.max = maxSpan.innerHTML = max;
-	parent.autoSetFileNameFromArray = fileNameList => {
+	parent.setProgressMax = (max) => (progress.max = maxSpan.innerHTML = max);
+	parent.autoSetFileNameFromArray = (fileNameList) => {
 		if (fileNameList.length > 2) {
-			parent.setFileName(fileNameList.slice(0, 2).concat(`......等${fileNameList.length - 2}个文件`).join('<br/>'));
+			parent.setFileName(
+				fileNameList
+					.slice(0, 2)
+					.concat(`......等${fileNameList.length - 2}个文件`)
+					.join("<br/>")
+			);
 		} else if (fileNameList.length == 2) {
-			parent.setFileName(fileNameList.join('<br/>'));
+			parent.setFileName(fileNameList.join("<br/>"));
 		} else if (fileNameList.length == 1) {
 			parent.setFileName(fileNameList[0]);
 		} else {
-			parent.setFileName('当前没有正在下载的文件');
+			parent.setFileName("当前没有正在下载的文件");
 		}
 	};
 	return parent;
-};
+}

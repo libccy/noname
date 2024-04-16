@@ -2,7 +2,7 @@ import { GeneratorFunction } from "../util/index.js";
 
 export class Is {
 	/**
-	 * @param {*} item 
+	 * @param {*} item
 	 * @returns {boolean}
 	 */
 	coroutine(item) {
@@ -10,7 +10,7 @@ export class Is {
 	}
 
 	/**
-	 * @param {*} item 
+	 * @param {*} item
 	 * @returns {boolean}
 	 */
 	generatorFunc(item) {
@@ -18,10 +18,16 @@ export class Is {
 	}
 
 	/**
-	 * @param {*} item 
+	 * @param {*} item
 	 * @returns {boolean}
 	 */
 	generator(item) {
-		return (typeof item == "object") && ("constructor" in item) && item.constructor && ("constructor" in item.constructor) && item.constructor.constructor === GeneratorFunction;
+		return (
+			typeof item == "object" &&
+			"constructor" in item &&
+			item.constructor &&
+			"constructor" in item.constructor &&
+			item.constructor.constructor === GeneratorFunction
+		);
 	}
-};
+}
