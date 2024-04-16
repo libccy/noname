@@ -1,11 +1,5 @@
 import {
 	menuContainer,
-	popupContainer,
-	updateActive,
-	setUpdateActive,
-	updateActiveCard,
-	setUpdateActiveCard,
-	menux,
 	menuxpages,
 	menuUpdates,
 	openMenu,
@@ -22,11 +16,12 @@ import {
 	checkVersion,
 	getRepoTags,
 	getRepoTagDescription,
-	getRepoFilesList,
 	flattenRepositoryFiles,
 	request,
 	createProgress,
 	gainAuthorization,
+	getLatestVersionFromGitHub,
+	getTreesFromGithub,
 } from "../../../../library/update.js";
 
 export const otherMenu = function (/** @type { boolean | undefined } */ connectMenu) {
@@ -410,42 +405,41 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				}
 				checkAssetButton.innerHTML = "正在检查更新";
 				checkAssetButton.disabled = true;
+
 				function refresh() {
 					checkAssetButton.innerHTML = "检查素材更新";
 					checkAssetButton.disabled = false;
 				}
-				const assetDirs = [];
-				if (lib.config.asset_font) {
-					assetDirs.push("font");
-				}
-				if (lib.config.asset_audio) {
-					assetDirs.push("audio");
-				}
-				if (lib.config.asset_image) {
-					assetDirs.push("image");
-				}
-				const files = await Promise.all(assetDirs.map((dir) => flattenRepositoryFiles(dir)));
-				assetDirs.forEach((value, index) => {
+
+				const assetDirectories = [];
+				if (lib.config.asset_font) assetDirectories.push("font");
+				if (lib.config.asset_audio) assetDirectories.push("audio");
+				if (lib.config.asset_image) assetDirectories.push("image");
+				const version = await getLatestVersionFromGitHub();
+				const files = await getTreesFromGithub(assetDirectories, version);
+
+				assetDirectories.forEach((assetDirectory, index) => {
 					const arr = files[index];
 					const size = arr.reduce((previous, current) => {
 						return previous + current.size;
 					}, 0);
-					game.saveConfig(`asset_${value}_size`, parseSize(size));
+					game.saveConfig(`asset_${assetDirectory}_size`, parseSize(size));
 				});
+
 				/**
-				 * @param { any[] } arr
-				 * @param { Function } predicate
+				 * @template T
+				 * @param { T[] } arr
+				 * @param { (value: T) => Promise<boolean> } predicate
 				 */
 				const asyncFilter = async (arr, predicate) => {
-					// @ts-ignore
 					const results = await Promise.all(arr.map(predicate));
-					// @ts-ignore
 					return arr.filter((_v, index) => results[index]);
 				};
-				// @ts-ignore
+
 				const result = await asyncFilter(files.flat(), async (v) => {
 					return v.size != (await game.promises.readFile(v.path)).length;
 				}).then((arr) => arr.map((v) => v.path));
+
 				console.log("需要更新的文件有:", result);
 				game.print("需要更新的文件有:", result);
 				const finish = async () => {
@@ -466,7 +460,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 					 */
 					let unZipProgress;
 					request(
-						"noname.unitedrhythmized.club/api",
+						"api.unitedrhythmized.club/noname",
 						(receivedBytes, total, filename) => {
 							if (typeof filename == "string") {
 								progress.setFileName(filename);
@@ -484,8 +478,10 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 							progress.setProgressValue(received);
 						},
 						{
-							method: "post",
+							method: "POST",
 							body: JSON.stringify({
+								action: "downloadAssets",
+								version,
 								fileList: result.concat("game/asset.js"),
 							}),
 						}
