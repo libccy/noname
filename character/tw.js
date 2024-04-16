@@ -9500,6 +9500,9 @@ game.import("character", function () {
 						game.delayx();
 					}
 				},
+				ai: {
+					combo: "twzhengrong"
+				},
 			},
 			twqingce: {
 				enable: "phaseUse",
