@@ -386,7 +386,9 @@ export async function request(url, onProgress, options = {}) {
 	try {
 		// @ts-ignore
 		filename = response.headers.get("Content-Disposition").split(";")[1].split("=")[1];
-	} catch { /* empty */ }
+	} catch {
+		/* empty */
+	}
 	let receivedBytes = 0;
 	let chunks = [];
 
@@ -527,20 +529,20 @@ export function createProgress(title, max, fileName, value) {
  * or rejects with an error if the operation fails.
  * @throws {Error} Will throw an error if the fetch operation fails or if no valid tags are found.
  */
-export async function getLatestVersionFromGitHub(owner = 'libccy', repo = 'noname') {
-	if (!localStorage.getItem('noname_authorization')) await gainAuthorization();
+export async function getLatestVersionFromGitHub(owner = "libccy", repo = "noname") {
+	if (!localStorage.getItem("noname_authorization")) await gainAuthorization();
 
 	const tags = await getRepoTags({
 		username: owner,
-		repository: repo
+		repository: repo,
 	});
 
 	for (const tag of tags) {
 		const tagName = tag.name;
-		if (tagName !== 'v1998') return tagName;
+		if (tagName !== "v1998") return tagName;
 	}
 
-	throw new Error('No valid tags found in the repository');
+	throw new Error("No valid tags found in the repository");
 }
 
 /**
@@ -559,14 +561,18 @@ export async function getLatestVersionFromGitHub(owner = 'libccy', repo = 'nonam
  * }[][]>} A promise that resolves with trees from the specified directories.
  * @throws {Error} Will throw an error if unable to fetch the repository tree from GitHub.
  */
-export async function getTreesFromGithub(directories, version, owner = 'libccy', repo = 'noname') {
-	if (!localStorage.getItem('noname_authorization')) await gainAuthorization();
+export async function getTreesFromGithub(directories, version, owner = "libccy", repo = "noname") {
+	if (!localStorage.getItem("noname_authorization")) await gainAuthorization();
 
-	const treesResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${version}?recursive=1`, {
-		headers: defaultHeaders
-	});
+	const treesResponse = await fetch(
+		`https://api.github.com/repos/${owner}/${repo}/git/trees/${version}?recursive=1`,
+		{
+			headers: defaultHeaders,
+		}
+	);
 
-	if (!treesResponse.ok) throw new Error(`Failed to fetch the GitHub repository tree: HTTP status ${treesResponse.status}`);
+	if (!treesResponse.ok)
+		throw new Error(`Failed to fetch the GitHub repository tree: HTTP status ${treesResponse.status}`);
 	/**
 	 * @type {{
 	 * 	sha: string;
@@ -584,5 +590,7 @@ export async function getTreesFromGithub(directories, version, owner = 'libccy',
 	 */
 	const trees = await treesResponse.json();
 	const tree = trees.tree;
-	return directories.map(directory => tree.filter(({ type, path }) => type === 'blob' && path.startsWith(directory)));
+	return directories.map((directory) =>
+		tree.filter(({ type, path }) => type === "blob" && path.startsWith(directory))
+	);
 }

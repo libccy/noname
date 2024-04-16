@@ -21,7 +21,7 @@ import {
 	createProgress,
 	gainAuthorization,
 	getLatestVersionFromGitHub,
-	getTreesFromGithub
+	getTreesFromGithub,
 } from "../../../../library/update.js";
 
 export const otherMenu = function (/** @type { boolean | undefined } */ connectMenu) {
@@ -333,7 +333,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 																.then(() => {
 																	cp.exec(
 																		`start /b ${__dirname}\\noname-server.exe -platform=electron`,
-																		() => { }
+																		() => {}
 																	);
 																	function loadURL() {
 																		let myAbortController =
@@ -412,9 +412,9 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				}
 
 				const assetDirectories = [];
-				if (lib.config.asset_font) assetDirectories.push('font');
-				if (lib.config.asset_audio) assetDirectories.push('audio');
-				if (lib.config.asset_image) assetDirectories.push('image');
+				if (lib.config.asset_font) assetDirectories.push("font");
+				if (lib.config.asset_audio) assetDirectories.push("audio");
+				if (lib.config.asset_image) assetDirectories.push("image");
 				const version = await getLatestVersionFromGitHub();
 				const files = await getTreesFromGithub(assetDirectories, version);
 
@@ -459,57 +459,73 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 					 * @type {progress}
 					 */
 					let unZipProgress;
-					request('api.unitedrhythmized.club/noname', (receivedBytes, total, filename) => {
-						if (typeof filename == 'string') {
-							progress.setFileName(filename);
-						}
-						let received = 0, max = 0;
-						if (total) {
-							max = +(total / (1024 * 1024)).toFixed(1)
-						} else {
-							max = 1000;
-						}
-						received = +(receivedBytes / (1024 * 1024)).toFixed(1);
-						if (received > max) max = received;
-						progress.setProgressMax(max);
-						progress.setProgressValue(received);
-					}, {
-						method: 'POST',
-						body: JSON.stringify({
-							action: 'downloadAssets',
-							version,
-							fileList: result.concat('game/asset.js')
-						})
-					}).then(async blob => {
-						progress.remove();
-						const zip = await get.promises.zip();
-						zip.load(await blob.arrayBuffer());
-						const entries = Object.entries(zip.files);
-						let root;
-						const hiddenFileFlags = ['.', '_'];
-						unZipProgress = createProgress('正在解压' + progress.getFileName(), entries.length);
-						let i = 0;
-						for (const [key, value] of entries) {
-							unZipProgress.setProgressValue(i++);
-							const fileName = typeof root == 'string' && key.startsWith(root) ? key.replace(root, '') : key;
-							if (hiddenFileFlags.includes(fileName[0])) continue;
-							if (value.dir) {
-								await game.promises.createDir(fileName);
-								continue;
+					request(
+						"api.unitedrhythmized.club/noname",
+						(receivedBytes, total, filename) => {
+							if (typeof filename == "string") {
+								progress.setFileName(filename);
 							}
-							unZipProgress.setFileName(fileName);
-							const [path, name] = [fileName.split('/').slice(0, -1).join('/'), fileName.split('/').slice(-1).join('/')];
-							game.print(`${fileName}(${i}/${entries.length})`);
-							await game.promises.writeFile(value.asArrayBuffer(), path, name);
+							let received = 0,
+								max = 0;
+							if (total) {
+								max = +(total / (1024 * 1024)).toFixed(1);
+							} else {
+								max = 1000;
+							}
+							received = +(receivedBytes / (1024 * 1024)).toFixed(1);
+							if (received > max) max = received;
+							progress.setProgressMax(max);
+							progress.setProgressValue(received);
+						},
+						{
+							method: "POST",
+							body: JSON.stringify({
+								action: "downloadAssets",
+								version,
+								fileList: result.concat("game/asset.js"),
+							}),
 						}
-						unZipProgress.remove();
-						await finish();
-					}).catch(e => {
-						if (progress.parentNode) progress.remove();
-						if (unZipProgress && unZipProgress.parentNode) unZipProgress.remove();
-						refresh();
-						throw e;
-					});
+					)
+						.then(async (blob) => {
+							progress.remove();
+							const zip = await get.promises.zip();
+							zip.load(await blob.arrayBuffer());
+							const entries = Object.entries(zip.files);
+							let root;
+							const hiddenFileFlags = [".", "_"];
+							unZipProgress = createProgress(
+								"正在解压" + progress.getFileName(),
+								entries.length
+							);
+							let i = 0;
+							for (const [key, value] of entries) {
+								unZipProgress.setProgressValue(i++);
+								const fileName =
+									typeof root == "string" && key.startsWith(root)
+										? key.replace(root, "")
+										: key;
+								if (hiddenFileFlags.includes(fileName[0])) continue;
+								if (value.dir) {
+									await game.promises.createDir(fileName);
+									continue;
+								}
+								unZipProgress.setFileName(fileName);
+								const [path, name] = [
+									fileName.split("/").slice(0, -1).join("/"),
+									fileName.split("/").slice(-1).join("/"),
+								];
+								game.print(`${fileName}(${i}/${entries.length})`);
+								await game.promises.writeFile(value.asArrayBuffer(), path, name);
+							}
+							unZipProgress.remove();
+							await finish();
+						})
+						.catch((e) => {
+							if (progress.parentNode) progress.remove();
+							if (unZipProgress && unZipProgress.parentNode) unZipProgress.remove();
+							refresh();
+							throw e;
+						});
 				} else {
 					await finish();
 				}
@@ -1646,4 +1662,3 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 	if (!active.link) active._initLink();
 	rightPane.appendChild(active.link);
 };
-
