@@ -111,7 +111,7 @@ game.import("card", function () {
 						return lib.translate["sha_nature_" + natures[0] + "_info"];
 					var str = "出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，";
 					if (natures.includes("stab")) {
-						str += "且在此之后需弃置一张手牌（没有则不弃）。";
+						str += "且在此之后需弃置一张手牌（没有则不弃），";
 					}
 					str += "否则你对其造成1点";
 					var linked = lib.linked.filter((n) => natures.includes(n));
