@@ -2229,18 +2229,72 @@ export class Game {
 				}
 			}
 			alert(`导入失败：\n${JSON.stringify(error, null, "\t")}`);
+			console.error(error);
 		};
 		try {
 			zip.load(data);
-			// alert(zip.file('文件夹/加扩展.js').asText())
-			const str = zip.file("extension.js").asText();
-			if (str === "" || undefined) throw "你导入的不是扩展！请选择正确的文件";
+			let extensionFile = zip.file("extension.js");
+			let isTsFile = false;
+			// 未找到extension.js
+			if (!extensionFile) {
+				extensionFile = zip.file("extension.ts");
+				if (!extensionFile) throw new Error("未找到extension.js");
+				isTsFile = true;
+			}
+			/** @type { string } */
+			// @ts-ignore
+			let str = extensionFile.asText();
+			if (str === "" || str === undefined) throw "你导入的不是扩展！请选择正确的文件";
+			// 编译ts扩展
+			if (isTsFile) {
+				if (typeof globalThis.ts === 'undefined') {
+					await lib.init.promises.js('game', 'typescript');
+				}
+				/**
+				 * @type {typeof import('typescript')}
+				 */
+				const ts = globalThis.ts;
+				str = ts.transpile(str, {
+					module: ts.ModuleKind.ES2015,
+					//@todo: ES2019 -> ES2020
+					target: ts.ScriptTarget.ES2019,
+					inlineSourceMap: true,
+					resolveJsonModule: true,
+					esModuleInterop: true,
+				}, 'extension.ts');
+			}
 			_status.importingExtension = true;
-			eval(str);
-			await Promise.allSettled(_status.extensionLoading);
-			delete _status.extensionLoading;
+			try {
+				// 导入普通扩展
+				eval(str);
+				// esm扩展可以不写game.impoprt或许会导致_status.extensionLoading不存在
+				if (Array.isArray(_status.extensionLoading)) {
+					await Promise.allSettled(_status.extensionLoading);
+					delete _status.extensionLoading;
+				}
+			} catch (error) {
+				// 是模块扩展
+				if (
+					// @ts-ignore
+					error.message === 'Cannot use import statement outside a module' || 
+					// @ts-ignore
+					error.message === 'await is only valid in async functions and the top level bodies of modules'
+				) {
+					// 改为用info.json判断扩展名
+					const infoFile = zip.file("info.json");
+					if (!infoFile) throw new Error("未找到info.json,导入模块化扩展必须加入info.json！");
+					const info = JSON.parse(infoFile.asText());
+					if (typeof info.name == 'string') {
+						await game.import('extension', () => {
+							return Object.assign(info, {
+								config: {},
+							});
+						});
+					}
+				}
+			}
 			_status.importingExtension = false;
-			if (!game.importedPack) throw "err";
+			if (!game.importedPack) throw "此压缩包不是一个扩展";
 			const extensionName = game.importedPack.name;
 			if (lib.config.all.plays.includes(extensionName)) throw "禁止安装游戏原生扩展";
 			const extensions = lib.config.extensions;
@@ -2260,7 +2314,6 @@ export class Game {
 					fileList = Object.keys(files)
 						.filter((key) => !files[key].dir && !hiddenFileFlags.includes(key[0]))
 						.reverse();
-				//alert(filelist)
 				//电脑端
 				//具备nodeJS环境
 				if (lib.node && lib.node.fs) {
@@ -2286,14 +2339,14 @@ export class Game {
 										)
 									).then(writeFile);
 							return fileName.length
-								? game
+								? game.promises
 										.createDir(`extension/${extensionName}/${fileName.join("/")}`)
 										.then(() => letGo(`${fileName.join("/")}/${name}`))
 								: letGo(name);
 						}
 						finishLoad();
 					};
-					game.ensureDirectory(`extension/${extensionName}`).then(writeFile).catch(UHP);
+					game.promises.ensureDirectory(`extension/${extensionName}`).then(writeFile).catch(UHP);
 				} else
 					new Promise((resolve, reject) =>
 						window.resolveLocalFileSystemURL(nonameInitialized, resolve, reject)
@@ -2351,7 +2404,7 @@ export class Game {
 											)
 											.then(writeFile);
 								return fileName.length
-									? game
+									? game.promises
 											.createDir(`extension/${extensionName}/${fileName.join("/")}`)
 											.then(() => letGo(`${fileName.join("/")}/${name}`))
 									: letGo(name);
@@ -4960,10 +5013,13 @@ export class Game {
 	 * @param { string } extensionName
 	 */
 	hasExtension(extensionName) {
-		if (typeof lib.config[`extension_${extensionName}_enable`] != "boolean") {
-			game.saveExtensionConfig(extensionName, "enable", true);
+		if (this.hasExtensionInstalled(extensionName)) {
+			if (typeof lib.config[`extension_${extensionName}_enable`] != "boolean") {
+				game.saveExtensionConfig(extensionName, "enable", true);
+			}
+			return lib.config[`extension_${extensionName}_enable`] === true;
 		}
-		return this.hasExtensionInstalled(extensionName) && lib.config[`extension_${extensionName}_enable`];
+		return false;
 	}
 	/**
 	 * @param { string } extensionName

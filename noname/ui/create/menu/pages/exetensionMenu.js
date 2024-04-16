@@ -2632,9 +2632,9 @@ export const extensionMenu = function (connectMenu) {
 					fileReader.onerror = reject;
 					fileReader.onload = resolve;
 					fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
-				}).then((progressEvent) => {
+				}).then(async (progressEvent) => {
 					if (
-						game.importExtension(progressEvent.target.result, () => {
+						await game.importExtension(progressEvent.target.result, () => {
 							extensionNode.innerHTML = "导入成功，3秒后将重启";
 							new Promise((resolve) => setTimeout(resolve, 1000))
 								.then(() => {

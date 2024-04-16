@@ -184,9 +184,12 @@ export function nodeReady() {
 	game.createDir = (directory, successCallback, errorCallback) => {
 		const target = lib.node.path.join(__dirname, directory);
 		if (lib.node.fs.existsSync(target)) {
-			if (typeof errorCallback == "function") {
-				errorCallback(new Error(`${target}已存在`));
-			}
+			// 修改逻辑，路径存在且是文件才会报错
+			if (!lib.node.fs.lstatSync(target).isDirectory()){
+				if (typeof errorCallback == "function") errorCallback(new Error(`${target}文件已存在`)); 
+				else if (typeof successCallback == "function") successCallback();
+			} 
+			else if (typeof successCallback == "function") successCallback();
 		} else if (checkVersion(process.versions.node, "10.12.0") > -1) {
 			lib.node.fs.mkdir(target, { recursive: true }, (e) => {
 				if (e) {
