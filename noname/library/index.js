@@ -1932,6 +1932,29 @@ export class Library {
 						}
 					},
 				},
+				skin_share: {
+					name: '共享皮肤',
+					init: false,
+					intro: '不同武将共享同一套皮肤，重启生效',
+					onclick(item) {
+						game.saveConfig('skin_share', item);
+						if (item) {
+							if (typeof game.promises.readFile === 'function' && typeof game.promises.writeFile === 'function') {
+								let promise = game.promises.readFile('./image/skinShare.js');
+								promise.then(result => {
+									//console.log('skinShare文件已存在');
+								}).catch(error => {
+									console.log(error);
+									let SkinShareDefault = 'export function skinshare_import(lib) {\n	lib.ice_skinShare = {\n		// 此文件为填写皮肤共享对应关系的文件，这里提供一个模板：\n		// ol_xiaoqiao: {							//需要共享皮肤的角色id\n			// name: \'xiaoqiao\',					//共享谁的皮肤 （*必填，否则报错）共享关系建立后，该角色将会共享目标角色的所有皮肤。\n		// },\n	};\n}';
+									game.promises.writeFile(SkinShareDefault, './image/', 'skinShare.js');
+									alert("无法读取skinShare文件，已在本体image目录下创建skinShare文件！");
+								});
+							} else {
+								alert("当前环境无法读取和写入文件，请自行在本体image目录下创建skinShare.js文件！");
+							}
+						}
+					},
+				},
 				card_style: {
 					name: "卡牌样式",
 					init: "default",
@@ -3638,8 +3661,11 @@ export class Library {
 					}
 					if (lib.config.change_skin) {
 						map.change_skin_auto.show();
-					} else {
+						map.skin_share.show();
+					}
+					else {
 						map.change_skin_auto.hide();
+						map.skin_share.hide();
 					}
 					if (lib.config.image_background_random) {
 						map.image_background_blur.show();
