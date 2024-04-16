@@ -520,6 +520,10 @@ export class Click {
 				callback(bool);
 			}
 		};
+		var sharename = name;
+		if(lib.ice_skinShare && lib.ice_skinShare[name] && lib.ice_skinShare[name].name){
+			sharename = lib.ice_skinShare[name].name;
+		}
 		var img = new Image();
 		img.onload = function () {
 			lib.config.skin[name] = num;
@@ -537,7 +541,7 @@ export class Click {
 			game.saveConfig("skin", lib.config.skin);
 			avatar.setBackground(name, "character");
 		};
-		img.src = lib.assetURL + "image/skin/" + name + "/" + num + ".jpg";
+		img.src = lib.assetURL + "image/skin/" + sharename + "/" + num + ".jpg";
 	}
 	touchpop(forced) {
 		if (lib.config.touchscreen || forced) {
@@ -3152,6 +3156,10 @@ export class Click {
 			nameskin = nameskin.slice(3);
 			gzbool = true;
 		}
+		var sharename = nameskin;
+		if(lib.ice_skinShare && lib.ice_skinShare[nameskin] && lib.ice_skinShare[nameskin].name){
+			sharename = lib.ice_skinShare[nameskin].name;
+		}
 		var changeskin = function () {
 			var node = ui.create.div(".changeskin", "可换肤", playerbg);
 			var avatars = ui.create.div(".avatars", playerbg);
@@ -3198,7 +3206,7 @@ export class Click {
 						});
 						button._link = i;
 						if (i) {
-							button.setBackgroundImage("image/skin/" + nameskin + "/" + i + ".jpg");
+							button.setBackgroundImage("image/skin/" + sharename + "/" + i + ".jpg");
 						} else {
 							if (
 								gzbool &&
@@ -3221,7 +3229,7 @@ export class Click {
 						num--;
 						createButtons(num);
 					};
-					img.src = lib.assetURL + "image/skin/" + nameskin + "/" + num + ".jpg";
+					img.src = lib.assetURL + "image/skin/" + sharename + "/" + num + ".jpg";
 				};
 				if (lib.config.change_skin) {
 					loadImage();
@@ -3233,7 +3241,7 @@ export class Click {
 		if (lib.config.change_skin) {
 			var img = new Image();
 			img.onload = changeskin;
-			img.src = lib.assetURL + "image/skin/" + nameskin + "/1.jpg";
+			img.src = lib.assetURL + "image/skin/" + sharename + "/1.jpg";
 		} else if (lib.config.debug && lib.skin[nameskin]) {
 			changeskin();
 		}
