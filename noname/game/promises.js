@@ -67,7 +67,7 @@ export class GamePromises {
 	}
 	/**
 	 * @param {string} filename
-	 * @returns {Promise<Buffer>}
+	 * @returns {Promise<ArrayBuffer | Buffer>}
 	 */
 	readFile(filename) {
 		return new Promise((resolve, reject) => {

@@ -328,17 +328,17 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				}
 
 				if (!dev) {
-					getRepoTags()
-						.then((tags) => tags.filter((tag) => tag.name != "v1998")[0])
-						.then((tag) => {
-							game.saveConfig("check_version", tag.name.slice(1));
-							if (typeof lib.config["version_description_" + tag.name] == "object") {
+					getLatestVersionFromGitHub()
+						.then(tagName => {
+							game.saveConfig("check_version", tagName.slice(1));
+							if (typeof lib.config[`version_description_${tagName}`] == "object") {
 								/** @type { ReturnType<import('../../../../library/update.js').getRepoTagDescription> } */
-								const description = lib.config["version_description_" + tag.name];
+								const description = lib.config[`version_description_${tagName}`];
 								return description;
-							} else return getRepoTagDescription(tag.name);
+							}
+							else return getRepoTagDescription(tagName);
 						})
-						.then((description) => {
+						.then(description => {
 							// 保存版本信息
 							if (typeof lib.config["version_description_" + description.name] != "object") {
 								game.saveConfig("version_description_" + description.name, description);
@@ -436,18 +436,28 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				 * @param { (value: T) => Promise<boolean> } predicate
 				 */
 				const asyncFilter = async (arr, predicate) => {
-					const results = await Promise.all(arr.map(predicate));
+					//将arr每10个分为一个数组，分别使用Promise.all
+					/** @type { boolean[] } */
+					const results = [];
+					for (let i = 0; i < arr.length; i += 10) {
+						const pushArr = arr.slice(i, i + 10);
+						results.push(
+							...await Promise.all(pushArr.map(predicate))
+						);
+					}
 					return arr.filter((_v, index) => results[index]);
 				};
 
-				const result = await asyncFilter(files.flat(), async (v) => {
-					return v.size != (await game.promises.readFile(v.path)).length;
-				}).then((arr) => arr.map((v) => v.path));
+				const result = await asyncFilter(files.flat(), async v => {
+					return game.promises.readFile(v.path).then(data => {
+						return v.size != data.byteLength;
+					})
+				}).then(arr => arr.map((v) => v.path));
 
 				console.log("需要更新的文件有:", result);
 				game.print("需要更新的文件有:", result);
 				const finish = async () => {
-					await lib.init.promises.js("game", "asset.js");
+					await lib.init.promises.js("game", "asset");
 					if (Array.isArray(window.noname_asset_list)) {
 						game.saveConfig("asset_version", window.noname_asset_list[0]);
 						delete window.noname_asset_list;
