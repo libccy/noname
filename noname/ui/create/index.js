@@ -2558,9 +2558,8 @@ export class Create {
 		lib.status.date = new Date();
 		lib.status.dateDelayed = 0;
 
-		while (lib.arenaReady.length) {
-			lib.arenaReady.shift()();
-		}
+		// @ts-ignore
+		while (lib.arenaReady.length) lib.arenaReady.shift()();
 		delete lib.arenaReady;
 		if (lib.config.auto_check_update && !sessionStorage.getItem("auto_check_update")) {
 			setTimeout(() => {
@@ -2575,7 +2574,7 @@ export class Create {
 						game.saveConfig("asset_version", "无");
 					} else {
 						var func = function () {
-							if (confirm("是否下载图片和字体素材？（约175MB）")) {
+							if (confirm("是否下载图片和字体素材？（约386.6MB）")) {
 								if (!ui.arena.classList.contains("menupaused")) {
 									ui.click.configMenu();
 									ui.click.menuTab("其它");

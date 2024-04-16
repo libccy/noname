@@ -13,6 +13,10 @@ export class Click {
 	 * @type {(arg0: string) => void}
 	 */
 	menuTab;
+	/**
+	 * @type {() => void}
+	 */
+	configMenu;
 	identitycircle() {
 		var list = [];
 		this.classList.toggle("transparent");
