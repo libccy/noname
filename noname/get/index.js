@@ -3586,6 +3586,10 @@ export class Get {
 							nameskin = nameskin.slice(3);
 							gzbool = true;
 						}
+						var sharename = nameskin;
+						if(lib.ice_skinShare && lib.ice_skinShare[nameskin] && lib.ice_skinShare[nameskin].name){
+							sharename = lib.ice_skinShare[nameskin].name;
+						}
 						for (var i = 0; i <= num; i++) {
 							var button = ui.create.div(".button.character.pointerdiv", buttons, function () {
 								if (this._link) {
@@ -3620,7 +3624,7 @@ export class Get {
 							});
 							button._link = i;
 							if (i) {
-								button.setBackgroundImage("image/skin/" + nameskin + "/" + i + ".jpg");
+								button.setBackgroundImage("image/skin/" + sharename + "/" + i + ".jpg");
 							} else {
 								if (
 									gzbool &&
@@ -3660,7 +3664,11 @@ export class Get {
 							nameskin = nameskin.slice(3);
 							gzbool = true;
 						}
-						img.src = lib.assetURL + "image/skin/" + nameskin + "/" + num + ".jpg";
+						var sharename = nameskin;
+						if(lib.ice_skinShare && lib.ice_skinShare[nameskin] && lib.ice_skinShare[nameskin].name){
+							sharename = lib.ice_skinShare[nameskin].name;
+						}
+						img.src = lib.assetURL + "image/skin/" + sharename + "/" + num + ".jpg";
 					};
 					if (lib.config.change_skin) {
 						if (!node.isUnseen(0)) {
@@ -4209,6 +4217,10 @@ export class Get {
 						nameskin = nameskin.slice(3);
 						gzbool = true;
 					}
+					var sharename = nameskin;
+					if(lib.ice_skinShare && lib.ice_skinShare[nameskin] && lib.ice_skinShare[nameskin].name){
+						sharename = lib.ice_skinShare[nameskin].name;
+					}
 					var createButtons = function (num) {
 						if (!num) return;
 						if (!introadded) {
@@ -4237,7 +4249,7 @@ export class Get {
 							});
 							button._link = i;
 							if (i) {
-								button.setBackgroundImage("image/skin/" + nameskin + "/" + i + ".jpg");
+								button.setBackgroundImage("image/skin/" + sharename + "/" + i + ".jpg");
 							} else {
 								if (
 									gzbool &&
@@ -4260,7 +4272,7 @@ export class Get {
 							num--;
 							createButtons(num);
 						};
-						img.src = lib.assetURL + "image/skin/" + nameskin + "/" + num + ".jpg";
+						img.src = lib.assetURL + "image/skin/" + sharename + "/" + num + ".jpg";
 					};
 					if (lib.config.change_skin) {
 						loadImage();
