@@ -71,6 +71,7 @@ game.import("character", function () {
 					"sb_pangtong",
 					"sb_zhanghe",
 					"sb_caopi",
+					"sb_ganning",
 				],
 				sb_tong: [
 					"liucheng",
@@ -90,7 +91,6 @@ game.import("character", function () {
 					"sb_huanggai",
 					"sb_zhouyu",
 					"sb_caoren",
-					"sb_ganning",
 					"sb_yl_luzhi",
 					"sb_huangyueying",
 				],
