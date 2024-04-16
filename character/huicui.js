@@ -446,6 +446,9 @@ game.import("character", function () {
 					await player.changeSkills(["dcfudou"], ["dcjianzhuan"]);
 				},
 				derivation: "dcfudou",
+				ai: {
+					combo: "dcjianzhuan"
+				},
 			},
 			dcfudou: {
 				audio: 2,
@@ -899,9 +902,6 @@ game.import("character", function () {
 				ai: {
 					combo: "dcjichou",
 				},
-				ai:{
-					combo:'dcjichou'
-				}
 			},
 			dczifu: {
 				audio: 2,

@@ -2629,6 +2629,9 @@ game.import("character", function () {
 				content: function () {
 					player.loseMaxHp();
 				},
+				ai: {
+					neg: true
+				},
 			},
 			xindanshou: {
 				audio: 2,
