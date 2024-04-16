@@ -1,4 +1,4 @@
-import { lib, ui, game } from "../../noname.js";
+import { ui, game } from "../../noname.js";
 
 // https://github.com/libccy/noname/archive/refs/tags/v1.10.10.zip
 
@@ -386,7 +386,7 @@ export async function request(url, onProgress, options = {}) {
 	try {
 		// @ts-ignore
 		filename = response.headers.get("Content-Disposition").split(";")[1].split("=")[1];
-	} catch {}
+	} catch { /* empty */ }
 	let receivedBytes = 0;
 	let chunks = [];
 
@@ -515,4 +515,74 @@ export function createProgress(title, max, fileName, value) {
 		}
 	};
 	return parent;
+}
+
+/**
+ * Retrieves the latest version tag from a GitHub repository, excluding a specific tag.
+ * This function fetches the list of tags from the GitHub repository specified by
+ * the owner and repository name, then returns the latest tag name that is not “v1998”.
+ * @param {string} owner - The username or organization name on GitHub that owns the repository.
+ * @param {string} repo - The name of the repository from which to fetch tags.
+ * @returns {Promise<string>} A promise that resolves with the name of the latest version tag,
+ * or rejects with an error if the operation fails.
+ * @throws {Error} Will throw an error if the fetch operation fails or if no valid tags are found.
+ */
+export async function getLatestVersionFromGitHub(owner = 'libccy', repo = 'noname') {
+	if (!localStorage.getItem('noname_authorization')) await gainAuthorization();
+
+	const tags = await getRepoTags({
+		username: owner,
+		repository: repo
+	});
+
+	for (const tag of tags) {
+		const tagName = tag.name;
+		if (tagName !== 'v1998') return tagName;
+	}
+
+	throw new Error('No valid tags found in the repository');
+}
+
+/**
+ * Fetches trees from a GitHub repository within specified directories.
+ * @param {string[]} directories - The list of directories to fetch the trees from.
+ * @param {string} version - The version or branch to fetch the trees from.
+ * @param {string} owner - The owner of the GitHub repository.
+ * @param {string} repo - The name of the GitHub repository.
+ * @returns {Promise<{
+ * 	path: string;
+ * 	mode: string;
+ * 	type: "blob" | "tree";
+ * 	sha: string;
+ * 	size: number;
+ * 	url: string;
+ * }[][]>} A promise that resolves with trees from the specified directories.
+ * @throws {Error} Will throw an error if unable to fetch the repository tree from GitHub.
+ */
+export async function getTreesFromGithub(directories, version, owner = 'libccy', repo = 'noname') {
+	if (!localStorage.getItem('noname_authorization')) await gainAuthorization();
+
+	const treesResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${version}?recursive=1`, {
+		headers: defaultHeaders
+	});
+
+	if (!treesResponse.ok) throw new Error(`Failed to fetch the GitHub repository tree: HTTP status ${treesResponse.status}`);
+	/**
+	 * @type {{
+	 * 	sha: string;
+	 * 	url: string;
+	 * 	tree: {
+	 * 		path: string;
+	 * 		mode: string;
+	 * 		type: "blob" | "tree";
+	 * 		sha: string;
+	 * 		size: number;
+	 * 		url: string;
+	 * 	}[];
+	 * 	truncated: boolean;
+	 * }}
+	 */
+	const trees = await treesResponse.json();
+	const tree = trees.tree;
+	return directories.map(directory => tree.filter(({ type, path }) => type === 'blob' && path.startsWith(directory)));
 }

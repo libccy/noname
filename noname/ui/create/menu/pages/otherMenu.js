@@ -1,11 +1,5 @@
 import {
 	menuContainer,
-	popupContainer,
-	updateActive,
-	setUpdateActive,
-	updateActiveCard,
-	setUpdateActiveCard,
-	menux,
 	menuxpages,
 	menuUpdates,
 	openMenu,
@@ -22,11 +16,12 @@ import {
 	checkVersion,
 	getRepoTags,
 	getRepoTagDescription,
-	getRepoFilesList,
 	flattenRepositoryFiles,
 	request,
 	createProgress,
 	gainAuthorization,
+	getLatestVersionFromGitHub,
+	getTreesFromGithub
 } from "../../../../library/update.js";
 
 export const otherMenu = function (/** @type { boolean | undefined } */ connectMenu) {
@@ -338,7 +333,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 																.then(() => {
 																	cp.exec(
 																		`start /b ${__dirname}\\noname-server.exe -platform=electron`,
-																		() => {}
+																		() => { }
 																	);
 																	function loadURL() {
 																		let myAbortController =
@@ -410,42 +405,41 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				}
 				checkAssetButton.innerHTML = "正在检查更新";
 				checkAssetButton.disabled = true;
+
 				function refresh() {
 					checkAssetButton.innerHTML = "检查素材更新";
 					checkAssetButton.disabled = false;
 				}
-				const assetDirs = [];
-				if (lib.config.asset_font) {
-					assetDirs.push("font");
-				}
-				if (lib.config.asset_audio) {
-					assetDirs.push("audio");
-				}
-				if (lib.config.asset_image) {
-					assetDirs.push("image");
-				}
-				const files = await Promise.all(assetDirs.map((dir) => flattenRepositoryFiles(dir)));
-				assetDirs.forEach((value, index) => {
+
+				const assetDirectories = [];
+				if (lib.config.asset_font) assetDirectories.push('font');
+				if (lib.config.asset_audio) assetDirectories.push('audio');
+				if (lib.config.asset_image) assetDirectories.push('image');
+				const version = await getLatestVersionFromGitHub();
+				const files = await getTreesFromGithub(assetDirectories, version);
+
+				assetDirectories.forEach((assetDirectory, index) => {
 					const arr = files[index];
 					const size = arr.reduce((previous, current) => {
 						return previous + current.size;
 					}, 0);
-					game.saveConfig(`asset_${value}_size`, parseSize(size));
+					game.saveConfig(`asset_${assetDirectory}_size`, parseSize(size));
 				});
+
 				/**
-				 * @param { any[] } arr
-				 * @param { Function } predicate
+				 * @template T
+				 * @param { T[] } arr
+				 * @param { (value: T) => Promise<boolean> } predicate
 				 */
 				const asyncFilter = async (arr, predicate) => {
-					// @ts-ignore
 					const results = await Promise.all(arr.map(predicate));
-					// @ts-ignore
 					return arr.filter((_v, index) => results[index]);
 				};
-				// @ts-ignore
+
 				const result = await asyncFilter(files.flat(), async (v) => {
 					return v.size != (await game.promises.readFile(v.path)).length;
 				}).then((arr) => arr.map((v) => v.path));
+
 				console.log("需要更新的文件有:", result);
 				game.print("需要更新的文件有:", result);
 				const finish = async () => {
@@ -465,71 +459,57 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 					 * @type {progress}
 					 */
 					let unZipProgress;
-					request(
-						"noname.unitedrhythmized.club/api",
-						(receivedBytes, total, filename) => {
-							if (typeof filename == "string") {
-								progress.setFileName(filename);
-							}
-							let received = 0,
-								max = 0;
-							if (total) {
-								max = +(total / (1024 * 1024)).toFixed(1);
-							} else {
-								max = 1000;
-							}
-							received = +(receivedBytes / (1024 * 1024)).toFixed(1);
-							if (received > max) max = received;
-							progress.setProgressMax(max);
-							progress.setProgressValue(received);
-						},
-						{
-							method: "post",
-							body: JSON.stringify({
-								fileList: result.concat("game/asset.js"),
-							}),
+					request('api.unitedrhythmized.club/noname', (receivedBytes, total, filename) => {
+						if (typeof filename == 'string') {
+							progress.setFileName(filename);
 						}
-					)
-						.then(async (blob) => {
-							progress.remove();
-							const zip = await get.promises.zip();
-							zip.load(await blob.arrayBuffer());
-							const entries = Object.entries(zip.files);
-							let root;
-							const hiddenFileFlags = [".", "_"];
-							unZipProgress = createProgress(
-								"正在解压" + progress.getFileName(),
-								entries.length
-							);
-							let i = 0;
-							for (const [key, value] of entries) {
-								unZipProgress.setProgressValue(i++);
-								const fileName =
-									typeof root == "string" && key.startsWith(root)
-										? key.replace(root, "")
-										: key;
-								if (hiddenFileFlags.includes(fileName[0])) continue;
-								if (value.dir) {
-									await game.promises.createDir(fileName);
-									continue;
-								}
-								unZipProgress.setFileName(fileName);
-								const [path, name] = [
-									fileName.split("/").slice(0, -1).join("/"),
-									fileName.split("/").slice(-1).join("/"),
-								];
-								game.print(`${fileName}(${i}/${entries.length})`);
-								await game.promises.writeFile(value.asArrayBuffer(), path, name);
-							}
-							unZipProgress.remove();
-							await finish();
+						let received = 0, max = 0;
+						if (total) {
+							max = +(total / (1024 * 1024)).toFixed(1)
+						} else {
+							max = 1000;
+						}
+						received = +(receivedBytes / (1024 * 1024)).toFixed(1);
+						if (received > max) max = received;
+						progress.setProgressMax(max);
+						progress.setProgressValue(received);
+					}, {
+						method: 'POST',
+						body: JSON.stringify({
+							action: 'downloadAssets',
+							version,
+							fileList: result.concat('game/asset.js')
 						})
-						.catch((e) => {
-							if (progress.parentNode) progress.remove();
-							if (unZipProgress && unZipProgress.parentNode) unZipProgress.remove();
-							refresh();
-							throw e;
-						});
+					}).then(async blob => {
+						progress.remove();
+						const zip = await get.promises.zip();
+						zip.load(await blob.arrayBuffer());
+						const entries = Object.entries(zip.files);
+						let root;
+						const hiddenFileFlags = ['.', '_'];
+						unZipProgress = createProgress('正在解压' + progress.getFileName(), entries.length);
+						let i = 0;
+						for (const [key, value] of entries) {
+							unZipProgress.setProgressValue(i++);
+							const fileName = typeof root == 'string' && key.startsWith(root) ? key.replace(root, '') : key;
+							if (hiddenFileFlags.includes(fileName[0])) continue;
+							if (value.dir) {
+								await game.promises.createDir(fileName);
+								continue;
+							}
+							unZipProgress.setFileName(fileName);
+							const [path, name] = [fileName.split('/').slice(0, -1).join('/'), fileName.split('/').slice(-1).join('/')];
+							game.print(`${fileName}(${i}/${entries.length})`);
+							await game.promises.writeFile(value.asArrayBuffer(), path, name);
+						}
+						unZipProgress.remove();
+						await finish();
+					}).catch(e => {
+						if (progress.parentNode) progress.remove();
+						if (unZipProgress && unZipProgress.parentNode) unZipProgress.remove();
+						refresh();
+						throw e;
+					});
 				} else {
 					await finish();
 				}
@@ -1666,3 +1646,4 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 	if (!active.link) active._initLink();
 	rightPane.appendChild(active.link);
 };
+
