@@ -1071,7 +1071,7 @@ game.import("character", function () {
 					},
 					buff:{
 						charlotte:true,
-						onremove:false,
+						onremove:true,
 						mod:{
 							maxHandcard(player,num){
 								return num+player.countMark('olliantao_buff');
