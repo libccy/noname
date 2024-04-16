@@ -14688,6 +14688,9 @@ game.import("character", function () {
 						if (event.goon) player.recover();
 					}
 				},
+				ai: {
+					combo: "yuqi"
+				},
 			},
 			xianjing: {
 				audio: 2,
@@ -14775,6 +14778,9 @@ game.import("character", function () {
 						game.log(player, "将", result.control, "数字改为", "#y" + list[result.index]);
 						player.markSkill("yuqi");
 					}
+				},
+				ai: {
+					combo: "yuqi"
 				},
 			},
 			//周夷
@@ -17262,6 +17268,9 @@ game.import("character", function () {
 						player.changeSkills(["hmxili"], ["mansi"]);
 						target.addSkills("hmxili");
 					}
+				},
+				ai: {
+					combo: "mansi"
 				},
 			},
 			hmxili: {

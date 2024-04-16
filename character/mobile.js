@@ -13198,6 +13198,9 @@ game.import("character", function () {
 						event.chara[event.skills.indexOf(result.control)],
 					]);
 				},
+				ai: {
+					combo: "baiyi"
+				},
 			},
 			hongyi: {
 				audio: 2,
@@ -15255,6 +15258,9 @@ game.import("character", function () {
 					player.addSkills("reqingce");
 					player.loseMaxHp();
 				},
+				ai: {
+					combo: "rezhengrong"
+				},
 			},
 			reqingce: {
 				enable: "phaseUse",
@@ -17043,6 +17049,9 @@ game.import("character", function () {
 					player.changeSkills(["jingong", "relianji"]);
 					player.gainMaxHp();
 					player.recover();
+				},
+				ai: {
+					combo: "relianji"
 				},
 			},
 			shouye: {
