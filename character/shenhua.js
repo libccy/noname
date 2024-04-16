@@ -881,6 +881,9 @@ game.import("character", function () {
 					game.log(player, "获得了技能", "#g【清侧】");
 					player.loseMaxHp();
 				},
+				ai: {
+					combo: "zhengrong"
+				},
 			},
 			qingce: {
 				enable: "phaseUse",
@@ -1053,6 +1056,9 @@ game.import("character", function () {
 					"step 2";
 					player.addSkills("drlt_qingce");
 					player.loseMaxHp();
+				},
+				ai: {
+					combo: "drlt_zhengrong"
 				},
 			},
 			drlt_qingce: {

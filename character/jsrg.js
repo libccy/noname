@@ -9476,6 +9476,9 @@ game.import("character", function () {
 					"step 1";
 					player.addSkills(["jsrgpingrong", "feiying"]);
 				},
+				ai: {
+					combo: "jsrgzhenglve"
+				},
 			},
 			jsrgpingrong: {
 				audio: 2,

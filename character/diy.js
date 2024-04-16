@@ -4765,6 +4765,9 @@ game.import("character", function () {
 					if (player.isHealthy()) player.draw(2);
 					player.addSkills("tenzen_tianquan");
 				},
+				ai: {
+					combo: "tenzen_yixing"
+				},
 			},
 			tenzen_tianquan: {
 				trigger: { player: "useCardToPlayered" },
@@ -7007,6 +7010,7 @@ game.import("character", function () {
 					tag: {
 						rejudge: 0.6,
 					},
+					combo: "shiroha_yuzhao"
 				},
 				derivation: ["umi_chaofan", "ao_xishi", "tsumugi_mugyu", "kamome_jieban"],
 			},
@@ -10050,6 +10054,9 @@ game.import("character", function () {
 					player.gainMaxHp();
 					player.recover();
 				},
+				ai: {
+					combo: "ao_kuihun"
+				},
 			},
 			ao_diegui: {
 				enable: "phaseUse",
@@ -10740,6 +10747,9 @@ game.import("character", function () {
 					player.gainMaxHp();
 					player.recover();
 					player.addSkills("riki_chongzhen");
+				},
+				ai: {
+					combo: "riki_spwenji"
 				},
 			},
 			riki_chongzhen: {
@@ -14163,6 +14173,9 @@ game.import("character", function () {
 					player.addSkill("nsliegong");
 				},
 				derivation: "nsliegong",
+				ai: {
+					combo: "nsdiewu"
+				},
 			},
 			nsliegong: {
 				inherit: "xinliegong",
@@ -14692,6 +14705,9 @@ game.import("character", function () {
 					player.gainMaxHp(2);
 				},
 				derivation: ["nsdiemou", "nszhihuang"],
+				ai: {
+					combo: "nsjiquan"
+				},
 			},
 			nsdiemou: {
 				trigger: { player: "phaseUseBegin" },
@@ -14705,6 +14721,9 @@ game.import("character", function () {
 					player.loseMaxHp();
 					player.loseToDiscardpile(cards);
 					if (cards.length > 4) player.turnOver();
+				},
+				ai: {
+					combo: "nsjiquan"
 				},
 			},
 			nszhihuang: {
@@ -14740,6 +14759,9 @@ game.import("character", function () {
 					"step 1";
 					player.loseToDiscardpile(result.links);
 					player.gain(trigger.cards.filterInD(), "gain2", "log");
+				},
+				ai: {
+					combo: "nsjiquan"
 				},
 			},
 			nszhihuang_damage: {
@@ -18580,6 +18602,9 @@ game.import("character", function () {
 						event.goto(1);
 					}
 				},
+				ai: {
+					combo: "nshuanxian"
+				},
 			},
 			nsshoudao: {
 				group: ["nsshoudao_gain", "nsshoudao_die"],
@@ -18659,6 +18684,9 @@ game.import("character", function () {
 							event.target.addSkillLog(result.control);
 						},
 					},
+				},
+				ai: {
+					combo: "nshuanxian"
 				},
 			},
 			nshuanxian: {

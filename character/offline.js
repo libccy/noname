@@ -6233,9 +6233,10 @@ game.import("character", function () {
 					if (event.lose && event.lose.loseHp) player.draw();
 				},
 				ai: {
+					halfneg: true,
 					filterDamage: true,
 					skillTagFilter: function (player, tag, arg) {
-						if (arg && arg.player) {
+						if (tag === "filterDamage" && arg && arg.player) {
 							if (arg.player.hasSkillTag("jueqing", false, player)) return false;
 						}
 					},

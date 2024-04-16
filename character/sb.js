@@ -4772,6 +4772,9 @@ game.import("character", function () {
 						},
 					},
 				},
+				ai: {
+					combo: "sbtiaoxin"
+				},
 			},
 			//刘备
 			sbrende: {
