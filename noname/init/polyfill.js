@@ -181,13 +181,17 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
 						break;
 					}
 				}
+			var sharename = name;
+			if(lib.ice_skinShare && lib.ice_skinShare[name] && lib.ice_skinShare[name].name){
+				sharename = lib.ice_skinShare[name].name;
+			}
 			if (extimage) src = extimage.replace(/^ext:/, "extension/");
 			else if (dbimage) {
 				this.setBackgroundDB(dbimage.slice(3));
 				return this;
 			} else if (modeimage) src = `image/mode/${modeimage}/character/${name}${ext}`;
 			else if (type == "character" && lib.config.skin[name] && arguments[2] != "noskin")
-				src = `image/skin/${name}/${lib.config.skin[name]}${ext}`;
+				src = `image/skin/${sharename}/${lib.config.skin[name]}${ext}`;
 			else if (type == "character") {
 				src = `image/character/${gzbool ? "gz_" : ""}${name}${ext}`;
 			} else src = `image/${type}/${subfolder}/${name}${ext}`;
