@@ -477,7 +477,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 					 */
 					let unZipProgress;
 					request(
-						"api.unitedrhythmized.club/noname",
+						"https://api.unitedrhythmized.club/noname",
 						(receivedBytes, total, filename) => {
 							if (typeof filename == "string") {
 								progress.setFileName(filename);
