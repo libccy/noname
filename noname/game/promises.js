@@ -65,6 +65,10 @@ export class GamePromises {
 			game.download(url, folder, resolve, reject, dev, onprogress);
 		});
 	}
+	/**
+	 * @param {string} filename
+	 * @returns {Promise<Buffer>}
+	 */
 	readFile(filename) {
 		return new Promise((resolve, reject) => {
 			// @ts-ignore
