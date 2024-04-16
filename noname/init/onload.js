@@ -21,6 +21,18 @@ export async function onload(resetGameTimeout) {
 
 	if (lib.config.touchscreen) createTouchDraggedFilter();
 
+	if(lib.config.skin_share){
+		const loadModule = async () => {
+			try {
+				const skinshare_module = await import('../../image/skinShare.js');
+				skinshare_module.skinshare_import(lib);
+			} catch (error) {
+				console.error('皮肤共享加载失败:', error);
+			}
+		};
+		loadModule();
+	}
+
 	// 不拆分，太玄学了
 	if (lib.config.card_style === "custom") {
 		const fileToLoad = await game.getDB("image", "card_style");
