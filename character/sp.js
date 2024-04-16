@@ -6910,6 +6910,9 @@ game.import("character", function () {
 					var stat = player.getStat().skill;
 					delete stat.gushe;
 				},
+				ai: {
+					combo: "gushe"
+				},
 			},
 			//OL刘老板
 			olpianan: {
@@ -21827,6 +21830,9 @@ game.import("character", function () {
 						},
 					},
 				},
+				ai: {
+					combo: "wylianji"
+				},
 			},
 			jingong: {
 				audio: 2,
@@ -27090,6 +27096,7 @@ game.import("character", function () {
 					content: "mark",
 				},
 				ai: {
+					neg: true,
 					effect: {
 						target: function (card, player, target, current) {
 							if (card.name == "sha") {
@@ -28756,6 +28763,9 @@ game.import("character", function () {
 					player.gainMaxHp();
 					player.recover();
 					player.changeSkills(["xiaoji"], ["liangzhu"]);
+				},
+				ai: {
+					combo: "liangzhu"
 				},
 			},
 			mingshi: {

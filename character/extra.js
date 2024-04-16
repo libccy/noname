@@ -4865,7 +4865,6 @@ game.import("character", function () {
 					},
 				},
 				ai: {
-					combo: "yingba",
 					effect: {
 						target(card, player, target) {
 							if (
