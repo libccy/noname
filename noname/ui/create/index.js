@@ -2562,8 +2562,9 @@ export class Create {
 			lib.arenaReady.shift()();
 		}
 		delete lib.arenaReady;
-		if (lib.config.auto_check_update) {
-			setTimeout(function () {
+		if (lib.config.auto_check_update && !sessionStorage.getItem("auto_check_update")) {
+			setTimeout(() => {
+				sessionStorage.setItem("auto_check_update", '1');
 				game.checkForUpdate(false);
 			}, 3000);
 		}

@@ -26,7 +26,7 @@ if (localStorage.getItem("noname_authorization")) {
  */
 export async function gainAuthorization() {
 	if (!localStorage.getItem("noname_authorization") && !sessionStorage.getItem("noname_authorization")) {
-		const result = await game.promises.prompt("请输入您github的token以解除访问每小时60次的限制");
+		const result = await game.promises.prompt("请输入您github的token以解除访问每小时60次的限制(可不输入)");
 		if (typeof result == "string") {
 			localStorage.setItem("noname_authorization", result);
 			defaultHeaders["Authorization"] = `token ${localStorage.getItem("noname_authorization")}`;
@@ -45,11 +45,17 @@ const defaultResponse = async (/** @type {Response} */ response) => {
 	// @ts-ignore
 	console.log(`限制重置时间`, new Date(reset * 1000).toLocaleString());
 	if (
-		Number(remaining) === 0 &&
-		!sessionStorage.getItem("noname_authorization") &&
-		confirm(`您达到了每小时${limit}次的访问限制，是否输入您github的token以获取更高的请求总量限制`)
+		(
+			Number(remaining) === 0 &&
+			!sessionStorage.getItem("noname_authorization") &&
+			confirm(`您达到了每小时${limit}次的访问限制，是否输入您github账号的token以获取更高的请求总量限制`)
+		) || (
+			response.status === 401 &&
+			(localStorage.removeItem("noname_authorization"), true) &&
+			(alert(`身份验证凭证错误，是否重新输入您github账号的token以获取更高的请求总量限制`), true)
+		)
 	) {
-		await gainAuthorization();
+		return gainAuthorization();
 	}
 };
 
@@ -168,9 +174,9 @@ export function checkVersion(ver1, ver2) {
  * ```
  */
 export async function getRepoTags(options = { username: "libccy", repository: "noname" }) {
-	if (!localStorage.getItem("noname_authorization")) {
-		await gainAuthorization();
-	}
+	// if (!localStorage.getItem("noname_authorization")) {
+	// 	await gainAuthorization();
+	// }
 	const { username = "libccy", repository = "noname", accessToken } = options;
 	const headers = Object.assign({}, defaultHeaders);
 	if (accessToken) {
@@ -203,9 +209,9 @@ export async function getRepoTags(options = { username: "libccy", repository: "n
  */
 
 export async function getRepoTagDescription(tagName, options = { username: "libccy", repository: "noname" }) {
-	if (!localStorage.getItem("noname_authorization")) {
-		await gainAuthorization();
-	}
+	// if (!localStorage.getItem("noname_authorization")) {
+	// 	await gainAuthorization();
+	// }
 	const { username = "libccy", repository = "noname", accessToken } = options;
 	const headers = Object.assign({}, defaultHeaders);
 	if (accessToken) {
@@ -267,9 +273,9 @@ export async function getRepoFilesList(
 	branch,
 	options = { username: "libccy", repository: "noname" }
 ) {
-	if (!localStorage.getItem("noname_authorization")) {
-		await gainAuthorization();
-	}
+	// if (!localStorage.getItem("noname_authorization")) {
+	// 	await gainAuthorization();
+	// }
 	const { username = "libccy", repository = "noname", accessToken } = options;
 	const headers = Object.assign({}, defaultHeaders);
 	if (accessToken) {
@@ -327,6 +333,9 @@ export async function flattenRepositoryFiles(
 	branch,
 	options = { username: "libccy", repository: "noname" }
 ) {
+	if (!localStorage.getItem("noname_authorization")) {
+		await gainAuthorization();
+	}
 	/**
 	 * @type { { download_url: string, name: string, path: string, sha: string, size: number, type: 'file' }[] }
 	 */
@@ -536,8 +545,6 @@ export function createProgress(title, max, fileName, value) {
  * @throws {Error} 如果获取操作失败或找不到有效tag，将抛出错误。
  */
 export async function getLatestVersionFromGitHub(owner = "libccy", repo = "noname") {
-	if (!localStorage.getItem("noname_authorization")) await gainAuthorization();
-
 	const tags = await getRepoTags({
 		username: owner,
 		repository: repo,
@@ -574,7 +581,7 @@ export async function getLatestVersionFromGitHub(owner = "libccy", repo = "nonam
  * @throws {Error} Will throw an error if unable to fetch the repository tree from GitHub.
  */
 export async function getTreesFromGithub(directories, version, owner = "libccy", repo = "noname") {
-	if (!localStorage.getItem("noname_authorization")) await gainAuthorization();
+	// if (!localStorage.getItem("noname_authorization")) await gainAuthorization();
 
 	const treesResponse = await fetch(
 		`https://api.github.com/repos/${owner}/${repo}/git/trees/${version}?recursive=1`,
@@ -582,7 +589,7 @@ export async function getTreesFromGithub(directories, version, owner = "libccy",
 			headers: defaultHeaders,
 		}
 	);
-
+	await defaultResponse(treesResponse);
 	if (!treesResponse.ok)
 		throw new Error(`Failed to fetch the GitHub repository tree: HTTP status ${treesResponse.status}`);
 	/**

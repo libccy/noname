@@ -14,12 +14,9 @@ import { ui, game, get, ai, lib, _status } from "../../../../../noname.js";
 import {
 	parseSize,
 	checkVersion,
-	getRepoTags,
 	getRepoTagDescription,
-	flattenRepositoryFiles,
 	request,
 	createProgress,
-	gainAuthorization,
 	getLatestVersionFromGitHub,
 	getTreesFromGithub,
 } from "../../../../library/update.js";
@@ -396,17 +393,17 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 			if (checkAssetButton.disabled) {
 				return;
 			} else if (game.download) {
-				if (
-					!localStorage.getItem("noname_authorization") &&
-					!sessionStorage.getItem("noname_authorization")
-				) {
-					if (
-						confirm(
-							"素材更新或许会直接超过每小时的访问限制，是否输入您github的token以解除访问每小时60次的限制？"
-						)
-					)
-						await gainAuthorization();
-				}
+				// if (
+				// 	!localStorage.getItem("noname_authorization") &&
+				// 	!sessionStorage.getItem("noname_authorization")
+				// ) {
+				// 	if (
+				// 		confirm(
+				// 			"素材更新或许会直接超过每小时的访问限制，是否输入您github的token以解除访问每小时60次的限制？"
+				// 		)
+				// 	)
+				// 		await gainAuthorization();
+				// }
 				checkAssetButton.innerHTML = "正在检查更新";
 				checkAssetButton.disabled = true;
 
@@ -419,8 +416,14 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				if (lib.config.asset_font) assetDirectories.push("font");
 				if (lib.config.asset_audio) assetDirectories.push("audio");
 				if (lib.config.asset_image) assetDirectories.push("image");
-				const version = await getLatestVersionFromGitHub();
-				const files = await getTreesFromGithub(assetDirectories, version);
+				const version = await getLatestVersionFromGitHub().catch(e => {
+					refresh();
+					throw e;
+				});
+				const files = await getTreesFromGithub(assetDirectories, version).catch(e => {
+					refresh();
+					throw e;
+				});
 
 				assetDirectories.forEach((assetDirectory, index) => {
 					const arr = files[index];
