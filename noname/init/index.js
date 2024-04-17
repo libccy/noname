@@ -469,14 +469,6 @@ export async function boot() {
 				extensionlist.push(config.get("extensions")[name]);
 			}
 		}
-	} else {
-		for (var name = 0; name < config.get("extensions").length; name++) {
-			if (Reflect.get(window, "bannedExtensions").includes(config.get("extensions")[name])) {
-				continue;
-			}
-			// @ts-ignore
-			game.import("extension", { name: config.get("extensions")[name] });
-		}
 	}
 
 	let layout = config.get("layout");
