@@ -124,6 +124,9 @@ export class Library {
 	onload = [];
 	onload2 = [];
 	onprepare = [];
+	/**
+	 * @type { Function[] | undefined }
+	 */
 	arenaReady = [];
 	onfree = [];
 	inpile = [];

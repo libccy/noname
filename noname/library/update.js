@@ -1,4 +1,4 @@
-import { ui, game } from "../../noname.js";
+import { ui, game, lib } from "../../noname.js";
 
 // https://github.com/libccy/noname/archive/refs/tags/v1.10.10.zip
 
@@ -21,9 +21,12 @@ if (localStorage.getItem("noname_authorization")) {
 	defaultHeaders["Authorization"] = `token ${localStorage.getItem("noname_authorization")}`;
 }
 
+/**
+ * 获取github授权的token
+ */
 export async function gainAuthorization() {
 	if (!localStorage.getItem("noname_authorization") && !sessionStorage.getItem("noname_authorization")) {
-		const result = await game.promises.prompt("请输入您github的token以解除访问每小时60次的限制");
+		const result = await game.promises.prompt("请输入您github的token以解除访问每小时60次的限制(可不输入)");
 		if (typeof result == "string") {
 			localStorage.setItem("noname_authorization", result);
 			defaultHeaders["Authorization"] = `token ${localStorage.getItem("noname_authorization")}`;
@@ -42,11 +45,17 @@ const defaultResponse = async (/** @type {Response} */ response) => {
 	// @ts-ignore
 	console.log(`限制重置时间`, new Date(reset * 1000).toLocaleString());
 	if (
-		Number(remaining) === 0 &&
-		!sessionStorage.getItem("noname_authorization") &&
-		confirm(`您达到了每小时${limit}次的访问限制，是否输入您github的token以获取更高的请求总量限制`)
+		(
+			Number(remaining) === 0 &&
+			!sessionStorage.getItem("noname_authorization") &&
+			confirm(`您达到了每小时${limit}次的访问限制，是否输入您github账号的token以获取更高的请求总量限制`)
+		) || (
+			response.status === 401 &&
+			(localStorage.removeItem("noname_authorization"), true) &&
+			(alert(`身份验证凭证错误，是否重新输入您github账号的token以获取更高的请求总量限制`), true)
+		)
 	) {
-		await gainAuthorization();
+		return gainAuthorization();
 	}
 };
 
@@ -85,9 +94,10 @@ export function parseSize(limit) {
 
 /**
  * 对比版本号
- * @param { string } ver1
- * @param { string } ver2
- * @returns { -1 | 0 | 1 }
+ * @param { string } ver1 版本号1
+ * @param { string } ver2 版本号2
+ * @returns { -1 | 0 | 1 } -1为ver1 < ver2, 0为ver1 == ver2, 1为ver1 > ver2
+ * @throws {Error}
  */
 export function checkVersion(ver1, ver2) {
 	if (typeof ver1 !== "string") ver1 = String(ver1);
@@ -164,9 +174,9 @@ export function checkVersion(ver1, ver2) {
  * ```
  */
 export async function getRepoTags(options = { username: "libccy", repository: "noname" }) {
-	if (!localStorage.getItem("noname_authorization")) {
-		await gainAuthorization();
-	}
+	// if (!localStorage.getItem("noname_authorization")) {
+	// 	await gainAuthorization();
+	// }
 	const { username = "libccy", repository = "noname", accessToken } = options;
 	const headers = Object.assign({}, defaultHeaders);
 	if (accessToken) {
@@ -199,9 +209,9 @@ export async function getRepoTags(options = { username: "libccy", repository: "n
  */
 
 export async function getRepoTagDescription(tagName, options = { username: "libccy", repository: "noname" }) {
-	if (!localStorage.getItem("noname_authorization")) {
-		await gainAuthorization();
-	}
+	// if (!localStorage.getItem("noname_authorization")) {
+	// 	await gainAuthorization();
+	// }
 	const { username = "libccy", repository = "noname", accessToken } = options;
 	const headers = Object.assign({}, defaultHeaders);
 	if (accessToken) {
@@ -243,7 +253,7 @@ export async function getRepoTagDescription(tagName, options = { username: "libc
 
 /**
  *
- * 获取仓库指定分支和指定目录内的所有文件和目录
+ * 获取仓库指定分支和指定(单个)目录内的所有文件和目录
  * @param { string } [path = ''] 路径名称(可放参数)
  * @param { string } [branch = ''] 仓库分支名称
  * @param { Object } options
@@ -263,9 +273,9 @@ export async function getRepoFilesList(
 	branch,
 	options = { username: "libccy", repository: "noname" }
 ) {
-	if (!localStorage.getItem("noname_authorization")) {
-		await gainAuthorization();
-	}
+	// if (!localStorage.getItem("noname_authorization")) {
+	// 	await gainAuthorization();
+	// }
 	const { username = "libccy", repository = "noname", accessToken } = options;
 	const headers = Object.assign({}, defaultHeaders);
 	if (accessToken) {
@@ -301,6 +311,9 @@ export async function getRepoFilesList(
 /**
  *
  * 获取仓库指定分支和指定目录内的所有文件(包含子目录的文件)
+ * 
+ * **注意： 此api可能会大幅度消耗请求次数，请谨慎使用**
+ * 
  * @param { string } [path = ''] 路径名称(可放参数)
  * @param { string } [branch = ''] 仓库分支名称
  * @param { Object } options
@@ -320,6 +333,9 @@ export async function flattenRepositoryFiles(
 	branch,
 	options = { username: "libccy", repository: "noname" }
 ) {
+	if (!localStorage.getItem("noname_authorization")) {
+		await gainAuthorization();
+	}
 	/**
 	 * @type { { download_url: string, name: string, path: string, sha: string, size: number, type: 'file' }[] }
 	 */
@@ -350,7 +366,7 @@ export async function flattenRepositoryFiles(
 }
 
 /**
- * 请求一个文件而不是直接储存为文件
+ * 请求一个文件而不是直接储存为文件，这样可以省内存空间
  * @param { string } url
  * @param { (receivedBytes: number, total?:number, filename?: string) => void } [onProgress]
  * @param { RequestInit } [options={}]
@@ -520,18 +536,15 @@ export function createProgress(title, max, fileName, value) {
 }
 
 /**
- * Retrieves the latest version tag from a GitHub repository, excluding a specific tag.
- * This function fetches the list of tags from the GitHub repository specified by
- * the owner and repository name, then returns the latest tag name that is not “v1998”.
- * @param {string} owner - The username or organization name on GitHub that owns the repository.
- * @param {string} repo - The name of the repository from which to fetch tags.
- * @returns {Promise<string>} A promise that resolves with the name of the latest version tag,
- * or rejects with an error if the operation fails.
- * @throws {Error} Will throw an error if the fetch operation fails or if no valid tags are found.
+ * 从GitHub存储库检索最新版本(tag)，不包括特定tag。
+ * 
+ * 此函数从GitHub存储库中获取由所有者和存储库名称指定的tags列表，然后返回不是“v1998”的最新tag名称。
+ * @param {string} owner GitHub上拥有存储库的用户名或组织名称。
+ * @param {string} repo 要从中提取tag的存储库的名称。
+ * @returns {Promise<string>} 以最新版本tag的名称解析的promise，或者如果操作失败则以错误拒绝。
+ * @throws {Error} 如果获取操作失败或找不到有效tag，将抛出错误。
  */
 export async function getLatestVersionFromGitHub(owner = "libccy", repo = "noname") {
-	if (!localStorage.getItem("noname_authorization")) await gainAuthorization();
-
 	const tags = await getRepoTags({
 		username: owner,
 		repository: repo,
@@ -539,18 +552,24 @@ export async function getLatestVersionFromGitHub(owner = "libccy", repo = "nonam
 
 	for (const tag of tags) {
 		const tagName = tag.name;
-		if (tagName !== "v1998") return tagName;
+		if (tagName === "v1998") continue;
+		try {
+			checkVersion(tagName, lib.version);
+			return tagName;
+		} catch {
+			// 非标准版本号
+		}
 	}
 
 	throw new Error("No valid tags found in the repository");
 }
 
 /**
- * Fetches trees from a GitHub repository within specified directories.
- * @param {string[]} directories - The list of directories to fetch the trees from.
- * @param {string} version - The version or branch to fetch the trees from.
- * @param {string} owner - The owner of the GitHub repository.
- * @param {string} repo - The name of the GitHub repository.
+ * 从指定目录中的GitHub存储库中获取树
+ * @param {string[]} directories 要从中获取树的目录列表
+ * @param {string} version 从中获取树的版本或分支。
+ * @param {string} [owner = 'libccy'] GitHub上拥有存储库的用户名或组织名称。
+ * @param {string} [repo = 'noname'] GitHub存储库的名称
  * @returns {Promise<{
  * 	path: string;
  * 	mode: string;
@@ -562,7 +581,7 @@ export async function getLatestVersionFromGitHub(owner = "libccy", repo = "nonam
  * @throws {Error} Will throw an error if unable to fetch the repository tree from GitHub.
  */
 export async function getTreesFromGithub(directories, version, owner = "libccy", repo = "noname") {
-	if (!localStorage.getItem("noname_authorization")) await gainAuthorization();
+	// if (!localStorage.getItem("noname_authorization")) await gainAuthorization();
 
 	const treesResponse = await fetch(
 		`https://api.github.com/repos/${owner}/${repo}/git/trees/${version}?recursive=1`,
@@ -570,7 +589,7 @@ export async function getTreesFromGithub(directories, version, owner = "libccy",
 			headers: defaultHeaders,
 		}
 	);
-
+	await defaultResponse(treesResponse);
 	if (!treesResponse.ok)
 		throw new Error(`Failed to fetch the GitHub repository tree: HTTP status ${treesResponse.status}`);
 	/**

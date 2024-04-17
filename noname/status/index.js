@@ -41,37 +41,41 @@ export class status {
 	prehidden_skills = [];
 	postReconnect = {};
 	/**
-	 * @type { string | void }
+	 * @type { string | undefined }
 	 */
 	extension = undefined;
 	/**
-	 * @type { boolean | void }
+	 * @type { boolean | undefined }
 	 */
 	dragged = undefined;
 	/**
-	 * @type { boolean | void }
+	 * @type { boolean | undefined }
 	 */
 	touchconfirmed = undefined;
 	/**
-	 * @type { boolean | void }
+	 * @type { boolean | undefined }
 	 */
 	connectMode = undefined;
 	/**
-	 * @type { boolean | void }
+	 * @type { boolean | undefined }
 	 */
 	importingExtension = undefined;
 	/**
-	 * @type { Promise<any>[] | void }
+	 * @type { Promise<any>[] | undefined }
 	 */
 	extensionLoaded = undefined;
 	/**
-	 * @type { Promise<any>[] | void }
+	 * @type { Promise<any>[] | undefined }
 	 */
 	extensionLoading = undefined;
 	/**
-	 * @type { { [key: string]: Promise<any>[] } | void }
+	 * @type { { [key: string]: Promise<any>[] } | undefined }
 	 */
 	importing = undefined;
+	/**
+	 * @type { Function | boolean | undefined }
+	 */
+	new_tutorial = undefined;
 }
 
 export let _status = new status();

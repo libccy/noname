@@ -14,12 +14,9 @@ import { ui, game, get, ai, lib, _status } from "../../../../../noname.js";
 import {
 	parseSize,
 	checkVersion,
-	getRepoTags,
 	getRepoTagDescription,
-	flattenRepositoryFiles,
 	request,
 	createProgress,
-	gainAuthorization,
 	getLatestVersionFromGitHub,
 	getTreesFromGithub,
 } from "../../../../library/update.js";
@@ -56,6 +53,9 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 	saveButton.style.display = "none";
 	saveButton.style.transition = "opacity 0.3s";
 
+	/**
+	 * @this { HTMLDivElement }
+	 */
 	var clickMode = function () {
 		if (this.classList.contains("off")) return;
 		var active = this.parentNode.querySelector(".active");
@@ -166,79 +166,17 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				checkDevVersionButton.disabled = true;
 				checkVersionButton.disabled = true;
 
-				function refresh() {
+				const refresh = () => {
 					checkVersionButton.disabled = false;
 					checkVersionButton.innerHTML = "检查游戏更新";
 					checkDevVersionButton.disabled = false;
 					checkDevVersionButton.innerHTML = "更新到开发版";
 				}
 
-				if (!dev) {
-					getRepoTags()
-						.then((tags) => tags.filter((tag) => tag.name != "v1998")[0])
-						.then((tag) => {
-							game.saveConfig("check_version", tag.name.slice(1));
-							if (typeof lib.config["version_description_" + tag.name] == "object") {
-								/** @type { ReturnType<import('../../../../library/update.js').getRepoTagDescription> } */
-								const description = lib.config["version_description_" + tag.name];
-								return description;
-							} else return getRepoTagDescription(tag.name);
-						})
-						.then((description) => {
-							// 保存版本信息
-							if (typeof lib.config["version_description_" + description.name] != "object") {
-								game.saveConfig("version_description_" + description.name, description);
-							}
-							const versionResult = checkVersion(lib.version, description.name);
-							if (versionResult === 0) {
-								// forcecheck: 为false的时候是自动检测更新的调用
-								if (forcecheck === false || !confirm("版本已是最新，是否强制更新？")) {
-									refresh();
-									return;
-								}
-							}
-							const str =
-								versionResult > 0
-									? `有新版本${description.name}可用，是否下载？`
-									: `本地版本${lib.version}高于或等于github版本${description.name}，是否强制下载？`;
-							const str2 = description.body;
-							if (navigator.notification && navigator.notification.confirm) {
-								navigator.notification.confirm(
-									str2,
-									function (index) {
-										if (index == 1) {
-											download(description);
-										} else refresh();
-									},
-									str,
-									["确定", "取消"]
-								);
-							} else {
-								if (confirm(str + "\n" + str2)) {
-									download(description);
-								} else refresh();
-							}
-						})
-						.catch((e) => {
-							alert("获取更新失败: " + e);
-							refresh();
-						});
-				} else {
-					if (confirm("将要直接下载dev版本的完整包，是否继续?")) {
-						download({
-							name: "noname-PR-Branch",
-							assets: [],
-							zipball_url:
-								"https://ghproxy.cc/https://github.com/libccy/noname/archive/PR-Branch.zip",
-						});
-					} else {
-						refresh();
-					}
-				}
 				/**
 				 * @param {{ assets: any; author?: { login: string; avatar_url: string; html_url: string; }; body?: string; html_url?: string; name: any; published_at?: string; zipball_url: any; }} description
 				 */
-				function download(description) {
+				const download = description => {
 					const progress = createProgress(
 						"正在更新" + description.name,
 						1,
@@ -333,7 +271,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 																.then(() => {
 																	cp.exec(
 																		`start /b ${__dirname}\\noname-server.exe -platform=electron`,
-																		() => {}
+																		() => { }
 																	);
 																	function loadURL() {
 																		let myAbortController =
@@ -385,6 +323,69 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 							throw e;
 						});
 				}
+
+				if (!dev) {
+					getLatestVersionFromGitHub()
+						.then(tagName => {
+							game.saveConfig("check_version", tagName.slice(1));
+							if (typeof lib.config[`version_description_${tagName}`] == "object") {
+								/** @type { ReturnType<import('../../../../library/update.js').getRepoTagDescription> } */
+								const description = lib.config[`version_description_${tagName}`];
+								return description;
+							}
+							else return getRepoTagDescription(tagName);
+						})
+						.then(description => {
+							// 保存版本信息
+							if (typeof lib.config["version_description_" + description.name] != "object") {
+								game.saveConfig("version_description_" + description.name, description);
+							}
+							const versionResult = checkVersion(lib.version, description.name);
+							if (versionResult === 0) {
+								// forcecheck: 为false的时候是自动检测更新的调用
+								if (forcecheck === false || !confirm("版本已是最新，是否强制更新？")) {
+									refresh();
+									return;
+								}
+							}
+							const str =
+								versionResult > 0
+									? `有新版本${description.name}可用，是否下载？`
+									: `本地版本${lib.version}高于或等于github版本${description.name}，是否强制下载？`;
+							const str2 = description.body;
+							if (navigator.notification && navigator.notification.confirm) {
+								navigator.notification.confirm(
+									str2,
+									function (index) {
+										if (index == 1) {
+											download(description);
+										} else refresh();
+									},
+									str,
+									["确定", "取消"]
+								);
+							} else {
+								if (confirm(str + "\n" + str2)) {
+									download(description);
+								} else refresh();
+							}
+						})
+						.catch((e) => {
+							alert("获取更新失败: " + e);
+							refresh();
+						});
+				} else {
+					if (confirm("将要直接下载dev版本的完整包，是否继续?")) {
+						download({
+							name: "noname-PR-Branch",
+							assets: [],
+							zipball_url:
+								"https://ghproxy.cc/https://github.com/libccy/noname/archive/PR-Branch.zip",
+						});
+					} else {
+						refresh();
+					}
+				}
 			}
 		};
 
@@ -392,21 +393,21 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 			if (checkAssetButton.disabled) {
 				return;
 			} else if (game.download) {
-				if (
-					!localStorage.getItem("noname_authorization") &&
-					!sessionStorage.getItem("noname_authorization")
-				) {
-					if (
-						confirm(
-							"素材更新或许会直接超过每小时的访问限制，是否输入您github的token以解除访问每小时60次的限制？"
-						)
-					)
-						await gainAuthorization();
-				}
+				// if (
+				// 	!localStorage.getItem("noname_authorization") &&
+				// 	!sessionStorage.getItem("noname_authorization")
+				// ) {
+				// 	if (
+				// 		confirm(
+				// 			"素材更新或许会直接超过每小时的访问限制，是否输入您github的token以解除访问每小时60次的限制？"
+				// 		)
+				// 	)
+				// 		await gainAuthorization();
+				// }
 				checkAssetButton.innerHTML = "正在检查更新";
 				checkAssetButton.disabled = true;
 
-				function refresh() {
+				const refresh = () => {
 					checkAssetButton.innerHTML = "检查素材更新";
 					checkAssetButton.disabled = false;
 				}
@@ -415,8 +416,14 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				if (lib.config.asset_font) assetDirectories.push("font");
 				if (lib.config.asset_audio) assetDirectories.push("audio");
 				if (lib.config.asset_image) assetDirectories.push("image");
-				const version = await getLatestVersionFromGitHub();
-				const files = await getTreesFromGithub(assetDirectories, version);
+				const version = await getLatestVersionFromGitHub().catch(e => {
+					refresh();
+					throw e;
+				});
+				const files = await getTreesFromGithub(assetDirectories, version).catch(e => {
+					refresh();
+					throw e;
+				});
 
 				assetDirectories.forEach((assetDirectory, index) => {
 					const arr = files[index];
@@ -432,18 +439,28 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				 * @param { (value: T) => Promise<boolean> } predicate
 				 */
 				const asyncFilter = async (arr, predicate) => {
-					const results = await Promise.all(arr.map(predicate));
+					//将arr每10个分为一个数组，分别使用Promise.all
+					/** @type { boolean[] } */
+					const results = [];
+					for (let i = 0; i < arr.length; i += 10) {
+						const pushArr = arr.slice(i, i + 10);
+						results.push(
+							...await Promise.all(pushArr.map(predicate))
+						);
+					}
 					return arr.filter((_v, index) => results[index]);
 				};
 
-				const result = await asyncFilter(files.flat(), async (v) => {
-					return v.size != (await game.promises.readFile(v.path)).length;
-				}).then((arr) => arr.map((v) => v.path));
+				const result = await asyncFilter(files.flat(), async v => {
+					return game.promises.readFile(v.path).then(data => {
+						return v.size != data.byteLength;
+					})
+				}).then(arr => arr.map((v) => v.path));
 
 				console.log("需要更新的文件有:", result);
 				game.print("需要更新的文件有:", result);
 				const finish = async () => {
-					await lib.init.promises.js("game", "asset.js");
+					await lib.init.promises.js("game", "asset");
 					if (Array.isArray(window.noname_asset_list)) {
 						game.saveConfig("asset_version", window.noname_asset_list[0]);
 						delete window.noname_asset_list;
@@ -460,7 +477,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 					 */
 					let unZipProgress;
 					request(
-						"api.unitedrhythmized.club/noname",
+						"https://api.unitedrhythmized.club/noname",
 						(receivedBytes, total, filename) => {
 							if (typeof filename == "string") {
 								progress.setFileName(filename);
