@@ -469,7 +469,7 @@ export async function boot() {
 				extensionlist.push(config.get("extensions")[name]);
 			}
 		}
-	} else {
+	} else if (!localStorage.getItem(lib.configprefix + 'directstart')) {
 		for (var name = 0; name < config.get("extensions").length; name++) {
 			if (Reflect.get(window, "bannedExtensions").includes(config.get("extensions")[name])) {
 				continue;
