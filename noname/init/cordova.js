@@ -63,7 +63,7 @@ export async function cordovaReady() {
 							request: request,
 							hasPermission: status.hasPermission
 						});
-					}, lib.other.ignore);
+					}, reject);
 				});
 			})).then(shouldRequestPermissions => {
 				return shouldRequestPermissions
@@ -75,7 +75,7 @@ export async function cordovaReady() {
 					lib.other.ignore,
 					lib.other.ignore
 				);
-			});
+			}).catch(console.log);
 		}
 	}
 	game.download = function (url, folder, onsuccess, onerror, dev, onprogress) {
