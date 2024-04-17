@@ -68,7 +68,7 @@ export async function cordovaReady() {
 			})).then(shouldRequestPermissions => {
 				return shouldRequestPermissions
 					.filter(({ hasPermission }) => !hasPermission)
-					.map(({ request }) => permissions[request]);
+					.map(({ request }) => permissions[request] || `android.permission.${request}`);
 			}).then(willRequestPermissions => {
 				permissions.requestPermissions(
 					willRequestPermissions,
