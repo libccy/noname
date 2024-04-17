@@ -1,5 +1,5 @@
 window.noname_update = {
-	version: "1.10.11",
+	version: "1.10.11.1",
 	update: "NULL", //新版本更新文件较多，直接强制进行全量更新
 	changeLog: [
 		"整合@Rintim @mengxinzxz @nonameShijian @lieren2023 @itsnoteasytonameaccount @kuangshen04 @IceCola97 @PZ157 @universe-st @Iking123 @copcap @nineMangos 的Pull Request",
