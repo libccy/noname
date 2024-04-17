@@ -394,8 +394,6 @@ game.import("character", function () {
 				"南华老仙，是古典小说《三国演义》中的虚拟人物。其原型来自道教典籍中对庄子的封号，又称“南华仙人”、“南华真人”等。在古典小说《三国演义》通行本的第一回中，描述了南华老仙将《太平要术》赠送给张角的情节。",
 			chenzhen:
 				"陈震（？—公元235年），字孝起。荆州南阳郡（今河南南阳）人。三国时期蜀汉官员。刘备领荆州牧时，辟陈震为从事。后随刘备入蜀，为蜀郡北部都尉、汶山太守、犍为太守。建兴三年（225年），拜尚书，迁尚书令。建兴七年（229年），孙权称帝。蜀汉以陈震为卫尉，前往祝贺，与孙权开坛歃盟，交分天下。还蜀，封城阳亭侯。建兴十三年（235年），卒。",
-			nanhualaoxian:
-				"南华老仙，其原型来自道教典籍中对庄子的封号，又称“南华仙人”、“南华真人”等。在古典小说《三国演义》通行本的第一回中，描述了南华老仙将《太平要术》赠送给张角的情节。",
 			hucheer:
 				"胡车儿（生卒年不详），东汉末年武将，初从张绣，为其心腹猛将，勇冠三军，与贾诩交情甚佳。宛城大战后，张绣投降曹操，曹操爱胡车儿之骁勇，手以黄金与之。后因曹操私纳张绣亡叔张济的遗孀邹氏，张绣深感其辱，欲杀曹操，与贾诩商议后决心反曹。《三国演义》中，作者考虑到典韦的勇猛，便增加了令胡车儿盗走典韦的双戟的情节。最终典韦、曹昂（曹操长子）、曹安民（曹操侄子）皆死于此次战斗。野史说胡车儿跟随曹操征战，被赵云在长坂坡上红枪挑死。",
 			simashi:
@@ -660,7 +658,6 @@ game.import("character", function () {
 			},
 			mbshishou: {
 				audio: 2,
-				forced: true,
 				trigger: { player: "useSkillAfter" },
 				filter(event, player) {
 					return event.skill === "mbzuoyou" && !event.targets.includes(player);
@@ -2714,7 +2711,6 @@ game.import("character", function () {
 				},
 				forced: true,
 				popup: false,
-				onremove: true,
 				firstDo: true,
 				init: function (player, skill) {
 					player.storage[skill] = 0;
@@ -10578,23 +10574,6 @@ game.import("character", function () {
 			//钟会
 			requanji: {
 				audio: 2,
-				mod: {
-					aiOrder: (player, card, num) => {
-						if (
-							num <= 0 ||
-							typeof card !== "object" ||
-							!player.isPhaseUsing() ||
-							!player.hasSkill("zili") ||
-							player.needsToDiscard()
-						)
-							return num;
-						if (
-							player.getExpansions("quanji").length < 3 &&
-							player.getUseValue(card) < Math.min(4, (player.hp * player.hp) / 4)
-						)
-							return 0;
-					},
-				},
 				trigger: { player: ["damageEnd", "phaseUseEnd"] },
 				frequent: true,
 				locked: false,
@@ -10634,8 +10613,23 @@ game.import("character", function () {
 					}
 				},
 				mod: {
-					maxHandcard: function (player, num) {
+					maxHandcard(player, num) {
 						return num + player.getExpansions("quanji").length;
+					},
+					aiOrder(player, card, num) {
+						if (
+							num <= 0 ||
+							typeof card !== "object" ||
+							!player.isPhaseUsing() ||
+							!player.hasSkill("zili") ||
+							player.needsToDiscard()
+						)
+							return num;
+						if (
+							player.getExpansions("quanji").length < 3 &&
+							player.getUseValue(card) < Math.min(4, (player.hp * player.hp) / 4)
+						)
+							return 0;
 					},
 				},
 				onremove: function (player, skill) {
@@ -21077,10 +21071,6 @@ game.import("character", function () {
 			pangdegong_prefix: "手杀",
 			zhaotongzhaoguang: "手杀赵统赵广",
 			zhaotongzhaoguang_prefix: "手杀",
-			re_liru: "手杀界李儒",
-			re_liru_prefix: "手杀界",
-			re_chenqun: "手杀界陈群",
-			re_chenqun_prefix: "手杀界",
 			re_liru: "手杀界李儒",
 			re_liru_prefix: "手杀界",
 			re_chenqun: "手杀界陈群",
