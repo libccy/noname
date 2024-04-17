@@ -143,6 +143,7 @@ game.import("character", function () {
 					"sp_zhangliao",
 					"sp_ol_zhanghe",
 					"sp_menghuo",
+					'sp_sunce',
 				],
 				sp_qifu: [
 					"ol_feiyi",
@@ -188,6 +189,7 @@ game.import("character", function () {
 			},
 		},
 		character: {
+			sp_sunce:['male','qun',4,['olliantao']],
 			ol_liupi: ["male", "qun", 4, ["olyicheng"]],
 			ol_lukai: ["male", "wu", 3, ["olxuanzhu", "oljiane"]],
 			liupan: ["male", "qun", 4, ["olpijing"]],
@@ -965,6 +967,121 @@ game.import("character", function () {
 			},
 		},
 		skill: {
+			//SP孙策
+			olliantao:{
+				audio:2,
+				trigger:{player:'phaseUseBegin'},
+				filter(event,player){
+					return game.hasPlayer(target=>target!=player);
+				},
+				async cost(event,trigger,player){
+					event.result=await player.chooseTarget(get.prompt2('olliantao'),lib.filter.notMe).set('ai',target=>{
+						const player=get.event('player'),att=get.attitude(player,target);
+						const colors=Object.keys(lib.color).filter(i=>i!='none');
+						if(!colors.some(color=>player.hasCard(card=>{
+							const juedou=get.autoViewAs({name:'juedou'},[card]);
+							return player.canUse(juedou,target,false);
+						},'h'))) return 20+(3-get.sgn(att))+Math.random();
+						const effs=colors.reduce((list,color)=>{
+							const cards=player.getCards('h',card=>{
+								const juedou=get.autoViewAs({name:'juedou'},[card]);
+								return player.canUse(juedou,target,false);
+							});
+							if(cards.length){
+								list.push(cards.reduce((sum,card)=>{
+									const juedou=get.autoViewAs({name:'juedou'},[card]);
+									return sum+get.effect(target,card,player,player);
+								},0));
+							}
+							return list;
+						},[]);
+						return Math[att>0?'max':'min'].apply(Math,list);
+					}).forResult();
+				},
+				async content(event,trigger,player){
+					const target=event.targets[0];
+					const colors=Object.keys(lib.color).filter(i=>i!='none');
+					if(colors.length&&player.countCards('h')){
+						const result=await target.chooseControl(colors)
+						.set('prompt','连讨：请选择一个颜色').set('ai',()=>{
+							const player=get.event('player'),source=get.event().getParent().player;
+							let controls=get.event('controls').slice();
+							if(controls.length==1) return controls[0];
+							const getSum=function(color,player,source){
+								return source.getCards('h',card=>{
+									if(get.color(card)!=color) return false;
+									const juedou=get.autoViewAs({name:'juedou'},[card]);
+									return source.canUse(juedou,player,false);
+								}).reduce((num,card)=>{
+									const juedou=get.autoViewAs({name:'juedou'},[card]);
+									return num+get.effect(player,card,source,player);
+								},0);
+							};
+							return controls.sort((a,b)=>getSum(b,player,source)-getSum(a,player,source))[0];
+						}).set('prompt2',get.translation(player)+'将对你依次使用由其手牌中所有此颜色的牌转化的【决斗】').forResult();
+						const color=result.control;
+						game.broadcastAll((color,target)=>{
+							lib.skill.olliantao_backup.filterCardx=[color,target];
+							lib.skill.olliantao_backup.filterCard=function(card,player){
+								const list=lib.skill.olliantao_backup.filterCardx;
+								if(get.color(card)!=list[0]) return false;
+								const juedou=get.autoViewAs({name:'juedou'},[card]);
+								return player.canUse(juedou,list[1],false);
+							};
+						},color,target);
+						while(target.isIn()&&player.hasCard(card=>lib.skill.olliantao_backup.filterCard(card,player))&&!game.getGlobalHistory('everything',evt=>{
+							return evt.name=='dying'&&[player,target].includes(evt.player)&&evt.getParent('olliantao')==event;
+						}).length){
+							await player.chooseToUse().set('forced',true)
+							.set('openskilldialog','连讨：将一张'+get.translation(color)+'手牌当作【决斗】对'+get.translation(target)+'使用')
+							.set('norestore',true).set('_backupevent','olliantao_backup').set('custom',{
+								add:{},
+								replace:{window:function(){}},
+							}).backup('olliantao_backup').set('targetRequired',true).set('complexSelect',true)
+							.set('filterTarget',function(card,player,target){
+								if(target!=_status.event.sourcex&&!ui.selected.targets.includes(_status.event.sourcex)) return false;
+								return lib.filter.targetEnabled.apply(this, arguments);
+							}).set('sourcex',target).set('addCount',false);
+						}
+					}
+					const num=player.getHistory('sourceDamage',evt=>{
+						return evt.getParent(4)==event;
+					}).reduce((sum,evt)=>sum+evt.num,0);
+					if(num) await player.draw(num);
+					if(!game.hasPlayer2(current=>{
+						return current.getHistory('damage',evt=>{
+							return evt.getParent(4)==event;
+						}).length;
+					})){
+						await player.draw(3);
+						player.addTempSkill('olliantao_buff');
+						player.addMark('olliantao_buff',3,false);
+					}
+				},
+				subSkill:{
+					backup:{
+						viewAs:{name:'juedou'},
+						position:'h',
+						check:()=>1+Math.random(),
+						precontent(){
+							delete event.result.skill;
+						},
+					},
+					buff:{
+						charlotte:true,
+						onremove:true,
+						mod:{
+							maxHandcard(player,num){
+								return num+player.countMark('olliantao_buff');
+							},
+							cardEnabled(card){
+								if(card.name=='sha') return false;
+							},
+						},
+						intro:{content:'手牌上限+#，不能使用【杀】'},
+					},
+				},
+			},
 			//刘辟
 			olyicheng: {
 				audio: 2,
@@ -34388,6 +34505,10 @@ game.import("character", function () {
 			olyicheng: "易城",
 			olyicheng_info:
 				"出牌阶段限一次，你可以亮出牌堆顶的三张牌，然后你可以以任意手牌交换这些牌，若这三张牌的点数和因此增加，则你可以选择用所有手牌交换这三张牌。最后你将这三张牌置于牌堆顶。",
+			sp_sunce:'SP孙策',
+			sp_sunce_prefix:'SP',
+			olliantao:'连讨',
+			olliantao_info:'出牌阶段开始时，你可以令一名其他角色选择一个颜色，然后你依次将此颜色的所有手牌当作【决斗】对其使用直到有一方进入濒死状态，然后你摸X张牌（X为你本次以此法造成的伤害数）。若没有角色因本次技能结算受到伤害，你摸三张牌，本回合手牌上限+3且本回合你不能使用【杀】。',
 
 			sp_tianji: "天极·皇室宗亲",
 			sp_sibi: "四弼·辅国文曲",
