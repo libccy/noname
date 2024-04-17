@@ -454,7 +454,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				const result = await asyncFilter(files.flat(), async v => {
 					return game.promises.readFile(v.path).then(data => {
 						return v.size != data.byteLength;
-					})
+					}).catch(()=>true)
 				}).then(arr => arr.map((v) => v.path));
 
 				console.log("需要更新的文件有:", result);
