@@ -1008,8 +1008,7 @@ game.import("character", function () {
 							let controls=get.event('controls').slice();
 							if(controls.length==1) return controls[0];
 							const getSum=function(color,player,source){
-								let sum=0;
-								sum+=source.getCards('h',card=>{
+								return source.getCards('h',card=>{
 									if(get.color(card)!=color) return false;
 									const juedou=get.autoViewAs({name:'juedou'},[card]);
 									return source.canUse(juedou,player,false);
@@ -1017,7 +1016,6 @@ game.import("character", function () {
 									const juedou=get.autoViewAs({name:'juedou'},[card]);
 									return num+get.effect(player,card,source,player);
 								},0);
-								return sum*get.sgn(get.sgn(get.attitude(player,source))-0.5);
 							};
 							return controls.sort((a,b)=>getSum(b,player,source)-getSum(a,player,source))[0];
 						}).set('prompt2',get.translation(player)+'将对你依次使用由其手牌中所有此颜色的牌转化的【决斗】').forResult();
