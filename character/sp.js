@@ -1048,7 +1048,7 @@ game.import("character", function () {
 						return evt.getParent(4)==event;
 					}).reduce((sum,evt)=>sum+evt.num,0);
 					if(num) await player.draw(num);
-					if(!game.hasPlayer(current=>{
+					if(!game.hasPlayer2(current=>{
 						return current.getHistory('damage',evt=>{
 							return evt.getParent(4)==event;
 						}).length;
