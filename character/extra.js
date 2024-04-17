@@ -891,6 +891,21 @@ game.import("character", function () {
 							game.swapSeat(list[0], list[1], false);
 						}
 					}, toSwapList);
+					if(!game.hasPlayer(target=>target.isZhu2())){
+						const AfterSortPlayers=game.filterPlayer();
+						if(AfterSortPlayers.length){
+							AfterSortPlayers.sortBySeat(game.findPlayer2((current)=>current.getSeatNum()==1,true));
+							const target=AfterSortPlayers[0];
+							if(target!=trigger.player){
+								while(_status.event.name!='phaseLoop'){
+									_status.event=_status.event.parent;
+								}
+								_status.paused=false;
+								_status.event.player=target;
+								_status.event.step=0;
+							}
+						}
+					}
 					await game.asyncDelay();
 				},
 			},
