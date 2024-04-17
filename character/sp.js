@@ -990,7 +990,7 @@ game.import("character", function () {
 							if(cards.length){
 								list.push(cards.reduce((sum,card)=>{
 									const juedou=get.autoViewAs({name:'juedou'},[card]);
-									return sum+get.effect(target,card,player,player);
+									return sum+get.effect(target,juedou,player,player);
 								},0));
 							}
 							return list;
@@ -1014,7 +1014,7 @@ game.import("character", function () {
 									return source.canUse(juedou,player,false);
 								}).reduce((num,card)=>{
 									const juedou=get.autoViewAs({name:'juedou'},[card]);
-									return num+get.effect(player,card,source,player);
+									return num+get.effect(player,juedou,source,player);
 								},0);
 							};
 							return controls.sort((a,b)=>getSum(b,player,source)-getSum(a,player,source))[0];
