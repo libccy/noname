@@ -899,8 +899,9 @@ game.import("character", function () {
 				audio: 2,
 				trigger: { player: "phaseAfter" },
 				filter(event, player) {
-					return game.hasPlayer((current) => {
-						return current.countCards("h") + player.countCards("h") > 0 && player != current;
+					return game.hasPlayer(target => {
+						if(target==player||target.countCards('h')+player.countCards('h')==0) return false;
+						return get.mode()=='identity'||target.countCards('h')<=player.countCards('h')+1;
 					});
 				},
 				direct: true,
@@ -912,9 +913,8 @@ game.import("character", function () {
 							get.prompt("zhimeng"),
 							"与一名其他角色平分手牌",
 							(card, player, target) => {
-								return (
-									target.countCards("h") + player.countCards("h") > 0 && player != target
-								);
+								if(target==player||target.countCards('h')+player.countCards('h')==0) return false;
+								return get.mode()=='identity'||target.countCards('h')<=player.countCards('h')+1;
 							}
 						)
 						.set("ai", (target) => {
@@ -10816,8 +10816,8 @@ game.import("character", function () {
 			tamo: "榻谟",
 			tamo_info: "游戏开始时，你可以重新分配除主公外所有角色的座次。",
 			zhimeng: "智盟",
-			zhimeng_info:
-				"回合结束后，你可以与一名其他角色将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。",
+			zhimeng_info_identity:'回合结束后，你可以选择一名其他角色。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
+			zhimeng_info:'回合结束后，你可以选择一名手牌数不大于Y的其他角色（Y为你的手牌数+1）。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
 			shen_xuzhu: "神许褚",
 			shen_xuzhu_prefix: "神",
 			zhengqing: "争擎",

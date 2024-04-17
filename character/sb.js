@@ -890,7 +890,7 @@ game.import("character", function () {
 					} = await player
 						.chooseTarget(
 							get.prompt("sbjieming"),
-							`令一名角色摸三张牌，然后其可以弃置任意张牌。若其弃置的牌数不大于${get.cnNumber(
+							`令一名角色摸四张牌，然后其可以弃置任意张牌。若其弃置的牌数不大于${get.cnNumber(
 								num
 							)}张，你失去1点体力。`
 						)
@@ -921,7 +921,7 @@ game.import("character", function () {
 					if (!bool) return;
 					const target = targets[0];
 					player.logSkill("sbjieming", target);
-					await target.draw(3);
+					await target.draw(4);
 					num = Math.max(1, player.getDamagedHp());
 					const {
 						result: { bool: bool2, cards },
@@ -8984,7 +8984,7 @@ game.import("character", function () {
 				"出牌阶段限一次。你可以选择两名有牌的其他角色，你与这些角色同时将任意张牌扣置于武将牌上。若你以此法扣置的牌唯一最少，则扣置牌最多的其他角色获得你扣置的牌，且这些角色获得各自扣置的牌；否则这两名角色中扣置牌较多的角色对较少的角色造成1点伤害，获得你扣置的牌，然后这些角色将各自扣置的牌置入弃牌堆（若这两名角色扣置的牌数相同，视为与你逆时针最近座次的角色扣置牌较多）。",
 			sbjieming: "节命",
 			sbjieming_info:
-				"当你受到伤害后，你可以令一名角色摸三张牌，然后其可以弃置任意张牌。若其弃置的牌数不大于X，你失去1点体力（X为你已损失的体力值，至少为1）。",
+				"当你受到伤害后，你可以令一名角色摸四张牌，然后其可以弃置任意张牌。若其弃置的牌数不大于X，你失去1点体力（X为你已损失的体力值，至少为1）。",
 			sb_xiahoudun: "谋夏侯惇",
 			sb_xiahoudun_prefix: "谋",
 			sbganglie: "刚烈",
