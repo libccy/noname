@@ -1248,14 +1248,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				next.setContent(function () {
 					"step 0";
 					ui.arena.classList.add("choose-character");
-					for (var i in lib.skill) {
-						if (lib.skill[i].changeSeat) {
-							lib.skill[i] = {};
-							if (lib.translate[i + "_info"]) {
-								lib.translate[i + "_info"] = "此模式下不可用";
-							}
-						}
-					}
+					// for (var i in lib.skill) {
+					// 	if (lib.skill[i].changeSeat) {
+					// 		lib.skill[i] = {};
+					// 		if (lib.translate[i + "_info"]) {
+					// 			lib.translate[i + "_info"] = "此模式下不可用";
+					// 		}
+					// 	}
+					// }
 					var bool = Math.random() < 0.5;
 					var bool2 = Math.random() < 0.5;
 					var ref = game.players[0];
