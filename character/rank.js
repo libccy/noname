@@ -1,6 +1,6 @@
 window.noname_character_rank = {
 	s: [
-		'sp_sunce',
+		"sp_sunce",
 		"gjqt_bailitusu",
 		"gjqt_beiluo",
 		"gjqt_xieyi",
@@ -1720,7 +1720,7 @@ window.noname_character_rank = {
 	],
 	rarity: {
 		legend: [
-			'sp_sunce',
+			"sp_sunce",
 			"star_caoren",
 			"dc_zhaoyun",
 			"dc_caocao",
