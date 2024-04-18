@@ -753,6 +753,7 @@ game.import("character", function () {
 				},
 				direct: true,
 				changeSeat: true,
+				derivation: "tamo_faq",
 				async content(event, trigger, player) {
 					const toSortPlayers = game.filterPlayer((current) => !current.isZhu2());
 					toSortPlayers.sortBySeat(game.findPlayer2((current) => current.getSeatNum() == 1, true));
@@ -870,7 +871,7 @@ game.import("character", function () {
 					});
 					const { result } = await next;
 					if (!result.bool) return;
-					player.logSkill("tamo");
+					await player.logSkill("tamo");
 					const resultList = result.moved[0].map((info) => {
 						return parseInt(info.split("|")[0]);
 					});
@@ -1183,7 +1184,6 @@ game.import("character", function () {
 										default:
 											return false;
 									}
-									break;
 							}
 						},
 						forced: true,
