@@ -1058,6 +1058,9 @@ game.import("character", function () {
 							})
 					);
 				},
+				ai: {
+					combo: "mbqianlong"
+				},
 			},
 			mbcmqingzheng: {
 				audio: "sbqingzheng",
@@ -14206,6 +14209,9 @@ game.import("character", function () {
 						evt.targets.remove(player);
 						evt.targets.push(target);
 					}
+				},
+				ai: {
+					combo: "zhengjian"
 				},
 			},
 			//一 将 成 名
