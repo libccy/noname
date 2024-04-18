@@ -9416,6 +9416,9 @@ game.import("character", function () {
 						}
 					}
 				},
+				ai: {
+					combo: "nzry_junlve"
+				},
 			},
 			nzry_dinghuo: {
 				audio: 2,
