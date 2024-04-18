@@ -2989,7 +2989,7 @@ game.import("card", function () {
 								cf = Math.pow(get.threaten(target, player), 2);
 							if (!num) return -0.01 * cf;
 							if (target.hp > 2) num--;
-							let dist = Math.sqrt(get.distance(player, target, "absolute"));
+							let dist = Math.sqrt(1 + get.distance(player, target, "absolute"));
 							if (dist < 1) dist = 1;
 							if (target.isTurnedOver()) dist++;
 							return (Math.min(-0.1, -num) * cf) / dist;
