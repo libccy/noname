@@ -892,7 +892,7 @@ game.import("character", function () {
 							game.swapSeat(list[0], list[1], false);
 						}
 					}, toSwapList);
-					if (trigger.name === "phase" && trigger.player !== toSortPlayers[0] && !trigger._finished) {
+					if (trigger.name === "phase" && !trigger.player.isZhu2() && trigger.player !== toSortPlayers[0] && !trigger._finished) {
 						trigger.finish();
 						trigger._triggered = 5;
 						const evt = toSortPlayers[0].insertPhase();
