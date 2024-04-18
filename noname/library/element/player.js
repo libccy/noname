@@ -4776,6 +4776,11 @@ export class Player extends HTMLDivElement {
 		if (next.filterCard == undefined) next.filterCard = lib.filter.all;
 		if (next.selectCard == undefined) next.selectCard = [1, 1];
 		if (next.ai == undefined) next.ai = get.unuseful3;
+		next.autochoose = function () {
+			if (!this.forced) return false;
+			if (typeof this.selectCard == "function") return false;
+			return get.select(this.selectCard)[0] >= this.player.countCards(this.position);
+		};
 		next.setContent("chooseCard");
 		next._args = Array.from(arguments);
 		return next;
