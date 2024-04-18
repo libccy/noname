@@ -1907,10 +1907,9 @@ game.import("character", function () {
 					if (name == "damageSource" && player.getHistory("sourceDamage").indexOf(event) != 0)
 						return false;
 					return game.hasPlayer((target) => {
-						if (get.mode() != "doudizhu") {
-							if (name == "damageEnd" && get.distance(player, target) <= 2) return false;
-							if (name == "damageSource" && get.distance(player, target) > 2) return false;
-						}
+						const num = (get.mode() == 'doudizhu' ? 1 : 2);
+						if (name == "damageEnd" && get.distance(player, target) <= num) return false;
+						if (name == "damageSource" && get.distance(player, target) > num) return false;
 						const zhoufa = player.storage.zhoulin_zhoufa;
 						if (!zhoufa) return true;
 						if (zhoufa == "豹" || zhoufa == "兔") return true;
@@ -1931,7 +1930,7 @@ game.import("character", function () {
 						: "令其随机执行一个效果";
 					const nodoudizhu =
 						get.mode() == "doudizhu"
-							? ""
+							? "距离" + (event.triggername == "damageEnd" ? "" : "不") + "大于1的"
 							: "距离" + (event.triggername == "damageEnd" ? "" : "不") + "大于2的";
 					const {
 						result: { bool, targets },
@@ -1941,12 +1940,9 @@ game.import("character", function () {
 							"选择一名" + nodoudizhu + "角色，" + str,
 							(card, player, target) => {
 								const name = _status.event.triggername;
-								if (get.mode() != "doudizhu") {
-									if (name == "damageEnd" && get.distance(player, target) <= 2)
-										return false;
-									if (name == "damageSource" && get.distance(player, target) > 2)
-										return false;
-								}
+								const num = (get.mode() == 'doudizhu' ? 1 : 2);
+								if (name == "damageEnd" && get.distance(player, target) <= num) return false;
+								if (name == "damageSource" && get.distance(player, target) > num) return false;
 								const zhoufa = player.storage.zhoulin_zhoufa;
 								if (!zhoufa) return true;
 								if (zhoufa == "豹" || zhoufa == "兔") return true;
@@ -20043,7 +20039,7 @@ game.import("character", function () {
 			},
 			shoufa: function (player) {
 				const zhoufa = player.storage.zhoulin_zhoufa;
-				const nodoudizhu = get.mode() == "doudizhu" ? "" : "与你距离大于/不大于2的";
+				const nodoudizhu = get.mode() == "doudizhu" ? "与你距离大于/不大于1的" : "与你距离大于/不大于2的";
 				if (!zhoufa)
 					return (
 						"当你受到伤害后/于一回合首次造成伤害后，你可以选择一名" +
@@ -21157,7 +21153,7 @@ game.import("character", function () {
 			shoufa_info:
 				"当你受到伤害后/于一回合首次造成伤害后，你可以选择一名与你距离大于/不大于2的角色，令其随机执行以下一项：豹，令其受到1点无来源伤害；鹰，你随机获得其一张牌；熊，你随机弃置其装备区的一张牌；兔，令其摸一张牌。",
 			shoufa_info_doudizhu:
-				"当你受到伤害后/于一回合首次造成伤害后，你可以选择一名角色，令其随机执行以下一项：豹，令其受到1点无来源伤害；鹰，你随机获得其一张牌；熊，你随机弃置其装备区的一张牌；兔，令其摸一张牌。",
+				"当你受到伤害后/于一回合首次造成伤害后，你可以选择一名与你距离大于/不大于1的角色，令其随机执行以下一项：豹，令其受到1点无来源伤害；鹰，你随机获得其一张牌；熊，你随机弃置其装备区的一张牌；兔，令其摸一张牌。",
 			yuxiang: "御象",
 			yuxiang_info:
 				"锁定技，若你有护甲值，则：①你计算与其他角色的距离-1，其他角色计算与你的距离+1；②当你受到火焰伤害时，此伤害+1。",
