@@ -349,7 +349,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 								}
 							}
 							const str =
-								versionResult > 0
+								versionResult < 0
 									? `有新版本${description.name}可用，是否下载？`
 									: `本地版本${lib.version}高于或等于github版本${description.name}，是否强制下载？`;
 							const str2 = description.body;
@@ -454,7 +454,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				const result = await asyncFilter(files.flat(), async v => {
 					return game.promises.readFile(v.path).then(data => {
 						return v.size != data.byteLength;
-					})
+					}).catch(()=>true)
 				}).then(arr => arr.map((v) => v.path));
 
 				console.log("需要更新的文件有:", result);
