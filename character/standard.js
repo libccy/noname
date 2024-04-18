@@ -279,6 +279,9 @@ game.import("character", function () {
 					evt.targets.remove(trigger.target);
 					evt.targets.push(player);
 				},
+				ai: {
+					neg: true
+				},
 			},
 			hujia: {
 				audio: 2,
@@ -2492,6 +2495,7 @@ game.import("character", function () {
 					trigger.source.chooseDrawRecover(true);
 				},
 				ai: {
+					halfneg: true,
 					effect: {
 						target(card, player, target, current) {
 							if (card.name == "sha" && get.color(card) == "red") {
