@@ -7987,7 +7987,7 @@ game.import("character", function () {
 				},
 				async content(event, trigger, player) {
 					if (event.cards && event.cards.length) {
-						await player.dicard(event.cards);
+						await player.discard(event.cards);
 						lib.skill.dcxieshou.change(player, 1);
 					} else {
 						player.drawTo(player.maxHp);
