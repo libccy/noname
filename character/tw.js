@@ -18750,7 +18750,9 @@ game.import("character", function () {
 				audio: 2,
 				enable: "phaseUse",
 				usable: 1,
-				filterTarget: lib.filter.notMe,
+				filterTarget: function (card, player, target) {
+					return target.hp >= player.hp;
+				},
 				content: function () {
 					"step 0";
 					var str = get.translation(target);
