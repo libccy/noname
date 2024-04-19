@@ -2442,9 +2442,9 @@ game.import("character", function () {
 			mbyilie3: {
 				audio: "mbyilie",
 				trigger: { player: "phaseEnd" },
-				//filter:function(event,player){
-				//	return player.countMark('mbyilie');
-				//},
+				filter: function (event, player) {
+					return player.hasMark('mbyilie');
+				},
 				forced: true,
 				content: function () {
 					"step 0";
@@ -21154,7 +21154,7 @@ game.import("character", function () {
 			mbyilie2: "义烈",
 			mbyilie3: "义烈",
 			mbyilie_info:
-				"锁定技。①游戏开始时，你选择一名其他角色，然后你获得以下效果：其受到伤害时，若你没有“烈”，则你获得等同于伤害值的“烈”标记，然后防止此伤害；其对其他角色造成伤害后，你回复1点体力。②结束阶段，你摸一张牌并失去X点体力，然后移去所有“烈”（X为你拥有的“烈”标记数）。",
+				"锁定技。①游戏开始时，你选择一名其他角色，然后你获得以下效果：其受到伤害时，若你没有“烈”，则你获得等同于伤害值的“烈”标记，然后防止此伤害；其对其他角色造成伤害后，你回复1点体力。②结束阶段，若你拥有“烈”标记，你摸一张牌并失去X点体力，然后移去所有“烈”（X为你拥有的“烈”标记数）。",
 			muludawang: "木鹿大王",
 			shoufa: "兽法",
 			shoufa_info:
