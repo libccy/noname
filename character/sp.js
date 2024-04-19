@@ -32648,6 +32648,9 @@ game.import("character", function () {
 						player.gain(event.togain, "gain2");
 					}
 				},
+				ai: {
+					combo: "xinfu_falu"
+				},
 			},
 			zhenyi_spade: {
 				trigger: {
