@@ -892,7 +892,12 @@ game.import("character", function () {
 							game.swapSeat(list[0], list[1], false);
 						}
 					}, toSwapList);
-					if (trigger.name === "phase" && !trigger.player.isZhu2() && trigger.player !== toSortPlayers[0] && !trigger._finished) {
+					if (
+						trigger.name === "phase" &&
+						!trigger.player.isZhu2() &&
+						trigger.player !== toSortPlayers[0] &&
+						!trigger._finished
+					) {
 						trigger.finish();
 						trigger._triggered = 5;
 						const evt = toSortPlayers[0].insertPhase();
@@ -903,10 +908,7 @@ game.import("character", function () {
 						}
 						//跳过新回合的phaseBefore
 						evt.pushHandler("onPhase", (event, option) => {
-							if (
-								event.step === 0 &&
-								option.state === "begin"
-							) {
+							if (event.step === 0 && option.state === "begin") {
 								event.step = 1;
 							}
 						});
@@ -919,9 +921,12 @@ game.import("character", function () {
 				audio: 2,
 				trigger: { player: "phaseAfter" },
 				filter(event, player) {
-					return game.hasPlayer(target => {
-						if(target==player||target.countCards('h')+player.countCards('h')==0) return false;
-						return get.mode()=='identity'||target.countCards('h')<=player.countCards('h')+1;
+					return game.hasPlayer((target) => {
+						if (target == player || target.countCards("h") + player.countCards("h") == 0)
+							return false;
+						return (
+							get.mode() == "identity" || target.countCards("h") <= player.countCards("h") + 1
+						);
 					});
 				},
 				direct: true,
@@ -933,8 +938,12 @@ game.import("character", function () {
 							get.prompt("zhimeng"),
 							"与一名其他角色平分手牌",
 							(card, player, target) => {
-								if(target==player||target.countCards('h')+player.countCards('h')==0) return false;
-								return get.mode()=='identity'||target.countCards('h')<=player.countCards('h')+1;
+								if (target == player || target.countCards("h") + player.countCards("h") == 0)
+									return false;
+								return (
+									get.mode() == "identity" ||
+									target.countCards("h") <= player.countCards("h") + 1
+								);
 							}
 						)
 						.set("ai", (target) => {
