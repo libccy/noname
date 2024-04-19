@@ -8241,7 +8241,7 @@ game.import("character", function () {
 					cardUsable: function (card, player) {
 						if (card.name == "sha") {
 							const suit = get.suit(card);
-							return suit === "unsure" || player.storage.xingongji2.includes(suit);
+							if (suit === "unsure" || player.storage.xingongji2.includes(suit)) return Infinity;
 						}
 					},
 					aiOrder: function (player, card, num) {
