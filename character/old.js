@@ -1169,7 +1169,13 @@ game.import("character", function () {
 				content: function () {
 					player.addToExpansion(cards, player, "give").gaintag.add("old_jijun");
 				},
-				ai: { order: 1, result: { player: 1 } },
+				ai: {
+					order: 1,
+					result: {
+						player: 1
+					},
+					combo: "old_fangtong"
+				},
 			},
 			old_fangtong: {
 				trigger: {
@@ -1185,6 +1191,9 @@ game.import("character", function () {
 				content: function () {
 					var winners = player.getFriends();
 					game.over(player == game.me || winners.includes(game.me));
+				},
+				ai:{
+					combo: "oldjijun"
 				},
 			},
 			oldanxu: {

@@ -3361,6 +3361,9 @@ game.import("character", function () {
 				content() {
 					player.draw(3);
 				},
+				ai: {
+					combo: "dddfusi"
+				},
 			},
 			dddchashi: {
 				trigger: { global: "phaseUseBegin" },
@@ -5113,6 +5116,9 @@ game.import("character", function () {
 						},
 					},
 				},
+				ai: {
+					combo: "dddyouxue"
+				},
 			},
 			dddyouxue_old: {
 				audio: 2,
@@ -6624,7 +6630,7 @@ game.import("character", function () {
 					"锁定技。出牌阶段开始时，你选择一名角色，其弃置两张牌，然后你对一名角色造成1点伤害。" +
 					(player.storage["dddxiaheng_del"]
 						? ""
-						: "。“若两名角色：均不为你，你失去一点体力上限；为同一名角色，你失去一点体力；然后若以此法对包括你在内三名不同的角色造成伤害，删除双引号里的描述内容”")
+						: "“若两名角色：均不为你，你失去一点体力上限；为同一名角色，你失去一点体力；然后若以此法对包括你在内三名不同的角色造成伤害，删除双引号里的描述内容”")
 				);
 			},
 			dddshichao(player) {
@@ -6638,9 +6644,8 @@ game.import("character", function () {
 				return (
 					"转换技，摸牌阶段，你" +
 					(player.hasMark("dddxuanlun_del") ? "" : "可") +
-					"展示手牌（无牌则不展示），并改为摸其中" +
-					(!player.storage["dddlanghuai"] ? "包含" : "缺少") +
-					"花色数的牌。"
+					"展示手牌（无牌则不展示），并改为摸其中：" +
+					(player.storage["dddlanghuai"] ? '阴：包含花色数的牌；<span class="bluetext">阳：缺少花色数的牌。</span>' : '<span class="bluetext">阴：包含花色数的牌；</span>阳：缺少花色数的牌。')
 				);
 			},
 			dddxuanlun(player) {
