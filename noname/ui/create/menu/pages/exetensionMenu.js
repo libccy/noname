@@ -426,6 +426,13 @@ export const extensionMenu = function (connectMenu) {
 							'import { lib, game, ui, get, ai, _status } from "../../noname.js";\ngame.import("extension",function(){\n\treturn ' +
 							str +
 							"\n});",
+						"info.json": JSON.stringify({
+							name: page.currentExtension,
+							author: authorExtLine.querySelector("input").value || "",
+							diskURL: diskExtLine.querySelector("input").value || "",
+							forumURL: forumExtLine.querySelector("input").value || "",
+							version: versionExtLine.querySelector("input").value || ""
+						}),
 					};
 					for (var i in dash1.content.image) {
 						extension[i] = dash1.content.image[i];

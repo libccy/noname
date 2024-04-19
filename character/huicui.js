@@ -7987,7 +7987,7 @@ game.import("character", function () {
 				},
 				async content(event, trigger, player) {
 					if (event.cards && event.cards.length) {
-						await player.dicard(cards);
+						await player.discard(event.cards);
 						lib.skill.dcxieshou.change(player, 1);
 					} else {
 						player.drawTo(player.maxHp);
@@ -8004,6 +8004,9 @@ game.import("character", function () {
 						)
 							return false;
 					},
+				},
+				ai: {
+					neg: true
 				},
 			},
 			//公孙度
@@ -10831,7 +10834,10 @@ game.import("character", function () {
 						player.addTempSkill("zhishi_mark", { player: "phaseBegin" });
 					}
 				},
-				ai: { expose: 0.3 },
+				ai: {
+					combo: "xunli",
+					expose: 0.3
+				},
 				subSkill: {
 					mark: {
 						trigger: {
@@ -12095,6 +12101,9 @@ game.import("character", function () {
 							player.recover();
 						}
 					}
+				},
+				ai: {
+					combo: "huguan"
 				},
 			},
 			mingluan: {
@@ -15060,6 +15069,10 @@ game.import("character", function () {
 				content: function () {
 					player.removeMark("recangchu", Math.min(player.countMark("recangchu"), trigger.num || 1));
 				},
+				ai: {
+					combo: "recangchu",
+					neg: true
+				},
 				group: "reshishou2",
 			},
 			reshishou2: {
@@ -15493,7 +15506,7 @@ game.import("character", function () {
 				var list = ["sha", "shan", "tao", "jiu"];
 				for (var i of list) {
 					var strx = "【" + get.translation(i) + "】";
-					if (!info || !info[0].includes(i))
+					if (info && !info[0].includes(i))
 						strx = '<span style="text-decoration:line-through;">' + strx + "</span>";
 					str += strx;
 					if (i != "jiu") str += "/";

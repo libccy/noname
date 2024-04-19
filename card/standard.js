@@ -2146,138 +2146,48 @@ game.import("card", function () {
 					},
 					result: {
 						player: function (player, target) {
-							let att = get.attitude(player, target),
-								hs = target.hasCard(
-									(card) => lib.filter.canBeGained(card, player, target),
-									"h"
-								),
-								lose = hs,
-								gain = att > 0 ? 0.52 : 1.28;
-							if (Math.abs(att) < 5.03) {
-								let temp = 0.015 * att * att;
-								if (att < 0) gain = 0.9 + temp;
-								else gain = 0.9 - temp;
+							const hs = target.getGainableCards(player, 'h');
+							const es = target.getGainableCards(player, 'e');
+							const js = target.getGainableCards(player, 'j');
+							const att = get.attitude(player, target);
+							if (att < 0) {
+								if (!hs.length && !es.some(card => {
+									return get.value(card, target) > 0 && card != target.getEquip('jinhe');
+								}) && !js.some(card => {
+									var cardj = card.viewAs ? { name: card.viewAs } : card;
+									return get.effect(target, cardj, target, player) < 0;
+								})) return 0;
 							}
-							target.countCards("e", function (card) {
-								if (
-									card.name != "jinhe" &&
-									lib.filter.canBeGained(card, player, target) &&
-									att * get.value(card, target) < 0
-								) {
-									lose = true;
-									let val = get.value(card, player);
-									if (val > 0) gain = Math.max(gain, val / 7);
-								}
-							});
-							target.countCards("j", function (card) {
-								let cardj = card.viewAs ? new lib.element.VCard({ name: card.viewAs }) : card;
-								if (
-									lib.filter.canBeGained(card, player, target) &&
-									att * get.effect(target, cardj, target, target) < 0
-								) {
-									lose = true;
-									if (cardj.name == "lebu") {
-										let needs = target.needsToDiscard(2);
-										if (att > 0) gain = Math.max(gain, 1.6 + needs / 10);
-									} else if (
-										cardj.name == "shandian" ||
-										cardj.name == "fulei" ||
-										cardj.name == "plague"
-									)
-										gain = Math.max(gain, 1.5 / Math.max(1, target.hp));
-									else if (att > 0) gain = Math.max(gain, 1.7);
-								}
-							});
-							if (!lose) return 0;
-							return gain;
+							else if (att > 1) {
+								return (es.some(card => {
+									return get.value(card, target) <= 0;
+								}) || js.some(card => {
+									var cardj = card.viewAs ? { name: card.viewAs } : card;
+									return get.effect(target, cardj, target, player) < 0;
+								})) ? 1.5 : 0;
+							}
+							return 1;
 						},
 						target: function (player, target) {
-							let att = get.attitude(player, target),
-								hs = target.countCards("h", (card) =>
-									lib.filter.canBeGained(card, player, target)
-								),
-								es = target.countCards("e", (card) =>
-									lib.filter.canBeGained(card, player, target)
-								),
-								js = target.countCards("j", (card) =>
-									lib.filter.canBeGained(card, player, target)
-								),
-								noh = !hs || target.hasSkillTag("noh"),
-								noe = !es || target.hasSkillTag("noe"),
-								check = [-1, att > 0 ? -1.3 : 1.3, att > 0 ? -2.5 : 2.5],
-								idx = -1;
-							if (hs) {
-								idx = 0;
-								if (noh) check[0] = 0.7;
+							const hs = target.getGainableCards(player, 'h');
+							const es = target.getGainableCards(player, 'e');
+							const js = target.getGainableCards(player, 'j');
+
+							if (get.attitude(player, target) <= 0) {
+								if (hs.length > 0) return -1.5;
+								return (es.some(card => {
+									return get.value(card, target) > 0 && card != target.getEquip('jinhe');
+								}) || js.some(card => {
+									var cardj = card.viewAs ? { name: card.viewAs } : card;
+									return get.effect(target, cardj, target, player) < 0;
+								})) ? -1.5 : 1.5;
 							}
-							if (es) {
-								if (idx < 0) idx = 1;
-								if (
-									target.getEquip("baiyin") &&
-									target.isDamaged() &&
-									lib.filter.canBeGained(target.getEquip("baiyin"), player, target)
-								) {
-									let rec = get.recoverEffect(target, player, target);
-									if (es == 1 || att * rec > 0) {
-										let val = 3 - 0.6 * Math.min(5, target.hp);
-										if (rec > 0) check[1] = val;
-										else if (rec < 0) check[1] = -val;
-									}
-								}
-								target.countCards("e", function (card) {
-									let val = get.value(card, target);
-									if (
-										card.name == "jinhe" ||
-										att * val >= 0 ||
-										!lib.filter.canBeGained(card, player, target)
-									)
-										return false;
-									if (att > 0) {
-										check[1] = Math.max(1.3, check[1]);
-										return true;
-									}
-									let sub = get.subtype(card);
-									if (sub == "equip2" || sub == "equip5") val += 4;
-									else if (sub == "equip1") val *= 0.4 * Math.min(3.6, target.hp);
-									else val *= 0.6;
-									if (target.hp < 3 && sub != "equip2" && sub != "equip5") val *= 0.4;
-									check[1] = Math.min(-0.16 * val, check[1]);
-								});
-								if (noe) check[1] += 0.9;
-							}
-							if (js) {
-								let func = function (num) {
-									if (att > 0) check[2] = Math.max(check[2], num);
-									else check[2] = Math.min(check[2], 0.6 - num);
-								};
-								if (idx < 0) idx = 2;
-								target.countCards("j", function (card) {
-									let cardj = card.viewAs
-										? new lib.element.VCard({ name: card.viewAs })
-										: card;
-									if (
-										!lib.filter.canBeGained(card, player, target) ||
-										att * get.effect(target, cardj, target, target) >= 0
-									)
-										return false;
-									if (cardj.name == "lebu") func(2.1 + 0.4 * target.needsToDiscard(2));
-									else if (cardj.name == "bingliang") func(2.4);
-									else if (
-										cardj.name == "shandian" ||
-										cardj.name == "fulei" ||
-										cardj.name == "plague"
-									)
-										func(Math.abs(check[2]) / (1 + target.hp));
-									else func(2.1);
-								});
-							}
-							if (idx < 0) return 0;
-							for (let i = idx + 1; i < 3; i++) {
-								if ((i == 1 && !es) || (i == 2 && !js)) continue;
-								if ((att > 0 && check[i] > check[idx]) || (att <= 0 && check[i] < check[idx]))
-									idx = i;
-							}
-							return check[idx];
+							return (es.some(card => {
+								return get.value(card, target) <= 0;
+							}) || js.some(card => {
+								var cardj = card.viewAs ? { name: card.viewAs } : card;
+								return get.effect(target, cardj, target, player) < 0;
+							})) ? 1.5 : -1.5;
 						},
 					},
 					tag: {
@@ -2546,92 +2456,38 @@ game.import("card", function () {
 					},
 					result: {
 						target: function (player, target) {
-							let att = get.attitude(player, target),
-								hs = target.countCards("h", (card) =>
-									lib.filter.canBeDiscarded(card, player, target)
-								),
-								es = target.countCards("e", (card) =>
-									lib.filter.canBeDiscarded(card, player, target)
-								),
-								js = target.countCards("j", (card) =>
-									lib.filter.canBeDiscarded(card, player, target)
-								),
-								noh = !hs || target.hasSkillTag("noh"),
-								noe = !es || target.hasSkillTag("noe"),
-								check = [-1, att > 0 ? -1.3 : 1.3, att > 0 ? -2.5 : 2.5],
-								idx = -1;
-							if (hs) {
-								idx = 0;
-								if (noh) check[0] = 0.7;
-							}
-							if (es) {
-								if (idx < 0) idx = 1;
-								if (
-									target.getEquip("baiyin") &&
-									target.isDamaged() &&
-									lib.filter.canBeDiscarded(target.getEquip("baiyin"), player, target)
-								) {
-									let rec = get.recoverEffect(target, player, target);
-									if (es == 1 || att * rec > 0) {
-										let val = 3 - 0.6 * Math.min(5, target.hp);
-										if (rec > 0) check[1] = val;
-										else if (rec < 0) check[1] = -val;
-									}
+							const att = get.attitude(player, target);
+							const hs = target.getDiscardableCards(player, 'h');
+							const es = target.getDiscardableCards(player, 'e');
+							const js = target.getDiscardableCards(player, 'j');
+							if (!hs.length && !es.length && !js.length) return 0;
+							if (att > 0) {
+								if (js.some(card => {
+									const cardj = card.viewAs ? { name: card.viewAs } : card;
+									return get.effect(target, cardj, target, player) < 0;
+								})) return 3;
+								if (target.isDamaged() && es.some(card => card.name == 'baiyin') &&
+									get.recoverEffect(target, player, player) > 0) {
+									if (target.hp == 1 && !target.hujia) return 1.6;
 								}
-								target.countCards("e", function (card) {
-									let val = get.value(card, target);
-									if (
-										card.name == "jinhe" ||
-										att * val >= 0 ||
-										!lib.filter.canBeDiscarded(card, player, target)
-									)
-										return false;
-									if (att > 0) {
-										check[1] = Math.max(1.3, check[1]);
-										return true;
-									}
-									let sub = get.subtype(card);
-									if (sub == "equip2" || sub == "equip5") val += 4;
-									else if (sub == "equip1") val *= 0.4 * Math.min(3.6, target.hp);
-									else val *= 0.6;
-									if (target.hp < 3 && sub != "equip2" && sub != "equip5") val *= 0.4;
-									check[1] = Math.min(-0.16 * val, check[1]);
-								});
-								if (noe) check[1] += 0.9;
+								if (es.some(card => {
+									return get.value(card, target) < 0;
+								})) return 1;
+								return -1.5;
 							}
-							if (js) {
-								let func = function (num) {
-									if (att > 0) check[2] = Math.max(check[2], num);
-									else check[2] = Math.min(check[2], 0.6 - num);
-								};
-								if (idx < 0) idx = 2;
-								target.countCards("j", function (card) {
-									let cardj = card.viewAs
-										? new lib.element.VCard({ name: card.viewAs })
-										: card;
-									if (
-										!lib.filter.canBeDiscarded(card, player, target) ||
-										att * get.effect(target, cardj, target, target) >= 0
-									)
-										return false;
-									if (cardj.name == "lebu") func(2.1 + 0.4 * target.needsToDiscard(2));
-									else if (cardj.name == "bingliang") func(2.4);
-									else if (
-										cardj.name == "shandian" ||
-										cardj.name == "fulei" ||
-										cardj.name == "plague"
-									)
-										func(Math.abs(check[2]) / (1 + target.hp));
-									else func(2.1);
-								});
+							else {
+								const noh = (hs.length == 0 || target.hasSkillTag('noh'));
+								const noe = (es.length == 0 || target.hasSkillTag('noe'));
+								const noe2 = (noe || !es.some(card => {
+									return get.value(card, target) > 0;
+								}));
+								const noj = (js.length == 0 || !js.some(card => {
+									const cardj = card.viewAs ? { name: card.viewAs } : card;
+									return get.effect(target, cardj, target, player) < 0;
+								}))
+								if (noh && noe2 && noj) return 1.5;
+								return -1.5;
 							}
-							if (idx < 0) return 0;
-							for (let i = idx + 1; i < 3; i++) {
-								if ((i == 1 && !es) || (i == 2 && !js)) continue;
-								if ((att > 0 && check[i] > check[idx]) || (att <= 0 && check[i] < check[idx]))
-									idx = i;
-							}
-							return check[idx];
 						},
 					},
 					tag: {
@@ -2989,7 +2845,7 @@ game.import("card", function () {
 								cf = Math.pow(get.threaten(target, player), 2);
 							if (!num) return -0.01 * cf;
 							if (target.hp > 2) num--;
-							let dist = Math.sqrt(get.distance(player, target, "absolute"));
+							let dist = Math.sqrt(1 + get.distance(player, target, "absolute"));
 							if (dist < 1) dist = 1;
 							if (target.isTurnedOver()) dist++;
 							return (Math.min(-0.1, -num) * cf) / dist;

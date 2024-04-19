@@ -753,6 +753,7 @@ game.import("character", function () {
 				},
 				direct: true,
 				changeSeat: true,
+				derivation: "tamo_faq",
 				async content(event, trigger, player) {
 					const toSortPlayers = game.filterPlayer((current) => !current.isZhu2());
 					toSortPlayers.sortBySeat(game.findPlayer2((current) => current.getSeatNum() == 1, true));
@@ -870,7 +871,7 @@ game.import("character", function () {
 					});
 					const { result } = await next;
 					if (!result.bool) return;
-					player.logSkill("tamo");
+					await player.logSkill("tamo");
 					const resultList = result.moved[0].map((info) => {
 						return parseInt(info.split("|")[0]);
 					});
@@ -891,6 +892,25 @@ game.import("character", function () {
 							game.swapSeat(list[0], list[1], false);
 						}
 					}, toSwapList);
+					if (trigger.name === "phase" && !trigger.player.isZhu2() && trigger.player !== toSortPlayers[0] && !trigger._finished) {
+						trigger.finish();
+						trigger._triggered = 5;
+						const evt = toSortPlayers[0].insertPhase();
+						delete evt.skill;
+						const evt2 = trigger.getParent();
+						if (evt2.name == "phaseLoop" && evt2._isStandardLoop) {
+							evt2.player = toSortPlayers[0];
+						}
+						//跳过新回合的phaseBefore
+						evt.pushHandler("onPhase", (event, option) => {
+							if (
+								event.step === 0 &&
+								option.state === "begin"
+							) {
+								event.step = 1;
+							}
+						});
+					}
 					await game.asyncDelay();
 				},
 			},
@@ -899,8 +919,9 @@ game.import("character", function () {
 				audio: 2,
 				trigger: { player: "phaseAfter" },
 				filter(event, player) {
-					return game.hasPlayer((current) => {
-						return current.countCards("h") + player.countCards("h") > 0 && player != current;
+					return game.hasPlayer(target => {
+						if(target==player||target.countCards('h')+player.countCards('h')==0) return false;
+						return get.mode()=='identity'||target.countCards('h')<=player.countCards('h')+1;
 					});
 				},
 				direct: true,
@@ -912,9 +933,8 @@ game.import("character", function () {
 							get.prompt("zhimeng"),
 							"与一名其他角色平分手牌",
 							(card, player, target) => {
-								return (
-									target.countCards("h") + player.countCards("h") > 0 && player != target
-								);
+								if(target==player||target.countCards('h')+player.countCards('h')==0) return false;
+								return get.mode()=='identity'||target.countCards('h')<=player.countCards('h')+1;
 							}
 						)
 						.set("ai", (target) => {
@@ -1164,7 +1184,6 @@ game.import("character", function () {
 										default:
 											return false;
 									}
-									break;
 							}
 						},
 						forced: true,
@@ -9397,6 +9416,9 @@ game.import("character", function () {
 						}
 					}
 				},
+				ai: {
+					combo: "nzry_junlve"
+				},
 			},
 			nzry_dinghuo: {
 				audio: 2,
@@ -10814,10 +10836,14 @@ game.import("character", function () {
 			dingzhou_info:
 				"出牌阶段限一次。你可以将X张牌交给一名场上有牌的角色，然后你获得其场上的所有牌（X为其场上的牌数+1）。",
 			tamo: "榻谟",
-			tamo_info: "游戏开始时，你可以重新分配除主公外所有角色的座次。",
+			tamo_info:
+				"游戏开始时，你可以重新分配除主公外所有角色的座次。",
+			tamo_faq: "FAQ",
+			tamo_faq_info:
+				"<br><li>Q：在一号位不为主公的情况下，〖榻谟〗如何结算？</li><li>A：该角色可以正常进行座次交换。若受此技能影响导致一号位角色发生了变化，则以排列后的一号位角色为起始角色开始本局游戏。</li>",
 			zhimeng: "智盟",
-			zhimeng_info:
-				"回合结束后，你可以与一名其他角色将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。",
+			zhimeng_info_identity:'回合结束后，你可以选择一名其他角色。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
+			zhimeng_info:'回合结束后，你可以选择一名手牌数不大于Y的其他角色（Y为你的手牌数+1）。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
 			shen_xuzhu: "神许褚",
 			shen_xuzhu_prefix: "神",
 			zhengqing: "争擎",

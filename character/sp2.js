@@ -2448,7 +2448,7 @@ game.import("character", function () {
 						} = await player.chooseButton(dialog, true).set("ai", (button) => {
 							const player = get.event("player"),
 								target = get.event().getParent().targets[0];
-							return get.value(card, player) * get.value(card, target) * (1 + Math.random());
+							return get.value(button.link, player) * get.value(button.link, target) * (1 + Math.random());
 						});
 						if (bool) {
 							await player.gain(links, target, "giveAuto", "bySelf");
@@ -9793,6 +9793,9 @@ game.import("character", function () {
 					player.storage.mubing2 = true;
 					player.markSkill("mubing_rewrite");
 					player.chooseDrawRecover(2, true);
+				},
+				ai: {
+					combo: "mubing"
 				},
 				derivation: "mubing_rewrite",
 			},

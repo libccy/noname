@@ -4522,7 +4522,9 @@ export class Player extends HTMLDivElement {
 		next.autochoose = function () {
 			if (!this.forced) return false;
 			if (typeof this.selectCard == "function") return false;
+			if (this.complexCard || this.complexSelect || this.filterOk) return false;
 			var cards = this.player.getCards(this.position);
+			if (cards.some(card => !this.filterCard(card, this))) return false;
 			var num = cards.length;
 			for (var i = 0; i < cards.length; i++) {
 				if (!lib.filter.cardDiscardable(cards[i], this.player, this)) num--;
@@ -4776,6 +4778,14 @@ export class Player extends HTMLDivElement {
 		if (next.filterCard == undefined) next.filterCard = lib.filter.all;
 		if (next.selectCard == undefined) next.selectCard = [1, 1];
 		if (next.ai == undefined) next.ai = get.unuseful3;
+		next.autochoose = function () {
+			if (!this.forced) return false;
+			if (typeof this.selectCard == "function") return false;
+			if (this.complexCard || this.complexSelect || this.filterOk) return false;
+			var cards = this.player.getCards(this.position);
+			if (cards.some(card => !this.filterCard(card, this))) return false;
+			return get.select(this.selectCard)[0] >= this.player.countCards(this.position);
+		};
 		next.setContent("chooseCard");
 		next._args = Array.from(arguments);
 		return next;

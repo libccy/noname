@@ -5467,6 +5467,9 @@ game.import("character", function () {
 				content: () => {
 					trigger.forceYingbian = true;
 				},
+				ai: {
+					combo: "asara_shelu"
+				},
 			},
 			yukito_kongwu: {
 				enable: "phaseUse",
