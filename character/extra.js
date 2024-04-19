@@ -892,7 +892,7 @@ game.import("character", function () {
 							game.swapSeat(list[0], list[1], false);
 						}
 					}, toSwapList);
-					if (trigger.name === "phase" && trigger.player !== toSortPlayers[0] && !trigger._finished) {
+					if (trigger.name === "phase" && !trigger.player.isZhu2() && trigger.player !== toSortPlayers[0] && !trigger._finished) {
 						trigger.finish();
 						trigger._triggered = 5;
 						const evt = toSortPlayers[0].insertPhase();
@@ -919,8 +919,9 @@ game.import("character", function () {
 				audio: 2,
 				trigger: { player: "phaseAfter" },
 				filter(event, player) {
-					return game.hasPlayer((current) => {
-						return current.countCards("h") + player.countCards("h") > 0 && player != current;
+					return game.hasPlayer(target => {
+						if(target==player||target.countCards('h')+player.countCards('h')==0) return false;
+						return get.mode()=='identity'||target.countCards('h')<=player.countCards('h')+1;
 					});
 				},
 				direct: true,
@@ -932,9 +933,8 @@ game.import("character", function () {
 							get.prompt("zhimeng"),
 							"与一名其他角色平分手牌",
 							(card, player, target) => {
-								return (
-									target.countCards("h") + player.countCards("h") > 0 && player != target
-								);
+								if(target==player||target.countCards('h')+player.countCards('h')==0) return false;
+								return get.mode()=='identity'||target.countCards('h')<=player.countCards('h')+1;
 							}
 						)
 						.set("ai", (target) => {
@@ -10842,8 +10842,8 @@ game.import("character", function () {
 			tamo_faq_info:
 				"<br><li>Q：在一号位不为主公的情况下，〖榻谟〗如何结算？</li><li>A：该角色可以正常进行座次交换。若受此技能影响导致一号位角色发生了变化，则以排列后的一号位角色为起始角色开始本局游戏。</li>",
 			zhimeng: "智盟",
-			zhimeng_info:
-				"回合结束后，你可以与一名其他角色将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。",
+			zhimeng_info_identity:'回合结束后，你可以选择一名其他角色。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
+			zhimeng_info:'回合结束后，你可以选择一名手牌数不大于Y的其他角色（Y为你的手牌数+1）。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
 			shen_xuzhu: "神许褚",
 			shen_xuzhu_prefix: "神",
 			zhengqing: "争擎",

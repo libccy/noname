@@ -999,7 +999,7 @@ game.import("character", function () {
 									list.push(
 										cards.reduce((sum, card) => {
 											const juedou = get.autoViewAs({ name: "juedou" }, [card]);
-											return sum + get.effect(target, card, player, player);
+											return sum + get.effect(target, juedou, player, player);
 										}, 0)
 									);
 								}
@@ -1030,7 +1030,7 @@ game.import("character", function () {
 										})
 										.reduce((num, card) => {
 											const juedou = get.autoViewAs({ name: "juedou" }, [card]);
-											return num + get.effect(player, card, source, player);
+											return num + get.effect(player, juedou, source, player);
 										}, 0);
 								};
 								return controls.sort(
