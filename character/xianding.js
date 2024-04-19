@@ -4306,6 +4306,9 @@ game.import("character", function () {
 				content: function () {
 					lib.skill.dcluoyan.init(player, "dcluoyan");
 				},
+				ai: {
+					combo: "dcxingwu"
+				},
 			},
 			retianxiang_daxiaoqiao: {
 				audio: "tianxiang_daxiaoqiao",
