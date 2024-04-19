@@ -49,33 +49,42 @@ export async function cordovaReady() {
 		if ("cordova" in window && "plugins" in window.cordova && "permissions" in window.cordova.plugins) {
 			const permissions = cordova.plugins.permissions;
 			const requests = ["WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"];
-			if (typeof device == 'object') {
+			if (typeof device == "object") {
 				// 安卓13或以上
 				if (checkVersion(device.version, "13") >= 0) {
 					requests.length = 0;
-					requests.push('READ_MEDIA_IMAGES', 'READ_MEDIA_VIDEO', 'READ_MEDIA_AUDIO');
+					requests.push("READ_MEDIA_IMAGES", "READ_MEDIA_VIDEO", "READ_MEDIA_AUDIO");
 				}
 			}
-			Promise.all(requests.map(request => {
-				return new Promise((resolve, reject) => {
-					permissions.checkPermission(permissions[request], status => {
-						resolve({
-							request: request,
-							hasPermission: status.hasPermission
-						});
-					}, reject);
-				});
-			})).then(shouldRequestPermissions => {
-				return shouldRequestPermissions
-					.filter(({ hasPermission }) => !hasPermission)
-					.map(({ request }) => permissions[request] || `android.permission.${request}`);
-			}).then(willRequestPermissions => {
-				permissions.requestPermissions(
-					willRequestPermissions,
-					lib.other.ignore,
-					lib.other.ignore
-				);
-			}).catch(console.log);
+			Promise.all(
+				requests.map((request) => {
+					return new Promise((resolve, reject) => {
+						permissions.checkPermission(
+							permissions[request],
+							(status) => {
+								resolve({
+									request: request,
+									hasPermission: status.hasPermission,
+								});
+							},
+							reject
+						);
+					});
+				})
+			)
+				.then((shouldRequestPermissions) => {
+					return shouldRequestPermissions
+						.filter(({ hasPermission }) => !hasPermission)
+						.map(({ request }) => permissions[request] || `android.permission.${request}`);
+				})
+				.then((willRequestPermissions) => {
+					permissions.requestPermissions(
+						willRequestPermissions,
+						lib.other.ignore,
+						lib.other.ignore
+					);
+				})
+				.catch(console.log);
 		}
 	}
 	game.download = function (url, folder, onsuccess, onerror, dev, onprogress) {
