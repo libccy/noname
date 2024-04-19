@@ -1913,7 +1913,7 @@ game.import("character", function () {
 					if (name == "damageSource" && player.getHistory("sourceDamage").indexOf(event) != 0)
 						return false;
 					return game.hasPlayer((target) => {
-						const num = (get.mode() == 'doudizhu' ? 1 : 2);
+						const num = get.mode() == "doudizhu" ? 1 : 2;
 						if (name == "damageEnd" && get.distance(player, target) <= num) return false;
 						if (name == "damageSource" && get.distance(player, target) > num) return false;
 						const zhoufa = player.storage.zhoulin_zhoufa;
@@ -1932,7 +1932,7 @@ game.import("character", function () {
 								"你随机获得其一张牌",
 								"你随机弃置其装备区的一张牌",
 								"令其摸一张牌",
-						  ][["豹", "鹰", "熊", "兔"].indexOf(zhoufa)]
+							][["豹", "鹰", "熊", "兔"].indexOf(zhoufa)]
 						: "令其随机执行一个效果";
 					const nodoudizhu =
 						get.mode() == "doudizhu"
@@ -1946,9 +1946,10 @@ game.import("character", function () {
 							"选择一名" + nodoudizhu + "角色，" + str,
 							(card, player, target) => {
 								const name = _status.event.triggername;
-								const num = (get.mode() == 'doudizhu' ? 1 : 2);
+								const num = get.mode() == "doudizhu" ? 1 : 2;
 								if (name == "damageEnd" && get.distance(player, target) <= num) return false;
-								if (name == "damageSource" && get.distance(player, target) > num) return false;
+								if (name == "damageSource" && get.distance(player, target) > num)
+									return false;
 								const zhoufa = player.storage.zhoulin_zhoufa;
 								if (!zhoufa) return true;
 								if (zhoufa == "豹" || zhoufa == "兔") return true;
@@ -1965,14 +1966,15 @@ game.import("character", function () {
 									return get.damageEffect(target, player, player);
 								case "鹰":
 									return get.effect(target, { name: "guohe_copy2" }, player, player);
-								case "熊":
-									let att = get.attitude(player, target),
-										eff = 0;
+								case "熊": {
+									let att = get.attitude(player, target);
+									let eff = 0;
 									target.getCards("e", (card) => {
 										var val = get.value(card, target);
 										eff = Math.max(eff, -val * att);
 									});
 									return eff;
+								}
 								case "兔":
 									return get.effect(target, { name: "draw" }, player, player);
 							}
