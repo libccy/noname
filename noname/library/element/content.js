@@ -5296,6 +5296,16 @@ export const Content = {
 				bool: true,
 				links: [],
 			};
+		} else if (event.autochoose()) {
+			event.result = {
+				bool: true,
+				autochoose: true,
+				cards: player.getCards(event.position),
+				confirm: "ok",
+				buttons: [],
+				targets: [],
+				links: [],
+			};
 		} else {
 			if (event.isMine()) {
 				game.check();

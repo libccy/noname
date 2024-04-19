@@ -1162,7 +1162,7 @@ game.import("character", function () {
 					var num = get.cardNameLength(event.card);
 					return typeof num == "number" && num > 0 && player.countCards("he") > 0;
 				},
-				async content(event, trigger, player) {
+				async cost(event, trigger, player) {
 					var num = get.cardNameLength(trigger.card),
 						str = "";
 					if (player.getDamagedHp() > 0)
