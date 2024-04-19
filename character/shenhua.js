@@ -6134,8 +6134,10 @@ game.import("character", function () {
 					}
 				},
 				ai: {
+					halfneg: true,
 					directHit_ai: true,
 					skillTagFilter: function (player, tag, arg) {
+						if (tag === "directHit_ai") return;
 						if (
 							arg.card.name != "sha" ||
 							!arg.target.hasSex("female") ||
