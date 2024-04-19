@@ -14492,6 +14492,10 @@ game.import("character", function () {
 						"的选项"
 					);
 				},
+				ai: {
+					combo: "luochong",
+					neg: true
+				},
 			},
 			//SP孟获
 			spmanwang: {
@@ -31488,6 +31492,7 @@ game.import("character", function () {
 				},
 				usable: 1,
 				direct: true,
+				derivation: ["lingren_jianxiong", "lingren_xingshang"],
 				content: function () {
 					"step 0";
 					player
@@ -32848,7 +32853,7 @@ game.import("character", function () {
 			},
 			spmanwang: function (player) {
 				var num = 4 - player.countMark("spmanwang");
-				var str = "出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：";
+				var str = "出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前等量项：";
 				var list = ["⒈获得〖叛侵〗。", "⒉摸一张牌。", "⒊回复1点体力。", "⒋摸两张牌并失去〖叛侵〗。"];
 				for (var i = 0; i < 4; i++) {
 					if (i == num) {
