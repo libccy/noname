@@ -672,6 +672,9 @@ game.import("character", function () {
 						player
 					);
 				},
+				ai: {
+					combo: "mbzuoyou"
+				},
 			},
 			//成济
 			mbkuangli: {
@@ -1731,6 +1734,9 @@ game.import("character", function () {
 							await game.asyncDelayx();
 						},
 					},
+				},
+				ai: {
+					combo: "mbxuetu"
 				},
 			},
 			//霍骏

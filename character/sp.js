@@ -18,6 +18,7 @@ game.import("character", function () {
 					"tengfanglan",
 					"ruiji",
 					"caoxiancaohua",
+					"caoyu",
 				],
 				sp_sibi: [
 					"ol_lukai",
@@ -168,7 +169,6 @@ game.import("character", function () {
 					"ol_tw_zhangji",
 					"ol_liwan",
 					"ol_liuyan",
-					"caoyu",
 					"liupan",
 					"ol_liupi",
 				],
@@ -1148,7 +1148,7 @@ game.import("character", function () {
 				enable: "phaseUse",
 				usable: 1,
 				async content(event, trigger, player) {
-					let cards = get.cards(3);
+					let num = player.maxHp, cards = get.cards(num);
 					await game.cardsGotoOrdering(cards);
 					await player.showCards(cards, get.translation(player) + "发动了【易城】");
 					if (player.countCards("h")) {
@@ -1181,7 +1181,7 @@ game.import("character", function () {
 							.set("filterOk", (moved) => moved[1].some((i) => !get.owner(i)))
 							.set("processAI", (list) => {
 								const player = get.event("player"),
-									limit = Math.min(3, player.countCards("h"));
+									limit = Math.min(get.event("num"), player.countCards("h"));
 								let cards = list[0][1].slice(),
 									hs = player.getCards("h");
 								if (
@@ -1216,7 +1216,8 @@ game.import("character", function () {
 									}
 									return list;
 								}
-							});
+							})
+							.set("num", num);
 						if (bool) {
 							const puts = player.getCards("h", (i) => moved[0].includes(i));
 							const gains = cards.filter((i) => moved[1].includes(i));
@@ -2666,18 +2667,18 @@ game.import("character", function () {
 								if (!ui.selected.targets.length) return 0;
 								const target = ui.selected.targets[0];
 								if (
-									player.getHistory("useSkill", (evt) => {
+									player.hasAllHistory("useSkill", (evt) => {
 										return (
 											evt.skill == "olgongjie" &&
 											(evt.targets || [evt.target]).includes(target)
 										);
-									}).length &&
-									player.getHistory("useSkill", (evt) => {
+									}) &&
+									player.hasAllHistory("useSkill", (evt) => {
 										return (
 											evt.skill == "olxiangxv" &&
 											(evt.targets || [evt.target]).includes(target)
 										);
-									}).length
+									})
 								) {
 									if (get.attitude(player, target) > 0) return 1;
 									if (player.canSaveCard(card, player)) return 0;
@@ -2694,18 +2695,18 @@ game.import("character", function () {
 							ai2(target) {
 								const player = get.event("player");
 								const goon =
-										player.getHistory("useSkill", (evt) => {
+										player.hasAllHistory("useSkill", (evt) => {
 											return (
 												evt.skill == "olgongjie" &&
 												(evt.targets || [evt.target]).includes(target)
 											);
-										}).length &&
-										player.getHistory("useSkill", (evt) => {
+										}) &&
+										player.hasAllHistory("useSkill", (evt) => {
 											return (
 												evt.skill == "olxiangxv" &&
 												(evt.targets || [evt.target]).includes(target)
 											);
-										}).length,
+										}),
 									att = get.attitude(player, target);
 								if (goon) return 5 * att;
 								if (!!player.countCards("he", (cardx) => player.canSaveCard(cardx, player)))
@@ -2724,12 +2725,12 @@ game.import("character", function () {
 					player.awakenSkill("olxiangzuo");
 					await player.give(cards, target);
 					if (
-						player.getHistory("useSkill", (evt) => {
+						player.hasAllHistory("useSkill", (evt) => {
 							return evt.skill == "olgongjie" && evt.targets.includes(target);
-						}).length &&
-						player.getHistory("useSkill", (evt) => {
+						}) &&
+						player.hasAllHistory("useSkill", (evt) => {
 							return evt.skill == "olxiangxv" && evt.targets.includes(target);
-						}).length
+						})
 					)
 						await player.recover(cards.length);
 				},
@@ -14491,6 +14492,10 @@ game.import("character", function () {
 							][index],
 						"的选项"
 					);
+				},
+				ai: {
+					combo: "luochong",
+					neg: true
 				},
 			},
 			//SP孟获
@@ -31488,6 +31493,7 @@ game.import("character", function () {
 				},
 				usable: 1,
 				direct: true,
+				derivation: ["lingren_jianxiong", "lingren_xingshang"],
 				content: function () {
 					"step 0";
 					player
@@ -32848,7 +32854,7 @@ game.import("character", function () {
 			},
 			spmanwang: function (player) {
 				var num = 4 - player.countMark("spmanwang");
-				var str = "出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前X项：";
+				var str = "出牌阶段，你可以弃置任意张牌。然后你依次执行以下选项中的前等量项：";
 				var list = ["⒈获得〖叛侵〗。", "⒉摸一张牌。", "⒊回复1点体力。", "⒋摸两张牌并失去〖叛侵〗。"];
 				for (var i = 0; i < 4; i++) {
 					if (i == num) {
@@ -34530,7 +34536,7 @@ game.import("character", function () {
 				"当你的手牌数变为全场最少时，你可以获得以下效果：本回合结束时，将手牌数调整至与当前回合角色手牌数相同（至多摸至五张），然后若你以此法弃置了至少两张手牌，则你回复1点体力。",
 			olxiangzuo: "襄胙",
 			olxiangzuo_info:
-				"限定技，当你进入濒死状态时，你可以交给一名其他角色任意张牌，然后若你本回合已对其发动过〖恭节〗和〖相胥〗，你回复等量的体力。",
+				"限定技，当你进入濒死状态时，你可以交给一名其他角色任意张牌，然后若你已对其发动过〖恭节〗和〖相胥〗，你回复等量的体力。",
 			liyi: "李异",
 			olchanshuang: "缠双",
 			olchanshuang_info:
@@ -34569,7 +34575,7 @@ game.import("character", function () {
 			ol_liupi: "刘辟",
 			olyicheng: "易城",
 			olyicheng_info:
-				"出牌阶段限一次，你可以亮出牌堆顶的三张牌，然后你可以以任意手牌交换这些牌，若这三张牌的点数和因此增加，则你可以选择用所有手牌交换这三张牌。最后你将这三张牌置于牌堆顶。",
+				"出牌阶段限一次，你可以亮出牌堆顶的X张牌（X为你的体力上限），然后你可以以任意手牌交换其中等量张牌，若亮出的牌的点数和因此增加，则你可以选择用所有手牌交换亮出的牌。最后你将亮出的牌置于牌堆顶。",
 			sp_sunce: "SP孙策",
 			sp_sunce_prefix: "SP",
 			olliantao: "连讨",

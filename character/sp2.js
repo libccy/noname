@@ -9794,6 +9794,9 @@ game.import("character", function () {
 					player.markSkill("mubing_rewrite");
 					player.chooseDrawRecover(2, true);
 				},
+				ai: {
+					combo: "mubing"
+				},
 				derivation: "mubing_rewrite",
 			},
 			refenyin_wufan: { audio: 2 },
