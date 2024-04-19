@@ -18,6 +18,7 @@ game.import("character", function () {
 					"tengfanglan",
 					"ruiji",
 					"caoxiancaohua",
+					"caoyu",
 				],
 				sp_sibi: [
 					"ol_lukai",
@@ -168,7 +169,6 @@ game.import("character", function () {
 					"ol_tw_zhangji",
 					"ol_liwan",
 					"ol_liuyan",
-					"caoyu",
 					"liupan",
 					"ol_liupi",
 				],
@@ -1148,7 +1148,7 @@ game.import("character", function () {
 				enable: "phaseUse",
 				usable: 1,
 				async content(event, trigger, player) {
-					let cards = get.cards(3);
+					let num = player.maxHp, cards = get.cards(num);
 					await game.cardsGotoOrdering(cards);
 					await player.showCards(cards, get.translation(player) + "发动了【易城】");
 					if (player.countCards("h")) {
@@ -1181,7 +1181,7 @@ game.import("character", function () {
 							.set("filterOk", (moved) => moved[1].some((i) => !get.owner(i)))
 							.set("processAI", (list) => {
 								const player = get.event("player"),
-									limit = Math.min(3, player.countCards("h"));
+									limit = Math.min(get.event("num"), player.countCards("h"));
 								let cards = list[0][1].slice(),
 									hs = player.getCards("h");
 								if (
@@ -1216,7 +1216,8 @@ game.import("character", function () {
 									}
 									return list;
 								}
-							});
+							})
+							.set("num", num);
 						if (bool) {
 							const puts = player.getCards("h", (i) => moved[0].includes(i));
 							const gains = cards.filter((i) => moved[1].includes(i));
@@ -34574,7 +34575,7 @@ game.import("character", function () {
 			ol_liupi: "刘辟",
 			olyicheng: "易城",
 			olyicheng_info:
-				"出牌阶段限一次，你可以亮出牌堆顶的三张牌，然后你可以以任意手牌交换这些牌，若这三张牌的点数和因此增加，则你可以选择用所有手牌交换这三张牌。最后你将这三张牌置于牌堆顶。",
+				"出牌阶段限一次，你可以亮出牌堆顶的X张牌（X为你的体力上限），然后你可以以任意手牌交换其中等量张牌，若亮出的牌的点数和因此增加，则你可以选择用所有手牌交换亮出的牌。最后你将亮出的牌置于牌堆顶。",
 			sp_sunce: "SP孙策",
 			sp_sunce_prefix: "SP",
 			olliantao: "连讨",

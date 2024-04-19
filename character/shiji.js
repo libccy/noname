@@ -3554,6 +3554,9 @@ game.import("character", function () {
 					"step 1";
 					player.addSkills("xinmouli");
 				},
+				ai: {
+					combo: "xingqi"
+				},
 				group: ["mibei_fail", "mibei_silent"],
 				derivation: "xinmouli",
 				subSkill: {
