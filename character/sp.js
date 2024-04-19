@@ -1005,7 +1005,7 @@ game.import("character", function () {
 								}
 								return list;
 							}, []);
-							return Math[att > 0 ? "max" : "min"].apply(Math, list);
+							return Math[att > 0 ? "max" : "min"].apply(Math, effs);
 						})
 						.forResult();
 				},

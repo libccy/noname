@@ -4524,7 +4524,7 @@ export class Player extends HTMLDivElement {
 			if (typeof this.selectCard == "function") return false;
 			if (this.complexCard || this.complexSelect || this.filterOk) return false;
 			var cards = this.player.getCards(this.position);
-			if (cards.some(card => !this.filterCard(card, this))) return false;
+			if (cards.some(card => !this.filterCard(card, this.player))) return false;
 			var num = cards.length;
 			for (var i = 0; i < cards.length; i++) {
 				if (!lib.filter.cardDiscardable(cards[i], this.player, this)) num--;
@@ -4783,7 +4783,7 @@ export class Player extends HTMLDivElement {
 			if (typeof this.selectCard == "function") return false;
 			if (this.complexCard || this.complexSelect || this.filterOk) return false;
 			var cards = this.player.getCards(this.position);
-			if (cards.some(card => !this.filterCard(card, this))) return false;
+			if (cards.some(card => !this.filterCard(card, this.player))) return false;
 			return get.select(this.selectCard)[0] >= this.player.countCards(this.position);
 		};
 		next.setContent("chooseCard");
