@@ -171,12 +171,12 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 					checkVersionButton.innerHTML = "检查游戏更新";
 					checkDevVersionButton.disabled = false;
 					checkDevVersionButton.innerHTML = "更新到开发版";
-				}
+				};
 
 				/**
 				 * @param {{ assets: any; author?: { login: string; avatar_url: string; html_url: string; }; body?: string; html_url?: string; name: any; published_at?: string; zipball_url: any; }} description
 				 */
-				const download = description => {
+				const download = (description) => {
 					const progress = createProgress(
 						"正在更新" + description.name,
 						1,
@@ -271,7 +271,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 																.then(() => {
 																	cp.exec(
 																		`start /b ${__dirname}\\noname-server.exe -platform=electron`,
-																		() => { }
+																		() => {}
 																	);
 																	function loadURL() {
 																		let myAbortController =
@@ -322,20 +322,19 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 							refresh();
 							throw e;
 						});
-				}
+				};
 
 				if (!dev) {
 					getLatestVersionFromGitHub()
-						.then(tagName => {
+						.then((tagName) => {
 							game.saveConfig("check_version", tagName.slice(1));
 							if (typeof lib.config[`version_description_${tagName}`] == "object") {
 								/** @type { ReturnType<import('../../../../library/update.js').getRepoTagDescription> } */
 								const description = lib.config[`version_description_${tagName}`];
 								return description;
-							}
-							else return getRepoTagDescription(tagName);
+							} else return getRepoTagDescription(tagName);
 						})
-						.then(description => {
+						.then((description) => {
 							// 保存版本信息
 							if (typeof lib.config["version_description_" + description.name] != "object") {
 								game.saveConfig("version_description_" + description.name, description);
@@ -410,17 +409,17 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				const refresh = () => {
 					checkAssetButton.innerHTML = "检查素材更新";
 					checkAssetButton.disabled = false;
-				}
+				};
 
 				const assetDirectories = [];
 				if (lib.config.asset_font) assetDirectories.push("font");
 				if (lib.config.asset_audio) assetDirectories.push("audio");
 				if (lib.config.asset_image) assetDirectories.push("image");
-				const version = await getLatestVersionFromGitHub().catch(e => {
+				const version = await getLatestVersionFromGitHub().catch((e) => {
 					refresh();
 					throw e;
 				});
-				const files = await getTreesFromGithub(assetDirectories, version).catch(e => {
+				const files = await getTreesFromGithub(assetDirectories, version).catch((e) => {
 					refresh();
 					throw e;
 				});
@@ -444,18 +443,19 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 					const results = [];
 					for (let i = 0; i < arr.length; i += 10) {
 						const pushArr = arr.slice(i, i + 10);
-						results.push(
-							...await Promise.all(pushArr.map(predicate))
-						);
+						results.push(...(await Promise.all(pushArr.map(predicate))));
 					}
 					return arr.filter((_v, index) => results[index]);
 				};
 
-				const result = await asyncFilter(files.flat(), async v => {
-					return game.promises.readFile(v.path).then(data => {
-						return v.size != data.byteLength;
-					}).catch(()=>true)
-				}).then(arr => arr.map((v) => v.path));
+				const result = await asyncFilter(files.flat(), async (v) => {
+					return game.promises
+						.readFile(v.path)
+						.then((data) => {
+							return v.size != data.byteLength;
+						})
+						.catch(() => true);
+				}).then((arr) => arr.map((v) => v.path));
 
 				console.log("需要更新的文件有:", result);
 				game.print("需要更新的文件有:", result);
