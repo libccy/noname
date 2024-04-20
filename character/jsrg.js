@@ -8741,6 +8741,9 @@ game.import("character", function () {
 							.set("cards", trigger.cards);
 					}
 				},
+				ai: {
+					combo: "jsrglirang"
+				},
 			},
 			//朱儁
 			jsrgfendi: {

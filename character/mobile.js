@@ -604,7 +604,7 @@ game.import("character", function () {
 				usable: 1,
 				zhuanhuanji: true,
 				filterTarget(card, player, target) {
-					if (player.storage.mbzuoyou) return target.countCards("h");
+					if (player.storage.mbzuoyou) return target.countCards("h") >= 2;
 					return true;
 				},
 				async content(event, trigger, player) {
@@ -612,12 +612,13 @@ game.import("character", function () {
 						target = event.target;
 					if (event.name === "mbzuoyou") player.changeZhuanhuanji("mbzuoyou");
 					if (!storage) {
-						await target.draw(3);
-						await target.chooseToDiscard(2, true, "he");
+						await target.draw(2);
+						await target.chooseToDiscard(1, true, "h");
 					} else {
 						await target.chooseToDiscard(
 							target === player ? "佐佑" : `${get.translation(player)}对你发动了【佐佑】`,
-							"请弃置一张手牌，然后获得1点护甲",
+							"请弃置两张手牌，然后获得1点护甲",
+							2,
 							true
 						);
 						await target.changeHujia(1, null, true);
@@ -628,8 +629,8 @@ game.import("character", function () {
 				intro: {
 					content(storage, player) {
 						if (!storage)
-							return "转换技。出牌阶段限一次，你可以令一名角色摸三张牌，然后其弃置两张牌。";
-						return "转换技。出牌阶段限一次，你可以令一名角色弃置一张手牌，然后其获得1点护甲。";
+							return "转换技。出牌阶段限一次，你可以令一名角色摸两张牌，然后其弃置一张手牌。";
+						return "转换技。出牌阶段限一次，你可以令一名手牌数不少于二的角色弃置两张手牌，然后其获得1点护甲。";
 					},
 				},
 				ai: {
@@ -21192,7 +21193,7 @@ game.import("character", function () {
 			lizhaojiaobo: "李昭焦伯",
 			mbzuoyou: "佐佑",
 			mbzuoyou_info:
-				"转换技。出牌阶段限一次，阴：你可以令一名角色摸三张牌，然后其弃置两张牌；阳：你可以令一名角色弃置一张手牌，然后其获得1点护甲。",
+				"转换技。出牌阶段限一次，阴：你可以令一名角色摸两张牌，然后其弃置一张手牌；阳：你可以令一名手牌数不少于二的角色弃置两张手牌，然后其获得1点护甲。",
 			mbshishou: "侍守",
 			mbshishou_info:
 				"锁定技。当你发动〖佐佑〗后，若目标角色不为你，你执行〖佐佑〗中目标角色未执行的一项。",

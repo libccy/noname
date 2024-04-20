@@ -1005,7 +1005,7 @@ game.import("character", function () {
 								}
 								return list;
 							}, []);
-							return Math[att > 0 ? "max" : "min"].apply(Math, list);
+							return Math[att > 0 ? "max" : "min"].apply(Math, effs);
 						})
 						.forResult();
 				},
@@ -32647,6 +32647,9 @@ game.import("character", function () {
 					if (event.togain.length) {
 						player.gain(event.togain, "gain2");
 					}
+				},
+				ai: {
+					combo: "xinfu_falu"
 				},
 			},
 			zhenyi_spade: {
