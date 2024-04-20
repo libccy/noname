@@ -67,37 +67,30 @@ export class GameEvent {
 	/**
 	 * @type { Player }
 	 */
-	// @ts-ignore
 	source;
 	/**
 	 * @type { Player }
 	 */
-	// @ts-ignore
 	player;
 	/**
 	 * @type { Player[] }
 	 */
-	// @ts-ignore
 	players;
 	/**
 	 * @type { Player }
 	 */
-	// @ts-ignore
 	target;
 	/**
 	 * @type { Player[] }
 	 */
-	// @ts-ignore
 	targets;
 	/**
 	 * @type { Card }
 	 */
-	// @ts-ignore
 	card;
 	/**
 	 * @type { Card[] }
 	 */
-	// @ts-ignore
 	cards;
 	/**
 	 * @type { string }
@@ -114,7 +107,6 @@ export class GameEvent {
 	/**
 	 * @type { GameEvent }
 	 */
-	// @ts-ignore
 	_trigger;
 	/**
 	 * @type { Result }
@@ -123,61 +115,79 @@ export class GameEvent {
 	/**
 	 * @type { number }
 	 */
-	// @ts-ignore
 	baseDamage;
 	/**
 	 * @type { Player }
 	 */
-	// @ts-ignore
 	customSource;
 	/**
 	 * @type { number }
 	 */
-	// @ts-ignore
 	extraDamage;
 	/**
 	 * @type { string }
 	 */
-	// @ts-ignore
 	nature;
 	/**
 	 * @type { boolean }
 	 */
-	// @ts-ignore
 	notrigger;
 	/**
 	 * @type { number }
 	 */
-	// @ts-ignore
 	original_num;
 	/**
 	 * @type { boolean }
 	 */
-	// @ts-ignore
 	unreal;
 	/**
 	 * @type { Button[] }
 	 */
-	// @ts-ignore
 	excludeButton;
 	/**
 	 * @type { Result }
 	 */
-	// @ts-ignore
 	result;
 	/**
 	 * @type { GameEventPromise | void | null }
 	 */
-	// @ts-ignore
 	parent;
 	/**
 	 * @type { string }
 	 */
 	name;
 	/**
-	 * @type { Function | void | null }
+	 * @type { (this: GameEventPromise) => any | undefined | void | null }
 	 */
 	filterStop;
+	/**
+	 * @type { Result['cost_data'] }
+	 */
+	cost_data;
+	/**
+	 * @type { boolean }
+	 */
+	responded;
+	/**
+	 * @type { string | undefined }
+	 */
+	judgestr;
+	/**
+	 * @type { boolean }
+	 */
+	judging;
+	/**
+	 * @type { Function | undefined }
+	 */
+	judge2;
+	/**
+	 * @type { Card[] }
+	 */
+	orderingCards;
+	/**
+	 * @type { Function | undefined }
+	 */
+	ai;
 	/**
 	 * @param {keyof this} key
 	 * @param {number} [value]

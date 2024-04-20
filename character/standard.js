@@ -129,6 +129,7 @@ game.import("character", function () {
 			ganning: ["lingtong", "xf_sufei"],
 			guanyu: ["zhangfei", "liaohua"],
 		},
+		/** @type { importCharacterConfig['skill'] } */
 		skill: {
 			//标准版甘夫人
 			stdshushen: {
@@ -578,7 +579,7 @@ game.import("character", function () {
 				async cost(event, trigger, player) {
 					let num = game.countPlayer(
 						(current) =>
-							current != player && current.countCards("h") && get.attitude(player, current) <= 0
+							current != player && current.countCards("h") > 0 && get.attitude(player, current) <= 0
 					);
 					let check = num >= 2;
 					const { result } = await player
@@ -2611,7 +2612,7 @@ game.import("character", function () {
 					global: ["dying", "gainAfter", "loseAsyncAfter"],
 				},
 				audio: 2,
-				getIndex: function (event, player) {
+				getIndex(event, player) {
 					if (event.name !== "loseAsync") return [event.player];
 					else
 						return game

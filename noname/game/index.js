@@ -53,18 +53,19 @@ export class Game {
 	/**
 	 * @type { string }
 	 */
-	// @ts-ignore
 	layout;
 	/**
 	 * @type { Player }
 	 */
-	// @ts-ignore
 	me;
 	/**
 	 * @type { boolean }
 	 */
-	// @ts-ignore
 	chess;
+	/**
+	 * @type { Player }
+	 */
+	zhu;
 	globalEventHandlers = new (class {
 		constructor() {
 			this._handlers = {};
@@ -557,8 +558,8 @@ export class Game {
 	/**
 	 * @template { keyof GameHistory } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
 	 * @returns { boolean }
 	 */
 	hasGlobalHistory(key, filter, last) {
@@ -580,8 +581,8 @@ export class Game {
 	/**
 	 * @template { keyof GameHistory } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
 	 * @returns { void }
 	 */
 	checkGlobalHistory(key, filter, last) {
@@ -608,8 +609,8 @@ export class Game {
 	 * @template { keyof GameHistory } T
 	 * @overload
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } [filter]
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } [filter]
+	 * @param { GameEventPromise } [last]
 	 * @returns { GameHistory[T] }
 	 */
 	getGlobalHistory(key, filter, last) {
@@ -630,8 +631,8 @@ export class Game {
 	/**
 	 * @template { keyof GameHistory } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
 	 * @returns { boolean }
 	 */
 	hasAllGlobalHistory(key, filter, last) {
@@ -656,8 +657,8 @@ export class Game {
 	/**
 	 * @template { keyof GameHistory } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
 	 * @returns { void }
 	 */
 	checkAllGlobalHistory(key, filter, last) {
@@ -686,8 +687,8 @@ export class Game {
 	 * @template { keyof GameHistory } T
 	 * @overload
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } [filter]
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } [filter]
+	 * @param { GameEventPromise } [last]
 	 * @returns { GameHistory[T] }
 	 */
 	getAllGlobalHistory(key, filter, last) {
@@ -718,12 +719,12 @@ export class Game {
 	/**
 	 * @overload
 	 * @param { Card } cards
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	/**
 	 * @overload
 	 * @param {Card[]} cards
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	cardsDiscard(cards) {
 		/** @type { 'cards' | 'card' | void } */
@@ -746,12 +747,12 @@ export class Game {
 	/**
 	 * @overload
 	 * @param { Card } cards
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	/**
 	 * @overload
 	 * @param {Card[]} cards
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	cardsGotoOrdering(cards) {
 		/** @type { 'cards' | 'card' | void } */
@@ -771,13 +772,13 @@ export class Game {
 	 * @overload
 	 * @param { Card } cards
 	 * @param { 'toRenku' | false } [bool] 为false时不触发trigger，为'toRenku'时牌放到仁库
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	/**
 	 * @overload
 	 * @param {Card[]} cards
 	 * @param { 'toRenku' | false } [bool] 为false时不触发trigger，为'toRenku'时牌放到仁库
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	cardsGotoSpecial(cards, bool) {
 		/** @type { 'cards' | 'card' | void } */
@@ -836,7 +837,7 @@ export class Game {
 		return next;
 	}
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } event
+	 * @param { GameEventPromise } event
 	 */
 	$cardsGotoPile(event) {
 		const cards = event.cards;
@@ -4651,8 +4652,8 @@ export class Game {
 	 * @param { string } name
 	 * @param { string } skill
 	 * @param { Player } player
-	 * @param { import('../library/index.js').GameEventPromise } event
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @param { GameEventPromise } event
+	 * @returns { GameEventPromise }
 	 */
 	createTrigger(name, skill, player, event, indexedData) {
 		let info = get.info(skill);
@@ -4675,7 +4676,7 @@ export class Game {
 	 *
 	 * @param { string } name
 	 * @param { false } [trigger]
-	 * @param { import('../library/index.js').GameEventPromise } [triggerEvent]
+	 * @param { GameEventPromise } [triggerEvent]
 	 */
 	createEvent(name, trigger, triggerEvent) {
 		const next = new lib.element.GameEvent(name, trigger).toPromise();
@@ -5832,11 +5833,11 @@ export class Game {
 	 */
 	executingAsyncEventMap = new Map();
 	/**
-	 * @type { import('../library/index.js').GameEventPromise[] }
+	 * @type { GameEventPromise[] }
 	 */
 	belongAsyncEventList = [];
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } [belongAsyncEvent]
+	 * @param { GameEventPromise } [belongAsyncEvent]
 	 */
 	async loop(belongAsyncEvent) {
 		if (belongAsyncEvent) {
@@ -6017,7 +6018,7 @@ export class Game {
 		}
 	}
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } [belongAsyncEvent]
+	 * @param { GameEventPromise } [belongAsyncEvent]
 	 */
 	runContent(belongAsyncEvent) {
 		return new Promise((resolve) => {
@@ -6331,7 +6332,7 @@ export class Game {
 		return game.asyncDelay(time, time2);
 	}
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } [event]
+	 * @param { GameEventPromise } [event]
 	 */
 	check(event = _status.event) {
 		game.callHook("checkBegin", [event]);
@@ -7486,20 +7487,21 @@ export class Game {
 	}
 	/**
 	 * @param { Player[] } players
-	 * @param { number | number[] | (player: Player) => number } num
+	 * @param { number | number[] | (player: Player) => number } [num]
 	 * @param { { drawDeck: boolean } } [drawDeck]
 	 * @param { boolean } [bottom]
 	 */
-	asyncDraw(players, num, drawDeck, bottom) {
-		return players.forEach((value, index) => {
+	async asyncDraw(players, num, drawDeck, bottom) {
+		for (let index = 0; index < players.length; index++) {
+			const value = players[index];
 			let num2 = 1;
 			if (typeof num == "number") num2 = num;
 			else if (Array.isArray(num)) num2 = num[index];
 			else if (typeof num == "function") num2 = num(value);
-			if (drawDeck && drawDeck.drawDeck) value.draw(num2, false, drawDeck);
-			else if (bottom) value.draw(num2, "nodelay", "bottom");
-			else value.draw(num2, "nodelay");
-		});
+			if (drawDeck && drawDeck.drawDeck) await value.draw(num2, false, drawDeck);
+			else if (bottom) await value.draw(num2, "nodelay", "bottom");
+			else await value.draw(num2, "nodelay");
+		}
 	}
 	/**
 	 * @param { Player[] } players
@@ -7936,7 +7938,7 @@ export class Game {
 	 * @param { Player } player
 	 * @param { string | Card[] } card
 	 * @param { Player[] } [targets]
-	 * @param { import('../library/index.js').GameEventPromise } [event]
+	 * @param { GameEventPromise } [event]
 	 * @param { boolean } [forced]
 	 * @param { string } [logvid]
 	 */
