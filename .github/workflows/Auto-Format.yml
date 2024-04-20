@@ -1,0 +1,30 @@
+name: Auto-Format
+
+# This action works with pull requests and pushes on the main branch
+on:
+  pull_request:
+    types: [closed]
+    branches: [PR-Branch]
+
+jobs:
+  prettier:
+    name: Prettier
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          # Make sure the actual branch is checked out when running on pull requests
+          ref: ${{ github.head_ref }}
+          # This is important to fetch the changes to the previous commit
+          fetch-depth: 0
+
+      - name: Prettify code
+        uses: creyD/prettier_action@v4.3
+        with:
+          # This part is also where you can pass other options, for example:
+          prettier_options: --write **/*.{js,ts,mjs,vue,json,yml,md} --config ./prettier.config.mjs --ignore-path ./.prettierignore
+          commit_message: "style: prettified code from pull request."
+          only_changed: True
+
