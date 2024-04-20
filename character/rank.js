@@ -142,6 +142,7 @@ window.noname_character_rank = {
 		"dc_shen_huatuo",
 		"sp_zhenji",
 		"wu_guanyu",
+		"clan_zhongyao",
 	],
 	a: [
 		"star_caoren",
@@ -1916,6 +1917,7 @@ window.noname_character_rank = {
 			"wu_guanyu",
 		],
 		epic: [
+			"clan_zhongyao",
 			"dc_caoshuang",
 			"tianchou",
 			"star_yuanshao",
