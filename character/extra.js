@@ -673,7 +673,7 @@ game.import("character", function () {
 					return game.hasPlayer((current) => {
 						if (current == player) return false;
 						const total = current.countCards("ej");
-						return total > 0 && num >= total + (get.mode() != "doudizhu" ? 1 : 0);
+						return total > 0 && num >= total;
 					});
 				},
 				filterCard: true,
@@ -682,7 +682,7 @@ game.import("character", function () {
 						1,
 						Math.max(
 							...game.filterPlayer((i) => i != get.player()).map((i) => i.countCards("ej"))
-						) + (get.mode() != "doudizhu" ? 1 : 0),
+						),
 					];
 				},
 				check(card) {
@@ -691,10 +691,10 @@ game.import("character", function () {
 				filterTarget(card, player, target) {
 					const num = target.countCards("ej");
 					if (!num) return false;
-					return ui.selected.cards.length == num + (get.mode() != "doudizhu" ? 1 : 0) && player != target;
+					return ui.selected.cards.length == num && player != target;
 				},
 				filterOk() {
-					return ui.selected.cards.length == ui.selected.targets[0].countCards("ej") + (get.mode() != "doudizhu" ? 1 : 0);
+					return ui.selected.cards.length == ui.selected.targets[0].countCards("ej");
 				},
 				position: "he",
 				lose: false,
@@ -10840,8 +10840,6 @@ game.import("character", function () {
 			shen_lusu_prefix: "神",
 			dingzhou: "定州",
 			dingzhou_info:
-				"出牌阶段限一次。你可以将X张牌交给一名场上有牌的角色，然后你获得其场上的所有牌（X为其场上的牌数+1）。",
-			dingzhou_info_doudizhu:
 				"出牌阶段限一次。你可以将X张牌交给一名场上有牌的角色，然后你获得其场上的所有牌（X为其场上的牌数）。",
 			tamo: "榻谟",
 			tamo_info:
