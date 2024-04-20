@@ -4,7 +4,7 @@ name: Auto-Format
 on:
   pull_request:
     types: [closed]
-    branches: [PR-Branch]
+    branches: [master, PR-Branch]
 
 permissions:
   # Give the default GITHUB_TOKEN write permission to commit and push the
