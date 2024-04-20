@@ -131,11 +131,20 @@ game.import("play", function () {
 			}
 		},
 		game: {
-			changeCoin: function (num,toast) {
+			changeCoin: function (num, toast, audio) {
 				if (typeof num == "number" && ui.coin) {
-					if(num!=0 && toast!== false){
-						game.playAudio('effect',num > 0?"coin":"coin_cost");
-						ui.create.toast(`${num > 0 ? "获得":"花费"}&nbsp;${num}&nbsp;金币`);
+					if (num != 0 && toast !== false) {
+						ui.create.toast(
+							`${num > 0 ? "获得" : "花费"}&nbsp;${Math.abs(
+								num
+							)}&nbsp;金币`
+						);
+					}
+					if (audio !== false) {
+						game.playAudio(
+							"effect",
+							num > 0 ? "coin" : "coin_cost"
+						);
 					}
 					game.saveConfig("coin", lib.config.coin + num);
 					var str;

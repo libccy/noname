@@ -1,12 +1,11 @@
 .toast-container {
-    display:block;
+    display: block;
     position: absolute;
     top: 15%;
     left: 50%;
     transform: translateX(-50%);
     z-index: 9999;
 }
-
 
 .toast {
     display: block;
@@ -25,17 +24,19 @@
     animation: fadeInOut 1500ms ease-in-out forwards;
 }
 
-
 @keyframes fadeInOut {
     0% {
         opacity: 0;
     }
+
     20% {
         opacity: 1;
     }
+
     80% {
         opacity: 1;
     }
+
     100% {
         opacity: 0;
     }
