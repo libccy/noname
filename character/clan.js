@@ -1366,7 +1366,7 @@ game.import("character", function () {
 						str = "";
 					if (player.getDamagedHp() > 0)
 						str += "，然后摸" + get.cnNumber(player.getDamagedHp()) + "张牌";
-					player
+					event.result=await player
 						.chooseToDiscard(
 							get.prompt("clanxieshu"),
 							"横置武将牌并弃置" + get.cnNumber(num) + "张牌" + str,
