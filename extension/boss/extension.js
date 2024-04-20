@@ -13,14 +13,11 @@ game.import("play", function () {
 			if (get.mode() != "boss") {
 				lib.characterPack.mode_extension_boss = storage.boss || {};
 				for (var i in lib.characterPack.mode_extension_boss) {
-					lib.characterPack.mode_extension_boss[i][4].push(
-						"mode:boss"
-					);
+					lib.characterPack.mode_extension_boss[i][4].push("mode:boss");
 					lib.character[i] = lib.characterPack.mode_extension_boss[i];
 					if (
 						typeof lib.character[i][2] != "number" &&
-						(typeof lib.character[i][2] != "string" ||
-							lib.character[i][2].indexOf("/") == -1)
+						(typeof lib.character[i][2] != "string" || lib.character[i][2].indexOf("/") == -1)
 					) {
 						lib.character[i][2] = Infinity;
 					}
@@ -30,16 +27,11 @@ game.import("play", function () {
 				}
 			}
 			var list2 = storage.versus || {};
-			if (
-				get.mode() != "versus" ||
-				get.config("versus_mode") != "jiange"
-			) {
+			if (get.mode() != "versus" || get.config("versus_mode") != "jiange") {
 				lib.characterPack.mode_extension_jiange = list2;
 				for (var i in list2) {
 					lib.characterPack.mode_extension_jiange[i] = list2[i];
-					lib.characterPack.mode_extension_jiange[i][4].push(
-						"mode:versus"
-					);
+					lib.characterPack.mode_extension_jiange[i][4].push("mode:versus");
 					lib.character[i] = list2[i];
 					if (typeof lib.character[i][2] != "number") {
 						lib.character[i][2] = Infinity;
@@ -49,20 +41,13 @@ game.import("play", function () {
 					}
 				}
 				lib.characterIntro.boss_liedixuande = lib.characterIntro.liubei;
-				lib.characterIntro.boss_gongshenyueying =
-					lib.characterIntro.huangyueying;
-				lib.characterIntro.boss_tianhoukongming =
-					lib.characterIntro.shen_zhugeliang;
-				lib.characterIntro.boss_yuhuoshiyuan =
-					lib.characterIntro.pangtong;
-				lib.characterIntro.boss_qiaokuijunyi =
-					lib.characterIntro.zhanghe;
-				lib.characterIntro.boss_jiarenzidan =
-					lib.characterIntro.caozhen;
-				lib.characterIntro.boss_duanyuzhongda =
-					lib.characterIntro.simayi;
-				lib.characterIntro.boss_juechenmiaocai =
-					lib.characterIntro.xiahouyuan;
+				lib.characterIntro.boss_gongshenyueying = lib.characterIntro.huangyueying;
+				lib.characterIntro.boss_tianhoukongming = lib.characterIntro.shen_zhugeliang;
+				lib.characterIntro.boss_yuhuoshiyuan = lib.characterIntro.pangtong;
+				lib.characterIntro.boss_qiaokuijunyi = lib.characterIntro.zhanghe;
+				lib.characterIntro.boss_jiarenzidan = lib.characterIntro.caozhen;
+				lib.characterIntro.boss_duanyuzhongda = lib.characterIntro.simayi;
+				lib.characterIntro.boss_juechenmiaocai = lib.characterIntro.xiahouyuan;
 			} else if (_status.mode != "jiange") {
 				for (var i in list2) {
 					lib.character[i] = list2[i];
@@ -94,8 +79,7 @@ game.import("play", function () {
 				if (get.mode() != "versus") {
 					game.loadModeAsync("versus", function (mode) {
 						for (var i in mode.translate) {
-							lib.translate[i] =
-								lib.translate[i] || mode.translate[i];
+							lib.translate[i] = lib.translate[i] || mode.translate[i];
 							storage.translate[i] = mode.translate[i];
 						}
 						for (var i in mode.skill) {
@@ -115,23 +99,16 @@ game.import("play", function () {
 								storage.versus[i] = mode.jiangeboss[i];
 							}
 						}
-						localStorage.setItem(
-							"boss_storage_playpackconfig",
-							JSON.stringify(storage)
-						);
+						localStorage.setItem("boss_storage_playpackconfig", JSON.stringify(storage));
 					});
 				} else {
-					localStorage.setItem(
-						"boss_storage_playpackconfig",
-						JSON.stringify(storage)
-					);
+					localStorage.setItem("boss_storage_playpackconfig", JSON.stringify(storage));
 				}
 			};
 			if (get.mode() != "boss") {
 				game.loadModeAsync("boss", function (mode) {
 					for (var i in mode.translate) {
-						lib.translate[i] =
-							lib.translate[i] || mode.translate[i];
+						lib.translate[i] = lib.translate[i] || mode.translate[i];
 						storage.translate[i] = mode.translate[i];
 					}
 					for (var i in mode.skill) {
@@ -145,11 +122,7 @@ game.import("play", function () {
 					}
 					storage.boss = {};
 					for (var i in mode.characterPack.mode_boss) {
-						if (
-							mode.characterPack.mode_boss[i][4].includes(
-								"bossallowed"
-							)
-						) {
+						if (mode.characterPack.mode_boss[i][4].includes("bossallowed")) {
 							storage.boss[i] = mode.characterPack.mode_boss[i];
 						}
 					}

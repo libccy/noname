@@ -3,19 +3,13 @@ game.import("play", function () {
 	return {
 		name: "coin",
 		init: function () {
-			if (
-				lib.config.mode != "chess" ||
-				get.config("chess_mode") != "leader"
-			) {
+			if (lib.config.mode != "chess" || get.config("chess_mode") != "leader") {
 				_status.coin = 0;
 			}
 		},
 		arenaReady: function () {
 			if (_status.video || _status.connectMode) return;
-			if (
-				lib.config.mode != "chess" ||
-				get.config("chess_mode") != "leader"
-			) {
+			if (lib.config.mode != "chess" || get.config("chess_mode") != "leader") {
 				var str;
 				if (lib.config.coin_display_playpackconfig == "text") {
 					str = "<span>" + lib.config.coin + "</span><span>金</span>";
@@ -72,8 +66,7 @@ game.import("play", function () {
 									item.cost +
 									"金</span></div></div>"
 							);
-							var buy =
-								uiintro.content.lastChild.lastChild.lastChild;
+							var buy = uiintro.content.lastChild.lastChild.lastChild;
 							if (lib.config.coin < item.cost && !item.bought) {
 								buy.classList.add("disabled");
 							}
@@ -83,10 +76,7 @@ game.import("play", function () {
 									if (item.control) {
 										var node = item.control();
 										if (node) {
-											buy.parentNode.appendChild(
-												node,
-												buy
-											);
+											buy.parentNode.appendChild(node, buy);
 										}
 									}
 								} else {
@@ -103,8 +93,7 @@ game.import("play", function () {
 							uiintro.add(
 								'<div class="coin_buy">本局获胜<div class="menubutton">20金</span></div></div>'
 							);
-							var bet =
-								uiintro.content.lastChild.lastChild.lastChild;
+							var bet = uiintro.content.lastChild.lastChild.lastChild;
 							bet.listen(function () {
 								if (_status.betWin) return;
 								_status.betWin = true;
@@ -136,10 +125,7 @@ game.import("play", function () {
 					game.saveConfig("coin", lib.config.coin + num);
 					var str;
 					if (lib.config.coin_display_playpackconfig == "text") {
-						str =
-							"<span>" +
-							lib.config.coin +
-							"</span><span>金</span>";
+						str = "<span>" + lib.config.coin + "</span><span>金</span>";
 					} else {
 						str =
 							'<span style="position:absolute">㉤</span><span style="margin-left:18px;font-family:xinwei;line-height:10px">' +
@@ -278,10 +264,7 @@ game.import("play", function () {
 								ctx.beginPath();
 								//changing opacity according to the life.
 								//opacity goes to 0 at the end of life of a particle
-								p.opacity =
-									Math.round(
-										(p.remaining_life / p.life) * 100
-									) / 100;
+								p.opacity = Math.round((p.remaining_life / p.life) * 100) / 100;
 								//a gradient instead of white fill
 								var gradient = ctx.createRadialGradient(
 									p.location.x,
@@ -293,46 +276,15 @@ game.import("play", function () {
 								);
 								gradient.addColorStop(
 									0,
-									"rgba(" +
-										p.r +
-										", " +
-										p.g +
-										", " +
-										p.b +
-										", " +
-										p.opacity +
-										")"
+									"rgba(" + p.r + ", " + p.g + ", " + p.b + ", " + p.opacity + ")"
 								);
 								gradient.addColorStop(
 									0.5,
-									"rgba(" +
-										p.r +
-										", " +
-										p.g +
-										", " +
-										p.b +
-										", " +
-										p.opacity +
-										")"
+									"rgba(" + p.r + ", " + p.g + ", " + p.b + ", " + p.opacity + ")"
 								);
-								gradient.addColorStop(
-									1,
-									"rgba(" +
-										p.r +
-										", " +
-										p.g +
-										", " +
-										p.b +
-										", 0)"
-								);
+								gradient.addColorStop(1, "rgba(" + p.r + ", " + p.g + ", " + p.b + ", 0)");
 								ctx.fillStyle = gradient;
-								ctx.arc(
-									p.location.x,
-									p.location.y,
-									p.radius,
-									Math.PI * 2,
-									false
-								);
+								ctx.arc(p.location.x, p.location.y, p.radius, Math.PI * 2, false);
 								ctx.fill();
 
 								//lets move the particles
@@ -427,27 +379,17 @@ game.import("play", function () {
 								return sqrt(sqr(this.x + this.y));
 							},
 							distance: function (another) {
-								return abs(
-									sqrt(
-										sqr(this.x - another.x) +
-											sqr(this.y - another.y)
-									)
-								);
+								return abs(sqrt(sqr(this.x - another.x) + sqr(this.y - another.y)));
 							},
 							angle: function (angle, magnitude) {
-								if (angle && magnitude)
-									return Vector.fromAngle(angle, magnitude);
+								if (angle && magnitude) return Vector.fromAngle(angle, magnitude);
 								return atan2(this.y, this.x);
 							},
 							clone: function () {
 								return new Vector(this.x, this.y, this.z);
 							},
 							equals: function (another) {
-								return (
-									this.x === another.x &&
-									this.y === another.y &&
-									this.z === another.z
-								);
+								return this.x === another.x && this.y === another.y && this.z === another.z;
 							},
 							random: function (r) {
 								this.x += random() * r * 2 - r;
@@ -487,16 +429,11 @@ game.import("play", function () {
 								var distance = this.pos.distance(field.pos);
 								if (distance < 1) field.grow(this);
 								if (distance < 100) this.doubleSize = true;
-								var force = G(
-									this.forceBetween(field, distance)
-								);
+								var force = G(this.forceBetween(field, distance));
 								totalAccelerationX += vectorX * force;
 								totalAccelerationY += vectorY * force;
 							}
-							this.ac = new Vector(
-								totalAccelerationX,
-								totalAccelerationY
-							);
+							this.ac = new Vector(totalAccelerationX, totalAccelerationY);
 
 							totalAccelerationX = 0;
 							totalAccelerationY = 0;
@@ -509,10 +446,7 @@ game.import("play", function () {
 								if (distance < 1) {
 									if (this.mass >= field.mass) {
 										var massRatio = this.mass / field.mass;
-										if (
-											particles.length <= maxParticles &&
-											this.mass > 40
-										) {
+										if (particles.length <= maxParticles && this.mass > 40) {
 											this.alive = false;
 											this.nova = true;
 											collidedMass += this.mass;
@@ -520,31 +454,18 @@ game.import("play", function () {
 									} else this.alive = false;
 								}
 								if (this.alive) {
-									var force = G(
-										this.forceBetween(field, distance)
-									);
+									var force = G(this.forceBetween(field, distance));
 									totalAccelerationX += vectorX * G(force);
 									totalAccelerationY += vectorY * G(force);
 								}
 							}
 
-							var travelDist = this.pos.distance(
-								this.lastPos ? this.lastPos : this.pos
-							);
-							this.velocity =
-								travelDist -
-								(this.lastDistance
-									? this.lastDistance
-									: travelDist);
+							var travelDist = this.pos.distance(this.lastPos ? this.lastPos : this.pos);
+							this.velocity = travelDist - (this.lastDistance ? this.lastDistance : travelDist);
 							this.lastDistance = travelDist;
 							this.lastPos = this.pos.clone();
 
-							this.ac.add(
-								new Vector(
-									totalAccelerationX,
-									totalAccelerationY
-								)
-							);
+							this.ac.add(new Vector(totalAccelerationX, totalAccelerationY));
 							this.lastPos = this.pos.clone();
 							// if(this.mass > 20) {
 							//   var chance = 1 / (this.mass - 20);
@@ -563,23 +484,15 @@ game.import("play", function () {
 							another.alive = false;
 							delete this.size;
 						};
-						Particle.prototype.breakApart = function (
-							minMass,
-							maxParts
-						) {
+						Particle.prototype.breakApart = function (minMass, maxParts) {
 							if (!minMass) minMass = 1;
 							if (!maxParts) maxParts = 2;
 							var remainingMass = this.mass;
 							var num = 0;
 							while (remainingMass > 0) {
-								var np = new Particle(
-									this.pos.clone().random(this.mass),
-									new Vector(0, 0)
-								);
-								np.mass =
-									1 + Math.random() * (remainingMass - 1);
-								if (num >= maxParts - 1)
-									np.mass = remainingMass;
+								var np = new Particle(this.pos.clone().random(this.mass), new Vector(0, 0));
+								np.mass = 1 + Math.random() * (remainingMass - 1);
+								if (num >= maxParts - 1) np.mass = remainingMass;
 								np.mass = np.mass < minMass ? minMass : np.mass;
 								remainingMass -= np.mass;
 								num++;
@@ -588,13 +501,8 @@ game.import("play", function () {
 							delete this.size;
 							this.alive = false;
 						};
-						Particle.prototype.forceBetween = function (
-							another,
-							distance
-						) {
-							var distance = distance
-								? distance
-								: this.pos.distance(another.pos);
+						Particle.prototype.forceBetween = function (another, distance) {
+							var distance = distance ? distance : this.pos.distance(another.pos);
 							return (this.mass * another.mass) / sqr(distance);
 						};
 
@@ -608,10 +516,7 @@ game.import("play", function () {
 							this.color = "#999";
 						};
 						ParticleEmitter.prototype.emit = function () {
-							var angle =
-								this.vc.angle() +
-								this.ang -
-								Math.random() * this.ang * 2;
+							var angle = this.vc.angle() + this.ang - Math.random() * this.ang * 2;
 							var magnitude = this.vc.magnitude();
 							var position = this.pos.clone();
 							position.add(
@@ -657,11 +562,7 @@ game.import("play", function () {
 							canvasHeight = canvas.height;
 						});
 
-						var renderToCanvas = function (
-							width,
-							height,
-							renderFunction
-						) {
+						var renderToCanvas = function (width, height, renderFunction) {
 							var buffer = document.createElement("canvas");
 							buffer.width = width;
 							buffer.height = height;
@@ -713,10 +614,7 @@ game.import("play", function () {
 						];
 						forces = [
 							new Force(
-								new Vector(
-									(canvasWidth / 2) * drawScale,
-									(canvasHeight / 2) * drawScale
-								),
+								new Vector((canvasWidth / 2) * drawScale, (canvasHeight / 2) * drawScale),
 								1800
 							),
 						];
@@ -759,11 +657,7 @@ game.import("play", function () {
 									for (var j = 0; j < emissionRate; j++) {
 										var p = emitters[i].emit();
 										p.color =
-											ctr % 10 === 0
-												? Math.random() * 5 <= 1
-													? c2
-													: rndc()
-												: rndc();
+											ctr % 10 === 0 ? (Math.random() * 5 <= 1 ? c2 : rndc()) : rndc();
 										p.mass = ~~(Math.random() * 5);
 										particles.push(p);
 										ret += p.mass;
@@ -775,8 +669,7 @@ game.import("play", function () {
 							if (collidedMass !== 0) {
 								while (collidedMass !== 0) {
 									collidedMass -= _emit();
-									collidedMass =
-										collidedMass < 0 ? 0 : collidedMass;
+									collidedMass = collidedMass < 0 ? 0 : collidedMass;
 								}
 							}
 							if (particles.length > maxParticles) return;
@@ -787,10 +680,7 @@ game.import("play", function () {
 							BUFFEROFFSCREEN = 2,
 							LOOPSCREEN = 3;
 
-						var isPositionAliveAndAdjust = function (
-							particle,
-							check
-						) {
+						var isPositionAliveAndAdjust = function (particle, check) {
 							return true;
 							//   var pos = particle.pos;
 							//   if(!check) check = BUFFEROFFSCREEN;
@@ -820,8 +710,7 @@ game.import("play", function () {
 							for (var i = 0; i < particles.length; i++) {
 								var particle = particles[i];
 								particle.reactToForces(forces);
-								if (!isPositionAliveAndAdjust(particle))
-									continue;
+								if (!isPositionAliveAndAdjust(particle)) continue;
 								particle.move();
 								currentParticles.push(particle);
 							}
@@ -839,10 +728,7 @@ game.import("play", function () {
 							if (p.opacity > 0.08) p.opacity -= 0.02;
 
 							var actualSize = p.size / drawScale;
-							actualSize =
-								actualSize < minParticleSize
-									? minParticleSize
-									: actualSize;
+							actualSize = actualSize < minParticleSize ? minParticleSize : actualSize;
 							if (p.mass > 8) actualSize *= 2;
 							if (p.nova) {
 								actualSize *= 4;
@@ -859,8 +745,7 @@ game.import("play", function () {
 							//   if(p.supernovaDur === 0)
 							//     p.supernova = false;
 							// }
-							var cacheKey =
-								actualSize + "_" + p.opacity + "_" + p.color;
+							var cacheKey = actualSize + "_" + p.opacity + "_" + p.color;
 							var cacheValue = offscreenCache[cacheKey];
 							if (!cacheValue) {
 								cacheValue = renderToCanvas(
@@ -897,8 +782,7 @@ game.import("play", function () {
 										ofsContext.beginPath();
 										for (var f in fills) {
 											f = fills[f];
-											ofsContext.fillStyle =
-												p.color + f.opacity + ")";
+											ofsContext.fillStyle = p.color + f.opacity + ")";
 											ofsContext.arc(
 												actualSize * 16,
 												actualSize * 16,
@@ -1023,11 +907,7 @@ game.import("play", function () {
 
 						// 停止下雪
 						snowFall.prototype.stop = function () {
-							if (
-								this.status == 2 ||
-								this.status == 0 ||
-								!this.canvas
-							) {
+							if (this.status == 2 || this.status == 0 || !this.canvas) {
 								return false;
 							}
 							// 停止动画循环
@@ -1078,12 +958,7 @@ game.import("play", function () {
 						};
 
 						// 雪运动对象
-						var flakeMove = function (
-							canvasWidth,
-							canvasHeight,
-							flakeSize,
-							fallSpeed
-						) {
+						var flakeMove = function (canvasWidth, canvasHeight, flakeSize, fallSpeed) {
 							this.x = Math.floor(Math.random() * canvasWidth); //x坐标
 							this.y = Math.floor(Math.random() * canvasHeight); //y坐标
 							this.size = Math.random() * flakeSize + 2; //形状
@@ -1105,8 +980,7 @@ game.import("play", function () {
 							if (this.velY <= this.speed) {
 								this.velY = this.speed;
 							}
-							this.velX +=
-								Math.cos((this.step += 0.05)) * this.stepSize;
+							this.velX += Math.cos((this.step += 0.05)) * this.stepSize;
 
 							this.y += this.velY;
 							this.x += this.velX;
@@ -1141,14 +1015,8 @@ game.import("play", function () {
 								this.y,
 								this.size
 							);
-							snowFlake.addColorStop(
-								0,
-								"rgba(255, 255, 255, 0.9)"
-							);
-							snowFlake.addColorStop(
-								0.5,
-								"rgba(255, 255, 255, 0.5)"
-							);
+							snowFlake.addColorStop(0, "rgba(255, 255, 255, 0.9)");
+							snowFlake.addColorStop(0.5, "rgba(255, 255, 255, 0.5)");
 							snowFlake.addColorStop(1, "rgba(255, 255, 255, 0)");
 							ctx.save();
 							ctx.fillStyle = snowFlake;
@@ -1165,12 +1033,7 @@ game.import("play", function () {
 								canvas = this.canvas;
 							for (var i = 0; i < 200; i++) {
 								flakes.push(
-									new flakeMove(
-										canvas.width,
-										canvas.height,
-										this.flakeSize,
-										this.fallSpeed
-									)
+									new flakeMove(canvas.width, canvas.height, this.flakeSize, this.fallSpeed)
 								);
 							}
 						};
@@ -1296,9 +1159,7 @@ game.import("play", function () {
 						var calculateDistance = function (p1x, p1y, p2x, p2y) {
 							var xDistance = p1x - p2x,
 								yDistance = p1y - p2y;
-							return Math.sqrt(
-								Math.pow(xDistance, 2) + Math.pow(yDistance, 2)
-							);
+							return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
 						};
 
 						// create firework
@@ -1313,12 +1174,7 @@ game.import("play", function () {
 							this.tx = tx;
 							this.ty = ty;
 							// distance from starting point to target
-							this.distanceToTarget = calculateDistance(
-								sx,
-								sy,
-								tx,
-								ty
-							);
+							this.distanceToTarget = calculateDistance(sx, sy, tx, ty);
 							this.distanceTraveled = 0;
 							// track the past coordinates of each firework to create a trail effect, increase the coordinate count to create more prominent trails
 							this.coordinates = [];
@@ -1364,9 +1220,7 @@ game.import("play", function () {
 							);
 
 							// if the distance traveled, including velocities, is greater than the initial distance to the target, then the target has been reached
-							if (
-								this.distanceTraveled >= this.distanceToTarget
-							) {
+							if (this.distanceTraveled >= this.distanceToTarget) {
 								createParticles(this.tx, this.ty);
 								// remove the firework, use the index passed into the update function to determine which to remove
 								fireworks.splice(index, 1);
@@ -1382,29 +1236,16 @@ game.import("play", function () {
 							ctx.beginPath();
 							// move to the last tracked coordinate in the set, then draw a line to the current x and y
 							ctx.moveTo(
-								this.coordinates[
-									this.coordinates.length - 1
-								][0],
+								this.coordinates[this.coordinates.length - 1][0],
 								this.coordinates[this.coordinates.length - 1][1]
 							);
 							ctx.lineTo(this.x, this.y);
-							ctx.strokeStyle =
-								"hsl(" +
-								hue +
-								", 100%, " +
-								this.brightness +
-								"%)";
+							ctx.strokeStyle = "hsl(" + hue + ", 100%, " + this.brightness + "%)";
 							ctx.stroke();
 
 							ctx.beginPath();
 							// draw the target for this firework with a pulsing circle
-							ctx.arc(
-								this.tx,
-								this.ty,
-								this.targetRadius,
-								0,
-								Math.PI * 2
-							);
+							ctx.arc(this.tx, this.ty, this.targetRadius, 0, Math.PI * 2);
 							ctx.stroke();
 						};
 
@@ -1443,9 +1284,7 @@ game.import("play", function () {
 							this.speed *= this.friction;
 							// apply velocity
 							this.x += Math.cos(this.angle) * this.speed;
-							this.y +=
-								Math.sin(this.angle) * this.speed +
-								this.gravity;
+							this.y += Math.sin(this.angle) * this.speed + this.gravity;
 							// fade out the particle
 							this.alpha -= this.decay;
 
@@ -1460,20 +1299,12 @@ game.import("play", function () {
 							ctx.beginPath();
 							// move to the last tracked coordinates in the set, then draw a line to the current x and y
 							ctx.moveTo(
-								this.coordinates[
-									this.coordinates.length - 1
-								][0],
+								this.coordinates[this.coordinates.length - 1][0],
 								this.coordinates[this.coordinates.length - 1][1]
 							);
 							ctx.lineTo(this.x, this.y);
 							ctx.strokeStyle =
-								"hsla(" +
-								this.hue +
-								", 100%, " +
-								this.brightness +
-								"%, " +
-								this.alpha +
-								")";
+								"hsla(" + this.hue + ", 100%, " + this.brightness + "%, " + this.alpha + ")";
 							ctx.stroke();
 						};
 
@@ -1536,12 +1367,7 @@ game.import("play", function () {
 								if (!mousedown) {
 									// start the firework at the bottom middle of the screen, then set the random target coordinates, the random y coordinates will be set within the range of the top half of the screen
 									fireworks.push(
-										new Firework(
-											cw / 2,
-											ch,
-											random(0, cw),
-											random(0, ch / 2)
-										)
+										new Firework(cw / 2, ch, random(0, cw), random(0, ch / 2))
 									);
 									timerTick = 0;
 								}
@@ -1553,9 +1379,7 @@ game.import("play", function () {
 							if (limiterTick >= limiterTotal) {
 								if (mousedown) {
 									// start the firework at the bottom middle of the screen, then set the current mouse coordinates as the target
-									fireworks.push(
-										new Firework(cw / 2, ch, mx, my)
-									);
+									fireworks.push(new Firework(cw / 2, ch, mx, my));
 									limiterTick = 0;
 								}
 							} else {
@@ -1564,54 +1388,29 @@ game.import("play", function () {
 						};
 
 						if (lib.config.touchscreen) {
-							ui.window.addEventListener(
-								"touchmove",
-								function (e) {
-									mx =
-										e.touches[0].clientX /
-											game.documentZoom -
-										canvas.offsetLeft;
-									my =
-										e.touches[0].clientY /
-											game.documentZoom -
-										canvas.offsetTop;
-								}
-							);
-							ui.window.addEventListener(
-								"touchstart",
-								function (e) {
-									mousedown = true;
-								}
-							);
-							ui.window.addEventListener(
-								"touchend",
-								function (e) {
-									mousedown = false;
-								}
-							);
+							ui.window.addEventListener("touchmove", function (e) {
+								mx = e.touches[0].clientX / game.documentZoom - canvas.offsetLeft;
+								my = e.touches[0].clientY / game.documentZoom - canvas.offsetTop;
+							});
+							ui.window.addEventListener("touchstart", function (e) {
+								mousedown = true;
+							});
+							ui.window.addEventListener("touchend", function (e) {
+								mousedown = false;
+							});
 						} else {
 							// mouse event bindings
 							// update the mouse coordinates on mousemove
-							ui.window.addEventListener(
-								"mousemove",
-								function (e) {
-									mx =
-										e.pageX / game.documentZoom -
-										canvas.offsetLeft;
-									my =
-										e.pageY / game.documentZoom -
-										canvas.offsetTop;
-								}
-							);
+							ui.window.addEventListener("mousemove", function (e) {
+								mx = e.pageX / game.documentZoom - canvas.offsetLeft;
+								my = e.pageY / game.documentZoom - canvas.offsetTop;
+							});
 
 							// toggle mousedown state and prevent canvas from being selected
-							ui.window.addEventListener(
-								"mousedown",
-								function (e) {
-									e.preventDefault();
-									mousedown = true;
-								}
-							);
+							ui.window.addEventListener("mousedown", function (e) {
+								e.preventDefault();
+								mousedown = true;
+							});
 
 							ui.window.addEventListener("mouseup", function (e) {
 								e.preventDefault();

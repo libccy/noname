@@ -4,11 +4,11 @@ game.import("play", function () {
 		name: "wuxing",
 		arenaReady: function () {
 			if (_status.connectMode) return;
-			lib.card.list.splice(
-				Math.floor(lib.card.list.length * Math.random()),
-				0,
-				["spade", 5, "wuxingpan"]
-			);
+			lib.card.list.splice(Math.floor(lib.card.list.length * Math.random()), 0, [
+				"spade",
+				5,
+				"wuxingpan",
+			]);
 			if (!_status.video) {
 				lib.video.push({
 					type: "play",
@@ -48,11 +48,7 @@ game.import("play", function () {
 					if (_status.video || _status.connectMode) return;
 					if (card.name == "wuxingpan") return;
 					if (card.wunature) return;
-					if (
-						Math.random() >
-						(parseFloat(lib.config.wuxing_num_playpackconfig) || 0)
-					)
-						return;
+					if (Math.random() > (parseFloat(lib.config.wuxing_num_playpackconfig) || 0)) return;
 					var node = ui.create.div(".wunature", card);
 					var list = ["metal", "wood", "water", "fire", "soil"];
 					var nature = list.randomGet();
@@ -83,11 +79,7 @@ game.import("play", function () {
 									if (player.countCards("he")) {
 										game.log(
 											player,
-											"被" +
-												get.translation(
-													trigger.card.wunature
-												) +
-												"属性的卡牌克制"
+											"被" + get.translation(trigger.card.wunature) + "属性的卡牌克制"
 										);
 										player.chooseToDiscard(
 											"你被金属性卡牌克制，需弃置一张牌",
@@ -100,11 +92,7 @@ game.import("play", function () {
 								case "water":
 									game.log(
 										player,
-										"得到" +
-											get.translation(
-												trigger.card.wunature
-											) +
-											"属性卡牌的加成"
+										"得到" + get.translation(trigger.card.wunature) + "属性卡牌的加成"
 									);
 									player.draw();
 									player.popup("金生水");
@@ -117,11 +105,7 @@ game.import("play", function () {
 									if (player.countCards("he")) {
 										game.log(
 											player,
-											"被" +
-												get.translation(
-													trigger.card.wunature
-												) +
-												"属性的卡牌克制"
+											"被" + get.translation(trigger.card.wunature) + "属性的卡牌克制"
 										);
 										player.chooseToDiscard(
 											"你被木属性卡牌克制，需弃置一张牌",
@@ -134,11 +118,7 @@ game.import("play", function () {
 								case "fire":
 									game.log(
 										player,
-										"得到" +
-											get.translation(
-												trigger.card.wunature
-											) +
-											"属性卡牌的加成"
+										"得到" + get.translation(trigger.card.wunature) + "属性卡牌的加成"
 									);
 									player.draw();
 									player.popup("木生火");
@@ -151,11 +131,7 @@ game.import("play", function () {
 									if (player.countCards("he")) {
 										game.log(
 											player,
-											"被" +
-												get.translation(
-													trigger.card.wunature
-												) +
-												"属性的卡牌克制"
+											"被" + get.translation(trigger.card.wunature) + "属性的卡牌克制"
 										);
 										player.chooseToDiscard(
 											"你被水属性卡牌克制，需弃置一张牌",
@@ -168,11 +144,7 @@ game.import("play", function () {
 								case "wood":
 									game.log(
 										player,
-										"得到" +
-											get.translation(
-												trigger.card.wunature
-											) +
-											"属性卡牌的加成"
+										"得到" + get.translation(trigger.card.wunature) + "属性卡牌的加成"
 									);
 									player.draw();
 									player.popup("水生木");
@@ -185,11 +157,7 @@ game.import("play", function () {
 									if (player.countCards("he")) {
 										game.log(
 											player,
-											"被" +
-												get.translation(
-													trigger.card.wunature
-												) +
-												"属性的卡牌克制"
+											"被" + get.translation(trigger.card.wunature) + "属性的卡牌克制"
 										);
 										player.chooseToDiscard(
 											"你被火属性卡牌克制，需弃置一张牌",
@@ -202,11 +170,7 @@ game.import("play", function () {
 								case "soil":
 									game.log(
 										player,
-										"得到" +
-											get.translation(
-												trigger.card.wunature
-											) +
-											"属性卡牌的加成"
+										"得到" + get.translation(trigger.card.wunature) + "属性卡牌的加成"
 									);
 									player.draw();
 									player.popup("火生土");
@@ -219,11 +183,7 @@ game.import("play", function () {
 									if (player.countCards("he")) {
 										game.log(
 											player,
-											"被" +
-												get.translation(
-													trigger.card.wunature
-												) +
-												"属性的卡牌克制"
+											"被" + get.translation(trigger.card.wunature) + "属性的卡牌克制"
 										);
 										player.chooseToDiscard(
 											"你被土属性卡牌克制，需弃置一张牌",
@@ -236,11 +196,7 @@ game.import("play", function () {
 								case "metal":
 									game.log(
 										player,
-										"得到" +
-											get.translation(
-												trigger.card.wunature
-											) +
-											"属性卡牌的加成"
+										"得到" + get.translation(trigger.card.wunature) + "属性卡牌的加成"
 									);
 									player.draw();
 									player.popup("土生金");
@@ -316,13 +272,7 @@ game.import("play", function () {
 				prompt: "选择一张手牌永久改变其五行属性",
 				content: function () {
 					"step 0";
-					player.chooseControl(
-						"metal",
-						"wood",
-						"water",
-						"fire",
-						"soil"
-					);
+					player.chooseControl("metal", "wood", "water", "fire", "soil");
 					("step 1");
 					var card = cards[0];
 					if (!card.node.wuxing) {
@@ -331,9 +281,7 @@ game.import("play", function () {
 
 					card.wunature = result.control;
 					card.node.wuxing.dataset.nature = result.control;
-					card.node.wuxing.innerHTML = get.translation(
-						result.control
-					);
+					card.node.wuxing.innerHTML = get.translation(result.control);
 				},
 			},
 		},
@@ -362,8 +310,7 @@ game.import("play", function () {
 			soilColor2: "rgba(163,98,0,0.3)",
 			wuxingpan: "五行盘",
 			wuxingpan_skill: "五行",
-			wuxingpan_skill_info:
-				"出牌阶段限一次，你可以永久改变一张手牌的五行属性",
+			wuxingpan_skill_info: "出牌阶段限一次，你可以永久改变一张手牌的五行属性",
 			wuxingpan_info: "出牌阶段限一次，你可以永久改变一张手牌的五行属性",
 		},
 		help: {

@@ -63,12 +63,7 @@ game.import("play", function () {
 				return Math.ceil(Math.random() * 13);
 			};
 			var getn = function (i, j) {
-				return Math.round(
-					data[i][j] *
-						parseFloat(
-							lib.config["cardpile_" + i + "_playpackconfig"]
-						)
-				);
+				return Math.round(data[i][j] * parseFloat(lib.config["cardpile_" + i + "_playpackconfig"]));
 			};
 			var num = 0;
 			for (var i in data) {
@@ -76,9 +71,7 @@ game.import("play", function () {
 					num += getn(i, j);
 				}
 			}
-			var dn =
-				(num * (lib.card.list.length - data.total)) /
-				(data.total - num);
+			var dn = (num * (lib.card.list.length - data.total)) / (data.total - num);
 			if (dn > 1000) dn = 1000;
 			if (dn > 0) {
 				var p = 0;
@@ -89,12 +82,7 @@ game.import("play", function () {
 							if (i == "huosha") {
 								lib.card.list.push([j, rand(), "sha", "fire"]);
 							} else if (i == "leisha") {
-								lib.card.list.push([
-									j,
-									rand(),
-									"sha",
-									"thunder",
-								]);
+								lib.card.list.push([j, rand(), "sha", "thunder"]);
 							} else {
 								lib.card.list.push([j, rand(), i]);
 							}
