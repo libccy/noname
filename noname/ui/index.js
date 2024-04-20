@@ -136,6 +136,11 @@ export class UI {
 	 * @type {HTMLDivElement}
 	 */
 	tempnowuxie;
+	/**
+	 * @type {HTMLDivElement[]}
+	 */
+	toastQueue = [];
+  
 	refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}
