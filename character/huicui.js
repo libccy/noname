@@ -9905,7 +9905,7 @@ game.import("character", function () {
 					var delta = player.countCards("h") - player.hp;
 					if (delta > 0) player.chooseToDiscard("h", 4, true);
 					else if (delta == 0) {
-						player.chooseToDiscard("h", true);
+						player.chooseToDiscard("he", true);
 						player.recover();
 					} else {
 						player.damage("fire", "nosource");
@@ -15868,7 +15868,7 @@ game.import("character", function () {
 			lianzhou_info: "锁定技。准备阶段，你横置你的武将牌。然后你可横置任意名体力值等于你的角色。",
 			jinglan: "惊澜",
 			jinglan_info:
-				"锁定技。当你造成伤害后，若你的手牌数：大于体力值，你弃置四张手牌；等于体力值，你弃置一张手牌并回复1点体力；小于体力值，你受到1点无来源火焰伤害并摸五张牌。",
+				"锁定技。当你造成伤害后，若你的手牌数：大于体力值，你弃置四张手牌；等于体力值，你弃置一张牌并回复1点体力；小于体力值，你受到1点无来源火焰伤害并摸五张牌。",
 			dc_yanghu: "羊祜",
 			dcdeshao: "德劭",
 			dcdeshao_info:
