@@ -26,6 +26,7 @@ jobs:
           ref: PR-Branch
           # This is important to fetch the changes to the previous commit
           fetch-depth: 0
+          token: ${{ secrets.READABLE_WRITEABLE_TOKEN }}
 
       - name: Prettify code
         uses: creyD/prettier_action@v4.3
