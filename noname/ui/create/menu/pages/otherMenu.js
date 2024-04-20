@@ -453,8 +453,11 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 
 				const result = await asyncFilter(files.flat(), async v => {
 					return game.promises.readFile(v.path).then(data => {
+						// 有设置就不进行对比直接返回false
+						if (lib.config.asset_notReplaceExistingFiles) return false;
 						return v.size != data.byteLength;
-					}).catch(()=>true)
+						// 报错了就是没有文件
+					}).catch(() => true);
 				}).then(arr => arr.map((v) => v.path));
 
 				console.log("需要更新的文件有:", result);
@@ -463,6 +466,22 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 					await lib.init.promises.js("game", "asset");
 					if (Array.isArray(window.noname_asset_list)) {
 						game.saveConfig("asset_version", window.noname_asset_list[0]);
+						try {
+							// 动态更新素材版本显示
+							if (
+								li2 instanceof HTMLLIElement &&
+								li2.childNodes[0] &&
+								// nodeType = 3为text
+								li2.childNodes[0].nodeType === 3 &&
+								li2.childNodes[0].textContent.startsWith(
+									"素材版本"
+								)
+							) {
+								li2.childNodes[0].textContent = `素材版本：${window.noname_asset_list[0]}`;
+							}
+						} catch (error) {
+							console.error("动态更新素材版本显示失败:", error);
+						}
 						delete window.noname_asset_list;
 					}
 					if (confirm("更新完成，是否重启？")) {
@@ -655,7 +674,9 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 			if (!this.classList.toggle("on")) {
 				game.saveConfig("asset_toggle_off", true);
 				[
-					/* span2, span2_br, span2_check,*/
+					span7,
+					span7_br,
+					span7_check,
 					span3,
 					span3_br,
 					span3_check,
@@ -674,7 +695,9 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 			} else {
 				game.saveConfig("asset_toggle_off");
 				[
-					/* span2, span2_br, span2_check,*/
+					span7,
+					span7_br,
+					span7_check,
 					span3,
 					span3_br,
 					span3_check,
@@ -698,6 +721,23 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 		// var span6_br = ui.create.node('br');
 		// li2.lastChild.appendChild(span6_br);
 		// var span2_br = ui.create.node('br');
+
+		var span7 = ui.create.div("", `不替换已有素材`);
+		span7.style.fontSize = "small";
+		span7.style.lineHeight = "16px";
+		li2.lastChild.appendChild(span7);
+		var span7_check = document.createElement("input");
+		span7_check.type = "checkbox";
+		span7_check.style.marginLeft = "5px";
+		if (lib.config.asset_notReplaceExistingFiles) {
+			span7_check.checked = true;
+		}
+		span7_check.onchange = function () {
+			game.saveConfig("asset_notReplaceExistingFiles", this.checked);
+		};
+		li2.lastChild.appendChild(span7_check);
+		var span7_br = ui.create.node("br");
+		li2.lastChild.appendChild(span7_br);
 
 		var span4 = ui.create.div("", `字体素材（${lib.config.asset_font_size || "23.4MB"}）`);
 		span4.style.fontSize = "small";
