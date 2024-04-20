@@ -703,7 +703,10 @@ game.import("character", function () {
 			dragjuwu: {
 				trigger: { target: "shaBefore" },
 				filter(event, player) {
-					return game.countPlayer((target) => event.player.inRange(target)) >= 3;
+					return (
+						!game.hasNature(event.card) &&
+						game.countPlayer((target) => event.player.inRange(target)) >= 3
+					);
 				},
 				forced: true,
 				content() {
@@ -714,6 +717,7 @@ game.import("character", function () {
 						target(card, player, target) {
 							if (
 								card.name == "sha" &&
+								!game.hasNature(card) &&
 								game.countPlayer((targetx) => player.inRange(targetx)) >= 3
 							)
 								return "zerotarget";

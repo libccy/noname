@@ -9905,7 +9905,7 @@ game.import("character", function () {
 					var delta = player.countCards("h") - player.hp;
 					if (delta > 0) player.chooseToDiscard("h", 4, true);
 					else if (delta == 0) {
-						player.chooseToDiscard("h", true);
+						player.chooseToDiscard("he", true);
 						player.recover();
 					} else {
 						player.damage("fire", "nosource");
@@ -14163,18 +14163,18 @@ game.import("character", function () {
 				check: function (event, player) {
 					var target = event.player;
 					var att = get.attitude(player, target);
-					var num2 = Math.min(5, target.hp - target.countCards("h"));
+					var num2 = Math.min(5, target.hp) - target.countCards("h");
 					if (num2 <= 0) return att <= 0;
 					var num = target.countCards("h", function (card) {
 						return target.hasValueTarget(card, null, true);
 					});
 					if (!num) return att > 0;
-					return num > num2;
+					return (num - num2) * att < 0;
 				},
 				preHidden: true,
 				content: function () {
 					"step 0";
-					var num = Math.min(5, trigger.player.hp - trigger.player.countCards("h"));
+					var num = Math.min(5, trigger.player.hp) - trigger.player.countCards("h");
 					if (num > 0) trigger.player.draw(num);
 					"step 1";
 					trigger.player.addTempSkill("xibing2");
@@ -15731,9 +15731,9 @@ game.import("character", function () {
 				"①当你受到伤害后，你可以摸一张牌，或和一名势力相同的其他角色各摸一张牌；②每回合限一次，当你造成伤害后，你可以对一名与你势力不同的角色造成1点伤害。",
 			xibing: "息兵",
 			xibing_info:
-				"当一名其他角色在其出牌阶段内使用黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力值(至多摸五张)且本回合不能再使用手牌。",
+				"当一名其他角色在其出牌阶段内使用黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力值(至多摸至五张)且本回合不能再使用手牌。",
 			xibing_info_guozhan:
-				"当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力(至多摸五张)值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。",
+				"当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力(至多摸至五张)值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。",
 			luyusheng: "陆郁生",
 			zhente: "贞特",
 			zhente2: "贞特",
@@ -15868,7 +15868,7 @@ game.import("character", function () {
 			lianzhou_info: "锁定技。准备阶段，你横置你的武将牌。然后你可横置任意名体力值等于你的角色。",
 			jinglan: "惊澜",
 			jinglan_info:
-				"锁定技。当你造成伤害后，若你的手牌数：大于体力值，你弃置四张手牌；等于体力值，你弃置一张手牌并回复1点体力；小于体力值，你受到1点无来源火焰伤害并摸五张牌。",
+				"锁定技。当你造成伤害后，若你的手牌数：大于体力值，你弃置四张手牌；等于体力值，你弃置一张牌并回复1点体力；小于体力值，你受到1点无来源火焰伤害并摸五张牌。",
 			dc_yanghu: "羊祜",
 			dcdeshao: "德劭",
 			dcdeshao_info:
