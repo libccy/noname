@@ -165,6 +165,7 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/** @type { SMap<HTMLDivElement> } */
+	// eslint-disable-next-line no-unreachable
 	node;
 	/**
 	 * @type { number }
