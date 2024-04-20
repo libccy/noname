@@ -230,9 +230,18 @@ game.import("character", function () {
 					event.result = await player.chooseTarget(get.prompt("clanjieli"), "观看一名角色的牌名字数最多的手牌" + str, (card, player, target) => {
 						return target.countCards("h");
 					}).set('ai', target => {
-						const player = get.event("player");
-						return get.effect(target, { name: "draw" }, player, player);
-					}).forResult();
+						const player = get.event("player"), num = get.event('num');
+						let map = {};
+						for (const i of target.getCards("h")) {
+							if (!map[get.cardNameLength(i)]) {
+								map[get.cardNameLength(i)] = 0;
+							}
+							map[get.cardNameLength(i)]++;
+						}
+						const num2 = Object.keys(map).sort((a, b) => map[b] - map[a])[0];
+						if (num >= num2) return target.countCards('h') * 5 * get.sgn(get.sgn(get.attitude(player, target)) - 0.5);
+						return -target.countCards('h');
+					}).set('num', num).forResult();
 				},
 				async content(event, trigger, player) {
 					const target = event.targets[0];
@@ -1366,7 +1375,7 @@ game.import("character", function () {
 						str = "";
 					if (player.getDamagedHp() > 0)
 						str += "，然后摸" + get.cnNumber(player.getDamagedHp()) + "张牌";
-					event.result=await player
+					event.result = await player
 						.chooseToDiscard(
 							get.prompt("clanxieshu"),
 							"横置武将牌并弃置" + get.cnNumber(num) + "张牌" + str,
