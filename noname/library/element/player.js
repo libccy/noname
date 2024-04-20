@@ -1,3 +1,17 @@
+/**
+ * @typedef { {
+ * useCard: GameEventPromise[], 
+ * respond: GameEventPromise[], 
+ * skipped: GameEventPromise[], 
+ * lose: GameEventPromise[], 
+ * gain: GameEventPromise[],
+ * 	sourceDamage: GameEventPromise[],
+ * 	damage: GameEventPromise[],
+ * 	custom: GameEventPromise[],
+ * 	useSkill: GameEventPromise[],
+ * }} ActionHistory
+ */
+
 import { ai } from "../../ai/index.js";
 import { get } from "../../get/index.js";
 import { game } from "../../game/index.js";
@@ -224,17 +238,7 @@ export class Player extends HTMLDivElement {
 	 */
 	stat;
 	/**
-	 * @type { {
-	 * 	useCard: GameEventPromise[],
-	 * 	respond: GameEventPromise[],
-	 * 	skipped: GameEventPromise[],
-	 * 	lose: GameEventPromise[],
-	 * 	gain: GameEventPromise[],
-	 * 	sourceDamage: GameEventPromise[],
-	 * 	damage: GameEventPromise[],
-	 * 	custom: GameEventPromise[],
-	 * 	useSkill: GameEventPromise[],
-	 * }[] }
+	 * @type { ActionHistory[] }
 	 */
 	actionHistory;
 	/**
@@ -262,7 +266,8 @@ export class Player extends HTMLDivElement {
 	 * 	friend: [],
 	 * 	enemy: [],
 	 * 	neutral: [],
-	 * 	handcards: {
+	 * 	shown?: number,
+	 * 	handcards?: {
 	 * 		global: [],
 	 * 		source: [],
 	 * 		viewed: []
@@ -342,6 +347,18 @@ export class Player extends HTMLDivElement {
 	 * @type { ((player: this) => any)[] }
 	 */
 	_inits;
+	/**
+	 * @type { boolean }
+	 */
+	isZhu;
+	/**
+	 * @type { string }
+	 */
+	identity;
+	/**
+	 * @type { boolean | undefined }
+	 */
+	identityShown;
 	//新函数
 	/**
 	 * 怒气
@@ -1402,7 +1419,7 @@ export class Player extends HTMLDivElement {
 	/**
 	 * 向target发起协力
 	 * @param { Player } target
-	 * @param {*} type
+	 * @param { string } type
 	 * @param {*} reason
 	 */
 	cooperationWith(target, type, reason) {
@@ -2023,6 +2040,7 @@ export class Player extends HTMLDivElement {
 	/**
 	 * @param { string } name
 	 * @param { string } type
+	 * @returns { boolean }
 	 */
 	hasUsableCard(name, type) {
 		if (typeof type !== "string") type = type ? "limit" : "all";
@@ -3698,6 +3716,12 @@ export class Player extends HTMLDivElement {
 		if (num == undefined) return 0;
 		return num;
 	}
+	/**
+	 * @param {*} [unowned] 
+	 * @param {*} [unique] 
+	 * @param {*} [hidden] 
+	 * @returns { string[] }
+	 */
 	getStockSkills(unowned, unique, hidden) {
 		var list = [];
 		if (lib.character[this.name] && (hidden || !this.isUnseen(0))) {
@@ -3842,6 +3866,11 @@ export class Player extends HTMLDivElement {
 	getDiscardableCards(player, arg1, arg2) {
 		return Array.from(this.iterableGetDiscardableCards(player, arg1, arg2));
 	}
+	/**
+	 * @param {Parameters<lib['filter']['canBeGained']>[1]} player 
+	 * @param {Parameters<this['iterableGetCards']>[0]} arg1 
+	 * @param {Parameters<this['iterableGetCards']>[1]} arg2 
+	 */
 	*iterableGetGainableCards(player, arg1, arg2) {
 		for (let card of this.iterableGetCards(arg1, arg2)) {
 			if (lib.filter.canBeGained(card, player, this)) {
@@ -3849,6 +3878,12 @@ export class Player extends HTMLDivElement {
 			}
 		}
 	}
+	/**
+	 * 
+	 * @param {Parameters<this['iterableGetGainableCards']>[0]} player 
+	 * @param {Parameters<this['iterableGetGainableCards']>[1]} [arg1] 
+	 * @param {Parameters<this['iterableGetGainableCards']>[2]} [arg2] 
+	 */
 	getGainableCards(player, arg1, arg2) {
 		return Array.from(this.iterableGetGainableCards(player, arg1, arg2));
 	}
@@ -3860,6 +3895,10 @@ export class Player extends HTMLDivElement {
 		}
 		return list;
 	}
+	/**
+	 * @param { Parameters<typeof this['iterableGetCards']>[0] } [arg1] 
+	 * @param { Parameters<typeof this['iterableGetCards']>[1] } [arg2] 
+	 */
 	countCards(arg1, arg2) {
 		let count = 0;
 		for (let item of this.iterableGetCards(arg1, arg2)) {
@@ -3883,6 +3922,11 @@ export class Player extends HTMLDivElement {
 	countDiscardableCards(player, arg1, arg2) {
 		return this.getDiscardableCards(player, arg1, arg2).length;
 	}
+	/**
+	 * @param {Parameters<this['getGainableCards']>[0]} player 
+	 * @param {Parameters<this['getGainableCards']>[1]} [arg1] 
+	 * @param {Parameters<this['getGainableCards']>[2]} [arg2] 
+	 */
 	countGainableCards(player, arg1, arg2) {
 		return this.getGainableCards(player, arg1, arg2).length;
 	}
@@ -3906,6 +3950,11 @@ export class Player extends HTMLDivElement {
 		skills.sort((a, b) => get.priority(a) - get.priority(b));
 		return skills;
 	}
+	/**
+	 * @param { string | boolean | null } [arg2]
+	 * @param { boolean | null} [arg3]
+	 * @param {boolean} [arg4]
+	 */
 	getSkills(arg2, arg3, arg4) {
 		var skills = this.skills.slice(0);
 		var es = [];
@@ -5781,7 +5830,12 @@ export class Player extends HTMLDivElement {
 			);
 		return this;
 	}
-	gainMultiple(targets, position) {
+	/**
+	 * 
+	 * @param { Player[] } targets 
+	 * @param { string } [position] 
+	 */
+	gainMultiple(targets, position = "h") {
 		var next = game.createEvent("gainMultiple", false);
 		next.setContent("gainMultiple");
 		next.player = this;
@@ -5945,6 +5999,12 @@ export class Player extends HTMLDivElement {
 		next.gaintag = [];
 		return next;
 	}
+	/**
+	 * 
+	 * @param { Card | Card[] } cards 
+	 * @param { Player } target 
+	 * @param { boolean } [visible] 
+	 */
 	give(cards, target, visible) {
 		var next = target.gain(cards, this);
 		next.animate = visible ? "give" : "giveAuto";
@@ -6136,6 +6196,9 @@ export class Player extends HTMLDivElement {
 		next.setContent("doubleDraw");
 		return next;
 	}
+	/**
+	 * @param { number } [num] 
+	 */
 	loseHp(num) {
 		var next = game.createEvent("loseHp");
 		next.num = num;
@@ -6787,6 +6850,12 @@ export class Player extends HTMLDivElement {
 		}
 		if (typeof proceed == "function") proceed();
 	}
+	/**
+	 * @param { string | string[] } name 
+	 * @param { Player | Player[] } [targets] 
+	 * @param { boolean | string } [nature] 
+	 * @param { boolean } [logv] 
+	 */
 	logSkill(name, targets, nature, logv) {
 		if (get.itemtype(targets) == "player") targets = [targets];
 		var nopop = false;
@@ -6980,7 +7049,13 @@ export class Player extends HTMLDivElement {
 			node.classList.add(className);
 		}
 	}
-	popup(name, className, nobroadcast) {
+	/**
+	 * 
+	 * @param { string } name 
+	 * @param { string } className 
+	 * @param { Parameters<this["damagepop"]>[3] } [nobroadcast] 
+	 */
+	popup(name, className = "water", nobroadcast) {
 		var name2 = get.translation(name);
 		if (!name2) return;
 		this.$damagepop(name2, className || "water", true, nobroadcast);
@@ -7403,6 +7478,13 @@ export class Player extends HTMLDivElement {
 			this.classList.remove("linked");
 		}
 	}
+	/**
+	 * @param { string | Card | VCard } card 
+	 * @param { Player } target 
+	 * @param { boolean } [distance] 
+	 * @param { GameEventPromise | boolean } [includecard] 
+	 * @returns { boolean }
+	 */
 	canUse(card, target, distance, includecard) {
 		if (typeof card == "string") card = { name: card, isCard: true };
 		var info = get.info(card);
@@ -8247,6 +8329,18 @@ export class Player extends HTMLDivElement {
 			}
 		});
 	}
+	/**
+	 * @overload
+	 * @param { string } skill 
+	 * @param { SkillTrigger | string } [expire] 
+	 * @param { boolean } [checkConflict] 
+	 */
+	/**
+	 * @overload
+	 * @param { string[] } skill 
+	 * @param { SkillTrigger } [expire] 
+	 * @param { boolean } [checkConflict] 
+	 */
 	addTempSkill(skill, expire, checkConflict) {
 		if (Array.isArray(skill)) {
 			for (var i = 0; i < skill.length; i++) {
@@ -8417,6 +8511,18 @@ export class Player extends HTMLDivElement {
 		}
 		return evts;
 	}
+	/**
+	 * @overload
+	 * @returns { ActionHistory }
+	 */
+	/**
+	 * @template { keyof ActionHistory } T
+	 * @overload
+	 * @param { T } key 
+	 * @param { (event: GameEventPromise) => boolean } [filter]
+	 * @param { GameEventPromise } [last]
+	 * @returns { ActionHistory[T] }
+	 */
 	getHistory(key, filter, last) {
 		if (!key) return this.actionHistory[this.actionHistory.length - 1];
 		if (!filter) return this.actionHistory[this.actionHistory.length - 1][key];
@@ -8432,6 +8538,12 @@ export class Player extends HTMLDivElement {
 			return history.filter(filter);
 		}
 	}
+	/**
+	 * @template { keyof ActionHistory } T
+	 * @param { T } key 
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
+	 */
 	checkHistory(key, filter, last) {
 		if (!key || !filter) return;
 		else {
@@ -8447,7 +8559,14 @@ export class Player extends HTMLDivElement {
 			}
 		}
 	}
-	hasHistory(key, filter, last) {
+	/**
+	 * @template { keyof ActionHistory } T
+	 * @param { T } key 
+	 * @param { (event: GameEventPromise) => boolean } [filter]
+	 * @param { GameEventPromise } [last]
+	 * @returns { boolean }
+	 */
+	hasHistory(key, filter = lib.filter.all, last) {
 		const history = this.getHistory(key);
 		if (!filter || typeof filter != "function") filter = lib.filter.all;
 		if (last) {
@@ -8459,6 +8578,14 @@ export class Player extends HTMLDivElement {
 		}
 		return history.some(filter);
 	}
+	/**
+	 * @template { keyof ActionHistory } T
+	 * @overload
+	 * @param { T } [key] 
+	 * @param { (event: GameEventPromise) => boolean } [filter]
+	 * @param { GameEventPromise } [last]
+	 * @returns { null | ActionHistory[T] | boolean }
+	 */
 	getLastHistory(key, filter, last) {
 		let history = false;
 		for (let i = this.actionHistory.length - 1; i >= 0; i--) {
@@ -8481,6 +8608,12 @@ export class Player extends HTMLDivElement {
 			return history.filter(filter);
 		}
 	}
+	/**
+	 * @template { keyof ActionHistory } T
+	 * @param { T } key
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
+	 */
 	checkAllHistory(key, filter, last) {
 		if (!key || !filter) return;
 		this.actionHistory.forEach((value) => {
@@ -8496,6 +8629,13 @@ export class Player extends HTMLDivElement {
 			}
 		});
 	}
+	/**
+	 * @template { keyof ActionHistory } T
+	 * @param { T } [key]
+	 * @param { (event: GameEventPromise) => boolean } [filter]
+	 * @param { GameEventPromise } [last]
+	 * @returns { ActionHistory[T] }
+	 */
 	getAllHistory(key, filter, last) {
 		const history = [];
 		this.actionHistory.forEach((value) => {
@@ -8517,6 +8657,13 @@ export class Player extends HTMLDivElement {
 		}
 		return history;
 	}
+	/**
+	 * @template { keyof ActionHistory } T
+	 * @param { T } key
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
+	 * @returns { boolean }
+	 */
 	hasAllHistory(key, filter, last) {
 		return this.actionHistory.some((value) => {
 			let history = value[key];
@@ -9096,6 +9243,12 @@ export class Player extends HTMLDivElement {
 		}
 		return false;
 	}
+	/**
+	 * 
+	 * @param { number | Card[] | Card } [add] 
+	 * @param { (card?: Card, player?: Player) => boolean } [filter] 
+	 * @param { boolean } [pure] 
+	 */
 	needsToDiscard(add, filter, pure) {
 		/**
 		 * add: (逻辑上)同时考虑“获得”的这张/些牌
@@ -9124,9 +9277,23 @@ export class Player extends HTMLDivElement {
 	distanceFrom(target, method) {
 		return get.distance(target, this, method);
 	}
+	/**
+	 * @param { string } skill 
+	 * @param { Parameters<this['getSkills']>[0] } arg2 
+	 * @param { Parameters<this['getSkills']>[1] } arg3 
+	 * @param { Parameters<this['getSkills']>[2] } arg4 
+	 * @returns { boolean }
+	 */
 	hasSkill(skill, arg2, arg3, arg4) {
 		return game.expandSkills(this.getSkills(arg2, arg3, arg4)).includes(skill);
 	}
+	/**
+	 * @param { string } skill 
+	 * @param { Parameters<this['getStockSkills']>[0] } arg1 
+	 * @param { Parameters<this['getStockSkills']>[1] } arg2 
+	 * @param { Parameters<this['getStockSkills']>[2] } arg3 
+	 * @returns { boolean }
+	 */
 	hasStockSkill(skill, arg1, arg2, arg3) {
 		return game.expandSkills(this.getStockSkills(arg1, arg2, arg3)).includes(skill);
 	}
@@ -9153,6 +9320,11 @@ export class Player extends HTMLDivElement {
 		}
 		return false;
 	}
+	/**
+	 * 
+	 * @param {string} skill 
+	 * @param {Player} [player] 
+	 */
 	hasZhuSkill(skill, player) {
 		if (!this.hasSkill(skill)) return false;
 		if (player) {
@@ -9187,6 +9359,12 @@ export class Player extends HTMLDivElement {
 		}
 		return false;
 	}
+	/**
+	 * @param {string} tag 
+	 * @param {Parameters<this['getSkills']>[0]} hidden 
+	 * @param {Parameters<SkillAI['skillTagFilter']>[2]} arg 
+	 * @param {boolean} [globalskill] 
+	 */
 	hasSkillTag(tag, hidden, arg, globalskill) {
 		var skills = this.getSkills(hidden);
 		if (globalskill) {
@@ -9281,6 +9459,11 @@ export class Player extends HTMLDivElement {
 		}
 		return false;
 	}
+	/**
+	 * 
+	 * @param {string|boolean} [respond] 
+	 * @param {boolean} [noauto] 
+	 */
 	hasSha(respond, noauto) {
 		if (this.countCards("hs", "sha")) return true;
 		if (this.countCards("hs", "hufu")) return true;
@@ -10848,7 +11031,14 @@ export class Player extends HTMLDivElement {
 			avatar ? 1600 : 1000
 		);
 	}
-	$damagepop(num, nature, font, nobroadcast) {
+	/**
+	 * 
+	 * @param { number | string } num 
+	 * @param { string } [nature] 
+	 * @param { boolean } [font] 
+	 * @param { boolean } [nobroadcast] 
+	 */
+	$damagepop(num, nature = "soil", font, nobroadcast) {
 		if (typeof num == "number" || typeof num == "string") {
 			game.addVideo("damagepop", this, [num, nature, font]);
 			if (nobroadcast !== false)

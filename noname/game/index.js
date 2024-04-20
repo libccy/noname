@@ -53,18 +53,19 @@ export class Game {
 	/**
 	 * @type { string }
 	 */
-	// @ts-ignore
 	layout;
 	/**
 	 * @type { Player }
 	 */
-	// @ts-ignore
 	me;
 	/**
 	 * @type { boolean }
 	 */
-	// @ts-ignore
 	chess;
+	/**
+	 * @type { Player }
+	 */
+	zhu;
 	globalEventHandlers = new (class {
 		constructor() {
 			this._handlers = {};
@@ -7486,7 +7487,7 @@ export class Game {
 	}
 	/**
 	 * @param { Player[] } players
-	 * @param { number | number[] | (player: Player) => number } num
+	 * @param { number | number[] | (player: Player) => number } [num]
 	 * @param { { drawDeck: boolean } } [drawDeck]
 	 * @param { boolean } [bottom]
 	 */
