@@ -1529,18 +1529,21 @@ export class Game {
 			const name = (player.tempname || []).find((i) => filter(i));
 			return (
 				name ||
-				[player.name, player.name1, player.name2].reduce((result, name) => {
-					if (result) return result;
-					if (!name) return result;
-					if (filter(name)) return name;
-					let tempname = get.character(name, 4).find((tag) => tag.startsWith("tempname:"));
-					if (!tempname) return result;
-					tempname = tempname
-						.split(":")
-						.slice(1)
-						.find((i) => filter(i));
-					return tempname || result;
-				}, void 0)
+				[player.name, player.name1, player.name2].reduce(
+					(result, name) => {
+						if (result) return result;
+						if (!name) return result;
+						if (filter(name)) return name;
+						let tempname = get.character(name, 4).find((tag) => tag.startsWith("tempname:"));
+						if (!tempname) return result;
+						tempname = tempname
+							.split(":")
+							.slice(1)
+							.find((i) => filter(i));
+						return tempname || result;
+					},
+					void 0
+				)
 			);
 		};
 
@@ -2247,21 +2250,25 @@ export class Game {
 			if (str === "" || str === undefined) throw "你导入的不是扩展！请选择正确的文件";
 			// 编译ts扩展
 			if (isTsFile) {
-				if (typeof globalThis.ts === 'undefined') {
-					await lib.init.promises.js('game', 'typescript');
+				if (typeof globalThis.ts === "undefined") {
+					await lib.init.promises.js("game", "typescript");
 				}
 				/**
 				 * @type {typeof import('typescript')}
 				 */
 				const ts = globalThis.ts;
-				str = ts.transpile(str, {
-					module: ts.ModuleKind.ES2015,
-					//@todo: ES2019 -> ES2020
-					target: ts.ScriptTarget.ES2019,
-					inlineSourceMap: true,
-					resolveJsonModule: true,
-					esModuleInterop: true,
-				}, 'extension.ts');
+				str = ts.transpile(
+					str,
+					{
+						module: ts.ModuleKind.ES2015,
+						//@todo: ES2019 -> ES2020
+						target: ts.ScriptTarget.ES2019,
+						inlineSourceMap: true,
+						resolveJsonModule: true,
+						esModuleInterop: true,
+					},
+					"extension.ts"
+				);
 			}
 			_status.importingExtension = true;
 			try {
@@ -2276,16 +2283,17 @@ export class Game {
 				// 是模块扩展
 				if (
 					// @ts-ignore
-					error.message === 'Cannot use import statement outside a module' || 
+					error.message === "Cannot use import statement outside a module" ||
 					// @ts-ignore
-					error.message === 'await is only valid in async functions and the top level bodies of modules'
+					error.message ===
+						"await is only valid in async functions and the top level bodies of modules"
 				) {
 					// 改为用info.json判断扩展名
 					const infoFile = zip.file("info.json");
 					if (!infoFile) throw new Error("未找到info.json,导入模块化扩展必须加入info.json！");
 					const info = JSON.parse(infoFile.asText());
-					if (typeof info.name == 'string') {
-						await game.import('extension', () => {
+					if (typeof info.name == "string") {
+						await game.import("extension", () => {
 							return Object.assign(info, {
 								config: {},
 							});
@@ -7308,7 +7316,7 @@ export class Game {
 			for (let i = 0; i < event.config.size; i++) {
 				ui.window.appendChild(event.nodes[i]);
 			}
-			"step 1";
+			("step 1");
 			let rand1 = event.config.first;
 			if (rand1 == "rand") {
 				rand1 = Math.random() < 0.5;
@@ -7350,7 +7358,7 @@ export class Game {
 			}
 			game.delay();
 			lib.init.onfree();
-			"step 2";
+			("step 2");
 			if (event.checkredo()) return;
 			if (event._skiprest) return;
 			if (event.side < 2) {
@@ -7366,7 +7374,7 @@ export class Game {
 				event.aiMove();
 				game.delay();
 			}
-			"step 3";
+			("step 3");
 			if (typeof event.fast == "number" && get.time() - event.fast <= 1000) {
 				event.fast = true;
 			} else {
@@ -7401,7 +7409,7 @@ export class Game {
 					game.delay();
 				}
 			}
-			"step 4";
+			("step 4");
 			if (event.checkredo()) return;
 			if (event.skipnode) event.skipnode.delete();
 			if (event.replacenode) event.replacenode.delete();
@@ -7423,7 +7431,7 @@ export class Game {
 				}
 			}
 			game.delay();
-			"step 5";
+			("step 5");
 			event.prompt("选择" + get.cnNumber(event.config.num) + "名出场武将");
 			event.enemylist = [];
 			for (let i = 0; i < event.avatars.length; i++) {
@@ -7453,7 +7461,7 @@ export class Game {
 				event.nodes[i].hide();
 			}
 			game.pause();
-			"step 6";
+			("step 6");
 			event.promptbar.delete();
 			if (ui.cardPileButton) ui.cardPileButton.style.display = "";
 			lib.onresize.remove(event.resize);
@@ -8207,7 +8215,7 @@ export class Game {
 							game.reload2();
 							resolve(result);
 						};
-				  }
+					}
 				: (resolve, reject) => {
 						lib.status.reload++;
 						const idbRequest = lib.db
@@ -8240,7 +8248,7 @@ export class Game {
 							game.reload2();
 							resolve(object);
 						};
-				  }
+					}
 		);
 	}
 	/**
@@ -8297,7 +8305,7 @@ export class Game {
 						game.reload2();
 						resolve(event);
 					};
-			  })
+				})
 			: game.getDB(storeName).then((object) => {
 					const keys = Object.keys(object);
 					lib.status.reload += keys.length;
@@ -8318,7 +8326,7 @@ export class Game {
 								})
 						)
 					);
-			  });
+				});
 	}
 	/**
 	 * @param { string } key

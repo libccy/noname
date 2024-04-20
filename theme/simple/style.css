@@ -12,12 +12,16 @@ html {
 	backdrop-filter: blur(3px);
 	-webkit-backdrop-filter: blur(3px);
 	background: rgba(0, 0, 0, 0.4);
-	box-shadow: rgba(0, 0, 0, 0.5) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.5) 0 0 0 1px,
+		rgba(0, 0, 0, 0.3) 0 3px 10px;
 }
 #window.glass_ui .dialog.popped:not(.menu) {
 	backdrop-filter: blur(3px);
 	-webkit-backdrop-filter: blur(3px);
-	box-shadow: rgba(0, 0, 0, 0.6) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.6) 0 0 0 1px,
+		rgba(0, 0, 0, 0.3) 0 3px 10px;
 }
 #system > div > div,
 #mebg,
@@ -38,7 +42,9 @@ html {
 #window .player.playerbg,
 .menubg,
 .mebg {
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px;
 	background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
 	border-radius: 8px;
 }
@@ -55,7 +61,9 @@ html {
 }
 .videonode.menubutton.extension.current {
 	background-image: linear-gradient(rgba(89, 111, 117, 0.4), rgba(89, 111, 117, 0.4));
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px;
 }
 
 /*.player.current_action{
@@ -126,14 +134,18 @@ html {
 	background-size: 100% 100%;
 }
 .card .markcount {
-	box-shadow: rgba(0, 0, 0, 0.8) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.8) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px;
 	background: url("card.png");
 	background-size: cover;
 	/*color: white;*/
 }
 #me > div > div > .card,
 #arena > .card:not(*:empty) {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 3px 10px;
 }
 /*.player{
 	background:repeating-linear-gradient(
@@ -157,7 +169,9 @@ html {
 
 #system > div > .glow {
 	background-image: linear-gradient(rgba(47, 101, 150, 1), rgba(43, 90, 132, 1));
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px !important;
 }
 
 .menupaused {
@@ -193,7 +207,9 @@ html {
 .woodbg .menubutton.large {
 	background: url("card2.png") !important;
 	background-size: 100% 100% !important;
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 0, 0, 0.3) 0 0 5px !important;
 }
 
 .player > .glassbg {
@@ -230,7 +246,9 @@ html {
 }
 
 .popup-container > .menu.visual > .button.dashedmenubutton {
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px !important;
 	border: none;
 	background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)) !important;
 }

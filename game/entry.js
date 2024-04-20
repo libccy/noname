@@ -7,15 +7,12 @@ const core = coreAndVersion[0],
 	version = coreAndVersion[1];
 //@todo: 77 -> 80
 if (core === "chrome" && !isNaN(version) && version < 77) {
-	const tip =
-		"检测到您的浏览器内核版本小于77，请及时升级浏览器或手机webview内核！";
+	const tip = "检测到您的浏览器内核版本小于77，请及时升级浏览器或手机webview内核！";
 	console.warn(tip);
 	game.print(tip);
 	const redirect_tip = `您使用的浏览器或无名杀客户端内核版本过低，将在未来的版本被废弃！\n目前使用的浏览器UA信息为：\n${userAgent}\n点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。`;
 	if (confirm(redirect_tip)) {
-		window.open(
-			"https://github.com/libccy/noname/releases/tag/chromium77-client"
-		);
+		window.open("https://github.com/libccy/noname/releases/tag/chromium77-client");
 	}
 }
 
@@ -32,11 +29,7 @@ boot().then(() => {
 		let data;
 		let export_data = function (data) {
 			game.promises
-				.writeFile(
-					lib.init.encode(JSON.stringify(data)),
-					"./",
-					"noname.config.txt"
-				)
+				.writeFile(lib.init.encode(JSON.stringify(data)), "./", "noname.config.txt")
 				.then(saveProtocol)
 				.catch((e) => {
 					console.error("升级失败:", e);
@@ -65,10 +58,7 @@ boot().then(() => {
 		function saveProtocol() {
 			const url = sendUpdate();
 			if (typeof url == "string") {
-				if (
-					typeof window.require == "function" &&
-					typeof window.process == "object"
-				) {
+				if (typeof window.require == "function" && typeof window.process == "object") {
 					// @ts-ignore
 					const remote = require("@electron/remote");
 					const thisWindow = remote.getCurrentWindow();
@@ -95,10 +85,7 @@ boot().then(() => {
 										throw "err";
 									}
 									// @ts-ignore
-									if (
-										lib.db &&
-										(!data.config || !data.data)
-									) {
+									if (lib.db && (!data.config || !data.data)) {
 										throw "err";
 									}
 								} catch (e) {
@@ -115,42 +102,25 @@ boot().then(() => {
 								alert("导入成功, 即将自动重启");
 								// @ts-ignore
 								if (!lib.db) {
-									const noname_inited =
-										localStorage.getItem("noname_inited");
-									const onlineKey = localStorage.getItem(
-										lib.configprefix + "key"
-									);
+									const noname_inited = localStorage.getItem("noname_inited");
+									const onlineKey = localStorage.getItem(lib.configprefix + "key");
 									localStorage.clear();
 									if (noname_inited) {
-										localStorage.setItem(
-											"noname_inited",
-											noname_inited
-										);
+										localStorage.setItem("noname_inited", noname_inited);
 									}
 									if (onlineKey) {
-										localStorage.setItem(
-											lib.configprefix + "key",
-											onlineKey
-										);
+										localStorage.setItem(lib.configprefix + "key", onlineKey);
 									}
 									for (let i in data) {
 										localStorage.setItem(i, data[i]);
 									}
 								} else {
 									for (let i in data.config) {
-										await game.putDB(
-											"config",
-											i,
-											data.config[i]
-										);
+										await game.putDB("config", i, data.config[i]);
 										lib.config[i] = data.config[i];
 									}
 									for (let i in data.data) {
-										await game.putDB(
-											"data",
-											i,
-											data.data[i]
-										);
+										await game.putDB("data", i, data.data[i]);
 									}
 								}
 								lib.init.background();

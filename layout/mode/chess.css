@@ -176,10 +176,16 @@
 }
 
 .fakeme.player > div > .selectable {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 1) 0 0 5px, rgba(0, 133, 255, 1) 0 0 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 133, 255, 1) 0 0 5px,
+		rgba(0, 133, 255, 1) 0 0 10px;
 }
 .fakeme.player > div > .selected {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(255, 0, 0, 1) 0 0 5px, rgba(255, 0, 0, 1) 0 0 10px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(255, 0, 0, 1) 0 0 5px,
+		rgba(255, 0, 0, 1) 0 0 10px !important;
 }
 .fakeme.player > div > .dead {
 	filter: grayscale(1);

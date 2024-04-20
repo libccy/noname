@@ -24,7 +24,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			if (_status.mode == "combat") {
 				_status.first_less = true;
 			}
-			"step 1";
+			("step 1");
 			for (var i in lib.skill) {
 				if (lib.skill[i].changeSeat) {
 					lib.skill[i] = {};
@@ -134,7 +134,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 				}
 			}
-			"step 2";
+			("step 2");
 			ui.arena.classList.add("chess");
 			if (_status.mode == "three") {
 				_status.mylist = result.friend;
@@ -435,7 +435,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			lib.setScroll(ui.chessinfo.firstChild);
 
 			game.arrangePlayers();
-			"step 3";
+			("step 3");
 			ui.control.style.display = "";
 			var p;
 			for (var i = 0; i < game.players.length; i++) {
@@ -1273,7 +1273,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (game.me.isDead()) {
 						event.swapNow = true;
 					}
-					"step 1";
+					("step 1");
 					game.uncheck();
 					var player = game.addChessPlayer(event.playername, event.enemy);
 					game.log(player, "加入游戏");
@@ -1411,7 +1411,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.switchToAuto();
 					}
-					"step 1";
+					("step 1");
 					_status.imchoosing = false;
 					if (event.moved) {
 						game.delay();
@@ -1865,7 +1865,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						"step 0";
 						player.classList.add("acted");
 						player.phase();
-						"step 1";
+						("step 1");
 						if (player != game.friendZhu && player != game.enemyZhu) {
 							for (var i = 0; i < game.players.length; i++) {
 								if (
@@ -1881,7 +1881,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								}
 							}
 						}
-						"step 2";
+						("step 2");
 						var target = event.swap(player);
 						var swap = [],
 							swap2 = [];
@@ -1951,7 +1951,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								return num;
 							};
 						}
-						"step 3";
+						("step 3");
 						if (event.directresult) {
 							event.player = event.directresult;
 							delete event.directresult;
@@ -2014,11 +2014,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.goto(2);
 					}
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						game.asyncDraw(result.targets);
 					}
-					"step 2";
+					("step 2");
 					if (player.side == game.me.side) {
 						player = game.me;
 					}
@@ -2057,7 +2057,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						});
 						event.goto(0);
 					}
-					"step 3";
+					("step 3");
 					if (event.decided) {
 						event.decided.phase();
 						event.justacted = event.decided;
@@ -2067,7 +2067,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						current.phase();
 						event.justacted = current;
 					}
-					"step 4";
+					("step 4");
 					event.justacted.classList.add("acted");
 					event.goto(0);
 					for (var i = 0; i < game.players.length; i++) {
@@ -2281,7 +2281,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						//	}
 						//}
 					}
-					"step 1";
+					("step 1");
 					lib.rank.all = lib.rank.s
 						.concat(lib.rank.ap)
 						.concat(lib.rank.a)
@@ -3252,7 +3252,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					};
 					lib.init.onfree();
 					game.pause();
-					"step 2";
+					("step 2");
 					if (!game.data.arena) {
 						event.dialog1.close();
 						event.dialog2.close();
@@ -3264,7 +3264,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					ui.arena.classList.add("leaderhide");
 					ui.money.hide();
 					game.delay();
-					"step 3";
+					("step 3");
 					ui.arena.classList.remove("leaderhide");
 					if (!_status.enterArena) {
 						ui.wuxie.show();
@@ -3339,7 +3339,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							}
 						};
 					}
-					"step 4";
+					("step 4");
 					var choice;
 					if (game.data._arena) {
 						game.data.arena = game.data._arena;
@@ -3438,7 +3438,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}, 200);
 					lib.init.onfree();
 					game.pause();
-					"step 5";
+					("step 5");
 					if (event.arenachoice.length < 9) {
 						event.goto(4);
 					} else {
@@ -3450,7 +3450,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						game.saveData();
 						event.choosefinished = true;
 					}
-					"step 6";
+					("step 6");
 					game.minskin = true;
 					ui.arena.classList.add("noleft");
 					var nodes = event.arenachoicenodes;
@@ -3612,33 +3612,60 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							};
 							node.listenTransition(onEnd);
 						};
-						setTimeout(function () {
-							nodes[0].delete();
-						}, 400 + Math.random() * 300);
-						setTimeout(function () {
-							nodes[1].delete();
-						}, 400 + Math.random() * 300);
-						setTimeout(function () {
-							nodes[2].delete();
-						}, 400 + Math.random() * 300);
-						setTimeout(function () {
-							nodes[3].delete();
-						}, 400 + Math.random() * 300);
-						setTimeout(function () {
-							nodes[4].delete();
-						}, 400 + Math.random() * 300);
-						setTimeout(function () {
-							nodes[5].delete();
-						}, 400 + Math.random() * 300);
-						setTimeout(function () {
-							nodes[6].delete();
-						}, 400 + Math.random() * 300);
-						setTimeout(function () {
-							nodes[7].delete();
-						}, 400 + Math.random() * 300);
-						setTimeout(function () {
-							nodes[8].delete();
-						}, 400 + Math.random() * 300);
+						setTimeout(
+							function () {
+								nodes[0].delete();
+							},
+							400 + Math.random() * 300
+						);
+						setTimeout(
+							function () {
+								nodes[1].delete();
+							},
+							400 + Math.random() * 300
+						);
+						setTimeout(
+							function () {
+								nodes[2].delete();
+							},
+							400 + Math.random() * 300
+						);
+						setTimeout(
+							function () {
+								nodes[3].delete();
+							},
+							400 + Math.random() * 300
+						);
+						setTimeout(
+							function () {
+								nodes[4].delete();
+							},
+							400 + Math.random() * 300
+						);
+						setTimeout(
+							function () {
+								nodes[5].delete();
+							},
+							400 + Math.random() * 300
+						);
+						setTimeout(
+							function () {
+								nodes[6].delete();
+							},
+							400 + Math.random() * 300
+						);
+						setTimeout(
+							function () {
+								nodes[7].delete();
+							},
+							400 + Math.random() * 300
+						);
+						setTimeout(
+							function () {
+								nodes[8].delete();
+							},
+							400 + Math.random() * 300
+						);
 						setTimeout(function () {
 							var prize = new Array(6);
 							var map = [1, 2, 3, 4, 5];
@@ -3885,7 +3912,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					};
 					lib.init.onfree();
 					game.pause();
-					"step 7";
+					("step 7");
 					ui.control.style.top = "";
 					if (!get.is.safari()) {
 						ui.control.style.transition = "";
@@ -4340,7 +4367,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					};
 					if (!ui.cheat && get.config("change_choice")) ui.create.cheat();
 					if (!ui.cheat2 && get.config("free_choose")) ui.create.cheat2();
-					"step 1";
+					("step 1");
 					ui.wuxie.show();
 					if (ui.cheat) {
 						ui.cheat.close();
@@ -4523,7 +4550,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					game.log("毒镖陷阱发动");
 					player.damage("nosource");
 					player.draw(2);
@@ -4567,7 +4594,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					game.log("集气石发动");
 					player.recover("nosource");
 					var he = player.getCards("he");
@@ -4614,7 +4641,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					game.log("乌鸦神像发动");
 					player.recover("nosource");
 					// player.draw();
@@ -4668,7 +4695,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					game.log("审判之刃发动");
 					var hs = player.getCards("h");
 					if (hs.length) {
@@ -4695,7 +4722,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					game.delayx();
-					"step 1";
+					("step 1");
 					var source = null;
 					for (var i = 0; i < game.treasures.length; i++) {
 						if (game.treasures[i].name == "treasure_shiyuansu") {
@@ -4716,7 +4743,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					game.log("石元素像发动");
 					player.changeHujia();
 				},
@@ -4762,7 +4789,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					game.log("神秘雕像发动");
 					player.moveTowards(event.source);
 				},
@@ -4795,7 +4822,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					};
 					event.custom.replace.confirm = game.resume;
 					event.switchToAuto = game.resume;
-					"step 1";
+					("step 1");
 					if (ui.confirm) {
 						ui.confirm.classList.add("removing");
 					}
@@ -5303,7 +5330,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					event.players = get.players(player);
-					"step 1";
+					("step 1");
 					if (event.players.length) {
 						event.players.shift().damage("fire");
 						event.redo();
@@ -5329,7 +5356,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					players.remove(player);
 					event.players = players;
 					player.line(players, "green");
-					"step 1";
+					("step 1");
 					if (event.players.length) {
 						var current = event.players.shift();
 						var hs = current.getCards("h");
@@ -5513,7 +5540,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					player.chooseToMoveChess(2, get.prompt("pianyi"));
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.logSkill("pianyi");
 					}
@@ -5537,7 +5564,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}).length,
 						get.prompt("lingdong")
 					);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.logSkill("lingdong");
 					}
@@ -5682,7 +5709,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							game.resume();
 						};
 					}
-					"step 1";
+					("step 1");
 					if (ui.confirm) {
 						ui.confirm.classList.add("removing");
 					}
@@ -5760,7 +5787,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					var move = 2;
 					move = game.checkMod(player, move, "chessMove", player);
 					player.chooseToMoveChess(move).phasing = true;
-					"step 1";
+					("step 1");
 					if (ui.confirm) {
 						ui.confirm.classList.add("removing");
 					}
@@ -5980,7 +6007,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					players.sort(lib.sort.seat);
 					event.players = players;
-					"step 1";
+					("step 1");
 					if (event.players.length) {
 						event.current = event.players.shift();
 						event.current.chooseCard(
@@ -5990,7 +6017,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (result.cards.length) {
 						player.gain(result.cards, event.current);
 						event.current.$give(1, player);
@@ -6381,7 +6408,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.grids = [];
 					}
-					"step 1";
+					("step 1");
 					_status.imchoosing = false;
 					if (!event.obstacle) {
 						event.obstacle = event.poses.randomGet();
@@ -6486,7 +6513,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						_status.imchoosing = true;
 						event.dialog = ui.create.dialog("选择一个与你相邻的障碍清除之");
 					}
-					"step 1";
+					("step 1");
 					_status.imchoosing = false;
 					if (!event.obstacle) {
 						event.obstacle = event.obstacles.randomGet();

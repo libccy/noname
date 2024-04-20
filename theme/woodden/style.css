@@ -1,7 +1,9 @@
 html {
 	color: white;
 	text-shadow: black 0 0 2px;
-	background: url("grid.png"), linear-gradient(#6c7989, #434b55) fixed;
+	background:
+		url("grid.png"),
+		linear-gradient(#6c7989, #434b55) fixed;
 }
 #system > div > div,
 #mebg,
@@ -18,18 +20,24 @@ html {
 .playerbg,
 .menubg,
 .mebg {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 3px 10px;
 	border-radius: 8px;
 }
 
 .dialog.choose-character > .packnode > div {
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px;
 	background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
 	color: white;
 	text-shadow: black 0 0 2px;
 }
 .dialog.choose-character > .packnode > div.active {
-	box-shadow: rgba(27, 63, 95, 0.8) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px !important;
+	box-shadow:
+		rgba(27, 63, 95, 0.8) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px !important;
 	background-image: linear-gradient(rgba(47, 101, 150, 1), rgba(43, 90, 132, 1));
 }
 
@@ -67,7 +75,9 @@ html {
 	background: url("wood.png");
 	border-radius: 4px;
 	overflow: hidden;
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 2px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 2px 10px;
 }
 #arena:not(.long).mobile:not(.oldlayout) .player.unseen:not([data-position="0"]) .equips:not(*:empty) > .card,
 #arena:not(.long):not(.mobile):not(.oldlayout) .player.unseen .equips:not(*:empty) > .card:not(.selected),
@@ -77,7 +87,9 @@ html {
 }
 
 .coin_menu .content > .caption > .coin_buy > .menubutton {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 0, 0, 0.3) 0 0 5px !important;
 }
 
 .popup.fire {
@@ -150,7 +162,9 @@ html {
 	box-shadow: rgba(0, 0, 0, 0.4) 0 1px 0 0 !important;
 }
 #arena:not(.chess).textequip .player[data-position="0"] .equips > .card > .name2 {
-	transition: opacity 0.5s, color 0s;
+	transition:
+		opacity 0.5s,
+		color 0s;
 }
 
 .control,
@@ -167,7 +181,10 @@ html {
 	box-shadow: none;
 }
 #system > div > .pressdown2 {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 133, 255, 0.8) 0 0 0 2px,
+		rgba(0, 133, 255, 1) 0 0 5px !important;
 }
 .judges > div,
 .marks > div {
@@ -181,30 +198,46 @@ html {
 	background: url("wood.png");
 }
 .menubutton.large {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 0, 0, 0.3) 0 0 5px !important;
 }
 .menubutton.large.active,
 .menubutton.round.active,
 .menubutton.active,
 .menubutton.highlight.update {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 133, 255, 0.4) 0 0 0 2px,
+		rgba(0, 133, 255, 1) 0 0 5px !important;
 }
 .connectevents.icon.highlight {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 0, 0, 0.3) 0 0 5px !important;
 	background: url("wood.jpg");
 }
 .videonode.menubutton.extension > .caption > .menubutton.active {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px !important;
 }
 .videonode.menubutton.extension.current {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 133, 255, 0.4) 0 0 0 2px,
+		rgba(0, 133, 255, 1) 0 0 5px !important;
 }
 .themebutton {
-	box-shadow: rgba(0, 0, 0, 0.45) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.45) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 3px 10px !important;
 }
 .config.toggle > div > div {
 	background: url("wood.png");
-	box-shadow: rgba(151, 151, 151, 1) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	box-shadow:
+		rgba(151, 151, 151, 1) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px;
 }
 .config.toggle.on > div {
 	background-color: transparent;
@@ -227,7 +260,9 @@ html {
 #system > div > div,
 .popup,
 .dialog > .bar {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 2px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 2px 10px;
 }
 .card {
 	text-shadow: rgba(0, 0, 0, 0.1) 0 0 1px;
@@ -277,7 +312,9 @@ html {
 	box-shadow: rgba(0, 0, 0, 0.5) 0 0 5px inset;
 }
 .menubg.charactercard > .ava > .avatar {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.3) 0 0 5px;
 }
 
 #arena:not(.chess) .player[data-position="0"] > .equips > .equip5 > .image {

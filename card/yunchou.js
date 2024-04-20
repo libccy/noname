@@ -15,7 +15,7 @@ game.import("card", function () {
 					"step 0";
 					game.delay();
 					player.draw();
-					"step 1";
+					("step 1");
 					if (get.is.versus()) {
 						player
 							.chooseControl("顺时针", "逆时针", function (event, player) {
@@ -26,7 +26,7 @@ game.import("card", function () {
 					} else {
 						event.goto(3);
 					}
-					"step 2";
+					("step 2");
 					if (result && result.control == "顺时针") {
 						var evt = event.getParent();
 						evt.fixedSeat = true;
@@ -36,7 +36,7 @@ game.import("card", function () {
 							evt.targets.unshift(evt.targets.pop());
 						}
 					}
-					"step 3";
+					("step 3");
 					ui.clear();
 					var cards = get.cards(Math.ceil(game.countPlayer() / 2));
 					var dialog = ui.create.dialog("调兵遣将", cards, true);
@@ -71,7 +71,7 @@ game.import("card", function () {
 					next.set("dialog", event.preResult);
 					next.set("closeDialog", false);
 					next.set("dialogdisplay", true);
-					"step 1";
+					("step 1");
 					event.dialog.setCaption("调兵遣将");
 					if (result.bool) {
 						event.button = result.buttons[0];
@@ -83,7 +83,7 @@ game.import("card", function () {
 						target.popup("不换");
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						target.lose(result.cards, ui.special);
 						target.$throw(result.cards);
@@ -96,7 +96,7 @@ game.import("card", function () {
 						);
 						event.button.remove();
 					}
-					"step 3";
+					("step 3");
 					game.delay(2);
 				},
 				contentAfter: function () {
@@ -121,7 +121,7 @@ game.import("card", function () {
 					};
 					next.set("closeDialog", false);
 					next.set("dialogdisplay", true);
-					"step 1";
+					("step 1");
 					if (result && result.bool && result.links && result.links.length) {
 						for (var i = 0; i < result.buttons.length; i++) {
 							event.dialog.buttons.remove(result.buttons[i]);
@@ -135,7 +135,7 @@ game.import("card", function () {
 					for (var i = 0; i < event.dialog.buttons.length; i++) {
 						event.dialog.buttons[i].link.discard();
 					}
-					"step 2";
+					("step 2");
 					var dialog = event.dialog;
 					dialog.close();
 					_status.dieClose.remove(dialog);
@@ -196,7 +196,7 @@ game.import("card", function () {
 					} else {
 						event.directfalse = true;
 					}
-					"step 1";
+					("step 1");
 					if (event.directfalse || result.control == "选项二") {
 						if (target.countCards("h")) {
 							if (!player.isUnderControl(true)) {
@@ -212,7 +212,7 @@ game.import("card", function () {
 						player.gain(hs, target);
 						target.$give(hs, player);
 					}
-					"step 2";
+					("step 2");
 					target.useCard({ name: "sha" }, player);
 				},
 				ai: {
@@ -311,7 +311,7 @@ game.import("card", function () {
 						return;
 					}
 					target.chooseToCompare(event.addedTarget);
-					"step 1";
+					("step 1");
 					if (!result.tie) {
 						if (result.bool) {
 							if (event.addedTarget.countCards("he")) {
@@ -326,7 +326,7 @@ game.import("card", function () {
 						}
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					target.discardPlayerCard(player);
 					target.line(player);
 				},
@@ -362,7 +362,7 @@ game.import("card", function () {
 						event.list = list;
 						event.torespond = [];
 					}
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						event.current = event.list.shift();
 						event.current
@@ -391,7 +391,7 @@ game.import("card", function () {
 					} else {
 						event.goto(3);
 					}
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						event.torespond.push(event.current);
 						event.current.line(target, "green");
@@ -400,14 +400,14 @@ game.import("card", function () {
 						game.delayx(0.5);
 					}
 					event.goto(1);
-					"step 3";
+					("step 3");
 					if (event.torespond.length == 0) {
 						event.num = 1;
 					} else {
 						event.num = 0;
 						target.chooseToCompare(event.torespond).callback = lib.card.shezhanqunru.callback;
 					}
-					"step 4";
+					("step 4");
 					if (event.num > 0) {
 						target.draw(3);
 					}
@@ -456,7 +456,7 @@ game.import("card", function () {
 					event.source = info.source;
 					event.source.storage.youdishenru = player;
 					event.source.addSkill("youdishenru");
-					"step 1";
+					("step 1");
 					var next = event.source
 						.chooseToUse(
 							{ name: "sha" },
@@ -468,7 +468,7 @@ game.import("card", function () {
 					next.ai2 = function () {
 						return 1;
 					};
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						if (event.source.storage.youdishenru) {
 							event.goto(1);
@@ -511,7 +511,7 @@ game.import("card", function () {
 						target.recover();
 						event.rec = true;
 					}
-					"step 1";
+					("step 1");
 					if (target.isMinHandcard()) target.draw(event.rec ? 1 : 2);
 				},
 				ai: {
@@ -629,7 +629,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					player.chooseToCompare(target).set("preserve", "win").clear = false;
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.gain([result.player, result.target]);
 						result.player.clone.moveDelete(player);
@@ -724,7 +724,7 @@ game.import("card", function () {
 						player.viewHandcards(target);
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.card = result.links[[0]];
 						player.chooseCard("h", true, "用一张手牌替换" + get.translation(event.card)).ai =
@@ -734,7 +734,7 @@ game.import("card", function () {
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						player.gain(event.card, target);
 						target.gain(result.cards, player);

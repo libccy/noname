@@ -432,7 +432,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					target.damage("fire");
-					"step 1";
+					("step 1");
 					target.changeHujia();
 				},
 				ai: {
@@ -470,7 +470,7 @@ game.import("card", function () {
 					).ai = function (card) {
 						return 6 - get.value(card);
 					};
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						target.draw(result.cards.length);
 					}
@@ -511,13 +511,13 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					target.recover();
-					"step 1";
+					("step 1");
 					if (target.isIn()) {
 						target.chooseToDiscard([1, Infinity], "he", "弃置任意张牌并摸等量的牌");
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						target.draw(result.cards.length);
 					}
@@ -682,7 +682,7 @@ game.import("card", function () {
 						"展示的牌相同，你弃置展示的牌，" +
 						get.translation(target) +
 						"失去1点体力";
-					"step 1";
+					("step 1");
 					event.card1 = result.cards[0];
 					target
 						.chooseCard("请展示一张手牌", true)
@@ -704,13 +704,13 @@ game.import("card", function () {
 						"展示的牌相同，" +
 						get.translation(player) +
 						"弃置展示的牌，你失去1点体力";
-					"step 2";
+					("step 2");
 					event.card2 = result.cards[0];
 					ui.arena.classList.add("thrownhighlight");
 					game.addVideo("thrownhighlight1");
 					player.$compare(event.card1, target, event.card2);
 					game.delay(4);
-					"step 3";
+					("step 3");
 					game.log(player, "展示了", event.card1);
 					game.log(target, "展示了", event.card2);
 					if (get.color(event.card2) == get.color(event.card1)) {
@@ -733,7 +733,7 @@ game.import("card", function () {
 					}
 					ui.arena.classList.remove("thrownhighlight");
 					game.addVideo("thrownhighlight2");
-					"step 4";
+					("step 4");
 					// if(cards&&cards.length){
 					//     player.gain(cards,'gain2');
 					//     target.addTempSkill('bingpotong');
@@ -795,7 +795,7 @@ game.import("card", function () {
 								return 8 - get.value(card);
 							};
 					}
-					"step 1";
+					("step 1");
 					if (!result.bool) {
 						target.loseHp();
 					}
@@ -836,7 +836,7 @@ game.import("card", function () {
 					} else {
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						target.$give(result.links[0], player);
 						target.lose(result.links[0], ui.special);
@@ -845,7 +845,7 @@ game.import("card", function () {
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (event.card && get.position(event.card) == "s") {
 						player.equip(event.card);
 					}
@@ -929,7 +929,7 @@ game.import("card", function () {
 						return 11 - get.value(card);
 					};
 					next.autochoose = lib.filter.autoRespondShan;
-					"step 1";
+					("step 1");
 					if (result.bool == false) {
 						target.damage("fire");
 					}
@@ -993,7 +993,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					target.draw();
-					"step 1";
+					("step 1");
 					target.loseHp();
 				},
 				ai: {
@@ -1089,7 +1089,7 @@ game.import("card", function () {
 					"step 0";
 					var next = _status.currentPhase.chooseToRespond({ name: "shan" });
 					next.set("prompt2", "否则本回合无法对其他角色使用卡牌");
-					"step 1";
+					("step 1");
 					if (!result.bool) {
 						_status.currentPhase.addTempSkill("shihuifen", "phaseUseAfter");
 					}
@@ -1684,7 +1684,7 @@ game.import("card", function () {
 						player.line(current[0]);
 						current[0].give(current[1].randomGet(), player, true);
 					}
-					"step 1";
+					("step 1");
 					var card = player.getEquip("gjyuheng");
 					if (card) {
 						if (typeof card.storage.gjyuheng != "number") {
@@ -1736,7 +1736,7 @@ game.import("card", function () {
 						player.line(current[0]);
 						current[0].give(current[1].randomGet(), player, true);
 					}
-					"step 1";
+					("step 1");
 					var card = player.getEquip("gjyuheng_plus");
 					if (card) {
 						if (typeof card.storage.gjyuheng != "number") {
@@ -1784,7 +1784,7 @@ game.import("card", function () {
 						player.line(current[0]);
 						current[0].give(current[1].randomGet(), player, true);
 					}
-					"step 1";
+					("step 1");
 					var card = player.getEquip("gjyuheng");
 					if (card) {
 						if (typeof card.storage.gjyuheng != "number") {

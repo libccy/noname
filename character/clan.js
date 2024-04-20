@@ -634,7 +634,7 @@ game.import("character", function () {
 							} else event.goto(2);
 						}
 					} else event.goto(2);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var key = `${get.suit(trigger.card)}+${get.type2(trigger.card)}`,
 							name = result.links[0][2];
@@ -644,7 +644,7 @@ game.import("character", function () {
 						game.log(player, "记录了", "#y" + get.translation(name));
 						game.delayx();
 					}
-					"step 2";
+					("step 2");
 					if (Object.values(player.getStorage("clanbaichu")).includes(trigger.card.name)) {
 						player.chooseDrawRecover(true);
 					}
@@ -713,7 +713,7 @@ game.import("character", function () {
 							return num1 >= num2 ? 1 : 0;
 						})
 						.set("target", player);
-					"step 1";
+					("step 1");
 					player.addSkill("clanqiuxin_effect");
 					player.markAuto("clanqiuxin_effect", [[target, result.index]]);
 				},
@@ -803,7 +803,7 @@ game.import("character", function () {
 							player.unmarkAuto("clanqiuxin_effect", list);
 							var targets = list.map((listx) => listx[0]);
 							event.targets = targets;
-							"step 1";
+							("step 1");
 							var target = event.targets.shift();
 							event.target = target;
 							var list = [];
@@ -839,7 +839,7 @@ game.import("character", function () {
 									})
 									.set("target", target);
 							}
-							"step 2";
+							("step 2");
 							if (result.bool) {
 								var card = {
 									name: result.links[0][2],
@@ -847,7 +847,7 @@ game.import("character", function () {
 								};
 								player.useCard(card, target, false);
 							}
-							"step 3";
+							("step 3");
 							if (event.targets.length) event.goto(1);
 							else if (!player.getStorage("clanqiuxin_effect").length)
 								player.removeSkill("clanqiuxin_effect");
@@ -899,7 +899,7 @@ game.import("character", function () {
 								return get.cardNameLength(card) == num;
 							})
 						);
-					"step 1";
+					("step 1");
 					if (result.bool) trigger.player.recast(result.cards);
 				},
 			},
@@ -929,7 +929,7 @@ game.import("character", function () {
 							}
 						)
 						.set("ai", (target) => get.attitude(_status.event.player, target));
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var target = result.targets[0];
 						player.logSkill("clanjiejian", target);
@@ -1008,7 +1008,7 @@ game.import("character", function () {
 					"step 0";
 					player.draw(get.cardNameLength(trigger.card));
 					if (player.isDamaged()) player.chooseToDiscard(player.getDamagedHp(), "he", true);
-					"step 1";
+					("step 1");
 					if (
 						player.getHistory("useSkill", (evt) => evt.skill == "clanhuanghan").length > 1 &&
 						player.hasSkill("clanbaozu", null, false, false) &&
@@ -1060,7 +1060,7 @@ game.import("character", function () {
 							true
 						).logSkill = "clanyuzhi";
 					}
-					"step 1";
+					("step 1");
 					player.removeGaintag("clanyuzhi");
 					var num1 = player
 						.getRoundHistory(
@@ -1102,11 +1102,11 @@ game.import("character", function () {
 								.set("choice", player.awakenedSkills.includes("clanbaozu"));
 						else event._result = { bool: false };
 					} else event.goto(3);
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						player.removeSkills("clanbaozu");
 					} else player.damage(1, "thunder");
-					"step 3";
+					("step 3");
 					if (player.countCards("h")) {
 						player
 							.chooseCard(
@@ -1137,7 +1137,7 @@ game.import("character", function () {
 							)
 							.set("num", event.num1);
 					} else event.finish();
-					"step 4";
+					("step 4");
 					if (result.bool) {
 						player.logSkill("clanyuzhi");
 						player.showCards(result.cards, get.translation(player) + "发动了【迂志】");
@@ -1289,7 +1289,7 @@ game.import("character", function () {
 					} else {
 						player.gainPlayerCard(target, "h", true);
 					}
-					"step 1";
+					("step 1");
 					var evtx = event.getParent("phaseUse");
 					if (
 						player.countCards("h") == target.countCards("h") &&
@@ -1337,7 +1337,7 @@ game.import("character", function () {
 								});
 						} else event.finish();
 					} else event.finish();
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						var card = {
 							name: result.links[0][2],
@@ -1482,7 +1482,7 @@ game.import("character", function () {
 								return get.cardNameLength(card) == num;
 							})
 						);
-					"step 1";
+					("step 1");
 					if (result.bool) trigger.player.recast(result.cards);
 				},
 			},
@@ -1671,7 +1671,7 @@ game.import("character", function () {
 									var trigger = _status.event.getTrigger();
 									return get.effect(target, trigger.card, player, player);
 								});
-							"step 1";
+							("step 1");
 							if (result.bool) {
 								var targets = result.targets.sortBySeat();
 								player.logSkill("clanmingjie_effect", targets);
@@ -1718,7 +1718,7 @@ game.import("character", function () {
 							var cards = player.getStorage("clanmingjie_record").slice();
 							cards = cards.filterInD("d");
 							event.cards = cards;
-							"step 1";
+							("step 1");
 							player
 								.chooseButton(["铭戒：是否使用这些牌？", cards])
 								.set("filterButton", (button) => {
@@ -1727,7 +1727,7 @@ game.import("character", function () {
 								.set("ai", (button) => {
 									return _status.event.player.getUseValue(button.link);
 								});
-							"step 2";
+							("step 2");
 							if (result.bool) {
 								var card = result.links[0];
 								event.cards.remove(card);
@@ -1735,7 +1735,7 @@ game.import("character", function () {
 								game.delayx();
 								player.chooseUseTarget(card, true);
 							} else event.finish();
-							"step 3";
+							("step 3");
 							if (
 								event.cards.filter((card) => {
 									return get.position(card, true) == "d" && player.hasUseTarget(card);
@@ -1871,13 +1871,13 @@ game.import("character", function () {
 										})
 										.set("num", ret);
 								}
-								"step 1";
+								("step 1");
 								if (result.bool) {
 									event.cards = result.links;
 								} else {
 									event.finish();
 								}
-								"step 2";
+								("step 2");
 								var count = cards.length;
 								event.getParent().viewedCount = count;
 								player
@@ -1913,7 +1913,7 @@ game.import("character", function () {
 											return 4;
 										})()
 									);
-								"step 3";
+								("step 3");
 								if (result.bool) {
 									var card = result.links[0];
 									cards.remove(card);
@@ -2057,7 +2057,7 @@ game.import("character", function () {
 				content() {
 					"step 0";
 					player.awakenSkill("clanbaozu");
-					"step 1";
+					("step 1");
 					trigger.player.link(true);
 					trigger.player.recover();
 				},
@@ -2112,7 +2112,7 @@ game.import("character", function () {
 									return true;
 								})()
 							);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var cards = result.cards;
 						target.give(cards, player);
@@ -2127,7 +2127,7 @@ game.import("character", function () {
 							"he"
 						);
 					}
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						var cards = result.cards;
 						player.give(cards, target);
@@ -2351,20 +2351,20 @@ game.import("character", function () {
 							target.addTempSkill("clanlianzhu_targeted", "phaseUseAfter");
 							if (target.storage.clanlianzhu) event.goto(4);
 							target.changeZhuanhuanji("clanlianzhu");
-							"step 1";
+							("step 1");
 							player.recast(cards);
-							"step 2";
+							("step 2");
 							if (!target.countCards("he") && !_status.connectMode)
 								event._result = { bool: false };
 							else target.chooseCard("he", "联诛：是否重铸一张牌？", lib.filter.cardRecastable);
-							"step 3";
+							("step 3");
 							if (result.bool) {
 								target.recast(result.cards);
 								if (get.color(cards[0]) === get.color(result.cards[0]))
 									lib.skill.chenliuwushi.change(target, 1);
 							}
 							event.finish();
-							"step 4";
+							("step 4");
 							target
 								.chooseTarget(
 									"联诛：选择其与你使用【杀】的目标",
@@ -2386,7 +2386,7 @@ game.import("character", function () {
 									);
 								})
 								.set("sourcex", player);
-							"step 5";
+							("step 5");
 							if (result.bool) {
 								var targetx = result.targets[0];
 								event.targetx = targetx;
@@ -2395,13 +2395,16 @@ game.import("character", function () {
 								event.cards = [];
 								if (!event.isMine() && !event.isOnline()) game.delayx();
 							} else event.finish();
-							"step 6";
+							("step 6");
 							var current = targets.shift();
 							current
-								.chooseToUse(function (card, player, event) {
-									if (get.name(card) != "sha") return false;
-									return lib.filter.filterCard.apply(this, arguments);
-								}, "联诛：是否对" + get.translation(event.targetx) + "使用一张杀？")
+								.chooseToUse(
+									function (card, player, event) {
+										if (get.name(card) != "sha") return false;
+										return lib.filter.filterCard.apply(this, arguments);
+									},
+									"联诛：是否对" + get.translation(event.targetx) + "使用一张杀？"
+								)
 								.set("targetRequired", true)
 								.set("complexSelect", true)
 								.set("filterTarget", function (card, player, target) {
@@ -2414,10 +2417,10 @@ game.import("character", function () {
 								})
 								.set("sourcex", event.targetx)
 								.set("addCount", false);
-							"step 7";
+							("step 7");
 							if (result.bool) cards.push(result.card);
 							if (targets.length > 0) event.goto(6);
-							"step 8";
+							("step 8");
 							if (cards.length > 1) {
 								const color = get.color(cards[0], false);
 								if (color != "none") {
@@ -2508,7 +2511,7 @@ game.import("character", function () {
 									return game.hasNature(card, "linked");
 								})
 						);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
@@ -2543,7 +2546,7 @@ game.import("character", function () {
 									: 1;
 							});
 					} else event.finish();
-					"step 2";
+					("step 2");
 					if (result.control == "选项一") {
 						player.draw(2);
 						if (player == target) event.finish();
@@ -2551,7 +2554,7 @@ game.import("character", function () {
 						target.recover();
 						event.finish();
 					}
-					"step 3";
+					("step 3");
 					if (!player.countCards("he")) event.finish();
 					else if (player.countCards("he") <= 2)
 						event._result = {
@@ -2561,7 +2564,7 @@ game.import("character", function () {
 					else {
 						player.chooseCard("放赈：交给" + get.translation(target) + "两张牌", "he", 2, true);
 					}
-					"step 4";
+					("step 4");
 					if (result.bool) {
 						player.give(result.cards, target);
 					}
@@ -2618,14 +2621,14 @@ game.import("character", function () {
 							}
 							return get.type(ts[0]) != "basic";
 						});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
 						player.logSkill("clanliuju", target);
 						player.chooseToCompare(target).set("small", true);
 					} else event.finish();
-					"step 2";
+					("step 2");
 					if (!result.tie) {
 						var loser = result.bool ? target : player;
 						var cards = [];
@@ -2645,7 +2648,7 @@ game.import("character", function () {
 						if (cards.length) event.cards = cards;
 						else event.finish();
 					} else event.finish();
-					"step 3";
+					("step 3");
 					var cardsx = cards.filter(
 						(i) => get.position(i, true) == "d" && event.loser.hasUseTarget(i)
 					);
@@ -2659,7 +2662,7 @@ game.import("character", function () {
 							.set("ai", (button) => {
 								return _status.event.player.getUseValue(button.link) + 0.1;
 							});
-					"step 4";
+					("step 4");
 					if (result.bool) {
 						var card = result.links[0];
 						event.cards.remove(card);
@@ -2667,13 +2670,13 @@ game.import("character", function () {
 						game.delayx();
 						event.loser.chooseUseTarget(true, card, false);
 					} else event.goto(6);
-					"step 5";
+					("step 5");
 					if (
 						cards.filter((i) => get.position(i, true) == "d" && event.loser.hasUseTarget(i))
 							.length
 					)
 						event.goto(3);
-					"step 6";
+					("step 6");
 					if (
 						get.distance(player, target) != event.distance[0] ||
 						get.distance(target, player) != event.distance[1]
@@ -2732,7 +2735,7 @@ game.import("character", function () {
 							if (att > 0) att /= 1.2;
 							return Math.abs(att);
 						});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var targets = result.targets.sortBySeat();
 						targets.forEach((i) => i.link(true));
@@ -2758,7 +2761,7 @@ game.import("character", function () {
 							"step 0";
 							player.unmarkAuto("clanlianhe_effect", [trigger.player]);
 							if (trigger.name == "die") event.finish();
-							"step 1";
+							("step 1");
 							if (
 								trigger.player.hasHistory("gain", (evt) => {
 									return (
@@ -2797,7 +2800,7 @@ game.import("character", function () {
 										.set("draw", get.attitude(trigger.player, player) >= 0);
 								}
 							}
-							"step 2";
+							("step 2");
 							if (result.bool) {
 								trigger.player.give(result.cards, player);
 							} else player.draw(num + 1);
@@ -2838,14 +2841,14 @@ game.import("character", function () {
 							}
 							return 0;
 						});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var target = result.targets[0];
 						event.target = target;
 						player.logSkill("clanhuanjia", target);
 						player.chooseToCompare(target);
 					} else event.finish();
-					"step 2";
+					("step 2");
 					if (!result.tie) {
 						var winner = result.bool ? player : target;
 						var cards = [];
@@ -2856,7 +2859,7 @@ game.import("character", function () {
 						if (cards.length) event.cards = cards;
 						else event.finish();
 					} else event.finish();
-					"step 3";
+					("step 3");
 					var cardsx = cards.filter(
 						(i) => get.position(i, true) == "d" && event.winner.hasUseTarget(i)
 					);
@@ -2873,7 +2876,7 @@ game.import("character", function () {
 								return _status.event.player.getUseValue(button.link) * damage + 0.1;
 							})
 							.set("att", get.attitude(event.winner, player));
-					"step 4";
+					("step 4");
 					if (result.bool) {
 						var card = result.links[0];
 						event.card = card;
@@ -2882,7 +2885,7 @@ game.import("character", function () {
 						game.delayx();
 						event.winner.chooseUseTarget(true, card, false);
 					}
-					"step 5";
+					("step 5");
 					if (
 						game.hasPlayer2((current) => {
 							return current.hasHistory(
@@ -2930,7 +2933,7 @@ game.import("character", function () {
 						player.gain(cards, "gain2");
 						event.finish();
 					}
-					"step 6";
+					("step 6");
 					player.removeSkills(result.control);
 				},
 				ai: {
@@ -2985,7 +2988,7 @@ game.import("character", function () {
 								trigger.cards.map((i) => get.value(i))
 							) <= 5 || trigger.cards.filterInD("oe").length == 0
 						);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var target = result.targets[0],
 							num = lib.skill.clansankuang.getNum(target),
@@ -3019,13 +3022,13 @@ game.import("character", function () {
 								);
 						}
 					} else event.finish();
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						var cards = result.cards;
 						target.give(cards, player);
 						game.delayx();
 					} else event.finish();
-					"step 3";
+					("step 3");
 					if (trigger.cards.filterInD().length)
 						target.gain(trigger.cards.filterInD(), "gain2", "bySelf");
 					else if (trigger.cards.filterInD("e").length)
@@ -3177,7 +3180,7 @@ game.import("character", function () {
 										nature: button.link[3],
 									});
 								});
-							"step 1";
+							("step 1");
 							if (result.bool) {
 								var name = result.links[0][2],
 									nature = result.links[0][3];
@@ -3266,7 +3269,7 @@ game.import("character", function () {
 				content() {
 					"step 0";
 					target.recover();
-					"step 1";
+					("step 1");
 					var name = get.translation(target);
 					player
 						.chooseControl()
@@ -3290,7 +3293,7 @@ game.import("character", function () {
 								else return "选项二";
 							})()
 						);
-					"step 2";
+					("step 2");
 					var players = [target, player];
 					if (result.control == "选项二") players.reverse();
 					var card = { name: "sha", nature: "ice", isCard: true };
@@ -3545,7 +3548,7 @@ game.import("character", function () {
 								var cards = player.getCards("h", choice);
 								if (cards.length) player.discard(cards);
 							}
-							"step 1";
+							("step 1");
 							if (!player.isIn() || !game.hasPlayer((current) => current != player))
 								event.finish();
 							else
@@ -3566,7 +3569,7 @@ game.import("character", function () {
 										}
 										return get.damageEffect(target, player, player, "fire");
 									});
-							"step 2";
+							("step 2");
 							if (result.bool) {
 								var target = result.targets[0];
 								event.target = target;
@@ -3631,7 +3634,7 @@ game.import("character", function () {
 										return controls.randomGet();
 									});
 							} else event.finish();
-							"step 3";
+							("step 3");
 							if (result.control == "选项一") {
 								if (!target.isDisabledJudge()) target.disableJudge();
 								target.damage("fire");
@@ -3682,7 +3685,7 @@ game.import("character", function () {
 						player.recast(cards);
 						event.recast = true;
 					}
-					"step 1";
+					("step 1");
 					if (event.link && event.recast) player.draw();
 				},
 				group: "clandianzhan_count",
@@ -3815,13 +3818,13 @@ game.import("character", function () {
 							if (player.hp > 3) return "cancel2";
 							return Math.random() < 0.75 ? "clandaojie" : choices.randomGet();
 						});
-					"step 1";
+					("step 1");
 					if (result.control != "cancel2") {
 						player.removeSkills(result.control);
 					} else {
 						player.loseHp();
 					}
-					"step 2";
+					("step 2");
 					var targets = game.filterPlayer(
 						(current) => current == player || current.hasClan("颍川荀氏")
 					);
@@ -3838,7 +3841,7 @@ game.import("character", function () {
 								}
 							)
 							.set("ai", (target) => get.attitude(_status.event.player, target));
-					"step 3";
+					("step 3");
 					if (result.bool) {
 						var target = result.targets[0];
 						player.line(target, "green");
@@ -3963,7 +3966,7 @@ game.import("character", function () {
 							num2 = player.getHandcardLimit();
 						if (num1 < num2) player.draw(Math.min(8, num2 - num1));
 					}
-					"step 1";
+					("step 1");
 					lib.skill.chenliuwushi.change(player, -1);
 				},
 				ai: {
@@ -4036,7 +4039,7 @@ game.import("character", function () {
 						.set("ai", function (target) {
 							return get.attitude(_status.event.player, target);
 						});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var target = result.targets[0];
 						player.logSkill("clanmuyin", target);

@@ -56,7 +56,7 @@ game.import("card", function () {
 								return 7 - get.value(card);
 							};
 					}
-					"step 1";
+					("step 1");
 					if (!result.bool) {
 						target.damage();
 					}
@@ -147,9 +147,9 @@ game.import("card", function () {
 					player.$fullscreenpop("猴子偷桃", "fire");
 					trigger.untrigger();
 					trigger.finish();
-					"step 1";
+					("step 1");
 					player.discard(player.getEquip(5));
-					"step 2";
+					("step 2");
 					player.gain(trigger.cards.filterInD(), "gain2", "log");
 				},
 			},
@@ -229,14 +229,14 @@ game.import("card", function () {
 						.set("ai", function (target) {
 							return Math.random();
 						});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.target = result.targets[0];
 						player.logSkill("xuelunyang", event.target);
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					var names = [];
 					var list = [];
 					if (target.name && !target.isUnseen(0)) names.add(target.name);
@@ -266,7 +266,7 @@ game.import("card", function () {
 						.set("ai", function () {
 							return _status.event.choice;
 						});
-					"step 3";
+					("step 3");
 					player.addTempSkill(result.control);
 					player.popup(result.control);
 					game.log(player, "获得了", "#g【" + get.translation(result.control) + "】");

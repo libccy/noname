@@ -452,14 +452,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				// game.delay();
 			}
 			ui.arena.classList.add("stone");
-			"step 1";
+			("step 1");
 			for (var i = 0; i < game.players.length; i++) {
 				game.players[i].getId();
 				game.players[i].classList.add("noidentity");
 			}
 			game.enemy = game.me.next;
 			game.chooseCharacter();
-			"step 2";
+			("step 2");
 			if (_status.mode == "deck") {
 				_status.deckButton = ui.create.system("卡组", null, true);
 				lib.setPopped(
@@ -550,9 +550,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			} else {
 				game.gameDraw(game.me);
 			}
-			"step 3";
+			("step 3");
 			game.me.chooseBool("是否置换手牌？");
-			"step 4";
+			("step 4");
 			if (result.bool) {
 				var hs = game.me.getCards("h");
 				for (var i = 0; i < hs.length; i++) {
@@ -565,7 +565,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.me.directgain(get.cards(4));
 				}
 			}
-			"step 5";
+			("step 5");
 			if (game.me.side) {
 				game.stoneLoop(game.me);
 			} else {
@@ -607,7 +607,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						fellow.noPhaseDelay = true;
 					}
 					// player.line(fellow,'green');
-					"step 1";
+					("step 1");
 					event.trigger("fellow");
 					event.result = event.source;
 				},
@@ -651,7 +651,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (fellow.hasSkillTag("noPhaseDelay")) {
 						fellow.noPhaseDelay = true;
 					}
-					"step 1";
+					("step 1");
 					event.trigger("fellow");
 				},
 				ai: {
@@ -2226,7 +2226,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					_status.roundStart = game.me;
 					player.phase();
 					event.num = 0;
-					"step 1";
+					("step 1");
 					if (event.num < player.actcharacterlist.length) {
 						var current = player.actcharacterlist[event.num];
 						if (current) {
@@ -2235,7 +2235,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						event.num++;
 						event.redo();
 					}
-					"step 2";
+					("step 2");
 					if (event.player == game.me) {
 						event.player = game.enemy;
 					} else {
@@ -2520,7 +2520,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					};
 					if (!ui.cheat && get.config("change_choice")) ui.create.cheat();
 					if (!ui.cheat2 && get.config("free_choose")) ui.create.cheat2();
-					"step 1";
+					("step 1");
 					if (ui.cheat) {
 						ui.cheat.close();
 						delete ui.cheat;
@@ -2540,7 +2540,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.list.randomSort();
 					_status.enemylist = event.list.slice(0, result.links.length);
 					_status.double_character = get.config("double_character");
-					"step 2";
+					("step 2");
 					event.choosingDeck = true;
 					if (_status.mode == "deck") {
 						_status.deck = [];
@@ -2626,7 +2626,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							}
 						}
 					}
-					"step 3";
+					("step 3");
 					game.addRecentCharacter.apply(this, _status.mylist);
 					if (ui.coin) {
 						_status.coinCoeff = get.coinCoeff(_status.mylist);
@@ -2734,7 +2734,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.damage();
-					"step 1";
+					("step 1");
 					if (target.isDead()) {
 						player.drawDeck();
 					}
@@ -2817,12 +2817,12 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (fellows.length) {
 						fellows.randomGet().die();
 					}
-					"step 1";
+					("step 1");
 					var fellows = player.getEnemy().getFellow();
 					if (fellows.length) {
 						fellows.randomGet().die();
 					}
-					"step 2";
+					("step 2");
 					var hs = player.getCards("h");
 					if (hs.length) {
 						player.discard(hs.randomGets(2));
@@ -2852,7 +2852,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.die();
-					"step 1";
+					("step 1");
 					player.recover();
 				},
 				ai: {
@@ -2933,7 +2933,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					player.damage(2, target);
-					"step 1";
+					("step 1");
 					target.damage(2);
 				},
 				ai: {
@@ -3021,7 +3021,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.draw(3);
-					"step 1";
+					("step 1");
 					if (target.isTurnedOver()) {
 						target.turnOver();
 					}
@@ -3132,7 +3132,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					targets.sort(lib.sort.seat);
 					event.targets = targets;
-					"step 1";
+					("step 1");
 					if (event.targets.length) {
 						event.targets.shift().die();
 						event.redo();
@@ -3186,7 +3186,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					event.card = player.getDeckCards()[0];
 					player.gain(event.card, "gain2", "log");
-					"step 1";
+					("step 1");
 					var num = lib.card[event.card.name].stoneact;
 					if (num && typeof num == "number") {
 						target.damage(num);
@@ -3565,7 +3565,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					player.chooseCardButton("选择一张加入手牌", player.getDeckCards(3), true);
-					"step 1";
+					("step 1");
 					player.gain(result.links, "draw");
 				},
 				ai: {
@@ -3590,7 +3590,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.damage();
-					"step 1";
+					("step 1");
 					if (target.isAlive()) {
 						var hs = target.getCards("h");
 						if (hs.length) {
@@ -3629,11 +3629,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (player.canAddFellow()) {
 						player.addFellowAuto("stone_jiewangzhu");
 					}
-					"step 1";
+					("step 1");
 					if (player.canAddFellow()) {
 						player.addFellowAuto("stone_jiewangzhu");
 					}
-					"step 2";
+					("step 2");
 					if (player.canAddFellow()) {
 						player.addFellowAuto("stone_jiewangzhu");
 					}
@@ -3711,7 +3711,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.num = 0;
 					}
-					"step 1";
+					("step 1");
 					if (player.canAddFellow() && event.num++ < 10) {
 						player.addFellowAuto("stone_xiaojingling");
 						event.redo();
@@ -3749,7 +3749,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return "获得行动值";
 						};
 					}
-					"step 1";
+					("step 1");
 					if (result.control == "摸牌") {
 						player.drawDeck(3);
 					} else {
@@ -3793,7 +3793,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							event.finish();
 						}
 					}
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						event.list.shift().damage(2);
 						event.redo();
@@ -3827,14 +3827,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					player.chooseControl("两点", "一点").prompt =
 						"造成2点伤害，或造成1点伤害并从牌库中获得一张牌";
-					"step 1";
+					("step 1");
 					if (result.control == "一点") {
 						target.damage();
 					} else {
 						target.damage(2);
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					player.drawDeck();
 				},
 				ai: {
@@ -3861,7 +3861,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.die();
-					"step 1";
+					("step 1");
 					var list = [];
 					for (var i in lib.card) {
 						if (lib.card[i].stonehidden) continue;
@@ -3896,7 +3896,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					target.die()._triggered = null;
 					event.name = target.name;
-					"step 1";
+					("step 1");
 					player.getEnemy().gain(game.createCard(event.name + "_stonecharacter"), "gain2");
 				},
 				ai: {
@@ -4012,7 +4012,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (list.length) {
 						list.randomGet().die({ source: player });
 					}
-					"step 1";
+					("step 1");
 					var es = target.getCards("e");
 					if (es.length) {
 						target.discard(es.randomGet());
@@ -4202,7 +4202,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					event.num = 0;
 					event.map = map;
-					"step 1";
+					("step 1");
 					if (event.num < targets.length) {
 						if (event.map[event.num]) {
 							targets[event.num].damage(event.map[event.num]);
@@ -4240,7 +4240,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (player.canAddFellow()) {
 						player.addFellowAuto("stone_jingxiang", false);
 					}
-					"step 1";
+					("step 1");
 					if (player.canAddFellow()) {
 						player.addFellowAuto("stone_jingxiang", false);
 					}
@@ -4359,7 +4359,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							targets[0].useCard(targets[0], hs.randomGet(), false).noActCount = true;
 						}
 					}
-					"step 1";
+					("step 1");
 					if (targets[1]) {
 						var hs = targets[1].getCards("h", function (card) {
 							return get.type(card) == "stonecharacter";
@@ -4448,7 +4448,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.damage(3, "fire");
-					"step 1";
+					("step 1");
 					player.loseHp();
 				},
 				ai: {
@@ -4555,7 +4555,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.die()._triggered = null;
-					"step 1";
+					("step 1");
 					if (player.deckCards) {
 						player.deckCards.push(game.createCard(target.name + "_stonecharacter"));
 					}
@@ -4621,7 +4621,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						target.recover(num);
 					}
-					"step 1";
+					("step 1");
 					if (target.hp < target.maxHp && player.canAddFellow()) {
 						player.addFellowAuto("stone_shengguanghuwei");
 					}
@@ -4767,7 +4767,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.damage();
-					"step 1";
+					("step 1");
 					if (target.isAlive()) {
 						target.draw(2);
 					}
@@ -4837,7 +4837,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					targets.randomRemove();
 					targets.sort(lib.sort.seat);
 					event.list = targets;
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						event.list.shift().die();
 						event.redo();
@@ -4914,7 +4914,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					event.num = player.getEnemy().countFellow();
-					"step 1";
+					("step 1");
 					if (player.canAddFellow() && event.num--) {
 						player.addFellowAuto("stone_liegou");
 						event.redo();
@@ -5010,7 +5010,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						list.sort(lib.sort.seat);
 					}
 					event.list = list;
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						var current = event.list.shift();
 						player.line(current);
@@ -5068,7 +5068,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					event.num = Math.ceil(Math.random() * 3);
 					target.damage(event.num);
-					"step 1";
+					("step 1");
 					if (player.canAddFellow() && event.num--) {
 						player.addFellowAuto("stone_xiaogui");
 						event.redo();
@@ -5126,7 +5126,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					target.die({ source: player });
 					event.num = target.hp;
-					"step 1";
+					("step 1");
 					event.list = [];
 					for (var i = 0; i < game.players.length; i++) {
 						if (game.players[i].isMin() && game.players[i].side != player.side) {
@@ -5134,7 +5134,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 					event.list.sort(lib.sort.seat);
-					"step 2";
+					("step 2");
 					if (event.list.length) {
 						event.list.shift().damage(event.num);
 						event.redo();
@@ -5262,7 +5262,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					event.num = 3;
-					"step 1";
+					("step 1");
 					if (player.canAddFellow() && event.num--) {
 						player.addFellowAuto("stone_shuren");
 						event.redo();
@@ -5322,7 +5322,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 					target.damage(2);
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						event.list.shift().damage();
 						event.redo();
@@ -5355,7 +5355,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					player.chooseControl("法术牌", "随从牌").ai = function () {
 						return Math.random() < 0.5 ? "法术牌" : "随从牌";
 					};
-					"step 1";
+					("step 1");
 					var list = [];
 					var bool = result.control == "法术牌";
 					for (var i in lib.card) {
@@ -5376,7 +5376,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						cards.push(game.createCard(list[i]));
 					}
 					player.chooseCardButton(cards, "选择一张加入手牌", true);
-					"step 2";
+					("step 2");
 					player.gain(result.links, "draw");
 				},
 				ai: {
@@ -5407,7 +5407,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.num = 2;
 					}
-					"step 1";
+					("step 1");
 					if (player.canAddFellow() && event.num--) {
 						player.addFellowAuto("stone_shumiao");
 						event.redo();
@@ -5444,11 +5444,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.goto(2);
 					}
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.add = true;
 					}
-					"step 2";
+					("step 2");
 					if (event.add) {
 						target.damage(2);
 					} else {
@@ -5680,7 +5680,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					event.num = 0;
 					event.map = map;
-					"step 1";
+					("step 1");
 					if (event.num < targets.length) {
 						if (event.map[event.num]) {
 							targets[event.num].damage(event.map[event.num]);
@@ -5758,11 +5758,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (player.canAddFellow()) {
 						player.addFellowAuto("stone_xinbing");
 					}
-					"step 1";
+					("step 1");
 					if (player.canAddFellow()) {
 						player.addFellowAuto("stone_xinbing");
 					}
-					"step 2";
+					("step 2");
 					var equip1 = get.cardPile(function (card) {
 						return get.subtype(card) == "equip1";
 					});
@@ -5923,7 +5923,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (player.canAddFellow()) {
 						player.addFellowAuto("stone_youlinglang");
 					}
-					"step 1";
+					("step 1");
 					if (player.canAddFellow()) {
 						player.addFellowAuto("stone_youlinglang");
 					}
@@ -5964,7 +5964,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						list.sort(lib.sort.seat);
 					}
 					event.list = list;
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						var current = event.list.shift();
 						player.line(current, "thunder");
@@ -5992,7 +5992,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.damage(2);
-					"step 1";
+					("step 1");
 					if (target.isAlive() && !target.isTurnedOver()) {
 						target.turnOver();
 					}
@@ -6121,7 +6121,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.damage();
-					"step 1";
+					("step 1");
 					if (target.isAlive()) {
 						target.turnOver();
 					}
@@ -6152,7 +6152,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.discard(target.getCards("he"));
-					"step 1";
+					("step 1");
 					if (target.maxHp > 2) {
 						target.loseMaxHp(target.maxHp - 2);
 					}
@@ -6180,12 +6180,12 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					targets.sort(lib.sort.seat);
 					event.list = targets;
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						event.list.shift().die();
 						event.redo();
 					}
-					"step 2";
+					("step 2");
 					player.recover(2);
 				},
 				stoneact: 5,
@@ -6420,7 +6420,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					targets[1].lose(event.cards[1], ui.special);
 					if (event.cards[0].length) targets[0].$give(event.cards[0], targets[1]);
 					if (event.cards[1].length) targets[1].$give(event.cards[1], targets[0]);
-					"step 1";
+					("step 1");
 					var targets = [player, target];
 					for (var i = 0; i < event.cards[1].length; i++) {
 						targets[0].equip(event.cards[1][i]);
@@ -6428,7 +6428,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					for (var i = 0; i < event.cards[0].length; i++) {
 						targets[1].equip(event.cards[0][i]);
 					}
-					"step 2";
+					("step 2");
 					var dh = target.countCards("h") - player.countCards("h");
 					if (dh > 0) {
 						player.draw(dh);
@@ -6463,7 +6463,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					target.gain(target.getCards("e"), "gain2");
-					"step 1";
+					("step 1");
 					var dh = target.countCards("h") - player.countCards("h");
 					if (dh > 0) {
 						target.discard(target.getCards("h").randomGets(dh));
@@ -6505,14 +6505,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					list.sort(lib.sort.seat);
 					event.list = list;
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						var current = event.list.shift();
 						current.damage(2, "fire");
 						player.line(current, "fire");
 						event.redo();
 					}
-					"step 2";
+					("step 2");
 					var target = player.getLeader();
 					var hs = target.getCards("h");
 					if (hs.length) {
@@ -6661,7 +6661,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					target.syncStorage("stone_lianyu");
 					game.delay();
-					"step 1";
+					("step 1");
 					player.die()._triggered = null;
 				},
 			},
@@ -6734,7 +6734,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (target.countFellow() <= 2) return "召唤树人";
 						return "增强随从";
 					};
-					"step 1";
+					("step 1");
 					if (result.control == "增强随从") {
 						var targets = player.getLeader().getFellow();
 						targets.remove(player);
@@ -6746,12 +6746,12 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						game.asyncDraw(targets, 2);
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					var target = player.getLeader();
 					if (target.canAddFellow()) {
 						target.addFellowAuto("stone_shurenxx");
 					}
-					"step 3";
+					("step 3");
 					var target = player.getLeader();
 					if (target.canAddFellow()) {
 						target.addFellowAuto("stone_shurenxx");
@@ -6778,11 +6778,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					player.removeSkill("stone_fuchou2");
 					var targets = player.getEnemy().getFellow();
 					if (targets.length) {
-						player.useCard(
-							targets,
-							game.createCard("spell_fuchouzhinu"),
-							false
-						).noActCount = true;
+						player.useCard(targets, game.createCard("spell_fuchouzhinu"), false).noActCount =
+							true;
 					}
 				},
 			},
@@ -6813,7 +6810,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						cards.push(game.createCard(list[i]));
 					}
 					player.getLeader().chooseCardButton(cards, "选择一张加入手牌", true);
-					"step 1";
+					("step 1");
 					player.getLeader().gain(result.links, "draw");
 				},
 			},
@@ -6902,7 +6899,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return -target.hp - target.countCards("h") / 4;
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						game.delay();
@@ -6989,7 +6986,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return get.attitude(event.chooser, target) * target.hp;
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						result.targets[0].addSkill("lschaofeng");
@@ -7071,7 +7068,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return get.attitude(event.chooser, target) * Math.max(1, 10 - target.hp);
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						result.targets[0].maxHp += 2;
@@ -7123,7 +7120,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						result.targets[0].maxHp -= 2;
@@ -7146,7 +7143,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					var target = player.getLeader();
 					target.damage();
 					player.line(target, "green");
-					"step 1";
+					("step 1");
 					var target = player.getEnemy();
 					target.damage();
 					player.line(target, "green");
@@ -7268,7 +7265,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (list.length && target.canAddFellow()) {
 						target.useCard(target, list.randomGet(), false).noActCount = true;
 					}
-					"step 1";
+					("step 1");
 					var list = [];
 					var target = player.getEnemy();
 					for (var i = 0; i < target.deckCards.length; i++) {
@@ -7338,7 +7335,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					).ai = function (card) {
 						return 7 - get.value(card);
 					};
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.draw(3);
 					}
@@ -7491,7 +7488,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					list.sort(lib.sort.seat);
 					event.list = list;
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						var current = event.list.shift();
 						current.damage(2);
@@ -7516,7 +7513,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					target.judge(function (card) {
 						return get.color(card) == "red" ? 1 : 0;
 					});
-					"step 1";
+					("step 1");
 					if (result.color == "red") {
 						event.target.recover();
 					}
@@ -7554,7 +7551,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return get.attitude(event.chooser, target) * (2 - target.hp);
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						result.targets[0].hp = 2;
@@ -7590,7 +7587,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return get.attitude(event.chooser, target);
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						result.targets[0].changeHujia();
@@ -7658,7 +7655,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						cards.push(game.createCard(list[i]));
 					}
 					player.getLeader().chooseCardButton(cards, "选择一张法术加入手牌", true);
-					"step 1";
+					("step 1");
 					player.getLeader().gain(result.links, "draw");
 				},
 			},
@@ -7713,7 +7710,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					event.num = 0;
 					event.map = map;
-					"step 1";
+					("step 1");
 					var targets = event.targets;
 					if (event.num < targets.length) {
 						if (event.map[event.num]) {
@@ -7809,7 +7806,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (Math.random() < 0.5) return "潜行";
 						return "冲锋";
 					};
-					"step 1";
+					("step 1");
 					if (result.control == "潜行") {
 						player.maxHp++;
 						player.hp++;
@@ -8038,7 +8035,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 					event.target = player.getEnemy();
-					"step 1";
+					("step 1");
 					if (event.num-- && event.target.canAddFellow()) {
 						event.target.addFellowAuto("stone_zhumo");
 						event.redo();
@@ -8403,7 +8400,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						cards.push(game.createCard(list[i]));
 					}
 					player.getLeader().chooseCardButton(cards, "选择一个随从加入手牌", true);
-					"step 1";
+					("step 1");
 					player.getLeader().gain(result.links, "draw");
 				},
 			},
@@ -8466,7 +8463,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						prompt: "偷袭：弃置一张装备区内的牌并对一名敌方角色1点伤害",
 					});
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.discard(result.cards);
 						event.chooser.line(result.targets[0]);
@@ -8504,7 +8501,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					list.sort(lib.sort.seat);
 					event.list = list;
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						var current = event.list.shift();
 						current.damage();
@@ -8551,7 +8548,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					player.getLeader().addFellowAuto("stone_haidao");
-					"step 1";
+					("step 1");
 					player.line(result, "green");
 				},
 			},
@@ -8632,7 +8629,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return att;
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						game.delay();
@@ -8663,7 +8660,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					list.sort(lib.sort.seat);
 					event.list = list;
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						var current = event.list.shift();
 						current.damage();
@@ -8797,7 +8794,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return target.countCards("he");
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						game.delay();
@@ -8976,7 +8973,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return get.attitude(event.chooser, target);
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						result.targets[0].maxHp++;
@@ -9110,7 +9107,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return Math.max(1, 10 - target.hp);
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.target = result.targets[0];
 						event.chooser.chooseControl("造成伤害", "discard_card").ai = function () {
@@ -9122,7 +9119,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (result.control == "造成伤害") {
 						event.target.damage(event.chooser);
 					} else {
@@ -9228,7 +9225,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return Math.max(1, 10 - target.hp);
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						game.delay();
@@ -9439,7 +9436,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					player.updateActCount();
 					event.parent.career = "warlock";
 					player.addFellowAuto("stone_diyuhuox");
-					"step 1";
+					("step 1");
 					var num = player.storage.stone_lianyu;
 					if (num && get.itemtype(result) == "player") {
 						result.maxHp += num;
@@ -9542,10 +9539,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.delay();
 					event.equip1 = equip1;
 					event.equip4 = equip4;
-					"step 1";
+					("step 1");
 					player.equip(event.equip1);
 					game.delay(0.5);
-					"step 2";
+					("step 2");
 					player.equip(event.equip4);
 					event.parent.career = "rogue";
 				},
@@ -9638,7 +9635,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					game.delay();
 				},
 				ai: {
@@ -9671,7 +9668,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					game.delay();
 				},
 			},
@@ -9698,7 +9695,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					game.delay();
 				},
 			},
@@ -9802,7 +9799,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return Math.max(1, 10 - target.hp);
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						game.delay();
@@ -9914,7 +9911,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return get.effect(target, { name: "sha" }, event.chooser);
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.useCard({ name: "sha" }, result.targets, false);
 					}
@@ -9942,7 +9939,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return get.attitude(event.chooser, target);
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						result.targets[0].draw();
@@ -9979,7 +9976,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return target.countCards("he");
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						game.delay();
@@ -10011,7 +10008,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return Math.max(1, 10 - target.hp);
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						game.delay();
@@ -10151,7 +10148,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return -target.hp;
 					};
 					player.line(event.chooser);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.chooser.line(result.targets[0]);
 						game.delay();
@@ -10428,7 +10425,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 						return Math.random();
 					};
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.$skill(get.translation(result.links[0]), "legend", "metal");
 						game.delay(2);
@@ -10439,7 +10436,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (event.addname) {
 						if (event.addname == "stone_jialakesi") {
 							if (player.name == "stone_jialakesix") {

@@ -28,14 +28,9 @@ new Promise((resolve) => {
 
 	const exit = () => {
 		const ios =
-			userAgent.includes("iphone") ||
-			userAgent.includes("ipad") ||
-			userAgent.includes("macintosh");
+			userAgent.includes("iphone") || userAgent.includes("ipad") || userAgent.includes("macintosh");
 		//electron
-		if (
-			typeof window.process == "object" &&
-			typeof window.require == "function"
-		) {
+		if (typeof window.process == "object" && typeof window.require == "function") {
 			const versions = window.process.versions;
 			// @ts-ignore
 			const electronVersion = parseFloat(versions.electron);
@@ -100,12 +95,7 @@ new Promise((resolve) => {
 		if (result[1] != "safari") {
 			const [major, minor, patch] = result[2].split(".");
 			// @ts-ignore
-			return [
-				result[1],
-				parseInt(major),
-				parseInt(minor),
-				parseInt(patch),
-			];
+			return [result[1], parseInt(major), parseInt(minor), parseInt(patch)];
 		}
 		result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/);
 		// @ts-ignore
@@ -154,9 +144,7 @@ new Promise((resolve) => {
 			);
 		} else {
 			if (confirm(redirect_tip)) {
-				window.open(
-					"https://github.com/libccy/noname/releases/tag/chromium77-client"
-				);
+				window.open("https://github.com/libccy/noname/releases/tag/chromium77-client");
 			}
 		}
 		exit();
@@ -180,9 +168,7 @@ new Promise((resolve) => {
 					try {
 						return module.require(moduleId);
 					} catch {
-						return module.require(
-							path.join(window.__dirname, moduleId)
-						);
+						return module.require(path.join(window.__dirname, moduleId));
 					}
 				};
 				oldData.forEach(([key, value]) => {
@@ -217,10 +203,7 @@ new Promise((resolve) => {
 					return _compile.call(this, result, fileName);
 				};
 				// @ts-ignore
-				module._compile(
-					require("fs").readFileSync(filename, "utf8"),
-					filename
-				);
+				module._compile(require("fs").readFileSync(filename, "utf8"), filename);
 			};
 		}
 		// 使serviceWorker加载完成后，再加载entry.js
@@ -239,49 +222,34 @@ new Promise((resolve) => {
 			document.head.appendChild(script);
 		};
 
-		if (
-			location.protocol.startsWith("http") &&
-			"serviceWorker" in navigator
-		) {
-			let scope =
-				window.location.protocol + "//" + window.location.host + "/";
+		if (location.protocol.startsWith("http") && "serviceWorker" in navigator) {
+			let scope = window.location.protocol + "//" + window.location.host + "/";
 			navigator.serviceWorker
 				.getRegistrations()
 				.then(async (registrations) => {
-					let findServiceWorker = registrations.find(
-						(registration) => {
-							return (
-								registration &&
-								registration.active &&
-								registration.active.scriptURL ==
-									`${scope}service-worker.js`
-							);
-						}
-					);
+					let findServiceWorker = registrations.find((registration) => {
+						return (
+							registration &&
+							registration.active &&
+							registration.active.scriptURL == `${scope}service-worker.js`
+						);
+					});
 					try {
-						const registration_1 =
-							await navigator.serviceWorker.register(
-								`${scope}service-worker.js`,
-								{
-									type: "module",
-									updateViaCache: "all",
-									scope,
-								}
-							);
+						const registration_1 = await navigator.serviceWorker.register(
+							`${scope}service-worker.js`,
+							{
+								type: "module",
+								updateViaCache: "all",
+								scope,
+							}
+						);
 						// 初次加载worker，需要重新启动一次
 						if (!findServiceWorker) location.reload();
 						// 接收消息，暂时没用到
-						navigator.serviceWorker.addEventListener(
-							"message",
-							(e) => {
-								console.log(e);
-							}
-						);
-						registration_1
-							.update()
-							.catch((e) =>
-								console.error("worker update失败", e)
-							);
+						navigator.serviceWorker.addEventListener("message", (e) => {
+							console.log(e);
+						});
+						registration_1.update().catch((e) => console.error("worker update失败", e));
 						if (!sessionStorage.getItem("canUseTs")) {
 							await import("./canUse.ts")
 								.then(({ text }) => console.log(text))

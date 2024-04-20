@@ -1,7 +1,9 @@
 html {
 	color: white;
 	text-shadow: black 0 0 2px;
-	background: url("grid.png"), linear-gradient(#333333, #222222) fixed;
+	background:
+		url("grid.png"),
+		linear-gradient(#333333, #222222) fixed;
 }
 #system > div > div,
 #mebg,
@@ -21,7 +23,9 @@ html {
 #window .player.playerbg,
 .menubg,
 .mebg {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px;
 	background-image: linear-gradient(#4b4b4b, #464646);
 	border-radius: 8px;
 }
@@ -30,8 +34,11 @@ html {
 }
 
 .videonode.menubutton.extension.current {
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 2px 5px,
-		rgba(0, 133, 255, 0.5) 0 0 12px, rgba(0, 133, 255, 0.8) 0 0 15px;
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(0, 133, 255, 0.4) 0 2px 5px,
+		rgba(0, 133, 255, 0.5) 0 0 12px,
+		rgba(0, 133, 255, 0.8) 0 0 15px;
 }
 body[data-background_color_music="blue"] #system > div > div,
 body[data-background_color_music="blue"] #mebg,
@@ -99,12 +106,16 @@ body[data-background_color_music="blue"] #arena.mobile:not(.chess) .player[data-
 }
 #me > div > div > .card,
 #arena > .card:not(*:empty) {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 3px 10px;
 }
 
 #system > div > .glow {
 	background-image: linear-gradient(rgba(47, 101, 150, 1), rgba(43, 90, 132, 1));
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px !important;
 }
 
 .fire {
@@ -135,7 +146,9 @@ body[data-background_color_music="blue"] #arena.mobile:not(.chess) .player[data-
 }
 .woodbg .menubutton.large {
 	background: url("wood3.png") !important;
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 0, 0, 0.3) 0 0 5px !important;
 }
 
 #window .player.minskin.obstacle[data-obscolor="blue"] {

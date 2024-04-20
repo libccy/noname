@@ -177,14 +177,14 @@ game.import("card", function () {
 					event.targets = game.filterPlayer(function (current) {
 						return current.siege(player);
 					});
-					"step 1";
+					("step 1");
 					if (event.targets.length) {
 						var current = event.targets.shift();
 						player.line(current, "green");
 						player.discardPlayerCard(current, true);
 						event.redo();
 					}
-					"step 2";
+					("step 2");
 					var card = { name: "sha", isCard: true };
 					var list = game.filterPlayer(function (current) {
 						return current.siege(player) && player.canUse(card, current);
@@ -248,9 +248,9 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					player.choosePlayerCard(target, "he", true);
-					"step 1";
+					("step 1");
 					target.discard(result.buttons[0].link);
-					"step 2";
+					("step 2");
 					if (target == targets[targets.length - 1]) {
 						player.draw();
 					}
@@ -288,11 +288,11 @@ game.import("card", function () {
 						}
 						return 0;
 					};
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.useCard({ name: "sha" }, result.cards, target, false);
 					}
-					"step 2";
+					("step 2");
 					if (target == player.next) event.player2 = player.next.next;
 					else event.player2 = player.previous.previous;
 					event.player2.chooseCard(
@@ -307,7 +307,7 @@ game.import("card", function () {
 						}
 						return 0;
 					};
-					"step 3";
+					("step 3");
 					if (result.bool) {
 						event.player2.useCard({ name: "sha" }, result.cards, target, false);
 					}
@@ -340,7 +340,7 @@ game.import("card", function () {
 						return 1;
 					};
 					next.autochoose = lib.filter.autoRespondShan;
-					"step 1";
+					("step 1");
 					if (result.bool == false) {
 						target.damage();
 					}

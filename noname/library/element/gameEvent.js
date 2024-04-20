@@ -508,8 +508,8 @@ export class GameEvent {
 			typeof level === "function"
 				? level
 				: typeof level === "number"
-				? (evt) => i === level
-				: (evt) => evt.name === level;
+					? (evt) => i === level
+					: (evt) => evt.name === level;
 		while (true) {
 			if (!event) return toreturn;
 			historys.push(event);
@@ -826,8 +826,8 @@ export class GameEvent {
 					const list = info.firstDo
 						? firstDo.todoList
 						: info.lastDo
-						? lastDo.todoList
-						: this.todoList;
+							? lastDo.todoList
+							: this.todoList;
 					if (typeof info.getIndex === "function") {
 						const indexedResult = info.getIndex(event, player, name);
 						if (Array.isArray(indexedResult)) {

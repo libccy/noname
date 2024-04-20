@@ -3705,7 +3705,7 @@ export class Click {
 								showSkillNamePinyin == "showCodeIdentifier"
 									? derivation
 									: lib.translate[`${derivation}_rt`] ||
-									  get.pinyin(derivationName).join(" ");
+										get.pinyin(derivationName).join(" ");
 							ruby.appendChild(rt);
 							const rightParenthesisRP = document.createElement("rp");
 							rightParenthesisRP.textContent = "）";

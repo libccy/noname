@@ -9,7 +9,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			lib.init.css(lib.assetURL + "layout/mode", "chess");
 			lib.init.css(lib.assetURL + "layout/mode", "tafang");
 			game.loadMode("chess");
-			"step 1";
+			("step 1");
 			if (
 				get.is.phoneLayout() &&
 				lib.config.touchscreen &&
@@ -71,7 +71,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			// if(!localStorage.getItem(lib.configprefix+'playback')){
 			//     game.loadMap();
 			// }
-			"step 2";
+			("step 2");
 			var result = "basic_medium";
 			_status.map = lib.tafang.map[result];
 			_status.mapname = result;
@@ -126,7 +126,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			}
 			_status.mylist = [];
 			_status.enemylist = [];
-			"step 3";
+			("step 3");
 			ui.arena.classList.add("chess");
 			if (event.video) {
 				for (var ii = 0; ii < event.video.length; ii++) {
@@ -217,7 +217,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			lib.setScroll(ui.chessinfo.firstChild);
 
 			game.arrangePlayers();
-			"step 4";
+			("step 4");
 			ui.control.style.display = "";
 			if (event.video) {
 				game.playVideoContent(event.video);
@@ -568,14 +568,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						eventdong();
 					}
-					"step 1";
+					("step 1");
 					event.dialog.close();
 					event.control.close();
 					event.done.close();
 					delete event.dialog;
 					delete event.control;
 					delete event.done;
-					"step 2";
+					("step 2");
 					event.chooseObstacle = false;
 					if (event.bufang.length) {
 						event.obstacles = game.obstacles.slice(0);
@@ -599,7 +599,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						delete event.bufang;
 					}
-					"step 3";
+					("step 3");
 					if (event.dialog) {
 						event.dialog.close();
 						delete event.dialog;
@@ -624,7 +624,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						delete event.obstacle;
 						delete event.currentBufang;
 					}
-					"step 4";
+					("step 4");
 					if (event.dialog) {
 						event.dialog.close();
 						delete event.dialog;
@@ -685,7 +685,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						delete event.zhaomu;
 					}
-					"step 5";
+					("step 5");
 					_status.imchoosing = false;
 					ui.auto.show();
 					game.delay();
@@ -700,7 +700,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						delete event.playergrids;
 					}
 					delete event.currentZhaomu;
-					"step 6";
+					("step 6");
 					var shalldelay = false;
 					for (var i = 0; i < ui.chesswidth; i++) {
 						if (lib.posmap[i] && game.players.includes(lib.posmap[i])) {
@@ -722,7 +722,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 					if (shalldelay) game.delay();
-					"step 7";
+					("step 7");
 					event.justadded = [];
 					if (_status.characterList.length) {
 						if (_status.enemies.length < ui.chesswidth * 2) {
@@ -767,7 +767,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						game.over(true);
 					}
-					"step 8";
+					("step 8");
 					if (event.xingdong.length) {
 						var toact = event.xingdong.shift();
 						if (game.players.includes(toact)) {
@@ -777,7 +777,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.xingdong = _status.enemies.slice(0);
 					}
-					"step 9";
+					("step 9");
 					if (event.xingdong.length) {
 						var enemy = event.xingdong.shift();
 						if (!event.justadded.includes(enemy.name) && game.players.includes(enemy)) {
@@ -787,7 +787,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.mechlist = game.treasures.slice(0);
 					}
-					"step 10";
+					("step 10");
 					if (event.mechlist.length) {
 						var mech = event.mechlist.shift();
 						var info = lib.skill[mech.name + "_skill"];
@@ -810,7 +810,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 						event.redo();
 					}
-					"step 11";
+					("step 11");
 					delete event.xingdong;
 					delete event.mechlist;
 					if (_status.turnCount >= _status.turnTotal) {
@@ -1134,7 +1134,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						var target = event.list.shift();
 						var he = target.getCards("he");

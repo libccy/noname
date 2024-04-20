@@ -431,7 +431,7 @@ export const extensionMenu = function (connectMenu) {
 							author: authorExtLine.querySelector("input").value || "",
 							diskURL: diskExtLine.querySelector("input").value || "",
 							forumURL: forumExtLine.querySelector("input").value || "",
-							version: versionExtLine.querySelector("input").value || ""
+							version: versionExtLine.querySelector("input").value || "",
 						}),
 					};
 					for (var i in dash1.content.image) {
@@ -2641,7 +2641,7 @@ export const extensionMenu = function (connectMenu) {
 					fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
 				}).then(async (progressEvent) => {
 					if (
-						await game.importExtension(progressEvent.target.result, () => {
+						(await game.importExtension(progressEvent.target.result, () => {
 							extensionNode.innerHTML = "导入成功，3秒后将重启";
 							new Promise((resolve) => setTimeout(resolve, 1000))
 								.then(() => {
@@ -2653,7 +2653,7 @@ export const extensionMenu = function (connectMenu) {
 									return new Promise((resolve) => setTimeout(resolve, 1000));
 								})
 								.then(game.reload);
-						}) !== false
+						})) !== false
 					)
 						importExtension.style.display = "none";
 				});

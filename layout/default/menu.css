@@ -100,7 +100,10 @@
 }
 
 .menu-buttons > .glow {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 10px, rgba(0, 133, 255, 0.8) 0 0 10px,
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 133, 255, 0.8) 0 0 10px,
+		rgba(0, 133, 255, 0.8) 0 0 10px,
 		rgba(0, 133, 255, 0.8) 0 0 15px !important;
 }
 
@@ -109,7 +112,10 @@
 }
 
 .menu-cheat > .selecting {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(255, 0, 0, 0.8) 0 0 5px, rgba(255, 0, 0, 0.8) 0 0 5px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(255, 0, 0, 0.8) 0 0 5px,
+		rgba(255, 0, 0, 0.8) 0 0 5px !important;
 }
 
 .menu-cheat.config > .menubutton {
@@ -251,7 +257,9 @@
 	left: 10px;
 	top: 10px;
 	overflow: hidden;
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 5px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 0 5px !important;
 }
 
 .menubg.charactercard > .menubutton.large {
@@ -435,7 +443,9 @@
 	border-radius: 4px;
 	background-size: cover;
 	background-position: 50% 0;
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 5px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 0 5px;
 }
 
 .menubg.charactercard > .ava > .avatars > div:first-child,
@@ -470,7 +480,9 @@
 	background-position: 50% 0;
 	border-radius: 4px !important;
 	z-index: 1;
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 5px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 0 5px;
 }
 
 .menu.main > .menu-tab {
@@ -677,7 +689,10 @@
 }
 
 .menu.main > .menu-content > div > .menubutton.round.glowing {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 10px, rgba(0, 133, 255, 0.8) 0 0 15px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 133, 255, 0.8) 0 0 10px,
+		rgba(0, 133, 255, 0.8) 0 0 15px !important;
 }
 
 .popup-container.hidden {
@@ -800,7 +815,9 @@
 	left: 20%;
 	top: 20%;
 	border-radius: 100%;
-	box-shadow: rgba(0, 0, 0, 0.2) 1px -1px 2px inset, rgba(255, 255, 255, 0.15) -1px 1px 5px inset;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 1px -1px 2px inset,
+		rgba(255, 255, 255, 0.15) -1px 1px 5px inset;
 	filter: brightness(1.5);
 	-webkit-filter: brightness(1.5);
 }
@@ -841,7 +858,9 @@
 	margin-top: 6px;
 	position: relative;
 	border-radius: 2px;
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 5px;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 0, 0, 0.3) 0 0 5px;
 	transition: all 0s;
 }
 
@@ -850,16 +869,22 @@
 }
 
 .themebutton.woodden {
-	background: url("../../theme/woodden/grid.png"), linear-gradient(#6c7989, #434b55) fixed;
+	background:
+		url("../../theme/woodden/grid.png"),
+		linear-gradient(#6c7989, #434b55) fixed;
 }
 
 .themebutton.woodden > div:not(*:first-child) {
 	background: url("../../theme/woodden/wood2.png");
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 3px 10px;
 }
 
 .themebutton.woodden > div.fakeplayer:not(*:first-child) {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 0px 10px;
 }
 
 .themebutton.woodden > div > div {
@@ -867,16 +892,23 @@
 }
 
 .themebutton.woodden > div > div.active {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 0 2px, rgba(0, 133, 255, 1) 0 0 5px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 133, 255, 0.4) 0 0 0 2px,
+		rgba(0, 133, 255, 1) 0 0 5px !important;
 }
 
 .themebutton.music {
-	background: url("../../theme/music/grid.png"), linear-gradient(#333333, #222222) fixed;
+	background:
+		url("../../theme/music/grid.png"),
+		linear-gradient(#333333, #222222) fixed;
 }
 
 .themebutton.music > div:not(*:first-child) {
 	background: linear-gradient(#4b4b4b, #464646);
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px;
 }
 
 .themebutton.music > div > div {
@@ -890,7 +922,9 @@
 
 .themebutton.ol > div:not(*:first-child) {
 	background: linear-gradient(#4b4b4b, #464646);
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px;
 }
 
 .themebutton.ol > div > div {
@@ -904,7 +938,9 @@
 
 .themebutton.simple > div:not(*:first-child) {
 	background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px;
 }
 
 .themebutton.simple > div > div {
@@ -1457,7 +1493,9 @@ input.fileinput::-webkit-file-upload-button {
 }
 
 .menubutton {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px;
 	border-radius: 4px;
 	background-image: linear-gradient(rgba(75, 75, 75, 1), rgba(70, 70, 70, 1));
 }
@@ -1466,7 +1504,9 @@ input.fileinput::-webkit-file-upload-button {
 .menubutton.large.red,
 .redbg {
 	color: white !important;
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 3px 10px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.3) 0 3px 10px !important;
 }
 
 .menubutton.active,
@@ -1503,12 +1543,16 @@ input.fileinput::-webkit-file-upload-button {
 
 .menubutton.large.active,
 .menubutton.large.lighlight {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.3) 0 3px 10px;
 }
 
 .config.toggle > div {
 	border-radius: 25px;
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 0 10px inset;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 0 10px inset;
 }
 
 .config.toggle.on > div {
@@ -1518,7 +1562,9 @@ input.fileinput::-webkit-file-upload-button {
 .config.toggle > div > div {
 	border-radius: 25px;
 	background-image: linear-gradient(rgba(75, 75, 75, 1), rgba(70, 70, 70, 1));
-	box-shadow: rgba(51, 51, 51, 1) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 3px 10px;
+	box-shadow:
+		rgba(51, 51, 51, 1) 0 0 0 1px,
+		rgba(0, 0, 0, 0.2) 0 3px 10px;
 }
 
 .popup-container > .menu:not(.visual) > div:hover {
@@ -1650,8 +1696,13 @@ input.fileinput::-webkit-file-upload-button {
 .videonode.menubutton > .victory {
 	font-family: "huangcao", "xinwei";
 	font-size: 25px;
-	text-shadow: black 0 0 1px, rgba(255, 203, 0, 1) 0 0 2px, rgba(255, 203, 0, 1) 0 0 5px,
-		rgba(255, 203, 0, 1) 0 0 5px, rgba(255, 203, 0, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(255, 203, 0, 1) 0 0 2px,
+		rgba(255, 203, 0, 1) 0 0 5px,
+		rgba(255, 203, 0, 1) 0 0 5px,
+		rgba(255, 203, 0, 1) 0 0 5px,
+		black 0 0 1px;
 	color: white;
 	position: absolute;
 	left: 48px;
@@ -1927,7 +1978,9 @@ div.popup-container.editor div {
 	left: 10%;
 	top: 5%;
 	border-radius: 4px;
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 0 10px;
 	background: white;
 	overflow: hidden;
 }

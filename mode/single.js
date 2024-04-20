@@ -336,13 +336,13 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			} else if (!_status.connectMode) {
 				game.prepareArena(2);
 			}
-			"step 1";
+			("step 1");
 			if (_status.connectMode) {
 				game.waitForPlayer(function () {
 					lib.configOL.number = 2;
 				});
 			}
-			"step 2";
+			("step 2");
 			if (_status.mode == "normal") {
 				lib.card.list = lib.singlePile.slice(0);
 				game.fixedPile = true;
@@ -419,7 +419,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				}
 				game.chooseCharacter();
 			}
-			"step 3";
+			("step 3");
 			if (ui.coin) {
 				_status.coinCoeff = get.coinCoeff([game.me.name]);
 			}
@@ -451,7 +451,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				return player.maxHp;
 			});
 			if (_status.connectMode && lib.configOL.change_card) game.replaceHandcards(game.players.slice(0));
-			"step 4";
+			("step 4");
 			game.phaseLoop(game.zhu);
 			game.countPlayer((current) => current.showGiveup(), true);
 		},
@@ -546,15 +546,15 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					ui.arena.classList.add("choose-character");
 					lib.init.onfree();
-					"step 1";
+					("step 1");
 					game.me.chooseControl("先手", "后手").prompt = "请选择自己的行动顺序";
-					"step 2";
+					("step 2");
 					var map = result.control == "先手" ? ["zhu", "fan"] : ["fan", "zhu"];
 					game.me.identity = map[0];
 					game.me.next.identity = map[1];
 					game.me.showIdentity();
 					game.me.next.showIdentity();
-					"step 3";
+					("step 3");
 					event.flipassign = true;
 					event.videoId = lib.status.videoId++;
 					var list = [];
@@ -575,7 +575,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return Math.random();
 						})
 						.set("dialog", event.videoId);
-					"step 4";
+					("step 4");
 					game.me.init(result.links[0]);
 					_status.characterlist.remove(result.links[0]);
 					game.addRecentCharacter(result.links[0]);
@@ -585,7 +585,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return Math.random();
 						})
 						.set("dialog", event.videoId);
-					"step 5";
+					("step 5");
 					game.broadcastAll("closeDialog", event.videoId);
 					game.me.next.init(result.links[0]);
 					_status.characterlist.remove(result.links[0]);
@@ -624,7 +624,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						"mianmianjudao",
 					].randomGet();
 					game.globalBuff.add(`wuxianhuoli_${randomBuff}`);
-					"step 1";
+					("step 1");
 					_status.characterChoice = {
 						zhu: _status.characterlist.randomRemove(6),
 						fan: _status.characterlist.randomRemove(6),
@@ -639,7 +639,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					});
 					dialog.add([_status.characterChoice[game.me.identity], "character"]);
 					game.me.chooseButton(true, dialog);
-					"step 2";
+					("step 2");
 					game.me.init(result.links[0]);
 					_status.characterChoice[game.me.identity].removeArray(result.links);
 					var list = _status.characterChoice[game.me.enemy.identity].randomRemove(1);
@@ -729,7 +729,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					};
 					game.broadcastAll(func);
 					game.delay(0, 3000);
-					"step 3";
+					("step 3");
 					_status.characterlist.addArray(Object.values(_status.characterChoice).flat());
 					setTimeout(function () {
 						ui.arena.classList.remove("choose-character");
@@ -764,7 +764,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					for (var i = 0; i < game.players.length; i++) {
 						game.players[i].showIdentity();
 					}
-					"step 1";
+					("step 1");
 					_status.characterChoice = {
 						zhu: _status.characterlist.randomRemove(3),
 						fan: _status.characterlist.randomRemove(3),
@@ -782,7 +782,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						event.videoIdx,
 						_status.characterChoice
 					);
-					"step 2";
+					("step 2");
 					var next = game.fan.chooseButton(true, 1);
 					next.filterButton = function (button) {
 						return _status.event.canChoose.includes(button.link);
@@ -793,7 +793,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					next.ai = function () {
 						return Math.random();
 					};
-					"step 3";
+					("step 3");
 					_status.characterChoice.fan.addArray(result.links);
 					_status.characterChoice.all.removeArray(result.links);
 					game.broadcastAll(
@@ -832,7 +832,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					next.ai = function () {
 						return Math.random();
 					};
-					"step 4";
+					("step 4");
 					_status.characterChoice.zhu.addArray(result.links);
 					_status.characterChoice.all.removeArray(result.links);
 					game.broadcastAll(
@@ -871,7 +871,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					next.ai = function () {
 						return Math.random();
 					};
-					"step 5";
+					("step 5");
 					_status.characterChoice.fan.addArray(result.links);
 					_status.characterChoice.all.removeArray(result.links);
 					game.broadcastAll(
@@ -910,7 +910,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					next.ai = function () {
 						return Math.random();
 					};
-					"step 6";
+					("step 6");
 					_status.characterChoice.zhu.addArray(result.links);
 					_status.characterChoice.all.removeArray(result.links);
 					game.broadcastAll(
@@ -940,22 +940,22 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						false,
 						event.videoIdx
 					);
-					"step 7";
+					("step 7");
 					game.broadcastAll("closeDialog", event.videoIdx);
-					"step 8";
+					("step 8");
 					game.me.chooseButton(
 						true,
 						["请选择出场武将", [_status.characterChoice[game.me.identity], "character"]],
 						_status.mode == "changban" ? 2 : 1
 					);
-					"step 9";
+					("step 9");
 					game.me.init(result.links[0], _status.mode == "changban" ? result.links[1] : null);
 					_status.characterChoice[game.me.identity].removeArray(result.links);
 					var list = _status.characterChoice[game.me.enemy.identity].randomRemove(
 						_status.mode == "changban" ? 2 : 1
 					);
 					game.me.enemy.init(list[0], list[1]);
-					"step 10";
+					("step 10");
 					setTimeout(function () {
 						ui.arena.classList.remove("choose-character");
 					}, 500);
@@ -971,7 +971,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.me.next.identity = map[1];
 					game.me.showIdentity();
 					game.me.next.showIdentity();
-					"step 1";
+					("step 1");
 					//event.flipassign=true;
 					event.videoId = lib.status.videoId++;
 					var list = [];
@@ -1005,7 +1005,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return Math.random();
 						})
 						.set("dialog", event.videoId);
-					"step 2";
+					("step 2");
 					game.broadcastAll(
 						function (player, character, id) {
 							player.init(character);
@@ -1021,7 +1021,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return Math.random();
 						})
 						.set("dialog", event.videoId);
-					"step 3";
+					("step 3");
 					game.broadcastAll("closeDialog", event.videoId);
 					game.broadcastAll(
 						function (player, character, id) {
@@ -1077,7 +1077,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (!_status.postReconnect.wuxianhuoliBuff)
 						_status.postReconnect.wuxianhuoliBuff = [setBuff, []];
 					_status.postReconnect.wuxianhuoliBuff[1].addArray(game.globalBuff);
-					"step 1";
+					("step 1");
 					_status.characterChoice = {
 						zhu: _status.characterlist.randomRemove(6),
 						fan: _status.characterlist.randomRemove(6),
@@ -1103,7 +1103,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							player.update();
 						}
 					});
-					"step 2";
+					("step 2");
 					for (var i in result) {
 						var current = lib.playerOL[i];
 						if (result[i] == "ai") {
@@ -1226,7 +1226,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					};
 					game.broadcastAll(func);
 					game.delay(0, 3000);
-					"step 3";
+					("step 3");
 					_status.characterlist.addArray(Object.values(_status.characterChoice).flat());
 					setTimeout(function () {
 						ui.arena.classList.remove("choose-character");
@@ -1260,7 +1260,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					for (var i = 0; i < game.players.length; i++) {
 						game.players[i].showIdentity();
 					}
-					"step 1";
+					("step 1");
 					_status.characterChoice = {
 						zhu: _status.characterlist.randomRemove(3),
 						fan: _status.characterlist.randomRemove(3),
@@ -1280,7 +1280,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						event.videoIdx,
 						_status.characterChoice
 					);
-					"step 2";
+					("step 2");
 					var next = game.fan.chooseButton(true, 1);
 					next.set("filterButton", function (button) {
 						return _status.event.canChoose.includes(button.link);
@@ -1290,7 +1290,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					next.ai = function () {
 						return Math.random();
 					};
-					"step 3";
+					("step 3");
 					_status.characterChoice.fan.addArray(result.links);
 					_status.characterChoice.all.removeArray(result.links);
 					game.broadcastAll(
@@ -1329,7 +1329,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					next.ai = function () {
 						return Math.random();
 					};
-					"step 4";
+					("step 4");
 					_status.characterChoice.zhu.addArray(result.links);
 					_status.characterChoice.all.removeArray(result.links);
 					game.broadcastAll(
@@ -1368,7 +1368,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					next.ai = function () {
 						return Math.random();
 					};
-					"step 5";
+					("step 5");
 					_status.characterChoice.fan.addArray(result.links);
 					_status.characterChoice.all.removeArray(result.links);
 					game.broadcastAll(
@@ -1407,7 +1407,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					next.ai = function () {
 						return Math.random();
 					};
-					"step 6";
+					("step 6");
 					_status.characterChoice.zhu.addArray(result.links);
 					_status.characterChoice.all.removeArray(result.links);
 					game.broadcastAll(
@@ -1437,9 +1437,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						false,
 						event.videoIdx
 					);
-					"step 7";
+					("step 7");
 					game.broadcastAll("closeDialog", event.videoIdx);
-					"step 8";
+					("step 8");
 					var num = _status.mode == "changban" ? 2 : 1;
 					var list = [
 						[game.zhu, num, true, ["选择出场角色", [_status.characterChoice.zhu, "character"]]],
@@ -1448,7 +1448,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.me.chooseButtonOL(list, function (player, result) {
 						if (game.online || player == game.me) player.init(result.links[0], result.links[1]);
 					});
-					"step 9";
+					("step 9");
 					for (var i in result) {
 						var current = lib.playerOL[i];
 						if (result[i] == "ai") {
@@ -1493,14 +1493,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					next.setContent(function () {
 						"step 0";
 						game.delay();
-						"step 1";
+						("step 1");
 						player
 							.chooseButton(true, [
 								"请选择一名出场武将",
 								[_status.characterChoice[player.identity].slice(0), "character"],
 							])
 							.set("forceDie", true);
-						"step 2";
+						("step 2");
 						var source = player;
 						var name = result.links[0];
 						var color = source.node.identity.dataset.color;
@@ -1596,7 +1596,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					player.awakenSkill("xiechan");
 					player.chooseToCompare(target);
-					"step 1";
+					("step 1");
 					if (result.bool) player.useCard({ name: "juedou" }, target, "noai");
 					else target.useCard({ name: "juedou" }, player, "noai");
 				},
@@ -1643,7 +1643,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					player.judge(function (result) {
 						return get.color(result) == "black" ? 2 : -2;
 					});
-					"step 1";
+					("step 1");
 					if (result.bool == true) player.recover();
 				},
 			},
@@ -1836,13 +1836,13 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						var hs = player.getCards("h");
 						return get.value(hs, "raw") < 6 * hs;
 					};
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var hs = player.getCards("h");
 						player.lose(hs, ui.special);
 						event.hs = hs;
 					} else event.finish();
-					"step 2";
+					("step 2");
 					var hs = event.hs;
 					player.draw(hs.length, "nodelay");
 					for (var i = 0; i < hs.length; i++) {

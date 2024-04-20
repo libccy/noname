@@ -86,7 +86,7 @@ game.import("card", function () {
 						}
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					if (result.index == 0) {
 						target.discard(event.e1);
 					} else {
@@ -179,7 +179,7 @@ game.import("card", function () {
 							player.damage(card.storage.fulei, "thunder", "nosource");
 						}
 					}
-					"step 1";
+					("step 1");
 					player.addJudgeNext(card);
 				},
 				cancel: function () {
@@ -292,9 +292,9 @@ game.import("card", function () {
 						event.target2 = event.addedTarget;
 						player.chooseCard("h", "将一张手牌交给" + get.translation(event.target1), true);
 					}
-					"step 1";
+					("step 1");
 					player.give(result.cards, event.target1);
-					"step 2";
+					("step 2");
 					if (!event.target1.countCards("h")) {
 						event.finish();
 					} else {
@@ -310,7 +310,7 @@ game.import("card", function () {
 							);
 						}
 					}
-					"step 3";
+					("step 3");
 					if (!event.directresult) {
 						event.directresult = result.cards;
 					}
@@ -355,7 +355,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					target.draw(3);
-					"step 1";
+					("step 1");
 					if (target.countCards("he", { type: "basic" }) < target.countCards("he")) {
 						target
 							.chooseToDiscard("增兵减灶", "he", function (card) {
@@ -376,7 +376,7 @@ game.import("card", function () {
 					} else {
 						target.chooseToDiscard("he", 2, true).set("ai", get.disvalue2);
 					}
-					"step 2";
+					("step 2");
 					if (event.more && !result.bool) {
 						target.chooseToDiscard("he", 2, true).set("ai", get.disvalue2);
 					}
@@ -518,9 +518,9 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					game.delayx();
-					"step 1";
+					("step 1");
 					trigger.target.discardPlayerCard("h", player, true);
-					"step 2";
+					("step 2");
 					player.discardPlayerCard("h", trigger.target, true);
 				},
 			},
@@ -577,7 +577,7 @@ game.import("card", function () {
 							return lib.filter.cardEnabled(card, player, "forceEnable");
 						});
 					trigger.jinchan = true;
-					"step 1";
+					("step 1");
 					delete trigger.jinchan;
 				},
 			},
@@ -625,7 +625,7 @@ game.import("card", function () {
 					next.aidelay = true;
 					next.logSkill = "yinyueqiang";
 					next.noButton = true;
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						game.delay();
 					}

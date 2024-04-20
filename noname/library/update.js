@@ -26,7 +26,9 @@ if (localStorage.getItem("noname_authorization")) {
  */
 export async function gainAuthorization() {
 	if (!localStorage.getItem("noname_authorization") && !sessionStorage.getItem("noname_authorization")) {
-		const result = await game.promises.prompt("请输入您github的token以解除访问每小时60次的限制(可不输入)");
+		const result = await game.promises.prompt(
+			"请输入您github的token以解除访问每小时60次的限制(可不输入)"
+		);
 		if (typeof result == "string") {
 			localStorage.setItem("noname_authorization", result);
 			defaultHeaders["Authorization"] = `token ${localStorage.getItem("noname_authorization")}`;
@@ -45,15 +47,14 @@ const defaultResponse = async (/** @type {Response} */ response) => {
 	// @ts-ignore
 	console.log(`限制重置时间`, new Date(reset * 1000).toLocaleString());
 	if (
-		(
-			Number(remaining) === 0 &&
+		(Number(remaining) === 0 &&
 			!sessionStorage.getItem("noname_authorization") &&
-			confirm(`您达到了每小时${limit}次的访问限制，是否输入您github账号的token以获取更高的请求总量限制`)
-		) || (
-			response.status === 401 &&
+			confirm(
+				`您达到了每小时${limit}次的访问限制，是否输入您github账号的token以获取更高的请求总量限制`
+			)) ||
+		(response.status === 401 &&
 			(localStorage.removeItem("noname_authorization"), true) &&
-			(alert(`身份验证凭证错误，是否重新输入您github账号的token以获取更高的请求总量限制`), true)
-		)
+			(alert(`身份验证凭证错误，是否重新输入您github账号的token以获取更高的请求总量限制`), true))
 	) {
 		return gainAuthorization();
 	}
@@ -311,9 +312,9 @@ export async function getRepoFilesList(
 /**
  *
  * 获取仓库指定分支和指定目录内的所有文件(包含子目录的文件)
- * 
+ *
  * **注意： 此api可能会大幅度消耗请求次数，请谨慎使用**
- * 
+ *
  * @param { string } [path = ''] 路径名称(可放参数)
  * @param { string } [branch = ''] 仓库分支名称
  * @param { Object } options
@@ -537,7 +538,7 @@ export function createProgress(title, max, fileName, value) {
 
 /**
  * 从GitHub存储库检索最新版本(tag)，不包括特定tag。
- * 
+ *
  * 此函数从GitHub存储库中获取由所有者和存储库名称指定的tags列表，然后返回不是“v1998”的最新tag名称。
  * @param {string} owner GitHub上拥有存储库的用户名或组织名称。
  * @param {string} repo 要从中提取tag的存储库的名称。

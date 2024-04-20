@@ -526,7 +526,7 @@ game.import("character", function () {
 						player.gain(trigger.cards, "gain2");
 					}
 					player.draw(player.countMark("dcjianxiong") + 1, "nodelay");
-					"step 1";
+					("step 1");
 					if (player.countMark("dcjianxiong") < 4) player.addMark("dcjianxiong", 1, false);
 				},
 				marktext: "雄",
@@ -591,7 +591,7 @@ game.import("character", function () {
 					player.addTempSkill("dcrende_targeted", "phaseUseAfter");
 					player.markAuto("dcrende_targeted", [target]);
 					player.gainPlayerCard(target, "h", true, 2);
-					"step 1";
+					("step 1");
 					var list = [];
 					for (var name of lib.inpile) {
 						if (get.type(name) != "basic") continue;
@@ -660,7 +660,7 @@ game.import("character", function () {
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (result && result.bool && result.links[0]) {
 						var card = {
 							name: result.links[0][2],
@@ -736,7 +736,7 @@ game.import("character", function () {
 							break;
 						}
 					}
-					"step 1";
+					("step 1");
 					player.draw(event.num + cards.length);
 				},
 				subSkill: {
@@ -824,7 +824,7 @@ game.import("character", function () {
 					player
 						.chooseControl(skills)
 						.set("dialog", ["选择获得一个技能并“变装”", [characters, "character"]]);
-					"step 1";
+					("step 1");
 					var skill = result.control;
 					player.addTempSkills(skill, "dcbianzhuangAfter");
 					for (var i in lib.skill.dcbianzhuang.characterMap) {
@@ -836,7 +836,7 @@ game.import("character", function () {
 						}
 					}
 					player.chooseUseTarget("sha", true, false, "nodistance");
-					"step 2";
+					("step 2");
 					if (result.bool && !player.storage.dcbianzhuang_inited) {
 						player.addMark("dcbianzhuang", 1, false);
 						if (player.countMark("dcbianzhuang") > 2) {
@@ -925,7 +925,7 @@ game.import("character", function () {
 							var player = _status.event.player;
 							return 1 + Math.max(0, player.getUseValue(card, null, true));
 						});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.logSkill("dctongliao");
 						player.addGaintag(result.cards, "dctongliao");
@@ -1067,7 +1067,7 @@ game.import("character", function () {
 							return get.effect(target, { name: "sha" }, _status.event.player);
 						})
 						.setHiddenSkill("clbjisu");
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.useCard({ name: "sha", isCard: true }, result.targets[0], false, "clbjisu");
 						trigger.cancel();
@@ -1220,7 +1220,7 @@ game.import("character", function () {
 						content() {
 							"step 0";
 							player.removeGaintag("dcshixian_yayun");
-							"step 1";
+							("step 1");
 							player.addGaintag(
 								player.getCards("h", (card) => {
 									return get.is.yayun(
@@ -1249,7 +1249,7 @@ game.import("character", function () {
 				content() {
 					"step 0";
 					trigger.cancel();
-					"step 1";
+					("step 1");
 					var card = get.cardPile2(function (card) {
 							return get.type(card, null, false) == "equip";
 						}),
@@ -1309,7 +1309,7 @@ game.import("character", function () {
 						.set("ai", function (button) {
 							return lib.skill.dcsitian.weathers[button.link].ai(_status.event.player);
 						});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var choice = result.links[0];
 						game.log(player, "将当前天气变更为", "#g" + choice);
@@ -1382,7 +1382,7 @@ game.import("character", function () {
 							var targets = game.filterPlayer((current) => current != player).sortBySeat();
 							player.line(targets, "thunder");
 							event.targets = targets;
-							"step 1";
+							("step 1");
 							var target = targets.shift();
 							if (!target.isIn()) {
 								if (targets.length > 0) event.redo();
@@ -1396,7 +1396,7 @@ game.import("character", function () {
 							target.judge(lib.card.shandian.judge, event.judgestr).judge2 =
 								lib.card.shandian.judge2;
 							//game.delayx(1.5);
-							"step 2";
+							("step 2");
 							var name = "shandian";
 							if (event.cancelled && !event.direct) {
 								if (lib.card[name].cancel) {
@@ -1437,7 +1437,7 @@ game.import("character", function () {
 							var targets = game.filterPlayer((current) => current != player).sortBySeat();
 							player.line(targets, "green");
 							event.targets = targets;
-							"step 1";
+							("step 1");
 							var target = targets.shift();
 							if (target.isIn()) {
 								var num = target.countCards("e");
@@ -1483,7 +1483,7 @@ game.import("character", function () {
 									}
 									return get.effect(current, { name: "losehp" }, player, player);
 								});
-							"step 1";
+							("step 1");
 							if (result.bool) {
 								var target = result.targets[0];
 								player.line(target, "green");
@@ -1807,14 +1807,14 @@ game.import("character", function () {
 						}
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						if (!event.isMine() && !event.isOnline()) game.delayx();
 						event.targets = result.targets;
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					player.logSkill("ruyijingubang_effect", event.targets);
 					trigger.targets.addArray(event.targets);
 				},
@@ -1923,7 +1923,7 @@ game.import("character", function () {
 					event.card = get.cards()[0];
 					game.cardsGotoOrdering(event.card);
 					player.showCards(event.card);
-					"step 1";
+					("step 1");
 					player
 						.chooseTarget("令一名角色获得" + get.translation(card), true)
 						.set("ai", function (target) {
@@ -1939,7 +1939,7 @@ game.import("character", function () {
 							return att;
 						})
 						.set("du", card.name == "du");
-					"step 2";
+					("step 2");
 					if (result && result.bool) {
 						var target = result.targets[0];
 						target.gain(card, "gain2");
@@ -1974,7 +1974,7 @@ game.import("character", function () {
 						"###" + get.prompt("spcangni") + "###摸两张牌或回复1点体力，然后将武将牌翻面",
 						2
 					).logSkill = "spcangni";
-					"step 1";
+					("step 1");
 					if (result.control != "cancel2") player.turnOver();
 				},
 				group: ["spcangni_gain", "spcangni_lose"],
@@ -2070,18 +2070,21 @@ game.import("character", function () {
 				content() {
 					"step 0";
 					player.give(cards, targets[0]);
-					"step 1";
+					("step 1");
 					if (!targets[0].isIn() || !targets[1].isIn()) {
 						event.finish();
 						return;
 					}
 					targets[0]
-						.chooseToUse(function (card, player, event) {
-							if (get.name(card) != "sha") return false;
-							return lib.filter.filterCard.apply(this, arguments);
-						}, "密信：对" +
-							get.translation(targets[1]) +
-							"使用一张【杀】，或令其观看并获得你的一张手牌")
+						.chooseToUse(
+							function (card, player, event) {
+								if (get.name(card) != "sha") return false;
+								return lib.filter.filterCard.apply(this, arguments);
+							},
+							"密信：对" +
+								get.translation(targets[1]) +
+								"使用一张【杀】，或令其观看并获得你的一张手牌"
+						)
 						.set("complexSelect", true)
 						.set("filterTarget", function (card, player, target) {
 							if (
@@ -2092,7 +2095,7 @@ game.import("character", function () {
 							return lib.filter.targetEnabled.apply(this, arguments);
 						})
 						.set("sourcex", targets[1]);
-					"step 2";
+					("step 2");
 					if (!result.bool && targets[0].countCards("h"))
 						targets[1].gainPlayerCard(targets[0], "visible", "h", true);
 				},
@@ -2156,7 +2159,7 @@ game.import("character", function () {
 								return true;
 							})()
 						);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var target = trigger.player;
 						player.logSkill("spfengyin", target);

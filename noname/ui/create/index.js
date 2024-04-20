@@ -2462,12 +2462,8 @@ export class Create {
 		ui.create.div(ui.shortcut, function (e) {
 			e.stopPropagation();
 		});
-		ui.create.div(
-			".menubutton.round",
-			"<span>重来</span>",
-			ui.shortcut,
-			game.reload
-		).dataset.position = 1;
+		ui.create.div(".menubutton.round", "<span>重来</span>", ui.shortcut, game.reload).dataset.position =
+			1;
 		ui.create.div(".menubutton.round", "<span>退出</span>", ui.shortcut, game.exit).dataset.position = 3;
 		ui.create.div(
 			".menubutton.round",
@@ -2563,7 +2559,7 @@ export class Create {
 		delete lib.arenaReady;
 		if (lib.config.auto_check_update && !sessionStorage.getItem("auto_check_update")) {
 			setTimeout(() => {
-				sessionStorage.setItem("auto_check_update", '1');
+				sessionStorage.setItem("auto_check_update", "1");
 				game.checkForUpdate(false);
 			}, 3000);
 		}

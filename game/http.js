@@ -37,14 +37,7 @@ server.on("request", function (request, response) {
 			response.writeHead(200, {
 				"Content-type": "text/plain; charset=UTF-8",
 			});
-			response.write(
-				request.mothod +
-					" " +
-					request.url +
-					" HTTP/" +
-					request.httpVersion +
-					"\r\n"
-			);
+			response.write(request.mothod + " " + request.url + " HTTP/" + request.httpVersion + "\r\n");
 			for (var h in request.headers) {
 				response.write(h + ":" + request.headers[h] + "\r\n");
 			}
@@ -65,9 +58,7 @@ server.on("request", function (request, response) {
 			break;
 		default:
 			var filename = url.pathname.substring(1);
-			var type = getType(
-				filename.substring(filename.lastIndexOf(".") + 1)
-			);
+			var type = getType(filename.substring(filename.lastIndexOf(".") + 1));
 			fs.readFile(filename, function (err, content) {
 				if (err) {
 					response.writeHead(404, {

@@ -434,31 +434,47 @@
 }*/
 @keyframes skillbarglow {
 	0% {
-		box-shadow: rgba(0, 0, 0, 0.1) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px;
+		box-shadow:
+			rgba(0, 0, 0, 0.1) 0 0 0 1px,
+			rgba(255, 0, 0, 0.4) 0 0 5px;
 	}
 
 	50% {
-		box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px, rgba(255, 0, 0, 0.4) 0 0 12px,
-			rgba(255, 0, 0, 1) 0 0 30px, rgba(255, 0, 0, 0.2) 0 0 30px;
+		box-shadow:
+			rgba(0, 0, 0, 0.2) 0 0 0 1px,
+			rgba(255, 0, 0, 0.4) 0 0 5px,
+			rgba(255, 0, 0, 0.4) 0 0 12px,
+			rgba(255, 0, 0, 1) 0 0 30px,
+			rgba(255, 0, 0, 0.2) 0 0 30px;
 	}
 
 	100% {
-		box-shadow: rgba(0, 0, 0, 0.1) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px;
+		box-shadow:
+			rgba(0, 0, 0, 0.1) 0 0 0 1px,
+			rgba(255, 0, 0, 0.4) 0 0 5px;
 	}
 }
 
 @-webkit-keyframes skillbarglow {
 	0% {
-		box-shadow: rgba(0, 0, 0, 0.1) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px;
+		box-shadow:
+			rgba(0, 0, 0, 0.1) 0 0 0 1px,
+			rgba(255, 0, 0, 0.4) 0 0 5px;
 	}
 
 	50% {
-		box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px, rgba(255, 0, 0, 0.4) 0 0 12px,
-			rgba(255, 0, 0, 1) 0 0 30px, rgba(255, 0, 0, 0.2) 0 0 30px;
+		box-shadow:
+			rgba(0, 0, 0, 0.2) 0 0 0 1px,
+			rgba(255, 0, 0, 0.4) 0 0 5px,
+			rgba(255, 0, 0, 0.4) 0 0 12px,
+			rgba(255, 0, 0, 1) 0 0 30px,
+			rgba(255, 0, 0, 0.2) 0 0 30px;
 	}
 
 	100% {
-		box-shadow: rgba(0, 0, 0, 0.1) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px;
+		box-shadow:
+			rgba(0, 0, 0, 0.1) 0 0 0 1px,
+			rgba(255, 0, 0, 0.4) 0 0 5px;
 	}
 }
 

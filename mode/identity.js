@@ -45,7 +45,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 				}
 			};
-			"step 1";
+			("step 1");
 			var playback = localStorage.getItem(lib.configprefix + "playback");
 			if (playback) {
 				ui.create.me();
@@ -78,7 +78,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.delay();
 				}
 			}
-			"step 2";
+			("step 2");
 			if (!lib.config.new_tutorial) {
 				_status.new_tutorial = true;
 				lib.init.onfree();
@@ -185,7 +185,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.showChangeLog();
 				}
 			}
-			"step 3";
+			("step 3");
 			if (typeof _status.new_tutorial == "function") {
 				_status.new_tutorial();
 			}
@@ -197,7 +197,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 				});
 			}
-			"step 4";
+			("step 4");
 			var yearLimitCheck = () => {
 				var next = game.createEvent("year_limit_pop", false);
 				next.setContent(function () {
@@ -207,11 +207,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.log("游戏进入了", `#y第${str}年`);
 					if (game.shuffleNumber + 1 < game.countPlayer2()) event.finish();
 					else game.delay(2);
-					"step 1";
+					("step 1");
 					game.me.$fullscreenpop("年份已到", "metal");
 					game.log("年份已到，主忠方判定为胜利");
 					game.delay(2);
-					"step 2";
+					("step 2");
 					game.over(
 						game.me.identity == "zhu" ||
 							game.me.identity == "zhong" ||
@@ -286,7 +286,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				}
 				game.chooseCharacter();
 			}
-			"step 5";
+			("step 5");
 			if (ui.coin) {
 				_status.coinCoeff = get.coinCoeff([game.me.name]);
 			}
@@ -465,7 +465,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				}
 				game.stratagemCamouflage();
 			}
-			"step 6";
+			("step 6");
 			if (_status.mode != "stratagem")
 				event.beginner = _status.firstAct2 || game.zhong || game.zhu || _status.firstAct || game.me;
 			game.gameDraw(event.beginner, function (player) {
@@ -473,7 +473,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				return 4;
 			});
 			if (_status.connectMode && lib.configOL.change_card) game.replaceHandcards(game.players.slice(0));
-			"step 7";
+			("step 7");
 			game.phaseLoop(event.beginner);
 		},
 		game: {
@@ -988,7 +988,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				next.setContent(function () {
 					"step 0";
 					ui.arena.classList.add("choose-character");
-					"step 1";
+					("step 1");
 					var list = ["rZhu", "rZhong", "rNei", "rYe"];
 					var list2 = ["bZhu", "bZhong", "bNei", "bYe"];
 					list.randomSort();
@@ -1028,7 +1028,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					for (var i = 0; i < players.length; i++) {
 						players[i].seatNum = i;
 					}
-					"step 2";
+					("step 2");
 					var map = {};
 					var map_zhu = {};
 					event.mapNum = {};
@@ -1077,7 +1077,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return _status.event.choice;
 						})
 						.set("choice", event.list.randomGet());
-					"step 3";
+					("step 3");
 					event.bZhu = result.control;
 					event.list.remove(event.bZhu);
 					game.rZhu
@@ -1087,7 +1087,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return _status.event.choice;
 						})
 						.set("choice", event.list.randomGet());
-					"step 4";
+					("step 4");
 					event.rZhu = result.control;
 					var players = [game.rZhu, game.bZhu];
 					var list = [];
@@ -1109,7 +1109,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							}
 						}
 					});
-					"step 5";
+					("step 5");
 					for (var i in result) {
 						if (result[i] == "ai" || !result[i] || !result[i].links) {
 							result[i] = event.map[i].randomGet();
@@ -1150,7 +1150,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							player.init(result.links[0]);
 						}
 					});
-					"step 6";
+					("step 6");
 					for (var i in result) {
 						if (result[i] == "ai" || !result[i] || !result[i].links) {
 							result[i] = event.map[i].randomGet();
@@ -1185,7 +1185,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					ui.arena.classList.add("choose-character");
 					game.no_continue_game = true;
 					lib.init.onfree();
-					"step 1";
+					("step 1");
 					var list = ["rZhu", "rZhong", "rNei", "rYe"];
 					var list2 = ["bZhu", "bZhong", "bNei", "bYe"];
 					list.randomSort();
@@ -1216,7 +1216,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					for (var i = 0; i < players.length; i++) {
 						players[i].seatNum = i;
 					}
-					"step 2";
+					("step 2");
 					var map = {};
 					var map_zhu = {};
 					var list = [];
@@ -1256,7 +1256,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return _status.event.choice;
 						})
 						.set("choice", event.list.randomGet());
-					"step 3";
+					("step 3");
 					event.bZhu = result.control;
 					event.list.remove(event.bZhu);
 					game.rZhu
@@ -1266,7 +1266,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return _status.event.choice;
 						})
 						.set("choice", event.list.randomGet());
-					"step 4";
+					("step 4");
 					event.rZhu = result.control;
 					if (game.me == game.rZhu || game.me == game.bZhu) {
 						event.isZhu = true;
@@ -1275,7 +1275,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							list.addArray(event.map_zhu[event[game.me.identity]].randomGets(2));
 						game.me.chooseButton(true, ["请选择您的武将牌", [list, "character"]]);
 					}
-					"step 5";
+					("step 5");
 					if (event.isZhu) {
 						event.map[event[game.me.identity]].remove(result.links[0]);
 						game.me.init(result.links[0]);
@@ -1311,7 +1311,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							[event.map[group].randomRemove(5), "character"],
 						]);
 					}
-					"step 6";
+					("step 6");
 					if (!event.isZhu) {
 						game.me.init(result.links[0]);
 					}
@@ -1321,7 +1321,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							current.init(event.map[group].randomRemove(1)[0]);
 						}
 					});
-					"step 7";
+					("step 7");
 					setTimeout(function () {
 						ui.arena.classList.remove("choose-character");
 					}, 500);
@@ -1441,7 +1441,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					_status.characterlist = list4.slice(0);
 					list = list3.randomGets(5);
-					"step 1";
+					("step 1");
 					var list = [];
 					var selectButton = lib.configOL.double_character ? 2 : 1;
 
@@ -1474,7 +1474,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.me.chooseButtonOL(list, function (player, result) {
 						if (game.online || player == game.me) player.init(result.links[0], result.links[1]);
 					});
-					"step 2";
+					("step 2");
 					var shen = [];
 					for (var i in result) {
 						if (result[i] && result[i].links) {
@@ -1544,7 +1544,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								};
 							});
 					} else event._result = {};
-					"step 3";
+					("step 3");
 					if (!result) result = {};
 					for (var i in result) {
 						if (result[i] && result[i].links) result[i] = result[i].links[0][2].slice(6);
@@ -2339,7 +2339,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (!ui.cheat && get.config("change_choice")) ui.create.cheat();
 						if (!ui.cheat2 && get.config("free_choose")) ui.create.cheat2();
 					}
-					"step 1";
+					("step 1");
 					if (ui.cheat) {
 						ui.cheat.close();
 						delete ui.cheat;
@@ -2374,7 +2374,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						list.remove("shen");
 						game.me.chooseControl(list).set("prompt", "请选择神武将的势力");
 					}
-					"step 2";
+					("step 2");
 					event.group = result.control || false;
 					if (event.choosed.length == 2) {
 						game.me.init(event.choosed[0], event.choosed[1]);
@@ -2404,7 +2404,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							);
 						}
 					}
-					"step 3";
+					("step 3");
 					if (event.group) {
 						game.me.group = event.group;
 						game.me.node.name.dataset.nature = get.groupnature(game.me.group);
@@ -2415,7 +2415,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						_status.characterlist.remove(game.players[i].name1);
 						_status.characterlist.remove(game.players[i].name2);
 					}
-					"step 4";
+					("step 4");
 					if (event.stratagemMode) {
 						["stratagem_gain", "stratagem_insight", "stratagem_expose"].forEach((globalSkill) =>
 							game.addGlobalSkill(globalSkill)
@@ -2640,7 +2640,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					next.set("ai", function (button) {
 						return Math.random();
 					});
-					"step 1";
+					("step 1");
 					if (!game.zhu.name) {
 						game.zhu.init(result.links[0], result.links[1]);
 					}
@@ -2699,10 +2699,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								return Math.random();
 							});
 					} else event.goto(3);
-					"step 2";
+					("step 2");
 					var name = result.links[0][2].slice(6);
 					game.zhu.changeGroup(name);
-					"step 3";
+					("step 3");
 					var list = [];
 					var selectButton = lib.configOL.double_character ? 2 : 1;
 
@@ -2750,7 +2750,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.me.chooseButtonOL(list, function (player, result) {
 						if (game.online || player == game.me) player.init(result.links[0], result.links[1]);
 					});
-					"step 4";
+					("step 4");
 					var shen = [];
 					for (var i in result) {
 						if (result[i] && result[i].links) {
@@ -2820,7 +2820,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								};
 							});
 					} else event._result = {};
-					"step 5";
+					("step 5");
 					if (!result) result = {};
 					for (var i in result) {
 						if (result[i] && result[i].links) result[i] = result[i].links[0][2].slice(6);
@@ -3383,7 +3383,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				stratagemInsight: (event) => {
 					"step 0";
 					game.log(player, "洞察了", target, "与其的阵营关系");
-					"step 1";
+					("step 1");
 					var storage = player.storage;
 					if (!storage.zhibi) storage.zhibi = [];
 					var zhibi = storage.zhibi;
@@ -3436,7 +3436,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						player.wait();
 						game.pause();
 					}
-					"step 2";
+					("step 2");
 					game.broadcastAll("closeDialog", event.videoId);
 					if (
 						!_status.connectMode &&
@@ -3498,7 +3498,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (!storage.zhibi) storage.zhibi = [];
 						storage.zhibi.addArray(camouflaged);
 					});
-					"step 1";
+					("step 1");
 					targets.forEach((current) => {
 						if (game.me.identity == "nei" && get.config("nei_auto_mark_camouflage"))
 							current.setIdentity();
@@ -3575,22 +3575,25 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					new Promise((resolve) =>
 						setTimeout(resolve, Math.ceil(5000 + 5000 * Math.random()))
 					).then(() => {
-						var interval = setInterval(() => {
-							aiTargets.shift();
-							if (aiTargets.length) return;
-							clearInterval(interval);
-							if (event.withAI) game.resume();
-						}, Math.ceil(500 + 500 * Math.random()));
+						var interval = setInterval(
+							() => {
+								aiTargets.shift();
+								if (aiTargets.length) return;
+								clearInterval(interval);
+								if (event.withAI) game.resume();
+							},
+							Math.ceil(500 + 500 * Math.random())
+						);
 					});
-					"step 1";
+					("step 1");
 					if (event.withMe) game.me.unwait(result);
-					"step 2";
+					("step 2");
 					if (event.withOL && !event.resultOL) game.pause();
-					"step 3";
+					("step 3");
 					if (!event.aiTargets.length) return;
 					event.withAI = true;
 					game.pause();
-					"step 4";
+					("step 4");
 					game.broadcastAll("closeDialog", event.videoId);
 					event.players.forEach((current) => current.hideTimer());
 					var afterCamouflage = (clientCamouflaged) =>
@@ -4538,7 +4541,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: () => {
 					"step 0";
 					if (event.triggername == "dying") game.delayx();
-					"step 1";
+					("step 1");
 					player.storage.stratagem_monarchy = true;
 					game.broadcastAll((clientPlayer) => {
 						if (!game.zhu) game.zhu = clientPlayer;
@@ -4561,10 +4564,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.delay(2);
 					player.playerfocus(1000);
 					event.trigger("zhuUpdate");
-					"step 2";
+					("step 2");
 					player.recover();
 					player.draw();
-					"step 3";
+					("step 3");
 					const skills = player.getStockSkills(true, true).filter((stockSkill) => {
 						if (player.hasSkill(stockSkill)) return;
 						var info = get.info(stockSkill);
@@ -4595,7 +4598,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: () => {
 					"step 0";
 					game.delayx();
-					"step 1";
+					("step 1");
 					player.storage.stratagem_revitalization = true;
 					game.broadcastAll((clientPlayer) => {
 						clientPlayer.identityShown = true;
@@ -4607,7 +4610,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.addVideo("showIdentity", player, "fan");
 					game.delay(2);
 					player.playerfocus(800);
-					"step 2";
+					("step 2");
 					player.changeFury(-player.storage.stratagem_fury, true);
 					player.discard(player.getCards("hej"));
 					player.link(false);
@@ -4723,7 +4726,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						bottom = cards;
 						return [top, bottom];
 					};
-					"step 1";
+					("step 1");
 					var top = result.moved[0];
 					var bottom = result.moved[1];
 					top.reverse();
@@ -4812,7 +4815,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							if (att <= 0 && !es.length) return 1.5 * att;
 							return -1.5 * att;
 						});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.target = result.targets[0];
 						event.target.addExpose(0.1);
@@ -4821,7 +4824,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (event.target) {
 						player.discardPlayerCard("ej", true, event.target);
 					}
@@ -4888,18 +4891,18 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					trigger.player.gainMaxHp();
-					"step 1";
+					("step 1");
 					var dh = player.hp - trigger.player.hp;
 					if (dh > 0) {
 						trigger.player.recover(dh);
 					}
-					"step 2";
+					("step 2");
 					var cards = player.getCards("he");
 					if (cards.length) {
 						trigger.player.gain(cards, player);
 						player.$giveAuto(cards, trigger.player);
 					}
-					"step 3";
+					("step 3");
 					trigger.cancel();
 					player.die();
 				},

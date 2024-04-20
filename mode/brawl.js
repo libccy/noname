@@ -655,7 +655,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 										content: function () {
 											"step 0";
 											player.changeLingli(-2);
-											"step 1";
+											("step 1");
 											event.skills = lib.huanhuazhizhan.skills;
 											var skills = event.skills;
 											skills.randomSort();
@@ -674,7 +674,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 											player.chooseControl(event.list).set("ai", function () {
 												return 0;
 											}).dialog = dialog;
-											"step 2";
+											("step 2");
 											if (result.control == "刷新") {
 												player.changeLingli(-1);
 												event.goto(1);
@@ -686,7 +686,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 												player.chooseControl(player.skillH).prompt =
 													"选择失去1个已有技能";
 											}
-											"step 3";
+											("step 3");
 											if (event.lose) player.removeSkillH(result.control);
 											player.addSkillH(event.skill);
 										},
@@ -758,7 +758,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 												game.log(player, "本回合内未造成伤害，触发死战模式惩罚");
 											}
 											if (trigger._lastDead == undefined) event.goto(2);
-											"step 1";
+											("step 1");
 											var type = get.rand(1, 8);
 											event.type = type;
 											trigger._lastDead.playerfocus(1200);
@@ -770,7 +770,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 												get.groupnature(trigger._lastDead.group, "raw")
 											);
 											game.delay(1.5);
-											"step 2";
+											("step 2");
 											var type = event.type;
 											switch (type) {
 												case 1: {
@@ -853,7 +853,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 													break;
 												}
 											}
-											"step 3";
+											("step 3");
 											if (game.playerx().length <= 4 && !_status._aozhan) {
 												game.countPlayer2(function (current) {
 													delete current._toKill;
@@ -1181,14 +1181,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 											],
 											true
 										).onfree = true;
-										"step 1";
+										("step 1");
 										game.me.init(result.links[0]);
 										var list = ["xiandeng", "shulv", "xisheng"];
 										game.me.chooseControl(list).dialog = game.getSkillDialog(
 											list,
 											"选择要获得的初始技能"
 										);
-										"step 2";
+										("step 2");
 										var list = [
 											"_lingli",
 											"_lingli_round",
@@ -1212,7 +1212,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 											current.markSkill("_lingli");
 										});
 										game.showIdentity(true);
-										"step 3";
+										("step 3");
 										game.randomMission();
 										var list = [
 											game.createCard("hhzz_fudichouxin"),
@@ -1229,7 +1229,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 											);
 										}
 										game.updateRoundNumber();
-										"step 4";
+										("step 4");
 										setTimeout(function () {
 											ui.arena.classList.remove("choose-character");
 										}, 500);
@@ -2229,7 +2229,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 											return 1 / (1 + target.countCards("he"));
 										},
 									});
-									"step 1";
+									("step 1");
 									if (result.bool) {
 										player.logSkill(event.name, result.targets);
 										player.discard(result.cards);
@@ -2238,7 +2238,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 											"he"
 										).ai = lib.skill.zhiheng.check;
 									} else event.finish();
-									"step 2";
+									("step 2");
 									if (!result.bool) player.draw();
 								},
 							},
@@ -2376,9 +2376,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								content: function () {
 									"step 0";
 									player.draw();
-									"step 1";
+									("step 1");
 									player.changeHujia(1);
-									"step 2";
+									("step 2");
 									var evt = event.getParent("phase");
 									if (evt && evt.after) {
 										var next = player.loseHp();
@@ -2728,7 +2728,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									.set("ai", function () {
 										return Math.random() < 0.15 ? "确定" : "取消";
 									});
-								"step 1";
+								("step 1");
 								if (result.control == "确定") {
 									game.log(player, "将", player.name, "替换为了", player._backupCharacter);
 									player.reinit(player.name, player._backupCharacter);
@@ -2818,7 +2818,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									}
 									return event.filterChoice(button.link, ui.selected.buttons[0].link);
 								});
-								"step 1";
+								("step 1");
 								game.me.init(result.links[0]);
 								game.me._backupCharacter = result.links[1];
 								_status.characterlist.removeArray(result.links);
@@ -2927,8 +2927,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"无尽而漫长的单挑试炼",
 					lib.config.qianlidanji_level
 						? "你的最高纪录是连续通过" +
-						  lib.config.qianlidanji_level +
-						  "关，是否能够突破这一记录呢？"
+							lib.config.qianlidanji_level +
+							"关，是否能够突破这一记录呢？"
 						: "你能否过五关斩六将，击败古城战神蔡阳呢？",
 				],
 				init: function () {
@@ -3224,7 +3224,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 										ui.discardPile.appendChild(cards.shift());
 									}
 								}
-								"step 1";
+								("step 1");
 								if (game.fellow) {
 									game.dead.remove(game.fellow);
 									game.fellow.remove();
@@ -3259,7 +3259,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 												"关）"
 										);
 								}
-								"step 2";
+								("step 2");
 								if (_status.qianlidanji.completeNumber != 5) {
 									if (result.index == 3) {
 										game.over(true);
@@ -3278,7 +3278,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 										],
 										true
 									);
-								"step 3";
+								("step 3");
 								_status.event.getParent("phaseLoop").player = game.zhu;
 								var source = game.fan;
 								var name = result.links[0];
@@ -3316,7 +3316,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								source.gain(get.cards(gain))._triggered = null;
 								game.triggerEnter(source);
 								if (event.reward) event.reward();
-								"step 4";
+								("step 4");
 								var cards = Array.from(ui.ordering.childNodes);
 								while (cards.length) {
 									cards.shift().discard();
@@ -3456,7 +3456,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									if (!ui.cheat && get.config("change_choice")) ui.create.cheat();
 									if (!ui.cheat2 && get.config("free_choose")) ui.create.cheat2();
 								}
-								"step 1";
+								("step 1");
 								if (ui.cheat) {
 									ui.cheat.close();
 									delete ui.cheat;
@@ -3472,7 +3472,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								game.zhu
 									.chooseControl("地狱", "困难", "普通", "简单", "无双")
 									.set("prompt", "请选择游戏难度");
-								"step 2";
+								("step 2");
 								var hp = Math.floor(result.index / 2);
 								event.draw = Math.floor((result.index + 1) / 2);
 								if (hp) {
@@ -3487,7 +3487,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									],
 									true
 								);
-								"step 3";
+								("step 3");
 								game.fan.init(result.links[0]);
 								_status.characterlist.remove(result.links[0]);
 								_status.qianlidanji.used.add(result.links[0]);
@@ -4011,7 +4011,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									"textbutton",
 								]);
 								game.me.chooseButton(true).set("dialog", id).set("onfree", true);
-								"step 1";
+								("step 1");
 								var pack = game.liangjunduilei[result.links[0]];
 								game.versusVideoName = pack.name;
 								if (get.is.phoneLayout()) {

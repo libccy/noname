@@ -925,15 +925,15 @@ export class Get {
 		// @ts-ignore
 		const target = constructor
 			? // 这四类数据处理单独处理
-			  // （实际上需要处理的只有Map和Set）
-			  // 除此之外的就只能祝愿有拷贝构造函数了
-			  Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object
+				// （实际上需要处理的只有Map和Set）
+				// 除此之外的就只能祝愿有拷贝构造函数了
+				Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object
 				? // @ts-ignore
-				  new constructor()
+					new constructor()
 				: constructor.name in window && /\[native code\]/.test(constructor.toString())
-				? // @ts-ignore
-				  new constructor(obj)
-				: obj
+					? // @ts-ignore
+						new constructor(obj)
+					: obj
 			: Object.create(null);
 		if (target === obj) return target;
 
@@ -1583,7 +1583,7 @@ export class Get {
 							stringifying[key] = get.stringifiedResult(entry[1], null, false);
 						return stringifying;
 					}, {})
-			  )}`
+				)}`
 			: "";
 	}
 	/**

@@ -239,7 +239,7 @@ game.import("card", function () {
 							if (_status.event.getRand() < 0.5) return Math.random();
 							return get.value(card);
 						};
-					"step 1";
+					("step 1");
 					target.showCards(result.cards).setContent(function () {});
 					event.dialog = ui.create.dialog(get.translation(target) + "展示的手牌", result.cards);
 					event.videoId = lib.status.videoId++;
@@ -269,7 +269,7 @@ game.import("card", function () {
 						})
 						.set("prompt", false);
 					game.delay(2);
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						target.damage("fire");
 					} else {
@@ -667,7 +667,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					player.loseToSpecial(cards, "muniu");
-					"step 1";
+					("step 1");
 					for (var i = 0; i < cards.length; i++) {
 						if (
 							cards[i]._selfDestroyed ||
@@ -696,7 +696,7 @@ game.import("card", function () {
 						muniu.cards
 					);
 					game.delayx();
-					"step 2";
+					("step 2");
 					var muniu = player.getEquip("muniu");
 					var players = game.filterPlayer(function (current) {
 						if (
@@ -722,7 +722,7 @@ game.import("card", function () {
 						return target == _status.event.choice ? 1 : -1;
 					});
 					next.set("choice", choice);
-					"step 3";
+					("step 3");
 					if (result.bool) {
 						var card = player.getEquip("muniu");
 						result.targets[0].equip(card);

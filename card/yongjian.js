@@ -31,7 +31,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					target.recover();
-					"step 1";
+					("step 1");
 					if (
 						target.hasCard(function (card) {
 							return _status.connectMode || get.name(card, target) == "du";
@@ -64,7 +64,7 @@ game.import("card", function () {
 					if (typeof event.extraDamage != "number") event.extraDamage = 0;
 					if (!target.countCards("h") || !player.isIn()) event.finish();
 					else player.choosePlayerCard(target, "h", true);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						event.show_card = result.cards[0];
 						var str = get.translation(player);
@@ -89,7 +89,7 @@ game.import("card", function () {
 									: 0;
 							});
 					} else event.finish();
-					"step 2";
+					("step 2");
 					if (result.index == 0) target.give(event.show_card, player);
 					else target.damage();
 				},
@@ -117,7 +117,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					player.gainPlayerCard(target, "hej", true, [1, 2]);
-					"step 1";
+					("step 1");
 					if (result.bool && target.isIn()) {
 						var num = result.cards.length,
 							hs = player.getCards("h");
@@ -131,7 +131,7 @@ game.import("card", function () {
 								"交给" + get.translation(target) + get.cnNumber(num) + "张牌"
 							);
 					} else event.finish();
-					"step 2";
+					("step 2");
 					if (result.bool) player.give(result.cards, target);
 				},
 				ai: {
@@ -395,7 +395,7 @@ game.import("card", function () {
 					player
 						.chooseToDiscard("h", get.prompt("yitianjian"), "弃置一张手牌并回复1点体力")
 						.set("ai", (card) => 7 - get.value(card)).logSkill = "yitianjian";
-					"step 1";
+					("step 1");
 					if (result.bool) player.recover();
 				},
 			},
@@ -423,7 +423,7 @@ game.import("card", function () {
 					}).judge2 = function (result) {
 						return result.bool == false ? true : false;
 					};
-					"step 1";
+					("step 1");
 					if (result.bool === false) {
 						var map = trigger.customArgs,
 							id = player.playerid;
@@ -574,7 +574,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					if (trigger.delay === false) game.delayx();
-					"step 1";
+					("step 1");
 					game.log(player, "触发了", "#g【毒】", "的效果");
 					var num = 1;
 					if (typeof trigger.getl == "function") {
@@ -626,7 +626,7 @@ game.import("card", function () {
 							_status.noclearcountdown = true;
 						});
 					event.given_map = {};
-					"step 1";
+					("step 1");
 					player.chooseCardTarget({
 						filterCard: function (card) {
 							return _status.event.cards.includes(card);
@@ -652,7 +652,7 @@ game.import("card", function () {
 							return -get.attitude(_status.event.player, target) + 0.01;
 						},
 					});
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						event.given = true;
 						var res = result.cards,
@@ -671,7 +671,7 @@ game.import("card", function () {
 						}
 						event.finish();
 					}
-					"step 3";
+					("step 3");
 					if (_status.connectMode) {
 						game.broadcastAll(function () {
 							delete _status.noclearcountdown;

@@ -641,9 +641,10 @@ export async function onload(resetGameTimeout) {
 					_status.evaluatingExtension = lib.extensions[i][3];
 					if (typeof lib.extensions[i][1] == "function")
 						try {
-							await (gnc.is.coroutine(lib.extensions[i][1])
-								? gnc.of(lib.extensions[i][1])
-								: lib.extensions[i][1]
+							await (
+								gnc.is.coroutine(lib.extensions[i][1])
+									? gnc.of(lib.extensions[i][1])
+									: lib.extensions[i][1]
 							).call(lib.extensions[i], lib.extensions[i][2], lib.extensions[i][4]);
 						} catch (e) {
 							console.log(`加载《${lib.extensions[i][0]}》扩展的content时出现错误。`, e);

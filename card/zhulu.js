@@ -24,7 +24,7 @@ game.import("card", function () {
 					} else {
 						event.goto(2);
 					}
-					"step 1";
+					("step 1");
 					if (result && result.control == "顺时针") {
 						var evt = event.getParent();
 						evt.fixedSeat = true;
@@ -34,7 +34,7 @@ game.import("card", function () {
 							evt.targets.unshift(evt.targets.pop());
 						}
 					}
-					"step 2";
+					("step 2");
 					ui.clear();
 					var num;
 					if (event.targets) {
@@ -103,7 +103,7 @@ game.import("card", function () {
 					} else if (equips.length) {
 						event.directButton = equips[0];
 					} else event.finish();
-					"step 1";
+					("step 1");
 					var dialog = event.dialog;
 					var card;
 					if (event.directButton) {
@@ -228,7 +228,7 @@ game.import("card", function () {
 							return 8 - get.value(card);
 						return 6 - get.value(card);
 					});
-					"step 1";
+					("step 1");
 					if (result.bool && result.cards) {
 						var bool = 0;
 						for (var i = 0; i < result.cards.length; i++) {
@@ -654,7 +654,7 @@ game.import("card", function () {
 						event.target = player;
 						event.player = event.getParent(2).player;
 					}
-					"step 1";
+					("step 1");
 					var id = card.cardid;
 					event.cardid = id;
 					if (!_status.jinhe) _status.jinhe = {};
@@ -665,7 +665,7 @@ game.import("card", function () {
 					var cards2 = get.cards(2);
 					event.cards2 = cards2;
 					player.chooseButton(["选择一张牌作为「礼」", cards2], true);
-					"step 2";
+					("step 2");
 					var id = event.cardid;
 					_status.jinhe[id] = {
 						player: player,
@@ -771,10 +771,10 @@ game.import("card", function () {
 					game.broadcastAll(function (jinhe) {
 						_status.jinhe = jinhe;
 					}, _status.jinhe);
-					"step 1";
+					("step 1");
 					var hs = player.getCards("h");
 					if (hs.length) player.discard(hs);
-					"step 2";
+					("step 2");
 					game.broadcastAll(ui.clear);
 				},
 			},
@@ -820,13 +820,13 @@ game.import("card", function () {
 							_status.jinhe = jinhe;
 						}, _status.jinhe);
 					} else event.finish();
-					"step 1";
+					("step 1");
 					var cards = player.getCards("he", function (card) {
 						if (get.position(card) == "h") return get.suit(card) == event.suit;
 						return get.position(card) == "e" && card.name == "jinhe";
 					});
 					if (cards.length) player.discard(cards);
-					"step 2";
+					("step 2");
 					game.broadcastAll(ui.clear);
 				},
 				ai: {

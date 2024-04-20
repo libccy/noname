@@ -1348,16 +1348,24 @@ body > .background.land {
 	bottom: 5px;
 	right: 5px;
 	text-align: right;
-	text-shadow: rgba(213, 194, 179, 1) 0 0 3px, rgba(213, 194, 179, 1) 0 0 3px,
-		rgba(213, 194, 179, 1) 0 0 3px, rgba(213, 194, 179, 1) 0 0 3px, black 0 0 3px;
+	text-shadow:
+		rgba(213, 194, 179, 1) 0 0 3px,
+		rgba(213, 194, 179, 1) 0 0 3px,
+		rgba(213, 194, 179, 1) 0 0 3px,
+		rgba(213, 194, 179, 1) 0 0 3px,
+		black 0 0 3px;
 }
 .card > .gaintag {
 	bottom: 5px;
 	left: 5px;
 	text-align: left;
 	color: white;
-	text-shadow: rgba(255, 120, 0, 1) 0 0 2px, rgba(255, 120, 0, 1) 0 0 2px, rgba(255, 120, 0, 1) 0 0 2px,
-		rgba(255, 120, 0, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(255, 120, 0, 1) 0 0 2px,
+		rgba(255, 120, 0, 1) 0 0 2px,
+		rgba(255, 120, 0, 1) 0 0 2px,
+		rgba(255, 120, 0, 1) 0 0 2px,
+		black 0 0 1px;
 }
 .card > .name {
 	top: 9px;
@@ -1421,7 +1429,9 @@ body > .background.land {
 	position: absolute;
 	border-radius: 6px;
 	pointer-events: none;
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px inset, rgba(0, 0, 0, 0.45) 0 0 10px inset;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px inset,
+		rgba(0, 0, 0, 0.45) 0 0 10px inset;
 }
 
 #window[data-radius_size="reduce"] .card > .cardavatar {
@@ -2056,7 +2066,9 @@ div:not(.handcards) > .card > .info > span,
 	height: 10px;
 	background: rgba(57, 123, 4, 1);
 	border: 1px solid rgba(39, 79, 7, 1);
-	box-shadow: rgba(0, 0, 0, 0.2) 1px -1px 2px inset, rgba(255, 255, 255, 0.15) -1px 1px 5px inset;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 1px -1px 2px inset,
+		rgba(255, 255, 255, 0.15) -1px 1px 5px inset;
 }
 .button.newstyle > .hp > .shield {
 	background: rgba(63, 119, 173, 1);
@@ -2071,7 +2083,9 @@ div:not(.handcards) > .card > .info > span,
 	width: auto;
 	height: auto;
 	transform: none !important;
-	text-shadow: black 0 0 2px, black 0 0 3px;
+	text-shadow:
+		black 0 0 2px,
+		black 0 0 3px;
 }
 
 .button.replaceButton,
@@ -2164,7 +2178,10 @@ div:not(.handcards) > .card > .info > span,
 	opacity: 0.8;
 }
 .player > .avatar > .action:not(.freecolor) {
-	text-shadow: black 0 0 1px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 10px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(10, 155, 67, 1) 0 0 5px,
+		rgba(10, 155, 67, 1) 0 0 10px;
 }
 .player:not(.current_action) .avatar > .action {
 	opacity: 0;
@@ -2331,7 +2348,9 @@ div:not(.handcards) > .card > .info > span,
 	margin: 0;
 	padding: 0;
 	left: 0;
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 0, 0, 0.4) 0 0 2px;
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(0, 0, 0, 0.4) 0 0 2px;
 }
 .player > .chain > div > div:nth-child(odd) {
 	height: 8px;
@@ -2375,50 +2394,86 @@ div:not(.handcards) > .card > .info > span,
 	left: 150px;
 	top: 0;
 	height: 100%;
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 10px;
 }
 #window > .damage.fullscreenavatar[data-nature="thunder"]:not(.noshadow) > div:first-child > div {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 10px, rgba(0, 0, 0, 0.3) 0 0 30px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 10px,
+		rgba(0, 0, 0, 0.3) 0 0 30px,
 		rgba(100, 74, 139, 1) 0 0 60px;
 }
 #window > .damage.fullscreenavatar[data-nature="kami"]:not(.noshadow) > div:first-child > div {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 10px, rgba(0, 0, 0, 0.3) 0 0 30px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 10px,
+		rgba(0, 0, 0, 0.3) 0 0 30px,
 		rgba(90, 118, 99, 1) 0 0 60px;
 }
 #window > .damage.fullscreenavatar[data-nature="metal"] > div:first-child > div {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 10px, rgba(255, 0, 0, 0.1) 0 0 30px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 10px,
+		rgba(255, 0, 0, 0.1) 0 0 30px,
 		rgba(255, 203, 0, 0.6) 0 0 80px;
 }
 #window > .damage.fullscreenavatar[data-nature="wood"] > div:first-child > div {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 10px, rgba(0, 0, 0, 0.3) 0 0 30px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 10px,
+		rgba(0, 0, 0, 0.3) 0 0 30px,
 		rgba(57, 123, 4, 1) 0 0 60px;
 }
 #window > .damage.fullscreenavatar[data-nature="water"] > div:first-child > div {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 10px, rgba(0, 0, 0, 0.3) 0 0 30px,
-		rgba(78, 117, 140, 1) 0 0 60px, rgba(78, 117, 140, 1) 0 0 60px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 10px,
+		rgba(0, 0, 0, 0.3) 0 0 30px,
+		rgba(78, 117, 140, 1) 0 0 60px,
+		rgba(78, 117, 140, 1) 0 0 60px;
 }
 #window > .damage.fullscreenavatar[data-nature="ice"] > div:first-child > div {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 20px, rgba(0, 0, 0, 0.3) 0 0 40px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 20px,
+		rgba(0, 0, 0, 0.3) 0 0 40px,
 		rgba(213, 194, 179, 1) 0 0 80px;
 }
 #window > .damage.fullscreenavatar[data-nature="soil"] > div:first-child > div {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 10px, rgba(0, 0, 0, 0.3) 0 0 30px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 10px,
+		rgba(0, 0, 0, 0.3) 0 0 30px,
 		rgba(128, 59, 2, 1) 0 0 60px;
 }
 #window > .damage.fullscreenavatar[data-nature="fire"] > div:first-child > div {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 20px, rgba(0, 0, 0, 0.3) 0 0 40px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 20px,
+		rgba(0, 0, 0, 0.3) 0 0 40px,
 		rgba(232, 53, 53, 1) 0 0 80px;
 }
 #window > .damage.fullscreenavatar[data-nature="fire"] > div:first-child > div {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 20px, rgba(0, 0, 0, 0.3) 0 0 40px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 20px,
+		rgba(0, 0, 0, 0.3) 0 0 40px,
 		rgba(203, 177, 255, 1) 0 0 80px;
 }
 #window > .damage.fullscreenavatar[data-nature="orange"] > div:first-child > div {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 20px, rgba(0, 0, 0, 0.3) 0 0 40px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 20px,
+		rgba(0, 0, 0, 0.3) 0 0 40px,
 		rgba(255, 120, 0, 1) 0 0 80px;
 }
 #window > .damage.fullscreenavatar[data-nature="gray"] > div:first-child > div {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 20px, rgba(0, 0, 0, 0.3) 0 0 40px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 20px,
+		rgba(0, 0, 0, 0.3) 0 0 40px,
 		rgba(213, 194, 179, 1) 0 0 80px;
 }
 #window > .damage.fullscreenavatar > .text {
@@ -2709,7 +2764,9 @@ div:not(.handcards) > .card > .info > span,
 	margin-left: 3px;
 	position: relative;
 	border-radius: 100%;
-	box-shadow: rgba(0, 0, 0, 0.2) 1px -1px 2px inset, rgba(255, 255, 255, 0.15) -1px 1px 5px inset;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 1px -1px 2px inset,
+		rgba(255, 255, 255, 0.15) -1px 1px 5px inset;
 	position: relative;
 	filter: brightness(1.5);
 	-webkit-filter: brightness(1.5);
@@ -2781,17 +2838,26 @@ div:not(.handcards) > .card > .info > span,
 }
 .hp.text[data-condition="low"],
 .hp.textstyle[data-condition="low"] {
-	text-shadow: black 0 0 1px, rgba(232, 53, 53, 1) 0 0 2px, rgba(232, 53, 53, 1) 0 0 5px,
+	text-shadow:
+		black 0 0 1px,
+		rgba(232, 53, 53, 1) 0 0 2px,
+		rgba(232, 53, 53, 1) 0 0 5px,
 		rgba(232, 53, 53, 1) 0 0 10px;
 }
 .hp.text[data-condition="mid"],
 .hp.textstyle[data-condition="mid"] {
-	text-shadow: black 0 0 1px, rgba(255, 203, 0, 1) 0 0 2px, rgba(255, 203, 0, 1) 0 0 5px,
+	text-shadow:
+		black 0 0 1px,
+		rgba(255, 203, 0, 1) 0 0 2px,
+		rgba(255, 203, 0, 1) 0 0 5px,
 		rgba(255, 203, 0, 1) 0 0 10px;
 }
 .hp.text[data-condition="high"],
 .hp.textstyle[data-condition="high"] {
-	text-shadow: rgba(57, 123, 4, 1) 0 0 2px, rgba(57, 123, 4, 1) 0 0 5px, rgba(57, 123, 4, 1) 0 0 10px;
+	text-shadow:
+		rgba(57, 123, 4, 1) 0 0 2px,
+		rgba(57, 123, 4, 1) 0 0 5px,
+		rgba(57, 123, 4, 1) 0 0 10px;
 }
 
 .player::after,
@@ -2817,14 +2883,20 @@ div:not(.handcards) > .card > .info > span,
 .player::after,
 .card::after,
 .button::after {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px, rgba(255, 0, 0, 0.4) 0 0 12px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(255, 0, 0, 0.4) 0 0 5px,
+		rgba(255, 0, 0, 0.4) 0 0 12px,
 		rgba(255, 0, 0, 0.8) 0 0 15px;
 }
 
 .player::before,
 .card::before,
 .button::before {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 133, 255, 0.5) 0 0 5px, rgba(0, 133, 255, 0.6) 0 0 12px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 133, 255, 0.5) 0 0 5px,
+		rgba(0, 133, 255, 0.6) 0 0 12px,
 		rgba(0, 133, 255, 0.8) 0 0 15px;
 }
 
@@ -3779,7 +3851,10 @@ div:hover > .intro {
 /*.player.target{-webkit-filter:brightness(1.2)}*/
 
 .target {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px, rgba(255, 0, 0, 0.5) 0 0 12px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(255, 0, 0, 0.4) 0 0 5px,
+		rgba(255, 0, 0, 0.5) 0 0 12px,
 		rgba(255, 0, 0, 0.8) 0 0 15px !important;
 }
 #mebg.target {
@@ -3833,7 +3908,9 @@ div:hover > .intro {
 	color: white !important;
 }
 .shadowed2 {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 3px 10px;
 }
 #window[data-radius_size="reduce"] .shadowed {
 	border-radius: 4px;
@@ -3948,25 +4025,45 @@ div[data-nature="enemy"],
 span[data-nature="enemy"],
 div[data-nature="fire"],
 span[data-nature="fire"] {
-	text-shadow: black 0 0 1px, rgba(232, 53, 53, 1) 0 0 2px, rgba(232, 53, 53, 1) 0 0 5px,
-		rgba(232, 53, 53, 1) 0 0 10px, rgba(232, 53, 53, 1) 0 0 10px, rgba(232, 53, 53, 1) 0 0 20px,
+	text-shadow:
+		black 0 0 1px,
+		rgba(232, 53, 53, 1) 0 0 2px,
+		rgba(232, 53, 53, 1) 0 0 5px,
+		rgba(232, 53, 53, 1) 0 0 10px,
+		rgba(232, 53, 53, 1) 0 0 10px,
+		rgba(232, 53, 53, 1) 0 0 20px,
 		rgba(232, 53, 53, 1) 0 0 20px;
 }
 
 div[data-nature="firem"],
 span[data-nature="firem"] {
-	text-shadow: black 0 0 1px, rgba(232, 53, 53, 1) 0 0 2px, rgba(232, 53, 53, 1) 0 0 5px,
-		rgba(232, 53, 53, 1) 0 0 5px, rgba(232, 53, 53, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(232, 53, 53, 1) 0 0 2px,
+		rgba(232, 53, 53, 1) 0 0 5px,
+		rgba(232, 53, 53, 1) 0 0 5px,
+		rgba(232, 53, 53, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="firemx"],
 span[data-nature="firemx"] {
-	text-shadow: black 0 0 1px, rgba(191, 0, 0, 0.2) 0 0 2px, rgba(191, 0, 0, 1) 0 0 2px,
-		rgba(191, 0, 0, 1) 0 0 5px, rgba(191, 0, 0, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(191, 0, 0, 0.2) 0 0 2px,
+		rgba(191, 0, 0, 1) 0 0 2px,
+		rgba(191, 0, 0, 1) 0 0 5px,
+		rgba(191, 0, 0, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="firemm"],
 span[data-nature="firemm"] {
-	text-shadow: black 0 0 1px, rgba(232, 53, 53, 1) 0 0 2px, rgba(232, 53, 53, 1) 0 0 2px,
-		rgba(232, 53, 53, 1) 0 0 2px, rgba(232, 53, 53, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(232, 53, 53, 1) 0 0 2px,
+		rgba(232, 53, 53, 1) 0 0 2px,
+		rgba(232, 53, 53, 1) 0 0 2px,
+		rgba(232, 53, 53, 1) 0 0 2px,
+		black 0 0 1px;
 }
 
 .player .identity[data-color="mingzhong"],
@@ -3976,24 +4073,42 @@ span[data-nature="firemm"] {
 .player .identity[data-color="cai2"],
 div[data-nature="orange"],
 span[data-nature="orange"] {
-	text-shadow: rgba(255, 120, 0, 1) 0 0 2px, rgba(255, 120, 0, 1) 0 0 5px, rgba(255, 120, 0, 1) 0 0 10px,
-		rgba(255, 120, 0, 1) 0 0 10px, rgba(255, 120, 0, 1) 0 0 20px, rgba(255, 120, 0, 1) 0 0 20px,
+	text-shadow:
+		rgba(255, 120, 0, 1) 0 0 2px,
+		rgba(255, 120, 0, 1) 0 0 5px,
+		rgba(255, 120, 0, 1) 0 0 10px,
+		rgba(255, 120, 0, 1) 0 0 10px,
+		rgba(255, 120, 0, 1) 0 0 20px,
+		rgba(255, 120, 0, 1) 0 0 20px,
 		black 0 0 1px;
 }
 div[data-nature="orangem"],
 span[data-nature="orangem"] {
-	text-shadow: rgba(255, 120, 0, 1) 0 0 2px, rgba(255, 120, 0, 1) 0 0 5px, rgba(255, 120, 0, 1) 0 0 5px,
-		rgba(255, 120, 0, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(255, 120, 0, 1) 0 0 2px,
+		rgba(255, 120, 0, 1) 0 0 5px,
+		rgba(255, 120, 0, 1) 0 0 5px,
+		rgba(255, 120, 0, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="orangemm"],
 span[data-nature="orangemm"] {
-	text-shadow: rgba(255, 120, 0, 1) 0 0 2px, rgba(255, 120, 0, 1) 0 0 2px, rgba(255, 120, 0, 1) 0 0 2px,
-		rgba(255, 120, 0, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(255, 120, 0, 1) 0 0 2px,
+		rgba(255, 120, 0, 1) 0 0 2px,
+		rgba(255, 120, 0, 1) 0 0 2px,
+		rgba(255, 120, 0, 1) 0 0 2px,
+		black 0 0 1px;
 }
 div[data-nature="firemx"],
 span[data-nature="firemx"] {
-	text-shadow: black 0 0 1px, rgba(255, 120, 0, 0.2) 0 0 2px, rgba(255, 120, 0, 1) 0 0 2px,
-		rgba(255, 120, 0, 1) 0 0 5px, rgba(255, 120, 0, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(255, 120, 0, 0.2) 0 0 2px,
+		rgba(255, 120, 0, 1) 0 0 2px,
+		rgba(255, 120, 0, 1) 0 0 5px,
+		rgba(255, 120, 0, 1) 0 0 5px,
+		black 0 0 1px;
 }
 
 .player .identity[data-color="zhong"],
@@ -4004,69 +4119,122 @@ div[data-nature="zhong"],
 span[data-nature="zhong"],
 div[data-nature="metal"],
 span[data-nature="metal"] {
-	text-shadow: black 0 0 1px, rgba(255, 203, 0, 1) 0 0 2px, rgba(255, 203, 0, 1) 0 0 5px,
-		rgba(255, 203, 0, 1) 0 0 10px, rgba(255, 203, 0, 1) 0 0 10px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(255, 203, 0, 1) 0 0 2px,
+		rgba(255, 203, 0, 1) 0 0 5px,
+		rgba(255, 203, 0, 1) 0 0 10px,
+		rgba(255, 203, 0, 1) 0 0 10px;
 }
 div[data-nature="metalm"],
 span[data-nature="metalm"] {
-	text-shadow: black 0 0 1px, rgba(255, 203, 0, 1) 0 0 2px, rgba(255, 203, 0, 1) 0 0 5px,
-		rgba(255, 203, 0, 1) 0 0 5px, rgba(255, 203, 0, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(255, 203, 0, 1) 0 0 2px,
+		rgba(255, 203, 0, 1) 0 0 5px,
+		rgba(255, 203, 0, 1) 0 0 5px,
+		rgba(255, 203, 0, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="metalmm"],
 span[data-nature="metalmm"] {
-	text-shadow: black 0 0 1px, rgba(255, 203, 0, 1) 0 0 2px, rgba(255, 203, 0, 1) 0 0 2px,
-		rgba(255, 203, 0, 1) 0 0 2px, rgba(255, 203, 0, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(255, 203, 0, 1) 0 0 2px,
+		rgba(255, 203, 0, 1) 0 0 2px,
+		rgba(255, 203, 0, 1) 0 0 2px,
+		rgba(255, 203, 0, 1) 0 0 2px,
+		black 0 0 1px;
 }
 
 .player .identity[data-color="key"],
 div[data-nature="key"],
 span[data-nature="key"] {
-	text-shadow: rgba(203, 177, 255, 1) 0 0 2px, rgba(203, 177, 255, 1) 0 0 5px,
-		rgba(203, 177, 255, 1) 0 0 10px, rgba(203, 177, 255, 1) 0 0 10px, rgba(203, 177, 255, 1) 0 0 20px,
-		rgba(203, 177, 255, 1) 0 0 20px, black 0 0 1px;
+	text-shadow:
+		rgba(203, 177, 255, 1) 0 0 2px,
+		rgba(203, 177, 255, 1) 0 0 5px,
+		rgba(203, 177, 255, 1) 0 0 10px,
+		rgba(203, 177, 255, 1) 0 0 10px,
+		rgba(203, 177, 255, 1) 0 0 20px,
+		rgba(203, 177, 255, 1) 0 0 20px,
+		black 0 0 1px;
 }
 div[data-nature="keym"],
 span[data-nature="keym"] {
-	text-shadow: rgba(203, 177, 255, 1) 0 0 2px, rgba(203, 177, 255, 1) 0 0 5px,
-		rgba(203, 177, 255, 1) 0 0 5px, rgba(203, 177, 255, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(203, 177, 255, 1) 0 0 2px,
+		rgba(203, 177, 255, 1) 0 0 5px,
+		rgba(203, 177, 255, 1) 0 0 5px,
+		rgba(203, 177, 255, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="keymm"],
 span[data-nature="keymm"] {
-	text-shadow: rgba(203, 177, 255, 1) 0 0 2px, rgba(203, 177, 255, 1) 0 0 2px,
-		rgba(203, 177, 255, 1) 0 0 2px, rgba(203, 177, 255, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(203, 177, 255, 1) 0 0 2px,
+		rgba(203, 177, 255, 1) 0 0 2px,
+		rgba(203, 177, 255, 1) 0 0 2px,
+		rgba(203, 177, 255, 1) 0 0 2px,
+		black 0 0 1px;
 }
 
 div[data-nature="shen"],
 span[data-nature="shen"] {
-	text-shadow: rgba(243, 171, 27, 1) 0 0 2px, rgba(243, 171, 27, 1) 0 0 5px, rgba(243, 171, 27, 1) 0 0 10px,
-		rgba(243, 171, 27, 1) 0 0 10px, rgba(243, 171, 27, 1) 0 0 20px, rgba(243, 171, 27, 1) 0 0 20px,
+	text-shadow:
+		rgba(243, 171, 27, 1) 0 0 2px,
+		rgba(243, 171, 27, 1) 0 0 5px,
+		rgba(243, 171, 27, 1) 0 0 10px,
+		rgba(243, 171, 27, 1) 0 0 10px,
+		rgba(243, 171, 27, 1) 0 0 20px,
+		rgba(243, 171, 27, 1) 0 0 20px,
 		black 0 0 1px;
 }
 div[data-nature="shenm"],
 span[data-nature="shenm"] {
-	text-shadow: rgba(243, 171, 27, 1) 0 0 2px, rgba(243, 171, 27, 1) 0 0 5px, rgba(243, 171, 27, 1) 0 0 5px,
-		rgba(243, 171, 27, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(243, 171, 27, 1) 0 0 2px,
+		rgba(243, 171, 27, 1) 0 0 5px,
+		rgba(243, 171, 27, 1) 0 0 5px,
+		rgba(243, 171, 27, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="shenmm"],
 span[data-nature="shenmm"] {
-	text-shadow: rgba(243, 171, 27, 1) 0 0 2px, rgba(243, 171, 27, 1) 0 0 2px, rgba(243, 171, 27, 1) 0 0 2px,
-		rgba(243, 171, 27, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(243, 171, 27, 1) 0 0 2px,
+		rgba(243, 171, 27, 1) 0 0 2px,
+		rgba(243, 171, 27, 1) 0 0 2px,
+		rgba(243, 171, 27, 1) 0 0 2px,
+		black 0 0 1px;
 }
 div[data-nature="qun"],
 span[data-nature="qun"] {
-	text-shadow: rgba(164, 164, 164, 1) 0 0 2px, rgba(164, 164, 164, 1) 0 0 5px,
-		rgba(164, 164, 164, 1) 0 0 10px, rgba(164, 164, 164, 1) 0 0 10px, rgba(164, 164, 164, 1) 0 0 20px,
-		rgba(164, 164, 164, 1) 0 0 20px, black 0 0 1px;
+	text-shadow:
+		rgba(164, 164, 164, 1) 0 0 2px,
+		rgba(164, 164, 164, 1) 0 0 5px,
+		rgba(164, 164, 164, 1) 0 0 10px,
+		rgba(164, 164, 164, 1) 0 0 10px,
+		rgba(164, 164, 164, 1) 0 0 20px,
+		rgba(164, 164, 164, 1) 0 0 20px,
+		black 0 0 1px;
 }
 div[data-nature="qunm"],
 span[data-nature="qunm"] {
-	text-shadow: rgba(164, 164, 164, 1) 0 0 2px, rgba(164, 164, 164, 1) 0 0 5px,
-		rgba(164, 164, 164, 1) 0 0 5px, rgba(164, 164, 164, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(164, 164, 164, 1) 0 0 2px,
+		rgba(164, 164, 164, 1) 0 0 5px,
+		rgba(164, 164, 164, 1) 0 0 5px,
+		rgba(164, 164, 164, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="qunmm"],
 span[data-nature="qunmm"] {
-	text-shadow: rgba(164, 164, 164, 1) 0 0 2px, rgba(164, 164, 164, 1) 0 0 2px,
-		rgba(164, 164, 164, 1) 0 0 2px, rgba(164, 164, 164, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(164, 164, 164, 1) 0 0 2px,
+		rgba(164, 164, 164, 1) 0 0 2px,
+		rgba(164, 164, 164, 1) 0 0 2px,
+		rgba(164, 164, 164, 1) 0 0 2px,
+		black 0 0 1px;
 }
 
 .player .identity[data-color="nei"],
@@ -4078,37 +4246,63 @@ div[data-nature="nei"],
 span[data-nature="nei"],
 div[data-nature="thunder"],
 span[data-nature="thunder"] {
-	text-shadow: rgba(100, 74, 139, 1) 0 0 2px, rgba(100, 74, 139, 1) 0 0 5px, rgba(100, 74, 139, 1) 0 0 10px,
-		rgba(100, 74, 139, 1) 0 0 10px, rgba(100, 74, 139, 1) 0 0 20px, rgba(100, 74, 139, 1) 0 0 20px,
+	text-shadow:
+		rgba(100, 74, 139, 1) 0 0 2px,
+		rgba(100, 74, 139, 1) 0 0 5px,
+		rgba(100, 74, 139, 1) 0 0 10px,
+		rgba(100, 74, 139, 1) 0 0 10px,
+		rgba(100, 74, 139, 1) 0 0 20px,
+		rgba(100, 74, 139, 1) 0 0 20px,
 		black 0 0 1px;
 }
 div[data-nature="thunderm"],
 span[data-nature="thunderm"] {
-	text-shadow: rgba(100, 74, 139, 1) 0 0 2px, rgba(100, 74, 139, 1) 0 0 5px, rgba(100, 74, 139, 1) 0 0 5px,
-		rgba(100, 74, 139, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(100, 74, 139, 1) 0 0 2px,
+		rgba(100, 74, 139, 1) 0 0 5px,
+		rgba(100, 74, 139, 1) 0 0 5px,
+		rgba(100, 74, 139, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="thundermm"],
 span[data-nature="thundermm"] {
-	text-shadow: rgba(100, 74, 139, 1) 0 0 2px, rgba(100, 74, 139, 1) 0 0 2px, rgba(100, 74, 139, 1) 0 0 2px,
-		rgba(100, 74, 139, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(100, 74, 139, 1) 0 0 2px,
+		rgba(100, 74, 139, 1) 0 0 2px,
+		rgba(100, 74, 139, 1) 0 0 2px,
+		rgba(100, 74, 139, 1) 0 0 2px,
+		black 0 0 1px;
 }
 
 .player .identity[data-color="kami"],
 div[data-nature="kami"],
 span[data-nature="kami"] {
-	text-shadow: rgba(90, 118, 99, 1) 0 0 2px, rgba(90, 118, 99, 1) 0 0 5px, rgba(90, 118, 99, 1) 0 0 10px,
-		rgba(90, 118, 99, 1) 0 0 10px, rgba(90, 118, 99, 1) 0 0 20px, rgba(90, 118, 99, 1) 0 0 20px,
+	text-shadow:
+		rgba(90, 118, 99, 1) 0 0 2px,
+		rgba(90, 118, 99, 1) 0 0 5px,
+		rgba(90, 118, 99, 1) 0 0 10px,
+		rgba(90, 118, 99, 1) 0 0 10px,
+		rgba(90, 118, 99, 1) 0 0 20px,
+		rgba(90, 118, 99, 1) 0 0 20px,
 		black 0 0 1px;
 }
 div[data-nature="kamim"],
 span[data-nature="kamim"] {
-	text-shadow: rgba(90, 118, 99, 1) 0 0 2px, rgba(90, 118, 99, 1) 0 0 5px, rgba(90, 118, 99, 1) 0 0 5px,
-		rgba(90, 118, 99, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(90, 118, 99, 1) 0 0 2px,
+		rgba(90, 118, 99, 1) 0 0 5px,
+		rgba(90, 118, 99, 1) 0 0 5px,
+		rgba(90, 118, 99, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="kamimm"],
 span[data-nature="kamimm"] {
-	text-shadow: rgba(90, 118, 99, 1) 0 0 2px, rgba(90, 118, 99, 1) 0 0 2px, rgba(90, 118, 99, 1) 0 0 2px,
-		rgba(90, 118, 99, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(90, 118, 99, 1) 0 0 2px,
+		rgba(90, 118, 99, 1) 0 0 2px,
+		rgba(90, 118, 99, 1) 0 0 2px,
+		rgba(90, 118, 99, 1) 0 0 2px,
+		black 0 0 1px;
 }
 
 .player .identity[data-color="fan"],
@@ -4117,26 +4311,44 @@ div[data-nature="fan"],
 span[data-nature="fan"],
 div[data-nature="wood"],
 span[data-nature="wood"] {
-	text-shadow: rgba(57, 123, 4, 1) 0 0 2px, rgba(57, 123, 4, 1) 0 0 5px, rgba(57, 123, 4, 1) 0 0 10px,
-		rgba(57, 123, 4, 1) 0 0 10px, rgba(57, 123, 4, 1) 0 0 20px, rgba(57, 123, 4, 1) 0 0 20px,
+	text-shadow:
+		rgba(57, 123, 4, 1) 0 0 2px,
+		rgba(57, 123, 4, 1) 0 0 5px,
+		rgba(57, 123, 4, 1) 0 0 10px,
+		rgba(57, 123, 4, 1) 0 0 10px,
+		rgba(57, 123, 4, 1) 0 0 20px,
+		rgba(57, 123, 4, 1) 0 0 20px,
 		black 0 0 1px;
 }
 div[data-nature="woodm"],
 span[data-nature="woodm"] {
-	text-shadow: rgba(57, 123, 4, 1) 0 0 2px, rgba(57, 123, 4, 1) 0 0 5px, rgba(57, 123, 4, 1) 0 0 5px,
-		rgba(57, 123, 4, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(57, 123, 4, 1) 0 0 2px,
+		rgba(57, 123, 4, 1) 0 0 5px,
+		rgba(57, 123, 4, 1) 0 0 5px,
+		rgba(57, 123, 4, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="woodmm"],
 span[data-nature="woodmm"] {
-	text-shadow: rgba(57, 123, 4, 1) 0 0 2px, rgba(57, 123, 4, 1) 0 0 2px, rgba(57, 123, 4, 1) 0 0 2px,
-		rgba(57, 123, 4, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(57, 123, 4, 1) 0 0 2px,
+		rgba(57, 123, 4, 1) 0 0 2px,
+		rgba(57, 123, 4, 1) 0 0 2px,
+		rgba(57, 123, 4, 1) 0 0 2px,
+		black 0 0 1px;
 }
 .player .identity[data-color="commoner"],
 div[data-nature="commoner"],
 span[data-nature="commoner"] {
-	text-shadow: rgb(135, 135, 135, 1) 0 0 2px, rgba(135, 135, 135, 1) 0 0 5px,
-		rgba(135, 135, 135, 1) 0 0 10px, rgba(135, 135, 135, 1) 0 0 10px, rgba(135, 135, 135, 1) 0 0 20px,
-		rgba(135, 135, 135, 1) 0 0 20px, black 0 0 1px;
+	text-shadow:
+		rgb(135, 135, 135, 1) 0 0 2px,
+		rgba(135, 135, 135, 1) 0 0 5px,
+		rgba(135, 135, 135, 1) 0 0 10px,
+		rgba(135, 135, 135, 1) 0 0 10px,
+		rgba(135, 135, 135, 1) 0 0 20px,
+		rgba(135, 135, 135, 1) 0 0 20px,
+		black 0 0 1px;
 }
 
 .player .identity[data-color="cai"],
@@ -4151,107 +4363,194 @@ div[data-nature="friend"],
 span[data-nature="friend"],
 div[data-nature="water"],
 span[data-nature="water"] {
-	text-shadow: rgba(78, 117, 140, 1) 0 0 2px, rgba(78, 117, 140, 1) 0 0 5px, rgba(78, 117, 140, 1) 0 0 10px,
-		rgba(78, 117, 140, 1) 0 0 10px, rgba(78, 117, 140, 1) 0 0 20px, rgba(78, 117, 140, 1) 0 0 20px,
+	text-shadow:
+		rgba(78, 117, 140, 1) 0 0 2px,
+		rgba(78, 117, 140, 1) 0 0 5px,
+		rgba(78, 117, 140, 1) 0 0 10px,
+		rgba(78, 117, 140, 1) 0 0 10px,
+		rgba(78, 117, 140, 1) 0 0 20px,
+		rgba(78, 117, 140, 1) 0 0 20px,
 		black 0 0 1px;
 }
 div[data-nature="waterm"],
 span[data-nature="waterm"] {
-	text-shadow: rgba(78, 117, 140, 1) 0 0 2px, rgba(78, 117, 140, 1) 0 0 5px, rgba(78, 117, 140, 1) 0 0 5px,
-		rgba(78, 117, 140, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(78, 117, 140, 1) 0 0 2px,
+		rgba(78, 117, 140, 1) 0 0 5px,
+		rgba(78, 117, 140, 1) 0 0 5px,
+		rgba(78, 117, 140, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="watermm"],
 span[data-nature="watermm"] {
-	text-shadow: rgba(78, 117, 140, 1) 0 0 2px, rgba(78, 117, 140, 1) 0 0 2px, rgba(78, 117, 140, 1) 0 0 2px,
-		rgba(78, 117, 140, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(78, 117, 140, 1) 0 0 2px,
+		rgba(78, 117, 140, 1) 0 0 2px,
+		rgba(78, 117, 140, 1) 0 0 2px,
+		rgba(78, 117, 140, 1) 0 0 2px,
+		black 0 0 1px;
 }
 div[data-nature="watermx"],
 span[data-nature="watermx"] {
-	text-shadow: rgba(0, 0, 0, 0.4) 0 0 1px, rgba(20, 83, 140, 1) 0 0 2px, rgba(20, 83, 140, 1) 0 0 2px,
-		rgba(20, 83, 140, 1) 0 0 5px, rgba(20, 83, 140, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 1px,
+		rgba(20, 83, 140, 1) 0 0 2px,
+		rgba(20, 83, 140, 1) 0 0 2px,
+		rgba(20, 83, 140, 1) 0 0 5px,
+		rgba(20, 83, 140, 1) 0 0 5px,
+		black 0 0 1px;
 }
 
 .player .identity[data-color="shu"],
 div[data-nature="soil"],
 span[data-nature="soil"] {
-	text-shadow: rgba(128, 59, 2, 1) 0 0 2px, rgba(128, 59, 2, 1) 0 0 5px, rgba(128, 59, 2, 1) 0 0 10px,
-		rgba(128, 59, 2, 1) 0 0 10px, rgba(128, 59, 2, 1) 0 0 20px, rgba(128, 59, 2, 1) 0 0 20px,
+	text-shadow:
+		rgba(128, 59, 2, 1) 0 0 2px,
+		rgba(128, 59, 2, 1) 0 0 5px,
+		rgba(128, 59, 2, 1) 0 0 10px,
+		rgba(128, 59, 2, 1) 0 0 10px,
+		rgba(128, 59, 2, 1) 0 0 20px,
+		rgba(128, 59, 2, 1) 0 0 20px,
 		black 0 0 1px;
 }
 div[data-nature="soilm"],
 span[data-nature="soilm"] {
-	text-shadow: rgba(128, 59, 2, 1) 0 0 2px, rgba(128, 59, 2, 1) 0 0 5px, rgba(128, 59, 2, 1) 0 0 5px,
-		rgba(128, 59, 2, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(128, 59, 2, 1) 0 0 2px,
+		rgba(128, 59, 2, 1) 0 0 5px,
+		rgba(128, 59, 2, 1) 0 0 5px,
+		rgba(128, 59, 2, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="soilmm"],
 span[data-nature="soilmm"] {
-	text-shadow: rgba(128, 59, 2, 1) 0 0 2px, rgba(128, 59, 2, 1) 0 0 2px, rgba(128, 59, 2, 1) 0 0 2px,
-		rgba(128, 59, 2, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(128, 59, 2, 1) 0 0 2px,
+		rgba(128, 59, 2, 1) 0 0 2px,
+		rgba(128, 59, 2, 1) 0 0 2px,
+		rgba(128, 59, 2, 1) 0 0 2px,
+		black 0 0 1px;
 }
 div[data-nature="soilmx"],
 span[data-nature="soilmx"] {
-	text-shadow: rgba(0, 0, 0, 0.4) 0 0 1px, rgba(128, 59, 2, 1) 0 0 2px, rgba(128, 59, 2, 1) 0 0 2px,
-		rgba(128, 59, 2, 1) 0 0 5px, rgba(128, 59, 2, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 1px,
+		rgba(128, 59, 2, 1) 0 0 2px,
+		rgba(128, 59, 2, 1) 0 0 2px,
+		rgba(128, 59, 2, 1) 0 0 5px,
+		rgba(128, 59, 2, 1) 0 0 5px,
+		black 0 0 1px;
 }
 
 div[data-nature="gray"],
 span[data-nature="gray"] {
-	text-shadow: rgba(213, 194, 179, 1) 0 0 2px, rgba(213, 194, 179, 1) 0 0 5px,
-		rgba(213, 194, 179, 1) 0 0 10px, rgba(213, 194, 179, 1) 0 0 10px, rgba(213, 194, 179, 1) 0 0 20px,
-		rgba(213, 194, 179, 1) 0 0 20px, black 0 0 1px;
+	text-shadow:
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		rgba(213, 194, 179, 1) 0 0 10px,
+		rgba(213, 194, 179, 1) 0 0 10px,
+		rgba(213, 194, 179, 1) 0 0 20px,
+		rgba(213, 194, 179, 1) 0 0 20px,
+		black 0 0 1px;
 }
 div[data-nature="graym"],
 span[data-nature="graym"] {
-	text-shadow: rgba(213, 194, 179, 1) 0 0 2px, rgba(213, 194, 179, 1) 0 0 5px,
-		rgba(213, 194, 179, 1) 0 0 5px, rgba(213, 194, 179, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="graymm"],
 span[data-nature="graymm"] {
-	text-shadow: rgba(213, 194, 179, 1) 0 0 2px, rgba(213, 194, 179, 1) 0 0 2px,
-		rgba(213, 194, 179, 1) 0 0 2px, rgba(213, 194, 179, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 2px,
+		black 0 0 1px;
 }
 div[data-nature="graymx"],
 span[data-nature="graymx"] {
-	text-shadow: black 0 0 1px, rgba(213, 194, 179, 0.2) 0 0 2px, rgba(213, 194, 179, 1) 0 0 2px,
-		rgba(213, 194, 179, 1) 0 0 5px, rgba(213, 194, 179, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(213, 194, 179, 0.2) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		black 0 0 1px;
 }
 
 div[data-nature="ice"],
 span[data-nature="ice"] {
-	text-shadow: rgba(213, 194, 179, 1) 0 0 2px, rgba(213, 194, 179, 1) 0 0 5px,
-		rgba(213, 194, 179, 1) 0 0 10px, rgba(213, 194, 179, 1) 0 0 10px, rgba(213, 194, 179, 1) 0 0 20px,
-		rgba(213, 194, 179, 1) 0 0 20px, black 0 0 1px;
+	text-shadow:
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		rgba(213, 194, 179, 1) 0 0 10px,
+		rgba(213, 194, 179, 1) 0 0 10px,
+		rgba(213, 194, 179, 1) 0 0 20px,
+		rgba(213, 194, 179, 1) 0 0 20px,
+		black 0 0 1px;
 }
 div[data-nature="icem"],
 span[data-nature="icem"] {
-	text-shadow: rgba(213, 194, 179, 1) 0 0 2px, rgba(213, 194, 179, 1) 0 0 5px,
-		rgba(213, 194, 179, 1) 0 0 5px, rgba(213, 194, 179, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="icemm"],
 span[data-nature="icemm"] {
-	text-shadow: rgba(213, 194, 179, 1) 0 0 2px, rgba(213, 194, 179, 1) 0 0 2px,
-		rgba(213, 194, 179, 1) 0 0 2px, rgba(213, 194, 179, 1) 0 0 2px, black 0 0 1px;
+	text-shadow:
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 2px,
+		black 0 0 1px;
 }
 div[data-nature="icemx"],
 span[data-nature="icemx"] {
-	text-shadow: black 0 0 1px, rgba(213, 194, 179, 0.2) 0 0 2px, rgba(213, 194, 179, 1) 0 0 2px,
-		rgba(213, 194, 179, 1) 0 0 5px, rgba(213, 194, 179, 1) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(213, 194, 179, 0.2) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 2px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		rgba(213, 194, 179, 1) 0 0 5px,
+		black 0 0 1px;
 }
 
 .player .identity[data-color="unknownx"],
 div[data-nature="black"],
 span[data-nature="black"] {
-	text-shadow: rgba(0, 0, 0, 0.5) 0 0 2px, rgba(0, 0, 0, 0.5) 0 0 5px, rgba(0, 0, 0, 0.5) 0 0 10px,
-		rgba(0, 0, 0, 0.5) 0 0 10px, rgba(0, 0, 0, 0.5) 0 0 20px, rgba(0, 0, 0, 0.5) 0 0 20px, black 0 0 1px;
+	text-shadow:
+		rgba(0, 0, 0, 0.5) 0 0 2px,
+		rgba(0, 0, 0, 0.5) 0 0 5px,
+		rgba(0, 0, 0, 0.5) 0 0 10px,
+		rgba(0, 0, 0, 0.5) 0 0 10px,
+		rgba(0, 0, 0, 0.5) 0 0 20px,
+		rgba(0, 0, 0, 0.5) 0 0 20px,
+		black 0 0 1px;
 }
 div[data-color="unknownm"],
 span[data-color="unknownm"] {
-	text-shadow: rgba(0, 0, 0, 0.5) 0 0 2px, rgba(0, 0, 0, 0.2) 0 0 5px, rgba(0, 0, 0, 0.2) 0 0 5px,
-		rgba(0, 0, 0, 0.2) 0 0 5px, black 0 0 1px;
+	text-shadow:
+		rgba(0, 0, 0, 0.5) 0 0 2px,
+		rgba(0, 0, 0, 0.2) 0 0 5px,
+		rgba(0, 0, 0, 0.2) 0 0 5px,
+		rgba(0, 0, 0, 0.2) 0 0 5px,
+		black 0 0 1px;
 }
 div[data-nature="unknown"] {
-	text-shadow: rgba(0, 0, 0, 0.2) 0 0 2px, rgba(0, 0, 0, 0.2) 0 0 5px, rgba(0, 0, 0, 0.2) 0 0 10px,
-		rgba(0, 0, 0, 0.2) 0 0 10px, rgba(0, 0, 0, 0.2) 0 0 20px, rgba(0, 0, 0, 0.2) 0 0 20px,
+	text-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 2px,
+		rgba(0, 0, 0, 0.2) 0 0 5px,
+		rgba(0, 0, 0, 0.2) 0 0 10px,
+		rgba(0, 0, 0, 0.2) 0 0 10px,
+		rgba(0, 0, 0, 0.2) 0 0 20px,
+		rgba(0, 0, 0, 0.2) 0 0 20px,
 		rgba(0, 0, 0, 0.6) 0 0 1px;
 }
 
@@ -4439,7 +4738,9 @@ div[data-decoration="bronze"]::after {
 }
 .card.fullskin.gold > .name {
 	color: white;
-	text-shadow: black 0 0 1px, rgba(0, 0, 0, 0.5) 0 0 1px;
+	text-shadow:
+		black 0 0 1px,
+		rgba(0, 0, 0, 0.5) 0 0 1px;
 	background: rgba(234, 158, 0, 0.6);
 	border: 1px solid rgb(134, 87, 1);
 	box-shadow: rgba(255, 149, 0, 0.4) 0 0 10px inset;
@@ -4468,7 +4769,9 @@ div[data-decoration="bronze"]::after {
 	width: 100%;
 	border: 1px solid white;
 	border-radius: 12px;
-	box-shadow: black 0 0 2px, black 0 0 1px inset;
+	box-shadow:
+		black 0 0 2px,
+		black 0 0 1px inset;
 	margin: auto;
 	overflow: hidden;
 	transition-property: none;
@@ -4536,7 +4839,9 @@ div[data-decoration="bronze"]::after {
 	z-index: 1;
 }
 #arena > .skillbar > .skillbarfill > div {
-	box-shadow: 0px 0px 10px #555 inset, rgba(0, 0, 0, 0.05) 0 0 0 1px;
+	box-shadow:
+		0px 0px 10px #555 inset,
+		rgba(0, 0, 0, 0.05) 0 0 0 1px;
 	width: 200%;
 	height: 200%;
 	position: absolute;
@@ -4707,7 +5012,9 @@ div[data-decoration="bronze"]::after {
 }
 .tempname.tempimage:not([data-nature]) {
 	color: black !important;
-	text-shadow: white 0 0 2px, white 0 0 3px;
+	text-shadow:
+		white 0 0 2px,
+		white 0 0 3px;
 }
 .tempname.tempimage > div {
 	width: 100%;
@@ -4818,15 +5125,24 @@ div[data-decoration="bronze"]::after {
 
 .selected:not(.tdnodes):not(.text):not(.player):not(.card):not(.button),
 .selectedx {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(255, 0, 0, 0.4) 0 0 5px, rgba(255, 0, 0, 0.4) 0 0 12px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(255, 0, 0, 0.4) 0 0 5px,
+		rgba(255, 0, 0, 0.4) 0 0 12px,
 		rgba(255, 0, 0, 0.8) 0 0 15px !important;
 }
 
 #me .card.selected::after {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgb(255, 0, 0) 0 0 5px, rgba(255, 0, 0, 1) 0 0 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgb(255, 0, 0) 0 0 5px,
+		rgba(255, 0, 0, 1) 0 0 10px;
 }
 #me .card.glow::before {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgb(0, 133, 255) 0 0 5px, rgba(0, 133, 255, 1) 0 0 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgb(0, 133, 255) 0 0 5px,
+		rgba(0, 133, 255, 1) 0 0 10px;
 }
 
 #me > #handcards1:not(.scrollh),
@@ -4842,36 +5158,61 @@ div[data-decoration="bronze"]::after {
 
 #me .card.glows {
 	opacity: 1;
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgb(255, 153, 51) 0 0 5px, rgba(255, 153, 51, 1) 0 0 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgb(255, 153, 51) 0 0 5px,
+		rgba(255, 153, 51, 1) 0 0 10px;
 }
 .glow:not(.button):not(.card) {
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 133, 255, 0.4) 0 0 5px, rgba(0, 133, 255, 0.5) 0 0 12px,
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 133, 255, 0.4) 0 0 5px,
+		rgba(0, 133, 255, 0.5) 0 0 12px,
 		rgba(0, 133, 255, 0.8) 0 0 15px !important;
 }
 .glow2:not(.player.glow_phase) > .avatar {
 	/*-webkit-animation:control_glow 4s infinite;*/
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(10, 155, 67, 1) 0 0 15px,
+		rgba(10, 155, 67, 1) 0 0 15px !important;
 }
 .glow3 {
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 10px, rgba(0, 133, 255, 0) 0 0 40px,
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(0, 133, 255, 0.8) 0 0 10px,
+		rgba(0, 133, 255, 0) 0 0 40px,
 		rgba(0, 133, 255, 0.8) 0 0 60px !important;
 }
 .selectedx3 {
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(255, 0, 0, 0.8) 0 0 10px, rgba(255, 0, 0, 0) 0 0 40px,
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(255, 0, 0, 0.8) 0 0 10px,
+		rgba(255, 0, 0, 0) 0 0 40px,
 		rgba(255, 0, 0, 0.8) 0 0 60px !important;
 }
 .glow4 {
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(0, 133, 255, 0.8) 0 0 10px, rgba(0, 133, 255, 0) 0 0 40px,
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(0, 133, 255, 0.8) 0 0 10px,
+		rgba(0, 133, 255, 0) 0 0 40px,
 		rgba(0, 133, 255, 0.8) 0 0 40px !important;
 }
 .selectedx4 {
-	box-shadow: rgba(0, 0, 0, 0.4) 0 0 0 1px, rgba(255, 0, 0, 0.6) 0 0 10px, rgba(255, 0, 0, 0) 0 0 40px,
+	box-shadow:
+		rgba(0, 0, 0, 0.4) 0 0 0 1px,
+		rgba(255, 0, 0, 0.6) 0 0 10px,
+		rgba(255, 0, 0, 0) 0 0 40px,
 		rgba(255, 0, 0, 0.8) 0 0 40px !important;
 }
 .player:not(.glow_phase) > .avatar.glow2,
 .button.glow2:not(.selected) {
-	box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 5px, rgba(10, 155, 67, 1) 0 0 5px,
-		rgba(10, 155, 67, 1) 0 0 10px, rgba(10, 155, 67, 1) 0 0 10px !important;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 0 0 1px,
+		rgba(10, 155, 67, 1) 0 0 5px,
+		rgba(10, 155, 67, 1) 0 0 5px,
+		rgba(10, 155, 67, 1) 0 0 10px,
+		rgba(10, 155, 67, 1) 0 0 10px !important;
 }
 
 .control.blue {
@@ -5134,16 +5475,28 @@ div[data-decoration="bronze"]::after {
 /*--------动画--------*/
 @keyframes shadow_thunder {
 	0% {
-		box-shadow: rgba(0, 0, 0, 1) 0 0 1px, rgba(0, 0, 0, 0.1) 0 0 40px, rgba(100, 74, 139, 0.5) 0 0 60px,
-			rgba(100, 74, 139, 0.5) 0 0 100px, black 0 0 1px;
+		box-shadow:
+			rgba(0, 0, 0, 1) 0 0 1px,
+			rgba(0, 0, 0, 0.1) 0 0 40px,
+			rgba(100, 74, 139, 0.5) 0 0 60px,
+			rgba(100, 74, 139, 0.5) 0 0 100px,
+			black 0 0 1px;
 	}
 	50% {
-		box-shadow: rgba(0, 0, 0, 1) 0 0 1px, rgba(0, 0, 0, 0.3) 0 0 40px, rgba(100, 74, 139, 1) 0 0 60px,
-			rgba(100, 74, 139, 1) 0 0 100px, black 0 0 1px;
+		box-shadow:
+			rgba(0, 0, 0, 1) 0 0 1px,
+			rgba(0, 0, 0, 0.3) 0 0 40px,
+			rgba(100, 74, 139, 1) 0 0 60px,
+			rgba(100, 74, 139, 1) 0 0 100px,
+			black 0 0 1px;
 	}
 	100% {
-		box-shadow: rgba(0, 0, 0, 1) 0 0 1px, rgba(0, 0, 0, 0.1) 0 0 40px, rgba(100, 74, 139, 0.5) 0 0 60px,
-			rgba(100, 74, 139, 0.5) 0 0 100px, black 0 0 1px;
+		box-shadow:
+			rgba(0, 0, 0, 1) 0 0 1px,
+			rgba(0, 0, 0, 0.1) 0 0 40px,
+			rgba(100, 74, 139, 0.5) 0 0 60px,
+			rgba(100, 74, 139, 0.5) 0 0 100px,
+			black 0 0 1px;
 	}
 }
 @keyframes cardeffect {
@@ -5171,38 +5524,58 @@ div[data-decoration="bronze"]::after {
 }
 @keyframes control_glow {
 	0% {
-		box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+		box-shadow:
+			rgba(0, 0, 0, 0.2) 0 0 0 1px,
+			rgba(0, 0, 0, 0.45) 0 3px 10px;
 	}
 
 	30% {
-		box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px;
+		box-shadow:
+			rgba(0, 0, 0, 0.3) 0 0 0 1px,
+			rgba(10, 155, 67, 1) 0 0 15px,
+			rgba(10, 155, 67, 1) 0 0 15px;
 	}
 
 	70% {
-		box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px;
+		box-shadow:
+			rgba(0, 0, 0, 0.3) 0 0 0 1px,
+			rgba(10, 155, 67, 1) 0 0 15px,
+			rgba(10, 155, 67, 1) 0 0 15px;
 	}
 
 	100% {
-		box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+		box-shadow:
+			rgba(0, 0, 0, 0.2) 0 0 0 1px,
+			rgba(0, 0, 0, 0.45) 0 3px 10px;
 	}
 	/*from{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;}
 	to{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px !important}*/
 }
 @-webkit-keyframes control_glow {
 	0% {
-		box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+		box-shadow:
+			rgba(0, 0, 0, 0.2) 0 0 0 1px,
+			rgba(0, 0, 0, 0.45) 0 3px 10px;
 	}
 
 	30% {
-		box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px;
+		box-shadow:
+			rgba(0, 0, 0, 0.3) 0 0 0 1px,
+			rgba(10, 155, 67, 1) 0 0 15px,
+			rgba(10, 155, 67, 1) 0 0 15px;
 	}
 
 	70% {
-		box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px;
+		box-shadow:
+			rgba(0, 0, 0, 0.3) 0 0 0 1px,
+			rgba(10, 155, 67, 1) 0 0 15px,
+			rgba(10, 155, 67, 1) 0 0 15px;
 	}
 
 	100% {
-		box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+		box-shadow:
+			rgba(0, 0, 0, 0.2) 0 0 0 1px,
+			rgba(0, 0, 0, 0.45) 0 3px 10px;
 	}
 	/*from{box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;}
 	to{box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px !important}*/

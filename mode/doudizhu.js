@@ -24,7 +24,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			} else if (!_status.connectMode) {
 				game.prepareArena(3);
 			}
-			"step 1";
+			("step 1");
 			event.replacePile = function () {
 				var map = {
 					shuiyanqijunx: "shuiyanqijuny",
@@ -67,7 +67,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				lib.inpile.addArray(["nanman", "wanjian", "taoyuan", "wugu"]);
 				game.fixedPile = true;
 			}
-			"step 2";
+			("step 2");
 			if (_status.connectMode) {
 				if (_status.mode == "online") {
 					lib.card.list = lib.online_cardPile.slice(0);
@@ -84,7 +84,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				}
 				game.chooseCharacter();
 			}
-			"step 3";
+			("step 3");
 			if (ui.coin) {
 				_status.coinCoeff = get.coinCoeff([game.me.name]);
 			}
@@ -370,7 +370,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					game.no_continue_game = true;
 					lib.init.onfree();
-					"step 1";
+					("step 1");
 					ui.arena.classList.add("choose-character");
 					var i;
 					var groups = [];
@@ -412,7 +412,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.start = game.players.randomGet();
 					event.current = event.start;
 					game.delay(7);
-					"step 2";
+					("step 2");
 					event.current.classList.add("glow_phase");
 					if (event.current == game.me) event.dialog.content.firstChild.innerHTML = "是否叫地主？";
 					else {
@@ -422,7 +422,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.current.chooseControl(event.controls).set("ai", function () {
 						return _status.event.getParent().controls.randomGet();
 					});
-					"step 3";
+					("step 3");
 					event.current.classList.remove("glow_phase");
 					event.current._control = result.control;
 					event.current.chat(result.control);
@@ -446,7 +446,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else event.goto(2);
 					if (event.current == event.start.previous && !event.tempDizhu)
 						event.controls.remove("不叫地主");
-					"step 4";
+					("step 4");
 					game.updateRoundNumber();
 					for (var player of game.players) {
 						player.identity = player == game.zhu ? "zhu" : "fan";
@@ -459,7 +459,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						.set("filterButton", function (button) {
 							return typeof button.link == "string";
 						});
-					"step 5";
+					("step 5");
 					game.me.init(result.links[0], result.links[1]);
 					for (var player of game.players) {
 						if (player != game.me) {
@@ -488,7 +488,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					game.no_continue_game = true;
 					lib.init.onfree();
-					"step 1";
+					("step 1");
 					ui.arena.classList.add("choose-character");
 					game.zhuSkill = "zhuSkill_" + ["xiangyang", "jiangling", "fancheng"].randomGet();
 					var i;
@@ -511,7 +511,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.start = game.players.randomGet();
 					event.current = event.start;
 					game.delay(8);
-					"step 2";
+					("step 2");
 					event.current.classList.add("glow_phase");
 					if (event.current == game.me) event.dialog.content.firstChild.innerHTML = "是否叫地主？";
 					else {
@@ -521,7 +521,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.current.chooseControl(event.controls).set("ai", function () {
 						return _status.event.getParent().controls.randomGet();
 					});
-					"step 3";
+					("step 3");
 					event.current.classList.remove("glow_phase");
 					event.current._control = result.control;
 					event.current.chat(result.control);
@@ -540,14 +540,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else event.goto(2);
 					if (event.current == event.start.previous && !event.tempDizhu)
 						event.controls.remove("不叫地主");
-					"step 4";
+					("step 4");
 					for (var player of game.players) {
 						player.identity = player == game.zhu ? "zhu" : "fan";
 						player.showIdentity();
 					}
 					event.dialog.close();
 					event.map[game.zhu.playerid].addArray(event.list.randomRemove(3));
-					"step 5";
+					("step 5");
 					var list = ["请选择你的武将", [event.map[game.me.playerid], "character"]];
 					if (game.me.identity == "fan") {
 						var friend = game.findPlayer(function (current) {
@@ -562,7 +562,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						.set("filterButton", function (button) {
 							return _status.event.list.includes(button.link);
 						});
-					"step 6";
+					("step 6");
 					game.me.init(result.links[0]);
 					for (var player of game.players) {
 						if (player != game.me) player.init(event.map[player.playerid].randomGet());
@@ -628,14 +628,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.current = event.start;
 					lib.init.onfree();
 					game.delay(2.5);
-					"step 1";
+					("step 1");
 					event.current.chooseControl(event.controls).set("ai", function () {
 						return Math.random() > 0.5 ? "不叫" : "叫地主";
 					});
 					if (event.current == game.me) {
 						event.dialog.content.childNodes[0].innerHTML = "是否抢地主？";
 					}
-					"step 2";
+					("step 2");
 					event.current.chat(result.control);
 					if (result.control == "叫地主" || event.current == event.start.next) {
 						game.zhu = result.control == "叫地主" ? event.current : event.current.next;
@@ -650,12 +650,12 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						event.goto(1);
 						game.delay(1.5);
 					}
-					"step 3";
+					("step 3");
 					game.me.chooseButton(
 						["请选择你的武将", [event.map[game.me.playerid], "character"]],
 						true
 					);
-					"step 4";
+					("step 4");
 					game.me.init(result.links[0]);
 					for (var player of game.players) {
 						if (player != game.me) player.init(event.map[player.playerid].randomGet());
@@ -738,7 +738,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						.set("filterButton", function (button) {
 							return _status.event.player._characterChoice.includes(button.link);
 						});
-					"step 1";
+					("step 1");
 					game.me.init(result.links[0]);
 					for (var i = 0; i < game.players.length; i++) {
 						if (game.players[i] != game.me)
@@ -1130,7 +1130,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (!ui.cheat && get.config("change_choice")) ui.create.cheat();
 						if (!ui.cheat2 && get.config("free_choose")) ui.create.cheat2();
 					}
-					"step 1";
+					("step 1");
 					if (ui.cheat) {
 						ui.cheat.close();
 						delete ui.cheat;
@@ -1160,7 +1160,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 						game.addRecentCharacter(result.buttons[0].link);
 					}
-					"step 2";
+					("step 2");
 					if (event.chosen.length) {
 						game.me.init(event.chosen[0], event.chosen[1]);
 					} else if (event.modchosen) {
@@ -1191,7 +1191,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							);
 						}
 					}
-					"step 3";
+					("step 3");
 					for (var i = 0; i < game.players.length; i++) {
 						_status.characterlist.remove(game.players[i].name1);
 						_status.characterlist.remove(game.players[i].name2);
@@ -1264,7 +1264,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							lib.playerOL[i]._characterChoice = map[i];
 						}
 					}, map);
-					"step 1";
+					("step 1");
 					var list = [];
 					for (var i = 0; i < game.players.length; i++) {
 						var dialog = ["请选择武将", [game.players[i]._characterChoice, "character"]];
@@ -1287,7 +1287,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.me.chooseButtonOL(list, function (player, result) {
 						if (game.online || player == game.me) player.init(result.links[0]);
 					});
-					"step 2";
+					("step 2");
 					for (var i in lib.playerOL) {
 						if (!result[i] || result[i] == "ai" || !result[i].links || !result[i].links.length) {
 							result[i] = lib.playerOL[i]._characterChoice.randomGet();
@@ -1392,11 +1392,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.start = game.players.randomGet();
 					event.current = event.start;
 					if (event.current != game.me || !event.current.isOnline()) game.delay(3);
-					"step 1";
+					("step 1");
 					event.current.chooseControl(event.controls).set("ai", function () {
 						return Math.random() > 0.5 ? "不叫" : "叫地主";
 					});
-					"step 2";
+					("step 2");
 					event.current.chat(result.control);
 					if (result.control == "叫地主" || event.current == event.start.next) {
 						game.zhu = result.control == "叫地主" ? event.current : event.current.next;
@@ -1411,7 +1411,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						event.current = event.current.next;
 						event.goto(1);
 					}
-					"step 3";
+					("step 3");
 					var list = [];
 					var str = "选择角色";
 					for (var i = 0; i < game.players.length; i++) {
@@ -1424,7 +1424,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.me.chooseButtonOL(list, function (player, result) {
 						if (game.online || player == game.me) player.init(result.links[0], result.links[1]);
 					});
-					"step 4";
+					("step 4");
 					for (var i in result) {
 						if (result[i] && result[i].links) {
 							for (var j = 0; j < result[i].links.length; j++) {
@@ -1523,7 +1523,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						game.zhuSkill
 					);
 					game.delay(6);
-					"step 1";
+					("step 1");
 					game.broadcastAll(
 						function (id, current) {
 							var dialog = get.idDialog(id);
@@ -1539,7 +1539,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.current.chooseControl(event.controls).set("ai", function () {
 						return _status.event.getParent().controls.randomGet();
 					});
-					"step 2";
+					("step 2");
 					event.current._control = result.control;
 					event.current.chat(result.control);
 					if (result.control == "三倍") {
@@ -1557,7 +1557,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else event.goto(1);
 					if (event.current == event.start.previous && !event.tempDizhu)
 						event.controls.remove("不叫地主");
-					"step 3";
+					("step 3");
 					for (var player of game.players) {
 						player.identity = player == game.zhu ? "zhu" : "fan";
 						player.showIdentity();
@@ -1599,7 +1599,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.me.chooseButtonOL(list, function (player, result) {
 						if (game.online || player == game.me) player.init(result.links[0]);
 					});
-					"step 4";
+					("step 4");
 					for (var i in lib.playerOL) {
 						if (!result[i] || result[i] == "ai" || !result[i].links || !result[i].links.length) {
 							result[i] = event.map[i].randomGet();
@@ -1715,7 +1715,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						event.videoId
 					);
 					game.delay(4);
-					"step 1";
+					("step 1");
 					game.broadcastAll(
 						function (id, current) {
 							var dialog = get.idDialog(id);
@@ -1731,7 +1731,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.current.chooseControl(event.controls).set("ai", function () {
 						return _status.event.getParent().controls.randomGet();
 					});
-					"step 2";
+					("step 2");
 					event.current._control = result.control;
 					event.current.chat(result.control);
 					if (result.control == "三倍") {
@@ -1754,7 +1754,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else event.goto(1);
 					if (event.current == event.start.previous && !event.tempDizhu)
 						event.controls.remove("不叫地主");
-					"step 3";
+					("step 3");
 					for (var player of game.players) {
 						player.identity = player == game.zhu ? "zhu" : "fan";
 						player.showIdentity();
@@ -1776,7 +1776,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.me.chooseButtonOL(list, function (player, result) {
 						if (game.online || player == game.me) player.init(result.links[0], result.links[1]);
 					});
-					"step 4";
+					("step 4");
 					for (var i in result) {
 						if (result[i] == "ai") {
 							result[i] = event.map[i].randomRemove(lib.playerOL[i] == game.zhu ? 2 : 1);
@@ -1885,7 +1885,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						list4.push(i);
 					}
 					_status.characterlist = list4;
-					"step 1";
+					("step 1");
 					var list = [];
 					var selectButton = lib.configOL.double_character ? 2 : 1;
 
@@ -1914,7 +1914,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.me.chooseButtonOL(list, function (player, result) {
 						if (game.online || player == game.me) player.init(result.links[0], result.links[1]);
 					});
-					"step 2";
+					("step 2");
 					for (var i in result) {
 						if (result[i] && result[i].links) {
 							for (var j = 0; j < result[i].links.length; j++) {
@@ -2153,7 +2153,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					player
 						.chooseControl("摸牌阶段", "出牌阶段", "cancel2")
 						.set("prompt", "襄阳：是否执行一个额外的阶段？");
-					"step 1";
+					("step 1");
 					if (result.control != "cancel2") {
 						player.logSkill(event.name);
 						var next = player[result.index ? "phaseUse" : "phaseDraw"]();
@@ -2172,7 +2172,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						.chooseControl("加目标", "多刀", "取消")
 						.set("prompt", get.prompt2("zhuSkill_jiangling"))
 						.set("ai", () => 3 - game.countPlayer());
-					"step 1";
+					("step 1");
 					if (result.index < 2) {
 						player.logSkill("zhuSkill_jiangling");
 						player.addTempSkill("zhuSkill_jiangling" + result.index, "phaseUseAfter");
@@ -2227,14 +2227,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						})
 						.set("targets", trigger.targets)
 						.set("card", trigger.card);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						if (!event.isMine() && !event.isOnline()) game.delayx();
 						event.targets = result.targets;
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (event.targets) {
 						player.logSkill("zhuSkill_jiangling", event.targets);
 						if (trigger.targets.includes(event.targets[0]))
@@ -2267,7 +2267,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						.chooseControl("杀", "其他")
 						.set("prompt", "选择要强化的伤害")
 						.set("ai", () => get.rand(0, 1));
-					"step 1";
+					("step 1");
 					player.addSkill("zhuSkill_fancheng" + result.index);
 					game.log(player, "本局游戏内", result.index ? "#g杀以外" : "#y杀", "的伤害+1");
 				},
@@ -2356,7 +2356,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					event.targets = lib.skill.toushiche_skill.logTarget(null, player).sortBySeat();
-					"step 1";
+					("step 1");
 					var target = targets.shift();
 					if (target.countCards("h") > 0) target.chooseToDiscard("h", true);
 					if (targets.length) event.redo();
@@ -2507,7 +2507,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					player.gainPlayerCard(target, [1, 2], "he", true);
 					target.storage.kaihei = true;
-					"step 1";
+					("step 1");
 					if (!result.bool || !result.cards.length) {
 						event.finish();
 						return;
@@ -2524,7 +2524,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								"选择交给" + get.translation(target) + get.cnNumber(num) + "张牌"
 							);
 					} else event.finish();
-					"step 2";
+					("step 2");
 					if (result.bool && result.cards && result.cards.length) player.give(result.cards, target);
 				},
 				ai: {
@@ -2591,7 +2591,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								}, "j");
 							})()
 						);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.discardPlayerCard(player, "j", true);
 					}
@@ -2737,12 +2737,12 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						"_juzhong",
 						trigger.player,
 					];
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						lib.skill.online_juzhong.infos[trigger.card.name][1]();
 						if (!event.goon) event.finish();
 					} else event.finish();
-					"step 2";
+					("step 2");
 					trigger.player
 						.chooseTarget("你可选择一名角色，弃置其的一张牌", function (card, player, target) {
 							return target.countDiscardableCards(player, "he") > 0;
@@ -2751,7 +2751,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							var player = _status.event.player;
 							return get.effect(target, { name: "guohe_copy2" }, player, player);
 						});
-					"step 3";
+					("step 3");
 					if (result.bool) {
 						var target = result.targets[0];
 						trigger.player.line(target, "green");
@@ -2982,7 +2982,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							next.nouse = true;
 						}
 					};
-					"step 1";
+					("step 1");
 					var list = game.filterPlayer(function (current) {
 						return current.hasCard(function (card) {
 							if (get.name(card) != "zhadan") return false;
@@ -2997,7 +2997,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							get.distance(event.source, b, "absolute")
 						);
 					});
-					"step 2";
+					("step 2");
 					if (event.list.length == 0) {
 						event.finish();
 					} else if (
@@ -3016,7 +3016,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							trigger.parent.id
 						);
 					}
-					"step 3";
+					("step 3");
 					if (result.bool) {
 						event.zhadanresult = event.current;
 						event.zhadanresult2 = result;
@@ -3025,7 +3025,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					} else {
 						event.goto(2);
 					}
-					"step 4";
+					("step 4");
 					var id = event.id;
 					var sendback = function (result, player) {
 						if (result && result.id == id && !event.zhadanresult && result.bool) {
@@ -3098,21 +3098,21 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 					event.withol = withol;
-					"step 5";
+					("step 5");
 					if (result && result.bool && !event.zhadanresult) {
 						game.broadcast("cancel", event.id);
 						event.zhadanresult = game.me;
 						event.zhadanresult2 = result;
 					}
-					"step 6";
+					("step 6");
 					if (event.withol && !event.resultOL) {
 						game.pause();
 					}
-					"step 7";
+					("step 7");
 					for (var i = 0; i < game.players.length; i++) {
 						game.players[i].hideTimer();
 					}
-					"step 8";
+					("step 8");
 					if (event.zhadanresult) {
 						event.zhadanresult.$fullscreenpop("炸弹", get.groupnature(event.zhadanresult));
 						var next = event.zhadanresult.useResult(event.zhadanresult2);
@@ -3167,7 +3167,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								var evt = _status.event.getParent();
 								return get.attitude(evt.player, evt.target) > 0 ? 0 : 1;
 							});
-					"step 1";
+					("step 1");
 					if (result.index + event.addIndex == 0) {
 						target.drawTo(event.num1);
 					} else target.chooseToDiscard(true, "h", target.countCards("h") - event.num2);
@@ -3265,7 +3265,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								return "discard_card";
 							});
 					} else event.finish();
-					"step 1";
+					("step 1");
 					if (result.control == "discard_card") {
 						player.discard(
 							player.getCards("e", function (card) {
@@ -3399,7 +3399,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						else if (discard) event._result = { index: 0 };
 						else event.finish();
 					} else event.finish();
-					"step 1";
+					("step 1");
 					var cards = player.getCards("h");
 					if (result.index == 0) {
 						player.discard(cards);
@@ -3427,7 +3427,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								});
 						} else event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (result.bool)
 						player.chooseUseTarget({ name: result.links[0][2] }, player.getCards("h"), true);
 				},

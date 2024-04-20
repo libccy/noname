@@ -38,20 +38,14 @@
 			this.room = room;
 			delete this.status;
 			if (room.owner) {
-				if (
-					room.servermode &&
-					!room.owner._onconfig &&
-					config &&
-					mode
-				) {
+				if (room.servermode && !room.owner._onconfig && config && mode) {
 					room.owner.sendl("createroom", index, config, mode);
 					room.owner._onconfig = this;
 					room.owner.nickname = util.getNickname(nickname);
 					room.owner.avatar = avatar;
 				} else if (
 					!room.config ||
-					(room.config.gameStarted &&
-						(!room.config.observe || !room.config.observeReady))
+					(room.config.gameStarted && (!room.config.observe || !room.config.observeReady))
 				) {
 					this.sendl("enterroomfailed");
 				} else {
@@ -108,11 +102,7 @@
 			delete this.keyCheck;
 		},
 		events: function (cfg, id, type) {
-			if (
-				bannedKeys.indexOf(id) != -1 ||
-				typeof id != "string" ||
-				this.onlineKey != id
-			) {
+			if (bannedKeys.indexOf(id) != -1 || typeof id != "string" || this.onlineKey != id) {
 				bannedIps.push(this._socket.remoteAddress);
 				console.log(id, this._socket.remoteAddress);
 				this.close();
@@ -230,9 +220,7 @@
 			}
 		},
 		getid: function () {
-			return Math.floor(
-				1000000000 + 9000000000 * Math.random()
-			).toString();
+			return Math.floor(1000000000 + 9000000000 * Math.random()).toString();
 		},
 		getroomlist: function () {
 			var roomlist = [];
@@ -331,13 +319,7 @@
 		}, 2000);
 		ws.wsid = util.getid();
 		clients[ws.wsid] = ws;
-		ws.sendl(
-			"roomlist",
-			util.getroomlist(),
-			util.checkevents(),
-			util.getclientlist(ws),
-			ws.wsid
-		);
+		ws.sendl("roomlist", util.getroomlist(), util.checkevents(), util.getclientlist(ws), ws.wsid);
 		ws.heartbeat = setInterval(function () {
 			if (ws.beat) {
 				ws.close();

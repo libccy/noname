@@ -354,13 +354,13 @@ export class Library {
 														return ai - get.value(cardx);
 													} else if (get.attitude(player, source) <= 0) return 0;
 													return 5 - get.value(cardx);
-											  },
+												},
 								});
 								if (!game.online) return;
 								_status.event._resultid = id;
 								game.resume();
 							};
-							"step 1";
+							("step 1");
 							var type = get.type2(card);
 							event.list = game
 								.filterPlayer(
@@ -372,7 +372,7 @@ export class Library {
 								)
 								.sortBySeat(_status.currentPhase || player);
 							event.id = get.id();
-							"step 2";
+							("step 2");
 							if (!event.list.length) event.finish();
 							else if (
 								_status.connectMode &&
@@ -389,14 +389,14 @@ export class Library {
 									trigger.parent.id,
 									trigger.yingbianZhuzhanAI
 								);
-							"step 3";
+							("step 3");
 							if (result.bool) {
 								event.zhuzhanresult = event.current;
 								event.zhuzhanresult2 = result;
 								if (event.current != game.me) game.delayx();
 								event.goto(8);
 							} else event.goto(2);
-							"step 4";
+							("step 4");
 							var id = event.id,
 								sendback = (result, player) => {
 									if (result && result.id == id && !event.zhuzhanresult && result.bool) {
@@ -460,16 +460,16 @@ export class Library {
 									if (value != player) value.showTimer();
 								});
 							event.withol = withol;
-							"step 5";
+							("step 5");
 							if (!result || !result.bool || event.zhuzhanresult) return;
 							game.broadcast("cancel", event.id);
 							event.zhuzhanresult = game.me;
 							event.zhuzhanresult2 = result;
-							"step 6";
+							("step 6");
 							if (event.withol && !event.resultOL) game.pause();
-							"step 7";
+							("step 7");
 							game.players.forEach((value) => value.hideTimer());
-							"step 8";
+							("step 8");
 							if (event.zhuzhanresult) {
 								var target = event.zhuzhanresult;
 								target.line(player, "green");
@@ -8487,7 +8487,7 @@ export class Library {
 					for (const content of item) {
 						yield content;
 					}
-			  })()
+				})()
 			: Promise.resolve(item);
 	}
 	gnc = {
@@ -11270,7 +11270,7 @@ export class Library {
 								storage: {
 									stratagem_buffed: 1,
 								},
-						  })
+							})
 						: new lib.element.VCard();
 				}
 				return null;
@@ -12529,7 +12529,7 @@ export class Library {
 				"step 0";
 				event.dying = trigger.player;
 				if (!event.acted) event.acted = [];
-				"step 1";
+				("step 1");
 				if (trigger.player.isDead()) {
 					event.finish();
 					return;
@@ -12600,7 +12600,7 @@ export class Library {
 				} else {
 					event._result = { bool: false };
 				}
-				"step 2";
+				("step 2");
 				if (result.bool) {
 					var player = trigger.player;
 					if (
@@ -12707,7 +12707,7 @@ export class Library {
 			content: function () {
 				"step 0";
 				event.logvid = trigger.getLogv();
-				"step 1";
+				("step 1");
 				event.targets = game.filterPlayer(function (current) {
 					return current != event.player && current.isLinked();
 				});
@@ -12717,7 +12717,7 @@ export class Library {
 				event._args = [trigger.num, trigger.nature, trigger.cards, trigger.card];
 				if (trigger.source) event._args.push(trigger.source);
 				else event._args.push("nosource");
-				"step 2";
+				("step 2");
 				if (event.targets.length) {
 					var target = event.targets.shift();
 					if (target.isLinked()) target.damage.apply(target, event._args.slice(0));

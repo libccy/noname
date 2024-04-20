@@ -73,7 +73,7 @@ game.import("character", function () {
 					player.judge(function (card) {
 						return get.color(card) == "red" ? 1 : 0;
 					});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.draw();
 					}
@@ -224,7 +224,7 @@ game.import("character", function () {
 					}).ai = function (target) {
 						return -get.attitude(player, target);
 					};
-					"step 1";
+					("step 1");
 					if (result.targets && result.targets.length) {
 						player.logSkill("qiangzheng", result.targets);
 						player.gain(result.targets[0].getCards("h").randomGet(), result.targets[0]);
@@ -254,7 +254,7 @@ game.import("character", function () {
 					event.targets.remove(player);
 					event.targets.sort(lib.sort.seat);
 					if (player.isLinked()) player.link();
-					"step 1";
+					("step 1");
 					if (event.targets.length) {
 						var target = event.targets.shift();
 						if (!target.isLinked()) {
@@ -289,7 +289,7 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					target.damage();
-					"step 1";
+					("step 1");
 					player.recover();
 				},
 				ai: {

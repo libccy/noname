@@ -32,15 +32,8 @@ var get = function (dir, callback) {
 					var url = dir + "/" + filename;
 					var stat = fs.statSync(url);
 					if (stat.isFile()) {
-						if (
-							[".jpg", ".png", ".mp3", ".ttf"].indexOf(
-								path.extname(url)
-							) != -1
-						) {
-							var assetentry = path.relative(
-								path.dirname(__dirname),
-								url
-							);
+						if ([".jpg", ".png", ".mp3", ".ttf"].indexOf(path.extname(url)) != -1) {
+							var assetentry = path.relative(path.dirname(__dirname), url);
 							assetlist += ",\n\t'" + assetentry + "'";
 							entrylist.push(assetentry);
 						}
@@ -51,10 +44,7 @@ var get = function (dir, callback) {
 								for (var i = 0; i < list.length; i++) {
 									var url2 = url + "/" + list[i];
 									var stat = fs.statSync(url2);
-									if (
-										stat.isFile() &&
-										path.extname(url2) == ".jpg"
-									) {
+									if (stat.isFile() && path.extname(url2) == ".jpg") {
 										num++;
 									}
 								}
@@ -108,8 +98,7 @@ get(path.dirname(__dirname), function () {
 	}
 	var next = function () {
 		exec("git diff --name-only", (error, stdout, stderr) => {
-			var updatelist =
-				"window.noname_update={\n\tversion:'" + updates.version + "',";
+			var updatelist = "window.noname_update={\n\tversion:'" + updates.version + "',";
 			updatelist += "\n\tupdate:'" + (updates.update || "") + "',";
 			var apply = function (name, list) {
 				updatelist += "\n\t" + name + ":[\n";
@@ -162,30 +151,20 @@ get(path.dirname(__dirname), function () {
 				return 0;
 			});
 			apply("files", files);
-			fs.writeFile(
-				"game/update.js",
-				updatelist + "\n};",
-				"utf-8",
-				function () {
-					console.log("updated update.js");
-					if (commit && typeof commit === "string") {
-						exec("git add . && git commit -am " + commit);
-						console.log("committed " + commit);
-					}
+			fs.writeFile("game/update.js", updatelist + "\n};", "utf-8", function () {
+				console.log("updated update.js");
+				if (commit && typeof commit === "string") {
+					exec("git add . && git commit -am " + commit);
+					console.log("committed " + commit);
 				}
-			);
+			});
 		});
 	};
 	if (diff) {
-		var assetversion =
-			"window.noname_asset_list=[\n\t'" + updates.version + "'";
+		var assetversion = "window.noname_asset_list=[\n\t'" + updates.version + "'";
 		fs.writeFile(
 			"game/asset.js",
-			assetversion +
-				assetlist +
-				"\n];\n" +
-				skinlist.slice(0, skinlist.length - 2) +
-				"\n};",
+			assetversion + assetlist + "\n];\n" + skinlist.slice(0, skinlist.length - 2) + "\n};",
 			"utf-8",
 			function () {
 				console.log("udpated asset.js");

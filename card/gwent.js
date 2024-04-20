@@ -121,7 +121,7 @@ game.import("card", function () {
 						})
 						.sortBySeat();
 					event.targets.remove(player);
-					"step 1";
+					("step 1");
 					if (event.targets.length) {
 						var target = event.targets.shift();
 						var ej = target.getCards("ej");
@@ -181,14 +181,14 @@ game.import("card", function () {
 						target.damage("fire");
 						game.delay();
 					}
-					"step 1";
+					("step 1");
 					event.targets = game
 						.filterPlayer(function (current) {
 							return current.isMaxHp();
 						})
 						.sortBySeat();
 					player.line(event.targets, "fire");
-					"step 2";
+					("step 2");
 					if (event.targets.length) {
 						var target = event.targets.shift();
 						player.line(target, "fire");
@@ -324,7 +324,7 @@ game.import("card", function () {
 					"step 0";
 					var enemies = player.getEnemies();
 					event.list = [enemies.randomGet()];
-					"step 1";
+					("step 1");
 					if (event.list.length) {
 						var target = event.list.shift();
 						event.target = target;
@@ -333,7 +333,7 @@ game.import("card", function () {
 					} else {
 						delete event.target;
 					}
-					"step 2";
+					("step 2");
 					if (event.target) {
 						if (!event.target.isTurnedOver()) {
 							event.target.turnOver();
@@ -341,7 +341,7 @@ game.import("card", function () {
 						}
 						event.goto(1);
 					}
-					"step 3";
+					("step 3");
 					game.delay();
 				},
 				contentAfter: function () {
@@ -489,7 +489,7 @@ game.import("card", function () {
 							return -get.rank(button.link, true);
 						}
 					};
-					"step 1";
+					("step 1");
 					event.nametarget = result.links[0];
 					player.chooseTarget(
 						true,
@@ -504,14 +504,14 @@ game.import("card", function () {
 							return 0;
 						}
 					};
-					"step 2";
+					("step 2");
 					var target = result.targets[0];
 					var hp = target.hp;
 					target.reinit(target.name, event.nametarget);
 					target.hp = Math.min(hp + 1, target.maxHp);
 					target.update();
 					player.line(target, "green");
-					"step 3";
+					("step 3");
 					game.triggerEnter(target);
 				},
 				contentAfter: function () {
@@ -640,7 +640,7 @@ game.import("card", function () {
 					"step 0";
 					event.num = 0;
 					event.targets = game.filterPlayer().sortBySeat();
-					"step 1";
+					("step 1");
 					if (event.num < targets.length) {
 						ui.clear();
 						var target = targets[event.num];
@@ -651,7 +651,7 @@ game.import("card", function () {
 						event.redo();
 						game.delay(0.7);
 					}
-					"step 2";
+					("step 2");
 					ui.clear();
 				},
 				contentAfter: function () {
@@ -690,7 +690,7 @@ game.import("card", function () {
 					"step 0";
 					event.num = 0;
 					event.targets = game.filterPlayer().sortBySeat();
-					"step 1";
+					("step 1");
 					if (event.num < targets.length) {
 						ui.clear();
 						var target = targets[event.num];
@@ -698,7 +698,7 @@ game.import("card", function () {
 						event.num++;
 						event.redo();
 					}
-					"step 2";
+					("step 2");
 					ui.clear();
 				},
 				contentAfter: function () {
@@ -770,7 +770,7 @@ game.import("card", function () {
 							return Math.random();
 						};
 					}
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.gain(game.createCard(result.links[0][2]), "draw");
 					}
@@ -863,7 +863,7 @@ game.import("card", function () {
 					event.hs = player.getCards("h");
 					event.es = player.getCards("e");
 					player.discard(event.hs.concat(event.es));
-					"step 1";
+					("step 1");
 					var hs2 = [];
 					for (var i = 0; i < event.hs.length; i++) {
 						var type = get.type(event.hs[i], "trick");
@@ -888,7 +888,7 @@ game.import("card", function () {
 					if (hs2.length) {
 						player.gain(hs2, "draw");
 					}
-					"step 2";
+					("step 2");
 					var es2 = [];
 					for (var i = 0; i < event.es.length; i++) {
 						var subtype = get.subtype(event.es[i]);
@@ -911,7 +911,7 @@ game.import("card", function () {
 							player.equip(es2[i]);
 						}
 					}
-					"step 3";
+					("step 3");
 					player.tempHide();
 				},
 				contentAfter: function () {
@@ -944,7 +944,7 @@ game.import("card", function () {
 					target.lose(cards, ui.special);
 					target.storage.gw_youer = cards;
 					target.addSkill("gw_youer");
-					"step 1";
+					("step 1");
 					player.draw();
 				},
 				ai: {
@@ -979,7 +979,7 @@ game.import("card", function () {
 					player.gainPlayerCard(target, "h", true, "visible").set("ai", function (button) {
 						return get.value(button.link);
 					});
-					"step 1";
+					("step 1");
 					target.gain(game.createCard("sha"), "gain2");
 				},
 				ai: {
@@ -1094,12 +1094,12 @@ game.import("card", function () {
 					}).filterButton = function (button) {
 						return !target.hasJudge(button.link[2]);
 					};
-					"step 1";
+					("step 1");
 					var card = game.createCard(result.links[0][2]);
 					event.judgecard = card;
 					target.$draw(card);
 					game.delay(0.7);
-					"step 2";
+					("step 2");
 					target.addJudge(event.judgecard);
 				},
 				ai: {
@@ -1190,7 +1190,7 @@ game.import("card", function () {
 					"step 0";
 					event.num = game.countPlayer();
 					player.draw(event.num);
-					"step 1";
+					("step 1");
 					player.chooseToDiscard(true, event.num, "he");
 				},
 				ai: {
@@ -1329,7 +1329,7 @@ game.import("card", function () {
 						}
 						return true;
 					};
-					"step 1";
+					("step 1");
 					player.chooseUseTarget(
 						true,
 						game.createCard(result.links[0][2], get.suit(card), get.number(card))
@@ -1548,7 +1548,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					target.chooseToDiscard("h", 2, true).delay = false;
-					"step 1";
+					("step 1");
 					target.draw();
 				},
 				ai: {
@@ -1587,7 +1587,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					target.loseMaxHp(true);
-					"step 1";
+					("step 1");
 					if (target.isDamaged() && target.countCards("h") < target.maxHp) {
 						event.goto(0);
 					}
@@ -1651,7 +1651,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					target.damage("thunder");
-					"step 1";
+					("step 1");
 					if (target.isIn()) {
 						target.draw();
 					}
@@ -1702,7 +1702,7 @@ game.import("card", function () {
 					} else {
 						event.directfalse = true;
 					}
-					"step 1";
+					("step 1");
 					if (!event.directfalse && result.index == 0) {
 						player.chooseTarget(
 							true,
@@ -1725,9 +1725,9 @@ game.import("card", function () {
 						}
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					event.list = result.targets.slice(0).sortBySeat();
-					"step 3";
+					("step 3");
 					if (event.list.length) {
 						var target = event.list.shift();
 						player.line(target, "green");
@@ -2184,7 +2184,7 @@ game.import("card", function () {
 					} else {
 						event.num = 1;
 					}
-					"step 1";
+					("step 1");
 					if (event.num) {
 						var max = 0;
 						var maxp = null;
@@ -2214,7 +2214,7 @@ game.import("card", function () {
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					event.num--;
 					event.goto(1);
 					game.delay();

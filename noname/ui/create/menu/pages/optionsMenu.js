@@ -667,24 +667,24 @@ export const optionsMenu = function (connectMenu) {
 																	filename,
 																	{ create: true },
 																	function (fileEntry) {
-																		fileEntry.createWriter(function (
-																			fileWriter
-																		) {
-																			fileWriter.onwriteend = writeFile;
-																			fileWriter.onerror = function (
-																				e
-																			) {
-																				game.print(
-																					"Write failed: " +
-																						e.toString()
+																		fileEntry.createWriter(
+																			function (fileWriter) {
+																				fileWriter.onwriteend =
+																					writeFile;
+																				fileWriter.onerror =
+																					function (e) {
+																						game.print(
+																							"Write failed: " +
+																								e.toString()
+																						);
+																					};
+																				fileWriter.write(
+																					zip.files[
+																						dir + "/" + filename
+																					].asArrayBuffer()
 																				);
-																			};
-																			fileWriter.write(
-																				zip.files[
-																					dir + "/" + filename
-																				].asArrayBuffer()
-																			);
-																		});
+																			}
+																		);
 																	}
 																);
 															} else {

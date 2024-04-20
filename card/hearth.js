@@ -11,7 +11,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					target.damage("fire");
-					"step 1";
+					("step 1");
 					var hs = player.getCards("h");
 					if (hs.length) {
 						player.discard(hs.randomGet());
@@ -78,15 +78,15 @@ game.import("card", function () {
 					} else {
 						event.goto(2);
 					}
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						game.delay(0.5);
 					}
-					"step 2";
+					("step 2");
 					target.draw(false);
 					target.$draw();
 					game.delay(0.5);
-					"step 3";
+					("step 3");
 					player.draw();
 				},
 				ai: {
@@ -166,7 +166,7 @@ game.import("card", function () {
 						}
 					}
 					event.cards = cards;
-					"step 1";
+					("step 1");
 					if (event.cards.length) {
 						target.equip(event.cards.shift());
 						game.delay(0.5);
@@ -174,9 +174,9 @@ game.import("card", function () {
 							event.redo();
 						}
 					}
-					"step 2";
+					("step 2");
 					game.delay(0.5);
-					"step 3";
+					("step 3");
 					if (target.countCards("he")) {
 						target.chooseToDiscard("he", true);
 					}
@@ -215,7 +215,7 @@ game.import("card", function () {
 						if (rand) return Math.random();
 						return get.value(card);
 					};
-					"step 1";
+					("step 1");
 					event.dialog = ui.create.dialog(
 						get.translation(target.name) + "展示的手牌",
 						result.cards
@@ -240,7 +240,7 @@ game.import("card", function () {
 						}
 					).prompt = false;
 					game.delay(2);
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						target.damage("thunder");
 					} else {
@@ -346,7 +346,7 @@ game.import("card", function () {
 					if (hs.length) {
 						target.discard(hs.randomGet());
 					}
-					"step 1";
+					("step 1");
 					if (!target.countCards("h")) {
 						player.draw();
 					}
@@ -377,7 +377,7 @@ game.import("card", function () {
 					"step 0";
 					target.changeHujia();
 					target.draw();
-					"step 1";
+					("step 1");
 					if (target.countCards("he")) {
 						target.chooseToDiscard("he", true);
 					}
@@ -429,7 +429,7 @@ game.import("card", function () {
 						// }
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					if (result.bool && !target.hasSkill("chuansongmen3")) {
 						if (target.hasSkill("chuansongmen2")) {
 							target.addTempSkill("chuansongmen3");
@@ -471,7 +471,7 @@ game.import("card", function () {
 					if (event.num % 2 == 0) {
 						event.num--;
 					}
-					"step 1";
+					("step 1");
 					if (event.num) {
 						var enemies = event.current.getEnemies();
 						enemies.remove(player);
@@ -555,7 +555,7 @@ game.import("card", function () {
 						target.lose(cards)._triggered = null;
 					}
 					event.num = 1 + cards.length;
-					"step 1";
+					("step 1");
 					var cards = [];
 					var list = get.typeCard("basic");
 					list.remove("du");
@@ -593,7 +593,7 @@ game.import("card", function () {
 					target.judge(function (card) {
 						return get.color(card) == "red" ? 1 : 0;
 					});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						target.recover();
 					} else {
@@ -646,7 +646,7 @@ game.import("card", function () {
 						}
 						return 8 - get.value(card);
 					};
-					"step 1";
+					("step 1");
 					if (!result.bool || result.cards.length < 2) {
 						if (result.bool) target.damage(2 - result.cards.length, "thunder");
 						else target.damage(2, "thunder");

@@ -27,7 +27,9 @@
 	z-index: 1;
 	border-radius: 16px !important;
 	overflow: hidden;
-	box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.2) 0 0 0 1px,
+		rgba(0, 0, 0, 0.45) 0 3px 10px;
 }
 .storyscene > .scene > .background.player {
 	border-radius: 0 !important;
@@ -40,7 +42,9 @@
 }
 .storyscene > .scene.unselectable {
 	opacity: 1 !important;
-	box-shadow: rgba(0, 0, 0, 0.1) 0 0 0 1px, rgba(0, 0, 0, 0.225) 0 3px 10px;
+	box-shadow:
+		rgba(0, 0, 0, 0.1) 0 0 0 1px,
+		rgba(0, 0, 0, 0.225) 0 3px 10px;
 }
 .storyscene > .scene.unselectable > .background {
 	opacity: 0.3;

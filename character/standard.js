@@ -280,7 +280,7 @@ game.import("character", function () {
 					evt.targets.push(player);
 				},
 				ai: {
-					neg: true
+					neg: true,
 				},
 			},
 			hujia: {

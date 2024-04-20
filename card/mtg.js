@@ -19,7 +19,7 @@ game.import("card", function () {
 					if (card) {
 						player.gain(card, "draw");
 					}
-					"step 1";
+					("step 1");
 					player
 						.chooseToDiscard("he", [1, Infinity], { suit: "heart" }, "林地溪流")
 						.set("ai", function (card) {
@@ -29,12 +29,12 @@ game.import("card", function () {
 							"prompt2",
 							"弃置任意张红桃牌，每弃置一张牌，将一张延时锦囊牌置入一名随机敌方角色的判定区"
 						);
-					"step 2";
+					("step 2");
 					if (result.bool) {
 						event.num = result.cards.length;
 						event.targets = player.getEnemies();
 					}
-					"step 3";
+					("step 3");
 					if (event.num && event.targets && event.targets.length) {
 						var target = event.targets.randomGet();
 						var list = get.inpile("delay");
@@ -83,7 +83,7 @@ game.import("card", function () {
 							if (player.hasShan()) return 0;
 							return 1;
 						});
-					"step 1";
+					("step 1");
 					if (result.control == "获得杀") {
 						player.gain(game.createCard("sha"), "gain2");
 					} else {
@@ -147,7 +147,7 @@ game.import("card", function () {
 							return _status.event.controls.randomGet("轩辕剑（卡牌包）");
 						})
 						.set("prompt", "选择一个扩展包获得其中一张衍生牌");
-					"step 1";
+					("step 1");
 					if (result.control && event.map[result.control]) {
 						player.gain(game.createCard(event.map[result.control].randomGet()), "draw");
 					}
@@ -178,7 +178,7 @@ game.import("card", function () {
 						"nogain",
 						"选择一个武器装备之"
 					);
-					"step 1";
+					("step 1");
 					if (result.choice) {
 						player.equip(game.createCard(result.choice), true);
 					}
@@ -252,13 +252,13 @@ game.import("card", function () {
 							})
 							.set("prompt2", "弃置一张牌并回复1点体力，或取消并获得1点护甲");
 					}
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.recover();
 					} else {
 						player.changeHujia();
 					}
-					"step 2";
+					("step 2");
 					delete player._temp_mtg_haidao;
 				},
 				ai: {
@@ -288,7 +288,7 @@ game.import("card", function () {
 							if (!player.hasSha() || !player.hasShan() || player.hp == 1) return 0;
 							return 1;
 						});
-					"step 1";
+					("step 1");
 					if (result.control == "基本牌") {
 						player.gain(game.createCard(get.inpile("basic").randomGet()), "gain2");
 					} else {
@@ -321,7 +321,7 @@ game.import("card", function () {
 					} else {
 						event.finish();
 					}
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.draw(2);
 					}
@@ -398,7 +398,7 @@ game.import("card", function () {
 						if (target.hasSkillTag("nodu")) return 0;
 						return -get.attitude(_status.event.player, target) / Math.sqrt(target.hp + 1);
 					});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var target = result.targets[0];
 						player.line(target, "green");
@@ -439,7 +439,7 @@ game.import("card", function () {
 					"step 0";
 					game.changeLand("mtg_bingheyaosai", player);
 					player.draw(2);
-					"step 1";
+					("step 1");
 					player.chooseToDiscard("he", 2, true);
 				},
 				ai: {
@@ -668,7 +668,7 @@ game.import("card", function () {
 							return 8 - get.value(card);
 						})
 						.set("logSkill", "mtg_lindixiliu_skill");
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.discardPlayerCard(player, "j", true);
 					}

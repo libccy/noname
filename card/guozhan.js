@@ -158,7 +158,7 @@ game.import("card", function () {
 						next.set("oncard", function () {
 							_status.event.baseDamage++;
 						});
-					"step 1";
+					("step 1");
 					if (!result.bool) {
 						target.draw(target.identity == "shu" ? 2 : 1);
 					}
@@ -197,14 +197,14 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					target.draw(8);
-					"step 1";
+					("step 1");
 					target.chooseToDiscard("请弃置至少六张手牌", [6, target.countCards("h")], true, "h");
 					if (target.identity != "wu") event.finish();
-					"step 2";
+					("step 2");
 					if (!result.cards || !result.cards.length) event.finish();
 					event.give_cards = result.cards;
 					event.given_list = [];
-					"step 3";
+					("step 3");
 					event.give_cards = event.give_cards.filterInD("d");
 					if (
 						!event.give_cards.length ||
@@ -220,7 +220,7 @@ game.import("card", function () {
 					else {
 						target.chooseButton(["是否将弃置的牌交给其他吴势力角色？", event.give_cards], [1, 2]);
 					}
-					"step 4";
+					("step 4");
 					if (result.bool) {
 						event.cards2 = result.links;
 						target
@@ -237,7 +237,7 @@ game.import("card", function () {
 							)
 							.set("targets", event.given_list);
 					} else event.finish();
-					"step 5";
+					("step 5");
 					if (result.bool && result.targets && result.targets.length) {
 						var current = result.targets[0];
 						target.line(current, "green");
@@ -296,7 +296,7 @@ game.import("card", function () {
 					"step 0";
 					if (!target.countCards("h") || !player.isIn()) event.finish();
 					else target.showHandcards();
-					"step 1";
+					("step 1");
 					var str = get.translation(target);
 					player
 						.chooseControl()
@@ -322,7 +322,7 @@ game.import("card", function () {
 							if (hs.length === 2) return att > 0 ? 0 : 1;
 							return att > 0 ? 1 : 0;
 						});
-					"step 2";
+					("step 2");
 					if (result.index == 0) {
 						var list = [],
 							hs = target.getCards("h");
@@ -351,7 +351,7 @@ game.import("card", function () {
 					} else {
 						player.discardPlayerCard(target, "h", true, "visible");
 					}
-					"step 3";
+					("step 3");
 					if (
 						target.identity != "qun" ||
 						!result.bool ||
@@ -521,7 +521,7 @@ game.import("card", function () {
 					"step 0";
 					player.logSkill("taipingyaoshu");
 					player.draw(2);
-					"step 1";
+					("step 1");
 					if (player.hp > 1) player.loseHp();
 				},
 			},
@@ -644,7 +644,7 @@ game.import("card", function () {
 									get.translation(player) +
 									"造成的1点雷电伤害。"
 							);
-					"step 1";
+					("step 1");
 					if (result.control == "discard_card") {
 						target.discard(
 							target.getCards("e", function (card) {
@@ -856,7 +856,7 @@ game.import("card", function () {
 							target.draw();
 						}
 					}
-					"step 1";
+					("step 1");
 					if (target != player) target.link(false);
 					else if (typeof result.control == "string") {
 						var index = result.control.indexOf("回");
@@ -930,7 +930,7 @@ game.import("card", function () {
 						.chooseControl(lib.card.chiling.chooseai)
 						.set("prompt", "敕令")
 						.set("choiceList", choiceList);
-					"step 1";
+					("step 1");
 					var index = result.index;
 					if (event.nomingzhi) {
 						index++;
@@ -948,7 +948,7 @@ game.import("card", function () {
 						target.chooseToDiscard("he", { type: "equip" }, true);
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					if (result.index == 0) {
 						target.showCharacter(0);
 					} else {
@@ -1207,7 +1207,7 @@ game.import("card", function () {
 						});
 					}
 					if (controls.length == 0) event.finish();
-					"step 1";
+					("step 1");
 					var content;
 					var str = get.translation(target) + "的";
 					if (result.control) {
@@ -1376,7 +1376,7 @@ game.import("card", function () {
 					var cards = player.getExpansions("zhaoshu_cards");
 					player.loseToDiscardpile(cards);
 					game.delayx();
-					"step 1";
+					("step 1");
 					var list = [
 						["spade", 12, "gz_haolingtianxia"],
 						["diamond", 1, "gz_kefuzhongyuan"],
@@ -1486,7 +1486,7 @@ game.import("card", function () {
 				content: function () {
 					"step 0";
 					target.addToExpansion(cards, player, "give").gaintag.add("zhaoshu_cards");
-					"step 1";
+					("step 1");
 					target.markSkill("zhaoshu_skill");
 				},
 				ai: {
@@ -1763,7 +1763,7 @@ game.import("card", function () {
 						event.directresult = list.randomGet();
 					}
 					event.list = list;
-					"step 1";
+					("step 1");
 					game.uncheck();
 					if (!event.directresult) {
 						if (event.resultOL) {
@@ -1935,7 +1935,7 @@ game.import("card", function () {
 						.set("ai", function (card) {
 							return 10 - get.value(card);
 						});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.insertPhase();
 					}
@@ -1957,7 +1957,7 @@ game.import("card", function () {
 					});
 					targets.sort(lib.sort.seat);
 					event.targets = targets;
-					"step 1";
+					("step 1");
 					if (event.targets.length) {
 						var target = event.targets.shift();
 						event.current = target;
@@ -1972,7 +1972,7 @@ game.import("card", function () {
 					} else {
 						event.finish();
 					}
-					"step 2";
+					("step 2");
 					var target = event.current;
 					if (result.control == "选项一") {
 						target
@@ -1987,7 +1987,7 @@ game.import("card", function () {
 						target.chooseToDiscard("he", { type: "equip" }, true);
 						event.goto(1);
 					}
-					"step 3";
+					("step 3");
 					var target = event.current;
 					if (result.index == 0) {
 						target.showCharacter(0);
@@ -2100,7 +2100,7 @@ game.import("card", function () {
 							prompt: get.prompt("sanjian"),
 						})
 						.set("damaged", damaged);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.logSkill("sanjian_skill", result.targets);
 						player.discard(result.cards);

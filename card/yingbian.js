@@ -222,7 +222,7 @@ game.import("card", function () {
 						return;
 					}
 					player.choosePlayerCard(target, "h", true);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						target.showCards(result.cards);
 						if (get.suit(card) != get.suit(result.cards[0])) target.damage();
@@ -417,7 +417,7 @@ game.import("card", function () {
 						.chooseControl(list)
 						.set("prompt", get.prompt("wuxinghelingshan_skill"))
 						.set("prompt2", "将" + get.translation(trigger.card) + "转换为以下属性之一");
-					"step 1";
+					("step 1");
 					if (result.control != "cancel2") {
 						player.logSkill("wuxinghelingshan_skill");
 						player.popup(get.translation(result.control) + "杀", result.control);
@@ -532,7 +532,7 @@ game.import("card", function () {
 						.set("ai", function (card) {
 							return 5 - get.value(card);
 						});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						player.logSkill("taigongyinfu_skill");
 						player.recast(result.cards);
@@ -566,7 +566,7 @@ game.import("card", function () {
 								_status.event.player
 							);
 						});
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var target = result.targets[0];
 						player.logSkill("taigongyinfu_link", target);
@@ -635,7 +635,7 @@ game.import("card", function () {
 						(event.num = 0) >= (event.yingbianConditions = get.complexYingbianConditions()).length
 					)
 						event.finish();
-					"step 1";
+					("step 1");
 					var yingbianCondition = event.yingbianConditions[num];
 					if (
 						event.temporaryYingbian.includes(yingbianCondition) ||
@@ -643,13 +643,13 @@ game.import("card", function () {
 					)
 						lib.yingbian.condition.complex.get(yingbianCondition)(trigger);
 					else event.goto(3);
-					"step 2";
+					("step 2");
 					if (result.bool) event.goto(4);
-					"step 3";
+					("step 3");
 					event.num++;
 					if (event.num < event.yingbianConditions.length) event.goto(1);
 					else event.finish();
-					"step 4";
+					("step 4");
 					trigger.card.yingbian = true;
 					var yingbianEffectExecuted = false;
 					lib.yingbian.effect.forEach((value, key) => {
@@ -715,14 +715,14 @@ game.import("card", function () {
 								return get.effect(target, card, player, player);
 							});
 					else event.goto(2);
-					"step 1";
+					("step 1");
 					if (result.bool) {
 						var target = result.targets[0];
 						player.line(target, "green");
 						game.log(player, "发动应变效果，令", target, "也成为了", trigger.card, "的目标");
 						trigger.targets.add(target);
 					}
-					"step 2";
+					("step 2");
 					if (trigger.yingbian_removeTarget && trigger.targets.length > 1)
 						player
 							.chooseTarget(
@@ -738,7 +738,7 @@ game.import("card", function () {
 								return -get.effect(target, card, player, player);
 							});
 					else event.finish();
-					"step 3";
+					("step 3");
 					if (result.bool) {
 						var target = result.targets[0];
 						player.line(target, "green");
