@@ -33,7 +33,7 @@ game.import("character", function () {
 		character: {
 			dc_shen_huatuo: ["male", "shen", 3, ["jingyu", "lvxin", "huandao"], ["qun"]],
 			shen_xuzhu: ["male", "shen", 5, ["zhengqing", "zhuangpo"], ["wei"]],
-			shen_lusu: ["male", "shen", 3, ["dingzhou", "tamo", "zhimeng"], ["wu"]],
+			shen_lusu: ["male", "shen", 3, ["tamo", "dingzhou", "zhimeng"], ["wu"]],
 			shen_huatuo: ["male", "shen", 3, ["wuling", "youyi"], ["qun"]],
 			le_shen_jiaxu: ["male", "shen", 4, ["jxlianpo", "jxzhaoluan"], ["qun"]],
 			shen_dianwei: ["male", "shen", 4, ["juanjia", "qiexie", "cuijue"], ["wei"]],
@@ -715,7 +715,7 @@ game.import("character", function () {
 								eff = ui.selected.cards
 									.map((card) => get.value(card))
 									.reduce((p, c) => p + c, 0);
-							if (player.hasSkill("zhimeng")) eff *= 1 + get.sgnAttitude(player, target) * 0.15;
+							if (player.hasSkill("zhimeng") && (get.mode() == 'identity' || (player.countCards('h') - target.countCards('h') > 2 * ui.selected.cards.length))) eff *= 1 + get.sgnAttitude(player, target) * 0.15;
 							const es = target.getCards("e"),
 								js = target.getCards("j");
 							es.forEach((card) => {
@@ -931,8 +931,7 @@ game.import("character", function () {
 				filter(event, player) {
 					return game.hasPlayer(target => {
 						if (target == player || target.countCards('h') + player.countCards('h') == 0) return false;
-						// return get.mode() == 'identity' || target.countCards('h') <= player.countCards('h') + 1;
-						return true;
+						return get.mode() == 'identity' || target.countCards('h') <= player.countCards('h') + 1;
 					});
 				},
 				direct: true,
@@ -945,8 +944,7 @@ game.import("character", function () {
 							"与一名其他角色平分手牌",
 							(card, player, target) => {
 								if (target == player || target.countCards('h') + player.countCards('h') == 0) return false;
-								// return get.mode() == 'identity' || target.countCards('h') <= player.countCards('h') + 1;
-								return true;
+								return get.mode() == 'identity' || target.countCards('h') <= player.countCards('h') + 1;
 							}
 						)
 						.set("ai", (target) => {
@@ -10845,14 +10843,16 @@ game.import("character", function () {
 			dingzhou_info:
 				"出牌阶段限一次。你可以将X张牌交给一名场上有牌的角色，然后你获得其场上的所有牌（X为其场上的牌数）。",
 			tamo: "榻谟",
-			tamo_info_doudizhu: "游戏开始时，你可以重新分配除三号位角色外所有角色的座次。",
 			tamo_info: "游戏开始时，你可以重新分配除主公外所有角色的座次。",
+			tamo_info_doudizhu: "游戏开始时，你可以重新分配除三号位角色外所有角色的座次。",
 			tamo_faq: "FAQ",
 			tamo_faq_info:
 				"<br><li>Q：在一号位不为主公的情况下，〖榻谟〗如何结算？</li><li>A：该角色可以正常进行座次交换。若受此技能影响导致一号位角色发生了变化，则以排列后的一号位角色为起始角色开始本局游戏。</li>",
 			zhimeng: "智盟",
-			zhimeng_info:
+			zhimeng_info_identity:
 				"回合结束后，你可以选择一名其他角色。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。",
+			zhimeng_info:
+				"回合结束后，你可以选择一名手牌数不大于Y的其他角色（Y为你的手牌数+1）。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。",
 			shen_xuzhu: "神许褚",
 			shen_xuzhu_prefix: "神",
 			zhengqing: "争擎",
