@@ -1536,38 +1536,26 @@ game.import("character", function () {
 						return evt && evt.hs && evt.hs.length && current.countCards("h") == 0;
 					});
 				},
-				direct: true,
-				async content(event, trigger, player) {
+				async cost(event, trigger, player) {
 					const targetx = _status.currentPhase;
 					const targets = game
 						.filterPlayer((current) => {
-							if (targetx && current == targetx) return false;
+							if (targetx && current == targetx || !current.isIn()) return false;
 							let evt = trigger.getl(current);
 							return evt && evt.hs && evt.hs.length && current.countCards("h") == 0;
 						})
 						.sortBySeat(targetx || player);
-					for (const target of targets) {
-						if (!target.isIn()) continue;
-						const {
-							result: { bool },
-						} = await player
-							.chooseBool(get.prompt2("dcshoucheng", target))
-							.set("choice", get.attitude(player, target) > 0);
-						if (bool) {
-							player.logSkill("dcshoucheng", target);
-							if (target != player) player.addExpose(0.2);
-							target.draw(2);
-						}
-					}
+					event.result = await player
+						.chooseTarget("是否对" + (targets.length > 1 ? "其中一名角色" : get.translation(targets[0])) + "发动【守成】？",
+							"令其摸两张牌")
+						.set("ai", target => get.attitude(get.event(player), target))
+						.forResult();
 				},
-				ai: {
-					threaten(player, target) {
-						return Math.sqrt(
-							game.countPlayer((i) => {
-								return get.attitude(target, i) > 0;
-							})
-						);
-					},
+				usable: 1,
+				async content(event, trigger, player) {
+					const target = event.targets[0];
+					if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.2);
+					target.draw(2);
 				},
 				subSkill: {
 					ai: {
@@ -16244,7 +16232,7 @@ game.import("character", function () {
 			dcshengxi: "生息",
 			dcshengxi_info: "弃牌阶段结束时，若你本回合未造成过伤害，你可以摸两张牌。",
 			dcshoucheng: "守成",
-			dcshoucheng_info: "一名角色于其回合外失去最后的手牌后，你可令其摸两张牌。",
+			dcshoucheng_info: "每回合限一次，当一名角色于其回合外失去手牌后，若其没有手牌，你可令其摸两张牌。",
 			dc_liuli: "刘理",
 			dcfuli: "抚黎",
 			dcfuli_info:

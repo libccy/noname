@@ -9722,9 +9722,9 @@ game.import("character", function () {
 					"step 1";
 					if (result.number < 7) {
 						var source = trigger.source;
-						if (source && source.isIn() && source.countCards("he") > 0) {
+						if (source && source.isIn() && source.countCards("h") > 0) {
 							player.line(source);
-							source.chooseToDiscard("he", true);
+							source.chooseToDiscard("h", true);
 						}
 					}
 				},
@@ -20724,7 +20724,7 @@ game.import("character", function () {
 			simafu: "司马孚",
 			xunde: "勋德",
 			xunde_info:
-				"一名角色受到伤害后，若你至其的距离不大于1，则你可判定。若判定结果：大于5，你令该角色获得判定牌；小于7，你令伤害来源弃置一张牌。",
+				"一名角色受到伤害后，若你至其的距离不大于1，则你可判定。若判定结果：大于5，你令该角色获得判定牌；小于7，你令伤害来源弃置一张手牌。",
 			chenjie: "臣节",
 			chenjie_info:
 				"一名角色的判定牌生效前，你可打出一张花色相同的牌。系统将你打出的牌作为新判定牌，将原判定牌置入弃牌堆。然后你摸两张牌。",
