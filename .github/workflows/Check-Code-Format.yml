@@ -2,30 +2,30 @@ name: Check-Code-Format
 
 # This action works with pull requests and pushes on the main branch
 on:
-    pull_request:
-        branches: [PR-Branch]
+  pull_request:
+    branches: [PR-Branch]
 
 jobs:
-    prettier:
-        name: Prettier Check
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout Repository
-              uses: actions/checkout@v2
+  prettier:
+    name: Prettier Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-            - name: Prettier Check
-              id: "prettier-run"
-              uses: rutajdash/prettier-cli-action@v1.0.2
-              with:
-                file_pattern: "**/*.{js,ts,mjs,vue,json,yml,md}"
-                config_path: "./prettier.config.mjs"
-                ignore_path: "./.prettierignore"
+      - name: Prettier Check
+        id: "prettier-run"
+        uses: rutajdash/prettier-cli-action@v1.0.2
+        with:
+          file_pattern: "**/*.{js,ts,mjs,vue,json,yml,md}"
+          config_path: "./prettier.config.mjs"
+          ignore_path: "./.prettierignore"
 
-            # This step only runs if prettier finds errors causing the previous step to fail
-            # This steps lists the files where errors were found
-            - name: Prettier Output
-              if: ${{ failure() }}
-              shell: bash
-              run: |
-                  echo "The following files are not formatted:"
-                  echo "${{steps.prettier-run.outputs.prettier_output}}"
+      # This step only runs if prettier finds errors causing the previous step to fail
+      # This steps lists the files where errors were found
+      - name: Prettier Output
+        if: ${{ failure() }}
+        shell: bash
+        run: |
+          echo "The following files are not formatted:"
+          echo "${{steps.prettier-run.outputs.prettier_output}}"
