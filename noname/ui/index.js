@@ -141,6 +141,9 @@ export class UI {
 	 */
 	toastQueue = [];
   
+	 * @type {HTMLDivElement}
+	 */
+	cardPile;
 	refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}
