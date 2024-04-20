@@ -916,23 +916,32 @@ export class Get {
 			"[object Date]": true,
 		};
 
-		if (typeof obj !== "object" || obj === null || !canTranverse[getType(obj)]) return obj;
+		if (
+			typeof obj !== "object" ||
+			obj === null ||
+			!canTranverse[getType(obj)]
+		)
+			return obj;
 
 		// @ts-ignore
 		if (map.has(obj)) return map.get(obj);
 
 		const constructor = obj.constructor;
 		// @ts-ignore
+		// 这四类数据处理单独处理
+		// （实际上需要处理的只有Map和Set）
+		// 除此之外的就只能祝愿有拷贝构造函数了
 		const target = constructor
-			? // 这四类数据处理单独处理
-			  // （实际上需要处理的只有Map和Set）
-			  // 除此之外的就只能祝愿有拷贝构造函数了
-			  Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object
+			? Array.isArray(obj) ||
+				obj instanceof Map ||
+				obj instanceof Set ||
+				constructor === Object
 				? // @ts-ignore
-				  new constructor()
-				: constructor.name in window && /\[native code\]/.test(constructor.toString())
+					new constructor()
+				: constructor.name in window &&
+					/\[native code\]/.test(constructor.toString())
 				? // @ts-ignore
-				  new constructor(obj)
+					new constructor(obj)
 				: obj
 			: Object.create(null);
 		if (target === obj) return target;
@@ -959,7 +968,11 @@ export class Get {
 				if (obj.hasOwnProperty(key)) {
 					const result = { enumerable, configurable };
 					if (descriptor.hasOwnProperty("value")) {
-						result.value = get.copy(descriptor.value, copyKeyDeep, map);
+						result.value = get.copy(
+							descriptor.value,
+							copyKeyDeep,
+							map
+						);
 						result.writable = descriptor.writable;
 					} else {
 						const { get, set } = descriptor;

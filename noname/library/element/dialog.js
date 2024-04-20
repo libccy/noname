@@ -5,6 +5,7 @@ import { ui } from "../../ui/index.js";
 
 export class Dialog extends HTMLDivElement {
 	/** @type { HTMLDivElement } */
+	// eslint-disable-next-line no-unreachable
 	contentContainer;
 	/** @type { HTMLDivElement } */
 	content;
@@ -51,7 +52,8 @@ export class Dialog extends HTMLDivElement {
 			else dialog.add(argument);
 		});
 		//if (!hidden) dialog.open();
-		if (!lib.config.touchscreen) dialog.contentContainer.onscroll = ui.update;
+		if (!lib.config.touchscreen)
+			dialog.contentContainer.onscroll = ui.update;
 		if (!noTouchScroll) {
 			dialog.contentContainer.ontouchstart = ui.click.dialogtouchStart;
 			dialog.contentContainer.ontouchmove = ui.click.touchScroll;
@@ -98,21 +100,27 @@ export class Dialog extends HTMLDivElement {
 			const buttons = ui.create.div(".buttons", this.content);
 			if (zoom) buttons.classList.add("smallzoom");
 			// @ts-ignore
-			this.buttons = this.buttons.concat(ui.create.buttons(item, "card", buttons, noclick));
+			this.buttons = this.buttons.concat(
+				ui.create.buttons(item, "card", buttons, noclick)
+			);
 		}
 		// @ts-ignore
 		else if (get.itemtype(item) == "players") {
 			var buttons = ui.create.div(".buttons", this.content);
 			if (zoom) buttons.classList.add("smallzoom");
 			// @ts-ignore
-			this.buttons = this.buttons.concat(ui.create.buttons(item, "player", buttons, noclick));
+			this.buttons = this.buttons.concat(
+				ui.create.buttons(item, "player", buttons, noclick)
+			);
 		} else if (item[1] == "textbutton") {
 			ui.create.textbuttons(item[0], this, noclick);
 		} else {
 			var buttons = ui.create.div(".buttons", this.content);
 			if (zoom) buttons.classList.add("smallzoom");
 			// @ts-ignore
-			this.buttons = this.buttons.concat(ui.create.buttons(item[0], item[1], buttons, noclick));
+			this.buttons = this.buttons.concat(
+				ui.create.buttons(item[0], item[1], buttons, noclick)
+			);
 		}
 		if (this.buttons.length) {
 			if (this.forcebutton !== false) this.forcebutton = true;
@@ -166,10 +174,19 @@ export class Dialog extends HTMLDivElement {
 		}
 		ui.dialog = this;
 		let translate;
-		if (lib.config.remember_dialog && lib.config.dialog_transform && !this.classList.contains("fixed")) {
+		if (
+			lib.config.remember_dialog &&
+			lib.config.dialog_transform &&
+			!this.classList.contains("fixed")
+		) {
 			translate = lib.config.dialog_transform;
 			this._dragtransform = translate;
-			this.style.transform = "translate(" + translate[0] + "px," + translate[1] + "px) scale(0.8)";
+			this.style.transform =
+				"translate(" +
+				translate[0] +
+				"px," +
+				translate[1] +
+				"px) scale(0.8)";
 		} else {
 			this.style.transform = "scale(0.8)";
 		}
@@ -179,8 +196,17 @@ export class Dialog extends HTMLDivElement {
 		ui.dialogs.unshift(this);
 		ui.update();
 		ui.refresh(this);
-		if (lib.config.remember_dialog && lib.config.dialog_transform && !this.classList.contains("fixed")) {
-			this.style.transform = "translate(" + translate[0] + "px," + translate[1] + "px) scale(1)";
+		if (
+			lib.config.remember_dialog &&
+			lib.config.dialog_transform &&
+			!this.classList.contains("fixed")
+		) {
+			this.style.transform =
+				"translate(" +
+				translate[0] +
+				"px," +
+				translate[1] +
+				"px) scale(1)";
 		} else {
 			this.style.transform = "scale(1)";
 		}

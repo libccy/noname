@@ -136,6 +136,14 @@ export class UI {
 	 * @type {HTMLDivElement}
 	 */
 	tempnowuxie;
+	/**
+	 * @type {HTMLDivElement[]}
+	 */
+	toastQueue = [];
+  
+	 * @type {HTMLDivElement}
+	 */
+	cardPile;
 	refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}
