@@ -26,7 +26,7 @@ jobs:
           ref: PR-Branch
           # This is important to fetch the changes to the previous commit
           fetch-depth: 0
-          token: ${{ secrets.READABLE_WRITEABLE_TOKEN }}
+          persist-credentials: false
 
       - name: Prettify code
         uses: creyD/prettier_action@v4.3
@@ -35,3 +35,4 @@ jobs:
           prettier_options: --write **/*.{js,ts,mjs,vue,json,yml,md} --config ./prettier.config.mjs --ignore-path ./.prettierignore
           commit_message: "style: prettified code from pull request."
           only_changed: True
+          github_token: ${{ secrets.FORMAT_TOKEN }}
