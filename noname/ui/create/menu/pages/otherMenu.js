@@ -439,11 +439,11 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				 * @param { (value: T) => Promise<boolean> } predicate
 				 */
 				const asyncFilter = async (arr, predicate) => {
-					//将arr每10个分为一个数组，分别使用Promise.all
+					//将arr每20个分为一个数组，分别使用Promise.all
 					/** @type { boolean[] } */
 					const results = [];
-					for (let i = 0; i < arr.length; i += 10) {
-						const pushArr = arr.slice(i, i + 10);
+					for (let i = 0; i < arr.length; i += 20) {
+						const pushArr = arr.slice(i, i + 20);
 						results.push(
 							...await Promise.all(pushArr.map(predicate))
 						);
