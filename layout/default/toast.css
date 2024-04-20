@@ -1,5 +1,5 @@
 .toast-container {
-    position: fixed;
+    position: absolute;
     top: 15%;
     left: 50%;
     transform: translateX(-50%);

@@ -360,7 +360,7 @@ export class Create {
 				return container;
 			})();
 		const toast = document.createElement("div");
-		toast.textContent = message;
+		toast.innerHTML = message;
 		toast.classList.add("toast");
 		toastContainer.appendChild(toast);
 		ui.toastQueue.push(toast);
