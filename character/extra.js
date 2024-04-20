@@ -673,7 +673,7 @@ game.import("character", function () {
 					return game.hasPlayer((current) => {
 						if (current == player) return false;
 						const total = current.countCards("ej");
-						return total > 0 && num > total;
+						return total > 0 && num >= total + (get.mode() != "doudizhu" ? 1 : 0);
 					});
 				},
 				filterCard: true,
@@ -682,7 +682,7 @@ game.import("character", function () {
 						1,
 						Math.max(
 							...game.filterPlayer((i) => i != get.player()).map((i) => i.countCards("ej"))
-						) + 1,
+						) + (get.mode() != "doudizhu" ? 1 : 0),
 					];
 				},
 				check(card) {
@@ -691,10 +691,10 @@ game.import("character", function () {
 				filterTarget(card, player, target) {
 					const num = target.countCards("ej");
 					if (!num) return false;
-					return ui.selected.cards.length == num + 1 && player != target;
+					return ui.selected.cards.length == num + (get.mode() != "doudizhu" ? 1 : 0) && player != target;
 				},
 				filterOk() {
-					return ui.selected.cards.length == ui.selected.targets[0].countCards("ej") + 1;
+					return ui.selected.cards.length == ui.selected.targets[0].countCards("ej") + (get.mode() != "doudizhu" ? 1 : 0);
 				},
 				position: "he",
 				lose: false,
@@ -746,8 +746,9 @@ game.import("character", function () {
 				filter(event, player) {
 					return (
 						(event.name != "phase" || game.phaseNumber == 0) &&
-						game.countPlayer((current) => {
-							return !current.isZhu2();
+						game.countPlayer(current => {
+							if (get.mode() != "doudizhu") return !current.isZhu2();
+							return current.getSeatNum() != 3;
 						}) > 1
 					);
 				},
@@ -756,15 +757,13 @@ game.import("character", function () {
 				derivation: "tamo_faq",
 				async content(event, trigger, player) {
 					const toSortPlayers = game.filterPlayer((current) => {
-						return (
-							!current.isZhu2() ||
-							get.mode() == "doudizhu" && current.getSeatNum() == 3
-						);
+						if (get.mode() != "doudizhu") return !current.isZhu2();
+						return current.getSeatNum() != 3;
 					});
 					toSortPlayers.sortBySeat(game.findPlayer2((current) => current.getSeatNum() == 1, true));
 					const next = player.chooseToMove("榻谟：是否分配" +
-						(game.countPlayer() > toSortPlayers.length ?
-							"除主公" + (get.mode() == "doudizhu" ? "和三号位外" : "外") : "") +
+						(get.mode() != "doudizhu" ?
+							(game.hasPlayer(cur => cur.isZhu2()) ? "除主公外" : "") : "除三号位外") +
 						"所有角色的座次？"
 					);
 					next.set("list", [
@@ -10842,17 +10841,21 @@ game.import("character", function () {
 			dingzhou: "定州",
 			dingzhou_info:
 				"出牌阶段限一次。你可以将X张牌交给一名场上有牌的角色，然后你获得其场上的所有牌（X为其场上的牌数+1）。",
+			dingzhou_info_doudizhu:
+				"出牌阶段限一次。你可以将X张牌交给一名场上有牌的角色，然后你获得其场上的所有牌（X为其场上的牌数）。",
 			tamo: "榻谟",
 			tamo_info:
 				"游戏开始时，你可以重新分配除主公外所有角色的座次。",
 			tamo_info_doudizhu:
-				"游戏开始时，你可以重新分配除主公和三号位外所有角色的座次。",
+				"游戏开始时，你可以重新分配除三号位外所有角色的座次。",
 			tamo_faq: "FAQ",
 			tamo_faq_info:
 				"<br><li>Q：在一号位不为主公的情况下，〖榻谟〗如何结算？</li><li>A：该角色可以正常进行座次交换。若受此技能影响导致一号位角色发生了变化，则以排列后的一号位角色为起始角色开始本局游戏。</li>",
 			zhimeng: "智盟",
-			zhimeng_info_identity: '回合结束后，你可以选择一名其他角色。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
-			zhimeng_info: '回合结束后，你可以选择一名手牌数不大于Y的其他角色（Y为你的手牌数+1）。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
+			zhimeng_info:
+				'回合结束后，你可以选择一名手牌数不大于Y的其他角色（Y为你的手牌数+1）。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
+			zhimeng_info_identity:
+				'回合结束后，你可以选择一名其他角色。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
 			shen_xuzhu: "神许褚",
 			shen_xuzhu_prefix: "神",
 			zhengqing: "争擎",
