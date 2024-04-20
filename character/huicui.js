@@ -1063,39 +1063,30 @@ game.import("character", function () {
 				filter(event, player) {
 					if (!event.isFirstTarget) return false;
 					if (get.type(event.card) !== "trick") return false;
-					const evt = event.getParent();
-					const evts = game.getGlobalHistory("useCard", null, evt).slice().remove(evt);
-					return event.targets.some((target) => {
-						return evts.some((evt) => evt.targets.includes(target));
-					});
+					return true;
 				},
 				direct: true,
 				async content(event, trigger, player) {
-					const evt = trigger.getParent();
-					const evts = game.getGlobalHistory("useCard", null, evt).slice().remove(evt);
-					const chooseableTargets = trigger.targets.filter((target) => {
-						return evts.some((evt) => evt.targets.includes(target));
-					});
 					const result = await player
 						.chooseTarget()
 						.set("prompt", get.prompt("dcyingshi"))
 						.set(
 							"prompt2",
-							`令一名可选角色选择本回合未被选择过的一项：⒈令你于此牌结算结束后视为对其使用一张${get.translation(
+							`令其中一名角色选择本回合未被选择过的一项：⒈令你于此牌结算结束后视为对其使用一张${get.translation(
 								trigger.card.name
 							)}；⒉弃置${get.cnNumber(player.countCards("e"))}张牌，此牌对其无效。`
 						)
 						.set("filterTarget", (card, player, target) => {
 							return get.event("targets").includes(target);
 						})
-						.set("targets", chooseableTargets)
+						.set("targets", trigger.targets)
 						.set(
 							"toFriends",
 							(() => {
-								const isPositive = chooseableTargets.some((current) => {
+								const isPositive = trigger.targets.some((current) => {
 										return get.effect(current, trigger.card, trigger.player, player) > 0;
 									}),
-									isNegative = chooseableTargets.some((current) => {
+									isNegative = trigger.targets.some((current) => {
 										return get.effect(current, trigger.card, trigger.player, player) < -5;
 									});
 								if (
@@ -1547,8 +1538,13 @@ game.import("character", function () {
 						.sortBySeat(targetx || player);
 					event.result = await player
 						.chooseTarget("是否对" + (targets.length > 1 ? "其中一名角色" : get.translation(targets[0])) + "发动【守成】？",
-							"令其摸两张牌")
-						.set("ai", target => get.attitude(get.event(player), target))
+							"令其摸两张牌",
+							(card, player, target) => {
+								return get.event("targets").includes(target);
+							}
+						)
+						.set("targets", targets)
+						.set("ai", target => get.attitude(get.event("player"), target))
 						.forResult();
 				},
 				usable: 1,
@@ -16252,7 +16248,7 @@ game.import("character", function () {
 				"其他角色的出牌阶段限一次。其可以交给你一张牌，若此牌为装备牌，你可以使用之，然后其本回合攻击范围+X（X为你装备区里的牌数）。若你以此法替换了装备，你与其各摸两张牌。",
 			dcyingshi: "应时",
 			dcyingshi_info:
-				"每回合每项各限一次。当你使用普通锦囊牌指定第一个目标后，若有目标不为本回合第一次成为牌的目标，则你可以令其选择一项：⒈令你于此牌结算结束后视为对其使用一张与此牌牌名相同的牌；⒉弃置X张牌，此牌对其无效（X为你装备区里的牌数）。",
+				"每回合每项各限一次。当你使用普通锦囊牌指定目标后，你可令其中一个目标选择一项：⒈令你于此牌结算结束后视为对其使用一张与此牌牌名相同的牌；⒉弃置X张牌，此牌对其无效（X为你装备区里的牌数）。",
 			dc_wangling: "王淩",
 			dcjichou: "集筹",
 			dcjichou_info:
