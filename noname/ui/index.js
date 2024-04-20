@@ -137,6 +137,10 @@ export class UI {
 	 */
 	tempnowuxie;
 	/**
+	 * @type {HTMLDivElement[]}
+	 */
+	toastQueue = [];
+  
 	 * @type {HTMLDivElement}
 	 */
 	cardPile;
