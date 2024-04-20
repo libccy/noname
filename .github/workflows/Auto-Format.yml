@@ -35,4 +35,3 @@ jobs:
           prettier_options: --write **/*.{js,ts,mjs,vue,json,yml,md} --config ./prettier.config.mjs --ignore-path ./.prettierignore
           commit_message: "style: prettified code from pull request."
           only_changed: True
-
