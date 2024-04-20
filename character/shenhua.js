@@ -458,9 +458,8 @@ game.import("character", function () {
 				},
 				direct: true,
 				usable: 1,
-				content() {
-					"step 0";
-					player
+				async content(event, trigger, player) {
+					const { result: { bool, targets } } = await player
 						.chooseTarget(
 							get.prompt("olliangyin"),
 							"选择一名其他角色，你与其各摸一张牌",
@@ -479,32 +478,32 @@ game.import("character", function () {
 								return 3 * att;
 							return att;
 						});
-					"step 1";
-					if (result.bool) {
-						var target = result.targets[0];
+					if (bool) {
+						const target = targets[0];
 						event.target = target;
 						player.logSkill("olliangyin", target);
-						game.asyncDraw([player, target].sortBySeat());
-					} else event.finish();
-					"step 2";
-					game.delayx();
-					var num = player.getExpansions("olkongsheng").length;
-					var check = function (player) {
+						await game.asyncDraw([player, target].sortBySeat());
+					}
+					else return;
+					await game.asyncDelayx();
+					let num = player.getExpansions("olkongsheng").length;
+					let check = player => {
 						if (!player.isIn() || player.isHealthy()) return false;
 						return player.countCards("h") == num;
 					};
+					const { target } = event;
 					if (check(player) || check(target)) {
-						var choiceList = [
+						const choiceList = [
 							"令自己回复1点体力",
 							"令" + get.translation(target) + "回复1点体力",
 						];
-						var choices = [];
+						const choices = [];
 						if (check(player)) choices.push("选项一");
 						else choiceList[0] = '<span style="opacity:0.5">' + choiceList[0] + "</span>";
 						if (check(target)) choices.push("选项二");
 						else choiceList[1] = '<span style="opacity:0.5">' + choiceList[1] + "</span>";
 						choices.push("cancel2");
-						player
+						const { result : { control } } = await player
 							.chooseControl(choices)
 							.set("choiceList", choiceList)
 							.set("prompt", "良姻：是否令一名角色回复体力？")
@@ -520,10 +519,9 @@ game.import("character", function () {
 								if (eff2 > 0) return "选项二";
 								return "cancel2";
 							});
-					} else event.finish();
-					"step 3";
-					if (result.control == "选项一") player.recover();
-					else if (result.control == "选项二") target.recover();
+						if (control == "选项一") await player.recover();
+						else if (control == "选项二") await target.recover();
+					}
 				},
 				group: "olliangyin_gain",
 				subSkill: {
@@ -547,90 +545,86 @@ game.import("character", function () {
 							});
 						},
 						usable: 1,
-						content() {
-							"step 0";
+						async content(event, trigger, player) {
 							if (
 								!player.countCards("he") ||
-								!game.hasPlayer(function (current) {
-									return current != player && current.countCards("he") > 0;
-								})
-							)
-								event.finish();
-							else
-								player.chooseCardTarget({
-									prompt: get.prompt("olliangyin"),
-									prompt2: "弃置一张牌，并令一名其他角色也弃置一张牌",
-									position: "he",
-									filterCard: lib.filter.cardDiscardable,
-									filterTarget(card, player, target) {
-										return target != player && target.countCards("he") > 0;
-									},
-									ai1(card) {
-										let player = _status.event.player;
-										if (_status.event.me) {
-											if (get.position(card) === _status.event.me)
-												return 12 - player.hp - get.value(card);
-											return 0;
-										}
-										return 5 - get.value(card);
-									},
-									ai2(target) {
-										let player = _status.event.player,
-											att = get.attitude(player, target);
-										if (att > 0 && (_status.event.me || target.isHealthy())) return -att;
-										if (
-											att > 0 &&
-											(target.countCards("he") > target.hp ||
-												target.hasCard(function (card) {
-													return get.value(card, target) <= 0;
-												}, "e"))
-										)
-											return att;
-										return -att;
-									},
-									me: (function () {
-										if (
-											player.isHealthy() ||
-											get.recoverEffect(player, player, _status.event.player) <= 0
-										)
-											return false;
-										let ph = player.countCards("h"),
-											num = player.getExpansions("olkongsheng").length;
-										if (ph === num) {
-											if (player.hasSkillTag("noh")) return "h";
-											return "e";
-										}
-										if (ph - 1 === num) return "h";
+								!game.hasPlayer(current => current != player &&
+									current.countCards("he") > 0)
+							) return;
+							const { result: { bool, targets, cards } } = await player.chooseCardTarget({
+								prompt: get.prompt("olliangyin"),
+								prompt2: "弃置一张牌，并令一名其他角色也弃置一张牌",
+								position: "he",
+								filterCard: lib.filter.cardDiscardable,
+								filterTarget(card, player, target) {
+									return target != player && target.countCards("he") > 0;
+								},
+								ai1(card) {
+									let player = _status.event.player;
+									if (_status.event.me) {
+										if (get.position(card) === _status.event.me)
+											return 12 - player.hp - get.value(card);
+										return 0;
+									}
+									return 5 - get.value(card);
+								},
+								ai2(target) {
+									let player = _status.event.player,
+										att = get.attitude(player, target);
+									if (att > 0 && (_status.event.me || target.isHealthy())) return -att;
+									if (
+										att > 0 &&
+										(target.countCards("he") > target.hp ||
+											target.hasCard(function (card) {
+												return get.value(card, target) <= 0;
+											}, "e"))
+									)
+										return att;
+									return -att;
+								},
+								me: (() => {
+									if (
+										player.isHealthy() ||
+										get.recoverEffect(player, player, _status.event.player) <= 0
+									)
 										return false;
-									})(),
-								});
-							"step 1";
-							if (result.bool) {
-								var target = result.targets[0];
+									let ph = player.countCards("h"),
+										num = player.getExpansions("olkongsheng").length;
+									if (ph === num) {
+										if (player.hasSkillTag("noh")) return "h";
+										return "e";
+									}
+									if (ph - 1 === num) return "h";
+									return false;
+								})(),
+							});
+							if (bool) {
+								const target = targets[0];
 								event.target = target;
 								player.logSkill("olliangyin_gain", target);
-								player.discard(result.cards);
-								target.chooseToDiscard("he", true);
-							} else event.finish();
-							"step 2";
-							game.delayx();
-							var num = player.getExpansions("olkongsheng").length;
-							var check = function (player) {
+								await player.discard(cards);
+								await target.chooseToDiscard("he", true);
+							}
+							else return;
+							await game.asyncDelayx();
+							let num = player.getExpansions("olkongsheng").length;
+							let check = player => {
 								if (!player.isIn() || player.isHealthy()) return false;
 								return player.countCards("h") == num;
 							};
+							const { target } = event;
 							if (check(player) || check(target)) {
-								var choiceList = [
+								const choiceList = [
 									"令自己回复1点体力",
 									"令" + get.translation(target) + "回复1点体力",
 								];
-								var choices = [];
+								const choices = [];
 								if (check(player)) choices.push("选项一");
 								else choiceList[0] = '<span style="opacity:0.5">' + choiceList[0] + "</span>";
 								if (check(target)) choices.push("选项二");
 								else choiceList[1] = '<span style="opacity:0.5">' + choiceList[1] + "</span>";
 								choices.push("cancel2");
-								player
+								const { result: { control } } = await player
 									.chooseControl(choices)
 									.set("choiceList", choiceList)
 									.set("prompt", "良姻：是否令一名角色回复体力？")
@@ -648,10 +642,9 @@ game.import("character", function () {
 										if (eff2 > 0) return "选项二";
 										return "cancel2";
 									});
-							} else event.finish();
-							"step 3";
-							if (result.control == "选项一") player.recover();
-							else if (result.control == "选项二") target.recover();
+								if (control == "选项一") await player.recover();
+								else if (control == "选项二") await target.recover();
+							}
 						},
 					},
 				},
