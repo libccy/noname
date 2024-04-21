@@ -348,9 +348,6 @@ export class Create {
 	 * @param {string} message 弹出的文字
 	 */
 	toast(message) {
-		if(!ui.toastStyle){
-			ui.toastStyle = lib.init.css(lib.assetURL+"layout/default/toast.css");
-		}
 		const toastContainer =
 			document.querySelector(".toast-container") ||
 			(() => {
@@ -361,15 +358,24 @@ export class Create {
 			})();
 		const toast = document.createElement("div");
 		toast.innerHTML = message;
-		toast.classList.add("toast");
-		toastContainer.appendChild(toast);
-		ui.toastQueue.push(toast);
-		ui.create.showNextToast();
+		const toShow = () => {
+			toast.classList.add("toast");
+			toastContainer.appendChild(toast);
+			ui.toastQueue.push(toast);
+			ui.create.showNextToast();
+		};
+		if (!ui.toastStyle) {
+			ui.toastStyle = lib.init.promises
+				.css(lib.assetURL + "layout/default/toast.css")
+				.then(() => toShow());
+		} else {
+			toShow();
+		}
 		return toast;
 	}
 	showNextToast() {
 		const toast = ui.toastQueue.shift();
-		if(!toast)return;
+		if (!toast) return;
 		toast.style.display = "block";
 		toast.addEventListener("animationend", () => {
 			toast.remove();
