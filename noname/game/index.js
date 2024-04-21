@@ -1469,6 +1469,7 @@ export class Game {
 					reject
 				);
 			else if (lib.path.extname(path)) resolve(`${lib.assetURL}${path}`);
+			else if (URL.canParse(path)) resolve(path);
 			else resolve(`${lib.assetURL}${path}.mp3`);
 		}).then((resolvedPath) => {
 			audio.src = resolvedPath;
@@ -1603,7 +1604,11 @@ export class Game {
 				let path = "",
 					format = "";
 				if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
-				if (!/\.\w+$/.test(audioInfo)) format = ".mp3";
+				if (
+					!/\.\w+$/.test(audioInfo) &&
+					!["data:", "blob:"].some((name) => audioInfo.startsWith(name))
+				)
+					format = ".mp3";
 				if (path && format) return parseAudio(audioInfo, options, [true, 2]);
 				return [`${path}${audioInfo}${format}`];
 			}
