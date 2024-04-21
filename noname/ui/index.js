@@ -140,7 +140,7 @@ export class UI {
 	 * @type {HTMLDivElement[]}
 	 */
 	toastQueue = [];
-	/**
+  
 	 * @type {HTMLDivElement}
 	 */
 	cardPile;
