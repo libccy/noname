@@ -409,7 +409,9 @@ export class Game {
 			style.transform = "scale(1.05)";
 		}
 		document.body.insertBefore(uiBackground, document.body.firstChild);
-		if (background.startsWith("db:")) uiBackground.setBackgroundDB(background.slice(3));
+		if (background.startsWith("blob:") || background.startsWith("data:")) {
+			uiBackground.setBackgroundImage(background);
+		} else if (background.startsWith("db:")) uiBackground.setBackgroundDB(background.slice(3));
 		else if (background.startsWith("ext:"))
 			uiBackground.setBackgroundImage(`extension/${background.slice(4)}`);
 		else if (background == "default") {
@@ -1441,7 +1443,8 @@ export class Game {
 				if (_status.video) break;
 			}
 			if (path.startsWith("ext:")) path = path.replace(/^ext:/, "extension/");
-			else if (!path.startsWith("db:")) path = `audio/${path}`;
+			else if (!["db:", "blob:", "data:"].some((prefix) => path.startsWith(prefix)))
+				path = `audio/${path}`;
 			if (!lib.config.repeat_audio && _status.skillaudio.includes(path)) return;
 		}
 		const audio = document.createElement("audio");
@@ -1466,6 +1469,7 @@ export class Game {
 					reject
 				);
 			else if (lib.path.extname(path)) resolve(`${lib.assetURL}${path}`);
+			else if (URL.canParse(path)) resolve(path);
 			else resolve(`${lib.assetURL}${path}.mp3`);
 		}).then((resolvedPath) => {
 			audio.src = resolvedPath;
@@ -1600,7 +1604,11 @@ export class Game {
 				let path = "",
 					format = "";
 				if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
-				if (!/\.\w+$/.test(audioInfo)) format = ".mp3";
+				if (
+					!/\.\w+$/.test(audioInfo) &&
+					!["data:", "blob:"].some((name) => audioInfo.startsWith(name))
+				)
+					format = ".mp3";
 				if (path && format) return parseAudio(audioInfo, options, [true, 2]);
 				return [`${path}${audioInfo}${format}`];
 			}
@@ -1734,7 +1742,9 @@ export class Game {
 		const audio = get.dynamicVariable(lib.card[card.name].audio, card, sex);
 		if (typeof audio == "string") {
 			const audioInfo = audio.split(":");
-			if (audio.startsWith("db:"))
+			if (["blob:", "data:"].some((prefix) => audio.startsWith(prefix))) {
+				game.playAudio(audio);
+			} else if (audio.startsWith("db:"))
 				game.playAudio(
 					`${audioInfo[0]}:${audioInfo[1]}`,
 					audioInfo[2],
@@ -1766,7 +1776,9 @@ export class Game {
 					_status.currentAozhan
 				);
 			_status.currentAozhan = aozhan;
-			if (aozhan.startsWith("db:"))
+			if (["blob:", "data:"].some((prefix) => aozhan.startsWith(prefix))) {
+				ui.backgroundMusic.src = aozhan;
+			} else if (aozhan.startsWith("db:"))
 				game.getDB("image", aozhan.slice(3)).then((result) => (ui.backgroundMusic.src = result));
 			else if (aozhan.startsWith("ext:"))
 				ui.backgroundMusic.src = `${lib.assetURL}extension/${aozhan.slice(4)}`;
@@ -1789,7 +1801,9 @@ export class Game {
 				ui.backgroundMusic.src = backgroundMusicSourceConfiguration;
 			return;
 		}
-		if (music.startsWith("db:"))
+		if (["blob:", "data:"].some((prefix) => music.startsWith(prefix))) {
+			ui.backgroundMusic.src = music;
+		} else if (music.startsWith("db:"))
 			game.getDB("image", music.slice(3)).then((result) => (ui.backgroundMusic.src = result));
 		else if (music.startsWith("ext:"))
 			ui.backgroundMusic.src = `${lib.assetURL}extension/${music.slice(4)}`;
@@ -4737,7 +4751,8 @@ export class Game {
 					const audiosrc = "die:ext:" + extname + "/" + j + ".mp3";
 					if (
 						!pack[i][j][4].some(
-							(str) => typeof str == "string" && /^(?:db:extension-|ext:):(?:.+)/.test(str)
+							(str) =>
+								typeof str == "string" && /^(?:db:extension-.+?|ext|img):(?:.+)/.test(str)
 						)
 					)
 						pack[i][j][4].add(imgsrc);
@@ -4786,17 +4801,19 @@ export class Game {
 		if (info.audio == true) {
 			info.audio = "ext:" + extname;
 		}
-		if (info.fullskin) {
-			if (_status.evaluatingExtension) {
-				info.image = "db:extension-" + extname + ":" + name + ".png";
-			} else {
-				info.image = "ext:" + extname + "/" + name + ".png";
-			}
-		} else if (info.fullimage) {
-			if (_status.evaluatingExtension) {
-				info.image = "db:extension-" + extname + ":" + name + ".jpg";
-			} else {
-				info.image = "ext:" + extname + "/" + name + ".jpg";
+		if (!info.image || typeof info.image !== "string") {
+			if (info.fullskin) {
+				if (_status.evaluatingExtension) {
+					info.image = "db:extension-" + extname + ":" + name + ".png";
+				} else {
+					info.image = "ext:" + extname + "/" + name + ".png";
+				}
+			} else if (info.fullimage) {
+				if (_status.evaluatingExtension) {
+					info.image = "db:extension-" + extname + ":" + name + ".jpg";
+				} else {
+					info.image = "ext:" + extname + "/" + name + ".jpg";
+				}
 			}
 		}
 		lib.card[name] = info;
@@ -4916,10 +4933,14 @@ export class Game {
 		lib.translate[name] = info2.translate;
 		let imgsrc;
 		let extname = _status.extension || info2.extension;
-		if (_status.evaluatingExtension) {
-			imgsrc = "extension-" + extname + ":" + name + ".jpg";
+		if (info.splash) {
+			imgsrc = info.splash;
 		} else {
-			imgsrc = "ext:" + extname + "/" + name + ".jpg";
+			if (_status.evaluatingExtension) {
+				imgsrc = "extension-" + extname + ":" + name + ".jpg";
+			} else {
+				imgsrc = "ext:" + extname + "/" + name + ".jpg";
+			}
 		}
 		lib.mode[name] = {
 			name: info2.translate,

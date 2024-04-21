@@ -165,9 +165,13 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
 					nameinfo = get.character(name);
 				}
 			}
-			if (!modeimage && nameinfo && nameinfo[4])
+			let imgPrefixUrl;
+			if (!modeimage && nameinfo && nameinfo[4]) {
 				for (const value of nameinfo[4]) {
-					if (value.startsWith("ext:")) {
+					if (value.startsWith("img:")) {
+						imgPrefixUrl = value.slice(4);
+						break;
+					} else if (value.startsWith("ext:")) {
 						extimage = value;
 						break;
 					} else if (value.startsWith("db:")) {
@@ -181,7 +185,9 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
 						break;
 					}
 				}
-			if (extimage) src = extimage.replace(/^ext:/, "extension/");
+			}
+			if (imgPrefixUrl) src = imgPrefixUrl;
+			else if (extimage) src = extimage.replace(/^ext:/, "extension/");
 			else if (dbimage) {
 				this.setBackgroundDB(dbimage.slice(3));
 				return this;
@@ -225,6 +231,8 @@ HTMLDivElement.prototype.setBackgroundImage = function (img) {
 			.unique()
 			.map((v) => `url("${lib.assetURL}${v}")`)
 			.join(",");
+	} else if (URL.canParse(img)) {
+		this.style.backgroundImage = `url("${img}")`;
 	} else {
 		this.style.backgroundImage = `url("${lib.assetURL}${img}")`;
 	}
