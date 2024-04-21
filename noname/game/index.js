@@ -1776,7 +1776,9 @@ export class Game {
 					_status.currentAozhan
 				);
 			_status.currentAozhan = aozhan;
-			if (aozhan.startsWith("db:"))
+			if (["blob:", "data:"].some((prefix) => aozhan.startsWith(prefix))) {
+				ui.backgroundMusic.src = aozhan;
+			} else if (aozhan.startsWith("db:"))
 				game.getDB("image", aozhan.slice(3)).then((result) => (ui.backgroundMusic.src = result));
 			else if (aozhan.startsWith("ext:"))
 				ui.backgroundMusic.src = `${lib.assetURL}extension/${aozhan.slice(4)}`;
@@ -1799,7 +1801,9 @@ export class Game {
 				ui.backgroundMusic.src = backgroundMusicSourceConfiguration;
 			return;
 		}
-		if (music.startsWith("db:"))
+		if (["blob:", "data:"].some((prefix) => music.startsWith(prefix))) {
+			ui.backgroundMusic.src = music;
+		} else if (music.startsWith("db:"))
 			game.getDB("image", music.slice(3)).then((result) => (ui.backgroundMusic.src = result));
 		else if (music.startsWith("ext:"))
 			ui.backgroundMusic.src = `${lib.assetURL}extension/${music.slice(4)}`;
