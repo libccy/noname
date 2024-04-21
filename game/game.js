@@ -244,7 +244,7 @@ new Promise((resolve) => {
 			"serviceWorker" in navigator
 		) {
 			let scope =
-				window.location.protocol + "//" + window.location.host + "/";
+				window.location.protocol + "//" + window.location.host + window.location.pathname;
 			navigator.serviceWorker
 				.getRegistrations()
 				.then(async (registrations) => {
