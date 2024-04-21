@@ -618,8 +618,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								character: {
 									hhzz_shiona: ["female", "key", 1, ["hhzz_huilei"]],
 									hhzz_kanade: ["female", "key", 2, ["hhzz_youlian"]],
-									hhzz_takaramono1: ["male", "qun", 5, ["hhzz_jubao", "hhzz_huizhen"]],
-									hhzz_takaramono2: ["male", "qun", 3, ["hhzz_jubao", "hhzz_zhencang"]],
+									hhzz_takaramono1: ["male", "qun", 5, ["hhzz_jubao", "hhzz_huizhen"], ["noDefaultPicture"]],
+									hhzz_takaramono2: ["male", "qun", 3, ["hhzz_jubao", "hhzz_zhencang"], ["noDefaultPicture"]],
 								},
 								skill: {
 									_lingli_damage: {
@@ -1276,12 +1276,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 													"qun",
 													5,
 													["hhzz_jubao", "hhzz_huizhen"],
+													["noDefaultPicture"]
 												],
 												hhzz_takaramono2: [
 													"male",
 													"qun",
 													3,
 													["hhzz_jubao", "hhzz_zhencang"],
+													["noDefaultPicture"]
 												],
 											},
 											translate: {
