@@ -141,6 +141,7 @@ export class UI {
 	 */
 	toastQueue = [];
   
+	/**
 	 * @type {HTMLDivElement}
 	 */
 	cardPile;
