@@ -241,9 +241,12 @@ game.import("character", function () {
 							}
 							map[get.cardNameLength(i)]++;
 						}
-						const num2 = Object.keys(map).sort((a, b) => map[b] - map[a])[0];
-						if (num >= num2) return target.countCards('h') * 5 * get.sgn(get.sgn(get.attitude(player, target)) - 0.5);
-						return -target.countCards('h');
+						let list = Object.keys(map).sort((a, b) => map[b] - map[a]);
+						list = list.filter(i => map[i] == map[list[0]]).map(i => parseInt(i));
+						if (num >= target.countCards("h", card => {
+							return list.includes(get.cardNameLength(card));
+						})) return target.countCards("h") * 5 * get.sgn(get.sgn(get.attitude(player, target)) - 0.5);
+						return -target.countCards("h");
 					}).set('num', num).forResult();
 				},
 				async content(event, trigger, player) {
@@ -263,8 +266,11 @@ game.import("character", function () {
 						}
 						map[get.cardNameLength(i)]++;
 					}
-					const num2 = Object.keys(map).sort((a, b) => map[b] - map[a])[0];
-					const cards = target.getCards("he", card => get.cardNameLength(card) == num2);
+					let list = Object.keys(map).sort((a, b) => map[b] - map[a]);
+					list = list.filter(i => map[i] == map[list[0]]).map(i => parseInt(i));
+					const cards = target.getCards("h", card => {
+						return list.includes(get.cardNameLength(card));
+					});
 					if (num > 0 && cards.length >= num) {
 						const topCards = get.cards(num);
 						game.updateRoundNumber();
