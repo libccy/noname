@@ -196,8 +196,10 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
 		this.style.backgroundSize = "cover";
 		if (type === "character") {
 			const nameinfo = get.character(name);
-			const sex = nameinfo && ["male", "female", "double"].includes(nameinfo[0]) ? nameinfo[0] : "male";
-			this.setBackgroundImage([src, `${lib.characterDefaultPicturePath}${sex}${ext}`]);
+			const hasNoDefaultPicture = nameinfo && nameinfo[4] && nameinfo[4].includes("noDefaultPicture");
+			const sex = (nameinfo && ["male", "female", "double"].includes(nameinfo[0])) ? nameinfo[0] : "male";
+			const backgrounds = hasNoDefaultPicture ? [src] : [src, `${lib.characterDefaultPicturePath}${sex}${ext}`];
+			this.setBackgroundImage(backgrounds);
 		} else {
 			this.setBackgroundImage(src);
 		}
