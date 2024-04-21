@@ -409,7 +409,9 @@ export class Game {
 			style.transform = "scale(1.05)";
 		}
 		document.body.insertBefore(uiBackground, document.body.firstChild);
-		if (background.startsWith("db:")) uiBackground.setBackgroundDB(background.slice(3));
+		if (background.startsWith("blob:") || background.startsWith("data:")) {
+			uiBackground.setBackgroundImage(background);
+		} else if (background.startsWith("db:")) uiBackground.setBackgroundDB(background.slice(3));
 		else if (background.startsWith("ext:"))
 			uiBackground.setBackgroundImage(`extension/${background.slice(4)}`);
 		else if (background == "default") {
@@ -1441,7 +1443,8 @@ export class Game {
 				if (_status.video) break;
 			}
 			if (path.startsWith("ext:")) path = path.replace(/^ext:/, "extension/");
-			else if (!path.startsWith("db:")) path = `audio/${path}`;
+			else if (!["db:", "blob:", "data:"].some((prefix) => path.startsWith(prefix)))
+				path = `audio/${path}`;
 			if (!lib.config.repeat_audio && _status.skillaudio.includes(path)) return;
 		}
 		const audio = document.createElement("audio");
