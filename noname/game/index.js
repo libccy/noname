@@ -1737,7 +1737,9 @@ export class Game {
 		const audio = get.dynamicVariable(lib.card[card.name].audio, card, sex);
 		if (typeof audio == "string") {
 			const audioInfo = audio.split(":");
-			if (audio.startsWith("db:"))
+			if (["blob:", "data:"].some((prefix) => audio.startsWith(prefix))) {
+				game.playAudio(audio);
+			} else if (audio.startsWith("db:"))
 				game.playAudio(
 					`${audioInfo[0]}:${audioInfo[1]}`,
 					audioInfo[2],
