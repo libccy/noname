@@ -1424,21 +1424,20 @@ game.import("character", function () {
 								player.removeMark("sbxingshang", get.info("sbxingshang").getNum(num + 4));
 								switch (num) {
 									case 1:
-									case 2:
+									case 5:
 									case 6:
-										const type = ["basic", "equip", "trick"][[1, 2, 6].indexOf(num)];
+										const type = ["basic", "equip", "trick"][[1, 5, 6].indexOf(num)];
 										target.addTempSkill("sbfangzhu_ban", { player: "phaseEnd" });
 										target.markAuto("sbfangzhu_ban", [type]);
+										break;
+									case 2:
+										target.addTempSkill("baiban", { player: "phaseEnd" });
 										break;
 									case 3:
 										target.addTempSkill("sbfangzhu_kill", { player: "phaseEnd" });
 										break;
 									case 4:
 										target.turnOver();
-										break;
-									case 5:
-										target.addTempSkill("sbfangzhu_ban", { player: "phaseEnd" });
-										target.markAuto("sbfangzhu_ban", ["equip"]);
 										break;
 								}
 							},
