@@ -160,6 +160,9 @@ game.import("character", function () {
 							},
 						};
 					},
+					prompt(links, player) {
+						return "将至少两张牌当作" + get.translation(links[0][3] || "") + "【" + get.translation(links[0][2]) + "】使用";
+					},
 				},
 				ai: {
 					order(item, player) {
@@ -293,9 +296,13 @@ game.import("character", function () {
 						}
 					}
 					else {
-						const topCards = get.cards(num, true);
-						game.updateRoundNumber();
-						const content = [get.translation(target) + "牌名字数最多的手牌", cards, "牌堆顶", topCards];
+						let content = ['<div class="text center">' + get.translation(target) + "牌名字数最多的手牌</div>", cards];
+						if (num > 0) {
+							const topCards = get.cards(num, true);
+							game.updateRoundNumber();
+							content.push('<div class="text center">牌堆顶</div>');
+							content.push(topCards);
+						}
 						await player.chooseControl("ok").set("dialog", content);
 					}
 				},
