@@ -12962,14 +12962,13 @@ game.import("character", function () {
 				},
 				usable: 1,
 				async cost(event, trigger, player) {
-					"step 0";
 					var num = player.getFriends().length;
 					if (
 						!game.hasPlayer(function (current) {
 							return current != player && current.getFriends().length > num;
 						})
 					) {
-						player
+						event.result = await player
 							.chooseToDiscard(
 								"h",
 								get.prompt("rewangzu"),
@@ -12978,12 +12977,11 @@ game.import("character", function () {
 							)
 							.set("ai", function (card) {
 								return 7 - get.value(card);
-							});
+							})
+							.forResult();
 					} else {
-						player.chooseBool(get.prompt("rewangzu"), "随机弃置一张牌并令伤害-1");
+						event.result = await player.chooseBool(get.prompt("rewangzu"), "随机弃置一张牌并令伤害-1").forResult();
 					}
-					"step 1";
-					event.result = result;
 				},
 				async content(event, trigger, player) {
 					trigger.num--;
