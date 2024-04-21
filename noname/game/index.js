@@ -4751,7 +4751,8 @@ export class Game {
 					const audiosrc = "die:ext:" + extname + "/" + j + ".mp3";
 					if (
 						!pack[i][j][4].some(
-							(str) => typeof str == "string" && /^(?:db:extension-|ext:):(?:.+)/.test(str)
+							(str) =>
+								typeof str == "string" && /^(?:db:extension-.+?|ext|img):(?:.+)/.test(str)
 						)
 					)
 						pack[i][j][4].add(imgsrc);
@@ -4800,17 +4801,19 @@ export class Game {
 		if (info.audio == true) {
 			info.audio = "ext:" + extname;
 		}
-		if (info.fullskin) {
-			if (_status.evaluatingExtension) {
-				info.image = "db:extension-" + extname + ":" + name + ".png";
-			} else {
-				info.image = "ext:" + extname + "/" + name + ".png";
-			}
-		} else if (info.fullimage) {
-			if (_status.evaluatingExtension) {
-				info.image = "db:extension-" + extname + ":" + name + ".jpg";
-			} else {
-				info.image = "ext:" + extname + "/" + name + ".jpg";
+		if (!info.image || typeof info.image !== "string") {
+			if (info.fullskin) {
+				if (_status.evaluatingExtension) {
+					info.image = "db:extension-" + extname + ":" + name + ".png";
+				} else {
+					info.image = "ext:" + extname + "/" + name + ".png";
+				}
+			} else if (info.fullimage) {
+				if (_status.evaluatingExtension) {
+					info.image = "db:extension-" + extname + ":" + name + ".jpg";
+				} else {
+					info.image = "ext:" + extname + "/" + name + ".jpg";
+				}
 			}
 		}
 		lib.card[name] = info;
@@ -4930,10 +4933,14 @@ export class Game {
 		lib.translate[name] = info2.translate;
 		let imgsrc;
 		let extname = _status.extension || info2.extension;
-		if (_status.evaluatingExtension) {
-			imgsrc = "extension-" + extname + ":" + name + ".jpg";
+		if (info.splash) {
+			imgsrc = info.splash;
 		} else {
-			imgsrc = "ext:" + extname + "/" + name + ".jpg";
+			if (_status.evaluatingExtension) {
+				imgsrc = "extension-" + extname + ":" + name + ".jpg";
+			} else {
+				imgsrc = "ext:" + extname + "/" + name + ".jpg";
+			}
 		}
 		lib.mode[name] = {
 			name: info2.translate,

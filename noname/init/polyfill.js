@@ -171,8 +171,7 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
 					if (value.startsWith("img:")) {
 						imgPrefixUrl = value.slice(4);
 						break;
-					}
-					if (value.startsWith("ext:")) {
+					} else if (value.startsWith("ext:")) {
 						extimage = value;
 						break;
 					} else if (value.startsWith("db:")) {
