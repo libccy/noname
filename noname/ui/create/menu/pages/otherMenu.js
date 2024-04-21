@@ -674,6 +674,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 			if (!this.classList.toggle("on")) {
 				game.saveConfig("asset_toggle_off", true);
 				[
+					span114514_br,
 					span7,
 					span7_br,
 					span7_check,
@@ -695,6 +696,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 			} else {
 				game.saveConfig("asset_toggle_off");
 				[
+					span114514_br,
 					span7,
 					span7_br,
 					span7_check,
@@ -721,6 +723,8 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 		// var span6_br = ui.create.node('br');
 		// li2.lastChild.appendChild(span6_br);
 		// var span2_br = ui.create.node('br');
+		var span114514_br = ui.create.node('br');
+		li2.lastChild.appendChild(span114514_br);
 
 		var span7 = ui.create.div("", `不替换已有素材`);
 		span7.style.fontSize = "small";
