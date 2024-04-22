@@ -31,9 +31,6 @@ game.import("character", function () {
 			ol_mengda(mode) {
 				return mode !== "guozhan";
 			},
-			ol_mengda(mode) {
-				return mode !== "guozhan";
-			},
 		},
 		character: {
 			sp_sunce: ["male", "qun", 4, ["olliantao"]],
@@ -1802,11 +1799,12 @@ game.import("character", function () {
 					target.popup(list[result[1]]);
 					for (let current of [player, target]) {
 						switch (list[result[current == player ? 0 : 1]]) {
-							case "重铸":
+							case "重铸": {
 								let result2 = yield current.chooseCard("he", "请重铸一张牌", (card, player) => player.canRecast(card), true);
 								if (result2.bool) current.recast(result2.cards);
 								break;
-							case "出杀":
+							}
+							case "出杀": {
 								current.chooseToUse({
 									prompt: "请使用一张【杀】",
 									filterCard: function (card, player) {
@@ -1819,9 +1817,11 @@ game.import("character", function () {
 									},
 								});
 								break;
-							case "弃牌":
+							}
+							case "弃牌": {
 								current.chooseToDiscard("he", 2, true);
 								break;
+							}
 						}
 					}
 				},
@@ -2112,7 +2112,7 @@ game.import("character", function () {
 										}),
 									att = get.attitude(player, target);
 								if (goon) return 5 * att;
-								if (!!player.countCards("he", cardx => player.canSaveCard(cardx, player))) return att;
+								if (player.countCards("he", cardx => player.canSaveCard(cardx, player)) > 0) return att;
 								return 0;
 							},
 						})
@@ -27841,19 +27841,21 @@ game.import("character", function () {
 							"step 1";
 							var num = get.rand(0, 2);
 							switch (num) {
-								case 0:
+								case 0: {
 									player.line(trigger.player, "fire");
 									trigger.player.damage("fire");
 									trigger.player.addTempSkill("xinfu_xionghuo_disable");
 									trigger.player.markAuto("xinfu_xionghuo_disable", [player]);
 									break;
-								case 1:
+								}
+								case 1: {
 									player.line(trigger.player, "water");
 									trigger.player.loseHp();
 									trigger.player.addMark("xinfu_xionghuo_low", 1, false);
 									trigger.player.addTempSkill("xinfu_xionghuo_low");
 									break;
-								case 2:
+								}
+								case 2: {
 									player.line(trigger.player, "green");
 									/*
 									var card1=trigger.player.getCards('h').randomGet();
@@ -27866,6 +27868,7 @@ game.import("character", function () {
 									const cards = trigger.player.getGainableCards(player, "he");
 									if (cards.length) player.gain(cards.randomGets(2), trigger.player, "giveAuto", "bySelf");
 									break;
+								}
 							}
 							"step 2";
 							game.delay();
@@ -28891,7 +28894,6 @@ game.import("character", function () {
 			ruiji: ["ruiji", "dc_ruiji"],
 			jsp_huangyueying: ["jsp_huangyueying", "re_jsp_huangyueying"],
 			ganfuren: ["ganfuren", "dc_ganfuren", "jsp_ganfuren"],
-			wenqin: ["wenqin", "pe_wenqin"],
 			zhouqun: ["ol_zhouqun", "zhouqun"],
 			qianzhao: ["ol_qianzhao", "qianzhao"],
 			ol_pengyang: ["ol_pengyang", "sp_pengyang"],
