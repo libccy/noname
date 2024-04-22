@@ -23588,7 +23588,7 @@ game.import("character", function () {
 						event.count--;
 						var card = event.history.shift().card;
 						card = { name: card.name, nature: card.nature };
-						if (card.name != "jiu" && lib.filter.cardEnabled(card)) {
+						if (player.hasUseTarget(card, true, true)) {
 							if (
 								game.hasPlayer(function (current) {
 									return player.canUse(card, current);
@@ -29398,7 +29398,7 @@ game.import("character", function () {
 			chenqing: "陈情",
 			chenqing_info: "每轮限一次，当一名角色处于濒死状态时，你可以令另一名其他角色摸四张牌，然后其弃置四张牌。若其以此法弃置的四张牌花色各不相同，则视为该角色对濒死的角色使用一张【桃】。",
 			mozhi: "默识",
-			mozhi_info: "结束阶段开始时，你可以将一张手牌当作你本回合出牌阶段内使用的第一张基本或普通锦囊牌使用。然后，你可以将一张手牌当做你本回合出牌阶段内使用的第二张基本或普通锦囊牌使用。（你不能通过此技能使用【酒】）",
+			mozhi_info: "结束阶段，你可以将一张手牌当做你本回合出牌阶段内使用的第一张基本或普通锦囊牌使用。然后你可以将一张手牌当做你本回合出牌阶段内使用的第二张基本或普通锦囊牌使用（以此法使用的牌须满足使用的限制）。",
 			ranshang: "燃殇",
 			ranshang2: "燃殇",
 			ranshang_info: "锁定技，当你受到1点火焰伤害后，你获得1枚“燃”标记；结束阶段开始时，你失去X点体力。若X大于2，则你减2点体力上限并摸两张牌。（X为“燃”标记的数量）",
