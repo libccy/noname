@@ -10108,6 +10108,7 @@ export class Library {
 		Control: Element.Control,
 		Client: Element.Client,
 		NodeWS: Element.NodeWS,
+		Character: Element.Character,
 		ws: {
 			onopen: function () {
 				if (_status.connectCallback) {
@@ -10212,6 +10213,12 @@ export class Library {
 		 */
 		get nodews() {
 			return this.NodeWS.prototype;
+		},
+		/**
+		 * @legacy Use {@link lib.element.Character.prototype} instead.
+		 */
+		get character() {
+			return this.Character.prototype;
 		},
 	};
 	card = {
@@ -12771,7 +12778,15 @@ export class Library {
 			},
 		},
 	};
-	character = {};
+	character = new Proxy(
+		{},
+		{
+			set(target, prop, newValue){
+				newValue = new lib.element.Character(newValue);
+				return Reflect.set(target, prop, newValue);
+			}
+		}
+	);
 	perfectPair = {};
 	cardPile = {};
 	message = {

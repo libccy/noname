@@ -10,3 +10,4 @@ export { GameEventPromise } from "./gameEventPromise.js";
 export { NodeWS } from "./nodeWS.js";
 export { Player } from "./player.js";
 export { VCard } from "./vcard.js";
+export { Character } from "./character.js"
