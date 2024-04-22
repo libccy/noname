@@ -11,10 +11,13 @@ export const importCardPack = generateImportFunction("card", (name) => `../../ca
  * @param {string} name - 武将包名
  * @returns {Promise<void>}
  */
-export const importCharacterPack = generateImportFunction(
-	"character",
-	(name) => `../../character/${name}.js`
-);
+export const importCharacterPack = generateImportFunction("character", (name) => {
+	const alreadyModernCharacterPack = ["key"];
+
+	return alreadyModernCharacterPack.includes(name)
+		? `../../character/${name}/index.js`
+		: `../../character/${name}.js`;
+});
 
 /**
  * @param {string} name - 扩展名

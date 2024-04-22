@@ -126,4 +126,17 @@ export class GamePromises {
 			})
 		);
 	}
+
+	/**
+	 * 获取文件列表
+	 *
+	 * @param { string } dir 目录
+	 * @returns { Promise<[string[], string[]]> } 返回一个数组，第一个元素是文件夹列表，第二个元素是文件列表
+	 */
+	getFileList(dir) {
+		return new Promise((resolve, reject) => {
+			// @ts-ignore
+			game.getFileList(dir, (folders, files) => resolve([folders, files]), reject);
+		});
+	}
 }
