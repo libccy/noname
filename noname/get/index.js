@@ -638,15 +638,8 @@ export class Get {
 		return "暂无武将介绍";
 	}
 	bordergroup(info, raw) {
-		if (!Array.isArray(info)) {
-			info = lib.character[info];
-			if (!info) return "";
-		}
-		if (Array.isArray(info[4]))
-			for (const str of info[4]) {
-				if (typeof str == "string" && str.startsWith("border:")) return str.slice(7);
-			}
-		return raw ? "" : info[1] || "";
+		if(info.groupBorder) return info.groupBorder;
+		return raw ? "" : info.group || "";
 	}
 	groupnature(group, method) {
 		var nature = lib.groupnature[group];
@@ -2938,15 +2931,7 @@ export class Get {
 	}
 	skillintro(name, learn, learn2) {
 		var str = "";
-		var infoitem = lib.character[name];
-		if (!infoitem) {
-			for (var itemx in lib.characterPack) {
-				if (lib.characterPack[itemx][name]) {
-					infoitem = lib.characterPack[itemx][name];
-					break;
-				}
-			}
-		}
+		var infoitem = get.character(name);
 		var skills = infoitem[3];
 		var opacity;
 		for (var i = 0; i < skills.length; i++) {

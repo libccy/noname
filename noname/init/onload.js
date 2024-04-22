@@ -307,20 +307,27 @@ export async function onload(resetGameTimeout) {
 				}
 				for (k in character[i][j]) {
 					if (j == "character") {
-						if (!character[i][j][k][4]) {
-							character[i][j][k][4] = [];
-						}
-						if (
-							character[i][j][k][4].includes("boss") ||
-							character[i][j][k][4].includes("hiddenboss")
-						) {
-							lib.config.forbidai.add(k);
-						}
 						if (lib.config.forbidai_user && lib.config.forbidai_user.includes(k)) {
 							lib.config.forbidai.add(k);
 						}
-						for (var l = 0; l < character[i][j][k][3].length; l++) {
-							lib.skilllist.add(character[i][j][k][3][l]);
+						if (Array.isArray(character[i][j][k])) {
+							if (!character[i][j][k][4]) {
+								character[i][j][k][4] = [];
+							}
+							if (
+								character[i][j][k][4].includes("boss") ||
+								character[i][j][k][4].includes("hiddenboss")
+							) {
+								lib.config.forbidai.add(k);
+							}
+							for (var l = 0; l < character[i][j][k][3].length; l++) {
+								lib.skilllist.add(character[i][j][k][3][l]);
+							}
+						}
+						else{
+							for (var l = 0; l < character[i][j][k].skills.length; l++) {
+								lib.skilllist.add(character[i][j][k].skills[l]);
+							}
 						}
 					}
 					if (
@@ -346,6 +353,8 @@ export async function onload(resetGameTimeout) {
 									nopop: character[i][j][k].nopop,
 									derivation: character[i][j][k].derivation,
 								};
+							} else if (j === 'character') {
+								lib.character[k] = character[i][j][k];
 							} else {
 								Object.defineProperty(
 									lib[j],
@@ -649,8 +658,7 @@ export async function onload(resetGameTimeout) {
 							console.log(`加载《${lib.extensions[i][0]}》扩展的content时出现错误。`, e);
 							if (!lib.config.extension_alert)
 								alert(
-									`加载《${
-										lib.extensions[i][0]
+									`加载《${lib.extensions[i][0]
 									}》扩展的content时出现错误。\n该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。\n${decodeURI(
 										e.stack
 									)}`

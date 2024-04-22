@@ -1,5 +1,11 @@
 const characters = {
-    sp_key_yuri: ["female", "qun", 4, ["mubing", "ziqu", "diaoling"], ["border:key"]],
+    sp_key_yuri: {
+        sex: "female",
+        group: "qun",
+        hp: 4,
+        skills:  ["mubing", "ziqu", "diaoling"],
+        groupBorder: "key",
+    },
     key_lucia: ["female", "key", "2/3", ["lucia_duqu", "lucia_zhenren"]],
     key_kyousuke: ["male", "key", 4, ["nk_shekong", "key_huanjie"]],
     key_yuri: ["female", "key", 3, ["yuri_xingdong", "key_huanjie", "yuri_wangxi"], ["zhu"]],

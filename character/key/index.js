@@ -7,7 +7,7 @@ import translates from "./translate.js";
 
 game.import("character", function () {
     return {
-        name: "key/index",
+        name: "key",
         character: { ...characters },
         characterFilter: {
             key_jojiro(mode) {

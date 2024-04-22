@@ -44,7 +44,7 @@ export class Library {
 	characterDefaultPicturePath = characterDefaultPicturePath;
 	compatibleEdition = Boolean(
 		typeof nonameInitialized == "string" &&
-			nonameInitialized.match(/\/(?:com\.widget|yuri\.nakamura)\.noname\//)
+		nonameInitialized.match(/\/(?:com\.widget|yuri\.nakamura)\.noname\//)
 	);
 	changeLog = [];
 	updates = [];
@@ -342,19 +342,19 @@ export class Library {
 										typeof yingbianZhuzhanAI == "function"
 											? yingbianZhuzhanAI(player, card, source, targets)
 											: (cardx) => {
-													var info = get.info(card);
-													if (info && info.ai && info.ai.yingbian) {
-														var ai = info.ai.yingbian(
-															card,
-															source,
-															targets,
-															player
-														);
-														if (!ai) return 0;
-														return ai - get.value(cardx);
-													} else if (get.attitude(player, source) <= 0) return 0;
-													return 5 - get.value(cardx);
-											  },
+												var info = get.info(card);
+												if (info && info.ai && info.ai.yingbian) {
+													var ai = info.ai.yingbian(
+														card,
+														source,
+														targets,
+														player
+													);
+													if (!ai) return 0;
+													return ai - get.value(cardx);
+												} else if (get.attitude(player, source) <= 0) return 0;
+												return 5 - get.value(cardx);
+											},
 								});
 								if (!game.online) return;
 								_status.event._resultid = id;
@@ -1170,8 +1170,7 @@ export class Library {
 					unfrequent: true,
 					item: {},
 					intro: () =>
-						`获取在线扩展时的地址。当前地址：${document.createElement("br").outerHTML}${
-							lib.config.extension_sources[lib.config.extension_source]
+						`获取在线扩展时的地址。当前地址：${document.createElement("br").outerHTML}${lib.config.extension_sources[lib.config.extension_source]
 						}`,
 				},
 				extension_create: {
@@ -1837,7 +1836,7 @@ export class Library {
 								} else {
 									this.lastChild.innerHTML =
 										lib.configMenu.appearence.config.image_background.item[
-											lib.config.image_background
+										lib.config.image_background
 										];
 									return;
 								}
@@ -1860,7 +1859,7 @@ export class Library {
 									} else {
 										this.lastChild.innerHTML =
 											lib.configMenu.appearence.config.image_background.item[
-												lib.config.image_background
+											lib.config.image_background
 											];
 										return;
 									}
@@ -2064,8 +2063,8 @@ export class Library {
 									}
 									ui.css.card_stylesheet = lib.init.sheet(
 										".card:not(*:empty){background-image:url(" +
-											fileLoadedEvent.target.result +
-											")}"
+										fileLoadedEvent.target.result +
+										")}"
 									);
 								};
 								fileReader.readAsDataURL(fileToLoad, "UTF-8");
@@ -2234,8 +2233,8 @@ export class Library {
 									}
 									ui.css.cardback_stylesheet = lib.init.sheet(
 										".card:empty,.card.infohidden{background-image:url(" +
-											fileLoadedEvent.target.result +
-											")}"
+										fileLoadedEvent.target.result +
+										")}"
 									);
 									game.getDB("image", "cardback_style2", function (fileToLoad) {
 										if (!fileToLoad) return;
@@ -2246,8 +2245,8 @@ export class Library {
 											}
 											ui.css.cardback_stylesheet2 = lib.init.sheet(
 												".card.infohidden:not(.infoflip){background-image:url(" +
-													fileLoadedEvent.target.result +
-													")}"
+												fileLoadedEvent.target.result +
+												")}"
 											);
 										};
 										fileReader.readAsDataURL(fileToLoad, "UTF-8");
@@ -2404,8 +2403,8 @@ export class Library {
 									}
 									ui.css.hp_stylesheet1 = lib.init.sheet(
 										'.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url(' +
-											fileLoadedEvent.target.result +
-											")}"
+										fileLoadedEvent.target.result +
+										")}"
 									);
 								};
 								fileReader.readAsDataURL(fileToLoad, "UTF-8");
@@ -2419,8 +2418,8 @@ export class Library {
 									}
 									ui.css.hp_stylesheet2 = lib.init.sheet(
 										'.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url(' +
-											fileLoadedEvent.target.result +
-											")}"
+										fileLoadedEvent.target.result +
+										")}"
 									);
 								};
 								fileReader.readAsDataURL(fileToLoad, "UTF-8");
@@ -2434,8 +2433,8 @@ export class Library {
 									}
 									ui.css.hp_stylesheet3 = lib.init.sheet(
 										'.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url(' +
-											fileLoadedEvent.target.result +
-											")}"
+										fileLoadedEvent.target.result +
+										")}"
 									);
 								};
 								fileReader.readAsDataURL(fileToLoad, "UTF-8");
@@ -2449,8 +2448,8 @@ export class Library {
 									}
 									ui.css.hp_stylesheet4 = lib.init.sheet(
 										".hp:not(.text):not(.actcount)>.lost{background-image:url(" +
-											fileLoadedEvent.target.result +
-											")}"
+										fileLoadedEvent.target.result +
+										")}"
 									);
 								};
 								fileReader.readAsDataURL(fileToLoad, "UTF-8");
@@ -2571,8 +2570,8 @@ export class Library {
 									}
 									ui.css.player_stylesheet = lib.init.sheet(
 										'#window .player{background-image:url("' +
-											fileLoadedEvent.target.result +
-											'");background-size:100% 100%;}'
+										fileLoadedEvent.target.result +
+										'");background-size:100% 100%;}'
 									);
 								};
 								fileReader.readAsDataURL(fileToLoad, "UTF-8");
@@ -2709,8 +2708,8 @@ export class Library {
 									ui.css.border_stylesheet.id = "ui.css.border";
 									ui.css.border_stylesheet.sheet.insertRule(
 										'#window .player>.framebg{display:block;background-image:url("' +
-											fileLoadedEvent.target.result +
-											'")}',
+										fileLoadedEvent.target.result +
+										'")}',
 										0
 									);
 									ui.css.border_stylesheet.sheet.insertRule(
@@ -2730,18 +2729,18 @@ export class Library {
 							}
 							ui.css.border_stylesheet.sheet.insertRule(
 								'#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("' +
-									lib.assetURL +
-									"theme/style/player/" +
-									layout +
-									'1.png")}',
+								lib.assetURL +
+								"theme/style/player/" +
+								layout +
+								'1.png")}',
 								0
 							);
 							ui.css.border_stylesheet.sheet.insertRule(
 								'#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("' +
-									lib.assetURL +
-									"theme/style/player/" +
-									layout +
-									'3.png")}',
+								lib.assetURL +
+								"theme/style/player/" +
+								layout +
+								'3.png")}',
 								0
 							);
 							ui.css.border_stylesheet.sheet.insertRule(
@@ -2924,8 +2923,8 @@ export class Library {
 									}
 									ui.css.menu_stylesheet = lib.init.sheet(
 										'html #window>.dialog.popped,html .menu,html .menubg{background-image:url("' +
-											fileLoadedEvent.target.result +
-											'");background-size:cover}'
+										fileLoadedEvent.target.result +
+										'");background-size:cover}'
 									);
 								};
 								fileReader.readAsDataURL(fileToLoad, "UTF-8");
@@ -2947,8 +2946,8 @@ export class Library {
 							}
 							ui.css.menu_stylesheet = lib.init.sheet(
 								"html #window>.dialog.popped,html .menu,html .menubg{background-image:" +
-									str +
-									"}"
+								str +
+								"}"
 							);
 						}
 					},
@@ -3062,8 +3061,8 @@ export class Library {
 									}
 									ui.css.control_stylesheet = lib.init.sheet(
 										'#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("' +
-											fileLoadedEvent.target.result +
-											'")}'
+										fileLoadedEvent.target.result +
+										'")}'
 									);
 								};
 								fileReader.readAsDataURL(fileToLoad, "UTF-8");
@@ -3086,14 +3085,14 @@ export class Library {
 							if (layout == "wood") {
 								ui.css.control_stylesheet = lib.init.sheet(
 									"#window .control,#window .menubutton,#window #system>div>div,#window #system>div>.pressdown2{background-image:" +
-										str +
-										"}"
+									str +
+									"}"
 								);
 							} else {
 								ui.css.control_stylesheet = lib.init.sheet(
 									"#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:" +
-										str +
-										"}"
+									str +
+									"}"
 								);
 							}
 						}
@@ -3128,20 +3127,20 @@ export class Library {
 							}
 							ui.css.buttonsheet = lib.init.sheet(
 								"#system>div>div, .caption>div>.tdnode{padding-top:" +
-									cbnum1 +
-									"px !important;padding-bottom:" +
-									cbnum2 +
-									"px !important}",
+								cbnum1 +
+								"px !important;padding-bottom:" +
+								cbnum2 +
+								"px !important}",
 								"#control>.control>div{padding-top:" +
-									cbnum3 +
-									"px;padding-bottom:" +
-									cbnum4 +
-									"px}",
+								cbnum3 +
+								"px;padding-bottom:" +
+								cbnum4 +
+								"px}",
 								"#control>.control{padding-top:" +
-									cbnum5 +
-									"px;padding-bottom:" +
-									cbnum6 +
-									"px}"
+								cbnum5 +
+								"px;padding-bottom:" +
+								cbnum6 +
+								"px}"
 							);
 						}
 					},
@@ -8484,10 +8483,10 @@ export class Library {
 	genAwait(item) {
 		return gnc.is.generator(item)
 			? gnc.of(function* () {
-					for (const content of item) {
-						yield content;
-					}
-			  })()
+				for (const content of item) {
+					yield content;
+				}
+			})()
 			: Promise.resolve(item);
 	}
 	gnc = {
@@ -9209,9 +9208,9 @@ export class Library {
 				log("键：" + (f - sf) + "/" + f);
 				log(
 					"已启用：" +
-						(a + b + c + d + e + f - (sa + sb + sc + sd + se + sf)) +
-						"/" +
-						(a + b + c + d + e + f)
+					(a + b + c + d + e + f - (sa + sb + sc + sd + se + sf)) +
+					"/" +
+					(a + b + c + d + e + f)
 				);
 			})();
 			(function () {
@@ -11139,9 +11138,8 @@ export class Library {
 				content: (storage, player) => {
 					const stratagemFuryMax = _status.stratagemFuryMax,
 						fury = storage || 0;
-					return `当前怒气值：${
-						typeof stratagemFuryMax == "number" ? `${fury}/${stratagemFuryMax}` : fury
-					}`;
+					return `当前怒气值：${typeof stratagemFuryMax == "number" ? `${fury}/${stratagemFuryMax}` : fury
+						}`;
 				},
 			},
 		},
@@ -11214,7 +11212,7 @@ export class Library {
 								return (
 									((zhibi && !zhibi.includes(current)) ||
 										get.effect(current, card, player, player) >=
-											2 - Math.max(0, (storage.stratagem_fury || 0) - 1)) &&
+										2 - Math.max(0, (storage.stratagem_fury || 0) - 1)) &&
 									current.mayHaveShan(
 										player,
 										"use",
@@ -11268,16 +11266,16 @@ export class Library {
 					const cardName = get.name(cards[0], player);
 					return cardName
 						? new lib.element.VCard({
-								name: cardName,
-								nature: get.nature(cards[0], player),
-								suit: get.suit(cards[0], player),
-								number: get.number(cards[0], player),
-								isCard: true,
-								cards: [cards[0]],
-								storage: {
-									stratagem_buffed: 1,
-								},
-						  })
+							name: cardName,
+							nature: get.nature(cards[0], player),
+							suit: get.suit(cards[0], player),
+							number: get.number(cards[0], player),
+							isCard: true,
+							cards: [cards[0]],
+							storage: {
+								stratagem_buffed: 1,
+							},
+						})
 						: new lib.element.VCard();
 				}
 				return null;
@@ -11295,9 +11293,8 @@ export class Library {
 					)}点怒气。${prompt()}`;
 					span.appendChild(li);
 				});
-				return `当你需要使用位于“强化表”内的非虚拟卡牌时，你可以消耗对应数量的怒气将其强化并使用。${
-					document.createElement("hr").outerHTML
-				}${span.outerHTML}`;
+				return `当你需要使用位于“强化表”内的非虚拟卡牌时，你可以消耗对应数量的怒气将其强化并使用。${document.createElement("hr").outerHTML
+					}${span.outerHTML}`;
 			},
 			onuse: (result, player) => {
 				player.logSkill(result.skill);
@@ -11332,7 +11329,7 @@ export class Library {
 										return (
 											((zhibi && !zhibi.includes(current)) ||
 												get.effect(current, card, player, player) >=
-													2 - Math.max(0, (storage.stratagem_fury || 0) - 1)) &&
+												2 - Math.max(0, (storage.stratagem_fury || 0) - 1)) &&
 											current.mayHaveShan(
 												player,
 												"use",
@@ -12778,15 +12775,12 @@ export class Library {
 			},
 		},
 	};
-	character = new Proxy(
-		{},
-		{
-			set(target, prop, newValue){
-				newValue = new lib.element.Character(newValue);
-				return Reflect.set(target, prop, newValue);
-			}
+	character = new Proxy({}, {
+		set(target, prop, newValue) {
+			if(!(newValue instanceof Element.Character)) newValue = new Element.Character(newValue);
+			return Reflect.set(target, prop, newValue);
 		}
-	);
+	});
 	perfectPair = {};
 	cardPile = {};
 	message = {
@@ -13379,7 +13373,7 @@ export class Library {
 								navigator.clipboard
 									.readText()
 									.then(read)
-									.catch((_) => {});
+									.catch((_) => { });
 							} else {
 								var input = ui.create.node("textarea", ui.window, { opacity: "0" });
 								input.select();

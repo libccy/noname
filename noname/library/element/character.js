@@ -12,13 +12,23 @@ export class Character {
     /** @type { number } */
     maxHp;
     /** @type { number } */
-    hujia;
+    hujia = 0;
     /** @type { string } */
     group;
+    /** @type { string } */
+    groupBorder;
+    /** @type { string } */
+    groupInGuozhan;
     /** @type { string[] } */
-    skills;
+    skills = [];
+    /** @type { boolean } */
+    isZhugong = false;
+    /** @type { boolean } */
+    isUnseen = false;
+    /** @type { boolean } */
+    hasHiddenSkill = false;
     /** @type { Array } */
-    trashBin;
+    trashBin = [];
     /**
      * @param { Array|Object } [data]
      */
@@ -31,15 +41,35 @@ export class Character {
             this.hujia = get.infoHujia(data[2]);
             this.skills = get.copy(data[3] || []);
             this.trashBin = get.copy(data[4] || []);
+            Character.convertTrashToProperties(this, this.trashBin);
         }
         else if (get.is.object(data)) {
-            this.sex = data.sex;
-            this.group = data.group || '';
-            this.hp = data.hp || 1;
-            this.maxHp = data.maxHp || this.hp;
-            this.hujia = data.hujia || 0;
-            this.skills = get.copy(data.skills || []);
-            this.trashBin = get.copy(data.trashBin || []);
+            Object.assign(this, data);
+            if(typeof this.maxHp !== 'number') this.maxHp = this.hp;
+        }
+    };
+    /**
+     * @param { Character } character
+     * @param { Array } trash
+     */
+    static convertTrashToProperties(character, trash){
+        for(let i = 0; i < trash.length; i++){
+            let item = trash[i];
+            if (i === 0 && lib.group.includes(item)){
+                character.groupInGuozhan = item;
+            }
+            else if(item === 'zhu'){
+                character.isZhugong = true;
+            }
+            else if(item === 'unseen'){
+                character.isUnseen = true;
+            }
+            else if(item === 'hiddenSkill'){
+                character.hasHiddenSkill = true;
+            }
+            else if(item.startsWith('border:')){
+                character.groupBorder = item.slice(7);
+            }
         }
     };
     /**
