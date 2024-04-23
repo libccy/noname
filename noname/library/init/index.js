@@ -724,7 +724,7 @@ export class LibInit {
 				let k = 0;
 				let result;
 				//去除99个step的限制
-				while ((result = str.slice(skip).match(new RegExp(`['"]step ${k}['"]`))) != null) {
+				while ((result = str.slice(skip).match(new RegExp(`\\(?['"]step ${k}['"]\\)?;?`))) != null) {
 					let insertStr;
 					if (k == 0) {
 						insertStr = `switch(step){case 0:`;

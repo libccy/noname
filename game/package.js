@@ -23,6 +23,7 @@ window.noname_package = {
 		old: "怀旧",
 		diy: "DIY",
 		ddd: "3D精选",
+		key: "Key",
 		yxs: "英雄杀",
 		hearth: "炉石传说",
 		gwent: "昆特牌",
