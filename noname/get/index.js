@@ -32,6 +32,15 @@ export class Get {
 		return ["safari", parseInt(major), parseInt(minor), parseInt(patch)];
 	}
 	/**
+	 * 将一个传统格式的character转化为Character对象格式
+	 * @param { Array|Object|import("../library/element/character").Character } data
+	 * @returns {import("../library/element/character").Character}
+	 */
+	convertedCharacter(data){
+		if(!(data instanceof lib.element.Character)) return new lib.element.Character(data);
+		return data;
+	}
+	/**
 	 * 返回 VCard[] 形式的所有牌，用于印卡将遍历
 	 * @param {Function} filter
 	 * @returns {string[][]}
@@ -591,7 +600,7 @@ export class Get {
 	/**
 	 * @overload
 	 * @param { string } name
-	 * @returns { Character }
+	 * @returns { import("../library/element/character").Character }
 	 */
 	/**
 	 * @template { 0 | 1 | 2 | 3 | 4 } T
@@ -604,7 +613,7 @@ export class Get {
 		let info = lib.character[name];
 		if (!info) {
 			const pack = Object.keys(lib.characterPack).find((pack) => name in lib.characterPack[pack]);
-			if (pack) info = new lib.element.Character(lib.characterPack[pack][name]);
+			if (pack) info = get.convertedCharacter(lib.characterPack[pack][name]);
 		}
 		if (typeof num === "number") {
 			if (!info) info = [];
@@ -2610,7 +2619,7 @@ export class Get {
 				if (lib.character[name][4].includes("boss")) return list;
 				if (lib.character[name][4].includes("hiddenboss")) return list;
 				if (lib.character[name][4].includes("minskin")) return list;
-				if (lib.character[name][4].includes("unseen")) return list;
+				if (lib.character[name].isUnseen) return list;
 			}
 			for (var j = 0; j < lib.character[name][3].length; j++) {
 				var skill = lib.character[name][3][j];

@@ -2358,7 +2358,7 @@ export class Player extends HTMLDivElement {
 		}
 		var info = lib.character[character];
 		if (!info) {
-			info = new lib.element.Character(["", "", 1, [], []]);
+			info = get.convertedCharacter(["", "", 1, [], []]);
 		}
 		var skills = info.skills.slice(0);
 		this.clearSkills(true);
@@ -2398,7 +2398,7 @@ export class Player extends HTMLDivElement {
 		if (character2 && lib.character[character2]) {
 			var info2 = lib.character[character2];
 			if (!info2) {
-				info2 = new lib.element.Character(["", "", 1, [], []]);
+				info2 = get.convertedCharacter(["", "", 1, [], []]);
 			}
 
 			this.name2 = character2;
@@ -2487,7 +2487,7 @@ export class Player extends HTMLDivElement {
 		this.classList.add("fullskin");
 		var info = lib.character[character];
 		if (!info) {
-			info = new lib.element.Character(["", "", 1, [], []]);
+			info = get.convertedCharacter(["", "", 1, [], []]);
 		}
 
 		if (!game.minskin && get.is.newLayout() && !info[4].includes("minskin")) {
@@ -2530,7 +2530,7 @@ export class Player extends HTMLDivElement {
 		if (character2 && lib.character[character2]) {
 			var info2 = lib.character[character2];
 			if (!info2) {
-				info2 = new lib.element.Character(["", "", 1, [], []]);
+				info2 = get.convertedCharacter(["", "", 1, [], []]);
 			}
 			this.classList.add("fullskin2");
 			this.node.avatar2.setBackground(character2, "character");

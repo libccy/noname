@@ -29,6 +29,22 @@ export class Character {
     hasHiddenSkill = false;
     /** @type { Array } */
     trashBin = [];
+    /** @type { string } */
+    dualSideCharacter;
+    /** @type { Array } */
+    doubleGroup = [];
+    /** @type { boolean } */
+    isMinskin = false;
+    /** @type { boolean } */
+    isBoss = false;
+    /** @type { boolean } */
+    isHiddenBoss = false;
+    /** @type { boolean } */
+    isAiForbidden = false;
+    /** @type { boolean } */
+    isHiddenInStoneMode = false;
+    /** @type { boolean } */
+    isBossAllowed = false;
     /**
      * @param { Array|Object } [data]
      */
@@ -45,30 +61,54 @@ export class Character {
         }
         else if (get.is.object(data)) {
             Object.assign(this, data);
-            if(typeof this.maxHp !== 'number') this.maxHp = this.hp;
+            if (typeof this.maxHp !== 'number') this.maxHp = this.hp;
         }
     };
     /**
      * @param { Character } character
      * @param { Array } trash
      */
-    static convertTrashToProperties(character, trash){
-        for(let i = 0; i < trash.length; i++){
+    static convertTrashToProperties(character, trash) {
+        for (let i = 0; i < trash.length; i++) {
             let item = trash[i];
-            if (i === 0 && lib.group.includes(item)){
+            if (i === 0 && lib.group.includes(item)) {
                 character.groupInGuozhan = item;
             }
-            else if(item === 'zhu'){
+            else if (item === 'zhu') {
                 character.isZhugong = true;
             }
-            else if(item === 'unseen'){
+            else if (item === 'unseen') {
                 character.isUnseen = true;
             }
-            else if(item === 'hiddenSkill'){
+            else if (item === 'minskin') {
+                character.isMinskin = true;
+            }
+            else if (item === 'boss') {
+                character.isBoss = true;
+            }
+            else if (item === 'bossallowed') {
+                character.isBossAllowed = true;
+            }
+            else if (item === 'hiddenBoss') {
+                character.isHiddenBoss = true;
+            }
+            else if (item === 'forbidai') {
+                character.isAiForbidden = true;
+            }
+            else if (item === 'stonehidden') {
+                character.isHiddenInStoneMode = true;
+            }
+            else if (item === 'hiddenSkill') {
                 character.hasHiddenSkill = true;
             }
-            else if(item.startsWith('border:')){
+            else if (item.startsWith('border:')) {
                 character.groupBorder = item.slice(7);
+            }
+            else if (item.startsWith('dualside:')) {
+                character.dualSideCharacter = item.slice(9);
+            }
+            else if (item.startsWith('doublegroup:')) {
+                character.doubleGroup = item.slice(12).split(":")
             }
         }
     };

@@ -1316,7 +1316,7 @@ export class Create {
 					}
 
 					if (lib.character[i][4].includes("stonehidden")) continue;
-					if (lib.character[i][4].includes("unseen")) continue;
+					if (lib.character[i].isUnseen) continue;
 				}
 				if (lib.config.banned.includes(i)) continue;
 				if (

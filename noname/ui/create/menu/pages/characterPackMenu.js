@@ -159,18 +159,19 @@ export const characterPackMenu = function (connectMenu) {
 			var alterableCharacters = [];
 			var charactersToAlter = [];
 			for (var i in _info) {
-				if (_info[i][4] && _info[i][4].includes("unseen")) continue;
+				const characterInfo = get.convertedCharacter( _info[i]);
+				if (characterInfo.isUnseen) continue;
 				if (connectMenu && lib.connectBanned.includes(i)) continue;
 				list.push(i);
 				if (boolAI && !lib.config.forbidai_user.includes(i)) boolAI = false;
-				for (var j = 0; j < _info[i][3].length; j++) {
-					if (!lib.skill[_info[i][3][j]]) {
+				for (var j = 0; j < characterInfo.skills.length; j++) {
+					if (!lib.skill[characterInfo.skills[j]]) {
 						continue;
 					}
-					if (lib.skill[_info[i][3][j]].alter) {
-						alterableSkills.add(_info[i][3][j]);
+					if (lib.skill[characterInfo.skills[j]].alter) {
+						alterableSkills.add(characterInfo.skills[j]);
 						alterableCharacters.add(i);
-						if (lib.config.vintageSkills.includes(_info[i][3][j])) {
+						if (lib.config.vintageSkills.includes(characterInfo.skills[j])) {
 							charactersToAlter.add(i);
 						}
 					}

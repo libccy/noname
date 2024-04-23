@@ -10533,7 +10533,7 @@ export class Library {
 		characterDisabled: function (i, libCharacter) {
 			if (!lib.character[i] || (lib.character[i][4] && lib.character[i][4].includes("forbidai")))
 				return true;
-			if (lib.character[i][4] && lib.character[i][4].includes("unseen")) return true;
+			if (lib.character[i].isUnseen) return true;
 			if (lib.config.forbidai.includes(i)) return true;
 			if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) return true;
 			if (_status.connectMode) {
@@ -10605,7 +10605,7 @@ export class Library {
 				if (info[4].includes("boss")) return true;
 				if (info[4].includes("hiddenboss")) return true;
 				if (info[4].includes("minskin")) return true;
-				if (info[4].includes("unseen")) return true;
+				if (info.isUnseen) return true;
 				if (info[4].includes("forbidai") && (!_status.event.isMine || !_status.event.isMine()))
 					return true;
 				if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) return true;
@@ -12777,8 +12777,7 @@ export class Library {
 	};
 	character = new Proxy({}, {
 		set(target, prop, newValue) {
-			if(!(newValue instanceof Element.Character)) newValue = new Element.Character(newValue);
-			return Reflect.set(target, prop, newValue);
+			return Reflect.set(target, prop, get.convertedCharacter(newValue));
 		}
 	});
 	perfectPair = {};
