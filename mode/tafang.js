@@ -85,9 +85,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					lib.mechlist.push(i);
 				}
 				lib.character[i] = lib.characterPack.mode_tafang[i];
-				if (!lib.character[i][4]) {
-					lib.character[i][4] = [];
-				}
 			}
 			ui.create.cardsAsync();
 			game.finishCards();

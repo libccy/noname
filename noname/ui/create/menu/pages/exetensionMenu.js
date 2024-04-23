@@ -370,6 +370,7 @@ export const extensionMenu = function (connectMenu) {
 						",package:" +
 						get.stringify({
 							//替换die audio，加上扩展名
+							//TODO: 创建扩展这部分更是重量级
 							character: ((pack) => {
 								var character = pack.character;
 								for (var key in character) {

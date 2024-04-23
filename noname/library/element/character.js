@@ -111,7 +111,7 @@ export class Character {
 	 **/
 	isHiddenInStoneMode = false;
 	/**
-	 * 武将牌是否为炉石模式下的特殊随从（可以使用装备和锦囊）
+	 * 武将牌是否为炉石模式下的特殊随从（可以使用装备和法术）
 	 * @type { boolean }
 	 **/
 	isSpecialInStoneMode = false;
@@ -136,10 +136,20 @@ export class Character {
 	 **/
 	isJiangeMech = false;
 	/**
+	 * 武将牌是否在国战模式下拥有独立的皮肤
+	 * @type { boolean }
+	 **/
+	hasSkinInGuozhan = false;
+	/**
 	 * 武将牌对应的全部宗族
 	 * @type { string[] }
 	 **/
 	clans = [];
+	/**
+	 * 武将牌“无法享受到的主公/地主红利”
+	 * @type { string[] }
+	 **/
+	initFilters = [];
 	/**
 	 * @param { Array|Object } [data]
 	 */
@@ -177,6 +187,8 @@ export class Character {
 				character.isUnseen = true;
 			} else if (item === "minskin") {
 				character.isMinskin = true;
+			} else if (item === "gzskin") {
+				character.hasSkinInGuozhan = true;
 			} else if (item === "boss") {
 				character.isBoss = true;
 			} else if (item === "chessboss") {
@@ -207,6 +219,8 @@ export class Character {
 				character.doubleGroup = item.slice(12).split(":");
 			} else if (item.startsWith("clan:")) {
 				clans.push(item.slice(5));
+			} else if (item.startsWith("InitFilter:")) {
+				character.initFilters = item.slice(11).split(":");
 			} else {
 				keptTrashes.push(item);
 			}
@@ -277,6 +291,9 @@ export class Character {
 		if (character.isMinskin) {
 			trashes.push("minskin");
 		}
+		if (character.hasSkinInGuozhan) {
+			trashes.push("gzskin");
+		}
 		if (character.isBoss) {
 			trashes.push("boss");
 		}
@@ -321,6 +338,9 @@ export class Character {
 		}
 		if (character.clans.length > 0) {
 			character.clans.forEach((item) => trashes.push(`clan:${item}`));
+		}
+		if (character.initFilters.length > 0) {
+			trashes.push(`InitFilters:${character.initFilters.join(":")}`);
 		}
 
 		return trashes.concat(character.trashBin);

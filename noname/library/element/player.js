@@ -2562,6 +2562,7 @@ export class Player extends HTMLDivElement {
 	 * @param { string } character
 	 */
 	changeSkin(map, character) {
+		//TODO: 这一坨改不动了 谁爱改谁改
 		if (!map || !character) {
 			console.warn("error: no sourceMap or character to changeSkin", get.translation(this));
 			return;
@@ -7597,6 +7598,7 @@ export class Player extends HTMLDivElement {
 			}
 		}
 		game.broadcastAll(
+			//TODO: 这里直接修改trashBin部分，后续需要修改为新写法
 			function (player, skill, cfg) {
 				lib.skill[skill] = {
 					intro: {
@@ -7612,9 +7614,9 @@ export class Player extends HTMLDivElement {
 				if (Array.isArray(cfg.image)) {
 					cfg.image.forEach((image) => lib.character[skill][4].push(image));
 				} else if (typeof cfg.image == "string") {
-					lib.character[skill][4].push(cfg.image);
+					lib.character[skill].trashBin.push(cfg.image);
 				} else {
-					lib.character[skill][4].push("character:" + cfg.name);
+					lib.character[skill].trashBin.push("character:" + cfg.name);
 				}
 				lib.translate[skill] = cfg.caption || get.rawName(cfg.name);
 				player.storage[skill] = cfg;
@@ -9301,7 +9303,7 @@ export class Player extends HTMLDivElement {
 		const player = this;
 		for (const name of [player.name, player.name1, player.name2]) {
 			if (name && lib.character[name]) {
-				const filter = get.characterInitFilter(name);
+				const filter = lib.character[name].initFilters;
 				if (!filter.includes(tag)) continue;
 				if (lib.characterInitFilter[name] && lib.characterInitFilter[name](tag) === false) continue;
 				return true;

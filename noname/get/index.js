@@ -625,10 +625,8 @@ export class Get {
 	}
 	characterInitFilter(name) {
 		const info = get.character(name);
-		if (!info || !info[4]) return [];
-		const filter = info[4].find((tag) => tag.startsWith("InitFilter"));
-		if (!filter) return [];
-		return filter.split(":").slice(1);
+		if (!info) return [];
+		return info.initFilters || [];
 	}
 	characterIntro(name) {
 		if (lib.characterIntro[name]) return lib.characterIntro[name];
@@ -2612,12 +2610,10 @@ export class Get {
 	gainableSkillsName(name, func) {
 		var list = [];
 		if (name && lib.character[name]) {
-			if (lib.character[name][4]) {
-				if (lib.character[name].isBoss) return list;
-				if (lib.character[name].isHiddenBoss) return list;
-				if (lib.character[name].isMinskin) return list;
-				if (lib.character[name].isUnseen) return list;
-			}
+			if (lib.character[name].isBoss) return list;
+			if (lib.character[name].isHiddenBoss) return list;
+			if (lib.character[name].isMinskin) return list;
+			if (lib.character[name].isUnseen) return list;
 			for (var skill of lib.character[name].skills) {
 				var info = lib.skill[skill];
 				if (lib.filter.skillDisabled(skill)) continue;
@@ -3604,7 +3600,7 @@ export class Get {
 									if (avatar2) {
 										if (
 											gzbool &&
-											lib.character[nameskin2][4].includes("gzskin") &&
+											lib.character[nameskin2].hasSkinInGuozhan &&
 											lib.config.mode_config.guozhan.guozhanSkin
 										)
 											node.node.avatar2.setBackground(nameskin2, "character");
@@ -3612,7 +3608,7 @@ export class Get {
 									} else {
 										if (
 											gzbool &&
-											lib.character[nameskin2][4].includes("gzskin") &&
+											lib.character[nameskin2].hasSkinInGuozhan &&
 											lib.config.mode_config.guozhan.guozhanSkin
 										)
 											node.node.avatar.setBackground(nameskin2, "character");
@@ -3627,7 +3623,7 @@ export class Get {
 							} else {
 								if (
 									gzbool &&
-									lib.character[nameskin2][4].includes("gzskin") &&
+									lib.character[nameskin2].hasSkinInGuozhan &&
 									lib.config.mode_config.guozhan.guozhanSkin
 								)
 									button.setBackground(nameskin2, "character", "noskin");
@@ -4230,7 +4226,7 @@ export class Get {
 									delete lib.config.skin[nameskin];
 									if (
 										gzbool &&
-										lib.character[nameskin2][4].includes("gzskin") &&
+										lib.character[nameskin2].hasSkinInGuozhan &&
 										lib.config.mode_config.guozhan.guozhanSkin
 									)
 										node.setBackground(nameskin2, "character");
@@ -4244,7 +4240,7 @@ export class Get {
 							} else {
 								if (
 									gzbool &&
-									lib.character[nameskin2][4].includes("gzskin") &&
+									lib.character[nameskin2].hasSkinInGuozhan &&
 									lib.config.mode_config.guozhan.guozhanSkin
 								)
 									button.setBackground(nameskin2, "character", "noskin");

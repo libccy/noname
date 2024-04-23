@@ -4702,6 +4702,7 @@ export class Game {
 	 * @param { { extension: string, sex: Sex, group: string, hp: string | number, skills?: string[], tags?: any[], translate: string } } information
 	 */
 	addCharacter(name, information) {
+		//TODO: 这一坨也要改
 		const extensionName = _status.extension || information.extension,
 			character = [
 				information.sex,

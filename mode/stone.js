@@ -5867,7 +5867,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					return target.isMin();
 				},
 				content: function () {
-					target.clearSkills();
+					target.clearSkills(true);
 					target.init("stone_qingwa");
 					target.noPhaseDelay = true;
 				},

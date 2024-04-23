@@ -347,7 +347,7 @@ export class Click {
 			uiintro.listen(function () {
 				_status.clicked = true;
 			});
-			uiintro.style.zIndex = 21;
+			uiintro.style.zIndex = "21";
 			uiintro.classList.add("popped");
 			uiintro.classList.add("static");
 			uiintro.classList.add("onlineclient");
@@ -3186,7 +3186,7 @@ export class Click {
 								delete lib.config.skin[nameskin];
 								if (
 									gzbool &&
-									lib.character[nameskin2][4].includes("gzskin") &&
+									lib.character[nameskin2].hasSkinInGuozhan &&
 									lib.config.mode_config.guozhan.guozhanSkin
 								) {
 									bg.setBackground(nameskin2, "character");
@@ -3206,7 +3206,7 @@ export class Click {
 						} else {
 							if (
 								gzbool &&
-								lib.character[nameskin2][4].includes("gzskin") &&
+								lib.character[nameskin2].hasSkinInGuozhan &&
 								lib.config.mode_config.guozhan.guozhanSkin
 							)
 								button.setBackground(nameskin2, "character", "noskin");
@@ -3483,6 +3483,7 @@ export class Click {
 			};
 		} else {
 			// 样式一
+			//TODO: 这里的数据也暂时没有改成新格式，需要后续的修改
 			const introduction = ui.create.div(".characterintro", uiintro),
 				showCharacterNamePinyin = lib.config.show_characternamepinyin;
 			if (showCharacterNamePinyin != "doNotShow") {
@@ -3490,7 +3491,7 @@ export class Click {
 					span = document.createElement("span");
 				span.style.fontWeight = "bold";
 				const nameInfo = get.character(name),
-					exInfo = nameInfo[4],
+					exInfo = nameInfo.trashBin,
 					characterName =
 						exInfo && exInfo.includes("ruby") ? lib.translate[name] : get.rawName2(name);
 				span.innerHTML = characterName;
