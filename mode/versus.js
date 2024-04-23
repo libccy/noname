@@ -1753,7 +1753,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (event.filterChoice(i)) continue;
 						if (lib.filter.characterDisabled(i)) continue;
 						event.list.push(i);
-						if (lib.character[i][4] && lib.character[i][4].includes("zhu")) {
+						if (lib.character[i].isZhugong) {
 							list2.push(i);
 						}
 					}
@@ -3455,7 +3455,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							if (_status.event.player.identity == "zhu") {
 								if (Math.random() < 0.8) {
 									var info = lib.character[button.link];
-									if (!info[4] || !info[4].includes("zhu")) {
+									if (!info || !info.isZhugong) {
 										return 0;
 									}
 								}

@@ -31,7 +31,7 @@ export class Character {
 	 **/
 	group;
 	/**
-	 * 武将牌的势力边框颜（如徐庶“身在曹营心在汉”）
+	 * 武将牌的势力边框颜色（如徐庶“身在曹营心在汉”）
 	 * @type { string }
 	 **/
 	groupBorder;
