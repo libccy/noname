@@ -5,45 +5,105 @@ import { _status } from "../../status/index.js";
 import { ui } from "../../ui/index.js";
 
 export class Character {
-	/** @type { string } */
+	/**
+	 * 武将牌的性别
+	 * @type { string }
+	 **/
 	sex;
-	/** @type { number } */
+	/**
+	 * 武将牌的体力值
+	 * @type { number }
+	 **/
 	hp;
-	/** @type { number } */
+	/**
+	 * 武将牌的体力上限
+	 * @type { number }
+	 **/
 	maxHp;
-	/** @type { number } */
+	/**
+	 * 武将牌的护甲值
+	 * @type { number }
+	 **/
 	hujia = 0;
-	/** @type { string } */
+	/**
+	 * 武将牌的势力
+	 * @type { string }
+	 **/
 	group;
-	/** @type { string } */
+	/**
+	 * 武将牌的势力边框颜（如徐庶“身在曹营心在汉”）
+	 * @type { string }
+	 **/
 	groupBorder;
-	/** @type { string } */
+	/**
+	 * 神武将牌在国战模式下的势力
+	 * @type { string }
+	 **/
 	groupInGuozhan;
-	/** @type { string[] } */
+	/**
+	 * 武将牌拥有的技能
+	 * @type { string[] }
+	 **/
 	skills = [];
-	/** @type { boolean } */
+	/**
+	 * 武将牌是否为常备主公
+	 * @type { boolean }
+	 **/
 	isZhugong = false;
-	/** @type { boolean } */
+	/**
+	 * 武将牌是否为隐藏武将
+	 * @type { boolean }
+	 **/
 	isUnseen = false;
-	/** @type { boolean } */
+	/**
+	 * 武将牌是否拥有隐匿技能
+	 * @type { boolean }
+	 **/
 	hasHiddenSkill = false;
-	/** @type { Array } */
+	/**
+	 * 垃圾桶，用于存储原本Character[4]的垃圾数据
+	 * @type { Array }
+	 **/
 	trashBin = [];
-	/** @type { string } */
+	/**
+	 * 武将牌对应的另一半双面武将牌
+	 * @type { string }
+	 **/
 	dualSideCharacter;
-	/** @type { Array } */
+	/** 
+     * 多势力武将牌的全部势力
+     * @type { Array }
+     **/
 	doubleGroup = [];
-	/** @type { boolean } */
+	/** 
+     * 武将牌是否为minskin
+     * @type { boolean }
+     **/
 	isMinskin = false;
-	/** @type { boolean } */
+	/** 
+     * 武将牌是否为挑战模式下的BOSS
+     * @type { boolean } 
+     **/
 	isBoss = false;
-	/** @type { boolean } */
+	/** 
+     * 武将牌是否为隐藏BOSS
+     * @type { boolean } 
+     **/
 	isHiddenBoss = false;
-	/** @type { boolean } */
+	/** 
+     * 武将牌是否“仅点将可用”
+     * @type { boolean } 
+     **/
 	isAiForbidden = false;
-	/** @type { boolean } */
+	/** 
+     * 武将牌是否为炉石模式下的隐藏武将
+     * @type { boolean } 
+     **/
 	isHiddenInStoneMode = false;
-	/** @type { boolean } */
+	/** 
+     * 武将牌是否为bossallowed
+     * @type { boolean } 
+     **/
 	isBossAllowed = false;
 	/**
 	 * @param { Array|Object } [data]
@@ -82,7 +142,7 @@ export class Character {
 				character.isBoss = true;
 			} else if (item === "bossallowed") {
 				character.isBossAllowed = true;
-			} else if (item === "hiddenBoss") {
+			} else if (item === "hiddenboss") {
 				character.isHiddenBoss = true;
 			} else if (item === "forbidai") {
 				character.isAiForbidden = true;
