@@ -2491,12 +2491,12 @@ export class Player extends HTMLDivElement {
 			info = get.convertedCharacter(["", "", 1, [], []]);
 		}
 
-		if (!game.minskin && get.is.newLayout() && !info[4].includes("minskin")) {
+		if (!game.minskin && get.is.newLayout() && !info.isMinskin) {
 			this.classList.remove("minskin");
 			this.node.avatar.setBackground(character, "character");
 		} else {
 			this.node.avatar.setBackground(character, "character");
-			if (info[4].includes("minskin")) {
+			if (info.isMinskin) {
 				this.classList.add("minskin");
 			} else if (game.minskin) {
 				this.classList.add("minskin");

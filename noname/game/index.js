@@ -4731,6 +4731,7 @@ export class Game {
 		let extname = _status.extension || "扩展";
 		let gzFlag = false;
 		packagename = packagename || extname;
+		//TODO: 把这里一大坨改成新写法
 		for (let i in pack) {
 			if (i == "mode") {
 				if (pack[i] == "guozhan") gzFlag = true;

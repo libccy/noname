@@ -1127,16 +1127,16 @@ export class Create {
 	characterDialog2(filter) {
 		var list = [];
 		for (var i in lib.character) {
-			if (lib.character[i][4].includes("minskin")) continue;
+			if (lib.character[i].isMinskin) continue;
 			if (
-				lib.character[i][4].includes("boss") ||
-				lib.character[i][4].includes("hiddenboss")
+				lib.character[i].isBoss ||
+				lib.character[i].isHiddenBoss
 			) {
 				if (lib.config.mode == "boss") continue;
-				if (!lib.character[i][4].includes("bossallowed")) continue;
+				if (!lib.character[i].isBossAllowed) continue;
 			}
 
-			if (lib.character[i][4].includes("stonehidden")) continue;
+			if (lib.character[i].isHiddenInStoneMode) continue;
 			if (lib.config.banned.includes(i)) continue;
 			if (filter && filter(i)) continue;
 			list.push(i);
@@ -1306,16 +1306,16 @@ export class Create {
 		} else {
 			for (var i in lib.character) {
 				if(lib.character[i][4]) {
-					if (lib.character[i][4].includes("minskin")) continue;
+					if (lib.character[i].isMinskin) continue;
 					if (
-						lib.character[i][4].includes("boss") ||
-						lib.character[i][4].includes("hiddenboss")
+						lib.character[i].isBoss ||
+						lib.character[i].isHiddenBoss
 					) {
 						if (lib.config.mode == "boss") continue;
-						if (!lib.character[i][4].includes("bossallowed")) continue;
+						if (!lib.character[i].isBossAllowed) continue;
 					}
 
-					if (lib.character[i][4].includes("stonehidden")) continue;
+					if (lib.character[i].isHiddenInStoneMode) continue;
 					if (lib.character[i].isUnseen) continue;
 				}
 				if (lib.config.banned.includes(i)) continue;

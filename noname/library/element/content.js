@@ -2399,6 +2399,7 @@ export const Content = {
 			}
 			for (j in character[i]) {
 				if (j == "mode" || j == "forbid" || j == "characterSort") continue;
+				//TODO: 改掉这第二坨
 				for (k in character[i][j]) {
 					if (j == "character") {
 						if (!character[i][j][k][4]) {

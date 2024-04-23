@@ -755,8 +755,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						for (var i in lib.characterPack.boss) {
 							if (!lib.character[i] && lib.characterPack.boss[i][4]) {
 								if (
-									lib.characterPack.boss[i][4].includes("jiangeboss") ||
-									lib.characterPack.boss[i][4].includes("jiangemech")
+									get.convertedCharacter(lib.characterPack.boss[i]).isJiangeBoss ||
+									get.convertedCharacter(lib.characterPack.boss[i]).isJiangeMech
 								) {
 									lib.character[i] = lib.characterPack.boss[i];
 								}
@@ -765,11 +765,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					for (var i in lib.character) {
 						if (lib.character[i][4]) {
-							if (lib.character[i][4].includes("jiangeboss")) {
-								list[lib.character[i][1] + "boss"].push(i);
+							if (lib.character[i].isJiangeBoss) {
+								list[lib.character[i].group + "boss"].push(i);
 								continue;
-							} else if (lib.character[i][4].includes("jiangemech")) {
-								list[lib.character[i][1] + "mech"].push(i);
+							} else if (lib.character[i].isJiangeMech) {
+								list[lib.character[i].group + "mech"].push(i);
 								continue;
 							}
 						}

@@ -106,6 +106,21 @@ export class Character {
 	 **/
 	isBossAllowed = false;
 	/**
+	 * 武将牌是否为战旗模式下的BOSS
+	 * @type { boolean }
+	 **/
+	isChessBoss = false;
+	/**
+	 * 武将牌是否为剑阁模式下的BOSS
+	 * @type { boolean }
+	 **/
+	isJiangeBoss = false;
+	/**
+	 * 武将牌是否为剑阁模式下的机械
+	 * @type { boolean }
+	 **/
+	isJiangeMech = false;
+	/**
 	 * 武将牌对应的全部宗族
 	 * @type { string[] }
 	 **/
@@ -136,8 +151,10 @@ export class Character {
 			clans = [];
 		for (let i = 0; i < trash.length; i++) {
 			let item = trash[i];
-			if (i === 0 && lib.group.includes(item)) {
+			if (i === 0 && (lib.group.includes(item) || item === 'key')) {
 				character.groupInGuozhan = item;
+			} else if(item.startsWith("gzgroup:")){
+				character.groupInGuozhan = item.slice(8);
 			} else if (item === "zhu") {
 				character.isZhugong = true;
 			} else if (item === "unseen") {
@@ -146,6 +163,12 @@ export class Character {
 				character.isMinskin = true;
 			} else if (item === "boss") {
 				character.isBoss = true;
+			} else if (item === "chessboss") {
+				character.isChessBoss = true;
+			} else if (item === "jiangeboss") {
+				character.isJiangeBoss = true;
+			} else if (item === "jiangemech") {
+				character.isJiangeMech = true;
 			} else if (item === "bossallowed") {
 				character.isBossAllowed = true;
 			} else if (item === "hiddenboss") {
@@ -216,13 +239,14 @@ export class Character {
 	}
 
 	/**
-	 * @deprecated
+	 * 把新格式下的数据转换回传统的屎山
+     * @deprecated
 	 */
 	get 4() {
 		const trashes = [],
 			character = this;
 		if (lib.group.includes(character.groupInGuozhan)) {
-			trashes.push(character.groupInGuozhan);
+			trashes.push(`gzgroup:${character.groupInGuozhan}`);
 		}
 		if (character.isZhugong) {
 			trashes.push("zhu");
@@ -235,6 +259,15 @@ export class Character {
 		}
 		if (character.isBoss) {
 			trashes.push("boss");
+		}
+		if (character.isChessBoss) {
+			trashes.push("chessboss");
+		}
+		if (character.isJiangeBoss) {
+			trashes.push("jiangeboss");
+		}
+		if (character.isJiangeMech) {
+			trashes.push("jiangemech");
 		}
 		if (character.isBossAllowed) {
 			trashes.push("bossallowed");

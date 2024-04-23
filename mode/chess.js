@@ -45,9 +45,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					if (!playback && i.indexOf("leader_") == 0 && _status.mode != "leader") continue;
 					lib.character[i] = lib.characterPack.mode_chess[i];
-					if (!lib.character[i][4]) {
-						lib.character[i][4] = [];
-					}
 				}
 			}
 			if (get.config("chess_card")) {
@@ -106,7 +103,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						} else {
 							game.chooseCharacterDouble(
 								function (i) {
-									if (lib.character[i][4].includes("chessboss")) {
+									if (lib.character[i].isChessBoss) {
 										return false;
 									}
 									return !lib.filter.characterDisabled(i);
@@ -3957,15 +3954,15 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					var jiangelist = [];
 					event.list = list;
 					for (i in lib.character) {
-						if (lib.character[i][4].includes("chessboss")) {
+						if (lib.character[i].isChessBoss) {
 							bosslist.push(i);
 							continue;
-						} else if (lib.character[i][4].includes("jiangeboss")) {
+						} else if (lib.character[i].isJiangeBoss) {
 							// if(get.config('chess_jiange')) jiangelist.push(i);
 							continue;
 						}
 						if (i.indexOf("treasure_") == 0) continue;
-						if (lib.character[i][4].includes("minskin")) continue;
+						if (lib.character[i].isMinskin) continue;
 						if (lib.config.forbidchess.includes(i)) continue;
 						if (lib.filter.characterDisabled(i)) continue;
 						list.push(i);

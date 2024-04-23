@@ -1360,11 +1360,11 @@ export class Get {
 		if (rank.bm.includes(name)) return num ? Math.round((2 * (num - 1)) / 8 + 1) : "bm";
 		if (rank.c.includes(name)) return num ? Math.round((1 * (num - 1)) / 8 + 1) : "c";
 		if (rank.d.includes(name)) return num ? Math.round((0 * (num - 1)) / 8 + 1) : "d";
-		if (lib.character[name] && lib.character[name][4]) {
+		if (lib.character[name]) {
 			if (
-				lib.character[name][4].includes("boss") ||
-				lib.character[name][4].includes("bossallowed") ||
-				lib.character[name][4].includes("hiddenboss")
+				lib.character[name].isBoss ||
+				lib.character[name].isBossAllowed ||
+				lib.character[name].isHiddenBoss
 			) {
 				return num ? Math.round((9 * (num - 1)) / 8 + 1) : "sp";
 			}
@@ -2594,14 +2594,11 @@ export class Get {
 		for (var i in lib.character) {
 			if (lib.filter.characterDisabled(i)) continue;
 			if (lib.filter.characterDisabled2(i)) continue;
-			if (lib.character[i][4]) {
-				if (lib.character[i][4].includes("boss")) continue;
-				if (lib.character[i][4].includes("hiddenboss")) continue;
-				if (lib.character[i][4].includes("minskin")) continue;
-				if (lib.character[i][4].includes("unseen")) continue;
-			}
-			for (var j = 0; j < lib.character[i][3].length; j++) {
-				var skill = lib.character[i][3][j];
+			if (lib.character[i].isBoss) continue;
+			if (lib.character[i].isHiddenBoss) continue;
+			if (lib.character[i].isMinskin) continue;
+			if (lib.character[i].isUnseen) continue;
+			for (var skill of lib.character[i].skills) {
 				var info = lib.skill[skill];
 				if (lib.filter.skillDisabled(skill)) continue;
 				if (func && !func(info, skill, i)) continue;
@@ -2616,13 +2613,12 @@ export class Get {
 		var list = [];
 		if (name && lib.character[name]) {
 			if (lib.character[name][4]) {
-				if (lib.character[name][4].includes("boss")) return list;
-				if (lib.character[name][4].includes("hiddenboss")) return list;
-				if (lib.character[name][4].includes("minskin")) return list;
+				if (lib.character[name].isBoss) return list;
+				if (lib.character[name].isHiddenBoss) return list;
+				if (lib.character[name].isMinskin) return list;
 				if (lib.character[name].isUnseen) return list;
 			}
-			for (var j = 0; j < lib.character[name][3].length; j++) {
-				var skill = lib.character[name][3][j];
+			for (var skill of lib.character[name].skills) {
 				var info = lib.skill[skill];
 				if (lib.filter.skillDisabled(skill)) continue;
 				if (func && !func(info, skill, name)) continue;

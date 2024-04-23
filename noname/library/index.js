@@ -10531,7 +10531,7 @@ export class Library {
 			return true;
 		},
 		characterDisabled: function (i, libCharacter) {
-			if (!lib.character[i] || (lib.character[i][4] && lib.character[i][4].includes("forbidai")))
+			if (!lib.character[i] || lib.character[i].isAiForbidden)
 				return true;
 			if (lib.character[i].isUnseen) return true;
 			if (lib.config.forbidai.includes(i)) return true;
@@ -10602,11 +10602,11 @@ export class Library {
 			var info = lib.character[i];
 			if (!info) return true;
 			if (info[4]) {
-				if (info[4].includes("boss")) return true;
-				if (info[4].includes("hiddenboss")) return true;
-				if (info[4].includes("minskin")) return true;
+				if (info.isBoss) return true;
+				if (info.isHiddenBoss) return true;
+				if (info.isMinskin) return true;
 				if (info.isUnseen) return true;
-				if (info[4].includes("forbidai") && (!_status.event.isMine || !_status.event.isMine()))
+				if (info.isAiForbidden && (!_status.event.isMine || !_status.event.isMine()))
 					return true;
 				if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) return true;
 			}
@@ -12213,22 +12213,19 @@ export class Library {
 					trigger: { global: "gameStart", player: "enterGame" },
 					silent: true,
 					content: function () {
-						var list = [player.name, player.name1, player.name2];
+						var list = [player.name1, player.name2];
 						for (var i = 0; i < list.length; i++) {
 							if (list[i] && lib.character[list[i]]) {
 								var info = lib.character[list[i]];
-								if (info[3].includes("dualside") && info[4]) {
+								if (info.skills.includes("dualside") && info.dualSideCharacter) {
 									player.storage.dualside = [list[i], player.hp, player.maxHp];
-									for (var j = 0; j < info[4].length; j++) {
-										if (info[4][j].startsWith("dualside:")) {
-											var name2 = info[4][j].slice(9);
-											var info2 = lib.character[name2];
-											player.storage.dualside.push(name2);
-											player.storage.dualside.push(get.infoHp(info2[2]));
-											player.storage.dualside.push(get.infoMaxHp(info2[2]));
-										}
-									}
+									var name2 = info.dualSideCharacter;
+									var info2 = lib.character[name2];
+									player.storage.dualside.push(name2);
+									player.storage.dualside.push(info2.hp);
+									player.storage.dualside.push(info2.maxHp);
 								}
+								break;
 							}
 						}
 						var cfg = player.storage.dualside;

@@ -245,9 +245,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			for (i in lib.character) {
 				if (i.indexOf("treasure_") == 0) continue;
 				if (i.indexOf("tafang_mech_") == 0) continue;
-				if (lib.character[i][4].includes("minskin")) continue;
+				if (lib.character[i].isMinskin) continue;
 				if (lib.config.forbidchess.includes(i)) continue;
-				if (lib.character[i][4].includes("boss")) continue;
+				if (lib.character[i].isBoss) continue;
 				if (lib.filter.characterDisabled(i)) continue;
 				list.push(i);
 			}
