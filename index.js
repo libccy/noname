@@ -1,10 +1,17 @@
 try {
 	const express = require("express");
-	const bodyParser = require('body-parser')
+	const bodyParser = require('body-parser');
 	const app = express();
 	const fs = require('fs');
 	const path = require('path');
 
+	app.use(bodyParser.json({
+		limit:'10240mb'
+	}));
+	app.use(bodyParser.urlencoded({
+		limit: "10240mb",
+		extended: true, //需明确设置
+	}));
 	function join(url) {
 		return path.join(__dirname, url);
 	}
@@ -244,5 +251,6 @@ try {
 	}
 
 } catch (e) {
+	console.error("本地服务器启动失败: ");
 	console.error(e);
 }
