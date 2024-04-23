@@ -324,9 +324,14 @@ export async function onload(resetGameTimeout) {
 								lib.skilllist.add(character[i][j][k][3][l]);
 							}
 						}
-						else{
-							for (var l = 0; l < character[i][j][k].skills.length; l++) {
-								lib.skilllist.add(character[i][j][k].skills[l]);
+						else {
+							if (character[i][j][k].isBoss || character[i][j][k].isHiddenBoss) {
+								lib.config.forbidai.add(k);
+							}
+							if (character[i][j][k].skills) {
+								for (var l = 0; l < character[i][j][k].skills.length; l++ ) {
+									lib.skilllist.add(character[i][j][k].skills[l]);
+								}
 							}
 						}
 					}

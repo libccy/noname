@@ -116,7 +116,6 @@ export class Character {
 			this.maxHp = get.infoMaxHp(data[2]);
 			this.hujia = get.infoHujia(data[2]);
 			this.skills = get.copy(data[3] || []);
-			this.trashBin = get.copy(data[4] || []);
 			Character.convertTrashToProperties(this, this.trashBin);
 		} else if (get.is.object(data)) {
 			Object.assign(this, data);
@@ -128,7 +127,8 @@ export class Character {
 	 * @param { Array } trash
 	 */
 	static convertTrashToProperties(character, trash) {
-		for (let i = 0; i < trash.length; i++) {
+		let keptTrashes = [];
+        for (let i = 0; i < trash.length; i++) {
 			let item = trash[i];
 			if (i === 0 && lib.group.includes(item)) {
 				character.groupInGuozhan = item;
@@ -156,8 +156,11 @@ export class Character {
 				character.dualSideCharacter = item.slice(9);
 			} else if (item.startsWith("doublegroup:")) {
 				character.doubleGroup = item.slice(12).split(":");
-			}
+			} else {
+                keptTrashes.push(item);
+            }
 		}
+        character.trashBin = keptTrashes;
 	}
 	/**
 	 * @deprecated
@@ -207,7 +210,48 @@ export class Character {
 	 * @deprecated
 	 */
 	get 4() {
-		return this.trashBin;
+		const trashes = [], character = this;
+        if (lib.group.includes(character.groupInGuozhan)) {
+            trashes.push(character.groupInGuozhan);
+        }
+        if (character.isZhugong) {
+            trashes.push('zhu');
+        }
+        if (character.isUnseen) {
+            trashes.push('unseen');
+        }
+        if (character.isMinskin) {
+            trashes.push('minskin');
+        }
+        if (character.isBoss) {
+            trashes.push('boss');
+        }
+        if (character.isBossAllowed) {
+            trashes.push('bossallowed');
+        }
+        if (character.isHiddenBoss) {
+            trashes.push('hiddenboss');
+        }
+        if (character.isAiForbidden) {
+            trashes.push('forbidai');
+        }
+        if (character.isHiddenInStoneMode) {
+            trashes.push('stonehidden');
+        }
+        if (character.hasHiddenSkill) {
+            trashes.push('hiddenSkill');
+        }
+        if (character.groupBorder) {
+            trashes.push(`border:${character.groupBorder}`);
+        }
+        if (character.dualSideCharacter) {
+            trashes.push(`duaslside:${character.dualSideCharacter}`)
+        }
+        if (character.doubleGroup.length>0) {
+            trashes.push(`doublegroup:${character.doubleGroup.join(':')}`)
+        }
+
+        return trashes.concat(character.trashBin);
 	}
 	set 4(trashBin) {
 		this.trashBin = trashBin;
