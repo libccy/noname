@@ -67,7 +67,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						delete lib.translate.shuiyanqijunx_info_guozhan;
 						const pack = lib.yingbian_guozhan;
 						for (const i in pack) {
-							if (!pack[i][4]) pack[i][4] = [];
 							lib.character[i] = pack[i];
 							lib.characterPack.mode_guozhan[i] = pack[i];
 							if (!lib.translate[i]) lib.translate[i] = lib.translate[i.slice(3)];
@@ -120,7 +119,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							delete lib.translate.shuiyanqijunx_info_guozhan;
 							const pack2 = lib.yingbian_guozhan;
 							for (const i in pack2) {
-								if (!pack2[i][4]) pack2[i][4] = [];
 								pack[i] = pack2[i];
 							}
 						}
@@ -22329,7 +22327,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									}
 								}
 							}
-							if (lib.character[button.link][4].includes("hiddenSkill")) return false;
+							if (lib.character[button.link].hasHiddenSkill) return false;
 							var filterChoice = function (name1, name2) {
 								if (_status.separatism) return true;
 								var group1 = lib.character[name1][1];

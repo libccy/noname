@@ -2256,33 +2256,33 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				var i, j, name;
 				for (var i in lib.characterPack.mode_stone) {
 					lib.character[i] = lib.characterPack.mode_stone[i];
-					if (lib.characterPack.mode_stone[i][4].includes("stonespecial")) continue;
-					lib.character[i][3].add("stonesha");
-					lib.character[i][3].add("stoneshan");
-					lib.character[i][3].add("stonedraw");
+					if (lib.character[i].isSpecialInStoneMode) continue;
+					lib.character[i].skills.add("stonesha");
+					lib.character[i].skills.add("stoneshan");
+					lib.character[i].skills.add("stonedraw");
 					name = i + "_stonecharacter";
 					lib.card[name] = {
 						image: "mode/stone/character/" + i,
-						stoneact: lib.character[i][5][0],
-						career: lib.character[i][5][2] || null,
+						stoneact: lib.character[i].stoneModeData[0],
+						career: lib.character[i].stoneModeData[2] || null,
 					};
 					for (j in lib.element.stonecharacter) {
 						lib.card[name][j] = lib.element.stonecharacter[j];
 					}
 					lib.translate[name] = get.translation(i);
 					lib.translate[name + "_info"] = get.skillintro(i);
-					if (lib.character[i][4].includes("stonehidden")) {
+					if (lib.character[i].isHiddenInStoneMode) {
 						lib.card[name].stonehidden = true;
 						continue;
 					}
-					if (!lib.character[i][5][2]) {
-						if (lib.character[i][5][0] < 3) {
+					if (!lib.character[i].stoneModeData[2]) {
+						if (lib.character[i].stoneModeData[0] < 3) {
 							list.push(name);
 						} else {
 							list2.push(name);
 						}
 					} else {
-						list3[lib.character[i][5][2]].push(name);
+						list3[lib.character[i].stoneModeData[2]].push(name);
 					}
 				}
 				if (_status.mode == "deck") {
@@ -2415,8 +2415,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					var list = [];
 					event.list = list;
 					for (i in lib.character) {
-						if (lib.character[i][4] && lib.character[i][4].includes("minskin")) continue;
-						if (lib.character[i][4] && lib.character[i][4].includes("stonehidden")) continue;
+						if (lib.character[i].isMinskin) continue;
+						if (lib.character[i].isHiddenInStoneMode) continue;
 						if (lib.config.forbidstone.includes(i)) continue;
 						if (lib.filter.characterDisabled(i)) continue;
 						list.push(i);
@@ -7232,10 +7232,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					var list = [];
 					for (var i in lib.character) {
 						if (
-							lib.character[i][4].includes("stone") &&
-							!lib.character[i][4].includes("stonehidden") &&
-							lib.character[i][5] &&
-							lib.character[i][5][0] == num
+							lib.character[i].isFellowInStoneMode &&
+							!lib.character[i].isHiddenInStoneMode &&
+							lib.character[i].stoneModeData &&
+							lib.character[i].stoneModeData[0] == num
 						) {
 							list.push(i);
 						}
@@ -7787,10 +7787,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					var list = [];
 					for (var i in lib.character) {
 						if (
-							lib.character[i][4].includes("stone") &&
-							!lib.character[i][4].includes("stonehidden") &&
-							lib.character[i][5] &&
-							lib.character[i][5][0] == 1
+							lib.character[i].isFellowInStoneMode &&
+							!lib.character[i].isHiddenInStoneMode &&
+							lib.character[i].stoneModeData &&
+							lib.character[i].stoneModeData[0] == 1
 						) {
 							list.push(i);
 						}
@@ -10366,9 +10366,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					var list = [];
 					var list2 = [];
 					for (var i in lib.character) {
-						if (lib.character[i][4].includes("stonelegend_" + player.career)) {
+						if (lib.character[i].trashBin.includes("stonelegend_" + player.career)) {
 							list.push(i);
-						} else if (lib.character[i][4].includes("stonelegend")) {
+						} else if (lib.character[i].trashBin.includes("stonelegend")) {
 							list2.push(i);
 						}
 					}

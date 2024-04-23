@@ -96,10 +96,25 @@ export class Character {
 	 **/
 	isAiForbidden = false;
 	/**
+	 * 武将牌在炉石模式下的特殊信息
+	 * @type { array|undefined }
+	 **/
+	stoneModeData;
+	/**
+	 * 武将牌是否为炉石模式下的随从
+	 * @type { boolean }
+	 **/
+	isFellowInStoneMode = false;
+	/**
 	 * 武将牌是否为炉石模式下的隐藏武将
 	 * @type { boolean }
 	 **/
 	isHiddenInStoneMode = false;
+	/**
+	 * 武将牌是否为炉石模式下的特殊随从（可以使用装备和锦囊）
+	 * @type { boolean }
+	 **/
+	isSpecialInStoneMode = false;
 	/**
 	 * 武将牌是否为bossallowed
 	 * @type { boolean }
@@ -137,6 +152,7 @@ export class Character {
 			this.hujia = get.infoHujia(data[2]);
 			this.skills = get.copy(data[3] || []);
 			if (data[4]) Character.convertTrashToProperties(this, data[4]);
+			if (data[5]) this.stoneModeData = data[5];
 		} else if (get.is.object(data)) {
 			Object.assign(this, data);
 			if (typeof this.maxHp !== "number") this.maxHp = this.hp;
@@ -175,8 +191,12 @@ export class Character {
 				character.isHiddenBoss = true;
 			} else if (item === "forbidai") {
 				character.isAiForbidden = true;
+			} else if (item === "stone") {
+				character.isFellowInStoneMode = true;
 			} else if (item === "stonehidden") {
 				character.isHiddenInStoneMode = true;
+			} else if (item === "stonespecial") {
+				character.isSpecialInStoneMode = true;
 			} else if (item === "hiddenSkill") {
 				character.hasHiddenSkill = true;
 			} else if (item.startsWith("border:")) {
@@ -278,8 +298,14 @@ export class Character {
 		if (character.isAiForbidden) {
 			trashes.push("forbidai");
 		}
+		if (character.isFellowInStoneMode) {
+			trashes.push("stone");
+		}
 		if (character.isHiddenInStoneMode) {
 			trashes.push("stonehidden");
+		}
+		if (character.isSpecialInStoneMode) {
+			trashes.push("stonespecial");
 		}
 		if (character.hasHiddenSkill) {
 			trashes.push("hiddenSkill");
@@ -301,5 +327,12 @@ export class Character {
 	}
 	set 4(trashBin) {
 		console.warn("你set你🐎的废弃属性");
+	}
+
+	get 5(){
+		return this.stoneModeData;
+	}
+	set 5(stoneData){
+		this.stoneModeData = stoneData;
 	}
 }
