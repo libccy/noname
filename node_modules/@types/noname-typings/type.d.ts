@@ -59,12 +59,12 @@ declare type GeneratorContentFuncByAll = (event: GameEventPromise, map: {
 
 declare type OldContentFuncByAll = () => void
 
-declare type Game = typeof import('./nonameModules/noname.d.ts').game;
-declare type Library = typeof import('./nonameModules/noname.d.ts').lib;
-declare type Status = typeof import('./nonameModules/noname.d.ts')._status;
-declare type UI = typeof import('./nonameModules/noname.d.ts').ui;
-declare type Get = typeof import('./nonameModules/noname.d.ts').get;
-declare type AI = typeof import('./nonameModules/noname.d.ts').ai;
+declare type Game = typeof import('noname-typings/nonameModules/noname.js').game;
+declare type Library = typeof import('noname-typings/nonameModules/noname.js').lib;
+declare type Status = typeof import('noname-typings/nonameModules/noname.js')._status;
+declare type UI = typeof import('noname-typings/nonameModules/noname.js').ui;
+declare type Get = typeof import('noname-typings/nonameModules/noname.js').get;
+declare type AI = typeof import('noname-typings/nonameModules/noname.js').ai;
 
 declare type Button = import('./nonameModules/noname/library/index.js').Button;
 declare type Card = import('./nonameModules/noname/library/index.js').Card;
@@ -195,7 +195,6 @@ declare interface importCharacterConfig {
      * 若里面是项目内的同名字段，将覆盖原方法
      */
     game?: SMap<any>;
-
     /**
      * 类型：键值对
      * 
@@ -535,6 +534,80 @@ declare interface importExtensionConfig {
      * 这些对象会对应附加在lib中，或替换对应lib位置的对象：
      * 例如：translate，help，skill... ... 或者其他自定义的...
      */
+    [key: string]: any;
+}
+
+/**
+ * 导入玩法的配置
+ */
+declare interface importPlayConfig {
+    /** 扩展名 */
+    name: string;
+    arenaReady?: Function;
+    /**
+     * 设置播放录像
+     */
+    video?: Function;
+    /** 
+     * 设置技能 
+     * */
+    skill?: SMap<Skill>;
+    /** 
+     * 设置该武将包独有的卡牌（或者是特殊卡牌） 
+     * 
+     * */
+    card?: SMap<any>;
+    translate?: SMap<string>;
+    /**
+     * 对应lib.element
+     * 
+     * 若里面是项目内的同名字段，将覆盖原方法
+     */
+    element?: SMap<any>;
+    /**
+     * 对应ai
+     * 
+     * 若里面是项目内的同名字段，将覆盖原方法
+     */
+    ai?: SMap<any>;
+    /**
+     * 对应ui
+     * 
+     * 若里面是项目内的同名字段，将覆盖原方法
+     */
+    ui?: SMap<any>;
+    /**
+     * 对应game
+     * 
+     * 若里面是项目内的同名字段，将覆盖原方法
+     */
+    game?: SMap<any>;
+    /**
+     * 类型：键值对
+     * 
+     * 作用：对应get
+     * 若里面是项目内的同名字段，将覆盖原方法
+     */
+    get?: SMap<any>;
+    /**
+     * 帮助内容将显示在菜单－选项－帮助中
+     * 
+     * 游戏编辑器的帮助代码基本示例结构：
+     * 
+     * "帮助条目":
+     * ```jsx
+     *  <ul>
+     *      <li>列表1-条目1
+     *      <li>列表1-条目2
+     *  </ul>
+     *  <ol>
+     *      <li>列表2-条目1
+     *      <li>列表2-条目2
+     *  </ul>
+     * ```
+     * (目前可显示帮助信息：mode，extension，card卡包，character武将包)
+     */
+    help?: SMap<string>;
     [key: string]: any;
 }
 

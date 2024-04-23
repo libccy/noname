@@ -1,1 +1,1 @@
-export function otherMenu(connectMenu: any): void;
+export function otherMenu(connectMenu: boolean | undefined): void;

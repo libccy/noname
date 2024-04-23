@@ -1,7 +1,6 @@
-import { Uninstantable } from "../util/index.js";
-import { game, Game } from "./index.js";
+import { game } from "../../noname.js";
 
-export class GamePromises extends Uninstantable {
+export class GamePromises {
 	/**
 	 * 模仿h5的prompt，用于显示可提示用户进行输入的对话框
 	 *
@@ -29,12 +28,12 @@ export class GamePromises extends Uninstantable {
 	 * @param { string } title
 	 * @param { boolean } [forced]
 	 * @returns { Promise<string> }
-	 * 
+	 *
 	 */
 	// @ts-ignore
-	static prompt(alertOption, title, forced) {
+	prompt(alertOption, title, forced) {
 		return new Promise((resolve, reject) => {
-			if (alertOption !== 'alert') {
+			if (alertOption !== "alert") {
 				// @ts-ignore
 				forced = title || false;
 				title = alertOption;
@@ -54,31 +53,39 @@ export class GamePromises extends Uninstantable {
 	 * ```
 	 * @returns { Promise<true> }
 	 */
-	static alert(title) {
+	alert(title) {
 		return new Promise((resolve, reject) => {
-			game.prompt(title, 'alert', resolve);
+			game.prompt(title, "alert", resolve);
 		});
 	}
 	// 读写函数promises化(不用考虑其对应函数是否存在)
-	static download(url, folder, dev, onprogress) {
+	download(url, folder, dev, onprogress) {
 		return new Promise((resolve, reject) => {
+			// @ts-ignore
 			game.download(url, folder, resolve, reject, dev, onprogress);
 		});
 	}
-	static readFile(filename) {
+	/**
+	 * @param {string} filename
+	 * @returns {Promise<ArrayBuffer | Buffer>}
+	 */
+	readFile(filename) {
 		return new Promise((resolve, reject) => {
+			// @ts-ignore
 			game.readFile(filename, resolve, reject);
 		});
 	}
-	static readFileAsText(filename) {
+	readFileAsText(filename) {
 		return new Promise((resolve, reject) => {
+			// @ts-ignore
 			game.readFileAsText(filename, resolve, reject);
 		});
 	}
-	static writeFile(data, path, name) {
-		return (new Promise((resolve, reject) => {
+	writeFile(data, path, name) {
+		return new Promise((resolve, reject) => {
+			// @ts-ignore
 			game.writeFile(data, path, name, resolve);
-		})).then(result => {
+		}).then((result) => {
 			return new Promise((resolve, reject) => {
 				if (result instanceof Error) {
 					reject(result);
@@ -88,27 +95,35 @@ export class GamePromises extends Uninstantable {
 			});
 		});
 	}
-	static ensureDirectory(list, callback, file) {
+	ensureDirectory(list, callback, file) {
 		return new Promise((resolve, reject) => {
-			game.ensureDirectory(list, callback, file).then(resolve).catch(reject);
+			// @ts-ignore
+			game.ensureDirectory(list, resolve, file);
 		});
 	}
-	static createDir(directory) {
+	createDir(directory) {
 		return new Promise((resolve, reject) => {
+			// @ts-ignore
 			game.createDir(directory, resolve, reject);
 		});
 	}
-	static removeFile(filename) {
-		return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
-			game.removeFile(filename, err => {
-				if (err) reject(err);
-				else resolve();
-			});
-		}));
+	removeFile(filename) {
+		return /** @type {Promise<void>} */ (
+			new Promise((resolve, reject) => {
+				// @ts-ignore
+				game.removeFile(filename, (err) => {
+					if (err) reject(err);
+					else resolve();
+				});
+			})
+		);
 	}
-	static removeDir(directory) {
-		return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
-			game.removeDir(directory, resolve, reject);
-		}));
+	removeDir(directory) {
+		return /** @type {Promise<void>} */ (
+			new Promise((resolve, reject) => {
+				// @ts-ignore
+				game.removeDir(directory, resolve, reject);
+			})
+		);
 	}
 }

@@ -1,2 +1,5 @@
-import codemirror from 'codemirror/index';
-export = codemirror;
+export default CodeMirror;
+/**
+ * @type { typeof import('codemirror/index') }
+ */
+declare var CodeMirror: typeof import('codemirror/index');
