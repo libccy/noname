@@ -70,41 +70,46 @@ export class Character {
 	 * @type { string }
 	 **/
 	dualSideCharacter;
-	/** 
-     * 多势力武将牌的全部势力
-     * @type { Array }
-     **/
+	/**
+	 * 多势力武将牌的全部势力
+	 * @type { Array }
+	 **/
 	doubleGroup = [];
-	/** 
-     * 武将牌是否为minskin
-     * @type { boolean }
-     **/
+	/**
+	 * 武将牌是否为minskin
+	 * @type { boolean }
+	 **/
 	isMinskin = false;
-	/** 
-     * 武将牌是否为挑战模式下的BOSS
-     * @type { boolean } 
-     **/
+	/**
+	 * 武将牌是否为挑战模式下的BOSS
+	 * @type { boolean }
+	 **/
 	isBoss = false;
-	/** 
-     * 武将牌是否为隐藏BOSS
-     * @type { boolean } 
-     **/
+	/**
+	 * 武将牌是否为隐藏BOSS
+	 * @type { boolean }
+	 **/
 	isHiddenBoss = false;
-	/** 
-     * 武将牌是否“仅点将可用”
-     * @type { boolean } 
-     **/
+	/**
+	 * 武将牌是否“仅点将可用”
+	 * @type { boolean }
+	 **/
 	isAiForbidden = false;
-	/** 
-     * 武将牌是否为炉石模式下的隐藏武将
-     * @type { boolean } 
-     **/
+	/**
+	 * 武将牌是否为炉石模式下的隐藏武将
+	 * @type { boolean }
+	 **/
 	isHiddenInStoneMode = false;
-	/** 
-     * 武将牌是否为bossallowed
-     * @type { boolean } 
-     **/
+	/**
+	 * 武将牌是否为bossallowed
+	 * @type { boolean }
+	 **/
 	isBossAllowed = false;
+	/**
+	 * 武将牌对应的全部宗族
+	 * @type { string[] }
+	 **/
+	clans = [];
 	/**
 	 * @param { Array|Object } [data]
 	 */
@@ -116,7 +121,7 @@ export class Character {
 			this.maxHp = get.infoMaxHp(data[2]);
 			this.hujia = get.infoHujia(data[2]);
 			this.skills = get.copy(data[3] || []);
-			Character.convertTrashToProperties(this, this.trashBin);
+			if (data[4]) Character.convertTrashToProperties(this, data[4]);
 		} else if (get.is.object(data)) {
 			Object.assign(this, data);
 			if (typeof this.maxHp !== "number") this.maxHp = this.hp;
@@ -127,8 +132,9 @@ export class Character {
 	 * @param { Array } trash
 	 */
 	static convertTrashToProperties(character, trash) {
-		let keptTrashes = [];
-        for (let i = 0; i < trash.length; i++) {
+		let keptTrashes = [],
+			clans = [];
+		for (let i = 0; i < trash.length; i++) {
 			let item = trash[i];
 			if (i === 0 && lib.group.includes(item)) {
 				character.groupInGuozhan = item;
@@ -156,11 +162,14 @@ export class Character {
 				character.dualSideCharacter = item.slice(9);
 			} else if (item.startsWith("doublegroup:")) {
 				character.doubleGroup = item.slice(12).split(":");
+			} else if (item.startsWith("clan:")) {
+				clans.push(item.slice(5));
 			} else {
-                keptTrashes.push(item);
-            }
+				keptTrashes.push(item);
+			}
 		}
-        character.trashBin = keptTrashes;
+		if (clans.length > 0) character.clans = clans;
+		character.trashBin = keptTrashes;
 	}
 	/**
 	 * @deprecated
@@ -210,50 +219,54 @@ export class Character {
 	 * @deprecated
 	 */
 	get 4() {
-		const trashes = [], character = this;
-        if (lib.group.includes(character.groupInGuozhan)) {
-            trashes.push(character.groupInGuozhan);
-        }
-        if (character.isZhugong) {
-            trashes.push('zhu');
-        }
-        if (character.isUnseen) {
-            trashes.push('unseen');
-        }
-        if (character.isMinskin) {
-            trashes.push('minskin');
-        }
-        if (character.isBoss) {
-            trashes.push('boss');
-        }
-        if (character.isBossAllowed) {
-            trashes.push('bossallowed');
-        }
-        if (character.isHiddenBoss) {
-            trashes.push('hiddenboss');
-        }
-        if (character.isAiForbidden) {
-            trashes.push('forbidai');
-        }
-        if (character.isHiddenInStoneMode) {
-            trashes.push('stonehidden');
-        }
-        if (character.hasHiddenSkill) {
-            trashes.push('hiddenSkill');
-        }
-        if (character.groupBorder) {
-            trashes.push(`border:${character.groupBorder}`);
-        }
-        if (character.dualSideCharacter) {
-            trashes.push(`duaslside:${character.dualSideCharacter}`)
-        }
-        if (character.doubleGroup.length>0) {
-            trashes.push(`doublegroup:${character.doubleGroup.join(':')}`)
-        }
+		const trashes = [],
+			character = this;
+		if (lib.group.includes(character.groupInGuozhan)) {
+			trashes.push(character.groupInGuozhan);
+		}
+		if (character.isZhugong) {
+			trashes.push("zhu");
+		}
+		if (character.isUnseen) {
+			trashes.push("unseen");
+		}
+		if (character.isMinskin) {
+			trashes.push("minskin");
+		}
+		if (character.isBoss) {
+			trashes.push("boss");
+		}
+		if (character.isBossAllowed) {
+			trashes.push("bossallowed");
+		}
+		if (character.isHiddenBoss) {
+			trashes.push("hiddenboss");
+		}
+		if (character.isAiForbidden) {
+			trashes.push("forbidai");
+		}
+		if (character.isHiddenInStoneMode) {
+			trashes.push("stonehidden");
+		}
+		if (character.hasHiddenSkill) {
+			trashes.push("hiddenSkill");
+		}
+		if (character.groupBorder) {
+			trashes.push(`border:${character.groupBorder}`);
+		}
+		if (character.dualSideCharacter) {
+			trashes.push(`duaslside:${character.dualSideCharacter}`);
+		}
+		if (character.doubleGroup.length > 0) {
+			trashes.push(`doublegroup:${character.doubleGroup.join(":")}`);
+		}
+		if (character.clans.length > 0) {
+			character.clans.forEach((item) => trashes.push(`clan:${item}`));
+		}
 
-        return trashes.concat(character.trashBin);
+		return trashes.concat(character.trashBin);
 	}
 	set 4(trashBin) {
-		this.trashBin = trashBin;
+		console.warn("你set你🐎的废弃属性");
 	}
 }

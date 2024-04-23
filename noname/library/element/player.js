@@ -1492,27 +1492,28 @@ export class Player extends HTMLDivElement {
 		else this.markSkill("cooperation_" + reason);
 	}
 	/**
-	 * @param { string } clan 氏族名称
 	 * @param { boolean } unseen 是否无视暗将的限制
+	 * @returns { string[] }
 	 */
-	hasClan(clan, unseen) {
+	getClans(unseen){
+		const clans = [];
 		if (unseen || !this.isUnseen(0)) {
 			let info = lib.character[this.name1];
-			if (info && info[4]) {
-				for (let i of info[4]) {
-					if (typeof i == "string" && i.startsWith("clan:") && i.slice(5) == clan) return true;
-				}
-			}
+			if (info && info.clans) clans.addArray(info.clans);
 		}
 		if (this.name2 && (unseen || !this.isUnseen(1))) {
 			let info = lib.character[this.name2];
-			if (info && info[4]) {
-				for (let i of info[4]) {
-					if (typeof i == "string" && i.startsWith("clan:") && i.slice(5) == clan) return true;
-				}
-			}
+			if (info && info.clans) clans.addArray(info.clans);
 		}
-		return false;
+		return clans;
+	}
+	/**
+	 * @param { string } clan 氏族名称
+	 * @param { boolean } unseen 是否无视暗将的限制
+	 * @returns { boolean }
+	 */
+	hasClan(clan, unseen) {
+		return this.getClans(unseen).includes(clan);
 	}
 	/**
 	 * @param { string } skill
