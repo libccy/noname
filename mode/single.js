@@ -307,9 +307,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			if (_status.mode != "normal") return;
 			for (var i in lib.characterSingle) {
 				lib.character[i] = lib.characterSingle[i];
-				if (!lib.character[i][4]) {
-					lib.character[i][4] = [];
-				}
 			}
 			for (var j in lib.singleTranslate) lib.translate[j] = lib.singleTranslate[j];
 		},
@@ -352,11 +349,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						for (var j in singleTranslate) lib.translate[j] = singleTranslate[j];
 						_status.characterlist = [];
 						for (var i in characterSingle) {
-							if (!jin && characterSingle[i][1] == "jin") continue;
+							if (!jin && get.convertedCharacter(characterSingle[i]) == "jin") continue;
 							lib.character[i] = characterSingle[i];
-							if (!lib.character[i][4]) {
-								lib.character[i][4] = [];
-							}
 							_status.characterlist.push(i);
 						}
 					},
@@ -647,7 +641,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					[game.me, game.me.enemy].forEach((current) => {
 						if (
 							current.storage.nohp ||
-							(lib.character[current.name1][4].includes("hiddenSkill") && !current.noclick)
+							(lib.character[current.name1].hasHiddenSkil && !current.noclick)
 						) {
 							current.storage.rawHp = 1;
 							current.storage.rawMaxHp = 1;
@@ -1116,7 +1110,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							current.init(result[i][0]);
 							if (
 								current.storage.nohp ||
-								(lib.character[current.name1][4].includes("hiddenSkill") && !current.noclick)
+								(lib.character[current.name1].hasHiddenSkil && !current.noclick)
 							) {
 								current.storage.rawHp = 1;
 								current.storage.rawMaxHp = 1;
@@ -1134,7 +1128,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								current.init(result[i][0]);
 								if (
 									current.storage.nohp ||
-									(lib.character[current.name1][4].includes("hiddenSkill") &&
+									(lib.character[current.name1].hasHiddenSkil &&
 										!current.noclick)
 								) {
 									current.storage.rawHp = 1;

@@ -32,6 +32,15 @@ export class Get {
 		return ["safari", parseInt(major), parseInt(minor), parseInt(patch)];
 	}
 	/**
+	 * 将一个传统格式的character转化为Character对象格式
+	 * @param { Array|Object|import("../library/element/character").Character } data
+	 * @returns {import("../library/element/character").Character}
+	 */
+	convertedCharacter(data){
+		if(!(data instanceof lib.element.Character)) return new lib.element.Character(data);
+		return data;
+	}
+	/**
 	 * 返回 VCard[] 形式的所有牌，用于印卡将遍历
 	 * @param {Function} filter
 	 * @returns {string[][]}
@@ -591,7 +600,7 @@ export class Get {
 	/**
 	 * @overload
 	 * @param { string } name
-	 * @returns { Character }
+	 * @returns { import("../library/element/character").Character }
 	 */
 	/**
 	 * @template { 0 | 1 | 2 | 3 | 4 } T
@@ -604,7 +613,7 @@ export class Get {
 		let info = lib.character[name];
 		if (!info) {
 			const pack = Object.keys(lib.characterPack).find((pack) => name in lib.characterPack[pack]);
-			if (pack) info = lib.characterPack[pack][name];
+			if (pack) info = get.convertedCharacter(lib.characterPack[pack][name]);
 		}
 		if (typeof num === "number") {
 			if (!info) info = [];
@@ -616,10 +625,8 @@ export class Get {
 	}
 	characterInitFilter(name) {
 		const info = get.character(name);
-		if (!info || !info[4]) return [];
-		const filter = info[4].find((tag) => tag.startsWith("InitFilter"));
-		if (!filter) return [];
-		return filter.split(":").slice(1);
+		if (!info) return [];
+		return info.initFilters || [];
 	}
 	characterIntro(name) {
 		if (lib.characterIntro[name]) return lib.characterIntro[name];
@@ -638,15 +645,8 @@ export class Get {
 		return "暂无武将介绍";
 	}
 	bordergroup(info, raw) {
-		if (!Array.isArray(info)) {
-			info = lib.character[info];
-			if (!info) return "";
-		}
-		if (Array.isArray(info[4]))
-			for (const str of info[4]) {
-				if (typeof str == "string" && str.startsWith("border:")) return str.slice(7);
-			}
-		return raw ? "" : info[1] || "";
+		if(info.groupBorder) return info.groupBorder;
+		return raw ? "" : info.group || "";
 	}
 	groupnature(group, method) {
 		var nature = lib.groupnature[group];
@@ -1358,11 +1358,11 @@ export class Get {
 		if (rank.bm.includes(name)) return num ? Math.round((2 * (num - 1)) / 8 + 1) : "bm";
 		if (rank.c.includes(name)) return num ? Math.round((1 * (num - 1)) / 8 + 1) : "c";
 		if (rank.d.includes(name)) return num ? Math.round((0 * (num - 1)) / 8 + 1) : "d";
-		if (lib.character[name] && lib.character[name][4]) {
+		if (lib.character[name]) {
 			if (
-				lib.character[name][4].includes("boss") ||
-				lib.character[name][4].includes("bossallowed") ||
-				lib.character[name][4].includes("hiddenboss")
+				lib.character[name].isBoss ||
+				lib.character[name].isBossAllowed ||
+				lib.character[name].isHiddenBoss
 			) {
 				return num ? Math.round((9 * (num - 1)) / 8 + 1) : "sp";
 			}
@@ -2592,14 +2592,11 @@ export class Get {
 		for (var i in lib.character) {
 			if (lib.filter.characterDisabled(i)) continue;
 			if (lib.filter.characterDisabled2(i)) continue;
-			if (lib.character[i][4]) {
-				if (lib.character[i][4].includes("boss")) continue;
-				if (lib.character[i][4].includes("hiddenboss")) continue;
-				if (lib.character[i][4].includes("minskin")) continue;
-				if (lib.character[i][4].includes("unseen")) continue;
-			}
-			for (var j = 0; j < lib.character[i][3].length; j++) {
-				var skill = lib.character[i][3][j];
+			if (lib.character[i].isBoss) continue;
+			if (lib.character[i].isHiddenBoss) continue;
+			if (lib.character[i].isMinskin) continue;
+			if (lib.character[i].isUnseen) continue;
+			for (var skill of lib.character[i].skills) {
 				var info = lib.skill[skill];
 				if (lib.filter.skillDisabled(skill)) continue;
 				if (func && !func(info, skill, i)) continue;
@@ -2613,14 +2610,11 @@ export class Get {
 	gainableSkillsName(name, func) {
 		var list = [];
 		if (name && lib.character[name]) {
-			if (lib.character[name][4]) {
-				if (lib.character[name][4].includes("boss")) return list;
-				if (lib.character[name][4].includes("hiddenboss")) return list;
-				if (lib.character[name][4].includes("minskin")) return list;
-				if (lib.character[name][4].includes("unseen")) return list;
-			}
-			for (var j = 0; j < lib.character[name][3].length; j++) {
-				var skill = lib.character[name][3][j];
+			if (lib.character[name].isBoss) return list;
+			if (lib.character[name].isHiddenBoss) return list;
+			if (lib.character[name].isMinskin) return list;
+			if (lib.character[name].isUnseen) return list;
+			for (var skill of lib.character[name].skills) {
 				var info = lib.skill[skill];
 				if (lib.filter.skillDisabled(skill)) continue;
 				if (func && !func(info, skill, name)) continue;
@@ -2938,15 +2932,7 @@ export class Get {
 	}
 	skillintro(name, learn, learn2) {
 		var str = "";
-		var infoitem = lib.character[name];
-		if (!infoitem) {
-			for (var itemx in lib.characterPack) {
-				if (lib.characterPack[itemx][name]) {
-					infoitem = lib.characterPack[itemx][name];
-					break;
-				}
-			}
-		}
+		var infoitem = get.character(name);
 		var skills = infoitem[3];
 		var opacity;
 		for (var i = 0; i < skills.length; i++) {
@@ -3614,7 +3600,7 @@ export class Get {
 									if (avatar2) {
 										if (
 											gzbool &&
-											lib.character[nameskin2][4].includes("gzskin") &&
+											lib.character[nameskin2].hasSkinInGuozhan &&
 											lib.config.mode_config.guozhan.guozhanSkin
 										)
 											node.node.avatar2.setBackground(nameskin2, "character");
@@ -3622,7 +3608,7 @@ export class Get {
 									} else {
 										if (
 											gzbool &&
-											lib.character[nameskin2][4].includes("gzskin") &&
+											lib.character[nameskin2].hasSkinInGuozhan &&
 											lib.config.mode_config.guozhan.guozhanSkin
 										)
 											node.node.avatar.setBackground(nameskin2, "character");
@@ -3637,7 +3623,7 @@ export class Get {
 							} else {
 								if (
 									gzbool &&
-									lib.character[nameskin2][4].includes("gzskin") &&
+									lib.character[nameskin2].hasSkinInGuozhan &&
 									lib.config.mode_config.guozhan.guozhanSkin
 								)
 									button.setBackground(nameskin2, "character", "noskin");
@@ -4240,7 +4226,7 @@ export class Get {
 									delete lib.config.skin[nameskin];
 									if (
 										gzbool &&
-										lib.character[nameskin2][4].includes("gzskin") &&
+										lib.character[nameskin2].hasSkinInGuozhan &&
 										lib.config.mode_config.guozhan.guozhanSkin
 									)
 										node.setBackground(nameskin2, "character");
@@ -4254,7 +4240,7 @@ export class Get {
 							} else {
 								if (
 									gzbool &&
-									lib.character[nameskin2][4].includes("gzskin") &&
+									lib.character[nameskin2].hasSkinInGuozhan &&
 									lib.config.mode_config.guozhan.guozhanSkin
 								)
 									button.setBackground(nameskin2, "character", "noskin");

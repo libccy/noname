@@ -206,15 +206,13 @@ export class Is {
 	/**
 	 * 是否是双势力武将
 	 * @param { string } name
-	 * @param { string[] } array
+	 * @param { string[] } [array]
 	 * @returns { boolean | string[] }
 	 */
 	double(name, array) {
-		const extraInformations = get.character(name, 4);
-		if (!extraInformations) return false;
-		for (const extraInformation of extraInformations) {
-			if (!extraInformation.startsWith("doublegroup:")) continue;
-			return array ? extraInformation.split(":").slice(1) : true;
+		const extraInformation = get.character(name);
+		if(extraInformation && extraInformation.doubleGroup && extraInformation.doubleGroup.length>0){
+			return array ? extraInformation.doubleGroup.slice(0) : true;
 		}
 		return false;
 	}

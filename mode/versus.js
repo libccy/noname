@@ -717,9 +717,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					ui.arena.classList.add("choose-character");
 					for (var i in lib.characterPack.mode_versus) {
 						lib.character[i] = lib.characterPack.mode_versus[i];
-						if (!lib.character[i][4]) {
-							lib.character[i][4] = [];
-						}
 					}
 					lib.characterIntro.boss_liedixuande = lib.characterIntro.liubei;
 					lib.characterIntro.boss_gongshenyueying = lib.characterIntro.huangyueying;
@@ -753,10 +750,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.list = list;
 					if (lib.characterPack.boss) {
 						for (var i in lib.characterPack.boss) {
-							if (!lib.character[i] && lib.characterPack.boss[i][4]) {
+							if (!lib.character[i]) {
 								if (
-									lib.characterPack.boss[i][4].includes("jiangeboss") ||
-									lib.characterPack.boss[i][4].includes("jiangemech")
+									get.convertedCharacter(lib.characterPack.boss[i]).isJiangeBoss ||
+									get.convertedCharacter(lib.characterPack.boss[i]).isJiangeMech
 								) {
 									lib.character[i] = lib.characterPack.boss[i];
 								}
@@ -764,20 +761,18 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 					for (var i in lib.character) {
-						if (lib.character[i][4]) {
-							if (lib.character[i][4].includes("jiangeboss")) {
-								list[lib.character[i][1] + "boss"].push(i);
-								continue;
-							} else if (lib.character[i][4].includes("jiangemech")) {
-								list[lib.character[i][1] + "mech"].push(i);
-								continue;
-							}
+						if (lib.character[i].isJiangeBoss) {
+							list[lib.character[i].group + "boss"].push(i);
+							continue;
+						} else if (lib.character[i].isJiangeMech) {
+							list[lib.character[i].group + "mech"].push(i);
+							continue;
 						}
 						if (lib.filter.characterDisabled(i)) continue;
 						if (get.is.double(i)) continue;
-						if (lib.character[i][1] == "wei") {
+						if (lib.character[i].group == "wei") {
 							list.weilist.push(i);
-						} else if (lib.character[i][1] == "shu") {
+						} else if (lib.character[i].group == "shu") {
 							list.shulist.push(i);
 						}
 					}
@@ -821,10 +816,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							};
 							var createCharacterDialog = function () {
 								event.dialogxx = ui.create.characterDialog("heightset", function (name) {
-									if (lib.character[name][4]) {
-										if (lib.character[name][4].includes("jiangeboss")) return true;
-										if (lib.character[name][4].includes("jiangemech")) return true;
-									}
+									if (lib.character[name].isJiangeBoss) return true;
+									if (lib.character[name].isJiangeMech) return true;
 									if (lib.character[name][1] != game.me.identity) return true;
 								});
 								if (ui.cheat2) {
@@ -1753,7 +1746,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (event.filterChoice(i)) continue;
 						if (lib.filter.characterDisabled(i)) continue;
 						event.list.push(i);
-						if (lib.character[i][4] && lib.character[i][4].includes("zhu")) {
+						if (lib.character[i].isZhugong) {
 							list2.push(i);
 						}
 					}
@@ -3455,7 +3448,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							if (_status.event.player.identity == "zhu") {
 								if (Math.random() < 0.8) {
 									var info = lib.character[button.link];
-									if (!info[4] || !info[4].includes("zhu")) {
+									if (!info || !info.isZhugong) {
 										return 0;
 									}
 								}
