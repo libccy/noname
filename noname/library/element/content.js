@@ -131,7 +131,7 @@ export const Content = {
 				game.log(
 					player,
 					"获得了技能",
-					...event.addSkill.map((i) => {
+					...event.addSkill.filter(i => i in lib.translate).map((i) => {
 						return "#g【" + get.translation(i) + "】";
 					})
 				);
@@ -141,7 +141,7 @@ export const Content = {
 				game.log(
 					player,
 					"失去了技能",
-					...event.removeSkill.map((i) => {
+					...event.removeSkill.filter(i => i in lib.translate).map((i) => {
 						return "#g【" + get.translation(i) + "】";
 					})
 				);
@@ -2399,6 +2399,7 @@ export const Content = {
 			}
 			for (j in character[i]) {
 				if (j == "mode" || j == "forbid" || j == "characterSort") continue;
+				//TODO: 改掉这第二坨
 				for (k in character[i][j]) {
 					if (j == "character") {
 						if (!character[i][j][k][4]) {

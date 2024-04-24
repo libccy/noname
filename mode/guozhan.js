@@ -9,25 +9,13 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (lib.character[i.slice(3)]) continue;
 				}
 				lib.character[i] = lib.characterPack.mode_guozhan[i];
-				if (!lib.character[i][4]) {
-					lib.character[i][4] = [];
-				}
 				if (!lib.translate[i]) {
 					lib.translate[i] = lib.translate[i.slice(3)];
 				}
 			}
 			for (var i in lib.character) {
-				if (lib.character[i][1] == "shen") {
-					if (lib.character[i][4]) {
-						var group = lib.character[i][4].find(
-							(group) =>
-								lib.group.includes(group) || group == "key" || group.startsWith("gzgroup:")
-						);
-						if (group) {
-							if (group.startsWith("gzgroup:")) lib.character[i][1] = group.slice(8);
-							else lib.character[i][1] = group;
-						} else lib.character[i][1] = "qun";
-					} else lib.character[i][1] = "qun";
+				if (lib.character[i].group == "shen") {
+					lib.character[i].group = (lib.character[i].groupInGuozhan || "qun");
 				}
 			}
 		},
@@ -35,25 +23,13 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			var pack = lib.characterPack.mode_guozhan;
 			for (var i in pack) {
 				lib.character[i] = pack[i];
-				if (!lib.character[i][4]) {
-					lib.character[i][4] = [];
-				}
 				if (!lib.translate[i]) {
 					lib.translate[i] = lib.translate[i.slice(3)];
 				}
 			}
 			for (var i in lib.character) {
-				if (lib.character[i][1] == "shen") {
-					if (lib.character[i][4]) {
-						var group = lib.character[i][4].find(
-							(group) =>
-								lib.group.includes(group) || group == "key" || group.startsWith("gzgroup:")
-						);
-						if (group) {
-							if (group.startsWith("gzgroup:")) lib.character[i][1] = group.slice(8);
-							else lib.character[i][1] = group;
-						} else lib.character[i][1] = "qun";
-					} else lib.character[i][1] = "qun";
+				if (lib.character[i].group == "shen") {
+					lib.character[i].group = (lib.character[i].groupInGuozhan || "qun");
 				}
 			}
 		},
@@ -91,7 +67,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						delete lib.translate.shuiyanqijunx_info_guozhan;
 						const pack = lib.yingbian_guozhan;
 						for (const i in pack) {
-							if (!pack[i][4]) pack[i][4] = [];
 							lib.character[i] = pack[i];
 							lib.characterPack.mode_guozhan[i] = pack[i];
 							if (!lib.translate[i]) lib.translate[i] = lib.translate[i.slice(3)];
@@ -144,7 +119,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							delete lib.translate.shuiyanqijunx_info_guozhan;
 							const pack2 = lib.yingbian_guozhan;
 							for (const i in pack2) {
-								if (!pack2[i][4]) pack2[i][4] = [];
 								pack[i] = pack2[i];
 							}
 						}
@@ -154,28 +128,13 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 						for (var i in pack) {
 							lib.character[i] = pack[i];
-							if (!lib.character[i][4]) {
-								lib.character[i][4] = [];
-							}
 							if (!lib.translate[i]) {
 								lib.translate[i] = lib.translate[i.slice(3)];
 							}
 						}
 						for (var i in lib.character) {
 							if (lib.character[i][1] == "shen") {
-								if (lib.character[i][4]) {
-									var group = lib.character[i][4].find(
-										(group) =>
-											lib.group.includes(group) ||
-											group == "key" ||
-											group.startsWith("gzgroup:")
-									);
-									if (group) {
-										if (group.startsWith("gzgroup:"))
-											lib.character[i][1] = group.slice(8);
-										else lib.character[i][1] = group;
-									} else lib.character[i][1] = "qun";
-								} else lib.character[i][1] = "qun";
+								lib.character[i].group = (lib.character[i].groupInGuozhan || "qun");
 							}
 						}
 						//lib.characterReplace={};
@@ -22319,9 +22278,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								continue;
 							if (get.is.jun(i)) continue;
 						}
-						if (lib.character[i][4].includes("hiddenSkill")) continue;
-						if (lib.character[i][2] == 3 || lib.character[i][2] == 4 || lib.character[i][2] == 5)
-							event.list.push(i);
+						if (lib.character[i].hasHiddenSkill) continue;
+						const hp = lib.character[i].hp, maxHp = lib.character[i].maxHp;
+						if (hp === maxHp && hp >= 3 && hp <= 5) event.list.push(i);
 					}
 					_status.characterlist = event.list.slice(0);
 					_status.yeidentity = [];
@@ -22368,7 +22327,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									}
 								}
 							}
-							if (lib.character[button.link][4].includes("hiddenSkill")) return false;
+							if (lib.character[button.link].hasHiddenSkill) return false;
 							var filterChoice = function (name1, name2) {
 								if (_status.separatism) return true;
 								var group1 = lib.character[name1][1];

@@ -150,7 +150,7 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
 							if (
 								lib.config.mode_config.guozhan.guozhanSkin &&
 								lib.character[name] &&
-								lib.character[name][4].includes("gzskin")
+								lib.character[name].hasSkinInGuozhan
 							)
 								gzbool = true;
 							name = name.slice(3);

@@ -25,13 +25,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			}
 			for (var i in lib.characterPack.mode_boss) {
 				lib.character[i] = lib.characterPack.mode_boss[i];
-				if (!lib.character[i][4]) {
-					lib.character[i][4] = [];
-				}
 			}
-			// for(var i in lib.cardPack.mode_boss){
-			//		lib.card[i]=lib.cardPack.mode_boss[i];
-			// }
 			for (var i in lib.skill) {
 				if (lib.skill[i].changeSeat) {
 					lib.skill[i] = {};
@@ -82,7 +76,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			if (lib.storage.current == undefined) lib.storage.current = "boss_hundun";
 			for (var i in lib.character) {
 				var info = lib.character[i];
-				if (info[4].includes("boss")) {
+				if (info.isBoss) {
 					// var cfg=i+'_bossconfig';
 					// if(get.config(cfg)==undefined){
 					//		game.saveConfig(cfg,true,true);
@@ -1443,7 +1437,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 		},
 		init: function () {
 			for (var i in lib.characterPack.mode_boss) {
-				if (lib.characterPack.mode_boss[i][4].includes("hiddenboss")) continue;
+				if (get.convertedCharacter(lib.characterPack.mode_boss[i]).isHiddenBoss) continue;
 				lib.mode.boss.config[i + "_boss_config"] = {
 					name: get.translation(i),
 					init: true,
@@ -1643,10 +1637,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					var list = [];
 					event.list = list;
 					for (i in lib.character) {
-						if (lib.character[i][4].includes("minskin")) continue;
-						if (lib.character[i][4].includes("boss")) continue;
-						if (lib.character[i][4].includes("hiddenboss")) continue;
-						if (lib.character[i][4] && lib.character[i][4].includes("forbidai")) continue;
+						if (lib.character[i].isMinskin) continue;
+						if (lib.character[i].isBoss) continue;
+						if (lib.character[i].isHiddenBoss) continue;
+						if (lib.character[i].isAiForbidden) continue;
 						if (lib.config.forbidboss.includes(i)) continue;
 						if (lib.filter.characterDisabled(i)) continue;
 						list.push(i);
@@ -7027,8 +7021,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					for (var i in lib.character) {
 						if (lib.character[i][1] != "wei") continue;
-						if (lib.character[i][4].includes("boss")) continue;
-						if (lib.character[i][4].includes("minskin")) continue;
+						if (lib.character[i].isBoss) continue;
+						if (lib.character[i].isMinskin) continue;
 						if (player.storage.xiongcai.includes(i)) continue;
 						if (list2.includes(i)) continue;
 						list.push(i);

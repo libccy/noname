@@ -1492,27 +1492,28 @@ export class Player extends HTMLDivElement {
 		else this.markSkill("cooperation_" + reason);
 	}
 	/**
-	 * @param { string } clan 氏族名称
 	 * @param { boolean } unseen 是否无视暗将的限制
+	 * @returns { string[] }
 	 */
-	hasClan(clan, unseen) {
+	getClans(unseen){
+		const clans = [];
 		if (unseen || !this.isUnseen(0)) {
 			let info = lib.character[this.name1];
-			if (info && info[4]) {
-				for (let i of info[4]) {
-					if (typeof i == "string" && i.startsWith("clan:") && i.slice(5) == clan) return true;
-				}
-			}
+			if (info && info.clans) clans.addArray(info.clans);
 		}
 		if (this.name2 && (unseen || !this.isUnseen(1))) {
 			let info = lib.character[this.name2];
-			if (info && info[4]) {
-				for (let i of info[4]) {
-					if (typeof i == "string" && i.startsWith("clan:") && i.slice(5) == clan) return true;
-				}
-			}
+			if (info && info.clans) clans.addArray(info.clans);
 		}
-		return false;
+		return clans;
+	}
+	/**
+	 * @param { string } clan 氏族名称
+	 * @param { boolean } unseen 是否无视暗将的限制
+	 * @returns { boolean }
+	 */
+	hasClan(clan, unseen) {
+		return this.getClans(unseen).includes(clan);
 	}
 	/**
 	 * @param { string } skill
@@ -2358,17 +2359,14 @@ export class Player extends HTMLDivElement {
 		}
 		var info = lib.character[character];
 		if (!info) {
-			info = ["", "", 1, [], []];
+			info = get.convertedCharacter(["", "", 1, [], []]);
 		}
-		if (!info[4]) {
-			info[4] = [];
-		}
-		var skills = info[3].slice(0);
+		var skills = info.skills.slice(0);
 		this.clearSkills(true);
 
-		var hp1 = get.infoHp(info[2]);
-		var maxHp1 = get.infoMaxHp(info[2]);
-		var hujia1 = get.infoHujia(info[2]);
+		var hp1 = info.hp;
+		var maxHp1 = info.maxHp;
+		var hujia1 = info.hujia;
 
 		this.name = character;
 		this.name1 = character;
@@ -2377,8 +2375,8 @@ export class Player extends HTMLDivElement {
 			name: character,
 			name2: character2,
 		};
-		this.sex = info[0];
-		this.group = info[1];
+		this.sex = info.sex;
+		this.group = info.group;
 		this.hp = hp1;
 		this.maxHp = maxHp1;
 		this.hujia = hujia1;
@@ -2389,7 +2387,7 @@ export class Player extends HTMLDivElement {
 		if (this.classList.contains("minskin") && this.node.name.querySelectorAll("br").length >= 4) {
 			this.node.name.classList.add("long");
 		}
-		if (info[4].includes("hiddenSkill") && !this.noclick) {
+		if (info.hasHiddenSkill && !this.noclick) {
 			if (!this.hiddenSkills) this.hiddenSkills = [];
 			this.hiddenSkills.addArray(skills);
 			skills = [];
@@ -2401,16 +2399,13 @@ export class Player extends HTMLDivElement {
 		if (character2 && lib.character[character2]) {
 			var info2 = lib.character[character2];
 			if (!info2) {
-				info2 = ["", "", 1, [], []];
-			}
-			if (!info2[4]) {
-				info2[4] = [];
+				info2 = get.convertedCharacter(["", "", 1, [], []]);
 			}
 
 			this.name2 = character2;
-			var hp2 = get.infoHp(info2[2]);
-			var maxHp2 = get.infoMaxHp(info2[2]);
-			var hujia2 = get.infoHujia(info2[2]);
+			var hp2 = info2.hp;
+			var maxHp2 = info2.maxHp;
+			var hujia2 = info2.hujia;
 			this.hujia += hujia2;
 			var double_hp;
 			if (_status.connectMode || get.mode() == "single") {
@@ -2445,12 +2440,12 @@ export class Player extends HTMLDivElement {
 					this.hp = hp1 + hp2 - 3;
 				}
 			}
-			if (info2[4].includes("hiddenSkill") && !this.noclick) {
+			if (info2.hasHiddenSkill && !this.noclick) {
 				if (!this.hiddenSkills) this.hiddenSkills = [];
-				this.hiddenSkills.addArray(info2[3]);
+				this.hiddenSkills.addArray(info2.skills);
 				hidden = true;
 				skills.add("g_hidden_ai");
-			} else skills = skills.concat(info2[3]);
+			} else skills = skills.concat(info2.skills);
 		}
 		if (this.storage.nohp || hidden) {
 			this.storage.rawHp = this.hp;
@@ -2493,18 +2488,15 @@ export class Player extends HTMLDivElement {
 		this.classList.add("fullskin");
 		var info = lib.character[character];
 		if (!info) {
-			info = ["", "", 1, [], []];
-		}
-		if (!info[4]) {
-			info[4] = [];
+			info = get.convertedCharacter(["", "", 1, [], []]);
 		}
 
-		if (!game.minskin && get.is.newLayout() && !info[4].includes("minskin")) {
+		if (!game.minskin && get.is.newLayout() && !info.isMinskin) {
 			this.classList.remove("minskin");
 			this.node.avatar.setBackground(character, "character");
 		} else {
 			this.node.avatar.setBackground(character, "character");
-			if (info[4].includes("minskin")) {
+			if (info.isMinskin) {
 				this.classList.add("minskin");
 			} else if (game.minskin) {
 				this.classList.add("minskin");
@@ -2524,7 +2516,7 @@ export class Player extends HTMLDivElement {
 		if (this.classList.contains("minskin") && this.node.name.querySelectorAll("br").length >= 4) {
 			this.node.name.classList.add("long");
 		}
-		if (info[4].includes("hiddenSkill") && !this.noclick) {
+		if (info.hasHiddenSkill && !this.noclick) {
 			if (!_status.video && get.mode() != "guozhan") this.classList.add("unseen_show");
 			this.classList.add(_status.video ? "unseen_v" : "unseen");
 			if (!this.node.name_seat && !_status.video) {
@@ -2539,10 +2531,7 @@ export class Player extends HTMLDivElement {
 		if (character2 && lib.character[character2]) {
 			var info2 = lib.character[character2];
 			if (!info2) {
-				info2 = ["", "", 1, [], []];
-			}
-			if (!info2[4]) {
-				info2[4] = [];
+				info2 = get.convertedCharacter(["", "", 1, [], []]);
 			}
 			this.classList.add("fullskin2");
 			this.node.avatar2.setBackground(character2, "character");
@@ -2550,7 +2539,7 @@ export class Player extends HTMLDivElement {
 			this.name2 = character2;
 
 			this.node.count.classList.add("p2");
-			if (info2[4].includes("hiddenSkill") && !this.noclick) {
+			if (info2.hasHiddenSkill && !this.noclick) {
 				if (!_status.video && get.mode() != "guozhan") this.classList.add("unseen2_show");
 				this.classList.add(_status.video ? "unseen2_v" : "unseen2");
 			}
@@ -2573,6 +2562,7 @@ export class Player extends HTMLDivElement {
 	 * @param { string } character
 	 */
 	changeSkin(map, character) {
+		//TODO: 这一坨改不动了 谁爱改谁改
 		if (!map || !character) {
 			console.warn("error: no sourceMap or character to changeSkin", get.translation(this));
 			return;
@@ -7608,6 +7598,7 @@ export class Player extends HTMLDivElement {
 			}
 		}
 		game.broadcastAll(
+			//TODO: 这里直接修改trashBin部分，后续需要修改为新写法
 			function (player, skill, cfg) {
 				lib.skill[skill] = {
 					intro: {
@@ -7623,9 +7614,9 @@ export class Player extends HTMLDivElement {
 				if (Array.isArray(cfg.image)) {
 					cfg.image.forEach((image) => lib.character[skill][4].push(image));
 				} else if (typeof cfg.image == "string") {
-					lib.character[skill][4].push(cfg.image);
+					lib.character[skill].trashBin.push(cfg.image);
 				} else {
-					lib.character[skill][4].push("character:" + cfg.name);
+					lib.character[skill].trashBin.push("character:" + cfg.name);
 				}
 				lib.translate[skill] = cfg.caption || get.rawName(cfg.name);
 				player.storage[skill] = cfg;
@@ -9312,7 +9303,7 @@ export class Player extends HTMLDivElement {
 		const player = this;
 		for (const name of [player.name, player.name1, player.name2]) {
 			if (name && lib.character[name]) {
-				const filter = get.characterInitFilter(name);
+				const filter = lib.character[name].initFilters;
 				if (!filter.includes(tag)) continue;
 				if (lib.characterInitFilter[name] && lib.characterInitFilter[name](tag) === false) continue;
 				return true;
