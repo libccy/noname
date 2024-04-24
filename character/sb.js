@@ -5654,6 +5654,12 @@ game.import("character", function () {
 						.chooseToDuiben(target)
 						.set("title", "谋弈")
 						.set("namelist", ["固守城池", "突出重围", "围城断粮", "擂鼓进军"])
+						.set("translationList", [
+							`以防止${get.translation(player)}通过此技能对你使用【决斗】`,
+							`以防止${get.translation(player)}通过此技能对你使用【兵粮寸断】`,
+							`若成功，将牌堆顶的牌当做【兵粮寸断】对${get.translation(target)}使用`,
+							`若成功，视为对${get.translation(target)}使用【决斗】`,
+						])
 						.set("ai", (button) => {
 							var source = _status.event.getParent().player,
 								target = _status.event.getParent().target;
@@ -5886,6 +5892,12 @@ game.import("character", function () {
 						.chooseToDuiben(target)
 						.set("title", "谋弈")
 						.set("namelist", ["出阵迎战", "拱卫中军", "直取敌营", "扰阵疲敌"])
+						.set("translationList", [
+							`以防止${get.translation(player)}摸2张牌`,
+							`以防止${get.translation(player)}获得你1张牌`,
+							`若成功，你获得${get.translation(target)}1张牌`,
+							`若成功，你摸2张牌`,
+						])
 						.set("ai", (button) => {
 							var source = get.event().getParent().player,
 								target = get.event().getParent().target;
