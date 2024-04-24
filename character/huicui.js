@@ -1063,39 +1063,30 @@ game.import("character", function () {
 				filter(event, player) {
 					if (!event.isFirstTarget) return false;
 					if (get.type(event.card) !== "trick") return false;
-					const evt = event.getParent();
-					const evts = game.getGlobalHistory("useCard", null, evt).slice().remove(evt);
-					return event.targets.some((target) => {
-						return evts.some((evt) => evt.targets.includes(target));
-					});
+					return true;
 				},
 				direct: true,
 				async content(event, trigger, player) {
-					const evt = trigger.getParent();
-					const evts = game.getGlobalHistory("useCard", null, evt).slice().remove(evt);
-					const chooseableTargets = trigger.targets.filter((target) => {
-						return evts.some((evt) => evt.targets.includes(target));
-					});
 					const result = await player
 						.chooseTarget()
 						.set("prompt", get.prompt("dcyingshi"))
 						.set(
 							"prompt2",
-							`令一名可选角色选择本回合未被选择过的一项：⒈令你于此牌结算结束后视为对其使用一张${get.translation(
+							`令其中一名角色选择本回合未被选择过的一项：⒈令你于此牌结算结束后视为对其使用一张${get.translation(
 								trigger.card.name
 							)}；⒉弃置${get.cnNumber(player.countCards("e"))}张牌，此牌对其无效。`
 						)
 						.set("filterTarget", (card, player, target) => {
 							return get.event("targets").includes(target);
 						})
-						.set("targets", chooseableTargets)
+						.set("targets", trigger.targets)
 						.set(
 							"toFriends",
 							(() => {
-								const isPositive = chooseableTargets.some((current) => {
+								const isPositive = trigger.targets.some((current) => {
 										return get.effect(current, trigger.card, trigger.player, player) > 0;
 									}),
-									isNegative = chooseableTargets.some((current) => {
+									isNegative = trigger.targets.some((current) => {
 										return get.effect(current, trigger.card, trigger.player, player) < -5;
 									});
 								if (
@@ -1536,38 +1527,31 @@ game.import("character", function () {
 						return evt && evt.hs && evt.hs.length && current.countCards("h") == 0;
 					});
 				},
-				direct: true,
-				async content(event, trigger, player) {
+				async cost(event, trigger, player) {
 					const targetx = _status.currentPhase;
 					const targets = game
 						.filterPlayer((current) => {
-							if (targetx && current == targetx) return false;
+							if (targetx && current == targetx || !current.isIn()) return false;
 							let evt = trigger.getl(current);
 							return evt && evt.hs && evt.hs.length && current.countCards("h") == 0;
 						})
 						.sortBySeat(targetx || player);
-					for (const target of targets) {
-						if (!target.isIn()) continue;
-						const {
-							result: { bool },
-						} = await player
-							.chooseBool(get.prompt2("dcshoucheng", target))
-							.set("choice", get.attitude(player, target) > 0);
-						if (bool) {
-							player.logSkill("dcshoucheng", target);
-							if (target != player) player.addExpose(0.2);
-							target.draw(2);
-						}
-					}
+					event.result = await player
+						.chooseTarget("是否对" + (targets.length > 1 ? "其中一名角色" : get.translation(targets[0])) + "发动【守成】？",
+							"令其摸两张牌",
+							(card, player, target) => {
+								return get.event("targets").includes(target);
+							}
+						)
+						.set("targets", targets)
+						.set("ai", target => get.attitude(get.event("player"), target))
+						.forResult();
 				},
-				ai: {
-					threaten(player, target) {
-						return Math.sqrt(
-							game.countPlayer((i) => {
-								return get.attitude(target, i) > 0;
-							})
-						);
-					},
+				usable: 1,
+				async content(event, trigger, player) {
+					const target = event.targets[0];
+					if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.2);
+					target.draw(2);
 				},
 				subSkill: {
 					ai: {
@@ -9905,7 +9889,7 @@ game.import("character", function () {
 					var delta = player.countCards("h") - player.hp;
 					if (delta > 0) player.chooseToDiscard("h", 4, true);
 					else if (delta == 0) {
-						player.chooseToDiscard("h", true);
+						player.chooseToDiscard("he", true);
 						player.recover();
 					} else {
 						player.damage("fire", "nosource");
@@ -12978,14 +12962,13 @@ game.import("character", function () {
 				},
 				usable: 1,
 				async cost(event, trigger, player) {
-					"step 0";
 					var num = player.getFriends().length;
 					if (
 						!game.hasPlayer(function (current) {
 							return current != player && current.getFriends().length > num;
 						})
 					) {
-						player
+						event.result = await player
 							.chooseToDiscard(
 								"h",
 								get.prompt("rewangzu"),
@@ -12994,12 +12977,11 @@ game.import("character", function () {
 							)
 							.set("ai", function (card) {
 								return 7 - get.value(card);
-							});
+							})
+							.forResult();
 					} else {
-						player.chooseBool(get.prompt("rewangzu"), "随机弃置一张牌并令伤害-1");
+						event.result = await player.chooseBool(get.prompt("rewangzu"), "随机弃置一张牌并令伤害-1").forResult();
 					}
-					"step 1";
-					event.result = result;
 				},
 				async content(event, trigger, player) {
 					trigger.num--;
@@ -14163,18 +14145,18 @@ game.import("character", function () {
 				check: function (event, player) {
 					var target = event.player;
 					var att = get.attitude(player, target);
-					var num2 = Math.min(5, target.hp - target.countCards("h"));
+					var num2 = Math.min(5, target.hp) - target.countCards("h");
 					if (num2 <= 0) return att <= 0;
 					var num = target.countCards("h", function (card) {
 						return target.hasValueTarget(card, null, true);
 					});
 					if (!num) return att > 0;
-					return num > num2;
+					return (num - num2) * att < 0;
 				},
 				preHidden: true,
 				content: function () {
 					"step 0";
-					var num = Math.min(5, trigger.player.hp - trigger.player.countCards("h"));
+					var num = Math.min(5, trigger.player.hp) - trigger.player.countCards("h");
 					if (num > 0) trigger.player.draw(num);
 					"step 1";
 					trigger.player.addTempSkill("xibing2");
@@ -15731,9 +15713,9 @@ game.import("character", function () {
 				"①当你受到伤害后，你可以摸一张牌，或和一名势力相同的其他角色各摸一张牌；②每回合限一次，当你造成伤害后，你可以对一名与你势力不同的角色造成1点伤害。",
 			xibing: "息兵",
 			xibing_info:
-				"当一名其他角色在其出牌阶段内使用黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力值(至多摸五张)且本回合不能再使用手牌。",
+				"当一名其他角色在其出牌阶段内使用黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力值(至多摸至五张)且本回合不能再使用手牌。",
 			xibing_info_guozhan:
-				"当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力(至多摸五张)值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。",
+				"当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至当前体力(至多摸至五张)值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。",
 			luyusheng: "陆郁生",
 			zhente: "贞特",
 			zhente2: "贞特",
@@ -15868,7 +15850,7 @@ game.import("character", function () {
 			lianzhou_info: "锁定技。准备阶段，你横置你的武将牌。然后你可横置任意名体力值等于你的角色。",
 			jinglan: "惊澜",
 			jinglan_info:
-				"锁定技。当你造成伤害后，若你的手牌数：大于体力值，你弃置四张手牌；等于体力值，你弃置一张手牌并回复1点体力；小于体力值，你受到1点无来源火焰伤害并摸五张牌。",
+				"锁定技。当你造成伤害后，若你的手牌数：大于体力值，你弃置四张手牌；等于体力值，你弃置一张牌并回复1点体力；小于体力值，你受到1点无来源火焰伤害并摸五张牌。",
 			dc_yanghu: "羊祜",
 			dcdeshao: "德劭",
 			dcdeshao_info:
@@ -16244,7 +16226,7 @@ game.import("character", function () {
 			dcshengxi: "生息",
 			dcshengxi_info: "弃牌阶段结束时，若你本回合未造成过伤害，你可以摸两张牌。",
 			dcshoucheng: "守成",
-			dcshoucheng_info: "一名角色于其回合外失去最后的手牌后，你可令其摸两张牌。",
+			dcshoucheng_info: "每回合限一次，当一名角色于其回合外失去手牌后，若其没有手牌，你可令其摸两张牌。",
 			dc_liuli: "刘理",
 			dcfuli: "抚黎",
 			dcfuli_info:
@@ -16264,7 +16246,7 @@ game.import("character", function () {
 				"其他角色的出牌阶段限一次。其可以交给你一张牌，若此牌为装备牌，你可以使用之，然后其本回合攻击范围+X（X为你装备区里的牌数）。若你以此法替换了装备，你与其各摸两张牌。",
 			dcyingshi: "应时",
 			dcyingshi_info:
-				"每回合每项各限一次。当你使用普通锦囊牌指定第一个目标后，若有目标不为本回合第一次成为牌的目标，则你可以令其选择一项：⒈令你于此牌结算结束后视为对其使用一张与此牌牌名相同的牌；⒉弃置X张牌，此牌对其无效（X为你装备区里的牌数）。",
+				"每回合每项各限一次。当你使用普通锦囊牌指定目标后，你可令其中一个目标选择一项：⒈令你于此牌结算结束后视为对其使用一张与此牌牌名相同的牌；⒉弃置X张牌，此牌对其无效（X为你装备区里的牌数）。",
 			dc_wangling: "王淩",
 			dcjichou: "集筹",
 			dcjichou_info:

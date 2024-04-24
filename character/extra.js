@@ -33,7 +33,7 @@ game.import("character", function () {
 		character: {
 			dc_shen_huatuo: ["male", "shen", 3, ["jingyu", "lvxin", "huandao"], ["qun"]],
 			shen_xuzhu: ["male", "shen", 5, ["zhengqing", "zhuangpo"], ["wei"]],
-			shen_lusu: ["male", "shen", 3, ["dingzhou", "tamo", "zhimeng"], ["wu"]],
+			shen_lusu: ["male", "shen", 3, ["tamo", "dingzhou", "zhimeng"], ["wu"]],
 			shen_huatuo: ["male", "shen", 3, ["wuling", "youyi"], ["qun"]],
 			le_shen_jiaxu: ["male", "shen", 4, ["jxlianpo", "jxzhaoluan"], ["qun"]],
 			shen_dianwei: ["male", "shen", 4, ["juanjia", "qiexie", "cuijue"], ["wei"]],
@@ -126,7 +126,7 @@ game.import("character", function () {
 					if (!skill || skill === "jingyu") return false;
 					let info = get.info(skill);
 					while (true) {
-						if (!info || info.charlotte) return false;
+						if (!info || info.charlotte || info.equipSkill) return false;
 						if (info && !info.sourceSkill) break;
 						skill = info.sourceSkill;
 						info = get.info(skill);
@@ -235,13 +235,13 @@ game.import("character", function () {
 							if (["global", "equip"].includes(event.type)) return false;
 							const skill = event.sourceSkill || event.skill;
 							const info = get.info(skill);
-							return info && !info.charlotte;
+							return info && !info.charlotte && !info.equipSkill;
 						},
 						forced: true,
 						onremove: true,
 						charlotte: true,
 						async content(event, trigger, player) {
-							player.loseHp(player.countMark("lvxin_recover"));
+							player.recover(player.countMark("lvxin_recover"));
 							player.removeSkill("lvxin_recover");
 						},
 						intro: {
@@ -256,7 +256,7 @@ game.import("character", function () {
 							if (["global", "equip"].includes(event.type)) return false;
 							const skill = event.sourceSkill || event.skill;
 							const info = get.info(skill);
-							return info && !info.charlotte;
+							return info && !info.charlotte && !info.equipSkill;
 						},
 						forced: true,
 						onremove: true,
@@ -673,7 +673,7 @@ game.import("character", function () {
 					return game.hasPlayer((current) => {
 						if (current == player) return false;
 						const total = current.countCards("ej");
-						return total > 0 && num > total;
+						return total > 0 && num >= total;
 					});
 				},
 				filterCard: true,
@@ -682,7 +682,7 @@ game.import("character", function () {
 						1,
 						Math.max(
 							...game.filterPlayer((i) => i != get.player()).map((i) => i.countCards("ej"))
-						) + 1,
+						),
 					];
 				},
 				check(card) {
@@ -691,10 +691,10 @@ game.import("character", function () {
 				filterTarget(card, player, target) {
 					const num = target.countCards("ej");
 					if (!num) return false;
-					return ui.selected.cards.length == num + 1 && player != target;
+					return ui.selected.cards.length == num && player != target;
 				},
 				filterOk() {
-					return ui.selected.cards.length == ui.selected.targets[0].countCards("ej") + 1;
+					return ui.selected.cards.length == ui.selected.targets[0].countCards("ej");
 				},
 				position: "he",
 				lose: false,
@@ -715,7 +715,7 @@ game.import("character", function () {
 								eff = ui.selected.cards
 									.map((card) => get.value(card))
 									.reduce((p, c) => p + c, 0);
-							if (player.hasSkill("zhimeng")) eff *= 1 + get.sgnAttitude(player, target) * 0.15;
+							if (player.hasSkill("zhimeng") && (get.mode() == 'identity' || (player.countCards('h') - target.countCards('h') > 2 * ui.selected.cards.length))) eff *= 1 + get.sgnAttitude(player, target) * 0.15;
 							const es = target.getCards("e"),
 								js = target.getCards("j");
 							es.forEach((card) => {
@@ -747,6 +747,7 @@ game.import("character", function () {
 					return (
 						(event.name != "phase" || game.phaseNumber == 0) &&
 						game.countPlayer((current) => {
+							if (get.mode() === "doudizhu") return current.getSeatNum() !== 3;
 							return !current.isZhu2();
 						}) > 1
 					);
@@ -756,15 +757,13 @@ game.import("character", function () {
 				derivation: "tamo_faq",
 				async content(event, trigger, player) {
 					const toSortPlayers = game.filterPlayer((current) => {
-						return (
-							!current.isZhu2() ||
-							get.mode() == "doudizhu" && current.getSeatNum() == 3
-						);
+						if (get.mode() === "doudizhu") return current.getSeatNum() !== 3;
+						return !current.isZhu2();
 					});
 					toSortPlayers.sortBySeat(game.findPlayer2((current) => current.getSeatNum() == 1, true));
 					const next = player.chooseToMove("榻谟：是否分配" +
-						(game.countPlayer() > toSortPlayers.length ?
-							"除主公" + (get.mode() == "doudizhu" ? "和三号位外" : "外") : "") +
+						(get.mode() != "doudizhu" ?
+							(game.hasPlayer(cur => cur.isZhu2()) ? "除主公外" : "") : "除三号位外") +
 						"所有角色的座次？"
 					);
 					next.set("list", [
@@ -901,7 +900,12 @@ game.import("character", function () {
 							game.swapSeat(list[0], list[1], false);
 						}
 					}, toSwapList);
-					if (trigger.name === "phase" && !trigger.player.isZhu2() && trigger.player !== toSortPlayers[0] && !trigger._finished) {
+					if (
+						trigger.name === "phase" &&
+						!trigger.player.isZhu2() &&
+						trigger.player !== toSortPlayers[0] &&
+						!trigger._finished
+					) {
 						trigger.finish();
 						trigger._triggered = 5;
 						const evt = toSortPlayers[0].insertPhase();
@@ -912,10 +916,7 @@ game.import("character", function () {
 						}
 						//跳过新回合的phaseBefore
 						evt.pushHandler("onPhase", (event, option) => {
-							if (
-								event.step === 0 &&
-								option.state === "begin"
-							) {
+							if (event.step === 0 && option.state === "begin") {
 								event.step = 1;
 							}
 						});
@@ -1422,8 +1423,7 @@ game.import("character", function () {
 				group: "jxlianpo_show",
 				*content(event, map) {
 					var source = map.trigger.source;
-					source.draw(2);
-					source.recover();
+					source.chooseDrawRecover(2, true);
 				},
 				mark: true,
 				intro: {
@@ -10817,7 +10817,7 @@ game.import("character", function () {
 			le_shen_jiaxu_prefix: "神",
 			jxlianpo: "炼魄",
 			jxlianpo_info:
-				"锁定技。①若场上最大阵营为：反贼，其他角色的手牌上限-1，所有角色使用【杀】的次数上限和攻击范围+1；主忠，其他角色不能对其以外的角色使用【桃】。其他角色死亡后，若有多个最大阵营，来源摸两张牌并回复1点体力。②一轮游戏开始时，你展示一张未加入游戏或已死亡角色的身份牌，本轮视为该身份对应阵营的角色数+1。",
+				"锁定技。①若场上最大阵营为：反贼，其他角色的手牌上限-1，所有角色使用【杀】的次数上限和攻击范围+1；主忠，其他角色不能对其以外的角色使用【桃】。若有多个最大阵营，其他角色死亡后，来源摸两张牌或回复1点体力。②一轮游戏开始时，你展示一张未加入游戏或已死亡角色的身份牌，本轮视为该身份对应阵营的角色数+1。",
 			jxzhaoluan: "兆乱",
 			jxzhaoluan_info:
 				"限定技。一名角色死亡前，若其此次进入过濒死状态，你可以取消之，令其加3点体力上限并失去所有非锁定技，回复体力至3点，摸四张牌。然后你获得如下效果：出牌阶段，你可以令一名成为过你〖兆乱〗目标的角色减1点体力上限，然后对一名此阶段未以此法选择过的角色造成1点伤害。",
@@ -10841,18 +10841,18 @@ game.import("character", function () {
 			shen_lusu_prefix: "神",
 			dingzhou: "定州",
 			dingzhou_info:
-				"出牌阶段限一次。你可以将X张牌交给一名场上有牌的角色，然后你获得其场上的所有牌（X为其场上的牌数+1）。",
+				"出牌阶段限一次。你可以将X张牌交给一名场上有牌的角色，然后你获得其场上的所有牌（X为其场上的牌数）。",
 			tamo: "榻谟",
-			tamo_info:
-				"游戏开始时，你可以重新分配除主公外所有角色的座次。",
-			tamo_info_doudizhu:
-				"游戏开始时，你可以重新分配除主公和三号位外所有角色的座次。",
+			tamo_info: "游戏开始时，你可以重新分配除主公外所有角色的座次。",
+			tamo_info_doudizhu: "游戏开始时，你可以重新分配除三号位角色外所有角色的座次。",
 			tamo_faq: "FAQ",
 			tamo_faq_info:
 				"<br><li>Q：在一号位不为主公的情况下，〖榻谟〗如何结算？</li><li>A：该角色可以正常进行座次交换。若受此技能影响导致一号位角色发生了变化，则以排列后的一号位角色为起始角色开始本局游戏。</li>",
 			zhimeng: "智盟",
-			zhimeng_info_identity: '回合结束后，你可以选择一名其他角色。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
-			zhimeng_info: '回合结束后，你可以选择一名手牌数不大于Y的其他角色（Y为你的手牌数+1）。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。',
+			zhimeng_info_identity:
+				"回合结束后，你可以选择一名其他角色。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。",
+			zhimeng_info:
+				"回合结束后，你可以选择一名手牌数不大于Y的其他角色（Y为你的手牌数+1）。若如此做，你与其将各自所有手牌置于处理区，然后你随机获得这些牌中的一半（向上取整），其获得剩余的牌。",
 			shen_xuzhu: "神许褚",
 			shen_xuzhu_prefix: "神",
 			zhengqing: "争擎",

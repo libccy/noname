@@ -2442,9 +2442,9 @@ game.import("character", function () {
 			mbyilie3: {
 				audio: "mbyilie",
 				trigger: { player: "phaseEnd" },
-				//filter:function(event,player){
-				//	return player.countMark('mbyilie');
-				//},
+				filter: function (event, player) {
+					return player.hasMark('mbyilie');
+				},
 				forced: true,
 				content: function () {
 					"step 0";
@@ -9722,9 +9722,9 @@ game.import("character", function () {
 					"step 1";
 					if (result.number < 7) {
 						var source = trigger.source;
-						if (source && source.isIn() && source.countCards("he") > 0) {
+						if (source && source.isIn() && source.countCards("h") > 0) {
 							player.line(source);
-							source.chooseToDiscard("he", true);
+							source.chooseToDiscard("h", true);
 						}
 					}
 				},
@@ -20080,8 +20080,8 @@ game.import("character", function () {
 			mbzuoyou(player) {
 				const mbzuoyou = player.storage.mbzuoyou;
 				if (mbzuoyou)
-					return '转换技。出牌阶段限一次，阴：你可以令一名角色摸三张牌，然后其弃置两张牌；<span class="bluetext">阳：你可以令一名角色弃置一张手牌，然后其获得1点护甲。</span>';
-				return '转换技。出牌阶段限一次，<span class="bluetext">阴：你可以令一名角色摸三张牌，然后其弃置两张牌；</span>阳：你可以令一名角色弃置一张手牌，然后其获得1点护甲。';
+					return '转换技。出牌阶段限一次，阴：你可以令一名角色摸两张牌，然后其弃置一张牌；<span class="bluetext">阳：你可以令一名手牌数不少于二的角色弃置两张手牌，然后其获得1点护甲。</span>';
+				return '转换技。出牌阶段限一次，<span class="bluetext">阴：你可以令一名角色摸两张牌，然后其弃置一张牌；</span>阳：你可以令一名手牌数不少于二的角色弃置两张手牌，然后其获得1点护甲。';
 			},
 		},
 		perfectPair: {
@@ -20724,7 +20724,7 @@ game.import("character", function () {
 			simafu: "司马孚",
 			xunde: "勋德",
 			xunde_info:
-				"一名角色受到伤害后，若你至其的距离不大于1，则你可判定。若判定结果：大于5，你令该角色获得判定牌；小于7，你令伤害来源弃置一张牌。",
+				"一名角色受到伤害后，若你至其的距离不大于1，则你可判定。若判定结果：大于5，你令该角色获得判定牌；小于7，你令伤害来源弃置一张手牌。",
 			chenjie: "臣节",
 			chenjie_info:
 				"一名角色的判定牌生效前，你可打出一张花色相同的牌。系统将你打出的牌作为新判定牌，将原判定牌置入弃牌堆。然后你摸两张牌。",
@@ -21154,7 +21154,7 @@ game.import("character", function () {
 			mbyilie2: "义烈",
 			mbyilie3: "义烈",
 			mbyilie_info:
-				"锁定技。①游戏开始时，你选择一名其他角色，然后你获得以下效果：其受到伤害时，若你没有“烈”，则你获得等同于伤害值的“烈”标记，然后防止此伤害；其对其他角色造成伤害后，你回复1点体力。②结束阶段，你摸一张牌并失去X点体力，然后移去所有“烈”（X为你拥有的“烈”标记数）。",
+				"锁定技。①游戏开始时，你选择一名其他角色，然后你获得以下效果：其受到伤害时，若你没有“烈”，则你获得等同于伤害值的“烈”标记，然后防止此伤害；其对其他角色造成伤害后，你回复1点体力。②结束阶段，若你拥有“烈”标记，你摸一张牌并失去X点体力，然后移去所有“烈”（X为你拥有的“烈”标记数）。",
 			muludawang: "木鹿大王",
 			shoufa: "兽法",
 			shoufa_info:

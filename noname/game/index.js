@@ -53,18 +53,19 @@ export class Game {
 	/**
 	 * @type { string }
 	 */
-	// @ts-ignore
 	layout;
 	/**
 	 * @type { Player }
 	 */
-	// @ts-ignore
 	me;
 	/**
 	 * @type { boolean }
 	 */
-	// @ts-ignore
 	chess;
+	/**
+	 * @type { Player }
+	 */
+	zhu;
 	globalEventHandlers = new (class {
 		constructor() {
 			this._handlers = {};
@@ -408,7 +409,9 @@ export class Game {
 			style.transform = "scale(1.05)";
 		}
 		document.body.insertBefore(uiBackground, document.body.firstChild);
-		if (background.startsWith("db:")) uiBackground.setBackgroundDB(background.slice(3));
+		if (background.startsWith("blob:") || background.startsWith("data:")) {
+			uiBackground.setBackgroundImage(background);
+		} else if (background.startsWith("db:")) uiBackground.setBackgroundDB(background.slice(3));
 		else if (background.startsWith("ext:"))
 			uiBackground.setBackgroundImage(`extension/${background.slice(4)}`);
 		else if (background == "default") {
@@ -557,8 +560,8 @@ export class Game {
 	/**
 	 * @template { keyof GameHistory } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
 	 * @returns { boolean }
 	 */
 	hasGlobalHistory(key, filter, last) {
@@ -580,8 +583,8 @@ export class Game {
 	/**
 	 * @template { keyof GameHistory } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
 	 * @returns { void }
 	 */
 	checkGlobalHistory(key, filter, last) {
@@ -608,8 +611,8 @@ export class Game {
 	 * @template { keyof GameHistory } T
 	 * @overload
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } [filter]
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } [filter]
+	 * @param { GameEventPromise } [last]
 	 * @returns { GameHistory[T] }
 	 */
 	getGlobalHistory(key, filter, last) {
@@ -630,8 +633,8 @@ export class Game {
 	/**
 	 * @template { keyof GameHistory } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
 	 * @returns { boolean }
 	 */
 	hasAllGlobalHistory(key, filter, last) {
@@ -656,8 +659,8 @@ export class Game {
 	/**
 	 * @template { keyof GameHistory } T
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } filter
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { GameEventPromise } [last]
 	 * @returns { void }
 	 */
 	checkAllGlobalHistory(key, filter, last) {
@@ -686,8 +689,8 @@ export class Game {
 	 * @template { keyof GameHistory } T
 	 * @overload
 	 * @param { T } key
-	 * @param { (event: import('../library/index.js').GameEventPromise) => boolean } [filter]
-	 * @param { import('../library/index.js').GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } [filter]
+	 * @param { GameEventPromise } [last]
 	 * @returns { GameHistory[T] }
 	 */
 	getAllGlobalHistory(key, filter, last) {
@@ -718,12 +721,12 @@ export class Game {
 	/**
 	 * @overload
 	 * @param { Card } cards
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	/**
 	 * @overload
 	 * @param {Card[]} cards
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	cardsDiscard(cards) {
 		/** @type { 'cards' | 'card' | void } */
@@ -746,12 +749,12 @@ export class Game {
 	/**
 	 * @overload
 	 * @param { Card } cards
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	/**
 	 * @overload
 	 * @param {Card[]} cards
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	cardsGotoOrdering(cards) {
 		/** @type { 'cards' | 'card' | void } */
@@ -771,13 +774,13 @@ export class Game {
 	 * @overload
 	 * @param { Card } cards
 	 * @param { 'toRenku' | false } [bool] 为false时不触发trigger，为'toRenku'时牌放到仁库
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	/**
 	 * @overload
 	 * @param {Card[]} cards
 	 * @param { 'toRenku' | false } [bool] 为false时不触发trigger，为'toRenku'时牌放到仁库
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @returns { GameEventPromise }
 	 */
 	cardsGotoSpecial(cards, bool) {
 		/** @type { 'cards' | 'card' | void } */
@@ -836,7 +839,7 @@ export class Game {
 		return next;
 	}
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } event
+	 * @param { GameEventPromise } event
 	 */
 	$cardsGotoPile(event) {
 		const cards = event.cards;
@@ -1440,7 +1443,8 @@ export class Game {
 				if (_status.video) break;
 			}
 			if (path.startsWith("ext:")) path = path.replace(/^ext:/, "extension/");
-			else if (!path.startsWith("db:")) path = `audio/${path}`;
+			else if (!["db:", "blob:", "data:"].some((prefix) => path.startsWith(prefix)))
+				path = `audio/${path}`;
 			if (!lib.config.repeat_audio && _status.skillaudio.includes(path)) return;
 		}
 		const audio = document.createElement("audio");
@@ -1465,6 +1469,7 @@ export class Game {
 					reject
 				);
 			else if (lib.path.extname(path)) resolve(`${lib.assetURL}${path}`);
+			else if (URL.canParse(path)) resolve(path);
 			else resolve(`${lib.assetURL}${path}.mp3`);
 		}).then((resolvedPath) => {
 			audio.src = resolvedPath;
@@ -1599,7 +1604,11 @@ export class Game {
 				let path = "",
 					format = "";
 				if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
-				if (!/\.\w+$/.test(audioInfo)) format = ".mp3";
+				if (
+					!/\.\w+$/.test(audioInfo) &&
+					!["data:", "blob:"].some((name) => audioInfo.startsWith(name))
+				)
+					format = ".mp3";
 				if (path && format) return parseAudio(audioInfo, options, [true, 2]);
 				return [`${path}${audioInfo}${format}`];
 			}
@@ -1733,7 +1742,9 @@ export class Game {
 		const audio = get.dynamicVariable(lib.card[card.name].audio, card, sex);
 		if (typeof audio == "string") {
 			const audioInfo = audio.split(":");
-			if (audio.startsWith("db:"))
+			if (["blob:", "data:"].some((prefix) => audio.startsWith(prefix))) {
+				game.playAudio(audio);
+			} else if (audio.startsWith("db:"))
 				game.playAudio(
 					`${audioInfo[0]}:${audioInfo[1]}`,
 					audioInfo[2],
@@ -1765,7 +1776,9 @@ export class Game {
 					_status.currentAozhan
 				);
 			_status.currentAozhan = aozhan;
-			if (aozhan.startsWith("db:"))
+			if (["blob:", "data:"].some((prefix) => aozhan.startsWith(prefix))) {
+				ui.backgroundMusic.src = aozhan;
+			} else if (aozhan.startsWith("db:"))
 				game.getDB("image", aozhan.slice(3)).then((result) => (ui.backgroundMusic.src = result));
 			else if (aozhan.startsWith("ext:"))
 				ui.backgroundMusic.src = `${lib.assetURL}extension/${aozhan.slice(4)}`;
@@ -1788,7 +1801,9 @@ export class Game {
 				ui.backgroundMusic.src = backgroundMusicSourceConfiguration;
 			return;
 		}
-		if (music.startsWith("db:"))
+		if (["blob:", "data:"].some((prefix) => music.startsWith(prefix))) {
+			ui.backgroundMusic.src = music;
+		} else if (music.startsWith("db:"))
 			game.getDB("image", music.slice(3)).then((result) => (ui.backgroundMusic.src = result));
 		else if (music.startsWith("ext:"))
 			ui.backgroundMusic.src = `${lib.assetURL}extension/${music.slice(4)}`;
@@ -4651,8 +4666,8 @@ export class Game {
 	 * @param { string } name
 	 * @param { string } skill
 	 * @param { Player } player
-	 * @param { import('../library/index.js').GameEventPromise } event
-	 * @returns { import('../library/index.js').GameEventPromise }
+	 * @param { GameEventPromise } event
+	 * @returns { GameEventPromise }
 	 */
 	createTrigger(name, skill, player, event, indexedData) {
 		let info = get.info(skill);
@@ -4675,7 +4690,7 @@ export class Game {
 	 *
 	 * @param { string } name
 	 * @param { false } [trigger]
-	 * @param { import('../library/index.js').GameEventPromise } [triggerEvent]
+	 * @param { GameEventPromise } [triggerEvent]
 	 */
 	createEvent(name, trigger, triggerEvent) {
 		const next = new lib.element.GameEvent(name, trigger).toPromise();
@@ -4736,7 +4751,8 @@ export class Game {
 					const audiosrc = "die:ext:" + extname + "/" + j + ".mp3";
 					if (
 						!pack[i][j][4].some(
-							(str) => typeof str == "string" && /^(?:db:extension-|ext:):(?:.+)/.test(str)
+							(str) =>
+								typeof str == "string" && /^(?:db:extension-.+?|ext|img):(?:.+)/.test(str)
 						)
 					)
 						pack[i][j][4].add(imgsrc);
@@ -4785,17 +4801,19 @@ export class Game {
 		if (info.audio == true) {
 			info.audio = "ext:" + extname;
 		}
-		if (info.fullskin) {
-			if (_status.evaluatingExtension) {
-				info.image = "db:extension-" + extname + ":" + name + ".png";
-			} else {
-				info.image = "ext:" + extname + "/" + name + ".png";
-			}
-		} else if (info.fullimage) {
-			if (_status.evaluatingExtension) {
-				info.image = "db:extension-" + extname + ":" + name + ".jpg";
-			} else {
-				info.image = "ext:" + extname + "/" + name + ".jpg";
+		if (!info.image || typeof info.image !== "string") {
+			if (info.fullskin) {
+				if (_status.evaluatingExtension) {
+					info.image = "db:extension-" + extname + ":" + name + ".png";
+				} else {
+					info.image = "ext:" + extname + "/" + name + ".png";
+				}
+			} else if (info.fullimage) {
+				if (_status.evaluatingExtension) {
+					info.image = "db:extension-" + extname + ":" + name + ".jpg";
+				} else {
+					info.image = "ext:" + extname + "/" + name + ".jpg";
+				}
 			}
 		}
 		lib.card[name] = info;
@@ -4915,10 +4933,14 @@ export class Game {
 		lib.translate[name] = info2.translate;
 		let imgsrc;
 		let extname = _status.extension || info2.extension;
-		if (_status.evaluatingExtension) {
-			imgsrc = "extension-" + extname + ":" + name + ".jpg";
+		if (info.splash) {
+			imgsrc = info.splash;
 		} else {
-			imgsrc = "ext:" + extname + "/" + name + ".jpg";
+			if (_status.evaluatingExtension) {
+				imgsrc = "extension-" + extname + ":" + name + ".jpg";
+			} else {
+				imgsrc = "ext:" + extname + "/" + name + ".jpg";
+			}
 		}
 		lib.mode[name] = {
 			name: info2.translate,
@@ -5832,11 +5854,11 @@ export class Game {
 	 */
 	executingAsyncEventMap = new Map();
 	/**
-	 * @type { import('../library/index.js').GameEventPromise[] }
+	 * @type { GameEventPromise[] }
 	 */
 	belongAsyncEventList = [];
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } [belongAsyncEvent]
+	 * @param { GameEventPromise } [belongAsyncEvent]
 	 */
 	async loop(belongAsyncEvent) {
 		if (belongAsyncEvent) {
@@ -6017,7 +6039,7 @@ export class Game {
 		}
 	}
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } [belongAsyncEvent]
+	 * @param { GameEventPromise } [belongAsyncEvent]
 	 */
 	runContent(belongAsyncEvent) {
 		return new Promise((resolve) => {
@@ -6331,7 +6353,7 @@ export class Game {
 		return game.asyncDelay(time, time2);
 	}
 	/**
-	 * @param { import('../library/index.js').GameEventPromise } [event]
+	 * @param { GameEventPromise } [event]
 	 */
 	check(event = _status.event) {
 		game.callHook("checkBegin", [event]);
@@ -7486,20 +7508,21 @@ export class Game {
 	}
 	/**
 	 * @param { Player[] } players
-	 * @param { number | number[] | (player: Player) => number } num
+	 * @param { number | number[] | (player: Player) => number } [num]
 	 * @param { { drawDeck: boolean } } [drawDeck]
 	 * @param { boolean } [bottom]
 	 */
-	asyncDraw(players, num, drawDeck, bottom) {
-		return players.forEach((value, index) => {
+	async asyncDraw(players, num, drawDeck, bottom) {
+		for (let index = 0; index < players.length; index++) {
+			const value = players[index];
 			let num2 = 1;
 			if (typeof num == "number") num2 = num;
 			else if (Array.isArray(num)) num2 = num[index];
 			else if (typeof num == "function") num2 = num(value);
-			if (drawDeck && drawDeck.drawDeck) value.draw(num2, false, drawDeck);
-			else if (bottom) value.draw(num2, "nodelay", "bottom");
-			else value.draw(num2, "nodelay");
-		});
+			if (drawDeck && drawDeck.drawDeck) await value.draw(num2, false, drawDeck);
+			else if (bottom) await value.draw(num2, "nodelay", "bottom");
+			else await value.draw(num2, "nodelay");
+		}
 	}
 	/**
 	 * @param { Player[] } players
@@ -7936,7 +7959,7 @@ export class Game {
 	 * @param { Player } player
 	 * @param { string | Card[] } card
 	 * @param { Player[] } [targets]
-	 * @param { import('../library/index.js').GameEventPromise } [event]
+	 * @param { GameEventPromise } [event]
 	 * @param { boolean } [forced]
 	 * @param { string } [logvid]
 	 */

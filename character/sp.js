@@ -23921,17 +23921,16 @@ game.import("character", function () {
 				filter: function (event, player) {
 					if (event.name == "loseAsync") {
 						if (event.type != "gain") return false;
-						var hs = current.getCards("h"),
-							cards = event.getl(player).cards2;
 						return game.hasPlayer(function (current) {
 							if (current == player) return false;
+							var hs = current.getCards("h"),
+								cards = event.getl(player).cards2;
 							var cardsx = event.getg(current);
 							for (var i of cardsx) {
 								if (
+									hs.includes(i) &&
 									cards.includes(i) &&
-									hs.includes(card) &&
-									cards.includes(card) &&
-									get.color(card, player) == "black"
+									get.color(i, player) == "black"
 								)
 									return true;
 							}
