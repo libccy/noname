@@ -22,6 +22,23 @@ if (core === "chrome" && !isNaN(version) && version < 77) {
 boot().then(() => {
 	// 判断是否从file协议切换到http/s协议
 	if (canUseHttpProtocol()) {
+		// 保存协议的切换状态
+		const saveProtocol = () => {
+			const url = sendUpdate();
+			if (typeof url == "string") {
+				if (
+					typeof window.require == "function" &&
+					typeof window.process == "object"
+				) {
+					// @ts-ignore
+					const remote = require("@electron/remote");
+					const thisWindow = remote.getCurrentWindow();
+					thisWindow.loadURL(url);
+				} else {
+					location.href = url;
+				}
+			}
+		};
 		/*
 		升级方法:
 			1. 游戏启动后导出数据，然后以http/s协议重启
@@ -60,23 +77,6 @@ boot().then(() => {
 					});
 				});
 			});
-		}
-		// 保存协议的切换状态
-		function saveProtocol() {
-			const url = sendUpdate();
-			if (typeof url == "string") {
-				if (
-					typeof window.require == "function" &&
-					typeof window.process == "object"
-				) {
-					// @ts-ignore
-					const remote = require("@electron/remote");
-					const thisWindow = remote.getCurrentWindow();
-					thisWindow.loadURL(url);
-				} else {
-					location.href = url;
-				}
-			}
 		}
 	} else {
 		// 成功导入后删除noname.config.txt
