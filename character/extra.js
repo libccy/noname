@@ -8288,6 +8288,7 @@ game.import("character", function () {
 			kuangfeng: {
 				unique: true,
 				audio: 2,
+				priority:-1,
 				trigger: { player: "phaseJieshuBegin" },
 				direct: true,
 				filter(event, player) {
