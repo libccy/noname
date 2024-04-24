@@ -24327,7 +24327,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			["heart", 3, "jingfanma", null, ["lianheng"]],
 			["heart", 4, "shan"],
 			["heart", 5, "shan"],
-			["heart", 6, "shan"],
+			["heart", 6, "shan", null, ["lianheng"]],
 			["heart", 7, "shan"],
 			["heart", 8, "tao"],
 			["heart", 9, "tao"],

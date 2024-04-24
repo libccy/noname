@@ -9763,6 +9763,9 @@ game.import("character", function () {
 					content:
 						"出牌阶段开始时，你可以亮出牌堆顶的四张牌。你可弃置任意张手牌，并可获得任意张点数之和不大于你弃置的牌点数之和的牌。然后你可将以此法得到的牌以任意方式交给其他角色。",
 				},
+				ai: {
+					combo: "mubing"
+				},
 			},
 			diaoling: {
 				audio: 2,
