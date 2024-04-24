@@ -1496,13 +1496,14 @@ export const Content = {
 	chooseToDuiben: function () {
 		"step 0";
 		if (!event.namelist) event.namelist = ["全军出击", "分兵围城", "奇袭粮道", "开城诱敌"];
-		game.broadcastAll(function (list) {
+		game.broadcastAll(function (list, translationList = []) {
 			var list2 = ["db_atk1", "db_atk2", "db_def1", "db_def2"];
 			for (var i = 0; i < 4; i++) {
 				lib.card[list2[i]].image = "card/" + list2[i] + (list[0] == "全军出击" ? "" : "_" + list[i]);
 				lib.translate[list2[i]] = list[i];
+				lib.translate[list2[i] + "_info"] = translationList[i];
 			}
-		}, event.namelist);
+		}, event.namelist, event.translationList);
 		if (!event.title) event.title = "对策";
 		game.log(player, "向", target, "发起了", "#y" + event.title);
 		if (!event.ai)
