@@ -7649,7 +7649,7 @@ game.import("character", function () {
 				audio: 1,
 				trigger: { player: "damageEnd" },
 				direct: true,
-				priority:-1,
+				priority: -1,
 				filter(event, player) {
 					return player.hasMark("renjie");
 				},
@@ -8288,7 +8288,7 @@ game.import("character", function () {
 			kuangfeng: {
 				unique: true,
 				audio: 2,
-				priority:-1,
+				priority: -1,
 				trigger: { player: "phaseJieshuBegin" },
 				direct: true,
 				filter(event, player) {
