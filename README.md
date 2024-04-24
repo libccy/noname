@@ -1,3 +1,5 @@
+[![Docker Image CI](https://github.com/xiaochun-z/noname/actions/workflows/docker-image.yml/badge.svg)](https://github.com/xiaochun-z/noname/actions/workflows/docker-image.yml)
+
 Forked from: https://github.com/libccy/noname
 
 ## 一键安装
