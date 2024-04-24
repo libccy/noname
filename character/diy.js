@@ -4657,6 +4657,9 @@ game.import("character", function () {
 					)
 						player.storage.nsfuzhou_draw = true;
 				},
+				ai: {
+					combo: "nsfuzhou"
+				},
 				derivation: ["nsfuzhou_damage", "nsfuzhou_draw"],
 			},
 			nsweiyuan: {
@@ -7587,6 +7590,7 @@ game.import("character", function () {
 				},
 			},
 			nschangshi: {
+				mode: ["identity"],
 				enable: "phaseUse",
 				usable: 1,
 				filter(event, player) {
@@ -7602,17 +7606,20 @@ game.import("character", function () {
 				multitarget: true,
 				selectTarget: 2,
 				content() {
-					var tmp = targets[0].hp;
-					targets[0].hp = targets[1].hp;
-					targets[1].hp = tmp;
-					targets[0].update();
-					targets[1].update();
-					if (Math.abs(targets[0].hp - targets[1].hp) == 1) {
-						player.loseHp();
-					}
-					//else{
-					//player.die();
-					//}
+					game.broadcastAll(function (player, targets) {
+						player.showIdentity();
+						var tmp = targets[0].hp;
+						targets[0].hp = targets[1].hp;
+						targets[1].hp = tmp;
+						targets[0].update();
+						targets[1].update();
+						if (Math.abs(targets[0].hp - targets[1].hp) == 1) {
+							player.loseHp();
+						}
+						//else{
+						//player.die();
+						//}
+					}, player, targets);
 				},
 				ai: {
 					order: 10,
@@ -7636,6 +7643,7 @@ game.import("character", function () {
 				},
 			},
 			nsjianning: {
+				mode: ["identity"],
 				enable: "phaseUse",
 				usable: 1,
 				filter(event, player) {
@@ -7646,6 +7654,11 @@ game.import("character", function () {
 				},
 				content() {
 					"step 0";
+					if (!player.identityShown) {
+						game.broadcastAll(function (player) {
+							player.showIdentity();
+						}, player);
+					}
 					player.swapHandcards(target);
 					"step 1";
 					target.damage();
@@ -7675,6 +7688,7 @@ game.import("character", function () {
 				},
 			},
 			nscuanquan: {
+				mode: ["identity"],
 				init(player) {
 					player.storage.nscuanquan = 0;
 				},
@@ -7707,16 +7721,19 @@ game.import("character", function () {
 				},
 				content() {
 					player.awakenSkill("nscuanquan");
-					var tmp = player.maxHp;
-					player.identity = "zhu";
-					player.maxHp = game.zhu.hp;
-					player.showIdentity();
-					player.update();
-					game.zhu.identity = "zhong";
-					game.zhu.maxHp = tmp;
-					game.zhu.showIdentity();
-					game.zhu.update();
-					game.zhu = player;
+					game.broadcastAll(function (player) {
+						var tmp = player.maxHp;
+						player.identity = "zhu";
+						player.maxHp = game.zhu.hp;
+						player.showIdentity();
+						player.update();
+						game.zhu.identity = "zhong";
+						game.zhu.maxHp = tmp;
+						game.zhu.showIdentity();
+						game.zhu.update();
+						game.zhu = player;
+					}, player);
+					event.trigger("zhuUpdate");
 				},
 			},
 			nstianji: {
@@ -7991,6 +8008,9 @@ game.import("character", function () {
 					},
 				},
 				group: "nsshijun_hp",
+				ai: {
+					halfneg: true
+				},
 			},
 			nszhaoxin: {
 				mark: true,
@@ -8011,6 +8031,9 @@ game.import("character", function () {
 							return "无手牌";
 						}
 					},
+				},
+				ai: {
+					neg: true
 				},
 			},
 			nsxiuxin: {
@@ -10000,6 +10023,9 @@ game.import("character", function () {
 					"step 2";
 					trigger.cancel();
 				},
+				ai: {
+					combo: "jugong"
+				},
 			},
 			nsxinsheng: {
 				trigger: { source: "damageEnd" },
@@ -10563,6 +10589,7 @@ game.import("character", function () {
 				},
 				ai: {
 					expose: 0.2,
+					combo: "zhucheng"
 				},
 			},
 			zhucheng: {
@@ -11093,16 +11120,25 @@ game.import("character", function () {
 				inherit: "jianxiong",
 			},
 			diyjianxiong: {
-				mode: ["identity"],
+				mode: ["identity", "guozhan"],
 				trigger: { global: "dieBefore" },
 				forced: true,
 				filter(event, player) {
-					return event.player != game.zhu && _status.currentPhase == player;
+					if (_status.currentPhase !== player) return false;
+					if (get.mode() === "identity") return event.player != game.zhu;
+					return get.mode() === "guozhan" && event.player.isFriendOf(player);
 				},
 				content() {
-					trigger.player.identity = "fan";
-					trigger.player.setIdentity("fan");
-					trigger.player.identityShown = true;
+					game.broadcastAll(function (target, group) {
+						if (get.mode() === "identity") {
+							target.identity = group;
+							target.setIdentity(group);
+							target.identityShown = true;
+						}
+						else {
+							target.trueIdentity = lib.group.slice(0).filter(i => group !== i).randomGet();
+						}
+					}, trigger.player, get.mode() === "identity" ? "fan" : player.getGuozhanGroup());
 				},
 			},
 			nsshuaiyan: {
@@ -12178,7 +12214,7 @@ game.import("character", function () {
 			nsshijun_info: "锁定技，你造成伤害时，你令此伤害+1，并在结算后失去1点体力。",
 			nshunyou: "魂佑",
 			nshunyou_info:
-				"出阶段限一次，你可以弃置一张基本牌，获得弃牌堆底的一张装备牌和一张锦囊牌，然后你可以将那张装备牌装备给一名角色（允许替换）。如果弃牌堆没有装备以及锦囊牌，则改为摸X张牌，X为损失的体力加一（最多3张）。",
+				"出牌阶段限一次，你可以弃置一张基本牌，获得弃牌堆底的一张装备牌和一张锦囊牌，然后你可以将那张装备牌装备给一名角色（允许替换）。如果弃牌堆没有装备以及锦囊牌，则改为摸X张牌，X为你已损失的体力值+1（最多3张）。",
 			nswulie: "武烈",
 			nswulie_info:
 				"限定技，准备阶段，你可以失去1点体力上限，从弃牌堆选择最多三张牌以任意顺序放置于牌堆顶。若如此做，此回合的结束阶段，你可以重复此操作。",

@@ -149,6 +149,9 @@ const skills = {
 			if (draws) player.draw(draws).gaintag = ["fuuko_chuanyuan"];
 			player.addSkill("fuuko_chuanyuan_effect");
 		},
+		ai: {
+			combo: "fuuko_xingdiao"
+		},
 		subSkill: {
 			effect: {
 				mod: {
@@ -4450,6 +4453,7 @@ const skills = {
 					return player.getUseValue({ name: "kaihua" });
 				},
 			},
+			combo: "kotori_yumo"
 		},
 	},
 	kotori_huazhan2: { onremove: true, charlotte: true },
@@ -9222,6 +9226,9 @@ const skills = {
 		},
 		content() {
 			player.turnOver();
+		},
+		ai: {
+			combo: "yusa_yanyi"
 		},
 	},
 	misa_yusa: {
