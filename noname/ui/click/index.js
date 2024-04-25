@@ -2843,10 +2843,20 @@ export class Click {
 				}
 				if (targetprompt) {
 					if (Array.isArray(targetprompt)) {
-						targetprompt =
-							targetprompt[
-								Math.min(targetprompt.length - 1, ui.selected.targets.indexOf(this))
-							];
+						const targets = ui.selected.targets.slice();
+						let index = ui.selected.targets.indexOf(this);
+						for (let i = 0; i < targetprompt.length; i++) {
+							const target = targets.find(
+								(cur) => cur.node.prompt && cur.node.prompt.innerText === targetprompt[i]
+							);
+							if (target) {
+								targets.remove(target);
+							} else {
+								index = i;
+								break;
+							}
+						}
+						targetprompt = targetprompt[Math.min(targetprompt.length - 1, index)];
 					} else if (typeof targetprompt == "function") {
 						targetprompt = targetprompt(this);
 					}
@@ -3706,7 +3716,7 @@ export class Click {
 								showSkillNamePinyin == "showCodeIdentifier"
 									? derivation
 									: lib.translate[`${derivation}_rt`] ||
-									  get.pinyin(derivationName).join(" ");
+										get.pinyin(derivationName).join(" ");
 							ruby.appendChild(rt);
 							const rightParenthesisRP = document.createElement("rp");
 							rightParenthesisRP.textContent = "）";
