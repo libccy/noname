@@ -159,7 +159,7 @@ export const characterPackMenu = function (connectMenu) {
 			var alterableCharacters = [];
 			var charactersToAlter = [];
 			for (var i in _info) {
-				const characterInfo = get.convertedCharacter( _info[i]);
+				const characterInfo = _info[i];
 				if (characterInfo.isUnseen) continue;
 				if (connectMenu && lib.connectBanned.includes(i)) continue;
 				list.push(i);

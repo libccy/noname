@@ -3287,15 +3287,7 @@ export class Create {
 					group: ui.create.div(".identity", node),
 					intro: ui.create.div(".intro", node),
 				};
-				var infoitem = lib.character[item];
-				if (!infoitem) {
-					for (var itemx in lib.characterPack) {
-						if (lib.characterPack[itemx][item]) {
-							infoitem = lib.characterPack[itemx][item];
-							break;
-						}
-					}
-				}
+				var infoitem = get.character(item);
 				node.node.name.innerHTML = get.slimName(item);
 				if (
 					lib.config.buttoncharacter_style == "default" ||
@@ -3313,11 +3305,11 @@ export class Create {
 						"raw"
 					);
 					ui.create.div(node.node.hp);
-					var hp = get.infoHp(infoitem[2]),
-						maxHp = get.infoMaxHp(infoitem[2]),
-						hujia = get.infoHujia(infoitem[2]);
+					var hp = infoitem.hp,
+						maxHp = infoitem.maxHp,
+						hujia = infoitem.hujia;
 					var str = get.numStr(hp);
-					if (hp != maxHp) {
+					if (hp !== maxHp) {
 						str += "/";
 						str += get.numStr(maxHp);
 					}
@@ -3334,11 +3326,11 @@ export class Create {
 						ui.create.div(".text", get.numStr(hujia), node.node.hp);
 					}
 				} else {
-					var hp = get.infoHp(infoitem[2]);
-					var maxHp = get.infoMaxHp(infoitem[2]);
-					var shield = get.infoHujia(infoitem[2]);
+					var hp = infoitem.hp,
+						maxHp = infoitem.maxHp,
+						shield = infoitem.hujia;
 					if (maxHp > 14) {
-						if (typeof infoitem[2] == "string")
+						if (hp !== maxHp || shield > 0)
 							node.node.hp.innerHTML = infoitem[2];
 						else node.node.hp.innerHTML = get.numStr(infoitem[2]);
 						node.node.hp.classList.add("text");

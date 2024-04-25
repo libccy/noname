@@ -69,7 +69,13 @@ export class Library {
 						});
 					}
 				}
-				return Reflect.set(target, prop, newValue);
+				const newPack = new Proxy({}, {
+					set(target, prop, newValue) {
+						return Reflect.set(target, prop, get.convertedCharacter(newValue));
+					}
+				});
+				Object.assign(newPack, newValue);
+				return Reflect.set(target, prop, newPack);
 			},
 		}
 	);
@@ -4947,7 +4953,7 @@ export class Library {
 									storage.translate[i] = mode.translate[i];
 								}
 								for (var i in mode.jiangeboss) {
-									if (mode.jiangeboss[i][4].includes("bossallowed")) {
+									if (mode.jiangeboss[i].isBossAllowed) {
 										storage.versus[i] = mode.jiangeboss[i];
 									}
 								}
@@ -4959,7 +4965,7 @@ export class Library {
 								storage.translate[i] = mode.translate[i];
 							}
 							for (var i in mode.characterPack.mode_boss) {
-								if (mode.characterPack.mode_boss[i][4].includes("bossallowed")) {
+								if (mode.characterPack.mode_boss[i].isBossAllowed) {
 									storage.boss[i] = mode.characterPack.mode_boss[i];
 								}
 							}

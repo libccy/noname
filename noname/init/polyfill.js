@@ -166,8 +166,8 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
 				}
 			}
 			let imgPrefixUrl;
-			if (!modeimage && nameinfo && nameinfo[4]) {
-				for (const value of nameinfo[4]) {
+			if (!modeimage && nameinfo && nameinfo.trashBin) {
+				for (const value of nameinfo.trashBin) {
 					if (value.startsWith("img:")) {
 						imgPrefixUrl = value.slice(4);
 						break;

@@ -2263,8 +2263,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					name = i + "_stonecharacter";
 					lib.card[name] = {
 						image: "mode/stone/character/" + i,
-						stoneact: lib.character[i].stoneModeData[0],
-						career: lib.character[i].stoneModeData[2] || null,
+						stoneact: lib.character[i].extraModeData[0],
+						career: lib.character[i].extraModeData[2] || null,
 					};
 					for (j in lib.element.stonecharacter) {
 						lib.card[name][j] = lib.element.stonecharacter[j];
@@ -2275,14 +2275,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						lib.card[name].stonehidden = true;
 						continue;
 					}
-					if (!lib.character[i].stoneModeData[2]) {
-						if (lib.character[i].stoneModeData[0] < 3) {
+					if (!lib.character[i].extraModeData[2]) {
+						if (lib.character[i].extraModeData[0] < 3) {
 							list.push(name);
 						} else {
 							list2.push(name);
 						}
 					} else {
-						list3[lib.character[i].stoneModeData[2]].push(name);
+						list3[lib.character[i].extraModeData[2]].push(name);
 					}
 				}
 				if (_status.mode == "deck") {
@@ -7234,8 +7234,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (
 							lib.character[i].isFellowInStoneMode &&
 							!lib.character[i].isHiddenInStoneMode &&
-							lib.character[i].stoneModeData &&
-							lib.character[i].stoneModeData[0] == num
+							lib.character[i].extraModeData &&
+							lib.character[i].extraModeData[0] == num
 						) {
 							list.push(i);
 						}
@@ -7789,8 +7789,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (
 							lib.character[i].isFellowInStoneMode &&
 							!lib.character[i].isHiddenInStoneMode &&
-							lib.character[i].stoneModeData &&
-							lib.character[i].stoneModeData[0] == 1
+							lib.character[i].extraModeData &&
+							lib.character[i].extraModeData[0] == 1
 						) {
 							list.push(i);
 						}
