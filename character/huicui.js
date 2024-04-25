@@ -13327,22 +13327,23 @@ game.import("character", function () {
 					if (result.bool) {
 						if (!target.countCards("hej")) event.finish();
 						else {
-							event.giver = target;
-							event.gainner = player;
-							target.choosePlayerCard(
+							// event.giver = target;
+							// event.gainner = player;
+							player.gainPlayerCard(
 								target,
 								true,
 								"hej",
 								2,
-								"交给" + get.translation(player) + "两张牌"
+								"获得" + get.translation(target) + "区域里的两张牌"
 							);
 						}
 					} else if (result.tie) {
 						delete player.getStat("skill").refenglve;
-						event.finish();
+						if (get.position(result.player, true) == "d") player.gain(result.player, "gain2");
+						// event.finish();
 					} else {
 						if (get.position(result.player, true) == "d") target.gain(result.player, "gain2");
-						event.finish();
+						// event.finish();
 						/*if(!player.countCards('he')) event.finish();
 						else{
 							event.giver=player;
@@ -13351,7 +13352,7 @@ game.import("character", function () {
 						}*/
 					}
 					"step 2";
-					if (result.bool) event.giver.give(result.cards, event.gainner);
+					// if (result.bool) event.giver.give(result.cards, event.gainner);
 				},
 				ai: {
 					order: 8,
@@ -13386,7 +13387,7 @@ game.import("character", function () {
 						event.source &&
 						event.source == _status.currentPhase &&
 						event.num == 1 &&
-						event.player != event.source &&
+						// event.player != event.source &&
 						event.player.isIn() &&
 						player.countCards("he") > 0 &&
 						event.source
@@ -15930,10 +15931,10 @@ game.import("character", function () {
 			re_xunchen: "荀谌",
 			refenglve: "锋略",
 			refenglve_info:
-				"出牌阶段限一次，你可以和一名其他角色进行拼点。若你赢，其将区域内的两张牌交给你；若平局，则你令此技能于本阶段内的发动次数上限+1；若你输，其获得你的拼点牌。",
+				"出牌阶段限一次，你可以和一名其他角色进行拼点。若你赢，你获得其区域里的两张牌；若平局，则你获得你的拼点牌且令此技能于本阶段内的发动次数上限+1；若你输，其获得你的拼点牌。",
 			anyong: "暗涌",
 			anyong_info:
-				"当一名角色于其回合内第一次对另一名其他角色造成伤害后，若伤害值为1，则你可弃置一张牌，并对受伤角色造成1点伤害。",
+				"当一名角色于其回合内第一次造成伤害后，若伤害值为1，则你可弃置一张牌，并对受伤角色造成1点伤害。",
 			wanniangongzhu: "万年公主",
 			zhenge: "枕戈",
 			zhenge_info:
