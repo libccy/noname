@@ -192,7 +192,7 @@ game.import("character", function () {
 					order: 9,
 					result: {
 						player(player, target) {
-							let res = 2 * get.effect(player, { name: "draw", player, player });
+							let res = 2 * get.effect(player, { name: "draw" }, player, player);
 							if (player !== target)
 								res += get.effect(player, { name: "losehp" }, player, player);
 							return res;
@@ -1434,7 +1434,7 @@ game.import("character", function () {
 						list.length > 1
 							? `，令${get.translation(event.card)}目标改为${get.translation(
 									list
-							  )}中的一名随机角色`
+								)}中的一名随机角色`
 							: ""
 					}。${gainText}`;
 				},
@@ -2252,8 +2252,8 @@ game.import("character", function () {
 				filter: function (event, player) {
 					return player.countCards("h") > 0;
 				},
-				getSkills: function (target) {
-					return target.getSkills(null, false).filter((skill) => {
+				getSkills(target, skills) {
+					return (target && !skills ? target.getSkills(null, false) : skills).filter((skill) => {
 						var str = get.skillInfoTranslation(skill, target);
 						if (str.indexOf("当你于出牌阶段") != -1) return true;
 						var skills = game.expandSkills([skill]);
@@ -2381,91 +2381,140 @@ game.import("character", function () {
 					});
 				},
 				async cost(event, trigger, player) {
-					const func = function (player) {
-						game.countPlayer((target) => {
-							if (target != player) {
-								const skills = lib.skill.dclongsong.getSkills(target);
-								if (skills.length) {
-									target.prompt(skills.map((i) => get.translation(i)).join("<br>"));
-								}
-							}
-						});
-					};
-					if (event.player == game.me) func(player);
-					else if (event.isOnline()) player.send(func, player);
 					event.result = await player
-						.chooseTarget(get.prompt2("longsong"), (card, player, target) => {
-							if (target == player) return false;
-							return target.hasCard((card) => {
-								if (get.position(card) == "h") return true;
+						.chooseCardTarget({
+							prompt: get.prompt2("longsong"),
+							filterTarget(card, player, target) {
+								if (target === player) return false;
+								const skills = lib.skill.dclongsong
+									.getSkills(target)
+									.map((skill) => get.translation(skill));
+								if (skills.length) {
+									target.prompt(skills.join("<br>"));
+								}
+								return target.hasCard((card) => {
+									if (get.position(card) == "h") return true;
+									return (
+										get.color(card) == "red" &&
+										lib.filter.canBeGained(card, player, target)
+									);
+								}, "he");
+							},
+							filterCard: { color: "red" },
+							selectCard: [0, 1],
+							ai1(card) {
+								const ai2 = get.event("ai2");
+								if (
+									game.hasPlayer((current) => {
+										return ai2(current) > 0;
+									})
+								) {
+									return -1 - get.value(card);
+								}
+								return 6 - get.value(card);
+							},
+							ai2(target) {
+								const player = get.event("player"),
+									att = get.attitude(player, target);
+								if (
+									att > 0 &&
+									!target
+										.getGainableCards(player, "he")
+										.some((card) => get.color(card) == "red")
+								)
+									return 0;
 								return (
-									get.color(card) == "red" && lib.filter.canBeGained(card, player, target)
+									lib.skill.dclongsong.getSkills(target).length +
+									(att > 0
+										? 0
+										: Math.max(
+												0,
+												get.effect(target, { name: "shunshou_copy2" }, player, player)
+											))
 								);
-							}, "he");
-						})
-						.set("ai", (target) => {
-							const player = get.event("player"),
-								att = get.attitude(player, target);
-							if (
-								att > 0 &&
-								!target
-									.getGainableCards(player, "he")
-									.some((card) => get.color(card) == "red")
-							)
-								return 0;
-							return (
-								lib.skill.dclongsong.getSkills(target).length +
-								(att > 0
-									? 0
-									: Math.max(
-											0,
-											get.effect(target, { name: "shunshou_copy2" }, player, player)
-									  ))
-							);
+							},
 						})
 						.forResult();
 				},
 				async content(event, trigger, player) {
 					const target = event.targets[0],
-						cards = target
+						card = event.cards[0],
+						gainableCards = target
 							.getGainableCards(player, "he")
 							.filter((card) => get.color(card) == "red");
-					if (cards.length) {
-						let dialog = ["龙诵：获得" + get.translation(target) + "的一张红色牌"];
-						let cards1 = cards.filter((i) => get.position(i) == "h"),
-							cards2 = cards.filter((i) => get.position(i) == "e");
-						if (cards1.length) {
-							dialog.push('<div class="text center">手牌区</div>');
-							if (player.hasSkillTag("viewHandcard", null, target, true)) dialog.push(cards1);
-							else dialog.push([cards1.randomSort(), "blank"]);
-						}
-						if (cards2.length) {
-							dialog.push('<div class="text center">装备区</div>');
-							dialog.push(cards2);
-						}
-						const {
-							result: { bool, links },
-						} = await player.chooseButton(dialog, true).set("ai", (button) => {
-							const player = get.event("player"),
-								target = get.event().getParent().targets[0];
-							return get.value(button.link, player) * get.value(button.link, target) * (1 + Math.random());
-						});
-						if (bool) {
+					if (card) {
+						await player.give(card, target);
+					} else {
+						if (gainableCards.length) {
+							let dialog = ["龙诵：获得" + get.translation(target) + "的一张红色牌"];
+							let cards1 = cards.filter((i) => get.position(i) == "h"),
+								cards2 = cards.filter((i) => get.position(i) == "e");
+							if (cards1.length) {
+								dialog.push('<div class="text center">手牌区</div>');
+								if (player.hasSkillTag("viewHandcard", null, target, true))
+									dialog.push(cards1);
+								else dialog.push([cards1.randomSort(), "blank"]);
+							}
+							if (cards2.length) {
+								dialog.push('<div class="text center">装备区</div>');
+								dialog.push(cards2);
+							}
+							const {
+								result: { bool, links },
+							} = await player.chooseButton(dialog, true).set("ai", (button) => {
+								const player = get.event("player"),
+									target = get.event().getParent().targets[0];
+								return (
+									get.value(button.link, player) *
+									get.value(button.link, target) *
+									(1 + Math.random())
+								);
+							});
+							if (!bool) return;
 							await player.gain(links, target, "giveAuto", "bySelf");
-							const skills = lib.skill.dclongsong.getSkills(target);
-							if (skills.length) {
-								if (!event.isMine() && !event.isOnline()) await game.asyncDelayx();
-								for (const skill of skills) {
-									player.popup(skill, "thunder");
-									await player.addTempSkills(skill, ["phaseUseAfter", "phaseAfter"]);
-								}
+						} else {
+							player.popup("杯具");
+							player.chat("无牌可得？！");
+							game.log("但是", target, "没有红色牌可被" + get.translation(player) + "获得！");
+							return;
+						}
+					}
+					let skills = lib.skill.dclongsong.getSkills(target), fromTarget = true;
+					if (!skills.length) {
+						if (!_status.characterlist) {
+							lib.skill.pingjian.initList();
+						}
+						const allList = _status.characterlist.slice(0);
+						allList.randomSort();
+						for (const name of allList) {
+							const curSkills = lib.character[name][3];
+							const filteredSkills = lib.skill.dclongsong.getSkills(null, curSkills);
+							if (filteredSkills.length > 0) {
+								skills = filteredSkills.randomGets();
+								fromTarget = false;
+								break;
 							}
 						}
-					} else {
-						player.popup("杯具");
-						player.chat("无牌可得？！");
-						game.log("但是", target, "没有红色牌可被" + get.translation(player) + "获得！");
 					}
+					if (!skills.length) return;
+					if (!event.isMine() && !event.isOnline()) await game.asyncDelayx();
+					skills.forEach((skill) => {
+						player.popup(skill, "thunder");
+					});
+					if (fromTarget) {
+						target.disableSkill("dclongsong_back", skills);
+						target.markAuto("dclongsong_back", skills);
+						target.addTempSkill("dclongsong_back", ["phaseUseAfter", "phaseAfter"]);
+						let str = "";
+						for (let i = 0; i < skills.length; i++) {
+							str += "【" + get.translation(skills[i]) + "】";
+							if (i != skills.length - 1) str += "、";
+						}
+						game.log(target, "的技能", "#g" + str, "失效了");
+					}
+					player.addTempSkill("dclongsong_remove", ["phaseUseAfter", "phaseAfter"]);
+					player.markAuto("dclongsong_remove", skills);
+					await player.addTempSkills(skills, ["phaseUseAfter", "phaseAfter"]);
 				},
 			},
 			//伏完
@@ -14459,7 +14508,7 @@ game.import("character", function () {
 				"出牌阶段开始时，你可以将一张红色牌交给一名其他角色。然后其须选择其所有的发动时机包含“出牌阶段”的技能，其于此阶段这些技能失效，你获得这些技能且至多可以发动一次。",
 			longsong: "龙诵",
 			longsong_info:
-				"出牌阶段开始时，你可以获得一名其他角色的一张红色牌，然后你本阶段视为拥有其所有的发动时机包含“出牌阶段”的技能。",
+				"出牌阶段开始时，你可以将一张红色牌交给一名其他角色或获得一名其他角色的一张红色牌，然后你本阶段获得其所有的发动时机包含“出牌阶段”的技能且至多可以发动一次，若其没有符合条件的技能，则改为随机获得一个满足条件的技能。",
 			dc_mengda: "孟达",
 			dclibang: "利傍",
 			dclibang_info:
