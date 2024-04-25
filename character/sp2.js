@@ -1832,13 +1832,14 @@ game.import("character", function () {
 				forced: true,
 				juexingji: true,
 				derivation: ["mashu", "dcnuchen"],
-				filter: function (event, player) {
-					return player.countCards("h") > player.hp;
+				filter(event, player) {
+					return player.countCards("hej") > player.getHp();
 				},
 				async content(event, trigger, player) {
 					player.awakenSkill("dcdanji");
 					await player.loseMaxHp();
 					await player.recover(player.maxHp - player.hp);
+					await player.draw(player.getHp());
 					await player.addSkills(["mashu", "dcnuchen"]);
 				},
 				ai: {
@@ -14520,7 +14521,7 @@ game.import("character", function () {
 			dc_jsp_guanyu_prefix: "新杀SP",
 			dcdanji: "单骑",
 			dcdanji_info:
-				"觉醒技。准备阶段，若你的手牌数大于体力值，你减1点体力上限，将体力回复至体力上限，然后获得〖马术〗和〖怒嗔〗。",
+				"觉醒技。准备阶段，若你区域内的牌数大于体力值，你减1点体力上限，将体力回复至体力上限并摸等同于体力值的牌，然后获得〖马术〗和〖怒嗔〗。",
 			dcnuchen: "怒嗔",
 			dcnuchen_info:
 				"出牌阶段限一次。你可以展示一名其他角色的一张手牌，然后选择一项：1.弃置任意张该花色的牌，对其造成等量伤害；2.获得该角色手牌中所有此花色的牌。",
