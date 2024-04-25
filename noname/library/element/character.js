@@ -96,10 +96,10 @@ export class Character {
 	 **/
 	isAiForbidden = false;
 	/**
-	 * 武将牌在炉石模式下的特殊信息
+	 * 武将牌在炉石模式/挑战模式下的特殊信息
 	 * @type { array|undefined }
 	 **/
-	stoneModeData;
+	extraModeData;
 	/**
 	 * 武将牌是否为炉石模式下的随从
 	 * @type { boolean }
@@ -162,7 +162,7 @@ export class Character {
 			this.hujia = get.infoHujia(data[2]);
 			this.skills = get.copy(data[3] || []);
 			if (data[4]) Character.convertTrashToProperties(this, data[4]);
-			if (data[5]) this.stoneModeData = data[5];
+			if (data.length > 5) this.extraModeData = data[5];
 		} else if (get.is.object(data)) {
 			Object.assign(this, data);
 			if (typeof this.maxHp !== "number") this.maxHp = this.hp;
@@ -350,9 +350,9 @@ export class Character {
 	}
 
 	get 5(){
-		return this.stoneModeData;
+		return this.extraModeData;
 	}
 	set 5(stoneData){
-		this.stoneModeData = stoneData;
+		this.extraModeData = stoneData;
 	}
 }

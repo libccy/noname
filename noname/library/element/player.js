@@ -3330,7 +3330,7 @@ export class Player extends HTMLDivElement {
 			}
 			for (var i = 0; i < list.length; i++) {
 				for (var j in lib.characterPack[list[i]]) {
-					if (lib.characterPack[list[i]][j][3].includes(name)) {
+					if (lib.characterPack[list[i]][j].skills.includes(name)) {
 						name = j;
 						stop = true;
 						break;
@@ -3341,7 +3341,7 @@ export class Player extends HTMLDivElement {
 				}
 			}
 		}
-		if (lib.character[this.name2] && lib.character[this.name2][3].includes(skill)) {
+		if (lib.character[this.name2] && lib.character[this.name2].skills.includes(skill)) {
 			this.setAvatarQueue(this.name2, [name]);
 		} else {
 			this.setAvatarQueue(this.name, [name]);
