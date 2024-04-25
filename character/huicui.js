@@ -4366,43 +4366,37 @@ game.import("character", function () {
 			//裴元绍
 			dcmoyu: {
 				audio: 2,
-				init: () => {
+				init() {
 					game.addGlobalSkill("dcmoyu_ai");
 				},
-				onremove: () => {
+				onremove() {
 					if (!game.hasPlayer((i) => i.hasSkill("dcmoyu"), true))
 						game.removeGlobalSkill("dcmoyu_ai");
 				},
 				enable: "phaseUse",
-				filter: function (event, player) {
-					return (
-						!player.hasSkill("dcmoyu_ban") &&
-						game.hasPlayer((current) => lib.skill.dcmoyu.filterTarget(null, player, current))
-					);
+				filter(event, player) {
+					return game.hasPlayer((current) => lib.skill.dcmoyu.filterTarget(null, player, current));
 				},
-				filterTarget: function (card, player, target) {
+				filterTarget(card, player, target) {
 					return (
 						player != target &&
 						!player.getStorage("dcmoyu_clear").includes(target) &&
 						target.countGainableCards(player, "hej")
 					);
 				},
-				content: function () {
-					"step 0";
+				async content(event,trigger,player) {
 					player.addTempSkill("dcmoyu_clear");
 					player.markAuto("dcmoyu_clear", [target]);
-					player.gainPlayerCard(target, "hej", true);
-					"step 1";
-					var num = player.getStorage("dcmoyu_clear").length;
-					target
+					await player.gainPlayerCard(target, "hej", true, 1 + player.hasSkill("dcmoyu_add"));
+					player.removeSkill("dcmoyu_add");
+					const num = player.getStorage("dcmoyu_clear").length;
+					const result = await target
 						.chooseToUse(function (card, player, event) {
 							if (get.name(card) != "sha") return false;
 							return lib.filter.filterCard.apply(this, arguments);
 						}, "是否对" +
-							get.translation(player) +
-							"使用一张无距离限制的【杀】（伤害基数为" +
-							num +
-							"）？")
+						get.translation(player) +
+						"使用一张无距离限制的【杀】？")
 						.set("targetRequired", true)
 						.set("complexSelect", true)
 						.set("filterTarget", function (card, player, target) {
@@ -4417,15 +4411,20 @@ game.import("character", function () {
 						.set("num", num)
 						.set("oncard", (card) => {
 							_status.event.baseDamage = _status.event.getParent().num;
-						});
-					"step 2";
+						})
+						.forResult();
 					if (result.bool) {
 						if (
 							player.hasHistory("damage", (evt) => {
 								return evt.card && evt.card.name == "sha" && evt.getParent(4) == event;
 							})
-						)
-							player.addTempSkill("dcmoyu_ban");
+						) {
+							player.tempBanSkill("dcmoyu");
+						}
+						else {
+							player.addTempSkill("dcmoyu_add", "phaseChange");
+						}
+						
 					}
 				},
 				subSkill: {
@@ -4438,6 +4437,11 @@ game.import("character", function () {
 						mark: true,
 						marktext: "欲",
 						intro: { content: "偷马贼被反打了！" },
+					},
+					add: {
+						charlotte: true,
+						marktext: "欲",
+						intro: { content: "欲望加速，下次抢两张！" },
 					},
 					ai: {
 						trigger: { player: "dieAfter" },
@@ -4516,7 +4520,167 @@ game.import("character", function () {
 											savable = savable(card, player, player);
 										return savable;
 									}) <=
-									player.getStorage("dcmoyu_clear").length + 1
+									1
+							)
+								return 0;
+							return eff;
+						},
+					},
+				},
+			},
+			oldmoyu: {
+				audio: "dcmoyu",
+				init: () => {
+					game.addGlobalSkill("oldmoyu_ai");
+				},
+				onremove: () => {
+					if (!game.hasPlayer((i) => i.hasSkill("oldmoyu"), true))
+						game.removeGlobalSkill("oldmoyu_ai");
+				},
+				enable: "phaseUse",
+				filter: function (event, player) {
+					return (
+						!player.hasSkill("oldmoyu_ban") &&
+						game.hasPlayer((current) => lib.skill.oldmoyu.filterTarget(null, player, current))
+					);
+				},
+				filterTarget: function (card, player, target) {
+					return (
+						player != target &&
+						!player.getStorage("oldmoyu_clear").includes(target) &&
+						target.countGainableCards(player, "hej")
+					);
+				},
+				content: function () {
+					"step 0";
+					player.addTempSkill("oldmoyu_clear");
+					player.markAuto("oldmoyu_clear", [target]);
+					player.gainPlayerCard(target, "hej", true);
+					"step 1";
+					var num = player.getStorage("oldmoyu_clear").length;
+					target
+						.chooseToUse(function (card, player, event) {
+							if (get.name(card) != "sha") return false;
+							return lib.filter.filterCard.apply(this, arguments);
+						}, "是否对" +
+							get.translation(player) +
+							"使用一张无距离限制的【杀】（伤害基数为" +
+							num +
+							"）？")
+						.set("targetRequired", true)
+						.set("complexSelect", true)
+						.set("filterTarget", function (card, player, target) {
+							if (
+								target != _status.event.sourcex &&
+								!ui.selected.targets.includes(_status.event.sourcex)
+							)
+								return false;
+							return lib.filter.targetEnabled.apply(this, arguments);
+						})
+						.set("sourcex", player)
+						.set("num", num)
+						.set("oncard", (card) => {
+							_status.event.baseDamage = _status.event.getParent().num;
+						});
+					"step 2";
+					if (result.bool) {
+						if (
+							player.hasHistory("damage", (evt) => {
+								return evt.card && evt.card.name == "sha" && evt.getParent(4) == event;
+							})
+						)
+							player.addTempSkill("oldmoyu_ban");
+					}
+				},
+				subSkill: {
+					clear: {
+						charlotte: true,
+						onremove: true,
+					},
+					ban: {
+						charlotte: true,
+						mark: true,
+						marktext: "欲",
+						intro: { content: "偷马贼被反打了！" },
+					},
+					ai: {
+						trigger: { player: "dieAfter" },
+						filter: () => {
+							return !game.hasPlayer((i) => i.hasSkill("oldmoyu"), true);
+						},
+						silent: true,
+						forceDie: true,
+						content: () => {
+							game.removeGlobalSkill("oldmoyu_ai");
+						},
+						ai: {
+							effect: {
+								target: function (card, player, target, current) {
+									if (get.type(card) == "delay" && current < 0) {
+										var currentx = _status.currentPhase;
+										if (!currentx || !currentx.isIn()) return;
+										var list = game.filterPlayer((current) => {
+											if (current == target) return true;
+											if (!current.hasSkill("oldmoyu")) return false;
+											if (current.hasJudge("lebu")) return false;
+											return get.attitude(current, target) > 0;
+										});
+										list.sortBySeat(currentx);
+										if (list.indexOf(target) != 0) return "zerotarget";
+									}
+								},
+							},
+						},
+					},
+				},
+				ai: {
+					order: 9,
+					threaten: 2.4,
+					result: {
+						target: function (player, target) {
+							var num = get.sgn(get.attitude(player, target));
+							var eff = get.effect(target, { name: "shunshou" }, player, player) * num;
+							if (eff * num > 0) return eff / 10;
+							if (
+								player.hasShan() &&
+								!target.hasSkillTag(
+									"directHit_ai",
+									true,
+									{
+										target: player,
+										card: { name: "sha" },
+									},
+									true
+								)
+							)
+								return eff;
+							if (
+								target.hasSha() &&
+								player.hp +
+									player.countCards("hs", function (card) {
+										var mod2 = game.checkMod(
+											card,
+											player,
+											"unchanged",
+											"cardEnabled2",
+											player
+										);
+										if (mod2 != "unchanged") return mod2;
+										var mod = game.checkMod(
+											card,
+											player,
+											player,
+											"unchanged",
+											"cardSavable",
+											player
+										);
+										if (mod != "unchanged") return mod;
+										var savable = get.info(card).savable;
+										if (typeof savable == "function")
+											savable = savable(card, player, player);
+										return savable;
+									}) <=
+									player.getStorage("oldmoyu_clear").length + 1
 							)
 								return 0;
 							return eff;
@@ -16070,9 +16234,12 @@ game.import("character", function () {
 			dcsigong_info:
 				"其他角色的回合结束时，若其于本回合内使用牌被响应过，你可以将手牌摸至或弃置至1，视为对其使用一张需使用X张【闪】抵消的【杀】，且此【杀】的伤害基数+1（X为你以此法弃置的牌数且至少为1）。当你以此法造成伤害后，该技能于本轮失效。",
 			peiyuanshao: "裴元绍",
+			oldmoyu: "没欲",
+			oldmoyu_info:
+				"出牌阶段每名角色限一次。你可以获得一名其他角色区域里的一张牌，然后其可以对你使用一张无距离限制的【杀】，且此【杀】伤害基数为X（X为你于本回合发动此技能的次数）。若此【杀】对你造成了伤害，你令此技能于本回合失效。",
 			dcmoyu: "没欲",
 			dcmoyu_info:
-				"出牌阶段每名角色限一次。你可以获得一名其他角色区域里的一张牌，然后其可以对你使用一张无距离限制的【杀】，且此【杀】伤害基数为X（X为你于本回合发动此技能的次数）。若此【杀】对你造成了伤害，你令此技能于本回合失效。",
+				"出牌阶段每名角色限一次。你可以获得一名其他角色区域里的一张牌，然后其可以对你使用一张无距离限制的【杀】。若此【杀】：未对你造成过伤害，你将此技能于此阶段下次获得的牌数改为两张；对你造成过伤害，你令此技能于本回合失效。",
 			zhangchu: "张楚",
 			dcjizhong: "集众",
 			dcjizhong_info:
