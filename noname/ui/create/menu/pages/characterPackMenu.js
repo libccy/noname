@@ -260,6 +260,7 @@ export const characterPackMenu = function (connectMenu) {
 					mode != "mode_extension_jiange"
 				) {
 					page.appendChild(cfgnode);
+					cfgnodeAI.style.marginTop = "0px";
 				}
 				page.appendChild(cfgnodeAI);
 			} else {
