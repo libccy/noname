@@ -4370,61 +4370,52 @@ game.import("character", function () {
 					game.addGlobalSkill("dcmoyu_ai");
 				},
 				onremove() {
-					if (!game.hasPlayer((i) => i.hasSkill("dcmoyu"), true))
-						game.removeGlobalSkill("dcmoyu_ai");
+					if (!game.hasPlayer(i => i.hasSkill("dcmoyu"), true)) game.removeGlobalSkill("dcmoyu_ai");
 				},
 				enable: "phaseUse",
 				filter(event, player) {
 					return game.hasPlayer((current) => lib.skill.dcmoyu.filterTarget(null, player, current));
 				},
 				filterTarget(card, player, target) {
-					return (
-						player != target &&
-						!player.getStorage("dcmoyu_clear").includes(target) &&
-						target.countGainableCards(player, "hej")
-					);
+					return player != target && !player.getStorage("dcmoyu_clear").includes(target) && target.countGainableCards(player, "hej");
 				},
-				async content(event,trigger,player) {
+				async content(event, trigger, player) {
+					const target = event.target;
 					player.addTempSkill("dcmoyu_clear");
 					player.markAuto("dcmoyu_clear", [target]);
 					await player.gainPlayerCard(target, "hej", true, 1 + player.hasSkill("dcmoyu_add"));
 					player.removeSkill("dcmoyu_add");
 					const num = player.getStorage("dcmoyu_clear").length;
 					const result = await target
-						.chooseToUse(function (card, player, event) {
-							if (get.name(card) != "sha") return false;
-							return lib.filter.filterCard.apply(this, arguments);
-						}, "是否对" +
-						get.translation(player) +
-						"使用一张无距离限制的【杀】？")
+						.chooseToUse(
+							function (card, player, event) {
+								if (get.name(card) != "sha") return false;
+								return lib.filter.filterCard.apply(this, arguments);
+							},
+							"是否对" + get.translation(player) + "使用一张无距离限制的【杀】？"
+						)
 						.set("targetRequired", true)
 						.set("complexSelect", true)
 						.set("filterTarget", function (card, player, target) {
-							if (
-								target != _status.event.sourcex &&
-								!ui.selected.targets.includes(_status.event.sourcex)
-							)
-								return false;
+							if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
 							return lib.filter.targetEnabled.apply(this, arguments);
 						})
 						.set("sourcex", player)
 						.set("num", num)
-						.set("oncard", (card) => {
+						.set("oncard", card => {
 							_status.event.baseDamage = _status.event.getParent().num;
 						})
 						.forResult();
 					if (result.bool) {
 						if (
-							player.hasHistory("damage", (evt) => {
+							player.hasHistory("damage", evt => {
 								return evt.card && evt.card.name == "sha" && evt.getParent(4) == event;
 							})
 						) {
 							player.tempBanSkill("dcmoyu");
-						}
-						else {
+						} else {
 							player.addTempSkill("dcmoyu_add", "phaseChange");
 						}
-						
 					}
 				},
 				subSkill: {
@@ -4440,6 +4431,7 @@ game.import("character", function () {
 					},
 					add: {
 						charlotte: true,
+						mark: true,
 						marktext: "欲",
 						intro: { content: "欲望加速，下次抢两张！" },
 					},

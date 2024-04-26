@@ -2363,7 +2363,7 @@ game.import("character", function () {
 						content: function () {
 							"step 0";
 							var skill = trigger.sourceSkill || trigger.skill;
-							player.removeSkill(skill);
+							player.removeSkills(skill);
 							player.unmarkAuto("dclongsong_remove", [skill]);
 						},
 					},
@@ -2373,9 +2373,9 @@ game.import("character", function () {
 				audio: "dclongsong",
 				trigger: { player: "phaseUseBegin" },
 				filter(event, player) {
-					return game.hasPlayer((target) => {
+					return game.hasPlayer(target => {
 						if (target == player) return false;
-						return target.hasCard((card) => {
+						return target.hasCard(card => {
 							if (get.position(card) == "h") return true;
 							return get.color(card) == "red" && lib.filter.canBeGained(card, player, target);
 						}, "he");
@@ -2387,26 +2387,22 @@ game.import("character", function () {
 							prompt: get.prompt2("longsong"),
 							filterTarget(card, player, target) {
 								if (target === player) return false;
-								const skills = lib.skill.dclongsong
-									.getSkills(target)
-									.map((skill) => get.translation(skill));
+								const skills = lib.skill.dclongsong.getSkills(target).map(skill => get.translation(skill));
 								if (skills.length) {
 									target.prompt(skills.join("<br>"));
 								}
-								return target.hasCard((card) => {
+								return ui.selected.cards.length || target.hasCard(card => {
 									if (get.position(card) == "h") return true;
-									return (
-										get.color(card) == "red" &&
-										lib.filter.canBeGained(card, player, target)
-									);
+									return get.color(card) == "red" && lib.filter.canBeGained(card, player, target);
 								}, "he");
 							},
 							filterCard: { color: "red" },
 							selectCard: [0, 1],
+							multitarget: true,
 							ai1(card) {
 								const ai2 = get.event("ai2");
 								if (
-									game.hasPlayer((current) => {
+									game.hasPlayer(current => {
 										return ai2(current) > 0;
 									})
 								) {
@@ -2417,43 +2413,26 @@ game.import("character", function () {
 							ai2(target) {
 								const player = get.event("player"),
 									att = get.attitude(player, target);
-								if (
-									att > 0 &&
-									!target
-										.getGainableCards(player, "he")
-										.some((card) => get.color(card) == "red")
-								)
-									return 0;
-								return (
-									lib.skill.dclongsong.getSkills(target).length +
-									(att > 0
-										? 0
-										: Math.max(
-												0,
-												get.effect(target, { name: "shunshou_copy2" }, player, player)
-											))
-								);
+								if (att > 0 && !target.getGainableCards(player, "he").some(card => get.color(card) == "red")) return 0;
+								return lib.skill.dclongsong.getSkills(target).length + (att > 0 ? 0 : Math.max(0, get.effect(target, { name: "shunshou_copy2" }, player, player)));
 							},
 						})
 						.forResult();
 				},
 				async content(event, trigger, player) {
 					const target = event.targets[0],
-						card = event.cards[0],
-						gainableCards = target
-							.getGainableCards(player, "he")
-							.filter((card) => get.color(card) == "red");
-					if (card) {
-						await player.give(card, target);
+						cards = event.cards,
+						gainableCards = target.getGainableCards(player, "he").filter(card => get.color(card) == "red");
+					if (cards) {
+						await player.give(cards, target);
 					} else {
 						if (gainableCards.length) {
 							let dialog = ["龙诵：获得" + get.translation(target) + "的一张红色牌"];
-							let cards1 = cards.filter((i) => get.position(i) == "h"),
-								cards2 = cards.filter((i) => get.position(i) == "e");
+							let cards1 = gainableCards.filter(i => get.position(i) == "h"),
+								cards2 = gainableCards.filter(i => get.position(i) == "e");
 							if (cards1.length) {
 								dialog.push('<div class="text center">手牌区</div>');
-								if (player.hasSkillTag("viewHandcard", null, target, true))
-									dialog.push(cards1);
+								if (player.hasSkillTag("viewHandcard", null, target, true)) dialog.push(cards1);
 								else dialog.push([cards1.randomSort(), "blank"]);
 							}
 							if (cards2.length) {
@@ -2462,14 +2441,10 @@ game.import("character", function () {
 							}
 							const {
 								result: { bool, links },
-							} = await player.chooseButton(dialog, true).set("ai", (button) => {
+							} = await player.chooseButton(dialog, true).set("ai", button => {
 								const player = get.event("player"),
 									target = get.event().getParent().targets[0];
-								return (
-									get.value(button.link, player) *
-									get.value(button.link, target) *
-									(1 + Math.random())
-								);
+								return get.value(button.link, player) * get.value(button.link, target) * (1 + Math.random());
 							});
 							if (!bool) return;
 							await player.gain(links, target, "giveAuto", "bySelf");
@@ -2477,10 +2452,10 @@ game.import("character", function () {
 							player.popup("杯具");
 							player.chat("无牌可得？！");
 							game.log("但是", target, "没有红色牌可被" + get.translation(player) + "获得！");
-							return;
 						}
 					}
-					let skills = lib.skill.dclongsong.getSkills(target), fromTarget = true;
+					let skills = lib.skill.dclongsong.getSkills(target),
+						fromTarget = true;
 					if (!skills.length) {
 						if (!_status.characterlist) {
 							lib.skill.pingjian.initList();
@@ -2491,7 +2466,7 @@ game.import("character", function () {
 							const curSkills = lib.character[name][3];
 							const filteredSkills = lib.skill.dclongsong.getSkills(null, curSkills);
 							if (filteredSkills.length > 0) {
-								skills = filteredSkills.randomGets();
+								skills = filteredSkills.randomGets(1);
 								fromTarget = false;
 								break;
 							}
@@ -2499,7 +2474,7 @@ game.import("character", function () {
 					}
 					if (!skills.length) return;
 					if (!event.isMine() && !event.isOnline()) await game.asyncDelayx();
-					skills.forEach((skill) => {
+					skills.forEach(skill => {
 						player.popup(skill, "thunder");
 					});
 					if (fromTarget) {
