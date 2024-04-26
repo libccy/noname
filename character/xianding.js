@@ -5488,7 +5488,7 @@ game.import("character", function () {
 												},
 												target,
 												target
-										  ))
+											))
 								);
 							})
 							.set("card", card);
@@ -7727,7 +7727,6 @@ game.import("character", function () {
 					var evt = lib.skill.dcjianying.getLastUsed(player, trigger.getParent());
 					player.draw(trigger.targets.filter((target) => evt.targets.includes(target)).length);
 				},
-				locked: false,
 				mod: {
 					aiOrder: function (player, card, num) {
 						var evt = player.getLastUsed();
@@ -8578,13 +8577,13 @@ game.import("character", function () {
 					},
 				},
 			},
-			dcjinjie: {
-				audio: 2,
+			oldjinjie: {
+				audio: "dcjinjie",
 				trigger: { global: "dying" },
 				hasPhase: function (player) {
 					var history = player.actionHistory;
 					for (var i = history.length - 1; i >= 0; i--) {
-						if (history[i].isMe) return true;
+						if (history[i].isMe && !history[i].isSkipped) return true;
 						if (history[i].isRound) break;
 					}
 					return false;
@@ -8593,28 +8592,28 @@ game.import("character", function () {
 				content: function () {
 					"step 0";
 					player
-						.chooseBool(get.prompt("dcjinjie", trigger.player), "令其摸一张牌")
+						.chooseBool(get.prompt("oldjinjie", trigger.player), "令其摸一张牌")
 						.set("ai", () => {
 							return get.attitude(_status.event.player, _status.event.getTrigger().player) > 0;
 						});
 					"step 1";
 					if (result.bool) {
-						player.logSkill("dcjinjie", trigger.player);
+						player.logSkill("oldjinjie", trigger.player);
 						trigger.player.draw();
 					} else event.finish();
-					if (lib.skill.dcjinjie.hasPhase(player)) event.finish();
+					if (lib.skill.oldjinjie.hasPhase(player)) event.finish();
 					"step 2";
 					var num = 0;
 					var history = player.actionHistory;
 					for (var i = history.length - 1; i >= 0; i--) {
 						for (var evt of history[i].useSkill) {
-							if (evt.skill == "dcjinjie") num++;
+							if (evt.skill == "oldjinjie") num++;
 						}
 						if (history[i].isRound) break;
 					}
 					if (num == 0) {
 						player
-							.chooseBool(get.prompt("dcjinjie", trigger.player), "令其回复1点体力")
+							.chooseBool(get.prompt("oldjinjie", trigger.player), "令其回复1点体力")
 							.set("ai", () => {
 								var player = _status.event.player;
 								return (
@@ -8629,7 +8628,7 @@ game.import("character", function () {
 					} else {
 						player
 							.chooseToDiscard(
-								get.prompt("dcjinjie", trigger.player),
+								get.prompt("oldjinjie", trigger.player),
 								"弃置" + get.cnNumber(num) + "张牌，令其回复1点体力",
 								"he",
 								num
@@ -8648,8 +8647,101 @@ game.import("character", function () {
 					}
 				},
 			},
-			dcjue: {
+			dcjinjie: {
 				audio: 2,
+				trigger: { global: "dying" },
+				async cost(event, trigger, player) {
+					const target = trigger.player;
+					const result = await player
+						.chooseControl(
+							[0, 1, 2, 3].map(i => get.cnNumber(i, true)),
+							"cancel2"
+						)
+						.set("prompt", get.prompt("dcjinjie", target))
+						.set("prompt2", `令${get.translation(target)}摸至多三张牌，然后你可以弃置等量的牌令其回复1点体力。`)
+						.set("ai", () => {
+							return get.event("choice");
+						})
+						.set(
+							"choice",
+							(() => {
+								if (get.attitude(player, target) <= 0) return "cancel2";
+								if (target === player) return 3;
+								const unusefulCount = player.countCards("he", card => {
+									return lib.filter.cardDiscardable(card, player, "dcjinjie") && get.value(card) < 5 && !player.canSaveCard(card, target);
+								});
+								if (
+									[player, target]
+										.unique()
+										.map(current => {
+											return current.countCards("hs", card => {
+												return player.canSaveCard(card, target);
+											});
+										})
+										.reduce((p, c) => p + c) > unusefulCount
+								) {
+									return 3;
+								}
+								return Math.min(3, unusefulCount);
+							})()
+						)
+						.forResult();
+					if (result.control !== "cancel2") {
+						event.result = {
+							bool: true,
+							cost_data: {
+								index: result.index,
+							},
+						};
+					}
+				},
+				round: 1,
+				logTarget: "player",
+				async content(event, trigger, player) {
+					const num = event.cost_data.index,
+						target = trigger.player;
+					if (num > 0) await target.draw(num);
+					let next;
+					if (num > 0) {
+						next = player
+							.chooseToDiscard(`尽节：是否弃置${get.cnNumber(num)}张牌，令${get.translation(target)}回复1点体力？`, num, "he")
+							.set("ai", card => {
+								if (get.event("goon")) {
+									return 100 / Math.max(0.01, get.value(card) + 20);
+								}
+								return 0;
+							})
+							.set(
+								"goon",
+								(() => {
+									if (get.attitude(player, target) <= 0) return false;
+									const count = player.countCards("hs", card => {
+										return player.canSaveCard(card, target);
+									});
+									return (
+										!count ||
+										(count > 0 &&
+											player.countCards("he", card => {
+												return get.value(card) < 5;
+											}) >= num)
+									);
+								})()
+							);
+					} else {
+						next = player.chooseBool(`尽节：是否令${get.translation(target)}回复1点体力？`).set("choice", get.attitude(player, target) > 0);
+					}
+					const bool = await next.forResultBool();
+					if (bool) {
+						player.line(target, "green");
+						await target.recover();
+					}
+				},
+				subSkill:{
+					round:{},
+				}
+			},
+			oldjue: {
+				audio: "dcjue",
 				trigger: { player: "phaseZhunbeiBegin" },
 				direct: true,
 				filter: function (event, player) {
@@ -8664,7 +8756,7 @@ game.import("character", function () {
 					"step 0";
 					player
 						.chooseTarget(
-							get.prompt("dcjue"),
+							get.prompt("oldjue"),
 							"视为对一名体力值或手牌数大于你的角色使用一张【杀】",
 							(card, player, target) => {
 								return (
@@ -8680,8 +8772,69 @@ game.import("character", function () {
 					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
-						player.logSkill("dcjue", target);
+						player.logSkill("oldjue", target);
 						player.useCard({ name: "sha", isCard: true }, target, false);
+					}
+				},
+			},
+			dcjue: {
+				audio: 2,
+				trigger: { global: "phaseJieshuBegin" },
+				filter(event, player) {
+					if (!lib.skill.dcjue.getCards().length) return false;
+					return (
+						(event.player !== player && event.player.isIn()) ||
+						(event.player === player &&
+							game.hasPlayer(current => {
+								return current.isIn();
+							}))
+					);
+				},
+				round: 1,
+				async cost(event, trigger, player) {
+					let maxLimit = lib.skill.dcjue.getCards().length;
+					if (trigger.player === player) {
+						event.result = await player
+							.chooseTarget(get.prompt("dcjue"), `选择一名其他角色，视为对其依次随机使用X次【杀】/【过河拆桥】/【五谷丰登】（X为${maxLimit}与其体力上限中的较小值）。`)
+							.set("filterTarget", lib.filter.notMe)
+							.set("ai", target => {
+								return -get.attitude(get.player(), target);
+							})
+							.forResult();
+					} else {
+						const target = trigger.player;
+						maxLimit = Math.min(maxLimit, target.maxHp);
+						event.result = await player
+							.chooseBool(get.prompt("dcjue", target), `视为对${get.translation(target)}依次随机使用${get.cnNumber(maxLimit)}次【杀】/【过河拆桥】/【五谷丰登】。`)
+							.set("choice", get.attitude(player, target) < 0)
+							.forResult();
+					}
+				},
+				logTarget: "player",
+				getCards() {
+					const cards = [];
+					game.countPlayer2(current => {
+						current.getHistory("lose", evt => {
+							if (evt.type == "discard") cards.addArray(evt.cards2.filterInD("d"));
+						});
+					});
+					return cards;
+				},
+				async content(event, trigger, player) {
+					const target = event.targets ? event.targets[0] : trigger.player;
+					const nameList = ["sha", "guohe", "wugu"];
+					let maxLimit = Math.min(lib.skill.dcjue.getCards().length, target.maxHp);
+					while (maxLimit--) {
+						if (!target.isIn()) return;
+						const list = nameList.slice().randomSort();
+						for (const name of list) {
+							const card = new lib.element.VCard({ name });
+							if (player.canUse(card, target)) {
+								await player.useCard(card, target);
+								await game.asyncDelayx();
+								break;
+							}
+						}
 					}
 				},
 			},
@@ -19368,11 +19521,16 @@ game.import("character", function () {
 			dczhaohan: "昭汉",
 			dczhaohan_info:
 				"摸牌阶段，你可以多摸两张牌，然后你于得到牌后选择一项：1.将两张手牌交给一名没有手牌的角色；2.弃置两张手牌。",
+			oldjinjie: "尽节",
+			oldjinjie_info:
+				"当一名角色进入濒死状态时，你可以令其摸一张牌。然后若你本轮未进行过回合，你可以弃置X张手牌令其回复1点体力（X为本轮你发动过〖尽节〗的次数）。",
 			dcjinjie: "尽节",
 			dcjinjie_info:
-				"当一名角色进入濒死状态时，可以令其摸一张牌。然后若你本轮未进行过回合，你可以弃置X张手牌令其回复1点体力（X为本轮你发动过〖尽节〗的次数）。",
+				"每轮限一次。当一名角色进入濒死状态时，你可以声明一个整数X（X∈[0,3]），令其摸X张牌，然后你可以弃置X张牌令其回复1点体力（若X为0则跳过摸牌和弃牌的步骤）。",
+			oldjue: "举讹",
+			oldjue_info: "准备阶段，你可以视为对一名体力值或手牌数大于你的角色使用一张【杀】。",
 			dcjue: "举讹",
-			dcjue_info: "准备阶段，你可以视为对一名体力值或手牌数大于你的角色使用一张【杀】。",
+			dcjue_info: "每轮限一次。一名角色的结束阶段，你可以视为对其随机使用【杀】/【过河拆桥】/【五谷丰登】，直到你以此法使用的牌数不小于Y（Y为本回合因弃置进入弃牌堆的牌数，且至多为其体力上限）。若此时是你的回合，改为你选择一名其他角色。",
 			dc_tengfanglan: "滕芳兰",
 			dcluochong: "落宠",
 			dcluochong_info:
