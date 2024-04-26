@@ -2051,7 +2051,7 @@ export class Get {
 			return card.split(lib.natureSeparator).sort(lib.sort.nature).join(lib.natureSeparator);
 		if (Array.isArray(card)) return card.sort(lib.sort.nature).join(lib.natureSeparator);
 		var nature = card.nature;
-		if (get.itemtype(player) == "player" || player !== false) {
+		if (get.itemtype(player) == "player" || (player !== false && get.position(card) == "h")) {
 			var owner = get.owner(card);
 			if (owner) {
 				return game.checkMod(card, owner, nature, "cardnature", owner);
