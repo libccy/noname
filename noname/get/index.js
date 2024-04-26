@@ -645,6 +645,7 @@ export class Get {
 		return "暂无武将介绍";
 	}
 	bordergroup(info, raw) {
+		if(typeof info == 'string') info = get.character(info);
 		if(info.groupBorder) return info.groupBorder;
 		return raw ? "" : info.group || "";
 	}
