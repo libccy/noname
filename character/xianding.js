@@ -1890,19 +1890,17 @@ game.import("character", function () {
 				logTarget: "player",
 				async content(event, trigger, player) {
 					player
-						.judge((card) => {
+						.judge(card => {
 							const evt = get.event().getParent(get.event("eventName")).getTrigger();
-							if (!evt.source.isIn() || !evt.card || typeof get.number(evt.card) !== "number")
-								return 0;
+							if (!evt.source || !evt.source.isIn() || !evt.card || typeof get.number(evt.card) !== "number") return 0;
 							if (get.number(card) > get.number(evt.card)) return 1.5;
 							return 0;
 						})
-						.set("judge2", (r) => r.bool)
+						.set("judge2", r => r.bool)
 						.set("callback", () => {
 							const evtx = event.getParent();
 							const evt = event.getParent(evtx.eventName).getTrigger();
-							if (!evt.source.isIn() || !evt.card || typeof get.number(evt.card) !== "number")
-								return;
+							if (!evt.source || !evt.source.isIn() || !evt.card || typeof get.number(evt.card) !== "number") return;
 							if (event.judgeResult.number > get.number(evt.card)) {
 								const sha = new lib.element.VCard({ name: "sha" }),
 									target = evt.source;
