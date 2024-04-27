@@ -1219,26 +1219,21 @@ game.import("character", function () {
 						.forResult();
 				},
 				popup: false,
-				content() {
-					player.link(true);
-					if (player.getDamagedHp() > 0) player.draw(player.getDamagedHp());
+				*content(event, map) {
+					const player = map.player;
+					yield player.link(true);
+					if (player.getDamagedHp() > 0) {
+						yield player.draw(player.getDamagedHp());
+					}
+					if (
+						game.getGlobalHistory("everything", evt => {
+							return evt.name == "dying";
+						}).length
+					) {
+						player.tempBanSkill("clanxieshu");
+					}
 				},
 				ai: { threaten: 3 },
-				group: "clanxieshu_ban",
-				subSkill: {
-					ban: {
-						audio: "clanxieshu",
-						trigger: { global: "dyingAfter" },
-						filter(event, player) {
-							return !player.isTempBanned("clanxieshu");
-						},
-						forced: true,
-						locked: false,
-						content() {
-							player.tempBanSkill("clanxieshu");
-						},
-					},
-				},
 			},
 			//族王浑
 			clanfuxun: {
@@ -2264,13 +2259,10 @@ game.import("character", function () {
 							("step 6");
 							var current = targets.shift();
 							current
-								.chooseToUse(
-									function (card, player, event) {
-										if (get.name(card) != "sha") return false;
-										return lib.filter.filterCard.apply(this, arguments);
-									},
-									"联诛：是否对" + get.translation(event.targetx) + "使用一张杀？"
-								)
+								.chooseToUse(function (card, player, event) {
+									if (get.name(card) != "sha") return false;
+									return lib.filter.filterCard.apply(this, arguments);
+								}, "联诛：是否对" + get.translation(event.targetx) + "使用一张杀？")
 								.set("targetRequired", true)
 								.set("complexSelect", true)
 								.set("filterTarget", function (card, player, target) {
@@ -3794,7 +3786,7 @@ game.import("character", function () {
 			clanyuzhi: "迂志",
 			clanyuzhi_info: "锁定技。新的一轮开始时，你依次执行以下项：①你弃置上一轮因〖迂志〗展示的手牌，然后若你上一轮使用的牌数或你上上轮因〖迂志〗摸的牌数小于你上轮因〖迂志〗摸的牌数，你受到1点雷属性伤害或失去〖保族〗。②你展示一张手牌，然后摸X张牌（X为此牌牌名字数）。",
 			clanxieshu: "挟术",
-			clanxieshu_info: "①当你因牌造成或受到伤害后，你可以横置武将牌并弃置Y张牌，然后摸你已损失体力值张牌（Y为此牌牌名字数）。②一名角色的濒死状态结算完毕后，你令〖挟术〗于本回合失效。",
+			clanxieshu_info: "当你因牌造成或受到伤害后，你可以横置武将牌并弃置Y张牌，然后摸你已损失体力值张牌（Y为此牌牌名字数）。若本回合有角色进入过濒死状态，则〖挟术〗于本回合失效。",
 			clan_zhongyu: "族钟毓",
 			clanjiejian: "捷谏",
 			clanjiejian_info: "当你于一回合使用第X张牌指定第一个目标后，若此牌不为装备牌，则你可以令一名目标角色摸X张牌。（X为此牌牌名字数）",
