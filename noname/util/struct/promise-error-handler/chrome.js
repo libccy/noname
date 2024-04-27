@@ -81,6 +81,7 @@ export class ChromePromiseErrorHandler {
 		event.promise.catch((error) => {
 			// 如果`error`是个错误，则继续处理
 			if (error instanceof Error) {
+				if (/Failed to fetch/.test(error.message) || /Failed to load because no supported source was found/.test(error.message)) return;
 				// 如果已经处理过该错误，则不再处理
 				if (this.#errorList.includes(error)) return;
 				this.#errorList.push(error);

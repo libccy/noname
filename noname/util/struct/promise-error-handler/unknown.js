@@ -20,6 +20,7 @@ export class UnknownPromiseErrorHandler {
 	onHandle(event) {
 		event.promise.catch((error) => {
 			if (typeof error === "object" && error instanceof Error) {
+				if (/Failed to fetch/.test(error.message)) return;
 				// 很遗憾，因浏览器问题，你只能看到这一段
 				throw error;
 			}
