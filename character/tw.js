@@ -9551,6 +9551,7 @@ game.import("character", function () {
 						player.discardPlayerCard("hej", true, target);
 				},
 				ai: {
+					combo: "twzhengrong",
 					order: 8,
 					result: {
 						player: function (player) {

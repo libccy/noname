@@ -7858,6 +7858,9 @@ game.import("character", function () {
 						player.addTempSkill("olnishou_swap", name + "After");
 					}
 				},
+				ai: {
+					halfneg: true
+				},
 				subSkill: {
 					swap: {
 						audio: "olnishou",
@@ -22392,6 +22395,9 @@ game.import("character", function () {
 					player.storage.yawang = num;
 					player.addTempSkill("yawang2");
 				},
+				ai: {
+					halfneg: true
+				},
 			},
 			yawang2: {
 				mod: {
@@ -25975,6 +25981,9 @@ game.import("character", function () {
 						trigger.parent.source.line(player, "green");
 						player.draw();
 					}
+				},
+				ai: {
+					halfneg: true
 				},
 				group: "suishi2",
 			},

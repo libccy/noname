@@ -3067,6 +3067,7 @@ game.import("character", function () {
 				},
 				ai: {
 					expose: 0.15,
+					halfneg: true
 				},
 			},
 			jsrgchuanxin: {

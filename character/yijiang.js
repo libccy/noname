@@ -6611,6 +6611,9 @@ game.import("character", function () {
 				content: function () {
 					trigger.num++;
 				},
+				ai: {
+					halfneg: true
+				},
 			},
 			huisheng: {
 				audio: 2,
@@ -9713,6 +9716,7 @@ game.import("character", function () {
 						if (player.hp != 1) return false;
 					},
 					respondSha: true,
+					halfneg: true
 				},
 				audio: 2,
 				audioname: ["xin_zhangyi"],

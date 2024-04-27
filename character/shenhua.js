@@ -946,6 +946,7 @@ game.import("character", function () {
 					}
 				},
 				ai: {
+					combo: "zhengrong",
 					order: 8,
 					result: {
 						player(player) {
@@ -964,7 +965,6 @@ game.import("character", function () {
 							return 0;
 						},
 					},
-					combo: "qingce",
 				},
 			},
 			//阴雷
@@ -1052,7 +1052,7 @@ game.import("character", function () {
 					player.loseMaxHp();
 				},
 				ai: {
-					combo: "drlt_zhengrong"
+					combo: "drlt_zhenrong"
 				},
 			},
 			drlt_qingce: {
@@ -1082,6 +1082,7 @@ game.import("character", function () {
 					}
 				},
 				ai: {
+					combo: "drlt_zhenrong",
 					order: 13,
 					result: {
 						target(player, target) {

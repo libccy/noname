@@ -842,6 +842,7 @@ game.import("character", function () {
 				filter(event, player) {
 					return game.hasPlayer((current) => player.inRange(current));
 				},
+				derivation: "tomoyo_changshi",
 				async cost(event, trigger, player) {
 					event.result = await player
 						.chooseTarget(
@@ -9114,6 +9115,7 @@ game.import("character", function () {
 					},
 				},
 				ai: {
+					halfneg: true,
 					effect: {
 						target(card, player, target) {
 							if (get.tag(card, "save")) {

@@ -7507,6 +7507,9 @@ game.import("character", function () {
 				content: function () {
 					player.recover();
 				},
+				ai: {
+					halfneg: true
+				},
 			},
 			//界陈群
 			redingpin: {
