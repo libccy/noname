@@ -7146,6 +7146,9 @@ game.import("character", function () {
 					else if (player.countCards("he") > 0)
 						player.chooseToDiscard("he", true, "存畏：请弃置一张牌");
 				},
+				ai: {
+					halfneg: true
+				},
 			},
 			//刘辟
 			dcjuying: {

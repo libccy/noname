@@ -15336,6 +15336,7 @@ game.import("character", function () {
 					}
 				},
 				ai: {
+					combo: "rezhengrong",
 					order: 8,
 					result: {
 						player: function (player) {
