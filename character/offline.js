@@ -1970,6 +1970,9 @@ game.import("character", function () {
 				content: function () {
 					player.draw();
 				},
+				ai: {
+					halfneg: true
+				},
 				group: "gzsuishi2",
 			},
 			gzsuishi2: {

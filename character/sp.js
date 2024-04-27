@@ -29807,6 +29807,9 @@ game.import("character", function () {
 						player.draw();
 					}
 				},
+				ai: {
+					halfneg: true
+				},
 				group: "suishi2",
 			},
 			suishi2: {

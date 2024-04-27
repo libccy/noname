@@ -10921,6 +10921,7 @@ game.import("character", function () {
 							return 0;
 						},
 					},
+					combo: "xunli"
 				},
 			},
 			//马日磾
