@@ -4,6 +4,7 @@ game.import("character", function () {
 		name: "xianding",
 		connect: true,
 		character: {
+			guanyue: ["male", "shu", 4, ["dcshouzhi", "dcfenhui"]],
 			sp_zhenji: ["female", "qun", 3, ["dcjijie", "dchuiji"]],
 			wu_guanyu: ["male", "shu", 5, ["dcjuewu", "dcwuyou", "dcyixian"]],
 			caofang: ["male", "wei", 4, ["dczhimin", "dcjujian"], ["zhu"]],
@@ -172,7 +173,7 @@ game.import("character", function () {
 					"bailingyun",
 				],
 				sp2_jichu: ["zhaoang", "dc_liuye", "dc_wangyun", "yanghong", "huanfan", "xizheng", "lvfan"],
-				sp2_yuxiu: ["dongguiren", "dc_tengfanglan", "zhangjinyun", "zhoubuyi", "dc_xujing"],
+				sp2_yuxiu: ["dongguiren", "dc_tengfanglan", "zhangjinyun", "zhoubuyi", "dc_xujing", "guanyue"],
 				sp2_qifu: ["dc_guansuo", "xin_baosanniang", "dc_zhaoxiang"],
 				sp2_gaoshan: ["wanglang", "liuhui", "zhangjian"],
 				sp2_wumiao: ["wu_zhugeliang", "wu_luxun", "wu_guanyu"],
@@ -183,6 +184,214 @@ game.import("character", function () {
 			dc_sb_simayi: [],
 		},
 		skill: {
+			//关樾
+			dcshouzhi: {
+				audio: 2,
+				trigger: {
+					global: "phaseEnd",
+				},
+				filter(event, player) {
+					let delt = 0;
+					player.checkHistory("lose", evt => {
+						delt -= evt.hs.length;
+					});
+					player.checkHistory("gain", evt => {
+						delt += evt.cards.length;
+					});
+					return delt < 0 || delt > 0 && player.countCards("h");
+				},
+				locked(skill, player) {
+					return player && player.storage.dcshouzhi_modified;
+				},
+				derivation: ["dcshouzhi_modified"],
+				onremove: ["dcshouzhi_modified"],
+				async cost(event, trigger, player) {
+					let delt = 0;
+					player.checkHistory("lose", evt => {
+						delt -= evt.hs.length;
+					});
+					player.checkHistory("gain", evt => {
+						delt += evt.cards.length;
+					});
+					const forced = !player.storage.dcshouzhi_modified;
+					if (delt < 0) {
+						const bool = forced ? true : await player.chooseBool(get.prompt("dcshouzhi"), "你可以摸两张牌。").forResultBool();
+						event.result = { bool };
+					} else {
+						const next = player.chooseCard("守执：请弃置一张手牌").set("filterCard", (card, player) => {
+							return lib.filter.cardDiscardable(card, player, "dcshouzhi");
+						});
+						next.set("forced", forced);
+						if (!forced) {
+							next.set("prompt", get.prompt("dcshouzhi"))
+								.set("prompt2", "你可以弃置一张手牌。")
+								.set("ai", card => {
+									const player = get.player();
+									if (player.hasSkill("dcxingmen") && get.recoverEffect(player, player) > 0) return 6 - get.value(card);
+									return 0;
+								});
+						}
+						event.result = await next.forResult();
+					}
+				},
+				async content(event, trigger, player) {
+					const { cards } = event;
+					if (cards && cards.length) await player.discard(cards);
+					else await player.draw(2);
+					await game.asyncDelayx();
+				},
+			},
+			dcfenhui: {
+				audio: 2,
+				enable: "phaseUse",
+				limited: true,
+				filterTarget(card, player, target) {
+					const list = get.event("dcfenhui_enabled");
+					if (!list || !list.length) return false;
+					return list.includes(target);
+				},
+				onChooseToUse(event) {
+					if (game.online) return;
+					const player = event.player;
+					const evts = player.getAllHistory("useCard", evt => {
+						return get.color(evt.card, player) === "black" && evt.targets && evt.targets.length;
+					});
+					event.set(
+						"dcfenhui_enabled",
+						game.filterPlayer(current => {
+							return evts.filter(evt => evt.targets.includes(current)).length;
+						})
+					);
+				},
+				skillAnimation: true,
+				animationColor: "fire",
+				derivation: ["dcxingmen"],
+				async content(event, trigger, player) {
+					player.awakenSkill("dcfenhui");
+					const target = event.target;
+					const count = player.getAllHistory("useCard", evt => {
+						return get.color(evt.card, player) === "black" && evt.targets && evt.targets.includes(target);
+					}).length;
+					target.addMark("dcfenhui_mark", Math.min(5, count));
+					player.addSkill("dcfenhui_effect");
+				},
+				subSkill: {
+					effect: {
+						audio: "dcfenhui",
+						trigger: {
+							source: "damageBegin1",
+							global: "die",
+						},
+						filter(event, player) {
+							return event.player.hasMark("dcfenhui_mark");
+						},
+						logTarget: "player",
+						forced: true,
+						charlotte: true,
+						async content(event, trigger, player) {
+							if (trigger.name === "damage") {
+								trigger.player.removeMark("dcfenhui_mark", 1);
+								trigger.num++;
+							} else {
+								await player.loseMaxHp();
+								player.storage.dcshouzhi_modified = true;
+								await player.addSkills("dcxingmen");
+							}
+						},
+					},
+					mark: {
+						marktext: "恨",
+						intro: {
+							name: "恨(奋恚)",
+							name2: "恨",
+							content: "mark",
+						}
+					},
+				},
+				ai: {
+					order: 6,
+					result: {
+						target(player, target) {
+							if (!player.hasCard(card => {
+								return get.tag(card, "damage") && player.canUse(card, target, true, true) && get.effect(target, card, player, player) > 0;
+							}, "hs")) return 0;
+							const count = Math.min(
+								5,
+								player.getAllHistory("useCard", evt => {
+									return get.color(evt.card, player) === "black" && evt.targets && evt.targets.includes(target);
+								}).length
+							);
+							let value = Math.max(player.getHp(true), 3) - count;
+							if (
+								(count - 1) *
+									(target.hasSkillTag("filterDamage", null, {
+										player: player,
+									})
+										? 1
+										: 2) >=
+								target.getHp(true) +
+									target.countCards("hs", card => {
+										return target.canSaveCard(card, target);
+									})
+							)
+								value -= 2;
+							return Math.min(0, value);
+						},
+					},
+				},
+			},
+			dcxingmen: {
+				audio: 2,
+				trigger: {
+					player: "loseAfter",
+				},
+				filter(event, player) {
+					return event.getParent(2).name === "dcshouzhi" && player.isDamaged();
+				},
+				frequent: true,
+				prompt2: "你可以回复1点体力。",
+				group: ["dcxingmen_norespond"],
+				check(event, player) {
+					return get.recoverEffect(player, player) > 0;
+				},
+				async content(event, trigger, player) {
+					await player.recover();
+				},
+				subSkill: {
+					norespond: {
+						audio: "dcxingmen",
+						trigger: {
+							player: "gainAfter",
+						},
+						filter(event, player) {
+							return event.getParent().name === "draw" && event.cards.length >= 2 && event.cards.every(card => get.color(card) === "red");
+						},
+						forced: true,
+						locked: false,
+						popup: false,
+						async content(event, trigger, player) {
+							player.addGaintag(trigger.cards, "dcxingmen");
+							player.addSkill("dcxingmen_directHit");
+						},
+					},
+					directHit: {
+						audio: "dcxingmen",
+						trigger: { player: "useCard" },
+						forced: true,
+						charlotte: true,
+						filter(event, player) {
+							return player.hasHistory("lose", evt => {
+								if (evt.getParent() !== event) return false;
+								return Object.values(evt.gaintag_map).some(tags => tags.includes("dcxingmen"));
+							});
+						},
+						async content(event, trigger, player) {
+							trigger.directHit.addArray(game.filterPlayer());
+							game.log(trigger.card, "不可被响应");
+						},
+					},
+				},
+			},
 			//武关羽
 			dcjuewu: {
 				audio: 2,
@@ -18901,6 +19110,7 @@ game.import("character", function () {
 			zhugemengxue: "诸葛氏（“梦雪”为网络小说虚构），诸葛亮的大姐。",
 			caoyi: "曹轶，游卡桌游旗下产品《三国杀》原创角色。设定上为曹纯所收养的孙女，从小受到曹纯的教导，在军营中长大，性情坚毅有担当，军事谋略丰富，战斗能力超强。曹轶喜欢美食，特别是甜食，并且擅长制作各种点心。她身边跟随的雪白小老虎是曹纯在她及笄时送的生辰礼物，希望她如小老虎一样，英勇无畏。曹轶与曹婴交好，两人以姐妹相称。曹轶成年后继承祖父衣钵，接手精锐部队“虎豹骑”，成为新的虎豹骑的统领者。",
 			huzun: "胡遵（？～256年），安定临泾（今甘肃省镇原县）人，三国时期曹魏大臣，官至卫将军，封阴密侯。出身安定胡氏。历任征东将军、征东大将军、卫将军等职。早年由张既征辟。后追随司马懿，参与平定匈奴胡薄居姿职叛乱、抵御诸葛亮北伐、平定公孙渊叛乱。嘉平四年（252年），作为曹魏三征之一的征东将军，主持征讨东吴，被诸葛恪击败。正元元年（255年）参与平定淮南三叛的第二叛毌丘俭、文钦之乱，事后升任卫将军。甘露元年（256年）秋七月己卯去世，追赠车骑将军。",
+			guanyue: "关樾，传说记载之人物，声称是关羽之孙，关平长子。未见载于正史，仅记载于清朝地方志以及传说。清·《江陵县志》：“娶镇东将军女赵氏。生子樾，世居江陵。”。清·《关氏宗谱·江陵县儒学册结》：“平子樾，因守祖、父陵墓遂家于荆州焉，此荆州之关氏所由来也。”",
 		},
 		characterTitle: {
 			// wulan:'#b对决限定武将',
@@ -19059,6 +19269,11 @@ game.import("character", function () {
 				if (player.storage.dcsbquanmou)
 					return '转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。阴：当你于本阶段内下次对其造成伤害时，取消之；<span class="bluetext">阳：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。</span>';
 				return '转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。<span class="bluetext">阴：当你于本阶段内下次对其造成伤害时，取消之；</span>阳：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。';
+			},
+			dcshouzhi(player) {
+				let skillName = "dcshouzhi";
+				if (player.storage.dcshouzhi_modified) skillName += "_modified";
+				return lib.translate[`${skillName}_info`];
 			},
 		},
 		characterReplace: {
@@ -19862,6 +20077,15 @@ game.import("character", function () {
 			dchuiji: "惠济",
 			dchuiji_info:
 				"出牌阶段限一次。你可以令一名角色摸两张牌或从牌堆中随机使用一张不为赠物的装备牌，然后若其手牌数不小于存活角色数，其视为使用一张【五谷丰登】。系统不于此牌使用准备工作结束时执行亮出牌堆顶的牌的动作，改为你令其将所有手牌置于处理区，然后令所有目标角色依次获得其中一张牌。当这些牌因执行【五谷丰登】的执行动作而置于弃牌堆后，你令其获得这些牌。",
+			guanyue: "关樾",
+			dcshouzhi: "守执",
+			dcshouzhi_info: "锁定技。一名角色的回合结束时，若你的手牌数：大于本回合开始时的手牌数，你弃置一张手牌；小于本回合开始时的手牌数，你摸两张牌。",
+			dcshouzhi_modified: "守执·改",
+			dcshouzhi_modified_info: "一名角色的回合结束时，若你的手牌数：大于本回合开始时的手牌数，你可以弃置一张手牌；小于本回合开始时的手牌数，你可以摸两张牌。",
+			dcfenhui: "奋恚",
+			dcfenhui_info: "限定技。出牌阶段，你可以令一名角色获得X枚“恨”标记，你摸等量的牌（X为本局游戏你使用黑色牌指定其为目标的次数，至多为5）。你获得如下效果：⒈当你对其造成伤害时，你移去其1枚“恨”，令此伤害+1；⒉当其死亡时，若其有“恨”，你减1点体力上限，修改〖守执〗并获得〖兴门〗。",
+			dcxingmen: "兴门",
+			dcxingmen_info: "①当你因〖守执〗弃置而失去牌后，你可以回复1点体力。②当你因摸牌而得到牌后，若这些牌均为红色且牌数不小于2，则你使用这些牌时不能被响应。",
 
 			sp2_yinyu: "隐山之玉",
 			sp2_huben: "百战虎贲",
