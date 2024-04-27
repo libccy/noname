@@ -12664,6 +12664,9 @@ game.import("character", function () {
 							return false;
 					},
 				},
+				ai: {
+					combo: "dcgeyuan"
+				},
 			},
 			dcgusuan: {
 				audio: 2,
