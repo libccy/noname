@@ -428,6 +428,7 @@ game.import("character", function () {
 				fullskin: true,
 				//vanish:true,
 				derivation: "liuye",
+				cardcolor: "diamond",
 				type: "equip",
 				subtype: "equip1",
 				distance: { attackFrom: -8 },
@@ -2743,7 +2744,12 @@ game.import("character", function () {
 						}
 					}
 				},
-				ai: { presha: true, pretao: true, nokeep: true },
+				ai: {
+					presha: true,
+					pretao: true,
+					neg: true,
+					nokeep: true
+				},
 			},
 			//庞统
 			xinlianhuan: {
@@ -7011,6 +7017,10 @@ game.import("character", function () {
 						content: function () {
 							player.loseHp();
 						},
+						ai: {
+							neg: true,
+							nokeep: true
+						},
 						mod: {
 							maxHandcard: function (player, num) {
 								return num - 3;
@@ -7056,6 +7066,10 @@ game.import("character", function () {
 						trigger: { player: "phaseZhunbeiBegin" },
 						content: function () {
 							player.skip("phaseDraw");
+						},
+						ai: {
+							neg: true,
+							nokeep: true
 						},
 						marktext: "金",
 						intro: {

@@ -8701,6 +8701,9 @@ game.import("character", function () {
 					},
 				},
 				group: "panshi_damage",
+				ai: {
+					halfneg: true
+				},
 			},
 			panshi_damage: {
 				trigger: { source: "damageBegin1" },

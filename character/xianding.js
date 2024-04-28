@@ -18877,6 +18877,7 @@ game.import("character", function () {
 			pyzhuren_heart: {
 				fullskin: true,
 				derivation: "puyuan",
+				cardcolor: "heart",
 				type: "equip",
 				subtype: "equip1",
 				distance: { attackFrom: -2 },
@@ -18895,6 +18896,7 @@ game.import("character", function () {
 			pyzhuren_diamond: {
 				fullskin: true,
 				derivation: "puyuan",
+				cardcolor: "diamond",
 				type: "equip",
 				subtype: "equip1",
 				distance: { attackFrom: -1 },
@@ -18913,6 +18915,7 @@ game.import("character", function () {
 			pyzhuren_club: {
 				fullskin: true,
 				derivation: "puyuan",
+				cardcolor: "club",
 				type: "equip",
 				subtype: "equip1",
 				distance: { attackFrom: -1 },
@@ -18944,6 +18947,7 @@ game.import("character", function () {
 			pyzhuren_spade: {
 				fullskin: true,
 				derivation: "puyuan",
+				cardcolor: "spade",
 				type: "equip",
 				subtype: "equip1",
 				skills: ["pyzhuren_spade"],
@@ -18961,6 +18965,7 @@ game.import("character", function () {
 			pyzhuren_shandian: {
 				fullskin: true,
 				derivation: "puyuan",
+				cardcolor: "spade",
 				type: "equip",
 				subtype: "equip1",
 				distance: { attackFrom: -3 },
@@ -18979,6 +18984,7 @@ game.import("character", function () {
 			dagongche: {
 				fullskin: true,
 				derivation: "zhangfen",
+				cardcolor: "spade",
 				type: "equip",
 				subtype: "equip5",
 				skills: ["dagongche_skill"],
@@ -19008,6 +19014,7 @@ game.import("character", function () {
 				fullskin: true,
 				derivation: "dc_liuye",
 				cardimage: "ly_piliche",
+				cardcolor: "diamond",
 				type: "equip",
 				subtype: "equip5",
 				skills: ["pilitoushiche"],

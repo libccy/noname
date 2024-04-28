@@ -396,6 +396,7 @@ game.import("character", function () {
 			//蒲元衍生
 			sanlve: {
 				derivation: "ol_puyuan",
+				cardcolor: "spade",
 				type: "equip",
 				subtype: "equip5",
 				ai: {
@@ -408,6 +409,7 @@ game.import("character", function () {
 			},
 			zhaogujing: {
 				derivation: "ol_puyuan",
+				cardcolor: "diamond",
 				type: "equip",
 				subtype: "equip5",
 				ai: {
@@ -420,6 +422,7 @@ game.import("character", function () {
 			},
 			shufazijinguan: {
 				derivation: "ol_puyuan",
+				cardcolor: "diamond",
 				type: "equip",
 				subtype: "equip5",
 				modeimage: "boss",
@@ -433,6 +436,7 @@ game.import("character", function () {
 			},
 			xuwangzhimian: {
 				derivation: "ol_puyuan",
+				cardcolor: "club",
 				type: "equip",
 				fullskin: true,
 				subtype: "equip5",
@@ -444,6 +448,7 @@ game.import("character", function () {
 			},
 			hongmianbaihuapao: {
 				derivation: "ol_puyuan",
+				cardcolor: "club",
 				type: "equip",
 				subtype: "equip2",
 				modeimage: "boss",
@@ -457,6 +462,7 @@ game.import("character", function () {
 			},
 			guofengyupao: {
 				derivation: "ol_puyuan",
+				cardcolor: "spade",
 				type: "equip",
 				fullskin: true,
 				modeimage: "boss",
@@ -468,6 +474,7 @@ game.import("character", function () {
 			},
 			qimenbagua: {
 				derivation: "ol_puyuan",
+				cardcolor: "spade",
 				type: "equip",
 				fullskin: true,
 				modeimage: "boss",
@@ -479,6 +486,7 @@ game.import("character", function () {
 			},
 			linglongshimandai: {
 				derivation: "ol_puyuan",
+				cardcolor: "spade",
 				type: "equip",
 				subtype: "equip2",
 				modeimage: "boss",
@@ -492,6 +500,7 @@ game.import("character", function () {
 			},
 			chixueqingfeng: {
 				derivation: "ol_puyuan",
+				cardcolor: "spade",
 				type: "equip",
 				fullskin: true,
 				modeimage: "boss",
@@ -504,6 +513,7 @@ game.import("character", function () {
 			},
 			guilongzhanyuedao: {
 				derivation: "ol_puyuan",
+				cardcolor: "spade",
 				type: "equip",
 				fullskin: true,
 				modeimage: "boss",
@@ -519,6 +529,7 @@ game.import("character", function () {
 			},
 			wushuangfangtianji: {
 				derivation: "ol_puyuan",
+				cardcolor: "diamond",
 				type: "equip",
 				modeimage: "boss",
 				subtype: "equip1",
@@ -535,6 +546,7 @@ game.import("character", function () {
 			},
 			bintieshuangji: {
 				derivation: "ol_puyuan",
+				cardcolor: "diamond",
 				type: "equip",
 				subtype: "equip1",
 				distance: {
@@ -651,8 +663,8 @@ game.import("character", function () {
 				fullskin: true,
 				vanish: true,
 				derivation: "fengfangnv",
+				cardcolor: "spade",
 				type: "equip",
-				suit: "spade",
 				subtype: "equip5",
 				skills: ["zhuangshu_basic"],
 				forceDie: true,
@@ -677,8 +689,8 @@ game.import("character", function () {
 				fullskin: true,
 				vanish: true,
 				derivation: "fengfangnv",
+				cardcolor: "club",
 				type: "equip",
-				suit: "club",
 				subtype: "equip5",
 				forceDie: true,
 				skills: ["zhuangshu_trick"],
@@ -697,8 +709,8 @@ game.import("character", function () {
 				fullskin: true,
 				vanish: true,
 				derivation: "fengfangnv",
+				cardcolor: "heart",
 				type: "equip",
-				suit: "heart",
 				subtype: "equip5",
 				skills: ["zhuangshu_equip"],
 				forceDie: true,
@@ -13420,7 +13432,7 @@ game.import("character", function () {
 								var card = target.getEquip(name);
 								target.$give(card, trigger.player, false);
 							} else {
-								var card = game.createCard(name, lib.card[name].suit, 12);
+								var card = game.createCard(name, lib.card[name].cardcolor, 12);
 								trigger.player.$gain2(card, false);
 							}
 							game.delayx();
@@ -13447,7 +13459,7 @@ game.import("character", function () {
 							if (result.bool) {
 								player.logSkill("zhuangshu");
 								var name = result.links[0][2],
-									card = game.createCard(name, lib.card[name].suit, 12);
+									card = game.createCard(name, lib.card[name].cardcolor, 12);
 								player.$gain2(card, false);
 								game.delayx();
 								player.equip(card);
@@ -17918,7 +17930,12 @@ game.import("character", function () {
 					player.addMark("new_zhixi", 1, false);
 					if (get.type2(trigger.card) == "trick") player.storage.new_zhixi2 = true;
 				},
-				ai: { presha: true, pretao: true, nokeep: true },
+				ai: {
+					presha: true,
+					pretao: true,
+					neg: true,
+					nokeep: true
+				},
 			},
 			new_mumu2: {
 				charlotte: true,

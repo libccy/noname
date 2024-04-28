@@ -56,6 +56,7 @@ game.import("character", function () {
 		card: {
 			sizhaojian: {
 				derivation: "ol_sb_yuanshao",
+				cardcolor: "diamond",
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",

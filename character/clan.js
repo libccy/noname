@@ -25,8 +25,7 @@ game.import("character", function () {
 			clan_wuqiao: ["male", "jin", 4, ["clanqiajue", "clanmuyin"], ["clan:陈留吴氏"]],
 			clan_wangguang: ["male", "wei", 3, ["clanlilun", "clanjianji", "clanzhongliu"], ["clan:太原王氏"]],
 			clan_wangmingshan: ["male", "wei", 3, ["clantanque", "clanshengmo", "clanzhongliu"], ["clan:太原王氏"]],
-			//笑点解析——群雄
-			clan_zhongyao: ["male", "qun", 3, ["clanchengqi", "clanjieli", "clanbaozu"], ["clan:颍川钟氏"]],
+			clan_zhongyao: ["male", "wei", 3, ["clanchengqi", "clanjieli", "clanbaozu"], ["clan:颍川钟氏"]],
 		},
 		characterSort: {
 			clan: {

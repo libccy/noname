@@ -2270,6 +2270,7 @@ game.import("character", function () {
 				derivation: "sunwukong",
 				type: "equip",
 				subtype: "equip1",
+				cardcolor: "heart",
 				skills: ["ruyijingubang_skill", "ruyijingubang_effect"],
 				equipDelay: false,
 				distance: {

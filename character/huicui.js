@@ -14525,6 +14525,10 @@ game.import("character", function () {
 				content: function () {
 					player.chooseToDiscard("h", true);
 				},
+				ai: {
+					halfneg: true,
+					nokeep: true
+				},
 			},
 			//董白
 			relianzhu: {
