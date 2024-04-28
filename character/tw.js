@@ -19825,7 +19825,6 @@ game.import("character", function () {
 				},
 			},
 			twyanqin: {
-				forbid: ["guozhan"],
 				audio: 2,
 				trigger: { player: "phaseBegin" },
 				direct: true,
@@ -19878,7 +19877,6 @@ game.import("character", function () {
 			},
 			chijie: {
 				audio: true,
-				forbid: ["guozhan"],
 				trigger: {
 					global: "phaseBefore",
 					player: "enterGame",
@@ -19988,7 +19986,6 @@ game.import("character", function () {
 				},
 			},
 			renshe: {
-				forbid: ["guozhan"],
 				audio: 2,
 				trigger: { player: "damageEnd" },
 				direct: true,
@@ -20239,10 +20236,10 @@ game.import("character", function () {
 			twbaimei: "白眉",
 			twbaimei_info: "锁定技，若你没有手牌，则防止你受到的所有属性伤害和锦囊牌造成的伤害。",
 			chijie: "持节",
-			chijie_info: " 游戏开始时，你可以选择一个现存势力，你的势力视为该势力。",
+			chijie_info: "游戏开始时，你可以选择一个现存势力，你的势力视为该势力。",
 			waishi: "外使",
 			waishi_info:
-				" 出牌阶段限一次，你可以用至多X张牌交换一名其他角色等量的手牌（X为现存势力数），然后若其与你势力相同或手牌多于你，你摸一张牌。",
+				"出牌阶段限一次，你可以用至多X张牌交换一名其他角色等量的手牌（X为现存势力数），然后若其与你势力相同或手牌多于你，你摸一张牌。",
 			renshe: "忍涉",
 			renshe_info:
 				"当你受到伤害后，你可以选择一项：将势力改为现存的另一个势力；或可以额外发动一次“外使”直到你的下个出牌阶段结束；或与另一名其他角色各摸一张牌。",
