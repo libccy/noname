@@ -19421,7 +19421,7 @@ game.import("character", function () {
 						});
 					"step 1";
 					if (result.bool) {
-						var card = game.createCard2(result.links[0][2]);
+						var card = game.createCard2(result.links[0][2], "heart", 1);
 						lib.inpile.add(result.links[0][2]);
 						player.storage.twsidao = card;
 						player.chooseUseTarget(card, "nopopup", true);

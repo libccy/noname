@@ -2693,7 +2693,8 @@ game.import("character", function () {
 							return Math.random();
 						});
 					"step 1";
-					var card = game.createCard(result.links[0][2]);
+					var name = result.links[0][2],
+						card = game.createCard(name, lib.card[name].cardcolor, 5);
 					player.$gain2(card);
 					player.equip(card);
 					game.delay();
@@ -2756,6 +2757,7 @@ game.import("character", function () {
 			cheliji_sichengliangyu: {
 				trigger: { global: "phaseJieshuBegin" },
 				equipSkill: true,
+				cardcolor: "heart",
 				filter: function (event, player) {
 					return player.countCards("h") < player.hp && player.getEquip("cheliji_sichengliangyu");
 				},
@@ -2770,6 +2772,7 @@ game.import("character", function () {
 			cheliji_tiejixuanyu: {
 				trigger: { global: "phaseJieshuBegin" },
 				equipSkill: true,
+				cardcolor: "club",
 				filter: function (event, player) {
 					return (
 						player != event.player &&
@@ -2793,6 +2796,7 @@ game.import("character", function () {
 			cheliji_feilunzhanyu: {
 				trigger: { global: "phaseJieshuBegin" },
 				equipSkill: true,
+				cardcolor: "spade",
 				filter: function (event, player) {
 					return (
 						player != event.player &&
