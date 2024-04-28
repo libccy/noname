@@ -6722,8 +6722,10 @@ game.import("character", function () {
 					}
 					if (targets.length < 3) event.goto(5);
 					"step 4";
-					var num = targets[2].countCards("e");
-					if (num > 0) targets[2].chooseToDiscard("e", true, num);
+					for (var i = 2; i < targets.length; i++) {
+						var num = targets[i].countCards("e");
+						if (num > 0) targets[i].chooseToDiscard("e", true, num);
+					}
 					"step 5";
 					game.delayx();
 				},
