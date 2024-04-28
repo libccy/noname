@@ -1482,8 +1482,9 @@ export class Game {
 	 * @typedef {[string,number]|string|number|boolean} audioInfo
 	 * @typedef {{audio: audioInfo, audioname?:string[], audioname2?:{[playerName: string]: audioInfo}}} skillInfo
 	 * @param { string } skill  技能名
-	 * @param { Player | string } [player]  角色/角色名
+	 * @param { Player | Object | string } [player]  角色/角色名
 	 * @param { skillInfo | audioInfo } [skillInfo]  预设的skillInfo/audioInfo(转为skillInfo)，覆盖lib.skill[skill]
+	 * @param { boolean | undefined } [useRawAudio]
 	 * @returns { string[] }  语音地址列表
 	 * @example
 	 * ```js
@@ -1515,7 +1516,7 @@ export class Game {
 	 * //如果key中包含发动技能的角色名player，则直接改用info.audioname2[player]来播放语音
 	 * ```
 	 */
-	parseSkillAudio(skill, player, skillInfo) {
+	parseSkillAudio(skill, player, skillInfo, useRawAudio) {
 		if (typeof player === "string") player = { name: player };
 		else if (typeof player !== "object" || player === null) player = {};
 
@@ -1527,7 +1528,7 @@ export class Game {
 			if (!history.includes(skill)) return true;
 			if (history[0] === skill) return false;
 			//deadlock
-			throw new RangeError(`parseSkillAudio: ${skill} in `, history, ` forms a deadlock`);
+			throw new RangeError(`parseSkillAudio: ${skill} in ${ history }forms a deadlock`);
 		};
 
 		const getName = (filter) => {
@@ -1538,7 +1539,7 @@ export class Game {
 					if (result) return result;
 					if (!name) return result;
 					if (filter(name)) return name;
-					let tempname = get.character(name, 4).find((tag) => tag.startsWith("tempname:"));
+					let tempname = get.character(name).trashBin.find((tag) => tag.startsWith("tempname:"));
 					if (!tempname) return result;
 					tempname = tempname
 						.split(":")
@@ -1555,7 +1556,7 @@ export class Game {
 		 * @param {skillInfo} [skillInfo]
 		 * @returns {string[]}
 		 */
-		function getAudioList(skill, options, skillInfo) {
+		function getAudioList(skill, options, skillInfo, useRawAudio) {
 			const info = skillInfo || lib.skill[skill];
 			if (!info) {
 				console.error(new ReferenceError(`parseSkillAudio: Cannot find ${skill} in lib.skill`));
@@ -1610,7 +1611,7 @@ export class Game {
 				)
 					format = ".mp3";
 				if (path && format) return parseAudio(audioInfo, options, [true, 2]);
-				return [`${path}${audioInfo}${format}`];
+				return [useRawAudio ? audioInfo : `${path}${audioInfo}${format}`];
 			}
 
 			let _audioname = getName((i) => audioname.includes(i));
@@ -1622,12 +1623,31 @@ export class Game {
 			const audioList = [];
 			list[2] = parseInt(list[2]);
 			for (let i = 1; i <= list[2]; i++) {
-				audioList.push(`${list[1] || "skill"}/${skill}${_audioname}${i}.${list[3] || "mp3"}`);
+				if(useRawAudio) audioList.push(`${skill}${_audioname}${i}`);
+				else audioList.push(`${list[1] || "skill"}/${skill}${_audioname}${i}.${list[3] || "mp3"}`);
 			}
 			return audioList;
 		}
 
 		return getAudioList(skill, { audioname: [], history: [] }, skillInfo);
+	}
+	/**
+	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表
+	 * @typedef {[string,number]|string|number|boolean} audioInfo
+	 * @typedef {{audio: audioInfo, audioname?:string[], audioname2?:{[playerName: string]: audioInfo}}} skillInfo
+	 * @param { string } skill  技能名
+	 * @param { Player | Object | string } [player]  角色/角色名
+	 * @param { skillInfo | audioInfo } [skillInfo]  预设的skillInfo/audioInfo(转为skillInfo)，覆盖lib.skill[skill]
+	 * @returns { string[] }  语音地址列表
+	 */
+	parseSkillText(skill, player, skillInfo){
+		const audios = game.parseSkillAudio(skill, player, skillInfo, true);
+		const voiceMap = [];
+		audios.forEach(audioname => {
+			const voiceText = lib.translate[`#${audioname}`];
+			if(voiceText) voiceMap.push(voiceText);
+		});
+		return voiceMap;
 	}
 	/**
 	 *

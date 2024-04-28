@@ -4,6 +4,7 @@ import cards from "./card.js";
 import pinyins from "./pinyin.js";
 import skills from "./skill.js";
 import translates from "./translate.js";
+import voices from "./voices.json";
 
 game.import("character", function () {
 	return {
@@ -98,7 +99,7 @@ game.import("character", function () {
 		},
 		card: { ...cards },
 		skill: { ...skills },
-		translate: { ...translates },
+		translate: { ...translates, ...voices },
 		pinyins: { ...pinyins },
 	};
 });

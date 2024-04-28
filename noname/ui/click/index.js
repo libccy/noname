@@ -3494,14 +3494,14 @@ export class Click {
 		} else {
 			// 样式一
 			//TODO: 这里的数据也暂时没有改成新格式，需要后续的修改
+			const nameInfo = get.character(name);
 			const introduction = ui.create.div(".characterintro", uiintro),
 				showCharacterNamePinyin = lib.config.show_characternamepinyin;
 			if (showCharacterNamePinyin != "doNotShow") {
 				const characterIntroTable = ui.create.div(".character-intro-table", introduction),
 					span = document.createElement("span");
 				span.style.fontWeight = "bold";
-				const nameInfo = get.character(name),
-					exInfo = nameInfo.trashBin,
+				const exInfo = nameInfo.trashBin,
 					characterName =
 						exInfo && exInfo.includes("ruby") ? lib.translate[name] : get.rawName2(name);
 				span.innerHTML = characterName;
@@ -3632,8 +3632,45 @@ export class Click {
 			const htmlParser = document.createElement("body");
 			htmlParser.innerHTML = get.characterIntro(name);
 			Array.from(htmlParser.childNodes).forEach((value) => introduction.appendChild(value));
+			//添加技能语音部分
+			const dieAudio = lib.translate[`#${name}:die`];
+			const skillAudioMap = new Map();
+			nameInfo.skills.forEach(skill => {
+				const voiceMap = game.parseSkillText(skill, name, null, true);
+				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
+			});
+			if (dieAudio || skillAudioMap.size > 0){
+				introduction.appendChild(document.createElement("hr"));
+				const skillNameSpan = document.createElement("span");
+				skillNameSpan.innerHTML = `技能台词<br>`;
+				introduction.appendChild(skillNameSpan);
+
+				if(skillAudioMap.size > 0){
+					skillAudioMap.forEach((texts, skill) => {
+						const skillNameSpan = document.createElement("span"), skillNameSpanStyle = skillNameSpan.style;
+						skillNameSpanStyle.fontWeight = "bold";
+						skillNameSpan.innerHTML = `<br>${get.translation(skill)}<br>`;
+						introduction.appendChild(skillNameSpan);
+						texts.forEach((text, index) => {
+							const skillTextSpan = document.createElement("span");
+							skillTextSpan.innerHTML = `${index + 1}. ${text}<br>`;
+							introduction.appendChild(skillTextSpan);
+						})
+					});
+				}
+				if(dieAudio){
+					const skillNameSpan = document.createElement("span"), skillNameSpanStyle = skillNameSpan.style;
+					skillNameSpanStyle.fontWeight = "bold";
+					skillNameSpan.innerHTML = `<br>阵亡台词<br>`;
+					introduction.appendChild(skillNameSpan);
+					
+					const skillTextSpan = document.createElement("span");
+					skillTextSpan.innerHTML = `${dieAudio}`;
+					introduction.appendChild(skillTextSpan);
+				}
+			}
 			const introduction2 = ui.create.div(".characterintro.intro2", uiintro);
-			var list = get.character(name, 3) || [];
+			var list = get.character(name).skills;
 			var skills = ui.create.div(".characterskill", uiintro);
 			if (lib.config.touchscreen) {
 				lib.setScroll(introduction);
