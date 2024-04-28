@@ -380,6 +380,7 @@ game.import("character", function () {
 				type: "equip",
 				subtype: "equip1",
 				derivation: "tw_gexuan",
+				cardcolor: "heart",
 				distance: { attackFrom: -2 },
 				ai: {
 					basic: {
@@ -393,6 +394,7 @@ game.import("character", function () {
 				type: "equip",
 				subtype: "equip1",
 				derivation: "tw_gexuan",
+				cardcolor: "heart",
 				distance: { attackFrom: -4 },
 				ai: {
 					basic: {
@@ -406,6 +408,7 @@ game.import("character", function () {
 				type: "equip",
 				subtype: "equip2",
 				derivation: "tw_gexuan",
+				cardcolor: "heart",
 				ai: {
 					basic: {
 						equipValue: 7,
@@ -419,6 +422,7 @@ game.import("character", function () {
 				type: "equip",
 				subtype: "equip1",
 				cardimage: "yinyueqiang",
+				cardcolor: "diamond",
 				derivation: "tw_zhaoxiang",
 				distance: { attackFrom: -2 },
 				ai: {

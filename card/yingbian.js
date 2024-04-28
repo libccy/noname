@@ -281,6 +281,7 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
+				cardcolor: "diamond",
 				distance: { attackFrom: -3 },
 				ai: {
 					basic: {
@@ -307,6 +308,7 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip2",
+				cardcolor: "club",
 				ai: {
 					basic: {
 						equipValue: 2,
@@ -331,6 +333,7 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip5",
+				cardcolor: "club",
 				skills: ["tianjitu_skill"],
 				onLose: function () {
 					player.addTempSkill("tianjitu_skill_lose");
@@ -355,6 +358,7 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip5",
+				cardcolor: "spade",
 				ai: {
 					basic: {
 						equipValue: 3,

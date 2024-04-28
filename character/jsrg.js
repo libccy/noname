@@ -118,6 +118,7 @@ game.import("character", function () {
 				audio: true,
 				fullskin: true,
 				type: "basic",
+				cardcolor: "spade",
 				enable: false,
 				destroy: "discardPile",
 				getYing: function (count) {

@@ -428,6 +428,7 @@ game.import("character", function () {
 				fullskin: true,
 				//vanish:true,
 				derivation: "liuye",
+				cardcolor: "diamond",
 				type: "equip",
 				subtype: "equip1",
 				distance: { attackFrom: -8 },
