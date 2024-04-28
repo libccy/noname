@@ -2847,7 +2847,7 @@ export class Click {
 						let index = ui.selected.targets.indexOf(this);
 						for (let i = 0; i < targetprompt.length; i++) {
 							const target = targets.find(
-								(cur) => cur.node.prompt && cur.node.prompt.innerText === targetprompt[i]
+								(cur) => cur.node.prompt && cur.node.prompt.innerHTML === targetprompt[i]
 							);
 							if (target) {
 								targets.remove(target);
