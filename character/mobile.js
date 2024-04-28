@@ -2743,7 +2743,12 @@ game.import("character", function () {
 						}
 					}
 				},
-				ai: { presha: true, pretao: true, nokeep: true },
+				ai: {
+					presha: true,
+					pretao: true,
+					neg: true,
+					nokeep: true
+				},
 			},
 			//庞统
 			xinlianhuan: {
@@ -7011,6 +7016,10 @@ game.import("character", function () {
 						content: function () {
 							player.loseHp();
 						},
+						ai: {
+							neg: true,
+							nokeep: true
+						},
 						mod: {
 							maxHandcard: function (player, num) {
 								return num - 3;
@@ -7056,6 +7065,10 @@ game.import("character", function () {
 						trigger: { player: "phaseZhunbeiBegin" },
 						content: function () {
 							player.skip("phaseDraw");
+						},
+						ai: {
+							neg: true,
+							nokeep: true
 						},
 						marktext: "金",
 						intro: {

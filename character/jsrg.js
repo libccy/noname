@@ -8400,6 +8400,9 @@ game.import("character", function () {
 						},
 					},
 				},
+				ai: {
+					combo: "jsrgzhenglve"
+				},
 			},
 			//南华老仙
 			jsrgshoushu: {

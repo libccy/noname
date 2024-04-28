@@ -17918,7 +17918,12 @@ game.import("character", function () {
 					player.addMark("new_zhixi", 1, false);
 					if (get.type2(trigger.card) == "trick") player.storage.new_zhixi2 = true;
 				},
-				ai: { presha: true, pretao: true, nokeep: true },
+				ai: {
+					presha: true,
+					pretao: true,
+					neg: true,
+					nokeep: true
+				},
 			},
 			new_mumu2: {
 				charlotte: true,
