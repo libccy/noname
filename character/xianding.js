@@ -1122,28 +1122,6 @@ game.import("character", function () {
 						target.addAdditionalSkill(`${key}_${player.playerid}`, `${key}_mark`);
 					}
 				},
-				group: "dcsbquanmou_change",
-				subSkill: {
-					change: {
-						audio: "dcsbquanmou",
-						audioname: ["dc_sb_simayi_shadow"],
-						trigger: {
-							global: "phaseBefore",
-							player: "enterGame",
-						},
-						filter(event, player) {
-							return event.name != "phase" || game.phaseNumber == 0;
-						},
-						prompt2(event, player) {
-							//无名杀先阳后阴，不要问为什么
-							return "切换【权谋】为状态" + (player.storage.dcsbquanmou ? "阳" : "阴");
-						},
-						content() {
-							player.changeZhuanhuanji("dcsbquanmou");
-							player.changeSkin("dcsbquanmou", "dc_sb_simayi" + (player.storage.dcsbquanmou ? "_shadow" : ""));
-						},
-					},
-				},
 				ai: {
 					order: 9,
 					result: {
@@ -1166,7 +1144,28 @@ game.import("character", function () {
 						return "转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。当你于本阶段内下次对其造成伤害时，取消之。";
 					},
 				},
+				group: "dcsbquanmou_change",
 				subSkill: {
+					change: {
+						audio: "dcsbquanmou",
+						audioname: ["dc_sb_simayi_shadow"],
+						trigger: {
+							global: "phaseBefore",
+							player: "enterGame",
+						},
+						filter(event, player) {
+							return event.name != "phase" || game.phaseNumber == 0;
+						},
+						prompt2(event, player) {
+							//无名杀先阳后阴，不要问为什么
+							return "切换【权谋】为状态" + (player.storage.dcsbquanmou ? "阳" : "阴");
+						},
+						check: () => Math.random() > 0.5,
+						content() {
+							player.changeZhuanhuanji("dcsbquanmou");
+							player.changeSkin("dcsbquanmou", "dc_sb_simayi" + (player.storage.dcsbquanmou ? "_shadow" : ""));
+						},
+					},
 					true: {
 						charlotte: true,
 						audio: "dcsbquanmou",
@@ -2407,6 +2406,7 @@ game.import("character", function () {
 							//无名杀先阳后阴，不要问为什么
 							return "切换【英谋】为状态" + (player.storage.dcsbyingmou ? "阳" : "阴");
 						},
+						check: () => Math.random() > 0.5,
 						content() {
 							player.changeZhuanhuanji("dcsbyingmou");
 							player.changeSkin("dcsbyingmou", "dc_sb_zhouyu" + (player.storage.dcsbyingmou ? "_shadow" : ""));
@@ -2654,6 +2654,7 @@ game.import("character", function () {
 							//无名杀先阳后阴，不要问为什么
 							return "切换【盟谋】为状态" + (player.storage.dcsbmengmou ? "阳" : "阴");
 						},
+						check: () => Math.random() > 0.5,
 						content() {
 							player.changeZhuanhuanji("dcsbmengmou");
 							//鲁肃暂时没有另一张原画（悲
