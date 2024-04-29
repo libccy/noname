@@ -117,7 +117,7 @@ game.import("character", function () {
 						};
 					},
 					prompt(links, player) {
-						return "将至少两张牌当作" + get.translation(links[0][3] || "") + "【" + get.translation(links[0][2]) + "】使用";
+						return "将至少两张手牌当作" + get.translation(links[0][3] || "") + "【" + get.translation(links[0][2]) + "】使用";
 					},
 				},
 				ai: {
@@ -245,6 +245,11 @@ game.import("character", function () {
 							}
 							game.updateRoundNumber();
 							if (gain.length) await target.gain(gain, "draw");
+						} else {
+							for (let i = topCards.length - 1; i--; i >= 0) {
+								ui.cardPile.insertBefore(topCards[i], ui.cardPile.firstChild);
+							}
+							game.updateRoundNumber();
 						}
 					} else {
 						const content = ['###诫厉###<div class="text center">' + get.translation(target) + "牌名字数最多的手牌</div>", cards];
