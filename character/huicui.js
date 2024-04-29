@@ -4,6 +4,7 @@ game.import("character", function () {
 		name: "huicui",
 		connect: true,
 		character: {
+			wupu: ["male", "qun", 4, ["dcduanti", "dcshicao"]],
 			dc_caoshuang: ["male", "wei", 4, ["dcjianzhuan", "dcfanshi"]],
 			zangba: ["male", "wei", 4, ["rehengjiang"]],
 			dc_simashi: ["male", "wei", 3, ["dcsanshi", "dczhenrao", "dcchenlve"]],
@@ -191,7 +192,7 @@ game.import("character", function () {
 					"dc_wuban",
 					"jiangfei",
 				],
-				sp_jishi: ["dc_jiben", "zhenghun", "dc_sunhanhua", "liuchongluojun"],
+				sp_jishi: ["dc_jiben", "zhenghun", "dc_sunhanhua", "liuchongluojun", "wupu"],
 				sp_raoting: ["dc_huanghao", "dc_sunziliufang", "dc_sunchen", "dc_jiachong"],
 				sp_yijun: ["gongsundu", "mengyou", "dc_sp_menghuo", "gongsunxiu"],
 				sp_zhengyin: ["yue_caiwenji", "yue_zhoufei", "yue_caiyong", "yue_xiaoqiao", "yue_daqiao"],
@@ -200,6 +201,106 @@ game.import("character", function () {
 		},
 		/** @type { importCharacterConfig['skill'] } */
 		skill: {
+			//吴普
+			dcduanti: {
+				audio: 2,
+				trigger: {
+					player: ["useCardAfter", "respondAfter"],
+				},
+				forced: true,
+				filter(event, player) {
+					const number = game
+						.getAllGlobalHistory("everything", evt => {
+							if (evt.player !== player) return false;
+							return ["useCard", "respond"].includes(evt.name);
+						})
+						.indexOf(event);
+					return number >= 0 && (number + 1) % 5 === 0;
+				},
+				onremove: true,
+				async content(event, trigger, player) {
+					await player.recover();
+					if (player.countMark("dcduanti") >= 5) return;
+					player.addMark("dcduanti", 1, false);
+					await player.gainMaxHp();
+				},
+			},
+			dcshicao: {
+				audio: 2,
+				enable: "phaseUse",
+				onremove: ["dcshicao_aiRecord"],
+				chooseButton: {
+					dialog(event, player) {
+						return ui.create.dialog("###识草###选择一种类型与要摸牌的来源", [["basic", "trick", "equip"].map(type => [type, get.translation(type)]), "tdnodes"], [["牌堆顶", "牌堆底"], "tdnodes"]);
+					},
+					check(button) {
+						const aiStorage = get.player().getStorage("dcshicao_aiRecord");
+						if (aiStorage.length > 0 && get.name(ui.cardPile.lastChild, false) === get.name(aiStorage.lastItem, false)) {
+							if (button.link === "牌堆底" || button.link === get.type2(aiStorage.lastItem, false)) return 20;
+						}
+						if (button.link === "牌堆顶" || button.link === "basic") return 10;
+						return 5 + Math.random();
+					},
+					filter(button, player) {
+						if (!ui.selected.buttons.length) return true;
+						return ui.selected.buttons[0].parentNode != button.parentNode;
+					},
+					select: 2,
+					backup(links, player) {
+						return {
+							audio: "dcshicao",
+							type: links[0],
+							pos: links[1],
+							filterCard: () => false,
+							selectCard: -1,
+							async content(event, trigger, player) {
+								let { type, pos } = lib.skill.dcshicao_backup;
+								game.log(player, "声明了", `#y${get.translation(type)}牌`);
+								const next = player.draw();
+								const bottom = pos === "牌堆底";
+								if (bottom) {
+									next.set("bottom", true);
+									if (player.getStorage("dcshicao_aiRecord").length > 0) {
+										player.storage.dcshicao_aiRecord.pop();
+									}
+								}
+								const drawnCards = await next.forResult();
+								if (get.type2(drawnCards[0], player) === type) return;
+								let cards;
+								if (bottom) {
+									cards = get.bottomCards(2);
+									cards.reverse();
+								} else cards = get.cards(2);
+								await game.cardsGotoOrdering(cards);
+								await player.viewCards(`${bottom ? "牌堆顶" : "牌堆底"}的两张牌(靠左的在牌堆更靠上)`, cards);
+								if (bottom) {
+									cards.reverse();
+									delete player.storage.dcshicao_aiRecord;
+								} else {
+									player.storage.dcshicao_aiRecord = cards.slice();
+								}
+								await game.cardsGotoPile(cards, bottom ? "insert" : null);
+								player.tempBanSkill("dcshicao");
+							},
+							ai: {
+								result: {player: 1},
+							},
+						};
+					},
+					prompt(links, player) {
+						return `点击“确定”，从${links[1]}摸一张牌`;
+					},
+				},
+				subSkill: {
+					backup: {},
+				},
+				ai: {
+					order: 8,
+					result:{
+						player: 1,
+					},
+				},
+			},
 			//新杀曹爽
 			dcjianzhuan: {
 				audio: 2,
@@ -16450,6 +16551,11 @@ game.import("character", function () {
 			dcfudou: "覆斗",
 			dcfudou_info:
 				"当你使用黑色牌/红色牌指定唯一目标后，若该角色不为你，且其于本局游戏对你/未对你造成过伤害，则你可以与其各失去1点体力/各摸一张牌。",
+			wupu: "吴普",
+			dcduanti: "锻体",
+			dcduanti_info: "锁定技。当你使用或打出牌结算结束后，若此牌是你本局游戏使用或打出过的牌中的第5X张牌（X∈N⁺），你回复1点体力，然后若你以此法增加的上限小于5，你加1点体力上限。",
+			dcshicao: "识草",
+			dcshicao_info: "出牌阶段，你可以声明一种类型，然后选择从牌堆顶或牌堆底摸一张牌。若此牌类型与你声明的类型不同，你观看牌堆另一端的两张牌，此技能本回合失效。",
 
 			sp_baigei: "无双上将",
 			sp_caizijiaren: "才子佳人",
