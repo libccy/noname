@@ -1963,7 +1963,7 @@ game.import("character", function () {
 			},
 			clanbaozu: {
 				audio: 2,
-				audioname: ["clan_zhongyan", "clan_zhonghui", "clan_zhongyu"],
+				audioname: ["clan_zhongyan", "clan_zhonghui", "clan_zhongyu", "clan_zhongyao"],
 				trigger: { global: "dying" },
 				clanSkill: true,
 				limited: true,
