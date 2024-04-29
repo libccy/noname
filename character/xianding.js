@@ -124,6 +124,7 @@ game.import("character", function () {
 		characterSubstitute: {
 			dc_sb_simayi: [],
 			dc_sb_zhouyu: [],
+			//dc_sb_lusu: [],
 		},
 		skill: {
 			//关樾
@@ -2369,6 +2370,7 @@ game.import("character", function () {
 							player.logSkill("dcsbyingmou", result.targets, false);
 							player.line2(result.targets);
 							player.changeZhuanhuanji("dcsbyingmou");
+							player.changeSkin("dcsbyingmou", "dc_sb_zhouyu" + (player.storage.dcsbyingmou ? "_shadow" : ""));
 							var source = result.targets[1],
 								discard = true;
 							while (true) {
@@ -2590,6 +2592,8 @@ game.import("character", function () {
 						player.logSkill("dcsbmengmou", target);
 						player.addTempSkill("dcsbmengmou_" + (storage || false));
 						player.changeZhuanhuanji("dcsbmengmou");
+						//鲁肃暂时没有另一张原画（悲
+						//player.changeSkin("dcsbmengmou", "dc_sb_lusu" + (player.storage.dcsbmengmou ? "_shadow" : ""));
 						while (num > 0) {
 							num--;
 							var result2;
