@@ -18,7 +18,7 @@ game.import("character", function () {
 			clan_zhongyan: ["female", "jin", 3, ["clanguangu", "clanxiaoyong", "clanbaozu"], ["clan:颍川钟氏"]],
 			clan_wangyun: ["male", "qun", 3, ["clanjiexuan", "clanmingjie", "clanzhongliu"], ["clan:太原王氏"]],
 			clan_wanghun: ["male", "jin", 3, ["clanfuxun", "clanchenya", "clanzhongliu"], ["clan:太原王氏"]],
-			clan_zhonghui: ["male", "wei", "3/4", ["clanyuzhi", "clanxieshu", "clanbaozu"], ["clan:颍川钟氏"]],
+			clan_zhonghui: ["male", "wei", "3/4", ["clanyuzhi", "clanxieshu", "clanbaozu"], ["clan:颍川钟氏", "die_audio:clan_zhonghui:clan_zhonghui2:clan_zhonghui3"]],
 			clan_zhongyu: ["male", "wei", 3, ["clanjiejian", "clanhuanghan", "clanbaozu"], ["clan:颍川钟氏"]],
 			clan_wanglun: ["male", "jin", 3, ["clanqiuxin", "clanjianyuan", "clanzhongliu"], ["clan:太原王氏"]],
 			clan_xunyou: ["male", "wei", 3, ["clanbaichu", "clandaojie"], ["clan:颍川荀氏"]],
@@ -1046,7 +1046,7 @@ game.import("character", function () {
 						if (card.name == "tao") return num / 114514;
 					},
 				},
-				audio: 2,
+				audio: 6,
 				trigger: { global: "roundStart" },
 				direct: true,
 				locked: true,
@@ -1153,7 +1153,7 @@ game.import("character", function () {
 				intro: { content: "本轮野心：#张" },
 			},
 			clanxieshu: {
-				audio: 2,
+				audio: 6,
 				trigger: { player: "damageEnd", source: "damageSource" },
 				filter(event, player) {
 					if (!event.card || player.isLinked()) return false;
@@ -1926,6 +1926,7 @@ game.import("character", function () {
 			clanbaozu: {
 				audio: 2,
 				audioname: ["clan_zhongyan", "clan_zhonghui", "clan_zhongyu", "clan_zhongyao"],
+				audioname2: { clan_zhonghui: "clanbaozu_clan_zhonghui" },
 				trigger: { global: "dying" },
 				clanSkill: true,
 				limited: true,
@@ -1945,6 +1946,7 @@ game.import("character", function () {
 					trigger.player.link(true);
 					trigger.player.recover();
 				},
+				subSkill: { clan_zhonghui: { audio: 6 } },
 			},
 			//族王淩
 			clanbolong: {
