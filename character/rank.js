@@ -144,6 +144,7 @@ window.noname_character_rank = {
 		"wu_guanyu",
 		"clan_zhongyao",
 		"guanyue",
+		"wupu",
 	],
 	a: [
 		"star_caoren",
@@ -383,6 +384,7 @@ window.noname_character_rank = {
 		"drag_guanyu",
 		"drag_caoren",
 		"drag_lvchang",
+		"star_sunjian",
 	],
 	am: [
 		"tw_yanliang",
@@ -2204,6 +2206,8 @@ window.noname_character_rank = {
 			"sp_zhenji",
 			"drag_guanyu",
 			"drag_caoren",
+			"wupu",
+			"star_sunjian",
 		],
 		rare: [
 			"drag_lvchang",
