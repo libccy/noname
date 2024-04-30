@@ -64,7 +64,7 @@ game.import("character", function () {
 			shen_lvbu: ["male", "shen", 5, ["baonu", "wumou", "ol_wuqian", "ol_shenfen"], ["qun"]],
 
 			shen_liubei: ["male", "shen", 6, ["nzry_longnu", "nzry_jieying"], ["shu"]],
-			shen_luxun: ["male", "shen", 4, ["nzry_junlve", "nzry_cuike", "nzry_dinghuo"], ["wu"]],
+			shen_luxun: ["male", "shen", 4, ["nzry_junlve", "nzry_cuike", "nzry_dinghuo"], ["wu","clan:吴郡陆氏"]],
 			shen_zhangliao: ["male", "shen", 4, ["drlt_duorui", "drlt_zhiti"], ["wei"]],
 			shen_ganning: ["male", "shen", "3/6", ["drlt_poxi", "drlt_jieying"], ["wu"]],
 			ol_zhangliao: ["male", "shen", 4, ["olduorui", "olzhiti"], ["wei"]],
