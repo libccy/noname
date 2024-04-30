@@ -9995,7 +9995,8 @@ export class Library {
 		skillDisabled: function (skill, names, unique) {
 			if (!lib.translate[skill] || !lib.translate[skill + "_info"]) return true;
 			//if (lib.translate[skill + "_info"] === "此模式下不可用") return true;
-			let info = lib.skill[skill];
+			let info = lib.skill[skill],
+				mode = get.mode();
 			if (!info) return true;
 			if (info.sub || info.temp || info.fixed || info.vanish) return true;
 			if (info.forbid && info.forbid.includes(mode)) return true;
