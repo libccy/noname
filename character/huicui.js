@@ -82,7 +82,7 @@ game.import("character", function () {
 			re_kanze: ["male", "wu", 3, ["xiashu", "rekuanshi"]],
 			lvlingqi: ["female", "qun", 4, ["guowu", "zhuangrong"]],
 			zhanghu: ["male", "wei", 4, ["cuijian", "zhtongyuan"]],
-			luyusheng: ["female", "wu", 3, ["zhente", "zhiwei"]],
+			luyusheng: ["female", "wu", 3, ["zhente", "zhiwei"],['clan:吴郡陆氏']],
 			huaxin: ["male", "wei", 3, ["spwanggui", "xibing"]],
 			mengyou: ["male", "qun", 5, ["manyi", "dcmanzhi"]],
 			liuyong: ["male", "shu", 3, ["zhuning", "fengxiang"]],
