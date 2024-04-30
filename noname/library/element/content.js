@@ -8811,7 +8811,7 @@ export const Content = {
 				} else if (lib.character[name][4].some((tag) => tag.startsWith("die_audio"))) {
 					var tag = lib.character[name][4].find((tag) => tag.startsWith("die_audio"));
 					var list = tag.split(":").slice(1);
-					game.playAudio("die", list.length ? list[0] : name);
+					game.playAudio("die", list.length ? list.randomGet() : name);
 				} else {
 					game.playAudio("die", name, function () {
 						game.playAudio("die", name.slice(name.indexOf("_") + 1));

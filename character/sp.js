@@ -888,9 +888,7 @@ game.import("character", function () {
 				enable: "phaseUse",
 				usable: 1,
 				async content(event, trigger, player) {
-					let num = player.maxHp,
-						cards = get.cards(num);
-					await game.cardsGotoOrdering(cards);
+					let num = player.maxHp, cards = get.cards(num, true);
 					await player.showCards(cards, get.translation(player) + "发动了【易城】");
 					if (player.countCards("h")) {
 						const sum = cards.reduce((num, card) => num + get.number(card), 0);
@@ -951,6 +949,14 @@ game.import("character", function () {
 								await player.lose(puts, ui.special);
 								await player.gain(gains, "gain2");
 								cards = moved[0].slice();
+								if (cards.length) {
+									await game.cardsGotoOrdering(cards);
+									for (let i = cards.length - 1; i--; i >= 0) {
+										ui.cardPile.insertBefore(cards[i], ui.cardPile.firstChild);
+									}
+									game.log(cards, "被放回了牌堆顶");
+									game.updateRoundNumber();
+								}
 								await player.showCards(cards, get.translation(player) + "【易城】第一次交换后");
 								if (cards.reduce((num, card) => num + get.number(card), 0) > sum && player.countCards("h")) {
 									const {
@@ -967,17 +973,18 @@ game.import("character", function () {
 										await player.lose(hs, ui.special);
 										await player.gain(cards, "gain2");
 										cards = hs.slice();
+										if (cards.length) {
+											await game.cardsGotoOrdering(cards);
+											for (let i = cards.length - 1; i--; i >= 0) {
+												ui.cardPile.insertBefore(cards[i], ui.cardPile.firstChild);
+											}
+											game.log(cards, "被放回了牌堆顶");
+											game.updateRoundNumber();
+										}
 										await player.showCards(cards, get.translation(player) + "【易城】第二次交换后");
 									}
 								}
 							}
-						}
-						if (cards.length) {
-							for (let i = cards.length - 1; i--; i >= 0) {
-								ui.cardPile.insertBefore(cards[i], ui.cardPile.firstChild);
-							}
-							game.log(cards, "被放回了牌堆顶");
-							game.updateRoundNumber();
 						}
 					}
 				},
@@ -30067,7 +30074,7 @@ game.import("character", function () {
 			ol_luyusheng: "OL陆郁生",
 			ol_luyusheng_prefix: "OL",
 			olcangxin: "藏心",
-			olcangxin_info: "锁定技。①当你每回合第一次受到伤害时，你观看牌堆底的三张牌并弃置其中任意张牌，然后此伤害-X。②摸牌阶段开始时，你亮出牌堆底的三张牌，然后摸X张牌（X为其中红桃牌的数量）。",
+			olcangxin_info: "锁定技。①当你每回合第一次受到伤害时，你观看牌堆底的三张牌并弃置其中任意张牌，然后此伤害-X。②摸牌阶段开始时，你展示牌堆底的三张牌，然后摸X张牌（X为其中红桃牌的数量）。",
 			olrunwei: "润微",
 			olrunwei_info: "其他角色的弃牌阶段开始时，若其已受伤，则你可以选择一项：①令其弃置一张牌，其本回合手牌上限+1；②令其摸一张牌，其本回合手牌上限-1。",
 			caoxi: "曹羲",
@@ -30157,7 +30164,7 @@ game.import("character", function () {
 			oljiane_info: "锁定技。①当你对其他角色使用的牌生效后，其本回合无法抵消牌。②当你抵消牌后，你本回合无法成为牌的目标。",
 			ol_liupi: "刘辟",
 			olyicheng: "易城",
-			olyicheng_info: "出牌阶段限一次，你可以亮出牌堆顶的X张牌（X为你的体力上限），然后你可以以任意手牌交换其中等量张牌，若亮出的牌的点数和因此增加，则你可以选择用所有手牌交换亮出的牌。最后你将亮出的牌置于牌堆顶。",
+			olyicheng_info: "出牌阶段限一次，你可以展示牌堆顶的X张牌（X为你的体力上限），然后你可以以任意手牌交换其中等量张牌，若这些牌的点数和因此增加，则你可以选择用所有手牌再次交换这些牌。",
 			sp_sunce: "SP孙策",
 			sp_sunce_prefix: "SP",
 			olliantao: "连讨",
