@@ -6017,6 +6017,9 @@ game.import("character", function () {
 						},
 					},
 				},
+				ai: {
+					combo: "twxiongzheng"
+				},
 			},
 			//鲍信
 			twmutao: {
@@ -17393,6 +17396,9 @@ game.import("character", function () {
 						target.addSkills(skills);
 						//for(var i of skills) target.addSkillLog(i);
 					}
+				},
+				ai: {
+					combo: "twyujue"
 				},
 			},
 			twsidai: {

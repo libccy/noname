@@ -12059,6 +12059,9 @@ game.import("character", function () {
 					player.storage.bingzhao = group;
 					player.markSkill("bingzhao");
 				},
+				ai: {
+					combo: "guju"
+				},
 			},
 			baijia: {
 				audio: 2,

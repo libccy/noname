@@ -9921,6 +9921,9 @@ const skills = {
 			await trigger.player.changeGroup(player.group);
 			await trigger.player.draw();
 		},
+		ai: {
+			combo: "yuri_xingdong"
+		},
 	},
 	//枣恭介
 	nk_shekong: {

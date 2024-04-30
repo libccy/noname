@@ -24225,7 +24225,7 @@ game.import("character", function () {
 				zhuSkill: true,
 				locked: true,
 				ai: {
-					combo: "canshi",
+					combo: "recanshi",
 				},
 			},
 			canshi: {
