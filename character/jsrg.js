@@ -57,7 +57,7 @@ game.import("character", function () {
 			//合
 			jsrg_zhugeliang: ["male", "shu", 3, ["jsrgwentian", "jsrgchushi", "jsrgyinlve"]],
 			jsrg_jiangwei: ["male", "shu", 4, ["jsrgjinfa", "jsrgfumou", "jsrgxuanfeng"], ["border:wei"]],
-			jsrg_luxun: ["male", "wu", 3, ["jsrgyoujin", "jsrgdailao", "jsrgzhubei"]],
+			jsrg_luxun: ["male", "wu", 3, ["jsrgyoujin", "jsrgdailao", "jsrgzhubei"],['clan:吴郡陆氏']],
 			jsrg_zhaoyun: ["male", "shu", 4, ["jsrglonglin", "jsrgzhendan"]],
 			jsrg_simayi: ["male", "wei", 4, ["jsrgyingshi", "jsrgtuigu"]],
 			jsrg_guoxun: ["male", "wei", 4, ["jsrgeqian", "jsrgfusha"]],
