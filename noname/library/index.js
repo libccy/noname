@@ -9992,7 +9992,7 @@ export class Library {
 			}
 			return false;
 		},
-		skillDisabled: function (skill, player, unique) {
+		skillDisabled: function (skill, names, unique) {
 			if (!lib.translate[skill] || !lib.translate[skill + "_info"]) return true;
 			//if (lib.translate[skill + "_info"] === "此模式下不可用") return true;
 			let info = lib.skill[skill];
@@ -10009,10 +10009,13 @@ export class Library {
 				if (!lib.card[info.viewAs.name]) return true;
 			}
 			if (info.unique && !unique) {
-				if (!player) player = _status.event.player;
-				if (get.itemtype(player) !== "player") return true;
-				if (typeof info.unique === "function") return info.unique(player);
-				let names = [player.name, player.name1, player.name2];
+				if (!names) {
+					let player = _status.event.player;
+					if (get.itemtype(player) !== "player") return true;
+					names = [player.name, player.name1, player.name2];
+				}
+				if (!Array.isArray(names)) names = [names];
+				if (typeof info.unique === "function") return info.unique(names);
 				for (let name of names) {
 					let character = lib.character[name];
 					if (character && character.skills && character.skills.includes(skill)) return false;
@@ -13700,4 +13703,3 @@ setAllPropertiesEnumerable(lib.element.Dialog.prototype);
 setAllPropertiesEnumerable(lib.element.Control.prototype);
 setAllPropertiesEnumerable(lib.element.Client.prototype);
 setAllPropertiesEnumerable(lib.element.NodeWS.prototype);
-
