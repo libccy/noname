@@ -2460,7 +2460,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (lib.character[name][1] == "key") return 4;
 					};
 					game.data.character = game.data.character.filter(function (i) {
-						return Array.isArray(lib.character[i]);
+						return get.is.object(lib.character[i]);
 					});
 					game.data.character.sort(function (a, b) {
 						var del = groupSort(a) - groupSort(b);

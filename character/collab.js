@@ -810,7 +810,7 @@ game.import("character", function () {
 					var list = [];
 					for (var i in lib.skill.dcbianzhuang.characterMap) {
 						if (
-							Array.isArray(lib.character[i]) &&
+							lib.character[i] &&
 							get.is.object(lib.skill[lib.skill.dcbianzhuang.characterMap[i]])
 						)
 							list.push(i);
