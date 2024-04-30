@@ -118,7 +118,7 @@ game.import("character", function () {
 			// ns_sunhao:['male','qun',3,[]],
 			ns_xinnanhua: ["male", "qun", 3, ["ns_xiandao", "ns_xiuzheng", "ns_chuanshu"]],
 			ns_caimao: ["male", "qun", 4, ["nsdingzhou"]],
-			ns_luyusheng: ["female", "wu", 3, ["nshuaishuang", "nsfengli"]],
+			ns_luyusheng: ["female", "wu", 3, ["nshuaishuang", "nsfengli"],['clan:吴郡陆氏']],
 			ns_chengpu: ["male", "wu", 4, ["decadelihuo", "decadechunlao"]],
 			ns_sundeng: ["male", "wu", 4, ["xinkuangbi"]],
 			ns_duji: ["male", "wei", 3, ["xinfu_andong", "xinyingshi"]],
