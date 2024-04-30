@@ -10015,7 +10015,7 @@ export class Library {
 					names = [player.name, player.name1, player.name2];
 				}
 				if (!Array.isArray(names)) names = [names];
-				if (typeof info.unique === "function") return info.unique(names);
+				if (typeof info.unique === "function") return !info.unique(names);
 				for (let name of names) {
 					let character = lib.character[name];
 					if (character && character.skills && character.skills.includes(skill)) return false;
