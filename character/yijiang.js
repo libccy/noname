@@ -117,7 +117,7 @@ game.import("character", function () {
 			liwan: ["female", "wei", 3, ["liandui", "biejun"]],
 			zhugeshang: ["male", "shu", 3, ["sangu", "yizu"]],
 			kebineng: ["male", "qun", 4, ["kousheng"]],
-			lukai: ["male", "wu", 4, ["lkbushi", "lkzhongzhuang"]],
+			lukai: ["male", "wu", 4, ["lkbushi", "lkzhongzhuang"],['clan:吴郡陆氏']],
 			xin_fazheng: ["male", "shu", 3, ["xinxuanhuo", "xinenyuan"]],
 			guanzhang: ["male", "shu", 4, ["fuhun"]],
 			wangyi: ["female", "wei", 3, ["zhenlie", "miji"]],
