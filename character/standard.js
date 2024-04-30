@@ -61,7 +61,7 @@ game.import("character", function () {
 			huanggai: ["male", "wu", 4, ["kurou"]],
 			zhouyu: ["male", "wu", 3, ["yingzi", "fanjian"]],
 			daqiao: ["female", "wu", 3, ["guose", "liuli"]],
-			luxun: ["male", "wu", 3, ["qianxun", "lianying"]],
+			luxun: ["male", "wu", 3, ["qianxun", "lianying","clan:吴郡陆氏"]],
 			sunshangxiang: ["female", "wu", 3, ["xiaoji", "jieyin"]],
 			huatuo: ["male", "qun", 3, ["qingnang", "jijiu"]],
 			lvbu: ["male", "qun", 4, ["wushuang"]],
