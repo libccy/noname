@@ -109,7 +109,7 @@ game.import("character", function () {
 			wangji: ["male", "wei", 3, ["qizhi", "jinqu"]],
 			yanyan: ["male", "shu", 4, ["nzry_juzhan"], []],
 			wangping: ["male", "shu", 4, ["nzry_feijun", "nzry_binglve"], []],
-			luji: ["male", "wu", 3, ["nzry_huaiju", "nzry_yili", "nzry_zhenglun"], []],
+			luji: ["male", "wu", 3, ["nzry_huaiju", "nzry_yili", "nzry_zhenglun"], ['clan:吴郡陆氏']],
 			sunliang: ["male", "wu", 3, ["nzry_kuizhu", "nzry_zhizheng", "nzry_lijun"], ["zhu"]],
 			xuyou: ["male", "qun", 3, ["nzry_chenglve", "nzry_shicai", "nzry_cunmu"]],
 			yl_luzhi: ["male", "qun", 3, ["nzry_mingren", "nzry_zhenliang"], ["die_audio"]],
