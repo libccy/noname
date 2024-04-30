@@ -6724,7 +6724,6 @@ game.import("character", function () {
 						event.goto(5);
 					} else {
 						targets.splice(0, 2);
-						event.targets = targets;
 					}
 					"step 4";
 					var target = targets.shift();
