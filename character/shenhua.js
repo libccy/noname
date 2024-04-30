@@ -118,7 +118,7 @@ game.import("character", function () {
 			guanqiujian: ["male", "wei", 4, ["zhengrong", "hongju"]],
 			haozhao: ["male", "wei", 4, ["drlt_zhenggu"], []],
 			zhugezhan: ["male", "shu", 3, ["xinfu_zuilun", "xinfu_fuyin"], []],
-			lukang: ["male", "wu", 4, ["drlt_qianjie", "drlt_jueyan", "drlt_poshi"], []],
+			lukang: ["male", "wu", 4, ["drlt_qianjie", "drlt_jueyan", "drlt_poshi"], ['clan:吴郡陆氏']],
 			yl_yuanshu: ["male", "qun", 4, ["drlt_yongsi", "drlt_weidi"], ["zhu"]],
 			zhangxiu: ["male", "qun", 4, ["drlt_xiongluan", "drlt_congjian", "twjuxiang"], ["zhu"]],
 			chendao: ["male", "shu", 4, ["dcwanglie"], []],
