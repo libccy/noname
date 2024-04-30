@@ -23,7 +23,7 @@ game.import("character", function () {
 			zhugeruoxue: ["female", "wei", 3, ["dcqiongying", "dcnuanhui"]],
 			caoyi: ["female", "wei", 4, ["dcmiyi", "dcyinjun"]],
 			malingli: ["female", "shu", 3, ["dclima", "dcxiaoyin", "dchuahuo"]],
-			wu_luxun: ["male", "wu", 3, ["dcxiongmu", "dczhangcai", "dcruxian"]],
+			wu_luxun: ["male", "wu", 3, ["dcxiongmu", "dczhangcai", "dcruxian"],['clan:吴郡陆氏']],
 			dc_xujing: ["male", "shu", 3, ["dcshangyu", "dccaixia"]],
 			dc_zhaoxiang: ["female", "shu", 4, ["refanghun", "refuhan"]],
 			dc_guansuo: ["male", "shu", 4, ["xinzhengnan", "xiefang"]],
