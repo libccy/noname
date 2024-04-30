@@ -9992,11 +9992,35 @@ export class Library {
 			}
 			return false;
 		},
-		skillDisabled: function (skill) {
+		skillDisabled: function (skill, player, unique) {
 			if (!lib.translate[skill] || !lib.translate[skill + "_info"]) return true;
-			var info = lib.skill[skill];
-			if (info && !info.unique && !info.temp && !info.sub && !info.fixed && !info.vanish) {
-				return false;
+			//if (lib.translate[skill + "_info"] === "此模式下不可用") return true;
+			let info = lib.skill[skill];
+			if (!info) return true;
+			if (info.sub || info.temp || info.fixed || info.vanish) return true;
+			if (info.forbid && info.forbid.includes(mode)) return true;
+			if (info.mode && !info.mode.includes(mode)) return true;
+			if (info.available && !info.available(mode)) return true;
+			if (info.viewAs && typeof info.viewAs != "function") {
+				if (typeof info.viewAs == "string")
+					info.viewAs = {
+						name: info.viewAs,
+					};
+				if (!lib.card[info.viewAs.name]) return true;
+			}
+			if (info.unique && !unique) {
+				if (!player) player = _status.event.player;
+				if (get.itemtype(player) !== "player") return true;
+				if (typeof info.unique === "function") return info.unique(player);
+				let names = [player.name, player.name1, player.name2];
+				for (let name of names) {
+					let character = lib.character[name];
+					if (character && character.skills && character.skills.includes(skill)) return false;
+				}
+				return true;
+			}
+			for (let i in info) {
+				if (i.indexOf("audio")) return false;
 			}
 			return true;
 		},
@@ -13676,3 +13700,4 @@ setAllPropertiesEnumerable(lib.element.Dialog.prototype);
 setAllPropertiesEnumerable(lib.element.Control.prototype);
 setAllPropertiesEnumerable(lib.element.Client.prototype);
 setAllPropertiesEnumerable(lib.element.NodeWS.prototype);
+

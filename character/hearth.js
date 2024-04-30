@@ -731,7 +731,7 @@ game.import("character", function () {
 				trigger: { global: "useSkillAfter" },
 				forced: true,
 				filter(event, player) {
-					if (lib.filter.skillDisabled(event.skill)) return false;
+					if (lib.filter.skillDisabled(event.skill, player)) return false;
 					if (!game.expandSkills(event.player.getStockSkills()).includes(event.skill)) return false;
 					return _status.currentPhase == event.player && event.player.isEnemiesOf(player);
 				},
@@ -1313,7 +1313,7 @@ game.import("character", function () {
 					var list = get.gainableSkills(function (info, skill, name) {
 						if (current.includes(skill)) return false;
 						return lib.characterPack.hearth && lib.characterPack.hearth[name];
-					});
+					}, player);
 					if (!list.length) {
 						return;
 					}
@@ -2463,7 +2463,7 @@ game.import("character", function () {
 				},
 				content() {
 					"step 0";
-					var list = get.gainableSkills();
+					var list = get.gainableSkills(false, player);
 					list.remove(player.getSkills());
 					list = list.randomGets(3);
 					event.skillai = function () {
@@ -4851,7 +4851,7 @@ game.import("character", function () {
 				unique: true,
 				content() {
 					"step 0";
-					var list = get.gainableSkills();
+					var list = get.gainableSkills(false, player);
 					list.remove("maoxian");
 					list = list.randomGets(3);
 					event.skillai = function () {

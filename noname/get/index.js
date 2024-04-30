@@ -2599,7 +2599,7 @@ export class Get {
 			if (lib.character[i].isUnseen) continue;
 			for (var skill of lib.character[i].skills) {
 				var info = lib.skill[skill];
-				if (lib.filter.skillDisabled(skill)) continue;
+				if (lib.filter.skillDisabled(skill, player)) continue;
 				if (func && !func(info, skill, i)) continue;
 				if (player && player.hasSkill && info.ai && info.ai.combo && !player.hasSkill(info.ai.combo))
 					continue;
