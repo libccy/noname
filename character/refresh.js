@@ -250,7 +250,7 @@ game.import("character", function () {
 			re_zhouyu: ["male", "wu", 3, ["reyingzi", "refanjian"]],
 			re_lvmeng: ["male", "wu", 4, ["keji", "qinxue", "rebotu"]],
 			re_ganning: ["male", "wu", 4, ["qixi", "fenwei"]],
-			re_luxun: ["male", "wu", 3, ["reqianxun", "relianying"]],
+			re_luxun: ["male", "wu", 3, ["reqianxun", "relianying"],['clan:吴郡陆氏']],
 			re_daqiao: ["female", "wu", 3, ["reguose", "liuli"]],
 			re_huanggai: ["male", "wu", 4, ["rekurou", "zhaxiang"]],
 			re_lvbu: ["male", "qun", 5, ["wushuang", "new_liyu"]],
