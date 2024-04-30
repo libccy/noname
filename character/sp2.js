@@ -6720,12 +6720,17 @@ game.import("character", function () {
 					if (result.bool) {
 						targets[1].give(result.cards, player);
 					}
-					if (targets.length < 3) event.goto(5);
-					"step 4";
-					for (var i = 2; i < targets.length; i++) {
-						var num = targets[i].countCards("e");
-						if (num > 0) targets[i].chooseToDiscard("e", true, num);
+					if (targets.length < 3) {
+						event.goto(5);
+					} else {
+						targets.splice(0, 2);
+						event.targets = targets;
 					}
+					"step 4";
+					var target = targets.shift();
+					var num = target.countCards("e");
+					if (num > 0) target.chooseToDiscard("e", true, num);
+					if (targets.length > 0) event.redo();
 					"step 5";
 					game.delayx();
 				},
