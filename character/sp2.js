@@ -4,6 +4,7 @@ game.import("character", function () {
 		name: "sp2",
 		connect: true,
 		character: {
+			star_sunjian: ["male", "qun", "4/5", ["starruijun", "stargangyi"]],
 			liqueguosi: ["male", "qun", 4, ["xiongsuan"]],
 			star_zhangchunhua: ["female", "wei", 3, ["starliangyan", "starminghui"]],
 			star_yuanshao: [
@@ -168,12 +169,133 @@ game.import("character", function () {
 					"star_dongzhuo",
 					"star_yuanshao",
 					"star_zhangchunhua",
+					"star_sunjian",
 				],
 				mini_qixian: ["mp_liuling"],
 				sp2_waitforsort: ["caobuxing", "re_maliang", "dc_jikang"],
 			},
 		},
 		skill: {
+			//星孙坚
+			starruijun: {
+				audio: 2,
+				trigger: {
+					player: "useCardToPlayered",
+				},
+				filter(event, player) {
+					if (event.targets.length > 1) return false;
+					if (
+						player.hasHistory("useCard", evt => {
+							if (evt === event.getParent()) return false;
+							const targets = evt.targets;
+							return targets.length === 1 && targets[0] !== player;
+						})
+					)
+						return false;
+					const target = event.target;
+					if (target === player || !target.isIn()) return false;
+					return true;
+				},
+				logTarget: "target",
+				locked: false,
+				check(event, player) {
+					return (
+						get.attitude(player, event.target) <= 0 ||
+						!player.hasCard(card => {
+							return game.hasPlayer(current => {
+								return get.effect(current, card, player, player) > 0 && player.canUse(card, current, true, true);
+							});
+						}, "hs")
+					);
+				},
+				prompt2(event, player) {
+					return `摸${get.cnNumber(player.getDamagedHp() + 1)}张牌，令所有除${get.translation(event.target)}外的其他角色不在你的攻击范围内，且你对其造成的伤害逐次增加。`;
+				},
+				async content(event, trigger, player) {
+					await player.draw(player.getDamagedHp() + 1);
+					player.addTempSkill("starruijun_effect", "phaseChange");
+					player.markAuto("starruijun_effect", trigger.target);
+				},
+				subSkill: {
+					effect: {
+						audio: "starruijun",
+						trigger: {
+							source: "damageBegin2",
+						},
+						charlotte: true,
+						forced: true,
+						onremove: true,
+						async content(event, trigger, player) {
+							let num = 1;
+							const evts = player.getHistory("sourceDamage", evt => {
+								return evt.source === player && evt.player === trigger.player;
+							});
+							if (evts.length) num += evts.lastItem.num;
+							trigger.num = Math.min(5, num);
+						},
+						mod: {
+							inRange(from, to) {
+								if (!from.getStorage("starruijun_effect").includes(to)) return false;
+							},
+						}
+					},
+				},
+				mod: {
+					aiOrder(player, card, num) {
+						const event = get.event();
+						if (!event || event.type !== "phase") return;
+						if (
+							game.hasPlayer(current => {
+								return get.effect(current, card, player, player) > 0 && player.canUse(card, current, true, true) && get.damageEffect(current, player, player) > 0;
+							})
+						)
+							return num * 2;
+						return num / 1.5;
+					}
+				},
+			},
+			stargangyi: {
+				audio: 2,
+				trigger: {
+					source: "damage",
+				},
+				silent: true,
+				forced: true,
+				group: "stargangyi_recover",
+				async content(event, trigger, player) {
+					player.addTempSkill("stargangyi_access");
+				},
+				subSkill: {
+					recover: {
+						audio: "stargangyi",
+						trigger: {
+							player: "recoverBegin",
+						},
+						filter(event, player) {
+							const evt = event.getParent(3);
+							if (!player.isDying() || evt.type !== "dying") return false;
+							return ["tao", "jiu"].includes(event.getParent().name);
+						},
+						forced: true,
+						async content(event, trigger, player) {
+							trigger.num++;
+						},
+					},
+					access: {
+						charlotte: true,
+					},
+				},
+				mod: {
+					cardEnabled(card, player) {
+						if (player.hasSkill("stargangyi_access")) return;
+						if (player === _status.currentPhase && card.name === "tao") return false;
+					},
+					cardSavable(card, player) {
+						if (player.hasSkill("stargangyi_access")) return;
+						if (player === _status.currentPhase && card.name === "tao") return false;
+					},
+				},
+			},
 			//李傕郭汜
 			xiongsuan: {
 				audio: 2,
@@ -14587,6 +14709,12 @@ game.import("character", function () {
 			xiongsuan: "凶算",
 			xiongsuan_info:
 				"出牌阶段限一次，你可以弃置一张手牌并对一名角色造成1点伤害，然后你摸三张牌。若该角色不为你，你失去1点体力。",
+			star_sunjian: "星孙坚",
+			star_sunjian_prefix: "星",
+			starruijun: "锐军",
+			starruijun_info: "当你于出牌阶段首次使用牌指定其他角色为目标后，若目标角色数为1，你可以摸X张牌（X为你已损失的体力值+1）。直到此阶段结束，所有不为其的其他角色均不在你的攻击范围内，且当你对其造成伤害时，此伤害值改为Y（Y为你本回合上一次对其造成过的伤害值+1，至多为5）。",
+			stargangyi: "刚毅",
+			stargangyi_info: "锁定技。①你的回合内，若你本回合没有造成过伤害，你不能使用【桃】。②当你处于濒死状态时，以你为目标的【桃】或【酒】的回复值+1。",
 
 			sp_whlw: "文和乱武",
 			sp_zlzy: "逐鹿中原",
