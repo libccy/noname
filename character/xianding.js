@@ -11496,6 +11496,7 @@ game.import("character", function () {
 				},
 				check: function (card) {
 					var player = _status.event.player;
+					if (!ui.selected.cards.length) return 7 - get.value(card);
 					if (!player.hasSkill("dcpingxi")) return 0;
 					var num = lib.skill.dcpingxi.getNum() + ui.selected.cards.length;
 					if (
