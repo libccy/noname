@@ -2387,6 +2387,7 @@ game.import("character", function () {
 						} else {
 							player.logSkill("dcsbyingmou", target);
 							player.changeZhuanhuanji("dcsbyingmou");
+							player.changeSkin("dcsbyingmou", "dc_sb_zhouyu" + (player.storage.dcsbyingmou ? "_shadow" : ""));
 							if (player.countCards("h") < target.countCards("h")) player.draw(Math.min(5, target.countCards("h") - player.countCards("h")));
 							if (player.canUse({ name: "huogong" }, target, false)) player.useCard({ name: "huogong" }, target, false);
 						}
