@@ -917,7 +917,6 @@ game.import("character", function () {
 				},
 			},
 			kuangchan: {
-				locked: true,
 				ai: {
 					neg: true,
 				},
@@ -1823,9 +1822,9 @@ game.import("character", function () {
 					(next.complexCard = true), (next.logSkill = ["zhensha", trigger.player]);
 					next.selectCard = function () {
 						if (ui.selected.cards.length) {
-							if (get.color(ui.selected.cards[0]) != "black") return [1, 1];
+							if (ui.selected.cards[0].name == "jiu") return [1, 1];
 						}
-						return [1, 2];
+						return [2, 2];
 					};
 					"step 1";
 					if (result.bool) {
@@ -2501,7 +2500,7 @@ game.import("character", function () {
 				},
 			},
 			nvquan: {
-				locked: false,
+				locked: true,
 				group: ["nvquan1", "nvquan2", "nvquan3"],
 			},
 			nvquan1: {
