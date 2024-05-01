@@ -378,7 +378,7 @@ export async function onload(resetGameTimeout) {
 							lib[j][k].addArray(character[i][j][k]);
 						} else {
 							console.log(
-								`dublicate ${j} in character ${i}:\n${k}:\nlib.${j}.${k}`,
+								`duplicated ${j} in character ${i}:\n${k}:\nlib.${j}.${k}`,
 								lib[j][k],
 								`\ncharacter.${i}.${j}.${k}`,
 								character[i][j][k]
@@ -491,7 +491,7 @@ export async function onload(resetGameTimeout) {
 								}
 							} else {
 								console.log(
-									`dublicate ${j} in card ${i}:\n${k}:\nlib.${j}.${k}`,
+									`duplicated ${j} in card ${i}:\n${k}:\nlib.${j}.${k}`,
 									lib[j][k],
 									`\ncard.${i}.${j}.${k}`,
 									card[i][j][k]
@@ -577,7 +577,7 @@ export async function onload(resetGameTimeout) {
 						} else {
 							if (lib[j][k] != undefined) {
 								console.log(
-									`dublicate ${j} in play ${i}:\n${k}:\nlib.${j}.${k}`,
+									`duplicated ${j} in play ${i}:\n${k}:\nlib.${j}.${k}`,
 									lib[j][k],
 									`\nplay.${i}.${j}.${k}`,
 									play[i][j][k]

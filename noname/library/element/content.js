@@ -2432,7 +2432,7 @@ export const Content = {
 							lib[j][k].addArray(character[i][j][k]);
 						} else {
 							console.log(
-								`dublicate ${j} in character ${i}:\n${k}:\nlib.${j}.${k}`,
+								`duplicated ${j} in character ${i}:\n${k}:\nlib.${j}.${k}`,
 								lib[j][k],
 								`\ncharacter.${i}.${j}.${k}`,
 								character[i][j][k]
@@ -2465,7 +2465,7 @@ export const Content = {
 							Object.defineProperty(lib[j], k, Object.getOwnPropertyDescriptor(card[i][j], k));
 						else {
 							console.log(
-								`dublicate ${j} in card ${i}:\n${k}\nlib.${j}.${k}`,
+								`duplicated ${j} in card ${i}:\n${k}\nlib.${j}.${k}`,
 								lib[j][k],
 								`\ncard.${i}.${j}.${k}`,
 								card[i][j][k]
