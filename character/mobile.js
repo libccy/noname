@@ -16746,6 +16746,7 @@ game.import("character", function () {
 					player.loseMaxHp();
 				},
 				ai: {
+					halfneg: true,
 					filterDamage: true,
 					skillTagFilter: function (player, tag, arg) {
 						if (arg && arg.card && arg.card.name == "sha") return true;
@@ -18830,6 +18831,9 @@ game.import("character", function () {
 					player.loseMaxHp(event.num, true);
 					"step 1";
 					player.draw(event.num);
+				},
+				ai: {
+					halfneg: true
 				},
 			},
 			yixiang: {

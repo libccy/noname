@@ -1859,6 +1859,9 @@ game.import("character", function () {
 					player.markAuto("sbyijue", [trigger.player]);
 					player.markAuto("sbyijue_effect", [trigger.player]);
 				},
+				ai: {
+					halfneg: true
+				},
 				marktext: "绝",
 				intro: { content: "已放$一马" },
 				subSkill: {

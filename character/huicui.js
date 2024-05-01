@@ -1284,6 +1284,9 @@ game.import("character", function () {
 					await player.draw(2);
 					await player.loseHp();
 				},
+				ai: {
+					halfneg: true
+				},
 			},
 			dckuizhen: {
 				audio: 2,
