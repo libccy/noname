@@ -11089,7 +11089,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				trigger: { player: "phaseJieshuBegin" },
 				zhenfa: "siege",
 				direct: true,
-				locked: true,
+				locked: false,
 				filter: function (event, player) {
 					return (
 						game.countPlayer() > 4 &&
@@ -20604,6 +20604,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					return player.siege(event.target) && event.player.siege(event.target);
 				},
 				forced: true,
+				locked: false,
 				forceaudio: true,
 				logTarget: "target",
 				content: function () {
