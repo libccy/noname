@@ -196,7 +196,6 @@ export class Character {
 	 * @param { any[] } trash
 	 */
 	setPropertiesFromTrash(trash) {
-		this.initializeTrashProperties();
 		const keptTrashes = [],
 			clans = [];
 		for (let i = 0; i < trash.length; i++) {
@@ -370,18 +369,21 @@ export class Character {
 		return new Proxy(trashes.concat(character.trashBin), {
 			set(target, prop, newValue) {
 				const result = Reflect.set(target, prop, newValue);
+				character.initializeTrashProperties();
 				character.setPropertiesFromTrash(target);
 				return result;
 			},
 			deleteProperty(target, prop) {
 				const result = Reflect.deleteProperty(target, prop);
+				character.initializeTrashProperties();
 				character.setPropertiesFromTrash(target);
 				return result;
 			}
 		});
 	}
 	set 4(trashBin) {
-		console.warn("你set你🐎的废弃属性");
+		this.initializeTrashProperties();
+		this.setPropertiesFromTrash(trashBin);
 	}
 
 	get 5() {

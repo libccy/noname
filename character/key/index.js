@@ -4,7 +4,7 @@ import cards from "./card.js";
 import pinyins from "./pinyin.js";
 import skills from "./skill.js";
 import translates from "./translate.js";
-import voices from "./voices.json";
+import voices from "./voices.js";
 
 game.import("character", function () {
 	return {
@@ -15,14 +15,7 @@ game.import("character", function () {
 				return mode == "chess" || mode == "tafang";
 			},
 			key_yuu(mode) {
-				return (
-					mode == "identity" ||
-					mode == "doudizhu" ||
-					mode == "single" ||
-					(mode == "versus" &&
-						_status.mode != "standard" &&
-						_status.mode != "three")
-				);
+				return mode == "identity" || mode == "doudizhu" || mode == "single" || (mode == "versus" && _status.mode != "standard" && _status.mode != "three");
 			},
 			key_tomoya(mode) {
 				return mode != "chess" && mode != "tafang" && mode != "stone";
