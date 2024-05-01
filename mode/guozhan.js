@@ -2034,6 +2034,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					);
 				},
 				forced: true,
+				locked: false,
 				async content(event, trigger, player) {
 					if (trigger.name == "phaseZhunbei") {
 						const num = player.getStorage("fakeshilu").length;
@@ -2184,6 +2185,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					return !goon && groups.includes(event.source.identity);
 				},
 				forced: true,
+				locked: false,
 				logTarget(event, player) {
 					return event.source == player ? event.player : event.source;
 				},
@@ -4725,6 +4727,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					);
 				},
 				forced: true,
+				locked: false,
 				popup: false,
 				preHidden: ["xijue_tuxi", "fakexijue_xiaoguo"],
 				content() {
@@ -6464,6 +6467,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			gzrehuaiyi: {
 				audio: "gzhuaiyi",
 				enable: "phaseUse",
+				locked: false,
 				filter: function (event, player) {
 					return player.countCards("h") > 0;
 				},
@@ -9987,6 +9991,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				trigger: { player: "phaseDrawBegin2" },
 				forced: true,
+				locked: false,
 				filter: (event, player) => !event.numFixed && player.isMaxHandcard(),
 				preHidden: true,
 				content: function () {
@@ -11051,7 +11056,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				trigger: { player: "phaseJieshuBegin" },
 				zhenfa: "siege",
 				direct: true,
-				locked: true,
+				locked: false,
 				filter: function (event, player) {
 					return (
 						game.countPlayer() > 4 &&
@@ -20566,6 +20571,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					return player.siege(event.target) && event.player.siege(event.target);
 				},
 				forced: true,
+				locked: false,
 				forceaudio: true,
 				logTarget: "target",
 				content: function () {

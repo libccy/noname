@@ -6232,6 +6232,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_xiaorui: {
 				trigger: { global: "damageSource" },
 				forced: true,
+				locked: false,
 				logTarget: "source",
 				filter: function (event, player) {
 					var target = event.source;
@@ -6281,6 +6282,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_fengjian: {
 				trigger: { source: "damageSource" },
 				forced: true,
+				locked: false,
 				filter: function (event, player) {
 					return event.player.isAlive();
 				},
@@ -6767,6 +6769,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					return num >= 0;
 				},
 				forced: true,
+				locked: false,
 				content: function () {
 					"step 0";
 					var targets = game.filterPlayer(function (current) {

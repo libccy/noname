@@ -9148,6 +9148,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			fanghua: {
 				trigger: { player: "phaseJieshuBegin" },
 				forced: true,
+				locked: false,
 				unique: true,
 				filter: function () {
 					return game.hasPlayer(function (current) {
