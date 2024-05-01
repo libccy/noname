@@ -2367,7 +2367,7 @@ game.import("character", function () {
 					if (result.bool) {
 						var target = result.targets[0];
 						if (storage) {
-							player.logSkill("dcsbyingmou", result.targets, false);
+							yield player.logSkill("dcsbyingmou", result.targets, false);
 							player.line2(result.targets);
 							player.changeZhuanhuanji("dcsbyingmou");
 							player.changeSkin("dcsbyingmou", "dc_sb_zhouyu" + (player.storage.dcsbyingmou ? "_shadow" : ""));
@@ -2385,7 +2385,7 @@ game.import("character", function () {
 							}
 							if (discard && player.countCards("h") < source.countCards("h")) source.chooseToDiscard(source.countCards("h") - player.countCards("h"), "h", true);
 						} else {
-							player.logSkill("dcsbyingmou", target);
+							yield player.logSkill("dcsbyingmou", target);
 							player.changeZhuanhuanji("dcsbyingmou");
 							player.changeSkin("dcsbyingmou", "dc_sb_zhouyu" + (player.storage.dcsbyingmou ? "_shadow" : ""));
 							if (player.countCards("h") < target.countCards("h")) player.draw(Math.min(5, target.countCards("h") - player.countCards("h")));
@@ -2590,7 +2590,7 @@ game.import("character", function () {
 					}
 					if (result.bool) {
 						if (!target) target = result.targets[0];
-						player.logSkill("dcsbmengmou", target);
+						yield player.logSkill("dcsbmengmou", target);
 						player.addTempSkill("dcsbmengmou_" + (storage || false));
 						player.changeZhuanhuanji("dcsbmengmou");
 						//鲁肃暂时没有另一张原画（悲
