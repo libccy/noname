@@ -3209,6 +3209,7 @@ game.import("character", function () {
 					player.loseMaxHp();
 				},
 				ai: {
+					halfneg: true,
 					filterDamage: true,
 					skillTagFilter: function (player, tag, arg) {
 						if (arg && arg.card && arg.card.name == "sha") return true;
@@ -12180,6 +12181,9 @@ game.import("character", function () {
 					game.log(player, "选择了", "#y" + get.translation(group) + "势力");
 					player.storage.bingzhao = group;
 					player.markSkill("bingzhao");
+				},
+				ai: {
+					combo: "guju"
 				},
 			},
 			baijia: {

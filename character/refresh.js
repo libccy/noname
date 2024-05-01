@@ -9528,6 +9528,9 @@ game.import("character", function () {
 					player.addSkills("jixi");
 					player.insertPhase();
 				},
+				ai: {
+					combo: "oltuntian"
+				},
 			},
 			rejunxing: {
 				enable: "phaseUse",
@@ -13189,6 +13192,9 @@ game.import("character", function () {
 						player.logSkill("rexinsheng");
 						event.goto(1);
 					}
+				},
+				ai: {
+					combo: "rehuasheng"
 				},
 			},
 			reguhuo: {

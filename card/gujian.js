@@ -733,11 +733,6 @@ game.import("card", function () {
 					}
 					ui.arena.classList.remove("thrownhighlight");
 					game.addVideo("thrownhighlight2");
-					"step 4";
-					// if(cards&&cards.length){
-					//     player.gain(cards,'gain2');
-					//     target.addTempSkill('bingpotong');
-					// }
 				},
 				ai: {
 					basic: {
@@ -1619,7 +1614,6 @@ game.import("card", function () {
 					player.removeSkill("dinvxuanshuang_skill");
 				},
 			},
-			bingpotong: {},
 			heilonglinpian: {
 				mark: true,
 				marktext: "鳞",

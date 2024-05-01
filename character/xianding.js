@@ -8455,6 +8455,9 @@ game.import("character", function () {
 					player.awakenSkill("dcmoucheng");
 					player.changeSkills(["xinjingong"], ["dclianji"]);
 				},
+				ai: {
+					combo: "dclianji"
+				},
 			},
 			//周宣
 			dcwumei: {
@@ -11501,7 +11504,11 @@ game.import("character", function () {
 				},
 				check: function (card) {
 					var player = _status.event.player;
-					if (!player.hasSkill("dcpingxi")) return 0;
+					if (!player.hasSkill("dcpingxi")) {
+						if (ui.selected.cards.length) return 0;
+						if (player.needsToDiscard()) return 12 - get.value(card);
+						return 2 * player.hp + 1.5 - get.value(card);
+					}
 					var num = lib.skill.dcpingxi.getNum() + ui.selected.cards.length;
 					if (
 						num <

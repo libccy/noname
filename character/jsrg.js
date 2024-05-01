@@ -6102,6 +6102,7 @@ game.import("character", function () {
 					},
 				},
 				ai: {
+					halfneg: true,
 					effect: {
 						player_use: function (card, player, target) {
 							if (card.name == "jiu") return [1, 1];
