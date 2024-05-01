@@ -917,6 +917,7 @@ game.import("character", function () {
 				},
 			},
 			kuangchan: {
+				locked: true,
 				ai: {
 					neg: true,
 				},
@@ -2500,7 +2501,7 @@ game.import("character", function () {
 				},
 			},
 			nvquan: {
-				locked: true,
+				locked: false,
 				group: ["nvquan1", "nvquan2", "nvquan3"],
 			},
 			nvquan1: {
