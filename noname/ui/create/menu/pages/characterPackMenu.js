@@ -251,8 +251,7 @@ export const characterPackMenu = function (connectMenu) {
 					page.appendChild(cfgnode2);
 				}
 			} else if (mode.startsWith("mode_extension")) {
-				// 排除4个基本扩展
-				// 再排除那个boss扩展的间隔包
+				// 排除4个基本扩展，再排除剑阁武将包
 				// 给扩展的武将包加一个开启关闭的功能
 				if (
 					!lib.config.all.stockextension.includes(mode.slice(15)) &&
