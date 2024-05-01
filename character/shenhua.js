@@ -4444,6 +4444,9 @@ game.import("character", function () {
 					player.loseMaxHp();
 					player.addSkills("jixi");
 				},
+				ai: {
+					combo: "tuntian"
+				},
 			},
 			jixi: {
 				audio: 2,
@@ -5345,6 +5348,9 @@ game.import("character", function () {
 						player.logSkill("xinsheng");
 						event.goto(1);
 					}
+				},
+				ai: {
+					combo: "huashen"
 				},
 			},
 			huoshou: {

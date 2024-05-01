@@ -8450,6 +8450,9 @@ game.import("character", function () {
 					player.awakenSkill("dcmoucheng");
 					player.changeSkills(["xinjingong"], ["dclianji"]);
 				},
+				ai: {
+					combo: "dclianji"
+				},
 			},
 			//周宣
 			dcwumei: {

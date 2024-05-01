@@ -16472,6 +16472,9 @@ game.import("character", function () {
 					player.awakenSkill("xinmoucheng");
 					player.changeSkills(["xinjingong"], ["xinlianji"]);
 				},
+				ai: {
+					combo: "xinlianji"
+				},
 			},
 			xinjingong: {
 				audio: "jingong",
@@ -20271,6 +20274,9 @@ game.import("character", function () {
 					}, map.skills);
 					"step 3";
 					if (player.isMinHp()) player.recover();
+				},
+				ai: {
+					combo: "refanghun"
 				},
 			},
 			refanghun: {
@@ -24225,7 +24231,7 @@ game.import("character", function () {
 				zhuSkill: true,
 				locked: true,
 				ai: {
-					combo: "canshi",
+					combo: "recanshi",
 				},
 			},
 			canshi: {
