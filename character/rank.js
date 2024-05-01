@@ -145,6 +145,7 @@ window.noname_character_rank = {
 		"clan_zhongyao",
 		"guanyue",
 		"wupu",
+		"xukun",
 	],
 	a: [
 		"star_caoren",
@@ -385,6 +386,7 @@ window.noname_character_rank = {
 		"drag_caoren",
 		"drag_lvchang",
 		"star_sunjian",
+		"yj_xuangongzhu",
 	],
 	am: [
 		"tw_yanliang",
@@ -700,6 +702,7 @@ window.noname_character_rank = {
 		"clan_wangling",
 		"clan_wangguang",
 		"lizhaojiaobo",
+		"linghuyu",
 	],
 	bp: [
 		"xin_huojun",
@@ -1418,6 +1421,7 @@ window.noname_character_rank = {
 		"jsrg_sunjun",
 		"xia_shie",
 		"clan_wangmingshan",
+		"yj_simafu",
 	],
 	bm: [
 		"kongrong",
@@ -1921,6 +1925,7 @@ window.noname_character_rank = {
 			"guanyue",
 		],
 		epic: [
+			"xukun",
 			"clan_zhongyao",
 			"dc_caoshuang",
 			"tianchou",
@@ -2210,6 +2215,9 @@ window.noname_character_rank = {
 			"star_sunjian",
 		],
 		rare: [
+			"linghuyu",
+			"yj_simafu",
+			"yj_xuangongzhu",
 			"drag_lvchang",
 			"re_wangyi",
 			"ol_wangyi",
