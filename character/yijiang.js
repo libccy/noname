@@ -340,7 +340,7 @@ game.import("character", function () {
 									.forResult();
 							}
 							if (resultx.bool) {
-								const moved = result.moved[0];
+								const moved = resultx.moved[0];
 								if (moved.length) {
 									await player.lose(cards, ui.cardPile);
 									for (let i = 0; i < moved.length; i++) {
