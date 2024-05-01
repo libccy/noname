@@ -248,8 +248,8 @@ game.import("character", function () {
 				multitarget: true,
 				async content(event, trigger, player) {
 					const targets = event.targets;
-					if (!player.getStat("xvzhi")) player.getStat("xvzhi") = [];
-					player.getStat("xvzhi").addArray(targets);
+					if (!player.getStat().xvzhi) player.getStat().xvzhi = [];
+					player.getStat().xvzhi.addArray(targets);
 					if (targets.some(i => !i.countCards("h"))) return;
 					const result = await player
 						.chooseCardOL(targets, "h", true, [1, Infinity], "蓄志：选择任意张手牌并与对方交换")
@@ -275,7 +275,7 @@ game.import("character", function () {
 										})
 								  )
 								: 0;
-							return 5 + 3 * get.sgn(playerEffect - targetEffect) - get.value(card);
+							return 5 + 2 * get.sgn(playerEffect - targetEffect) - get.value(card);
 						})
 						.forResult();
 					await targets[0].swapHandcards(targets[1], result[0].cards, result[1].cards);
