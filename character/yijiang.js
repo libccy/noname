@@ -115,7 +115,7 @@ game.import("character", function () {
 
 			linghuyu: ["male", "wei", 4, ["xvzhi"]],
 			yj_simafu: ["male", "wei", 3, ["beiyu", "duchi"]],
-			yj_xuangongzhu: ["female", "wei", 3, ["qimei", "zhuiji"]],
+			yj_xuangongzhu: ["female", "wei", 3, ["yjqimei", "yjzhuiji"]],
 			xukun: ["male", "wu", 4, ["fazhu"]],
 		},
 		characterIntro: {
@@ -242,7 +242,10 @@ game.import("character", function () {
 					const stat = player.getStat("xvzhi");
 					return target.countCards("h") && (!stat || !stat.includes(target));
 				},
+				selectTarget:2,
 				usable: 1,
+				multiline: true,
+				multitarget: true,
 				async content(event, trigger, player) {
 					const targets = event.targets;
 					if (targets.some(i => !i.countCards("h"))) return;
@@ -250,27 +253,24 @@ game.import("character", function () {
 						.chooseCardOL(targets, "h", true, [1, Infinity], "蓄志：选择任意张手牌并与对方交换")
 						.set("ai", card => {
 							const player = get.event("player"),
-								target = get
-									.event()
-									.getParent(2)
-									.targets.find(i => i != player);
+								target = get.event().getParent(2).targets.find(i => i != player);
 							const sha = new lib.element.VCard({ name: "sha" });
 							const playerEffect = player.hasUseTarget(sha, false)
 								? Math.max(
 										...game.filterPlayer(current =>
-											player.canUse(sha, current, false).map(current => {
-												return get.effect(current, sha, player, player);
-											})
-										)
+											player.canUse(sha, current, false)
+										).map(current => {
+											return get.effect(current, sha, player, player);
+										})
 								  )
 								: 0;
 							const targetEffect = target.hasUseTarget(sha, false)
 								? Math.max(
 										...game.filterPlayer(current =>
-											target.canUse(sha, current, false).map(current => {
-												return get.effect(current, sha, target, target);
-											})
-										)
+											target.canUse(sha, current, false)
+										).map(current => {
+											return get.effect(current, sha, player, player);
+										})
 								  )
 								: 0;
 							return 5 + 3 * get.sgn(playerEffect - targetEffect) - get.value(card);
@@ -374,12 +374,12 @@ game.import("character", function () {
 						await player.showHandcards(get.translation(player) + "发动了【督持】");
 						const colors = player.getCards("h").reduce((list, card) => list.add(get.color(card)), []);
 						if (colors.length == 1) {
-							player.chat("洗具");
+							player.popup("洗具");
 							trigger.getParent().excluded.add(player);
 							return;
 						}
 					}
-					player.chat("杯具");
+					player.popup("杯具");
 				},
 				ai: { threaten: 0.8 },
 			},
@@ -389,7 +389,7 @@ game.import("character", function () {
 				enable: "phaseUse",
 				filter(event, player) {
 					const count = player.getStat("skill").yjqimei;
-					if (count && count > 0 && !player.hasSkill("yjqimei")) return false;
+					if (count && count > 0 && !player.hasSkill("yjqimei_rewrite")) return false;
 					return true;
 				},
 				filterTarget: lib.filter.notMe,
