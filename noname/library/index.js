@@ -10001,7 +10001,7 @@ export class Library {
 			if (info.sub || info.temp || info.fixed || info.vanish) return true;
 			if (info.forbid && info.forbid.includes(mode)) return true;
 			if (info.mode && !info.mode.includes(mode)) return true;
-			if (info.available && !info.available(mode)) return true;
+			if (info.available && info.available(mode) === false) return true;
 			if (info.viewAs && typeof info.viewAs != "function") {
 				if (typeof info.viewAs == "string")
 					info.viewAs = {
@@ -10022,9 +10022,6 @@ export class Library {
 					if (character && character.skills && character.skills.includes(skill)) return false;
 				}
 				return true;
-			}
-			for (let i in info) {
-				if (i.indexOf("audio")) return false;
 			}
 			return true;
 		},
