@@ -353,8 +353,8 @@ export class GameEvent {
 	cancel(arg1, arg2, notrigger) {
 		this.untrigger(arg1, arg2);
 		this.finish();
-		//cancelSource的事件不能被Cancel
-		this.cancelSource=_status.event;
+		//cancelSource的事件不能被cancel
+		this.cancelSource = _status.event;
 		if (notrigger != "notrigger") {
 			if (this.player && lib.phaseName.includes(this.name))
 				this.player.getHistory("skipped").add(this.name);
