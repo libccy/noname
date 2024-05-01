@@ -32,12 +32,12 @@ export class Character {
 	group;
 	/**
 	 * 武将牌的势力边框颜色（如徐庶“身在曹营心在汉”）
-	 * @type { string }
+	 * @type { string|undefined }
 	 **/
 	groupBorder;
 	/**
 	 * 神武将牌在国战模式下的势力
-	 * @type { string }
+	 * @type { string|undefined }
 	 **/
 	groupInGuozhan;
 	/**
@@ -62,17 +62,17 @@ export class Character {
 	hasHiddenSkill = false;
 	/**
 	 * 垃圾桶，用于存储原本Character[4]的垃圾数据
-	 * @type { Array }
+	 * @type { any[] }
 	 **/
 	trashBin = [];
 	/**
 	 * 武将牌对应的另一半双面武将牌
-	 * @type { string }
+	 * @type { string|undefined }
 	 **/
 	dualSideCharacter;
 	/**
 	 * 多势力武将牌的全部势力
-	 * @type { Array }
+	 * @type { string[] }
 	 **/
 	doubleGroup = [];
 	/**
@@ -97,7 +97,7 @@ export class Character {
 	isAiForbidden = false;
 	/**
 	 * 武将牌在炉石模式/挑战模式下的特殊信息
-	 * @type { array|undefined }
+	 * @type { any[]|undefined }
 	 **/
 	extraModeData;
 	/**
@@ -151,7 +151,7 @@ export class Character {
 	 **/
 	initFilters = [];
 	/**
-	 * @param { Array|Object } [data]
+	 * @param { Object|[string, string, string|number, string[], any[], any[]|undefined] } [data]
 	 */
 	constructor(data) {
 		if (Array.isArray(data)) {
@@ -161,72 +161,96 @@ export class Character {
 			this.maxHp = get.infoMaxHp(data[2]);
 			this.hujia = get.infoHujia(data[2]);
 			this.skills = get.copy(data[3] || []);
-			if (data[4]) Character.convertTrashToProperties(this, data[4]);
+			if (data[4]) this.setPropertiesFromTrash(data[4]);
 			if (data.length > 5) this.extraModeData = data[5];
 		} else if (get.is.object(data)) {
 			Object.assign(this, data);
 			if (typeof this.maxHp !== "number") this.maxHp = this.hp;
 		}
 	}
+	initializeTrashProperties() {
+		this.groupInGuozhan = void 0;
+		this.isZhugong = false;
+		this.isUnseen = false;
+		this.isMinskin = false;
+		this.hasSkinInGuozhan = false;
+		this.isBoss = false;
+		this.isChessBoss = false;
+		this.isJiangeBoss = false;
+		this.isJiangeMech = false;
+		this.isBossAllowed = false;
+		this.isHiddenBoss = false;
+		this.isAiForbidden = false;
+		this.isFellowInStoneMode = false;
+		this.isHiddenInStoneMode = false;
+		this.isSpecialInStoneMode = false;
+		this.hasHiddenSkill = false;
+		this.groupBorder = void 0;
+		this.dualSideCharacter = void 0;
+		this.doubleGroup = [];
+		this.clans = [];
+		this.initFilters = [];
+		this.trashBin = [];
+	}
 	/**
-	 * @param { Character } character
-	 * @param { Array } trash
+	 * @param { any[] } trash
 	 */
-	static convertTrashToProperties(character, trash) {
-		let keptTrashes = [],
+	setPropertiesFromTrash(trash) {
+		this.initializeTrashProperties();
+		const keptTrashes = [],
 			clans = [];
 		for (let i = 0; i < trash.length; i++) {
-			let item = trash[i];
+			const item = trash[i];
 			if (i === 0 && (lib.group.includes(item) || item === 'key')) {
-				character.groupInGuozhan = item;
-			} else if(item.startsWith("gzgroup:")){
-				character.groupInGuozhan = item.slice(8);
+				this.groupInGuozhan = item;
 			} else if (item === "zhu") {
-				character.isZhugong = true;
+				this.isZhugong = true;
 			} else if (item === "unseen") {
-				character.isUnseen = true;
+				this.isUnseen = true;
 			} else if (item === "minskin") {
-				character.isMinskin = true;
+				this.isMinskin = true;
 			} else if (item === "gzskin") {
-				character.hasSkinInGuozhan = true;
+				this.hasSkinInGuozhan = true;
 			} else if (item === "boss") {
-				character.isBoss = true;
+				this.isBoss = true;
 			} else if (item === "chessboss") {
-				character.isChessBoss = true;
+				this.isChessBoss = true;
 			} else if (item === "jiangeboss") {
-				character.isJiangeBoss = true;
+				this.isJiangeBoss = true;
 			} else if (item === "jiangemech") {
-				character.isJiangeMech = true;
+				this.isJiangeMech = true;
 			} else if (item === "bossallowed") {
-				character.isBossAllowed = true;
+				this.isBossAllowed = true;
 			} else if (item === "hiddenboss") {
-				character.isHiddenBoss = true;
+				this.isHiddenBoss = true;
 			} else if (item === "forbidai") {
-				character.isAiForbidden = true;
+				this.isAiForbidden = true;
 			} else if (item === "stone") {
-				character.isFellowInStoneMode = true;
+				this.isFellowInStoneMode = true;
 			} else if (item === "stonehidden") {
-				character.isHiddenInStoneMode = true;
+				this.isHiddenInStoneMode = true;
 			} else if (item === "stonespecial") {
-				character.isSpecialInStoneMode = true;
+				this.isSpecialInStoneMode = true;
 			} else if (item === "hiddenSkill") {
-				character.hasHiddenSkill = true;
-			} else if (item.startsWith("border:")) {
-				character.groupBorder = item.slice(7);
-			} else if (item.startsWith("dualside:")) {
-				character.dualSideCharacter = item.slice(9);
-			} else if (item.startsWith("doublegroup:")) {
-				character.doubleGroup = item.slice(12).split(":");
-			} else if (item.startsWith("clan:")) {
+				this.hasHiddenSkill = true;
+			} else if (item?.startsWith("border:")) {
+				this.groupBorder = item.slice(7);
+			} else if (item?.startsWith("dualside:")) {
+				this.dualSideCharacter = item.slice(9);
+			} else if (item?.startsWith("gzgroup:")) {
+				this.groupInGuozhan = item.slice(8);
+			} else if (item?.startsWith("doublegroup:")) {
+				this.doubleGroup = item.slice(12).split(":");
+			} else if (item?.startsWith("clan:")) {
 				clans.push(item.slice(5));
-			} else if (item.startsWith("InitFilter:")) {
-				character.initFilters = item.slice(11).split(":");
+			} else if (item?.startsWith("InitFilter:")) {
+				this.initFilters = item.slice(11).split(":");
 			} else {
 				keptTrashes.push(item);
 			}
 		}
-		if (clans.length > 0) character.clans = clans;
-		character.trashBin = keptTrashes;
+		this.clans = clans;
+		this.trashBin = keptTrashes;
 	}
 	/**
 	 * @deprecated
@@ -274,12 +298,12 @@ export class Character {
 
 	/**
 	 * 把新格式下的数据转换回传统的屎山
-     * @deprecated
+	 * @deprecated
 	 */
 	get 4() {
 		const trashes = [],
 			character = this;
-		if (lib.group.includes(character.groupInGuozhan)) {
+		if (character.groupInGuozhan && lib.group.includes(character.groupInGuozhan)) {
 			trashes.push(`gzgroup:${character.groupInGuozhan}`);
 		}
 		if (character.isZhugong) {
@@ -343,16 +367,27 @@ export class Character {
 			trashes.push(`InitFilters:${character.initFilters.join(":")}`);
 		}
 
-		return trashes.concat(character.trashBin);
+		return new Proxy(trashes.concat(character.trashBin), {
+			set(target, prop, newValue) {
+				const result = Reflect.set(target, prop, newValue);
+				character.setPropertiesFromTrash(target);
+				return result;
+			},
+			deleteProperty(target, prop) {
+				const result = Reflect.deleteProperty(target, prop);
+				character.setPropertiesFromTrash(target);
+				return result;
+			}
+		});
 	}
 	set 4(trashBin) {
 		console.warn("你set你🐎的废弃属性");
 	}
 
-	get 5(){
+	get 5() {
 		return this.extraModeData;
 	}
-	set 5(stoneData){
+	set 5(stoneData) {
 		this.extraModeData = stoneData;
 	}
 }
