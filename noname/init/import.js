@@ -12,7 +12,7 @@ export const importCardPack = generateImportFunction("card", (name) => `../../ca
  * @returns {Promise<void>}
  */
 export const importCharacterPack = generateImportFunction("character", (name) => {
-	const alreadyModernCharacterPack = ["key"];
+	const alreadyModernCharacterPack = lib.config.moderned_chracters || [];
 
 	return alreadyModernCharacterPack.includes(name)
 		? `../../character/${name}/index.js`

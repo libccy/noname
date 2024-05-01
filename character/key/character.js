@@ -142,11 +142,7 @@ const characters = {
 		group: "key",
 		hp: 3,
 		hujia: 2,
-		skills: [
-			"sunohara_chengshuang",
-			"sunohara_tiaoyin",
-			"sunohara_jianren",
-		],
+		skills: ["sunohara_chengshuang", "sunohara_tiaoyin", "sunohara_jianren"],
 	},
 	key_rin: {
 		sex: "female",

@@ -1489,7 +1489,7 @@ export class Game {
 		 * @param {skillInfo} [skillInfo]
 		 * @returns {string[]}
 		 */
-		function getAudioList(skill, options, skillInfo, useRawAudio) {
+		function getAudioList(skill, options, skillInfo) {
 			const info = skillInfo || lib.skill[skill];
 			if (!info) {
 				console.error(new ReferenceError(`parseSkillAudio: Cannot find ${skill} in lib.skill`));
@@ -1558,8 +1558,6 @@ export class Game {
 	}
 	/**
 	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表
-	 * @typedef {[string,number]|string|number|boolean} audioInfo
-	 * @typedef {{audio: audioInfo, audioname?:string[], audioname2?:{[playerName: string]: audioInfo}}} skillInfo
 	 * @param { string } skill  技能名
 	 * @param { Player | Object | string } [player]  角色/角色名
 	 * @param { skillInfo | audioInfo } [skillInfo]  预设的skillInfo/audioInfo(转为skillInfo)，覆盖lib.skill[skill]
@@ -1571,6 +1569,22 @@ export class Game {
 		audios.forEach(audioname => {
 			const voiceText = lib.translate[`#${audioname}`];
 			if (voiceText) voiceMap.push(voiceText);
+		});
+		return voiceMap;
+	}
+	/**
+	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表及其对应的源文件名
+	 * @param { string } skill  技能名
+	 * @param { Player | Object | string } [player]  角色/角色名
+	 * @param { skillInfo | audioInfo } [skillInfo]  预设的skillInfo/audioInfo(转为skillInfo)，覆盖lib.skill[skill]
+	 * @returns { Object }  语音地址列表
+	 */
+	parseSkillTextMap(skill, player, skillInfo) {
+		const audios = game.parseSkillAudio(skill, player, skillInfo, true);
+		const voiceMap = {};
+		audios.forEach(audioname => {
+			const voiceText = lib.translate[`#${audioname}`];
+			if (voiceText) voiceMap[audioname] = voiceText;
 		});
 		return voiceMap;
 	}
