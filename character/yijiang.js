@@ -353,6 +353,10 @@ game.import("character", function () {
 						}
 					}
 				},
+				ai: {
+					order: 0.001,
+					result: { player: 1 },
+				},
 			},
 			duchi: {
 				audio: 2,
