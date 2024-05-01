@@ -276,7 +276,6 @@ game.import("character", function () {
 							return 5 + 3 * get.sgn(playerEffect - targetEffect) - get.value(card);
 						})
 						.forResult();
-					const list = [result[0].cards, result[1].cards];
 					await targets[0].swapHandcards(targets[1], result[0].cards, result[1].cards);
 					if (result[0].cards.length == result[1].cards.length) {
 						await player.draw(2);
