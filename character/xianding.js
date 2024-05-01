@@ -558,8 +558,13 @@ game.import("character", function () {
 							if (!links || !links.length) return;
 							const viewAs = { name: links[0][2], nature: links[0][3] };
 							if (!isMe) {
-								cards = await target.chooseToGive(player, true).forResultCards();
+								cards = await target.chooseToGive(player).set('ai', card => {
+									const player = get.event("player"), target = get.event().getParent().player;
+									if (get.attitude(player, target) <= 0) return 0;
+									return 6 - get.value(card);
+								}).forResultCards();
 							}
+							if (!cards) return;
 							const card = cards[0];
 							if (player.getCards("h").includes(card)) {
 								if (!player.storage.dcwuyou_transfer) player.storage.dcwuyou_transfer = {};
@@ -572,8 +577,8 @@ game.import("character", function () {
 							order: 10,
 							result: {
 								player(player, target) {
-									if (get.attitude(player, target) > 0) return 2;
-									return 1;
+									if (get.attitude(player, target) > 0) return 1;
+									return 0;
 								},
 								target: 0.5,
 							},
@@ -17622,7 +17627,7 @@ game.import("character", function () {
 			dcjuewu_two: "2点",
 			dcjuewu_info: "①每回合每种牌名限一次。你可以将一张点数为2的牌当任意伤害类牌使用（包括【水淹七军】）。②当你得到其他角色区域内的牌后，你令这些牌的点数均视为2直到你失去这些牌。",
 			dcwuyou: "武佑",
-			dcwuyou_info: "①出牌阶段限一次。你可以选择一张手牌，从系统随机生成的五个非装备牌牌名中选择一个，令此牌的牌名与属性视为与你选择的相同。②其他角色的出牌阶段限一次。其可以交给你一张手牌，你从系统随机生成的五个非装备牌牌名中选择一个，然后交给其一张手牌，令此牌的牌名与属性视为与你选择的相同（一名角色使用〖武佑〗转化的牌无距离且无任何次数限制）。",
+			dcwuyou_info: "①出牌阶段限一次。你可以选择一张手牌，从系统随机生成的五个非装备牌牌名中选择一个，令此牌的牌名与属性视为与你选择的相同。②其他角色的出牌阶段限一次。其可以交给你一张手牌，你从系统随机生成的五个非装备牌牌名中选择一个，然后可以交给其一张手牌，令此牌的牌名与属性视为与你选择的相同（一名角色使用〖武佑〗转化的牌无距离且无任何次数限制）。",
 			dcyixian: "义贤",
 			dcyixian_info: "限定技。出牌阶段，你可以选择一项：⒈获得场上的所有装备牌；⒉获得弃牌堆中的所有装备牌。然后你依次选择是否令被你以此法获得牌的角色摸X张牌并回复1点体力（X为其以此法失去的牌数）。",
 			shuiyanqijuny: "水淹七军",
