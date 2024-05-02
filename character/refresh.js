@@ -6678,7 +6678,7 @@ game.import("character", function () {
 						const num = player.countCards("h");
 						const result = await player
 							.chooseTarget(
-								get.prompt("xinbingyi"),
+								get.prompt("rebingyi"),
 								`展示所有手牌，并选择至多${get.cnNumber(num)}名角色各摸一张牌${
 									selfDraw ? "" : "，然后你摸一张牌"
 								}`,
@@ -6700,7 +6700,7 @@ game.import("character", function () {
 					} else {
 						event.result = await player
 							.chooseBool(
-								get.prompt("bingyi"),
+								get.prompt("rebingyi"),
 								`展示所有手牌${selfDraw ? "" : "，然后你摸一张牌"}`
 							)
 							.set("choice", selfDraw)
@@ -6714,7 +6714,7 @@ game.import("character", function () {
 					const data = event.cost_data;
 					if (data.asyncDraw && data.targets && data.targets.length) {
 						const targets = data.targets.sortBySeat();
-						game.asyncDraw(targets);
+						await game.asyncDraw(targets);
 					}
 					if (data.selfDraw) {
 						player.draw();
