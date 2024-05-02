@@ -1472,7 +1472,7 @@ export class Game {
 					if (result) return result;
 					if (!name) return result;
 					if (filter(name)) return name;
-					let tempname = ((get.character(name) || {}).trashBin || []).find(tag => tag.startsWith("tempname:"));
+					let tempname = (get.character(name).trashBin || []).find(tag => tag.startsWith("tempname:"));
 					if (!tempname) return result;
 					tempname = tempname
 						.split(":")

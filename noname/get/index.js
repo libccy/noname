@@ -621,7 +621,7 @@ export class Get {
 			if (num === 3 || num === 4) return [];
 			return;
 		}
-		return info;
+		return info || {};
 	}
 	characterInitFilter(name) {
 		const info = get.character(name);
@@ -1332,17 +1332,7 @@ export class Get {
 		if (name == _status.lord) return num ? Math.round((7 * (num - 1)) / 8 + 1) : "ap";
 		var rank = lib.rank;
 		if (lib.characterPack.standard[name] || lib.characterPack.shenhua[name]) {
-			var skills;
-			if (lib.character[name]) {
-				skills = lib.character[name][3];
-			} else {
-				var tmpinfo = get.character(name);
-				if (tmpinfo) {
-					skills = tmpinfo[3];
-				} else {
-					skills = [];
-				}
-			}
+			var skills = get.character(name, 3);
 			for (var i = 0; i < skills.length; i++) {
 				if (skills[i].alter && !lib.config.vintageSkills.includes(skills[i])) {
 					name = lib.rank.a[0];
@@ -2933,8 +2923,7 @@ export class Get {
 	}
 	skillintro(name, learn, learn2) {
 		var str = "";
-		var infoitem = get.character(name);
-		var skills = infoitem[3];
+		var skills = get.character(name, 3);
 		var opacity;
 		for (var i = 0; i < skills.length; i++) {
 			if (lib.translate[skills[i]] && lib.translate[skills[i] + "_info"] && lib.skill[skills[i]]) {
@@ -4145,8 +4134,7 @@ export class Get {
 				).style.marginTop = "-10px";
 				ui.create.div(".placeholder.slim", uiintro.content);
 			} else {
-				var infoitem = get.character(character);
-				var skills = infoitem[3];
+				var skills = get.character(character, 3);
 				for (i = 0; i < skills.length; i++) {
 					if (lib.translate[skills[i] + "_info"]) {
 						if (lib.translate[skills[i] + "_ab"]) translation = lib.translate[skills[i] + "_ab"];

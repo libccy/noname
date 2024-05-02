@@ -2455,7 +2455,7 @@ export class Player extends HTMLDivElement {
 						if (typeof map == "function") {
 							return map(this, name);
 						}
-						if (typeof map.skill == "string" && (get.character(this[i], 3) || []).includes(map.skill)) return true;
+						if (typeof map.skill == "string" && get.character(this[i], 3).includes(map.skill)) return true;
 						if (typeof map.characterName == "string" && this[i] == map.characterName) return true;
 						if (typeof map.characterSkinName == "string" && this.skin[name] == map.characterSkinName) return true;
 						if (typeof map.source == "string" && name == map.source) return true;
@@ -2643,10 +2643,10 @@ export class Player extends HTMLDivElement {
 		//修改性别
 		if (!player.isUnseen(1)) {
 			player.name = player.name1;
-			player.sex = get.character(player.name1)[0];
+			player.sex = get.character(player.name1, 0);
 		} else if (!player.isUnseen(2)) {
 			player.name = player.name2;
-			player.sex = get.character(player.name2)[0];
+			player.sex = get.character(player.name2, 0);
 		}
 	}
 	$reinit12(newPairs) {
