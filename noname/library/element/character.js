@@ -200,7 +200,11 @@ export class Character {
 			clans = [];
 		for (let i = 0; i < trash.length; i++) {
 			const item = trash[i];
-			if (i === 0 && (lib.group.includes(item) || item === 'key')) {
+			if (typeof item !== "string") {
+				keptTrashes.push(item);
+				continue;
+			}
+			if (i === 0 && (lib.group.includes(item) || item === "key")) {
 				this.groupInGuozhan = item;
 			} else if (item === "zhu") {
 				this.isZhugong = true;
@@ -232,17 +236,17 @@ export class Character {
 				this.isSpecialInStoneMode = true;
 			} else if (item === "hiddenSkill") {
 				this.hasHiddenSkill = true;
-			} else if (item?.startsWith("border:")) {
+			} else if (item.startsWith("border:")) {
 				this.groupBorder = item.slice(7);
-			} else if (item?.startsWith("dualside:")) {
+			} else if (item.startsWith("dualside:")) {
 				this.dualSideCharacter = item.slice(9);
-			} else if (item?.startsWith("gzgroup:")) {
+			} else if (item.startsWith("gzgroup:")) {
 				this.groupInGuozhan = item.slice(8);
-			} else if (item?.startsWith("doublegroup:")) {
+			} else if (item.startsWith("doublegroup:")) {
 				this.doubleGroup = item.slice(12).split(":");
-			} else if (item?.startsWith("clan:")) {
+			} else if (item.startsWith("clan:")) {
 				clans.push(item.slice(5));
-			} else if (item?.startsWith("InitFilter:")) {
+			} else if (item.startsWith("InitFilter:")) {
 				this.initFilters = item.slice(11).split(":");
 			} else {
 				keptTrashes.push(item);
