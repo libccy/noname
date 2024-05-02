@@ -12873,22 +12873,24 @@ game.import("character", function () {
 					if (player.storage.rehuashen.current != event.card) {
 						const old = player.storage.rehuashen.current;
 						player.storage.rehuashen.current = event.card;
+						const sex = get.character(event.card, 0);
 						game.broadcastAll(
-							function (player, character, old) {
+							function (player, character, old, sex) {
 								player.tempname.remove(old);
 								player.tempname.add(character);
-								player.sex = lib.character[event.card][0];
+								player.sex = sex;
 							},
 							player,
 							event.card,
-							old
+							old,
+							sex
 						);
 						game.log(
 							player,
 							"将性别变为了",
-							"#y" + get.translation(lib.character[event.card][0]) + "性"
+							"#y" + get.translation(sex) + "性"
 						);
-						player.changeGroup(lib.character[event.card][1]);
+						player.changeGroup(get.character(event.card, 1));
 					}
 					var link = result.control;
 					player.storage.rehuashen.current2 = link;
