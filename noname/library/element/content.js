@@ -9186,19 +9186,13 @@ export const Content = {
 		game.addVideo("turnOver", player, player.classList.contains("turnedover"));
 	},
 	link: function () {
-		if (player.isLinked()) {
-			game.log(player, "解除连环");
-		} else {
-			game.log(player, "被连环");
-		}
-		if (lib.config.background_audio) {
-			game.playAudio("effect", "link");
-		}
-		game.broadcast(function () {
+		const isLinked = player.isLinked();
+		game.log(player, (isLinked ? "解除" : "被") + "连环");
+		game.broadcastAll(isLinked => {
 			if (lib.config.background_audio) {
-				game.playAudio("effect", "link");
+				game.playAudio("effect", "link" + (isLinked ? "_clear" : ""));
 			}
-		});
+		}, isLinked);
 		player.classList.remove("target");
 		if (get.is.linked2(player)) {
 			player.classList.toggle("linked2");
