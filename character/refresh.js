@@ -12873,7 +12873,7 @@ game.import("character", function () {
 					if (player.storage.rehuashen.current != event.card) {
 						const old = player.storage.rehuashen.current;
 						player.storage.rehuashen.current = event.card;
-						const sex = get.character(event.card, 0);
+						const sex = get.character(event.card).sex;
 						game.broadcastAll(
 							function (player, character, old, sex) {
 								player.tempname.remove(old);
@@ -12890,7 +12890,7 @@ game.import("character", function () {
 							"将性别变为了",
 							"#y" + get.translation(sex) + "性"
 						);
-						player.changeGroup(get.character(event.card, 1));
+						player.changeGroup(get.character(event.card).group);
 					}
 					var link = result.control;
 					player.storage.rehuashen.current2 = link;
@@ -12914,8 +12914,8 @@ game.import("character", function () {
 					player.when("dieBegin").then(() => {
 						const name = player.name ? player.name : player.name1;
 						if (name) {
-							const sex = get.character(name, 0);
-							const group = get.character(name, 1);
+							const sex = get.character(name).sex;
+							const group = get.character(name).group;
 							if (player.sex != sex) {
 								game.broadcastAll(
 									(player, sex) => {
@@ -13037,12 +13037,12 @@ game.import("character", function () {
 							characterInfo = get.character(node.link);
 						let capt = get.translation(character);
 						if (characterInfo) {
-							capt += `&nbsp;&nbsp;${get.translation(characterInfo[0])}`;
+							capt += `&nbsp;&nbsp;${get.translation(characterInfo.sex)}`;
 							let charactergroup;
 							const charactergroups = get.is.double(character, true);
 							if (charactergroups)
 								charactergroup = charactergroups.map((i) => get.translation(i)).join("/");
-							else charactergroup = get.translation(characterInfo[1]);
+							else charactergroup = get.translation(characterInfo.group);
 							capt += `&nbsp;&nbsp;${charactergroup}`;
 						}
 						uiintro.add(capt);
