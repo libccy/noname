@@ -8916,7 +8916,7 @@ game.import("character", function () {
 			xinlonghun: {
 				audio: "longhun",
 				enable: ["chooseToUse", "chooseToRespond"],
-				prompt: "将♦手牌当做火【杀】，♥手牌当做【桃】，♣手牌当做【闪】，♠手牌当做【无懈可击】使用或打出",
+				prompt: "将♦牌当做火【杀】，♥牌当做【桃】，♣牌当做【闪】，♠牌当做【无懈可击】使用或打出",
 				viewAs(cards, player) {
 					if (cards.length) {
 						var name = false,
@@ -8950,7 +8950,7 @@ game.import("character", function () {
 						for (var i = 0; i < list.length; i++) {
 							var name = list[i];
 							if (
-								player.countCards("hs", function (card) {
+								player.countCards("hes", function (card) {
 									return (
 										(name != "sha" || get.value(card) < 5) &&
 										get.suit(card, player) == map[name]
@@ -8971,7 +8971,7 @@ game.import("character", function () {
 					}
 					return 1;
 				},
-				position: "hs",
+				position: "hes",
 				filterCard(card, player, event) {
 					event = event || _status.event;
 					var filter = event._backup.filterCard;
@@ -8991,22 +8991,22 @@ game.import("character", function () {
 					var filter = event.filterCard;
 					if (
 						filter(get.autoViewAs({ name: "sha", nature: "fire" }, "unsure"), player, event) &&
-						player.countCards("hs", { suit: "diamond" })
+						player.countCards("hes", { suit: "diamond" })
 					)
 						return true;
 					if (
 						filter(get.autoViewAs({ name: "shan" }, "unsure"), player, event) &&
-						player.countCards("hs", { suit: "club" })
+						player.countCards("hes", { suit: "club" })
 					)
 						return true;
 					if (
 						filter(get.autoViewAs({ name: "tao" }, "unsure"), player, event) &&
-						player.countCards("hs", { suit: "heart" })
+						player.countCards("hes", { suit: "heart" })
 					)
 						return true;
 					if (
 						filter(get.autoViewAs({ name: "wuxie" }, "unsure"), player, event) &&
-						player.countCards("hs", { suit: "spade" })
+						player.countCards("hes", { suit: "spade" })
 					)
 						return true;
 					return false;
@@ -9033,7 +9033,7 @@ game.import("character", function () {
 								name = "heart";
 								break;
 						}
-						if (!player.countCards("hs", { suit: name })) return false;
+						if (!player.countCards("hes", { suit: name })) return false;
 					},
 					order(item, player) {
 						if (player && _status.event.type == "phase") {
@@ -9043,7 +9043,7 @@ game.import("character", function () {
 							for (var i = 0; i < list.length; i++) {
 								var name = list[i];
 								if (
-									player.countCards("hs", function (card) {
+									player.countCards("hes", function (card) {
 										return (
 											(name != "sha" || get.value(card) < 5) &&
 											get.suit(card, player) == map[name]
@@ -9068,9 +9068,11 @@ game.import("character", function () {
 					},
 				},
 				hiddenCard(player, name) {
-					if (name == "wuxie" && _status.connectMode && player.countCards("hs") > 0) return true;
-					if (name == "wuxie") return player.countCards("hs", { suit: "spade" }) > 0;
-					if (name == "tao") return player.countCards("hs", { suit: "heart" }) > 0;
+					if (name == "wuxie") {
+						if (_status.connectMode) return player.countCards("hes") > 0;
+						return player.countCards("hes", { suit: "spade" }) > 0;
+					}
+					if (name == "tao") return player.countCards("hes", { suit: "heart" }) > 0;
 				},
 			},
 			xinjuejing: {
@@ -10458,7 +10460,7 @@ game.import("character", function () {
 				"你可以将同花色的一至两张牌按下列规则使用或打出：红桃当【桃】，方块当火【杀】，梅花当【闪】，黑桃当普【无懈可击】。若你以此法使用了两张红色牌，则此牌回复值或伤害值+1。若你以此法使用了两张黑色牌，则你弃置当前回合角色一张牌。",
 			xinlonghun: "龙魂",
 			xinlonghun_info:
-				"你可以将你的手牌按下列规则使用或打出：红桃当【桃】，方块当火【杀】，梅花当【闪】，黑桃当【无懈可击】。",
+				"你可以将你的牌按下列规则使用或打出：红桃当【桃】，方块当火【杀】，梅花当【闪】，黑桃当【无懈可击】。",
 			longhun: "龙魂",
 			longhun1: "龙魂♥︎",
 			longhun2: "龙魂♦︎",
