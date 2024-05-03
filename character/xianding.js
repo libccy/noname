@@ -668,15 +668,15 @@ game.import("character", function () {
 					},
 					backup(links) {
 						return {
+							audio: "dcyixian",
 							filterCard: () => false,
 							selectCard: -1,
 							pos: links[0],
 							filterTarget: () => false,
 							selectTarget: -1,
-							popup: false,
-							direct: true,
+							skillAnimation: true,
+							animationColor: "metal",
 							async content(event, trigger, player) {
-								await player.logSkill("dcyixian");
 								player.awakenSkill("dcyixian");
 								const position = lib.skill.dcyixian_backup.pos;
 								let cards = [];
