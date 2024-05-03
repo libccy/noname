@@ -209,20 +209,45 @@ game.import("character", function () {
 				},
 				forced: true,
 				filter(event, player) {
-					const number = game
-						.getAllGlobalHistory("everything", evt => {
-							if (evt.player !== player) return false;
-							return ["useCard", "respond"].includes(evt.name);
-						})
-						.indexOf(event);
-					return number >= 0 && (number + 1) % 5 === 0;
+					return event._copdcduanti;
 				},
-				onremove: true,
+				onremove: ["dcduanti", "dcduanti_counter"],
+				group: "dcduanti_counter",
 				async content(event, trigger, player) {
 					await player.recover();
 					if (player.countMark("dcduanti") >= 5) return;
 					player.addMark("dcduanti", 1, false);
 					await player.gainMaxHp();
+				},
+				subSkill: {
+					counter: {
+						trigger: {
+							player: ["useCard1", "respond"],
+						},
+						forced: true,
+						charlotte: true,
+						popup: false,
+						firstDo: true,
+						async content(event, trigger, player) {
+							if (!player.countMark("dcduanti_counter")) {
+								const num = game.getAllGlobalHistory("everything", evt => {
+									return evt.player === player && ["useCard", "respond"].includes(evt.name) && evt !== trigger;
+								}).length;
+								if (num) player.addMark("dcduanti_counter", num, false);
+							}
+							player.addMark("dcduanti_counter", 1, false);
+							if (player.countMark("dcduanti_counter") % 5 === 0) trigger._copdcduanti = true;
+							player.markSkill("dcduanti");
+						},
+					},
+				},
+				intro: {
+					markcount(storage, player) {
+						return player.countMark("dcduanti_counter");
+					},
+					content(storage, player) {
+						return `<li>已使用过${get.cnNumber(player.countMark("dcduanti_counter"))}张牌<br><li>已以此法增加${player.countMark("dcduanti")}点体力上限`;
+					},
 				},
 			},
 			dcshicao: {
@@ -234,8 +259,10 @@ game.import("character", function () {
 						return ui.create.dialog("###识草###选择一种类型与要摸牌的来源", [["basic", "trick", "equip"].map(type => [type, get.translation(type)]), "tdnodes"], [["牌堆顶", "牌堆底"], "tdnodes"]);
 					},
 					check(button) {
-						const aiStorage = get.player().getStorage("dcshicao_aiRecord");
-						if (aiStorage.length > 0 && get.name(ui.cardPile.lastChild, false) === get.name(aiStorage.lastItem, false)) {
+						const player = get.player();
+						const bottom = player.storage.dcshicao_bottom,
+							aiStorage = player.getStorage("dcshicao_aiRecord");
+						if (bottom && aiStorage.length > 0 && get.name(ui.cardPile.lastChild, false) === get.name(aiStorage.lastItem, false)) {
 							if (button.link === "牌堆底" || button.link === get.type2(aiStorage.lastItem, false)) return 20;
 						}
 						if (button.link === "牌堆顶" || button.link === "basic") return 10;
@@ -247,6 +274,7 @@ game.import("character", function () {
 					},
 					select: 2,
 					backup(links, player) {
+						if (links[0].includes("牌堆")) links.reverse();
 						return {
 							audio: "dcshicao",
 							type: links[0],
@@ -267,18 +295,20 @@ game.import("character", function () {
 								const drawnCards = await next.forResult();
 								if (get.type2(drawnCards[0], player) === type) return;
 								let cards;
-								if (bottom) {
+								if (!bottom) {
 									cards = get.bottomCards(2);
 									cards.reverse();
 								} else cards = get.cards(2);
 								await game.cardsGotoOrdering(cards);
 								await player.viewCards(`${bottom ? "牌堆顶" : "牌堆底"}的两张牌(靠左的在牌堆更靠上)`, cards);
-								if (bottom) {
-									cards.reverse();
-									delete player.storage.dcshicao_aiRecord;
-								} else {
-									player.storage.dcshicao_aiRecord = cards.slice();
-								}
+								player.storage.dcshicao_record = cards.slice();
+								player.storage.dcshicao_aiRecord = cards.slice();
+								player.storage.dcshicao_bottom = !bottom;
+								const func = lib.skill.dctongguan.localMark,
+									skill = "dcshicao";
+								if (event.player.isUnderControl(true)) func(skill, player);
+								else if (event.isOnline()) player.send(func, skill, player);
+								if (bottom) cards.reverse();
 								await game.cardsGotoPile(cards, bottom ? "insert" : null);
 								player.tempBanSkill("dcshicao");
 							},
@@ -289,6 +319,19 @@ game.import("character", function () {
 					},
 					prompt(links, player) {
 						return `点击“确定”，从${links[1]}摸一张牌`;
+					},
+				},
+				intro: {
+					mark(dialog, content, player) {
+						var cards = player.getStorage("dcshicao_record");
+						if (cards && cards.length) {
+							if (player.isUnderControl(true)) {
+								dialog.addText(`上一次观看的${player.storage.dcshicao_bottom ? "牌堆底" : "牌堆顶"}的牌：`);
+								dialog.addAuto(cards);
+							} else {
+								return "不给看";
+							}
+						}
 					},
 				},
 				subSkill: {
