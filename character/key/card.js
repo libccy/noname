@@ -11,12 +11,12 @@ const cards = {
 		content() {
 			"step 0";
 			target.draw();
-			("step 1");
+			"step 1";
 			var hs = target.getCards("he");
 			if (!hs.length) event.finish();
 			else if (hs.length == 1) event._result = { bool: true, cards: hs };
 			else target.chooseCard("he", true, "选择一张牌置入仁库");
-			("step 2");
+			"step 2";
 			if (result.bool) {
 				var card = result.cards[0];
 				target.$throw(card, 1000);
@@ -33,10 +33,8 @@ const cards = {
 					var color = get.color(cards[0], false),
 						type = get.type(cards[0], false);
 					for (var i = 1; i < cards.length; i++) {
-						if (color && get.color(cards[i], false) != color)
-							color = false;
-						if (type && get.type(cards[i], false) != type)
-							type = false;
+						if (color && get.color(cards[i], false) != color) color = false;
+						if (type && get.type(cards[i], false) != type) type = false;
 						if (!color && !type) return false;
 					}
 					return true;
