@@ -1,21 +1,6 @@
 const characters = {
 	noname: ["female", "key", 3, ["noname_zhuyuan", "noname_duocai"]],
 
-	key_kud: ["female", "key", 3, ["kud_qiaoshou", "kud_buhui"]],
-	key_misuzu: ["female", "key", 3, ["misuzu_hengzhou", "misuzu_nongyin", "misuzu_zhongxing"]],
-	key_kamome: ["female", "key", 3, ["kamome_yangfan", "kamome_huanmeng", "kamome_jieban"]],
-	key_nao: ["female", "key", 3, ["nao_duyin", "nao_wanxin", "nao_shouqing"]],
-	key_yuuki: ["female", "key", 3, ["yuuki_yicha"]],
-	key_kotarou: ["male", "key", 3, ["kotarou_rewrite", "kotarou_aurora"]],
-	key_tenzen: ["male", "key", 4, ["tenzen_fenghuan", "tenzen_retianquan"]],
-	key_kyouko: ["female", "key", 3, ["kyouko_rongzhu", "kyouko_gongmian"]],
-	key_kyou: ["female", "key", 3, ["kyou_zhidian", "kyou_duanfa"]],
-	key_seira: ["female", "key", 3, ["seira_xinghui", "seira_yuanying"]],
-	key_kiyu: ["female", "key", 3, ["kiyu_yuling", "kiyu_rexianyu"]],
-	key_tomoyo: ["female", "key", 4, ["tomoyo_wuwei", "tomoyo_zhengfeng"]],
-	key_minagi: ["female", "key", 3, ["minagi_peiquan", "minagi_huanliu"]],
-	key_michiru: ["female", "key", 3, ["michiru_sheyuan"]],
-
 	ns_huangchengyan: ["male", "shu", 3, ["nslongyue", "nszhenyin"]],
 	ns_sunchensunjun: ["male", "wu", 5, ["nsxianhai", "nsxingchu"]],
 	ns_yuanxi: ["male", "qun", 4, ["nsshengyan", "nsdaizhan"]],

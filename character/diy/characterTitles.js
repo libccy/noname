@@ -1,18 +1,4 @@
 export default {
-	key_kud: "#b千夜",
-	key_misuzu: "#b长发及腰黑长直",
-	key_kamome: "#b仿生纱",
-	key_nao: "#b潮鸣",
-	key_kyou: "#b长发及腰黑长直",
-	key_yuuki: "#b4399司命",
-	key_kyouko: "#b阿阿阿687",
-	key_tenzen: "#b皋耳击",
-	key_kotarou: "#bb1154486224",
-	key_seira: "#b阿开木木W🍀",
-	key_kiyu: "#b无面◎隐者",
-	key_tomoyo: "#b长发及腰黑长直",
-	key_minagi: "#b无面◎隐者",
-
 	ns_huangchengyan: "#g竹邀月",
 	ns_sunchensunjun: "#gVenusjeu",
 	ns_yuanxi: "#g食茸二十四",
