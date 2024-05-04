@@ -32,7 +32,7 @@ const characterReplaces = {
 	chenqun: ["chenqun", "dc_chenqun", "re_chenqun", "old_chenqun"],
 	hanhaoshihuan: ["hanhaoshihuan", "re_hanhaoshihuan"],
 	caozhen: ["caozhen", "re_caozhen", "xin_caozhen", "old_caozhen"],
-	wuyi: ["wuyi", "re_wuyi", "xin_wuyi"],
+	wuyi: ["wuyi", "re_wuyi", "xin_wuyi", "dc_wuyi"],
 	sunluban: ["re_sunluban", "xin_sunluban", "sunluban"],
 	zhuhuan: ["re_zhuhuan", "xin_zhuhuan", "zhuhuan", "old_zhuhuan"],
 	caoxiu: ["caoxiu", "re_caoxiu", "xin_caoxiu", "tw_caoxiu", "old_caoxiu"],
