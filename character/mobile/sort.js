@@ -1,0 +1,41 @@
+const characterSort = {
+	mobile_default: ["mb_sp_guanqiujian", "mb_caomao", "chengji", "lizhaojiaobo", "xin_huojun", "muludawang", "mb_chengui", "mb_huban", "mb_xianglang", "yanxiang", "xin_wuban", "laimin", "baoxin", "jiangji", "liwei", "xin_guozhao", "miheng", "taoqian", "lingcao", "sunru", "lifeng", "zhuling", "liuye", "zhaotongzhaoguang", "majun", "simazhao", "wangyuanji", "pangdegong", "shenpei", "hujinding", "zhangyì", "jiakui", "yangbiao", "chendeng", "dongcheng", "yangyi", "dengzhi", "zhengxuan", "sp_sufei", "furong", "dingyuan", "simashi", "yanghuiyu", "hucheer", "gongsunkang", "nanhualaoxian", "zhouqun", "qiaozhou", "fuqian", "simafu", "mayuanyi", "yanpu", "sunhanhua", "sp_maojie", "peixiu", "sp_jianggan", "ruanhui", "xin_mamidi", "sp_caosong", "yangfu", "wangjun", "sp_pengyang", "qianzhao", "shichangshi", "yangfeng"],
+	mobile_yijiang: ["yj_zhanghe", "yj_zhangliao", "yj_xuhuang", "yj_ganning", "yj_huangzhong", "yj_weiyan", "yj_zhoubuyi"],
+	mobile_standard: ["xin_xiahoudun", "xin_zhangfei"],
+	mobile_shenhua_feng: ["re_xiaoqiao", "xin_zhoutai"],
+	mobile_shenhua_huo: ["re_pangtong", "re_sp_zhugeliang", "re_xunyu", "re_dianwei", "re_yanwen", "xin_yuanshao"],
+	mobile_shenhua_lin: ["re_dongzhuo", "re_sunjian", "re_zhurong"],
+	mobile_shenhua_shan: ["re_liushan", "re_dengai", "re_jiangwei", "re_caiwenji", "re_zhangzhang", "re_sunben"],
+	mobile_shenhua_yin: ["xin_sunliang"],
+	mobile_shenhua_lei: ["re_guanqiujian"],
+	mobile_yijiang1: ["re_xusheng", "re_lingtong", "ol_yujin", "re_wuguotai", "re_gaoshun", "re_caozhi"],
+	mobile_yijiang2: ["xin_liaohua", "xin_caozhang", "re_liubiao", "re_handang", "xin_chengpu", "xin_gongsunzan", "re_zhonghui", "re_bulianshi"],
+	mobile_yijiang3: ["re_liru", "xin_jianyong", "xin_zhuran", "xin_guohuai", "xin_panzhangmazhong", "xin_fuhuanghou", "re_yufan"],
+	mobile_yijiang4: ["xin_zhoucang", "xin_caifuren", "xin_guyong", "xin_sunluban", "xin_caozhen", "xin_jushou", "xin_wuyi", "xin_zhuhuan", "re_chenqun"],
+	mobile_yijiang5: ["xin_zhangyi", "xin_sunxiu", "xin_quancong", "xin_zhuzhi", "xin_caoxiu"],
+	mobile_yijiang67: ["re_jikang"],
+	mobile_changshi: ["scs_zhangrang", "scs_zhaozhong", "scs_sunzhang", "scs_bilan", "scs_xiayun", "scs_hankui", "scs_lisong", "scs_duangui", "scs_guosheng", "scs_gaowang"],
+	mobile_sp: ["old_yuanshu", "re_wangyun", "re_baosanniang", "re_weiwenzhugezhi", "re_zhanggong", "re_xugong", "re_heqi", "liuzan", "xin_hansui", "mb_sunluyu"],
+};
+
+const characterSortTranslate = {
+	mobile_standard: "手杀异构·标准包",
+	mobile_shenhua_feng: "手杀异构·其疾如风",
+	mobile_shenhua_huo: "手杀异构·侵掠如火",
+	mobile_shenhua_lin: "手杀异构·其徐如林",
+	mobile_shenhua_shan: "手杀异构·不动如山",
+	mobile_shenhua_yin: "手杀异构·难知如阴",
+	mobile_shenhua_lei: "手杀异构·动如雷霆",
+	mobile_yijiang1: "手杀异构·将1",
+	mobile_yijiang2: "手杀异构·将2",
+	mobile_yijiang3: "手杀异构·将3",
+	mobile_yijiang4: "手杀异构·将4",
+	mobile_yijiang5: "手杀异构·将5",
+	mobile_yijiang67: "手杀异构·原创设计",
+	mobile_sp: "手杀异构·SP",
+	mobile_default: "袖里乾坤",
+	mobile_others: "其他",
+	mobile_changshi: "十常侍单体",
+};
+
+export { characterSort, characterSortTranslate };

@@ -1,0 +1,25 @@
+const characters = {
+	clan_wuxian: ["female", "shu", 3, ["clanyirong", "clanguixiang", "clanmuyin"], ["clan:陈留吴氏"]],
+	clan_wuban: ["male", "shu", 4, ["clanzhanding", "clanmuyin"], ["clan:陈留吴氏"]],
+	clan_xunshu: ["male", "qun", 3, ["clanshenjun", "clanbalong", "clandaojie"], ["clan:颍川荀氏"]],
+	clan_xunchen: ["male", "qun", 3, ["clansankuang", "clanbeishi", "clandaojie"], ["clan:颍川荀氏"]],
+	clan_xuncai: ["female", "qun", 3, ["clanlieshi", "clandianzhan", "clanhuanyin", "clandaojie"], ["clan:颍川荀氏"]],
+	clan_xuncan: ["male", "wei", 3, ["clanyunshen", "clanshangshen", "clanfenchai", "clandaojie"], ["clan:颍川荀氏"]],
+	clan_hanshao: ["male", "qun", 3, ["clanfangzhen", "clanliuju", "clanxumin"], ["clan:颍川韩氏"]],
+	clan_hanrong: ["male", "qun", 3, ["clanlianhe", "clanhuanjia", "clanxumin"], ["clan:颍川韩氏"]],
+	clan_wukuang: ["male", "qun", 4, ["clanlianzhu", "clanmuyin"], ["clan:陈留吴氏"]],
+	clan_wangling: ["male", "wei", 4, ["clanbolong", "clanzhongliu"], ["clan:太原王氏"]],
+	clan_zhongyan: ["female", "jin", 3, ["clanguangu", "clanxiaoyong", "clanbaozu"], ["clan:颍川钟氏"]],
+	clan_wangyun: ["male", "qun", 3, ["clanjiexuan", "clanmingjie", "clanzhongliu"], ["clan:太原王氏"]],
+	clan_wanghun: ["male", "jin", 3, ["clanfuxun", "clanchenya", "clanzhongliu"], ["clan:太原王氏"]],
+	clan_zhonghui: ["male", "wei", "3/4", ["clanyuzhi", "clanxieshu", "clanbaozu"], ["clan:颍川钟氏", "die_audio:clan_zhonghui:clan_zhonghui2:clan_zhonghui3"]],
+	clan_zhongyu: ["male", "wei", 3, ["clanjiejian", "clanhuanghan", "clanbaozu"], ["clan:颍川钟氏"]],
+	clan_wanglun: ["male", "jin", 3, ["clanqiuxin", "clanjianyuan", "clanzhongliu"], ["clan:太原王氏"]],
+	clan_xunyou: ["male", "wei", 3, ["clanbaichu", "clandaojie"], ["clan:颍川荀氏"]],
+	clan_wuqiao: ["male", "jin", 4, ["clanqiajue", "clanmuyin"], ["clan:陈留吴氏"]],
+	clan_wangguang: ["male", "wei", 3, ["clanlilun", "clanjianji", "clanzhongliu"], ["clan:太原王氏"]],
+	clan_wangmingshan: ["male", "wei", 3, ["clantanque", "clanshengmo", "clanzhongliu"], ["clan:太原王氏"]],
+	clan_zhongyao: ["male", "wei", 3, ["clanchengqi", "clanjieli", "clanbaozu"], ["clan:颍川钟氏"]],
+};
+
+export default characters;
