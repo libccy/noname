@@ -13,9 +13,6 @@ const characters = {
 	shen_machao: ["male", "shen", 4, ["shouli", "hengwu"], ["shu"]],
 	shen_sunquan: ["male", "shen", 4, ["junkyuheng", "junkdili"], ["wu"]],
 	shen_jiangwei: ["male", "shen", 4, ["jiufa", "tianren", "pingxiang"], ["shu"]],
-	key_kagari: ["female", "shen", 3, ["kagari_zongsi"], ["key"]],
-	key_shiki: ["female", "shen", "3/5", ["shiki_omusubi"], ["key"]],
-	db_key_hina: ["female", "key", 3, ["hina_shenshi", "hina_xingzhi"], ["doublegroup:key:shen"]],
 
 	shen_sunce: ["male", "shen", "1/6", ["yingba", "scfuhai", "pinghe"], ["wu"]],
 	shen_xunyu: ["male", "shen", 3, ["tianzuo", "lingce", "dinghan"], ["wei", "clan:颍川荀氏"]],

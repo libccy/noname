@@ -1422,6 +1422,7 @@ window.noname_character_rank = {
 		"xia_shie",
 		"clan_wangmingshan",
 		"yj_simafu",
+		"dc_wuyi",
 	],
 	bm: [
 		"kongrong",
@@ -1728,6 +1729,7 @@ window.noname_character_rank = {
 	],
 	rarity: {
 		legend: [
+			"dc_wuyi",
 			"sp_sunce",
 			"star_caoren",
 			"dc_zhaoyun",

@@ -1,3 +1,5 @@
+import { lib, game, ui, get, ai, _status } from "../../noname.js";
+
 const characterFilters = {
 	old_lingju(mode) {
 		return mode == "identity";

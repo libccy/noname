@@ -2,6 +2,110 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//名将吴懿
+	dcbenxi: {
+		trigger: {
+			player: ["loseAfter"],
+			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
+		},
+		forced: true,
+		zhuanhuanji: true,
+		filter(event, player) {
+			const evt = event.getl(player);
+			return evt && evt.hs && evt.hs.length > 0;
+		},
+		async content(event, trigger, player) {
+			player.changeZhuanhuanji("dcbenxi");
+			if (player.storage.dcbenxi) {
+				const map = lib.skill.dcbenxi.getMap(),
+					list = Object.keys(map);
+				if (list.length > 0) {
+					const skill = list.randomGet(),
+						voiceMap = game.parseSkillTextMap(skill, map[skill]);
+					console.log(voiceMap);
+					player.storage.dcbenxi_pending = skill;
+					findaudio: for (let data of voiceMap) {
+						if(!data.text) continue;
+						const pinyins = get.pinyin(data.text, false);
+						for (let i = 0; i < pinyins.length - 1; i++) {
+							if (pinyins[i] === "wu" && pinyins[i + 1] === "yi") {
+								player.chat(data.text);
+								game.broadcastAll(file => game.playAudio(file), data.file)
+								break findaudio;
+							}
+						}
+					}
+				}
+			} else {
+				const skill = player.storage.dcbenxi_pending;
+				if (skill) {
+					if (player.hasSkill(skill, null, false)){
+						const targets = game.filterPlayer(current => current != player).sortBySeat();
+						player.line(targets, 'fire');
+						for(let target of targets){
+							if(target.isIn()) await target.damage();
+						}
+					}
+					else{
+						await player.addTempSkills([skill], {player: "phaseBegin"});
+					}
+					delete player.storage.dcbenxi_pending;
+				}
+			}
+		},
+		onremove(player){
+			delete player.storage.dcbenxi;
+			delete player.storage.dcbenxi_pending;
+		},
+		mark: true,
+		marktext: "☯",
+		intro: {
+			mark(dialog, storage, player){
+				if(storage){
+					const skill = player.storage.dcbenxi_pending;
+					if(skill){
+						dialog.addText(`锁定技，当你下次失去手牌后，你获得技能〖${get.translation(skill)}〗直到你的下回合开始。若已获得该技能，则改为对所有其他角色各造成1点伤害。`, false);
+						dialog.add('<div><div class="skill">【' + get.translation(lib.translate[skill + "_ab"] || get.translation(skill).slice(0, 2)) + "】</div><div>" + get.skillInfoTranslation(skill, player) + "</div></div>");
+					}
+				}
+				else{
+					return "锁定技。当你下次失去手牌后，你随机念出一句拼音中含有“wu,yi”的台词。";
+				}
+			},
+		},
+		getMap() {
+			if (!_status.dcbenxi_map) {
+				_status.dcbenxi_map = {};
+				let list;
+				if (_status.connectMode) {
+					list = get.charactersOL();
+				} else {
+					list = get.gainableCharacters();
+				}
+				list.forEach(name => {
+					if (name !== "dc_wuyi") {
+						const skills = get.character(name).skills;
+						skills.forEach(skill => {
+							if (skill in _status.dcbenxi_map) return;
+							const voices = game.parseSkillText(skill, name);
+							if (
+								voices.some(text => {
+									const pinyins = get.pinyin(text, false);
+									for (let i = 0; i < pinyins.length - 1; i++) {
+										if (pinyins[i] === "wu" && pinyins[i + 1] === "yi") return true;
+									}
+									return false;
+								})
+							) {
+								_status.dcbenxi_map[skill] = name;
+							}
+						});
+					}
+				});
+			}
+			return _status.dcbenxi_map;
+		},
+	},
 	//新InitFilter测试高达一号
 	//打赢复活赛的牢达[哭]
 	dclonghun: {
