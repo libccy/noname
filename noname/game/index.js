@@ -1581,6 +1581,61 @@ export class Game {
 		return getAudioList(skill, { audioname: [], history: [] }, skillInfo);
 	}
 	/**
+	 * 获取角色死亡时能播放的所有阵亡语音
+	 * @param { string | Player } player  角色名
+	 * @returns { any[] }  语音地址列表
+	 */
+	parseDieTextMap(player){
+		let name, rawName;
+		if (typeof player === "string") {
+			name = player;
+			rawName = name;
+		}
+		else if (get.itemtype(player) === "player") {
+			// @ts-ignore
+			name = player.skin.name || player.name;
+			rawName = player.name;
+		}
+		const info = get.character(name), datas = [];
+		let dieAudios;
+		if(info && info.dieAudios.length > 0){
+			dieAudios = info.dieAudios;
+		}
+		//@mengxinzxz写的屎山
+		else if(rawName !== name && lib.characterSubstitute[rawName] && lib.characterSubstitute[rawName].some((i) => i[0] == name)){
+			const trashes = lib.characterSubstitute[rawName].find((i) => i[0] == name)[1];
+			const newCharacter = get.convertedCharacter(['','',0,[],trashes]);
+			dieAudios = newCharacter.dieAudios;
+		}
+		if(dieAudios && dieAudios.length > 0){
+			dieAudios.forEach(item => {
+				let key, file;
+				if(item.startsWith("ext:")){
+					const audioData = item.split(":");
+					key = audioData[2];
+					file = item;
+				}
+				else {
+					key = item;
+					file = `die/${item}.mp3`;
+				}
+				const data = {key, file}
+				if(lib.translate[`#${key}:die`]) data.text = lib.translate[`#${key}:die`];
+				datas.push(data);
+			});
+		}
+		else {
+			const data = {
+				key: name,
+				file: `die/${name}.mp3`,
+				isDefault: true,
+			}
+			if(lib.translate[`#${name}:die`]) data.text = lib.translate[`#${name}:die`];
+			datas.push(data);
+		}
+		return datas;
+	}
+	/**
 	 *
 	 * @param { string } skill
 	 * @param { Player | string } player
