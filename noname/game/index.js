@@ -1611,8 +1611,7 @@ export class Game {
 			dieAudios.forEach(item => {
 				let key, file;
 				if(item.startsWith("ext:")){
-					const audioData = item.split(":");
-					key = audioData[2];
+					key = item.slice(4).split("/")[1];
 					file = item;
 				}
 				else {
