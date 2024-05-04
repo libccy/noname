@@ -4930,7 +4930,10 @@ const skills = {
 		content() {
 			"step 0";
 			trigger.source.chooseCard("是否响应" + get.translation(player) + "的【附义】？", "弃置两张牌，令其获得其武将牌上的一个技能", "he", 2, lib.filter.cardDiscardable).set("ai", () => {
-				if (get.attitude(_status.event.player, _status.event.getParent().player) <= 2) return 0;
+				let zhu = _status.event.getParent().player;
+				if (!zhu.getStockSkills(true, true).some(skill => {
+					return !zhu.hasSkill(skill, null, false, false);
+				}) || get.attitude(_status.event.player, zhu) <= 2) return 0;
 				return 6 - get.value(card);
 			});
 			"step 1";
@@ -4941,6 +4944,7 @@ const skills = {
 					return !player.hasSkill(skill, null, false, false);
 				});
 				if (skills.length == 1) event._result = { control: skills[0] };
+				else if (!skills.length) event.finish();
 				else
 					trigger.source
 						.chooseControl(skills)
