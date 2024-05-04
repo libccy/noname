@@ -133,4 +133,9 @@ export default {
 	"#clanzhongliu_clan_wangmingshan1": null,
 	"#clanzhongliu_clan_wangmingshan2": null,
 	"#clan_wangmingshan:die": null,
+	"#clanchengqi1": "世有十万字形，亦当有十万字体。",
+	"#clanchengqi2": "笔画如骨，不可拘于一形。",
+	"#clanjieli1": "子不学难成其材，子不教难筑其器。",
+	"#clanjieli2": "此子顽劣如斯，必当严加管教。",
+	"#clan_zhongyao:die": "幼子得宠而无忌，恐生无妄之祸……"
 };

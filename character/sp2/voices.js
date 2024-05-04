@@ -334,7 +334,7 @@ export default {
 	"#zhangji:die": "哪，哪里来的乱箭？",
 	"#xinfu_xingluan1": "大兴兵争，长安当乱。",
 	"#xinfu_xingluan2": "勇猛兴军，乱世当立。",
-	"#fanchou:die": "唉，稚然，疑心甚重。",
+	"#fanchou:die": "唉，稚然疑心，甚重。",
 	"#xinfu_tanbei1": "此机，我怎么会错失。",
 	"#xinfu_tanbei2": "你的东西，现在是我的了！",
 	"#xinfu_sidao1": "连发伺动，顺手可得。",
