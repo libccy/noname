@@ -19,6 +19,7 @@ const characters = {
 	sp_fuwan: ["male", "qun", 3, ["spfengyin", "spchizhong"]],
 	old_lingju: ["female", "qun", 3, ["jieyuan", "fenxin_old"]],
 	sp_mushun: ["male", "qun", 4, ["moukui"]],
+	dc_wuyi: ["male", "shu", 4, ["dcbenxi"]],
 };
 
 export default characters;

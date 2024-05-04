@@ -10,6 +10,7 @@ import { characterSort, characterSortTranslate } from "./sort.js";
 game.import("character", function () {
 	return {
 		name: "key",
+		connect: true,
 		character: { ...characters },
 		characterSort: {
 			key: characterSort,

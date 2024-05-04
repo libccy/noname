@@ -1450,7 +1450,7 @@ export class Game {
 	 * //如果key中包含发动技能的角色名player，则直接改用info.audioname2[player]来播放语音
 	 * ```
 	 */
-	parseSkillAudio(skill, player, skillInfo, useRawAudio) {
+	parseSkillAudio(skill, player, skillInfo) {
 		if (typeof player === "string") player = { name: player };
 		else if (typeof player !== "object" || player === null) player = {};
 
@@ -1537,7 +1537,7 @@ export class Game {
 				if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
 				if (!/\.\w+$/.test(audioInfo) && !["data:", "blob:"].some(name => audioInfo.startsWith(name))) format = ".mp3";
 				if (path && format) return parseAudio(audioInfo, options, [true, 2]);
-				return [useRawAudio ? audioInfo : `${path}${audioInfo}${format}`];
+				return [`${path}${audioInfo}${format}`];
 			}
 
 			let _audioname = getName(i => audioname.includes(i));
@@ -1548,8 +1548,7 @@ export class Game {
 			const audioList = [];
 			list[2] = parseInt(list[2]);
 			for (let i = 1; i <= list[2]; i++) {
-				if (useRawAudio) audioList.push(`${skill}${_audioname}${i}`);
-				else audioList.push(`${list[1] || "skill"}/${skill}${_audioname}${i}.${list[3] || "mp3"}`);
+				audioList.push(`${list[1] || "skill"}/${skill}${_audioname}${i}.${list[3] || "mp3"}`);
 			}
 			return audioList;
 		}
@@ -1564,11 +1563,10 @@ export class Game {
 	 * @returns { string[] }  语音地址列表
 	 */
 	parseSkillText(skill, player, skillInfo) {
-		const audios = game.parseSkillAudio(skill, player, skillInfo, true);
+		const audios = game.parseSkillTextMap(skill, player, skillInfo);
 		const voiceMap = [];
 		audios.forEach(audioname => {
-			const voiceText = lib.translate[`#${audioname}`];
-			if (voiceText) voiceMap.push(voiceText);
+			if(audioname.text) voiceMap.push(audioname.text);
 		});
 		return voiceMap;
 	}
@@ -1577,16 +1575,112 @@ export class Game {
 	 * @param { string } skill  技能名
 	 * @param { Player | Object | string } [player]  角色/角色名
 	 * @param { skillInfo | audioInfo } [skillInfo]  预设的skillInfo/audioInfo(转为skillInfo)，覆盖lib.skill[skill]
-	 * @returns { Object }  语音地址列表
+	 * @returns { any[] }  语音地址列表
 	 */
 	parseSkillTextMap(skill, player, skillInfo) {
-		const audios = game.parseSkillAudio(skill, player, skillInfo, true);
-		const voiceMap = {};
-		audios.forEach(audioname => {
-			const voiceText = lib.translate[`#${audioname}`];
-			if (voiceText) voiceMap[audioname] = voiceText;
-		});
-		return voiceMap;
+		if (typeof player === "string") player = { name: player };
+		else if (typeof player !== "object" || player === null) player = {};
+
+		if (skillInfo && (typeof skillInfo !== "object" || Array.isArray(skillInfo))) skillInfo = { audio: skillInfo };
+
+		const checkSkill = (skill, history) => {
+			if (!lib.skill[skill]) return false;
+			if (!history.includes(skill)) return true;
+			if (history[0] === skill) return false;
+			//deadlock
+			throw new RangeError(`parseSkillAudio: ${skill} in ${history}forms a deadlock`);
+		};
+
+		const getName = filter => {
+			const name = (player.tempname || []).find(i => filter(i));
+			return (
+				name ||
+				[player.name, player.name1, player.name2].reduce((result, name) => {
+					if (result) return result;
+					if (!name) return result;
+					if (filter(name)) return name;
+					let tempname = (get.character(name).trashBin || []).find(tag => tag.startsWith("tempname:"));
+					if (!tempname) return result;
+					tempname = tempname
+						.split(":")
+						.slice(1)
+						.find(i => filter(i));
+					return tempname || result;
+				}, void 0)
+			);
+		};
+
+		function getAudioList(skill, options, skillInfo) {
+			const info = skillInfo || lib.skill[skill];
+			if (!info) {
+				console.error(new ReferenceError(`parseSkillAudio: Cannot find ${skill} in lib.skill`));
+				return parseAudio(skill, options, [true, 2]);
+			}
+
+			const { audioname, history } = options;
+			history.unshift(skill);
+			let audioInfo = info.audio;
+			if (Array.isArray(info.audioname)) audioname.addArray(info.audioname);
+			if (info.audioname2) audioInfo = info.audioname2[getName(i => info.audioname2[i])] || audioInfo;
+			if (typeof audioInfo === "function") audioInfo = audioInfo(player);
+
+			return parseAudio(skill, options, audioInfo);
+		}
+
+		function parseAudio(skill, options, audioInfo) {
+			const audioname = options.audioname.slice();
+			const history = options.history.slice();
+			options = { audioname, history };
+			if (Array.isArray(audioInfo)) {
+				if (typeof audioInfo[0] === "string" && typeof audioInfo[1] === "number") {
+					// [audioname, number]
+					if (checkSkill(audioInfo[0], history)) return getAudioList(audioInfo[0], options).slice(0, audioInfo[1]);
+					return parseAudio(audioInfo[0], options, audioInfo[1]);
+				}
+				return audioInfo.reduce((total, i) => total.addArray(parseAudio(skill, options, i)), []);
+			}
+
+			if (!["string", "number", "boolean"].includes(typeof audioInfo)) return parseAudio(skill, options, [true, 2]);
+			if (audioInfo === false) return [];
+			if (typeof audioInfo === "string" && checkSkill(audioInfo, history)) return getAudioList(audioInfo, options);
+
+			audioInfo = String(audioInfo);
+			let list = audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/); // [path, number|true, format]
+			if (!list) {
+				let path = "",
+					format = "";
+				if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
+				if (!/\.\w+$/.test(audioInfo) && !["data:", "blob:"].some(name => audioInfo.startsWith(name))) format = ".mp3";
+				if (path && format) return parseAudio(audioInfo, options, [true, 2]);
+				
+				const key = audioInfo, file = `${path}${audioInfo}${format}`;
+				const data = {key, file};
+				if(lib.translate[`#${key}`]) data.text = lib.translate[`#${key}`];
+				return [data];
+			}
+
+			let _audioname = getName(i => audioname.includes(i));
+			_audioname = _audioname ? `_${_audioname}` : "";
+
+			if (list[2] === "true") {
+				const key = `${skill}${_audioname}`, file = `${list[1] || "skill"}/${skill}${_audioname}.${list[3] || "mp3"}`;
+				const data = {key, file};
+				if(lib.translate[`#${key}`]) data.text = lib.translate[`#${key}`];
+				return [data];
+			}
+
+			const audioList = []
+			list[2] = parseInt(list[2]);
+			for (let i = 1; i <= list[2]; i++) {
+				const key = `${skill}${_audioname}${i}`, file = `${list[1] || "skill"}/${skill}${_audioname}${i}.${list[3] || "mp3"}`;
+				const data = {key, file};
+				if(lib.translate[`#${key}`]) data.text = lib.translate[`#${key}`];
+				audioList.push(data);
+			}
+			return audioList;
+		}
+
+		return getAudioList(skill, { audioname: [], history: [] }, skillInfo);
 	}
 	/**
 	 *

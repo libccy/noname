@@ -95,11 +95,10 @@ const translates = {
 	dczhanjiang: "斩将",
 	dczhanjiang_info: "准备阶段，若场上有【青釭剑】，则你可以获得之。",
 
-	collab_olympic: "OL·伦敦奥运会",
-	collab_tongque: "OL·铜雀台",
-	collab_duanwu: "新服·端午畅玩",
-	collab_decade: "新服·创玩节",
-	collab_remake: "新服·共创武将",
+	dc_wuyi: "经典吴懿",
+	dc_wuyi_prefix: "经典",
+	dcbenxi: "奔袭",
+	dcbenxi_info: "转换技，锁定技。当你失去手牌后，阴：系统随机检索出一句转换为拼音后包含“wu,yi”的技能台词，然后你念出此台词。阳：你获得上次所念出的台词对应的技能；若你已拥有该技能，则改为对其他角色各造成1点伤害。",
 };
 
 export default translates;
