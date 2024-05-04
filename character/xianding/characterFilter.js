@@ -1,3 +1,5 @@
+import { lib, game, ui, get, ai, _status } from "../../noname.js";
+
 const characterFilters = {
 	// leitong(mode) {
 	// 	return mode != "identity" && mode != "guozhan";
