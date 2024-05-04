@@ -8723,6 +8723,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			gzyimie: {
 				audio: "yimie",
 				inherit: "yimie",
+				mainSkill: true,
 				init: function (player) {
 					if (player.checkMainSkill("gzyimie")) {
 						player.removeMaxHp(2);
@@ -20769,6 +20770,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						player.removeMaxHp();
 					}
 				},
+				viceSkill: true,
 				group: ["hunshang_yingzi", "hunshang_yinghun"],
 			},
 			reyingzi_sunce: { audio: 2 },
