@@ -3639,16 +3639,17 @@ export class Click {
 				const voiceMap = game.parseSkillText(skill, name, null, true);
 				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
 			});
-			if (dieAudios.length || skillAudioMap.size > 0){
+			if (dieAudios.length || skillAudioMap.size > 0) {
 				introduction.appendChild(document.createElement("hr"));
 
-				if(skillAudioMap.size > 0){
+				if (skillAudioMap.size > 0) {
 					const skillNameSpan = document.createElement("span");
 					skillNameSpan.innerHTML = `技能台词<br>`;
 					introduction.appendChild(skillNameSpan);
 
 					skillAudioMap.forEach((texts, skill) => {
-						const skillNameSpan = document.createElement("span"), skillNameSpanStyle = skillNameSpan.style;
+						const skillNameSpan = document.createElement("span"),
+							skillNameSpanStyle = skillNameSpan.style;
 						skillNameSpanStyle.fontWeight = "bold";
 						skillNameSpan.innerHTML = `<br>${get.translation(skill)}<br>`;
 						introduction.appendChild(skillNameSpan);
@@ -3656,21 +3657,22 @@ export class Click {
 							const skillTextSpan = document.createElement("span");
 							skillTextSpan.innerHTML = `${index + 1}. ${text}<br>`;
 							introduction.appendChild(skillTextSpan);
-						})
+						});
 					});
 				}
 
-				if(dieAudios.length > 0){
-					const skillNameSpan = document.createElement("span"), skillNameSpanStyle = skillNameSpan.style;
+				if (dieAudios.length > 0) {
+					const skillNameSpan = document.createElement("span"),
+						skillNameSpanStyle = skillNameSpan.style;
 					skillNameSpanStyle.fontWeight = "bold";
 					skillNameSpan.innerHTML = `<br>阵亡台词`;
 					introduction.appendChild(skillNameSpan);
 
 					dieAudios.forEach((item, index) => {
 						const dieTextSpan = document.createElement("span");
-						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ''}${item.text}`;
+						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${item.text}`;
 						introduction.appendChild(dieTextSpan);
-					})
+					});
 				}
 			}
 			const introduction2 = ui.create.div(".characterintro.intro2", uiintro);
