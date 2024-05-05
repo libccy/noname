@@ -3633,21 +3633,23 @@ export class Click {
 			htmlParser.innerHTML = get.characterIntro(name);
 			Array.from(htmlParser.childNodes).forEach((value) => introduction.appendChild(value));
 			//添加技能语音部分
-			const dieAudio = lib.translate[`#${name}:die`];
+			const dieAudios = game.parseDieTextMap(name).filter(i => "text" in i);
 			const skillAudioMap = new Map();
 			nameInfo.skills.forEach(skill => {
 				const voiceMap = game.parseSkillText(skill, name, null, true);
 				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
 			});
-			if (dieAudio || skillAudioMap.size > 0){
+			if (dieAudios.length || skillAudioMap.size > 0) {
 				introduction.appendChild(document.createElement("hr"));
-				const skillNameSpan = document.createElement("span");
-				skillNameSpan.innerHTML = `技能台词<br>`;
-				introduction.appendChild(skillNameSpan);
 
-				if(skillAudioMap.size > 0){
+				if (skillAudioMap.size > 0) {
+					const skillNameSpan = document.createElement("span");
+					skillNameSpan.innerHTML = `技能台词<br>`;
+					introduction.appendChild(skillNameSpan);
+
 					skillAudioMap.forEach((texts, skill) => {
-						const skillNameSpan = document.createElement("span"), skillNameSpanStyle = skillNameSpan.style;
+						const skillNameSpan = document.createElement("span"),
+							skillNameSpanStyle = skillNameSpan.style;
 						skillNameSpanStyle.fontWeight = "bold";
 						skillNameSpan.innerHTML = `<br>${get.translation(skill)}<br>`;
 						introduction.appendChild(skillNameSpan);
@@ -3655,18 +3657,22 @@ export class Click {
 							const skillTextSpan = document.createElement("span");
 							skillTextSpan.innerHTML = `${index + 1}. ${text}<br>`;
 							introduction.appendChild(skillTextSpan);
-						})
+						});
 					});
 				}
-				if(dieAudio){
-					const skillNameSpan = document.createElement("span"), skillNameSpanStyle = skillNameSpan.style;
+
+				if (dieAudios.length > 0) {
+					const skillNameSpan = document.createElement("span"),
+						skillNameSpanStyle = skillNameSpan.style;
 					skillNameSpanStyle.fontWeight = "bold";
-					skillNameSpan.innerHTML = `<br>阵亡台词<br>`;
+					skillNameSpan.innerHTML = `<br>阵亡台词`;
 					introduction.appendChild(skillNameSpan);
-					
-					const skillTextSpan = document.createElement("span");
-					skillTextSpan.innerHTML = `${dieAudio}`;
-					introduction.appendChild(skillTextSpan);
+
+					dieAudios.forEach((item, index) => {
+						const dieTextSpan = document.createElement("span");
+						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${item.text}`;
+						introduction.appendChild(dieTextSpan);
+					});
 				}
 			}
 			const introduction2 = ui.create.div(".characterintro.intro2", uiintro);

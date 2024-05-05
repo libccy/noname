@@ -8786,38 +8786,16 @@ export const Content = {
 			_status.dying.remove(player);
 
 			if (lib.config.background_speak) {
-				const name = player.skin.name || player.name;
-				const goon = !lib.character[name];
-				if (goon)
-					lib.character[name] = [
-						"",
-						"",
-						0,
-						[],
-						((lib.characterSubstitute[player.name] || []).find((i) => i[0] == name) || [
-							name,
-							[],
-						])[1],
-					];
-				if (lib.character[name][4].some((tag) => /^die:.+$/.test(tag))) {
-					var tag = lib.character[name][4].find((tag) => /^die:.+$/.test(tag));
-					var reg = new RegExp("^ext:(.+)?/");
-					var match = tag.match(/^die:(.+)$/);
-					if (match) {
-						var path = match[1];
-						if (reg.test(path)) path = path.replace(reg, (_o, p) => `../extension/${p}/`);
-						game.playAudio(path);
-					}
-				} else if (lib.character[name][4].some((tag) => tag.startsWith("die_audio"))) {
-					var tag = lib.character[name][4].find((tag) => tag.startsWith("die_audio"));
-					var list = tag.split(":").slice(1);
-					game.playAudio("die", list.length ? list.randomGet() : name);
-				} else {
+				const audios = game.parseDieTextMap(player).randomGet();
+				if (audios.isDefault) {
+					const name = audios.key;
 					game.playAudio("die", name, function () {
 						game.playAudio("die", name.slice(name.indexOf("_") + 1));
 					});
 				}
-				if (goon) delete lib.character[name];
+				else{
+					game.playAudio(audios.file);
+				}
 			}
 		}, player);
 
