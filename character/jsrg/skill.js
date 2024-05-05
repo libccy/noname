@@ -3340,29 +3340,16 @@ const skills = {
 				charlotte: true,
 				direct: true,
 				check: function (event, player) {
-					return (
-						player
-							.getCards("h")
-							.map(i => get.value(i))
-							.reduce((p, c) => p + c, 0) <
-						event.player
-							.getCards("h")
-							.map(i => get.value(i))
-							.reduce((p, c) => p + c, 0) +
-							4 * Math.random()
-					);
+					return (player.getCards("h").map(i => get.value(i)).reduce((p, c) => p + c, 0) < event.player.getCards("h").map(i => get.value(i)).reduce((p, c) => p + c, 0) + 4 * Math.random());
 				},
 				content: function () {
 					"step 0";
+					player.unmarkAuto("jsrgguiji_swapback", [trigger.player]);
 					if (trigger.name == "phaseUse") {
-						player
-							.chooseBool(get.prompt("jsrgguiji_swapback", trigger.player), "与其交换手牌。")
-							.set("ai", () => {
-								return get.event("bool");
-							})
-							.set("bool", lib.skill.jsrgguiji_swapback.check(trigger, player) > 0);
+						player.chooseBool(get.prompt("jsrgguiji_swapback", trigger.player), "与其交换手牌。").set("ai", () => {
+							return get.event("bool");
+						}).set("bool", lib.skill.jsrgguiji_swapback.check(trigger, player) > 0);
 					} else {
-						player.unmarkAuto("jsrgguiji_swapback", [trigger.player]);
 						event.finish();
 					}
 					"step 1";
@@ -3370,7 +3357,6 @@ const skills = {
 						player.logSkill("jsrgguiji_swapback", trigger.player);
 						player.swapHandcards(trigger.player);
 					}
-					player.unmarkAuto("jsrgguiji_swapback", [trigger.player]);
 				},
 				intro: {
 					content: "$的下个出牌阶段结束时，你可以与其交换手牌",
