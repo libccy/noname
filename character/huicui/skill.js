@@ -12300,8 +12300,8 @@ const skills = {
 					player.removeSkill("zhiwei2");
 					if (trigger.name != "die" || get.mode() != "guozhan") event.finish();
 					"step 1";
-					if (player.name1 == "gz_luyusheng" || player.name1 == "luyusheng") player.hideCharacter(0);
-					if (player.name2 == "gz_luyusheng" || player.name2 == "luyusheng") player.hideCharacter(1);
+					if (get.character(player.name1, 3).includes("zhiwei")) player.hideCharacter(0);
+					if (get.character(player.name2, 3).includes("zhiwei")) player.hideCharacter(1);
 				},
 			},
 		},
