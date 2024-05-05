@@ -463,6 +463,8 @@ const skills = {
 	},
 	//加纳天善（旧）
 	tenzen_yixing: {
+		unique: true,
+		forceunique: true,
 		trigger: {
 			global: "damageEnd",
 		},
