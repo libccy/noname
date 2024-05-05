@@ -146,6 +146,11 @@ export class Character {
 	 **/
 	clans = [];
 	/**
+	 * 武将牌拥有的全部阵亡语音
+	 * @type { string[] }
+	 **/
+	dieAudios = [];
+	/**
 	 * 武将牌“无法享受到的主公/地主红利”
 	 * @type { string[] }
 	 **/
@@ -191,6 +196,7 @@ export class Character {
 		this.clans = [];
 		this.initFilters = [];
 		this.trashBin = [];
+		this.dieAudios = [];
 	}
 	/**
 	 * @param { any[] } trash
@@ -248,6 +254,10 @@ export class Character {
 				clans.push(item.slice(5));
 			} else if (item.startsWith("InitFilter:")) {
 				this.initFilters = item.slice(11).split(":");
+			} else if (item.startsWith("die:")){
+				this.dieAudios.push(item.slice(4));
+			} else if (item.startsWith("die_audio:")){
+				this.dieAudios = item.slice(10).split(":");
 			} else {
 				keptTrashes.push(item);
 			}
@@ -368,6 +378,10 @@ export class Character {
 		}
 		if (character.initFilters.length > 0) {
 			trashes.push(`InitFilters:${character.initFilters.join(":")}`);
+		}
+		if (character.dieAudios.length > 0) {
+			if (character.dieAudios.length === 1) trashes.push(`die:${character.dieAudios[0]}`)
+			else trashes.push(`die_audio:${character.dieAudios.join(":")}`);
 		}
 
 		return new Proxy(trashes.concat(character.trashBin), {
