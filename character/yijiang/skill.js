@@ -8374,25 +8374,36 @@ const skills = {
 		usable: 1,
 		delay: false,
 		filter: function (event, player) {
-			return player.countCards("h", { color: "red" }) && player.countCards("h", { color: "black" });
+			return player.countCards("h") > 0;
 		},
 		content: function () {
 			"step 0";
 			player.showHandcards();
-			"step 1";
-			player.chooseControl("红色", "黑色").set("ai", function () {
-				var player = _status.event.player;
-				if (player.countCards("h", { color: "red" }) == 1 && player.countCards("h", { color: "black" }) > 1) return "红色";
-				return "黑色";
-			});
-			"step 2";
-			event.control = result.control;
-			var cards;
-			if (event.control == "红色") {
-				cards = player.getCards("h", { color: "red" });
-			} else {
-				cards = player.getCards("h", { color: "black" });
+			const hs = player.getCards("h"), color = get.color(hs[0], player);
+			if (hs.length === 1 || !hs.some((card,index) => {
+				return index > 0 && get.color(card) !== color;
+			})) {
+				event.finish();
 			}
+			"step 1";
+			const list = [], bannedList = [], indexs = Object.keys(lib.color);
+			player.getCards("h").forEach(card => {
+				const color = get.color(card, player);
+				list.add(color);
+				if (!lib.filter.cardDiscardable(card, player, "huaiyi")) bannedList.add(color);
+			});
+			list.removeArray(bannedList);
+			list.sort((a, b) => indexs.indexOf(a) - indexs.indexOf(b));
+			if (!list.length) event.finish();
+			else if(list.length === 1) event._result = {control: list[0]};
+			else player.chooseControl(list.map(i => `${i}2`)).set("ai", function () {
+				var player = _status.event.player;
+				if (player.countCards("h", { color: "red" }) == 1 && player.countCards("h", { color: "black" }) > 1) return 1;
+				return 0;
+			}).set("prompt", "请选择弃置一种颜色的所有手牌");
+			"step 2";
+			event.control = result.control.slice(0, result.control.length - 1);
+			var cards = player.getCards("h", {color: event.control});
 			player.discard(cards);
 			event.num = cards.length;
 			"step 3";
@@ -8431,7 +8442,10 @@ const skills = {
 				return 1;
 			},
 			result: {
-				player: 1,
+				player:(player) => {
+					if (get.color(player.getCards("h")) != "none") return 0;
+					return 1;
+				},
 			},
 		},
 	},

@@ -9318,6 +9318,8 @@ export class Library {
 		none2: "无色",
 		red: "红色",
 		black: "黑色",
+		red2: "红色",
+		black2: "黑色",
 		ok: "确定",
 		ok2: "确定",
 		cancel: "取消",

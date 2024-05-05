@@ -677,7 +677,8 @@ const skills = {
 					content: "expansion",
 					markcount: "expansion",
 					mark(dialog, storage, player) {
-						return "共扣置" + get.cnNumber(player.getExpansions("olqushi_effect").length) + "张“趋”";
+						if (storage.some(source => source.isUnderControl(true))) dialog.add(player.getExpansions("olqushi_effect"));
+						else return "共扣置" + get.cnNumber(player.getExpansions("olqushi_effect").length) + "张“趋”";
 					},
 				},
 				trigger: { player: "phaseJieshuBegin" },
@@ -687,29 +688,18 @@ const skills = {
 					const cards = player.getExpansions("olqushi_effect");
 					if (cards.length) {
 						await player.loseToDiscardpile(cards);
-						const targets = player
-							.getStorage("olqushi_effect")
-							.filter(i => {
-								return i.isIn();
-							})
-							.sortBySeat();
-						const num = Math.min(
-							player
-								.getHistory("useCard", evt => {
-									return evt.targets && evt.targets.length;
-								})
-								.reduce((sum, evt) => {
-									return sum + evt.targets.length;
-								}, 0),
-							5
-						);
-						if (
-							targets.length &&
-							player.getHistory("useCard", evt => {
-								return cards.some(card => get.type2(card) == get.type2(evt.card));
-							}).length &&
-							num
-						) {
+						const targets = player.getStorage("olqushi_effect").filter(i => {
+							return i.isIn();
+						}).sortBySeat();
+						const num = Math.min(player.getHistory("useCard", evt => {
+							return evt.targets && evt.targets.length;
+						}).reduce((targets, evt) => {
+							targets.addArray(evt.targets);
+							return targets;
+						}, []).length, 5);
+						if (targets.length && num>0 && player.getHistory("useCard", evt => {
+							return cards.some(card => get.type2(card) == get.type2(evt.card));
+						}).length) {
 							for (const target of targets) await target.draw(num);
 						}
 					}
