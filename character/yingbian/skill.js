@@ -946,6 +946,7 @@ const skills = {
 		},
 	},
 	gaoling: {
+		unique: true,
 		audio: 2,
 		trigger: { player: "showCharacterAfter" },
 		hiddenSkill: true,

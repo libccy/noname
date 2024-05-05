@@ -4754,6 +4754,7 @@ const skills = {
 		},
 	},
 	yukito_yaxiang: {
+		unique: true,
 		forceunique: true,
 		enable: "chooseToUse",
 		limited: true,
@@ -10573,6 +10574,7 @@ const skills = {
 		},
 	},
 	umi_qihuan: {
+		unique: true,
 		forceunique: true,
 		enable: "chooseToUse",
 		filter(summer, umi) {

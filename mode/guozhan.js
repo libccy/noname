@@ -2674,8 +2674,15 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakezhiwei: {
+				unique: true,
 				audio: "zhiwei",
 				inherit: "zhiwei",
+				filter: function (event, player, name) {
+					if (!game.hasPlayer(current => current != player)) return false;
+					return event.name == "showCharacter" && event.toShow(name => {
+						return get.character(name, 3).includes("fakezhiwei");
+					});
+				},
 				content() {
 					"step 0";
 					player
@@ -4914,6 +4921,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakebaoqie: {
+				unique: true,
 				audio: "baoqie",
 				trigger: { player: "showCharacterEnd" },
 				filter(event, player) {
@@ -5087,6 +5095,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakehuirong: {
+				unique: true,
 				audio: "huirong",
 				trigger: { player: "showCharacterEnd" },
 				filter(event, player) {
@@ -5258,6 +5267,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakeshiren: {
+				unique: true,
 				audio: "shiren",
 				trigger: { player: "showCharacterEnd" },
 				filter(event, player) {
@@ -7524,6 +7534,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			//黄权
 			gzdianhu: {
+				unique: true,
 				audio: "xinfu_dianhu",
 				trigger: { player: "showCharacterAfter" },
 				forced: true,
@@ -20613,6 +20624,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			gzguixiu: {
+				unique: true,
 				audio: "guixiu",
 				trigger: { player: ["showCharacterAfter", "removeCharacterBefore"] },
 				filter: function (event, player) {

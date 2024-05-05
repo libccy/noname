@@ -5075,6 +5075,7 @@ const skills = {
 		},
 	},
 	dcxunbie: {
+		unique: true,
 		audio: 2,
 		trigger: {
 			player: "dying",

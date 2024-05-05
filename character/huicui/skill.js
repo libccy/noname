@@ -12193,7 +12193,9 @@ const skills = {
 		filter: function (event, player, name) {
 			if (player.hasSkill("zhiwei2")) return false;
 			if (!game.hasPlayer(current => current != player)) return false;
-			if (get.mode() == "guozhan") return event.name == "showCharacter" && (event.toShow.includes("gz_luyusheng") || event.toShow.includes("luyusheng"));
+			if (get.mode() == "guozhan") return event.name == "showCharacter" && event.toShow(name => {
+				return get.character(name, 3).includes("zhiwei");
+			});
 			return event.name != "showCharacter" && (name != "phaseBefore" || game.phaseNumber == 0);
 		},
 		content: function () {

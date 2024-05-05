@@ -807,6 +807,7 @@ const skills = {
 	},
 	noname_duocai2: { charlotte: true },
 	nsbizhao: {
+		unique: true,
 		trigger: { player: "showCharacterAfter" },
 		forced: true,
 		hiddenSkill: true,
