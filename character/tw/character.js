@@ -66,7 +66,7 @@ const characters = {
 	tw_daxiaoqiao: ["female", "wu", 3, ["twxingwu", "twpingting"], ["tempname:daxiaoqiao"]],
 	tw_furong: ["male", "shu", 4, ["twxuewei", "twliechi"]],
 	tw_yl_luzhi: ["male", "qun", 3, ["twmingren", "twzhenliang"]],
-	tw_liuzhang: ["male", "qun", 3, ["jutu", "twyaohu", "rehuaibi"]],
+	tw_liuzhang: ["male", "qun", 3, ["jutu", "twyaohu", "rehuaibi"], ["zhu"]],
 	tw_zongyu: ["male", "shu", 3, ["twzhibian", "twyuyan"]],
 	tw_zhouchu: ["male", "wu", 4, ["twguoyi", "twchuhai"]],
 	tw_qiaogong: ["male", "wu", 3, ["twyizhu", "twluanchou"]],

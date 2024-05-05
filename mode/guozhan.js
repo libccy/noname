@@ -5056,11 +5056,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				async content(event, trigger, player) {
 					trigger.targets.length = 0;
 					trigger.all_excluded = true;
-					const cards = trigger.cards.filter(i => !get.owner(i));
+					const cards = trigger.cards.filterInD();
 					if (cards.length && get.type(trigger.card) == "equip") {
 						await player.gain(cards, "gain2");
 						for (let i of cards) {
-							if (get.owner(i) == player && player.hasUseTarget(i)) {
+							if (player.getCards("h").includes(i) && player.hasUseTarget(i)) {
 								await player.chooseUseTarget(i);
 							}
 						}
@@ -6485,30 +6485,32 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				delay: false,
 				content: function () {
 					"step 0";
-					var map = {};
 					player.showHandcards();
-					for (var i of ["red", "black", "none"]) {
-						if (player.countCards("h", { color: i })) map[i] = true;
+					var hs = player.getCards("h"), color = get.color(hs[0], player);
+					if (hs.length === 1 || !hs.some((card,index) => {
+						return index > 0 && get.color(card) !== color;
+					})) {
+						event.finish();
 					}
-					if (Object.keys(map).length < 2) event.finish();
-					else event.map = map;
 					"step 1";
-					var mapx = { red: "红色", black: "黑色", none: "无色" };
-					player
-						.chooseControl(Object.keys(event.map).map((color) => mapx[color]))
-						.set("ai", function () {
-							var list = _status.event.controls;
-							var map = { 红色: "red", 黑色: "black", 无色: "none" };
-							return list.sort(
-								(a, b) =>
-									player.countCards("h", { color: map[a] }) -
-									player.countCards("h", { color: map[b] })
-							)[0];
-						})
-						.set("prompt", "怀异：弃置一种颜色的所有牌");
+					const list = [], bannedList = [], indexs = Object.keys(lib.color);
+					player.getCards("h").forEach(card => {
+						const color = get.color(card, player);
+						list.add(color);
+						if (!lib.filter.cardDiscardable(card, player, "gzrehuaiyi")) bannedList.add(color);
+					});
+					list.removeArray(bannedList);
+					list.sort((a, b) => indexs.indexOf(a) - indexs.indexOf(b));
+					if (!list.length) event.finish();
+					else if(list.length === 1) event._result = {control: list[0]};
+					else player.chooseControl(list.map(i => `${i}2`)).set("ai", function () {
+						var player = _status.event.player;
+						if (player.countCards("h", { color: "red" }) == 1 && player.countCards("h", { color: "black" }) > 1) return 1;
+						return 0;
+					}).set("prompt", "请选择弃置一种颜色的所有手牌");
 					"step 2";
-					var map = { 红色: "red", 黑色: "black", 无色: "none" };
-					var cards = player.getCards("h", { color: map[result.control] });
+					event.control = result.control.slice(0, result.control.length - 1);
+					var cards = player.getCards("h", {color: event.control});
 					player.discard(cards);
 					event.num = cards.length;
 					"step 3";

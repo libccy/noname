@@ -20,9 +20,7 @@ const skills = {
 				const map = lib.skill.dcbenxi.getMap(),
 					list = Object.keys(map);
 				if (list.length > 0) {
-					const skill = list.randomGet(),
-						voiceMap = game.parseSkillTextMap(skill, map[skill]);
-					console.log(voiceMap);
+					const skill = list.randomGet(), voiceMap = game.parseSkillTextMap(skill, map[skill]);
 					player.storage.dcbenxi_pending = skill;
 					findaudio: for (let data of voiceMap) {
 						if(!data.text) continue;

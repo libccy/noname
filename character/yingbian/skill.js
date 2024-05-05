@@ -2903,7 +2903,7 @@ const skills = {
 		},
 		content: function () {
 			var stat = player.getStat("skill");
-			if (this.trigger.name === "phaseUse") {
+			if (trigger.name === "phaseUse") {
 				delete stat.xinquanbian;
 			} else {
 				if (!stat.xinquanbian) stat.xinquanbian = 0;

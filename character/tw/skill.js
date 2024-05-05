@@ -458,19 +458,16 @@ const skills = {
 				trigger: { global: "damageBegin1" },
 				filter(event, player) {
 					if (event.getParent().type != "card" || event.card.name != "juedou" || !event.player.isIn()) return false;
-					const evt = game.getGlobalHistory("useCard", evt => evt.card == event.card)[0];
-					if (evt && evt.targets && (event.player != player || player.countCards("h"))) {
-						if (evt.player == player) {
-							return evt.targets.includes(event.player) && event.player != player;
-						}
-						return evt.targets.includes(player) && evt.player != player;
+					const evt = event.getParent()
+					if (evt && evt.targets && (event.player != player || player.countCards("h") > 0)) {
+						return (evt.player === player || evt.targets.includes(player));
 					}
 					return false;
 				},
 				forced: true,
 				popup: false,
 				async content(event, trigger, player) {
-					await player.logSkill("twxiayong" + (trigger.player === player ? "1" : "2"), trigger.player);
+					player.logSkill("twxiayong" + (trigger.player === player ? "1" : "2"), trigger.player);
 					if (trigger.player === player) {
 						const cards = player.getCards("h", card => {
 							return lib.filter.cardDiscardable(card, player, "twxiayong");

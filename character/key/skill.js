@@ -1251,15 +1251,17 @@ const skills = {
 			}
 		},
 		async content(event, trigger, player) {
-			await player.addToExpansion(event.cards, player, "give").gaintag.add("kud_qiaoshou_equip");
+			const next = player.addToExpansion(event.cards, player, "give");
+			next.gaintag.add("kud_qiaoshou_equip");
+			await next;
 			if (!player.getExpansions("kud_qiaoshou_equip").length) return;
 			player.addTempSkill("kud_qiaoshou_equip", {
 				player: ["phaseUseEnd", "phaseZhunbeiBegin"],
 			});
-			var name = event.cost_data.cardname;
+			const name = event.cost_data.cardname;
 			player.storage.kud_qiaoshou_equip2 = name;
-			player.markAuto("kud_qiaoshou_equip", cards);
-			var info = lib.card[name].skills;
+			player.markAuto("kud_qiaoshou_equip", event.cards);
+			const info = lib.card[name].skills;
 			if (info && info.length) player.addAdditionalSkill("kud_qiaoshou_equip", info);
 			game.log(player, "声明了", "#y" + get.translation(name));
 			await player.draw();

@@ -677,7 +677,8 @@ const skills = {
 					content: "expansion",
 					markcount: "expansion",
 					mark(dialog, storage, player) {
-						return "共扣置" + get.cnNumber(player.getExpansions("olqushi_effect").length) + "张“趋”";
+						if (storage.some(source => source.isUnderControl(true))) dialog.add(player.getExpansions("olqushi_effect"));
+						else return "共扣置" + get.cnNumber(player.getExpansions("olqushi_effect").length) + "张“趋”";
 					},
 				},
 				trigger: { player: "phaseJieshuBegin" },
@@ -687,29 +688,18 @@ const skills = {
 					const cards = player.getExpansions("olqushi_effect");
 					if (cards.length) {
 						await player.loseToDiscardpile(cards);
-						const targets = player
-							.getStorage("olqushi_effect")
-							.filter(i => {
-								return i.isIn();
-							})
-							.sortBySeat();
-						const num = Math.min(
-							player
-								.getHistory("useCard", evt => {
-									return evt.targets && evt.targets.length;
-								})
-								.reduce((sum, evt) => {
-									return sum + evt.targets.length;
-								}, 0),
-							5
-						);
-						if (
-							targets.length &&
-							player.getHistory("useCard", evt => {
-								return cards.some(card => get.type2(card) == get.type2(evt.card));
-							}).length &&
-							num
-						) {
+						const targets = player.getStorage("olqushi_effect").filter(i => {
+							return i.isIn();
+						}).sortBySeat();
+						const num = Math.min(player.getHistory("useCard", evt => {
+							return evt.targets && evt.targets.length;
+						}).reduce((targets, evt) => {
+							targets.addArray(evt.targets);
+							return targets;
+						}, []).length, 5);
+						if (targets.length && num>0 && player.getHistory("useCard", evt => {
+							return cards.some(card => get.type2(card) == get.type2(evt.card));
+						}).length) {
 							for (const target of targets) await target.draw(num);
 						}
 					}
@@ -3416,30 +3406,28 @@ const skills = {
 			return player.hasCard(card => lib.filter.cardDiscardable(card, player), "he");
 		},
 		check: function (card) {
-			var player = _status.event.player;
+			var player = get.player();
 			return (5 - get.value(card)) / Math.pow(Math.max(0.1, player.getUseValue(card)), 0.33);
 		},
 		content: function () {
 			"step 0";
-			player
-				.judge(card => {
-					var evt = _status.event.getParent();
-					var cardx = evt.cards[0];
-					if (get.type2(card) == get.type2(cardx)) return 0.5;
-					return 0.1;
-				})
-				.set("callback", function () {
-					var card = event.judgeResult.card;
-					player.addTempSkill("olweifu_clear");
-					player.addTempSkill("olweifu_add");
-					if (!get.is.object(player.storage.olweifu_add)) player.storage.olweifu_add = {};
-					var type = get.type2(card, player);
-					if (typeof player.storage.olweifu_add[type] != "number") player.storage.olweifu_add[type] = 0;
-					player.storage.olweifu_add[type]++;
-					player.markSkill("olweifu_add");
-					if (type == get.type2(event.getParent(2).cards[0], player)) player.draw();
-				})
-				.set("judge2", result => result.bool);
+			player.judge(card => {
+				var evt = get.event().getParent("olweifu");
+				if (evt.name !== "olweifu") return 0;
+				var cardx = evt.cards[0];
+				if (get.type2(card) == get.type2(cardx)) return 0.5;
+				return 0.1;
+			}).set("callback", function () {
+				var card = event.judgeResult.card;
+				player.addTempSkill("olweifu_clear");
+				player.addTempSkill("olweifu_add");
+				if (!get.is.object(player.storage.olweifu_add)) player.storage.olweifu_add = {};
+				var type = get.type2(card, player);
+				if (typeof player.storage.olweifu_add[type] != "number") player.storage.olweifu_add[type] = 0;
+				player.storage.olweifu_add[type]++;
+				player.markSkill("olweifu_add");
+				if (type == get.type2(event.getParent(2).cards[0], player)) player.draw();
+			}).set("judge2", result => result.bool);
 		},
 		ai: {
 			order: 7,
@@ -3457,9 +3445,7 @@ const skills = {
 								1 >
 								(get.is.object(player.storage.olweifu_add) ? player.storage.olweifu_add[type] || 0 : 0)
 						);
-					}, "hs")
-						? 1
-						: 0;
+					}, "hs") ? 1 : 0;
 				},
 			},
 		},
@@ -20480,7 +20466,8 @@ const skills = {
 			player.storage.jianshu = true;
 			player.give(cards, targets[0], "give");
 			"step 1";
-			targets[0].chooseToCompare(targets[1]);
+			if (targets[0].canCompare(targets[1])) targets[0].chooseToCompare(targets[1]);
+			else event.finish();
 			"step 2";
 			if (result.bool) {
 				targets[0].chooseToDiscard("he", 2, true);
