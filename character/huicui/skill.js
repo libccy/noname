@@ -12371,53 +12371,53 @@ const skills = {
 			player: "damageEnd",
 			source: "damageSource",
 		},
-		direct: true,
 		filter: function (event, player) {
-			if (!player.hasSkill("wanggui") || player.hasSkill("wanggui2")) return false;
+			if (player.isUnseen()) return false;
 			if (!player.isUnseen(2)) return true;
-			return !player.isUnseen() && [player.name1, player.name2].some(name => {
-				return get.character(name, 3).includes("wanggui");
-			});
+			return (
+				!player.isUnseen(0) && get.character(player.name1, 3).includes("wanggui") ||
+				!player.isUnseen(1) && get.character(player.name2, 3).includes("wanggui")
+			);
 		},
+		usable: 1,
 		preHidden: true,
-		content: function () {
-			"step 0";
-			player.addTempSkill("wanggui2");
-			var bool = player.isUnseen(2);
-			if (bool) {
-				player
-					.chooseTarget("望归：是否对一名势力不同的角色造成1点伤害？", function (card, player, target) {
+		async cost(event, trigger, player) {
+			if (player.isUnseen(2)) event.result = await player
+				.chooseTarget(
+					get.prompt("wanggui"),
+					"望归：是否对与你势力不同的一名角色造成1点伤害？",
+					(card, player, target) => {
 						return target.isEnemyOf(player);
-					})
-					.set("ai", function (target) {
-						var player = _status.event.player;
-						return get.damageEffect(target, player, player);
-					})
-					.setHiddenSkill("wanggui");
-			} else event.goto(2);
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("wanggui", target);
-				target.damage();
+					}
+				)
+				.set("ai", (target) => {
+					let player = _status.event.player;
+					return get.damageEffect(target, player, player);
+				})
+				.setHiddenSkill("wanggui")
+				.forResult();
+			else event.result = await player
+				.chooseBool("望归：是否令与你势力相同的角色各摸一张牌？")
+				.setHiddenSkill("wanggui")
+				.set("logSkill", ["wanggui", game.filterPlayer(current => {
+					return current.isFriendOf(player);
+				})])
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			if (player.isUnseen(2)) {
+				const target = event.targets[0];
+				target.damage("nocard");
 			}
-			event.finish();
-			"step 2";
-			player.chooseBool("望归：是否令所有与自己势力相同的角色各摸一张牌？").setHiddenSkill("wanggui");
-			"step 3";
-			if (result.bool) {
-				var targets = game.filterPlayer(function (current) {
+			else {
+				const targets = game.filterPlayer(current => {
 					return current.isFriendOf(player);
 				});
 				targets.sortBySeat();
-				player.logSkill("wanggui", targets);
 				game.asyncDraw(targets);
-			} else event.finish();
-			"step 4";
-			game.delayx();
+			}
 		},
 	},
-	wanggui2: {},
 	xibing: {
 		audio: 2,
 		trigger: { global: "useCardToPlayered" },
