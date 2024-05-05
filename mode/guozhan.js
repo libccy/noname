@@ -20617,9 +20617,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				trigger: { player: ["showCharacterAfter", "removeCharacterBefore"] },
 				filter: function (event, player) {
 					if (event.name == "removeCharacter" || event.name == "changeVice")
-						return event.toRemove.some(name => {
-							return get.character(name, 3).includes("gzguixiu");
-						}) && player.isDamaged();
+						return get.character(event.toRemove, 3).includes("gzguixiu") && player.isDamaged();
 					return event.toShow.some(name => {
 						return get.character(name, 3).includes("gzguixiu");
 					});

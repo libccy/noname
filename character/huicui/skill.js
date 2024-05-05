@@ -12366,7 +12366,11 @@ const skills = {
 		},
 		direct: true,
 		filter: function (event, player) {
-			return player.hasSkill("wanggui") && !player.hasSkill("wanggui2");
+			if (!player.hasSkill("wanggui") || player.hasSkill("wanggui2")) return false;
+			if (!player.isUnseen(2)) return true;
+			return !player.isUnseen() && [player.name1, player.name2].some(name => {
+				return get.character(name, 3).includes("wanggui");
+			});
 		},
 		preHidden: true,
 		content: function () {
