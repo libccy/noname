@@ -2,7 +2,7 @@
 	width: 100%;
 	height: 260px;
 	text-align: center;
-	top: calc(50% - 200px);
+	/* top: calc(50% - 200px); */
 	top: 60px;
 	white-space: nowrap;
 	z-index: 1;
