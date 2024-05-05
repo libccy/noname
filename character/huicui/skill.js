@@ -2793,8 +2793,12 @@ const skills = {
 				trigger: { player: ["gainAfter", "loseAsyncAfter"] },
 				forced: true,
 				filter: (event, player) => {
-					if (event.getParent("phaseDraw", true)) return false;
-					const evt = player.getHistory("gain", i => !i.getParent("phaseDraw", true))[0];
+					const phaseDraw = event.getParent("phaseDraw");
+					if (phaseDraw && phaseDraw.player === player) return false;
+					const evt = player.getHistory("gain").find(i => {
+						const phaseDraw = i.getParent("phaseDraw");
+						return (!phaseDraw || phaseDraw.player !== player);
+					});
 					if (!evt) return false;
 					if (event.name == "gain") {
 						if (evt != event || event.getlx === false) return false;

@@ -2355,72 +2355,60 @@ const skills = {
 		filter(event, player) {
 			return game.hasPlayer(current => player.canCompare(current));
 		},
-		direct: true,
+		async cost(event, trigger, player){
+			event.result = await player.chooseTarget(get.prompt("clanliuju"), "与一名其他角色拼点，输的角色可以使用任意张拼点牌中的非基本牌", (card, player, target) => {
+				return player.canCompare(target);
+			}).set("ai", target => {
+				var player = _status.event.player;
+				var ts = target.getCards("h").sort((a, b) => get.number(a) - get.number(b));
+				if (get.attitude(player, target) < 0) {
+					var hs = player.getCards("h").sort((a, b) => get.number(a) - get.number(b));
+					if (!hs.length || !ts.length) return 0;
+					if (get.type(hs[0], null, false) == "basic" && get.value(hs[0]) > 6) return 0;
+					if (get.number(hs[0]) < get.number(ts[0]) || get.type(hs[0], null, false) == "basic") return 1;
+					return Math.random() - 0.7;
+				}
+				return get.type(ts[0]) != "basic";
+			}).forResult();
+		},
 		content() {
 			"step 0";
-			player
-				.chooseTarget(get.prompt("clanliuju"), "与一名其他角色拼点，输的角色可以使用任意张拼点牌中的非基本牌", (card, player, target) => {
-					return player.canCompare(target);
-				})
-				.set("ai", target => {
-					var player = _status.event.player;
-					var ts = target.getCards("h").sort((a, b) => get.number(a) - get.number(b));
-					if (get.attitude(player, target) < 0) {
-						var hs = player.getCards("h").sort((a, b) => get.number(a) - get.number(b));
-						if (!hs.length || !ts.length) return 0;
-						if (get.type(hs[0], null, false) == "basic" && get.value(hs[0]) > 6) return 0;
-						if (get.number(hs[0]) < get.number(ts[0]) || get.type(hs[0], null, false) == "basic") return 1;
-						return Math.random() - 0.7;
-					}
-					return get.type(ts[0]) != "basic";
-				});
+			var target = targets[0];
+			event.target = target;
+			player.chooseToCompare(target).set("small", true);
 			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				event.target = target;
-				player.logSkill("clanliuju", target);
-				player.chooseToCompare(target).set("small", true);
-			} else event.finish();
-			"step 2";
 			if (!result.tie) {
 				var loser = result.bool ? target : player;
 				var cards = [];
 				game.getGlobalHistory("cardMove", evt => {
-					if (evt.getParent(2) == event)
-						cards.addArray(
-							evt.cards.filter(i => {
-								return get.position(i, true) == "d" && get.type(i, null, false) != "basic";
-							})
-						);
+					if (evt.getParent(2).name === "chooseToCompare" && evt.getParent(3) === event) cards.addArray(evt.cards.filter(i => {
+						return get.position(i, true) == "d" && get.type(i, null, false) != "basic";
+					}));
 				});
 				event.loser = loser;
 				event.distance = [get.distance(player, target), get.distance(target, player)];
 				if (cards.length) event.cards = cards;
 				else event.finish();
 			} else event.finish();
-			"step 3";
+			"step 2";
 			var cardsx = cards.filter(i => get.position(i, true) == "d" && event.loser.hasUseTarget(i));
 			if (!cardsx.length) event.goto(6);
-			else
-				event.loser
-					.chooseButton(["留驹：是否使用其中的一张牌？", cardsx])
-					.set("filterButton", button => {
-						return _status.event.player.hasUseTarget(button.link);
-					})
-					.set("ai", button => {
-						return _status.event.player.getUseValue(button.link) + 0.1;
-					});
-			"step 4";
+			else event.loser.chooseButton(["留驹：是否使用其中的一张牌？", cardsx]).set("filterButton", button => {
+				return _status.event.player.hasUseTarget(button.link);
+			}).set("ai", button => {
+				return _status.event.player.getUseValue(button.link) + 0.1;
+			});
+			"step 3";
 			if (result.bool) {
 				var card = result.links[0];
 				event.cards.remove(card);
 				event.loser.$gain2(card, false);
 				game.delayx();
 				event.loser.chooseUseTarget(true, card, false);
-			} else event.goto(6);
-			"step 5";
+			} else event.goto(5);
+			"step 4";
 			if (cards.filter(i => get.position(i, true) == "d" && event.loser.hasUseTarget(i)).length) event.goto(3);
-			"step 6";
+			"step 5";
 			if (get.distance(player, target) != event.distance[0] || get.distance(target, player) != event.distance[1]) {
 				player.restoreSkill("clanxumin");
 				game.log(player, "重置了", "#g【恤民】");
