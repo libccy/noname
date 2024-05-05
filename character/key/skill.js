@@ -4754,6 +4754,7 @@ const skills = {
 		},
 	},
 	yukito_yaxiang: {
+		forceunique: true,
 		enable: "chooseToUse",
 		limited: true,
 		filter(event, player) {
@@ -10572,9 +10573,14 @@ const skills = {
 		},
 	},
 	umi_qihuan: {
+		forceunique: true,
 		enable: "chooseToUse",
 		filter(summer, umi) {
-			return summer.type == "dying" && umi.isDying();
+			return (
+				summer.type == "dying" &&
+				umi.isDying() &&
+				[umi.name1, umi.name2].includes("key_umi")
+			);
 		},
 		limited: true,
 		skillAnimation: true,

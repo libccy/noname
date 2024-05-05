@@ -5090,7 +5090,9 @@ const skills = {
 					characters.remove("dc_mifuren");
 				}
 			});
-			return characters.length;
+			return characters.length && [player.name1, player.name2].some(name => {
+				return get.character(name, 3).includes("dcxunbie");
+			});
 		},
 		check: () => true,
 		skillAnimation: true,
@@ -5100,30 +5102,30 @@ const skills = {
 		content: function () {
 			"step 0";
 			player.awakenSkill("dcxunbie");
-			if (player.name1 == "ganfurenmifuren" || player.name2 == "ganfurenmifuren") {
-				var characters = ["dc_ganfuren", "dc_mifuren"];
-				game.countPlayer(current => {
-					if (current.name1 == "dc_ganfuren" || current.name2 == "dc_ganfuren") {
-						characters.remove("dc_ganfuren");
-					}
-					if (current.name1 == "dc_mifuren" || current.name2 == "dc_mifuren") {
-						characters.remove("dc_mifuren");
-					}
-				});
-				if (characters.length == 1) event._result = { control: characters[0] };
-				else {
-					player
-						.chooseControl(characters)
-						.set("dialog", ["选择要替换成的武将", [characters, "character"]])
-						.set("ai", () => [0, 1].randomGet());
+			var characters = ["dc_ganfuren", "dc_mifuren"];
+			game.countPlayer(current => {
+				if (current.name1 == "dc_ganfuren" || current.name2 == "dc_ganfuren") {
+					characters.remove("dc_ganfuren");
 				}
-			} else event.goto(2);
+				if (current.name1 == "dc_mifuren" || current.name2 == "dc_mifuren") {
+					characters.remove("dc_mifuren");
+				}
+			});
+			if (characters.length == 1) event._result = { control: characters[0] };
+			else {
+				player
+					.chooseControl(characters)
+					.set("dialog", ["选择要替换成的武将", [characters, "character"]])
+					.set("ai", () => [0, 1].randomGet());
+			}
 			"step 1";
 			var character = result.control;
 			if (!_status.characterlist) {
 				lib.skill.pingjian.initList();
 			}
-			player.reinitCharacter("ganfurenmifuren", character);
+			player.reinitCharacter((get.character(player.name2, 3).includes("dcxunbie") ?
+				player.name2 : player.name1
+			), character);
 			"step 2";
 			player.recover(1 - player.hp);
 			player.addTempSkill("dcxunbie_muteki", { player: "phaseAfter" });
