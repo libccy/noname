@@ -12690,7 +12690,10 @@ const skills = {
 				} else event.finish();
 			} else if (target.isLinked()) target.link();
 			"step 3";
-			if (target.isIn()) target.addMark("baoshu", event.num2);
+			if (target.isIn()){
+				target.addSkill("baoshu_draw");
+				target.addMark("baoshu", event.num2);
+			}
 			if (num < targets.length - 1) {
 				event.num++;
 				event.goto(2);
@@ -12700,20 +12703,22 @@ const skills = {
 		intro: {
 			name2: "梳",
 			content: "mark",
+			onunmark(storage, player){
+				delete player.storage.baoshu;
+				player.removeSkill("baoshu_draw");
+			}
 		},
-		group: "baoshu_draw",
+		//group: "baoshu_draw",
 		subSkill: {
 			draw: {
-				trigger: { global: "phaseDrawBegin2" },
+				trigger: { player: "phaseDrawBegin2" },
 				forced: true,
-				popup: false,
+				charlotte: true,
 				filter: function (event, player) {
-					return !event.numFixed && event.player.hasMark("baoshu");
+					return !event.numFixed && player.hasMark("baoshu");
 				},
 				content: function () {
-					var target = trigger.player,
-						num = target.countMark("baoshu");
-					trigger.player.logSkill("baoshu_draw");
+					var num = player.countMark("baoshu");
 					trigger.num += num;
 					trigger.player.removeMark("baoshu", num);
 				},
