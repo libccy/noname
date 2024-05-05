@@ -13939,24 +13939,20 @@ const skills = {
 			} else event.finish();
 			"step 2";
 			player.gain(event.cards, "gain2");
-			player
-				.chooseControl()
-				.set("choiceList", ["将" + get.cnNumber(event.num) + "张牌交给一名其他角色", "弃置" + get.cnNumber(event.num) + "张牌"])
-				.set("ai", function () {
-					if (
-						game.hasPlayer(function (current) {
-							return current != player && get.attitude(player, current) > 2;
-						})
-					)
-						return 0;
-					return 1;
-				});
-			"step 3";
+			"step 3"
+			if (!player.countCards("he")) event.finish();
+			else player.chooseControl().set("choiceList", ["将" + get.cnNumber(event.num) + "张牌交给一名其他角色", "弃置" + get.cnNumber(event.num) + "张牌"]).set("ai", function () {
+				if (game.hasPlayer(function (current) {
+					return current != player && get.attitude(player, current) > 2;
+				})) return 0;
+				return 1;
+			});
+			"step 4";
 			if (result.index == 0) {
 				player.chooseCardTarget({
 					position: "he",
 					filterCard: true,
-					selectCard: event.num,
+					selectCard: Math.min(event.num, player.countCards("he")),
 					filterTarget: function (card, player, target) {
 						return player != target;
 					},
@@ -13976,7 +13972,7 @@ const skills = {
 				player.chooseToDiscard(event.num, true, "he");
 				event.finish();
 			}
-			"step 4";
+			"step 5";
 			if (result.bool) {
 				var target = result.targets[0];
 				player.give(result.cards, target);

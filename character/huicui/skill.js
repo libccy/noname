@@ -743,7 +743,7 @@ const skills = {
 				const evtx = evt.event;
 				if (evtx.givenCards) names.addArray(evtx.givenCards.map(card => get.name(card, false)));
 			});
-			return names.length >= 5;
+			return names.length > 5;
 		},
 		forced: true,
 		juexingji: true,
@@ -6446,7 +6446,8 @@ const skills = {
 			"step 0";
 			player.give(cards, targets[0], "give");
 			"step 1";
-			targets[0].chooseToCompare(targets[1]);
+			if (targets[0].canCompare(targets[1])) targets[0].chooseToCompare(targets[1]);
+			else event.finish();
 			"step 2";
 			player.addTempSkill("dcjianshu_check", "phaseUseAfter");
 			if (result.bool) {

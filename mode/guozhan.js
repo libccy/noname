@@ -5048,11 +5048,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				async content(event, trigger, player) {
 					trigger.targets.length = 0;
 					trigger.all_excluded = true;
-					const cards = trigger.cards.filter(i => !get.owner(i));
+					const cards = trigger.cards.filterInD();
 					if (cards.length && get.type(trigger.card) == "equip") {
 						await player.gain(cards, "gain2");
 						for (let i of cards) {
-							if (get.owner(i) == player && player.hasUseTarget(i)) {
+							if (player.getCards("h").includes(i) && player.hasUseTarget(i)) {
 								await player.chooseUseTarget(i);
 							}
 						}

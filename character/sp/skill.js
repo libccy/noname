@@ -20466,7 +20466,8 @@ const skills = {
 			player.storage.jianshu = true;
 			player.give(cards, targets[0], "give");
 			"step 1";
-			targets[0].chooseToCompare(targets[1]);
+			if (targets[0].canCompare(targets[1])) targets[0].chooseToCompare(targets[1]);
+			else event.finish();
 			"step 2";
 			if (result.bool) {
 				targets[0].chooseToDiscard("he", 2, true);
