@@ -49,8 +49,6 @@ export default {
 	"#yanjun:die": "著作，还……没完成……",
 	"#xinfu_kannan1": "俊才之杰，材匪戡难。",
 	"#xinfu_kannan2": "戡，克也，难，攻之。",
-	"#twniju1": null,
-	"#twniju2": null,
 	"#liuyao:die": "伯符小儿，还我子义！",
 	"#xinfu_tushe1": "非英杰不图？吾既谋之且射毕！",
 	"#xinfu_tushe2": "汉室衰微，朝纲祸乱，必图后福。",
