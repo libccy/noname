@@ -807,11 +807,14 @@ const skills = {
 	},
 	noname_duocai2: { charlotte: true },
 	nsbizhao: {
+		unique: true,
 		trigger: { player: "showCharacterAfter" },
 		forced: true,
 		hiddenSkill: true,
 		filter(event, player) {
-			return event.toShow && event.toShow.includes("ns_yanghu") && player != _status.currentPhase;
+			return event.toShow && event.toShow.some(name => {
+				return get.character(name, 3).includes("nsbizhao");
+			}) && player != _status.currentPhase;
 		},
 		content() {
 			player.addTempSkill("nsbizhao2", {

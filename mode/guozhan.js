@@ -2674,8 +2674,15 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakezhiwei: {
+				unique: true,
 				audio: "zhiwei",
 				inherit: "zhiwei",
+				filter: function (event, player, name) {
+					if (!game.hasPlayer(current => current != player)) return false;
+					return event.name == "showCharacter" && event.toShow(name => {
+						return get.character(name, 3).includes("fakezhiwei");
+					});
+				},
 				content() {
 					"step 0";
 					player
@@ -4914,6 +4921,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakebaoqie: {
+				unique: true,
 				audio: "baoqie",
 				trigger: { player: "showCharacterEnd" },
 				filter(event, player) {
@@ -5087,6 +5095,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakehuirong: {
+				unique: true,
 				audio: "huirong",
 				trigger: { player: "showCharacterEnd" },
 				filter(event, player) {
@@ -5258,6 +5267,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakeshiren: {
+				unique: true,
 				audio: "shiren",
 				trigger: { player: "showCharacterEnd" },
 				filter(event, player) {
@@ -6439,8 +6449,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								.set("prompt", "近谀：请暗置一张武将牌")
 								.set("ai", function () {
 									var target = _status.event.player;
-									if (target.name == "gz_pengyang") return "主将";
-									if (target.name2 == "gz_pengyang") return "副将";
+									if (get.character(target.name, 3).includes("gzjinyu")) return "主将";
+									if (get.character(target.name2, 3).includes("gzjinyu")) return "副将";
 									if (
 										lib.character[target.name][3].some((skill) => {
 											var info = get.info(skill);
@@ -7526,11 +7536,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			//黄权
 			gzdianhu: {
+				unique: true,
 				audio: "xinfu_dianhu",
 				trigger: { player: "showCharacterAfter" },
 				forced: true,
 				filter: function (event, player) {
-					return event.toShow.includes("gz_xf_huangquan") && !player.storage.gzdianhu_effect;
+					return event.toShow.some(name => {
+						return get.character(name, 3).includes("gzdianhu");
+					}) && !player.storage.gzdianhu_effect;
 				},
 				content: function () {
 					"step 0";
@@ -8647,7 +8660,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				audio: "xuanbei",
 				trigger: { player: "showCharacterAfter" },
 				filter: function (event, player) {
-					return !player.storage.gzxuanbei && event.toShow.includes("gz_yangyan");
+					return !player.storage.gzxuanbei && event.toShow.some(name => {
+						return get.character(name, 3).includes("gzxuanbei");
+					});
 				},
 				forced: true,
 				locked: false,
@@ -9567,7 +9582,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						trigger: { player: "showCharacterAfter" },
 						forced: true,
 						filter: function (event, player) {
-							return event.toShow.includes("gz_liaohua") && !player.storage.gzdangxian_draw;
+							return event.toShow.some(name => {
+								return get.character(name, 3).includes("gzdangxian");
+							}) && !player.storage.gzdangxian_draw;
 						},
 						content: function () {
 							player.storage.gzdangxian_draw = true;
@@ -13040,7 +13057,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						},
 						content: function () {
 							trigger.cancel();
-							player.removeCharacter(player.name1 == "gz_yanbaihu" ? 0 : 1);
+							player.removeCharacter(get.character(player.name1, 3).includes("gzyjili") ? 0 : 1);
 						},
 					},
 				},
@@ -14723,7 +14740,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				forced: true,
 				filter: function (event, player) {
-					return event.toShow.includes("gz_zuoci") && !player.storage.yigui_init;
+					return event.toShow.some(name => {
+						return get.character(name, 3).includes("yigui");
+					}) && !player.storage.yigui_init;
 				},
 				content: function () {
 					player.storage.yigui_init = true;
@@ -16349,8 +16368,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							if (event.filterName(event.current.name2)) list.push("副将");
 							if (list.length > 1)
 								event.current.chooseControl(["主将", "副将"]).set("ai", function () {
-									if (player.name1 == "gz_fazheng") return 0;
-									if (player.name2 == "gz_fazheng") return 1;
+									let player = _status.event.player;
+									if (get.character(player.name1, 3).includes("gzxuanhuo")) return 0;
+									if (get.character(player.name2, 3).includes("gzxuanhuo")) return 1;
 									return Math.random() > 0.5 ? 0 : 1;
 								}).prompt = "选择并展示一张武将牌，然后执行军令";
 							else event._result = { index: list[0] == "主将" ? 0 : 1 };
@@ -17010,9 +17030,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								break;
 							}
 						}
-						if (event.target.name == "gz_zhoutai") {
+						if (get.character(event.target.name, 3).includes("buqu")) {
 							choice = "主将";
-						} else if (event.target.name2 == "gz_zhoutai") {
+						} else if (get.character(event.target.name2, 3).includes("buqu")) {
 							choice = "副将";
 						}
 						player
@@ -20606,12 +20626,15 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			gzguixiu: {
+				unique: true,
 				audio: "guixiu",
 				trigger: { player: ["showCharacterAfter", "removeCharacterBefore"] },
 				filter: function (event, player) {
 					if (event.name == "removeCharacter" || event.name == "changeVice")
-						return event.toRemove == "gz_mifuren" && player.isDamaged();
-					return event.toShow.includes("gz_mifuren");
+						return get.character(event.toRemove, 3).includes("gzguixiu") && player.isDamaged();
+					return event.toShow.some(name => {
+						return get.character(name, 3).includes("gzguixiu");
+					});
 				},
 				content: function () {
 					if (trigger.name == "showCharacter") {
