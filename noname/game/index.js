@@ -2988,6 +2988,11 @@ export class Game {
 			player.node["avatar" + map.name.slice(4)].show();
 			if (goon) delete lib.character[map.to];
 		},
+		changeGroup: function (player, targetGroup) {
+			if (!player || !targetGroup) return;
+			player.group = targetGroup;
+			player.node.name.dataset.nature = get.groupnature(targetGroup);
+		},
 		skill: function (player, content) {
 			if (typeof content == "string") {
 				if (lib.skill[content]) lib.skill[content].video(player);
@@ -3313,7 +3318,21 @@ export class Game {
 		},
 		removeGaintag: function (player, content) {
 			if (player && content) {
-				if (Array.isArray(content)) player.removeGaintag.apply(player, content);
+				if (Array.isArray(content)) {
+					const checkMatch = function (l1, l2) {
+						for (var i = 0; i < l1.length; i++) {
+							for (var j = 0; j < l2.length; j++) {
+								if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
+									l2[j].addGaintag(content[0]);
+									l2.splice(j--, 1);
+									break;
+								}
+							}
+						}
+					};
+					// player.removeGaintag.apply(player, content);
+					checkMatch(content[1], player.getCards("h"));
+				}
 				else player.removeGaintag(content);
 			} else {
 				console.log(player);

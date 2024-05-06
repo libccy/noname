@@ -640,6 +640,7 @@ export const Content = {
 		event.originGroup = player.group;
 		if (!event.group) event.group = player.group;
 		var group = event.group;
+		game.addVideo("changeGroup", player, group);
 		player.getHistory("custom").push(event);
 		if (event.broadcast !== false) {
 			game.broadcast(

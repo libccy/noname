@@ -12812,7 +12812,8 @@ export class Library {
 						}
 						player.playerid = i;
 						player.nickname = info.nickname;
-						player.changeGroup(info.group, false, "nobroadcast");
+						player.group = info.group;
+						player.node.name.dataset.nature = get.groupnature(info.group);
 						player.identity = info.identity;
 						player.identityShown = info.identityShown;
 						player.hp = info.hp;
