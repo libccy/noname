@@ -1,4 +1,4 @@
-export const rootURL = new URL(import.meta.url);
+export const rootURL = new URL("../", import.meta.url);
 
 export { GNC, gnc, setGNC } from "./noname/gnc/index.js";
 export { AI, ai, setAI } from "./noname/ai/index.js";
