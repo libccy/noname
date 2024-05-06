@@ -3647,7 +3647,7 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
-			event.num = 0;
+			target.addTempSkill("jsrgyangming_lose", "phaseUseAfter");
 			"step 1";
 			player.chooseToCompare(target).set(
 				"small",
@@ -3667,9 +3667,11 @@ const skills = {
 						.chooseBool("是否与其重复此拼点流程？")
 						.set("ai", () => get.event("bool"))
 						.set("bool", get.effect(target, "jsrgyangming", player, player) > 0);
-				event.num++;
+				game.broadcastAll((target)=>{
+					target.storage.jsrgyangming_lose++;
+				}, target);
 			} else {
-				if (event.num) target.draw(event.num);
+				if (target.storage.jsrgyangming_lose) target.draw(target.storage.jsrgyangming_lose);
 				player.recover();
 				event.finish();
 			}
@@ -3700,6 +3702,15 @@ const skills = {
 				},
 			},
 		},
+		subSkill: {
+			lose: {
+				init(player, skill) {
+					player.storage[skill] = 0;
+				},
+				onremove: true,
+				charlotte: true
+			}
+		}
 	},
 	//韩遂
 	jsrgniluan: {
