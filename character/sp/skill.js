@@ -171,6 +171,9 @@ const skills = {
 					result: { bool, moved },
 				} = await player
 					.chooseToMove("易城：请选择你要交换的牌")
+					.set("filterMove", (from, to) => {
+						return typeof to !== "number";
+					})
 					.set("list", [
 						[
 							"牌堆顶",

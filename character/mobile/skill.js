@@ -14821,12 +14821,14 @@ const skills = {
 			trigger.target.chooseToDiscard("he", true, 2);
 			"step 1";
 			if (result.bool && result.cards && result.cards.length) {
-				if (result.cards.length == 1) {
+				const cards = result.cards.filterInD("d");
+				if (cards.length == 1) {
 					event._result = { bool: true, links: result.cards.slice(0) };
-				} else
-					player.chooseButton(["选择获得其中的一张牌", result.cards.slice(0)], true).ai = function (button) {
+				} else if (cards.length > 1) {
+					player.chooseButton(["选择获得其中的一张牌", result.cards.slice(0)], true).set("ai", function (button) {
 						return get.value(button.link);
-					};
+					});
+				} else event.finish();
 			} else event.finish();
 			"step 2";
 			if (result.links) player.gain(result.links, "gain2");

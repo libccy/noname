@@ -1158,50 +1158,56 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					const targets = list
 						.slice()
 						.filter((i) => (event.num1 - event.num2) * get.sgn(0.5 - list.indexOf(i)) <= 0);
-					return targets.some((i) => i.countGainableCards(list[1 - list.indexOf(i)], "e"));
+					return targets.some((i) => {
+						const target = list[1 - list.indexOf(i)];
+						return target.hasCard((card) => {
+							return lib.filter.canBeGained(card, i, target);
+						}, "e");
+					});
 				},
 				async cost(event, trigger, player) {
 					let users = [];
-					const list = [event.player, event.target];
+					const list = [trigger.player, trigger.target];
 					let targets = list
 						.slice()
-						.filter((i) => (event.num1 - event.num2) * get.sgn(0.5 - list.indexOf(i)) <= 0);
-					targets = targets
-						.filter((i) => i.countGainableCards(list[1 - list.indexOf(i)], "e"))
-						.sortBySeat(player);
+						.filter((i) => (trigger.num1 - trigger.num2) * get.sgn(0.5 - list.indexOf(i)) <= 0);
+					targets = targets.filter((i) => {
+						const target = list[1 - list.indexOf(i)];
+						return target.hasCard((card) => {
+							return lib.filter.canBeGained(card, i, target);
+						}, "e");
+					}).sortBySeat(player);
 					for (const i of targets) {
 						const aim = list[1 - list.indexOf(i)];
 						const {
 							result: { bool },
-						} = await i
-							.chooseBool(
+						} = await i.chooseBool(
 								get.prompt("fakehanzhan"),
 								"获得" + get.translation(aim) + "装备区的一张牌"
-							)
-							.set(
-								"choice",
-								target.hasCard((card) => {
-									return get.value(card, aim) * get.attitude(i, aim) < 0;
-								}, "e")
-							);
+							).set("choice", aim.hasCard((card) => {
+								return get.value(card, aim) * get.attitude(i, aim) < 0;
+							}, "e"));
 						if (bool) users.push(i);
 					}
 					event.result = { bool: Boolean(users.length), targets: users };
 				},
+				logLine: false,
 				async content(event, trigger, player) {
 					const list = [trigger.player, trigger.target];
 					let targets = list
 						.slice()
 						.filter((i) => (trigger.num1 - trigger.num2) * get.sgn(0.5 - list.indexOf(i)) <= 0);
 					targets = targets
-						.filter(
-							(i) =>
-								i.countGainableCards(list[1 - list.indexOf(i)], "e") &&
-								event.targets.includes(i)
-						)
+						.filter((i) => {
+							const target = list[1 - list.indexOf(i)];
+							return target.hasCard((card) => {
+								return lib.filter.canBeGained(card, i, target);
+							}, "e");
+						})
 						.sortBySeat(player);
 					for (const i of targets) {
 						const aim = list[1 - list.indexOf(i)];
+						i.line(aim, "green");
 						await i.gainPlayerCard(aim, "e", true);
 					}
 				},
@@ -2630,14 +2636,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								const storage = player.getStorage("fakechengshang_effect");
 								const list = lib.card.list
 									.filter((list) => {
-										const type = get.type(card[2]);
+										const type = get.type(list[2]);
 										if (type != "basic" && type != "trick") return false;
 										return storage.some(
 											(card) =>
 												card[0] == list[0] && card[1] == list[1] && card[2] != list[2]
 										);
 									})
-									.map((card) => [get.translation(type), "", card[2], card[3]]);
+									.map((card) => [get.translation(get.type2(card[2])), "", card[2], card[3]]);
 								return ui.create.dialog("承赏", [list, "vcard"]);
 							},
 							filter(button, player) {
@@ -3766,21 +3772,19 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				audio: "mobiledanshou",
 				trigger: { global: "phaseZhunbeiBegin" },
 				filter(event, player) {
-					return ["h", "e", "j"].some((pos) =>
-						player.getCards(pos).every((card) => lib.filter.cardDiscardable(card, player))
-					);
+					return ["h", "e", "j"].some((pos) =>{
+						const cards = player.getCards(pos);
+						return cards.length > 0 && cards.every((card) => lib.filter.cardDiscardable(card, player));
+					});
 				},
 				async cost(event, trigger, player) {
 					let list = [],
 						map = { h: "手牌区", e: "装备区", j: "判定区" };
 					list.addArray(
-						["h", "e", "j"]
-							.filter((pos) => {
-								return player
-									.getCards(pos)
-									.every((card) => lib.filter.cardDiscardable(card, player));
-							})
-							.map((i) => map[i])
+						["h", "e", "j"].filter((pos) => {
+							const cards = player.getCards(pos);
+							return cards.length > 0 && cards.every((card) => lib.filter.cardDiscardable(card, player));
+						}).map((i) => map[i])
 					);
 					list.push("cancel2");
 					const {
@@ -3829,7 +3833,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								result: { control },
 							} = await player
 								.chooseControl("摸牌", "增加摸牌数")
-								.set("prompt", "胆守：请选择一项")
+								.set("prompt", `胆守：请选择一项（当前为${get.translation(trigger.name)}）`)
 								.set("ai", () => {
 									const player = get.event().player,
 										trigger = get.event().getTrigger();
