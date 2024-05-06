@@ -8260,6 +8260,9 @@ const skills = {
 				},
 			},
 		},
+		ai:{
+			combo: "twzhenliang",
+		},
 	},
 	twzhenliang: {
 		group: ["twzhenliang_1", "twzhenliang_2"],
