@@ -4775,12 +4775,36 @@ export class Get {
 	/**
 	 * 将URL转换成相对于无名杀根目录的路径
 	 *
-	 * @param {URL} url
+	 * ---
+	 *
+	 * 在无名杀正式过渡到http协议前，无名杀的路径在不同端拥有不同的情况:
+	 * - 网页端: 除了`db`外，没任何可能
+	 * - 电脑端(electron): 和`node.js`保持一致
+	 * - 手机端(cordova): 需要使用`cordova`的`cordova-plugin-file`插件实现，有较为严格的限制
+	 *
+	 * 故之前的路径API基本如下:
+	 * - 网页端完全不考虑
+	 * - 使用`lib.assetURL + <relative path>`的形式，其中`lib.assetURL`的值为:
+	 *   - 在网页端和电脑端为空字符串
+	 *   - 在手机端为无名杀包的`externalApplicationStorageDirectory`里（也就是`Android/data/<app-id>/`）
+	 *
+	 * 现在无名杀即将踏入http协议，也早已用上了ES Module，故活用`import.meta.url`来提供路径理应被重视，`URL`也理应成为路径的主要构成
+	 *
+	 * 然而由于之前的API混乱且针对多端有不同的情况，故需要提供函数，来方便提供调用旧API的情况
+	 *
+	 * @param {URL} url - 需要转换的URL对象
+	 * @param {boolean} [addAssetURL=false] - 是否需要在函数内加上`lib.assetURL`，
+	 * 默认为`false`，当为`true`时会在协议为`file`时增加`lib.assetURL`
 	 * @returns {string}
+	 *
+	 * @example
+	 * // 当前文件以"noname/get/index.js"举例
+	 * let parsedPath = get.relativePath(import.meta.url, true);
+	 * console.log(parsedPath == `${lib.assetURL}noname/get/index.js`) //=> true
 	 */
-	relativePath(url) {
+	relativePath(url, addAssetURL = false) {
 		let base = lib.path.relative(decodeURI(rootURL.pathname), decodeURI(url.pathname)).slice(3);
-		if (rootURL.protocol == "file:" && lib.device) {
+		if (addAssetURL && rootURL.protocol == "file:") {
 			base = `${lib.assetURL}${base}`;
 		}
 		return base;
