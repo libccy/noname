@@ -17173,9 +17173,6 @@ const skills = {
 			cardUsable: function (card, player) {
 				if (player.storage.new_zhixi2 || player.countMark("new_zhixi") >= player.hp) return false;
 			},
-			cardRespondable: function (card, player) {
-				if (player.storage.new_zhixi2 || player.countMark("new_zhixi") >= player.hp) return false;
-			},
 			cardSavable: function (card, player) {
 				if (player.storage.new_zhixi2 || player.countMark("new_zhixi") >= player.hp) return false;
 			},
