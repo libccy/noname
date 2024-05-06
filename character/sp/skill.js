@@ -14611,7 +14611,7 @@ const skills = {
 			if (!phsu || phsu.player != player) return false;
 			if (
 				player.getHistory("gain", function (evt) {
-					return evt.getParent().name == "chengshang";
+					return evt.getParent().name == "chengshang" && phsu === evt.getParent("phaseUse");
 				}).length
 			)
 				return false;
