@@ -4804,6 +4804,10 @@ export class Get {
 	 */
 	relativePath(url, addAssetURL = false) {
 		let base = lib.path.relative(decodeURI(rootURL.pathname), decodeURI(url.pathname)).slice(3);
+		// 由于`rootURL`的实现，当且仅当url指向`~/noname.js`时，会变为空字符串
+		if (base == "") {
+			base = "noname.js";
+		}
 		if (addAssetURL && rootURL.protocol == "file:") {
 			base = `${lib.assetURL}${base}`;
 		}
