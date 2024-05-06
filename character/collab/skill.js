@@ -84,6 +84,8 @@ const skills = {
 					if (name !== "dc_wuyi") {
 						const skills = get.character(name, 3);
 						skills.forEach(skill => {
+							const info = get.info(skill);
+							if (!info || (info.ai && info.ai.combo)) return;
 							if (skill in _status.dcbenxi_map) return;
 							const voices = game.parseSkillText(skill, name);
 							if (
