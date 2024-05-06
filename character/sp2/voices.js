@@ -15,7 +15,7 @@ export default {
 	"#starweilin2": "天下事在我，我今为之，谁敢不从？",
 	"#starzhangrong1": "尔欲行大事，问过吾掌中兵刃否？",
 	"#starzhangrong2": "西凉铁骑曳城，天下高楼可摧！",
-	"#starhaoshou1": "满朝主公，试吾剑不利否？",
+	"#starhaoshou1": "满朝诸公，视吾剑不利否？",
 	"#starhaoshou2": "顺我者生，逆我者十死无生！",
 	"#star_dongzhuo:die": "美人迷人眼，溢权昏人智……",
 	"#starcanxi1": "大势散于天下，全宝玺者其谁？",
