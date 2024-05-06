@@ -12431,6 +12431,7 @@ const skills = {
 			if (evt.player != event.player) return false;
 			return true;
 		},
+		usable: 1,
 		logTarget: "player",
 		check: function (event, player) {
 			var target = event.player;

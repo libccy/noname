@@ -5396,7 +5396,7 @@ const skills = {
 		unique: true,
 		forceunique: true,
 		init(player) {
-			if (player.storage.nscongjun_show) return false;
+			if (player.storage.nscongjun_show || ![player.name1, player.name2].includes("ns_huamulan")) return false;
 			var change = function (target) {
 				if (target == player) {
 					var list;
@@ -5427,7 +5427,12 @@ const skills = {
 			show: {
 				trigger: { global: "useCard" },
 				filter(event, player) {
-					return player.getEnemies().includes(event.player) && event.card.name == "wuxie" && event.getRand() < 0.1;
+					return (
+						player.storage.nscongjun_show &&
+						event.card.name == "wuxie" &&
+						event.getRand() < 0.1 &&
+						player.getEnemies().includes(event.player)
+					);
 				},
 				direct: true,
 				skillAnimation: true,

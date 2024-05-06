@@ -2382,7 +2382,7 @@ game.import("character", function () {
 				trigger: { player: "phaseBefore" },
 				unique: true,
 				skillAnimation: true,
-				forceunique: true,
+				//forceunique: true,
 				filter() {
 					return game.roundNumber >= 3;
 				},
@@ -2407,7 +2407,7 @@ game.import("character", function () {
 					};
 					player.awakenSkill("szbianshen");
 					"step 1";
-					player.reinit("hs_shizugui", result.links[0]);
+					player.reinit(get.character(player.name2, 3).includes("szbianshen") ? player.name2 : player.name1, result.links[0]);
 					player.hp = player.maxHp;
 					player.update();
 				},

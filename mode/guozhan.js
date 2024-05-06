@@ -6455,7 +6455,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						})
 					)
 						return false;
-					return event.toShow.some((name) => lib.character[name][3].includes("gzjinyu"));
+					return event.toShow.some((name) => get.character(name, 3).includes("gzjinyu"));
 				},
 				logTarget: function (event, player) {
 					return game
