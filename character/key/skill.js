@@ -8694,7 +8694,7 @@ const skills = {
 					});
 				}
 			} else {
-				player.addTempSkill("zishou2", "phaseEnd");
+				player.addTempSkill("zishou2", "phaseUseAfter");
 			}
 		},
 		ai: { expose: 0.2 },
