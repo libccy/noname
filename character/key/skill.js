@@ -7074,7 +7074,7 @@ const skills = {
 			let num = 1 + event.cost_data;
 			await player.draw(num).set("gaintag", ["shiorimiyuki_tingxian"]);
 			await player.recover();
-			player.addTempSkill("shiorimiyuki_tingxian2");
+			player.addTempSkill("shiorimiyuki_tingxian2", "phaseUseAfter");
 		},
 		group: "shiorimiyuki_tingxian1",
 	},
