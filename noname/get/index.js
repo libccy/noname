@@ -4803,11 +4803,7 @@ export class Get {
 	 * console.log(parsedPath == `${lib.assetURL}noname/get/index.js`) //=> true
 	 */
 	relativePath(url, addAssetURL = false) {
-		let base = lib.path.relative(decodeURI(rootURL.pathname), decodeURI(url.pathname)).slice(3);
-		// 由于`rootURL`的实现，当且仅当url指向`~/noname.js`时，会变为空字符串
-		if (base == "") {
-			base = "noname.js";
-		}
+		let base = lib.path.relative(decodeURI(rootURL.pathname), decodeURI(url.pathname));
 		if (addAssetURL && rootURL.protocol == "file:") {
 			base = `${lib.assetURL}${base}`;
 		}
