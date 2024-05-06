@@ -619,7 +619,7 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					player.line(trigger.player);
-					trigger.player.addTempSkill("jsrglonglin_forbid");
+					trigger.player.addTempSkill("jsrglonglin_forbid", "phaseUseAfter");
 				},
 			},
 			forbid: {
