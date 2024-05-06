@@ -5402,7 +5402,7 @@ const skills = {
 					var list;
 					if (_status.connectMode) {
 						list = get.charactersOL(function (i) {
-							return lib.character[i][0] == "male";
+							return lib.character[i][0] != "male";
 						});
 					} else {
 						list = get.gainableCharacters(function (info) {
