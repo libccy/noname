@@ -2714,7 +2714,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				inherit: "zhiwei",
 				filter: function (event, player, name) {
 					if (!game.hasPlayer(current => current != player)) return false;
-					return event.name == "showCharacter" && event.toShow(name => {
+					return event.name == "showCharacter" && event.toShow.some(name => {
 						return get.character(name, 3).includes("fakezhiwei");
 					});
 				},

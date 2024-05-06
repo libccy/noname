@@ -14207,7 +14207,7 @@ const skills = {
 				.set("ai", () => {
 					const player = get.event("player"),
 						trigger = get.event().getTrigger();
-					const cards = trigger.cards.filterInD();
+					const cards = trigger.cards ? trigger.cards.filterInD() : [];
 					if (get.event().controls.includes("拿牌")) {
 						if (
 							cards.reduce((sum, card) => {
