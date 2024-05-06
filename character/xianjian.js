@@ -308,9 +308,9 @@ game.import("character", function () {
 				},
 				content: function () {
 					player.storage.yuexing2 = target;
-					player.addTempSkill("yuexing2");
+					player.addTempSkill("yuexing2", "phaseUseAfter");
 					target.storage.yuexing2 = player;
-					target.addTempSkill("yuexing2");
+					target.addTempSkill("yuexing2", "phaseUseAfter");
 				},
 				ai: {
 					order: function () {
