@@ -7569,6 +7569,7 @@ const skills = {
 		trigger: { player: "phaseZhunbeiBegin" },
 		limited: true,
 		unique: true,
+		forceunique: true,
 		charlotte: true,
 		skillAnimation: true,
 		animationColor: "water",
@@ -7576,6 +7577,7 @@ const skills = {
 			return player.isDamaged();
 		},
 		check(event, player) {
+			if (![player.name1, player.name2].includes("key_mio")) return false;
 			return player.hp <= 1 || player.getDamagedHp() > 1;
 		},
 		content() {
@@ -7644,12 +7646,14 @@ const skills = {
 		limited: true,
 		charlotte: true,
 		unique: true,
+		forceunique: true,
 		skillAnimation: true,
 		animationColor: "water",
 		filter(event, player) {
 			return player.isDamaged();
 		},
 		check(event, player) {
+			if (![player.name1, player.name2].includes("key_midori")) return false;
 			return player.hp <= 1 || player.getDamagedHp() > 1;
 		},
 		content() {

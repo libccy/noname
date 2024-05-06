@@ -15585,7 +15585,6 @@ const skills = {
 		limited: true,
 		skillAnimation: true,
 		animationColor: "orange",
-		forceunique: true,
 		filter: function (event, player) {
 			return player.countMark("fanghun") > 0;
 		},

@@ -19319,7 +19319,6 @@ const skills = {
 		limited: true,
 		skillAnimation: true,
 		animationColor: "orange",
-		forceunique: true,
 		filter: function (event, player) {
 			return player.storage.fanghun2 > 0;
 		},
@@ -19377,7 +19376,7 @@ const skills = {
 			player.awakenSkill("fuhan");
 			"step 1";
 			event.num = Math.min(event.num, 8);
-			player.reinitCharacter("zhaoxiang", result.links[0]);
+			player.reinitCharacter(get.character(player.name2, 3).includes("fuhan") ? player.name2 : player.name1, result.links[0]);
 			"step 2";
 			var num = event.num - player.maxHp;
 			if (num > 0) player.gainMaxHp(num);
@@ -19395,7 +19394,6 @@ const skills = {
 		limited: true,
 		skillAnimation: true,
 		animationColor: "orange",
-		forceunique: true,
 		filter: function (event, player) {
 			return player.countMark("fanghun") > 0;
 		},
@@ -24477,7 +24475,6 @@ const skills = {
 		audio: 2,
 		unique: true,
 		juexingji: true,
-		forceunique: true,
 		derivation: "xiaoji",
 		trigger: { player: "phaseZhunbeiBegin" },
 		filter: function (event, player) {
