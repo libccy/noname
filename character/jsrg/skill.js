@@ -6025,6 +6025,9 @@ const skills = {
 			lib.skill.sbyingmen.addVisitors(characters, player);
 			game.delayx();
 		},
+		ai: {
+			combo: "sbpingjian"
+		},
 		group: "sbyingmen_reload",
 		subSkill: {
 			reload: {
