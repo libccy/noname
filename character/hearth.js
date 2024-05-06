@@ -6837,7 +6837,7 @@ game.import("character", function () {
 				content() {
 					var num = (get.is.altered("guozai") ? 3 : 4) - player.countCards("h");
 					player.draw(num);
-					player.addSkill("guozai2");
+					player.addTempSkill("guozai2", "phaseUseAfter");
 					player.storage.guozai2 += num;
 					game.addVideo("storage", player, ["guozai2", player.storage.guozai2]);
 				},
@@ -6851,14 +6851,13 @@ game.import("character", function () {
 			guozai2: {
 				mark: true,
 				intro: {
-					content: "结束阶段需弃置&张牌",
+					content: "当前阶段结束时需弃置&张牌",
 				},
 				trigger: { player: "phaseUseEnd" },
 				forced: true,
 				content() {
 					player.chooseToDiscard("he", true, player.storage.guozai2);
 					player.storage.guozai2 = 0;
-					player.removeSkill("guozai2");
 				},
 			},
 			guozaix: {
@@ -6873,7 +6872,7 @@ game.import("character", function () {
 				content() {
 					var num = 4 - player.countCards("h");
 					player.draw(num);
-					player.addSkill("guozaix2");
+					player.addTempSkill("guozaix2", "phaseUseAfter");
 					player.storage.guozaix2 += num;
 					game.addVideo("storage", player, ["guozaix2", player.storage.guozaix2]);
 				},
@@ -6887,14 +6886,13 @@ game.import("character", function () {
 			guozaix2: {
 				mark: true,
 				intro: {
-					content: "结束阶段需弃置&张牌",
+					content: "当前阶段结束时需弃置&张牌",
 				},
 				trigger: { player: "phaseUseEnd" },
 				forced: true,
 				content() {
 					player.chooseToDiscard("he", true, player.storage.guozaix2);
 					player.storage.guozaix2 = 0;
-					player.removeSkill("guozaix2");
 				},
 			},
 			hanshuang: {
