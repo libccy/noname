@@ -11913,7 +11913,7 @@ const skills = {
 				player.loseHp();
 			}
 			"step 1";
-			target.addTempSkill("reqiangxi_off");
+			target.addTempSkill("reqiangxi_off", "phaseUseAfter");
 			target.damage("nocard");
 		},
 		check: function (card) {
