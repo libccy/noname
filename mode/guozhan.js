@@ -2501,14 +2501,37 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			fakexibing: {
 				audio: "xibing",
-				inherit: "xibing",
+				filter: function (event, player) {
+					if (player == event.player || event.targets.length != 1 || event.player.countCards("h") >= event.player.hp) return false;
+					var bool = function (card) {
+						return (card.name == "sha" || get.type(card, false) == "trick") && get.color(card, false) == "black";
+					};
+					if (!bool(event.card)) return false;
+					var evt = event.getParent("phaseUse");
+					if (evt.player != event.player) return false;
+					return event.player.getHistory("useCard", function (evtx) {
+						return bool(evtx.card) && evtx.getParent("phaseUse") == evt;
+					})[0] == event.getParent();
+				},
+				logTarget: "player",
+				check: function (event, player) {
+					var target = event.player;
+					var att = get.attitude(player, target);
+					var num2 = Math.min(5, target.hp) - target.countCards("h");
+					if (num2 <= 0) return att <= 0;
+					var num = target.countCards("h", function (card) {
+						return target.hasValueTarget(card, null, true);
+					});
+					if (!num) return att > 0;
+					return (num - num2) * att < 0;
+				},
+				preHidden: true,
 				content() {
 					"step 0";
 					var num = trigger.player.hp - trigger.player.countCards("h");
 					if (num > 0) trigger.player.draw(num);
 					"step 1";
-					trigger.player.addTempSkill("xibing2");
-					player._xibing = true;
+					trigger.player.addTempSkill("fakexibing_banned");
 					if (get.mode() != "guozhan" || player.isUnseen(2) || trigger.player.isUnseen(2))
 						event.finish();
 					"step 2";
@@ -2537,9 +2560,21 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						var target = trigger.player;
 						player.hideCharacter(player.name1 == result.links[0] ? 0 : 1);
 						target.hideCharacter(target.name1 == result.links[1] ? 0 : 1);
-						player.addTempSkill("xibing3");
-						target.addTempSkill("xibing3");
+						player.addTempSkill("fakexibing_nomingzhi");
+						target.addTempSkill("fakexibing_nomingzhi");
 					}
+				},
+				subSkill: {
+					banned: {
+						mod: {
+							cardEnabled2: function (card) {
+								if (get.position(card) == "h") return false;
+							},
+						},
+					},
+					nomingzhi: {
+						ai: { nomingzhi: true },
+					},
 				},
 			},
 			fakechengshang: {
@@ -23796,7 +23831,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				"副将技。①此武将牌计算体力上限时减少半个阴阳鱼。②结束阶段，你可以弃置一张非基本牌并选择一名友方角色，令其选择摸两张牌或回复1点体力，然后其可以变更副将。",
 			fakexibing: "息兵",
 			fakexibing_info:
-				"当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至体力值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。",
+				"手牌数小于体力值的其他角色于其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至体力值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。",
 			fakechengshang: "承赏",
 			fakechengshang_info:
 				"出牌阶段限一次，当你使用存在花色和点数且指定了其他势力角色为目标的牌结算完毕后，若你未因此牌造成过伤害，则你可以摸一张牌，然后本阶段你可以将一张手牌当作初始游戏牌堆中与此牌花色和点数相同的另一张基本牌或普通锦囊牌使用一次。",

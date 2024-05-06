@@ -619,7 +619,7 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					player.line(trigger.player);
-					trigger.player.addTempSkill("jsrglonglin_forbid");
+					trigger.player.addTempSkill("jsrglonglin_forbid", "phaseUseAfter");
 				},
 			},
 			forbid: {
@@ -3647,7 +3647,7 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
-			event.num = 0;
+			target.addTempSkill("jsrgyangming_lose", "phaseUseAfter");
 			"step 1";
 			player.chooseToCompare(target).set(
 				"small",
@@ -3667,9 +3667,11 @@ const skills = {
 						.chooseBool("是否与其重复此拼点流程？")
 						.set("ai", () => get.event("bool"))
 						.set("bool", get.effect(target, "jsrgyangming", player, player) > 0);
-				event.num++;
+				game.broadcastAll((target)=>{
+					target.storage.jsrgyangming_lose++;
+				}, target);
 			} else {
-				if (event.num) target.draw(event.num);
+				if (target.storage.jsrgyangming_lose) target.draw(target.storage.jsrgyangming_lose);
 				player.recover();
 				event.finish();
 			}
@@ -3700,6 +3702,15 @@ const skills = {
 				},
 			},
 		},
+		subSkill: {
+			lose: {
+				init(player, skill) {
+					player.storage[skill] = 0;
+				},
+				onremove: true,
+				charlotte: true
+			}
+		}
 	},
 	//韩遂
 	jsrgniluan: {
@@ -6014,6 +6025,9 @@ const skills = {
 			lib.skill.sbyingmen.addVisitors(characters, player);
 			game.delayx();
 		},
+		ai: {
+			combo: "sbpingjian"
+		},
 		group: "sbyingmen_reload",
 		subSkill: {
 			reload: {
@@ -6654,7 +6668,12 @@ const skills = {
 		group: "jsrgguanhuo_viewas",
 		content: function () {
 			"step 0";
-			var count = player.getHistory("useSkill", evt => evt.skill == "jsrgguanhuo_viewas").length;
+			var count = player.getHistory("useSkill", evt => {
+				return (
+					evt.skill == "jsrgguanhuo_viewas" &&
+					evt.getParent("phaseUse") === trigger.getParent("phaseUse")
+				);
+			}).length;
 			if (count == 1) {
 				player.addTempSkill("jsrgguanhuo_ex", "phaseUseAfter");
 				player.addMark("jsrgguanhuo_ex", 1, false);
@@ -6666,8 +6685,18 @@ const skills = {
 		ai: {
 			effect: {
 				player: function (card, player) {
-					if (_status.event.getParent().skill == "jsrgguanhuo_viewas" && player.getHistory("useSkill", evt => evt.skill == "jsrgguanhuo_viewas").length == 1) return "zeroplayertarget";
-					if (_status.event.type == "phase" && _status.event.skill == "jsrgguanhuo_viewas" && player.getHistory("useSkill", evt => evt.skill == "jsrgguanhuo_viewas").length > 1 && player.countCards("h") <= 3) return [0, 0];
+					if (_status.event.getParent().skill == "jsrgguanhuo_viewas" && player.getHistory("useSkill", evt => {
+						return (
+							evt.skill == "jsrgguanhuo_viewas" &&
+							evt.getParent("phaseUse") === _status.event.getParent("phaseUse")
+						);
+					}).length == 1) return "zeroplayertarget";
+					if (_status.event.type == "phase" && _status.event.skill == "jsrgguanhuo_viewas" && player.getHistory("useSkill", evt => {
+						return (
+							evt.skill == "jsrgguanhuo_viewas" &&
+							evt.getParent("phaseUse") === _status.event.getParent("phaseUse")
+						);
+					}).length > 1 && player.countCards("h") <= 3) return [0, 0];
 				},
 			},
 		},

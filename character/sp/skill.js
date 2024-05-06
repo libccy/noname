@@ -14611,7 +14611,7 @@ const skills = {
 			if (!phsu || phsu.player != player) return false;
 			if (
 				player.getHistory("gain", function (evt) {
-					return evt.getParent().name == "chengshang";
+					return evt.getParent().name == "chengshang" && phsu === evt.getParent("phaseUse");
 				}).length
 			)
 				return false;
@@ -17171,9 +17171,6 @@ const skills = {
 				if (player.storage.new_zhixi2 || player.countMark("new_zhixi") >= player.hp) return false;
 			},
 			cardUsable: function (card, player) {
-				if (player.storage.new_zhixi2 || player.countMark("new_zhixi") >= player.hp) return false;
-			},
-			cardRespondable: function (card, player) {
 				if (player.storage.new_zhixi2 || player.countMark("new_zhixi") >= player.hp) return false;
 			},
 			cardSavable: function (card, player) {

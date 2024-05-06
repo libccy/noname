@@ -6851,7 +6851,7 @@ game.import("character", function () {
 			guozai2: {
 				mark: true,
 				intro: {
-					content: "结束阶段需弃置&张牌",
+					content: "当前阶段结束时需弃置&张牌",
 				},
 				trigger: { player: "phaseUseEnd" },
 				forced: true,
@@ -6887,7 +6887,7 @@ game.import("character", function () {
 			guozaix2: {
 				mark: true,
 				intro: {
-					content: "结束阶段需弃置&张牌",
+					content: "当前阶段结束时需弃置&张牌",
 				},
 				trigger: { player: "phaseUseEnd" },
 				forced: true,

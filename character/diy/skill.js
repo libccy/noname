@@ -5279,7 +5279,7 @@ const skills = {
 				.set("logSkill", "nsduijue");
 			"step 1";
 			if (result.bool) {
-				player.addTempSkill("nsduijue_use");
+				player.addTempSkill("nsduijue_use", "phaseUseAfter");
 				player.storage.nsduijue_use = get.color(result.cards[0]);
 			}
 		},

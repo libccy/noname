@@ -3338,6 +3338,9 @@ const skills = {
 				if (event.num > 0) event.redo();
 			}
 		},
+		ai: {
+			halfneg: true
+		},
 	},
 	xiongrao: {
 		audio: 2,

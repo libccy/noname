@@ -12422,19 +12422,14 @@ const skills = {
 		audio: 2,
 		trigger: { global: "useCardToPlayered" },
 		filter: function (event, player) {
-			if (player == event.player || event.targets.length != 1 || event.player.countCards("h") >= event.player.hp) return false;
+			if (player == event.player || event.targets.length != 1) return false;
 			var bool = function (card) {
 				return (card.name == "sha" || get.type(card, false) == "trick") && get.color(card, false) == "black";
 			};
 			if (!bool(event.card)) return false;
 			var evt = event.getParent("phaseUse");
 			if (evt.player != event.player) return false;
-			return (
-				get.mode() != "guozhan" ||
-				event.player.getHistory("useCard", function (evtx) {
-					return bool(evtx.card) && evtx.getParent("phaseUse") == evt;
-				})[0] == event.getParent()
-			);
+			return true;
 		},
 		logTarget: "player",
 		check: function (event, player) {
@@ -12452,41 +12447,23 @@ const skills = {
 		content: function () {
 			"step 0";
 			var num = Math.min(5, trigger.player.hp) - trigger.player.countCards("h");
-			if (num > 0) trigger.player.draw(num);
-			"step 1";
-			trigger.player.addTempSkill("xibing2");
-			player._xibing = true;
-			if (get.mode() != "guozhan" || player.isUnseen(2) || trigger.player.isUnseen(2)) event.finish();
-			"step 2";
-			var target = trigger.player;
-			var players1 = [player.name1, player.name2];
-			var players2 = [target.name1, target.name2];
-			player
-				.chooseButton(2, ["是否暗置自己和" + get.translation(target) + "的各一张武将牌？", '<div class="text center">你的武将牌</div>', [players1, "character"], '<div class="text center">' + get.translation(target) + "的武将牌</div>", [players2, "character"]])
-				.set("players", players1)
-				.set("complexSelect", true)
-				.set("filterButton", function (button) {
-					return !get.is.jun(button.link) && (ui.selected.buttons.length == 0) == _status.event.players.includes(button.link);
-				});
-			"step 3";
-			if (result.bool) {
-				var target = trigger.player;
-				player.hideCharacter(player.name1 == result.links[0] ? 0 : 1);
-				target.hideCharacter(target.name1 == result.links[1] ? 0 : 1);
-				player.addTempSkill("xibing3");
-				target.addTempSkill("xibing3");
+			if (num > 0) {
+				trigger.player.draw(num);
+				trigger.player.addTempSkill("xibing_banned");
 			}
 		},
-	},
-	xibing2: {
-		mod: {
-			cardEnabled2: function (card) {
-				if (get.position(card) == "h") return false;
+		subSkill:{
+			banned: {
+				mod: {
+					cardEnabled(card) {
+						return false;
+					},
+					cardSavable(card) {
+						return false;
+					},
+				},
 			},
 		},
-	},
-	xibing3: {
-		ai: { nomingzhi: true },
 	},
 	//小虎
 	remeibu: {

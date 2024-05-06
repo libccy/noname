@@ -6257,7 +6257,7 @@ const skills = {
 					var history = current.getHistory("useCard");
 					if (!history.length) return false;
 					for (var evt of history) {
-						if (evt.card && evt.card.name == "shunshou") {
+						if (evt.card && evt.card.name == "shunshou" && evt.getParent("phaseUse") === event.getParent("phaseUse")) {
 							targets.addArray(evt.targets);
 						}
 					}

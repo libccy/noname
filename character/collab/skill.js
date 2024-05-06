@@ -743,7 +743,7 @@ const skills = {
 				player.addMark("dcbianzhuang", 1, false);
 				if (player.countMark("dcbianzhuang") > 2) {
 					player.storage.dcbianzhuang_inited = true;
-					player.reinitCharacter("zhutiexiong", "wu_zhutiexiong");
+					player.reinitCharacter(get.character(player.name2, 3).includes("dcbianzhuang") ? player.name2 : player.name1, "wu_zhutiexiong");
 				}
 			}
 		},

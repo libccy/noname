@@ -1869,9 +1869,6 @@ const skills = {
 			cardUsable: function (card, player) {
 				if (player.countMark("mbzhixi") >= player.hp) return false;
 			},
-			cardRespondable: function (card, player) {
-				if (player.countMark("mbzhixi") >= player.hp) return false;
-			},
 			cardSavable: function (card, player) {
 				if (player.countMark("mbzhixi") >= player.hp) return false;
 			},
