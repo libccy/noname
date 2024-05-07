@@ -2828,7 +2828,7 @@ const skills = {
 		},
 		checkx: function (event, player) {
 			var target = event.source;
-			return get.damageEffect(player, target, target) <= 0;
+			return get.damageEffect(player, target, player) <= 0;
 		},
 		forced: true,
 		content: function () {
@@ -22183,6 +22183,7 @@ const skills = {
 			player.awakenSkill("zhiri");
 			player.loseMaxHp();
 			player.storage.zhiri = true;
+			player.addSkills("xintan");
 		},
 		ai: {
 			combo: "fentian",

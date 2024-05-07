@@ -14737,12 +14737,12 @@ const skills = {
 			order: 2.9,
 			result: {
 				target: function (player, target) {
+					if (get.attitude(player, target) >= 0) return -20;
 					var cards = ui.selected.cards.slice(0);
 					var names = [];
 					for (var i of cards) names.add(i.name);
 					if (names.length < player.hp) return 0;
 					if (player.hasUnknown() && (player.identity != "fan" || !target.isZhu)) return 0;
-					if (get.attitude(player, target) >= 0) return -20;
 					return lib.card.sha.ai.result.target.apply(this, arguments);
 				},
 			},

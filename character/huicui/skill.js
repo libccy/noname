@@ -12437,7 +12437,7 @@ const skills = {
 			var target = event.player;
 			var att = get.attitude(player, target);
 			var num2 = Math.min(5, target.hp) - target.countCards("h");
-			if (num2 <= 0) return att <= 0;
+			if (num2 <= 0) return false;
 			var num = target.countCards("h", function (card) {
 				return target.hasValueTarget(card, null, true);
 			});
