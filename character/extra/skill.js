@@ -4930,7 +4930,7 @@ const skills = {
 		derivation: "zuoxing",
 	},
 	zuoxing: {
-		audio: 2,
+		audio: 3,
 		enable: "phaseUse",
 		usable: 1,
 		filter(event, player) {
