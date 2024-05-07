@@ -5178,7 +5178,7 @@ const skills = {
 		trigger: { player: "dieBefore" },
 		forced: true,
 		filter(event, player) {
-			return player.maxHp > 0;
+			return player.maxHp > 0 && event.getParent().name != "giveup";
 		},
 		content() {
 			trigger.cancel();
