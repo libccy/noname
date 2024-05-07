@@ -242,7 +242,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			["spade", 12, "zhangba"],
 			["spade", 13, "nanman"],
 		],
-		characterSingle: {
+		characterSingle: Object.assign(new Proxy(
+			{},
+			{
+				set(target, prop, newValue) {
+					return Reflect.set(target, prop, get.convertedCharacter(newValue));
+				},
+			}
+		), {
 			caocao: ["male", "wei", 4, ["jianxiong"], ["zhu"]],
 			simayi: ["male", "wei", 3, ["fankui", "guicai"]],
 			xiahoudun: ["male", "wei", 4, ["ganglie"]],
@@ -300,7 +307,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			jin_simashi: ["male", "jin", "3/4", ["yimie", "tairan"]],
 			zhanghuyuechen: ["male", "jin", 4, ["xijue"]],
 			duyu: ["male", "jin", 4, ["sanchen", "zhaotao"]],
-		},
+		}),
 		startBefore: function () {},
 		onreinit: function () {
 			_status.mode = _status.connectMode ? lib.configOL.single_mode : get.config("single_mode");
@@ -349,7 +356,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						for (var j in singleTranslate) lib.translate[j] = singleTranslate[j];
 						_status.characterlist = [];
 						for (var i in characterSingle) {
-							if (!jin && get.convertedCharacter(characterSingle[i]) == "jin") continue;
+							if (!jin && characterSingle[i].group === "jin") continue;
 							lib.character[i] = characterSingle[i];
 							_status.characterlist.push(i);
 						}

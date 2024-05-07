@@ -156,6 +156,11 @@ export class Character {
 	 **/
 	initFilters = [];
 	/**
+	 * 武将牌的“临时名称”
+	 * @type { string[] }
+	 */
+	tempname = [];
+	/**
 	 * @param { Object|[string, string, string|number, string[], any[]|undefined, any[]|undefined] } [data]
 	 */
 	constructor(data) {
@@ -197,6 +202,7 @@ export class Character {
 		this.initFilters = [];
 		this.trashBin = [];
 		this.dieAudios = [];
+		this.tempname = [];
 	}
 	/**
 	 * @param { any[] } trash
@@ -258,6 +264,8 @@ export class Character {
 				this.dieAudios.push(item.slice(4));
 			} else if (item.startsWith("die_audio:")){
 				this.dieAudios = item.slice(10).split(":");
+			} else if (item.startsWith("tempname:")) {
+				this.tempname = item.slice(9).split(":");
 			} else {
 				keptTrashes.push(item);
 			}
@@ -382,6 +390,9 @@ export class Character {
 		if (character.dieAudios.length > 0) {
 			if (character.dieAudios.length === 1) trashes.push(`die:${character.dieAudios[0]}`)
 			else trashes.push(`die_audio:${character.dieAudios.join(":")}`);
+		}
+		if (character.tempname.length > 0) {
+			trashes.push(`tempname:${character.tempname.join(":")}`);
 		}
 
 		return new Proxy(trashes.concat(character.trashBin), {

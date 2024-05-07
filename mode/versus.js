@@ -752,8 +752,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						for (var i in lib.characterPack.boss) {
 							if (!lib.character[i]) {
 								if (
-									get.convertedCharacter(lib.characterPack.boss[i]).isJiangeBoss ||
-									get.convertedCharacter(lib.characterPack.boss[i]).isJiangeMech
+									lib.characterPack.boss[i].isJiangeBoss ||
+									lib.characterPack.boss[i].isJiangeMech
 								) {
 									lib.character[i] = lib.characterPack.boss[i];
 								}
@@ -4711,7 +4711,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ctx.stroke();
 			},
 		},
-		jiangeboss: {
+		jiangeboss: Object.assign(new Proxy(
+			{},
+			{
+				set(target, prop, newValue) {
+					return Reflect.set(target, prop, get.convertedCharacter(newValue));
+				},
+			}
+		), {
 			boss_liedixuande: [
 				"male",
 				"shu",
@@ -4874,7 +4881,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				["jiangeboss", "hiddenboss", "bossallowed"],
 				"shu",
 			],
-		},
+		}),
 		cardsFour: [
 			["spade", 7, "sha"],
 			["spade", 8, "sha"],

@@ -613,7 +613,7 @@ export class Get {
 		let info = lib.character[name];
 		if (!info) {
 			const pack = Object.keys(lib.characterPack).find((pack) => name in lib.characterPack[pack]);
-			if (pack) info = get.convertedCharacter(lib.characterPack[pack][name]);
+			if (pack) info = lib.characterPack[pack][name];
 		}
 		if (typeof num === "number") {
 			if (!info) info = [];
