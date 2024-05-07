@@ -640,6 +640,7 @@ export const Content = {
 		event.originGroup = player.group;
 		if (!event.group) event.group = player.group;
 		var group = event.group;
+		game.addVideo("changeGroup", player, group);
 		player.getHistory("custom").push(event);
 		if (event.broadcast !== false) {
 			game.broadcast(
@@ -2774,7 +2775,7 @@ export const Content = {
 		if (ui.updateVideoMenu) {
 			ui.updateVideoMenu();
 		}
-		_status.videoDuration = 1;
+		_status.videoDuration = 1 / parseFloat(lib.config.video_default_play_speed.slice(0, -1));
 		ui.create.system("返回", function () {
 			var mode = localStorage.getItem(lib.configprefix + "playbackmode");
 			if (mode) {
@@ -2787,6 +2788,14 @@ export const Content = {
 			game.playVideo(_status.playback, lib.config.mode);
 		});
 		ui.create.system("暂停", ui.click.pause, true).id = "pausebutton";
+		var atempo = ui.create.system(
+			"原速",
+			function () {
+				_status.videoDuration = 1;
+				updateDuration();
+			},
+			true
+		);
 		var slow = ui.create.system(
 			"减速",
 			function () {
@@ -2804,6 +2813,7 @@ export const Content = {
 			true
 		);
 		var updateDuration = function () {
+			atempo.innerHTML = `原速(当前${Math.round(100 / _status.videoDuration) / 100}倍速)`;
 			if (_status.videoDuration > 1) {
 				slow.classList.add("glow");
 			} else {
@@ -2815,6 +2825,7 @@ export const Content = {
 				fast.classList.remove("glow");
 			}
 		};
+		updateDuration();
 		ui.system.style.display = "";
 		ui.refresh(ui.system);
 		ui.system.show();

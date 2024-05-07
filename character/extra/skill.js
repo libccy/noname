@@ -1823,27 +1823,40 @@ const skills = {
 			if (result.bool) {
 				game.broadcastAll(
 					function (moved, player) {
-						var tags = ["dctuoyu_fengtian", "dctuoyu_qingqu", "dctuoyu_junshan"];
-						var cards = [];
-						for (var i = 0; i < moved.length; i++) {
-							for (var card of moved[i]) {
-								cards.unshift(card);
-								for (var j = 0; j < tags.length; j++) {
-									if (i == j + 1) {
-										if (!card.hasGaintag(tags[j] + "_tag")) card.addGaintag(tags[j] + "_tag");
-									} else {
-										if (card.hasGaintag(tags[j] + "_tag")) card.removeGaintag(tags[j] + "_tag");
-									}
-								}
-							}
-						}
 						if (player == game.me) {
+							const cards = moved.flat(1).reverse();
 							game.addVideo("lose", game.me, [get.cardsInfo(cards), [], [], []]);
 							for (var i = 0; i < cards.length; i++) {
 								cards[i].goto(ui.special);
 							}
 							game.me.directgain(cards, false);
 						}
+						var tags = ["dctuoyu_fengtian", "dctuoyu_qingqu", "dctuoyu_junshan"];
+						var map = {};
+						for (var i = 0; i < moved.length; i++) {
+							for (var card of moved[i]) {
+								for (var j = 0; j < tags.length; j++) {
+									const tag = `${tags[j]}_tag`;
+									if (!map[tag]) map[tag] = [[], []];
+									if (i == j + 1) {
+										map[tag][0].add(card);
+										if (!card.hasGaintag(tag)) {
+											card.addGaintag(tag);
+										}
+									} else {
+										if (card.hasGaintag(tag)) {
+											map[tag][1].add(card);
+											card.removeGaintag(tag);
+										}
+									}
+								}
+							}
+						}
+						for (const tag in map) {
+							if (map[tag][0].length) game.addVideo("addGaintag", player, [get.cardsInfo(map[tag][0]), tag]);
+							if (map[tag][1].length) game.addVideo("removeGaintag", player, [tag, get.cardsInfo(map[tag][1])]);
+						}
+						game.addVideo("delay", null, 1);
 					},
 					result.moved,
 					player
