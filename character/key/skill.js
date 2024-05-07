@@ -463,6 +463,8 @@ const skills = {
 	},
 	//加纳天善（旧）
 	tenzen_yixing: {
+		unique: true,
+		forceunique: true,
 		trigger: {
 			global: "damageEnd",
 		},
@@ -4756,6 +4758,8 @@ const skills = {
 		},
 	},
 	yukito_yaxiang: {
+		unique: true,
+		forceunique: true,
 		enable: "chooseToUse",
 		limited: true,
 		filter(event, player) {
@@ -7070,7 +7074,7 @@ const skills = {
 			let num = 1 + event.cost_data;
 			await player.draw(num).set("gaintag", ["shiorimiyuki_tingxian"]);
 			await player.recover();
-			player.addTempSkill("shiorimiyuki_tingxian2");
+			player.addTempSkill("shiorimiyuki_tingxian2", "phaseUseAfter");
 		},
 		group: "shiorimiyuki_tingxian1",
 	},
@@ -7565,6 +7569,7 @@ const skills = {
 		trigger: { player: "phaseZhunbeiBegin" },
 		limited: true,
 		unique: true,
+		forceunique: true,
 		charlotte: true,
 		skillAnimation: true,
 		animationColor: "water",
@@ -7572,6 +7577,7 @@ const skills = {
 			return player.isDamaged();
 		},
 		check(event, player) {
+			if (![player.name1, player.name2].includes("key_mio")) return false;
 			return player.hp <= 1 || player.getDamagedHp() > 1;
 		},
 		content() {
@@ -7640,12 +7646,14 @@ const skills = {
 		limited: true,
 		charlotte: true,
 		unique: true,
+		forceunique: true,
 		skillAnimation: true,
 		animationColor: "water",
 		filter(event, player) {
 			return player.isDamaged();
 		},
 		check(event, player) {
+			if (![player.name1, player.name2].includes("key_midori")) return false;
 			return player.hp <= 1 || player.getDamagedHp() > 1;
 		},
 		content() {
@@ -8690,7 +8698,7 @@ const skills = {
 					});
 				}
 			} else {
-				player.addTempSkill("zishou2", "phaseEnd");
+				player.addTempSkill("zishou2", "phaseUseAfter");
 			}
 		},
 		ai: { expose: 0.2 },
@@ -10574,9 +10582,15 @@ const skills = {
 		},
 	},
 	umi_qihuan: {
+		unique: true,
+		forceunique: true,
 		enable: "chooseToUse",
 		filter(summer, umi) {
-			return summer.type == "dying" && umi.isDying();
+			return (
+				summer.type == "dying" &&
+				umi.isDying() &&
+				[umi.name1, umi.name2].includes("key_umi")
+			);
 		},
 		limited: true,
 		skillAnimation: true,

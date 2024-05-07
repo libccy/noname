@@ -6257,7 +6257,7 @@ const skills = {
 					var history = current.getHistory("useCard");
 					if (!history.length) return false;
 					for (var evt of history) {
-						if (evt.card && evt.card.name == "shunshou") {
+						if (evt.card && evt.card.name == "shunshou" && evt.getParent("phaseUse") === event.getParent("phaseUse")) {
 							targets.addArray(evt.targets);
 						}
 					}
@@ -8259,6 +8259,9 @@ const skills = {
 					}
 				},
 			},
+		},
+		ai:{
+			combo: "twzhenliang",
 		},
 	},
 	twzhenliang: {
@@ -14734,12 +14737,12 @@ const skills = {
 			order: 2.9,
 			result: {
 				target: function (player, target) {
+					if (get.attitude(player, target) >= 0) return -20;
 					var cards = ui.selected.cards.slice(0);
 					var names = [];
 					for (var i of cards) names.add(i.name);
 					if (names.length < player.hp) return 0;
 					if (player.hasUnknown() && (player.identity != "fan" || !target.isZhu)) return 0;
-					if (get.attitude(player, target) >= 0) return -20;
 					return lib.card.sha.ai.result.target.apply(this, arguments);
 				},
 			},
@@ -15585,7 +15588,6 @@ const skills = {
 		limited: true,
 		skillAnimation: true,
 		animationColor: "orange",
-		forceunique: true,
 		filter: function (event, player) {
 			return player.countMark("fanghun") > 0;
 		},

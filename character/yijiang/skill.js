@@ -11661,7 +11661,7 @@ const skills = {
 			threaten: 0.8,
 			effect: {
 				target: function (card, player, target) {
-					if (get.tag(card, "damage")) {
+					if (get.tag(card, "damage") && (player.hasSkill("paiyi") || player.hasSkill("zili"))) {
 						if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
 						if (!target.hasFriend()) return;
 						if (target.hp >= 4) return [0.5, get.tag(card, "damage") * 2];
@@ -14447,7 +14447,8 @@ const skills = {
 			aiOrder: function (player, card, num) {
 				if (typeof card == "object" && player.isPhaseUsing()) {
 					var evt = player.getLastUsed();
-					if (evt && evt.card && ((get.suit(evt.card) && get.suit(evt.card) == get.suit(card)) || (evt.card.number && evt.card.number == get.number(card)))) {
+					if (!evt || !evt.card || evt.getParent("phaseUse") !== _status.event.getParent("phaseUse")) return num;
+					if ((get.suit(evt.card) && get.suit(evt.card) == get.suit(card)) || (evt.card.number && evt.card.number == get.number(card))) {
 						return num + 10;
 					}
 				}
@@ -14460,7 +14461,7 @@ const skills = {
 			if (!evt || !evt.card) return false;
 			if (!player.isPhaseUsing()) return false;
 			var evt2 = evt.getParent("phaseUse");
-			if (!evt2 || evt2.name != "phaseUse" || evt2.player != player) return false;
+			if (!evt2 || evt2.name != "phaseUse" || evt2 !== event.getParent("phaseUse")) return false;
 			return (get.suit(evt.card) != "none" && get.suit(evt.card) == get.suit(event.card)) || (typeof get.number(evt.card, false) == "number" && get.number(evt.card, false) == get.number(event.card));
 		},
 		content: function () {

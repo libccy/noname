@@ -1238,7 +1238,10 @@ const skills = {
 					aiOrder: function (player, card, num) {
 						if (typeof card.number != "number") return;
 						var history = player.getHistory("useCard", function (evt) {
-							return evt.isPhaseUsing();
+							return (
+								evt.isPhaseUsing() &&
+								evt.getParent("phaseUse") === _status.event.getParent("phaseUse")
+							);
 						});
 						if (history.length == 0) return num + 10 * (14 - card.number);
 						var num = get.number(history[0].card);
@@ -1253,7 +1256,10 @@ const skills = {
 				},
 				filter: function (event, player) {
 					var history = player.getHistory("useCard", function (evt) {
-						return evt.isPhaseUsing();
+						return (
+							evt.isPhaseUsing() &&
+							evt.getParent("phaseUse") === event.getParent("phaseUse")
+						);
 					});
 					if (history.length < 2) return false;
 					var num = get.number(history[0].card);
@@ -1291,7 +1297,10 @@ const skills = {
 					aiOrder: function (player, card, num) {
 						if (typeof card.number != "number") return;
 						var history = player.getHistory("useCard", function (evt) {
-							return evt.isPhaseUsing();
+							return (
+								evt.isPhaseUsing() &&
+								evt.getParent("phaseUse") === _status.event.getParent("phaseUse")
+							);
 						});
 						if (history.length == 0) return num + 10 * card.number;
 						var num = get.number(history[0].card);
@@ -1306,7 +1315,10 @@ const skills = {
 				},
 				filter: function (event, player) {
 					var history = player.getHistory("useCard", function (evt) {
-						return evt.isPhaseUsing();
+						return (
+							evt.isPhaseUsing() &&
+							evt.getParent("phaseUse") === event.getParent("phaseUse")
+						);
 					});
 					if (history.length < 2) return false;
 					var num = get.number(history[0].card);

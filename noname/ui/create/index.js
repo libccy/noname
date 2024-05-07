@@ -1042,7 +1042,7 @@ export class Create {
 						.setContent(function () {
 							game.log(player, "投降");
 							player.popup("投降");
-							player.die("nosource").includeOut = true;
+							player.die("nosource").set("_triggered", null).includeOut = true;
 						}).player = player;
 				}
 				if (_status.paused && _status.imchoosing && !_status.auto) {

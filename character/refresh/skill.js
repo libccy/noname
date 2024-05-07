@@ -11913,7 +11913,7 @@ const skills = {
 				player.loseHp();
 			}
 			"step 1";
-			target.addTempSkill("reqiangxi_off");
+			target.addTempSkill("reqiangxi_off", "phaseUseAfter");
 			target.damage("nocard");
 		},
 		check: function (card) {
@@ -14207,7 +14207,7 @@ const skills = {
 				.set("ai", () => {
 					const player = get.event("player"),
 						trigger = get.event().getTrigger();
-					const cards = trigger.cards.filterInD();
+					const cards = trigger.cards ? trigger.cards.filterInD() : [];
 					if (get.event().controls.includes("拿牌")) {
 						if (
 							cards.reduce((sum, card) => {

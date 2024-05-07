@@ -2419,6 +2419,9 @@ const skills = {
 			if (cards.length) player.loseToDiscardpile(cards);
 		},
 		group: ["nzry_mingren_1", "nzry_mingren_2"],
+		ai:{
+			combo: "nzry_zhenliang",
+		},
 		subSkill: {
 			1: {
 				audio: 2,

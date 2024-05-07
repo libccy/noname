@@ -630,7 +630,7 @@ game.import("character", function () {
 							player.turnOver(false);
 							"step 3";
 							player.draw(4);
-							player.reinit("gjqt_xieyi", "gjqt_chuqi");
+							player.reinit(get.character(player.name2, 3).includes("humeng") ? player.name2 : player.name1, "gjqt_chuqi");
 							player.hp = player.maxHp;
 							"step 4";
 							if (event.yanjia) {

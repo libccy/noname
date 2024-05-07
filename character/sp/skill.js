@@ -171,6 +171,9 @@ const skills = {
 					result: { bool, moved },
 				} = await player
 					.chooseToMove("易城：请选择你要交换的牌")
+					.set("filterMove", (from, to) => {
+						return typeof to !== "number";
+					})
 					.set("list", [
 						[
 							"牌堆顶",
@@ -2825,7 +2828,7 @@ const skills = {
 		},
 		checkx: function (event, player) {
 			var target = event.source;
-			return get.damageEffect(player, target, target) <= 0;
+			return get.damageEffect(player, target, player) <= 0;
 		},
 		forced: true,
 		content: function () {
@@ -14611,7 +14614,7 @@ const skills = {
 			if (!phsu || phsu.player != player) return false;
 			if (
 				player.getHistory("gain", function (evt) {
-					return evt.getParent().name == "chengshang";
+					return evt.getParent().name == "chengshang" && phsu === evt.getParent("phaseUse");
 				}).length
 			)
 				return false;
@@ -17173,9 +17176,6 @@ const skills = {
 			cardUsable: function (card, player) {
 				if (player.storage.new_zhixi2 || player.countMark("new_zhixi") >= player.hp) return false;
 			},
-			cardRespondable: function (card, player) {
-				if (player.storage.new_zhixi2 || player.countMark("new_zhixi") >= player.hp) return false;
-			},
 			cardSavable: function (card, player) {
 				if (player.storage.new_zhixi2 || player.countMark("new_zhixi") >= player.hp) return false;
 			},
@@ -19322,7 +19322,6 @@ const skills = {
 		limited: true,
 		skillAnimation: true,
 		animationColor: "orange",
-		forceunique: true,
 		filter: function (event, player) {
 			return player.storage.fanghun2 > 0;
 		},
@@ -19380,7 +19379,7 @@ const skills = {
 			player.awakenSkill("fuhan");
 			"step 1";
 			event.num = Math.min(event.num, 8);
-			player.reinitCharacter("zhaoxiang", result.links[0]);
+			player.reinitCharacter(get.character(player.name2, 3).includes("fuhan") ? player.name2 : player.name1, result.links[0]);
 			"step 2";
 			var num = event.num - player.maxHp;
 			if (num > 0) player.gainMaxHp(num);
@@ -19398,7 +19397,6 @@ const skills = {
 		limited: true,
 		skillAnimation: true,
 		animationColor: "orange",
-		forceunique: true,
 		filter: function (event, player) {
 			return player.countMark("fanghun") > 0;
 		},
@@ -22185,6 +22183,7 @@ const skills = {
 			player.awakenSkill("zhiri");
 			player.loseMaxHp();
 			player.storage.zhiri = true;
+			player.addSkills("xintan");
 		},
 		ai: {
 			combo: "fentian",
@@ -24480,7 +24479,6 @@ const skills = {
 		audio: 2,
 		unique: true,
 		juexingji: true,
-		forceunique: true,
 		derivation: "xiaoji",
 		trigger: { player: "phaseZhunbeiBegin" },
 		filter: function (event, player) {

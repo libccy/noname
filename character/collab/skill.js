@@ -82,8 +82,10 @@ const skills = {
 				}
 				list.forEach(name => {
 					if (name !== "dc_wuyi") {
-						const skills = get.character(name).skills;
+						const skills = get.character(name, 3);
 						skills.forEach(skill => {
+							const info = get.info(skill);
+							if (!info || (info.ai && info.ai.combo)) return;
 							if (skill in _status.dcbenxi_map) return;
 							const voices = game.parseSkillText(skill, name);
 							if (
@@ -743,7 +745,7 @@ const skills = {
 				player.addMark("dcbianzhuang", 1, false);
 				if (player.countMark("dcbianzhuang") > 2) {
 					player.storage.dcbianzhuang_inited = true;
-					player.reinitCharacter("zhutiexiong", "wu_zhutiexiong");
+					player.reinitCharacter(get.character(player.name2, 3).includes("dcbianzhuang") ? player.name2 : player.name1, "wu_zhutiexiong");
 				}
 			}
 		},

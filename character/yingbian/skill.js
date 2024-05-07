@@ -946,12 +946,15 @@ const skills = {
 		},
 	},
 	gaoling: {
+		unique: true,
 		audio: 2,
 		trigger: { player: "showCharacterAfter" },
 		hiddenSkill: true,
 		filter: function (event, player) {
 			return (
-				event.toShow.includes("xuangongzhu") &&
+				event.toShow.some(name => {
+					return get.character(name, 3).includes("gaoling");
+				}) &&
 				player != _status.currentPhase &&
 				game.hasPlayer(function (current) {
 					return current.isDamaged();
