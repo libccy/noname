@@ -543,7 +543,7 @@ export default {
 	"#wusheng_jsp_guanyu2": "义击逆流，武安黎庶。",
 	"#danji1": "单骑护嫂千里，只为桃园之义！",
 	"#danji2": "独身远涉，赤心归国！",
-	"#jsp_guanyu:die": "桃园一拜，此生无憾！",
+	"#jsp_guanyu:die": "樊城一去，死亦无惧！",
 	"#jiqiao1": "驭巧器，以取先机。",
 	"#jiqiao2": "颖悟之人，不以拙力取胜。",
 	"#linglong1": "哼~书中自有玲珑心~",
