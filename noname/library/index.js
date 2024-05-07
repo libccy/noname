@@ -965,6 +965,20 @@ export class Library {
 					},
 					unfrequent: true,
 				},
+				video_default_play_speed: {
+					name: "默认录像播放速度",
+					init: "1x",
+					intro: "设置播放游戏录像时默认的播放速度",
+					item: {
+						"0.25x": "0.25倍速",
+						"0.5x": "0.5倍速",
+						"1x": "原速",
+						"1.5x": "1.5倍速",
+						"2x": "2倍速",
+						"4x": "4倍速",
+					},
+					unfrequent: true,
+				},
 				max_loadtime: {
 					name: "最长载入时间",
 					intro: "设置游戏从启动到完成载入所需的最长时间，超过此时间未完成载入会报错，若设备较慢或安装了较多扩展可适当延长此时间",
