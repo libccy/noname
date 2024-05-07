@@ -457,6 +457,8 @@ export default {
 	"#re_zhenji:die": "出亦复何苦，入亦复何愁。",
 	"#guanxing_re_zhugeliang1": "天星之变，吾窥探一二。",
 	"#guanxing_re_zhugeliang2": "星途莫测，细细推敲。",
+	"#kongcheng1_re_zhugeliang1": "淡然相对，转危为安。",
+	"#kongcheng1_re_zhugeliang2": "绝处逢生，此招慎用。",
 	"#re_zhugeliang:die": "穷尽毕生，有憾无悔。",
 	"#new_reyaowu1": "有吾在此，解太师烦忧。",
 	"#new_reyaowu2": "这些杂兵，我有何惧！",

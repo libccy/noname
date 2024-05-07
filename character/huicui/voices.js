@@ -1,4 +1,9 @@
 export default {
+	"#dcduanti1": "流水不腐，户枢不蠹。",
+	"#dcduanti2": "五禽锻体，百病不侵。",
+	"#dcshicao1": "掌中非药，乃活人之根本。",
+	"#dcshicao2": "药长于草木，然草木非皆可入药。",
+	"#wupu:die": "医者，不可使人长生……",
 	"#dcjianzhuan1": "今作擎天之柱，何怜八方风雨？",
 	"#dcjianzhuan2": "吾寄百里之命，当居万丈危楼。",
 	"#dcfanshi1": "垒巨木为寨，发屯兵自守。",

@@ -4930,7 +4930,7 @@ const skills = {
 		derivation: "zuoxing",
 	},
 	zuoxing: {
-		audio: 2,
+		audio: 3,
 		enable: "phaseUse",
 		usable: 1,
 		filter(event, player) {
@@ -7068,7 +7068,7 @@ const skills = {
 	yeyan: {
 		unique: true,
 		limited: true,
-		audio: 3,
+		audio: 2,
 		enable: "phaseUse",
 		filterCard(card, player) {
 			return !ui.selected.cards.some(cardx => get.suit(cardx, player) == get.suit(card, player));

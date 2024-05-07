@@ -7053,7 +7053,7 @@ const skills = {
 		},
 	},
 	shichou: {
-		//audio:1,
+		audio: true,
 		skillAnimation: true,
 		animationColor: "orange",
 		unique: true,
