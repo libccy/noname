@@ -604,7 +604,7 @@ export class Get {
 			if (num === 3 || num === 4) return [];
 			return;
 		}
-		return info || {};
+		return info || get.convertedCharacter({});
 	}
 	characterInitFilter(name) {
 		const info = get.character(name);
