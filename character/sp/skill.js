@@ -22183,6 +22183,7 @@ const skills = {
 			player.awakenSkill("zhiri");
 			player.loseMaxHp();
 			player.storage.zhiri = true;
+			player.addSkills("xintan");
 		},
 		ai: {
 			combo: "fentian",
