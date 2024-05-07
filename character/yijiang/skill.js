@@ -11661,7 +11661,7 @@ const skills = {
 			threaten: 0.8,
 			effect: {
 				target: function (card, player, target) {
-					if (get.tag(card, "damage")) {
+					if (get.tag(card, "damage") && (player.hasSkill("paiyi") || player.hasSkill("zili"))) {
 						if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
 						if (!target.hasFriend()) return;
 						if (target.hp >= 4) return [0.5, get.tag(card, "damage") * 2];

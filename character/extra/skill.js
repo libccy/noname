@@ -6323,6 +6323,7 @@ const skills = {
 			combo: "sbaiyin",
 			effect: {
 				target(card, player, target) {
+					if (!target.hasSkill("sbaiyin") && !target.hasSkill("jilue") || !target.hasFriend()) return;
 					if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
 					if (get.tag(card, "damage")) {
 						if (target.hp == target.maxHp) {
