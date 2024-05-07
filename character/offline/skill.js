@@ -4064,8 +4064,7 @@ const skills = {
 			"step 0";
 			player.give(cards, targets[0], "give");
 			"step 1";
-			if (targets[0].canCompare(targets[1])) targets[0].chooseToCompare(targets[1]);
-			else event.finish();
+			targets[0].chooseToCompare(targets[1]);
 			"step 2";
 			if (result.bool) {
 				targets[1].loseHp();
@@ -7053,7 +7052,7 @@ const skills = {
 		},
 	},
 	shichou: {
-		//audio:1,
+		audio: 1,
 		skillAnimation: true,
 		animationColor: "orange",
 		unique: true,
