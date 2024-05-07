@@ -7170,10 +7170,11 @@ const skills = {
 		},
 		check: function (event, player) {
 			return (
-				get.damageEffect(event.player, player, player) < 0 ||
-				(!event.player.hasSkillTag("noe") &&
+				get.damageEffect(event.player, player, player) <= 0 ||
+				(get.attitude(player, event.player) <= 0 &&
+					!event.player.hasSkillTag("noe") &&
 					event.player.hasCard(function (card) {
-						return get.value(card) > 6;
+						return get.value(card) > 9 - event.player.hp;
 					}, "e"))
 			);
 		},
