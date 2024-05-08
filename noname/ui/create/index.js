@@ -1242,7 +1242,6 @@ export class Create {
 			expandall,
 			onlypack,
 			heightset,
-			precharacter,
 			characterx;
 		for (var i = 0; i < arguments.length; i++) {
 			if (arguments[i] === "thisiscard") {
@@ -1251,8 +1250,6 @@ export class Create {
 				expandall = true;
 			} else if (arguments[i] === "heightset") {
 				heightset = true;
-			} else if (arguments[i] == "precharacter") {
-				precharacter = true;
 			} else if (arguments[i] == "characterx") {
 				characterx = true;
 			} else if (
@@ -1982,9 +1979,7 @@ export class Create {
 				dialog.add([list, "vcard"], noclick);
 			}
 		} else {
-			if (precharacter) {
-				dialog.add([list, "precharacter"], noclick);
-			} else if (characterx) {
+			if (characterx) {
 				dialog.add([list, "characterx"], noclick);
 			} else {
 				dialog.add([list, "character"], noclick);

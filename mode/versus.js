@@ -1775,7 +1775,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							game.players[i].node.name_seat = ui.create.div(
 								".name.name_seat",
 								get.verticalStr(
-									get.seatTranslation(_status.firstAct, game.players[i], "absolute")
+									get.seatTranslation(get.distance(_status.firstAct, game.players[i], "absolute"))
 								),
 								game.players[i]
 							);
@@ -2006,7 +2006,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									ui.create.characterDialog(
 										"heightset",
 										event.filterChoice,
-										"precharacter"
+										"character"
 									);
 							}
 						}
