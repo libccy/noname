@@ -57,7 +57,7 @@ const translates = {
 	ol_yufan: "OL界虞翻",
 	ol_yufan_prefix: "OL界",
 	olzongxuan: "纵玄",
-	olzongxuan_info: "当你或你的上家因弃置而失去牌后，你可以将位于弃牌堆的这些牌中的任意牌以任意顺序置于牌堆顶。",
+	olzongxuan_info: "当你弃置而失去牌后，或你的上家每回合因弃置首次失去牌后，你可以将位于弃牌堆的这些牌中的任意牌以任意顺序置于牌堆顶。",
 	olzhiyan: "直言",
 	olzhiyan_info: "你或你的上家的结束阶段，你可以令一名角色正面朝上摸一张牌，然后若此牌：为装备牌，则其使用此牌并回复1点体力；不为装备牌且其体力值大于等于你，则其失去1点体力。",
 	ol_chengpu: "OL界程普",
