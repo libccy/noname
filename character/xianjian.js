@@ -308,9 +308,9 @@ game.import("character", function () {
 				},
 				content: function () {
 					player.storage.yuexing2 = target;
-					player.addTempSkill("yuexing2");
+					player.addTempSkill("yuexing2", "phaseUseAfter");
 					target.storage.yuexing2 = player;
-					target.addTempSkill("yuexing2");
+					target.addTempSkill("yuexing2", "phaseUseAfter");
 				},
 				ai: {
 					order: function () {
@@ -2811,7 +2811,7 @@ game.import("character", function () {
 				unique: true,
 				forceunique: true,
 				filter: function () {
-					return Math.random() < 0.5;
+					return Math.random() < 0.5 && [player.name1, player.name2].includes("pal_longkui");
 				},
 				derivation: ["diesha", "guijiang"],
 				content: function () {

@@ -142,17 +142,14 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
 				gzbool = false;
 			const mode = get.mode();
 			if (type == "character") {
+				nameinfo = get.character(name);
 				if (lib.characterPack[`mode_${mode}`] && lib.characterPack[`mode_${mode}`][name]) {
 					if (mode == "guozhan") {
-						nameinfo = lib.character[name];
 						if (name.startsWith("gz_shibing")) name = name.slice(3, 11);
 						else {
-							if (
-								lib.config.mode_config.guozhan.guozhanSkin &&
-								lib.character[name] &&
-								lib.character[name][4].includes("gzskin")
-							)
+							if (lib.config.mode_config.guozhan.guozhanSkin && nameinfo && nameinfo.hasSkinInGuozhan){
 								gzbool = true;
+							}
 							name = name.slice(3);
 						}
 					} else modeimage = mode;
@@ -161,13 +158,15 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
 					name = name.split("::");
 					modeimage = name[0];
 					name = name[1];
-				} else {
-					nameinfo = get.character(name);
 				}
 			}
-			if (!modeimage && nameinfo && nameinfo[4])
-				for (const value of nameinfo[4]) {
-					if (value.startsWith("ext:")) {
+			let imgPrefixUrl;
+			if (!modeimage && nameinfo && nameinfo.trashBin) {
+				for (const value of nameinfo.trashBin) {
+					if (value.startsWith("img:")) {
+						imgPrefixUrl = value.slice(4);
+						break;
+					} else if (value.startsWith("ext:")) {
 						extimage = value;
 						break;
 					} else if (value.startsWith("db:")) {
@@ -181,7 +180,9 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
 						break;
 					}
 				}
-			if (extimage) src = extimage.replace(/^ext:/, "extension/");
+			}
+			if (imgPrefixUrl) src = imgPrefixUrl;
+			else if (extimage) src = extimage.replace(/^ext:/, "extension/");
 			else if (dbimage) {
 				this.setBackgroundDB(dbimage.slice(3));
 				return this;
@@ -225,6 +226,8 @@ HTMLDivElement.prototype.setBackgroundImage = function (img) {
 			.unique()
 			.map((v) => `url("${lib.assetURL}${v}")`)
 			.join(",");
+	} else if (URL.canParse(img)) {
+		this.style.backgroundImage = `url("${img}")`;
 	} else {
 		this.style.backgroundImage = `url("${lib.assetURL}${img}")`;
 	}

@@ -347,7 +347,7 @@ export class Click {
 			uiintro.listen(function () {
 				_status.clicked = true;
 			});
-			uiintro.style.zIndex = 21;
+			uiintro.style.zIndex = "21";
 			uiintro.classList.add("popped");
 			uiintro.classList.add("static");
 			uiintro.classList.add("onlineclient");
@@ -2843,10 +2843,20 @@ export class Click {
 				}
 				if (targetprompt) {
 					if (Array.isArray(targetprompt)) {
-						targetprompt =
-							targetprompt[
-								Math.min(targetprompt.length - 1, ui.selected.targets.indexOf(this))
-							];
+						const targets = ui.selected.targets.slice();
+						let index = ui.selected.targets.indexOf(this);
+						for (let i = 0; i < targetprompt.length; i++) {
+							const target = targets.find(
+								(cur) => cur.node.prompt && cur.node.prompt.innerHTML === targetprompt[i]
+							);
+							if (target) {
+								targets.remove(target);
+							} else {
+								index = i;
+								break;
+							}
+						}
+						targetprompt = targetprompt[Math.min(targetprompt.length - 1, index)];
 					} else if (typeof targetprompt == "function") {
 						targetprompt = targetprompt(this);
 					}
@@ -3186,7 +3196,7 @@ export class Click {
 								delete lib.config.skin[nameskin];
 								if (
 									gzbool &&
-									lib.character[nameskin2][4].includes("gzskin") &&
+									lib.character[nameskin2].hasSkinInGuozhan &&
 									lib.config.mode_config.guozhan.guozhanSkin
 								) {
 									bg.setBackground(nameskin2, "character");
@@ -3206,7 +3216,7 @@ export class Click {
 						} else {
 							if (
 								gzbool &&
-								lib.character[nameskin2][4].includes("gzskin") &&
+								lib.character[nameskin2].hasSkinInGuozhan &&
 								lib.config.mode_config.guozhan.guozhanSkin
 							)
 								button.setBackground(nameskin2, "character", "noskin");
@@ -3483,14 +3493,15 @@ export class Click {
 			};
 		} else {
 			// 样式一
+			//TODO: 这里的数据也暂时没有改成新格式，需要后续的修改
+			const nameInfo = get.character(name);
 			const introduction = ui.create.div(".characterintro", uiintro),
 				showCharacterNamePinyin = lib.config.show_characternamepinyin;
 			if (showCharacterNamePinyin != "doNotShow") {
 				const characterIntroTable = ui.create.div(".character-intro-table", introduction),
 					span = document.createElement("span");
 				span.style.fontWeight = "bold";
-				const nameInfo = get.character(name),
-					exInfo = nameInfo[4],
+				const exInfo = nameInfo.trashBin,
 					characterName =
 						exInfo && exInfo.includes("ruby") ? lib.translate[name] : get.rawName2(name);
 				span.innerHTML = characterName;
@@ -3543,17 +3554,15 @@ export class Click {
 				if (characterGroups)
 					Promise.all(
 						characterGroups.map((characterGroup) =>
-							new Promise((resolve, reject) => {
+							Promise.resolve().then(async () => {
 								const imageName = `group_${characterGroup}`,
 									information = lib.card[imageName];
-								if (!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+								if (!information) return `${lib.assetURL}image/card/${imageName}.png`;
 								const image = information.image;
-								if (!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-								else if (image.startsWith("db:"))
-									game.getDB("image", image.slice(3)).then(resolve, reject);
-								else if (image.startsWith("ext:"))
-									resolve(`${lib.assetURL}${image.replace(/^ext:/, "extension/")}`);
-								else resolve(`${lib.assetURL}${image}`);
+								if (!image) return `${lib.assetURL}image/card/${imageName}.png`;
+								if (image.startsWith("db:")) return await game.getDB("image", image.slice(3));
+								if (image.startsWith("ext:")) return `${lib.assetURL}${image.replace(/^ext:/, "extension/")}`;
+								return `${lib.assetURL}${image}`;
 							}).then(
 								(source) =>
 									new Promise((resolve, reject) => {
@@ -3578,17 +3587,15 @@ export class Click {
 						);
 				else {
 					const characterGroup = nameInfo[1];
-					new Promise((resolve, reject) => {
+					Promise.resolve().then(async () => {
 						const imageName = `group_${characterGroup}`,
 							information = lib.card[imageName];
-						if (!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+						if (!information) return `${lib.assetURL}image/card/${imageName}.png`;
 						const image = information.image;
-						if (!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						else if (image.startsWith("db:"))
-							game.getDB("image", image.slice(3)).then(resolve, reject);
-						else if (image.startsWith("ext:"))
-							resolve(`${lib.assetURL}${image.replace(/^ext:/, "extension/")}`);
-						else resolve(`${lib.assetURL}${image}`);
+						if (!image) return `${lib.assetURL}image/card/${imageName}.png`;
+						if (image.startsWith("db:")) return await game.getDB("image", image.slice(3));
+						if (image.startsWith("ext:")) return `${lib.assetURL}${image.replace(/^ext:/, "extension/")}`;
+						return `${lib.assetURL}${image}`;
 					})
 						.then(
 							(source) =>
@@ -3621,8 +3628,51 @@ export class Click {
 			const htmlParser = document.createElement("body");
 			htmlParser.innerHTML = get.characterIntro(name);
 			Array.from(htmlParser.childNodes).forEach((value) => introduction.appendChild(value));
+			//添加技能语音部分
+			const dieAudios = game.parseDieTextMap(name).filter(i => "text" in i);
+			const skillAudioMap = new Map();
+			nameInfo.skills.forEach(skill => {
+				const voiceMap = game.parseSkillText(skill, name, null, true);
+				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
+			});
+			if (dieAudios.length || skillAudioMap.size > 0) {
+				introduction.appendChild(document.createElement("hr"));
+
+				if (skillAudioMap.size > 0) {
+					const skillNameSpan = document.createElement("span");
+					skillNameSpan.innerHTML = `技能台词<br>`;
+					introduction.appendChild(skillNameSpan);
+
+					skillAudioMap.forEach((texts, skill) => {
+						const skillNameSpan = document.createElement("span"),
+							skillNameSpanStyle = skillNameSpan.style;
+						skillNameSpanStyle.fontWeight = "bold";
+						skillNameSpan.innerHTML = `<br>${get.translation(skill)}<br>`;
+						introduction.appendChild(skillNameSpan);
+						texts.forEach((text, index) => {
+							const skillTextSpan = document.createElement("span");
+							skillTextSpan.innerHTML = `${index + 1}. ${text}<br>`;
+							introduction.appendChild(skillTextSpan);
+						});
+					});
+				}
+
+				if (dieAudios.length > 0) {
+					const skillNameSpan = document.createElement("span"),
+						skillNameSpanStyle = skillNameSpan.style;
+					skillNameSpanStyle.fontWeight = "bold";
+					skillNameSpan.innerHTML = `<br>阵亡台词`;
+					introduction.appendChild(skillNameSpan);
+
+					dieAudios.forEach((item, index) => {
+						const dieTextSpan = document.createElement("span");
+						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${item.text}`;
+						introduction.appendChild(dieTextSpan);
+					});
+				}
+			}
 			const introduction2 = ui.create.div(".characterintro.intro2", uiintro);
-			var list = get.character(name, 3) || [];
+			var list = get.character(name).skills;
 			var skills = ui.create.div(".characterskill", uiintro);
 			if (lib.config.touchscreen) {
 				lib.setScroll(introduction);
@@ -3705,7 +3755,7 @@ export class Click {
 								showSkillNamePinyin == "showCodeIdentifier"
 									? derivation
 									: lib.translate[`${derivation}_rt`] ||
-									  get.pinyin(derivationName).join(" ");
+										get.pinyin(derivationName).join(" ");
 							ruby.appendChild(rt);
 							const rightParenthesisRP = document.createElement("rp");
 							rightParenthesisRP.textContent = "）";

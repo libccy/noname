@@ -37,7 +37,12 @@ declare interface Result {
 	 * 当前有“视为”操作，该card参数特供给视为牌，不需要cards[0]获取视为牌 ；
 	 * 判断是否为视为牌：card.isCard，false为视为牌
 	 */
-	card: Card;
+	card: Card | CardBaseUIData;
+
+	
+	cost_data: {
+		[key: string]: any;
+	};
 
 	[key: string]: any;
 }

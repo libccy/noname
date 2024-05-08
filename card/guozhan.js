@@ -482,6 +482,7 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip2",
+				cardcolor: "heart",
 				nomod: true,
 				nopower: true,
 				unique: true,
@@ -1059,6 +1060,7 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip2",
+				cardcolor: "club",
 				skills: ["huxinjing"],
 				filterTarget: function (card, player, target) {
 					if (get.mode() == "guozhan" && player != target) return false;

@@ -816,7 +816,11 @@ game.import("character", function () {
 				forceunique: true,
 				enable: "phaseUse",
 				filter: function (event, player) {
-					return !player.hasSkill("tongyu_guiyin") && !player.getStat("damage");
+					return (
+						!player.hasSkill("tongyu_guiyin") &&
+						!player.getStat("damage") &&
+						[player.name1, player.name2].includes("yxs_luobinhan")
+					);
 				},
 				derivation: ["lzhangyi", "jimin", "tongyu"],
 				content: function () {
@@ -848,7 +852,11 @@ game.import("character", function () {
 				forceunique: true,
 				enable: "phaseUse",
 				filter: function (event, player) {
-					return player.countCards("he") > 0 && !player.hasSkill("tongyu_guiyin");
+					return (
+						player.countCards("he") > 0 &&
+						!player.hasSkill("tongyu_guiyin") &&
+						[player.name1, player.name2].includes("yxs_luobinhan")
+					);
 				},
 				filterCard: true,
 				position: "he",
@@ -917,6 +925,7 @@ game.import("character", function () {
 				},
 			},
 			kuangchan: {
+				locked: true,
 				ai: {
 					neg: true,
 				},
@@ -1822,9 +1831,9 @@ game.import("character", function () {
 					(next.complexCard = true), (next.logSkill = ["zhensha", trigger.player]);
 					next.selectCard = function () {
 						if (ui.selected.cards.length) {
-							if (get.color(ui.selected.cards[0]) != "black") return [1, 1];
+							if (ui.selected.cards[0].name == "jiu") return [1, 1];
 						}
-						return [1, 2];
+						return [2, 2];
 					};
 					"step 1";
 					if (result.bool) {
@@ -2500,7 +2509,7 @@ game.import("character", function () {
 				},
 			},
 			nvquan: {
-				locked: true,
+				locked: false,
 				group: ["nvquan1", "nvquan2", "nvquan3"],
 			},
 			nvquan1: {

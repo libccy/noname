@@ -1,6 +1,6 @@
 /**
-* 子节点观察器，对于需要频繁遍历子节点的DOM对象的实时变化进行缓存。
-*/
+ * 子节点观察器，对于需要频繁遍历子节点的DOM对象的实时变化进行缓存。
+ */
 export class ChildNodesWatcher {
     constructor(dom: any);
     dom: any;

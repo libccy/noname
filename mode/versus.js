@@ -717,15 +717,12 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					ui.arena.classList.add("choose-character");
 					for (var i in lib.characterPack.mode_versus) {
 						lib.character[i] = lib.characterPack.mode_versus[i];
-						if (!lib.character[i][4]) {
-							lib.character[i][4] = [];
-						}
 					}
 					lib.characterIntro.boss_liedixuande = lib.characterIntro.liubei;
 					lib.characterIntro.boss_gongshenyueying = lib.characterIntro.huangyueying;
 					lib.characterIntro.boss_tianhoukongming = lib.characterIntro.shen_zhugeliang;
 					lib.characterIntro.boss_yuhuoshiyuan = lib.characterIntro.pangtong;
-					lib.characterIntro.boss_qiaokuijunyi = lib.characterIntro.zhenghe;
+					lib.characterIntro.boss_qiaokuijunyi = lib.characterIntro.zhanghe;
 					lib.characterIntro.boss_jiarenzidan = lib.characterIntro.caozhen;
 					lib.characterIntro.boss_duanyuzhongda = lib.characterIntro.simayi;
 					lib.characterIntro.boss_juechenmiaocai = lib.characterIntro.xiahouyuan;
@@ -753,10 +750,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.list = list;
 					if (lib.characterPack.boss) {
 						for (var i in lib.characterPack.boss) {
-							if (!lib.character[i] && lib.characterPack.boss[i][4]) {
+							if (!lib.character[i]) {
 								if (
-									lib.characterPack.boss[i][4].includes("jiangeboss") ||
-									lib.characterPack.boss[i][4].includes("jiangemech")
+									lib.characterPack.boss[i].isJiangeBoss ||
+									lib.characterPack.boss[i].isJiangeMech
 								) {
 									lib.character[i] = lib.characterPack.boss[i];
 								}
@@ -764,20 +761,18 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 					for (var i in lib.character) {
-						if (lib.character[i][4]) {
-							if (lib.character[i][4].includes("jiangeboss")) {
-								list[lib.character[i][1] + "boss"].push(i);
-								continue;
-							} else if (lib.character[i][4].includes("jiangemech")) {
-								list[lib.character[i][1] + "mech"].push(i);
-								continue;
-							}
+						if (lib.character[i].isJiangeBoss) {
+							list[lib.character[i].group + "boss"].push(i);
+							continue;
+						} else if (lib.character[i].isJiangeMech) {
+							list[lib.character[i].group + "mech"].push(i);
+							continue;
 						}
 						if (lib.filter.characterDisabled(i)) continue;
 						if (get.is.double(i)) continue;
-						if (lib.character[i][1] == "wei") {
+						if (lib.character[i].group == "wei") {
 							list.weilist.push(i);
-						} else if (lib.character[i][1] == "shu") {
+						} else if (lib.character[i].group == "shu") {
 							list.shulist.push(i);
 						}
 					}
@@ -821,10 +816,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							};
 							var createCharacterDialog = function () {
 								event.dialogxx = ui.create.characterDialog("heightset", function (name) {
-									if (lib.character[name][4]) {
-										if (lib.character[name][4].includes("jiangeboss")) return true;
-										if (lib.character[name][4].includes("jiangemech")) return true;
-									}
+									if (lib.character[name].isJiangeBoss) return true;
+									if (lib.character[name].isJiangeMech) return true;
 									if (lib.character[name][1] != game.me.identity) return true;
 								});
 								if (ui.cheat2) {
@@ -841,7 +834,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								ui.cheat2 = ui.create.control("自由选将", function () {
 									if (this.dialog == _status.event.dialog) {
 										if (game.changeCoin) {
-											game.changeCoin(50);
+											game.changeCoin(10);
 										}
 										this.dialog.close();
 										_status.event.dialog = this.backup;
@@ -1115,7 +1108,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						ui.cheat2 = ui.create.control("自由选将", function () {
 							if (this.dialog == _status.event.dialog) {
 								if (game.changeCoin) {
-									game.changeCoin(50);
+									game.changeCoin(10);
 								}
 								this.dialog.close();
 								_status.event.dialog = this.backup;
@@ -1446,7 +1439,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						ui.cheat2 = ui.create.control("自由选将", function () {
 							if (this.dialog == _status.event.dialog) {
 								if (game.changeCoin) {
-									game.changeCoin(50);
+									game.changeCoin(10);
 								}
 								this.dialog.close();
 								_status.event.dialog = this.backup;
@@ -1637,7 +1630,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						ui.cheat2 = ui.create.control("自由选将", function () {
 							if (this.dialog == _status.event.dialog) {
 								if (game.changeCoin) {
-									game.changeCoin(50);
+									game.changeCoin(10);
 								}
 								this.dialog.close();
 								_status.event.dialog = this.backup;
@@ -1753,7 +1746,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (event.filterChoice(i)) continue;
 						if (lib.filter.characterDisabled(i)) continue;
 						event.list.push(i);
-						if (lib.character[i][4] && lib.character[i][4].includes("zhu")) {
+						if (lib.character[i].isZhugong) {
 							list2.push(i);
 						}
 					}
@@ -3455,7 +3448,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							if (_status.event.player.identity == "zhu") {
 								if (Math.random() < 0.8) {
 									var info = lib.character[button.link];
-									if (!info[4] || !info[4].includes("zhu")) {
+									if (!info || !info.isZhugong) {
 										return 0;
 									}
 								}
@@ -4718,7 +4711,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ctx.stroke();
 			},
 		},
-		jiangeboss: {
+		jiangeboss: Object.assign(new Proxy(
+			{},
+			{
+				set(target, prop, newValue) {
+					return Reflect.set(target, prop, get.convertedCharacter(newValue));
+				},
+			}
+		), {
 			boss_liedixuande: [
 				"male",
 				"shu",
@@ -4881,7 +4881,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				["jiangeboss", "hiddenboss", "bossallowed"],
 				"shu",
 			],
-		},
+		}),
 		cardsFour: [
 			["spade", 7, "sha"],
 			["spade", 8, "sha"],
@@ -6239,6 +6239,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_xiaorui: {
 				trigger: { global: "damageSource" },
 				forced: true,
+				locked: false,
 				logTarget: "source",
 				filter: function (event, player) {
 					var target = event.source;
@@ -6288,6 +6289,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_fengjian: {
 				trigger: { source: "damageSource" },
 				forced: true,
+				locked: false,
 				filter: function (event, player) {
 					return event.player.isAlive();
 				},
@@ -6774,6 +6776,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					return num >= 0;
 				},
 				forced: true,
+				locked: false,
 				content: function () {
 					"step 0";
 					var targets = game.filterPlayer(function (current) {

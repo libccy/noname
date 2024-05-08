@@ -7,4 +7,4 @@
  */
 export const promiseErrorHandlerMap: Record<"firefox" | "chrome" | "safari" | "other", new () => PromiseErrorHandler>;
 export type PromiseErrorHandler = import('./struct/interface/promise-error-handler.js').PromiseErrorHandler;
-import { PromiseErrorHandler } from './struct/index.js';
+import { PromiseErrorHandler } from "./struct/index.js";

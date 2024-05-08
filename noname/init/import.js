@@ -11,10 +11,13 @@ export const importCardPack = generateImportFunction("card", (name) => `../../ca
  * @param {string} name - 武将包名
  * @returns {Promise<void>}
  */
-export const importCharacterPack = generateImportFunction(
-	"character",
-	(name) => `../../character/${name}.js`
-);
+export const importCharacterPack = generateImportFunction("character", (name) => {
+	const alreadyModernCharacterPack = lib.config.moderned_chracters || [];
+
+	return alreadyModernCharacterPack.includes(name)
+		? `../../character/${name}/index.js`
+		: `../../character/${name}.js`;
+});
 
 /**
  * @param {string} name - 扩展名
@@ -99,8 +102,8 @@ function generateImportFunction(type, pathParser) {
 		script.remove();
 		if (status === "error") {
 			if (type === "character") {
-				console.error(
-					"如果您在扩展中使用了game.import创建武将包，请将以下代码删除: lib.config.all.characters.push('武将包名');"
+				console.warn(
+					"如果您在扩展中使用了game.import创建武将包，可将以下代码删除: lib.config.all.characters.push('武将包名');"
 				);
 			}
 			return;
