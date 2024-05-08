@@ -311,18 +311,7 @@ const skills = {
 			let cards = [];
 			for (const target of [player, player.getPrevious()]) {
 				const evt = event.getl(target);
-				if (evt && evt.cards2 && evt.cards2.some(i => get.position(i) == "d")) {
-					if (
-						target == player ||
-						target
-							.getHistory("lose", evt => {
-								return evt.type == "discard" && evt.getlx !== false;
-							})
-							.indexOf(event) == 0
-					) {
-						cards.addArray(evt.cards2.filter(i => get.position(i) == "d"));
-					}
-				}
+				if (evt && evt.cards2 && evt.cards2.some(i => get.position(i) == "d")) cards.addArray(evt.cards2.filter(i => get.position(i) == "d"));
 			}
 			return cards;
 		},
