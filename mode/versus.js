@@ -2006,7 +2006,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									ui.create.characterDialog(
 										"heightset",
 										event.filterChoice,
-										"precharacter"
+										"character"
 									);
 							}
 						}
