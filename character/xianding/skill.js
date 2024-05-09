@@ -2,6 +2,209 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//谋贾诩
+	dcsbsushen: {
+		unique: true,
+		limited: true,
+		audio: 2,
+		audioname: ["dc_sb_jiaxu_shadow"],
+		enable: "phaseUse",
+		skillAnimation: true,
+		animationColor: "soil",
+		content() {
+			player.awakenSkill("dcsbsushen");
+			player.storage.dcsbsushen_reload = [Boolean(player.storage.dcsbfumou), player.countCards("h"), player.getHp()];
+			player.addSkill("dcsbsushen_reload");
+			player.addSkillLog("dcsbrushi");
+		},
+		derivation: "dcsbrushi",
+		subSkill: {
+			reload: {
+				charlotte: true,
+				onremove: true,
+				mark: true,
+				intro: {
+					content(storage) {
+						return ["【覆谋】状态：" + ["阳", "阴"][storage[0] ? 1 : 0], "手牌数：" + storage[1], "体力值：" + storage[2]].join("<br>");
+					},
+				},
+			},
+		},
+		ai: {
+			//waiting for PZ157
+		},
+	},
+	dcsbrushi: {
+		unique: true,
+		limited: true,
+		audio: 2,
+		audioname: ["dc_sb_jiaxu_shadow"],
+		enable: "phaseUse",
+		filter(event, player) {
+			return Array.isArray(player.storage.dcsbsushen_reload);
+		},
+		skillAnimation: true,
+		animationColor: "thunder",
+		*content(event, map) {
+			const player = map.player,
+				storage = player.storage.dcsbsushen_reload;
+			player.awakenSkill("dcsbrushi");
+			player.removeSkill("dcsbsushen_reload");
+			if (Boolean(player.storage.dcsbfumou) !== storage[0]) {
+				if (player.hasSkill("dcsbfumou", null, null, false)) {
+					player.changeZhuanhuanji("dcsbfumou");
+				}
+			}
+			if (player.countCards("h") != storage[1]) {
+				if (player.countCards("h") < storage[1]) {
+					yield player.drawTo(storage[1]);
+				} else {
+					yield player.chooseToDiscard("h", true, storage[1] - player.countCards("h"));
+				}
+			}
+			if (player.getHp() != storage[2]) {
+				yield player[player.getHp() > storage[2] ? "loseHp" : "recover"](Math.abs(player.getHp() - storage[2]));
+			}
+		},
+		ai: {
+			//waiting for PZ157
+		},
+	},
+	dcsbfumou: {
+		audio: 2,
+		audioname: ["dc_sb_jiaxu_shadow"],
+		enable: "phaseUse",
+		filter(event, player) {
+			return (
+				game.hasPlayer(target => {
+					return target != player && target.countCards("h");
+				}) && game.countPlayer(target => target != player) >= (player.storage.dcsbfumou ? 1 : 2)
+			);
+		},
+		filterTarget(card, player, target) {
+			if (target == player) return false;
+			if (!ui.selected.targets.length) return target.countCards("h");
+			return !player.storage.dcsbfumou;
+		},
+		selectTarget() {
+			const player = get.event("player");
+			return player.storage.dcsbfumou ? [1, 2] : 2;
+		},
+		targetprompt() {
+			const player = get.event("player");
+			return player.storage.dcsbfumou ? "" : ["看牌角色", "得牌角色"][ui.selected.targets.length-1];
+		},
+		prompt() {
+			const player = get.event("player");
+			return lib.skill.dcsbfumou.intro.content(player.storage.dcsbfumou);
+		},
+		usable: 1,
+		complexTarget: true,
+		complexSelect: true,
+		multitarget: true,
+		async content(event, trigger, player) {
+			const storage = player.storage.dcsbfumou,
+				target = event.targets[0],
+				num = Math.ceil(target.countCards("h")/2);
+			player.changeZhuanhuanji("dcsbfumou");
+			let cards = await player
+				.choosePlayerCard("覆谋：展示" + get.translation(target) + "的至多" + get.cnNumber(num) + "张牌", target, "h", num, true)
+				.set("ai", card => {
+					const player = get.event("player"),
+						storage = get.event("storage"),
+						target = get.event().getParent().targets[0];
+					if (!storage) return get.value(card) * -get.attitude(player, target);
+					return target.getUseValue(card) * get.attitude(player, target);
+				})
+				.set("visible", true)
+				.set("storage", storage)
+				.forResult("cards");
+			if (!cards.length) return;
+			await player.showCards(cards, get.translation(player) + "发动了【覆谋】");
+			if (!storage) {
+				const aim = event.targets[1];
+				cards = cards.filter(card => lib.filter.canBeGained(card, aim, target));
+				if (cards.length) {
+					await aim.gain(cards, target, "give");
+					await game.asyncDraw([player, target], cards.length);
+				} else {
+					aim.popup("杯具");
+					aim.chat("555一张都拿不到~");
+				}
+			} else {
+				cards = cards.filter(card => {
+					return target.hasUseTarget(card) && get.owner(card) == target && get.position(card) == "h";
+				});
+				while (
+					cards.some(card => {
+						return target.hasUseTarget(card) && get.owner(card) == target && get.position(card) == "h";
+					})
+				) {
+					const result = await target
+						.chooseToUse(
+							true,
+							function (card) {
+								const event = get.event();
+								if (!lib.filter.cardEnabled(card, event.player, event)) return false;
+								return get.event("cards").includes(card);
+							},
+							"覆谋：请依次使用展示的牌"
+						)
+						.set("cards", cards)
+						.forResult();
+					if (result.bool) {
+						cards = cards.filter(card => {
+							return target.hasUseTarget(card) && get.owner(card) == target && get.position(card) == "h";
+						});
+					} else break;
+				}
+			}
+		},
+		zhuanhuanji: true,
+		marktext: "☯",
+		mark: true,
+		intro: {
+			content(storage) {
+				if (storage) return "转换技，出牌阶段限一次，你可以观看一名其他角色的手牌并展示其一半手牌，令其依次使用这些牌中所有其可以使用的牌。";
+				return "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其一半手牌并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）。";
+			},
+		},
+		ai: {
+			order: 7,
+			result: {
+				target(player, target) {
+					const storage = player.storage.dcsbfumou;
+					const sgn = get.sgn(get.attitude(player, target));
+					if (!storage && !ui.selected.targets.length) {
+						return (sgn * (2 + sgn)) / (target.countCards("h") + 1);
+					}
+					return (sgn * (2 + sgn)) / (target.countCards("h") + 1);
+				},
+			},
+		},
+		group: "dcsbfumou_change",
+		subSkill: {
+			change: {
+				audio: "dcsbfumou",
+				audioname: ["dc_sb_jiaxu_shadow"],
+				trigger: {
+					global: "phaseBefore",
+					player: "enterGame",
+				},
+				filter(event, player) {
+					return event.name != "phase" || game.phaseNumber == 0;
+				},
+				prompt2(event, player) {
+					return "切换【腹谋】为状态" + (player.storage.dcsbfumou ? "阳" : "阴");
+				},
+				check: () => Math.random() > 0.5,
+				content() {
+					player.changeZhuanhuanji("dcsbfumou");
+					//player.changeSkin("dcsbfumou", "dc_sb_jiaxu" + (player.storage.dcsbfumou ? "_shadow" : ""));
+				},
+			},
+		},
+	},
 	//关樾
 	dcshouzhi: {
 		audio: 2,
