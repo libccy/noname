@@ -5,6 +5,7 @@ const skills = {
 	//李丰
 	dctunchu: {
 		audio: 2,
+		/*
 		trigger: { global: "gameDrawBegin" },
 		forced: true,
 		content() {
@@ -14,6 +15,19 @@ const skills = {
 			trigger.num = function (player) {
 				return player == me ? sum : typeof numx == "function" ? numx(player) : numx;
 			};
+		},
+		*/
+		trigger: {
+			global: "phaseBefore",
+			player: "enterGame",
+		},
+		filter(event, player) {
+			const sum = game.players.slice().concat(game.dead).length * 4;
+			return player.countCards("h") < sum && (event.name != "phase" || game.phaseNumber == 0);
+		},
+		forced: true,
+		content() {
+			player.drawTo(game.players.slice().concat(game.dead).length * 4);
 		},
 		mod: {
 			cardDiscardable(card, player) {
