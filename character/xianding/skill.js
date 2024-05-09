@@ -132,31 +132,15 @@ const skills = {
 					aim.chat("555一张都拿不到~");
 				}
 			} else {
-				cards = cards.filter(card => {
-					return target.hasUseTarget(card) && get.owner(card) == target && get.position(card) == "h";
-				});
-				while (
-					cards.some(card => {
-						return target.hasUseTarget(card) && get.owner(card) == target && get.position(card) == "h";
-					})
-				) {
-					const result = await target
-						.chooseToUse(
-							true,
-							function (card) {
-								const event = get.event();
-								if (!lib.filter.cardEnabled(card, event.player, event)) return false;
-								return get.event("cards").includes(card);
-							},
-							"覆谋：请依次使用展示的牌"
-						)
-						.set("cards", cards)
-						.forResult();
-					if (result.bool) {
-						cards = cards.filter(card => {
-							return target.hasUseTarget(card) && get.owner(card) == target && get.position(card) == "h";
-						});
-					} else break;
+				for (const card of cards) {
+					const cardx = {
+						name: get.name(card, player),
+						nature: get.nature(card, player),
+						isCard: true,
+					};
+					if (target.hasUseTarget(cardx)) {
+						await target.chooseUseTarget(cardx, true, false);
+					}
 				}
 			}
 		},
@@ -165,7 +149,7 @@ const skills = {
 		mark: true,
 		intro: {
 			content(storage) {
-				if (storage) return "转换技，出牌阶段限一次，你可以观看一名其他角色的手牌并展示其一半手牌，令其依次使用这些牌中所有其可以使用的牌。";
+				if (storage) return "转换技，出牌阶段限一次，你可以观看一名其他角色的手牌并展示其一半手牌，令其依次视为使用这些牌中所有其可以使用的牌。";
 				return "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其一半手牌并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）。";
 			},
 		},
