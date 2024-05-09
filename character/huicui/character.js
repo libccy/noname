@@ -1,4 +1,5 @@
 const characters = {
+	dc_lifeng: ["male", "shu", 3, ["dctunchu", "dcshuliang"]],
 	wupu: ["male", "qun", 4, ["dcduanti", "dcshicao"]],
 	dc_caoshuang: ["male", "wei", 4, ["dcjianzhuan", "dcfanshi"]],
 	zangba: ["male", "wei", 4, ["rehengjiang"]],
