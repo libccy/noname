@@ -179,7 +179,7 @@ const skills = {
 					return event.name != "phase" || game.phaseNumber == 0;
 				},
 				prompt2(event, player) {
-					return "切换【腹谋】为状态" + (player.storage.dcsbfumou ? "阳" : "阴");
+					return "切换【覆谋】为状态" + (player.storage.dcsbfumou ? "阳" : "阴");
 				},
 				check: () => Math.random() > 0.5,
 				content() {
