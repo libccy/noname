@@ -77,7 +77,7 @@ const skills = {
 						if (card.cards && (card.cards || []).some(i => get.position(i) == "h")) return false;
 					},
 					cardSavable() {
-						return lib.skill.dctunchu_subSkill.debuff.mod.cardEnabled2.apply(this, arguments);
+						return lib.skill.dctunchu.subSkill.debuff.mod.cardEnabled2.apply(this, arguments);
 					},
 				},
 			},
