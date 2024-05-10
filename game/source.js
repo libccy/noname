@@ -12,6 +12,8 @@ window.noname_source_list = [
 	"noname/get/index.js",
 	"noname/get/is.js",
 	"noname/get/promises.js",
+	"noname/get/pinyins/index.js",
+	"noname/get/pinyins/noname-dict.js",
 	"noname/gnc/index.js",
 	"noname/gnc/is.js",
 	"noname/init/cordova.js",

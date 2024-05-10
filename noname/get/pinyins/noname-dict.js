@@ -1,5 +1,7 @@
 const dictionary = {
+	//无名杀自己的名词
 	用间: ["yòng jiàn"],
+	//无名杀的人名
 	乐进: ["yuè jìn"],
 	乐就: ["yuè jiù"],
 	乐綝: ["yuè chēn"],
@@ -53,6 +55,7 @@ const dictionary = {
 	亚煞极: ["yà shà jí"],
 	库特莉亚芙卡: ["kù tè lì yà fú kǎ"],
 	露娜: ["lù nà"],
+	//无名杀自己的技能
 	弹雀: ["tán què"],
 	重身: ["chóng shēn"],
 	畜鸣: ["chù míng"],
