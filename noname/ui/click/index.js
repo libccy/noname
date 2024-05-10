@@ -3358,6 +3358,54 @@ export class Click {
 					"<br>" +
 					characterintroinfo;
 			}
+			
+			// 添加台词部分
+			const dieAudios = game.parseDieTextMap(name).filter(i => "text" in i);
+			const skillAudioMap = new Map();
+			nameinfo.skills.forEach(skill => {
+				const voiceMap = game.parseSkillText(skill, name, null, true);
+				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
+			});
+			if (dieAudios.length || skillAudioMap.size > 0) {
+				const eleHr = document.createElement("hr");
+				eleHr.style.marginTop = "11px";
+				intro.appendChild(eleHr);
+				if (skillAudioMap.size > 0) {
+					const skillNameSpan = document.createElement("span");
+					skillNameSpan.style.lineHeight = "1.7";
+					skillNameSpan.innerHTML = `• 技能台词<br>`;
+					intro.appendChild(skillNameSpan);
+					skillAudioMap.forEach((texts, skill) => {
+						const skillNameSpan1 = document.createElement("span"),
+							skillNameSpanStyle1 = skillNameSpan1.style;
+						skillNameSpanStyle1.fontWeight = "bold";
+						skillNameSpanStyle1.fontSize = "15.7px";
+						skillNameSpanStyle1.lineHeight = "1.4";
+						skillNameSpan1.innerHTML = `${get.translation(skill)}<br>`;
+						intro.appendChild(skillNameSpan1);
+						texts.forEach((text, index) => {
+							const skillTextSpan = document.createElement("span");
+							skillTextSpan.style.fontSize = "15.2px";
+							skillTextSpan.innerHTML = `${texts.length > 1 ? `${index + 1}. ` : ""}${text}<br>`;
+							intro.appendChild(skillTextSpan);
+						});
+					});
+				}
+				if (dieAudios.length > 0) {
+					const skillNameSpan2 = document.createElement("span"),
+						skillNameSpanStyle2 = skillNameSpan2.style;
+					skillNameSpanStyle2.lineHeight = "1.9";
+					skillNameSpan2.innerHTML = `• 阵亡台词`;
+					intro.appendChild(skillNameSpan2);
+					dieAudios.forEach((item, index) => {
+						const dieTextSpan = document.createElement("span");
+						dieTextSpan.style.fontSize = "15.2px";
+						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${item.text}`;
+						intro.appendChild(dieTextSpan);
+					});
+				}
+			}
+			
 			var intro2 = ui.create.div(".characterintro.intro2", uiintro);
 			var list = get.character(name, 3) || [];
 			var skills = ui.create.div(".characterskill", uiintro);
@@ -3628,7 +3676,7 @@ export class Click {
 			htmlParser.innerHTML = get.characterIntro(name);
 			Array.from(htmlParser.childNodes).forEach((value) => introduction.appendChild(value));
 			
-			//添加技能语音部分
+			// 添加台词部分
 			const dieAudios = game.parseDieTextMap(name).filter(i => "text" in i);
 			const skillAudioMap = new Map();
 			nameInfo.skills.forEach(skill => {
