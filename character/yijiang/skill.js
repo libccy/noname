@@ -11220,11 +11220,11 @@ const skills = {
 		},
 	},
 	xiantu: {
-		//unique:true,
-		audio: "xiantu1",
-		group: "xiantu2",
-		//gainable:true,
-		//forceunique:true,
+		audio: 2,
+		group: ["xiantu1", "xiantu2"],
+	},
+	xiantu1: {
+		audio: true,
 		trigger: { global: "phaseUseBegin" },
 		filter: function (event, player) {
 			return event.player != player;
@@ -11258,7 +11258,6 @@ const skills = {
 			threaten: 1.1,
 		},
 	},
-	xiantu1: { audio: true },
 	xiantu2: { audio: true },
 	xiantu4: {
 		trigger: { player: "phaseUseEnd" },
