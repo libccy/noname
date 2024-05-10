@@ -3017,16 +3017,10 @@ export const Content = {
 		//提前phaseBefore时机解决“游戏开始时”时机和“一轮开始时”先后
 		event.trigger("phaseBefore");
 		"step 1";
+		game.phaseNumber++;
 		//初始化阶段列表
 		if (!event.phaseList) {
-			event.phaseList = [
-				"phaseZhunbei",
-				"phaseJudge",
-				"phaseDraw",
-				"phaseUse",
-				"phaseDiscard",
-				"phaseJieshu",
-			];
+			event.phaseList = ["phaseZhunbei", "phaseJudge", "phaseDraw", "phaseUse", "phaseDiscard", "phaseJieshu"];
 		}
 		if (typeof event.num != "number") {
 			event.num = 0;
@@ -3040,11 +3034,7 @@ export const Content = {
 			} else if (_status.seatNumSettled) {
 				var seatNum = player.getSeatNum();
 				if (seatNum != 0) {
-					if (
-						get.itemtype(_status.lastPhasedPlayer) != "player" ||
-						seatNum < _status.lastPhasedPlayer.getSeatNum()
-					)
-						isRound = true;
+					if (get.itemtype(_status.lastPhasedPlayer) != "player" || seatNum < _status.lastPhasedPlayer.getSeatNum()) isRound = true;
 					_status.lastPhasedPlayer = player;
 				}
 			} else if (player == _status.roundStart) isRound = true;
@@ -3122,7 +3112,6 @@ export const Content = {
 		while (ui.dialogs.length) {
 			ui.dialogs[0].close();
 		}
-		game.phaseNumber++;
 		player.phaseNumber++;
 		game.broadcastAll(
 			function (player, num, popup) {
@@ -3151,11 +3140,7 @@ export const Content = {
 		game.log();
 		game.log(player, "的回合开始");
 		player._noVibrate = true;
-		if (
-			get.config("identity_mode") != "zhong" &&
-			get.config("identity_mode") != "purple" &&
-			!_status.connectMode
-		) {
+		if (get.config("identity_mode") != "zhong" && get.config("identity_mode") != "purple" && !_status.connectMode) {
 			var num;
 			switch (get.config("auto_identity")) {
 				case "one":
@@ -3174,12 +3159,7 @@ export const Content = {
 					num = 0;
 					break;
 			}
-			if (
-				num &&
-				!_status.identityShown &&
-				game.phaseNumber > game.players.length * num &&
-				game.showIdentity
-			) {
+			if (num && !_status.identityShown && game.phaseNumber > game.players.length * num && game.showIdentity) {
 				if (!_status.video) player.popup("显示身份");
 				_status.identityShown = true;
 				game.showIdentity(false);
