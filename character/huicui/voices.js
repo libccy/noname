@@ -438,7 +438,7 @@ export default {
 	"#shengxi1": "国之生计，在民生息。",
 	"#shengxi2": "安民止战，兴汉室！",
 	"#shoucheng1": "待吾等助将军一臂之力！",
-	"#shoucheng2": "大汉羸弱，唯有守成，方有生机。",
+	"#shoucheng2": "国库盈余，可助军威！",
 	"#jiangfei:die": "墨守成规，终为其害啊……",
 	"#dctunchu1": "秋收冬藏，此四时之理，亘古不变。",
 	"#dctunchu2": "屯粮之家，必无饥馑之虞。",
