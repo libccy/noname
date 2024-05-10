@@ -3651,7 +3651,7 @@ export class Click {
 						introduction.appendChild(skillNameSpan);
 						texts.forEach((text, index) => {
 							const skillTextSpan = document.createElement("span");
-							skillTextSpan.innerHTML = `${index + 1}. ${text}<br>`;
+							skillTextSpan.innerHTML = `${texts.length > 1 ? `${index + 1}. ` : ""}${text}<br>`;
 							introduction.appendChild(skillTextSpan);
 						});
 					});
