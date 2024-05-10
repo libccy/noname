@@ -3470,8 +3470,7 @@ export class Click {
 						clickSkill.call(skillnode, "init");
 					});
 				}
-				// if(e!=='init') game.trySkillAudio(this.link,playername);
-				// 有bug，先用旧版
+				
 				if (lib.config.background_speak && e !== "init") {
 					let audio,
 						skillnode = this;
@@ -3628,6 +3627,7 @@ export class Click {
 			const htmlParser = document.createElement("body");
 			htmlParser.innerHTML = get.characterIntro(name);
 			Array.from(htmlParser.childNodes).forEach((value) => introduction.appendChild(value));
+			
 			//添加技能语音部分
 			const dieAudios = game.parseDieTextMap(name).filter(i => "text" in i);
 			const skillAudioMap = new Map();
@@ -3671,6 +3671,7 @@ export class Click {
 					});
 				}
 			}
+			
 			const introduction2 = ui.create.div(".characterintro.intro2", uiintro);
 			var list = get.character(name).skills;
 			var skills = ui.create.div(".characterskill", uiintro);
@@ -3795,8 +3796,7 @@ export class Click {
 						clickSkill.call(skillnode, "init");
 					});
 				}
-				// if(e!=='init') game.trySkillAudio(this.link,playername);
-				// 有bug，先用旧版
+				
 				if (lib.config.background_speak && e !== "init") {
 					let audio,
 						skillnode = this;
