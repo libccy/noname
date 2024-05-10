@@ -703,6 +703,7 @@ window.noname_character_rank = {
 		"clan_wangguang",
 		"lizhaojiaobo",
 		"linghuyu",
+		"key_mia",
 	],
 	bp: [
 		"xin_huojun",
@@ -1926,6 +1927,7 @@ window.noname_character_rank = {
 			"caoxian",
 			"wu_guanyu",
 			"guanyue",
+			"key_mia",
 		],
 		epic: [
 			"xukun",
