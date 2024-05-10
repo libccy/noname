@@ -89,7 +89,7 @@ export default {
 	"#quanbian2": "随机应变，谋国窃权。",
 	"#jin_simayi:die": "虎入骷冢，司马难兴。",
 	"#shiren1": "宠过必乱，不可大任。",
-	"#shiren2": "开卷有益，识人有法",
+	"#shiren2": "开卷有益，识人有法。",
 	"#yanxi1": "宴会嬉趣，其乐融融。",
 	"#yanxi2": "宴中趣玩，得遇知己。",
 	"#jin_wangyuanji:die": "祖父已逝，哀凄悲戚。",
