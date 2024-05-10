@@ -41590,8 +41590,9 @@ var pinyin_dict_withtone = "yī,dīng zhēng,kǎo qiǎo yú,qī,shàng,xià,hǎn
 	 */
 	function parsePolyphone(chinese, result, splitter, withtone) {
 		// 先删除中文字符之外的所有字符（包括英文字母、数字、标点符号、空格和其他非中文字符），然后再查找多音字
-		chinese = chinese.replace(/[^\u4e00-\u9fa5]/g, '');
-		if(chinese.length == 0) return result;
+		// 处理句子的过程中会出现问题，暂时移除。
+		// chinese = chinese.replace(/[^\u4e00-\u9fa5]/g, '');
+		// if(chinese.length == 0) return result;
 		
 		var poly = window.pinyin_dict_polyphone;
 		var max = 7; // 最多只考虑7个汉字的多音字词，虽然词库里面有10个字的，但是数量非常少，为了整体效率暂时忽略之
