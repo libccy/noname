@@ -238,4 +238,6 @@ export default {
 	"#fenji2": "两肋插刀，愿赴此躯！",
 	"#yinghun_ol_sunjian1": "提刀奔走，灭敌不休。",
 	"#yinghun_ol_sunjian2": "贼寇草莽，我且出战。",
+	"#xueyi_re_yuanshao1": "崇王攘夷，生长尊贵。",
+	"#xueyi_re_yuanshao2": "衣冠华胄，宜蒙优免。",
 };

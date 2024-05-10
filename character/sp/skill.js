@@ -24338,6 +24338,7 @@ const skills = {
 	},
 	wangzun: {
 		audio: 2,
+		audioname: ["old_yuanshu"],
 		trigger: { global: "phaseZhunbeiBegin" },
 		check: function (event, player) {
 			var att = get.attitude(player, event.player);
