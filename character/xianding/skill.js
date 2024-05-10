@@ -108,7 +108,7 @@ const skills = {
 				num = Math.ceil(target.countCards("h")/2);
 			player.changeZhuanhuanji("dcsbfumou");
 			let cards = await player
-				.choosePlayerCard("覆谋：展示" + get.translation(target) + "的至多" + get.cnNumber(num) + "张牌", target, "h", num, true)
+				.choosePlayerCard("覆谋：选择展示" + get.translation(target) + "的" + get.cnNumber(num) + "张牌", target, "h", num, true)
 				.set("ai", card => {
 					const player = get.event("player"),
 						storage = get.event("storage"),
@@ -133,13 +133,8 @@ const skills = {
 				}
 			} else {
 				for (const card of cards) {
-					const cardx = {
-						name: get.name(card, player),
-						nature: get.nature(card, player),
-						isCard: true,
-					};
-					if (target.hasUseTarget(cardx)) {
-						await target.chooseUseTarget(cardx, true, false);
+					if (target.hasUseTarget(card)) {
+						await target.chooseUseTarget(card, true, false);
 					}
 				}
 			}
@@ -149,7 +144,7 @@ const skills = {
 		mark: true,
 		intro: {
 			content(storage) {
-				if (storage) return "转换技，出牌阶段限一次，你可以观看一名其他角色的手牌并展示其一半手牌，令其依次视为使用这些牌中所有其可以使用的牌。";
+				if (storage) return "转换技，出牌阶段限一次，你可以观看一名其他角色的手牌并展示其一半手牌，令其依次使用这些牌中所有其可以使用的牌。";
 				return "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其一半手牌并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）。";
 			},
 		},
