@@ -2441,7 +2441,6 @@ export class Create {
 				});
 			}
 		}
-		lib.init.js(lib.assetURL + "game", "pinyinjs", function () {});
 		lib.init.js(lib.assetURL + "game", "keyWords", function () {});
 
 		lib.updateURL =

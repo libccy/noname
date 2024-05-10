@@ -7,6 +7,7 @@ import { CacheContext } from "../library/cache/cacheContext.js";
 import { Is } from "./is.js";
 import { Promises } from "./promises.js";
 import { rootURL } from "../../noname.js";
+import * as pinyinPro from "./pinyins/index.js";
 
 export class Get {
 	is = new Is();
@@ -214,22 +215,32 @@ export class Get {
 	}
 	//装备栏 END
 	/**
-	 * @returns { string[] }
+	 * @param {string} chinese
+	 * @param {boolean|undefined} withTone  
+	 * @returns { any[] }
 	 */
 	pinyin(chinese, withTone) {
-		const pinyinUtilx = window.pinyinUtilx;
-		if (!pinyinUtilx) return [];
+		let result = [];
 		const pinyins = lib.pinyins;
-		if (pinyins) {
-			const pinyin = pinyins[chinese];
-			if (Array.isArray(pinyin)) return withTone === false ? pinyin.map(pinyinUtilx.removeTone) : pinyin.slice();
+		if (pinyins && pinyins[chinese] && Array.isArray(pinyins[chinese])) {
+			result = pinyins[chinese].slice(0);
 		}
-		return pinyinUtilx.getPinyin(chinese, null, withTone, true);
+		else {
+			//@ts-ignore
+			result = pinyinPro.pinyin(chinese, {type: "array"});
+		}
+		//@ts-ignore
+		if (withTone === false) result = pinyinPro.convert(result, { format: "toneNone" });
+		return result;
 	}
+	/**
+	 * @param { string } str
+	 * @returns { string }
+	 */
 	yunmu(str) {
 		//部分整体认读音节特化处理
-		const util = window.pinyinUtilx;
-		if (util && lib.pinyins._metadata.zhengtirendu.includes(util.removeTone(str))) {
+		//@ts-ignore
+		if (lib.pinyins._metadata.zhengtirendu.includes(pinyinPro.convert(str, { format: "toneNone" }))) {
 			return "-" + str[str.length - 1];
 		}
 		//排除声母
@@ -278,9 +289,13 @@ export class Get {
 		}
 		return str;
 	}
+	/**
+	 * @param { string } str
+	 * @returns { string|null }
+	 */
 	yunjiao(str) {
-		const util = window.pinyinUtilx;
-		if (util) str = util.removeTone(str);
+		//@ts-ignore
+		str = pinyinPro.convert(str, { format: "toneNone" })
 		if (lib.pinyins._metadata.zhengtirendu.includes(str)) {
 			str = "-" + str[str.length - 1];
 		} else {

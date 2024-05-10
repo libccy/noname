@@ -420,7 +420,6 @@ window.noname_source_list = [
 	"game/NoSleep.js",
 	"game/package.js",
 	"game/phantom.js",
-	"game/pinyinjs.js",
 	"game/pressure.js",
 	"game/server.js",
 	"game/source.js",
