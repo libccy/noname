@@ -786,7 +786,7 @@ export class GameEvent {
 	}
 	trigger(name) {
 		if (_status.video) return;
-		if ((this.name === "gain" || this.name === "lose") && !_status.gameDrawed) return;
+		if (!_status.gameDrawed && ["lose", "gain", "loseAsync", "equip", "addJudge", "addToExpansion"].includes(this.name)) return;
 		if (name === "gameDrawEnd") _status.gameDrawed = true;
 		if (name === "gameStart") {
 			lib.announce.publish("Noname.Game.Event.GameStart", {});

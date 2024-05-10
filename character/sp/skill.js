@@ -5241,7 +5241,7 @@ const skills = {
 	//卢氏
 	olzhuyan: {
 		audio: 2,
-		trigger: { player: "phaseJieshuBegin" },
+		trigger: { player: "phaseDiscardEnd" },
 		init: function (player) {
 			player.addSkill("olzhuyan_record");
 		},
