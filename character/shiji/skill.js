@@ -1304,7 +1304,7 @@ const skills = {
 		},
 	},
 	spxizhan: {
-		audio: 4,
+		audio: 5,
 		group: "spxizhan_effect",
 		locked: false,
 		subSkill: {
@@ -1351,7 +1351,7 @@ const skills = {
 							suit = get.suit(card, player);
 						if (!lib.suit.includes(suit) || ((!target || !target.isIn()) && suit != "heart")) return;
 						game.broadcastAll(function (suit) {
-							if (lib.config.background_speak) game.playAudio("skill", "spxizhan" + (4 - lib.suit.indexOf(suit)));
+							if (lib.config.background_speak) game.playAudio("skill", "spxizhan" + [null, "spade", null, "heart", "club", "diamond"].indexOf(suit));
 						}, suit);
 						switch (suit) {
 							case "spade":
@@ -1393,7 +1393,12 @@ const skills = {
 									);
 								break;
 						}
-					} else player.loseHp();
+					} else {
+						game.broadcastAll(function () {
+							if (lib.config.background_speak) game.playAudio("skill", "spxizhan2");
+						});
+						player.loseHp();
+					}
 				},
 			},
 		},
