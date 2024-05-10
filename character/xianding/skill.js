@@ -108,7 +108,7 @@ const skills = {
 				num = Math.ceil(target.countCards("h")/2);
 			player.changeZhuanhuanji("dcsbfumou");
 			let cards = await player
-				.choosePlayerCard("覆谋：展示" + get.translation(target) + "的至多" + get.cnNumber(num) + "张牌", target, "h", num, true)
+				.choosePlayerCard("覆谋：选择展示" + get.translation(target) + "的" + get.cnNumber(num) + "张牌", target, "h", num, true)
 				.set("ai", card => {
 					const player = get.event("player"),
 						storage = get.event("storage"),
@@ -132,31 +132,10 @@ const skills = {
 					aim.chat("555一张都拿不到~");
 				}
 			} else {
-				cards = cards.filter(card => {
-					return target.hasUseTarget(card) && get.owner(card) == target && get.position(card) == "h";
-				});
-				while (
-					cards.some(card => {
-						return target.hasUseTarget(card) && get.owner(card) == target && get.position(card) == "h";
-					})
-				) {
-					const result = await target
-						.chooseToUse(
-							true,
-							function (card) {
-								const event = get.event();
-								if (!lib.filter.cardEnabled(card, event.player, event)) return false;
-								return get.event("cards").includes(card);
-							},
-							"覆谋：请依次使用展示的牌"
-						)
-						.set("cards", cards)
-						.forResult();
-					if (result.bool) {
-						cards = cards.filter(card => {
-							return target.hasUseTarget(card) && get.owner(card) == target && get.position(card) == "h";
-						});
-					} else break;
+				for (const card of cards) {
+					if (target.hasUseTarget(card)) {
+						await target.chooseUseTarget(card, true, false);
+					}
 				}
 			}
 		},
@@ -195,7 +174,7 @@ const skills = {
 					return event.name != "phase" || game.phaseNumber == 0;
 				},
 				prompt2(event, player) {
-					return "切换【腹谋】为状态" + (player.storage.dcsbfumou ? "阳" : "阴");
+					return "切换【覆谋】为状态" + (player.storage.dcsbfumou ? "阳" : "阴");
 				},
 				check: () => Math.random() > 0.5,
 				content() {

@@ -16469,57 +16469,52 @@ const skills = {
 	choulve: {
 		audio: 2,
 		trigger: { player: "phaseUseBegin" },
-		direct: true,
 		filter: function (event, player) {
 			return game.hasPlayer(function (current) {
 				return current != player && current.countCards("he");
 			});
 		},
-		content: function () {
-			"step 0";
-			var str = "令一名其他角色交给你一张牌";
-			var history = player.getAllHistory("damage", function (evt) {
+		async cost(event, trigger, player){
+			let str = "令一名其他角色交给你一张牌";
+			const history = player.getAllHistory("damage", function (evt) {
 				return evt.card && evt.card.name && lib.card[evt.card.name];
 			});
 			if (history.length) event.cardname = history[history.length - 1].card.name;
 			if (event.cardname) {
-				str += "若其如此做，视为你使用【" + get.translation(event.cardname) + "】";
+				str += "。若其如此做，视为你使用【" + get.translation(event.cardname) + "】";
 			}
-			var goon = true;
+			let goon = true;
 			if (event.cardname) {
 				goon = game.hasPlayer(function (current) {
 					return player.canUse(event.cardname, current) && get.effect(current, { name: event.cardname }, player, player) > 0;
 				});
 			}
-			player
-				.chooseTarget(get.prompt("choulve"), str, function (card, player, target) {
-					return target != player && target.countCards("he");
-				})
-				.set("ai", function (target) {
-					if (!_status.event.goon) return 0;
-					var player = _status.event.player;
-					if (get.attitude(player, target) >= 0 && get.attitude(target, player) >= 0) {
-						return Math.sqrt(target.countCards("he"));
-					}
-					return 0;
-				})
-				.set("goon", goon);
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("choulve", target);
-				target
-					.chooseCard("he", "是否交给" + get.translation(player) + "一张牌？", event.cardname ? "若如此做，视为" + get.translation(player) + "使用【" + get.translation(event.cardname) + "】" : null)
-					.set("ai", function (card) {
-						if (_status.event.goon) return 7 - get.value(card);
-						return 0;
-					})
-					.set("goon", get.attitude(target, player) > 1);
-				event.target = target;
-			} else {
-				event.finish();
+			const result = await player.chooseTarget(get.prompt("choulve"), str, function (card, player, target) {
+				return target != player && target.countCards("he");
+			}).set("ai", function (target) {
+				const event = get.event();
+				if (!event.goon) return 0;
+				var player = event.player;
+				if (get.attitude(player, target) >= 0 && get.attitude(target, player) >= 0) {
+					return Math.sqrt(target.countCards("he"));
+				}
+				return 0;
+			}).set("goon", goon).forResult();
+			if(result.bool){
+				result.cost_data = {cardname: event.cardname};
+				event.result = result;
 			}
-			"step 2";
+		},
+		content: function () {
+			"step 0";
+			event.cardname = event.cost_data.cardname;
+			var target = targets[0];
+			target.chooseCard("he", "是否交给" + get.translation(player) + "一张牌？", event.cardname ? "若如此做，视为" + get.translation(player) + "使用【" + get.translation(event.cardname) + "】" : null).set("ai", function (card) {
+				if (_status.event.goon) return 7 - get.value(card);
+				return 0;
+			}).set("goon", get.attitude(target, player) > 1);
+			event.target = target;
+			"step 1";
 			if (result.bool) {
 				event.target.give(result.cards, player);
 				if (event.cardname) {

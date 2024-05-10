@@ -6549,6 +6549,9 @@ const skills = {
 			//player.removeSkill('mouni');
 			player.changeSkills(["zhangu"], ["mouni"]);
 		},
+		ai: {
+			combo: "mouni",
+		},
 	},
 	zhangu: {
 		trigger: { player: "phaseZhunbeiBegin" },
