@@ -6242,6 +6242,9 @@ const skills = {
 			"step 1";
 			trigger.phaseList.splice(trigger.num, 0, "phaseUse|oldianjun");
 		},
+		ai: {
+			halfneg: true
+		},
 	},
 	olkangrui: {
 		audio: 2,

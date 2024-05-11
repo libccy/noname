@@ -4494,7 +4494,7 @@ const skills = {
 		content() {
 			"step 0";
 			player
-				.chooseTarget("恭俭：将置的牌交给一名体力值大于你的角色", function (card, player, target) {
+				.chooseTarget("恭俭：将弃置的牌交给一名体力值大于你的角色", function (card, player, target) {
 					return target.hp > player.hp;
 				})
 				.set("ai", function (target) {
@@ -4505,6 +4505,9 @@ const skills = {
 				player.line(result.targets, "green");
 				result.targets[0].gain(trigger.cards, "gain2");
 			}
+		},
+		ai: {
+			halfneg: true
 		},
 	},
 	nscaijian: {

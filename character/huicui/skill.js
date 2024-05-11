@@ -13362,6 +13362,9 @@ const skills = {
 				}
 			}
 		},
+		ai: {
+			combo: "recangchu"
+		},
 	},
 	reshishou: {
 		audio: 2,

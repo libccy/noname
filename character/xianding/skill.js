@@ -5737,7 +5737,7 @@ const skills = {
 				if (name != "phase") return false;
 			},
 			effect: {
-				target: (card, player, target) => {
+				target_use: (card, player, target) => {
 					if (player === target || typeof card !== "object" || get.color(card) !== "black") return;
 					if (target.hasSkill("jiu")) {
 						if (
@@ -8906,7 +8906,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: (card, player, target) => {
+				target_use: (card, player, target) => {
 					if (player === target) return;
 					if (
 						game.hasPlayer2(current => {
@@ -14985,7 +14985,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use: function (card, player, target) {
 					if (get.itemtype(player) !== "player" || player === target) return 1;
 					let num = 1,
 						ds = 2 + get.sgn(player.hp - target.hp);
