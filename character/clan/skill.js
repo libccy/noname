@@ -932,7 +932,7 @@ const skills = {
 		ai: {
 			threaten: 3,
 			effect: {
-				player(card, player, target) {
+				player_use(card, player, target) {
 					if (!target || typeof card !== "object" || player._clanjiejian_mod_temp || get.type(card) === "equip" || get.attitude(player, target) <= 0 || get.cardNameLength(card) !== player.getHistory("useCard").length + 1) return;
 					let targets = [target],
 						evt = _status.event.getParent("useCard");
@@ -2705,7 +2705,7 @@ const skills = {
 				if (player.getHistory("useCard", evt => get.type(evt.card) == "equip").length > 0) return false;
 			},
 			effect: {
-				target(card, player, target) {
+				target_use(card, player, target) {
 					if (player == target && get.type(card) == "equip" && !player.getHistory("useCard", evt => get.type(evt.card) == "equip").length == 0) return [1, 3];
 				},
 			},

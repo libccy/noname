@@ -3176,7 +3176,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (get.type(card, "trick") == "trick" && get.distance(player, target) > 1) return "zeroplayertarget";
 				},
 			},
@@ -4609,7 +4609,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						target(card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (get.type(card, "trick") == "trick" && _status.currentPhase == player) return "zeroplayertarget";
 						},
 					},
@@ -6238,7 +6238,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card, player, target) {
+				target_use(card, player, target) {
 					if (get.tag(card, "multineg")) {
 						return "zerotarget";
 					}

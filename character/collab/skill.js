@@ -759,7 +759,7 @@ const skills = {
 				},
 			},
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (player == target && player.isPhaseUsing() && get.type(card) == "equip") {
 						if (player.hasValueTarget("sha", false) && typeof player.getStat("skill").dcbianzhuang == "number") return [1, 3];
 					}
@@ -1645,7 +1645,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player(card, player, target) {
+				player_use(card, player, target) {
 					if (player !== target && get.type2(card) === "trick") {
 						let tars = [target];
 						if (ui.selected.targets.length) tars.addArray(ui.selected.targets.filter(i => i !== player && i !== target));

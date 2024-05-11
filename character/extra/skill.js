@@ -2327,7 +2327,7 @@ const skills = {
 		ai: {
 			threaten: 1.5,
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (get.type(card) == "equip" && !get.cardtag(card, "gifts")) return [1, 0.1];
 				},
 			},
@@ -3297,7 +3297,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: (card, player, target) => {
+				player_use(card, player, target) {
 					if (typeof card !== "object") return;
 					let suit = get.suit(card);
 					if (
@@ -4286,7 +4286,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						target(card, player, target) {
+						target_use(card, player, target) {
 							if (card && card.name == "qizhengxiangsheng") return "zeroplayertarget";
 						},
 					},
@@ -4413,7 +4413,7 @@ const skills = {
 			global: {
 				ai: {
 					effect: {
-						player: (card, player, target) => {
+						player_use(card, player, target) {
 							let num = 0,
 								nohave = true;
 							game.countPlayer(i => {
@@ -4529,7 +4529,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card, player, target, current, isLink) {
+				target_use(card, player, target, current, isLink) {
 					if (card.name == "sha" && !isLink && player.hp > target.hp) return 0.5;
 				},
 			},
