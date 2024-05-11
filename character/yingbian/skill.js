@@ -101,10 +101,16 @@ const skills = {
 			effect: {
 				player: function (card, player, target) {
 					if (!get.tag(card, "damage")) return;
-					if (!lib.card[card.name] || !card.cards || !card.cards.length) return [1, 0, 1, -1];
+					if (!lib.card[card.name] || !card.cards || !card.cards.length) return [1, 0, 2, 0];
+					return [1, -1];
+				},
+				target: function (card, player, target) {
+					if (!get.tag(card, "damage")) return;
+					if (!lib.card[card.name] || !card.cards || !card.cards.length) return 2;
 					return [1, -1];
 				},
 			},
+			halfneg: true
 		},
 		subSkill: {
 			effect: {
@@ -591,7 +597,7 @@ const skills = {
 				onremove: true,
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (card.name == player.storage.xiongshu_ai) return "zeroplayertarget";
 						},
 					},

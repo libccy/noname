@@ -9820,7 +9820,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (player !== target && get.itemtype(target) === "player" && (card.name === "sha" || get.type(card, false) === "trick") && target.countCards("he") && !target.hasSkillTag("noh")) return [1, 0, 1, -1];
 						},
 					},
@@ -10483,7 +10483,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (typeof card == "object" && player != target) {
 						var suit = get.suit(card);
 						if (suit == "none") return;
@@ -13093,7 +13093,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (_status._dcdanying_aiChecking) return;
 							_status._dcdanying_aiChecking = true;
 							let eff = get.effect(target, { name: "guohe_copy2" }, player, player);
@@ -13361,6 +13361,9 @@ const skills = {
 						.setContent("gaincardMultiple");
 				}
 			}
+		},
+		ai: {
+			combo: "recangchu"
 		},
 	},
 	reshishou: {

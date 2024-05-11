@@ -1918,6 +1918,13 @@ const skills = {
 		},
 	},
 	nszhihuang: {
+		available(mode) {
+			return (
+				mode == "identity" ||
+				mode == "versus" && (_status.mode == "four" || _status.mode == "guandu") ||
+				mode == "guozhan"
+			);
+		},
 		group: "nszhihuang_damage",
 		trigger: { global: "useCard" },
 		usable: 1,
@@ -3169,7 +3176,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (get.type(card, "trick") == "trick" && get.distance(player, target) > 1) return "zeroplayertarget";
 				},
 			},
@@ -4494,7 +4501,7 @@ const skills = {
 		content() {
 			"step 0";
 			player
-				.chooseTarget("恭俭：将置的牌交给一名体力值大于你的角色", function (card, player, target) {
+				.chooseTarget("恭俭：将弃置的牌交给一名体力值大于你的角色", function (card, player, target) {
 					return target.hp > player.hp;
 				})
 				.set("ai", function (target) {
@@ -4505,6 +4512,9 @@ const skills = {
 				player.line(result.targets, "green");
 				result.targets[0].gain(trigger.cards, "gain2");
 			}
+		},
+		ai: {
+			halfneg: true
 		},
 	},
 	nscaijian: {
@@ -4599,7 +4609,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						target(card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (get.type(card, "trick") == "trick" && _status.currentPhase == player) return "zeroplayertarget";
 						},
 					},
@@ -6228,7 +6238,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card, player, target) {
+				target_use(card, player, target) {
 					if (get.tag(card, "multineg")) {
 						return "zerotarget";
 					}
@@ -6718,9 +6728,11 @@ const skills = {
 			player.draw();
 		},
 		ai: {
-			effect(card, player, target) {
-				if (get.color(card) == "red") return [1, 1];
-			},
+			effect: {
+				target_use(card, player, target) {
+					if (get.color(card) == "red") return [1, 1];
+				},
+			}
 		},
 	},
 	zaiqix: {

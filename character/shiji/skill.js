@@ -1471,13 +1471,13 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target) {
+				player_use(card, player, target) {
 					var hp = player.hp,
 						evt = _status.event;
 					if (evt.name == "chooseToUse" && evt.player == player && evt.skill == "spjungong" && !ui.selected.cards.length) hp -= (player.getStat("skill").spjungong || 0) + 1;
 					if (card && card.name == "sha" && hp == target.hp) return [1, 0.3];
 				},
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (card && card.name == "sha" && player.hp == target.hp) return [1, 0.3];
 				},
 			},
@@ -1710,7 +1710,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (get.name(card) == "shan") {
 								let num = get.number(card);
 								if (!num || num <= player.storage.shanxie_banned.num) return "zeroplayertarget";
@@ -2119,7 +2119,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (card.name == "sha" && player.hp > target.hp && get.attitude(player, target) < 0) {
 						var num = get.number(card);
 						if (typeof num != "number") return false;

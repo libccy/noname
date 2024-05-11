@@ -432,7 +432,7 @@ const skills = {
 		subSkill: {
 			ai: {
 				effect: {
-					player(card, player) {
+					player_use(card, player) {
 						if (
 							!game.hasPlayer(target => {
 								return target.hasSkill("olsbhetao") && (get.attitude(player, target) < 0 || get.attitude(target, player) < 0);

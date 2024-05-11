@@ -1609,7 +1609,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (target.isHealthy() || (card.name != "sha" && card.name != "juedou")) return;
 					if (target.storage.counttrigger && target.storage.counttrigger.yizu && current < 0) return 5;
 					if (player.hp < target.hp) return;
@@ -2495,7 +2495,7 @@ const skills = {
 		ai: {
 			threaten: 0.6,
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (typeof card != "object" || target.hasSkill("xindanshou_as") || !["basic", "trick"].includes(get.type(card, "trick"))) return;
 					var num = 0;
 					game.countPlayer2(function (current) {
@@ -4153,7 +4153,7 @@ const skills = {
 				return bool;
 			},
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (card.name == "sha" && current < 0) return 0.7;
 				},
 			},
@@ -4857,7 +4857,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (card.name == "sha" && get.attitude(player, target) < 0) {
 						return 0.3;
 					}
@@ -7307,7 +7307,7 @@ const skills = {
 				if (arg.target != player.storage.xinxianzhen) return false;
 			},
 			effect: {
-				player: function (card, player, target, current, isLink) {
+				player_use(card, player, target, current, isLink) {
 					if (isLink || !player.storage.xinxianzhen) return;
 					if (target != player.storage.xinxianzhen && ["sha", "guohe", "shunshou", "huogong", "juedou"].includes(card.name)) {
 						if (get.effect(player.storage.xinxianzhen, card, player, player) > 0) {
@@ -8350,7 +8350,7 @@ const skills = {
 		ai: {
 			respondShan: true,
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (get.tag(card, "respondShan") && current < 0) {
 						var nh = player.countCards("h");
 						var players = game.filterPlayer();
@@ -9547,7 +9547,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player_use: function (card, player, target) {
+						player_use(card, player, target) {
 							var list = player.storage.taoxi_list;
 							if (!list || !list[1]) return;
 							if (list[1].includes(card)) return [1, 1];
@@ -11102,9 +11102,11 @@ const skills = {
 			player.draw();
 		},
 		ai: {
-			effect: function (card, player, target) {
-				if (get.type(card) == "trick") return [1, 1];
-			},
+			effect: {
+				target_use(card, player, target) {
+					if (get.type(card) == "trick" && player !== target) return [1, 1];
+				},
+			}
 		},
 	},
 	shenxing: {
@@ -12067,7 +12069,7 @@ const skills = {
 		ai: {
 			expose: 0.2,
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (card.name != "sha") return;
 					var players = game.filterPlayer();
 					if (get.attitude(player, target) <= 0) {
@@ -12785,7 +12787,7 @@ const skills = {
 				return arg && arg.jiu == true;
 			},
 			effect: {
-				target: (card, player, target) => {
+				target_use(card, player, target) {
 					if (target.hp <= 0 && target.hasSkill("zhenlie_lose") && get.tag(card, "recover")) return [1, 1.2];
 				},
 			},
@@ -12810,10 +12812,10 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (get.type(card) == "trick" && player != target) return "zeroplayertarget";
 				},
-				player: function (card, player, target, current) {
+				player_use(card, player, target, current) {
 					if (get.type(card) == "trick" && player != target) return "zeroplayertarget";
 				},
 			},
@@ -12987,7 +12989,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (player == target && get.subtypes(card).includes("equip2")) {
 						if (get.equipValue(card) <= 8) return 0;
 					}
