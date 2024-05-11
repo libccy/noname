@@ -9,6 +9,7 @@ import { gnc } from "../../gnc/index.js";
 import { LibInitPromises } from "./promises.js";
 import { GameEvent } from "../element/gameEvent.js";
 import { GameEventPromise } from "../element/gameEventPromise.js";
+import { rootURL } from "../../../noname.js";
 
 export class LibInit {
 	/**
@@ -23,11 +24,7 @@ export class LibInit {
 	reset() {
 		if (window.inSplash) return;
 		if (window.resetExtension) {
-			if (
-				confirm(
-					"游戏似乎未正常载入，有可能因为部分扩展未正常载入，或者因为部分扩展未载入完毕。\n是否禁用扩展并重新打开？"
-				)
-			) {
+			if (confirm("游戏似乎未正常载入，有可能因为部分扩展未正常载入，或者因为部分扩展未载入完毕。\n是否禁用扩展并重新打开？")) {
 				window.resetExtension();
 				window.location.reload();
 			}
@@ -91,7 +88,7 @@ export class LibInit {
 		event._resultid = null;
 		event._result = null;
 		game.pause();
-		"step 1";
+		("step 1");
 		if (result) {
 			if (event._resultid) {
 				result.id = event._resultid;
@@ -176,10 +173,7 @@ export class LibInit {
 		if (path) {
 			if (path[path.length - 1] == "/") path = path.slice(0, path.length - 1);
 			if (file) path = `${path}${/^db:extension-[^:]*$/.test(path) ? ":" : "/"}${file}.css`;
-			(path.startsWith("db:")
-				? game.getDB("image", path.slice(3)).then(get.objectURL)
-				: new Promise((resolve) => resolve(path))
-			).then((resolvedPath) => {
+			(path.startsWith("db:") ? game.getDB("image", path.slice(3)).then(get.objectURL) : new Promise(resolve => resolve(path))).then(resolvedPath => {
 				style.href = resolvedPath;
 				if (typeof before == "function") {
 					style.addEventListener("load", before);
@@ -211,28 +205,19 @@ export class LibInit {
 			return;
 		}
 		if (Array.isArray(file)) {
-			file.forEach((value) => lib.init.js(path, value, onLoad, onError));
+			file.forEach(value => lib.init.js(path, value, onLoad, onError));
 			return;
 		}
 		let scriptSource = file ? `${path}${/^db:extension-[^:]*$/.test(path) ? ":" : "/"}${file}.js` : path;
 		if (path.startsWith("http")) scriptSource += `?rand=${get.id()}`;
-		else if (
-			lib.config.fuck_sojson &&
-			scriptSource.includes("extension") != -1 &&
-			scriptSource.startsWith(lib.assetURL)
-		) {
+		else if (lib.config.fuck_sojson && scriptSource.includes("extension") != -1 && scriptSource.startsWith(lib.assetURL)) {
 			const pathToRead = scriptSource.slice(lib.assetURL.length);
 			const alertMessage = `检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${pathToRead}`;
 			if (typeof game.readFileAsText == "function")
 				game.readFileAsText(
 					pathToRead,
-					(result) => {
-						if (
-							result.includes("sojson") ||
-							result.includes("jsjiami") ||
-							result.includes("var _0x")
-						)
-							alert(alertMessage);
+					result => {
+						if (result.includes("sojson") || result.includes("jsjiami") || result.includes("var _0x")) alert(alertMessage);
 					},
 					() => void 0
 				);
@@ -241,21 +226,13 @@ export class LibInit {
 					pathToRead,
 					function () {
 						const result = this.responseText;
-						if (
-							result.includes("sojson") ||
-							result.includes("jsjiami") ||
-							result.includes("var _0x")
-						)
-							alert(alertMessage);
+						if (result.includes("sojson") || result.includes("jsjiami") || result.includes("var _0x")) alert(alertMessage);
 					},
 					() => void 0
 				);
 		}
 		const script = document.createElement("script");
-		(scriptSource.startsWith("db:")
-			? game.getDB("image", scriptSource.slice(3)).then(get.objectURL)
-			: new Promise((resolve) => resolve(scriptSource))
-		).then((resolvedScriptSource) => {
+		(scriptSource.startsWith("db:") ? game.getDB("image", scriptSource.slice(3)).then(get.objectURL) : new Promise(resolve => resolve(scriptSource))).then(resolvedScriptSource => {
 			script.src = resolvedScriptSource;
 			if (path.startsWith("http")) script.addEventListener("load", () => script.remove());
 			document.head.appendChild(script);
@@ -282,7 +259,7 @@ export class LibInit {
 			return;
 		}
 		if (Array.isArray(file)) {
-			return file.forEach((value) => lib.init.jsSync(path, value, onLoad, onError));
+			return file.forEach(value => lib.init.jsSync(path, value, onLoad, onError));
 		}
 		let scriptSource;
 		if (!file) scriptSource = path;
@@ -301,16 +278,9 @@ export class LibInit {
 				if (typeof onError == "function") onError(new Error(`${scriptSource}加载失败！`));
 				return;
 			}
-			if (
-				lib.config.fuck_sojson &&
-				scriptSource.includes("extension") != -1 &&
-				scriptSource.startsWith(lib.assetURL)
-			) {
+			if (lib.config.fuck_sojson && scriptSource.includes("extension") != -1 && scriptSource.startsWith(lib.assetURL)) {
 				const pathToRead = scriptSource.slice(lib.assetURL.length);
-				if (data.includes("sojson") || data.includes("jsjiami") || data.includes("var _0x"))
-					alert(
-						`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${pathToRead}`
-					);
+				if (data.includes("sojson") || data.includes("jsjiami") || data.includes("var _0x")) alert(`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${pathToRead}`);
 			}
 			try {
 				window.eval(data);
@@ -328,11 +298,7 @@ export class LibInit {
 		let sScriptURL;
 		if (str.startsWith("http")) sScriptURL = str;
 		else if (str.startsWith("local:")) {
-			if (
-				lib.assetURL.length == 0 &&
-				location.origin == "file://" &&
-				typeof game.readFile == "undefined"
-			) {
+			if (lib.assetURL.length == 0 && location.origin == "file://" && typeof game.readFile == "undefined") {
 				const e = new Error("浏览器file协议下无法使用此api，请在http/https协议下使用此api");
 				if (typeof onerror == "function") onerror(e);
 				else throw e;
@@ -346,7 +312,7 @@ export class LibInit {
 		}
 		const oReq = new XMLHttpRequest();
 		if (typeof onload == "function")
-			oReq.addEventListener("load", (result) => {
+			oReq.addEventListener("load", result => {
 				if (![0, 200].includes(oReq.status)) {
 					// @ts-ignore
 					if (typeof onerror == "function") onerror(new Error(oReq.statusText || oReq.status));
@@ -366,11 +332,7 @@ export class LibInit {
 		let sScriptURL;
 		if (str.startsWith("http")) sScriptURL = str;
 		else if (str.startsWith("local:")) {
-			if (
-				lib.assetURL.length == 0 &&
-				location.origin == "file://" &&
-				typeof game.readFile == "undefined"
-			) {
+			if (lib.assetURL.length == 0 && location.origin == "file://" && typeof game.readFile == "undefined") {
 				const e = new Error("浏览器file协议下无法使用此api，请在http/https协议下使用此api");
 				if (typeof onerror == "function") onerror(e);
 				else throw e;
@@ -384,7 +346,7 @@ export class LibInit {
 		}
 		const oReq = new XMLHttpRequest();
 		if (typeof onload == "function")
-			oReq.addEventListener("load", (result) => {
+			oReq.addEventListener("load", result => {
 				if (![0, 200].includes(oReq.status)) {
 					// @ts-ignore
 					if (typeof onerror == "function") onerror(new Error(oReq.statusText || oReq.status));
@@ -460,61 +422,26 @@ export class LibInit {
 			ui.css.styles.remove();
 		}
 		ui.css.styles = lib.init.sheet();
-		ui.css.styles.sheet.insertRule(
-			"#arena .player>.name,#arena .button.character>.name {font-family: " +
-				(lib.config.name_font || "xinwei") +
-				",xinwei}",
-			0
-		);
-		ui.css.styles.sheet.insertRule(
-			"#arena .player>.name,.button.character>.name {font-family: " +
-				(lib.config.name_font || "xinwei") +
-				",xinwei}",
-			0
-		);
-		ui.css.styles.sheet.insertRule(
-			"#arena .player .identity>div {font-family: " +
-				(lib.config.identity_font || "huangcao") +
-				",xinwei}",
-			0
-		);
-		ui.css.styles.sheet.insertRule(
-			".button.character.newstyle>.identity {font-family: " +
-				(lib.config.identity_font || "huangcao") +
-				",xinwei}",
-			0
-		);
+		ui.css.styles.sheet.insertRule("#arena .player>.name,#arena .button.character>.name {font-family: " + (lib.config.name_font || "xinwei") + ",xinwei}", 0);
+		ui.css.styles.sheet.insertRule("#arena .player>.name,.button.character>.name {font-family: " + (lib.config.name_font || "xinwei") + ",xinwei}", 0);
+		ui.css.styles.sheet.insertRule("#arena .player .identity>div {font-family: " + (lib.config.identity_font || "huangcao") + ",xinwei}", 0);
+		ui.css.styles.sheet.insertRule(".button.character.newstyle>.identity {font-family: " + (lib.config.identity_font || "huangcao") + ",xinwei}", 0);
 		if (lib.config.cardtext_font && lib.config.cardtext_font != "default") {
-			ui.css.styles.sheet.insertRule(
-				".card div:not(.info):not(.background) {font-family: " + lib.config.cardtext_font + ";}",
-				0
-			);
+			ui.css.styles.sheet.insertRule(".card div:not(.info):not(.background) {font-family: " + lib.config.cardtext_font + ";}", 0);
 		}
 		if (lib.config.global_font && lib.config.global_font != "default") {
 			ui.css.styles.sheet.insertRule("#window {font-family: " + lib.config.global_font + ",xinwei}", 0);
-			ui.css.styles.sheet.insertRule(
-				"#window #control{font-family: STHeiti,SimHei,Microsoft JhengHei,Microsoft YaHei,WenQuanYi Micro Hei,Suits,Helvetica,Arial,sans-serif}",
-				0
-			);
+			ui.css.styles.sheet.insertRule("#window #control{font-family: STHeiti,SimHei,Microsoft JhengHei,Microsoft YaHei,WenQuanYi Micro Hei,Suits,Helvetica,Arial,sans-serif}", 0);
 		}
 		switch (lib.config.glow_phase) {
 			case "yellow":
-				ui.css.styles.sheet.insertRule(
-					"#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(217, 152, 62) 0 0 15px, rgb(217, 152, 62) 0 0 15px !important;}",
-					0
-				);
+				ui.css.styles.sheet.insertRule("#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(217, 152, 62) 0 0 15px, rgb(217, 152, 62) 0 0 15px !important;}", 0);
 				break;
 			case "green":
-				ui.css.styles.sheet.insertRule(
-					"#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;}",
-					0
-				);
+				ui.css.styles.sheet.insertRule("#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(10, 155, 67, 1) 0 0 15px, rgba(10, 155, 67, 1) 0 0 15px !important;}", 0);
 				break;
 			case "purple":
-				ui.css.styles.sheet.insertRule(
-					"#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(189, 62, 170) 0 0 15px, rgb(189, 62, 170) 0 0 15px !important;}",
-					0
-				);
+				ui.css.styles.sheet.insertRule("#arena .player:not(.selectable):not(.selected).glow_phase {box-shadow: rgba(0, 0, 0, 0.3) 0 0 0 1px, rgb(189, 62, 170) 0 0 15px, rgb(189, 62, 170) 0 0 15px !important;}", 0);
 				break;
 		}
 	}
@@ -529,7 +456,7 @@ export class LibInit {
 		if (!nosave) game.saveConfig("layout", layout);
 		game.layout = layout;
 		ui.arena.hide();
-		new Promise((resolve) => setTimeout(resolve, 500))
+		new Promise(resolve => setTimeout(resolve, 500))
 			.then(() => {
 				if (game.layout == "default") {
 					ui.css.layout.href = "";
@@ -541,12 +468,7 @@ export class LibInit {
 				} else {
 					ui.arena.classList.remove("mobile");
 				}
-				if (
-					game.layout == "mobile" ||
-					game.layout == "long" ||
-					game.layout == "long2" ||
-					game.layout == "nova"
-				) {
+				if (game.layout == "mobile" || game.layout == "long" || game.layout == "long2" || game.layout == "nova") {
 					if (game.me && game.me.node.handcards2.childNodes.length) {
 						while (game.me.node.handcards2.childNodes.length) {
 							game.me.node.handcards1.appendChild(game.me.node.handcards2.firstChild);
@@ -558,13 +480,7 @@ export class LibInit {
 				} else {
 					ui.arena.classList.remove("oldlayout");
 				}
-				if (
-					lib.config.cardshape == "oblong" &&
-					(game.layout == "long" ||
-						game.layout == "mobile" ||
-						game.layout == "long2" ||
-						game.layout == "nova")
-				) {
+				if (lib.config.cardshape == "oblong" && (game.layout == "long" || game.layout == "mobile" || game.layout == "long2" || game.layout == "nova")) {
 					ui.arena.classList.add("oblongcard");
 					ui.window.classList.add("oblongcard");
 				} else {
@@ -607,11 +523,7 @@ export class LibInit {
 				} else {
 					ui.arena.classList.remove("slim_player");
 				}
-				if (
-					lib.config.player_border == "normal" &&
-					lib.config.mode != "brawl" &&
-					(game.layout == "long" || game.layout == "long2")
-				) {
+				if (lib.config.player_border == "normal" && lib.config.mode != "brawl" && (game.layout == "long" || game.layout == "long2")) {
 					ui.arena.classList.add("lslim_player");
 				} else {
 					ui.arena.classList.remove("lslim_player");
@@ -628,24 +540,22 @@ export class LibInit {
 				}
 				ui.updatej();
 				ui.updatem();
-				return new Promise((resolve) => setTimeout(resolve, 100));
+				return new Promise(resolve => setTimeout(resolve, 100));
 			})
 			.then(() => {
 				ui.arena.show();
 				if (game.me) game.me.update();
-				return new Promise((resolve) => setTimeout(resolve, 500));
+				return new Promise(resolve => setTimeout(resolve, 500));
 			})
 			.then(() => {
 				ui.updatex();
 				ui.updatePlayerPositions();
-				return new Promise((resolve) => setTimeout(resolve, 500));
+				return new Promise(resolve => setTimeout(resolve, 500));
 			})
 			.then(() => {
 				ui.updatec();
 				loadingScreenStyle.animationName = "opacity-1-0";
-				loadingScreen.addEventListener("animationend", (animationEvent) =>
-					animationEvent.target.remove()
-				);
+				loadingScreen.addEventListener("animationend", animationEvent => animationEvent.target.remove());
 			});
 	}
 
@@ -658,11 +568,7 @@ export class LibInit {
 			}
 			list.remove(lib.config.image_background);
 			localStorage.setItem(lib.configprefix + "background", JSON.stringify(list));
-		} else if (
-			lib.config.image_background &&
-			lib.config.image_background != "default" &&
-			!lib.config.image_background.startsWith("custom_")
-		) {
+		} else if (lib.config.image_background && lib.config.image_background != "default" && !lib.config.image_background.startsWith("custom_")) {
 			localStorage.setItem(lib.configprefix + "background", lib.config.image_background);
 		} else if (lib.config.image_background == "default" && lib.config.theme == "simple") {
 			localStorage.setItem(lib.configprefix + "background", "ol_bg");
@@ -687,10 +593,7 @@ export class LibInit {
 			//移除所有注释
 			let str = func
 				.toString()
-				.replace(
-					/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^/"'\\\s]*)/gm,
-					"$2"
-				)
+				.replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^/"'\\\s]*)/gm, "$2")
 				.trim();
 			//获取第一个 { 后的所有字符
 			str = str.slice(str.indexOf("{") + 1);
@@ -702,10 +605,7 @@ export class LibInit {
 			let debuggerResult;
 			while ((debuggerResult = str.slice(debuggerSkip).match(regex)) != null) {
 				let debuggerCopy = str;
-				debuggerCopy =
-					debuggerCopy.slice(0, debuggerSkip + debuggerResult.index) +
-					insertDebugger +
-					debuggerCopy.slice(debuggerSkip + debuggerResult.index + debuggerResult[0].length, -1);
+				debuggerCopy = debuggerCopy.slice(0, debuggerSkip + debuggerResult.index) + insertDebugger + debuggerCopy.slice(debuggerSkip + debuggerResult.index + debuggerResult[0].length, -1);
 				//测试是否有错误
 				try {
 					new GeneratorFunction(debuggerCopy);
@@ -732,10 +632,7 @@ export class LibInit {
 						insertStr = `break;case ${k}:`;
 					}
 					let copy = str;
-					copy =
-						copy.slice(0, skip + result.index) +
-						insertStr +
-						copy.slice(skip + result.index + result[0].length);
+					copy = copy.slice(0, skip + result.index) + insertStr + copy.slice(skip + result.index + result[0].length);
 					//测试是否有错误
 					try {
 						new (hasDebugger ? GeneratorFunction : Function)(copy);
@@ -750,32 +647,9 @@ export class LibInit {
 				str = `if(event.step==${k}){event.finish();return;}` + str;
 			}
 			if (!scope) {
-				return new (hasDebugger ? GeneratorFunction : Function)(
-					"event",
-					"step",
-					"source",
-					"player",
-					"target",
-					"targets",
-					"card",
-					"cards",
-					"skill",
-					"forced",
-					"num",
-					"trigger",
-					"result",
-					"_status",
-					"lib",
-					"game",
-					"ui",
-					"get",
-					"ai",
-					str
-				);
+				return new (hasDebugger ? GeneratorFunction : Function)("event", "step", "source", "player", "target", "targets", "card", "cards", "skill", "forced", "num", "trigger", "result", "_status", "lib", "game", "ui", "get", "ai", str);
 			} else {
-				return scope(`function${
-					hasDebugger ? "*" : ""
-				} anonymous(event,step,source,player,target,targets,
+				return scope(`function${hasDebugger ? "*" : ""} anonymous(event,step,source,player,target,targets,
 						card,cards,skill,forced,num,trigger,result,
 						_status,lib,game,ui,get,ai){${str}}; anonymous;`);
 			}
@@ -784,31 +658,10 @@ export class LibInit {
 			case "object":
 				if (Array.isArray(item)) {
 					let lastEvent = null;
-					return function* (
-						event,
-						step,
-						source,
-						player,
-						target,
-						targets,
-						card,
-						cards,
-						skill,
-						forced,
-						num,
-						trigger,
-						result,
-						_status,
-						lib,
-						game,
-						ui,
-						get,
-						ai
-					) {
+					return function* (event, step, source, player, target, targets, card, cards, skill, forced, num, trigger, result, _status, lib, game, ui, get, ai) {
 						if (step >= item.length) return event.finish();
 						var current = item[step];
-						if (typeof current != "function")
-							throw new Error(`content ${step} of ${event.name} is not vaild: ${current}`);
+						if (typeof current != "function") throw new Error(`content ${step} of ${event.name} is not vaild: ${current}`);
 						var currentResult = current(
 							event,
 							{
@@ -845,27 +698,7 @@ export class LibInit {
 			case "function":
 				if (gnc.is.generatorFunc(item)) {
 					// let gen, lastEvent;
-					let content = function* (
-						event,
-						step,
-						source,
-						player,
-						target,
-						targets,
-						card,
-						cards,
-						skill,
-						forced,
-						num,
-						trigger,
-						result,
-						_status,
-						lib,
-						game,
-						ui,
-						get,
-						ai
-					) {
+					let content = function* (event, step, source, player, target, targets, card, cards, skill, forced, num, trigger, result, _status, lib, game, ui, get, ai) {
 						event.step = NaN;
 						if (!this.gen)
 							this.gen = item(event, {
@@ -887,8 +720,7 @@ export class LibInit {
 						let res;
 						if (!this.last) res = this.gen.next();
 						else if (typeof this.last !== "object") res = this.gen.next(this.last);
-						else if (this.last instanceof GameEvent || this.last instanceof GameEventPromise)
-							res = this.gen.next(this.last.result);
+						else if (this.last instanceof GameEvent || this.last instanceof GameEventPromise) res = this.gen.next(this.last.result);
 						else res = this.gen.next(this.last);
 
 						if (res.done) {
@@ -952,8 +784,7 @@ export class LibInit {
 	decode(str) {
 		var strUtf = atob(str);
 		var strUni = strUtf.replace(/[\u00e0-\u00ef][\u0080-\u00bf][\u0080-\u00bf]/g, function (c) {
-			var cc =
-				((c.charCodeAt(0) & 0x0f) << 12) | ((c.charCodeAt(1) & 0x3f) << 6) | (c.charCodeAt(2) & 0x3f);
+			var cc = ((c.charCodeAt(0) & 0x0f) << 12) | ((c.charCodeAt(1) & 0x3f) << 6) | (c.charCodeAt(2) & 0x3f);
 			return String.fromCharCode(cc);
 		});
 		strUni = strUni.replace(/[\u00c0-\u00df][\u0080-\u00bf]/g, function (c) {
@@ -1004,5 +835,66 @@ export class LibInit {
 		let head = window.location.href.slice(0, window.location.href.lastIndexOf("/") + 1);
 		let ret = url.replace(head, "");
 		return decodeURIComponent(ret);
+	}
+
+	/**
+	 * @async
+	 * @param {string | URL} link - 需要解析的路径
+	 * @param {(item: string) => string} [defaultHandle] - 在给定路径不符合可用情况（或基于无名杀相关默认情况）时，处理路径的函数，返回的路径应是相对于根目录的相对路径，默认为恒等函数
+	 * @param {boolean} [forceLoadAsDataUrl] - 是否将资源加载为[Data URL](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URLs)，默认为`false`
+	 * @param {boolean} [dbNow] - 此刻是否在解析数据库中的内容，请勿直接使用
+	 * @returns {Promise<URL>}
+	 */
+	async parseResourceAddress(link, defaultHandle = item => item, forceLoadAsDataUrl = false, dbNow = false) {
+		let linkString = link instanceof URL ? link.href : link;
+
+		// 如果传入值为Data URL，经过分析可知无需处理，故直接返回成品URL
+		if (linkString.startsWith("data:")) return new URL(linkString);
+
+		/**
+		 * @type {URL}
+		 */
+		let resultUrl;
+		if (linkString.startsWith("ext:")) {
+			let resultLink = `extension/${linkString.slice(4)}`;
+			resultUrl = new URL(resultLink, rootURL);
+		} else if (URL.canParse(linkString)) {
+			resultUrl = new URL(linkString);
+		} else if (dbNow) {
+			let content = new Blob([linkString], { type: "text/plain" });
+			resultUrl = new URL(await get.dataUrl(content));
+		} else {
+			let resultLink = defaultHandle(linkString);
+			resultUrl = new URL(resultLink, rootURL);
+		}
+
+		if (forceLoadAsDataUrl && !resultUrl.href.startsWith("data:")) {
+			if (linkString.startsWith("db:")) {
+				/**
+				 * @type {string}
+				 */
+				let storeResult = await game.getDB("image", linkString.slice(3));
+
+				// 我思索了一下，如果这玩意能造成无限递归
+				// 那么我只能说，你赢了
+				return this.parseResourceAddress(storeResult, defaultHandle, forceLoadAsDataUrl, true);
+			}
+			/**
+			 * @type {Blob}
+			 */
+			let blob;
+
+			if (linkString.startsWith("file:")) {
+				let buffer = await game.promises.readFile(get.relativePath(resultUrl));
+				blob = new Blob([buffer]);
+			} else {
+				let response = await fetch(resultUrl.href);
+				blob = await response.blob();
+			}
+
+			resultUrl.href = await get.dataUrl(blob);
+		}
+
+		return resultUrl;
 	}
 }
