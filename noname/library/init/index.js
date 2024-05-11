@@ -862,7 +862,7 @@ export class LibInit {
 			resultUrl = new URL(linkString);
 		} else if (dbNow) {
 			let content = new Blob([linkString], { type: "text/plain" });
-			resultUrl = new URL(await get.dataUrl(content));
+			resultUrl = new URL(await get.dataUrlAsync(content));
 		} else {
 			let resultLink = defaultHandle == null ? linkString : defaultHandle(linkString);
 			resultUrl = new URL(resultLink, rootURL);
@@ -892,7 +892,7 @@ export class LibInit {
 				blob = await response.blob();
 			}
 
-			resultUrl.href = await get.dataUrl(blob);
+			resultUrl.href = await get.dataUrlAsync(blob);
 		}
 
 		return resultUrl;

@@ -4822,10 +4822,10 @@ export class Get {
 	 * console.assert(btoa(text) === "SGVsbG8sIFdvcmxkIQ==");
 	 *
 	 * let blob = new Blob([text], { type: "text/plain" });
-	 * let url = await get.dataUrl(blob);
+	 * let url = await get.dataUrlAsync(blob);
 	 * console.assert("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==");
 	 */
-	dataUrl(blob) {
+	dataUrlAsync(blob) {
 		return new Promise((resolve, reject) => {
 			let fileReader = new FileReader();
 			fileReader.onload = resolve;
