@@ -4815,7 +4815,7 @@ export class Get {
 	 * @example
 	 * // 当前文件以"noname/get/index.js"举例
 	 * let parsedPath = get.relativePath(import.meta.url, true);
-	 * console.log(parsedPath == `${lib.assetURL}noname/get/index.js`) //=> true
+	 * console.assert(parsedPath == `${lib.assetURL}noname/get/index.js`);
 	 */
 	relativePath(url, addAssetURL = false) {
 		let base = lib.path.relative(decodeURI(rootURL.pathname), decodeURI(url.pathname));
@@ -4823,6 +4823,56 @@ export class Get {
 			base = `${lib.assetURL}${base}`;
 		}
 		return base;
+	}
+
+	/**
+	 * 通过`FileReader`，将Blob转换成对应内容的[Data URL](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URLs)
+	 *
+	 * @async
+	 * @param {Blob} blob - 需要转换的内容
+	 * @returns {Promise<string>} 对应Blob内容的
+	 *
+	 * @example
+	 * let text = "Hello, World!";
+	 * console.assert(btoa(text) === "SGVsbG8sIFdvcmxkIQ==");
+	 *
+	 * let blob = new Blob([text], { type: "text/plain" });
+	 * let url = await get.dataUrlAsync(blob);
+	 * console.assert("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==");
+	 */
+	dataUrlAsync(blob) {
+		return new Promise((resolve, reject) => {
+			let fileReader = new FileReader();
+			fileReader.onload = resolve;
+			fileReader.onerror = reject;
+			fileReader.readAsDataURL(blob);
+		}).then(event => event.target.result);
+	}
+
+	/**
+	 * 通过`fetch`读取data URL的内容，转换成Blob后返回生成的blob URL
+	 *
+	 * 该方法具有缓存，同一data URL仅会返回同一blob URL
+	 *
+	 * 该方法相比`get.objectURL`，会保留文件的类型
+	 *
+	 * ---
+	 *
+	 * > 其实我不确定`get.objectURL`是否有实际意义上的需求，我也不确定`get.objectURL`不保留类型是否是刚需，但既然原先就存在，那么就不要动
+	 *
+	 * @async
+	 * @param {string | URL} dataUrl - 需要转换的data URL
+	 * @returns {Promise<URL>}
+	 */
+	async objectURLAsync(dataUrl) {
+		let dataString = dataUrl instanceof URL ? dataUrl.href : dataUrl;
+		const objectURLMap = lib.objectURL;
+		if (objectURLMap.has(dataString)) return new URL(objectURLMap.get(dataString));
+
+		let blob = await (await fetch(dataUrl)).blob();
+		const objectURL = URL.createObjectURL(blob);
+		objectURLMap.set(dataString, objectURL);
+		return new URL(objectURL);
 	}
 }
 
