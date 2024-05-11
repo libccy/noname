@@ -417,7 +417,7 @@ export default {
 	"#dengzhi:die": "使命既成，但死无妨！",
 	"#relihuo1": "此火只为全歼敌寇，无需妇人之仁。",
 	"#relihuo2": "战胜攻取，以火修功。",
-	"#chunlao_xin_chengpu1": "背下佳酿，以做庆功之用。",
+	"#chunlao_xin_chengpu1": "备下佳酿，以做庆功之用。",
 	"#chunlao_xin_chengpu2": "饮此壮行酒，当立先头功。",
 	"#xin_chengpu:die": "箭尽弓折，力竭人亡。",
 	"#duoduan1": "北伐之事，丞相亦听我定夺。",

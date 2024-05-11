@@ -343,7 +343,7 @@ const skills = {
 			},
 		},
 	},
-	//徐琨
+	//徐琨（菜不菜我不知道）
 	fazhu: {
 		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },
@@ -11235,6 +11235,7 @@ const skills = {
 			return event.player != player;
 		},
 		logTarget: "player",
+		prompt2: "摸两张牌，然后交给其两张牌。若该角色于本回合阶段时未杀死过角色，则你失去1点体力。",
 		check: function (event, player) {
 			if (get.attitude(player, event.player) < 5) return false;
 			if (player.maxHp - player.hp >= 2) return false;
