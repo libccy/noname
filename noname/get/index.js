@@ -4852,7 +4852,9 @@ export class Get {
 	}
 
 	/**
-	 * 通过`fetch`读取data URL的内容，转换成Blob后返回生成的blob URL
+	 * 通过`Get#blobFromUrl`读取data URL的内容，转换成Blob后返回生成的blob URL
+	 *
+	 * > 实际上所有的URL都能通过此方法读取
 	 *
 	 * 该方法具有缓存，同一data URL仅会返回同一blob URL
 	 *
@@ -4866,15 +4868,29 @@ export class Get {
 	 * @param {string | URL} dataUrl - 需要转换的data URL
 	 * @returns {Promise<URL>}
 	 */
-	async objectURLAsync(dataUrl) {
+	async objectUrlAsync(dataUrl) {
 		let dataString = dataUrl instanceof URL ? dataUrl.href : dataUrl;
 		const objectURLMap = lib.objectURL;
 		if (objectURLMap.has(dataString)) return new URL(objectURLMap.get(dataString));
 
-		let blob = await (await fetch(dataUrl)).blob();
+		let blob = await this.blobFromUrl(dataUrl);
 		const objectURL = URL.createObjectURL(blob);
 		objectURLMap.set(dataString, objectURL);
 		return new URL(objectURL);
+	}
+
+	/**
+	 * 读取给定的URL，将其中的内容转换成Blob
+	 *
+	 * 在File协议下通过无名杀自带的文件处理函数读取内容，其他协议通过`fetch`读取内容
+	 *
+	 * @async
+	 * @param {string | URL} url - 需要读取的URL
+	 * @returns {Promise<Blob>}
+	 */
+	blobFromUrl(url) {
+		let link = url instanceof URL ? url : new URL(url);
+		return link.protocol == "file:" ? game.promises.readFile(get.relativePath(link)).then(buffer => new Blob([buffer])) : fetch(link).then(response => response.blob());
 	}
 }
 
