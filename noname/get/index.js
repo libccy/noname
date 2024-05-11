@@ -216,7 +216,7 @@ export class Get {
 	//装备栏 END
 	/**
 	 * @param {string} chinese
-	 * @param {boolean|undefined} withTone  
+	 * @param {boolean|undefined} withTone
 	 * @returns { any[] }
 	 */
 	pinyin(chinese, withTone) {
@@ -224,10 +224,9 @@ export class Get {
 		const pinyins = lib.pinyins;
 		if (pinyins && pinyins[chinese] && Array.isArray(pinyins[chinese])) {
 			result = pinyins[chinese].slice(0);
-		}
-		else {
+		} else {
 			//@ts-ignore
-			result = pinyinPro.pinyin(chinese, {type: "array"});
+			result = pinyinPro.pinyin(chinese, { type: "array" });
 		}
 		//@ts-ignore
 		if (withTone === false) result = pinyinPro.convert(result, { format: "toneNone" });
@@ -295,7 +294,7 @@ export class Get {
 	 */
 	yunjiao(str) {
 		//@ts-ignore
-		str = pinyinPro.convert(str, { format: "toneNone" })
+		str = pinyinPro.convert(str, { format: "toneNone" });
 		if (lib.pinyins._metadata.zhengtirendu.includes(str)) {
 			str = "-" + str[str.length - 1];
 		} else {
@@ -4601,7 +4600,8 @@ export class Get {
 					)
 						temp2 = cache.delegate(temp2.effect).target(card, player, target, result2, isLink);
 					else temp2 = undefined;
-				} else if (typeof temp2.effect == "function") { //考虑废弃
+				} else if (typeof temp2.effect == "function") {
+					//考虑废弃
 					console.log("此写法使用频率极低且影响代码可读性，不建议使用");
 					if (
 						!player.hasSkillTag("ignoreSkill", true, {
@@ -4832,7 +4832,7 @@ export class Get {
 	 *
 	 * @async
 	 * @param {Blob} blob - 需要转换的内容
-	 * @returns {Promise<string>} 对应Blob内容的
+	 * @returns {Promise<URL>} 对应Blob内容的
 	 *
 	 * @example
 	 * let text = "Hello, World!";
@@ -4840,7 +4840,7 @@ export class Get {
 	 *
 	 * let blob = new Blob([text], { type: "text/plain" });
 	 * let url = await get.dataUrlAsync(blob);
-	 * console.assert("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==");
+	 * console.assert(url.href === "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==");
 	 */
 	dataUrlAsync(blob) {
 		return new Promise((resolve, reject) => {
@@ -4848,7 +4848,7 @@ export class Get {
 			fileReader.onload = resolve;
 			fileReader.onerror = reject;
 			fileReader.readAsDataURL(blob);
-		}).then(event => event.target.result);
+		}).then(event => new URL(event.target.result));
 	}
 
 	/**
