@@ -2083,7 +2083,7 @@ game.import("card", function () {
 				},
 				ai: {
 					wuxie: function (target, card, player, viewer) {
-						if (get.attitude(viewer, player._trueMe || player) > 0) return 0;
+						if (!target.countCards("hej") ||get.attitude(viewer, player._trueMe || player) > 0) return 0;
 					},
 					basic: {
 						order: 7.5,
@@ -2366,6 +2366,7 @@ game.import("card", function () {
 				ai: {
 					wuxie: (target, card, player, viewer, status) => {
 						if (
+							!target.countCards("hej") ||
 							status * get.attitude(viewer, player._trueMe || player) > 0 ||
 							(target.hp > 2 &&
 								!target.hasCard((i) => {
