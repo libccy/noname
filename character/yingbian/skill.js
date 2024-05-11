@@ -1643,9 +1643,13 @@ const skills = {
 							.getCards("he", function (card) {
 								return lib.filter.canBeDiscarded(card, player, target);
 							})
+							.map(c => {
+								link: c;
+							})
 							.sort(function (a, b) {
 								return get.buttonValue(b) - get.buttonValue(a);
-							});
+							})
+							.map(b => b.link);
 						if (
 							target.countCards("h") - player.countCards("h") >=
 							Math.max(

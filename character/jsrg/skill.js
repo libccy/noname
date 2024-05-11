@@ -6101,7 +6101,7 @@ const skills = {
 			player.removeInvisibleSkill(skills);
 		},
 		onremove: function (player, skill) {
-			lib.skill.sbyingmen.removeVisitors(player.getSkills("sbyingmen"), player);
+			lib.skill.sbyingmen.removeVisitors(player.getStorage("sbyingmen"), player);
 			player.removeSkillBlocker("sbyingmen");
 		},
 		skillBlocker: function (skill, player) {

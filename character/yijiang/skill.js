@@ -1268,18 +1268,16 @@ const skills = {
 		audio: 2,
 		trigger: { global: "useCard" },
 		filter: function (event, player) {
-			var history = game.getAllGlobalHistory("useCard");
-			var index = history.indexOf(event);
+			const history = game.getAllGlobalHistory("useCard");
+			const index = history.indexOf(event);
 			if (index <= 0) return false;
-			var previous = history[index - 1].player;
+			const previous = history[index - 1].player;
 			if (event.player == player && previous != player && previous.isIn()) return true;
 			if (event.player != player && previous == player) return true;
 			return false;
 		},
 		async cost(event, trigger, player) {
-			event.result = { bool: !!trigger.player };
-		},
-		async content(event, trigger, player) {
+			if (!trigger.player) return;
 			const history = game.getAllGlobalHistory("useCard");
 			const index = history.indexOf(trigger);
 			const previous = history[index - 1].player;
@@ -1287,10 +1285,12 @@ const skills = {
 				.chooseBool("是否对" + get.translation(previous) + "发动【联对】？", "令" + get.translation(previous) + "摸两张牌")
 				.set("ai", () => _status.event.bool)
 				.set("bool", get.effect(previous, { name: "draw" }, trigger.player, trigger.player) > 0);
-			if (result.bool) {
-				trigger.player.logSkill("liandui", previous);
-				previous.draw(2);
-			}
+			if (result.bool) event.result = { bool: true, cost_data: previous };
+		},
+		async content(event, trigger, player) {
+			const { cost_data: previous } = event;
+			trigger.player.logSkill("liandui", previous);
+			previous.draw(2);
 		},
 	},
 	biejun: {
