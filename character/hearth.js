@@ -2517,7 +2517,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target(card, player, target) {
+						target_use(card, player, target) {
 							if (get.type(card, "trick") == "trick" && player == target) return [1, 1];
 						},
 					},

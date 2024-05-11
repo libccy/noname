@@ -597,7 +597,7 @@ const skills = {
 				onremove: true,
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (card.name == player.storage.xiongshu_ai) return "zeroplayertarget";
 						},
 					},
