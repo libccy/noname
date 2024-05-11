@@ -873,10 +873,10 @@ const skills = {
 			chooseToMove.set("num", num);
 			chooseToMove.set("processAI", function (list) {
 				const check = function (card) {
-					var player = _status.event.player;
-					var next = player.next;
-					var att = get.attitude(player, next);
-					var judge = next.getCards("j")[tops.length];
+					const player = _status.event.player;
+					const next = player.next;
+					const att = get.attitude(player, next);
+					const judge = next.getCards("j")[tops.length];
 					if (judge) {
 						return get.judge(judge)(card) * att;
 					}
