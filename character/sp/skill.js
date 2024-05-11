@@ -20368,6 +20368,9 @@ const skills = {
 		charlotte: true,
 	},
 	weidi: {
+		available(mode) {
+			return mode == "identity" || mode == "versus" && _status.mode == "four";
+		},
 		init(player) {
 			const list = [];
 			const zhu = get.zhu(player);

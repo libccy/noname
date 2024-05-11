@@ -137,6 +137,9 @@ const skills = {
 		},
 	},
 	jsrgchushi: {
+		available(mode) {
+			return mode == "identity" || mode == "versus" && (_status.mode == "four" || _status.mode == "guandu");
+		},
 		audio: 2,
 		enable: "phaseUse",
 		usable: 1,

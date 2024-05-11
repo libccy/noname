@@ -1918,6 +1918,13 @@ const skills = {
 		},
 	},
 	nszhihuang: {
+		available(mode) {
+			return (
+				mode == "identity" ||
+				mode == "versus" && (_status.mode == "four" || _status.mode == "guandu") ||
+				mode == "guozhan"
+			);
+		},
 		group: "nszhihuang_damage",
 		trigger: { global: "useCard" },
 		usable: 1,
