@@ -343,7 +343,7 @@ const skills = {
 			},
 		},
 	},
-	//徐琨
+	//徐琨（菜不菜我不知道）
 	fazhu: {
 		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },

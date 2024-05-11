@@ -1799,7 +1799,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							lib.storage.ladder.current = 900;
 							game.save("ladder", lib.storage.ladder);
 						}
-						ui.ladder = ui.create.system(
+						if(!ui.ladder) ui.ladder = ui.create.system(
 							game.getLadderName(lib.storage.ladder.current),
 							null,
 							true
