@@ -840,12 +840,12 @@ export class LibInit {
 	/**
 	 * @async
 	 * @param {string | URL} link - 需要解析的路径
-	 * @param {(item: string) => string} [defaultHandle] - 在给定路径不符合可用情况（或基于无名杀相关默认情况）时，处理路径的函数，返回的路径应是相对于根目录的相对路径，默认为恒等函数
+	 * @param {((item: string) => string) | null} [defaultHandle] - 在给定路径不符合可用情况（或基于无名杀相关默认情况）时，处理路径的函数，返回的路径应是相对于根目录的相对路径，默认为`null`，当且仅当无法解析成`URL`时会调用该回调
 	 * @param {boolean} [forceLoadAsDataUrl] - 是否将资源加载为[Data URL](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URLs)，默认为`false`
 	 * @param {boolean} [dbNow] - 此刻是否在解析数据库中的内容，请勿直接使用
 	 * @returns {Promise<URL>}
 	 */
-	async parseResourceAddress(link, defaultHandle = item => item, forceLoadAsDataUrl = false, dbNow = false) {
+	async parseResourceAddress(link, defaultHandle = null, forceLoadAsDataUrl = false, dbNow = false) {
 		let linkString = link instanceof URL ? link.href : link;
 
 		// 如果传入值为Data URL，经过分析可知无需处理，故直接返回成品URL
@@ -864,7 +864,7 @@ export class LibInit {
 			let content = new Blob([linkString], { type: "text/plain" });
 			resultUrl = new URL(await get.dataUrl(content));
 		} else {
-			let resultLink = defaultHandle(linkString);
+			let resultLink = defaultHandle == null ? linkString : defaultHandle(linkString);
 			resultUrl = new URL(resultLink, rootURL);
 		}
 
