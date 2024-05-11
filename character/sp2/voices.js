@@ -103,6 +103,7 @@ export default {
 	"#fengfang:die": "掌控校事，为人所忌。",
 	"#piaoping1": "奔波四处，前途未明。",
 	"#piaoping2": "辗转各地，功业难寻。",
+	"#tuoxian1": "一贵一贱，其情乃见。",
 	"#tuoxian2": "一死一生，乃知交情。",
 	"#chuaili1": "近况艰难，何不忧愁？",
 	"#chuaili2": "形势如此，惴惕难当。",
