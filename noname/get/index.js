@@ -4800,7 +4800,7 @@ export class Get {
 	 * @example
 	 * // 当前文件以"noname/get/index.js"举例
 	 * let parsedPath = get.relativePath(import.meta.url, true);
-	 * console.log(parsedPath == `${lib.assetURL}noname/get/index.js`) //=> true
+	 * console.assert(parsedPath == `${lib.assetURL}noname/get/index.js`);
 	 */
 	relativePath(url, addAssetURL = false) {
 		let base = lib.path.relative(decodeURI(rootURL.pathname), decodeURI(url.pathname));
@@ -4813,8 +4813,17 @@ export class Get {
 	/**
 	 * 通过`FileReader`，将Blob转换成对应内容的[Data URL](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URLs)
 	 *
+	 * @async
 	 * @param {Blob} blob - 需要转换的内容
 	 * @returns {Promise<string>} 对应Blob内容的
+	 *
+	 * @example
+	 * let text = "Hello, World!";
+	 * console.assert(btoa(text) === "SGVsbG8sIFdvcmxkIQ==");
+	 *
+	 * let blob = new Blob([text], { type: "text/plain" });
+	 * let url = await get.dataUrl(blob);
+	 * console.assert("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==");
 	 */
 	dataUrl(blob) {
 		return new Promise((resolve, reject) => {
