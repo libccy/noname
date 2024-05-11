@@ -6728,9 +6728,11 @@ const skills = {
 			player.draw();
 		},
 		ai: {
-			effect(card, player, target) {
-				if (get.color(card) == "red") return [1, 1];
-			},
+			effect: {
+				target_use(card, player, target) {
+					if (get.color(card) == "red") return [1, 1];
+				},
+			}
 		},
 	},
 	zaiqix: {

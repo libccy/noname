@@ -3834,22 +3834,24 @@ game.import("character", function () {
 				ai: {
 					maixie: true,
 					maixie_hp: true,
-					effect: function (card, player, target) {
-						if (get.tag(card, "damage")) {
-							if (player.hasSkillTag("jueqing", false, target)) return [1, -0.5];
-							if (!target.hasFriend()) {
-								if (get.mode() == "guozhan") {
-									if (!player.hasFriend()) return;
-								} else {
-									return;
+					effect: {
+						target(card, player, target) {
+							if (get.tag(card, "damage")) {
+								if (player.hasSkillTag("jueqing", false, target)) return [1, -0.5];
+								if (!target.hasFriend()) {
+									if (get.mode() == "guozhan") {
+										if (!player.hasFriend()) return;
+									} else {
+										return;
+									}
 								}
+								if (target.countCards("h") > 2 || target.countCards("e", { color: "black" })) {
+									return [1, 0, 0, -1];
+								}
+								return [1, -0.5];
 							}
-							if (target.countCards("h") > 2 || target.countCards("e", { color: "black" })) {
-								return [1, 0, 0, -1];
-							}
-							return [1, -0.5];
-						}
-					},
+						},
+					}
 				},
 			},
 			xuanyuan: {

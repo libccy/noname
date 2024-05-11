@@ -6090,16 +6090,18 @@ const skills = {
 				},
 				ai: {
 					maihp: true,
-					effect: function (card, player, target) {
-						if (get.tag(card, "damage")) {
-							if (player.hasSkillTag("jueqing", false, target)) return [1, 1];
-							return 1.2;
-						}
-						if (get.tag(card, "loseHp")) {
-							if (target.hp <= 1 || target.hujia >= 5) return;
-							return [1, 1];
-						}
-					},
+					effect: {
+						target(card, player, target) {
+							if (get.tag(card, "damage")) {
+								if (player.hasSkillTag("jueqing", false, target)) return [1, 1];
+								return 1.2;
+							}
+							if (get.tag(card, "loseHp")) {
+								if (target.hp <= 1 || target.hujia >= 5) return;
+								return [1, 1];
+							}
+						},
+					}
 				},
 			},
 		},

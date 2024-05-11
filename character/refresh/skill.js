@@ -14582,27 +14582,29 @@ const skills = {
 		},
 		ai: {
 			maihp: true,
-			effect: function (card, player, target) {
-				if (get.tag(card, "damage")) {
-					if (player.hasSkillTag("jueqing", false, target)) return [1, 1];
-					return 1.2;
-				}
-				if (get.tag(card, "loseHp")) {
-					if (target.hp <= 1) return;
-					var using = target.isPhaseUsing();
-					if (target.hp <= 2) return [1, player.countCards("h") <= 1 && using ? 3 : 0];
-					if (using && target.countCards("h", { name: "sha", color: "red" })) return [1, 3];
-					return [
-						1,
-						target.countCards("h") <= target.hp ||
-						(using &&
-							game.hasPlayer(function (current) {
-								return current != player && get.attitude(player, current) < 0 && player.inRange(current);
-							}))
-							? 3
-							: 2,
-					];
-				}
+			effect: {
+				target(card, player, target) {
+					if (get.tag(card, "damage")) {
+						if (player.hasSkillTag("jueqing", false, target)) return [1, 1];
+						return 1.2;
+					}
+					if (get.tag(card, "loseHp")) {
+						if (target.hp <= 1) return;
+						var using = target.isPhaseUsing();
+						if (target.hp <= 2) return [1, player.countCards("h") <= 1 && using ? 3 : 0];
+						if (using && target.countCards("h", { name: "sha", color: "red" })) return [1, 3];
+						return [
+							1,
+							target.countCards("h") <= target.hp ||
+							(using &&
+								game.hasPlayer(function (current) {
+									return current != player && get.attitude(player, current) < 0 && player.inRange(current);
+								}))
+								? 3
+								: 2,
+						];
+					}
+				},
 			},
 		},
 	},

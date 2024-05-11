@@ -4587,20 +4587,10 @@ export class Get {
 			game.expandSkills(skills2);
 			for (var i = 0; i < skills2.length; i++) {
 				temp2 = get.info(skills2[i]).ai;
-				if (temp2 && temp2.threaten) temp3 = cache.delegate(temp2).threaten;
+				if (!temp2) continue;
+				if (temp2.threaten) temp3 = cache.delegate(temp2).threaten;
 				else temp3 = undefined;
-				if (temp2 && typeof temp2.effect == "function") {
-					if (
-						!player.hasSkillTag("ignoreSkill", true, {
-							card: card,
-							target: target,
-							skill: skills2[i],
-							isLink: isLink,
-						})
-					)
-						temp2 = cache.delegate(temp2).effect(card, player, target, result2, isLink);
-					else temp2 = undefined;
-				} else if (temp2 && typeof temp2.effect == "object" && typeof temp2.effect.target == "function") {
+				if (typeof temp2.effect == "object" && typeof temp2.effect.target == "function") {
 					if (
 						!player.hasSkillTag("ignoreSkill", true, {
 							card: card,
@@ -4610,6 +4600,18 @@ export class Get {
 						})
 					)
 						temp2 = cache.delegate(temp2.effect).target(card, player, target, result2, isLink);
+					else temp2 = undefined;
+				} else if (typeof temp2.effect == "function") { //考虑废弃
+					console.log("此写法使用频率极低且影响代码可读性，不建议使用");
+					if (
+						!player.hasSkillTag("ignoreSkill", true, {
+							card: card,
+							target: target,
+							skill: skills2[i],
+							isLink: isLink,
+						})
+					)
+						temp2 = cache.delegate(temp2).effect(card, player, target, result2, isLink);
 					else temp2 = undefined;
 				} else temp2 = undefined;
 				if (typeof temp2 == "object") {
