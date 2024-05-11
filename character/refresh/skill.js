@@ -7400,7 +7400,7 @@ const skills = {
 		ai: {
 			expose: 0.2,
 			effect: {
-				target: function (card, player, target) {
+				target_use: function (card, player, target) {
 					if (card.name != "sha") return;
 					var players = game.filterPlayer();
 					if (get.attitude(player, target) <= 0) {
@@ -7648,7 +7648,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use: function (card, player, target) {
 					if (target != _status.currentPhase && target.countCards("h") >= target.getHandcardLimit() && (get.type(card) == "delay" || get.color(card) == "none")) return "zerotarget";
 				},
 			},
@@ -13465,7 +13465,7 @@ const skills = {
 				},
 			},
 			effect: {
-				target: function (card, player, target) {
+				target_use: function (card, player, target) {
 					if (player == target && get.type(card) == "equip") {
 						if (player.countCards("e", { subtype: get.subtype(card) })) {
 							if (
@@ -13941,20 +13941,22 @@ const skills = {
 			player.addSkill("reqianxun2");
 		},
 		ai: {
-			effect: function (card, player, target) {
-				if (player == target || !target.hasFriend()) return;
-				var type = get.type(card);
-				var nh = Math.min(
-					target.countCards(),
-					game.countPlayer(i => get.attitude(target, i) > 0)
-				);
-				if (type == "trick") {
-					if (!get.tag(card, "multitarget") || get.info(card).singleCard) {
-						if (get.tag(card, "damage")) return [1.5, nh - 1];
-						return [1, nh];
-					}
-				} else if (type == "delay") return [0.5, 0.5];
-			},
+			effect: {
+				target_use(card, player, target) {
+					if (player == target || !target.hasFriend()) return;
+					var type = get.type(card);
+					var nh = Math.min(
+						target.countCards(),
+						game.countPlayer(i => get.attitude(target, i) > 0)
+					);
+					if (type == "trick") {
+						if (!get.tag(card, "multitarget") || get.info(card).singleCard) {
+							if (get.tag(card, "damage")) return [1.5, nh - 1];
+							return [1, nh];
+						}
+					} else if (type == "delay") return [0.5, 0.5];
+				},
+			}
 		},
 	},
 	reqianxun2: {
