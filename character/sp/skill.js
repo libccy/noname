@@ -2420,7 +2420,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (card.name == "tiesuo" && (!player.storage.counttrigger || !player.storage.counttrigger.hezhong_0)) return "zerotarget";
 						},
 					},
@@ -2457,7 +2457,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (card.name == "tiesuo" && (!player.storage.counttrigger || !player.storage.counttrigger.hezhong_1)) return "zerotarget";
 						},
 					},
@@ -4320,7 +4320,7 @@ const skills = {
 			diamond_ai: {
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (get.name(card) == "sha" && !player.hasSkill("oltianhou_diamond") && target != player.getNext() && target != player.getPrevious()) {
 								let num = get.number(card),
 									max = _status.aiyh_MAXNUM || 13;
@@ -5067,7 +5067,7 @@ const skills = {
 		ai: {
 			threaten: 3,
 			effect: {
-				player_use: function (card, player, target) {
+				player_use(card, player, target) {
 					if (
 						typeof card == "object" &&
 						card.cards &&
@@ -6587,7 +6587,7 @@ const skills = {
 			order: 1,
 			threaten: 1.1,
 			effect: {
-				player_use: function (card, player, target) {
+				player_use(card, player, target) {
 					if (_status._olkenshang_aiChecking || ui.selected.targets.length) return;
 					if (typeof card != "object" || !card.storage || !card.storage.olkenshang) return false;
 					_status._olkenshang_aiChecking = true;
@@ -6795,7 +6795,7 @@ const skills = {
 			threaten: 0.8,
 			halfneg: true,
 			effect: {
-				player: function (card, player, target) {
+				player_use(card, player, target) {
 					if ((!card.isCard || !card.cards) && get.itemtype(card) != "card") return;
 					let cs = 0;
 					if (
@@ -10746,7 +10746,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (card.name != "sha") return;
 					if (
 						target.hasSkillTag("unequip2") ||
@@ -10871,7 +10871,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, effect) {
+				target_use(card, player, target, effect) {
 					if (
 						effect > 0 ||
 						player.hasSkillTag("unequip", false, {
@@ -12042,7 +12042,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player_use: function (card, player, target) {
+				player_use(card, player, target) {
 					if (!target || player._saodi_judging || ui.selected.targets.length || player == target || target.hasSkill("nodis")) return;
 					if (typeof card != "object" || (card.name != "sha" && get.type(card) != "trick")) return false;
 					player._saodi_judging = true;
@@ -16192,17 +16192,6 @@ const skills = {
 			}
 		},
 		group: "neifa_use",
-		ai: {
-			reverseOrder: true,
-			skillTagFilter: function (player) {
-				if (player.storage.counttrigger && player.storage.counttrigger.neifa_use >= 2) return false;
-			},
-			effect: {
-				target: function (card, player, target) {
-					if ((!player.storage.counttrigger || !player.storage.counttrigger.neifa_use || player.storage.counttrigger.neifa_use < 2) && player == target && get.type(card) == "equip") return [1, 3];
-				},
-			},
-		},
 	},
 	neifa_use: {
 		audio: "neifa",
@@ -16214,6 +16203,17 @@ const skills = {
 		},
 		content: function () {
 			player.draw(player.countMark("neifa_nobasic"));
+		},
+		ai: {
+			reverseOrder: true,
+			skillTagFilter(player) {
+				if (player.storage.counttrigger && player.storage.counttrigger.neifa_use >= 2) return false;
+			},
+			effect: {
+				player_use(card, player, target) {
+					if (player.countSkill("neifa_use") < 2 && get.type(card) == "equip") return [1, player.countMark("neifa_nobasic")];
+				},
+			},
 		},
 	},
 	//许靖
@@ -16686,7 +16686,7 @@ const skills = {
 		ai: {
 			threaten: 1.8,
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					let used = target.getHistory("useCard").length + target.getHistory("respond").length;
 					if (get.subtype(card) == "equip1" && !get.cardtag(card, "gifts")) {
 						if (player != target || !player.isPhaseUsing()) return;
@@ -23894,7 +23894,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card) {
+				target_use(card) {
 					if (get.type(card) != "trick") return;
 					if (card.name == "tiesuo") return [0, 0];
 					if (card.name == "yihuajiemu") return [0, 1];
@@ -24055,7 +24055,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (get.color(card) == "black" && target.countCards("h") > 0) {
 						return [1, 0.5];
 					}
@@ -26673,7 +26673,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (card.name == "sha") return [1, 0.5];
 				},
 			},

@@ -1479,7 +1479,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (player.getStorage("sbyijue_effect").includes(target)) return "zeroplayertarget";
 						},
 					},
@@ -2736,10 +2736,10 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (card.name == "sha" && get.color(card) == "red") return [1, 0.6];
 				},
-				player: function (card, player, target) {
+				player_use(card, player, target) {
 					if (card.name == "sha" && get.color(card) == "red") return [1, 1];
 				},
 			},
@@ -3451,7 +3451,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target) {
+				player_use(card, player, target) {
 					if (player != target && target && target.group == "qun" && card.name != "tao") return [1, 0.1];
 				},
 			},

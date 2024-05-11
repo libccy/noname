@@ -119,7 +119,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player(card, player, target, current) {
+						player_use(card, player, target, current) {
 							if (!target) return;
 							const counttrigger = player.storage.counttrigger;
 							if (counttrigger && counttrigger.mbkuangli_target && counttrigger.mbkuangli_target >= lib.skill.mbkuangli_target.usable) return;
@@ -5176,7 +5176,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (player.canUse(card, target) && get.distance(player, target) != 1) return 1.2;
 						},
 					},
@@ -7599,7 +7599,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (card.name == "sha" && current < 0) return 0.7;
 				},
 			},
@@ -8046,7 +8046,7 @@ const skills = {
 		ai: {
 			reverseEquip: true,
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (get.type(card) == "equip" && !get.tag(card, "gifts") && target.storage.jueyong && target.storage.jueyong[1].length) {
 						var result1 = get.equipResult(player, target, card.name),
 							subtype = get.subtype(card);
@@ -10239,7 +10239,7 @@ const skills = {
 		ai: {
 			expose: 0.2,
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (card.name != "sha") return;
 					var players = game.filterPlayer();
 					if (get.attitude(player, target) <= 0) {
@@ -15180,7 +15180,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (["tiesuo", "lulitongxin"].includes(card.name)) {
 						return "zerotarget";
 					}
@@ -15205,7 +15205,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (typeof card !== "object" || target.hasSkillTag("unequip2")) return;
 					if (
 						player.hasSkillTag("unequip", false, {
@@ -15238,7 +15238,7 @@ const skills = {
 		inherit: "rw_minguangkai_link",
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (["tiesuo", "lulitongxin"].includes(card.name)) {
 						return "zeroplayertarget";
 					}

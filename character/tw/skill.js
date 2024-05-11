@@ -8888,7 +8888,7 @@ const skills = {
 				charlotte: true,
 				ai: {
 					effect: {
-						player_use: function (card, player, target) {
+						player_use(card, player, target) {
 							if (
 								card.cards &&
 								card.cards.some(i => i.hasGaintag("twkujianx")) &&
@@ -9519,7 +9519,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (card.name == "sha" && player.hp > target.hp && get.attitude(player, target) < 0) {
 						var num = get.number(card);
 						var bs = player.getCards("h", function (cardx) {
@@ -13976,7 +13976,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current, isLink) {
+				target_use(card, player, target, current, isLink) {
 					if (card.name == "sha" && !isLink) return 0.8;
 				},
 			},
@@ -14317,7 +14317,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (get.type(card) !== "delay" && get.type(card) !== "equip") return 1;
 							let za = game.findPlayer(cur => cur.hasSkill("twzhian") && (!cur.storage.counttrigger || !cur.storage.counttrigger.twzhian) && get.attitude(player, cur) <= 0);
 							if (za) return [0.5, -0.8];

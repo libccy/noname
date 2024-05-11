@@ -5964,7 +5964,7 @@ const skills = {
 		ai: {
 			halfneg: true,
 			effect: {
-				player_use: function (card, player, target) {
+				player_use(card, player, target) {
 					if (card.name == "jiu") return [1, 1];
 				},
 			},
@@ -6773,7 +6773,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (lib.skill.jsrgjuxia.countSkill(target) >= lib.skill.jsrgjuxia.countSkill(player)) return;
 					if (card && (card.cards || card.isCard) && get.attitude(target, player) > 0 && (!target.storage.counttrigger || !target.storage.counttrigger.jsrgjuxia)) return [0, 0.5, 0, 0.5];
 				},
@@ -8034,7 +8034,7 @@ const skills = {
 			pretao: true,
 			threaten: 1.8,
 			effect: {
-				player(card, player, target) {
+				player_use(card, player, target) {
 					if (
 						typeof card === "object" &&
 						card.name !== "shan" &&

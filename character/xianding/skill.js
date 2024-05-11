@@ -1146,7 +1146,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player(card, player, target, current) {
+						player_use(card, player, target, current) {
 							if (get.type(card) == "trick" && player.getStorage("dcjujian_forbid").includes(target)) return "zeroplayertarget";
 						},
 					},
@@ -5670,7 +5670,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player: (card, player, target) => {
+						player_use(card, player, target) {
 							if (get.itemtype(card) === "card" && cardx.hasGaintag("dczhaowen_tag") && get.color(card, player) === "red") return [1, 1];
 						},
 					},
@@ -5737,7 +5737,7 @@ const skills = {
 				if (name != "phase") return false;
 			},
 			effect: {
-				target_use: (card, player, target) => {
+				target_use(card, player, target) {
 					if (player === target || typeof card !== "object" || get.color(card) !== "black") return;
 					if (target.hasSkill("jiu")) {
 						if (
@@ -7056,7 +7056,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target) {
+				player_use(card, player, target) {
 					var evt = player.getLastUsed();
 					if (evt && evt.targets.includes(target)) return [1.5, 0];
 				},
@@ -8630,7 +8630,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player_use: function (card, player, target) {
+						player_use(card, player, target) {
 							if (get.tag(card, "recover") && target.hp > 0) return 0;
 							if (get.tag(card, "damage")) return 0.5;
 						},
@@ -8906,7 +8906,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use: (card, player, target) => {
+				target_use(card, player, target) {
 					if (player === target) return;
 					if (
 						game.hasPlayer2(current => {
@@ -9451,7 +9451,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player_use: function (card, player, target) {
+						player_use(card, player, target) {
 							if (typeof card != "object") return;
 							var storage = player.getStorage("olddcxiangmian_countdown");
 							for (var i = 0; i < storage.length / 3; i++) {
@@ -9553,7 +9553,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player_use: function (card, player, target) {
+						player_use(card, player, target) {
 							if (typeof card != "object") return;
 							var storage = player.getStorage("dcxiangmian_countdown");
 							for (var i = 0; i < storage.length / 3; i++) {
@@ -13133,7 +13133,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target) {
+				player_use(card, player, target) {
 					if (
 						target &&
 						target.getExpansions("xinzhoufu2").length > 0 &&
@@ -13988,7 +13988,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player_use: function (card, player, target) {
+				player_use(card, player, target) {
 					if (
 						typeof card == "object" &&
 						player == _status.currentPhase &&
@@ -14985,7 +14985,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use: function (card, player, target) {
+				target_use(card, player, target) {
 					if (get.itemtype(player) !== "player" || player === target) return 1;
 					let num = 1,
 						ds = 2 + get.sgn(player.hp - target.hp);

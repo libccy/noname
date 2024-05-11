@@ -889,7 +889,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player_use: function (card, player, target) {
+						player_use(card, player, target) {
 							var targets = game.filterPlayer(targetx => targetx != player && targetx.getStorage("starcanxi_xiangsi").includes(player.group));
 							if (!targets.length) return;
 							if (get.tag(card, "recover") && target == player && target.hp > 2) return 0;
@@ -2249,7 +2249,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target) {
+				player_use(card, player, target) {
 					if (_status.event.name == "chooseToUse" && get.name(card) == "sha" && (!player.storage.counttrigger || !player.storage.counttrigger.dctingxian) && !_status._dctingxian_aiChecking) {
 						_status._dctingxian_aiChecking = true;
 						var eff = get.effect(target, { name: "sha" }, player, player);
@@ -11789,7 +11789,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target) {
+				player_use(card, player, target) {
 					var evt = player.getLastUsed();
 					if (evt && evt.targets.includes(target) && (!player.storage.counttrigger || !player.storage.counttrigger.xinfu_lianpian || !player.storage.counttrigger.xinfu_lianpian < 3) && player.isPhaseUsing(player)) return [1.5, 0];
 				},
