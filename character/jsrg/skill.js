@@ -6671,7 +6671,7 @@ const skills = {
 			var count = player.getHistory("useSkill", evt => {
 				return (
 					evt.skill == "jsrgguanhuo_viewas" &&
-					evt.getParent("phaseUse") === trigger.getParent("phaseUse")
+					evt.event.getParent("phaseUse") === trigger.getParent("phaseUse")
 				);
 			}).length;
 			if (count == 1) {
@@ -6688,13 +6688,13 @@ const skills = {
 					if (_status.event.getParent().skill == "jsrgguanhuo_viewas" && player.getHistory("useSkill", evt => {
 						return (
 							evt.skill == "jsrgguanhuo_viewas" &&
-							evt.getParent("phaseUse") === _status.event.getParent("phaseUse")
+							evt.event.getParent("phaseUse") === _status.event.getParent("phaseUse")
 						);
 					}).length == 1) return "zeroplayertarget";
 					if (_status.event.type == "phase" && _status.event.skill == "jsrgguanhuo_viewas" && player.getHistory("useSkill", evt => {
 						return (
 							evt.skill == "jsrgguanhuo_viewas" &&
-							evt.getParent("phaseUse") === _status.event.getParent("phaseUse")
+							evt.event.getParent("phaseUse") === _status.event.getParent("phaseUse")
 						);
 					}).length > 1 && player.countCards("h") <= 3) return [0, 0];
 				},

@@ -59,11 +59,14 @@ const skills = {
 				if (player.countCards("h") < storage[1]) {
 					yield player.drawTo(storage[1]);
 				} else {
-					yield player.chooseToDiscard("h", true, storage[1] - player.countCards("h"));
+					yield player.chooseToDiscard("h", true, player.countCards("h") - storage[1]);
 				}
 			}
 			if (player.getHp() != storage[2]) {
 				yield player[player.getHp() > storage[2] ? "loseHp" : "recover"](Math.abs(player.getHp() - storage[2]));
+			}
+			if (player.getStat("skill").dcsbfumou) {
+				delete player.getStat("skill").dcsbfumou;
 			}
 		},
 		ai: {
@@ -75,24 +78,24 @@ const skills = {
 		audioname: ["dc_sb_jiaxu_shadow"],
 		enable: "phaseUse",
 		filter(event, player) {
-			return (
-				game.hasPlayer(target => {
-					return target != player && target.countCards("h");
-				}) && game.countPlayer(target => target != player) >= (player.storage.dcsbfumou ? 1 : 2)
-			);
+			return game.hasPlayer(target => {
+				return target != player && target.countCards("h");
+			});
 		},
 		filterTarget(card, player, target) {
 			if (target == player) return false;
 			if (!ui.selected.targets.length) return target.countCards("h");
-			return !player.storage.dcsbfumou;
+			return !player.storage.dcsbfumou && game.countPlayer(target => target != player) > 1;
 		},
 		selectTarget() {
 			const player = get.event("player");
+			if (game.countPlayer(target => target != player) == 1) return [1, 2];
 			return player.storage.dcsbfumou ? [1, 2] : 2;
 		},
 		targetprompt() {
 			const player = get.event("player");
-			return player.storage.dcsbfumou ? "" : ["看牌角色", "得牌角色"][ui.selected.targets.length-1];
+			if (game.countPlayer(target => target != player) == 1) return "";
+			return player.storage.dcsbfumou ? "" : ["看牌角色", "得牌角色"][ui.selected.targets.length - 1];
 		},
 		prompt() {
 			const player = get.event("player");
@@ -105,7 +108,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const storage = player.storage.dcsbfumou,
 				target = event.targets[0],
-				num = Math.ceil(target.countCards("h")/2);
+				num = Math.ceil(target.countCards("h") / 2);
 			player.changeZhuanhuanji("dcsbfumou");
 			let cards = await player
 				.choosePlayerCard("覆谋：选择展示" + get.translation(target) + "的" + get.cnNumber(num) + "张牌", target, "h", num, true)
@@ -114,7 +117,7 @@ const skills = {
 						storage = get.event("storage"),
 						target = get.event().getParent().targets[0];
 					if (!storage) return get.value(card) * -get.attitude(player, target);
-					return target.getUseValue(card) * get.attitude(player, target);
+					return target.getUseValue(card, false) * get.attitude(player, target);
 				})
 				.set("visible", true)
 				.set("storage", storage)
@@ -123,18 +126,25 @@ const skills = {
 			await player.showCards(cards, get.translation(player) + "发动了【覆谋】");
 			if (!storage) {
 				const aim = event.targets[1];
-				cards = cards.filter(card => lib.filter.canBeGained(card, aim, target));
-				if (cards.length) {
-					await aim.gain(cards, target, "give");
-					await game.asyncDraw([player, target], cards.length);
+				if (aim) {
+					cards = cards.filter(card => lib.filter.canBeGained(card, aim, target));
+					if (cards.length) {
+						await aim.gain(cards, target, "give");
+						await game.asyncDraw([player, target], cards.length);
+					} else {
+						aim.popup("杯具");
+						aim.chat("555一张都拿不到");
+					}
 				} else {
-					aim.popup("杯具");
-					aim.chat("555一张都拿不到~");
+					player.chat("只是看看，但给不了...");
 				}
 			} else {
 				for (const card of cards) {
-					if (target.hasUseTarget(card)) {
-						await target.chooseUseTarget(card, true, false);
+					if (target.hasUseTarget(card, false)) {
+						await target.chooseUseTarget(card, true, false, "nodistance").set("oncard", card => {
+							game.log(_status.event.card, "不可被响应");
+							_status.event.directHit.addArray(game.players);
+						});
 					}
 				}
 			}
@@ -144,7 +154,7 @@ const skills = {
 		mark: true,
 		intro: {
 			content(storage) {
-				if (storage) return "转换技，出牌阶段限一次，你可以观看一名其他角色的手牌并展示其一半手牌，令其依次使用这些牌中所有其可以使用的牌。";
+				if (storage) return "转换技，出牌阶段限一次，你可以观看一名其他角色的手牌并展示其一半手牌，令其依次使用这些牌中所有其可以使用的牌（无距离限制且不可被响应）。";
 				return "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其一半手牌并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）。";
 			},
 		},
