@@ -63,4 +63,15 @@ export class LibInitPromises {
 			style.addEventListener("error", reject);
 		});
 	}
+
+	/**
+	 * @async
+	 * @param {string | URL} link - 需要解析的路径
+	 * @param {(item: string) => string} [defaultHandle] - 在给定路径不符合可用情况（或基于无名杀相关默认情况）时，处理路径的函数，返回的路径应是相对于根目录的相对路径，默认为恒等函数
+	 * @param {boolean} [forceLoadAsDataUrl] - 是否将资源加载为[Data URL](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URLs)，默认为`false`
+	 * @returns {Promise<URL>}
+	 */
+	parseResourceAddress(link, defaultHandle = item => item, forceLoadAsDataUrl = false) {
+		return lib.init.parseResourceAddress(link, defaultHandle, forceLoadAsDataUrl);
+	}
 }
