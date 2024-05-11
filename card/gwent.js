@@ -2001,7 +2001,7 @@ game.import("card", function () {
 				ai: {
 					weather: true,
 					effect: {
-						player: function (card, player) {
+						player_use(card, player) {
 							if (!player.needsToDiscard()) return "zeroplayertarget";
 						},
 					},
