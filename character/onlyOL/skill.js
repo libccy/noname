@@ -688,14 +688,80 @@ const skills = {
 				result: { bool },
 			} = await player.chooseToCompare(target);
 			if (bool) {
-				player.storage.xinxianzhen = target;
-				player.addTempSkill("xinxianzhen2");
+				player.markAuto("olxianzhen_effect", [target]);
+				player.addTempSkill("olxianzhen_effect");
 			} else {
 				player.markAuto("olxianzhen_buff", [target]);
 				player.addTempSkill("olxianzhen_buff");
 			}
 		},
 		subSkill: {
+			effect: {
+				charlotte: true,
+				onremove: true,
+				audio: "rexianzhen",
+				mod: {
+					targetInRange(card, player, target) {
+						if (player.getStorage("olxianzhen_effect").includes(target)) return true;
+					},
+					cardUsableTarget(card, player, target) {
+						if (player.getStorage("olxianzhen_effect").includes(target)) return true;
+					},
+				},
+				trigger: { player: "useCard2" },
+				filter(event, player) {
+					if (event.card.name != "sha" && get.type(event.card) != "trick") return false;
+					if (!Array.isArray(event.targets)) return false;
+					return game.hasPlayer(target => {
+						if (!player.getStorage("olxianzhen_effect").includes(target)) return false;
+						return !event.targets.includes(target) && lib.filter.targetEnabled2(event.card, player, target);
+					});
+				},
+				async cost(event, trigger, player) {
+					const targets = game.filterPlayer(target => {
+						if (!player.getStorage("olxianzhen_effect").includes(target)) return false;
+						return trigger.targets.includes(target) && lib.filter.targetEnabled2(trigger.card, player, target);
+					});
+					if (targets.length == 1) {
+						const target = targets[0];
+						const bool = await player.chooseBool(get.prompt("olxianzhen_effect", target), "令" + get.translation(target) + "也成为" + get.translation(trigger.card) + "的目标").forResult("bool");
+						event.result = { bool: bool, targets: targets };
+					} else {
+						event.result = await player
+							.chooseTarget(get.prompt("olxianzhen_effect"), "令任意名【陷阵】拼点成功的目标角色也成为" + get.translation(trigger.card) + "的目标", (card, player, target) => {
+								const trigger = get.event().getTrigger();
+								if (!player.getStorage("olxianzhen_effect").includes(target)) return false;
+								return trigger.targets.includes(target) && lib.filter.targetEnabled2(trigger.card, player, target);
+							})
+							.set("ai", target => {
+								const player = get.event("player"),
+									trigger = get.event().getTrigger();
+								return get.effect(target, trigger.card, player, player);
+							})
+							.forResult();
+					}
+				},
+				content() {
+					trigger.targets.addArray(event.targets);
+					game.log(event.targets, "成为了", trigger.card, "的额外目标");
+				},
+				ai: {
+					unequip: true,
+					skillTagFilter(player, tag, arg) {
+						if (!arg || !arg.target || !player.getStorage("olxianzhen_effect").includes(arg.target)) return false;
+					},
+					effect: {
+						player(card, player, target, current, isLink) {
+							if (isLink || !target) return;
+							if (!player.getStorage("olxianzhen_effect").includes(target) && ["sha", "guohe", "shunshou", "huogong", "juedou"].includes(card.name)) {
+								if (get.effect(target, card, player, player) > 0) {
+									return [1, 2];
+								}
+							}
+						},
+					},
+				},
+			},
 			buff: {
 				charlotte: true,
 				onremove: true,
