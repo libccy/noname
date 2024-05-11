@@ -1268,34 +1268,29 @@ const skills = {
 		audio: 2,
 		trigger: { global: "useCard" },
 		filter: function (event, player) {
-			var history = game.getAllGlobalHistory("useCard");
-			var index = history.indexOf(event);
+			const history = game.getAllGlobalHistory("useCard");
+			const index = history.indexOf(event);
 			if (index <= 0) return false;
-			var previous = history[index - 1].player;
+			const previous = history[index - 1].player;
 			if (event.player == player && previous != player && previous.isIn()) return true;
 			if (event.player != player && previous == player) return true;
 			return false;
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			var history = game.getAllGlobalHistory("useCard");
-			var index = history.indexOf(trigger);
-			var previous = history[index - 1].player;
-			var user = trigger.player,
-				target = previous;
-			event.user = user;
-			event.target = target;
-			if (user) {
-				user.chooseBool("是否对" + get.translation(target) + "发动【联对】？", "令" + get.translation(target) + "摸两张牌")
-					.set("ai", () => _status.event.bool)
-					.set("bool", get.effect(target, { name: "draw" }, user, user) > 0);
-			}
-			"step 1";
-			if (result.bool) {
-				event.user.logSkill("liandui", target);
-				target.draw(2);
-			}
+		async cost(event, trigger, player) {
+			if (!trigger.player) return;
+			const history = game.getAllGlobalHistory("useCard");
+			const index = history.indexOf(trigger);
+			const previous = history[index - 1].player;
+			const { result } = await trigger.player
+				.chooseBool("是否对" + get.translation(previous) + "发动【联对】？", "令" + get.translation(previous) + "摸两张牌")
+				.set("ai", () => _status.event.bool)
+				.set("bool", get.effect(previous, { name: "draw" }, trigger.player, trigger.player) > 0);
+			if (result.bool) event.result = { bool: true, cost_data: previous };
+		},
+		async content(event, trigger, player) {
+			const { cost_data: previous } = event;
+			trigger.player.logSkill("liandui", previous);
+			previous.draw(2);
 		},
 	},
 	biejun: {
@@ -8379,14 +8374,20 @@ const skills = {
 		content: function () {
 			"step 0";
 			player.showHandcards();
-			const hs = player.getCards("h"), color = get.color(hs[0], player);
-			if (hs.length === 1 || !hs.some((card,index) => {
-				return index > 0 && get.color(card) !== color;
-			})) {
+			const hs = player.getCards("h"),
+				color = get.color(hs[0], player);
+			if (
+				hs.length === 1 ||
+				!hs.some((card, index) => {
+					return index > 0 && get.color(card) !== color;
+				})
+			) {
 				event.finish();
 			}
 			"step 1";
-			const list = [], bannedList = [], indexs = Object.keys(lib.color);
+			const list = [],
+				bannedList = [],
+				indexs = Object.keys(lib.color);
 			player.getCards("h").forEach(card => {
 				const color = get.color(card, player);
 				list.add(color);
@@ -8395,15 +8396,19 @@ const skills = {
 			list.removeArray(bannedList);
 			list.sort((a, b) => indexs.indexOf(a) - indexs.indexOf(b));
 			if (!list.length) event.finish();
-			else if(list.length === 1) event._result = {control: list[0]};
-			else player.chooseControl(list.map(i => `${i}2`)).set("ai", function () {
-				var player = _status.event.player;
-				if (player.countCards("h", { color: "red" }) == 1 && player.countCards("h", { color: "black" }) > 1) return 1;
-				return 0;
-			}).set("prompt", "请选择弃置一种颜色的所有手牌");
+			else if (list.length === 1) event._result = { control: list[0] };
+			else
+				player
+					.chooseControl(list.map(i => `${i}2`))
+					.set("ai", function () {
+						var player = _status.event.player;
+						if (player.countCards("h", { color: "red" }) == 1 && player.countCards("h", { color: "black" }) > 1) return 1;
+						return 0;
+					})
+					.set("prompt", "请选择弃置一种颜色的所有手牌");
 			"step 2";
 			event.control = result.control.slice(0, result.control.length - 1);
-			var cards = player.getCards("h", {color: event.control});
+			var cards = player.getCards("h", { color: event.control });
 			player.discard(cards);
 			event.num = cards.length;
 			"step 3";
@@ -8442,7 +8447,7 @@ const skills = {
 				return 1;
 			},
 			result: {
-				player:(player) => {
+				player: player => {
 					if (get.color(player.getCards("h")) != "none") return 0;
 					return 1;
 				},
