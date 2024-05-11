@@ -103,7 +103,7 @@ const dynamicTranslates = {
 		str += "阴，并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）；";
 		if (!storage) str += "</span>";
 		if (storage) str += '<span class="bluetext">';
-		str += "阳，令A依次使用这些牌中所有其可以使用的牌。";
+		str += "阳，令A依次使用这些牌中所有其可以使用的牌（无距离限制且不可被响应）。";
 		if (storage) str += "</span>";
 		return str;
 	},

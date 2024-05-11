@@ -455,8 +455,8 @@ const translates = {
 	dc_xiahouba_prefix: "新杀",
 	old_huangfusong: "新杀皇甫嵩",
 	old_huangfusong_prefix: "新杀",
-	dc_sp_machao: "群马超",
-	dc_sp_machao_prefix: "群",
+	dc_sp_machao: "新杀SP马超",
+	dc_sp_machao_prefix: "新杀SP",
 	dc_shixie: "新杀士燮",
 	dc_shixie_prefix: "新杀",
 	dc_guansuo: "新杀关索",
@@ -596,9 +596,9 @@ const translates = {
 	dcsbsushen: "肃身",
 	dcsbsushen_info: "限定技，出牌阶段，你可以记录你当前〖覆谋〗的状态、你的手牌数和你的体力值，然后获得技能〖入世〗。",
 	dcsbrushi: "入世",
-	dcsbrushi_info: "限定技，出牌阶段，你可以将你当前〖覆谋〗的状态、你的手牌数和你的体力值调整为你发动〖肃身〗时的记录。",
+	dcsbrushi_info: "限定技，出牌阶段，你可以将你当前〖覆谋〗的状态、你的手牌数和你的体力值调整为你发动〖肃身〗时的记录，然后重置〖覆谋〗的发动次数。",
 	dcsbfumou: "覆谋",
-	dcsbfumou_info: "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其一半手牌：阴，并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）；阳，令A依次使用这些牌中所有其可以使用的牌。",
+	dcsbfumou_info: "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其一半手牌：阴，并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）；阳，令A依次使用这些牌中所有其可以使用的牌（无距离限制且不可被响应）。",
 };
 
 export default translates;

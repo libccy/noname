@@ -13,7 +13,7 @@ const characterSort = {
 	sp2_qifu: ["dc_guansuo", "xin_baosanniang", "dc_zhaoxiang"],
 	sp2_gaoshan: ["wanglang", "liuhui", "zhangjian"],
 	sp2_wumiao: ["wu_zhugeliang", "wu_luxun", "wu_guanyu"],
-	sp2_mouding: ["dc_sb_lusu", "dc_sb_zhouyu", "dc_sb_simayi"],
+	sp2_mouding: ["dc_sb_jiaxu", "dc_sb_lusu", "dc_sb_zhouyu", "dc_sb_simayi"],
 };
 
 const characterSortTranslate = {
