@@ -1599,8 +1599,21 @@ export class Game {
 		}
 		if (dieAudios && dieAudios.length > 0) {
 			dieAudios.forEach(item => {
-				let file = lib.init.parseResourceAddress(item, path => (lib.path.extname(path) ? `audio/die/${path}.mp3` : `audio/die/${path}`)).href;
-				let key = file.startsWith("db:") ? file.slice(3) : file.startsWith("data:") ? file : lib.path.basename(file);
+				let file = lib.init.parseResourceAddress(item, path => (lib.path.extname(path) ? `audio/die/${path}.mp3` : `audio/die/${path}`));
+				//let key = file.startsWith("db:") ? file.slice(3) : file.startsWith("data:") ? file : lib.path.basename(file);
+
+				/**
+				 * @type {string}
+				 */
+				let key;
+				if (item.startsWith("ext:")) {
+					let relativePath = get.relativePath(file);
+					let keyPath = relativePath.split("/").slice(2).join("/");
+					if (lib.path.extname(keyPath)) keyPath = keyPath.replace(lib.path.extname(keyPath), "");
+					key = keyPath;
+				} else {
+					key = file.href;
+				}
 
 				// if (item.startsWith("ext:")) {
 				//	key = item.slice(4).split("/")[1];
@@ -1609,7 +1622,7 @@ export class Game {
 				//	key = item;
 				//	file = `die/${item}.mp3`;
 				// }
-				const data = { key, file };
+				const data = { key, file: file.href };
 				if (lib.translate[`#${key}:die`]) data.text = lib.translate[`#${key}:die`];
 				datas.push(data);
 			});
