@@ -1711,18 +1711,23 @@ export class Game {
 		game.broadcast(game.tryDieAudio, player);
 		if (!lib.config.background_speak) return;
 
+		let playerName;
+		if (typeof player === "string") playerName = player;
+		else if (player.skin && player.skin.name) playerName = player.skin.name;
+		else playerName = player.name;
+
 		let audio, isDefault, list = game.parseDieTextMap(player).randomSort();
-		const check = audio => {
+		const check = () => {
 			if (list.length) return true;
 			if (!audio) return false;
 			if (!audio.isDefault) return false;
-			const name = audio.name;
-			if (!name.includes("_")) return false;
-			list = game.parseDieTextMap(name.slice(name.indexOf("_") + 1)).randomSort();
-			return check(list[0]);
+			if (!playerName.includes("_")) return false;
+			playerName = playerName.slice(playerName.indexOf("_") + 1);
+			list = game.parseDieTextMap(playerName).randomSort();
+			return check();
 		}
 		return (function play() {
-			if (!check(audio)) return;
+			if (!check()) return;
 			audio = list.shift();
 			return game.playAudio(audio.file, play);
 		})();
