@@ -619,7 +619,7 @@ export class Get {
 			if (num === 3 || num === 4) return [];
 			return;
 		}
-		return info || get.convertedCharacter({});
+		return info || get.convertedCharacter({ isNull: true });
 	}
 	characterInitFilter(name) {
 		const info = get.character(name);

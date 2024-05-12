@@ -8776,18 +8776,7 @@ export const Content = {
 			game.dead.push(player);
 			_status.dying.remove(player);
 
-			if (lib.config.background_speak) {
-				const audios = game.parseDieTextMap(player).randomGet();
-				if (audios.isDefault) {
-					const name = audios.key;
-					game.playAudio("die", name, function () {
-						game.playAudio("die", name.slice(name.indexOf("_") + 1));
-					});
-				}
-				else{
-					game.playAudio(audios.file);
-				}
-			}
+			game.tryDieAudio(player);
 		}, player);
 
 		game.addVideo("diex", player);
