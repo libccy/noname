@@ -8776,9 +8776,9 @@ export const Content = {
 			game.dead.push(player);
 			_status.dying.remove(player);
 
-			game.tryDieAudio(player);
 		}, player);
 
+		game.tryDieAudio(player);
 		game.addVideo("diex", player);
 		if (event.animate !== false) {
 			player.$die(source);
