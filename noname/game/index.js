@@ -1381,6 +1381,9 @@ export class Game {
 				} else if (typeof argument == "function") onError = argument;
 				if (_status.video) break;
 			}
+			if (path.startsWith("ext:")) path = path.replace(/^ext:/, "extension/");
+			else if (!["db:", "blob:", "data:"].some(prefix => path.startsWith(prefix))) path = `audio/${path}`;
+			if (!lib.config.repeat_audio && _status.skillaudio.includes(path)) return;
 		}
 		const audio = document.createElement("audio");
 		audio.autoplay = true;
@@ -1397,10 +1400,13 @@ export class Game {
 			audio.remove();
 			if (onError) onError(event);
 		};
-
-		game.parseResourcePath(path, path => (lib.path.extname(path) ? `audio/${path}` : `audio/${path}.mp3`)).then(path => {
-			audio.src = path.href;
-			if (!lib.config.repeat_audio && _status.skillaudio.includes(path.href)) return;
+		new Promise((resolve, reject) => {
+			if (path.startsWith("db:")) game.getDB("image", path.slice(3)).then(octetStream => resolve(get.objectURL(octetStream)), reject);
+			else if (lib.path.extname(path)) resolve(`${lib.assetURL}${path}`);
+			else if (URL.canParse(path)) resolve(path);
+			else resolve(`${lib.assetURL}${path}.mp3`);
+		}).then(resolvedPath => {
+			audio.src = resolvedPath;
 			ui.window.appendChild(audio);
 		});
 		return audio;
@@ -1468,13 +1474,15 @@ export class Game {
 	 * @returns { any[] }  语音地址列表
 	 */
 	parseSkillTextMap(skill, player, skillInfo) {
-		if (typeof player === "string") player = { name: player };
-		else if (typeof player !== "object" || player === null) player = {};
+		if (typeof player === "string") player = get.convertedCharacter({ name: player });
+		else if (typeof player !== "object" || player === null) player = get.convertedCharacter({ isNull: true });
 
 		if (skillInfo && (typeof skillInfo !== "object" || Array.isArray(skillInfo))) skillInfo = { audio: skillInfo };
 
-		const checkSkill = (skill, history) => {
-			if (!lib.skill[skill]) return false;
+		const defaultInfo = [true, 2];
+
+		const check = (skill, history) => {
+			if (!get.info(skill)) return false;
 			if (!history.includes(skill)) return true;
 			if (history[0] === skill) return false;
 			//deadlock
@@ -1495,17 +1503,18 @@ export class Game {
 			);
 		};
 
-		const getTextMap = (path, name, ext) => ({
+		const getTextMap = (path, name, ext, isDefault) => ({
 			name,
 			file: `${path}${name}${ext}`,
 			text: lib.translate[`#${name}`],
+			isDefault,
 		});
 
-		function getAudioList(skill, options, skillInfo) {
-			const info = skillInfo || lib.skill[skill];
+		const getAudioList = (skill, options, skillInfo) => {
+			const info = skillInfo || get.info(skill);
 			if (!info) {
-				console.error(new ReferenceError(`parseSkillAudio: Cannot find ${skill} in lib.skill`));
-				return parseAudio(skill, options, [true, 2]);
+				console.error(new ReferenceError(`parseSkillTextMap: Cannot find ${skill} in lib.skill`));
+				return parseAudio(skill, Object.assign(options, { isDefault: true }), defaultInfo);
 			}
 
 			const { audioname, history } = options;
@@ -1515,16 +1524,17 @@ export class Game {
 			if (info.audioname2) audioInfo = info.audioname2[getName(i => info.audioname2[i])] || audioInfo;
 
 			return parseAudio(skill, options, audioInfo);
-		}
+		};
 
-		function parseAudio(skill, options, audioInfo) {
+		const parseAudio = (skill, options, audioInfo) => {
 			const audioname = options.audioname.slice();
 			const history = options.history.slice();
-			options = { audioname, history };
+			const isDefault = options.isDefault;
+			options = { audioname, history, isDefault };
 			if (Array.isArray(audioInfo)) {
 				if (audioInfo.length === 2 && typeof audioInfo[0] === "string" && typeof audioInfo[1] === "number") {
 					const [name, number] = audioInfo;
-					if (checkSkill(name, history)) return getAudioList(name, options).slice(0, number);
+					if (check(name, history)) return getAudioList(name, options).slice(0, number);
 					return parseAudio(name, options, number);
 				}
 
@@ -1535,40 +1545,40 @@ export class Game {
 				return Object.values(map);
 			}
 
-			if (!["string", "number", "boolean"].includes(typeof audioInfo)) return parseAudio(skill, options, [true, 2]);
+			if (!["string", "number", "boolean"].includes(typeof audioInfo)) return parseAudio(skill, Object.assign(options, { isDefault: true }), defaultInfo);
 			if (audioInfo === false) return [];
 			if (typeof audioInfo === "string") {
-				if (["data:", "blob:"].some(prefix => audioInfo.startsWith(prefix))) return [getTextMap("", audioInfo, "")];
-				if (checkSkill(audioInfo, history)) return getAudioList(audioInfo, options);
+				if (["data:", "blob:"].some(prefix => audioInfo.startsWith(prefix))) return [getTextMap("", audioInfo, "", isDefault)];
+				if (check(audioInfo, history)) return getAudioList(audioInfo, options);
 			}
 			audioInfo = String(audioInfo);
 			const list = audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/); // [path, number|true, ext]
-			if (!list) {
-				let path = "",
-					ext = "";
-				if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
-				if (!/\.\w+$/.test(audioInfo)) ext = ".mp3";
-				if (path && ext) return parseAudio(audioInfo, options, [true, 2]);
-				//@TODO
-				console.warn(`${skill}中“${audioInfo}”的地址写法暂时没有完全支持台词系统。`);
-				return [getTextMap(path, audioInfo, ext)];
+			if (list) {
+				let [, path = "skill", audioNum, ext = "mp3"] = list;
+				let _audioname = getName(i => audioname.includes(i));
+				_audioname = _audioname ? `_${_audioname}` : "";
+
+				if (audioNum === "true") return [getTextMap(`${path}/`, `${skill}${_audioname}`, `.${ext}`, isDefault)];
+
+				const audioList = [];
+				audioNum = parseInt(audioNum);
+				for (let i = 1; i <= audioNum; i++) {
+					audioList.push(getTextMap(`${path}/`, `${skill}${_audioname}${i}`, `.${ext}`, isDefault));
+				}
+				return audioList;
 			}
 
-			let [, path = "skill", audioNum, ext = "mp3"] = list;
-			let _audioname = getName(i => audioname.includes(i));
-			_audioname = _audioname ? `_${_audioname}` : "";
+			let path = "",
+				ext = "";
+			if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
+			if (!/\.\w+$/.test(audioInfo)) ext = ".mp3";
+			if (path && ext) return parseAudio(audioInfo, Object.assign(options, { isDefault: true }), defaultInfo);
+			//@TODO
+			console.warn(`${skill}中的地址写法(${audioInfo})暂时没有完全支持台词系统。`);
+			return [getTextMap(path, audioInfo, ext, isDefault)];
+		};
 
-			if (audioNum === "true") return [getTextMap(`${path}/`, `${skill}${_audioname}`, `.${ext}`)];
-
-			const audioList = [];
-			audioNum = parseInt(audioNum);
-			for (let i = 1; i <= audioNum; i++) {
-				audioList.push(getTextMap(`${path}/`, `${skill}${_audioname}${i}`, `.${ext}`));
-			}
-			return audioList;
-		}
-
-		return getAudioList(skill, { audioname: [], history: [] }, skillInfo);
+		return getAudioList(skill, { audioname: [], history: [], isDefault: false }, skillInfo);
 	}
 	/**
 	 * 获取角色死亡时能播放的所有阵亡语音
@@ -1576,66 +1586,105 @@ export class Game {
 	 * @returns { any[] }  语音地址列表
 	 */
 	parseDieTextMap(player) {
-		let name, rawName;
-		if (typeof player === "string") {
-			name = player;
-			rawName = name;
-		} else if (get.itemtype(player) === "player") {
-			// @ts-ignore
-			name = player.skin.name || player.name;
-			rawName = player.name;
-		}
-		const info = get.character(name),
-			datas = [];
-		let dieAudios;
-		if (info && info.dieAudios.length > 0) {
-			dieAudios = info.dieAudios;
-		}
-		//@mengxinzxz写的屎山
-		else if (rawName !== name && lib.characterSubstitute[rawName] && lib.characterSubstitute[rawName].some(i => i[0] == name)) {
-			const trashes = lib.characterSubstitute[rawName].find(i => i[0] == name)[1];
-			const newCharacter = get.convertedCharacter(["", "", 0, [], trashes]);
-			dieAudios = newCharacter.dieAudios;
-		}
-		if (dieAudios && dieAudios.length > 0) {
-			dieAudios.forEach(item => {
-				let file = lib.init.parseResourceAddress(item, path => (lib.path.extname(path) ? `audio/die/${path}.mp3` : `audio/die/${path}`));
-				//let key = file.startsWith("db:") ? file.slice(3) : file.startsWith("data:") ? file : lib.path.basename(file);
-
-				/**
-				 * @type {string}
-				 */
-				let key;
-				if (item.startsWith("ext:")) {
-					let relativePath = get.relativePath(file);
-					let keyPath = relativePath.split("/").slice(2).join("/");
-					if (lib.path.extname(keyPath)) keyPath = keyPath.replace(lib.path.extname(keyPath), "");
-					key = keyPath;
-				} else {
-					key = file.href;
+		let name = typeof player === "string" ? player : player.name;
+		let audioInfo;
+		if (typeof player !== "string" && player.skin && player.skin.name) {
+			const skinName = player.skin.name;
+			if (skinName !== name && lib.characterSubstitute[name]) {
+				const skin = lib.characterSubstitute[name].find(i => i[0] === skinName);
+				if (skin) {
+					const newCharacter = get.convertedCharacter(["", "", 0, [], skin[1]]);
+					name = skinName;
+					audioInfo = newCharacter.dieAudios;
 				}
-
-				// if (item.startsWith("ext:")) {
-				//	key = item.slice(4).split("/")[1];
-				//	file = item;
-				// } else {
-				//	key = item;
-				//	file = `die/${item}.mp3`;
-				// }
-				const data = { key, file: file.href };
-				if (lib.translate[`#${key}:die`]) data.text = lib.translate[`#${key}:die`];
-				datas.push(data);
-			});
-		} else {
-			const data = {
-				key: name,
-				file: `die/${name}.mp3`,
-				isDefault: true,
-			};
-			if (lib.translate[`#${name}:die`]) data.text = lib.translate[`#${name}:die`];
-			datas.push(data);
+			}
 		}
-		return datas;
+
+		const defaultInfo = true;
+
+		const check = (name, history) => {
+			if (get.character(name).isNull) return false;
+			if (!history.includes(name)) return true;
+			if (history[0] === name) return false;
+			//deadlock
+			throw new RangeError(`parseDieTextMap: ${name} in ${history} forms a deadlock`);
+		};
+
+		const getTextMap = (path, name, ext, isDefault) => ({
+			name,
+			file: `${path}${name}${ext}`,
+			text: lib.translate[`#${name}:die`],
+			isDefault,
+		});
+
+		const getAudioList = (name, options, audioInfo) => {
+			if (!audioInfo) {
+				const info = get.character(name);
+				if (info.isNull) {
+					// console.error(new ReferenceError(`parseDieTextMap: Cannot find ${name} in lib.character`));
+					return parseAudio(name, Object.assign(options, { isDefault: true }), defaultInfo);
+				}
+				audioInfo = info.dieAudios;
+			}
+
+			if (audioInfo.length === 0) audioInfo = void 0;
+
+			const { history } = options;
+			history.unshift(name);
+
+			return parseAudio(name, options, audioInfo);
+		};
+
+		const parseAudio = (name, options, audioInfo) => {
+			const history = options.history.slice();
+			const isDefault = options.isDefault;
+			options = { history, isDefault };
+			if (Array.isArray(audioInfo)) {
+				// if (audioInfo.length === 2 && typeof audioInfo[0] === "string" && typeof audioInfo[1] === "number") {
+				//     const [name, number] = audioInfo;
+				//     if (check(name, history)) return getAudioList(name, options).slice(0, number);
+				//     return parseAudio(name, options, number);
+				// }
+
+				const map = {};
+				audioInfo.forEach(i => {
+					parseAudio(name, options, i).forEach(data => (map[data.name] = data));
+				});
+				return Object.values(map);
+			}
+
+			if (!["string", "number", "boolean"].includes(typeof audioInfo)) return parseAudio(name, Object.assign(options, { isDefault: true }), defaultInfo);
+			if (audioInfo === false) return [];
+			if (typeof audioInfo === "string") {
+				if (["data:", "blob:"].some(prefix => audioInfo.startsWith(prefix))) return [getTextMap("", audioInfo, "", isDefault)];
+				if (check(audioInfo, history)) return getAudioList(audioInfo, options);
+			}
+			audioInfo = String(audioInfo);
+			const list = audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/); // [path, number|true, ext]
+			if (list) {
+				let [, path = "die", audioNum, ext = "mp3"] = list;
+
+				if (audioNum === "true") return [getTextMap(`${path}/`, `${name}`, `.${ext}`, isDefault)];
+
+				const audioList = [];
+				audioNum = parseInt(audioNum);
+				for (let i = 1; i <= audioNum; i++) {
+					audioList.push(getTextMap(`${path}/`, `${name}${i}`, `.${ext}`, isDefault));
+				}
+				return audioList;
+			}
+
+			let path = "",
+				ext = "";
+			if (!/^db:|^ext:|\//.test(audioInfo)) path = "die/";
+			if (!/\.\w+$/.test(audioInfo)) ext = ".mp3";
+			if (path && ext) return parseAudio(audioInfo, Object.assign(options, { isDefault: true }), defaultInfo);
+			//@TODO
+			console.warn(`${name}中的地址写法(${audioInfo})暂时没有完全支持台词系统。`);
+			return [getTextMap(path, audioInfo, ext, isDefault)];
+		};
+
+		return getAudioList(name, { history: [], isDefault: false }, audioInfo);
 	}
 	/**
 	 *
@@ -1655,11 +1704,42 @@ export class Game {
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
 
 		let audio,
-			list = game.parseSkillAudio(skill, player, skillInfo).randomSort();
+			list = game.parseSkillTextMap(skill, player, skillInfo).randomSort();
 		return (function play() {
 			if (!list.length) return;
 			audio = list.shift();
-			return game.playAudio(audio, play);
+			return game.playAudio(audio.file, play);
+		})();
+	}
+	/**
+	 * @param { Player | string } player
+	 * @returns
+	 */
+	tryDieAudio(player) {
+		game.broadcast(game.tryDieAudio, player);
+		if (!lib.config.background_speak) return;
+
+		let playerName;
+		if (typeof player === "string") playerName = player;
+		else if (player.skin && player.skin.name) playerName = player.skin.name;
+		else playerName = player.name;
+
+		let audio,
+			isDefault,
+			list = game.parseDieTextMap(player).randomSort();
+		const check = () => {
+			if (list.length) return true;
+			if (!audio) return false;
+			if (!audio.isDefault) return false;
+			if (!playerName.includes("_")) return false;
+			playerName = playerName.slice(playerName.indexOf("_") + 1);
+			list = game.parseDieTextMap(playerName).randomSort();
+			return check();
+		};
+		return (function play() {
+			if (!check()) return;
+			audio = list.shift();
+			return game.playAudio(audio.file, play);
 		})();
 	}
 	/**
@@ -5835,19 +5915,19 @@ export class Game {
 			// 数组形式
 			if ("contents" in event && Array.isArray(event.contents)) {
 				/*
-				event.contents[step](event, trigger, player, _storeEvent).then((evt) => {
-					if (evt) event._storeEvent = evt;
-					if (game.executingAsyncEventMap.has(event.toEvent())) {
-						game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
-							if (event.step >= event.contents.length - 1) event.finish();
-							resolve();
-						}));
-					} else {
-						if (event.step >= event.contents.length - 1) event.finish();
-						resolve();
-					}
-				});
-				*/
+			   event.contents[step](event, trigger, player, _storeEvent).then((evt) => {
+				   if (evt) event._storeEvent = evt;
+				   if (game.executingAsyncEventMap.has(event.toEvent())) {
+					   game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+						   if (event.step >= event.contents.length - 1) event.finish();
+						   resolve();
+					   }));
+				   } else {
+					   if (event.step >= event.contents.length - 1) event.finish();
+					   resolve();
+				   }
+			   });
+			   */
 				// 解决不了问题...就把问题统一
 				const run = async event => {
 					if (typeof event.step !== "number") event.step = 0;
@@ -8522,16 +8602,6 @@ export class Game {
 			let target = sortedTargets[i];
 			await Promise.resolve(asyncFunc(target, i));
 		}
-	}
-
-	/**
-	 * @async
-	 * @param {string | URL} link
-	 * @param {((item: string) => string) | null} [defaultHandle]
-	 * @returns {Promise<URL>}
-	 */
-	parseResourcePath(link, defaultHandle = null) {
-		return (link instanceof URL ? link.href : link).startsWith("db:") ? lib.init.promises.parseResourceAddress(link, defaultHandle, true) : Promise.resolve(lib.init.parseResourceAddress(link, defaultHandle));
 	}
 }
 
