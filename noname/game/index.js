@@ -1381,9 +1381,6 @@ export class Game {
 				} else if (typeof argument == "function") onError = argument;
 				if (_status.video) break;
 			}
-			if (path.startsWith("ext:")) path = path.replace(/^ext:/, "extension/");
-			else if (!["db:", "blob:", "data:"].some(prefix => path.startsWith(prefix))) path = `audio/${path}`;
-			if (!lib.config.repeat_audio && _status.skillaudio.includes(path)) return;
 		}
 		const audio = document.createElement("audio");
 		audio.autoplay = true;
@@ -1400,13 +1397,10 @@ export class Game {
 			audio.remove();
 			if (onError) onError(event);
 		};
-		new Promise((resolve, reject) => {
-			if (path.startsWith("db:")) game.getDB("image", path.slice(3)).then(octetStream => resolve(get.objectURL(octetStream)), reject);
-			else if (lib.path.extname(path)) resolve(`${lib.assetURL}${path}`);
-			else if (URL.canParse(path)) resolve(path);
-			else resolve(`${lib.assetURL}${path}.mp3`);
-		}).then(resolvedPath => {
-			audio.src = resolvedPath;
+
+		game.parseResourcePath(path, path => (lib.path.extname(path) ? `audio/${path}` : `audio/${path}.mp3`)).then(path => {
+			audio.src = path.href;
+			if (!lib.config.repeat_audio && _status.skillaudio.includes(path.href)) return;
 			ui.window.appendChild(audio);
 		});
 		return audio;
@@ -1461,7 +1455,10 @@ export class Game {
 	 * @returns { string[] }  语音地址列表
 	 */
 	parseSkillText(skill, player, skillInfo) {
-		return game.parseSkillTextMap(skill, player, skillInfo).map(data => data.text).filter(Boolean);
+		return game
+			.parseSkillTextMap(skill, player, skillInfo)
+			.map(data => data.text)
+			.filter(Boolean);
 	}
 	/**
 	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表及其对应的源文件名
@@ -1487,12 +1484,15 @@ export class Game {
 		const getName = filter => {
 			const name = (player.tempname || []).find(i => filter(i));
 			if (name) return name;
-			return [player.name, player.name1, player.name2].reduce((result, name) => {
-				if (result) return result;
-				if (!name) return result;
-				if (filter(name)) return name;
-				return get.character(name).tempname.find(i => filter(i)) || result;
-			}, void 0);
+			return [player.name, player.name1, player.name2].reduce(
+				(result, name) => {
+					if (result) return result;
+					if (!name) return result;
+					if (filter(name)) return name;
+					return get.character(name).tempname.find(i => filter(i)) || result;
+				},
+				void 0
+			);
 		};
 
 		const getTextMap = (path, name, ext) => ({
@@ -1529,8 +1529,8 @@ export class Game {
 				}
 
 				const map = {};
-				audioInfo.forEach((i) => {
-					parseAudio(skill, options, i).forEach(data => map[data.name] = data);
+				audioInfo.forEach(i => {
+					parseAudio(skill, options, i).forEach(data => (map[data.name] = data));
 				});
 				return Object.values(map);
 			}
@@ -1539,12 +1539,13 @@ export class Game {
 			if (audioInfo === false) return [];
 			if (typeof audioInfo === "string") {
 				if (["data:", "blob:"].some(prefix => audioInfo.startsWith(prefix))) return [getTextMap("", audioInfo, "")];
-				if(checkSkill(audioInfo, history)) return getAudioList(audioInfo, options);
+				if (checkSkill(audioInfo, history)) return getAudioList(audioInfo, options);
 			}
 			audioInfo = String(audioInfo);
 			const list = audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/); // [path, number|true, ext]
 			if (!list) {
-				let path = "", ext = "";
+				let path = "",
+					ext = "";
 				if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
 				if (!/\.\w+$/.test(audioInfo)) ext = ".mp3";
 				if (path && ext) return parseAudio(audioInfo, options, [true, 2]);
@@ -1574,51 +1575,49 @@ export class Game {
 	 * @param { string | Player } player  角色名
 	 * @returns { any[] }  语音地址列表
 	 */
-	parseDieTextMap(player){
+	parseDieTextMap(player) {
 		let name, rawName;
 		if (typeof player === "string") {
 			name = player;
 			rawName = name;
-		}
-		else if (get.itemtype(player) === "player") {
+		} else if (get.itemtype(player) === "player") {
 			// @ts-ignore
 			name = player.skin.name || player.name;
 			rawName = player.name;
 		}
-		const info = get.character(name), datas = [];
+		const info = get.character(name),
+			datas = [];
 		let dieAudios;
-		if(info && info.dieAudios.length > 0){
+		if (info && info.dieAudios.length > 0) {
 			dieAudios = info.dieAudios;
 		}
 		//@mengxinzxz写的屎山
-		else if(rawName !== name && lib.characterSubstitute[rawName] && lib.characterSubstitute[rawName].some((i) => i[0] == name)){
-			const trashes = lib.characterSubstitute[rawName].find((i) => i[0] == name)[1];
-			const newCharacter = get.convertedCharacter(['','',0,[],trashes]);
+		else if (rawName !== name && lib.characterSubstitute[rawName] && lib.characterSubstitute[rawName].some(i => i[0] == name)) {
+			const trashes = lib.characterSubstitute[rawName].find(i => i[0] == name)[1];
+			const newCharacter = get.convertedCharacter(["", "", 0, [], trashes]);
 			dieAudios = newCharacter.dieAudios;
 		}
-		if(dieAudios && dieAudios.length > 0){
+		if (dieAudios && dieAudios.length > 0) {
 			dieAudios.forEach(item => {
 				let key, file;
-				if(item.startsWith("ext:")){
+				if (item.startsWith("ext:")) {
 					key = item.slice(4).split("/")[1];
 					file = item;
-				}
-				else {
+				} else {
 					key = item;
 					file = `die/${item}.mp3`;
 				}
-				const data = {key, file}
-				if(lib.translate[`#${key}:die`]) data.text = lib.translate[`#${key}:die`];
+				const data = { key, file };
+				if (lib.translate[`#${key}:die`]) data.text = lib.translate[`#${key}:die`];
 				datas.push(data);
 			});
-		}
-		else {
+		} else {
 			const data = {
 				key: name,
 				file: `die/${name}.mp3`,
 				isDefault: true,
-			}
-			if(lib.translate[`#${name}:die`]) data.text = lib.translate[`#${name}:die`];
+			};
+			if (lib.translate[`#${name}:die`]) data.text = lib.translate[`#${name}:die`];
 			datas.push(data);
 		}
 		return datas;
@@ -3332,8 +3331,7 @@ export class Game {
 					};
 					// player.removeGaintag.apply(player, content);
 					checkMatch(content[1], player.getCards("h"));
-				}
-				else player.removeGaintag(content);
+				} else player.removeGaintag(content);
 			} else {
 				console.log(player);
 			}
@@ -6998,7 +6996,7 @@ export class Game {
 			for (let i = 0; i < event.config.size; i++) {
 				ui.window.appendChild(event.nodes[i]);
 			}
-			"step 1";
+			("step 1");
 			let rand1 = event.config.first;
 			if (rand1 == "rand") {
 				rand1 = Math.random() < 0.5;
@@ -7035,7 +7033,7 @@ export class Game {
 			}
 			game.delay();
 			lib.init.onfree();
-			"step 2";
+			("step 2");
 			if (event.checkredo()) return;
 			if (event._skiprest) return;
 			if (event.side < 2) {
@@ -7051,7 +7049,7 @@ export class Game {
 				event.aiMove();
 				game.delay();
 			}
-			"step 3";
+			("step 3");
 			if (typeof event.fast == "number" && get.time() - event.fast <= 1000) {
 				event.fast = true;
 			} else {
@@ -7086,7 +7084,7 @@ export class Game {
 					game.delay();
 				}
 			}
-			"step 4";
+			("step 4");
 			if (event.checkredo()) return;
 			if (event.skipnode) event.skipnode.delete();
 			if (event.replacenode) event.replacenode.delete();
@@ -7105,7 +7103,7 @@ export class Game {
 				}
 			}
 			game.delay();
-			"step 5";
+			("step 5");
 			event.prompt("选择" + get.cnNumber(event.config.num) + "名出场武将");
 			event.enemylist = [];
 			for (let i = 0; i < event.avatars.length; i++) {
@@ -7135,7 +7133,7 @@ export class Game {
 				event.nodes[i].hide();
 			}
 			game.pause();
-			"step 6";
+			("step 6");
 			event.promptbar.delete();
 			if (ui.cardPileButton) ui.cardPileButton.style.display = "";
 			lib.onresize.remove(event.resize);
@@ -7842,7 +7840,7 @@ export class Game {
 							game.reload2();
 							resolve(result);
 						};
-				  }
+					}
 				: (resolve, reject) => {
 						lib.status.reload++;
 						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
@@ -7872,7 +7870,7 @@ export class Game {
 							game.reload2();
 							resolve(object);
 						};
-				  }
+					}
 		);
 	}
 	/**
@@ -7926,7 +7924,7 @@ export class Game {
 						game.reload2();
 						resolve(event);
 					};
-			  })
+				})
 			: game.getDB(storeName).then(object => {
 					const keys = Object.keys(object);
 					lib.status.reload += keys.length;
@@ -7947,7 +7945,7 @@ export class Game {
 								})
 						)
 					);
-			  });
+				});
 	}
 	/**
 	 * @param { string } key
@@ -8509,6 +8507,16 @@ export class Game {
 			let target = sortedTargets[i];
 			await Promise.resolve(asyncFunc(target, i));
 		}
+	}
+
+	/**
+	 * @async
+	 * @param {string | URL} link
+	 * @param {((item: string) => string) | null} [defaultHandle]
+	 * @returns {Promise<URL>}
+	 */
+	parseResourcePath(link, defaultHandle = null) {
+		return (link instanceof URL ? link.href : link).startsWith("db:") ? lib.init.promises.parseResourceAddress(link, defaultHandle, true) : Promise.resolve(lib.init.parseResourceAddress(link, defaultHandle));
 	}
 }
 
