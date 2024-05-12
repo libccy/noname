@@ -55,4 +55,6 @@ export default {
 	"#xinfu_limu1": "米贼作乱，吾必为益州自保。",
 	"#xinfu_limu2": "废史立牧，可得一方安定。",
 	"#liuyan:die": "背疮难治，世子难继。",
+	"#xinfu_zhanji1": "公瑾安全至吴，心安之。",
+	"#xinfu_zhanji2": "功曹之恩，吾必有展骥之机。",
 };
