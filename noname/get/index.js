@@ -216,7 +216,7 @@ export class Get {
 	//装备栏 END
 	/**
 	 * @param {string} chinese
-	 * @param {boolean|undefined} withTone  
+	 * @param {boolean|undefined} withTone
 	 * @returns { any[] }
 	 */
 	pinyin(chinese, withTone) {
@@ -224,10 +224,9 @@ export class Get {
 		const pinyins = lib.pinyins;
 		if (pinyins && pinyins[chinese] && Array.isArray(pinyins[chinese])) {
 			result = pinyins[chinese].slice(0);
-		}
-		else {
+		} else {
 			//@ts-ignore
-			result = pinyinPro.pinyin(chinese, {type: "array"});
+			result = pinyinPro.pinyin(chinese, { type: "array" });
 		}
 		//@ts-ignore
 		if (withTone === false) result = pinyinPro.convert(result, { format: "toneNone" });
@@ -295,7 +294,7 @@ export class Get {
 	 */
 	yunjiao(str) {
 		//@ts-ignore
-		str = pinyinPro.convert(str, { format: "toneNone" })
+		str = pinyinPro.convert(str, { format: "toneNone" });
 		if (lib.pinyins._metadata.zhengtirendu.includes(str)) {
 			str = "-" + str[str.length - 1];
 		} else {
@@ -4601,7 +4600,8 @@ export class Get {
 					)
 						temp2 = cache.delegate(temp2.effect).target(card, player, target, result2, isLink);
 					else temp2 = undefined;
-				} else if (typeof temp2.effect == "function") { //考虑废弃
+				} else if (typeof temp2.effect == "function") {
+					//考虑废弃
 					console.log("此写法使用频率极低且影响代码可读性，不建议使用");
 					if (
 						!player.hasSkillTag("ignoreSkill", true, {
@@ -4832,7 +4832,7 @@ export class Get {
 	 *
 	 * @async
 	 * @param {Blob} blob - 需要转换的内容
-	 * @returns {Promise<string>} 对应Blob内容的
+	 * @returns {Promise<URL>} 对应Blob内容的
 	 *
 	 * @example
 	 * let text = "Hello, World!";
@@ -4840,7 +4840,7 @@ export class Get {
 	 *
 	 * let blob = new Blob([text], { type: "text/plain" });
 	 * let url = await get.dataUrlAsync(blob);
-	 * console.assert("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==");
+	 * console.assert(url.href === "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==");
 	 */
 	dataUrlAsync(blob) {
 		return new Promise((resolve, reject) => {
@@ -4848,11 +4848,13 @@ export class Get {
 			fileReader.onload = resolve;
 			fileReader.onerror = reject;
 			fileReader.readAsDataURL(blob);
-		}).then(event => event.target.result);
+		}).then(event => new URL(event.target.result));
 	}
 
 	/**
-	 * 通过`fetch`读取data URL的内容，转换成Blob后返回生成的blob URL
+	 * 通过`Get#blobFromUrl`读取data URL的内容，转换成Blob后返回生成的blob URL
+	 *
+	 * > 实际上所有的URL都能通过此方法读取
 	 *
 	 * 该方法具有缓存，同一data URL仅会返回同一blob URL
 	 *
@@ -4866,15 +4868,29 @@ export class Get {
 	 * @param {string | URL} dataUrl - 需要转换的data URL
 	 * @returns {Promise<URL>}
 	 */
-	async objectURLAsync(dataUrl) {
+	async objectUrlAsync(dataUrl) {
 		let dataString = dataUrl instanceof URL ? dataUrl.href : dataUrl;
 		const objectURLMap = lib.objectURL;
 		if (objectURLMap.has(dataString)) return new URL(objectURLMap.get(dataString));
 
-		let blob = await (await fetch(dataUrl)).blob();
+		let blob = await this.blobFromUrl(dataUrl);
 		const objectURL = URL.createObjectURL(blob);
 		objectURLMap.set(dataString, objectURL);
 		return new URL(objectURL);
+	}
+
+	/**
+	 * 读取给定的URL，将其中的内容转换成Blob
+	 *
+	 * 在File协议下通过无名杀自带的文件处理函数读取内容，其他协议通过`fetch`读取内容
+	 *
+	 * @async
+	 * @param {string | URL} url - 需要读取的URL
+	 * @returns {Promise<Blob>}
+	 */
+	blobFromUrl(url) {
+		let link = url instanceof URL ? url : new URL(url);
+		return link.protocol == "file:" ? game.promises.readFile(get.relativePath(link)).then(buffer => new Blob([buffer])) : fetch(link).then(response => response.blob());
 	}
 }
 

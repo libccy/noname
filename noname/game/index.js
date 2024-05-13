@@ -1461,7 +1461,10 @@ export class Game {
 	 * @returns { string[] }  语音地址列表
 	 */
 	parseSkillText(skill, player, skillInfo) {
-		return game.parseSkillTextMap(skill, player, skillInfo).map(data => data.text).filter(Boolean);
+		return game
+			.parseSkillTextMap(skill, player, skillInfo)
+			.map(data => data.text)
+			.filter(Boolean);
 	}
 	/**
 	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表及其对应的源文件名
@@ -1489,19 +1492,22 @@ export class Game {
 		const getName = filter => {
 			const name = (player.tempname || []).find(i => filter(i));
 			if (name) return name;
-			return [player.name, player.name1, player.name2].reduce((result, name) => {
-				if (result) return result;
-				if (!name) return result;
-				if (filter(name)) return name;
-				return get.character(name).tempname.find(i => filter(i)) || result;
-			}, void 0);
+			return [player.name, player.name1, player.name2].reduce(
+				(result, name) => {
+					if (result) return result;
+					if (!name) return result;
+					if (filter(name)) return name;
+					return get.character(name).tempname.find(i => filter(i)) || result;
+				},
+				void 0
+			);
 		};
 
 		const getTextMap = (path, name, ext, isDefault) => ({
 			name,
 			file: `${path}${name}${ext}`,
 			text: lib.translate[`#${name}`],
-			isDefault
+			isDefault,
 		});
 
 		const getAudioList = (skill, options, skillInfo) => {
@@ -1518,7 +1524,7 @@ export class Game {
 			if (info.audioname2) audioInfo = info.audioname2[getName(i => info.audioname2[i])] || audioInfo;
 
 			return parseAudio(skill, options, audioInfo);
-		}
+		};
 
 		const parseAudio = (skill, options, audioInfo) => {
 			const audioname = options.audioname.slice();
@@ -1533,8 +1539,8 @@ export class Game {
 				}
 
 				const map = {};
-				audioInfo.forEach((i) => {
-					parseAudio(skill, options, i).forEach(data => map[data.name] = data);
+				audioInfo.forEach(i => {
+					parseAudio(skill, options, i).forEach(data => (map[data.name] = data));
 				});
 				return Object.values(map);
 			}
@@ -1551,9 +1557,7 @@ export class Game {
 				let [, path = "skill", audioNum, ext = "mp3"] = list;
 				let _audioname = getName(i => audioname.includes(i));
 				_audioname = _audioname ? `_${_audioname}` : "";
-
 				if (audioNum === "true") return [getTextMap(`${path}/`, `${skill}${_audioname}`, `.${ext}`, isDefault)];
-
 				const audioList = [];
 				audioNum = parseInt(audioNum);
 				for (let i = 1; i <= audioNum; i++) {
@@ -1584,15 +1588,14 @@ export class Game {
 		if (typeof player !== "string" && player.skin && player.skin.name) {
 			const skinName = player.skin.name;
 			if (skinName !== name && lib.characterSubstitute[name]) {
-				const skin = lib.characterSubstitute[name].find((i) => i[0] === skinName);
+				const skin = lib.characterSubstitute[name].find(i => i[0] === skinName);
 				if (skin) {
-					const newCharacter = get.convertedCharacter(['', '', 0, [], skin[1]]);
+					const newCharacter = get.convertedCharacter(["", "", 0, [], skin[1]]);
 					name = skinName;
 					audioInfo = newCharacter.dieAudios;
 				}
 			}
 		}
-
 
 		const defaultInfo = true;
 
@@ -1608,7 +1611,7 @@ export class Game {
 			name,
 			file: `${path}${name}${ext}`,
 			text: lib.translate[`#${name}:die`],
-			isDefault
+			isDefault,
 		});
 
 		const getAudioList = (name, options, audioInfo) => {
@@ -1627,7 +1630,7 @@ export class Game {
 			history.unshift(name);
 
 			return parseAudio(name, options, audioInfo);
-		}
+		};
 
 		const parseAudio = (name, options, audioInfo) => {
 			const history = options.history.slice();
@@ -1641,8 +1644,8 @@ export class Game {
 				// }
 
 				const map = {};
-				audioInfo.forEach((i) => {
-					parseAudio(name, options, i).forEach(data => map[data.name] = data);
+				audioInfo.forEach(i => {
+					parseAudio(name, options, i).forEach(data => (map[data.name] = data));
 				});
 				return Object.values(map);
 			}
@@ -1668,14 +1671,15 @@ export class Game {
 				return audioList;
 			}
 
-			let path = "", ext = "";
+			let path = "",
+				ext = "";
 			if (!/^db:|^ext:|\//.test(audioInfo)) path = "die/";
 			if (!/\.\w+$/.test(audioInfo)) ext = ".mp3";
 			if (path && ext) return parseAudio(audioInfo, Object.assign(options, { isDefault: true }), defaultInfo);
 			//@TODO
 			console.warn(`${name}中的地址写法(${audioInfo})暂时没有完全支持台词系统。`);
 			return [getTextMap(path, audioInfo, ext, isDefault)];
-		}
+		};
 
 		return getAudioList(name, { history: [], isDefault: false }, audioInfo);
 	}
@@ -1695,8 +1699,8 @@ export class Game {
 		if (!lib.config.background_speak) return;
 		if (info.direct && !directaudio) return;
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
-
-		let audio, list = game.parseSkillTextMap(skill, player, skillInfo).randomSort();
+		let audio,
+			list = game.parseSkillTextMap(skill, player, skillInfo).randomSort();
 		return (function play() {
 			if (!list.length) return;
 			audio = list.shift();
@@ -1716,7 +1720,9 @@ export class Game {
 		else if (player.skin && player.skin.name) playerName = player.skin.name;
 		else playerName = player.name;
 
-		let audio, isDefault, list = game.parseDieTextMap(player).randomSort();
+		let audio,
+			isDefault,
+			list = game.parseDieTextMap(player).randomSort();
 		const check = () => {
 			if (list.length) return true;
 			if (!audio) return false;
@@ -1725,7 +1731,7 @@ export class Game {
 			playerName = playerName.slice(playerName.indexOf("_") + 1);
 			list = game.parseDieTextMap(playerName).randomSort();
 			return check();
-		}
+		};
 		return (function play() {
 			if (!check()) return;
 			audio = list.shift();
@@ -3416,8 +3422,7 @@ export class Game {
 					};
 					// player.removeGaintag.apply(player, content);
 					checkMatch(content[1], player.getCards("h"));
-				}
-				else player.removeGaintag(content);
+				} else player.removeGaintag(content);
 			} else {
 				console.log(player);
 			}
@@ -5906,19 +5911,19 @@ export class Game {
 			// 数组形式
 			if ("contents" in event && Array.isArray(event.contents)) {
 				/*
-				event.contents[step](event, trigger, player, _storeEvent).then((evt) => {
-					if (evt) event._storeEvent = evt;
-					if (game.executingAsyncEventMap.has(event.toEvent())) {
-						game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
-							if (event.step >= event.contents.length - 1) event.finish();
-							resolve();
-						}));
-					} else {
-						if (event.step >= event.contents.length - 1) event.finish();
-						resolve();
-					}
-				});
-				*/
+			   event.contents[step](event, trigger, player, _storeEvent).then((evt) => {
+				   if (evt) event._storeEvent = evt;
+				   if (game.executingAsyncEventMap.has(event.toEvent())) {
+					   game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+						   if (event.step >= event.contents.length - 1) event.finish();
+						   resolve();
+					   }));
+				   } else {
+					   if (event.step >= event.contents.length - 1) event.finish();
+					   resolve();
+				   }
+			   });
+			   */
 				// 解决不了问题...就把问题统一
 				const run = async event => {
 					if (typeof event.step !== "number") event.step = 0;
@@ -7082,7 +7087,7 @@ export class Game {
 			for (let i = 0; i < event.config.size; i++) {
 				ui.window.appendChild(event.nodes[i]);
 			}
-			"step 1";
+			("step 1");
 			let rand1 = event.config.first;
 			if (rand1 == "rand") {
 				rand1 = Math.random() < 0.5;
@@ -7119,7 +7124,7 @@ export class Game {
 			}
 			game.delay();
 			lib.init.onfree();
-			"step 2";
+			("step 2");
 			if (event.checkredo()) return;
 			if (event._skiprest) return;
 			if (event.side < 2) {
@@ -7135,7 +7140,7 @@ export class Game {
 				event.aiMove();
 				game.delay();
 			}
-			"step 3";
+			("step 3");
 			if (typeof event.fast == "number" && get.time() - event.fast <= 1000) {
 				event.fast = true;
 			} else {
@@ -7170,7 +7175,7 @@ export class Game {
 					game.delay();
 				}
 			}
-			"step 4";
+			("step 4");
 			if (event.checkredo()) return;
 			if (event.skipnode) event.skipnode.delete();
 			if (event.replacenode) event.replacenode.delete();
@@ -7189,7 +7194,7 @@ export class Game {
 				}
 			}
 			game.delay();
-			"step 5";
+			("step 5");
 			event.prompt("选择" + get.cnNumber(event.config.num) + "名出场武将");
 			event.enemylist = [];
 			for (let i = 0; i < event.avatars.length; i++) {
@@ -7219,7 +7224,7 @@ export class Game {
 				event.nodes[i].hide();
 			}
 			game.pause();
-			"step 6";
+			("step 6");
 			event.promptbar.delete();
 			if (ui.cardPileButton) ui.cardPileButton.style.display = "";
 			lib.onresize.remove(event.resize);
@@ -7926,7 +7931,7 @@ export class Game {
 							game.reload2();
 							resolve(result);
 						};
-				  }
+					}
 				: (resolve, reject) => {
 						lib.status.reload++;
 						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
@@ -7956,7 +7961,7 @@ export class Game {
 							game.reload2();
 							resolve(object);
 						};
-				  }
+					}
 		);
 	}
 	/**
@@ -8010,7 +8015,7 @@ export class Game {
 						game.reload2();
 						resolve(event);
 					};
-			  })
+				})
 			: game.getDB(storeName).then(object => {
 					const keys = Object.keys(object);
 					lib.status.reload += keys.length;
@@ -8031,7 +8036,7 @@ export class Game {
 								})
 						)
 					);
-			  });
+				});
 	}
 	/**
 	 * @param { string } key

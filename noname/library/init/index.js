@@ -838,18 +838,24 @@ export class LibInit {
 	}
 
 	/**
-	 * @async
 	 * @param {string | URL} link - 需要解析的路径
 	 * @param {((item: string) => string) | null} [defaultHandle] - 在给定路径不符合可用情况（或基于无名杀相关默认情况）时，处理路径的函数，返回的路径应是相对于根目录的相对路径，默认为`null`，当且仅当无法解析成`URL`时会调用该回调
-	 * @param {boolean} [forceLoadAsDataUrl] - 是否将资源加载为[Data URL](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URLs)，默认为`false`
+	 * @param {((item: URL) => unknown) | null} [loadAsDataUrlCallback] - 若存在值，则将资源加载为[Data URL](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URLs)，然后传入进回调函数
 	 * @param {boolean} [dbNow] - 此刻是否在解析数据库中的内容，请勿直接使用
-	 * @returns {Promise<URL>}
+	 * @returns {URL}
 	 */
-	async parseResourceAddress(link, defaultHandle = null, forceLoadAsDataUrl = false, dbNow = false) {
+	parseResourceAddress(link, defaultHandle = null, loadAsDataUrlCallback = null, dbNow = false) {
+		// 适当的摆了，中文错误应该没人会反对
+		if (!link) throw new Error(dbNow ? "传入的数据库链接中不存在内容" : "请传入需要解析的链接");
+
 		let linkString = link instanceof URL ? link.href : link;
 
 		// 如果传入值为Data URL，经过分析可知无需处理，故直接返回成品URL
-		if (linkString.startsWith("data:")) return new URL(linkString);
+		if (linkString.startsWith("data:")) {
+			let result = new URL(linkString);
+			if (loadAsDataUrlCallback) loadAsDataUrlCallback(result);
+			return result;
+		}
 
 		/**
 		 * @type {URL}
@@ -862,37 +868,24 @@ export class LibInit {
 			resultUrl = new URL(linkString);
 		} else if (dbNow) {
 			let content = new Blob([linkString], { type: "text/plain" });
-			resultUrl = new URL(await get.dataUrlAsync(content));
+			get.dataUrlAsync(content).then(loadAsDataUrlCallback);
+			// @ts-expect-error 此处的返回值无任何用处
+			return;
 		} else {
 			let resultLink = defaultHandle == null ? linkString : defaultHandle(linkString);
 			resultUrl = new URL(resultLink, rootURL);
 		}
 
-		if (forceLoadAsDataUrl && !resultUrl.href.startsWith("data:")) {
-			if (linkString.startsWith("db:")) {
-				/**
-				 * @type {string}
-				 */
-				let storeResult = await game.getDB("image", linkString.slice(3));
-
+		if (loadAsDataUrlCallback != null) {
+			if (resultUrl.protocol == "db:") {
 				// 我思索了一下，如果这玩意能造成无限递归
 				// 那么我只能说，你赢了
-				return this.parseResourceAddress(storeResult, defaultHandle, forceLoadAsDataUrl, true);
-			}
-			/**
-			 * @type {Blob}
-			 */
-			let blob;
-
-			if (linkString.startsWith("file:")) {
-				let buffer = await game.promises.readFile(get.relativePath(resultUrl));
-				blob = new Blob([buffer]);
+				game.getDB("image", linkString.slice(3)).then(storeResult => this.parseResourceAddress(storeResult, defaultHandle, loadAsDataUrlCallback, true));
 			} else {
-				let response = await fetch(resultUrl.href);
-				blob = await response.blob();
+				get.blobFromUrl(resultUrl)
+					.then(blob => get.dataUrlAsync(blob))
+					.then(loadAsDataUrlCallback);
 			}
-
-			resultUrl.href = await get.dataUrlAsync(blob);
 		}
 
 		return resultUrl;
