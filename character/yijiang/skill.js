@@ -1289,7 +1289,6 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const { cost_data: previous } = event;
-			trigger.player.logSkill("liandui", previous);
 			previous.draw(2);
 		},
 	},
