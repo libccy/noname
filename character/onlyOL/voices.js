@@ -29,4 +29,5 @@ export default {
 	"#olsbshishou3": "吾居群士之首，可配剑履否？",
 	"#ol_sb_yuanshao:die": "众人合而无力，徒负大义也……",
 	"#ol_yufan:die": "唉，主公不能容我啊！",
+	"#ol_jianyong:die": "此景竟无言以对。",
 };

@@ -1557,9 +1557,7 @@ export class Game {
 				let [, path = "skill", audioNum, ext = "mp3"] = list;
 				let _audioname = getName(i => audioname.includes(i));
 				_audioname = _audioname ? `_${_audioname}` : "";
-
 				if (audioNum === "true") return [getTextMap(`${path}/`, `${skill}${_audioname}`, `.${ext}`, isDefault)];
-
 				const audioList = [];
 				audioNum = parseInt(audioNum);
 				for (let i = 1; i <= audioNum; i++) {
@@ -1568,15 +1566,14 @@ export class Game {
 				return audioList;
 			}
 
-			let path = "",
-				ext = "";
+			let path = "", ext = "";
 			if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
 			if (!/\.\w+$/.test(audioInfo)) ext = ".mp3";
 			if (path && ext) return parseAudio(audioInfo, Object.assign(options, { isDefault: true }), defaultInfo);
 			//@TODO
 			console.warn(`${skill}中的地址写法(${audioInfo})暂时没有完全支持台词系统。`);
 			return [getTextMap(path, audioInfo, ext, isDefault)];
-		};
+		}
 
 		return getAudioList(skill, { audioname: [], history: [], isDefault: false }, skillInfo);
 	}
@@ -1702,7 +1699,6 @@ export class Game {
 		if (!lib.config.background_speak) return;
 		if (info.direct && !directaudio) return;
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
-
 		let audio,
 			list = game.parseSkillTextMap(skill, player, skillInfo).randomSort();
 		return (function play() {
