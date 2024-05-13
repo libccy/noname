@@ -1,0 +1,15 @@
+export default {
+	jiaxu: ["liqueguosi"],
+	re_yuanshao: ["yanwen", "tianfeng"],
+	menghuo: ["zhurong"],
+	sp_zhugeliang: ["pangtong", "huangyueying"],
+	sunce: ["zhouyu", "taishici", "daqiao"],
+	zuoci: ["yuji"],
+	xunyu: ["xunyou"],
+	lukang: ["luxun"],
+	yuanshu: ["jiling"],
+	zhangxiu: ["jiaxu"],
+	wangping: ["jiangfei"],
+	jiangwei: ["xiahouba"],
+	guanqiujian: ["wenqin"],
+};

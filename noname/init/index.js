@@ -21,10 +21,17 @@ export function canUseHttpProtocol() {
 		// 手机端
 		if (window.cordova) {
 			// 直接确定包名
-			if (nonameInitialized.endsWith("com.noname.shijian/")) {
+			// 因为懒人包作者不一定会改成什么版本
+			// @ts-ignore
+			if (nonameInitialized.endsWith("com.noname.shijian/") && window.noname_shijianInterfaces && typeof window.noname_shijianInterfaces.sendUpdate === 'function') {
 				// 每个app自定义能升级的渠道，比如判断版本
 				// @ts-ignore
 				return window.noname_shijianInterfaces.getApkVersion() >= 16000;
+			}
+			// 由理版判断，后续所有app都通过此接口来升级协议
+			// @ts-ignore
+			if (window.NonameAndroidBridge && typeof window.NonameAndroidBridge.sendUpdate === 'function') {
+				return true;
 			}
 		}
 		// 电脑端
@@ -55,10 +62,18 @@ export function sendUpdate() {
 	// 手机端
 	if (window.cordova) {
 		// 直接确定包名
-		if (nonameInitialized && nonameInitialized.includes("com.noname.shijian")) {
+		// @ts-ignore
+		if (nonameInitialized && nonameInitialized.includes("com.noname.shijian") && window.noname_shijianInterfaces && typeof window.noname_shijianInterfaces.sendUpdate === 'function') {
 			// 给诗笺版apk的java层传递升级完成的信息
 			// @ts-ignore
 			return window.noname_shijianInterfaces.sendUpdate() + "?sendUpdate=true";
+		}
+		// 由理版判断
+		// @ts-ignore
+		if (window.NonameAndroidBridge && typeof window.NonameAndroidBridge.sendUpdate === 'function') {
+			// 给由理版apk的java层传递升级完成的信息
+			// @ts-ignore
+			return window.NonameAndroidBridge.sendUpdate() + "?sendUpdate=true";
 		}
 	}
 	// 电脑端

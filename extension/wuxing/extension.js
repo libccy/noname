@@ -323,7 +323,7 @@ game.import("play", function () {
 						"fire",
 						"soil"
 					);
-					("step 1");
+					"step 1";
 					var card = cards[0];
 					if (!card.node.wuxing) {
 						card.node.wuxing = ui.create.div(".wunature", card);

@@ -131,7 +131,7 @@ export const Content = {
 				game.log(
 					player,
 					"获得了技能",
-					...event.addSkill.map((i) => {
+					...event.addSkill.filter(i => i in lib.translate).map((i) => {
 						return "#g【" + get.translation(i) + "】";
 					})
 				);
@@ -141,7 +141,7 @@ export const Content = {
 				game.log(
 					player,
 					"失去了技能",
-					...event.removeSkill.map((i) => {
+					...event.removeSkill.filter(i => i in lib.translate).map((i) => {
 						return "#g【" + get.translation(i) + "】";
 					})
 				);
@@ -640,6 +640,7 @@ export const Content = {
 		event.originGroup = player.group;
 		if (!event.group) event.group = player.group;
 		var group = event.group;
+		game.addVideo("changeGroup", player, group);
 		player.getHistory("custom").push(event);
 		if (event.broadcast !== false) {
 			game.broadcast(
@@ -1496,13 +1497,14 @@ export const Content = {
 	chooseToDuiben: function () {
 		"step 0";
 		if (!event.namelist) event.namelist = ["全军出击", "分兵围城", "奇袭粮道", "开城诱敌"];
-		game.broadcastAll(function (list) {
+		game.broadcastAll(function (list, translationList = []) {
 			var list2 = ["db_atk1", "db_atk2", "db_def1", "db_def2"];
 			for (var i = 0; i < 4; i++) {
 				lib.card[list2[i]].image = "card/" + list2[i] + (list[0] == "全军出击" ? "" : "_" + list[i]);
 				lib.translate[list2[i]] = list[i];
+				lib.translate[list2[i] + "_info"] = translationList[i];
 			}
-		}, event.namelist);
+		}, event.namelist, event.translationList);
 		if (!event.title) event.title = "对策";
 		game.log(player, "向", target, "发起了", "#y" + event.title);
 		if (!event.ai)
@@ -2399,6 +2401,7 @@ export const Content = {
 			}
 			for (j in character[i]) {
 				if (j == "mode" || j == "forbid" || j == "characterSort") continue;
+				//TODO: 改掉这第二坨
 				for (k in character[i][j]) {
 					if (j == "character") {
 						if (!character[i][j][k][4]) {
@@ -2430,7 +2433,7 @@ export const Content = {
 							lib[j][k].addArray(character[i][j][k]);
 						} else {
 							console.log(
-								`dublicate ${j} in character ${i}:\n${k}:\nlib.${j}.${k}`,
+								`duplicated ${j} in character ${i}:\n${k}:\nlib.${j}.${k}`,
 								lib[j][k],
 								`\ncharacter.${i}.${j}.${k}`,
 								character[i][j][k]
@@ -2463,7 +2466,7 @@ export const Content = {
 							Object.defineProperty(lib[j], k, Object.getOwnPropertyDescriptor(card[i][j], k));
 						else {
 							console.log(
-								`dublicate ${j} in card ${i}:\n${k}\nlib.${j}.${k}`,
+								`duplicated ${j} in card ${i}:\n${k}\nlib.${j}.${k}`,
 								lib[j][k],
 								`\ncard.${i}.${j}.${k}`,
 								card[i][j][k]
@@ -2772,7 +2775,7 @@ export const Content = {
 		if (ui.updateVideoMenu) {
 			ui.updateVideoMenu();
 		}
-		_status.videoDuration = 1;
+		_status.videoDuration = 1 / parseFloat(lib.config.video_default_play_speed.slice(0, -1));
 		ui.create.system("返回", function () {
 			var mode = localStorage.getItem(lib.configprefix + "playbackmode");
 			if (mode) {
@@ -2785,6 +2788,14 @@ export const Content = {
 			game.playVideo(_status.playback, lib.config.mode);
 		});
 		ui.create.system("暂停", ui.click.pause, true).id = "pausebutton";
+		var atempo = ui.create.system(
+			"原速",
+			function () {
+				_status.videoDuration = 1;
+				updateDuration();
+			},
+			true
+		);
 		var slow = ui.create.system(
 			"减速",
 			function () {
@@ -2802,6 +2813,7 @@ export const Content = {
 			true
 		);
 		var updateDuration = function () {
+			atempo.innerHTML = `原速(当前${Math.round(100 / _status.videoDuration) / 100}倍速)`;
 			if (_status.videoDuration > 1) {
 				slow.classList.add("glow");
 			} else {
@@ -2813,6 +2825,7 @@ export const Content = {
 				fast.classList.remove("glow");
 			}
 		};
+		updateDuration();
 		ui.system.style.display = "";
 		ui.refresh(ui.system);
 		ui.system.show();
@@ -8784,38 +8797,16 @@ export const Content = {
 			_status.dying.remove(player);
 
 			if (lib.config.background_speak) {
-				const name = player.skin.name || player.name;
-				const goon = !lib.character[name];
-				if (goon)
-					lib.character[name] = [
-						"",
-						"",
-						0,
-						[],
-						((lib.characterSubstitute[player.name] || []).find((i) => i[0] == name) || [
-							name,
-							[],
-						])[1],
-					];
-				if (lib.character[name][4].some((tag) => /^die:.+$/.test(tag))) {
-					var tag = lib.character[name][4].find((tag) => /^die:.+$/.test(tag));
-					var reg = new RegExp("^ext:(.+)?/");
-					var match = tag.match(/^die:(.+)$/);
-					if (match) {
-						var path = match[1];
-						if (reg.test(path)) path = path.replace(reg, (_o, p) => `../extension/${p}/`);
-						game.playAudio(path);
-					}
-				} else if (lib.character[name][4].some((tag) => tag.startsWith("die_audio"))) {
-					var tag = lib.character[name][4].find((tag) => tag.startsWith("die_audio"));
-					var list = tag.split(":").slice(1);
-					game.playAudio("die", list.length ? list[0] : name);
-				} else {
+				const audios = game.parseDieTextMap(player).randomGet();
+				if (audios.isDefault) {
+					const name = audios.key;
 					game.playAudio("die", name, function () {
 						game.playAudio("die", name.slice(name.indexOf("_") + 1));
 					});
 				}
-				if (goon) delete lib.character[name];
+				else{
+					game.playAudio(audios.file);
+				}
 			}
 		}, player);
 
@@ -9184,19 +9175,13 @@ export const Content = {
 		game.addVideo("turnOver", player, player.classList.contains("turnedover"));
 	},
 	link: function () {
-		if (player.isLinked()) {
-			game.log(player, "解除连环");
-		} else {
-			game.log(player, "被连环");
-		}
-		if (lib.config.background_audio) {
-			game.playAudio("effect", "link");
-		}
-		game.broadcast(function () {
+		const isLinked = player.isLinked();
+		game.log(player, (isLinked ? "解除" : "被") + "连环");
+		game.broadcastAll(isLinked => {
 			if (lib.config.background_audio) {
-				game.playAudio("effect", "link");
+				game.playAudio("effect", "link" + (isLinked ? "_clear" : ""));
 			}
-		});
+		}, isLinked);
 		player.classList.remove("target");
 		if (get.is.linked2(player)) {
 			player.classList.toggle("linked2");

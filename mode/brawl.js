@@ -533,9 +533,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							if (lib.filter.characterDisabled(name)) continue;
 							if (name.indexOf("old_") == 0) continue;
 							var skillsx = lib.character[name][3].slice(0);
-							lib.character[name][2] = 4;
-							lib.character[name][3] = [];
-							if (lib.character[name][4]) lib.character[name][4].remove("hiddenSkill");
+							lib.character[name].hp = 4;
+							lib.character[name].maxHp = 4;
+							lib.character[name].hujia = 0;
+							lib.character[name].skills = [];
+							lib.character[name].hasHiddenSkill = false;
 							characters.push(name);
 							var list = skillsx.slice(0);
 							for (var j = 0; j < skillsx.length; j++) {
@@ -3420,7 +3422,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									ui.cheat2 = ui.create.control("自由选将", function () {
 										if (this.dialog == _status.event.dialog) {
 											if (game.changeCoin) {
-												game.changeCoin(50);
+												game.changeCoin(10);
 											}
 											this.dialog.close();
 											_status.event.dialog = this.backup;

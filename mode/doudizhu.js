@@ -1094,7 +1094,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						ui.cheat2 = ui.create.control("自由选将", function () {
 							if (this.dialog == _status.event.dialog) {
 								if (game.changeCoin) {
-									game.changeCoin(50);
+									game.changeCoin(10);
 								}
 								this.dialog.close();
 								_status.event.dialog = this.backup;
