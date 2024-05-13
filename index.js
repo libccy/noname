@@ -1,9 +1,19 @@
 try {
 	const express = require("express");
+	const minimist = require("minimist");
 	const bodyParser = require('body-parser');
 	const app = express();
 	const fs = require('fs');
 	const path = require('path');
+
+	const oneYear = 60 * 1000 * 60 * 24 * 365;
+
+	// 解析命令行参数
+	// 示例: -s --maxAge 100
+	const argv = minimist(process.argv.slice(2), {
+		alias: { "server": "s" },
+		default: { maxAge: oneYear }
+	});
 
 	app.use(bodyParser.json({
 		limit:'10240mb'
@@ -20,8 +30,6 @@ try {
 		return path.normalize(join(url)).startsWith(__dirname);
 	}
 
-	app.use(express.static(__dirname));
-
 	// parse application/x-www-form-urlencoded
 	app.use(bodyParser.urlencoded({ extended: false }));
 	// parse application/json
@@ -35,6 +43,11 @@ try {
 		next()
 	});
 
+	// 根据参数设置 maxAge
+	const maxAge = argv.server ? argv.maxAge : 0;
+
+	app.use(express.static(__dirname, { maxAge: maxAge }));
+
 	app.get("/", (req, res) => {
 		res.send(fs.readFileSync(join('index.html')));
 	});
@@ -47,7 +60,7 @@ try {
 		if (!fs.existsSync(join(dir))) {
 			fs.mkdirSync(join(dir), { recursive: true });
 		} else {
-			if (!fs.lstatSync(join(dir)).isDirectory()) {
+			if (!fs.statSync(join(dir)).isDirectory()) {
 				throw new Error(`${join(dir)}不是文件夹`);
 			}
 		}
@@ -60,7 +73,7 @@ try {
 			throw new Error(`只能访问${__dirname}的文件或文件夹`);
 		}
 		if (fs.existsSync(join(dir))) {
-			if (!fs.lstatSync(join(dir)).isDirectory()) {
+			if (!fs.statSync(join(dir)).isDirectory()) {
 				throw new Error(`${join(dir)}不是文件夹`);
 			}
 			fs.rmdirSync(join(dir), { recursive: true });
@@ -116,7 +129,7 @@ try {
 		if (!fs.existsSync(join(fileName))) {
 			throw new Error(`文件不存在`);
 		}
-		const stat = fs.lstatSync(join(fileName));
+		const stat = fs.statSync(join(fileName));
 		if (stat.isDirectory()) {
 			throw new Error("不能删除文件夹");
 		}
@@ -132,7 +145,7 @@ try {
 		if (!fs.existsSync(join(dir))) {
 			throw new Error(`文件夹不存在`);
 		}
-		const stat = fs.lstatSync(join(dir));
+		const stat = fs.statSync(join(dir));
 		if (stat.isFile()) {
 			throw new Error("getFileList只适用于文件夹而不是文件");
 		}
@@ -158,6 +171,38 @@ try {
 		}
 		catch (e) {
 			res.json(failedJson(500, String(e)));
+		}
+	});
+
+	app.get("/checkFile", (req, res) => {
+		const { fileName } = req.query;
+		if (!isInProject(fileName)) {
+			throw new Error(`只能访问${__dirname}的文件或文件夹`);
+		}
+		try {
+			if (fs.statSync(join(fileName)).isFile()) {
+				res.json(successfulJson());
+			} else {
+				res.json(failedJson(404, '不是一个文件'));
+			}
+		} catch (error) {
+			res.json(failedJson(404, '文件不存在或无法访问'));
+		}
+	});
+
+	app.get("/checkDir", (req, res) => {
+		const { dir } = req.query;
+		if (!isInProject(dir)) {
+			throw new Error(`只能访问${__dirname}的文件或文件夹`);
+		}
+		try {
+			if (fs.statSync(join(dir)).isDirectory()) {
+				res.json(successfulJson());
+			} else {
+				res.json(failedJson(404, '不是一个文件夹'));
+			}
+		} catch (error) {
+			res.json(failedJson(404, '文件夹不存在或无法访问'));
 		}
 	});
 
