@@ -7,7 +7,8 @@
         "options": "^0.0.6",
         "ultron": "^1.0.2",
         "ws": "^1.1.5",
-        "express": "^4.19.2"
+        "express": "^4.19.2",
+        "minimist":"^1.2.8"
     },
     "scripts": {
         "start": "node index.js",

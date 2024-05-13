@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM --platform=${TARGETPLATFORM} node:alpine
 RUN npm install pm2 -g
 
 WORKDIR /app
