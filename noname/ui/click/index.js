@@ -3360,7 +3360,7 @@ export class Click {
 			}
 			
 			// 添加台词部分
-			const dieAudios = game.parseDieTextMap(name).filter(i => "text" in i);
+			const dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
 			const skillAudioMap = new Map();
 			nameinfo.skills.forEach(skill => {
 				const voiceMap = game.parseSkillText(skill, name, null, true);
@@ -3397,10 +3397,10 @@ export class Click {
 					skillNameSpanStyle2.lineHeight = "1.9";
 					skillNameSpan2.innerHTML = `• 阵亡台词`;
 					intro.appendChild(skillNameSpan2);
-					dieAudios.forEach((item, index) => {
+					dieAudios.forEach((text, index) => {
 						const dieTextSpan = document.createElement("span");
 						dieTextSpan.style.fontSize = "15.2px";
-						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${item.text}`;
+						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${text}`;
 						intro.appendChild(dieTextSpan);
 					});
 				}
@@ -3677,7 +3677,7 @@ export class Click {
 			Array.from(htmlParser.childNodes).forEach((value) => introduction.appendChild(value));
 			
 			// 添加台词部分
-			const dieAudios = game.parseDieTextMap(name).filter(i => "text" in i);
+			const dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
 			const skillAudioMap = new Map();
 			nameInfo.skills.forEach(skill => {
 				const voiceMap = game.parseSkillText(skill, name, null, true);
@@ -3712,9 +3712,9 @@ export class Click {
 					skillNameSpan.innerHTML = `<br>阵亡台词`;
 					introduction.appendChild(skillNameSpan);
 
-					dieAudios.forEach((item, index) => {
+					dieAudios.forEach((text, index) => {
 						const dieTextSpan = document.createElement("span");
-						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${item.text}`;
+						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${text}`;
 						introduction.appendChild(dieTextSpan);
 					});
 				}
