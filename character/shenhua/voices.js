@@ -246,7 +246,7 @@ export default {
 	"#guanxing_jiangwei2": "克复中原，指日可待！",
 	"#jijiang1_liushan1": "匡扶汉室，谁敢出战！",
 	"#jijiang1_liushan2": "谁来替朕出战！",
-	"#jixi1": "攻其无备，出其不意！",
+	"#jixi1": "攻其不备，出其不意！",
 	"#jixi2": "偷渡阴平，直取蜀汉！",
 	"#reyingzi_sunce1": "尔等看好了！",
 	"#reyingzi_sunce2": "公瑾，助我决一死战！",
