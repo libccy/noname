@@ -2034,8 +2034,9 @@ export class Create {
 				}
 			}
 		};
-		input.addEventListener("keyup", (e) => {
+		input.addEventListener("keydown", (e) => {
 			if (e.key == "Enter") clickfind(e);
+			e.stopPropagation();
 		});
 		find.listen(clickfind);
 		Searcher.appendChild(input);
