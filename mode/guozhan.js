@@ -24082,7 +24082,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#gz_zhuling:die": "半生曹家麾下将，终是，丞相眼中，倒戈臣……",
 			"#gz_caocao:die": "霸业未成未成啊！",
 			"#gz_simayi:die": "难道真是天意难违？",
-			"#gz_xiahoudun:die": "两边都看不见了……",
+			"#gz_xiahoudun:die": "两，两边都看不见了……",
 			"#gz_zhangliao:die": "真的没想到……",
 			"#gz_xuzhu:die": "冷，好冷啊……",
 			"#gz_guojia:die": "咳，咳……",
