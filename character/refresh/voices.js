@@ -614,8 +614,8 @@ export default {
 	"#jijiang1_ol_liushan2": "将军快替我，拦下此贼！",
 	"#sishu1": "蜀乐乡土，怎不思念？",
 	"#sishu2": "思乡心切，徘徊惶惶。",
-	"#reyingzi_re_sunce1": "策虽暗稚，窃有微志。",
-	"#reyingzi_re_sunce2": "收合流散，东据吴会。",
+	"#reyingzi_re_sunce1": "得公瑾辅助，策必当一战！",
+	"#reyingzi_re_sunce2": "公瑾在此，此战无忧！",
 	"#yinghun_re_sunce1": "东吴繁盛，望父亲可知。",
 	"#yinghun_re_sunce2": "父亲，吾定不负你期望！",
 };
