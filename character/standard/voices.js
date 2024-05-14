@@ -13,7 +13,7 @@ export default {
 	"#simayi:die": "难道真是天意难违？",
 	"#ganglie1": "鼠辈，竟敢伤我！",
 	"#ganglie2": "以彼之道，还施彼身！",
-	"#xiahoudun:die": "两边都看不见了……",
+	"#xiahoudun:die": "两，两边都看不见了……",
 	"#tuxi1": "哼，没想到吧！",
 	"#tuxi2": "拿来吧！",
 	"#zhangliao:die": "真的没想到……",
