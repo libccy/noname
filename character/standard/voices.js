@@ -1,6 +1,6 @@
 export default {
-	"#ganfuren:die": "请替我照顾好阿斗。",
-	"#std_panfeng:die": "潘凤又被华雄斩了。",
+	"#ganfuren:die": "请替我照顾好阿斗……",
+	"#std_panfeng:die": "潘凤又被华雄斩了……",
 	"#jianxiong1": "宁教我负天下人，休教天下人负我！",
 	"#jianxiong2": "吾好梦中杀人！",
 	"#hujia1": "魏将何在？",
@@ -29,7 +29,7 @@ export default {
 	"#luoshen2": "飘飖兮若流风之回雪。",
 	"#qingguo1": "凌波微步，罗袜生尘。",
 	"#qingguo2": "体迅飞凫，飘忽若神。",
-	"#zhenji:die": "悼良会之永绝兮，哀一逝而异乡。",
+	"#zhenji:die": "悼良会之永绝兮，哀一逝而异乡……",
 	"#rende1": "以德服人。",
 	"#rende2": "唯贤唯德，能服于人。",
 	"#jijiang11": "蜀将何在？",
@@ -45,7 +45,7 @@ export default {
 	"#guanxing2": "知天易，逆天难。",
 	"#kongcheng11": "（抚琴声）",
 	"#kongcheng12": "（抚琴声）",
-	"#zhugeliang:die": "将星陨落，天命难违。",
+	"#zhugeliang:die": "将星陨落，天命难违……",
 	"#longdan_sha1": "能进能退，乃真正法器！",
 	"#longdan_sha2": "吾乃常山赵子龙也！",
 	"#zhaoyun:die": "这，就是失败的滋味吗？",
@@ -117,5 +117,5 @@ export default {
 	"#wangzun2": "归顺于我，封爵赏地！",
 	"#tongji1": "弑君之罪，当诛九族！",
 	"#tongji2": "你，你这是反啦！",
-	"#re_yuanshu:die": "把玉玺，还给我。",
+	"#re_yuanshu:die": "把玉玺，还给我……",
 };
