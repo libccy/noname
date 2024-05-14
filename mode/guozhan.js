@@ -24102,7 +24102,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#gz_zhangfei:die": "实在是杀不动了……",
 			"#gz_zhugeliang:die": "将星陨落，天命难违……",
 			"#gz_zhaoyun:die": "这……就是失败的滋味吗……",
-			"#gz_machao:die": "（马蹄声）",
+			"#gz_machao:die": "（马蹄声远去……）",
 			"#gz_huangyueying:die": "亮……",
 			"#liegong1": "百步穿杨！",
 			"#liegong2": "中！",
