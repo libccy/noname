@@ -238,7 +238,7 @@ game.import("character", function () {
 			hs_kazhakusi:
 				"暗金教在此严正声明，卡扎库斯教主并非巨龙，也从未染指过违禁药水。任何公开污蔑暗金教与卡扎库斯教主本人的言论，必将遭受法律与龙息药水的严惩。",
 			hs_shaku: "艾雅曾调查过沙库尔，看看他有没有私藏了什么好东西。",
-			hs_laxiao: "什么？身为死亡之翼的儿子，拉西奥居然不是龙牌？你似乎知道的太多了…",
+			hs_laxiao: "什么？身为死亡之翼的儿子，拉西奥居然不是龙牌？你似乎知道的太多了……",
 		},
 		characterTitle: {
 			hs_aiqinvyao: "#bSnonamekill",
