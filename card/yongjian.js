@@ -841,7 +841,7 @@ game.import("card", function () {
 			qixingbaodao: "七星宝刀",
 			qixingbaodao_info: "锁定技。当此牌进入你的装备区时，你弃置装备区和判定区内的所有其他牌。",
 			duanjian: "断剑",
-			duanjian_info: "这是一把坏掉的武器…",
+			duanjian_info: "这是一把坏掉的武器……",
 			duanjian_append: '<span class="text" style="font-family: yuanli">不要因为手快而装给自己。</span>',
 			serafuku: "水手服",
 			serafuku_info:
