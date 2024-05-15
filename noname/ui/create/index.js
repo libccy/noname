@@ -2015,6 +2015,7 @@ export class Create {
 		input.style.borderRadius = "6px";
 		input.style.fontWeight = "bold";
 		input.style.fontSize = "21px";
+		input.placeholder = "支持正则搜索";
 		let find = ui.create.button(["find", "搜索"], "tdnodes");
 		find.style.display = "inline";
 		let clickfind = function (e) {
@@ -2034,8 +2035,9 @@ export class Create {
 				}
 			}
 		};
-		input.addEventListener("keyup", (e) => {
+		input.addEventListener("keydown", (e) => {
 			if (e.key == "Enter") clickfind(e);
+			e.stopPropagation();
 		});
 		find.listen(clickfind);
 		Searcher.appendChild(input);
