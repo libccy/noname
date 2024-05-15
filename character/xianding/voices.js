@@ -128,7 +128,7 @@ export default {
 	"#cunsi1": "一切，便托付将军了……",
 	"#cunsi2": "存汉室之嗣，留汉室之本。",
 	"#dc_mifuren:die": "阿斗被救，妾身……再无牵挂……",
-	"#wanglang:die": "你，你…哇啊…啊……",
+	"#wanglang:die": "你，你……哇啊……啊……",
 	"#dczhaowen1": "我辈昭昭，正始之音浩荡。",
 	"#dczhaowen2": "正文之昭，微言之绪，绝而复续。",
 	"#dcjiudun1": "籍不胜酒力，恐失言失仪。",
