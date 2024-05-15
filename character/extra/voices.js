@@ -146,7 +146,7 @@ export default {
 	"#shen_caocao:die": "腾蛇乘雾，终为土灰……",
 	"#baonu1": "嗯~~~~~！",
 	"#baonu2": "哼！",
-	"#wumou1": "哪个说我有勇无谋？!",
+	"#wumou1": "哪个说我有勇无谋？！",
 	"#wumou2": "不管这些了！",
 	"#ol_wuqian1": "看我神威，无坚不摧！",
 	"#ol_wuqian2": "天王老子也保不住你！",
