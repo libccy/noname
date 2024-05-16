@@ -1373,7 +1373,7 @@ const skills = {
 			return 6 - get.value(card);
 		},
 		async content(event, trigger, player) {
-			player.draw(event.cards.length);
+			await player.draw(event.cards.length);
 		},
 		ai: {
 			order: 1,

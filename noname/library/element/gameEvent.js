@@ -298,6 +298,15 @@ export class GameEvent {
 		this.numFixed = true;
 		return this;
 	}
+	forceFinish() {
+		if (!this.finished){
+			this.finished = true;
+			if (this.content instanceof AsyncFunction){
+				throw "event_finish";
+			}
+		}
+		return this;
+	}
 	finish() {
 		this.finished = true;
 		return this;
@@ -352,7 +361,7 @@ export class GameEvent {
 	}
 	cancel(arg1, arg2, notrigger) {
 		this.untrigger(arg1, arg2);
-		this.finish();
+		this.forceFinish();
 		if (notrigger != "notrigger") {
 			if (this.player && lib.phaseName.includes(this.name))
 				this.player.getHistory("skipped").add(this.name);

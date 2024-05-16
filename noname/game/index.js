@@ -6024,7 +6024,39 @@ export class Game {
 						event.finish();
 						resolve();
 					}
-				});
+				}).catch((error)=>{
+					//先让事件处理下去
+					if (game.executingAsyncEventMap.has(event.toEvent())) {
+						if (!game.executingAsyncEventMap.get(_status.event.toEvent())) {
+							console.warn(`game.executingAsyncEventMap中包括了event，但不包括_status.event！`);
+							console.log("event :>> ", event.toEvent());
+							console.log("_status.event :>> ", _status.event.toEvent());
+							// debugger;
+							game.executingAsyncEventMap.set(
+								event.toEvent(),
+								game.executingAsyncEventMap.get(event.toEvent()).then(() => {
+									event.finish();
+									resolve();
+								})
+							);
+						} else {
+							game.executingAsyncEventMap.set(
+								_status.event.toEvent(),
+								game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+									event.finish();
+									resolve();
+								})
+							);
+						}
+					} else {
+						event.finish();
+						resolve();
+					}
+					//再抛出异常
+					if (error !== "event_finish"){
+						throw error;
+					}
+				})
 			} else {
 				event.content(event, step, source, player, target, targets, card, cards, skill, forced, num, trigger, result, _status, lib, game, ui, get, ai);
 				resolve();
