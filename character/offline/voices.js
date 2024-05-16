@@ -59,8 +59,6 @@ export default {
 	"#manjuan": "漫卷纵酒，白首狂歌。",
 	"#zuixiang": "懵懵醉乡中，天下心中藏。",
 	"#sp_pangtong:die": "纵有治世才，难遇治世主……",
-	"#spmiewu1": "倾荡之势已成，石城尽在眼下",
-	"#spmiewu2": "吾军势如破竹，江东六郡唾手可得。",
 	"#gzshilu1": "以杀立威，谁敢反我？",
 	"#gzshilu2": "将这些乱臣贼子，尽皆诛之！",
 	"#gzxiongnve1": "当今天子乃我所立，他敢怎样？",

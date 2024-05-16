@@ -24031,7 +24031,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#gzjiancai2": "将军，在下可举荐一人。",
 			"#gz_re_xushu:die": "未尽孝道，抱憾此生……",
 			"#donggui1": "闻伯符立业，今特来相助。",
-			"#donggui2": "臣虽驽钝，愿以此腔热血报国",
+			"#donggui2": "臣虽驽钝，愿以此腔热血报国。",
 			"#fengyang1": "谁也休想染指江东寸土！",
 			"#fengyang2": "如此咽喉要地，吾当亲力守之。",
 			"#gz_wujing:die": "憾未能见，我江东一统天下之时……",
