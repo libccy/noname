@@ -9067,6 +9067,7 @@ export class Player extends HTMLDivElement {
 		game.expandSkills(skills);
 		for (var i = 0; i < skills.length; i++) {
 			var ifo = get.info(skills[i]);
+			if (!ifo) continue;
 			if (ifo.hiddenWuxie && info) {
 				if (typeof ifo.hiddenWuxie == "function" && ifo.hiddenWuxie(this, info)) {
 					return true;
