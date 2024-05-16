@@ -79,9 +79,9 @@ boot().then(() => {
 			});
 		}
 	} else {
-		// 成功导入后删除noname.config.txt
 		let searchParams = new URLSearchParams(location.search);
 		for (let [key, value] of searchParams) {
+			// 成功导入后删除noname.config.txt
 			if (key === "sendUpdate" && value === "true") {
 				game.promises
 					.readFileAsText("noname.config.txt")
@@ -165,6 +165,15 @@ boot().then(() => {
 						const url = new URL(location.href);
 						location.href = url.origin + url.pathname;
 					});
+			}
+			// 新客户端导入扩展
+			else if (key === "importExtensionName") {
+				lib.config.extensions.add(value);
+				game.saveConfig("extensions", lib.config.extensions);
+				game.saveConfig(`extension_${value}_enable`, true);
+				alert(`扩展${value}已导入成功，点击确定重启游戏`);
+				const url = new URL(location.href);
+				location.href = url.origin + url.pathname;
 			}
 		}
 	}
