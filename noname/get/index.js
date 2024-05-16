@@ -2125,12 +2125,12 @@ export class Get {
 	 */
 	info(item, player) {
 		if (typeof item == "string") {
-			return lib.skill[item] || {};
+			return lib.skill[item];
 		}
 		if (typeof item == "object") {
 			var name = item.name;
 			if (player !== false) name = get.name(item, player);
-			return lib.card[name] || {};
+			return lib.card[name];
 		}
 	}
 	/**
