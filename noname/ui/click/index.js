@@ -3358,6 +3358,54 @@ export class Click {
 					"<br>" +
 					characterintroinfo;
 			}
+			
+			// 添加台词部分
+			const dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
+			const skillAudioMap = new Map();
+			nameinfo.skills.forEach(skill => {
+				const voiceMap = game.parseSkillText(skill, name, null, true);
+				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
+			});
+			if (dieAudios.length || skillAudioMap.size > 0) {
+				const eleHr = document.createElement("hr");
+				eleHr.style.marginTop = "11px";
+				intro.appendChild(eleHr);
+				if (skillAudioMap.size > 0) {
+					const skillNameSpan = document.createElement("span");
+					skillNameSpan.style.lineHeight = "1.7";
+					skillNameSpan.innerHTML = `• 技能台词<br>`;
+					intro.appendChild(skillNameSpan);
+					skillAudioMap.forEach((texts, skill) => {
+						const skillNameSpan1 = document.createElement("span"),
+							skillNameSpanStyle1 = skillNameSpan1.style;
+						skillNameSpanStyle1.fontWeight = "bold";
+						skillNameSpanStyle1.fontSize = "15.7px";
+						skillNameSpanStyle1.lineHeight = "1.4";
+						skillNameSpan1.innerHTML = `${get.translation(skill)}<br>`;
+						intro.appendChild(skillNameSpan1);
+						texts.forEach((text, index) => {
+							const skillTextSpan = document.createElement("span");
+							skillTextSpan.style.fontSize = "15.2px";
+							skillTextSpan.innerHTML = `${texts.length > 1 ? `${index + 1}. ` : ""}${text}<br>`;
+							intro.appendChild(skillTextSpan);
+						});
+					});
+				}
+				if (dieAudios.length > 0) {
+					const skillNameSpan2 = document.createElement("span"),
+						skillNameSpanStyle2 = skillNameSpan2.style;
+					skillNameSpanStyle2.lineHeight = "1.9";
+					skillNameSpan2.innerHTML = `• 阵亡台词`;
+					intro.appendChild(skillNameSpan2);
+					dieAudios.forEach((text, index) => {
+						const dieTextSpan = document.createElement("span");
+						dieTextSpan.style.fontSize = "15.2px";
+						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${text}`;
+						intro.appendChild(dieTextSpan);
+					});
+				}
+			}
+			
 			var intro2 = ui.create.div(".characterintro.intro2", uiintro);
 			var list = get.character(name, 3) || [];
 			var skills = ui.create.div(".characterskill", uiintro);
@@ -3470,8 +3518,7 @@ export class Click {
 						clickSkill.call(skillnode, "init");
 					});
 				}
-				// if(e!=='init') game.trySkillAudio(this.link,playername);
-				// 有bug，先用旧版
+				
 				if (lib.config.background_speak && e !== "init") {
 					let audio,
 						skillnode = this;
@@ -3554,17 +3601,15 @@ export class Click {
 				if (characterGroups)
 					Promise.all(
 						characterGroups.map((characterGroup) =>
-							new Promise((resolve, reject) => {
+							Promise.resolve().then(async () => {
 								const imageName = `group_${characterGroup}`,
 									information = lib.card[imageName];
-								if (!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+								if (!information) return `${lib.assetURL}image/card/${imageName}.png`;
 								const image = information.image;
-								if (!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-								else if (image.startsWith("db:"))
-									game.getDB("image", image.slice(3)).then(resolve, reject);
-								else if (image.startsWith("ext:"))
-									resolve(`${lib.assetURL}${image.replace(/^ext:/, "extension/")}`);
-								else resolve(`${lib.assetURL}${image}`);
+								if (!image) return `${lib.assetURL}image/card/${imageName}.png`;
+								if (image.startsWith("db:")) return await game.getDB("image", image.slice(3));
+								if (image.startsWith("ext:")) return `${lib.assetURL}${image.replace(/^ext:/, "extension/")}`;
+								return `${lib.assetURL}${image}`;
 							}).then(
 								(source) =>
 									new Promise((resolve, reject) => {
@@ -3589,17 +3634,15 @@ export class Click {
 						);
 				else {
 					const characterGroup = nameInfo[1];
-					new Promise((resolve, reject) => {
+					Promise.resolve().then(async () => {
 						const imageName = `group_${characterGroup}`,
 							information = lib.card[imageName];
-						if (!information) resolve(`${lib.assetURL}image/card/${imageName}.png`);
+						if (!information) return `${lib.assetURL}image/card/${imageName}.png`;
 						const image = information.image;
-						if (!image) resolve(`${lib.assetURL}image/card/${imageName}.png`);
-						else if (image.startsWith("db:"))
-							game.getDB("image", image.slice(3)).then(resolve, reject);
-						else if (image.startsWith("ext:"))
-							resolve(`${lib.assetURL}${image.replace(/^ext:/, "extension/")}`);
-						else resolve(`${lib.assetURL}${image}`);
+						if (!image) return `${lib.assetURL}image/card/${imageName}.png`;
+						if (image.startsWith("db:")) return await game.getDB("image", image.slice(3));
+						if (image.startsWith("ext:")) return `${lib.assetURL}${image.replace(/^ext:/, "extension/")}`;
+						return `${lib.assetURL}${image}`;
 					})
 						.then(
 							(source) =>
@@ -3632,43 +3675,51 @@ export class Click {
 			const htmlParser = document.createElement("body");
 			htmlParser.innerHTML = get.characterIntro(name);
 			Array.from(htmlParser.childNodes).forEach((value) => introduction.appendChild(value));
-			//添加技能语音部分
-			const dieAudio = lib.translate[`#${name}:die`];
+			
+			// 添加台词部分
+			const dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
 			const skillAudioMap = new Map();
 			nameInfo.skills.forEach(skill => {
 				const voiceMap = game.parseSkillText(skill, name, null, true);
 				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
 			});
-			if (dieAudio || skillAudioMap.size > 0){
+			if (dieAudios.length || skillAudioMap.size > 0) {
 				introduction.appendChild(document.createElement("hr"));
-				const skillNameSpan = document.createElement("span");
-				skillNameSpan.innerHTML = `技能台词<br>`;
-				introduction.appendChild(skillNameSpan);
 
-				if(skillAudioMap.size > 0){
+				if (skillAudioMap.size > 0) {
+					const skillNameSpan = document.createElement("span");
+					skillNameSpan.innerHTML = `技能台词<br>`;
+					introduction.appendChild(skillNameSpan);
+
 					skillAudioMap.forEach((texts, skill) => {
-						const skillNameSpan = document.createElement("span"), skillNameSpanStyle = skillNameSpan.style;
+						const skillNameSpan = document.createElement("span"),
+							skillNameSpanStyle = skillNameSpan.style;
 						skillNameSpanStyle.fontWeight = "bold";
 						skillNameSpan.innerHTML = `<br>${get.translation(skill)}<br>`;
 						introduction.appendChild(skillNameSpan);
 						texts.forEach((text, index) => {
 							const skillTextSpan = document.createElement("span");
-							skillTextSpan.innerHTML = `${index + 1}. ${text}<br>`;
+							skillTextSpan.innerHTML = `${texts.length > 1 ? `${index + 1}. ` : ""}${text}<br>`;
 							introduction.appendChild(skillTextSpan);
-						})
+						});
 					});
 				}
-				if(dieAudio){
-					const skillNameSpan = document.createElement("span"), skillNameSpanStyle = skillNameSpan.style;
+
+				if (dieAudios.length > 0) {
+					const skillNameSpan = document.createElement("span"),
+						skillNameSpanStyle = skillNameSpan.style;
 					skillNameSpanStyle.fontWeight = "bold";
-					skillNameSpan.innerHTML = `<br>阵亡台词<br>`;
+					skillNameSpan.innerHTML = `<br>阵亡台词`;
 					introduction.appendChild(skillNameSpan);
-					
-					const skillTextSpan = document.createElement("span");
-					skillTextSpan.innerHTML = `${dieAudio}`;
-					introduction.appendChild(skillTextSpan);
+
+					dieAudios.forEach((text, index) => {
+						const dieTextSpan = document.createElement("span");
+						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${text}`;
+						introduction.appendChild(dieTextSpan);
+					});
 				}
 			}
+			
 			const introduction2 = ui.create.div(".characterintro.intro2", uiintro);
 			var list = get.character(name).skills;
 			var skills = ui.create.div(".characterskill", uiintro);
@@ -3793,8 +3844,7 @@ export class Click {
 						clickSkill.call(skillnode, "init");
 					});
 				}
-				// if(e!=='init') game.trySkillAudio(this.link,playername);
-				// 有bug，先用旧版
+				
 				if (lib.config.background_speak && e !== "init") {
 					let audio,
 						skillnode = this;

@@ -137,6 +137,9 @@ const skills = {
 		},
 	},
 	jsrgchushi: {
+		available(mode) {
+			return mode == "identity" || mode == "versus" && (_status.mode == "four" || _status.mode == "guandu");
+		},
 		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
@@ -619,7 +622,7 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					player.line(trigger.player);
-					trigger.player.addTempSkill("jsrglonglin_forbid");
+					trigger.player.addTempSkill("jsrglonglin_forbid", "phaseUseAfter");
 				},
 			},
 			forbid: {
@@ -3340,29 +3343,16 @@ const skills = {
 				charlotte: true,
 				direct: true,
 				check: function (event, player) {
-					return (
-						player
-							.getCards("h")
-							.map(i => get.value(i))
-							.reduce((p, c) => p + c, 0) <
-						event.player
-							.getCards("h")
-							.map(i => get.value(i))
-							.reduce((p, c) => p + c, 0) +
-							4 * Math.random()
-					);
+					return (player.getCards("h").map(i => get.value(i)).reduce((p, c) => p + c, 0) < event.player.getCards("h").map(i => get.value(i)).reduce((p, c) => p + c, 0) + 4 * Math.random());
 				},
 				content: function () {
 					"step 0";
+					player.unmarkAuto("jsrgguiji_swapback", [trigger.player]);
 					if (trigger.name == "phaseUse") {
-						player
-							.chooseBool(get.prompt("jsrgguiji_swapback", trigger.player), "与其交换手牌。")
-							.set("ai", () => {
-								return get.event("bool");
-							})
-							.set("bool", lib.skill.jsrgguiji_swapback.check(trigger, player) > 0);
+						player.chooseBool(get.prompt("jsrgguiji_swapback", trigger.player), "与其交换手牌。").set("ai", () => {
+							return get.event("bool");
+						}).set("bool", lib.skill.jsrgguiji_swapback.check(trigger, player) > 0);
 					} else {
-						player.unmarkAuto("jsrgguiji_swapback", [trigger.player]);
 						event.finish();
 					}
 					"step 1";
@@ -3370,7 +3360,6 @@ const skills = {
 						player.logSkill("jsrgguiji_swapback", trigger.player);
 						player.swapHandcards(trigger.player);
 					}
-					player.unmarkAuto("jsrgguiji_swapback", [trigger.player]);
 				},
 				intro: {
 					content: "$的下个出牌阶段结束时，你可以与其交换手牌",
@@ -3661,7 +3650,7 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
-			event.num = 0;
+			target.addTempSkill("jsrgyangming_lose", "phaseUseAfter");
 			"step 1";
 			player.chooseToCompare(target).set(
 				"small",
@@ -3681,9 +3670,11 @@ const skills = {
 						.chooseBool("是否与其重复此拼点流程？")
 						.set("ai", () => get.event("bool"))
 						.set("bool", get.effect(target, "jsrgyangming", player, player) > 0);
-				event.num++;
+				game.broadcastAll((target)=>{
+					target.storage.jsrgyangming_lose++;
+				}, target);
 			} else {
-				if (event.num) target.draw(event.num);
+				if (target.storage.jsrgyangming_lose) target.draw(target.storage.jsrgyangming_lose);
 				player.recover();
 				event.finish();
 			}
@@ -3714,6 +3705,15 @@ const skills = {
 				},
 			},
 		},
+		subSkill: {
+			lose: {
+				init(player, skill) {
+					player.storage[skill] = 0;
+				},
+				onremove: true,
+				charlotte: true
+			}
+		}
 	},
 	//韩遂
 	jsrgniluan: {
@@ -5964,7 +5964,7 @@ const skills = {
 		ai: {
 			halfneg: true,
 			effect: {
-				player_use: function (card, player, target) {
+				player_use(card, player, target) {
 					if (card.name == "jiu") return [1, 1];
 				},
 			},
@@ -6027,6 +6027,9 @@ const skills = {
 			var characters = _status.characterlist.randomRemove(4);
 			lib.skill.sbyingmen.addVisitors(characters, player);
 			game.delayx();
+		},
+		ai: {
+			combo: "sbpingjian"
 		},
 		group: "sbyingmen_reload",
 		subSkill: {
@@ -6101,7 +6104,7 @@ const skills = {
 			player.removeInvisibleSkill(skills);
 		},
 		onremove: function (player, skill) {
-			lib.skill.sbyingmen.removeVisitors(player.getSkills("sbyingmen"), player);
+			lib.skill.sbyingmen.removeVisitors(player.getStorage("sbyingmen"), player);
 			player.removeSkillBlocker("sbyingmen");
 		},
 		skillBlocker: function (skill, player) {
@@ -6668,7 +6671,12 @@ const skills = {
 		group: "jsrgguanhuo_viewas",
 		content: function () {
 			"step 0";
-			var count = player.getHistory("useSkill", evt => evt.skill == "jsrgguanhuo_viewas").length;
+			var count = player.getHistory("useSkill", evt => {
+				return (
+					evt.skill == "jsrgguanhuo_viewas" &&
+					evt.event.getParent("phaseUse") === trigger.getParent("phaseUse")
+				);
+			}).length;
 			if (count == 1) {
 				player.addTempSkill("jsrgguanhuo_ex", "phaseUseAfter");
 				player.addMark("jsrgguanhuo_ex", 1, false);
@@ -6680,8 +6688,18 @@ const skills = {
 		ai: {
 			effect: {
 				player: function (card, player) {
-					if (_status.event.getParent().skill == "jsrgguanhuo_viewas" && player.getHistory("useSkill", evt => evt.skill == "jsrgguanhuo_viewas").length == 1) return "zeroplayertarget";
-					if (_status.event.type == "phase" && _status.event.skill == "jsrgguanhuo_viewas" && player.getHistory("useSkill", evt => evt.skill == "jsrgguanhuo_viewas").length > 1 && player.countCards("h") <= 3) return [0, 0];
+					if (_status.event.getParent().skill == "jsrgguanhuo_viewas" && player.getHistory("useSkill", evt => {
+						return (
+							evt.skill == "jsrgguanhuo_viewas" &&
+							evt.event.getParent("phaseUse") === _status.event.getParent("phaseUse")
+						);
+					}).length == 1) return "zeroplayertarget";
+					if (_status.event.type == "phase" && _status.event.skill == "jsrgguanhuo_viewas" && player.getHistory("useSkill", evt => {
+						return (
+							evt.skill == "jsrgguanhuo_viewas" &&
+							evt.event.getParent("phaseUse") === _status.event.getParent("phaseUse")
+						);
+					}).length > 1 && player.countCards("h") <= 3) return [0, 0];
 				},
 			},
 		},
@@ -6755,7 +6773,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (lib.skill.jsrgjuxia.countSkill(target) >= lib.skill.jsrgjuxia.countSkill(player)) return;
 					if (card && (card.cards || card.isCard) && get.attitude(target, player) > 0 && (!target.storage.counttrigger || !target.storage.counttrigger.jsrgjuxia)) return [0, 0.5, 0, 0.5];
 				},
@@ -8016,7 +8034,7 @@ const skills = {
 			pretao: true,
 			threaten: 1.8,
 			effect: {
-				player(card, player, target) {
+				player_use(card, player, target) {
 					if (
 						typeof card === "object" &&
 						card.name !== "shan" &&

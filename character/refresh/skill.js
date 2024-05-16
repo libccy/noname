@@ -7237,25 +7237,34 @@ const skills = {
 		content: function () {
 			"step 0";
 			player.showHandcards();
-			if (get.color(player.getCards("h")) != "none") {
+			const hs = player.getCards("h"), color = get.color(hs[0], player);
+			if (hs.length === 1 || !hs.some((card,index) => {
+				return index > 0 && get.color(card) !== color;
+			})) {
 				player.draw();
 				player.addTempSkill("rehuaiyi2", "phaseUseEnd");
 				event.finish();
 			}
 			"step 1";
-			player.chooseControl("红色", "黑色").set("ai", function () {
-				var player = _status.event.player;
-				if (player.countCards("h", { color: "red" }) == 1 && player.countCards("h", { color: "black" }) > 1) return "红色";
-				return "黑色";
+			
+			const list = [], bannedList = [], indexs = Object.keys(lib.color);
+			player.getCards("h").forEach(card => {
+				const color = get.color(card, player);
+				list.add(color);
+				if (!lib.filter.cardDiscardable(card, player, "rehuaiyi")) bannedList.add(color);
 			});
+			list.removeArray(bannedList);
+			list.sort((a, b) => indexs.indexOf(a) - indexs.indexOf(b));
+			if (!list.length) event.finish();
+			else if(list.length === 1) event._result = {control: list[0]};
+			else player.chooseControl(list.map(i => `${i}2`)).set("ai", function () {
+				var player = _status.event.player;
+				if (player.countCards("h", { color: "red" }) == 1 && player.countCards("h", { color: "black" }) > 1) return 1;
+				return 0;
+			}).set("prompt", "请选择弃置一种颜色的所有手牌");
 			"step 2";
-			event.control = result.control;
-			var cards;
-			if (event.control == "红色") {
-				cards = player.getCards("h", { color: "red" });
-			} else {
-				cards = player.getCards("h", { color: "black" });
-			}
+			event.control = result.control.slice(0, result.control.length - 1);
+			var cards = player.getCards("h", {color: event.control});
 			player.discard(cards);
 			event.num = cards.length;
 			"step 3";
@@ -7391,7 +7400,7 @@ const skills = {
 		ai: {
 			expose: 0.2,
 			effect: {
-				target: function (card, player, target) {
+				target_use: function (card, player, target) {
 					if (card.name != "sha") return;
 					var players = game.filterPlayer();
 					if (get.attitude(player, target) <= 0) {
@@ -7639,7 +7648,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use: function (card, player, target) {
 					if (target != _status.currentPhase && target.countCards("h") >= target.getHandcardLimit() && (get.type(card) == "delay" || get.color(card) == "none")) return "zerotarget";
 				},
 			},
@@ -11904,7 +11913,7 @@ const skills = {
 				player.loseHp();
 			}
 			"step 1";
-			target.addTempSkill("reqiangxi_off");
+			target.addTempSkill("reqiangxi_off", "phaseUseAfter");
 			target.damage("nocard");
 		},
 		check: function (card) {
@@ -13456,7 +13465,7 @@ const skills = {
 				},
 			},
 			effect: {
-				target: function (card, player, target) {
+				target_use: function (card, player, target) {
 					if (player == target && get.type(card) == "equip") {
 						if (player.countCards("e", { subtype: get.subtype(card) })) {
 							if (
@@ -13932,20 +13941,22 @@ const skills = {
 			player.addSkill("reqianxun2");
 		},
 		ai: {
-			effect: function (card, player, target) {
-				if (player == target || !target.hasFriend()) return;
-				var type = get.type(card);
-				var nh = Math.min(
-					target.countCards(),
-					game.countPlayer(i => get.attitude(target, i) > 0)
-				);
-				if (type == "trick") {
-					if (!get.tag(card, "multitarget") || get.info(card).singleCard) {
-						if (get.tag(card, "damage")) return [1.5, nh - 1];
-						return [1, nh];
-					}
-				} else if (type == "delay") return [0.5, 0.5];
-			},
+			effect: {
+				target_use(card, player, target) {
+					if (player == target || !target.hasFriend()) return;
+					var type = get.type(card);
+					var nh = Math.min(
+						target.countCards(),
+						game.countPlayer(i => get.attitude(target, i) > 0)
+					);
+					if (type == "trick") {
+						if (!get.tag(card, "multitarget") || get.info(card).singleCard) {
+							if (get.tag(card, "damage")) return [1.5, nh - 1];
+							return [1, nh];
+						}
+					} else if (type == "delay") return [0.5, 0.5];
+				},
+			}
 		},
 	},
 	reqianxun2: {
@@ -14198,7 +14209,7 @@ const skills = {
 				.set("ai", () => {
 					const player = get.event("player"),
 						trigger = get.event().getTrigger();
-					const cards = trigger.cards.filterInD();
+					const cards = trigger.cards ? trigger.cards.filterInD() : [];
 					if (get.event().controls.includes("拿牌")) {
 						if (
 							cards.reduce((sum, card) => {
@@ -14571,27 +14582,29 @@ const skills = {
 		},
 		ai: {
 			maihp: true,
-			effect: function (card, player, target) {
-				if (get.tag(card, "damage")) {
-					if (player.hasSkillTag("jueqing", false, target)) return [1, 1];
-					return 1.2;
-				}
-				if (get.tag(card, "loseHp")) {
-					if (target.hp <= 1) return;
-					var using = target.isPhaseUsing();
-					if (target.hp <= 2) return [1, player.countCards("h") <= 1 && using ? 3 : 0];
-					if (using && target.countCards("h", { name: "sha", color: "red" })) return [1, 3];
-					return [
-						1,
-						target.countCards("h") <= target.hp ||
-						(using &&
-							game.hasPlayer(function (current) {
-								return current != player && get.attitude(player, current) < 0 && player.inRange(current);
-							}))
-							? 3
-							: 2,
-					];
-				}
+			effect: {
+				target(card, player, target) {
+					if (get.tag(card, "damage")) {
+						if (player.hasSkillTag("jueqing", false, target)) return [1, 1];
+						return 1.2;
+					}
+					if (get.tag(card, "loseHp")) {
+						if (target.hp <= 1) return;
+						var using = target.isPhaseUsing();
+						if (target.hp <= 2) return [1, player.countCards("h") <= 1 && using ? 3 : 0];
+						if (using && target.countCards("h", { name: "sha", color: "red" })) return [1, 3];
+						return [
+							1,
+							target.countCards("h") <= target.hp ||
+							(using &&
+								game.hasPlayer(function (current) {
+									return current != player && get.attitude(player, current) < 0 && player.inRange(current);
+								}))
+								? 3
+								: 2,
+						];
+					}
+				},
 			},
 		},
 	},

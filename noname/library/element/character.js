@@ -146,10 +146,25 @@ export class Character {
 	 **/
 	clans = [];
 	/**
+	 * 武将牌拥有的全部阵亡语音
+	 * @type { string[] }
+	 **/
+	dieAudios = [];
+	/**
 	 * 武将牌“无法享受到的主公/地主红利”
 	 * @type { string[] }
 	 **/
 	initFilters = [];
+	/**
+	 * 武将牌的“临时名称”
+	 * @type { string[] }
+	 */
+	tempname = [];
+	/**
+	 * 武将牌是否存在(get.character未找到武将使用)
+	 * @type { boolean }
+	 */
+	isNull = false;
 	/**
 	 * @param { Object|[string, string, string|number, string[], any[]|undefined, any[]|undefined] } [data]
 	 */
@@ -191,13 +206,14 @@ export class Character {
 		this.clans = [];
 		this.initFilters = [];
 		this.trashBin = [];
+		this.dieAudios = [];
+		this.tempname = [];
 	}
 	/**
 	 * @param { any[] } trash
 	 */
 	setPropertiesFromTrash(trash) {
-		const keptTrashes = [],
-			clans = [];
+		const keptTrashes = [], clans = [], dieAudios=[];
 		for (let i = 0; i < trash.length; i++) {
 			const item = trash[i];
 			if (typeof item !== "string") {
@@ -248,11 +264,19 @@ export class Character {
 				clans.push(item.slice(5));
 			} else if (item.startsWith("InitFilter:")) {
 				this.initFilters = item.slice(11).split(":");
+			} else if (item.startsWith("die:")) {
+				dieAudios.add(item.slice(4));
+			} else if (item.startsWith("die_audio:")) {
+				console.warn(`die_audio参数已废弃，请使用多个die参数。`);
+				dieAudios.addArray(item.slice(10).split(":"));
+			} else if (item.startsWith("tempname:")) {
+				this.tempname = item.slice(9).split(":");
 			} else {
 				keptTrashes.push(item);
 			}
 		}
 		this.clans = clans;
+		this.dieAudios = dieAudios;
 		this.trashBin = keptTrashes;
 	}
 	/**
@@ -368,6 +392,12 @@ export class Character {
 		}
 		if (character.initFilters.length > 0) {
 			trashes.push(`InitFilters:${character.initFilters.join(":")}`);
+		}
+		if (character.dieAudios.length > 0) {
+			character.dieAudios.forEach((item) => trashes.push(`die:${item}`));
+		}
+		if (character.tempname.length > 0) {
+			trashes.push(`tempname:${character.tempname.join(":")}`);
 		}
 
 		return new Proxy(trashes.concat(character.trashBin), {

@@ -1437,7 +1437,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 		},
 		init: function () {
 			for (var i in lib.characterPack.mode_boss) {
-				if (get.convertedCharacter(lib.characterPack.mode_boss[i]).isHiddenBoss) continue;
+				if (lib.characterPack.mode_boss[i].isHiddenBoss) continue;
 				lib.mode.boss.config[i + "_boss_config"] = {
 					name: get.translation(i),
 					init: true,

@@ -20,9 +20,7 @@ const skills = {
 				const map = lib.skill.dcbenxi.getMap(),
 					list = Object.keys(map);
 				if (list.length > 0) {
-					const skill = list.randomGet(),
-						voiceMap = game.parseSkillTextMap(skill, map[skill]);
-					console.log(voiceMap);
+					const skill = list.randomGet(), voiceMap = game.parseSkillTextMap(skill, map[skill]);
 					player.storage.dcbenxi_pending = skill;
 					findaudio: for (let data of voiceMap) {
 						if(!data.text) continue;
@@ -84,8 +82,10 @@ const skills = {
 				}
 				list.forEach(name => {
 					if (name !== "dc_wuyi") {
-						const skills = get.character(name).skills;
+						const skills = get.character(name, 3);
 						skills.forEach(skill => {
+							const info = get.info(skill);
+							if (!info || (info.ai && info.ai.combo)) return;
 							if (skill in _status.dcbenxi_map) return;
 							const voices = game.parseSkillText(skill, name);
 							if (
@@ -745,7 +745,7 @@ const skills = {
 				player.addMark("dcbianzhuang", 1, false);
 				if (player.countMark("dcbianzhuang") > 2) {
 					player.storage.dcbianzhuang_inited = true;
-					player.reinitCharacter("zhutiexiong", "wu_zhutiexiong");
+					player.reinitCharacter(get.character(player.name2, 3).includes("dcbianzhuang") ? player.name2 : player.name1, "wu_zhutiexiong");
 				}
 			}
 		},
@@ -759,7 +759,7 @@ const skills = {
 				},
 			},
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (player == target && player.isPhaseUsing() && get.type(card) == "equip") {
 						if (player.hasValueTarget("sha", false) && typeof player.getStat("skill").dcbianzhuang == "number") return [1, 3];
 					}
@@ -1645,7 +1645,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player(card, player, target) {
+				player_use(card, player, target) {
 					if (player !== target && get.type2(card) === "trick") {
 						let tars = [target];
 						if (ui.selected.targets.length) tars.addArray(ui.selected.targets.filter(i => i !== player && i !== target));

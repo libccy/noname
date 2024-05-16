@@ -754,7 +754,7 @@ game.import("card", function () {
 			heiguangkai_ai: {
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (
 								typeof card !== "object" ||
 								!target ||

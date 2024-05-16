@@ -1158,50 +1158,56 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					const targets = list
 						.slice()
 						.filter((i) => (event.num1 - event.num2) * get.sgn(0.5 - list.indexOf(i)) <= 0);
-					return targets.some((i) => i.countGainableCards(list[1 - list.indexOf(i)], "e"));
+					return targets.some((i) => {
+						const target = list[1 - list.indexOf(i)];
+						return target.hasCard((card) => {
+							return lib.filter.canBeGained(card, i, target);
+						}, "e");
+					});
 				},
 				async cost(event, trigger, player) {
 					let users = [];
-					const list = [event.player, event.target];
+					const list = [trigger.player, trigger.target];
 					let targets = list
 						.slice()
-						.filter((i) => (event.num1 - event.num2) * get.sgn(0.5 - list.indexOf(i)) <= 0);
-					targets = targets
-						.filter((i) => i.countGainableCards(list[1 - list.indexOf(i)], "e"))
-						.sortBySeat(player);
+						.filter((i) => (trigger.num1 - trigger.num2) * get.sgn(0.5 - list.indexOf(i)) <= 0);
+					targets = targets.filter((i) => {
+						const target = list[1 - list.indexOf(i)];
+						return target.hasCard((card) => {
+							return lib.filter.canBeGained(card, i, target);
+						}, "e");
+					}).sortBySeat(player);
 					for (const i of targets) {
 						const aim = list[1 - list.indexOf(i)];
 						const {
 							result: { bool },
-						} = await i
-							.chooseBool(
+						} = await i.chooseBool(
 								get.prompt("fakehanzhan"),
 								"获得" + get.translation(aim) + "装备区的一张牌"
-							)
-							.set(
-								"choice",
-								target.hasCard((card) => {
-									return get.value(card, aim) * get.attitude(i, aim) < 0;
-								}, "e")
-							);
+							).set("choice", aim.hasCard((card) => {
+								return get.value(card, aim) * get.attitude(i, aim) < 0;
+							}, "e"));
 						if (bool) users.push(i);
 					}
 					event.result = { bool: Boolean(users.length), targets: users };
 				},
+				logLine: false,
 				async content(event, trigger, player) {
 					const list = [trigger.player, trigger.target];
 					let targets = list
 						.slice()
 						.filter((i) => (trigger.num1 - trigger.num2) * get.sgn(0.5 - list.indexOf(i)) <= 0);
 					targets = targets
-						.filter(
-							(i) =>
-								i.countGainableCards(list[1 - list.indexOf(i)], "e") &&
-								event.targets.includes(i)
-						)
+						.filter((i) => {
+							const target = list[1 - list.indexOf(i)];
+							return target.hasCard((card) => {
+								return lib.filter.canBeGained(card, i, target);
+							}, "e");
+						})
 						.sortBySeat(player);
 					for (const i of targets) {
 						const aim = list[1 - list.indexOf(i)];
+						i.line(aim, "green");
 						await i.gainPlayerCard(aim, "e", true);
 					}
 				},
@@ -2501,14 +2507,37 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			fakexibing: {
 				audio: "xibing",
-				inherit: "xibing",
+				filter: function (event, player) {
+					if (player == event.player || event.targets.length != 1 || event.player.countCards("h") >= event.player.hp) return false;
+					var bool = function (card) {
+						return (card.name == "sha" || get.type(card, false) == "trick") && get.color(card, false) == "black";
+					};
+					if (!bool(event.card)) return false;
+					var evt = event.getParent("phaseUse");
+					if (evt.player != event.player) return false;
+					return event.player.getHistory("useCard", function (evtx) {
+						return bool(evtx.card) && evtx.getParent("phaseUse") == evt;
+					})[0] == event.getParent();
+				},
+				logTarget: "player",
+				check: function (event, player) {
+					var target = event.player;
+					var att = get.attitude(player, target);
+					var num2 = Math.min(5, target.hp) - target.countCards("h");
+					if (num2 <= 0) return att <= 0;
+					var num = target.countCards("h", function (card) {
+						return target.hasValueTarget(card, null, true);
+					});
+					if (!num) return att > 0;
+					return (num - num2) * att < 0;
+				},
+				preHidden: true,
 				content() {
 					"step 0";
 					var num = trigger.player.hp - trigger.player.countCards("h");
 					if (num > 0) trigger.player.draw(num);
 					"step 1";
-					trigger.player.addTempSkill("xibing2");
-					player._xibing = true;
+					trigger.player.addTempSkill("fakexibing_banned");
 					if (get.mode() != "guozhan" || player.isUnseen(2) || trigger.player.isUnseen(2))
 						event.finish();
 					"step 2";
@@ -2537,9 +2566,21 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						var target = trigger.player;
 						player.hideCharacter(player.name1 == result.links[0] ? 0 : 1);
 						target.hideCharacter(target.name1 == result.links[1] ? 0 : 1);
-						player.addTempSkill("xibing3");
-						target.addTempSkill("xibing3");
+						player.addTempSkill("fakexibing_nomingzhi");
+						target.addTempSkill("fakexibing_nomingzhi");
 					}
+				},
+				subSkill: {
+					banned: {
+						mod: {
+							cardEnabled2: function (card) {
+								if (get.position(card) == "h") return false;
+							},
+						},
+					},
+					nomingzhi: {
+						ai: { nomingzhi: true },
+					},
 				},
 			},
 			fakechengshang: {
@@ -2595,14 +2636,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								const storage = player.getStorage("fakechengshang_effect");
 								const list = lib.card.list
 									.filter((list) => {
-										const type = get.type(card[2]);
+										const type = get.type(list[2]);
 										if (type != "basic" && type != "trick") return false;
 										return storage.some(
 											(card) =>
 												card[0] == list[0] && card[1] == list[1] && card[2] != list[2]
 										);
 									})
-									.map((card) => [get.translation(type), "", card[2], card[3]]);
+									.map((card) => [get.translation(get.type2(card[2])), "", card[2], card[3]]);
 								return ui.create.dialog("承赏", [list, "vcard"]);
 							},
 							filter(button, player) {
@@ -2674,8 +2715,15 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakezhiwei: {
+				unique: true,
 				audio: "zhiwei",
 				inherit: "zhiwei",
+				filter: function (event, player, name) {
+					if (!game.hasPlayer(current => current != player)) return false;
+					return event.name == "showCharacter" && event.toShow.some(name => {
+						return get.character(name, 3).includes("fakezhiwei");
+					});
+				},
 				content() {
 					"step 0";
 					player
@@ -3724,21 +3772,19 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				audio: "mobiledanshou",
 				trigger: { global: "phaseZhunbeiBegin" },
 				filter(event, player) {
-					return ["h", "e", "j"].some((pos) =>
-						player.getCards(pos).every((card) => lib.filter.cardDiscardable(card, player))
-					);
+					return ["h", "e", "j"].some((pos) =>{
+						const cards = player.getCards(pos);
+						return cards.length > 0 && cards.every((card) => lib.filter.cardDiscardable(card, player));
+					});
 				},
 				async cost(event, trigger, player) {
 					let list = [],
 						map = { h: "手牌区", e: "装备区", j: "判定区" };
 					list.addArray(
-						["h", "e", "j"]
-							.filter((pos) => {
-								return player
-									.getCards(pos)
-									.every((card) => lib.filter.cardDiscardable(card, player));
-							})
-							.map((i) => map[i])
+						["h", "e", "j"].filter((pos) => {
+							const cards = player.getCards(pos);
+							return cards.length > 0 && cards.every((card) => lib.filter.cardDiscardable(card, player));
+						}).map((i) => map[i])
 					);
 					list.push("cancel2");
 					const {
@@ -3787,7 +3833,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								result: { control },
 							} = await player
 								.chooseControl("摸牌", "增加摸牌数")
-								.set("prompt", "胆守：请选择一项")
+								.set("prompt", `胆守：请选择一项（当前为${get.translation(trigger.name)}）`)
 								.set("ai", () => {
 									const player = get.event().player,
 										trigger = get.event().getTrigger();
@@ -4914,6 +4960,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakebaoqie: {
+				unique: true,
 				audio: "baoqie",
 				trigger: { player: "showCharacterEnd" },
 				filter(event, player) {
@@ -5048,11 +5095,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				async content(event, trigger, player) {
 					trigger.targets.length = 0;
 					trigger.all_excluded = true;
-					const cards = trigger.cards.filter(i => !get.owner(i));
+					const cards = trigger.cards.filterInD();
 					if (cards.length && get.type(trigger.card) == "equip") {
 						await player.gain(cards, "gain2");
 						for (let i of cards) {
-							if (get.owner(i) == player && player.hasUseTarget(i)) {
+							if (player.getCards("h").includes(i) && player.hasUseTarget(i)) {
 								await player.chooseUseTarget(i);
 							}
 						}
@@ -5087,6 +5134,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakehuirong: {
+				unique: true,
 				audio: "huirong",
 				trigger: { player: "showCharacterEnd" },
 				filter(event, player) {
@@ -5258,6 +5306,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			fakeshiren: {
+				unique: true,
 				audio: "shiren",
 				trigger: { player: "showCharacterEnd" },
 				filter(event, player) {
@@ -6410,7 +6459,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						})
 					)
 						return false;
-					return event.toShow.some((name) => lib.character[name][3].includes("gzjinyu"));
+					return event.toShow.some((name) => get.character(name, 3).includes("gzjinyu"));
 				},
 				logTarget: function (event, player) {
 					return game
@@ -6439,8 +6488,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								.set("prompt", "近谀：请暗置一张武将牌")
 								.set("ai", function () {
 									var target = _status.event.player;
-									if (target.name == "gz_pengyang") return "主将";
-									if (target.name2 == "gz_pengyang") return "副将";
+									if (get.character(target.name, 3).includes("gzjinyu")) return "主将";
+									if (get.character(target.name2, 3).includes("gzjinyu")) return "副将";
 									if (
 										lib.character[target.name][3].some((skill) => {
 											var info = get.info(skill);
@@ -6475,30 +6524,32 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				delay: false,
 				content: function () {
 					"step 0";
-					var map = {};
 					player.showHandcards();
-					for (var i of ["red", "black", "none"]) {
-						if (player.countCards("h", { color: i })) map[i] = true;
+					var hs = player.getCards("h"), color = get.color(hs[0], player);
+					if (hs.length === 1 || !hs.some((card,index) => {
+						return index > 0 && get.color(card) !== color;
+					})) {
+						event.finish();
 					}
-					if (Object.keys(map).length < 2) event.finish();
-					else event.map = map;
 					"step 1";
-					var mapx = { red: "红色", black: "黑色", none: "无色" };
-					player
-						.chooseControl(Object.keys(event.map).map((color) => mapx[color]))
-						.set("ai", function () {
-							var list = _status.event.controls;
-							var map = { 红色: "red", 黑色: "black", 无色: "none" };
-							return list.sort(
-								(a, b) =>
-									player.countCards("h", { color: map[a] }) -
-									player.countCards("h", { color: map[b] })
-							)[0];
-						})
-						.set("prompt", "怀异：弃置一种颜色的所有牌");
+					const list = [], bannedList = [], indexs = Object.keys(lib.color);
+					player.getCards("h").forEach(card => {
+						const color = get.color(card, player);
+						list.add(color);
+						if (!lib.filter.cardDiscardable(card, player, "gzrehuaiyi")) bannedList.add(color);
+					});
+					list.removeArray(bannedList);
+					list.sort((a, b) => indexs.indexOf(a) - indexs.indexOf(b));
+					if (!list.length) event.finish();
+					else if(list.length === 1) event._result = {control: list[0]};
+					else player.chooseControl(list.map(i => `${i}2`)).set("ai", function () {
+						var player = _status.event.player;
+						if (player.countCards("h", { color: "red" }) == 1 && player.countCards("h", { color: "black" }) > 1) return 1;
+						return 0;
+					}).set("prompt", "请选择弃置一种颜色的所有手牌");
 					"step 2";
-					var map = { 红色: "red", 黑色: "black", 无色: "none" };
-					var cards = player.getCards("h", { color: map[result.control] });
+					event.control = result.control.slice(0, result.control.length - 1);
+					var cards = player.getCards("h", {color: event.control});
 					player.discard(cards);
 					event.num = cards.length;
 					"step 3";
@@ -7524,11 +7575,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			//黄权
 			gzdianhu: {
+				unique: true,
 				audio: "xinfu_dianhu",
 				trigger: { player: "showCharacterAfter" },
 				forced: true,
 				filter: function (event, player) {
-					return event.toShow.includes("gz_xf_huangquan") && !player.storage.gzdianhu_effect;
+					return event.toShow.some(name => {
+						return get.character(name, 3).includes("gzdianhu");
+					}) && !player.storage.gzdianhu_effect;
 				},
 				content: function () {
 					"step 0";
@@ -8645,7 +8699,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				audio: "xuanbei",
 				trigger: { player: "showCharacterAfter" },
 				filter: function (event, player) {
-					return !player.storage.gzxuanbei && event.toShow.includes("gz_yangyan");
+					return !player.storage.gzxuanbei && event.toShow.some(name => {
+						return get.character(name, 3).includes("gzxuanbei");
+					});
 				},
 				forced: true,
 				locked: false,
@@ -9565,7 +9621,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						trigger: { player: "showCharacterAfter" },
 						forced: true,
 						filter: function (event, player) {
-							return event.toShow.includes("gz_liaohua") && !player.storage.gzdangxian_draw;
+							return event.toShow.some(name => {
+								return get.character(name, 3).includes("gzdangxian");
+							}) && !player.storage.gzdangxian_draw;
 						},
 						content: function () {
 							player.storage.gzdangxian_draw = true;
@@ -13038,7 +13096,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						},
 						content: function () {
 							trigger.cancel();
-							player.removeCharacter(player.name1 == "gz_yanbaihu" ? 0 : 1);
+							player.removeCharacter(get.character(player.name1, 3).includes("gzyjili") ? 0 : 1);
 						},
 					},
 				},
@@ -14721,7 +14779,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				forced: true,
 				filter: function (event, player) {
-					return event.toShow.includes("gz_zuoci") && !player.storage.yigui_init;
+					return event.toShow.some(name => {
+						return get.character(name, 3).includes("yigui");
+					}) && !player.storage.yigui_init;
 				},
 				content: function () {
 					player.storage.yigui_init = true;
@@ -16347,8 +16407,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							if (event.filterName(event.current.name2)) list.push("副将");
 							if (list.length > 1)
 								event.current.chooseControl(["主将", "副将"]).set("ai", function () {
-									if (player.name1 == "gz_fazheng") return 0;
-									if (player.name2 == "gz_fazheng") return 1;
+									let player = _status.event.player;
+									if (get.character(player.name1, 3).includes("gzxuanhuo")) return 0;
+									if (get.character(player.name2, 3).includes("gzxuanhuo")) return 1;
 									return Math.random() > 0.5 ? 0 : 1;
 								}).prompt = "选择并展示一张武将牌，然后执行军令";
 							else event._result = { index: list[0] == "主将" ? 0 : 1 };
@@ -17008,9 +17069,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								break;
 							}
 						}
-						if (event.target.name == "gz_zhoutai") {
+						if (get.character(event.target.name, 3).includes("buqu")) {
 							choice = "主将";
-						} else if (event.target.name2 == "gz_zhoutai") {
+						} else if (get.character(event.target.name2, 3).includes("buqu")) {
 							choice = "副将";
 						}
 						player
@@ -20604,12 +20665,15 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			gzguixiu: {
+				unique: true,
 				audio: "guixiu",
 				trigger: { player: ["showCharacterAfter", "removeCharacterBefore"] },
 				filter: function (event, player) {
 					if (event.name == "removeCharacter" || event.name == "changeVice")
-						return event.toRemove == "gz_mifuren" && player.isDamaged();
-					return event.toShow.includes("gz_mifuren");
+						return get.character(event.toRemove, 3).includes("gzguixiu") && player.isDamaged();
+					return event.toShow.some(name => {
+						return get.character(name, 3).includes("gzguixiu");
+					});
 				},
 				content: function () {
 					if (trigger.name == "showCharacter") {
@@ -23771,7 +23835,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				"副将技。①此武将牌计算体力上限时减少半个阴阳鱼。②结束阶段，你可以弃置一张非基本牌并选择一名友方角色，令其选择摸两张牌或回复1点体力，然后其可以变更副将。",
 			fakexibing: "息兵",
 			fakexibing_info:
-				"当一名其他角色在其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至体力值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。",
+				"手牌数小于体力值的其他角色于其出牌阶段内使用第一张黑色【杀】或黑色普通锦囊牌指定唯一角色为目标后，你可令该角色将手牌摸至体力值且本回合不能再使用手牌。若你与其均明置了所有武将牌，则你可以暗置你与其各一张武将牌且本回合不能再明置此武将牌。",
 			fakechengshang: "承赏",
 			fakechengshang_info:
 				"出牌阶段限一次，当你使用存在花色和点数且指定了其他势力角色为目标的牌结算完毕后，若你未因此牌造成过伤害，则你可以摸一张牌，然后本阶段你可以将一张手牌当作初始游戏牌堆中与此牌花色和点数相同的另一张基本牌或普通锦囊牌使用一次。",
@@ -23916,6 +23980,345 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			guozhan_qunxiong: "群雄割据",
 			guozhan_decade: "十年踪迹十年心",
 			guozhan_others: "其他",
+
+			// 语音部分
+			"#gz_zhonghui:die": "吾机关算尽，却还是棋错一着……",
+			"#gzzhaoxin1": "行明动正，何惧他人讥毁。",
+			"#gzzhaoxin2": "大业之举，岂因宵小而动？",
+			"#gzsuzhi1": "敌军势大与否，无碍我自计定施。",
+			"#gzsuzhi2": "汝竭力强攻，也只是徒燥军心。",
+			"#gzfankui1": "胆敢诽谤惑众，这就是下场！",
+			"#gzfankui2": "今天，就拿你来杀鸡儆猴。",
+			"#gz_simazhao:die": "千里之功，只差一步了……",
+			"#gzhuaiyi1": "曹魏可王，吾亦可王！",
+			"#gzhuaiyi2": "这天下，本就是我囊中之物。",
+			"#gzzisui1": "仲达公，敢问这辽隧之战，谁胜谁负啊，哈哈哈哈……",
+			"#gzzisui2": "凡从我大燕者，授印封爵，全族俱荣！",
+			"#gz_gongsunyuan:die": "流星骤损，三军皆溃，看来大势去矣……",
+			"#gz_sunchen:die": "愿陛下念臣昔日之功，陛下？陛下！！",
+			"#gzxingzhao1": "让我先探他一探。",
+			"#gzxingzhao2": "船，也不是一天就能造出来的。",
+			"#gzxingzhao_xunxun1": "拿些上好的木料来。",
+			"#gzxingzhao_xunxun2": "精挑细选，方能成百年之计。",
+			"#gz_tangzi:die": "偷工减料，要不得啊……",
+			"#gz_mengda:die": "吾一生寡信，今报应果然来矣……",
+			"#gzwenji1": "这，可如何是好？",
+			"#gzwenji2": "望先生不吝赐教。",
+			"#gztunjiang1": "大恩难报，军粮以资。",
+			"#gztunjiang2": "虽有不舍，也只能离家远行了。",
+			"#gz_liuqi:die": "身侧之人，歹毒更甚于敌！",
+			"#mffengshi1": "雪中送炭？倒不如落井下石！",
+			"#mffengshi2": "今发兵援羽，敢问是过是功？",
+			"#gz_mifangfushiren:die": "虞翻小儿，你安敢辱我！",
+			"#gzbiluan1": "审势夺度，以稳求进。",
+			"#gzbiluan2": "进退利弊，自当细细思量。",
+			"#gzlixia1": "先生大才，岂可居于人下。",
+			"#gzlixia2": "先生贤才，老夫着实佩服。",
+			"#gz_shixie:die": "天命之时……已到……",
+			"#gzbushi1": "争斗，永远没有赢家。",
+			"#gzbushi2": "和平，永远没有输家。",
+			"#gzmidao1": "恩结天地，法惠八荒。",
+			"#gzmidao2": "行五斗米道，可知暖饱。",
+			"#gz_zhanglu:die": "唉，义不敌武，道难御兵……",
+			"#quanjin1": "今称魏公，则可以藩卫之名，征吴伐蜀也。",
+			"#quanjin2": "明公受封，正合天心人意！",
+			"#zaoyun1": "开渠输粮，振军之心，破敌之胆！",
+			"#zaoyun2": "兵精粮足，胜局已定！",
+			"#gz_dongzhao:die": "一生无愧，又何惧身后之议……",
+			"#zhuhai_gz_re_xushu1": "今日当要替天行道。",
+			"#zhuhai_gz_re_xushu2": "我容得你，天不容你！",
+			"#gzjiancai1": "得此贤士，如鱼得水。",
+			"#gzjiancai2": "将军，在下可举荐一人。",
+			"#gz_re_xushu:die": "未尽孝道，抱憾此生……",
+			"#donggui1": "闻伯符立业，今特来相助。",
+			"#donggui2": "臣虽驽钝，愿以此腔热血报国。",
+			"#fengyang1": "谁也休想染指江东寸土！",
+			"#fengyang2": "如此咽喉要地，吾当亲力守之。",
+			"#gz_wujing:die": "憾未能见，我江东一统天下之时……",
+			"#gzzhidao1": "一朝得势，自当尽诸其力！",
+			"#gzzhidao2": "本王要的，没有得不到的！",
+			"#gzyjili1": "处处受制于人，难施拳脚。",
+			"#gzyjili2": "寄居人下，终是气短。",
+			"#gz_yanbaihu:die": "江东，有我一半……",
+			"#gzchenglve1": "如此大胜，皆由我一人谋划。",
+			"#gzchenglve2": "画谋定计，谁堪与我比较。",
+			"#gzshicai1": "阿瞒，苦思之事，我早有良策。",
+			"#gzshicai2": "策略已有，按部就班即可得胜。",
+			"#gz_xuyou:die": "阿瞒，你竟忘恩负义！！",
+			"#gzbaolie1": "废话少说，受死吧，喝！",
+			"#gzbaolie2": "当今曹营之将，一个能打的都没有！",
+			"#gz_xiahouba:die": "不好，有埋伏！呃！",
+			"#gzcongcha1": "窥一斑而知全豹。",
+			"#gzcongcha2": "问一事则明其心。",
+			"#xinfu_gongqing_gz_panjun1": "水至清则无鱼，人至察则可无过。",
+			"#xinfu_gongqing_gz_panjun2": "若人人怀公忘私，则天下早定矣。",
+			"#gz_panjun:die": "密谋既泄，难处奸贼啊……",
+			"#gzxishe1": "伏箭灭破虏，坚城拒讨逆。",
+			"#gzxishe2": "什么江东猛虎？还不是我箭下之鬼！",
+			"#gz_huangzu:die": "今日不过是成王败寇，哼！动手吧！",
+			"#aocai_gz_zhugeke1": "诸位可知，自古英雄出少年！",
+			"#aocai_gz_zhugeke2": "恪乞笔再添二字，还请陛下一观。",
+			"#gzduwu1": "此战罪在当代，然功在千秋。",
+			"#gzduwu2": "昔秦灭六国之事，足表养敌之患！",
+			"#gz_zhugeke:die": "祸及三族，愧对父亲……",
+			"#gz_wenqin:die": "公休，汝这是何意，呃……",
+			"#gzlianpian1": "公之大才，当于行伍建功，安能空老林泉？",
+			"#gzlianpian2": "你我旧识，此险，望兄搭救之！",
+			"#gz_xf_sufei:die": "身陷庸主而不自知，今日终陷囹圄……",
+			"#gztongduo1": "统荆益二州诸物之价，以为民生国祚之大计。",
+			"#gztongduo2": "铸直百之钱，可平物价，定军民之心。",
+			"#qingyin1": "功成身退，再不问世间诸事。",
+			"#qingyin2": "天下既定，我亦当遁迹匿踪，颐养天年矣。",
+			"#gz_liuba:die": "家国将逢巨变，奈何此身先陨……",
+			"#daming1": "孝直溢美之言，特以此小利报之，还望笑纳。",
+			"#daming2": "孟起，莫非甘心为他人座下之客。",
+			"#xiaoni1": "如此荒辈之徒为主，成何用也。",
+			"#xiaoni2": "公既如此，恕在下诚难留之。",
+			"#gz_pengyang:die": "人言我心大志寡，难可保安，果然如此，唉……",
+			"#gzjuejue1": "舍小家而取大胜，何惜之有？！",
+			"#gzjuejue2": "今家小虽陷敌手，安敢以私废公！",
+			"#gzfangyuan1": "布阵合围，滴水不漏，待敌自溃。",
+			"#gzfangyuan2": "乘敌阵未稳，待我斩将刈旗，先奋士气！",
+			"#gz_zhuling:die": "半生曹家麾下将，终是，丞相眼中，倒戈臣……",
+			"#gz_caocao:die": "霸业未成未成啊！",
+			"#gz_simayi:die": "难道真是天意难违？",
+			"#gz_xiahoudun:die": "两，两边都看不见了……",
+			"#gz_zhangliao:die": "真的没想到……",
+			"#gz_xuzhu:die": "冷，好冷啊……",
+			"#gz_guojia:die": "咳，咳……",
+			"#gz_zhenji:die": "悼良会之永绝兮，哀一逝而异乡……",
+			"#gz_xiahouyuan:die": "竟然……比我还……快……",
+			"#gz_zhanghe:die": "啊……膝盖……中箭了……",
+			"#duanliang11": "截其源，断其粮，贼可擒也。",
+			"#duanliang12": "人是铁，饭是钢。",
+			"#gz_xuhuang:die": "一顿不吃饿得慌……",
+			"#gz_caoren:die": "长江以南，再无王土矣……",
+			"#gz_dianwei:die": "主公，快走……！",
+			"#gz_xunyu:die": "主公要臣死，臣不得不死……",
+			"#gz_caopi:die": "子建，子建……",
+			"#gz_yuejin:die": "箭疮发作，吾命休矣……",
+			"#gz_liubei:die": "这就是桃园吗？",
+			"#gz_guanyu:die": "什么？此地名叫麦城？",
+			"#gz_zhangfei:die": "实在是杀不动了……",
+			"#gz_zhugeliang:die": "将星陨落，天命难违……",
+			"#gz_zhaoyun:die": "这……就是失败的滋味吗……",
+			"#gz_machao:die": "（马蹄声远去……）",
+			"#gz_huangyueying:die": "亮……",
+			"#liegong1": "百步穿杨！",
+			"#liegong2": "中！",
+			"#gz_huangzhong:die": "不得不服老啦~",
+			"#kuanggu1": "我会怕你吗！",
+			"#kuanggu2": "真是美味啊！",
+			"#gz_weiyan:die": "谁敢杀我！呃啊！",
+			"#gz_pangtong:die": "看来我命中注定将丧命于此……",
+			"#gz_liushan:die": "别……别打脸，我投降还不行吗？",
+			"#gz_menghuo:die": "七纵之恩……来世……再报了……",
+			"#gz_zhurong:die": "大王，我，先走一步了……",
+			"#gz_ganfuren:die": "请替我照顾好阿斗……",
+			"#qianhuan1": "幻变迷踪，虽飞鸟亦难觅踪迹。",
+			"#qianhuan2": "幻化于阴阳，藏匿于乾坤。",
+			"#gz_yuji:die": "幻化之物，终是算不得真呐……",
+			"#gz_sunquan:die": "父亲，大哥，仲谋愧矣……",
+			"#gz_ganning:die": "二十年后，又是一条好汉……",
+			"#gz_lvmeng:die": "被看穿了吗……",
+			"#gz_huanggai:die": "失血……过多了……",
+			"#gz_zhouyu:die": "既生瑜，何生……",
+			"#liuli1": "交给你了~",
+			"#liuli2": "你来嘛~",
+			"#gz_daqiao:die": "伯符，我去了……",
+			"#duoshi1": "国之大计，审势为先。",
+			"#duoshi2": "依今日之大势，当行此计。",
+			"#gz_luxun:die": "还以为我已经不再年轻……",
+			"#gz_sunshangxiang:die": "不！还不可以死！",
+			"#gz_sunjian:die": "有埋伏！呃……啊！！",
+			"#gz_xiaoqiao:die": "公瑾，我先走一步……",
+			"#gz_re_taishici:die": "无妄之灾，难以避免……",
+			"#buqu1": "哼，这点小伤算什么！",
+			"#gz_zhoutai:die": "敌众我寡，无力回天……",
+			"#guzheng2": "固国安邦，居当如是！",
+			"#gz_zhangzhang:die": "竭力尽智，死而无憾……",
+			"#gz_dingfeng:die": "这风，太冷了……",
+			"#chulao1": "病入膏肓，需下猛药。",
+			"#chulao2": "病去，如抽丝。",
+			"#gz_huatuo:die": "医者……不能自医啊……",
+			"#gz_lvbu:die": "不可能！",
+			"#lijian1": "嗯呵呵~~呵呵~~",
+			"#biyue1": "失礼了~",
+			"#biyue2": "羡慕吧~",
+			"#gz_diaochan:die": "父亲大人，对不起……",
+			"#gz_yanwen:die": "这红脸长须大将是……",
+			"#gz_jiaxu:die": "我的时辰也到了……",
+			"#jianchu1": "休想全身而退！",
+			"#jianchu2": "杀到你丢盔弃甲！",
+			"#gz_pangde:die": "四面都是水，我命休矣……",
+			"#leiji1": "雷公助我！",
+			"#leiji2": "以我之真气，合天地之造化！",
+			"#guidao1": "哼哼哼哼~",
+			"#guidao2": "天下大势，为我所控。",
+			"#gz_zhangjiao:die": "黄天既覆，苍生何存……",
+			"#gz_caiwenji:die": "人生几何时，怀忧终年岁……",
+			"#gz_mateng:die": "儿子，为爹报仇啊！",
+			"#gz_kongrong:die": "覆巢之下，岂有完卵……",
+			"#shuangren1": "吃我一记三尖两刃刀！",
+			"#gz_jiling:die": "额，将军为何咆哮不断……",
+			"#gz_tianfeng:die": "不纳吾言而反诛吾心，奈何奈何！！",
+			"#kuangfu1": "这家伙还是给我用吧！",
+			"#kuangfu2": "吾乃上将潘凤，可斩华雄！",
+			"#gz_panfeng:die": "潘凤又被华雄斩啦……",
+			"#huoshui1": "别走了，再玩一会儿嘛。",
+			"#huoshui2": "走不动了嘛？",
+			"#qingcheng1": "我和你们真是投缘啊。",
+			"#qingcheng2": "哼，眼睛都直了呀。",
+			"#gz_zoushi:die": "年老色衰了吗？",
+			"#tuntian_gz_dengai1": "击鼓于此，以致四方。",
+			"#tuntian_gz_dengai2": "留得良田在，何愁不破敌？",
+			"#ziliang1": "吃饱了，才有力气为国效力。",
+			"#ziliang2": "兵，断不可无粮啊。",
+			"#jixi_gz_dengai1": "哪里走！！",
+			"#jixi_gz_dengai2": "谁占到先机，谁就胜了。",
+			"#gz_dengai:die": "吾破蜀克敌，竟葬于奸贼之手！",
+			"#gz_caohong:die": "福兮祸所伏……",
+			"#gz_jiangfei:die": "墨守成规，终为其害啊……",
+			"#tiaoxin_gz_jiangwei1": "小小娃娃，乳臭未干。",
+			"#tiaoxin_gz_jiangwei2": "快滚回去，叫你主将出来！",
+			"#yizhi1": "天文地理，丞相所教，维铭记于心。",
+			"#yizhi2": "哪怕只有一线生机，我也不会放弃！",
+			"#tianfu1": "丞相已教我识得此计！",
+			"#tianfu2": "哼，有破绽！",
+			"#gz_jiangwei:die": "我计不成，乃天命也……",
+			"#yicheng1": "不怕死，就尽管放马过来！",
+			"#yicheng2": "待末将布下疑城，以退曹贼。",
+			"#gz_xusheng:die": "可怜一身胆略，尽随一抔黄土……",
+			"#gz_hetaihou:die": "你们男人造的孽，非要说什么红颜祸水……",
+			"#gz_zangba:die": "短刃沉江，负主重托……",
+			"#gz_madai:die": "反骨贼已除，丞相放心……",
+			"#gz_mifuren:die": "阿斗被救，妾身再无牵挂……",
+			"#yingyang1": "此战，我必取胜！",
+			"#yingyang2": "相斗之趣，吾常胜之。",
+			"#yinghun_sunce1": "父亲，助我背水一战！",
+			"#yinghun_sunce2": "孙氏英烈，庇佑江东！",
+			"#gz_sunce:die": "内事不决问张昭，外事不决问周瑜……",
+			"#gz_chendong:die": "杀身为主，死而无憾……",
+			"#baoling1": "待吾大开杀戒，哈哈哈哈！",
+			"#baoling2": "大丈夫，岂能妇人之仁？",
+			"#gz_zhangren:die": "老臣，绝不事二主！",
+			"#zhangwu1": "遁剑归一，有凤来仪。",
+			"#zhangwu2": "剑气化龙，听朕雷动！",
+			"#jizhao1": "仇未报，汉未兴，朕志犹在！",
+			"#jizhao2": "王业不偏安，起师再兴汉！",
+			"#rerende_gz_jun_liubei1": "勿以恶小而为之，勿以善小而不为。",
+			"#rerende_gz_jun_liubei2": "君才十倍于丕，必能安国成事。",
+			"#gz_jun_liubei:die": "若嗣子可辅，辅之。如其不才，君可自取……",
+			"#wuxin1": "冀悟迷惑之心。",
+			"#wuxin2": "吾已明此救世之术矣。",
+			"#hongfa1": "汝等安心，吾乃大贤良师矣。",
+			"#hongfa2": "此法可助汝等脱离苦海。",
+			"#huangjintianbingfu1": "此乃天将天兵，尔等妖孽看着！",
+			"#huangjintianbingfu2": "且作一法，召唤神力！",
+			"#hongfa_hp": "吾有天神护体！",
+			"#wendao1": "诚心求天地之道，救世之法。",
+			"#wendao2": "求太平之法以安天下。",
+			"#gz_jun_zhangjiao:die": "天，真要灭我……",
+			"#jiahe1": "有敌来犯，速速御敌。",
+			"#jiahe2": "来，扶孤上马迎敌！",
+			"#lianzi1": "税以足食，赋以足兵。",
+			"#lianzi2": "府库充盈，国家方能强盛！",
+			"#jubao1": "四海之宝，孤之所爱。",
+			"#jubao2": "夷洲，扶南，辽东，皆大吴臣邦也！",
+			"#gz_jun_sunquan:die": "朕的江山，要倒下了么……",
+			"#gz_liqueguosi:die": "文和之言，诚不欺我……",
+			"#yigui1": "百鬼众魅，自缚见形。",
+			"#yigui2": "来去无踪，众谓诡异。",
+			"#jihun1": "魂聚则生，魂散则弃。",
+			"#jihun2": "魂羽化游，以辅四方。",
+			"#gz_zuoci:die": "腾云跨风，飞升太虚……",
+			"#gz_bianfuren:die": "心肝涂地，惊愕断绝……",
+			"#gz_xunyou:die": "主公何日再得无忧？",
+			"#xuanlve1": "强敌破阵，斩将于须臾！",
+			"#xuanlve2": "轻装急袭，破敌于千里！",
+			"#yongjin1": "冲啊，扬我东吴之勇！",
+			"#yongjin2": "东吴虎威，岂是尔等可犯！",
+			"#gz_lingtong:die": "大丈夫不惧死亡……",
+			"#gz_lvfan:die": "闻主公欲授大司马之职，容臣不能……谢恩了……",
+			"#gz_shamoke:die": "五溪蛮夷，不可能输！",
+			"#gz_lingcao:die": "呃啊！（扑通）此箭……何来……",
+			"#gz_lifeng:die": "吾，有负丞相重托……",
+			"#gz_beimihu:die": "我还会从黄泉比良坂回来的……",
+			"#gz_jianggan:die": "丞相，再给我一次机会啊！",
+			"#gz_huaxin:die": "大举发兵，劳民伤国……",
+			"#gz_luyusheng:die": "父亲，郁生甚是想念……",
+			"#gz_zongyu:die": "吾年逾七十，唯少一死耳……",
+			"#gzkuangcai1": "耳所瞥闻，不忘于心。",
+			"#gzkuangcai2": "吾焉能从屠沽儿耶？",
+			"#gzshejian1": "伤人的，可不止刀剑！",
+			"#gzshejian2": "死公！云等道？",
+			"#gz_miheng:die": "恶口……终至杀身……",
+			"#gz_fengxi:die": "乡音未改双鬓苍，身陷北国有义求……",
+			"#gzjianliang1": "岂曰少衣食，与君共袍泽！",
+			"#gzjianliang2": "义士同心力，粮秣应期来！",
+			"#gzweimeng1": "此礼献于友邦，共赴兴汉大业！",
+			"#gzweimeng2": "吴有三江之守，何故委身侍魏？",
+			"#gz_dengzhi:die": "伯约啊，我帮不了你了……",
+			"#gzduannian1": "断思量，莫思量。",
+			"#gzduannian2": "一别两宽，不负相思。",
+			"#gzlianyou1": "莲花佑兴，业火可兴。",
+			"#gzlianyou2": "昔日莲花开，今日红火燃。",
+			"#gz_zhouyi:die": "江水寒，萧瑟起……",
+			"#anyong2": "冀州暗潮汹涌，群仕居危思变。",
+			"#gz_lvlingqi:die": "父亲，女儿好累……",
+			"#gz_dc_yanghu:die": "臣死之后，杜元凯可继之……",
+			"#gz_cuimao:die": "为世所痛惜，冤哉……",
+			"#gz_yujin:die": "我，无颜面对丞相了……",
+			"#jianglue1": "奇谋为短，将略为要。",
+			"#jianglue2": "为将者，需有谋略。",
+			"#gz_wangping:die": "无当飞军，也有困于深林之时……",
+			"#gz_fazheng:die": "辅翼既折，蜀汉衰矣……",
+			"#gz_wuguotai:die": "卿等，务必用心辅佐仲谋……",
+			"#keshou1": "仁以待民，自处不败之势。",
+			"#keshou2": "宽济百姓，则得战前养备之机。",
+			"#gz_lukang:die": "抗仅以君子之交待叔子，未有半分背国之念啊！",
+			"#gz_yuanshu:die": "可恶！就差……一步了……",
+			"#gzfudi1": "弃暗投明，为明公计！",
+			"#gzfudi2": "绣虽有降心，奈何贵营难容。",
+			"#drlt_congjian1": "听君谏言，去危亡，保宗祀！",
+			"#gz_zhangxiu:die": "若失文和，吾将何归？",
+			"#jianan1": "行为军锋，还为后拒！",
+			"#jianan2": "行为军锋，还为后拒！",
+			"#huibian1": "吾任天下之智力，以道御之，无所不可。",
+			"#huibian2": "青青子衿，悠悠我心，但为君故，沉吟至今。",
+			"#gzzongyu1": "驾六龙，乘风而行。行四海，路下之八邦。",
+			"#gzzongyu2": "齐桓之功，为霸之首，九合诸侯，一匡天下。",
+			"#gz_jun_caocao:die": "神龟虽寿，犹有竟时。腾蛇乘雾，终为土灰……",
+			"#sanchen1": "陈书弼国，当一而再、再而三。",
+			"#gz_duyu:die": "金瓯尚缺，死难瞑目……",
+			"#gz_zhanghuyuechen:die": "儿有辱……父亲威名……",
+			"#gz_simazhou:die": "恩赐重物，病身难消受……",
+			"#gz_shibao:die": "寒门出身，难以擢升……",
+			"#gz_weiguan:die": "辞荣善终，不可求……",
+			"#gz_zhongyan:die": "嗟尔姜任，邈不我留……",
+			"#gz_yangyan:die": "一旦殂损，痛悼伤怀……",
+			"#gz_zuofen:die": "惨怆愁悲……",
+			"#gz_xuangongzhu:die": "元凯，我去也……",
+			"#gz_xinchang:die": "宪英，救我！",
+			"#gz_yangzhi:die": "贾氏……构陷……",
+			"#gz_liaohua:die": "今后，就靠你们啦……",
+			"#mingzhe2": "塞翁失马，焉知非福？",
+			"#gz_zhugejin:die": "君臣不相负，来世复君臣……",
+			"#gz_yangxiu:die": "我固自以死之晚也……",
+			"#gz_zumao:die": "孙将军，已经，安全了吧……",
+			"#gz_fuwan:die": "后会有期……",
+			"#gz_chendao:die": "我的白毦兵，再也不能为先帝出力了……",
+			"#twzhenxi2": "震疆扫寇，袭贼平戎！",
+			"#gz_guohuai:die": "姜维小儿，竟然……",
+			"#gz_guanqiujian:die": "峥嵘一生，然被平民所击射！",
+			"#gz_zhujun:die": "乞降不受，愿一战！",
+			"#gz_chengong:die": "请出就戮！",
+			"#gz_yangwan:die": "遇人不淑……",
+			"#gz_wangling:die": "一生尽忠事魏，不料，今日晚节尽毁啊！",
+			"#gz_yanyan:die": "宁可断头死，安能屈膝降！",
+			"#mobiledanshou1": "此诚危难，我定当竭尽全力！",
+			"#gz_gaoshun:die": "生死有命……",
+			"#weishu2": "吴人来犯，当用心戒备。",
 		},
 		junList: ["liubei", "zhangjiao", "sunquan", "caocao"],
 		guozhanPile_yingbian: [

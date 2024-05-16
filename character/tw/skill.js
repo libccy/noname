@@ -458,19 +458,16 @@ const skills = {
 				trigger: { global: "damageBegin1" },
 				filter(event, player) {
 					if (event.getParent().type != "card" || event.card.name != "juedou" || !event.player.isIn()) return false;
-					const evt = game.getGlobalHistory("useCard", evt => evt.card == event.card)[0];
-					if (evt && evt.targets && (event.player != player || player.countCards("h"))) {
-						if (evt.player == player) {
-							return evt.targets.includes(event.player) && event.player != player;
-						}
-						return evt.targets.includes(player) && evt.player != player;
+					const evt = event.getParent()
+					if (evt && evt.targets && (event.player != player || player.countCards("h") > 0)) {
+						return (evt.player === player || evt.targets.includes(player));
 					}
 					return false;
 				},
 				forced: true,
 				popup: false,
 				async content(event, trigger, player) {
-					await player.logSkill("twxiayong" + (trigger.player === player ? "1" : "2"), trigger.player);
+					player.logSkill("twxiayong" + (trigger.player === player ? "1" : "2"), trigger.player);
 					if (trigger.player === player) {
 						const cards = player.getCards("h", card => {
 							return lib.filter.cardDiscardable(card, player, "twxiayong");
@@ -6260,7 +6257,7 @@ const skills = {
 					var history = current.getHistory("useCard");
 					if (!history.length) return false;
 					for (var evt of history) {
-						if (evt.card && evt.card.name == "shunshou") {
+						if (evt.card && evt.card.name == "shunshou" && evt.getParent("phaseUse") === event.getParent("phaseUse")) {
 							targets.addArray(evt.targets);
 						}
 					}
@@ -8263,6 +8260,9 @@ const skills = {
 				},
 			},
 		},
+		ai:{
+			combo: "twzhenliang",
+		},
 	},
 	twzhenliang: {
 		group: ["twzhenliang_1", "twzhenliang_2"],
@@ -8888,7 +8888,7 @@ const skills = {
 				charlotte: true,
 				ai: {
 					effect: {
-						player_use: function (card, player, target) {
+						player_use(card, player, target) {
 							if (
 								card.cards &&
 								card.cards.some(i => i.hasGaintag("twkujianx")) &&
@@ -9519,7 +9519,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (card.name == "sha" && player.hp > target.hp && get.attitude(player, target) < 0) {
 						var num = get.number(card);
 						var bs = player.getCards("h", function (cardx) {
@@ -13976,7 +13976,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current, isLink) {
+				target_use(card, player, target, current, isLink) {
 					if (card.name == "sha" && !isLink) return 0.8;
 				},
 			},
@@ -14317,7 +14317,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (get.type(card) !== "delay" && get.type(card) !== "equip") return 1;
 							let za = game.findPlayer(cur => cur.hasSkill("twzhian") && (!cur.storage.counttrigger || !cur.storage.counttrigger.twzhian) && get.attitude(player, cur) <= 0);
 							if (za) return [0.5, -0.8];
@@ -14737,12 +14737,12 @@ const skills = {
 			order: 2.9,
 			result: {
 				target: function (player, target) {
+					if (get.attitude(player, target) >= 0) return -20;
 					var cards = ui.selected.cards.slice(0);
 					var names = [];
 					for (var i of cards) names.add(i.name);
 					if (names.length < player.hp) return 0;
 					if (player.hasUnknown() && (player.identity != "fan" || !target.isZhu)) return 0;
-					if (get.attitude(player, target) >= 0) return -20;
 					return lib.card.sha.ai.result.target.apply(this, arguments);
 				},
 			},
@@ -15588,7 +15588,6 @@ const skills = {
 		limited: true,
 		skillAnimation: true,
 		animationColor: "orange",
-		forceunique: true,
 		filter: function (event, player) {
 			return player.countMark("fanghun") > 0;
 		},

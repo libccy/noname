@@ -640,6 +640,7 @@ export const Content = {
 		event.originGroup = player.group;
 		if (!event.group) event.group = player.group;
 		var group = event.group;
+		game.addVideo("changeGroup", player, group);
 		player.getHistory("custom").push(event);
 		if (event.broadcast !== false) {
 			game.broadcast(
@@ -2774,7 +2775,7 @@ export const Content = {
 		if (ui.updateVideoMenu) {
 			ui.updateVideoMenu();
 		}
-		_status.videoDuration = 1;
+		_status.videoDuration = 1 / parseFloat(lib.config.video_default_play_speed.slice(0, -1));
 		ui.create.system("返回", function () {
 			var mode = localStorage.getItem(lib.configprefix + "playbackmode");
 			if (mode) {
@@ -2787,6 +2788,14 @@ export const Content = {
 			game.playVideo(_status.playback, lib.config.mode);
 		});
 		ui.create.system("暂停", ui.click.pause, true).id = "pausebutton";
+		var atempo = ui.create.system(
+			"原速",
+			function () {
+				_status.videoDuration = 1;
+				updateDuration();
+			},
+			true
+		);
 		var slow = ui.create.system(
 			"减速",
 			function () {
@@ -2804,6 +2813,7 @@ export const Content = {
 			true
 		);
 		var updateDuration = function () {
+			atempo.innerHTML = `原速(当前${Math.round(100 / _status.videoDuration) / 100}倍速)`;
 			if (_status.videoDuration > 1) {
 				slow.classList.add("glow");
 			} else {
@@ -2815,6 +2825,7 @@ export const Content = {
 				fast.classList.remove("glow");
 			}
 		};
+		updateDuration();
 		ui.system.style.display = "";
 		ui.refresh(ui.system);
 		ui.system.show();
@@ -3006,16 +3017,10 @@ export const Content = {
 		//提前phaseBefore时机解决“游戏开始时”时机和“一轮开始时”先后
 		event.trigger("phaseBefore");
 		"step 1";
+		game.phaseNumber++;
 		//初始化阶段列表
 		if (!event.phaseList) {
-			event.phaseList = [
-				"phaseZhunbei",
-				"phaseJudge",
-				"phaseDraw",
-				"phaseUse",
-				"phaseDiscard",
-				"phaseJieshu",
-			];
+			event.phaseList = ["phaseZhunbei", "phaseJudge", "phaseDraw", "phaseUse", "phaseDiscard", "phaseJieshu"];
 		}
 		if (typeof event.num != "number") {
 			event.num = 0;
@@ -3029,11 +3034,7 @@ export const Content = {
 			} else if (_status.seatNumSettled) {
 				var seatNum = player.getSeatNum();
 				if (seatNum != 0) {
-					if (
-						get.itemtype(_status.lastPhasedPlayer) != "player" ||
-						seatNum < _status.lastPhasedPlayer.getSeatNum()
-					)
-						isRound = true;
+					if (get.itemtype(_status.lastPhasedPlayer) != "player" || seatNum < _status.lastPhasedPlayer.getSeatNum()) isRound = true;
 					_status.lastPhasedPlayer = player;
 				}
 			} else if (player == _status.roundStart) isRound = true;
@@ -3111,7 +3112,6 @@ export const Content = {
 		while (ui.dialogs.length) {
 			ui.dialogs[0].close();
 		}
-		game.phaseNumber++;
 		player.phaseNumber++;
 		game.broadcastAll(
 			function (player, num, popup) {
@@ -3140,11 +3140,7 @@ export const Content = {
 		game.log();
 		game.log(player, "的回合开始");
 		player._noVibrate = true;
-		if (
-			get.config("identity_mode") != "zhong" &&
-			get.config("identity_mode") != "purple" &&
-			!_status.connectMode
-		) {
+		if (get.config("identity_mode") != "zhong" && get.config("identity_mode") != "purple" && !_status.connectMode) {
 			var num;
 			switch (get.config("auto_identity")) {
 				case "one":
@@ -3163,12 +3159,7 @@ export const Content = {
 					num = 0;
 					break;
 			}
-			if (
-				num &&
-				!_status.identityShown &&
-				game.phaseNumber > game.players.length * num &&
-				game.showIdentity
-			) {
+			if (num && !_status.identityShown && game.phaseNumber > game.players.length * num && game.showIdentity) {
 				if (!_status.video) player.popup("显示身份");
 				_status.identityShown = true;
 				game.showIdentity(false);
@@ -8785,42 +8776,9 @@ export const Content = {
 			game.dead.push(player);
 			_status.dying.remove(player);
 
-			if (lib.config.background_speak) {
-				const name = player.skin.name || player.name;
-				const goon = !lib.character[name];
-				if (goon)
-					lib.character[name] = [
-						"",
-						"",
-						0,
-						[],
-						((lib.characterSubstitute[player.name] || []).find((i) => i[0] == name) || [
-							name,
-							[],
-						])[1],
-					];
-				if (lib.character[name][4].some((tag) => /^die:.+$/.test(tag))) {
-					var tag = lib.character[name][4].find((tag) => /^die:.+$/.test(tag));
-					var reg = new RegExp("^ext:(.+)?/");
-					var match = tag.match(/^die:(.+)$/);
-					if (match) {
-						var path = match[1];
-						if (reg.test(path)) path = path.replace(reg, (_o, p) => `../extension/${p}/`);
-						game.playAudio(path);
-					}
-				} else if (lib.character[name][4].some((tag) => tag.startsWith("die_audio"))) {
-					var tag = lib.character[name][4].find((tag) => tag.startsWith("die_audio"));
-					var list = tag.split(":").slice(1);
-					game.playAudio("die", list.length ? list.randomGet() : name);
-				} else {
-					game.playAudio("die", name, function () {
-						game.playAudio("die", name.slice(name.indexOf("_") + 1));
-					});
-				}
-				if (goon) delete lib.character[name];
-			}
 		}, player);
 
+		game.tryDieAudio(player);
 		game.addVideo("diex", player);
 		if (event.animate !== false) {
 			player.$die(source);

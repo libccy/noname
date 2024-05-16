@@ -1461,12 +1461,10 @@ export class Game {
 	 * @returns { string[] }  语音地址列表
 	 */
 	parseSkillText(skill, player, skillInfo) {
-		const audios = game.parseSkillTextMap(skill, player, skillInfo);
-		const voiceMap = [];
-		audios.forEach(audioname => {
-			if(audioname.text) voiceMap.push(audioname.text);
-		});
-		return voiceMap;
+		return game
+			.parseSkillTextMap(skill, player, skillInfo)
+			.map(data => data.text)
+			.filter(Boolean);
 	}
 	/**
 	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表及其对应的源文件名
@@ -1476,43 +1474,47 @@ export class Game {
 	 * @returns { any[] }  语音地址列表
 	 */
 	parseSkillTextMap(skill, player, skillInfo) {
-		if (typeof player === "string") player = { name: player };
-		else if (typeof player !== "object" || player === null) player = {};
+		if (typeof player === "string") player = get.convertedCharacter({ name: player });
+		else if (typeof player !== "object" || player === null) player = get.convertedCharacter({ isNull: true });
 
 		if (skillInfo && (typeof skillInfo !== "object" || Array.isArray(skillInfo))) skillInfo = { audio: skillInfo };
 
-		const checkSkill = (skill, history) => {
-			if (!lib.skill[skill]) return false;
+		const defaultInfo = [true, 2];
+
+		const check = (skill, history) => {
+			if (!get.info(skill)) return false;
 			if (!history.includes(skill)) return true;
 			if (history[0] === skill) return false;
 			//deadlock
-			throw new RangeError(`parseSkillAudio: ${skill} in ${history}forms a deadlock`);
+			throw new RangeError(`parseSkillTextMap: ${skill} in ${history} forms a deadlock`);
 		};
 
 		const getName = filter => {
 			const name = (player.tempname || []).find(i => filter(i));
-			return (
-				name ||
-				[player.name, player.name1, player.name2].reduce((result, name) => {
+			if (name) return name;
+			return [player.name, player.name1, player.name2].reduce(
+				(result, name) => {
 					if (result) return result;
 					if (!name) return result;
 					if (filter(name)) return name;
-					let tempname = (get.character(name).trashBin || []).find(tag => tag.startsWith("tempname:"));
-					if (!tempname) return result;
-					tempname = tempname
-						.split(":")
-						.slice(1)
-						.find(i => filter(i));
-					return tempname || result;
-				}, void 0)
+					return get.character(name).tempname.find(i => filter(i)) || result;
+				},
+				void 0
 			);
 		};
 
-		function getAudioList(skill, options, skillInfo) {
-			const info = skillInfo || lib.skill[skill];
+		const getTextMap = (path, name, ext, isDefault) => ({
+			name,
+			file: `${path}${name}${ext}`,
+			text: lib.translate[`#${name}`],
+			isDefault,
+		});
+
+		const getAudioList = (skill, options, skillInfo) => {
+			const info = skillInfo || get.info(skill);
 			if (!info) {
-				console.error(new ReferenceError(`parseSkillAudio: Cannot find ${skill} in lib.skill`));
-				return parseAudio(skill, options, [true, 2]);
+				console.error(new ReferenceError(`parseSkillTextMap: Cannot find ${skill} in lib.skill`));
+				return parseAudio(skill, Object.assign(options, { isDefault: true }), defaultInfo);
 			}
 
 			const { audioname, history } = options;
@@ -1520,65 +1522,166 @@ export class Game {
 			let audioInfo = info.audio;
 			if (Array.isArray(info.audioname)) audioname.addArray(info.audioname);
 			if (info.audioname2) audioInfo = info.audioname2[getName(i => info.audioname2[i])] || audioInfo;
-			if (typeof audioInfo === "function") audioInfo = audioInfo(player);
 
 			return parseAudio(skill, options, audioInfo);
-		}
+		};
 
-		function parseAudio(skill, options, audioInfo) {
+		const parseAudio = (skill, options, audioInfo) => {
 			const audioname = options.audioname.slice();
 			const history = options.history.slice();
-			options = { audioname, history };
+			const isDefault = options.isDefault;
+			options = { audioname, history, isDefault };
 			if (Array.isArray(audioInfo)) {
-				if (typeof audioInfo[0] === "string" && typeof audioInfo[1] === "number") {
-					// [audioname, number]
-					if (checkSkill(audioInfo[0], history)) return getAudioList(audioInfo[0], options).slice(0, audioInfo[1]);
-					return parseAudio(audioInfo[0], options, audioInfo[1]);
+				if (audioInfo.length === 2 && typeof audioInfo[0] === "string" && typeof audioInfo[1] === "number") {
+					const [name, number] = audioInfo;
+					if (check(name, history)) return getAudioList(name, options).slice(0, number);
+					return parseAudio(name, options, number);
 				}
-				return audioInfo.reduce((total, i) => total.addArray(parseAudio(skill, options, i)), []);
+
+				const map = {};
+				audioInfo.forEach(i => {
+					parseAudio(skill, options, i).forEach(data => (map[data.name] = data));
+				});
+				return Object.values(map);
 			}
 
-			if (!["string", "number", "boolean"].includes(typeof audioInfo)) return parseAudio(skill, options, [true, 2]);
+			if (!["string", "number", "boolean"].includes(typeof audioInfo)) return parseAudio(skill, Object.assign(options, { isDefault: true }), defaultInfo);
 			if (audioInfo === false) return [];
-			if (typeof audioInfo === "string" && checkSkill(audioInfo, history)) return getAudioList(audioInfo, options);
-
+			if (typeof audioInfo === "string") {
+				if (["data:", "blob:"].some(prefix => audioInfo.startsWith(prefix))) return [getTextMap("", audioInfo, "", isDefault)];
+				if (check(audioInfo, history)) return getAudioList(audioInfo, options);
+			}
 			audioInfo = String(audioInfo);
-			let list = audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/); // [path, number|true, format]
-			if (!list) {
-				let path = "",
-					format = "";
-				if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
-				if (!/\.\w+$/.test(audioInfo) && !["data:", "blob:"].some(name => audioInfo.startsWith(name))) format = ".mp3";
-				if (path && format) return parseAudio(audioInfo, options, [true, 2]);
-				
-				const key = audioInfo, file = `${path}${audioInfo}${format}`;
-				const data = {key, file};
-				if(lib.translate[`#${key}`]) data.text = lib.translate[`#${key}`];
-				return [data];
+			const list = audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/); // [path, number|true, ext]
+			if (list) {
+				let [, path = "skill", audioNum, ext = "mp3"] = list;
+				let _audioname = getName(i => audioname.includes(i));
+				_audioname = _audioname ? `_${_audioname}` : "";
+				if (audioNum === "true") return [getTextMap(`${path}/`, `${skill}${_audioname}`, `.${ext}`, isDefault)];
+				const audioList = [];
+				audioNum = parseInt(audioNum);
+				for (let i = 1; i <= audioNum; i++) {
+					audioList.push(getTextMap(`${path}/`, `${skill}${_audioname}${i}`, `.${ext}`, isDefault));
+				}
+				return audioList;
 			}
 
-			let _audioname = getName(i => audioname.includes(i));
-			_audioname = _audioname ? `_${_audioname}` : "";
-
-			if (list[2] === "true") {
-				const key = `${skill}${_audioname}`, file = `${list[1] || "skill"}/${skill}${_audioname}.${list[3] || "mp3"}`;
-				const data = {key, file};
-				if(lib.translate[`#${key}`]) data.text = lib.translate[`#${key}`];
-				return [data];
-			}
-
-			const audioList = []
-			list[2] = parseInt(list[2]);
-			for (let i = 1; i <= list[2]; i++) {
-				const key = `${skill}${_audioname}${i}`, file = `${list[1] || "skill"}/${skill}${_audioname}${i}.${list[3] || "mp3"}`;
-				const data = {key, file};
-				if(lib.translate[`#${key}`]) data.text = lib.translate[`#${key}`];
-				audioList.push(data);
-			}
-			return audioList;
+			let path = "", ext = "";
+			if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
+			if (!/\.\w+$/.test(audioInfo)) ext = ".mp3";
+			if (path && ext) return parseAudio(audioInfo, Object.assign(options, { isDefault: true }), defaultInfo);
+			//@TODO
+			console.warn(`${skill}中的地址写法(${audioInfo})暂时没有完全支持台词系统。`);
+			return [getTextMap(path, audioInfo, ext, isDefault)];
 		}
 
-		return getAudioList(skill, { audioname: [], history: [] }, skillInfo);
+		return getAudioList(skill, { audioname: [], history: [], isDefault: false }, skillInfo);
+	}
+	/**
+	 * 获取角色死亡时能播放的所有阵亡语音
+	 * @param { string | Player } player  角色名
+	 * @returns { any[] }  语音地址列表
+	 */
+	parseDieTextMap(player) {
+		let name = typeof player === "string" ? player : player.name;
+		let audioInfo;
+		if (typeof player !== "string" && player.skin && player.skin.name) {
+			const skinName = player.skin.name;
+			if (skinName !== name && lib.characterSubstitute[name]) {
+				const skin = lib.characterSubstitute[name].find(i => i[0] === skinName);
+				if (skin) {
+					const newCharacter = get.convertedCharacter(["", "", 0, [], skin[1]]);
+					name = skinName;
+					audioInfo = newCharacter.dieAudios;
+				}
+			}
+		}
+
+		const defaultInfo = true;
+
+		const check = (name, history) => {
+			if (get.character(name).isNull) return false;
+			if (!history.includes(name)) return true;
+			if (history[0] === name) return false;
+			//deadlock
+			throw new RangeError(`parseDieTextMap: ${name} in ${history} forms a deadlock`);
+		};
+
+		const getTextMap = (path, name, ext, isDefault) => ({
+			name,
+			file: `${path}${name}${ext}`,
+			text: lib.translate[`#${name}:die`],
+			isDefault,
+		});
+
+		const getAudioList = (name, options, audioInfo) => {
+			if (!audioInfo) {
+				const info = get.character(name);
+				if (info.isNull) {
+					// console.error(new ReferenceError(`parseDieTextMap: Cannot find ${name} in lib.character`));
+					return parseAudio(name, Object.assign(options, { isDefault: true }), defaultInfo);
+				}
+				audioInfo = info.dieAudios;
+			}
+
+			if (audioInfo.length === 0) audioInfo = void 0;
+
+			const { history } = options;
+			history.unshift(name);
+
+			return parseAudio(name, options, audioInfo);
+		};
+
+		const parseAudio = (name, options, audioInfo) => {
+			const history = options.history.slice();
+			const isDefault = options.isDefault;
+			options = { history, isDefault };
+			if (Array.isArray(audioInfo)) {
+				// if (audioInfo.length === 2 && typeof audioInfo[0] === "string" && typeof audioInfo[1] === "number") {
+				//     const [name, number] = audioInfo;
+				//     if (check(name, history)) return getAudioList(name, options).slice(0, number);
+				//     return parseAudio(name, options, number);
+				// }
+
+				const map = {};
+				audioInfo.forEach(i => {
+					parseAudio(name, options, i).forEach(data => (map[data.name] = data));
+				});
+				return Object.values(map);
+			}
+
+			if (!["string", "number", "boolean"].includes(typeof audioInfo)) return parseAudio(name, Object.assign(options, { isDefault: true }), defaultInfo);
+			if (audioInfo === false) return [];
+			if (typeof audioInfo === "string") {
+				if (["data:", "blob:"].some(prefix => audioInfo.startsWith(prefix))) return [getTextMap("", audioInfo, "", isDefault)];
+				if (check(audioInfo, history)) return getAudioList(audioInfo, options);
+			}
+			audioInfo = String(audioInfo);
+			const list = audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/); // [path, number|true, ext]
+			if (list) {
+				let [, path = "die", audioNum, ext = "mp3"] = list;
+
+				if (audioNum === "true") return [getTextMap(`${path}/`, `${name}`, `.${ext}`, isDefault)];
+
+				const audioList = [];
+				audioNum = parseInt(audioNum);
+				for (let i = 1; i <= audioNum; i++) {
+					audioList.push(getTextMap(`${path}/`, `${name}${i}`, `.${ext}`, isDefault));
+				}
+				return audioList;
+			}
+
+			let path = "",
+				ext = "";
+			if (!/^db:|^ext:|\//.test(audioInfo)) path = "die/";
+			if (!/\.\w+$/.test(audioInfo)) ext = ".mp3";
+			if (path && ext) return parseAudio(audioInfo, Object.assign(options, { isDefault: true }), defaultInfo);
+			//@TODO
+			console.warn(`${name}中的地址写法(${audioInfo})暂时没有完全支持台词系统。`);
+			return [getTextMap(path, audioInfo, ext, isDefault)];
+		};
+
+		return getAudioList(name, { history: [], isDefault: false }, audioInfo);
 	}
 	/**
 	 *
@@ -1596,13 +1699,43 @@ export class Game {
 		if (!lib.config.background_speak) return;
 		if (info.direct && !directaudio) return;
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
-
 		let audio,
-			list = game.parseSkillAudio(skill, player, skillInfo).randomSort();
+			list = game.parseSkillTextMap(skill, player, skillInfo).randomSort();
 		return (function play() {
 			if (!list.length) return;
 			audio = list.shift();
-			return game.playAudio(audio, play);
+			return game.playAudio(audio.file, play);
+		})();
+	}
+	/**
+	 * @param { Player | string } player
+	 * @returns
+	 */
+	tryDieAudio(player) {
+		game.broadcast(game.tryDieAudio, player);
+		if (!lib.config.background_speak) return;
+
+		let playerName;
+		if (typeof player === "string") playerName = player;
+		else if (player.skin && player.skin.name) playerName = player.skin.name;
+		else playerName = player.name;
+
+		let audio,
+			isDefault,
+			list = game.parseDieTextMap(player).randomSort();
+		const check = () => {
+			if (list.length) return true;
+			if (!audio) return false;
+			if (!audio.isDefault) return false;
+			if (!playerName.includes("_")) return false;
+			playerName = playerName.slice(playerName.indexOf("_") + 1);
+			list = game.parseDieTextMap(playerName).randomSort();
+			return check();
+		};
+		return (function play() {
+			if (!check()) return;
+			audio = list.shift();
+			return game.playAudio(audio.file, play);
 		})();
 	}
 	/**
@@ -2945,6 +3078,11 @@ export class Game {
 			player.node["avatar" + map.name.slice(4)].show();
 			if (goon) delete lib.character[map.to];
 		},
+		changeGroup: function (player, targetGroup) {
+			if (!player || !targetGroup) return;
+			player.group = targetGroup;
+			player.node.name.dataset.nature = get.groupnature(targetGroup);
+		},
 		skill: function (player, content) {
 			if (typeof content == "string") {
 				if (lib.skill[content]) lib.skill[content].video(player);
@@ -3270,8 +3408,21 @@ export class Game {
 		},
 		removeGaintag: function (player, content) {
 			if (player && content) {
-				if (Array.isArray(content)) player.removeGaintag.apply(player, content);
-				else player.removeGaintag(content);
+				if (Array.isArray(content)) {
+					const checkMatch = function (l1, l2) {
+						for (var i = 0; i < l1.length; i++) {
+							for (var j = 0; j < l2.length; j++) {
+								if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
+									l2[j].addGaintag(content[0]);
+									l2.splice(j--, 1);
+									break;
+								}
+							}
+						}
+					};
+					// player.removeGaintag.apply(player, content);
+					checkMatch(content[1], player.getCards("h"));
+				} else player.removeGaintag(content);
 			} else {
 				console.log(player);
 			}
@@ -5760,19 +5911,19 @@ export class Game {
 			// 数组形式
 			if ("contents" in event && Array.isArray(event.contents)) {
 				/*
-				event.contents[step](event, trigger, player, _storeEvent).then((evt) => {
-					if (evt) event._storeEvent = evt;
-					if (game.executingAsyncEventMap.has(event.toEvent())) {
-						game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
-							if (event.step >= event.contents.length - 1) event.finish();
-							resolve();
-						}));
-					} else {
-						if (event.step >= event.contents.length - 1) event.finish();
-						resolve();
-					}
-				});
-				*/
+			   event.contents[step](event, trigger, player, _storeEvent).then((evt) => {
+				   if (evt) event._storeEvent = evt;
+				   if (game.executingAsyncEventMap.has(event.toEvent())) {
+					   game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
+						   if (event.step >= event.contents.length - 1) event.finish();
+						   resolve();
+					   }));
+				   } else {
+					   if (event.step >= event.contents.length - 1) event.finish();
+					   resolve();
+				   }
+			   });
+			   */
 				// 解决不了问题...就把问题统一
 				const run = async event => {
 					if (typeof event.step !== "number") event.step = 0;
@@ -6936,7 +7087,7 @@ export class Game {
 			for (let i = 0; i < event.config.size; i++) {
 				ui.window.appendChild(event.nodes[i]);
 			}
-			"step 1";
+			("step 1");
 			let rand1 = event.config.first;
 			if (rand1 == "rand") {
 				rand1 = Math.random() < 0.5;
@@ -6973,7 +7124,7 @@ export class Game {
 			}
 			game.delay();
 			lib.init.onfree();
-			"step 2";
+			("step 2");
 			if (event.checkredo()) return;
 			if (event._skiprest) return;
 			if (event.side < 2) {
@@ -6989,7 +7140,7 @@ export class Game {
 				event.aiMove();
 				game.delay();
 			}
-			"step 3";
+			("step 3");
 			if (typeof event.fast == "number" && get.time() - event.fast <= 1000) {
 				event.fast = true;
 			} else {
@@ -7024,7 +7175,7 @@ export class Game {
 					game.delay();
 				}
 			}
-			"step 4";
+			("step 4");
 			if (event.checkredo()) return;
 			if (event.skipnode) event.skipnode.delete();
 			if (event.replacenode) event.replacenode.delete();
@@ -7043,7 +7194,7 @@ export class Game {
 				}
 			}
 			game.delay();
-			"step 5";
+			("step 5");
 			event.prompt("选择" + get.cnNumber(event.config.num) + "名出场武将");
 			event.enemylist = [];
 			for (let i = 0; i < event.avatars.length; i++) {
@@ -7073,7 +7224,7 @@ export class Game {
 				event.nodes[i].hide();
 			}
 			game.pause();
-			"step 6";
+			("step 6");
 			event.promptbar.delete();
 			if (ui.cardPileButton) ui.cardPileButton.style.display = "";
 			lib.onresize.remove(event.resize);
@@ -7780,7 +7931,7 @@ export class Game {
 							game.reload2();
 							resolve(result);
 						};
-				  }
+					}
 				: (resolve, reject) => {
 						lib.status.reload++;
 						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
@@ -7810,7 +7961,7 @@ export class Game {
 							game.reload2();
 							resolve(object);
 						};
-				  }
+					}
 		);
 	}
 	/**
@@ -7864,7 +8015,7 @@ export class Game {
 						game.reload2();
 						resolve(event);
 					};
-			  })
+				})
 			: game.getDB(storeName).then(object => {
 					const keys = Object.keys(object);
 					lib.status.reload += keys.length;
@@ -7885,7 +8036,7 @@ export class Game {
 								})
 						)
 					);
-			  });
+				});
 	}
 	/**
 	 * @param { string } key

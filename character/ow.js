@@ -180,7 +180,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (_status.woliu2_temp) return;
 							if (card.name == "sha" && target.storage.woliu2) {
 								_status.woliu2_temp = true;
@@ -266,7 +266,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (card.name == "sha") {
 								if (_status.event.name == "qianggu2") return;
 								if (get.attitude(player, target) > 0) return;

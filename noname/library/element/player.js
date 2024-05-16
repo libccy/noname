@@ -5848,6 +5848,7 @@ export class Player extends HTMLDivElement {
 			return get.is.sameNature(natures, naturesx);
 		};
 		if (next.hasNature("poison")) delete next._triggered;
+		else if(next.unreal) next._triggered = 2;
 		next.setContent("damage");
 		next.filterStop = function () {
 			if (this.source && this.source.isDead()) delete this.source;
@@ -9066,6 +9067,7 @@ export class Player extends HTMLDivElement {
 		game.expandSkills(skills);
 		for (var i = 0; i < skills.length; i++) {
 			var ifo = get.info(skills[i]);
+			if (!ifo) continue;
 			if (ifo.hiddenWuxie && info) {
 				if (typeof ifo.hiddenWuxie == "function" && ifo.hiddenWuxie(this, info)) {
 					return true;

@@ -752,8 +752,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						for (var i in lib.characterPack.boss) {
 							if (!lib.character[i]) {
 								if (
-									get.convertedCharacter(lib.characterPack.boss[i]).isJiangeBoss ||
-									get.convertedCharacter(lib.characterPack.boss[i]).isJiangeMech
+									lib.characterPack.boss[i].isJiangeBoss ||
+									lib.characterPack.boss[i].isJiangeMech
 								) {
 									lib.character[i] = lib.characterPack.boss[i];
 								}
@@ -1775,7 +1775,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							game.players[i].node.name_seat = ui.create.div(
 								".name.name_seat",
 								get.verticalStr(
-									get.seatTranslation(_status.firstAct, game.players[i], "absolute")
+									get.seatTranslation(get.distance(_status.firstAct, game.players[i], "absolute"))
 								),
 								game.players[i]
 							);
@@ -1799,7 +1799,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							lib.storage.ladder.current = 900;
 							game.save("ladder", lib.storage.ladder);
 						}
-						ui.ladder = ui.create.system(
+						if(!ui.ladder) ui.ladder = ui.create.system(
 							game.getLadderName(lib.storage.ladder.current),
 							null,
 							true
@@ -2006,7 +2006,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									ui.create.characterDialog(
 										"heightset",
 										event.filterChoice,
-										"precharacter"
+										"character"
 									);
 							}
 						}
@@ -4711,7 +4711,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ctx.stroke();
 			},
 		},
-		jiangeboss: {
+		jiangeboss: Object.assign(new Proxy(
+			{},
+			{
+				set(target, prop, newValue) {
+					return Reflect.set(target, prop, get.convertedCharacter(newValue));
+				},
+			}
+		), {
 			boss_liedixuande: [
 				"male",
 				"shu",
@@ -4874,7 +4881,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				["jiangeboss", "hiddenboss", "bossallowed"],
 				"shu",
 			],
-		},
+		}),
 		cardsFour: [
 			["spade", 7, "sha"],
 			["spade", 8, "sha"],

@@ -1651,7 +1651,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card, player, target) {
+				target_use(card, player, target) {
 					if (target.countCards("he") == 0) return;
 					if (card.name != "sha") return;
 					let min = 1;

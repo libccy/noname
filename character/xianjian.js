@@ -287,7 +287,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						player: function (card, player) {
+						player_use(card, player) {
 							if (_status.currentPhase != player) return;
 							if (get.type(card) == "basic") return;
 							if (get.tag(card, "gain")) return;
@@ -308,9 +308,9 @@ game.import("character", function () {
 				},
 				content: function () {
 					player.storage.yuexing2 = target;
-					player.addTempSkill("yuexing2");
+					player.addTempSkill("yuexing2", "phaseUseAfter");
 					target.storage.yuexing2 = player;
-					target.addTempSkill("yuexing2");
+					target.addTempSkill("yuexing2", "phaseUseAfter");
 				},
 				ai: {
 					order: function () {
@@ -1029,7 +1029,7 @@ game.import("character", function () {
 					reverseEquip: true,
 					threaten: 1.5,
 					effect: {
-						target: function (card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (get.type(card) == "equip") return [1, 3];
 						},
 					},
@@ -2811,7 +2811,7 @@ game.import("character", function () {
 				unique: true,
 				forceunique: true,
 				filter: function () {
-					return Math.random() < 0.5;
+					return Math.random() < 0.5 && [player.name1, player.name2].includes("pal_longkui");
 				},
 				derivation: ["diesha", "guijiang"],
 				content: function () {
@@ -4157,7 +4157,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (
 								target.storage.xjzhimeng2 &&
 								get.type(card, "trick") == get.type(target.storage.xjzhimeng2, "trick")
@@ -4268,7 +4268,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (target == player.next || target == player.previous) return 0.1;
 						},
 					},

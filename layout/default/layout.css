@@ -1958,7 +1958,7 @@ div:not(.handcards) > .card > .info > span,
 .skill {
 	left: 0 !important;
 	width: 70px !important;
-	white-space: nowrap;
+	/*-- white-space: nowrap; --*/
 }
 .skilln {
 	left: 0 !important;

@@ -965,6 +965,20 @@ export class Library {
 					},
 					unfrequent: true,
 				},
+				video_default_play_speed: {
+					name: "默认录像播放速度",
+					init: "1x",
+					intro: "设置播放游戏录像时默认的播放速度",
+					item: {
+						"0.25x": "0.25倍速",
+						"0.5x": "0.5倍速",
+						"1x": "原速",
+						"1.5x": "1.5倍速",
+						"2x": "2倍速",
+						"4x": "4倍速",
+					},
+					unfrequent: true,
+				},
 				max_loadtime: {
 					name: "最长载入时间",
 					intro: "设置游戏从启动到完成载入所需的最长时间，超过此时间未完成载入会报错，若设备较慢或安装了较多扩展可适当延长此时间",
@@ -9318,6 +9332,8 @@ export class Library {
 		none2: "无色",
 		red: "红色",
 		black: "黑色",
+		red2: "红色",
+		black2: "黑色",
 		ok: "确定",
 		ok2: "确定",
 		cancel: "取消",
@@ -12810,7 +12826,8 @@ export class Library {
 						}
 						player.playerid = i;
 						player.nickname = info.nickname;
-						player.changeGroup(info.group, false, "nobroadcast");
+						player.group = info.group;
+						player.node.name.dataset.nature = get.groupnature(info.group);
 						player.identity = info.identity;
 						player.identityShown = info.identityShown;
 						player.hp = info.hp;

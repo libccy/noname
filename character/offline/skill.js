@@ -442,7 +442,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card, player, target) {
+				target_use(card, player, target) {
 					if (card.name == "sha" && !game.hasNature(card) && game.countPlayer(targetx => player.inRange(targetx)) >= 3) return "zerotarget";
 				},
 			},
@@ -1487,7 +1487,7 @@ const skills = {
 			threaten: 100,
 			reverseEquip: true,
 			effect: {
-				player: (card, player, target) => {
+				player_use(card, player, target) {
 					if (typeof card !== "object") return;
 					let suit = get.suit(card);
 					if (
@@ -1506,7 +1506,7 @@ const skills = {
 						}),
 					];
 				},
-				target: (card, player, target) => {
+				target(card, player, target) {
 					if (
 						card.name === "sha" &&
 						!player.hasSkillTag(
@@ -1580,7 +1580,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (card.name === "sha" && game.hasNature(card) && target.hasEmptySlot(2)) return "zeroplayertarget";
 					if (get.subtype(card) == "equip2" && target.isEmpty(2)) return [0.6, -0.8];
 				},
@@ -2290,7 +2290,7 @@ const skills = {
 			threaten: 1.1,
 			combo: "psshiyin",
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					var list = target.getExpansions("psshiyin");
 					for (var cardx of list) {
 						if (get.suit(cardx) == get.suit(card)) return "zeroplayertarget";
@@ -4064,7 +4064,8 @@ const skills = {
 			"step 0";
 			player.give(cards, targets[0], "give");
 			"step 1";
-			targets[0].chooseToCompare(targets[1]);
+			if (targets[0].canCompare(targets[1])) targets[0].chooseToCompare(targets[1]);
+			else event.finish();
 			"step 2";
 			if (result.bool) {
 				targets[1].loseHp();
@@ -6441,7 +6442,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					var type = get.type2(card);
 					var list = target.getExpansions("zuixiang2");
 					for (var i of list) {
@@ -7052,7 +7053,7 @@ const skills = {
 		},
 	},
 	shichou: {
-		//audio:1,
+		audio: true,
 		skillAnimation: true,
 		animationColor: "orange",
 		unique: true,

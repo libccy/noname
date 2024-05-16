@@ -807,11 +807,14 @@ const skills = {
 	},
 	noname_duocai2: { charlotte: true },
 	nsbizhao: {
+		unique: true,
 		trigger: { player: "showCharacterAfter" },
 		forced: true,
 		hiddenSkill: true,
 		filter(event, player) {
-			return event.toShow && event.toShow.includes("ns_yanghu") && player != _status.currentPhase;
+			return event.toShow && event.toShow.some(name => {
+				return get.character(name, 3).includes("nsbizhao");
+			}) && player != _status.currentPhase;
 		},
 		content() {
 			player.addTempSkill("nsbizhao2", {
@@ -1915,6 +1918,13 @@ const skills = {
 		},
 	},
 	nszhihuang: {
+		available(mode) {
+			return (
+				mode == "identity" ||
+				mode == "versus" && (_status.mode == "four" || _status.mode == "guandu") ||
+				mode == "guozhan"
+			);
+		},
 		group: "nszhihuang_damage",
 		trigger: { global: "useCard" },
 		usable: 1,
@@ -3166,7 +3176,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (get.type(card, "trick") == "trick" && get.distance(player, target) > 1) return "zeroplayertarget";
 				},
 			},
@@ -4491,7 +4501,7 @@ const skills = {
 		content() {
 			"step 0";
 			player
-				.chooseTarget("恭俭：将置的牌交给一名体力值大于你的角色", function (card, player, target) {
+				.chooseTarget("恭俭：将弃置的牌交给一名体力值大于你的角色", function (card, player, target) {
 					return target.hp > player.hp;
 				})
 				.set("ai", function (target) {
@@ -4502,6 +4512,9 @@ const skills = {
 				player.line(result.targets, "green");
 				result.targets[0].gain(trigger.cards, "gain2");
 			}
+		},
+		ai: {
+			halfneg: true
 		},
 	},
 	nscaijian: {
@@ -4596,7 +4609,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						target(card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (get.type(card, "trick") == "trick" && _status.currentPhase == player) return "zeroplayertarget";
 						},
 					},
@@ -5175,7 +5188,7 @@ const skills = {
 		trigger: { player: "dieBefore" },
 		forced: true,
 		filter(event, player) {
-			return player.maxHp > 0;
+			return player.maxHp > 0 && event.getParent().name != "giveup";
 		},
 		content() {
 			trigger.cancel();
@@ -5276,7 +5289,7 @@ const skills = {
 				.set("logSkill", "nsduijue");
 			"step 1";
 			if (result.bool) {
-				player.addTempSkill("nsduijue_use");
+				player.addTempSkill("nsduijue_use", "phaseUseAfter");
 				player.storage.nsduijue_use = get.color(result.cards[0]);
 			}
 		},
@@ -5393,7 +5406,7 @@ const skills = {
 		unique: true,
 		forceunique: true,
 		init(player) {
-			if (player.storage.nscongjun_show) return false;
+			if (player.storage.nscongjun_show || ![player.name1, player.name2].includes("ns_huamulan")) return false;
 			var change = function (target) {
 				if (target == player) {
 					var list;
@@ -5424,7 +5437,12 @@ const skills = {
 			show: {
 				trigger: { global: "useCard" },
 				filter(event, player) {
-					return player.getEnemies().includes(event.player) && event.card.name == "wuxie" && event.getRand() < 0.1;
+					return (
+						player.storage.nscongjun_show &&
+						event.card.name == "wuxie" &&
+						event.getRand() < 0.1 &&
+						player.getEnemies().includes(event.player)
+					);
 				},
 				direct: true,
 				skillAnimation: true,
@@ -6220,7 +6238,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card, player, target) {
+				target_use(card, player, target) {
 					if (get.tag(card, "multineg")) {
 						return "zerotarget";
 					}
@@ -6710,9 +6728,11 @@ const skills = {
 			player.draw();
 		},
 		ai: {
-			effect(card, player, target) {
-				if (get.color(card) == "red") return [1, 1];
-			},
+			effect: {
+				target_use(card, player, target) {
+					if (get.color(card) == "red") return [1, 1];
+				},
+			}
 		},
 	},
 	zaiqix: {

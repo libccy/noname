@@ -1042,7 +1042,7 @@ export class Create {
 						.setContent(function () {
 							game.log(player, "投降");
 							player.popup("投降");
-							player.die("nosource").includeOut = true;
+							player.die("nosource").set("_triggered", null).includeOut = true;
 						}).player = player;
 				}
 				if (_status.paused && _status.imchoosing && !_status.auto) {
@@ -1242,7 +1242,6 @@ export class Create {
 			expandall,
 			onlypack,
 			heightset,
-			precharacter,
 			characterx;
 		for (var i = 0; i < arguments.length; i++) {
 			if (arguments[i] === "thisiscard") {
@@ -1251,8 +1250,6 @@ export class Create {
 				expandall = true;
 			} else if (arguments[i] === "heightset") {
 				heightset = true;
-			} else if (arguments[i] == "precharacter") {
-				precharacter = true;
 			} else if (arguments[i] == "characterx") {
 				characterx = true;
 			} else if (
@@ -1982,9 +1979,7 @@ export class Create {
 				dialog.add([list, "vcard"], noclick);
 			}
 		} else {
-			if (precharacter) {
-				dialog.add([list, "precharacter"], noclick);
-			} else if (characterx) {
+			if (characterx) {
 				dialog.add([list, "characterx"], noclick);
 			} else {
 				dialog.add([list, "character"], noclick);
@@ -2020,6 +2015,7 @@ export class Create {
 		input.style.borderRadius = "6px";
 		input.style.fontWeight = "bold";
 		input.style.fontSize = "21px";
+		input.placeholder = "支持正则搜索";
 		let find = ui.create.button(["find", "搜索"], "tdnodes");
 		find.style.display = "inline";
 		let clickfind = function (e) {
@@ -2039,8 +2035,9 @@ export class Create {
 				}
 			}
 		};
-		input.addEventListener("keyup", (e) => {
+		input.addEventListener("keydown", (e) => {
 			if (e.key == "Enter") clickfind(e);
+			e.stopPropagation();
 		});
 		find.listen(clickfind);
 		Searcher.appendChild(input);
@@ -2446,7 +2443,6 @@ export class Create {
 				});
 			}
 		}
-		lib.init.js(lib.assetURL + "game", "pinyinjs", function () {});
 		lib.init.js(lib.assetURL + "game", "keyWords", function () {});
 
 		lib.updateURL =

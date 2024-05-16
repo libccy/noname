@@ -101,10 +101,16 @@ const skills = {
 			effect: {
 				player: function (card, player, target) {
 					if (!get.tag(card, "damage")) return;
-					if (!lib.card[card.name] || !card.cards || !card.cards.length) return [1, 0, 1, -1];
+					if (!lib.card[card.name] || !card.cards || !card.cards.length) return [1, 0, 2, 0];
+					return [1, -1];
+				},
+				target: function (card, player, target) {
+					if (!get.tag(card, "damage")) return;
+					if (!lib.card[card.name] || !card.cards || !card.cards.length) return 2;
 					return [1, -1];
 				},
 			},
+			halfneg: true
 		},
 		subSkill: {
 			effect: {
@@ -591,7 +597,7 @@ const skills = {
 				onremove: true,
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (card.name == player.storage.xiongshu_ai) return "zeroplayertarget";
 						},
 					},
@@ -946,12 +952,15 @@ const skills = {
 		},
 	},
 	gaoling: {
+		unique: true,
 		audio: 2,
 		trigger: { player: "showCharacterAfter" },
 		hiddenSkill: true,
 		filter: function (event, player) {
 			return (
-				event.toShow.includes("xuangongzhu") &&
+				event.toShow.some(name => {
+					return get.character(name, 3).includes("gaoling");
+				}) &&
 				player != _status.currentPhase &&
 				game.hasPlayer(function (current) {
 					return current.isDamaged();
@@ -1640,9 +1649,13 @@ const skills = {
 							.getCards("he", function (card) {
 								return lib.filter.canBeDiscarded(card, player, target);
 							})
+							.map(c => {
+								link: c;
+							})
 							.sort(function (a, b) {
 								return get.buttonValue(b) - get.buttonValue(a);
-							});
+							})
+							.map(b => b.link);
 						if (
 							target.countCards("h") - player.countCards("h") >=
 							Math.max(
@@ -2900,7 +2913,7 @@ const skills = {
 		},
 		content: function () {
 			var stat = player.getStat("skill");
-			if (this.trigger.name === "phaseUse") {
+			if (trigger.name === "phaseUse") {
 				delete stat.xinquanbian;
 			} else {
 				if (!stat.xinquanbian) stat.xinquanbian = 0;

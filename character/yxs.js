@@ -816,7 +816,11 @@ game.import("character", function () {
 				forceunique: true,
 				enable: "phaseUse",
 				filter: function (event, player) {
-					return !player.hasSkill("tongyu_guiyin") && !player.getStat("damage");
+					return (
+						!player.hasSkill("tongyu_guiyin") &&
+						!player.getStat("damage") &&
+						[player.name1, player.name2].includes("yxs_luobinhan")
+					);
 				},
 				derivation: ["lzhangyi", "jimin", "tongyu"],
 				content: function () {
@@ -848,7 +852,11 @@ game.import("character", function () {
 				forceunique: true,
 				enable: "phaseUse",
 				filter: function (event, player) {
-					return player.countCards("he") > 0 && !player.hasSkill("tongyu_guiyin");
+					return (
+						player.countCards("he") > 0 &&
+						!player.hasSkill("tongyu_guiyin") &&
+						[player.name1, player.name2].includes("yxs_luobinhan")
+					);
 				},
 				filterCard: true,
 				position: "he",
@@ -1452,7 +1460,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (get.type(card) == "trick" || card.name == "sha") return "zeroplayertarget";
 						},
 					},
@@ -1773,7 +1781,7 @@ game.import("character", function () {
 				ai: {
 					mingzhi: false,
 					effect: {
-						target: function (card, player, target) {
+						player_use(card, player, target) {
 							if (get.tag(card, "respondShan")) {
 								return 0.8;
 							}
