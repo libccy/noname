@@ -845,7 +845,6 @@ const skills = {
 			return get.prompt("xinfu_zuilun") + "（可获得" + get.cnNumber(num) + "张牌）";
 		},
 		async content(event, trigger, player) {
-			"step 0";
 			let num = 0;
 			const cards = get.cards(3);
 			await game.cardsGotoOrdering(cards);
@@ -1389,7 +1388,6 @@ const skills = {
 			return get.type(event.card) == "trick" && event.targets.length > 1 && player.countCards("he") > 0;
 		},
 		async cost(event, trigger, player) {
-			"step 0";
 			event.result = await player
 				.chooseCardTarget({
 					filterCard: true,
@@ -1590,7 +1588,6 @@ const skills = {
 			return player.countCards("he") > 0;
 		},
 		async cost(event, trigger, player) {
-			"step 0";
 			event.result = await player
 				.chooseCard(get.prompt("kongsheng"), "将任意张牌置于武将牌上", "he", [1, player.countCards("he")])
 				.set("ai", function (card) {
@@ -1630,13 +1627,13 @@ const skills = {
 					return get.type(i, false) == "equip" && player.hasUseTarget(i);
 				});
 				if (cards.length > 0) {
-					let card = cards[0];
+					let [card] = cards;
 					if (cards.length > 1) {
 						const { result } = await player.chooseButton(true, ["选择要使用的装备牌", cards]).set("ai", function (button) {
 							return get.order(button.link);
 						});
 						if (!result.bool) continue;
-						card = result.links[0];
+						[card] = result.links;
 					}
 					await player.chooseUseTarget(card, true);
 				} else break;
@@ -1961,6 +1958,7 @@ const skills = {
 			combo: "nzry_huaiju",
 		},
 	},
+	// ----- 审查分界线喵 ----- 上面的代码已经经过了审查喵
 	nzry_kuizhu: {
 		audio: 2,
 		trigger: {

@@ -513,6 +513,8 @@ export async function boot() {
 	}
 	delete _status.htmlbg;
 
+	const isFirstStartAfterUpdate = !!window.noname_update;
+
 	// 无名杀更新日志
 	if (window.noname_update) {
 		Reflect.set(lib, "version", window.noname_update.version);
@@ -527,7 +529,7 @@ export async function boot() {
 					html`
 						<div
 							style="position: relative;width:50px;height:50px;border-radius:50px;background-image:url('${description
-								.author.avatar_url}');background-size:cover;vertical-align:middle;"
+							.author.avatar_url}');background-size:cover;vertical-align:middle;"
 						></div>
 						${description.author.login}于${description.published_at}发布
 					`.trim(),
@@ -633,12 +635,21 @@ export async function boot() {
 		for (const promise of _status.extensionLoading) {
 			await promise.catch(async (error) => {
 				if (extErrorList.includes(error)) return;
+				extErrorList.add(error);
 				if (!promiseErrorHandler || !promiseErrorHandler.onHandle) return;
 				// @ts-ignore
 				await promiseErrorHandler.onHandle({ promise });
 			});
 		}
 		// await Promise.allSettled(_status.extensionLoading);
+
+		if (isFirstStartAfterUpdate && extErrorList.length) {
+			const stacktraces = extErrorList.map(e => e instanceof Error ? e.stack : String(e)).join("\n\n")
+			// game.saveConfig("update_first_log", stacktraces);
+			if(confirm(`扩展加载出错！是否重新载入游戏？\n本次更新可能导致了扩展出现了错误：\n${stacktraces}`)){
+				game.reload();
+			}
+		}
 
 		_status.extensionLoaded
 			.filter((name) => game.hasExtension(name))
@@ -778,18 +789,18 @@ function initSheet(libConfig) {
 		}
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
 			'#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("' +
-				lib.assetURL +
-				"theme/style/player/" +
-				bstyle +
-				'1.png")}',
+			lib.assetURL +
+			"theme/style/player/" +
+			bstyle +
+			'1.png")}',
 			0
 		);
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
 			'#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("' +
-				lib.assetURL +
-				"theme/style/player/" +
-				bstyle +
-				'3.png")}',
+			lib.assetURL +
+			"theme/style/player/" +
+			bstyle +
+			'3.png")}',
 			0
 		);
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
@@ -818,14 +829,14 @@ function initSheet(libConfig) {
 		if (libConfig.control_style == "wood") {
 			Reflect.get(ui, "css").control_stylesheet = lib.init.sheet(
 				"#window .control,#window .menubutton,#window #system>div>div,#window #system>div>.pressdown2{background-image:" +
-					str +
-					"}"
+				str +
+				"}"
 			);
 		} else {
 			Reflect.get(ui, "css").control_stylesheet = lib.init.sheet(
 				"#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:" +
-					str +
-					"}"
+				str +
+				"}"
 			);
 		}
 	}
