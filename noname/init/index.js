@@ -66,14 +66,18 @@ export function sendUpdate() {
 		if (nonameInitialized && nonameInitialized.includes("com.noname.shijian") && window.noname_shijianInterfaces && typeof window.noname_shijianInterfaces.sendUpdate === 'function') {
 			// 给诗笺版apk的java层传递升级完成的信息
 			// @ts-ignore
-			return window.noname_shijianInterfaces.sendUpdate() + "?sendUpdate=true";
+			const url = new URL(window.noname_shijianInterfaces.sendUpdate());
+			url.searchParams.set("sendUpdate", "true");
+			return url.toString();
 		}
 		// 由理版判断
 		// @ts-ignore
 		if (window.NonameAndroidBridge && typeof window.NonameAndroidBridge.sendUpdate === 'function') {
 			// 给由理版apk的java层传递升级完成的信息
 			// @ts-ignore
-			return window.NonameAndroidBridge.sendUpdate() + "?sendUpdate=true";
+			const url = new URL(window.NonameAndroidBridge.sendUpdate());
+			url.searchParams.set("sendUpdate", "true");
+			return url.toString();
 		}
 	}
 	// 电脑端
@@ -790,7 +794,7 @@ function initSheet(libConfig) {
 			bstyle = bstyle.slice(7);
 		}
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
-				'#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("' +
+			'#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("' +
 				lib.assetURL +
 				"theme/style/player/" +
 				bstyle +
@@ -799,10 +803,10 @@ function initSheet(libConfig) {
 		);
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
 			'#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("' +
-			lib.assetURL +
-			"theme/style/player/" +
-			bstyle +
-			'3.png")}',
+				lib.assetURL +
+				"theme/style/player/" +
+				bstyle +
+				'3.png")}',
 			0
 		);
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
