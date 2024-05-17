@@ -79,14 +79,13 @@ export class GameEventPromise extends Promise {
 									return eventPromise;
 								}
 								const oldEvent = _status.event;
-								if (_status.event != eventPromise) {
-									eventPromise.parent = _status.event;
-									_status.event = eventPromise;
-									game.getGlobalHistory("everything").push(eventPromise);
-								}
-
 								// 处理eventNeutralized反复横跳
 								if (!oldEvent.finished) {
+									if (_status.event != eventPromise) {
+										eventPromise.parent = _status.event;
+										_status.event = eventPromise;
+										game.getGlobalHistory("everything").push(eventPromise);
+									}
 									return game.loop(eventPromise).then(() => {
 										// 有时候event.finished还是false
 										return eventPromise;
@@ -95,6 +94,11 @@ export class GameEventPromise extends Promise {
 								else {
 									if (eventPromise.name == "arrangeTrigger" &&
 										eventPromise.triggername == "eventNeutralized") {
+										if (_status.event != eventPromise) {
+											eventPromise.parent = _status.event;
+											_status.event = eventPromise;
+											game.getGlobalHistory("everything").push(eventPromise);
+										}
 										return game.loop(eventPromise).then(() => {
 											// 有时候event.finished还是false
 											return eventPromise;
