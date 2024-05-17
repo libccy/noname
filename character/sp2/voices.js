@@ -405,4 +405,9 @@ export default {
 	"#xz_xunxun1": "精挑细选，方能成百年之计。",
 	"#xz_xunxun2": "让我先探他一探。",
 	"#xinfu_xingzhao2": "船，也不是一天就能造出来的。",
+	"#starruijun1": "三军夺锐，势不可挡。",
+	"#starruijun2": "士如钢锋，可破三属之甲。",
+	"#stargangyi1": "不见狼居胥，何妨马革裹尸。",
+	"#stargangyi2": "既无功，不受禄。",
+	"#star_sunjian:die": "身怀宝器，必受群狼觊觎。",
 };
