@@ -56,6 +56,14 @@ const characters = {
 	jsrg_zhangxuan: ["female", "wu", 4, ["jsrgtongli", "jsrgshezang"]],
 	jsrg_gaoxiang: ["male", "shu", 4, ["jsrgchiying"]],
 	jsrg_guozhao: ["female", "wei", 3, ["jsrgpianchong", "jsrgzunwei"]],
+	//衰
+	jsrg_yuanshao: {
+		sex: "male",
+		group: "qun",
+		hp: 4,
+		skills: ["jsrgzhimeng", "jsrgtianyu", "jsrgzhuni", "jsrghezhi"],
+		isZhugong: true,
+	},
 };
 
 export default characters;

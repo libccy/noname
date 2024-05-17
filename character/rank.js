@@ -1102,6 +1102,7 @@ window.noname_character_rank = {
 		"ol_wangyi",
 		"chengji",
 		"mb_sp_guanqiujian",
+		"jsrg_yuanshao",
 	],
 	b: [
 		"junk_guanyu",
@@ -1929,6 +1930,7 @@ window.noname_character_rank = {
 			"wu_guanyu",
 			"guanyue",
 			"key_mia",
+			"jsrg_yuanshao",
 		],
 		epic: [
 			"xukun",

@@ -2,6 +2,248 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//江山如故·衰
+	jsrgzhimeng: {
+		trigger: { player: "phaseZhunbeiBegin" },
+		logTarget() {
+			return game.filterPlayer(current => current.countCards("h") > 0).sortBySeat();
+		},
+		prompt: "是否发动【执盟】？",
+		async content(event, trigger, player) {
+			const { cards } = await game.cardsGotoOrdering(get.cards(game.countPlayer()));
+			await player.showCards(cards, `${get.translation(player)}发动了【执盟】`);
+			const targets = game.filterPlayer(current => current.countCards("h") > 0).sortBySeat();
+			//选牌
+			const showCardEvent = player.chooseCardOL(targets, `${get.translation(player)}发动了【执盟】，请展示一张手牌`, true);
+			showCardEvent.set("ai", card => {
+				if (get.event("_suits").includes(get.suit(card))) return 1 + Math.random();
+				return (1 - get.value(card)) * Math.random();
+			});
+			showCardEvent.set(
+				"_suits",
+				cards.map(card => get.suit(card, false))
+			);
+			showCardEvent.set("source", player);
+			showCardEvent.set("aiCard", target => {
+				const hs = target.getCards("h");
+				return { bool: true, cards: [hs.randomGet()] };
+			});
+			showCardEvent._args.remove("glow_result");
+			const result = await showCardEvent.forResult();
+			//选完了 展示牌
+			const videoId = lib.status.videoId++;
+			const cardsToShown = [];
+			for (let i = 0; i < targets.length; i++) {
+				cardsToShown.push(result[i].cards[0]);
+				game.log(targets[i], "展示了", result[i].cards[0]);
+			}
+			game.broadcastAll(
+				(targets, cards, id, player) => {
+					const dialog = ui.create.dialog(get.translation(player) + "发动了【执盟】", cards);
+					dialog.videoId = id;
+					const getName = function (target) {
+						if (target._tempTranslate) return target._tempTranslate;
+						var name = target.name;
+						if (lib.translate[name + "_ab"]) return lib.translate[name + "_ab"];
+						return get.translation(name);
+					};
+					for (let i = 0; i < targets.length; i++) {
+						dialog.buttons[i].querySelector(".info").innerHTML = getName(targets[i]) + get.translation(get.suit(cards[i], targets[i]));
+					}
+				},
+				targets,
+				cardsToShown,
+				videoId,
+				player
+			);
+			await game.asyncDelay(4);
+			game.broadcastAll("closeDialog", videoId);
+			//展示完了 开始拿牌
+			const suitsMap = {};
+			for (let i = 0; i < targets.length; i++) {
+				const target = targets[i],
+					card = cardsToShown[i],
+					suit = get.suit(card, target);
+				if (!(suit in suitsMap)) suitsMap[suit] = target;
+				else suitsMap[suit] = null;
+			}
+			const gain_list = [];
+			for (const data of Object.entries(suitsMap)) {
+				const [suit, target] = data;
+				if (target) {
+					const cardsToGain = cards.filter(card => get.suit(card, false) === suit);
+					if (cardsToGain.length) gain_list.push([target, cardsToGain]);
+				}
+			}
+			if (gain_list.length) {
+				await game
+					.loseAsync({
+						gain_list,
+						animate: "gain2",
+					})
+					.setContent("gaincardMultiple");
+			}
+		},
+	},
+	jsrgtianyu: {
+		trigger: { global: ["loseAsyncAfter", "cardsDiscardAfter"] },
+		frequent: true,
+		filter(event) {
+			return lib.skill.jsrgtianyu.getCards(event).length > 0;
+		},
+		getCards(event) {
+			const cards = event.getd().filter(card => {
+				return get.type(card, null, false) === "equip" || get.tag(card, "damage", null, false) > 0;
+			});
+			if (!cards.length) return [];
+			game.checkGlobalHistory("cardMove", evt => {
+				if (evt.name === "lose") cards.removeArray(evt.cards);
+			});
+			return cards;
+		},
+		async content(event, trigger, player) {
+			const cards = lib.skill.jsrgtianyu.getCards(trigger);
+			let cardsToGain;
+			if (cards.length === 1) {
+				cardsToGain = cards;
+			} else {
+				cardsToGain = await player.chooseButton(["天予：选择获得任意张牌", cards], true, [1, cards.length]).forResult("links");
+			}
+			await player.gain(cards, "gain2");
+		},
+	},
+	jsrgzhuni: {
+		enable: "phaseUse",
+		usable: 1,
+		filterTarget: true,
+		selectTarget: -1,
+		multitarget: true,
+		multiline: true,
+		async content(event, trigger, player) {
+			let targets = event.targets.slice(0),
+				results = [],
+				forceTargets = [];
+			//XXX自选选择目标
+			if (player.hasSkill("jsrghezhi")) {
+				forceTargets = targets.filter(current => current !== player && current.group === "qun");
+				targets.removeArray(forceTargets);
+			}
+			//让读条不消失
+			event._global_waiting = true;
+			const send = (player, source) => {
+				lib.skill.jsrgzhuni.chooseTarget(player, source);
+				game.resume();
+			};
+			const solve = (result, chooser) => {
+				let target;
+				if (!result || !result.targets || result === "ai") {
+					target = game.filterPlayer(current => current !== player).randomGet();
+				} else target = result.targets[0];
+				results.push([chooser, target]);
+				if (chooser === player) {
+					forceTargets.forEach(current => results.push([current, target]));
+				}
+			};
+			let time = 10000;
+			if (lib.configOL && lib.configOL.choose_timeout) time = parseInt(lib.configOL.choose_timeout) * 1000;
+			//Promise，爽！清瑶你有种抄过去
+			await Promise.all(
+				targets.map((current, index) => {
+					return new Promise(async (resolve, reject) => {
+						current.showTimer(time);
+						if (current.isOnline()) {
+							current.send(send, current, player);
+							current.wait((result, player) => {
+								solve(result, player);
+								resolve();
+							});
+						} else if (current == game.me) {
+							const next = lib.skill.jsrgzhuni.chooseTarget(current, player);
+							const solver = (result, player) => {
+								solve(result, player);
+								resolve();
+							};
+							if (_status.connectMode) game.me.wait(solver);
+							const result = await next.forResult();
+							if (_status.connectMode) game.me.unwait(result, current);
+							else solver(result, current);
+						} else {
+							const next = lib.skill.jsrgzhuni.chooseTarget(current, player);
+							const result = await next.forResult();
+							setTimeout(async () => {
+								solve(result, current);
+								resolve();
+							}, 500 + 100 * index);
+						}
+					});
+				})
+			);
+			//清除读条
+			delete event._global_waiting;
+			for (var i of targets) i.hideTimer();
+			//统计票数
+			const ticketsMap = new Map();
+			results.forEach(data => {
+				const [source, current] = data;
+				source.line(current);
+				game.log(source, forceTargets.includes(source) ? "自愿选择" : "选择了", current, "作为讨伐目标");
+				ticketsMap.set(current, (ticketsMap.get(current) || 0) + 1);
+			});
+			console.log(ticketsMap);
+			let maxTicket = 0;
+			const target = ticketsMap.entries().reduce((target, data) => {
+				console.log(data);
+				const [current, ticket] = data;
+				if (ticket > maxTicket) {
+					maxTicket = ticket;
+					return current;
+				} else if (ticket === maxTicket) return false;
+				else return target;
+			}, false);
+			//上Buff
+			if (target) {
+				game.log(target, "成为了", "#g【执盟】", "的讨伐目标");
+				player.addTempSkill("jsrgzhuni_effect");
+				player.markAuto("jsrgzhuni_effect", [target]);
+			}
+		},
+		ai: {
+			order: 10,
+			result: { player: 1 },
+			threaten: 1.8,
+		},
+		chooseTarget(player, source) {
+			const next = player.chooseTarget(`${get.translation(player)}发动了【执盟】，请选择一名讨伐目标`, (card, player, target) => target !== source, true);
+			next.set("ai", target => -get.attitude(get.player(), target));
+			next.set("animate", false);
+			return next;
+		},
+		subSkill: {
+			effect: {
+				onremove: true,
+				mod: {
+					targetInRange(card, player, target) {
+						if (player.getStorage("jsrgzhuni_effect").includes(target)) {
+							return true;
+						}
+					},
+					cardUsableTarget(card, player, target) {
+						if (player.getStorage("jsrgzhuni_effect").includes(target)) {
+							return true;
+						}
+					},
+				},
+				charlotte: true,
+				intro: {
+					content: "对$使用牌无距离和次数限制",
+				},
+			},
+		},
+	},
+	jsrghezhi: {
+		zhuSkill: true,
+		locked: true,
+	},
 	//江山如故·合
 	//蓄谋临时禁用
 	xumou_jsrg_temp: {
