@@ -35,7 +35,7 @@ export class GameEventPromise extends Promise {
 	}
 	#event;
 	/**
-	 * @param { import('./gameEvent.js').GameEvent } arg
+	 * @param { GameEvent } arg
 	 */
 	constructor(arg) {
 		if (arg instanceof GameEventPromise) throw new Error("GameEventPromise cannot copy.");

@@ -6,7 +6,7 @@ import { ui } from "../../ui/index.js";
 import { AsyncFunction } from "../../util/index.js";
 
 export class GameEvent {
-	/** @type { this & import('./gameEventPromise.js').GameEventPromise } */
+	/** @type { this & GameEventPromise } */
 	#promise;
 	/**
 	 * @param {string | GameEvent} [name]
@@ -55,7 +55,7 @@ export class GameEvent {
 		 **/
 		this.async = false;
 		/**
-		 * @type {null|(event: GameEvent)=>any} 这个异步事件对应Promise的resolve函数
+		 * @type {null|((event: GameEvent | PromiseLike<GameEvent>)=>void)} 这个异步事件对应Promise的resolve函数
 		 **/
 		this.resolve = null;
 		if (trigger !== false && !game.online) this._triggered = 0;
