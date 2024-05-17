@@ -58,6 +58,10 @@ export class GameEvent {
 		 * @type {null|((event: GameEvent | PromiseLike<GameEvent>)=>void)} 这个异步事件对应Promise的resolve函数
 		 **/
 		this.resolve = null;
+		/**
+		 * @type {null|((value?: any) => void)} 另一种结束event.content的resolve形式
+		 **/
+		this.resolveContent = null;
 		if (trigger !== false && !game.online) this._triggered = 0;
 		this.__args = [name, trigger];
 	}
@@ -298,6 +302,15 @@ export class GameEvent {
 		this.numFixed = true;
 		return this;
 	}
+	forceFinish() {
+		if (!this.finished) {
+			this.finished = true;
+			if (this.content instanceof AsyncFunction) {
+				throw "event_finish";
+			}
+		}
+		return this;
+	}
 	finish() {
 		this.finished = true;
 		return this;
@@ -352,7 +365,7 @@ export class GameEvent {
 	}
 	cancel(arg1, arg2, notrigger) {
 		this.untrigger(arg1, arg2);
-		this.finish();
+		this.forceFinish();
 		if (notrigger != "notrigger") {
 			if (this.player && lib.phaseName.includes(this.name))
 				this.player.getHistory("skipped").add(this.name);

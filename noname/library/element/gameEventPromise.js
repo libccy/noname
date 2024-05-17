@@ -78,16 +78,39 @@ export class GameEventPromise extends Promise {
 									resolve();
 									return eventPromise;
 								}
-
+								const oldEvent = _status.event;
 								if (_status.event != eventPromise) {
 									eventPromise.parent = _status.event;
 									_status.event = eventPromise;
 									game.getGlobalHistory("everything").push(eventPromise);
 								}
-								return game.loop(eventPromise).then(() => {
-									// 有时候event.finished还是false
-									return eventPromise;
-								});
+
+								// 处理eventNeutralized反复横跳
+								if (!oldEvent.finished) {
+									return game.loop(eventPromise).then(() => {
+										// 有时候event.finished还是false
+										return eventPromise;
+									}); 
+								}
+								else {
+									if (eventPromise.name == "arrangeTrigger" &&
+										eventPromise.triggername == "eventNeutralized") {
+										return game.loop(eventPromise).then(() => {
+											// 有时候event.finished还是false
+											return eventPromise;
+										}).then(() => {
+											// 如果它终于不给我跳了
+											// 就给老子停
+											if (oldEvent.finished === true && oldEvent.resolveContent) {
+												oldEvent.resolveContent();
+											}
+											return eventPromise;
+										});
+									}
+									else {
+										console.log('不继续执行event', eventPromise.toEvent());
+									}
+								}
 							}
 						}
 					)
