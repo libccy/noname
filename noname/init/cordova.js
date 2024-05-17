@@ -18,6 +18,11 @@ export async function cordovaReady() {
 				game.reload();
 			}
 		}, false);
+		window.addEventListener("importPackage", () => {
+			if (confirm(`离线包/完整包已导入成功，是否重启游戏？`)) {
+				game.reload();
+			}
+		}, false);
 		document.addEventListener("pause", function () {
 			if (!_status.paused2 && typeof _status.event.isMine == "function" && !_status.event.isMine()) {
 				ui.click.pause();
