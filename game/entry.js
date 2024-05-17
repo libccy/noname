@@ -175,7 +175,8 @@ boot().then(() => {
 					})
 					.then(() => {
 						const url = new URL(location.href);
-						location.href = url.origin + url.pathname;
+						url.searchParams.delete("sendUpdate");
+						location.href = url.toString();
 					}).catch(e => {
 						if (navigator.notification) {
 							navigator.notification.activityStop();
@@ -189,7 +190,8 @@ boot().then(() => {
 				game.saveConfig(`extension_${value}_enable`, true);
 				alert(`扩展${value}已导入成功，点击确定重启游戏`);
 				const url = new URL(location.href);
-				location.href = url.origin + url.pathname;
+				url.searchParams.delete("importExtensionName");
+				location.href = url.toString();
 			}
 		}
 	}
