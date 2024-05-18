@@ -7440,6 +7440,9 @@ const skills = {
 		},
 		derivation: ["reduanbing", "reyingzi", "fenwei", "lanjiang"],
 	},
+	duanbing_heqi: { audio: 1 },
+	reyingzi_heqi: { audio: 1 },
+	fenwei_heqi: { audio: 1 },
 	olshanxi: {
 		audio: "shanxi",
 		enable: "phaseUse",
@@ -12270,8 +12273,8 @@ const skills = {
 	//吾彦
 	lanjiang: {
 		audio: 2,
+		audioname2: { heqi: "lanjiang_heqi" },
 		trigger: { player: "phaseJieshuBegin" },
-		audioname: ["heqi"],
 		content: function () {
 			"step 0";
 			var ph = player.countCards("h");
@@ -14640,8 +14643,8 @@ const skills = {
 	},
 	//新丁奉
 	reduanbing: {
-		audio: 2,
-		audioname: ["heqi"],
+		audio: "duanbing",
+		audioname2: { heqi: "duanbing_heqi" },
 		trigger: { player: "useCard2" },
 		filter: function (event, player) {
 			if (event.card.name != "sha") return false;
@@ -19262,7 +19265,7 @@ const skills = {
 	},
 	duanbing: {
 		audio: 2,
-		audioname: ["heqi"],
+		audioname2: { heqi: "duanbing_heqi" },
 		trigger: { player: "useCard2" },
 		filter: function (event, player) {
 			if (event.card.name != "sha") return false;
