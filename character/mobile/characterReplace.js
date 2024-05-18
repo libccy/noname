@@ -17,6 +17,7 @@ const characterReplaces = {
 	qiaozhou: ["yj_qiaozhou", "qiaozhou"],
 	sunhanhua: ["dc_sunhanhua", "sunhanhua"],
 	zhoubuyi: ["zhoubuyi", "yj_zhoubuyi"],
+	xianglang: ["xianglang", "mb_xianglang"],
 };
 
 export default characterReplaces;
