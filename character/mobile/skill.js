@@ -13285,6 +13285,9 @@ const skills = {
 			threaten: 1.2,
 		},
 	},
+	reyingzi_re_heqi: { audio: 1 },
+	qixi_re_heqi: { audio: 1 },
+	xuanfeng_re_heqi: { audio: 1 },
 	zhaohan: {
 		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },
