@@ -322,7 +322,7 @@ const skills = {
 					const targets = trigger
 						.getParent(2)
 						.targets.filter(i => {
-							return i != player;
+							return i != trigger.player;
 						})
 						.sortBySeat();
 					if (targets.length) {
