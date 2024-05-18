@@ -2413,7 +2413,7 @@ const skills = {
 		},
 	},
 	tianjie: {
-		audio: 2,
+		audio: 3,
 		trigger: { global: "phaseEnd" },
 		direct: true,
 		filter(event, player) {
