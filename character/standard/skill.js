@@ -94,31 +94,22 @@ const skills = {
 				"nojudge"
 			);
 		},
-		check(event, player) {
-			return player.canMoveCard(
-				true,
-				true,
-				game.filterPlayer(i => {
-					return i.group == "qun";
-				}),
-				card => {
-					return [3, 4, 6].includes(parseInt(get.subtype(card).slice("equip".length)));
-				},
-				"nojudge"
-			);
-		},
+		direct: true,
 		zhuSkill: true,
 		content() {
-			player.moveCard(
-				true,
-				game.filterPlayer(i => {
-					return i.group == "qun";
-				}),
-				card => {
-					return [3, 4, 6].includes(parseInt(get.subtype(card).slice("equip".length)));
-				},
-				"nojudge"
-			);
+			player
+				.moveCard(
+					true,
+					game.filterPlayer(i => {
+						return i.group == "qun";
+					}),
+					card => {
+						return [3, 4, 6].includes(parseInt(get.subtype(card).slice("equip".length)));
+					}
+				)
+				.set("prompt", get.prompt2("stdyouji"))
+				.set("nojudge", true)
+				.set("logSkill", "stdyouji");
 		},
 	},
 	//马云禄
@@ -161,7 +152,8 @@ const skills = {
 					const suit = get.suit(button.link);
 					return (suit == "diamond" ? 5 : 1) * get.value(button.link);
 				})
-				.set("prompt", "凤魄：弃置" + (target != player ? get.translation(target) : "") + "一张牌，若弃置了方片牌，则此伤害+1")
+				.set("prompt", "凤魄：弃置" + (target != player ? get.translation(target) : "") + "一张牌")
+				.set("prompt2", "若弃置了方片牌，则此伤害+1")
 				.forResult();
 			if (result.bool) {
 				if (result.cards && result.cards.some(i => get.suit(i, target) == "diamond")) {
@@ -195,7 +187,7 @@ const skills = {
 		async content(event, trigger, player) {
 			player.tempBanSkill("stddaoshu", "roundStart", false);
 			const target = event.targets[0];
-			const result = await player.choosePlayerCard(target, "h", true);
+			const result = await player.choosePlayerCard(target, "h", true).forResult();
 			if (result.bool) {
 				const cards = result.cards || [];
 				if (cards.length) {
@@ -305,7 +297,8 @@ const skills = {
 					const player = get.event("player"),
 						event = get.event().getTrigger();
 					return get.effect(target, event.card, player);
-				});
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			trigger.targets.addArray(event.targets);
@@ -358,6 +351,7 @@ const skills = {
 	//羊祜
 	stdmingfa: {
 		audio: "dcmingfa",
+		enable: "phaseUse",
 		filter(event, player) {
 			if (player.hasSkill("stdmingfa_used")) return false;
 			return game.hasPlayer(target => target.getHp() > 1);
@@ -366,6 +360,7 @@ const skills = {
 			return target.getHp() > 1;
 		},
 		async content(event, trigger, player) {
+			const target = event.target;
 			await target.damage();
 			if (target.isIn()) {
 				player.addSkill("stdmingfa_used");
@@ -551,7 +546,8 @@ const skills = {
 				.set("ai", target => {
 					const player = get.event("player");
 					return get.damageEffect(target, player, player);
-				});
+				})
+				.forResult();
 		},
 		locked: true,
 		async content(event, trigger, player) {
@@ -693,7 +689,7 @@ const skills = {
 		},
 		forced: true,
 		async content(event, trigger, player) {
-			const result = await player.chooseUseTarget("执义：是为使用【杀】，或摸一张牌", { name: "sha" }, false).forResult();
+			const result = await player.chooseUseTarget("执义：视为使用【杀】，或摸一张牌", { name: "sha" }, false).forResult();
 			if (!result.bool) await player.draw();
 		},
 	},
@@ -704,7 +700,7 @@ const skills = {
 		filter(event, player) {
 			return player.countCards("h");
 		},
-		async cost(event, player) {
+		async cost(event, trigger, player) {
 			event.result = await player
 				.chooseCard(get.prompt("stdshefu"), "将一张手牌置于武将牌上", "h")
 				.set("ai", card => {
@@ -743,11 +739,11 @@ const skills = {
 				audio: "shefu",
 				trigger: { global: "useCard" },
 				filter(event, player) {
-					return player.getStorage("stdshefu").some(card => card.name == event.card.name);
+					return player.getExpansions("stdshefu").some(card => card.name == event.card.name);
 				},
 				async cost(event, trigger, player) {
 					let result = await player
-						.chooseButton(["###" + get.prompt("stdshefu") + "###弃置一张同名牌，令此牌无效", player.getStorage("stdshefu")])
+						.chooseButton(["###" + get.prompt("stdshefu") + "###弃置一张同名牌，令此牌无效", player.getExpansions("stdshefu")])
 						.set("filterButton", button => {
 							return button.link.name == get.event().getTrigger().card.name;
 						})
@@ -763,7 +759,7 @@ const skills = {
 					event.result = result;
 				},
 				async content(event, trigger, player) {
-					await player.loseToSpecial(event.cards);
+					await player.loseToDiscardpile(event.cards);
 					trigger.targets.length = 0;
 					trigger.all_excluded = true;
 				},
@@ -904,6 +900,9 @@ const skills = {
 				.getDiscardableCards(player, "e")
 				.filter(card => parseInt(get.subtype(card).slice("equip".length)) <= 2)
 				.map(card => get.subtype(card));
+			if (cards.length == 2) {
+				return target.getDiscardableCards(player, "e").some(card => parseInt(get.subtype(card).slice("equip".length)) <= 2);
+			}
 			let Tcards = target
 				.getDiscardableCards(player, "e")
 				.filter(card => parseInt(get.subtype(card).slice("equip".length)) <= 2)
@@ -917,21 +916,18 @@ const skills = {
 		multiline: true,
 		async content(event, trigger, player) {
 			let discardedType = [];
-			for (const i = 0; i < 2; i++) {
+			for (let i = 0; i < 2; i++) {
 				const target = event.targets[i],
 					other = event.targets[1 - i];
 				let cards = target
 					.getDiscardableCards(player, "e")
 					.filter(card => parseInt(get.subtype(card).slice("equip".length)) <= 2)
 					.map(card => get.subtype(card));
-				cards.removeArray(
-					i == 0
-						? other
-								.getDiscardableCards(player, "e")
-								.filter(card => parseInt(get.subtype(card).slice("equip".length)) <= 2)
-								.map(card => get.subtype(card))
-						: discardedType
-				);
+				const Tcards = other
+					.getDiscardableCards(player, "e")
+					.filter(card => parseInt(get.subtype(card).slice("equip".length)) <= 2)
+					.map(card => get.subtype(card));
+				cards.removeArray(i == 0 ? (Tcards.length == 2 ? [] : Tcards) : discardedType);
 				if (!cards.length) continue;
 				const result = await player
 					.discardPlayerCard("e", target, true)
@@ -940,12 +936,13 @@ const skills = {
 					})
 					.set("cards", cards)
 					.forResult();
-				if (result.bool)
+				if (result.bool) {
 					discardedType.addArray(
 						result.cards.reduce((list, card) => {
 							return list.add(get.subtype(card));
 						}, [])
 					);
+				}
 			}
 		},
 		ai: {
