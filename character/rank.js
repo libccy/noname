@@ -1103,6 +1103,7 @@ window.noname_character_rank = {
 		"chengji",
 		"mb_sp_guanqiujian",
 		"jsrg_yuanshao",
+		"jsrg_songhuanghou",
 	],
 	b: [
 		"junk_guanyu",
@@ -1427,6 +1428,7 @@ window.noname_character_rank = {
 		"clan_wangmingshan",
 		"yj_simafu",
 		"dc_wuyi",
+		"jsrg_caojiewangfu",
 	],
 	bm: [
 		"kongrong",
@@ -2719,6 +2721,7 @@ window.noname_character_rank = {
 			"chengji",
 			"mb_sp_guanqiujian",
 			"lizhaojiaobo",
+			"jsrg_songhuanghou",
 		],
 		junk: [
 			"ol_sb_guanyu",

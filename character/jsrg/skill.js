@@ -3,6 +3,101 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//江山如故·衰
+	//宋皇后
+	jsrgzhongzen: {},
+	jsrgxuchong: {},
+	//曹节王甫
+	jsrgzonghai: {
+		trigger: { global: "dying" },
+		logTarget: "player",
+		round: 1,
+		filter(event, player) {
+			return event.player !== player && event.player.hp <= 0;
+		},
+		check(event, player) {
+			//理论上是小完杀+卖血
+			//先粗略地写一写，后面等157补
+			return get.attitude(player, event.player) < 0;
+		},
+		async content(event, trigger, player) {
+			const target = trigger.player;
+			const targets = await target
+				.chooseTarget([1, 2], true, "请选择至多两名角色", `${get.translation(player)}对你发动了【纵害】。你可以选择至多两名角色，只有这两名角色可以使用牌拯救你，且当此次濒死结算结束后，这两名角色均会受到来自${get.translation(player)}的1点伤害。`)
+				.set("ai", target => {
+					//自救还要挨一刀，最好的反制方法就是跟对面爆了
+					const evt = get.event(),
+						player = evt.player,
+						source = evt.getParent().player;
+					return get.damageEffect(target, source, player);
+				})
+				.set("forceDie", true)
+				.forResult("targets");
+			target.line(targets);
+			game.log(target, "选择了", targets);
+			targets.sortBySeat(_status.currentPhase);
+			const allPlayers = game.filterPlayer().sortBySeat();
+			if (!trigger._jsrgzonghai_id) trigger._jsrgzonghai_id = get.id();
+			const id = trigger._jsrgzonghai_id;
+			allPlayers.forEach(target => {
+				if (!targets.includes(target)) {
+					target.addTempSkill("jsrgzonghai_blocker");
+					target.markAuto("jsrgzonghai_blocker", [id]);
+				}
+			});
+			target
+				.when("dyingAfter")
+				.vars({ id, allPlayers, targets, source: player })
+				.assign({ forceDie: true })
+				.then(() => {
+					allPlayers.forEach(target => {
+						target.unmarkAuto("jsrgzonghai_blocker", [id]);
+						if (target.getStorage("jsrgzonghai_blocker").length) target.removeSkill("jsrgzonghai_blocker");
+					});
+					if (source.isIn()) {
+						targets.forEach(target => target.damage(source));
+					}
+				});
+		},
+		subSkill: {
+			blocker: {
+				charlotte: true,
+				onremove: true,
+				mod: {
+					cardSavable: () => false,
+					cardEnabled: () => false,
+				},
+			},
+		},
+	},
+	jsrgjueyin: {
+		trigger: { player: "damageEnd" },
+		filter(event, player) {
+			return player.getHistory("damage")[0] === event;
+		},
+		async content(event, trigger, player) {
+			await player.draw(3);
+			const targets = game.filterPlayer().sortBySeat();
+			targets.forEach(current => {
+				current.addTempSkill("jsrgjueyin_damage");
+				current.addMark("jsrgjueyin_damage", 1, false);
+			});
+		},
+		subSkill: {
+			damage: {
+				onremove: true,
+				charlotte: true,
+				trigger: { player: "damageBegin1" },
+				forced: true,
+				async content(event, trigger, player) {
+					trigger.num++;
+				},
+				intro: {
+					content: "本回合受到的伤害+#",
+				},
+			},
+		},
+	},
+	//梦袁绍
 	jsrgzhimeng: {
 		trigger: { player: "phaseZhunbeiBegin" },
 		logTarget() {

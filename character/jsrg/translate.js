@@ -367,6 +367,18 @@ const translates = {
 	jsrgzhuni_info: "出牌阶段限一次，你可以令所有角色同时选择一名除你之外的其他角色。若有角色本回合内被指定过的次数唯一最多，则你本回合内对该角色使用牌没有次数和距离限制。",
 	jsrghezhi: "合志",
 	jsrghezhi_info: "主公技，锁定技。其他群势力角色需要因〖诛逆〗而选择角色时，改为选择你本次选择的角色。",
+	jsrg_caojiewangfu: "衰曹节王甫",
+	jsrg_caojiewangfu_prefix: "衰",
+	jsrgzonghai: "纵害",
+	jsrgzonghai_info: "每轮限一次。当有其他角色进入濒死状态时，你可以令其选择至多两名角色。未被选择的角色不能于此次濒死结算中使用牌，且此次濒死状态结算结束后，你对其选择的角色各造成1点伤害。",
+	jsrgjueyin: "绝禋",
+	jsrgjueyin_info: "当你于一回合内首次收到伤害后，你可以摸三张牌，然后本回合内所有角色受到的伤害+1。",
+	jsrg_songhuanghou: "衰宋皇后",
+	jsrg_songhuanghou_prefix: "衰",
+	jsrgzhongzen: "众谮",
+	jsrgzhongzen_info: "锁定技。①弃牌阶段开始时，你令所有手牌数小于你的角色各交给你一张手牌。②弃牌阶段结束时，若你本阶段弃置的♠牌数大于你的体力值，则你弃置所有牌。",
+	jsrgxuchong: "虚宠",
+	jsrgxuchong_info: "当你成为牌的目标后，你可以选择一项：⒈摸一张牌；⒉令当前回合角色本回合的手牌上限+2。选择完成后，你获得一张【影】。",
 };
 
 export default translates;
