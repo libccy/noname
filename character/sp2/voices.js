@@ -409,5 +409,5 @@ export default {
 	"#starruijun2": "士如钢锋，可破三属之甲。",
 	"#stargangyi1": "不见狼居胥，何妨马革裹尸。",
 	"#stargangyi2": "既无功，不受禄。",
-	"#star_sunjian:die": "身怀宝器，必受群狼觊觎。",
+	"#star_sunjian:die": "身怀宝器，必受群狼觊觎……",
 };
