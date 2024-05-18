@@ -13505,7 +13505,8 @@ const skills = {
 	},
 	xuanfeng: {
 		audio: 2,
-		audioname: ["boss_lvbu3", "re_heqi"],
+		audioname: ["boss_lvbu3"],
+		audioname2: { re_heqi: "xuanfeng_re_heqi" },
 		trigger: {
 			player: ["loseAfter", "phaseDiscardEnd"],
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
