@@ -4,8 +4,97 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//江山如故·衰
 	//宋皇后
-	jsrgzhongzen: {},
-	jsrgxuchong: {},
+	jsrgzhongzen: {
+		trigger: { player: "phaseDiscardBegin" },
+		forced: true,
+		filter(event, player) {
+			const hs = player.countCards("h");
+			return game.hasPlayer(current => {
+				if (current === player) return false;
+				const hs2 = current.countCards("h");
+				return hs2 > 0 && hs2 < hs;
+			});
+		},
+		logTarget(event, player) {
+			const hs = player.countCards("h");
+			return game.filterPlayer(current => {
+				if (current === player) return false;
+				const hs2 = current.countCards("h");
+				return hs2 > 0 && hs2 < hs;
+			});
+		},
+		async content(event, trigger, player) {
+			const targets = event.targets.slice(0);
+			targets.forEach(async target => {
+				if (player.isIn() && target.countCards("h") > 0) {
+					await target.chooseToGive(player, "h", true);
+				}
+			});
+		},
+		group: "jsrgzhongzen_discard",
+		subSkill: {
+			discard: {
+				trigger: { player: "phaseDiscardEnd" },
+				forced: true,
+				filter(event, player) {
+					if (player.countCards("he") === 0) return false;
+					const cards = [];
+					player.getHistory("lose", evt => {
+						if (evt.type === "discard" && evt.getParent("phaseDiscard") === event) cards.addArray(evt.cards);
+					});
+					return (
+						cards.length > player.hp &&
+						cards.reduce((num, card) => {
+							if (num <= player.hp && get.suit(card, false) === "spade") num++;
+							return num;
+						}, 0) > player.hp
+					);
+				},
+				async content(event, trigger, player) {
+					await player.chooseToDiscard(true, "he", player.countCards("he"));
+				},
+			},
+		},
+	},
+	jsrgxuchong: {
+		trigger: { target: "useCardToTargeted" },
+		async cost(event, trigger, player) {
+			const current = _status.currentPhase;
+			const choices = ["摸一张牌"];
+			if (current) choices.push(`令${get.translation(current)}本回合的手牌上限+2`);
+			const control = await player.chooseControl("cancel2").set("choiceList", choices).forResult("control");
+			if (control !== "cancel2") {
+				event.result = {
+					bool: true,
+					targets: control === "选项二" ? [current] : [],
+				};
+			}
+		},
+		async content(event, trigger, player) {
+			if (event.targets && event.targets.length) {
+				const [target] = event.targets;
+				target.addTempSkill("jsrgxuchong_effect");
+				target.addMark("jsrgxuchong_effect", 2, false);
+			} else {
+				await player.draw();
+			}
+			await player.gain(lib.card.ying.getYing(1), "gain2");
+		},
+		subSkill: {
+			effect: {
+				mod: {
+					maxHandcard(player, num) {
+						return num + player.countMark("jsrgxuchong_effect");
+					},
+				},
+				onremove: true,
+				charlotte: true,
+				intro: {
+					content: "手牌上限+#",
+				},
+			},
+		},
+	},
 	//曹节王甫
 	jsrgzonghai: {
 		trigger: { global: "dying" },
@@ -34,7 +123,7 @@ const skills = {
 				.forResult("targets");
 			target.line(targets);
 			game.log(target, "选择了", targets);
-			targets.sortBySeat(_status.currentPhase);
+			targets.sortBySeat(_status.currentPhase || player);
 			const allPlayers = game.filterPlayer().sortBySeat();
 			if (!trigger._jsrgzonghai_id) trigger._jsrgzonghai_id = get.id();
 			const id = trigger._jsrgzonghai_id;
