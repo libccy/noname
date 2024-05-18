@@ -11,7 +11,7 @@ const characterSortTranslate = {
 	standard_2013: "2013版标准包",
 	standard_2019: "2019版标准包",
 	standard_2023: "2023版标准包",
-	standard_2024: "204版标准包",
+	standard_2024: "2024版标准包",
 };
 
 export { characterSort, characterSortTranslate };
