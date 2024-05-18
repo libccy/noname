@@ -134,7 +134,18 @@
 
 	// 使serviceWorker加载完成后，再加载entry.js
 	if (location.protocol.startsWith("http") && "serviceWorker" in navigator) {
-		let scope = window.location.protocol + "//" + window.location.host + window.location.pathname;
+		const getScope = (url) => {
+			const urlObj = new URL(url);
+			let pathParts = urlObj.pathname.split("/");
+			if (pathParts[pathParts.length - 1].includes(".")) {
+				pathParts.pop();
+			}
+			let basePath = pathParts.join("/") || "/";
+			basePath = basePath.endsWith("/") ? basePath : `${basePath}/`;
+			return urlObj.protocol + "//" + urlObj.host + basePath;
+		};
+
+		let scope = getScope(window.location.href);
 		let registrations = await navigator.serviceWorker.getRegistrations();
 		let findServiceWorker = registrations.find(registration => {
 			return registration && registration.active && registration.active.scriptURL == `${scope}service-worker.js`;
