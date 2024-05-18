@@ -2,6 +2,246 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//谋庞统
+	olsbhongtu: {
+		audio: 2,
+		trigger: {
+			global: ["phaseZhunbeiEnd", "phaseJudgeEnd", "phaseDrawEnd", "phaseUseEnd", "phaseDiscardEnd", "phaseJieshuEnd"],
+		},
+		filter(event, player) {
+			let count = 0;
+			player.checkHistory("gain", evt => {
+				if (evt.getParent(event.name) !== event) return;
+				count += evt.cards.length;
+			});
+			return count >= 2;
+		},
+		derivation: ["nzry_feijun", "qianxi"],
+		prompt2: "你可以摸三张牌，展示三张手牌，令一名其他角色选择是否使用其中一张牌并令你随机弃置其中另一张牌。若使用牌的点数于三张牌中满足以下条件，其获得如下技能或效果直到其下一个回合的回合结束：唯一最大：〖飞军〗；不为最大且不为最小：〖潜袭〗；唯一最小：手牌上限+2。若其未以此法使用牌，你对其与你各造成1点火焰伤害。",
+		check(event, player) {
+			if (
+				game.hasPlayer(current => {
+					return current !== player && get.attitude(player, current) > 0;
+				})
+			)
+				return true;
+			const eff = get.damageEffect(player, player, player, "fire");
+			if (
+				game.hasPlayer(current => {
+					return (
+						get.damageEffect(current, player, player, "fire") > eff &&
+						player.countCards("h", card => {
+							return !current.hasUseTarget(card);
+						}) >=
+							2 + (player.getHp() > 1)
+					);
+				})
+			)
+				return true;
+			return false;
+		},
+		async content(event, trigger, player) {
+			await player.draw(3);
+			if (player.countCards("h") < 3) return;
+			const [cards, targets] = await player
+				.chooseCardTarget({
+					prompt: "鸿图：请展示三张手牌并选择一名角色",
+					prompt2: "你选择的角色须选择是否使用其中的一张牌，并令你随机弃置其中的另一张牌。",
+					position: "h",
+					filterCard: true,
+					selectCard: 3,
+					filterTarget: lib.filter.notMe,
+					forced: true,
+					hasFriend: game.hasPlayer(current => {
+						return current !== player && get.attitude(player, current) > 0;
+					}),
+					ai1(card) {
+						const player = get.player(),
+							val = player.getUseValue(card);
+						if (get.event("hasFriend")) {
+							if (
+								ui.selected.cards.some(cardx => {
+									return player.getUseValue(cardx) > 5;
+								})
+							)
+								return -val - get.value(card);
+							return val - 5;
+						}
+						if (
+							game.hasPlayer(current => {
+								return get.attitude(get.player(), current) < 0 && !current.hasUseTarget(card);
+							})
+						)
+							return 100 - val;
+						return -val;
+					},
+					ai2(target) {
+						const att = get.attitude(get.player(), target);
+						if (!ui.selected.cards.length) return 0;
+						if (ui.selected.cards.every(card => !target.hasUseTarget(card))) {
+							return 10 * (get.damageEffect(target, player, player, "fire") - get.damageEffect(player, player, player, "fire"));
+						}
+						return Math.max(...ui.selected.cards.map(card => target.getUseValue(card) * att));
+					},
+				})
+				.forResult("cards", "targets");
+			if (!cards || !cards.length || !targets || !targets.length) return;
+			const [target] = targets;
+			player.line(target, "green");
+			await player.showCards(cards, `${get.translation(player)}对${get.translation(target)}发动了【鸿图】`);
+			const links = await target
+				.chooseButton([`鸿图：是否使用${get.translation(player)}展示的其中一张牌？`, cards])
+				.set("filterButton", button => {
+					const player = get.player(),
+						card = button.link;
+					const cardx = get.autoViewAs(
+						{
+							name: get.name(card),
+							nature: get.nature(card),
+						},
+						[card]
+					);
+					return player.hasUseTarget(cardx, null, false);
+				})
+				.set("ai", button => {
+					return get.player().getUseValue(button.link);
+				})
+				.forResultLinks();
+			if (!links || !links.length) {
+				for (const current of [target, player]) {
+					if (!current.isIn()) continue;
+					player.line(current, "fire");
+					await current.damage("fire");
+				}
+			} else {
+				const [card] = links;
+				cards.remove(card);
+				const cardx = get.autoViewAs(
+					{
+						name: get.name(card),
+						nature: get.nature(card),
+					},
+					[card]
+				);
+				const owner = get.owner(card);
+				const next = target
+					.chooseUseTarget(cardx, [card], true, false)
+					.set("throw", false)
+					.set("owner", owner)
+					.set("oncard", card => {
+						const owner = get.event().getParent().owner;
+						if (owner) owner.$throw(card.cards);
+					});
+				if (card.name === cardx.name && get.is.sameNature(card, cardx, true)) next.set("viewAs", false);
+				await next;
+				const restCards = cards.filter(card => {
+					return get.owner(card) === player && get.position(card) === "h" && lib.filter.cardDiscardable(card, player, "olsbhongtu");
+				});
+				if (restCards.length) {
+					player.discard(restCards.randomGet());
+				}
+				const num = get.number(card, player);
+				let skill = null;
+				if (
+					cards.every(cardx => {
+						if (cardx === card) return true;
+						return get.number(cardx) < num;
+					})
+				) {
+					skill = "nzry_feijun";
+				} else if (
+					cards.every(cardx => {
+						if (cardx === card) return true;
+						return get.number(cardx) > num;
+					})
+				) {
+					target.addSkill("olsbhongtu_limit");
+					target.addMark("olsbhongtu_limit", 2, false);
+				} else {
+					skill = "qianxi";
+				}
+				let skillName = null;
+				if (skill) {
+					skillName = `olsbhongtu_${player.playerid}`;
+					target.addAdditionalSkills(skillName, [skill]);
+				}
+				target.when({ player: "phaseBegin" }).then(() => {
+					player.storage.olsbhongtu_phased = true;
+				});
+				target
+					.when({ player: "phaseEnd" })
+					.filter(() => {
+						return target.storage.olsbhongtu_phased;
+					})
+					.assign({
+						firstDo: true,
+						priority: Infinity,
+					})
+					.vars({
+						skillName,
+					})
+					.then(() => {
+						delete player.storage.olsbhongtu_phased;
+						if (skillName) {
+							player.removeAdditionalSkills(skillName);
+						} else {
+							player.removeSkill("olsbhongtu_limit");
+						}
+					});
+			}
+		},
+		subSkill: {
+			limit: {
+				markimage: "image/card/handcard.png",
+				intro: {
+					content(storage, player) {
+						return "手牌上限+" + storage;
+					},
+				},
+				charlotte: true,
+				mod: {
+					maxHandcard(player, num) {
+						return num + player.countMark("olsbhongtu_limit");
+					},
+				},
+			}
+		},
+	},
+	olsbqiwu: {
+		audio: 2,
+		trigger: {
+			player: "damageBegin4",
+		},
+		filter(event, player) {
+			if (!event.source) return false;
+			if (event.source !== player && !event.source.inRangeOf(player)) return false;
+			return (
+				game
+					.getGlobalHistory(
+						"everything",
+						evt => {
+							return evt.name == "damage" && evt.player == player;
+						},
+						event
+					)
+					.indexOf(event) === 0
+			);
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseToDiscard(get.prompt("olsbqiwu"), `你可以弃置一张红色牌，防止${get.translation(trigger.source)}对你造成的${trigger.num}点伤害。`, "chooseonly", { color: "red" }, "he")
+				.set("ai", card => {
+					if (get.event("goon")) return 6 - get.value(card);
+					return 0;
+				})
+				.set("goon", get.damageEffect(player, trigger.source, player) < 0)
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			await player.discard(event.cards);
+			trigger.cancel();
+		},
+	},
 	//王异
 	olzhenlie: {
 		audio: 2,
