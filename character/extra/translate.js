@@ -235,7 +235,7 @@ const translates = {
 	dili_jiaohui: "交辉",
 	dili_jiaohui_info: "锁定技。若你因〖驭衡〗获得过〖下书〗〖结姻〗〖缔盟〗，且你的手牌数为1，则此牌的牌名视为【远交近攻】。",
 	dili_yuanlv: "渊虑",
-	dili_yuanlv_info: "锁定技。若你因〖驭衡〗获得过〖观潮〗〖决堰〗〖澜江〗，则当你成为自己使用的不为【长安大舰】的装备牌的目标后，你将此牌置于弃牌堆，然后使用一张与此装备牌副类别相同的【长安大舰】。",
+	dili_yuanlv_info: "锁定技。若你因〖驭衡〗获得过〖观潮〗〖决堰〗〖澜疆〗，则当你成为自己使用的不为【长安大舰】的装备牌的目标后，你将此牌置于弃牌堆，然后使用一张与此装备牌副类别相同的【长安大舰】。",
 	changandajian_equip1: "长安大舰",
 	changandajian_equip2: "长安大舰",
 	changandajian_equip3: "长安大舰",
