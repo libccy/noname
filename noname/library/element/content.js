@@ -5604,7 +5604,7 @@ export const Content = {
 					controls.remove("cancel2");
 					if ((event.direct && controls.length == 1) || event.forceDirect) {
 						event.result = {
-							control: event.controls[0].link,
+							control: event.controls[0],
 							links: get.links([event.controls[0]]),
 						};
 						return;
@@ -5620,7 +5620,7 @@ export const Content = {
 					controls.remove("cancel2");
 					if ((event.direct && controls.length == 1) || event.forceDirect) {
 						event.result = {
-							control: event.controls[0].link,
+							control: event.controls[0],
 							links: get.links([event.controls[0]]),
 						};
 						return;
