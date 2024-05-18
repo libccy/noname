@@ -8,6 +8,7 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		filterTarget(card, player, target) {
+			if (get.mode() === "identity" && target.getHp() >= player.getHp()) return false;
 			return target !== player;
 		},
 		async content(event, trigger, player) {
@@ -71,10 +72,12 @@ const skills = {
 						}
 						game.log(card, "无视防具且不计入次数限制");
 						if (!player.storage.sbxianzhen_damaged) {
-							player.storage.sbxianzhen_damaged = true;
+							player.storage.sbxianzhen_damaged = (player.storage.sbxianzhen_damaged || 0) + 1;
 							player.when("phaseAfter").then(() => {
 								delete player.storage.sbxianzhen_damaged;
 							});
+						}
+						if (player.storage.sbxianzhen_damaged <= 2) {
 							await target.damage();
 							await game.asyncDelayx();
 						}
@@ -211,6 +214,7 @@ const skills = {
 	sbganglie: {
 		audio: 2,
 		enable: "phaseUse",
+		usable: 1,
 		filter(event, player) {
 			if (!event.sbganglie_enabledTargets) return false;
 			return game.hasPlayer(current => {
@@ -224,12 +228,12 @@ const skills = {
 				.getAllHistory("useSkill", evt => evt.skill === "sbganglie")
 				.map(evt => {
 					return evt.targets;
-				})
-				.flat();
-			const targets = player
+				});
+			let targets = player
 				.getAllHistory("damage", evt => evt.source && evt.source.isIn())
 				.map(evt => evt.source)
 				.unique();
+			targets = [...targets, ...targets];
 			targets.removeArray(chosen);
 			event.set("sbganglie_enabledTargets", targets);
 		},

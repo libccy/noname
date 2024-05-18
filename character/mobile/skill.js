@@ -812,86 +812,117 @@ const skills = {
 		usable: 2,
 		filter(event, player) {
 			if (player.countMark("mbxuetu_status") !== 1 && player.getStat("skill").mbxuetu) return false;
-			if (!player.storage.mbxuetu) return player.countCards("he");
 			return true;
 		},
 		zhuanhuanji2(skill, player) {
 			return player.countMark("mbxuetu_status") !== 1;
 		},
-		filterCard(card, player) {
-			if (player.countMark("mbxuetu_status") > 1) return false;
-			if (player.countMark("mbxuetu_status") === 1) {
-				if (player.getStorage("mbxuetu_used").includes(false)) return false;
-				return true;
-			}
-			return !player.storage.mbxuetu;
-		},
-		selectCard() {
-			const player = get.player();
-			if (player.countMark("mbxuetu_status") > 1) return -1;
-			if (player.countMark("mbxuetu_status") === 1) {
-				if (player.getStorage("mbxuetu_used").includes(false)) return -1;
-				if (player.getStorage("mbxuetu_used").includes(true)) return 1;
-				return [0, 1];
-			}
-			return !player.storage.mbxuetu ? 1 : -1;
-		},
-		check(card) {
-			return 6 - get.value(card);
-		},
-		prompt() {
-			const player = get.player(),
-				storage = player.storage.mbxuetu,
-				status = player.countMark("mbxuetu_status");
-			if (status === 0) {
-				if (storage) return "转换技。出牌阶段限一次，你可以失去1点体力，然后令一名角色摸两张牌。";
-				return "转换技。出牌阶段限一次，你可以弃置一张牌，然后令一名角色回复1点体力。";
-			} else if (status === 1) {
-				return "出牌阶段各限一次。⒈你可以弃置一张牌，然后令一名角色回复1点体力；⒉你可以失去1点体力，然后令一名角色摸两张牌。";
-			} else {
-				if (storage) return "转换技。出牌阶段限一次，你可以摸一张牌，然后对一名角色造成1点伤害。";
-				return "转换技。出牌阶段限一次，你可以回复1点体力，然后令一名角色弃置两张牌。";
-			}
-		},
 		position: "he",
-		filterTarget: true,
 		onremove: ["mbxuetu", "mbxuetu_status"],
 		derivation: ["mbxuetu_achieve", "mbxuetu_fail"],
-		async content(event, trigger, player) {
-			const target = event.targets[0],
-				storage = Boolean(player.storage.mbxuetu);
-			const status = player.countMark("mbxuetu_status");
-			player.changeZhuanhuanji("mbxuetu");
-			if (status < 2) {
-				if (!player.storage.mbxuetu_used) {
-					player.when(["phaseUseAfter", "mbweiming_achieveAfter"]).then(() => {
-						delete player.storage.mbxuetu_used;
+		
+		chooseButton: {
+			dialog() {
+				const dialog = ui.create.dialog("###血途###请选择要执行的项");
+				dialog.direct = true;
+				return dialog;
+			},
+			chooseControl(event, player) {
+				let list = ["令一名角色回复1点体力", "令一名角色摸两张牌"];
+				if (player.countMark("mbxuetu_status") !== 1) {
+					list[player.storage.mbxuetu ? "shift" : "pop"]();
+				} else {
+					list = list.filter((choice, index) => {
+						return !player.getStorage("mbxuetu_used").includes(index);
 					});
 				}
-				player.markAuto("mbxuetu_used", [status === 0 ? storage : !event.cards.length]);
-				if ((status === 0 && !storage) || (status === 1 && event.cards.length)) {
-					await target.recover();
+				list.push("cancel2");
+				return list;
+			},
+			check() {
+				return get.event("controls")[0];
+			},
+			backup(result, player) {
+				return {
+					audio: "mbxuetu",
+					choice: result.control.includes("回复") ? 0 : 1,
+					filterCard: () => false,
+					selectCard: -1,
+					filterTarget: true,
+					async content(event, trigger, player) {
+						const { choice } = get.info("mbxuetu_backup");
+						const target = event.targets[0];
+						const status = player.countMark("mbxuetu_status");
+						player.changeZhuanhuanji("mbxuetu");
+						if (status < 2) {
+							if (!player.storage.mbxuetu_used) {
+								player.when(["phaseUseAfter", "mbweiming_achieveAfter"]).then(() => {
+									delete player.storage.mbxuetu_used;
+								});
+							}
+							player.markAuto("mbxuetu_used", [choice]);
+							if (!choice) {
+								await target.recover();
+							} else {
+								await target.draw(2);
+							}
+						} else {
+							if (!choice) {
+								await player.recover();
+								await target.chooseToDiscard(2, true, "he");
+							} else {
+								await player.draw();
+								await target.damage();
+							}
+						}
+					},
+					ai: {
+						result: {
+							target(player, target) {
+								const { choice } = get.info("mbxuetu_backup");
+								const status = player.countMark("mbxuetu_status");
+								if (status > 1) {
+									if (player.storage.mbxuetu) return -get.damageEffect(target, player, player) / 10;
+									return -2;
+								}
+								if (choice === 1) return 2;
+								const eff = get.recoverEffect(target, player, player);
+								return eff > 0 ? 2 : eff < 0 ? -get.sgnAttitude(player, target) : 0;
+							},
+							player(player, target) {
+								const status = player.countMark("mbxuetu_status");
+								if (status > 1) {
+									if (player.storage.mbxuetu) return 1;
+									return get.recoverEffect(player, player) / 6;
+								}
+								return 0;
+							},
+						},
+					},
+				};
+			},
+			prompt(result, player) {
+				const { choice } = get.info("mbxuetu_backup");
+				const status = player.countMark("mbxuetu_status");
+				let str = "";
+				if (status < 2) {
+					str += "令一名角色" + (choice ? "摸两张牌" : "回复1点体力");
 				} else {
-					await player.loseHp();
-					await target.draw(2);
+					str += choice ? "摸一张牌，然后对一名角色造成1点伤害" : "回复1点体力，然后令一名角色弃置两张牌";
 				}
-			} else {
-				if (!storage) {
-					await player.recover();
-					await target.chooseToDiscard(2, true, "he");
-				} else {
-					await player.draw();
-					await target.damage();
-				}
-			}
+				return `###血途###<div class="text center">${str}</div>`;
+			},
+		},
+		subSkill: {
+			backup: {},
 		},
 		mark: true,
 		marktext: "☯",
 		intro: {
 			content: (storage, player) => {
 				if (!player.countMark("mbxuetu_status")) {
-					if (storage) return "转换技。出牌阶段限一次，你可以失去1点体力，然后令一名角色摸两张牌。";
-					return "转换技。出牌阶段限一次，你可以弃置一张牌，然后令一名角色回复1点体力。";
+					if (storage) return "转换技。出牌阶段限一次，你可以令一名角色摸两张牌。";
+					return "转换技。出牌阶段限一次，你可以令一名角色回复1点体力。";
 				} else {
 					if (storage) return "转换技。出牌阶段限一次，你可以摸一张牌，然后对一名角色造成1点伤害。";
 					return "转换技。出牌阶段限一次，你可以回复1点体力，然后令一名角色弃置两张牌。";
@@ -906,32 +937,7 @@ const skills = {
 				return 2;
 			},
 			result: {
-				target(player, target) {
-					const status = player.countMark("mbxuetu_status");
-					if (status > 1) {
-						if (player.storage.mbxuetu) return -get.damageEffect(target, player, player) / 10;
-						return -2;
-					}
-					if ((status === 0 && player.storage.mbxuetu) || (status === 1 && !ui.selected.cards.length)) return 2;
-					const eff = get.recoverEffect(target, player, player);
-					return eff > 0 ? 2 : eff < 0 ? -get.sgnAttitude(player, target) : 0;
-				},
-				player(player, target) {
-					const status = player.countMark("mbxuetu_status");
-					if (status > 1) {
-						if (player.storage.mbxuetu) return 1;
-						return get.recoverEffect(player, player) / 6;
-					}
-					if (status === 1 || !player.storage.mbxuetu) return -0.5;
-					const eff = get.effect(player, { name: "losehp" }, player, player);
-					if (eff >= 0) return Math.min(1, eff / 2);
-					const hp =
-						player.getHp() +
-						player.countCards("hes", card => {
-							return player.canSaveCard(card, player);
-						});
-					return -1.5 * Math.max(0, 3 - hp);
-				},
+				player: 1,
 			},
 		},
 	},
