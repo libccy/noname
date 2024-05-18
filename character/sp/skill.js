@@ -7443,6 +7443,7 @@ const skills = {
 	duanbing_heqi: { audio: 1 },
 	reyingzi_heqi: { audio: 1 },
 	fenwei_heqi: { audio: 1 },
+	lanjiang_heqi: { audio: 1 },
 	olshanxi: {
 		audio: "shanxi",
 		enable: "phaseUse",
