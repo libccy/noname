@@ -379,6 +379,14 @@ const translates = {
 	jsrgzhongzen_info: "锁定技。①弃牌阶段开始时，你令所有手牌数小于你的角色各交给你一张手牌。②弃牌阶段结束时，若你本阶段弃置的♠牌数大于你的体力值，则你弃置所有牌。",
 	jsrgxuchong: "虚宠",
 	jsrgxuchong_info: "当你成为牌的目标后，你可以选择一项：⒈摸一张牌；⒉令当前回合角色本回合的手牌上限+2。选择完成后，你获得一张【影】。",
+	jsrg_zhangjiao: "衰张角",
+	jsrg_zhangjiao_prefix: "衰",
+	jsrgxiangru: "相濡",
+	jsrgxiangru_info: "当一名已受伤的其他角色／你受到致命伤害时，你／已受伤的其他角色可以交给伤害来源两张牌，然后防止此伤害。",
+	jsrgwudao: "悟道",
+	jsrgwudao_info: "觉醒技。一名其他角色进入濒死状态时，若你没有手牌，则你加１点体力上限并回复１点体力，然后获得〖惊雷〗。",
+	jsrgjinglei: "惊雷",
+	jsrgjinglei_info: "准备阶段，你可以选择一名其他角色Ａ，然后选择任意名手牌数之和小于Ａ的角色，令这些角色依次对Ａ造成１点雷属性伤害。",
 };
 
 export default translates;
