@@ -21,6 +21,7 @@ const skills = {
 					})
 					.forResult("cards");
 				const videoId = lib.status.videoId++;
+				game.addVideo("showCards", player, [`${get.translation(player)}对${get.translation(target)}发动了【扫奸】`, get.cardsInfo([card])]);
 				game.broadcastAll(
 					(card, id, player, target) => {
 						if (target === game.me) return;
