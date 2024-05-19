@@ -1626,6 +1626,7 @@ window.noname_character_rank = {
 		"old_xiaoqiao",
 		"old_guanyu",
 		"dc_kongrong",
+		"jsrg_zhangjiao",
 	],
 	c: [
 		"xiahoudun",
@@ -2722,6 +2723,7 @@ window.noname_character_rank = {
 			"mb_sp_guanqiujian",
 			"lizhaojiaobo",
 			"jsrg_songhuanghou",
+			"jsrg_zhangjiao",
 		],
 		junk: [
 			"ol_sb_guanyu",

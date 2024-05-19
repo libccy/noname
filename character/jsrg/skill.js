@@ -10,13 +10,12 @@ const skills = {
 			if (event.player.hp + event.player.hujia > event.num) return false;
 			const source = event.source;
 			if (!source || !source.isIn()) return false;
-			const targets =
-				event.player === player
-					? game.filterPlayer(current => {
-							return current !== player;
-						})
-					: [player];
-			return targets.some(current => current !== source && current !== event.player && current.countCards("h") >= 1);
+			if (player !== event.player) {
+				return event.player.isDamaged() && player !== source && player.countCards("he") > 1;
+			}
+			return game.hasPlayer(current => {
+				return current !== source && current !== player && current.isDamaged() && current.countCards("he") >= 1;
+			});
 		},
 		async cost(event, trigger, player) {
 			const target = trigger.player,
@@ -24,16 +23,16 @@ const skills = {
 			const targets = (
 				target === player
 					? game.filterPlayer(current => {
-							return current !== player;
+							return current !== source && current !== player && current.isDamaged() && current.countCards("he") >= 1;
 						})
 					: [player]
-			).filter(current => current !== source && current !== target && current.countCards("h") >= 1);
+			).filter(current => current !== source && current !== target && current.countCards("he") >= 1);
 			targets.sortBySeat();
 			let cards = null,
 				giver = null;
 			const eventId = get.id(),
-				send = (target, source, current) => {
-					lib.skill.jsrgxiangru.chooseTarget(target, source, current, eventId);
+				send = (target, source, current, eventId, eventNum) => {
+					lib.skill.jsrgxiangru.chooseTarget(target, source, current, eventId, eventNum);
 					game.resume();
 				},
 				humans = targets.filter(current => current === game.me || current.isOnline()),
@@ -46,36 +45,33 @@ const skills = {
 			targets.forEach(current => current.showTimer(time));
 			//先处理人类玩家
 			if (humans.length > 0) {
+				const solve = function (resolve, reject) {
+					return function (result, player) {
+						if (result && result.bool && !cards) {
+							resolve();
+							giver = player;
+							cards = result.cards;
+						} else reject();
+					};
+				};
 				await Promise.any(
 					humans.map(current => {
 						return new Promise(async (resolve, reject) => {
 							if (current.isOnline()) {
-								current.send(send, target, source, current, eventId);
-								current.wait((result, player) => {
-									if (result.bool && !cards) {
-										giver = player;
-										cards = result.cards;
-										resolve();
-									} else reject();
-								});
+								current.send(send, target, source, current, eventId, trigger.num);
+								current.wait(solve(resolve, reject));
 							} else {
-								const next = lib.skill.jsrgxiangru.chooseTarget(target, source, current, eventId);
-								const solver = (result, player) => {
-									if (result.bool && !cards) {
-										giver = player;
-										cards = result.cards;
-										resolve();
-									} else reject();
-								};
+								const next = lib.skill.jsrgxiangru.chooseTarget(target, source, current, eventId, trigger.num);
+								const solver = solve(resolve, reject);
 								if (_status.connectMode) game.me.wait(solver);
 								const result = await next.forResult();
-								if (_status.connectMode) game.me.unwait(result, current);
+								if (_status.connectMode && !cards) game.me.unwait(result, current);
 								else solver(result, current);
 							}
 						});
 					})
-				);
-				game.broadcast("cancel", eventId);
+				).catch(() => {});
+				game.broadcastAll("cancel", eventId);
 			}
 			//再处理单机的他人控制玩家/AI玩家
 			if (!cards && locals.length > 0) {
@@ -83,7 +79,7 @@ const skills = {
 					if (cards) continue;
 					const result = await lib.skill.jsrgxiangru.chooseTarget(target, source, current).forResult();
 					if (result.bool) {
-						giver = player;
+						giver = current;
 						cards = result.cards;
 					}
 				}
@@ -95,9 +91,10 @@ const skills = {
 			if (cards) {
 				event.result = {
 					bool: true,
-					targets: [target],
+					targets: [player === target ? giver : target],
 					cost_data: { cards, giver },
 				};
+				game.broadcastAll(result => console.log(result), event.result);
 			}
 		},
 		async content(event, trigger, player) {
@@ -105,11 +102,24 @@ const skills = {
 			await giver.give(cards, trigger.source);
 			await trigger.cancel();
 		},
-		chooseTarget(target, source, current, eventId) {
+		chooseTarget(target, source, current, eventId, eventNum) {
+			const goon = (() => {
+				if (get.attitude(current, target) < 4) return false;
+				if (current.countCards("hs", card => current.canSaveCard(card, target)) >= 1 - (target.hp + target.hujia - eventNum)) return false;
+				if (target == get.zhu(current) || get.attitude(current, source) > 0) return "长崎素世一般的恳求";
+				return "给点废牌算了";
+			})();
 			const next = current.chooseCard("he", 2);
 			next.set("prompt", `是否对${get.translation(target)}发动【相濡】？`);
-			next.set("prompt2", `选择交给${get.translation(source)}两张牌，然后防止${get.translation(target)}即将受到的致命伤害`);
+			next.set("prompt2", `选择交给${get.translation(source)}两张牌，然后防止${get.translation(target)}即将受到的致命伤害。`);
 			next.set("id", eventId);
+			next.set("ai", card => {
+				if (goon) {
+					if (goon.includes("长崎素世")) return 20 - get.value(card);
+					return 6 - get.value(card);
+				}
+				return 0;
+			});
 			return next;
 		},
 	},
@@ -136,12 +146,19 @@ const skills = {
 			return game.hasPlayer(current => !current.isMinHandcard());
 		},
 		async cost(event, trigger, player) {
-			event.result = await player.chooseTarget(get.prompt("jsrgjinglei"), "选择一名其他角色，令任意名手牌数之和小于其的角色各对其造成1点雷属性伤害", (card, player, target) => !target.isMinHandcard()).forResult();
+			event.result = await player
+				.chooseTarget(get.prompt("jsrgjinglei"), "选择一名其他角色，令任意名手牌数之和小于其的角色各对其造成1点雷属性伤害", (card, player, target) => !target.isMinHandcard())
+				.set("ai", target => {
+					const player = get.player();
+					if (get.attitude(player, target) >= 0) return false;
+					return get.damageEffect(target, player, player, "thunder") * Math.sqrt(target.countCards("h"));
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			const [target] = event.targets;
 			const maxmium = target.countCards("h");
-			const next = player.chooseTargets(true, `选择任意名手牌数之和小于${maxmium}的角色`, [1, Infinity]);
+			const next = player.chooseTarget(true, `选择任意名手牌数之和小于${maxmium}的角色`, [1, Infinity]);
 			next.set("promptbar", "none");
 			next.set("maxmium", maxmium);
 			next.set("complexTarget", true);
@@ -150,9 +167,12 @@ const skills = {
 					maxmium = get.event("maxmium");
 				return (
 					selected.reduce((p, c) => {
-						return p + current.countCards("h");
+						return p + c.countCards("h");
 					}, target.countCards("h")) < maxmium
 				);
+			});
+			next.set("ai", target => {
+				return 1 / (1 + target.countCards("h"));
 			});
 			const sources = await next.forResult("targets");
 			sources.sortBySeat();
