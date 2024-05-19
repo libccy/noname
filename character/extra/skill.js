@@ -6394,7 +6394,7 @@ const skills = {
 			player.loseMaxHp();
 			player.addSkills("jilue");
 		},
-		derivation: ["jilue", "reguicai", "fangzhu", "rejizhi", "rezhiheng", "rewansha"],
+		derivation: ["jilue", "jilue_guicai", "jilue_fangzhu", "jilue_jizhi", "jilue_zhiheng", "jilue_wansha"],
 		ai: {
 			combo: "renjie",
 		},
@@ -6505,8 +6505,7 @@ const skills = {
 		},
 	},
 	jilue_wansha: {
-		audio: "wansha",
-		audioname: ["shen_simayi"],
+		audio: 1,
 		enable: "phaseUse",
 		usable: 1,
 		filter(event, player) {
