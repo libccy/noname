@@ -1450,7 +1450,7 @@ const skills = {
 	qixi: {
 		audio: 2,
 		audioname: ["re_ganning"],
-		audioname2: { re_heqi: "qixi_re_heqi" },
+		audioname2: { re_heqi: "duanbing_heqi" },
 		enable: "chooseToUse",
 		filterCard(card) {
 			return get.color(card) == "black";
