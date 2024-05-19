@@ -9407,7 +9407,7 @@ const skills = {
 	rexuanfeng: {
 		audio: "xuanfeng",
 		audioname: ["boss_lvbu3", "re_lingtong"],
-		audioname2: { re_heqi: "xuanfeng_re_heqi" },
+		audioname2: { re_heqi: "fenwei_heqi" },
 		trigger: {
 			player: ["loseAfter", "phaseDiscardEnd"],
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -13838,7 +13838,7 @@ const skills = {
 		audioname2: {
 			re_sunyi: "reyingzi_re_sunyi",
 			heqi: "reyingzi_heqi",
-			re_heqi: "reyingzi_re_heqi"
+			re_heqi: "reyingzi_heqi"
 		},
 		trigger: { player: "phaseDrawBegin2" },
 		forced: true,
