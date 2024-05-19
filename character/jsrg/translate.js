@@ -384,9 +384,13 @@ const translates = {
 	jsrgxiangru: "相濡",
 	jsrgxiangru_info: "当一名已受伤的其他角色／你受到致命伤害时，你／已受伤的其他角色可以交给伤害来源两张牌，然后防止此伤害。",
 	jsrgwudao: "悟道",
-	jsrgwudao_info: "觉醒技。一名其他角色进入濒死状态时，若你没有手牌，则你加１点体力上限并回复１点体力，然后获得〖惊雷〗。",
+	jsrgwudao_info: "觉醒技。一名角色进入濒死状态时，若你没有手牌，则你加１点体力上限并回复１点体力，然后获得〖惊雷〗。",
 	jsrgjinglei: "惊雷",
 	jsrgjinglei_info: "准备阶段，你可以选择一名其他角色Ａ，然后选择任意名手牌数之和小于Ａ的角色，令这些角色依次对Ａ造成１点雷属性伤害。",
+	jsrg_yangqiu: "衰阳球",
+	jsrg_yangqiu_prefix: "衰",
+	jsrgsaojian: "扫奸",
+	jsrgsaojian_info: "出牌阶段限一次，你可以观看一名其他角色的手牌，然后展示其中的一张（对该角色自己不可见）。然后该角色重复弃置一张手牌，直到其以此法弃置了五张牌／弃置了你选择的牌／没有可弃置的手牌。若其弃置完成后的手牌数大于你，则你失去１点体力。",
 };
 
 export default translates;

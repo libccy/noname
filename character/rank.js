@@ -705,6 +705,7 @@ window.noname_character_rank = {
 		"lizhaojiaobo",
 		"linghuyu",
 		"key_mia",
+		"jsrg_yangqiu",
 	],
 	bp: [
 		"xin_huojun",
@@ -2724,6 +2725,7 @@ window.noname_character_rank = {
 			"lizhaojiaobo",
 			"jsrg_songhuanghou",
 			"jsrg_zhangjiao",
+			"jsrg_yangqiu",
 		],
 		junk: [
 			"ol_sb_guanyu",

@@ -3,6 +3,69 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//江山如故·衰
+	//阳球
+	jsrgsaojian: {
+		enable: "phaseUse",
+		usable: 1,
+		filterTarget(card, player, target) {
+			return target.countCards("h") > 0;
+		},
+		async content(event, trigger, player) {
+			const target = event.target;
+			if (target.countCards("h") > 0) {
+				const [card] = await player
+					.choosePlayerCard(target, true, "h", "visible")
+					.set("ai", button => {
+						//开摆，直接随机选，不考虑有的没的
+						return get.event().getRand(button.link.cardid);
+					})
+					.forResult("cards");
+				const videoId = lib.status.videoId++;
+				game.broadcastAll(
+					(card, id, player, target) => {
+						if (target === game.me) return;
+						const dialog = ui.create.dialog(`${get.translation(player)}对${get.translation(target)}发动了【扫奸】`, [card]);
+						dialog.forcebutton = true;
+						dialog.videoId = id;
+					},
+					card,
+					videoId,
+					player,
+					target
+				);
+				await game.asyncDelay(3);
+				game.broadcastAll("closeDialog", videoId);
+				for (let i = 0; i < 5; i++) {
+					const discarded = await target
+						.chooseToDiscard("h", true)
+						.set("ai", card => {
+							//开摆，直接随机弃牌，不考虑有的没的
+							return get.event().getRand(card.cardid);
+						})
+						.forResult("cards");
+					if (!discarded || !discarded.length || discarded[0] === card) break;
+				}
+				if (target.countCards("h") > player.countCards("h")) player.loseHp();
+			}
+		},
+		ai:{
+			order: 7,
+			result: {
+				target(player, target){
+					//对面牌比自己少，就放心大胆弃牌
+					if (target.countCards("h") <= player.countCards("h") - 1) return -3;
+					//残血别浪
+					if (player.hp === 1 && get.effect(player, {name: "losehp"}, player, player)<0) return 0;
+					//血多无所谓
+					return -1;
+				},
+			},
+			tag: {
+				loseCard: 1,
+				discard: 1,
+			},
+		},
+	},
 	//张角
 	jsrgxiangru: {
 		trigger: { global: "damageBegin2" },
@@ -104,6 +167,7 @@ const skills = {
 		},
 		chooseTarget(target, source, current, eventId, eventNum) {
 			const goon = (() => {
+				//资敌的代价太大，因此不到万不得已不给牌
 				if (get.attitude(current, target) < 4) return false;
 				if (current.countCards("hs", card => current.canSaveCard(card, target)) >= 1 - (target.hp + target.hujia - eventNum)) return false;
 				if (target == get.zhu(current) || get.attitude(current, source) > 0) return "长崎素世一般的恳求";
@@ -116,7 +180,7 @@ const skills = {
 			next.set("ai", card => {
 				if (goon) {
 					if (goon.includes("长崎素世")) return 20 - get.value(card);
-					return 6 - get.value(card);
+					return 5 - get.value(card);
 				}
 				return 0;
 			});
@@ -149,6 +213,7 @@ const skills = {
 			event.result = await player
 				.chooseTarget(get.prompt("jsrgjinglei"), "选择一名其他角色，令任意名手牌数之和小于其的角色各对其造成1点雷属性伤害", (card, player, target) => !target.isMinHandcard())
 				.set("ai", target => {
+					//AI写的比较简单：不打队友，根据手牌数平方根酌情打牌多的
 					const player = get.player();
 					if (get.attitude(player, target) >= 0) return false;
 					return get.damageEffect(target, player, player, "thunder") * Math.sqrt(target.countCards("h"));
@@ -172,6 +237,7 @@ const skills = {
 				);
 			});
 			next.set("ai", target => {
+				//谁手牌少就选谁，没啥要考虑的
 				return 1 / (1 + target.countCards("h"));
 			});
 			const sources = await next.forResult("targets");
@@ -179,7 +245,7 @@ const skills = {
 			player.line(sources, "thunder");
 			for (let source of sources) {
 				if (!source.isIn() || !target.isIn()) break;
-				target.damage(source);
+				target.damage(source, "thunder");
 			}
 		},
 	},
