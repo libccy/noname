@@ -744,7 +744,7 @@ export default {
 	"#dangxian_guansuo2": "各位将军，且让小辈先行出战！",
 	"#zhiman_guansuo1": "蛮夷可抚，不可剿！",
 	"#zhiman_guansuo2": "蛮夷可抚，不可剿！",
-	"#duanbing_heqi1": "可真是一把好刀啊！",
+	"#duanbing_heqi1": "可真是把好刀啊！",
 	"#reyingzi_heqi1": "人靠衣装马靠鞍！",
 	"#fenwei_heqi1": "我的船队，要让全建业城都看见！",
 	"#lanjiang_heqi1": "大江惊澜，浪涌四极之疆！",
