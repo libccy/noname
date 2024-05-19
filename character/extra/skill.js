@@ -2413,7 +2413,7 @@ const skills = {
 		},
 	},
 	tianjie: {
-		audio: 2,
+		audio: 3,
 		trigger: { global: "phaseEnd" },
 		direct: true,
 		filter(event, player) {
@@ -3751,7 +3751,7 @@ const skills = {
 						var str = "";
 						if (unfinished.length) str += "<li>未获得：" + get.translation(unfinished) + "<br>";
 						if (finished.length) str += "<li>已获得过：" + get.translation(finished) + "<br>";
-						str += "<li>锁定技。若你因〖驭衡〗获得过〖观潮〗〖决堰〗〖澜江〗，则当你成为自己使用的装备牌的目标后，你将此牌置于弃牌堆，然后使用一张与此装备牌副类别相同的【长安大舰】。";
+						str += "<li>锁定技。若你因〖驭衡〗获得过〖观潮〗〖决堰〗〖澜疆〗，则当你成为自己使用的装备牌的目标后，你将此牌置于弃牌堆，然后使用一张与此装备牌副类别相同的【长安大舰】。";
 						return str;
 					},
 				},
