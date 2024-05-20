@@ -5379,7 +5379,8 @@ const skills = {
 	wansha: {
 		locked: true,
 		audio: 2,
-		audioname: ["boss_lvbu3", "shen_simayi"],
+		audioname: ["boss_lvbu3"],
+		audioname2: { shen_simayi: "jilue_wansha" },
 		global: "wansha2",
 		trigger: { global: "dying" },
 		priority: 15,

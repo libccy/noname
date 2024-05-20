@@ -5359,7 +5359,8 @@ const skills = {
 	//贾诩
 	rewansha: {
 		audio: "wansha",
-		audioname: ["re_jiaxu", "shen_simayi", "boss_lvbu3"],
+		audioname: ["re_jiaxu", "boss_lvbu3"],
+		audioname2: { shen_simayi: "jilue_wansha" },
 		global: "rewansha_global",
 		trigger: { global: "dyingBegin" },
 		forced: true,
