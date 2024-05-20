@@ -290,6 +290,107 @@ const skills = {
 			result: { player: 1 },
 		},
 	},
+	//司马孚
+	xunde: {
+		audio: 2,
+		trigger: { global: "damageEnd" },
+		filter(event, player) {
+			return event.player.isIn() && get.distance(player, event.player) <= 1;
+		},
+		logTarget: "player",
+		check(event, player) {
+			return get.attitude(player, event.player) > 0 && (!event.source || get.attitude(player, event.source) < 0);
+		},
+		content() {
+			"step 0";
+			player.judge().set("callback", function () {
+				if (event.judgeResult.number > 5) {
+					var player = event.getParent(2)._trigger.player;
+					if (get.position(card, true) == "o") player.gain(card, "gain2");
+				}
+			});
+			"step 1";
+			if (result.number < 7) {
+				var source = trigger.source;
+				if (source && source.isIn() && source.countCards("h") > 0) {
+					player.line(source);
+					source.chooseToDiscard("h", true);
+				}
+			}
+		},
+	},
+	chenjie: {
+		audio: 2,
+		trigger: { global: "judge" },
+		filter(event, player) {
+			var suit = get.suit(event.player.judging[0], event.player);
+			return (
+				player.countCards("hes", function (card) {
+					if (_status.connectMode && get.position(card) != "e") return true;
+					return get.suit(card) == suit;
+				}) > 0
+			);
+		},
+		popup: false,
+		preHidden: true,
+		async cost(event, trigger, player) {
+			var suit = get.suit(trigger.player.judging[0], trigger.player);
+			const {
+				result: { bool, cards },
+			} = await player
+				.chooseCard(get.translation(trigger.player) + "的" + (trigger.judgestr || "") + "判定为" + get.translation(trigger.player.judging[0]) + "，" + get.prompt("chenjie"), "hes", function (card) {
+					if (get.suit(card) != _status.event.suit) return false;
+					var player = _status.event.player;
+					var mod2 = game.checkMod(card, player, "unchanged", "cardEnabled2", player);
+					if (mod2 != "unchanged") return mod2;
+					var mod = game.checkMod(card, player, "unchanged", "cardRespondable", player);
+					if (mod != "unchanged") return mod;
+					return true;
+				})
+				.set("ai", function (card) {
+					var trigger = _status.event.getTrigger();
+					var player = _status.event.player;
+					var judging = _status.event.judging;
+					var result = trigger.judge(card) - trigger.judge(judging);
+					var attitude = get.attitude(player, trigger.player);
+					if (attitude == 0 || result == 0) return 0.1;
+					if (attitude > 0) {
+						return result + 0.01;
+					} else {
+						return 0.01 - result;
+					}
+				})
+				.set("judging", trigger.player.judging[0])
+				.set("suit", suit)
+				.setHiddenSkill("chenjie");
+			if (bool) event.result = { bool, cost_data: { cards } };
+		},
+		async content(event, trigger, player) {
+			const result = event.cost_data;
+			const card = result.cards[0];
+			await player.respond(result.cards, "highlight", "chenjie", "noOrdering");
+			if (trigger.player.judging[0].clone) {
+				trigger.player.judging[0].clone.classList.remove("thrownhighlight");
+				game.broadcast(function (card) {
+					if (card.clone) {
+						card.clone.classList.remove("thrownhighlight");
+					}
+				}, trigger.player.judging[0]);
+				game.addVideo("deletenode", player, get.cardsInfo([trigger.player.judging[0].clone]));
+			}
+			await game.cardsDiscard(trigger.player.judging[0]);
+			trigger.player.judging[0] = card;
+			trigger.orderingCards.add(card);
+			game.log(trigger.player, "的判定牌改为", card);
+			await player.draw(2);
+		},
+		ai: {
+			rejudge: true,
+			tag: {
+				rejudge: 0.1,
+			},
+		},
+	},
 	//颜良文丑，但是颜良+文丑
 	twduwang: {
 		audio: 3,
