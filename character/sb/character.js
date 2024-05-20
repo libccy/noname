@@ -1,4 +1,6 @@
 const characters = {
+	sb_handang: ["male", "wu", 4, ["sbgongqi", "sbjiefan"]],
+	sb_gongsunzan: ["male", "qun", 4, ["sbyicong", "sbqiaomeng"]],
 	sb_gaoshun: ["male", "qun", 4, ["sbxianzhen", "sbjinjiu"]],
 	sb_xiahoudun: ["male", "wei", 4, ["sbganglie", "sbqingjian"]],
 	sb_xunyu: ["male", "wei", 3, ["sbquhu", "sbjieming"]],
