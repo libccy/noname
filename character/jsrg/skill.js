@@ -3,6 +3,190 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//江山如故·衰
+	//董卓
+	jsrgguanshi: {
+		enable: "phaseUse",
+		usable: 1,
+		viewAs: { name: "huogong" },
+		viewAsFilter(player) {
+			return player.hasCard(card => get.name(card) === "sha", "hs");
+		},
+		filterCard(card) {
+			return get.name(card) === "sha";
+		},
+		selectTarget: [1, Infinity],
+		onuse(result, player) {
+			player.addTempSkill("jsrgguanshi_effect");
+		},
+		position: "hs",
+		//这个AI难写，交给157了！
+		check() {
+			return -1;
+		},
+		ai: {},
+		subSkill: {
+			effect: {
+				trigger: {
+					player: ["useCardToBefore", "useCardToAfter", "useCardToExcluded", "useCardToOmitted", "useCardToCancelled"],
+				},
+				forced: true,
+				charlotte: true,
+				popup: false,
+				firstDo: true,
+				priority: 100,
+				filter(event, player, name) {
+					if (event.type !== "card" || event.skill !== "jsrgguanshi") return false;
+					const isUnhurted = event.card.storage && event.card.storage.jsrgguanshi;
+					if (name === "useCardToBefore") return isUnhurted;
+					return (
+						!isUnhurted &&
+						event.target &&
+						!player.hasHistory("sourceDamage", evt => {
+							return evt.card === event.card && evt.getParent() === event;
+						})
+					);
+				},
+				async content(event, trigger, player) {
+					if (event.triggername === "useCardToBefore") {
+						trigger.setContent(lib.card.juedou.content);
+					} else {
+						const card = trigger.card;
+						if (!card.storage) card.storage = {};
+						card.storage.jsrgguanshi = true;
+					}
+				},
+			},
+		},
+	},
+	jsrgcangxiong: {
+		trigger: {
+			player: "loseAfter",
+			global: ["gainAfter", "loseAsyncAfter"],
+		},
+		getIndex(event, player, triggername) {
+			if (event.type === "discard") {
+				return event.getl(player).cards2 || [];
+			} else if (event.name === "gain") {
+				if (event.player === player) return;
+				const cardsGained = event.getg(event.player),
+					cardsLost = event.getl(player).cards2;
+				return cardsLost.filter(card => cardsGained.includes(card));
+			} else if (event.name === "loseAsync" && event.type === "gain") {
+				const cardsLost = event.getl(player).cards2;
+				if (!cardsLost.length) return [];
+				const cardsGained = [];
+				game.countPlayer2(
+					current => {
+						if (current !== player) cardsGained.addArray(event.getg(current));
+					},
+					null,
+					true
+				);
+				return cardsLost.filter(card => cardsGained.includes(card));
+			}
+			return [];
+		},
+		filter(event, player, name, card) {
+			if (player.isDisabledJudge()) return false;
+			if (event.type === "discard") return get.position(card, true) === "d";
+			else {
+				const owner = game.findPlayer2(
+					current => {
+						return current !== player && event.getg(current).includes(card);
+					},
+					null,
+					true
+				);
+				return owner.getCards("h").includes(card);
+			}
+		},
+		prompt2(event, player, name, card){
+			return `将${get.translation(card)}作为蓄谋牌置入判定区${player.isPhaseUsing() ? "，然后摸一张牌。" : ""}`
+		},
+		async content(event, trigger, player) {
+			const card = event.indexedData;
+			if(get.position(card) === "d"){
+				player.$gain2(card, false);
+				game.log(player, "使用", card, "进行了明目张胆的蓄谋")
+			}
+			else{
+				get.owner(card).$giveAuto(card, player, false);
+			}
+			await game.asyncDelayx();
+			await player.addJudge({ name: "xumou_jsrg" }, [card]);
+			if (player.isPhaseUsing()) await player.draw();
+		},
+	},
+	jsrgjiebing: {
+		derivation: "jsrgbaowei",
+		trigger: { player: "phaseZhunbeiBegin" },
+		forced: true,
+		juexingji: true,
+		skillAnimation: true,
+		animationColor: "gray",
+		filter(event, player) {
+			const target = lib.skill.jsrgjiebing.getZhugong(player);
+			return (
+				target &&
+				player.countCards("j", card => {
+					return (card.viewAs || card.name) == "xumou_jsrg";
+				}) > target.getHp()
+			);
+		},
+		async content(event, trigger, player) {
+			await player.gainMaxHp(2);
+			await player.recover(2);
+			await player.addSkills("jsrgbaowei");
+		},
+		ai: {
+			combo: "jsrgcangxiong",
+		},
+		getZhugong(player) {
+			const mode = get.mode();
+			if (mode === "identity") {
+				if (_status.mode === "purple") {
+					return game.findPlayer(current => {
+						return current.isZhu2() && current.identity.slice(0, 1) === player.identity.slice(0, 1);
+					});
+				}
+				return game.findPlayer(current => current.isZhu2());
+			} else {
+				return game.findPlayer(current => current.getSeatNum() === 1);
+			}
+		},
+	},
+	jsrgbaowei: {
+		trigger: { player: "phaseJieshuBegin" },
+		forced: true,
+		filter(event, player) {
+			return game.hasPlayer(current => {
+				return current !== player && (current.getHistory("useCard").length > 0 || current.getHistory("respond").length > 0);
+			});
+		},
+		async content(event, trigger, player){
+			const targets = game.filterPlayer(current => {
+				return current !== player && (current.getHistory("useCard").length > 0 || current.getHistory("respond").length > 0);
+			});
+			if (targets.length > 2){
+				await player.loseHp(2);
+			}
+			else {
+				let target;
+				if (targets.length === 1) [target] = targets;
+				else [target] = await player.chooseTarget(true, "暴威：对一名目标角色造成2点伤害", (card, player, target)=>{
+					return get.event("targets").includes(target);
+				}).set("targets", targets).set("ai", target=>{
+					const player = get.player();
+					return get.damageEffect(target, player, player) * (1.1 - get.sgn(get.attitude(player, target)));
+				});
+				player.line(target, "green");
+				target.damage(2);
+			}
+		},
+		ai:{
+			//这里应该写一个强命AI，但是比较麻烦，可能还要写全局AI技能，先摆了
+		},
+	},
 	//阳球
 	jsrgsaojian: {
 		enable: "phaseUse",
@@ -49,14 +233,14 @@ const skills = {
 				if (target.countCards("h") > player.countCards("h")) player.loseHp();
 			}
 		},
-		ai:{
+		ai: {
 			order: 7,
 			result: {
-				target(player, target){
+				target(player, target) {
 					//对面牌比自己少，就放心大胆弃牌
 					if (target.countCards("h") <= player.countCards("h") - 1) return -3;
 					//残血别浪
-					if (player.hp === 1 && get.effect(player, {name: "losehp"}, player, player)<0) return 0;
+					if (player.hp === 1 && get.effect(player, { name: "losehp" }, player, player) < 0) return 0;
 					//血多无所谓
 					return -1;
 				},
@@ -521,8 +705,14 @@ const skills = {
 	jsrgtianyu: {
 		trigger: { global: ["loseAsyncAfter", "cardsDiscardAfter"] },
 		frequent: true,
-		filter(event) {
-			return lib.skill.jsrgtianyu.getCards(event).length > 0;
+		getIndex(event) {
+			return lib.skill.jsrgtianyu.getCards(event);
+		},
+		filter(event, player, triggername, card) {
+			return get.position(card, true) === "d";
+		},
+		frequent(event, player, triggername, card) {
+			return get.value(card, player) > 0;
 		},
 		getCards(event) {
 			const cards = event.getd().filter(card => {
@@ -534,14 +724,11 @@ const skills = {
 			});
 			return cards;
 		},
+		prompt2(event, player, triggername, card) {
+			return `获得即将进入弃牌堆的${get.translation(card)}`;
+		},
 		async content(event, trigger, player) {
-			const cards = lib.skill.jsrgtianyu.getCards(trigger);
-			let cardsToGain;
-			if (cards.length === 1) {
-				cardsToGain = cards;
-			} else {
-				cardsToGain = await player.chooseButton(["天予：选择获得任意张牌", cards], true, [1, cards.length]).forResult("links");
-			}
+			const cards = event.indexedData;
 			await player.gain(cards, "gain2");
 		},
 	},
@@ -1673,7 +1860,7 @@ const skills = {
 				audio: "jsrgeqian",
 				trigger: { player: "phaseJieshuBegin" },
 				filter(event, player) {
-					return player.countCards("h");
+					return player.countCards("h") && !player.isDisabledJudge();
 				},
 				direct: true,
 				async content(event, trigger, player) {
@@ -1750,7 +1937,7 @@ const skills = {
 		},
 		filter(event, player) {
 			if (event.card.name != "sha") return false;
-			if (event.target != player) return !player.hasSkill("jsrgdaimou_other");
+			if (event.target != player) return !player.hasSkill("jsrgdaimou_other") && !player.isDisabledJudge();
 			return (
 				!player.hasSkill("jsrgdaimou_me") &&
 				player.hasCard(card => {

@@ -391,6 +391,17 @@ const translates = {
 	jsrg_yangqiu_prefix: "衰",
 	jsrgsaojian: "扫奸",
 	jsrgsaojian_info: "出牌阶段限一次，你可以观看一名其他角色的手牌，然后展示其中的一张（对该角色自己不可见）。然后该角色重复弃置一张手牌，直到其以此法弃置了五张牌／弃置了你选择的牌／没有可弃置的手牌。若其弃置完成后的手牌数大于你，则你失去１点体力。",
+	jsrg_dongzhuo: "衰董卓",
+	jsrg_dongzhuo_prefix: "衰",
+	jsrgguanshi: "观势",
+	jsrgguanshi_info: "出牌阶段限一次，你可以将【杀】当作【火攻】对任意名角色使用。当此【火攻】对一名目标角色结算结束后，若未对其造成伤害，则此牌对其余目标角色改为以【决斗】的形式结算。",
+	jsrgcangxiong: "藏凶",
+	jsrgcangxiong_info: "当你因弃置或被其他角色得到牌而失去一张牌后，你可以用此牌蓄谋。然后若此时在你的出牌阶段内，则你摸一张牌。",
+	jsrgjiebing: "劫柄",
+	jsrgjiebing_info_identity: "觉醒技。准备阶段，若你的蓄谋牌数大于主公的体力值，则你加２点体力上限并回复２点体力，然后获得〖暴威〗。",
+	jsrgjiebing_info: "觉醒技。准备阶段，若你的蓄谋牌数大于一号位的体力值，则你加２点体力上限并回复２点体力，然后获得〖暴威〗。",
+	jsrgbaowei: "暴威",
+	jsrgbaowei_info: "锁定技。结束阶段，若本回合内使用或打出过牌的其他角色数：大于２，则你失去２点体力；不大于２，则你对其中一名角色造成２点伤害。",
 };
 
 export default translates;

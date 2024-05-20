@@ -2608,7 +2608,7 @@ export const Content = {
 		const checkFrequent = function (info) {
 			if (player.hasSkillTag("nofrequent", false, event.skill)) return false;
 			if (typeof info.frequent == "boolean") return info.frequent;
-			if (typeof info.frequent == "function") return info.frequent(trigger, player);
+			if (typeof info.frequent == "function") return info.frequent(trigger, player, event.triggername, event.indexedData);
 			if (info.frequent == "check" && typeof info.check == "function")
 				return info.check(trigger, player);
 			return false;
