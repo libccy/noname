@@ -32,7 +32,7 @@ export class Audio {
         //@ts-ignore
         else if (typeof player !== "object" || player === null) player = get.convertedCharacter({ isNull: true });
 
-        if (typeof info !== "undefined" && (typeof info !== "object" || Array.isArray(info))) info = { audio: info };
+        if (info !== void 0 && info !== null && (typeof info !== "object" || Array.isArray(info))) info = { audio: info };
 
         const data = {
             audioname: []
@@ -128,7 +128,7 @@ export class Audio {
         const getAudioList = (name, data, info) => {
             data = JSON.parse(JSON.stringify(data));
 
-            if (typeof info === "undefined") {
+            if (info === void 0 || info === null) {
                 if (!isExist(name)) {
                     console.warn(`parse: Cannot find ${name} when parsing ${type} audio.`);
                     return this.#parseAudioWithCache({ parseAudio, options }, name, defaultInfo, data, true);
