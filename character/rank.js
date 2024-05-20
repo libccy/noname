@@ -2228,6 +2228,7 @@ window.noname_character_rank = {
 			"drag_caoren",
 			"wupu",
 			"star_sunjian",
+			"jsrg_zhangjiao",
 		],
 		rare: [
 			"linghuyu",
