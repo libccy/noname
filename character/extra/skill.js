@@ -5582,6 +5582,10 @@ const skills = {
 			combo: "chuyuan",
 		},
 	},
+	rerende_shen_caopi: { audio: 1 },
+	rezhiheng_shen_caopi: { audio: 1 },
+	olluanji_shen_caopi: { audio: 1 },
+	olfangquan_shen_caopi: { audio: 1 },
 	olzhiti: {
 		audio: "drlt_zhiti",
 		global: "olzhiti2",

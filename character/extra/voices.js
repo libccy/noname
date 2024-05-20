@@ -218,11 +218,7 @@ export default {
 	"#rejianxiong_shen_caopi1": "孤之所长，继父之所长。",
 	"#rejianxiong_shen_caopi2": "乱世枭雄，哼，孤亦是。",
 	"#rerende_shen_caopi1": "这些都是孤赏赐给你的。",
-	"#rerende_shen_caopi2": "这些都是孤赏赐给你的。",
 	"#rezhiheng_shen_caopi1": "有些事情，还需多加思索。",
-	"#rezhiheng_shen_caopi2": "有些事情，还需多加思索。",
 	"#olluanji_shen_caopi1": "违逆我的，都该处罚。",
-	"#olluanji_shen_caopi2": "违逆我的，都该处罚。",
 	"#olfangquan_shen_caopi1": "此等小事，你们处理即可。",
-	"#olfangquan_shen_caopi2": "此等小事，你们处理即可。",
 };
