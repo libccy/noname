@@ -27,7 +27,7 @@ const skills = {
 				const event = get.event(), player = get.player();
 				if (
 					game.hasPlayer(current => {
-						return current !== player && get.attitude(player, current) > 0;
+						return current !== player && get.attitude(player, current) < 0;
 					})
 				)
 					return [0, 1, 2].randomGet();
@@ -51,15 +51,17 @@ const skills = {
 						const [target] = event.targets;
 						const chosenNumber = get.info("dcsbtaozhou_backup").chosenNumber;
 						const cards = await target
-							.chooseToGive(`${get.translation(player)}对你发动了【讨州】`, "你可以交给其至多三张手牌", [1, 3])
+							.chooseToGive(`${get.translation(player)}对你发动了【讨州】`, "你可以交给其至多三张手牌", [1, 3], player)
 							.set("ai", card => {
 								if (get.event("att") > 0) {
 									if (get.event("chosenNumber") < ui.selected.cards.length + (get.event("getRand")() < 0.5)) {
-										return 5 - get.value(card);
+										return 5.1 - get.value(card);
 									}
 									return 0;
 								}
-								return -get.value(card);
+								if (ui.selected.cards.length > 1) return -get.value(card);
+								if (ui.selected.cards.length > 0) return 3.6 - get.value(card);
+								return 4.6 - get.value(card);
 							})
 							.set("att", get.attitude(target, player))
 							.set("chosenNumber", chosenNumber)

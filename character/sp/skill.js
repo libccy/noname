@@ -151,6 +151,69 @@ const skills = {
 				await player.discardPlayerCard(current, true);
 			}
 			await game.asyncDelayx();
+			let evt = trigger;
+			while (true) {
+				if (!evt.name || lib.phaseName.includes(evt.name)) break;
+				evt = evt.getParent();
+			}
+			if (player.getHistory("custom", evtx => evtx.olqingya === evt.name).length) return;
+			player.getHistory("custom").push({ olqingya: evt.name });
+			player
+				.when({
+					global: lib.phaseName.map(name => name + "End").concat("phaseAfter"),
+				})
+				.filter(evt => {
+					if (evt.name === "phase") return true;
+					let evt2 = trigger;
+					while (true) {
+						if (!evt2.name || lib.phaseName.includes(evt2.name)) break;
+						evt2 = evt2.getParent();
+					}
+					return evt2.name !== evt.name;
+				})
+				.vars({
+					curPhaseName: evt.name,
+				})
+				.then(() => {
+					if (trigger.name === "phase") {
+						return event.finish();
+					}
+					const history = player.getHistory("useSkill", evt => {
+							if (evt.skill !== "olqingya") return false;
+							const evtx = evt.event.getParent(curPhaseName);
+							if (!evtx || evtx.name !== curPhaseName) return false;
+							return true;
+						}),
+						cards = [];
+					history.forEach(evt => {
+						game.countPlayer2(current => {
+							current.checkHistory("lose", evtx => {
+								if (evtx.getParent(4) !== evt.event) return;
+								cards.addArray(evtx.cards.filterInD("d"));
+							});
+						}, true);
+					});
+					if (!cards.length) {
+						return event.finish();
+					}
+					event.cards = cards;
+					player
+						.chooseButton(["倾轧：是否使用其中的一张牌？", event.cards])
+						.set("filterButton", button => {
+							return get.player().hasUseTarget(button.link);
+						})
+						.set("ai", button => {
+							return get.player().getUseValue(button.link);
+						});
+				})
+				.then(() => {
+					if (result.bool) {
+						const card = result.links[0];
+						player.$gain2(card, false);
+						game.delayx();
+						player.chooseUseTarget(card, true);
+					}
+				});
 		},
 		ai: {
 			effect: {
