@@ -10589,7 +10589,7 @@ const skills = {
 	},
 	olfangquan: {
 		audio: 2,
-		audioname: ["shen_caopi"],
+		audioname2: { shen_caopi: "olfangquan_shen_caopi" },
 		trigger: { player: "phaseUseBefore" },
 		filter: function (event, player) {
 			return player.countCards("h") > 0 && !player.hasSkill("olfangquan3");
@@ -10666,7 +10666,7 @@ const skills = {
 	},
 	olluanji: {
 		inherit: "luanji",
-		audioname: ["shen_caopi"],
+		audioname2: { shen_caopi: "olluanji_shen_caopi" },
 		audio: 2,
 		line: false,
 		group: "olluanji_remove",
@@ -13144,7 +13144,7 @@ const skills = {
 	},
 	rezhiheng: {
 		audio: 2,
-		audioname: ["shen_caopi"],
+		audioname2: { shen_caopi: "rezhiheng_shen_caopi" },
 		mod: {
 			aiOrder: function (player, card, num) {
 				if (num <= 0 || get.itemtype(card) !== "card" || get.type(card) !== "equip") return num;
@@ -13307,7 +13307,8 @@ const skills = {
 	},
 	rerende: {
 		audio: 2,
-		audioname: ["gz_jun_liubei", "shen_caopi"],
+		audioname: ["gz_jun_liubei"],
+		audioname2: { shen_caopi: "rerende_shen_caopi" },
 		enable: "phaseUse",
 		filterCard: true,
 		selectCard: [1, Infinity],
