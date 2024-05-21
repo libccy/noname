@@ -193,6 +193,10 @@ export class GameEvent {
 	 */
 	ai;
 	/**
+	 * @type { string }
+	 */
+	triggername;
+	/**
 	 * @param {keyof this} key
 	 * @param {number} [value]
 	 * @param {number} [baseValue]
