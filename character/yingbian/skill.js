@@ -110,7 +110,7 @@ const skills = {
 					return [1, -1];
 				},
 			},
-			halfneg: true
+			halfneg: true,
 		},
 		subSkill: {
 			effect: {
@@ -1649,9 +1649,9 @@ const skills = {
 							.getCards("he", function (card) {
 								return lib.filter.canBeDiscarded(card, player, target);
 							})
-							.map(c => {
-								link: c;
-							})
+							.map(c => ({
+								link: c,
+							}))
 							.sort(function (a, b) {
 								return get.buttonValue(b) - get.buttonValue(a);
 							})
