@@ -357,6 +357,10 @@ export class Player extends HTMLDivElement {
 	 * @type { boolean | undefined }
 	 */
 	identityShown;
+	/**
+	 * @type { boolean }
+	 */
+	removed;
 	//新函数
 	/**
 	 * 怒气

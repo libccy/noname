@@ -76,6 +76,14 @@ export class status {
 	 * @type { Function | boolean | undefined }
 	 */
 	new_tutorial = undefined;
+	/**
+	 * @type { Player | undefined }
+	 */
+	roundStart = undefined;
+	/**
+	 * @type { boolean }
+	 */
+	roundSkipped;
 }
 
 export let _status = new status();

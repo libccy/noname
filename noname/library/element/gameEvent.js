@@ -201,6 +201,18 @@ export class GameEvent {
 	 */
 	content;
 	/**
+	 * @type { boolean }
+	 */
+	forceDie;
+	/**
+	 * @type { Function | undefined }
+	 */
+	_oncancel;
+	/**
+	 * @type { boolean }
+	 */
+	includeOut;
+	/**
 	 * @param {keyof this} key
 	 * @param {number} [value]
 	 * @param {number} [baseValue]
