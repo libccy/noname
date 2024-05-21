@@ -18,8 +18,8 @@ export class Audio {
     #Cache = {};
 
     /**
-	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表及其对应的源文件名
-	 * @typedef {{audio: audioInfo, audioname?: string[], audioname2?: {[playerName: string]: audioInfo}}} skillInfo
+     * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表及其对应的源文件名
+     * @typedef {{audio: audioInfo, audioname?: string[], audioname2?: {[playerName: string]: audioInfo}}} skillInfo
      * @param { object } options
      * @param { string } options.skill 技能名
      * @param { Player | string } [options.player] 角色/角色名
@@ -30,7 +30,7 @@ export class Audio {
         if (skill === void 0) {
             console.error(new ReferenceError(`skill is not defined`));
             return [];
-        } 
+        }
         //@ts-ignore
         if (typeof player === "string") player = get.convertedCharacter({ name: player });
         //@ts-ignore
@@ -74,7 +74,7 @@ export class Audio {
     }
 
     /**
-	 * 获取角色死亡时能播放的所有阵亡台词列表及其对应的源文件名
+     * 获取角色死亡时能播放的所有阵亡台词列表及其对应的源文件名
      * @param { object } options
      * @param { Player | string } options.player 角色/角色名
      * @param { audioInfo } [options.info] 使用指定的audioInfo
@@ -216,7 +216,7 @@ export class Audio {
 
         const getResult = () => {
             const result = getAudioList(name, data, info);
-            if (!result.every(i => i.isDefault)) return result;
+            if (!result.every(i => i.isDefault && !i.text)) return result;
             if (name.includes("_")) {
                 name = name.slice(name.indexOf("_") + 1);
                 info = void 0;
