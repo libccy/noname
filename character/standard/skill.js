@@ -99,7 +99,6 @@ const skills = {
 		content() {
 			player
 				.moveCard(
-					true,
 					game.filterPlayer(i => {
 						return i.group == "qun";
 					}),
