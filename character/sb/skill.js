@@ -140,14 +140,15 @@ const skills = {
 			const targets = game.filterPlayer(current => {
 				return current.inRange(target);
 			});
-			if (!targets.length) {
+			const count = Math.min(2, targets.length);
+			if (!count) {
 				target.chat("没人打得到我喔！");
 				return;
 			}
 			const controls = ["选项一", "选项二", "背水！"];
 			const control = await target
 				.chooseControl(controls)
-				.set("choiceList", [`令所有攻击范围内含有你的角色依次弃置一张牌（${get.translation(targets)}）`, `你摸等同于攻击范围内含有你的角色数的牌（${get.cnNumber(targets.length)}张牌）`, `背水！令${get.translation(player)}的〖解烦〗失效直到其杀死一名角色，然后你依次执行上述所有选项`])
+				.set("choiceList", [`令所有攻击范围内含有你的角色依次弃置一张牌（${get.translation(targets)}）`, `你摸等同于攻击范围内含有你的角色数的牌（${get.cnNumber(count)}张牌）`, `背水！令${get.translation(player)}的〖解烦〗失效直到其杀死一名角色，然后你依次执行上述所有选项`])
 				.set("ai", () => {
 					return get.event("choice");
 				})
@@ -161,7 +162,7 @@ const skills = {
 								return get.effect(current, { name: "guohe", position }, target, target);
 							})
 							.reduce((p, c) => p + c, 0);
-						const eff2 = (get.effect(target, { name: "wuzhong" }, target) * targets.length) / 2;
+						const eff2 = (get.effect(target, { name: "wuzhong" }, target) * count) / 2;
 						if (
 							game.hasPlayer(current => {
 								const att1 = get.attitude(player, current),
@@ -191,7 +192,7 @@ const skills = {
 				}
 			}
 			if (control !== "选项一") {
-				target.draw(targets.length);
+				target.draw(count);
 			}
 		},
 		ai: {
@@ -201,7 +202,7 @@ const skills = {
 					const targets = game.filterPlayer(current => {
 						return current.inRange(target);
 					});
-					return targets.length / 2;
+					return Math.min(2, targets.length) / 2;
 				},
 			}
 		}
