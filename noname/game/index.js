@@ -1468,15 +1468,24 @@ export class Game {
 	 */
 	trySkillAudio(skill, player, directaudio, nobroadcast, skillInfo) {
 		if (!nobroadcast) game.broadcast(game.trySkillAudio, skill, player, directaudio, nobroadcast, skillInfo);
+		if (!lib.config.background_speak) return;
+
 		const info = skillInfo || lib.skill[skill];
 		if (!info) return;
-		if (!lib.config.background_speak) return;
 		if (info.direct && !directaudio) return;
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
-		let audio,
-			list = game.parseSkillTextMap(skill, player, skillInfo).randomSort();
+		
+		let audio, list = get.Audio.skill({ skill, player, info: skillInfo }).randomSort();
+		const check = () => {
+			if (list.length) return true;
+			//@ts-ignore
+			if (!list.alternate) return false;
+			//@ts-ignore
+			list = list.alternate;
+			return check();
+		};
 		return (function play() {
-			if (!list.length) return;
+			if (!check()) return;
 			audio = list.shift();
 			return game.playAudio(audio.file, play);
 		})();
@@ -1489,21 +1498,13 @@ export class Game {
 		game.broadcast(game.tryDieAudio, player);
 		if (!lib.config.background_speak) return;
 
-		let playerName;
-		if (typeof player === "string") playerName = player;
-		else if (player.skin && player.skin.name) playerName = player.skin.name;
-		else playerName = player.name;
-
-		let audio,
-			isDefault,
-			list = game.parseDieTextMap(player).randomSort();
+		let audio, list = get.Audio.die({player}).randomSort();
 		const check = () => {
 			if (list.length) return true;
-			if (!audio) return false;
-			if (!audio.isDefault) return false;
-			if (!playerName.includes("_")) return false;
-			playerName = playerName.slice(playerName.indexOf("_") + 1);
-			list = game.parseDieTextMap(playerName).randomSort();
+			//@ts-ignore
+			if (!list.alternate) return false;
+			//@ts-ignore
+			list = list.alternate;
 			return check();
 		};
 		return (function play() {

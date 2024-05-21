@@ -27,6 +27,10 @@ export class Audio {
      * @returns { textMap[] }
      */
     skill({ skill, player, info }) {
+        if (skill === void 0) {
+            console.error(new ReferenceError(`skill is not defined`));
+            return [];
+        } 
         //@ts-ignore
         if (typeof player === "string") player = get.convertedCharacter({ name: player });
         //@ts-ignore
@@ -77,6 +81,10 @@ export class Audio {
      * @returns { textMap[] } 
      */
     die({ player, info }) {
+        if (player === void 0) {
+            console.error(new ReferenceError(`player is not defined`));
+            return [];
+        }
         let name = typeof player === "string" ? player : player.name;
         let skinInfo;
         if (info) skinInfo = { dieAudios: info };
@@ -113,7 +121,8 @@ export class Audio {
      * @returns { textMap[] } 
      */
     #parse = function (arg) {
-        const { name, info, data = {}, options, getInfo, isExist, getAudioInfo } = arg;
+        const { data = {}, options, getInfo, isExist, getAudioInfo } = arg;
+        let { name, info } = arg;
         const { type, defaultPath, defaultInfo } = options;
         data.history = [];
 
@@ -205,7 +214,18 @@ export class Audio {
             return [this.#textMap({ path, name: audioInfo, ext, type, isDefault, defaultPath })];
         }
 
-        return getAudioList(name, data, info);
+        const getResult = () => {
+            const result = getAudioList(name, data, info);
+            if (!result.every(i => i.isDefault)) return result;
+            if (name.includes("_")) {
+                name = name.slice(name.indexOf("_") + 1);
+                info = void 0;
+                //@ts-ignore
+                result.alternate = getResult();
+            }
+            return result;
+        }
+        return getResult();
     }
 
     /**
