@@ -1417,271 +1417,45 @@ export class Game {
 	 * @typedef {{audio: audioInfo, audioname?:string[], audioname2?:{[playerName: string]: audioInfo}}} skillInfo
 	 * @param { string } skill  技能名
 	 * @param { Player | Object | string } [player]  角色/角色名
-	 * @param { skillInfo | audioInfo } [skillInfo]  预设的skillInfo/audioInfo(转为skillInfo)，覆盖lib.skill[skill]
-	 * @param { boolean | undefined } [useRawAudio]
+	 * @param { skillInfo | audioInfo } [skillInfo]  使用指定的skillInfo/audioInfo
 	 * @returns { string[] }  语音地址列表
-	 * @example
-	 * ```js
-	 * const info=lib.skill['skillname'];
-	 * info.audio=undefined //默认值[true,2]
-	 * info.audio=false // 不播放语音
-	 * info.audio=true // [skill/skillname.mp3]
-	 * info.audio=3 // [skill/skillname1.mp3,skill/skillname2.mp3,skill/skillname3.mp3]（项数为数字大小）
-	 * info.audio="(ext:extName|db:extension-extName)(/anyPath):true|number(:format)" //间接路径
-	 * // 同上，只是将目录改为(ext:extName|db:extension-extName)(/anyPath)，且可以指定格式(默认mp3)
-	 * info.audio="(ext:extName|db:extension-extName/)(anyPath/)filename(.format)" //直接路径
-	 * //path和format至少有一个，否则会识别为引用技能
-	 * //起始位置为audio/(若无anyPath则为audio/skill/)，若没有format默认mp3
-	 * info.audio="otherSkillname" //引用技能
-	 * //引用一个其他技能的语音，若lib.skill["otherSkillname"]不存在则读取"otherSkillname"的audio为默认值[true,2]
-	 * info.audio=["otherSkillname", number] //带fixedNum的引用技能
-	 * //同样引用一个其他技能的语音，若lib.skill["otherSkillname"]不存在则读取"otherSkillname"的audio为number
-	 * //若"otherSkillname"的语音数超过number，则只取前number个
-	 * info.audio=[true,2,"otherSkillname1",["otherSkillname2",2]] //任意元素拼接
-	 * //数组里可以放任何以上的格式，结果为分析完的结果合并
-	 *
-	 * info.audioname=['player1','player2']
-	 * //audioname里可以放任意角色名。
-	 * //如果其中包含发动技能的角色名"player"，且info.audio不是直接路径"(anyPath/)filename(.format)"的形式
-	 * //则在"skill"和number中插入"_player"，形如
-	 *
-	 * info.audioname2={'player1':audioInfo1,'player2':audioInfo2}
-	 * //audioname2是一个对象，其中key为角色名，value的类型和info.audio一样
-	 * //如果key中包含发动技能的角色名player，则直接改用info.audioname2[player]来播放语音
-	 * ```
 	 */
 	parseSkillAudio(skill, player, skillInfo) {
-		return game.parseSkillTextMap(skill, player, skillInfo).map(data => data.file);
+		return get.Audio.skill({ skill, player, info: skillInfo }).map(data => data.file);
 	}
 	/**
 	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表
 	 * @param { string } skill  技能名
 	 * @param { Player | Object | string } [player]  角色/角色名
-	 * @param { skillInfo | audioInfo } [skillInfo]  预设的skillInfo/audioInfo(转为skillInfo)，覆盖lib.skill[skill]
+	 * @param { skillInfo | audioInfo } [skillInfo]  使用指定的skillInfo/audioInfo
 	 * @returns { string[] }  语音地址列表
 	 */
 	parseSkillText(skill, player, skillInfo) {
-		return game
-			.parseSkillTextMap(skill, player, skillInfo)
+		return get.Audio.skill({ skill, player, info: skillInfo })
 			.map(data => data.text)
-			.filter(Boolean);
+			.filter(text => text !== void 0);
 	}
 	/**
+	 * @deprecated 请使用get.Audio.skill 
+	 * 
 	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表及其对应的源文件名
 	 * @param { string } skill  技能名
 	 * @param { Player | Object | string } [player]  角色/角色名
-	 * @param { skillInfo | audioInfo } [skillInfo]  预设的skillInfo/audioInfo(转为skillInfo)，覆盖lib.skill[skill]
-	 * @returns { any[] }  语音地址列表
+	 * @param { skillInfo | audioInfo } [skillInfo]  使用指定的skillInfo/audioInfo
+	 * @returns 语音地址列表
 	 */
 	parseSkillTextMap(skill, player, skillInfo) {
-		if (typeof player === "string") player = get.convertedCharacter({ name: player });
-		else if (typeof player !== "object" || player === null) player = get.convertedCharacter({ isNull: true });
-
-		if (skillInfo && (typeof skillInfo !== "object" || Array.isArray(skillInfo))) skillInfo = { audio: skillInfo };
-
-		const defaultInfo = [true, 2];
-
-		const check = (skill, history) => {
-			if (!get.info(skill)) return false;
-			if (!history.includes(skill)) return true;
-			if (history[0] === skill) return false;
-			//deadlock
-			throw new RangeError(`parseSkillTextMap: ${skill} in ${history} forms a deadlock`);
-		};
-
-		const getName = filter => {
-			const name = (player.tempname || []).find(i => filter(i));
-			if (name) return name;
-			return [player.name, player.name1, player.name2].reduce(
-				(result, name) => {
-					if (result) return result;
-					if (!name) return result;
-					if (filter(name)) return name;
-					return get.character(name).tempname.find(i => filter(i)) || result;
-				},
-				void 0
-			);
-		};
-
-		const getTextMap = (path, name, ext, isDefault) => ({
-			name,
-			file: `${path}${name}${ext}`,
-			text: lib.translate[`#${name}`],
-			isDefault,
-		});
-
-		const getAudioList = (skill, options, skillInfo) => {
-			const info = skillInfo || get.info(skill);
-			if (!info) {
-				console.error(new ReferenceError(`parseSkillTextMap: Cannot find ${skill} in lib.skill`));
-				return parseAudio(skill, Object.assign(options, { isDefault: true }), defaultInfo);
-			}
-
-			const { audioname, history } = options;
-			history.unshift(skill);
-			let audioInfo = info.audio;
-			if (Array.isArray(info.audioname)) audioname.addArray(info.audioname);
-			if (info.audioname2) audioInfo = info.audioname2[getName(i => info.audioname2[i])] || audioInfo;
-
-			return parseAudio(skill, options, audioInfo);
-		};
-
-		const parseAudio = (skill, options, audioInfo) => {
-			const audioname = options.audioname.slice();
-			const history = options.history.slice();
-			const isDefault = options.isDefault;
-			options = { audioname, history, isDefault };
-			if (Array.isArray(audioInfo)) {
-				if (audioInfo.length === 2 && typeof audioInfo[0] === "string" && typeof audioInfo[1] === "number") {
-					const [name, number] = audioInfo;
-					if (check(name, history)) return getAudioList(name, options).slice(0, number);
-					return parseAudio(name, options, number);
-				}
-
-				const map = {};
-				audioInfo.forEach(i => {
-					parseAudio(skill, options, i).forEach(data => (map[data.name] = data));
-				});
-				return Object.values(map);
-			}
-
-			if (!["string", "number", "boolean"].includes(typeof audioInfo)) return parseAudio(skill, Object.assign(options, { isDefault: true }), defaultInfo);
-			if (audioInfo === false) return [];
-			if (typeof audioInfo === "string") {
-				if (["data:", "blob:"].some(prefix => audioInfo.startsWith(prefix))) return [getTextMap("", audioInfo, "", isDefault)];
-				if (check(audioInfo, history)) return getAudioList(audioInfo, options);
-			}
-			audioInfo = String(audioInfo);
-			const list = audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/); // [path, number|true, ext]
-			if (list) {
-				let [, path = "skill", audioNum, ext = "mp3"] = list;
-				let _audioname = getName(i => audioname.includes(i));
-				_audioname = _audioname ? `_${_audioname}` : "";
-				if (audioNum === "true") return [getTextMap(`${path}/`, `${skill}${_audioname}`, `.${ext}`, isDefault)];
-				const audioList = [];
-				audioNum = parseInt(audioNum);
-				for (let i = 1; i <= audioNum; i++) {
-					audioList.push(getTextMap(`${path}/`, `${skill}${_audioname}${i}`, `.${ext}`, isDefault));
-				}
-				return audioList;
-			}
-
-			let path = "", ext = "";
-			if (!/^db:|^ext:|\//.test(audioInfo)) path = "skill/";
-			if (!/\.\w+$/.test(audioInfo)) ext = ".mp3";
-			if (path && ext) return parseAudio(audioInfo, Object.assign(options, { isDefault: true }), defaultInfo);
-			//@TODO
-			console.warn(`${skill}中的地址写法(${audioInfo})暂时没有完全支持台词系统。`);
-			return [getTextMap(path, audioInfo, ext, isDefault)];
-		}
-
-		return getAudioList(skill, { audioname: [], history: [], isDefault: false }, skillInfo);
+		return get.Audio.skill({ skill, player, info: skillInfo });
 	}
 	/**
+	 * @deprecated 请使用get.Audio.die 
+	 * 
 	 * 获取角色死亡时能播放的所有阵亡语音
 	 * @param { string | Player } player  角色名
-	 * @returns { any[] }  语音地址列表
+	 * @returns 语音地址列表
 	 */
 	parseDieTextMap(player) {
-		let name = typeof player === "string" ? player : player.name;
-		let audioInfo;
-		if (typeof player !== "string" && player.skin && player.skin.name) {
-			const skinName = player.skin.name;
-			if (skinName !== name && lib.characterSubstitute[name]) {
-				const skin = lib.characterSubstitute[name].find(i => i[0] === skinName);
-				if (skin) {
-					const newCharacter = get.convertedCharacter(["", "", 0, [], skin[1]]);
-					name = skinName;
-					audioInfo = newCharacter.dieAudios;
-				}
-			}
-		}
-
-		const defaultInfo = true;
-
-		const check = (name, history) => {
-			if (get.character(name).isNull) return false;
-			if (!history.includes(name)) return true;
-			if (history[0] === name) return false;
-			//deadlock
-			throw new RangeError(`parseDieTextMap: ${name} in ${history} forms a deadlock`);
-		};
-
-		const getTextMap = (path, name, ext, isDefault) => ({
-			name,
-			file: `${path}${name}${ext}`,
-			text: lib.translate[`#${name}:die`],
-			isDefault,
-		});
-
-		const getAudioList = (name, options, audioInfo) => {
-			if (!audioInfo) {
-				const info = get.character(name);
-				if (info.isNull) {
-					// console.error(new ReferenceError(`parseDieTextMap: Cannot find ${name} in lib.character`));
-					return parseAudio(name, Object.assign(options, { isDefault: true }), defaultInfo);
-				}
-				audioInfo = info.dieAudios;
-			}
-
-			if (audioInfo.length === 0) audioInfo = void 0;
-
-			const { history } = options;
-			history.unshift(name);
-
-			return parseAudio(name, options, audioInfo);
-		};
-
-		const parseAudio = (name, options, audioInfo) => {
-			const history = options.history.slice();
-			const isDefault = options.isDefault;
-			options = { history, isDefault };
-			if (Array.isArray(audioInfo)) {
-				// if (audioInfo.length === 2 && typeof audioInfo[0] === "string" && typeof audioInfo[1] === "number") {
-				//     const [name, number] = audioInfo;
-				//     if (check(name, history)) return getAudioList(name, options).slice(0, number);
-				//     return parseAudio(name, options, number);
-				// }
-
-				const map = {};
-				audioInfo.forEach(i => {
-					parseAudio(name, options, i).forEach(data => (map[data.name] = data));
-				});
-				return Object.values(map);
-			}
-
-			if (!["string", "number", "boolean"].includes(typeof audioInfo)) return parseAudio(name, Object.assign(options, { isDefault: true }), defaultInfo);
-			if (audioInfo === false) return [];
-			if (typeof audioInfo === "string") {
-				if (["data:", "blob:"].some(prefix => audioInfo.startsWith(prefix))) return [getTextMap("", audioInfo, "", isDefault)];
-				if (check(audioInfo, history)) return getAudioList(audioInfo, options);
-			}
-			audioInfo = String(audioInfo);
-			const list = audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/); // [path, number|true, ext]
-			if (list) {
-				let [, path = "die", audioNum, ext = "mp3"] = list;
-
-				if (audioNum === "true") return [getTextMap(`${path}/`, `${name}`, `.${ext}`, isDefault)];
-
-				const audioList = [];
-				audioNum = parseInt(audioNum);
-				for (let i = 1; i <= audioNum; i++) {
-					audioList.push(getTextMap(`${path}/`, `${name}${i}`, `.${ext}`, isDefault));
-				}
-				return audioList;
-			}
-
-			let path = "",
-				ext = "";
-			if (!/^db:|^ext:|\//.test(audioInfo)) path = "die/";
-			if (!/\.\w+$/.test(audioInfo)) ext = ".mp3";
-			if (path && ext) return parseAudio(audioInfo, Object.assign(options, { isDefault: true }), defaultInfo);
-			//@TODO
-			console.warn(`${name}中的地址写法(${audioInfo})暂时没有完全支持台词系统。`);
-			return [getTextMap(path, audioInfo, ext, isDefault)];
-		};
-
-		return getAudioList(name, { history: [], isDefault: false }, audioInfo);
+		return get.Audio.die({ player });
 	}
 	/**
 	 *
@@ -1694,15 +1468,24 @@ export class Game {
 	 */
 	trySkillAudio(skill, player, directaudio, nobroadcast, skillInfo) {
 		if (!nobroadcast) game.broadcast(game.trySkillAudio, skill, player, directaudio, nobroadcast, skillInfo);
+		if (!lib.config.background_speak) return;
+
 		const info = skillInfo || lib.skill[skill];
 		if (!info) return;
-		if (!lib.config.background_speak) return;
 		if (info.direct && !directaudio) return;
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
-		let audio,
-			list = game.parseSkillTextMap(skill, player, skillInfo).randomSort();
+		
+		let audio, list = get.Audio.skill({ skill, player, info: skillInfo }).randomSort();
+		const check = () => {
+			if (list.length) return true;
+			//@ts-ignore
+			if (!list.alternate) return false;
+			//@ts-ignore
+			list = list.alternate;
+			return check();
+		};
 		return (function play() {
-			if (!list.length) return;
+			if (!check()) return;
 			audio = list.shift();
 			return game.playAudio(audio.file, play);
 		})();
@@ -1715,21 +1498,13 @@ export class Game {
 		game.broadcast(game.tryDieAudio, player);
 		if (!lib.config.background_speak) return;
 
-		let playerName;
-		if (typeof player === "string") playerName = player;
-		else if (player.skin && player.skin.name) playerName = player.skin.name;
-		else playerName = player.name;
-
-		let audio,
-			isDefault,
-			list = game.parseDieTextMap(player).randomSort();
+		let audio, list = get.Audio.die({player}).randomSort();
 		const check = () => {
 			if (list.length) return true;
-			if (!audio) return false;
-			if (!audio.isDefault) return false;
-			if (!playerName.includes("_")) return false;
-			playerName = playerName.slice(playerName.indexOf("_") + 1);
-			list = game.parseDieTextMap(playerName).randomSort();
+			//@ts-ignore
+			if (!list.alternate) return false;
+			//@ts-ignore
+			list = list.alternate;
 			return check();
 		};
 		return (function play() {

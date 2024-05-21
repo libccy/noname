@@ -8,10 +8,12 @@ import { Is } from "./is.js";
 import { Promises } from "./promises.js";
 import { rootURL } from "../../noname.js";
 import * as pinyinPro from "./pinyins/index.js";
+import { Audio } from "./audio.js";
 
 export class Get {
 	is = new Is();
 	promises = new Promises();
+	Audio = new Audio();
 	/**
 	 * 获取当前内核版本信息
 	 *
