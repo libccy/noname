@@ -8,7 +8,6 @@ import { get } from "./index.js";
  *     file: string,
  *     text: string | undefined,
  *     type: string,
- *     isDefault: boolean
  * } } textMap
  */
 export class Audio {
@@ -24,9 +23,10 @@ export class Audio {
      * @param { string } options.skill 技能名
      * @param { Player | string } [options.player] 角色/角色名
      * @param { audioInfo | skillInfo } [options.info] 使用指定的skillInfo/audioInfo
+     * @param { audioInfo } [options.defaultInfo] 默认的audioInfo
      * @returns { textMap[] }
      */
-    skill({ skill, player, info }) {
+    skill({ skill, player, info, defaultInfo = [true, 2] }) {
         if (skill === void 0) {
             console.error(new ReferenceError(`skill is not defined`));
             return [];
@@ -45,7 +45,7 @@ export class Audio {
         const options = {
             type: "skill",
             defaultPath: "skill",
-            defaultInfo: [true, 2],
+            defaultInfo,
         };
 
         const getInfo = name => get.info(name);
@@ -78,9 +78,10 @@ export class Audio {
      * @param { object } options
      * @param { Player | string } options.player 角色/角色名
      * @param { audioInfo } [options.info] 使用指定的audioInfo
+     * @param { audioInfo } [options.defaultInfo] 默认的audioInfo
      * @returns { textMap[] } 
      */
-    die({ player, info }) {
+    die({ player, info, defaultInfo = true }) {
         if (player === void 0) {
             console.error(new ReferenceError(`player is not defined`));
             return [];
@@ -102,7 +103,7 @@ export class Audio {
         const options = {
             type: "die",
             defaultPath: "die",
-            defaultInfo: true,
+            defaultInfo,
         };
 
         const getInfo = name => get.character(name);
@@ -121,76 +122,89 @@ export class Audio {
      * @returns { textMap[] } 
      */
     #parse = function (arg) {
-        const { data = {}, options, getInfo, isExist, getAudioInfo } = arg;
-        let { name, info } = arg;
-        const { type, defaultPath, defaultInfo } = options;
-        data.history = [];
+        const { name, info, data: originData = {}, options, getInfo, isExist, getAudioInfo } = arg;
+        const { type, defaultPath } = options;
+        originData.history = [];
 
         const check = (name, history) => {
             if (!isExist(name)) return false;
             if (!history.includes(name)) return true;
             if (history[0] === name) return false;
             //deadlock
-            throw new RangeError(`parse: ${name} in ${history} forms a deadlock`);
+            throw new RangeError(`parseAudio: ${name} in ${history} forms a deadlock`);
         }
 
-        const getAudioList = (name, data, info) => {
+        const getInfoAudio = (name, data, { info = void 0, defaultInfo = options.defaultInfo } = {},) => {
             data = JSON.parse(JSON.stringify(data));
 
             if (info === void 0 || info === null) {
-                if (!isExist(name)) {
-                    console.warn(`parse: Cannot find ${name} when parsing ${type} audio.`);
-                    return this.#parseAudioWithCache({ parseAudio, options }, name, defaultInfo, data, true);
+                if (!check(name, data.history)) {
+                    // console.warn(`parse: Cannot find ${name} when parsing ${type} audio.`);
+                    return parseAudioWithCache(name, defaultInfo, data, true);
                 }
                 data.history.unshift(name);
                 info = getInfo(name);
             }
 
             const { audioInfo, isDefault } = getAudioInfo(name, info, data, options);
+            if (isDefault || audioInfo === null || audioInfo === void 0)
+                return parseAudioWithCache(name, defaultInfo, data, true);
 
-            return this.#parseAudioWithCache({ parseAudio, options }, name, audioInfo, data, isDefault);
+            return parseAudioWithCache(name, audioInfo, data);
         }
 
-        const parseAudio = (name, audioInfo, data, isDefault = false) => {
-            const { history, _audioname } = data;
+        const parseAudioWithCache = (name, audioInfo, data, isDefault = false) => {
+            const key = this.#getCacheKey(options, name, audioInfo, data);
+            const result = this.#Cache[key];
+            if (result !== void 0) return result;
+            else {
+                const result = parseAudio(name, audioInfo, data);
+                if (isDefault && name.includes("_")) {
+                    name = name.slice(name.indexOf("_") + 1);
+                    result.alternate = getInfoAudio(name, originData);
+                }
+                this.#Cache[key] = result;
+                return result;
+            }
+        }
+
+        const parseAudio = (name, audioInfo, data) => {
             if (Array.isArray(audioInfo)) {
                 if (type === "skill") {//skill的屎山
                     if (audioInfo.length === 2 && typeof audioInfo[0] === "string" && typeof audioInfo[1] === "number") {
                         const [newName, number] = audioInfo;
-                        if (check(newName, history)) return getAudioList(newName, data).slice(0, number);
-                        return parseAudio(newName, number, data, isDefault);
+                        return getInfoAudio(newName, data, { defaultInfo: number }).slice(0, number);
                     }
                 }
                 const map = {};
                 audioInfo.forEach(info => {
-                    parseAudio(name, info, data, isDefault).forEach(i => (map[i.name] = i));
+                    parseAudio(name, info, data).forEach(i => (map[i.name] = i));
                 });
                 return Object.values(map);
             }
 
-            if (!["string", "number", "boolean"].includes(typeof audioInfo))
-                return parseAudio(name, defaultInfo, data, true);
-            if (audioInfo === false) return [];
 
             audioInfo = String(audioInfo);
 
+            if (audioInfo === "false") return [];
+
             if (["data:", "blob:"].some(prefix => audioInfo.startsWith(prefix))) {
-                return [this.#textMap({ path: "", name: audioInfo, ext: "", type, isDefault, defaultPath })];
+                return [this.#textMap({ path: "", name: audioInfo, ext: "", type, defaultPath })];
             }
-            if (check(audioInfo, history)) return getAudioList(audioInfo, data);
 
             const list = audioInfo.match(/(?:(.*):|^)(true|\d+)(?::(.*)|$)/); // [path, number|true, ext]
             if (list) {
                 let [, path = defaultPath, audioNum, ext = "mp3"] = list;
                 path = path + "/";
                 ext = "." + ext;
+                const { _audioname } = data;
                 if (_audioname) name += "_" + _audioname;
 
-                if (audioNum === "true") return [this.#textMap({ path, name, ext, type, isDefault, defaultPath })];
+                if (audioNum === "true") return [this.#textMap({ path, name, ext, type, defaultPath })];
                 const audioList = [];
                 audioNum = parseInt(audioNum);
                 for (let i = 1; i <= audioNum; i++) {
-                    audioList.push(this.#textMap({ path, name: name + i, ext, type, isDefault, defaultPath }));
+                    audioList.push(this.#textMap({ path, name: name + i, ext, type, defaultPath }));
                 }
                 return audioList;
             }
@@ -210,43 +224,18 @@ export class Audio {
                 audioInfo = audioInfo.slice(0, extIndex);
             }
 
-            if (pathIndex === -1 && extIndex === -1) return parseAudio(name, defaultInfo, data, true);
-            return [this.#textMap({ path, name: audioInfo, ext, type, isDefault, defaultPath })];
+            if (pathIndex === -1 && extIndex === -1) return getInfoAudio(audioInfo, data);
+            return [this.#textMap({ path, name: audioInfo, ext, type, defaultPath })];
         }
 
-        const getResult = () => {
-            const result = getAudioList(name, data, info);
-            if (!result.every(i => i.isDefault && !i.text)) return result;
-            if (name.includes("_")) {
-                name = name.slice(name.indexOf("_") + 1);
-                info = void 0;
-                //@ts-ignore
-                result.alternate = getResult();
-            }
-            return result;
-        }
-        return getResult();
+        return getInfoAudio(name, originData, { info });
     }
 
     /**
      * @this {typeof get.Audio}
      */
-    #parseAudioWithCache = function ({ parseAudio, options }, ...args) {
-        const key = this.#getCacheKey(options, ...args);
-        const result = this.#Cache[key];
-        if (typeof result !== "undefined") return result;
-        else {
-            const result = parseAudio(...args);
-            this.#Cache[key] = result;
-            return result;
-        }
-    }
-
-    /**
-     * @this {typeof get.Audio}
-     */
-    #getCacheKey = function (options, name, audioInfo, data, isDefault = false) {
-        const key = { name, audioInfo, ...options, isDefault };
+    #getCacheKey = function (options, name, audioInfo, data) {
+        const key = { name, audioInfo, ...options };
         for (const i in data) {
             const type = typeof data[i];
             if (type !== 'object' && type !== 'function' || data[i] === null) key[i] = data[i];
@@ -258,7 +247,7 @@ export class Audio {
      * @this {typeof get.Audio}
      * @returns {textMap}
      */
-    #textMap = function ({ path, name, ext, type, isDefault = false, defaultPath }) {
+    #textMap = function ({ path, name, ext, type, defaultPath }) {
         const suffix = type === "skill" ? "" : ":" + type; //skill的屎山
         const translatePath = path.startsWith(defaultPath + "/") ? path.slice(defaultPath.length + 1) : path;
         return {
@@ -266,7 +255,6 @@ export class Audio {
             file: path + name + ext,
             text: lib.translate[`#${translatePath}${name}${suffix}`],
             type,
-            isDefault,
         }
     }
 
