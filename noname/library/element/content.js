@@ -2095,6 +2095,11 @@ export const Content = {
 			var cfg = player.storage[event.directresult];
 			player.storage.subplayer.name2 = event.directresult;
 			player.reinit(current, event.directresult, [cfg.hp, cfg.maxHp]);
+			if (player.name == event.directresult || player.name1 == event.directresult) {
+				const groupx = cfg.group || "qun";
+				player.group = groupx;
+				player.node.name.dataset.nature = get.groupnature(groupx);
+			}
 			if (cfg.hs.length) player.directgain(cfg.hs);
 			if (cfg.es.length) player.directequip(cfg.es);
 		}
@@ -2103,6 +2108,7 @@ export const Content = {
 		"step 0";
 		if (player.storage.subplayer) {
 			var current = player.storage.subplayer.name2;
+			const goon = player.name == current || player.name1 == current;
 			if (event.remove) {
 				player.lose(player.getCards("he"), ui.discardPile)._triggered = null;
 			} else {
@@ -2116,10 +2122,15 @@ export const Content = {
 				player.storage.subplayer.hp,
 				player.storage.subplayer.maxHp,
 			]);
+			if (goon) {
+				const groupx = player.storage.subplayer.group || "qun";
+				player.group = groupx;
+				player.node.name.dataset.nature = get.groupnature(groupx);
+			}
 			player.update();
 			if (event.remove) {
 				if (player.storage[current].onremove) {
-					player.storage[current].onremove(player);
+					player.storage[current].onremove(player, current);
 				}
 				delete player.storage[current];
 				player.storage.subplayer.skills.remove(current);
@@ -2182,9 +2193,15 @@ export const Content = {
 				hs: player.getCards("h"),
 				es: player.getCards("e"),
 				intro2: cfg.intro2,
+				group: player.group,
 			};
 			player.removeSkill(event.list);
 			player.reinit(source, name, [cfg.hp, cfg.maxHp]);
+			if (player.name == name || player.name1 == name) {
+				const groupx = cfg.group || "qun";
+				player.group = groupx;
+				player.node.name.dataset.nature = get.groupnature(groupx);
+			}
 			player.addSkill("subplayer");
 			player.lose(player.getCards("he"), ui.special)._triggered = null;
 			if (cfg.hs.length) player.directgain(cfg.hs);

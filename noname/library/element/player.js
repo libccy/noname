@@ -7348,7 +7348,7 @@ export class Player extends HTMLDivElement {
 			this.exitSubPlayer(true);
 		} else {
 			if (player.storage[name].onremove) {
-				player.storage[name].onremove(player);
+				player.storage[name].onremove(player, name);
 			}
 			this.removeSkill(name);
 			delete this.storage[name];
