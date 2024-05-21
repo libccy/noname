@@ -3,6 +3,87 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//江山如故·衰
+	//张奂
+	jsrgzhushou: {
+		trigger: { global: "phaseEnd" },
+		filter(event, player) {
+			if (!player.getHistory("lose").length) return false;
+			const card = lib.skill.jsrgzhushou.getMaxCard();
+			if (!card) return false;
+			return game.hasPlayer(current => {
+				return current.hasHistory("lose", evt => {
+					return evt.cards2 && evt.cards2.includes(card);
+				});
+			});
+		},
+		async cost(event, trigger, player) {
+			const card = lib.skill.jsrgzhushou.getMaxCard();
+			const targets = game.filterPlayer(current => {
+				return current.hasHistory("lose", evt => {
+					return evt.cards2 && evt.cards2.includes(card);
+				});
+			});
+			const result = await player.chooseTarget(get.prompt("jsrgzhushou"), `选择一名本回合内失去过${get.translation(card)}的角色，对其造成1点伤害。`, (card, player, target)=>{
+				return get.event("targets").includes(target);
+			}).set("targets", targets).set("ai", target=>{
+				const player = get.player();
+				return get.damageEffect(target, player, player);
+			}).forResult();
+			if (result.bool) {
+				event.result = {
+					bool: true,
+					targets: result.targets,
+					cards: [card],
+				};
+			}
+		},
+		async content(event, trigger, player) {
+			await player.showCards(event.cards, `${get.translation(player)}发动了【诛首】`);
+			await event.targets[0].damage("nocard");
+		},
+		getMaxCard() {
+			let cardsLost = [];
+			game.getGlobalHistory("cardMove", evt => {
+				if (evt.name === "cardsDiscard" || (evt.name === "lose" && evt.position === ui.discardPile)) {
+					cardsLost.addArray(evt.cards);
+				}
+			});
+			cardsLost = cardsLost.filterInD("d");
+			let max = 0;
+			return cardsLost.reduce((maxCard, card) => {
+				const num = get.number(card, false);
+				if (num > max) {
+					max = num;
+					return card;
+				} else if (num === max) {
+					return void 0;
+				}
+				return maxCard;
+			}, void 0);
+		},
+	},
+	jsrgyangge: {
+		global: "jsrgyangge_mizhao",
+		subSkill: {
+			mizhao: {
+				//直接继承mizhao
+				inherit: "mizhao",
+				usable: void 0,
+				filter(event, player){
+					return player.countCards("h") > 0 && player.isMinHp() && game.hasPlayer(current => lib.skill.jsrgyangge_mizhao.filterTarget(void 0, player, current));
+				},
+				filterTarget(card, player, target){
+					if (player === target) return false;
+					return target.hasSkill("jsrgyangge") && !target.hasMark("jsrgyangge");
+				},
+				prompt(){
+					const player = get.player();
+					const targets = game.filterPlayer(current => lib.skill.jsrgyangge_mizhao.filterTarget(void 0, player, current));
+					return `对${get.translation(targets)}${targets.length > 1 ? "中的一人" : ""}发动【密诏】`
+				},
+			},
+		},
+	},
 	//董卓
 	jsrgguanshi: {
 		enable: "phaseUse",
@@ -100,16 +181,15 @@ const skills = {
 				return owner.getCards("h").includes(card);
 			}
 		},
-		prompt2(event, player, name, card){
-			return `将${get.translation(card)}作为蓄谋牌置入判定区${player.isPhaseUsing() ? "，然后摸一张牌。" : ""}`
+		prompt2(event, player, name, card) {
+			return `将${get.translation(card)}作为蓄谋牌置入判定区${player.isPhaseUsing() ? "，然后摸一张牌。" : ""}`;
 		},
 		async content(event, trigger, player) {
 			const card = event.indexedData;
-			if(get.position(card) === "d"){
+			if (get.position(card) === "d") {
 				player.$gain2(card, false);
-				game.log(player, "使用", card, "进行了明目张胆的蓄谋")
-			}
-			else{
+				game.log(player, "使用", card, "进行了明目张胆的蓄谋");
+			} else {
 				get.owner(card).$giveAuto(card, player, false);
 			}
 			await game.asyncDelayx();
@@ -163,27 +243,30 @@ const skills = {
 				return current !== player && (current.getHistory("useCard").length > 0 || current.getHistory("respond").length > 0);
 			});
 		},
-		async content(event, trigger, player){
+		async content(event, trigger, player) {
 			const targets = game.filterPlayer(current => {
 				return current !== player && (current.getHistory("useCard").length > 0 || current.getHistory("respond").length > 0);
 			});
-			if (targets.length > 2){
+			if (targets.length > 2) {
 				await player.loseHp(2);
-			}
-			else {
+			} else {
 				let target;
 				if (targets.length === 1) [target] = targets;
-				else [target] = await player.chooseTarget(true, "暴威：对一名目标角色造成2点伤害", (card, player, target)=>{
-					return get.event("targets").includes(target);
-				}).set("targets", targets).set("ai", target=>{
-					const player = get.player();
-					return get.damageEffect(target, player, player) * (1.1 - get.sgn(get.attitude(player, target)));
-				});
+				else
+					[target] = await player
+						.chooseTarget(true, "暴威：对一名目标角色造成2点伤害", (card, player, target) => {
+							return get.event("targets").includes(target);
+						})
+						.set("targets", targets)
+						.set("ai", target => {
+							const player = get.player();
+							return get.damageEffect(target, player, player) * (1.1 - get.sgn(get.attitude(player, target)));
+						});
 				player.line(target, "green");
 				target.damage(2);
 			}
 		},
-		ai:{
+		ai: {
 			//这里应该写一个强命AI，但是比较麻烦，可能还要写全局AI技能，先摆了
 		},
 	},
@@ -362,6 +445,7 @@ const skills = {
 			next.set("prompt", `是否对${get.translation(target)}发动【相濡】？`);
 			next.set("prompt2", `选择交给${get.translation(source)}两张牌，然后防止${get.translation(target)}即将受到的致命伤害。`);
 			next.set("id", eventId);
+			next.set("_global_waiting", true);
 			next.set("ai", card => {
 				if (goon) {
 					if (goon.includes("长崎素世")) return 20 - get.value(card);
@@ -842,6 +926,7 @@ const skills = {
 			const next = player.chooseTarget(`${get.translation(source)}发动了【执盟】，请选择一名讨伐目标`, (card, player, target) => target !== source, true);
 			next.set("ai", target => -get.attitude(get.player(), target));
 			next.set("animate", false);
+			next.set("_global_waiting", true);
 			return next;
 		},
 		subSkill: {

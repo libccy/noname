@@ -402,6 +402,13 @@ const translates = {
 	jsrgjiebing_info: "觉醒技。准备阶段，若你的蓄谋牌数大于一号位的体力值，则你加２点体力上限并回复２点体力，然后获得〖暴威〗。",
 	jsrgbaowei: "暴威",
 	jsrgbaowei_info: "锁定技。结束阶段，若本回合内使用或打出过牌的其他角色数：大于２，则你失去２点体力；不大于２，则你对其中一名角色造成２点伤害。",
+	jsrg_zhanghuan: "衰张奂",
+	jsrg_zhanghuan_prefix: "衰",
+	jsrgzhushou: "诛首",
+	jsrgzhushou_info: "一名角色的回合结束时，若你于本回合内失去过牌，则你可以选择弃牌堆中本回合置入的点数唯一最大的牌，并对本回合失去过此牌的一名角色造成1点伤害。",
+	jsrgyangge: "扬戈",
+	jsrgyangge_mizhao: "密诏",
+	jsrgyangge_info: "每轮限一次。体力值最低的其他角色可以于其出牌阶段内对你发动〖密诏〗。",
 };
 
 export default translates;
