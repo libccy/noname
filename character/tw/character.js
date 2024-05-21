@@ -1,5 +1,6 @@
 const characters = {
 	tw_zhugejun: ["male", "qun", 3, ["twshouzhu", "twdaigui", "twcairu"]],
+	simafu: ["male", "wei", 3, ["xunde", "chenjie"]],
 	tw_yanliang: ["male", "qun", 4, ["twduwang", "twylyanshi"]],
 	tw_wenchou: ["male", "qun", 4, ["twjuexing", "twxiayong"]],
 	tw_yuantan: ["male", "qun", 4, ["twqiaosi", "twbaizu"]],
