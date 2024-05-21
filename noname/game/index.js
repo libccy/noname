@@ -1412,6 +1412,8 @@ export class Game {
 		return audio;
 	}
 	/**
+	 * @deprecated 请使用get.Audio.skill + get.Audio.toFile
+	 * 
 	 * 根据skill中的audio,audioname,audioname2和player来获取音频地址列表
 	 * @typedef {[string,number]|string|number|boolean} audioInfo
 	 * @typedef {{audio: audioInfo, audioname?:string[], audioname2?:{[playerName: string]: audioInfo}}} skillInfo
@@ -1421,9 +1423,11 @@ export class Game {
 	 * @returns { string[] }  语音地址列表
 	 */
 	parseSkillAudio(skill, player, skillInfo) {
-		return get.Audio.skill({ skill, player, info: skillInfo }).map(data => data.file);
+		return get.Audio.toFile(get.Audio.skill({ skill, player, info: skillInfo }));
 	}
 	/**
+	 * @deprecated 请使用get.Audio.skill + get.Audio.toText
+	 * 
 	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表
 	 * @param { string } skill  技能名
 	 * @param { Player | Object | string } [player]  角色/角色名
@@ -1431,9 +1435,7 @@ export class Game {
 	 * @returns { string[] }  语音地址列表
 	 */
 	parseSkillText(skill, player, skillInfo) {
-		return get.Audio.skill({ skill, player, info: skillInfo })
-			.map(data => data.text)
-			.filter(text => text !== void 0);
+		return get.Audio.toText(get.Audio.skill({ skill, player, info: skillInfo }));
 	}
 	/**
 	 * @deprecated 请使用get.Audio.skill 

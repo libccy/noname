@@ -269,4 +269,30 @@ export class Audio {
         return result;
     }
 
+    /**
+     * @param {textMap[]} list
+     * @returns {string[]}
+     */
+    toFile(list) {
+        return (function getResult(textMap) {
+            const result = textMap.map(data => data.file);
+            //@ts-ignore
+            if (textMap.alternate) result.alternate = getResult(textMap.alternate);
+            return result;
+        })(list);
+    }
+
+    /**
+     * @param {textMap[]} list
+     * @returns {string[]}
+     */
+    toText(list) {
+        return (function getResult(textMap) {
+            const result = textMap.map(data => data.text).filter(text => text !== void 0);
+            //@ts-ignore
+            if (textMap.alternate) result.alternate = getResult(textMap.alternate);
+            return result;
+        })(list);
+    }
+
 }
