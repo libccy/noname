@@ -1,4 +1,5 @@
 const characters = {
+	mb_simafu: ["male", "wei", 3, ["mbpanxiang", "mbchenjie"]],
 	mb_sp_guanqiujian: ["male", "wei", 4, ["mbcuizhen", "mbkuili"]],
 	mb_caomao: ["male", "wei", 3, ["mbqianlong", "mbweitong"], ["zhu"]],
 	chengji: ["male", "wei", 4, ["mbkuangli", "mbxiongsi"]],
@@ -57,7 +58,6 @@ const characters = {
 	sunhanhua: ["female", "wu", 3, ["chongxu", "miaojian", "shhlianhua"]],
 	yanpu: ["male", "qun", 3, ["huantu", "bihuo"]],
 	mayuanyi: ["male", "qun", 4, ["jibing", "wangjing", "moucuan"]],
-	simafu: ["male", "wei", 3, ["xunde", "chenjie"]],
 	fuqian: ["male", "shu", 4, ["jueyong", "poxiang"]],
 	xin_caozhen: ["male", "wei", 4, ["discretesidi"]],
 	xin_sunluban: ["female", "wu", 3, ["xinzenhui", "xinjiaojin"]],

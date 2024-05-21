@@ -389,6 +389,8 @@ window.noname_character_rank = {
 		"drag_lvchang",
 		"star_sunjian",
 		"yj_xuangongzhu",
+		"ol_sb_pangtong",
+		"dc_sb_zhugejin",
 	],
 	am: [
 		"tw_yanliang",
@@ -706,6 +708,8 @@ window.noname_character_rank = {
 		"lizhaojiaobo",
 		"linghuyu",
 		"key_mia",
+		"sb_handang",
+		"sb_gongsunzan",
 	],
 	bp: [
 		"xin_huojun",
@@ -1115,6 +1119,8 @@ window.noname_character_rank = {
 		"std_chengyu",
 		"std_fanyufeng",
 		"std_feiyi",
+		"tw_zhugejun",
+		"mb_simafu",
 	],
 	b: [
 		"std_dc_yanghu",
@@ -1640,6 +1646,7 @@ window.noname_character_rank = {
 		"old_xiaoqiao",
 		"old_guanyu",
 		"dc_kongrong",
+		"yadan",
 	],
 	c: [
 		"xiahoudun",
@@ -2238,6 +2245,8 @@ window.noname_character_rank = {
 			"drag_caoren",
 			"wupu",
 			"star_sunjian",
+			"ol_sb_pangtong",
+			"dc_sb_zhugejin",
 		],
 		rare: [
 			"std_sunhao",
@@ -2747,6 +2756,11 @@ window.noname_character_rank = {
 			"chengji",
 			"mb_sp_guanqiujian",
 			"lizhaojiaobo",
+			"tw_zhugejun",
+			"yadan",
+			"mb_simafu",
+			"sb_handang",
+			"sb_gongsunzan",
 		],
 		junk: [
 			"ol_sb_guanyu",

@@ -2,6 +2,186 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//鸭蛋
+	olqingya: {
+		audio: 2,
+		trigger: {
+			player: "useCardToPlayered",
+		},
+		filter(event, player) {
+			if (event.targets.length != 1 || event.target == player || event.target.hasSkill("nodis")) return false;
+			if (event.card.name != "sha") return false;
+			const target = event.target;
+			let left = [],
+				right = [],
+				left2 = player,
+				right2 = player;
+			while (left2 != target && right2 != target) {
+				left2 = left2.getPrevious();
+				right2 = right2.getNext();
+				if (left2 != target) left.push(left2);
+				if (right2 != target) right.push(right2);
+			}
+			if (target == left2) {
+				for (const i of left) {
+					if (i.countDiscardableCards(player)) return true;
+				}
+			}
+			if (target == right2) {
+				for (const i of right) {
+					if (i.countDiscardableCards(player)) return true;
+				}
+			}
+			return false;
+		},
+		aiJudge(player, target, bool) {
+			let left = [],
+				right = [],
+				left2 = player,
+				right2 = player,
+				left3 = false,
+				right3 = false;
+			let eff_left = 0,
+				eff_right = 0;
+			while (left2 != target && right2 != target) {
+				left2 = left2.getPrevious();
+				right2 = right2.getNext();
+				if (left2 != target) left.push(left2);
+				if (right2 != target) right.push(right2);
+			}
+			const card = { name: "guohe", position: "h" };
+			if (target == left2) {
+				for (const i of left) {
+					if (i.countDiscardableCards(player)) {
+						left3 = true;
+						eff_left += get.effect(i, card, player, player);
+					}
+				}
+			}
+			if (target == right2) {
+				for (const i of right) {
+					if (i.countDiscardableCards(player)) {
+						right3 = true;
+						eff_right += get.effect(i, card, player, player);
+					}
+				}
+			}
+			if (left3 && right3) {
+				if (!bool) return Math.max(eff_left, eff_right);
+				if (eff_left > Math.max(0, eff_right)) return "↖顺时针";
+				if (eff_right > Math.max(0, eff_left)) return "逆时针↗";
+				return "cancel2";
+			} else if (left3) {
+				if (bool) return eff_left > 0 ? "↖顺时针" : "cancel2";
+				return eff_left;
+			} else if (right3) {
+				if (bool) return eff_right > 0 ? "逆时针↗" : "cancel2";
+				return eff_right;
+			} else return bool ? "cancel2" : 0;
+		},
+		async cost(event, trigger, player) {
+			const choices = [];
+			const target = trigger.target;
+			let left = [],
+				right = [],
+				left2 = player,
+				right2 = player;
+			while (left2 != target && right2 != target) {
+				left2 = left2.getPrevious();
+				right2 = right2.getNext();
+				if (left2 != target) left.push(left2);
+				if (right2 != target) right.push(right2);
+			}
+			if (target == left2) {
+				for (const i of left) {
+					if (lib.filter.targetEnabled2(trigger.card, player, i)) {
+						choices.push("↖顺时针");
+						break;
+					}
+				}
+			}
+			if (target == right2) {
+				for (const i of right) {
+					if (lib.filter.targetEnabled2(trigger.card, player, i)) {
+						choices.push("逆时针↗");
+						break;
+					}
+				}
+			}
+			choices.push("cancel2");
+			const result = await player
+				.chooseControl(choices)
+				.set("prompt", get.prompt("olqingya"))
+				.set("prompt2", `弃置自己和${get.translation(trigger.target)}某个方向之间的所有角色（不包括你与其）各一张手牌`)
+				.set("choices", choices)
+				.set("ai", () => {
+					var evt = _status.event.getTrigger();
+					return lib.skill.olqingya.aiJudge(evt.player, evt.target, true);
+				})
+				.forResult();
+			if (result.control !== "cancel2") {
+				event.result = {
+					bool: true,
+					cost_data: {
+						control: result.control,
+					},
+				};
+			}
+		},
+		async content(event, trigger, player) {
+			const result = event.cost_data;
+			const targets = [];
+			game.log(player, "选择了", "#g" + result.control);
+			if (result.control == "↖顺时针") {
+				let current = player.getPrevious();
+				while (current != trigger.target) {
+					if (current.countDiscardableCards(player)) targets.push(current);
+					current = current.getPrevious();
+				}
+			} else {
+				let current = player.getNext();
+				while (current != trigger.target) {
+					if (current.countDiscardableCards(player)) targets.push(current);
+					current = current.getNext();
+				}
+			}
+			for (const current of targets) {
+				if (!current.countDiscardableCards(player)) continue;
+				player.line(current);
+				await player.discardPlayerCard(current, true);
+			}
+			await game.asyncDelayx();
+		},
+		ai: {
+			effect: {
+				player_use(card, player, target) {
+					if (!target || player._olqingya_judging || ui.selected.targets.length || player == target || target.hasSkill("nodis")) return;
+					if (typeof card != "object" || card.name != "sha") return false;
+					player._olqingya_judging = true;
+					var effect = lib.skill.olqingya.aiJudge(player, target);
+					delete player._olqingya_judging;
+					if (effect > 0) return [1, effect / Math.max(0.01, get.attitude(player, player))];
+				},
+			},
+		},
+	},
+	oltielun: {
+		audio: 2,
+		mod: {
+			globalFrom(from, to, distance) {
+				let usedCount = 0;
+				const stats = from.stat.slice();
+				stats.reverse();
+				for (const stat of stats) {
+					Object.values(stat.card).forEach(cnt => {
+						usedCount += cnt;
+					});
+					if (stat.isRound) break;
+				}
+				return distance - usedCount;
+			},
+		},
+	},
 	//SP孙策
 	olliantao: {
 		audio: 2,

@@ -31,7 +31,7 @@ const characterReplaces = {
 	huatuo: ["huatuo", "re_huatuo", "old_huatuo"],
 	huaxiong: ["huaxiong", "re_huaxiong", "old_huaxiong", "sb_huaxiong", "ol_huaxiong"],
 	yuanshu: ["yuanshu", "re_yuanshu", "yl_yuanshu", "old_yuanshu", "ol_yuanshu", "star_yuanshu"],
-	gongsunzan: ["gongsunzan", "re_gongsunzan", "dc_gongsunzan", "xin_gongsunzan"],
+	gongsunzan: ["gongsunzan", "re_gongsunzan", "dc_gongsunzan", "xin_gongsunzan", "sb_gongsunzan"],
 	re_lidian: ["re_lidian", "old_re_lidian", "junk_lidian"],
 	sunhao: ["sunhao", "std_sunhao"],
 	lvlingqi: ["lvlingqi", "std_lvlingqi"],

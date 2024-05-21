@@ -14,6 +14,7 @@ const characterSort = {
 	sp2_gaoshan: ["wanglang", "liuhui", "zhangjian"],
 	sp2_wumiao: ["wu_zhugeliang", "wu_luxun", "wu_guanyu"],
 	sp2_mouding: ["dc_sb_jiaxu", "dc_sb_lusu", "dc_sb_zhouyu", "dc_sb_simayi"],
+	sp2_zijing: ["dc_sb_zhugejin"],
 };
 
 const characterSortTranslate = {
@@ -32,6 +33,7 @@ const characterSortTranslate = {
 	sp2_gaoshan: "高山仰止",
 	sp2_qifu: "祈福",
 	sp2_mouding: "谋定天下",
+	sp2_zijing: "子敬邀刀",
 };
 
 export { characterSort, characterSortTranslate };
