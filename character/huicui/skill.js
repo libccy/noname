@@ -5892,6 +5892,9 @@ const skills = {
 					});
 			}
 		},
+		ai: {
+			combo: "dcaishou"
+		},
 	},
 	//向朗
 	dckanji: {
