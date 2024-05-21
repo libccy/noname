@@ -3,7 +3,7 @@ export default {
 	"#dcsbtaozhou2": "荆州弹丸之地，诸君岂可食言而肥？",
 	"#dcsbhoude1": "君子有德，可以载天下之重。",
 	"#dcsbhoude2": "南山有松，任尔风雨雷霆。",
-	"#dc_sb_zhugejin:die": "吾数梦，琅琊旧园。",
+	"#dc_sb_zhugejin:die": "吾数梦，琅琊旧园……",
 	"#dcjijie1": "不知书，何由见之。",
 	"#dcjijie2": "闻古贤女，未有不学前世成败者。",
 	"#dchuiji1": "明眸善睐，瑰姿艳逸。",
