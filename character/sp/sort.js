@@ -4,7 +4,7 @@ const characterSort = {
 	sp_tianzhu: ["ol_liupi", "yadan", "liyi", "zhangyan", "niujin", "hejin", "hansui", "wutugu", "yanbaihu", "shamoke", "zhugedan", "huangzu", "gaogan", "tadun", "fanjiangzhangda", "ahuinan", "dongtuna", "ol_wenqin"],
 	sp_nvshi: ["ol_dingshangwan", "lingju", "guanyinping", "zhangxingcai", "mayunlu", "dongbai", "zhaoxiang", "ol_zhangchangpu", "daxiaoqiao", "jin_guohuai", "ol_hujinding"],
 	sp_shaowei: ["ol_pengyang", "simahui", "zhangbao", "zhanglu", "zhugeguo", "xujing", "zhangling", "huangchengyan", "zhangzhi", "lushi"],
-	sp_huben: ["duanjiong", "ol_mengda", "caohong", "xiahouba", "zhugeke", "zumao", "wenpin", "litong", "mazhong", "heqi", "quyi", "luzhi", "yuejin", "dingfeng", "wuyan", "ol_zhuling", "tianyu", "huojun", "zhaoyǎn", "dengzhong", "ol_furong", "macheng", "ol_zhangyì", "ol_zhujun", "maxiumatie", "luoxian", "ol_huban", "haopu", "ol_qianzhao"],
+	sp_huben: ["duanjiong", "liupan", "ol_mengda", "caohong", "xiahouba", "zhugeke", "zumao", "wenpin", "litong", "mazhong", "heqi", "quyi", "luzhi", "yuejin", "dingfeng", "wuyan", "ol_zhuling", "tianyu", "huojun", "zhaoyǎn", "dengzhong", "ol_furong", "macheng", "ol_zhangyì", "ol_zhujun", "maxiumatie", "luoxian", "ol_huban", "haopu", "ol_qianzhao"],
 	sp_liesi: ["lvboshe", "mizhu", "weizi", "ol_liuba", "zhangshiping"],
 	sp_default: ["sp_diaochan", "sp_zhaoyun", "sp_sunshangxiang", "sp_caoren", "sp_jiangwei", "sp_machao", "sp_caiwenji", "jsp_guanyu", "jsp_huangyueying", "sp_pangde", "sp_jiaxu", "yuanshu", "sp_zhangliao", "sp_ol_zhanghe", "sp_menghuo", "sp_sunce"],
 	sp_qifu: ["ol_feiyi", "caoying", "panshu", "caochun", "yuantanyuanshang", "caoshuang", "wolongfengchu", "guansuo", "baosanniang", "fengfangnv", "jin_zhouchu"],
@@ -12,7 +12,7 @@ const characterSort = {
 	sp_zhongdan: ["cuiyan", "huangfusong"],
 	sp_guozhan2: ["sp_dongzhuo", "liqueguosi", "zhangren"],
 	sp_others: ["hanba", "caiyang"],
-	sp_waitforsort: ["ol_luyusheng", "ol_tw_zhangji", "ol_liwan", "ol_liuyan", "liupan"],
+	sp_waitforsort: ["ol_luyusheng", "ol_tw_zhangji", "ol_liwan", "ol_liuyan"],
 };
 
 const characterSortTranslate = {
