@@ -72,6 +72,14 @@ const translates = {
 	olzhenlie_info: "当你成为其他角色使用【杀】或普通锦囊牌的目标后，你可以失去1点体力并令此牌对你无效，然后你选择一项：①获得使用者的一张牌；②发动一次〖秘计〗。",
 	olmiji: "秘计",
 	olmiji_info: "结束阶段，若你已受伤，则你可以摸X张牌，然后你可以将至多X张牌任意分配给其他角色（X为你已损失的体力值）。",
+	ol_fazheng:'OL界法正',
+	ol_fazheng_prefix:'OL界',
+	olxuanhuo:'眩惑',
+	olxuanhuo_info:'摸牌阶段结束时，你可以交给一名其他角色两张牌，然后其选择一项：1.视为对你选择的另一名其他角色使用一张【杀】，2.令你观看并获得其两张牌。',
+	olenyuan:'恩怨',
+	olenyuan1:'恩怨',
+	olenyuan2:'恩怨',
+	olenyuan_info:'①当你一次性获得一名其他角色超过一张牌后，你可以令其摸一张牌。②当你受到1点伤害后，你可以令伤害来源选择一项：1.将一张红色手牌交给你；2.失去1点体力。',
 };
 
 export default translates;
