@@ -14521,7 +14521,7 @@ const skills = {
 						break;
 					default:
 						player.logSkill("twlingfa");
-						player.addSkills(["twzhian"], ["twlingfa"]);
+						player.changeSkills(["twzhian"], ["twlingfa"]);
 						break;
 				}
 			}
