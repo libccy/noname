@@ -357,6 +357,10 @@ export class Player extends HTMLDivElement {
 	 * @type { boolean | undefined }
 	 */
 	identityShown;
+	/**
+	 * @type { boolean }
+	 */
+	removed;
 	//新函数
 	/**
 	 * 怒气
@@ -3646,6 +3650,12 @@ export class Player extends HTMLDivElement {
 	getCards(arg1, arg2) {
 		return Array.from(this.iterableGetCards(arg1, arg2));
 	}
+	/**
+	 * @param { Player } player 
+	 * @param { string } [arg1] 
+	 * @param { string } [arg2] 
+	 * @returns { Generator<Card, void, unknown> }
+	 */
 	*iterableGetDiscardableCards(player, arg1, arg2) {
 		for (let card of this.iterableGetCards(arg1, arg2)) {
 			if (lib.filter.canBeDiscarded(card, player, this)) {

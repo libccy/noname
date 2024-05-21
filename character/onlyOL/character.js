@@ -11,6 +11,7 @@ const characters = {
 	ol_chengpu: ["male", "wu", 4, ["dclihuo", "olchunlao"], ["tempname:xin_chengpu", "die_audio:xin_chengpu"]],
 	ol_wangyi: ["female", "wei", 3, ["olzhenlie", "olmiji"]],
 	ol_sb_pangtong: ["male", "shu", 3, ["olsbhongtu", "olsbqiwu"]],
+	ol_fazheng: ["male", "shu", 3, ["olxuanhuo", "olenyuan"]],
 };
 
 export default characters;

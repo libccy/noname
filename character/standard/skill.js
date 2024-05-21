@@ -2,7 +2,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
-	//2024标包武将
+	//四象封印·少阴
 	//孙皓
 	stdcanshi: {
 		audio: "canshi",
@@ -836,7 +836,7 @@ const skills = {
 		},
 	},
 	stdzhanying: {
-		audio: "zhanying",
+		audio: "jiaoying",
 		trigger: { global: "damageBegin2" },
 		filter(event, player) {
 			if (_status.currentPhase !== player) return false;

@@ -5996,14 +5996,15 @@ export class Game {
 				resolve();
 			} else if (event.content instanceof AsyncFunction) {
 				// _status,lib,game,ui,get,ai六个变量由game.import提供
-				event.content(event, trigger, player).then(() => {
+				// 使用另一种方式来停止event.content
+				const { promise, resolve: resolveContent } = Promise.withResolvers();
+				promise.then(() => {
 					// 其实这个if几乎一定执行了
 					if (game.executingAsyncEventMap.has(event.toEvent())) {
 						if (!game.executingAsyncEventMap.get(_status.event.toEvent())) {
 							console.warn(`game.executingAsyncEventMap中包括了event，但不包括_status.event！`);
 							console.log("event :>> ", event.toEvent());
 							console.log("_status.event :>> ", _status.event.toEvent());
-							// debugger;
 							game.executingAsyncEventMap.set(
 								event.toEvent(),
 								game.executingAsyncEventMap.get(event.toEvent()).then(() => {
@@ -6025,6 +6026,8 @@ export class Game {
 						resolve();
 					}
 				});
+				event.resolveContent = resolveContent;
+				event.content(event, trigger, player).finally(() => resolveContent());
 			} else {
 				event.content(event, step, source, player, target, targets, card, cards, skill, forced, num, trigger, result, _status, lib, game, ui, get, ai);
 				resolve();
