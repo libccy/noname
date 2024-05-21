@@ -197,6 +197,10 @@ export class GameEvent {
 	 */
 	triggername;
 	/**
+	 * @type { ContentFuncByAll | GeneratorContentFuncByAll | OldContentFuncByAll }
+	 */
+	content;
+	/**
 	 * @param {keyof this} key
 	 * @param {number} [value]
 	 * @param {number} [baseValue]
@@ -306,15 +310,6 @@ export class GameEvent {
 		this.numFixed = true;
 		return this;
 	}
-	forceFinish() {
-		if (!this.finished) {
-			this.finished = true;
-			if (this.content instanceof AsyncFunction) {
-				throw "event_finish";
-			}
-		}
-		return this;
-	}
 	finish() {
 		this.finished = true;
 		return this;
@@ -369,7 +364,11 @@ export class GameEvent {
 	}
 	cancel(arg1, arg2, notrigger) {
 		this.untrigger(arg1, arg2);
-		this.forceFinish();
+		// this.forceFinish();
+		this.finish();
+		if (typeof this.resolveContent == 'function') {
+			this.resolveContent();
+		}
 		if (notrigger != "notrigger") {
 			if (this.player && lib.phaseName.includes(this.name))
 				this.player.getHistory("skipped").add(this.name);
@@ -440,9 +439,11 @@ export class GameEvent {
 				try {
 					if (
 						!(lib.element.content[item] instanceof AsyncFunction) &&
+						// @ts-ignore
 						!lib.element.content[item]._parsed
 					) {
 						lib.element.content[item] = lib.init.parsex(lib.element.content[item]);
+						// @ts-ignore
 						lib.element.content[item]._parsed = true;
 					}
 				} catch {

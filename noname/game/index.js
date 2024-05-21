@@ -6027,15 +6027,7 @@ export class Game {
 					}
 				});
 				event.resolveContent = resolveContent;
-				event.content(event, trigger, player)
-					.then(() => resolveContent())
-					.catch((error) => {
-						resolveContent();
-						//再抛出异常
-						if (error !== "event_finish") {
-							throw error;
-						}
-				});
+				event.content(event, trigger, player).finally(() => resolveContent());
 			} else {
 				event.content(event, step, source, player, target, targets, card, cards, skill, forced, num, trigger, result, _status, lib, game, ui, get, ai);
 				resolve();
