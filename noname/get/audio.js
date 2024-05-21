@@ -12,7 +12,7 @@ import { get } from "./index.js";
  */
 export class Audio {
     /**
-     * @type { { [key: string]: textMap } }
+     * @type { { [key: string]: textMap[] } }
      */
     #Cache = {};
 
@@ -121,8 +121,7 @@ export class Audio {
      * @this {typeof get.Audio}
      * @returns { textMap[] } 
      */
-    #parse = function (arg) {
-        const { name, info, data: originData = {}, options, getInfo, isExist, getAudioInfo } = arg;
+    #parse = function ({ name, info, data: originData = {}, options, getInfo, isExist, getAudioInfo }) {
         const { type, defaultPath } = options;
         originData.history = [];
 
@@ -156,7 +155,7 @@ export class Audio {
         const parseAudioWithCache = (name, audioInfo, data, isDefault = false) => {
             const key = this.#getCacheKey(options, name, audioInfo, data);
             const result = this.#Cache[key];
-            if (result !== void 0) return result;
+            if (result !== void 0) return this.#copy(result);
             else {
                 const result = parseAudio(name, audioInfo, data);
                 if (isDefault && name.includes("_")) {
@@ -164,7 +163,7 @@ export class Audio {
                     result.alternate = getInfoAudio(name, originData);
                 }
                 this.#Cache[key] = result;
-                return result;
+                return this.#copy(result);
             }
         }
 
@@ -256,6 +255,18 @@ export class Audio {
             text: lib.translate[`#${translatePath}${name}${suffix}`],
             type,
         }
+    }
+
+    /**
+     * @param {textMap[]} list
+     * @this {typeof get.Audio}
+     * @returns {textMap[]}
+     */
+    #copy = function (list) {
+        const result = JSON.parse(JSON.stringify(list));
+        //@ts-ignore
+        if (list.alternate) result.alternate = this.#copy(list.alternate);
+        return result;
     }
 
 }
