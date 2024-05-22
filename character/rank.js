@@ -1107,6 +1107,7 @@ window.noname_character_rank = {
 		"jsrg_songhuanghou",
 		"jsrg_dongzhuo",
 		"jsrg_zhanghuan",
+		"jsrg_liubiao",
 	],
 	b: [
 		"junk_guanyu",
@@ -2729,7 +2730,7 @@ window.noname_character_rank = {
 			"jsrg_songhuanghou",
 			"jsrg_zhangjiao",
 			"jsrg_yangqiu",
-			"jsrg_zhanghuan",
+			"jsrg_liubiao",
 		],
 		junk: [
 			"ol_sb_guanyu",

@@ -409,6 +409,12 @@ const translates = {
 	jsrgyangge: "扬戈",
 	jsrgyangge_mizhao: "密诏",
 	jsrgyangge_info: "每轮限一次。体力值最低的其他角色可以于其出牌阶段内对你发动〖密诏〗。",
+	jsrg_liubiao: "衰刘表",
+	jsrg_liubiao_prefix: "衰",
+	jsrgyansha: "宴杀",
+	jsrgyansha_info: "准备阶段，你可以视为对任意名角色使用【五谷丰登】。此牌结算结束后，所有非目标角色可以依次将一张装备牌当作【杀】对其中一名目标角色使用。",
+	jsrgqingping: "清平",
+	jsrgqingping_info: "结束阶段，若你攻击范围内的角色均有手牌且手牌数均不大于你，则你可以摸等同于这些角色数的牌。",
 };
 
 export default translates;

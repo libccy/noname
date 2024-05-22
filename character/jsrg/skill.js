@@ -3,6 +3,73 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//江山如故·衰
+	//刘表
+	jsrgyansha: {
+		trigger: { player: "phaseZhunbeiBegin" },
+		async cost(event, trigger, player) {
+			//AI摆了，交给157了
+			event.result = await player
+				.chooseTarget(get.prompt("jsrgyansha"), "你可以选择任意名角色，视为对这些角色使用【五谷丰登】，然后未被选择的角色依次可以将一张装备牌当作【杀】对目标角色使用。", [1, Infinity], (card, player, target) => {
+					return player.canUse({ name: "wugu", isCard: true }, target);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const targets = event.targets.slice(0).sortBySeat();
+			await player.useCard({ name: "wugu", isCard: true }, targets);
+			const players = game.filterPlayer(current => !targets.includes(current)).sortBySeat();
+			for (const current of players) {
+				const aliveTargets = targets.filter(current => current.isIn());
+				if (!aliveTargets.length) break;
+				if (
+					current.isIn() &&
+					(current.countCards("e") > 0 ||
+						current.hasCard(card => {
+							if (_status.connectMode) return true;
+							return get.type(card) === "trick";
+						}, "hs"))
+				) {
+				}
+				const result = await current
+					.chooseCardTarget({
+						prompt: `是否将一张装备牌当作【杀】对${get.translation(targets)}${targets.length > 1 ? "中的一名角色" : ""}使用？`,
+						position: "hes",
+						filterCard(card) {
+							return get.type(card) === "equip";
+						},
+						filterTarget(card, player, target) {
+							if (!get.event("targets").includes(target)) return false;
+							card = get.autoViewAs({ name: "sha" }, ui.selected.cards);
+							return player.canUse(card, target, false);
+						},
+						ai1(card) {
+							return 7 - get.value(card);
+						},
+						ai2(target) {
+							const player = get.player(),
+								card = get.autoViewAs({ name: "sha" }, ui.selected.cards);
+							return get.effect(target, card, player, player);
+						},
+						targets: aliveTargets,
+					})
+					.forResult();
+				if (result.bool) {
+					await current.useCard(get.autoViewAs({ name: "sha" }, result.cards), result.cards, result.targets);
+				}
+			}
+		},
+	},
+	jsrgqingping: {
+		trigger: { player: "phaseJieshuBegin" },
+		frequent: true,
+		filter(event, player){
+			const targets = game.filterPlayer(current => player.inRange(current)), hs = player.countCards("h");
+			return targets.length > 0 && targets.every(current => current.countCards("h") <= hs); 
+		},
+		async content(event, trigger, player){
+			await player.draw(game.countPlayer(current => player.inRange(current)));
+		},
+	},
 	//张奂
 	jsrgzhushou: {
 		trigger: { global: "phaseEnd" },
@@ -23,12 +90,16 @@ const skills = {
 					return evt.cards2 && evt.cards2.includes(card);
 				});
 			});
-			const result = await player.chooseTarget(get.prompt("jsrgzhushou"), `选择一名本回合内失去过${get.translation(card)}的角色，对其造成1点伤害。`, (card, player, target)=>{
-				return get.event("targets").includes(target);
-			}).set("targets", targets).set("ai", target=>{
-				const player = get.player();
-				return get.damageEffect(target, player, player);
-			}).forResult();
+			const result = await player
+				.chooseTarget(get.prompt("jsrgzhushou"), `选择一名本回合内失去过${get.translation(card)}的角色，对其造成1点伤害。`, (card, player, target) => {
+					return get.event("targets").includes(target);
+				})
+				.set("targets", targets)
+				.set("ai", target => {
+					const player = get.player();
+					return get.damageEffect(target, player, player);
+				})
+				.forResult();
 			if (result.bool) {
 				event.result = {
 					bool: true,
@@ -50,16 +121,19 @@ const skills = {
 			});
 			cardsLost = cardsLost.filterInD("d");
 			let max = 0;
-			return cardsLost.reduce((maxCard, card) => {
-				const num = get.number(card, false);
-				if (num > max) {
-					max = num;
-					return card;
-				} else if (num === max) {
-					return void 0;
-				}
-				return maxCard;
-			}, void 0);
+			return cardsLost.reduce(
+				(maxCard, card) => {
+					const num = get.number(card, false);
+					if (num > max) {
+						max = num;
+						return card;
+					} else if (num === max) {
+						return void 0;
+					}
+					return maxCard;
+				},
+				void 0
+			);
 		},
 	},
 	jsrgyangge: {
@@ -69,17 +143,17 @@ const skills = {
 				//直接继承mizhao
 				inherit: "mizhao",
 				usable: void 0,
-				filter(event, player){
+				filter(event, player) {
 					return player.countCards("h") > 0 && player.isMinHp() && game.hasPlayer(current => lib.skill.jsrgyangge_mizhao.filterTarget(void 0, player, current));
 				},
-				filterTarget(card, player, target){
+				filterTarget(card, player, target) {
 					if (player === target) return false;
 					return target.hasSkill("jsrgyangge") && !target.hasMark("jsrgyangge");
 				},
-				prompt(){
+				prompt() {
 					const player = get.player();
 					const targets = game.filterPlayer(current => lib.skill.jsrgyangge_mizhao.filterTarget(void 0, player, current));
-					return `对${get.translation(targets)}${targets.length > 1 ? "中的一人" : ""}发动【密诏】`
+					return `对${get.translation(targets)}${targets.length > 1 ? "中的一人" : ""}发动【密诏】`;
 				},
 			},
 		},
