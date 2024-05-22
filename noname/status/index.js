@@ -14,7 +14,10 @@ export class status {
 	event = null;
 	ai = {};
 	lastdragchange = [];
-	skillaudio = [];
+	/**
+	 * @type { string[] }
+	 */
+	skillaudio = []
 	dieClose = [];
 	dragline = [];
 	dying = [];
@@ -56,6 +59,10 @@ export class status {
 	 * @type { boolean | undefined }
 	 */
 	connectMode = undefined;
+	/**
+	 * @type { boolean | undefined }
+	 */
+	video = undefined
 	/**
 	 * @type { boolean | undefined }
 	 */

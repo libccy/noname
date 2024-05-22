@@ -155,7 +155,7 @@ export class Audio {
         const parseAudioWithCache = (name, audioInfo, data, isDefault = false) => {
             const key = this.#getCacheKey(options, name, audioInfo, data);
             const result = this.#Cache[key];
-            if (result !== void 0) return this.#copy(result);
+            if (result !== void 0) return this.copy(result);
             else {
                 const result = parseAudio(name, audioInfo, data);
                 if (isDefault && name.includes("_")) {
@@ -163,7 +163,7 @@ export class Audio {
                     result.alternate = getInfoAudio(name, originData);
                 }
                 this.#Cache[key] = result;
-                return this.#copy(result);
+                return this.copy(result);
             }
         }
 
@@ -258,14 +258,15 @@ export class Audio {
     }
 
     /**
-     * @param {textMap[]} list
+     * @template {textMap | string} T
+     * @param {T[]} list
      * @this {typeof get.Audio}
-     * @returns {textMap[]}
+     * @returns {T[]}
      */
-    #copy = function (list) {
+    copy(list) {
         const result = JSON.parse(JSON.stringify(list));
         //@ts-ignore
-        if (list.alternate) result.alternate = this.#copy(list.alternate);
+        if (list.alternate) result.alternate = this.copy(list.alternate);
         return result;
     }
 
