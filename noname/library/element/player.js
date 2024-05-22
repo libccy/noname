@@ -7315,7 +7315,7 @@ export class Player extends HTMLDivElement {
 				cfg.source = this.name;
 			}
 		}
-		const list = cfg.caption ? [cfg.caption] : ["", "_prefix", "_ab"].map(str => "name" + str).filter(str => lib.translate[str]);
+		const list = cfg.caption ? [cfg.caption] : ["", "_prefix", "_ab"].map(str => lib.translate["name" + str]);
 		game.broadcastAll(
 			//TODO: 这里直接修改trashBin部分，后续需要修改为新写法
 			function (player, skill, list, cfg) {
@@ -7338,6 +7338,7 @@ export class Player extends HTMLDivElement {
 					lib.character[skill].trashBin.push("character:" + cfg.name);
 				}
 				for (let i = 0; i < list.length; i++) {
+					if (!list[i]) continue;
 					lib.translate[skill + ["", "_prefix", "_ab"][i]] = list[i];
 				}
 				player.storage[skill] = cfg;

@@ -2793,6 +2793,7 @@ export class Game {
 				lib.skill[skill] = content[1];
 				lib.character[skill] = content[2];
 				for (let i = 0; i < list.length; i++) {
+					if (!list[i]) continue;
 					lib.translate[skill + ["", "_prefix", "_ab"][i]] = list[i];
 				}
 				player.storage[skill] = content[4];
