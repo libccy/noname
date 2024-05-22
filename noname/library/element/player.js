@@ -7315,9 +7315,10 @@ export class Player extends HTMLDivElement {
 				cfg.source = this.name;
 			}
 		}
+		const list = cfg.caption ? [cfg.caption] : ["", "_prefix", "_ab"].map(str => "name" + str).filter(str => lib.translate[str]);
 		game.broadcastAll(
 			//TODO: 这里直接修改trashBin部分，后续需要修改为新写法
-			function (player, skill, cfg) {
+			function (player, skill, list, cfg) {
 				lib.skill[skill] = {
 					intro: {
 						content: cfg.intro || "",
@@ -7328,7 +7329,7 @@ export class Player extends HTMLDivElement {
 						subplayer: true,
 					},
 				};
-				lib.character[skill] = [cfg.sex, cfg.group, parseFloat(cfg.hp) + "/" + parseFloat(cfg.maxHp) + "/" + parseFloat(cfg.hujia), cfg.skills, []];
+				lib.character[skill] = [cfg.sex, cfg.group, parseFloat(cfg.hp) + "/" + parseFloat(cfg.maxHp) + "/" + parseFloat(cfg.hujia), cfg.skills, lib.character[cfg.name].trashBin || []];
 				if (Array.isArray(cfg.image)) {
 					cfg.image.forEach(image => lib.character[skill][4].push(image));
 				} else if (typeof cfg.image == "string") {
@@ -7336,14 +7337,17 @@ export class Player extends HTMLDivElement {
 				} else {
 					lib.character[skill].trashBin.push("character:" + cfg.name);
 				}
-				lib.translate[skill] = cfg.caption || get.rawName(cfg.name);
+				for (let i = 0; i < list.length; i++) {
+					lib.translate[skill + ["", "_prefix", "_ab"][i]] = list[i];
+				}
 				player.storage[skill] = cfg;
 			},
 			this,
 			skill,
+			list,
 			cfg
 		);
-		game.addVideo("addSubPlayer", this, [skill, lib.skill[skill], lib.character[skill], lib.translate[skill], { name: cfg.name }]);
+		game.addVideo("addSubPlayer", this, [skill, lib.skill[skill], lib.character[skill], list, { name: cfg.name }]);
 		this.addSkill(skill);
 		return skill;
 	}
