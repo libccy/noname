@@ -1,4 +1,5 @@
 const characters = {
+	yj_zhouji: ["female", "wu", 3, ["psyanmou", "pszhanyan", "psyuhuo"]],
 	drag_guanyu: ["male", "shu", 4, ["dragchaojue", "dragjunshen"]],
 	drag_caoren: ["male", "wei", 4, ["draglizhong", "dragjuesui"]],
 	drag_lvchang: ["male", "wei", 3, ["dragjuwu", "dragshouxiang"]],

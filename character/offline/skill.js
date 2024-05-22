@@ -2,6 +2,175 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//线下E系列肘击
+	psyanmou: {
+		getCards(event, player) {
+			let cards = [];
+			if (event.name == "cardsDiscard") {
+				const evt = event.getParent().relatedEvent;
+				if (evt && evt.name == "judge" && evt.player == player) {
+					cards.addArray(event.cards.filter(i => get.position(i, true) == "d"));
+				}
+			} else {
+				if (event.type == "discard" && event.getlx !== false) {
+					for (const target of game.filterPlayer2()) {
+						if (target == player) continue;
+						const evt = event.getl(target);
+						if (evt && (evt.cards2 || []).length) {
+							cards.addArray((evt.cards2 || []).filter(i => i.original != "j" && get.position(i, true) == "d"));
+						}
+					}
+				}
+			}
+			return cards.filter(card => {
+				return card.name == "huogong" || (card.name == "sha" && game.hasNature(card, "fire"));
+			});
+		},
+		trigger: { global: ["cardsDiscardAfter", "loseAfter", "loseAsyncAfter"] },
+		filter(event, player) {
+			return lib.skill.psyanmou.getCards(event, player).length;
+		},
+		prompt2(event, player) {
+			return "获得" + get.translation(lib.skill.psyanmou.getCards(event, player));
+		},
+		frequent: true,
+		content() {
+			player.gain(lib.skill.psyanmou.getCards(trigger, player), "gain2");
+		},
+		group: "psyanmou_chooseToUse",
+		subSkill: {
+			chooseToUse: {
+				trigger: {
+					player: "gainAfter",
+					global: "loseAsyncAfter",
+				},
+				filter(event, player) {
+					return event.getg && event.getg(player).length;
+				},
+				forced: true,
+				locked: false,
+				async content(event, trigger, player) {
+					let cards = trigger.getg(player);
+					await player.showCards(cards, get.translation(player) + "发动了【炎谋】");
+					cards = cards.filter(card => {
+						if (!player.hasUseTarget(card)) return false;
+						return get.name(card) == "huogong" || (get.name(card) == "sha" && game.hasNature(card, "fire"));
+					});
+					if (cards.length) {
+						await player
+							.chooseToUse(function (card, player, event) {
+								if (!get.event("cards").includes(card)) return false;
+								return lib.filter.filterCard.apply(this, arguments);
+							}, "炎谋：选择使用其中的一张【火攻】或火【杀】")
+							.set("cards", cards)
+							.set("filterTarget", function (card, player, target) {
+								return lib.filter.filterTarget.apply(this, arguments);
+							})
+							.set("targetRequired", true)
+							.set("complexSelect", true)
+							.set("forced", true)
+							.set("addCount", false);
+					}
+				},
+			},
+		},
+	},
+	pszhanyan: {
+		enable: "phaseUse",
+		filter(event, player) {
+			return game.hasPlayer(target => player.inRange(target));
+		},
+		usable: 1,
+		delay: 0,
+		async content(event, trigger, player) {
+			const targets = game
+				.filterPlayer(target => {
+					return player.inRange(target);
+				})
+				.sortBySeat();
+			let damages = 0,
+				puts = 0;
+			player.line(targets);
+			await game.asyncDelay();
+			for (const target of targets) {
+				let dialog = ["绽焰：将手牌中或弃牌堆中的一张【火攻】或火【杀】置于牌堆顶，或受到1点火焰伤害"];
+				const Tcards = target.getCards("h", card => {
+					return get.name(card) == "huogong" || (get.name(card) == "sha" && game.hasNature(card, "fire"));
+				});
+				const Pcards = Array.from(ui.discardPile.childNodes).filter(card => {
+					return card.name == "huogong" || (card.name == "sha" && game.hasNature(card, "fire"));
+				});
+				if (Tcards.length) {
+					dialog.push('<div class="text center">手牌区</div>');
+					dialog.push(Tcards);
+				}
+				if (Pcards.length) {
+					dialog.push('<div class="text center">弃牌堆</div>');
+					dialog.push(Pcards);
+				}
+				let result;
+				if (Tcards.length + Pcards.length == 0) {
+					result = { bool: false };
+				} else {
+					result = await target
+						.chooseButton(dialog)
+						.set("ai", button => {
+							const player = get.event("player"),
+								source = get.event().getParent().player;
+							if (get.damageEffect(source, player, player) <= 0 && get.attitude(player, source) <= 0) return 0;
+							if (!get.owner(button.link)) return 114514;
+							return 20 - get.value(button.link);
+						})
+						.forResult();
+				}
+				if (result.bool) {
+					puts++;
+					const card = result.links[0];
+					target.$throw([card], 1000);
+					if (get.owner(card)) await get.owner(card).lose([card], ui.special);
+					else ui.discardPile.removeChild(card);
+					ui.cardPile.insertBefore(card, ui.cardPile.firstChild);
+					game.updateRoundNumber();
+				} else {
+					damages++;
+					await target.damage(1, "fire");
+				}
+				await game.asyncDelay(0.5);
+			}
+			const num = Math.min(damages, puts);
+			if (num) await player.draw(num);
+		},
+		ai: {
+			order: 9,
+			result: { player: 1 },
+		},
+	},
+	psyuhuo: {
+		trigger: { player: "damageBegin4" },
+		filter(event) {
+			return event.hasNature("fire");
+		},
+		forced: true,
+		content() {
+			trigger.cancel();
+		},
+		ai: {
+			nofire: true,
+			effect: {
+				target(card, player, target, current) {
+					if (get.tag(card, "fireDamage")) return "zerotarget";
+				},
+			},
+		},
+		mod: {
+			cardDiscardable(card, player, name) {
+				if (name == "phaseDiscard" && (get.name(card) == "huogong" || (get.name(card) == "sha" && game.hasNature(card, "fire")))) return false;
+			},
+			ignoredHandcard(card, player) {
+				if (get.name(card) == "huogong" || (get.name(card) == "sha" && game.hasNature(card, "fire"))) return true;
+			},
+		},
+	},
 	//龙起襄樊
 	//关羽
 	//界界关羽
