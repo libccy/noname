@@ -2788,10 +2788,14 @@ export class Game {
 		},
 		addSubPlayer: function (player, content) {
 			if (player && content && content[0] && content[1] && content[2] && content[3] && content[4]) {
-				var skill = content[0];
+				var skill = content[0],
+					list = content[3];
 				lib.skill[skill] = content[1];
 				lib.character[skill] = content[2];
-				lib.translate[skill] = content[3];
+				for (let i = 0; i < list.length; i++) {
+					if (!list[i]) continue;
+					lib.translate[skill + ["", "_prefix", "_ab"][i]] = list[i];
+				}
 				player.storage[skill] = content[4];
 			}
 		},

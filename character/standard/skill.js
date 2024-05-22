@@ -914,10 +914,15 @@ const skills = {
 		multitarget: true,
 		multiline: true,
 		async content(event, trigger, player) {
+			const targets = event.targets.slice();
+			if (targets.length == 1) {
+				await player.discardPlayerCard("e", targets[0], true);
+				return;
+			}
 			let discardedType = [];
 			for (let i = 0; i < 2; i++) {
-				const target = event.targets[i],
-					other = event.targets[1 - i];
+				const target = targets[i],
+					other = targets[1 - i];
 				let cards = target
 					.getDiscardableCards(player, "e")
 					.filter(card => parseInt(get.subtype(card).slice("equip".length)) <= 2)
