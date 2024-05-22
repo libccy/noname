@@ -204,7 +204,7 @@ const skills = {
 						return num + player.countMark("olsbhongtu_limit");
 					},
 				},
-			}
+			},
 		},
 	},
 	olsbqiwu: {
@@ -308,28 +308,21 @@ const skills = {
 					.forResult();
 				if (result2.bool) {
 					const target2 = result2.targets[0];
-					const sha = new lib.element.VCard({ name: "sha" });
 					player.line(target2);
-					if (target.canUse(sha, target2, false)) {
-						const index = await target
-							.chooseControl()
-							.set("choiceList", ["视为对" + get.translation(target2) + "使用一张【杀】", "令" + get.translation(player) + "观看你的手牌并获得你的两张牌"])
-							.set("ai", () => {
-								const player = get.event("player"),
-									target = get.event("target"),
-									source = get.event("source");
-								const sha = new lib.element.VCard({ name: "sha" }),
-									shunshou = new lib.element.VCard({ name: "shunshou_copy2" });
-								return get.effect(target, sha, player, player) > get.effect(player, shunshou, source, player) * Math.min(2, player.countGainableCards(source, "he")) ? 0 : 1;
-							})
-							.set("source", player)
-							.set("target", target2)
-							.forResult("index");
-						if (index == 0) {
-							await target.useCard(sha, false, target2);
-							return;
-						}
-					}
+					const result = await target
+						.chooseToUse(function (card, player, event) {
+							if (get.name(card) != "sha") return false;
+							return lib.filter.filterCard.apply(this, arguments);
+						}, "眩惑：对" + get.translation(player) + "使用一张【杀】，或令" + get.translation(player) + "你的手牌并获得你的两张牌")
+						.set("filterTarget", function (card, player, target) {
+							if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
+							return lib.filter.targetEnabled.apply(this, arguments);
+						})
+						.set("targetRequired", true)
+						.set("complexSelect", true)
+						.set("sourcex", target2)
+						.forResult();
+					if (result.bool) return;
 				}
 			}
 			await player.gainPlayerCard(target, 2, "he", true, "visible");

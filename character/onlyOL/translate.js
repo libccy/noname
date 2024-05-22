@@ -81,7 +81,7 @@ const translates = {
 	ol_fazheng:'OL界法正',
 	ol_fazheng_prefix:'OL界',
 	olxuanhuo:'眩惑',
-	olxuanhuo_info:'摸牌阶段结束时，你可以交给一名其他角色两张牌，然后其选择一项：1.视为对你选择的另一名其他角色使用一张【杀】，2.令你观看并获得其两张牌。',
+	olxuanhuo_info:'摸牌阶段结束时，你可以交给一名其他角色两张牌，然后其选择一项：1.对你选择的另一名其他角色使用一张【杀】，2.令你观看并获得其两张牌。',
 	olenyuan:'恩怨',
 	olenyuan1:'恩怨',
 	olenyuan2:'恩怨',
