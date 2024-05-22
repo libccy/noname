@@ -2716,6 +2716,9 @@ export class Player extends HTMLDivElement {
 			if (Array.isArray(maxHp)) {
 				this.maxHp = maxHp[1];
 				this.hp = maxHp[0];
+				if (typeof maxHp[2] == "number") {
+					this.hujia = maxHp[2];
+				}
 			} else {
 				var num;
 				if (maxHp === false) {
@@ -7301,6 +7304,7 @@ export class Player extends HTMLDivElement {
 		cfg.skills = cfg.skills || [];
 		cfg.hp = cfg.hp || 1;
 		cfg.maxHp = cfg.maxHp || 1;
+		cfg.hujia = cfg.hujia || 0;
 		cfg.sex = cfg.sex || "male";
 		cfg.group = cfg.group || "qun";
 		cfg.skill = cfg.skill || _status.event.name;
@@ -7324,7 +7328,7 @@ export class Player extends HTMLDivElement {
 						subplayer: true,
 					},
 				};
-				lib.character[skill] = [cfg.sex, cfg.group, cfg.maxHp, cfg.skills, []];
+				lib.character[skill] = [cfg.sex, cfg.group, parseFloat(cfg.hp) + "/" + parseFloat(cfg.maxHp) + "/" + parseFloat(cfg.hujia), cfg.skills, []];
 				if (Array.isArray(cfg.image)) {
 					cfg.image.forEach(image => lib.character[skill][4].push(image));
 				} else if (typeof cfg.image == "string") {

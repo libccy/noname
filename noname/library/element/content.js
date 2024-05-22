@@ -2088,13 +2088,14 @@ export const Content = {
 			}
 			player.storage[current].hp = player.hp;
 			player.storage[current].maxHp = player.maxHp;
+			player.storage[current].hujia = player.hujia;
 			player.storage[current].hs = player.getCards("h");
 			player.storage[current].es = player.getCards("e");
 			player.lose(player.getCards("he"), ui.special)._triggered = null;
 
 			var cfg = player.storage[event.directresult];
 			player.storage.subplayer.name2 = event.directresult;
-			player.reinit(current, event.directresult, [cfg.hp, cfg.maxHp]);
+			player.reinit(current, event.directresult, [cfg.hp, cfg.maxHp, cfg.hujia]);
 			if (player.name == event.directresult || player.name1 == event.directresult) {
 				const groupx = cfg.group || "qun";
 				player.group = groupx;
@@ -2114,6 +2115,7 @@ export const Content = {
 			} else {
 				player.storage[current].hp = player.hp;
 				player.storage[current].maxHp = player.maxHp;
+				player.storage[current].hujia = player.hujia;
 				player.storage[current].hs = player.getCards("h");
 				player.storage[current].es = player.getCards("e");
 				player.lose(player.getCards("he"), ui.special)._triggered = null;
@@ -2121,6 +2123,7 @@ export const Content = {
 			player.reinit(current, player.storage.subplayer.name, [
 				player.storage.subplayer.hp,
 				player.storage.subplayer.maxHp,
+				player.storage.subplayer.hujia,
 			]);
 			if (goon) {
 				const groupx = player.storage.subplayer.group || "qun";
@@ -2189,6 +2192,7 @@ export const Content = {
 				name2: event.directresult,
 				hp: player.hp,
 				maxHp: player.maxHp,
+				hujia: player.hujia,
 				skills: event.list.slice(0),
 				hs: player.getCards("h"),
 				es: player.getCards("e"),
@@ -2196,7 +2200,7 @@ export const Content = {
 				group: player.group,
 			};
 			player.removeSkill(event.list);
-			player.reinit(source, name, [cfg.hp, cfg.maxHp]);
+			player.reinit(source, name, [cfg.hp, cfg.maxHp, cfg.hujia]);
 			if (player.name == name || player.name1 == name) {
 				const groupx = cfg.group || "qun";
 				player.group = groupx;
