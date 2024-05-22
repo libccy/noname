@@ -7315,7 +7315,7 @@ export class Player extends HTMLDivElement {
 				cfg.source = this.name;
 			}
 		}
-		const list = cfg.caption ? [cfg.caption] : ["", "_prefix", "_ab"].map(str => lib.translate["name" + str]);
+		const list = cfg.caption ? [cfg.caption] : ["", "_prefix", "_ab"].map(str => lib.translate[cfg.name + str]);
 		game.broadcastAll(
 			//TODO: 这里直接修改trashBin部分，后续需要修改为新写法
 			function (player, skill, list, cfg) {
