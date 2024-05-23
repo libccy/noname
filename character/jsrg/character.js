@@ -5,7 +5,7 @@ const characters = {
 		group: "qun",
 		hp: 4,
 		skills: ["jsrgchaozheng", "jsrgshenchong", "jsrgjulian"],
-		isZhu: true,
+		isZhugong: true,
 		dieAudios: ["liuhong"],
 	},
 	jsrg_hejin: {
@@ -91,7 +91,7 @@ const characters = {
 		group: "qun",
 		hp: 3,
 		skills: ["xinfu_limu", "jsrgtushe", "jsrgtongjue"],
-		isZhu: true,
+		isZhugong: true,
 		dieAudios: ["liuyan"],
 	},
 	jsrg_caocao: {
@@ -114,7 +114,7 @@ const characters = {
 		group: "wu",
 		hp: 4,
 		skills: ["jsrgduxing", "jsrgzhiheng", "jsrgzhasi", "jsrgbashi"],
-		isZhu: true,
+		isZhugong: true,
 		dieAudios: ["sunce"],
 	},
 	jsrg_xuyou: {
@@ -259,7 +259,7 @@ const characters = {
 		group: "qun",
 		hp: 4,
 		skills: ["jsrgniluan", "jsrghuchou", "jsrgjiemeng"],
-		isZhu: true,
+		isZhugong: true,
 		dieAudios: ["hansui"],
 	},
 	jsrg_zhangchu: {
@@ -339,7 +339,7 @@ const characters = {
 		hp: 3,
 		maxHp: 4,
 		skills: ["jsrgzhaotu", "jsrgjingju", "jsrgweizhui"],
-		isZhu: true,
+		isZhugong: true,
 		dieAudios: ["caofang"],
 	},
 	jsrg_sunjun: {
