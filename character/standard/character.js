@@ -1,5 +1,5 @@
 const characters = {
-	old_re_lidian: ["male", "wei", 3, ["xunxun", "wangxi"], ["die_audio:lidian"]],
+	old_re_lidian: ["male", "wei", 3, ["xunxun", "wangxi"], ["die:lidian"]],
 	ganfuren: ["female", "shu", 3, ["stdshushen", "shenzhi"]],
 	std_panfeng: ["male", "qun", 4, ["stdkuangfu"]],
 	caocao: ["male", "wei", 4, ["jianxiong", "hujia"], ["zhu"]],

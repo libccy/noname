@@ -3555,23 +3555,17 @@ export class Click {
 					});
 				}
 				
-				if (lib.config.background_speak && e !== "init") {
-					let audio,
-						skillnode = this;
-					const playedAudios = [];
-					(function play() {
-						if (!skillnode.audioList || !skillnode.audioList.length) {
-							skillnode.audioList = game.parseSkillAudio(skillnode.link, playername);
-							if (
-								!skillnode.audioList.length ||
-								skillnode.audioList.length == playedAudios.length
-							)
-								return;
-						}
-						audio = skillnode.audioList.shift();
-						playedAudios.push(audio);
-						game.playAudio(audio, play);
-					})();
+				if (lib.config.background_speak && e !== 'init') {
+					if (!this.playAudio) {
+						const audioList = get.Audio.toFile(get.Audio.skill({ skill: this.link, player: playername }));
+						this.playAudio = game.tryAudio({
+							audioList,
+							addVideo: false,
+							random: false,
+							autoplay: false
+						});
+					}
+					this.playAudio();
 				}
 			};
 		} else {
@@ -3914,23 +3908,17 @@ export class Click {
 					});
 				}
 				
-				if (lib.config.background_speak && e !== "init") {
-					let audio,
-						skillnode = this;
-					const playedAudios = [];
-					(function play() {
-						if (!skillnode.audioList || !skillnode.audioList.length) {
-							skillnode.audioList = game.parseSkillAudio(skillnode.link, playername);
-							if (
-								!skillnode.audioList.length ||
-								skillnode.audioList.length == playedAudios.length
-							)
-								return;
-						}
-						audio = skillnode.audioList.shift();
-						playedAudios.push(audio);
-						game.playAudio(audio, play);
-					})();
+				if (lib.config.background_speak && e !== 'init') {
+					if (!this.playAudio) {
+						const audioList = get.Audio.toFile(get.Audio.skill({ skill: this.link, player: playername }));
+						this.playAudio = game.tryAudio({
+							audioList,
+							addVideo: false,
+							random: false,
+							autoplay: false
+						});
+					}
+					this.playAudio();
 				}
 			};
 		}

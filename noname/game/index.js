@@ -1356,62 +1356,147 @@ export class Game {
 		}
 	}
 	/**
+	 * @overload
+	 * @param { object } options
+	 * @param { string } options.path
+	 * //param { boolean } [options.broadcast = false]
+	 * @param { boolean } [options.addVideo = true]
+	 * @param { boolean } [options.video = false]
+	 * @param { (evt: Event) => void } [options.onCanPlay = (evt => void 0)]
+	 * @param { (evt: Event) => void } [options.onPlay = (evt => void 0)]
+	 * @param { (evt: Event) => void } [options.onEnded = (evt => void 0)]
+	 * @param { (evt: Event) => void } [options.onError = (evt => void 0)]
 	 * @returns { HTMLAudioElement }
 	 */
-	playAudio() {
-		let path = "",
-			emptyPath = true,
-			notCheckDBPath = true,
-			onError = null;
-		if (_status.video) {
-			// 为了能更美观的写代码，默认返回audio而不额外加一个void类型
-			// @ts-ignore
-			if (arguments[1] != "video") return;
-			path = arguments[0];
-		} else {
-			for (const argument of arguments) {
-				if (typeof argument === "string" || typeof argument == "number") {
-					if (emptyPath) emptyPath = false;
-					else if (notCheckDBPath) {
-						notCheckDBPath = false;
-						if (/^db:extension-[^:]*$/.test(path)) path += ":";
-						else path += "/";
-					} else path += "/";
-					path += argument;
-				} else if (typeof argument == "function") onError = argument;
-				if (_status.video) break;
-			}
-			if (path.startsWith("ext:")) path = path.replace(/^ext:/, "extension/");
-			else if (!["db:", "blob:", "data:"].some(prefix => path.startsWith(prefix))) path = `audio/${path}`;
-			if (!lib.config.repeat_audio && _status.skillaudio.includes(path)) return;
-		}
-		const audio = document.createElement("audio");
-		audio.autoplay = true;
+	/**
+	 * @overload
+	 * @param { ...string | number | ((evt: Event) => void) } args 
+	 * @returns { HTMLAudioElement }
+	 */
+	playAudio(...args) {
+		const options = (args.length === 1 && get.objtype(args[0]) === "object")
+			? args[0]
+			: {
+				path: args.filter(arg => typeof arg === 'string' || typeof arg === 'number').join("/"),
+				onError: args.find(arg => typeof arg === "function"),
+			};
+
+		const {
+			path = "",
+			// broadcast = false,
+			addVideo = true,
+			video = false,
+			onCanPlay = (evt => void 0),
+			onPlay = (evt => void 0),
+			onEnded = (evt => void 0),
+			onError = (evt => void 0),
+		} = options;
+
+		// 为了能更美观的写代码，默认返回audio而不额外加一个void类型
+		// @ts-ignore
+		if (_status.video && !video) return;
+
+		let parsedPath = "";
+		if (["blob:", "data:"].some(prefix => path.startsWith(prefix))) parsedPath = path;
+		else if (path.startsWith('ext:')) parsedPath = path.replace(/^ext:/, 'extension/');
+		else if (path.startsWith('db:')) parsedPath = path.replace(/^(db:[^:]*)\//, (_, p) => p + ":");
+		else parsedPath = `audio/${path}`;
+
+		// @ts-ignore
+		if (!lib.config.repeat_audio && _status.skillaudio.includes(parsedPath)) return;
+
+		const audio = document.createElement('audio');
 		audio.volume = lib.config.volumn_audio / 8;
-		//Some browsers do not support "autoplay", so "oncanplay" listening has been added
-		audio.oncanplay = () => Promise.resolve(audio.play()).catch(() => void 0);
-		audio.onplay = () => {
-			_status.skillaudio.add(path);
-			setTimeout(() => _status.skillaudio.remove(path), 1000);
-			game.addVideo("playAudio", null, path);
+		audio.autoplay = true;
+
+		audio.oncanplay = ev => {
+			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
+			Promise.resolve(audio.play()).catch(e => console.error(e));
+			if (_status.video || game.online) return;
+			onCanPlay(ev);
+		}
+		audio.onplay = ev => {
+			_status.skillaudio.add(parsedPath);
+			setTimeout(() => _status.skillaudio.remove(parsedPath), 1000);
+			// if (broadcast) game.broadcast(game.playAudio, options);
+			if (addVideo) game.addVideo("playAudio", null, path);
+			if (_status.video || game.online) return;
+			onPlay(ev);
 		};
-		audio.onended = event => audio.remove();
-		audio.onerror = event => {
+		audio.onended = ev => {
 			audio.remove();
-			if (onError) onError(event);
+			if (_status.video || game.online) return;
+			onEnded(ev);
 		};
-		new Promise((resolve, reject) => {
-			if (path.startsWith("db:")) game.getDB("image", path.slice(3)).then(octetStream => resolve(get.objectURL(octetStream)), reject);
-			else if (lib.path.extname(path)) resolve(`${lib.assetURL}${path}`);
-			else if (URL.canParse(path)) resolve(path);
-			else resolve(`${lib.assetURL}${path}.mp3`);
-		}).then(resolvedPath => {
+		audio.onerror = ev => {
+			audio.remove();
+			if (_status.video || game.online) return;
+			onError(ev);
+		};
+
+		Promise.resolve().then(async () => {
+			let resolvedPath;
+			if (parsedPath.startsWith('db:')) resolvedPath = get.objectURL(await game.getDB('image', parsedPath.slice(3)));
+			else if (lib.path.extname(parsedPath)) resolvedPath = `${lib.assetURL}${parsedPath}`;
+			else if (URL.canParse(path)) resolvedPath = path;
+			else resolvedPath = `${lib.assetURL}${parsedPath}.mp3`;
+
 			audio.src = resolvedPath;
 			ui.window.appendChild(audio);
 		});
+
 		return audio;
 	}
 	/**
+	 * @param { object } options
+	 * @param { string[] } options.audioList
+	 * @param { boolean } [options.autoplay = true]
+	 * @param { boolean } [options.random = true]
+	 * @param { boolean } [options.addVideo = true]
+	 * @returns
+	 */
+	tryAudio({ audioList, autoplay = true, random = true, addVideo=true}) {
+		/**
+		 * @type {string}
+		 */
+		let audio,
+			list = audioList.slice(),
+			refresh = false; // 当前audioList是否有可播放的音频
+
+		const check = () => {
+			if (list.length) return true;
+			if (refresh) {
+				list = audioList.slice();
+				return true;
+			}
+			return false;
+		};
+
+		/**
+		 * @returns {HTMLAudioElement}
+		 */
+		const play = () => {
+			//@ts-ignore
+			if (!check()) return;
+			//@ts-ignore
+			audio = random ? list.randomRemove() : list.shift();
+			return game.playAudio({
+				path: audio,
+				addVideo,
+				onCanPlay: () => refresh = true,
+				onError: play,
+			});
+		};
+
+		if (autoplay) return play();
+		return () => {
+			if (random) list = audioList.slice();
+			return play();
+		};
+	}
+	/**
+	 * @deprecated 请使用get.Audio.skill + get.Audio.toFile
+	 * 
 	 * 根据skill中的audio,audioname,audioname2和player来获取音频地址列表
 	 * @typedef {[string,number]|string|number|boolean} audioInfo
 	 * @typedef {{audio: audioInfo, audioname?:string[], audioname2?:{[playerName: string]: audioInfo}}} skillInfo
@@ -1421,9 +1506,11 @@ export class Game {
 	 * @returns { string[] }  语音地址列表
 	 */
 	parseSkillAudio(skill, player, skillInfo) {
-		return get.Audio.skill({ skill, player, info: skillInfo }).map(data => data.file);
+		return get.Audio.toFile(get.Audio.skill({ skill, player, info: skillInfo }));
 	}
 	/**
+	 * @deprecated 请使用get.Audio.skill + get.Audio.toText
+	 * 
 	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表
 	 * @param { string } skill  技能名
 	 * @param { Player | Object | string } [player]  角色/角色名
@@ -1431,9 +1518,7 @@ export class Game {
 	 * @returns { string[] }  语音地址列表
 	 */
 	parseSkillText(skill, player, skillInfo) {
-		return get.Audio.skill({ skill, player, info: skillInfo })
-			.map(data => data.text)
-			.filter(text => text !== void 0);
+		return get.Audio.toText(get.Audio.skill({ skill, player, info: skillInfo }));
 	}
 	/**
 	 * @deprecated 请使用get.Audio.skill 
@@ -1463,7 +1548,7 @@ export class Game {
 	 * @param { Player | string } player
 	 * @param { boolean } [directaudio]
 	 * @param { boolean } [nobroadcast]
-	 * @param { ['lib']['skill'] } [skillInfo]
+	 * @param { any } [skillInfo]
 	 * @returns
 	 */
 	trySkillAudio(skill, player, directaudio, nobroadcast, skillInfo) {
@@ -1474,21 +1559,9 @@ export class Game {
 		if (!info) return;
 		if (info.direct && !directaudio) return;
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
-		
-		let audio, list = get.Audio.skill({ skill, player, info: skillInfo }).randomSort();
-		const check = () => {
-			if (list.length) return true;
-			//@ts-ignore
-			if (!list.alternate) return false;
-			//@ts-ignore
-			list = list.alternate;
-			return check();
-		};
-		return (function play() {
-			if (!check()) return;
-			audio = list.shift();
-			return game.playAudio(audio.file, play);
-		})();
+
+		const audioList = get.Audio.toFile(get.Audio.skill({ skill, player, info: skillInfo }));
+		return game.tryAudio({ audioList });
 	}
 	/**
 	 * @param { Player | string } player
@@ -1498,22 +1571,11 @@ export class Game {
 		game.broadcast(game.tryDieAudio, player);
 		if (!lib.config.background_speak) return;
 
-		let audio, list = get.Audio.die({player}).randomSort();
-		const check = () => {
-			if (list.length) return true;
-			//@ts-ignore
-			if (!list.alternate) return false;
-			//@ts-ignore
-			list = list.alternate;
-			return check();
-		};
-		return (function play() {
-			if (!check()) return;
-			audio = list.shift();
-			return game.playAudio(audio.file, play);
-		})();
+		const audioList = get.Audio.toFile(get.Audio.die({ player }));
+		return game.tryAudio({ audioList });
 	}
 	/**
+	 * @deprecated
 	 * @param { string } name
 	 * @param { number } [index]
 	 * @returns
@@ -2574,7 +2636,7 @@ export class Game {
 			}
 		},
 		playAudio: function (str) {
-			game.playAudio(str, "video");
+			game.playAudio({ path: str, video: true });
 		},
 		playSkillAudio: function (name) {
 			game.playSkillAudio(name, "video");

@@ -3,7 +3,7 @@ const characters = {
 	panfeng: ["male", "qun", 4, ["kuangfu"]],
 	old_shen_zhaoyun: ["male", "shen", 2, ["oldjuejing", "oldlonghun"], ["shu"]],
 	old_guanyinping: ["female", "shu", 3, ["xueji_old", "oldhuxiao", "oldwuji"]],
-	old_caocao: ["male", "shen", 3, ["junkguixin", "feiying"], ["die_audio"]],
+	old_caocao: ["male", "shen", 3, ["junkguixin", "feiying"], ["die:caocao"]],
 	old_chendao: ["male", "shu", 4, ["drlt_wanglie"]],
 	old_liyan: ["male", "shu", 3, ["duliang", "fulin"]],
 	old_guanzhang: ["male", "shu", 4, ["old_fuhun"]],
