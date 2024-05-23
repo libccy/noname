@@ -3,6 +3,161 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//江山如故·衰
+	//陈蕃
+	jsrggangfen: {
+		trigger: { global: "useCardToPlayer" },
+		filter(event, player) {
+			if (event.card.name !== "sha") return false;
+			if (event.player === player || event.player.countCards("h") <= player.countCards("h")) return false;
+			return !event.targets.includes(player) && lib.filter.targetEnabled(event.card, event.player, player);
+		},
+		logTarget: "player",
+		prompt2(event, player) {
+			return `你可以成为该角色使用的${get.translation(event.card)}的额外目标，并令所有其他角色也选择是否成为此牌的目标。然后该角色展示所有手牌，若其中的黑色牌数量小于此牌目标数，则此牌无效。`;
+		},
+		check(event, player) {
+			if (
+				event.targets.reduce((p, c) => {
+					return p + get.effect_use(c, event.card, event.player, player) > 0;
+				}, 0) >= 0
+			)
+				return false;
+			//绝对保守策略：队友数大于来源牌数才发动技能
+			return game.countPlayer(current => event.targets.includes(current) || get.attitude(current, player) > 0) > event.player.countCards("h");
+		},
+		async content(event, trigger, player) {
+			trigger.targets.add(player);
+			const source = trigger.player;
+			const targets = game
+				.filterPlayer(current => {
+					return current !== player && current !== source && !trigger.targets.includes(current) && lib.filter.targetEnabled(trigger.card, source, current);
+				})
+				.sortBySeat();
+			for (const target of targets) {
+				const bool = await target
+					.chooseBool(`是否也成为${get.translation(trigger.card)}的目标？`, `若最终目标数大于${get.translation(source)}手牌中的黑色牌数，则此牌无效。`)
+					.set("ai", () => get.event("choice"))
+					.set(
+						"choice",
+						(() => {
+							if (get.attitude(target, player) < 0) return false;
+							return game.countPlayer(current => trigger.targets.includes(current) || get.attitude(current, player) > 0) > trigger.player.countCards("h");
+						})()
+					)
+					.forResult("bool");
+				if (bool) {
+					target.addExpose(0.15);
+					target.chat("我也上！");
+					target.line(source);
+					trigger.targets.add(target);
+					game.log(target, "也成为了", trigger.card, "的目标");
+					await game.asyncDelayx();
+				}
+			}
+			await source.showHandcards();
+			const blackNum = source.countCards("h", card => get.color(card, source) === "black");
+			if (blackNum < trigger.targets.length) {
+				trigger.getParent().all_excluded = true;
+				trigger.targets.length = 0;
+				trigger.untrigger();
+			}
+		},
+		ai: {
+			expose: 0.2,
+			threaten: 4.5,
+		},
+	},
+	jsrgdangren: {
+		zhuanhuanji: true,
+		enable: "chooseToUse",
+		filter(event, player) {
+			if (player.storage.jsrgdangren) return false;
+			const card = get.autoViewAs({ name: "tao", isCard: true });
+			return event.filterCard(card, player, event) && event.filterTarget(card, player, player);
+		},
+		viewAs: { name: "tao", isCard: true },
+		filterTarget(card, player, target) {
+			return target === player;
+		},
+		selectTarget: -1,
+		filterCard() {
+			return false;
+		},
+		selectCard: -1,
+		check(){
+			const player = get.player();
+			if (player.isDying()) return true;
+			return game.countPlayer(current => {
+				return current.hp <= 2 && get.attitude(player, current) > 0;
+			}) > game.countPlayer(current => {
+				return current.hp <= 2 && get.attitude(player, current) <= 0;
+			})
+		},
+		prompt: "视为对自己使用【桃】",
+		async precontent(event, trigger, player) {
+			player.logSkill("jsrgdangren");
+			player.changeZhuanhuanji("jsrgdangren");
+			delete event.result.skill;
+		},
+		hiddenCard(player, name) {
+			return name === "tao";
+		},
+		mark: true,
+		marktext: "☯",
+		intro: {
+			content(storage){
+				if (storage) return '当你可以对其他角色使用【桃】时，你须视为使用之。';
+				return '当你需要对自己使用【桃】时，你可以视为使用之';
+			}
+		},
+		group: "jsrgdangren_save",
+		subSkill: {
+			save: {
+				trigger: { player: "chooseToUseBegin" },
+				filter(event, player) {
+					if (event.responded || !player.storage.jsrgdangren) return false;
+					const card = get.autoViewAs({ name: "tao", isCard: true });
+					if (!event.filterCard(card, player, event)) return false;
+					const backup = _status.event;
+					_status.event = event;
+					const hasTarget = game.hasPlayer(current => {
+						return current !== player && event.filterTarget(card, player, current);
+					});
+					_status.event = backup;
+					return hasTarget;
+				},
+				async cost(event, trigger, player) {
+					const card = get.autoViewAs({ name: "tao", isCard: true });
+					const backup = _status.event;
+					_status.event = trigger;
+					const targets = game.filterPlayer(current => {
+						return current !== player && trigger.filterTarget(card, player, current);
+					});
+					_status.event = backup;
+					if (targets.length === 1) {
+						event.result = { bool: true, targets };
+					} else {
+						event.result = await player
+							.chooseTarget(true, "当仁：请选择【桃】的目标", (card, player, target) => {
+								return get.event("targets").includes(target);
+							})
+							.set("targets", targets)
+							.forResult();
+					}
+				},
+				async content(event, trigger, player) {
+					trigger.result = {
+						bool: true,
+						card: { name: "tao", isCard: true },
+						targets: event.targets,
+					};
+					trigger.untrigger();
+					trigger.set("responded", true);
+					player.changeZhuanhuanji("jsrgdangren")
+				},
+			},
+		},
+	},
 	//卢植
 	jsrgruzong: {
 		trigger: { player: "phaseEnd" },
@@ -85,19 +240,19 @@ const skills = {
 		ai: {
 			order: 2,
 			result: {
-				player(player, target){
+				player(player, target) {
 					const targets = game.filterPlayer(current => {
 						return player.inRange(current) && target.inRange(current);
 					});
 					if (targets.length === 0) return false;
-					return targets.reduce((p, c)=>{
+					return targets.reduce((p, c) => {
 						let eff = get.damageEffect(c, player, player);
 						if (eff < 0 && current.hp <= 2) {
 							const att = get.attitude(player, current);
 							if (att > 0) eff *= Math.sqrt(att);
 						}
 						return p + eff;
-					}, 0)
+					}, 0);
 				},
 			},
 		},
@@ -831,7 +986,7 @@ const skills = {
 				.then(() => {
 					allPlayers.forEach(target => {
 						target.unmarkAuto("jsrgzonghai_blocker", [id]);
-						if (target.getStorage("jsrgzonghai_blocker").length) target.removeSkill("jsrgzonghai_blocker");
+						if (!target.getStorage("jsrgzonghai_blocker").length) target.removeSkill("jsrgzonghai_blocker");
 					});
 					if (source.isIn()) {
 						targets.forEach(target => target.damage(source));

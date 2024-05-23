@@ -1632,6 +1632,7 @@ window.noname_character_rank = {
 		"old_guanyu",
 		"dc_kongrong",
 		"jsrg_zhangjiao",
+		"jsrg_chenfan",
 	],
 	c: [
 		"xiahoudun",
