@@ -49,13 +49,13 @@ export class Audio {
         };
 
         const getInfo = name => get.info(name);
-        const isExist = name => get.info(name);
+        const isExist = name => !!get.info(name);
         const getAudioInfo = (name, info, data, options) => {
             let audioInfo = info.audio;
             if (Array.isArray(info.audioname)) data.audioname.addArray(info.audioname);
             data._audioname = getName(i => data.audioname.includes(i));
             if (info.audioname2) audioInfo = info.audioname2[getName(i => info.audioname2[i])] || audioInfo;
-            return { audioInfo, isDefault: false };
+            return audioInfo;
         }
 
         const getName = filter => {
@@ -111,18 +111,32 @@ export class Audio {
         const getAudioInfo = (name, info, data, options) => {
             let audioInfo = info.dieAudios;
             if (audioInfo.length === 0) audioInfo = void 0;
-            return { audioInfo, isDefault: false };
+            return audioInfo;
         }
 
         return this.#parse({ name, info: skinInfo, options, getInfo, isExist, getAudioInfo });
     }
 
     /**
+     * @typedef { {
+     *  type:string,
+     *  defaultPath:string,
+     *  defaultInfo:audioInfo
+     * } } Options
      * @this {typeof get.Audio}
+     * @param {object} arg
+     * @param { string } arg.name
+     * @param { any } arg.info 这是（技能、角色等的）整个信息，不是audioInfo
+     * @param {object} [arg.data={}] 可变信息
+     * @param {Options} arg.options 不变信息
+     * @param {(name:string)=>any} arg.getInfo 
+     * @param {(name:string)=>boolean} arg.isExist 
+     * @param {(name:string,info:any,data:object,options:Options)=>boolean} arg.getAudioInfo 
      * @returns { textMap[] } 
      */
     #parse = function ({ name, info, data: originData = {}, options, getInfo, isExist, getAudioInfo }) {
         const { type, defaultPath } = options;
+        //@ts-ignore
         originData.history = [];
 
         const check = (name, history) => {
@@ -130,40 +144,35 @@ export class Audio {
             if (!history.includes(name)) return true;
             if (history[0] === name) return false;
             //deadlock
-            throw new RangeError(`parseAudio: ${name} in ${history} forms a deadlock`);
+            throw new RangeError(`${name} in ${history} forms a deadlock`);
         }
 
-        const getInfoAudio = (name, data, { info = void 0, defaultInfo = options.defaultInfo } = {},) => {
+        const getAudio = (name, data, { info = void 0, defaultInfo = options.defaultInfo } = {},) => {
             data = JSON.parse(JSON.stringify(data));
 
             if (info === void 0 || info === null) {
                 if (!check(name, data.history)) {
-                    // console.warn(`parse: Cannot find ${name} when parsing ${type} audio.`);
-                    return parseAudioWithCache(name, defaultInfo, data, true);
+                    console.error(new ReferenceError(`Cannot find ${name} when parsing ${type} audio.`));
+                    return parseAudioWithCache(name, defaultInfo, data);
                 }
                 data.history.unshift(name);
                 info = getInfo(name);
             }
 
-            const { audioInfo, isDefault } = getAudioInfo(name, info, data, options);
-            if (isDefault || audioInfo === null || audioInfo === void 0)
-                return parseAudioWithCache(name, defaultInfo, data, true);
+            const audioInfo = getAudioInfo(name, info, data, options);
+            if (audioInfo === null || audioInfo === void 0) return parseAudioWithCache(name, defaultInfo, data);
 
             return parseAudioWithCache(name, audioInfo, data);
         }
 
-        const parseAudioWithCache = (name, audioInfo, data, isDefault = false) => {
+        const parseAudioWithCache = (name, audioInfo, data) => {
             const key = this.#getCacheKey(options, name, audioInfo, data);
             const result = this.#Cache[key];
-            if (result !== void 0) return this.copy(result);
+            if (result !== void 0) return JSON.parse(JSON.stringify(result));
             else {
                 const result = parseAudio(name, audioInfo, data);
-                if (isDefault && name.includes("_")) {
-                    name = name.slice(name.indexOf("_") + 1);
-                    result.alternate = getInfoAudio(name, originData);
-                }
                 this.#Cache[key] = result;
-                return this.copy(result);
+                return JSON.parse(JSON.stringify(result));
             }
         }
 
@@ -172,7 +181,7 @@ export class Audio {
                 if (type === "skill") {//skill的屎山
                     if (audioInfo.length === 2 && typeof audioInfo[0] === "string" && typeof audioInfo[1] === "number") {
                         const [newName, number] = audioInfo;
-                        return getInfoAudio(newName, data, { defaultInfo: number }).slice(0, number);
+                        return getAudio(newName, data, { defaultInfo: number }).slice(0, number);
                     }
                 }
                 const map = {};
@@ -223,11 +232,11 @@ export class Audio {
                 audioInfo = audioInfo.slice(0, extIndex);
             }
 
-            if (pathIndex === -1 && extIndex === -1) return getInfoAudio(audioInfo, data);
+            if (pathIndex === -1 && extIndex === -1) return getAudio(audioInfo, data);
             return [this.#textMap({ path, name: audioInfo, ext, type, defaultPath })];
         }
 
-        return getInfoAudio(name, originData, { info });
+        return getAudio(name, originData, { info });
     }
 
     /**
@@ -258,29 +267,11 @@ export class Audio {
     }
 
     /**
-     * @template {textMap | string} T
-     * @param {T[]} list
-     * @this {typeof get.Audio}
-     * @returns {T[]}
-     */
-    copy(list) {
-        const result = JSON.parse(JSON.stringify(list));
-        //@ts-ignore
-        if (list.alternate) result.alternate = this.copy(list.alternate);
-        return result;
-    }
-
-    /**
      * @param {textMap[]} list
      * @returns {string[]}
      */
     toFile(list) {
-        return (function getResult(textMap) {
-            const result = textMap.map(data => data.file);
-            //@ts-ignore
-            if (textMap.alternate) result.alternate = getResult(textMap.alternate);
-            return result;
-        })(list);
+        return list.map(data => data.file);
     }
 
     /**
@@ -288,12 +279,7 @@ export class Audio {
      * @returns {string[]}
      */
     toText(list) {
-        return (function getResult(textMap) {
-            const result = textMap.map(data => data.text).filter(text => text !== void 0);
-            //@ts-ignore
-            if (textMap.alternate) result.alternate = getResult(textMap.alternate);
-            return result;
-        })(list);
+        return list.map(data => data.text).filter(text => text !== void 0);
     }
 
 }

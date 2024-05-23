@@ -1459,21 +1459,16 @@ export class Game {
 		 * @type {string}
 		 */
 		let audio,
-			list = get.Audio.copy(audioList),
+			list = audioList.slice(),
 			refresh = false; // 当前audioList是否有可播放的音频
 
 		const check = () => {
 			if (list.length) return true;
 			if (refresh) {
-				list = get.Audio.copy(audioList);
+				list = audioList.slice();
 				return true;
 			}
-			//@ts-ignore
-			if (!list.alternate) return false;
-			//@ts-ignore
-			audioList = list.alternate;
-			list = get.Audio.copy(audioList);
-			return check();
+			return false;
 		};
 
 		/**
@@ -1494,7 +1489,7 @@ export class Game {
 
 		if (autoplay) return play();
 		return () => {
-			if (random) list = get.Audio.copy(audioList);
+			if (random) list = audioList.slice();
 			return play();
 		};
 	}
