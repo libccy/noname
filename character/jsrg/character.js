@@ -382,6 +382,74 @@ const characters = {
 		hp: 3,
 		skills: ["jsrgpianchong", "jsrgzunwei"],
 		dieAudios: ["guozhao"],
+  },
+	//衰
+	jsrg_yuanshao: {
+		sex: "male",
+		group: "qun",
+		hp: 4,
+		skills: ["jsrgzhimeng", "jsrgtianyu", "jsrgzhuni", "jsrghezhi"],
+		isZhugong: true,
+	},
+	jsrg_caojiewangfu: {
+		sex: "male",
+		group: "qun",
+		hp: 3,
+		skills: ["jsrgzonghai", "jsrgjueyin"],
+	},
+	jsrg_songhuanghou: {
+		sex: "female",
+		group: "qun",
+		hp: 3,
+		skills: ["jsrgzhongzen", "jsrgxuchong"],
+	},
+	jsrg_zhangjiao: {
+		sex: "male",
+		group: "qun",
+		hp: 3,
+		skills: ["jsrgxiangru", "jsrgwudao"],
+	},
+	jsrg_yangqiu: {
+		sex: "male",
+		group: "qun",
+		hp: 4,
+		skills: ["jsrgsaojian"],
+	},
+	jsrg_dongzhuo: {
+		sex: "male",
+		group: "qun",
+		hp: 4,
+		skills: ["jsrgguanshi", "jsrgcangxiong", "jsrgjiebing"],
+	},
+	jsrg_zhanghuan: {
+		sex: "male",
+		group: "qun",
+		hp: 3,
+		skills: ["jsrgzhushou", "jsrgyangge"],
+	},
+	jsrg_liubiao: {
+		sex: "male",
+		group: "qun",
+		hp: 3,
+		skills: ["jsrgyansha", "jsrgqingping"],
+	},
+	jsrg_yl_luzhi: {
+		sex: "male",
+		group: "qun",
+		hp: 3,
+		skills: ["jsrgruzong", "jsrgdaoren"],
+	},
+	jsrg_chenfan: {
+		sex: "male",
+		group: "qun",
+		hp: 3,
+		skills: ["jsrggangfen", "jsrgdangren"],
+	},
+	jsrg_zhangju: {
+		sex: "male",
+		group: "qun",
+		hp: 4,
+		skills: ["jsrgqiluan", "jsrgxiangjia"],
 	},
 };
 

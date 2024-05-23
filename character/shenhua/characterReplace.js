@@ -7,7 +7,7 @@ const characterReplaces = {
 	zhoutai: ["zhoutai", "xin_zhoutai", "old_zhoutai"],
 	xiaoqiao: ["xiaoqiao", "ol_xiaoqiao", "re_xiaoqiao", "sb_xiaoqiao", "old_xiaoqiao"],
 	yuji: ["xin_yuji", "re_yuji", "yuji"],
-	zhangjiao: ["sp_zhangjiao", "re_zhangjiao", "sb_zhangjiao", "zhangjiao"],
+	zhangjiao: ["sp_zhangjiao", "re_zhangjiao", "sb_zhangjiao", "jsrg_zhangjiao", "zhangjiao"],
 	dianwei: ["dianwei", "ol_dianwei", "re_dianwei"],
 	xunyu: ["xunyu", "ol_xunyu", "re_xunyu", "sb_xunyu"],
 	sp_zhugeliang: ["sp_zhugeliang", "ol_sp_zhugeliang", "re_sp_zhugeliang", "sb_sp_zhugeliang"],
@@ -23,7 +23,7 @@ const characterReplaces = {
 	zhurong: ["zhurong", "ol_zhurong", "re_zhurong", "sb_zhurong"],
 	sunjian: ["sunjian", "ol_sunjian", "re_sunjian", "tw_ol_sunjian"],
 	jiaxu: ["jiaxu", "re_jiaxu", "ns_jiaxu", "ps_jiaxu"],
-	dongzhuo: ["dongzhuo", "ol_dongzhuo", "re_dongzhuo", "star_dongzhuo", "sp_dongzhuo", "yj_dongzhuo"],
+	dongzhuo: ["dongzhuo", "ol_dongzhuo", "re_dongzhuo", "star_dongzhuo", "jsrg_dongzhuo", "sp_dongzhuo", "yj_dongzhuo"],
 	dengai: ["dengai", "ol_dengai", "re_dengai"],
 	sp_ol_zhanghe: ["sp_ol_zhanghe", "yj_zhanghe", "sp_zhanghe", "jsrg_zhanghe"],
 	jiangwei: ["jiangwei", "ol_jiangwei", "re_jiangwei", "ol_sb_jiangwei", "sb_jiangwei", "jsrg_jiangwei"],
@@ -38,7 +38,7 @@ const characterReplaces = {
 	zhugezhan: ["zhugezhan", "old_zhugezhan"],
 	ol_lusu: ["re_lusu", "ol_lusu", "dc_sb_lusu"],
 	zhanghe: ["zhanghe", "re_zhanghe", "sb_zhanghe"],
-	yl_luzhi: ["yl_luzhi", "sb_yl_luzhi", "tw_yl_luzhi"],
+	yl_luzhi: ["yl_luzhi", "jsrg_yl_luzhi", "sb_yl_luzhi", "tw_yl_luzhi"],
 	sunliang: ["sunliang", "xin_sunliang"],
 };
 

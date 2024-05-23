@@ -613,6 +613,7 @@ Object.defineProperty(Array.prototype, "randomRemove", {
 	writable: true,
 	/**
 	 * @this any[]
+	 * @param { number } [num]
 	 * @type { typeof Array['prototype']['randomRemove'] }
 	 */
 	value: function (num) {
