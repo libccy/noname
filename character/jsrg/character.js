@@ -382,7 +382,7 @@ const characters = {
 		hp: 3,
 		skills: ["jsrgpianchong", "jsrgzunwei"],
 		dieAudios: ["guozhao"],
-  },
+	},
 	//衰
 	jsrg_yuanshao: {
 		sex: "male",
