@@ -1412,6 +1412,7 @@ export class Game {
 		audio.oncanplay = ev => {
 			//Some browsers do not support "autoplay", so "oncanplay" listening has been added
 			Promise.resolve(audio.play()).catch(e => console.error(e));
+			if (_status.video || game.online) return;
 			onCanPlay(ev);
 		}
 		audio.onplay = ev => {
