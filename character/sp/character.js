@@ -1,4 +1,5 @@
 const characters = {
+	yadan: ["male", "qun", 4, ["olqingya", "oltielun"]],
 	sp_sunce: ["male", "qun", 4, ["olliantao"]],
 	ol_liupi: ["male", "qun", 4, ["olyicheng"]],
 	ol_lukai: ["male", "wu", 3, ["olxuanzhu", "oljiane"]],

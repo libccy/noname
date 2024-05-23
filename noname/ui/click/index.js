@@ -3366,6 +3366,21 @@ export class Click {
 				const voiceMap = game.parseSkillText(skill, name, null, true);
 				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
 			});
+			const derivationSkillAudioMap = new Map();
+			nameinfo.skills.forEach(skill => {
+				var info = get.info(skill);
+				if(info.derivation) {
+					var derivation = info.derivation;
+					if(typeof derivation == 'string') {
+						derivation = [derivation];
+					}
+					for(var i=0; i<derivation.length; i++) {
+						if (derivation[i].indexOf('_faq') != -1) continue;
+						const derivationVoiceMap = game.parseSkillText(derivation[i], name, null, true);
+						if(derivationVoiceMap.length) derivationSkillAudioMap.set(derivation[i], derivationVoiceMap);
+					}
+				}
+			});
 			if (dieAudios.length || skillAudioMap.size > 0) {
 				const eleHr = document.createElement("hr");
 				eleHr.style.marginTop = "11px";
@@ -3388,6 +3403,27 @@ export class Click {
 							skillTextSpan.style.fontSize = "15.2px";
 							skillTextSpan.innerHTML = `${texts.length > 1 ? `${index + 1}. ` : ""}${text}<br>`;
 							intro.appendChild(skillTextSpan);
+						});
+					});
+				}
+				if (derivationSkillAudioMap.size > 0) {
+					const derivationSkillNameSpan = document.createElement("span");
+					derivationSkillNameSpan.style.lineHeight = "1.7";
+					derivationSkillNameSpan.innerHTML = `• 衍生技能台词<br>`;
+					intro.appendChild(derivationSkillNameSpan);
+					derivationSkillAudioMap.forEach((texts, skill) => {
+						const derivationSkillNameSpan1 = document.createElement("span"),
+							derivationSkillNameSpanStyle1 = derivationSkillNameSpan1.style;
+						derivationSkillNameSpanStyle1.fontWeight = "bold";
+						derivationSkillNameSpanStyle1.fontSize = "15.7px";
+						derivationSkillNameSpanStyle1.lineHeight = "1.4";
+						derivationSkillNameSpan1.innerHTML = `${get.translation(skill)}<br>`;
+						intro.appendChild(derivationSkillNameSpan1);
+						texts.forEach((text, index) => {
+							const derivationSkillTextSpan = document.createElement("span");
+							derivationSkillTextSpan.style.fontSize = "15.2px";
+							derivationSkillTextSpan.innerHTML = `${texts.length > 1 ? `${index + 1}. ` : ""}${text}<br>`;
+							intro.appendChild(derivationSkillTextSpan);
 						});
 					});
 				}
@@ -3519,23 +3555,17 @@ export class Click {
 					});
 				}
 				
-				if (lib.config.background_speak && e !== "init") {
-					let audio,
-						skillnode = this;
-					const playedAudios = [];
-					(function play() {
-						if (!skillnode.audioList || !skillnode.audioList.length) {
-							skillnode.audioList = game.parseSkillAudio(skillnode.link, playername);
-							if (
-								!skillnode.audioList.length ||
-								skillnode.audioList.length == playedAudios.length
-							)
-								return;
-						}
-						audio = skillnode.audioList.shift();
-						playedAudios.push(audio);
-						game.playAudio(audio, play);
-					})();
+				if (lib.config.background_speak && e !== 'init') {
+					if (!this.playAudio) {
+						const audioList = get.Audio.toFile(get.Audio.skill({ skill: this.link, player: playername }));
+						this.playAudio = game.tryAudio({
+							audioList,
+							addVideo: false,
+							random: false,
+							autoplay: false
+						});
+					}
+					this.playAudio();
 				}
 			};
 		} else {
@@ -3683,6 +3713,21 @@ export class Click {
 				const voiceMap = game.parseSkillText(skill, name, null, true);
 				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
 			});
+			const derivationSkillAudioMap = new Map();
+			nameInfo.skills.forEach(skill => {
+				var info = get.info(skill);
+				if(info.derivation) {
+					var derivation = info.derivation;
+					if(typeof derivation == 'string') {
+						derivation = [derivation];
+					}
+					for(var i=0; i<derivation.length; i++) {
+						if (derivation[i].indexOf('_faq') != -1) continue;
+						const derivationVoiceMap = game.parseSkillText(derivation[i], name, null, true);
+						if(derivationVoiceMap.length) derivationSkillAudioMap.set(derivation[i], derivationVoiceMap);
+					}
+				}
+			});
 			if (dieAudios.length || skillAudioMap.size > 0) {
 				introduction.appendChild(document.createElement("hr"));
 
@@ -3701,6 +3746,24 @@ export class Click {
 							const skillTextSpan = document.createElement("span");
 							skillTextSpan.innerHTML = `${texts.length > 1 ? `${index + 1}. ` : ""}${text}<br>`;
 							introduction.appendChild(skillTextSpan);
+						});
+					});
+				}
+
+				if (derivationSkillAudioMap.size > 0) {
+					const derivationSkillNameSpan = document.createElement("span");
+					derivationSkillNameSpan.innerHTML = `<br>衍生技能台词<br>`;
+					introduction.appendChild(derivationSkillNameSpan);
+					derivationSkillAudioMap.forEach((texts, skill) => {
+						const derivationSkillNameSpan1 = document.createElement("span"),
+							derivationSkillNameSpanStyle1 = derivationSkillNameSpan1.style;
+						derivationSkillNameSpanStyle1.fontWeight = "bold";
+						derivationSkillNameSpan1.innerHTML = `<br>${get.translation(skill)}<br>`;
+						introduction.appendChild(derivationSkillNameSpan1);
+						texts.forEach((text, index) => {
+							const derivationSkillTextSpan = document.createElement("span");
+							derivationSkillTextSpan.innerHTML = `${texts.length > 1 ? `${index + 1}. ` : ""}${text}<br>`;
+							introduction.appendChild(derivationSkillTextSpan);
 						});
 					});
 				}
@@ -3845,23 +3908,17 @@ export class Click {
 					});
 				}
 				
-				if (lib.config.background_speak && e !== "init") {
-					let audio,
-						skillnode = this;
-					const playedAudios = [];
-					(function play() {
-						if (!skillnode.audioList || !skillnode.audioList.length) {
-							skillnode.audioList = game.parseSkillAudio(skillnode.link, playername);
-							if (
-								!skillnode.audioList.length ||
-								skillnode.audioList.length == playedAudios.length
-							)
-								return;
-						}
-						audio = skillnode.audioList.shift();
-						playedAudios.push(audio);
-						game.playAudio(audio, play);
-					})();
+				if (lib.config.background_speak && e !== 'init') {
+					if (!this.playAudio) {
+						const audioList = get.Audio.toFile(get.Audio.skill({ skill: this.link, player: playername }));
+						this.playAudio = game.tryAudio({
+							audioList,
+							addVideo: false,
+							random: false,
+							autoplay: false
+						});
+					}
+					this.playAudio();
 				}
 			};
 		}

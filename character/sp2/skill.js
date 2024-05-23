@@ -1161,6 +1161,9 @@ const skills = {
 				}
 			}
 		},
+		ai: {
+			combo: "mpjiusong"
+		},
 	},
 	mpbishi: {
 		audio: 2,

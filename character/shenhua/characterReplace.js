@@ -11,7 +11,7 @@ const characterReplaces = {
 	dianwei: ["dianwei", "ol_dianwei", "re_dianwei"],
 	xunyu: ["xunyu", "ol_xunyu", "re_xunyu", "sb_xunyu"],
 	sp_zhugeliang: ["sp_zhugeliang", "ol_sp_zhugeliang", "re_sp_zhugeliang", "sb_sp_zhugeliang"],
-	pangtong: ["pangtong", "ol_pangtong", "re_pangtong", "sb_pangtong"],
+	pangtong: ["pangtong", "ol_pangtong", "re_pangtong", "ol_sb_pangtong", "sb_pangtong"],
 	re_jsp_pangtong: ["re_jsp_pangtong", "jsrg_pangtong", "sp_pangtong"],
 	taishici: ["taishici", "re_taishici", "ol_sb_taishici"],
 	re_yuanshao: ["re_yuanshao", "ol_yuanshao", "xin_yuanshao", "ol_sb_yuanshao", "star_yuanshao", "sb_yuanshao"],

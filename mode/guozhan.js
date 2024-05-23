@@ -786,7 +786,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"wu",
 					4,
 					["tianyi", "fakehanzhan"],
-					["tempname:re_taishici", "die_audio:re_taishici"],
+					["tempname:re_taishici", "die:re_taishici"],
 				],
 				gz_zhoutai: ["male", "wu", 4, ["buqu", "new_fenji"]],
 				gz_re_lusu: ["male", "wu", 3, ["haoshi", "dimeng"]],
@@ -809,7 +809,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				gz_panfeng: ["male", "qun", 4, ["gzkuangfu"], ["gzskin"]],
 				gz_zoushi: ["female", "qun", 3, ["huoshui", "new_qingcheng"]],
 
-				gz_dengai: ["male", "wei", 4, ["tuntian", "ziliang", "gzjixi"], ["gzskin", "die_audio"]],
+				gz_dengai: ["male", "wei", 4, ["tuntian", "ziliang", "gzjixi"], ["gzskin", "die:dengai"]],
 				gz_caohong: ["male", "wei", 4, ["fakehuyuan", "heyi"], ["gzskin"]],
 				gz_jiangfei: ["male", "shu", 3, ["shengxi", "gzshoucheng"]],
 				gz_jiangwei: ["male", "shu", 4, ["tiaoxin", "yizhi", "tianfu"], ["gzskin"]],

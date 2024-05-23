@@ -1,4 +1,9 @@
 export default {
+	"#starliangyan1": "佳燕并头语，不恋雕梁而归于万里。",
+	"#starliangyan2": "灵禽非醴泉不饮，非积善之家不栖。",
+	"#starminghui1": "大智若愚，女子之锦绣常隐于华服。",
+	"#starminghui2": "知者不惑，心有明镜以照人。",
+	"#star_zhangchunhua:die": "我何为也，竟称可憎之老物？",
 	"#xiongsuan1": "朝中无一是男儿，谁敢拦我二人！",
 	"#xiongsuan2": "挟持天子，执掌重兵，天下可图！",
 	"#liqueguosi:die": "文和之言，诚不欺我……",
@@ -409,5 +414,5 @@ export default {
 	"#starruijun2": "士如钢锋，可破三属之甲。",
 	"#stargangyi1": "不见狼居胥，何妨马革裹尸。",
 	"#stargangyi2": "既无功，不受禄。",
-	"#star_sunjian:die": "身怀宝器，必受群狼觊觎。",
+	"#star_sunjian:die": "身怀宝器，必受群狼觊觎……",
 };

@@ -5359,7 +5359,8 @@ const skills = {
 	//贾诩
 	rewansha: {
 		audio: "wansha",
-		audioname: ["re_jiaxu", "shen_simayi", "boss_lvbu3"],
+		audioname: ["re_jiaxu", "boss_lvbu3"],
+		audioname2: { shen_simayi: "jilue_wansha" },
 		global: "rewansha_global",
 		trigger: { global: "dyingBegin" },
 		forced: true,
@@ -9406,7 +9407,8 @@ const skills = {
 	},
 	rexuanfeng: {
 		audio: "xuanfeng",
-		audioname: ["boss_lvbu3", "re_heqi", "re_lingtong"],
+		audioname: ["boss_lvbu3", "re_lingtong"],
+		audioname2: { re_heqi: "fenwei_heqi" },
 		trigger: {
 			player: ["loseAfter", "phaseDiscardEnd"],
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -10587,7 +10589,7 @@ const skills = {
 	},
 	olfangquan: {
 		audio: 2,
-		audioname: ["shen_caopi"],
+		audioname2: { shen_caopi: "olfangquan_shen_caopi" },
 		trigger: { player: "phaseUseBefore" },
 		filter: function (event, player) {
 			return player.countCards("h") > 0 && !player.hasSkill("olfangquan3");
@@ -10664,7 +10666,7 @@ const skills = {
 	},
 	olluanji: {
 		inherit: "luanji",
-		audioname: ["shen_caopi"],
+		audioname2: { shen_caopi: "olluanji_shen_caopi" },
 		audio: 2,
 		line: false,
 		group: "olluanji_remove",
@@ -13142,7 +13144,7 @@ const skills = {
 	},
 	rezhiheng: {
 		audio: 2,
-		audioname: ["shen_caopi"],
+		audioname2: { shen_caopi: "rezhiheng_shen_caopi" },
 		mod: {
 			aiOrder: function (player, card, num) {
 				if (num <= 0 || get.itemtype(card) !== "card" || get.type(card) !== "equip") return num;
@@ -13305,7 +13307,8 @@ const skills = {
 	},
 	rerende: {
 		audio: 2,
-		audioname: ["gz_jun_liubei", "shen_caopi"],
+		audioname: ["gz_jun_liubei"],
+		audioname2: { shen_caopi: "rerende_shen_caopi" },
 		enable: "phaseUse",
 		filterCard: true,
 		selectCard: [1, Infinity],
@@ -13833,8 +13836,12 @@ const skills = {
 	},
 	reyingzi: {
 		audio: 2,
-		audioname: ["heqi", "sunce", "gexuan", "re_sunben", "re_sunce", "re_heqi"],
-		audioname2: { re_sunyi: "reyingzi_re_sunyi" },
+		audioname: ["sunce", "gexuan", "re_sunben", "re_sunce"],
+		audioname2: {
+			re_sunyi: "reyingzi_re_sunyi",
+			heqi: "reyingzi_heqi",
+			re_heqi: "reyingzi_heqi"
+		},
 		trigger: { player: "phaseDrawBegin2" },
 		forced: true,
 		preHidden: true,
@@ -14788,7 +14795,7 @@ const skills = {
 		skillAnimation: true,
 		animationColor: "wood",
 		audio: 2,
-		audioname: ["heqi"],
+		audioname2: { heqi: "fenwei_heqi" },
 		unique: true,
 		mark: true,
 		limited: true,

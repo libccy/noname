@@ -4,7 +4,7 @@ const characterReplaces = {
 	yujin: ["yujin", "yujin_yujin", "ol_yujin", "sb_yujin", "xin_yujin", "re_yujin"],
 	dc_xushu: ["re_xushu", "dc_xushu"],
 	xushu: ["xin_xushu", "xushu"],
-	fazheng: ["xin_fazheng", "re_fazheng", "sb_fazheng", "tw_re_fazheng", "fazheng"],
+	fazheng: ["xin_fazheng", "ol_fazheng", "re_fazheng", "sb_fazheng", "tw_re_fazheng", "fazheng"],
 	masu: ["xin_masu", "re_masu", "masu"],
 	xusheng: ["xusheng", "xin_xusheng", "re_xusheng", "old_xusheng"],
 	wuguotai: ["wuguotai", "xin_wuguotai", "re_wuguotai"],
@@ -17,8 +17,8 @@ const characterReplaces = {
 	madai: ["old_madai", "re_madai", "tw_madai", "madai"],
 	liaohua: ["liaohua", "re_liaohua", "xin_liaohua"],
 	bulianshi: ["bulianshi", "dc_bulianshi", "re_bulianshi", "old_bulianshi"],
-	handang: ["handang", "xin_handang", "re_handang", "tw_handang", "old_handang"],
-	chengpu: ["chengpu", "ol_chengpu", "re_chengpu", "xin_chengpu", "tw_chengpu", "ns_chengpu"],
+	handang: ["handang", "xin_handang", "re_handang", "tw_handang", "sb_handang", "old_handang"],
+	chengpu: ["chengpu", "ol_chengpu", "re_chengpu", "xin_chengpu", "tw_chengpu", "ns_chengpu", "std_chengpu"],
 	liubiao: ["liubiao", "xin_liubiao", "re_liubiao", "jsrg_liubiao", "sb_liubiao", "oldre_liubiao", "old_liubiao"],
 	manchong: ["manchong", "re_manchong"],
 	caochong: ["caochong", "re_caochong", "old_caochong"],
@@ -68,7 +68,7 @@ const characterReplaces = {
 	zhongyao: ["zhongyao", "re_zhongyao"],
 	liwan: ["ol_liwan", "liwan"],
 	wuxian: ["wuxian", "clan_wuxian"],
-	simafu: ["simafu", "yj_simafu"],
+	simafu: ["mb_simafu", "simafu", "yj_simafu"],
 	xuangongzhu: ["yj_xuangongzhu", "xuangongzhu"],
 };
 

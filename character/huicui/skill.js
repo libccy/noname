@@ -33,6 +33,9 @@ const skills = {
 			cardDiscardable(card, player) {
 				if (get.position(card) == "h") return false;
 			},
+			canBeDiscarded(card, player) {
+				if (get.position(card) == "h") return false;
+			},
 		},
 		group: "dctunchu_limit",
 		subSkill: {
@@ -5888,6 +5891,9 @@ const skills = {
 						}
 					});
 			}
+		},
+		ai: {
+			combo: "dcaishou"
 		},
 	},
 	//向朗

@@ -12,7 +12,7 @@ const characters = {
 	clan_zhongyan: ["female", "jin", 3, ["clanguangu", "clanxiaoyong", "clanbaozu"], ["clan:颍川钟氏"]],
 	clan_wangyun: ["male", "qun", 3, ["clanjiexuan", "clanmingjie", "clanzhongliu"], ["clan:太原王氏"]],
 	clan_wanghun: ["male", "jin", 3, ["clanfuxun", "clanchenya", "clanzhongliu"], ["clan:太原王氏"]],
-	clan_zhonghui: ["male", "wei", "3/4", ["clanyuzhi", "clanxieshu", "clanbaozu"], ["clan:颍川钟氏", "die_audio:clan_zhonghui:clan_zhonghui2:clan_zhonghui3"]],
+	clan_zhonghui: ["male", "wei", "3/4", ["clanyuzhi", "clanxieshu", "clanbaozu"], ["clan:颍川钟氏", "die:true", "die:3"]],
 	clan_zhongyu: ["male", "wei", 3, ["clanjiejian", "clanhuanghan", "clanbaozu"], ["clan:颍川钟氏"]],
 	clan_wanglun: ["male", "jin", 3, ["clanqiuxin", "clanjianyuan", "clanzhongliu"], ["clan:太原王氏"]],
 	clan_xunyou: ["male", "wei", 3, ["clanbaichu", "clandaojie"], ["clan:颍川荀氏"]],
