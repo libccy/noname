@@ -9946,6 +9946,7 @@ export class Library {
 			if (!lib.character[i] || lib.character[i].isAiForbidden) return true;
 			if (lib.character[i].isUnseen) return true;
 			if (lib.config.forbidai.includes(i)) return true;
+			if (lib.config.forbidai_user.includes(i)) return true;
 			if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) return true;
 			if (_status.connectMode) {
 				if (lib.configOL.banned.includes(i) || lib.connectBanned.includes(i)) return true;
