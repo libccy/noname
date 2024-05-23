@@ -118,6 +118,12 @@ const characters = {
 		hp: 3,
 		skills: ["jsrggangfen", "jsrgdangren"],
 	},
+	jsrg_zhangju: {
+		sex: "male",
+		group: "qun",
+		hp: 4,
+		skills: ["jsrgqiluan", "jsrgxiangjia"],
+	},
 };
 
 export default characters;

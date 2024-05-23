@@ -3538,6 +3538,9 @@ export const Content = {
 					}
 				}
 			}
+			else{
+				delete event.openskilldialog;
+			}
 		} else if (event.isOnline()) {
 			event.send();
 		} else {
@@ -3754,6 +3757,9 @@ export const Content = {
 						if (event.prompt) event.dialog = ui.create.dialog(event.prompt);
 						if (event.prompt2) event.dialog.addText(event.prompt2);
 					}
+				}
+				else{
+					delete event.openskilldialog;
 				}
 			} else if (event.isOnline()) {
 				event.send();

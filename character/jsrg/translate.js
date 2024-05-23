@@ -427,6 +427,12 @@ const translates = {
 	jsrggangfen_info: "当手牌数大于你的角色使用【杀】指定其他角色为目标时，你可以成为此【杀】的额外目标，并令所有其他角色也选择是否如此做。然后使用者展示其手牌，若其黑色手牌数小于目标数，则取消此【杀】的所有目标。",
 	jsrgdangren: "当仁",
 	jsrgdangren_info: "转换技。阴：当你需要对自己使用【桃】时，你可以视为使用之。阳：当你可以对其他角色使用【桃】时，你须视为使用之。",
+	jsrg_zhangju: "衰张举",
+	jsrg_zhangju_prefix: "衰",
+	jsrgqiluan: "起乱",
+	jsrgqiluan_info: "每回合限两次。当你需要使用【杀】或【闪】时，你可以弃置任意张牌，并令至多等两名其他角色选择是否代替你使用之。若有角色响应，则你摸等同与你弃置牌数的牌。",
+	jsrgxiangjia: "相假",
+	jsrgxiangjia_info: "出牌阶段限一次。若你的装备区内有武器牌，则你可以视为使用一张【借刀杀人】。然后此牌的目标角色可以视为对你使用一张【借刀杀人】。",
 };
 
 export default translates;

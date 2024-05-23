@@ -3,6 +3,148 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//江山如故·衰
+	//张举
+	jsrgqiluan: {
+		usable: 2,
+		enable: "chooseToUse",
+		hiddenCard(player, name) {
+			return (name === "sha" || name === "shan") && (player.getStat("skill").jsrgqiluan || 0) < 2 && player.countCards("he") > 0;
+		},
+		filter(event, player) {
+			return (event.filterCard({ name: "sha", isCard: true }, player, event) || event.filterCard({ name: "shan", isCard: true }, player, event)) && player.hasCard(card => lib.filter.cardDiscardable(card, player, "jsrgqiluan"));
+		},
+		chooseButton: {
+			dialog(event, player) {
+				const vcards = [];
+				if (event.filterCard({ name: "sha", isCard: true }, player, event)) vcards.push("sha");
+				if (event.filterCard({ name: "shan", isCard: true }, player, event)) vcards.push("shan");
+				return ui.create.dialog("起乱", [vcards, "vcard"], "hidden");
+			},
+			backup(links, player) {
+				return {
+					viewAs: { name: links[0][2], isCard: true },
+					filterCard: () => false,
+					selectCard: -1,
+					popname: true,
+					async precontent(event, trigger, player) {
+						delete event.result.skill;
+						const stat = player.getStat("skill");
+						if (!stat.jsrgqiluan) stat.jsrgqiluan = 0;
+						stat.jsrgqiluan++;
+						const evt = event.getParent();
+						player.logSkill("jsrgqiluan");
+						const { cards, targets } = await player
+							.chooseCardTarget({
+								prompt: "弃置任意张牌并选择等量角色",
+								position: "he",
+								filterCard: card => lib.filter.cardDiscardable(card, player, "jsrgqiluan"),
+								filterTarget: lib.filter.notMe,
+								selectCard: [1, Infinity],
+								selectTarget: [1, Infinity],
+								filterOk() {
+									return ui.selected.cards.length === ui.selected.targets.length;
+								},
+								forced: true,
+							})
+							.forResult();
+						player.line(targets);
+						targets.sortBySeat();
+						const cardsNum = cards.length;
+						await player.discard(cards);
+						let hasSomeoneUsed = false;
+						for (const target of targets) {
+							const cardName = event.result.card.name;
+							const chooseToRespondEvent = target.chooseToRespond("是否替" + get.translation(player) + "打出一张" + get.translation(cardName) + "？", {name: cardName});
+							chooseToRespondEvent.set("ai", () => {
+								const event = _status.event;
+								return get.attitude(event.player, event.source) - 2;
+							});
+							chooseToRespondEvent.set("source", player);
+							chooseToRespondEvent.set("skillwarn", "替" + get.translation(player) + "打出一张" + get.translation(cardName));
+							chooseToRespondEvent.noOrdering = true;
+							chooseToRespondEvent.autochoose = (cardName === "sha" ? lib.filter.autoRespondSha : lib.filter.autoRespondShan);
+							const { bool, card, cards } = (await chooseToRespondEvent).result;
+							if(bool){
+								hasSomeoneUsed = true;
+								event.result.card = card;
+								event.result.cards = cards;
+								event.result._apply_args = { throw: false };
+								target.addExpose(0.2)
+								await player.draw(cardsNum)
+								break;
+							}
+						}
+						if(!hasSomeoneUsed){
+							evt.goto(0);
+						}
+					},
+				};
+			},
+			prompt(links, player) {
+				return `请选择【${get.translation(links[0][2])}】的目标`;
+			},
+		},
+		//技能收益太低，不写AI了
+	},
+	jsrgxiangjia: {
+		enable: "phaseUse",
+		usable: 1,
+		filter(event, player) {
+			return player.getEquips(1).length > 0;
+		},
+		viewAs: {
+			name: "jiedao",
+			isCard: true,
+		},
+		filterCard: () => false,
+		selectCard: -1,
+		onuse(result, player) {
+			player.addTempSkill("jsrgxiangjia_effect");
+		},
+		//技能收益太低，先不写AI了
+		subSkill: {
+			effect: {
+				charlotte: true,
+				filter(event, player) {
+					const card = get.autoViewAs({ name: "jiedao", isCard: true });
+					return (
+						event.skill === "jsrgxiangjia" &&
+						event.targets.some(current => {
+							return current.isIn() && current.canUse(card, player);
+						})
+					);
+				},
+				popup: false,
+				async content(event, trigger, player) {
+					const card = get.autoViewAs({ name: "jiedao", isCard: true });
+					for (const target of trigger.targets) {
+						if (target.isIn() && target.canUse(card, player)) {
+							const result = await target
+								.chooseTarget(`是否对${get.translation(player)}使用【借刀杀人】？`, `操作提示：直接选择${get.translation(player)}使用【杀】的目标角色`, (card, player, target) => {
+									const source = get.event("source");
+									return lib.card.jiedao.filterAddedTarget(card, player, target, source);
+								})
+								.set("source", player)
+								.set("ai", target => {
+									const player = get.player(),
+										card = get.autoViewAs({ name: "jiedao", isCard: true });
+									const source = get.event("source");
+									let eff = get.effect(source, card, player, player);
+									_status.event.preTarget = source;
+									eff += get.effect(target, card, player, player);
+									delete _status.event.preTarget;
+									return eff;
+								})
+								.forResult();
+							if (result.bool) {
+								await target.useCard(get.autoViewAs({ name: "jiedao", isCard: true }), [player, result.targets[0]]);
+							}
+						}
+					}
+				},
+			},
+		},
+	},
 	//陈蕃
 	jsrggangfen: {
 		trigger: { global: "useCardToPlayer" },
@@ -84,14 +226,17 @@ const skills = {
 			return false;
 		},
 		selectCard: -1,
-		check(){
+		check() {
 			const player = get.player();
 			if (player.isDying()) return true;
-			return game.countPlayer(current => {
-				return current.hp <= 2 && get.attitude(player, current) > 0;
-			}) > game.countPlayer(current => {
-				return current.hp <= 2 && get.attitude(player, current) <= 0;
-			})
+			return (
+				game.countPlayer(current => {
+					return current.hp <= 2 && get.attitude(player, current) > 0;
+				}) >
+				game.countPlayer(current => {
+					return current.hp <= 2 && get.attitude(player, current) <= 0;
+				})
+			);
 		},
 		prompt: "视为对自己使用【桃】",
 		async precontent(event, trigger, player) {
@@ -105,10 +250,10 @@ const skills = {
 		mark: true,
 		marktext: "☯",
 		intro: {
-			content(storage){
-				if (storage) return '当你可以对其他角色使用【桃】时，你须视为使用之。';
-				return '当你需要对自己使用【桃】时，你可以视为使用之';
-			}
+			content(storage) {
+				if (storage) return "当你可以对其他角色使用【桃】时，你须视为使用之。";
+				return "当你需要对自己使用【桃】时，你可以视为使用之";
+			},
 		},
 		group: "jsrgdangren_save",
 		subSkill: {
@@ -153,7 +298,7 @@ const skills = {
 					};
 					trigger.untrigger();
 					trigger.set("responded", true);
-					player.changeZhuanhuanji("jsrgdangren")
+					player.changeZhuanhuanji("jsrgdangren");
 				},
 			},
 		},
