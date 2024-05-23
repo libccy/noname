@@ -3,6 +3,105 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//江山如故·衰
+	//卢植
+	jsrgruzong: {
+		trigger: { player: "phaseEnd" },
+		filter(event, player) {
+			const target = lib.skill.jsrgruzong.getTarget(player);
+			if (!target) return false;
+			const hs = player.countCards("h");
+			if (target !== player) return target.countCards("h") > hs;
+			return game.hasPlayer(current => current !== player && current.countCards("h") < hs);
+		},
+		getTarget(player) {
+			const targets = [];
+			player.checkHistory("useCard", evt => targets.addArray(evt.targets));
+			return targets.length === 1 ? targets[0] : null;
+		},
+		frequent: true,
+		async cost(event, trigger, player) {
+			const target = lib.skill.jsrgruzong.getTarget(player);
+			if (target !== player) {
+				const bool = await player.chooseBool(get.prompt("jsrgruzong", target), "将手牌数摸至与该角色相同").set("frequentSkill", "jsrgruzong");
+				if (bool) {
+					event.result = {
+						bool,
+						targets: [target],
+						cost_data: "drawToOthers",
+					};
+				}
+			} else {
+				event.result = await player
+					.chooseTarget(get.prompt("jsrgruzong"), "令任意名角色将手牌数摸至与你相同", (card, player, target) => {
+						return target.countCards("h") < player.countCards("h");
+					})
+					.set("ai", target => {
+						const player = get.player();
+						return (get.attitude(player, target) * Math.sqrt(player.countCards("h") - target.countCards("h"))) / (target.hasSkillTag("nogain") ? 1 : 10);
+					});
+			}
+		},
+		async content(event, trigger, player) {
+			if (event.cost_data === "drawToOthers") {
+				const num = Math.min(5, event.targets[0].countCards("h") - player.countCards("h"));
+				if (num > 0) await player.draw(num);
+			} else {
+				const num = player.countCards("h");
+				game.asyncDraw(event.targets.sortBySeat(), target => {
+					return Math.min(5, num - target.countCards("h"));
+				});
+			}
+		},
+	},
+	jsrgdaoren: {
+		enable: "phaseUse",
+		usable: 1,
+		filter(event, player) {
+			return player.countCards("h") > 0;
+		},
+		filterCard: true,
+		position: "h",
+		discard: false,
+		lose: false,
+		delay: false,
+		filterTarget: lib.filter.notMe,
+		check(card) {
+			return 6 - get.value(card);
+		},
+		async content(event, trigger, player) {
+			const target = event.target;
+			await player.give(event.cards, target);
+			const targets = game
+				.filterPlayer(current => {
+					return player.inRange(current) && target.inRange(current);
+				})
+				.sortBySeat();
+			for (const current of targets) {
+				player.line(current);
+				await current.damage("nocard");
+				await game.asyncDelayx();
+			}
+		},
+		ai: {
+			order: 2,
+			result: {
+				player(player, target){
+					const targets = game.filterPlayer(current => {
+						return player.inRange(current) && target.inRange(current);
+					});
+					if (targets.length === 0) return false;
+					return targets.reduce((p, c)=>{
+						let eff = get.damageEffect(c, player, player);
+						if (eff < 0 && current.hp <= 2) {
+							const att = get.attitude(player, current);
+							if (att > 0) eff *= Math.sqrt(att);
+						}
+						return p + eff;
+					}, 0)
+				},
+			},
+		},
+	},
 	//刘表
 	jsrgyansha: {
 		trigger: { player: "phaseZhunbeiBegin" },
@@ -62,11 +161,12 @@ const skills = {
 	jsrgqingping: {
 		trigger: { player: "phaseJieshuBegin" },
 		frequent: true,
-		filter(event, player){
-			const targets = game.filterPlayer(current => player.inRange(current)), hs = player.countCards("h");
-			return targets.length > 0 && targets.every(current => current.countCards("h") <= hs); 
+		filter(event, player) {
+			const targets = game.filterPlayer(current => player.inRange(current)),
+				hs = player.countCards("h");
+			return targets.length > 0 && targets.every(current => current.countCards("h") <= hs);
 		},
-		async content(event, trigger, player){
+		async content(event, trigger, player) {
 			await player.draw(game.countPlayer(current => player.inRange(current)));
 		},
 	},

@@ -415,6 +415,12 @@ const translates = {
 	jsrgyansha_info: "准备阶段，你可以视为对任意名角色使用【五谷丰登】。此牌结算结束后，所有非目标角色可以依次将一张装备牌当作【杀】对其中一名目标角色使用。",
 	jsrgqingping: "清平",
 	jsrgqingping_info: "结束阶段，若你攻击范围内的角色均有手牌且手牌数均不大于你，则你可以摸等同于这些角色数的牌。",
+	jsrg_yl_luzhi: "衰卢植",
+	jsrg_yl_luzhi_prefix: "衰",
+	jsrgruzong: "儒宗",
+	jsrgruzong_info: "回合结束时，若你本回合使用牌指定过的目标角色仅有一名，则你可以将手牌数摸至与其相同。若该角色为你自己，则你可以改为令任意名其他角色将手牌摸至与你相同（均至多摸五张）。",
+	jsrgdaoren: "蹈刃",
+	jsrgdaoren_info: "出牌阶段限一次，你可以将一张手牌交给一名其他角色，然后对你与其攻击范围内均包含的所有角色各造成１点伤害。",
 };
 
 export default translates;

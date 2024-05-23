@@ -38,7 +38,7 @@ const characterReplaces = {
 	zhugezhan: ["zhugezhan", "old_zhugezhan"],
 	ol_lusu: ["re_lusu", "ol_lusu", "dc_sb_lusu"],
 	zhanghe: ["zhanghe", "re_zhanghe", "sb_zhanghe"],
-	yl_luzhi: ["yl_luzhi", "sb_yl_luzhi", "tw_yl_luzhi"],
+	yl_luzhi: ["yl_luzhi", "jsrg_yl_luzhi", "sb_yl_luzhi", "tw_yl_luzhi"],
 	sunliang: ["sunliang", "xin_sunliang"],
 };
 

@@ -1108,6 +1108,7 @@ window.noname_character_rank = {
 		"jsrg_dongzhuo",
 		"jsrg_zhanghuan",
 		"jsrg_liubiao",
+		"jsrg_yl_luzhi",
 	],
 	b: [
 		"junk_guanyu",
