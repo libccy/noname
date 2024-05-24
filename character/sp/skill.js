@@ -124,14 +124,14 @@ const skills = {
 				.set("ai", target => {
 					const player = get.event("player"),
 						trigger = get.event().getTrigger();
-					if (trigger.nature && target == player) {
+					if (trigger.hasNature() && target == player) {
 						return -get.effect(target, { name: "tiesuo" }, player, player);
 					}
 					return get.effect(target, { name: "tiesuo" }, player, player);
 				})
 				.forResult();
 		},
-		async cost(event, trigger, player) {
+		async content(event, trigger, player) {
 			for (const i of event.targets) {
 				await i.link(!i.isLinked());
 			}
