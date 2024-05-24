@@ -735,7 +735,7 @@ const skills = {
 						.set("ai", target => {
 							const player = get.player();
 							return get.damageEffect(target, player, player) * (1.1 - get.sgn(get.attitude(player, target)));
-						});
+						}).forResult("targets");
 				player.line(target, "green");
 				target.damage(2);
 			}
