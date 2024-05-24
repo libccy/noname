@@ -392,8 +392,8 @@ const skills = {
 					if (targets.length === 0) return false;
 					return targets.reduce((p, c) => {
 						let eff = get.damageEffect(c, player, player);
-						if (eff < 0 && current.hp <= 2) {
-							const att = get.attitude(player, current);
+						if (eff < 0 && c.hp <= 2) {
+							const att = get.attitude(player, c);
 							if (att > 0) eff *= Math.sqrt(att);
 						}
 						return p + eff;
