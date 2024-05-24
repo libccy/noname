@@ -2,7 +2,114 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
-	//线下E系列肘击
+	//线下E系列
+	//鄂焕
+	psdiwan: {
+		trigger: { player: "useCardToPlayered" },
+		filter(event, player) {
+			return event.card.name == "sha" && event.isFirstTarget;
+		},
+		frequent: true,
+		usable: 1,
+		content() {
+			player.draw(trigger.targets.length);
+		},
+	},
+	pssuiluan: {
+		trigger: { player: "useCard2" },
+		filter(event, player) {
+			if (player.group != "qun" || event.card.name != "sha") return false;
+			return (
+				game.countPlayer(target => {
+					return !event.targets.includes(target) && lib.filter.targetEnabled2(event.card, player, target) && lib.filter.targetInRange(event.card, player, target);
+				}) > 1
+			);
+		},
+		groupSkill: true,
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(
+					get.prompt2("pssuiluan"),
+					(card, player, target) => {
+						const event = get.event().getTrigger();
+						return !event.targets.includes(target) && lib.filter.targetEnabled2(event.card, player, target) && lib.filter.targetInRange(event.card, player, target);
+					},
+					2
+				)
+				.set("ai", target => {
+					const player = get.event("player"),
+						event = get.event().getTrigger();
+					return get.effect(target, event.card, player);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			trigger.targets.addArray(event.targets);
+			player.addTempSkill("pssuiluan_effect");
+			trigger.card.pssuiluan = true;
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				trigger: { player: ["useCardAfter", "damageEnd"] },
+				filter(event, player) {
+					if (event.name == "damage") {
+						return player.group != "shu" && event.getParent(4).name == "pssuiluan_effect";
+					}
+					return event.card.pssuiluan && (event.targets || []).some(i => i.isIn());
+				},
+				forced: true,
+				popup: false,
+				forceDie: true,
+				async content(event, trigger, player) {
+					if (trigger.name == "damage") {
+						await player.changeGroup("shu");
+						return;
+					}
+					const targets = trigger.targets.filter(i => i.isIn()).sortBySeat();
+					for (const target of targets) {
+						await target
+							.chooseToUse(function (card, player, event) {
+								if (get.name(card) != "sha") return false;
+								return lib.filter.filterCard.apply(this, arguments);
+							}, "随乱：是否对" + get.translation(player) + "使用一张【杀】？")
+							.set("filterTarget", function (card, player, target) {
+								if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
+								return lib.filter.filterTarget.apply(this, arguments);
+							})
+							.set("targetRequired", true)
+							.set("complexSelect", true)
+							.set("sourcex", player);
+					}
+				},
+			},
+		},
+	},
+	psconghan: {
+		trigger: { global: "damageSource" },
+		filter(event, player) {
+			if (player.group != "shu" || !event.source || !event.player.isIn()) return false;
+			return event.source.getSeatNum() == 1 && (player.hasSha() || (_status.connectMode && player.countCards("hs")));
+		},
+		direct: true,
+		groupSkill: true,
+		content() {
+			player
+				.chooseToUse(function (card, player, event) {
+					if (get.name(card) != "sha") return false;
+					return lib.filter.filterCard.apply(this, arguments);
+				}, get.prompt2("psconghan", trigger.player))
+				.set("filterTarget", function (card, player, target) {
+					if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
+					return lib.filter.filterTarget.apply(this, arguments);
+				})
+				.set("targetRequired", true)
+				.set("complexSelect", true)
+				.set("logSkill", ["psconghan", trigger.player])
+				.set("sourcex", trigger.player);
+		},
+	},
+	//肘击
 	psyanmou: {
 		getCards(event, player) {
 			let cards = [];

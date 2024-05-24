@@ -274,7 +274,7 @@ const skills = {
 				let max = 0,
 					names = ["huogong", "tiesuo", "wuzhong"].filter(name => {
 						if (player.getStorage("twcairu_used").includes(name)) return false;
-						return event.filterCard({ name }, player, event);
+						return player.hasValueTarget(name ,true, true);
 					});
 				if (!names.length) return 0;
 				names = names.map(namex => ({ name: namex }));

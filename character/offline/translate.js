@@ -404,8 +404,7 @@ const translates = {
 	drag_guanyu_prefix: "龙",
 	drag_caoren: "龙曹仁",
 	drag_caoren_prefix: "龙",
-	drag_lvchang: "龙吕常",
-	drag_lvchang_prefix: "龙",
+	drag_lvchang: "吕常",
 	dragchaojue: "超绝",
 	dragchaojue_info: "准备阶段，你可以弃置一张手牌，然后令所有其他角色本回合不能使用或打出此花色的牌，然后这些角色依次选择一项：①正面朝上交给你一张牌；②本回合非锁定技失效。",
 	dragjunshen: "军神",
@@ -425,6 +424,13 @@ const translates = {
 	pszhanyan_info: "出牌阶段限一次，你可以令你攻击范围内的所有角色依次选择一项：①受到你对其造成的1点火属性伤害；②将手牌或弃牌堆中的一张【火攻】或火【杀】置于牌堆顶。然后你摸X张牌（X为本次选择次数较小的选项的被选择次数）。",
 	psyuhuo: "驭火",
 	psyuhuo_info: "锁定技。①防止你受到的火属性伤害。②你的【火攻】和火【杀】不计入手牌上限。",
+	yj_ehuan: "鄂焕",
+	psdiwan: "敌万",
+	psdiwan_info: "每回合限一次，当你使用【杀】指定第一个目标后，你可以摸X张牌（X为此牌指定的目标数）。",
+	pssuiluan: "随乱",
+	pssuiluan_info: "群势力技。你使用【杀】可以额外指定两个目标，若如此做，此牌结算完毕后，所有目标角色可依次对你使用一张【杀】，你以此法受到伤害后，将势力变更至蜀。",
+	psconghan: "从汉",
+	psconghan_info: "蜀势力技。一号位造成伤害后，你可以对受伤角色使用一张【杀】。",
 };
 
 export default translates;
