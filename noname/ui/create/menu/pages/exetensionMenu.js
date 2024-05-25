@@ -2906,6 +2906,7 @@ export const extensionMenu = function (connectMenu) {
 						}
 					}
 				};
+				debugger; // NEED TO VIEW DATA
 				window.extension = {};
 				fetch(`${extensionURL}catalog.js`, {
 					referrerPolicy: "no-referrer",

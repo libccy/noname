@@ -125,6 +125,7 @@ export const startMenu = function (connectMenu) {
 						true
 					);
 					game.switchMode(active.mode);
+					game.requireSandboxOn();
 				}
 				clickContainer.call(cacheMenuContainer, connectMenu);
 			} else {

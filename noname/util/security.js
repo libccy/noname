@@ -1,7 +1,11 @@
 import { Sandbox, Domain, Marshal, Monitor, AccessAction, Rule, SANDBOX_ENABLED } from "./sandbox.js";
 
 // 是否强制所有模式下使用沙盒
-const SANDBOX_FORCED = true;
+const SANDBOX_FORCED = false;
+
+const TRUSTED_IPS = Object.freeze([
+    "47.99.105.222",
+]);
 
 let initialized = false;
 
@@ -11,6 +15,7 @@ const sandboxStack = [];
 /** @type {WeakMap<Sandbox, Array<typeof Function>>} */
 const isolatedsMap = new WeakMap();
 
+// noname 顶级变量
 const topVariables = {
     lib: null,
     game: null,
@@ -148,6 +153,18 @@ function requireSandbox() {
 
 /**
  * ```plain
+ * 进入沙盒运行模式
+ * ```
+ * 
+ * @param {string} ip 
+ */
+function requireSandboxOn(ip) {
+    if (!TRUSTED_IPS.includes(ip))
+        sandBoxRequired = true;
+}
+
+/**
+ * ```plain
  * 判断是否是沙盒运行模式
  * ```
  * 
@@ -168,8 +185,12 @@ function isSandboxRequired() {
  * @returns {any} 
  */
 function _eval(x) {
-    if (!SANDBOX_ENABLED || !sandBoxRequired)
-        return new Function(x)();
+    if (!SANDBOX_ENABLED || !sandBoxRequired) {
+        new Function(x);
+        const topVars = Object.assign({}, topVariables);
+        const vars = "_" + Math.random().toString(36).slice(2);
+        return new Function(vars, `with(${vars}){${x}}`)(topVars);
+    }
 
     // @ts-ignore
     return defaultSandbox.exec(x);
@@ -191,9 +212,12 @@ function _exec(x, scope = {}) {
         scope = {};
 
     if (!SANDBOX_ENABLED || !sandBoxRequired) {
+        // 如果没有沙盒，则进行简单模拟
         new Function(x);
-        const name = "_" + Math.random().toString(36).slice(2);
-        return new Function(name, `with(${name}){return(()=>{"use strict";${x}})()}`)(scope);
+        const topVars = Object.assign({}, topVariables);
+        const vars = "__vars_" + Math.random().toString(36).slice(2);
+        const name = "__scope_" + Math.random().toString(36).slice(2);
+        return new Function(vars, name, `with(${vars}){with(${name}){${x}}}`)(topVars, scope);
     }
 
     // @ts-ignore
@@ -221,8 +245,11 @@ function _exec2(x, scope = {}) {
         scope = {};
 
     if (!SANDBOX_ENABLED || !sandBoxRequired) {
+        // 如果没有沙盒，则进行简单模拟
+        // 进行语法检查
         new Function(x);
 
+        // 构造拦截器
         const intercepter = new Proxy(scope, {
             get(target, prop, receiver) {
                 if (prop === Symbol.unscopables)
@@ -232,7 +259,8 @@ function _exec2(x, scope = {}) {
                     && !Reflect.has(window, prop))
                     throw new ReferenceError(`"${String(prop)}" is not defined`);
 
-                return Reflect.get(target, prop, receiver) || window[prop];
+                return Reflect.get(target, prop, receiver)
+                    || topVariables[prop] || window[prop];
             },
             has(target, prop) {
                 return true;
@@ -307,15 +335,18 @@ function initSecurity({
         window,
     ];
 
+    // 构造禁止函数调用的规则
     const callRule = new Rule();
     callRule.canMarshal = false; // 禁止获取函数
     callRule.setGranted(AccessAction.CALL, false); // 禁止函数调用
     callRule.setGranted(AccessAction.NEW, false); // 禁止函数new调用
 
+    // 为禁止的函数设置规则
     accessDenieds.filter(Boolean).forEach(o => {
         Marshal.setRule(o, callRule);
     });
 
+    // 构造禁止访问的规则
     const bannedRule = new Rule();
     bannedRule.canMarshal = false; // 禁止获取
     bannedRule.setGranted(AccessAction.READ, false); // 禁止读取属性
@@ -330,35 +361,43 @@ function initSecurity({
         .filter(Boolean)
         .forEach(o => Marshal.setRule(o, bannedRule));
 
+    // 构造禁止修改的规则
     const writeRule = new Rule();
     writeRule.setGranted(AccessAction.WRITE, false); // 禁止写入属性
     writeRule.setGranted(AccessAction.DEFINE, false); // 禁止重定义属性
+    // 禁止修改 game.promises 的函数
     Marshal.setRule(game.promises, writeRule);
 
+    // 对于 game 当中访问特定函数我们通过 Monitor 进行拦截
     new Monitor()
+        // 如果是写入或重定义属性
         .action(AccessAction.WRITE)
         .action(AccessAction.DEFINE)
+        // 如果目标是 game 的 ioFuncs 包含的所有函数
         .require("target", game)
         .require("property", ...ioFuncs)
+        // 抛出异常
         .then(() => {
             throw "禁止修改关键函数";
         })
+        // 让 Monitor 开始工作
         .start(); // 差点忘记启动了喵
 
+    // 现在 parsex 已经禁止传递字符串，这段 Monitor 不需要了
     // 监听原型、toStringTag的更改
-    const toStringTag = Symbol.toStringTag;
-    new Monitor()
-        .action(AccessAction.WRITE)
-        .action(AccessAction.DEFINE)
-        .action(AccessAction.META)
-        .require("property", toStringTag)
-        .then((access, nameds, control) => {
-            // 阻止原型、toStringTag的更改
-            control.preventDefault();
-            control.stopPropagation();
-            control.setReturnValue(false);
-        })
-        .start();
+    // const toStringTag = Symbol.toStringTag;
+    // new Monitor()
+    //     .action(AccessAction.WRITE)
+    //     .action(AccessAction.DEFINE)
+    //     .action(AccessAction.META)
+    //     .require("property", toStringTag)
+    //     .then((access, nameds, control) => {
+    //         // 阻止原型、toStringTag的更改
+    //         control.preventDefault();
+    //         control.stopPropagation();
+    //         control.setReturnValue(false);
+    //     })
+    //     .start();
 
     initialized = true;
 }
@@ -405,6 +444,7 @@ function getIsolateds(sandbox) {
     if (isolateds)
         return isolateds.slice();
 
+    // 获取当前沙盒的Function类型
     isolateds = Array.from(sandbox.exec(`
         return [
             (function(){}).constructor,
@@ -441,6 +481,8 @@ function loadPolyfills() {
         }
     }
 
+    // 将垫片函数的描述器复制出来
+
     for (const key of pfPrototypes) {
         const top = window[key];
 
@@ -475,6 +517,7 @@ function setupPolyfills(sandbox) {
         namespaces: polyfills.namespaces,
     };
 
+    // 根据之前复制的垫片函数描述器定义垫片函数
     sandbox.exec(`
     function definePolyfills(top, box) {
         for (const key in top)
@@ -538,6 +581,8 @@ if (SANDBOX_ENABLED) {
     let ModAsyncFunction;
     /** @type {typeof Function} */
     let ModAsyncGeneratorFunction;
+
+    // 封装Function类型
 
     ModFunction = new Proxy(defaultFunction, {
         apply(target, thisArg, argumentsList) {
@@ -630,6 +675,7 @@ const exports = {
     assertSafeObject,
     getIsolateds,
     requireSandbox,
+    requireSandboxOn,
     isSandboxRequired,
     initSecurity,
     eval: _eval,
