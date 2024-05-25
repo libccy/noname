@@ -9,6 +9,7 @@ import { Promises } from "./promises.js";
 import { rootURL } from "../../noname.js";
 import * as pinyinPro from "./pinyins/index.js";
 import { Audio } from "./audio.js";
+import security from "../util/security.js";
 
 export class Get {
 	is = new Is();
@@ -927,10 +928,10 @@ export class Get {
 		const target = constructor
 			? Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object
 				? // @ts-ignore
-					new constructor()
+				new constructor()
 				: constructor.name in window && /\[native code\]/.test(constructor.toString())
 					? // @ts-ignore
-						new constructor(obj)
+					new constructor(obj)
 					: obj
 			: Object.create(null);
 		if (target === obj) return target;
@@ -1488,6 +1489,61 @@ export class Get {
 	infoPlayersOL(infos) {
 		return Array.from(infos || []).map(get.infoPlayerOL);
 	}
+	/** 箭头函数头 */
+	static #arrowPattern = /^(?:async\b\s*)?(?:([\w$]+)|\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\))\s*=>/;
+	/** 标准函数头 */
+	static #fullPattern = /^([\w\s*]+)\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\)\s*\{/;
+	/**
+	 * ```plain
+	 * 测试一段代码是否为函数体
+	 * ```
+	 * 
+	 * @param {string} code 
+	 * @returns {boolean} 
+	 */
+	static isFunctionBody(code) {
+		try {
+			new Function(code);
+		} catch (e) {
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * ```plain
+	 * 清洗函数体代码
+	 * ```
+	 * 
+	 * @param {string} str 
+	 * @returns 
+	 */
+	static pureFunctionStr(str) {
+		str = str.trim();
+		const arrowMatch = Get.#arrowPattern.exec(str);
+		if (arrowMatch) {
+			const body = `return ${str.slice(arrowMatch[0].length)}`;
+			if (!Get.isFunctionBody(body)) {
+				console.error("发现疑似恶意的远程代码:", str);
+				return `()=>console.error("尝试执行疑似恶意的远程代码")`;
+			}
+			return `${arrowMatch[0]}{${body}}`;
+		}
+		if (!str.endsWith("}")) return '()=>console.warn("无法识别的远程代码")';
+		const fullMatch = Get.#fullPattern.exec(str);
+		if (!fullMatch) return '()=>console.warn("无法识别的远程代码")';
+		const head = fullMatch[1];
+		const args = fullMatch[2] || '';
+		const body = str.slice(fullMatch[0].length).slice(0, -1);
+		if (!Get.isFunctionBody(body)) {
+			console.error("发现疑似恶意的远程代码:", str);
+			return `()=>console.error("尝试执行疑似恶意的远程代码")`;
+		}
+		str = `(${args}){${body}}`;
+		if (head.includes("*")) str = "*" + str;
+		str = "function" + str;
+		if (/\basync\b/.test(head)) str = "async " + str;
+		return str;
+	}
 	funcInfoOL(func) {
 		if (typeof func == "function") {
 			if (func._filter_args) {
@@ -1496,29 +1552,25 @@ export class Get {
 			const str = func.toString();
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return "_noname_func:function () {}";
-			return "_noname_func:" + str;
+			return "_noname_func:" + Get.pureFunctionStr(str);
 		}
 		return "";
 	}
 	infoFuncOL(info) {
 		let func;
-		const str = info.slice(13).trim();
+		const str = Get.pureFunctionStr(info.slice(13)); // 清洗函数并阻止注入
 		try {
 			// js内置的函数
-			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () {};
-			// 一般fun和数组形式
-			if (str.startsWith("function") || str.startsWith("(")) eval(`func=(${str});`);
-			// 其他奇形怪状的fun
-			else {
-				try {
-					eval(`func = ${str}`);
-				} catch {
-					eval(`let obj = {${str}}; func = obj[Object.keys(obj)[0]]`);
-				}
-			}
+			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () { };
+			if (security.isSandboxRequired()) {
+				const loadStr = `return (${str});`;
+				const box = security.currentSandbox();
+				if (!box) throw new ReferenceError("没有找到当前沙盒");
+				func = box.exec(loadStr);
+			} else func = security.exec(`return (${str});`);
 		} catch (e) {
 			console.error(`${e} in \n${str}`);
-			return function () {};
+			return function () { };
 		}
 		if (Array.isArray(func)) {
 			func = get.filter.apply(this, get.parsedResult(func));
@@ -1528,14 +1580,14 @@ export class Get {
 	eventInfoOL(item, level, noMore) {
 		return get.itemtype(item) == "event"
 			? `_noname_event:${JSON.stringify(
-					Object.entries(item).reduce((stringifying, entry) => {
-						const key = entry[0];
-						if (key == "_trigger") {
-							if (noMore !== false) stringifying[key] = get.eventInfoOL(entry[1], null, false);
-						} else if (!lib.element.GameEvent.prototype[key] && key != "content" && get.itemtype(entry[1]) != "event") stringifying[key] = get.stringifiedResult(entry[1], null, false);
-						return stringifying;
-					}, {})
-				)}`
+				Object.entries(item).reduce((stringifying, entry) => {
+					const key = entry[0];
+					if (key == "_trigger") {
+						if (noMore !== false) stringifying[key] = get.eventInfoOL(entry[1], null, false);
+					} else if (!lib.element.GameEvent.prototype[key] && key != "content" && get.itemtype(entry[1]) != "event") stringifying[key] = get.stringifiedResult(entry[1], null, false);
+					return stringifying;
+				}, {})
+			)}`
 			: "";
 	}
 	/**
@@ -2074,8 +2126,8 @@ export class Get {
 		n = game.checkMod(from, to, n, "globalFrom", from);
 		n = game.checkMod(from, to, n, "globalTo", to);
 		const equips1 = from.getCards("e", function (card) {
-				return !ui.selected.cards || !ui.selected.cards.includes(card);
-			}),
+			return !ui.selected.cards || !ui.selected.cards.includes(card);
+		}),
 			equips2 = to.getCards("e", function (card) {
 				return !ui.selected.cards || !ui.selected.cards.includes(card);
 			});
@@ -4895,6 +4947,19 @@ export class Get {
 		return link.protocol == "file:" ? game.promises.readFile(get.relativePath(link)).then(buffer => new Blob([buffer])) : fetch(link).then(response => response.blob());
 	}
 }
+
+function freezeSlot(obj, key) {
+	const descriptor = Reflect.getOwnPropertyDescriptor(obj, key);
+	if (!descriptor) return;
+	descriptor.writable = false;
+	descriptor.configurable = false;
+	Reflect.defineProperty(obj, key, descriptor);
+}
+
+freezeSlot(Get, "isFunctionBody");
+freezeSlot(Get, "pureFunctionStr");
+freezeSlot(Get, "funcInfoOL");
+freezeSlot(Get, "infoFuncOL");
 
 export let get = new Get();
 /**

@@ -186,7 +186,7 @@ function _eval(x) {
  * @param {Object} scope 
  * @returns {any} 
  */
-function _exec(x, scope) {
+function _exec(x, scope = {}) {
     if (isPrimitive(scope))
         scope = {};
 
