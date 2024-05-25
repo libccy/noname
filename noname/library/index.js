@@ -24,6 +24,7 @@ import * as Element from "./element/index.js";
 import { updateURLs } from "./update-urls.js";
 import { defaultHooks } from "./hooks/index.js";
 import { freezeButExtensible } from "../util/index.js";
+import security from "../util/security.js";
 
 export class Library {
 	configprefix = "noname_0.9_";
@@ -6333,8 +6334,8 @@ export class Library {
 								code = container.textarea.value;
 							}
 							try {
-								var character = null;
-								eval(code);
+								debugger; // NEED TO VIEW DATA
+								var { character } = security.exec2(code);
 								if (!Array.isArray(character)) {
 									throw "err";
 								}
@@ -6421,8 +6422,8 @@ export class Library {
 								code = container.textarea.value;
 							}
 							try {
-								var character = null;
-								eval(code);
+								debugger; // NEED TO VIEW DATA
+								var { character } = security.exec2(code);
 								if (!Array.isArray(character)) {
 									throw "err";
 								}
@@ -6850,8 +6851,8 @@ export class Library {
 								code = container.textarea.value;
 							}
 							try {
-								var character = null;
-								eval(code);
+								debugger; // NEED TO VIEW DATA
+								var { character } = security.exec2(code);
 								if (!get.is.object(character)) {
 									throw "err";
 								}
@@ -7752,7 +7753,8 @@ export class Library {
 			if (Array.isArray(context)) {
 				try {
 					const code = context.length == 1 ? context[0].string : context.reduceRight((pre, cur) => (pre.string || pre) + "." + cur.string);
-					obj = eval(code);
+					debugger; // NEED TO VIEW DATA
+					obj = security.eval(`return ${code};`);
 					if (![null, undefined].includes(obj)) {
 						const keys = Object.getOwnPropertyNames(obj)
 							.concat(Object.getOwnPropertyNames(Object.getPrototypeOf(obj)))
@@ -9560,8 +9562,14 @@ export class Library {
 					if (!Array.isArray(message) || typeof lib.message.client[message[0]] !== "function") {
 						throw "err";
 					}
-					for (var i = 1; i < message.length; i++) {
-						message[i] = get.parsedResult(message[i]);
+					if (!game.sandbox) game.sandbox = security.createSandbox();
+					security.enterSandbox(game.sandbox);
+					try {
+						for (var i = 1; i < message.length; i++) {
+							message[i] = get.parsedResult(message[i]);
+						}
+					} finally {
+						security.exitSandbox();
 					}
 				} catch (e) {
 					console.log(e);
@@ -9597,6 +9605,7 @@ export class Library {
 				}
 				game.online = false;
 				game.ws = null;
+				game.sandbox = null;
 			},
 		},
 		/**
@@ -12251,8 +12260,9 @@ export class Library {
 			log: function () {
 				var items = [];
 				try {
+					debugger; // NEED TO VIEW DATA
 					for (var i = 0; i < arguments.length; i++) {
-						eval("items.push(" + arguments[i] + ")");
+						items.push(security.eval(`return ${arguments[i]}`));
 					}
 				} catch (e) {
 					this.send("log", ["err"]);

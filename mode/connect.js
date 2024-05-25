@@ -2,6 +2,9 @@
 game.import("mode", function (lib, game, ui, get, ai, _status) {
 	return {
 		name: "connect",
+		init() {
+			game.requireSandbox();
+		},
 		start: function () {
 			var directstartmode = lib.config.directstartmode;
 			ui.create.menu(true);

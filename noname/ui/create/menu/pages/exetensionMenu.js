@@ -333,20 +333,17 @@ export const extensionMenu = function (connectMenu) {
 				inputExtName.disabled = true;
 				setTimeout(function () {
 					var ext = {};
-					var config = null,
-						help = null;
-					debugger; // NEED TO VIEW DATA
 					for (var i in dash4.content) {
 						try {
 							if (i == "content" || i == "precontent") {
-								({ config, help, return: ext[i] } = security.exec2(`return (${dash4.content[i]});`));
+								ext[i] = security.exec2(`return (${dash4.content[i]});`).return;
 								if (typeof ext[i] != "function") {
 									throw "err";
 								} else {
 									ext[i] = ext[i].toString();
 								}
 							} else {
-								({ config, help, return: ext[i] } = security.exec2(`${dash4.content[i]}; return (${i});`));
+								ext[i] = security.exec2(dash4.content[i])[i];
 								if (ext[i] == null || typeof ext[i] != "object") {
 									throw "err";
 								} else {
