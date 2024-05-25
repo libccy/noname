@@ -27033,7 +27033,7 @@ const skills = {
 	juyi: {
 		skillAnimation: true,
 		animationColor: "thunder",
-		audio: 2,
+		audio: 1,
 		derivation: ["benghuai", "weizhong"],
 		trigger: { player: "phaseZhunbeiBegin" },
 		filter: function (event, player) {
@@ -27048,8 +27048,9 @@ const skills = {
 			player.addSkills(["benghuai", "weizhong"]);
 		},
 	},
+	benghuai_zhugedan: { audio: 1 },
 	weizhong: {
-		audio: 2,
+		audio: 1,
 		trigger: { player: ["gainMaxHpEnd", "loseMaxHpEnd"] },
 		forced: true,
 		content: function () {
