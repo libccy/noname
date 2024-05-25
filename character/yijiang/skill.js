@@ -10221,6 +10221,8 @@ const skills = {
 		},
 	},
 	fuhun3: {},
+	wusheng_guanzhang: { audio: 1 },
+	paoxiao_guanzhang: { audio: 1 },
 	fencheng: {
 		skillAnimation: "epic",
 		animationColor: "gray",
