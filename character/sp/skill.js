@@ -21763,6 +21763,9 @@ const skills = {
 		},
 		ai: { threaten: 2 },
 	},
+	wusheng_guansuo: { audio: 1 },
+	dangxian_guansuo: { audio: 1 },
+	zhiman_guansuo: { audio: 1 },
 	xiefang: {
 		mod: {
 			globalFrom: function (from, to, distance) {
@@ -27221,7 +27224,7 @@ const skills = {
 	juyi: {
 		skillAnimation: true,
 		animationColor: "thunder",
-		audio: 2,
+		audio: 1,
 		derivation: ["benghuai", "weizhong"],
 		trigger: { player: "phaseZhunbeiBegin" },
 		filter: function (event, player) {
@@ -27236,8 +27239,9 @@ const skills = {
 			player.addSkills(["benghuai", "weizhong"]);
 		},
 	},
+	benghuai_zhugedan: { audio: 1 },
 	weizhong: {
-		audio: 2,
+		audio: 1,
 		trigger: { player: ["gainMaxHpEnd", "loseMaxHpEnd"] },
 		forced: true,
 		content: function () {
