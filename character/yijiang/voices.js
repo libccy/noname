@@ -50,7 +50,7 @@ export default {
 	"#xin_fazheng:die": "汉室复兴，我，是看不到了……",
 	"#fuhun1": "光复汉室，重任在肩！",
 	"#fuhun2": "将门虎子，承我父志！",
-	"#guanzhang:die": "未能手刃仇敌，愧对先父。",
+	"#guanzhang:die": "未能手刃仇敌，愧对先父……",
 	"#zhenlie1": "虽是妇人，亦当奋身一搏！",
 	"#zhenlie2": "为雪前耻，不惜吾身！",
 	"#miji1": "此计，可歼敌精锐！",
