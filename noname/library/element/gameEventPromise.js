@@ -226,8 +226,14 @@ export class GameEventPromise extends Promise {
 			const runCode = function (event, code) {
 				try {
 					// 为了使玩家调试时使用var player=xxx时不报错，故使用var
-					var { player, _trigger: trigger, _result: result } = event;
-					return eval(code);
+					// var { player, _trigger: trigger, _result: result } = event;
+					var context = { 
+						event,
+						player: event.player,
+						_trigger: event.trigger,
+						_result: event.result,
+					};
+					return security.exec(`return ${code}`, context);
 				} catch (error) {
 					return error;
 				}

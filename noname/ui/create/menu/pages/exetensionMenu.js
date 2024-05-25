@@ -380,16 +380,16 @@ export const extensionMenu = function (connectMenu) {
 											if (typeof game.readFile == "function") {
 												info[4].push(
 													"die:ext:" +
-														page.currentExtension +
-														"/audio/die/" +
-														tag.slice(tag.lastIndexOf("/") + 1)
+													page.currentExtension +
+													"/audio/die/" +
+													tag.slice(tag.lastIndexOf("/") + 1)
 												);
 											} else {
 												info[4].push(
 													"die:db:extension-" +
-														page.currentExtension +
-														":audio/die/" +
-														tag.slice(tag.lastIndexOf("/") + 1)
+													page.currentExtension +
+													":audio/die/" +
+													tag.slice(tag.lastIndexOf("/") + 1)
 												);
 											}
 										}
@@ -1679,8 +1679,8 @@ export const extensionMenu = function (connectMenu) {
 						code = container.textarea.value;
 					}
 					try {
-						var card = null;
-						eval(code);
+						debugger; // NEED TO VIEW DATA
+						var { card } = security.exec2(code);
 						if (card == null || typeof card != "object") {
 							throw "err";
 						}
@@ -1769,8 +1769,8 @@ export const extensionMenu = function (connectMenu) {
 						page.content.pack.translate[name] = translate;
 						page.content.pack.translate[name + "_info"] = info;
 						try {
-							var card = null;
-							eval(container.code);
+							debugger; // NEED TO VIEW DATA
+							var { card } = security.exec2(container.code);
 							if (card == null || typeof card != "object") {
 								throw "err";
 							}
@@ -2138,8 +2138,8 @@ export const extensionMenu = function (connectMenu) {
 						code = container.textarea.value;
 					}
 					try {
-						var skill = null;
-						eval(code);
+						debugger; // NEED TO VIEW DATA
+						var { skill } = security.exec2(code);
 						if (skill == null || typeof skill != "object") {
 							throw "err";
 						}
@@ -2321,8 +2321,8 @@ export const extensionMenu = function (connectMenu) {
 						page.content.pack.translate[name] = translate;
 						page.content.pack.translate[name + "_info"] = info;
 						try {
-							var skill = null;
-							eval(container.code);
+							debugger; // NEED TO VIEW DATA
+							var { skill } = security.exec2(container.code);
 							if (skill == null || typeof skill != "object") {
 								throw "err";
 							}
@@ -2452,20 +2452,20 @@ export const extensionMenu = function (connectMenu) {
 						}
 						try {
 							if (link == "content" || link == "precontent") {
-								var func = null;
-								eval("func=" + code);
+								debugger; // NEED TO VIEW DATA
+								var { func } = security.exec2(`func = ${code}`);
 								if (typeof func != "function") {
 									throw "err";
 								}
 							} else if (link == "config") {
-								var config = null;
-								eval(code);
+								debugger; // NEED TO VIEW DATA
+								var { config } = security.exec2(code);
 								if (config == null || typeof config != "object") {
 									throw "err";
 								}
 							} else if (link == "help") {
-								var help = null;
-								eval(code);
+								debugger; // NEED TO VIEW DATA
+								var { help } = security.exec2(code);
 								if (help == null || typeof help != "object") {
 									throw "err";
 								}
@@ -2911,7 +2911,7 @@ export const extensionMenu = function (connectMenu) {
 					referrerPolicy: "no-referrer",
 				})
 					.then((response) => response.text())
-					.then(eval)
+					.then(security.eval)
 					.then(loaded)
 					.catch((reason) => {
 						console.log(reason);
