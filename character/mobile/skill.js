@@ -11577,7 +11577,10 @@ const skills = {
 		trigger: { player: "phaseBegin" },
 		forced: true,
 		audio: "dangxian",
-		audioname: ["guansuo", "xin_liaohua"],
+		audioname: ["xin_liaohua"],
+		audioname2: {
+			guansuo: "dangxian_guansuo",
+		},
 		content: function () {
 			"step 0";
 			var card = get.discardPile(function (card) {
