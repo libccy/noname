@@ -1878,8 +1878,9 @@ const skills = {
 			old_guanzhang: "old_fuhun",
 			old_guanyu: "wusheng_re_guanyu",
 			guanzhang: "wusheng_guanzhang",
+			guansuo: "wusheng_guansuo",
 		},
-		audioname: ["re_guanyu", "jsp_guanyu", "guansuo", "re_guanzhang", "dc_jsp_guanyu"],
+		audioname: ["re_guanyu", "jsp_guanyu", "re_guanzhang", "dc_jsp_guanyu"],
 		enable: ["chooseToRespond", "chooseToUse"],
 		filterCard(card, player) {
 			if (get.zhu(player, "shouyue")) return true;
