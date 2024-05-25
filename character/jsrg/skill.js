@@ -987,7 +987,7 @@ const skills = {
 			sources.sortBySeat();
 			player.line(sources, "thunder");
 			for (let source of sources) {
-				if (!source.isIn() || !target.isIn()) break;
+				if (!source.isIn() || !target.isIn()) continue;
 				target.damage(source, "thunder");
 			}
 		},
