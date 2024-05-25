@@ -1877,8 +1877,9 @@ const skills = {
 		audioname2: {
 			old_guanzhang: "old_fuhun",
 			old_guanyu: "wusheng_re_guanyu",
+			guanzhang: "wusheng_guanzhang",
 		},
-		audioname: ["re_guanyu", "guanzhang", "jsp_guanyu", "guansuo", "re_guanzhang", "dc_jsp_guanyu"],
+		audioname: ["re_guanyu", "jsp_guanyu", "guansuo", "re_guanzhang", "dc_jsp_guanyu"],
 		enable: ["chooseToRespond", "chooseToUse"],
 		filterCard(card, player) {
 			if (get.zhu(player, "shouyue")) return true;
@@ -1950,10 +1951,11 @@ const skills = {
 	paoxiao: {
 		audio: 2,
 		firstDo: true,
-		audioname: ["re_zhangfei", "guanzhang", "xiahouba"],
+		audioname: ["re_zhangfei", "xiahouba"],
 		audioname2: {
 			old_guanzhang: "old_fuhun",
 			dc_xiahouba: "paoxiao_xiahouba",
+			guanzhang: "paoxiao_guanzhang",
 		},
 		trigger: { player: "useCard1" },
 		forced: true,
