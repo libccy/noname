@@ -10,6 +10,7 @@ import * as config from "../util/config.js";
 import { promiseErrorHandlerMap } from "../util/browser.js";
 import { importCardPack, importCharacterPack, importExtension, importMode } from "./import.js";
 import { onload } from "./onload.js";
+import security from "../util/security.js";
 
 // 判断是否从file协议切换到http/s协议
 export function canUseHttpProtocol() {
@@ -123,6 +124,11 @@ export async function boot() {
 
 	// 加载polyfill内容
 	await import("./polyfill.js");
+
+	// 初始化security
+	security.initSecurity({
+		lib, game, ui, get, ai, _status, gnc,
+	});
 
 	// 设定游戏加载时间，超过时间未加载就提醒
 	const configLoadTime = localStorage.getItem(lib.configprefix + "loadtime");
@@ -478,7 +484,8 @@ export async function boot() {
 				//var backup_onload=lib.init.onload;
 				_status.evaluatingExtension = true;
 				try {
-					eval(extcontent);
+					debugger; // NEED TO VIEW DATA
+					security.eval(extcontent);
 				} catch (e) {
 					console.log(e);
 				}

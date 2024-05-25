@@ -7,8 +7,15 @@ export const assetURL =
 	nonameInitialized == "nodejs"
 		? ""
 		: nonameInitialized;
-export const GeneratorFunction = function* () {}.constructor;
-export const AsyncFunction = async function () {}.constructor;
+/** @type {typeof Function} */
+// @ts-ignore
+export const GeneratorFunction = (function* () {}).constructor;
+/** @type {typeof Function} */
+// @ts-ignore
+export const AsyncFunction = (async function () {}).constructor;
+/** @type {typeof Function} */
+// @ts-ignore
+export const AsyncGeneratorFunction = (async function* () {}).constructor;
 export const userAgent = navigator.userAgent.toLowerCase();
 export { Mutex } from "./mutex.js";
 export const characterDefaultPicturePath = "image/character/default_silhouette_";

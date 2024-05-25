@@ -1490,9 +1490,9 @@ export class Get {
 		return Array.from(infos || []).map(get.infoPlayerOL);
 	}
 	/** 箭头函数头 */
-	static #arrowPattern = /^(?:async\b\s*)?(?:([\w$]+)|\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\))\s*=>/;
+	#arrowPattern = /^(?:async\b\s*)?(?:([\w$]+)|\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\))\s*=>/;
 	/** 标准函数头 */
-	static #fullPattern = /^([\w\s*]+)\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\)\s*\{/;
+	#fullPattern = /^([\w\s*]+)\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\)\s*\{/;
 	/**
 	 * ```plain
 	 * 测试一段代码是否为函数体
@@ -1501,7 +1501,7 @@ export class Get {
 	 * @param {string} code 
 	 * @returns {boolean} 
 	 */
-	static isFunctionBody(code) {
+	isFunctionBody(code) {
 		try {
 			new Function(code);
 		} catch (e) {
@@ -1517,24 +1517,24 @@ export class Get {
 	 * @param {string} str 
 	 * @returns 
 	 */
-	static pureFunctionStr(str) {
+	pureFunctionStr(str) {
 		str = str.trim();
-		const arrowMatch = Get.#arrowPattern.exec(str);
+		const arrowMatch = get.#arrowPattern.exec(str);
 		if (arrowMatch) {
 			const body = `return ${str.slice(arrowMatch[0].length)}`;
-			if (!Get.isFunctionBody(body)) {
+			if (!get.isFunctionBody(body)) {
 				console.error("发现疑似恶意的远程代码:", str);
 				return `()=>console.error("尝试执行疑似恶意的远程代码")`;
 			}
 			return `${arrowMatch[0]}{${body}}`;
 		}
 		if (!str.endsWith("}")) return '()=>console.warn("无法识别的远程代码")';
-		const fullMatch = Get.#fullPattern.exec(str);
+		const fullMatch = get.#fullPattern.exec(str);
 		if (!fullMatch) return '()=>console.warn("无法识别的远程代码")';
 		const head = fullMatch[1];
 		const args = fullMatch[2] || '';
 		const body = str.slice(fullMatch[0].length).slice(0, -1);
-		if (!Get.isFunctionBody(body)) {
+		if (!get.isFunctionBody(body)) {
 			console.error("发现疑似恶意的远程代码:", str);
 			return `()=>console.error("尝试执行疑似恶意的远程代码")`;
 		}
@@ -1552,13 +1552,13 @@ export class Get {
 			const str = func.toString();
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return "_noname_func:function () {}";
-			return "_noname_func:" + Get.pureFunctionStr(str);
+			return "_noname_func:" + get.pureFunctionStr(str);
 		}
 		return "";
 	}
 	infoFuncOL(info) {
 		let func;
-		const str = Get.pureFunctionStr(info.slice(13)); // 清洗函数并阻止注入
+		const str = get.pureFunctionStr(info.slice(13)); // 清洗函数并阻止注入
 		try {
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () { };

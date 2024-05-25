@@ -18,6 +18,7 @@ import {
 } from "../index.js";
 import { ui, game, get, ai, lib, _status } from "../../../../../noname.js";
 import { nonameInitialized } from "../../../../util/index.js";
+import security from "../../../../util/security.js";
 
 export const extensionMenu = function (connectMenu) {
 	if (connectMenu) return;
@@ -334,18 +335,18 @@ export const extensionMenu = function (connectMenu) {
 					var ext = {};
 					var config = null,
 						help = null;
+					debugger; // NEED TO VIEW DATA
 					for (var i in dash4.content) {
 						try {
 							if (i == "content" || i == "precontent") {
-								eval("ext[i]=" + dash4.content[i]);
+								({ config, help, return: ext[i] } = security.exec2(`return (${dash4.content[i]});`));
 								if (typeof ext[i] != "function") {
 									throw "err";
 								} else {
 									ext[i] = ext[i].toString();
 								}
 							} else {
-								eval(dash4.content[i]);
-								eval("ext[i]=" + i);
+								({ config, help, return: ext[i] } = security.exec2(`${dash4.content[i]}; return (${i});`));
 								if (ext[i] == null || typeof ext[i] != "object") {
 									throw "err";
 								} else {

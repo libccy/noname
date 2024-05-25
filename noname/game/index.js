@@ -22,6 +22,8 @@ import { DynamicStyle } from "./dynamic-style/index.js";
 import { GamePromises } from "./promises.js";
 import { Check } from "./check.js";
 
+import security from "../util/security.js";
+
 export class Game {
 	online = false;
 	onlineID = null;
@@ -1312,6 +1314,7 @@ export class Game {
 			if (callback) callback(false);
 			return;
 		}
+		game.sandbox = security.createSandbox();
 		game.ws.onopen = lib.element.ws.onopen;
 		game.ws.onmessage = lib.element.ws.onmessage;
 		game.ws.onerror = lib.element.ws.onerror;
@@ -2135,8 +2138,8 @@ export class Game {
 			_status.importingExtension = true;
 			try {
 				// 导入普通扩展
-				eval(str);
-				// esm扩展可以不写game.impoprt或许会导致_status.extensionLoading不存在
+				security.eval(str);
+				// esm扩展可以不写game.import或许会导致_status.extensionLoading不存在
 				if (Array.isArray(_status.extensionLoading)) {
 					await Promise.allSettled(_status.extensionLoading);
 					delete _status.extensionLoading;
@@ -5453,6 +5456,8 @@ export class Game {
 				newvid.name1 = newvid.name2.slice(10, newvid.name1.lastIndexOf("_"));
 			}
 			lib.videos.unshift(newvid);
+			// 清洗代理对象
+			newvid.video = structuredClone(newvid.video);
 			store.put(newvid);
 			ui.create.videoNode(newvid, true);
 		}
@@ -7695,7 +7700,8 @@ export class Game {
 			);
 		lib.status.reload++;
 		return new Promise((resolve, reject) => {
-			const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).put(value, idbValidKey);
+			const record = lib.db.transaction([storeName], "readwrite")
+				.objectStore(storeName).put(structuredClone(value), idbValidKey);
 			record.onerror = event => {
 				if (typeof onError == "function") {
 					onError(event);

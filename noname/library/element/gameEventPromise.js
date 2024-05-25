@@ -3,6 +3,7 @@ import { game } from "../../game/index.js";
 import { lib } from "../index.js";
 import { _status } from "../../status/index.js";
 import { AsyncFunction } from "../../util/index.js";
+import security from '../../util/security.js';
 
 /**
  * 将事件Promise化以使用async异步函数来执行事件。
@@ -220,6 +221,7 @@ export class GameEventPromise extends Promise {
 	 * ```
 	 */
 	async debugger() {
+		if (security.isSandboxRequired()) throw new Error("当前模式下禁止调试");
 		return new Promise((resolve) => {
 			const runCode = function (event, code) {
 				try {
