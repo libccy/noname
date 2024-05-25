@@ -12474,10 +12474,11 @@ const skills = {
 		},
 		locked: false,
 		audio: "wusheng",
-		audioname: ["re_guanyu", "jsp_guanyu", "guansuo", "re_guanzhang", "dc_jsp_guanyu"],
+		audioname: ["re_guanyu", "jsp_guanyu", "re_guanzhang", "dc_jsp_guanyu"],
 		audioname2: {
 			dc_guansuo: "wusheng_guansuo",
 			guanzhang: "wusheng_guanzhang",
+			guansuo: "wusheng_guansuo",
 		},
 		enable: ["chooseToRespond", "chooseToUse"],
 		filterCard: function (card, player) {
@@ -12512,7 +12513,6 @@ const skills = {
 			},
 		},
 	},
-	wusheng_guansuo: { audio: 2 },
 	new_yijue: {
 		audio: "yijue",
 		enable: "phaseUse",
