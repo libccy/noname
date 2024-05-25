@@ -313,7 +313,7 @@ const skills = {
 						.chooseToUse(function (card, player, event) {
 							if (get.name(card) != "sha") return false;
 							return lib.filter.filterCard.apply(this, arguments);
-						}, "眩惑：对" + get.translation(player) + "使用一张【杀】，或令" + get.translation(player) + "你的手牌并获得你的两张牌")
+						}, "眩惑：对" + get.translation(target2) + "使用一张【杀】，或令" + get.translation(player) + "你的手牌并获得你的两张牌")
 						.set("filterTarget", function (card, player, target) {
 							if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
 							return lib.filter.targetEnabled.apply(this, arguments);

@@ -714,6 +714,9 @@ window.noname_character_rank = {
 		"sb_gongsunzan",
 	],
 	bp: [
+		"ol_peixiu",
+		"caimao",
+		"yj_ehuan",
 		"xin_huojun",
 		"chess_diaochan",
 		"chess_huangzhong",
@@ -2287,6 +2290,8 @@ window.noname_character_rank = {
 			"zhugemengxue",
 			"ol_sb_taishici",
 			"clan_wuqiao",
+			"caimao",
+			"yj_ehuan",
 			"xin_huojun",
 			"muludawang",
 			"mb_huban",
@@ -2782,6 +2787,7 @@ window.noname_character_rank = {
 			"sb_gongsunzan",
 		],
 		junk: [
+			"ol_peixiu",
 			"ol_sb_guanyu",
 			"junk_guanyu",
 			"sunshao",

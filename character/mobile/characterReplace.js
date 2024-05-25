@@ -19,6 +19,7 @@ const characterReplaces = {
 	zhoubuyi: ["zhoubuyi", "yj_zhoubuyi"],
 	xianglang: ["xianglang", "mb_xianglang"],
 	miheng: ["re_miheng", "miheng"],
+	peixiu: ["ol_peixiu", "peixiu"],
 };
 
 export default characterReplaces;
