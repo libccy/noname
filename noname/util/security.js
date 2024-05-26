@@ -1,5 +1,3 @@
-import { Sandbox, Domain, Marshal, Monitor, AccessAction, Rule, SANDBOX_ENABLED } from "./sandbox.js";
-
 // 是否强制所有模式下使用沙盒
 const SANDBOX_FORCED = true;
 // 是否启用自动测试
@@ -12,11 +10,37 @@ const TRUSTED_IPS = Object.freeze([
     "47.99.105.222",
 ]);
 
+/** @type {boolean} */
+let SANDBOX_ENABLED = true;
+/** @type {typeof import("./sandbox.js").AccessAction} */
+let AccessAction;
+/** @type {typeof import("./sandbox.js").Domain} */
+let Domain;
+/** @type {typeof import("./sandbox.js").Marshal} */
+let Marshal;
+/** @type {typeof import("./sandbox.js").Monitor} */
+let Monitor;
+/** @type {typeof import("./sandbox.js").Rule} */
+let Rule;
+/** @type {typeof import("./sandbox.js").Sandbox} */
+let Sandbox;
+
+/** @typedef {import("./sandbox.js").AccessAction} AccessAction */
+/** @typedef {import("./sandbox.js").Domain} Domain */
+/** @typedef {import("./sandbox.js").Marshal} Marshal */
+/** @typedef {import("./sandbox.js").Monitor} Monitor */
+/** @typedef {import("./sandbox.js").Rule} Rule */
+/** @typedef {import("./sandbox.js").Sandbox} Sandbox */
+
+/** @type {boolean} */
 let initialized = false;
+/** @type {Sandbox} */
+let defaultSandbox;
 
 /** @type {Array<Sandbox>} */
 const sandboxStack = [];
 
+// 沙盒Function类型缓存
 /** @type {WeakMap<Sandbox, Array<typeof Function>>} */
 const isolatedsMap = new WeakMap();
 
@@ -45,6 +69,16 @@ const polyfills = {
     prototypes: {},
     namespaces: {},
 };
+
+// 被封装的Function类型
+/** @type {typeof Function} */
+let ModFunction;
+/** @type {typeof Function} */
+let ModGeneratorFunction;
+/** @type {typeof Function} */
+let ModAsyncFunction;
+/** @type {typeof Function} */
+let ModAsyncGeneratorFunction;
 
 /**
  * ```plain
@@ -283,7 +317,12 @@ function _exec2(x, scope = {}) {
     return scope;
 }
 
-function initSecurity({
+/**
+ * ```plain
+ * 初始化模块
+ * ```
+ */
+async function initSecurity({
     lib,
     game,
     ui,
@@ -294,6 +333,15 @@ function initSecurity({
 }) {
     if (initialized)
         throw "security 已经被初始化过了";
+
+    const sandbox = await import("./sandbox.js");
+    SANDBOX_ENABLED = sandbox.SANDBOX_ENABLED;
+    AccessAction = sandbox.AccessAction;
+    Domain = sandbox.Domain;
+    Marshal = sandbox.Marshal;
+    Monitor = sandbox.Monitor;
+    Rule = sandbox.Rule;
+    Sandbox = sandbox.Sandbox;
 
     topVariables.lib = lib;
     topVariables.game = game;
@@ -307,11 +355,7 @@ function initSecurity({
         return;
 
     loadPolyfills();
-
-    // @ts-ignore
-    Object.assign(defaultSandbox.scope, topVariables);
-    // @ts-ignore
-    setupPolyfills(defaultSandbox);
+    initIsolatedEnvironment();
 
     // 不允许被远程代码访问的game函数
     const ioFuncs = [
@@ -512,6 +556,181 @@ function getIsolateds(sandbox) {
 
 /**
  * ```plain
+ * 根据传入对象的运行域获取对应的Function类型
+ * ```
+ * 
+ * @param {Object} item
+ * @returns {Array<typeof Function>}
+ */
+function getIsolatedsFrom(item) {
+    const domain = Marshal.getMarshalledDomain(item) || Domain.caller;
+
+    // 非顶级域调用情况下我们替换掉Function类型
+    if (domain && domain !== Domain.topDomain) {
+        const box = Sandbox.from(domain);
+
+        if (!box)
+            throw "意外的运行域: 运行域没有绑定沙盒";
+
+        return getIsolateds(box);
+    }
+
+    return [
+        ModFunction,
+        ModGeneratorFunction,
+        ModAsyncFunction,
+        ModAsyncGeneratorFunction,
+    ];
+}
+
+/**
+ * ```plain
+ * 导入 `sandbox.js` 的相关类
+ * ```
+ * 
+ * @returns {{
+ *     AccessAction: typeof import("./sandbox.js").AccessAction,
+ *     Domain: typeof import("./sandbox.js").Domain,
+ *     Marshal: typeof import("./sandbox.js").Marshal,
+ *     Monitor: typeof import("./sandbox.js").Monitor,
+ *     Rule: typeof import("./sandbox.js").Rule,
+ *     Sandbox: typeof import("./sandbox.js").Sandbox,
+ * }}
+ */
+function importSandbox() {
+    if (!AccessAction)
+        throw new ReferenceError("sandbox.js 还没有被载入");
+
+    return {
+        AccessAction,
+        Domain,
+        Marshal,
+        Monitor,
+        Rule,
+        Sandbox,
+    };
+}
+
+/**
+ * ```plain
+ * 初始化顶级域的Funcion类型封装
+ * ```
+ */
+function initIsolatedEnvironment() {
+    /** @type {typeof Function} */
+    // @ts-ignore
+    const defaultFunction = function () { }.constructor;
+    /** @type {typeof Function} */
+    // @ts-ignore
+    const defaultGeneratorFunction = function* () { }.constructor;
+    /** @type {typeof Function} */
+    // @ts-ignore
+    const defaultAsyncFunction = async function () { }.constructor;
+    /** @type {typeof Function} */
+    // @ts-ignore
+    const defaultAsyncGeneratorFunction = async function* () { }.constructor;
+
+    // @ts-ignore
+    defaultSandbox = createSandbox(); // 所有 eval、parsex 代码全部丢进去喵
+
+    // @ts-ignore
+    // 对于 defaultSandbox 我们要补充一些东西喵
+    defaultSandbox.scope.localStorage = localStorage;
+
+    // 对Function类型进行包裹
+    /** @type {Array<typeof Function>} */
+    const [
+        IsolatedFunction,
+        IsolatedGeneratorFunction,
+        IsolatedAsyncFunction,
+        IsolatedAsyncGeneratorFunction,
+    ]
+        // @ts-ignore
+        = getIsolateds(defaultSandbox);
+
+    // 封装Function类型
+
+    ModFunction = new Proxy(defaultFunction, {
+        apply(target, thisArg, argumentsList) {
+            if (!sandBoxRequired)
+                return new target(...argumentsList);
+
+            return new IsolatedFunction(...argumentsList);
+        },
+        construct(target, argumentsList, newTarget) {
+            if (!sandBoxRequired)
+                return new target(...argumentsList);
+
+            return new IsolatedFunction(...argumentsList);
+        },
+    });
+
+    /** @type {typeof Function} */
+    ModGeneratorFunction = new Proxy(defaultGeneratorFunction, {
+        apply(target, thisArg, argumentsList) {
+            if (!sandBoxRequired)
+                return new target(...argumentsList);
+
+            return new IsolatedGeneratorFunction(...argumentsList);
+        },
+        construct(target, argumentsList, newTarget) {
+            if (!sandBoxRequired)
+                return new target(...argumentsList);
+
+            return new IsolatedGeneratorFunction(...argumentsList);
+        },
+    });
+
+    /** @type {typeof Function} */
+    ModAsyncFunction = new Proxy(defaultAsyncFunction, {
+        apply(target, thisArg, argumentsList) {
+            if (!sandBoxRequired)
+                return new target(...argumentsList);
+
+            return new IsolatedAsyncFunction(...argumentsList);
+        },
+        construct(target, argumentsList, newTarget) {
+            if (!sandBoxRequired)
+                return new target(...argumentsList);
+
+            return new IsolatedAsyncFunction(...argumentsList);
+        },
+    });
+
+    /** @type {typeof Function} */
+    ModAsyncGeneratorFunction = new Proxy(defaultAsyncGeneratorFunction, {
+        apply(target, thisArg, argumentsList) {
+            if (!sandBoxRequired)
+                return new target(...argumentsList);
+
+            return new IsolatedAsyncGeneratorFunction(...argumentsList);
+        },
+        construct(target, argumentsList, newTarget) {
+            if (!sandBoxRequired)
+                return new target(...argumentsList);
+
+            return new IsolatedAsyncGeneratorFunction(...argumentsList);
+        },
+    });
+
+    function rewriteCtor(prototype, newCtor) {
+        const descriptor = Object.getOwnPropertyDescriptor(prototype, 'constructor')
+            || { configurable: true, writable: true, enumerable: false };
+        if (!descriptor.configurable) throw new TypeError("无法覆盖不可配置的构造函数");
+        descriptor.value = newCtor;
+        Reflect.defineProperty(prototype, 'constructor', descriptor);
+    }
+
+    // 覆盖所有的Function类型构造函数
+    window.Function = ModFunction;
+    rewriteCtor(defaultFunction.prototype, ModFunction);
+    rewriteCtor(defaultGeneratorFunction.prototype, ModGeneratorFunction);
+    rewriteCtor(defaultAsyncFunction.prototype, ModAsyncFunction);
+    rewriteCtor(defaultAsyncGeneratorFunction.prototype, ModAsyncGeneratorFunction);
+}
+
+/**
+ * ```plain
  * 加载当前的垫片函数
  * ```
  */
@@ -607,127 +826,6 @@ function setupPolyfills(sandbox) {
     `, context);
 }
 
-/** @type {typeof Function} */
-// @ts-ignore
-const defaultFunction = function () { }.constructor;
-/** @type {typeof Function} */
-// @ts-ignore
-const defaultGeneratorFunction = function* () { }.constructor;
-/** @type {typeof Function} */
-// @ts-ignore
-const defaultAsyncFunction = async function () { }.constructor;
-/** @type {typeof Function} */
-// @ts-ignore
-const defaultAsyncGeneratorFunction = async function* () { }.constructor;
-
-const defaultSandbox = createSandbox(); // 所有 eval、parsex 代码全部丢进去喵
-
-if (SANDBOX_ENABLED) {
-    // @ts-ignore
-    // 对于 defaultSandbox 我们要补充一些东西喵
-    defaultSandbox.scope.localStorage = localStorage;
-
-    // 对Function类型进行包裹
-    /** @type {Array<typeof Function>} */
-    const [
-        IsolatedFunction,
-        IsolatedGeneratorFunction,
-        IsolatedAsyncFunction,
-        IsolatedAsyncGeneratorFunction,
-    ]
-        // @ts-ignore
-        = getIsolateds(defaultSandbox);
-
-    /** @type {typeof Function} */
-    let ModFunction;
-    /** @type {typeof Function} */
-    let ModGeneratorFunction;
-    /** @type {typeof Function} */
-    let ModAsyncFunction;
-    /** @type {typeof Function} */
-    let ModAsyncGeneratorFunction;
-
-    // 封装Function类型
-
-    ModFunction = new Proxy(defaultFunction, {
-        apply(target, thisArg, argumentsList) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
-
-            return new IsolatedFunction(...argumentsList);
-        },
-        construct(target, argumentsList, newTarget) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
-
-            return new IsolatedFunction(...argumentsList);
-        },
-    });
-
-    /** @type {typeof Function} */
-    ModGeneratorFunction = new Proxy(defaultGeneratorFunction, {
-        apply(target, thisArg, argumentsList) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
-
-            return new IsolatedGeneratorFunction(...argumentsList);
-        },
-        construct(target, argumentsList, newTarget) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
-
-            return new IsolatedGeneratorFunction(...argumentsList);
-        },
-    });
-
-    /** @type {typeof Function} */
-    ModAsyncFunction = new Proxy(defaultAsyncFunction, {
-        apply(target, thisArg, argumentsList) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
-
-            return new IsolatedAsyncFunction(...argumentsList);
-        },
-        construct(target, argumentsList, newTarget) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
-
-            return new IsolatedAsyncFunction(...argumentsList);
-        },
-    });
-
-    /** @type {typeof Function} */
-    ModAsyncGeneratorFunction = new Proxy(defaultAsyncGeneratorFunction, {
-        apply(target, thisArg, argumentsList) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
-
-            return new IsolatedAsyncGeneratorFunction(...argumentsList);
-        },
-        construct(target, argumentsList, newTarget) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
-
-            return new IsolatedAsyncGeneratorFunction(...argumentsList);
-        },
-    });
-
-    function rewriteCtor(prototype, newCtor) {
-        const descriptor = Object.getOwnPropertyDescriptor(prototype, 'constructor')
-            || { configurable: true, writable: true, enumerable: false };
-        if (!descriptor.configurable) throw new TypeError("无法覆盖不可配置的构造函数");
-        descriptor.value = newCtor;
-        Reflect.defineProperty(prototype, 'constructor', descriptor);
-    }
-
-    // 覆盖所有的Function类型构造函数
-    window.Function = ModFunction;
-    rewriteCtor(defaultFunction.prototype, ModFunction);
-    rewriteCtor(defaultGeneratorFunction.prototype, ModGeneratorFunction);
-    rewriteCtor(defaultAsyncFunction.prototype, ModAsyncFunction);
-    rewriteCtor(defaultAsyncGeneratorFunction.prototype, ModAsyncGeneratorFunction);
-}
-
 // 测试暴露喵
 // window.sandbox = defaultSandbox;
 
@@ -739,6 +837,8 @@ const exports = {
     isUnsafeObject,
     assertSafeObject,
     getIsolateds,
+    getIsolatedsFrom,
+    importSandbox,
     requireSandbox,
     requireSandboxOn,
     isSandboxRequired,

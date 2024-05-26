@@ -10,7 +10,7 @@ import * as config from "../util/config.js";
 import { promiseErrorHandlerMap } from "../util/browser.js";
 import { importCardPack, importCharacterPack, importExtension, importMode } from "./import.js";
 import { onload } from "./onload.js";
-import security from "../util/security.js";
+import { initializeSandboxRealms } from "../util/initRealms.js";
 
 // 判断是否从file协议切换到http/s协议
 export function canUseHttpProtocol() {
@@ -125,7 +125,12 @@ export async function boot() {
 	// 加载polyfill内容
 	await import("./polyfill.js");
 
+	// 初始化沙盒的Realms
+	await initializeSandboxRealms();
+
 	// 初始化security
+	const securityModule = await import("../util/security.js");
+	const security = securityModule.default;
 	security.initSecurity({
 		lib, game, ui, get, ai, _status, gnc,
 	});

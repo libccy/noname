@@ -12,7 +12,6 @@ import { GameEventPromise } from "../element/gameEventPromise.js";
 import { rootURL } from "../../../noname.js";
 
 import security from "../../util/security.js";
-import { Domain, Marshal, Sandbox } from "../../util/sandbox.js";
 
 export class LibInit {
 	/**
@@ -596,32 +595,15 @@ export class LibInit {
 	 * @returns
 	 */
 	parsex(item, scope) {
-		let ModFunction = Function;
-		let ModGeneratorFunction = GeneratorFunction;
-		// let ModAsyncFunction = AsyncFunction;
-		// let ModAsyncGeneratorFunction = AsyncGeneratorFunction;
-
 		// 虽然现在 parsex 被控制到了沙盒，
 		// 但是因为默认沙盒还是可以额外操作东西，
 		// 故而对不同的运行域做了区分
-		if (security.SANDBOX_ENABLED) {
-			const domain = Marshal.getMarshalledDomain(item) || Domain.caller;
-
-			// 非顶级域调用情况下我们替换掉Function类型
-			if (domain && domain !== Domain.topDomain) {
-				const sandbox = Sandbox.from(domain);
-
-				if (!sandbox)
-					throw "意外的运行域: 运行域没有绑定沙盒";
-
-				[
-					ModFunction,
-					ModGeneratorFunction,
-					// ModAsyncFunction,
-					// ModAsyncGeneratorFunction,
-				] = security.getIsolateds(sandbox);
-			}
-		}
+		let [
+			ModFunction,
+			ModGeneratorFunction,
+			// ModAsyncFunction,
+			// ModAsyncGeneratorFunction,
+		] = security.getIsolatedsFrom(item);
 
 		//by 诗笺、Tipx-L
 		/**

@@ -1,4 +1,9 @@
-const FILE_URL = import.meta.url;
+import { SANDBOX_EXPORT } from "./initRealms.js";
+
+// 很重要的事情！
+// 请不要在在其他文件中import sandbox.js！
+// 如果需要沙盒相关的类请用security.importSandbox()导入！！！
+// 什么时候支持顶级await(Chrome 89)就可以改回去了，现在好麻烦哦
 
 /** @typedef {any} Window */
 
@@ -1030,28 +1035,15 @@ class NativeWrapper {
 
 /** @type {(target: Function, thiz: Object, args: Array) => any} */
 // @ts-ignore
-const ContextInvoker1 = window.replacedCI1
-    || (function (apply, target, thiz, args) {
-        return apply(target, thiz, args);
-    }).bind(null, Reflect.apply);
+const ContextInvoker1 = window.replacedCI1;
 
 /** @type {(target: Function, args: Array, newTarget: Function) => any} */
 // @ts-ignore
-const ContextInvoker2 = window.replacedCI2
-    || (function (construct, target, args, newTarget) {
-        return construct(target, args, newTarget);
-    }).bind(null, Reflect.construct);
+const ContextInvoker2 = window.replacedCI2;
 
 /** @type {(closure: Object, target: Function) => ((...args: any[]) => any)} */
 // @ts-ignore
-const ContextInvokerCreator = window.replacedCIC
-    || (function (apply, closure, target) {
-        return function (...args) {
-            return apply(target, closure,
-                // @ts-ignore
-                [this === window ? null : this, args, new.target]);
-        };
-    }).bind(null, Reflect.apply);
+const ContextInvokerCreator = window.replacedCIC;
 
 /**
  * ```plain
@@ -3521,89 +3513,9 @@ function sealObject(obj, freeze = Object.freeze) {
     }
 }
 
-const SANDBOX_EXPORT = {
-    AccessAction,
-    Rule,
-    Monitor,
-    Marshal,
-    Domain,
-    Sandbox,
-};
-
-// TODO: 其他扩展的全局变量
-
 if (SANDBOX_ENABLED) {
     // 确保顶级运行域的原型链不暴露
     if (window.top === window) {
-        // 如果当前是顶级运行域
-        const document = window.document;
-        const createElement = document.createElement.bind(document);
-        const appendChild = document.body.appendChild.bind(document.body);
-
-        // 通过构造 iframe 来创建新的变量域
-        // 我们需要确保顶级运行域的原型链不暴露
-        // 为此我们从新的变量域重新载入当前脚本
-        // 然后就可以直接冻结当前变量域的原型链
-        const iframe = createElement("iframe");
-        iframe.style.display = "none";
-        appendChild(iframe);
-
-        if (!iframe.contentWindow)
-            throw new ReferenceError("无法载入运行域");
-
-        // 定义 createRealms 函数
-        Reflect.defineProperty(iframe.contentWindow, "createRealms", {
-            value() {
-                // 通过构造 iframe 来创建新的变量域
-                const iframe = createElement("iframe");
-                iframe.style.display = "none";
-                appendChild(iframe);
-
-                const window = iframe.contentWindow;
-                if (!window)
-                    throw new ReferenceError("顶级域已经被卸载");
-
-                iframe.remove();
-                return window;
-            },
-        });
-
-        // 传递顶级变量域、上下文执行器
-        // @ts-ignore
-        iframe.contentWindow.replacedGlobal = window;
-        // @ts-ignore
-        iframe.contentWindow.replacedCI1 = ContextInvoker1;
-        // @ts-ignore
-        iframe.contentWindow.replacedCI2 = ContextInvoker2;
-        // @ts-ignore
-        iframe.contentWindow.replacedCIC = ContextInvokerCreator;
-
-        // 重新以新的变量域载入当前脚本
-        const script = iframe.contentWindow.document.createElement("script");
-        script.src = FILE_URL;
-        script.type = "module";
-
-        const promise = new Promise((resolve, reject) => {
-            script.onload = resolve;
-            script.onerror = reject;
-        });
-        iframe.contentWindow.document.head.appendChild(script);
-        await promise;
-
-        // @ts-ignore
-        delete iframe.contentWindow.replacedGlobal;
-        // @ts-ignore
-        delete iframe.contentWindow.replacedCI1;
-        // @ts-ignore
-        delete iframe.contentWindow.replacedCI2;
-        // @ts-ignore
-        delete iframe.contentWindow.replacedCIC;
-
-        // 从新的变量域暴露的对象获取导出
-        // @ts-ignore
-        Object.assign(SANDBOX_EXPORT, iframe.contentWindow.SANDBOX_EXPORT);
-        iframe.remove(); // 释放 iframe 与相关的 browser context
-
         ({
             // @ts-ignore
             AccessAction,
@@ -3658,8 +3570,14 @@ if (SANDBOX_ENABLED) {
 
         // 向顶级运行域暴露导出
         // @ts-ignore
-        window.SANDBOX_EXPORT =
-            Object.assign({}, SANDBOX_EXPORT);
+        window.SANDBOX_EXPORT = {
+            AccessAction,
+            Rule,
+            Monitor,
+            Marshal,
+            Domain,
+            Sandbox,
+        };
     }
 }
 

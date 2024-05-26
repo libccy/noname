@@ -21,7 +21,6 @@ import {
 	getTreesFromGithub,
 } from "../../../../library/update.js";
 import security from "../../../../util/security.js";
-import { AccessAction, Marshal, Monitor } from "../../../../util/sandbox.js";
 
 export const otherMenu = function (/** @type { boolean | undefined } */ connectMenu) {
 	if (connectMenu) return;
@@ -1215,6 +1214,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 				cheat: lib.cheat,
 			});
 			if (security.isSandboxRequired()) {
+				const { Monitor, AccessAction } = security.importSandbox();
 				new Monitor()
 					.action(AccessAction.DEFINE)
 					.action(AccessAction.WRITE)
