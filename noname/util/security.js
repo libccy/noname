@@ -1,7 +1,12 @@
 import { Sandbox, Domain, Marshal, Monitor, AccessAction, Rule, SANDBOX_ENABLED } from "./sandbox.js";
 
 // 是否强制所有模式下使用沙盒
-const SANDBOX_FORCED = false;
+const SANDBOX_FORCED = true;
+// 是否启用自动测试
+const SANDBOX_AUTOTEST = true;
+// 是否禁用自动测试延迟
+// 这将放弃渲染，在游戏结束前无响应
+const SANDBOX_AUTOTEST_NODELAY = false;
 
 const TRUSTED_IPS = Object.freeze([
     "47.99.105.222",
@@ -289,8 +294,6 @@ function initSecurity({
 }) {
     if (initialized)
         throw "security 已经被初始化过了";
-    if (!SANDBOX_ENABLED)
-        return;
 
     topVariables.lib = lib;
     topVariables.game = game;
@@ -299,6 +302,9 @@ function initSecurity({
     topVariables.ai = ai;
     topVariables._status = _status;
     topVariables.gnc = gnc;
+
+    if (!SANDBOX_ENABLED)
+        return;
 
     loadPolyfills();
 
@@ -332,6 +338,14 @@ function initSecurity({
         ...Object.values(game.promises),
         defaultEval,
         window.require,
+        window.process,
+        window.module,
+        window.exports,
+        window.cordova,
+        // @ts-ignore
+        window.NonameAndroidBridge,
+        // @ts-ignore
+        window.noname_shijianInterfaces,
         window,
     ];
 
@@ -399,6 +413,44 @@ function initSecurity({
     //     })
     //     .start();
 
+    if (SANDBOX_AUTOTEST) {
+        // 一个测试循环喵
+        if (SANDBOX_AUTOTEST_NODELAY) {
+            game.resume = () => { };
+            game.pause = () => { };
+        }
+        game.delay = game.delayx = () => { };
+        game.asyncDelay = game.asyncDelayx = async () => { };
+
+        Reflect.defineProperty(lib.element.GameEvent.prototype, "animate", {
+            get: () => undefined,
+            set() { },
+            enumerable: false,
+            configurable: false,
+        });
+
+        if (!lib.videos)
+            lib.videos = [];
+
+        game.over = function (...args) {
+            if (_status.over) return;
+            _status.over = true;
+            setTimeout(() => {
+                if (!_status.auto)
+                    return;
+
+                const count = parseInt(localStorage.getItem("__sandboxTestCount") || "0");
+                localStorage.setItem("__sandboxTestCount", String(count + 1));
+
+                localStorage.setItem(
+                    lib.configprefix + "directstart", "true");
+                game.reload();
+            }, SANDBOX_AUTOTEST_NODELAY ? 5000 : 1000);
+        };
+
+        lib.arenaReady.push(() => ui.click.auto());
+    }
+
     initialized = true;
 }
 
@@ -464,17 +516,30 @@ function getIsolateds(sandbox) {
  * ```
  */
 function loadPolyfills() {
+    function isNativeDescriptor(descriptor) {
+        if (typeof descriptor.value == "function"
+            && !nativePattern.test(descriptor.value.toString()))
+            return false;
+        if (typeof descriptor.get == "function"
+            && !nativePattern.test(descriptor.get.toString()))
+            return false;
+        if (typeof descriptor.set == "function"
+            && !nativePattern.test(descriptor.set.toString()))
+            return false;
+
+        return true;
+    }
+
     function copyDescriptors(top, box) {
         for (const key of Reflect.ownKeys(top)) {
             const descriptor = Reflect.getOwnPropertyDescriptor(top, key);
 
             if (!descriptor
-                || typeof descriptor.value !== "function")
+                || (typeof descriptor.value !== "function"
+                    && !descriptor.get && !descriptor.set))
                 continue;
 
-            const body = descriptor.value.toString();
-
-            if (nativePattern.test(body))
+            if (isNativeDescriptor(descriptor))
                 continue;
 
             box[key] = descriptor;

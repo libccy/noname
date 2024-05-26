@@ -3,7 +3,7 @@ const FILE_URL = import.meta.url;
 /** @typedef {any} Window */
 
 // 方便开关确定沙盒的问题喵
-const SANDBOX_ENABLED = false;
+const SANDBOX_ENABLED = true;
 
 // 暴露方法Symbol，用于类之间通信
 const SandboxExposer = Symbol("Sandbox.Exposer"); // 实例暴露
@@ -3269,15 +3269,16 @@ class Sandbox {
 
         const executingScope = Sandbox.#executingScope[Sandbox.#executingScope.length - 1];
         const scope = inheritScope && executingScope || thiz.#scope;
-        const contextName = Sandbox.#makeName("__context_", scope);
-        const argsName = Sandbox.#makeName("__args_", scope);
+        const contextName = Sandbox.#makeName("_", scope);
+        const argsName = Sandbox.#makeName("_", scope);
+        const applyName = Sandbox.#makeName("_", scope);
         const parameters = paramList
             ? paramList.join(", ") : "";
         const writeContextAction = { exists: 0, extend: 1, all: 2 }[writeContext] || 0;
 
         let argumentList;
 
-        const raw = new thiz.#domainFunction("_", `with(_){with(window){with(${contextName}){return(()=>{"use strict";return(function(${parameters}){\n// 沙盒代码起始\n${code}\n// 沙盒代码结束\n}).call(${contextName}.this,...${argsName})})()}}}`);
+        const raw = new thiz.#domainFunction("_", `with(_){with(window){with(${contextName}){return(()=>{"use strict";return(${applyName}(function(${parameters}){\n// 沙盒代码起始\n${code}\n// 沙盒代码结束\n},${contextName}.this,${argsName}))})()}}}`);
 
         const domain = thiz.#domain;
         const domainWindow = thiz.#domainWindow;
@@ -3295,6 +3296,8 @@ class Sandbox {
                         return marshalledContext;
                     case argsName:
                         return argumentList;
+                    case applyName:
+                        return Reflect.apply;
                 }
 
                 // 防止逃逸
