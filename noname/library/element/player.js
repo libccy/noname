@@ -4445,6 +4445,7 @@ export class Player extends HTMLDivElement {
 				next.func = arguments[i];
 			}
 		}
+		return next;
 	}
 	discoverCard(list) {
 		var next = game.createEvent("discoverCard");
