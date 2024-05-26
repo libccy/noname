@@ -119,6 +119,9 @@ const skills = {
 			if (cards.length) await player.discard(cards);
 			await player.draw(4);
 		},
+		ai: {
+			combo: "mbpanxiang"
+		},
 	},
 	//李昭焦伯
 	mbzuoyou: {
