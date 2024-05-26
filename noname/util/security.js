@@ -7,7 +7,7 @@ const SANDBOX_AUTOTEST = true;
 const SANDBOX_AUTOTEST_NODELAY = false;
 
 const TRUSTED_IPS = Object.freeze([
-    "47.99.105.222",
+	"47.99.105.222",
 ]);
 
 /** @type {boolean} */
@@ -46,13 +46,13 @@ const isolatedsMap = new WeakMap();
 
 // noname 顶级变量
 const topVariables = {
-    lib: null,
-    game: null,
-    ui: null,
-    get: null,
-    ai: null,
-    _status: null,
-    gnc: null,
+	lib: null,
+	game: null,
+	ui: null,
+	get: null,
+	ai: null,
+	_status: null,
+	gnc: null,
 };
 const defaultEval = window.eval;
 
@@ -66,8 +66,8 @@ const nativePattern = /^function \w*\(\) \{ \[native code\] \}$/;
 
 // 垫片备份
 const polyfills = {
-    prototypes: {},
-    namespaces: {},
+	prototypes: {},
+	namespaces: {},
 };
 
 // 被封装的Function类型
@@ -88,13 +88,13 @@ let ModAsyncGeneratorFunction;
  * @param {Sandbox} box 
  */
 function enterSandbox(box) {
-    if (!SANDBOX_ENABLED)
-        return;
+	if (!SANDBOX_ENABLED)
+		return;
 
-    if (!Domain.isBelievable(Domain.topDomain))
-        throw "无法在沙盒里面访问";
+	if (!Domain.isBelievable(Domain.topDomain))
+		throw "无法在沙盒里面访问";
 
-    sandboxStack.push(box);
+	sandboxStack.push(box);
 }
 
 /**
@@ -103,15 +103,15 @@ function enterSandbox(box) {
  * ```
  */
 function exitSandbox() {
-    if (!SANDBOX_ENABLED)
-        return;
+	if (!SANDBOX_ENABLED)
+		return;
 
-    if (!Domain.isBelievable(Domain.topDomain))
-        throw "无法在沙盒里面访问";
-    if (!sandboxStack.length)
-        return;
+	if (!Domain.isBelievable(Domain.topDomain))
+		throw "无法在沙盒里面访问";
+	if (!sandboxStack.length)
+		return;
 
-    sandboxStack.pop();
+	sandboxStack.pop();
 }
 
 /**
@@ -123,28 +123,28 @@ function exitSandbox() {
  * @param {string?} prop 指定要检查的属性描述符
  */
 function isUnsafeObject(obj, prop = null) {
-    if (!SANDBOX_ENABLED)
-        return true;
+	if (!SANDBOX_ENABLED)
+		return true;
 
-    if (prop != null) {
-        const descriptor = Object.getOwnPropertyDescriptor(obj, prop);
+	if (prop != null) {
+		const descriptor = Object.getOwnPropertyDescriptor(obj, prop);
 
-        if (descriptor) {
-            if (descriptor.get
-                && isUnsafeObject(descriptor.get))
-                return true;
-            if (descriptor.set
-                && isUnsafeObject(descriptor.set))
-                return true;
-            if (isUnsafeObject(descriptor.value))
-                return true;
-        }
-    }
+		if (descriptor) {
+			if (descriptor.get
+				&& isUnsafeObject(descriptor.get))
+				return true;
+			if (descriptor.set
+				&& isUnsafeObject(descriptor.set))
+				return true;
+			if (isUnsafeObject(descriptor.value))
+				return true;
+		}
+	}
 
-    if (isPrimitive(obj))
-        return false;
+	if (isPrimitive(obj))
+		return false;
 
-    return !Domain.topDomain.isFrom(obj);
+	return !Domain.topDomain.isFrom(obj);
 }
 
 /**
@@ -156,15 +156,15 @@ function isUnsafeObject(obj, prop = null) {
  * @param {string?} prop 指定要检查的属性描述符
  */
 function assertSafeObject(obj, prop = null) {
-    if (isUnsafeObject(obj, prop))
-        throw "unsafe object denied";
+	if (isUnsafeObject(obj, prop))
+		throw "unsafe object denied";
 }
 
 /**
  * @param {Object?} obj 
  */
 function isPrimitive(obj) {
-    return Object(obj) !== obj;
+	return Object(obj) !== obj;
 }
 
 /**
@@ -175,10 +175,10 @@ function isPrimitive(obj) {
  * @returns {Sandbox?} 
  */
 function currentSandbox() {
-    if (!SANDBOX_ENABLED)
-        return null;
+	if (!SANDBOX_ENABLED)
+		return null;
 
-    return sandboxStack[sandboxStack.length - 1] || defaultSandbox;
+	return sandboxStack[sandboxStack.length - 1] || defaultSandbox;
 }
 
 /**
@@ -187,7 +187,7 @@ function currentSandbox() {
  * ```
  */
 function requireSandbox() {
-    sandBoxRequired = true;
+	sandBoxRequired = true;
 }
 
 /**
@@ -198,8 +198,8 @@ function requireSandbox() {
  * @param {string} ip 
  */
 function requireSandboxOn(ip) {
-    if (!TRUSTED_IPS.includes(ip))
-        sandBoxRequired = true;
+	if (!TRUSTED_IPS.includes(ip))
+		sandBoxRequired = true;
 }
 
 /**
@@ -210,7 +210,7 @@ function requireSandboxOn(ip) {
  * @returns {boolean} 
  */
 function isSandboxRequired() {
-    return SANDBOX_ENABLED && sandBoxRequired;
+	return SANDBOX_ENABLED && sandBoxRequired;
 }
 
 /**
@@ -224,15 +224,15 @@ function isSandboxRequired() {
  * @returns {any} 
  */
 function _eval(x) {
-    if (!SANDBOX_ENABLED || !sandBoxRequired) {
-        new Function(x);
-        const topVars = Object.assign({}, topVariables);
-        const vars = "_" + Math.random().toString(36).slice(2);
-        return new Function(vars, `with(${vars}){${x}}`)(topVars);
-    }
+	if (!SANDBOX_ENABLED || !sandBoxRequired) {
+		new Function(x);
+		const topVars = Object.assign({}, topVariables);
+		const vars = "_" + Math.random().toString(36).slice(2);
+		return new Function(vars, `with(${vars}){${x}}`)(topVars);
+	}
 
-    // @ts-ignore
-    return defaultSandbox.exec(x);
+	// @ts-ignore
+	return defaultSandbox.exec(x);
 }
 
 /**
@@ -247,20 +247,20 @@ function _eval(x) {
  * @returns {any} 
  */
 function _exec(x, scope = {}) {
-    if (isPrimitive(scope))
-        scope = {};
+	if (isPrimitive(scope))
+		scope = {};
 
-    if (!SANDBOX_ENABLED || !sandBoxRequired) {
-        // 如果没有沙盒，则进行简单模拟
-        new Function(x);
-        const topVars = Object.assign({}, topVariables);
-        const vars = "__vars_" + Math.random().toString(36).slice(2);
-        const name = "__scope_" + Math.random().toString(36).slice(2);
-        return new Function(vars, name, `with(${vars}){with(${name}){${x}}}`)(topVars, scope);
-    }
+	if (!SANDBOX_ENABLED || !sandBoxRequired) {
+		// 如果没有沙盒，则进行简单模拟
+		new Function(x);
+		const topVars = Object.assign({}, topVariables);
+		const vars = "__vars_" + Math.random().toString(36).slice(2);
+		const name = "__scope_" + Math.random().toString(36).slice(2);
+		return new Function(vars, name, `with(${vars}){with(${name}){${x}}}`)(topVars, scope);
+	}
 
-    // @ts-ignore
-    return defaultSandbox.exec(x, scope);
+	// @ts-ignore
+	return defaultSandbox.exec(x, scope);
 }
 
 /**
@@ -277,44 +277,44 @@ function _exec(x, scope = {}) {
  * @returns {Object} 
  */
 function _exec2(x, scope = {}) {
-    if (scope == "window") {
-        scope = {};
-        scope.window = scope;
-    } else if (isPrimitive(scope))
-        scope = {};
+	if (scope == "window") {
+		scope = {};
+		scope.window = scope;
+	} else if (isPrimitive(scope))
+		scope = {};
 
-    if (!SANDBOX_ENABLED || !sandBoxRequired) {
-        // 如果没有沙盒，则进行简单模拟
-        // 进行语法检查
-        new Function(x);
+	if (!SANDBOX_ENABLED || !sandBoxRequired) {
+		// 如果没有沙盒，则进行简单模拟
+		// 进行语法检查
+		new Function(x);
 
-        // 构造拦截器
-        const intercepter = new Proxy(scope, {
-            get(target, prop, receiver) {
-                if (prop === Symbol.unscopables)
-                    return undefined;
+		// 构造拦截器
+		const intercepter = new Proxy(scope, {
+			get(target, prop, receiver) {
+				if (prop === Symbol.unscopables)
+					return undefined;
 
-                if (!Reflect.has(target, prop)
-                    && !Reflect.has(window, prop))
-                    throw new ReferenceError(`"${String(prop)}" is not defined`);
+				if (!Reflect.has(target, prop)
+					&& !Reflect.has(window, prop))
+					throw new ReferenceError(`"${String(prop)}" is not defined`);
 
-                return Reflect.get(target, prop, receiver)
-                    || topVariables[prop] || window[prop];
-            },
-            has(target, prop) {
-                return true;
-            },
-        });
+				return Reflect.get(target, prop, receiver)
+					|| topVariables[prop] || window[prop];
+			},
+			has(target, prop) {
+				return true;
+			},
+		});
 
-        const result = new Function("_", `with(_){return(()=>{"use strict";\n${x}})()}`)(intercepter);
-        scope.return = result;
-        return scope;
-    }
+		const result = new Function("_", `with(_){return(()=>{"use strict";\n${x}})()}`)(intercepter);
+		scope.return = result;
+		return scope;
+	}
 
-    // @ts-ignore
-    const [result] = defaultSandbox.exec2(x, scope);
-    scope.return = result;
-    return scope;
+	// @ts-ignore
+	const [result] = defaultSandbox.exec2(x, scope);
+	scope.return = result;
+	return scope;
 }
 
 /**
@@ -323,179 +323,179 @@ function _exec2(x, scope = {}) {
  * ```
  */
 async function initSecurity({
-    lib,
-    game,
-    ui,
-    get,
-    ai,
-    _status,
-    gnc,
+	lib,
+	game,
+	ui,
+	get,
+	ai,
+	_status,
+	gnc,
 }) {
-    if (initialized)
-        throw "security 已经被初始化过了";
+	if (initialized)
+		throw "security 已经被初始化过了";
 
-    const sandbox = await import("./sandbox.js");
-    SANDBOX_ENABLED = sandbox.SANDBOX_ENABLED;
-    AccessAction = sandbox.AccessAction;
-    Domain = sandbox.Domain;
-    Marshal = sandbox.Marshal;
-    Monitor = sandbox.Monitor;
-    Rule = sandbox.Rule;
-    Sandbox = sandbox.Sandbox;
+	const sandbox = await import("./sandbox.js");
+	SANDBOX_ENABLED = sandbox.SANDBOX_ENABLED;
+	AccessAction = sandbox.AccessAction;
+	Domain = sandbox.Domain;
+	Marshal = sandbox.Marshal;
+	Monitor = sandbox.Monitor;
+	Rule = sandbox.Rule;
+	Sandbox = sandbox.Sandbox;
 
-    topVariables.lib = lib;
-    topVariables.game = game;
-    topVariables.ui = ui;
-    topVariables.get = get;
-    topVariables.ai = ai;
-    topVariables._status = _status;
-    topVariables.gnc = gnc;
+	topVariables.lib = lib;
+	topVariables.game = game;
+	topVariables.ui = ui;
+	topVariables.get = get;
+	topVariables.ai = ai;
+	topVariables._status = _status;
+	topVariables.gnc = gnc;
 
-    if (!SANDBOX_ENABLED)
-        return;
+	if (!SANDBOX_ENABLED)
+		return;
 
-    loadPolyfills();
-    initIsolatedEnvironment();
+	loadPolyfills();
+	initIsolatedEnvironment();
 
-    // 不允许被远程代码访问的game函数
-    const ioFuncs = [
-        "download",
-        "readFile",
-        "readFileAsText",
-        "writeFile",
-        "removeFile",
-        "getFileList",
-        "ensureDirectory",
-        "createDir",
-        "removeDir",
-        "checkForUpdate",
-        "checkForAssetUpdate",
-        "importExtension",
-        "export",
-        "multiDownload2",
-        "multiDownload",
-        "fetch",
-    ];
+	// 不允许被远程代码访问的game函数
+	const ioFuncs = [
+		"download",
+		"readFile",
+		"readFileAsText",
+		"writeFile",
+		"removeFile",
+		"getFileList",
+		"ensureDirectory",
+		"createDir",
+		"removeDir",
+		"checkForUpdate",
+		"checkForAssetUpdate",
+		"importExtension",
+		"export",
+		"multiDownload2",
+		"multiDownload",
+		"fetch",
+	];
 
-    const accessDenieds = [
-        ...ioFuncs.map(n => game[n]).filter(Boolean),
-        ...Object.values(game.promises),
-        defaultEval,
-        window.require,
-        window.process,
-        window.module,
-        window.exports,
-        window.cordova,
-        // @ts-ignore
-        window.NonameAndroidBridge,
-        // @ts-ignore
-        window.noname_shijianInterfaces,
-        window,
-    ];
+	const accessDenieds = [
+		...ioFuncs.map(n => game[n]).filter(Boolean),
+		...Object.values(game.promises),
+		defaultEval,
+		window.require,
+		window.process,
+		window.module,
+		window.exports,
+		window.cordova,
+		// @ts-ignore
+		window.NonameAndroidBridge,
+		// @ts-ignore
+		window.noname_shijianInterfaces,
+		window,
+	];
 
-    // 构造禁止函数调用的规则
-    const callRule = new Rule();
-    callRule.canMarshal = false; // 禁止获取函数
-    callRule.setGranted(AccessAction.CALL, false); // 禁止函数调用
-    callRule.setGranted(AccessAction.NEW, false); // 禁止函数new调用
+	// 构造禁止函数调用的规则
+	const callRule = new Rule();
+	callRule.canMarshal = false; // 禁止获取函数
+	callRule.setGranted(AccessAction.CALL, false); // 禁止函数调用
+	callRule.setGranted(AccessAction.NEW, false); // 禁止函数new调用
 
-    // 为禁止的函数设置规则
-    accessDenieds.filter(Boolean).forEach(o => {
-        Marshal.setRule(o, callRule);
-    });
+	// 为禁止的函数设置规则
+	accessDenieds.filter(Boolean).forEach(o => {
+		Marshal.setRule(o, callRule);
+	});
 
-    // 构造禁止访问的规则
-    const bannedRule = new Rule();
-    bannedRule.canMarshal = false; // 禁止获取
-    bannedRule.setGranted(AccessAction.READ, false); // 禁止读取属性
-    bannedRule.setGranted(AccessAction.WRITE, false); // 禁止读取属性
+	// 构造禁止访问的规则
+	const bannedRule = new Rule();
+	bannedRule.canMarshal = false; // 禁止获取
+	bannedRule.setGranted(AccessAction.READ, false); // 禁止读取属性
+	bannedRule.setGranted(AccessAction.WRITE, false); // 禁止读取属性
 
-    // 禁止访问关键对象
-    [
-        lib.cheat,
-        lib.node,
-        lib.message,
-    ]
-        .filter(Boolean)
-        .forEach(o => Marshal.setRule(o, bannedRule));
+	// 禁止访问关键对象
+	[
+		lib.cheat,
+		lib.node,
+		lib.message,
+	]
+		.filter(Boolean)
+		.forEach(o => Marshal.setRule(o, bannedRule));
 
-    // 构造禁止修改的规则
-    const writeRule = new Rule();
-    writeRule.setGranted(AccessAction.WRITE, false); // 禁止写入属性
-    writeRule.setGranted(AccessAction.DEFINE, false); // 禁止重定义属性
-    // 禁止修改 game.promises 的函数
-    Marshal.setRule(game.promises, writeRule);
+	// 构造禁止修改的规则
+	const writeRule = new Rule();
+	writeRule.setGranted(AccessAction.WRITE, false); // 禁止写入属性
+	writeRule.setGranted(AccessAction.DEFINE, false); // 禁止重定义属性
+	// 禁止修改 game.promises 的函数
+	Marshal.setRule(game.promises, writeRule);
 
-    // 对于 game 当中访问特定函数我们通过 Monitor 进行拦截
-    new Monitor()
-        // 如果是写入或重定义属性
-        .action(AccessAction.WRITE)
-        .action(AccessAction.DEFINE)
-        // 如果目标是 game 的 ioFuncs 包含的所有函数
-        .require("target", game)
-        .require("property", ...ioFuncs)
-        // 抛出异常
-        .then(() => {
-            throw "禁止修改关键函数";
-        })
-        // 让 Monitor 开始工作
-        .start(); // 差点忘记启动了喵
+	// 对于 game 当中访问特定函数我们通过 Monitor 进行拦截
+	new Monitor()
+		// 如果是写入或重定义属性
+		.action(AccessAction.WRITE)
+		.action(AccessAction.DEFINE)
+		// 如果目标是 game 的 ioFuncs 包含的所有函数
+		.require("target", game)
+		.require("property", ...ioFuncs)
+		// 抛出异常
+		.then(() => {
+			throw "禁止修改关键函数";
+		})
+		// 让 Monitor 开始工作
+		.start(); // 差点忘记启动了喵
 
-    // 现在 parsex 已经禁止传递字符串，这段 Monitor 不需要了
-    // 监听原型、toStringTag的更改
-    // const toStringTag = Symbol.toStringTag;
-    // new Monitor()
-    //     .action(AccessAction.WRITE)
-    //     .action(AccessAction.DEFINE)
-    //     .action(AccessAction.META)
-    //     .require("property", toStringTag)
-    //     .then((access, nameds, control) => {
-    //         // 阻止原型、toStringTag的更改
-    //         control.preventDefault();
-    //         control.stopPropagation();
-    //         control.setReturnValue(false);
-    //     })
-    //     .start();
+	// 现在 parsex 已经禁止传递字符串，这段 Monitor 不需要了
+	// 监听原型、toStringTag的更改
+	// const toStringTag = Symbol.toStringTag;
+	// new Monitor()
+	//	 .action(AccessAction.WRITE)
+	//	 .action(AccessAction.DEFINE)
+	//	 .action(AccessAction.META)
+	//	 .require("property", toStringTag)
+	//	 .then((access, nameds, control) => {
+	//		 // 阻止原型、toStringTag的更改
+	//		 control.preventDefault();
+	//		 control.stopPropagation();
+	//		 control.setReturnValue(false);
+	//	 })
+	//	 .start();
 
-    if (SANDBOX_AUTOTEST) {
-        // 一个测试循环喵
-        if (SANDBOX_AUTOTEST_NODELAY) {
-            game.resume = () => { };
-            game.pause = () => { };
-        }
-        game.delay = game.delayx = () => { };
-        game.asyncDelay = game.asyncDelayx = async () => { };
+	if (SANDBOX_AUTOTEST) {
+		// 一个测试循环喵
+		if (SANDBOX_AUTOTEST_NODELAY) {
+			game.resume = () => { };
+			game.pause = () => { };
+		}
+		game.delay = game.delayx = () => { };
+		game.asyncDelay = game.asyncDelayx = async () => { };
 
-        Reflect.defineProperty(lib.element.GameEvent.prototype, "animate", {
-            get: () => undefined,
-            set() { },
-            enumerable: false,
-            configurable: false,
-        });
+		Reflect.defineProperty(lib.element.GameEvent.prototype, "animate", {
+			get: () => undefined,
+			set() { },
+			enumerable: false,
+			configurable: false,
+		});
 
-        if (!lib.videos)
-            lib.videos = [];
+		if (!lib.videos)
+			lib.videos = [];
 
-        game.over = function (...args) {
-            if (_status.over) return;
-            _status.over = true;
-            setTimeout(() => {
-                if (!_status.auto)
-                    return;
+		game.over = function (...args) {
+			if (_status.over) return;
+			_status.over = true;
+			setTimeout(() => {
+				if (!_status.auto)
+					return;
 
-                const count = parseInt(localStorage.getItem("__sandboxTestCount") || "0");
-                localStorage.setItem("__sandboxTestCount", String(count + 1));
+				const count = parseInt(localStorage.getItem("__sandboxTestCount") || "0");
+				localStorage.setItem("__sandboxTestCount", String(count + 1));
 
-                localStorage.setItem(
-                    lib.configprefix + "directstart", "true");
-                game.reload();
-            }, SANDBOX_AUTOTEST_NODELAY ? 5000 : 1000);
-        };
+				localStorage.setItem(
+					lib.configprefix + "directstart", "true");
+				game.reload();
+			}, SANDBOX_AUTOTEST_NODELAY ? 5000 : 1000);
+		};
 
-        lib.arenaReady.push(() => ui.click.auto());
-    }
+		lib.arenaReady.push(() => ui.click.auto());
+	}
 
-    initialized = true;
+	initialized = true;
 }
 
 /**
@@ -506,24 +506,24 @@ async function initSecurity({
  * @returns {Sandbox?} 
  */
 function createSandbox() {
-    if (!SANDBOX_ENABLED)
-        return null;
+	if (!SANDBOX_ENABLED)
+		return null;
 
-    const box = new Sandbox();
-    box.freeAccess = true;
-    box.initBuiltins();
+	const box = new Sandbox();
+	box.freeAccess = true;
+	box.initBuiltins();
 
-    // 向沙盒提供顶级运行域的文档对象
-    // TODO: 仅提供必要的document函数(?)
-    box.document = document;
+	// 向沙盒提供顶级运行域的文档对象
+	// TODO: 仅提供必要的document函数(?)
+	box.document = document;
 
-    // 传递七个变量
-    Object.assign(box.scope, topVariables);
-    // 复制垫片函数
-    setupPolyfills(box);
+	// 传递七个变量
+	Object.assign(box.scope, topVariables);
+	// 复制垫片函数
+	setupPolyfills(box);
 
-    box.pushScope();
-    return box;
+	box.pushScope();
+	return box;
 }
 
 /**
@@ -535,23 +535,23 @@ function createSandbox() {
  * @returns {Array<typeof Function>} 
  */
 function getIsolateds(sandbox) {
-    let isolateds = isolatedsMap.get(sandbox);
+	let isolateds = isolatedsMap.get(sandbox);
 
-    if (isolateds)
-        return isolateds.slice();
+	if (isolateds)
+		return isolateds.slice();
 
-    // 获取当前沙盒的Function类型
-    isolateds = Array.from(sandbox.exec(`
-        return [
-            (function(){}).constructor,
-            (function*(){}).constructor,
-            (async function(){}).constructor,
-            (async function*(){}).constructor,
-        ];
-    `));
+	// 获取当前沙盒的Function类型
+	isolateds = Array.from(sandbox.exec(`
+		return [
+			(function(){}).constructor,
+			(function*(){}).constructor,
+			(async function(){}).constructor,
+			(async function*(){}).constructor,
+		];
+	`));
 
-    isolatedsMap.set(sandbox, isolateds);
-    return isolateds.slice();
+	isolatedsMap.set(sandbox, isolateds);
+	return isolateds.slice();
 }
 
 /**
@@ -563,24 +563,24 @@ function getIsolateds(sandbox) {
  * @returns {Array<typeof Function>}
  */
 function getIsolatedsFrom(item) {
-    const domain = Marshal.getMarshalledDomain(item) || Domain.caller;
+	const domain = Marshal.getMarshalledDomain(item) || Domain.caller;
 
-    // 非顶级域调用情况下我们替换掉Function类型
-    if (domain && domain !== Domain.topDomain) {
-        const box = Sandbox.from(domain);
+	// 非顶级域调用情况下我们替换掉Function类型
+	if (domain && domain !== Domain.topDomain) {
+		const box = Sandbox.from(domain);
 
-        if (!box)
-            throw "意外的运行域: 运行域没有绑定沙盒";
+		if (!box)
+			throw "意外的运行域: 运行域没有绑定沙盒";
 
-        return getIsolateds(box);
-    }
+		return getIsolateds(box);
+	}
 
-    return [
-        ModFunction,
-        ModGeneratorFunction,
-        ModAsyncFunction,
-        ModAsyncGeneratorFunction,
-    ];
+	return [
+		ModFunction,
+		ModGeneratorFunction,
+		ModAsyncFunction,
+		ModAsyncGeneratorFunction,
+	];
 }
 
 /**
@@ -589,26 +589,26 @@ function getIsolatedsFrom(item) {
  * ```
  * 
  * @returns {{
- *     AccessAction: typeof import("./sandbox.js").AccessAction,
- *     Domain: typeof import("./sandbox.js").Domain,
- *     Marshal: typeof import("./sandbox.js").Marshal,
- *     Monitor: typeof import("./sandbox.js").Monitor,
- *     Rule: typeof import("./sandbox.js").Rule,
- *     Sandbox: typeof import("./sandbox.js").Sandbox,
+ *	 AccessAction: typeof import("./sandbox.js").AccessAction,
+ *	 Domain: typeof import("./sandbox.js").Domain,
+ *	 Marshal: typeof import("./sandbox.js").Marshal,
+ *	 Monitor: typeof import("./sandbox.js").Monitor,
+ *	 Rule: typeof import("./sandbox.js").Rule,
+ *	 Sandbox: typeof import("./sandbox.js").Sandbox,
  * }}
  */
 function importSandbox() {
-    if (!AccessAction)
-        throw new ReferenceError("sandbox.js 还没有被载入");
+	if (!AccessAction)
+		throw new ReferenceError("sandbox.js 还没有被载入");
 
-    return {
-        AccessAction,
-        Domain,
-        Marshal,
-        Monitor,
-        Rule,
-        Sandbox,
-    };
+	return {
+		AccessAction,
+		Domain,
+		Marshal,
+		Monitor,
+		Rule,
+		Sandbox,
+	};
 }
 
 /**
@@ -617,116 +617,116 @@ function importSandbox() {
  * ```
  */
 function initIsolatedEnvironment() {
-    /** @type {typeof Function} */
-    // @ts-ignore
-    const defaultFunction = function () { }.constructor;
-    /** @type {typeof Function} */
-    // @ts-ignore
-    const defaultGeneratorFunction = function* () { }.constructor;
-    /** @type {typeof Function} */
-    // @ts-ignore
-    const defaultAsyncFunction = async function () { }.constructor;
-    /** @type {typeof Function} */
-    // @ts-ignore
-    const defaultAsyncGeneratorFunction = async function* () { }.constructor;
+	/** @type {typeof Function} */
+	// @ts-ignore
+	const defaultFunction = function () { }.constructor;
+	/** @type {typeof Function} */
+	// @ts-ignore
+	const defaultGeneratorFunction = function* () { }.constructor;
+	/** @type {typeof Function} */
+	// @ts-ignore
+	const defaultAsyncFunction = async function () { }.constructor;
+	/** @type {typeof Function} */
+	// @ts-ignore
+	const defaultAsyncGeneratorFunction = async function* () { }.constructor;
 
-    // @ts-ignore
-    defaultSandbox = createSandbox(); // 所有 eval、parsex 代码全部丢进去喵
+	// @ts-ignore
+	defaultSandbox = createSandbox(); // 所有 eval、parsex 代码全部丢进去喵
 
-    // @ts-ignore
-    // 对于 defaultSandbox 我们要补充一些东西喵
-    defaultSandbox.scope.localStorage = localStorage;
+	// @ts-ignore
+	// 对于 defaultSandbox 我们要补充一些东西喵
+	defaultSandbox.scope.localStorage = localStorage;
 
-    // 对Function类型进行包裹
-    /** @type {Array<typeof Function>} */
-    const [
-        IsolatedFunction,
-        IsolatedGeneratorFunction,
-        IsolatedAsyncFunction,
-        IsolatedAsyncGeneratorFunction,
-    ]
-        // @ts-ignore
-        = getIsolateds(defaultSandbox);
+	// 对Function类型进行包裹
+	/** @type {Array<typeof Function>} */
+	const [
+		IsolatedFunction,
+		IsolatedGeneratorFunction,
+		IsolatedAsyncFunction,
+		IsolatedAsyncGeneratorFunction,
+	]
+		// @ts-ignore
+		= getIsolateds(defaultSandbox);
 
-    // 封装Function类型
+	// 封装Function类型
 
-    ModFunction = new Proxy(defaultFunction, {
-        apply(target, thisArg, argumentsList) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
+	ModFunction = new Proxy(defaultFunction, {
+		apply(target, thisArg, argumentsList) {
+			if (!sandBoxRequired)
+				return new target(...argumentsList);
 
-            return new IsolatedFunction(...argumentsList);
-        },
-        construct(target, argumentsList, newTarget) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
+			return new IsolatedFunction(...argumentsList);
+		},
+		construct(target, argumentsList, newTarget) {
+			if (!sandBoxRequired)
+				return new target(...argumentsList);
 
-            return new IsolatedFunction(...argumentsList);
-        },
-    });
+			return new IsolatedFunction(...argumentsList);
+		},
+	});
 
-    /** @type {typeof Function} */
-    ModGeneratorFunction = new Proxy(defaultGeneratorFunction, {
-        apply(target, thisArg, argumentsList) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
+	/** @type {typeof Function} */
+	ModGeneratorFunction = new Proxy(defaultGeneratorFunction, {
+		apply(target, thisArg, argumentsList) {
+			if (!sandBoxRequired)
+				return new target(...argumentsList);
 
-            return new IsolatedGeneratorFunction(...argumentsList);
-        },
-        construct(target, argumentsList, newTarget) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
+			return new IsolatedGeneratorFunction(...argumentsList);
+		},
+		construct(target, argumentsList, newTarget) {
+			if (!sandBoxRequired)
+				return new target(...argumentsList);
 
-            return new IsolatedGeneratorFunction(...argumentsList);
-        },
-    });
+			return new IsolatedGeneratorFunction(...argumentsList);
+		},
+	});
 
-    /** @type {typeof Function} */
-    ModAsyncFunction = new Proxy(defaultAsyncFunction, {
-        apply(target, thisArg, argumentsList) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
+	/** @type {typeof Function} */
+	ModAsyncFunction = new Proxy(defaultAsyncFunction, {
+		apply(target, thisArg, argumentsList) {
+			if (!sandBoxRequired)
+				return new target(...argumentsList);
 
-            return new IsolatedAsyncFunction(...argumentsList);
-        },
-        construct(target, argumentsList, newTarget) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
+			return new IsolatedAsyncFunction(...argumentsList);
+		},
+		construct(target, argumentsList, newTarget) {
+			if (!sandBoxRequired)
+				return new target(...argumentsList);
 
-            return new IsolatedAsyncFunction(...argumentsList);
-        },
-    });
+			return new IsolatedAsyncFunction(...argumentsList);
+		},
+	});
 
-    /** @type {typeof Function} */
-    ModAsyncGeneratorFunction = new Proxy(defaultAsyncGeneratorFunction, {
-        apply(target, thisArg, argumentsList) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
+	/** @type {typeof Function} */
+	ModAsyncGeneratorFunction = new Proxy(defaultAsyncGeneratorFunction, {
+		apply(target, thisArg, argumentsList) {
+			if (!sandBoxRequired)
+				return new target(...argumentsList);
 
-            return new IsolatedAsyncGeneratorFunction(...argumentsList);
-        },
-        construct(target, argumentsList, newTarget) {
-            if (!sandBoxRequired)
-                return new target(...argumentsList);
+			return new IsolatedAsyncGeneratorFunction(...argumentsList);
+		},
+		construct(target, argumentsList, newTarget) {
+			if (!sandBoxRequired)
+				return new target(...argumentsList);
 
-            return new IsolatedAsyncGeneratorFunction(...argumentsList);
-        },
-    });
+			return new IsolatedAsyncGeneratorFunction(...argumentsList);
+		},
+	});
 
-    function rewriteCtor(prototype, newCtor) {
-        const descriptor = Object.getOwnPropertyDescriptor(prototype, 'constructor')
-            || { configurable: true, writable: true, enumerable: false };
-        if (!descriptor.configurable) throw new TypeError("无法覆盖不可配置的构造函数");
-        descriptor.value = newCtor;
-        Reflect.defineProperty(prototype, 'constructor', descriptor);
-    }
+	function rewriteCtor(prototype, newCtor) {
+		const descriptor = Object.getOwnPropertyDescriptor(prototype, 'constructor')
+			|| { configurable: true, writable: true, enumerable: false };
+		if (!descriptor.configurable) throw new TypeError("无法覆盖不可配置的构造函数");
+		descriptor.value = newCtor;
+		Reflect.defineProperty(prototype, 'constructor', descriptor);
+	}
 
-    // 覆盖所有的Function类型构造函数
-    window.Function = ModFunction;
-    rewriteCtor(defaultFunction.prototype, ModFunction);
-    rewriteCtor(defaultGeneratorFunction.prototype, ModGeneratorFunction);
-    rewriteCtor(defaultAsyncFunction.prototype, ModAsyncFunction);
-    rewriteCtor(defaultAsyncGeneratorFunction.prototype, ModAsyncGeneratorFunction);
+	// 覆盖所有的Function类型构造函数
+	window.Function = ModFunction;
+	rewriteCtor(defaultFunction.prototype, ModFunction);
+	rewriteCtor(defaultGeneratorFunction.prototype, ModGeneratorFunction);
+	rewriteCtor(defaultAsyncFunction.prototype, ModAsyncFunction);
+	rewriteCtor(defaultAsyncGeneratorFunction.prototype, ModAsyncGeneratorFunction);
 }
 
 /**
@@ -735,55 +735,55 @@ function initIsolatedEnvironment() {
  * ```
  */
 function loadPolyfills() {
-    function isNativeDescriptor(descriptor) {
-        if (typeof descriptor.value == "function"
-            && !nativePattern.test(descriptor.value.toString()))
-            return false;
-        if (typeof descriptor.get == "function"
-            && !nativePattern.test(descriptor.get.toString()))
-            return false;
-        if (typeof descriptor.set == "function"
-            && !nativePattern.test(descriptor.set.toString()))
-            return false;
+	function isNativeDescriptor(descriptor) {
+		if (typeof descriptor.value == "function"
+			&& !nativePattern.test(descriptor.value.toString()))
+			return false;
+		if (typeof descriptor.get == "function"
+			&& !nativePattern.test(descriptor.get.toString()))
+			return false;
+		if (typeof descriptor.set == "function"
+			&& !nativePattern.test(descriptor.set.toString()))
+			return false;
 
-        return true;
-    }
+		return true;
+	}
 
-    function copyDescriptors(top, box) {
-        for (const key of Reflect.ownKeys(top)) {
-            const descriptor = Reflect.getOwnPropertyDescriptor(top, key);
+	function copyDescriptors(top, box) {
+		for (const key of Reflect.ownKeys(top)) {
+			const descriptor = Reflect.getOwnPropertyDescriptor(top, key);
 
-            if (!descriptor
-                || (typeof descriptor.value !== "function"
-                    && !descriptor.get && !descriptor.set))
-                continue;
+			if (!descriptor
+				|| (typeof descriptor.value !== "function"
+					&& !descriptor.get && !descriptor.set))
+				continue;
 
-            if (isNativeDescriptor(descriptor))
-                continue;
+			if (isNativeDescriptor(descriptor))
+				continue;
 
-            box[key] = descriptor;
-        }
-    }
+			box[key] = descriptor;
+		}
+	}
 
-    // 将垫片函数的描述器复制出来
+	// 将垫片函数的描述器复制出来
 
-    for (const key of pfPrototypes) {
-        const top = window[key];
+	for (const key of pfPrototypes) {
+		const top = window[key];
 
-        if (!top || !top.prototype)
-            continue;
+		if (!top || !top.prototype)
+			continue;
 
-        copyDescriptors(top.prototype, polyfills.prototypes[key] = {});
-    }
+		copyDescriptors(top.prototype, polyfills.prototypes[key] = {});
+	}
 
-    for (const key of pfNamespaces) {
-        const top = window[key];
+	for (const key of pfNamespaces) {
+		const top = window[key];
 
-        if (!top)
-            continue;
+		if (!top)
+			continue;
 
-        copyDescriptors(top, polyfills.namespaces[key] = {});
-    }
+		copyDescriptors(top, polyfills.namespaces[key] = {});
+	}
 }
 
 /**
@@ -794,59 +794,63 @@ function loadPolyfills() {
  * @param {Sandbox} sandbox 
  */
 function setupPolyfills(sandbox) {
-    const context = {
-        pfPrototypes,
-        pfNamespaces,
-        prototypes: polyfills.prototypes,
-        namespaces: polyfills.namespaces,
-    };
+	const context = {
+		pfPrototypes,
+		pfNamespaces,
+		prototypes: polyfills.prototypes,
+		namespaces: polyfills.namespaces,
+	};
 
-    // 根据之前复制的垫片函数描述器定义垫片函数
-    sandbox.exec(`
-    function definePolyfills(top, box) {
-        for (const key in top)
-            Reflect.defineProperty(box, key, top[key]);
-    }
+	// 根据之前复制的垫片函数描述器定义垫片函数
+	sandbox.exec(`
+	function definePolyfills(top, box) {
+		for (const key in top)
+			Reflect.defineProperty(box, key, top[key]);
+	}
 
-    for (const key of pfPrototypes) {
-        if (key in prototypes)
-            definePolyfills(
-                prototypes[key],
-                window[key].prototype
-            );
-    }
+	for (const key of pfPrototypes) {
+		if (key in prototypes)
+			definePolyfills(
+				prototypes[key],
+				window[key].prototype
+			);
+	}
 
-    for (const key of pfNamespaces) {
-        if (key in namespaces)
-            definePolyfills(
-                namespaces[key],
-                window[key]
-            );
-    }
-    `, context);
+	for (const key of pfNamespaces) {
+		if (key in namespaces)
+			definePolyfills(
+				namespaces[key],
+				window[key]
+			);
+	}
+	`, context);
 }
 
 // 测试暴露喵
-// window.sandbox = defaultSandbox;
+// Reflect.defineProperty(window, "sandbox", {
+//	 get: () => defaultSandbox,
+//	 set: () => { },
+//	 configurable: true,
+// });
 
 const exports = {
-    enterSandbox,
-    exitSandbox,
-    currentSandbox,
-    createSandbox,
-    isUnsafeObject,
-    assertSafeObject,
-    getIsolateds,
-    getIsolatedsFrom,
-    importSandbox,
-    requireSandbox,
-    requireSandboxOn,
-    isSandboxRequired,
-    initSecurity,
-    eval: _eval,
-    exec: _exec,
-    exec2: _exec2,
-    SANDBOX_ENABLED,
+	enterSandbox,
+	exitSandbox,
+	currentSandbox,
+	createSandbox,
+	isUnsafeObject,
+	assertSafeObject,
+	getIsolateds,
+	getIsolatedsFrom,
+	importSandbox,
+	requireSandbox,
+	requireSandboxOn,
+	isSandboxRequired,
+	initSecurity,
+	eval: _eval,
+	exec: _exec,
+	exec2: _exec2,
+	SANDBOX_ENABLED,
 };
 
 Object.freeze(exports);
