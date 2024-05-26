@@ -1054,11 +1054,11 @@ const skills = {
 			result: {
 				player(player) {
 					const enemies = game.filterPlayer(current => {
-							return get.rawAttitude(player, current) < 0 && get.attitude(player, current) >= 0;
-						}),
-						knownEnemies = game.filterPlayer(current => {
-							return get.attitude(player, current) < 0;
-						});
+						return (!get.rawAttitude || get.rawAttitude(player, current) < 0) && get.attitude(player, current) >= 0;
+					}),
+					knownEnemies = game.filterPlayer(current => {
+						return get.attitude(player, current) < 0;
+					});
 					if ((!knownEnemies.length && player.countCards("e") > 1) || (player.getHp() > 3 && enemies.length > 0 && knownEnemies.length < 2 && knownEnemies.length < enemies.length && !knownEnemies.some(enemy => get.attitude(player, enemy) <= -9))) return 0;
 					const val1 = game
 						.filterPlayer()
