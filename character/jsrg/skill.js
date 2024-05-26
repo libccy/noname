@@ -688,6 +688,7 @@ const skills = {
 			);
 		},
 		async content(event, trigger, player) {
+			player.awakenSkill("jsrgjiebing");
 			await player.gainMaxHp(2);
 			await player.recover(2);
 			await player.addSkills("jsrgbaowei");
