@@ -140,4 +140,6 @@ export default {
 	"#clanbaozu_clan_zhongyao1": "立规定矩，教习钟门之材。",
 	"#clanbaozu_clan_zhongyao2": "放任纨绔，于族是祸非福。",
 	"#clan_zhongyao:die": "幼子得宠而无忌，恐生无妄之祸……",
+	"#qice_clan_xunyou1": "二袁相争，此曹公得利之时。",
+	"#qice_clan_xunyou2": "穷寇宜追，需防死蛇之不僵。",
 };

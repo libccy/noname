@@ -1259,7 +1259,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (
 								target == player &&
 								lib.skill.gaizao.filterx(card, target) &&
@@ -1869,7 +1869,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (get.tag(card, "respondShan")) {
 								var shans = target.countCards("h", "shan");
 								var hs = target.countCards("h");
@@ -1920,7 +1920,7 @@ game.import("character", function () {
 					mingzhi: false,
 					useShan: true,
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (get.tag(card, "respondShan")) {
 								var shans = target.countCards("h", "shan");
 								var hs = target.countCards("h");
@@ -2970,7 +2970,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card) {
+						target_use(card) {
 							if (card.name == "sha") return 1.3;
 						},
 					},
@@ -3307,7 +3307,7 @@ game.import("character", function () {
 				ai: {
 					mingzhi: false,
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (player == _status.currentPhase) return;
 							if (
 								!game.hasPlayer(function (current) {
@@ -3834,22 +3834,24 @@ game.import("character", function () {
 				ai: {
 					maixie: true,
 					maixie_hp: true,
-					effect: function (card, player, target) {
-						if (get.tag(card, "damage")) {
-							if (player.hasSkillTag("jueqing", false, target)) return [1, -0.5];
-							if (!target.hasFriend()) {
-								if (get.mode() == "guozhan") {
-									if (!player.hasFriend()) return;
-								} else {
-									return;
+					effect: {
+						target(card, player, target) {
+							if (get.tag(card, "damage")) {
+								if (player.hasSkillTag("jueqing", false, target)) return [1, -0.5];
+								if (!target.hasFriend()) {
+									if (get.mode() == "guozhan") {
+										if (!player.hasFriend()) return;
+									} else {
+										return;
+									}
 								}
+								if (target.countCards("h") > 2 || target.countCards("e", { color: "black" })) {
+									return [1, 0, 0, -1];
+								}
+								return [1, -0.5];
 							}
-							if (target.countCards("h") > 2 || target.countCards("e", { color: "black" })) {
-								return [1, 0, 0, -1];
-							}
-							return [1, -0.5];
-						}
-					},
+						},
+					}
 				},
 			},
 			xuanyuan: {
@@ -4482,7 +4484,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (player != target) return;
 							if (get.type(card) == "equip" && !player.needsToDiscard()) {
 								return [0, 0, 0, 0];
@@ -8404,7 +8406,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (
 								get.color(card) == "black" &&
 								get.attitude(target, player) < 0 &&
@@ -8674,7 +8676,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							return 0.7;
 						},
 					},

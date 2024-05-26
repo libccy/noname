@@ -2250,7 +2250,7 @@ const skills = {
 		ai: {
 			threaten: 0.7,
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (card.name == "sha") return 0.7;
 				},
 			},
@@ -6484,6 +6484,9 @@ const skills = {
 			"step 2";
 			event.cards = result.cards;
 		},
+		ai: {
+			halfneg: true
+		},
 	},
 	//乙坂有宇
 	yuu_lveduo: {
@@ -6626,6 +6629,9 @@ const skills = {
 			player.loseMaxHp(3);
 			player.draw(3);
 			player.removeSkills("godan_feiqu");
+		},
+		ai: {
+			halfneg: true
 		},
 	},
 	//游佐
@@ -8785,6 +8791,7 @@ const skills = {
 			else trigger.directHit.add(player);
 		},
 		ai: {
+			halfneg: true,
 			directHit_ai: true,
 			skillTagFilter(player, tag, arg) {
 				return arg.card.name == "sha";
@@ -9790,10 +9797,10 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card, player, target) {
+				target_use(card, player, target) {
 					if (card.name == "sha" && get.color(card) == "red") return [1, 0.6];
 				},
-				player(card, player, target) {
+				player_use(card, player, target) {
 					if (card.name == "sha" && get.color(card) == "red") return [1, 1];
 				},
 			},

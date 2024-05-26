@@ -1,5 +1,5 @@
 const characterReplaces = {
-	lijue: ["lijue", "ns_lijue"],
+	lijue: ["lijue", "ns_lijue", "std_lijue"],
 	fanchou: ["fanchou", "tw_fanchou", "ns_fanchou"],
 	zhangji: ["zhangji", "ns_zhangji"],
 	zhangchangpu: ["ol_zhangchangpu", "zhangchangpu", "sp_zhangchangpu"],

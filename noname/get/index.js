@@ -7,10 +7,13 @@ import { CacheContext } from "../library/cache/cacheContext.js";
 import { Is } from "./is.js";
 import { Promises } from "./promises.js";
 import { rootURL } from "../../noname.js";
+import * as pinyinPro from "./pinyins/index.js";
+import { Audio } from "./audio.js";
 
 export class Get {
 	is = new Is();
 	promises = new Promises();
+	Audio = new Audio();
 	/**
 	 * 获取当前内核版本信息
 	 *
@@ -214,22 +217,31 @@ export class Get {
 	}
 	//装备栏 END
 	/**
-	 * @returns { string[] }
+	 * @param {string} chinese
+	 * @param {boolean|undefined} withTone
+	 * @returns { any[] }
 	 */
 	pinyin(chinese, withTone) {
-		const pinyinUtilx = window.pinyinUtilx;
-		if (!pinyinUtilx) return [];
+		let result = [];
 		const pinyins = lib.pinyins;
-		if (pinyins) {
-			const pinyin = pinyins[chinese];
-			if (Array.isArray(pinyin)) return withTone === false ? pinyin.map(pinyinUtilx.removeTone) : pinyin.slice();
+		if (pinyins && pinyins[chinese] && Array.isArray(pinyins[chinese])) {
+			result = pinyins[chinese].slice(0);
+		} else {
+			//@ts-ignore
+			result = pinyinPro.pinyin(chinese, { type: "array" });
 		}
-		return pinyinUtilx.getPinyin(chinese, null, withTone, true);
+		//@ts-ignore
+		if (withTone === false) result = pinyinPro.convert(result, { format: "toneNone" });
+		return result;
 	}
+	/**
+	 * @param { string } str
+	 * @returns { string }
+	 */
 	yunmu(str) {
 		//部分整体认读音节特化处理
-		const util = window.pinyinUtilx;
-		if (util && lib.pinyins._metadata.zhengtirendu.includes(util.removeTone(str))) {
+		//@ts-ignore
+		if (lib.pinyins._metadata.zhengtirendu.includes(pinyinPro.convert(str, { format: "toneNone" }))) {
 			return "-" + str[str.length - 1];
 		}
 		//排除声母
@@ -278,9 +290,13 @@ export class Get {
 		}
 		return str;
 	}
+	/**
+	 * @param { string } str
+	 * @returns { string|null }
+	 */
 	yunjiao(str) {
-		const util = window.pinyinUtilx;
-		if (util) str = util.removeTone(str);
+		//@ts-ignore
+		str = pinyinPro.convert(str, { format: "toneNone" });
 		if (lib.pinyins._metadata.zhengtirendu.includes(str)) {
 			str = "-" + str[str.length - 1];
 		} else {
@@ -604,7 +620,7 @@ export class Get {
 			if (num === 3 || num === 4) return [];
 			return;
 		}
-		return info || get.convertedCharacter({});
+		return info || get.convertedCharacter({ isNull: true });
 	}
 	characterInitFilter(name) {
 		const info = get.character(name);
@@ -4572,20 +4588,10 @@ export class Get {
 			game.expandSkills(skills2);
 			for (var i = 0; i < skills2.length; i++) {
 				temp2 = get.info(skills2[i]).ai;
-				if (temp2 && temp2.threaten) temp3 = cache.delegate(temp2).threaten;
+				if (!temp2) continue;
+				if (temp2.threaten) temp3 = cache.delegate(temp2).threaten;
 				else temp3 = undefined;
-				if (temp2 && typeof temp2.effect == "function") {
-					if (
-						!player.hasSkillTag("ignoreSkill", true, {
-							card: card,
-							target: target,
-							skill: skills2[i],
-							isLink: isLink,
-						})
-					)
-						temp2 = cache.delegate(temp2).effect(card, player, target, result2, isLink);
-					else temp2 = undefined;
-				} else if (temp2 && typeof temp2.effect == "object" && typeof temp2.effect.target == "function") {
+				if (typeof temp2.effect == "object" && typeof temp2.effect.target == "function") {
 					if (
 						!player.hasSkillTag("ignoreSkill", true, {
 							card: card,
@@ -4595,6 +4601,19 @@ export class Get {
 						})
 					)
 						temp2 = cache.delegate(temp2.effect).target(card, player, target, result2, isLink);
+					else temp2 = undefined;
+				} else if (typeof temp2.effect == "function") {
+					//考虑废弃
+					console.log("此写法使用频率极低且影响代码可读性，不建议使用");
+					if (
+						!player.hasSkillTag("ignoreSkill", true, {
+							card: card,
+							target: target,
+							skill: skills2[i],
+							isLink: isLink,
+						})
+					)
+						temp2 = cache.delegate(temp2).effect(card, player, target, result2, isLink);
 					else temp2 = undefined;
 				} else temp2 = undefined;
 				if (typeof temp2 == "object") {
@@ -4800,7 +4819,7 @@ export class Get {
 	 * @example
 	 * // 当前文件以"noname/get/index.js"举例
 	 * let parsedPath = get.relativePath(import.meta.url, true);
-	 * console.log(parsedPath == `${lib.assetURL}noname/get/index.js`) //=> true
+	 * console.assert(parsedPath == `${lib.assetURL}noname/get/index.js`);
 	 */
 	relativePath(url, addAssetURL = false) {
 		let base = lib.path.relative(decodeURI(rootURL.pathname), decodeURI(url.pathname));
@@ -4808,6 +4827,72 @@ export class Get {
 			base = `${lib.assetURL}${base}`;
 		}
 		return base;
+	}
+
+	/**
+	 * 通过`FileReader`，将Blob转换成对应内容的[Data URL](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URLs)
+	 *
+	 * @async
+	 * @param {Blob} blob - 需要转换的内容
+	 * @returns {Promise<URL>} 对应Blob内容的
+	 *
+	 * @example
+	 * let text = "Hello, World!";
+	 * console.assert(btoa(text) === "SGVsbG8sIFdvcmxkIQ==");
+	 *
+	 * let blob = new Blob([text], { type: "text/plain" });
+	 * let url = await get.dataUrlAsync(blob);
+	 * console.assert(url.href === "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==");
+	 */
+	dataUrlAsync(blob) {
+		return new Promise((resolve, reject) => {
+			let fileReader = new FileReader();
+			fileReader.onload = resolve;
+			fileReader.onerror = reject;
+			fileReader.readAsDataURL(blob);
+		}).then(event => new URL(event.target.result));
+	}
+
+	/**
+	 * 通过`Get#blobFromUrl`读取data URL的内容，转换成Blob后返回生成的blob URL
+	 *
+	 * > 实际上所有的URL都能通过此方法读取
+	 *
+	 * 该方法具有缓存，同一data URL仅会返回同一blob URL
+	 *
+	 * 该方法相比`get.objectURL`，会保留文件的类型
+	 *
+	 * ---
+	 *
+	 * > 其实我不确定`get.objectURL`是否有实际意义上的需求，我也不确定`get.objectURL`不保留类型是否是刚需，但既然原先就存在，那么就不要动
+	 *
+	 * @async
+	 * @param {string | URL} dataUrl - 需要转换的data URL
+	 * @returns {Promise<URL>}
+	 */
+	async objectUrlAsync(dataUrl) {
+		let dataString = dataUrl instanceof URL ? dataUrl.href : dataUrl;
+		const objectURLMap = lib.objectURL;
+		if (objectURLMap.has(dataString)) return new URL(objectURLMap.get(dataString));
+
+		let blob = await this.blobFromUrl(dataUrl);
+		const objectURL = URL.createObjectURL(blob);
+		objectURLMap.set(dataString, objectURL);
+		return new URL(objectURL);
+	}
+
+	/**
+	 * 读取给定的URL，将其中的内容转换成Blob
+	 *
+	 * 在File协议下通过无名杀自带的文件处理函数读取内容，其他协议通过`fetch`读取内容
+	 *
+	 * @async
+	 * @param {string | URL} url - 需要读取的URL
+	 * @returns {Promise<Blob>}
+	 */
+	blobFromUrl(url) {
+		let link = url instanceof URL ? url : new URL(url);
+		return link.protocol == "file:" ? game.promises.readFile(get.relativePath(link)).then(buffer => new Blob([buffer])) : fetch(link).then(response => response.blob());
 	}
 }
 

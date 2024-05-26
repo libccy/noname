@@ -357,6 +357,10 @@ export class Player extends HTMLDivElement {
 	 * @type { boolean | undefined }
 	 */
 	identityShown;
+	/**
+	 * @type { boolean }
+	 */
+	removed;
 	//新函数
 	/**
 	 * 怒气
@@ -2712,6 +2716,9 @@ export class Player extends HTMLDivElement {
 			if (Array.isArray(maxHp)) {
 				this.maxHp = maxHp[1];
 				this.hp = maxHp[0];
+				if (typeof maxHp[2] == "number") {
+					this.hujia = maxHp[2];
+				}
 			} else {
 				var num;
 				if (maxHp === false) {
@@ -3646,6 +3653,12 @@ export class Player extends HTMLDivElement {
 	getCards(arg1, arg2) {
 		return Array.from(this.iterableGetCards(arg1, arg2));
 	}
+	/**
+	 * @param { Player } player 
+	 * @param { string } [arg1] 
+	 * @param { string } [arg2] 
+	 * @returns { Generator<Card, void, unknown> }
+	 */
 	*iterableGetDiscardableCards(player, arg1, arg2) {
 		for (let card of this.iterableGetCards(arg1, arg2)) {
 			if (lib.filter.canBeDiscarded(card, player, this)) {
@@ -4432,6 +4445,7 @@ export class Player extends HTMLDivElement {
 				next.func = arguments[i];
 			}
 		}
+		return next;
 	}
 	discoverCard(list) {
 		var next = game.createEvent("discoverCard");
@@ -7291,6 +7305,7 @@ export class Player extends HTMLDivElement {
 		cfg.skills = cfg.skills || [];
 		cfg.hp = cfg.hp || 1;
 		cfg.maxHp = cfg.maxHp || 1;
+		cfg.hujia = cfg.hujia || 0;
 		cfg.sex = cfg.sex || "male";
 		cfg.group = cfg.group || "qun";
 		cfg.skill = cfg.skill || _status.event.name;
@@ -7301,9 +7316,10 @@ export class Player extends HTMLDivElement {
 				cfg.source = this.name;
 			}
 		}
+		const list = cfg.caption ? [cfg.caption] : ["", "_prefix", "_ab"].map(str => lib.translate[cfg.name + str]);
 		game.broadcastAll(
 			//TODO: 这里直接修改trashBin部分，后续需要修改为新写法
-			function (player, skill, cfg) {
+			function (player, skill, list, cfg) {
 				lib.skill[skill] = {
 					intro: {
 						content: cfg.intro || "",
@@ -7314,7 +7330,7 @@ export class Player extends HTMLDivElement {
 						subplayer: true,
 					},
 				};
-				lib.character[skill] = [cfg.sex, cfg.group, cfg.maxHp, cfg.skills, []];
+				lib.character[skill] = [cfg.sex, cfg.group, parseFloat(cfg.hp) + "/" + parseFloat(cfg.maxHp) + "/" + parseFloat(cfg.hujia), cfg.skills, ["tempname:" + cfg.name].concat(lib.character[cfg.name].trashBin || [])];
 				if (Array.isArray(cfg.image)) {
 					cfg.image.forEach(image => lib.character[skill][4].push(image));
 				} else if (typeof cfg.image == "string") {
@@ -7322,14 +7338,18 @@ export class Player extends HTMLDivElement {
 				} else {
 					lib.character[skill].trashBin.push("character:" + cfg.name);
 				}
-				lib.translate[skill] = cfg.caption || get.rawName(cfg.name);
+				for (let i = 0; i < list.length; i++) {
+					if (!list[i]) continue;
+					lib.translate[skill + ["", "_prefix", "_ab"][i]] = list[i];
+				}
 				player.storage[skill] = cfg;
 			},
 			this,
 			skill,
+			list,
 			cfg
 		);
-		game.addVideo("addSubPlayer", this, [skill, lib.skill[skill], lib.character[skill], lib.translate[skill], { name: cfg.name }]);
+		game.addVideo("addSubPlayer", this, [skill, lib.skill[skill], lib.character[skill], list, { name: cfg.name }]);
 		this.addSkill(skill);
 		return skill;
 	}
@@ -7338,7 +7358,7 @@ export class Player extends HTMLDivElement {
 			this.exitSubPlayer(true);
 		} else {
 			if (player.storage[name].onremove) {
-				player.storage[name].onremove(player);
+				player.storage[name].onremove(player, name);
 			}
 			this.removeSkill(name);
 			delete this.storage[name];
@@ -8037,19 +8057,21 @@ export class Player extends HTMLDivElement {
 
 			if (log !== false && this.hasSkill(skill)) game.log(this, "的技能", `#g【${get.translation(skill)}】`, "暂时失效了");
 
-			if (!expire) expire = { global: ["phaseAfter", "phaseBeforeStart"] };
-			else if (typeof expire == "string" || Array.isArray(expire)) expire = { global: expire };
-			this.when(expire, false)
-				.assign({
-					firstDo: true,
-				})
-				.vars({
-					bannedSkill: skill,
-				})
-				.then(() => {
-					delete player.storage[`temp_ban_${bannedSkill}`];
-				})
-				.finish();
+			if (expire !== "forever") {
+				if (!expire) expire = { global: ["phaseAfter", "phaseBeforeStart"] };
+				else if (typeof expire == "string" || Array.isArray(expire)) expire = { global: expire };
+				this.when(expire, false)
+					.assign({
+						firstDo: true,
+					})
+					.vars({
+						bannedSkill: skill,
+					})
+					.then(() => {
+						delete player.storage[`temp_ban_${bannedSkill}`];
+					})
+					.finish();
+			}
 		}
 		return skill;
 	}
@@ -9067,6 +9089,7 @@ export class Player extends HTMLDivElement {
 		game.expandSkills(skills);
 		for (var i = 0; i < skills.length; i++) {
 			var ifo = get.info(skills[i]);
+			if (!ifo) continue;
 			if (ifo.hiddenWuxie && info) {
 				if (typeof ifo.hiddenWuxie == "function" && ifo.hiddenWuxie(this, info)) {
 					return true;

@@ -46,8 +46,14 @@ boot().then(() => {
 			3. 保存http/s协议的状态，以后不再以file协议启动
 		*/
 		// 导出数据到根目录的noname.config.txt
+		if (navigator.notification) {
+			navigator.notification.activityStart("正在进行升级", "请稍候");
+		}
 		let data;
 		let export_data = function (data) {
+			if (navigator.notification) {
+				navigator.notification.activityStop();
+			}
 			game.promises
 				.writeFile(
 					lib.init.encode(JSON.stringify(data)),
@@ -79,10 +85,13 @@ boot().then(() => {
 			});
 		}
 	} else {
-		// 成功导入后删除noname.config.txt
 		let searchParams = new URLSearchParams(location.search);
 		for (let [key, value] of searchParams) {
+			// 成功导入后删除noname.config.txt
 			if (key === "sendUpdate" && value === "true") {
+				if (navigator.notification) {
+					navigator.notification.activityStart("正在导入旧版数据", "请稍候");
+				}
 				game.promises
 					.readFileAsText("noname.config.txt")
 					.then((data) => {
@@ -112,7 +121,10 @@ boot().then(() => {
 									}
 									return;
 								}
-								alert("导入成功, 即将自动重启");
+								if (navigator.notification) {
+									navigator.notification.activityStop();
+								}
+								alert("升级前的配置导入成功, 即将自动重启");
 								// @ts-ignore
 								if (!lib.db) {
 									const noname_inited =
@@ -163,8 +175,23 @@ boot().then(() => {
 					})
 					.then(() => {
 						const url = new URL(location.href);
-						location.href = url.origin + url.pathname;
+						url.searchParams.delete("sendUpdate");
+						location.href = url.toString();
+					}).catch(e => {
+						if (navigator.notification) {
+							navigator.notification.activityStop();
+						}
 					});
+			}
+			// 新客户端导入扩展
+			else if (key === "importExtensionName") {
+				lib.config.extensions.add(value);
+				game.saveConfig("extensions", lib.config.extensions);
+				game.saveConfig(`extension_${value}_enable`, true);
+				alert(`扩展${value}已导入成功，点击确定重启游戏`);
+				const url = new URL(location.href);
+				url.searchParams.delete("importExtensionName");
+				location.href = url.toString();
 			}
 		}
 	}

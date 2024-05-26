@@ -14,7 +14,10 @@ export class status {
 	event = null;
 	ai = {};
 	lastdragchange = [];
-	skillaudio = [];
+	/**
+	 * @type { string[] }
+	 */
+	skillaudio = []
 	dieClose = [];
 	dragline = [];
 	dying = [];
@@ -59,6 +62,10 @@ export class status {
 	/**
 	 * @type { boolean | undefined }
 	 */
+	video = undefined
+	/**
+	 * @type { boolean | undefined }
+	 */
 	importingExtension = undefined;
 	/**
 	 * @type { Promise<any>[] | undefined }
@@ -76,6 +83,14 @@ export class status {
 	 * @type { Function | boolean | undefined }
 	 */
 	new_tutorial = undefined;
+	/**
+	 * @type { Player | undefined }
+	 */
+	roundStart = undefined;
+	/**
+	 * @type { boolean }
+	 */
+	roundSkipped;
 }
 
 export let _status = new status();

@@ -1,4 +1,6 @@
 const characters = {
+	dc_sb_zhugejin: ["male", "wu", 3, ["dcsbtaozhou", "dcsbhoude"]],
+	dc_sb_jiaxu: ["male", "qun", 3, ["dcsbsushen", "dcsbfumou"]],
 	guanyue: ["male", "shu", 4, ["dcshouzhi", "dcfenhui"]],
 	sp_zhenji: ["female", "qun", 3, ["dcjijie", "dchuiji"]],
 	wu_guanyu: ["male", "shu", 5, ["dcjuewu", "dcwuyou", "dcyixian"]],

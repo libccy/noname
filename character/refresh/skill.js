@@ -5359,7 +5359,8 @@ const skills = {
 	//贾诩
 	rewansha: {
 		audio: "wansha",
-		audioname: ["re_jiaxu", "shen_simayi", "boss_lvbu3"],
+		audioname: ["re_jiaxu", "boss_lvbu3"],
+		audioname2: { shen_simayi: "jilue_wansha" },
 		global: "rewansha_global",
 		trigger: { global: "dyingBegin" },
 		forced: true,
@@ -7400,7 +7401,7 @@ const skills = {
 		ai: {
 			expose: 0.2,
 			effect: {
-				target: function (card, player, target) {
+				target_use: function (card, player, target) {
 					if (card.name != "sha") return;
 					var players = game.filterPlayer();
 					if (get.attitude(player, target) <= 0) {
@@ -7648,7 +7649,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
+				target_use: function (card, player, target) {
 					if (target != _status.currentPhase && target.countCards("h") >= target.getHandcardLimit() && (get.type(card) == "delay" || get.color(card) == "none")) return "zerotarget";
 				},
 			},
@@ -9350,7 +9351,8 @@ const skills = {
 	},
 	olpaoxiao: {
 		audio: "paoxiao",
-		audioname: ["re_zhangfei", "guanzhang", "xiahouba", "re_guanzhang"],
+		audioname: ["re_zhangfei", "xiahouba", "re_guanzhang"],
+		audioname2: { guanzhang: "paoxiao_guanzhang" },
 		trigger: { player: "shaMiss" },
 		forced: true,
 		content: function () {
@@ -9367,7 +9369,8 @@ const skills = {
 		trigger: { source: "damageBegin1" },
 		forced: true,
 		audio: "paoxiao",
-		audioname: ["re_zhangfei", "guanzhang", "xiahouba", "re_guanzhang"],
+		audioname: ["re_zhangfei", "xiahouba", "re_guanzhang"],
+		audioname2: { guanzhang: "paoxiao_guanzhang" },
 		filter: function (event, player) {
 			return event.card && event.card.name == "sha" && player.countMark("olpaoxiao2") > 0;
 		},
@@ -9406,7 +9409,8 @@ const skills = {
 	},
 	rexuanfeng: {
 		audio: "xuanfeng",
-		audioname: ["boss_lvbu3", "re_heqi", "re_lingtong"],
+		audioname: ["boss_lvbu3", "re_lingtong"],
+		audioname2: { re_heqi: "fenwei_heqi" },
 		trigger: {
 			player: ["loseAfter", "phaseDiscardEnd"],
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -10587,7 +10591,7 @@ const skills = {
 	},
 	olfangquan: {
 		audio: 2,
-		audioname: ["shen_caopi"],
+		audioname2: { shen_caopi: "olfangquan_shen_caopi" },
 		trigger: { player: "phaseUseBefore" },
 		filter: function (event, player) {
 			return player.countCards("h") > 0 && !player.hasSkill("olfangquan3");
@@ -10664,7 +10668,7 @@ const skills = {
 	},
 	olluanji: {
 		inherit: "luanji",
-		audioname: ["shen_caopi"],
+		audioname2: { shen_caopi: "olluanji_shen_caopi" },
 		audio: 2,
 		line: false,
 		group: "olluanji_remove",
@@ -12470,9 +12474,11 @@ const skills = {
 		},
 		locked: false,
 		audio: "wusheng",
-		audioname: ["re_guanyu", "guanzhang", "jsp_guanyu", "guansuo", "re_guanzhang", "dc_jsp_guanyu"],
+		audioname: ["re_guanyu", "jsp_guanyu", "re_guanzhang", "dc_jsp_guanyu"],
 		audioname2: {
 			dc_guansuo: "wusheng_guansuo",
+			guanzhang: "wusheng_guanzhang",
+			guansuo: "wusheng_guansuo",
 		},
 		enable: ["chooseToRespond", "chooseToUse"],
 		filterCard: function (card, player) {
@@ -12507,7 +12513,6 @@ const skills = {
 			},
 		},
 	},
-	wusheng_guansuo: { audio: 2 },
 	new_yijue: {
 		audio: "yijue",
 		enable: "phaseUse",
@@ -13142,7 +13147,7 @@ const skills = {
 	},
 	rezhiheng: {
 		audio: 2,
-		audioname: ["shen_caopi"],
+		audioname2: { shen_caopi: "rezhiheng_shen_caopi" },
 		mod: {
 			aiOrder: function (player, card, num) {
 				if (num <= 0 || get.itemtype(card) !== "card" || get.type(card) !== "equip") return num;
@@ -13305,7 +13310,8 @@ const skills = {
 	},
 	rerende: {
 		audio: 2,
-		audioname: ["gz_jun_liubei", "shen_caopi"],
+		audioname: ["gz_jun_liubei"],
+		audioname2: { shen_caopi: "rerende_shen_caopi" },
 		enable: "phaseUse",
 		filterCard: true,
 		selectCard: [1, Infinity],
@@ -13465,7 +13471,7 @@ const skills = {
 				},
 			},
 			effect: {
-				target: function (card, player, target) {
+				target_use: function (card, player, target) {
 					if (player == target && get.type(card) == "equip") {
 						if (player.countCards("e", { subtype: get.subtype(card) })) {
 							if (
@@ -13833,8 +13839,12 @@ const skills = {
 	},
 	reyingzi: {
 		audio: 2,
-		audioname: ["heqi", "sunce", "gexuan", "re_sunben", "re_sunce", "re_heqi"],
-		audioname2: { re_sunyi: "reyingzi_re_sunyi" },
+		audioname: ["sunce", "gexuan", "re_sunben", "re_sunce"],
+		audioname2: {
+			re_sunyi: "reyingzi_re_sunyi",
+			heqi: "reyingzi_heqi",
+			re_heqi: "reyingzi_heqi"
+		},
 		trigger: { player: "phaseDrawBegin2" },
 		forced: true,
 		preHidden: true,
@@ -13941,20 +13951,22 @@ const skills = {
 			player.addSkill("reqianxun2");
 		},
 		ai: {
-			effect: function (card, player, target) {
-				if (player == target || !target.hasFriend()) return;
-				var type = get.type(card);
-				var nh = Math.min(
-					target.countCards(),
-					game.countPlayer(i => get.attitude(target, i) > 0)
-				);
-				if (type == "trick") {
-					if (!get.tag(card, "multitarget") || get.info(card).singleCard) {
-						if (get.tag(card, "damage")) return [1.5, nh - 1];
-						return [1, nh];
-					}
-				} else if (type == "delay") return [0.5, 0.5];
-			},
+			effect: {
+				target_use(card, player, target) {
+					if (player == target || !target.hasFriend()) return;
+					var type = get.type(card);
+					var nh = Math.min(
+						target.countCards(),
+						game.countPlayer(i => get.attitude(target, i) > 0)
+					);
+					if (type == "trick") {
+						if (!get.tag(card, "multitarget") || get.info(card).singleCard) {
+							if (get.tag(card, "damage")) return [1.5, nh - 1];
+							return [1, nh];
+						}
+					} else if (type == "delay") return [0.5, 0.5];
+				},
+			}
 		},
 	},
 	reqianxun2: {
@@ -14580,27 +14592,29 @@ const skills = {
 		},
 		ai: {
 			maihp: true,
-			effect: function (card, player, target) {
-				if (get.tag(card, "damage")) {
-					if (player.hasSkillTag("jueqing", false, target)) return [1, 1];
-					return 1.2;
-				}
-				if (get.tag(card, "loseHp")) {
-					if (target.hp <= 1) return;
-					var using = target.isPhaseUsing();
-					if (target.hp <= 2) return [1, player.countCards("h") <= 1 && using ? 3 : 0];
-					if (using && target.countCards("h", { name: "sha", color: "red" })) return [1, 3];
-					return [
-						1,
-						target.countCards("h") <= target.hp ||
-						(using &&
-							game.hasPlayer(function (current) {
-								return current != player && get.attitude(player, current) < 0 && player.inRange(current);
-							}))
-							? 3
-							: 2,
-					];
-				}
+			effect: {
+				target(card, player, target) {
+					if (get.tag(card, "damage")) {
+						if (player.hasSkillTag("jueqing", false, target)) return [1, 1];
+						return 1.2;
+					}
+					if (get.tag(card, "loseHp")) {
+						if (target.hp <= 1) return;
+						var using = target.isPhaseUsing();
+						if (target.hp <= 2) return [1, player.countCards("h") <= 1 && using ? 3 : 0];
+						if (using && target.countCards("h", { name: "sha", color: "red" })) return [1, 3];
+						return [
+							1,
+							target.countCards("h") <= target.hp ||
+							(using &&
+								game.hasPlayer(function (current) {
+									return current != player && get.attitude(player, current) < 0 && player.inRange(current);
+								}))
+								? 3
+								: 2,
+						];
+					}
+				},
 			},
 		},
 	},
@@ -14784,7 +14798,7 @@ const skills = {
 		skillAnimation: true,
 		animationColor: "wood",
 		audio: 2,
-		audioname: ["heqi"],
+		audioname2: { heqi: "fenwei_heqi" },
 		unique: true,
 		mark: true,
 		limited: true,

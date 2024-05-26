@@ -43,7 +43,7 @@ const characters = {
 	luji: ["male", "wu", 3, ["nzry_huaiju", "nzry_yili", "nzry_zhenglun"], []],
 	sunliang: ["male", "wu", 3, ["nzry_kuizhu", "nzry_zhizheng", "nzry_lijun"], ["zhu"]],
 	xuyou: ["male", "qun", 3, ["nzry_chenglve", "nzry_shicai", "nzry_cunmu"]],
-	yl_luzhi: ["male", "qun", 3, ["nzry_mingren", "nzry_zhenliang"], ["die_audio"]],
+	yl_luzhi: ["male", "qun", 3, ["nzry_mingren", "nzry_zhenliang"], []],
 	kuailiangkuaiyue: ["male", "wei", 3, ["nzry_jianxiang", "nzry_shenshi"], []],
 
 	guanqiujian: ["male", "wei", 4, ["zhengrong", "hongju"]],

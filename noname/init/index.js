@@ -5,7 +5,7 @@ import { game } from "../game/index.js";
 import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 import { gnc } from "../gnc/index.js";
-import { userAgent, nonameInitialized } from "../util/index.js";
+import { userAgent, nonameInitialized, AsyncFunction } from "../util/index.js";
 import * as config from "../util/config.js";
 import { promiseErrorHandlerMap } from "../util/browser.js";
 import { importCardPack, importCharacterPack, importExtension, importMode } from "./import.js";
@@ -66,14 +66,18 @@ export function sendUpdate() {
 		if (nonameInitialized && nonameInitialized.includes("com.noname.shijian") && window.noname_shijianInterfaces && typeof window.noname_shijianInterfaces.sendUpdate === 'function') {
 			// 给诗笺版apk的java层传递升级完成的信息
 			// @ts-ignore
-			return window.noname_shijianInterfaces.sendUpdate() + "?sendUpdate=true";
+			const url = new URL(window.noname_shijianInterfaces.sendUpdate());
+			url.searchParams.set("sendUpdate", "true");
+			return url.toString();
 		}
 		// 由理版判断
 		// @ts-ignore
 		if (window.NonameAndroidBridge && typeof window.NonameAndroidBridge.sendUpdate === 'function') {
 			// 给由理版apk的java层传递升级完成的信息
 			// @ts-ignore
-			return window.NonameAndroidBridge.sendUpdate() + "?sendUpdate=true";
+			const url = new URL(window.NonameAndroidBridge.sendUpdate());
+			url.searchParams.set("sendUpdate", "true");
+			return url.toString();
 		}
 	}
 	// 电脑端
@@ -633,12 +637,25 @@ export async function boot() {
 		for (const promise of _status.extensionLoading) {
 			await promise.catch(async (error) => {
 				if (extErrorList.includes(error)) return;
+				extErrorList.add(error);
 				if (!promiseErrorHandler || !promiseErrorHandler.onHandle) return;
 				// @ts-ignore
 				await promiseErrorHandler.onHandle({ promise });
 			});
 		}
 		// await Promise.allSettled(_status.extensionLoading);
+
+		const isFirstStartAfterUpdate = lib.version && lib.version != lib.config.version;
+
+		if (isFirstStartAfterUpdate && extErrorList.length) {
+			const stacktraces = extErrorList.map(e => e instanceof Error ? e.stack : String(e)).join("\n\n")
+			// game.saveConfig("update_first_log", stacktraces);
+			if(confirm(`扩展加载出错！是否重新载入游戏？\n本次更新可能导致了扩展出现了错误：\n\n${stacktraces}`)){
+				game.reload();
+				clearTimeout(resetGameTimeout);
+				return;
+			}
+		}
 
 		_status.extensionLoaded
 			.filter((name) => game.hasExtension(name))
@@ -1123,7 +1140,7 @@ async function setOnError() {
 		game.print(str);
 		if (promiseErrorHandler.onErrorFinish) promiseErrorHandler.onErrorFinish();
 		// @ts-ignore
-		if (!lib.config.errstop) {
+		if (!lib.config.errstop && (_status && _status.event && !(_status.event.content instanceof AsyncFunction))) {
 			_status.withError = true;
 			game.loop();
 		}

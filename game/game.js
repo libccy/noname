@@ -134,7 +134,7 @@
 
 	// 使serviceWorker加载完成后，再加载entry.js
 	if (location.protocol.startsWith("http") && "serviceWorker" in navigator) {
-		let scope = window.location.protocol + "//" + window.location.host + window.location.pathname;
+		let scope = (new URL("./", location.href)).toString();
 		let registrations = await navigator.serviceWorker.getRegistrations();
 		let findServiceWorker = registrations.find(registration => {
 			return registration && registration.active && registration.active.scriptURL == `${scope}service-worker.js`;
