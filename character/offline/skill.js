@@ -115,7 +115,7 @@ const skills = {
 			let cards = [];
 			if (event.name == "cardsDiscard") {
 				const evt = event.getParent().relatedEvent;
-				if (evt && evt.name == "judge" && evt.player == player) {
+				if (evt && evt.name == "judge" && evt.player != player) {
 					cards.addArray(event.cards.filter(i => get.position(i, true) == "d"));
 				}
 			} else {

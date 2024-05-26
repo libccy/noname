@@ -9311,7 +9311,7 @@ const skills = {
 			aiValue: (player, card, num) => {
 				if (num > 0 && get.itemtype(card) === "card" && card.name !== "zhuge" && get.subtype(card) === "equip1" && !player.getEquip(1)) return 0.01 * num;
 			},
-			aiUseful: () => {
+			aiUseful: function () {
 				return lib.skill.jsrgzhenqiao.mod.aiValue.apply(this, arguments);
 			},
 		},

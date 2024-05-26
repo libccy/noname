@@ -798,6 +798,7 @@ const skills = {
 		subSkill: {
 			g: {
 				audio: "dcwuyou",
+				forceaudio: true,
 				enable: "phaseUse",
 				usable: 1,
 				filter(event, player) {
@@ -933,6 +934,10 @@ const skills = {
 					cardUsable(card) {
 						if (!card.cards) return;
 						if (card.cards.some(card => card.hasGaintag("dcwuyou_transfer"))) return Infinity;
+					},
+					targetInRange(card, player) {
+						if (!card.cards) return;
+						if (card.cards.some(card => card.hasGaintag("dcwuyou_transfer"))) return true;
 					},
 				},
 			},

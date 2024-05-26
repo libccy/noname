@@ -3947,12 +3947,6 @@ const skills = {
 	//裴元绍
 	dcmoyu: {
 		audio: 2,
-		init() {
-			game.addGlobalSkill("dcmoyu_ai");
-		},
-		onremove() {
-			if (!game.hasPlayer(i => i.hasSkill("dcmoyu"), true)) game.removeGlobalSkill("dcmoyu_ai");
-		},
 		enable: "phaseUse",
 		filter(event, player) {
 			return game.hasPlayer(current => lib.skill.dcmoyu.filterTarget(null, player, current));
@@ -3962,7 +3956,7 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const target = event.target;
-			player.addTempSkill("dcmoyu_clear");
+			player.addTempSkill("dcmoyu_clear", "phaseUseAfter");
 			player.markAuto("dcmoyu_clear", [target]);
 			await player.gainPlayerCard(target, "hej", true, 1 + player.hasSkill("dcmoyu_add"));
 			player.removeSkill("dcmoyu_add");
@@ -3979,10 +3973,6 @@ const skills = {
 					return lib.filter.targetEnabled.apply(this, arguments);
 				})
 				.set("sourcex", player)
-				.set("num", num)
-				.set("oncard", card => {
-					_status.event.baseDamage = _status.event.getParent().num;
-				})
 				.forResult();
 			if (result.bool) {
 				if (
@@ -3991,11 +3981,13 @@ const skills = {
 					})
 				) {
 					player.tempBanSkill("dcmoyu");
+					player.addTempSkill("dcmoyu_ban");
 				} else {
 					player.addTempSkill("dcmoyu_add", "phaseChange");
 				}
 			}
 		},
+		global: "dcmoyu_ai",
 		subSkill: {
 			clear: {
 				charlotte: true,
@@ -4004,7 +3996,7 @@ const skills = {
 			ban: {
 				charlotte: true,
 				mark: true,
-				marktext: "欲",
+				marktext: '<span style="text-decoration: line-through;">欲</span>',
 				intro: { content: "偷马贼被反打了！" },
 			},
 			add: {
@@ -4014,15 +4006,6 @@ const skills = {
 				intro: { content: "欲望加速，下次抢两张！" },
 			},
 			ai: {
-				trigger: { player: "dieAfter" },
-				filter: () => {
-					return !game.hasPlayer(i => i.hasSkill("dcmoyu"), true);
-				},
-				silent: true,
-				forceDie: true,
-				content: () => {
-					game.removeGlobalSkill("dcmoyu_ai");
-				},
 				ai: {
 					effect: {
 						target: function (card, player, target, current) {
