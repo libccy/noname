@@ -3125,7 +3125,7 @@ const skills = {
 			trigger.source.chooseDrawRecover(true);
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 			effect: {
 				target(card, player, target, current) {
 					if (card.name == "sha" && get.color(card) == "red") {

@@ -24761,6 +24761,9 @@ const skills = {
 			return event.targets.includes(player) && player != event.player && event.card.name == "sha" && player.hp < player.countCards("h");
 		},
 		content: function () {},
+		ai: {
+			neg: true
+		},
 		unique: true,
 		gainable: true,
 		subSkill: {
