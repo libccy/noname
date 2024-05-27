@@ -1419,33 +1419,28 @@ const skills = {
 										break;
 									}
 									case 4: {
-										let map = {};
-										game.dead.forEach(target => (map[target.playerid] = get.translation(target)));
-										const {
-											result: { control },
-										} = await player
-											.chooseControl(Object.values(map))
-											.set("ai", () => {
-												const getNum = target => {
-													let num = 0;
-													if (target.name && lib.character[target.name]) num += get.rank(target.name, true);
-													if (target.name2 && lib.character[target.name2]) num += get.rank(target.name2, true);
-													return num;
-												};
-												let controls = _status.event.controls.slice();
-												controls = controls.map(name => [name, game.dead.find(target => _status.event.map[target.playerid] == name)]);
-												controls.sort((a, b) => getNum(b[1]) - getNum(a[1]));
-												return controls[0][0];
+										const result = await player
+											.chooseTarget(
+												"行殇：请选择一名已阵亡角色",
+												(card, player, target) => {
+													return target.isDead();
+												},
+												true,
+												"获得一名已阵亡角色的所有技能，然后失去〖行殇〗〖放逐〗〖颂威〗"
+											)
+											.set("ai", target => {
+												return ["name", "name1", "name2"].reduce((sum, name) => {
+													if (!target[name] || !lib.character[target[name]] || (name == "name1" && target.name1 == target.name)) return sum;
+													return sum + get.rank(target[name], true);
+												}, 0);
 											})
-											.set("prompt", "获得一名已阵亡角色的所有技能")
-											.set("map", map);
-										if (control) {
-											const target2 = game.dead.find(targetx => map[targetx.playerid] == control);
+											.set("deadTarget", true)
+											.forResult();
+										if (result.bool) {
+											const target2 = result.targets[0];
 											player.line(target2);
 											game.log(player, "选择了", target2);
-											const skills = target2.getStockSkills(true, true);
-											const skills2 = ["sbxingshang", "sbfangzhu", "sbsongwei"];
-											player.changeSkills(skills, skills2);
+											await player.changeSkills(target2.getStockSkills(true, true), ["sbxingshang", "sbfangzhu", "sbsongwei"]);
 										}
 									}
 								}
@@ -1485,7 +1480,7 @@ const skills = {
 							case 3:
 								return str + "移去5个“颂”标记，令一名体力上限小于10的角色加1点体力上限并回复1点体力，然后随机恢复一个被废除的装备栏";
 							case 4:
-								return str + "移去5个“颂”标记，获得一名已阵亡角色的所有技能，然后失去武将牌上的所有技能";
+								return str + "移去5个“颂”标记，获得一名已阵亡角色的所有技能，然后失去〖行殇〗〖放逐〗〖颂威〗";
 						}
 					},
 				},
