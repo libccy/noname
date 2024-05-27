@@ -1521,7 +1521,9 @@ export class Get {
 		str = str.trim();
 		const arrowMatch = get.#arrowPattern.exec(str);
 		if (arrowMatch) {
-			const body = `return ${str.slice(arrowMatch[0].length)}`;
+			let body = str.slice(arrowMatch[0].length).trim();
+			if (body.startsWith("{") && body.endsWith("}")) body = body.slice(1, -1);
+			else body = `return ${body}`;
 			if (!get.isFunctionBody(body)) {
 				console.error("发现疑似恶意的远程代码:", str);
 				return `()=>console.error("尝试执行疑似恶意的远程代码")`;
@@ -1558,7 +1560,9 @@ export class Get {
 	}
 	infoFuncOL(info) {
 		let func;
+		console.log("[infoFuncOL] info:", info);
 		const str = get.pureFunctionStr(info.slice(13)); // 清洗函数并阻止注入
+		console.log("[infoFuncOL] pured:", str);
 		try {
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () { };

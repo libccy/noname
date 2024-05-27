@@ -57,7 +57,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					game.saveConfig("last_ip", ip);
 					game.connect(ip, function (success) {
 						if (success) {
-							game.requireSandboxOn(ip); // 启用沙盒喵
+							game.requireSandboxOn(ip);
 							var info = lib.config.reconnect_info;
 							if (info && info[0] == _status.ip) {
 								game.onlineID = info[1];

@@ -1,15 +1,17 @@
 // 是否强制所有模式下使用沙盒
 const SANDBOX_FORCED = true;
 // 是否启用自动测试
-const SANDBOX_AUTOTEST = true;
+const SANDBOX_AUTOTEST = false;
 // 是否禁用自动测试延迟
 // 这将放弃渲染，在游戏结束前无响应
 const SANDBOX_AUTOTEST_NODELAY = false;
 
+const WSURL_FOR_IP = /ws:\/\/(\d+.\d+.\d+.\d+):\d+\//;
 const TRUSTED_IPS = Object.freeze([
 	"47.99.105.222",
 ]);
 
+// 声明导入类
 /** @type {boolean} */
 let SANDBOX_ENABLED = true;
 /** @type {typeof import("./sandbox.js").AccessAction} */
@@ -45,6 +47,7 @@ const sandboxStack = [];
 const isolatedsMap = new WeakMap();
 
 // noname 顶级变量
+/** @type {Object<string|symbol, any>} */
 const topVariables = {
 	lib: null,
 	game: null,
@@ -54,8 +57,13 @@ const topVariables = {
 	_status: null,
 	gnc: null,
 };
+
+// eval保存
 const defaultEval = window.eval;
 
+// 对于 `lib.init.start` 的首次编译我们放宽
+let initStartParsed = false;
+// 是否软启用沙盒
 let sandBoxRequired = SANDBOX_FORCED;
 
 // 可能的垫片函数
@@ -198,8 +206,19 @@ function requireSandbox() {
  * @param {string} ip 
  */
 function requireSandboxOn(ip) {
-	if (!TRUSTED_IPS.includes(ip))
+	if (!TRUSTED_IPS.includes(ip)) {
 		sandBoxRequired = true;
+		return;
+	}
+
+	if (SANDBOX_FORCED
+		&& topVariables.game
+		&& topVariables.game.ws) {
+		const match = WSURL_FOR_IP.exec(topVariables.game.ws.url);
+
+		if (match && match[1] === ip)
+			sandBoxRequired = false;
+	}
 }
 
 /**
@@ -211,6 +230,28 @@ function requireSandboxOn(ip) {
  */
 function isSandboxRequired() {
 	return SANDBOX_ENABLED && sandBoxRequired;
+}
+
+/**
+ * ```plain
+ * 是否可以跳过沙盒进行编译
+ * ```
+ * 
+ * @param {any} item 
+ * @returns {boolean} 
+ */
+function canSkipSandbox(item) {
+	if (!topVariables.lib)
+		return false;
+
+	if (item === topVariables.lib.init.start) {
+		if (!initStartParsed) {
+			initStartParsed = true;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**
@@ -382,15 +423,8 @@ async function initSecurity({
 		...Object.values(game.promises),
 		defaultEval,
 		window.require,
-		window.process,
-		window.module,
-		window.exports,
-		window.cordova,
 		// @ts-ignore
-		window.NonameAndroidBridge,
-		// @ts-ignore
-		window.noname_shijianInterfaces,
-		window,
+		window.define,
 	];
 
 	// 构造禁止函数调用的规则
@@ -409,12 +443,25 @@ async function initSecurity({
 	bannedRule.canMarshal = false; // 禁止获取
 	bannedRule.setGranted(AccessAction.READ, false); // 禁止读取属性
 	bannedRule.setGranted(AccessAction.WRITE, false); // 禁止读取属性
+	bannedRule.setGranted(AccessAction.DEFINE, false); // 禁止定义属性
+	bannedRule.setGranted(AccessAction.DESCRIBE, false); // 禁止描述属性
+	bannedRule.setGranted(AccessAction.TRACE, false); // 禁止获取原型
+	bannedRule.setGranted(AccessAction.META, false); // 禁止设置原型
 
 	// 禁止访问关键对象
 	[
 		lib.cheat,
 		lib.node,
 		lib.message,
+		window.process,
+		window.module,
+		window.exports,
+		window.cordova,
+		// @ts-ignore
+		window.NonameAndroidBridge,
+		// @ts-ignore
+		window.noname_shijianInterfaces,
+		window,
 	]
 		.filter(Boolean)
 		.forEach(o => Marshal.setRule(o, bannedRule));
@@ -434,9 +481,10 @@ async function initSecurity({
 		// 如果目标是 game 的 ioFuncs 包含的所有函数
 		.require("target", game)
 		.require("property", ...ioFuncs)
+		.require("property", "ws")
 		// 抛出异常
-		.then(() => {
-			throw "禁止修改关键函数";
+		.then((access, nameds, control) => {
+			throw `禁止沙盒修改 \`game.${nameds.prototype}\` 属性`;
 		})
 		// 让 Monitor 开始工作
 		.start(); // 差点忘记启动了喵
@@ -517,6 +565,18 @@ function createSandbox() {
 	// TODO: 仅提供必要的document函数(?)
 	box.document = document;
 
+	if (topVariables.game
+		&& topVariables.game.ws) {
+		const match = WSURL_FOR_IP.exec(topVariables.game.ws.url);
+
+		if (match && TRUSTED_IPS.includes(match[1])) {
+			box.scope.ArrayBuffer = ArrayBuffer;
+			box.scope.localStorage = localStorage;
+			box.scope.exports = undefined;
+			box.scope.define = undefined;
+		}
+	}
+
 	// 传递七个变量
 	Object.assign(box.scope, topVariables);
 	// 复制垫片函数
@@ -563,6 +623,15 @@ function getIsolateds(sandbox) {
  * @returns {Array<typeof Function>}
  */
 function getIsolatedsFrom(item) {
+	if (canSkipSandbox(item) || !SANDBOX_ENABLED) {
+		return [
+			defaultFunction,
+			defaultGeneratorFunction,
+			defaultAsyncFunction,
+			defaultAsyncGeneratorFunction,
+		];
+	}
+
 	const domain = Marshal.getMarshalledDomain(item) || Domain.caller;
 
 	// 非顶级域调用情况下我们替换掉Function类型
@@ -611,25 +680,26 @@ function importSandbox() {
 	};
 }
 
+// 原本的Function类型记录
+/** @type {typeof Function} */
+// @ts-ignore
+const defaultFunction = function () { }.constructor;
+/** @type {typeof Function} */
+// @ts-ignore
+const defaultGeneratorFunction = function* () { }.constructor;
+/** @type {typeof Function} */
+// @ts-ignore
+const defaultAsyncFunction = async function () { }.constructor;
+/** @type {typeof Function} */
+// @ts-ignore
+const defaultAsyncGeneratorFunction = async function* () { }.constructor;
+
 /**
  * ```plain
  * 初始化顶级域的Funcion类型封装
  * ```
  */
 function initIsolatedEnvironment() {
-	/** @type {typeof Function} */
-	// @ts-ignore
-	const defaultFunction = function () { }.constructor;
-	/** @type {typeof Function} */
-	// @ts-ignore
-	const defaultGeneratorFunction = function* () { }.constructor;
-	/** @type {typeof Function} */
-	// @ts-ignore
-	const defaultAsyncFunction = async function () { }.constructor;
-	/** @type {typeof Function} */
-	// @ts-ignore
-	const defaultAsyncGeneratorFunction = async function* () { }.constructor;
-
 	// @ts-ignore
 	defaultSandbox = createSandbox(); // 所有 eval、parsex 代码全部丢进去喵
 
@@ -827,11 +897,11 @@ function setupPolyfills(sandbox) {
 }
 
 // 测试暴露喵
-// Reflect.defineProperty(window, "sandbox", {
-//	 get: () => defaultSandbox,
-//	 set: () => { },
-//	 configurable: true,
-// });
+Reflect.defineProperty(window, "sandbox", {
+	get: () => defaultSandbox,
+	set: () => { },
+	configurable: true,
+});
 
 const exports = {
 	enterSandbox,

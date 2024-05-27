@@ -1679,7 +1679,6 @@ export const extensionMenu = function (connectMenu) {
 						code = container.textarea.value;
 					}
 					try {
-						debugger; // NEED TO VIEW DATA
 						var { card } = security.exec2(code);
 						if (card == null || typeof card != "object") {
 							throw "err";
@@ -1769,7 +1768,6 @@ export const extensionMenu = function (connectMenu) {
 						page.content.pack.translate[name] = translate;
 						page.content.pack.translate[name + "_info"] = info;
 						try {
-							debugger; // NEED TO VIEW DATA
 							var { card } = security.exec2(container.code);
 							if (card == null || typeof card != "object") {
 								throw "err";
@@ -2138,7 +2136,6 @@ export const extensionMenu = function (connectMenu) {
 						code = container.textarea.value;
 					}
 					try {
-						debugger; // NEED TO VIEW DATA
 						var { skill } = security.exec2(code);
 						if (skill == null || typeof skill != "object") {
 							throw "err";
@@ -2321,7 +2318,6 @@ export const extensionMenu = function (connectMenu) {
 						page.content.pack.translate[name] = translate;
 						page.content.pack.translate[name + "_info"] = info;
 						try {
-							debugger; // NEED TO VIEW DATA
 							var { skill } = security.exec2(container.code);
 							if (skill == null || typeof skill != "object") {
 								throw "err";
@@ -2452,19 +2448,16 @@ export const extensionMenu = function (connectMenu) {
 						}
 						try {
 							if (link == "content" || link == "precontent") {
-								debugger; // NEED TO VIEW DATA
 								var { func } = security.exec2(`func = ${code}`);
 								if (typeof func != "function") {
 									throw "err";
 								}
 							} else if (link == "config") {
-								debugger; // NEED TO VIEW DATA
 								var { config } = security.exec2(code);
 								if (config == null || typeof config != "object") {
 									throw "err";
 								}
 							} else if (link == "help") {
-								debugger; // NEED TO VIEW DATA
 								var { help } = security.exec2(code);
 								if (help == null || typeof help != "object") {
 									throw "err";
@@ -2906,13 +2899,12 @@ export const extensionMenu = function (connectMenu) {
 						}
 					}
 				};
-				debugger; // NEED TO VIEW DATA
 				window.extension = {};
 				fetch(`${extensionURL}catalog.js`, {
 					referrerPolicy: "no-referrer",
 				})
 					.then((response) => response.text())
-					.then(security.eval)
+					.then(security.eval) // 返回的是HTML?
 					.then(loaded)
 					.catch((reason) => {
 						console.log(reason);

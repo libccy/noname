@@ -306,14 +306,14 @@ export class Library {
 										typeof yingbianZhuzhanAI == "function"
 											? yingbianZhuzhanAI(player, card, source, targets)
 											: cardx => {
-													var info = get.info(card);
-													if (info && info.ai && info.ai.yingbian) {
-														var ai = info.ai.yingbian(card, source, targets, player);
-														if (!ai) return 0;
-														return ai - get.value(cardx);
-													} else if (get.attitude(player, source) <= 0) return 0;
-													return 5 - get.value(cardx);
-											  },
+												var info = get.info(card);
+												if (info && info.ai && info.ai.yingbian) {
+													var ai = info.ai.yingbian(card, source, targets, player);
+													if (!ai) return 0;
+													return ai - get.value(cardx);
+												} else if (get.attitude(player, source) <= 0) return 0;
+												return 5 - get.value(cardx);
+											},
 								});
 								if (!game.online) return;
 								_status.event._resultid = id;
@@ -6334,7 +6334,6 @@ export class Library {
 								code = container.textarea.value;
 							}
 							try {
-								debugger; // NEED TO VIEW DATA
 								var { character } = security.exec2(code);
 								if (!Array.isArray(character)) {
 									throw "err";
@@ -6422,7 +6421,6 @@ export class Library {
 								code = container.textarea.value;
 							}
 							try {
-								debugger; // NEED TO VIEW DATA
 								var { character } = security.exec2(code);
 								if (!Array.isArray(character)) {
 									throw "err";
@@ -6851,7 +6849,6 @@ export class Library {
 								code = container.textarea.value;
 							}
 							try {
-								debugger; // NEED TO VIEW DATA
 								var { character } = security.exec2(code);
 								if (!get.is.object(character)) {
 									throw "err";
@@ -7753,8 +7750,10 @@ export class Library {
 			if (Array.isArray(context)) {
 				try {
 					const code = context.length == 1 ? context[0].string : context.reduceRight((pre, cur) => (pre.string || pre) + "." + cur.string);
-					debugger; // NEED TO VIEW DATA
-					obj = security.eval(`return ${code};`);
+					obj = security.exec(`return ${code};`, {
+						event, trigger, player, card, cards,
+						result, source, target, targets,
+					});
 					if (![null, undefined].includes(obj)) {
 						const keys = Object.getOwnPropertyNames(obj)
 							.concat(Object.getOwnPropertyNames(Object.getPrototypeOf(obj)))
@@ -8042,10 +8041,10 @@ export class Library {
 	genAwait(item) {
 		return gnc.is.generator(item)
 			? gnc.of(function* () {
-					for (const content of item) {
-						yield content;
-					}
-			  })()
+				for (const content of item) {
+					yield content;
+				}
+			})()
 			: Promise.resolve(item);
 	}
 	gnc = {
@@ -10622,16 +10621,16 @@ export class Library {
 					const cardName = get.name(cards[0], player);
 					return cardName
 						? new lib.element.VCard({
-								name: cardName,
-								nature: get.nature(cards[0], player),
-								suit: get.suit(cards[0], player),
-								number: get.number(cards[0], player),
-								isCard: true,
-								cards: [cards[0]],
-								storage: {
-									stratagem_buffed: 1,
-								},
-						  })
+							name: cardName,
+							nature: get.nature(cards[0], player),
+							suit: get.suit(cards[0], player),
+							number: get.number(cards[0], player),
+							isCard: true,
+							cards: [cards[0]],
+							storage: {
+								stratagem_buffed: 1,
+							},
+						})
 						: new lib.element.VCard();
 				}
 				return null;
@@ -12260,7 +12259,6 @@ export class Library {
 			log: function () {
 				var items = [];
 				try {
-					debugger; // NEED TO VIEW DATA
 					for (var i = 0; i < arguments.length; i++) {
 						items.push(security.eval(`return ${arguments[i]}`));
 					}
@@ -12531,7 +12529,7 @@ export class Library {
 								navigator.clipboard
 									.readText()
 									.then(read)
-									.catch(_ => {});
+									.catch(_ => { });
 							} else {
 								var input = ui.create.node("textarea", ui.window, { opacity: "0" });
 								input.select();

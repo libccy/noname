@@ -9,7 +9,7 @@ export class Client {
 	/**
 	 * @param {import('../index.js').NodeWS | InstanceType<typeof import('ws').WebSocket> | Client} ws
 	 */
-	constructor(ws) {
+	constructor(ws, temp) {
 		if (ws instanceof Client) throw new Error("Client cannot copy.");
 		this.ws = ws;
 		/**
@@ -18,7 +18,9 @@ export class Client {
 		// @ts-ignore
 		this.id = ws.wsid || get.id();
 		this.closed = false;
-		this.sandbox = security.createSandbox();
+
+		if (!temp)
+			this.sandbox = security.createSandbox();
 	}
 	send() {
 		if (this.closed) return this;

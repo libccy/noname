@@ -1346,7 +1346,7 @@ export class Game {
 	 * @param {*} message
 	 */
 	sendTo(id, message) {
-		return new lib.element.Client(new lib.element.NodeWS(id)).send(message);
+		return new lib.element.Client(new lib.element.NodeWS(id), true).send(message);
 	}
 	createServer() {
 		lib.node.clients = [];

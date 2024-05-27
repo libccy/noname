@@ -98,10 +98,6 @@ async function initializeSandboxRealms() {
     await promise; // Top Await Required Chrome 89
 
     // @ts-ignore
-    if (!iframe.contentWindow.SANDBOX_EXPORT)
-        throw new ReferenceError("无法同步载入运行域");
-
-    // @ts-ignore
     delete iframe.contentWindow.replacedGlobal;
     // @ts-ignore
     delete iframe.contentWindow.replacedCI1;

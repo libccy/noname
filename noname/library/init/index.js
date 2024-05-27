@@ -293,7 +293,6 @@ export class LibInit {
 				if (data.includes("sojson") || data.includes("jsjiami") || data.includes("var _0x")) alert(`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${pathToRead}`);
 			}
 			try {
-				debugger; // NEED TO VIEW DATA
 				security.eval(data);
 				if (typeof onLoad == "function") onLoad();
 			} catch (error) {
@@ -775,7 +774,6 @@ export class LibInit {
 
 	eval(func) {
 		if (typeof func == "function") {
-			debugger; // NEED TO VIEW DATA
 			return security.eval(`return (${func.toString()});`);
 		} else if (typeof func == "object") {
 			for (var i in func) {
@@ -783,7 +781,6 @@ export class LibInit {
 					if (typeof func[i] == "function") {
 						let checkObject = {};
 						checkObject[i] = func[i];
-						debugger; // NEED TO VIEW DATA
 						return security.eval(`return ${get.stringify(checkObject)};`)[i];
 					} else {
 						func[i] = lib.init.eval(func[i]);

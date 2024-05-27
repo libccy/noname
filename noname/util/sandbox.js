@@ -316,7 +316,7 @@ class Rule {
 	 * 返回值则控制本次访问是否允许
 	 * ```
 	 * 
-	 * @param {(...args: any[]) => boolean} accessControl 
+	 * @param {(action: number, ...args: any[]) => boolean} accessControl 
 	 */
 	setAccessControl(accessControl) {
 		Rule.#assertOperator(this);
@@ -442,6 +442,7 @@ const MARSHALLED_LIST = Object.freeze([
 	"/requestIdleCallback",
 	"/cancelIdleCallback",
 	"/queueMicrotask",
+	"/MutationObserver",
 ]);
 
 /**
@@ -2146,7 +2147,7 @@ class Marshal {
 
 						if (rule && !rule.canAccess(AccessAction.CALL,
 							target, marshalledThis, marshalledArgs))
-							throw new ReferenceError("Access denied");
+							throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 						const args = [target, marshalledThis, marshalledArgs];
 						const dispatched = DomainMonitors.dispatch(
@@ -2177,7 +2178,7 @@ class Marshal {
 
 					if (rule && !rule.canAccess(AccessAction.NEW,
 						target, argArray, newTarget))
-						throw new ReferenceError("Access denied");
+						throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 					const args = [target, marshalledArgs, marshalledNewTarget];
 					const dispatched = DomainMonitors.dispatch(
@@ -2227,7 +2228,7 @@ class Marshal {
 
 					if (rule && !rule.canAccess(AccessAction.DEFINE,
 						target, property, attributes))
-						throw new ReferenceError("Access denied");
+						throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 					const args = [target, property, attributes];
 					const dispatched = DomainMonitors.dispatch(
@@ -2251,7 +2252,7 @@ class Marshal {
 					const rule = ruleRef.rule;
 
 					if (rule && !rule.canAccess(AccessAction.DELETE, target, p))
-						throw new ReferenceError("Access denied");
+						throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 					const args = [target, p];
 					const dispatched = DomainMonitors.dispatch(
@@ -2286,7 +2287,7 @@ class Marshal {
 
 					if (rule && !rule.canAccess(AccessAction.READ,
 						target, p, marshalledReceiver))
-						throw new ReferenceError("Access denied");
+						throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 					// 通知 Monitor
 					const args = [target, p, marshalledReceiver];
@@ -2310,7 +2311,7 @@ class Marshal {
 					const rule = ruleRef.rule;
 
 					if (rule && !rule.canAccess(AccessAction.DESCRIBE, target, p))
-						throw new ReferenceError("Access denied");
+						throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 					const args = [target, p];
 					const dispatched = DomainMonitors.dispatch(
@@ -2336,7 +2337,7 @@ class Marshal {
 					const rule = ruleRef.rule;
 
 					if (rule && !rule.canAccess(AccessAction.TRACE, target))
-						throw new ReferenceError("Access denied");
+						throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 					const args = [target];
 					const dispatched = DomainMonitors.dispatch(
@@ -2361,7 +2362,7 @@ class Marshal {
 					const rule = ruleRef.rule;
 
 					if (rule && !rule.canAccess(AccessAction.EXISTS, target, p))
-						throw new ReferenceError("Access denied");
+						throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 					const args = [target, p];
 					const dispatched = DomainMonitors.dispatch(
@@ -2387,7 +2388,7 @@ class Marshal {
 					const rule = ruleRef.rule;
 
 					if (rule && !rule.canAccess(AccessAction.LIST, target))
-						throw new ReferenceError("Access denied");
+						throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 					const args = [target];
 					const dispatched = DomainMonitors.dispatch(
@@ -2414,7 +2415,7 @@ class Marshal {
 					const rule = ruleRef.rule;
 
 					if (rule && !rule.canAccess(AccessAction.SEAL, target))
-						throw new ReferenceError("Access denied");
+						throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 					const args = [target];
 					const dispatched = DomainMonitors.dispatch(
@@ -2436,7 +2437,7 @@ class Marshal {
 
 					if (rule && !rule.canAccess(AccessAction.WRITE,
 						target, p, marshalledNewValue, marshalledReceiver))
-						throw new ReferenceError("Access denied");
+						throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 					const args = [target, p, marshalledNewValue, marshalledReceiver];
 					const dispatched = DomainMonitors.dispatch(
@@ -2459,7 +2460,7 @@ class Marshal {
 					const rule = ruleRef.rule;
 
 					if (rule && !rule.canAccess(AccessAction.META, target, marshalledV))
-						throw new ReferenceError("Access denied");
+						throw new ReferenceError("封送对象的源运行域禁止了此项操作");
 
 					const args = [target, marshalledV];
 					const dispatched = DomainMonitors.dispatch(
@@ -3190,6 +3191,7 @@ class Sandbox {
 			parseFloat: this.#domainWindow.parseFloat,
 			isFinite: this.#domainWindow.isFinite,
 			isNaN: this.#domainWindow.isNaN,
+			Domain: Domain,
 		};
 
 		const hardBuiltins = {
