@@ -565,18 +565,6 @@ function createSandbox() {
 	// TODO: 仅提供必要的document函数(?)
 	box.document = document;
 
-	if (topVariables.game
-		&& topVariables.game.ws) {
-		const match = WSURL_FOR_IP.exec(topVariables.game.ws.url);
-
-		if (match && TRUSTED_IPS.includes(match[1])) {
-			box.scope.ArrayBuffer = ArrayBuffer;
-			box.scope.localStorage = localStorage;
-			box.scope.exports = undefined;
-			box.scope.define = undefined;
-		}
-	}
-
 	// 传递七个变量
 	Object.assign(box.scope, topVariables);
 	// 复制垫片函数
@@ -897,11 +885,11 @@ function setupPolyfills(sandbox) {
 }
 
 // 测试暴露喵
-Reflect.defineProperty(window, "sandbox", {
-	get: () => defaultSandbox,
-	set: () => { },
-	configurable: true,
-});
+// Reflect.defineProperty(window, "sandbox", {
+// 	get: () => defaultSandbox,
+// 	set: () => { },
+// 	configurable: true,
+// });
 
 const exports = {
 	enterSandbox,
