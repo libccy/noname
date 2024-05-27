@@ -1407,7 +1407,7 @@ game.import("card", function () {
 						return 1;
 					},
 					basic: {
-						order: 9,
+						order: 7.2,
 						useful: [5, 1],
 						value: 5,
 					},
@@ -1700,7 +1700,7 @@ game.import("card", function () {
 						return 1;
 					},
 					basic: {
-						order: 9,
+						order: 7.2,
 						useful: 1,
 						value: 5,
 					},
@@ -1843,7 +1843,7 @@ game.import("card", function () {
 						}
 					},
 					basic: {
-						order: 7.2,
+						order: 7,
 						useful: 4.5,
 						value: 9.2,
 					},
