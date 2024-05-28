@@ -8,8 +8,9 @@ import security from "../../util/security.js";
 export class Client {
 	/**
 	 * @param {import('../index.js').NodeWS | InstanceType<typeof import('ws').WebSocket> | Client} ws
+	 * @param {boolean} temp
 	 */
-	constructor(ws, temp) {
+	constructor(ws, temp = false) {
 		if (ws instanceof Client) throw new Error("Client cannot copy.");
 		this.ws = ws;
 		/**
@@ -19,8 +20,21 @@ export class Client {
 		this.id = ws.wsid || get.id();
 		this.closed = false;
 
-		if (!temp)
+		if (!temp) {
 			this.sandbox = security.createSandbox();
+			if (this.sandbox) {
+				Reflect.defineProperty(this, "sandbox", {
+					value: this.sandbox,
+					writable: false,
+					configurable: false,
+				});
+				Reflect.defineProperty(this.sandbox, "client", {
+					value: this,
+					writable: false,
+					configurable: false,
+				});
+			}
+		}
 	}
 	send() {
 		if (this.closed) return this;

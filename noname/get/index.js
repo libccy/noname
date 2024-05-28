@@ -1515,7 +1515,7 @@ export class Get {
 	 * ```
 	 * 
 	 * @param {string} str 
-	 * @returns 
+	 * @returns {string} 
 	 */
 	pureFunctionStr(str) {
 		str = str.trim();
@@ -1551,7 +1551,13 @@ export class Get {
 			if (func._filter_args) {
 				return "_noname_func:" + JSON.stringify(get.stringifiedResult(func._filter_args, 3));
 			}
-			const str = func.toString();
+			const { Marshal, Sandbox } = security.importSandbox();
+			const domain = Marshal.getMarshalledDomain(func);
+			if (domain) {
+				const sandbox = Sandbox.from(domain);
+				if (sandbox && "client" in sandbox) throw new Error("不应该二次扩散远程代码");
+			}
+			const str = Marshal.decompileFunction(func);
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return "_noname_func:function () {}";
 			return "_noname_func:" + get.pureFunctionStr(str);
@@ -4960,10 +4966,10 @@ function freezeSlot(obj, key) {
 	Reflect.defineProperty(obj, key, descriptor);
 }
 
-freezeSlot(Get, "isFunctionBody");
-freezeSlot(Get, "pureFunctionStr");
-freezeSlot(Get, "funcInfoOL");
-freezeSlot(Get, "infoFuncOL");
+freezeSlot(Get.prototype, "isFunctionBody");
+freezeSlot(Get.prototype, "pureFunctionStr");
+freezeSlot(Get.prototype, "funcInfoOL");
+freezeSlot(Get.prototype, "infoFuncOL");
 
 export let get = new Get();
 /**

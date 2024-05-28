@@ -98,6 +98,8 @@ let ModAsyncGeneratorFunction;
 function enterSandbox(box) {
 	if (!SANDBOX_ENABLED)
 		return;
+	if (!(box instanceof Sandbox))
+		throw new TypeError("无效的沙盒对象");
 
 	if (!Domain.isBelievable(Domain.topDomain))
 		throw "无法在沙盒里面访问";
@@ -117,7 +119,7 @@ function exitSandbox() {
 	if (!Domain.isBelievable(Domain.topDomain))
 		throw "无法在沙盒里面访问";
 	if (!sandboxStack.length)
-		return;
+		throw new ReferenceError("无法弹出更多的沙盒");
 
 	sandboxStack.pop();
 }
@@ -422,6 +424,7 @@ async function initSecurity({
 		...ioFuncs.map(n => game[n]).filter(Boolean),
 		...Object.values(game.promises),
 		defaultEval,
+		localStorage.setItem,
 		window.require,
 		// @ts-ignore
 		window.define,
@@ -472,6 +475,8 @@ async function initSecurity({
 	writeRule.setGranted(AccessAction.DEFINE, false); // 禁止重定义属性
 	// 禁止修改 game.promises 的函数
 	Marshal.setRule(game.promises, writeRule);
+	// 禁止修改 localStorage
+	Marshal.setRule(localStorage, writeRule);
 
 	// 对于 game 当中访问特定函数我们通过 Monitor 进行拦截
 	new Monitor()
@@ -481,29 +486,28 @@ async function initSecurity({
 		// 如果目标是 game 的 ioFuncs 包含的所有函数
 		.require("target", game)
 		.require("property", ...ioFuncs)
-		.require("property", "ws")
+		.require("property", "ws", "sandbox")
 		// 抛出异常
 		.then((access, nameds, control) => {
-			throw `禁止沙盒修改 \`game.${nameds.prototype}\` 属性`;
+			throw `有不信任的代码修改 \`game.${String(nameds.property)}\` 属性`;
 		})
 		// 让 Monitor 开始工作
 		.start(); // 差点忘记启动了喵
 
-	// 现在 parsex 已经禁止传递字符串，这段 Monitor 不需要了
 	// 监听原型、toStringTag的更改
-	// const toStringTag = Symbol.toStringTag;
-	// new Monitor()
-	//	 .action(AccessAction.WRITE)
-	//	 .action(AccessAction.DEFINE)
-	//	 .action(AccessAction.META)
-	//	 .require("property", toStringTag)
-	//	 .then((access, nameds, control) => {
-	//		 // 阻止原型、toStringTag的更改
-	//		 control.preventDefault();
-	//		 control.stopPropagation();
-	//		 control.setReturnValue(false);
-	//	 })
-	//	 .start();
+	const toStringTag = Symbol.toStringTag;
+	new Monitor()
+		.action(AccessAction.WRITE)
+		.action(AccessAction.DEFINE)
+		.action(AccessAction.META)
+		.require("property", toStringTag)
+		.then((access, nameds, control) => {
+			// 阻止原型、toStringTag的更改
+			control.preventDefault();
+			control.stopPropagation();
+			control.setReturnValue(false);
+		})
+		.start();
 
 	if (SANDBOX_AUTOTEST) {
 		// 一个测试循环喵
@@ -646,12 +650,12 @@ function getIsolatedsFrom(item) {
  * ```
  * 
  * @returns {{
- *	 AccessAction: typeof import("./sandbox.js").AccessAction,
- *	 Domain: typeof import("./sandbox.js").Domain,
- *	 Marshal: typeof import("./sandbox.js").Marshal,
- *	 Monitor: typeof import("./sandbox.js").Monitor,
- *	 Rule: typeof import("./sandbox.js").Rule,
- *	 Sandbox: typeof import("./sandbox.js").Sandbox,
+ *     AccessAction: typeof import("./sandbox.js").AccessAction,
+ *     Domain: typeof import("./sandbox.js").Domain,
+ *     Marshal: typeof import("./sandbox.js").Marshal,
+ *     Monitor: typeof import("./sandbox.js").Monitor,
+ *     Rule: typeof import("./sandbox.js").Rule,
+ *     Sandbox: typeof import("./sandbox.js").Sandbox,
  * }}
  */
 function importSandbox() {
@@ -885,11 +889,11 @@ function setupPolyfills(sandbox) {
 }
 
 // 测试暴露喵
-// Reflect.defineProperty(window, "sandbox", {
-// 	get: () => defaultSandbox,
-// 	set: () => { },
-// 	configurable: true,
-// });
+Reflect.defineProperty(window, "sandbox", {
+	get: () => defaultSandbox,
+	set: () => { },
+	configurable: true,
+});
 
 const exports = {
 	enterSandbox,

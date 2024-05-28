@@ -164,8 +164,9 @@ export class Library {
 	 * } }
 	 */
 	node;
+	// 谁写的值类型是string，这也太离谱了喵
 	/**
-	 * @type { { [key: string]: string } }
+	 * @type { { [key: string]: Player } }
 	 */
 	playerOL;
 	/**
@@ -9561,14 +9562,13 @@ export class Library {
 					if (!Array.isArray(message) || typeof lib.message.client[message[0]] !== "function") {
 						throw "err";
 					}
-					if (!game.sandbox) game.sandbox = security.createSandbox();
-					security.enterSandbox(game.sandbox);
+					if (game.sandbox) security.enterSandbox(game.sandbox);
 					try {
 						for (var i = 1; i < message.length; i++) {
 							message[i] = get.parsedResult(message[i]);
 						}
 					} finally {
-						security.exitSandbox();
+						if (game.sandbox) security.exitSandbox();
 					}
 				} catch (e) {
 					console.log(e);
@@ -12011,7 +12011,9 @@ export class Library {
 	cardPile = {};
 	message = {
 		server: {
-			/** @this { any } */
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
 			init(version, config, banned_info) {
 				if (lib.node.banned.includes(banned_info)) {
 					this.send("denied", "banned");
@@ -12030,9 +12032,14 @@ export class Library {
 					lib.node.clients.remove(this);
 					this.closed = true;
 				} else if (!_status.waitingForPlayer) {
-					if (game.phaseNumber && lib.configOL.observe) {
+					if (!config.nickname) {
+						this.send("denied", "banned");
+						lib.node.clients.remove(this);
+						this.closed = true;
+					} else if (game.phaseNumber && lib.configOL.observe) {
 						lib.node.observing.push(this);
 						this.send("reinit", lib.configOL, get.arenaState(), game.getState ? game.getState() : {}, game.ip, game.players[0].playerid, null, _status.cardtag);
+						game.broadcastAll(name => game.log("玩家 ", `#y${name}`, " 进入房间旁观"), config.nickname);
 						if (!ui.removeObserve) {
 							ui.removeObserve = ui.create.system(
 								"移除旁观",
@@ -12077,37 +12084,53 @@ export class Library {
 					this.send("init", this.id, lib.configOL, game.ip, window.isNonameServer, game.roomId);
 				}
 			},
-			/** @this { any } */
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
 			inited() {
 				this.inited = true;
 				if (_status.waitingForPlayer) {
 					game.updateWaiting();
 				}
 			},
-			/** @this { any } */
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
 			reinited() {
 				this.inited = true;
 			},
-			result: function (result) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			result(result) {
 				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
 					player.unwait(result);
 				}
 			},
-			tempResult: function (result) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			tempResult(result) {
 				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
 					player.tempUnwait(result);
 				}
 			},
-			startGame: function () {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			startGame() {
 				if (this.id == game.onlinezhu) {
 					game.resume();
 				}
 			},
-			changeRoomConfig: function (config) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			changeRoomConfig(config) {
 				if (this.id == game.onlinezhu) {
 					game.broadcastAll(function (config) {
 						for (var i in config) {
@@ -12134,7 +12157,10 @@ export class Library {
 					}
 				}
 			},
-			changeNumConfig: function (num, index, bool) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			changeNumConfig(num, index, bool) {
 				if (this.id == game.onlinezhu) {
 					lib.configOL.number = num;
 					game.send("server", "config", lib.configOL);
@@ -12148,14 +12174,20 @@ export class Library {
 					}
 				}
 			},
-			throwEmotion: function (target, emotion, rotate) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			throwEmotion(target, emotion, rotate) {
 				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
 					player.throwEmotion(target, emotion, rotate);
 				}
 			},
-			emotion: function (id, pack, emotion) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			emotion(id, pack, emotion) {
 				if (lib.node.observing.includes(this)) return;
 				var that = this;
 				if (
@@ -12185,7 +12217,10 @@ export class Library {
 				}
 				if (player) player.emotion(pack, emotion);
 			},
-			chat: function (id, str) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			chat(id, str) {
 				if (lib.node.observing.includes(this)) return;
 				var that = this;
 				if (
@@ -12215,8 +12250,18 @@ export class Library {
 				}
 				if (player) player.chat(str);
 			},
-			giveup: function (player) {
+			/**
+			 * ```plain
+			 * 当客机向主机发送投降请求时的回调
+			 * ```
+			 * 
+			 * @this {import("./element/client.js").Client}
+			 * @param {Player} player 
+			 */
+			giveup(player) {
 				if (lib.node.observing.includes(this) || !player || !player._giveUp) return;
+				var self = lib.playerOL[this.id];
+				if (self !== player) return; // 禁止让别人投降
 				_status.event.next.length = 0;
 				game
 					.createEvent("giveup", false)
@@ -12227,7 +12272,10 @@ export class Library {
 						player.die("nosource").includeOut = true;
 					}).player = player;
 			},
-			auto: function () {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			auto() {
 				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
@@ -12238,7 +12286,10 @@ export class Library {
 					}, player);
 				}
 			},
-			unauto: function () {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			unauto() {
 				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
@@ -12249,18 +12300,21 @@ export class Library {
 					}, player);
 				}
 			},
-			exec: function (func) {
+			exec(func) {
 				// if(typeof func=='function'){
 				//     var args=Array.from(arguments);
 				//     args.shift();
 				//     func.apply(this,args);
 				// }
 			},
-			log: function () {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			log() {
 				var items = [];
 				try {
 					for (var i = 0; i < arguments.length; i++) {
-						items.push(security.eval(`return ${arguments[i]}`));
+						items.push(this.sandbox.exec(`return ${arguments[i]}`));
 					}
 				} catch (e) {
 					this.send("log", ["err"]);

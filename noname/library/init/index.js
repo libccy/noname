@@ -142,23 +142,21 @@ export class LibInit {
 				if (!Array.isArray(message) || typeof lib.message.server[message[0]] !== "function") {
 					throw "err";
 				}
-				if (!client.sandbox) client.sandbox = security.createSandbox();
 				// @ts-ignore
-				security.enterSandbox(client.sandbox);
+				if (client.sandbox) security.enterSandbox(client.sandbox);
 				try {
 					for (var i = 1; i < message.length; i++) {
 						message[i] = get.parsedResult(message[i]);
 					}
 				} finally {
 					// @ts-ignore
-					security.exitSandbox(client.sandbox);
+					if (client.sandbox) security.exitSandbox();
 				}
 			} catch (e) {
 				console.log(e);
 				console.log("invalid message: " + messagestr);
 				return;
 			}
-			lib.message.server[message.shift()].apply(client, message);
 		});
 		ws.on("close", function () {
 			client.close();
@@ -609,10 +607,10 @@ export class LibInit {
 		 * @param {Function} func
 		 */
 		function Legacy(func) {
+			const { Marshal } = security.importSandbox();
 			//Remove all comments
 			//移除所有注释
-			let str = func
-				.toString()
+			let str = Marshal.decompileFunction(func)
 				.replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^/"'\\\s]*)/gm, "$2")
 				.trim();
 			//获取第一个 { 后的所有字符
