@@ -3464,18 +3464,8 @@ class Sandbox {
 				if (p === Symbol.unscopables)
 					return undefined;
 
-				if (!(p in target)) {
-					// 暴露非内建的顶级全局变量
-					if (thiz.#freeAccess
-						&& !Globals.isBuiltinKey(p)) {
-						const topWindow = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
-
-						if (p in topWindow)
-							return trapMarshal(Domain.topDomain, domain, topWindow[p]);
-					}
-
+				if (!(p in target))
 					throw new domainWindow.ReferenceError(`${String(p)} is not defined`);
-				}
 
 				return target[p];
 			},
@@ -3597,12 +3587,51 @@ class Sandbox {
 		return sandbox;
 	}
 
+	/**
+	 * ```plain
+	 * 创建一个被代理的 Window 对象
+	 * 
+	 * （为什么一定要指名道姓选window的东西喵）
+	 * ```
+	 * 
+	 * @param {Sandbox} thiz 
+	 */
 	static #createScope = function (thiz) {
 		let baseScope = thiz.#scope;
-		thiz.#scope = new thiz.#domainObject();
+		const rawScope = new thiz.#domainObject();
 
-		// 定义两个超级变量
-		Reflect.defineProperty(thiz.#scope, "window", {
+		thiz.#scope = new Proxy(rawScope, {
+			get(target, p, receiver) {
+				if (p in target)
+					return Reflect.get(target, p, receiver);
+
+				// 暴露非内建的顶级全局变量
+				if (thiz.#freeAccess
+					&& !Globals.isBuiltinKey(p)) {
+					const topWindow = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
+
+					if (p in topWindow)
+						return trapMarshal(Domain.topDomain, thiz.#domain, topWindow[p]);
+				}
+
+				return undefined;
+			},
+			has(target, p) {
+				if (p in target)
+					return true;
+
+				if (thiz.#freeAccess
+					&& !Globals.isBuiltinKey(p)) {
+					const topWindow = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
+					return p in topWindow;
+				}
+
+				return false;
+			},
+		});
+
+		// 定义三个超级变量
+		Reflect.defineProperty(rawScope, "window", {
 			get: (function () {
 				// @ts-ignore
 				return this;
@@ -3610,7 +3639,15 @@ class Sandbox {
 			enumerable: false,
 			configurable: false,
 		});
-		Reflect.defineProperty(thiz.#scope, "document", {
+		Reflect.defineProperty(rawScope, "self", {
+			get: (function () {
+				// @ts-ignore
+				return this;
+			}).bind(thiz.#scope),
+			enumerable: false,
+			configurable: false,
+		});
+		Reflect.defineProperty(rawScope, "document", {
 			get: (function () {
 				// @ts-ignore
 				return this.#domainDocument;
@@ -3625,8 +3662,9 @@ class Sandbox {
 		// 继承之前的变量域
 		const descriptors = Object.getOwnPropertyDescriptors(baseScope);
 		delete descriptors.window;
+		delete descriptors.self;
 		delete descriptors.document;
-		Object.defineProperties(thiz.#scope, descriptors);
+		Object.defineProperties(rawScope, descriptors);
 	}
 
 	static #makeName = function (prefix, conflict) {
