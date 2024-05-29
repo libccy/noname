@@ -1,10 +1,15 @@
+// 声明：沙盒维护的是服务器秩序，让服务器秩序不会因为非房主的玩家以及旁观者的影响，并在此基础上维护玩家设备不受危险代码攻击
+// 但沙盒不会也没有办法维护恶意服务器/房主对于游戏规则的破坏，请玩家尽量选择官方或其他安全的服务器，同时选择一个受信任的玩家作为房主
+
 // 是否强制所有模式下使用沙盒
-const SANDBOX_FORCED = true;
+const SANDBOX_FORCED = false;
 // 是否启用自动测试
 const SANDBOX_AUTOTEST = false;
 // 是否禁用自动测试延迟
 // 这将放弃渲染，在游戏结束前无响应
 const SANDBOX_AUTOTEST_NODELAY = false;
+// 沙盒开发模式
+const SANDBOX_DEV = false;
 
 const WSURL_FOR_IP = /ws:\/\/(\d+.\d+.\d+.\d+):\d+\//;
 const TRUSTED_IPS = Object.freeze([
@@ -311,8 +316,20 @@ function _exec(x, scope = {}) {
  * 携带简单上下文的eval函数，并返回scope
  * eval代码的返回值将覆盖 `scope.return` 这个属性
  * 另外任意因对未定义变量赋值导致全局变量赋值的行为将被转移到scope里面
+ * （替代eval的对策函数，具体看下面的例子）
  * 
  * 自动根据沙盒的启用状态使用不同的实现
+ * 
+ * 下面是 `security.exec2` 的使用示例:
+ * ```
+ * @example
+ * ```javascript
+ * // 执行一段代码并获取赋值的多个变量
+ * let { return: skill, filter, content } = security.exec2(`
+ *     filter = (e, p) => e.source && e.source == p;
+ *     content = async (e, t, p) => t.cancel();
+ *     return { filter, content };
+ * `, { content: () => {}, lib, game, ui, get, ai, _status, }); // 提供默认的content，提供六个变量
  * ```
  * 
  * @param {any} x 
@@ -511,13 +528,6 @@ async function initSecurity({
 
 	if (SANDBOX_AUTOTEST) {
 		// 一个测试循环喵
-		if (SANDBOX_AUTOTEST_NODELAY) {
-			game.resume = () => { };
-			game.pause = () => { };
-		}
-		game.delay = game.delayx = () => { };
-		game.asyncDelay = game.asyncDelayx = async () => { };
-
 		Reflect.defineProperty(lib.element.GameEvent.prototype, "animate", {
 			get: () => undefined,
 			set() { },
@@ -544,7 +554,16 @@ async function initSecurity({
 			}, SANDBOX_AUTOTEST_NODELAY ? 5000 : 1000);
 		};
 
-		lib.arenaReady.push(() => ui.click.auto());
+		lib.arenaReady.push(() => setTimeout(() => {
+			if (SANDBOX_AUTOTEST_NODELAY) {
+				game.resume = () => { };
+				game.pause = () => { };
+			}
+			game.delay = game.delayx = () => { };
+			game.asyncDelay = game.asyncDelayx = async () => { };
+
+			ui.auto.click();
+		}, 1000));
 	}
 
 	initialized = true;
@@ -889,11 +908,13 @@ function setupPolyfills(sandbox) {
 }
 
 // 测试暴露喵
-Reflect.defineProperty(window, "sandbox", {
-	get: () => defaultSandbox,
-	set: () => { },
-	configurable: true,
-});
+if (SANDBOX_DEV) {
+	Reflect.defineProperty(window, "sandbox", {
+		get: () => defaultSandbox,
+		set: () => { },
+		configurable: true,
+	});
+}
 
 const exports = {
 	enterSandbox,

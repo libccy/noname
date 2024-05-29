@@ -1566,9 +1566,9 @@ export class Get {
 	}
 	infoFuncOL(info) {
 		let func;
-		console.log("[infoFuncOL] info:", info);
+		if ("sandbox" in window) console.log("[infoFuncOL] info:", info);
 		const str = get.pureFunctionStr(info.slice(13)); // 清洗函数并阻止注入
-		console.log("[infoFuncOL] pured:", str);
+		if ("sandbox" in window) console.log("[infoFuncOL] pured:", str);
 		try {
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () { };

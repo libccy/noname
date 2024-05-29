@@ -1,3 +1,11 @@
+// 给扩展开发者的的提示:
+// 如果你在调试时启用了类似 `在出现异常时中断` 的选项，
+// 如果你不想频繁进入此文件，那么你可以在调试窗口中 `右键-将此文件添加到忽略列表/black box script` 来屏蔽此文件
+// 另外由于封送的原因，如果当前模式启用了沙盒，会导致编译后的本地或远程代码创建的对象使用代理包装
+// 你在调试器中需要通过 `[[Target]].target` 查看原始对象，在此导致的不便对开发者表示歉意
+
+// 最后为安全考虑，请遵守规范，尽量不要使用 `eval` 函数而是使用 `security.exec2` 来替代
+
 import { SANDBOX_EXPORT } from "./initRealms.js";
 
 // 很重要的事情！
@@ -410,9 +418,6 @@ const GLOBAL_PATHES = Object.freeze([
 	"/parseFloat",
 	"/isNaN",
 	"/isFinite",
-	"/alert",
-	"/confirm",
-	"/console",
 
 	// 危险对象不传递
 	// "/Function",
@@ -1595,6 +1600,7 @@ class Monitor {
 	allow(...domains) {
 		Monitor.#assertOperator(this);
 
+		// 参数检查
 		if (this.isStarted)
 			throw new Error("Monitor 在启动期间不能修改");
 		if (!domains.length)
@@ -1632,6 +1638,7 @@ class Monitor {
 	disallow(...domains) {
 		Monitor.#assertOperator(this);
 
+		// 参数检查
 		if (this.isStarted)
 			throw new Error("Monitor 在启动期间不能修改");
 		if (!domains.length)
@@ -1665,6 +1672,7 @@ class Monitor {
 	action(...action) {
 		Monitor.#assertOperator(this);
 
+		// 参数检查
 		if (this.isStarted)
 			throw new Error("Monitor 在启动期间不能修改");
 		if (action.length == 0
@@ -3412,7 +3420,7 @@ class Sandbox {
 	 * @param {string} code 代码字符串
 	 * @param {Object?} context 额外的执行上下文
 	 * @param {Array<string>?} paramList 参数名列表，以此来创建可以传递参数的函数
-	 * @param {boolean?} inheritScope 是否继承当前正在执行的scope而不是当前沙盒的scope
+	 * @param {boolean?} inheritScope 是否继承当前正在执行的scope而不是当前沙盒的scope（为封装Function类型而提供的参数）
 	 * @param {"exists"|"extend"|"all"} writeContext 当执行的代码尝试为未声明的变量赋值时，应该 根据context与window的变量写入(默认行为)|默认行为并且新的变量写入context|全部写入context
 	 * @returns 
 	 */

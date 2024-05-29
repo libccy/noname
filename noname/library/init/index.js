@@ -157,6 +157,7 @@ export class LibInit {
 				console.log("invalid message: " + messagestr);
 				return;
 			}
+			lib.message.server[message.shift()].apply(client, message);
 		});
 		ws.on("close", function () {
 			client.close();
