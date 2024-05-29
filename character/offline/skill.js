@@ -5592,7 +5592,7 @@ const skills = {
 			if (event.lose && event.lose.loseHp) player.draw();
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 			filterDamage: true,
 			skillTagFilter: function (player, tag, arg) {
 				if (tag === "filterDamage" && arg && arg.player) {

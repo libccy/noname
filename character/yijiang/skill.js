@@ -8776,7 +8776,7 @@ const skills = {
 				if (player.hp != 1) return false;
 			},
 			respondSha: true,
-			halfneg: true,
+			neg: true,
 		},
 		audio: 2,
 		audioname: ["xin_zhangyi"],

@@ -3757,6 +3757,9 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "yuheng"
+		},
 	},
 	yuheng: {
 		audio: 2,
