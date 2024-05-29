@@ -1327,7 +1327,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				boss_zhugeliang: [
 					"male",
 					"shen",
-					Infinity,
+					"Infinity/Infinity",
 					["xiangxing", "yueyin", "fengqi", "gaiming"],
 					["shu", "boss", "bossallowed"],
 					"qun",
