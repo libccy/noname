@@ -3212,29 +3212,50 @@ class Sandbox {
 		rewriteCtor(defaultAsyncGeneratorFunction.prototype, new Proxy(defaultAsyncGeneratorFunction, handler));
 	}
 
+	// /**
+	//  * ```plain
+	//  * 替代原本的eval函数，阻止访问原生的 window 对象
+	//  * ```
+	//  * 
+	//  * @param {Window} trueWindow
+	//  * @param {(x: string) => any} _eval 
+	//  * @param {Proxy} intercepter 
+	//  * @param {Window} global 
+	//  * @param {any} x 
+	//  */
+	// static #wrappedEval = function (trueWindow, _eval, intercepter, global, x) {
+	// 	const intercepterName = Sandbox.#makeName("_", trueWindow);
+	// 	const evalName = Sandbox.#makeName("_", global);
+	// 	const codeName = Sandbox.#makeName("_", global);
+	// 	trueWindow[intercepterName] = intercepter;
+	// 	global[evalName] = _eval;
+	// 	global[codeName] = x;
+	// 	const result = _eval(`with(${intercepterName}){with(window){${evalName}(\`"use strict";\${${codeName}}\`)}}`);
+	// 	delete global[codeName];
+	// 	delete global[evalName];
+	// 	delete trueWindow[intercepterName];
+	// 	return result;
+	// }
+
 	/**
 	 * ```plain
 	 * 替代原本的eval函数，阻止访问原生的 window 对象
 	 * ```
 	 * 
-	 * @param {Window} trueWindow
-	 * @param {(x: string) => any} _eval 
-	 * @param {Proxy} intercepter 
-	 * @param {Window} global 
+	 * @param {Sandbox} thiz 
 	 * @param {any} x 
+	 * @returns 
 	 */
-	static #wrappedEval = function (trueWindow, _eval, intercepter, global, x) {
-		const intercepterName = Sandbox.#makeName("_", trueWindow);
-		const evalName = Sandbox.#makeName("_", global);
-		const codeName = Sandbox.#makeName("_", global);
-		trueWindow[intercepterName] = intercepter;
-		global[evalName] = _eval;
-		global[codeName] = x;
-		const result = _eval(`with(${intercepterName}){with(window){${evalName}("use strict;"+${codeName})}}`);
-		delete global[codeName];
-		delete global[evalName];
-		delete trueWindow[intercepterName];
-		return result;
+	static #wrappedEval = function (thiz, x) {
+		let code = String(x).trim();
+
+		while (code.endsWith(";"))
+			code = code.slice(0, -1);
+
+		if (!/[;\n\r]$/.test(code))
+			code = `return (${code})`;
+
+		return thiz.exec(code);
 	}
 
 	/**
@@ -3520,8 +3541,9 @@ class Sandbox {
 			},
 		});
 
-		wrappedEval = Sandbox.#wrappedEval.bind(null,
-			thiz.#domainWindow, thiz.#domainEval, intercepter, scope);
+		// wrappedEval = Sandbox.#wrappedEval.bind(null,
+		// 	thiz.#domainWindow, thiz.#domainEval, intercepter, scope);
+		wrappedEval = Sandbox.#wrappedEval.bind(null, thiz);
 
 		// 构建陷入的沙盒闭包
 		// 同时对返回值进行封送
