@@ -20,6 +20,7 @@ import { _status } from "../../status/index.js";
 import { ui } from "../../ui/index.js";
 import { CacheContext } from "../cache/cacheContext.js";
 import { ChildNodesWatcher } from "../cache/childNodesWatcher.js";
+import security from "../../util/security.js";
 
 export class Player extends HTMLDivElement {
 	/**
@@ -454,7 +455,7 @@ export class Player extends HTMLDivElement {
 		const vars = {};
 		/**
 		 * 作用域
-		 * @type { (code: string) => any }
+		 * @type { ((code: string) => any)? }
 		 */
 		let scope;
 		/** @type { Skill } */
@@ -500,14 +501,13 @@ export class Player extends HTMLDivElement {
 				varstr += `var ${key}=lib.skill['${skillName}'].vars['${key}'];\n`;
 			}
 			let str = `
-					function content(){
-						${varstr}if(event.triggername=='${skillName}After'){
-							player.removeSkill('${skillName}');
-							delete lib.skill['${skillName}'];
-							delete lib.translate['${skillName}'];
-							return event.finish();
-						}
-				`;
+					${varstr}if(event.triggername=='${skillName}After'){
+						player.removeSkill('${skillName}');
+						delete lib.skill['${skillName}'];
+						delete lib.translate['${skillName}'];
+						return event.finish();
+					}
+			`;
 			for (let i = 0; i < skill.contentFuns.length; i++) {
 				const fun2 = skill.contentFuns[i];
 				const a = fun2.toString();
@@ -516,7 +516,15 @@ export class Player extends HTMLDivElement {
 				const str2 = a.slice(begin, a.lastIndexOf("}") != -1 ? a.lastIndexOf("}") : undefined).trim();
 				str += `'step ${i}'\n\t${str2}\n\t`;
 			}
-			skill.content = lib.init.parsex((scope || eval)(str + `\n};content;`), scope);
+			// 防止注入喵
+			if (!get.isFunctionBody(str)) throw new Error("无效的content函数代码");
+			let recompiledScope;
+			if (security.isSandboxRequired()) {
+				recompiledScope = scope ? security.eval(`return (${scope.toString()})`) : code => security.eval(`return (${code.toString()})`);
+			} else {
+				recompiledScope = scope || eval;
+			}
+			skill.content = lib.init.parsex(recompiledScope(`(function(){\n${str}\n})`), scope && recompiledScope);
 			// @ts-ignore
 			skill.content._parsed = true;
 		};
@@ -632,6 +640,7 @@ export class Player extends HTMLDivElement {
 			 */
 			apply(_scope) {
 				if (lib.skill[skillName] != skill) throw `This skill has been destroyed`;
+				if (security.isSandboxRequired()) console.warn("`player.when().apply()` 在沙盒模式下不推荐使用");
 				// @ts-ignore
 				scope = _scope;
 				if (skill.contentFuns.length > 0) createContent();
@@ -3654,9 +3663,9 @@ export class Player extends HTMLDivElement {
 		return Array.from(this.iterableGetCards(arg1, arg2));
 	}
 	/**
-	 * @param { Player } player 
-	 * @param { string } [arg1] 
-	 * @param { string } [arg2] 
+	 * @param { Player } player
+	 * @param { string } [arg1]
+	 * @param { string } [arg2]
 	 * @returns { Generator<Card, void, unknown> }
 	 */
 	*iterableGetDiscardableCards(player, arg1, arg2) {
@@ -5862,7 +5871,7 @@ export class Player extends HTMLDivElement {
 			return get.is.sameNature(natures, naturesx);
 		};
 		if (next.hasNature("poison")) delete next._triggered;
-		else if(next.unreal) next._triggered = 2;
+		else if (next.unreal) next._triggered = 2;
 		next.setContent("damage");
 		next.filterStop = function () {
 			if (this.source && this.source.isDead()) delete this.source;

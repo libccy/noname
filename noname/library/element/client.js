@@ -3,12 +3,14 @@ import { game } from "../../game/index.js";
 import { lib } from "../index.js";
 import { _status } from "../../status/index.js";
 import { ui } from "../../ui/index.js";
+import security from "../../util/security.js";
 
 export class Client {
 	/**
 	 * @param {import('../index.js').NodeWS | InstanceType<typeof import('ws').WebSocket> | Client} ws
+	 * @param {boolean} temp
 	 */
-	constructor(ws) {
+	constructor(ws, temp = false) {
 		if (ws instanceof Client) throw new Error("Client cannot copy.");
 		this.ws = ws;
 		/**
@@ -17,6 +19,22 @@ export class Client {
 		// @ts-ignore
 		this.id = ws.wsid || get.id();
 		this.closed = false;
+
+		if (!temp) {
+			this.sandbox = security.createSandbox();
+			if (this.sandbox) {
+				Reflect.defineProperty(this, "sandbox", {
+					value: this.sandbox,
+					writable: false,
+					configurable: false,
+				});
+				Reflect.defineProperty(this.sandbox, "client", {
+					value: this,
+					writable: false,
+					configurable: false,
+				});
+			}
+		}
 	}
 	send() {
 		if (this.closed) return this;

@@ -10,6 +10,7 @@ import * as config from "../util/config.js";
 import { promiseErrorHandlerMap } from "../util/browser.js";
 import { importCardPack, importCharacterPack, importExtension, importMode } from "./import.js";
 import { onload } from "./onload.js";
+import { initializeSandboxRealms } from "../util/initRealms.js";
 
 // 判断是否从file协议切换到http/s协议
 export function canUseHttpProtocol() {
@@ -124,6 +125,9 @@ export async function boot() {
 	// 加载polyfill内容
 	await import("./polyfill.js");
 
+	// 初始化沙盒的Realms
+	await initializeSandboxRealms();
+
 	// 设定游戏加载时间，超过时间未加载就提醒
 	const configLoadTime = localStorage.getItem(lib.configprefix + "loadtime");
 	// 现在不暴露到全局变量里了，直接传给onload
@@ -232,6 +236,7 @@ export async function boot() {
 				await window.initReadWriteFunction(g).catch((e) => {
 					console.error("文件读写函数初始化失败:", e);
 				});
+				delete window.initReadWriteFunction; // 后续用不到了喵
 			}
 			window.onbeforeunload = function () {
 				if (config.get("confirm_exit") && !_status.reloading) {
@@ -242,6 +247,13 @@ export async function boot() {
 			};
 		}
 	}
+
+	// 初始化security
+	const securityModule = await import("../util/security.js");
+	const security = securityModule.default;
+	security.initSecurity({
+		lib, game, ui, get, ai, _status, gnc,
+	});
 
 	const loadCssPromise = loadCss();
 	const loadConfigPromise = loadConfig();
@@ -478,7 +490,7 @@ export async function boot() {
 				//var backup_onload=lib.init.onload;
 				_status.evaluatingExtension = true;
 				try {
-					eval(extcontent);
+					security.eval(extcontent); // 喵？
 				} catch (e) {
 					console.log(e);
 				}
