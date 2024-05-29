@@ -1229,6 +1229,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 							return;
 						}
 
+						// 
 						control.overrideParameter("target", window);
 					})
 					.start();
@@ -1260,21 +1261,27 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 			 */
 			let fun
 			if (security.isSandboxRequired()) {
-				fun = security.eval(`
-					const _status=window._status;
-					const lib=window.lib;
-					const game=window.game;
-					const ui=window.ui;
-					const get=window.get;
-					const ai=window.ai;
-					// const cheat=window.lib.cheat; // 不再允许使用 cheat，因为它是不允许访问的变量
-					//使用正则匹配绝大多数的普通obj对象，避免解析成代码块。
-					const reg=${/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/};
-					return function(value){
-						"use strict";
-						return eval(reg.test(value)?('('+value+')'):value);
-					};
-				`);
+				const reg = /^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/;
+				fun = function (value) {
+					const exp = reg.test(value) ? `(${value})` : value;
+					const expName = "_" + Math.random().toString().slice(2);
+					return security.exec(`return eval(${expName})`, { window: proxyWindow, [expName]: exp });
+				};
+				// security.exec(`
+				// 	const _status=window._status;
+				// 	const lib=window.lib;
+				// 	const game=window.game;
+				// 	const ui=window.ui;
+				// 	const get=window.get;
+				// 	const ai=window.ai;
+				// 	// const cheat=window.lib.cheat; // 不再允许使用 cheat，因为它是不允许访问的变量
+				// 	//使用正则匹配绝大多数的普通obj对象，避免解析成代码块。
+				// 	const reg=${/^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/};
+				// 	return function(value){
+				// 		"use strict";
+				// 		return eval(reg.test(value)?('('+value+')'):value);
+				// 	};
+				// `, { window: proxyWindow });
 			} else {
 				fun = (new Function('window', `
 					const _status=window._status;

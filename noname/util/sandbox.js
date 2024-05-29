@@ -3101,9 +3101,11 @@ class Sandbox {
 	/** @type {Document?} */
 	#domainDocument;
 	/** @type {typeof Object} */
-	#domainObject = Object;
+	#domainObject;
 	/** @type {typeof Function} */
-	#domainFunction = Function;
+	#domainFunction;
+	/** @type {typeof Function} */
+	#domainEval;
 
 	/**
 	 * ```plain
@@ -3128,9 +3130,10 @@ class Sandbox {
 		this.#domainDocument = null; // 默认不开放DOM，而且我们也缺少BrowserContext
 		this.#domainObject = this.#domainWindow.Object;
 		this.#domainFunction = this.#domainWindow.Function;
+		this.#domainEval = this.#domainWindow.eval;
 		Sandbox.#domainMap.set(this.#domain, this);
-		Sandbox.#createScope(this);
 		Sandbox.#initDomainFunctions(this, this.#domainWindow);
+		Sandbox.#createScope(this);
 	}
 
 	/**
@@ -3207,6 +3210,31 @@ class Sandbox {
 		rewriteCtor(defaultGeneratorFunction.prototype, new Proxy(defaultGeneratorFunction, handler));
 		rewriteCtor(defaultAsyncFunction.prototype, new Proxy(defaultAsyncFunction, handler));
 		rewriteCtor(defaultAsyncGeneratorFunction.prototype, new Proxy(defaultAsyncGeneratorFunction, handler));
+	}
+
+	/**
+	 * ```plain
+	 * 替代原本的eval函数，阻止访问原生的 window 对象
+	 * ```
+	 * 
+	 * @param {Window} trueWindow
+	 * @param {(x: string) => any} _eval 
+	 * @param {Proxy} intercepter 
+	 * @param {Window} global 
+	 * @param {any} x 
+	 */
+	static #wrappedEval = function (trueWindow, _eval, intercepter, global, x) {
+		const intercepterName = Sandbox.#makeName("_", trueWindow);
+		const evalName = Sandbox.#makeName("_", global);
+		const codeName = Sandbox.#makeName("_", global);
+		trueWindow[intercepterName] = intercepter;
+		global[evalName] = _eval;
+		global[codeName] = x;
+		const result = _eval(`with(${intercepterName}){with(window){${evalName}("use strict;"+${codeName})}}`);
+		delete global[codeName];
+		delete global[evalName];
+		delete trueWindow[intercepterName];
+		return result;
 	}
 
 	/**
@@ -3306,8 +3334,8 @@ class Sandbox {
 		 * ```
 		 */
 		const builtins = {
-			Object: this.#domainObject,
-			Function: this.#domainFunction,
+			Object: this.#domainWindow.Object,
+			Function: this.#domainWindow.Function,
 			Array: this.#domainWindow.Array,
 			Math: this.#domainWindow.Math,
 			Date: this.#domainWindow.Date,
@@ -3332,7 +3360,7 @@ class Sandbox {
 			Reflect: this.#domainWindow.Reflect,
 			BigInt: this.#domainWindow.BigInt,
 			JSON: this.#domainWindow.JSON,
-			eval: this.#domainWindow.eval,
+			// eval: this.#domainWindow.eval, // 我们另外定义 `eval` 函数
 			setTimeout: this.#domainWindow.setTimeout,
 			clearTimeout: this.#domainWindow.clearTimeout,
 			setInterval: this.#domainWindow.setInterval,
@@ -3446,6 +3474,7 @@ class Sandbox {
 		const writeContextAction = { exists: 0, extend: 1, all: 2 }[writeContext] || 0;
 
 		let argumentList;
+		let wrappedEval;
 
 		const raw = new thiz.#domainFunction("_", `with(_){with(window){with(${contextName}){return(()=>{"use strict";return(${applyName}(function(${parameters}){\n// 沙盒代码起始\n${code}\n// 沙盒代码结束\n},${contextName}.this,${argsName}))})()}}}`);
 
@@ -3473,8 +3502,12 @@ class Sandbox {
 				if (p === Symbol.unscopables)
 					return undefined;
 
-				if (!(p in target))
+				if (!(p in target)) {
+					if (p === "eval")
+						return wrappedEval; // 返回我们封装的 `eval` 函数
+
 					throw new domainWindow.ReferenceError(`${String(p)} is not defined`);
+				}
 
 				return target[p];
 			},
@@ -3487,9 +3520,12 @@ class Sandbox {
 			},
 		});
 
+		wrappedEval = Sandbox.#wrappedEval.bind(null,
+			thiz.#domainWindow, thiz.#domainEval, intercepter, scope);
+
 		// 构建陷入的沙盒闭包
 		// 同时对返回值进行封送
-		return ((...args) => {
+		return ((/** @type {any} */ ...args) => {
 			const prevDomain = Domain.current;
 			const domainAction = () => {
 				// 指定执行域

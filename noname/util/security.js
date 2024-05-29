@@ -2,7 +2,7 @@
 // 但沙盒不会也没有办法维护恶意服务器/房主对于游戏规则的破坏，请玩家尽量选择官方或其他安全的服务器，同时选择一个受信任的玩家作为房主
 
 // 是否强制所有模式下使用沙盒
-const SANDBOX_FORCED = false;
+const SANDBOX_FORCED = true;
 // 是否启用自动测试
 const SANDBOX_AUTOTEST = false;
 // 是否禁用自动测试延迟
