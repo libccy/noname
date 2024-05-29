@@ -1635,9 +1635,12 @@ const skills = {
 					return target.countCards("he") > 0 && target != player;
 				})
 				.set("ai", target => {
-					var player = _status.event.player;
-					if (_status.event.goon) return get.attitude(player, target) * Math.sqrt(target.countCards("he"));
-					return (-get.attitude(player, target) / (target.countCards("he") + 1)) * 10;
+					var player = _status.event.player, att = get.attitude(player, target);
+					if (_status.event.goon) {
+						if (att > 0) return att * Math.sqrt(target.countCards("he"));
+						return (1 - att) / (target.countCards("he") + 1);
+					}
+					return -10 * att / (target.countCards("he") + 1);
 				})
 				.set("goon", player.countCards("hs", card => player.hasValueTarget(card)) >= 2);
 			"step 1";
@@ -1661,6 +1664,14 @@ const skills = {
 		},
 		subSkill: {
 			effect: {
+				mod: {
+					aiOrder(player, card, num) {
+						if (num <= 0 || !player.getExpansions("rekuangbi_effect").length) return;
+						let suit = get.suit(card);
+						if (player.getExpansions("rekuangbi_effect").some(i => get.suit(i) == suit)) return num + 10;
+						return num / 4;
+					}
+				},
 				trigger: { player: "useCard" },
 				charlotte: true,
 				forced: true,

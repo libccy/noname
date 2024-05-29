@@ -240,6 +240,7 @@ const skills = {
 		selectCard: 2,
 		position: "hes",
 		viewAs: { name: "juedou" },
+		selectTarget: 2,
 		viewAsFilter(player) {
 			if (player.countCards("hes") < 2) return false;
 		},

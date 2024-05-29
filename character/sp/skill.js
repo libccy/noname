@@ -663,7 +663,7 @@ const skills = {
 						cards = moved[0].slice();
 						if (cards.length) {
 							await game.cardsGotoOrdering(cards);
-							for (let i = cards.length - 1; i--; i >= 0) {
+							for (let i = cards.length - 1; i >= 0; i--) {
 								ui.cardPile.insertBefore(cards[i], ui.cardPile.firstChild);
 							}
 							game.log(cards, "被放回了牌堆顶");
@@ -687,7 +687,7 @@ const skills = {
 								cards = hs.slice();
 								if (cards.length) {
 									await game.cardsGotoOrdering(cards);
-									for (let i = cards.length - 1; i--; i >= 0) {
+									for (let i = cards.length - 1; i >= 0; i--) {
 										ui.cardPile.insertBefore(cards[i], ui.cardPile.firstChild);
 									}
 									game.log(cards, "被放回了牌堆顶");
@@ -25173,7 +25173,12 @@ const skills = {
 		usable: 1,
 		content: function () {
 			"step 0";
-			player.judge();
+			player.judge(card => {
+				if (game.hasPlayer(cur => {
+					return get.event("player").canUse("sha", cur);
+				})) return get.number(card);
+				return 1 / get.number(card);
+			});
 			"step 1";
 			player.storage.qiangwu = result.number;
 			player.addTempSkill("qiangwu3", "phaseUseEnd");
