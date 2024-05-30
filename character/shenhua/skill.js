@@ -4219,7 +4219,7 @@ const skills = {
 				let name = _status.characterlist[i];
 				if (name.indexOf("zuoci") != -1 || name.indexOf("key_") == 0 || name.indexOf("sp_key_") == 0 || lib.skill.rehuashen.banned.includes(name) || player.storage.huashen.owned[name]) continue;
 				let skills = lib.character[name][3].filter(skill => {
-					const categories = get.skillCategoriesOf(skill);
+					const categories = get.skillCategoriesOf(skill, player);
 					return !categories.some(type => lib.skill.rehuashen.bannedType.includes(type));
 				});
 				if (skills.length) {
