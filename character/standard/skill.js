@@ -42,6 +42,7 @@ const skills = {
 		unique: true,
 		limited: true,
 		audio: "xiongyi",
+		enable: "phaseUse",
 		filterTarget: true,
 		selectTarget: [1, Infinity],
 		skillAnimation: true,
@@ -51,6 +52,7 @@ const skills = {
 			const targets = event.targets.sortBySeat();
 			let keep = true;
 			while (true) {
+				let stop = false;
 				for (const target of targets) {
 					let next = target
 						.chooseToUse(function (card) {
@@ -63,9 +65,13 @@ const skills = {
 						});
 					if (!keep) next.set("prompt2", "若你不使用，则结束此流程");
 					const result = await next.forResult();
-					if (!result.bool && !keep) break;
-					if (targets[targets.length - 1] == target && !keep) keep = true;
+					if (!result.bool && !keep) {
+						stop = true;
+						break;
+					}
 				}
+				if (keep) keep = false;
+				if (stop) break;
 			}
 		},
 		ai: {
