@@ -11574,30 +11574,8 @@ const skills = {
 		},
 	},
 	xinfu_xingzhao: {
-		audio: true,
+		audio: 2,
 		group: ["xz_xunxun", "xinfu_xingzhao2", "xinfu_xingzhao3"],
-		mark: true,
-		intro: {
-			content: function (storage, player) {
-				var num = game.countPlayer(function (current) {
-					return current.isDamaged();
-				});
-				var str = "<li>造成的伤害+1";
-				if (num >= 1) {
-					str = "<li>视为拥有技能“恂恂”";
-				}
-				if (num >= 2) {
-					str += "<br><li>装备牌进入或离开你的装备区时摸一张牌";
-				}
-				if (num >= 3) {
-					str += "<br><li>始终跳过弃牌阶段";
-				}
-				if (num >= 4) {
-					str += "<br><li>造成的伤害+1";
-				}
-				return str;
-			},
-		},
 		trigger: {
 			player: "loseAfter",
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -11622,9 +11600,32 @@ const skills = {
 		content: function () {
 			player.draw();
 		},
+		derivation: "xz_xunxun",
+		mark: true,
+		intro: {
+			content: function (storage, player) {
+				var num = game.countPlayer(function (current) {
+					return current.isDamaged();
+				});
+				var str = "<li>造成的伤害+1";
+				if (num >= 1) {
+					str = "<li>视为拥有技能“恂恂”";
+				}
+				if (num >= 2) {
+					str += "<br><li>装备牌进入或离开你的装备区时摸一张牌";
+				}
+				if (num >= 3) {
+					str += "<br><li>始终跳过弃牌阶段";
+				}
+				if (num >= 4) {
+					str += "<br><li>造成的伤害+1";
+				}
+				return str;
+			},
+		},
 	},
 	xinfu_xingzhao2: {
-		audio: true,
+		audio: "xinfu_xingzhao",
 		trigger: {
 			player: ["phaseJudgeBefore", "phaseDiscardBefore"],
 		},
