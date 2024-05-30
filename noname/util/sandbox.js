@@ -7,7 +7,7 @@
 
 // 最后为安全考虑，请遵守规范，尽量不要使用 `eval` 函数而是使用 `security.exec2` 来替代
 
-import { SANDBOX_EXPORT } from "./initRealms.js";
+import { SANDBOX_EXPORT, isSandboxEnabled } from "./initRealms.js";
 
 // 很重要的事情！
 // 请不要在在其他文件中import sandbox.js！
@@ -16,8 +16,8 @@ import { SANDBOX_EXPORT } from "./initRealms.js";
 
 /** @typedef {any} Window */
 
-// 方便开关确定沙盒的问题喵
-const SANDBOX_ENABLED = true;
+// 新的开关放到了 "./initRealms.js" 里面，请不要改动此处！
+const SANDBOX_ENABLED = isSandboxEnabled();
 
 // 暴露方法Symbol，用于类之间通信
 const SandboxExposer = Symbol("Sandbox.Exposer"); // 实例暴露
