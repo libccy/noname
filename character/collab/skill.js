@@ -2,6 +2,61 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//会玩孙权
+	dchuiwan: {
+		audio: 2,
+		trigger: { player: "drawBegin" },
+		filter(event, player) {
+			return lib.inpile.some(name => {
+				const type = get.type(name);
+				if (type != "basic" && type != "trick") return false;
+				return !player.getStorage("dchuiwan_used").includes(name);
+			});
+		},
+		async cost(event, trigger, player) {
+			let result = await player
+				.chooseButton(
+					[
+						get.prompt2("dchuiwan"),
+						[
+							lib.inpile.filter(name => {
+								const type = get.type(name);
+								if (type != "basic" && type != "trick") return false;
+								return !player.getStorage("dchuiwan_used").includes(name);
+							}),
+							"vcard",
+						],
+					],
+					[1, trigger.num]
+				)
+				.set("ai", button => {
+					if (!get.cardPile2(button.link[2])) return 0;
+					return get.value({ name: button.link[2] }, get.event("player"));
+				})
+				.forResult();
+			if (result.bool) {
+				result.cost_data = result.links;
+			}
+			event.result = result;
+		},
+		async content(event, trigger, player) {
+			trigger.cancel();
+			if (!player.storage.dchuiwan_used) {
+				player.when({ global: "phaseAfter" }).then(() => delete player.storage.dchuiwan_used);
+			}
+			player.markAuto(
+				"dchuiwan_used",
+				event.cost_data.map(name => name[2])
+			);
+			let list = [];
+			for (const name of event.cost_data) {
+				const card = get.cardPile2(name[2]);
+				if (card) list.push(card);
+			}
+			if (list.length) await player.gain(list, "gain2");
+			else player.chat("无牌可得？！");
+		},
+	},
 	//名将吴懿
 	dcbenxi: {
 		trigger: {
