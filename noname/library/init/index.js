@@ -11,6 +11,8 @@ import { GameEvent } from "../element/gameEvent.js";
 import { GameEventPromise } from "../element/gameEventPromise.js";
 import { rootURL } from "../../../noname.js";
 
+import security from "../../util/security.js";
+
 export class LibInit {
 	/**
 	 * 部分函数的Promise版本
@@ -140,8 +142,15 @@ export class LibInit {
 				if (!Array.isArray(message) || typeof lib.message.server[message[0]] !== "function") {
 					throw "err";
 				}
-				for (var i = 1; i < message.length; i++) {
-					message[i] = get.parsedResult(message[i]);
+				// @ts-ignore
+				if (client.sandbox) security.enterSandbox(client.sandbox);
+				try {
+					for (var i = 1; i < message.length; i++) {
+						message[i] = get.parsedResult(message[i]);
+					}
+				} finally {
+					// @ts-ignore
+					if (client.sandbox) security.exitSandbox();
 				}
 			} catch (e) {
 				console.log(e);
@@ -283,7 +292,7 @@ export class LibInit {
 				if (data.includes("sojson") || data.includes("jsjiami") || data.includes("var _0x")) alert(`检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${pathToRead}`);
 			}
 			try {
-				window.eval(data);
+				security.eval(data);
 				if (typeof onLoad == "function") onLoad();
 			} catch (error) {
 				if (typeof onError == "function") onError(error);
@@ -584,15 +593,25 @@ export class LibInit {
 	 * @returns
 	 */
 	parsex(item, scope) {
+		// 虽然现在 parsex 被控制到了沙盒，
+		// 但是因为默认沙盒还是可以额外操作东西，
+		// 故而对不同的运行域做了区分
+		let [
+			ModFunction,
+			ModGeneratorFunction,
+			// ModAsyncFunction,
+			// ModAsyncGeneratorFunction,
+		] = security.getIsolatedsFrom(item);
+
 		//by 诗笺、Tipx-L
 		/**
 		 * @param {Function} func
 		 */
 		function Legacy(func) {
+			const { Marshal } = security.importSandbox();
 			//Remove all comments
 			//移除所有注释
-			let str = func
-				.toString()
+			let str = Marshal.decompileFunction(func)
 				.replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^/"'\\\s]*)/gm, "$2")
 				.trim();
 			//获取第一个 { 后的所有字符
@@ -608,7 +627,7 @@ export class LibInit {
 				debuggerCopy = debuggerCopy.slice(0, debuggerSkip + debuggerResult.index) + insertDebugger + debuggerCopy.slice(debuggerSkip + debuggerResult.index + debuggerResult[0].length, -1);
 				//测试是否有错误
 				try {
-					new GeneratorFunction(debuggerCopy);
+					new ModGeneratorFunction(debuggerCopy);
 					str = debuggerCopy + "}";
 					debuggerSkip += debuggerResult.index + insertDebugger.length;
 					hasDebugger = true;
@@ -635,7 +654,7 @@ export class LibInit {
 					copy = copy.slice(0, skip + result.index) + insertStr + copy.slice(skip + result.index + result[0].length);
 					//测试是否有错误
 					try {
-						new (hasDebugger ? GeneratorFunction : Function)(copy);
+						new (hasDebugger ? ModGeneratorFunction : ModFunction)(copy);
 						str = copy;
 						skip += result.index + insertStr.length;
 					} catch (error) {
@@ -647,11 +666,12 @@ export class LibInit {
 				str = `if(event.step==${k}){event.finish();return;}` + str;
 			}
 			if (!scope) {
-				return new (hasDebugger ? GeneratorFunction : Function)("event", "step", "source", "player", "target", "targets", "card", "cards", "skill", "forced", "num", "trigger", "result", "_status", "lib", "game", "ui", "get", "ai", str);
+				return new (hasDebugger ? ModGeneratorFunction : ModFunction)("event", "step", "source", "player", "target", "targets", "card", "cards", "skill", "forced", "num", "trigger", "result", "_status", "lib", "game", "ui", "get", "ai", str);
 			} else {
-				return scope(`function${hasDebugger ? "*" : ""} anonymous(event,step,source,player,target,targets,
+				new (hasDebugger ? ModGeneratorFunction : ModFunction)(str); // 防止注入喵
+				return scope(`(function${hasDebugger ? "*" : ""}(event,step,source,player,target,targets,
 						card,cards,skill,forced,num,trigger,result,
-						_status,lib,game,ui,get,ai){${str}}; anonymous;`);
+						_status,lib,game,ui,get,ai){${str}})`);
 			}
 		}
 		switch (typeof item) {
@@ -687,7 +707,8 @@ export class LibInit {
 					};
 				} else {
 					if (Symbol.iterator in item) return lib.init.parsex(Array.from(item));
-					if (item.toString !== Object.prototype.toString) return lib.init.parsex(item.toString());
+					// 根据狂神喵的建议，禁用parsex接受字符串喵
+					// if (item.toString !== Object.prototype.toString) return lib.init.parsex(item.toString());
 					if ("render" in item) {
 						// TODO: Object Render Parse
 						throw new Error("NYI: Object Render Parse");
@@ -744,22 +765,22 @@ export class LibInit {
 					content._gen = true;
 					return content;
 				} else if (item._parsed) return item;
-			// falls through
-			default:
 				return Legacy(item);
+			default:
+				throw new TypeError("为确保安全禁止用parsex解析字符串");
 		}
 	}
 
 	eval(func) {
 		if (typeof func == "function") {
-			return eval("(" + func.toString() + ")");
+			return security.eval(`return (${func.toString()});`);
 		} else if (typeof func == "object") {
 			for (var i in func) {
 				if (Object.prototype.hasOwnProperty.call(func, i)) {
 					if (typeof func[i] == "function") {
 						let checkObject = {};
 						checkObject[i] = func[i];
-						return eval(`(function(){return ${get.stringify(checkObject)};})()`)[i];
+						return security.eval(`return ${get.stringify(checkObject)};`)[i];
 					} else {
 						func[i] = lib.init.eval(func[i]);
 					}

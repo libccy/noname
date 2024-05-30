@@ -22,6 +22,8 @@ import { DynamicStyle } from "./dynamic-style/index.js";
 import { GamePromises } from "./promises.js";
 import { Check } from "./check.js";
 
+import security from "../util/security.js";
+
 export class Game {
 	online = false;
 	onlineID = null;
@@ -1282,6 +1284,16 @@ export class Game {
 		}
 	}
 	/**
+	 * ```plain
+	 * 进入沙盒运行模式
+	 * ```
+	 * 
+	 * @param { string } ip 
+	 */
+	requireSandboxOn(ip = "") {
+		security.requireSandboxOn(ip);
+	}
+	/**
 	 * @param { string } ip
 	 * @param { (result: boolean) => any } callback
 	 */
@@ -1312,6 +1324,7 @@ export class Game {
 			if (callback) callback(false);
 			return;
 		}
+		game.sandbox = security.createSandbox();
 		game.ws.onopen = lib.element.ws.onopen;
 		game.ws.onmessage = lib.element.ws.onmessage;
 		game.ws.onerror = lib.element.ws.onerror;
@@ -1333,7 +1346,7 @@ export class Game {
 	 * @param {*} message
 	 */
 	sendTo(id, message) {
-		return new lib.element.Client(new lib.element.NodeWS(id)).send(message);
+		return new lib.element.Client(new lib.element.NodeWS(id), true).send(message);
 	}
 	createServer() {
 		lib.node.clients = [];
@@ -1455,7 +1468,7 @@ export class Game {
 	 * @param { boolean } [options.addVideo = true]
 	 * @returns
 	 */
-	tryAudio({ audioList, autoplay = true, random = true, addVideo=true}) {
+	tryAudio({ audioList, autoplay = true, random = true, addVideo = true }) {
 		/**
 		 * @type {string}
 		 */
@@ -2038,8 +2051,8 @@ export class Game {
 				);
 			}
 			const blob = zip.generate({
-					type: "blob",
-				}),
+				type: "blob",
+			}),
 				fileNameToSaveAs = `${exportExtension.replace(/\\|\/|:|\?|"|\*|<|>|\|/g, "-")}.zip`;
 
 			if (lib.device) {
@@ -2135,8 +2148,8 @@ export class Game {
 			_status.importingExtension = true;
 			try {
 				// 导入普通扩展
-				eval(str);
-				// esm扩展可以不写game.impoprt或许会导致_status.extensionLoading不存在
+				security.eval(str);
+				// esm扩展可以不写game.import或许会导致_status.extensionLoading不存在
 				if (Array.isArray(_status.extensionLoading)) {
 					await Promise.allSettled(_status.extensionLoading);
 					delete _status.extensionLoading;
@@ -3964,7 +3977,7 @@ export class Game {
 			}
 		}
 		if (!callback) {
-			callback = function () {};
+			callback = function () { };
 		}
 		//try{
 		//	if(noinput){
@@ -5453,6 +5466,8 @@ export class Game {
 				newvid.name1 = newvid.name2.slice(10, newvid.name1.lastIndexOf("_"));
 			}
 			lib.videos.unshift(newvid);
+			// 清洗代理对象
+			newvid.video = structuredClone(newvid.video);
 			store.put(newvid);
 			ui.create.videoNode(newvid, true);
 		}
@@ -7695,7 +7710,8 @@ export class Game {
 			);
 		lib.status.reload++;
 		return new Promise((resolve, reject) => {
-			const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).put(value, idbValidKey);
+			const record = lib.db.transaction([storeName], "readwrite")
+				.objectStore(storeName).put(structuredClone(value), idbValidKey);
 			record.onerror = event => {
 				if (typeof onError == "function") {
 					onError(event);
@@ -7753,59 +7769,59 @@ export class Game {
 		return new Promise(
 			query
 				? (resolve, reject) => {
-						lib.status.reload++;
-						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).get(query);
-						idbRequest.onerror = event => {
-							if (typeof onError == "function") {
-								onError(event);
-								game.reload2();
-								resolve();
-							} else {
-								game.reload2();
-								reject(event);
-							}
-						};
-						idbRequest.onsuccess = event => {
-							const result = event.target.result;
-							if (typeof onSuccess == "function") {
-								_status.dburgent = true;
-								onSuccess(result);
-								delete _status.dburgent;
-							}
+					lib.status.reload++;
+					const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).get(query);
+					idbRequest.onerror = event => {
+						if (typeof onError == "function") {
+							onError(event);
 							game.reload2();
-							resolve(result);
-						};
-					}
+							resolve();
+						} else {
+							game.reload2();
+							reject(event);
+						}
+					};
+					idbRequest.onsuccess = event => {
+						const result = event.target.result;
+						if (typeof onSuccess == "function") {
+							_status.dburgent = true;
+							onSuccess(result);
+							delete _status.dburgent;
+						}
+						game.reload2();
+						resolve(result);
+					};
+				}
 				: (resolve, reject) => {
-						lib.status.reload++;
-						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
-							object = {};
-						idbRequest.onerror = event => {
-							if (typeof onError == "function") {
-								onError(event);
-								game.reload2();
-								resolve();
-							} else {
-								game.reload2();
-								reject(event);
-							}
-						};
-						idbRequest.onsuccess = event => {
-							const result = event.target.result;
-							if (result) {
-								object[result.key] = result.value;
-								result.continue();
-								return;
-							}
-							if (typeof onSuccess == "function") {
-								_status.dburgent = true;
-								onSuccess(object);
-								delete _status.dburgent;
-							}
+					lib.status.reload++;
+					const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
+						object = {};
+					idbRequest.onerror = event => {
+						if (typeof onError == "function") {
+							onError(event);
 							game.reload2();
-							resolve(object);
-						};
-					}
+							resolve();
+						} else {
+							game.reload2();
+							reject(event);
+						}
+					};
+					idbRequest.onsuccess = event => {
+						const result = event.target.result;
+						if (result) {
+							object[result.key] = result.value;
+							result.continue();
+							return;
+						}
+						if (typeof onSuccess == "function") {
+							_status.dburgent = true;
+							onSuccess(object);
+							delete _status.dburgent;
+						}
+						game.reload2();
+						resolve(object);
+					};
+				}
 		);
 	}
 	/**
@@ -7842,45 +7858,45 @@ export class Game {
 			);
 		return query
 			? new Promise((resolve, reject) => {
-					lib.status.reload++;
-					const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).delete(query);
-					record.onerror = event => {
-						if (typeof onError == "function") {
-							onError(event);
-							game.reload2();
-							resolve();
-						} else {
-							game.reload2();
-							reject(event);
-						}
-					};
-					record.onsuccess = event => {
-						if (typeof onSuccess == "function") onSuccess(event);
+				lib.status.reload++;
+				const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).delete(query);
+				record.onerror = event => {
+					if (typeof onError == "function") {
+						onError(event);
 						game.reload2();
-						resolve(event);
-					};
-				})
+						resolve();
+					} else {
+						game.reload2();
+						reject(event);
+					}
+				};
+				record.onsuccess = event => {
+					if (typeof onSuccess == "function") onSuccess(event);
+					game.reload2();
+					resolve(event);
+				};
+			})
 			: game.getDB(storeName).then(object => {
-					const keys = Object.keys(object);
-					lib.status.reload += keys.length;
-					const store = lib.db.transaction([storeName], "readwrite").objectStore(storeName);
-					return Promise.allSettled(
-						keys.map(
-							key =>
-								new Promise((resolve, reject) => {
-									const request = store.delete(key);
-									request.onerror = event => {
-										game.reload2();
-										reject(event);
-									};
-									request.onsuccess = event => {
-										game.reload2();
-										resolve(event);
-									};
-								})
-						)
-					);
-				});
+				const keys = Object.keys(object);
+				lib.status.reload += keys.length;
+				const store = lib.db.transaction([storeName], "readwrite").objectStore(storeName);
+				return Promise.allSettled(
+					keys.map(
+						key =>
+							new Promise((resolve, reject) => {
+								const request = store.delete(key);
+								request.onerror = event => {
+									game.reload2();
+									reject(event);
+								};
+								request.onsuccess = event => {
+									game.reload2();
+									resolve(event);
+								};
+							})
+					)
+				);
+			});
 	}
 	/**
 	 * @param { string } key
