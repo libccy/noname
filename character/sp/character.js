@@ -2,7 +2,7 @@ const characters = {
 	caimao: ["male", "wei", 4, ["olzuolian", "oljingzhou"]],
 	ol_peixiu: ["male", "wei", 4, ["olmaozhu", "oljinlan"]],
 	yadan: ["male", "qun", 4, ["olqingya", "oltielun"]],
-	sp_sunce: ["male", "qun", 4, ["olliantao"]],
+	sp_sunce: ["male", "qun", 4, ["junkliantao"]],
 	ol_liupi: ["male", "qun", 4, ["olyicheng"]],
 	ol_lukai: ["male", "wu", 3, ["olxuanzhu", "oljiane"]],
 	liupan: ["male", "qun", 4, ["olpijing"]],

@@ -47,7 +47,7 @@ const characters = {
 	dc_sp_jiaxu: ["male", "wei", 3, ["zhenlue", "dcjianshu", "dcyongdi"]],
 	leibo: ["male", "qun", 4, ["dcsilve", "dcshuaijie"]],
 	gongsundu: ["male", "qun", 4, ["dczhenze", "dcanliao"]],
-	panghui: ["male", "wei", 5, ["dcyiyong"]],
+	panghui: ["male", "wei", 5, ["dcyiyong", "dcsuchou"]],
 	dc_yuejiu: ["male", "qun", 4, ["dccuijin"]],
 	chenjiao: ["male", "wei", 3, ["dcxieshou", "dcqingyan", "dcqizi"]],
 	wanglie: ["male", "qun", 3, ["dcchongwang", "dchuagui"]],
