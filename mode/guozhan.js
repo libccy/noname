@@ -24133,8 +24133,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#gz_sunjian:die": "有埋伏！呃……啊！！",
 			"#gz_xiaoqiao:die": "公瑾，我先走一步……",
 			"#gz_re_taishici:die": "无妄之灾，难以避免……",
-			"#buqu1": "哼，这点小伤算什么！",
-			"#gz_zhoutai:die": "敌众我寡，无力回天……",
 			"#guzheng2": "固国安邦，居当如是！",
 			"#gz_zhangzhang:die": "竭力尽智，死而无憾……",
 			"#gz_dingfeng:die": "这风，太冷了……",
