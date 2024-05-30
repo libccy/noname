@@ -4,7 +4,7 @@ export default {
 	"#re_huangzhong:die": "真哉，老将无用矣……",
 	"#gzbuqu1": "还不够！",
 	"#gzbuqu2": "我绝不会倒下！",
-	"#gz_zhoutai:die": "已经，尽力了……",
+	"#old_zhoutai:die": "已经，尽力了……",
 	"#jushou1": "我先休息一会！",
 	"#jushou2": "尽管来吧！",
 	"#duanliang1_re_xuhuang1": "粮不三载，敌军已犯行军大忌。",

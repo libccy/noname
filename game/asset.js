@@ -637,7 +637,7 @@ window.noname_asset_list = [
 	"audio/die/ol_lukai.mp3",
 	"audio/die/ol_lusu.mp3",
 	"audio/die/xin_masu.mp3",
-	"audio/die/gz_zhoutai.mp3",
+	"audio/die/old_zhoutai.mp3",
 	"audio/die/old_huaxiong.mp3",
 	"audio/die/ol_mengda.mp3",
 	"audio/die/ol_pangde.mp3",
