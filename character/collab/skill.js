@@ -31,7 +31,7 @@ const skills = {
 				)
 				.set("ai", button => {
 					if (!get.cardPile2(button.link[2])) return 0;
-					return get.value({ name: button.link }, get.event("player"));
+					return get.value({ name: button.link[2] }, get.event("player"));
 				})
 				.forResult();
 			if (result.bool) {
