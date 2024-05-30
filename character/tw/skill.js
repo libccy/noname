@@ -8327,6 +8327,7 @@ const skills = {
 		forced: true,
 		content: function () {
 			trigger.directHit.addArray(game.players);
+			game.log(trigger.card, "不可被响应");
 		},
 		ai: { directHit_ai: true },
 	},
