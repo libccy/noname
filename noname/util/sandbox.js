@@ -7,7 +7,7 @@
 
 // 最后为安全考虑，请遵守规范，尽量不要使用 `eval` 函数而是使用 `security.exec2` 来替代
 
-import { SANDBOX_EXPORT } from "./initRealms.js";
+import { SANDBOX_EXPORT, isSandboxEnabled } from "./initRealms.js";
 
 // 很重要的事情！
 // 请不要在在其他文件中import sandbox.js！
@@ -16,8 +16,8 @@ import { SANDBOX_EXPORT } from "./initRealms.js";
 
 /** @typedef {any} Window */
 
-// 方便开关确定沙盒的问题喵
-const SANDBOX_ENABLED = true;
+// 新的开关放到了 "./initRealms.js" 里面，请不要改动此处！
+const SANDBOX_ENABLED = isSandboxEnabled();
 
 // 暴露方法Symbol，用于类之间通信
 const SandboxExposer = Symbol("Sandbox.Exposer"); // 实例暴露
@@ -382,6 +382,7 @@ const GLOBAL_PATHES = Object.freeze([
 	"/WeakRef",
 	"/WeakMap",
 	"/WeakSet",
+	["/Object/Symbol(Symbol.hasInstance)", "Object[Symbol.hasInstance]"],
 	"/Object/prototype",
 	"/Array/prototype",
 	"/Function/prototype",
@@ -2220,7 +2221,6 @@ class Marshal {
 			cloned = {};
 
 		Reflect.setPrototypeOf(cloned, null);
-		cloned["target"] = src;
 		return cloned;
 	}
 
@@ -2293,12 +2293,14 @@ class Marshal {
 
 		// 创建一个空白对象，防止JavaScript的一些奇怪错误
 		const pure = Marshal.#clonePureObject(target);
-		// 设置属性方便调试
-		pure.sourceDomain = sourceDomain;
-		pure.targetDomain = targetDomain;
 
 		// 创建封送代理
 		const proxy = new Proxy(pure, {
+			// 设置属性方便调试
+			// @ts-ignore
+			$target: target,
+			$sourceDomain: sourceDomain,
+			$targetDomain: targetDomain,
 			apply(_, thisArg, argArray) {
 				const defaultApply = () => {
 					const marshalledThis = Marshal.#marshal(thisArg, sourceDomain);
@@ -2400,7 +2402,19 @@ class Marshal {
 						return !!dispatched.returnValue;
 
 					// @ts-ignore
-					return Reflect.defineProperty(...args);
+					const success = Reflect.defineProperty(...args);
+
+					if (success && target === args[0]) {
+						// 为适配JavaScript对于代理的强制要求
+						// 我们要对空白对象模拟不可配置
+						// @ts-ignore
+						attributes = Reflect.getOwnPropertyDescriptor(...args);
+
+						if (!attributes.configurable)
+							Reflect.defineProperty(pure, args[1], attributes);
+					}
+
+					return success;
 				};
 
 				// `defineProperty`、`getOwnPropertyDescriptor`、`has` 都可能被JavaScript引擎重复调用
@@ -2587,7 +2601,18 @@ class Marshal {
 						return !!dispatched.returnValue;
 
 					// @ts-ignore
-					return Reflect.preventExtensions(...args);
+					const success = Reflect.preventExtensions(...args);
+
+					if (success && target === args[0]) {
+						// 为适配JavaScript对于代理的强制要求
+						// 我们要对空白对象进行模拟键
+						Reflect.ownKeys(target).forEach(key => {
+							pure[key] = undefined;
+						});
+						Reflect.preventExtensions(pure);
+					}
+
+					return success;
 				});
 			},
 			set(_, p, newValue, receiver) {
@@ -3212,29 +3237,50 @@ class Sandbox {
 		rewriteCtor(defaultAsyncGeneratorFunction.prototype, new Proxy(defaultAsyncGeneratorFunction, handler));
 	}
 
+	// /**
+	//  * ```plain
+	//  * 替代原本的eval函数，阻止访问原生的 window 对象
+	//  * ```
+	//  * 
+	//  * @param {Window} trueWindow
+	//  * @param {(x: string) => any} _eval 
+	//  * @param {Proxy} intercepter 
+	//  * @param {Window} global 
+	//  * @param {any} x 
+	//  */
+	// static #wrappedEval = function (trueWindow, _eval, intercepter, global, x) {
+	// 	const intercepterName = Sandbox.#makeName("_", trueWindow);
+	// 	const evalName = Sandbox.#makeName("_", global);
+	// 	const codeName = Sandbox.#makeName("_", global);
+	// 	trueWindow[intercepterName] = intercepter;
+	// 	global[evalName] = _eval;
+	// 	global[codeName] = x;
+	// 	const result = _eval(`with(${intercepterName}){with(window){${evalName}(\`"use strict";\${${codeName}}\`)}}`);
+	// 	delete global[codeName];
+	// 	delete global[evalName];
+	// 	delete trueWindow[intercepterName];
+	// 	return result;
+	// }
+
 	/**
 	 * ```plain
 	 * 替代原本的eval函数，阻止访问原生的 window 对象
 	 * ```
 	 * 
-	 * @param {Window} trueWindow
-	 * @param {(x: string) => any} _eval 
-	 * @param {Proxy} intercepter 
-	 * @param {Window} global 
+	 * @param {Sandbox} thiz 
 	 * @param {any} x 
+	 * @returns 
 	 */
-	static #wrappedEval = function (trueWindow, _eval, intercepter, global, x) {
-		const intercepterName = Sandbox.#makeName("_", trueWindow);
-		const evalName = Sandbox.#makeName("_", global);
-		const codeName = Sandbox.#makeName("_", global);
-		trueWindow[intercepterName] = intercepter;
-		global[evalName] = _eval;
-		global[codeName] = x;
-		const result = _eval(`with(${intercepterName}){with(window){${evalName}("use strict;"+${codeName})}}`);
-		delete global[codeName];
-		delete global[evalName];
-		delete trueWindow[intercepterName];
-		return result;
+	static #wrappedEval = function (thiz, x) {
+		let code = String(x).trim();
+
+		while (code.endsWith(";"))
+			code = code.slice(0, -1);
+
+		if (!/[;\n\r]$/.test(code))
+			code = `return (${code})`;
+
+		return thiz.exec(code);
 	}
 
 	/**
@@ -3476,7 +3522,7 @@ class Sandbox {
 		let argumentList;
 		let wrappedEval;
 
-		const raw = new thiz.#domainFunction("_", `with(_){with(window){with(${contextName}){return(()=>{"use strict";return(${applyName}(function(${parameters}){\n// 沙盒代码起始\n${code}\n// 沙盒代码结束\n},${contextName}.this,${argsName}))})()}}}`);
+		const raw = new thiz.#domainFunction("_", `with(_){with(window){with(${contextName}){return(${applyName}(function(${parameters}){"use strict";\n// 沙盒代码起始\n${code}\n// 沙盒代码结束\n},${contextName}.this,${argsName}))}}}`);
 
 		const domain = thiz.#domain;
 		const domainWindow = thiz.#domainWindow;
@@ -3520,8 +3566,9 @@ class Sandbox {
 			},
 		});
 
-		wrappedEval = Sandbox.#wrappedEval.bind(null,
-			thiz.#domainWindow, thiz.#domainEval, intercepter, scope);
+		// wrappedEval = Sandbox.#wrappedEval.bind(null,
+		// 	thiz.#domainWindow, thiz.#domainEval, intercepter, scope);
+		wrappedEval = Sandbox.#wrappedEval.bind(null, thiz);
 
 		// 构建陷入的沙盒闭包
 		// 同时对返回值进行封送

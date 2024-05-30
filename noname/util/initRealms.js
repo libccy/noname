@@ -1,5 +1,6 @@
-// 为了兼容无法使用顶级await的版本
-const iframe = document.createElement("iframe");
+// 方便开关确定沙盒的问题喵
+// 当此处为true、debug模式为启用、设备非苹果时，沙盒生效
+let SANDBOX_ENABLED = true;
 
 // 执行上下文传递函数，请勿动喵
 // 用于传递顶级execute context
@@ -38,7 +39,12 @@ function replaceName(path, name) {
 const TARGET_URL = replaceName(import.meta.url, "sandbox.js");
 const SANDBOX_EXPORT = {};
 
-async function initializeSandboxRealms() {
+async function initializeSandboxRealms(enabled) {
+    if (!enabled) {
+        SANDBOX_ENABLED = false;
+        return;
+    }
+
     const document = window.document;
     const createElement = document.createElement.bind(document);
     const appendChild = document.body.appendChild.bind(document.body);
@@ -86,10 +92,6 @@ async function initializeSandboxRealms() {
     script.src = TARGET_URL;
     script.type = "module";
 
-    // 无法同步载入
-    // script.async = false;
-    // script.defer = false;
-
     const promise = new Promise((resolve, reject) => {
         script.onload = resolve;
         script.onerror = reject;
@@ -111,7 +113,12 @@ async function initializeSandboxRealms() {
     iframe.remove();
 }
 
+function isSandboxEnabled() {
+    return SANDBOX_ENABLED;
+}
+
 export {
     initializeSandboxRealms,
+    isSandboxEnabled,
     SANDBOX_EXPORT,
 };

@@ -125,9 +125,6 @@ export async function boot() {
 	// 加载polyfill内容
 	await import("./polyfill.js");
 
-	// 初始化沙盒的Realms
-	await initializeSandboxRealms();
-
 	// 设定游戏加载时间，超过时间未加载就提醒
 	const configLoadTime = localStorage.getItem(lib.configprefix + "loadtime");
 	// 现在不暴露到全局变量里了，直接传给onload
@@ -248,13 +245,6 @@ export async function boot() {
 		}
 	}
 
-	// 初始化security
-	const securityModule = await import("../util/security.js");
-	const security = securityModule.default;
-	security.initSecurity({
-		lib, game, ui, get, ai, _status, gnc,
-	});
-
 	const loadCssPromise = loadCss();
 	const loadConfigPromise = loadConfig();
 	await loadCssPromise;
@@ -302,6 +292,18 @@ export async function boot() {
 			delete window.noname_asset_list;
 		}
 	}
+
+	const sandboxEnabled = !config.get("debug") && !get.is.safari();
+
+	// 初始化沙盒的Realms
+	await initializeSandboxRealms(sandboxEnabled);
+
+	// 初始化security
+	const securityModule = await import("../util/security.js");
+	const security = securityModule.default;
+	security.initSecurity({
+		lib, game, ui, get, ai, _status, gnc,
+	});
 
 	if (Reflect.get(window, "isNonameServer")) config.set("mode", "connect");
 
