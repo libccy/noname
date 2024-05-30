@@ -445,7 +445,7 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
-				.chooseTarget(get.prompt2("olliantao"), lib.filter.notMe)
+				.chooseTarget(get.prompt2(event.name.slice(0, -"_cost".length)), lib.filter.notMe)
 				.set("ai", target => {
 					const player = get.event("player"),
 						att = get.attitude(player, target);
@@ -555,6 +555,7 @@ const skills = {
 				.reduce((sum, evt) => sum + evt.num, 0);
 			if (num) await player.draw(num);
 			if (
+				event.name == "olliantao" &&
 				!game.hasPlayer2(current => {
 					return current.getHistory("damage", evt => {
 						return evt.getParent(4) == event;
@@ -564,6 +565,16 @@ const skills = {
 				await player.draw(3);
 				player.addTempSkill("olliantao_buff");
 				player.addMark("olliantao_buff", 3, false);
+			}
+			if (
+				event.name == "junkliantao" &&
+				!target.getHistory("damage", evt => {
+					return evt.getParent(4) == event;
+				}).length
+			) {
+				await player.draw();
+				player.addTempSkill("olliantao_buff");
+				player.addMark("olliantao_buff", 1, false);
 			}
 		},
 		subSkill: {
@@ -589,6 +600,11 @@ const skills = {
 				intro: { content: "手牌上限+#，不能使用【杀】" },
 			},
 		},
+	},
+	//王战孙策，但是通渠
+	junkliantao: {
+		audio: "olliantao",
+		inherit: "olliantao",
 	},
 	//刘辟
 	olyicheng: {

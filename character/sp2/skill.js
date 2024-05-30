@@ -1162,7 +1162,7 @@ const skills = {
 			}
 		},
 		ai: {
-			combo: "mpjiusong"
+			combo: "mpjiusong",
 		},
 	},
 	mpbishi: {
@@ -2227,9 +2227,11 @@ const skills = {
 		filter: function (event, player) {
 			return event.card.name == "sha" && event.getParent().triggeredTargets3.length == event.targets.length;
 		},
+		/*
 		check: function (event, player) {
 			return event.targets.some(target => get.effect(target, event.card, player, player) <= 0);
 		},
+		*/
 		content: function () {
 			"step 0";
 			var num = player.countCards("e") + 1;
@@ -2238,7 +2240,7 @@ const skills = {
 			"step 1";
 			var num = Math.min(trigger.targets.length, num);
 			player
-				.chooseTarget("铤险：令此杀对其中至多" + get.cnNumber(num) + "个目标无效", [1, num], true, (card, player, target) => {
+				.chooseTarget("铤险：是否令此杀对其中至多" + get.cnNumber(num) + "个目标无效？", [1, num], (card, player, target) => {
 					return _status.event.getTrigger().targets.includes(target);
 				})
 				.set("ai", target => {
@@ -2250,6 +2252,7 @@ const skills = {
 				trigger.getParent().excluded.addArray(result.targets);
 			}
 		},
+		/*
 		ai: {
 			effect: {
 				player_use(card, player, target) {
@@ -2273,6 +2276,7 @@ const skills = {
 				},
 			},
 		},
+		*/
 	},
 	dcbenshi: {
 		audio: 2,
@@ -2294,6 +2298,7 @@ const skills = {
 		},
 		content: function () {},
 		mod: {
+			/*
 			attackRangeBase: function (player, num) {
 				if (num !== "unchanged") return num;
 				var range = 1;
@@ -2309,8 +2314,9 @@ const skills = {
 				}
 				return range;
 			},
+			*/
 			attackRange: function (player, num) {
-				return num + 1;
+				if (!player.getEquips(1).length) return num + 1;
 			},
 			selectTarget: function (card, player, range) {
 				if (card.name == "sha") {
@@ -3342,7 +3348,7 @@ const skills = {
 			}
 		},
 		ai: {
-			halfneg: true
+			halfneg: true,
 		},
 	},
 	xiongrao: {
@@ -11576,32 +11582,42 @@ const skills = {
 				var num = game.countPlayer(function (current) {
 					return current.isDamaged();
 				});
-				var str = "暂无任何效果";
+				var str = "<li>造成的伤害+1";
 				if (num >= 1) {
 					str = "<li>视为拥有技能“恂恂”";
 				}
 				if (num >= 2) {
-					str += "；使用装备牌时摸一张牌";
+					str += "<br><li>装备牌进入或离开你的装备区时摸一张牌";
 				}
 				if (num >= 3) {
-					str += "；始终跳过弃牌阶段";
+					str += "<br><li>始终跳过弃牌阶段";
 				}
-				if (num == 0 || num >= 4) {
-					str += "；造成的伤害+1";
+				if (num >= 4) {
+					str += "<br><li>造成的伤害+1";
 				}
 				return str;
 			},
 		},
 		trigger: {
-			player: "useCard",
+			player: "loseAfter",
+			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 		},
 		forced: true,
 		filter: function (event, player) {
-			if (get.type(event.card) != "equip") return false;
-			var num = game.countPlayer(function (current) {
-				return current.isDamaged();
-			});
-			return num >= 2;
+			if (
+				game.countPlayer(function (current) {
+					return current.isDamaged();
+				}) < 2
+			)
+				return false;
+			const evt = event.getl(player);
+			if (event.name == "equip" && event.player == player) return true;
+			return evt && evt.es.length;
+		},
+		getIndex(event, player) {
+			const evt = event.getl(player);
+			if (event.name == "equip" && event.player == player && evt && evt.es.length) return 2;
+			return 1;
 		},
 		content: function () {
 			player.draw();
