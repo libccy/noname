@@ -382,6 +382,7 @@ const GLOBAL_PATHES = Object.freeze([
 	"/WeakRef",
 	"/WeakMap",
 	"/WeakSet",
+	["/Object/Symbol(Symbol.hasInstance)", "Object[Symbol.hasInstance]"],
 	"/Object/prototype",
 	"/Array/prototype",
 	"/Function/prototype",
@@ -2220,7 +2221,6 @@ class Marshal {
 			cloned = {};
 
 		Reflect.setPrototypeOf(cloned, null);
-		cloned["target"] = src;
 		return cloned;
 	}
 
@@ -2293,12 +2293,14 @@ class Marshal {
 
 		// 创建一个空白对象，防止JavaScript的一些奇怪错误
 		const pure = Marshal.#clonePureObject(target);
-		// 设置属性方便调试
-		pure.sourceDomain = sourceDomain;
-		pure.targetDomain = targetDomain;
 
 		// 创建封送代理
 		const proxy = new Proxy(pure, {
+			// 设置属性方便调试
+			// @ts-ignore
+			$target: target,
+			$sourceDomain: sourceDomain,
+			$targetDomain: targetDomain,
 			apply(_, thisArg, argArray) {
 				const defaultApply = () => {
 					const marshalledThis = Marshal.#marshal(thisArg, sourceDomain);
@@ -2400,7 +2402,19 @@ class Marshal {
 						return !!dispatched.returnValue;
 
 					// @ts-ignore
-					return Reflect.defineProperty(...args);
+					const success = Reflect.defineProperty(...args);
+
+					if (success && target === args[0]) {
+						// 为适配JavaScript对于代理的强制要求
+						// 我们要对空白对象模拟不可配置
+						// @ts-ignore
+						attributes = Reflect.getOwnPropertyDescriptor(...args);
+
+						if (!attributes.configurable)
+							Reflect.defineProperty(pure, args[1], attributes);
+					}
+
+					return success;
 				};
 
 				// `defineProperty`、`getOwnPropertyDescriptor`、`has` 都可能被JavaScript引擎重复调用
@@ -2587,7 +2601,18 @@ class Marshal {
 						return !!dispatched.returnValue;
 
 					// @ts-ignore
-					return Reflect.preventExtensions(...args);
+					const success = Reflect.preventExtensions(...args);
+
+					if (success && target === args[0]) {
+						// 为适配JavaScript对于代理的强制要求
+						// 我们要对空白对象进行模拟键
+						Reflect.ownKeys(target).forEach(key => {
+							pure[key] = undefined;
+						});
+						Reflect.preventExtensions(pure);
+					}
+
+					return success;
 				});
 			},
 			set(_, p, newValue, receiver) {
@@ -3497,7 +3522,7 @@ class Sandbox {
 		let argumentList;
 		let wrappedEval;
 
-		const raw = new thiz.#domainFunction("_", `with(_){with(window){with(${contextName}){return(()=>{"use strict";return(${applyName}(function(${parameters}){\n// 沙盒代码起始\n${code}\n// 沙盒代码结束\n},${contextName}.this,${argsName}))})()}}}`);
+		const raw = new thiz.#domainFunction("_", `with(_){with(window){with(${contextName}){return(${applyName}(function(${parameters}){"use strict";\n// 沙盒代码起始\n${code}\n// 沙盒代码结束\n},${contextName}.this,${argsName}))}}}`);
 
 		const domain = thiz.#domain;
 		const domainWindow = thiz.#domainWindow;
