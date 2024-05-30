@@ -224,7 +224,7 @@ const skills = {
 				gaifa = targets.slice(); //该罚
 			let question = [];
 			const sentences = _status.lisao_text.randomGets(2).randomSort();
-			const goon = Math.floor(Math.random());
+			const goon = Math.round(Math.random());
 			question.addArray(["请回答《离骚》中“" + sentences[0].split("，")[goon] + "”的" + (goon ? "上" : "下") + "句", [sentences[0].split("，")[1 - goon], sentences[1].split("，")[1 - goon]].randomSort()]);
 			//人类和AI
 			//AI随机排序一下，模拟不同顺序回答
@@ -316,7 +316,7 @@ const skills = {
 			next.set("prompt", question[0]);
 			next.set("id", eventId);
 			next.set("_global_waiting", true);
-			next.set("ai", () => Math.floor(Math.random()));
+			next.set("ai", () => Math.round(Math.random()));
 			return next;
 		},
 		init() {
