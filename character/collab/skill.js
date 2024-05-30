@@ -202,7 +202,7 @@ const skills = {
 	//屈原
 	dcqiusuo: {
 		audio: 2,
-		trigger: { source: "damageSOurce" },
+		trigger: { source: "damageSource" },
 		frequent: true,
 		async content(event, trigger, player) {
 			const tiesuo = get.cardPile("tiesuo");
