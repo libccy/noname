@@ -191,7 +191,7 @@ const skills = {
 					if (!player.storage.dchuanli_sunquan) {
 						player.storage.dchuanli_sunquan = true;
 					} else {
-						await player.removeAdditionalSkills("rezhiheng");
+						await player.removeAdditionalSkills("dchuanli_sunquan");
 						player.removeSkill("dchuanli_sunquan");
 					}
 				},
