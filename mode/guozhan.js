@@ -8168,7 +8168,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.target = target;
 					player.awakenSkill("gzshigong");
 					var list = lib.character[player.name2][3].filter(function (skill) {
-						return get.skillCategoriesOf(skill).length == 0;
+						return get.skillCategoriesOf(skill, player).length == 0;
 					});
 					if (!list.length) {
 						event._result = { control: "cancel2" };

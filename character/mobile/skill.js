@@ -936,7 +936,7 @@ const skills = {
 			return true;
 		},
 		zhuanhuanji2(skill, player) {
-			return player.countMark("mbxuetu_status") !== 1;
+			return player && player.countMark("mbxuetu_status") !== 1;
 		},
 		position: "he",
 		onremove: ["mbxuetu", "mbxuetu_status"],

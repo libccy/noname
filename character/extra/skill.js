@@ -1440,7 +1440,7 @@ const skills = {
 					info[3].some(function (skill) {
 						var info = get.skillInfoTranslation(skill);
 						if (!info.includes("【杀】")) return false;
-						var list = get.skillCategoriesOf(skill);
+						var list = get.skillCategoriesOf(skill, player);
 						list.remove("锁定技");
 						return list.length == 0;
 					})
@@ -1472,7 +1472,7 @@ const skills = {
 						var skills = info[3].filter(function (skill) {
 							var info = get.skillInfoTranslation(skill);
 							if (!info.includes("【杀】")) return false;
-							var list = get.skillCategoriesOf(skill);
+							var list = get.skillCategoriesOf(skill, get.player());
 							list.remove("锁定技");
 							return list.length == 0;
 						});
@@ -1511,7 +1511,7 @@ const skills = {
 			const skills = info[3].filter(function (skill) {
 				var info = get.skillInfoTranslation(skill);
 				if (!info.includes("【杀】")) return false;
-				var list = get.skillCategoriesOf(skill);
+				var list = get.skillCategoriesOf(skill, get.player());
 				list.remove("锁定技");
 				return list.length == 0;
 			});
@@ -1590,7 +1590,7 @@ const skills = {
 				var skills = info[3].filter(function (skill) {
 					var info = get.skillInfoTranslation(skill);
 					if (!info.includes("【杀】")) return false;
-					var list = get.skillCategoriesOf(skill);
+					var list = get.skillCategoriesOf(skill, get.player());
 					list.remove("锁定技");
 					return list.length == 0;
 				});
