@@ -5769,22 +5769,25 @@ const skills = {
 			notemp: true,
 			effect: {
 				target: (card, player, target) => {
-					if (!get.tag(card, "damage") || !target.hasFriend()) return;
-					if (player.hasSkillTag("jueqing", null, target)) return 1.7;
+					if (!target.hasFriend()) return;
+					let rec = get.tag(card, "recover"), damage = get.tag(card, "damage");
+					if (!rec && !damage) return;
+					if (damage && player.hasSkillTag("jueqing", null, target)) return 1.7;
 					let die = [null, 1],
 						temp;
 					game.filterPlayer(i => {
 						temp = i.countMark("new_wuhun");
 						if (i === player && target.hp + target.hujia > 1) temp++;
-						if (temp >= die[1]) {
+						if (temp > die[1]) die = [i, temp];
+						else if (temp === die[1]) {
 							if (!die[0]) die = [i, temp];
-							else {
-								let att = get.attitude(player, i);
-								if (att < die[1]) die = [i, temp];
-							}
+							else if (get.attitude(target, i) < get.attitude(target, die[0])) die = [i, temp];
 						}
 					});
-					if (die[0]) return [1, 0, 1, (-6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp)];
+					if (die[0]) {
+						if (damage) return [1, 0, 1, (-6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp)];
+						return [1, (6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp)];
+					}
 				},
 			},
 		},
@@ -6733,7 +6736,7 @@ const skills = {
 				target(card, player, target, current) {
 					if (player.getHp() <= 0) return;
 					if (!target.hasFriend()) return;
-					if (target.hp <= 1 && get.tag(card, "damage")) return [1, 0, 0, -2];
+					if (target.hp <= 1 && get.tag(card, "damage")) return [1, 0, 0, -2 * player.getHp()];
 				},
 			},
 		},
