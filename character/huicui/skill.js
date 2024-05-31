@@ -2,6 +2,89 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//侧肘
+	dcshefu: {
+		audio: 2,
+		trigger: {
+			player: "damageBegin2",
+			source: "damageBegin1",
+		},
+		filter(event, player) {
+			if (!event.source || event.source == event.player) return false;
+			const evt = event.getParent(2);
+			return evt && evt.name == "useCard";
+		},
+		forced: true,
+		logTarget(event, player) {
+			return event.source == player ? event.player : event.source;
+		},
+		content() {
+			const evt = trigger.getParent(2);
+			const cards = evt.cards.filter(card => {
+				if (trigger.source._start_cards.includes(card)) return true;
+				return trigger.source.getAllHistory("gain", evt => {
+					return evt.cards.includes(card);
+				}).length;
+			});
+			trigger.num =
+				cards.length +
+				cards.reduce((sum, card) => {
+					let num = 0,
+						history = trigger.source.actionHistory;
+					for (let i = history.length - 1; i >= 0; i--) {
+						if (history[i].gain.some(evtx => evtx.cards.includes(card))) break;
+						if (history[i].isRound) num++;
+						if (i == 0 && trigger.source._start_cards.includes(card)) num--;
+					}
+					return sum + num;
+				}, 0);
+		},
+		ai: {
+			effect: {
+				target(card, player, target) {
+					if (target == player || !get.tag(card, "damage")) return;
+					if (!(card.cards || []).length) return "zeroplayertarget";
+				},
+				player: function () {
+					return lib.skill.dcshefu.ai.effect.target.apply(this, arguments);
+				},
+			},
+		},
+	},
+	dcpigua: {
+		audio: 2,
+		trigger: { source: "damageSource" },
+		filter(event, player) {
+			return event.num > 1 && event.player.isIn() && event.player.countCards("he") && game.roundNumber > 0;
+		},
+		async cost(event, trigger, player) {
+			const target = trigger.player;
+			let result = await player.gainPlayerCard(target, "he", [1, game.roundNumber]).set("prompt", get.prompt2("dcpigua", target)).set("logSkill", ["dcpigua", target]).forResult();
+			result.bool = Boolean((result.cards || []).length);
+			event.result = result;
+		},
+		popup: false,
+		async content(event, trigger, player) {
+			player.addTempSkill("dcpigua_effect");
+			player.addGaintag(event.cards, "dcpigua_effect");
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				onremove(player, skill) {
+					player.removeGaintag(skill);
+				},
+				mod: {
+					ignoredHandcard(card) {
+						if (card.hasGaintag("dcpigua_effect")) return true;
+					},
+					cardDiscardable(card, _, name) {
+						if (name == "phaseDiscard" && card.hasGaintag("dcpigua_effect")) return false;
+					},
+				},
+			},
+		},
+	},
 	//李丰
 	dctunchu: {
 		audio: 2,

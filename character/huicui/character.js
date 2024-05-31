@@ -1,4 +1,5 @@
 const characters = {
+	chezhou: ["male", "wei", 4, ["dcshefu", "dcpigua"]],
 	dc_lifeng: ["male", "shu", 3, ["dctunchu", "dcshuliang"]],
 	wupu: ["male", "qun", 4, ["dcduanti", "dcshicao"]],
 	zangba: ["male", "wei", 4, ["rehengjiang"]],

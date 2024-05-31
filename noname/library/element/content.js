@@ -3152,7 +3152,6 @@ export const Content = {
 		game.syncState();
 		game.addVideo("phaseChange", player);
 		if (game.phaseNumber == 1) {
-			delete player._start_cards;
 			if (lib.configOL.observe) {
 				lib.configOL.observeReady = true;
 				game.send("server", "config", lib.configOL);

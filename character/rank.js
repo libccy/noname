@@ -147,6 +147,8 @@ window.noname_character_rank = {
 		"guanyue",
 		"wupu",
 		"xukun",
+		"ol_feiyi",
+		"ol_jiangwan",
 	],
 	a: [
 		"star_caoren",
@@ -1773,6 +1775,7 @@ window.noname_character_rank = {
 	],
 	rarity: {
 		legend: [
+			"ol_feiyi",
 			"dc_wuyi",
 			"sp_sunce",
 			"star_caoren",
@@ -1975,6 +1978,7 @@ window.noname_character_rank = {
 			"jsrg_yuanshao",
 		],
 		epic: [
+			"ol_jiangwan",
 			"xukun",
 			"clan_zhongyao",
 			"dc_caoshuang",
