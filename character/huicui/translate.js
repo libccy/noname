@@ -535,6 +535,8 @@ const translates = {
 	chezhou: "车胄",
 	dcshefu: "慑伏",
 	dcshefu_info: "锁定技。你对其他角色/其他角色对你使用牌造成的伤害改为X（X为此牌对应的所有实体牌最近一次被伤害来源获得后至现在经过的轮次数之和）。",
+	dcpigua: "披挂",
+	dcpigua_info: "当你对一名角色造成超过1点伤害后，你可以获得其至多等同于游戏轮次的牌，这些牌本回合不计入你的手牌上限。",
 	yue_miheng: "乐祢衡",
 	yue_miheng_prefix: "乐",
 	dcjigu: "激鼓",
