@@ -383,7 +383,7 @@ const skills = {
 				if (goon && player.isDamaged())
 					result = await player
 						.chooseControl()
-						.set("choiceList", ["获得" + get.translation(target) + "的一张牌", "发动一次〖秘计〗"])
+						.set("choiceList", ["获得" + get.translation(target) + "的一张牌", "于本回合的结束阶段发动一次〖秘计〗"])
 						.set("ai", () => {
 							const player = get.event("player"),
 								target = get.event().getTrigger().player;
@@ -394,16 +394,28 @@ const skills = {
 				if (result.index == 0) {
 					await player.gainPlayerCard(target, "he", true);
 				} else {
-					await player.useSkill("olmiji");
+					player.addTempSkill("olzhenjie_effect");
+					player.addMark("olzhenlie_effect", 1, false);
 				}
 			}
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				onremove: true,
+				intro: { content: "本回合的结束阶段可以发动#次〖秘计〗" },
+			},
 		},
 	},
 	olmiji: {
 		audio: 2,
-		trigger: { player: "phaseJieshuBegin" },
+		trigger: { global: "phaseJieshuBegin" },
 		filter(event, player) {
-			return player.isDamaged();
+			if (player.isHealthy()) return false;
+			return event.player == player || player.hasMark("olzhenlie_effect");
+		},
+		getIndex(event, player) {
+			return player.countMark("olzhenlie_effect") + (event.player == player);
 		},
 		async content(event, trigger, player) {
 			let num = player.getDamagedHp();
