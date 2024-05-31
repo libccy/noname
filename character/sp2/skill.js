@@ -3348,7 +3348,7 @@ const skills = {
 			}
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 		},
 	},
 	xiongrao: {

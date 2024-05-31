@@ -1891,7 +1891,7 @@ const skills = {
 			player.markAuto("sbyijue_effect", [trigger.player]);
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 		},
 		marktext: "绝",
 		intro: { content: "已放$一马" },
@@ -7407,7 +7407,6 @@ const skills = {
 		ai: {
 			threaten: 3.5,
 			directHit_ai: true,
-			halfneg: true,
 			skillTagFilter: function (player, tag, arg) {
 				if (arg && arg.card && arg.card.name == "sha") {
 					var storage = player.getStorage("sbliegong");

@@ -4049,7 +4049,6 @@ const skills = {
 		},
 		ai: {
 			threaten: 2.5,
-			halfneg: true,
 		},
 		subSkill: {
 			block: {
@@ -16128,7 +16127,7 @@ const skills = {
 			player.draw(event.num);
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 		},
 	},
 	yixiang: {

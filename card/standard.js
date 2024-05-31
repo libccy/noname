@@ -608,6 +608,12 @@ game.import("card", function () {
 							if (target !== _status.event.dying) {
 								if (
 									!player.isPhaseUsing() ||
+									player.needsToDiscard(0, (i, player) => {
+										return (
+											!player.canIgnoreHandcard(i) &&
+											taos.includes(i)
+										);
+									}) ||
 									player.hasSkillTag(
 										"nokeep",
 										true,
@@ -619,7 +625,7 @@ game.import("card", function () {
 									)
 								)
 									return 2;
-								let min = 7.2 - (4 * player.hp) / player.maxHp,
+								let min = 8.1 - (4.5 * player.hp) / player.maxHp,
 									nd = player.needsToDiscard(0, (i, player) => {
 										return (
 											!player.canIgnoreHandcard(i) &&

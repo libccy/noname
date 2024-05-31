@@ -5963,7 +5963,7 @@ const skills = {
 			trigger.num++;
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 		},
 	},
 	huisheng: {
