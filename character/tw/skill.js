@@ -4355,6 +4355,7 @@ const skills = {
 			target.damage();
 		},
 		ai: {
+			combo: "twjuntun",
 			expose: 0.25,
 			order: 8,
 			result: {
@@ -4438,6 +4439,9 @@ const skills = {
 					},
 				},
 			},
+		},
+		ai: {
+			combo: "twjuntun"
 		},
 	},
 	//蒋济

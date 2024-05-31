@@ -6279,6 +6279,7 @@ const skills = {
 			});
 		},
 		ai: {
+			combo: "sbjushou",
 			order: 8,
 			result: {
 				target: -1,
@@ -7178,6 +7179,9 @@ const skills = {
 			player.addSkills("sbduojing");
 			player.storage.sbkeji = true;
 		},
+		ai: {
+			combo: "sbkeji"
+		},
 	},
 	sbduojing: {
 		audio: 2,
@@ -7252,7 +7256,10 @@ const skills = {
 			} else player.removeSkill("sbxiayuan_round");
 		},
 		subSkill: { round: { charlotte: true } },
-		ai: { expose: 0.2 },
+		ai: {
+			combo: "sbjieyue",
+			expose: 0.2
+		},
 	},
 	sbjieyue: {
 		audio: 4,

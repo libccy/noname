@@ -1835,6 +1835,9 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "jsrgjinfa"
+		},
 	},
 	jsrgxuanfeng: {
 		audio: 2,
@@ -1867,6 +1870,7 @@ const skills = {
 		},
 		ai: {
 			order: 2,
+			combo: "jsrgjinfa"
 		},
 	},
 	//陆逊
@@ -2920,6 +2924,9 @@ const skills = {
 				}
 			}
 			player.logSkill("jsrgbazheng", dissident);
+		},
+		ai: {
+			combo: "jsrgyaoyan"
 		},
 	},
 	//刘永
@@ -9398,6 +9405,9 @@ const skills = {
 				player.logSkill("jsrgfayi", target);
 				target.damage();
 			}
+		},
+		ai: {
+			combo: "jsrgshelun"
 		},
 	},
 	jsrgtushe: {
