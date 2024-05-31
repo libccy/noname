@@ -23981,7 +23981,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			guozhan_decade: "十年踪迹十年心",
 			guozhan_others: "其他",
 
-			// 语音部分
+			// 台词部分
 			"#gz_zhonghui:die": "吾机关算尽，却还是棋错一着……",
 			"#gzzhaoxin1": "行明动正，何惧他人讥毁。",
 			"#gzzhaoxin2": "大业之举，岂因宵小而动？",
@@ -24282,7 +24282,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#drlt_congjian1": "听君谏言，去危亡，保宗祀！",
 			"#gz_zhangxiu:die": "若失文和，吾将何归？",
 			"#jianan1": "行为军锋，还为后拒！",
-			"#jianan2": "行为军锋，还为后拒！",
+			"#jianan2": "国之良将，五子为先。",
 			"#huibian1": "吾任天下之智力，以道御之，无所不可。",
 			"#huibian2": "青青子衿，悠悠我心，但为君故，沉吟至今。",
 			"#gzzongyu1": "驾六龙，乘风而行。行四海，路下之八邦。",
