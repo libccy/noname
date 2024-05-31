@@ -2300,10 +2300,18 @@ class Marshal {
 			const errorCtor = target.constructor;
 			const mappedCtor = Globals.mapTo(errorCtor, sourceDomain, targetDomain);
 
+			// // 立即报告错误，而不是通过封送报错
+			// const window = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
+			// window.onunhandledrejection && window.onunhandledrejection({ promise: Promise.reject(target) });
+
 			if (mappedCtor) {
 				const newError = new mappedCtor();
-				Object.defineProperties(newError,
-					Object.getOwnPropertyDescriptors(target));
+				const stack = String(target.stack);
+				Reflect.defineProperty(newError, 'stack', {
+					get: () => () => stack,
+					set: () => { },
+					configurable: false,
+				});
 				return newError;
 			}
 		}
@@ -3322,8 +3330,13 @@ class Sandbox {
 		while (code.endsWith(";"))
 			code = code.slice(0, -1);
 
-		if (!/[;\n\r]$/.test(code))
-			code = `return (${code})`;
+		if (!/[;\n\r]$/.test(code)) {
+			const newCode = `return (${code})`;
+			try {
+				new Function(newCode);
+				code = newCode;
+			} catch (e) { }
+		}
 
 		return thiz.exec(code);
 	}
@@ -3555,6 +3568,7 @@ class Sandbox {
 		// 进行语法检查，防止注入
 		new thiz.#domainFunction(code);
 
+		const passThis = !("this" in context);
 		const executingScope = Sandbox.#executingScope[Sandbox.#executingScope.length - 1];
 		const scope = inheritScope && executingScope || thiz.#scope;
 		const contextName = Sandbox.#makeName("_", scope);
@@ -3617,7 +3631,7 @@ class Sandbox {
 
 		// 构建陷入的沙盒闭包
 		// 同时对返回值进行封送
-		return ((/** @type {any} */ ...args) => {
+		return /** @this {any} */ function (/** @type {any} */ ...args) {
 			const prevDomain = Domain.current;
 			const domainAction = () => {
 				// 指定执行域
@@ -3625,11 +3639,38 @@ class Sandbox {
 				Sandbox.#executingScope.push(scope);
 
 				try {
+					// 传递 `this`、以及函数参数
+					if (passThis)
+						context.this = Marshal[SandboxExposer2]
+							(SandboxSignal_Marshal, this, domain);
 					argumentList = Marshal[SandboxExposer2]
 						(SandboxSignal_MarshalArray, args, domain);
+
+					// 调用闭包函数
 					const result = raw.call(null, intercepter);
+
+					// 封送返回结果
 					return Marshal[SandboxExposer2]
 						(SandboxSignal_Marshal, result, prevDomain);
+					// } catch (e) {
+					// 	// 立即报告错误
+					// 	const window = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
+					// 	// @ts-ignore
+					// 	const line = String(e.stack).split("\n")[1];
+					// 	const match = /<anonymous>:(\d+):\d+\)/.exec(line);
+					// 	if (match) {
+					// 		const index = parseInt(match[1]) - 5;
+					// 		const lines = code.split("\n");
+					// 		let codeView = "";
+					// 		for (let i = index - 4; i < index + 5; i++) {
+					// 			if (i < 0 || i >= lines.length)
+					// 				continue;
+					// 			codeView += `${i + 1}|${i == index ? "⚠️" : "    "}${lines[i]}\n`;
+					// 		}
+					// 		// @ts-ignore
+					// 		window.alert(`沙盒内出现错误：\n----------\n${codeView}\n----------\n${String(e.stack)}`);
+					// 	}
+					// 	throw e;
 				} finally {
 					Sandbox.#executingScope.pop();
 				}
@@ -3640,7 +3681,7 @@ class Sandbox {
 
 			return Marshal[SandboxExposer2]
 				(SandboxSignal_TrapDomain, domain, domainAction);
-		}).bind(null); // 编译函数不应该发送
+		};
 	}
 
 	/**
