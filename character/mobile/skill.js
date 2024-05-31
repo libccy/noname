@@ -16128,7 +16128,7 @@ const skills = {
 			player.draw(event.num);
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 		},
 	},
 	yixiang: {

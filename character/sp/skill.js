@@ -7399,7 +7399,7 @@ const skills = {
 		},
 		ai: {
 			threaten: 0.8,
-			halfneg: true,
+			neg: true,
 			effect: {
 				player_use(card, player, target) {
 					if ((!card.isCard || !card.cards) && get.itemtype(card) != "card") return;
@@ -7751,7 +7751,7 @@ const skills = {
 			}
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 		},
 		subSkill: {
 			swap: {
