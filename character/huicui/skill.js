@@ -2,6 +2,155 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//朱佩兰
+	dccilv: {
+		audio: 2,
+		trigger: { target: "useCardToTargeted" },
+		filter(event, player) {
+			return get.type(event.card) == "trick" && player.getStorage("dccilv").length < 3;
+		},
+		async content(event, trigger, player) {
+			await player.draw(3 - player.getStorage("dccilv").length);
+			if (player.countCards("h") > player.maxHp) {
+				let result,
+					list = ["无效", "防伤", "获得"].filter(i => !player.getStorage("dccilv").includes(i));
+				if (list.length == 1) result = { control: list[0] };
+				else
+					result = await player
+						.chooseControl(list)
+						.set("prompt", "辞虑：选择执行并移去一项")
+						.set("ai", () => {
+							const player = get.event("player"),
+								trigger = get.event().getTrigger();
+							let controls = get.event("controls").slice();
+							if (controls.includes("防伤")) {
+								if (get.tag(card, "damage")) return "防伤";
+								else controls.remove("防伤");
+							}
+							if (get.effect(player, trigger.card, trigger.player, player) < 0 && controls.includes("无效")) return "无效";
+							return controls[controls.length - 1];
+						})
+						.forResult();
+				const choice = result.control;
+				player.popup(choice);
+				game.log(player, "选择了", "#y" + choice);
+				switch (choice) {
+					case "无效":
+						trigger.getParent().excluded.add(player);
+						game.log(trigger.card, "对", player, "无效");
+						break;
+					case "防伤":
+						player.addTempSkill("dccilv_effect");
+						player.markAuto("dccilv_effect", [trigger.card]);
+						break;
+					case "获得":
+						player
+							.when({ global: "useCardAfter" })
+							.filter(evt => evt == trigger.getParent())
+							.then(() => {
+								const cards = (trigger.cards || []).filterInD();
+								if (cards.length) player.gain(cards, "gain2");
+							});
+						break;
+				}
+				player.markAuto("dccilv", [choice]);
+			}
+		},
+		mark: true,
+		intro: {
+			markcount: storage => 3 - (storage || []).length,
+			content: storage => ((storage || []).length ? "已移去了$项" : "暂未移去任何项"),
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				trigger: { player: "damageBegin4" },
+				filter(event, player) {
+					const evt = event.getParent(2);
+					return evt && evt.name == "useCard" && player.getStorage("dccilv_effect").includes(evt.card);
+				},
+				forced: true,
+				content() {
+					trigger.cancel();
+				},
+				ai: {
+					effect: {
+						target(card, player, target) {
+							if (player.getStorage("dccilv_effect").includes(card)) return "zeroplayertarget";
+						},
+					},
+				},
+			},
+		},
+	},
+	dctongdao: {
+		unique: true,
+		limited: true,
+		trigger: { player: "dying" },
+		skillAnimation: true,
+		animationColor: "fire",
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt2("dctongdao"))
+				.set("ai", target => {
+					const player = get.event("player");
+					if (player.hp + player.countCards("hs", card => player.canSaveCard(card, player)) > 0) return target == player ? 1 : 0;
+					return target.hp + 114514;
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			player.awakenSkill("dctongdao");
+			const removeSkills = target.getSkills(null, false, false).filter(i => {
+				const info = get.info(i);
+				return !info || !info.charlotte;
+			});
+			if (removeSkills.length) target.removeSkill(removeSkills);
+			const gainSkills = target.getStockSkills(true, true).filter(i => {
+				const info = get.info(i);
+				if (info && info.zhuSkill && !player.isZhu2()) return false;
+				return !info || !info.charlotte;
+			});
+			if (gainSkills.length) {
+				//抽象
+				//混沌初开——牢戏
+				Object.keys(target.storage)
+				.filter(i => gainSkills.some(skill => i.startsWith(skill)))
+				.forEach(storage => delete target.storage[storage]);
+				target.addSkill(gainSkills);
+				const suffixs = ["used", "round", "block", "blocker"];
+				for (const skill of gainSkills) {
+					const info = get.info(skill);
+					if (typeof info.usable == "number") {
+						if (target.hasSkill("counttrigger") && target.storage.counttrigger[skill] && target.storage.counttrigger[skill] >= 1) {
+							delete target.storage.counttrigger[skill];
+						}
+						if (typeof get.skillCount(skill) == "number" && get.skillCount(skill) >= 1) {
+							delete target.getStat("skill")[skill];
+						}
+					}
+					if (info.round && target.storage[skill + "_roundcount"]) {
+						delete target.storage[skill + "_roundcount"];
+					}
+					if (target.storage[`temp_ban_${skill}`]) {
+						delete target.storage[`temp_ban_${skill}`];
+					}
+					if (target.awakenedSkills.includes(skill)) {
+						target.restoreSkill(skill);
+					}
+					for (const suffix of suffixs) {
+						if (target.hasSkill(skill + "_" + suffix)) {
+							target.removeSkill(skill + "_" + suffix);
+						}
+					}
+				}
+			}
+			if (target != player && target.hp > player.hp) {
+				await player.recoverTo(target.hp);
+			}
+		},
+	},
 	//乐祢衡
 	dcjigu: {
 		audio: 2,

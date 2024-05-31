@@ -461,4 +461,9 @@ export default {
 	"#llqshenwei2": "红妆非我愿，学武觅封侯。",
 	"#wushuang_lvlingqi1": "猛将策良骥，长戟破敌营。",
 	"#wushuang_lvlingqi2": "杀气腾剑戟，严风卷戎装。",
+	"#dcjigu1": "我接着奏乐，诸公接着舞。",
+	"#dcjigu2": "这不是鼓，而是曹公的脸面！",
+	"#dcsirui1": "暑气可借酒气消，此间艳阳醉着酒。",
+	"#dcsirui2": "诸君饮霓而醉，举事唯我独行。",
+	"#chezhou:die": "映日荷花今犹在，不见当年采荷人……",
 };
