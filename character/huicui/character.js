@@ -1,11 +1,7 @@
 const characters = {
 	dc_lifeng: ["male", "shu", 3, ["dctunchu", "dcshuliang"]],
 	wupu: ["male", "qun", 4, ["dcduanti", "dcshicao"]],
-	dc_caoshuang: ["male", "wei", 4, ["dcjianzhuan", "dcfanshi"]],
 	zangba: ["male", "wei", 4, ["rehengjiang"]],
-	dc_simashi: ["male", "wei", 3, ["dcsanshi", "dczhenrao", "dcchenlve"]],
-	dc_wangling: ["male", "wei", 4, ["dcjichou", "dcmouli"], ["clan:太原王氏"]],
-	dc_jiangji: ["male", "wei", 3, ["dcshiju", "dcyingshi"]],
 	gongsunxiu: ["male", "qun", 4, ["dcgangu", "dckuizhen"]],
 	dc_liuli: ["male", "shu", 3, ["dcfuli", "dcdehua"]],
 	yue_daqiao: ["female", "wu", 3, ["dcqiqin", "dczixi"]],

@@ -1,4 +1,8 @@
 const characters = {
+	dc_caoshuang: ["male", "wei", 4, ["dcjianzhuan", "dcfanshi"]],
+	dc_simashi: ["male", "wei", 3, ["dcsanshi", "dczhenrao", "dcchenlve"]],
+	dc_wangling: ["male", "wei", 4, ["dcjichou", "dcmouli"], ["clan:太原王氏"]],
+	dc_jiangji: ["male", "wei", 3, ["dcshiju", "dcyingshi"]],
 	dc_sb_zhugejin: ["male", "wu", 3, ["dcsbtaozhou", "dcsbhoude"]],
 	dc_sb_jiaxu: ["male", "qun", 3, ["dcsbsushen", "dcsbfumou"]],
 	guanyue: ["male", "shu", 4, ["dcshouzhi", "dcfenhui"]],
