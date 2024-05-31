@@ -2200,17 +2200,6 @@ game.import("character", function () {
 				content() {
 					trigger.num++;
 				},
-			},
-			qingtian_old: {
-				trigger: { player: "recoverBefore" },
-				forced: true,
-				filter(event, player) {
-					return player.hp > 0 && event.num > 0;
-				},
-				content() {
-					trigger.cancel();
-					player.changeHujia(trigger.num);
-				},
 				ai: {
 					neg: true,
 				},
