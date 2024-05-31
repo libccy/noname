@@ -1551,12 +1551,7 @@ export class Get {
 			if (func._filter_args) {
 				return "_noname_func:" + JSON.stringify(get.stringifiedResult(func._filter_args, 3));
 			}
-			const { Marshal, Sandbox } = security.importSandbox();
-			const domain = Marshal.getMarshalledDomain(func);
-			if (domain) {
-				const sandbox = Sandbox.from(domain);
-				if (sandbox && "client" in sandbox) throw new Error("不应该二次扩散远程代码");
-			}
+			const { Marshal } = security.importSandbox();
 			const str = Marshal.decompileFunction(func);
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return "_noname_func:function () {}";

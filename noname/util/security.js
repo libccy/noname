@@ -415,6 +415,7 @@ async function initSecurity({
 		return;
 
 	loadPolyfills();
+	initSerializeNeeded();
 	initIsolatedEnvironment();
 
 	// 不允许被远程代码访问的game函数
@@ -808,6 +809,41 @@ function initIsolatedEnvironment() {
 	rewriteCtor(defaultGeneratorFunction.prototype, ModGeneratorFunction);
 	rewriteCtor(defaultAsyncFunction.prototype, ModAsyncFunction);
 	rewriteCtor(defaultAsyncGeneratorFunction.prototype, ModAsyncGeneratorFunction);
+}
+
+/**
+ * ```plain
+ * 初始化需要额外序列化的函数
+ * 
+ * 适配扩展，当在skillcontent里面调用皮切的playEffect时会报错
+ * ```
+ */
+function initSerializeNeeded() {
+	const structuredClone = window.structuredClone;
+	const deepClone = (/** @type {any} */ obj) => {
+		try {
+			return structuredClone(obj);
+		} catch (e) {
+			return obj;
+		}
+	};
+	
+	/** @type {Array<[string, number[]]>} */
+	const funcList = [
+		["Worker.prototype.postMessage", [0]],
+	];
+
+	for (const [funcCode, argIndexes] of funcList) {
+		const originalFunc = new Function(`return ${funcCode}`)();
+		const newFunc = /** @this {any} */ function (/** @type {any[]} */ ...args) {
+			for (const index of argIndexes)
+				args[index] = deepClone(args[index]);
+
+			return originalFunc.apply(this, args);
+		};
+
+		new Function("_", `${funcCode} = _;`)(newFunc);
+	}
 }
 
 /**
