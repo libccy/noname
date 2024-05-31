@@ -237,6 +237,9 @@ const skills = {
 			player.popup("盗书");
 			game.log(player, "重置了技能", "#g【盗书】");
 		},
+		ai: {
+			combo: "stddaoshu"
+		},
 	},
 	//周处
 	stdxiongxia: {

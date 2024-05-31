@@ -1049,7 +1049,6 @@ const skills = {
 				}
 			}
 		},
-		ai: { combo: "olsbyufeng" },
 	},
 	//界高顺
 	olxianzhen: {

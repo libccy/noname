@@ -1992,7 +1992,17 @@ const skills = {
 			},
 		},
 		ai: {
-			combo: "dctuoyu",
+			effect: {
+				player(card, player, target) {
+					if (
+						!get.tag(card, "damage") ||
+						player.countMark("dcxianjin") % 2 ||
+						!player.hasSkillTag("jueqing", null, target)
+					) return;
+					if (player.isMaxHandcard()) return [1, 1];
+					return [1, Math.min(3, 1 + player.getStorage("dctuoyu").length)];
+				}
+			}
 		},
 	},
 	dcqijing: {

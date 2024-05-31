@@ -335,7 +335,6 @@ const skills = {
 			}
 			return bool;
 		},
-		ai: { combo: "rejijun" },
 	},
 	//界司马朗
 	requji: {
