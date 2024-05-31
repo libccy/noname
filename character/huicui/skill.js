@@ -2493,7 +2493,7 @@ const skills = {
 			return get.type(event.card) == "basic" && _status.currentPhase;
 		},
 		prompt2: function (event, player) {
-			const num = Math.pow(2, player.countMark("dccaisi_more") - 1);
+			const num = Math.pow(2, player.countMark("dccaisi_more"));
 			return `从${player == _status.currentPhase ? "牌堆" : "弃牌"}堆中随机获得${get.cnNumber(num)}张非基本牌`;
 		},
 		content: function* (event, map) {
@@ -2501,7 +2501,7 @@ const skills = {
 				trigger = map.trigger;
 			const position = player == _status.currentPhase ? "cardPile" : "discardPile";
 			let cards = [],
-				num = Math.pow(2, player.countMark("dccaisi_more") - 1);
+				num = Math.pow(2, player.countMark("dccaisi_more"));
 			while (num > 0) {
 				num--;
 				let card = get[position](card => get.type(card) != "basic" && !cards.includes(card));
@@ -7079,8 +7079,17 @@ const skills = {
 				mark: true,
 				marktext: "仇",
 				intro: { content: "使用牌不可被响应" },
-				inherit: "twsaotao",
 				audio: "dcsuchou",
+				trigger: { player: "useCard" },
+				filter(event, player) {
+					return event.card.name == "sha" || get.type(event.card) == "trick";
+				},
+				forced: true,
+				content() {
+					trigger.directHit.addArray(game.players);
+					game.log(trigger.card, "不可被响应");
+				},
+				ai: { directHit_ai: true },
 			},
 		},
 	},

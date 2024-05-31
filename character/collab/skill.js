@@ -31,7 +31,7 @@ const skills = {
 				)
 				.set("ai", button => {
 					if (!get.cardPile2(button.link[2])) return 0;
-					return get.value({ name: button.link }, get.event("player"));
+					return get.value({ name: button.link[2] }, get.event("player"));
 				})
 				.forResult();
 			if (result.bool) {
@@ -86,8 +86,7 @@ const skills = {
 			) {
 				const result = await player
 					.chooseTarget(get.prompt("dchuanli"), "令一名其他角色的所有技能失效，然后令其获得〖直谏〗和〖固政〗直到其回合结束", (card, player, target) => {
-						if (player == target) return false;
-						return !target.hasSkill("dchuanli_zhangzhang") && !target.hasSkill("dchuanli_zhouyu");
+						return target != player && !target.hasSkill("dchuanli_zhangzhang");
 					})
 					.set("ai", target => {
 						const player = get.event("player");
@@ -105,13 +104,12 @@ const skills = {
 					const target = result.targets[0];
 					await player.logSkill("dchuanli", target);
 					target.addTempSkill("dchuanli_zhangzhang", { player: "phaseAfter" });
-					target.markSkillCharacter("dchuanli_zhangzhang", "re_zhouyu", "唤理-内事", "内事不决问张昭");
+					target.markSkillCharacter("dchuanli_zhangzhang", "zhangzhang", "唤理-内事", "内事不决问张昭");
 					await target.addAdditionalSkills("dchuanli_zhangzhang", ["zhijian", "guzheng"]);
 				}
 			}
 			const targets = game.filterPlayer(target => {
-				if (target == player) return false;
-				if (target.hasSkill("dchuanli_zhangzhang") || target.hasSkill("dchuanli_zhouyu")) return false;
+				if (target == player || target.hasSkill("dchuanli_zhouyu")) return false;
 				return (
 					player.getHistory("useCard", evt => {
 						return (evt.targets || []).includes(target);
@@ -121,7 +119,6 @@ const skills = {
 			if (targets.length) {
 				const result = await player
 					.chooseTarget(get.prompt("dchuanli"), "令一名其他角色的所有技能失效，然后令其获得〖直谏〗和〖固政〗直到其回合结束", (card, player, target) => {
-						if (player == target) return false;
 						return get.event("targets").includes(target);
 					})
 					.set("ai", target => {
@@ -141,7 +138,7 @@ const skills = {
 					const target = result.targets[0];
 					await player.logSkill("dchuanli", target);
 					target.addTempSkill("dchuanli_zhouyu", { player: "phaseAfter" });
-					target.markSkillCharacter("dchuanli_zhouyu", "zhangzhang", "唤理-外事", "外事不决问周瑜");
+					target.markSkillCharacter("dchuanli_zhouyu", "re_zhouyu", "唤理-外事", "外事不决问周瑜");
 					await target.addAdditionalSkills("dchuanli_zhouyu", ["reyingzi", "refanjian"]);
 				}
 			}

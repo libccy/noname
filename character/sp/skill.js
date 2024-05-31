@@ -2050,6 +2050,162 @@ const skills = {
 			lose: { charlotte: true },
 		},
 	},
+	relianju: {
+		audio: "ollianju",
+		trigger: { player: "phaseJieshuBegin" },
+		filter(event, player) {
+			return player.hasHistory("useCard", evt => {
+				return (evt.cards || []).some(card => get.position(card, true) == "d");
+			});
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt("relianju"), "令一名其他角色获得你本回合使用的且进入弃牌堆的至多两张颜色相同的牌", lib.filter.notMe)
+				.set("ai", target => {
+					const player = get.event("player");
+					let att = get.attitude(_status.event.player, target);
+					if (target.hasJudge("lebu")) att /= 2;
+					if (target.hasSkillTag("nogain")) att /= 10;
+					return att / (1 + get.distance(player, target, "absolute"));
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const cards = player
+					.getHistory("useCard", evt => {
+						return (evt.cards || []).some(card => get.position(card, true) == "d");
+					})
+					.reduce((sum, evt) => {
+						return sum.addArray(evt.cards.filter(card => get.position(card, true) == "d"));
+					}, []),
+				target = event.targets[0];
+			const result = await player
+				.chooseButton(["联句：选择令" + get.translation(target) + "获得的牌", cards], [1, 2], true)
+				.set("filterButton", button => {
+					return !ui.selected.buttons.some(but => get.color(but.link) != get.color(button.link));
+				})
+				.set("ai", button => {
+					return get.value(button.link, get.event("target"));
+				})
+				.set("target", target)
+				.forResult();
+			if (result.bool) {
+				const color = get.color(result.links[0], false);
+				await target.gain(result.links, "gain2").set('gaintag', ["resilv"]);
+				player.when({ global: "phaseJieshuBegin" })
+					.filter(
+						evt =>
+							evt.player == target &&
+							target.hasHistory("useCard", evt => {
+								return (evt.cards || []).some(card => get.position(card, true) == "d" && get.color(card) != color);
+							})
+					)
+					.then(() => {
+						const cards = trigger.player
+							.getHistory("useCard", evt => {
+								return (evt.cards || []).some(card => get.position(card, true) == "d" && get.color(card) != color);
+							})
+							.reduce((sum, evt) => {
+								return sum.addArray(evt.cards.filter(card => get.position(card, true) == "d" && get.color(card) != color));
+							}, []);
+						player
+							.chooseButton(["联句：请选择获得的牌", cards], [1, 2], true)
+							.set("filterButton", button => {
+								return !ui.selected.buttons.some(but => get.color(but.link) != get.color(button.link));
+							})
+							.set("ai", button => {
+								return get.value(button.link, get.event("target"));
+							});
+					})
+					.then(() => {
+						if (result.bool) {
+							player.gain(result.links, "gain2").gaintag.add("resilv");
+						}
+					})
+					.vars({ color: color });
+			}
+		},
+	},
+	resilv: {
+		audio: "olsilv",
+		trigger: { player: "damageEnd" },
+		forced: true,
+		content() {
+			player.draw().gaintag = ["resilv"];
+		},
+		group: "resilv_restore",
+		subSkill: {
+			restore: {
+				audio: "olsilv",
+				trigger: { global: ["loseAfter", "loseAsyncAfter"] },
+				filter(event, player) {
+					if (event.type != "discard" || event.getlx === false) return false;
+					if (event.name == "lose") {
+						if (!event.player.isIn()) return false;
+						return event.cards2.some(card => {
+							return (event.gaintag_map[card.cardid] || []).includes("resilv") && get.position(card, true) == "d";
+						});
+					}
+					return game.hasPlayer(target => {
+						return target.hasHistory("lose", evt => {
+							if (evt.getParent() != event || evt.position != ui.discardPile) return false;
+							return evt.cards2.some(card => {
+								if (get.position(card, true) != "d") return false;
+								return (evt.gaintag_map[card.cardid] || []).includes("resilv");
+							});
+						});
+					});
+				},
+				forced: true,
+				logTarget(event, player) {
+					if (event.name == "lose") return event.player;
+					return game
+						.filterPlayer(target => {
+							return target.hasHistory("lose", evt => {
+								if (evt.getParent() != event || evt.position != ui.discardPile) return false;
+								return evt.cards2.some(card => {
+									if (get.position(card, true) != "d") return false;
+									return evt.gaintag_map[card.cardid] && evt.gaintag_map[card.cardid].includes("resilv");
+								});
+							});
+						})
+						.sortBySeat();
+				},
+				async content(event, trigger, player) {
+					if (trigger.name == "lose") {
+						await trigger.player.gain(
+							trigger.cards2.filter(card => {
+								return (trigger.gaintag_map[card.cardid] || []).includes("resilv") && get.position(card, true) == "d";
+							}),
+							"gain2"
+						);
+					} else {
+						for (const target of lib.skill.resilv_restore.logTarget(trigger, player)) {
+							await target.gain(
+								target
+									.getHistory("lose", evt => {
+										if (evt.getParent() != trigger || evt.position != ui.discardPile) return false;
+										return evt.cards2.some(card => {
+											if (get.position(card, true) != "d") return false;
+											return (evt.gaintag_map[card.cardid] || []).includes("resilv");
+										});
+									})
+									.reduce((sum, evt) => {
+										return sum.addArray(
+											evt.cards2.filter(card => {
+												if (get.position(card, true) != "d") return false;
+												return (evt.gaintag_map[card.cardid] || []).includes("resilv");
+											})
+										);
+									}, []),
+								"gain2"
+							);
+						}
+					}
+				},
+			},
+		},
+	},
 	//丁尚涴
 	olfudao: {
 		audio: 2,

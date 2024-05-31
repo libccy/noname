@@ -653,7 +653,7 @@ export default {
 	"#chuanxin2": "穿心之痛，细细品吧，哈哈哈哈！",
 	"#zfengshi1": "大军压境，还不卸甲受降！",
 	"#zfengshi2": "放下兵器，饶你不死！",
-	"#zhangren:die": "老臣，绝不事二主！",
+	"#zhangren:die": "本将军败于诸葛，无憾！",
 	"#wylianji1": "两计扣用，以催强势。",
 	"#wylianji2": "容老夫细细思量。",
 	"#moucheng1": "董贼伏诛，天下太平！",
