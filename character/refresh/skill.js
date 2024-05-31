@@ -14582,7 +14582,7 @@ const skills = {
 	},
 	zhaxiang: {
 		audio: 2,
-		audioname: ["ol_sb_jiangwei"],
+		audioname2: { ol_sb_jiangwei: "zhaxiang_ol_sb_jiangwei" },
 		trigger: { player: "loseHpEnd" },
 		forced: true,
 		content: function () {
@@ -14641,7 +14641,7 @@ const skills = {
 		charlotte: true,
 		onremove: true,
 		audio: "zhaxiang",
-		audioname: ["ol_sb_jiangwei"],
+		audioname2: { ol_sb_jiangwei: "zhaxiang_ol_sb_jiangwei" },
 		trigger: { player: "useCard" },
 		filter: function (event, player) {
 			return event.card && event.card.name == "sha" && get.color(event.card) == "red";

@@ -1724,8 +1724,10 @@ const skills = {
 	},
 	kunfenx: {
 		audio: "kunfen",
-		audioname: ["ol_sb_jiangwei"],
+		audioname2: { ol_sb_jiangwei: "kunfen_ol_sb_jiangwei" },
 	},
+	kunfen_ol_sb_jiangwei: { audio: 1 },
+	zhaxiang_ol_sb_jiangwei: { audio: 1 },
 	//界曹彰
 	oljiangchi: {
 		audio: "rejiangchi",

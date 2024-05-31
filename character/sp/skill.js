@@ -24268,7 +24268,7 @@ const skills = {
 	},
 	kunfen: {
 		audio: 2,
-		audioname: ["ol_sb_jiangwei"],
+		audioname2: { ol_sb_jiangwei: "kunfen_ol_sb_jiangwei" },
 		trigger: { player: "phaseJieshuBegin" },
 		locked: function (skill, player) {
 			if (!player || !player.storage.kunfen) return true;
