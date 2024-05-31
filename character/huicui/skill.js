@@ -2,6 +2,137 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//乐祢衡
+	dcjigu: {
+		audio: 2,
+		trigger: {
+			global: "phaseBefore",
+			player: "enterGame",
+		},
+		filter(event, player) {
+			return event.name != "phase" || game.phaseNumber == 0;
+		},
+		forced: true,
+		content() {
+			const cards = player.getCards("h");
+			player.addGaintag(cards, "dcjigu");
+		},
+		mod: {
+			ignoredHandcard(card) {
+				if (card.hasGaintag("dcshuangjia_tag")) return true;
+			},
+			cardDiscardable(card, _, name) {
+				if (name == "phaseDiscard" && card.hasGaintag("dcshuangjia_tag")) return false;
+			},
+		},
+		group: "dcjigu_temp",
+		subSkill: {
+			temp: {
+				audio: "dcjigu",
+				trigger: {
+					player: "damageEnd",
+					source: "damageSource",
+				},
+				filter(event, player) {
+					return player.countCards("e") == player.countCards("h", card => card.hasGaintag("dcjigu"));
+				},
+				usable: 1,
+				prompt2(event, player) {
+					return (
+						"摸" +
+						get.cnNumber(
+							Array.from({ length: 5 })
+								.map((_, i) => i + 1)
+								.reduce((sum, i) => sum + player.countEmptySlot(i), 0)
+						) +
+						"张牌"
+					);
+				},
+				content() {
+					player.draw(
+						Array.from({ length: 5 })
+							.map((_, i) => i + 1)
+							.reduce((sum, i) => sum + player.countEmptySlot(i), 0)
+					);
+				},
+			},
+		},
+	},
+	dcsirui: {
+		audio: 2,
+		enable: "phaseUse",
+		filter(event, player) {
+			if (!player.countCards("hes")) return false;
+			return get
+				.inpileVCardList(info => {
+					const name = info[2];
+					if (get.type(name) != "basic" && get.type(name) != "trick") return false;
+					return true;
+				})
+				.some(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && event.filterCard({ name: card[2], nature: card[3], cards: [cardx] }, player, event), "hes"));
+		},
+		usable: 1,
+		chooseButton: {
+			dialog(event, player) {
+				const list = get
+					.inpileVCardList(info => {
+						const name = info[2];
+						if (get.type(name) != "basic" && get.type(name) != "trick") return false;
+						return true;
+					})
+					.filter(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && event.filterCard({ name: card[2], nature: card[3], cards: [cardx] }, player, event), "hes"));
+				return ui.create.dialog("思锐", [list, "vcard"]);
+			},
+			check(button) {
+				return get.event("player").getUseValue({
+					name: button.link[2],
+					nature: button.link[3],
+				});
+			},
+			backup(links, player) {
+				return {
+					audio: "dcsirui",
+					filterCard(card, player) {
+						return get.cardNameLength(card) == get.cardNameLength(lib.skill.dcsirui_backup.viewAs.name);
+					},
+					popname: true,
+					viewAs: {
+						name: links[0][2],
+						nature: links[0][3],
+					},
+					check(card) {
+						return 7 - get.value(card);
+					},
+					position: "hes",
+				};
+			},
+			prompt(links, player) {
+				return "将一张字数为" + get.cardNameLength(links[0][2]) + "的牌当作" + get.translation(links[0][3] || "") + "【" + get.translation(links[0][2]) + "】使用";
+			},
+		},
+		ai: {
+			order(item, player) {
+				let list = get
+					.inpileVCardList(info => {
+						const name = info[2];
+						if (get.type(name) != "basic" && get.type(name) != "trick") return false;
+						return true;
+					})
+					.filter(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && player.hasUseTarget(get.autoViewAs({ name: card[2], nature: card[3] }, [cardx]), true, true), "hes"))
+					.map(card => {
+						return { name: card[2], nature: card[3] };
+					})
+					.filter(card => player.getUseValue(card, true, true) > 0);
+				if (!list.length) return 0;
+				list.sort((a, b) => (player.getUseValue(b, true, true) || 0) - (player.getUseValue(a, true, true) || 0));
+				return get.order(list[0], player) * 0.99;
+			},
+			result: { player: 1 },
+		},
+		subSkill: {
+			backup: { audio: "dcsirui" },
+		},
+	},
 	//侧肘
 	dcshefu: {
 		audio: 2,
