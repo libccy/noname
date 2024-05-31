@@ -118,7 +118,7 @@ const skills = {
 			});
 			if (targets.length) {
 				const result = await player
-					.chooseTarget(get.prompt("dchuanli"), "令一名其他角色的所有技能失效，然后令其获得〖直谏〗和〖固政〗直到其回合结束", (card, player, target) => {
+					.chooseTarget(get.prompt("dchuanli"), "令一名其他角色的所有技能失效，然后令其获得〖英姿〗和〖反间〗直到其回合结束", (card, player, target) => {
 						return get.event("targets").includes(target);
 					})
 					.set("ai", target => {

@@ -21,7 +21,7 @@ const characters = {
 	sp_mushun: ["male", "qun", 4, ["moukui"]],
 	dc_wuyi: ["male", "shu", 4, ["dcbenxi"]],
 	quyuan: ["male", "qun", 3, ["dcqiusuo", "dclisao"]],
-	xin_sunquan: ["male", "wu", 4, ["dchuiwan", "dchuanli"]],
+	xin_sunquan: ["male", "wu", 3, ["dchuiwan", "dchuanli"], ["die_audio"]],
 };
 
 export default characters;
