@@ -7407,7 +7407,6 @@ const skills = {
 		ai: {
 			threaten: 3.5,
 			directHit_ai: true,
-			halfneg: true,
 			skillTagFilter: function (player, tag, arg) {
 				if (arg && arg.card && arg.card.name == "sha") {
 					var storage = player.getStorage("sbliegong");

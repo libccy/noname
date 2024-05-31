@@ -9700,7 +9700,6 @@ const skills = {
 		},
 		ai: {
 			halfneg: true,
-			combo: "fenrui",
 			threaten: 3.2,
 		},
 	},

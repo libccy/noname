@@ -4049,7 +4049,6 @@ const skills = {
 		},
 		ai: {
 			threaten: 2.5,
-			halfneg: true,
 		},
 		subSkill: {
 			block: {
