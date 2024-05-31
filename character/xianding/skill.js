@@ -2919,8 +2919,7 @@ const skills = {
 				yield player.logSkill("dcsbmengmou", target);
 				player.addTempSkill("dcsbmengmou_" + (storage || false));
 				player.changeZhuanhuanji("dcsbmengmou");
-				//鲁肃暂时没有另一张原画（悲
-				//player.changeSkin("dcsbmengmou", "dc_sb_lusu" + (player.storage.dcsbmengmou ? "_shadow" : ""));
+				player.changeSkin("dcsbmengmou", "dc_sb_lusu" + (player.storage.dcsbmengmou ? "_shadow" : ""));
 				while (num > 0) {
 					num--;
 					var result2;
@@ -2988,8 +2987,7 @@ const skills = {
 				check: () => Math.random() > 0.5,
 				content() {
 					player.changeZhuanhuanji("dcsbmengmou");
-					//鲁肃暂时没有另一张原画（悲
-					//player.changeSkin("dcsbmengmou", "dc_sb_lusu" + (player.storage.dcsbmengmou ? "_shadow" : ""));
+					player.changeSkin("dcsbmengmou", "dc_sb_lusu" + (player.storage.dcsbmengmou ? "_shadow" : ""));
 				},
 			},
 		},
