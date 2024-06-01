@@ -21120,49 +21120,46 @@ const skills = {
 		animationColor: "thunder",
 		skillAnimation: "legend",
 		mark: true,
-		direct: true,
-		content: function () {
-			"step 0";
-			player
-				.chooseTarget(get.prompt2("yongdi"), function (card, player, target) {
-					return (target.hasSex("male") || target.name == "key_yuri") && target != player;
-				})
-				.set("ai", function (target) {
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(
+					get.prompt2("yongdi"),
+					(card, player, target) => {
+						if (player === target) return false;
+						return target.hasSex("male") || target.name == "key_yuri";
+					}
+				)
+				.set("ai", target => {
 					if (!_status.event.goon) return 0;
-					var player = _status.event.player;
-					var att = get.attitude(player, target);
+					let player = _status.event.player;
+					let att = get.attitude(player, target);
 					if (att <= 1) return 0;
-					var mode = get.mode();
+					let mode = get.mode();
 					if (mode == "identity" || (mode == "versus" && (_status.mode == "four" || _status.mode == "guandu"))) {
-						if (target.name && lib.character[target.name]) {
-							for (var i = 0; i < lib.character[target.name][3].length; i++) {
-								if (lib.skill[lib.character[target.name][3][i]].zhuSkill) {
-									return att * 2;
-								}
-							}
-						}
+						if (target.getStockSkills(true, true).some(i => {
+							if (target.hasSkill(i)) return false;
+							let info = get.info(i);
+							return info && info.zhuSkill;
+						})) return att * 2;
 					}
 					return att;
 				})
-				.set("goon", !player.hasUnknown());
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("yongdi", target);
-				player.awakenSkill("yongdi");
-				target.gainMaxHp();
-				target.recover();
-				var skills = target.getStockSkills(true, true).filter(skill => {
-					if (target.hasSkill(skill)) return false;
-					var info = get.info(skill);
-					return info && info.zhuSkill;
-				});
-				if (skills.length) {
-					target.addSkills(skills);
-				}
-			}
+				.set("goon", !player.hasUnknown())
+				.forResult();
 		},
-		ai: { expose: 0.2 },
+		async content(event, trigger, player) {
+			player.awakenSkill("yongdi");
+			let target = event.targets[0], mode = get.mode();
+			if (mode !== "identity" || player.identity !== "nei") player.addExpose(0.25);
+			target.gainMaxHp();
+			target.recover();
+			let skills = target.getStockSkills(true, true).filter(skill => {
+				if (target.hasSkill(skill)) return false;
+				let info = get.info(skill);
+				return info && info.zhuSkill;
+			});
+			if (skills.length) target.addSkills(skills);
+		},
 	},
 	regushe: {
 		audio: "gushe",
