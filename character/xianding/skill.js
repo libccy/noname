@@ -20,6 +20,7 @@ const skills = {
 			const evt = event.getl(player);
 			return evt && evt.player == target && (evt.es || []).length;
 		},
+		forced: true,
 		logTarget: () => _status.currentPhase,
 		async content(event, trigger, player) {
 			player.addMark("dcsbfengmin", 1, false);
