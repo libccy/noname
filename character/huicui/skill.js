@@ -15,6 +15,7 @@ const skills = {
 				var list = Array.from({
 					length: 4,
 				}).map((_, i) => get.cnNumber(i + 1, true));
+				list.push("cancel2");
 				return list;
 			},
 			check(event, player) {
