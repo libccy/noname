@@ -21,6 +21,14 @@ const skills = {
 		intro: { content: storage => "当你使用最" + (storage ? "右" : "左") + "侧的卡牌时，你摸一张牌" },
 		global: "olziruo_mark",
 		ai: { noSortCard: true },
+		mod: {
+			aiOrder(player, card, num) {
+				if (typeof card == "object") {
+					const cards = player.getCards("h");
+					if (cards.indexOf(card) == (player.storage.olziruo ? cards.length - 1 : 0)) return num + 10;
+				}
+			},
+		},
 		subSkill: {
 			mark: {
 				charlotte: true,
@@ -50,8 +58,8 @@ const skills = {
 			dialog(_, player) {
 				let dialog = ui.create.dialog("蓄发：请选择一项", "hidden");
 				const list = [
-					["0", "将至少一半手牌称为“蓄发”置于武将牌上（向上取整）"],
-					["1", "移去一半“蓄发”牌（向上取整）"],
+					["0", "将至少一半手牌称为“蓄发”置于武将牌上（向上取整），然后可以视为使用“蓄发”牌中的一张普通锦囊牌"],
+					["1", "移去一半“蓄发”牌（向上取整），然后可以视为使用其中一张普通锦囊牌"],
 				].filter(listx => {
 					if (listx[0] == "0") return !player.hasSkill("olxvfa_0") && player.countCards("h");
 					return !player.hasSkill("olxvfa_1") && player.getExpansions("olxvfa").length;
@@ -67,8 +75,8 @@ const skills = {
 			check: () => 1 + Math.random(),
 			backup: links => get.copy(lib.skill["olxvfa_" + ["put", "remove"][parseInt(links[0])]]),
 			prompt(links) {
-				if (links[0] == "0") return "###蓄发###将至少一半手牌称为“蓄发”置于武将牌上（向上取整）";
-				return "###蓄发###移去一半“蓄发”牌（向上取整）";
+				if (links[0] == "0") return "###蓄发###将至少一半手牌称为“蓄发”置于武将牌上（向上取整），然后可以视为使用“蓄发”牌中的一张普通锦囊牌";
+				return "###蓄发###移去一半“蓄发”牌（向上取整），然后可以视为使用其中一张普通锦囊牌";
 			},
 		},
 		intro: {
@@ -97,18 +105,37 @@ const skills = {
 				lose: false,
 				discard: false,
 				delay: 0,
-				content() {
-					player.addTempSkill("olxvfa_effect");
+				async content(event, trigger, player) {
 					player.addTempSkill("olxvfa_0", "phaseUseAfter");
-					player.addToExpansion(cards, player, "give").gaintag.add("olxvfa");
+					await player.addToExpansion(event.cards, player, "give").set("gaintag", ["olxvfa"]);
+					const cards = player.getExpansions("olxvfa");
+					if (cards.some(card => get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true))) {
+						const result = await player
+							.chooseButton(["蓄发：是否视为使用一张“蓄发”牌？", cards])
+							.set("filterButton", button => {
+								const player = get.event("player"),
+									card = button.link;
+								return get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true);
+							})
+							.set("ai", button => {
+								const player = get.event("player"),
+									card = button.link;
+								return player.getUseValue({ name: card.name, isCard: true }, true);
+							})
+							.forResult();
+						if (result.bool) {
+							const card = result.links[0];
+							await player.chooseUseTarget({ name: card.name, isCard: true }, true, false);
+						}
+					}
 				},
 			},
 			remove: {
 				audio: "olxvfa",
 				filterCard: () => false,
 				selectCard: -1,
+				delay: 0,
 				async content(event, trigger, player) {
-					player.addTempSkill("olxvfa_effect");
 					player.addTempSkill("olxvfa_1", "phaseUseAfter");
 					const cards = player.getExpansions("olxvfa"),
 						num = Math.ceil(cards.length / 2);
@@ -117,39 +144,40 @@ const skills = {
 						.set("ai", button => {
 							const player = get.event("player"),
 								value = player.getUseValue(button.link, true);
-							if (value > 0 && get.type(button.link) == "trick") return 0;
+							if (value > 0 && get.type(button.link) == "trick") {
+								if (
+									!ui.selected.buttons.some(but => {
+										return get.type(but.link) == "trick" && player.getUseValue(but.link, true) > 0;
+									})
+								)
+									return 20 + value;
+								return 0;
+							}
 							return 1 / (get.useful(button.link) || 0.5);
 						})
 						.forResult();
-					if (result.bool) await player.loseToDiscardpile(result.links);
-				},
-			},
-			effect: {
-				charlotte: true,
-				trigger: { player: "olxvfa_backupAfter" },
-				filter(event, player) {
-					return player.getExpansions("olxvfa").some(card => get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true));
-				},
-				forced: true,
-				popup: false,
-				async content(event, trigger, player) {
-					const cards = player.getExpansions("olxvfa");
-					const result = await player
-						.chooseButton(["蓄发：是否视为使用一张“蓄发”牌？", cards])
-						.set("filterButton", button => {
-							const player = get.event("player"),
-								card = button.link;
-							return get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true);
-						})
-						.set("ai", button => {
-							const player = get.event("player"),
-								card = button.link;
-							return player.getUseValue({ name: card.name, isCard: true }, true);
-						})
-						.forResult();
 					if (result.bool) {
-						const card = result.links[0];
-						await player.chooseUseTarget({ name: card.name, isCard: true }, true, false);
+						const cardx = result.links;
+						await player.loseToDiscardpile(cardx);
+						if (cardx.some(card => get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true))) {
+							const result2 = await player
+								.chooseButton(["蓄发：是否视为使用一张移去的“蓄发”牌？", cardx])
+								.set("filterButton", button => {
+									const player = get.event("player"),
+										card = button.link;
+									return get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true);
+								})
+								.set("ai", button => {
+									const player = get.event("player"),
+										card = button.link;
+									return player.getUseValue({ name: card.name, isCard: true }, true);
+								})
+								.forResult();
+							if (result2.bool) {
+								const card = result2.links[0];
+								await player.chooseUseTarget({ name: card.name, isCard: true }, true, false);
+							}
+						}
 					}
 				},
 			},
