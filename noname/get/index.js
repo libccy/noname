@@ -349,10 +349,10 @@ export class Get {
 	 * @returns { string }
 	 */
 	plainText(str) {
-		if (!window.noname_plainText) {
-			window.noname_plainText = document.createElement('div');
+		if (!window.noname_get_plainText) {
+			window.noname_get_plainText = document.createElement('div');
 		}
-		var node = window.noname_plainText;
+		var node = window.noname_get_plainText;
 		if(str){
 			node.innerHTML = str;
 		} else {
