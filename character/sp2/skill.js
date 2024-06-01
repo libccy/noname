@@ -150,6 +150,7 @@ const skills = {
 		check(event, player) {
 			return get.attitude(player, event.source) > 0;
 		},
+		usable:1,
 		logTarget: "source",
 		async content(event, trigger, player) {
 			const target = trigger.source,
