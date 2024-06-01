@@ -8041,7 +8041,7 @@ const skills = {
 				})
 				.set("max", trigger.target.countDiscardableCards(player, "he"))
 				.set("goon", get.attitude(player, trigger.target) < 0)
-				.set("logSkill", ["jsrgjuelie_discard", trigger.target]);
+				.set("logSkill", ["jsrgjuelie", trigger.target]);
 			("step 1");
 			if (result.bool) {
 				var num = result.cards.length;

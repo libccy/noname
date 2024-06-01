@@ -11,8 +11,8 @@ const characterSort = {
 	sp_jishi: ["dc_jiben", "zhenghun", "dc_sunhanhua", "liuchongluojun", "wupu"],
 	sp_raoting: ["dc_huanghao", "dc_sunziliufang", "dc_sunchen", "dc_jiachong"],
 	sp_yijun: ["gongsundu", "mengyou", "dc_sp_menghuo", "gongsunxiu"],
-	sp_zhengyin: ["yue_caiwenji", "yue_zhoufei", "yue_caiyong", "yue_xiaoqiao", "yue_daqiao"],
-	sp_zhonghu: ["dc_jiangji", "dc_wangling", "dc_simashi", "dc_caoshuang"],
+	sp_zhengyin: ["yue_caiwenji", "yue_zhoufei", "yue_caiyong", "yue_xiaoqiao", "yue_daqiao", "yue_miheng", "yue_zoushi", "yue_zhugeguo"],
+	huicui_waitforsort: ["chezhou", "zhupeilan"],
 };
 
 const characterSortTranslate = {
@@ -29,7 +29,7 @@ const characterSortTranslate = {
 	sp_raoting: "绕庭之鸦",
 	sp_yijun: "异军突起",
 	sp_zhengyin: "正音雅乐",
-	sp_zhonghu: "冢虎狼顾",
+	huicui_waitforsort: "等待分包",
 };
 
 export { characterSort, characterSortTranslate };

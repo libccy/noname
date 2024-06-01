@@ -394,7 +394,7 @@ const skills = {
 				if (result.index == 0) {
 					await player.gainPlayerCard(target, "he", true);
 				} else {
-					player.addTempSkill("olzhenjie_effect");
+					player.addTempSkill("olzhenlie_effect");
 					player.addMark("olzhenlie_effect", 1, false);
 				}
 			}

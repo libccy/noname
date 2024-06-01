@@ -607,6 +607,14 @@ const translates = {
 	dcsbhoude_info: "当你于其他角色的出牌阶段内首次成为红色【杀】/黑色普通锦囊牌的目标后，你可以弃置你/其的一张牌，令此牌对你无效。",
 	dcsbzijin: "自矜",
 	dcsbzijin_info: "锁定技。①你不能成为〖讨州〗的目标。②当你使用牌结算结束后，若此牌未造成过伤害，你须弃置一张牌或失去1点体力。",
+	dc_wangling: "新杀谋王淩",
+	dc_wangling_prefix: "新杀谋",
+	dc_simashi: "新杀谋司马师",
+	dc_simashi_prefix: "新杀谋",
+	dc_caoshuang: "新杀谋曹爽",
+	dc_caoshuang_prefix: "新杀谋",
+	dc_jiangji: "新杀谋蒋济",
+	dc_jiangji_prefix: "新杀谋",
 };
 
 export default translates;
