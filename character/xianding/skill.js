@@ -3,6 +3,101 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//关平
+	dcsbwuwei: {
+		audio: 2,
+		enable: "phaseUse",
+		filter(event, player) {
+			const count = player.getStat("skill").dcsbwuwei;
+			if (count && count > player.countMark("dcsbwuwei_count")) return false;
+			const colors = player.getCards("h").reduce((list, card) => list.add(get.color(card)), []);
+			return colors.some(color => event.filterCard(get.autoViewAs(lib.skill.dcsbwuwei.viewAs, player.getCards("h", { color: color })), player, event));
+		},
+		viewAs: { name: "sha", storage: { dcsbwuwei: true } },
+		locked: false,
+		mod: {
+			targetInRange(card) {
+				if (card.storage && card.storage.dcsbwuwei) return true;
+			},
+			cardUsable(card, player, num) {
+				if (card.storage && card.storage.dcsbwuwei) return Infinity;
+			},
+		},
+		filterCard: () => false,
+		selectCard: -1,
+		async precontent(event, _, player) {
+			let colors = player.getCards("h").reduce((list, card) => list.add(get.color(card)), []),
+				evt = event.getParent();
+			colors = colors.filter(color => evt.filterCard(get.autoViewAs(lib.skill.dcsbwuwei.viewAs, player.getCards("h", { color: color })), player, evt));
+			colors = colors.map(color => (color == "none" ? "none2" : color));
+			const result = await player.chooseControl(colors, "cancel2").set("prompt", "武威：将一种颜色的所有手牌当作【杀】使用").forResult();
+			const color = result.control == "none2" ? "none" : result.control;
+			if (color == "cancel2") {
+				evt.goto(0);
+				return;
+			}
+			player.addTempSkill("dcsbwuwei_effect");
+			event.result.cards = player.getCards("h", { color: color });
+			event.result.card.cards = player.getCards("h", { color: color });
+		},
+		ai: {
+			order(item, player) {
+				return get.order({ name: "sha" }, player) - 0.001;
+			},
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				trigger: { player: "useCard" },
+				filter(event, player) {
+					return (event.card.storage || {}).dcsbwuwei && (event.cards || []).length;
+				},
+				forced: true,
+				popup: false,
+				async content(event, trigger, player) {
+					let result,
+						types = trigger.cards.reduce((list, card) => list.add(get.type(card, player)), []);
+					if (types.length >= 3) {
+						result = { bool: true, links: [0, 1, 2] };
+					} else {
+						result = await player
+							.chooseButton(["武威：请选择" + get.cnNumber(types.length) + "项执行", [["摸一张牌", "令目标角色本回合非锁定技失效", "令本回合〖武威〗可发动次数+1"].map((item, i) => [i, item]), "textbutton"]])
+							.set("forced", true)
+							.set("selectButton", types.length)
+							.set("ai", button => {
+								return [1, 3, 2].slice(0, get.event("selectButton")).includes(button.link) ? 1 : 0;
+							})
+							.forResult();
+					}
+					if (result.bool) {
+						result.links.sort((a, b) => a - b);
+						for (const i of result.links) {
+							game.log(player, "选择了", "#g【武威】", "的", "#y第" + get.cnNumber(i + 1, true) + "项");
+						}
+						if (result.links.includes(0)) await player.draw();
+						if (result.links.includes(1)) {
+							for (const target of trigger.targets || []) {
+								target.addTempSkill("fengyin");
+							}
+						}
+						if (result.links.includes(2)) {
+							player.addTempSkill("dcsbwuwei_count");
+							player.addMark("dcsbwuwei_count", 1, false);
+						}
+						if (result.links.length == 3) {
+							trigger.baseDamage++;
+							game.log(trigger.card, "造成的伤害", "#y+1");
+						}
+					}
+				},
+			},
+			count: {
+				charlotte: true,
+				onremove: true,
+				intro: { content: "本回合〖武威〗可发动次数+#" },
+			},
+		},
+	},
 	//曹昂
 	dcsbfengmin: {
 		audio: 2,

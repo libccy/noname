@@ -623,6 +623,10 @@ const translates = {
 	dcsbzhiwang_info: "每回合限一次，当你因受到牌造成的伤害进入濒死状态时，你可以将此伤害改为无来源并选择一名其他角色，其于本回合结束时可以使用本回合令你进入濒死状态的牌。",
 	dcsbjueying: "绝影",
 	dcsbjueying_info: "当你受到伤害时，你可以弃置装备区里的【绝影】，然后防止此伤害。",
+	dc_sb_guanping: "新杀谋关平",
+	dc_sb_guanping_prefix: "新杀谋",
+	dcsbwuwei: "武威",
+	dcsbwuwei_info: "出牌阶段限一次，你可以将一种颜色的所有手牌当作无距离和次数限制的【杀】使用，然后你选择执行以下X项（X为转化为此【杀】的牌的类别数）：①摸一张牌；②令目标角色本回合非锁定技失效；③令本回合〖武威〗可发动次数+1。然后若你执行了所有项，则此【杀】造成的伤害+1。",
 };
 
 export default translates;

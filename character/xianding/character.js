@@ -1,4 +1,5 @@
 const characters = {
+	dc_sb_guanping: ["male", "shu", 4, ["dcsbwuwei"]],
 	dc_sb_caoang: ["male", "wei", 4, ["dcsbfengmin", "dcsbzhiwang", "dcsbjueying"]],
 	dc_caoshuang: ["male", "wei", 4, ["dcjianzhuan", "dcfanshi"]],
 	dc_simashi: ["male", "wei", 3, ["dcsanshi", "dczhenrao", "dcchenlve"]],
