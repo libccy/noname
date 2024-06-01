@@ -18,7 +18,7 @@ const skills = {
 		mark: true,
 		marktext: "☯",
 		zhuanhuanji: true,
-		intro: { content: storage => "当你使用最" + (storage ? "右" : "左") + "边的卡牌时，你摸一张牌，且本回合你不能整理手牌" },
+		intro: { content: storage => "当你使用最" + (storage ? "右" : "左") + "侧的卡牌时，你摸一张牌" },
 		global: "olziruo_mark",
 		ai: { noSortCard: true },
 		subSkill: {
