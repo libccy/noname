@@ -8635,6 +8635,16 @@ const skills = {
 		},
 	},
 	riki_nvzhuang: {
+		init(player) {
+			if (get.character(player.name1, 3).includes("riki_nvzhuang")) {
+				player.storage.riki_nvzhuang = player.sex;
+				if (player.sex === "male") player.sex = "double";
+				else player.sex = "female";
+			}
+		},
+		onremove(player) {
+			if (player.storage.riki_nvzhuang) player.sex = player.storage.riki_nvzhuang;
+		},
 		trigger: { player: "phaseJieshuBegin" },
 		forced: true,
 		content() {

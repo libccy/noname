@@ -3249,7 +3249,7 @@ const skills = {
 			player.addMark("twshoushou_plus", 1, false);
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 		},
 		subSkill: {
 			damage: {

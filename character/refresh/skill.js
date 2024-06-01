@@ -9792,6 +9792,9 @@ const skills = {
 			player.recover();
 			player.draw();
 		},
+		ai: {
+			combo: "rejiushi"
+		},
 	},
 	rejiushi: {
 		audio: 2,

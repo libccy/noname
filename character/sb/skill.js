@@ -379,6 +379,9 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "sbqiaomeng"
+		},
 	},
 	sbqiaomeng: {
 		audio: 2,
@@ -433,6 +436,9 @@ const skills = {
 				const num = Math.min(2, 4 - player.countMark("charge"));
 				if (num > 0) player.addMark("charge", num);
 			}
+		},
+		ai: {
+			combo: "sbyicong"
 		},
 	},
 	//高顺
@@ -6975,6 +6981,9 @@ const skills = {
 					game.delayx();
 				},
 			},
+		},
+		ai: {
+			combo: "sbliangzhu"
 		},
 	},
 	sbliangzhu: {

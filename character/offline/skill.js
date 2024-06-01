@@ -5037,6 +5037,9 @@ const skills = {
 				player.gift(result.cards, target);
 			}
 		},
+		ai: {
+			combo: "yixiandao"
+		},
 	},
 	yjyibing: {
 		trigger: {
