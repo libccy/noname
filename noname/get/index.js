@@ -343,6 +343,23 @@ export class Get {
 		if (info.categories) list.addArray(info.categories(skill, player));
 		return list;
 	}
+	/**
+	 * 用于将HTML代码转换为纯文本。
+	 * @param {string} str 
+	 * @returns { string }
+	 */
+	plainText(str) {
+		if (!window.noname_plainText) {
+			window.noname_plainText = document.createElement('div');
+		}
+		var node = window.noname_plainText;
+		if(str){
+			node.innerHTML = str;
+		} else {
+			node.innerHTML = '';
+		}
+		return node.innerText;
+	}
 	numOf(obj, item) {
 		return obj.filter(element => element == item).length;
 	}
