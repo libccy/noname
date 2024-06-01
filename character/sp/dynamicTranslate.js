@@ -87,5 +87,9 @@ const dynamicTranslates = {
 		if (player.storage.olxuanzhu) return '转换技，每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用：阴，任意基本牌；<span class="bluetext">阳，任意普通锦囊牌（须指定目标且仅指定一个目标）</span>。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
 		return '转换技，每回合限一次，你可以将一张牌称为“玄”置于武将牌上，然后视为使用：<span class="bluetext">阴，任意基本牌</span>；阳，任意普通锦囊牌（须指定目标且仅指定一个目标）。若此次置于武将牌上的“玄”：不为装备牌，你弃置一张牌；为装备牌，你将所有“玄”置入弃牌堆，然后摸等量的牌。';
 	},
+	olziruo(player){
+		if (player.storage.olziruo) return '转换技，锁定技。①你不能整理手牌。②当你使用最{阴：左；<span class="bluetext">阳：右</span>}侧的手牌时，你摸一张牌。';
+		return '转换技，锁定技。①你不能整理手牌。②当你使用最{<span class="bluetext">阴：左</span>；阳：右}侧的手牌时，你摸一张牌。';
+	},
 };
 export default dynamicTranslates;

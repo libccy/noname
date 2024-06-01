@@ -2,6 +2,187 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//蒋济
+	olziruo: {
+		audio: 2,
+		trigger: { player: "useCard" },
+		filter(event, player) {
+			if (!event.olziruo || !event.olziruo[player.playerid]) return false;
+			return event.olziruo[player.playerid][Boolean(player.storage.olziruo) ? 1 : 0];
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			player.changeZhuanhuanji("olziruo");
+			await player.draw();
+		},
+		mark: true,
+		marktext: "☯",
+		zhuanhuanji: true,
+		intro: { content: storage => "当你使用最" + (storage ? "右" : "左") + "侧的卡牌时，你摸一张牌" },
+		global: "olziruo_mark",
+		ai: { noSortCard: true },
+		mod: {
+			aiOrder(player, card, num) {
+				if (typeof card == "object") {
+					const cards = player.getCards("h");
+					if (cards.indexOf(card) == (player.storage.olziruo ? cards.length - 1 : 0)) return num + 10;
+				}
+			},
+		},
+		subSkill: {
+			mark: {
+				charlotte: true,
+				trigger: { player: "useCardBegin" },
+				filter(event, player) {
+					const cards = player.getCards("h");
+					if (!cards.length) return false;
+					return (event.cards || []).some(card => cards[0] == card || cards[cards.length - 1] == card);
+				},
+				forced: true,
+				popup: false,
+				content() {
+					const cards = player.getCards("h");
+					if (!trigger.olziruo) trigger.olziruo = {};
+					trigger.olziruo[player.playerid] = [trigger.cards.some(card => cards[0] == card), trigger.cards.some(card => cards[cards.length - 1] == card)];
+				},
+			},
+		},
+	},
+	olxvfa: {
+		audio: 2,
+		enable: "phaseUse",
+		filter(event, player) {
+			return (!player.hasSkill("olxvfa_0") && player.countCards("h")) || (!player.hasSkill("olxvfa_1") && player.getExpansions("olxvfa").length);
+		},
+		chooseButton: {
+			dialog(_, player) {
+				let dialog = ui.create.dialog("蓄发：请选择一项", "hidden");
+				const list = [
+					["0", "将至少一半手牌称为“蓄发”置于武将牌上（向上取整），然后可以视为使用“蓄发”牌中的一张普通锦囊牌"],
+					["1", "移去一半“蓄发”牌（向上取整），然后可以视为使用其中一张普通锦囊牌"],
+				].filter(listx => {
+					if (listx[0] == "0") return !player.hasSkill("olxvfa_0") && player.countCards("h");
+					return !player.hasSkill("olxvfa_1") && player.getExpansions("olxvfa").length;
+				});
+				dialog.add([list, "textbutton"]);
+				if (list.length == 1) dialog.direct = true;
+				return dialog;
+			},
+			filter(button, player) {
+				if (button.link == "0") return !player.hasSkill("olxvfa_0") && player.countCards("h");
+				return !player.hasSkill("olxvfa_1") && player.getExpansions("olxvfa").length;
+			},
+			check: () => 1 + Math.random(),
+			backup: links => get.copy(lib.skill["olxvfa_" + ["put", "remove"][parseInt(links[0])]]),
+			prompt(links) {
+				if (links[0] == "0") return "###蓄发###将至少一半手牌称为“蓄发”置于武将牌上（向上取整），然后可以视为使用“蓄发”牌中的一张普通锦囊牌";
+				return "###蓄发###移去一半“蓄发”牌（向上取整），然后可以视为使用其中一张普通锦囊牌";
+			},
+		},
+		intro: {
+			content: "expansion",
+			markcount: "expansion",
+		},
+		onremove(player, skill) {
+			const cards = player.getExpansions(skill);
+			if (cards.length) player.loseToDiscardpile(cards);
+		},
+		subSkill: {
+			backup: {},
+			0: { charlotte: true },
+			1: { charlotte: true },
+			put: {
+				audio: "olxvfa",
+				filterCard: true,
+				selectCard: () => [Math.ceil(get.event("player").countCards("h") / 2), Infinity],
+				position: "h",
+				check(card) {
+					const player = get.event("player"),
+						value = player.getUseValue(card, true);
+					if (value > 0) return get.type(card) == "trick" ? 20 + value : 0;
+					return 15 - get.value(card) - get.useful(card);
+				},
+				lose: false,
+				discard: false,
+				delay: 0,
+				async content(event, trigger, player) {
+					player.addTempSkill("olxvfa_0", "phaseUseAfter");
+					await player.addToExpansion(event.cards, player, "give").set("gaintag", ["olxvfa"]);
+					const cards = player.getExpansions("olxvfa");
+					if (cards.some(card => get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true))) {
+						const result = await player
+							.chooseButton(["蓄发：是否视为使用一张“蓄发”牌？", cards])
+							.set("filterButton", button => {
+								const player = get.event("player"),
+									card = button.link;
+								return get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true);
+							})
+							.set("ai", button => {
+								const player = get.event("player"),
+									card = button.link;
+								return player.getUseValue({ name: card.name, isCard: true }, true);
+							})
+							.forResult();
+						if (result.bool) {
+							const card = result.links[0];
+							await player.chooseUseTarget({ name: card.name, isCard: true }, true, false);
+						}
+					}
+				},
+			},
+			remove: {
+				audio: "olxvfa",
+				filterCard: () => false,
+				selectCard: -1,
+				delay: 0,
+				async content(event, trigger, player) {
+					player.addTempSkill("olxvfa_1", "phaseUseAfter");
+					const cards = player.getExpansions("olxvfa"),
+						num = Math.ceil(cards.length / 2);
+					const result = await player
+						.chooseButton(["蓄发：请移去至少" + get.cnNumber(num) + "张“蓄发”牌", cards], [num, Infinity], true)
+						.set("ai", button => {
+							const player = get.event("player"),
+								value = player.getUseValue(button.link, true);
+							if (value > 0 && get.type(button.link) == "trick") {
+								if (
+									!ui.selected.buttons.some(but => {
+										return get.type(but.link) == "trick" && player.getUseValue(but.link, true) > 0;
+									})
+								)
+									return 20 + value;
+								return 0;
+							}
+							return 1 / (get.useful(button.link) || 0.5);
+						})
+						.forResult();
+					if (result.bool) {
+						const cardx = result.links;
+						await player.loseToDiscardpile(cardx);
+						if (cardx.some(card => get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true))) {
+							const result2 = await player
+								.chooseButton(["蓄发：是否视为使用一张移去的“蓄发”牌？", cardx])
+								.set("filterButton", button => {
+									const player = get.event("player"),
+										card = button.link;
+									return get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true);
+								})
+								.set("ai", button => {
+									const player = get.event("player"),
+										card = button.link;
+									return player.getUseValue({ name: card.name, isCard: true }, true);
+								})
+								.forResult();
+							if (result2.bool) {
+								const card = result2.links[0];
+								await player.chooseUseTarget({ name: card.name, isCard: true }, true, false);
+							}
+						}
+					}
+				},
+			},
+		},
+	},
 	//蔡瑁
 	olzuolian: {
 		audio: 2,
@@ -1872,6 +2053,9 @@ const skills = {
 				})
 			)
 				await player.recover(cards.length);
+		},
+		ai: {
+			combo: "olgongjie"
 		},
 	},
 	//OL飞扬
@@ -21117,49 +21301,46 @@ const skills = {
 		animationColor: "thunder",
 		skillAnimation: "legend",
 		mark: true,
-		direct: true,
-		content: function () {
-			"step 0";
-			player
-				.chooseTarget(get.prompt2("yongdi"), function (card, player, target) {
-					return (target.hasSex("male") || target.name == "key_yuri") && target != player;
-				})
-				.set("ai", function (target) {
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(
+					get.prompt2("yongdi"),
+					(card, player, target) => {
+						if (player === target) return false;
+						return target.hasSex("male") || target.name == "key_yuri";
+					}
+				)
+				.set("ai", target => {
 					if (!_status.event.goon) return 0;
-					var player = _status.event.player;
-					var att = get.attitude(player, target);
+					let player = _status.event.player;
+					let att = get.attitude(player, target);
 					if (att <= 1) return 0;
-					var mode = get.mode();
+					let mode = get.mode();
 					if (mode == "identity" || (mode == "versus" && (_status.mode == "four" || _status.mode == "guandu"))) {
-						if (target.name && lib.character[target.name]) {
-							for (var i = 0; i < lib.character[target.name][3].length; i++) {
-								if (lib.skill[lib.character[target.name][3][i]].zhuSkill) {
-									return att * 2;
-								}
-							}
-						}
+						if (target.getStockSkills(true, true).some(i => {
+							if (target.hasSkill(i)) return false;
+							let info = get.info(i);
+							return info && info.zhuSkill;
+						})) return att * 2;
 					}
 					return att;
 				})
-				.set("goon", !player.hasUnknown());
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("yongdi", target);
-				player.awakenSkill("yongdi");
-				target.gainMaxHp();
-				target.recover();
-				var skills = target.getStockSkills(true, true).filter(skill => {
-					if (target.hasSkill(skill)) return false;
-					var info = get.info(skill);
-					return info && info.zhuSkill;
-				});
-				if (skills.length) {
-					target.addSkills(skills);
-				}
-			}
+				.set("goon", !player.hasUnknown())
+				.forResult();
 		},
-		ai: { expose: 0.2 },
+		async content(event, trigger, player) {
+			player.awakenSkill("yongdi");
+			let target = event.targets[0], mode = get.mode();
+			if (mode !== "identity" || player.identity !== "nei") player.addExpose(0.25);
+			target.gainMaxHp();
+			target.recover();
+			let skills = target.getStockSkills(true, true).filter(skill => {
+				if (target.hasSkill(skill)) return false;
+				let info = get.info(skill);
+				return info && info.zhuSkill;
+			});
+			if (skills.length) target.addSkills(skills);
+		},
 	},
 	regushe: {
 		audio: "gushe",

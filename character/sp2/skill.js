@@ -5898,26 +5898,27 @@ const skills = {
 				player.logSkill("rehuoshui", targets);
 				event.targets = targets;
 				targets[0].addTempSkill("fengyin");
-				if (targets.length < 2) event.goto(5);
+				if (targets.length < 2) event.goto(6);
 			} else event.finish();
 			"step 2";
-			if (targets[1].countCards("h") == 0) event.goto(targets.length > 2 ? 4 : 5);
+			if (targets[1].countCards("h") == 0) event.goto(targets.length > 2 ? 4 : 6);
 			else targets[1].chooseCard("h", true, "交给" + get.translation(player) + "一张手牌");
 			"step 3";
 			if (result.bool) {
 				targets[1].give(result.cards, player);
 			}
+			"step 4";
 			if (targets.length < 3) {
-				event.goto(5);
+				event.goto(6);
 			} else {
 				targets.splice(0, 2);
 			}
-			"step 4";
+			"step 5";
 			var target = targets.shift();
 			var num = target.countCards("e");
 			if (num > 0) target.chooseToDiscard("e", true, num);
 			if (targets.length > 0) event.redo();
-			"step 5";
+			"step 6";
 			game.delayx();
 		},
 	},
@@ -8843,6 +8844,31 @@ const skills = {
 		},
 		ai: {
 			jueqing: true,
+		},
+		init(player) {
+			game.addGlobalSkill("gangzhi_jueqing");
+		},
+		onremove(player) {
+			game.removeGlobalSkill("gangzhi_jueqing");
+		},
+		subSkill: {
+			jueqing: {
+				trigger: {player: "dieAfter"},
+				filter(event, player) {
+					return !game.hasPlayer(cur => cur.hasSkill("gangzhi"));
+				},
+				silent: true,
+				forceDie: true,
+				content() {
+					game.removeGlobalSkill("gangzhi_jueqing");
+				},
+				ai: {
+					jueqing: true,
+					skillTagFilter(player, tag, arg) {
+						if (tag === "jueqing") return arg && arg.hasSkill("gangzhi");
+					}
+				}
+			}
 		},
 	},
 	beizhan: {

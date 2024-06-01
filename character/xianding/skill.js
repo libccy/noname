@@ -2919,8 +2919,7 @@ const skills = {
 				yield player.logSkill("dcsbmengmou", target);
 				player.addTempSkill("dcsbmengmou_" + (storage || false));
 				player.changeZhuanhuanji("dcsbmengmou");
-				//鲁肃暂时没有另一张原画（悲
-				//player.changeSkin("dcsbmengmou", "dc_sb_lusu" + (player.storage.dcsbmengmou ? "_shadow" : ""));
+				player.changeSkin("dcsbmengmou", "dc_sb_lusu" + (player.storage.dcsbmengmou ? "_shadow" : ""));
 				while (num > 0) {
 					num--;
 					var result2;
@@ -2988,8 +2987,7 @@ const skills = {
 				check: () => Math.random() > 0.5,
 				content() {
 					player.changeZhuanhuanji("dcsbmengmou");
-					//鲁肃暂时没有另一张原画（悲
-					//player.changeSkin("dcsbmengmou", "dc_sb_lusu" + (player.storage.dcsbmengmou ? "_shadow" : ""));
+					player.changeSkin("dcsbmengmou", "dc_sb_lusu" + (player.storage.dcsbmengmou ? "_shadow" : ""));
 				},
 			},
 		},
@@ -3705,7 +3703,7 @@ const skills = {
 		ai: {
 			effect: {
 				target: function (card, player, target) {
-					if (target.countCards("h") > target.getHp() || player.hasSkillTag("jueqing")) return;
+					if (target.countCards("h") > target.getHp() || player.hasSkillTag("jueqing", false, target)) return;
 					if (player._dcxiongmu_temp) return;
 					if (_status.event.getParent("useCard", true) || _status.event.getParent("_wuxie", true)) return;
 					if (get.tag(card, "damage")) {
@@ -12999,7 +12997,7 @@ const skills = {
 			threaten: 0.9,
 			effect: {
 				target: function (card, player, target) {
-					if (player.hasSkillTag("jueqing")) return;
+					if (player.hasSkillTag("jueqing", false, target)) return;
 					//if(target.hujia) return;
 					if (player._jinjian_tmp) return;
 					if (_status.event.getParent("useCard", true) || _status.event.getParent("_wuxie", true)) return;

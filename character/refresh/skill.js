@@ -335,7 +335,6 @@ const skills = {
 			}
 			return bool;
 		},
-		ai: { combo: "rejijun" },
 	},
 	//界司马朗
 	requji: {
@@ -3200,7 +3199,7 @@ const skills = {
 			threaten: 0.9,
 			effect: {
 				target: function (card, player, target) {
-					if (player.hasSkillTag("jueqing")) return;
+					if (player.hasSkillTag("jueqing", false, target)) return;
 					if (target.hujia) return;
 					if (player._shibei_tmp) return;
 					if (target.hasSkill("shibei_ai")) return;
@@ -9793,6 +9792,9 @@ const skills = {
 			player.recover();
 			player.draw();
 		},
+		ai: {
+			combo: "rejiushi"
+		},
 	},
 	rejiushi: {
 		audio: 2,
@@ -12843,8 +12845,8 @@ const skills = {
 		ai: {
 			effect: {
 				target: (card, player, target) => {
-					if (typeof card !== "object" || !get.tag(card, "damage") || target.hasSkill("gangzhi")) return;
-					if (player.hasSkillTag("jueqing", null, true)) return;
+					if (typeof card !== "object" || !get.tag(card, "damage")) return;
+					if (player.hasSkillTag("jueqing", false, target)) return;
 					if (get.color(card) === "red") return [1, 0, 1, 0.6];
 					return [1, 0.6];
 				},

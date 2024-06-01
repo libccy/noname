@@ -31,7 +31,7 @@ const characterReplaces = {
 	jsp_guanyu: ["jsp_guanyu", "dc_jsp_guanyu", "jsrg_guanyu"],
 	mushun: ["mushun", "sp_mushun"],
 	wangjun: ["dc_wangjun", "wangjun"],
-	zoushi: ["re_zoushi", "jsrg_zoushi"],
+	re_zoushi: ["yue_zoushi", "re_zoushi", "jsrg_zoushi"],
 	zhangmancheng: ["dc_zhangmancheng", "tw_zhangmancheng"],
 };
 

@@ -1379,6 +1379,9 @@ const skills = {
 		async content(event, trigger, player) {
 			trigger.num++;
 		},
+		ai: {
+			combo: "zhoulin"
+		},
 	},
 	zhoulin: {
 		audio: 2,
@@ -8385,62 +8388,6 @@ const skills = {
 				game.delay(0.5);
 				trigger.cancel();
 			}
-		},
-	},
-	//新华歆
-	yuanqing: {
-		audio: 2,
-		trigger: { player: "phaseUseEnd" },
-		forced: true,
-		filter: function (event, player) {
-			return player.hasHistory("useCard", function (evt) {
-				return evt.getParent("phaseUse") == event;
-			});
-		},
-		content: function () {
-			var map = {},
-				cards = [];
-			player.getHistory("useCard", function (evt) {
-				if (evt.getParent("phaseUse") == trigger) {
-					var type = get.type2(evt.card, false);
-					if (!map[type]) map[type] = [];
-				}
-			});
-			for (var i = 0; i < ui.discardPile.childNodes.length; i++) {
-				var card = ui.discardPile.childNodes[i],
-					type = get.type2(card, false);
-				if (map[type]) map[type].push(card);
-			}
-			for (var i in map) {
-				if (map[i].length) cards.push(map[i].randomGet());
-			}
-			if (cards.length) {
-				player.$gain2(cards, false);
-				game.cardsGotoSpecial(cards, "toRenku");
-				game.log(player, "将", cards, "置入了仁库");
-				game.delayx();
-			}
-		},
-		init: function (player) {
-			player.storage.renku = true;
-		},
-	},
-	shuchen: {
-		audio: 2,
-		init: function (player) {
-			player.storage.renku = true;
-		},
-		trigger: { global: "dying" },
-		forced: true,
-		filter: function (event, player) {
-			return _status.renku.length > 3;
-		},
-		logTarget: "player",
-		content: function () {
-			player.gain(_status.renku, "gain2", "fromRenku");
-			_status.renku.length = 0;
-			game.updateRenku();
-			trigger.player.recover();
 		},
 	},
 	//谯周

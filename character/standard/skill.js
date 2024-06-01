@@ -237,6 +237,9 @@ const skills = {
 			player.popup("盗书");
 			game.log(player, "重置了技能", "#g【盗书】");
 		},
+		ai: {
+			combo: "stddaoshu"
+		},
 	},
 	//周处
 	stdxiongxia: {
@@ -493,7 +496,7 @@ const skills = {
 			threaten: 0.9,
 			effect: {
 				target: function (card, player, target) {
-					if (player.hasSkillTag("jueqing")) return;
+					if (player.hasSkillTag("jueqing", false, target)) return;
 					if (player._stdjinjian_tmp) return;
 					const count = player.storage.counttrigger;
 					if (count && count.stdjinjian_player && count.stdjinjian_player > 0) return;

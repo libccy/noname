@@ -845,8 +845,6 @@ const skills = {
 			var go = false,
 				d1 = false;
 			if (get.attitude(player, trigger.player) > 0) {
-				d1 = true;
-				if (trigger.player.hasSkill("jueqing") || trigger.player.hasSkill("gangzhi")) d1 = false;
 				for (var target of trigger.targets) {
 					if (
 						!target.mayHaveShan(
@@ -866,15 +864,17 @@ const skills = {
 							true
 						)
 					) {
-						if (!target.hasSkill("gangzhi")) d1 = false;
 						if (
-							target.hasSkillTag("filterDamage", null, {
+							get.attitude(player, target) < 0 &&
+							!trigger.player.hasSkillTag("jueqing", false, target) &&
+							!target.hasSkillTag("filterDamage", null, {
 								player: trigger.player,
 								card: trigger.card,
-							}) ||
-							get.attitude(player, target) >= 0
-						)
-							d1 = false;
+							})
+						) {
+							d1 = true;
+							break;
+						}
 					}
 				}
 				if (trigger.addCount === false || !trigger.player.isPhaseUsing()) go = false;
@@ -4374,61 +4374,46 @@ const skills = {
 		intro: {
 			content: "limited",
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			player
-				.chooseTarget(get.prompt2("yjyongdi"), function (card, player, target) {
-					return target.hasSex("male") || target.name == "key_yuri";
-				})
-				.set("ai", function (target) {
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(
+					get.prompt2("yjyongdi"),
+					(card, player, target) => {
+						return target.hasSex("male") || target.name == "key_yuri";
+					}
+				)
+				.set("ai", target => {
 					if (!_status.event.goon) return 0;
 					var player = _status.event.player;
 					var att = get.attitude(player, target);
 					if (att <= 1) return 0;
 					var mode = get.mode();
 					if (mode == "identity" || (mode == "versus" && _status.mode == "four")) {
-						if (target.name && lib.character[target.name]) {
-							for (var i = 0; i < lib.character[target.name][3].length; i++) {
-								if (lib.skill[lib.character[target.name][3][i]].zhuSkill) {
-									return att * 2;
-								}
-							}
-						}
+						if (target.getStockSkills(true, true).some(i => {
+							if (target.hasSkill(i)) return false;
+							let info = get.info(i);
+							return info && info.zhuSkill;
+						})) return att * 2;
 					}
 					return att;
 				})
-				.set("goon", !player.hasUnknown());
-			"step 1";
-			if (result.bool) {
-				player.awakenSkill("yjyongdi");
-				player.logSkill("yjyongdi", result.targets);
-				var target = result.targets[0];
-				target.gainMaxHp(true);
-				target.recover();
-				var mode = get.mode();
-				if (mode == "identity" || (mode == "versus" && _status.mode == "four") || mode == "doudizhu") {
-					if (target.name && lib.character[target.name]) {
-						var skills = lib.character[target.name][3];
-						target.storage.zhuSkill_yjyongdi = [];
-						for (var i = 0; i < skills.length; i++) {
-							var info = lib.skill[skills[i]];
-							if (info.zhuSkill) {
-								target.storage.zhuSkill_yjyongdi.push(skills[i]);
-								if (info.init) {
-									info.init(target);
-								}
-								if (info.init2) {
-									info.init2(target);
-								}
-							}
-						}
-					}
-				}
-			}
+				.set("goon", !player.hasUnknown())
+				.forResult();
 		},
-		ai: {
-			expose: 0.2,
+		async content(event, trigger, player) {
+			player.awakenSkill("yjyongdi");
+			let target = event.targets[0], mode = get.mode();
+			if (player !== target && (mode !== "identity" || player.identity !== "nei")) player.addExpose(0.3);
+			target.gainMaxHp(true);
+			target.recover();
+			if (mode == "identity" || (mode == "versus" && _status.mode == "four") || mode == "doudizhu") {
+				let skills = target.getStockSkills(true, true).filter(i => {
+					if (target.hasSkill(i)) return false;
+					let info = get.info(i);
+					return info && info.zhuSkill;
+				});
+				if (skills.length) target.addSkills(skills);
+			}
 		},
 	},
 	//用间篇豪华版盒子许攸
@@ -5036,6 +5021,9 @@ const skills = {
 				player.line(target, "green");
 				player.gift(result.cards, target);
 			}
+		},
+		ai: {
+			combo: "yixiandao"
 		},
 	},
 	yjyibing: {
