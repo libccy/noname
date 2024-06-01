@@ -3,6 +3,161 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//张绣
+	dcsbfuxi: {
+		audio: 2,
+		trigger: { global: "phaseUseBegin" },
+		filter(event, player) {
+			const target = event.player;
+			if (!player.countCards("he") && !target.countCards("he") && !player.canUse(new lib.element.VCard({ name: "sha" }), target, false)) return false;
+			return event.player != player && event.player.isMaxHandcard();
+		},
+		async cost(event, trigger, player) {
+			const target = trigger.player,
+				str = get.translation(target);
+			let result;
+			if (!player.countCards("he")) {
+				result = await player
+					.chooseBool(get.prompt("dcsbfuxi", target), "弃置" + str + "的一张牌，然后视为对其使用一张【杀】")
+					.set("choice", get.effect(target, { name: "guohe_copy2" }, player, player) + get.effect(target, new lib.element.VCard({ name: "sha" }), player, player) > 0)
+					.forResult();
+				result.index = 1;
+			} else if (!target.countCards("he") && !player.canUse(new lib.element.VCard({ name: "sha" }), target, false)) {
+				result = await player
+					.chooseBool(get.prompt("dcsbfuxi", target), "交给" + str + "一张牌，然后摸两张牌")
+					.set("choice", get.attitude(player, target) > 0 || player.hasCard(card => card.name == "du", "h"))
+					.forResult();
+				result.index = 0;
+			} else {
+				result = await player
+					.chooseControl("给牌", "出杀", "cancel2")
+					.set("choiceList", ["交给" + str + "一张牌，然后摸两张牌", "弃置" + str + "的一张牌，然后视为对其使用一张【杀】"])
+					.set("ai", () => {
+						const player = get.event("player"),
+							target = get.event("target");
+						const num = get.effect(target, { name: "guohe_copy2" }, player, player) + get.effect(target, new lib.element.VCard({ name: "sha" }), player, player);
+						if (num <= 0 && get.attitude(player, target) < 0) return "cancel2";
+						return get.attitude(player, target) >= 0 ? 0 : 1;
+					})
+					.set("target", target)
+					.forResult();
+				result.bool = result.control != "cancel2";
+			}
+			if (result.bool) {
+				result.targets = [target];
+				result.cost_data = result.index;
+			}
+			event.result = result;
+		},
+		async content(event, trigger, player) {
+			const target = trigger.player;
+			if (event.cost_data == 0) {
+				await player.chooseToGive(target, "he", true);
+				await player.draw(2);
+			} else {
+				await player.discardPlayerCard(target, "he", true);
+				const sha = new lib.element.VCard({ name: "sha" });
+				if (player.canUse(sha, target, false)) {
+					await player.useCard(sha, target, false);
+				}
+			}
+		},
+	},
+	dcsbhaoyi: {
+		audio: 2,
+		trigger: { player: "phaseJieshuBegin" },
+		filter(event, player) {
+			return lib.skill.dcsbhaoyi.getCards().length;
+		},
+		frequent: true,
+		prompt(event, player) {
+			return get.prompt("dcsbhaoyi") + "（可获得" + get.translation(lib.skill.dcsbhaoyi.getCards()) + "）";
+		},
+		async content(event, trigger, player) {
+			let cardx = lib.skill.dcsbhaoyi.getCards();
+			await player.gain(cardx, "gain2");
+			cardx = cardx.filter(i => get.owner(i) == player && get.position(i) == "h");
+			if (!cardx.length) return;
+			if (_status.connectMode) game.broadcastAll(() => (_status.noclearcountdown = true));
+			let given_map = [];
+			while (player.hasCard(card => cardx.includes(card) && !card.hasGaintag("olsujian_given"), "h")) {
+				const {
+					result: { bool, cards, targets },
+				} = await player
+					.chooseCardTarget({
+						filterCard(card, player) {
+							return get.event("cards").includes(card) && !card.hasGaintag("olsujian_given");
+						},
+						selectCard: [1, Infinity],
+						position: "h",
+						filterTarget: lib.filter.notMe,
+						prompt: "豪意：请选择要分配的卡牌和目标",
+						ai1(card) {
+							return !ui.selected.cards.length && card.name == "du" ? 1 : 0;
+						},
+						ai2(target) {
+							const player = get.event("player");
+							const card = ui.selected.cards[0];
+							if (card) return get.value(card, target) * get.attitude(player, target);
+							return 0;
+						},
+					})
+					.set("cards", cardx);
+				if (bool) {
+					const target = targets[0];
+					if (given_map.some(i => i[0] == target)) {
+						given_map[given_map.indexOf(given_map.find(i => i[0] == target))][1].addArray(cards);
+					} else given_map.push([target, cards]);
+					player.addGaintag(cards, "olsujian_given");
+				} else break;
+			}
+			if (_status.connectMode) {
+				game.broadcastAll(() => {
+					delete _status.noclearcountdown;
+					game.stopCountChoose();
+				});
+			}
+			if (given_map.length) {
+				await game
+					.loseAsync({
+						gain_list: given_map,
+						player: player,
+						cards: given_map.slice().map(list => list[1]),
+						giver: player,
+						animate: "giveAuto",
+					})
+					.setContent("gaincardMultiple");
+			}
+		},
+		getCards() {
+			let cards = [],
+				targets = game.players.slice().concat(game.dead.slice());
+			for (const target of targets) {
+				const history = target.getHistory("lose", evt => evt.position == ui.discardPile);
+				if (history.length) {
+					for (const evt of history) cards.addArray(evt.cards2.filterInD("d"));
+				}
+			}
+			const historyx = game.getGlobalHistory("cardMove", evt => evt.name == "cardsDiscard");
+			if (historyx.length) {
+				for (const evtx of historyx) cards.addArray(evtx.cards.filterInD("d"));
+			}
+			for (const target of targets) {
+				const history = target.getHistory(
+					"useCard",
+					evt =>
+						(evt.cards || []).length &&
+						target.getHistory("sourceDamage", evtx => {
+							return evtx.card && evtx.card == evt.card;
+						}).length
+				);
+				if (history.length) {
+					for (const evt of history) cards.removeArray(evt.cards.filterInD("d"));
+				}
+			}
+			return cards.filter(card => get.tag(card, "damage"));
+		},
+	},
 	//关平
 	dcsbwuwei: {
 		audio: 2,

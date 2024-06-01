@@ -16,7 +16,7 @@ const characterSort = {
 	sp2_mouding: ["dc_sb_jiaxu", "dc_sb_lusu", "dc_sb_zhouyu", "dc_sb_simayi"],
 	sp2_zhonghu: ["dc_jiangji", "dc_wangling", "dc_simashi", "dc_caoshuang"],
 	sp2_zijing: ["dc_sb_zhugejin"],
-	sp2_waitingforsort: ["dc_sb_caoang", "dc_sb_guanping"],
+	sp2_waitingforsort: ["dc_sb_caoang", "dc_sb_guanping", "dc_sb_zhangxiu"],
 };
 
 const characterSortTranslate = {

@@ -627,6 +627,12 @@ const translates = {
 	dc_sb_guanping_prefix: "新杀谋",
 	dcsbwuwei: "武威",
 	dcsbwuwei_info: "出牌阶段限一次，你可以将一种颜色的所有手牌当作无距离和次数限制的【杀】使用，然后你选择执行以下X项（X为转化为此【杀】的牌的类别数）：①摸一张牌；②令目标角色本回合非锁定技失效；③令本回合〖武威〗可发动次数+1。然后若你执行了所有项，则此【杀】造成的伤害+1。",
+	dc_sb_zhangxiu: "新杀谋张绣",
+	dc_sb_zhangxiu_prefix: "新杀谋",
+	dcsbfuxi: "附袭",
+	dcsbfuxi_info: "其他角色的出牌阶段开始时，若其手牌数为全场最多，则你可以选择一项：①交给其一张牌，然后摸两张牌；②弃置其一张牌，然后视为对其使用一张【杀】。",
+	dcsbhaoyi: "豪意",
+	dcsbhaoyi_info: "结束阶段，你可以获得本回合进入弃牌堆的所有未造成过伤害的伤害牌，然后你可以将这些牌任意分配给其他角色。",
 };
 
 export default translates;
