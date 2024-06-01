@@ -9753,6 +9753,9 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "zhishi"
+		},
 	},
 	zhishi: {
 		audio: 2,
