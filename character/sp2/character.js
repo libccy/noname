@@ -1,4 +1,5 @@
 const characters = {
+	star_zhangzhao: ["male", "wu", 3, ["starzhongyan", "starjinglun"]],
 	star_sunjian: ["male", "qun", "4/5", ["starruijun", "stargangyi"]],
 	liqueguosi: ["male", "qun", 4, ["xiongsuan"]],
 	star_zhangchunhua: ["female", "wei", 3, ["starliangyan", "starminghui"]],
