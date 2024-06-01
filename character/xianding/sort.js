@@ -16,6 +16,7 @@ const characterSort = {
 	sp2_mouding: ["dc_sb_jiaxu", "dc_sb_lusu", "dc_sb_zhouyu", "dc_sb_simayi"],
 	sp2_zhonghu: ["dc_jiangji", "dc_wangling", "dc_simashi", "dc_caoshuang"],
 	sp2_zijing: ["dc_sb_zhugejin"],
+	sp2_waitingforsort: ["dc_sb_caoang"],
 };
 
 const characterSortTranslate = {
@@ -36,6 +37,7 @@ const characterSortTranslate = {
 	sp2_mouding: "谋定天下",
 	sp2_zhonghu: "冢虎狼顾",
 	sp2_zijing: "子敬邀刀",
+	sp2_waitingforsort: "等待分包",
 };
 
 export { characterSort, characterSortTranslate };

@@ -615,6 +615,14 @@ const translates = {
 	dc_caoshuang_prefix: "新杀谋",
 	dc_jiangji: "新杀谋蒋济",
 	dc_jiangji_prefix: "新杀谋",
+	dc_sb_caoang: "新杀谋曹昂",
+	dc_sb_caoang_prefix: "新杀谋",
+	dcsbfengmin: "丰愍",
+	dcsbfengmin_info: "锁定技，一名角色于其回合内失去装备区的牌后，你摸等同于其装备区空缺装备栏数的牌，然后若你发动〖丰愍〗的次数大于你的体力上限，〖丰愍〗于本回合失效。",
+	dcsbzhiwang: "质死",
+	dcsbzhiwang_info: "每回合限一次，当你因受到牌造成的伤害进入濒死状态时，你可以将此伤害改为无来源并选择一名其他角色，其于本回合结束时可以使用本回合令你进入濒死状态的牌。",
+	dcsbjueying: "绝影",
+	dcsbjueying_info: "当你受到伤害时，你可以弃置装备区里的【绝影】，然后防止此伤害。",
 };
 
 export default translates;

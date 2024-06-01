@@ -3,6 +3,114 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//曹昂
+	dcsbfengmin: {
+		audio: 2,
+		trigger: { global: ["loseAfter", "equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"] },
+		filter(event, player) {
+			const target = _status.currentPhase;
+			if (
+				!target ||
+				!target.isIn() ||
+				!Array.from({ length: 5 })
+					.map((_, i) => i + 1)
+					.reduce((sum, i) => sum + target.countEmptySlot(i), 0)
+			)
+				return false;
+			const evt = event.getl(player);
+			return evt && evt.player == target && (evt.es || []).length;
+		},
+		logTarget: () => _status.currentPhase,
+		async content(event, trigger, player) {
+			player.addMark("dcsbfengmin", 1, false);
+			const target = _status.currentPhase;
+			await player.draw(
+				Array.from({ length: 5 })
+					.map((_, i) => i + 1)
+					.reduce((sum, i) => sum + target.countEmptySlot(i), 0)
+			);
+			if (player.countMark("dcsbfengmin") > player.getDamagedHp()) {
+				player.tempBanSkill("dcsbfengmin");
+			}
+		},
+		intro: { content: "本局游戏已发动过#次此技能" },
+	},
+	dcsbzhiwang: {
+		audio: 2,
+		trigger: { player: "dying" },
+		filter(event, player) {
+			const evt = event.getParent(),
+				evtx = event.getParent(3);
+			if (!evt || evt.name != "damage" || !evtx || evtx.name != "useCard") return false;
+			return game.hasPlayer(target => target != player);
+		},
+		usable: 1,
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt("dcsbzhiwang"), lib.filter.notMe)
+				.set("ai", target => {
+					return get.attitude(get.event("player"), target);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			if (trigger.source) delete trigger.source;
+			if (trigger.getParent().source) delete trigger.getParent().source;
+			event.targets[0].addTempSkill("dcsbzhiwang_effect");
+			event.targets[0].markAuto("dcsbzhiwang_effect", [player]);
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				onremove: true,
+				trigger: { global: "phaseEnd" },
+				forced: true,
+				popup: false,
+				async content(event, trigger, player) {
+					let cards = game
+						.getGlobalHistory("everything", evt => {
+							if (evt.name != "dying") return false;
+							if (!player.getStorage("dcsbzhiwang_effect").includes(evt.player)) return false;
+							const evtx = evt.getParent(3);
+							return (evtx.cards || []).someInD("d");
+						})
+						.reduce((cards, evt) => cards.addArray(evt.getParent(3).cards.filterInD("d")), []);
+					while (cards.length) {
+						const result = await player
+							.chooseButton(["质亡：是否使用其中的一张牌？", cards])
+							.set("filterButton", button => {
+								return get.event("player").hasUseTarget(button.link, false);
+							})
+							.set("ai", button => {
+								if (button.link.name == "jiu") return 10;
+								return get.event("player").getUseValue(button.link);
+							})
+							.forResult();
+						if (result.bool) {
+							const card = result.links[0];
+							cards.remove(card);
+							player.$gain2(card, false);
+							await game.asyncDelayx();
+							await player.chooseUseTarget(true, card, false);
+						}
+					}
+				},
+				intro: { content: "本回合结束时，可以使用令$进入濒死的牌" },
+			},
+		},
+	},
+	dcsbjueying: {
+		audio: 2,
+		trigger: { player: "damageBegin4" },
+		filter(event, player) {
+			const cards = player.getEquips("jueying");
+			return cards.length && cards.every(card => lib.filter.cardDiscardable(card, player));
+		},
+		content() {
+			player.discard(player.getEquips("jueying"));
+			trigger.cancel();
+		},
+	},
 	//诸葛瑾
 	dcsbtaozhou: {
 		audio: 2,

@@ -14,6 +14,7 @@ const characterReplaces = {
 	caomao: ["caomao", "mb_caomao"],
 	sp_zhenji: ["sp_zhenji", "jsrg_zhenji"],
 	zhugejin: ["zhugejin", "dc_sb_zhugejin"],
+	caoang: ["dc_sb_caoang", "caoang"],
 };
 
 export default characterReplaces;
