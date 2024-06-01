@@ -845,8 +845,6 @@ const skills = {
 			var go = false,
 				d1 = false;
 			if (get.attitude(player, trigger.player) > 0) {
-				d1 = true;
-				if (trigger.player.hasSkill("jueqing") || trigger.player.hasSkill("gangzhi")) d1 = false;
 				for (var target of trigger.targets) {
 					if (
 						!target.mayHaveShan(
@@ -866,15 +864,17 @@ const skills = {
 							true
 						)
 					) {
-						if (!target.hasSkill("gangzhi")) d1 = false;
 						if (
-							target.hasSkillTag("filterDamage", null, {
+							get.attitude(player, target) < 0 &&
+							!trigger.player.hasSkillTag("jueqing", false, target) &&
+							!target.hasSkillTag("filterDamage", null, {
 								player: trigger.player,
 								card: trigger.card,
-							}) ||
-							get.attitude(player, target) >= 0
-						)
-							d1 = false;
+							})
+						) {
+							d1 = true;
+							break;
+						}
 					}
 				}
 				if (trigger.addCount === false || !trigger.player.isPhaseUsing()) go = false;

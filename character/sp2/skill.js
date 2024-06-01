@@ -8687,6 +8687,31 @@ const skills = {
 		ai: {
 			jueqing: true,
 		},
+		init(player) {
+			game.addGlobalSkill("gangzhi_jueqing");
+		},
+		onremove(player) {
+			game.removeGlobalSkill("gangzhi_jueqing");
+		},
+		subSkill: {
+			jueqing: {
+				trigger: {player: "dieAfter"},
+				filter(event, player) {
+					return !game.hasPlayer(cur => cur.hasSkill("gangzhi"));
+				},
+				silent: true,
+				forceDie: true,
+				content() {
+					game.removeGlobalSkill("gangzhi_jueqing");
+				},
+				ai: {
+					jueqing: true,
+					skillTagFilter(player, tag, arg) {
+						if (tag === "jueqing") return arg && arg.hasSkill("gangzhi");
+					}
+				}
+			}
+		},
 	},
 	beizhan: {
 		trigger: { player: "phaseJieshuBegin" },

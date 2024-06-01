@@ -9028,9 +9028,7 @@ export class Player extends HTMLDivElement {
 	 */
 	hasSkillTag(tag, hidden, arg, globalskill) {
 		var skills = this.getSkills(hidden);
-		if (globalskill) {
-			skills.addArray(lib.skill.global);
-		}
+		if (globalskill !== false) skills.addArray(lib.skill.global);
 		game.expandSkills(skills);
 		for (var i = 0; i < skills.length; i++) {
 			var info = lib.skill[skills[i]];
