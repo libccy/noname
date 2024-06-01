@@ -717,6 +717,7 @@ window.noname_character_rank = {
 		"jsrg_yuanshao",
 		"sb_handang",
 		"sb_gongsunzan",
+		"yue_zoushi",
 	],
 	bp: [
 		"ol_peixiu",
@@ -2278,6 +2279,7 @@ window.noname_character_rank = {
 			"yue_miheng",
 		],
 		rare: [
+			"yue_zoushi",
 			"chezhou",
 			"std_sunhao",
 			"std_chengpu",

@@ -2,6 +2,111 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//乐邹氏
+	dcyunzheng: {
+		audio: 2,
+		trigger: {
+			global: "phaseBefore",
+			player: "enterGame",
+		},
+		filter(event, player) {
+			return event.name != "phase" || game.phaseNumber == 0;
+		},
+		forced: true,
+		content() {
+			const cards = player.getCards("h");
+			player.addGaintag(cards, "dcyunzheng_tag");
+		},
+		mod: {
+			ignoredHandcard(card) {
+				if (card.hasGaintag("dcyunzheng_tag")) return true;
+			},
+			cardDiscardable(card, _, name) {
+				if (name == "phaseDiscard" && card.hasGaintag("dcyunzheng_tag")) return false;
+			},
+		},
+		group: "dcyunzheng_fengyin",
+		subSkill: {
+			fengyin: {
+				audio: "dcyunzheng",
+				trigger: {
+					global: ["phaseBefore", "loseAfter", "loseAsyncAfter", "gainAfter", "equipAfter", "addJudgeAfter", "addToExpansionAfter"],
+					player: ["dchuoxin_update", "enterGame"],
+				},
+				filter(event, player) {
+					if (
+						["lose", "loseAsync", "gain", "equip", "addJudge", "addToExpansion"].includes(event.name) &&
+						!game.hasPlayer(target => {
+							const evt = event.getl(target);
+							return evt && (evt.hs || []).length;
+						})
+					)
+						return false;
+					return game.hasPlayer(target => {
+						return target.hasCard(card => card.hasGaintag("dcyunzheng_tag")) == !target.hasSkill("dcyunzheng_block");
+					});
+				},
+				logTarget(event, player) {
+					return game
+						.filterPlayer(target => {
+							return target.hasCard(card => card.hasGaintag("dcyunzheng_tag")) == !target.hasSkill("dcyunzheng_block");
+						})
+						.sortBySeat();
+				},
+				forced: true,
+				content() {
+					const targets = game
+						.filterPlayer(target => {
+							return target.hasCard(card => card.hasGaintag("dcyunzheng_tag")) == !target.hasSkill("dcyunzheng_block");
+						})
+						.sortBySeat();
+					for (const target of targets) {
+						target[target.hasSkill("dcyunzheng_block") ? "removeSkill" : "addSkill"]("dcyunzheng_block");
+					}
+				},
+			},
+			block: {
+				inherit: "fengyin",
+			},
+		},
+	},
+	dchuoxin: {
+		audio: 2,
+		trigger: { player: "useCardToPlayered" },
+		filter(event, player) {
+			if (
+				!player.hasHistory("lose", evt => {
+					if (evt.getParent() != event.getParent()) return false;
+					return event.cards.some(card => (evt.hs || []).includes(card));
+				})
+			)
+				return false;
+			return event.target != player && event.target.countCards("h");
+		},
+		forced: true,
+		logTarget: "target",
+		async content(event, trigger, player) {
+			const target = trigger.target;
+			const result = await player.choosePlayerCard("h", target, true, "惑心：展示" + get.translation(target) + "的一张手牌").forResult();
+			if (result.bool) {
+				let cards = result.cards.slice();
+				await player.showCards(cards, get.translation(player) + "发动了【惑心】");
+				const cardx = cards.filter(card => card.hasGaintag("dcyunzheng_tag") || get.suit(card) == get.suit(trigger.card));
+				if (cardx.length) {
+					cards.removeArray(cardx);
+					await player.gain(cardx, target, "give");
+					await event.trigger("dchuoxin_update");
+				}
+				if (cards.some(card => !card.hasGaintag("dcyunzheng_tag"))) {
+					target.addGaintag(
+						cards.filter(card => !card.hasGaintag("dcyunzheng_tag")),
+						"dcyunzheng_tag"
+					);
+					await event.trigger("dchuoxin_update");
+				}
+			}
+		},
+	},
 	//朱佩兰
 	dccilv: {
 		audio: 2,
@@ -168,10 +273,10 @@ const skills = {
 		},
 		mod: {
 			ignoredHandcard(card) {
-				if (card.hasGaintag("dcshuangjia_tag")) return true;
+				if (card.hasGaintag("dcjigu")) return true;
 			},
 			cardDiscardable(card, _, name) {
-				if (name == "phaseDiscard" && card.hasGaintag("dcshuangjia_tag")) return false;
+				if (name == "phaseDiscard" && card.hasGaintag("dcjigu")) return false;
 			},
 		},
 		group: "dcjigu_temp",
@@ -335,6 +440,7 @@ const skills = {
 		audio: 2,
 		trigger: { source: "damageSource" },
 		filter(event, player) {
+			if (event.player == player) return false;
 			return event.num > 1 && event.player.isIn() && event.player.countCards("he") && game.roundNumber > 0;
 		},
 		async cost(event, trigger, player) {

@@ -11,7 +11,7 @@ const characterSort = {
 	sp_jishi: ["dc_jiben", "zhenghun", "dc_sunhanhua", "liuchongluojun", "wupu"],
 	sp_raoting: ["dc_huanghao", "dc_sunziliufang", "dc_sunchen", "dc_jiachong"],
 	sp_yijun: ["gongsundu", "mengyou", "dc_sp_menghuo", "gongsunxiu"],
-	sp_zhengyin: ["yue_caiwenji", "yue_zhoufei", "yue_caiyong", "yue_xiaoqiao", "yue_daqiao", "yue_miheng"],
+	sp_zhengyin: ["yue_caiwenji", "yue_zhoufei", "yue_caiyong", "yue_xiaoqiao", "yue_daqiao", "yue_miheng", "yue_zoushi"],
 	huicui_waitforsort: ["chezhou", "zhupeilan"],
 };
 
