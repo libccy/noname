@@ -1953,12 +1953,12 @@ const skills = {
 						const card = player
 							.getCards("h", card => {
 								if (get.value(card) >= 7) return false;
-								return card.hasGaintag("dcqiqin_tag") && game.hasPlayer(target => target.canAddJudge(get.autoViewAs({ name: "dczixi_" + name }, [card])));
+								return card.hasGaintag("dcqiqin_tag") && game.hasPlayer(target => target.canAddJudge(get.autoViewAs({ name: "dczixi_" + button.link }, [card])));
 							})
 							.sort((a, b) => get.value(a) - get.value(b))[0];
 						if (
 							game.hasPlayer(current => {
-								return get.attitude(player, current) < 0 && lib.skill.dczixi.zixiList.some(name => current.canAddJudge(get.autoViewAs({ name: "dczixi_" + name }, [card])));
+								return get.attitude(player, current) < 0 && lib.skill.dczixi.zixiList.some(name => current.canAddJudge(get.autoViewAs({ name: "dczixi_" + button.link }, [card])));
 							})
 						)
 							return list.indexOf(button.link) + 1;
