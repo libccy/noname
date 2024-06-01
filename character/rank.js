@@ -1142,6 +1142,7 @@ window.noname_character_rank = {
 		"mb_simafu",
 	],
 	b: [
+		"yue_zhugeguo",
 		"std_dc_yanghu",
 		"std_re_dengzhi",
 		"std_mateng",
@@ -2279,6 +2280,7 @@ window.noname_character_rank = {
 			"yue_miheng",
 		],
 		rare: [
+			"yue_zhugeguo",
 			"yue_zoushi",
 			"chezhou",
 			"std_sunhao",

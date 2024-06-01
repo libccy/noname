@@ -2,6 +2,136 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//乐诸葛果
+	dcxidi: {
+		audio: 2,
+		trigger: {
+			global: "phaseBefore",
+			player: "enterGame",
+		},
+		filter(event, player) {
+			return event.name != "phase" || game.phaseNumber == 0;
+		},
+		forced: true,
+		content() {
+			const cards = player.getCards("h");
+			player.addGaintag(cards, "dcxidi_tag");
+		},
+		mod: {
+			ignoredHandcard(card) {
+				if (card.hasGaintag("dcxidi_tag")) return true;
+			},
+			cardDiscardable(card, _, name) {
+				if (name == "phaseDiscard" && card.hasGaintag("dcxidi_tag")) return false;
+			},
+		},
+		group: "dcxidi_guanxing",
+		subSkill: {
+			guanxing: {
+				audio: "dcxidi",
+				trigger: { player: "phaseZhunbeiBegin" },
+				filter(event, player) {
+					return player.hasCard(card => card.hasGaintag("dcxidi_tag"), "h");
+				},
+				forced: true,
+				locked: false,
+				preHidden: true,
+				async content(event, trigger, player) {
+					const num = player.countCards("h", card => card.hasGaintag("dcxidi_tag"));
+					const cards = get.cards(Math.min(num, 5));
+					await game.cardsGotoOrdering(cards);
+					const next = player.chooseToMove();
+					next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
+					next.set("prompt", "羲笛：点击将牌移动到牌堆顶或牌堆底");
+					next.processAI = list => {
+						const cards = list[0][1],
+							player = _status.event.player;
+						const top = [];
+						const judges = player.getCards("j");
+						let stopped = false;
+						if (!player.hasWuxie()) {
+							for (let i = 0; i < judges.length; i++) {
+								const judge = get.judge(judges[i]);
+								cards.sort((a, b) => judge(b) - judge(a));
+								if (judge(cards[0]) < 0) {
+									stopped = true;
+									break;
+								} else {
+									top.unshift(cards.shift());
+								}
+							}
+						}
+						let bottom;
+						if (!stopped) {
+							cards.sort((a, b) => get.value(b, player) - get.value(a, player));
+							while (cards.length) {
+								if (get.value(cards[0], player) <= 5) break;
+								top.unshift(cards.shift());
+							}
+						}
+						bottom = cards;
+						return [top, bottom];
+					};
+					const {
+						result: { moved },
+					} = await next;
+					const top = moved[0];
+					const bottom = moved[1];
+					top.reverse();
+					await game.cardsGotoPile(top.concat(bottom), ["top_cards", top], (event, card) => {
+						if (event.top_cards.includes(card)) return ui.cardPile.firstChild;
+						return null;
+					});
+					player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
+					game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
+					await game.asyncDelayx();
+				},
+			},
+		},
+	},
+	dcchengyan: {
+		audio: 2,
+		trigger: { player: "useCardToPlayered" },
+		filter(event, player) {
+			if (!player.isPhaseUsing()) return false;
+			if (event.card.name != "sha" && get.type(event.card) != "trick") return false;
+			return event.target != player;
+		},
+		logTarget: "target",
+		async content(event, trigger, player) {
+			const target = trigger.target;
+			const cards = get.cards();
+			await game.cardsGotoOrdering(cards);
+			await player.showCards(cards, get.translation(player) + "发动了【乘烟】");
+			const card = cards[0];
+			if (card.name == "sha" || (get.type(card) == "trick" && get.info(card).filterTarget)) {
+				player.addTempSkill("dcchengyan_effect");
+				player.markAuto("dcchengyan_effect", [[trigger.card, card, target]]);
+			}
+			if (card.name != "sha" && get.type(card) != "trick") {
+				await player.gain(card, "gain2").set("gaintag", ["dcxidi_tag"]);
+			}
+			else await game.cardsDiscard(cards);
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				onremove: true,
+				trigger: { player: "useCardToBegin" },
+				filter(event, player) {
+					const storage = player.getStorage("dcchengyan_effect");
+					return storage.some(list => list[0] == event.card && list[2] == event.target);
+				},
+				forced: true,
+				popup: false,
+				firstDo: true,
+				async content(event, trigger, player) {
+					const list = player.getStorage("dcchengyan_effect").find(list => list[0] == trigger.card && list[2] == trigger.target);
+					trigger.setContent(lib.card[list[1].name].content);
+				},
+			},
+		},
+	},
 	//乐邹氏
 	dcyunzheng: {
 		audio: 2,
@@ -43,13 +173,13 @@ const skills = {
 					)
 						return false;
 					return game.hasPlayer(target => {
-						return target.hasCard(card => card.hasGaintag("dcyunzheng_tag")) == !target.hasSkill("dcyunzheng_block");
+						return target.hasCard(card => card.hasGaintag("dcyunzheng_tag"), "h") == !target.hasSkill("dcyunzheng_block");
 					});
 				},
 				logTarget(event, player) {
 					return game
 						.filterPlayer(target => {
-							return target.hasCard(card => card.hasGaintag("dcyunzheng_tag")) == !target.hasSkill("dcyunzheng_block");
+							return target.hasCard(card => card.hasGaintag("dcyunzheng_tag"), "h") == !target.hasSkill("dcyunzheng_block");
 						})
 						.sortBySeat();
 				},
@@ -57,7 +187,7 @@ const skills = {
 				content() {
 					const targets = game
 						.filterPlayer(target => {
-							return target.hasCard(card => card.hasGaintag("dcyunzheng_tag")) == !target.hasSkill("dcyunzheng_block");
+							return target.hasCard(card => card.hasGaintag("dcyunzheng_tag"), "h") == !target.hasSkill("dcyunzheng_block");
 						})
 						.sortBySeat();
 					for (const target of targets) {
