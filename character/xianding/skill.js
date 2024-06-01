@@ -17,7 +17,7 @@ const skills = {
 					.reduce((sum, i) => sum + target.countEmptySlot(i), 0)
 			)
 				return false;
-			const evt = event.getl(player);
+			const evt = event.getl(target);
 			return evt && evt.player == target && (evt.es || []).length;
 		},
 		forced: true,
