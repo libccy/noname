@@ -1942,8 +1942,7 @@ const skills = {
 				.set(
 					"goon",
 					(function () {
-						var d1 = true;
-						if (player.hasSkill("jueqing") || player.hasSkill("gangzhi")) d1 = false;
+						var d1 = false;
 						if (
 							!target.mayHaveShan(
 								player,
@@ -1962,15 +1961,7 @@ const skills = {
 								true
 							)
 						) {
-							if (!target.hasSkill("gangzhi")) d1 = false;
-							if (
-								!target.hasSkillTag("filterDamage", null, {
-									player: player,
-									card: trigger.card,
-								}) &&
-								get.attitude(player, target) < 0
-							)
-								return true;
+							if (get.attitude(player, target) < 0 && !player.hasSkillTag("jueqing", false, target)) return true;
 						}
 						if (d1) return get.damageEffect(player, player, player) > 0;
 						return false;
@@ -3258,7 +3249,7 @@ const skills = {
 			player.addMark("twshoushou_plus", 1, false);
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 		},
 		subSkill: {
 			damage: {
@@ -4355,6 +4346,7 @@ const skills = {
 			target.damage();
 		},
 		ai: {
+			combo: "twjuntun",
 			expose: 0.25,
 			order: 8,
 			result: {
@@ -4438,6 +4430,9 @@ const skills = {
 					},
 				},
 			},
+		},
+		ai: {
+			combo: "twjuntun"
 		},
 	},
 	//蒋济
@@ -13716,8 +13711,6 @@ const skills = {
 							"goon",
 							(function () {
 								if (get.attitude(target, player) < 0) return false;
-								var d1 = true;
-								if (trigger.player.hasSkill("jueqing") || trigger.player.hasSkill("gangzhi")) d1 = false;
 								for (var target of trigger.targets) {
 									if (
 										!target.mayHaveShan(
@@ -13737,18 +13730,19 @@ const skills = {
 											true
 										)
 									) {
-										if (!target.hasSkill("gangzhi")) d1 = false;
 										if (
+											
+											get.attitude(player, target) < 0 &&
+											!trigger.player.hasSkillTag("jueqing", false, target) &&
 											!target.hasSkillTag("filterDamage", null, {
 												player: trigger.player,
 												card: trigger.card,
-											}) &&
-											get.attitude(player, target) < 0
+											})
 										)
 											return true;
 									}
 								}
-								return d1;
+								return false;
 							})()
 						);
 					if (!event.target.isUnderControl(true) && !event.target.isOnline()) game.delayx();
@@ -16108,9 +16102,8 @@ const skills = {
 			return event.card.name == "sha" && (event.player == player || player.inRange(event.player)) && player.countCards("he") > 0;
 		},
 		checkx(event, player) {
-			let d1 = true,
+			let d1 = false,
 				e = false;
-			if (event.player.hasSkill("jueqing") || event.player.hasSkill("gangzhi")) d1 = false;
 			for (let tar of event.targets) {
 				if (event.card.name == "sha") {
 					if (
@@ -16131,13 +16124,14 @@ const skills = {
 							true
 						)
 					) {
-						if (!tar.hasSkill("gangzhi")) d1 = false;
 						if (
+							!event.player.hasSkillTag("jueqing", false, tar) &&
 							!tar.hasSkillTag("filterDamage", null, {
 								player: event.player,
 								card: event.card,
 							})
 						) {
+							d1 = true;
 							let att = get.attitude(_status.event.player, tar);
 							if (att > 0) return false;
 							if (att < 0) e = true;

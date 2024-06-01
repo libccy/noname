@@ -869,7 +869,7 @@ const skills = {
 						true
 					)
 				) {
-					if (player.hasSkill("jueqing") || target.hasSkill("gangzhi")) extra_num--;
+					if (player.hasSkillTag("jueqing", false, target)) extra_num--;
 					else if (
 						target.hasSkillTag("filterDamage", null, {
 							player: event.player,
@@ -1049,7 +1049,6 @@ const skills = {
 				}
 			}
 		},
-		ai: { combo: "olsbyufeng" },
 	},
 	//界高顺
 	olxianzhen: {

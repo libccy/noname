@@ -1992,7 +1992,17 @@ const skills = {
 			},
 		},
 		ai: {
-			combo: "dctuoyu",
+			effect: {
+				player(card, player, target) {
+					if (
+						!get.tag(card, "damage") ||
+						player.countMark("dcxianjin") % 2 ||
+						!player.hasSkillTag("jueqing", false, target)
+					) return;
+					if (player.isMaxHandcard()) return [1, 1];
+					return [1, Math.min(3, 1 + player.getStorage("dctuoyu").length)];
+				}
+			}
 		},
 	},
 	dcqijing: {
@@ -5772,7 +5782,7 @@ const skills = {
 					if (!target.hasFriend()) return;
 					let rec = get.tag(card, "recover"), damage = get.tag(card, "damage");
 					if (!rec && !damage) return;
-					if (damage && player.hasSkillTag("jueqing", null, target)) return 1.7;
+					if (damage && player.hasSkillTag("jueqing", false, target)) return 1.7;
 					let die = [null, 1],
 						temp;
 					game.filterPlayer(i => {
