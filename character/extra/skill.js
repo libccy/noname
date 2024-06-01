@@ -1438,7 +1438,7 @@ const skills = {
 				var info = lib.character[name];
 				if (
 					info[3].some(function (skill) {
-						var info = get.skillInfoTranslation(skill);
+						var info = get.plainText(get.skillInfoTranslation(skill));
 						if (!info.includes("【杀】")) return false;
 						var list = get.skillCategoriesOf(skill, player);
 						list.remove("锁定技");
@@ -1470,7 +1470,7 @@ const skills = {
 						var name = button.link;
 						var info = lib.character[name];
 						var skills = info[3].filter(function (skill) {
-							var info = get.skillInfoTranslation(skill);
+							var info = get.plainText(get.skillInfoTranslation(skill));
 							if (!info.includes("【杀】")) return false;
 							var list = get.skillCategoriesOf(skill, get.player());
 							list.remove("锁定技");
@@ -1509,7 +1509,7 @@ const skills = {
 			node = ui.create.buttonPresets.character(item, "character", position, noclick);
 			const info = lib.character[item];
 			const skills = info[3].filter(function (skill) {
-				var info = get.skillInfoTranslation(skill);
+				var info = get.plainText(get.skillInfoTranslation(skill));
 				if (!info.includes("【杀】")) return false;
 				var list = get.skillCategoriesOf(skill, get.player());
 				list.remove("锁定技");
@@ -1588,7 +1588,7 @@ const skills = {
 				var maxHp = get.infoMaxHp(info[2]);
 				if (maxHp != 1) card.distance = { attackFrom: 1 - maxHp };
 				var skills = info[3].filter(function (skill) {
-					var info = get.skillInfoTranslation(skill);
+					var info = get.plainText(get.skillInfoTranslation(skill));
 					if (!info.includes("【杀】")) return false;
 					var list = get.skillCategoriesOf(skill, get.player());
 					list.remove("锁定技");
@@ -1617,10 +1617,10 @@ const skills = {
 				if (skills.length) {
 					for (var skill of skills) {
 						if (lib.skill[skill].nobracket) {
-							append += '<div class="skilln">' + get.translation(skill) + '</div><div><span style="font-family: yuanli">' + get.skillInfoTranslation(skill) + "</span></div><br><br>";
+							append += '<div class="skilln">' + get.translation(skill) + '</div><div><span style="font-family: yuanli">' + get.plainText(get.skillInfoTranslation(skill)) + "</span></div><br><br>";
 						} else {
 							var translation = lib.translate[skill + "_ab"] || get.translation(skill).slice(0, 2);
-							append += '<div class="skill">【' + translation + '】</div><div><span style="font-family: yuanli">' + get.skillInfoTranslation(skill) + "</span></div><br><br>";
+							append += '<div class="skill">【' + translation + '】</div><div><span style="font-family: yuanli">' + get.plainText(get.skillInfoTranslation(skill)) + "</span></div><br><br>";
 						}
 					}
 					str = str.slice(0, str.length - 8);
