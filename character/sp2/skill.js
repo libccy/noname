@@ -2,6 +2,163 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//星张昭
+	starzhongyan: {
+		audio: 2,
+		enable: "phaseUse",
+		usable: 1,
+		filter(event, player) {
+			return game.hasPlayer(current => get.info("starzhongyan").filterTarget(null, player, current));
+		},
+		filterTarget(card, player, target) {
+			return target.countCards("h");
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0],
+				topCards = get.cards(3);
+			await game.cardsGotoOrdering(topCards);
+			await player.showCards(topCards, get.translation(player) + "发动了【忠言】");
+			if (!target.countCards("h")) return;
+			const result = await target
+				.chooseToMove("忠言：交换其中一张牌")
+				.set("list", [
+					["牌堆顶", topCards],
+					["你的手牌", target.getCards("h")],
+				])
+				.set("filterMove", (from, to, moved) => {
+					if (typeof to == "number") return false;
+					var player = _status.event.player;
+					var hs = player.getCards("h");
+					var changed = hs.filter(function (card) {
+						return !moved[1].includes(card);
+					});
+					var changed2 = moved[1].filter(function (card) {
+						return !hs.includes(card);
+					});
+					if (changed.length < 1) return true;
+					var pos1 = moved[0].includes(from.link) ? 0 : 1,
+						pos2 = moved[0].includes(to.link) ? 0 : 1;
+					if (pos1 == pos2) return true;
+					if (pos1 == 0) {
+						if (changed.includes(from.link)) return true;
+						return changed2.includes(to.link);
+					}
+					if (changed2.includes(from.link)) return true;
+					return changed.includes(to.link);
+				})
+				.set("filterOk", moved => {
+					return moved[0].filter(card => get.owner(card)).length == 1;
+				})
+				.set("processAI", function (list) {
+					var cards1 = list[0][1].slice(),
+						cards2 = list[1][1].slice();
+					var card1 = cards1.sort((a, b) => get.value(b) - get.value(a))[0];
+					var card2 = cards2.sort((a, b) => get.value(a) - get.value(b))[0];
+					if (card1 && card2 && get.value(card1) > get.value(card2)) {
+						cards1.remove(card1);
+						cards2.remove(card2);
+						cards1.push(card2);
+						cards2.push(card1);
+					}
+					return [cards1, cards2];
+				})
+				.forResult();
+			if (result.bool) {
+				const lose = result.moved[0].slice();
+				const gain = result.moved[1].slice().filter(i => !get.owner(i));
+				if (lose.some(i => get.owner(i)))
+					await target.lose(
+						lose.filter(i => get.owner(i)),
+						ui.special
+					);
+				for (let i = lose.length - 1; i--; i >= 0) {
+					ui.cardPile.insertBefore(lose[i], ui.cardPile.firstChild);
+				}
+				game.updateRoundNumber();
+				if (gain.length) await target.gain(gain, "draw");
+				if (lose.map(card => get.color(card)).toUniqued().length == 1) {
+					const chosen = [],
+						list = player != target ? [target, player] : [target];
+					for (const current of list) {
+						const goon = game.hasPlayer(i => i.countGainableCards(current, "ej"));
+						const choices = [];
+						const choiceList = ["回复1点体力", "获得场上一张牌"];
+						if (current.isDamaged() && !chosen.includes("选项一")) choices.push("选项一");
+						else choiceList[0] = '<span style="opacity:0.5">' + choiceList[0] + "</span>";
+						if (goon && !chosen.includes("选项二")) choices.push("选项二");
+						else choiceList[1] = '<span style="opacity:0.5">' + choiceList[1] + "</span>";
+						if (!choices.length) continue;
+						const control =
+							choices.length == 1
+								? choices[0]
+								: await current
+										.chooseControl(choices)
+										.set("choiceList", choiceList)
+										.set("prompt", "忠言：请选择一项")
+										.set("ai", () => {
+											const player = get.player();
+											const eff2 = get.recoverEffect(player, player, player);
+											return eff2 ? 0 : 1;
+										})
+										.forResultControl();
+						chosen.push(control);
+						if (control == "选项一") {
+							await current.recover();
+						} else {
+							const targets = await current
+								.chooseTarget("获得一名角色场上的一张牌", true, (card, player, target) => {
+									const targetx = get.event("targetx");
+									return target.countGainableCards(targetx, "ej") > 0;
+								})
+								.set("ai", target => {
+									const player = get.player();
+									let att = get.attitude(player, target);
+									if (att < 0) att = -Math.sqrt(-att);
+									else att = Math.sqrt(att);
+									return att * lib.card.shunshou.ai.result.target(player, target);
+								})
+								.set("targetx", current)
+								.forResultTargets();
+							await current.gainPlayerCard(targets[0], "ej", true);
+						}
+					}
+				}
+			} else {
+				for (let i = topCards.length - 1; i--; i >= 0) {
+					ui.cardPile.insertBefore(topCards[i], ui.cardPile.firstChild);
+				}
+				game.updateRoundNumber();
+			}
+		},
+		ai: {
+			order: 8,
+			result: {
+				player: 1,
+				target: 1,
+			},
+		},
+	},
+	starjinglun: {
+		audio: 2,
+		trigger: {
+			global: "damageSource",
+		},
+		filter(event, player) {
+			const target = event.source;
+			return target && target.isIn() && get.distance(player, target) <= 1;
+		},
+		check(event, player) {
+			return get.attitude(player, event.source) > 0;
+		},
+		usable:1,
+		logTarget: "source",
+		async content(event, trigger, player) {
+			const target = trigger.source,
+				num = target.countCards("e");
+			if (num) await target.draw(num);
+			await player.useSkill("starzhongyan", [target]);
+		},
+	},
 	//星孙坚
 	starruijun: {
 		audio: 2,

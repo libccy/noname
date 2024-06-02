@@ -10,9 +10,9 @@ const characterSort = {
 	sp_yanhan: ["dc_lifeng", "dc_liuba", "dc_huangquan", "furongfuqian", "xianglang", "dc_huojun", "gaoxiang", "dc_wuban", "jiangfei"],
 	sp_jishi: ["dc_jiben", "zhenghun", "dc_sunhanhua", "liuchongluojun", "wupu"],
 	sp_raoting: ["dc_huanghao", "dc_sunziliufang", "dc_sunchen", "dc_jiachong"],
-	sp_yijun: ["gongsundu", "mengyou", "dc_sp_menghuo", "gongsunxiu"],
+	sp_yijun: ["gongsundu", "mengyou", "dc_sp_menghuo", "gongsunxiu", "dc_sp_zhurong"],
 	sp_zhengyin: ["yue_caiwenji", "yue_zhoufei", "yue_caiyong", "yue_xiaoqiao", "yue_daqiao", "yue_miheng", "yue_zoushi", "yue_zhugeguo"],
-	huicui_waitforsort: ["chezhou", "zhupeilan"],
+	huicui_waitforsort: ["chezhou", "zhupeilan", "hansong", "matie"],
 };
 
 const characterSortTranslate = {
