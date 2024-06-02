@@ -345,20 +345,13 @@ export class Get {
 	}
 	/**
 	 * 用于将HTML代码转换为纯文本。
-	 * @param {string} str 
+	 * @param { string } htmlContent
 	 * @returns { string }
 	 */
-	plainText(str) {
-		if (!window.noname_get_plainText) {
-			window.noname_get_plainText = document.createElement('div');
-		}
-		var node = window.noname_get_plainText;
-		if(str){
-			node.innerHTML = str;
-		} else {
-			node.innerHTML = '';
-		}
-		return node.innerText;
+	plainText(htmlContent) {
+		var parser = new DOMParser();
+		var doc = parser.parseFromString(htmlContent || '', 'text/html');
+		return doc.body.textContent || doc.body.innerText;
 	}
 	numOf(obj, item) {
 		return obj.filter(element => element == item).length;
