@@ -7171,7 +7171,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return player.countCards("h") == 0;
 					},
 					x6: function (player, event) {
-						if(event.hasNature) return event.hasNature("fire");
+						if(event.hasNature) return event.hasNature("fire"); // 另一个人修复了那我就保持他的代码哦
 					},
 					x5: function (player, event) {
 						if(event.hasNature) return event.hasNature("thunder");
