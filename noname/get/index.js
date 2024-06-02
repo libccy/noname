@@ -974,6 +974,16 @@ export class Get {
 
 		return target;
 	}
+	/**
+	 * 用于将HTML代码转换为纯文本。
+	 * @param { string } htmlContent
+	 * @returns { string }
+	 */
+	plainText(htmlContent) {
+		var parser = new DOMParser();
+		var doc = parser.parseFromString(htmlContent || '', 'text/html');
+		return doc.body.textContent || doc.body.innerText;
+	}
 	inpilefull(type) {
 		var list = [];
 		for (var i in lib.cardPile) {

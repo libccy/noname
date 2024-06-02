@@ -3449,6 +3449,7 @@ const skills = {
 	},
 	qiaobian: {
 		audio: 2,
+		audioname2: { gz_jun_caocao: "jianan_qiaobian" },
 		trigger: {
 			player: ["phaseJudgeBefore", "phaseDrawBefore", "phaseUseBefore", "phaseDiscardBefore"],
 		},
