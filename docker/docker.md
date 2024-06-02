@@ -1,9 +1,11 @@
 ### 使用 docker 运行 noname
 
+/docker/index.js 来自[noname-server](https://github.com/nonameShijian/noname-server)
+
 1.克隆存储库
 
 ```shell
-git clone https://github.com/nonameShijian/noname.git
+git clone -b master --depth=1 https://github.com/nonameShijian/noname.git
 cd noname
 ```
 

@@ -23,6 +23,8 @@ https://spmario233.github.io/noname/index.html (图片素材加载速度较慢�
 
 GitHub： https://github.com/libccy/noname/releases/tag/chromium77-client
 
+docker部署: [docker.md](./docker/docker.md)
+
 网页端推荐使用Chrome系内核浏览器游玩，不推荐使用低版本Firefox浏览器
 
 请尽量保证游玩的Chrome系浏览器或手机Webview的`内核版本大于等于77`
