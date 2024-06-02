@@ -12253,6 +12253,7 @@ const skills = {
 	},
 	new_retuxi: {
 		audio: "retuxi",
+		audioname2: { gz_jun_caocao: "jianan_tuxi" },
 		trigger: {
 			player: "phaseDrawBegin2",
 		},
