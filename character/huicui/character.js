@@ -1,12 +1,8 @@
 const characters = {
 	dc_sp_zhurong: ["female", "qun", 4, ["dcmanhou"]],
-	matie: ["male", "qun", 4, ["dczhuiwang", "dcquxian"]],
-	hansong: ["male", "qun", 3, ["dcyinbi", "dcshuaiyan"]],
 	yue_zhugeguo: ["female", "shu", 3, ["dcxidi", "dcchengyan"]],
 	yue_zoushi: ["female", "qun", 3, ["dcyunzheng", "dchuoxin"]],
-	zhupeilan: ["female", "wu", 3, ["dccilv", "dctongdao"]],
 	yue_miheng: ["male", "qun", 3, ["dcjigu", "dcsirui"]],
-	chezhou: ["male", "wei", 4, ["dcshefu", "dcpigua"]],
 	dc_lifeng: ["male", "shu", 3, ["dctunchu", "dcshuliang"]],
 	wupu: ["male", "qun", 4, ["dcduanti", "dcshicao"]],
 	zangba: ["male", "wei", 4, ["rehengjiang"]],

@@ -12,7 +12,7 @@ const characterSort = {
 	sp_raoting: ["dc_huanghao", "dc_sunziliufang", "dc_sunchen", "dc_jiachong"],
 	sp_yijun: ["gongsundu", "mengyou", "dc_sp_menghuo", "gongsunxiu", "dc_sp_zhurong"],
 	sp_zhengyin: ["yue_caiwenji", "yue_zhoufei", "yue_caiyong", "yue_xiaoqiao", "yue_daqiao", "yue_miheng", "yue_zoushi", "yue_zhugeguo"],
-	huicui_waitforsort: ["chezhou", "zhupeilan", "hansong", "matie"],
+	huicui_waitforsort: [],
 };
 
 const characterSortTranslate = {
