@@ -511,7 +511,8 @@ const skills = {
 						.set("prompt", "辞虑：选择执行并移去一项")
 						.set("ai", () => {
 							const player = get.event("player"),
-								trigger = get.event().getTrigger();
+								trigger = get.event().getTrigger(),
+								card = trigger.card;
 							let controls = get.event("controls").slice();
 							if (controls.includes("防伤")) {
 								if (get.tag(card, "damage")) return "防伤";

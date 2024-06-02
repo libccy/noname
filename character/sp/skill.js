@@ -182,6 +182,10 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			order: 1,
+			result: { player: 1 },
+		},
 	},
 	//蔡瑁
 	olzuolian: {

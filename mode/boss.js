@@ -7171,10 +7171,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return player.countCards("h") == 0;
 					},
 					x6: function (player, event) {
-						return event.hasNature("fire");
+						return event.name == "damage" && event.hasNature("fire");
 					},
 					x5: function (player, event) {
-						return event.hasNature("thunder");
+						return event.name == "damage" && event.hasNature("thunder");
 					},
 					x4: function (player, event) {
 						return event.name == "loseHp";
