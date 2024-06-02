@@ -943,6 +943,7 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
+		changeSeat: true,
 		limited: true,
 		skillAnimation: true,
 		animationColor: "orange",
