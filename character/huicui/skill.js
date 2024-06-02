@@ -218,14 +218,8 @@ const skills = {
 		trigger: {
 			global: ["loseAfter", "equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 		},
-		filter(event, player) {
-			return game.hasPlayer(target => {
-				if (target == player) return false;
-				if (event.getg && event.getg(target) && event.getg(target).length && target.countCards("h") == player.countCards("h")) return true;
-				const evt = event.getl(target);
-				if (evt && evt.hs && evt.hs.length && target.countCards("h") == player.countCards("h")) return true;
-				return false;
-			});
+		filter(event, player, name, target) {
+			return target && target.countCards("h") == player.countCards("h");
 		},
 		getIndex(event, player) {
 			return game
