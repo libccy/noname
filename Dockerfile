@@ -3,9 +3,8 @@ FROM node:18
 WORKDIR /app
 
 COPY ./docker/index.js ./
-COPY ./docker/package.json ./
 
-RUN npm install
+RUN npm install body-parser express minimist
 
 COPY . .
 

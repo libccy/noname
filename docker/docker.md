@@ -5,7 +5,7 @@
 1.克隆存储库
 
 ```shell
-git clone -b master --depth=1 https://github.com/nonameShijian/noname.git
+git clone -b master --depth=1 https://github.com/libccy/noname.git
 cd noname
 ```
 
