@@ -5888,6 +5888,7 @@ export const Content = {
 							} else if (!event.dialog.noforcebutton) {
 								event.dialog.classList.add("forcebutton-auto");
 							}
+							directh = false;
 						} else {
 							event.dialog.add([hs, "blank"]);
 						}
@@ -6082,6 +6083,7 @@ export const Content = {
 							} else if (!event.dialog.noforcebutton) {
 								event.dialog.classList.add("forcebutton-auto");
 							}
+							directh = false;
 						} else {
 							event.dialog.add([hs, "blank"]);
 						}
@@ -6299,6 +6301,7 @@ export const Content = {
 							} else if (!event.dialog.noforcebutton) {
 								event.dialog.classList.add("forcebutton-auto");
 							}
+							directh = false;
 						} else {
 							event.dialog.add([hs, "blank"]);
 						}
