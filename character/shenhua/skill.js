@@ -4260,6 +4260,8 @@ const skills = {
 				lib.skill.huashen.addHuashens(player, 2);
 				event.logged = true;
 			}
+			await Promise.all(event.next); // await logSkill 防止被 paused
+			// 因为化身内置了一个 chooseButtonControl 需要特殊处理一下
 			const cards = [];
 			const skills = [];
 			for (const i in player.storage.huashen.owned) {
@@ -4335,7 +4337,6 @@ const skills = {
 					}
 					event.control.replacex(["cancel2"]);
 				};
-
 				event.switchToAuto = function () {
 					const cards = [];
 					const skills = [];
@@ -4357,11 +4358,11 @@ const skills = {
 							break;
 						}
 					}
-					event._result = {
+					resolve({
 						bool: true,
 						skill: skill,
 						character: character,
-					};
+					});
 					if (event.dialog) event.dialog.close();
 					if (event.control) event.control.close();
 				};
@@ -4384,7 +4385,7 @@ const skills = {
 						}
 						event.dialog.close();
 						event.control.close();
-						game.resume();
+						// game.resume(); // 不再 game.resume 防止 game.loop 被重复执行
 						_status.imchoosing = false;
 						resolve(result);
 					});
@@ -4395,7 +4396,7 @@ const skills = {
 					event.control.style.opacity = 1;
 				}
 				event.control.replacex(controls);
-				game.pause();
+				game.pause(); // 暂停 game.loop 防止 game.resume2
 				game.countChoose();
 				return promise;
 			};
@@ -4405,13 +4406,14 @@ const skills = {
 			} else if (event.isOnline()) {
 				const { promise, resolve } = Promise.withResolvers();
 				event.player.send(chooseButton, event.player, cards, event.logged);
-				event.player.wait(result => resolve(result));
-				game.pause();
+				event.player.wait(result => !!void resolve(result)); // 不再 game.resume 防止 game.loop 被重复执行
+				game.pause(); // 暂停 game.loop 防止 game.resume2
 				next = promise;
 			} else {
 				next = switchToAuto();
 			}
 			const result = await next;
+			_status.paused = false; // 恢复 game.loop 但不立刻执行
 			result.logged = event.logged;
 			event.result = {
 				bool: result.bool,
@@ -4840,7 +4842,7 @@ const skills = {
 		async content(event, trigger, player) {
 			player.removeSkill("haoshi2");
 			if (player.countCards("h") <= 5) return;
-			const { result } = player.chooseCardTarget({
+			const { result } = await player.chooseCardTarget({
 				selectCard: Math.floor(player.countCards("h") / 2),
 				filterTarget(card, player, target) {
 					return target.isMinHandcard();
@@ -5089,7 +5091,7 @@ const skills = {
 			const num = player.getDamagedHp();
 			const [target] = event.targets;
 			let directcontrol = num == 1;
-			if (directcontrol) {
+			if (!directcontrol) {
 				const str1 = "摸" + get.cnNumber(num, true) + "弃一";
 				const str2 = "摸一弃" + get.cnNumber(num, true);
 				directcontrol = str1 == await player
@@ -5233,7 +5235,7 @@ const skills = {
 			return player.hasZhuSkill("baonue", event.source);
 		},
 		async cost(event, trigger, player) {
-			event.result = trigger.source.chooseBool("是否对" + get.translation(player) + "发动【暴虐】？")
+			event.result = await trigger.source.chooseBool("是否对" + get.translation(player) + "发动【暴虐】？")
 				.set("choice", get.attitude(trigger.source, player) > 0)
 				.forResult();
 		},
@@ -5302,9 +5304,7 @@ const skills = {
 					.forResultBool();
 				if (!bool) await current.loseHp();
 				current = current.next;
-				const loopNext = !currented.includes(current);
-				if (loopNext) await game.asyncDelay(0.5);
-			} while (loopNext);
+			} while (!currented.includes(current) && !void await game.asyncDelay(0.5));
 		},
 		ai: {
 			order: 1,
@@ -5860,7 +5860,7 @@ const skills = {
 			return player.countCards("h") > 0;
 		},
 		async content(event, trigger, player) {
-			const bool = await player.chooseToCompare(target).forResultBool();
+			const bool = await player.chooseToCompare(event.target).forResultBool();
 			if (bool) {
 				player.addTempSkill("tianyi2");
 			} else {
@@ -6128,7 +6128,7 @@ const skills = {
 			});
 			next.set("type", type);
 			event.type = type;
-			const { result2 } = await next;
+			const result2 = await next.forResult();
 			if (type && result2.bool && result2.targets && result2.targets.length) {
 				player.line(result2.targets, "green");
 				if (type == "equip") {
@@ -6338,7 +6338,7 @@ const skills = {
 		trigger: { player: "phaseDiscardBefore" },
 		async cost(event, trigger, player) {
 			const check = player.needsToDiscard() || player.isTurnedOver() || (player.hasSkill("shebian") && player.canMoveCard(true, true));
-			event.result = player
+			event.result = await player
 				.chooseTarget(get.prompt("shensu"), "跳过弃牌阶段并将武将牌翻面，视为对一名其他角色使用一张【杀】", function (card, player, target) {
 					if (player == target) return false;
 					return player.canUse({ name: "sha" }, target, false);
@@ -6609,9 +6609,9 @@ const skills = {
 				.set("target", target);
 			if (typeof result.index != "number") return;
 			if (result.index) {
-				event.related = event.target.loseHp();
+				event.related = target.loseHp();
 			} else {
-				event.related = event.target.damage(trigger.source || "nosource", "nocard");
+				event.related = target.damage(trigger.source || "nosource", "nocard");
 			}
 			await event.related;
 			//if(event.related.cancelled||target.isDead()) return;
@@ -7231,14 +7231,12 @@ const skills = {
 				.forResult();
 		},
 		async content(event, trigger, player) {
-			const bool = await player.respond(event.cards, "highlight", "guidao", "noOrdering").forResultBool();
-			if (bool) {
-				player.$gain2(trigger.player.judging[0]);
-				trigger.player.judging[0] = result.cards[0];
-				trigger.orderingCards.addArray(result.cards);
-				game.log(trigger.player, "的判定牌改为", result.cards[0]);
-				await player.gain(trigger.player.judging[0]);
-			}
+			await player.respond(event.cards, "highlight", "guidao", "noOrdering");
+			player.$gain2(trigger.player.judging[0]);
+			await player.gain(trigger.player.judging[0]);
+			trigger.player.judging[0] = event.cards[0];
+			trigger.orderingCards.addArray(event.cards);
+			game.log(trigger.player, "的判定牌改为", event.cards[0]);
 			await game.asyncDelay(2);
 		},
 		ai: {
