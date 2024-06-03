@@ -7158,7 +7158,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					content: function (storage, player) {
 						var str = "扣减" + (7 - player.storage.xiangxing_count) + "点体力后失去下一枚星；";
 						str +=
-							"防上禳星伤害条件：" +
+							"防止禳星伤害条件：" +
 							lib.translate["xiangxing" + player.storage.xiangxing + "_info"];
 						return str;
 					},
