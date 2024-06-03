@@ -7074,7 +7074,7 @@ export class Player extends HTMLDivElement {
 			node = ui.create.div(".card.mark.drawinghidden");
 			ui.create.div(".background.skillmark", node).innerHTML = get.translation(name)[0];
 		} else {
-			if (!lib.character[name]) return;
+			if (!get.character(name)) return;
 			node = ui.create.div(".card.mark.drawinghidden").setBackground(name, "character");
 		}
 		this.node.marks.insertBefore(node, this.node.marks.childNodes[1]);

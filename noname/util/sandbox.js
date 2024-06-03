@@ -3653,24 +3653,25 @@ class Sandbox {
 					return Marshal[SandboxExposer2]
 						(SandboxSignal_Marshal, result, prevDomain);
 					// } catch (e) {
-					// 	// 立即报告错误
-					// 	const window = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
-					// 	// @ts-ignore
-					// 	const line = String(e.stack).split("\n")[1];
-					// 	const match = /<anonymous>:(\d+):\d+\)/.exec(line);
-					// 	if (match) {
-					// 		const index = parseInt(match[1]) - 5;
-					// 		const lines = code.split("\n");
-					// 		let codeView = "";
-					// 		for (let i = index - 4; i < index + 5; i++) {
-					// 			if (i < 0 || i >= lines.length)
-					// 				continue;
-					// 			codeView += `${i + 1}|${i == index ? "⚠️" : "    "}${lines[i]}\n`;
-					// 		}
-					// 		// @ts-ignore
-					// 		window.alert(`沙盒内出现错误：\n----------\n${codeView}\n----------\n${String(e.stack)}`);
+					// // 立即报告错误
+					// const window = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
+					// // @ts-ignore
+					// const stack = String(e.stack);
+					// const line = stack.split("\n")[1];
+					// const match = /<anonymous>:(\d+):\d+\)/.exec(line);
+					// if (match) {
+					// 	const index = parseInt(match[1]) - 5;
+					// 	const lines = code.split("\n");
+					// 	let codeView = "";
+					// 	for (let i = index - 4; i < index + 5; i++) {
+					// 		if (i < 0 || i >= lines.length)
+					// 			continue;
+					// 		codeView += `${i + 1}|${i == index ? "⚠️" : "    "}${lines[i]}\n`;
 					// 	}
-					// 	throw e;
+					// 	// @ts-ignore
+					// 	window.alert(`Sandbox内执行的代码出现错误：\n${stack}\n----------\n${codeView}\n----------`);
+					// }
+					// throw e; // 不再向上抛出异常
 				} finally {
 					Sandbox.#executingScope.pop();
 				}
