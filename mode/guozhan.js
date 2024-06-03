@@ -1023,10 +1023,12 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			fakeduoshi: {
 				audio: "duoshi",
+				audioname2: { gz_jun_sunquan: "jiahe_duoshi" },
 				global: "fakeduoshi_global",
 				subSkill: {
 					global: {
 						audio: "duoshi",
+						audioname2: { gz_jun_sunquan: "jiahe_duoshi" },
 						forceaudio: true,
 						enable: "chooseToUse",
 						filter(event, player) {
@@ -19144,15 +19146,19 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			jiahe_reyingzi: {
+				audio: 2,
 				inherit: "reyingzi",
 			},
 			jiahe_haoshi: {
+				audio: 2,
 				inherit: "haoshi",
 			},
 			jiahe_shelie: {
+				audio: 2,
 				inherit: "shelie",
 			},
 			jiahe_duoshi: {
+				audio: 2,
 				inherit: "fakeduoshi",
 			},
 			yuanjiangfenghuotu: {

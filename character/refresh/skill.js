@@ -13857,7 +13857,8 @@ const skills = {
 		audioname2: {
 			re_sunyi: "reyingzi_re_sunyi",
 			heqi: "reyingzi_heqi",
-			re_heqi: "reyingzi_heqi"
+			re_heqi: "reyingzi_heqi",
+			boss_sunce: "reyingzi_sunce"
 		},
 		trigger: { player: "phaseDrawBegin2" },
 		forced: true,

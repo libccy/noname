@@ -7158,7 +7158,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					content: function (storage, player) {
 						var str = "扣减" + (7 - player.storage.xiangxing_count) + "点体力后失去下一枚星；";
 						str +=
-							"防上禳星伤害条件：" +
+							"防止禳星伤害条件：" +
 							lib.translate["xiangxing" + player.storage.xiangxing + "_info"];
 						return str;
 					},
@@ -9641,6 +9641,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					},
 				},
 			},
+			reyingzi_sunce: { audio: 2 },
+			yinghun_sunce: { audio: 2 },
 			boss_jiang: {
 				audio: "jiang",
 				trigger: {
@@ -9691,6 +9693,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				group: ["boss_jiang_use"],
 				subSkill: {
 					use: {
+						audio: "jiang",
 						trigger: {
 							global: ["useCard"],
 						},
@@ -10581,6 +10584,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#wansha_boss_lvbu31": "蝼蚁，怎容偷生？",
 			"#wansha_boss_lvbu32": "沉沦吧，在这无边的恐惧！",
 			"#boss_lvbu3:die": "你们的项上人头，我改日再取！",
+			"#boss_sunce:die": "内事不决问张昭，外事不决问周瑜……",
 		},
 		get: {
 			rawAttitude: function (from, to) {
