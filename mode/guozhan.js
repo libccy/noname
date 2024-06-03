@@ -6722,7 +6722,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				mod: {
 					maxHandcard: function (player, num) {
 						if (!player.hasEmptySlot(2)) return;
-						if (player.hasSkill("huangjintianbingfu")) {
+						// if (player.hasSkill("hongfa")) {
+						// 村规
+						if (player.skills.includes("hongfa")) {
 							num += player.getExpansions("huangjintianbingfu").length;
 						}
 						return (
@@ -15889,6 +15891,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						trigger: { player: "equipAfter" },
 						forced: true,
 						filter: function (event, player) {
+							// if (!player.hasSkill("gzzongyu")) return false;
+							// 村规
 							if (!player.skills.includes("gzzongyu")) return false;
 							if (!["equip3", "equip4"].includes(get.subtype(event.card))) return false;
 							for (var i = 0; i < ui.discardPile.childElementCount; i++) {
@@ -19914,6 +19918,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			hongfa: {
 				audio: 3,
+				locked: false,
 				derivation: "huangjintianbingfu",
 				unique: true,
 				forceunique: true,
@@ -20046,7 +20051,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							dialog.addSmall(content);
 						}
 						dialog.addText(
-							'<ul style="margin-top:5px;padding-left:22px;"><li>当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。<li>每当你失去体力时，你可改为将一张“天兵”置入弃牌堆。<li>与你势力相同的角色可将一张“天兵”当【杀】使用或打出。',
+							'<ul style="margin-top:5px;padding-left:22px;"><li>锁定技，当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。<li>每当你失去体力时，你可改为将一张“天兵”置入弃牌堆。<li>与你势力相同的角色可将一张“天兵”当【杀】使用或打出。',
 							false
 						);
 					},
@@ -20061,7 +20066,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				content: function () {
 					"step 0";
 					var num = get.population("qun");
-					if (player.hasSkill("huangjintianbingfu")) {
+					// if (player.hasSkill("hongfa")) {
+					// 村规
+					if (player.skills.includes("hongfa")) {
 						num += player.getExpansions("huangjintianbingfu").length;
 					}
 					var cards = get.cards(num);
@@ -23511,7 +23518,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			jiahe_skill: "缘江烽火图",
 			yuanjiangfenghuotu: "缘江烽火图",
 			yuanjiangfenghuotu_info:
-				"每名吴势力角色的出牌阶段限一次，该角色可以将一张装备牌置于“缘江烽火图”上，称之为“烽火”。<br>根据“烽火”的数量，所有吴势力角色可于其准备阶段选择并获得其中一个技能直到回合结束：一张及以上：〖英姿〗；两张及以上：〖好施〗；三张及以上：〖涉猎〗；四张及以上：〖度势〗；五张及以上：可额外选择一项。<br>锁定技，当你受到【杀】或锦囊牌造成的伤害后，你将一张“烽火”置入弃牌堆。",
+				"①每名吴势力角色的出牌阶段限一次，该角色可以将一张装备牌置于“缘江烽火图”上，称之为“烽火”。②根据“烽火”的数量，所有吴势力角色可于其准备阶段选择并获得其中一个技能直到回合结束：一张及以上：〖英姿〗；两张及以上：〖好施〗；三张及以上：〖涉猎〗；四张及以上：〖度势〗；五张及以上：可额外选择一项。③锁定技，当你受到【杀】或锦囊牌造成的伤害后，你将一张“烽火”置入弃牌堆。",
 			yuanjiangfenghuotu_ab: "江图",
 			yuanjiangfenghuotu_bg: "图",
 			wuxin: "悟心",
@@ -23522,7 +23529,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			hongfa_respond: "天兵",
 			hongfa_hp: "黄巾天兵符",
 			hongfa_info:
-				"君主技，锁定技，此武将牌明置时，你获得“黄巾天兵符”；准备阶段，若没有“天兵”，你将牌堆顶的X张牌置于“黄巾天兵符”上，称为“天兵”（X为群势力角色的数量）。",
+				"君主技。此武将牌明置时，你获得“黄巾天兵符”；准备阶段，若没有“天兵”，你将牌堆顶的X张牌置于“黄巾天兵符”上，称为“天兵”（X为群势力角色的数量）。",
 			wendao: "问道",
 			wendao_info:
 				"出牌阶段限一次，你可以弃置一张不为【太平要术】的红色牌，然后获得弃牌堆或场上的一张【太平要术】。",
@@ -23530,7 +23537,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			huangjintianbingfu_ab: "兵符",
 			huangjintianbingfu_bg: "符",
 			huangjintianbingfu_info:
-				"锁定技，当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。<br>当你失去体力时，你可改为将一张“天兵”置入弃牌堆。<br>与你势力相同的角色可将一张“天兵”当作【杀】使用或打出。",
+				"①锁定技，当你计算群势力角色数时，每一张“天兵”均可视为一名群势力角色。②当你失去体力时，你可改为将一张“天兵”置入弃牌堆。③与你势力相同的角色可将一张“天兵”当作【杀】使用或打出。",
 			wuhujiangdaqi: "五虎将大旗",
 			wuhujiangdaqi_ab: "将旗",
 			wuhujiangdaqi_bg: "旗",
