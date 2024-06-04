@@ -6724,7 +6724,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						if (!player.hasEmptySlot(2)) return;
 						// if (player.hasSkill("hongfa")) {
 						// 村规
-						if (player.skills.includes("hongfa")) {
+						if (player.hasSkill("hongfa", null, null, false)) {
 							num += player.getExpansions("huangjintianbingfu").length;
 						}
 						return (
@@ -15893,7 +15893,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						filter: function (event, player) {
 							// if (!player.hasSkill("gzzongyu")) return false;
 							// 村规
-							if (!player.skills.includes("gzzongyu")) return false;
+							if (!player.hasSkill("gzzongyu", null, null, false)) return false;
 							if (!["equip3", "equip4"].includes(get.subtype(event.card))) return false;
 							for (var i = 0; i < ui.discardPile.childElementCount; i++) {
 								if (ui.discardPile.childNodes[i].name == "liulongcanjia") return true;
@@ -20068,7 +20068,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					var num = get.population("qun");
 					// if (player.hasSkill("hongfa")) {
 					// 村规
-					if (player.skills.includes("hongfa")) {
+					if (player.hasSkill("hongfa", null, null, false)) {
 						num += player.getExpansions("huangjintianbingfu").length;
 					}
 					var cards = get.cards(num);
@@ -20094,6 +20094,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			zhangwu: {
 				audio: 2,
+				derivation: "feilongduofeng",
 				unique: true,
 				forceunique: true,
 				ai: {
