@@ -1,7 +1,7 @@
 const characters = {
 	ol_jiangwan: ["male", "shu", 3, ["olziruo", "olxvfa"]],
 	caimao: ["male", "wei", 4, ["olzuolian", "oljingzhou"]],
-	ol_peixiu: ["male", "wei", 4, ["olmaozhu", "oljinlan"]],
+	ol_peixiu: ["male", "jin", 4, ["olmaozhu", "oljinlan"]],
 	yadan: ["male", "qun", 4, ["olqingya", "oltielun"]],
 	sp_sunce: ["male", "qun", 4, ["junkliantao"]],
 	ol_liupi: ["male", "qun", 4, ["olyicheng"]],

@@ -58,8 +58,8 @@ const skills = {
 			dialog(_, player) {
 				let dialog = ui.create.dialog("蓄发：请选择一项", "hidden");
 				const list = [
-					["0", "将至少一半手牌称为“蓄发”置于武将牌上（向上取整），然后可以视为使用“蓄发”牌中的一张普通锦囊牌"],
-					["1", "移去一半“蓄发”牌（向上取整），然后可以视为使用其中一张普通锦囊牌"],
+					["0", "将至少一半手牌称为“蓄发”置于武将牌上，然后可以将一张牌当作“蓄发”牌中的一张普通锦囊牌使用"],
+					["1", "移去至少一半“蓄发”牌，然后可以将一张牌当作其中一张普通锦囊牌使用"],
 				].filter(listx => {
 					if (listx[0] == "0") return !player.hasSkill("olxvfa_0") && player.countCards("h");
 					return !player.hasSkill("olxvfa_1") && player.getExpansions("olxvfa").length;
@@ -75,8 +75,8 @@ const skills = {
 			check: () => 1 + Math.random(),
 			backup: links => get.copy(lib.skill["olxvfa_" + ["put", "remove"][parseInt(links[0])]]),
 			prompt(links) {
-				if (links[0] == "0") return "###蓄发###将至少一半手牌称为“蓄发”置于武将牌上（向上取整），然后可以视为使用“蓄发”牌中的一张普通锦囊牌";
-				return "###蓄发###移去一半“蓄发”牌（向上取整），然后可以视为使用其中一张普通锦囊牌";
+				if (links[0] == "0") return "###蓄发###将至少一半手牌称为“蓄发”置于武将牌上，然后可以将一张牌当作“蓄发”牌中的一张普通锦囊牌使用";
+				return "###蓄发###移去一半“蓄发”牌，然后可以将一张牌当作其中一张普通锦囊牌使用";
 			},
 		},
 		intro: {
@@ -109,13 +109,13 @@ const skills = {
 					player.addTempSkill("olxvfa_0", "phaseUseAfter");
 					await player.addToExpansion(event.cards, player, "give").set("gaintag", ["olxvfa"]);
 					const cards = player.getExpansions("olxvfa");
-					if (cards.some(card => get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true))) {
+					if (cards.some(card => get.type(card) == "trick" && player.hasCard(cardx => player.hasUseTarget(get.autoViewAs({ name: card.name }, [cardx]), true), "hes"))) {
 						const result = await player
-							.chooseButton(["蓄发：是否视为使用一张“蓄发”牌？", cards])
+							.chooseButton(['###蓄发###<div class="text center">是否将一张牌当作一张“蓄发”牌使用？</div>', cards])
 							.set("filterButton", button => {
 								const player = get.event("player"),
 									card = button.link;
-								return get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true);
+								return get.type(card) == "trick" && player.hasCard(cardx => player.hasUseTarget(get.autoViewAs({ name: card.name }, [cardx]), true), "hes");
 							})
 							.set("ai", button => {
 								const player = get.event("player"),
@@ -125,7 +125,20 @@ const skills = {
 							.forResult();
 						if (result.bool) {
 							const card = result.links[0];
-							await player.chooseUseTarget({ name: card.name, isCard: true }, true, false);
+							game.broadcastAll(function (card) {
+								lib.skill.olxvfa_backupx.viewAs = { name: card.name };
+							}, card);
+							await player
+								.chooseToUse()
+								.set("openskilldialog", "###蓄发###将一张牌当作【" + get.translation(card.name) + "】使用")
+								.set("norestore", true)
+								.set("addCount", false)
+								.set("_backupevent", "olxvfa_backupx")
+								.set("custom", {
+									add: {},
+									replace: { window: function () {} },
+								})
+								.backup("olxvfa_backupx");
 						}
 					}
 				},
@@ -140,7 +153,7 @@ const skills = {
 					const cards = player.getExpansions("olxvfa"),
 						num = Math.ceil(cards.length / 2);
 					const result = await player
-						.chooseButton(["蓄发：请移去至少" + get.cnNumber(num) + "张“蓄发”牌", cards], [num, Infinity], true)
+						.chooseButton(['###蓄发###<div class="text center">请移去至少' + get.cnNumber(num) + '张“蓄发”牌</div>', cards], [num, Infinity], true)
 						.set("ai", button => {
 							const player = get.event("player"),
 								value = player.getUseValue(button.link, true);
@@ -159,13 +172,13 @@ const skills = {
 					if (result.bool) {
 						const cardx = result.links;
 						await player.loseToDiscardpile(cardx);
-						if (cardx.some(card => get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true))) {
+						if (cardx.some(card => get.type(card) == "trick" && player.hasCard(cardxx => player.hasUseTarget(get.autoViewAs({ name: card.name }, [cardxx]), true), "hes"))) {
 							const result2 = await player
-								.chooseButton(["蓄发：是否视为使用一张移去的“蓄发”牌？", cardx])
+								.chooseButton(['###蓄发###<div class="text center">是否将一张牌当作一张移去的“蓄发”牌使用？</div>', cardx])
 								.set("filterButton", button => {
 									const player = get.event("player"),
 										card = button.link;
-									return get.type(card) == "trick" && player.hasUseTarget({ name: card.name, isCard: true }, true);
+									return get.type(card) == "trick" && player.hasCard(cardx => player.hasUseTarget(get.autoViewAs({ name: card.name }, [cardx]), true), "hes");
 								})
 								.set("ai", button => {
 									const player = get.event("player"),
@@ -175,10 +188,42 @@ const skills = {
 								.forResult();
 							if (result2.bool) {
 								const card = result2.links[0];
-								await player.chooseUseTarget({ name: card.name, isCard: true }, true, false);
+								game.broadcastAll(function (card) {
+									lib.skill.olxvfa_backupx.viewAs = { name: card.name };
+								}, card);
+								await player
+									.chooseToUse()
+									.set("openskilldialog", "###蓄发###将一张牌当作【" + get.translation(card.name) + "】使用")
+									.set("norestore", true)
+									.set("addCount", false)
+									.set("_backupevent", "olxvfa_backupx")
+									.set("custom", {
+										add: {},
+										replace: { window: function () {} },
+									})
+									.backup("olxvfa_backupx");
 							}
 						}
 					}
+				},
+			},
+			backupx: {
+				filterCard: true,
+				position: "hes",
+				check(card) {
+					const player = get.event("player");
+					if (player.hasValueTarget(card, true, true)) return 0;
+					if (player.hasSkill("olziruo")) {
+						const cards = player.getCards("h");
+						if (cards.indexOf(card) == (player.storage.olziruo ? cards.length - 1 : 0)) {
+							return 15 - get.value(card);
+						}
+					}
+					return 5 - get.value(card);
+				},
+				log: false,
+				precontent() {
+					delete event.result.skill;
 				},
 			},
 		},
