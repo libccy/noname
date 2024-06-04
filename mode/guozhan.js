@@ -23345,7 +23345,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			gz_jun_caocao: "君曹操",
 			gz_jun_caocao_prefix: "君",
 			jianan: "建安",
-			jianan_info: "君主技，只要此武将处于明置状态，你便拥有“五子良将纛”。",
+			jianan_info: "君主技，只要此武将牌处于明置状态，你便拥有“五子良将纛”。",
 			g_jianan: "五子良将纛",
 			wuziliangjiangdao: "五子良将纛",
 			wuziliangjiangdao_ab: "将纛",
@@ -23529,7 +23529,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			hongfa_respond: "天兵",
 			hongfa_hp: "黄巾天兵符",
 			hongfa_info:
-				"君主技。此武将牌明置时，你获得“黄巾天兵符”；准备阶段，若没有“天兵”，你将牌堆顶的X张牌置于“黄巾天兵符”上，称为“天兵”（X为群势力角色的数量）。",
+				"君主技。①只要此武将牌处于明置状态，你便拥有“黄巾天兵符”。②准备阶段，若没有“天兵”，你将牌堆顶的X张牌置于“黄巾天兵符”上，称为“天兵”（X为群势力角色的数量）。",
 			wendao: "问道",
 			wendao_info:
 				"出牌阶段限一次，你可以弃置一张不为【太平要术】的红色牌，然后获得弃牌堆或场上的一张【太平要术】。",
