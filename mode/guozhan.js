@@ -19189,7 +19189,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			gzqice: {
 				enable: "phaseUse",
 				usable: 1,
-				audio: "qice_backup",
+				audio: "qice",
 				filter: function (event, player) {
 					var hs = player.getCards("h");
 					if (!hs.length) return false;
@@ -19273,7 +19273,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					backup: function (links, player) {
 						return {
 							filterCard: true,
-							audio: "qice_backup",
+							audio: "qice",
 							selectCard: -1,
 							position: "h",
 							selectTarget: function () {
