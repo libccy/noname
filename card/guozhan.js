@@ -1833,7 +1833,7 @@ game.import("card", function () {
 						if (get.mode() == "guozhan") {
 							// if (player.hasSkill("hongfa")) {
 							// 村规
-							if (player.skills.includes("hongfa")) {
+							if (player.hasSkill("hongfa", null, null, false)) {
 								num += player.getExpansions("huangjintianbingfu").length;
 							}
 							return (
