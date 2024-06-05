@@ -7091,38 +7091,46 @@ const skills = {
 	bingqing: {
 		audio: 2,
 		trigger: { player: "useCardAfter" },
-		direct: true,
-		filter: function (event, player) {
-			var suit = get.suit(event.card);
+		filter(event, player) {
+			const evt = event.getParent("phaseUse");
+			if (!evt || !evt.player || evt.player != player) return false;
+			const suit = get.suit(event.card);
 			if (!lib.suit.includes(suit)) return false;
-			var evt = event.getParent("phaseUse");
-			if (!evt || player != evt.player) return false;
-			var list = [],
-				history = player.getHistory("useCard");
-			if (history.length < 2) return false;
-			for (var i of history) {
-				if (i.getParent("phaseUse") != evt) continue;
-				var suit2 = get.suit(i.card);
-				if (!lib.suit.includes(suit2)) continue;
-				if (i != event && suit2 == suit) return false;
-				if (i.finished) list.add(suit2);
-			}
-			return list.length > 1 && list.length < 5;
+			if (
+				player
+					.getHistory("useCard", evtx => {
+						return evtx.getParent("phaseUse") == evt && get.suit(evtx.card) == suit;
+					})
+					.indexOf(event) != 0
+			)
+				return false;
+			return Array.from({ length: 3 })
+				.map((_, i) => i + 2)
+				.includes(
+					player
+						.getHistory(
+							"useCard",
+							evtx => {
+								return evtx.getParent("phaseUse") == evt && lib.suit.includes(get.suit(evtx.card));
+							},
+							event
+						)
+						.reduce((list, evtx) => list.add(get.suit(evtx.card)), []).length
+				);
 		},
-		content: function () {
-			"step 0";
-			var suit = get.suit(trigger.card);
-			var evt = event.getParent("phaseUse");
-			var list = [],
-				history = player.getHistory("useCard");
-			for (var i of history) {
-				if (i.getParent("phaseUse") != evt) continue;
-				var suit2 = get.suit(i.card);
-				if (!lib.suit.includes(suit2)) continue;
-				if (i.finished) list.add(suit2);
-			}
-			var prompt, filterTarget, ai;
-			switch (list.length) {
+		async cost(event, trigger, player) {
+			const evt = trigger.getParent("phaseUse");
+			const num = player
+				.getHistory(
+					"useCard",
+					evtx => {
+						return evtx.getParent("phaseUse") == evt && lib.suit.includes(get.suit(evtx.card));
+					},
+					trigger
+				)
+				.reduce((list, evtx) => list.add(get.suit(evtx.card)), []).length;
+			let prompt, filterTarget, ai;
+			switch (num) {
 				case 2:
 					prompt = "令一名角色摸两张牌";
 					filterTarget = function (card, player, target) {
@@ -7144,7 +7152,7 @@ const skills = {
 					};
 					ai = function (target) {
 						var player = _status.event.player;
-						return get.effect(target, { name: "guohe_copy" }, player, player);
+						return get.effect(target, { name: "guohe" }, player, player);
 					};
 					break;
 				case 4:
@@ -7158,29 +7166,30 @@ const skills = {
 					};
 					break;
 				default:
-					event.finish();
+					event.result = { bool: false };
 					return;
 			}
-			event.num = list.length;
-			player.chooseTarget(get.prompt("bingqing"), prompt, filterTarget).set("ai", ai);
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("bingqing", target);
-				event.target = target;
-				event.goto(num);
-			} else event.finish();
-			"step 2";
-			target.draw(2);
-			event.finish();
-			"step 3";
-			player.discardPlayerCard(target, true, "hej");
-			event.finish();
-			"step 4";
-			target.damage();
+			let result = await player.chooseTarget(get.prompt("bingqing"), prompt, filterTarget).set("ai", ai).forResult();
+			result.cost_data = num;
+			event.result = result;
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			switch (event.cost_data) {
+				case 2:
+					await target.draw(2);
+					break;
+				case 3:
+					await player.discardPlayerCard(target, true, "hej");
+					break;
+				case 4:
+					await target.damage();
+					break;
+			}
 		},
 	},
 	yingfeng: {
+		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },
 		direct: true,
 		content: function () {
