@@ -859,7 +859,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				gz_cuimao: ["male", "wei", 3, ["gzzhengbi", "gzfengying"], []],
 				gz_yujin: ["male", "wei", 4, ["gzjieyue"], ["gzskin"]],
 				gz_wangping: ["male", "shu", 4, ["jianglue"], ["gzskin"]],
-				gz_fazheng: ["male", "shu", 3, ["gzxuanhuo", "gzenyuan"], ["gzskin"]],
+				gz_fazheng: ["male", "shu", 3, ["gzxuanhuo", "gzenyuan"], ["gzskin", "die:xin_fazheng"]],
 				gz_wuguotai: ["female", "wu", 3, ["gzbuyi", "ganlu"], ["gzskin"]],
 				gz_lukang: ["male", "wu", 4, ["fakejueyan", "fakekeshou"], ["gzskin"]],
 				gz_yuanshu: ["male", "qun", 4, ["gzweidi", "gzyongsi"], ["gzskin"]],
@@ -9824,6 +9824,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			//黄忠
 			gzliegong: {
 				audio: "liegong",
+				audioname2: { gz_jun_liubei: "shouyue_liegong" },
 				locked: false,
 				mod: {
 					targetInRange: function (card, player, target) {
@@ -9942,7 +9943,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			gzwushuang: {
 				shaRelated: true,
 				audio: "wushuang",
-				audioname: ["re_lvbu", "shen_lvbu", "lvlingqi"],
+				audioname2: { gz_lvlingqi: "wushuang_lvlingqi" },
 				forced: true,
 				locked: true,
 				group: ["wushuang1", "wushuang2"],
@@ -10085,6 +10086,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				derivation: "gzwushuang",
 			},
+			wushuang_lvlingqi: { audio: 2 },
 			//荀谌
 			gzfenglve: {
 				audio: "refenglve",
@@ -16486,11 +16488,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			gzxuanhuo: {
-				audio: "rexuanhuo",
+				audio: "xinxuanhuo",
 				global: "gzxuanhuo_others",
 				derivation: [
-					"fz_new_rewusheng",
-					"fz_gzpaoxiao",
+					"fz_wusheng",
+					"fz_new_paoxiao",
 					"fz_new_longdan",
 					"fz_new_tieji",
 					"fz_liegong",
@@ -16509,7 +16511,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				subSkill: {
 					others: {
-						audio: "rexuanhuo",
+						audio: "xinxuanhuo",
 						forceaudio: true,
 						enable: "phaseUse",
 						usable: 1,
@@ -16560,7 +16562,15 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								.set("prompt", "选择并获得一项技能直到回合结束");
 							"step 1";
 							player.popup(result.control);
-							player.addTempSkill("fz_" + result.control);
+							var map = {
+								new_rewusheng: "fz_wusheng",
+								gzpaoxiao: "fz_new_paoxiao",
+								new_longdan: "fz_new_longdan",
+								new_tieji: "fz_new_tieji",
+								liegong: "fz_liegong",
+								xinkuanggu: "fz_xinkuanggu"
+							};
+							player.addTempSkill(map[result.control]);
 							game.log(player, "获得了技能", "#g【" + get.translation(result.control) + "】");
 							game.delay();
 						},
@@ -16575,7 +16585,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				// audio:['xuanhuo',2],
 			},
-			fz_gzpaoxiao: {
+			fz_new_paoxiao: {
 				audio: true,
 				inherit: "gzpaoxiao",
 			},
@@ -16583,7 +16593,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				audio: true,
 				inherit: "new_tieji",
 			},
-			fz_new_rewusheng: {
+			fz_wusheng: {
 				audio: true,
 				inherit: "new_rewusheng",
 			},
@@ -16756,7 +16766,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			gzenyuan: {
 				locked: true,
-				audio: "reenyuan",
+				audio: "xinenyuan",
 				group: ["gzenyuan_gain", "gzenyuan_damage"],
 				preHidden: true,
 				ai: {
@@ -16771,7 +16781,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				subSkill: {
 					gain: {
-						audio: "reenyuan",
+						audio: "xinenyuan",
 						trigger: { target: "useCardToTargeted" },
 						forced: true,
 						filter: function (event, player) {
@@ -16783,7 +16793,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						},
 					},
 					damage: {
-						audio: "reenyuan",
+						audio: "xinenyuan",
 						trigger: { player: "damageEnd" },
 						forced: true,
 						filter: function (event, player) {
@@ -17299,6 +17309,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 			},
 			new_longdan: {
+				audio: "longdan_sha",
+				audioname2: { gz_jun_liubei: "shouyue_longdan" },
 				group: [
 					"new_longdan_sha",
 					"new_longdan_shan",
@@ -17310,6 +17322,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					shanafter: {
 						sub: true,
 						audio: "longdan_sha",
+						audioname2: { gz_jun_liubei: "shouyue_longdan" },
 						trigger: {
 							player: "useCard",
 						},
@@ -17345,6 +17358,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					shamiss: {
 						sub: true,
 						audio: "longdan_sha",
+						audioname2: { gz_jun_liubei: "shouyue_longdan" },
 						trigger: {
 							player: "shaMiss",
 						},
@@ -17377,6 +17391,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							player: ["useCard", "respond"],
 						},
 						audio: "longdan_sha",
+						audioname2: { gz_jun_liubei: "shouyue_longdan" },
 						forced: true,
 						locked: false,
 						filter: function (event, player) {
@@ -17391,6 +17406,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					},
 					sha: {
 						audio: "longdan_sha",
+						audioname2: { gz_jun_liubei: "shouyue_longdan" },
 						enable: ["chooseToUse", "chooseToRespond"],
 						filterCard: {
 							name: "shan",
@@ -17424,6 +17440,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					},
 					shan: {
 						audio: "longdan_sha",
+						audioname2: { gz_jun_liubei: "shouyue_longdan" },
 						enable: ["chooseToRespond", "chooseToUse"],
 						filterCard: {
 							name: "sha",
@@ -17456,6 +17473,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			gzpaoxiao: {
 				audio: "paoxiao",
+				audioname2: { gz_jun_liubei: "shouyue_paoxiao" },
 				trigger: {
 					player: "useCard",
 				},
@@ -17961,6 +17979,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			new_tieji: {
 				audio: "retieji",
+				audioname2: { gz_jun_liubei: "shouyue_tieji" },
 				trigger: {
 					player: "useCardToPlayered",
 				},
@@ -20221,13 +20240,18 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				unique: true,
 				forceunique: true,
 				global: "wuhujiangdaqi",
-				derivation: "wuhujiangdaqi",
+				derivation: ["wuhujiangdaqi", "new_rewusheng", "gzpaoxiao", "new_longdan", "new_tieji", "gzliegong"],
 				mark: true,
 				lordSkill: true,
 				init(player) {
 					player.markSkill("wuhujiangdaqi");
 				},
 			},
+			shouyue_wusheng: { audio: 2 },
+			shouyue_paoxiao: { audio: 2 },
+			shouyue_longdan: { audio: 2 },
+			shouyue_tieji: { audio: 2 },
+			shouyue_liegong: { audio: 2 },
 			wuhujiangdaqi: {
 				unique: true,
 				forceunique: true,
