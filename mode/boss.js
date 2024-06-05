@@ -1406,7 +1406,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"shen",
 					"1/8",
 					["boss_jiang", "boss_hunzi", "boss_hunyou", "boss_taoni"],
-					["qun", "boss", "bossallowed", "InitFilter:noZhuHp:noZhuSkill"],
+					["qun", "boss", "bossallowed", "InitFilter:noZhuHp:noZhuSkill", "die:sunce"],
 					"wu",
 				],
 
@@ -10584,7 +10584,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#wansha_boss_lvbu31": "蝼蚁，怎容偷生？",
 			"#wansha_boss_lvbu32": "沉沦吧，在这无边的恐惧！",
 			"#boss_lvbu3:die": "你们的项上人头，我改日再取！",
-			"#boss_sunce:die": "内事不决问张昭，外事不决问周瑜……",
 		},
 		get: {
 			rawAttitude: function (from, to) {
