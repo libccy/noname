@@ -1191,7 +1191,7 @@ const skills = {
 	//OL界火诸葛
 	olhuoji: {
 		audio: "rehuoji",
-		audioname: ["ol_sp_zhugeliang"],
+		audioname: ["ol_sp_zhugeliang", "ol_pangtong"],
 		trigger: { player: "huogongBegin" },
 		forced: true,
 		locked: false,
@@ -12493,6 +12493,7 @@ const skills = {
 			dc_guansuo: "wusheng_guansuo",
 			guanzhang: "wusheng_guanzhang",
 			guansuo: "wusheng_guansuo",
+			gz_jun_liubei: "shouyue_wusheng"
 		},
 		enable: ["chooseToRespond", "chooseToUse"],
 		filterCard: function (card, player) {
