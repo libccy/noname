@@ -386,7 +386,13 @@ const skills = {
 			trigger.increase("num");
 		},
 		countSkill(player) {
+			//飞扬跋扈，OL你无敌了
+			const list = [
+				["feiyang", "飞扬"],
+				["bahu", "跋扈"],
+			];
 			return player.getSkills(null, false, false).filter(i => {
+				if (list.some(text => i.includes(text[0]) && get.translation(i) == text[1])) return true;
 				const info = get.info(i);
 				return !info || !info.charlotte;
 			}).length;
