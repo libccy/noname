@@ -2725,7 +2725,7 @@ export const Content = {
 		if (get.itemtype(targets) === "player") {
 			targets = [targets];
 		}
-		if (info.popup != false && !info.direct) {
+		if (info.popup != false && !info.direct && !("skill_popup" in result && !Boolean(result["skill_popup"]))) {
 			let popup_info = event.skill;
 			if (typeof info.popup === "string") popup_info = [event.skill, info.popup];
 			if (info.logLine === false) player.logSkill(popup_info, false, info.line);
