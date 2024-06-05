@@ -965,7 +965,7 @@ const skills = {
 			return delt < 0 || (delt > 0 && player.countCards("h"));
 		},
 		locked(skill, player) {
-			return player && player.storage.dcshouzhi_modified;
+			return !(player && player.storage.dcshouzhi_modified);
 		},
 		derivation: ["dcshouzhi_modified"],
 		onremove: ["dcshouzhi_modified"],
