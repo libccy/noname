@@ -413,7 +413,7 @@ export default {
 	"#liuli_re_daqiao2": "帮帮人家嘛~",
 	"#re_daqiao:die": "伯符，再也没人能欺负我了……",
 	"#rekurou1": "我这把老骨头，不算什么！",
-	"#rekurou2": "为成大业，死不足惜！",
+	"#rekurou2": "为成大义，死不足惜！",
 	"#zhaxiang1": "铁锁连舟而行，东吴水师可破！",
 	"#zhaxiang2": "两军阵前，不斩降将！",
 	"#re_huanggai:die": "盖，有负公瑾重托……",

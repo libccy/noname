@@ -688,6 +688,7 @@ const skills = {
 			);
 		},
 		async content(event, trigger, player) {
+			player.awakenSkill("jsrgjiebing");
 			await player.gainMaxHp(2);
 			await player.recover(2);
 			await player.addSkills("jsrgbaowei");
@@ -987,7 +988,7 @@ const skills = {
 			sources.sortBySeat();
 			player.line(sources, "thunder");
 			for (let source of sources) {
-				if (!source.isIn() || !target.isIn()) break;
+				if (!source.isIn() || !target.isIn()) continue;
 				target.damage(source, "thunder");
 			}
 		},
@@ -1834,6 +1835,9 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "jsrgjinfa"
+		},
 	},
 	jsrgxuanfeng: {
 		audio: 2,
@@ -1866,6 +1870,7 @@ const skills = {
 		},
 		ai: {
 			order: 2,
+			combo: "jsrgjinfa"
 		},
 	},
 	//陆逊
@@ -2919,6 +2924,9 @@ const skills = {
 				}
 			}
 			player.logSkill("jsrgbazheng", dissident);
+		},
+		ai: {
+			combo: "jsrgyaoyan"
 		},
 	},
 	//刘永
@@ -8040,7 +8048,7 @@ const skills = {
 				})
 				.set("max", trigger.target.countDiscardableCards(player, "he"))
 				.set("goon", get.attitude(player, trigger.target) < 0)
-				.set("logSkill", ["jsrgjuelie_discard", trigger.target]);
+				.set("logSkill", ["jsrgjuelie", trigger.target]);
 			("step 1");
 			if (result.bool) {
 				var num = result.cards.length;
@@ -9311,7 +9319,7 @@ const skills = {
 			aiValue: (player, card, num) => {
 				if (num > 0 && get.itemtype(card) === "card" && card.name !== "zhuge" && get.subtype(card) === "equip1" && !player.getEquip(1)) return 0.01 * num;
 			},
-			aiUseful: () => {
+			aiUseful: function () {
 				return lib.skill.jsrgzhenqiao.mod.aiValue.apply(this, arguments);
 			},
 		},
@@ -9397,6 +9405,9 @@ const skills = {
 				player.logSkill("jsrgfayi", target);
 				target.damage();
 			}
+		},
+		ai: {
+			combo: "jsrgshelun"
 		},
 	},
 	jsrgtushe: {

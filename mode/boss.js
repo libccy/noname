@@ -1327,7 +1327,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				boss_zhugeliang: [
 					"male",
 					"shen",
-					Infinity,
+					"Infinity/Infinity",
 					["xiangxing", "yueyin", "fengqi", "gaiming"],
 					["shu", "boss", "bossallowed"],
 					"qun",
@@ -1406,7 +1406,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"shen",
 					"1/8",
 					["boss_jiang", "boss_hunzi", "boss_hunyou", "boss_taoni"],
-					["qun", "boss", "bossallowed", "InitFilter:noZhuHp:noZhuSkill"],
+					["qun", "boss", "bossallowed", "InitFilter:noZhuHp:noZhuSkill", "die:sunce"],
 					"wu",
 				],
 
@@ -7158,7 +7158,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					content: function (storage, player) {
 						var str = "扣减" + (7 - player.storage.xiangxing_count) + "点体力后失去下一枚星；";
 						str +=
-							"防上禳星伤害条件：" +
+							"防止禳星伤害条件：" +
 							lib.translate["xiangxing" + player.storage.xiangxing + "_info"];
 						return str;
 					},
@@ -7171,10 +7171,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return player.countCards("h") == 0;
 					},
 					x6: function (player, event) {
-						return event.hasNature("fire");
+						if(event.hasNature) return event.hasNature("fire");
 					},
 					x5: function (player, event) {
-						return event.hasNature("thunder");
+						if(event.hasNature) return event.hasNature("thunder");
 					},
 					x4: function (player, event) {
 						return event.name == "loseHp";
@@ -9641,6 +9641,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					},
 				},
 			},
+			reyingzi_sunce: { audio: 2 },
+			yinghun_sunce: { audio: 2 },
 			boss_jiang: {
 				audio: "jiang",
 				trigger: {
@@ -9691,6 +9693,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				group: ["boss_jiang_use"],
 				subSkill: {
 					use: {
+						audio: "jiang",
 						trigger: {
 							global: ["useCard"],
 						},
@@ -10505,7 +10508,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				"觉醒技，准备阶段，若你的体力值为1，你减1点体力上限，失去技能〖魂佑〗并获得技能〖英姿〗和〖英魂〗。",
 			boss_jiang: "激昂",
 			boss_jiang_info:
-				"①锁定技，〖激昂〗不会无效。<br>②每当你使用或打出红色牌时，你可以摸一张牌。若你是因响应其他角色使用或打出的牌，则你获得对方使用或打出的牌。<br>③当有其他角色使用或打出红色牌指定你为目标或响应你后，你可以摸一张牌并获得这些牌。",
+				"①锁定技，〖激昂〗不会无效。②每当你使用或打出红色牌时，你可以摸一张牌。若你是因响应其他角色使用或打出的牌，则你获得对方使用或打出的牌。③当有其他角色使用或打出红色牌指定你为目标或响应你后，你可以摸一张牌并获得这些牌。",
 			boss_hunyou: "魂佑",
 			boss_hunyou_info: "锁定技，你的体力值变化和体力上限变化无效。",
 			boss_taoni: "讨逆",
@@ -10558,6 +10561,29 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 
 			mode_boss_card_config: "挑战卡牌",
 			mode_boss_character_config: "挑战武将",
+			
+			// 台词部分
+			"#boss_lvbu1:die": "虎牢关，失守了……",
+			"#xiuluo1": "准备受死吧！",
+			"#xiuluo2": "鼠辈！螳臂当车！",
+			"#shenwei1": "萤烛之火，也敢与日月争辉？",
+			"#shenwei2": "我不会输给任何人！",
+			"#shenji1": "杂鱼们！都去死吧！",
+			"#shenji2": "竟想赢我？痴人说梦！",
+			"#boss_lvbu2:die": "虎牢关，失守了……",
+			"#shenqu1": "别心怀侥幸了，你们不可能赢！",
+			"#shenqu2": "虎牢关，我一人镇守足矣！",
+			"#jiwu1": "我，是不可战胜的！",
+			"#jiwu2": "今天，就让你们感受一下真正的绝望！",
+			"#qiangxi_boss_lvbu31": "这么想死，那我就成全你！",
+			"#qiangxi_boss_lvbu32": "项上人头，待我来取！",
+			"#retieji_boss_lvbu31": "哈哈哈，破绽百出！",
+			"#retieji_boss_lvbu32": "我要让这虎牢关下，血流成河！",
+			"#xuanfeng_boss_lvbu31": "千钧之势，力贯苍穹！",
+			"#xuanfeng_boss_lvbu32": "横扫六合，威震八荒！",
+			"#wansha_boss_lvbu31": "蝼蚁，怎容偷生？",
+			"#wansha_boss_lvbu32": "沉沦吧，在这无边的恐惧！",
+			"#boss_lvbu3:die": "你们的项上人头，我改日再取！",
 		},
 		get: {
 			rawAttitude: function (from, to) {

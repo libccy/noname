@@ -4454,6 +4454,7 @@ export class Player extends HTMLDivElement {
 				next.func = arguments[i];
 			}
 		}
+		return next;
 	}
 	discoverCard(list) {
 		var next = game.createEvent("discoverCard");
@@ -7073,7 +7074,7 @@ export class Player extends HTMLDivElement {
 			node = ui.create.div(".card.mark.drawinghidden");
 			ui.create.div(".background.skillmark", node).innerHTML = get.translation(name)[0];
 		} else {
-			if (!lib.character[name]) return;
+			if (!get.character(name)) return;
 			node = ui.create.div(".card.mark.drawinghidden").setBackground(name, "character");
 		}
 		this.node.marks.insertBefore(node, this.node.marks.childNodes[1]);
@@ -9027,9 +9028,7 @@ export class Player extends HTMLDivElement {
 	 */
 	hasSkillTag(tag, hidden, arg, globalskill) {
 		var skills = this.getSkills(hidden);
-		if (globalskill) {
-			skills.addArray(lib.skill.global);
-		}
+		if (globalskill !== false) skills.addArray(lib.skill.global);
 		game.expandSkills(skills);
 		for (var i = 0; i < skills.length; i++) {
 			var info = lib.skill[skills[i]];

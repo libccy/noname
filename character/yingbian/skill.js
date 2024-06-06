@@ -1750,7 +1750,7 @@ const skills = {
 					var skill = lib.skill[j];
 					if (!skill || skill.juexingji || skill.hiddenSkill || skill.zhuSkill || skill.dutySkill || skill.chargeSkill || lib.skill.bolan.banned.includes(j)) continue;
 					if (skill.init || (skill.ai && (skill.ai.combo || skill.ai.notemp || skill.ai.neg))) continue;
-					var info = lib.translate[j + "_info"];
+					var info = get.plainText(lib.translate[j + "_info"]);
 					if (info && info.indexOf("出牌阶段限一次") != -1) skills.add(j);
 				}
 			}
@@ -2312,6 +2312,9 @@ const skills = {
 			globalFrom: function (player, target, distance) {
 				if (player.getEquips(5).length) return distance - 1;
 			},
+		},
+		ai: {
+			combo: "chexuan"
 		},
 	},
 	cheliji_sichengliangyu: {

@@ -335,7 +335,6 @@ const skills = {
 			}
 			return bool;
 		},
-		ai: { combo: "rejijun" },
 	},
 	//界司马朗
 	requji: {
@@ -1192,7 +1191,7 @@ const skills = {
 	//OL界火诸葛
 	olhuoji: {
 		audio: "rehuoji",
-		audioname: ["ol_sp_zhugeliang"],
+		audioname: ["ol_sp_zhugeliang", "ol_pangtong"],
 		trigger: { player: "huogongBegin" },
 		forced: true,
 		locked: false,
@@ -1635,9 +1634,12 @@ const skills = {
 					return target.countCards("he") > 0 && target != player;
 				})
 				.set("ai", target => {
-					var player = _status.event.player;
-					if (_status.event.goon) return get.attitude(player, target) * Math.sqrt(target.countCards("he"));
-					return (-get.attitude(player, target) / (target.countCards("he") + 1)) * 10;
+					var player = _status.event.player, att = get.attitude(player, target);
+					if (_status.event.goon) {
+						if (att > 0) return att * Math.sqrt(target.countCards("he"));
+						return (1 - att) / (target.countCards("he") + 1);
+					}
+					return -10 * att / (target.countCards("he") + 1);
 				})
 				.set("goon", player.countCards("hs", card => player.hasValueTarget(card)) >= 2);
 			"step 1";
@@ -1661,6 +1663,14 @@ const skills = {
 		},
 		subSkill: {
 			effect: {
+				mod: {
+					aiOrder(player, card, num) {
+						if (num <= 0 || !player.getExpansions("rekuangbi_effect").length) return;
+						let suit = get.suit(card);
+						if (player.getExpansions("rekuangbi_effect").some(i => get.suit(i) == suit)) return num + 10;
+						return num / 4;
+					}
+				},
 				trigger: { player: "useCard" },
 				charlotte: true,
 				forced: true,
@@ -3189,7 +3199,7 @@ const skills = {
 			threaten: 0.9,
 			effect: {
 				target: function (card, player, target) {
-					if (player.hasSkillTag("jueqing")) return;
+					if (player.hasSkillTag("jueqing", false, target)) return;
 					if (target.hujia) return;
 					if (player._shibei_tmp) return;
 					if (target.hasSkill("shibei_ai")) return;
@@ -9351,7 +9361,8 @@ const skills = {
 	},
 	olpaoxiao: {
 		audio: "paoxiao",
-		audioname: ["re_zhangfei", "guanzhang", "xiahouba", "re_guanzhang"],
+		audioname: ["re_zhangfei", "xiahouba", "re_guanzhang"],
+		audioname2: { guanzhang: "paoxiao_guanzhang" },
 		trigger: { player: "shaMiss" },
 		forced: true,
 		content: function () {
@@ -9368,7 +9379,8 @@ const skills = {
 		trigger: { source: "damageBegin1" },
 		forced: true,
 		audio: "paoxiao",
-		audioname: ["re_zhangfei", "guanzhang", "xiahouba", "re_guanzhang"],
+		audioname: ["re_zhangfei", "xiahouba", "re_guanzhang"],
+		audioname2: { guanzhang: "paoxiao_guanzhang" },
 		filter: function (event, player) {
 			return event.card && event.card.name == "sha" && player.countMark("olpaoxiao2") > 0;
 		},
@@ -9779,6 +9791,9 @@ const skills = {
 			player.storage.chengzhang = true;
 			player.recover();
 			player.draw();
+		},
+		ai: {
+			combo: "rejiushi"
 		},
 	},
 	rejiushi: {
@@ -11146,7 +11161,7 @@ const skills = {
 				let name = _status.characterlist[i];
 				if (name.indexOf("zuoci") != -1 || name.indexOf("key_") == 0 || name.indexOf("sp_key_") == 0 || get.is.double(name) || lib.skill.rehuashen.banned.includes(name) || player.storage.rehuashen.character.includes(name)) continue;
 				let skills = lib.character[name][3].filter(skill => {
-					const categories = get.skillCategoriesOf(skill);
+					const categories = get.skillCategoriesOf(skill, player);
 					return !categories.some(type => lib.skill.rehuashen.bannedType.includes(type));
 				});
 				if (skills.length) {
@@ -11200,7 +11215,7 @@ const skills = {
 			node = ui.create.buttonPresets.character(item, "character", position, noclick);
 			const info = lib.character[item];
 			const skills = info[3].filter(function (skill) {
-				const categories = get.skillCategoriesOf(skill);
+				const categories = get.skillCategoriesOf(skill, get.player());
 				return !categories.some(type => lib.skill.rehuashen.bannedType.includes(type));
 			});
 			if (skills.length) {
@@ -12238,6 +12253,7 @@ const skills = {
 	},
 	new_retuxi: {
 		audio: "retuxi",
+		audioname2: { gz_jun_caocao: "jianan_tuxi" },
 		trigger: {
 			player: "phaseDrawBegin2",
 		},
@@ -12472,9 +12488,12 @@ const skills = {
 		},
 		locked: false,
 		audio: "wusheng",
-		audioname: ["re_guanyu", "guanzhang", "jsp_guanyu", "guansuo", "re_guanzhang", "dc_jsp_guanyu"],
+		audioname: ["re_guanyu", "jsp_guanyu", "re_guanzhang", "dc_jsp_guanyu"],
 		audioname2: {
 			dc_guansuo: "wusheng_guansuo",
+			guanzhang: "wusheng_guanzhang",
+			guansuo: "wusheng_guansuo",
+			gz_jun_liubei: "shouyue_wusheng"
 		},
 		enable: ["chooseToRespond", "chooseToUse"],
 		filterCard: function (card, player) {
@@ -12509,7 +12528,6 @@ const skills = {
 			},
 		},
 	},
-	wusheng_guansuo: { audio: 2 },
 	new_yijue: {
 		audio: "yijue",
 		enable: "phaseUse",
@@ -12829,8 +12847,8 @@ const skills = {
 		ai: {
 			effect: {
 				target: (card, player, target) => {
-					if (typeof card !== "object" || !get.tag(card, "damage") || target.hasSkill("gangzhi")) return;
-					if (player.hasSkillTag("jueqing", null, true)) return;
+					if (typeof card !== "object" || !get.tag(card, "damage")) return;
+					if (player.hasSkillTag("jueqing", false, target)) return;
 					if (get.color(card) === "red") return [1, 0, 1, 0.6];
 					return [1, 0.6];
 				},
@@ -13840,7 +13858,8 @@ const skills = {
 		audioname2: {
 			re_sunyi: "reyingzi_re_sunyi",
 			heqi: "reyingzi_heqi",
-			re_heqi: "reyingzi_heqi"
+			re_heqi: "reyingzi_heqi",
+			boss_sunce: "reyingzi_sunce"
 		},
 		trigger: { player: "phaseDrawBegin2" },
 		forced: true,
@@ -14568,7 +14587,7 @@ const skills = {
 	},
 	zhaxiang: {
 		audio: 2,
-		audioname: ["ol_sb_jiangwei"],
+		audioname2: { ol_sb_jiangwei: "zhaxiang_ol_sb_jiangwei" },
 		trigger: { player: "loseHpEnd" },
 		forced: true,
 		content: function () {
@@ -14627,7 +14646,7 @@ const skills = {
 		charlotte: true,
 		onremove: true,
 		audio: "zhaxiang",
-		audioname: ["ol_sb_jiangwei"],
+		audioname2: { ol_sb_jiangwei: "zhaxiang_ol_sb_jiangwei" },
 		trigger: { player: "useCard" },
 		filter: function (event, player) {
 			return event.card && event.card.name == "sha" && get.color(event.card) == "red";

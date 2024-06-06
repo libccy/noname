@@ -313,7 +313,7 @@ const skills = {
 						.chooseToUse(function (card, player, event) {
 							if (get.name(card) != "sha") return false;
 							return lib.filter.filterCard.apply(this, arguments);
-						}, "眩惑：对" + get.translation(player) + "使用一张【杀】，或令" + get.translation(player) + "你的手牌并获得你的两张牌")
+						}, "眩惑：对" + get.translation(target2) + "使用一张【杀】，或令" + get.translation(player) + "你的手牌并获得你的两张牌")
 						.set("filterTarget", function (card, player, target) {
 							if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
 							return lib.filter.targetEnabled.apply(this, arguments);
@@ -383,7 +383,7 @@ const skills = {
 				if (goon && player.isDamaged())
 					result = await player
 						.chooseControl()
-						.set("choiceList", ["获得" + get.translation(target) + "的一张牌", "发动一次〖秘计〗"])
+						.set("choiceList", ["获得" + get.translation(target) + "的一张牌", "于本回合的结束阶段发动一次〖秘计〗"])
 						.set("ai", () => {
 							const player = get.event("player"),
 								target = get.event().getTrigger().player;
@@ -394,16 +394,28 @@ const skills = {
 				if (result.index == 0) {
 					await player.gainPlayerCard(target, "he", true);
 				} else {
-					await player.useSkill("olmiji");
+					player.addTempSkill("olzhenlie_effect");
+					player.addMark("olzhenlie_effect", 1, false);
 				}
 			}
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				onremove: true,
+				intro: { content: "本回合的结束阶段可以发动#次〖秘计〗" },
+			},
 		},
 	},
 	olmiji: {
 		audio: 2,
-		trigger: { player: "phaseJieshuBegin" },
+		trigger: { global: "phaseJieshuBegin" },
 		filter(event, player) {
-			return player.isDamaged();
+			if (player.isHealthy()) return false;
+			return event.player == player || player.hasMark("olzhenlie_effect");
+		},
+		getIndex(event, player) {
+			return player.countMark("olzhenlie_effect") + (event.player == player);
 		},
 		async content(event, trigger, player) {
 			let num = player.getDamagedHp();
@@ -857,7 +869,7 @@ const skills = {
 						true
 					)
 				) {
-					if (player.hasSkill("jueqing") || target.hasSkill("gangzhi")) extra_num--;
+					if (player.hasSkillTag("jueqing", false, target)) extra_num--;
 					else if (
 						target.hasSkillTag("filterDamage", null, {
 							player: event.player,
@@ -1037,7 +1049,6 @@ const skills = {
 				}
 			}
 		},
-		ai: { combo: "olsbyufeng" },
 	},
 	//界高顺
 	olxianzhen: {
@@ -1712,8 +1723,10 @@ const skills = {
 	},
 	kunfenx: {
 		audio: "kunfen",
-		audioname: ["ol_sb_jiangwei"],
+		audioname2: { ol_sb_jiangwei: "kunfen_ol_sb_jiangwei" },
 	},
+	kunfen_ol_sb_jiangwei: { audio: 1 },
+	zhaxiang_ol_sb_jiangwei: { audio: 1 },
 	//界曹彰
 	oljiangchi: {
 		audio: "rejiangchi",

@@ -2,7 +2,7 @@
 // 但沙盒不会也没有办法维护恶意服务器/房主对于游戏规则的破坏，请玩家尽量选择官方或其他安全的服务器，同时选择一个受信任的玩家作为房主
 
 // 是否强制所有模式下使用沙盒
-const SANDBOX_FORCED = true;
+const SANDBOX_FORCED = false;
 // 是否启用自动测试
 const SANDBOX_AUTOTEST = false;
 // 是否禁用自动测试延迟
@@ -415,6 +415,7 @@ async function initSecurity({
 		return;
 
 	loadPolyfills();
+	initSerializeNeeded();
 	initIsolatedEnvironment();
 
 	// 不允许被远程代码访问的game函数
@@ -808,6 +809,41 @@ function initIsolatedEnvironment() {
 	rewriteCtor(defaultGeneratorFunction.prototype, ModGeneratorFunction);
 	rewriteCtor(defaultAsyncFunction.prototype, ModAsyncFunction);
 	rewriteCtor(defaultAsyncGeneratorFunction.prototype, ModAsyncGeneratorFunction);
+}
+
+/**
+ * ```plain
+ * 初始化需要额外序列化的函数
+ * 
+ * 适配扩展，当在skillcontent里面调用皮切的playEffect时会报错
+ * ```
+ */
+function initSerializeNeeded() {
+	const structuredClone = window.structuredClone;
+	const deepClone = (/** @type {any} */ obj) => {
+		try {
+			return structuredClone(obj);
+		} catch (e) {
+			return obj;
+		}
+	};
+	
+	/** @type {Array<[string, number[]]>} */
+	const funcList = [
+		["Worker.prototype.postMessage", [0]],
+	];
+
+	for (const [funcCode, argIndexes] of funcList) {
+		const originalFunc = new Function(`return ${funcCode}`)();
+		const newFunc = /** @this {any} */ function (/** @type {any[]} */ ...args) {
+			for (const index of argIndexes)
+				args[index] = deepClone(args[index]);
+
+			return originalFunc.apply(this, args);
+		};
+
+		new Function("_", `${funcCode} = _;`)(newFunc);
+	}
 }
 
 /**

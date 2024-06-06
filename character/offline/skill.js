@@ -2,13 +2,120 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
-	//线下E系列肘击
+	//线下E系列
+	//鄂焕
+	psdiwan: {
+		trigger: { player: "useCardToPlayered" },
+		filter(event, player) {
+			return event.card.name == "sha" && event.isFirstTarget;
+		},
+		frequent: true,
+		usable: 1,
+		content() {
+			player.draw(trigger.targets.length);
+		},
+	},
+	pssuiluan: {
+		trigger: { player: "useCard2" },
+		filter(event, player) {
+			if (player.group != "qun" || event.card.name != "sha") return false;
+			return (
+				game.countPlayer(target => {
+					return !event.targets.includes(target) && lib.filter.targetEnabled2(event.card, player, target) && lib.filter.targetInRange(event.card, player, target);
+				}) > 1
+			);
+		},
+		groupSkill: true,
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(
+					get.prompt2("pssuiluan"),
+					(card, player, target) => {
+						const event = get.event().getTrigger();
+						return !event.targets.includes(target) && lib.filter.targetEnabled2(event.card, player, target) && lib.filter.targetInRange(event.card, player, target);
+					},
+					2
+				)
+				.set("ai", target => {
+					const player = get.event("player"),
+						event = get.event().getTrigger();
+					return get.effect(target, event.card, player);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			trigger.targets.addArray(event.targets);
+			player.addTempSkill("pssuiluan_effect");
+			trigger.card.pssuiluan = true;
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				trigger: { player: ["useCardAfter", "damageEnd"] },
+				filter(event, player) {
+					if (event.name == "damage") {
+						return player.group != "shu" && event.getParent(4).name == "pssuiluan_effect";
+					}
+					return event.card.pssuiluan && (event.targets || []).some(i => i.isIn());
+				},
+				forced: true,
+				popup: false,
+				forceDie: true,
+				async content(event, trigger, player) {
+					if (trigger.name == "damage") {
+						await player.changeGroup("shu");
+						return;
+					}
+					const targets = trigger.targets.filter(i => i.isIn()).sortBySeat();
+					for (const target of targets) {
+						await target
+							.chooseToUse(function (card, player, event) {
+								if (get.name(card) != "sha") return false;
+								return lib.filter.filterCard.apply(this, arguments);
+							}, "随乱：是否对" + get.translation(player) + "使用一张【杀】？")
+							.set("filterTarget", function (card, player, target) {
+								if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
+								return lib.filter.filterTarget.apply(this, arguments);
+							})
+							.set("targetRequired", true)
+							.set("complexSelect", true)
+							.set("sourcex", player);
+					}
+				},
+			},
+		},
+	},
+	psconghan: {
+		trigger: { global: "damageSource" },
+		filter(event, player) {
+			if (player.group != "shu" || !event.source || !event.player.isIn()) return false;
+			return event.source.getSeatNum() == 1 && (player.hasSha() || (_status.connectMode && player.countCards("hs")));
+		},
+		direct: true,
+		groupSkill: true,
+		content() {
+			player
+				.chooseToUse(function (card, player, event) {
+					if (get.name(card) != "sha") return false;
+					return lib.filter.filterCard.apply(this, arguments);
+				}, get.prompt2("psconghan", trigger.player))
+				.set("filterTarget", function (card, player, target) {
+					if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
+					return lib.filter.filterTarget.apply(this, arguments);
+				})
+				.set("targetRequired", true)
+				.set("complexSelect", true)
+				.set("logSkill", ["psconghan", trigger.player])
+				.set("sourcex", trigger.player);
+		},
+	},
+	//肘击
 	psyanmou: {
 		getCards(event, player) {
 			let cards = [];
 			if (event.name == "cardsDiscard") {
 				const evt = event.getParent().relatedEvent;
-				if (evt && evt.name == "judge" && evt.player == player) {
+				if (evt && evt.name == "judge" && evt.player != player) {
 					cards.addArray(event.cards.filter(i => get.position(i, true) == "d"));
 				}
 			} else {
@@ -738,8 +845,6 @@ const skills = {
 			var go = false,
 				d1 = false;
 			if (get.attitude(player, trigger.player) > 0) {
-				d1 = true;
-				if (trigger.player.hasSkill("jueqing") || trigger.player.hasSkill("gangzhi")) d1 = false;
 				for (var target of trigger.targets) {
 					if (
 						!target.mayHaveShan(
@@ -759,15 +864,17 @@ const skills = {
 							true
 						)
 					) {
-						if (!target.hasSkill("gangzhi")) d1 = false;
 						if (
-							target.hasSkillTag("filterDamage", null, {
+							get.attitude(player, target) < 0 &&
+							!trigger.player.hasSkillTag("jueqing", false, target) &&
+							!target.hasSkillTag("filterDamage", null, {
 								player: trigger.player,
 								card: trigger.card,
-							}) ||
-							get.attitude(player, target) >= 0
-						)
-							d1 = false;
+							})
+						) {
+							d1 = true;
+							break;
+						}
 					}
 				}
 				if (trigger.addCount === false || !trigger.player.isPhaseUsing()) go = false;
@@ -4267,61 +4374,46 @@ const skills = {
 		intro: {
 			content: "limited",
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			player
-				.chooseTarget(get.prompt2("yjyongdi"), function (card, player, target) {
-					return target.hasSex("male") || target.name == "key_yuri";
-				})
-				.set("ai", function (target) {
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(
+					get.prompt2("yjyongdi"),
+					(card, player, target) => {
+						return target.hasSex("male") || target.name == "key_yuri";
+					}
+				)
+				.set("ai", target => {
 					if (!_status.event.goon) return 0;
 					var player = _status.event.player;
 					var att = get.attitude(player, target);
 					if (att <= 1) return 0;
 					var mode = get.mode();
 					if (mode == "identity" || (mode == "versus" && _status.mode == "four")) {
-						if (target.name && lib.character[target.name]) {
-							for (var i = 0; i < lib.character[target.name][3].length; i++) {
-								if (lib.skill[lib.character[target.name][3][i]].zhuSkill) {
-									return att * 2;
-								}
-							}
-						}
+						if (target.getStockSkills(true, true).some(i => {
+							if (target.hasSkill(i)) return false;
+							let info = get.info(i);
+							return info && info.zhuSkill;
+						})) return att * 2;
 					}
 					return att;
 				})
-				.set("goon", !player.hasUnknown());
-			"step 1";
-			if (result.bool) {
-				player.awakenSkill("yjyongdi");
-				player.logSkill("yjyongdi", result.targets);
-				var target = result.targets[0];
-				target.gainMaxHp(true);
-				target.recover();
-				var mode = get.mode();
-				if (mode == "identity" || (mode == "versus" && _status.mode == "four") || mode == "doudizhu") {
-					if (target.name && lib.character[target.name]) {
-						var skills = lib.character[target.name][3];
-						target.storage.zhuSkill_yjyongdi = [];
-						for (var i = 0; i < skills.length; i++) {
-							var info = lib.skill[skills[i]];
-							if (info.zhuSkill) {
-								target.storage.zhuSkill_yjyongdi.push(skills[i]);
-								if (info.init) {
-									info.init(target);
-								}
-								if (info.init2) {
-									info.init2(target);
-								}
-							}
-						}
-					}
-				}
-			}
+				.set("goon", !player.hasUnknown())
+				.forResult();
 		},
-		ai: {
-			expose: 0.2,
+		async content(event, trigger, player) {
+			player.awakenSkill("yjyongdi");
+			let target = event.targets[0], mode = get.mode();
+			if (player !== target && (mode !== "identity" || player.identity !== "nei")) player.addExpose(0.3);
+			target.gainMaxHp(true);
+			target.recover();
+			if (mode == "identity" || (mode == "versus" && _status.mode == "four") || mode == "doudizhu") {
+				let skills = target.getStockSkills(true, true).filter(i => {
+					if (target.hasSkill(i)) return false;
+					let info = get.info(i);
+					return info && info.zhuSkill;
+				});
+				if (skills.length) target.addSkills(skills);
+			}
 		},
 	},
 	//用间篇豪华版盒子许攸
@@ -4930,6 +5022,9 @@ const skills = {
 				player.gift(result.cards, target);
 			}
 		},
+		ai: {
+			combo: "yixiandao"
+		},
 	},
 	yjyibing: {
 		trigger: {
@@ -5485,7 +5580,7 @@ const skills = {
 			if (event.lose && event.lose.loseHp) player.draw();
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 			filterDamage: true,
 			skillTagFilter: function (player, tag, arg) {
 				if (tag === "filterDamage" && arg && arg.player) {

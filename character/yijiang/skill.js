@@ -2894,9 +2894,10 @@ const skills = {
 		trigger: { player: "phaseBegin" },
 		forced: true,
 		audio: "dangxian",
-		audioname: ["guansuo", "xin_liaohua", "re_liaohua"],
+		audioname: ["xin_liaohua", "re_liaohua"],
 		audioname2: {
 			dc_guansuo: "dangxian_guansuo",
+			guansuo: "dangxian_guansuo",
 		},
 		content: function () {
 			trigger.phaseList.splice(trigger.num, 0, "phaseUse|xindangxian");
@@ -2934,7 +2935,6 @@ const skills = {
 			},
 		},
 	},
-	dangxian_guansuo: { audio: 2 },
 	xinjunxing: {
 		inherit: "junxing",
 		audio: "junxing",
@@ -5963,7 +5963,7 @@ const skills = {
 			trigger.num++;
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 		},
 	},
 	huisheng: {
@@ -8140,7 +8140,9 @@ const skills = {
 		trigger: { player: "phaseBegin" },
 		forced: true,
 		audio: 2,
-		audioname: ["guansuo"],
+		audioname2: {
+			guansuo: "dangxian_guansuo",
+		},
 		content: function () {
 			trigger.phaseList.splice(trigger.num, 0, "phaseUse|dangxian");
 		},
@@ -8774,7 +8776,7 @@ const skills = {
 				if (player.hp != 1) return false;
 			},
 			respondSha: true,
-			halfneg: true,
+			neg: true,
 		},
 		audio: 2,
 		audioname: ["xin_zhangyi"],
@@ -10221,6 +10223,8 @@ const skills = {
 		},
 	},
 	fuhun3: {},
+	wusheng_guanzhang: { audio: 1 },
+	paoxiao_guanzhang: { audio: 1 },
 	fencheng: {
 		skillAnimation: "epic",
 		animationColor: "gray",
@@ -10630,7 +10634,9 @@ const skills = {
 	},
 	zhiman: {
 		audio: 2,
-		audioname: ["guansuo"],
+		audioname2: {
+			guansuo: "zhiman_guansuo",
+		},
 		trigger: { source: "damageBegin2" },
 		check: function (event, player) {
 			if (get.damageEffect(event.player, player, player) < 0) return true;
@@ -10782,9 +10788,10 @@ const skills = {
 	olsanyao1: {},
 	rezhiman: {
 		audio: "zhiman",
-		audioname: ["guansuo", "re_masu"],
+		audioname: ["re_masu"],
 		audioname2: {
 			dc_guansuo: "zhiman_guansuo",
+			guansuo: "zhiman_guansuo",
 		},
 		trigger: { source: "damageBegin2" },
 		filter: function (event, player) {
@@ -10812,7 +10819,6 @@ const skills = {
 			trigger.cancel();
 		},
 	},
-	zhiman_guansuo: { audio: 2 },
 	resanyao: {
 		audio: 2,
 		enable: "phaseUse",
@@ -14377,7 +14383,7 @@ const skills = {
 			threaten: 0.9,
 			effect: {
 				target: function (card, player, target) {
-					if (player.hasSkillTag("jueqing")) return;
+					if (player.hasSkillTag("jueqing", false, target)) return;
 					if (target.hujia) return;
 					if (player._shibei_tmp) return;
 					if (target.hasSkill("shibei_ai")) return;

@@ -10,9 +10,9 @@ const characterSort = {
 	sp_qifu: ["ol_feiyi", "caoying", "panshu", "caochun", "yuantanyuanshang", "caoshuang", "wolongfengchu", "guansuo", "baosanniang", "fengfangnv", "jin_zhouchu"],
 	sp_wanglang: ["ol_wanglang", "ol_puyuan", "ol_zhouqun"],
 	sp_zhongdan: ["cuiyan", "huangfusong"],
-	sp_guozhan2: ["sp_dongzhuo", "liqueguosi", "zhangren"],
+	sp_guozhan2: ["sp_dongzhuo", "zhangren"],
 	sp_others: ["hanba", "caiyang"],
-	sp_waitforsort: ["ol_luyusheng", "ol_tw_zhangji", "ol_liwan", "ol_liuyan"],
+	sp_waitforsort: ["ol_luyusheng", "ol_tw_zhangji", "ol_liwan", "ol_liuyan", "ol_peixiu", "caimao", "ol_jiangwan"],
 };
 
 const characterSortTranslate = {

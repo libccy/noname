@@ -974,6 +974,16 @@ export class Get {
 
 		return target;
 	}
+	/**
+	 * 用于将HTML代码转换为纯文本。
+	 * @param { string } htmlContent
+	 * @returns { string }
+	 */
+	plainText(htmlContent) {
+		var parser = new DOMParser();
+		var doc = parser.parseFromString(htmlContent || '', 'text/html');
+		return doc.body.textContent || doc.body.innerText;
+	}
 	inpilefull(type) {
 		var list = [];
 		for (var i in lib.cardPile) {
@@ -1551,12 +1561,7 @@ export class Get {
 			if (func._filter_args) {
 				return "_noname_func:" + JSON.stringify(get.stringifiedResult(func._filter_args, 3));
 			}
-			const { Marshal, Sandbox } = security.importSandbox();
-			const domain = Marshal.getMarshalledDomain(func);
-			if (domain) {
-				const sandbox = Sandbox.from(domain);
-				if (sandbox && "client" in sandbox) throw new Error("不应该二次扩散远程代码");
-			}
+			const { Marshal } = security.importSandbox();
 			const str = Marshal.decompileFunction(func);
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return "_noname_func:function () {}";

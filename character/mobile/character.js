@@ -28,7 +28,7 @@ const characters = {
 	re_yanwen: ["male", "qun", 4, ["reshuangxiong"]],
 	xin_zhoutai: ["male", "wu", 4, ["buqu", "new_fenji"]],
 	re_caozhi: ["male", "wei", 3, ["reluoying", "rejiushi", "chengzhang"]],
-	yj_weiyan: ["male", "qun", 5, ["mbguli", "mbaosi"]],
+	yj_weiyan: ["male", "qun", "4/4/1", ["mbguli", "mbaosi"]],
 	re_chenqun: ["male", "wei", 3, ["redingpin", "refaen"]],
 	xin_caoxiu: ["male", "wei", 4, ["qianju", "xinqingxi"]],
 	xin_zhuhuan: ["male", "wu", 4, ["fenli", "xinpingkou"]],

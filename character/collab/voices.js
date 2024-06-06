@@ -45,4 +45,9 @@ export default {
 	"#taoshen:die": "马革裹尸，身沉江心……",
 	"#jieyuan_more": "我所有的努力，都是为了杀你！",
 	"#jieyuan_less": "我必须活下去！",
+	"#dchuiwan1": "金珠弹黄鹂，玉带做秋千，如此游戏人间。",
+	"#dchuiwan2": "小爷横行江东，今日走马、明日弄鹰。",
+	"#dchuanli1": "金乌当空，汝欲与我辩日否？",
+	"#dchuanli2": "童言无忌，童言有理！",
+	"#xin_sunquan:die": "阿娘，大哥抢我糖人！",
 };

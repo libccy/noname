@@ -41,6 +41,28 @@ const SandboxSignal_ListMonitor = Symbol("ListMonitor");
 const SandboxSignal_ExposeInfo = Symbol("ExposeInfo");
 const SandboxSignal_TryFunctionRefs = Symbol("TryFunctionRefs");
 
+// 用于适配 < Chrome 84 的设备
+const WeakRef = window.WeakRef || class WeakRef {
+	/**
+	 * @param {any} target
+	 */
+	constructor(target) {
+		this.target = target;
+	}
+
+	/**
+	 * @returns {any} 
+	 */
+	deref() {
+		return this.target;
+	}
+
+	/**
+	 * @type {"WeakRef"} 
+	 */
+	[Symbol.toStringTag] = "WeakRef";
+};
+
 /**
  * ```plain
  * 判断是否为基元类型
@@ -914,19 +936,18 @@ class NativeWrapper {
 		const prototype = NativeWrapper.#currentFunction.prototype;
 		// 根据是否装箱进行不同的封装
 		const wrapped = (flags & 2)
-			? function (...args) {
+			? function (/** @type {any[]} */ ...args) {
 				const list = args.map(a =>
 					NativeWrapper.boxCallback(a, prototype));
 				// @ts-ignore
 				return ContextInvoker1(func, this, list);
 			}
-			: function (...args) {
+			: function (/** @type {any[]} */ ...args) {
 				// @ts-ignore
 				return ContextInvoker1(func, this, args);
 			};
 
 		// 构造原型链
-		sealObjectTree(wrapped);
 		Reflect.setPrototypeOf(wrapped, prototype);
 		return wrapped;
 	}
@@ -945,17 +966,16 @@ class NativeWrapper {
 		const prototype = NativeWrapper.#currentFunction.prototype;
 		// 根据是否装箱进行不同的封装
 		const wrapped = (flags & 2)
-			? function (...args) {
+			? function (/** @type {any[]} */ ...args) {
 				const list = args.map(a =>
 					NativeWrapper.boxCallback(a, prototype));
 				return ContextInvoker2(func, list, new.target);
 			}
-			: function (...args) {
+			: function (/** @type {any[]} */ ...args) {
 				return ContextInvoker2(func, args, new.target);
 			};
 
 		// 构造原型链
-		sealObjectTree(wrapped);
 		Reflect.setPrototypeOf(wrapped, prototype);
 		return wrapped;
 	}
@@ -977,7 +997,6 @@ class NativeWrapper {
 		};
 
 		// 构造原型链
-		sealObjectTree(wrapped);
 		Reflect.setPrototypeOf(wrapped, prototype);
 		return wrapped;
 	}
@@ -993,14 +1012,13 @@ class NativeWrapper {
 	static wrapSetter(func) {
 		// @ts-ignore
 		const prototype = NativeWrapper.#currentFunction.prototype;
-		const wrapped = function (value) {
+		const wrapped = function (/** @type {ProxyConstructor} */ value) {
 			// @ts-ignore
 			return ContextInvoker1(func, this,
 				[NativeWrapper.boxCallback(value, prototype)]);
 		};
 
 		// 构造原型链
-		sealObjectTree(wrapped);
 		Reflect.setPrototypeOf(wrapped, prototype);
 		return wrapped;
 	}
@@ -1025,7 +1043,7 @@ class NativeWrapper {
 			// 缓存不存在则创建
 			wrapped = ContextInvokerCreator({
 				unboxed, // 向封装函数提供unboxed函数
-			}, function (thiz, args, newTarget) {
+			}, function (/** @type {any} */ thiz, /** @type {readonly any[]} */ args, /** @type {(new (...args: any) => any) | undefined} */ newTarget) {
 				return newTarget
 					// @ts-ignore
 					? Reflect.construct(this.unboxed, args, newTarget)
@@ -1034,13 +1052,12 @@ class NativeWrapper {
 			});
 
 			// 设置暴露器
-			wrapped[SandboxExposer] = (signal) => {
+			wrapped[SandboxExposer] = (/** @type {symbol} */ signal) => {
 				if (signal === NativeWrapper.#unboxedFunction)
 					return unboxed;
 			};
 
 			// 构造原型链
-			sealObjectTree(wrapped);
 			Reflect.setPrototypeOf(wrapped, prototype);
 			NativeWrapper.#boxedMap.set(unboxed, wrapped);
 		}
@@ -1132,6 +1149,9 @@ class DomainMonitors {
 			return;
 		}
 
+		/**
+		 * @param {{ [x: number]: Set<Monitor>; }} actionMap
+		 */
 		function addToActionMap(actionMap) {
 			for (const action of actions) {
 				let monitorMap = actionMap[action];
@@ -1205,6 +1225,9 @@ class DomainMonitors {
 			return;
 		}
 
+		/**
+		 * @param {{ [x: number]: Set<Monitor>; }} actionMap
+		 */
 		function removeFromActionMap(actionMap) {
 			for (const action of actions) {
 				const monitorMap = actionMap[action];
@@ -1465,12 +1488,19 @@ class DomainMonitors {
 			stopPropagation() {
 				result.stopPropagation = true;
 			},
+			/**
+			 * @param {string} name
+			 * @param {any} value
+			 */
 			overrideParameter(name, value) {
 				if (!(name in indexMap))
 					throw new TypeError(`参数 ${name} 没有找到`);
 
 				args[indexMap[name]] = value;
 			},
+			/**
+			 * @param {undefined} value
+			 */
 			setReturnValue(value) {
 				result.returnValue = value;
 			},
@@ -2270,10 +2300,18 @@ class Marshal {
 			const errorCtor = target.constructor;
 			const mappedCtor = Globals.mapTo(errorCtor, sourceDomain, targetDomain);
 
+			// // 立即报告错误，而不是通过封送报错
+			// const window = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
+			// window.onunhandledrejection && window.onunhandledrejection({ promise: Promise.reject(target) });
+
 			if (mappedCtor) {
 				const newError = new mappedCtor();
-				Object.defineProperties(newError,
-					Object.getOwnPropertyDescriptors(target));
+				const stack = String(target.stack);
+				Reflect.defineProperty(newError, 'stack', {
+					get: () => () => stack,
+					set: () => { },
+					configurable: false,
+				});
 				return newError;
 			}
 		}
@@ -2923,6 +2961,7 @@ class Domain {
 	 * 确保 Array.isArray 对代理数组放宽
 	 * ```
 	 * 
+	 * @param {Domain} domain
 	 * @param {any} array 
 	 * @returns {boolean} 
 	 */
@@ -3212,14 +3251,28 @@ class Sandbox {
 		}
 
 		const handler = {
+			/**
+			 * @param {FunctionConstructor} target
+			 * @param {any} thisArg
+			 * @param {any[]} argArray
+			 */
 			apply(target, thisArg, argArray) {
 				return functionCtor(target, argArray);
 			},
+			/**
+			 * @param {FunctionConstructor} target
+			 * @param {any[]} argArray
+			 * @param {any} newTarget
+			 */
 			construct(target, argArray, newTarget) {
 				return functionCtor(target, argArray);
 			},
 		};
 
+		/**
+		 * @param {object} prototype
+		 * @param {any} newCtor
+		 */
 		function rewriteCtor(prototype, newCtor) {
 			const descriptor = Object.getOwnPropertyDescriptor(prototype, 'constructor')
 				|| { configurable: true, writable: true, enumerable: false };
@@ -3277,8 +3330,13 @@ class Sandbox {
 		while (code.endsWith(";"))
 			code = code.slice(0, -1);
 
-		if (!/[;\n\r]$/.test(code))
-			code = `return (${code})`;
+		if (!/[;\n\r]$/.test(code)) {
+			const newCode = `return (${code})`;
+			try {
+				new Function(newCode);
+				code = newCode;
+			} catch (e) { }
+		}
 
 		return thiz.exec(code);
 	}
@@ -3510,6 +3568,7 @@ class Sandbox {
 		// 进行语法检查，防止注入
 		new thiz.#domainFunction(code);
 
+		const passThis = !("this" in context);
 		const executingScope = Sandbox.#executingScope[Sandbox.#executingScope.length - 1];
 		const scope = inheritScope && executingScope || thiz.#scope;
 		const contextName = Sandbox.#makeName("_", scope);
@@ -3572,7 +3631,7 @@ class Sandbox {
 
 		// 构建陷入的沙盒闭包
 		// 同时对返回值进行封送
-		return ((/** @type {any} */ ...args) => {
+		return /** @this {any} */ function (/** @type {any} */ ...args) {
 			const prevDomain = Domain.current;
 			const domainAction = () => {
 				// 指定执行域
@@ -3580,11 +3639,39 @@ class Sandbox {
 				Sandbox.#executingScope.push(scope);
 
 				try {
+					// 传递 `this`、以及函数参数
+					if (passThis)
+						context.this = Marshal[SandboxExposer2]
+							(SandboxSignal_Marshal, this, domain);
 					argumentList = Marshal[SandboxExposer2]
 						(SandboxSignal_MarshalArray, args, domain);
+
+					// 调用闭包函数
 					const result = raw.call(null, intercepter);
+
+					// 封送返回结果
 					return Marshal[SandboxExposer2]
 						(SandboxSignal_Marshal, result, prevDomain);
+					// } catch (e) {
+					// // 立即报告错误
+					// const window = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
+					// // @ts-ignore
+					// const stack = String(e.stack);
+					// const line = stack.split("\n")[1];
+					// const match = /<anonymous>:(\d+):\d+\)/.exec(line);
+					// if (match) {
+					// 	const index = parseInt(match[1]) - 5;
+					// 	const lines = code.split("\n");
+					// 	let codeView = "";
+					// 	for (let i = index - 4; i < index + 5; i++) {
+					// 		if (i < 0 || i >= lines.length)
+					// 			continue;
+					// 		codeView += `${i + 1}|${i == index ? "⚠️" : "    "}${lines[i]}\n`;
+					// 	}
+					// 	// @ts-ignore
+					// 	window.alert(`Sandbox内执行的代码出现错误：\n${stack}\n----------\n${codeView}\n----------`);
+					// }
+					// throw e; // 不再向上抛出异常
 				} finally {
 					Sandbox.#executingScope.pop();
 				}
@@ -3595,7 +3682,7 @@ class Sandbox {
 
 			return Marshal[SandboxExposer2]
 				(SandboxSignal_TrapDomain, domain, domainAction);
-		}).bind(null); // 编译函数不应该发送
+		};
 	}
 
 	/**
@@ -3759,7 +3846,7 @@ class Sandbox {
 		Object.defineProperties(rawScope, descriptors);
 	}
 
-	static #makeName = function (prefix, conflict) {
+	static #makeName = function (/** @type {string} */ prefix, /** @type {any} */ conflict) {
 		let builtName;
 
 		do {
@@ -3782,6 +3869,9 @@ class Sandbox {
 	}
 }
 
+/**
+ * @param {any} clazz
+ */
 function sealClass(clazz) {
 	sealObjectTree(clazz);
 
@@ -3792,9 +3882,12 @@ function sealClass(clazz) {
 }
 
 // FREEZE FROM SOUL!
+/**
+ * @param {any} obj
+ */
 function sealObjectTree(obj) {
 	// @ts-ignore
-	sealObject(obj, o => {
+	sealObject(obj, (/** @type {object} */ o) => {
 		if (!Reflect.isExtensible(o)) // 防止1103
 			return;
 		if (o === obj)
@@ -3804,6 +3897,9 @@ function sealObjectTree(obj) {
 	});
 }
 
+/**
+ * @param {any} obj
+ */
 function sealObject(obj, freeze = Object.freeze) {
 	if (isPrimitive(obj))
 		return;

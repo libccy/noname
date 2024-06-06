@@ -17,7 +17,7 @@ const characterReplaces = {
 	sp_machao: ["sp_machao", "dc_sp_machao", "jsrg_machao", "old_machao"],
 	zhugeliang: ["zhugeliang", "re_zhugeliang", "sb_zhugeliang", "ps2066_zhugeliang", "ps_zhugeliang"],
 	huangyueying: ["huangyueying", "re_huangyueying", "junk_huangyueying", "sb_huangyueying"],
-	sunquan: ["sunquan", "re_sunquan", "sb_sunquan", "dc_sunquan"],
+	sunquan: ["sunquan", "re_sunquan", "sb_sunquan", "dc_sunquan", "xin_sunquan"],
 	zhouyu: ["zhouyu", "re_zhouyu", "dc_sb_zhouyu", "sb_zhouyu", "ps1062_zhouyu", "ps2080_zhouyu"],
 	luxun: ["luxun", "re_luxun", "jsrg_luxun"],
 	lvmeng: ["lvmeng", "re_lvmeng", "sb_lvmeng"],

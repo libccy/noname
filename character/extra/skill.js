@@ -1438,9 +1438,9 @@ const skills = {
 				var info = lib.character[name];
 				if (
 					info[3].some(function (skill) {
-						var info = get.skillInfoTranslation(skill);
+						var info = get.plainText(get.skillInfoTranslation(skill));
 						if (!info.includes("【杀】")) return false;
-						var list = get.skillCategoriesOf(skill);
+						var list = get.skillCategoriesOf(skill, player);
 						list.remove("锁定技");
 						return list.length == 0;
 					})
@@ -1470,9 +1470,9 @@ const skills = {
 						var name = button.link;
 						var info = lib.character[name];
 						var skills = info[3].filter(function (skill) {
-							var info = get.skillInfoTranslation(skill);
+							var info = get.plainText(get.skillInfoTranslation(skill));
 							if (!info.includes("【杀】")) return false;
-							var list = get.skillCategoriesOf(skill);
+							var list = get.skillCategoriesOf(skill, get.player());
 							list.remove("锁定技");
 							return list.length == 0;
 						});
@@ -1509,9 +1509,9 @@ const skills = {
 			node = ui.create.buttonPresets.character(item, "character", position, noclick);
 			const info = lib.character[item];
 			const skills = info[3].filter(function (skill) {
-				var info = get.skillInfoTranslation(skill);
+				var info = get.plainText(get.skillInfoTranslation(skill));
 				if (!info.includes("【杀】")) return false;
-				var list = get.skillCategoriesOf(skill);
+				var list = get.skillCategoriesOf(skill, get.player());
 				list.remove("锁定技");
 				return list.length == 0;
 			});
@@ -1588,9 +1588,9 @@ const skills = {
 				var maxHp = get.infoMaxHp(info[2]);
 				if (maxHp != 1) card.distance = { attackFrom: 1 - maxHp };
 				var skills = info[3].filter(function (skill) {
-					var info = get.skillInfoTranslation(skill);
+					var info = get.plainText(get.skillInfoTranslation(skill));
 					if (!info.includes("【杀】")) return false;
-					var list = get.skillCategoriesOf(skill);
+					var list = get.skillCategoriesOf(skill, get.player());
 					list.remove("锁定技");
 					return list.length == 0;
 				});
@@ -1617,10 +1617,10 @@ const skills = {
 				if (skills.length) {
 					for (var skill of skills) {
 						if (lib.skill[skill].nobracket) {
-							append += '<div class="skilln">' + get.translation(skill) + '</div><div><span style="font-family: yuanli">' + get.skillInfoTranslation(skill) + "</span></div><br><br>";
+							append += '<div class="skilln">' + get.translation(skill) + '</div><div><span style="font-family: yuanli">' + get.plainText(get.skillInfoTranslation(skill)) + "</span></div><br><br>";
 						} else {
 							var translation = lib.translate[skill + "_ab"] || get.translation(skill).slice(0, 2);
-							append += '<div class="skill">【' + translation + '】</div><div><span style="font-family: yuanli">' + get.skillInfoTranslation(skill) + "</span></div><br><br>";
+							append += '<div class="skill">【' + translation + '】</div><div><span style="font-family: yuanli">' + get.plainText(get.skillInfoTranslation(skill)) + "</span></div><br><br>";
 						}
 					}
 					str = str.slice(0, str.length - 8);
@@ -1992,7 +1992,17 @@ const skills = {
 			},
 		},
 		ai: {
-			combo: "dctuoyu",
+			effect: {
+				player(card, player, target) {
+					if (
+						!get.tag(card, "damage") ||
+						player.countMark("dcxianjin") % 2 ||
+						!player.hasSkillTag("jueqing", false, target)
+					) return;
+					if (player.isMaxHandcard()) return [1, 1];
+					return [1, Math.min(3, 1 + player.getStorage("dctuoyu").length)];
+				}
+			}
 		},
 	},
 	dcqijing: {
@@ -3756,6 +3766,9 @@ const skills = {
 					},
 				},
 			},
+		},
+		ai: {
+			combo: "yuheng"
 		},
 	},
 	yuheng: {
@@ -5766,22 +5779,25 @@ const skills = {
 			notemp: true,
 			effect: {
 				target: (card, player, target) => {
-					if (!get.tag(card, "damage") || !target.hasFriend()) return;
-					if (player.hasSkillTag("jueqing", null, target)) return 1.7;
+					if (!target.hasFriend()) return;
+					let rec = get.tag(card, "recover"), damage = get.tag(card, "damage");
+					if (!rec && !damage) return;
+					if (damage && player.hasSkillTag("jueqing", false, target)) return 1.7;
 					let die = [null, 1],
 						temp;
 					game.filterPlayer(i => {
 						temp = i.countMark("new_wuhun");
 						if (i === player && target.hp + target.hujia > 1) temp++;
-						if (temp >= die[1]) {
+						if (temp > die[1]) die = [i, temp];
+						else if (temp === die[1]) {
 							if (!die[0]) die = [i, temp];
-							else {
-								let att = get.attitude(player, i);
-								if (att < die[1]) die = [i, temp];
-							}
+							else if (get.attitude(target, i) < get.attitude(target, die[0])) die = [i, temp];
 						}
 					});
-					if (die[0]) return [1, 0, 1, (-6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp)];
+					if (die[0]) {
+						if (damage) return [1, 0, 1, (-6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp)];
+						return [1, (6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp)];
+					}
 				},
 			},
 		},
@@ -6730,7 +6746,7 @@ const skills = {
 				target(card, player, target, current) {
 					if (player.getHp() <= 0) return;
 					if (!target.hasFriend()) return;
-					if (target.hp <= 1 && get.tag(card, "damage")) return [1, 0, 0, -2];
+					if (target.hp <= 1 && get.tag(card, "damage")) return [1, 0, 0, -2 * player.getHp()];
 				},
 			},
 		},
