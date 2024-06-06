@@ -1,4 +1,4 @@
-import { userAgent, GeneratorFunction, AsyncFunction } from "../util/index.js";
+import { userAgent, GeneratorFunction, AsyncFunction, AsyncGeneratorFunction } from "../util/index.js";
 import { game } from "../game/index.js";
 import { lib } from "../library/index.js";
 import { _status } from "../status/index.js";
@@ -1508,12 +1508,33 @@ export class Get {
 	 * 测试一段代码是否为函数体
 	 * ```
 	 * 
+	 * @typedef {"async"|"generator"|"agenerator"|"any"|null} FunctionType
+	 * 
 	 * @param {string} code 
+	 * @param {FunctionType} type 
 	 * @returns {boolean} 
 	 */
-	isFunctionBody(code) {
+	isFunctionBody(code, type = null) {
+		if (type == "any") {
+			return ["async", "generator", "agenerator", null]
+				// @ts-ignore // 突然发现ts-ignore也挺方便的喵
+				.some(t => get.isFunctionBody(code, t));
+		}
 		try {
-			new Function(code);
+			switch (type) {
+				default:
+					new Function(code);
+					break;
+				case "generator":
+					new GeneratorFunction(code);
+					break;
+				case "async":
+					new AsyncFunction(code);
+					break;
+				case "agenerator":
+					new AsyncGeneratorFunction(code);
+					break;
+			}
 		} catch (e) {
 			return false;
 		}
@@ -1534,7 +1555,7 @@ export class Get {
 			let body = str.slice(arrowMatch[0].length).trim();
 			if (body.startsWith("{") && body.endsWith("}")) body = body.slice(1, -1);
 			else body = `return ${body}`;
-			if (!get.isFunctionBody(body)) {
+			if (!get.isFunctionBody(body, "any")) {
 				console.error("发现疑似恶意的远程代码:", str);
 				return `()=>console.error("尝试执行疑似恶意的远程代码")`;
 			}
@@ -1546,7 +1567,7 @@ export class Get {
 		const head = fullMatch[1];
 		const args = fullMatch[2] || '';
 		const body = str.slice(fullMatch[0].length).slice(0, -1);
-		if (!get.isFunctionBody(body)) {
+		if (!get.isFunctionBody(body, "any")) {
 			console.error("发现疑似恶意的远程代码:", str);
 			return `()=>console.error("尝试执行疑似恶意的远程代码")`;
 		}
