@@ -2,7 +2,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
-	//蒋济
+	//蒋琬
 	olziruo: {
 		audio: 2,
 		trigger: { player: "useCard" },
