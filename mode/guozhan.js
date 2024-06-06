@@ -1023,12 +1023,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			fakeduoshi: {
 				audio: "duoshi",
-				audioname2: { gz_jun_sunquan: "jiahe_duoshi" },
 				global: "fakeduoshi_global",
 				subSkill: {
 					global: {
 						audio: "duoshi",
-						audioname2: { gz_jun_sunquan: "jiahe_duoshi" },
 						forceaudio: true,
 						enable: "chooseToUse",
 						filter(event, player) {
@@ -15783,6 +15781,22 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					player.addTempSkill(link, "jiananUpdate");
 					player.addTempSkill("jianan_eff", "jiananUpdate");
 					game.log(player, "获得了技能", "#g【" + get.translation(result.control) + "】");
+					
+					// 语音修复
+					var map = {
+						new_retuxi: "jianan_tuxi",
+						qiaobian: "jianan_qiaobian",
+						fakexiaoguo: "jianan_xiaoguo",
+						gzjieyue: "jianan_jieyue",
+						new_duanliang: "jianan_duanliang"
+					};
+					var mapSkills = map[link];
+					game.broadcastAll(function () {
+						var info = lib.skill[link];
+						if (!info.audioname2) info.audioname2 = {};
+						info.audioname2[player.name1] = mapSkills;
+						info.audioname2[player.name2] = mapSkills;
+					}, link);
 				},
 			},
 			jianan_eff: {
@@ -19112,10 +19126,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.num = zhu.getExpansions("yuanjiangfenghuotu").length;
 					"step 1";
 					var list = [];
-					if (event.num >= 1 && !player.hasSkill("jiahe_reyingzi")) list.push("reyingzi");
-					if (event.num >= 2 && !player.hasSkill("jiahe_haoshi")) list.push("haoshi");
-					if (event.num >= 3 && !player.hasSkill("jiahe_shelie")) list.push("shelie");
-					if (event.num >= 4 && !player.hasSkill("jiahe_duoshi")) list.push("fakeduoshi");
+					if (event.num >= 1 && !(player.hasSkill("reyingzi") || player.hasSkill("jiahe_reyingzi"))) list.push("reyingzi");
+					if (event.num >= 2 && !(player.hasSkill("haoshi") || player.hasSkill("jiahe_haoshi"))) list.push("haoshi");
+					if (event.num >= 3 && !(player.hasSkill("shelie") || player.hasSkill("jiahe_shelie"))) list.push("shelie");
+					if (event.num >= 4 && !player.hasSkill("fakeduoshi")) list.push("fakeduoshi");
 					if (!list.length) {
 						event.finish();
 						return;
@@ -19157,8 +19171,30 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						});
 					"step 2";
 					if (result.control != "cancel2") {
-						var skill = (result.control != "fakeduoshi" ? "jiahe_" : "") + result.control;
-						player.addTempSkills(skill);
+						var map = {
+							reyingzi: "jiahe_reyingzi",
+							haoshi: "jiahe_haoshi",
+							shelie: "jiahe_shelie",
+							fakeduoshi: "fakeduoshi"
+						};
+						var skills = map[result.control];
+						player.addTempSkills(skills);
+						
+						// 语音修复
+						if (skills == "fakeduoshi") {
+							var mapSkills = "jiahe_duoshi";
+							game.broadcastAll(function () {
+								var info = lib.skill[skills];
+								if (!info.audioname2) info.audioname2 = {};
+								info.audioname2[player.name1] = mapSkills;
+								info.audioname2[player.name2] = mapSkills;
+								var subSkillInfo = info.subSkill.global;
+								if (!subSkillInfo.audioname2) subSkillInfo.audioname2 = {};
+								subSkillInfo.audioname2[player.name1] = mapSkills;
+								subSkillInfo.audioname2[player.name2] = mapSkills;
+							}, skills);
+						}
+						
 						if (!event.done) player.logSkill("jiahe_put");
 						// game.log(player,'获得了技能','【'+get.translation(skill)+'】');
 						if (event.num >= 5 && !event.done) {
