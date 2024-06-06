@@ -7220,6 +7220,7 @@ export class Game {
 				const iValue = `${i}_${value}`;
 				lib.skill[iValue] = info.subSkill[value];
 				lib.skill[iValue].sub = true;
+				if (!info.subSkill[value].sourceSkill) lib.skill[iValue].sourceSkill = i;
 				if (info.subSkill[value].name) lib.translate[iValue] = info.subSkill[value].name;
 				else lib.translate[iValue] = lib.translate[iValue] || lib.translate[i];
 				if (info.subSkill[value].description) lib.translate[`${iValue}_info`] = info.subSkill[value].description;
