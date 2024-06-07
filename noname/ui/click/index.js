@@ -4133,6 +4133,7 @@ export class Click {
 		}
 	}
 	pause() {
+		if (lib.config.test_game) return;
 		if (_status.paused2 || _status.pausing || _status.nopause || !ui.pause) return;
 		if (!_status.video) {
 			if (ui.pause.classList.contains("hidden")) return;
@@ -4165,6 +4166,7 @@ export class Click {
 		if (_status.pausing) return;
 		if (_status.dragged) return;
 		if (_status.clicked) return;
+		if (lib.config.test_game) return;
 		this.delete();
 		ui.system.show();
 		ui.time.show();

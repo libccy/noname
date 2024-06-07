@@ -517,7 +517,7 @@ export class Player extends HTMLDivElement {
 				str += `'step ${i}'\n\t${str2}\n\t`;
 			}
 			// 防止注入喵
-			if (!get.isFunctionBody(str)) throw new Error("无效的content函数代码");
+			if (!get.isFunctionBody(str, "any")) throw new Error("无效的content函数代码");
 			let recompiledScope;
 			if (security.isSandboxRequired()) {
 				recompiledScope = scope ? security.eval(`return (${scope.toString()})`) : code => security.eval(`return (${code.toString()})`);
