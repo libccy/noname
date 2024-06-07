@@ -1131,13 +1131,16 @@ const skills = {
 					player: "gainAfter",
 				},
 				filter(event, player) {
-					return event.getParent().name === "draw" && event.cards.length >= 2 && event.cards.every(card => get.color(card) === "red");
+					return event.getParent().name === "draw" && event.cards.length >= 2 && event.cards.some(card => get.color(card) === "red");
 				},
 				forced: true,
 				locked: false,
 				popup: false,
 				async content(event, trigger, player) {
-					player.addGaintag(trigger.cards, "dcxingmen");
+					player.addGaintag(
+						trigger.cards.filter(card => get.color(card) === "red"),
+						"dcxingmen"
+					);
 					player.addSkill("dcxingmen_directHit");
 				},
 			},
