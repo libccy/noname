@@ -218,8 +218,6 @@ class ErrorManager {
 			throw new TypeError("参数必须是一个对象");
 		if (!(reporter instanceof ErrorReporter))
 			reporter = new ErrorReporter(obj);
-		if (ErrorManager.#errorReporters.has(obj))
-			throw new Error("对象已存在错误报告器");
 
 		ErrorManager.#errorReporters.set(obj, reporter);
 	}
