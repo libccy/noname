@@ -1,3 +1,5 @@
+import { CodeSnippet, ErrorReporter, ErrorManager } from "./error.js";
+
 // 方便开关确定沙盒的问题喵
 // 当此处为true、debug模式为启用、设备非苹果时，沙盒生效
 let SANDBOX_ENABLED = true;
@@ -77,7 +79,7 @@ async function initializeSandboxRealms(enabled) {
         },
     });
 
-    // 传递顶级变量域、上下文执行器
+    // 传递顶级变量域、上下文执行器、错误管理器
     // @ts-ignore
     iframe.contentWindow.replacedGlobal = window;
     // @ts-ignore
@@ -86,6 +88,8 @@ async function initializeSandboxRealms(enabled) {
     iframe.contentWindow.replacedCI2 = ContextInvoker2;
     // @ts-ignore
     iframe.contentWindow.replacedCIC = ContextInvokerCreator;
+    // @ts-ignore
+    iframe.contentWindow.replacedErrors = { CodeSnippet, ErrorReporter, ErrorManager };
 
     // 重新以新的变量域载入当前脚本
     const script = iframe.contentWindow.document.createElement("script");

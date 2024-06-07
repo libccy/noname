@@ -11,6 +11,7 @@ import { promiseErrorHandlerMap } from "../util/browser.js";
 import { importCardPack, importCharacterPack, importExtension, importMode } from "./import.js";
 import { onload } from "./onload.js";
 import { initializeSandboxRealms } from "../util/initRealms.js";
+import { ErrorManager } from "../util/error.js";
 
 // 判断是否从file协议切换到http/s协议
 export function canUseHttpProtocol() {
@@ -96,7 +97,7 @@ export function sendUpdate() {
 				const cp = require("child_process");
 				cp.exec(
 					`start /min ${__dirname}\\noname-server.exe -platform=electron`,
-					(err, stdout, stderr) => {}
+					(err, stdout, stderr) => { }
 				);
 				return `http://localhost:8089/app.html?sendUpdate=true`;
 			}
@@ -664,7 +665,7 @@ export async function boot() {
 		if (isFirstStartAfterUpdate && extErrorList.length) {
 			const stacktraces = extErrorList.map(e => e instanceof Error ? e.stack : String(e)).join("\n\n")
 			// game.saveConfig("update_first_log", stacktraces);
-			if(confirm(`扩展加载出错！是否重新载入游戏？\n本次更新可能导致了扩展出现了错误：\n\n${stacktraces}`)){
+			if (confirm(`扩展加载出错！是否重新载入游戏？\n本次更新可能导致了扩展出现了错误：\n\n${stacktraces}`)) {
 				game.reload();
 				clearTimeout(resetGameTimeout);
 				return;
@@ -1021,137 +1022,141 @@ async function setOnError() {
 
 	window.onerror = function (msg, src, line, column, err) {
 		if (promiseErrorHandler.onErrorPrepare) promiseErrorHandler.onErrorPrepare();
-		const winPath = window.__dirname
-			? "file:///" + (__dirname.replace(new RegExp("\\\\", "g"), "/") + "/")
-			: "";
-		let str = `错误文件: ${
-			typeof src == "string"
-				? decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
-				: "未知文件"
-		}`;
-		str += `\n错误信息: ${msg}`;
-		const tip = lib.getErrorTip(msg);
-		if (tip) str += `\n错误提示: ${tip}`;
-		str += `\n行号: ${line}`;
-		str += `\n列号: ${column}`;
-		const version = typeof lib.version != "undefined" ? lib.version : "";
-		const reg = /[^\d.]/;
-		const match = version.match(reg) != null;
-		str += "\n" + `${match ? "游戏" : "无名杀"}版本: ${version || "未知版本"}`;
-		if (match)
-			str +=
-				"\n⚠️您使用的游戏代码不是源于libccy/noname无名杀官方仓库，请自行寻找您所使用的游戏版本开发者反馈！";
-		if (_status && _status.event) {
-			let evt = _status.event;
-			str += `\nevent.name: ${evt.name}\nevent.step: ${evt.step}`;
-			// @ts-ignore
-			if (evt.parent)
-				str += `\nevent.parent.name: ${evt.parent.name}\nevent.parent.step: ${evt.parent.step}`;
-			// @ts-ignore
-			if (evt.parent && evt.parent.parent)
-				str += `\nevent.parent.parent.name: ${evt.parent.parent.name}\nevent.parent.parent.step: ${evt.parent.parent.step}`;
-			if (evt.player || evt.target || evt.source || evt.skill || evt.card) {
-				str += "\n-------------";
-			}
-			if (evt.player) {
-				if (lib.translate[evt.player.name])
-					str += `\nplayer: ${lib.translate[evt.player.name]}[${evt.player.name}]`;
-				else str += "\nplayer: " + evt.player.name;
-				let distance = get.distance(_status.roundStart, evt.player, "absolute");
-				if (distance != Infinity) {
-					str += `\n座位号: ${distance + 1}`;
+		const errorReporter = ErrorManager.getErrorReporter(err);
+		if (errorReporter) game.print(errorReporter.report("沙盒内部执行的代码出现错误"));
+		else {
+			const winPath = window.__dirname
+				? "file:///" + (__dirname.replace(new RegExp("\\\\", "g"), "/") + "/")
+				: "";
+			let str = `错误文件: ${
+				typeof src == "string"
+					? decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
+					: "未知文件"
+			}`;
+			str += `\n错误信息: ${msg}`;
+			const tip = lib.getErrorTip(msg);
+			if (tip) str += `\n错误提示: ${tip}`;
+			str += `\n行号: ${line}`;
+			str += `\n列号: ${column}`;
+			const version = typeof lib.version != "undefined" ? lib.version : "";
+			const reg = /[^\d.]/;
+			const match = version.match(reg) != null;
+			str += "\n" + `${match ? "游戏" : "无名杀"}版本: ${version || "未知版本"}`;
+			if (match)
+				str +=
+					"\n⚠️您使用的游戏代码不是源于libccy/noname无名杀官方仓库，请自行寻找您所使用的游戏版本开发者反馈！";
+			if (_status && _status.event) {
+				let evt = _status.event;
+				str += `\nevent.name: ${evt.name}\nevent.step: ${evt.step}`;
+				// @ts-ignore
+				if (evt.parent)
+					str += `\nevent.parent.name: ${evt.parent.name}\nevent.parent.step: ${evt.parent.step}`;
+				// @ts-ignore
+				if (evt.parent && evt.parent.parent)
+					str += `\nevent.parent.parent.name: ${evt.parent.parent.name}\nevent.parent.parent.step: ${evt.parent.parent.step}`;
+				if (evt.player || evt.target || evt.source || evt.skill || evt.card) {
+					str += "\n-------------";
+				}
+				if (evt.player) {
+					if (lib.translate[evt.player.name])
+						str += `\nplayer: ${lib.translate[evt.player.name]}[${evt.player.name}]`;
+					else str += "\nplayer: " + evt.player.name;
+					let distance = get.distance(_status.roundStart, evt.player, "absolute");
+					if (distance != Infinity) {
+						str += `\n座位号: ${distance + 1}`;
+					}
+				}
+				if (evt.target) {
+					if (lib.translate[evt.target.name])
+						str += `\ntarget: ${lib.translate[evt.target.name]}[${evt.target.name}]`;
+					else str += "\ntarget: " + evt.target.name;
+				}
+				if (evt.source) {
+					if (lib.translate[evt.source.name])
+						str += `\nsource: ${lib.translate[evt.source.name]}[${evt.source.name}]`;
+					else str += "\nsource: " + evt.source.name;
+				}
+				if (evt.skill) {
+					if (lib.translate[evt.skill]) str += `\nskill: ${lib.translate[evt.skill]}[${evt.skill}]`;
+					else str += "\nskill: " + evt.skill;
+				}
+				if (evt.card) {
+					if (lib.translate[evt.card.name])
+						str += `\ncard: ${lib.translate[evt.card.name]}[${evt.card.name}]`;
+					else str += "\ncard: " + evt.card.name;
 				}
 			}
-			if (evt.target) {
-				if (lib.translate[evt.target.name])
-					str += `\ntarget: ${lib.translate[evt.target.name]}[${evt.target.name}]`;
-				else str += "\ntarget: " + evt.target.name;
-			}
-			if (evt.source) {
-				if (lib.translate[evt.source.name])
-					str += `\nsource: ${lib.translate[evt.source.name]}[${evt.source.name}]`;
-				else str += "\nsource: " + evt.source.name;
-			}
-			if (evt.skill) {
-				if (lib.translate[evt.skill]) str += `\nskill: ${lib.translate[evt.skill]}[${evt.skill}]`;
-				else str += "\nskill: " + evt.skill;
-			}
-			if (evt.card) {
-				if (lib.translate[evt.card.name])
-					str += `\ncard: ${lib.translate[evt.card.name]}[${evt.card.name}]`;
-				else str += "\ncard: " + evt.card.name;
-			}
-		}
-		str += "\n-------------";
-		if (
-			typeof line == "number" &&
-			(typeof Reflect.get(game, "readFile") == "function" || location.origin != "file://")
-		) {
-			const createShowCode = function (lines) {
-				let showCode = "";
-				if (lines.length >= 10) {
-					if (line > 4) {
-						for (let i = line - 5; i < line + 6 && i < lines.length; i++) {
-							showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+			str += "\n-------------";
+			if (
+				typeof line == "number" &&
+				(typeof Reflect.get(game, "readFile") == "function" || location.origin != "file://")
+			) {
+				const createShowCode = function (lines) {
+					let showCode = "";
+					if (lines.length >= 10) {
+						if (line > 4) {
+							for (let i = line - 5; i < line + 6 && i < lines.length; i++) {
+								showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+							}
+						} else {
+							for (let i = 0; i < line + 6 && i < lines.length; i++) {
+								showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+							}
 						}
 					} else {
-						for (let i = 0; i < line + 6 && i < lines.length; i++) {
-							showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+						showCode = lines
+							.map((_line, i) => `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${_line}\n`)
+							.toString();
+					}
+					return showCode;
+				};
+				//协议名须和html一致(网页端防跨域)，且文件是js
+				if (typeof src == "string" && src.startsWith(location.protocol) && src.endsWith(".js")) {
+					//获取代码
+					const codes = lib.init.reqSync(
+						"local:" + decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
+					);
+					if (codes) {
+						const lines = codes.split("\n");
+						str += "\n" + createShowCode(lines);
+						str += "\n-------------";
+					}
+				}
+				//解析parsex里的content fun内容(通常是技能content)
+				// @ts-ignore
+				else if (
+					err &&
+					err.stack &&
+					["at Object.eval [as content]", "at Proxy.content"].some((str) => {
+						let stackSplit1 = err.stack.split("\n")[1];
+						if (stackSplit1) {
+							return stackSplit1.trim().startsWith(str);
 						}
+						return false;
+					})
+				) {
+					const codes = _status.event.content;
+					if (typeof codes == "function") {
+						const lines = codes.toString().split("\n");
+						str += "\n" + createShowCode(lines);
+						str += "\n-------------";
 					}
-				} else {
-					showCode = lines
-						.map((_line, i) => `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${_line}\n`)
-						.toString();
-				}
-				return showCode;
-			};
-			//协议名须和html一致(网页端防跨域)，且文件是js
-			if (typeof src == "string" && src.startsWith(location.protocol) && src.endsWith(".js")) {
-				//获取代码
-				const codes = lib.init.reqSync(
-					"local:" + decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
-				);
-				if (codes) {
-					const lines = codes.split("\n");
-					str += "\n" + createShowCode(lines);
-					str += "\n-------------";
 				}
 			}
-			//解析parsex里的content fun内容(通常是技能content)
-			// @ts-ignore
-			else if (
-				err &&
-				err.stack &&
-				["at Object.eval [as content]", "at Proxy.content"].some((str) => {
-					let stackSplit1 = err.stack.split("\n")[1];
-					if (stackSplit1) {
-						return stackSplit1.trim().startsWith(str);
-					}
-					return false;
-				})
-			) {
-				const codes = _status.event.content;
-				if (typeof codes == "function") {
-					const lines = codes.toString().split("\n");
-					str += "\n" + createShowCode(lines);
-					str += "\n-------------";
-				}
-			}
+			if (err && err.stack)
+				str +=
+					"\n" +
+					decodeURI(err.stack)
+						.replace(new RegExp(lib.assetURL, "g"), "")
+						.replace(new RegExp(winPath, "g"), "");
+			alert(str);
+			game.print(str);
 		}
-		if (err && err.stack)
-			str +=
-				"\n" +
-				decodeURI(err.stack)
-					.replace(new RegExp(lib.assetURL, "g"), "")
-					.replace(new RegExp(winPath, "g"), "");
-		alert(str);
 		Reflect.set(window, "ea", Array.from(arguments));
 		Reflect.set(window, "em", msg);
 		Reflect.set(window, "el", line);
 		Reflect.set(window, "ec", column);
 		Reflect.set(window, "eo", err);
-		game.print(str);
 		if (promiseErrorHandler.onErrorFinish) promiseErrorHandler.onErrorFinish();
 		// @ts-ignore
 		if (!lib.config.errstop && (_status && _status.event && !(_status.event.content instanceof AsyncFunction))) {
