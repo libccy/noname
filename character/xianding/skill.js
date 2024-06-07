@@ -335,7 +335,14 @@ const skills = {
 				evt = event.getParent();
 			colors = colors.filter(color => evt.filterCard(get.autoViewAs(lib.skill.dcsbwuwei.viewAs, player.getCards("h", { color: color })), player, evt));
 			colors = colors.map(color => (color == "none" ? "none2" : color));
-			const result = await player.chooseControl(colors, "cancel2").set("prompt", "武威：将一种颜色的所有手牌当作【杀】使用").forResult();
+			const result = await player.chooseControl(colors, "cancel2").set("prompt", "武威：将一种颜色的所有手牌当作【杀】使用").set("ai", () => {
+				const player = get.event().player;
+				let controls = get.event().controls.slice();
+				controls.remove("cancel2");
+				return controls.sort((a, b) => {
+					return player.countCards("h", { color: a == "none2" ? "none" : a }) - player.countCards("h", { color: b == "none2" ? "none" : b });
+				})[0];
+			}).forResult();
 			const color = result.control == "none2" ? "none" : result.control;
 			if (color == "cancel2") {
 				evt.goto(0);
@@ -360,26 +367,101 @@ const skills = {
 				forced: true,
 				popup: false,
 				async content(event, trigger, player) {
-					let result,
-						types = trigger.cards.reduce((list, card) => list.add(get.type(card, player)), []);
-					if (types.length >= 3) {
-						result = { bool: true, links: [0, 1, 2] };
-					} else {
-						result = await player
-							.chooseButton(["武威：请选择" + get.cnNumber(types.length) + "项执行", [["摸一张牌", "令目标角色本回合非锁定技失效", "令本回合〖武威〗可发动次数+1"].map((item, i) => [i, item]), "textbutton"]])
-							.set("forced", true)
-							.set("selectButton", types.length)
-							.set("ai", button => {
-								return [1, 3, 2].slice(0, get.event("selectButton")).includes(button.link) ? 1 : 0;
-							})
-							.forResult();
-					}
+					const func = () => {
+						const event = get.event();
+						const controls = [
+							link => {
+								const evt = get.event();
+								if (evt.dialog && evt.dialog.buttons) {
+									for (let i = 0; i < evt.dialog.buttons.length; i++) {
+										const button = evt.dialog.buttons[i];
+										button.classList.remove("selectable");
+										button.classList.remove("selected");
+										const counterNode = button.querySelector(".caption");
+										if (counterNode) {
+											counterNode.childNodes[0].innerHTML = ``;
+										}
+									}
+									ui.selected.buttons.length = 0;
+									game.check();
+								}
+								return;
+							},
+						];
+						event.controls = [ui.create.control(controls.concat(["清除选择", "stayleft"]))];
+					};
+					if (event.isMine()) func();
+					else if (event.isOnline()) event.player.send(func);
+					let types = trigger.cards.reduce((list, card) => list.add(get.type(card, player)), []);
+					let result = await player
+						.chooseButton(["武威：请选择" + get.cnNumber(types.length) + "次以下项", [["摸一张牌", "令目标角色本回合非锁定技失效", "令本回合〖武威〗可发动次数+1"].map((item, i) => [i, item]), "textbutton"]])
+						.set("forced", true)
+						.set("selectButton", [types.length, types.length + 1])
+						.set("filterButton", button => {
+							const selected = ui.selected.buttons.slice().map(i => i.link);
+							if (selected.length >= get.event().selectButton[0]) return false;
+							return button.link !=1 || !selected.includes(1);
+						})
+						.set("ai", button => {
+							const selected = ui.selected.buttons.slice().map(i => i.link);
+							if (get.event().selectButton >= 3) return selected.includes(button.link) ? 0 : 1;
+							return [0, 2, 1].slice(0, get.event("selectButton")).includes(button.link) ? 1 : 0;
+						})
+						.set("custom", {
+							add: {
+								confirm(bool) {
+									if (bool != true) return;
+									const event = get.event().parent;
+									if (event.controls) event.controls.forEach(i => i.close());
+									if (ui.confirm) ui.confirm.close();
+									game.uncheck();
+								},
+								button() {
+									if (ui.selected.buttons.length) return;
+									const event = get.event();
+									if (event.dialog && event.dialog.buttons) {
+										for (let i = 0; i < event.dialog.buttons.length; i++) {
+											const button = event.dialog.buttons[i];
+											const counterNode = button.querySelector(".caption");
+											if (counterNode) {
+												counterNode.childNodes[0].innerHTML = ``;
+											}
+										}
+									}
+									if (!ui.selected.buttons.length) {
+										const evt = event.parent;
+										if (evt.controls) evt.controls[0].classList.add("disabled");
+									}
+								},
+							},
+							replace: {
+								button(button) {
+									const event = get.event();
+									if (!event.isMine() || !event.filterButton(button)) return;
+									if (button.classList.contains("selectable") == false) return;
+									button.classList.add("selected");
+									ui.selected.buttons.push(button);
+									let counterNode = button.querySelector(".caption");
+									const count = ui.selected.buttons.filter(i => i == button).length;
+									if (counterNode) {
+										counterNode = counterNode.childNodes[0];
+										counterNode.innerHTML = `×${count}`;
+									} else {
+										counterNode = ui.create.caption(`<span style="font-family:xinwei; text-shadow:#FFF 0 0 4px, #FFF 0 0 4px, rgba(74,29,1,1) 0 0 3px;">×${count}</span>`, button);
+									}
+									const evt = event.parent;
+									if (evt.controls) evt.controls[0].classList.remove("disabled");
+									game.check();
+								},
+							},
+						})
+						.forResult();
 					if (result.bool) {
 						result.links.sort((a, b) => a - b);
 						for (const i of result.links) {
 							game.log(player, "选择了", "#g【武威】", "的", "#y第" + get.cnNumber(i + 1, true) + "项");
 						}
-						if (result.links.includes(0)) await player.draw();
+						if (result.links.includes(0)) await player.draw(result.links.filter(count => count == 0).length);
 						if (result.links.includes(1)) {
 							for (const target of trigger.targets || []) {
 								target.addTempSkill("fengyin");
@@ -387,9 +469,9 @@ const skills = {
 						}
 						if (result.links.includes(2)) {
 							player.addTempSkill("dcsbwuwei_count");
-							player.addMark("dcsbwuwei_count", 1, false);
+							player.addMark("dcsbwuwei_count", result.links.filter(count => count == 2).length, false);
 						}
-						if (result.links.length == 3) {
+						if ( Array.from({length:3}).map( (_,i) => i).every(i => result.links.includes(i))) {
 							trigger.baseDamage++;
 							game.log(trigger.card, "造成的伤害", "#y+1");
 						}
