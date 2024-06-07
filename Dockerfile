@@ -2,12 +2,13 @@ FROM node:18
 
 WORKDIR /app
 
-COPY ./docker/index.js ./
+COPY ./docker/* ./
 
 RUN npm install body-parser express minimist
 
 COPY . .
 
+EXPOSE 8080
 EXPOSE 8089
 
-CMD [ "node", "index.js" ]
+CMD [ "sh","./start.sh" ]

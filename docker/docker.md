@@ -18,7 +18,9 @@ docker build -t noname .
 3. 启动
 
 ```shell
-docker run -dit --name noname --restart=unless-stopped -p 8734:8089  noname
+docker run -dit --name noname --restart=unless-stopped -p 8734:8089 -p 8324:8080  noname
 ```
 
-`8734`可改为自己的端口
+web 游戏界面: `8734`
+联机大厅: `8324`
+端口可以自己修改
