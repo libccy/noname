@@ -1,4 +1,9 @@
 export default {
+	"#olrunwei1": "流水不言，泽德万物。",
+	"#olrunwei2": "生如春雨，润物无声。",
+	"#olcangxin1": "世间百味，品在唇而味在心。",
+	"#olcangxin2": "我藏风雨于心，故而衣不沾雨。",
+	"#ol_luyusheng:die": "郁生既为张妇，誓不再许。",
 	"#olliantao1": "沙场百战疾，争衡天下间。",
 	"#olliantao2": "征战无休，决胜千里。",
 	"#sp_sunce:die": "身受百创，力难从心……",
