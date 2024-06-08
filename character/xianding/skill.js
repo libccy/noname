@@ -1104,7 +1104,7 @@ const skills = {
 			player.awakenSkill("dcfenhui");
 			const target = event.target;
 			const count = player.getAllHistory("useCard", evt => {
-				return get.color(evt.card, player) === "black" && evt.targets && evt.targets.includes(target);
+				return evt.targets && evt.targets.includes(target);
 			}).length;
 			target.addMark("dcfenhui_mark", Math.min(5, count));
 			player.addSkill("dcfenhui_effect");
