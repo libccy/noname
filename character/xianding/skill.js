@@ -1088,7 +1088,7 @@ const skills = {
 			if (game.online) return;
 			const player = event.player;
 			const evts = player.getAllHistory("useCard", evt => {
-				return get.color(evt.card, player) === "black" && evt.targets && evt.targets.length;
+				return evt.targets && evt.targets.length;
 			});
 			event.set(
 				"dcfenhui_enabled",
@@ -1113,8 +1113,7 @@ const skills = {
 			effect: {
 				audio: "dcfenhui",
 				trigger: {
-					source: "damageBegin1",
-					global: "die",
+					global: ["damageBegin2","die"],
 				},
 				filter(event, player) {
 					return event.player.hasMark("dcfenhui_mark");
