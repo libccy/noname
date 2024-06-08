@@ -199,7 +199,10 @@ const skills = {
 	//屈原
 	dcqiusuo: {
 		audio: 2,
-		trigger: { source: "damageSource" },
+		trigger: {
+			source: "damageSource",
+			player: "damageEnd",
+		},
 		frequent: true,
 		async content(event, trigger, player) {
 			const tiesuo = get.cardPile("tiesuo");
@@ -293,8 +296,8 @@ const skills = {
 							if (list[0].countCards("h")) {
 								await list[0].showHandcards();
 							}
+							gaifa.remove(list[0]);
 						}
-						gaifa.remove(list[0]);
 					} else {
 						list[0].popup("回答错误", "fire");
 						game.log(list[0], "回答错误");
@@ -305,6 +308,7 @@ const skills = {
 			if (gaifa.length) {
 				for (const i of gaifa) {
 					i.addTempSkill("dclisao_gaifa");
+					i.markAuto("dclisao_gaifa", [player]);
 				}
 			}
 		},
@@ -327,7 +331,7 @@ const skills = {
 			order: 10,
 			result: {
 				target(player, target) {
-					if (target.hasSkill("dclisao_gaifa")) return 0;
+					if (target.getStorage("dclisao_gaifa").includes(player)) return 0;
 					if (get.damageEffect(target, player, player) < 0 && get.attitude(player, target) > 0) return 0;
 					let cards = player.getCards("hs", card => get.tag(card, "damage") && player.canUse(card, target) && get.effect(target, card, player, player) > 0);
 					if (!cards.length) return 0;
@@ -342,18 +346,30 @@ const skills = {
 		subSkill: {
 			gaifa: {
 				charlotte: true,
-				trigger: { player: "damageBegin3" },
+				onremove: true,
+				trigger: {
+					global: "useCard",
+					player: "damageBegin3",
+				},
 				filter(event, player) {
-					return player.getHistory("damage", evt => evt.num > 0).length;
+					const targets = player.getStorage("dclisao_gaifa");
+					return event.name != "useCard" || targets.includes(event.player);
 				},
 				forced: true,
 				popup: false,
 				async content(event, trigger, player) {
-					trigger.num = player.getHistory("damage", evt => evt.num > 0).lastItem.num * 2;
+					const targets = player.getStorage("dclisao_gaifa");
+					if (trigger.name == "useCard") trigger.directHit.add(player);
+					else trigger.num = trigger.num * (targets.length + 1);
 				},
 				mark: true,
 				marktext: "江",
-				intro: { content: "不能熟记《离骚》的惩罚——本回合受到伤害时，若你本回合已受到过伤害，则此伤害值改为上一次受到的伤害的两倍" },
+				intro: {
+					markcount: () => 0,
+					content(storage) {
+						return "<li>无法响应" + get.translation(storage) + "使用的牌<br><li>受到的伤害翻" + storage.length + "倍";
+					},
+				},
 			},
 		},
 	},
