@@ -1104,7 +1104,7 @@ window.noname_character_rank = {
 		"xin_zhangliang",
 		"liwei",
 		"xin_wuban",
-		"ol_liuyan",
+		"junk_liuyan",
 		"sunhuan",
 		"yue_caiyong",
 		"sb_huangyueying",

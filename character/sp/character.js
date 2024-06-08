@@ -31,7 +31,6 @@ const characters = {
 	haopu: ["male", "shu", 4, ["olzhenying"]],
 	ol_mengda: ["male", "shu", 4, ["olgoude"]],
 	ol_wanglang: ["male", "wei", 3, ["gushe", "oljici"]],
-	ol_liuyan: ["male", "qun", "4/6", ["olpianan", "olyinji", "olkuisi"]],
 	lushi: ["female", "qun", 3, ["olzhuyan", "releijie"]],
 	zhangshiping: ["male", "shu", 3, ["olhongji", "olxinggu"]],
 	sunhong: ["male", "wu", 3, ["olxianbi", "olzenrun"]],
