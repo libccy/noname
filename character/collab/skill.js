@@ -360,7 +360,7 @@ const skills = {
 				async content(event, trigger, player) {
 					const targets = player.getStorage("dclisao_gaifa");
 					if (trigger.name == "useCard") trigger.directHit.add(player);
-					else trigger.num = trigger.num * targets.length;
+					else trigger.num = trigger.num * (targets.length + 1);
 				},
 				mark: true,
 				marktext: "江",
