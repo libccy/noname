@@ -1,4 +1,9 @@
 export default {
+	"#oljingzhou1": "艨艟连江，敌必不战自退。",
+	"#oljingzhou2": "精舟锐进，直捣孙家老巢。",
+	"#olzuolian1": "有我操练水军，曹公大可放心！",
+	"#olzuolian2": "好！儿郎们很有精神！",
+	"#caimao:die": "丞相，末将忠心耿耿呀。",
 	"#olrunwei1": "流水不言，泽德万物。",
 	"#olrunwei2": "生如春雨，润物无声。",
 	"#olcangxin1": "世间百味，品在唇而味在心。",
