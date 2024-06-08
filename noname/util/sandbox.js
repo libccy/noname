@@ -2247,8 +2247,7 @@ class Marshal {
 			if (descriptor
 				&& descriptor.value
 				&& !descriptor.enumerable
-				&& !descriptor.configurable
-				&& descriptor.value.constructor === src)
+				&& !descriptor.configurable)
 				cloned = function () { };
 			else
 				cloned = () => { };
@@ -2313,24 +2312,38 @@ class Marshal {
 
 			if (mappedCtor) {
 				const newError = new mappedCtor();
-				const stack = (function () {
+				const silentAccess = (o, p, d) => {
 					try {
-						return String(target.stack);
+						if (typeof p == "function")
+							return p(o);
+						else
+							return o[p];
 					} catch (e) {
-						return "无法获取错误";
+						return d;
 					}
-				})();
+				};
+				const pinValue = (o, p, v) => {
+					Reflect.defineProperty(o, p, {
+						get: () => v,
+						set: () => { },
+						configurable: false,
+					});
+				};
 
-				Reflect.defineProperty(newError, 'stack', {
-					get: () => () => stack,
-					set: () => { },
-					configurable: false,
-				});
+				const name = String(silentAccess(target, "name", "#无法获取错误名#"));
+				const message = String(silentAccess(target, "message", "#无法获取错误消息#"));
+				const stack = String(silentAccess(target, "stack", "#无法获取调用栈#"));
+				const string = silentAccess(target, String, "#无法获取错误信息#");
+
+				pinValue(newError, "name", name);
+				pinValue(newError, "message", message);
+				pinValue(newError, "stack", stack);
+				pinValue(newError, "toString", () => string);
 
 				// 继承原本的错误信息
 				const errorReporter = ErrorManager.getErrorReporter(target);
-				if (errorReporter)
-					ErrorManager.setErrorReporter(newError, errorReporter);
+				ErrorManager.setErrorReporter(newError,
+					errorReporter || new ErrorReporter(target)); // 无论有没有都捕获当前的错误信息
 
 				return newError;
 			}
@@ -3164,6 +3177,10 @@ function trapMarshal(srcDomain, dstDomain, obj) {
  * ```
  */
 class Sandbox {
+	// @ts-ignore
+	static #topWindow = window.replacedGlobal || window;
+	// @ts-ignore
+	static #topWindowHTMLElement = (window.replacedGlobal || window).HTMLElement;
 	/** @type {WeakMap<Domain, Sandbox>} */
 	static #domainMap = new WeakMap();
 	/** @type {Array} */
@@ -3203,6 +3220,20 @@ class Sandbox {
 	 * @type {boolean} 
 	 */
 	#freeAccess = false;
+
+	/**
+	 * ```plain
+	 * 当在当前scope中访问不到变量时，
+	 * 是否允许沙盒代码可以穿透到顶级域的全局变量域中
+	 * 去读取DOM类型的构造函数（仅读取）
+	 * （包括Image、Audio等）
+	 * 
+	 * 此开关有风险，请谨慎使用
+	 * ```
+	 * 
+	 * @type {boolean} 
+	 */
+	#domAccess = false;
 
 	/**
 	 * 创建一个新的沙盒
@@ -3439,6 +3470,40 @@ class Sandbox {
 	set freeAccess(value) {
 		Sandbox.#assertOperator(this);
 		this.#freeAccess = !!value;
+	}
+
+	/**
+	 * ```plain
+	 * 当在当前scope中访问不到变量时，
+	 * 是否允许沙盒代码可以穿透到顶级域的全局变量域中
+	 * 去读取DOM类型的构造函数（仅读取）
+	 * （包括Image、Audio等）
+	 * 
+	 * 此开关有风险，请谨慎使用
+	 * ```
+	 * 
+	 * @type {boolean} 
+	 */
+	get domAccess() {
+		Sandbox.#assertOperator(this);
+		return this.#domAccess;
+	}
+
+	/**
+	 * ```plain
+	 * 当在当前scope中访问不到变量时，
+	 * 是否允许沙盒代码可以穿透到顶级域的全局变量域中
+	 * 去读取DOM类型的构造函数（仅读取）
+	 * （包括Image、Audio等）
+	 * 
+	 * 此开关有风险，请谨慎使用
+	 * ```
+	 * 
+	 * @type {boolean} 
+	 */
+	set domAccess(value) {
+		Sandbox.#assertOperator(this);
+		this.#domAccess = !!value;
 	}
 
 	/**
@@ -3800,10 +3865,18 @@ class Sandbox {
 				// 暴露非内建的顶级全局变量
 				if (thiz.#freeAccess
 					&& !Globals.isBuiltinKey(p)) {
-					const topWindow = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
+					const topWindow = Sandbox.#topWindow;
 
 					if (p in topWindow)
 						return trapMarshal(Domain.topDomain, thiz.#domain, topWindow[p]);
+				} else if (thiz.#domAccess) {
+					const topWindow = Sandbox.#topWindow;
+					const accessTarget = topWindow[p];
+
+					if (typeof accessTarget == "function"
+						&& "prototype" in accessTarget
+						&& accessTarget.prototype instanceof Sandbox.#topWindowHTMLElement)
+						return trapMarshal(Domain.topDomain, thiz.#domain, accessTarget);
 				}
 
 				return undefined;
@@ -3816,6 +3889,14 @@ class Sandbox {
 					&& !Globals.isBuiltinKey(p)) {
 					const topWindow = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
 					return p in topWindow;
+				} else if (thiz.#domAccess) {
+					const topWindow = Sandbox.#topWindow;
+					const accessTarget = topWindow[p];
+
+					if (typeof accessTarget == "function"
+						&& "prototype" in accessTarget
+						&& accessTarget.prototype instanceof Sandbox.#topWindowHTMLElement)
+						return true;
 				}
 
 				return false;

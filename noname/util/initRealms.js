@@ -111,6 +111,8 @@ async function initializeSandboxRealms(enabled) {
     delete iframe.contentWindow.replacedCI2;
     // @ts-ignore
     delete iframe.contentWindow.replacedCIC;
+    // @ts-ignore
+    delete iframe.contentWindow.replacedErrors;
 
     // @ts-ignore
     Object.assign(SANDBOX_EXPORT, iframe.contentWindow.SANDBOX_EXPORT);

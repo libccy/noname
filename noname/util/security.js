@@ -583,6 +583,7 @@ function createSandbox() {
 
 	const box = new Sandbox();
 	box.freeAccess = true;
+	box.domAccess = true;
 	box.initBuiltins();
 
 	// 向沙盒提供顶级运行域的文档对象

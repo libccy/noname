@@ -65,11 +65,11 @@ class CodeSnippet {
 	 * 获取当前代码片段
 	 * ```
 	 * 
-	 * @type {CodeSnippet}
+	 * @type {CodeSnippet?}
 	 */
 	static get currentSnippet() {
 		if (!this.#snippetStack.length)
-			throw new Error("代码片段栈为空");
+			return null;
 
 		return this.#snippetStack[this.#snippetStack.length - 1];
 	}
@@ -114,7 +114,7 @@ class ErrorReporter {
 		/:(\d+):\d+/,
 	];
 
-	/** @type {CodeSnippet} */
+	/** @type {CodeSnippet?} */
 	#snippet;
 	/** @type {string} */
 	#message;
@@ -128,7 +128,7 @@ class ErrorReporter {
 	 * ```
 	 * 
 	 * @param {Error} error 
-	 * @param {CodeSnippet} snippet 
+	 * @param {CodeSnippet?} snippet 
 	 */
 	constructor(error, snippet = CodeSnippet.currentSnippet) {
 		if (!("stack" in error))
@@ -159,6 +159,9 @@ class ErrorReporter {
 	}
 
 	viewCode() {
+		if(!this.#snippet)
+			return null;
+		
 		const stack = this.#stack;
 		const line = stack.split("\n")[1];
 		const lineno = ErrorReporter.#findLineNo(line);
