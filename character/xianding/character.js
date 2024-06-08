@@ -2,7 +2,7 @@ const characters = {
 	zhupeilan: ["female", "wu", 3, ["dccilv", "dctongdao"]],
 	dc_sb_zhangxiu: ["male", "qun", 4, ["dcsbfuxi", "dcsbhaoyi"]],
 	dc_sb_guanping: ["male", "shu", 4, ["dcsbwuwei"]],
-	dc_sb_caoang: ["male", "wei", 4, ["dcsbfengmin", "dcsbzhiwang", "dcsbjueying"]],
+	dc_sb_caoang: ["male", "wei", 4, ["dcsbfengmin", "dcsbzhiwang"]],
 	dc_caoshuang: ["male", "wei", 4, ["dcjianzhuan", "dcfanshi"]],
 	dc_simashi: ["male", "wei", 3, ["dcsanshi", "dczhenrao", "dcchenlve"]],
 	dc_wangling: ["male", "wei", 4, ["dcjichou", "dcmouli"], ["clan:太原王氏"]],

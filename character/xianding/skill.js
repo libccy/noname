@@ -582,18 +582,6 @@ const skills = {
 			},
 		},
 	},
-	dcsbjueying: {
-		audio: 2,
-		trigger: { player: "damageBegin4" },
-		filter(event, player) {
-			const cards = player.getEquips("jueying");
-			return cards.length && cards.every(card => lib.filter.cardDiscardable(card, player));
-		},
-		content() {
-			player.discard(player.getEquips("jueying"));
-			trigger.cancel();
-		},
-	},
 	//诸葛瑾
 	dcsbtaozhou: {
 		audio: 2,
