@@ -15679,7 +15679,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 					var skills = ["new_retuxi", "qiaobian", "fakexiaoguo", "gzjieyue", "new_duanliang"];
 					game.countPlayer(function (current) {
-						if (current == player) return;
 						if (current.hasSkill("new_retuxi")) skills.remove("new_retuxi");
 						if (current.hasSkill("qiaobian")) skills.remove("qiaobian");
 						if (current.hasSkill("fakexiaoguo")) skills.remove("fakexiaoguo");
@@ -21450,7 +21449,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						player.reinit(player.name1, to, 4);
 						
 						// 修改君主亮将配音播放
-						// if (lib.skill[to]) game.trySkillAudio(to, player);
 						var map = {
 							gz_jun_liubei: "shouyue",
 							gz_jun_zhangjiao: "hongfa",
@@ -21678,10 +21676,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					}
 				},
 			},
-			// gz_jun_liubei: { audio: true },
-			// gz_jun_caocao: { audio: true },
-			// gz_jun_sunquan: { audio: true },
-			// gz_jun_zhangjiao: { audio: true },
 			_zhenfazhaohuan: {
 				enable: "phaseUse",
 				usable: 1,
@@ -23412,7 +23406,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			wuziliangjiangdao_ab: "将纛",
 			wuziliangjiangdao_bg: "纛",
 			wuziliangjiangdao_info:
-				"魏势力角色的准备阶段，其可以弃置一张牌。若如此做，其选择一张暗置的武将牌（若没有，则选择一张暗置），然后获得下列技能中的一项（其他角色已有的技能无法选择）且不能明置选择的武将牌直到你的下个回合开始：〖突袭〗，〖巧变〗，〖骁果〗，〖节钺〗，〖断粮〗。",
+				"魏势力角色的准备阶段，其可以弃置一张牌。若如此做，其选择一张暗置的武将牌（若没有，则选择一张暗置），然后获得下列技能中的一项（场上所有角色已有的技能无法选择）且不能明置选择的武将牌直到你的下个回合开始：〖突袭〗，〖巧变〗，〖骁果〗，〖节钺〗，〖断粮〗。",
 			huibian: "挥鞭",
 			huibian_info:
 				"出牌阶段限一次，你可以选择一名魏势力角色和另一名已受伤的魏势力角色。若如此做，你对前者造成1点伤害，然后其摸两张牌，然后后者回复1点体力。",
