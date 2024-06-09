@@ -17091,6 +17091,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				position: "he",
 				filterTarget: function (card, player, target) {
+					if (target == player) return false;
 					return !target.isUnseen(2);
 				},
 				check: function (card) {
