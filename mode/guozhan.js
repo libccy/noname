@@ -24370,7 +24370,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#jihun2": "魂羽化游，以辅四方。",
 			"#gz_zuoci:die": "腾云跨风，飞升太虚……",
 			"#gz_bianfuren:die": "心肝涂地，惊愕断绝……",
-			"#gz_xunyou:die": "主公何日再得无忧？",
+			"#gz_xunyou:die": "主公，丞相先行告退……",
 			"#xuanlve1": "强敌破阵，斩将于须臾！",
 			"#xuanlve2": "轻装急袭，破敌于千里！",
 			"#yongjin1": "冲啊，扬我东吴之勇！",
