@@ -1154,7 +1154,7 @@ const skills = {
 					const count = Math.min(
 						5,
 						player.getAllHistory("useCard", evt => {
-							return get.color(evt.card, player) === "black" && evt.targets && evt.targets.includes(target);
+							return evt.targets && evt.targets.includes(target);
 						}).length
 					);
 					let value = Math.max(player.getHp(true), 3) - count;
