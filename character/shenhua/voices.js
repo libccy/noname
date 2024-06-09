@@ -254,7 +254,6 @@ export default {
 	"#drlt_qingce1": "感明帝之恩，清君侧之贼。",
 	"#drlt_qingce2": "得太后手诏，清奸佞乱臣。",
 	"#rejizhi_lukang1": "智父安能有愚子乎？",
-	"#rejizhi_lukang2": "智父安能有愚子乎？",
 	"#drlt_huairou1": "各保分界，无求细利。",
 	"#drlt_huairou2": "胸怀千万，彰其德，包其柔。",
 	"#shensu11": "吾善于千里袭人！",
