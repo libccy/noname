@@ -4062,6 +4062,7 @@ const skills = {
 					return 0;
 				},
 			},
+			combo: "tianren"
 		},
 		subSkill: {
 			effect: {

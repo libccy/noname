@@ -4774,7 +4774,6 @@ const skills = {
 			if (card) player.gain(card, "gain2");
 		},
 		ai: {
-			combo: "fenli",
 			effect: {
 				target: function (card) {
 					if (card.name == "lebu" || card.name == "bingliang") return 0.5;

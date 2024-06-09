@@ -6631,6 +6631,7 @@ const skills = {
 			player.removeSkills("godan_feiqu");
 		},
 		ai: {
+			combo: "godan_feiqu",
 			halfneg: true
 		},
 	},

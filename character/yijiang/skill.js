@@ -3677,7 +3677,7 @@ const skills = {
 					return player.isMaxHandcard();
 				},
 				check: function (event, player) {
-					if (player.getHistory("skipped").length > 0) return false;
+					if (!player.hasSkill("pingkou") && !player.hasSkill("xinpingkou") || player.getHistory("skipped").length > 0) return false;
 					return game.hasPlayer(function (current) {
 						return get.attitude(player, current) < 0 && current.hp == 1 && get.damageEffect(current, player, player) > 0;
 					});
@@ -3695,6 +3695,7 @@ const skills = {
 					return player.isMaxHp();
 				},
 				check: function (event, player) {
+					if (!player.hasSkill("pingkou") && !player.hasSkill("xinpingkou")) return false;
 					if (!player.needsToDiscard() || (player.countCards("e") && player.isMaxEquip())) return true;
 					if (player.getHistory("skipped").length > 0) return false;
 					return game.hasPlayer(function (current) {
@@ -3718,9 +3719,6 @@ const skills = {
 					trigger.cancel();
 				},
 			},
-		},
-		ai: {
-			combo: "pingkou",
 		},
 	},
 	pingkou: {
@@ -3754,7 +3752,6 @@ const skills = {
 			}
 		},
 		ai: {
-			combo: "fenli",
 			effect: {
 				target: function (card) {
 					if (card.name == "lebu" || card.name == "bingliang") return 0.5;

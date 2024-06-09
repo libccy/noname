@@ -538,6 +538,7 @@ const skills = {
 	},
 	jsrgyangge: {
 		global: "jsrgyangge_mizhao",
+		derivation: "mizhao",
 		subSkill: {
 			mizhao: {
 				//直接继承mizhao
@@ -574,11 +575,59 @@ const skills = {
 			player.addTempSkill("jsrgguanshi_effect");
 		},
 		position: "hs",
-		//这个AI难写，交给157了！
-		check() {
-			return -1;
+		selectTargetAi(card) {
+			let cache = _status.event.getTempCache("jsrgguanshi", "targets");
+			if (Array.isArray(cache)) return cache.length;
+			let player = _status.event.player,
+				targets = [],
+				shas = player.mayHaveSha(player, "respond", player.getCards("h", i => {
+					return card === i;
+				}));
+			game.countPlayer(tar => {
+				if (player === tar) return;
+				let eff = get.effect(tar, get.autoViewAs({ name: "juedou" }, [card]), player, player);
+				if (eff <= 0) return;
+				if (get.attitude(player, tar) > 0) targets.push([tar, eff, 0]);
+				else targets.push([tar, eff, tar.mayHaveSha(player, "respond", null, "count")]);
+			});
+			targets.sort((a, b) => {
+				if (!a[2]) return -1;
+				if (!b[2]) return 1;
+				return b[1] / b[2] - a[1] / a[2];
+			});
+			for (let i = 0; i < targets.length; i++) {
+				if (targets[i][2] > shas) {
+					targets = targets.slice(0, i);
+					break;
+				}
+				else shas -= targets[i][2];
+			}
+			_status.event.putTempCache("jsrgguanshi", "targets", targets);
+			return targets.length;
 		},
-		ai: {},
+		check(card) {
+			let num = lib.skill.jsrgguanshi.selectTargetAi(card);
+			if (!num) return -1;
+			if (num === 1) return 4 - get.value(card);
+			return num + 5 - get.value(card);
+		},
+		ai: {
+			order: 9,
+			result: {
+				player(player, target) {
+					let tars = _status.event.putTempCache("jsrgguanshi", "targets", targets);
+					if (!tars) return lib.card.juedou.ai.result.player(player, target);
+				},
+				target(player, target) {
+					let tars = _status.event.putTempCache("jsrgguanshi", "targets", targets);
+					if (!tars) return lib.card.juedou.ai.result.target(player, target);
+					for (let tar of tars) {
+						if (tar[0] === target) return tar[1] / get.attitude(player, target);
+					}
+					return 0;
+				}
+			}
+		},
 		subSkill: {
 			effect: {
 				trigger: {
