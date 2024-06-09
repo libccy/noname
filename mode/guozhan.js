@@ -1869,7 +1869,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			fakejizhi: {
 				audio: "rejizhi",
-				audioname: ["lukang"],
+				audioname2: { gz_lukang: "rejizhi_lukang" },
 				inherit: "jizhi",
 			},
 			fakequanji: {
