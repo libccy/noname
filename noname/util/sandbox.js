@@ -41,6 +41,13 @@ const SandboxSignal_ListMonitor = Symbol("ListMonitor");
 const SandboxSignal_ExposeInfo = Symbol("ExposeInfo");
 const SandboxSignal_TryFunctionRefs = Symbol("TryFunctionRefs");
 
+/** @type {typeof import("./error.js").CodeSnippet} */
+let CodeSnippet;
+/** @type {typeof import("./error.js").ErrorReporter} */
+let ErrorReporter;
+/** @type {typeof import("./error.js").ErrorManager} */
+let ErrorManager;
+
 // 用于适配 < Chrome 84 的设备
 const WeakRef = window.WeakRef || class WeakRef {
 	/**
@@ -2240,8 +2247,7 @@ class Marshal {
 			if (descriptor
 				&& descriptor.value
 				&& !descriptor.enumerable
-				&& !descriptor.configurable
-				&& descriptor.value.constructor === src)
+				&& !descriptor.configurable)
 				cloned = function () { };
 			else
 				cloned = () => { };
@@ -2306,12 +2312,39 @@ class Marshal {
 
 			if (mappedCtor) {
 				const newError = new mappedCtor();
-				const stack = String(target.stack);
-				Reflect.defineProperty(newError, 'stack', {
-					get: () => () => stack,
-					set: () => { },
-					configurable: false,
-				});
+				const silentAccess = (o, p, d) => {
+					try {
+						if (typeof p == "function")
+							return p(o);
+						else
+							return o[p];
+					} catch (e) {
+						return d;
+					}
+				};
+				const pinValue = (o, p, v) => {
+					Reflect.defineProperty(o, p, {
+						get: () => v,
+						set: () => { },
+						configurable: false,
+					});
+				};
+
+				const name = String(silentAccess(target, "name", "#无法获取错误名#"));
+				const message = String(silentAccess(target, "message", "#无法获取错误消息#"));
+				const stack = String(silentAccess(target, "stack", "#无法获取调用栈#"));
+				const string = silentAccess(target, String, "#无法获取错误信息#");
+
+				pinValue(newError, "name", name);
+				pinValue(newError, "message", message);
+				pinValue(newError, "stack", stack);
+				pinValue(newError, "toString", () => string);
+
+				// 继承原本的错误信息
+				const errorReporter = ErrorManager.getErrorReporter(target);
+				ErrorManager.setErrorReporter(newError,
+					errorReporter || new ErrorReporter(target)); // 无论有没有都捕获当前的错误信息
+
 				return newError;
 			}
 		}
@@ -2866,7 +2899,7 @@ class Domain {
 	 * 检查对象是否来自于当前的运行域
 	 * ```
 	 * 
-	 * @param {Object} obj 
+	 * @param {Object?} obj 
 	 * @returns {boolean} 
 	 */
 	isFrom(obj) {
@@ -2885,7 +2918,7 @@ class Domain {
 	 * 检查对象是否来自于当前的运行域的Promise
 	 * ```
 	 * 
-	 * @param {Promise} promise 
+	 * @param {Promise?} promise 
 	 * @returns {boolean} 
 	 */
 	isPromise(promise) {
@@ -2902,7 +2935,7 @@ class Domain {
 	 * 检查对象是否来自于当前的运行域的Error
 	 * ```
 	 * 
-	 * @param {Error} error 
+	 * @param {Error?} error 
 	 * @returns {boolean} 
 	 */
 	isError(error) {
@@ -2919,7 +2952,7 @@ class Domain {
 	 * 检查对象是否来自于当前的运行域的危险对象
 	 * ```
 	 * 
-	 * @param {Object} obj 
+	 * @param {Object?} obj 
 	 * @returns {boolean} 
 	 */
 	isUnsafe(obj) {
@@ -3144,6 +3177,10 @@ function trapMarshal(srcDomain, dstDomain, obj) {
  * ```
  */
 class Sandbox {
+	// @ts-ignore
+	static #topWindow = window.replacedGlobal || window;
+	// @ts-ignore
+	static #topWindowHTMLElement = (window.replacedGlobal || window).HTMLElement;
 	/** @type {WeakMap<Domain, Sandbox>} */
 	static #domainMap = new WeakMap();
 	/** @type {Array} */
@@ -3183,6 +3220,20 @@ class Sandbox {
 	 * @type {boolean} 
 	 */
 	#freeAccess = false;
+
+	/**
+	 * ```plain
+	 * 当在当前scope中访问不到变量时，
+	 * 是否允许沙盒代码可以穿透到顶级域的全局变量域中
+	 * 去读取DOM类型的构造函数（仅读取）
+	 * （包括Image、Audio等）
+	 * 
+	 * 此开关有风险，请谨慎使用
+	 * ```
+	 * 
+	 * @type {boolean} 
+	 */
+	#domAccess = false;
 
 	/**
 	 * 创建一个新的沙盒
@@ -3423,6 +3474,40 @@ class Sandbox {
 
 	/**
 	 * ```plain
+	 * 当在当前scope中访问不到变量时，
+	 * 是否允许沙盒代码可以穿透到顶级域的全局变量域中
+	 * 去读取DOM类型的构造函数（仅读取）
+	 * （包括Image、Audio等）
+	 * 
+	 * 此开关有风险，请谨慎使用
+	 * ```
+	 * 
+	 * @type {boolean} 
+	 */
+	get domAccess() {
+		Sandbox.#assertOperator(this);
+		return this.#domAccess;
+	}
+
+	/**
+	 * ```plain
+	 * 当在当前scope中访问不到变量时，
+	 * 是否允许沙盒代码可以穿透到顶级域的全局变量域中
+	 * 去读取DOM类型的构造函数（仅读取）
+	 * （包括Image、Audio等）
+	 * 
+	 * 此开关有风险，请谨慎使用
+	 * ```
+	 * 
+	 * @type {boolean} 
+	 */
+	set domAccess(value) {
+		Sandbox.#assertOperator(this);
+		this.#domAccess = !!value;
+	}
+
+	/**
+	 * ```plain
 	 * 向当前域注入内建对象
 	 * 
 	 * 如果使用在使用了 `initBuiltins` 之后进行 `pushScope`，
@@ -3582,6 +3667,7 @@ class Sandbox {
 		let wrappedEval;
 
 		const raw = new thiz.#domainFunction("_", `with(_){with(window){with(${contextName}){return(${applyName}(function(${parameters}){"use strict";\n// 沙盒代码起始\n${code}\n// 沙盒代码结束\n},${contextName}.this,${argsName}))}}}`);
+		const snippet = new CodeSnippet(code, 5); // 错误信息的行号从 5 开始 (即错误信息的前 5 行是不属于 `code` 的范围)
 
 		const domain = thiz.#domain;
 		const domainWindow = thiz.#domainWindow;
@@ -3637,6 +3723,8 @@ class Sandbox {
 				// 指定执行域
 				// 方便后续新的函数来继承
 				Sandbox.#executingScope.push(scope);
+				// 指定当前的代码片段
+				CodeSnippet.pushSnippet(snippet);
 
 				try {
 					// 传递 `this`、以及函数参数
@@ -3652,27 +3740,17 @@ class Sandbox {
 					// 封送返回结果
 					return Marshal[SandboxExposer2]
 						(SandboxSignal_Marshal, result, prevDomain);
-					// } catch (e) {
-					// // 立即报告错误
-					// const window = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
-					// // @ts-ignore
-					// const stack = String(e.stack);
-					// const line = stack.split("\n")[1];
-					// const match = /<anonymous>:(\d+):\d+\)/.exec(line);
-					// if (match) {
-					// 	const index = parseInt(match[1]) - 5;
-					// 	const lines = code.split("\n");
-					// 	let codeView = "";
-					// 	for (let i = index - 4; i < index + 5; i++) {
-					// 		if (i < 0 || i >= lines.length)
-					// 			continue;
-					// 		codeView += `${i + 1}|${i == index ? "⚠️" : "    "}${lines[i]}\n`;
-					// 	}
-					// 	// @ts-ignore
-					// 	window.alert(`Sandbox内执行的代码出现错误：\n${stack}\n----------\n${codeView}\n----------`);
-					// }
-					// throw e; // 不再向上抛出异常
+				} catch (e) {
+					// @ts-ignore
+					if (!domain.isError(e))
+						throw e; // 非错误对象无法读取堆栈，继续向上抛出
+
+					// 保存当前错误信息
+					// 这样无论几次重抛都可以复现最原始的错误信息
+					ErrorManager.setErrorReporter(e);
+					throw e; // 继续向上抛出(由于JS不支持rethrow只能这样喵)
 				} finally {
+					CodeSnippet.popSnippet();
 					Sandbox.#executingScope.pop();
 				}
 			};
@@ -3787,10 +3865,18 @@ class Sandbox {
 				// 暴露非内建的顶级全局变量
 				if (thiz.#freeAccess
 					&& !Globals.isBuiltinKey(p)) {
-					const topWindow = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
+					const topWindow = Sandbox.#topWindow;
 
 					if (p in topWindow)
 						return trapMarshal(Domain.topDomain, thiz.#domain, topWindow[p]);
+				} else if (thiz.#domAccess) {
+					const topWindow = Sandbox.#topWindow;
+					const accessTarget = topWindow[p];
+
+					if (typeof accessTarget == "function"
+						&& "prototype" in accessTarget
+						&& accessTarget.prototype instanceof Sandbox.#topWindowHTMLElement)
+						return trapMarshal(Domain.topDomain, thiz.#domain, accessTarget);
 				}
 
 				return undefined;
@@ -3803,6 +3889,14 @@ class Sandbox {
 					&& !Globals.isBuiltinKey(p)) {
 					const topWindow = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow);
 					return p in topWindow;
+				} else if (thiz.#domAccess) {
+					const topWindow = Sandbox.#topWindow;
+					const accessTarget = topWindow[p];
+
+					if (typeof accessTarget == "function"
+						&& "prototype" in accessTarget
+						&& accessTarget.prototype instanceof Sandbox.#topWindowHTMLElement)
+						return true;
 				}
 
 				return false;
@@ -3973,6 +4067,16 @@ if (SANDBOX_ENABLED) {
 
 		// 改为此处初始化，防止多次初始化
 		Domain[SandboxExposer2](SandboxSignal_InitDomain);
+
+		// 获取顶级域的错误管理器
+		// @ts-ignore
+		({
+			CodeSnippet,
+			ErrorReporter,
+			ErrorManager,
+		}
+			// @ts-ignore
+			= window.replacedErrors);
 
 		// 向顶级运行域暴露导出
 		// @ts-ignore
