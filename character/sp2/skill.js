@@ -7145,6 +7145,9 @@ const skills = {
 				player.addTempSkill("csyizheng2", { player: "phaseBegin" });
 			}
 		},
+		ai: {
+			combo: "cslilu"
+		},
 	},
 	csyizheng2: {
 		audio: "csyizheng",

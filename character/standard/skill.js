@@ -336,6 +336,7 @@ const skills = {
 						.sortBySeat();
 					if (targets.length) {
 						for (const target of targets) {
+							if (!target.isIn()) continue;
 							const next = target.chooseToUse("挥战：是否替" + get.translation(trigger.player) + "使用一张【闪】？", { name: "shan" });
 							next.set("ai", () => {
 								const event = _status.event;

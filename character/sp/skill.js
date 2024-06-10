@@ -23146,6 +23146,9 @@ const skills = {
 				player.stat[player.stat.length - 1].card.sha--;
 			}
 		},
+		ai: {
+			combo: "wusheng"
+		},
 		group: "nuzhan2",
 	},
 	nuzhan2: {
