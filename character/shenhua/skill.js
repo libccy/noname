@@ -1081,6 +1081,7 @@ const skills = {
 		},
 		derivation: "rejizhi",
 	},
+	rejizhi_lukang: { audio: 1 },
 	drlt_jueyan1: {
 		mod: {
 			cardUsable(card, player, num) {

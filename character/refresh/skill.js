@@ -13253,7 +13253,7 @@ const skills = {
 	},
 	rejizhi: {
 		audio: 2,
-		audioname: ["lukang"],
+		audioname2: { lukang: "rejizhi_lukang" },
 		locked: false,
 		trigger: { player: "useCard" },
 		frequent: true,
