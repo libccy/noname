@@ -302,7 +302,7 @@ export async function boot() {
 	// 初始化security
 	const securityModule = await import("../util/security.js");
 	const security = securityModule.default;
-	security.initSecurity({
+	await security.initSecurity({
 		lib, game, ui, get, ai, _status, gnc,
 	});
 
