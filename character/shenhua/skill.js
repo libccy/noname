@@ -5011,7 +5011,7 @@ const skills = {
 				const str1 = "摸" + get.cnNumber(num, true) + "弃一";
 				const str2 = "摸一弃" + get.cnNumber(num, true);
 				directcontrol =
-					str ==
+					str1 ==
 					(await player
 						.chooseControl(str1, str2, function (event, player) {
 							if (player.isHealthy()) return 1 - _status.event.choice;
