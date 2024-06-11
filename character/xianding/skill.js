@@ -3692,11 +3692,16 @@ const skills = {
 	dcnuanhui: {
 		audio: 2,
 		trigger: { player: "phaseJieshuBegin" },
+		filter(event, player) {
+			return game.hasPlayer(current => current.countCards("e") > 0);
+		},
 		direct: true,
 		content: function* (event, map) {
 			const player = map.player;
 			let result = yield player
-				.chooseTarget(get.prompt("dcnuanhui"), "选择一名装备区有牌的角色，该角色可以依次使用X张基本牌（X为其装备区牌数且至少为1）")
+				.chooseTarget(get.prompt("dcnuanhui"), "选择一名装备区有牌的角色，该角色可以依次使用X张基本牌（X为其装备区牌数且至少为1）", (card, player, target) => {
+					return target.countCards("e") > 0;
+				})
 				.set("ai", target => {
 					return get.event("aiTarget") == target ? 10 : 0;
 				})

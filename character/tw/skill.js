@@ -30,7 +30,7 @@ const skills = {
 			for (const current of targets) {
 				if (!current.isIn()) continue;
 				const cards = await current
-					.chooseToGive(`${get.translation(player)}对你发动了【受嘱】`, "作为其的同心角色，是否交给其至多三张牌？", player, "he", [1, 3])
+					.chooseToGive(`${get.translation(player)}对你发动了【受嘱】`, "作为其的同心角色，是否交给其至多四张牌？", player, "he", [1, 4])
 					.set("ai", card => {
 						if (!get.event("goon")) return -get.value(card);
 						if (ui.selected.cards.length < 2) return 4.5 + ui.selected.cards.length - get.value(card) + get.player().getUseValue(card) / 5;
@@ -218,7 +218,7 @@ const skills = {
 		enable: ["chooseToUse", "chooseToRespond"],
 		filter(event, player) {
 			return ["huogong", "tiesuo", "wuzhong"].some(name => {
-				if (player.getStorage("twcairu_used").includes(name)) return false;
+				if (player.getStorage("twcairu_used").filter(namex => namex == name).length > 1) return false;
 				return event.filterCard({ name }, player, event);
 			});
 		},
@@ -226,7 +226,7 @@ const skills = {
 			dialog(event, player) {
 				const list = ["huogong", "tiesuo", "wuzhong"]
 					.filter(name => {
-						if (player.getStorage("twcairu_used").includes(name)) return false;
+						if (player.getStorage("twcairu_used").filter(namex => namex == name).length > 1) return false;
 						return event.filterCard({ name }, player, event);
 					})
 					.map(name => [get.translation(get.type(name)), "", name]);
@@ -259,7 +259,7 @@ const skills = {
 								delete player.storage.twcairu_used;
 							});
 						}
-						player.storage.twcairu_used.add(event.result.card.name);
+						player.storage.twcairu_used.push(event.result.card.name);
 					},
 				};
 			},
@@ -274,7 +274,7 @@ const skills = {
 				let max = 0,
 					names = ["huogong", "tiesuo", "wuzhong"].filter(name => {
 						if (player.getStorage("twcairu_used").includes(name)) return false;
-						return player.hasValueTarget(name ,true, true);
+						return player.hasValueTarget(name, true, true);
 					});
 				if (!names.length) return 0;
 				names = names.map(namex => ({ name: namex }));
