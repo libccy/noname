@@ -13112,31 +13112,39 @@ const skills = {
 	//生鱼片
 	olfengji: {
 		audio: 2,
-		trigger: { player: "phaseDrawBegin2" },
+		trigger: { global: "roundStart" },
 		forced: true,
 		locked: false,
-		filter: function (event, player) {
-			return !player.numFixed;
-		},
 		content: function () {
 			"step 0";
 			player
-				.chooseTarget("丰积：请选择增加摸牌的目标", "令自己本回合的额定摸牌数-1，且目标下回合的额定摸牌数+2。或者点击「取消」，令自己的额定摸牌数+1", lib.filter.notMe)
+				.chooseTarget("丰积：请选择增加摸牌的目标", "令自己本轮摸牌阶段的额定摸牌数-1，且目标本轮摸牌阶段的额定摸牌数+2。或者点击「取消」，令自己本轮摸牌阶段的额定摸牌数+1", lib.filter.notMe)
 				.set("ai", function (target) {
 					var player = _status.event.player;
-					if (target.hasJudge("lebu") || target.hasJudge("bingliang")) return 0;
 					var att = get.attitude(player, target),
 						dist = get.distance(player, target, "absolute");
-					if (_status.event.goon) {
+					if (att > 0) {
+						if (target.hasJudge("lebu") || target.hasJudge("bingliang")) return 0;
+						if (_status.event.goon) {
+							return att / dist;
+						}
+						if (
+							game.countPlayer(function (current) {
+								return current != player && current != target && get.attitude(player, current) < 0 && get.distance(player, current, "absolute") < dist;
+							}) >= target.hp
+						)
+							return 0;
 						return att / dist;
 					}
-					if (
-						game.countPlayer(function (current) {
-							return current != player && current != target && get.attitude(player, current) < 0 && get.distance(player, current, "absolute") < dist;
-						}) >= target.hp
-					)
-						return 0;
-					return att / dist;
+					if (player.hasSkill("olxuanhui", null, null, false) && !player.isTempBanned("olxuanhui") && att < 0) {
+						const first = get.event().getTrigger().player,
+							list = ["draw", "sha"];
+						if (first == player || get.distance(player, first, "absolute") > dist) {
+							const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
+							return 1 + targets.reduce((sum, num) => sum + num, 0);
+						}
+					}
+					return 0;
 				})
 				.set("goon", player.skipList.includes("lebu"));
 			"step 1";
@@ -13147,17 +13155,25 @@ const skills = {
 				player.storage.olfengji_draw--;
 				if (!target.storage.olfengji_draw) target.storage.olfengji_draw = 0;
 				target.storage.olfengji_draw += 2;
-				target.addTempSkill("olfengji_draw", { player: "phaseAfter" });
+				target.addTempSkill("olfengji_draw", "roundStart");
 				target.markSkill("olfengji_draw");
 			} else {
 				player.storage.olfengji_draw++;
 			}
-			player.addTempSkill("olfengji_draw");
+			player.addTempSkill("olfengji_draw", "roundStart");
 			player.markSkill("olfengji_draw");
 			"step 2";
-			player.chooseTarget("丰积：请选择增加使用杀次数的目标", "令自己本回合使用杀的次数上限-1，且目标下回合使用杀的次数上限+2。或者点击「取消」，令自己使用杀的次数上限+1", lib.filter.notMe).set("ai", function (target) {
+			player.chooseTarget("丰积：请选择增加使用杀次数的目标", "令自己本轮使用杀的次数上限-1，且目标本轮使用杀的次数上限+2。或者点击「取消」，令自己本轮使用杀的次数上限+1", lib.filter.notMe).set("ai", function (target) {
 				var player = _status.event.player;
-				if (target.countMark("olfengji_draw") > 0 && target.getCardUsable("sha") < 2) return get.attitude(player, target);
+				if (target.countMark("olfengji_draw") > 0 && target.getCardUsable("sha") < 2 && get.attitude(player, target) > 0) return get.attitude(player, target);
+				if (player.hasSkill("olxuanhui", null, null, false) && !player.isTempBanned("olxuanhui") && get.attitude(player, target) < 0) {
+					const first = get.event().getTrigger().player,
+						list = ["draw", "sha"];
+					if (first == player || get.distance(player, first, "absolute") > get.distance(player, target, "absolute")) {
+						const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
+						return 1 + targets.reduce((sum, num) => sum + num, 0);
+					}
+				}
 				return 0;
 			});
 			"step 3";
@@ -13168,12 +13184,12 @@ const skills = {
 				player.storage.olfengji_sha--;
 				if (!target.storage.olfengji_sha) target.storage.olfengji_sha = 0;
 				target.storage.olfengji_sha += 2;
-				target.addTempSkill("olfengji_sha", { player: "phaseAfter" });
+				target.addTempSkill("olfengji_sha", "roundStart");
 				target.markSkill("olfengji_sha");
 			} else {
 				player.storage.olfengji_sha++;
 			}
-			player.addTempSkill("olfengji_sha");
+			player.addTempSkill("olfengji_sha", "roundStart");
 			player.markSkill("olfengji_sha");
 		},
 		subSkill: {
@@ -13208,6 +13224,67 @@ const skills = {
 					trigger.num += player.storage.olfengji_draw;
 				},
 			},
+		},
+	},
+	olxuanhui: {
+		audio: 2,
+		trigger: { player: "phaseZhunbeiBegin" },
+		filter(event, player) {
+			const list = ["draw", "sha"];
+			return game.hasPlayer(target => {
+				if (target == player) return false;
+				const players = [player.storage["olfengji_" + list[0]] || 0, player.storage["olfengji_" + list[1]] || 0];
+				const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
+				return players[0] != targets[0] || players[1] != targets[1];
+			});
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt("olxuanhui"), "与一名其他角色交换〖丰积〗效果", (card, player, target) => {
+					const list = ["draw", "sha"];
+					if (target == player) return false;
+					const players = [player.storage["olfengji_" + list[0]] || 0, player.storage["olfengji_" + list[1]] || 0];
+					const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
+					return players[0] != targets[0] || players[1] != targets[1];
+				})
+				.set("ai", target => {
+					const player = get.event().player,
+						list = ["draw", "sha"];
+					return get.sgn(get.attitude(player, target)) * (
+						list.reduce((sum, skill) => {
+							if (typeof player.storage["olfengji_" + skill] == "number") sum += player.storage["olfengji_" + skill];
+							return sum;
+						}, 0) -
+						list.reduce((sum, skill) => {
+							if (typeof target.storage["olfengji_" + skill] == "number") sum += target.storage["olfengji_" + skill];
+							return sum;
+						}, 0)
+					);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0],
+				list = ["draw", "sha"];
+			const players = [player.storage["olfengji_" + list[0]] || 0, player.storage["olfengji_" + list[1]] || 0];
+			const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
+			for (let i = 0; i <= 1; i++) {
+				const skill = "olfengji_" + list[i];
+				if (!players[i]) target.removeSkill(skill);
+				else {
+					target.addTempSkill(skill, "roundStart");
+					target.storage[skill] = players[i];
+					target.markSkill(skill);
+				}
+				if (!targets[i]) player.removeSkill(skill);
+				else {
+					player.addTempSkill(skill, "roundStart");
+					player.storage[skill] = targets[i];
+					player.markSkill(skill);
+				}
+			}
+			game.log(player, "与", target, "交换了", "#g【丰积】", "的数值");
+			player.tempBanSkill("olxuanhui", "dieAfter");
 		},
 	},
 	//朱灵

@@ -66,7 +66,7 @@ const characters = {
 	qinghegongzhu: ["female", "wei", 3, ["zengou", "qhzhangji"]],
 	fanjiangzhangda: ["male", "wu", 4, ["yuanchou", "juesheng"]],
 	tianyu: ["male", "wei", 4, ["saodi", "zhuitao"]],
-	ol_chendeng: ["male", "qun", 4, ["olfengji"]],
+	ol_chendeng: ["male", "qun", 4, ["olfengji", "olxuanhui"]],
 	ol_zhuling: ["male", "wei", 4, ["jixian"]],
 	wuyan: ["male", "wu", 4, ["lanjiang"]],
 	sp_ol_zhanghe: ["male", "qun", 4, ["spolzhouxuan"]],
