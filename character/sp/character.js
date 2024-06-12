@@ -1,4 +1,5 @@
 const characters = {
+	mawan: ["male", "qun", 4, ["mashu", "olhunjiang"]],
 	ol_jiangwan: ["male", "shu", 3, ["olziruo", "olxvfa"]],
 	caimao: ["male", "wei", 4, ["olzuolian", "oljingzhou"]],
 	ol_peixiu: ["male", "jin", 4, ["olmaozhu", "oljinlan"]],
