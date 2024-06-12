@@ -220,7 +220,8 @@ const skills = {
 		async content(event, trigger, player) {
 			let targets = event.targets.sortBySeat();
 			//处理问题
-			let answer = [],
+			let answer_ok = false,
+				answered = targets.slice(),
 				gaifa = targets.slice(); //该罚
 			let question = [];
 			const sentences = _status.lisao_text.randomGets(2).randomSort();
@@ -245,9 +246,18 @@ const skills = {
 			if (humans.length > 0) {
 				const solve = function (resolve, reject) {
 					return function (result, player) {
-						if (result && result.control) {
+						if (result && result.control && !answer_ok) {
 							resolve();
-							answer.push([player, result.control]);
+							answered.remove(player);
+							if (result.control == sentences[0].split("，")[1 - goon]) {
+								player.popup("回答正确", "wood");
+								game.log(player, "回答正确");
+								answer_ok = true;
+								gaifa.remove(player);
+							} else {
+								player.popup("回答错误", "fire");
+								game.log(player, "回答错误");
+							}
 						} else reject();
 					};
 				};
@@ -262,7 +272,7 @@ const skills = {
 								const solver = solve(resolve, reject);
 								if (_status.connectMode) game.me.wait(solver);
 								const result = await next.forResult();
-								if (_status.connectMode) game.me.unwait(result, current);
+								if (_status.connectMode && !answer_ok) game.me.unwait(result, current);
 								else solver(result, current);
 							}
 						});
@@ -271,45 +281,41 @@ const skills = {
 				game.broadcastAll("cancel", eventId);
 			}
 			//再处理单机的他人控制玩家/AI玩家
-			if (locals.length > 0) {
-				for (let current of locals) {
+			if (!answer_ok && locals.length > 0) {
+				for (const current of locals) {
 					const result = await lib.skill.dclisao.chooseControl(question, current).forResult();
 					if (result && result.control) {
-						answer.push([current, result.control]);
+						answered.remove(current);
+						if (result.control == sentences[0].split("，")[1 - goon]) {
+							current.popup("回答正确", "wood");
+							game.log(current, "回答正确");
+							answer_ok = true;
+							gaifa.remove(current);
+							break;
+						} else {
+							current.popup("回答错误", "fire");
+							game.log(current, "回答错误");
+						}
 					}
 				}
 			}
 			//清除读条
 			delete event._global_waiting;
-			for (let i of targets) i.hideTimer();
-			//处理结果
-			if (answer.length) {
-				let show = false;
-				for (const list of answer) {
-					list[0].chat(list[1]);
-					game.log(list[0], "的答案为", "#y" + list[1]);
-					if (list[1] == sentences[0].split("，")[1 - goon]) {
-						list[0].popup("回答正确", "wood");
-						game.log(list[0], "回答正确");
-						if (!show) {
-							show = true;
-							if (list[0].countCards("h")) {
-								await list[0].showHandcards();
-							}
-							gaifa.remove(list[0]);
-						}
-					} else {
-						list[0].popup("回答错误", "fire");
-						game.log(list[0], "回答错误");
-					}
+			for (const i of targets) {
+				i.hideTimer();
+				if (answered.includes(i)) {
+					i.popup("未回答");
+					game.log(i, "未进行回答");
 				}
-				await game.asyncDelay();
 			}
+			await game.asyncDelay();
+			//处理结果
 			if (gaifa.length) {
 				for (const i of gaifa) {
 					i.addTempSkill("dclisao_gaifa");
 					i.markAuto("dclisao_gaifa", [player]);
 				}
+				await game.asyncDelay();
 			}
 		},
 		chooseControl(question, current, eventId) {
