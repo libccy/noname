@@ -52,7 +52,7 @@ const skills = {
 							}
 						}
 						if (list.includes(SUB)) {
-							if (att > 0 && attSource > 0) return SUB;
+							if (att > 0 && attSource >= 0) return SUB;
 							if (canFilterDamage && att > 0) return "cancel2";
 							if (damageEff > 0) {
 								if (target.getHp() > trigger.num && attSource > 0 && source.countCards("h") + source.getHp() <= 4) return SUB;
@@ -60,13 +60,13 @@ const skills = {
 								if (att > 0) {
 									if (trigger.num >= target.getHp()) return SUB;
 									if (
-										!source.countCards("hs", card => {
+										souce && !source.countCards("hs", card => {
 											return source.canUse(card, target, true) && get.effect(target, card, source, player) > 0;
 										})
 									)
 										return Math.random() < 0.7 ? ADD : "cancel2";
 								} else {
-									if (attSource > 0) return SUB;
+									if (attSource >= 0) return SUB;
 									if (target.hasSkillTag("maixie") && trigger.num === 1 && damageEff < -20) return SUB;
 								}
 							}

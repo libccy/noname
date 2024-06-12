@@ -15,7 +15,7 @@ export default {
 	"#twxiayong2": "这般身手，也敢来战我？",
 	"#tw_wenchou:die": "黄泉路上，你我兄弟亦不可独行……",
 	"#twqiaosi1": "身居长位，犹处峭崖之巅。",
-	"#twqiaosi2": "为长而不得承嗣，岂有善种乎？",
+	"#twqiaosi2": "为长而不得承嗣，岂有善终乎？",
 	"#twbaizu1": "今袁氏之事，岂独因我？",
 	"#twbaizu2": "长幼之序不明，何惜操戈以正！",
 	"#tw_yuantan:die": "咄，儿过我，必使富贵。呃……！",

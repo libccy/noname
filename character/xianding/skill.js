@@ -464,7 +464,7 @@ const skills = {
 						if (result.links.includes(0)) await player.draw(result.links.filter(count => count == 0).length);
 						if (result.links.includes(1)) {
 							for (const target of trigger.targets || []) {
-								target.addTempSkill("fengyin");
+								target.addTempSkill("dcsbwuwei_fengyin");
 							}
 						}
 						if (result.links.includes(2)) {
@@ -482,6 +482,9 @@ const skills = {
 				charlotte: true,
 				onremove: true,
 				intro: { content: "本回合〖武威〗可发动次数+#" },
+			},
+			fengyin: {
+				inherit: "fengyin",
 			},
 		},
 	},
@@ -1113,7 +1116,7 @@ const skills = {
 			effect: {
 				audio: "dcfenhui",
 				trigger: {
-					global: ["damageBegin2","die"],
+					global: ["damageBegin1","die"],
 				},
 				filter(event, player) {
 					return event.player.hasMark("dcfenhui_mark");

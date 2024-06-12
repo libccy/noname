@@ -92,7 +92,17 @@ const skills = {
 		forced: true,
 		ruleSkill: true,
 		async content(event, trigger, player) {
-			const targets = await player.chooseTarget("请选择你的“同心”角色", lib.filter.notMe).forResultTargets();
+			const beOfOneHeartLimit = player.storage.beOfOneHeartLimit || 1;
+			const targets = await player.chooseTarget("请选择你的“同心”角色", lib.filter.notMe, [1, beOfOneHeartLimit]).set("ai", function (target) {
+				const aiCheck = lib.skill.beOfOneHeart.aiCheck.slice();
+				let eff = 0;
+				while (aiCheck.length) {
+					const func = aiCheck.shift();
+					if (typeof func !== "function") continue;
+					eff += func.apply(this, arguments);
+				}
+				return eff;
+			}).forResultTargets();
 			if (!targets || !targets.length) return;
 			player.line(targets, "green");
 			game.log(player, "选择了", targets, "作为自己的同心角色");
@@ -109,6 +119,11 @@ const skills = {
 			await game.asyncDelayx();
 		},
 		marktext: "❤",
+		aiCheck: [
+			target => {
+				return get.attitude(get.player(), target);
+			},
+		],
 		intro: {
 			name: "同心",
 			content(_, player) {
