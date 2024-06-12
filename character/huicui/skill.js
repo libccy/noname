@@ -1580,63 +1580,62 @@ const skills = {
 		filter(event, player) {
 			if (!event.isFirstTarget) return false;
 			if (get.type(event.card) !== "trick") return false;
-			return true;
+			if (!player.hasSkill(`dcyingshi_choice1`)) return true;
+			return !player.hasSkill(`dcyingshi_choice2`) && player.countCards("e");
 		},
-		direct: true,
-		async content(event, trigger, player) {
-			const result = await player
+		async cost(event, trigger, player) {
+			let prompt2 = "令一名目标角色",
+				str = get.translation(trigger.card);
+			const goon1 = !player.hasSkill(`dcyingshi_choice1`),
+				goon2 = !player.hasSkill(`dcyingshi_choice2`) && player.countCards("e");
+			if (goon1 && goon2) prompt2 += "选择一项：①";
+			if (goon2) {
+				prompt2 += "弃置" + get.cnNumber(player.countCards("e")) + "张牌，令" + str + "对其无效";
+				prompt2 += goon1 ? "；②" : "。";
+			}
+			if (goon1) prompt2 += "于此牌结算完毕后视为其使用一张同名牌。";
+			event.result = await player
 				.chooseTarget()
 				.set("prompt", get.prompt("dcyingshi"))
-				.set("prompt2", `令其中一名角色选择本回合未被选择过的一项：⒈令你于此牌结算结束后视为对其使用一张${get.translation(trigger.card.name)}；⒉弃置${get.cnNumber(player.countCards("e"))}张牌，此牌对其无效。`)
+				.set("prompt2", prompt2)
 				.set("filterTarget", (card, player, target) => {
-					return get.event("targets").includes(target);
+					return get.event().getTrigger().targets.includes(target);
 				})
-				.set("targets", trigger.targets)
-				.set(
-					"toFriends",
-					(() => {
-						const isPositive = trigger.targets.some(current => {
-								return get.effect(current, trigger.card, trigger.player, player) > 0;
-							}),
-							isNegative = trigger.targets.some(current => {
-								return get.effect(current, trigger.card, trigger.player, player) < -5;
-							});
-						if ((player.hasSkill("dcyingshi_choice1") || player.countCards("e") < 2) && isNegative) return true;
-						if (!player.hasSkill("dcyingshi_choice1") && ((get.tag(trigger.card, "norepeat") && isNegative) || isPositive)) return true;
-						return false;
-					})()
-				)
 				.set("ai", target => {
 					const player = get.player(),
-						count = player.countCards("e"),
+						trigger = get.event().getTrigger(),
 						att = get.attitude(player, target);
-					if (att > 0 && get.event("toFriends")) {
-						if (target.countCards("he", card => get.value(card) < 5) < count) return 0;
-						return att;
+					const goon1 = !player.hasSkill(`dcyingshi_choice1`),
+						goon2 = !player.hasSkill(`dcyingshi_choice2`) && player.countCards("e");
+					const effect = get.effect(target, trigger.card, player, player);
+					if (effect == 0 || att == 0) return 0;
+					if (effect > 0) {
+						if (att > 0 && goon1) return att;
+						return 0;
 					}
-					if (player.hasSkill("dcyingshi_choice1") && !count) return 0;
-					return -get.attitude(player, target);
+					if (att < 0 && !goon1) return -att;
+					if (att > 0 && !goon2) return att;
+					return 0;
 				})
 				.forResult();
-			if (!result.bool) return;
-			const target = result.targets[0];
-			player.logSkill("dcyingshi", target);
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0],
+				count = player.countCards("e");
+			const goon1 = !player.hasSkill(`dcyingshi_choice1`),
+				goon2 = !player.hasSkill(`dcyingshi_choice2`) && count > 0;
 			let bool;
-			if (!player.hasSkill(`dcyingshi_choice2`)) {
-				const count = player.countCards("e"),
-					forced = player.hasSkill("dcyingshi_choice1");
-				if (count > 0) {
-					const prompt = `###${get.translation(player)}对你发动了【应时】###${forced ? "请" : "是否"}弃置${get.cnNumber(count)}张牌，令${get.translation(trigger.card)}对你无效${forced ? "。" : "？或点击“取消”，令其与此牌结算后视为对你使用一张同名牌。"}`;
-					bool = await target
-						.chooseToDiscard(prompt, count, forced, "he")
-						.set("ai", card => {
-							if (get.event("goon")) return 5.5 - get.value(card);
-							return 0;
-						})
-						.set("goon", !get.tag(trigger.card, "norepeat") && get.effect(target, trigger.card, trigger.player, target) < -5)
-						.forResultBool();
-				} else bool = false;
-			} else bool = player.hasSkill("dcyingshi_choice1");
+			if (goon2) {
+				const prompt = `###${get.translation(player)}对你发动了【应时】###${!goon1 ? "请" : "是否"}弃置${get.cnNumber(count)}张牌，令${get.translation(trigger.card)}对你无效${!goon1 ? "。" : "？或点击“取消”，令其与此牌结算后视为对你使用一张同名牌。"}`;
+				bool = await target
+					.chooseToDiscard(prompt, count, !goon1, "he")
+					.set("ai", card => {
+						if (get.event("goon")) return 15 - get.value(card);
+						return 0;
+					})
+					.set("goon", !get.tag(trigger.card, "norepeat") && get.effect(target, trigger.card, trigger.player, target) < 0)
+					.forResultBool();
+			} else bool = false;
 			if (bool) {
 				trigger.excluded.add(target);
 			} else {
