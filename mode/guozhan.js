@@ -202,6 +202,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					translate: lib.translate[game.players[i].name],
 					name1: players[i].name1,
 					name2: players[i].name2,
+					nickname: players[i].node.nameol.innerHTML,
 				});
 			}
 			(_status.videoInited = true), game.addVideo("init", null, info);
