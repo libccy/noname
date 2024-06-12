@@ -220,7 +220,7 @@ const skills = {
 		async content(event, trigger, player) {
 			let targets = event.targets.sortBySeat();
 			//处理问题
-			let answer_ok = false,
+			let answer_ok = undefined,
 				answered = targets.slice(),
 				gaifa = targets.slice(); //该罚
 			let question = [];
@@ -252,7 +252,7 @@ const skills = {
 							if (result.control == sentences[0].split("，")[1 - goon]) {
 								player.popup("回答正确", "wood");
 								game.log(player, "回答正确");
-								answer_ok = true;
+								answer_ok = player;
 								gaifa.remove(player);
 							} else {
 								player.popup("回答错误", "fire");
@@ -289,7 +289,7 @@ const skills = {
 						if (result.control == sentences[0].split("，")[1 - goon]) {
 							current.popup("回答正确", "wood");
 							game.log(current, "回答正确");
-							answer_ok = true;
+							answer_ok = current;
 							gaifa.remove(current);
 							break;
 						} else {
@@ -310,6 +310,7 @@ const skills = {
 			}
 			await game.asyncDelay();
 			//处理结果
+			if (answer_ok && answer_ok.countCards("h")) await answer_ok.showHandcards();
 			if (gaifa.length) {
 				for (const i of gaifa) {
 					i.addTempSkill("dclisao_gaifa");
