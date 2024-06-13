@@ -41,7 +41,7 @@ const skills = {
 				if (cards && cards.length) count += cards.length;
 			}
 			if (count < 2) return;
-			await game.asyncDraw(targets);
+			await game.asyncDraw(targets, 2);
 			await game.asyncDelay();
 			targets.unshift(player);
 			for (const current of targets) {
