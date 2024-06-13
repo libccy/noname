@@ -174,13 +174,22 @@ export async function boot() {
 	}).then(onWindowReady.bind(window));
 
 	// 闭源客户端检测并提醒
-	if (
-		lib.assetURL.includes("com.widget.noname.qingyao") ||
-		lib.assetURL.includes("online.nonamekill.android")
-	) {
-		alert(
-			"您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。"
-		);
+	if (typeof window.NonameAndroidBridge == 'object') {
+		if (["com.widget.noname.qingyao", "online.nonamekill.android"]
+			.some(packageName => window.NonameAndroidBridge.getPackageName().includes(packageName))) {
+			alert(
+				"您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。"
+			);
+		}
+	} else {
+		if (
+			lib.assetURL.includes("com.widget.noname.qingyao") ||
+			lib.assetURL.includes("online.nonamekill.android")
+		) {
+			alert(
+				"您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。"
+			);
+		}
 	}
 
 	// Electron平台
@@ -546,7 +555,7 @@ export async function boot() {
 					html`
 						<div
 							style="position: relative;width:50px;height:50px;border-radius:50px;background-image:url('${description
-								.author.avatar_url}');background-size:cover;vertical-align:middle;"
+							.author.avatar_url}');background-size:cover;vertical-align:middle;"
 						></div>
 						${description.author.login}于${description.published_at}发布
 					`.trim(),
@@ -810,18 +819,18 @@ function initSheet(libConfig) {
 		}
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
 			'#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("' +
-				lib.assetURL +
-				"theme/style/player/" +
-				bstyle +
-				'1.png")}',
+			lib.assetURL +
+			"theme/style/player/" +
+			bstyle +
+			'1.png")}',
 			0
 		);
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
 			'#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("' +
-				lib.assetURL +
-				"theme/style/player/" +
-				bstyle +
-				'3.png")}',
+			lib.assetURL +
+			"theme/style/player/" +
+			bstyle +
+			'3.png")}',
 			0
 		);
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
@@ -850,14 +859,14 @@ function initSheet(libConfig) {
 		if (libConfig.control_style == "wood") {
 			Reflect.get(ui, "css").control_stylesheet = lib.init.sheet(
 				"#window .control,#window .menubutton,#window #system>div>div,#window #system>div>.pressdown2{background-image:" +
-					str +
-					"}"
+				str +
+				"}"
 			);
 		} else {
 			Reflect.get(ui, "css").control_stylesheet = lib.init.sheet(
 				"#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:" +
-					str +
-					"}"
+				str +
+				"}"
 			);
 		}
 	}
@@ -966,7 +975,7 @@ async function loadCss() {
  * @deprecated
  * @return {Promise<void>}
  */
-async function onWindowReady() {}
+async function onWindowReady() { }
 
 function setBackground() {
 	let htmlbg = localStorage.getItem(lib.configprefix + "background");
@@ -1028,11 +1037,10 @@ async function setOnError() {
 			const winPath = window.__dirname
 				? "file:///" + (__dirname.replace(new RegExp("\\\\", "g"), "/") + "/")
 				: "";
-			let str = `错误文件: ${
-				typeof src == "string"
-					? decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
-					: "未知文件"
-			}`;
+			let str = `错误文件: ${typeof src == "string"
+				? decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
+				: "未知文件"
+				}`;
 			str += `\n错误信息: ${msg}`;
 			const tip = lib.getErrorTip(msg);
 			if (tip) str += `\n错误提示: ${tip}`;
