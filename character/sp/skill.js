@@ -2,6 +2,156 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//马玩
+	olhunjiang: {
+		audio: 2,
+		enable: "phaseUse",
+		filter(event, player) {
+			return game.hasPlayer(target => lib.skill.olhunjiang.filterTarget(null, player, target));
+		},
+		filterTarget(card, player, target) {
+			return target != player && player.inRange(target);
+		},
+		usable: 1,
+		selectTarget: [1, Infinity],
+		multitarget: true,
+		multiline: true,
+		async content(event, trigger, player) {
+			const targets = event.targets.sortBySeat();
+			let answer_result = [[], []];
+			let humans = targets.filter(current => current === game.me || current.isOnline());
+			let locals = targets.slice(0).randomSort();
+			locals.removeArray(humans);
+			const eventId = get.id();
+			const send = (question, current, eventId) => {
+				lib.skill.dclisao.chooseControl(question, current, eventId);
+				game.resume();
+			};
+			event._global_waiting = true;
+			let time = 10000;
+			if (lib.configOL && lib.configOL.choose_timeout) time = parseInt(lib.configOL.choose_timeout) * 1000;
+			targets.forEach(current => current.showTimer(time));
+			if (humans.length > 0) {
+				const solve = function (resolve, reject) {
+					return function (result, player) {
+						if (result && typeof result.index == "number") {
+							resolve();
+							answer_result[result.index].push(player);
+						} else reject();
+					};
+				};
+				await Promise.any(
+					humans.map(current => {
+						return new Promise(async (resolve, reject) => {
+							if (current.isOnline()) {
+								current.send(send, question, current, eventId);
+								current.wait(solve(resolve, reject));
+							} else {
+								const next = lib.skill.olhunjiang.chooseControl(current, player, eventId);
+								const solver = solve(resolve, reject);
+								if (_status.connectMode) game.me.wait(solver);
+								const result = await next.forResult();
+								if (_status.connectMode) game.me.unwait(result, current);
+								else solver(result, current);
+							}
+						});
+					})
+				).catch(() => {});
+				game.broadcastAll("cancel", eventId);
+			}
+			if (locals.length > 0) {
+				for (const current of locals) {
+					const result = await lib.skill.olhunjiang.chooseControl(current, player).forResult();
+					if (result && typeof result.index == "number") {
+						answer_result[result.index].push(current);
+					}
+				}
+			}
+			delete event._global_waiting;
+			for (const i of targets) {
+				i.hideTimer();
+				i.addExpose(0.05);
+				i.popup(answer_result[0].includes(i) ? "成为目标" : "令其摸牌");
+				game.log(i, "选择了", "#y" + (answer_result[0].includes(i) ? "成为目标" : "令其摸牌"));
+			}
+			await game.asyncDelay();
+			if (answer_result[0].length) {
+				answer_result[0].sortBySeat();
+				player.addTempSkill("olhunjiang_addTarget");
+				player.markAuto("olhunjiang_addTarget", answer_result[0]);
+				if (!answer_result[1].length) {
+					await player.draw(answer_result[0].length);
+				}
+			}
+			if (answer_result[1].length) {
+				answer_result[1].sortBySeat();
+				await player.draw(answer_result[1].length);
+				if (!answer_result[0].length) {
+					player.addTempSkill("olhunjiang_addTarget");
+					player.markAuto("olhunjiang_addTarget", answer_result[1]);
+				}
+			}
+		},
+		ai: {
+			order(_, player) {
+				return get.order({ name: "sha" }, player) + 1;
+			},
+			result: {
+				target(player, target) {
+					return get.sgn(get.sgn(get.attitude(player, target)) + 0.5);
+				},
+			},
+		},
+		chooseControl(player, source, eventId) {
+			const str = get.translation(source);
+			return player
+				.chooseControl("成为目标", "令其摸牌")
+				.set("prompt", "###" + str + "对你发动了【浑疆】，请选择一项" + '###<div class="text center">若所有角色选择了同一项，则所有角色也执行另一项</div>')
+				.set("choiceList", ["令" + str + "本阶段使用【杀】可以额外指定你为目标", "令" + str + "摸一张牌"])
+				.set("source", source)
+				.set("id", eventId)
+				.set("_global_waiting", true)
+				.set("ai", () => Math.max(0, get.sgn(get.attitude(get.event().player, get.event().source))));
+		},
+		subSkill: {
+			addTarget: {
+				charlotte: true,
+				onremove: true,
+				intro: { content: "本阶段使用【杀】可以额外指定$为目标" },
+				trigger: { player: "useCard2" },
+				filter(event, player) {
+					if (event.card.name != "sha") return false;
+					return game.hasPlayer(target => {
+						if (!player.getStorage("olhunjiang_addTarget").includes(target)) return false;
+						return !event.targets.includes(target) && lib.filter.targetEnabled2(event.card, player, target) && lib.filter.targetInRange(event.card, player, target);
+					});
+				},
+				async cost(event, trigger, player) {
+					event.result = await player
+						.chooseTarget(
+							get.prompt("olhunjiang_addTarget"),
+							"令任意名【浑疆】选择成为额外目标的角色成为" + get.translation(trigger.card) + "的目标",
+							(card, player, target) => {
+								if (!player.getStorage("olhunjiang_addTarget").includes(target)) return false;
+								const event = get.event().getTrigger();
+								return !event.targets.includes(target) && lib.filter.targetEnabled2(event.card, player, target) && lib.filter.targetInRange(event.card, player, target);
+							},
+							[1, Infinity]
+						)
+						.set("ai", target => {
+							const player = get.event("player"),
+								event = get.event().getTrigger();
+							return get.effect(target, event.card, player);
+						})
+						.forResult();
+				},
+				async content(event, trigger, player) {
+					trigger.targets.addArray(event.targets);
+					game.log(event.targets, "成为了", trigger.card, "的额外目标");
+				},
+			},
+		},
+	},
 	//蒋琬
 	olziruo: {
 		audio: 2,
@@ -12962,31 +13112,39 @@ const skills = {
 	//生鱼片
 	olfengji: {
 		audio: 2,
-		trigger: { player: "phaseDrawBegin2" },
+		trigger: { global: "roundStart" },
 		forced: true,
 		locked: false,
-		filter: function (event, player) {
-			return !player.numFixed;
-		},
 		content: function () {
 			"step 0";
 			player
-				.chooseTarget("丰积：请选择增加摸牌的目标", "令自己本回合的额定摸牌数-1，且目标下回合的额定摸牌数+2。或者点击「取消」，令自己的额定摸牌数+1", lib.filter.notMe)
+				.chooseTarget("丰积：请选择增加摸牌的目标", "令自己本轮摸牌阶段的额定摸牌数-1，且目标本轮摸牌阶段的额定摸牌数+2。或者点击「取消」，令自己本轮摸牌阶段的额定摸牌数+1", lib.filter.notMe)
 				.set("ai", function (target) {
 					var player = _status.event.player;
-					if (target.hasJudge("lebu") || target.hasJudge("bingliang")) return 0;
 					var att = get.attitude(player, target),
 						dist = get.distance(player, target, "absolute");
-					if (_status.event.goon) {
+					if (att > 0) {
+						if (target.hasJudge("lebu") || target.hasJudge("bingliang")) return 0;
+						if (_status.event.goon) {
+							return att / dist;
+						}
+						if (
+							game.countPlayer(function (current) {
+								return current != player && current != target && get.attitude(player, current) < 0 && get.distance(player, current, "absolute") < dist;
+							}) >= target.hp
+						)
+							return 0;
 						return att / dist;
 					}
-					if (
-						game.countPlayer(function (current) {
-							return current != player && current != target && get.attitude(player, current) < 0 && get.distance(player, current, "absolute") < dist;
-						}) >= target.hp
-					)
-						return 0;
-					return att / dist;
+					if (player.hasSkill("olxuanhui", null, null, false) && !player.isTempBanned("olxuanhui") && att < 0) {
+						const first = get.event().getTrigger().player,
+							list = ["draw", "sha"];
+						if (first == player || get.distance(player, first, "absolute") > dist) {
+							const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
+							return 1 + targets.reduce((sum, num) => sum + num, 0);
+						}
+					}
+					return 0;
 				})
 				.set("goon", player.skipList.includes("lebu"));
 			"step 1";
@@ -12997,17 +13155,25 @@ const skills = {
 				player.storage.olfengji_draw--;
 				if (!target.storage.olfengji_draw) target.storage.olfengji_draw = 0;
 				target.storage.olfengji_draw += 2;
-				target.addTempSkill("olfengji_draw", { player: "phaseAfter" });
+				target.addTempSkill("olfengji_draw", "roundStart");
 				target.markSkill("olfengji_draw");
 			} else {
 				player.storage.olfengji_draw++;
 			}
-			player.addTempSkill("olfengji_draw");
+			player.addTempSkill("olfengji_draw", "roundStart");
 			player.markSkill("olfengji_draw");
 			"step 2";
-			player.chooseTarget("丰积：请选择增加使用杀次数的目标", "令自己本回合使用杀的次数上限-1，且目标下回合使用杀的次数上限+2。或者点击「取消」，令自己使用杀的次数上限+1", lib.filter.notMe).set("ai", function (target) {
+			player.chooseTarget("丰积：请选择增加使用杀次数的目标", "令自己本轮使用杀的次数上限-1，且目标本轮使用杀的次数上限+2。或者点击「取消」，令自己本轮使用杀的次数上限+1", lib.filter.notMe).set("ai", function (target) {
 				var player = _status.event.player;
-				if (target.countMark("olfengji_draw") > 0 && target.getCardUsable("sha") < 2) return get.attitude(player, target);
+				if (target.countMark("olfengji_draw") > 0 && target.getCardUsable("sha") < 2 && get.attitude(player, target) > 0) return get.attitude(player, target);
+				if (player.hasSkill("olxuanhui", null, null, false) && !player.isTempBanned("olxuanhui") && get.attitude(player, target) < 0) {
+					const first = get.event().getTrigger().player,
+						list = ["draw", "sha"];
+					if (first == player || get.distance(player, first, "absolute") > get.distance(player, target, "absolute")) {
+						const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
+						return 1 + targets.reduce((sum, num) => sum + num, 0);
+					}
+				}
 				return 0;
 			});
 			"step 3";
@@ -13018,12 +13184,12 @@ const skills = {
 				player.storage.olfengji_sha--;
 				if (!target.storage.olfengji_sha) target.storage.olfengji_sha = 0;
 				target.storage.olfengji_sha += 2;
-				target.addTempSkill("olfengji_sha", { player: "phaseAfter" });
+				target.addTempSkill("olfengji_sha", "roundStart");
 				target.markSkill("olfengji_sha");
 			} else {
 				player.storage.olfengji_sha++;
 			}
-			player.addTempSkill("olfengji_sha");
+			player.addTempSkill("olfengji_sha", "roundStart");
 			player.markSkill("olfengji_sha");
 		},
 		subSkill: {
@@ -13058,6 +13224,67 @@ const skills = {
 					trigger.num += player.storage.olfengji_draw;
 				},
 			},
+		},
+	},
+	olxuanhui: {
+		audio: 2,
+		trigger: { player: "phaseZhunbeiBegin" },
+		filter(event, player) {
+			const list = ["draw", "sha"];
+			return game.hasPlayer(target => {
+				if (target == player) return false;
+				const players = [player.storage["olfengji_" + list[0]] || 0, player.storage["olfengji_" + list[1]] || 0];
+				const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
+				return players[0] != targets[0] || players[1] != targets[1];
+			});
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt("olxuanhui"), "与一名其他角色交换〖丰积〗效果", (card, player, target) => {
+					const list = ["draw", "sha"];
+					if (target == player) return false;
+					const players = [player.storage["olfengji_" + list[0]] || 0, player.storage["olfengji_" + list[1]] || 0];
+					const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
+					return players[0] != targets[0] || players[1] != targets[1];
+				})
+				.set("ai", target => {
+					const player = get.event().player,
+						list = ["draw", "sha"];
+					return get.sgn(get.attitude(player, target)) * (
+						list.reduce((sum, skill) => {
+							if (typeof player.storage["olfengji_" + skill] == "number") sum += player.storage["olfengji_" + skill];
+							return sum;
+						}, 0) -
+						list.reduce((sum, skill) => {
+							if (typeof target.storage["olfengji_" + skill] == "number") sum += target.storage["olfengji_" + skill];
+							return sum;
+						}, 0)
+					);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0],
+				list = ["draw", "sha"];
+			const players = [player.storage["olfengji_" + list[0]] || 0, player.storage["olfengji_" + list[1]] || 0];
+			const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
+			for (let i = 0; i <= 1; i++) {
+				const skill = "olfengji_" + list[i];
+				if (!players[i]) target.removeSkill(skill);
+				else {
+					target.addTempSkill(skill, "roundStart");
+					target.storage[skill] = players[i];
+					target.markSkill(skill);
+				}
+				if (!targets[i]) player.removeSkill(skill);
+				else {
+					player.addTempSkill(skill, "roundStart");
+					player.storage[skill] = targets[i];
+					player.markSkill(skill);
+				}
+			}
+			game.log(player, "与", target, "交换了", "#g【丰积】", "的数值");
+			player.tempBanSkill("olxuanhui", "dieAfter");
 		},
 	},
 	//朱灵
