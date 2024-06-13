@@ -25,6 +25,7 @@ import { updateURLs } from "./update-urls.js";
 import { defaultHooks } from "./hooks/index.js";
 import { freezeButExtensible } from "../util/index.js";
 import security from "../util/security.js";
+import { ErrorManager } from "../util/error.js";
 
 export class Library {
 	configprefix = "noname_0.9_";
@@ -13027,11 +13028,16 @@ export class Library {
 				});
 			},
 			exec: function (func) {
-				var key = game.onlineKey;
+				const key = game.onlineKey;
 				if (typeof func == "function") {
-					var args = Array.from(arguments);
+					const { Domain } = security.importSandbox();
+					// 被封送的函数额外间隔了三层调用栈
+					const level = (!Domain || Domain.current.isFrom(func)) ? 0 : 3;
+					const args = Array.from(arguments);
 					args.shift();
-					func.apply(this, args);
+					ErrorManager.errorHandle(() => {
+						func.apply(this, args);
+					}, func, level);
 				}
 				if (key) {
 					game.onlineKey = key;

@@ -1031,70 +1031,70 @@ async function setOnError() {
 
 	window.onerror = function (msg, src, line, column, err) {
 		if (promiseErrorHandler.onErrorPrepare) promiseErrorHandler.onErrorPrepare();
-		const errorReporter = ErrorManager.getErrorReporter(err);
-		if (errorReporter) game.print(errorReporter.report("沙盒内部执行的代码出现错误"));
-		else {
-			const winPath = window.__dirname
-				? "file:///" + (__dirname.replace(new RegExp("\\\\", "g"), "/") + "/")
-				: "";
-			let str = `错误文件: ${typeof src == "string"
+		const winPath = window.__dirname
+			? "file:///" + (__dirname.replace(new RegExp("\\\\", "g"), "/") + "/")
+			: "";
+		let str = `错误文件: ${typeof src == "string"
 				? decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
 				: "未知文件"
-				}`;
-			str += `\n错误信息: ${msg}`;
-			const tip = lib.getErrorTip(msg);
-			if (tip) str += `\n错误提示: ${tip}`;
-			str += `\n行号: ${line}`;
-			str += `\n列号: ${column}`;
-			const version = typeof lib.version != "undefined" ? lib.version : "";
-			const reg = /[^\d.]/;
-			const match = version.match(reg) != null;
-			str += "\n" + `${match ? "游戏" : "无名杀"}版本: ${version || "未知版本"}`;
-			if (match)
-				str +=
-					"\n⚠️您使用的游戏代码不是源于libccy/noname无名杀官方仓库，请自行寻找您所使用的游戏版本开发者反馈！";
-			if (_status && _status.event) {
-				let evt = _status.event;
-				str += `\nevent.name: ${evt.name}\nevent.step: ${evt.step}`;
-				// @ts-ignore
-				if (evt.parent)
-					str += `\nevent.parent.name: ${evt.parent.name}\nevent.parent.step: ${evt.parent.step}`;
-				// @ts-ignore
-				if (evt.parent && evt.parent.parent)
-					str += `\nevent.parent.parent.name: ${evt.parent.parent.name}\nevent.parent.parent.step: ${evt.parent.parent.step}`;
-				if (evt.player || evt.target || evt.source || evt.skill || evt.card) {
-					str += "\n-------------";
-				}
-				if (evt.player) {
-					if (lib.translate[evt.player.name])
-						str += `\nplayer: ${lib.translate[evt.player.name]}[${evt.player.name}]`;
-					else str += "\nplayer: " + evt.player.name;
-					let distance = get.distance(_status.roundStart, evt.player, "absolute");
-					if (distance != Infinity) {
-						str += `\n座位号: ${distance + 1}`;
-					}
-				}
-				if (evt.target) {
-					if (lib.translate[evt.target.name])
-						str += `\ntarget: ${lib.translate[evt.target.name]}[${evt.target.name}]`;
-					else str += "\ntarget: " + evt.target.name;
-				}
-				if (evt.source) {
-					if (lib.translate[evt.source.name])
-						str += `\nsource: ${lib.translate[evt.source.name]}[${evt.source.name}]`;
-					else str += "\nsource: " + evt.source.name;
-				}
-				if (evt.skill) {
-					if (lib.translate[evt.skill]) str += `\nskill: ${lib.translate[evt.skill]}[${evt.skill}]`;
-					else str += "\nskill: " + evt.skill;
-				}
-				if (evt.card) {
-					if (lib.translate[evt.card.name])
-						str += `\ncard: ${lib.translate[evt.card.name]}[${evt.card.name}]`;
-					else str += "\ncard: " + evt.card.name;
+			}`;
+		str += `\n错误信息: ${msg}`;
+		const tip = lib.getErrorTip(msg);
+		if (tip) str += `\n错误提示: ${tip}`;
+		str += `\n行号: ${line}`;
+		str += `\n列号: ${column}`;
+		const version = typeof lib.version != "undefined" ? lib.version : "";
+		const reg = /[^\d.]/;
+		const match = version.match(reg) != null;
+		str += "\n" + `${match ? "游戏" : "无名杀"}版本: ${version || "未知版本"}`;
+		if (match)
+			str +=
+				"\n⚠️您使用的游戏代码不是源于libccy/noname无名杀官方仓库，请自行寻找您所使用的游戏版本开发者反馈！";
+		if (_status && _status.event) {
+			let evt = _status.event;
+			str += `\nevent.name: ${evt.name}\nevent.step: ${evt.step}`;
+			// @ts-ignore
+			if (evt.parent)
+				str += `\nevent.parent.name: ${evt.parent.name}\nevent.parent.step: ${evt.parent.step}`;
+			// @ts-ignore
+			if (evt.parent && evt.parent.parent)
+				str += `\nevent.parent.parent.name: ${evt.parent.parent.name}\nevent.parent.parent.step: ${evt.parent.parent.step}`;
+			if (evt.player || evt.target || evt.source || evt.skill || evt.card) {
+				str += "\n-------------";
+			}
+			if (evt.player) {
+				if (lib.translate[evt.player.name])
+					str += `\nplayer: ${lib.translate[evt.player.name]}[${evt.player.name}]`;
+				else str += "\nplayer: " + evt.player.name;
+				let distance = get.distance(_status.roundStart, evt.player, "absolute");
+				if (distance != Infinity) {
+					str += `\n座位号: ${distance + 1}`;
 				}
 			}
-			str += "\n-------------";
+			if (evt.target) {
+				if (lib.translate[evt.target.name])
+					str += `\ntarget: ${lib.translate[evt.target.name]}[${evt.target.name}]`;
+				else str += "\ntarget: " + evt.target.name;
+			}
+			if (evt.source) {
+				if (lib.translate[evt.source.name])
+					str += `\nsource: ${lib.translate[evt.source.name]}[${evt.source.name}]`;
+				else str += "\nsource: " + evt.source.name;
+			}
+			if (evt.skill) {
+				if (lib.translate[evt.skill]) str += `\nskill: ${lib.translate[evt.skill]}[${evt.skill}]`;
+				else str += "\nskill: " + evt.skill;
+			}
+			if (evt.card) {
+				if (lib.translate[evt.card.name])
+					str += `\ncard: ${lib.translate[evt.card.name]}[${evt.card.name}]`;
+				else str += "\ncard: " + evt.card.name;
+			}
+		}
+		str += "\n-------------";
+		const errorReporter = ErrorManager.getErrorReporter(err);
+		if (errorReporter) game.print(errorReporter.report(str + "\n代码出现错误"));
+		else {
 			if (
 				typeof line == "number" &&
 				(typeof Reflect.get(game, "readFile") == "function" || location.origin != "file://")

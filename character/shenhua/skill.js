@@ -7421,8 +7421,10 @@ const skills = {
 					const type = get.type(i);
 					if (type == "basic" || type == "trick") list.push([type, "", i]);
 					if (i == "sha") {
-						if (event.type != "phase") if (!event.filterCard(get.autoViewAs({ name: i, nature: j }, "unsure"), player, event)) continue;
-						for (const j of lib.inpile_nature) list.push(["基本", "", "sha", j]);
+						for (const j of lib.inpile_nature) {
+							if (event.type != "phase") if (!event.filterCard(get.autoViewAs({ name: i, nature: j }, "unsure"), player, event)) continue;
+							list.push(["基本", "", "sha", j]);
+						}
 					}
 				}
 				return ui.create.dialog("蛊惑", [list, "vcard"]);
