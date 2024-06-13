@@ -7980,7 +7980,7 @@ const skills = {
 		filter: function (event, player, name) {
 			if (player == _status.currentPhase) return name == "logSkill" && event.skill == "dcliying" && player.getExpansions("dcwangyuan").length < game.countPlayer2();
 			if (name == "logSkill") return false;
-			if (player.getExpansions("dcwangyuan").length >= game.countPlayer()) return false;
+			if (player.getExpansions("dcwangyuan").length >= game.countPlayer2()) return false;
 			if (event.name == "gain" && event.player == player) return false;
 			var evt = event.getl(player);
 			return evt && evt.cards2 && evt.cards2.length > 0;

@@ -1147,13 +1147,10 @@ const skills = {
 		trigger: {
 			player: "damageEnd",
 		},
-		direct: true,
-		async content(event, trigger, player) {
-			let num = Math.max(1, player.getDamagedHp());
-			const {
-				result: { bool, targets },
-			} = await player
-				.chooseTarget(get.prompt("sbjieming"), `令一名角色摸四张牌，然后其可以弃置任意张牌。若其弃置的牌数不大于${get.cnNumber(num)}张，你失去1点体力。`)
+		async cost(event, trigger, player) {
+			const num = Math.max(1, player.getDamagedHp());
+			event.result = await player
+				.chooseTarget(get.prompt("sbjieming"), `令一名角色摸四张牌，然后其可以弃置任意张牌。若其弃置的牌数小于${get.cnNumber(num)}张，你失去1点体力。`)
 				.set("ai", target => {
 					if (get.event("nope")) return 0;
 					const player = get.player(),
@@ -1172,24 +1169,25 @@ const skills = {
 					}
 					return att / 3;
 				})
-				.set("nope", player.getHp() + player.countCards("hs", card => player.canSaveCard(card, player)) <= 1 && num > 2);
-			if (!bool) return;
-			const target = targets[0];
-			player.logSkill("sbjieming", target);
+				.set("nope", player.getHp() + player.countCards("hs", card => player.canSaveCard(card, player)) <= 1 && num > 2)
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
 			await target.draw(4);
-			num = Math.max(1, player.getDamagedHp());
+			const num = Math.max(1, player.getDamagedHp());
 			const {
-				result: { bool: bool2, cards },
+				result: { bool: bool, cards },
 			} = await target
-				.chooseToDiscard("节命：是否弃置任意张牌？", `若你本次弃置的牌数不大于${get.cnNumber(num)}张，${get.translation(player)}失去1点体力。`, [1, Infinity], "he")
+				.chooseToDiscard("节命：是否弃置任意张牌？", `若你本次弃置的牌数小于${get.cnNumber(num)}张，${get.translation(player)}失去1点体力。`, [1, Infinity], "he")
 				.set("ai", card => {
 					if (get.event("nope")) return 0;
-					if (ui.selected.cards.length > get.event("num")) return 0;
+					if (ui.selected.cards.length >= get.event("num")) return 0;
 					return 6 - get.value(card);
 				})
 				.set("nope", get.attitude(target, player) * get.effect(player, { name: "losehp" }, player, target) >= 0)
 				.set("num", num);
-			if (!bool2 || cards.length <= num) player.loseHp();
+			if (!bool || cards.length < num) player.loseHp();
 		},
 		ai: {
 			maixie: true,

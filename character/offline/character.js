@@ -1,5 +1,5 @@
 const characters = {
-	yj_ehuan: ["male", "qun", 4, ["psdiwan", "pssuiluan", "psconghan"], ["doublegroup:shu:qun"]],
+	yj_ehuan: ["male", "qun", 5, ["psdiwan", "pssuiluan", "psconghan"], ["doublegroup:shu:qun"]],
 	yj_zhouji: ["female", "wu", 3, ["psyanmou", "pszhanyan", "psyuhuo"]],
 	drag_guanyu: ["male", "shu", 4, ["dragchaojue", "dragjunshen"]],
 	drag_caoren: ["male", "wei", 4, ["draglizhong", "dragjuesui"]],
