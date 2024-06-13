@@ -12,6 +12,7 @@ import { GameEventPromise } from "../element/gameEventPromise.js";
 import { rootURL } from "../../../noname.js";
 
 import security from "../../util/security.js";
+import { CodeSnippet, ErrorManager } from "../../util/error.js";
 
 export class LibInit {
 	/**
@@ -596,7 +597,7 @@ export class LibInit {
 		// 虽然现在 parsex 被控制到了沙盒，
 		// 但是因为默认沙盒还是可以额外操作东西，
 		// 故而对不同的运行域做了区分
-		let [
+		const [
 			ModFunction,
 			ModGeneratorFunction,
 			// ModAsyncFunction,
@@ -611,11 +612,11 @@ export class LibInit {
 			const { Marshal } = security.importSandbox();
 			//Remove all comments
 			//移除所有注释
-			let str = Marshal.decompileFunction(func)
+			const code = Marshal.decompileFunction(func)
 				.replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^/"'\\\s]*)/gm, "$2")
 				.trim();
 			//获取第一个 { 后的所有字符
-			str = str.slice(str.indexOf("{") + 1);
+			let str = code.slice(code.indexOf("{") + 1);
 			//判断代码中是否有debugger
 			let regex = /event\.debugger\(\)/;
 			let hasDebugger = false;
@@ -666,7 +667,10 @@ export class LibInit {
 				str = `if(event.step==${k}){event.finish();return;}` + str;
 			}
 			if (!scope) {
-				return new (hasDebugger ? ModGeneratorFunction : ModFunction)("event", "step", "source", "player", "target", "targets", "card", "cards", "skill", "forced", "num", "trigger", "result", "_status", "lib", "game", "ui", "get", "ai", str);
+				const argList = ["event", "step", "source", "player", "target", "targets", "card", "cards", "skill", "forced", "num", "trigger", "result", "_status", "lib", "game", "ui", "get", "ai"];
+				const compiled = new (hasDebugger ? ModGeneratorFunction : ModFunction)(...argList, str);
+				ErrorManager.setCodeSnippet(compiled, new CodeSnippet(code, 3)); // 记录编译后函数的原代码片段
+				return compiled;
 			} else {
 				new (hasDebugger ? ModGeneratorFunction : ModFunction)(str); // 防止注入喵
 				return scope(`(function${hasDebugger ? "*" : ""}(event,step,source,player,target,targets,

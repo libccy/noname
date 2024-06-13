@@ -23,6 +23,7 @@ import { GamePromises } from "./promises.js";
 import { Check } from "./check.js";
 
 import security from "../util/security.js";
+import { ErrorManager } from "../util/error.js";
 
 export class Game {
 	online = false;
@@ -5885,7 +5886,10 @@ export class Game {
 				event.resolveContent = resolveContent;
 				event.content(event, trigger, player).finally(() => resolveContent());
 			} else {
-				event.content(event, step, source, player, target, targets, card, cards, skill, forced, num, trigger, result, _status, lib, game, ui, get, ai);
+				if (typeof event.content !== "function") throw new Error(`事件 '${event.name}' 的 content 不是一个函数`);
+				ErrorManager.errorHandle(() => {
+					event.content(event, step, source, player, target, targets, card, cards, skill, forced, num, trigger, result, _status, lib, game, ui, get, ai);
+				}, event.content);
 				resolve();
 			}
 		});

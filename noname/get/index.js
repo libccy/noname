@@ -10,6 +10,7 @@ import { rootURL } from "../../noname.js";
 import * as pinyinPro from "./pinyins/index.js";
 import { Audio } from "./audio.js";
 import security from "../util/security.js";
+import { CodeSnippet, ErrorManager } from "../util/error.js";
 
 export class Get {
 	is = new Is();
@@ -1546,9 +1547,10 @@ export class Get {
 	 * ```
 	 * 
 	 * @param {string} str 
+	 * @param {boolean} log 
 	 * @returns {string} 
 	 */
-	pureFunctionStr(str) {
+	pureFunctionStr(str, log = false) {
 		str = str.trim();
 		const arrowMatch = get.#arrowPattern.exec(str);
 		if (arrowMatch) {
@@ -1556,20 +1558,26 @@ export class Get {
 			if (body.startsWith("{") && body.endsWith("}")) body = body.slice(1, -1);
 			else body = `return ${body}`;
 			if (!get.isFunctionBody(body, "any")) {
-				console.error("发现疑似恶意的远程代码:", str);
-				return `()=>console.error("尝试执行疑似恶意的远程代码")`;
+				if (log) console.error("发现疑似恶意的远程代码:", str);
+				return `()=>{}`;
 			}
 			return `${arrowMatch[0]}{${body}}`;
 		}
-		if (!str.endsWith("}")) return '()=>console.warn("无法识别的远程代码")';
+		if (!str.endsWith("}")) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return '()=>{}';
+		}
 		const fullMatch = get.#fullPattern.exec(str);
-		if (!fullMatch) return '()=>console.warn("无法识别的远程代码")';
+		if (!fullMatch) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return '()=>{}';
+		}
 		const head = fullMatch[1];
 		const args = fullMatch[2] || '';
 		const body = str.slice(fullMatch[0].length).slice(0, -1);
 		if (!get.isFunctionBody(body, "any")) {
-			console.error("发现疑似恶意的远程代码:", str);
-			return `()=>console.error("尝试执行疑似恶意的远程代码")`;
+			if (log) console.error("发现疑似恶意的远程代码:", str);
+			return '()=>{}';
 		}
 		str = `(${args}){${body}}`;
 		if (head.includes("*")) str = "*" + str;
@@ -1593,7 +1601,7 @@ export class Get {
 	infoFuncOL(info) {
 		let func;
 		if ("sandbox" in window) console.log("[infoFuncOL] info:", info);
-		const str = get.pureFunctionStr(info.slice(13)); // 清洗函数并阻止注入
+		const str = get.pureFunctionStr(info.slice(13), true); // 清洗函数并阻止注入
 		if ("sandbox" in window) console.log("[infoFuncOL] pured:", str);
 		try {
 			// js内置的函数
@@ -1603,7 +1611,11 @@ export class Get {
 				const box = security.currentSandbox();
 				if (!box) throw new ReferenceError("没有找到当前沙盒");
 				func = box.exec(loadStr);
-			} else func = security.exec(`return (${str});`);
+				ErrorManager.setCodeSnippet(func, new CodeSnippet(str, 5));
+			} else {
+				func = security.exec(`return (${str});`);
+				ErrorManager.setCodeSnippet(func, new CodeSnippet(str, 3));
+			}
 		} catch (e) {
 			console.error(`${e} in \n${str}`);
 			return function () { };

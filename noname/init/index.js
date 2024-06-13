@@ -1085,7 +1085,7 @@ async function setOnError() {
 		}
 		str += "\n-------------";
 		const errorReporter = ErrorManager.getErrorReporter(err);
-		if (errorReporter) game.print(errorReporter.report(str + "\n沙盒内部执行的代码出现错误"));
+		if (errorReporter) game.print(errorReporter.report(str + "\n代码出现错误"));
 		else {
 			if (
 				typeof line == "number" &&
