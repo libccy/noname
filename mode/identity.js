@@ -3551,11 +3551,13 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						time = parseInt(lib.configOL.choose_timeout) * 1000;
 					var aiTargets = (event.aiTargets = []);
 					event.players.forEach((current) => {
-						current.showTimer(time);
 						if (current.isOnline()) {
 							current.send(send, camouflaged, event.videoId, true);
-							current.wait();
-							if (current.identity == "nei") event.withOL = true;
+							if (current.identity == "nei") {
+								current.showTimer(time);
+								current.wait();
+								event.withOL = true;
+							}
 							return;
 						}
 						var me = game.me;
