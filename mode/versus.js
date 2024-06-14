@@ -366,6 +366,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					name: players[i].name1,
 					name2: players[i].name2,
 					identity: players[i].node.identity.firstChild.innerHTML,
+					nickname: players[i].node.nameol.innerHTML,
 					color: players[i].node.identity.dataset.color,
 				});
 			}
