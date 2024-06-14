@@ -344,8 +344,7 @@ const skills = {
 				(event.name != "phase" || game.phaseNumber == 0) &&
 				game.hasPlayer(current => {
 					return current !== player && current.hasEnabledSlot(1);
-				}) &&
-				get.mode() == "identity"
+				})
 			);
 		},
 		async cost(event, trigger, player) {
