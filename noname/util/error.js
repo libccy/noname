@@ -40,16 +40,18 @@ class CodeSnippet {
 	 * @returns {string} 
 	 */
 	viewCode(lineno) {
+		const range = 5;
+
 		if (!Number.isInteger(lineno))
 			throw new TypeError("错误行号必须是一个整数");
 
 		const index = lineno - this.#erroff;
 		const lines = this.lines;
-		const width = String(index + 4).length;
+		const width = String(index + range).length;
 
 		let codeView = "";
 
-		for (let i = index - 4; i < index + 5; i++) {
+		for (let i = index - range; i < index + range + 1; i++) {
 			if (i < 0 || i >= lines.length)
 				continue;
 
@@ -159,9 +161,9 @@ class ErrorReporter {
 	}
 
 	viewCode() {
-		if(!this.#snippet)
+		if (!this.#snippet)
 			return null;
-		
+
 		const stack = this.#stack;
 		const line = stack.split("\n")[1];
 		const lineno = ErrorReporter.#findLineNo(line);
@@ -183,8 +185,8 @@ class ErrorReporter {
 	report(title) {
 		const codeView = this.viewCode() || "#没有代码预览#";
 		let errorInfo = `${title}:\n\t${this.#message}\n`;
-		errorInfo += `----------\n${codeView.trim()}\n`;
-		errorInfo += `----------\n调用堆栈:\n${this.#stack}`;
+		errorInfo += `-------------\n${codeView.trim()}\n`;
+		errorInfo += `-------------\n调用堆栈:\n${this.#stack}`;
 		ErrorReporter.#topAlert(errorInfo);
 		return errorInfo;
 	}
@@ -203,8 +205,97 @@ class ErrorReporter {
 }
 
 class ErrorManager {
+	/** @type {WeakMap<Function, CodeSnippet>} */
+	static #codeSnippets = new WeakMap();
 	/** @type {WeakMap<Object, ErrorReporter>} */
 	static #errorReporters = new WeakMap();
+
+	/**
+	 * ```plain
+	 * 获取函数对应的代码片段
+	 * ```
+	 * 
+	 * @param {Function} func 
+	 * @returns {CodeSnippet?}
+	 */
+	static getCodeSnippet(func) {
+		if (typeof func !== 'function')
+			throw new TypeError("参数func必须是一个function");
+
+		return this.#codeSnippets.get(func) || null;
+	}
+
+	/**
+	 * ```plain
+	 * 设置函数对应的代码片段
+	 * ```
+	 * 
+	 * @param {Function} func 
+	 * @param {CodeSnippet} snippet 
+	 */
+	static setCodeSnippet(func, snippet) {
+		if (typeof func !== 'function')
+			throw new TypeError("参数func必须是一个function");
+		if (!(snippet instanceof CodeSnippet))
+			throw new TypeError("参数snippet必须是一个CodeSnippet");
+
+		return this.#codeSnippets.set(func, snippet);
+	}
+
+	/**
+	 * ```plain
+	 * 获取一个错误的堆栈层数
+	 * ```
+	 * 
+	 * @param {Error} error 
+	 * @returns {number?}
+	 */
+	static #getStackLevel = function (error) {
+		return error.stack
+			? error.stack
+				.slice(String(error).length + 1)
+				.split("\n").length
+			: null;
+	}
+
+	/**
+	 * ```plain
+	 * 封装被设定了代码片段函数的错误捕获调用
+	 * 
+	 * 当 `body` 函数在它这一层调用栈中出现错误时
+	 * 此函数将自动记录此次错误信息并整理相关代码片段
+	 * ```
+	 * @example
+	 * ```javascript
+	 * ErrorManager.errorHandle(() => {
+	 *     event.content(...);
+	 * }, event.content);
+	 * ```
+	 * 
+	 * @param {Function} action 调用函数的闭包
+	 * @param {Function} body 实际被调用的函数，同时也是持有代码片段的函数
+	 * @param {number} extraLevel action调用到body的间隔调用栈层数
+	 */
+	static errorHandle(action, body, extraLevel = 0) {
+		const snippet = ErrorManager.getCodeSnippet(body);
+
+		try {
+			action();
+		} catch (e) {
+			if (!(e instanceof Error))
+				throw e;
+
+			if (snippet) {
+				const inner = ErrorManager.#getStackLevel(e);
+				const cur = ErrorManager.#getStackLevel(new Error());
+
+				if (inner && cur && inner == cur + 2 + extraLevel)
+					ErrorManager.setErrorReporter(e, snippet);
+			}
+
+			throw e;
+		}
+	}
 
 	/**
 	 * ```plain
@@ -214,13 +305,29 @@ class ErrorManager {
 	 * ```
 	 * 
 	 * @param {Object} obj 
+	 * @param {ErrorReporter|CodeSnippet|null} reporter 
+	 * 
+	 * @overload
+	 * @param {Object} obj 
+	 * 
+	 * @overload
+	 * @param {Object} obj 
 	 * @param {ErrorReporter?} reporter 
+	 * 
+	 * @overload
+	 * @param {Object} obj 
+	 * @param {CodeSnippet?} codeSnippet 
 	 */
 	static setErrorReporter(obj, reporter = null) {
 		if (obj !== Object(obj))
 			throw new TypeError("参数必须是一个对象");
-		if (!(reporter instanceof ErrorReporter))
-			reporter = new ErrorReporter(obj);
+
+		if (!(reporter instanceof ErrorReporter)) {
+			if (reporter instanceof CodeSnippet)
+				reporter = new ErrorReporter(obj, reporter);
+			else
+				reporter = new ErrorReporter(obj);
+		}
 
 		ErrorManager.#errorReporters.set(obj, reporter);
 	}

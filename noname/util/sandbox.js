@@ -187,7 +187,7 @@ class Rule {
 
 	/**
 	 * ```plain
-	 * 检查当前是否是 Monitor 所属的运行域
+	 * 检查当前是否是 Rule 所属的运行域
 	 * ```
 	 * 
 	 * @param {Rule} thiz 
@@ -481,31 +481,8 @@ const MARSHALLED_LIST = Object.freeze([
 	"/MutationObserver",
 	// 根据狂神喵提供的问题
 	// 我们对console进行迁移
-	"/console/debug",
-	"/console/error",
-	"/console/info",
-	"/console/log",
-	"/console/warn",
-	"/console/dir",
-	"/console/dirxml",
-	"/console/table",
-	"/console/trace",
-	"/console/group",
-	"/console/groupCollapsed",
-	"/console/groupEnd",
-	"/console/clear",
-	"/console/count",
-	"/console/countReset",
-	"/console/assert",
-	"/console/profile",
-	"/console/profileEnd",
-	"/console/time",
-	"/console/timeLog",
-	"/console/timeEnd",
-	"/console/timeStamp",
-	"/console/context",
-	"/console/createTask",
-	"/console/memory",
+	...Object.keys(console)
+		.map(key => `/console/${key}`),
 	// 另外补充这两个可能的函数哦
 	"/alert",
 	"/confirm",
@@ -2853,17 +2830,11 @@ class Domain {
 		this.#domainCSS = global.CSS;
 		this.#domainSharedWorker = global.SharedWorker;
 
-		this.#domainIsArray = global.Array.isArray;
-
 		NativeWrapper.wrapInDomains(global);
 		Globals.ensureDomainGlobals(this);
 		DomainMonitors.handleNewDomain(this);
 		Domain.#domainLinks.push(new WeakRef(this));
 		sealObjectTree(this);
-
-		global.Array.isArray = new global
-			.Function("domain", "array", "return this(domain, array)")
-			.bind(Domain.#isArray, this);
 	}
 
 	// 实装这个要代理Object喵
@@ -2873,25 +2844,6 @@ class Domain {
 	//             (SandboxSignal_UnpackProxy, obj);
 
 	//     return Domain.#hasInstance.call(this, obj);
-	// }
-
-	// 效率影响不确定，暂不实装
-	// static #marshalledThen = function (onfulfilled, onrejected) {
-	//     if (Marshal.isMarshalled(this)) {
-	//         const [domain, promise] = Marshal[SandboxExposer2]
-	//             (SandboxSignal_UnpackProxy, this);
-
-	//         const marshaller = value => {
-	//             return this(trapMarshal(domain, Domain.current, value));
-	//         };
-
-	//         return trapMarshal(domain, Domain.current, promise.then(
-	//             marshaller.bind(onfulfilled),
-	//             marshaller.bind(onrejected)
-	//         ));
-	//     }
-
-	//     return [[DefaultThen]].call(this, onfulfilled, onrejected);
 	// }
 
 	/**
@@ -2990,21 +2942,23 @@ class Domain {
 
 	/**
 	 * ```plain
-	 * 替代 Array.isArray 并暴露给外部
-	 * 确保 Array.isArray 对代理数组放宽
+	 * 检查对象是否是Promise对象
 	 * ```
 	 * 
-	 * @param {Domain} domain
-	 * @param {any} array 
+	 * @param {Error?} error 
 	 * @returns {boolean} 
 	 */
-	static #isArray = function (domain, array) {
-		if (Marshal.isMarshalled(array))
-			[domain, array] = Marshal[SandboxExposer2]
-				(SandboxSignal_UnpackProxy, array);
+	static isError(error) {
+		if (error instanceof Error)
+			return true;
+		if (!Marshal.isMarshalled(error))
+			return Domain.current.isError(error);
 
-		return domain.#domainIsArray(array);
-	};
+		const [domain, target] = Marshal[SandboxExposer2]
+			(SandboxSignal_UnpackProxy, error);
+
+		return target instanceof Error || domain.isError(target);
+	}
 
 	/**
 	 * @param {Domain} domain 
@@ -3742,7 +3696,7 @@ class Sandbox {
 						(SandboxSignal_Marshal, result, prevDomain);
 				} catch (e) {
 					// @ts-ignore
-					if (!domain.isError(e))
+					if (!Domain.isError(e))
 						throw e; // 非错误对象无法读取堆栈，继续向上抛出
 
 					// 保存当前错误信息
@@ -3982,7 +3936,7 @@ function sealClass(clazz) {
 function sealObjectTree(obj) {
 	// @ts-ignore
 	sealObject(obj, (/** @type {object} */ o) => {
-		if (!Reflect.isExtensible(o)) // 防止1103
+		if (!Reflect.isExtensible(o))
 			return;
 		if (o === obj)
 			return void Object.freeze(o);
