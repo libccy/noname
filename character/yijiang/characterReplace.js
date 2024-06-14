@@ -49,7 +49,7 @@ const characterReplaces = {
 	zhoucang: ["zhoucang", "re_zhoucang", "xin_zhoucang"],
 	guotufengji: ["guotufengji", "re_guotufengji"],
 	guanping: ["guanping", "re_guanping", "dc_sb_guanping"],
-	caifuren: ["caifuren", "re_caifuren", "xin_caifuren"],
+	caifuren: ["caifuren", "re_caifuren", "xin_caifuren", "ol_caifuren"],
 	guyong: ["guyong", "re_guyong", "xin_guyong", "tw_guyong"],
 	yj_jushou: ["yj_jushou", "re_jushou", "xin_jushou"],
 	guohuanghou: ["guohuanghou", "re_guohuanghou"],

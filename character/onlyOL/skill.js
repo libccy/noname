@@ -2,6 +2,90 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//OL界蔡夫人
+	olqieting: {
+		audio: 2,
+		trigger: {
+			global: "phaseEnd",
+		},
+		filter(event, player) {
+			const target = event.player;
+			if (target == player || !target.isIn()) return false;
+			return !target.hasHistory("useCard", evt => evt.targets && evt.targets.some(i => i != target)) || !target.hasHistory("sourceDamage", evt => evt.player != target);
+		},
+		async cost(event, trigger, player) {
+			const target = trigger.player;
+			let num = 0;
+			if (!target.hasHistory("useCard", evt => evt.targets && evt.targets.some(i => i != target))) num++;
+			if (!target.hasHistory("sourceDamage", evt => evt.player != target)) num++;
+			const next = player.chooseButton([
+				"窃听：请选择" + (num > 1 ? "一至两" : "一") + "项",
+				[
+					[
+						["move", "将" + get.translation(target) + "装备区的一张牌置于你的装备区"],
+						["draw", "摸一张牌"],
+					],
+					"textbutton",
+				],
+			]);
+			next.set("selectButton", [1, num]);
+			next.set("filterButton", button => {
+				if (
+					button.link == "move" &&
+					!get
+						.event()
+						.getTrigger()
+						.player.countCards("e", card => {
+							return player.canEquip(card);
+						})
+				)
+					return false;
+				return true;
+			});
+			next.set("ai", button => {
+				const target = get.event().getTrigger().player,
+					val = target.hasSkillTag("noe") ? 6 : 0;
+				if (
+					button.link == "move" &&
+					(get.attitude(player, target) > 0 ||
+						!target.countCards("e", function (card) {
+							return player.canEquip(card) && get.value(card, target) > val && get.effect(player, card, player, player) > 0;
+						}))
+				)
+					return 0;
+				return 1;
+			});
+			const {
+				result: { bool, links },
+			} = await next;
+			event.result = {
+				bool: bool,
+				cost_data: links,
+			};
+		},
+		logTarget: "player",
+		async content(event, trigger, player) {
+			const target = trigger.player,
+				choices = event.cost_data;
+			if (choices.includes("move")) {
+				const cards = await player
+					.choosePlayerCard(target, "e", true)
+					.set("filterButton", button => {
+						return get.player().canEquip(button.link);
+					})
+					.set("ai", button => {
+						const player = get.player();
+						return get.effect(player, button.link, player, player);
+					})
+					.forResultCards();
+				const card = cards[0];
+				target.$give(card, player, false);
+				await game.asyncDelay(0.5);
+				await player.equip(card);
+			}
+			if (choices.includes("draw")) await player.draw();
+		},
+	},
 	//谋庞统
 	olsbhongtu: {
 		audio: 2,
