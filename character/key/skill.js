@@ -6041,6 +6041,7 @@ const skills = {
 		filter(event, player) {
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
+		derivation: ["kotori_skill_wei", "kotori_skill_shu", "kotori_skill_wu", "kotori_skill_qun", "kotori_skill_jin", "kotori_skill_key"],
 		content() {
 			var list = ["wei", "shu", "wu", "qun", "jin"];
 			for (var i of list) {
