@@ -12,7 +12,7 @@ const skills = {
 			return event.player != player && player.inRange(event.player);
 		},
 		check(event, player) {
-			if (player.getEquip("bagua") || player.getEquip("rw_bagua_skill") || player.hasSkill("bazhen")) return true;
+			if (player.getEquip("bagua") || player.getEquip("rw_bagua")) return true;
 			if (player.hasSkill("huan_zhaoyun_B", null, null, false) && !player.awakenedSkills.includes("huan_zhaoyun_B")) return true;
 			if (player.countCards("hs", "shan") || (player.countCards("hs", "sha") && player.hasSkill("ollongdan", null, null, false))) return true;
 			return get.effect(player, { name: "draw" }, player, player) + get.effect(event.player, { name: "sha" }, event.player, player);
