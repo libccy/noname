@@ -13032,8 +13032,8 @@ export class Library {
 				const key = game.onlineKey;
 				if (typeof func == "function") {
 					const { Domain } = security.importSandbox();
-					// 被封送的函数额外间隔了三层调用栈
-					const level = (!Domain || Domain.current.isFrom(func)) ? 0 : 3;
+					// 被封送的函数额外间隔了四层调用栈
+					const level = (!Domain || Domain.current.isFrom(func)) ? 0 : 4;
 					const args = Array.from(arguments);
 					args.shift();
 					ErrorManager.errorHandle(() => {

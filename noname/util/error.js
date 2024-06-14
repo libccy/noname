@@ -244,18 +244,48 @@ class ErrorManager {
 
 	/**
 	 * ```plain
-	 * 获取一个错误的堆栈层数
+	 * 获取错误堆栈中与行列无关的错误信息
 	 * ```
 	 * 
 	 * @param {Error} error 
+	 * @returns {string[]?}
+	 */
+	static #getFramesHead = function (error) {
+		return error.stack
+			? error.stack.slice(String(error).length + 1)
+				.split("\n")
+				.map(line => {
+					line = line.trim();
+					const match = /^\s*(.+?):\d+:\d+/.exec(line);
+					return match ? match[1] : line;
+				})
+			: null;
+	}
+
+	/**
+	 * ```plain
+	 * 计算错误A比错误B多的堆栈层数
+	 * ```
+	 * 
+	 * @param {Error} errorA 
+	 * @param {Error} errorB 
 	 * @returns {number?}
 	 */
-	static #getStackLevel = function (error) {
-		return error.stack
-			? error.stack
-				.slice(String(error).length + 1)
-				.split("\n").length
-			: null;
+	static #compareStackLevel = function (errorA, errorB) {
+		const stackA = ErrorManager.#getFramesHead(errorA);
+		const stackB = ErrorManager.#getFramesHead(errorB);
+
+		if (!stackA || !stackB
+			|| stackA.length < stackB.length)
+			return null;
+
+		const lastFrameA = stackA[stackA.length - 1];
+		const indexInB = stackB.lastIndexOf(lastFrameA);
+
+		if (indexInB === -1)
+			return stackA.length - stackB.length;
+
+		return stackA.length - indexInB - 1;
 	}
 
 	/**
@@ -286,10 +316,9 @@ class ErrorManager {
 				throw e;
 
 			if (snippet) {
-				const inner = ErrorManager.#getStackLevel(e);
-				const cur = ErrorManager.#getStackLevel(new Error());
+				const diff = ErrorManager.#compareStackLevel(e, new Error());
 
-				if (inner && cur && inner == cur + 2 + extraLevel)
+				if (diff && diff == 2 + extraLevel)
 					ErrorManager.setErrorReporter(e, snippet);
 			}
 
