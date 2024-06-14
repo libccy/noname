@@ -11773,7 +11773,7 @@ const skills = {
 		skillAnimation: true,
 		animationColor: "gray",
 		audio: 2,
-		audioname: ["xin_caifuren"],
+		audioname: ["xin_caifuren", "ol_caifuren"],
 		unique: true,
 		limited: true,
 		enable: "phaseUse",
