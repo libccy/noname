@@ -24223,7 +24223,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#gz_huangzhong:die": "不得不服老啦~",
 			"#kuanggu1": "我会怕你吗！",
 			"#kuanggu2": "真是美味啊！",
-			"#gz_weiyan:die": "谁敢杀我！呃啊！",
+			"#gz_weiyan:die": "谁敢杀我？！呃啊……",
 			"#gz_pangtong:die": "看来我命中注定将丧命于此……",
 			"#gz_liushan:die": "别……别打脸，我投降还不行吗？",
 			"#gz_menghuo:die": "七纵之恩……来世……再报了……",
