@@ -1,4 +1,7 @@
 const characters = {
+	huan_zhaoyun: ["male", "shu", 4, ["huan_zhaoyun_A", "huan_zhaoyun_B"]],
+	huan_simayi: ["male", "wei", 4, ["twzongquan", "twguimou"]],
+	huan_weiyan: ["male", "shu", 4, ["twqiji", "twpiankuang"]],
 	tw_zhugejun: ["male", "qun", 3, ["twshouzhu", "twdaigui", "twcairu"]],
 	simafu: ["male", "wei", 3, ["xunde", "chenjie"]],
 	tw_yanliang: ["male", "qun", 4, ["twduwang", "twylyanshi"]],

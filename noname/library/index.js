@@ -13696,6 +13696,13 @@ export class Library {
 				nature: "firemm",
 			},
 		],
+		[
+			"幻",
+			{
+				color: "#ffff99",
+				nature: "firemm",
+			},
+		],
 	]);
 	groupnature = {
 		shen: "shen",
