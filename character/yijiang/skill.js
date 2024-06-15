@@ -6908,7 +6908,7 @@ const skills = {
 	},
 	xinjuece: {
 		audio: "juece",
-		audioname: ["dc_liru"],
+		audioname: ["dc_liru", "ol_liru"],
 		trigger: { player: "phaseJieshuBegin" },
 		direct: true,
 		filter: function (event, player) {
@@ -10395,6 +10395,7 @@ const skills = {
 	},
 	juece: {
 		audio: 2,
+		audioname: ["dc_liru", "ol_liru"],
 		trigger: {
 			global: ["loseAfter", "equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 		},
