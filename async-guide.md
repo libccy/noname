@@ -60,7 +60,7 @@ async函数写法可以让`content`这类step写法的函数贴近其他的函�
 
 例如，函数`filter`要求你写出`(event, player, name)`参数，然后你才可以用`event`/`player`/`name`三个变量
 
-而async函数也是如此，你需要写出`(event, trigger, player)`三个由无名杀提供的参数才能使用`event`/`player`/`name`三个变量
+而async函数也是如此，你需要写出`(event, trigger, player)`三个由无名杀提供的参数才能使用`event`/`trigger`/`player`三个变量
 
 这样的好处是统一规范了函数写法，减少了新开发者的疑惑，你所使用的`event`/`trigger`/`player`都是你看得到的
 
@@ -70,7 +70,7 @@ async函数写法可以让`content`这类step写法的函数贴近其他的函�
 
 我们要知道，`card`/`target`/`num`等变量其实都是`event`的属性，无名杀提前为我们从`event`对象中取出了这些变量
 
-换言之我们用`event.card`/`event.target`/`event.num`就可以代替原本的`card`/`target`/`num`这些变量了
+换言之，我们用`event.card`/`event.target`/`event.num`就可以代替原本的`card`/`target`/`num`这些变量了
 
 值得注意的是，`event.step`变量在async函数中不再有意义，因为没有了`step`标注，本体也无法确定async函数执行到了哪一步，自然`event.step`的值也就没有了意义
 
@@ -245,7 +245,7 @@ var result = await xxx.forResult()
 
 不过如果在实际编写代码时，实在无法区分哪些需要`await`怎么办呢？
 
-你可以通过在控制台输入`!!lib.element.content.xxx`(xxx为你的操作名称)来查看是否可以`await`，如果控制台显示是`true`就说明需要你进行`await`
+你可以通过在控制台输入`!!lib.element.content.xxx`(xxx为你的操作名称)来查看是否可以`await`，如果控制台显示是`true`，就说明需要你使用`await`等待这项操作完成
 
 例如:
 
@@ -352,13 +352,13 @@ await promise // 等待直到resolve在5秒后被调用
 
 你有没有发现，我们已经实现了类似`game.asyncDelay`的功能了！
 
-而事实上无名杀本体的`game.asyncDelay`就是使用这种方式实现的功能
+而事实上无名杀本体的`game.asyncDelay`也就是使用这种方式实现的功能
 
 当你掌握了`Promise`与`resolve`的使用时，你就可以进入下面的一节了
 
 #### 4. pause与resume
 
-`game.pause`与`game.resume`是一对游戏内暂停函数，与玩家暂停不同，它们用于等待游戏动画/等待玩家确定这类耗时的操作时使用
+`game.pause`与`game.resume`是一对游戏内暂停函数，与玩家暂停不同，它们用于`等待游戏动画`/`等待玩家确定`这类耗时的操作时使用
 
 在分步中，如果你要等待玩家按下确定再执行下一步，你需要先执行`game.pause`，这将启动游戏内暂停，直到你执行`game.resume`之前，下一步都不会执行
 
@@ -423,6 +423,8 @@ async写法支持电脑上的开发者工具进行断点调试
 断点被打上后，当代码执行到此行时，开发工具会暂停代码的执行，此时你可以在开发工具里面观察各个变量的值，或者执行额外的代码
 
 另外使用async写法的技能出现错误时，不会出现报错信息不正确的问题
+
+---
 
 好了，到此你就已经彻底的把async写法的关键知识浏览了一遍，如果要更好的巩固它，可以试着把你之前的技能改成async写法试试哦
 
