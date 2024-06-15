@@ -1,7 +1,7 @@
 const characterReplaces = {
 	caocao: ["caocao", "re_caocao", "sb_caocao", "dc_caocao"],
 	guojia: ["guojia", "re_guojia", "ps1059_guojia", "ps2070_guojia"],
-	simayi: ["simayi", "re_simayi", "jsrg_simayi", "ps_simayi", "ps2068_simayi"],
+	simayi: ["simayi", "re_simayi", "jsrg_simayi", "ps_simayi", "ps2068_simayi", "huan_simayi"],
 	jin_simayi: ["jin_simayi", "junk_simayi", "ps_jin_simayi"],
 	zhenji: ["zhenji", "re_zhenji", "sb_zhenji", "yj_zhenji"],
 	xuzhu: ["xuzhu", "re_xuzhu"],
@@ -11,7 +11,7 @@ const characterReplaces = {
 	liubei: ["liubei", "re_liubei", "sb_liubei", "dc_liubei", "junk_liubei"],
 	guanyu: ["guanyu", "re_guanyu", "ol_sb_guanyu", "sb_guanyu", "ps_guanyu", "old_guanyu", "junk_guanyu"],
 	zhangfei: ["zhangfei", "re_zhangfei", "old_zhangfei", "xin_zhangfei", "sb_zhangfei", "tw_zhangfei", "jsrg_zhangfei", "yj_zhangfei"],
-	zhaoyun: ["zhaoyun", "re_zhaoyun", "old_zhaoyun", "sb_zhaoyun", "jsrg_zhaoyun", "ps2063_zhaoyun", "ps2067_zhaoyun"],
+	zhaoyun: ["zhaoyun", "re_zhaoyun", "old_zhaoyun", "sb_zhaoyun", "jsrg_zhaoyun", "ps2063_zhaoyun", "ps2067_zhaoyun", "huan_zhaoyun"],
 	sp_zhaoyun: ["sp_zhaoyun", "jsp_zhaoyun"],
 	machao: ["machao", "re_machao", "sb_machao", "ps_machao"],
 	sp_machao: ["sp_machao", "dc_sp_machao", "jsrg_machao", "old_machao"],

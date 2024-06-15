@@ -86,6 +86,10 @@ const translates = {
 	olenyuan1: "恩怨",
 	olenyuan2: "恩怨",
 	olenyuan_info: "①当你一次性获得一名其他角色超过一张牌后，你可以令其摸一张牌。②当你受到1点伤害后，你可以令伤害来源选择一项：1.将一张红色手牌交给你；2.失去1点体力。",
+	ol_caifuren: "OL界蔡夫人",
+	ol_caifuren_prefix: "OL界",
+	olqieting: "窃听",
+	olqieting_info: "其他角色的回合结束后，你可以选择X项：1.将其装备区的一张牌置入你的装备区；2.摸一张牌（X为以下条件中其本回合满足的项数：未对其他角色造成伤害、未对其他角色使用过牌）。",
 };
 
 export default translates;

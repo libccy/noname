@@ -338,15 +338,23 @@ const skills = {
 			order: 10,
 			result: {
 				target(player, target) {
+					if (player === target) {
+						if (ui.selected.targets.length) return 8;
+						return 0;
+					}
 					if (target.getStorage("dclisao_gaifa").includes(player)) return 0;
 					if (get.damageEffect(target, player, player) < 0 && get.attitude(player, target) > 0) return 0;
-					let cards = player.getCards("hs", card => get.tag(card, "damage") && player.canUse(card, target) && get.effect(target, card, player, player) > 0);
+					let cards = player.getCards("hs", card => get.tag(card, "damage") && get.effect(target, card, player, player) > 0);
 					if (!cards.length) return 0;
 					let cardx = cards.filter(card => get.name(card) == "sha");
 					cardx.sort((a, b) => get.effect(target, b, player, player) - get.effect(target, a, player, player));
 					cardx = cardx.slice(Math.min(cardx.length, player.getCardUsable("sha")), cardx.length);
 					cards.removeArray(cardx);
-					return -cards.reduce((sum, card) => sum + get.effect(target, card, player, player), 0) - 10;
+					return cards.reduce((sum, card) => {
+						if (player.canUse(card, target)) return sum + get.effect(target, card, player, target);
+						if (player.canUse(card, target, false)) return sum + get.effect(target, card, player, target) / 10;
+						return 0;
+					}, 0) - 10;
 				},
 			},
 		},

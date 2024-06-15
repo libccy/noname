@@ -2395,7 +2395,6 @@ const skills = {
 			}
 		},
 		ai: {
-			combo: "fenli",
 			effect: {
 				target: function (card) {
 					if (card.name == "lebu" || card.name == "bingliang") return 0.5;

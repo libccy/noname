@@ -2566,9 +2566,11 @@ export class Game {
 						game.players[i].init(players[i].name, players[i].name2);
 						game.players[i].setIdentity(players[i].identity);
 					}
+					game.players[i].setNickname(players[i].nickname);
 				} else if (lib.config.mode == "doudizhu" || lib.config.mode == "single") {
 					game.players[i].init(players[i].name, players[i].name2);
 					game.players[i].setIdentity(players[i].identity);
+					game.players[i].setNickname(players[i].nickname);
 				} else if (lib.config.mode == "stone") {
 					game.players[i].init(players[i].name, players[i].name2);
 					game.players[i].classList.add("noidentity");
@@ -2602,6 +2604,7 @@ export class Game {
 					} else {
 						game.players[i].setIdentity(game.players[i].group);
 					}
+					game.players[i].setNickname(players[i].nickname);
 				}
 			}
 			for (var i = 0; i < game.players.length; i++) {

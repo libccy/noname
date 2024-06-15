@@ -1,7 +1,7 @@
 const characters = {
 	re_huangzhong: ["male", "shu", 4, ["xinliegong"]],
 	old_zhoutai: ["male", "wu", 4, ["gzbuqu"]],
-	old_caoren: ["male", "wei", 4, ["jushou"]],
+	old_caoren: ["male", "wei", 4, ["jushou"], ["die:new_caoren"]],
 	re_xuhuang: ["male", "wei", 4, ["duanliang", "jiezi"]],
 	re_pangde: ["male", "qun", 4, ["mashu", "jianchu"]],
 	re_xiahouyuan: ["male", "wei", 4, ["xinshensu"]],

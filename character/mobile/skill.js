@@ -52,7 +52,7 @@ const skills = {
 							}
 						}
 						if (list.includes(SUB)) {
-							if (att > 0 && attSource > 0) return SUB;
+							if (att > 0 && attSource >= 0) return SUB;
 							if (canFilterDamage && att > 0) return "cancel2";
 							if (damageEff > 0) {
 								if (target.getHp() > trigger.num && attSource > 0 && source.countCards("h") + source.getHp() <= 4) return SUB;
@@ -60,13 +60,13 @@ const skills = {
 								if (att > 0) {
 									if (trigger.num >= target.getHp()) return SUB;
 									if (
-										!source.countCards("hs", card => {
+										souce && !source.countCards("hs", card => {
 											return source.canUse(card, target, true) && get.effect(target, card, source, player) > 0;
 										})
 									)
 										return Math.random() < 0.7 ? ADD : "cancel2";
 								} else {
-									if (attSource > 0) return SUB;
+									if (attSource >= 0) return SUB;
 									if (target.hasSkillTag("maixie") && trigger.num === 1 && damageEff < -20) return SUB;
 								}
 							}
@@ -130,7 +130,7 @@ const skills = {
 		usable: 1,
 		zhuanhuanji: true,
 		filterTarget(card, player, target) {
-			if (player.storage.mbzuoyou) return target.countCards("h") >= 2;
+			if (player.storage.mbzuoyou) return target.countCards("h");
 			return true;
 		},
 		async content(event, trigger, player) {
@@ -138,8 +138,8 @@ const skills = {
 				target = event.target;
 			if (event.name === "mbzuoyou") player.changeZhuanhuanji("mbzuoyou");
 			if (!storage) {
-				await target.draw(2);
-				await target.chooseToDiscard(1, true, "h");
+				await target.draw(3);
+				await target.chooseToDiscard(2, true, "h");
 			} else {
 				await target.chooseToDiscard(target === player ? "佐佑" : `${get.translation(player)}对你发动了【佐佑】`, "请弃置两张手牌，然后获得1点护甲", 2, true);
 				await target.changeHujia(1, null, true);
@@ -149,8 +149,8 @@ const skills = {
 		marktext: "☯",
 		intro: {
 			content(storage, player) {
-				if (!storage) return "转换技。出牌阶段限一次，你可以令一名角色摸两张牌，然后其弃置一张手牌。";
-				return "转换技。出牌阶段限一次，你可以令一名手牌数不少于二的角色弃置两张手牌，然后其获得1点护甲。";
+				if (!storage) return "转换技。出牌阶段限一次，你可以令一名角色摸三张牌，然后其弃置两张手牌。";
+				return "转换技。出牌阶段限一次，你可以令一名有手牌的角色弃置一张手牌，然后其获得1点护甲。";
 			},
 		},
 		ai: {
@@ -344,8 +344,7 @@ const skills = {
 				(event.name != "phase" || game.phaseNumber == 0) &&
 				game.hasPlayer(current => {
 					return current !== player && current.hasEnabledSlot(1);
-				}) &&
-				get.mode() == "identity"
+				})
 			);
 		},
 		async cost(event, trigger, player) {

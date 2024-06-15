@@ -106,7 +106,7 @@ const characters = {
 	xiahouba: ["male", "shu", 4, ["baobian"]],
 	yuanshu: ["male", "qun", 4, ["yongsi", "weidi"]],
 	sp_diaochan: ["female", "qun", 3, ["lihun", "rebiyue"]],
-	sp_zhaoyun: ["male", "qun", 3, ["ollongdan", "chongzhen"]],
+	sp_zhaoyun: ["male", "qun", 3, ["ollongdan", "chongzhen"], ["die:zhaoyun"]],
 	liuxie: ["male", "qun", 3, ["tianming", "mizhao", "twzhuiting"], ["zhu"]],
 	zhugejin: ["male", "wu", 3, ["olhuanshi", "olhongyuan", "olmingzhe"]],
 	zhugeke: ["male", "wu", 3, ["aocai", "duwu"]],
