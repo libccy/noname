@@ -2,6 +2,163 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//ol界李儒
+	olmieji: {
+		audio: 2,
+		enable: "phaseUse",
+		usable: 1,
+		filter: function (event, player) {
+			return player.hasCard(lib.skill.olmieji.filterCard, "eh");
+		},
+		position: "he",
+		filterCard: (card) => get.type2(card) == 'trick',
+		filterTarget: function (card, player, target) {
+			return target != player && target.countCards("h");
+		},
+		discard: false,
+		delay: false,
+		check: function (card) {
+			return 8 - get.value(card);
+		},
+		loseTo: "cardPile",
+		insert: true,
+		async content(event, trigger, player) {
+			const target = event.target;
+			let discards = [];
+			const { result } = await target.chooseToDiscard("he", true)
+				.set("prompt", "请弃置一张锦囊牌，或依次弃置两张非锦囊牌。");
+			discards.addArray(result.cards);
+			if (
+				(!result.cards || get.type2(result.cards[0], target) != 'trick') && target.countCards("he", (card) => get.type2(card) != 'trick')
+			) {
+				const result2 = await target
+					.chooseToDiscard("he", true, (card) => get.type2(card) != 'trick')
+					.set("prompt", "请弃置第二张非锦囊牌")
+					.forResult();
+				discards.addArray(result2.cards);
+			}
+			if (discards.some(card => player.hasUseTarget(card))) {
+				const {
+					result: { bool, links },
+				} = await player
+					.chooseButton(["灭计：是否使用其中的一张牌？", discards])
+					.set("filterButton", button => {
+						return get.event("player").hasUseTarget(button.link);
+					})
+					.set("ai", button => {
+						return get.event("player").getUseValue(button.link);
+					});
+
+				if (bool) {
+					const card = links[0];
+					player.$gain2(card, false);
+					await game.asyncDelayx();
+					await player.chooseUseTarget(true, card, false);
+				}
+			}
+		},
+		ai: {
+			order: 9,
+			result: {
+				target: -1,
+			},
+		},
+	},
+	olfencheng: {
+		skillAnimation: "epic",
+		animationColor: "fire",
+		audio: 2,
+		enable: "phaseUse",
+		limited: true,
+		line: "fire",
+		filterTarget: true,
+		content: function () {
+			"step 0";
+			player.awakenSkill("olfencheng");
+			event.num = 1;
+			event.targets = game.filterPlayer(current => current != player);
+			event.targets.sortBySeat(target);
+			"step 1";
+			if (event.targets.length) {
+				var target = event.targets.shift();
+				if (!target.isIn()) {
+					event.redo();
+					return;
+				}
+				event.target = target;
+				player.line(target, "fire");
+				var res = get.damageEffect(target, player, target, "fire");
+				target
+					.chooseToDiscard("he", "弃置至少" + get.cnNumber(event.num) + "张牌或受到2点火焰伤害", [num, Infinity])
+					.set("ai", function (card) {
+						if (ui.selected.cards.length >= _status.event.getParent().num) return -1;
+						if (_status.event.player.hasSkillTag("nofire")) return -1;
+						if (_status.event.res >= 0) return 6 - get.value(card);
+						if (get.type(card) != "basic") {
+							return 10 - get.value(card);
+						}
+						return 8 - get.value(card);
+					})
+					.set("res", res);
+			} else {
+				event.finish();
+			}
+			"step 2";
+			if (!result.bool) {
+				event.target.damage(2, "fire");
+				event.num = 1;
+			} else {
+				event.num = result.cards.length + 1;
+				event.goto(1);
+			}
+			"step 3";
+			game.delayx();
+			event.goto(1);
+		},
+		ai: {
+			order: 1,
+			result: {
+				player: function (player, target) {
+					if (player.hasUnknown(2)) return 0;
+					var num = 0,
+						eff = 0,
+						players = game
+							.filterPlayer(function (current) {
+								return current != player;
+							})
+							.sortBySeat(target);
+					for (var target of players) {
+						if (get.damageEffect(target, player, target, "fire") >= 0) {
+							num = 0;
+							continue;
+						}
+						var shao = false;
+						num++;
+						if (
+							target.countCards("he", function (card) {
+								if (get.type(card) != "basic") {
+									return get.value(card) < 10;
+								}
+								return get.value(card) < 8;
+							}) < num
+						)
+							shao = true;
+						if (shao) {
+							eff -= 4 * (get.realAttitude || get.attitude)(player, target);
+							num = 0;
+						} else eff -= (num * (get.realAttitude || get.attitude)(player, target)) / 4;
+					}
+					if (eff < 4) return 0;
+					return eff;
+				},
+			},
+		},
+		mark: true,
+		intro: {
+			content: "limited",
+		},
+		init: (player, skill) => (player.storage[skill] = false),
+	},
 	//谋庞统
 	olsbhongtu: {
 		audio: 2,

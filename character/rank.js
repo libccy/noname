@@ -1131,6 +1131,7 @@ window.noname_character_rank = {
 		"mb_simafu",
 	],
 	b: [
+		"ol_liru",
 		"std_dc_yanghu",
 		"std_re_dengzhi",
 		"std_mateng",

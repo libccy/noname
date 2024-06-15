@@ -86,6 +86,12 @@ const translates = {
 	olenyuan1:'恩怨',
 	olenyuan2:'恩怨',
 	olenyuan_info:'①当你一次性获得一名其他角色超过一张牌后，你可以令其摸一张牌。②当你受到1点伤害后，你可以令伤害来源选择一项：1.将一张红色手牌交给你；2.失去1点体力。',
+	ol_liru:'OL界李儒',
+	ol_liru_prefix:'OL界',
+	olmieji:'灭计',
+	olmieji_info:'出牌阶段限一次，你可以将一张锦囊牌置于牌堆顶并令一名有手牌的其他角色选择一项: 1.弃置一张锦囊牌; 2.依次弃置两张非锦囊牌。然后你可以使用其中一张牌。',
+	olfencheng: "焚城",
+	olfencheng_info: "限定技。出牌阶段，你可以指定一名角色，令从其开始的其他角色依次选择一项：⒈弃置至少X张牌（X为上一名角色弃置的牌数+1）。⒉你对其造成2点火焰伤害。",
 };
 
 export default translates;
