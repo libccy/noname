@@ -1,4 +1,6 @@
 const characters = {
+	huan_guojia: ["male", "wei", 3, ["huan_guojia_A", "huan_guojia_B"]],
+	huan_zhanghe: ["male", "wei", 4, ["huan_zhanghe_A"]],
 	huan_zhaoyun: ["male", "shu", 4, ["huan_zhaoyun_A", "huan_zhaoyun_B"]],
 	huan_simayi: ["male", "wei", 4, ["twzongquan", "twguimou"]],
 	huan_weiyan: ["male", "shu", 4, ["twqiji", "twpiankuang"]],
