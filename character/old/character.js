@@ -7,7 +7,7 @@ const characters = {
 	old_chendao: ["male", "shu", 4, ["drlt_wanglie"]],
 	old_liyan: ["male", "shu", 3, ["duliang", "fulin"]],
 	old_guanzhang: ["male", "shu", 4, ["old_fuhun"]],
-	new_caoren: ["male", "wei", 4, ["moon_jushou", "jiewei"]],
+	new_caoren: ["male", "wei", 4, ["moon_jushou", "jiewei"], ["die:caoren"]],
 	huangzhong: ["male", "shu", 4, ["liegong"]],
 	junk_sunquan: ["male", "shen", 4, ["dili", "yuheng"], ["wei"]],
 	old_dingfeng: ["male", "wu", 4, ["fenxun", "duanbing"]],
