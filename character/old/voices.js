@@ -1,4 +1,7 @@
 export default {
+	"#xiahouyuan:die": "竟然……比我还……快……",
+	"#weiyan:die": "谁敢杀我？！呃啊……",
+	"#xuhuang:die": "一顿不吃，饿得慌……",
 	"#huangtian2_zhangjiao1": "岁在甲子，天下大吉！",
 	"#huangtian2_zhangjiao2": "苍天已死，黄天当立！",
 	"#zhangjiao:die": "黄天，也死了……",
