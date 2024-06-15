@@ -5908,6 +5908,8 @@ export class Game {
 			}
 			_status.paused = false;
 			delete _status.waitingForTransition;
+			if (_status.event && _status.event.content instanceof AsyncFunction ||
+				Array.isArray(_status.event.contents)) return;
 			game.loop();
 		}
 	}
@@ -5915,6 +5917,8 @@ export class Game {
 		if (_status.connectMode) return;
 		if (_status.paused2) {
 			_status.paused2 = false;
+			if (_status.event && _status.event.content instanceof AsyncFunction ||
+				Array.isArray(_status.event.contents)) return;
 			game.loop();
 		}
 	}
