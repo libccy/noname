@@ -1,4 +1,7 @@
 export default {
+	"#yizhong1": "不先为备，何以待敌？",
+	"#yizhong2": "稳重行军，百战不殆！",
+	"#xin_yujin:die": "呃，晚节不保……",
 	"#xiahouyuan:die": "竟然……比我还……快……",
 	"#weiyan:die": "谁敢杀我？！呃啊……",
 	"#xuhuang:die": "一顿不吃，饿得慌……",
