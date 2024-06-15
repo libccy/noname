@@ -202,6 +202,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					translate: lib.translate[game.players[i].name],
 					name1: players[i].name1,
 					name2: players[i].name2,
+					nickname: players[i].node.nameol.innerHTML,
 				});
 			}
 			(_status.videoInited = true), game.addVideo("init", null, info);
@@ -24214,7 +24215,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#gz_guanyu:die": "什么？此地名叫麦城？",
 			"#gz_zhangfei:die": "实在是杀不动了……",
 			"#gz_zhugeliang:die": "将星陨落，天命难违……",
-			"#gz_zhaoyun:die": "这……就是失败的滋味吗……",
+			"#gz_zhaoyun:die": "这，就是失败的滋味吗……",
 			"#gz_machao:die": "（马蹄声远去……）",
 			"#gz_huangyueying:die": "亮……",
 			"#liegong1": "百步穿杨！",
@@ -24222,7 +24223,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#gz_huangzhong:die": "不得不服老啦~",
 			"#kuanggu1": "我会怕你吗！",
 			"#kuanggu2": "真是美味啊！",
-			"#gz_weiyan:die": "谁敢杀我！呃啊！",
+			"#gz_weiyan:die": "谁敢杀我？！呃啊……",
 			"#gz_pangtong:die": "看来我命中注定将丧命于此……",
 			"#gz_liushan:die": "别……别打脸，我投降还不行吗？",
 			"#gz_menghuo:die": "七纵之恩……来世……再报了……",
@@ -24267,7 +24268,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#leiji2": "以我之真气，合天地之造化！",
 			"#guidao1": "哼哼哼哼~",
 			"#guidao2": "天下大势，为我所控。",
-			"#gz_zhangjiao:die": "黄天既覆，苍生何存……",
+			"#gz_zhangjiao:die": "黄天，也死了……",
 			"#gz_caiwenji:die": "人生几何时，怀忧终年岁……",
 			"#gz_mateng:die": "儿子，为爹报仇啊！",
 			"#gz_kongrong:die": "覆巢之下，岂有完卵……",
@@ -24370,7 +24371,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#jihun2": "魂羽化游，以辅四方。",
 			"#gz_zuoci:die": "腾云跨风，飞升太虚……",
 			"#gz_bianfuren:die": "心肝涂地，惊愕断绝……",
-			"#gz_xunyou:die": "主公，丞相先行告退……",
+			"#gz_xunyou:die": "主公，臣下先行告退……",
 			"#xuanlve1": "强敌破阵，斩将于须臾！",
 			"#xuanlve2": "轻装急袭，破敌于千里！",
 			"#yongjin1": "冲啊，扬我东吴之勇！",

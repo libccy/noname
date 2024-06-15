@@ -127,6 +127,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					name: players[i].name1,
 					name2: players[i].name2,
 					identity: players[i].identity,
+					nickname: players[i].node.nameol.innerHTML,
 				});
 			}
 			_status.videoInited = true;

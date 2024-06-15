@@ -400,6 +400,7 @@ window.noname_character_rank = {
 		"matie",
 		"dc_sb_caoang",
 		"dc_sb_guanping",
+		"ol_caifuren",
 	],
 	am: [
 		"tw_yanliang",
@@ -1145,6 +1146,9 @@ window.noname_character_rank = {
 		"std_feiyi",
 		"tw_zhugejun",
 		"mb_simafu",
+		"huan_weiyan",
+		"huan_simayi",
+		"huan_zhaoyun",
 	],
 	b: [
 		"star_zhangzhao",
@@ -1991,6 +1995,7 @@ window.noname_character_rank = {
 			"jsrg_yuanshao",
 		],
 		epic: [
+			"huan_simayi",
 			"dc_sb_zhangxiu",
 			"ol_jiangwan",
 			"xukun",
@@ -2292,6 +2297,7 @@ window.noname_character_rank = {
 			"dc_sp_zhurong",
 		],
 		rare: [
+			"ol_caifuren",
 			"dc_sb_caoang",
 			"dc_sb_guanping",
 			"yue_zhugeguo",
@@ -2818,6 +2824,8 @@ window.noname_character_rank = {
 			"sb_handang",
 			"sb_gongsunzan",
 			"matie",
+			"huan_weiyan",
+			"huan_zhaoyun",
 		],
 		junk: [
 			"ol_peixiu",
