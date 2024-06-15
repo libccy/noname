@@ -331,7 +331,199 @@ while (event.targets.length) {
 而`event.goto`也是同理，你可以用`if`、`while`、`for`、`break`、`continue`等语句来代替它
 
 ### 5. 操作结果的获取
+使用过分步写法的应该很清楚，如果要获取操作的结果，就必须要在下一步使用`result`
+
+而async函数里面如果想要获取`result`要怎么做呢？
+
+我们这里提供两种办法:
+
+#### 1. 解构写法
+
+```javascript
+var { result } = await xxx
+```
+
+你可以通过在`await`前面加上`var { result } =`来获取本次操作的结果，例如下面这样:
+
+```javascript
+var { result } = await player.chooseBool("你要摸牌吗？")
+if (result.bool) {
+    await player.draw()
+}
+```
+
+上面的代码会先询问玩家是否摸牌，如果玩家点击了`确定`，那么就让玩家摸一张牌
+
+#### 2. forResult写法
+
+如果你不习惯使用解构语法，或者你认为解构的大括号让你实在不方便，你还可以换另一种方式:
+
+```javascript
+var result = await xxx.forResult()
+```
+
+这样获得的`result`与上面的代码是相同的
+
 ### 6. async使用的一些细节补充
-#### delay与delayx
-#### pause与resume
-#### Promise的使用
+
+恭喜你哦，看到这里，你对于async写法的大致特点已经掌握，那接下来我们就来对一些实战中可能遇到的问题进行补充吧
+
+#### 1. 什么情况下要使用await？
+
+非常简单的判断，你可以查看操作是否有以下情况:
+
+1. 会触发时机。触发时机意味着可能进行插入结算，你需要等待所有插入结算的完成，故而使用`await`(包括使用`event.trigger`来主动触发时机也需要`await`)
+2. 等待玩家确认。如果有个操作需要玩家点击确认，或者会弹出窗口给玩家查看时，你需要等待玩家确认完毕，所以也使用`await`
+3. `asyncDelay`/`asyncDelayx`/其他Promise，这个我们稍后会讲到
+
+另外哪些操作不要使用`await`呢？
+
+根据现在无名杀本体代码，有大致下面几种情况：
+
+1. 基本的运算。基本的运算都是即时性的，不需要你的代码去等待什么。基本运算包括很多：数学运算、文本(字符串)操作、数组操作、对象操作、变量操作等等...
+2. 统计操作。例如统计玩家数量、统计手牌数量、统计标记数量、统计使用牌的次数、判断父事件的名称等等...这些都是直接获取一项已经确定的游戏数据，可以立刻执行完毕而不需要`await`
+3. 操作标记、storage、ui界面。添加/删除标记、获取/设置storage、更改ui界面也都是可以立刻执行的操作。不过比较特殊的是ui操作，有些ui操作有动画效果，但是它们不使用`await`，需要你特地去监听它们的动画结束
+
+不过如果在实际编写代码时，实在无法区分哪些需要`await`怎么办呢？
+
+你可以通过在控制台输入`!!lib.element.content.xxx`(xxx为你的操作名称)来查看是否可以`await`，如果控制台显示是`true`就说明需要你进行`await`
+
+例如:
+
+```javascript
+player.draw(2)
+player.addMark("mark")
+```
+
+上面的代码执行了两个操作，分别是`摸牌`与`添加标记`，如果我们要查看是否可以`await`那么可以这样做:
+
+```javascript
+!!lib.element.content.draw // true，可以await
+!!lib.element.content.addMark // false，不能await
+```
+
+#### 2. delay与delayx
+
+需要注意的是，在async函数里面，我们不能再使用`game.delay`/`game.delayx`/`game.resume`这三样了，我们需要替代方案
+
+本体对于这种情况已经准备好了，来看看这两个新函数:
+
+```javascript
+await game.asyncDelay()
+await game.asyncDelayx()
+```
+
+请注意哦，他们必须加上`await`，否则是不会产生任何效果的
+
+那么有了这两个函数，你在编写代码时就可以进行替换了哦
+
+将`game.delay()`替换为`await game.asyncDelay()`、`game.delayx()`替换为`await game.asyncDelayx()`，即可在async函数中实现类似的效果
+
+#### 3. Promise的使用
+
+上面我们提到了`game.resume`不能在async函数中使用，但是我们没有给出解决方案——这是因为使用`game.resume`需要我们会使用`Promise`
+
+**Promise的概念**
+
+`Promise`是什么？
+
+`Promise`其实已经算老朋友了——只是你没有意识到使用了它，你使用`await`等待的东西其实就是它
+
+`Promise`类似于一个通知，比如你点了一份外卖，如果你要知道外卖有没有完成，你肯定是查看外卖app是否显示已送达 而不是跑到楼下去看看外卖员有没有到对吧？
+
+`Promise`就是充当了一个外卖app的作用，当你对它使用`await`时，你的代码会暂停执行，等待`Promise`提供者确认任务完成之后，`Promise`就会结束你代码的等待，并继续向下执行
+
+**Promise的语法**
+
+我们来看看`Promise`的创建:
+
+```javascript
+var { promise, resolve } = Promise.withResolvers()
+```
+
+其中`promise`就是我们可以进行`await`的东西，我们可以`await promise`来暂停当前代码的执行
+
+但别着急！你创建的`Promise`还没有人通知结束，如果你直接等待会导致无限的等待时间哦！
+
+如何通知结束呢？这就要用到我们的`resolve`函数了，你可以把`resolve`传递给通知代码，当通知代码执行了`resolve`时，你的`Promise`便会结束等待
+
+**代码演示**
+
+接下来我们来看看如何用`Promise`演示外卖送达的流程
+
+```javascript
+// 外卖平台部分
+// 我们要提供dian_can()函数来接受外卖任务
+var { promise, resolve } = Promise.withResolvers() // 创建一个新的promise
+
+funcion dian_can() {
+    return promise // 返回我们创建的promise
+}
+
+// 外卖员部分
+// 当外卖员送达时需要通知用户取餐
+... // 送餐流程省略
+resolve() // 执行promise创建时提供的通知函数，告诉正在等待这个promise的代码任务已经完成
+
+// 用餐人部分
+// 我们执行dian_can()函数来发起一个外卖任务
+var waimaiPromise = dian_can() // 调用并获取promise
+await waimaiPromise // 等待外卖送达
+```
+
+从上面可以看出，如果要使用`Promise`，我们需要三个部分：
+
+1. 创建`Promise`
+2. 等待`Promise`
+3. 通知`Promise`
+
+**使用示例**
+
+那么我们来实现一个简单的效果，用`await`暂停代码5秒:
+
+我们的思路应该是这样的，首先我们肯定要创建一个`Promise`，这样才可以使用`await`
+
+然后我们要在5秒后执行`resolve`函数，让`await`结束等待
+
+```javascript
+var { promise, resolve } = Promise.withResolvers() // 创建promise
+setTimeout(resolve, 5000) // 将resolve传递给setTimeout，setTimeout是一个系统函数，会在指定时间后执行你传入的函数，这里填写的时间是5000毫秒即5秒
+await promise // 等待直到resolve在5秒后被调用
+```
+
+你有没有发现，我们已经实现了类似`game.asyncDelay`的功能了！
+
+而事实上无名杀本体的`game.asyncDelay`就是使用这种方式实现的功能
+
+当你掌握了`Promise`与`resolve`的使用时，你就可以进入下面的一节了
+
+#### 4. pause与resume
+
+`game.pause`与`game.resume`是一对游戏内暂停函数，与玩家暂停不同，它们用于等待游戏动画/等待玩家确定这类耗时的操作时使用
+
+在分步中，如果你要等待玩家按下确定再执行下一步，你需要先执行`game.pause`，这将启动游戏内暂停，直到你执行`game.resume`之前，下一步都不会执行
+
+而到了async函数里面，`game.resume`不再可以使用，这会导致事件被重复执行，出现不可预料的问题
+
+那么如果要实现原来的效果要如何做呢？
+
+这就要用到我们的`Promise`了，假设`button`是一个按钮，我们要等待按钮按下再继续执行，这种代码应该这样写:
+
+```javascript
+// 创建一个Promise来等待
+var { promise, resolve } = Promise.withResolvers()
+
+// 监听按钮点击，当按钮点击时执行大括号里面的代码
+button.listen(() => {
+    _status.paused = false // 手动关闭游戏内暂停，而不是执行`game.resume`
+    resolve() // 结束await的等待
+    game.log("玩家点击了按钮")
+})
+
+// 启动游戏内暂停
+game.pause()
+// 暂停代码的执行并等待点击
+await promise
+```
+
+这里可能会有人疑惑，为什么
