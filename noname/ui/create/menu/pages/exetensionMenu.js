@@ -832,7 +832,7 @@ export const extensionMenu = function (connectMenu) {
 								};
 								img.src = data;
 							};
-							if (game.download) {
+							if (game.readFile) {
 								var url = lib.assetURL + "extension/" + name + "/" + file;
 								createButton(i, url);
 								if (lib.device == "ios" || lib.device == "android") {
@@ -1418,7 +1418,7 @@ export const extensionMenu = function (connectMenu) {
 								};
 								img.src = data;
 							};
-							if (game.download) {
+							if (game.readFile) {
 								var url = lib.assetURL + "extension/" + name + "/" + file;
 								createButton(i, url, fullskin);
 								if (lib.device == "ios" || lib.device == "android") {

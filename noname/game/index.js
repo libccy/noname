@@ -2189,7 +2189,7 @@ export class Game {
 				const configObject = config[value];
 				if (configObject && "init" in configObject) game.saveConfig(`extension_${extensionName}_${value}`, configObject.init);
 			});
-			if (game.download) {
+			if (typeof game.readFile == 'function') {
 				const files = zip.files,
 					hiddenFileFlags = [".", "_"],
 					fileList = Object.keys(files)
@@ -2216,7 +2216,8 @@ export class Game {
 						finishLoad();
 					};
 					game.promises.ensureDirectory(`extension/${extensionName}`).then(writeFile).catch(UHP);
-				} else
+				}
+				else if (typeof window.resolveLocalFileSystemURL == "function") {
 					new Promise((resolve, reject) => window.resolveLocalFileSystemURL(nonameInitialized, resolve, reject))
 						.then(
 							directoryEntry =>
@@ -2268,6 +2269,28 @@ export class Game {
 							return writeFile();
 						})
 						.catch(UHP);
+				}
+				else {
+					const writeFile = errnoException => {
+						if (errnoException) {
+							finishLoad();
+							UHP(errnoException);
+							return;
+						}
+						if (fileList.length) {
+							//filename 数组 ...dir+/+file
+							//这里需要个创文件夹的函数
+							const zipDir = fileList.pop(),
+								fileName = zipDir.split("/"),
+								name = fileName.pop(),
+								// letGo = name => new Promise(resolve => lib.node.fs.writeFile(`${__dirname}/extension/${extensionName}/${name}`, zip.file(zipDir).asNodeBuffer(), null, resolve)).then(writeFile);
+								letGo = name => game.promises.writeFile(zip.file(zipDir).asArrayBuffer(), `extension/${extensionName}`, name).then(writeFile);
+							return fileName.length ? game.promises.createDir(`extension/${extensionName}/${fileName.join("/")}`).then(() => letGo(`${fileName.join("/")}/${name}`)) : letGo(name);
+						}
+						finishLoad();
+					};
+					game.promises.ensureDirectory(`extension/${extensionName}`).then(writeFile).catch(UHP);
+				}
 			} else {
 				localStorage.setItem(`${lib.configprefix}extension_${extensionName}`, str);
 				const hiddenFileFlags = [".", "_"],
