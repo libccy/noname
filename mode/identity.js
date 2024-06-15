@@ -3554,8 +3554,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.players.forEach((current) => {
 						if (current.isOnline()) {
 							current.send(send, camouflaged, event.videoId, true);
+							current.showTimer(time);
 							if (current.identity == "nei") {
-								current.showTimer(time);
 								current.wait();
 								event.withOL = true;
 							}
