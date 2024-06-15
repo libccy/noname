@@ -84,7 +84,7 @@ export default {
 	"#xunyou:die": "主公，臣下先行告退……",
 	"#xinwuyan1": "汝有良策，何必问我！",
 	"#xinwuyan2": "吾，誓不为汉贼献一策！",
-	"#xinjujian1": "卧龙之才，远胜于我。",
+	"#xinjujian1": "卧龙之才，远胜于吾。",
 	"#xinjujian2": "天下大任，望君莫辞！",
 	"#xin_xushu:die": "忠孝不能两全，孩儿……",
 	"#sanyao1": "三人成虎，事多有。",
