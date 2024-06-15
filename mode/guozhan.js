@@ -24268,7 +24268,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#leiji2": "以我之真气，合天地之造化！",
 			"#guidao1": "哼哼哼哼~",
 			"#guidao2": "天下大势，为我所控。",
-			"#gz_zhangjiao:die": "黄天既覆，苍生何存……",
+			"#gz_zhangjiao:die": "黄天，也死了……",
 			"#gz_caiwenji:die": "人生几何时，怀忧终年岁……",
 			"#gz_mateng:die": "儿子，为爹报仇啊！",
 			"#gz_kongrong:die": "覆巢之下，岂有完卵……",
