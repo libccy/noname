@@ -1,4 +1,7 @@
 export default {
+	"#huangtian2_zhangjiao1": "岁在甲子，天下大吉！",
+	"#huangtian2_zhangjiao2": "苍天已死，黄天当立！",
+	"#zhangjiao:die": "黄天，也死了……",
 	"#wuyan1": "唉，一切尽在不言中。",
 	"#wuyan2": "嘘，言多必失啊。",
 	"#jujian1": "将军岂愿抓牌乎？",
