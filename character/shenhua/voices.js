@@ -32,7 +32,7 @@ export default {
 	"#releiji2": "呼风唤雨，驱雷策电！",
 	"#guidao_sp_zhangjiao1": "道施所向，皆由我控。",
 	"#guidao_sp_zhangjiao2": "哼哼，天意如此。",
-	"#huangtian21": "苍天不覆，黄天交替！",
+	"#huangtian21": "苍天不覆，黄天将替！",
 	"#huangtian22": "黄天立，民心顺，天下平。",
 	"#sp_zhangjiao:die": "黄天既覆……苍生何存？",
 	"#guhuo_guess1": "道法玄机，变幻莫测。",
