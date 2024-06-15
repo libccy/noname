@@ -7,6 +7,7 @@ export default {
 	"#old_zhoutai:die": "已经，尽力了……",
 	"#jushou1": "我先休息一会！",
 	"#jushou2": "尽管来吧！",
+	"#new_caoren:die": "实在是守不住了……",
 	"#duanliang1_re_xuhuang1": "粮不三载，敌军已犯行军大忌。",
 	"#duanliang1_re_xuhuang2": "断敌粮秣，此战可胜。",
 	"#jiezi1": "因粮于敌，故军食可足也。",
