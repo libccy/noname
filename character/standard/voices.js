@@ -48,7 +48,7 @@ export default {
 	"#zhugeliang:die": "将星陨落，天命难违……",
 	"#longdan_sha1": "能进能退，乃真正法器！",
 	"#longdan_sha2": "吾乃常山赵子龙也！",
-	"#zhaoyun:die": "这……就是失败的滋味吗？",
+	"#zhaoyun:die": "这，就是失败的滋味吗？",
 	"#tieji1": "全军突击！",
 	"#tieji2": "（马蹄声，马叫声）",
 	"#machao:die": "（马蹄声远去……）",
