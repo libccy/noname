@@ -7,7 +7,7 @@ const characters = {
 	old_chendao: ["male", "shu", 4, ["drlt_wanglie"]],
 	old_liyan: ["male", "shu", 3, ["duliang", "fulin"]],
 	old_guanzhang: ["male", "shu", 4, ["old_fuhun"]],
-	new_caoren: ["male", "wei", 4, ["moon_jushou", "jiewei"]],
+	new_caoren: ["male", "wei", 4, ["moon_jushou", "jiewei"], ["die:caoren"]],
 	huangzhong: ["male", "shu", 4, ["liegong"]],
 	junk_sunquan: ["male", "shen", 4, ["dili", "yuheng"], ["wei"]],
 	old_dingfeng: ["male", "wu", 4, ["fenxun", "duanbing"]],
@@ -43,7 +43,7 @@ const characters = {
 	masu: ["male", "shu", 3, ["xinzhan", "huilei"]],
 	xushu: ["male", "shu", 3, ["xswuyan", "jujian"], ["border:wei"]],
 	liru: ["male", "qun", 3, ["juece", "mieji", "fencheng"]],
-	xin_yujin: ["male", "wei", 4, ["jieyue"]],
+	xin_yujin: ["male", "wei", 4, ["jieyue"], ["die:yujin"]],
 	//lusu:['male','wu',3,['haoshi','dimeng']],
 	//yuanshao:['male','qun',4,['luanji','xueyi'],['zhu']],
 	old_zhonghui: ["male", "wei", 3, ["zzhenggong", "zquanji", "zbaijiang"], ["clan:颍川钟氏"]],
@@ -63,7 +63,7 @@ const characters = {
 	old_guanqiujian: ["male", "wei", 4, ["drlt_zhenrong", "drlt_hongju"], []],
 	old_wanglang: ["male", "wei", 3, ["gushe", "jici"]],
 	old_wangyi: ["female", "wei", 3, ["oldzhenlie", "oldmiji"]],
-	re_yujin: ["male", "wei", 4, ["yizhong"]],
+	re_yujin: ["male", "wei", 4, ["yizhong"], ["die:yujin"]],
 };
 
 export default characters;
