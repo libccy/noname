@@ -5986,8 +5986,8 @@ const skills = {
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
 		content: function () {
-			var num = 1;
-			if (trigger.name != "damage") num ++;
+			var num = 2;
+			if (trigger.name == "damage" && get.mode() == "identity") num --;
 			num = Math.min(8 - player.countMark("sbguidao"), num);
 			player.addMark("sbguidao", num);
 		},
