@@ -68,7 +68,7 @@ const characters = {
 	re_masu: ["male", "shu", 3, ["resanyao", "rezhiman"]],
 	re_sunluban: ["female", "wu", 3, ["rechanhui", "rejiaojin"]],
 	xin_handang: ["male", "wu", 4, ["xingongji", "xinjiefan"]],
-	yujin_yujin: ["male", "wei", 4, ["decadezhenjun"]],
+	yujin_yujin: ["male", "wei", 4, ["decadezhenjun"], ["die:xin_yujin"]],
 	re_caozhang: ["male", "wei", 4, ["xinjiangchi"]],
 	re_chengpu: ["male", "wu", 4, ["ollihuo", "rechunlao"]],
 	re_quancong: ["male", "wu", 4, ["xinyaoming"]],

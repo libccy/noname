@@ -91,7 +91,7 @@ const characters = {
 
 	old_huaxiong: ["male", "qun", 6, ["shiyong"]],
 
-	yujin: ["male", "wei", 4, ["rezhenjun"], []],
+	yujin: ["male", "wei", 4, ["rezhenjun"], ["die:ol_yujin"]],
 
 	linghuyu: ["male", "wei", 4, ["xvzhi"]],
 	yj_simafu: ["male", "wei", 3, ["beiyu", "duchi"]],
