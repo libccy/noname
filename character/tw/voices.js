@@ -278,7 +278,7 @@ export default {
 	"#twjuezhu2": "天下可无洪，不可无君。",
 	"#xinzhenjun1": "将怀其威，则镇其军。",
 	"#xinzhenjun2": "治军之道，得之于严。",
-	"#tw_yujin:die": "命归九泉，何颜面对……",
+	"#tw_yujin:die": "今即命归九泉，何颜……",
 	"#cuijin1": "诸军速行，违者军法论处！",
 	"#cuijin2": "快！贻误军机者，定斩不赦！",
 	"#yuejiu:die": "哼，动手吧！",

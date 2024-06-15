@@ -5987,7 +5987,7 @@ const skills = {
 		},
 		content: function () {
 			var num = 2;
-			if (trigger.name != "damage") num += 2;
+			if (trigger.name == "damage" && get.mode() == "identity") num --;
 			num = Math.min(8 - player.countMark("sbguidao"), num);
 			player.addMark("sbguidao", num);
 		},
@@ -6043,7 +6043,7 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
-			if (!lib.inpile.contains("taipingyaoshu")) {
+			if (!lib.inpile.includes("taipingyaoshu")) {
 				lib.inpile.push("taipingyaoshu");
 			}
 			event.card = game.createCard2("taipingyaoshu", "heart", 3);

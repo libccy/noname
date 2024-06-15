@@ -245,6 +245,7 @@ export default {
 	"#jueyong2": "身陷敌阵，战而弥勇！",
 	"#poxiang1": "王瓘既然假降，吾等可将计就计。",
 	"#poxiang2": "佥率已降两千魏兵，便可大破魏军主力。",
+	"#fuqian:die": "生为蜀臣，死……亦当为蜀！",
 	"#disordersidi1": "司敌之动，先发而制。",
 	"#disordersidi2": "料敌之行，伏兵灭之。",
 	"#xin_caozhen:die": "雍凉动乱，皆吾之过也……",

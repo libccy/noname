@@ -61,7 +61,7 @@ const skills = {
 		mark: true,
 		intro: {
 			markcount: storage => 3 - (storage || []).length,
-			content: storage => ((storage || []).length ? "已移去了$项" : "暂未移去任何项"),
+			content: storage => ((storage || []).length ? ("已移去了" + storage + "项") : "暂未移去任何项"),
 		},
 		subSkill: {
 			effect: {
