@@ -53,9 +53,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.textnode.textContent = "正在连接...";
 					clearTimeout(event.timeout);
 					if (e) e.preventDefault();
-					game.saveConfig("last_ip", node.textContent);
-					game.connect(node.textContent, function (success) {
+					const ip = node.textContent;
+					game.saveConfig("last_ip", ip);
+					game.connect(ip, function (success) {
 						if (success) {
+							game.requireSandboxOn(ip);
 							var info = lib.config.reconnect_info;
 							if (info && info[0] == _status.ip) {
 								game.onlineID = info[1];

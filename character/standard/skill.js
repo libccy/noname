@@ -42,6 +42,7 @@ const skills = {
 		unique: true,
 		limited: true,
 		audio: "xiongyi",
+		enable: "phaseUse",
 		filterTarget: true,
 		selectTarget: [1, Infinity],
 		skillAnimation: true,
@@ -51,6 +52,7 @@ const skills = {
 			const targets = event.targets.sortBySeat();
 			let keep = true;
 			while (true) {
+				let stop = false;
 				for (const target of targets) {
 					let next = target
 						.chooseToUse(function (card) {
@@ -63,9 +65,13 @@ const skills = {
 						});
 					if (!keep) next.set("prompt2", "若你不使用，则结束此流程");
 					const result = await next.forResult();
-					if (!result.bool && !keep) break;
-					if (targets[targets.length - 1] == target && !keep) keep = true;
+					if (!result.bool && !keep) {
+						stop = true;
+						break;
+					}
 				}
+				if (keep) keep = false;
+				if (stop) break;
 			}
 		},
 		ai: {
@@ -231,6 +237,9 @@ const skills = {
 			player.popup("盗书");
 			game.log(player, "重置了技能", "#g【盗书】");
 		},
+		ai: {
+			combo: "stddaoshu"
+		},
 	},
 	//周处
 	stdxiongxia: {
@@ -240,6 +249,7 @@ const skills = {
 		selectCard: 2,
 		position: "hes",
 		viewAs: { name: "juedou" },
+		selectTarget: 2,
 		viewAsFilter(player) {
 			if (player.countCards("hes") < 2) return false;
 		},
@@ -326,6 +336,7 @@ const skills = {
 						.sortBySeat();
 					if (targets.length) {
 						for (const target of targets) {
+							if (!target.isIn()) continue;
 							const next = target.chooseToUse("挥战：是否替" + get.translation(trigger.player) + "使用一张【闪】？", { name: "shan" });
 							next.set("ai", () => {
 								const event = _status.event;
@@ -486,7 +497,7 @@ const skills = {
 			threaten: 0.9,
 			effect: {
 				target: function (card, player, target) {
-					if (player.hasSkillTag("jueqing")) return;
+					if (player.hasSkillTag("jueqing", false, target)) return;
 					if (player._stdjinjian_tmp) return;
 					const count = player.storage.counttrigger;
 					if (count && count.stdjinjian_player && count.stdjinjian_player > 0) return;
@@ -1877,8 +1888,10 @@ const skills = {
 		audioname2: {
 			old_guanzhang: "old_fuhun",
 			old_guanyu: "wusheng_re_guanyu",
+			guanzhang: "wusheng_guanzhang",
+			guansuo: "wusheng_guansuo",
 		},
-		audioname: ["re_guanyu", "guanzhang", "jsp_guanyu", "guansuo", "re_guanzhang", "dc_jsp_guanyu"],
+		audioname: ["re_guanyu", "jsp_guanyu", "re_guanzhang", "dc_jsp_guanyu"],
 		enable: ["chooseToRespond", "chooseToUse"],
 		filterCard(card, player) {
 			if (get.zhu(player, "shouyue")) return true;
@@ -1950,10 +1963,11 @@ const skills = {
 	paoxiao: {
 		audio: 2,
 		firstDo: true,
-		audioname: ["re_zhangfei", "guanzhang", "xiahouba"],
+		audioname: ["re_zhangfei", "xiahouba"],
 		audioname2: {
 			old_guanzhang: "old_fuhun",
 			dc_xiahouba: "paoxiao_xiahouba",
+			guanzhang: "paoxiao_guanzhang",
 		},
 		trigger: { player: "useCard1" },
 		forced: true,
@@ -3122,7 +3136,7 @@ const skills = {
 			trigger.source.chooseDrawRecover(true);
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 			effect: {
 				target(card, player, target, current) {
 					if (card.name == "sha" && get.color(card) == "red") {

@@ -10,6 +10,8 @@ import * as config from "../util/config.js";
 import { promiseErrorHandlerMap } from "../util/browser.js";
 import { importCardPack, importCharacterPack, importExtension, importMode } from "./import.js";
 import { onload } from "./onload.js";
+import { initializeSandboxRealms } from "../util/initRealms.js";
+import { ErrorManager } from "../util/error.js";
 
 // 判断是否从file协议切换到http/s协议
 export function canUseHttpProtocol() {
@@ -95,7 +97,7 @@ export function sendUpdate() {
 				const cp = require("child_process");
 				cp.exec(
 					`start /min ${__dirname}\\noname-server.exe -platform=electron`,
-					(err, stdout, stderr) => {}
+					(err, stdout, stderr) => { }
 				);
 				return `http://localhost:8089/app.html?sendUpdate=true`;
 			}
@@ -172,13 +174,22 @@ export async function boot() {
 	}).then(onWindowReady.bind(window));
 
 	// 闭源客户端检测并提醒
-	if (
-		lib.assetURL.includes("com.widget.noname.qingyao") ||
-		lib.assetURL.includes("online.nonamekill.android")
-	) {
-		alert(
-			"您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。"
-		);
+	if (typeof window.NonameAndroidBridge == 'object') {
+		if (["com.widget.noname.qingyao", "online.nonamekill.android"]
+			.some(packageName => window.NonameAndroidBridge.getPackageName().includes(packageName))) {
+			alert(
+				"您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。"
+			);
+		}
+	} else {
+		if (
+			lib.assetURL.includes("com.widget.noname.qingyao") ||
+			lib.assetURL.includes("online.nonamekill.android")
+		) {
+			alert(
+				"您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。"
+			);
+		}
 	}
 
 	// Electron平台
@@ -232,6 +243,7 @@ export async function boot() {
 				await window.initReadWriteFunction(g).catch((e) => {
 					console.error("文件读写函数初始化失败:", e);
 				});
+				delete window.initReadWriteFunction; // 后续用不到了喵
 			}
 			window.onbeforeunload = function () {
 				if (config.get("confirm_exit") && !_status.reloading) {
@@ -290,6 +302,18 @@ export async function boot() {
 			delete window.noname_asset_list;
 		}
 	}
+
+	const sandboxEnabled = !config.get("debug") && !get.is.safari();
+
+	// 初始化沙盒的Realms
+	await initializeSandboxRealms(sandboxEnabled);
+
+	// 初始化security
+	const securityModule = await import("../util/security.js");
+	const security = securityModule.default;
+	await security.initSecurity({
+		lib, game, ui, get, ai, _status, gnc,
+	});
 
 	if (Reflect.get(window, "isNonameServer")) config.set("mode", "connect");
 
@@ -478,7 +502,7 @@ export async function boot() {
 				//var backup_onload=lib.init.onload;
 				_status.evaluatingExtension = true;
 				try {
-					eval(extcontent);
+					security.eval(extcontent); // 喵？
 				} catch (e) {
 					console.log(e);
 				}
@@ -531,7 +555,7 @@ export async function boot() {
 					html`
 						<div
 							style="position: relative;width:50px;height:50px;border-radius:50px;background-image:url('${description
-								.author.avatar_url}');background-size:cover;vertical-align:middle;"
+							.author.avatar_url}');background-size:cover;vertical-align:middle;"
 						></div>
 						${description.author.login}于${description.published_at}发布
 					`.trim(),
@@ -650,7 +674,7 @@ export async function boot() {
 		if (isFirstStartAfterUpdate && extErrorList.length) {
 			const stacktraces = extErrorList.map(e => e instanceof Error ? e.stack : String(e)).join("\n\n")
 			// game.saveConfig("update_first_log", stacktraces);
-			if(confirm(`扩展加载出错！是否重新载入游戏？\n本次更新可能导致了扩展出现了错误：\n\n${stacktraces}`)){
+			if (confirm(`扩展加载出错！是否重新载入游戏？\n本次更新可能导致了扩展出现了错误：\n\n${stacktraces}`)) {
 				game.reload();
 				clearTimeout(resetGameTimeout);
 				return;
@@ -795,18 +819,18 @@ function initSheet(libConfig) {
 		}
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
 			'#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("' +
-				lib.assetURL +
-				"theme/style/player/" +
-				bstyle +
-				'1.png")}',
+			lib.assetURL +
+			"theme/style/player/" +
+			bstyle +
+			'1.png")}',
 			0
 		);
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
 			'#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("' +
-				lib.assetURL +
-				"theme/style/player/" +
-				bstyle +
-				'3.png")}',
+			lib.assetURL +
+			"theme/style/player/" +
+			bstyle +
+			'3.png")}',
 			0
 		);
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
@@ -835,14 +859,14 @@ function initSheet(libConfig) {
 		if (libConfig.control_style == "wood") {
 			Reflect.get(ui, "css").control_stylesheet = lib.init.sheet(
 				"#window .control,#window .menubutton,#window #system>div>div,#window #system>div>.pressdown2{background-image:" +
-					str +
-					"}"
+				str +
+				"}"
 			);
 		} else {
 			Reflect.get(ui, "css").control_stylesheet = lib.init.sheet(
 				"#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:" +
-					str +
-					"}"
+				str +
+				"}"
 			);
 		}
 	}
@@ -951,7 +975,7 @@ async function loadCss() {
  * @deprecated
  * @return {Promise<void>}
  */
-async function onWindowReady() {}
+async function onWindowReady() { }
 
 function setBackground() {
 	let htmlbg = localStorage.getItem(lib.configprefix + "background");
@@ -1010,11 +1034,10 @@ async function setOnError() {
 		const winPath = window.__dirname
 			? "file:///" + (__dirname.replace(new RegExp("\\\\", "g"), "/") + "/")
 			: "";
-		let str = `错误文件: ${
-			typeof src == "string"
+		let str = `错误文件: ${typeof src == "string"
 				? decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
 				: "未知文件"
-		}`;
+			}`;
 		str += `\n错误信息: ${msg}`;
 		const tip = lib.getErrorTip(msg);
 		if (tip) str += `\n错误提示: ${tip}`;
@@ -1069,75 +1092,79 @@ async function setOnError() {
 			}
 		}
 		str += "\n-------------";
-		if (
-			typeof line == "number" &&
-			(typeof Reflect.get(game, "readFile") == "function" || location.origin != "file://")
-		) {
-			const createShowCode = function (lines) {
-				let showCode = "";
-				if (lines.length >= 10) {
-					if (line > 4) {
-						for (let i = line - 5; i < line + 6 && i < lines.length; i++) {
-							showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+		const errorReporter = ErrorManager.getErrorReporter(err);
+		if (errorReporter) game.print(errorReporter.report(str + "\n代码出现错误"));
+		else {
+			if (
+				typeof line == "number" &&
+				(typeof Reflect.get(game, "readFile") == "function" || location.origin != "file://")
+			) {
+				const createShowCode = function (lines) {
+					let showCode = "";
+					if (lines.length >= 10) {
+						if (line > 4) {
+							for (let i = line - 5; i < line + 6 && i < lines.length; i++) {
+								showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+							}
+						} else {
+							for (let i = 0; i < line + 6 && i < lines.length; i++) {
+								showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+							}
 						}
 					} else {
-						for (let i = 0; i < line + 6 && i < lines.length; i++) {
-							showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+						showCode = lines
+							.map((_line, i) => `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${_line}\n`)
+							.toString();
+					}
+					return showCode;
+				};
+				//协议名须和html一致(网页端防跨域)，且文件是js
+				if (typeof src == "string" && src.startsWith(location.protocol) && src.endsWith(".js")) {
+					//获取代码
+					const codes = lib.init.reqSync(
+						"local:" + decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
+					);
+					if (codes) {
+						const lines = codes.split("\n");
+						str += "\n" + createShowCode(lines);
+						str += "\n-------------";
+					}
+				}
+				//解析parsex里的content fun内容(通常是技能content)
+				// @ts-ignore
+				else if (
+					err &&
+					err.stack &&
+					["at Object.eval [as content]", "at Proxy.content"].some((str) => {
+						let stackSplit1 = err.stack.split("\n")[1];
+						if (stackSplit1) {
+							return stackSplit1.trim().startsWith(str);
 						}
+						return false;
+					})
+				) {
+					const codes = _status.event.content;
+					if (typeof codes == "function") {
+						const lines = codes.toString().split("\n");
+						str += "\n" + createShowCode(lines);
+						str += "\n-------------";
 					}
-				} else {
-					showCode = lines
-						.map((_line, i) => `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${_line}\n`)
-						.toString();
-				}
-				return showCode;
-			};
-			//协议名须和html一致(网页端防跨域)，且文件是js
-			if (typeof src == "string" && src.startsWith(location.protocol) && src.endsWith(".js")) {
-				//获取代码
-				const codes = lib.init.reqSync(
-					"local:" + decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
-				);
-				if (codes) {
-					const lines = codes.split("\n");
-					str += "\n" + createShowCode(lines);
-					str += "\n-------------";
 				}
 			}
-			//解析parsex里的content fun内容(通常是技能content)
-			// @ts-ignore
-			else if (
-				err &&
-				err.stack &&
-				["at Object.eval [as content]", "at Proxy.content"].some((str) => {
-					let stackSplit1 = err.stack.split("\n")[1];
-					if (stackSplit1) {
-						return stackSplit1.trim().startsWith(str);
-					}
-					return false;
-				})
-			) {
-				const codes = _status.event.content;
-				if (typeof codes == "function") {
-					const lines = codes.toString().split("\n");
-					str += "\n" + createShowCode(lines);
-					str += "\n-------------";
-				}
-			}
+			if (err && err.stack)
+				str +=
+					"\n" +
+					decodeURI(err.stack)
+						.replace(new RegExp(lib.assetURL, "g"), "")
+						.replace(new RegExp(winPath, "g"), "");
+			alert(str);
+			game.print(str);
 		}
-		if (err && err.stack)
-			str +=
-				"\n" +
-				decodeURI(err.stack)
-					.replace(new RegExp(lib.assetURL, "g"), "")
-					.replace(new RegExp(winPath, "g"), "");
-		alert(str);
 		Reflect.set(window, "ea", Array.from(arguments));
 		Reflect.set(window, "em", msg);
 		Reflect.set(window, "el", line);
 		Reflect.set(window, "ec", column);
 		Reflect.set(window, "eo", err);
-		game.print(str);
 		if (promiseErrorHandler.onErrorFinish) promiseErrorHandler.onErrorFinish();
 		// @ts-ignore
 		if (!lib.config.errstop && (_status && _status.event && !(_status.event.content instanceof AsyncFunction))) {

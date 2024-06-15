@@ -538,6 +538,7 @@ const skills = {
 	},
 	jsrgyangge: {
 		global: "jsrgyangge_mizhao",
+		derivation: "mizhao",
 		subSkill: {
 			mizhao: {
 				//直接继承mizhao
@@ -574,11 +575,59 @@ const skills = {
 			player.addTempSkill("jsrgguanshi_effect");
 		},
 		position: "hs",
-		//这个AI难写，交给157了！
-		check() {
-			return -1;
+		selectTargetAi(card) {
+			let cache = _status.event.getTempCache("jsrgguanshi", "targets");
+			if (Array.isArray(cache)) return cache.length;
+			let player = _status.event.player,
+				targets = [],
+				shas = player.mayHaveSha(player, "respond", player.getCards("h", i => {
+					return card === i;
+				}));
+			game.countPlayer(tar => {
+				if (player === tar) return;
+				let eff = get.effect(tar, get.autoViewAs({ name: "juedou" }, [card]), player, player);
+				if (eff <= 0) return;
+				if (get.attitude(player, tar) > 0) targets.push([tar, eff, 0]);
+				else targets.push([tar, eff, tar.mayHaveSha(player, "respond", null, "count")]);
+			});
+			targets.sort((a, b) => {
+				if (!a[2]) return -1;
+				if (!b[2]) return 1;
+				return b[1] / b[2] - a[1] / a[2];
+			});
+			for (let i = 0; i < targets.length; i++) {
+				if (targets[i][2] > shas) {
+					targets = targets.slice(0, i);
+					break;
+				}
+				else shas -= targets[i][2];
+			}
+			_status.event.putTempCache("jsrgguanshi", "targets", targets);
+			return targets.length;
 		},
-		ai: {},
+		check(card) {
+			let num = lib.skill.jsrgguanshi.selectTargetAi(card);
+			if (!num) return -1;
+			if (num === 1) return 4 - get.value(card);
+			return num + 5 - get.value(card);
+		},
+		ai: {
+			order: 9,
+			result: {
+				player(player, target) {
+					let tars = _status.event.putTempCache("jsrgguanshi", "targets", targets);
+					if (!tars) return lib.card.juedou.ai.result.player(player, target);
+				},
+				target(player, target) {
+					let tars = _status.event.putTempCache("jsrgguanshi", "targets", targets);
+					if (!tars) return lib.card.juedou.ai.result.target(player, target);
+					for (let tar of tars) {
+						if (tar[0] === target) return tar[1] / get.attitude(player, target);
+					}
+					return 0;
+				}
+			}
+		},
 		subSkill: {
 			effect: {
 				trigger: {
@@ -688,6 +737,7 @@ const skills = {
 			);
 		},
 		async content(event, trigger, player) {
+			player.awakenSkill("jsrgjiebing");
 			await player.gainMaxHp(2);
 			await player.recover(2);
 			await player.addSkills("jsrgbaowei");
@@ -987,7 +1037,7 @@ const skills = {
 			sources.sortBySeat();
 			player.line(sources, "thunder");
 			for (let source of sources) {
-				if (!source.isIn() || !target.isIn()) break;
+				if (!source.isIn() || !target.isIn()) continue;
 				target.damage(source, "thunder");
 			}
 		},
@@ -1834,6 +1884,9 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "jsrgjinfa"
+		},
 	},
 	jsrgxuanfeng: {
 		audio: 2,
@@ -1866,6 +1919,7 @@ const skills = {
 		},
 		ai: {
 			order: 2,
+			combo: "jsrgjinfa"
 		},
 	},
 	//陆逊
@@ -2919,6 +2973,9 @@ const skills = {
 				}
 			}
 			player.logSkill("jsrgbazheng", dissident);
+		},
+		ai: {
+			combo: "jsrgyaoyan"
 		},
 	},
 	//刘永
@@ -8040,7 +8097,7 @@ const skills = {
 				})
 				.set("max", trigger.target.countDiscardableCards(player, "he"))
 				.set("goon", get.attitude(player, trigger.target) < 0)
-				.set("logSkill", ["jsrgjuelie_discard", trigger.target]);
+				.set("logSkill", ["jsrgjuelie", trigger.target]);
 			("step 1");
 			if (result.bool) {
 				var num = result.cards.length;
@@ -9311,7 +9368,7 @@ const skills = {
 			aiValue: (player, card, num) => {
 				if (num > 0 && get.itemtype(card) === "card" && card.name !== "zhuge" && get.subtype(card) === "equip1" && !player.getEquip(1)) return 0.01 * num;
 			},
-			aiUseful: () => {
+			aiUseful: function () {
 				return lib.skill.jsrgzhenqiao.mod.aiValue.apply(this, arguments);
 			},
 		},
@@ -9397,6 +9454,9 @@ const skills = {
 				player.logSkill("jsrgfayi", target);
 				target.damage();
 			}
+		},
+		ai: {
+			combo: "jsrgshelun"
 		},
 	},
 	jsrgtushe: {

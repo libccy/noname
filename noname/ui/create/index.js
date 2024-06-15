@@ -2770,7 +2770,7 @@ export class Create {
 		// }
 
 		ui.sortCard = ui.create.system("整理手牌", function () {
-			if (!game.me) return;
+			if (!game.me || game.me.hasSkillTag("noSortCard")) return;
 			var hs = game.me.getCards("h");
 			if (!hs.length) return;
 			game.addVideo("lose", game.me, [get.cardsInfo(hs), [], [], []]);

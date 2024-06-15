@@ -366,6 +366,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					name: players[i].name1,
 					name2: players[i].name2,
 					identity: players[i].node.identity.firstChild.innerHTML,
+					nickname: players[i].node.nameol.innerHTML,
 					color: players[i].node.identity.dataset.color,
 				});
 			}
@@ -3761,7 +3762,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					for (var i = 0; i < lib.configOL.characterPack.length; i++) {
 						var pack = lib.characterPack[lib.configOL.characterPack[i]];
 						for (var j in pack) {
-							if (typeof func == "function" && func(j)) continue;
 							if (lib.connectBanned.includes(j)) continue;
 							if (lib.character[j]) libCharacter[j] = pack[j];
 						}

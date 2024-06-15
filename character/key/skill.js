@@ -6041,6 +6041,7 @@ const skills = {
 		filter(event, player) {
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
+		derivation: ["kotori_skill_wei", "kotori_skill_shu", "kotori_skill_wu", "kotori_skill_qun", "kotori_skill_jin", "kotori_skill_key"],
 		content() {
 			var list = ["wei", "shu", "wu", "qun", "jin"];
 			for (var i of list) {
@@ -6631,6 +6632,7 @@ const skills = {
 			player.removeSkills("godan_feiqu");
 		},
 		ai: {
+			combo: "godan_feiqu",
 			halfneg: true
 		},
 	},
@@ -8635,6 +8637,16 @@ const skills = {
 		},
 	},
 	riki_nvzhuang: {
+		init(player) {
+			if (get.character(player.name1, 3).includes("riki_nvzhuang")) {
+				player.storage.riki_nvzhuang = player.sex;
+				if (player.sex === "male") player.sex = "double";
+				else player.sex = "female";
+			}
+		},
+		onremove(player) {
+			if (player.storage.riki_nvzhuang) player.sex = player.storage.riki_nvzhuang;
+		},
 		trigger: { player: "phaseJieshuBegin" },
 		forced: true,
 		content() {

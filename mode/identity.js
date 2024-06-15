@@ -437,6 +437,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					name: players[i].name1,
 					name2: players[i].name2,
 					identity: players[i].identity,
+					nickname: players[i].node.nameol.innerHTML,
 				};
 				if (stratagemMode) {
 					ifo.translate = lib.translate[game.players[i].name];
@@ -1712,7 +1713,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 					if (typeof lib.config.test_game == "string" && player == game.me.next) {
-						player.init(lib.config.test_game);
+						if (lib.config.test_game != "_")
+							player.init(lib.config.test_game);
 					}
 					if (get.is.double(player.name1)) {
 						player._groupChosen = true;

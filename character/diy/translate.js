@@ -468,6 +468,8 @@ const translates = {
 	junksijun_info: "准备阶段，若“黄”数大于牌堆的牌数，你可以移去所有“黄”，然后从牌堆中随机获得任意张点数之和为36的牌（若牌堆没有点数和为36的组合则获得牌堆顶点数和刚好超过36的牌组）。",
 	junk_guanyu: "旧谋关羽",
 	junk_guanyu_prefix: "旧谋",
+	junk_liuyan: "OL刘焉",
+	junk_liuyan_prefix: "OL",
 };
 
 export default translates;

@@ -2894,9 +2894,10 @@ const skills = {
 		trigger: { player: "phaseBegin" },
 		forced: true,
 		audio: "dangxian",
-		audioname: ["guansuo", "xin_liaohua", "re_liaohua"],
+		audioname: ["xin_liaohua", "re_liaohua"],
 		audioname2: {
 			dc_guansuo: "dangxian_guansuo",
+			guansuo: "dangxian_guansuo",
 		},
 		content: function () {
 			trigger.phaseList.splice(trigger.num, 0, "phaseUse|xindangxian");
@@ -2934,7 +2935,6 @@ const skills = {
 			},
 		},
 	},
-	dangxian_guansuo: { audio: 2 },
 	xinjunxing: {
 		inherit: "junxing",
 		audio: "junxing",
@@ -3677,7 +3677,7 @@ const skills = {
 					return player.isMaxHandcard();
 				},
 				check: function (event, player) {
-					if (player.getHistory("skipped").length > 0) return false;
+					if (!player.hasSkill("pingkou") && !player.hasSkill("xinpingkou") || player.getHistory("skipped").length > 0) return false;
 					return game.hasPlayer(function (current) {
 						return get.attitude(player, current) < 0 && current.hp == 1 && get.damageEffect(current, player, player) > 0;
 					});
@@ -3695,6 +3695,7 @@ const skills = {
 					return player.isMaxHp();
 				},
 				check: function (event, player) {
+					if (!player.hasSkill("pingkou") && !player.hasSkill("xinpingkou")) return false;
 					if (!player.needsToDiscard() || (player.countCards("e") && player.isMaxEquip())) return true;
 					if (player.getHistory("skipped").length > 0) return false;
 					return game.hasPlayer(function (current) {
@@ -3718,9 +3719,6 @@ const skills = {
 					trigger.cancel();
 				},
 			},
-		},
-		ai: {
-			combo: "pingkou",
 		},
 	},
 	pingkou: {
@@ -3754,7 +3752,6 @@ const skills = {
 			}
 		},
 		ai: {
-			combo: "fenli",
 			effect: {
 				target: function (card) {
 					if (card.name == "lebu" || card.name == "bingliang") return 0.5;
@@ -5963,7 +5960,7 @@ const skills = {
 			trigger.num++;
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 		},
 	},
 	huisheng: {
@@ -8140,7 +8137,9 @@ const skills = {
 		trigger: { player: "phaseBegin" },
 		forced: true,
 		audio: 2,
-		audioname: ["guansuo"],
+		audioname2: {
+			guansuo: "dangxian_guansuo",
+		},
 		content: function () {
 			trigger.phaseList.splice(trigger.num, 0, "phaseUse|dangxian");
 		},
@@ -8774,7 +8773,7 @@ const skills = {
 				if (player.hp != 1) return false;
 			},
 			respondSha: true,
-			halfneg: true,
+			neg: true,
 		},
 		audio: 2,
 		audioname: ["xin_zhangyi"],
@@ -10221,6 +10220,8 @@ const skills = {
 		},
 	},
 	fuhun3: {},
+	wusheng_guanzhang: { audio: 1 },
+	paoxiao_guanzhang: { audio: 1 },
 	fencheng: {
 		skillAnimation: "epic",
 		animationColor: "gray",
@@ -10630,7 +10631,9 @@ const skills = {
 	},
 	zhiman: {
 		audio: 2,
-		audioname: ["guansuo"],
+		audioname2: {
+			guansuo: "zhiman_guansuo",
+		},
 		trigger: { source: "damageBegin2" },
 		check: function (event, player) {
 			if (get.damageEffect(event.player, player, player) < 0) return true;
@@ -10782,9 +10785,10 @@ const skills = {
 	olsanyao1: {},
 	rezhiman: {
 		audio: "zhiman",
-		audioname: ["guansuo", "re_masu"],
+		audioname: ["re_masu"],
 		audioname2: {
 			dc_guansuo: "zhiman_guansuo",
+			guansuo: "zhiman_guansuo",
 		},
 		trigger: { source: "damageBegin2" },
 		filter: function (event, player) {
@@ -10812,7 +10816,6 @@ const skills = {
 			trigger.cancel();
 		},
 	},
-	zhiman_guansuo: { audio: 2 },
 	resanyao: {
 		audio: 2,
 		enable: "phaseUse",
@@ -14167,7 +14170,7 @@ const skills = {
 		trigger: { player: "damageEnd" },
 		direct: true,
 		filter: function (event, player) {
-			return player.countCards("h") > 0 && player.isDamaged();
+			return player.countCards("h") > 0;
 		},
 		content: function () {
 			"step 0";
@@ -14200,11 +14203,7 @@ const skills = {
 				event.finish();
 			}
 			"step 2";
-			if (event.recover) {
-				player.recover();
-			} else if (result.bool) {
-				//player.draw();
-			} else {
+			if (event.recover || !result.bool) {
 				player.recover();
 			}
 		},
@@ -14377,7 +14376,7 @@ const skills = {
 			threaten: 0.9,
 			effect: {
 				target: function (card, player, target) {
-					if (player.hasSkillTag("jueqing")) return;
+					if (player.hasSkillTag("jueqing", false, target)) return;
 					if (target.hujia) return;
 					if (player._shibei_tmp) return;
 					if (target.hasSkill("shibei_ai")) return;

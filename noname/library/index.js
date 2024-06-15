@@ -24,6 +24,8 @@ import * as Element from "./element/index.js";
 import { updateURLs } from "./update-urls.js";
 import { defaultHooks } from "./hooks/index.js";
 import { freezeButExtensible } from "../util/index.js";
+import security from "../util/security.js";
+import { ErrorManager } from "../util/error.js";
 
 export class Library {
 	configprefix = "noname_0.9_";
@@ -163,8 +165,9 @@ export class Library {
 	 * } }
 	 */
 	node;
+	// 谁写的值类型是string，这也太离谱了喵
 	/**
-	 * @type { { [key: string]: string } }
+	 * @type { { [key: string]: Player } }
 	 */
 	playerOL;
 	/**
@@ -305,14 +308,14 @@ export class Library {
 										typeof yingbianZhuzhanAI == "function"
 											? yingbianZhuzhanAI(player, card, source, targets)
 											: cardx => {
-													var info = get.info(card);
-													if (info && info.ai && info.ai.yingbian) {
-														var ai = info.ai.yingbian(card, source, targets, player);
-														if (!ai) return 0;
-														return ai - get.value(cardx);
-													} else if (get.attitude(player, source) <= 0) return 0;
-													return 5 - get.value(cardx);
-											  },
+												var info = get.info(card);
+												if (info && info.ai && info.ai.yingbian) {
+													var ai = info.ai.yingbian(card, source, targets, player);
+													if (!ai) return 0;
+													return ai - get.value(cardx);
+												} else if (get.attitude(player, source) <= 0) return 0;
+												return 5 - get.value(cardx);
+											},
 								});
 								if (!game.online) return;
 								_status.event._resultid = id;
@@ -6333,8 +6336,7 @@ export class Library {
 								code = container.textarea.value;
 							}
 							try {
-								var character = null;
-								eval(code);
+								var { character } = security.exec2(code);
 								if (!Array.isArray(character)) {
 									throw "err";
 								}
@@ -6421,8 +6423,7 @@ export class Library {
 								code = container.textarea.value;
 							}
 							try {
-								var character = null;
-								eval(code);
+								var { character } = security.exec2(code);
 								if (!Array.isArray(character)) {
 									throw "err";
 								}
@@ -6850,8 +6851,7 @@ export class Library {
 								code = container.textarea.value;
 							}
 							try {
-								var character = null;
-								eval(code);
+								var { character } = security.exec2(code);
 								if (!get.is.object(character)) {
 									throw "err";
 								}
@@ -7513,6 +7513,7 @@ export class Library {
 			"<li>游击：若一名角色拥有带有“游击”的技能，则当该游击技能执行至“游击”处时，若本次技能的目标角色在你的攻击范围内，且你不在其攻击范围内，则你可以执行“游击”后的额外效果。" +
 			"<li>激昂：一名角色发动“昂扬技”标签技能后，此技能失效，直至从此刻至满足此技能“激昂”条件后。" +
 			"<li>历战：一名角色的回合结束时，若本回合发动过拥有历战效果的技能，则对此技能效果的进行等同于发动次数的永久可叠加式升级或修改。" +
+			"<li>同心：若技能拥有同心效果，则拥有该技能的角色可在回合开始时与其他角色同心直到自己下回合开始（默认为选择一名角色同心），选择的角色称为“同心角色”。拥有同心效果的技能发动后，技能发动者先执行同心效果。然后若有与其同心的角色，这些角色也依次执行同心效果。" +
 			"",
 	};
 	/**
@@ -7752,7 +7753,10 @@ export class Library {
 			if (Array.isArray(context)) {
 				try {
 					const code = context.length == 1 ? context[0].string : context.reduceRight((pre, cur) => (pre.string || pre) + "." + cur.string);
-					obj = eval(code);
+					obj = security.exec(`return ${code};`, {
+						event, trigger, player, card, cards,
+						result, source, target, targets,
+					});
 					if (![null, undefined].includes(obj)) {
 						const keys = Object.getOwnPropertyNames(obj)
 							.concat(Object.getOwnPropertyNames(Object.getPrototypeOf(obj)))
@@ -8040,10 +8044,10 @@ export class Library {
 	genAwait(item) {
 		return gnc.is.generator(item)
 			? gnc.of(function* () {
-					for (const content of item) {
-						yield content;
-					}
-			  })()
+				for (const content of item) {
+					yield content;
+				}
+			})()
 			: Promise.resolve(item);
 	}
 	gnc = {
@@ -9560,8 +9564,13 @@ export class Library {
 					if (!Array.isArray(message) || typeof lib.message.client[message[0]] !== "function") {
 						throw "err";
 					}
-					for (var i = 1; i < message.length; i++) {
-						message[i] = get.parsedResult(message[i]);
+					if (game.sandbox) security.enterSandbox(game.sandbox);
+					try {
+						for (var i = 1; i < message.length; i++) {
+							message[i] = get.parsedResult(message[i]);
+						}
+					} finally {
+						if (game.sandbox) security.exitSandbox();
 					}
 				} catch (e) {
 					console.log(e);
@@ -9597,6 +9606,7 @@ export class Library {
 				}
 				game.online = false;
 				game.ws = null;
+				game.sandbox = null;
 			},
 		},
 		/**
@@ -10613,16 +10623,16 @@ export class Library {
 					const cardName = get.name(cards[0], player);
 					return cardName
 						? new lib.element.VCard({
-								name: cardName,
-								nature: get.nature(cards[0], player),
-								suit: get.suit(cards[0], player),
-								number: get.number(cards[0], player),
-								isCard: true,
-								cards: [cards[0]],
-								storage: {
-									stratagem_buffed: 1,
-								},
-						  })
+							name: cardName,
+							nature: get.nature(cards[0], player),
+							suit: get.suit(cards[0], player),
+							number: get.number(cards[0], player),
+							isCard: true,
+							cards: [cards[0]],
+							storage: {
+								stratagem_buffed: 1,
+							},
+						})
 						: new lib.element.VCard();
 				}
 				return null;
@@ -11991,6 +12001,7 @@ export class Library {
 			},
 		},
 	};
+	/** @type {Object<string, import("./element/character.js").Character>} */
 	character = new Proxy(
 		{},
 		{
@@ -12003,7 +12014,9 @@ export class Library {
 	cardPile = {};
 	message = {
 		server: {
-			/** @this { any } */
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
 			init(version, config, banned_info) {
 				if (lib.node.banned.includes(banned_info)) {
 					this.send("denied", "banned");
@@ -12022,9 +12035,16 @@ export class Library {
 					lib.node.clients.remove(this);
 					this.closed = true;
 				} else if (!_status.waitingForPlayer) {
-					if (game.phaseNumber && lib.configOL.observe) {
+					if (!config.nickname) {
+						this.send("denied", "banned");
+						lib.node.clients.remove(this);
+						this.closed = true;
+					} else if (game.phaseNumber && lib.configOL.observe) {
 						lib.node.observing.push(this);
 						this.send("reinit", lib.configOL, get.arenaState(), game.getState ? game.getState() : {}, game.ip, game.players[0].playerid, null, _status.cardtag);
+						// 没有系统提示的接口喵？
+						game.log("玩家 ", `#y${get.plainText(config.nickname)}`, " 进入房间观战");
+						game.me.chat(`玩家 <span style="font-weight: bold; color: rgb(126, 180, 255)">${get.plainText(config.nickname)}</span> 进入房间观战`);
 						if (!ui.removeObserve) {
 							ui.removeObserve = ui.create.system(
 								"移除旁观",
@@ -12069,37 +12089,53 @@ export class Library {
 					this.send("init", this.id, lib.configOL, game.ip, window.isNonameServer, game.roomId);
 				}
 			},
-			/** @this { any } */
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
 			inited() {
 				this.inited = true;
 				if (_status.waitingForPlayer) {
 					game.updateWaiting();
 				}
 			},
-			/** @this { any } */
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
 			reinited() {
 				this.inited = true;
 			},
-			result: function (result) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			result(result) {
 				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
 					player.unwait(result);
 				}
 			},
-			tempResult: function (result) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			tempResult(result) {
 				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
 					player.tempUnwait(result);
 				}
 			},
-			startGame: function () {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			startGame() {
 				if (this.id == game.onlinezhu) {
 					game.resume();
 				}
 			},
-			changeRoomConfig: function (config) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			changeRoomConfig(config) {
 				if (this.id == game.onlinezhu) {
 					game.broadcastAll(function (config) {
 						for (var i in config) {
@@ -12126,7 +12162,10 @@ export class Library {
 					}
 				}
 			},
-			changeNumConfig: function (num, index, bool) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			changeNumConfig(num, index, bool) {
 				if (this.id == game.onlinezhu) {
 					lib.configOL.number = num;
 					game.send("server", "config", lib.configOL);
@@ -12140,14 +12179,20 @@ export class Library {
 					}
 				}
 			},
-			throwEmotion: function (target, emotion, rotate) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			throwEmotion(target, emotion, rotate) {
 				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
 					player.throwEmotion(target, emotion, rotate);
 				}
 			},
-			emotion: function (id, pack, emotion) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			emotion(id, pack, emotion) {
 				if (lib.node.observing.includes(this)) return;
 				var that = this;
 				if (
@@ -12177,7 +12222,10 @@ export class Library {
 				}
 				if (player) player.emotion(pack, emotion);
 			},
-			chat: function (id, str) {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			chat(id, str) {
 				if (lib.node.observing.includes(this)) return;
 				var that = this;
 				if (
@@ -12207,8 +12255,18 @@ export class Library {
 				}
 				if (player) player.chat(str);
 			},
-			giveup: function (player) {
+			/**
+			 * ```plain
+			 * 当客机向主机发送投降请求时的回调
+			 * ```
+			 * 
+			 * @this {import("./element/client.js").Client}
+			 * @param {Player} player 
+			 */
+			giveup(player) {
 				if (lib.node.observing.includes(this) || !player || !player._giveUp) return;
+				var self = lib.playerOL[this.id];
+				if (self !== player) return; // 禁止让别人投降
 				_status.event.next.length = 0;
 				game
 					.createEvent("giveup", false)
@@ -12219,7 +12277,10 @@ export class Library {
 						player.die("nosource").includeOut = true;
 					}).player = player;
 			},
-			auto: function () {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			auto() {
 				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
@@ -12230,7 +12291,10 @@ export class Library {
 					}, player);
 				}
 			},
-			unauto: function () {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			unauto() {
 				if (lib.node.observing.includes(this)) return;
 				var player = lib.playerOL[this.id];
 				if (player) {
@@ -12241,18 +12305,21 @@ export class Library {
 					}, player);
 				}
 			},
-			exec: function (func) {
+			exec(func) {
 				// if(typeof func=='function'){
 				//     var args=Array.from(arguments);
 				//     args.shift();
 				//     func.apply(this,args);
 				// }
 			},
-			log: function () {
+			/**
+			 * @this {import("./element/client.js").Client}
+			 */
+			log() {
 				var items = [];
 				try {
 					for (var i = 0; i < arguments.length; i++) {
-						eval("items.push(" + arguments[i] + ")");
+						items.push(this.sandbox.exec(`return ${arguments[i]}`));
 					}
 				} catch (e) {
 					this.send("log", ["err"]);
@@ -12521,7 +12588,7 @@ export class Library {
 								navigator.clipboard
 									.readText()
 									.then(read)
-									.catch(_ => {});
+									.catch(_ => { });
 							} else {
 								var input = ui.create.node("textarea", ui.window, { opacity: "0" });
 								input.select();
@@ -12962,11 +13029,16 @@ export class Library {
 				});
 			},
 			exec: function (func) {
-				var key = game.onlineKey;
+				const key = game.onlineKey;
 				if (typeof func == "function") {
-					var args = Array.from(arguments);
+					const { Domain } = security.importSandbox();
+					// 被封送的函数额外间隔了三层调用栈
+					const level = (!Domain || Domain.current.isFrom(func)) ? 0 : 3;
+					const args = Array.from(arguments);
 					args.shift();
-					func.apply(this, args);
+					ErrorManager.errorHandle(() => {
+						func.apply(this, args);
+					}, func, level);
 				}
 				if (key) {
 					game.onlineKey = key;
