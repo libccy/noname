@@ -3552,9 +3552,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						time = parseInt(lib.configOL.choose_timeout) * 1000;
 					var aiTargets = (event.aiTargets = []);
 					event.players.forEach((current) => {
+						current.showTimer(time);
 						if (current.isOnline()) {
 							current.send(send, camouflaged, event.videoId, true);
-							current.showTimer(time);
 							if (current.identity == "nei") {
 								current.wait();
 								event.withOL = true;
@@ -3569,6 +3569,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							else
 								event._result = {
 									bool: true,
+									_noHidingTimer: true,
 								};
 							return;
 						}
@@ -3577,7 +3578,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (!aiTargets.length) return;
 					aiTargets.randomSort();
 					new Promise((resolve) =>
-						setTimeout(resolve, Math.ceil(5000 + 5000 * Math.random()))
+						setTimeout(resolve, Math.ceil(3000 + 5000 * Math.random()))
 					).then(() => {
 						var interval = setInterval(() => {
 							aiTargets.shift();
