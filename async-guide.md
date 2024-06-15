@@ -86,7 +86,7 @@ async函数写法可以让`content`这类step写法的函数贴近其他的函�
 var skill = {
     enable: "phaseUse",
     usable: 1,
-    async content(event, trigger, player) {
+    content() {
         "step 0"
         player.draw(2)
         "step 1"
