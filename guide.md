@@ -201,21 +201,22 @@ var skill = {
 
 ### 2. async函数替代step写法的基本变化有哪些？
 async函数写法可以让`content`这类step写法的函数贴近其他的函数
-> 例如函数`filter`要求你写出`(event, player, name)`参数，然后你才可以用`event`/`player`/`name`三个变量
-> 
-> 而async函数也是如此，你需要写出`(event, trigger, player)`三个由无名杀提供的参数才能使用`event`/`player`/`name`三个变量
-> 
-> 这样的好处是统一规范了函数写法，减少了新开发者的疑惑，你所使用的`event`/`trigger`/`player`都是你看得到的
-> 
-> 而另外在报错/调试代码时，可以更加方便，这个我们之后再说
->
-> 到这里你可能会反应过来，平常在`step`写法中经常直接使用`card`/`target`/`num`等变量，现在参数里面没有这些变量，要怎么样引用这些变量呢？
-> 
-> 我们要知道，`card`/`target`/`num`等变量其实都是`event`的属性，无名杀提前为我们从`event`对象中取出了这些变量
-> 
-> 换言之我们用`event.card`/`event.target`/`event.num`就可以代替原本的`card`/`target`/`num`这些变量了
-> 
-> 值得注意的是，`event.step`变量在async函数中不再有意义，因为没有了`step`标注，本体也无法确定async函数执行到了哪一步，自然`event.step`的值也就没有了意义
+
+例如，函数`filter`要求你写出`(event, player, name)`参数，然后你才可以用`event`/`player`/`name`三个变量
+
+而async函数也是如此，你需要写出`(event, trigger, player)`三个由无名杀提供的参数才能使用`event`/`player`/`name`三个变量
+
+这样的好处是统一规范了函数写法，减少了新开发者的疑惑，你所使用的`event`/`trigger`/`player`都是你看得到的
+
+而另外在报错/调试代码时，可以更加方便，这个我们之后再说
+
+到这里你可能会反应过来，平常在`step`写法中经常直接使用`card`/`target`/`num`等变量，现在参数里面没有这些变量，要怎么样引用这些变量呢？
+
+我们要知道，`card`/`target`/`num`等变量其实都是`event`的属性，无名杀提前为我们从`event`对象中取出了这些变量
+
+换言之我们用`event.card`/`event.target`/`event.num`就可以代替原本的`card`/`target`/`num`这些变量了
+
+值得注意的是，`event.step`变量在async函数中不再有意义，因为没有了`step`标注，本体也无法确定async函数执行到了哪一步，自然`event.step`的值也就没有了意义
 
 ### 3. 那么async函数如何写出分步的效果呢？
 来认识一下新的朋友——`await`
@@ -526,4 +527,8 @@ game.pause()
 await promise
 ```
 
-这里可能会有人疑惑，为什么
+这里可能会有人疑惑，为什么已经用了`Promise`还要追加`game.pause`？
+
+这是因为`Promise`只是暂停了当前代码的执行，并没有启动`游戏内暂停`，这会导致游戏其他部分并不知道已经暂停了，我们需要补充`game.pause`来告诉游戏已经暂停
+
+好了，到此你就已经彻底的把async写法的关键知识浏览了一遍，如果要更好的巩固它，可以试着把你之前的技能改成async写法试试哦~
