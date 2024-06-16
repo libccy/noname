@@ -1590,8 +1590,12 @@ export class Get {
 			if (func._filter_args) {
 				return "_noname_func:" + JSON.stringify(get.stringifiedResult(func._filter_args, 3));
 			}
-			const { Marshal } = security.importSandbox();
-			const str = Marshal.decompileFunction(func);
+			// 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
+			/** @type {(func: Function) => string} */
+			const decompileFunction = security.isSandboxRequired()
+				? security.importSandbox().Marshal.decompileFunction
+				: Function.prototype.toString.call;
+			const str = decompileFunction(func);
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return "_noname_func:function () {}";
 			return "_noname_func:" + get.pureFunctionStr(str);

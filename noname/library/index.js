@@ -13031,11 +13031,11 @@ export class Library {
 			exec: function (func) {
 				const key = game.onlineKey;
 				if (typeof func == "function") {
-					const { Domain } = security.importSandbox();
+					const isMarshalled = security.isSandboxRequired()
+						&& security.importSandbox().Domain.current.isFrom(func);
 					// 被封送的函数额外间隔了四层调用栈
-					const level = (!Domain || Domain.current.isFrom(func)) ? 0 : 4;
-					const args = Array.from(arguments);
-					args.shift();
+					const level = isMarshalled ? 4 : 0;
+					const args = Array.from(arguments).slice(1);
 					ErrorManager.errorHandle(() => {
 						func.apply(this, args);
 					}, func, level);
