@@ -5322,13 +5322,15 @@ const skills = {
 	},
 	nsshuangxiong: {
 		unique: true,
-		forceunique: true,
 		trigger: { player: "juedouBegin", target: "juedouBegin" },
 		check(event, player) {
 			return player.isTurnedOver();
 		},
 		content() {
 			player.turnOver();
+		},
+		ai: {
+			combo: "nsduijue"
 		},
 	},
 	nsguanyong: {
