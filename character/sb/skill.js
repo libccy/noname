@@ -370,12 +370,12 @@ const skills = {
 				charlotte: true,
 				mod: {
 					globalTo(from, to, distance) {
-						return distance - to.countMark("sbyicong_to");
+						return distance + to.countMark("sbyicong_to");
 					},
 				},
 				marktext: "从",
 				intro: {
-					content: "本轮其他角色至你的距离-#",
+					content: "本轮其他角色至你的距离+#",
 				},
 			},
 		},

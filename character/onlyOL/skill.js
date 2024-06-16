@@ -924,7 +924,7 @@ const skills = {
 							eff = get.effect(target, trigger.card, trigger.player, player);
 						if (trigger.card.name == "tiesuo") return eff > 0 ? 0 : get.sgn(att) * (2 + get.sgn(att));
 						const sum = trigger.targets.reduce((i, j) => i + get.effect(j, trigger.card, trigger.player, player), 0);
-						return get.sgn(att) * (eff * 2 - sum);
+						return eff * 2 - sum;
 					},
 				})
 				.set("prompt2", "弃置一张" + get.translation(get.color(trigger.card)) + "牌，令" + get.translation(trigger.card) + "改为对其中一个目标结算两次");
