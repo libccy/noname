@@ -1,4 +1,9 @@
 export default {
+	"#resilv1": "大义同胶漆，匪石心不移。",
+	"#resilv2": "人谁不虑终，日月有合离。",
+	"#relianju1": "叹息亦何为，但恐大义亏。",
+	"#relianju2": "室中是阿谁，叹息声正悲。",
+	"#ol_liwan:die": "及尔偕老，老使我怨。",
 	"#oljingzhou1": "艨艟连江，敌必不战自退。",
 	"#oljingzhou2": "精舟锐进，直捣孙家老巢。",
 	"#olzuolian1": "有我操练水军，曹公大可放心！",

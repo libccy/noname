@@ -16,7 +16,7 @@ const characters = {
 	ol_liwan: ["female", "wei", 3, ["relianju", "resilv"]],
 	ol_dingshangwan: ["female", "wei", 3, ["olfudao", "olfengyan"]],
 	zhangyan: ["male", "qun", 4, ["olsuji", "ollangdao"]],
-	ol_tw_zhangji: ["male", "wei", 3, ["skill_zhangji_A", "skill_zhangji_B"], ["unseen"]],
+	ol_tw_zhangji: ["male", "wei", 3, ["skill_zhangji_A", "skill_zhangji_B"]],
 	ol_feiyi: ["male", "shu", 3, ["yanru", "hezhong"]],
 	lvboshe: ["male", "qun", 4, ["olfushi", "oldongdao"]],
 	ol_luyusheng: ["female", "wu", 3, ["olcangxin", "olrunwei"]],

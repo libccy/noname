@@ -11103,7 +11103,7 @@ const skills = {
 					function (player, character, old) {
 						player.tempname.remove(old);
 						player.tempname.add(character);
-						player.sex = lib.character[event.card][0];
+						player.sex = lib.character[character][0];
 					},
 					player,
 					event.card,
