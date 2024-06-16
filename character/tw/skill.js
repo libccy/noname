@@ -121,14 +121,21 @@ const skills = {
 			player.awakenSkill(event.name);
 			await player.recoverTo(1);
 			player.addTempSkill(event.name + "_buff");
-			player.when({ global: "phaseAfter" }).then(() => {
-				const num = Math.min(7, player.getStorage("huan_zhugeliang_A").length);
-				if (num > 0) player.draw(num);
-				player.insertPhase();
-				player.changeSkin("huan_zhugeliang_C", "huan_zhugeliangx");
-				player.changeSkills(["huan_zhugeliang_D", "huan_zhugeliang_E", "huan_zhugeliang_F", "huan_zhugeliang_G"], ["huan_zhugeliang_A", "huan_zhugeliang_B", "huan_zhugeliang_C"]);
-			});
+			player
+				.when({ global: "phaseAfter" })
+				.then(() => {
+					const num = Math.min(7, player.getStorage("huan_zhugeliang_A").length);
+					if (num > 0) player.draw(num);
+				})
+				.then(() => {
+					player.insertPhase();
+				})
+				.then(() => {
+					player.changeSkin("huan_zhugeliang_C", "huan_zhugeliang_shadow");
+					player.changeSkills(["huan_zhugeliang_D", "huan_zhugeliang_E", "huan_zhugeliang_F", "huan_zhugeliang_G"], ["huan_zhugeliang_A", "huan_zhugeliang_B", "huan_zhugeliang_C"]);
+				});
 		},
+		derivation:["huan_zhugeliang_D", "huan_zhugeliang_E", "huan_zhugeliang_F", "huan_zhugeliang_G"],
 		subSkill: {
 			buff: {
 				trigger: {
@@ -285,6 +292,7 @@ const skills = {
 			player.changeSkin("huan_zhugeliang_G", "huan_zhugeliang");
 			player.changeSkills(["huan_zhugeliang_A", "huan_zhugeliang_B", "huan_zhugeliang_C"], ["huan_zhugeliang_D", "huan_zhugeliang_E", "huan_zhugeliang_F", "huan_zhugeliang_G"]);
 		},
+		derivation:["huan_zhugeliang_A", "huan_zhugeliang_B", "huan_zhugeliang_C"],
 	},
 	//幻姜维
 	huan_jiangwei_A: {
