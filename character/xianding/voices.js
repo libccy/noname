@@ -1,4 +1,9 @@
 export default {
+	"#dctongdao1": "安定宫无一丈之长，恐难七步成诗。",
+	"#dctongdao2": "故峻恶，皓恶甚于峻。",
+	"#dccilv1": "妾一介女流，安知社稷之虑。",
+	"#dccilv2": "家国无损、宗庙得续，我无异议。",
+	"#zhupeilan:die": "生如浮萍，随波而逝。",
 	"#dcsbwuwei1": "残阳洗长刀，漫卷天下帜。",
 	"#dcsbwuwei2": "武效万人敌，复行千里路。",
 	"#dc_sb_guanping:die": "生未屈刀兵，死罢战黄泉。",
