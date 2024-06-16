@@ -1151,8 +1151,10 @@ window.noname_character_rank = {
 		"huan_simayi",
 		"huan_zhaoyun",
 		"huan_guojia",
+		"huan_jiangwei",
 	],
 	b: [
+		"huan_zhugeliang",
 		"huan_zhanghe",
 		"star_zhangzhao",
 		"dc_sp_zhurong",
@@ -2832,6 +2834,8 @@ window.noname_character_rank = {
 			"matie",
 			"huan_weiyan",
 			"huan_zhaoyun",
+			"huan_jiangwei",
+			"huan_zhugeliang",
 		],
 		junk: [
 			"ol_peixiu",
