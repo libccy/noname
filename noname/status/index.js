@@ -3,6 +3,9 @@ import { lib } from "../library/index.js";
 export class status {
 	paused = false;
 	paused2 = false;
+	/**
+	 * @type { boolean | "paused" }
+	 */
 	paused3 = false;
 	over = false;
 	clicked = false;

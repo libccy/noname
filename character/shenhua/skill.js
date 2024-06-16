@@ -4414,7 +4414,8 @@ const skills = {
 				next = switchToAuto();
 			}
 			const result = await next;
-			_status.paused = false; // 恢复 game.loop 但不立刻执行
+			// _status.paused = false; // 恢复 game.loop 但不立刻执行
+			game.resume();
 			result.logged = event.logged;
 			event.result = {
 				bool: result.bool,

@@ -1167,7 +1167,9 @@ async function setOnError() {
 		Reflect.set(window, "eo", err);
 		if (promiseErrorHandler.onErrorFinish) promiseErrorHandler.onErrorFinish();
 		// @ts-ignore
-		if (!lib.config.errstop && (_status && _status.event && !(_status.event.content instanceof AsyncFunction))) {
+		if (!lib.config.errstop && _status && _status.event) {
+			if (_status.event.content instanceof AsyncFunction ||
+				Array.isArray(_status.event.contents)) return;
 			_status.withError = true;
 			game.loop();
 		}
