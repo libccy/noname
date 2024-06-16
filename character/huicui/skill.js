@@ -340,6 +340,9 @@ const skills = {
 				inherit: "fengyin",
 			},
 		},
+		ai: {
+			combo: "dchuoxin"
+		},
 	},
 	dchuoxin: {
 		audio: 2,

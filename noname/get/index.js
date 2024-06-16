@@ -2471,7 +2471,7 @@ export class Get {
 	}
 	cnNumber(num, ordinal) {
 		if (isNaN(num)) return "";
-		let numStr = num.toString();
+		let numStr = "" + num;
 		if (numStr === "Infinity") return "∞";
 		if (numStr === "-Infinity") return "-∞";
 		if (!/^\d+$/.test(numStr)) return num;

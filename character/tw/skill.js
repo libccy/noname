@@ -2,6 +2,217 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//幻郭嘉
+	huan_guojia_A: {
+		audio: 2,
+		enable: "phaseUse",
+		onChooseToUse(event) {
+			if (!game.online && event.type == "phase" && !event.huan_guojia_A) {
+				const player = event.player;
+				event.set(
+					"huan_guojia_A",
+					player
+						.getRoundHistory("useSkill", evt => {
+							return evt.skill == "huan_guojia_A";
+						})
+						.reduce((list, evt) => {
+							return list.add(evt.targets[0]);
+						}, [])
+				);
+			}
+		},
+		filter(event, player) {
+			return player.countCards("he") && game.hasPlayer(target => lib.skill.huan_guojia_A.filterTarget(null, player, target));
+		},
+		filterTarget(card, player, target) {
+			return player != target && !get.event().huan_guojia_A.includes(target);
+		},
+		filterCard: true,
+		selectCard: [1, 2],
+		position: "he",
+		check(card) {
+			return 5 - get.value(card);
+		},
+		usable: 3,
+		lose: false,
+		discard: false,
+		delay: 0,
+		prompt: "将至多两张牌标记为“技一”并交给一名本轮未以此法交给其牌的角色",
+		content() {
+			const ID = player.playerid;
+			const skill = "huan_guojia_A_effect",
+				skillID = "huan_guojia_A_" + ID;
+			if (!lib.skill[skillID]) {
+				game.broadcastAll(skillID => {
+					lib.skill[skillID] = { charlotte: true };
+					lib.translate[skillID] = "技一";
+				}, skillID);
+			}
+			if (!target.storage[skill]) {
+				target.storage[skill] = {};
+			}
+			if (!target.storage[skill][player.playerid]) {
+				target.storage[skill][player.playerid] = 0;
+			}
+			target.storage[skill][player.playerid] += cards.length;
+			player.give(cards, target).gaintag.add(skillID);
+		},
+		ai: {
+			order: 1,
+			result: {
+				target(player, target) {
+					const att = get.attitude(player, target);
+					return att * (att > 0 ? 2 : 1);
+				},
+			},
+		},
+		group: ["huan_guojia_A_effect", "huan_guojia_A_remove"],
+		subSkill: {
+			effect: {
+				audio: "huan_guojia_A",
+				trigger: { global: "phaseUseBegin" },
+				filter(event, player) {
+					return event.player.hasCard(card => card.hasGaintag("huan_guojia_A_" + player.playerid), "h");
+				},
+				prompt2(event, player) {
+					const num = event.player.storage["huan_guojia_A_effect"][player.playerid];
+					return "观看其手牌并将其中至多" + get.cnNumber(num) + "张牌以任意顺序置于牌堆顶";
+				},
+				check(event, player) {
+					return get.attitude(player, event.player) < 0;
+				},
+				logTarget: "player",
+				async content(event, trigger, player) {
+					const target = trigger.player,
+						num = target.storage["huan_guojia_A_effect"][player.playerid];
+					const result = await player
+						.chooseToMove("技一：将" + get.translation(target) + "的至多" + get.cnNumber(num) + "张牌以任意顺序置于牌堆顶", true)
+						.set("list", [[get.translation(target) + "的手牌", target.getCards("h"), "dcsushou_tag"], ["牌堆顶"]])
+						.set("filterOk", moved => {
+							const num = get.event().num;
+							return moved[1].length >= 1 && moved[1].length <= num;
+						})
+						.set("num", num)
+						.set("processAI", list => {
+							const num = get.event().num;
+							let cards = list[0][1],
+								sgn = get.attitude(get.event().player, get.event().getTrigger().player) > 0 ? 1 : -1;
+							cards.sort((a, b) => get.value(a) * sgn - get.value(b) * sgn);
+							return [cards.slice(sgn > 0 ? 1 : num, cards.length), cards.slice(0, sgn > 0 ? 1 : num)];
+						})
+						.forResult();
+					if (result.bool) {
+						const cards = result.moved[1];
+						target.$throw(cards.length, 1000);
+						await target.lose(cards, ui.cardPile);
+						game.log(target, "的" + get.cnNumber(cards.length) + "张牌被置入了", "#y牌堆顶");
+						for (let i = cards.length - 1; i--; i >= 0) {
+							ui.cardPile.insertBefore(cards[i], ui.cardPile.firstChild);
+						}
+						game.updateRoundNumber();
+					}
+				},
+			},
+			remove: {
+				audio: "huan_guojia_A",
+				trigger: { player: "phaseBegin" },
+				filter(event, player) {
+					return game.hasPlayer(target => target.hasCard(card => card.hasGaintag("huan_guojia_A_" + player.playerid), "h"));
+				},
+				forced: true,
+				locked: false,
+				async content(event, trigger, player) {
+					const targets = game.filterPlayer(target => target.hasCard(card => card.hasGaintag("huan_guojia_A_" + player.playerid), "h"));
+					const sum = targets.reduce((num, target) => num + target.countCards("h", card => card.hasGaintag("huan_guojia_A_" + player.playerid)), 0);
+					for (const target of targets) target.removeGaintag("huan_guojia_A_" + player.playerid);
+					await player.draw(sum);
+				},
+			},
+		},
+	},
+	huan_guojia_B: {
+		audio: 2,
+		trigger: { target: "useCardToTarget" },
+		filter(event, player) {
+			return get.type(event.card) == "trick";
+		},
+		async content(event, trigger, player) {
+			const cards = get.cards(1, true),
+				card = cards[0];
+			await player.showCards(cards, get.translation(player) + "发动了【技二】");
+			if (get.color(card) == get.color(trigger.card)) {
+				await player.gain(cards, "gain2");
+			}
+			if (get.suit(card) == get.suit(trigger.card)) {
+				trigger.getParent().excluded.add(player);
+				game.log(trigger.card, "对", player, "无效");
+			}
+			if (get.color(card) != get.color(trigger.card)) {
+				await game.cardsDiscard(cards);
+				player.$throw(cards);
+				game.log(cards, "被置入了弃牌堆");
+			}
+		},
+	},
+	//幻张郃
+	huan_zhanghe_A: {
+		audio: 2,
+		trigger: { player: "useCardToPlayered" },
+		filter(event, player) {
+			if (event.card.name != "sha" || event.targets.length != 1) return false;
+			return player.countCards("h") + event.target.countCards("h") > 0;
+		},
+		forced: true,
+		logTarget: "target",
+		content() {
+			const targets = [player, trigger.target];
+			for (const target of targets) {
+				if (!target.countCards("h")) continue;
+				target.addSkill("huan_zhanghe_A_card");
+				target.addGaintag(target.getCards("h").randomGets(2), "huan_zhanghe_A_card");
+			}
+		},
+		group: "huan_zhanghe_A_damage",
+		subSkill: {
+			damage: {
+				audio: "huan_zhanghe_A",
+				trigger: { global: "damageBegin1" },
+				filter(event, player) {
+					if (!event.source) return false;
+					const evtx = event.getParent(2);
+					if (
+						!evtx ||
+						evtx.name != "useCard" ||
+						!player.hasHistory("lose", evt => {
+							if (evt.getParent() != evtx) return false;
+							return Object.keys(evt.gaintag_map || {}).includes("huan_zhanghe_A_card");
+						})
+					)
+						return false;
+					return event.source.countCards("h", card => card.hasGaintag("huan_zhanghe_A_card")) > event.target.countCards("h", card => card.hasGaintag("huan_zhanghe_A_card"));
+				},
+				forced: true,
+				logTarget: "source",
+				content() {
+					trigger.num++;
+				},
+			},
+			card: {
+				charlotte: true,
+				mod: {
+					aiOrder(player, card, num) {
+						if (get.itemtype(card) == "card" && card.hasGaintag("huan_zhanghe_A_card")) return num + 1;
+					},
+					cardname(card, player) {
+						if (get.itemtype(card) == "card" && card.hasGaintag("huan_zhanghe_A_card")) return "sha";
+					},
+					cardnature(card, player) {
+						if (get.itemtype(card) == "card" && card.hasGaintag("huan_zhanghe_A_card")) return false;
+					},
+				},
+			},
+		},
+	},
 	//幻赵云
 	huan_zhaoyun_A: {
 		audio: 2,

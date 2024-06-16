@@ -27,7 +27,7 @@ const characterReplaces = {
 	panzhangmazhong: ["panzhangmazhong", "re_panzhangmazhong", "xin_panzhangmazhong"],
 	yufan: ["yufan", "ol_yufan", "xin_yufan", "re_yufan"],
 	zhuran: ["zhuran", "re_zhuran", "xin_zhuran", "old_zhuran"],
-	liru: ["xin_liru", "dc_liru", "re_liru", "yj_liru", "+liru"],
+	liru: ["xin_liru", "liru", "dc_liru", "re_liru", "yj_liru", "ol_liru"],
 	fuhuanghou: ["fuhuanghou", "re_fuhuanghou", "xin_fuhuanghou", "old_fuhuanghou"],
 	chenqun: ["chenqun", "dc_chenqun", "re_chenqun", "old_chenqun"],
 	hanhaoshihuan: ["hanhaoshihuan", "re_hanhaoshihuan"],

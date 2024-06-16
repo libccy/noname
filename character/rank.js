@@ -878,6 +878,7 @@ window.noname_character_rank = {
 		"re_liubiao",
 		"xin_liubiao",
 		"re_liru",
+		"ol_liru",
 		"re_manchong",
 		"re_jianyong",
 		"re_yufan",
@@ -1149,8 +1150,10 @@ window.noname_character_rank = {
 		"huan_weiyan",
 		"huan_simayi",
 		"huan_zhaoyun",
+		"huan_guojia",
 	],
 	b: [
+		"huan_zhanghe",
 		"star_zhangzhao",
 		"dc_sp_zhurong",
 		"hansong",
@@ -1995,6 +1998,7 @@ window.noname_character_rank = {
 			"jsrg_yuanshao",
 		],
 		epic: [
+			"huan_guojia",
 			"huan_simayi",
 			"dc_sb_zhangxiu",
 			"ol_jiangwan",
@@ -2297,6 +2301,7 @@ window.noname_character_rank = {
 			"dc_sp_zhurong",
 		],
 		rare: [
+			"huan_weiyan",
 			"ol_caifuren",
 			"dc_sb_caoang",
 			"dc_sb_guanping",
@@ -2569,6 +2574,7 @@ window.noname_character_rank = {
 			"re_manchong",
 			"re_yufan",
 			"re_liru",
+			"ol_liru",
 			"re_jianyong",
 			"re_sunluban",
 			"re_sunxiu",
