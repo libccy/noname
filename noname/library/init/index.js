@@ -612,7 +612,7 @@ export class LibInit {
 			/** @type {(func: Function) => string} */
 			const decompileFunction = security.isSandboxRequired()
 				? security.importSandbox().Marshal.decompileFunction
-				: Function.prototype.toString.call;
+				: Function.prototype.call.bind(Function.prototype.toString);
 			//Remove all comments
 			//移除所有注释
 			const code = decompileFunction(func)
