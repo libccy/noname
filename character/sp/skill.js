@@ -24361,6 +24361,9 @@ const skills = {
 			player.markSkill("rebiluan2");
 			game.addVideo("storage", player, ["biluan", player.storage.rebiluan2]);
 		},
+		ai: {
+			combo: "biluan"
+		},
 	},
 	olbiluan: {
 		audio: "biluan",
@@ -24437,6 +24440,9 @@ const skills = {
 			player.storage.rebiluan2--;
 			player.markSkill("rebiluan2");
 			game.addVideo("storage", player, ["rebiluan2", player.storage.rebiluan]);
+		},
+		ai: {
+			combo: "rebiluan"
 		},
 	},
 	rebiluan2: {
@@ -24575,6 +24581,9 @@ const skills = {
 			player.storage.rebiluan2 -= result.links.length;
 			player.markSkill("rebiluan2");
 			game.addVideo("storage", player, ["rebiluan2", player.storage.rebiluan2]);
+		},
+		ai: {
+			combo: "olbiluan"
 		},
 	},
 	guiming: {
