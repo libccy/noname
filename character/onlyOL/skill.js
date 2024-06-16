@@ -2,6 +2,59 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//OL界李儒
+	olmieji: {
+		audio: 2,
+		inherit: "xinmieji",
+		filter(event, player) {
+			return player.countCards("h", { type: ["trick", "delay"] });
+		},
+		filterCard(card) {
+			return get.type2(card) == "trick";
+		},
+		async content(event, trigger, player) {
+			const target = event.target;
+			await player.showCards(event.cards, get.translation(player) + "发动了【灭计】");
+			const result = await target.chooseToDiscard("he", true).set("prompt", "请弃置一张锦囊牌，或依次弃置两张非锦囊牌。").forResult();
+			if (
+				(!result.cards || get.type(result.cards[0], "trick", result.cards[0].original == "h" ? target : false) != "trick") &&
+				target.countCards("he", function (card) {
+					return get.type(card, "trick") != "trick";
+				})
+			) {
+				await target
+					.chooseToDiscard("he", true, function (card) {
+						return get.type(card, "trick") != "trick";
+					})
+					.set("prompt", "请弃置第二张非锦囊牌");
+			}
+			const cards = game
+				.getGlobalHistory("everything", evt => {
+					return evt.name == "lose" && evt.getParent(3) == event;
+				})
+				.reduce((list, evt) => {
+					return list.add(evt.cards[0]);
+				}, [])
+				.filterInD("d");
+			if (cards.some(card => player.hasUseTarget(card, true, false))) {
+				const result = await player
+					.chooseButton(["灭计：是否使用其中的一张牌？", cards])
+					.set("filterButton", button => {
+						return get.event().player.hasUseTarget(button.link, true, false);
+					})
+					.set("ai", button => {
+						return get.event().player.getUseValue(button.link);
+					})
+					.forResult();
+				if (result.bool) {
+					const card = result.links[0];
+					player.$gain2(card, false);
+					await game.asyncDelayx();
+					await player.chooseUseTarget(true, card, false);
+				}
+			}
+		},
+	},
 	//OL界蔡夫人
 	olqieting: {
 		audio: 2,
