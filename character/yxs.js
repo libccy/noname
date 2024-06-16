@@ -3120,7 +3120,7 @@ game.import("character", function () {
 			yxs_nandinggeer: "南丁格尔",
 			yxs_weizhongxian: "魏忠贤",
 			yxs_lanlinwang: "兰陵王",
-			yxs_meixi: "妹喜",
+			yxs_meixi: "妺喜",
 			yxs_qinqiong: "秦琼",
 
 			yxs_fanji: "反击",
