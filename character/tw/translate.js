@@ -331,7 +331,7 @@ const translates = {
 	tw_fengxí: "冯习",
 	twqingkou: "轻寇",
 	twqingkou_info: "准备阶段，你可以视为对一名其他角色使用一张【决斗】。然后此牌的伤害来源摸一张牌，若伤害来源包括你，你跳过本回合的判定阶段和弃牌阶段。",
-	tw_zhangji: "张既",
+	tw_zhangji: "TW张既",
 	tw_zhangji_prefix: "TW",
 	twdingzhen: "定镇", //丁真
 	twdingzhen_info: "一轮游戏开始时，你可以选择任意名你至其距离不大于X的角色（X为你的体力值），这些角色选择一项：1.弃置一张【杀】；2.本轮其于回合内使用的第一张牌不能指定你为目标。",
