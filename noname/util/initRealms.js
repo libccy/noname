@@ -57,7 +57,13 @@ async function initializeSandboxRealms(enabled) {
     // 然后就可以直接冻结当前变量域的原型链
     const iframe = createElement("iframe");
     iframe.style.display = "none";
+    const firefoxLoaded = new Promise(resolve => {
+        iframe.onload = resolve;
+    });
     appendChild(iframe);
+
+    // Firefox 的 appendChild 居然还是异步的喵_(:з」∠)_
+    await firefoxLoaded;
 
     if (!iframe.contentWindow)
         throw new ReferenceError("无法载入运行域");
