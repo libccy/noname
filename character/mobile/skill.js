@@ -17144,6 +17144,7 @@ const skills = {
 		charlotte: true,
 		firstDo: true,
 		popup: false,
+		forceLoad:true,
 		filter: function (event, player) {
 			return get.mode() != "guozhan" && get.is.double(player.name1) && !player._groupChosen;
 		},
