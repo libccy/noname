@@ -2729,6 +2729,10 @@ const skills = {
 				event.finish();
 				return;
 			}
+			player.markAuto("dcliangxiu", cards.map(card => get.type2(card, false)).toUniqued());
+			player.when({ global: "phaseChange" }).then(() => {
+				player.unmarkSkill("dcliangxiu");
+			});
 			if (_status.connectMode) game.broadcastAll(() => (_status.noclearcountdown = true));
 			let given_map = {};
 			while (cards.length) {
