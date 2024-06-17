@@ -9651,7 +9651,7 @@ const skills = {
 			var skills = target.getSkills(null, false, false).filter(function (i) {
 				if (i == "bazhen") return;
 				var info = get.info(i);
-				return info && !get.is.locked(i) && !info.limited && !info.juexingji && !info.zhuSkill && !info.charlotte;
+				return info && !get.is.locked(i) && !info.limited && !info.juexingji && !info.zhuSkill && !info.charlotte && !info.persevereSkill;
 			});
 			target.addAdditionalSkills("dcjiezhen_blocker", "bazhen");
 			target.addSkill("dcjiezhen_blocker");
@@ -9666,7 +9666,7 @@ const skills = {
 					var skills = target.getSkills(null, false, false).filter(function (i) {
 						if (i == "bazhen") return;
 						var info = get.info(i);
-						return info && !get.is.locked(i) && !info.limited && !info.juexingji && !info.zhuSkill && !info.charlotte;
+						return info && !get.is.locked(i) && !info.limited && !info.juexingji && !info.zhuSkill && !info.charlotte && !info.persevereSkill;
 					});
 					if (!skills.length && target.hasEmptySlot(2)) return 1;
 					return -0.5 * skills.length;
@@ -9686,7 +9686,7 @@ const skills = {
 				charlotte: true,
 				locked: true,
 				skillBlocker: function (skill, player) {
-					return skill != "bazhen" && skill != "dcjiezhen_blocker" && !lib.skill[skill].charlotte && player.getStorage("dcjiezhen_blocker").includes(skill);
+					return skill != "bazhen" && skill != "dcjiezhen_blocker" && !lib.skill[skill].charlotte && !info.persevereSkill && player.getStorage("dcjiezhen_blocker").includes(skill);
 				},
 				mark: true,
 				marktext: "阵",
