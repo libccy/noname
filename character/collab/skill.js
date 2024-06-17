@@ -1774,6 +1774,7 @@ const skills = {
 	},
 	dcruyi: {
 		audio: 2,
+		derivation: "ruyijingubang",
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
