@@ -413,9 +413,8 @@ const skills = {
 					source: "damageSource",
 				},
 				filter(event, player) {
-					return player.countCards("e") == player.countCards("h", card => card.hasGaintag("dcjigu"));
+					return player.countCards("e") == player.countCards("h", card => card.hasGaintag("dcjigu")) && player.getRoundHistory("useSkill", evt => evt.skill == "dcjigu_temp").length < game.roundNumber;
 				},
-				usable: 1,
 				prompt2(event, player) {
 					return (
 						"摸" +
@@ -439,6 +438,14 @@ const skills = {
 	},
 	dcsirui: {
 		audio: 2,
+		mod: {
+			targetInRange(card) {
+				if (card.storage && card.storage.dcsirui) return true;
+			},
+			cardUsable(card, player, num) {
+				if (card.storage && card.storage.dcsirui) return Infinity;
+			},
+		},
 		enable: "phaseUse",
 		filter(event, player) {
 			if (!player.countCards("hes")) return false;
@@ -448,9 +455,10 @@ const skills = {
 					if (get.type(name) != "basic" && get.type(name) != "trick") return false;
 					return true;
 				})
-				.some(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && event.filterCard({ name: card[2], nature: card[3], cards: [cardx] }, player, event), "hes"));
+				.some(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && player.hasUseTarget(get.autoViewAs({ name: card[2], nature: card[3], storage: { dcsirui: true } }, [cardx]), false, false), "hes"));
 		},
 		usable: 1,
+		locked: false,
 		chooseButton: {
 			dialog(event, player) {
 				const list = get
@@ -459,13 +467,14 @@ const skills = {
 						if (get.type(name) != "basic" && get.type(name) != "trick") return false;
 						return true;
 					})
-					.filter(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && event.filterCard({ name: card[2], nature: card[3], cards: [cardx] }, player, event), "hes"));
+					.filter(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && player.hasUseTarget(get.autoViewAs({ name: card[2], nature: card[3], storage: { dcsirui: true } }, [cardx]), false, false), "hes"));
 				return ui.create.dialog("思锐", [list, "vcard"]);
 			},
 			check(button) {
 				return get.event("player").getUseValue({
 					name: button.link[2],
 					nature: button.link[3],
+					storage: { dcsirui: true },
 				});
 			},
 			backup(links, player) {
@@ -478,6 +487,7 @@ const skills = {
 					viewAs: {
 						name: links[0][2],
 						nature: links[0][3],
+						storage: { dcsirui: true },
 					},
 					check(card) {
 						return 7 - get.value(card);
@@ -497,7 +507,7 @@ const skills = {
 						if (get.type(name) != "basic" && get.type(name) != "trick") return false;
 						return true;
 					})
-					.filter(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && player.hasUseTarget(get.autoViewAs({ name: card[2], nature: card[3] }, [cardx]), true, true), "hes"))
+					.filter(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && player.hasUseTarget(get.autoViewAs({ name: card[2], nature: card[3] }, [cardx]), false, false), "hes"))
 					.map(card => {
 						return { name: card[2], nature: card[3] };
 					})
