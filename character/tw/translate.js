@@ -737,7 +737,7 @@ const translates = {
 	huan_zhugeliang: "幻诸葛亮",
 	huan_zhugeliang_prefix: "幻",
 	huan_zhugeliang_A: "技一",
-	huan_zhugeliang_A_info: "每名角色的准备阶段，你可以声明并记录至多X个未记录的基本牌或普通锦囊牌牌名（X为你的体力值）。当前回合角色弃牌阶段结束时，你视为依次使用本回合声明的牌（无距离限制），若此牌的目标不包含其或被其响应，其摸一张牌。",
+	huan_zhugeliang_A_info: "每名角色的准备阶段，你可以声明并记录至多X个未记录的基本牌或普通锦囊牌牌名（X为你的体力值）。当前回合角色弃牌阶段结束时，你视为依次使用本回合声明的牌（无距离限制），若此牌的目标不包含其，其摸一张牌。",
 	huan_zhugeliang_B: "技二",
 	huan_zhugeliang_B_info: "锁定技。①每名角色回合结束时，若你未对其使用牌，你失去1点体力。②当你失去1点体力或受到1点伤害后后，若你的体力上限小于7，你增加1点体力上限。",
 	huan_zhugeliang_C: "技三",
