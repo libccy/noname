@@ -66,7 +66,7 @@ const characters = {
 	re_zhonghui: ["male", "wei", 4, ["requanji", "zili"], ["clan:颍川钟氏"]],
 	xin_caifuren: ["female", "qun", 3, ["xinqieting", "xianzhou"]],
 	xin_zhoucang: ["male", "shu", 4, ["mobilezhongyong"]],
-	ol_yujin: ["male", "wei", 4, ["rejieyue"], ["die:yujin_yujin"]],
+	ol_yujin: ["male", "wei", 4, ["rejieyue"], ["die:yujin_yujin.mp3"]],
 	zhouqun: ["male", "shu", 3, ["tiansuan"]],
 	re_zhurong: ["female", "shu", 4, ["juxiang", "relieren"]],
 	re_jiangwei: ["male", "shu", 4, ["retiaoxin", "zhiji"]],
