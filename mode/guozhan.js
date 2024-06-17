@@ -858,7 +858,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				gz_dc_yanghu: ["male", "wei", 3, ["gzdeshao", "gzmingfa"]],
 
 				gz_cuimao: ["male", "wei", 3, ["gzzhengbi", "gzfengying"], []],
-				gz_yujin: ["male", "wei", 4, ["gzjieyue"], ["gzskin"]],
+				gz_yujin: ["male", "wei", 4, ["gzjieyue"], ["gzskin", "die:yujin.mp3"]],
 				gz_wangping: ["male", "shu", 4, ["jianglue"], ["gzskin"]],
 				gz_fazheng: ["male", "shu", 3, ["gzxuanhuo", "gzenyuan"], ["gzskin", "die:xin_fazheng"]],
 				gz_wuguotai: ["female", "wu", 3, ["gzbuyi", "ganlu"], ["gzskin"]],
@@ -24406,7 +24406,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"#gz_lvlingqi:die": "父亲，女儿好累……",
 			"#gz_dc_yanghu:die": "臣死之后，杜元凯可继之……",
 			"#gz_cuimao:die": "为世所痛惜，冤哉……",
-			"#gz_yujin:die": "我，无颜面对丞相了……",
 			"#jianglue1": "奇谋为短，将略为要。",
 			"#jianglue2": "为将者，需有谋略。",
 			"#gz_wangping:die": "无当飞军，也有困于深林之时……",
