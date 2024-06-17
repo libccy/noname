@@ -437,6 +437,7 @@ const skills = {
 	//曹髦  史?!
 	mbqianlong: {
 		audio: 6,
+		persevereSkill: true,
 		trigger: {
 			player: ["mbqianlong_beginAfter", "mbqianlong_addAfter", "mbweitongAfter"],
 		},
@@ -467,6 +468,7 @@ const skills = {
 		subSkill: {
 			begin: {
 				audio: "mbqianlong",
+				persevereSkill: true,
 				trigger: {
 					global: "phaseBefore",
 					player: "enterGame",
@@ -482,6 +484,7 @@ const skills = {
 			},
 			add: {
 				audio: "mbqianlong",
+				persevereSkill: true,
 				trigger: {
 					player: ["gainAfter", "damageEnd"],
 					source: "damageSource",
@@ -507,6 +510,7 @@ const skills = {
 	},
 	mbweitong: {
 		audio: 1,
+		persevereSkill: true,
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
@@ -538,6 +542,7 @@ const skills = {
 	mbcmqingzheng: {
 		audio: "sbqingzheng",
 		audioname: ["mb_caomao"],
+		persevereSkill: true,
 		trigger: { player: "phaseUseBegin" },
 		filter(event, player) {
 			return player.countCards("h") > 0;
@@ -672,6 +677,7 @@ const skills = {
 	mbcmjiushi: {
 		audio: "rejiushi",
 		inherit: "rejiushi",
+		persevereSkill: true,
 		group: ["rejiushi1", "mbcmjiushi_check", "mbcmjiushi_turnback", "mbcmjiushi_gain"],
 		subSkill: {
 			check: {
@@ -688,6 +694,7 @@ const skills = {
 			turnback: {
 				audio: "rejiushi",
 				audioname: ["mb_caomao"],
+				persevereSkill: true,
 				trigger: { player: "damageEnd" },
 				check(event, player) {
 					return player.isTurnedOver();
@@ -706,6 +713,7 @@ const skills = {
 			gain: {
 				audio: "rejiushi",
 				audioname: ["mb_caomao"],
+				persevereSkill: true,
 				trigger: { player: "turnOverAfter" },
 				frequent: true,
 				prompt: "是否发动【酒诗】，获得牌堆中的一张锦囊牌？",
@@ -721,6 +729,7 @@ const skills = {
 	mbcmfangzhu: {
 		audio: "sbfangzhu",
 		audioname: ["mb_caomao"],
+		persevereSkill: true,
 		inherit: "sbfangzhu",
 		filter(event, player) {
 			return game.hasPlayer(current => current !== player);
@@ -861,6 +870,7 @@ const skills = {
 	},
 	mbjuejin: {
 		audio: 2,
+		persevereSkill: true,
 		enable: "phaseUse",
 		limited: true,
 		skillAnimation: true,

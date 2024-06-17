@@ -7863,7 +7863,10 @@ const skills = {
 			return player.getAttackRange() > 0;
 		},
 		content: function () {
-			var skills = game.filterSkills(player.getStockSkills(true, true), player);
+			var skills = game.filterSkills(player.getStockSkills(true, true).filter(skill => {
+				const info = get.info(skill);
+				return !info.persevereSkill || !info.charlotte;
+			}), player);
 			var num = Math.min(player.getAttackRange(), skills.length);
 			skills = skills.slice(0, num);
 			player.disableSkill("olchuanwu", skills);
@@ -9680,7 +9683,7 @@ const skills = {
 				var skills = source.getStockSkills("一！", "五！");
 				for (var skill of skills) {
 					var info = get.info(skill);
-					if (info && !info.charlotte && !get.is.locked(skill, source) && source.hasSkill(skill, null, null, false)) return true;
+					if (info && !info.persevereSkill && !info.charlotte && !get.is.locked(skill, source) && source.hasSkill(skill, null, null, false)) return true;
 				}
 			}
 			return false;
@@ -9699,7 +9702,7 @@ const skills = {
 				var skills = source.getStockSkills("一！", "五！");
 				for (var skill of skills) {
 					var info = get.info(skill);
-					if (info && !info.charlotte && !get.is.locked(skill, source) && source.hasSkill(skill, null, null, false)) return true;
+					if (info && !info.persevereSkill && !info.charlotte && !get.is.locked(skill, source) && source.hasSkill(skill, null, null, false)) return true;
 				}
 				return false;
 			});
