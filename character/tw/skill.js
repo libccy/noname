@@ -120,6 +120,7 @@ const skills = {
 			player.awakenSkill(event.name);
 			await player.recoverTo(1);
 			player.addTempSkill(event.name + "_buff");
+			if (!_status.currentPhase) return;
 			player
 				.when({ global: "phaseAfter" })
 				.then(() => {
@@ -938,7 +939,7 @@ const skills = {
 				.getCards("h")
 				.map(card => get.type2(card))
 				.toUniqued().length;
-			target.addTempSkill("twqiji_buff");
+			target.addTempSkill("twqiji_buff", "phaseUseAfter");
 			while (target.isIn() && num--) {
 				await player.useCard(sha, target, false);
 			}
@@ -951,7 +952,7 @@ const skills = {
 				filter(event, player) {
 					if (!event.card.storage || !event.card.storage.twqiji || !event.targets.includes(player)) return false;
 					const chosen = player.storage.twqiji_buff || [];
-					return !event.getParent().twqiji && game.hasPlayer(current => current != player && current != event.player && lib.filter.targetEnabled(event.card, event.player, current) && !chosen.includes(current));
+					return event.targets.includes(player) && game.hasPlayer(current => current != player && current != event.player && !chosen.includes(current));
 				},
 				async cost(event, trigger, player) {
 					const chosen = player.storage.twqiji_buff || [];
@@ -959,7 +960,7 @@ const skills = {
 						.chooseTarget("令一名本回合未以此法选择的角色摸一张牌，然后其可以将此杀转移给自己", (card, player, target) => {
 							const evt = get.event().getTrigger();
 							if (chosen.includes(target)) return false;
-							return target != evt.player && target != player && lib.filter.targetEnabled(evt.card, evt.player, target);
+							return target != evt.player && target != player;
 						})
 						.set("ai", target => {
 							const player = get.player(),
@@ -974,7 +975,6 @@ const skills = {
 				onremove: true,
 				charlotte: true,
 				async content(event, trigger, player) {
-					trigger.getParent().twqiji = true;
 					const target = event.targets[0];
 					if (!player.storage.twqiji_buff) {
 						player.when({ global: "phaseAfter" }).then(() => {
