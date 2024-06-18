@@ -341,7 +341,6 @@ export class Get {
 		if (info.chargingSkill) list.add("蓄能技");
 		if (info.charlotte) list.add("Charlotte");
 		if (info.sunbenSkill) list.add("昂扬技");
-		if (info.sunbenSkill) list.add("昂扬技");
 		if (info.persevereSkill) list.add("持恒技");
 		if (info.categories) list.addArray(info.categories(skill, player));
 		return list;

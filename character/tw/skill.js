@@ -952,7 +952,7 @@ const skills = {
 				filter(event, player) {
 					if (!event.card.storage || !event.card.storage.twqiji || !event.targets.includes(player)) return false;
 					const chosen = player.storage.twqiji_buff || [];
-					return event.targets.includes(player) && game.hasPlayer(current => current != player && current != event.player && !chosen.includes(current));
+					return event.isFirstTarget && event.targets.includes(player) && game.hasPlayer(current => current != player && current != event.player && !chosen.includes(current));
 				},
 				async cost(event, trigger, player) {
 					const chosen = player.storage.twqiji_buff || [];
