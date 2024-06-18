@@ -241,6 +241,7 @@ const skills = {
 					game.addVideo("lose", player, [get.cardsInfo(hs), [], [], []]);
 					h.forEach(i => i.goto(ui.special));
 					player.directgain(hs, false);
+					event.getParent(2).goto(0);
 				},
 			},
 		},
@@ -405,7 +406,9 @@ const skills = {
 				},
 			},
 			backupx: {
-				filterCard: true,
+				filterCard(card) {
+					return get.itemtype(card) == "card";
+				},
 				position: "hes",
 				check(card) {
 					const player = get.event("player");
