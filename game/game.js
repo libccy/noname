@@ -18,7 +18,7 @@
 	const globalText = {
 		GPL_ALERT: ["①无名杀是一款基于GPLv3协议的开源软件！", "你可以在遵守GPLv3协议的基础上任意使用，修改并转发《无名杀》，以及所有基于《无名杀》开发的拓展。", "点击“确定”即代表您认可并接受GPLv3协议↓️", "https://www.gnu.org/licenses/gpl-3.0.html", "②无名杀官方发布地址仅有GitHub仓库！", "其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！"].join("\n"),
 		LOAD_ENTRY_FAILED: ["您使用的浏览器或《无名杀》客户端加载内容失败！", "请检查是否缺少游戏文件！隔版本更新请下载完整包而不是离线包！", "目前使用的浏览器UA信息为: ", userAgent, "若您使用的客户端为自带内核的旧版“兼容版”，请及时更新客户端版本！", "若您使用的客户端为手机端的非兼容版《无名杀》，请尝试更新手机的WebView内核，或者更换为1.8.2版本及以上的兼容版！", "若您是直接使用浏览器加载index.html进行游戏，请改为运行文件夹内的“noname-server.exe”（或使用VSCode等工具启动Live Server），以动态服务器的方式启动《无名杀》！", "若您使用的是苹果端，请至少将Safari升级至14.5.0！"].join("\n"),
-		REDIRECT_TIP: ["您使用的浏览器或无名杀客户端内核版本过低，已经无法正常运行无名杀！", "目前使用的浏览器UA信息为: ", userAgent, "点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。", "稍后您的无名杀将自动退出（可能的话）"].join("\n"),
+		REDIRECT_TIP: ["您使用的浏览器或无名杀客户端内核版本过低，已经无法正常运行无名杀！", "目前使用的浏览器UA信息为: ", userAgent, "点击“确认”以前往GitHub下载最新版无名杀客户端（可能需要科学上网）。"].join("\n"),
 		SAFARI_VERSION_NOT_SUPPORT: ["您使用的Safari浏览器无法支持当前无名杀所需的功能，请至少升级至14.5.0！", "当前浏览器的UA为: ", userAgent, "稍后您的无名杀将自动退出（可能的话）"].join("\n"),
 	};
 
@@ -134,7 +134,7 @@
 
 	// 使serviceWorker加载完成后，再加载entry.js
 	if (location.protocol.startsWith("http") && "serviceWorker" in navigator) {
-		let scope = (new URL("./", location.href)).toString();
+		let scope = new URL("./", location.href).toString();
 		let registrations = await navigator.serviceWorker.getRegistrations();
 		let findServiceWorker = registrations.find(registration => {
 			return registration && registration.active && registration.active.scriptURL == `${scope}service-worker.js`;
@@ -184,12 +184,10 @@
 		console.error(message);
 		// 显示提示信息
 		alert(message);
-		// 退出程序
-		exit();
 	};
 	// 将 <script> 元素添加到 document.head 中
 	document.head.appendChild(script);
-	
+
 	// 创建一个新的 <script> 元素,用于回退
 	let fallback = document.createElement("script");
 	// 设置该 <script> 元素为旧式脚本
@@ -203,8 +201,6 @@
 			// 如果确认,则打开新的浏览器窗口,跳转到指定的 GitHub 页面
 			window.open("https://github.com/libccy/noname/releases/tag/chromium77-client");
 		}
-		// 退出程序
-		exit();
 	};
 	// 将 <script> 元素添加到 document.head 中
 	document.head.appendChild(fallback);
