@@ -12,31 +12,13 @@ import { Audio } from "./audio.js";
 import security from "../util/security.js";
 import { CodeSnippet, ErrorManager } from "../util/error.js";
 
-export class Get {
+import { GetCompatible } from "./compatible.js";
+
+export class Get extends GetCompatible {
 	is = new Is();
 	promises = new Promises();
 	Audio = new Audio();
-	/**
-	 * 获取当前内核版本信息
-	 *
-	 * 目前仅考虑`chrome`, `firefox`和`safari`三种浏览器的信息，其余均归于其他范畴
-	 *
-	 * > 其他后续或许会增加，但`IE`永无可能
-	 *
-	 * @returns {["firefox" | "chrome" | "safari" | "other", number, number, number]}
-	 */
-	coreInfo() {
-		const regex = /(firefox|chrome|safari)\/(\d+(?:\.\d+)+)/;
-		let result;
-		if (!(result = userAgent.match(regex))) return ["other", NaN, NaN, NaN];
-		if (result[1] != "safari") {
-			const [major, minor, patch] = result[2].split(".");
-			return [result[1], parseInt(major), parseInt(minor), parseInt(patch)];
-		}
-		result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/);
-		const [major, minor, patch] = result[1].split(".");
-		return ["safari", parseInt(major), parseInt(minor), parseInt(patch)];
-	}
+	
 	/**
 	 * 将一个传统格式的character转化为Character对象格式
 	 * @param { Array|Object|import("../library/element/character").Character } data
@@ -931,10 +913,10 @@ export class Get {
 		const target = constructor
 			? Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object
 				? // @ts-ignore
-				new constructor()
+					new constructor()
 				: constructor.name in window && /\[native code\]/.test(constructor.toString())
 					? // @ts-ignore
-					new constructor(obj)
+						new constructor(obj)
 					: obj
 			: Object.create(null);
 		if (target === obj) return target;
@@ -1517,18 +1499,20 @@ export class Get {
 	 * ```plain
 	 * 测试一段代码是否为函数体
 	 * ```
-	 * 
+	 *
 	 * @typedef {"async"|"generator"|"agenerator"|"any"|null} FunctionType
-	 * 
-	 * @param {string} code 
-	 * @param {FunctionType} type 
-	 * @returns {boolean} 
+	 *
+	 * @param {string} code
+	 * @param {FunctionType} type
+	 * @returns {boolean}
 	 */
 	isFunctionBody(code, type = null) {
 		if (type == "any") {
-			return ["async", "generator", "agenerator", null]
-				// @ts-ignore // 突然发现ts-ignore也挺方便的喵
-				.some(t => get.isFunctionBody(code, t));
+			return (
+				["async", "generator", "agenerator", null]
+					// @ts-ignore // 突然发现ts-ignore也挺方便的喵
+					.some(t => get.isFunctionBody(code, t))
+			);
 		}
 		try {
 			switch (type) {
@@ -1554,10 +1538,10 @@ export class Get {
 	 * ```plain
 	 * 清洗函数体代码
 	 * ```
-	 * 
-	 * @param {string} str 
-	 * @param {boolean} log 
-	 * @returns {string} 
+	 *
+	 * @param {string} str
+	 * @param {boolean} log
+	 * @returns {string}
 	 */
 	pureFunctionStr(str, log = false) {
 		str = str.trim();
@@ -1574,19 +1558,19 @@ export class Get {
 		}
 		if (!str.endsWith("}")) {
 			if (log) console.warn("发现无法识别的远程代码:", str);
-			return '()=>{}';
+			return "()=>{}";
 		}
 		const fullMatch = get.#fullPattern.exec(str);
 		if (!fullMatch) {
 			if (log) console.warn("发现无法识别的远程代码:", str);
-			return '()=>{}';
+			return "()=>{}";
 		}
 		const head = fullMatch[1];
-		const args = fullMatch[2] || '';
+		const args = fullMatch[2] || "";
 		const body = str.slice(fullMatch[0].length).slice(0, -1);
 		if (!get.isFunctionBody(body, "any")) {
 			if (log) console.error("发现疑似恶意的远程代码:", str);
-			return '()=>{}';
+			return "()=>{}";
 		}
 		str = `(${args}){${body}}`;
 		if (head.includes("*")) str = "*" + str;
@@ -1601,9 +1585,7 @@ export class Get {
 			}
 			// 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
 			/** @type {(func: Function) => string} */
-			const decompileFunction = security.isSandboxRequired()
-				? security.importSandbox().Marshal.decompileFunction
-				: Function.prototype.call.bind(Function.prototype.toString);
+			const decompileFunction = security.isSandboxRequired() ? security.importSandbox().Marshal.decompileFunction : Function.prototype.call.bind(Function.prototype.toString);
 			const str = decompileFunction(func);
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return "_noname_func:function () {}";
@@ -1618,7 +1600,7 @@ export class Get {
 		if ("sandbox" in window) console.log("[infoFuncOL] pured:", str);
 		try {
 			// js内置的函数
-			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () { };
+			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () {};
 			if (security.isSandboxRequired()) {
 				const loadStr = `return (${str});`;
 				const box = security.currentSandbox();
@@ -1631,7 +1613,7 @@ export class Get {
 			}
 		} catch (e) {
 			console.error(`${e} in \n${str}`);
-			return function () { };
+			return function () {};
 		}
 		if (Array.isArray(func)) {
 			func = get.filter.apply(this, get.parsedResult(func));
@@ -1641,14 +1623,14 @@ export class Get {
 	eventInfoOL(item, level, noMore) {
 		return get.itemtype(item) == "event"
 			? `_noname_event:${JSON.stringify(
-				Object.entries(item).reduce((stringifying, entry) => {
-					const key = entry[0];
-					if (key == "_trigger") {
-						if (noMore !== false) stringifying[key] = get.eventInfoOL(entry[1], null, false);
-					} else if (!lib.element.GameEvent.prototype[key] && key != "content" && get.itemtype(entry[1]) != "event") stringifying[key] = get.stringifiedResult(entry[1], null, false);
-					return stringifying;
-				}, {})
-			)}`
+					Object.entries(item).reduce((stringifying, entry) => {
+						const key = entry[0];
+						if (key == "_trigger") {
+							if (noMore !== false) stringifying[key] = get.eventInfoOL(entry[1], null, false);
+						} else if (!lib.element.GameEvent.prototype[key] && key != "content" && get.itemtype(entry[1]) != "event") stringifying[key] = get.stringifiedResult(entry[1], null, false);
+						return stringifying;
+					}, {})
+				)}`
 			: "";
 	}
 	/**
@@ -2187,8 +2169,8 @@ export class Get {
 		n = game.checkMod(from, to, n, "globalFrom", from);
 		n = game.checkMod(from, to, n, "globalTo", to);
 		const equips1 = from.getCards("e", function (card) {
-			return !ui.selected.cards || !ui.selected.cards.includes(card);
-		}),
+				return !ui.selected.cards || !ui.selected.cards.includes(card);
+			}),
 			equips2 = to.getCards("e", function (card) {
 				return !ui.selected.cards || !ui.selected.cards.includes(card);
 			});

@@ -17,7 +17,7 @@ export const AsyncFunction = (async function () {}).constructor;
 // @ts-ignore
 export const AsyncGeneratorFunction = (async function* () {}).constructor;
 export const userAgent = navigator.userAgent.toLowerCase();
-export { Mutex } from "./mutex.js";
+// export { Mutex } from "./mutex.js";
 export const characterDefaultPicturePath = "image/character/default_silhouette_";
 
 /**
