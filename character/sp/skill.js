@@ -178,7 +178,7 @@ const skills = {
 				}
 			},
 		},
-		group: "olziruo_gain",
+		group: ["olziruo_gain", "olziruo_sort"],
 		subSkill: {
 			mark: {
 				charlotte: true,
@@ -217,6 +217,31 @@ const skills = {
 					content: "本回合不能整理手牌",
 				},
 				ai: { noSortCard: true },
+			},
+			sort: {
+				enable: "chooseToUse",
+				filter(event, player) {
+					return player.countCards("h") > 1 && !player.hasSkillTag("noSortCard");
+				},
+				filterCard: true,
+				selectCard: 2,
+				position: "h",
+				direct: true,
+				lose: false,
+				discard: false,
+				delay: 0,
+				prompt: "选择两张手牌，更换这两张手牌的顺序",
+				content() {
+					let h = player.getCards("h"),
+						hs = h.slice();
+					const list = [hs.indexOf(cards[0]), hs.indexOf(cards[1])];
+					hs[list[0]] = cards[1];
+					hs[list[1]] = cards[0];
+					hs.reverse();
+					game.addVideo("lose", player, [get.cardsInfo(hs), [], [], []]);
+					h.forEach(i => i.goto(ui.special));
+					player.directgain(hs, false);
+				},
 			},
 		},
 	},
