@@ -515,7 +515,7 @@ const skills = {
 					.map((_, i) => i + 1)
 					.reduce((sum, i) => sum + target.countEmptySlot(i), 0)
 			);
-			if (player.countMark("dcsbfengmin") > player.getDamagedHp()) {
+			if (player.countMark("dcsbfengmin") > player.maxHp) {
 				player.tempBanSkill("dcsbfengmin");
 			}
 		},
