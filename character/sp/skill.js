@@ -405,7 +405,9 @@ const skills = {
 				},
 			},
 			backupx: {
-				filterCard: true,
+				filterCard(card) {
+					return get.itemtype(card) == "card";
+				},
 				position: "hes",
 				check(card) {
 					const player = get.event("player");
