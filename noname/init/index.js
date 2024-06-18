@@ -5,7 +5,7 @@ import { game } from "../game/index.js";
 import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 import { gnc } from "../gnc/index.js";
-import { userAgent, nonameInitialized, AsyncFunction } from "../util/index.js";
+import { userAgent, nonameInitialized, AsyncFunction, device } from "../util/index.js";
 import * as config from "../util/config.js";
 import { promiseErrorHandlerMap } from "../util/browser.js";
 import { importCardPack, importCharacterPack, importExtension, importMode } from "./import.js";
@@ -156,15 +156,7 @@ export async function boot() {
 	const promiseErrorHandler = await setOnError();
 
 	// 确认手机端平台
-	const noname_inited = localStorage.getItem("noname_inited");
-	if (noname_inited && noname_inited !== "nodejs") {
-		const ua = userAgent;
-		if (ua.includes("android")) {
-			Reflect.set(lib, "device", "android");
-		} else if (ua.includes("iphone") || ua.includes("ipad") || ua.includes("macintosh")) {
-			Reflect.set(lib, "device", "ios");
-		}
-	}
+	Reflect.set(lib, "device", device);
 
 	// 在dom加载完后执行相应的操作
 	const waitDomLoad = new Promise((resolve) => {
