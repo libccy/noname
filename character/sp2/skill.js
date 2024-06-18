@@ -26,7 +26,7 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0],
-				targets = game.filterPlayer(current => current.inRange(target)).sortBySeat();
+				targets = game.filterPlayer(current => current != player && current.inRange(target)).sortBySeat();
 			if (!targets.length) return;
 			const sha = [],
 				nosha = [];
