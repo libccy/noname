@@ -23,8 +23,9 @@ import { GamePromises } from "./promises.js";
 import { Check } from "./check.js";
 
 import security from "../util/security.js";
+import { GameCompatible } from "./compatible.js";
 
-export class Game {
+export class Game extends GameCompatible {
 	online = false;
 	onlineID = null;
 	onlineKey = null;
@@ -1287,8 +1288,8 @@ export class Game {
 	 * ```plain
 	 * 进入沙盒运行模式
 	 * ```
-	 * 
-	 * @param { string } ip 
+	 *
+	 * @param { string } ip
 	 */
 	requireSandboxOn(ip = "") {
 		security.requireSandboxOn(ip);
@@ -1383,26 +1384,27 @@ export class Game {
 	 */
 	/**
 	 * @overload
-	 * @param { ...string | number | ((evt: Event) => void) } args 
+	 * @param { ...string | number | ((evt: Event) => void) } args
 	 * @returns { HTMLAudioElement }
 	 */
 	playAudio(...args) {
-		const options = (args.length === 1 && get.objtype(args[0]) === "object")
-			? args[0]
-			: {
-				path: args.filter(arg => typeof arg === 'string' || typeof arg === 'number').join("/"),
-				onError: args.find(arg => typeof arg === "function"),
-			};
+		const options =
+			args.length === 1 && get.objtype(args[0]) === "object"
+				? args[0]
+				: {
+						path: args.filter(arg => typeof arg === "string" || typeof arg === "number").join("/"),
+						onError: args.find(arg => typeof arg === "function"),
+					};
 
 		const {
 			path = "",
 			// broadcast = false,
 			addVideo = true,
 			video = false,
-			onCanPlay = (evt => void 0),
-			onPlay = (evt => void 0),
-			onEnded = (evt => void 0),
-			onError = (evt => void 0),
+			onCanPlay = evt => void 0,
+			onPlay = evt => void 0,
+			onEnded = evt => void 0,
+			onError = evt => void 0,
 		} = options;
 
 		// 为了能更美观的写代码，默认返回audio而不额外加一个void类型
@@ -1411,14 +1413,14 @@ export class Game {
 
 		let parsedPath = "";
 		if (["blob:", "data:"].some(prefix => path.startsWith(prefix))) parsedPath = path;
-		else if (path.startsWith('ext:')) parsedPath = path.replace(/^ext:/, 'extension/');
-		else if (path.startsWith('db:')) parsedPath = path.replace(/^(db:[^:]*)\//, (_, p) => p + ":");
+		else if (path.startsWith("ext:")) parsedPath = path.replace(/^ext:/, "extension/");
+		else if (path.startsWith("db:")) parsedPath = path.replace(/^(db:[^:]*)\//, (_, p) => p + ":");
 		else parsedPath = `audio/${path}`;
 
 		// @ts-ignore
 		if (!lib.config.repeat_audio && _status.skillaudio.includes(parsedPath)) return;
 
-		const audio = document.createElement('audio');
+		const audio = document.createElement("audio");
 		audio.volume = lib.config.volumn_audio / 8;
 		audio.autoplay = true;
 
@@ -1427,7 +1429,7 @@ export class Game {
 			Promise.resolve(audio.play()).catch(e => console.error(e));
 			if (_status.video || game.online) return;
 			onCanPlay(ev);
-		}
+		};
 		audio.onplay = ev => {
 			_status.skillaudio.add(parsedPath);
 			setTimeout(() => _status.skillaudio.remove(parsedPath), 1000);
@@ -1449,7 +1451,7 @@ export class Game {
 
 		Promise.resolve().then(async () => {
 			let resolvedPath;
-			if (parsedPath.startsWith('db:')) resolvedPath = get.objectURL(await game.getDB('image', parsedPath.slice(3)));
+			if (parsedPath.startsWith("db:")) resolvedPath = get.objectURL(await game.getDB("image", parsedPath.slice(3)));
 			else if (lib.path.extname(parsedPath)) resolvedPath = `${lib.assetURL}${parsedPath}`;
 			else if (URL.canParse(path)) resolvedPath = path;
 			else resolvedPath = `${lib.assetURL}${parsedPath}.mp3`;
@@ -1496,7 +1498,7 @@ export class Game {
 			return game.playAudio({
 				path: audio,
 				addVideo,
-				onCanPlay: () => refresh = true,
+				onCanPlay: () => (refresh = true),
 				onError: play,
 			});
 		};
@@ -1509,7 +1511,7 @@ export class Game {
 	}
 	/**
 	 * @deprecated 请使用get.Audio.skill + get.Audio.toFile
-	 * 
+	 *
 	 * 根据skill中的audio,audioname,audioname2和player来获取音频地址列表
 	 * @typedef {[string,number]|string|number|boolean} audioInfo
 	 * @typedef {{audio: audioInfo, audioname?:string[], audioname2?:{[playerName: string]: audioInfo}}} skillInfo
@@ -1523,7 +1525,7 @@ export class Game {
 	}
 	/**
 	 * @deprecated 请使用get.Audio.skill + get.Audio.toText
-	 * 
+	 *
 	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表
 	 * @param { string } skill  技能名
 	 * @param { Player | Object | string } [player]  角色/角色名
@@ -1534,8 +1536,8 @@ export class Game {
 		return get.Audio.toText(get.Audio.skill({ skill, player, info: skillInfo }));
 	}
 	/**
-	 * @deprecated 请使用get.Audio.skill 
-	 * 
+	 * @deprecated 请使用get.Audio.skill
+	 *
 	 * 根据skill中的audio,audioname,audioname2和player来获取技能台词列表及其对应的源文件名
 	 * @param { string } skill  技能名
 	 * @param { Player | Object | string } [player]  角色/角色名
@@ -1546,8 +1548,8 @@ export class Game {
 		return get.Audio.skill({ skill, player, info: skillInfo });
 	}
 	/**
-	 * @deprecated 请使用get.Audio.die 
-	 * 
+	 * @deprecated 请使用get.Audio.die
+	 *
 	 * 获取角色死亡时能播放的所有阵亡语音
 	 * @param { string | Player } player  角色名
 	 * @returns 语音地址列表
@@ -2051,8 +2053,8 @@ export class Game {
 				);
 			}
 			const blob = zip.generate({
-				type: "blob",
-			}),
+					type: "blob",
+				}),
 				fileNameToSaveAs = `${exportExtension.replace(/\\|\/|:|\?|"|\*|<|>|\|/g, "-")}.zip`;
 
 			if (lib.device) {
@@ -2189,7 +2191,7 @@ export class Game {
 				const configObject = config[value];
 				if (configObject && "init" in configObject) game.saveConfig(`extension_${extensionName}_${value}`, configObject.init);
 			});
-			if (typeof game.readFile == 'function') {
+			if (typeof game.readFile == "function") {
 				const files = zip.files,
 					hiddenFileFlags = [".", "_"],
 					fileList = Object.keys(files)
@@ -2216,8 +2218,7 @@ export class Game {
 						finishLoad();
 					};
 					game.promises.ensureDirectory(`extension/${extensionName}`).then(writeFile).catch(UHP);
-				}
-				else if (typeof window.resolveLocalFileSystemURL == "function") {
+				} else if (typeof window.resolveLocalFileSystemURL == "function") {
 					new Promise((resolve, reject) => window.resolveLocalFileSystemURL(nonameInitialized, resolve, reject))
 						.then(
 							directoryEntry =>
@@ -2269,8 +2270,7 @@ export class Game {
 							return writeFile();
 						})
 						.catch(UHP);
-				}
-				else {
+				} else {
 					const writeFile = errnoException => {
 						if (errnoException) {
 							finishLoad();
@@ -4003,7 +4003,7 @@ export class Game {
 			}
 		}
 		if (!callback) {
-			callback = function () { };
+			callback = function () {};
 		}
 		//try{
 		//	if(noinput){
@@ -5931,8 +5931,7 @@ export class Game {
 			}
 			_status.paused = false;
 			delete _status.waitingForTransition;
-			if (_status.event && _status.event.content instanceof AsyncFunction ||
-				Array.isArray(_status.event.contents)) return;
+			if ((_status.event && _status.event.content instanceof AsyncFunction) || Array.isArray(_status.event.contents)) return;
 			game.loop();
 		}
 	}
@@ -5940,8 +5939,7 @@ export class Game {
 		if (_status.connectMode) return;
 		if (_status.paused2) {
 			_status.paused2 = false;
-			if (_status.event && _status.event.content instanceof AsyncFunction ||
-				Array.isArray(_status.event.contents)) return;
+			if ((_status.event && _status.event.content instanceof AsyncFunction) || Array.isArray(_status.event.contents)) return;
 			game.loop();
 		}
 	}
@@ -7741,8 +7739,7 @@ export class Game {
 			);
 		lib.status.reload++;
 		return new Promise((resolve, reject) => {
-			const record = lib.db.transaction([storeName], "readwrite")
-				.objectStore(storeName).put(structuredClone(value), idbValidKey);
+			const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).put(structuredClone(value), idbValidKey);
 			record.onerror = event => {
 				if (typeof onError == "function") {
 					onError(event);
@@ -7800,59 +7797,59 @@ export class Game {
 		return new Promise(
 			query
 				? (resolve, reject) => {
-					lib.status.reload++;
-					const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).get(query);
-					idbRequest.onerror = event => {
-						if (typeof onError == "function") {
-							onError(event);
+						lib.status.reload++;
+						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).get(query);
+						idbRequest.onerror = event => {
+							if (typeof onError == "function") {
+								onError(event);
+								game.reload2();
+								resolve();
+							} else {
+								game.reload2();
+								reject(event);
+							}
+						};
+						idbRequest.onsuccess = event => {
+							const result = event.target.result;
+							if (typeof onSuccess == "function") {
+								_status.dburgent = true;
+								onSuccess(result);
+								delete _status.dburgent;
+							}
 							game.reload2();
-							resolve();
-						} else {
-							game.reload2();
-							reject(event);
-						}
-					};
-					idbRequest.onsuccess = event => {
-						const result = event.target.result;
-						if (typeof onSuccess == "function") {
-							_status.dburgent = true;
-							onSuccess(result);
-							delete _status.dburgent;
-						}
-						game.reload2();
-						resolve(result);
-					};
-				}
+							resolve(result);
+						};
+					}
 				: (resolve, reject) => {
-					lib.status.reload++;
-					const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
-						object = {};
-					idbRequest.onerror = event => {
-						if (typeof onError == "function") {
-							onError(event);
+						lib.status.reload++;
+						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
+							object = {};
+						idbRequest.onerror = event => {
+							if (typeof onError == "function") {
+								onError(event);
+								game.reload2();
+								resolve();
+							} else {
+								game.reload2();
+								reject(event);
+							}
+						};
+						idbRequest.onsuccess = event => {
+							const result = event.target.result;
+							if (result) {
+								object[result.key] = result.value;
+								result.continue();
+								return;
+							}
+							if (typeof onSuccess == "function") {
+								_status.dburgent = true;
+								onSuccess(object);
+								delete _status.dburgent;
+							}
 							game.reload2();
-							resolve();
-						} else {
-							game.reload2();
-							reject(event);
-						}
-					};
-					idbRequest.onsuccess = event => {
-						const result = event.target.result;
-						if (result) {
-							object[result.key] = result.value;
-							result.continue();
-							return;
-						}
-						if (typeof onSuccess == "function") {
-							_status.dburgent = true;
-							onSuccess(object);
-							delete _status.dburgent;
-						}
-						game.reload2();
-						resolve(object);
-					};
-				}
+							resolve(object);
+						};
+					}
 		);
 	}
 	/**
@@ -7889,45 +7886,45 @@ export class Game {
 			);
 		return query
 			? new Promise((resolve, reject) => {
-				lib.status.reload++;
-				const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).delete(query);
-				record.onerror = event => {
-					if (typeof onError == "function") {
-						onError(event);
+					lib.status.reload++;
+					const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).delete(query);
+					record.onerror = event => {
+						if (typeof onError == "function") {
+							onError(event);
+							game.reload2();
+							resolve();
+						} else {
+							game.reload2();
+							reject(event);
+						}
+					};
+					record.onsuccess = event => {
+						if (typeof onSuccess == "function") onSuccess(event);
 						game.reload2();
-						resolve();
-					} else {
-						game.reload2();
-						reject(event);
-					}
-				};
-				record.onsuccess = event => {
-					if (typeof onSuccess == "function") onSuccess(event);
-					game.reload2();
-					resolve(event);
-				};
-			})
+						resolve(event);
+					};
+				})
 			: game.getDB(storeName).then(object => {
-				const keys = Object.keys(object);
-				lib.status.reload += keys.length;
-				const store = lib.db.transaction([storeName], "readwrite").objectStore(storeName);
-				return Promise.allSettled(
-					keys.map(
-						key =>
-							new Promise((resolve, reject) => {
-								const request = store.delete(key);
-								request.onerror = event => {
-									game.reload2();
-									reject(event);
-								};
-								request.onsuccess = event => {
-									game.reload2();
-									resolve(event);
-								};
-							})
-					)
-				);
-			});
+					const keys = Object.keys(object);
+					lib.status.reload += keys.length;
+					const store = lib.db.transaction([storeName], "readwrite").objectStore(storeName);
+					return Promise.allSettled(
+						keys.map(
+							key =>
+								new Promise((resolve, reject) => {
+									const request = store.delete(key);
+									request.onerror = event => {
+										game.reload2();
+										reject(event);
+									};
+									request.onsuccess = event => {
+										game.reload2();
+										resolve(event);
+									};
+								})
+						)
+					);
+				});
 	}
 	/**
 	 * @param { string } key
