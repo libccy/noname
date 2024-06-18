@@ -168,9 +168,8 @@ const skills = {
 		mark: true,
 		marktext: "☯",
 		zhuanhuanji: true,
-		intro: { content: storage => "当你使用最" + (storage ? "右" : "左") + "侧的卡牌时，你摸一张牌" },
+		intro: { content: storage => "当你使用最" + (storage ? "右" : "左") + "侧的卡牌时，你摸一张牌。你以此法摸牌后本回合不能整理手牌。" },
 		global: "olziruo_mark",
-		ai: { noSortCard: true },
 		mod: {
 			aiOrder(player, card, num) {
 				if (typeof card == "object") {
@@ -179,6 +178,7 @@ const skills = {
 				}
 			},
 		},
+		group: "olziruo_gain",
 		subSkill: {
 			mark: {
 				charlotte: true,
@@ -195,6 +195,28 @@ const skills = {
 					if (!trigger.olziruo) trigger.olziruo = {};
 					trigger.olziruo[player.playerid] = [trigger.cards.some(card => cards[0] == card), trigger.cards.some(card => cards[cards.length - 1] == card)];
 				},
+			},
+			gain: {
+				trigger: {
+					player: "gainAfter",
+				},
+				filter(event, player) {
+					if (player.hasSkill("olziruo_ban", null, null, false)) return false;
+					return event.getParent().name == "draw" && event.getParent(2).name == "olziruo";
+				},
+				forced: true,
+				popup: false,
+				async content(event, trigger, player) {
+					player.addTempSkill("olziruo_ban");
+				},
+			},
+			ban: {
+				charlotte: true,
+				mark: true,
+				intro: {
+					content: "本回合不能整理手牌",
+				},
+				ai: { noSortCard: true },
 			},
 		},
 	},
