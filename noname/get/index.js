@@ -977,15 +977,22 @@ export class Get {
 
 		return target;
 	}
+	plainTextMap = new Map();
 	/**
 	 * 用于将HTML代码转换为纯文本。
 	 * @param { string } htmlContent
 	 * @returns { string }
 	 */
 	plainText(htmlContent) {
-		var parser = new DOMParser();
-		var doc = parser.parseFromString(htmlContent || '', 'text/html');
-		return doc.body.textContent || doc.body.innerText;
+		if (htmlContent.includes("<") || htmlContent.includes(">")) {
+			if (this.plainTextMap.has(htmlContent)) return this.plainTextMap.get(htmlContent);
+			const parser = new DOMParser(),
+				doc = parser.parseFromString(htmlContent || "", "text/html");
+			const text = doc.body.textContent || doc.body.innerText;
+			this.plainTextMap.set(htmlContent, text);
+			return text;
+		}
+		return htmlContent;
 	}
 	inpilefull(type) {
 		var list = [];
