@@ -54,3 +54,9 @@ export function freezeButExtensible(record) {
 
 	return record;
 }
+
+// 目前是否还在game.js内运行代码
+export let compatibleEnvironment = true;
+export function leaveCompatibleEnvironment() {
+	compatibleEnvironment = false;
+}
