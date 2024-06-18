@@ -9,10 +9,12 @@
 	 */
 	const minSafariVersion = [14, 5, 0];
 
-	// 基础全局变量
-	const nonameInitialized = localStorage.getItem("noname_inited");
-	const assetURL = location.protocol.startsWith("http") || typeof nonameInitialized != "string" || nonameInitialized == "nodejs" ? "" : nonameInitialized;
-	const userAgent = navigator.userAgent.toLowerCase();
+	// 获取基础变量
+	const {
+		game,
+		get,
+		util: { nonameInitialized, assetURL, userAgent },
+	} = await import("../noname-compatible.js");
 
 	// 使用到的文本
 	const globalText = {
@@ -54,7 +56,7 @@
 			localStorage.setItem("gplv3_noname_alerted", String(true));
 		} else {
 			// 如果用户拒绝显示GPL许可协议警告，则退出程序
-			exit();
+			game.exit();
 		}
 	}
 
@@ -69,18 +71,19 @@
 	if (userAgent.includes("safari") && !userAgent.includes("chrome")) {
 		// 如果是 Safari 浏览器,则进行以下操作
 		// 获取 Safari 版本信息
-		let [coreName, ...safariVersion] = getSafariVersion();
+		let [coreName, ...safariVersion] = get.coreInfo();
 		// 检查 Safari 的内核名称是否为 "safari"，以及版本号是否低于要求的最小版本号
 		// 如果无法判定是Safari，则证明这个浏览器内核很玄乎，我们表示对未知的、不符合标准的内核无能为力，只能等出问题了再适配
-		if (coreName === "safari" && !checkVersion(minSafariVersion, safariVersion)) {
+		if (coreName === "safari" && !get.checkVersion(minSafariVersion, safariVersion)) {
 			// 如果版本号低于要求的最小版本号,则执行以下操作
 			// 显示警告消息
 			alert(globalText.SAFARI_VERSION_NOT_SUPPORT);
 			// 退出程序
-			exit();
+			game.exit();
 			return;
 		}
 	}
+	// Safari由于系统原因，管不了，先默哀几秒
 
 	// 处理Node环境下的http情况
 	if (typeof window.require == "function" && typeof window.process == "object" && typeof window.__dirname == "string") {
@@ -108,6 +111,7 @@
 			// @ts-ignore
 			module._compile = function (code, fileName) {
 				/**
+				 *
 				 * @type { import("typescript") }
 				 */
 				// @ts-ignore
@@ -196,100 +200,9 @@
 	// 设置 <script> 元素的 src 属性,指向 fallback.js 文件
 	fallback.src = `${assetURL}game/fallback.js`;
 	// 为 <script> 元素设置 onload 事件处理程序
-	fallback.onload = () => {
-		// 显示一个确认对话框,询问是否要重定向到 GitHub 页面
-		if (confirm(globalText.REDIRECT_TIP)) {
-			// 如果确认,则打开新的浏览器窗口,跳转到指定的 GitHub 页面
-			window.open("https://github.com/libccy/noname/releases/tag/chromium85-client");
-		}
-	};
+	fallback.onload = tryUpdateClient;
 	// 将 <script> 元素添加到 document.head 中
 	document.head.appendChild(fallback);
 
-	/**
-	 * 退出客户端用到的代码
-	 *
-	 * @author Spmario233
-	 */
-	function exit() {
-		const ios = userAgent.includes("iphone") || userAgent.includes("ipad") || userAgent.includes("macintosh");
-		//electron
-		if (typeof window.process == "object" && typeof window.require == "function") {
-			const versions = window.process.versions;
-			// @ts-ignore
-			const electronVersion = parseFloat(versions.electron);
-			let remote;
-			if (electronVersion >= 14) {
-				// @ts-ignore
-				remote = require("@electron/remote");
-			} else {
-				// @ts-ignore
-				remote = require("electron").remote;
-			}
-			const thisWindow = remote.getCurrentWindow();
-			thisWindow.destroy();
-			window.process.exit();
-		}
-		//android-cordova环境
-		//ios-cordova环境或ios浏览器环境
-		//非ios的网页版
-		else if (!ios) {
-			window.close();
-		}
-	}
-
-	/**
-	 * 获取Safari的版本号
-	 *
-	 * @returns {[coreName: "safari" | "other", majorVersion: number, minorVersion: number, patchVersion: number]}
-	 */
-	function getSafariVersion() {
-		let result;
-		// 以下是所有Safari平台的判断方法
-		// macOS以及以桌面显示的移动端则直接判断
-		if (/macintosh/.test(userAgent)) {
-			result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/);
-			if (!result) return ["other", NaN, NaN, NaN];
-		}
-		// 不然则通过OS后面的版本号来获取内容
-		else {
-			let safariRegex = /(?:iphone|ipad); cpu (?:iphone )?os (\d+(?:_\d+)+)/;
-			result = userAgent.match(safariRegex);
-			if (!result) return ["other", NaN, NaN, NaN];
-		}
-		// result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/)
-		// @ts-ignore
-		const [major, minor, patch] = result[1].split(".");
-		return ["safari", parseInt(major), parseInt(minor), parseInt(patch)];
-	}
-
-	// require是需求的版本号，current是浏览器环境本身的版本号
-	/**
-	 *
-	 * @param {[majorVersion: number, minorVersion: number, patchVersion: number]} require
-	 * @param {[majorVersion: number, minorVersion: number, patchVersion: number]} current
-	 * @returns
-	 */
-	function checkVersion(require, current) {
-		// 防止不存在的意外，提前截断当前版本号的长度
-		if (current.length > require.length) current.length = require.length;
-
-		// 考虑到玄学的NaN情况，记录是否存在NaN
-		let flag = false;
-		// 从主版本号遍历到修订版本号，只考虑当前版本号的长度
-		for (let i = 0; i < current.length; ++i) {
-			// 当前环境版本号当前位若是NaN，则记录后直接到下一位
-			if (isNaN(current[i])) {
-				flag = true;
-				continue;
-			}
-			// 如果此时flag为true且current[i]不为NaN，版本号则不合法，直接否
-			if (flag) return false;
-			// 上位版本号未达到要求，直接否决
-			if (require[i] > current[i]) return false;
-			// 上位版本号已超过要求，直接可行
-			if (current[i] > require[i]) return true;
-		}
-		return true;
-	}
+	function tryUpdateClient() {}
 })();
