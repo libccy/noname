@@ -4,5 +4,5 @@
 export const rootURL = new URL("../", import.meta.url);
 
 export { GetCompatible, get, setGetCompatible } from "./noname/get/compatible.js";
-export { GameCompatible, game, setGameCompatible } from "./noname/game/compatible.js";
+export { GameCompatible, game, setGameCompatible, UpdateReason } from "./noname/game/compatible.js";
 export * as util from "./noname/util/index.js";

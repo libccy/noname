@@ -17,6 +17,8 @@ export const characterDefaultPicturePath = "image/character/default_silhouette_"
 
 export const device = nonameInitialized && nonameInitialized !== "nodejs" ? (userAgent.includes("android") ? "android" : userAgent.includes("iphone") || userAgent.includes("ipad") || userAgent.includes("macintosh") ? "ios" : void 0) : void 0;
 
+export const androidNewStandardApp = device == "android" && typeof window.NonameAndroidBridge != "undefined";
+
 /**
  * 不能被new的类
  */
@@ -48,6 +50,7 @@ export function freezeButExtensible(record) {
 		for (const [key, descriptor] of Object.entries(descriptors)) {
 			if ("value" in descriptor) descriptor.writable = false;
 			descriptor.configurable = false;
+			// @ts-ignore
 			Reflect.defineProperty(record, key, descriptor);
 		}
 	}

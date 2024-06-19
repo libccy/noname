@@ -14,6 +14,7 @@
 		game,
 		get,
 		util: { nonameInitialized, assetURL, userAgent },
+		UpdateReason,
 	} = await import("../noname-compatible.js");
 
 	// 使用到的文本
@@ -200,7 +201,7 @@
 	// 设置 <script> 元素的 src 属性,指向 fallback.js 文件
 	fallback.src = `${assetURL}game/fallback.js`;
 	// 为 <script> 元素设置 onload 事件处理程序
-	fallback.onload = tryUpdateClient;
+	fallback.onload = () => game.tryUpdateClient(UpdateReason.FALLBACK);
 	// 将 <script> 元素添加到 document.head 中
 	document.head.appendChild(fallback);
 
