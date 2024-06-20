@@ -388,6 +388,7 @@ export async function request(url, onProgress, options = {}) {
 	);
 
 	if (!response.ok) {
+		console.error(response);
 		throw new Error(`HTTP error! status: ${response.status}`);
 	}
 
@@ -421,8 +422,8 @@ export async function request(url, onProgress, options = {}) {
 
 		if (typeof onProgress == "function") {
 			if (total) {
-				const progress = (receivedBytes / total) * 100;
-				onProgress(receivedBytes, progress, filename);
+				// const progress = (receivedBytes / total) * 100;
+				onProgress(receivedBytes, total, filename);
 			} else {
 				onProgress(receivedBytes, void 0, filename);
 			}
