@@ -1,4 +1,7 @@
 export default {
+	"#oldqianxi1": "伤其十指，不如断其一指！",
+	"#oldqianxi2": "斩草除根，除恶务尽！",
+	"#madai:die": "反骨贼已除，丞相放心……",
 	"#mengjin1": "你，可敢挡我？",
 	"#mengjin2": "我要杀你们个片甲不留！",
 	"#pangde:die": "四面都是水，我命休矣……",
