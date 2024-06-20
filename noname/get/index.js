@@ -15,7 +15,7 @@ import { CodeSnippet, ErrorManager } from "../util/error.js";
 export class Get {
 	is = new Is();
 	promises = new Promises();
-	Audio = new Audio();
+	Audio = Audio;
 	/**
 	 * 获取当前内核版本信息
 	 *
