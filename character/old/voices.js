@@ -1,4 +1,8 @@
 export default {
+	"#xinzhan1": "吾通晓兵法，世人皆知。",
+	"#xinzhan2": "用兵之道，攻心为上。",
+	"#huilei1": "丞相视某如子，某以丞相为父。",
+	"#huilei2": "谡愿以死安大局。",
 	"#oldzhenlie1": "我，绝不屈服！",
 	"#oldzhenlie2": "休要小看妇人志气！",
 	"#oldmiji1": "我将尽我所能！",
