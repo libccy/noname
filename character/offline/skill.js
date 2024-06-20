@@ -234,7 +234,7 @@ const skills = {
 					puts++;
 					const card = result.links[0];
 					target.$throw([card], 1000);
-					if (get.owner(card)) await get.owner(card).lose([card], ui.special);
+					if (get.owner(card)) await get.owner(card).lose([card], ui.cardPile);
 					else ui.discardPile.removeChild(card);
 					ui.cardPile.insertBefore(card, ui.cardPile.firstChild);
 					game.updateRoundNumber();

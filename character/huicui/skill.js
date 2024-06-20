@@ -493,6 +493,9 @@ const skills = {
 						return 7 - get.value(card);
 					},
 					position: "hes",
+					precontent() {
+						event.getParent().addCount = false;
+					},
 				};
 			},
 			prompt(links, player) {
@@ -4836,7 +4839,7 @@ const skills = {
 			var card = event.card;
 			var target = event.targets[0];
 			var marked = target.hasMark("dcjizhong");
-			return (get.type(card) == "trick" || (get.color(card) == "black" && get.type(card) == "basic")) && (marked || (!marked && game.hasPlayer(current => current.hasMark("dcjizhong"))));
+			return (get.type(card) == "trick" || (get.color(card) == "black" && get.type(card) == "basic")) && ((marked && target.countGainableCards(player, "hej")) || (!marked && game.hasPlayer(current => current.hasMark("dcjizhong"))));
 		},
 		logTarget: event => event.targets[0],
 		prompt2(event, player) {

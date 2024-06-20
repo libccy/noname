@@ -3,7 +3,7 @@ export default {
 	"#olsilv2": "人谁不虑终，日月有合离。",
 	"#ollianju1": "叹息亦何为，但恐大义亏。",
 	"#ollianju2": "室中是阿谁，叹息声正悲。",
-	"#ol_liwan:die": "及尔偕老，老使我怨。",
+	"#ol_liwan:die": "及尔偕老，老使我怨……",
 	"#oljingzhou1": "艨艟连江，敌必不战自退。",
 	"#oljingzhou2": "精舟锐进，直捣孙家老巢。",
 	"#olzuolian1": "有我操练水军，曹公大可放心！",

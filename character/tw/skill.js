@@ -55,7 +55,7 @@ const skills = {
 				filter(event, player) {
 					const target = _status.currentPhase;
 					if (!target || !target.isIn() || event.player != target) return false;
-					return player.getStorage("huan_zhugeliang_A_use").some(name => player.hasUseTarget({ name: name }, false));
+					return player.getStorage("huan_zhugeliang_A_use").length;
 				},
 				forced: true,
 				async content(event, trigger, player) {
@@ -68,7 +68,7 @@ const skills = {
 						const targets = await player.chooseUseTarget(`请选择${get.translation(card)}的目标，若此牌的目标不包含${get.translation(target)}，则其摸一张牌`, card, true, false, "nodistance").forResultTargets();
 						if (!targets.includes(target) && target.isIn()) await target.draw();
 					}
-					delete player.getStorage(event.name);
+					player.storage[event.name] = [];
 					player.unmarkSkill(event.name);
 				},
 				intro: {
@@ -952,7 +952,7 @@ const skills = {
 				filter(event, player) {
 					if (!event.card.storage || !event.card.storage.twqiji || !event.targets.includes(player)) return false;
 					const chosen = player.storage.twqiji_buff || [];
-					return event.targets.includes(player) && game.hasPlayer(current => current != player && current != event.player && !chosen.includes(current));
+					return event.isFirstTarget && event.targets.includes(player) && game.hasPlayer(current => current != player && current != event.player && !chosen.includes(current));
 				},
 				async cost(event, trigger, player) {
 					const chosen = player.storage.twqiji_buff || [];

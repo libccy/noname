@@ -32,7 +32,7 @@ const characters = {
 	shen_luxun: ["male", "shen", 4, ["nzry_junlve", "nzry_cuike", "nzry_dinghuo"], ["wu"]],
 	shen_zhangliao: ["male", "shen", 4, ["drlt_duorui", "drlt_zhiti"], ["wei"]],
 	shen_ganning: ["male", "shen", "3/6", ["drlt_poxi", "drlt_jieying"], ["wu"]],
-	ol_zhangliao: ["male", "shen", 4, ["olduorui", "olzhiti"], ["wei"]],
+	ol_zhangliao: ["male", "shen", 4, ["olduorui", "olzhiti"], ["wei", "die:shen_zhangliao"]],
 	shen_caopi: ["male", "shen", 5, ["chuyuan", "dengji"], ["wei"]],
 	shen_zhenji: ["female", "shen", 3, ["shenfu", "qixian"], ["wei"]],
 	boss_zhaoyun: ["male", "shen", 1, ["boss_juejing", "xinlonghun", "zhanjiang"], ["shu"]],

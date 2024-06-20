@@ -17,8 +17,8 @@ import { GetCompatible } from "./compatible.js";
 export class Get extends GetCompatible {
 	is = new Is();
 	promises = new Promises();
-	Audio = new Audio();
-	
+	Audio = Audio;
+
 	/**
 	 * 将一个传统格式的character转化为Character对象格式
 	 * @param { Array|Object|import("../library/element/character").Character } data
@@ -322,7 +322,6 @@ export class Get extends GetCompatible {
 		if (info.lordSkill) list.add("君主技");
 		if (info.chargingSkill) list.add("蓄能技");
 		if (info.charlotte) list.add("Charlotte");
-		if (info.sunbenSkill) list.add("昂扬技");
 		if (info.sunbenSkill) list.add("昂扬技");
 		if (info.persevereSkill) list.add("持恒技");
 		if (info.categories) list.addArray(info.categories(skill, player));
@@ -1491,10 +1490,34 @@ export class Get extends GetCompatible {
 	infoPlayersOL(infos) {
 		return Array.from(infos || []).map(get.infoPlayerOL);
 	}
-	/** 箭头函数头 */
-	#arrowPattern = /^(?:async\b\s*)?(?:([\w$]+)|\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\))\s*=>/;
-	/** 标准函数头 */
-	#fullPattern = /^([\w\s*]+)\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\)\s*\{/;
+	/** @type {RegExp} */
+	#specialHeadPattern = /^(?:async)?\s+[\w$]+\s*=>/;
+	/** @type {RegExp} */
+	#functionHeadPattern = /^(?:async\b\s*)?(?:function\b\s*)?(?:\*\s*)?(?:[\w$]+\b\s*)?\(/;
+	/** @type {RegExp} */
+	#illegalFunctionHeadPattern = /^(?:async\b\s*)?\*\s*\(/;
+	/** @type {RegExp} */
+	#functionNeckPattern = /^\)\s*(?:=>\s*\{|=>|\{)/;
+	/** @type {RegExp} */
+	#identifierPattern = /\b[\w$]+\b/;
+	/** @type {RegExp} */
+	#asyncHeadPattern = /^async[\s\*\(]/;
+	/**
+	 * ```plain
+	 * 测试一段代码是否为函数参数列表
+	 * ```
+	 * 
+	 * @param {string} paramstr
+	 */
+	isFunctionParam(paramstr) {
+		if (paramstr.length == 0) return true;
+		try {
+			new Function(paramstr, "");
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
 	/**
 	 * ```plain
 	 * 测试一段代码是否为函数体
@@ -1506,7 +1529,7 @@ export class Get extends GetCompatible {
 	 * @param {FunctionType} type
 	 * @returns {boolean}
 	 */
-	isFunctionBody(code, type = null) {
+	isFunctionBody(code, type = /* (function(){return null})() */ null) {
 		if (type == "any") {
 			return (
 				["async", "generator", "agenerator", null]
@@ -1544,39 +1567,109 @@ export class Get extends GetCompatible {
 	 * @returns {string}
 	 */
 	pureFunctionStr(str, log = false) {
+		const emptyFunction = "function () {}";
 		str = str.trim();
-		const arrowMatch = get.#arrowPattern.exec(str);
-		if (arrowMatch) {
-			let body = str.slice(arrowMatch[0].length).trim();
+		// 对于特殊的箭头函数特殊处理: identifier => ...
+		const specialMatch = get.#specialHeadPattern.exec(str);
+		if (specialMatch) {
+			let body = str.slice(specialMatch[0].length).trim();
 			if (body.startsWith("{") && body.endsWith("}")) body = body.slice(1, -1);
 			else body = `return ${body}`;
 			if (!get.isFunctionBody(body, "any")) {
-				if (log) console.error("发现疑似恶意的远程代码:", str);
-				return `()=>{}`;
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
 			}
-			return `${arrowMatch[0]}{${body}}`;
+			return `${specialMatch[0]}{${body}}`;
 		}
-		if (!str.endsWith("}")) {
+		// 匹配函数头
+		const functionHead = get.#functionHeadPattern.exec(str);
+		if (!functionHead) {
 			if (log) console.warn("发现无法识别的远程代码:", str);
-			return "()=>{}";
+			return emptyFunction;
 		}
-		const fullMatch = get.#fullPattern.exec(str);
-		if (!fullMatch) {
+		// 检查非法函数头
+		if (get.#illegalFunctionHeadPattern.test(functionHead[0])) {
 			if (log) console.warn("发现无法识别的远程代码:", str);
-			return "()=>{}";
+			return emptyFunction;
 		}
-		const head = fullMatch[1];
-		const args = fullMatch[2] || "";
-		const body = str.slice(fullMatch[0].length).slice(0, -1);
-		if (!get.isFunctionBody(body, "any")) {
-			if (log) console.error("发现疑似恶意的远程代码:", str);
-			return "()=>{}";
+		// 遍历字符串来寻找参数列表的关闭括号
+		const headLen = functionHead[0].length;
+		let start = headLen;
+		let foundClose;
+		let verifiedParams = null;
+		while ((foundClose = str.indexOf(")", start)) >= 0) {
+			const tempParams = str.slice(headLen, foundClose);
+			// 检查收集到的参数列表是否是有效的
+			if (get.isFunctionParam(tempParams)) {
+				verifiedParams = tempParams;
+				break;
+			}
+			start = foundClose + 1;
 		}
-		str = `(${args}){${body}}`;
-		if (head.includes("*")) str = "*" + str;
-		str = "function" + str;
-		if (/\basync\b/.test(head)) str = "async " + str;
-		return str;
+		if (verifiedParams == null) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 检查函数连接
+		const neckStart = str.slice(foundClose);
+		const neckMatch = get.#functionNeckPattern.exec(neckStart);
+		if (!neckMatch) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 箭头函数分流检查
+		if (neckMatch[0].includes("=>")) {
+			let funcHead = functionHead[0];
+			let idMatch;
+			while (idMatch = get.#identifierPattern.exec(funcHead)) {
+				if (idMatch[0] != "async") {
+					if (log) console.warn("发现无法识别的远程代码:", str);
+					return emptyFunction;
+				}
+				funcHead = funcHead.slice(idMatch.index + idMatch[0].length);
+			}
+		} else {
+			let funcHead = functionHead[0];
+			let idMatch;
+			while (idMatch = get.#identifierPattern.exec(funcHead)) {
+				if (idMatch[0] != "async") break;
+				funcHead = funcHead.slice(idMatch.index + idMatch[0].length);
+			}
+			if (!idMatch) {
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
+			}
+		}
+		// 块类型分流
+		const isBlock = neckMatch[0].endsWith("{");
+		let funcBody;
+		if (isBlock) {
+			if (!str.endsWith("}")) {
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
+			}
+			funcBody = "{" + str.slice(foundClose + neckMatch[0].length);
+		} else {
+			// 将表达式函数体转换成块函数体
+			funcBody = `{ return ${str.slice(foundClose + neckMatch[0].length)}; }`;
+		}
+		// 收集函数类型
+		let funcType = 0;
+		if (functionHead[0].includes("*")) funcType |= 1;
+		if (get.#asyncHeadPattern.test(functionHead[0])) funcType |= 2;
+		// 检查函数体
+		const checkType = [null, "generator", "async", "agenerator"][funcType];
+		// @ts-ignore
+		if (!get.isFunctionBody(funcBody, checkType)) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 开始构造最终的函数
+		let finalStr = ` (${verifiedParams}) ${funcBody}`;
+		if (funcType & 1) finalStr = "*" + finalStr;
+		finalStr = "function" + finalStr;
+		if (funcType & 2) finalStr = "async " + finalStr;
+		return finalStr;
 	}
 	funcInfoOL(func) {
 		if (typeof func == "function") {

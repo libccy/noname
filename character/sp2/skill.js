@@ -26,7 +26,7 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0],
-				targets = game.filterPlayer(current => current.inRange(target)).sortBySeat();
+				targets = game.filterPlayer(current => current != player && current.inRange(target)).sortBySeat();
 			if (!targets.length) return;
 			const sha = [],
 				nosha = [];
@@ -3744,7 +3744,7 @@ const skills = {
 				locked: true,
 				skillBlocker: function (skill, player) {
 					var info = get.info(skill);
-					return info && !info.charlotte && !get.is.locked(skill) && !info.limited && !info.juexingji;
+					return info && !info.charlotte && !info.persevereSkill && !get.is.locked(skill) && !info.limited && !info.juexingji;
 				},
 				mark: true,
 				marktext: "扰",
