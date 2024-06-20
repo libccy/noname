@@ -13737,12 +13737,12 @@ const skills = {
 		},
 	},
 	enyuan: {
-		audio: 2,
+		audio: 4,
 		locked: true,
 		group: ["enyuan1", "enyuan2"],
 	},
 	enyuan1: {
-		audio: true,
+		audio: ["enyuan3.mp3", "enyuan4.mp3"],
 		trigger: { player: "damageEnd" },
 		forced: true,
 		filter: function (event, player) {
@@ -13781,7 +13781,7 @@ const skills = {
 		},
 	},
 	enyuan2: {
-		audio: true,
+		audio: ["enyuan1.mp3", "enyuan2.mp3"],
 		trigger: { player: "recoverEnd" },
 		forced: true,
 		logTarget: "source",

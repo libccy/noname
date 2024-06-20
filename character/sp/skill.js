@@ -168,9 +168,8 @@ const skills = {
 		mark: true,
 		marktext: "☯",
 		zhuanhuanji: true,
-		intro: { content: storage => "当你使用最" + (storage ? "右" : "左") + "侧的卡牌时，你摸一张牌" },
+		intro: { content: storage => "当你使用最" + (storage ? "右" : "左") + "侧的卡牌时，你摸一张牌。你以此法摸牌后本回合不能整理手牌。" },
 		global: "olziruo_mark",
-		ai: { noSortCard: true },
 		mod: {
 			aiOrder(player, card, num) {
 				if (typeof card == "object") {
@@ -179,6 +178,7 @@ const skills = {
 				}
 			},
 		},
+		group: ["olziruo_gain", "olziruo_sort"],
 		subSkill: {
 			mark: {
 				charlotte: true,
@@ -194,6 +194,54 @@ const skills = {
 					const cards = player.getCards("h");
 					if (!trigger.olziruo) trigger.olziruo = {};
 					trigger.olziruo[player.playerid] = [trigger.cards.some(card => cards[0] == card), trigger.cards.some(card => cards[cards.length - 1] == card)];
+				},
+			},
+			gain: {
+				trigger: {
+					player: "gainAfter",
+				},
+				filter(event, player) {
+					if (player.hasSkill("olziruo_ban", null, null, false)) return false;
+					return event.getParent().name == "draw" && event.getParent(2).name == "olziruo";
+				},
+				forced: true,
+				popup: false,
+				async content(event, trigger, player) {
+					player.addTempSkill("olziruo_ban");
+				},
+			},
+			ban: {
+				charlotte: true,
+				mark: true,
+				intro: {
+					content: "本回合不能整理手牌",
+				},
+				ai: { noSortCard: true },
+			},
+			sort: {
+				enable: "chooseToUse",
+				filter(event, player) {
+					return player.countCards("h") > 1 && !player.hasSkillTag("noSortCard");
+				},
+				filterCard: true,
+				selectCard: 2,
+				position: "h",
+				direct: true,
+				lose: false,
+				discard: false,
+				delay: 0,
+				prompt: "选择两张手牌，更换这两张手牌的顺序",
+				content() {
+					let h = player.getCards("h"),
+						hs = h.slice();
+					const list = [hs.indexOf(cards[0]), hs.indexOf(cards[1])];
+					hs[list[0]] = cards[1];
+					hs[list[1]] = cards[0];
+					hs.reverse();
+					game.addVideo("lose", player, [get.cardsInfo(hs), [], [], []]);
+					h.forEach(i => i.goto(ui.special));
+					player.directgain(hs, false);
+					event.getParent(2).goto(0);
 				},
 			},
 		},
@@ -358,7 +406,9 @@ const skills = {
 				},
 			},
 			backupx: {
-				filterCard: true,
+				filterCard(card) {
+					return get.itemtype(card) == "card";
+				},
 				position: "hes",
 				check(card) {
 					const player = get.event("player");
