@@ -130,7 +130,7 @@ const skills = {
 		usable: 1,
 		zhuanhuanji: true,
 		filterTarget(card, player, target) {
-			if (player.storage.mbzuoyou) return target.countCards("h");
+			if (player.storage.mbzuoyou) return get.mode() == "versus" && _status.mode == "two" ? true : target.countCards("h");
 			return true;
 		},
 		async content(event, trigger, player) {
@@ -141,7 +141,7 @@ const skills = {
 				await target.draw(3);
 				await target.chooseToDiscard(2, true, "h");
 			} else {
-				await target.chooseToDiscard(target === player ? "佐佑" : `${get.translation(player)}对你发动了【佐佑】`, "请弃置两张手牌，然后获得1点护甲", 2, true);
+				if ((get.mode() != "versus" || _status.mode != "two") && target.countCards("h")) await target.chooseToDiscard(target === player ? "佐佑" : `${get.translation(player)}对你发动了【佐佑】`, "请弃置一张手牌，然后获得1点护甲", 1, true);
 				await target.changeHujia(1, null, true);
 			}
 		},
@@ -417,18 +417,13 @@ const skills = {
 			player: "damageEnd",
 		},
 		filter(event, player) {
-			return player.countCards("h") > 0 || (event.source && event.source.isIn() && event.source.hasDisabledSlot(1));
+			return event.source && event.source.isIn() && event.source.hasDisabledSlot(1);
 		},
 		forced: true,
 		async content(event, trigger, player) {
-			if (player.countCards("h") > 0) {
-				await player.chooseToDiscard(`溃离：请弃置${get.cnNumber(trigger.num)}张手牌`, trigger.num, true);
-			}
 			const source = trigger.source;
-			if (source && source.isIn() && source.hasDisabledSlot(1)) {
-				player.line(source, "green");
-				await source.enableEquip(1, player);
-			}
+			player.line(source, "green");
+			await source.enableEquip(1, player);
 		},
 		ai: {
 			neg: true,
