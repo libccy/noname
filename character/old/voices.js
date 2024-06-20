@@ -1,4 +1,9 @@
 export default {
+	"#oldzhenlie1": "我，绝不屈服！",
+	"#oldzhenlie2": "休要小看妇人志气！",
+	"#oldmiji1": "我将尽我所能！",
+	"#oldmiji2": "奇谋，只在绝境中诞生！",
+	"#old_wangyi:die": "忠义已尽，死又何妨？",
 	"#oldqianxi1": "伤其十指，不如断其一指！",
 	"#oldqianxi2": "斩草除根，除恶务尽！",
 	"#madai:die": "反骨贼已除，丞相放心……",
