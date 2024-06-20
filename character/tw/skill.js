@@ -55,7 +55,7 @@ const skills = {
 				filter(event, player) {
 					const target = _status.currentPhase;
 					if (!target || !target.isIn() || event.player != target) return false;
-					return player.getStorage("huan_zhugeliang_A_use").some(name => player.hasUseTarget({ name: name }, false));
+					return player.getStorage("huan_zhugeliang_A_use").length;
 				},
 				forced: true,
 				async content(event, trigger, player) {
