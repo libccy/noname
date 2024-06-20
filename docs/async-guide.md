@@ -332,7 +332,7 @@ if (!result.bool) return;
 
 当然你可能会问，`Async Content`需不需要确切的返回值？不需要，甚至不应该要，因为实现的复杂性，如果你返回了一个可`await`的东西，那么无名杀也会等后面的东西执行完毕才认为这个函数执行完毕，而这可能会导致这个函数循环等待而永远无法执行完毕；故在任何情况下，`Async Content`的`return`后面都不应该跟任何东西
 
-就比如，如果你尝试`return event.finish()`这条在`Step Content`中非常常见的代码，由于`event.finish()`会返回被结束的事件，故`event`的函数就会等待`event`的结束————而在`event`的函数执行完前，`event`都不会结束，故此时`event`将永远无法执行完成，这也是非常经典的循环引用
+就比如，如果你尝试`return event.finish()`这条在`Step Content`中非常常见的代码，由于`event.finish()`会返回被结束的事件，故`event`的函数就会等待`event`的结束——而在`event`的函数执行完前，`event`都不会结束，故此时`event`将永远无法执行完成，这也是非常经典的循环引用
 
 如果你因为一些操作必须得有，请使用`void`语句，这个语句会无视后面的值，一律返回`undefined`，比如：
 
@@ -341,6 +341,8 @@ return void await player.draw(2);
 ```
 
 我们不但等待了`player.draw`，而且返回的内容也是`undefined`
+
+> 实际上，我们现在所提到的事件，比如`player.draw`所返回的东西，实际上并不是`GameEvent`，而是`GameEventPromise`，前者并不是可`await`的东西，而后者是。`GameEventPromise`的诞生就是为了使无名杀的事件成为一个可`await`的东西，这里面涉及到一些复杂的实现，本章节不在此阐述。你可以对一个`GameEventPromise`使用`toEvent`函数来获取本身的事件，如`player.draw(2).toEvent()`；你也可以对一个事件本身调用`toPromise`函数来获取对应的`GameEventPromise`
 
 #### 代替`event.goto`与`event.redo`
 
