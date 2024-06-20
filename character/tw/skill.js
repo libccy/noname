@@ -68,7 +68,7 @@ const skills = {
 						const targets = await player.chooseUseTarget(`请选择${get.translation(card)}的目标，若此牌的目标不包含${get.translation(target)}，则其摸一张牌`, card, true, false, "nodistance").forResultTargets();
 						if (!targets.includes(target) && target.isIn()) await target.draw();
 					}
-					delete player.getStorage(event.name);
+					player.storage[event.name] = [];
 					player.unmarkSkill(event.name);
 				},
 				intro: {

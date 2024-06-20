@@ -493,6 +493,9 @@ const skills = {
 						return 7 - get.value(card);
 					},
 					position: "hes",
+					precontent() {
+						event.getParent().addCount = false;
+					},
 				};
 			},
 			prompt(links, player) {
