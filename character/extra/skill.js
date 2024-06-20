@@ -116,7 +116,7 @@ const skills = {
 				},
 				filter(event, player) {
 					if (["global", "equip"].includes(event.type)) return false;
-					const skill = event.sourceSkill || event.skill;
+					const skill = event.skill || event.sourceSkill;
 					const info = get.info(skill);
 					return info && !info.charlotte && !info.equipSkill;
 				},
@@ -137,7 +137,7 @@ const skills = {
 				},
 				filter(event, player) {
 					if (["global", "equip"].includes(event.type)) return false;
-					const skill = event.sourceSkill || event.skill;
+					const skill = event.skill || event.sourceSkill;
 					const info = get.info(skill);
 					return info && !info.charlotte && !info.equipSkill;
 				},
