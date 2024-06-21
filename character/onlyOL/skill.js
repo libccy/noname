@@ -2,6 +2,81 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//OL界刘表
+	olzishou: {
+		audio: 2,
+		trigger: {
+			player: "phaseDrawBegin2",
+		},
+		filter(event, player) {
+			return !event.numFixed;
+		},
+		check(event, player) {
+			return (
+				player.countCards("h") <= (player.hasSkill("olzongshi") ? player.maxHp : player.hp - 2) ||
+				player.skipList.includes("phaseUse") ||
+				!player.countCards("h", function (card) {
+					return get.tag(card, "damage") && player.hasUseTarget(card);
+				})
+			);
+		},
+		async content(event, trigger, player) {
+			trigger.num += game.countGroup();
+			player.addTempSkill("olzishou_debuff", "phaseJieshuAfter");
+		},
+		ai: {
+			threaten: 1.5,
+		},
+		subSkill: {
+			debuff: {
+				trigger: {
+					player: "phaseJieshuBegin",
+				},
+				filter(event, player) {
+					return player.hasHistory("sourceDamage", evt => evt.player != player) && player.countCards("he");
+				},
+				charlotte: true,
+				forced: true,
+				popup: false,
+				async content(event, trigger, player) {
+					player.chooseToDiscard("he", game.countGroup(), true);
+				},
+			},
+		},
+	},
+	olzongshi: {
+		mod: {
+			maxHandcard(player, num) {
+				return num + game.countGroup();
+			},
+		},
+		audio: 2,
+		trigger: {
+			player: "damageBegin4",
+		},
+		filter(event, player) {
+			const source = event.source;
+			if (!source || source == player || !source.isIn()) return false;
+			return !player.getStorage("olzongshi_record").includes(source.group);
+		},
+		forced: true,
+		logTarget: "source",
+		async content(event, trigger, player) {
+			const target = trigger.source;
+			await trigger.cancel();
+			await target.draw();
+			player.addSkill("olzongshi_record");
+			player.markAuto("olzongshi_record", [target.group]);
+		},
+		subSkill: {
+			record: {
+				charlotte: true,
+				intro: {
+					content: (storage, player) => `已记录势力：${get.translation(storage)}`,
+				},
+			},
+		},
+	},
 	//OL界李儒
 	olmieji: {
 		audio: 2,

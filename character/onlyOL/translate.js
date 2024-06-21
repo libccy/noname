@@ -94,6 +94,12 @@ const translates = {
 	ol_liru_prefix: "OL界",
 	olmieji: "灭计",
 	olmieji_info: "出牌阶段限一次，你可以将一张锦囊牌置于牌堆顶，然后令一名其他角色弃置一张锦囊牌或两张非锦囊牌，然后你可以使用其弃置的一张牌。",
+	ol_liubiao: "OL界刘表",
+	ol_liubiao_prefix: "OL界",
+	olzishou: "自守",
+	olzishou_info: "摸牌阶段，你可以多摸X张牌，你以此法摸牌的结束阶段，若你本回合对其他角色造成过伤害，你弃置X张牌（X为全场势力数）。",
+	olzongshi: "宗室",
+	olzongshi_info: "锁定技。①你的手牌上限+X（X为全场势力数）。②每种势力限一次，当其他角色对你造成伤害时，你防止此伤害并令其摸一张牌。",
 };
 
 export default translates;

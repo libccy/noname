@@ -9693,7 +9693,7 @@ const skills = {
 				charlotte: true,
 				locked: true,
 				skillBlocker: function (skill, player) {
-					return skill != "bazhen" && skill != "dcjiezhen_blocker" && !lib.skill[skill].charlotte && !info.persevereSkill && player.getStorage("dcjiezhen_blocker").includes(skill);
+					return skill != "bazhen" && skill != "dcjiezhen_blocker" && !lib.skill[skill].charlotte && !lib.skill[skill].persevereSkill && player.getStorage("dcjiezhen_blocker").includes(skill);
 				},
 				mark: true,
 				marktext: "阵",
