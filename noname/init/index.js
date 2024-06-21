@@ -628,6 +628,7 @@ export async function boot() {
 			.filter(name => game.hasExtension(name))
 			.forEach(name => {
 				lib.announce.publish("Noname.Init.Extension.onLoad", name);
+				// @ts-ignore
 				lib.announce.publish(`Noname.Init.Extension.${name}.onLoad`, void 0);
 			});
 		delete _status.extensionLoading;
