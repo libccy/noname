@@ -3,6 +3,7 @@ import { game } from "../../game/index.js";
 import { lib } from "../index.js";
 import { _status } from "../../status/index.js";
 import { AsyncFunction } from "../../util/index.js";
+import security from '../../util/security.js';
 
 /**
  * 将事件Promise化以使用async异步函数来执行事件。
@@ -35,7 +36,7 @@ export class GameEventPromise extends Promise {
 	}
 	#event;
 	/**
-	 * @param { import('./gameEvent.js').GameEvent } arg
+	 * @param { GameEvent } arg
 	 */
 	constructor(arg) {
 		if (arg instanceof GameEventPromise) throw new Error("GameEventPromise cannot copy.");
@@ -64,30 +65,103 @@ export class GameEventPromise extends Promise {
 								// 不直接game.loop(event)是因为需要让别人可以手动set()和setContent()
 								// 再执行game.loop是因为原有的game.loop被await卡住了，
 								// 得新执行一个只执行这个异步事件的game.loop
-
-								// 事件自行处理skip情况
 								_status.event.next.remove(eventPromise);
-								if (event.player && event.player.skipList.includes(event.name)) {
-									_status.event.trigger(event.name + "Skipped");
-									event.player.skipList.remove(event.name);
-									if (lib.phaseName.includes(event.name))
-										event.player.getHistory("skipped").add(event.name);
-									_status.event.next.remove(eventPromise);
-									event.finish();
-									// @ts-ignore
-									resolve();
+								
+								/**
+								 * @param { import("noname-typings/nonameModules/noname/library/index.js").GameEventPromise } event 
+								 */
+								const check = event => {
+									if (event.player) {
+										const { player } = event;
+										if (player.skipList.includes(event.name)) {
+											_status.event.trigger(event.name + "Skipped");
+											player.skipList.remove(event.name);
+											if (lib.phaseName.includes(event.name))
+												player.getHistory("skipped").add(event.name);
+											_status.event.next.remove(event);
+											event.finish();
+											resolve(event.toEvent());
+										} else if (player.classList.contains("dead") && !event.forceDie && event.name != "phaseLoop") {
+											game.broadcastAll(function () {
+												while (_status.dieClose.length) {
+													_status.dieClose.shift().close();
+												}
+											});
+											if (event._oncancel) event._oncancel();
+											event.finish();
+											resolve(event.toEvent());
+										} else if (player.removed && event.name != "phaseLoop") {
+											event.finish();
+											resolve(event.toEvent());
+										} else if (player.isOut() && event.name != "phaseLoop" && !event.includeOut) {
+											if (event.name == "phase" && player == _status.roundStart && !event.skill) {
+												_status.roundSkipped = true;
+											}
+											event.finish();
+											resolve(event.toEvent());
+										}
+									}
+								};
+
+								check(eventPromise)
+								if (eventPromise.finished) {
 									return eventPromise;
 								}
 
-								if (_status.event != eventPromise) {
-									eventPromise.parent = _status.event;
-									_status.event = eventPromise;
-									game.getGlobalHistory("everything").push(eventPromise);
+								const oldEvent = _status.event;
+								// 处理eventNeutralized反复横跳
+								if (!oldEvent.finished) {
+									if (_status.event != eventPromise) {
+										eventPromise.parent = _status.event;
+										_status.event = eventPromise;
+										game.getGlobalHistory("everything").push(eventPromise);
+									}
+									return game.loop(eventPromise).then(() => {
+										// 有时候event.finished还是false
+										return eventPromise;
+									}).then(event => {
+										check(event.toPromise());
+										return event.toPromise();
+									}); 
 								}
-								return game.loop(eventPromise).then(() => {
-									// 有时候event.finished还是false
-									return eventPromise;
-								});
+								else {
+									// event.neutralize()执行后只允许带有eventNeutralized的arrangeTrigger执行
+									if (eventPromise.name == "arrangeTrigger" &&
+										eventPromise.triggername == "eventNeutralized") {
+										if (_status.event != eventPromise) {
+											eventPromise.parent = _status.event;
+											_status.event = eventPromise;
+											game.getGlobalHistory("everything").push(eventPromise);
+										}
+										return game.loop(eventPromise).then(() => {
+											// 有时候event.finished还是false
+											return eventPromise;
+										}).then(event => {
+											// 如果它终于不给我跳了就给老子停
+											if (oldEvent.finished === true && typeof oldEvent.resolveContent == 'function') {
+												oldEvent.resolveContent();
+											}
+											return event.toPromise();
+										});
+									}
+									// 否则以其他形式使finished为true的时候停止oldEvent
+									else {
+										console.log(`不继续执行event(${eventPromise.name})`, eventPromise.toEvent());
+										// 给老子停
+										if (oldEvent.finished === true && typeof oldEvent.resolveContent == 'function') {
+											oldEvent.resolveContent();
+											console.log(`事件结束(${oldEvent.name})`, oldEvent.toEvent());
+										}
+										else {
+											if (oldEvent.finished === true) {
+												console.log(`事件未结束(${oldEvent.name})`, oldEvent.toEvent());
+											}
+											if (typeof oldEvent.resolveContent != 'function') {
+												console.log(`事件未结束, event.resolveContent不是一个函数`, oldEvent.toEvent());
+											}
+										}
+									}
+								}
 							}
 						}
 					)
@@ -147,12 +221,19 @@ export class GameEventPromise extends Promise {
 	 * ```
 	 */
 	async debugger() {
+		if (security.isSandboxRequired()) throw new Error("当前模式下禁止调试");
 		return new Promise((resolve) => {
 			const runCode = function (event, code) {
 				try {
 					// 为了使玩家调试时使用var player=xxx时不报错，故使用var
-					var { player, _trigger: trigger, _result: result } = event;
-					return eval(code);
+					// var { player, _trigger: trigger, _result: result } = event;
+					var context = { 
+						event,
+						player: event.player,
+						_trigger: event.trigger,
+						_result: event.result,
+					};
+					return security.exec(`return ${code}`, context);
 				} catch (error) {
 					return error;
 				}

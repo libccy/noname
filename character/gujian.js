@@ -1289,7 +1289,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target(card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (get.color(card) == "red" && target.isDamaged()) return [1, 1];
 						},
 					},
@@ -1480,7 +1480,7 @@ game.import("character", function () {
 				ai: {
 					halfneg: true,
 					effect: {
-						player(card, player, target, current) {
+						player_use(card, player, target, current) {
 							if (get.color(card) == "red") return [1, 0, 1, -2];
 						},
 					},

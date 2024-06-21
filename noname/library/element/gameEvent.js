@@ -6,7 +6,7 @@ import { ui } from "../../ui/index.js";
 import { AsyncFunction } from "../../util/index.js";
 
 export class GameEvent {
-	/** @type { this & import('./gameEventPromise.js').GameEventPromise } */
+	/** @type { this & GameEventPromise } */
 	#promise;
 	/**
 	 * @param {string | GameEvent} [name]
@@ -55,9 +55,13 @@ export class GameEvent {
 		 **/
 		this.async = false;
 		/**
-		 * @type {null|(event: GameEvent)=>any} 这个异步事件对应Promise的resolve函数
+		 * @type {null|((event: GameEvent | PromiseLike<GameEvent>)=>void)} 这个异步事件对应Promise的resolve函数
 		 **/
 		this.resolve = null;
+		/**
+		 * @type {null|((value?: any) => void)} 另一种结束event.content的resolve形式
+		 **/
+		this.resolveContent = null;
 		if (trigger !== false && !game.online) this._triggered = 0;
 		this.__args = [name, trigger];
 	}
@@ -188,6 +192,26 @@ export class GameEvent {
 	 * @type { Function | undefined }
 	 */
 	ai;
+	/**
+	 * @type { string }
+	 */
+	triggername;
+	/**
+	 * @type { ContentFuncByAll | GeneratorContentFuncByAll | OldContentFuncByAll }
+	 */
+	content;
+	/**
+	 * @type { boolean }
+	 */
+	forceDie;
+	/**
+	 * @type { Function | undefined }
+	 */
+	_oncancel;
+	/**
+	 * @type { boolean }
+	 */
+	includeOut;
 	/**
 	 * @param {keyof this} key
 	 * @param {number} [value]
@@ -352,7 +376,11 @@ export class GameEvent {
 	}
 	cancel(arg1, arg2, notrigger) {
 		this.untrigger(arg1, arg2);
+		// this.forceFinish();
 		this.finish();
+		if (typeof this.resolveContent == 'function') {
+			this.resolveContent();
+		}
 		if (notrigger != "notrigger") {
 			if (this.player && lib.phaseName.includes(this.name))
 				this.player.getHistory("skipped").add(this.name);
@@ -423,9 +451,11 @@ export class GameEvent {
 				try {
 					if (
 						!(lib.element.content[item] instanceof AsyncFunction) &&
+						// @ts-ignore
 						!lib.element.content[item]._parsed
 					) {
 						lib.element.content[item] = lib.init.parsex(lib.element.content[item]);
+						// @ts-ignore
 						lib.element.content[item]._parsed = true;
 					}
 				} catch {
@@ -786,7 +816,7 @@ export class GameEvent {
 	}
 	trigger(name) {
 		if (_status.video) return;
-		if ((this.name === "gain" || this.name === "lose") && !_status.gameDrawed) return;
+		if (!_status.gameDrawed && ["lose", "gain", "loseAsync", "equip", "addJudge", "addToExpansion"].includes(this.name)) return;
 		if (name === "gameDrawEnd") _status.gameDrawed = true;
 		if (name === "gameStart") {
 			lib.announce.publish("Noname.Game.Event.GameStart", {});

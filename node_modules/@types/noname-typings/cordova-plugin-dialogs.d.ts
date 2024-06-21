@@ -55,6 +55,32 @@ interface Notification {
 		title?: string,
 		buttonLabels?: string[],
 		defaultText?: string): void;
+	
+	/**
+     * open an activity dialog
+     */
+	activityStart(title: string, message: string): void;
+	/**
+     * Close an activity dialog
+     */
+	activityStop(): void;
+	/**
+     * Display a progress dialog with progress bar that goes from 0 to 100.
+     *
+     * @param title Title of the progress dialog.
+     * @param message Message to display in the dialog.
+     */
+	progressStart(title: string, message: string): void;
+	/**
+     * Close the progress dialog.
+     */
+	progressStop(): void;
+	/**
+     * Set the progress dialog value.
+     *
+     * @param value 0-100
+     */
+	progressValue(value: number): void;
 }
 
 /** Object, passed to promptCallback */

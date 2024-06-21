@@ -985,7 +985,7 @@ game.import("card", function () {
 			yinfengjia_info: "此牌的使用目标为其他角色。锁定技，当你受到锦囊牌造成的伤害时，此伤害+1。",
 			yinfengjia_skill: "引蜂甲",
 			zheji: "折戟",
-			zheji_info: "此牌的使用目标为其他角色。这是一把坏掉的武器...",
+			zheji_info: "此牌的使用目标为其他角色。这是一把坏掉的武器……",
 			wufengjian: "无锋剑",
 			wufengjian_info:
 				"此牌的使用目标为其他角色。锁定技，当你使用【杀】时，你弃置一张不为装备区内【无锋剑】的牌。",

@@ -8,6 +8,21 @@ import { checkVersion } from "../library/update.js";
 
 export async function cordovaReady() {
 	if (lib.device == "android") {
+		// 新客户端导入扩展逻辑
+		window.addEventListener("importExtension", e => {
+			const extensionName = e.detail.extensionName;
+			lib.config.extensions.add(extensionName);
+			game.saveConfig("extensions", lib.config.extensions);
+			game.saveConfig(`extension_${extensionName}_enable`, true);
+			if (confirm(`扩展${extensionName}已导入成功，是否重启游戏？`)) {
+				game.reload();
+			}
+		}, false);
+		window.addEventListener("importPackage", () => {
+			if (confirm(`离线包/完整包已导入成功，是否重启游戏？`)) {
+				game.reload();
+			}
+		}, false);
 		document.addEventListener("pause", function () {
 			if (!_status.paused2 && typeof _status.event.isMine == "function" && !_status.event.isMine()) {
 				ui.click.pause();

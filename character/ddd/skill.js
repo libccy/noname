@@ -2619,7 +2619,7 @@ const skills = {
 			order: 10,
 			result: { player: 1 },
 			effect: {
-				target: (card, player, target) => {
+				target_use(card, player, target) {
 					if (card.name === "sha" && target.getExpansions("ddddongcha_effect").length < 2 && lib.skill["dddzhijie"].hiddenCard(target, "shan")) return [1, 1, 1, -get.sgn(get.attitude(player, _status.currentPhase))];
 				},
 			},

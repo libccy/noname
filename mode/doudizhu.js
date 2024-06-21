@@ -127,6 +127,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					name: players[i].name1,
 					name2: players[i].name2,
 					identity: players[i].identity,
+					nickname: players[i].node.nameol.innerHTML,
 				});
 			}
 			_status.videoInited = true;
@@ -813,7 +814,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 					if (typeof lib.config.test_game == "string" && player == game.me.next) {
-						player.init(lib.config.test_game);
+						if (lib.config.test_game != "_")
+							player.init(lib.config.test_game);
 					}
 					player.node.name.dataset.nature = get.groupnature(player.group);
 				};

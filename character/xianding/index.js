@@ -22,7 +22,7 @@ game.import("character", function () {
 		characterSubstitute: {
 			dc_sb_simayi: [],
 			dc_sb_zhouyu: [],
-			//dc_sb_lusu: [],
+			dc_sb_lusu: [],
 		},
 		characterFilter: { ...characterFilters },
 		characterTitle: {

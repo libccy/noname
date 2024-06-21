@@ -1460,7 +1460,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (get.type(card) == "trick" || card.name == "sha") return "zeroplayertarget";
 						},
 					},
@@ -1781,7 +1781,7 @@ game.import("character", function () {
 				ai: {
 					mingzhi: false,
 					effect: {
-						target: function (card, player, target) {
+						player_use(card, player, target) {
 							if (get.tag(card, "respondShan")) {
 								return 0.8;
 							}
@@ -3120,7 +3120,7 @@ game.import("character", function () {
 			yxs_nandinggeer: "南丁格尔",
 			yxs_weizhongxian: "魏忠贤",
 			yxs_lanlinwang: "兰陵王",
-			yxs_meixi: "妹喜",
+			yxs_meixi: "妺喜",
 			yxs_qinqiong: "秦琼",
 
 			yxs_fanji: "反击",

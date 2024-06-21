@@ -1523,7 +1523,7 @@ game.import("card", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (
 								["huoshaolianying", "huogong"].includes(card.name) ||
 								(card.name == "sha" && game.hasNature(card, "fire"))
@@ -1575,7 +1575,7 @@ game.import("card", function () {
 			g_dinglanyemingzhu_ai: {
 				ai: {
 					effect: {
-						player: function (card, player) {
+						player_use(card, player) {
 							if (player.hasSkill("jubao")) return;
 							if (
 								card.name == "dinglanyemingzhu" &&
@@ -1592,7 +1592,7 @@ game.import("card", function () {
 			g_feilongduofeng_ai: {
 				ai: {
 					effect: {
-						player: function (card, player) {
+						player_use(card, player) {
 							if (player.hasSkill("zhangwu")) return;
 							if (
 								card.name == "feilongduofeng" &&
@@ -1609,7 +1609,7 @@ game.import("card", function () {
 			g_taipingyaoshu_ai: {
 				ai: {
 					effect: {
-						player: function (card, player) {
+						player_use(card, player) {
 							if (player.hasSkill("wendao")) return;
 							if (
 								card.name == "taipingyaoshu" &&
@@ -1620,7 +1620,7 @@ game.import("card", function () {
 								return [0, 0, 0, 0];
 							}
 						},
-						target: (card, player, target) => {
+						target_use(card, player, target) {
 							if (target._g_taipingyaoshu_temp) return;
 							if (
 								get.subtype(card) === "equip2" &&
@@ -1831,7 +1831,9 @@ game.import("card", function () {
 				mod: {
 					maxHandcard: function (player, num) {
 						if (get.mode() == "guozhan") {
-							if (player.hasSkill("huangjintianbingfu")) {
+							// if (player.hasSkill("hongfa")) {
+							// 村规
+							if (player.hasSkill("hongfa", null, null, false)) {
 								num += player.getExpansions("huangjintianbingfu").length;
 							}
 							return (

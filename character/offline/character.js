@@ -1,4 +1,6 @@
 const characters = {
+	yj_ehuan: ["male", "qun", 5, ["psdiwan", "pssuiluan", "psconghan"], ["doublegroup:shu:qun"]],
+	yj_zhouji: ["female", "wu", 3, ["psyanmou", "pszhanyan", "psyuhuo"]],
 	drag_guanyu: ["male", "shu", 4, ["dragchaojue", "dragjunshen"]],
 	drag_caoren: ["male", "wei", 4, ["draglizhong", "dragjuesui"]],
 	drag_lvchang: ["male", "wei", 3, ["dragjuwu", "dragshouxiang"]],
@@ -55,7 +57,7 @@ const characters = {
 	sp_liubei: ["male", "shu", 4, ["zhaolie", "shichou"], ["zhu"]],
 	sp_zhangfei: ["male", "shu", 4, ["jie", "dahe"]],
 	sp_lvmeng: ["male", "wu", 3, ["tanhu", "mouduan"]],
-	sp_xiahoudun: ["male", "wei", 4, ["fenyong", "xuehen"], ["die_audio"]],
+	sp_xiahoudun: ["male", "wei", 4, ["fenyong", "xuehen"]],
 	sp_ganning: ["male", "qun", 4, ["yinling", "junwei"]],
 	sp_daqiao: ["female", "wu", 3, ["yanxiao", "anxian"]],
 	sp_pangtong: ["male", "qun", 3, ["xinmanjuan", "zuixiang"]],

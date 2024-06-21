@@ -20,6 +20,7 @@ import { _status } from "../../status/index.js";
 import { ui } from "../../ui/index.js";
 import { CacheContext } from "../cache/cacheContext.js";
 import { ChildNodesWatcher } from "../cache/childNodesWatcher.js";
+import security from "../../util/security.js";
 
 export class Player extends HTMLDivElement {
 	/**
@@ -357,6 +358,10 @@ export class Player extends HTMLDivElement {
 	 * @type { boolean | undefined }
 	 */
 	identityShown;
+	/**
+	 * @type { boolean }
+	 */
+	removed;
 	//新函数
 	/**
 	 * 怒气
@@ -450,7 +455,7 @@ export class Player extends HTMLDivElement {
 		const vars = {};
 		/**
 		 * 作用域
-		 * @type { (code: string) => any }
+		 * @type { ((code: string) => any)? }
 		 */
 		let scope;
 		/** @type { Skill } */
@@ -496,14 +501,13 @@ export class Player extends HTMLDivElement {
 				varstr += `var ${key}=lib.skill['${skillName}'].vars['${key}'];\n`;
 			}
 			let str = `
-					function content(){
-						${varstr}if(event.triggername=='${skillName}After'){
-							player.removeSkill('${skillName}');
-							delete lib.skill['${skillName}'];
-							delete lib.translate['${skillName}'];
-							return event.finish();
-						}
-				`;
+					${varstr}if(event.triggername=='${skillName}After'){
+						player.removeSkill('${skillName}');
+						delete lib.skill['${skillName}'];
+						delete lib.translate['${skillName}'];
+						return event.finish();
+					}
+			`;
 			for (let i = 0; i < skill.contentFuns.length; i++) {
 				const fun2 = skill.contentFuns[i];
 				const a = fun2.toString();
@@ -512,7 +516,15 @@ export class Player extends HTMLDivElement {
 				const str2 = a.slice(begin, a.lastIndexOf("}") != -1 ? a.lastIndexOf("}") : undefined).trim();
 				str += `'step ${i}'\n\t${str2}\n\t`;
 			}
-			skill.content = lib.init.parsex((scope || eval)(str + `\n};content;`), scope);
+			// 防止注入喵
+			if (!get.isFunctionBody(str, "any")) throw new Error("无效的content函数代码");
+			let recompiledScope;
+			if (security.isSandboxRequired()) {
+				recompiledScope = scope ? security.eval(`return (${scope.toString()})`) : code => security.eval(`return (${code.toString()})`);
+			} else {
+				recompiledScope = scope || eval;
+			}
+			skill.content = lib.init.parsex(recompiledScope(`(function(){\n${str}\n})`), scope && recompiledScope);
 			// @ts-ignore
 			skill.content._parsed = true;
 		};
@@ -628,6 +640,7 @@ export class Player extends HTMLDivElement {
 			 */
 			apply(_scope) {
 				if (lib.skill[skillName] != skill) throw `This skill has been destroyed`;
+				if (security.isSandboxRequired()) console.warn("`player.when().apply()` 在沙盒模式下不推荐使用");
 				// @ts-ignore
 				scope = _scope;
 				if (skill.contentFuns.length > 0) createContent();
@@ -2712,6 +2725,9 @@ export class Player extends HTMLDivElement {
 			if (Array.isArray(maxHp)) {
 				this.maxHp = maxHp[1];
 				this.hp = maxHp[0];
+				if (typeof maxHp[2] == "number") {
+					this.hujia = maxHp[2];
+				}
 			} else {
 				var num;
 				if (maxHp === false) {
@@ -3646,6 +3662,12 @@ export class Player extends HTMLDivElement {
 	getCards(arg1, arg2) {
 		return Array.from(this.iterableGetCards(arg1, arg2));
 	}
+	/**
+	 * @param { Player } player
+	 * @param { string } [arg1]
+	 * @param { string } [arg2]
+	 * @returns { Generator<Card, void, unknown> }
+	 */
 	*iterableGetDiscardableCards(player, arg1, arg2) {
 		for (let card of this.iterableGetCards(arg1, arg2)) {
 			if (lib.filter.canBeDiscarded(card, player, this)) {
@@ -4432,6 +4454,7 @@ export class Player extends HTMLDivElement {
 				next.func = arguments[i];
 			}
 		}
+		return next;
 	}
 	discoverCard(list) {
 		var next = game.createEvent("discoverCard");
@@ -5848,7 +5871,7 @@ export class Player extends HTMLDivElement {
 			return get.is.sameNature(natures, naturesx);
 		};
 		if (next.hasNature("poison")) delete next._triggered;
-		else if(next.unreal) next._triggered = 2;
+		else if (next.unreal) next._triggered = 2;
 		next.setContent("damage");
 		next.filterStop = function () {
 			if (this.source && this.source.isDead()) delete this.source;
@@ -7051,7 +7074,7 @@ export class Player extends HTMLDivElement {
 			node = ui.create.div(".card.mark.drawinghidden");
 			ui.create.div(".background.skillmark", node).innerHTML = get.translation(name)[0];
 		} else {
-			if (!lib.character[name]) return;
+			if (!get.character(name)) return;
 			node = ui.create.div(".card.mark.drawinghidden").setBackground(name, "character");
 		}
 		this.node.marks.insertBefore(node, this.node.marks.childNodes[1]);
@@ -7291,6 +7314,7 @@ export class Player extends HTMLDivElement {
 		cfg.skills = cfg.skills || [];
 		cfg.hp = cfg.hp || 1;
 		cfg.maxHp = cfg.maxHp || 1;
+		cfg.hujia = cfg.hujia || 0;
 		cfg.sex = cfg.sex || "male";
 		cfg.group = cfg.group || "qun";
 		cfg.skill = cfg.skill || _status.event.name;
@@ -7301,9 +7325,10 @@ export class Player extends HTMLDivElement {
 				cfg.source = this.name;
 			}
 		}
+		const list = cfg.caption ? [cfg.caption] : ["", "_prefix", "_ab"].map(str => lib.translate[cfg.name + str]);
 		game.broadcastAll(
 			//TODO: 这里直接修改trashBin部分，后续需要修改为新写法
-			function (player, skill, cfg) {
+			function (player, skill, list, cfg) {
 				lib.skill[skill] = {
 					intro: {
 						content: cfg.intro || "",
@@ -7314,7 +7339,7 @@ export class Player extends HTMLDivElement {
 						subplayer: true,
 					},
 				};
-				lib.character[skill] = [cfg.sex, cfg.group, cfg.maxHp, cfg.skills, []];
+				lib.character[skill] = [cfg.sex, cfg.group, parseFloat(cfg.hp) + "/" + parseFloat(cfg.maxHp) + "/" + parseFloat(cfg.hujia), cfg.skills, ["tempname:" + cfg.name].concat(lib.character[cfg.name].trashBin || [])];
 				if (Array.isArray(cfg.image)) {
 					cfg.image.forEach(image => lib.character[skill][4].push(image));
 				} else if (typeof cfg.image == "string") {
@@ -7322,14 +7347,18 @@ export class Player extends HTMLDivElement {
 				} else {
 					lib.character[skill].trashBin.push("character:" + cfg.name);
 				}
-				lib.translate[skill] = cfg.caption || get.rawName(cfg.name);
+				for (let i = 0; i < list.length; i++) {
+					if (!list[i]) continue;
+					lib.translate[skill + ["", "_prefix", "_ab"][i]] = list[i];
+				}
 				player.storage[skill] = cfg;
 			},
 			this,
 			skill,
+			list,
 			cfg
 		);
-		game.addVideo("addSubPlayer", this, [skill, lib.skill[skill], lib.character[skill], lib.translate[skill], { name: cfg.name }]);
+		game.addVideo("addSubPlayer", this, [skill, lib.skill[skill], lib.character[skill], list, { name: cfg.name }]);
 		this.addSkill(skill);
 		return skill;
 	}
@@ -7338,7 +7367,7 @@ export class Player extends HTMLDivElement {
 			this.exitSubPlayer(true);
 		} else {
 			if (player.storage[name].onremove) {
-				player.storage[name].onremove(player);
+				player.storage[name].onremove(player, name);
 			}
 			this.removeSkill(name);
 			delete this.storage[name];
@@ -8037,19 +8066,21 @@ export class Player extends HTMLDivElement {
 
 			if (log !== false && this.hasSkill(skill)) game.log(this, "的技能", `#g【${get.translation(skill)}】`, "暂时失效了");
 
-			if (!expire) expire = { global: ["phaseAfter", "phaseBeforeStart"] };
-			else if (typeof expire == "string" || Array.isArray(expire)) expire = { global: expire };
-			this.when(expire, false)
-				.assign({
-					firstDo: true,
-				})
-				.vars({
-					bannedSkill: skill,
-				})
-				.then(() => {
-					delete player.storage[`temp_ban_${bannedSkill}`];
-				})
-				.finish();
+			if (expire !== "forever") {
+				if (!expire) expire = { global: ["phaseAfter", "phaseBeforeStart"] };
+				else if (typeof expire == "string" || Array.isArray(expire)) expire = { global: expire };
+				this.when(expire, false)
+					.assign({
+						firstDo: true,
+					})
+					.vars({
+						bannedSkill: skill,
+					})
+					.then(() => {
+						delete player.storage[`temp_ban_${bannedSkill}`];
+					})
+					.finish();
+			}
 		}
 		return skill;
 	}
@@ -8997,9 +9028,7 @@ export class Player extends HTMLDivElement {
 	 */
 	hasSkillTag(tag, hidden, arg, globalskill) {
 		var skills = this.getSkills(hidden);
-		if (globalskill) {
-			skills.addArray(lib.skill.global);
-		}
+		if (globalskill !== false) skills.addArray(lib.skill.global);
 		game.expandSkills(skills);
 		for (var i = 0; i < skills.length; i++) {
 			var info = lib.skill[skills[i]];
@@ -9067,6 +9096,7 @@ export class Player extends HTMLDivElement {
 		game.expandSkills(skills);
 		for (var i = 0; i < skills.length; i++) {
 			var ifo = get.info(skills[i]);
+			if (!ifo) continue;
 			if (ifo.hiddenWuxie && info) {
 				if (typeof ifo.hiddenWuxie == "function" && ifo.hiddenWuxie(this, info)) {
 					return true;
