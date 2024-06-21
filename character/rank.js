@@ -1152,6 +1152,7 @@ window.noname_character_rank = {
 		"huan_zhaoyun",
 		"huan_guojia",
 		"huan_jiangwei",
+		"budugen",
 	],
 	b: [
 		"huan_zhugeliang",
@@ -2000,6 +2001,7 @@ window.noname_character_rank = {
 			"jsrg_yuanshao",
 		],
 		epic: [
+			"budugen",
 			"huan_guojia",
 			"huan_simayi",
 			"dc_sb_zhangxiu",
