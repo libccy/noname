@@ -116,6 +116,7 @@ const skills = {
 				},
 				filter(event, player) {
 					if (["global", "equip"].includes(event.type)) return false;
+					if ((get.info(event.skill) || {}).charlotte) return false;
 					const skill = event.sourceSkill || event.skill;
 					const info = get.info(skill);
 					return info && !info.charlotte && !info.equipSkill;
@@ -137,6 +138,7 @@ const skills = {
 				},
 				filter(event, player) {
 					if (["global", "equip"].includes(event.type)) return false;
+					if ((get.info(event.skill) || {}).charlotte) return false;
 					const skill = event.sourceSkill || event.skill;
 					const info = get.info(skill);
 					return info && !info.charlotte && !info.equipSkill;
@@ -5695,7 +5697,7 @@ const skills = {
 			listm = listm.concat(listv);
 			var func = function (skill) {
 				var info = get.info(skill);
-				if (!info || info.charlotte) return false;
+				if (!info || info.charlotte || info.persevereSkill) return false;
 				return true;
 			};
 			for (var i = 0; i < listm.length; i++) {
@@ -5725,7 +5727,7 @@ const skills = {
 			listm = listm.concat(listv);
 			var func = function (skill) {
 				var info = get.info(skill);
-				if (!info || info.charlotte) return false;
+				if (!info || info.charlotte || info.persevereSkill) return false;
 				return true;
 			};
 			for (var i = 0; i < listm.length; i++) {
@@ -8127,7 +8129,7 @@ const skills = {
 			listm = listm.concat(listv);
 			var func = function (skill) {
 				var info = get.info(skill);
-				if (!info || info.charlotte || info.hiddenSkill || info.zhuSkill || info.juexingji || info.limited || info.dutySkill || (info.unique && !info.gainable) || lib.skill.drlt_duorui.bannedList.includes(skill)) return false;
+				if (!info || info.charlotte || info.persevereSkill || info.hiddenSkill || info.zhuSkill || info.juexingji || info.limited || info.dutySkill || (info.unique && !info.gainable) || lib.skill.drlt_duorui.bannedList.includes(skill)) return false;
 				return true;
 			};
 			for (var i = 0; i < listm.length; i++) {

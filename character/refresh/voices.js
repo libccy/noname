@@ -505,7 +505,7 @@ export default {
 	"#zhoutai:die": "敌众我寡，无力回天……",
 	"#rejianchu1": "你这身躯，怎么能快过我？",
 	"#rejianchu2": "这些怎么能挡住我的威力！",
-	"#ol_pangde:die": "水漫城池，不得不降……",
+	"#ol_pangde:die": "人亡马倒，命之所归……",
 	"#olduanliang1": "兵行无常，计行断粮。",
 	"#olduanliang2": "焚其粮营，断其粮道。",
 	"#oljiezi1": "剪径截辎，馈泽同袍。",

@@ -61,7 +61,7 @@ const skills = {
 		mark: true,
 		intro: {
 			markcount: storage => 3 - (storage || []).length,
-			content: storage => ((storage || []).length ? "已移去了$项" : "暂未移去任何项"),
+			content: storage => ((storage || []).length ? ("已移去了" + storage + "项") : "暂未移去任何项"),
 		},
 		subSkill: {
 			effect: {
@@ -515,7 +515,7 @@ const skills = {
 					.map((_, i) => i + 1)
 					.reduce((sum, i) => sum + target.countEmptySlot(i), 0)
 			);
-			if (player.countMark("dcsbfengmin") > player.getDamagedHp()) {
+			if (player.countMark("dcsbfengmin") > player.maxHp) {
 				player.tempBanSkill("dcsbfengmin");
 			}
 		},
@@ -1110,6 +1110,7 @@ const skills = {
 				return evt.targets && evt.targets.includes(target);
 			}).length;
 			target.addMark("dcfenhui_mark", Math.min(5, count));
+			await player.draw(Math.min(5, count));
 			player.addSkill("dcfenhui_effect");
 		},
 		subSkill: {
@@ -4464,6 +4465,12 @@ const skills = {
 	//新杀许靖
 	dcshangyu: {
 		audio: 2,
+		init: () => {
+			game.addGlobalSkill("dcshangyu_ai");
+		},
+		onremove: () => {
+			if (!game.hasPlayer(i => i.hasSkill("dcshangyu"), true)) game.removeGlobalSkill("dcshangyu_ai");
+		},
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
@@ -4519,6 +4526,46 @@ const skills = {
 			player.addSkill("dcshangyu_effect");
 		},
 		subSkill: {
+			ai: {
+				mod: {
+					aiOrder(player, card, num) {
+						if (
+							get.itemtype(card) == "card" &&
+							card.hasGaintag("dcshangyu_tag") &&
+							game.hasPlayer(current => {
+								return current.hasSkill("dcshangyu") && get.attitude(player, current) >= 0;
+							})
+						)
+							return num + 0.1;
+					},
+					aiValue(player, card, num) {
+						if (
+							get.itemtype(card) == "card" &&
+							card.hasGaintag("dcshangyu_tag") &&
+							game.hasPlayer(current => {
+								return current.hasSkill("dcshangyu") && get.attitude(player, current) >= 0;
+							})
+						)
+							return num / 10;
+					},
+					aiUseful: function () {
+						return lib.skill.dcshangyu_ai.mod.aiValue.apply(this, arguments);
+					},
+				},
+				trigger: {
+					player: "dieAfter",
+				},
+				filter: () => {
+					return !game.hasPlayer(i => i.hasSkill("dcshangyu"), true);
+				},
+				silent: true,
+				forceDie: true,
+				forced: true,
+				popup: false,
+				content: () => {
+					game.removeGlobalSkill("dcshangyu_ai");
+				},
+			},
 			effect: {
 				audio: "dcshangyu",
 				trigger: {

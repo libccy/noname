@@ -42,7 +42,7 @@ const characterReplaces = {
 	zhaoyǎn: ["zhaoyǎn", "dc_zhaoyǎn"],
 	furong: ["ol_furong", "furong", "tw_furong"],
 	daxiaoqiao: ["daxiaoqiao", "dc_daxiaoqiao", "tw_daxiaoqiao"],
-	zhugeguo: ["zhugeguo", "tw_zhugeguo"],
+	zhugeguo: ["zhugeguo", "tw_zhugeguo", "yue_zhugeguo"],
 	wanglang: ["ol_wanglang", "wanglang", "old_wanglang"],
 	tengfanglan: ["tengfanglan", "dc_tengfanglan"],
 	zhangyì: ["ol_zhangyì", "zhangyì", "std_zhangyì"],

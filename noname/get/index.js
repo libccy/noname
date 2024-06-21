@@ -12,31 +12,13 @@ import { Audio } from "./audio.js";
 import security from "../util/security.js";
 import { CodeSnippet, ErrorManager } from "../util/error.js";
 
-export class Get {
+import { GetCompatible } from "./compatible.js";
+
+export class Get extends GetCompatible {
 	is = new Is();
 	promises = new Promises();
-	Audio = new Audio();
-	/**
-	 * 获取当前内核版本信息
-	 *
-	 * 目前仅考虑`chrome`, `firefox`和`safari`三种浏览器的信息，其余均归于其他范畴
-	 *
-	 * > 其他后续或许会增加，但`IE`永无可能
-	 *
-	 * @returns {["firefox" | "chrome" | "safari" | "other", number, number, number]}
-	 */
-	coreInfo() {
-		const regex = /(firefox|chrome|safari)\/(\d+(?:\.\d+)+)/;
-		let result;
-		if (!(result = userAgent.match(regex))) return ["other", NaN, NaN, NaN];
-		if (result[1] != "safari") {
-			const [major, minor, patch] = result[2].split(".");
-			return [result[1], parseInt(major), parseInt(minor), parseInt(patch)];
-		}
-		result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/);
-		const [major, minor, patch] = result[1].split(".");
-		return ["safari", parseInt(major), parseInt(minor), parseInt(patch)];
-	}
+	Audio = Audio;
+
 	/**
 	 * 将一个传统格式的character转化为Character对象格式
 	 * @param { Array|Object|import("../library/element/character").Character } data
@@ -341,6 +323,7 @@ export class Get {
 		if (info.chargingSkill) list.add("蓄能技");
 		if (info.charlotte) list.add("Charlotte");
 		if (info.sunbenSkill) list.add("昂扬技");
+		if (info.persevereSkill) list.add("持恒技");
 		if (info.categories) list.addArray(info.categories(skill, player));
 		return list;
 	}
@@ -929,10 +912,10 @@ export class Get {
 		const target = constructor
 			? Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object
 				? // @ts-ignore
-				new constructor()
+					new constructor()
 				: constructor.name in window && /\[native code\]/.test(constructor.toString())
 					? // @ts-ignore
-					new constructor(obj)
+						new constructor(obj)
 					: obj
 			: Object.create(null);
 		if (target === obj) return target;
@@ -975,15 +958,22 @@ export class Get {
 
 		return target;
 	}
+	plainTextMap = new Map();
 	/**
 	 * 用于将HTML代码转换为纯文本。
 	 * @param { string } htmlContent
 	 * @returns { string }
 	 */
 	plainText(htmlContent) {
-		var parser = new DOMParser();
-		var doc = parser.parseFromString(htmlContent || '', 'text/html');
-		return doc.body.textContent || doc.body.innerText;
+		if (htmlContent.includes("<") || htmlContent.includes(">")) {
+			if (this.plainTextMap.has(htmlContent)) return this.plainTextMap.get(htmlContent);
+			const parser = new DOMParser(),
+				doc = parser.parseFromString(htmlContent || "", "text/html");
+			const text = doc.body.textContent || doc.body.innerText;
+			this.plainTextMap.set(htmlContent, text);
+			return text;
+		}
+		return htmlContent;
 	}
 	inpilefull(type) {
 		var list = [];
@@ -1500,26 +1490,52 @@ export class Get {
 	infoPlayersOL(infos) {
 		return Array.from(infos || []).map(get.infoPlayerOL);
 	}
-	/** 箭头函数头 */
-	#arrowPattern = /^(?:async\b\s*)?(?:([\w$]+)|\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\))\s*=>/;
-	/** 标准函数头 */
-	#fullPattern = /^([\w\s*]+)\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\)\s*\{/;
+	/** @type {RegExp} */
+	#specialHeadPattern = /^(?:async)?\s+[\w$]+\s*=>/;
+	/** @type {RegExp} */
+	#functionHeadPattern = /^(?:async\b\s*)?(?:function\b\s*)?(?:\*\s*)?(?:[\w$]+\b\s*)?\(/;
+	/** @type {RegExp} */
+	#illegalFunctionHeadPattern = /^(?:async\b\s*)?\*\s*\(/;
+	/** @type {RegExp} */
+	#functionNeckPattern = /^\)\s*(?:=>\s*\{|=>|\{)/;
+	/** @type {RegExp} */
+	#identifierPattern = /\b[\w$]+\b/;
+	/** @type {RegExp} */
+	#asyncHeadPattern = /^async[\s\*\(]/;
+	/**
+	 * ```plain
+	 * 测试一段代码是否为函数参数列表
+	 * ```
+	 * 
+	 * @param {string} paramstr
+	 */
+	isFunctionParam(paramstr) {
+		if (paramstr.length == 0) return true;
+		try {
+			new Function(paramstr, "");
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
 	/**
 	 * ```plain
 	 * 测试一段代码是否为函数体
 	 * ```
-	 * 
+	 *
 	 * @typedef {"async"|"generator"|"agenerator"|"any"|null} FunctionType
-	 * 
-	 * @param {string} code 
-	 * @param {FunctionType} type 
-	 * @returns {boolean} 
+	 *
+	 * @param {string} code
+	 * @param {FunctionType} type
+	 * @returns {boolean}
 	 */
-	isFunctionBody(code, type = null) {
+	isFunctionBody(code, type = /* (function(){return null})() */ null) {
 		if (type == "any") {
-			return ["async", "generator", "agenerator", null]
-				// @ts-ignore // 突然发现ts-ignore也挺方便的喵
-				.some(t => get.isFunctionBody(code, t));
+			return (
+				["async", "generator", "agenerator", null]
+					// @ts-ignore // 突然发现ts-ignore也挺方便的喵
+					.some(t => get.isFunctionBody(code, t))
+			);
 		}
 		try {
 			switch (type) {
@@ -1545,53 +1561,125 @@ export class Get {
 	 * ```plain
 	 * 清洗函数体代码
 	 * ```
-	 * 
-	 * @param {string} str 
-	 * @param {boolean} log 
-	 * @returns {string} 
+	 *
+	 * @param {string} str
+	 * @param {boolean} log
+	 * @returns {string}
 	 */
 	pureFunctionStr(str, log = false) {
+		const emptyFunction = "function () {}";
 		str = str.trim();
-		const arrowMatch = get.#arrowPattern.exec(str);
-		if (arrowMatch) {
-			let body = str.slice(arrowMatch[0].length).trim();
+		// 对于特殊的箭头函数特殊处理: identifier => ...
+		const specialMatch = get.#specialHeadPattern.exec(str);
+		if (specialMatch) {
+			let body = str.slice(specialMatch[0].length).trim();
 			if (body.startsWith("{") && body.endsWith("}")) body = body.slice(1, -1);
 			else body = `return ${body}`;
 			if (!get.isFunctionBody(body, "any")) {
-				if (log) console.error("发现疑似恶意的远程代码:", str);
-				return `()=>{}`;
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
 			}
-			return `${arrowMatch[0]}{${body}}`;
+			return `${specialMatch[0]}{${body}}`;
 		}
-		if (!str.endsWith("}")) {
+		// 匹配函数头
+		const functionHead = get.#functionHeadPattern.exec(str);
+		if (!functionHead) {
 			if (log) console.warn("发现无法识别的远程代码:", str);
-			return '()=>{}';
+			return emptyFunction;
 		}
-		const fullMatch = get.#fullPattern.exec(str);
-		if (!fullMatch) {
+		// 检查非法函数头
+		if (get.#illegalFunctionHeadPattern.test(functionHead[0])) {
 			if (log) console.warn("发现无法识别的远程代码:", str);
-			return '()=>{}';
+			return emptyFunction;
 		}
-		const head = fullMatch[1];
-		const args = fullMatch[2] || '';
-		const body = str.slice(fullMatch[0].length).slice(0, -1);
-		if (!get.isFunctionBody(body, "any")) {
-			if (log) console.error("发现疑似恶意的远程代码:", str);
-			return '()=>{}';
+		// 遍历字符串来寻找参数列表的关闭括号
+		const headLen = functionHead[0].length;
+		let start = headLen;
+		let foundClose;
+		let verifiedParams = null;
+		while ((foundClose = str.indexOf(")", start)) >= 0) {
+			const tempParams = str.slice(headLen, foundClose);
+			// 检查收集到的参数列表是否是有效的
+			if (get.isFunctionParam(tempParams)) {
+				verifiedParams = tempParams;
+				break;
+			}
+			start = foundClose + 1;
 		}
-		str = `(${args}){${body}}`;
-		if (head.includes("*")) str = "*" + str;
-		str = "function" + str;
-		if (/\basync\b/.test(head)) str = "async " + str;
-		return str;
+		if (verifiedParams == null) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 检查函数连接
+		const neckStart = str.slice(foundClose);
+		const neckMatch = get.#functionNeckPattern.exec(neckStart);
+		if (!neckMatch) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 箭头函数分流检查
+		if (neckMatch[0].includes("=>")) {
+			let funcHead = functionHead[0];
+			let idMatch;
+			while (idMatch = get.#identifierPattern.exec(funcHead)) {
+				if (idMatch[0] != "async") {
+					if (log) console.warn("发现无法识别的远程代码:", str);
+					return emptyFunction;
+				}
+				funcHead = funcHead.slice(idMatch.index + idMatch[0].length);
+			}
+		} else {
+			let funcHead = functionHead[0];
+			let idMatch;
+			while (idMatch = get.#identifierPattern.exec(funcHead)) {
+				if (idMatch[0] != "async") break;
+				funcHead = funcHead.slice(idMatch.index + idMatch[0].length);
+			}
+			if (!idMatch) {
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
+			}
+		}
+		// 块类型分流
+		const isBlock = neckMatch[0].endsWith("{");
+		let funcBody;
+		if (isBlock) {
+			if (!str.endsWith("}")) {
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
+			}
+			funcBody = "{" + str.slice(foundClose + neckMatch[0].length);
+		} else {
+			// 将表达式函数体转换成块函数体
+			funcBody = `{ return ${str.slice(foundClose + neckMatch[0].length)}; }`;
+		}
+		// 收集函数类型
+		let funcType = 0;
+		if (functionHead[0].includes("*")) funcType |= 1;
+		if (get.#asyncHeadPattern.test(functionHead[0])) funcType |= 2;
+		// 检查函数体
+		const checkType = [null, "generator", "async", "agenerator"][funcType];
+		// @ts-ignore
+		if (!get.isFunctionBody(funcBody, checkType)) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 开始构造最终的函数
+		let finalStr = ` (${verifiedParams}) ${funcBody}`;
+		if (funcType & 1) finalStr = "*" + finalStr;
+		finalStr = "function" + finalStr;
+		if (funcType & 2) finalStr = "async " + finalStr;
+		return finalStr;
 	}
 	funcInfoOL(func) {
 		if (typeof func == "function") {
 			if (func._filter_args) {
 				return "_noname_func:" + JSON.stringify(get.stringifiedResult(func._filter_args, 3));
 			}
-			const { Marshal } = security.importSandbox();
-			const str = Marshal.decompileFunction(func);
+			// 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
+			/** @type {(func: Function) => string} */
+			const decompileFunction = security.isSandboxRequired() ? security.importSandbox().Marshal.decompileFunction : Function.prototype.call.bind(Function.prototype.toString);
+			const str = decompileFunction(func);
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return "_noname_func:function () {}";
 			return "_noname_func:" + get.pureFunctionStr(str);
@@ -1605,7 +1693,7 @@ export class Get {
 		if ("sandbox" in window) console.log("[infoFuncOL] pured:", str);
 		try {
 			// js内置的函数
-			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () { };
+			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () {};
 			if (security.isSandboxRequired()) {
 				const loadStr = `return (${str});`;
 				const box = security.currentSandbox();
@@ -1618,7 +1706,7 @@ export class Get {
 			}
 		} catch (e) {
 			console.error(`${e} in \n${str}`);
-			return function () { };
+			return function () {};
 		}
 		if (Array.isArray(func)) {
 			func = get.filter.apply(this, get.parsedResult(func));
@@ -1628,14 +1716,14 @@ export class Get {
 	eventInfoOL(item, level, noMore) {
 		return get.itemtype(item) == "event"
 			? `_noname_event:${JSON.stringify(
-				Object.entries(item).reduce((stringifying, entry) => {
-					const key = entry[0];
-					if (key == "_trigger") {
-						if (noMore !== false) stringifying[key] = get.eventInfoOL(entry[1], null, false);
-					} else if (!lib.element.GameEvent.prototype[key] && key != "content" && get.itemtype(entry[1]) != "event") stringifying[key] = get.stringifiedResult(entry[1], null, false);
-					return stringifying;
-				}, {})
-			)}`
+					Object.entries(item).reduce((stringifying, entry) => {
+						const key = entry[0];
+						if (key == "_trigger") {
+							if (noMore !== false) stringifying[key] = get.eventInfoOL(entry[1], null, false);
+						} else if (!lib.element.GameEvent.prototype[key] && key != "content" && get.itemtype(entry[1]) != "event") stringifying[key] = get.stringifiedResult(entry[1], null, false);
+						return stringifying;
+					}, {})
+				)}`
 			: "";
 	}
 	/**
@@ -2174,8 +2262,8 @@ export class Get {
 		n = game.checkMod(from, to, n, "globalFrom", from);
 		n = game.checkMod(from, to, n, "globalTo", to);
 		const equips1 = from.getCards("e", function (card) {
-			return !ui.selected.cards || !ui.selected.cards.includes(card);
-		}),
+				return !ui.selected.cards || !ui.selected.cards.includes(card);
+			}),
 			equips2 = to.getCards("e", function (card) {
 				return !ui.selected.cards || !ui.selected.cards.includes(card);
 			});
@@ -2467,7 +2555,7 @@ export class Get {
 	}
 	cnNumber(num, ordinal) {
 		if (isNaN(num)) return "";
-		let numStr = num.toString();
+		let numStr = "" + num;
 		if (numStr === "Infinity") return "∞";
 		if (numStr === "-Infinity") return "-∞";
 		if (!/^\d+$/.test(numStr)) return num;

@@ -38,7 +38,7 @@ export class Mutex {
 		switch (this.#status) {
 			case "locked":
 				await this.#promise;
-
+			// [falls through]
 			case "unlocked":
 				this.#status = "locked";
 				// @ts-ignore

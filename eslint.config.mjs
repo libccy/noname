@@ -23,6 +23,7 @@ export default [
 			"no-undef": 0,
 			"no-unused-vars": 0,
 			"require-yield": 0,
+			"no-fallthrough": ["error", { commentPattern: "\\[falls[\\s\\w]*through\\]" }],
 		},
 		languageOptions: {
 			ecmaVersion: 13,

@@ -798,8 +798,11 @@ const skills = {
 	jsrgsaojian: {
 		enable: "phaseUse",
 		usable: 1,
+		filter(event, player) {
+			return game.hasPlayer(current => current != player && current.countCards("h") > 0);
+		},
 		filterTarget(card, player, target) {
-			return target.countCards("h") > 0;
+			return target != player && target.countCards("h") > 0;
 		},
 		async content(event, trigger, player) {
 			const target = event.target;

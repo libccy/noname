@@ -234,7 +234,7 @@ const skills = {
 					puts++;
 					const card = result.links[0];
 					target.$throw([card], 1000);
-					if (get.owner(card)) await get.owner(card).lose([card], ui.special);
+					if (get.owner(card)) await get.owner(card).lose([card], ui.cardPile);
 					else ui.discardPile.removeChild(card);
 					ui.cardPile.insertBefore(card, ui.cardPile.firstChild);
 					game.updateRoundNumber();
@@ -4572,11 +4572,17 @@ const skills = {
 				.set("targetprompt", ["打人", "被打"])
 				.set("complexSelect", true)
 				.set("ai", target => {
+					if (!get.event("check")) return -1;
 					var player = _status.event.player;
 					if (!ui.selected.targets.length) return get.effect(target, { name: "guohe_copy2" }, player, player);
 					var targetx = ui.selected.targets[0];
 					return get.effect(target, { name: "sha" }, targetx, player) + 5;
-				});
+				}).set("check", function(){
+					if (player.maxHp < 2) return false;
+					if (player.hasSkill("yjshicha") && !player.hasHistory("useSkill", evt => evt.skill == "yjtuicheng")) return true;
+					if (player.maxHp > 2 && player.getDamagedHp() > 1) return true;
+					return false;
+				}());
 			"step 1";
 			if (result.bool) {
 				var targets = result.targets;

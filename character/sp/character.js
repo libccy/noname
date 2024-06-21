@@ -1,4 +1,5 @@
 const characters = {
+	budugen: ["male", "qun", 4, ["olkouchao"]],
 	mawan: ["male", "qun", 4, ["mashu", "olhunjiang"]],
 	ol_jiangwan: ["male", "shu", 3, ["olziruo", "olxvfa"]],
 	caimao: ["male", "wei", 4, ["olzuolian", "oljingzhou"]],
@@ -16,7 +17,7 @@ const characters = {
 	ol_liwan: ["female", "wei", 3, ["relianju", "resilv"]],
 	ol_dingshangwan: ["female", "wei", 3, ["olfudao", "olfengyan"]],
 	zhangyan: ["male", "qun", 4, ["olsuji", "ollangdao"]],
-	ol_tw_zhangji: ["male", "wei", 3, ["skill_zhangji_A", "skill_zhangji_B"], ["unseen"]],
+	ol_tw_zhangji: ["male", "wei", 3, ["skill_zhangji_A", "skill_zhangji_B"]],
 	ol_feiyi: ["male", "shu", 3, ["yanru", "hezhong"]],
 	lvboshe: ["male", "qun", 4, ["olfushi", "oldongdao"]],
 	ol_luyusheng: ["female", "wu", 3, ["olcangxin", "olrunwei"]],
@@ -106,7 +107,7 @@ const characters = {
 	xiahouba: ["male", "shu", 4, ["baobian"]],
 	yuanshu: ["male", "qun", 4, ["yongsi", "weidi"]],
 	sp_diaochan: ["female", "qun", 3, ["lihun", "rebiyue"]],
-	sp_zhaoyun: ["male", "qun", 3, ["ollongdan", "chongzhen"]],
+	sp_zhaoyun: ["male", "qun", 3, ["ollongdan", "chongzhen"], ["die:zhaoyun"]],
 	liuxie: ["male", "qun", 3, ["tianming", "mizhao", "twzhuiting"], ["zhu"]],
 	zhugejin: ["male", "wu", 3, ["olhuanshi", "olhongyuan", "olmingzhe"]],
 	zhugeke: ["male", "wu", 3, ["aocai", "duwu"]],

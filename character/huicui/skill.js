@@ -340,6 +340,9 @@ const skills = {
 				inherit: "fengyin",
 			},
 		},
+		ai: {
+			combo: "dchuoxin"
+		},
 	},
 	dchuoxin: {
 		audio: 2,
@@ -410,9 +413,8 @@ const skills = {
 					source: "damageSource",
 				},
 				filter(event, player) {
-					return player.countCards("e") == player.countCards("h", card => card.hasGaintag("dcjigu"));
+					return player.countCards("e") == player.countCards("h", card => card.hasGaintag("dcjigu")) && player.getRoundHistory("useSkill", evt => evt.skill == "dcjigu_temp").length < game.roundNumber;
 				},
-				usable: 1,
 				prompt2(event, player) {
 					return (
 						"摸" +
@@ -436,6 +438,14 @@ const skills = {
 	},
 	dcsirui: {
 		audio: 2,
+		mod: {
+			targetInRange(card) {
+				if (card.storage && card.storage.dcsirui) return true;
+			},
+			cardUsable(card, player, num) {
+				if (card.storage && card.storage.dcsirui) return Infinity;
+			},
+		},
 		enable: "phaseUse",
 		filter(event, player) {
 			if (!player.countCards("hes")) return false;
@@ -445,9 +455,10 @@ const skills = {
 					if (get.type(name) != "basic" && get.type(name) != "trick") return false;
 					return true;
 				})
-				.some(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && event.filterCard({ name: card[2], nature: card[3], cards: [cardx] }, player, event), "hes"));
+				.some(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && player.hasUseTarget(get.autoViewAs({ name: card[2], nature: card[3], storage: { dcsirui: true } }, [cardx]), false, false), "hes"));
 		},
 		usable: 1,
+		locked: false,
 		chooseButton: {
 			dialog(event, player) {
 				const list = get
@@ -456,13 +467,14 @@ const skills = {
 						if (get.type(name) != "basic" && get.type(name) != "trick") return false;
 						return true;
 					})
-					.filter(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && event.filterCard({ name: card[2], nature: card[3], cards: [cardx] }, player, event), "hes"));
+					.filter(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && player.hasUseTarget(get.autoViewAs({ name: card[2], nature: card[3], storage: { dcsirui: true } }, [cardx]), false, false), "hes"));
 				return ui.create.dialog("思锐", [list, "vcard"]);
 			},
 			check(button) {
 				return get.event("player").getUseValue({
 					name: button.link[2],
 					nature: button.link[3],
+					storage: { dcsirui: true },
 				});
 			},
 			backup(links, player) {
@@ -475,11 +487,15 @@ const skills = {
 					viewAs: {
 						name: links[0][2],
 						nature: links[0][3],
+						storage: { dcsirui: true },
 					},
 					check(card) {
 						return 7 - get.value(card);
 					},
 					position: "hes",
+					precontent() {
+						event.getParent().addCount = false;
+					},
 				};
 			},
 			prompt(links, player) {
@@ -494,7 +510,7 @@ const skills = {
 						if (get.type(name) != "basic" && get.type(name) != "trick") return false;
 						return true;
 					})
-					.filter(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && player.hasUseTarget(get.autoViewAs({ name: card[2], nature: card[3] }, [cardx]), true, true), "hes"))
+					.filter(card => player.hasCard(cardx => get.cardNameLength(cardx) == get.cardNameLength(card[2]) && player.hasUseTarget(get.autoViewAs({ name: card[2], nature: card[3] }, [cardx]), false, false), "hes"))
 					.map(card => {
 						return { name: card[2], nature: card[3] };
 					})
@@ -2716,6 +2732,10 @@ const skills = {
 				event.finish();
 				return;
 			}
+			player.markAuto("dcliangxiu", cards.map(card => get.type2(card, false)).toUniqued());
+			player.when({ global: "phaseChange" }).then(() => {
+				player.unmarkSkill("dcliangxiu");
+			});
 			if (_status.connectMode) game.broadcastAll(() => (_status.noclearcountdown = true));
 			let given_map = {};
 			while (cards.length) {
@@ -4819,7 +4839,7 @@ const skills = {
 			var card = event.card;
 			var target = event.targets[0];
 			var marked = target.hasMark("dcjizhong");
-			return (get.type(card) == "trick" || (get.color(card) == "black" && get.type(card) == "basic")) && (marked || (!marked && game.hasPlayer(current => current.hasMark("dcjizhong"))));
+			return (get.type(card) == "trick" || (get.color(card) == "black" && get.type(card) == "basic")) && ((marked && target.countGainableCards(player, "hej")) || (!marked && game.hasPlayer(current => current.hasMark("dcjizhong"))));
 		},
 		logTarget: event => event.targets[0],
 		prompt2(event, player) {
@@ -9638,7 +9658,7 @@ const skills = {
 			var skills = target.getSkills(null, false, false).filter(function (i) {
 				if (i == "bazhen") return;
 				var info = get.info(i);
-				return info && !get.is.locked(i) && !info.limited && !info.juexingji && !info.zhuSkill && !info.charlotte;
+				return info && !get.is.locked(i) && !info.limited && !info.juexingji && !info.zhuSkill && !info.charlotte && !info.persevereSkill;
 			});
 			target.addAdditionalSkills("dcjiezhen_blocker", "bazhen");
 			target.addSkill("dcjiezhen_blocker");
@@ -9653,7 +9673,7 @@ const skills = {
 					var skills = target.getSkills(null, false, false).filter(function (i) {
 						if (i == "bazhen") return;
 						var info = get.info(i);
-						return info && !get.is.locked(i) && !info.limited && !info.juexingji && !info.zhuSkill && !info.charlotte;
+						return info && !get.is.locked(i) && !info.limited && !info.juexingji && !info.zhuSkill && !info.charlotte && !info.persevereSkill;
 					});
 					if (!skills.length && target.hasEmptySlot(2)) return 1;
 					return -0.5 * skills.length;
@@ -9673,7 +9693,7 @@ const skills = {
 				charlotte: true,
 				locked: true,
 				skillBlocker: function (skill, player) {
-					return skill != "bazhen" && skill != "dcjiezhen_blocker" && !lib.skill[skill].charlotte && player.getStorage("dcjiezhen_blocker").includes(skill);
+					return skill != "bazhen" && skill != "dcjiezhen_blocker" && !lib.skill[skill].charlotte && !info.persevereSkill && player.getStorage("dcjiezhen_blocker").includes(skill);
 				},
 				mark: true,
 				marktext: "阵",

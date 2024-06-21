@@ -130,7 +130,7 @@ const skills = {
 		usable: 1,
 		zhuanhuanji: true,
 		filterTarget(card, player, target) {
-			if (player.storage.mbzuoyou) return target.countCards("h") >= 2;
+			if (player.storage.mbzuoyou) return get.mode() == "versus" && _status.mode == "two" ? true : target.countCards("h");
 			return true;
 		},
 		async content(event, trigger, player) {
@@ -138,10 +138,10 @@ const skills = {
 				target = event.target;
 			if (event.name === "mbzuoyou") player.changeZhuanhuanji("mbzuoyou");
 			if (!storage) {
-				await target.draw(2);
-				await target.chooseToDiscard(1, true, "h");
+				await target.draw(3);
+				await target.chooseToDiscard(2, true, "h");
 			} else {
-				await target.chooseToDiscard(target === player ? "佐佑" : `${get.translation(player)}对你发动了【佐佑】`, "请弃置两张手牌，然后获得1点护甲", 2, true);
+				if ((get.mode() != "versus" || _status.mode != "two") && target.countCards("h")) await target.chooseToDiscard(target === player ? "佐佑" : `${get.translation(player)}对你发动了【佐佑】`, "请弃置一张手牌，然后获得1点护甲", 1, true);
 				await target.changeHujia(1, null, true);
 			}
 		},
@@ -149,8 +149,8 @@ const skills = {
 		marktext: "☯",
 		intro: {
 			content(storage, player) {
-				if (!storage) return "转换技。出牌阶段限一次，你可以令一名角色摸两张牌，然后其弃置一张手牌。";
-				return "转换技。出牌阶段限一次，你可以令一名手牌数不少于二的角色弃置两张手牌，然后其获得1点护甲。";
+				if (!storage) return "转换技。出牌阶段限一次，你可以令一名角色摸三张牌，然后其弃置两张手牌。";
+				return "转换技。出牌阶段限一次，你可以令一名有手牌的角色弃置一张手牌，然后其获得1点护甲。";
 			},
 		},
 		ai: {
@@ -344,8 +344,7 @@ const skills = {
 				(event.name != "phase" || game.phaseNumber == 0) &&
 				game.hasPlayer(current => {
 					return current !== player && current.hasEnabledSlot(1);
-				}) &&
-				get.mode() == "identity"
+				})
 			);
 		},
 		async cost(event, trigger, player) {
@@ -418,18 +417,13 @@ const skills = {
 			player: "damageEnd",
 		},
 		filter(event, player) {
-			return player.countCards("h") > 0 || (event.source && event.source.isIn() && event.source.hasDisabledSlot(1));
+			return event.source && event.source.isIn() && event.source.hasDisabledSlot(1);
 		},
 		forced: true,
 		async content(event, trigger, player) {
-			if (player.countCards("h") > 0) {
-				await player.chooseToDiscard(`溃离：请弃置${get.cnNumber(trigger.num)}张手牌`, trigger.num, true);
-			}
 			const source = trigger.source;
-			if (source && source.isIn() && source.hasDisabledSlot(1)) {
-				player.line(source, "green");
-				await source.enableEquip(1, player);
-			}
+			player.line(source, "green");
+			await source.enableEquip(1, player);
 		},
 		ai: {
 			neg: true,
@@ -438,6 +432,7 @@ const skills = {
 	//曹髦  史?!
 	mbqianlong: {
 		audio: 6,
+		persevereSkill: true,
 		trigger: {
 			player: ["mbqianlong_beginAfter", "mbqianlong_addAfter", "mbweitongAfter"],
 		},
@@ -468,6 +463,7 @@ const skills = {
 		subSkill: {
 			begin: {
 				audio: "mbqianlong",
+				persevereSkill: true,
 				trigger: {
 					global: "phaseBefore",
 					player: "enterGame",
@@ -483,6 +479,7 @@ const skills = {
 			},
 			add: {
 				audio: "mbqianlong",
+				persevereSkill: true,
 				trigger: {
 					player: ["gainAfter", "damageEnd"],
 					source: "damageSource",
@@ -508,6 +505,7 @@ const skills = {
 	},
 	mbweitong: {
 		audio: 1,
+		persevereSkill: true,
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
@@ -539,6 +537,7 @@ const skills = {
 	mbcmqingzheng: {
 		audio: "sbqingzheng",
 		audioname: ["mb_caomao"],
+		persevereSkill: true,
 		trigger: { player: "phaseUseBegin" },
 		filter(event, player) {
 			return player.countCards("h") > 0;
@@ -673,6 +672,7 @@ const skills = {
 	mbcmjiushi: {
 		audio: "rejiushi",
 		inherit: "rejiushi",
+		persevereSkill: true,
 		group: ["rejiushi1", "mbcmjiushi_check", "mbcmjiushi_turnback", "mbcmjiushi_gain"],
 		subSkill: {
 			check: {
@@ -689,6 +689,7 @@ const skills = {
 			turnback: {
 				audio: "rejiushi",
 				audioname: ["mb_caomao"],
+				persevereSkill: true,
 				trigger: { player: "damageEnd" },
 				check(event, player) {
 					return player.isTurnedOver();
@@ -707,6 +708,7 @@ const skills = {
 			gain: {
 				audio: "rejiushi",
 				audioname: ["mb_caomao"],
+				persevereSkill: true,
 				trigger: { player: "turnOverAfter" },
 				frequent: true,
 				prompt: "是否发动【酒诗】，获得牌堆中的一张锦囊牌？",
@@ -722,6 +724,7 @@ const skills = {
 	mbcmfangzhu: {
 		audio: "sbfangzhu",
 		audioname: ["mb_caomao"],
+		persevereSkill: true,
 		inherit: "sbfangzhu",
 		filter(event, player) {
 			return game.hasPlayer(current => current !== player);
@@ -862,6 +865,7 @@ const skills = {
 	},
 	mbjuejin: {
 		audio: 2,
+		persevereSkill: true,
 		enable: "phaseUse",
 		limited: true,
 		skillAnimation: true,
@@ -17145,6 +17149,7 @@ const skills = {
 		charlotte: true,
 		firstDo: true,
 		popup: false,
+		forceLoad:true,
 		filter: function (event, player) {
 			return get.mode() != "guozhan" && get.is.double(player.name1) && !player._groupChosen;
 		},

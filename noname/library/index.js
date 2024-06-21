@@ -7514,6 +7514,7 @@ export class Library {
 			"<li>激昂：一名角色发动“昂扬技”标签技能后，此技能失效，直至从此刻至满足此技能“激昂”条件后。" +
 			"<li>历战：一名角色的回合结束时，若本回合发动过拥有历战效果的技能，则对此技能效果的进行等同于发动次数的永久可叠加式升级或修改。" +
 			"<li>同心：若技能拥有同心效果，则拥有该技能的角色可在回合开始时与其他角色同心直到自己下回合开始（默认为选择一名角色同心），选择的角色称为“同心角色”。拥有同心效果的技能发动后，技能发动者先执行同心效果。然后若有与其同心的角色，这些角色也依次执行同心效果。" +
+			"<li>持恒技：拥有此标签的技能不会被其他技能无效。" +
 			"",
 	};
 	/**
@@ -11522,7 +11523,7 @@ export class Library {
 			},
 			charlotte: true,
 			skillBlocker: function (skill, player) {
-				return !lib.skill[skill].charlotte && !get.is.locked(skill, player);
+				return !lib.skill[skill].persevereSkill && !lib.skill[skill].charlotte && !get.is.locked(skill, player);
 			},
 			mark: true,
 			intro: {
@@ -11544,7 +11545,7 @@ export class Library {
 			},
 			charlotte: true,
 			skillBlocker: function (skill, player) {
-				return !lib.skill[skill].charlotte;
+				return !lib.skill[skill].persevereSkill && !lib.skill[skill].charlotte;
 			},
 			mark: true,
 			intro: {
@@ -13031,11 +13032,11 @@ export class Library {
 			exec: function (func) {
 				const key = game.onlineKey;
 				if (typeof func == "function") {
-					const { Domain } = security.importSandbox();
-					// 被封送的函数额外间隔了三层调用栈
-					const level = (!Domain || Domain.current.isFrom(func)) ? 0 : 3;
-					const args = Array.from(arguments);
-					args.shift();
+					const isMarshalled = security.isSandboxRequired()
+						&& security.importSandbox().Domain.current.isFrom(func);
+					// 被封送的函数额外间隔了四层调用栈
+					const level = isMarshalled ? 4 : 0;
+					const args = Array.from(arguments).slice(1);
 					ErrorManager.errorHandle(() => {
 						func.apply(this, args);
 					}, func, level);
@@ -13693,6 +13694,13 @@ export class Library {
 			"龙",
 			{
 				color: "#ff0000",
+				nature: "firemm",
+			},
+		],
+		[
+			"幻",
+			{
+				color: "#ffff99",
 				nature: "firemm",
 			},
 		],

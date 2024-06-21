@@ -396,12 +396,15 @@ async function initSecurity({
 
 	const sandbox = await import("./sandbox.js");
 	SANDBOX_ENABLED = sandbox.SANDBOX_ENABLED;
-	AccessAction = sandbox.AccessAction;
-	Domain = sandbox.Domain;
-	Marshal = sandbox.Marshal;
-	Monitor = sandbox.Monitor;
-	Rule = sandbox.Rule;
-	Sandbox = sandbox.Sandbox;
+
+	if (SANDBOX_ENABLED) {
+		AccessAction = sandbox.AccessAction;
+		Domain = sandbox.Domain;
+		Marshal = sandbox.Marshal;
+		Monitor = sandbox.Monitor;
+		Rule = sandbox.Rule;
+		Sandbox = sandbox.Sandbox;
+	}
 
 	topVariables.lib = lib;
 	topVariables.game = game;
@@ -668,6 +671,8 @@ function getIsolatedsFrom(item) {
 /**
  * ```plain
  * 导入 `sandbox.js` 的相关类
+ * 
+ * 请注意，这需要先判断 `security.isSandboxRequired()`
  * ```
  * 
  * @returns {{
@@ -828,7 +833,7 @@ function initSerializeNeeded() {
 			return obj;
 		}
 	};
-	
+
 	/** @type {Array<[string, number[]]>} */
 	const funcList = [
 		["Worker.prototype.postMessage", [0]],

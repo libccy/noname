@@ -1,8 +1,8 @@
 const characterSort = {
-	sp_tianji: ["sunhao", "liuxie", "caoang", "hetaihou", "sunluyu", "ol_wangrong", "zuofen", "ol_bianfuren", "qinghegongzhu", "tengfanglan", "ruiji", "caoxiancaohua", "caoyu", "ol_luyusheng"],
+	sp_tianji: ["sunhao", "liuxie", "caoang", "hetaihou", "sunluyu", "ol_wangrong", "zuofen", "ol_bianfuren", "qinghegongzhu", "tengfanglan", "ruiji", "caoxiancaohua", "caoyu"],
 	sp_sibi: ["ol_lukai", "yangxiu", "guotu", "chenlin", "chengyu", "shixie", "fuwan", "wangyun", "zhugejin", "simalang", "maliang", "buzhi", "dongyun", "kanze", "sunqian", "xizhicai", "sunshao", "duxi", "jianggan", "ol_dengzhi", "ol_yangyi", "ol_dongzhao", "ol_chendeng", "jin_yanghu", "wangyan", "xiahouxuan", "quhuang", "zhanghua", "wangguan", "sunhong", "caoxi", "tianchou"],
 	sp_tianzhu: ["ol_liupi", "yadan", "liyi", "zhangyan", "niujin", "hejin", "hansui", "wutugu", "yanbaihu", "shamoke", "zhugedan", "huangzu", "gaogan", "tadun", "fanjiangzhangda", "ahuinan", "dongtuna", "ol_wenqin"],
-	sp_nvshi: ["ol_dingshangwan", "lingju", "guanyinping", "zhangxingcai", "mayunlu", "dongbai", "zhaoxiang", "ol_zhangchangpu", "daxiaoqiao", "jin_guohuai", "ol_hujinding"],
+	sp_nvshi: ["ol_dingshangwan", "lingju", "guanyinping", "zhangxingcai", "mayunlu", "dongbai", "zhaoxiang", "ol_zhangchangpu", "daxiaoqiao", "jin_guohuai", "ol_hujinding", "ol_luyusheng", "ol_liwan"],
 	sp_shaowei: ["ol_pengyang", "simahui", "zhangbao", "zhanglu", "zhugeguo", "xujing", "zhangling", "huangchengyan", "zhangzhi", "lushi"],
 	sp_huben: ["duanjiong", "liupan", "ol_mengda", "caohong", "xiahouba", "zhugeke", "zumao", "wenpin", "litong", "mazhong", "heqi", "quyi", "luzhi", "yuejin", "dingfeng", "wuyan", "ol_zhuling", "tianyu", "huojun", "zhaoyǎn", "dengzhong", "ol_furong", "macheng", "ol_zhangyì", "ol_zhujun", "maxiumatie", "luoxian", "ol_huban", "haopu", "ol_qianzhao", "caimao"],
 	sp_liesi: ["lvboshe", "mizhu", "weizi", "ol_liuba", "zhangshiping"],
@@ -12,7 +12,7 @@ const characterSort = {
 	sp_zhongdan: ["cuiyan", "huangfusong"],
 	sp_guozhan2: ["sp_dongzhuo", "zhangren"],
 	sp_others: ["hanba", "caiyang", "ol_peixiu"],
-	sp_waitforsort: ["ol_tw_zhangji", "ol_liwan", "ol_jiangwan", "mawan"],
+	sp_waitforsort: ["ol_tw_zhangji", "ol_jiangwan", "mawan", "budugen"],
 };
 
 const characterSortTranslate = {

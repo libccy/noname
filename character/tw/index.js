@@ -25,6 +25,9 @@ game.import("character", function () {
 		dynamicTranslate: { ...dynamicTranslates },
 		characterIntro: { ...characterIntros },
 		characterReplace: { ...characterReplaces },
+		characterSubstitute: {
+			huan_zhugeliang: [],
+		},
 		card: { ...cards },
 		skill: { ...skills },
 		perfectPair: { ...perfectPairs },

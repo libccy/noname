@@ -6908,7 +6908,7 @@ const skills = {
 	},
 	xinjuece: {
 		audio: "juece",
-		audioname: ["dc_liru"],
+		audioname: ["dc_liru", "ol_liru"],
 		trigger: { player: "phaseJieshuBegin" },
 		direct: true,
 		filter: function (event, player) {
@@ -10395,6 +10395,7 @@ const skills = {
 	},
 	juece: {
 		audio: 2,
+		audioname: ["dc_liru", "ol_liru"],
 		trigger: {
 			global: ["loseAfter", "equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 		},
@@ -11773,7 +11774,7 @@ const skills = {
 		skillAnimation: true,
 		animationColor: "gray",
 		audio: 2,
-		audioname: ["xin_caifuren"],
+		audioname: ["xin_caifuren", "ol_caifuren"],
 		unique: true,
 		limited: true,
 		enable: "phaseUse",
@@ -13736,12 +13737,12 @@ const skills = {
 		},
 	},
 	enyuan: {
-		audio: 2,
+		audio: 4,
 		locked: true,
 		group: ["enyuan1", "enyuan2"],
 	},
 	enyuan1: {
-		audio: true,
+		audio: ["enyuan3.mp3", "enyuan4.mp3"],
 		trigger: { player: "damageEnd" },
 		forced: true,
 		filter: function (event, player) {
@@ -13780,7 +13781,7 @@ const skills = {
 		},
 	},
 	enyuan2: {
-		audio: true,
+		audio: ["enyuan1.mp3", "enyuan2.mp3"],
 		trigger: { player: "recoverEnd" },
 		forced: true,
 		logTarget: "source",

@@ -370,12 +370,12 @@ const skills = {
 				charlotte: true,
 				mod: {
 					globalTo(from, to, distance) {
-						return distance - to.countMark("sbyicong_to");
+						return distance + to.countMark("sbyicong_to");
 					},
 				},
 				marktext: "从",
 				intro: {
-					content: "本轮其他角色至你的距离-#",
+					content: "本轮其他角色至你的距离+#",
 				},
 			},
 		},
@@ -5388,7 +5388,7 @@ const skills = {
 				}
 				if (!arg || arg.isLink || !arg.card || arg.card.name != "sha") return false;
 				if (!arg.target || get.attitude(player, arg.target) >= 0) return false;
-				if (!arg.skill || !lib.skill[arg.skill] || lib.skill[arg.skill].charlotte || get.is.locked(arg.skill) || !arg.target.getSkills(true, false).includes(arg.skill)) return false;
+				if (!arg.skill || !lib.skill[arg.skill] || lib.skill[arg.skill].charlotte || lib.skill[arg.skill].persevereSkill || get.is.locked(arg.skill) || !arg.target.getSkills(true, false).includes(arg.skill)) return false;
 			},
 			directHit_ai: true,
 		},
@@ -5987,7 +5987,7 @@ const skills = {
 		},
 		content: function () {
 			var num = 2;
-			if (trigger.name != "damage") num += 2;
+			if (trigger.name == "damage" && get.mode() == "identity") num --;
 			num = Math.min(8 - player.countMark("sbguidao"), num);
 			player.addMark("sbguidao", num);
 		},
@@ -6043,7 +6043,7 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
-			if (!lib.inpile.contains("taipingyaoshu")) {
+			if (!lib.inpile.includes("taipingyaoshu")) {
 				lib.inpile.push("taipingyaoshu");
 			}
 			event.card = game.createCard2("taipingyaoshu", "heart", 3);
