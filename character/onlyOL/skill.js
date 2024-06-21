@@ -3,6 +3,11 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//OL界李儒
+	olfencheng: {
+		audio: 2,
+		inherit: 'dcfencheng',
+		filterTarget: true,
+	},
 	olmieji: {
 		audio: 2,
 		inherit: "xinmieji",
@@ -170,7 +175,7 @@ const skills = {
 						player.countCards("h", card => {
 							return !current.hasUseTarget(card);
 						}) >=
-							2 + (player.getHp() > 1)
+						2 + (player.getHp() > 1)
 					);
 				})
 			)

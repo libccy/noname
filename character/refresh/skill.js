@@ -2190,55 +2190,44 @@ const skills = {
 		skillAnimation: "epic",
 		animationColor: "fire",
 		audio: 2,
-		audioname: ["ol_liru"],
 		enable: "phaseUse",
 		filterTarget: function (card, player, target) {
 			return player != target;
 		},
 		limited: true,
 		line: "fire",
-		content: function () {
-			"step 0";
-			player.awakenSkill("dcfencheng");
-			event.num = 1;
-			event.targets = game.filterPlayer(current => current != player);
-			event.targets.sortBySeat(target);
-			"step 1";
-			if (event.targets.length) {
-				var target = event.targets.shift();
-				if (!target.isIn()) {
-					event.redo();
-					return;
-				}
-				event.target = target;
-				player.line(target, "fire");
-				var res = get.damageEffect(target, player, target, "fire");
-				target
-					.chooseToDiscard("he", "弃置至少" + get.cnNumber(event.num) + "张牌或受到2点火焰伤害", [num, Infinity])
-					.set("ai", function (card) {
-						if (ui.selected.cards.length >= _status.event.getParent().num) return -1;
-						if (_status.event.player.hasSkillTag("nofire")) return -1;
-						if (_status.event.res >= 0) return 6 - get.value(card);
-						if (get.type(card) != "basic") {
-							return 10 - get.value(card);
+		async content(event, trigger, player) {
+			player.awakenSkill(event.name);
+			let targets = game.filterPlayer(current => current != player);
+			targets.sortBySeat(event.target);
+			let num = 1
+			if (targets.length) {
+				for await (const target of targets) {
+					if (target.isIn()) {
+						player.line(target, "fire");
+						const res = get.damageEffect(target, player, target, "fire");
+						const { result } = await target
+							.chooseToDiscard("he", "弃置至少" + get.cnNumber(num) + "张牌或受到2点火焰伤害", [num, Infinity])
+							.set("ai", function (card) {
+								if (ui.selected.cards.length >= num) return -1;
+								if (_status.event.player.hasSkillTag("nofire")) return -1;
+								if (_status.event.res >= 0) return 6 - get.value(card);
+								if (get.type(card) != "basic") {
+									return 10 - get.value(card);
+								}
+								return 8 - get.value(card);
+							})
+							.set("res", res);
+
+						if (!result.bool) {
+							await target.damage(2, "fire");
+							num = 1
 						}
-						return 8 - get.value(card);
-					})
-					.set("res", res);
-			} else {
-				event.finish();
+						else num = result.cards.length + 1
+					}
+				}
 			}
-			"step 2";
-			if (!result.bool) {
-				event.target.damage(2, "fire");
-				event.num = 1;
-			} else {
-				event.num = result.cards.length + 1;
-				event.goto(1);
-			}
-			"step 3";
-			game.delayx();
-			event.goto(1);
+
 		},
 		ai: {
 			order: 1,
@@ -2252,7 +2241,7 @@ const skills = {
 								return current != player;
 							})
 							.sortBySeat(target);
-					for (var target of players) {
+					for (const target of players) {
 						if (get.damageEffect(target, player, target, "fire") >= 0) {
 							num = 0;
 							continue;
