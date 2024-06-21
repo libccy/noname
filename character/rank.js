@@ -51,7 +51,6 @@ window.noname_character_rank = {
 		"dc_zhaoyun",
 	],
 	ap: [
-		"ol_liru",
 		"xia_guanyu",
 		"ol_sb_yuanshao",
 		"gjqt_aruan",
