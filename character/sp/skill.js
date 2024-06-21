@@ -13089,10 +13089,10 @@ const skills = {
 		ai: {
 			result: {
 				player: function (player, target) {
-					return target.getAllHistory("useCard", evt => evt.card.name == "sha").length * lib.card.juedou.ai.result.player.apply(this, arguments);
+					return (target.getAllHistory("useCard", evt => evt.card.name == "sha").length + 1) * lib.card.juedou.ai.result.player.apply(this, arguments);
 				},
 				target: function (player, target) {
-					var num = target.getAllHistory("useCard", evt => evt.card.name == "sha").length;
+					var num = target.getAllHistory("useCard", evt => evt.card.name == "sha").length + 1;
 					if (num < target.hp) return 0;
 					return num * lib.card.juedou.ai.result.target;
 				},
@@ -13109,7 +13109,7 @@ const skills = {
 				},
 				content: function () {
 					var target = trigger.getParent().target;
-					trigger.num = Math.max(1, target.getAllHistory("useCard", evt => evt.card.name == "sha").length);
+					trigger.num = (1 + target.getAllHistory("useCard", evt => evt.card.name == "sha").length);
 					target.addTempSkills("juesheng", { player: "phaseAfter" });
 				},
 			},
