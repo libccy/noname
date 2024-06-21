@@ -3,11 +3,6 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//OL界李儒
-	olfencheng: {
-		audio: 2,
-		inherit: 'dcfencheng',
-		filterTarget: true,
-	},
 	olmieji: {
 		audio: 2,
 		inherit: "xinmieji",
