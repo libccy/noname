@@ -2190,6 +2190,7 @@ const skills = {
 		skillAnimation: "epic",
 		animationColor: "fire",
 		audio: 2,
+		audioname: ["ol_liru"],
 		enable: "phaseUse",
 		filterTarget: function (card, player, target) {
 			return player != target;
