@@ -1,15 +1,18 @@
 window.noname_source_list = [
 	"LICENSE",
 	"noname.js",
+	"noname-compatible.js",
 	"service-worker.js",
 
 	"noname/ai/basic.js",
 	"noname/ai/index.js",
 	"noname/game/check.js",
+	"noname/game/compatible.js",
 	"noname/game/index.js",
 	"noname/game/promises.js",
 	"noname/game/dynamic-style/index.js",
 	"noname/get/audio.js",
+	"noname/get/compatible.js",
 	"noname/get/index.js",
 	"noname/get/is.js",
 	"noname/get/promises.js",
