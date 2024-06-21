@@ -6,6 +6,7 @@ import { game } from "../game/index.js";
 import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 import { gnc } from "../gnc/index.js";
+import { importMode } from "./import.js";
 import { Mutex } from "../util/mutex.js";
 
 export async function onload(resetGameTimeout) {
