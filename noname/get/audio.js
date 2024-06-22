@@ -409,7 +409,7 @@ class SkillAudio {
     }
     textMapWithIndex(path, ext, index) {
         let name = this.name;
-        name += "_" + this.filteredAudioName;
+        if (this.filteredAudioName) name += "_" + this.filteredAudioName;
         if (typeof index === "number") name += index;
         return this.textMap(path, ext, name);
     }
