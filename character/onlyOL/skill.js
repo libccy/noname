@@ -2,7 +2,67 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
-	//OL界刘表
+	//OL界吴国太
+	olganlu: {
+		inherit: "xinganlu",
+		async content(event, trigger, player) {
+			const num = Math.abs(event.targets[0].countCards("e") - event.targets[1].countCards("e"));
+			await event.targets[0].swapEquip(event.targets[1]);
+			await game.asyncDelayx();
+			if (player.getDamagedHp() < num && player.countCards("e")) await player.chooseToDiscard("he", num, true);
+		},
+	},
+	olbuyi: {
+		audio: 2,
+		trigger: {
+			global: "dying",
+		},
+		filter(event, player) {
+			return event.player.hp <= 0 && event.player.countCards("hej") > 0;
+		},
+		logTarget: "player",
+		async cost(event, trigger, player) {
+			const target = trigger.player;
+			let check;
+			if (trigger.player.isUnderControl(true, player)) {
+				check = player.hasCard(card => {
+					return get.type(card) != "basic";
+				}, "hej");
+			} else {
+				check = get.attitude(player, target) > 0;
+			}
+			event.result = await player
+				.choosePlayerCard(target, get.prompt(event.name.slice(0, -5), target), "hej")
+				.set("ai", button => {
+					if (!get.event().check) return 0;
+					if (get.event().target.isUnderControl(true, get.player())) {
+						if (get.type(button.link) != "basic") {
+							return 10 - get.value(button.link);
+						}
+						return 0;
+					} else {
+						return Math.random();
+					}
+				})
+				.set("check", check)
+				.set("filterButton", button => {
+					if (get.player() == get.event().target) {
+						return lib.filter.cardDiscardable(button.link, get.player());
+					}
+					return true;
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = trigger.player;
+			await player.showCards(event.cards, get.translation(player) + "对" + (player == target ? "自己" : get.translation(target)) + "发动了【补益】");
+			if (get.type(event.cards[0]) != "basic") {
+				await target.recover();
+				await target.discard(event.cards[0]);
+			}
+		},
+	},
+	//OL界刘表（袁术
 	olzishou: {
 		audio: 2,
 		trigger: {

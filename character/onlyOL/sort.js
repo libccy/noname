@@ -1,5 +1,5 @@
 const characterSort = {
-	onlyOL_yijiang1: ["ol_jianyong", "ol_lingtong", "ol_gaoshun", "ol_fazheng"],
+	onlyOL_yijiang1: ["ol_jianyong", "ol_lingtong", "ol_gaoshun", "ol_fazheng", "ol_wuguotai"],
 	onlyOL_yijiang2: ["ol_caozhang", "ol_chengpu", "ol_wangyi", "ol_liubiao"],
 	onlyOL_yijiang3: ["ol_yufan", "ol_liru"],
 	onlyOL_yijiang4: ["ol_caifuren"],

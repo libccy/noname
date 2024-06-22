@@ -1489,6 +1489,7 @@ window.noname_character_rank = {
 		"yj_simafu",
 		"dc_wuyi",
 		"jsrg_caojiewangfu",
+		"ol_wuguotai",
 	],
 	bm: [
 		"kongrong",
@@ -2840,6 +2841,7 @@ window.noname_character_rank = {
 			"huan_zhaoyun",
 			"huan_jiangwei",
 			"huan_zhugeliang",
+			"ol_wuguotai",
 		],
 		junk: [
 			"ol_peixiu",
