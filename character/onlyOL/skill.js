@@ -2,6 +2,137 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//OL界吴国太
+	olganlu: {
+		inherit: "xinganlu",
+		async content(event, trigger, player) {
+			const num = Math.abs(event.targets[0].countCards("e") - event.targets[1].countCards("e"));
+			await event.targets[0].swapEquip(event.targets[1]);
+			await game.asyncDelayx();
+			if (player.getDamagedHp() < num && player.countCards("e")) await player.chooseToDiscard("he", num, true);
+		},
+	},
+	olbuyi: {
+		audio: 2,
+		trigger: {
+			global: "dying",
+		},
+		filter(event, player) {
+			return event.player.hp <= 0 && event.player.countCards("hej") > 0;
+		},
+		logTarget: "player",
+		async cost(event, trigger, player) {
+			const target = trigger.player;
+			let check;
+			if (trigger.player.isUnderControl(true, player)) {
+				check = player.hasCard(card => {
+					return get.type(card) != "basic";
+				}, "hej");
+			} else {
+				check = get.attitude(player, target) > 0;
+			}
+			event.result = await player
+				.choosePlayerCard(target, get.prompt(event.name.slice(0, -5), target), "hej")
+				.set("ai", button => {
+					if (!get.event().check) return 0;
+					if (get.event().target.isUnderControl(true, get.player())) {
+						if (get.type(button.link) != "basic") {
+							return 10 - get.value(button.link);
+						}
+						return 0;
+					} else {
+						return Math.random();
+					}
+				})
+				.set("check", check)
+				.set("filterButton", button => {
+					if (get.player() == get.event().target) {
+						return lib.filter.cardDiscardable(button.link, get.player());
+					}
+					return true;
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = trigger.player;
+			await player.showCards(event.cards, get.translation(player) + "对" + (player == target ? "自己" : get.translation(target)) + "发动了【补益】");
+			if (get.type(event.cards[0]) != "basic") {
+				await target.recover();
+				await target.discard(event.cards[0]);
+			}
+		},
+	},
+	//OL界刘表（袁术
+	olzishou: {
+		audio: 2,
+		trigger: {
+			player: "phaseDrawBegin2",
+		},
+		filter(event, player) {
+			return !event.numFixed;
+		},
+		check(event, player) {
+			return (
+				player.countCards("h") <= (player.hasSkill("olzongshi") ? player.maxHp : player.hp - 2) ||
+				player.skipList.includes("phaseUse") ||
+				!player.countCards("h", function (card) {
+					return get.tag(card, "damage") && player.hasUseTarget(card);
+				})
+			);
+		},
+		async content(event, trigger, player) {
+			trigger.num += game.countGroup();
+			player
+				.when("phaseJieshuBegin")
+				.filter(evt => evt.getParent() == trigger.getParent() && player.hasHistory("sourceDamage", evtx => evtx.player != player) && player.countCards("he"))
+				.then(() => {
+					player.chooseToDiscard("he", game.countGroup(), true);
+				});
+		},
+		ai: {
+			threaten: 1.5,
+		},
+	},
+	olzongshi: {
+		mod: {
+			maxHandcard(player, num) {
+				return num + game.countGroup();
+			},
+		},
+		audio: 2,
+		trigger: {
+			player: "damageBegin4",
+		},
+		filter(event, player) {
+			const source = event.source;
+			if (!source || source == player || !source.isIn()) return false;
+			return !player.getStorage("olzongshi_record").includes(source.group);
+		},
+		forced: true,
+		logTarget: "source",
+		async content(event, trigger, player) {
+			const target = trigger.source;
+			await trigger.cancel();
+			await target.draw();
+			player.addSkill("olzongshi_record");
+			player.markAuto("olzongshi_record", [target.group]);
+		},
+		ai: {
+			filterDamage: true,
+			skillTagFilter(player, tag, arg) {
+				if (arg && arg.player && player.getStorage("olzongshi_record").includes(arg.player.group)) return true;
+				return false;
+			},
+		},
+		subSkill: {
+			record: {
+				charlotte: true,
+				intro: {
+					content: (storage, player) => `已记录势力：${get.translation(storage)}`,
+				},
+			},
+		},
+	},
 	//OL界李儒
 	olmieji: {
 		audio: 2,
@@ -14,7 +145,7 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const target = event.target;
-			await player.showCards(event.cards, get.translation(player) + "发动了【灭计】");
+			player.$throw(event.cards.length, 1000);
 			const result = await target.chooseToDiscard("he", true).set("prompt", "请弃置一张锦囊牌，或依次弃置两张非锦囊牌。").forResult();
 			if (
 				(!result.cards || get.type(result.cards[0], "trick", result.cards[0].original == "h" ? target : false) != "trick") &&

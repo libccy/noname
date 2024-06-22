@@ -615,11 +615,11 @@ const skills = {
 			order: 9,
 			result: {
 				player(player, target) {
-					let tars = _status.event.putTempCache("jsrgguanshi", "targets", targets);
+					let tars = _status.event.getTempCache("jsrgguanshi", "targets");
 					if (!tars) return lib.card.juedou.ai.result.player(player, target);
 				},
 				target(player, target) {
-					let tars = _status.event.putTempCache("jsrgguanshi", "targets", targets);
+					let tars = _status.event.getTempCache("jsrgguanshi", "targets");
 					if (!tars) return lib.card.juedou.ai.result.target(player, target);
 					for (let tar of tars) {
 						if (tar[0] === target) return tar[1] / get.attitude(player, target);
