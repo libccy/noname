@@ -238,7 +238,7 @@ export class Audio {
         if (pathIndex !== -1) {
             path = audioInfoString.slice(0, pathIndex);
             audioInfoString = audioInfoString.slice(pathIndex);
-            if (!["db:", "ext:"].some(i => audioInfoString.startsWith(i))) path = this.#Audio.defaultPath + path;
+            if (!["db:", "ext:"].some(i => path.startsWith(i))) path = this.#Audio.defaultPath + path;
         }
 
         let ext = ".mp3";
