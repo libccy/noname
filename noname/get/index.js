@@ -1491,7 +1491,7 @@ export class Get extends GetCompatible {
 		return Array.from(infos || []).map(get.infoPlayerOL);
 	}
 	/** @type {RegExp} */
-	#specialHeadPattern = /^(?:async)?\s+[\w$]+\s*=>/;
+	#specialHeadPattern = /^(?:async\b)?\s*[\w$]+\s*=>/;
 	/** @type {RegExp} */
 	#functionHeadPattern = /^(?:async\b\s*)?(?:function\b\s*)?(?:\*\s*)?(?:[\w$]+\b\s*)?\(/;
 	/** @type {RegExp} */
