@@ -13383,7 +13383,7 @@ const skills = {
 			player.chooseToDiscard("h", true);
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 			nokeep: true,
 		},
 	},

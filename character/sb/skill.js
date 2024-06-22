@@ -6991,7 +6991,7 @@ const skills = {
 		filter: function (event, player) {
 			return player.group == "shu" && game.hasPlayer(current => current != player && current.countCards("e"));
 		},
-		groupSkill: true,
+		groupSkill: "shu",
 		filterTarget: function (card, player, target) {
 			return target.countCards("e") && target != player;
 		},
@@ -7043,7 +7043,7 @@ const skills = {
 		},
 		forced: true,
 		locked: false,
-		groupSkill: true,
+		groupSkill: "wu",
 		filter: function (event, player) {
 			if (player.group != "wu") return false;
 			var evt = event.getl(player);

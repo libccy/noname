@@ -25,7 +25,7 @@ const skills = {
 				}) > 1
 			);
 		},
-		groupSkill: true,
+		groupSkill: "qun",
 		async cost(event, trigger, player) {
 			event.result = await player
 				.chooseTarget(
@@ -92,7 +92,7 @@ const skills = {
 			return event.source.getSeatNum() == 1 && (player.hasSha() || (_status.connectMode && player.countCards("hs")));
 		},
 		direct: true,
-		groupSkill: true,
+		groupSkill: "shu",
 		content() {
 			player
 				.chooseToUse(function (card, player, event) {
