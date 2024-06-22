@@ -2676,7 +2676,7 @@ const skills = {
 	},
 	//佐藤雏
 	hina_shenshi: {
-		groupSkill: true,
+		groupSkill: "shen",
 		trigger: { player: ["phaseUseBegin", "phaseUseEnd"] },
 		frequent: true,
 		filter(event, player) {
@@ -2721,7 +2721,7 @@ const skills = {
 		},
 	},
 	hina_xingzhi: {
-		groupSkill: true,
+		groupSkill: "key",
 		trigger: { player: "yingbian" },
 		usable: 1,
 		filter: (event, player) => player.group == "key" && !event.card.yingbian && lib.yingbian.condition.complex.has("zhuzhan"),
