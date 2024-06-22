@@ -72,7 +72,7 @@ export class Audio {
         /**
          * @type { FormatedPlayer }
          */
-        const formatedPlayer = { name: "", sex:"male", tempname: [], skin: {} };
+        const formatedPlayer = { name: "", sex: "male", tempname: [], skin: {} };
         if (typeof player === "string") {
             formatedPlayer.name = player;
             const sex = get.character(player).sex;
@@ -91,7 +91,7 @@ export class Audio {
             } = player);
         }
 
-        
+
         return formatedPlayer;
     }
 
@@ -371,7 +371,7 @@ class SkillAudio {
         if (Array.isArray(this.info.audioname)) this.audioname.addArray(this.info.audioname);
         this.filteredAudioName = this.getName(i => this.audioname.includes(i));
 
-        if (this.info.audioname2){
+        if (this.info.audioname2) {
             const audioname2 = this.info.audioname2[this.getName(i => this.info.audioname2[i])];
             if (audioname2 != void 0) this.filteredAudioName2 = audioname2;
         }
@@ -409,7 +409,7 @@ class SkillAudio {
     }
     textMapWithIndex(path, ext, index) {
         let name = this.name;
-        name += this.filteredAudioName;
+        name += "_" + this.filteredAudioName;
         if (typeof index === "number") name += index;
         return this.textMap(path, ext, name);
     }
