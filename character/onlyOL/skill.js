@@ -170,7 +170,7 @@ const skills = {
 						player.countCards("h", card => {
 							return !current.hasUseTarget(card);
 						}) >=
-							2 + (player.getHp() > 1)
+						2 + (player.getHp() > 1)
 					);
 				})
 			)
