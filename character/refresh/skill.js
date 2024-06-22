@@ -2208,9 +2208,9 @@ const skills = {
 						player.line(target, "fire");
 						const res = get.damageEffect(target, player, target, "fire");
 						const { result } = await target
-							.chooseToDiscard("he", "弃置至少" + get.cnNumber(num) + "张牌或受到2点火焰伤害", [num, Infinity])
+							.chooseToDiscard("he", "弃置至少" + get.cnNumber(_status.event.num) + "张牌或受到2点火焰伤害", [_status.event.num, Infinity])
 							.set("ai", function (card) {
-								if (ui.selected.cards.length >= num) return -1;
+								if (ui.selected.cards.length >= _status.event.num) return -1;
 								if (_status.event.player.hasSkillTag("nofire")) return -1;
 								if (_status.event.res >= 0) return 6 - get.value(card);
 								if (get.type(card) != "basic") {
@@ -2218,7 +2218,7 @@ const skills = {
 								}
 								return 8 - get.value(card);
 							})
-							.set("res", res);
+							.set("res",res,"num",num);
 
 						if (!result.bool) {
 							await target.damage(2, "fire");
