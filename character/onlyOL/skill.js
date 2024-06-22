@@ -22,26 +22,15 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			trigger.num += game.countGroup();
-			player.addTempSkill("olzishou_debuff", "phaseJieshuAfter");
+			player
+				.when("phaseJieshuBegin")
+				.filter(evt => evt.getParent() == trigger.getParent() && player.hasHistory("sourceDamage", evtx => evtx.player != player) && player.countCards("he"))
+				.then(() => {
+					player.chooseToDiscard("he", game.countGroup(), true);
+				});
 		},
 		ai: {
 			threaten: 1.5,
-		},
-		subSkill: {
-			debuff: {
-				trigger: {
-					player: "phaseJieshuBegin",
-				},
-				filter(event, player) {
-					return player.hasHistory("sourceDamage", evt => evt.player != player) && player.countCards("he");
-				},
-				charlotte: true,
-				forced: true,
-				popup: false,
-				async content(event, trigger, player) {
-					player.chooseToDiscard("he", game.countGroup(), true);
-				},
-			},
 		},
 	},
 	olzongshi: {
@@ -68,6 +57,13 @@ const skills = {
 			player.addSkill("olzongshi_record");
 			player.markAuto("olzongshi_record", [target.group]);
 		},
+		ai: {
+			filterDamage: true,
+			skillTagFilter(player, tag, arg) {
+				if (arg && arg.player && player.getStorage("olzongshi_record").includes(arg.player.group)) return true;
+				return false;
+			},
+		},
 		subSkill: {
 			record: {
 				charlotte: true,
@@ -89,7 +85,7 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const target = event.target;
-			await player.showCards(event.cards, get.translation(player) + "发动了【灭计】");
+			player.$throw(event.cards.length, 1000);
 			const result = await target.chooseToDiscard("he", true).set("prompt", "请弃置一张锦囊牌，或依次弃置两张非锦囊牌。").forResult();
 			if (
 				(!result.cards || get.type(result.cards[0], "trick", result.cards[0].original == "h" ? target : false) != "trick") &&
