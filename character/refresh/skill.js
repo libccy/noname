@@ -2190,6 +2190,7 @@ const skills = {
 		skillAnimation: "epic",
 		animationColor: "fire",
 		audio: 2,
+		audioname: ["ol_liru"],
 		enable: "phaseUse",
 		filterTarget: function (card, player, target) {
 			return player != target;
@@ -2202,7 +2203,7 @@ const skills = {
 			targets.sortBySeat(event.target);
 			let num = 1
 			if (targets.length) {
-				for await (const target of targets) {
+				for (const target of targets) {
 					if (target.isIn()) {
 						player.line(target, "fire");
 						const res = get.damageEffect(target, player, target, "fire");
