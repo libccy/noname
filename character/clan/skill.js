@@ -826,10 +826,12 @@ const skills = {
 					var target = event.targets.shift();
 					event.target = target;
 					var list = [];
+					const nameFilter = trigger.card.name == "sha"
+						? name => get.type(name) == "trick"
+						: name => name == "sha";
 					for (var name of lib.inpile) {
 						if (name != "sha" && get.type(name) != "trick") continue;
-						if (trigger.card.name == "sha" && get.type(name) != "trick") continue;
-						if (name == "sha" && get.type(trigger.card) != "trick") continue;
+						if (!nameFilter(name)) continue;
 						if (!player.canUse(get.autoViewAs({ name: name }, []), target)) continue;
 						list.push([get.translation(get.type(name)), "", name]);
 					}
