@@ -2551,6 +2551,9 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "psliaozou"
+		},
 	},
 	psquwu: {
 		audio: 2,
