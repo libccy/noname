@@ -4978,7 +4978,21 @@ export class Get extends GetCompatible {
 	attitude2(to) {
 		return get.attitude(_status.event.player, to);
 	}
-
+	/**
+	 * Get the number of a skill's item's length
+	 *
+	 * 获取一个转换技的转换项数
+	 */
+	zhuanhuanItemNum(skill, player) {
+		if (!get.is.zhuanhuanji(skill, player)) return 0;
+		const info = lib.skill[skill];
+		if ("zhuanhuanLimit" in info) {
+			const { zhuanhuanLimit } = info;
+			if (typeof zhuanhuanLimit === "function") return parseInt(zhuanhuanLimit(skill, player));
+			return parseInt(zhuanhuanLimit);
+		}
+		return 2;
+	}
 	/**
 	 * 将URL转换成相对于无名杀根目录的路径
 	 *
