@@ -14,7 +14,8 @@ const characterSort = {
 	sp_xuzhou: ["re_taoqian", "caosong", "zhangmiao", "qiuliju"],
 	sp_zhongyuan: ["re_hucheer", "re_zoushi", "caoanmin", "re_dongcheng"],
 	sp_xiaohu: ["haomeng", "yanfuren", "yanrou", "dc_zhuling"],
-	sp_star: ["star_caoren", "star_yuanshu", "star_dongzhuo", "star_yuanshao", "star_zhangchunhua", "star_sunjian"],
+	sp_qunxiong: ["chezhou", "hansong", "matie"],
+	sp_star: ["star_caoren", "star_yuanshu", "star_dongzhuo", "star_yuanshao", "star_zhangchunhua", "star_sunjian", "star_zhangzhao"],
 	mini_qixian: ["mp_liuling"],
 	sp2_waitforsort: ["caobuxing", "re_maliang", "dc_jikang"],
 };
@@ -34,6 +35,7 @@ const characterSortTranslate = {
 	sp_zhongyuan: "列传·中原狼烟",
 	sp_binglin: "兵临城下",
 	sp_xiaohu: "列传·虓虎悲歌",
+	sp_qunxiong: "列传·群雄伺动",
 	sp_fenghuo: "烽火连天",
 	sp_danqi: "千里单骑",
 	sp_star: "将星系列",

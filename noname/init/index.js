@@ -5,11 +5,13 @@ import { game } from "../game/index.js";
 import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 import { gnc } from "../gnc/index.js";
-import { userAgent, nonameInitialized } from "../util/index.js";
+import { userAgent, nonameInitialized, AsyncFunction, device, leaveCompatibleEnvironment } from "../util/index.js";
 import * as config from "../util/config.js";
 import { promiseErrorHandlerMap } from "../util/browser.js";
 import { importCardPack, importCharacterPack, importExtension, importMode } from "./import.js";
 import { onload } from "./onload.js";
+import { initializeSandboxRealms } from "../util/initRealms.js";
+import { ErrorManager } from "../util/error.js";
 
 // 判断是否从file协议切换到http/s协议
 export function canUseHttpProtocol() {
@@ -66,14 +68,18 @@ export function sendUpdate() {
 		if (nonameInitialized && nonameInitialized.includes("com.noname.shijian") && window.noname_shijianInterfaces && typeof window.noname_shijianInterfaces.sendUpdate === 'function') {
 			// 给诗笺版apk的java层传递升级完成的信息
 			// @ts-ignore
-			return window.noname_shijianInterfaces.sendUpdate() + "?sendUpdate=true";
+			const url = new URL(window.noname_shijianInterfaces.sendUpdate());
+			url.searchParams.set("sendUpdate", "true");
+			return url.toString();
 		}
 		// 由理版判断
 		// @ts-ignore
 		if (window.NonameAndroidBridge && typeof window.NonameAndroidBridge.sendUpdate === 'function') {
 			// 给由理版apk的java层传递升级完成的信息
 			// @ts-ignore
-			return window.NonameAndroidBridge.sendUpdate() + "?sendUpdate=true";
+			const url = new URL(window.NonameAndroidBridge.sendUpdate());
+			url.searchParams.set("sendUpdate", "true");
+			return url.toString();
 		}
 	}
 	// 电脑端
@@ -91,7 +97,7 @@ export function sendUpdate() {
 				const cp = require("child_process");
 				cp.exec(
 					`start /min ${__dirname}\\noname-server.exe -platform=electron`,
-					(err, stdout, stderr) => {}
+					(err, stdout, stderr) => { }
 				);
 				return `http://localhost:8089/app.html?sendUpdate=true`;
 			}
@@ -105,6 +111,7 @@ export function sendUpdate() {
 
 // 无名杀，启动！
 export async function boot() {
+	leaveCompatibleEnvironment();
 	// 不想看，反正别动
 	if (typeof __dirname === "string" && __dirname.length) {
 		const dirsplit = __dirname.split("/");
@@ -150,31 +157,24 @@ export async function boot() {
 	const promiseErrorHandler = await setOnError();
 
 	// 确认手机端平台
-	const noname_inited = localStorage.getItem("noname_inited");
-	if (noname_inited && noname_inited !== "nodejs") {
-		const ua = userAgent;
-		if (ua.includes("android")) {
-			Reflect.set(lib, "device", "android");
-		} else if (ua.includes("iphone") || ua.includes("ipad") || ua.includes("macintosh")) {
-			Reflect.set(lib, "device", "ios");
-		}
-	}
+	Reflect.set(lib, "device", device);
 
 	// 在dom加载完后执行相应的操作
-	const waitDomLoad = new Promise((resolve) => {
+	const waitDomLoad = new Promise(resolve => {
 		if (document.readyState !== "complete") {
 			window.onload = resolve;
 		} else resolve(void 0);
 	}).then(onWindowReady.bind(window));
 
 	// 闭源客户端检测并提醒
-	if (
-		lib.assetURL.includes("com.widget.noname.qingyao") ||
-		lib.assetURL.includes("online.nonamekill.android")
-	) {
-		alert(
-			"您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。"
-		);
+	if (typeof window.NonameAndroidBridge == "object") {
+		if (["com.widget.noname.qingyao", "online.nonamekill.android"].some(packageName => window.NonameAndroidBridge.getPackageName().includes(packageName))) {
+			alert("您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。");
+		}
+	} else {
+		if (lib.assetURL.includes("com.widget.noname.qingyao") || lib.assetURL.includes("online.nonamekill.android")) {
+			alert("您正在一个不受信任的闭源客户端上运行《无名杀》。建议您更换为其他开源的无名杀客户端，避免给您带来不必要的损失。");
+		}
 	}
 
 	// Electron平台
@@ -187,7 +187,7 @@ export async function boot() {
 			const script = document.createElement("script");
 			script.src = "cordova.js";
 			document.body.appendChild(script);
-			await new Promise((resolve) => {
+			await new Promise(resolve => {
 				document.addEventListener("deviceready", async () => {
 					const { cordovaReady } = await import("./cordova.js");
 					await cordovaReady();
@@ -199,18 +199,8 @@ export async function boot() {
 			//但这种方式只允许修改game的文件读写函数。
 			if (typeof window.initReadWriteFunction == "function") {
 				const g = {};
-				const ReadWriteFunctionName = [
-					"download",
-					"readFile",
-					"readFileAsText",
-					"writeFile",
-					"removeFile",
-					"getFileList",
-					"ensureDirectory",
-					"createDir",
-					"removeDir",
-				];
-				ReadWriteFunctionName.forEach((prop) => {
+				const ReadWriteFunctionName = ["download", "readFile", "readFileAsText", "writeFile", "removeFile", "getFileList", "ensureDirectory", "createDir", "removeDir"];
+				ReadWriteFunctionName.forEach(prop => {
 					Object.defineProperty(g, prop, {
 						configurable: true,
 						get() {
@@ -225,9 +215,10 @@ export async function boot() {
 					});
 				});
 				// @ts-ignore
-				await window.initReadWriteFunction(g).catch((e) => {
+				await window.initReadWriteFunction(g).catch(e => {
 					console.error("文件读写函数初始化失败:", e);
 				});
+				delete window.initReadWriteFunction; // 后续用不到了喵
 			}
 			window.onbeforeunload = function () {
 				if (config.get("confirm_exit") && !_status.reloading) {
@@ -246,8 +237,7 @@ export async function boot() {
 
 	// 读取模式
 	if (config2.mode) config.set("mode", config2.mode);
-	if (config.get("mode_config")[config.get("mode")] === undefined)
-		config.get("mode_config")[config.get("mode")] = {};
+	if (config.get("mode_config")[config.get("mode")] === undefined) config.get("mode_config")[config.get("mode")] = {};
 
 	// 复制共有模式设置
 	for (const name in config.get("mode_config").global) {
@@ -287,15 +277,30 @@ export async function boot() {
 		}
 	}
 
+	const sandboxEnabled = !config.get("debug") && !get.is.safari();
+
+	// 初始化沙盒的Realms
+	await initializeSandboxRealms(sandboxEnabled);
+
+	// 初始化security
+	const securityModule = await import("../util/security.js");
+	const security = securityModule.default;
+	await security.initSecurity({
+		lib,
+		game,
+		ui,
+		get,
+		ai,
+		_status,
+		gnc,
+	});
+
 	if (Reflect.get(window, "isNonameServer")) config.set("mode", "connect");
 
 	var pack = Reflect.get(window, "noname_package");
 	Reflect.deleteProperty(window, "noname_package");
 	for (const name in pack.character) {
-		if (
-			config.get("all").sgscharacters.includes(name) ||
-			config.get("hiddenCharacterPack").indexOf(name) == -1
-		) {
+		if (config.get("all").sgscharacters.includes(name) || config.get("hiddenCharacterPack").indexOf(name) == -1) {
 			config.get("all").characters.push(name);
 			lib.translate[name + "_character_config"] = pack.character[name];
 		}
@@ -352,8 +357,7 @@ export async function boot() {
 		if (config.get("customBackgroundMusic")) {
 			for (const name in config.get("customBackgroundMusic")) {
 				config.get("all").background_music.push(name);
-				lib.configMenu.audio.config.background_music.item[name] =
-					config.get("customBackgroundMusic")[name];
+				lib.configMenu.audio.config.background_music.item[name] = config.get("customBackgroundMusic")[name];
 			}
 		}
 		lib.configMenu.audio.config.background_music.item.music_random = "随机播放";
@@ -375,35 +379,18 @@ export async function boot() {
 		const appearenceConfig = lib.configMenu.appearence.config,
 			fontSheet = Reflect.get(ui, "css").fontsheet.sheet,
 			suitsFont = config.get("suits_font");
-		Object.keys(pack.font).forEach((value) => {
+		Object.keys(pack.font).forEach(value => {
 			const font = pack.font[value];
 			appearenceConfig.name_font.item[value] = font;
 			appearenceConfig.identity_font.item[value] = font;
 			appearenceConfig.cardtext_font.item[value] = font;
 			appearenceConfig.global_font.item[value] = font;
-			fontSheet.insertRule(
-				`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.woff2');}`,
-				0
-			);
-			if (suitsFont)
-				fontSheet.insertRule(
-					`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`,
-					0
-				);
+			fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.woff2');}`, 0);
+			if (suitsFont) fontSheet.insertRule(`@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`, 0);
 		});
-		if (suitsFont)
-			fontSheet.insertRule(
-				`@font-face {font-family: 'Suits'; src: url('${lib.assetURL}font/suits.woff2');}`,
-				0
-			);
-		fontSheet.insertRule(
-			`@font-face {font-family: 'NonameSuits'; src: url('${lib.assetURL}font/suits.woff2');}`,
-			0
-		);
-		fontSheet.insertRule(
-			`@font-face {font-family: 'MotoyaLMaru'; src: url('${lib.assetURL}font/motoyamaru.woff2');}`,
-			0
-		);
+		if (suitsFont) fontSheet.insertRule(`@font-face {font-family: 'Suits'; src: url('${lib.assetURL}font/suits.woff2');}`, 0);
+		fontSheet.insertRule(`@font-face {font-family: 'NonameSuits'; src: url('${lib.assetURL}font/suits.woff2');}`, 0);
+		fontSheet.insertRule(`@font-face {font-family: 'MotoyaLMaru'; src: url('${lib.assetURL}font/motoyamaru.woff2');}`, 0);
 		appearenceConfig.cardtext_font.item.default = "默认";
 		appearenceConfig.global_font.item.default = "默认";
 	}
@@ -467,14 +454,12 @@ export async function boot() {
 			if (Reflect.get(window, "bannedExtensions").includes(config.get("extensions")[name])) {
 				continue;
 			}
-			var extcontent = localStorage.getItem(
-				lib.configprefix + "extension_" + config.get("extensions")[name]
-			);
+			var extcontent = localStorage.getItem(lib.configprefix + "extension_" + config.get("extensions")[name]);
 			if (extcontent) {
 				//var backup_onload=lib.init.onload;
 				_status.evaluatingExtension = true;
 				try {
-					eval(extcontent);
+					security.eval(extcontent); // 喵？
 				} catch (e) {
 					console.log(e);
 				}
@@ -525,10 +510,7 @@ export async function boot() {
 				const regex = /\[([^\]]*)\]\(([^)]+)\)/g;
 				lib.changeLog.push(
 					html`
-						<div
-							style="position: relative;width:50px;height:50px;border-radius:50px;background-image:url('${description
-								.author.avatar_url}');background-size:cover;vertical-align:middle;"
-						></div>
+						<div style="position: relative;width:50px;height:50px;border-radius:50px;background-image:url('${description.author.avatar_url}');background-size:cover;vertical-align:middle;"></div>
 						${description.author.login}于${description.published_at}发布
 					`.trim(),
 					description.body.replaceAll("\n", "<br/>").replace(regex, function (match, p1, p2) {
@@ -564,18 +546,7 @@ export async function boot() {
 	}
 
 	const stylesName = ["layout", "theme", "card_style", "cardback_style", "hp_style"];
-	const stylesLoading = [
-		lib.init.promises.css(lib.assetURL + "layout/" + layout, "layout", void 0, true),
-		lib.init.promises.css(lib.assetURL + "theme/" + config.get("theme"), "style", void 0, true),
-		lib.init.promises.css(lib.assetURL + "theme/style/card", config.get("card_style"), void 0, true),
-		lib.init.promises.css(
-			lib.assetURL + "theme/style/cardback",
-			config.get("cardback_style"),
-			void 0,
-			true
-		),
-		lib.init.promises.css(lib.assetURL + "theme/style/hp", config.get("hp_style"), void 0, true),
-	];
+	const stylesLoading = [lib.init.promises.css(lib.assetURL + "layout/" + layout, "layout", void 0, true), lib.init.promises.css(lib.assetURL + "theme/" + config.get("theme"), "style", void 0, true), lib.init.promises.css(lib.assetURL + "theme/style/card", config.get("card_style"), void 0, true), lib.init.promises.css(lib.assetURL + "theme/style/cardback", config.get("cardback_style"), void 0, true), lib.init.promises.css(lib.assetURL + "theme/style/hp", config.get("hp_style"), void 0, true)];
 
 	if (get.is.phoneLayout()) {
 		stylesName.push("phone");
@@ -623,7 +594,7 @@ export async function boot() {
 
 		const extErrorList = [];
 		for (const promise of extensionsLoading) {
-			await promise.catch(async (error) => {
+			await promise.catch(async error => {
 				extErrorList.add(error);
 				if (!promiseErrorHandler || !promiseErrorHandler.onHandle) return;
 				// @ts-ignore
@@ -631,8 +602,9 @@ export async function boot() {
 			});
 		}
 		for (const promise of _status.extensionLoading) {
-			await promise.catch(async (error) => {
+			await promise.catch(async error => {
 				if (extErrorList.includes(error)) return;
+				extErrorList.add(error);
 				if (!promiseErrorHandler || !promiseErrorHandler.onHandle) return;
 				// @ts-ignore
 				await promiseErrorHandler.onHandle({ promise });
@@ -640,9 +612,21 @@ export async function boot() {
 		}
 		// await Promise.allSettled(_status.extensionLoading);
 
+		const isFirstStartAfterUpdate = lib.version && lib.version != lib.config.version;
+
+		if (isFirstStartAfterUpdate && extErrorList.length) {
+			const stacktraces = extErrorList.map(e => (e instanceof Error ? e.stack : String(e))).join("\n\n");
+			// game.saveConfig("update_first_log", stacktraces);
+			if (confirm(`扩展加载出错！是否重新载入游戏？\n本次更新可能导致了扩展出现了错误：\n\n${stacktraces}`)) {
+				game.reload();
+				clearTimeout(resetGameTimeout);
+				return;
+			}
+		}
+
 		_status.extensionLoaded
-			.filter((name) => game.hasExtension(name))
-			.forEach((name) => {
+			.filter(name => game.hasExtension(name))
+			.forEach(name => {
 				lib.announce.publish("Noname.Init.Extension.onLoad", name);
 				lib.announce.publish(`Noname.Init.Extension.${name}.onLoad`, void 0);
 			});
@@ -652,7 +636,7 @@ export async function boot() {
 	const isArray = Array.isArray;
 	if (isArray(lib.onprepare) && lib.onprepare.length) {
 		_status.onprepare = Object.freeze(
-			lib.onprepare.map((fn) => {
+			lib.onprepare.map(fn => {
 				if (typeof fn !== "function") return;
 				return (gnc.is.generatorFunc(fn) ? gnc.of(fn) : fn)();
 			})
@@ -662,11 +646,7 @@ export async function boot() {
 	const toLoad = [];
 
 	if (localStorage.getItem(`${lib.configprefix}playback`)) toLoad.push(importMode(config.get("mode")));
-	else if (
-		(localStorage.getItem(`${lib.configprefix}directstart`) || !show_splash) &&
-		config.get("all").mode.includes(config.get("mode"))
-	)
-		toLoad.push(importMode(config.get("mode")));
+	else if ((localStorage.getItem(`${lib.configprefix}directstart`) || !show_splash) && config.get("all").mode.includes(config.get("mode"))) toLoad.push(importMode(config.get("mode")));
 
 	for (const cardPack of config.get("all").cards) {
 		toLoad.push(importCardPack(cardPack));
@@ -677,14 +657,7 @@ export async function boot() {
 	toLoad.push(lib.init.promises.js(`${lib.assetURL}character`, "rank"));
 
 	if (_status.javaScriptExtensions) {
-		const loadJavaScriptExtension = async (
-			javaScriptExtension,
-			pathArray,
-			fileArray,
-			onLoadArray,
-			onErrorArray,
-			index
-		) => {
+		const loadJavaScriptExtension = async (javaScriptExtension, pathArray, fileArray, onLoadArray, onErrorArray, index) => {
 			if (!pathArray && !fileArray && !onLoadArray && !onErrorArray) {
 				try {
 					await lib.init.promises.js(javaScriptExtension.path, javaScriptExtension.file);
@@ -709,23 +682,14 @@ export async function boot() {
 			} catch {
 				if (typeof onError == "function") onError();
 			}
-			await loadJavaScriptExtension(
-				javaScriptExtension,
-				pathArray,
-				fileArray,
-				onLoadArray,
-				onErrorArray,
-				index + 1
-			);
+			await loadJavaScriptExtension(javaScriptExtension, pathArray, fileArray, onLoadArray, onErrorArray, index + 1);
 		};
-		_status.javaScriptExtensions.forEach((javaScriptExtension) => {
+		_status.javaScriptExtensions.forEach(javaScriptExtension => {
 			const pathArray = isArray(javaScriptExtension.path);
 			const fileArray = isArray(javaScriptExtension.file);
 			const onLoadArray = isArray(javaScriptExtension.onLoad);
 			const onErrorArray = isArray(javaScriptExtension.onError);
-			toLoad.push(
-				loadJavaScriptExtension(javaScriptExtension, pathArray, fileArray, onLoadArray, onErrorArray)
-			);
+			toLoad.push(loadJavaScriptExtension(javaScriptExtension, pathArray, fileArray, onLoadArray, onErrorArray));
 		});
 	}
 
@@ -778,18 +742,18 @@ function initSheet(libConfig) {
 		}
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
 			'#window .player>.framebg,#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg{display:block;background-image:url("' +
-				lib.assetURL +
-				"theme/style/player/" +
-				bstyle +
-				'1.png")}',
+			lib.assetURL +
+			"theme/style/player/" +
+			bstyle +
+			'1.png")}',
 			0
 		);
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
 			'#window #arena.long:not(.fewplayer) .player>.framebg, #arena.oldlayout .player>.framebg{background-image:url("' +
-				lib.assetURL +
-				"theme/style/player/" +
-				bstyle +
-				'3.png")}',
+			lib.assetURL +
+			"theme/style/player/" +
+			bstyle +
+			'3.png")}',
 			0
 		);
 		Reflect.get(ui, "css").border_stylesheet.sheet.insertRule(
@@ -818,14 +782,14 @@ function initSheet(libConfig) {
 		if (libConfig.control_style == "wood") {
 			Reflect.get(ui, "css").control_stylesheet = lib.init.sheet(
 				"#window .control,#window .menubutton,#window #system>div>div,#window #system>div>.pressdown2{background-image:" +
-					str +
-					"}"
+				str +
+				"}"
 			);
 		} else {
 			Reflect.get(ui, "css").control_stylesheet = lib.init.sheet(
 				"#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:" +
-					str +
-					"}"
+				str +
+				"}"
 			);
 		}
 	}
@@ -934,7 +898,7 @@ async function loadCss() {
  * @deprecated
  * @return {Promise<void>}
  */
-async function onWindowReady() {}
+async function onWindowReady() { }
 
 function setBackground() {
 	let htmlbg = localStorage.getItem(lib.configprefix + "background");
@@ -993,11 +957,10 @@ async function setOnError() {
 		const winPath = window.__dirname
 			? "file:///" + (__dirname.replace(new RegExp("\\\\", "g"), "/") + "/")
 			: "";
-		let str = `错误文件: ${
-			typeof src == "string"
+		let str = `错误文件: ${typeof src == "string"
 				? decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
 				: "未知文件"
-		}`;
+			}`;
 		str += `\n错误信息: ${msg}`;
 		const tip = lib.getErrorTip(msg);
 		if (tip) str += `\n错误提示: ${tip}`;
@@ -1052,78 +1015,84 @@ async function setOnError() {
 			}
 		}
 		str += "\n-------------";
-		if (
-			typeof line == "number" &&
-			(typeof Reflect.get(game, "readFile") == "function" || location.origin != "file://")
-		) {
-			const createShowCode = function (lines) {
-				let showCode = "";
-				if (lines.length >= 10) {
-					if (line > 4) {
-						for (let i = line - 5; i < line + 6 && i < lines.length; i++) {
-							showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+		const errorReporter = ErrorManager.getErrorReporter(err);
+		if (errorReporter) game.print(errorReporter.report(str + "\n代码出现错误"));
+		else {
+			if (
+				typeof line == "number" &&
+				(typeof Reflect.get(game, "readFile") == "function" || location.origin != "file://")
+			) {
+				const createShowCode = function (lines) {
+					let showCode = "";
+					if (lines.length >= 10) {
+						if (line > 4) {
+							for (let i = line - 5; i < line + 6 && i < lines.length; i++) {
+								showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+							}
+						} else {
+							for (let i = 0; i < line + 6 && i < lines.length; i++) {
+								showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+							}
 						}
 					} else {
-						for (let i = 0; i < line + 6 && i < lines.length; i++) {
-							showCode += `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}\n`;
+						showCode = lines
+							.map((_line, i) => `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${_line}\n`)
+							.toString();
+					}
+					return showCode;
+				};
+				//协议名须和html一致(网页端防跨域)，且文件是js
+				if (typeof src == "string" && src.startsWith(location.protocol) && src.endsWith(".js")) {
+					//获取代码
+					const codes = lib.init.reqSync(
+						"local:" + decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
+					);
+					if (codes) {
+						const lines = codes.split("\n");
+						str += "\n" + createShowCode(lines);
+						str += "\n-------------";
+					}
+				}
+				//解析parsex里的content fun内容(通常是技能content)
+				// @ts-ignore
+				else if (
+					err &&
+					err.stack &&
+					["at Object.eval [as content]", "at Proxy.content"].some((str) => {
+						let stackSplit1 = err.stack.split("\n")[1];
+						if (stackSplit1) {
+							return stackSplit1.trim().startsWith(str);
 						}
+						return false;
+					})
+				) {
+					const codes = _status.event.content;
+					if (typeof codes == "function") {
+						const lines = codes.toString().split("\n");
+						str += "\n" + createShowCode(lines);
+						str += "\n-------------";
 					}
-				} else {
-					showCode = lines
-						.map((_line, i) => `${i + 1}| ${line == i + 1 ? "⚠️" : ""}${_line}\n`)
-						.toString();
-				}
-				return showCode;
-			};
-			//协议名须和html一致(网页端防跨域)，且文件是js
-			if (typeof src == "string" && src.startsWith(location.protocol) && src.endsWith(".js")) {
-				//获取代码
-				const codes = lib.init.reqSync(
-					"local:" + decodeURI(src).replace(lib.assetURL, "").replace(winPath, "")
-				);
-				if (codes) {
-					const lines = codes.split("\n");
-					str += "\n" + createShowCode(lines);
-					str += "\n-------------";
 				}
 			}
-			//解析parsex里的content fun内容(通常是技能content)
-			// @ts-ignore
-			else if (
-				err &&
-				err.stack &&
-				["at Object.eval [as content]", "at Proxy.content"].some((str) => {
-					let stackSplit1 = err.stack.split("\n")[1];
-					if (stackSplit1) {
-						return stackSplit1.trim().startsWith(str);
-					}
-					return false;
-				})
-			) {
-				const codes = _status.event.content;
-				if (typeof codes == "function") {
-					const lines = codes.toString().split("\n");
-					str += "\n" + createShowCode(lines);
-					str += "\n-------------";
-				}
-			}
+			if (err && err.stack)
+				str +=
+					"\n" +
+					decodeURI(err.stack)
+						.replace(new RegExp(lib.assetURL, "g"), "")
+						.replace(new RegExp(winPath, "g"), "");
+			alert(str);
+			game.print(str);
 		}
-		if (err && err.stack)
-			str +=
-				"\n" +
-				decodeURI(err.stack)
-					.replace(new RegExp(lib.assetURL, "g"), "")
-					.replace(new RegExp(winPath, "g"), "");
-		alert(str);
 		Reflect.set(window, "ea", Array.from(arguments));
 		Reflect.set(window, "em", msg);
 		Reflect.set(window, "el", line);
 		Reflect.set(window, "ec", column);
 		Reflect.set(window, "eo", err);
-		game.print(str);
 		if (promiseErrorHandler.onErrorFinish) promiseErrorHandler.onErrorFinish();
 		// @ts-ignore
-		if (!lib.config.errstop) {
+		if (!lib.config.errstop && _status && _status.event) {
+			if (_status.event.content instanceof AsyncFunction ||
+				Array.isArray(_status.event.contents)) return;
 			_status.withError = true;
 			game.loop();
 		}

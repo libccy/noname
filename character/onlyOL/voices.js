@@ -3,6 +3,8 @@ export default {
 	"#olsbzhuri2": "知天命而不顺，履穷途而强为。",
 	"#olsbranji1": "此身为薪，炬成灰亦昭大汉长明！",
 	"#olsbranji2": "维之一腔骨血，可驱驰来北马否？",
+	"#kunfen_ol_sb_jiangwei1": "虽千万人，吾往矣！",
+	"#zhaxiang_ol_sb_jiangwei1": "亡国之将姜维，请明公驱驰。",
 	"#ol_sb_jiangwei:die": "姜维姜维……又将何为？",
 	"#xuanfeng_re_lingtong1": "短兵相接，让敌人丢盔弃甲！",
 	"#xuanfeng_re_lingtong2": "攻敌不备，看他们闻风而逃！",
@@ -29,4 +31,5 @@ export default {
 	"#olsbshishou3": "吾居群士之首，可配剑履否？",
 	"#ol_sb_yuanshao:die": "众人合而无力，徒负大义也……",
 	"#ol_yufan:die": "唉，主公不能容我啊！",
+	"#ol_jianyong:die": "此景竟无言以对……",
 };

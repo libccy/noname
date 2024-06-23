@@ -5030,8 +5030,10 @@ game.import("card", function () {
 					player.updateMarks();
 				},
 				ai: {
-					effect: function (card, player, target) {
-						if (get.tag(card, "damage") && !target.hujia) return [1, 0.5];
+					effect: {
+						target(card, player, target) {
+							if (get.tag(card, "damage") && !target.hujia) return [1, 0.5];
+						}
 					},
 				},
 				intro: {
@@ -5133,9 +5135,11 @@ game.import("card", function () {
 					player.recover(trigger.num);
 				},
 				ai: {
-					effect: function (card) {
-						if (get.tag(card, "thunderDamage")) return [0, 2];
-					},
+					effect: {
+						target(card) {
+							if (get.tag(card, "thunderDamage")) return [0, 2];
+						},
+					}
 				},
 			},
 			guiyanfadao: {

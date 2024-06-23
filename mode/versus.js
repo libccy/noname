@@ -366,6 +366,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					name: players[i].name1,
 					name2: players[i].name2,
 					identity: players[i].node.identity.firstChild.innerHTML,
+					nickname: players[i].node.nameol.innerHTML,
 					color: players[i].node.identity.dataset.color,
 				});
 			}
@@ -1775,7 +1776,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							game.players[i].node.name_seat = ui.create.div(
 								".name.name_seat",
 								get.verticalStr(
-									get.seatTranslation(_status.firstAct, game.players[i], "absolute")
+									get.seatTranslation(get.distance(_status.firstAct, game.players[i], "absolute"))
 								),
 								game.players[i]
 							);
@@ -1799,7 +1800,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							lib.storage.ladder.current = 900;
 							game.save("ladder", lib.storage.ladder);
 						}
-						ui.ladder = ui.create.system(
+						if(!ui.ladder) ui.ladder = ui.create.system(
 							game.getLadderName(lib.storage.ladder.current),
 							null,
 							true
@@ -2006,7 +2007,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									ui.create.characterDialog(
 										"heightset",
 										event.filterChoice,
-										"precharacter"
+										"character"
 									);
 							}
 						}
@@ -3761,7 +3762,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					for (var i = 0; i < lib.configOL.characterPack.length; i++) {
 						var pack = lib.characterPack[lib.configOL.characterPack[i]];
 						for (var j in pack) {
-							if (typeof func == "function" && func(j)) continue;
 							if (lib.connectBanned.includes(j)) continue;
 							if (lib.character[j]) libCharacter[j] = pack[j];
 						}

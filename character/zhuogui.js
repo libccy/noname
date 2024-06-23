@@ -123,7 +123,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (target.getEquip(2)) return;
 							return lib.skill.tengjia1.ai.effect.target.apply(this, arguments);
 						},

@@ -1,4 +1,4 @@
-import { userAgent, GeneratorFunction, AsyncFunction } from "../util/index.js";
+import { userAgent, GeneratorFunction, AsyncFunction, AsyncGeneratorFunction } from "../util/index.js";
 import { game } from "../game/index.js";
 import { lib } from "../library/index.js";
 import { _status } from "../status/index.js";
@@ -7,31 +7,18 @@ import { CacheContext } from "../library/cache/cacheContext.js";
 import { Is } from "./is.js";
 import { Promises } from "./promises.js";
 import { rootURL } from "../../noname.js";
+import * as pinyinPro from "./pinyins/index.js";
+import { Audio } from "./audio.js";
+import security from "../util/security.js";
+import { CodeSnippet, ErrorManager } from "../util/error.js";
 
-export class Get {
+import { GetCompatible } from "./compatible.js";
+
+export class Get extends GetCompatible {
 	is = new Is();
 	promises = new Promises();
-	/**
-	 * 获取当前内核版本信息
-	 *
-	 * 目前仅考虑`chrome`, `firefox`和`safari`三种浏览器的信息，其余均归于其他范畴
-	 *
-	 * > 其他后续或许会增加，但`IE`永无可能
-	 *
-	 * @returns {["firefox" | "chrome" | "safari" | "other", number, number, number]}
-	 */
-	coreInfo() {
-		const regex = /(firefox|chrome|safari)\/(\d+(?:\.\d+)+)/;
-		let result;
-		if (!(result = userAgent.match(regex))) return ["other", NaN, NaN, NaN];
-		if (result[1] != "safari") {
-			const [major, minor, patch] = result[2].split(".");
-			return [result[1], parseInt(major), parseInt(minor), parseInt(patch)];
-		}
-		result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/);
-		const [major, minor, patch] = result[1].split(".");
-		return ["safari", parseInt(major), parseInt(minor), parseInt(patch)];
-	}
+	Audio = Audio;
+
 	/**
 	 * 将一个传统格式的character转化为Character对象格式
 	 * @param { Array|Object|import("../library/element/character").Character } data
@@ -214,22 +201,31 @@ export class Get {
 	}
 	//装备栏 END
 	/**
-	 * @returns { string[] }
+	 * @param {string} chinese
+	 * @param {boolean|undefined} withTone
+	 * @returns { any[] }
 	 */
 	pinyin(chinese, withTone) {
-		const pinyinUtilx = window.pinyinUtilx;
-		if (!pinyinUtilx) return [];
+		let result = [];
 		const pinyins = lib.pinyins;
-		if (pinyins) {
-			const pinyin = pinyins[chinese];
-			if (Array.isArray(pinyin)) return withTone === false ? pinyin.map(pinyinUtilx.removeTone) : pinyin.slice();
+		if (pinyins && pinyins[chinese] && Array.isArray(pinyins[chinese])) {
+			result = pinyins[chinese].slice(0);
+		} else {
+			//@ts-ignore
+			result = pinyinPro.pinyin(chinese, { type: "array" });
 		}
-		return pinyinUtilx.getPinyin(chinese, null, withTone, true);
+		//@ts-ignore
+		if (withTone === false) result = pinyinPro.convert(result, { format: "toneNone" });
+		return result;
 	}
+	/**
+	 * @param { string } str
+	 * @returns { string }
+	 */
 	yunmu(str) {
 		//部分整体认读音节特化处理
-		const util = window.pinyinUtilx;
-		if (util && lib.pinyins._metadata.zhengtirendu.includes(util.removeTone(str))) {
+		//@ts-ignore
+		if (lib.pinyins._metadata.zhengtirendu.includes(pinyinPro.convert(str, { format: "toneNone" }))) {
 			return "-" + str[str.length - 1];
 		}
 		//排除声母
@@ -278,9 +274,13 @@ export class Get {
 		}
 		return str;
 	}
+	/**
+	 * @param { string } str
+	 * @returns { string|null }
+	 */
 	yunjiao(str) {
-		const util = window.pinyinUtilx;
-		if (util) str = util.removeTone(str);
+		//@ts-ignore
+		str = pinyinPro.convert(str, { format: "toneNone" });
 		if (lib.pinyins._metadata.zhengtirendu.includes(str)) {
 			str = "-" + str[str.length - 1];
 		} else {
@@ -323,6 +323,7 @@ export class Get {
 		if (info.chargingSkill) list.add("蓄能技");
 		if (info.charlotte) list.add("Charlotte");
 		if (info.sunbenSkill) list.add("昂扬技");
+		if (info.persevereSkill) list.add("持恒技");
 		if (info.categories) list.addArray(info.categories(skill, player));
 		return list;
 	}
@@ -604,7 +605,7 @@ export class Get {
 			if (num === 3 || num === 4) return [];
 			return;
 		}
-		return info || get.convertedCharacter({});
+		return info || get.convertedCharacter({ isNull: true });
 	}
 	characterInitFilter(name) {
 		const info = get.character(name);
@@ -956,6 +957,23 @@ export class Get {
 		});
 
 		return target;
+	}
+	plainTextMap = new Map();
+	/**
+	 * 用于将HTML代码转换为纯文本。
+	 * @param { string } htmlContent
+	 * @returns { string }
+	 */
+	plainText(htmlContent) {
+		if (htmlContent.includes("<") || htmlContent.includes(">")) {
+			if (this.plainTextMap.has(htmlContent)) return this.plainTextMap.get(htmlContent);
+			const parser = new DOMParser(),
+				doc = parser.parseFromString(htmlContent || "", "text/html");
+			const text = doc.body.textContent || doc.body.innerText;
+			this.plainTextMap.set(htmlContent, text);
+			return text;
+		}
+		return htmlContent;
 	}
 	inpilefull(type) {
 		var list = [];
@@ -1472,33 +1490,219 @@ export class Get {
 	infoPlayersOL(infos) {
 		return Array.from(infos || []).map(get.infoPlayerOL);
 	}
+	/** @type {RegExp} */
+	#specialHeadPattern = /^(?:async)?\s+[\w$]+\s*=>/;
+	/** @type {RegExp} */
+	#functionHeadPattern = /^(?:async\b\s*)?(?:function\b\s*)?(?:\*\s*)?(?:[\w$]+\b\s*)?\(/;
+	/** @type {RegExp} */
+	#illegalFunctionHeadPattern = /^(?:async\b\s*)?\*\s*\(/;
+	/** @type {RegExp} */
+	#functionNeckPattern = /^\)\s*(?:=>\s*\{|=>|\{)/;
+	/** @type {RegExp} */
+	#identifierPattern = /\b[\w$]+\b/;
+	/** @type {RegExp} */
+	#asyncHeadPattern = /^async[\s\*\(]/;
+	/**
+	 * ```plain
+	 * 测试一段代码是否为函数参数列表
+	 * ```
+	 * 
+	 * @param {string} paramstr
+	 */
+	isFunctionParam(paramstr) {
+		if (paramstr.length == 0) return true;
+		try {
+			new Function(paramstr, "");
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
+	/**
+	 * ```plain
+	 * 测试一段代码是否为函数体
+	 * ```
+	 *
+	 * @typedef {"async"|"generator"|"agenerator"|"any"|null} FunctionType
+	 *
+	 * @param {string} code
+	 * @param {FunctionType} type
+	 * @returns {boolean}
+	 */
+	isFunctionBody(code, type = /* (function(){return null})() */ null) {
+		if (type == "any") {
+			return (
+				["async", "generator", "agenerator", null]
+					// @ts-ignore // 突然发现ts-ignore也挺方便的喵
+					.some(t => get.isFunctionBody(code, t))
+			);
+		}
+		try {
+			switch (type) {
+				default:
+					new Function(code);
+					break;
+				case "generator":
+					new GeneratorFunction(code);
+					break;
+				case "async":
+					new AsyncFunction(code);
+					break;
+				case "agenerator":
+					new AsyncGeneratorFunction(code);
+					break;
+			}
+		} catch (e) {
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * ```plain
+	 * 清洗函数体代码
+	 * ```
+	 *
+	 * @param {string} str
+	 * @param {boolean} log
+	 * @returns {string}
+	 */
+	pureFunctionStr(str, log = false) {
+		const emptyFunction = "function () {}";
+		str = str.trim();
+		// 对于特殊的箭头函数特殊处理: identifier => ...
+		const specialMatch = get.#specialHeadPattern.exec(str);
+		if (specialMatch) {
+			let body = str.slice(specialMatch[0].length).trim();
+			if (body.startsWith("{") && body.endsWith("}")) body = body.slice(1, -1);
+			else body = `return ${body}`;
+			if (!get.isFunctionBody(body, "any")) {
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
+			}
+			return `${specialMatch[0]}{${body}}`;
+		}
+		// 匹配函数头
+		const functionHead = get.#functionHeadPattern.exec(str);
+		if (!functionHead) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 检查非法函数头
+		if (get.#illegalFunctionHeadPattern.test(functionHead[0])) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 遍历字符串来寻找参数列表的关闭括号
+		const headLen = functionHead[0].length;
+		let start = headLen;
+		let foundClose;
+		let verifiedParams = null;
+		while ((foundClose = str.indexOf(")", start)) >= 0) {
+			const tempParams = str.slice(headLen, foundClose);
+			// 检查收集到的参数列表是否是有效的
+			if (get.isFunctionParam(tempParams)) {
+				verifiedParams = tempParams;
+				break;
+			}
+			start = foundClose + 1;
+		}
+		if (verifiedParams == null) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 检查函数连接
+		const neckStart = str.slice(foundClose);
+		const neckMatch = get.#functionNeckPattern.exec(neckStart);
+		if (!neckMatch) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 箭头函数分流检查
+		if (neckMatch[0].includes("=>")) {
+			let funcHead = functionHead[0];
+			let idMatch;
+			while (idMatch = get.#identifierPattern.exec(funcHead)) {
+				if (idMatch[0] != "async") {
+					if (log) console.warn("发现无法识别的远程代码:", str);
+					return emptyFunction;
+				}
+				funcHead = funcHead.slice(idMatch.index + idMatch[0].length);
+			}
+		} else {
+			let funcHead = functionHead[0];
+			let idMatch;
+			while (idMatch = get.#identifierPattern.exec(funcHead)) {
+				if (idMatch[0] != "async") break;
+				funcHead = funcHead.slice(idMatch.index + idMatch[0].length);
+			}
+			if (!idMatch) {
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
+			}
+		}
+		// 块类型分流
+		const isBlock = neckMatch[0].endsWith("{");
+		let funcBody;
+		if (isBlock) {
+			if (!str.endsWith("}")) {
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
+			}
+			funcBody = "{" + str.slice(foundClose + neckMatch[0].length);
+		} else {
+			// 将表达式函数体转换成块函数体
+			funcBody = `{ return ${str.slice(foundClose + neckMatch[0].length)}; }`;
+		}
+		// 收集函数类型
+		let funcType = 0;
+		if (functionHead[0].includes("*")) funcType |= 1;
+		if (get.#asyncHeadPattern.test(functionHead[0])) funcType |= 2;
+		// 检查函数体
+		const checkType = [null, "generator", "async", "agenerator"][funcType];
+		// @ts-ignore
+		if (!get.isFunctionBody(funcBody, checkType)) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 开始构造最终的函数
+		let finalStr = ` (${verifiedParams}) ${funcBody}`;
+		if (funcType & 1) finalStr = "*" + finalStr;
+		finalStr = "function" + finalStr;
+		if (funcType & 2) finalStr = "async " + finalStr;
+		return finalStr;
+	}
 	funcInfoOL(func) {
 		if (typeof func == "function") {
 			if (func._filter_args) {
 				return "_noname_func:" + JSON.stringify(get.stringifiedResult(func._filter_args, 3));
 			}
-			const str = func.toString();
+			// 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
+			/** @type {(func: Function) => string} */
+			const decompileFunction = security.isSandboxRequired() ? security.importSandbox().Marshal.decompileFunction : Function.prototype.call.bind(Function.prototype.toString);
+			const str = decompileFunction(func);
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return "_noname_func:function () {}";
-			return "_noname_func:" + str;
+			return "_noname_func:" + get.pureFunctionStr(str);
 		}
 		return "";
 	}
 	infoFuncOL(info) {
 		let func;
-		const str = info.slice(13).trim();
+		if ("sandbox" in window) console.log("[infoFuncOL] info:", info);
+		const str = get.pureFunctionStr(info.slice(13), true); // 清洗函数并阻止注入
+		if ("sandbox" in window) console.log("[infoFuncOL] pured:", str);
 		try {
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () {};
-			// 一般fun和数组形式
-			if (str.startsWith("function") || str.startsWith("(")) eval(`func=(${str});`);
-			// 其他奇形怪状的fun
-			else {
-				try {
-					eval(`func = ${str}`);
-				} catch {
-					eval(`let obj = {${str}}; func = obj[Object.keys(obj)[0]]`);
-				}
+			if (security.isSandboxRequired()) {
+				const loadStr = `return (${str});`;
+				const box = security.currentSandbox();
+				if (!box) throw new ReferenceError("没有找到当前沙盒");
+				func = box.exec(loadStr);
+				ErrorManager.setCodeSnippet(func, new CodeSnippet(str, 5));
+			} else {
+				func = security.exec(`return (${str});`);
+				ErrorManager.setCodeSnippet(func, new CodeSnippet(str, 3));
 			}
 		} catch (e) {
 			console.error(`${e} in \n${str}`);
@@ -2351,7 +2555,7 @@ export class Get {
 	}
 	cnNumber(num, ordinal) {
 		if (isNaN(num)) return "";
-		let numStr = num.toString();
+		let numStr = "" + num;
 		if (numStr === "Infinity") return "∞";
 		if (numStr === "-Infinity") return "-∞";
 		if (!/^\d+$/.test(numStr)) return num;
@@ -4572,20 +4776,10 @@ export class Get {
 			game.expandSkills(skills2);
 			for (var i = 0; i < skills2.length; i++) {
 				temp2 = get.info(skills2[i]).ai;
-				if (temp2 && temp2.threaten) temp3 = cache.delegate(temp2).threaten;
+				if (!temp2) continue;
+				if (temp2.threaten) temp3 = cache.delegate(temp2).threaten;
 				else temp3 = undefined;
-				if (temp2 && typeof temp2.effect == "function") {
-					if (
-						!player.hasSkillTag("ignoreSkill", true, {
-							card: card,
-							target: target,
-							skill: skills2[i],
-							isLink: isLink,
-						})
-					)
-						temp2 = cache.delegate(temp2).effect(card, player, target, result2, isLink);
-					else temp2 = undefined;
-				} else if (temp2 && typeof temp2.effect == "object" && typeof temp2.effect.target == "function") {
+				if (typeof temp2.effect == "object" && typeof temp2.effect.target == "function") {
 					if (
 						!player.hasSkillTag("ignoreSkill", true, {
 							card: card,
@@ -4595,6 +4789,19 @@ export class Get {
 						})
 					)
 						temp2 = cache.delegate(temp2.effect).target(card, player, target, result2, isLink);
+					else temp2 = undefined;
+				} else if (typeof temp2.effect == "function") {
+					//考虑废弃
+					console.log("此写法使用频率极低且影响代码可读性，不建议使用");
+					if (
+						!player.hasSkillTag("ignoreSkill", true, {
+							card: card,
+							target: target,
+							skill: skills2[i],
+							isLink: isLink,
+						})
+					)
+						temp2 = cache.delegate(temp2).effect(card, player, target, result2, isLink);
 					else temp2 = undefined;
 				} else temp2 = undefined;
 				if (typeof temp2 == "object") {
@@ -4800,7 +5007,7 @@ export class Get {
 	 * @example
 	 * // 当前文件以"noname/get/index.js"举例
 	 * let parsedPath = get.relativePath(import.meta.url, true);
-	 * console.log(parsedPath == `${lib.assetURL}noname/get/index.js`) //=> true
+	 * console.assert(parsedPath == `${lib.assetURL}noname/get/index.js`);
 	 */
 	relativePath(url, addAssetURL = false) {
 		let base = lib.path.relative(decodeURI(rootURL.pathname), decodeURI(url.pathname));
@@ -4809,7 +5016,86 @@ export class Get {
 		}
 		return base;
 	}
+
+	/**
+	 * 通过`FileReader`，将Blob转换成对应内容的[Data URL](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URLs)
+	 *
+	 * @async
+	 * @param {Blob} blob - 需要转换的内容
+	 * @returns {Promise<URL>} 对应Blob内容的
+	 *
+	 * @example
+	 * let text = "Hello, World!";
+	 * console.assert(btoa(text) === "SGVsbG8sIFdvcmxkIQ==");
+	 *
+	 * let blob = new Blob([text], { type: "text/plain" });
+	 * let url = await get.dataUrlAsync(blob);
+	 * console.assert(url.href === "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==");
+	 */
+	dataUrlAsync(blob) {
+		return new Promise((resolve, reject) => {
+			let fileReader = new FileReader();
+			fileReader.onload = resolve;
+			fileReader.onerror = reject;
+			fileReader.readAsDataURL(blob);
+		}).then(event => new URL(event.target.result));
+	}
+
+	/**
+	 * 通过`Get#blobFromUrl`读取data URL的内容，转换成Blob后返回生成的blob URL
+	 *
+	 * > 实际上所有的URL都能通过此方法读取
+	 *
+	 * 该方法具有缓存，同一data URL仅会返回同一blob URL
+	 *
+	 * 该方法相比`get.objectURL`，会保留文件的类型
+	 *
+	 * ---
+	 *
+	 * > 其实我不确定`get.objectURL`是否有实际意义上的需求，我也不确定`get.objectURL`不保留类型是否是刚需，但既然原先就存在，那么就不要动
+	 *
+	 * @async
+	 * @param {string | URL} dataUrl - 需要转换的data URL
+	 * @returns {Promise<URL>}
+	 */
+	async objectUrlAsync(dataUrl) {
+		let dataString = dataUrl instanceof URL ? dataUrl.href : dataUrl;
+		const objectURLMap = lib.objectURL;
+		if (objectURLMap.has(dataString)) return new URL(objectURLMap.get(dataString));
+
+		let blob = await this.blobFromUrl(dataUrl);
+		const objectURL = URL.createObjectURL(blob);
+		objectURLMap.set(dataString, objectURL);
+		return new URL(objectURL);
+	}
+
+	/**
+	 * 读取给定的URL，将其中的内容转换成Blob
+	 *
+	 * 在File协议下通过无名杀自带的文件处理函数读取内容，其他协议通过`fetch`读取内容
+	 *
+	 * @async
+	 * @param {string | URL} url - 需要读取的URL
+	 * @returns {Promise<Blob>}
+	 */
+	blobFromUrl(url) {
+		let link = url instanceof URL ? url : new URL(url);
+		return link.protocol == "file:" ? game.promises.readFile(get.relativePath(link)).then(buffer => new Blob([buffer])) : fetch(link).then(response => response.blob());
+	}
 }
+
+function freezeSlot(obj, key) {
+	const descriptor = Reflect.getOwnPropertyDescriptor(obj, key);
+	if (!descriptor) return;
+	descriptor.writable = false;
+	descriptor.configurable = false;
+	Reflect.defineProperty(obj, key, descriptor);
+}
+
+freezeSlot(Get.prototype, "isFunctionBody");
+freezeSlot(Get.prototype, "pureFunctionStr");
+freezeSlot(Get.prototype, "funcInfoOL");
+freezeSlot(Get.prototype, "infoFuncOL");
 
 export let get = new Get();
 /**

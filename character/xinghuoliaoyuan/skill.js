@@ -930,7 +930,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player_use: function (card, player, target) {
+						player_use(card, player, target) {
 							if (typeof card != "object" || !player.isPhaseUsing()) return;
 							var hasPanjun = game.hasPlayer(function (current) {
 								return (
@@ -1581,7 +1581,7 @@ const skills = {
 			pretao: true,
 			threaten: 1.8,
 			effect: {
-				player(card, player, target) {
+				player_use(card, player, target) {
 					if (
 						typeof card === "object" &&
 						card.name !== "shan" &&

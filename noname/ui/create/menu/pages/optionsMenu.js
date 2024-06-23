@@ -224,7 +224,7 @@ export const optionsMenu = function (connectMenu) {
 					for (var i in lib.character) {
 						if (lib.character[i][3].length) list.push([i, lib.translate[i]]);
 					}
-
+					if (!list.length) return;
 					list.sort(function (a, b) {
 						a = a[0];
 						b = b[0];

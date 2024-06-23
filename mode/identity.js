@@ -437,6 +437,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					name: players[i].name1,
 					name2: players[i].name2,
 					identity: players[i].identity,
+					nickname: players[i].node.nameol.innerHTML,
 				};
 				if (stratagemMode) {
 					ifo.translate = lib.translate[game.players[i].name];
@@ -1712,7 +1713,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 					if (typeof lib.config.test_game == "string" && player == game.me.next) {
-						player.init(lib.config.test_game);
+						if (lib.config.test_game != "_")
+							player.init(lib.config.test_game);
 					}
 					if (get.is.double(player.name1)) {
 						player._groupChosen = true;
@@ -3553,8 +3555,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						current.showTimer(time);
 						if (current.isOnline()) {
 							current.send(send, camouflaged, event.videoId, true);
-							current.wait();
-							if (current.identity == "nei") event.withOL = true;
+							if (current.identity == "nei") {
+								current.wait();
+								event.withOL = true;
+							}
 							return;
 						}
 						var me = game.me;
@@ -3565,6 +3569,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							else
 								event._result = {
 									bool: true,
+									_noHidingTimer: true,
 								};
 							return;
 						}
@@ -3573,7 +3578,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (!aiTargets.length) return;
 					aiTargets.randomSort();
 					new Promise((resolve) =>
-						setTimeout(resolve, Math.ceil(5000 + 5000 * Math.random()))
+						setTimeout(resolve, Math.ceil(3000 + 5000 * Math.random()))
 					).then(() => {
 						var interval = setInterval(() => {
 							aiTargets.shift();
