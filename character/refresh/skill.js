@@ -2187,58 +2187,54 @@ const skills = {
 		},
 	},
 	dcfencheng: {
-		skillAnimation: "epic",
-		animationColor: "fire",
 		audio: 2,
 		audioname: ["ol_liru"],
 		enable: "phaseUse",
-		filterTarget: function (card, player, target) {
-			return player != target;
-		},
+		filterTarget: lib.filter.notMe,
 		limited: true,
 		line: "fire",
+		skillAnimation: "epic",
+		animationColor: "fire",
 		async content(event, trigger, player) {
 			player.awakenSkill(event.name);
 			let targets = game.filterPlayer(current => current != player);
 			targets.sortBySeat(event.target);
-			let num = 1
+			let num = 1;
 			if (targets.length) {
 				for (const target of targets) {
 					if (target.isIn()) {
 						player.line(target, "fire");
-						const res = get.damageEffect(target, player, target, "fire");
 						const { result } = await target
-							.chooseToDiscard("he", "弃置至少" + get.cnNumber(num) + "张牌或受到2点火焰伤害", [num, Infinity])
-							.set("ai", function (card) {
-								if (ui.selected.cards.length >= _status.event.num) return -1;
-								if (_status.event.player.hasSkillTag("nofire")) return -1;
-								if (_status.event.res >= 0) return 6 - get.value(card);
+							.chooseToDiscard("he", "焚城：弃置至少" + get.cnNumber(num) + "张牌，或受到2点火焰伤害", [num, Infinity])
+							.set("ai", card => {
+								if (ui.selected.cards.length >= get.event("num")) return -1;
+								if (get.player().hasSkillTag("nofire")) return -1;
+								if (get.event().res >= 0) return 6 - get.value(card);
 								if (get.type(card) != "basic") {
 									return 10 - get.value(card);
 								}
 								return 8 - get.value(card);
 							})
-							.set("res",res,"num",num);
+							.set("num", num)
+							.set("res", get.damageEffect(target, player, target, "fire"));
 
 						if (!result.bool) {
 							await target.damage(2, "fire");
-							num = 1
-						}
-						else num = result.cards.length + 1
+							num = 1;
+						} else num = result.cards.length + 1;
 					}
 				}
 			}
-
 		},
 		ai: {
 			order: 1,
 			result: {
-				player: function (player, target) {
+				player(player, target) {
 					if (player.hasUnknown(2)) return 0;
-					var num = 0,
+					let num = 0,
 						eff = 0,
 						players = game
-							.filterPlayer(function (current) {
+							.filterPlayer(current=> {
 								return current != player;
 							})
 							.sortBySeat(target);
@@ -2247,10 +2243,10 @@ const skills = {
 							num = 0;
 							continue;
 						}
-						var shao = false;
+						let shao = false;
 						num++;
 						if (
-							target.countCards("he", function (card) {
+							target.countCards("he", card=> {
 								if (get.type(card) != "basic") {
 									return get.value(card) < 10;
 								}
