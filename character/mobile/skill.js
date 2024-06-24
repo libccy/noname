@@ -60,7 +60,7 @@ const skills = {
 								if (att > 0) {
 									if (trigger.num >= target.getHp()) return SUB;
 									if (
-										souce && !source.countCards("hs", card => {
+										source && !source.countCards("hs", card => {
 											return source.canUse(card, target, true) && get.effect(target, card, source, player) > 0;
 										})
 									)
