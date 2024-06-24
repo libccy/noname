@@ -19,6 +19,7 @@ export class Get extends GetCompatible {
 	promises = new Promises();
 	Audio = Audio;
 
+	
 	/**
 	 * 将一个传统格式的character转化为Character对象格式
 	 * @param { Array|Object|import("../library/element/character").Character } data
