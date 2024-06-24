@@ -70,6 +70,16 @@ const WeakRef = window.WeakRef || class WeakRef {
 	[Symbol.toStringTag] = "WeakRef";
 };
 
+/** @type {typeof Function} */
+// @ts-ignore
+const GeneratorFunction = (function* () { }).constructor;
+/** @type {typeof Function} */
+// @ts-ignore
+const AsyncFunction = (async function () { }).constructor;
+/** @type {typeof Function} */
+// @ts-ignore
+const AsyncGeneratorFunction = (async function* () { }).constructor;
+
 /**
  * ```plain
  * 判断是否为基元类型
@@ -2134,6 +2144,51 @@ class Marshal {
 			return refs;
 
 		return Function.prototype.toString.call(func);
+	}
+
+	/**
+	 * ```plain
+	 * 判断给定的参数列表和函数体字符串是否可以构造一个合法的函数
+	 * ```
+	 * 
+	 * @typedef {"async"|"generator"|"agenerator"|"any"|null} FunctionType
+	 * 
+	 * @param {string|string[]} paramList 
+	 * @param {string} funcBody 
+	 * @param {FunctionType} [type = null]
+	 */
+	static canCreateFunction(paramList, funcBody, type = null) {
+		if (Array.isArray(paramList))
+			paramList = paramList.join(",");
+
+		if (type == "any") {
+			return (
+				["async", "generator", "agenerator", null]
+					// @ts-ignore // 突然发现ts-ignore也挺方便的喵
+					.some(t => Marshal.canCreateFunction(t, paramList, funcBody))
+			);
+		}
+
+		try {
+			switch (type) {
+				default:
+					new Function(paramList, funcBody);
+					break;
+				case "generator":
+					new GeneratorFunction(paramList, funcBody);
+					break;
+				case "async":
+					new AsyncFunction(paramList, funcBody);
+					break;
+				case "agenerator":
+					new AsyncGeneratorFunction(paramList, funcBody);
+					break;
+			}
+		} catch (e) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

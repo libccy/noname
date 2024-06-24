@@ -1511,6 +1511,10 @@ export class Get extends GetCompatible {
 	 */
 	isFunctionParam(paramstr) {
 		if (paramstr.length == 0) return true;
+		const canCreateFunction = security.isSandboxRequired() 
+			&& security.importSandbox().Marshal.canCreateFunction;
+		if (canCreateFunction)
+			return canCreateFunction(paramstr, "");
 		try {
 			new Function(paramstr, "");
 			return true;
@@ -1530,6 +1534,10 @@ export class Get extends GetCompatible {
 	 * @returns {boolean}
 	 */
 	isFunctionBody(code, type = /* (function(){return null})() */ null) {
+		const canCreateFunction = security.isSandboxRequired() 
+			&& security.importSandbox().Marshal.canCreateFunction;
+		if (canCreateFunction)
+			return canCreateFunction("", code, type);
 		if (type == "any") {
 			return (
 				["async", "generator", "agenerator", null]
