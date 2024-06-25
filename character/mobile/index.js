@@ -25,6 +25,9 @@ game.import("character", function () {
 		dynamicTranslate: { ...dynamicTranslates },
 		characterIntro: { ...characterIntros },
 		characterReplace: { ...characterReplaces },
+		characterSubstitute: {
+			mb_caomao: [],
+		},
 		card: { ...cards },
 		skill: { ...skills },
 		perfectPair: { ...perfectPairs },

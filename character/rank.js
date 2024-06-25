@@ -724,6 +724,7 @@ window.noname_character_rank = {
 		"sb_handang",
 		"sb_gongsunzan",
 		"yue_zoushi",
+		"xin_simayi",
 	],
 	bp: [
 		"ol_peixiu",
@@ -2305,6 +2306,7 @@ window.noname_character_rank = {
 			"hansong",
 			"star_zhangzhao",
 			"dc_sp_zhurong",
+			"xin_simayi",
 		],
 		rare: [
 			"ol_liubiao",

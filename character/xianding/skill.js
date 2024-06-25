@@ -515,7 +515,7 @@ const skills = {
 					.map((_, i) => i + 1)
 					.reduce((sum, i) => sum + target.countEmptySlot(i), 0)
 			);
-			if (player.countMark("dcsbfengmin") > player.maxHp) {
+			if (player.countMark("dcsbfengmin") > player.getDamagedHp()) {
 				player.tempBanSkill("dcsbfengmin");
 			}
 		},
@@ -978,7 +978,7 @@ const skills = {
 		},
 		zhuanhuanji(player, skill) {
 			player.storage[skill] = !player.storage[skill];
-			//player.changeSkin(skill, "dc_sb_jiaxu" + (player.storage[skill] ? "_shadow" : ""));
+			//player.changeSkin({ characterName: "dc_sb_jiaxu" }, "dc_sb_jiaxu" + (player.storage[skill] ? "_shadow" : ""));
 		},
 		marktext: "☯",
 		mark: true,
@@ -2007,7 +2007,7 @@ const skills = {
 		audioname: ["dc_sb_simayi_shadow"],
 		zhuanhuanji(player, skill) {
 			player.storage[skill] = !player.storage[skill];
-			player.changeSkin(skill, "dc_sb_simayi" + (player.storage[skill] ? "_shadow" : ""));
+			player.changeSkin({ characterName: "dc_sb_simayi" }, "dc_sb_simayi" + (player.storage[skill] ? "_shadow" : ""));
 		},
 		marktext: "☯",
 		enable: "phaseUse",
@@ -3217,7 +3217,7 @@ const skills = {
 		marktext: "☯",
 		zhuanhuanji(player, skill) {
 			player.storage[skill] = !player.storage[skill];
-			player.changeSkin(skill, "dc_sb_zhouyu" + (player.storage[skill] ? "_shadow" : ""));
+			player.changeSkin({ characterName: "dc_sb_zhouyu" }, "dc_sb_zhouyu" + (player.storage[skill] ? "_shadow" : ""));
 		},
 		intro: {
 			content: function (storage) {
@@ -3398,7 +3398,7 @@ const skills = {
 		marktext: "☯",
 		zhuanhuanji(player, skill) {
 			player.storage[skill] = !player.storage[skill];
-			player.changeSkin(skill, "dc_sb_lusu" + (player.storage[skill] ? "_shadow" : ""));
+			player.changeSkin({ characterName: "dc_sb_lusu" }, "dc_sb_lusu" + (player.storage[skill] ? "_shadow" : ""));
 		},
 		intro: {
 			content: function (storage) {

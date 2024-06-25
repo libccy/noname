@@ -4644,6 +4644,9 @@ const skills = {
 	},
 	fangzhu: {
 		audio: 2,
+		audioname2: {
+			xin_simayi: "jilue_fangzhu",
+		},
 		trigger: { player: "damageEnd" },
 		preHidden: true,
 		async cost(event, trigger, player) {
@@ -5350,7 +5353,7 @@ const skills = {
 		locked: true,
 		audio: 2,
 		audioname: ["boss_lvbu3"],
-		audioname2: { shen_simayi: "jilue_wansha" },
+		audioname2: { shen_simayi: "jilue_wansha", xin_simayi: "jilue_wansha" },
 		global: "wansha2",
 		trigger: { global: "dying" },
 		priority: 15,

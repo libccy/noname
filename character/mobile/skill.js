@@ -450,7 +450,7 @@ const skills = {
 			num = Math.min(num, lib.skill.mbqianlong.maxMarkCount - player.countMark("mbqianlong"));
 			player.addMark("mbqianlong", num);
 		},
-		group: ["mbqianlong_begin", "mbqianlong_add"],
+		group: ["mbqianlong_begin", "mbqianlong_add", "mbqianlong_die"],
 		async content(event, trigger, player) {
 			player.addAdditionalSkill("mbqianlong", lib.skill.mbqianlong.derivation.slice(0, Math.floor(player.countMark("mbqianlong") / 25)));
 		},
@@ -499,6 +499,19 @@ const skills = {
 				async content(event, trigger, player) {
 					let toAdd = 5 * (1 + (trigger.name === "damage") + (event.triggername === "damageSource"));
 					lib.skill.mbqianlong.addMark(player, toAdd);
+				},
+			},
+			die: {
+				trigger: {
+					player: "dieBefore",
+				},
+				charlotte: true,
+				firstDo: true,
+				forced: true,
+				popup: false,
+				forceDie: true,
+				async content(event, trigger, player) {
+					player.changeSkin({ characterName: "mb_caomao" }, "mb_caomao_dead");
 				},
 			},
 		},
@@ -876,6 +889,7 @@ const skills = {
 		selectTarget: -1,
 		multiline: true,
 		async contentBefore(event, trigger, player) {
+			player.changeSkin({ characterName: "mb_caomao" }, "mb_caomao_shadow");
 			player.awakenSkill("mbjuejin");
 		},
 		async content(event, trigger, player) {
