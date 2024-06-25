@@ -4,7 +4,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//手杀神司马？
 	xinrenjie: {
-		audio: 2,
+		audio: "renjie2",
 		trigger: {
 			global: ["shaDamage", "useCardToEnd"],
 		},
@@ -25,6 +25,7 @@ const skills = {
 		},
 	},
 	xinbaiyin: {
+		audio: "sbaiyin",
 		inherit: "sbaiyin",
 		filter(event, player) {
 			return player.countMark("xinrenjie") >= 4;
@@ -40,7 +41,7 @@ const skills = {
 		},
 	},
 	xinlianpo: {
-		audio: 2,
+		audio: "lianpo",
 		trigger: {
 			source: "dieAfter",
 		},
@@ -91,7 +92,7 @@ const skills = {
 		},
 	},
 	xin_jilve: {
-		audio: 2,
+		audio: "jilue",
 		trigger: {
 			player: "phaseUseBegin",
 		},
