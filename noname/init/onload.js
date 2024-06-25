@@ -743,7 +743,7 @@ export async function onload(resetGameTimeout) {
 		}
 	};
 
-	if (!lib.imported.mode || !lib.imported.mode[lib.config.mode]) {
+	if (!lib.imported.mode?.[lib.config.mode]) {
 		window.inSplash = true;
 		clearTimeout(resetGameTimeout);
 		let clickedNode = false;
@@ -756,11 +756,7 @@ export async function onload(resetGameTimeout) {
 			if (game.layout != "mobile" && lib.layoutfixed.indexOf(lib.config.mode) !== -1) {
 				game.layout = "mobile";
 				ui.css.layout.href = lib.assetURL + "layout/" + game.layout + "/layout.css";
-			} else if (
-				game.layout == "mobile" &&
-				lib.config.layout != "mobile" &&
-				lib.layoutfixed.indexOf(lib.config.mode) === -1
-			) {
+			} else if (game.layout == "mobile" && lib.config.layout != "mobile" && lib.layoutfixed.indexOf(lib.config.mode) === -1) {
 				game.layout = lib.config.layout;
 				if (game.layout == "default") {
 					ui.css.layout.href = "";
@@ -801,17 +797,9 @@ export async function onload(resetGameTimeout) {
 				// 扩展可通过window.splashurl设置素材读取路径
 				if (window.splashurl == undefined) window.splashurl = "image/splash/";
 				if (lib.config.splash_style == "style1" || lib.config.splash_style == "style2") {
-					ui.create
-						.div(node, ".avatar")
-						.setBackgroundImage(
-							"image/splash/" + lib.config.splash_style + "/" + lib.config.all.mode[i] + ".jpg"
-						);
+					ui.create.div(node, ".avatar").setBackgroundImage("image/splash/" + lib.config.splash_style + "/" + lib.config.all.mode[i] + ".jpg");
 				} else {
-					ui.create
-						.div(node, ".avatar")
-						.setBackgroundImage(
-							splashurl + lib.config.splash_style + "/" + lib.config.all.mode[i] + ".jpg"
-						);
+					ui.create.div(node, ".avatar").setBackgroundImage(splashurl + lib.config.splash_style + "/" + lib.config.all.mode[i] + ".jpg");
 				}
 			} else {
 				var avatarnode = ui.create.div(node, ".avatar");
