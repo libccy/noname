@@ -679,8 +679,11 @@ const skills = {
 		filterTarget(card, player, target) {
 			return get.event("sbganglie_enabledTargets").includes(target);
 		},
+		selectTarget: [1, Infinity],
+		multitarget: true,
+		multiline: true,
 		async content(event, trigger, player) {
-			event.targets[0].damage(2);
+			for (const target of event.targets.sortBySeat()) await target.damage(2);
 		},
 		ai: {
 			order: 6,

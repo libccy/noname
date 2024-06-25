@@ -22,7 +22,6 @@ const skills = {
 				var list = Array.from({
 					length: 4,
 				}).map((_, i) => get.cnNumber(i + 1, true));
-				console.log(list);
 				if (get.effect(player, { name: "losehp" }, player, player) > 4 || player.countCards("hs", card => player.canSaveCard(card, player)) > 0 || player.hp > 2) return "四";
 				return "二";
 			},
