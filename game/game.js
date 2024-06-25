@@ -10,6 +10,9 @@
 	const minSafariVersion = [14, 5, 0];
 
 	// 获取基础变量
+	/**
+	 * @type {import("../noname-compatible.js")}
+	 */
 	const {
 		game,
 		get,
