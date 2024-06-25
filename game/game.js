@@ -10,12 +10,28 @@
 	const minSafariVersion = [14, 5, 0];
 
 	// 获取基础变量
+	/**
+	 * @type {import("../noname-compatible.js")}
+	 */
 	const {
 		game,
 		get,
 		util: { nonameInitialized, assetURL, userAgent },
 		UpdateReason,
-	} = await import("../noname-compatible.js");
+	} = await new Promise((resolve, reject) => {
+		import("../noname-compatible.js")
+			.then(resolve, async () => {
+				let [util, { get }, { game, UpdateReason }] = await Promise.all([import("../noname/util/index.js"), import("../noname/get/compatible.js"), import("../noname/game/compatible.js")]);
+
+				return {
+					get,
+					game,
+					UpdateReason,
+					util,
+				};
+			})
+			.catch(reject);
+	});
 
 	// 使用到的文本
 	const globalText = {
