@@ -23,6 +23,7 @@ const skills = {
 			name2: "忍",
 			content: "mark",
 		},
+		marktext: "忍",
 	},
 	xinbaiyin: {
 		audio: "sbaiyin",
@@ -35,7 +36,7 @@ const skills = {
 			await player.loseMaxHp();
 			await player.addSkills("xinjilve");
 		},
-		derivation: ["xinjilve", "guicai", "fangzhu", "jizhi", "zhiheng", "wansha"],
+		derivation: ["xinjilve", "reguicai", "fangzhu", "rejizhi", "rezhiheng", "rewansha"],
 		ai: {
 			combo: "xinrenjie",
 		},
@@ -48,7 +49,7 @@ const skills = {
 		async cost(event, trigger, player) {
 			const skills = get
 				.info("xinbaiyin")
-				.derivation.removeArray(["xinjilve", "guicai"])
+				.derivation.removeArray(["xinjilve", "reguicai"])
 				.filter(skill => !player.hasSkill(skill, null, null, false));
 			if (skills.length && player.hasSkill("xinjilve", null, null, false)) {
 				const next = player.chooseButton(["连破：请选择一项", [skills.map(i => [i, `获得【${get.translation(i)}】`]).concat(["于此回合结束后获得一个额外回合"]), "textbutton"]]);
@@ -56,9 +57,9 @@ const skills = {
 					const link = button.link,
 						skills = get.event("skills");
 					if ((skills.length <= 2 || game.countPlayer() <= 2) && !player.hasSkill("xinlianpo_mark", null, null, false) && link == "于此回合结束后获得一个额外回合") return 6;
-					if (link == "zhiheng" && player.countCards("h") > 0) return 5;
-					if (link == "jizhi" && (!skills.includes("zhiheng") || player.countCards("hs", { type: "trick" }))) return 3;
-					if (link == "wansha" && game.hasPlayer(current => get.attitude(player, current) < 0 && current.getHp() < 2 && (player == _status.currentPhase || player.hasSkill("xinlianpo_mark", null, null, false)))) return 2;
+					if (link == "rezhiheng" && player.countCards("h") > 0) return 5;
+					if (link == "rejizhi" && (!skills.includes("rezhiheng") || player.countCards("hs", { type: "trick" }))) return 3;
+					if (link == "rewansha" && game.hasPlayer(current => get.attitude(player, current) < 0 && current.getHp() < 2 && (player == _status.currentPhase || player.hasSkill("xinlianpo_mark", null, null, false)))) return 2;
 					return 1;
 				});
 				next.set("skills", skills);
@@ -111,7 +112,7 @@ const skills = {
 			const num = history.length + 1;
 			const skills = get
 				.info("xinbaiyin")
-				.derivation.removeArray(["xinjilve", "guicai"])
+				.derivation.removeArray(["xinjilve", "reguicai"])
 				.filter(skill => !player.hasSkill(skill, null, null, false));
 			if (skills.length && limit >= num) {
 				const next = player.chooseButton(2, ["连破：请选择你要移去的“忍”标记数和相应操作", '<div class="text center">移去“忍”标记数</div>', [choices, "tdnodes"], '<div class="text center">执行的操作</div>', [skills.map(i => [i, `获得【${get.translation(i)}】`]).concat(["摸牌"]), "tdnodes"]]);
@@ -130,8 +131,8 @@ const skills = {
 						skills = get.event("skills");
 					if (!ui.selected.buttons.length) {
 						if (num > 2 && link == "摸牌") return 10;
-						if (link == "zhiheng" && player.countCards("h") > 0) return 10;
-						if (link == "jizhi" && (!skills.includes("zhiheng") || player.countCards("hs", { type: "trick" }))) return 8;
+						if (link == "rezhiheng" && player.countCards("h") > 0) return 10;
+						if (link == "rejizhi" && (!skills.includes("rezhiheng") || player.countCards("hs", { type: "trick" }))) return 8;
 						if (player.countMark("xinrenjie") <= 2) return 0;
 					}
 					return ui.selected.buttons.length && ui.selected.buttons[0].link == "摸牌" ? num - 1 : 1;
@@ -195,12 +196,12 @@ const skills = {
 				},
 				forced: true,
 				async content(event, trigger, player) {
-					let skills = ["guicai"];
+					let skills = ["reguicai"];
 					const groupList = new Map([
 						["wei", "fangzhu"],
-						["shu", "jizhi"],
-						["wu", "zhiheng"],
-						["qun", "wansha"],
+						["shu", "rejizhi"],
+						["wu", "rezhiheng"],
+						["qun", "rewansha"],
 					]);
 					if (Array.from(groupList.keys()).includes(player.group)) skills.push(groupList.get(player.group));
 					skills = skills.filter(skill => !player.hasSkill(skill, null, null, false));
@@ -6560,6 +6561,7 @@ const skills = {
 			name2: "忍",
 			content: "mark",
 		},
+		marktext: "忍",
 		ai: {
 			maixie: true,
 			maixie_hp: true,
