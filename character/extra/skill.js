@@ -2,6 +2,213 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//手杀神司马？
+	xinrenjie: {
+		audio: "renjie2",
+		trigger: {
+			global: ["shaDamage", "useCardToEnd"],
+		},
+		filter(event, player, name) {
+			if (player.getRoundHistory("useSkill", evt => evt.skill == "xinrenjie").length >= 4) return false;
+			if (event.type != "card" || !event.target || event.target != player || event.player == player) return false;
+			if (player.hasHistory("useCard", evt => evt.respondTo && evt.respondTo[1] == event.card) || player.hasHistory("respond", evt => evt.respondTo && evt.respondTo[1] == event.card)) return false;
+			if (name == "shaDamage") return true;
+			return event.card.name != "sha" && !event.getParent()._neutralized;
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			player.addMark(event.name, 1);
+		},
+		intro: {
+			name2: "忍",
+			content: "mark",
+		},
+	},
+	xinbaiyin: {
+		audio: "sbaiyin",
+		inherit: "sbaiyin",
+		filter(event, player) {
+			return player.countMark("xinrenjie") >= 4;
+		},
+		async content(event, trigger, player) {
+			player.awakenSkill("xinbaiyin");
+			await player.loseMaxHp();
+			await player.addSkills("xinjilve");
+		},
+		derivation: ["xinjilve", "guicai", "fangzhu", "jizhi", "zhiheng", "wansha"],
+		ai: {
+			combo: "xinrenjie",
+		},
+	},
+	xinlianpo: {
+		audio: "lianpo",
+		trigger: {
+			source: "dieAfter",
+		},
+		async cost(event, trigger, player) {
+			const skills = get
+				.info("xinbaiyin")
+				.derivation.removeArray(["xinjilve", "guicai"])
+				.filter(skill => !player.hasSkill(skill, null, null, false));
+			if (skills.length && player.hasSkill("xinjilve", null, null, false)) {
+				const next = player.chooseButton(["连破：请选择一项", [skills.map(i => [i, `获得【${get.translation(i)}】`]).concat(["于此回合结束后获得一个额外回合"]), "textbutton"]]);
+				next.set("ai", button => {
+					const link = button.link,
+						skills = get.event("skills");
+					if ((skills.length <= 2 || game.countPlayer() <= 2) && !player.hasSkill("xinlianpo_mark", null, null, false) && link == "于此回合结束后获得一个额外回合") return 6;
+					if (link == "zhiheng" && player.countCards("h") > 0) return 5;
+					if (link == "jizhi" && (!skills.includes("zhiheng") || player.countCards("hs", { type: "trick" }))) return 3;
+					if (link == "wansha" && game.hasPlayer(current => get.attitude(player, current) < 0 && current.getHp() < 2 && (player == _status.currentPhase || player.hasSkill("xinlianpo_mark", null, null, false)))) return 2;
+					return 1;
+				});
+				next.set("skills", skills);
+				const {
+					result: { bool, links },
+				} = await next;
+				event.result = {
+					bool: bool,
+					cost_data: links,
+				};
+			} else {
+				const bool = await player.chooseBool("连破：于此回合结束后获得一个额外回合？").forResultBool();
+				event.result = {
+					bool: bool,
+				};
+			}
+		},
+		async content(event, trigger, player) {
+			const links = event.cost_data;
+			if (links && get.info("xinbaiyin").derivation.includes(links[0])) await player.addSkills(links[0]);
+			else {
+				player.addTempSkill("xinlianpo_mark");
+				player.insertPhase();
+			}
+		},
+		subSkill: {
+			mark: {
+				charlotte: true,
+				mark: true,
+				intro: {
+					content: "本回合结束后执行一个额外回合",
+				},
+			},
+		},
+	},
+	xinjilve: {
+		audio: "jilue",
+		trigger: {
+			player: "phaseUseBegin",
+		},
+		filter(event, player) {
+			return player.countMark("xinrenjie");
+		},
+		async cost(event, trigger, player) {
+			const limit = Math.min(3, player.countMark("xinrenjie"));
+			const choices = Array.from({
+				length: limit,
+			}).map((_, i) => [i, get.cnNumber(i + 1, true)]);
+			const history = game.getAllGlobalHistory("everything", evt => evt.name == "xinjilve" && evt.player == player && Array.isArray(evt.cost_data) && get.info("xinbaiyin").derivation.includes(evt.cost_data[0]));
+			const num = history.length + 1;
+			const skills = get
+				.info("xinbaiyin")
+				.derivation.removeArray(["xinjilve", "guicai"])
+				.filter(skill => !player.hasSkill(skill, null, null, false));
+			if (skills.length && limit >= num) {
+				const next = player.chooseButton(2, ["连破：请选择你要移去的“忍”标记数和相应操作", '<div class="text center">移去“忍”标记数</div>', [choices, "tdnodes"], '<div class="text center">执行的操作</div>', [skills.map(i => [i, `获得【${get.translation(i)}】`]).concat(["摸牌"]), "tdnodes"]]);
+				next.set("filterButton", button => {
+					const link = button.link;
+					if (!ui.selected.buttons.length && typeof link == "number") return false;
+					if (ui.selected.buttons.length) {
+						if (typeof link !== "number") return false;
+						return ui.selected.buttons[0].link == "摸牌" || link == get.event("num") - 1;
+					}
+					return true;
+				});
+				next.set("ai", button => {
+					const link = button.link,
+						num = get.event("num"),
+						skills = get.event("skills");
+					if (!ui.selected.buttons.length) {
+						if (num > 2 && link == "摸牌") return 10;
+						if (link == "zhiheng" && player.countCards("h") > 0) return 10;
+						if (link == "jizhi" && (!skills.includes("zhiheng") || player.countCards("hs", { type: "trick" }))) return 8;
+						if (player.countMark("xinrenjie") <= 2) return 0;
+					}
+					return ui.selected.buttons.length && ui.selected.buttons[0].link == "摸牌" ? num - 1 : 1;
+				});
+				next.set("num", num);
+				next.set("skills", skills);
+				const {
+					result: { bool, links },
+				} = await next;
+				event.result = {
+					bool: bool,
+					cost_data: links,
+				};
+			} else {
+				const draw = Array.from({
+					length: limit,
+				}).map((_, i) => get.cnNumber(i + 1, true));
+				const { result } = await player
+					.chooseControl(draw, "cancel2")
+					.set("prompt", get.prompt("xinrenjie"))
+					.set("prompt2", `你可以摸至多${get.cnNumber(draw.length)}张牌并移去等量枚“忍”标记`)
+					.set("ai", () => {
+						return get.event("choice");
+					})
+					.set(
+						"choice",
+						(function () {
+							if (!player.hasSkill("jizhi", null, null, false)) return "cancel2";
+							return choices.length - 1;
+						})()
+					);
+				event.result = {
+					bool: result.control != "cancel2",
+					cost_data: result.index,
+				};
+			}
+		},
+		async content(event, trigger, player) {
+			const choice = event.cost_data;
+			if (typeof choice == "number") {
+				player.removeMark("xinrenjie", choice + 1);
+				await player.draw(choice + 1);
+			} else if (get.info("xinbaiyin").derivation.includes(choice[0])) {
+				const history = game.getAllGlobalHistory("everything", evt => evt.name == "xinjilve" && evt.player == player && Array.isArray(evt.cost_data) && get.info("xinbaiyin").derivation.includes(evt.cost_data[0]));
+				const num = history.length;
+				player.removeMark("xinrenjie", num);
+				await player.addSkills(choice[0]);
+			} else {
+				player.removeMark("xinrenjie", choice[1] + 1);
+				await player.draw(choice[1] + 1);
+			}
+		},
+		group: "xinjilve_gain",
+		subSkill: {
+			gain: {
+				trigger: {
+					player: "changeSkillsAfter",
+				},
+				filter(event, player) {
+					return event.addSkill.includes("xinjilve");
+				},
+				forced: true,
+				async content(event, trigger, player) {
+					let skills = ["guicai"];
+					const groupList = new Map([
+						["wei", "fangzhu"],
+						["shu", "jizhi"],
+						["wu", "zhiheng"],
+						["qun", "wansha"],
+					]);
+					if (Array.from(groupList.keys()).includes(player.group)) skills.push(groupList.get(player.group));
+					skills = skills.filter(skill => !player.hasSkill(skill, null, null, false));
+					if (skills.length) await player.addSkills(skills);
+				},
+			},
+		},
+	},
 	//十周年神华佗
 	jingyu: {
 		audio: 2,

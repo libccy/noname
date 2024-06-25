@@ -1062,7 +1062,7 @@ const skills = {
 			if (bool) {
 				const target = targets[0];
 				player.logSkill("olsbhetao", target);
-				player.changeSkin("olsbhetao", "ol_sb_yuanshao");
+				player.changeSkin({ characterName: "ol_sb_yuanshao" }, "ol_sb_yuanshao");
 				player.discard(cards);
 				trigger.getParent().effectCount++;
 				trigger.getParent().excluded.addArray(game.filterPlayer(i => trigger.targets.includes(i) && target != i));
@@ -1151,7 +1151,7 @@ const skills = {
 			return num2 + (sum > player.countCards("h") ? Math.min(5, sum) : 0) + (sum > player.getHp() ? num2 : 0) >= num1;
 		},
 		async content(event, trigger, player) {
-			player.changeSkin("olsbshenli", "ol_sb_yuanshao_shadow");
+			player.changeSkin({ characterName: "ol_sb_yuanshao" }, "ol_sb_yuanshao_shadow");
 			player.addTempSkill("olsbshenli_used", "phaseUseAfter");
 			trigger.getParent().targets.addArray(
 				game.filterPlayer(target => {
