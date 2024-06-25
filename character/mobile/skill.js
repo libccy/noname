@@ -2,6 +2,288 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//张布
+	mbchengxiong: {
+		audio: 2,
+		trigger: {
+			player: "useCardToTargeted",
+		},
+		locked: false,
+		filter: function (event, player) {
+			if (get.type2(event.card) != "trick") return false;
+			if (!event.targets.some(current => current != player)) return false;
+			const num = lib.skill.mbchengxiong.phaseUsed(event, player);
+			return game.hasPlayer(current => current.countCards("he") >= num);
+		},
+		phaseUsed: function (event, player) {
+			let phase = null;
+			for (let i of lib.phaseName) {
+				if (event.getParent(i, true)) {
+					phase = i;
+					break;
+				}
+			}
+			if (!phase) return 0;
+			return player.getHistory("useCard", evt => evt.getParent(phase) == event.getParent(phase)).length;
+		},
+		async cost(event, trigger, player) {
+			const num = lib.skill.mbchengxiong.phaseUsed(trigger, player);
+			event.result = await player.chooseTarget(get.prompt2("mbchengxiong"), function (card, player, target) {
+				const num = get.event("num");
+				return target.countCards("he") >= num;
+			}).set("num", num).set("color", get.color(trigger.card)).set("ai", function (target) {
+				let player = get.player(), eff = get.effect(target, { name: "guohe_copy2" }, player, player);
+				const color = get.event("color");
+				if (target.getCards("e").some(card => get.color(card) == color)) eff += get.damageEffect(target, player, player) / 2;
+				return eff;
+			}).forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			const result = await player.discardPlayerCard("he", target, true).set("ai", function (button) {
+				let val = get.buttonValue(button);
+				if (get.attitude(_status.event.player, get.owner(button.link)) > 0) val *= -1;
+				if (get.position(button.link) == "e" && get.color(button.link) == get.event("color")) return val *= 2;
+				return val;
+			}).set("color", get.color(trigger.card)).forResult();
+			if (result.bool && get.color(result.links[0]) == get.color(trigger.card)) await target.damage();
+		},
+		mod: {
+			aiOrder: function (player, card, num) {
+				if (get.type2(card) == "trick") return num + 10;
+			},
+		},
+	},
+	mbwangzhuang: {
+		audio: 2,
+		trigger: {
+			global: "damageEnd",
+		},
+		filter: function (event, player) {
+			if (event.card) return false;
+			return [event.source, event.player].includes(player);
+		},
+		logTarget: function () {
+			return _status.currentPhase;
+		},
+		async content(event, trigger, player) {
+			await player.draw(2);
+			if (_status.currentPhase) _status.currentPhase.addTempSkill("fengyin");
+		},
+	},
+	//王经
+	mbzujin: {
+		audio: 3,
+		enable: ["chooseToUse", "chooseToRespond"],
+		filter: function (event, player) {
+			if (!player.countCards("hse", card => get.type(card) == "basic")) return false;
+			if (player.isDamaged()) {
+				if (event.filterCard(get.autoViewAs({ name: "shan" }, "unsure"), player, event) && !player.getStorage("mbzujin").includes("shan")) return true;
+				if (event.filterCard(get.autoViewAs({ name: "wuxie" }, "unsure"), player, event) && !player.getStorage("mbzujin").includes("wuxie")) return true;
+			}
+			if (!player.isDamaged() || !player.isMinHp()) {
+				if (event.filterCard(get.autoViewAs({ name: "sha" }, "unsure"), player, event) && !player.getStorage("mbzujin").includes("sha")) return true;
+			}
+			return false;
+		},
+		chooseButton: {
+			dialog: function (event, player) {
+				var list = [];
+				if (player.isDamaged()) {
+					if (event.filterCard(get.autoViewAs({ name: "shan" }, "unsure"), player, event) && !player.getStorage("mbzujin").includes("shan")) list.push(["基本", "", "shan"]);
+					if (event.filterCard(get.autoViewAs({ name: "wuxie" }, "unsure"), player, event) && !player.getStorage("mbzujin").includes("wuxie")) list.push(["锦囊", "", "wuxie"]);
+				}
+				if (!player.isDamaged() || !player.isMinHp() && !player.getStorage("mbzujin").includes("sha")) {
+					if (event.filterCard(get.autoViewAs({ name: "sha" }, "unsure"), player, event)) list.push(["基本", "", "sha"]);
+				}
+				return ui.create.dialog("阻进", [list, "vcard"]);
+			},
+			check: function (button) {
+				if (_status.event.getParent().type != "phase") return 1;
+				var player = _status.event.player;
+				return player.getUseValue({
+					name: button.link[2],
+					nature: button.link[3],
+				});
+			},
+			backup: function (links, player) {
+				return {
+					filterCard: card => get.type(card) == "basic",
+					popname: true,
+					check: function (card) {
+						return 8 - get.value(card);
+					},
+					position: "hse",
+					viewAs: { name: links[0][2], nature: links[0][3] },
+					precontent: function () {
+						player.logSkill("mbzujin");
+						if (!player.storage.mbzujin) {
+							player.storage.mbzujin = [];
+							player.when({ global: "phaseEnd" }).then(() => {
+								delete player.storage.mbzujin;
+							});
+						}
+						player.markAuto("mbzujin", [event.result.card.name]);
+					},
+				};
+			},
+			prompt: function (links, player) {
+				return "将一张基本牌当做" + get.translation(links[0][2]) + "使用";
+			},
+		},
+		hiddenCard: function (player, name) {
+			if (!player.countCards("she", card => get.type(card) == "basic")) return false;
+			if (player.getStorage("mbzujin").includes(name)) return false;
+			if (["shan", "wuxie"].includes(name)) return player.isDamaged();
+			if (name == "sha") return (!player.isDamaged() || !player.isMinHp());
+		},
+		ai: {
+			respondSha: true,
+			respondShan: true,
+			skillTagFilter: function (player, tag) {
+				if (!player.countCards("hse", card => get.type(card) == "basic")) return false;
+				if (tag == "respondSha") return (!player.isDamaged() || !player.isMinHp()) && !player.getStorage("mbzujin").includes("sha");
+				return player.isDamaged() && !player.getStorage("mbzujin").includes("shan");
+			},
+			order: 1,
+			result: {
+				player: function (player) {
+					if (_status.event.dying) return get.attitude(player, _status.event.dying);
+					return 1;
+				},
+			},
+		},
+	},
+	mbjiejian: {
+		audio: 3,
+		trigger: {
+			player: "phaseZhunbeiBegin",
+		},
+		filter: function (event, player) {
+			return player.countCards("h");
+		},
+		async cost(event, trigger, player) {
+			if (_status.connectMode)
+				game.broadcastAll(function () {
+					_status.noclearcountdown = true;
+				});
+			const give_map = {};
+			let used = [];
+			do {
+				const result = await player.chooseCardTarget({
+					filterCard: function (card) {
+						return get.itemtype(card) == "card" && !card.hasGaintag("mbjiejian_tag");
+					},
+					filterTarget: lib.filter.notMe,
+					selectCard: [1, Infinity],
+					prompt: used.length ? "是否继续分配手牌？" : get.prompt("mbjiejian"),
+					prompt2: "请选择要分配的卡牌和目标",
+					ai1: function (card) {
+						if (!ui.selected.cards.length) return 8 - get.value(card);
+						return 0;
+					},
+					ai2: function (target) {
+						let player = _status.event.player,
+							card = ui.selected.cards[0];
+						let val = get.value(card), att = get.attitude(player, target);
+						if (val <= 4) {
+							if (get.event("used").includes(target)) return 0;
+							return 1 / target.getUseValue(card);
+						}
+						return att * (target.getUseValue(card) + 4);
+					},
+				}).set("used", used).forResult();
+				if (result.bool && result.targets.length) {
+					const id = result.targets[0].playerid,
+						map = give_map;
+					if (!map[id]) map[id] = [];
+					map[id].addArray(result.cards);
+					player.addGaintag(result.cards, "mbjiejian_tag");
+					used.addArray(result.targets);
+				}
+				else break;
+			} while (player.countCards("h"));
+			if (_status.connectMode) {
+				game.broadcastAll(function () {
+					delete _status.noclearcountdown;
+					game.stopCountChoose();
+				});
+			}
+			const list = [], targets = [];
+			for (const i in give_map) {
+				const source = (_status.connectMode ? lib.playerOL : game.playerMap)[i];
+				player.line(source, "green");
+				if (player !== source && (get.mode() !== "identity" || player.identity !== "nei")) player.addExpose(0.2);
+				targets.push(source);
+				list.push([source, give_map[i]]);
+			}
+			event.result = {
+				bool: list.length > 0,
+				targets: targets,
+				cost_data: list,
+			};
+		},
+		async content(event, trigger, player) {
+			const list = event.cost_data;
+			await game.loseAsync({
+				gain_list: list,
+				player: player,
+				cards: list.map(i => i[1]).flat(),
+				giver: player,
+				animate: "giveAuto",
+			}).setContent("gaincardMultiple");
+			for (let target of event.targets) {
+				let num = target.hp - target.countMark("mbjiejian_mark");
+				target.addMark("mbjiejian_mark", num, false);
+			}
+		},
+		group: ["mbjiejian_liuli", "mbjiejian_remove"],
+		subSkill: {
+			liuli: {
+				audio: "mbjiejian",
+				trigger: {
+					global: "useCardToTarget",
+				},
+				filter: function (event, player) {
+					if (!event.targets || event.targets.length != 1) return false;
+					if (!event.targets[0].hasMark("mbjiejian_mark")) return false;
+					return true;
+				},
+				check: function (event, player) {
+					return get.effect(player, event.card, event.player, player) >= get.effect(event.targets[0], event.card, event.player, player);
+				},
+				logTarget: "target",
+				async content(event, trigger, player) {
+					const evt = trigger.getParent();
+					evt.triggeredTargets2.removeArray(event.targets);
+					evt.targets.removeArray(event.targets);
+					if (lib.filter.targetEnabled2(trigger.card, trigger.player, player)) evt.targets.push(player);
+					await player.draw();
+				},
+			},
+			remove: {
+				audio: "mbjiejian",
+				trigger: {
+					global: "phaseEnd",
+				},
+				forced: true,
+				filter: function (event, player) {
+					return event.player.hasMark("mbjiejian_mark");
+				},
+				logTarget: "player",
+				async content(event, trigger, player) {
+					const target = event.targets[0], num = target.countMark("mbjiejian_mark");
+					target.removeMark("mbjiejian_mark", num, false);
+					if (target.hp >= num) await player.draw(2);
+				},
+			},
+			mark: {
+				intro: {
+					content: "获得“节谏”时的体力值：$",
+				},
+			},
+		},
+	},
 	//新司马孚
 	mbpanxiang: {
 		audio: 2,

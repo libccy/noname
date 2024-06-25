@@ -7745,6 +7745,171 @@ const skills = {
 			}
 		},
 	},
+	//陆逊
+	sbqianxun: {
+		audio: 2,
+		trigger: {
+			target: "useCardToBegin",
+			player: "judgeBefore",
+		},
+		filter: function (event, player) {
+			if (!event.card || player.getStorage("sbqianxun").includes(event.card.viewAs || event.card.name)) return false;
+			if (event.getParent().name == "phaseJudge") return true;
+			if (event.name == "judge") return false;
+			if (get.type(event.card) == "trick" && event.player != player) return true;
+		},
+		forced: true,
+		locked: false,
+		async content(event, trigger, player) {
+			player.markAuto("sbqianxun", [trigger.card.viewAs || trigger.card.name]);
+			if (player.countCards("he")) {
+				const num = Math.min(5, player.getStorage("sbqianxun").length);
+				const result = await player.chooseCard(get.prompt(event.name), "将至多" + get.cnNumber(num) + "张牌置于武将牌上", "he", [1, num]).set("ai", function (card) {
+					return 4 - get.value(card);
+				}).forResult();
+				if (result.bool) {
+					player.addToExpansion(result.cards, "giveAuto", player).gaintag.add("sbqianxun_gain");
+					player.addSkill("sbqianxun_gain");
+				}
+			}
+		},
+		onremove: true,
+		intro: {
+			content: "已记录牌名：$",
+		},
+		group: "sbqianxun_use",
+		subSkill: {
+			use: {
+				audio: "sbqianxun",
+				trigger: {
+					player: "phaseUseBegin",
+				},
+				filter: function (event, player) {
+					return player.getStorage("sbqianxun").some(name => {
+						if (get.type(name) != "trick") return false;
+						return player.hasUseTarget(name);
+					});
+				},
+				async cost(event, trigger, player) {
+					const list = player.getStorage("sbqianxun").filter(name => get.type(name) == "trick").map(name => ["锦囊", "", name]);
+					const result = await player.chooseButton([get.prompt("sbqianxun"), "视为使用一张记录的普通锦囊牌", [list, "vcard"]]).set("ai", function (button) {
+						const card = { name: button.link[2], isCard: true };
+						return player.getUseValue(card);
+					}).set("filterButton", function (button) {
+						const card = { name: button.link[2], isCard: true };
+						return player.hasUseTarget(card);
+					}).forResult();
+					event.result = {
+						bool: result.bool,
+						cost_data: result.bool ? result.links[0][2] : [],
+					};
+				},
+				async content(event, trigger, player) {
+					const name = event.cost_data;
+					player.unmarkAuto("sbqianxun", [name]);
+					const card = { name: name, isCard: true };
+					await player.chooseUseTarget(card, true);
+				},
+			},
+			gain: {
+				trigger: {
+					global: "phaseEnd",
+				},
+				forced: true,
+				charlotte: true,
+				async content(event, trigger, player) {
+					var cards = player.getExpansions("sbqianxun_gain");
+					if (cards.length) await player.gain(cards, "draw");
+					player.removeSkill("sbqianxun_gain");
+				},
+				intro: {
+					mark: function (dialog, storage, player) {
+						var cards = player.getExpansions("sbqianxun_gain");
+						if (player.isUnderControl(true)) dialog.addAuto(cards);
+						else return "共有" + get.cnNumber(cards.length) + "张牌";
+					},
+					markcount: "expansion",
+				},
+			},
+		},
+	},
+	sblianying: {
+		audio: 2,
+		trigger: {
+			global: "phaseEnd",
+		},
+		filter:function(event,player){
+			if(player==event.player) return false;
+			return player.getHistory("lose",evt=>evt.cards2 && evt.cards2.length ).length;
+		},
+		async content(event,trigger,player){
+			let num = 0;
+			player.getHistory("lose", evt => {
+				if (evt.cards2) num += evt.cards2.length;
+			});
+			num = Math.min(5, num);
+			const { cards } = await game.cardsGotoOrdering(get.cards(num));
+			if (_status.connectMode)
+				game.broadcastAll(function () {
+					_status.noclearcountdown = true;
+				});
+			const give_map = {};
+			if (!cards.length) return;
+			do {
+				const {
+					result: { bool, links },
+				} =
+					cards.length == 1
+						? { result: { links: cards.slice(0), bool: true } }
+						: await player.chooseCardButton("连营：请选择要分配的牌", true, cards, [1, cards.length]).set("ai", () => {
+							if (ui.selected.buttons.length == 0) return 1;
+							return 0;
+						});
+				if (!bool) return;
+				cards.removeArray(links);
+				const togive = links.slice(0);
+				const {
+					result: { targets },
+				} = await player
+					.chooseTarget("选择一名角色获得" + get.translation(links), true)
+					.set("ai", target => {
+						const att = get.attitude(_status.event.player, target);
+						if (_status.event.enemy) {
+							return -att;
+						} else if (att > 0) {
+							return att / (1 + target.countCards("h"));
+						} else {
+							return att / 100;
+						}
+					})
+					.set("enemy", get.value(togive[0], player, "raw") < 0);
+				if (targets.length) {
+					const id = targets[0].playerid,
+						map = give_map;
+					if (!map[id]) map[id] = [];
+					map[id].addArray(togive);
+				}
+			} while (cards.length > 0);
+			if (_status.connectMode) {
+				game.broadcastAll(function () {
+					delete _status.noclearcountdown;
+					game.stopCountChoose();
+				});
+			}
+			const list = [];
+			for (const i in give_map) {
+				const source = (_status.connectMode ? lib.playerOL : game.playerMap)[i];
+				player.line(source, "green");
+				if (player !== source && (get.mode() !== "identity" || player.identity !== "nei")) player.addExpose(0.2);
+				list.push([source, give_map[i]]);
+			}
+			game.loseAsync({
+				gain_list: list,
+				giver: player,
+				animate: "draw",
+			}).setContent("gaincardMultiple");
+		},
+	},
 };
 
 export default skills;
