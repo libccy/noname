@@ -30,7 +30,7 @@ const characterSortTranslate = {
 	extra_offline: "神话再临·线下",
 	extra_decade: "神·武",
 	extra_tw: "海外服神将",
-	extra_tw: "移动版神将",
+	extra_mb: "移动版神将",
 };
 
 export { characterSort, characterSortTranslate };
