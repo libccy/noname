@@ -773,9 +773,7 @@ export async function onload(resetGameTimeout) {
 			// 这不好删/m/，顺带lib.init.reset也不好删
 			window.resetGameTimeout = setTimeout(lib.init.reset, 10000);
 
-			this.listenTransition(function () {
-				lib.init.js(lib.assetURL + "mode", lib.config.mode, proceed);
-			}, 500);
+			this.listenTransition(() => importMode(lib.config.mode).then(proceed), 500);
 		};
 		var downNode = function () {
 			this.classList.add("glow");
