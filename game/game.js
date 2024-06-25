@@ -122,8 +122,7 @@
 					code,
 					{
 						module: ts.ModuleKind.CommonJS,
-						//@todo: ES2019 -> ES2020
-						target: ts.ScriptTarget.ES2019,
+						target: ts.ScriptTarget.ES2020,
 						inlineSourceMap: true,
 						resolveJsonModule: true,
 						esModuleInterop: true,
