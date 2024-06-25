@@ -33,9 +33,9 @@ const skills = {
 		async content(event, trigger, player) {
 			player.awakenSkill("xinbaiyin");
 			await player.loseMaxHp();
-			await player.addSkills("xin_jilve");
+			await player.addSkills("xinjilve");
 		},
-		derivation: ["xin_jilve", "guicai", "fangzhu", "jizhi", "zhiheng", "wansha"],
+		derivation: ["xinjilve", "guicai", "fangzhu", "jizhi", "zhiheng", "wansha"],
 		ai: {
 			combo: "xinrenjie",
 		},
@@ -46,8 +46,11 @@ const skills = {
 			source: "dieAfter",
 		},
 		async cost(event, trigger, player) {
-			const skills = get.info("xin_jilve").derivation.filter(skill => skill !== "guicai" && !player.hasSkill(skill, null, null, false));
-			if (skills.length && player.hasSkill("xin_jilve", null, null, false)) {
+			const skills = get
+				.info("xinbaiyin")
+				.derivation.removeArray(["xinjilve", "guicai"])
+				.filter(skill => !player.hasSkill(skill, null, null, false));
+			if (skills.length && player.hasSkill("xinjilve", null, null, false)) {
 				const next = player.chooseButton(["连破：请选择一项", [skills.map(i => [i, `获得【${get.translation(i)}】`]).concat(["于此回合结束后获得一个额外回合"]), "textbutton"]]);
 				next.set("ai", button => {
 					const link = button.link,
@@ -75,7 +78,7 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const links = event.cost_data;
-			if (links && get.info("xin_jilve").derivation.includes(links[0])) await player.addSkills(links[0]);
+			if (links && get.info("xinbaiyin").derivation.includes(links[0])) await player.addSkills(links[0]);
 			else {
 				player.addTempSkill("xinlianpo_mark");
 				player.insertPhase();
@@ -91,7 +94,7 @@ const skills = {
 			},
 		},
 	},
-	xin_jilve: {
+	xinjilve: {
 		audio: "jilue",
 		trigger: {
 			player: "phaseUseBegin",
@@ -104,11 +107,11 @@ const skills = {
 			const choices = Array.from({
 				length: limit,
 			}).map((_, i) => [i, get.cnNumber(i + 1, true)]);
-			const history = game.getAllGlobalHistory("everything", evt => evt.name == "xin_jilve" && evt.player == player && Array.isArray(evt.cost_data) && get.info("xinbaiyin").derivation.includes(evt.cost_data[0]));
+			const history = game.getAllGlobalHistory("everything", evt => evt.name == "xinjilve" && evt.player == player && Array.isArray(evt.cost_data) && get.info("xinbaiyin").derivation.includes(evt.cost_data[0]));
 			const num = history.length + 1;
 			const skills = get
 				.info("xinbaiyin")
-				.derivation.removeArray(["xin_jilve", "guicai"])
+				.derivation.removeArray(["xinjilve", "guicai"])
 				.filter(skill => !player.hasSkill(skill, null, null, false));
 			if (skills.length && limit >= num) {
 				const next = player.chooseButton(2, ["连破：请选择你要移去的“忍”标记数和相应操作", '<div class="text center">移去“忍”标记数</div>', [choices, "tdnodes"], '<div class="text center">执行的操作</div>', [skills.map(i => [i, `获得【${get.translation(i)}】`]).concat(["摸牌"]), "tdnodes"]]);
@@ -172,7 +175,7 @@ const skills = {
 				player.removeMark("xinrenjie", choice + 1);
 				await player.draw(choice + 1);
 			} else if (get.info("xinbaiyin").derivation.includes(choice[0])) {
-				const history = game.getAllGlobalHistory("everything", evt => evt.name == "xin_jilve" && evt.player == player && Array.isArray(evt.cost_data) && get.info("xinbaiyin").derivation.includes(evt.cost_data[0]));
+				const history = game.getAllGlobalHistory("everything", evt => evt.name == "xinjilve" && evt.player == player && Array.isArray(evt.cost_data) && get.info("xinbaiyin").derivation.includes(evt.cost_data[0]));
 				const num = history.length;
 				player.removeMark("xinrenjie", num);
 				await player.addSkills(choice[0]);
@@ -181,14 +184,14 @@ const skills = {
 				await player.draw(choice[1] + 1);
 			}
 		},
-		group: "xin_jilve_gain",
+		group: "xinjilve_gain",
 		subSkill: {
 			gain: {
 				trigger: {
 					player: "changeSkillsAfter",
 				},
 				filter(event, player) {
-					return event.addSkill.includes("xin_jilve");
+					return event.addSkill.includes("xinjilve");
 				},
 				forced: true,
 				async content(event, trigger, player) {
