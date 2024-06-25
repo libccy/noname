@@ -900,6 +900,7 @@ const skills = {
 	stdtiaohe: {
 		audio: "fyjianyu",
 		enable: "phaseUse",
+		usable: 1,
 		filter(event, player) {
 			return game.hasPlayer(target => {
 				return target.getDiscardableCards(player, "e").some(card => parseInt(get.subtype(card).slice("equip".length)) <= 2);

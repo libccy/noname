@@ -4710,7 +4710,7 @@ const skills = {
 					(function () {
 						var cards = player.getCards("hs", card => get.name(card, player) !== "sha" && player.hasValueTarget(card));
 						var damage = Math.min(player.getCardUsable({ name: "sha" }), player.countCards("hs", "sha")) + cards.filter(i => get.tag(i, "damage")).length;
-						if (player.isPhaseUsing() || player.hp + player.hujia + player.countCards("hs", i => get.tag(card, "recover")) > 2) {
+						if (player.isPhaseUsing() || player.hp + player.hujia + player.countCards("hs", card => get.tag(card, "recover")) > 2) {
 							if (damage) return Math.min(choices.length - 1, cards.length - damage);
 							return Math.min(choices.length - 1, cards.length - 1);
 						}
