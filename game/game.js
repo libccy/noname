@@ -15,7 +15,30 @@
 		get,
 		util: { nonameInitialized, assetURL, userAgent },
 		UpdateReason,
-	} = await import("../noname-compatible.js");
+	} = await new Promise((resolve, reject) => {
+		import("../noname-compatible.js")
+			.then(resolve, async () => {
+				let util = await import("../noname/util/index.js");
+				let { device, assetURL } = util;
+
+				let rootURL = new URL(device ? assetURL : typeof window.__dirname == "string" ? window.__dirname : "/");
+				let { GetCompatible, get, setGetCompatible } = await import("../noname/get/compatible.js");
+				let { GameCompatible, game, setGameCompatible, UpdateReason } = await import("../noname/game/compatible.js");
+
+				return {
+					rootURL,
+					GetCompatible,
+					get,
+					setGetCompatible,
+					GameCompatible,
+					game,
+					setGameCompatible,
+					UpdateReason,
+					util,
+				};
+			})
+			.catch(reject);
+	});
 
 	// 使用到的文本
 	const globalText = {
