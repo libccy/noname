@@ -6,6 +6,9 @@ import { createApp } from "../../../game/vue.esm-browser.js";
 import OnloadSplash from "./OnloadSplash.vue";
 
 export class DefaultSplash implements IOnloadSplash {
+	id = "style1";
+	name = "样式一";
+
 	path = "image/splash/style1/";
 	resolve: (mode: string) => void;
 	app: any;
