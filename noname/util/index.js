@@ -34,7 +34,12 @@ export class Uninstantable {
  * @returns { Promise<void> }
  */
 export function delay(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise(resolve => {
+		let timeout = setTimeout(() => {
+			clearTimeout(timeout);
+			resolve();
+		}, ms);
+	});
 }
 
 /**
