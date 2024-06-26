@@ -41,7 +41,6 @@ export class DefaultSplash implements IOnloadSplash {
 	}
 
 	async dispose(node: HTMLDivElement): Promise<void> {
-		console.log(this.clicked);
 		node.delete(1000);
 
 		await new Promise<void>(resolve => this.clicked.listenTransition(resolve, 500));
