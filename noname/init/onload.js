@@ -33,9 +33,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad, "UTF-8");
 			});
 			if (ui.css.card_stylesheet) ui.css.card_stylesheet.remove();
-			ui.css.card_stylesheet = lib.init.sheet(
-				`.card:not(*:empty){background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.card_stylesheet = lib.init.sheet(`.card:not(*:empty){background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 	}
 	if (lib.config.cardback_style === "custom") {
@@ -48,9 +46,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad1, "UTF-8");
 			});
 			if (ui.css.cardback_stylesheet) ui.css.cardback_stylesheet.remove();
-			ui.css.cardback_stylesheet = lib.init.sheet(
-				`.card:empty,.card.infohidden{background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.cardback_stylesheet = lib.init.sheet(`.card:empty,.card.infohidden{background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 
 		const fileToLoad2 = await game.getDB("image", "cardback_style2");
@@ -62,9 +58,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad2, "UTF-8");
 			});
 			if (ui.css.cardback_stylesheet2) ui.css.cardback_stylesheet2.remove();
-			ui.css.cardback_stylesheet2 = lib.init.sheet(
-				`.card.infohidden:not(.infoflip){background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.cardback_stylesheet2 = lib.init.sheet(`.card.infohidden:not(.infoflip){background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 	}
 	if (lib.config.hp_style === "custom") {
@@ -77,9 +71,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad1, "UTF-8");
 			});
 			if (ui.css.hp_stylesheet1) ui.css.hp_stylesheet1.remove();
-			ui.css.hp_stylesheet1 = lib.init.sheet(
-				`.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.hp_stylesheet1 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 
 		const fileToLoad2 = await game.getDB("image", "hp_style2");
@@ -91,9 +83,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad2, "UTF-8");
 			});
 			if (ui.css.hp_stylesheet2) ui.css.hp_stylesheet2.remove();
-			ui.css.hp_stylesheet2 = lib.init.sheet(
-				`.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.hp_stylesheet2 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 
 		const fileToLoad3 = await game.getDB("image", "hp_style3");
@@ -105,9 +95,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad3, "UTF-8");
 			});
 			if (ui.css.hp_stylesheet3) ui.css.hp_stylesheet3.remove();
-			ui.css.hp_stylesheet3 = lib.init.sheet(
-				`.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.hp_stylesheet3 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 
 		const fileToLoad4 = await game.getDB("image", "hp_style4");
@@ -119,9 +107,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad4, "UTF-8");
 			});
 			if (ui.css.hp_stylesheet4) ui.css.hp_stylesheet4.remove();
-			ui.css.hp_stylesheet4 = lib.init.sheet(
-				`.hp:not(.text):not(.actcount)>.lost{background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.hp_stylesheet4 = lib.init.sheet(`.hp:not(.text):not(.actcount)>.lost{background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 	}
 
@@ -135,13 +121,9 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad, "UTF-8");
 			});
 			if (ui.css.player_stylesheet) ui.css.player_stylesheet.remove();
-			ui.css.player_stylesheet = lib.init.sheet(
-				`#window .player{background-image:url("${fileLoadedEvent.target.result}");background-size:100% 100%;}`
-			);
+			ui.css.player_stylesheet = lib.init.sheet(`#window .player{background-image:url("${fileLoadedEvent.target.result}");background-size:100% 100%;}`);
 		} else {
-			ui.css.player_stylesheet = lib.init.sheet(
-				"#window .player{background-image:none;background-size:100% 100%;}"
-			);
+			ui.css.player_stylesheet = lib.init.sheet("#window .player{background-image:none;background-size:100% 100%;}");
 		}
 	}
 	if (lib.config.border_style === "custom") {
@@ -155,14 +137,8 @@ export async function onload(resetGameTimeout) {
 			});
 			if (ui.css.border_stylesheet) ui.css.border_stylesheet.remove();
 			ui.css.border_stylesheet = lib.init.sheet();
-			ui.css.border_stylesheet.sheet.insertRule(
-				`#window .player>.framebg{display:block;background-image:url("${fileLoadedEvent.target.result}")}`,
-				0
-			);
-			ui.css.border_stylesheet.sheet.insertRule(
-				".player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}",
-				0
-			);
+			ui.css.border_stylesheet.sheet.insertRule(`#window .player>.framebg{display:block;background-image:url("${fileLoadedEvent.target.result}")}`, 0);
+			ui.css.border_stylesheet.sheet.insertRule(".player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}", 0);
 		}
 	}
 	if (lib.config.control_style === "custom") {
@@ -175,9 +151,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad, "UTF-8");
 			});
 			if (ui.css.control_stylesheet) ui.css.control_stylesheet.remove();
-			ui.css.control_stylesheet = lib.init.sheet(
-				`#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("${fileLoadedEvent.target.result}")}`
-			);
+			ui.css.control_stylesheet = lib.init.sheet(`#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("${fileLoadedEvent.target.result}")}`);
 		}
 	}
 	if (lib.config.menu_style === "custom") {
@@ -190,9 +164,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad, "UTF-8");
 			});
 			if (ui.css.menu_stylesheet) ui.css.menu_stylesheet.remove();
-			ui.css.menu_stylesheet = lib.init.sheet(
-				`html #window>.dialog.popped,html .menu,html .menubg{background-image:url("${fileLoadedEvent.target.result}");background-size:cover}`
-			);
+			ui.css.menu_stylesheet = lib.init.sheet(`html #window>.dialog.popped,html .menu,html .menubg{background-image:url("${fileLoadedEvent.target.result}");background-size:cover}`);
 		}
 	}
 
@@ -656,6 +628,7 @@ export async function onload(resetGameTimeout) {
 		}
 	};
 
+	Reflect.set(window, "resetGameTimeout", resetGameTimeout);
 	if (!lib.imported.mode?.[lib.config.mode]) {
 		window.inSplash = true;
 		clearTimeout(resetGameTimeout);
@@ -674,92 +647,6 @@ export async function onload(resetGameTimeout) {
 		delete window.inSplash;
 		game.saveConfig("mode", result);
 		await importMode(result);
-
-		const _oldSplash = () => {
-			let clickedNode = false;
-			const clickNode = function () {
-				if (clickedNode) return;
-				this.classList.add("clicked");
-				clickedNode = true;
-				lib.config.mode = this.link;
-				game.saveConfig("mode", this.link);
-				if (game.layout != "mobile" && lib.layoutfixed.indexOf(lib.config.mode) !== -1) {
-					game.layout = "mobile";
-					ui.css.layout.href = lib.assetURL + "layout/" + game.layout + "/layout.css";
-				} else if (game.layout == "mobile" && lib.config.layout != "mobile" && lib.layoutfixed.indexOf(lib.config.mode) === -1) {
-					game.layout = lib.config.layout;
-					if (game.layout == "default") {
-						ui.css.layout.href = "";
-					} else {
-						ui.css.layout.href = lib.assetURL + "layout/" + game.layout + "/layout.css";
-					}
-				}
-				splash.delete(1000);
-
-				// 这不好删/m/，顺带lib.init.reset也不好删
-				window.resetGameTimeout = setTimeout(lib.init.reset, 10000);
-
-				this.listenTransition(() => importMode(lib.config.mode).then(proceed), 500);
-			};
-			var downNode = function () {
-				this.classList.add("glow");
-			};
-			var upNode = function () {
-				this.classList.remove("glow");
-			};
-			var splash = ui.create.div("#splash", document.body);
-			if (lib.config.touchscreen) {
-				splash.classList.add("touch");
-				lib.setScroll(splash);
-			}
-			if (lib.config.player_border != "wide") {
-				splash.classList.add("slim");
-			}
-			splash.dataset.radius_size = lib.config.radius_size;
-			for (var i = 0; i < lib.config.all.mode.length; i++) {
-				var node = ui.create.div(".hidden", splash, clickNode);
-				node.link = lib.config.all.mode[i];
-				ui.create.div(node, ".splashtext", get.verticalStr(get.translation(lib.config.all.mode[i])));
-				if (lib.config.all.stockmode.includes(lib.config.all.mode[i])) {
-					// 初始启动页设置
-					if (lib.config.splash_style == undefined) game.saveConfig("splash_style", "style1");
-					splash.dataset.splash_style = lib.config.splash_style;
-					// 扩展可通过window.splashurl设置素材读取路径
-					if (window.splashurl == undefined) window.splashurl = "image/splash/";
-					if (lib.config.splash_style == "style1" || lib.config.splash_style == "style2") {
-						ui.create.div(node, ".avatar").setBackgroundImage("image/splash/" + lib.config.splash_style + "/" + lib.config.all.mode[i] + ".jpg");
-					} else {
-						ui.create.div(node, ".avatar").setBackgroundImage(splashurl + lib.config.splash_style + "/" + lib.config.all.mode[i] + ".jpg");
-					}
-				} else {
-					var avatarnode = ui.create.div(node, ".avatar");
-					var avatarbg = lib.mode[lib.config.all.mode[i]].splash;
-					if (avatarbg.startsWith("ext:")) {
-						avatarnode.setBackgroundImage(avatarbg.replace(/^ext:/, "extension/"));
-					} else {
-						avatarnode.setBackgroundDB(avatarbg);
-					}
-				}
-				if (!lib.config.touchscreen) {
-					node.addEventListener("mousedown", downNode);
-					node.addEventListener("mouseup", upNode);
-					node.addEventListener("mouseleave", upNode);
-				}
-				setTimeout(
-					(function (node) {
-						return function () {
-							node.show();
-						};
-					})(node),
-					i * 100
-				);
-			}
-			if (lib.config.mousewheel) {
-				splash.onmousewheel = ui.click.mousewheel;
-			}
-		};
-	} else {
-		Reflect.set(window, "resetGameTimeout", resetGameTimeout);
 	}
 
 	localStorage.removeItem(lib.configprefix + "directstart");
