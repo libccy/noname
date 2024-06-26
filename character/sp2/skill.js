@@ -1290,7 +1290,7 @@ const skills = {
 			"step 1";
 			player.draw(player.countMark("starpizhi"));
 			"step 2"
-			if (player.isDamaged()) player.recover();
+			if (player.isDamaged() && trigger.name == "die") player.recover();
 		},
 		intro: { content: "已失去#个“玺角”" },
 		ai: { combo: "starcanxi" },
