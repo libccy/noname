@@ -202,6 +202,7 @@ const skills = {
 						["shu", "rejizhi"],
 						["wu", "rezhiheng"],
 						["qun", "rewansha"],
+						["key", "hiroto_zonglve"]
 					]);
 					if (Array.from(groupList.keys()).includes(player.group)) skills.push(groupList.get(player.group));
 					skills = skills.filter(skill => !player.hasSkill(skill, null, null, false));
