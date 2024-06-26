@@ -28,8 +28,7 @@ import { freezeButExtensible } from "../util/index.js";
 import security from "../util/security.js";
 import { ErrorManager } from "../util/error.js";
 
-import { DefaultSplash } from "../init/onload/DefaultSplash.ts";
-import { WideSplash } from "../init/onload/WideSplash.ts";
+import { defaultSplashs } from "../init/onload/mod.ts";
 
 export class Library {
 	configprefix = "noname_0.9_";
@@ -142,7 +141,7 @@ export class Library {
 	/**
 	 * @type { IOnloadSplash[] }
 	 */
-	onloadSplash = [new DefaultSplash(), new WideSplash()];
+	onloadSplash = [...defaultSplashs];
 
 	cardType = {};
 	hook = { globalskill: {} };
