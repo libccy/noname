@@ -9,9 +9,20 @@ export class DefaultSplash implements IOnloadSplash {
 	path = "image/splash/style1/";
 	resolve: (mode: string) => void;
 	app: any;
+	clicked: HTMLDivElement;
 
 	async init(node: HTMLDivElement, resolve: (mode: string) => void) {
 		this.resolve = resolve;
+
+		if (lib.config.touchscreen) {
+			node.classList.add("touch");
+			lib.setScroll(node);
+		}
+		if (lib.config.player_border != "wide") {
+			node.classList.add("slim");
+		}
+
+		node.dataset.radius_size = lib.config.radius_size;
 
 		this.app = createApp(OnloadSplash, {
 			handle: this.handle.bind(this),
@@ -19,10 +30,17 @@ export class DefaultSplash implements IOnloadSplash {
 		});
 
 		this.app.mount(node);
+
+		if (lib.config.mousewheel) {
+			node.addEventListener("wheel", ui.click.mousewheel);
+		}
 	}
 
 	async dispose(node: HTMLDivElement): Promise<void> {
-		node.delete(1000, () => this.app.unmount());
+		node.delete(1000);
+
+		await new Promise<void>(resolve => this.clicked.listenTransition(resolve, 500));
+		this.app.unmount();
 	}
 
 	handle(mode: string) {
@@ -47,6 +65,7 @@ export class DefaultSplash implements IOnloadSplash {
 			}
 		}
 
-		node.listenTransition(() => this.resolve(mode), 500);
+		this.clicked = node;
+		this.resolve(mode);
 	}
 }
