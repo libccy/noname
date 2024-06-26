@@ -142,7 +142,7 @@ export class Library {
 	/**
 	 * @type { IOnloadSplash[] }
 	 */
-	onloadSplash = [DefaultSplash, WideSplash];
+	onloadSplash = [new DefaultSplash(), new WideSplash()];
 
 	cardType = {};
 	hook = { globalskill: {} };
