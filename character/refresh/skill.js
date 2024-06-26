@@ -5354,7 +5354,7 @@ const skills = {
 	rewansha: {
 		audio: "wansha",
 		audioname: ["re_jiaxu", "boss_lvbu3"],
-		audioname2: { shen_simayi: "jilue_wansha" },
+		audioname2: { shen_simayi: "jilue_wansha", xin_simayi: "jilue_wansha" },
 		global: "rewansha_global",
 		trigger: { global: "dyingBegin" },
 		forced: true,
@@ -13146,7 +13146,7 @@ const skills = {
 	},
 	rezhiheng: {
 		audio: 2,
-		audioname2: { shen_caopi: "rezhiheng_shen_caopi" },
+		audioname2: { shen_caopi: "rezhiheng_shen_caopi", xin_simayi: "jilue_zhiheng" },
 		mod: {
 			aiOrder: function (player, card, num) {
 				if (num <= 0 || get.itemtype(card) !== "card" || get.type(card) !== "equip") return num;
@@ -13239,7 +13239,7 @@ const skills = {
 	},
 	rejizhi: {
 		audio: 2,
-		audioname2: { lukang: "rejizhi_lukang" },
+		audioname2: { lukang: "rejizhi_lukang", xin_simayi: "jilue_jizhi" },
 		locked: false,
 		trigger: { player: "useCard" },
 		frequent: true,
@@ -13586,6 +13586,7 @@ const skills = {
 	},
 	reguicai: {
 		audio: 2,
+		audioname2: { xin_simayi: "jilue_guicai" },
 		trigger: { global: "judge" },
 		direct: true,
 		filter: function (event, player) {
