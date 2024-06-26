@@ -16,12 +16,18 @@ let props = defineProps<{
 }>();
 
 let nodeList: Ref<HTMLDivElement[]> = ref([]);
+let clicked = false;
 
 onMounted(() => {
 	nodeList.value.forEach(async node => {
 		let mode = node.getAttribute("link")!;
 		let index = parseInt(node.getAttribute("index")!);
-		node.listen(() => props.click(mode, node));
+        node.listen(() => {
+            if (!clicked) {
+                clicked = true;
+                props.click(mode, node);
+            }
+        });
 
 		let avatar = node.querySelector(".avatar") as HTMLDivElement;
 
