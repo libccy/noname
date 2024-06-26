@@ -629,7 +629,7 @@ export async function onload(resetGameTimeout) {
 	};
 
 	lib.onloadSplash.forEach(splash => {
-		lib.configMenu.appearence.config.splash_style.items[splash.id] = splash.name;
+		lib.configMenu.appearence.config.splash_style.item[splash.id] = splash.name;
 	});
 
 	Reflect.set(window, "resetGameTimeout", resetGameTimeout);
