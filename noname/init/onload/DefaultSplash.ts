@@ -14,8 +14,8 @@ export class DefaultSplash implements IOnloadSplash {
 		this.resolve = resolve;
 
 		this.app = createApp(OnloadSplash, {
-			handle: this.handle,
-			click: this.click,
+			handle: this.handle.bind(this),
+			click: this.click.bind(this),
 		});
 
 		this.app.mount(node);
