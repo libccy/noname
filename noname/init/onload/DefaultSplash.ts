@@ -26,6 +26,7 @@ export class DefaultSplash implements IOnloadSplash {
 		}
 
 		node.dataset.radius_size = lib.config.radius_size;
+		node.dataset.splash_style = lib.config.splash_style;
 
 		this.app = createApp(OnloadSplash, {
 			handle: this.handle.bind(this),
@@ -40,10 +41,10 @@ export class DefaultSplash implements IOnloadSplash {
 	}
 
 	async dispose(node: HTMLDivElement): Promise<void> {
+		console.log(this.clicked);
 		node.delete(1000);
 
 		await new Promise<void>(resolve => this.clicked.listenTransition(resolve, 500));
-		this.app.unmount();
 	}
 
 	preview(node: HTMLDivElement): void {
@@ -62,13 +63,13 @@ export class DefaultSplash implements IOnloadSplash {
 	}
 
 	click(mode: string, node: HTMLDivElement) {
-		lib.config.mode = mode;
-		game.saveConfig("mode", mode);
-		if (game.layout != "mobile" && lib.layoutfixed.indexOf(lib.config.mode) !== -1) {
+		node.classList.add("clicked");
+
+		if (game.layout != "mobile" && lib.layoutfixed.indexOf(mode) !== -1) {
 			game.layout = "mobile";
 			// @ts-ignore
 			ui.css.layout.href = lib.assetURL + "layout/" + game.layout + "/layout.css";
-		} else if (game.layout == "mobile" && lib.config.layout != "mobile" && lib.layoutfixed.indexOf(lib.config.mode) === -1) {
+		} else if (game.layout == "mobile" && lib.config.layout != "mobile" && lib.layoutfixed.indexOf(mode) === -1) {
 			game.layout = lib.config.layout;
 			if (game.layout == "default") {
 				// @ts-ignore
