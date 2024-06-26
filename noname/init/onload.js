@@ -628,13 +628,19 @@ export async function onload(resetGameTimeout) {
 		}
 	};
 
+	lib.onloadSplash.forEach(splash => {
+		lib.configMenu.appearence.config.splash_style.items[splash.id] = splash.name;
+	});
+
 	Reflect.set(window, "resetGameTimeout", resetGameTimeout);
 	if (!lib.imported.mode?.[lib.config.mode]) {
 		window.inSplash = true;
 		clearTimeout(resetGameTimeout);
 
-		if (lib.config.splash_style == undefined) game.saveConfig("splash_style", "style1");
+		if (lib.config.splash_style == undefined) game.saveConfig("splash_style", lib.onloadSplash[0].id);
 		let splash = lib.onloadSplash.find(item => item.id == lib.config.splash_style);
+		if (!splash) splash = lib.onloadSplash[0];
+
 		let node = ui.create.div("#splash", document.body);
 
 		let { promise, resolve } = Promise.withResolvers();
