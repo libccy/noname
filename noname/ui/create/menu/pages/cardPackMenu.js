@@ -82,8 +82,9 @@ export const cardPackMenu = function (connectMenu) {
 						if (!game.hasExtension(extName) || !game.hasExtensionLoaded(extName)) continue;
 						if (lib.config[`extension_${extName}_cards_enable`] == true) {
 							node.classList.remove("off");
-							if (node.link) node.link.firstChild.classList.add("on");
-						} else {
+							if (node.link && node.link.firstChild) node.link.firstChild.classList.add("on");//QQQ
+						} 
+						else {
 							node.classList.add("off");
 							if (node.link) node.link.firstChild.classList.remove("on");
 						}
