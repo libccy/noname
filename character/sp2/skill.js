@@ -364,38 +364,40 @@ const skills = {
 			player: "useCardToPlayered",
 		},
 		filter(event, player) {
-			if (event.targets.length > 1) return false;
 			if (
 				player.hasHistory("useCard", evt => {
 					if (evt === event.getParent()) return false;
 					const targets = evt.targets;
-					return targets.length === 1 && targets[0] !== player;
+					return evt.isPhaseUsing() && targets.some(target => target !== player);
 				})
 			)
 				return false;
-			const target = event.target;
-			if (target === player || !target.isIn()) return false;
-			return true;
+			return (event.targets || []).some(target => target !== player);
 		},
-		logTarget: "target",
 		locked: false,
-		check(event, player) {
-			return (
-				get.attitude(player, event.target) <= 0 ||
-				!player.hasCard(card => {
-					return game.hasPlayer(current => {
-						return get.effect(current, card, player, player) > 0 && player.canUse(card, current, true, true);
-					});
-				}, "hs")
-			);
-		},
-		prompt2(event, player) {
-			return `摸${get.cnNumber(player.getDamagedHp() + 1)}张牌，令所有除${get.translation(event.target)}外的其他角色不在你的攻击范围内，且你对其造成的伤害逐次增加。`;
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt(event.name.slice(0, -5))`选择其中一名目标角色，摸${get.cnNumber(player.getDamagedHp() + 1)}张牌，令所有除其外的其他角色不在你的攻击范围内，且你对其造成的伤害逐次增加。`, (card, player, target) => {
+					return target != player && get.event().getTrigger().targets.includes(target);
+				})
+				.set("ai", target => {
+					const player = get.player();
+					if (
+						player.hasCard(card => {
+							return game.hasPlayer(current => {
+								return get.effect(current, card, player, player) > 0 && player.canUse(card, current, true, true);
+							});
+						}, "hs")
+					)
+						return 0;
+					return -get.attitude(player, target);
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			await player.draw(player.getDamagedHp() + 1);
 			player.addTempSkill("starruijun_effect", "phaseChange");
-			player.markAuto("starruijun_effect", trigger.target);
+			player.markAuto("starruijun_effect", event.targets[0]);
 		},
 		subSkill: {
 			effect: {
@@ -1841,8 +1843,11 @@ const skills = {
 		async content(event, trigger, player) {
 			player.awakenSkill("dcdanji");
 			await player.loseMaxHp();
-			await player.recover(player.maxHp - player.hp);
-			await player.draw(player.getHp());
+			const num = player.maxHp - player.hp;
+			if (num) {
+				await player.recover(num);
+				await player.draw(num);
+			}
 			await player.addSkills(["mashu", "dcnuchen"]);
 		},
 		ai: {

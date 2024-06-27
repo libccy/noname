@@ -11417,10 +11417,7 @@ const skills = {
 				filter: function (event, player) {
 					var storage1 = event.player.getStorage("dcfudao_deadmark"),
 						storage2 = player.getStorage("dcfudao_effect");
-					for (var i of storage1) {
-						if (storage2.includes(i)) return true;
-					}
-					return false;
+					return storage1.some(i => storage2.includes(i)) && get.color(event.card) == "black";
 				},
 				content: function () {
 					trigger.player.addTempSkill("dcfudao_blocker");

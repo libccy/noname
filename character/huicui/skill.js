@@ -11328,7 +11328,7 @@ const skills = {
 		filter: function (event, player) {
 			if (player == event.player || !event.player.isIn()) return false;
 			if (
-				!player.hasAllHistory("useSkill", function (evt) {
+				!player.hasHistory("useSkill", function (evt) {
 					return evt.skill == "huguan" && evt.targets.includes(event.player);
 				})
 			)
