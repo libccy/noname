@@ -510,7 +510,7 @@ class Globals {
 	static #topGlobals;
 	/** @type {WeakMap<Domain, [WeakMap, Object]>} */
 	static #globals = new WeakMap();
-	/** @type {Object<string|symbol, true>} */
+	/** @type {Record<string|symbol, true>} */
 	static #builtinKeys = {};
 
 	/**
@@ -700,6 +700,12 @@ const wrappingFunctions = [
 	["IDBRequest", "prototype", /^on[a-z0-9]+$/, "*"],
 	["XMLHttpRequestEventTarget", "prototype", /^on[a-z0-9]+$/, "*"],
 	"/MutationObserver",
+
+	// 对于 cordova 的特殊处理
+	"/document/addEventListener",
+	"/document/removeEventListener",
+	"/window/addEventListener",
+	"/window/removeEventListener",
 
 	// "/HTMLCanvasElement/prototype/toBlob",
 	// "/DataTransferItem/prototype/getAsString",
@@ -1104,9 +1110,9 @@ class DomainMonitors {
 	/** @type {WeakMap<Domain, DomainMonitors>} */
 	static #domainMonitors = new WeakMap();
 
-	/** @type {WeakMap<Object, Set<Monitor>>} */
+	/** @type {WeakMap<Object, Record<number, Set<Monitor>>>} */
 	#targetMonitorsMap = new WeakMap();
-	/** @type {WeakMap<Domain, Object<number, Set<Monitor>>>} */
+	/** @type {WeakMap<Domain, Record<number, Set<Monitor>>>} */
 	#monitorsMap = new WeakMap();
 
 	/**
@@ -1128,21 +1134,6 @@ class DomainMonitors {
 		] = Monitor[SandboxExposer2]
 				(SandboxSignal_ExposeInfo, monitor);
 
-		// 如果指定了目标，使用目标 Monitor 集合
-		// 以此对于特定对象的 Monitor 进行性能优化
-		if (targets) {
-			for (const target of targets) {
-				let monitors = thiz.#targetMonitorsMap.get(target);
-
-				if (!monitors)
-					thiz.#targetMonitorsMap.set(target, monitors = new Set());
-
-				monitors.add(monitor);
-			}
-
-			return;
-		}
-
 		/**
 		 * @param {{ [x: number]: Set<Monitor>; }} actionMap
 		 */
@@ -1155,6 +1146,22 @@ class DomainMonitors {
 
 				monitorMap.add(monitor);
 			}
+		}
+
+		// 如果指定了目标，使用目标 Monitor 集合
+		// 以此对于特定对象的 Monitor 进行性能优化
+		if (targets) {
+			for (const target of targets) {
+				let actionMap = thiz.#targetMonitorsMap.get(target);
+
+				if (!actionMap)
+					thiz.#targetMonitorsMap.set(target, actionMap = {});
+
+				// 根据 actions 添加到不同的触发器集合
+				addToActionMap(actionMap);
+			}
+
+			return;
 		}
 
 		const domainList = [];
@@ -1205,20 +1212,6 @@ class DomainMonitors {
 		] = Monitor[SandboxExposer2]
 				(SandboxSignal_ExposeInfo, monitor);
 
-		// 对于指定了目标的 Monitor 特殊处理
-		if (targets) {
-			for (const target of targets) {
-				const monitors = thiz.#targetMonitorsMap.get(target);
-
-				if (!monitors)
-					continue;
-
-				monitors.delete(monitor);
-			}
-
-			return;
-		}
-
 		/**
 		 * @param {{ [x: number]: Set<Monitor>; }} actionMap
 		 */
@@ -1231,6 +1224,21 @@ class DomainMonitors {
 
 				monitorMap.delete(monitor);
 			}
+		}
+
+		// 对于指定了目标的 Monitor 特殊处理
+		if (targets) {
+			for (const target of targets) {
+				const actionMap = thiz.#targetMonitorsMap.get(target);
+
+				if (!actionMap)
+					continue;
+
+				// 根据 actions 从不同的触发器集合移除
+				removeFromActionMap(actionMap);
+			}
+
+			return;
 		}
 
 		const domainList = [];
@@ -1278,14 +1286,15 @@ class DomainMonitors {
 		if (!instance)
 			return null;
 
-		const targetMap = instance.#targetMonitorsMap.get(target);
+		const targetActionMap = instance.#targetMonitorsMap.get(target);
+		const targetMonitors = targetActionMap && targetActionMap[action];
 		const actionMap = instance.#monitorsMap.get(targetDomain);
 		const actionMonitors = actionMap && actionMap[action];
 
 		let array = null;
 
-		if (targetMap)
-			array = [...targetMap]; // 优先执行指定目标的 Monitor
+		if (targetMonitors)
+			array = [...targetMonitors]; // 优先执行指定目标的 Monitor
 
 		if (actionMonitors) {
 			if (!array)
@@ -1582,7 +1591,7 @@ class Monitor {
 	#disallowDomains = null;
 	/** @type {Set<number>} */
 	#actions = new Set();
-	/** @type {Object<string, Set>} */
+	/** @type {Record<string, Set>} */
 	#checkInfo = {};
 	/** @type {Function?} */
 	#filter = null;
@@ -1906,8 +1915,8 @@ class Monitor {
 	 * 检查 Monitor 监听的命名参数是否符合要求
 	 * ```
 	 * 
-	 * @param {Object<string, any>} nameds 
-	 * @param {Object<string, Set>} checkInfo 
+	 * @param {Record<string, any>} nameds 
+	 * @param {Record<string, Set>} checkInfo 
 	 */
 	static #check = function (nameds, checkInfo) {
 		for (const [key, value] of Object.entries(nameds)) {
