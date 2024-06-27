@@ -22,7 +22,6 @@ const skills = {
 				var list = Array.from({
 					length: 4,
 				}).map((_, i) => get.cnNumber(i + 1, true));
-				console.log(list);
 				if (get.effect(player, { name: "losehp" }, player, player) > 4 || player.countCards("hs", card => player.canSaveCard(card, player)) > 0 || player.hp > 2) return "四";
 				return "二";
 			},
@@ -1690,7 +1689,7 @@ const skills = {
 		usable: 1,
 		forced: true,
 		async content(event, trigger, player) {
-			await player.draw(2);
+			await player.draw(3);
 			await player.loseHp();
 		},
 		ai: {
@@ -1706,7 +1705,8 @@ const skills = {
 			});
 		},
 		filterTarget(card, player, target) {
-			return target.countCards("h") > player.countCards("h") || target.getHp() > player.getHp();
+			if (target == player) return false;
+			return target.countCards("h") >= player.countCards("h") || target.getHp() >= player.getHp();
 		},
 		usable: 1,
 		forced: true,
@@ -5148,18 +5148,23 @@ const skills = {
 		filterTarget: function (card, player, target) {
 			return target.hp <= player.hp;
 		},
-		content: function () {
-			"step 0";
-			var targets = game.filterPlayer(current => target.inRange(current) && current != player).sortBySeat(player);
-			event.targets = targets;
-			if (!targets.length) event.finish();
-			"step 1";
-			var current = targets.shift();
-			if (current.countCards("he")) current.chooseToDiscard("驰应：请弃置一张牌", "he", true);
-			if (targets.length) event.redo();
-			"step 2";
+		async content(event, tirgger, player) {
+			const target = event.target, targets = [player];
+			while (game.hasPlayer(current => target.inRange(current) && !targets.includes(current))) {
+				const result = await target.chooseTarget("驰应：是否弃置攻击范围内一名角色一张牌？", function (card, player, target) {
+					return _status.event.player.inRange(target) && !_status.event.targets.includes(target);
+				}).set("targets", targets).set('ai', function (target) {
+					return get.effect(target, { name: "guohe_copy2" }, _status.event.player, _status.event.player);
+				}).forResult();
+				if (result.bool) {
+					target.line(result.targets, 'green');
+					await target.discardPlayerCard(result.targets[0], true, "he");
+					targets.addArray(result.targets);
+				}
+				else break;
+			}
 			if (target != player) {
-				var cards = [];
+				let cards = [];
 				game.getGlobalHistory("cardMove", evt => {
 					if (evt.getParent(3) == event) {
 						cards.addArray(evt.cards.filter(card => get.type(card) == "basic"));
@@ -9693,7 +9698,7 @@ const skills = {
 				charlotte: true,
 				locked: true,
 				skillBlocker: function (skill, player) {
-					return skill != "bazhen" && skill != "dcjiezhen_blocker" && !lib.skill[skill].charlotte && !info.persevereSkill && player.getStorage("dcjiezhen_blocker").includes(skill);
+					return skill != "bazhen" && skill != "dcjiezhen_blocker" && !lib.skill[skill].charlotte && !lib.skill[skill].persevereSkill && player.getStorage("dcjiezhen_blocker").includes(skill);
 				},
 				mark: true,
 				marktext: "阵",
@@ -11329,7 +11334,7 @@ const skills = {
 		filter: function (event, player) {
 			if (player == event.player || !event.player.isIn()) return false;
 			if (
-				!player.hasAllHistory("useSkill", function (evt) {
+				!player.hasHistory("useSkill", function (evt) {
 					return evt.skill == "huguan" && evt.targets.includes(event.player);
 				})
 			)
@@ -13383,7 +13388,7 @@ const skills = {
 			player.chooseToDiscard("h", true);
 		},
 		ai: {
-			halfneg: true,
+			neg: true,
 			nokeep: true,
 		},
 	},

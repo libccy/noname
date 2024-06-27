@@ -900,6 +900,7 @@ const skills = {
 	stdtiaohe: {
 		audio: "fyjianyu",
 		enable: "phaseUse",
+		usable: 1,
 		filter(event, player) {
 			return game.hasPlayer(target => {
 				return target.getDiscardableCards(player, "e").some(card => parseInt(get.subtype(card).slice("equip".length)) <= 2);
@@ -1227,6 +1228,9 @@ const skills = {
 	},
 	guicai: {
 		audio: 2,
+		audioname2: {
+			xin_simayi: "jilue_guicai",
+		},
 		trigger: { global: "judge" },
 		preHidden: true,
 		filter(event, player) {
@@ -2231,6 +2235,9 @@ const skills = {
 	jizhi: {
 		audio: 2,
 		audioname: ["jianyong"],
+		audioname2: {
+			xin_simayi: "jilue_jizhi",
+		},
 		trigger: { player: "useCard" },
 		frequent: true,
 		preHidden: true,
@@ -2344,6 +2351,9 @@ const skills = {
 	zhiheng: {
 		audio: 2,
 		audioname: ["gz_jun_sunquan"],
+		audioname2: {
+			xin_simayi: "jilue_zhiheng",
+		},
 		mod: {
 			aiOrder(player, card, num) {
 				if (num <= 0 || get.itemtype(card) !== "card" || get.type(card) !== "equip") return num;

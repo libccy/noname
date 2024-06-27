@@ -615,11 +615,11 @@ const skills = {
 			order: 9,
 			result: {
 				player(player, target) {
-					let tars = _status.event.putTempCache("jsrgguanshi", "targets", targets);
+					let tars = _status.event.getTempCache("jsrgguanshi", "targets");
 					if (!tars) return lib.card.juedou.ai.result.player(player, target);
 				},
 				target(player, target) {
-					let tars = _status.event.putTempCache("jsrgguanshi", "targets", targets);
+					let tars = _status.event.getTempCache("jsrgguanshi", "targets");
 					if (!tars) return lib.card.juedou.ai.result.target(player, target);
 					for (let tar of tars) {
 						if (tar[0] === target) return tar[1] / get.attitude(player, target);
@@ -1804,7 +1804,7 @@ const skills = {
 	jsrgfumou: {
 		audio: 2,
 		trigger: { global: "chooseToDebateAfter" },
-		groupSkill: true,
+		groupSkill: "wei",
 		forced: true,
 		locked: false,
 		filter: function (event, player) {
@@ -1896,7 +1896,7 @@ const skills = {
 		enable: "chooseToUse",
 		filterCard: { name: "ying" },
 		position: "hs",
-		groupSkill: true,
+		groupSkill: "shu",
 		locked: false,
 		viewAs: {
 			name: "sha",
@@ -5994,7 +5994,7 @@ const skills = {
 			if (player.group != "qun") return false;
 			return game.hasPlayer(current => lib.skill.jsrgqingxi.filterTarget("", player, current));
 		},
-		groupSkill: true,
+		groupSkill: "qun",
 		filterTarget: function (card, player, target) {
 			if (target.countCards("h") >= player.countCards("h")) return false;
 			return !player.getStorage("jsrgqingxi_used").includes(target);
@@ -6051,7 +6051,7 @@ const skills = {
 			if (player.group != "wei") return false;
 			return game.hasPlayer(current => current.countCards("h") > player.countCards("h"));
 		},
-		groupSkill: true,
+		groupSkill: "wei",
 		filterTarget: function (card, player, target) {
 			return target.countCards("h") > player.countCards("h");
 		},
@@ -6181,7 +6181,7 @@ const skills = {
 					}))
 			);
 		},
-		groupSkill: true,
+		groupSkill: "qun",
 		position: "hes",
 		filterCard: true,
 		selectCard: 1,
@@ -6235,7 +6235,7 @@ const skills = {
 				return current != player && current.group == player.group;
 			});
 		},
-		groupSkill: true,
+		groupSkill: "shu",
 		content: function () {
 			trigger.directHit.addArray(
 				game.filterPlayer(current => {
@@ -6254,7 +6254,7 @@ const skills = {
 	jsrgqiongtu: {
 		audio: 2,
 		enable: "chooseToUse",
-		groupSkill: true,
+		groupSkill: "qun",
 		viewAs: {
 			name: "wuxie",
 			suit: "none",
@@ -6342,7 +6342,7 @@ const skills = {
 				}, "hs")
 			);
 		},
-		groupSkill: true,
+		groupSkill: "wei",
 		locked: false,
 		viewAs: {
 			name: "sha",
@@ -7144,7 +7144,7 @@ const skills = {
 			return val - get.value(card);
 		},
 		position: "he",
-		groupSkill: true,
+		groupSkill: "qun",
 		lose: false,
 		discard: false,
 		delay: false,
@@ -7195,7 +7195,7 @@ const skills = {
 				})
 			);
 		},
-		groupSkill: true,
+		groupSkill: "wei",
 		direct: true,
 		content: function () {
 			"step 0";

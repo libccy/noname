@@ -7,7 +7,7 @@ import { ui } from "../../ui/index.js";
 export class Character {
 	/**
 	 * 武将牌的性别
-	 * @type { string }
+	 * @type { Sex | "" }
 	 **/
 	sex;
 	/**

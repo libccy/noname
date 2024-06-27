@@ -364,38 +364,40 @@ const skills = {
 			player: "useCardToPlayered",
 		},
 		filter(event, player) {
-			if (event.targets.length > 1) return false;
 			if (
 				player.hasHistory("useCard", evt => {
 					if (evt === event.getParent()) return false;
 					const targets = evt.targets;
-					return targets.length === 1 && targets[0] !== player;
+					return evt.isPhaseUsing() && targets.some(target => target !== player);
 				})
 			)
 				return false;
-			const target = event.target;
-			if (target === player || !target.isIn()) return false;
-			return true;
+			return (event.targets || []).some(target => target !== player && target.isIn());
 		},
-		logTarget: "target",
 		locked: false,
-		check(event, player) {
-			return (
-				get.attitude(player, event.target) <= 0 ||
-				!player.hasCard(card => {
-					return game.hasPlayer(current => {
-						return get.effect(current, card, player, player) > 0 && player.canUse(card, current, true, true);
-					});
-				}, "hs")
-			);
-		},
-		prompt2(event, player) {
-			return `摸${get.cnNumber(player.getDamagedHp() + 1)}张牌，令所有除${get.translation(event.target)}外的其他角色不在你的攻击范围内，且你对其造成的伤害逐次增加。`;
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt(event.name.slice(0, -5))`选择其中一名目标角色，摸${get.cnNumber(player.getDamagedHp() + 1)}张牌，令所有除其外的其他角色不在你的攻击范围内，且你对其造成的伤害逐次增加。`, (card, player, target) => {
+					return target != player && get.event().getTrigger().targets.includes(target) && target.isIn();
+				})
+				.set("ai", target => {
+					const player = get.player();
+					if (
+						player.hasCard(card => {
+							return game.hasPlayer(current => {
+								return get.effect(current, card, player, player) > 0 && player.canUse(card, current, true, true);
+							});
+						}, "hs")
+					)
+						return 0;
+					return -get.attitude(player, target);
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			await player.draw(player.getDamagedHp() + 1);
 			player.addTempSkill("starruijun_effect", "phaseChange");
-			player.markAuto("starruijun_effect", trigger.target);
+			player.markAuto("starruijun_effect", event.targets[0]);
 		},
 		subSkill: {
 			effect: {
@@ -1093,7 +1095,9 @@ const skills = {
 			if (event.triggername != "roundStart") {
 				var list = game.filterPlayer().reduce((list, target) => list.add(target.group), []);
 				list.sort((a, b) => lib.group.indexOf(a) - lib.group.indexOf(b));
+				let lacks = lib.group.filter(group => group != "shen" && !list.includes(group));
 				list.forEach(group => lib.skill.starcanxi.create(group, player));
+				if (lacks.length) player.gainMaxHp(lacks.length);
 				event.finish();
 				return;
 			}
@@ -1272,6 +1276,7 @@ const skills = {
 		trigger: { player: "phaseEnd", global: "die" },
 		filter: function (event, player) {
 			if (event.name == "phase") return player.hasMark("starpizhi");
+			if (!game.hasPlayer(current => current != event.player && current.group == event.player.group)) return true;
 			if (!player.getStorage("starcanxi_wangsheng").includes(event.player.group) && !player.getStorage("starcanxi_xiangsi").includes(event.player.group)) return false;
 			var groups = player.getSkills().filter(skill => skill.indexOf("starcanxi_") == 0);
 			groups = groups.map(group => group.slice(10));
@@ -1286,6 +1291,8 @@ const skills = {
 			}
 			"step 1";
 			player.draw(player.countMark("starpizhi"));
+			"step 2"
+			if (player.isDamaged() && trigger.name == "die") player.recover();
 		},
 		intro: { content: "已失去#个“玺角”" },
 		ai: { combo: "starcanxi" },
@@ -1841,8 +1848,11 @@ const skills = {
 		async content(event, trigger, player) {
 			player.awakenSkill("dcdanji");
 			await player.loseMaxHp();
-			await player.recover(player.maxHp - player.hp);
-			await player.draw(player.getHp());
+			const num = player.maxHp - player.hp;
+			if (num) {
+				await player.recover(num);
+				await player.draw(num);
+			}
 			await player.addSkills(["mashu", "dcnuchen"]);
 		},
 		ai: {
@@ -5092,7 +5102,7 @@ const skills = {
 	difa: {
 		trigger: { player: "gainAfter" },
 		filter: function (event, player) {
-			if (player != _status.currentPhase || event.getParent().name != "draw") return false;
+			if (player != _status.currentPhase) return false;
 			var hs = player.getCards("h");
 			if (!hs.length) return false;
 			for (var i of event.cards) {
@@ -6390,6 +6400,9 @@ const skills = {
 				player.markAuto("xuezhao_hit", [target]);
 			}
 		},
+		contentAfter:function(){
+			if(!player.getHistory('gain',evt=>evt.getParent('useSkill')==event.getParent('useSkill')).length) player.drawTo(player.maxHp);
+		},
 		ai: {
 			threaten: 2.4,
 			order: 3.6,
@@ -6585,7 +6598,6 @@ const skills = {
 	//张横
 	dangzai: {
 		trigger: { player: "phaseUseBegin" },
-		direct: true,
 		filter: function (event, player) {
 			return (
 				!player.isDisabledJudge() &&
@@ -6599,9 +6611,8 @@ const skills = {
 				})
 			);
 		},
-		content: function () {
-			"step 0";
-			player.chooseTarget(
+		async cost(event, trigger, player) {
+			event.result = await player.chooseTarget(
 				function (card, player, target) {
 					return (
 						target != player &&
@@ -6611,27 +6622,25 @@ const skills = {
 					);
 				},
 				get.prompt("dangzai"),
-				"将一名其他角色判定区内的一张牌移动到你的判定区内"
-			);
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				event.target = target;
-				player.logSkill("dangzai", target);
-				player.choosePlayerCard(target, "j", true).set("filterButton", function (button) {
-					return _status.event.player.canAddJudge(button.link);
-				});
-			} else event.finish();
-			"step 2";
-			if (result.bool && result.cards && result.cards.length) {
-				var card = result.cards[0];
-				target.$give(card, player);
-				game.delayx();
-				var name = card.viewAs || card.name;
-				if (card.name != name) {
-					player.addJudge(name, card);
-				} else {
-					player.addJudge(card);
+				"将一名其他角色判定区内的任意张牌移动到你的判定区内"
+			).forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			const result = await player.choosePlayerCard(target, "j", true, [1, Infinity]).set("filterButton", function (button) {
+				return _status.event.player.canAddJudge(button.link);
+			}).forResult();
+			if (result.bool && result.cards) {
+				while (result.cards.length) {
+					const card = result.cards.shift();
+					target.$give(card, player);
+					await game.asyncDelay();
+					const name = card.viewAs || card.name;
+					if (card.name != name) {
+						await player.addJudge(name, card);
+					} else {
+						await player.addJudge(card);
+					}
 				}
 			}
 		},
@@ -6643,7 +6652,6 @@ const skills = {
 		},
 		forced: true,
 		filter: function (event, player) {
-			if (player.hp <= 1) return false;
 			if (event.player == player) {
 				if (event.name == "equip" && get.color(event.card, player) == "black") return true;
 				if (event.name == "addJudge" && get.color(event.cards[0], player) == "black") return true;
@@ -6658,9 +6666,23 @@ const skills = {
 			}
 			return false;
 		},
-		content: function () {
-			player.loseHp();
-			player.draw(2);
+		getIndex: function (event, player, triggername) {
+			if (event.player == player) {
+				if (event.name == "equip" && get.color(event.card, player) == "black") return 1;
+				if (event.name == "addJudge" && get.color(event.cards[0], player) == "black") return 1;
+			}
+			let evt = event.getl(player), num = 0;
+			for (var i of evt.es) {
+				if (get.color(i, player) == "black") num++;
+			}
+			for (var i of evt.js) {
+				if (get.color(i, player) == "black") num++;
+			}
+			return num
+		},
+		async content(event, trigger, player) {
+			await player.draw(2);
+			if (player.hp > 1) await player.loseHp();
 		},
 	},
 	//狼灭

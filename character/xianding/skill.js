@@ -515,7 +515,7 @@ const skills = {
 					.map((_, i) => i + 1)
 					.reduce((sum, i) => sum + target.countEmptySlot(i), 0)
 			);
-			if (player.countMark("dcsbfengmin") > player.maxHp) {
+			if (player.countMark("dcsbfengmin") > player.getDamagedHp()) {
 				player.tempBanSkill("dcsbfengmin");
 			}
 		},
@@ -976,7 +976,10 @@ const skills = {
 				}
 			}
 		},
-		zhuanhuanji: true,
+		zhuanhuanji(player, skill) {
+			player.storage[skill] = !player.storage[skill];
+			//player.changeSkin({ characterName: "dc_sb_jiaxu" }, "dc_sb_jiaxu" + (player.storage[skill] ? "_shadow" : ""));
+		},
 		marktext: "☯",
 		mark: true,
 		intro: {
@@ -1016,7 +1019,6 @@ const skills = {
 				check: () => Math.random() > 0.5,
 				content() {
 					player.changeZhuanhuanji("dcsbfumou");
-					//player.changeSkin("dcsbfumou", "dc_sb_jiaxu" + (player.storage.dcsbfumou ? "_shadow" : ""));
 				},
 			},
 		},
@@ -2003,7 +2005,10 @@ const skills = {
 	dcsbquanmou: {
 		audio: 2,
 		audioname: ["dc_sb_simayi_shadow"],
-		zhuanhuanji: true,
+		zhuanhuanji(player, skill) {
+			player.storage[skill] = !player.storage[skill];
+			player.changeSkin({ characterName: "dc_sb_simayi" }, "dc_sb_simayi" + (player.storage[skill] ? "_shadow" : ""));
+		},
 		marktext: "☯",
 		enable: "phaseUse",
 		filter(event, player) {
@@ -2023,7 +2028,6 @@ const skills = {
 		async content(event, trigger, player) {
 			const target = event.targets[0];
 			player.changeZhuanhuanji("dcsbquanmou");
-			player.changeSkin("dcsbquanmou", "dc_sb_simayi" + (player.storage.dcsbquanmou ? "_shadow" : ""));
 			player.markAuto("dcsbquanmou_selected", [target]);
 			const cards = await target.chooseCard("he", true, `选择交给${get.translation(player)}一张牌`).forResultCards();
 			if (cards && cards.length) {
@@ -2075,7 +2079,6 @@ const skills = {
 				check: () => Math.random() > 0.5,
 				content() {
 					player.changeZhuanhuanji("dcsbquanmou");
-					player.changeSkin("dcsbquanmou", "dc_sb_simayi" + (player.storage.dcsbquanmou ? "_shadow" : ""));
 				},
 			},
 			true: {
@@ -3212,7 +3215,10 @@ const skills = {
 	dcsbyingmou: {
 		mark: true,
 		marktext: "☯",
-		zhuanhuanji: true,
+		zhuanhuanji(player, skill) {
+			player.storage[skill] = !player.storage[skill];
+			player.changeSkin({ characterName: "dc_sb_zhouyu" }, "dc_sb_zhouyu" + (player.storage[skill] ? "_shadow" : ""));
+		},
 		intro: {
 			content: function (storage) {
 				if (!storage) return "每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】。";
@@ -3281,7 +3287,6 @@ const skills = {
 					yield player.logSkill("dcsbyingmou", result.targets, false);
 					player.line2(result.targets);
 					player.changeZhuanhuanji("dcsbyingmou");
-					player.changeSkin("dcsbyingmou", "dc_sb_zhouyu" + (player.storage.dcsbyingmou ? "_shadow" : ""));
 					var source = result.targets[1],
 						discard = true;
 					while (true) {
@@ -3298,7 +3303,6 @@ const skills = {
 				} else {
 					yield player.logSkill("dcsbyingmou", target);
 					player.changeZhuanhuanji("dcsbyingmou");
-					player.changeSkin("dcsbyingmou", "dc_sb_zhouyu" + (player.storage.dcsbyingmou ? "_shadow" : ""));
 					if (player.countCards("h") < target.countCards("h")) player.draw(Math.min(5, target.countCards("h") - player.countCards("h")));
 					if (player.canUse({ name: "huogong" }, target, false)) player.useCard({ name: "huogong" }, target, false);
 				}
@@ -3323,7 +3327,6 @@ const skills = {
 				check: () => Math.random() > 0.5,
 				content() {
 					player.changeZhuanhuanji("dcsbyingmou");
-					player.changeSkin("dcsbyingmou", "dc_sb_zhouyu" + (player.storage.dcsbyingmou ? "_shadow" : ""));
 				},
 			},
 		},
@@ -3393,7 +3396,10 @@ const skills = {
 	dcsbmengmou: {
 		mark: true,
 		marktext: "☯",
-		zhuanhuanji: true,
+		zhuanhuanji(player, skill) {
+			player.storage[skill] = !player.storage[skill];
+			player.changeSkin({ characterName: "dc_sb_lusu" }, "dc_sb_lusu" + (player.storage[skill] ? "_shadow" : ""));
+		},
 		intro: {
 			content: function (storage) {
 				if (!storage) return "每回合限一次，当你得到其他角色的牌后，或其他角色得到你的牌后，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力。（X为你的体力上限）";
@@ -3504,7 +3510,6 @@ const skills = {
 				yield player.logSkill("dcsbmengmou", target);
 				player.addTempSkill("dcsbmengmou_" + (storage || false));
 				player.changeZhuanhuanji("dcsbmengmou");
-				player.changeSkin("dcsbmengmou", "dc_sb_lusu" + (player.storage.dcsbmengmou ? "_shadow" : ""));
 				while (num > 0) {
 					num--;
 					var result2;
@@ -3572,7 +3577,6 @@ const skills = {
 				check: () => Math.random() > 0.5,
 				content() {
 					player.changeZhuanhuanji("dcsbmengmou");
-					player.changeSkin("dcsbmengmou", "dc_sb_lusu" + (player.storage.dcsbmengmou ? "_shadow" : ""));
 				},
 			},
 		},
@@ -4706,7 +4710,7 @@ const skills = {
 					(function () {
 						var cards = player.getCards("hs", card => get.name(card, player) !== "sha" && player.hasValueTarget(card));
 						var damage = Math.min(player.getCardUsable({ name: "sha" }), player.countCards("hs", "sha")) + cards.filter(i => get.tag(i, "damage")).length;
-						if (player.isPhaseUsing() || player.hp + player.hujia + player.countCards("hs", i => get.tag(card, "recover")) > 2) {
+						if (player.isPhaseUsing() || player.hp + player.hujia + player.countCards("hs", card => get.tag(card, "recover")) > 2) {
 							if (damage) return Math.min(choices.length - 1, cards.length - damage);
 							return Math.min(choices.length - 1, cards.length - 1);
 						}
@@ -11413,10 +11417,7 @@ const skills = {
 				filter: function (event, player) {
 					var storage1 = event.player.getStorage("dcfudao_deadmark"),
 						storage2 = player.getStorage("dcfudao_effect");
-					for (var i of storage1) {
-						if (storage2.includes(i)) return true;
-					}
-					return false;
+					return storage1.some(i => storage2.includes(i)) && get.color(event.card) == "black";
 				},
 				content: function () {
 					trigger.player.addTempSkill("dcfudao_blocker");

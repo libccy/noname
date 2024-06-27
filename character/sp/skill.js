@@ -81,7 +81,7 @@ const skills = {
 				if (!player || get.event().type != "phase") return 1;
 				let names = player.getStorage("olkouchao");
 				for (let i = 0; i < names.length; i++) {
-					if (player.getStorage("olkouchao_used").includes(i)) list.splice(i--, 1);
+					if (player.getStorage("olkouchao_used").includes(i)) names.splice(i--, 1);
 				}
 				names = names.map(name => {
 					return { name: name };
@@ -89,7 +89,7 @@ const skills = {
 				names.sort((a, b) => {
 					return player.getUseValue(b, true, true) - player.getUseValue(a, true, true);
 				});
-				let max = get.order(list[0], player);
+				let max = get.order(names[0], player);
 				if (max > 0) max += 0.3;
 				return max;
 			},

@@ -2643,7 +2643,7 @@ const skills = {
 	},
 	dbzhuifeng: {
 		audio: 2,
-		groupSkill: true,
+		groupSkill: "wei",
 		enable: "chooseToUse",
 		usable: 2,
 		viewAsFilter: function (player) {
@@ -2687,7 +2687,7 @@ const skills = {
 	},
 	dbchongjian: {
 		audio: 2,
-		groupSkill: true,
+		groupSkill: "wu",
 		hiddenCard: function (player, name) {
 			if (
 				player.group == "wu" &&

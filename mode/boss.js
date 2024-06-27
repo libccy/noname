@@ -8269,9 +8269,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use: function (card, player, target, current) {
 							if (target.getEquip(2)) return;
-							return lib.skill.tengjia1.ai.effect.target.apply(this, arguments);
+							return lib.skill.tengjia1.ai.effect.target_use.apply(this, arguments);
 						},
 					},
 				},
