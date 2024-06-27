@@ -16,17 +16,6 @@ export default class StepCompiler extends ContentCompilerBase {
         return true; // 无需任何额外过滤
     }
 
-    static #mapArgs(event: GameEvent): any[] {
-        return [
-            event, event.step, event.source,
-            event.player, event.target, event.targets,
-            event.card, event.cards, event.skill,
-            event.forced, event.num, event._trigger,
-            event._result,
-            _status, lib, game, ui, get, ai,
-        ];
-    }
-
     compile(content: EventContent): EventCompiledContent {
         if (typeof content != "function")
             throw new Error("StepCompiler只能接受函数");
@@ -34,28 +23,6 @@ export default class StepCompiler extends ContentCompilerBase {
         const compiled = StepCompiler.parseStep(content);
         compiled.type = "step";
         return compiled;
-
-        // const final: EventCompiledContent = async (event) => {
-        //     if (!Number.isInteger(event.step))
-        //         event.step = 0;
-
-        //     while (!event.finished) {
-        //         this.beforeExecute(event);
-
-        //         if (this.checkPrevented(event)) {
-        //             const args = StepCompiler.#mapArgs(event);
-        //             Reflect.apply(compiled, event, args);
-        //         }
-
-        //         this.afterExecute(event);
-        //         event.step++;
-
-        //         event._result = await event.waitNext(); // 等待狂神喵的代码哦
-        //     }
-        // };
-
-        // final.type = "step";
-        // return final;
     }
 
     static parseStep(func: Function) {
