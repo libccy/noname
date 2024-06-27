@@ -3458,7 +3458,9 @@ const skills = {
 		},
 		check: function (event, player) {
 			let att = get.attitude(player, event.player);
-			if (event.player.hasSkill("xinleiji")) return att > 0;
+			if (event.player.hasSkill('xinleiji') || event.player.hasSkill('tiandu')) return event.player.isFriendsOf(player);
+			if (game.hasPlayer(Q => Q.hasSkill('dctianji') && Q.isFriendsOf(player))) return true;
+			if (game.hasPlayer(Q => Q.hasSkill('dctianji') && !Q.isFriendsOf(player))) return false;
 			if (att > 0 || event.player.isHealthy()) return true;
 			if (!event.source) return true;
 			att = get.attitude(player, event.source);
