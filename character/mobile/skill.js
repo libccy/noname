@@ -245,10 +245,12 @@ const skills = {
 					global: "useCardToTarget",
 				},
 				filter: function (event, player) {
+					if (get.type(event.card) == "equip") return false;
 					if (!event.targets || event.targets.length != 1) return false;
 					if (!event.targets[0].hasMark("mbjiejian_mark")) return false;
 					return true;
 				},
+				prompt2: "将此牌转移给自己",
 				check: function (event, player) {
 					return get.effect(player, event.card, event.player, player) >= get.effect(event.targets[0], event.card, event.player, player);
 				},
@@ -507,17 +509,21 @@ const skills = {
 				logTarget: "target",
 				usable: 2,
 				async content(event, trigger, player) {
-					const target = trigger.target;
+					const target = trigger.target, list = [];
 					const playerCards = player.getCards("he", card => {
 						return lib.filter.cardDiscardable(card, player, "mbkuangli");
 					});
-					if (playerCards.length > 0) await player.discard(playerCards.randomGet());
+					if (playerCards.length > 0) list.push([player, playerCards.randomGets(1)]);
 					const targetCards = target.getCards("he", card => {
 						return lib.filter.cardDiscardable(card, target, "mbkuangli");
 					});
-					if (targetCards.length > 0) await target.discard(targetCards.randomGet());
+					if (targetCards.length > 0) list.push([target, targetCards.randomGets(1)]);
+					await game.loseAsync({
+						lose_list: list,
+						discarder: player,
+					}).setContent("discardMultiple");
 					await game.asyncDelayx();
-					await player.draw();
+					await player.draw(2);
 					await game.asyncDelayx();
 				},
 				ai: {
@@ -630,8 +636,9 @@ const skills = {
 			);
 		},
 		async cost(event, trigger, player) {
+			const num = get.mode() === "identity" ? 3 : 2;
 			event.result = await player
-				.chooseTarget(get.prompt("mbcuizhen"), "废除至多两名其他角色的武器栏", [1, 2], (card, player, target) => {
+				.chooseTarget(get.prompt("mbcuizhen"), "废除至多" + get.cnNumber(num) +"名其他角色的武器栏", [1, num], (card, player, target) => {
 					return target !== player && target.hasEnabledSlot(1);
 				})
 				.set("ai", target => {
@@ -684,10 +691,10 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					trigger.num += Math.min(
-						2,
+						4,
 						game.countPlayer(current => {
 							return current.countDisabledSlot(1);
-						})
+						}) + (get.mode() === "identity" ? 1 : 2)
 					);
 				},
 			},
