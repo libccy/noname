@@ -912,10 +912,10 @@ export class Get extends GetCompatible {
 		const target = constructor
 			? Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object
 				? // @ts-ignore
-					new constructor()
+				new constructor()
 				: constructor.name in window && /\[native code\]/.test(constructor.toString())
 					? // @ts-ignore
-						new constructor(obj)
+					new constructor(obj)
 					: obj
 			: Object.create(null);
 		if (target === obj) return target;
@@ -1693,7 +1693,7 @@ export class Get extends GetCompatible {
 		if ("sandbox" in window) console.log("[infoFuncOL] pured:", str);
 		try {
 			// js内置的函数
-			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () {};
+			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () { };
 			if (security.isSandboxRequired()) {
 				const loadStr = `return (${str});`;
 				const box = security.currentSandbox();
@@ -1706,7 +1706,7 @@ export class Get extends GetCompatible {
 			}
 		} catch (e) {
 			console.error(`${e} in \n${str}`);
-			return function () {};
+			return function () { };
 		}
 		if (Array.isArray(func)) {
 			func = get.filter.apply(this, get.parsedResult(func));
@@ -1716,14 +1716,14 @@ export class Get extends GetCompatible {
 	eventInfoOL(item, level, noMore) {
 		return get.itemtype(item) == "event"
 			? `_noname_event:${JSON.stringify(
-					Object.entries(item).reduce((stringifying, entry) => {
-						const key = entry[0];
-						if (key == "_trigger") {
-							if (noMore !== false) stringifying[key] = get.eventInfoOL(entry[1], null, false);
-						} else if (!lib.element.GameEvent.prototype[key] && key != "content" && get.itemtype(entry[1]) != "event") stringifying[key] = get.stringifiedResult(entry[1], null, false);
-						return stringifying;
-					}, {})
-				)}`
+				Object.entries(item).reduce((stringifying, entry) => {
+					const key = entry[0];
+					if (key == "_trigger") {
+						if (noMore !== false) stringifying[key] = get.eventInfoOL(entry[1], null, false);
+					} else if (!lib.element.GameEvent.prototype[key] && key != "content" && get.itemtype(entry[1]) != "event") stringifying[key] = get.stringifiedResult(entry[1], null, false);
+					return stringifying;
+				}, {})
+			)}`
 			: "";
 	}
 	/**
@@ -2262,8 +2262,8 @@ export class Get extends GetCompatible {
 		n = game.checkMod(from, to, n, "globalFrom", from);
 		n = game.checkMod(from, to, n, "globalTo", to);
 		const equips1 = from.getCards("e", function (card) {
-				return !ui.selected.cards || !ui.selected.cards.includes(card);
-			}),
+			return !ui.selected.cards || !ui.selected.cards.includes(card);
+		}),
 			equips2 = to.getCards("e", function (card) {
 				return !ui.selected.cards || !ui.selected.cards.includes(card);
 			});
@@ -4932,48 +4932,19 @@ export class Get extends GetCompatible {
 	}
 	buttonValue(button) {
 		var card = button.link;
-		var player = get.owner(card);
 		if (!player) player = _status.event.player;
-		if (player.getCards("j").includes(card)) {
-			var efff = get.effect(
-				player,
-				{
-					name: card.viewAs || card.name,
-					cards: [card],
-				},
-				player,
-				player
-			);
-			if (efff > 0) return 0.5;
-			if (efff == 0) return 0;
-			return -1.5;
+		if (!card) {
+			alert('buttonValue卡牌不存在');
+			throw new Error();
+			if (event && event.parent) alert('父事件' + event.parent.name + ',爷事件' + event.parent.parent.name);
 		}
-		if (player.getCards("e").includes(card)) {
-			var evalue = get.value(card, player);
-			if (player.hasSkillTag("noe")) {
-				if (evalue >= 7) {
-					return evalue / 6;
-				}
-				return evalue / 10;
-			}
-			return evalue / 3;
+		if (get.position(card) == 'j') {
+			if (!lib.card[card.viewAs].ai || !lib.card[card.viewAs].ai.result) return 0;
+			var Q = lib.card[card.viewAs].ai.result.target;
+			if (typeof Q == "function") return Q(player, player, { name: card.viewAs });
+			return Q;
 		}
-		if (player.hasSkillTag("noh")) return 0.1;
-		var nh = player.countCards("h");
-		switch (nh) {
-			case 1:
-				return 2;
-			case 2:
-				return 1.6;
-			case 3:
-				return 1;
-			case 4:
-				return 0.8;
-			case 5:
-				return 0.6;
-			default:
-				return 0.4;
-		}
+		return get.value(card, player) / 3;
 	}
 	attitude2(to) {
 		return get.attitude(_status.event.player, to);
