@@ -5885,13 +5885,10 @@ const skills = {
 			player.addMark("jishe2", 1, false);
 		},
 		ai: {
-			order: 10,
+			order: 1,
 			result: {
 				player: function (player) {
-					if (!player.needsToDiscard(1)) {
-						return 1;
-					}
-					return 0;
+					return 1;
 				},
 			},
 		},
