@@ -10,6 +10,7 @@ const characters = {
 	star_dongzhuo: ["male", "qun", 5, ["starweilin", "starzhangrong", "starhaoshou"], ["zhu"]],
 	star_yuanshu: ["male", "qun", 4, ["starcanxi", "starpizhi", "starzhonggu"], ["zhu"]],
 	star_caoren: ["male", "wei", 4, ["starsujun", "starlifeng"]],
+	star_sunshangxiang: ["female", "wu", 3, ["starsaying", "starjiaohao"]],
 	mp_liuling: ["male", "jin", 3, ["mpjiusong", "mpmaotao", "mpbishi"], ["doublegroup:wei:qun:jin"]],
 	dc_jikang: ["male", "wei", 3, ["new_qingxian", "dcjuexiang"]],
 	dc_jsp_guanyu: ["male", "wei", 4, ["new_rewusheng", "dcdanji"]],
