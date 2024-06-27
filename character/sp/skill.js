@@ -26107,7 +26107,9 @@ const skills = {
 				nono = true;
 			}
 			var next = player.chooseToDiscard(get.prompt2("zhendu", trigger.player));
-			next.set("ai", function (card) {
+			next.set('ai', function (card) {
+				var Q = player;
+				if (Q.hasSkill('olddanshou') && !trigger.player.isFriendsOf(Q)) return 20 - get.useful(card);
 				if (_status.event.nono) return -1;
 				return 7 - get.useful(card);
 			});
