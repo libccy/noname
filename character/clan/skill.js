@@ -4,9 +4,14 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//族钟繇
 	clanchengqi: {
+		getUsed: player =>
+			player
+				.getHistory("useCard", evt => ["basic", "trick"].includes(get.type(evt.card, null, false)))
+				.map(evt => get.name(evt.card))
+				.toUniqued(),
 		hiddenCard(player, name) {
 			if (get.type(name) != "basic" && get.type(name) != "trick") return false;
-			if (player.getStorage("clanchengqi_effect").includes(name)) return false;
+			if (get.info("clanchengqi").getUsed(player).includes(name)) return false;
 			return player.countCards("hs") > 1 && lib.inpile.includes(name);
 		},
 		audio: 2,
@@ -17,7 +22,7 @@ const skills = {
 				.inpileVCardList(info => {
 					const name = info[2];
 					if (get.type(name) != "basic" && get.type(name) != "trick") return false;
-					return !player.getStorage("clanchengqi_effect").includes(name);
+					return !get.info("clanchengqi").getUsed(player).includes(name);
 				})
 				.some(card => event.filterCard({ name: card[2], nature: card[3] }, player, event));
 		},
@@ -27,7 +32,7 @@ const skills = {
 					.inpileVCardList(info => {
 						const name = info[2];
 						if (get.type(name) != "basic" && get.type(name) != "trick") return false;
-						return !player.getStorage("clanchengqi_effect").includes(name);
+						return !get.info("clanchengqi").getUsed(player).includes(name);
 					})
 					.filter(card => event.filterCard({ name: card[2], nature: card[3] }, player, event));
 				return ui.create.dialog("承启", [list, "vcard"]);
