@@ -175,8 +175,7 @@ export const cardPackMenu = function (connectMenu) {
 			node.link = page;
 			var list = [];
 			for (var i = 0; i < info.length; i++) {
-				if (!lib.card[info[i]] || (lib.card[info[i]].derivation && mode != "mode_derivation"))
-					continue;
+				if (!lib.card[info[i]]) continue;//QQQ
 				list.push([get.translation(get.type(info[i], "trick")), "", info[i]]);
 			}
 			var sortCard = function (card) {
