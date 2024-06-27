@@ -5166,7 +5166,9 @@ const skills = {
 										cards.reduce(function (num, card) {
 											var players = game.filterPlayer(current => target.canUse(card, current, false));
 											players.sort((a, b) => get.effect(b, card, target, target) * get.effect(b, card, target, player) - get.effect(a, card, target, target) * get.effect(a, card, target, player));
-											return (num = get.effect(players[0], card, target, target) * get.effect(players[0], card, target, player));
+											if (players[0]) {//QQQ
+												return (num = get.effect(players[0], card, target, target) * get.effect(players[0], card, target, player));
+											}
 										}, 0)
 									);
 								return (
