@@ -2483,12 +2483,18 @@ const skills = {
 		},
 		ai: {
 			basic: {
-				order: 1,
+				order: function (item, player) {
+					if (player.hasSkill('buyi') && (player.countCards('h', { type: 'equip' }) + player.countCards('h', { type: 'trick' }) > 0)) return 96;
+					return 1;
+				},
+			},
+			effect: {
+				player(card, player, target) {
+					if (card.name == 'jiu' && !target.isDying()) return [0, -1, 0, -1];
+				}
 			},
 			result: {
-				player(player) {
-					if (player.countCards("h") >= player.hp - 1) return -1;
-					if (player.hp < 3) return -1;
+				player: function (player) {
 					return 1;
 				},
 			},
