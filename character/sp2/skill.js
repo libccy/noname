@@ -372,13 +372,13 @@ const skills = {
 				})
 			)
 				return false;
-			return (event.targets || []).some(target => target !== player);
+			return (event.targets || []).some(target => target !== player && target.isIn());
 		},
 		locked: false,
 		async cost(event, trigger, player) {
 			event.result = await player
 				.chooseTarget(get.prompt(event.name.slice(0, -5))`选择其中一名目标角色，摸${get.cnNumber(player.getDamagedHp() + 1)}张牌，令所有除其外的其他角色不在你的攻击范围内，且你对其造成的伤害逐次增加。`, (card, player, target) => {
-					return target != player && get.event().getTrigger().targets.includes(target);
+					return target != player && get.event().getTrigger().targets.includes(target) && target.isIn();
 				})
 				.set("ai", target => {
 					const player = get.player();
