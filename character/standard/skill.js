@@ -45,6 +45,8 @@ const skills = {
 		enable: "phaseUse",
 		filterTarget: true,
 		selectTarget: [1, Infinity],
+		multitarget: true,
+		multiline: true,
 		skillAnimation: true,
 		animationColor: "thunder",
 		async content(event, trigger, player) {
@@ -65,7 +67,7 @@ const skills = {
 						});
 					if (!keep) next.set("prompt2", "若你不使用，则结束此流程");
 					const result = await next.forResult();
-					if (!result.bool && !keep) {
+					if (!result.bool) {
 						stop = true;
 						break;
 					}
@@ -551,7 +553,8 @@ const skills = {
 					(card, player, target) => {
 						return target.getHp() == player.getHp();
 					},
-					[1, Infinity]
+					[1, Infinity],
+					true
 				)
 				.set("ai", target => {
 					const player = get.event("player");

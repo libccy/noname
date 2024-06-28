@@ -96,7 +96,7 @@ const skills = {
 						.inpileVCardList(info => {
 							const name = info[2];
 							if (get.type(name) != "basic" && get.type(name) != "trick") return false;
-							return !player.getStorage("clanchengqi_effect").includes(name);
+							return !get.info("clanchengqi").getUsed(player).includes(name);
 						})
 						.map(card => {
 							return { name: card[2], nature: card[3] };

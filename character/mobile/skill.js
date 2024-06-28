@@ -288,7 +288,7 @@ const skills = {
 	},
 	//新司马孚
 	mbpanxiang: {
-		audio: 2,
+		audio: 4,
 		trigger: {
 			global: "damageBegin3",	
 		},

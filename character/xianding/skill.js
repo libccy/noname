@@ -1059,7 +1059,7 @@ const skills = {
 		},
 		zhuanhuanji(player, skill) {
 			player.storage[skill] = !player.storage[skill];
-			//player.changeSkin({ characterName: "dc_sb_jiaxu" }, "dc_sb_jiaxu" + (player.storage[skill] ? "_shadow" : ""));
+			player.changeSkin({ characterName: "dc_sb_jiaxu" }, "dc_sb_jiaxu" + (player.storage[skill] ? "_shadow" : ""));
 		},
 		marktext: "☯",
 		mark: true,
