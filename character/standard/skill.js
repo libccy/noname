@@ -1489,9 +1489,9 @@ const skills = {
 					cards.length == 1
 						? { result: { links: cards.slice(0), bool: true } }
 						: await player.chooseCardButton("遗计：请选择要分配的牌", true, cards, [1, cards.length]).set("ai", () => {
-								if (ui.selected.buttons.length == 0) return 1;
-								return 0;
-						  });
+							if (ui.selected.buttons.length == 0) return 1;
+							return 0;
+						});
 				if (!bool) return;
 				cards.removeArray(links);
 				event.togive = links.slice(0);
@@ -2089,7 +2089,7 @@ const skills = {
 			}
 			return false;
 		},
-		async content() {},
+		async content() { },
 	},
 	longdan: {
 		audio: "longdan_sha",
@@ -2484,7 +2484,7 @@ const skills = {
 		ai: {
 			basic: {
 				order: function (item, player) {
-					if (player.hasSkill('buyi') && (player.countCards('h', { type: 'equip' }) + player.countCards('h', { type: 'trick' }) > 0)) return 96;
+					if (player.hasSkill('buyi') && player.hasCard('h', (card) => get.type(card) != 'basic')) return 96;
 					return 1;
 				},
 			},
