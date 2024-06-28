@@ -17,7 +17,7 @@ if (core === "chrome" && !isNaN(version) && version < 85) {
 		window.open("https://github.com/libccy/noname/releases/tag/chromium77-client");
 	}
 	*/
-	waitUpdate = game.tryUpdateClient(/** UpdateReason.UNDERSUPPORT **/ 4));
+	waitUpdate = game.tryUpdateClient(/** UpdateReason.UNDERSUPPORT **/ 4);
 }
 
 waitUpdate.then(boot).then(() => {
