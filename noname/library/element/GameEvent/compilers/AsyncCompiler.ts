@@ -27,6 +27,8 @@ export default class AsyncCompiler extends ContentCompilerBase {
                 await Reflect.apply(original, this, [event, trigger, player]);
 
             this.afterExecute(event);
+
+            await event.waitNext(); // 等待狂神喵的代码哦
         };
 
         compiled.type = "async";
