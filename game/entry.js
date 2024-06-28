@@ -1,4 +1,3 @@
-import { UpdateReason } from "../noname-compatible.js";
 import { game, get, lib, boot } from "../noname.js";
 import { canUseHttpProtocol, sendUpdate } from "../noname/init/index.js";
 
@@ -18,7 +17,7 @@ if (core === "chrome" && !isNaN(version) && version < 85) {
 		window.open("https://github.com/libccy/noname/releases/tag/chromium77-client");
 	}
 	*/
-	waitUpdate = game.tryUpdateClient(UpdateReason.UNDERSUPPORT);
+	waitUpdate = game.tryUpdateClient(/** UpdateReason.UNDERSUPPORT **/ 4));
 }
 
 waitUpdate.then(boot).then(() => {
