@@ -1423,6 +1423,180 @@ const skills = {
 			},
 		},
 	},
+	//星孙尚香
+	starsaying: {
+		audio: 2,
+		enable: "chooseToUse",
+		hiddenCard: function (player, name) {
+			if (player.getStorage('starsaying').includes(name)) return false;
+			if (['shan', 'sha'].includes(name)) return player.countCards("hs", card => get.type(card) == "equip" && player.canEquip(card, true));
+			if (['tao', 'jiu'].includes(name)) return player.countCards("e");
+		},
+		filter: function (event, player) {
+			for (var name of ['shan', 'sha']) {
+				if (player.getStorage('starsaying').includes(name)) continue;
+				if (!player.countCards("hs", card => get.type(card) == "equip" && player.canEquip(card, true))) continue;
+				if (event.filterCard({ name: name, isCard: true }, player, event)) return true;
+			}
+			for (var name of ['tao', 'jiu']) {
+				if (player.getStorage('starsaying').includes(name)) continue;
+				if (!player.countCards("e")) continue;
+				if (event.filterCard({ name: name, isCard: true }, player, event)) return true;
+			}
+			return false;
+		},
+		chooseButton: {
+			dialog: function (event, player) {
+				var list = [];
+				for (var name of ['shan', 'sha']) {
+					if (player.getStorage('starsaying').includes(name)) continue;
+					if (!player.countCards("hs", card => get.type(card) == "equip" && player.canEquip(card, true))) continue;
+					if (event.filterCard({ name: name, isCard: true }, player, event)) list.push(['基本', '', name]);
+				}
+				for (var name of ['tao', 'jiu']) {
+					if (player.getStorage('starsaying').includes(name)) continue;
+					if (!player.countCards("e")) continue;
+					if (event.filterCard({ name: name, isCard: true }, player, event)) list.push(['基本', '', name]);
+				}
+				return ui.create.dialog("飒影", [list, "vcard"], "hidden");
+			},
+			check: function (button) {
+				var player = _status.event.player;
+				var card = { name: button.link[2], isCard: true };
+				return player.getUseValue(card);
+			},
+			backup: function (links, player) {
+				return {
+					check: function (card) {
+						return 1 / Math.max(0.1, get.value(card));
+					},
+					filterCard: function (card) {
+						let bool = ['sha', 'shan'].includes(links[0][2]);
+						if (bool) return get.position(card) != 'e' && get.type(card) == 'equip' && player.canEquip(card, true);
+						return get.position(card) == 'e';
+					},
+					position: 'hes',
+					viewAs: {
+						name: links[0][2],
+						nature: links[0][3],
+						suit: "none",
+						number: null,
+						isCard: true,
+					},
+					popname: true,
+					ignoreMod: true,
+					precontent: function () {
+						player.logSkill("starsaying");
+						var card = event.result.cards[0];
+						player.$give(card, player, false);
+						if (['sha', 'shan'].includes(event.result.card.name)) player.equip(card);
+						else player.gain(card, 'gain2');
+						var viewAs = {
+							name: event.result.card.name,
+							nature: event.result.card.nature,
+						};
+						event.result.card = viewAs;
+						event.result.cards = [];
+						if (!player.storage.starsaying) {
+							player.when({ global: "roundStart" }).then(() => {
+								delete player.storage.starsaying;
+							});
+						}
+						player.markAuto("starsaying", viewAs.name);
+					},
+				};
+			},
+			prompt: function (links, player) {
+				var str = ['sha', 'shan'].includes(links[0][2]) ? "使用一张装备牌" : "获得装备区里的一张牌";
+				return str + "，视为使用" + get.translation(links[0][3] || "") + get.translation(links[0][2]);
+			},
+		},
+		ai: {
+			order: function () {
+				var player = _status.event.player;
+				var event = _status.event;
+				if (event.filterCard({ name: "jiu" }, player, event) && get.effect(player, { name: "jiu" }) > 0) {
+					return 6.3;
+				}
+				return 6.1;
+			},
+			skillTagFilter: function (player, tag, arg) {
+				let name = tag == 'respondSha' ? 'sha' : 'shan';
+				if (player.getStorage('starsaying').includes(name)) return false;
+				if (!player.countCards('hs', card => get.type(card) == 'equip' && player.canEquip(card, true))) {
+					return false;
+				}
+			},
+			result: {
+				player: 1,
+			},
+			respondSha: true,
+			respondShan: true,
+		},
+	},
+	starjiaohao:{
+		audio: 2,
+		enable: "phaseUse",
+		usable: 1,
+		filter: function (event, player) {
+			return player.countCards("h") && game.hasPlayer(current => lib.skill.starjiaohao.filterTarget(null, player, current));
+		},
+		filterTarget: function (card, player, target) {
+			return player.canCompare(target) && player.countCards('e') >= target.countCards('e');
+		},
+		async content(event, trigger, player) {
+			const target = event.target;
+			const result = await player.chooseToCompare(target).forResult();
+			if (result.winner) {
+				const cards = [result.player, result.target].filterInD("d");
+				const result2 = await player.chooseControl('cancel2').set('choiceList', [
+					'令' + get.translation(result.winner) + '获得' + (cards.length ? get.translation(cards) : '空气'),
+					'令' + get.translation(result.winner) + '使用一张杀',
+				]).set('ai', function () {
+					return _status.event.check;
+				}).set("check", function () {
+					if (get.attitude(player, result.winner) <= 0) return 'cancel2';
+					if (!game.hasPlayer(current => {
+						return result.winner.canUse({ name: 'sha' }, current, false) && get.effect(current, { name: 'sha' }, result.winner, result.winner) > 0;
+					})) return '选项一';
+					const eff1 = result.winner.getUseValue({ name: 'sha' });
+					const eff2 = (get.value(cards[0], result.winner) + get.value(cards[1], result.winner));
+					if (eff1 > eff2 * 2.5) return '选项二';
+					return '选项一';
+				}()).forResult();
+				switch (result2.control) {
+					case '选项二': {
+						const next = result.winner.chooseToUse("是否使用一张杀？", { name: "sha" }).set("filterTarget", function (card, player, target) {
+							return lib.filter.filterTarget.apply(this, arguments);
+						}).set("addCount", false);
+						await next;
+						break;
+					}
+					case '选项一': {
+						await result.winner.gain(cards, 'gain2');
+						break;
+					}
+				}
+			}
+		},
+		ai: {
+			order: 5,
+			result: {
+				target: function (player, target) {
+					var hs = player.getCards("h").sort(function (a, b) {
+						return b.number - a.number;
+					});
+					var ts = target.getCards("h").sort(function (a, b) {
+						return b.number - a.number;
+					});
+					if (!hs.length || !ts.length) return 0;
+					if (hs[0].number <= ts[0].number) return 2;
+					if (player.countCards("h") >= target.countCards("h")) return -10;
+					return -1;
+				},
+			},
+		},
+	},
 	//小程序刘伶
 	mpjiusong: {
 		audio: 2,

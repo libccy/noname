@@ -8,7 +8,7 @@ const characterReplaces = {
 	xiaoqiao: ["xiaoqiao", "ol_xiaoqiao", "re_xiaoqiao", "sb_xiaoqiao", "old_xiaoqiao"],
 	yuji: ["xin_yuji", "re_yuji", "yuji"],
 	zhangjiao: ["sp_zhangjiao", "re_zhangjiao", "sb_zhangjiao", "jsrg_zhangjiao", "zhangjiao"],
-	dianwei: ["dianwei", "ol_dianwei", "re_dianwei"],
+	dianwei: ["dianwei", "ol_dianwei", "re_dianwei", "dc_sb_dianwei"],
 	xunyu: ["xunyu", "ol_xunyu", "re_xunyu", "sb_xunyu"],
 	sp_zhugeliang: ["sp_zhugeliang", "ol_sp_zhugeliang", "re_sp_zhugeliang", "sb_sp_zhugeliang"],
 	pangtong: ["pangtong", "ol_pangtong", "re_pangtong", "ol_sb_pangtong", "sb_pangtong"],

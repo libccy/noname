@@ -4943,6 +4943,7 @@ const skills = {
 				usable: 1,
 				charlotte: true,
 				filter: function (event, player) {
+					if (player.hasSkill("twkaizeng_used")) return false;
 					return game.hasPlayer(current => {
 						return current != player && current.hasSkill("twkaizeng");
 					});
@@ -5011,6 +5012,7 @@ const skills = {
 							},
 							content: function () {
 								"step 0";
+								player.addTempSkill("twkaizeng_used");
 								var type = lib.skill.twkaizeng_want_backup.type;
 								var isbasic = lib.card[type];
 								target
@@ -5078,6 +5080,7 @@ const skills = {
 				},
 			},
 			want_backup: {},
+			used: {},
 		},
 		ai: {
 			threaten: 3,
