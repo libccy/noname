@@ -3,7 +3,7 @@ import { lib, game, ui } from "../../../noname.js";
 import { IOnloadSplash } from "./IOnloadSplash.ts";
 import { createApp } from "../../../game/vue.esm-browser.js";
 
-import OnloadSplash from "./OnloadSplash.vue";
+import OnloadSplash from "./OnloadSplash.js";
 
 export class DefaultSplash implements IOnloadSplash {
 	id = "style1";
