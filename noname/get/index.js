@@ -4395,6 +4395,14 @@ export class Get extends GetCompatible {
 		if (aii && aii.value) value = aii.value;
 		else if (aii && aii.basic) value = aii.basic.value;
 		if (player == undefined || get.itemtype(player) != "player") player = _status.event.player;
+		if (get.position(card) == 'j') {
+			if (!card.viewAs) var name = card.name;
+			else var name = card.viewAs;
+			if (!lib.card[name] || !lib.card[name].ai || !lib.card[name].ai.result) return 0;
+			var Q = lib.card[name].ai.result.target;
+			if (typeof Q == "function") return Q(player, player, { name: name });
+			return Q;
+		}
 		var geti = function () {
 			return player.getCardIndex("hs", card.name, card, 5);
 		};
@@ -4936,12 +4944,13 @@ export class Get extends GetCompatible {
 		if (!card) {
 			alert('buttonValue卡牌不存在');
 			throw new Error();
-			if (event && event.parent) alert('父事件' + event.parent.name + ',爷事件' + event.parent.parent.name);
 		}
 		if (get.position(card) == 'j') {
-			if (!lib.card[card.viewAs].ai || !lib.card[card.viewAs].ai.result) return 0;
-			var Q = lib.card[card.viewAs].ai.result.target;
-			if (typeof Q == "function") return Q(player, player, { name: card.viewAs });
+			if (!card.viewAs) var name = card.name;
+			else var name = card.viewAs;
+			if (!lib.card[name] || !lib.card[name].ai || !lib.card[name].ai.result) return 0;
+			var Q = lib.card[name].ai.result.target;
+			if (typeof Q == "function") return Q(player, player, { name: name });
 			return Q;
 		}
 		return get.value(card, player) / 3;
