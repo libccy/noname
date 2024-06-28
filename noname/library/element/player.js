@@ -21,7 +21,7 @@ import { ui } from "../../ui/index.js";
 import { CacheContext } from "../cache/cacheContext.js";
 import { ChildNodesWatcher } from "../cache/childNodesWatcher.js";
 import security from "../../util/security.js";
-import ContentCompiler from "../event/compilers/ContentCompiler.js";
+import ContentCompiler from "./GameEvent/compilers/ContentCompiler.js";
 
 export class Player extends HTMLDivElement {
 	/**
@@ -509,7 +509,7 @@ export class Player extends HTMLDivElement {
 				const params = ["topVars", "event", "trigger", "player", "resultEvent"];
 				const body = `var { ${deconstructs.join(", ")} } = event;\n` + `var { ${topVars.join(", ")} } = topVars;\n` + `var { result } = resultEvent;\n${varstr}\n\n` + code + `\nreturn event.next[event.next.length - 1];`;
 
-				return new Function(...params, body);
+				return new Function(...params, body).bind({ lib, game, ui, get, ai, _status });
 			};
 			const contents = [];
 			contents.push(

@@ -1,5 +1,5 @@
-import { lib } from "../../../../noname";
-import { Uninstantable } from "../../../util";
+import { lib } from "../../../../../noname";
+import { Uninstantable } from "../../../../util";
 import IContentCompiler, { EventCompileable, EventCompiledContent, EventContent, EventContentType } from "./IContentCompiler";
 
 import "./StepCompiler"

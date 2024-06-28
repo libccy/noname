@@ -1,5 +1,5 @@
 import { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler";
-import { _status, ai, game, get, lib, ui } from "../../../../noname";
+import { _status, ai, game, get, lib, ui } from "../../../../../noname";
 import ContentCompilerBase from "./ContentCompilerBase";
 import ContentCompiler from "./ContentCompiler";
 

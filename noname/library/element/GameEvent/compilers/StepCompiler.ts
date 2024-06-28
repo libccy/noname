@@ -1,11 +1,11 @@
 // 喵喵！step写法的content全在这里处理喵！
 
 import { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler";
-import { _status, ai, game, get, lib, ui } from "../../../../noname";
+import { _status, ai, game, get, lib, ui } from "../../../../../noname";
 import ContentCompilerBase from "./ContentCompilerBase";
 import ContentCompiler from "./ContentCompiler";
-import security from "../../../util/security";
-import { CodeSnippet, ErrorManager } from "../../../util/error";
+import security from "../../../../util/security";
+import { CodeSnippet, ErrorManager } from "../../../../util/error";
 
 export default class StepCompiler extends ContentCompilerBase {
     get type(): EventContentTypes {
@@ -76,12 +76,19 @@ export default class StepCompiler extends ContentCompilerBase {
         }
 
         const contents: Function[] = [];
-        const argList = ["event", "step", "source", "player", "target", "targets", "card", "cards",
-            "skill", "forced", "num", "trigger", "result", "_status", "lib", "game", "ui", "get", "ai"];
+        const deconstructs = ["step", "source", "target", "targets", "card", "cards", "skill", "forced", "num"];
+        const topVars = ["_status", "lib", "game", "ui", "get", "ai"];
+
+        const compileStep = (code: string) => {
+            const params = ["topVars", "event", "trigger", "player", "resultEvent"];
+            const body = `var { ${deconstructs.join(", ")} } = event;\n` + `var { ${topVars.join(", ")} } = topVars;\n` + `var { result } = resultEvent;\n\n` + code + `\nreturn event.next[event.next.length - 1];`;
+
+            return new ModAsyncFunction(...params, body).bind({ lib, game, ui, get, ai, _status });
+        };
 
         //func中要写步骤的话，必须要写step 0
         if (str.indexOf("step 0") == -1) {
-            const compiled = new ModAsyncFunction(...argList, str);
+            const compiled = compileStep(str);
             ErrorManager.setCodeSnippet(compiled, new CodeSnippet(str, 3)); // 记录编译后函数的原代码片段
             contents.push(compiled);
         } else {
@@ -97,7 +104,7 @@ export default class StepCompiler extends ContentCompilerBase {
                 const head = str.slice(0, skip + result.index);
 
                 try {
-                    const compiled = new ModAsyncFunction(...argList, head);
+                    const compiled = compileStep(head);
                     ErrorManager.setCodeSnippet(compiled, new CodeSnippet(head, 3)); // 记录编译后函数的原代码片段
                     contents.push(compiled);
                 } catch (e) {

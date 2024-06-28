@@ -38,6 +38,9 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 event.step++;
 
                 event._result = await event.waitNext(); // 等待狂神喵的代码哦
+
+                if (event.step >= originals.length)
+                    event.finish();
             }
         };
 

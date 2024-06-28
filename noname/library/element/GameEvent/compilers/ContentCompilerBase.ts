@@ -1,5 +1,5 @@
-import { game } from "../../../game";
-import { _status } from "../../../status";
+import { game } from "../../../../game";
+import { _status } from "../../../../status";
 import IContentCompiler, { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler";
 
 type HandlerOption = { state?: "begin" | "end" };
