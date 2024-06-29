@@ -2669,7 +2669,7 @@ const skills = {
 							.set("ai", target => {
 								return get.effect(target, { name: "guohe_copy2" }, _status.event.player);
 							});
-				}
+				} else event.finish();
 				if (choices.length >= 2) {
 					player.addTempSkill("dcmoukui_conseq");
 					player.markAuto("dcmoukui_conseq", [trigger.card]);
