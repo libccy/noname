@@ -288,7 +288,7 @@ const skills = {
 	},
 	//新司马孚
 	mbpanxiang: {
-		audio: 2,
+		audio: 4,
 		trigger: {
 			global: "damageBegin3",	
 		},
@@ -4180,7 +4180,7 @@ const skills = {
 			"step 0";
 			player.draw(2);
 			"step 1";
-			var num = player.countCards("he");
+			var num = player.countCards("h");
 			if (!num) event.finish();
 			else if (num < 2) event._result = { index: 1 };
 			else
@@ -4199,7 +4199,7 @@ const skills = {
 			"step 2";
 			if (result.index == 0) {
 				player.chooseCardTarget({
-					position: "he",
+					position: "h",
 					filterCard: true,
 					selectCard: 2,
 					filterTarget: function (card, player, target) {
@@ -4214,11 +4214,11 @@ const skills = {
 						if (target.hasJudge("lebu")) att /= 5;
 						return att;
 					},
-					prompt: "选择两张牌，交给一名其他角色",
+					prompt: "选择两张手牌，交给一名其他角色",
 					forced: true,
 				});
 			} else {
-				player.chooseToDiscard(2, true, "he");
+				player.chooseToDiscard(2, true, "h");
 				event.finish();
 			}
 			"step 3";
@@ -14810,7 +14810,7 @@ const skills = {
 		animationColor: "thunder",
 		content: function () {
 			player.awakenSkill("remoucheng");
-			player.changeSkills(["jingong", "relianji"]);
+			player.changeSkills(["jingong"], ["relianji"]);
 			player.gainMaxHp();
 			player.recover();
 		},
