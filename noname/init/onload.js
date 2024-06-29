@@ -649,6 +649,7 @@ export async function onload(resetGameTimeout) {
 		let result = await promise;
 
 		await splash.dispose(node);
+		node.remove();
 		window.resetGameTimeout = setTimeout(lib.init.reset, 10000);
 		delete window.inSplash;
 		game.saveConfig("mode", result);
