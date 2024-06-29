@@ -1,6 +1,6 @@
 export interface IOnloadSplash {
-	id: string;
-	name: string;
+	readonly id: string;
+	readonly name: string;
 
 	init(node: HTMLDivElement, resolve: (mode: string) => void): void | Promise<void>;
 

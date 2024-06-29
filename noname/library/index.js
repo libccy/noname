@@ -28,7 +28,7 @@ import { freezeButExtensible } from "../util/index.js";
 import security from "../util/security.js";
 import { ErrorManager } from "../util/error.js";
 
-import { defaultSplashs } from "../init/onload/mod.ts";
+import { defaultSplashs } from "../init/onload/mod.js";
 
 export class Library {
 	configprefix = "noname_0.9_";
