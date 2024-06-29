@@ -21,6 +21,7 @@ import { ui } from "../../ui/index.js";
 import { CacheContext } from "../cache/cacheContext.js";
 import { ChildNodesWatcher } from "../cache/childNodesWatcher.js";
 import security from "../../util/security.js";
+import ContentCompiler from "./GameEvent/compilers/ContentCompiler.js";
 
 export class Player extends HTMLDivElement {
 	/**
@@ -399,9 +400,9 @@ export class Player extends HTMLDivElement {
 	 * })();
 	 * ```
 	 */
-	when() {
+	when(...triggerNames) {
 		const player = this;
-		if (!_status.postReconnect.player_when)
+		if (!_status.postReconnect.player_when) {
 			_status.postReconnect.player_when = [
 				function (map) {
 					"use strict";
@@ -416,15 +417,15 @@ export class Player extends HTMLDivElement {
 				},
 				{},
 			];
-		let triggerNames = Array.from(arguments);
+		}
 		let trigger;
 		let instantlyAdd = true;
-		if (triggerNames.length == 0) throw "player.when的参数数量应大于0";
 		//从triggerNames中取出instantlyAdd的部分
 		if (triggerNames.includes(false)) {
 			instantlyAdd = false;
 			triggerNames.remove(false);
 		}
+		if (triggerNames.length == 0) throw "player.when的参数数量应大于0";
 		// add other triggerNames
 		// arguments.length = 1
 		if (triggerNames.length == 1) {
@@ -449,6 +450,7 @@ export class Player extends HTMLDivElement {
 			skillName = "player_when_" + Math.random().toString(36).slice(-8);
 		} while (lib.skill[skillName] != null);
 		const after = `${skillName}After`;
+		// 追加当前when的失效时机
 		if (!trigger.player) trigger.player = after;
 		else if (Array.isArray(trigger.player)) trigger.player.add(after);
 		else if (typeof trigger.player == "string") trigger.player = [trigger.player, after];
@@ -500,33 +502,45 @@ export class Player extends HTMLDivElement {
 				if (errVars.includes(key)) throw new Error(`Variable '${key}' should not be referenced by vars objects`);
 				varstr += `var ${key}=lib.skill['${skillName}'].vars['${key}'];\n`;
 			}
-			let str = `
-					${varstr}if(event.triggername=='${skillName}After'){
+			const compileStep = code => {
+				const deconstructs = ["step", "source", "target", "targets", "card", "cards", "skill", "forced", "num"];
+				const topVars = ["_status", "lib", "game", "ui", "get", "ai"];
+
+				const params = ["topVars", "event", "trigger", "player", "resultEvent"];
+				const body = `var { ${deconstructs.join(", ")} } = event;\n` + `var { ${topVars.join(", ")} } = topVars;\n` + `var { result } = resultEvent;\n${varstr}\n\n` + code + `\nreturn event.next[event.next.length - 1];`;
+
+				return new Function(...params, body).bind({ lib, game, ui, get, ai, _status });
+			};
+			const contents = [];
+			contents.push(
+				compileStep(`
+					if(event.triggername=='${skillName}After'){
 						player.removeSkill('${skillName}');
 						delete lib.skill['${skillName}'];
 						delete lib.translate['${skillName}'];
 						return event.finish();
 					}
-			`;
+				`)
+			);
 			for (let i = 0; i < skill.contentFuns.length; i++) {
 				const fun2 = skill.contentFuns[i];
-				const a = fun2.toString();
-				//防止传入()=>xxx的情况
-				const begin = a.indexOf("{") == a.indexOf("}") && a.indexOf("{") == -1 && a.indexOf("=>") > -1 ? a.indexOf("=>") + 2 : a.indexOf("{") + 1;
-				const str2 = a.slice(begin, a.lastIndexOf("}") != -1 ? a.lastIndexOf("}") : undefined).trim();
-				str += `'step ${i}'\n\t${str2}\n\t`;
+				if (typeof fun2 != "function") {
+					const a = fun2;
+					//防止传入()=>xxx的情况
+					const begin = a.indexOf("{") == a.indexOf("}") && a.indexOf("{") == -1 && a.indexOf("=>") > -1 ? a.indexOf("=>") + 2 : a.indexOf("{") + 1;
+					const str2 = a.slice(begin, a.lastIndexOf("}") != -1 ? a.lastIndexOf("}") : undefined).trim();
+					// 防止注入喵
+					if (!get.isFunctionBody(str2)) throw new Error("无效的content函数代码");
+					let recompiledScope;
+					if (security.isSandboxRequired()) {
+						recompiledScope = scope ? security.eval(`return (${scope.toString()})`) : code => security.eval(`return (${code.toString()})`);
+					} else {
+						recompiledScope = scope || eval;
+					}
+					contents.push(compileStep(recompiledScope(str2)));
+				} else contents.push(fun2);
 			}
-			// 防止注入喵
-			if (!get.isFunctionBody(str, "any")) throw new Error("无效的content函数代码");
-			let recompiledScope;
-			if (security.isSandboxRequired()) {
-				recompiledScope = scope ? security.eval(`return (${scope.toString()})`) : code => security.eval(`return (${code.toString()})`);
-			} else {
-				recompiledScope = scope || eval;
-			}
-			skill.content = lib.init.parsex(recompiledScope(`(function(){\n${str}\n})`), scope && recompiledScope);
-			// @ts-ignore
-			skill.content._parsed = true;
+			skill.content = ContentCompiler.compile(contents);
 		};
 		Object.defineProperty(lib.skill, skillName, {
 			configurable: true,
@@ -587,6 +601,31 @@ export class Player extends HTMLDivElement {
 			 * @param { Required<Skill>['content'] } fun
 			 */
 			then(fun) {
+				if (lib.skill[skillName] != skill) throw `This skill has been destroyed`;
+				skill.contentFuns.push(String(fun)); // 提前转换，防止与闭包函数弄混
+				createContent();
+				return this;
+			},
+			/**
+			 * ```plain
+			 * 闭包用法的then，不再提供parsex变量，改为使用闭包访问
+			 *
+			 * 闭包即你可以直接在when里面访问when外面的变量
+			 * 如下：
+			 * ```
+			 * ```javascript
+			 * var att = get.attitude(player, target);
+			 *
+			 * player.when("phaseEnd")
+			 *     .step(() => {
+			 *         if (att > 0) // 闭包访问了外面定义的变量 att
+			 *             player.say("你好喵!");
+			 *     });
+			 * ```
+			 *
+			 * @param { ContentFuncByAll } fun
+			 */
+			step(fun) {
 				if (lib.skill[skillName] != skill) throw `This skill has been destroyed`;
 				skill.contentFuns.push(fun);
 				createContent();
@@ -1567,10 +1606,10 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/**
-	 * 
-	 * @param { Card[] } cards 
-	 * @param { string } tag 
-	 * @param { Player } target 
+	 *
+	 * @param { Card[] } cards
+	 * @param { string } tag
+	 * @param { Player } target
 	 * @returns { GameEventPromise }
 	 */
 	loseToSpecial(cards, tag, target) {
@@ -3015,7 +3054,7 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 用法同 {@link say}，但联机模式用这个
-	 * @param { string } str 
+	 * @param { string } str
 	 */
 	chat(str) {
 		if (get.is.banWords(str)) return;
@@ -3039,7 +3078,7 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 让玩家说话
-	 * @param { string } str 
+	 * @param { string } str
 	 */
 	say(str) {
 		str = str.replace(/##assetURL##/g, lib.assetURL);
@@ -3380,8 +3419,8 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 清除玩家的标记
-	 * @param { string } i 
-	 * @param { boolean } [log] 
+	 * @param { string } i
+	 * @param { boolean } [log]
 	 */
 	clearMark(i, log) {
 		let num = this.countMark(i);
@@ -3389,8 +3428,8 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 移除玩家的标记
-	 * @param { string } i 
-	 * @param { number } [num = 1] 
+	 * @param { string } i
+	 * @param { number } [num = 1]
 	 * @param { boolean } [log]
 	 */
 	removeMark(i, num, log) {
@@ -3410,9 +3449,9 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 增加玩家的标记
-	 * @param { string } i 
-	 * @param { number } [num = 1] 
-	 * @param { boolean } [log] 
+	 * @param { string } i
+	 * @param { number } [num = 1]
+	 * @param { boolean } [log]
 	 */
 	addMark(i, num, log) {
 		if (typeof num != "number" || !num) num = 1;
@@ -3430,9 +3469,9 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 设置玩家的标记数
-	 * @param { string } name 
+	 * @param { string } name
 	 * @param { number } num
-	 * @param { boolean } [log] 
+	 * @param { boolean } [log]
 	 */
 	setMark(name, num, log) {
 		const count = this.countMark(name);
@@ -3452,7 +3491,7 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 返回玩家是否拥有某个标记
-	 * @param { string } i 
+	 * @param { string } i
 	 * @returns { boolean }
 	 */
 	hasMark(i) {
@@ -3629,7 +3668,7 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 返回玩家本回合使用某个技能的次数
-	 * @param { string } skill 
+	 * @param { string } skill
 	 * @returns { number }
 	 */
 	countSkill(skill) {
@@ -5057,7 +5096,7 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 玩家展示手牌
-	 * @param { string } str 
+	 * @param { string } str
 	 * @returns { GameEventPromise }
 	 */
 	showHandcards(str) {
@@ -5072,8 +5111,8 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 玩家展示一些牌
-	 * @param { Card[] } cards 
-	 * @param { string } str 
+	 * @param { Card[] } cards
+	 * @param { string } str
 	 * @returns { GameEventPromise }
 	 */
 	showCards(cards, str) {
@@ -5097,8 +5136,8 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 玩家观看一些牌
-	 * @param { string } str 
-	 * @param { Card[] } cards 
+	 * @param { string } str
+	 * @param { Card[] } cards
 	 * @returns { GameEventPromise }
 	 */
 	viewCards(str, cards) {
@@ -5112,7 +5151,7 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 玩家观看target的手牌
-	 * @param { Player } target 
+	 * @param { Player } target
 	 * @returns { GameEventPromise }
 	 */
 	viewHandcards(target) {
@@ -5402,8 +5441,8 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 令玩家摸牌摸至指定值
-	 * @param { number } num 
-	 * @param { * } args 
+	 * @param { number } num
+	 * @param { * } args
 	 * @returns { GameEventPromise }
 	 */
 	drawTo(num, args) {
@@ -6183,8 +6222,8 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 调整玩家的体力值
-	 * @param { number } num 
-	 * @param { boolean } [popup] 
+	 * @param { number } num
+	 * @param { boolean } [popup]
 	 * @returns { GameEventPromise }
 	 */
 	changeHp(num, popup) {
@@ -6197,8 +6236,8 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 调整玩家的护甲值
-	 * @param { number } [num] 
-	 * @param { "gain" | "lose" | "damage" | "null" } [type] 
+	 * @param { number } [num]
+	 * @param { "gain" | "lose" | "damage" | "null" } [type]
 	 * @param { number } [limit] 护甲上限
 	 * @returns { GameEventPromise }
 	 */
@@ -6332,7 +6371,7 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 令玩家进入濒死状态
-	 * @param { GameEvent | GameEventPromise } [reason] 
+	 * @param { GameEvent | GameEventPromise } [reason]
 	 * @returns { GameEventPromise }
 	 */
 	dying(reason) {
@@ -6352,7 +6391,7 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 令玩家死亡
-	 * @param { GameEvent | GameEventPromise } reason 
+	 * @param { GameEvent | GameEventPromise } reason
 	 * @returns { GameEventPromise }
 	 */
 	die(reason) {
@@ -6365,8 +6404,8 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 令玩家复活
-	 * @param { number } [hp = 1] 
-	 * @param { boolean } [log] 
+	 * @param { number } [hp = 1]
+	 * @param { boolean } [log]
 	 */
 	revive(hp, log) {
 		if (log !== false) game.log(this, "复活");
@@ -6508,8 +6547,8 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 将一些牌置入到玩家的判定区
-	 * @param { Card } card 
-	 * @param { Card[] } [cards] 
+	 * @param { Card } card
+	 * @param { Card[] } [cards]
 	 * @returns { GameEventPromise }
 	 */
 	addJudge(card, cards) {
@@ -6573,11 +6612,11 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 返回某些牌是否能进入玩家的判定区
-	 * 
+	 *
 	 * @overload
 	 * @param { string } card
 	 * @returns { boolean }
-	 * 
+	 *
 	 * @overload
 	 * @param { Card } card
 	 * @returns { boolean }
@@ -8668,7 +8707,7 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 返回玩家的攻击距离
-	 * @param { boolean } raw 
+	 * @param { boolean } raw
 	 * @returns { number }
 	 */
 	getAttackRange(raw) {
@@ -8699,7 +8738,7 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 返回一些牌的攻击距离
-	 * @param { Card[] } cards 
+	 * @param { Card[] } cards
 	 * @returns { number }
 	 */
 	getEquipRange(cards) {
@@ -8998,7 +9037,7 @@ export class Player extends HTMLDivElement {
 	/**
 	 * 判断玩家是否是场上体力最大的玩家
 	 * @param { boolean } [only] 是否唯一
-	 * @param { boolean } [raw] 
+	 * @param { boolean } [raw]
 	 * @returns { boolean }
 	 */
 	isMaxHp(only, raw) {
@@ -9010,7 +9049,7 @@ export class Player extends HTMLDivElement {
 	/**
 	 * 判断玩家是否是场上体力最少的玩家
 	 * @param { boolean } [only] 是否唯一
-	 * @param { boolean } [raw] 
+	 * @param { boolean } [raw]
 	 * @returns { boolean }
 	 */
 	isMinHp(only, raw) {
@@ -9350,11 +9389,11 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 返回玩家是否有某个牌名的牌
-	 * 
+	 *
 	 * @overload
-	 * @param { Card } name 
+	 * @param { Card } name
 	 * @returns { boolean }
-	 * 
+	 *
 	 * @overload
 	 * @param { string } name
 	 * @returns { boolean}
@@ -9588,7 +9627,7 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 返回玩家判定区中的牌
-	 * @param { string } [name] 
+	 * @param { string } [name]
 	 * @returns { Card[] }
 	 */
 	getJudge(name) {

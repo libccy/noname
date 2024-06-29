@@ -13033,7 +13033,7 @@ export class Library {
 				const key = game.onlineKey;
 				if (typeof func == "function") {
 					const isMarshalled = security.isSandboxRequired()
-						&& security.importSandbox().Domain.current.isFrom(func);
+						&& !security.importSandbox().Domain.current.isFrom(func);
 					// 被封送的函数额外间隔了四层调用栈
 					const level = isMarshalled ? 4 : 0;
 					const args = Array.from(arguments).slice(1);

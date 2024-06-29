@@ -1960,7 +1960,6 @@ const skills = {
 			combo: "nzry_huaiju",
 		},
 	},
-	// ----- 审查分界线喵 ----- 上面的代码已经经过了审查喵
 	nzry_kuizhu: {
 		audio: 2,
 		trigger: {
@@ -4386,7 +4385,7 @@ const skills = {
 						}
 						event.dialog.close();
 						event.control.close();
-						// game.resume(); // 不再 game.resume 防止 game.loop 被重复执行
+						game.resume(); // 不再 game.resume 防止 game.loop 被重复执行
 						_status.imchoosing = false;
 						resolve(result);
 					});
@@ -4407,7 +4406,12 @@ const skills = {
 			} else if (event.isOnline()) {
 				const { promise, resolve } = Promise.withResolvers();
 				event.player.send(chooseButton, event.player, cards, event.logged);
-				event.player.wait(result => !!void resolve(result)); // 不再 game.resume 防止 game.loop 被重复执行
+				event.player.wait(async result => {
+					if(result =="ai")
+						result = await switchToAuto();
+
+					resolve(result);
+				}); // 不再 game.resume 防止 game.loop 被重复执行
 				game.pause(); // 暂停 game.loop 防止 game.resume2
 				next = promise;
 			} else {
@@ -5387,7 +5391,7 @@ const skills = {
 			if (get.color(event.card) != "black") return false;
 			return (event.card.name == "nanman" && player != event.player) || (event.card.name == "wanjian" && player != event.player) || (event.card.name == "taoyuan" && player.hp < player.maxHp) || event.card.name == "wugu";
 		},
-		async content() {},
+		async content() { },
 		mod: {
 			targetEnabled(card) {
 				if ((get.type(card) == "trick" || get.type(card) == "delay") && get.color(card) == "black") return false;
