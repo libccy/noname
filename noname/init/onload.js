@@ -628,7 +628,7 @@ export async function onload(resetGameTimeout) {
 		}
 	};
 
-	lib.onloadSplash.forEach(splash => {
+	lib.onloadSplashes.forEach(splash => {
 		lib.configMenu.appearence.config.splash_style.item[splash.id] = splash.name;
 	});
 
@@ -637,9 +637,9 @@ export async function onload(resetGameTimeout) {
 		window.inSplash = true;
 		clearTimeout(resetGameTimeout);
 
-		if (lib.config.splash_style == undefined) game.saveConfig("splash_style", lib.onloadSplash[0].id);
-		let splash = lib.onloadSplash.find(item => item.id == lib.config.splash_style);
-		if (!splash) splash = lib.onloadSplash[0];
+		if (lib.config.splash_style == undefined) game.saveConfig("splash_style", lib.onloadSplashes[0].id);
+		let splash = lib.onloadSplashes.find(item => item.id == lib.config.splash_style);
+		if (!splash) splash = lib.onloadSplashes[0];
 
 		let node = ui.create.div("#splash", document.body);
 

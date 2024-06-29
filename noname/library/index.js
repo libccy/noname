@@ -141,7 +141,7 @@ export class Library {
 	/**
 	 * @type { IOnloadSplash[] }
 	 */
-	onloadSplash = [...defaultSplashs];
+	onloadSplashes = [...defaultSplashs];
 
 	cardType = {};
 	hook = { globalskill: {} };
@@ -1476,7 +1476,7 @@ export class Library {
 						style2: "样式二",
 					},
 					visualMenu: async (node, link) => {
-						let splash = lib.onloadSplash.find(item => item.id == link);
+						let splash = lib.onloadSplashes.find(item => item.id == link);
 						if (splash) {
 							await splash.preview(node);
 						}
