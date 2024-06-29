@@ -22,9 +22,15 @@ const skills = {
 				.inpileVCardList(info => {
 					const name = info[2];
 					if (get.type(name) != "basic" && get.type(name) != "trick") return false;
-					return !get.info("clanchengqi").getUsed(player).includes(name);
+					return !(event.clanchengqi || []).includes(name);
 				})
 				.some(card => event.filterCard({ name: card[2], nature: card[3] }, player, event));
+		},
+		onChooseToUse(event) {
+			if (!game.online && !event.clanchengqi) {
+				const player = event.player;
+				event.set("clanchengqi", get.info("clanchengqi").getUsed(player));
+			}
 		},
 		chooseButton: {
 			dialog(event, player) {
@@ -32,7 +38,7 @@ const skills = {
 					.inpileVCardList(info => {
 						const name = info[2];
 						if (get.type(name) != "basic" && get.type(name) != "trick") return false;
-						return !get.info("clanchengqi").getUsed(player).includes(name);
+						return !(event.clanchengqi || []).includes(name);
 					})
 					.filter(card => event.filterCard({ name: card[2], nature: card[3] }, player, event));
 				return ui.create.dialog("承启", [list, "vcard"]);
@@ -81,7 +87,6 @@ const skills = {
 					position: "hs",
 					precontent() {
 						player.addTempSkill("clanchengqi_effect");
-						player.markAuto("clanchengqi_effect", [event.result.card.name]);
 					},
 				};
 			},
@@ -121,7 +126,6 @@ const skills = {
 			backup: { audio: "clanchengqi" },
 			effect: {
 				charlotte: true,
-				onremove: true,
 				trigger: { player: "useCard" },
 				filter(event, player) {
 					return (

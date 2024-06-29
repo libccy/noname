@@ -67,7 +67,7 @@ const skills = {
 						});
 					if (!keep) next.set("prompt2", "若你不使用，则结束此流程");
 					const result = await next.forResult();
-					if (!result.bool) {
+					if (!result.bool && !keep) {
 						stop = true;
 						break;
 					}
