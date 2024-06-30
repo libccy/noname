@@ -11702,7 +11702,7 @@ const skills = {
 			}
 			str += "</div>";
 			event.cards = cards;
-			player.chooseButton(["纵适：选择要获得的牌", str, cards], true).set("ai", get.buttonValue);
+			player.chooseButton(["纵适：选择要获得的牌", str, cards]).set("ai", get.buttonValue);
 			"step 1";
 			if (result.bool) {
 				var draw = result.links[0] == cards[0];
@@ -13043,6 +13043,7 @@ const skills = {
 	},
 	rezhengrong: {
 		trigger: { player: "useCardAfter" },
+		locked: true,
 		direct: true,
 		audio: "drlt_zhenrong",
 		filter: function (event, player) {
@@ -13073,7 +13074,7 @@ const skills = {
 		content: function () {
 			"step 0";
 			player
-				.chooseTarget(get.prompt("rezhengrong"), "将一名其他角色的随机一张牌置于你的武将牌上，成为「荣」", function (card, player, target) {
+				.chooseTarget(get.prompt("rezhengrong"), true, "将一名其他角色的随机一张牌置于你的武将牌上，成为「荣」", function (card, player, target) {
 					return target != player && target.countCards("he") > 0;
 				})
 				.set("ai", function (target) {
@@ -13625,7 +13626,7 @@ const skills = {
 				}
 			}
 			"step 3";
-			var card = get.cardPile2(function (card) {
+			var card = get.cardPile(function (card) {
 				return get.type(card, "trick") == result.control;
 			});
 			if (card) player.gain(card, "gain2", "log");
@@ -14326,12 +14327,30 @@ const skills = {
 			"step 1";
 			if (result.bool) {
 				player.logSkill("rebiaozhao");
-				player.addToExpansion(player, "give", result.cards).gaintag.add("rebiaozhao");
+				player.addToExpansion(player, result.cards).gaintag.add("rebiaozhao");
 			}
 		},
-		onremove: function (player, skill) {
-			var cards = player.getExpansions(skill);
-			if (cards.length) player.loseToDiscardpile(cards);
+		intro: {
+			markcount: "expansion",
+			mark(dialog, content, player) {
+				var content = player.getExpansions("rebiaozhao");
+				if (content && content.length) {
+					if (player == game.me || player.isUnderControl()) {
+						dialog.addAuto(content);
+					} else {
+						return "共有" + get.cnNumber(content.length) + "张表";
+					}
+				}
+			},
+			content(content, player) {
+				var content = player.getExpansions("rebiaozhao");
+				if (content && content.length) {
+					if (player == game.me || player.isUnderControl()) {
+						return get.translation(content);
+					}
+					return "共有" + get.cnNumber(content.length) + "张表";
+				}
+			},
 		},
 		ai: { notemp: true },
 		group: ["rebiaozhao2", "rebiaozhao3"],
@@ -14693,9 +14712,9 @@ const skills = {
 		content: function () {
 			"step 0";
 			player
-				.chooseTarget(get.prompt("meiyong"), "获得一名其他角色的一张牌，然后其摸一张牌。", function (card, player, target) {
+				.chooseTarget(get.prompt("meiyong"), "获得一名其他角色区域内的一张牌，然后其摸一张牌。", function (card, player, target) {
 					if (player == target) return false;
-					return target.countGainableCards(player, "he") > 0;
+					return target.countGainableCards(player, "hej") > 0;
 				})
 				.set("ai", function (target) {
 					return 10 - get.attitude(_status.event.player, target);
@@ -14705,7 +14724,7 @@ const skills = {
 				var target = result.targets[0];
 				event.target = target;
 				player.logSkill("meiyong", target);
-				player.gainPlayerCard(target, "he", true);
+				player.gainPlayerCard(target, "hej", true);
 			} else event.finish();
 			"step 2";
 			target.draw();
@@ -15168,13 +15187,14 @@ const skills = {
 		usable: 1,
 		audio: 2,
 		filter: function (event, player) {
-			return player.countCards("h") > 0 && player.getExpansions("xinfu_zhaoxin").length < 3;
+			return player.countCards("he") > 0 && player.getExpansions("xinfu_zhaoxin").length < 3;
 		},
 		filterCard: true,
 		selectCard: function () {
 			var player = _status.event.player;
 			return [1, 3 - player.getExpansions("xinfu_zhaoxin").length];
 		},
+		position: "he",
 		discard: false,
 		lose: false,
 		delay: false,

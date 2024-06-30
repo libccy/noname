@@ -5567,7 +5567,7 @@ const skills = {
 			return true;
 		},
 		async cost(event, trigger, player) {
-			const selfDraw = lib.skill.rebingyi.filtery(player),
+			const selfDraw = lib.skill.rebingyi.filterx(player) && lib.skill.rebingyi.filtery(player),
 				asyncDraw = lib.skill.rebingyi.filterx(player);
 			if (asyncDraw) {
 				const num = player.countCards("h");
