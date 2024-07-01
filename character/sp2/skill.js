@@ -6206,8 +6206,9 @@ const skills = {
 			event.cardType = cardType;
 			var num = player.countDisabledSlot();
 			if (num < 5) player.draw(5 - num);
+			if (!game.hasPlayer(current => current != player)) return;
 			player
-				.chooseTarget(lib.filter.notMe, "是否令一名其他角色从牌堆中使用一张" + get.translation(cardType) + "牌？")
+				.chooseTarget(lib.filter.notMe, true, "令一名其他角色从牌堆中使用一张" + get.translation(cardType) + "牌")
 				.set("ai", function (target) {
 					var player = _status.event.player,
 						type = _status.event.cardType;
