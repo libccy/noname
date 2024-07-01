@@ -82,7 +82,7 @@ export const cardPackMenu = function (connectMenu) {
 						if (!game.hasExtension(extName) || !game.hasExtensionLoaded(extName)) continue;
 						if (lib.config[`extension_${extName}_cards_enable`] == true) {
 							node.classList.remove("off");
-							if (node.link) node.link.firstChild.classList.add("on");
+							if (node.link && node.link.firstChild) node.link.firstChild.classList.add("on");//QQQ
 						} else {
 							node.classList.add("off");
 							if (node.link) node.link.firstChild.classList.remove("on");
@@ -174,8 +174,7 @@ export const cardPackMenu = function (connectMenu) {
 			node.link = page;
 			var list = [];
 			for (var i = 0; i < info.length; i++) {
-				if (!lib.card[info[i]] || (lib.card[info[i]].derivation && mode != "mode_derivation"))
-					continue;
+				if (!lib.card[info[i]]) continue;//QQQ
 				list.push([get.translation(get.type(info[i], "trick")), "", info[i]]);
 			}
 			var sortCard = function (card) {
