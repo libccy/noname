@@ -6252,9 +6252,12 @@ const skills = {
 					characters.remove("dc_mifuren");
 				}
 			});
-			return characters.length && [player.name1, player.name2].some(name => {
-				return get.character(name, 3).includes("dcxunbie");
-			});
+			return (
+				characters.length &&
+				[player.name1, player.name2].some(name => {
+					return get.character(name, 3).includes("dcxunbie");
+				})
+			);
 		},
 		check: () => true,
 		skillAnimation: true,
@@ -6285,12 +6288,10 @@ const skills = {
 			if (!_status.characterlist) {
 				lib.skill.pingjian.initList();
 			}
-			player.reinitCharacter((get.character(player.name2, 3).includes("dcxunbie") ?
-				player.name2 : player.name1
-			), character);
+			player.reinitCharacter(get.character(player.name2, 3).includes("dcxunbie") ? player.name2 : player.name1, character);
 			"step 2";
 			player.recover(1 - player.hp);
-			player.addTempSkill("dcxunbie_muteki", { player: "phaseAfter" });
+			player.addTempSkill("dcxunbie_muteki");
 		},
 		subSkill: {
 			muteki: {
@@ -6303,7 +6304,7 @@ const skills = {
 					trigger.cancel();
 				},
 				mark: true,
-				intro: { content: "防止受到的所有伤害直到我的回合结束" },
+				intro: { content: "防止受到的所有伤害直到本回合结束" },
 				ai: {
 					nofire: true,
 					nothunder: true,

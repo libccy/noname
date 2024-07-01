@@ -377,7 +377,7 @@ const skills = {
 		locked: false,
 		async cost(event, trigger, player) {
 			event.result = await player
-				.chooseTarget(get.prompt(event.name.slice(0, -5))`选择其中一名目标角色，摸${get.cnNumber(player.getDamagedHp() + 1)}张牌，令所有除其外的其他角色不在你的攻击范围内，且你对其造成的伤害逐次增加。`, (card, player, target) => {
+				.chooseTarget(get.prompt(event.name.slice(0, -5)), `选择其中一名目标角色，摸${get.cnNumber(player.getDamagedHp() + 1)}张牌，令所有除其外的其他角色不在你的攻击范围内，且你对其造成的伤害逐次增加。`, (card, player, target) => {
 					return target != player && get.event().getTrigger().targets.includes(target) && target.isIn();
 				})
 				.set("ai", target => {
@@ -6206,8 +6206,9 @@ const skills = {
 			event.cardType = cardType;
 			var num = player.countDisabledSlot();
 			if (num < 5) player.draw(5 - num);
+			if (!game.hasPlayer(current => current != player)) return;
 			player
-				.chooseTarget(lib.filter.notMe, "是否令一名其他角色从牌堆中使用一张" + get.translation(cardType) + "牌？")
+				.chooseTarget(lib.filter.notMe, true, "令一名其他角色从牌堆中使用一张" + get.translation(cardType) + "牌")
 				.set("ai", function (target) {
 					var player = _status.event.player,
 						type = _status.event.cardType;
@@ -7243,8 +7244,10 @@ const skills = {
 				var target = result.targets[0];
 				player.logSkill("reyirang", target);
 				player.give(cards, target, "give");
-				if (target.maxHp > player.maxHp) player.gainMaxHp(target.maxHp - player.maxHp, true);
-				player.recover(cards.length);
+				if (target.maxHp > player.maxHp) {
+					player.gainMaxHp(target.maxHp - player.maxHp, true);
+					player.recover(cards.length);
+				}
 			}
 		},
 	},

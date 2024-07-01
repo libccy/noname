@@ -1951,7 +1951,7 @@ const skills = {
 		},
 		filterCardx: function (card, player) {
 			if (player.getStorage("sbqicai").includes(card.name)) return false;
-			return get.type(card) == "equip" && game.hasPlayer(target => target != player && target.hasEmptySlot(get.subtype(card)));
+			return (get.mode() == "doudizhu" ? get.subtype(card) == "equip2" : get.type(card) == "equip") && game.hasPlayer(target => target != player && target.hasEmptySlot(get.subtype(card)));
 		},
 		usable: 1,
 		chooseButton: {
@@ -2723,7 +2723,7 @@ const skills = {
 						target.removeSkill(skills);
 						num += skills.length;
 					});
-					if (get.mode() != "identity") num += 2;
+					if (get.mode() == "versus" && _status.mode == "two") num += 2;
 					player.draw(num);
 				},
 			},
