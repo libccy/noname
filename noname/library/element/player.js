@@ -8110,42 +8110,20 @@ export class Player extends HTMLDivElement {
 	removeSkillTrigger(skills, triggeronly) {
 		if (typeof skills == "string") skills = [skills];
 		game.expandSkills(skills);
-		for (const skill of skills) {
-			const info = lib.skill[skill];
-			if (!info) {
-				console.error(new ReferenceError(`Cannot find ${skill} in lib.skill, failed to remove ${skill}'s trigger to ${this.name}`));
-				continue;
+		for (const Q of skills) {
+			this.initedSkills.remove(Q);
+			for (var i in lib.hook) {
+				if (Array.isArray(lib.hook[i]) && lib.hook[i].includes(Q)) delete lib.hook[i];
 			}
-			if (!triggeronly) {
-				if (info.global) {
-					let global = info.global;
-					if (!Array.isArray(global)) global = [global];
-					global.forEach(skill => game.removeGlobalSkill(skill, this));
-				}
-				if (!this.initedSkills.includes(skill)) continue;
-				this.initedSkills.remove(skill);
-				// if(info.onremove&&!_status.video) info.onremove(this,skill);
-			}
-			if (info.trigger && this.playerid) {
-				const removeTrigger = (role, evt) => {
-					const name = this.playerid + "_" + role + "_" + evt;
-					if (!lib.hook[name]) return;
-					lib.hook[name].remove(skill);
-					if (lib.hook[name].length == 0) delete lib.hook[name];
-				};
-				for (const role in info.trigger) {
-					let evts = info.trigger[role];
-					if (!Array.isArray(evts)) evts = [evts];
-					evts.forEach(evt => removeTrigger(role, evt));
+			for (var i in lib.hook.globaltrigger) {
+				if (lib.hook.globaltrigger[i].includes(Q)) {
+					lib.hook.globaltrigger[i].remove(Q);
+					if (lib.hook.globaltrigger[i].length == 0) {
+						delete lib.hook.globaltrigger[i];
+					}
 				}
 			}
-			if (info.hookTrigger && this._hookTrigger) {
-				this._hookTrigger.remove(skill);
-				if (!this._hookTrigger.length) delete this._hookTrigger;
-			}
-			if (_status.event && _status.event.removeTrigger) _status.event.removeTrigger(skill, this);
-			_status.event.clearStepCache();
-		}
+		}//QQQ
 		return this;
 	}
 	removeSkill(skill) {
