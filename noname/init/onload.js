@@ -6,6 +6,7 @@ import { game } from "../game/index.js";
 import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 import { gnc } from "../gnc/index.js";
+import { importMode } from "./import.js";
 import { Mutex } from "../util/mutex.js";
 
 export async function onload(resetGameTimeout) {
@@ -32,9 +33,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad, "UTF-8");
 			});
 			if (ui.css.card_stylesheet) ui.css.card_stylesheet.remove();
-			ui.css.card_stylesheet = lib.init.sheet(
-				`.card:not(*:empty){background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.card_stylesheet = lib.init.sheet(`.card:not(*:empty){background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 	}
 	if (lib.config.cardback_style === "custom") {
@@ -47,9 +46,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad1, "UTF-8");
 			});
 			if (ui.css.cardback_stylesheet) ui.css.cardback_stylesheet.remove();
-			ui.css.cardback_stylesheet = lib.init.sheet(
-				`.card:empty,.card.infohidden{background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.cardback_stylesheet = lib.init.sheet(`.card:empty,.card.infohidden{background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 
 		const fileToLoad2 = await game.getDB("image", "cardback_style2");
@@ -61,9 +58,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad2, "UTF-8");
 			});
 			if (ui.css.cardback_stylesheet2) ui.css.cardback_stylesheet2.remove();
-			ui.css.cardback_stylesheet2 = lib.init.sheet(
-				`.card.infohidden:not(.infoflip){background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.cardback_stylesheet2 = lib.init.sheet(`.card.infohidden:not(.infoflip){background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 	}
 	if (lib.config.hp_style === "custom") {
@@ -76,9 +71,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad1, "UTF-8");
 			});
 			if (ui.css.hp_stylesheet1) ui.css.hp_stylesheet1.remove();
-			ui.css.hp_stylesheet1 = lib.init.sheet(
-				`.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.hp_stylesheet1 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 
 		const fileToLoad2 = await game.getDB("image", "hp_style2");
@@ -90,9 +83,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad2, "UTF-8");
 			});
 			if (ui.css.hp_stylesheet2) ui.css.hp_stylesheet2.remove();
-			ui.css.hp_stylesheet2 = lib.init.sheet(
-				`.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.hp_stylesheet2 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 
 		const fileToLoad3 = await game.getDB("image", "hp_style3");
@@ -104,9 +95,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad3, "UTF-8");
 			});
 			if (ui.css.hp_stylesheet3) ui.css.hp_stylesheet3.remove();
-			ui.css.hp_stylesheet3 = lib.init.sheet(
-				`.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.hp_stylesheet3 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 
 		const fileToLoad4 = await game.getDB("image", "hp_style4");
@@ -118,9 +107,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad4, "UTF-8");
 			});
 			if (ui.css.hp_stylesheet4) ui.css.hp_stylesheet4.remove();
-			ui.css.hp_stylesheet4 = lib.init.sheet(
-				`.hp:not(.text):not(.actcount)>.lost{background-image:url(${fileLoadedEvent.target.result})}`
-			);
+			ui.css.hp_stylesheet4 = lib.init.sheet(`.hp:not(.text):not(.actcount)>.lost{background-image:url(${fileLoadedEvent.target.result})}`);
 		}
 	}
 
@@ -134,13 +121,9 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad, "UTF-8");
 			});
 			if (ui.css.player_stylesheet) ui.css.player_stylesheet.remove();
-			ui.css.player_stylesheet = lib.init.sheet(
-				`#window .player{background-image:url("${fileLoadedEvent.target.result}");background-size:100% 100%;}`
-			);
+			ui.css.player_stylesheet = lib.init.sheet(`#window .player{background-image:url("${fileLoadedEvent.target.result}");background-size:100% 100%;}`);
 		} else {
-			ui.css.player_stylesheet = lib.init.sheet(
-				"#window .player{background-image:none;background-size:100% 100%;}"
-			);
+			ui.css.player_stylesheet = lib.init.sheet("#window .player{background-image:none;background-size:100% 100%;}");
 		}
 	}
 	if (lib.config.border_style === "custom") {
@@ -154,14 +137,8 @@ export async function onload(resetGameTimeout) {
 			});
 			if (ui.css.border_stylesheet) ui.css.border_stylesheet.remove();
 			ui.css.border_stylesheet = lib.init.sheet();
-			ui.css.border_stylesheet.sheet.insertRule(
-				`#window .player>.framebg{display:block;background-image:url("${fileLoadedEvent.target.result}")}`,
-				0
-			);
-			ui.css.border_stylesheet.sheet.insertRule(
-				".player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}",
-				0
-			);
+			ui.css.border_stylesheet.sheet.insertRule(`#window .player>.framebg{display:block;background-image:url("${fileLoadedEvent.target.result}")}`, 0);
+			ui.css.border_stylesheet.sheet.insertRule(".player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}", 0);
 		}
 	}
 	if (lib.config.control_style === "custom") {
@@ -174,9 +151,7 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad, "UTF-8");
 			});
 			if (ui.css.control_stylesheet) ui.css.control_stylesheet.remove();
-			ui.css.control_stylesheet = lib.init.sheet(
-				`#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("${fileLoadedEvent.target.result}")}`
-			);
+			ui.css.control_stylesheet = lib.init.sheet(`#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("${fileLoadedEvent.target.result}")}`);
 		}
 	}
 	if (lib.config.menu_style === "custom") {
@@ -189,15 +164,13 @@ export async function onload(resetGameTimeout) {
 				fileReader.readAsDataURL(fileToLoad, "UTF-8");
 			});
 			if (ui.css.menu_stylesheet) ui.css.menu_stylesheet.remove();
-			ui.css.menu_stylesheet = lib.init.sheet(
-				`html #window>.dialog.popped,html .menu,html .menubg{background-image:url("${fileLoadedEvent.target.result}");background-size:cover}`
-			);
+			ui.css.menu_stylesheet = lib.init.sheet(`html #window>.dialog.popped,html .menu,html .menubg{background-image:url("${fileLoadedEvent.target.result}");background-size:cover}`);
 		}
 	}
 
 	// 改不动，暂时不改了
 	const proceed2 = async () => {
-		var mode = lib.imported.mode;
+		let mode = lib.imported.mode;
 		var card = lib.imported.card;
 		var character = lib.imported.character;
 		var play = lib.imported.play;
@@ -289,11 +262,7 @@ export async function onload(resetGameTimeout) {
 					continue;
 				}
 				if (j == "character" && !lib.config.characters.includes(i) && lib.config.mode != "connect") {
-					if (
-						lib.config.mode == "chess" &&
-						get.config("chess_mode") == "leader" &&
-						get.config("chess_leader_allcharacter")
-					) {
+					if (lib.config.mode == "chess" && get.config("chess_mode") == "leader" && get.config("chess_leader_allcharacter")) {
 						for (k in character[i][j]) {
 							lib.hiddenCharacters.push(k);
 						}
@@ -314,58 +283,39 @@ export async function onload(resetGameTimeout) {
 							if (!character[i][j][k][4]) {
 								character[i][j][k][4] = [];
 							}
-							if (
-								character[i][j][k][4].includes("boss") ||
-								character[i][j][k][4].includes("hiddenboss")
-							) {
+							if (character[i][j][k][4].includes("boss") || character[i][j][k][4].includes("hiddenboss")) {
 								lib.config.forbidai.add(k);
 							}
 							for (var l = 0; l < character[i][j][k][3].length; l++) {
 								lib.skilllist.add(character[i][j][k][3][l]);
 							}
-						}
-						else {
+						} else {
 							if (character[i][j][k].isBoss || character[i][j][k].isHiddenBoss) {
 								lib.config.forbidai.add(k);
 							}
 							if (character[i][j][k].skills) {
-								for (var l = 0; l < character[i][j][k].skills.length; l++ ) {
+								for (var l = 0; l < character[i][j][k].skills.length; l++) {
 									lib.skilllist.add(character[i][j][k].skills[l]);
 								}
 							}
 						}
 					}
-					if (
-						j == "skill" &&
-						k[0] == "_" &&
-						(lib.config.mode != "connect"
-							? !lib.config.characters.includes(i)
-							: !character[i].connect)
-					) {
+					if (j == "skill" && k[0] == "_" && (lib.config.mode != "connect" ? !lib.config.characters.includes(i) : !character[i].connect)) {
 						continue;
 					}
 					if (j == "translate" && k == i) {
 						lib[j][k + "_character_config"] = character[i][j][k];
 					} else {
 						if (lib[j][k] == undefined) {
-							if (
-								j == "skill" &&
-								!character[i][j][k].forceLoad &&
-								lib.config.mode == "connect" &&
-								!character[i].connect
-							) {
+							if (j == "skill" && !character[i][j][k].forceLoad && lib.config.mode == "connect" && !character[i].connect) {
 								lib[j][k] = {
 									nopop: character[i][j][k].nopop,
 									derivation: character[i][j][k].derivation,
 								};
-							} else if (j === 'character') {
+							} else if (j === "character") {
 								lib.character[k] = character[i][j][k];
 							} else {
-								Object.defineProperty(
-									lib[j],
-									k,
-									Object.getOwnPropertyDescriptor(character[i][j], k)
-								);
+								Object.defineProperty(lib[j], k, Object.getOwnPropertyDescriptor(character[i][j], k));
 							}
 							if (j == "card" && lib[j][k].derivation) {
 								if (!lib.cardPack.mode_derivation) {
@@ -377,12 +327,7 @@ export async function onload(resetGameTimeout) {
 						} else if (Array.isArray(lib[j][k]) && Array.isArray(character[i][j][k])) {
 							lib[j][k].addArray(character[i][j][k]);
 						} else {
-							console.log(
-								`duplicated ${j} in character ${i}:\n${k}:\nlib.${j}.${k}`,
-								lib[j][k],
-								`\ncharacter.${i}.${j}.${k}`,
-								character[i][j][k]
-							);
+							console.log(`duplicated ${j} in character ${i}:\n${k}:\nlib.${j}.${k}`, lib[j][k], `\ncharacter.${i}.${j}.${k}`, character[i][j][k]);
 						}
 					}
 				}
@@ -460,42 +405,23 @@ export async function onload(resetGameTimeout) {
 					}
 				} else {
 					for (k in card[i][j]) {
-						if (
-							j == "skill" &&
-							k[0] == "_" &&
-							!card[i][j][k].forceLoad &&
-							(lib.config.mode != "connect" ? !lib.config.cards.includes(i) : !card[i].connect)
-						) {
+						if (j == "skill" && k[0] == "_" && !card[i][j][k].forceLoad && (lib.config.mode != "connect" ? !lib.config.cards.includes(i) : !card[i].connect)) {
 							continue;
 						}
 						if (j == "translate" && k == i) {
 							lib[j][k + "_card_config"] = card[i][j][k];
 						} else {
 							if (lib[j][k] == undefined) {
-								if (
-									j == "skill" &&
-									!card[i][j][k].forceLoad &&
-									lib.config.mode == "connect" &&
-									!card[i].connect
-								) {
+								if (j == "skill" && !card[i][j][k].forceLoad && lib.config.mode == "connect" && !card[i].connect) {
 									lib[j][k] = {
 										nopop: card[i][j][k].nopop,
 										derivation: card[i][j][k].derivation,
 									};
 								} else {
-									Object.defineProperty(
-										lib[j],
-										k,
-										Object.getOwnPropertyDescriptor(card[i][j], k)
-									);
+									Object.defineProperty(lib[j], k, Object.getOwnPropertyDescriptor(card[i][j], k));
 								}
 							} else {
-								console.log(
-									`duplicated ${j} in card ${i}:\n${k}:\nlib.${j}.${k}`,
-									lib[j][k],
-									`\ncard.${i}.${j}.${k}`,
-									card[i][j][k]
-								);
+								console.log(`duplicated ${j} in card ${i}:\n${k}:\nlib.${j}.${k}`, lib[j][k], `\ncard.${i}.${j}.${k}`, card[i][j][k]);
 							}
 							if (j == "card" && lib[j][k].derivation) {
 								if (!lib.cardPack.mode_derivation) {
@@ -511,15 +437,9 @@ export async function onload(resetGameTimeout) {
 		}
 		if (lib.cardPack.mode_derivation) {
 			for (var i = 0; i < lib.cardPack.mode_derivation.length; i++) {
-				if (
-					typeof lib.card[lib.cardPack.mode_derivation[i]].derivation == "string" &&
-					!lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]
-				) {
+				if (typeof lib.card[lib.cardPack.mode_derivation[i]].derivation == "string" && !lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]) {
 					lib.cardPack.mode_derivation.splice(i--, 1);
-				} else if (
-					typeof lib.card[lib.cardPack.mode_derivation[i]].derivationpack == "string" &&
-					!lib.config.cards.includes(lib.card[lib.cardPack.mode_derivation[i]].derivationpack)
-				) {
+				} else if (typeof lib.card[lib.cardPack.mode_derivation[i]].derivationpack == "string" && !lib.config.cards.includes(lib.card[lib.cardPack.mode_derivation[i]].derivationpack)) {
 					lib.cardPack.mode_derivation.splice(i--, 1);
 				}
 			}
@@ -560,28 +480,13 @@ export async function onload(resetGameTimeout) {
 					get[j] = play[i].get[j];
 				}
 				for (j in play[i]) {
-					if (
-						j == "mode" ||
-						j == "forbid" ||
-						j == "init" ||
-						j == "element" ||
-						j == "game" ||
-						j == "get" ||
-						j == "ui" ||
-						j == "arenaReady"
-					)
-						continue;
+					if (j == "mode" || j == "forbid" || j == "init" || j == "element" || j == "game" || j == "get" || j == "ui" || j == "arenaReady") continue;
 					for (k in play[i][j]) {
 						if (j == "translate" && k == i) {
 							// lib[j][k+'_play_config']=play[i][j][k];
 						} else {
 							if (lib[j][k] != undefined) {
-								console.log(
-									`duplicated ${j} in play ${i}:\n${k}:\nlib.${j}.${k}`,
-									lib[j][k],
-									`\nplay.${i}.${j}.${k}`,
-									play[i][j][k]
-								);
+								console.log(`duplicated ${j} in play ${i}:\n${k}:\nlib.${j}.${k}`, lib[j][k], `\nplay.${i}.${j}.${k}`, play[i][j][k]);
 							}
 							lib[j][k] = play[i][j][k];
 						}
@@ -620,10 +525,7 @@ export async function onload(resetGameTimeout) {
 				if (!lib.card[lib.card.list[i][2]]) {
 					lib.card.list.splice(i, 1);
 					i--;
-				} else if (
-					lib.card[lib.card.list[i][2]].mode &&
-					lib.card[lib.card.list[i][2]].mode.includes(lib.config.mode) == false
-				) {
+				} else if (lib.card[lib.card.list[i][2]].mode && lib.card[lib.card.list[i][2]].mode.includes(lib.config.mode) == false) {
 					lib.card.list.splice(i, 1);
 					i--;
 				}
@@ -655,19 +557,10 @@ export async function onload(resetGameTimeout) {
 					_status.evaluatingExtension = lib.extensions[i][3];
 					if (typeof lib.extensions[i][1] == "function")
 						try {
-							await (gnc.is.coroutine(lib.extensions[i][1])
-								? gnc.of(lib.extensions[i][1])
-								: lib.extensions[i][1]
-							).call(lib.extensions[i], lib.extensions[i][2], lib.extensions[i][4]);
+							await (gnc.is.coroutine(lib.extensions[i][1]) ? gnc.of(lib.extensions[i][1]) : lib.extensions[i][1]).call(lib.extensions[i], lib.extensions[i][2], lib.extensions[i][4]);
 						} catch (e) {
 							console.log(`加载《${lib.extensions[i][0]}》扩展的content时出现错误。`, e);
-							if (!lib.config.extension_alert)
-								alert(
-									`加载《${lib.extensions[i][0]
-									}》扩展的content时出现错误。\n该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。\n${decodeURI(
-										e.stack
-									)}`
-								);
+							if (!lib.config.extension_alert) alert(`加载《${lib.extensions[i][0]}》扩展的content时出现错误。\n该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。\n${decodeURI(e.stack)}`);
 						}
 					if (lib.extensions[i][4]) {
 						if (lib.extensions[i][4].character) {
@@ -684,14 +577,7 @@ export async function onload(resetGameTimeout) {
 						}
 						if (lib.extensions[i][4].skill) {
 							for (var j in lib.extensions[i][4].skill.skill) {
-								game.addSkill(
-									j,
-									lib.extensions[i][4].skill.skill[j],
-									lib.extensions[i][4].skill.translate[j],
-									lib.extensions[i][4].skill.translate[j + "_info"],
-									lib.extensions[i][4].skill.translate[j + "_append"],
-									lib.extensions[i][4].skill.translate[j + "_ab"]
-								);
+								game.addSkill(j, lib.extensions[i][4].skill.skill[j], lib.extensions[i][4].skill.translate[j], lib.extensions[i][4].skill.translate[j + "_info"], lib.extensions[i][4].skill.translate[j + "_append"], lib.extensions[i][4].skill.translate[j + "_ab"]);
 							}
 						}
 					}
@@ -735,120 +621,48 @@ export async function onload(resetGameTimeout) {
 			}
 			await proceed2();
 		} else {
-			await game.getDB("data", lib.config.mode, async (obj) => {
+			await game.getDB("data", lib.config.mode, async obj => {
 				lib.storage = obj || {};
 				await proceed2();
 			});
 		}
 	};
 
-	if (!lib.imported.mode || !lib.imported.mode[lib.config.mode]) {
+	lib.onloadSplashes.forEach(splash => {
+		lib.configMenu.appearence.config.splash_style.item[splash.id] = splash.name;
+	});
+
+	Reflect.set(window, "resetGameTimeout", resetGameTimeout);
+	if (!lib.imported.mode?.[lib.config.mode]) {
 		window.inSplash = true;
 		clearTimeout(resetGameTimeout);
-		let clickedNode = false;
-		const clickNode = function () {
-			if (clickedNode) return;
-			this.classList.add("clicked");
-			clickedNode = true;
-			lib.config.mode = this.link;
-			game.saveConfig("mode", this.link);
-			if (game.layout != "mobile" && lib.layoutfixed.indexOf(lib.config.mode) !== -1) {
-				game.layout = "mobile";
-				ui.css.layout.href = lib.assetURL + "layout/" + game.layout + "/layout.css";
-			} else if (
-				game.layout == "mobile" &&
-				lib.config.layout != "mobile" &&
-				lib.layoutfixed.indexOf(lib.config.mode) === -1
-			) {
-				game.layout = lib.config.layout;
-				if (game.layout == "default") {
-					ui.css.layout.href = "";
-				} else {
-					ui.css.layout.href = lib.assetURL + "layout/" + game.layout + "/layout.css";
-				}
-			}
-			splash.delete(1000);
-			delete window.inSplash;
-			// 这不好删/m/，顺带lib.init.reset也不好删
-			window.resetGameTimeout = setTimeout(lib.init.reset, 10000);
 
-			this.listenTransition(function () {
-				lib.init.js(lib.assetURL + "mode", lib.config.mode, proceed);
-			}, 500);
-		};
-		var downNode = function () {
-			this.classList.add("glow");
-		};
-		var upNode = function () {
-			this.classList.remove("glow");
-		};
-		var splash = ui.create.div("#splash", document.body);
-		if (lib.config.touchscreen) {
-			splash.classList.add("touch");
-			lib.setScroll(splash);
-		}
-		if (lib.config.player_border != "wide") {
-			splash.classList.add("slim");
-		}
-		splash.dataset.radius_size = lib.config.radius_size;
-		for (var i = 0; i < lib.config.all.mode.length; i++) {
-			var node = ui.create.div(".hidden", splash, clickNode);
-			node.link = lib.config.all.mode[i];
-			ui.create.div(node, ".splashtext", get.verticalStr(get.translation(lib.config.all.mode[i])));
-			if (lib.config.all.stockmode.includes(lib.config.all.mode[i])) {
-				// 初始启动页设置
-				if (lib.config.splash_style == undefined) game.saveConfig("splash_style", "style1");
-				splash.dataset.splash_style = lib.config.splash_style;
-				// 扩展可通过window.splashurl设置素材读取路径
-				if (window.splashurl == undefined) window.splashurl = "image/splash/";
-				if (lib.config.splash_style == "style1" || lib.config.splash_style == "style2") {
-					ui.create
-						.div(node, ".avatar")
-						.setBackgroundImage(
-							"image/splash/" + lib.config.splash_style + "/" + lib.config.all.mode[i] + ".jpg"
-						);
-				} else {
-					ui.create
-						.div(node, ".avatar")
-						.setBackgroundImage(
-							splashurl + lib.config.splash_style + "/" + lib.config.all.mode[i] + ".jpg"
-						);
-				}
-			} else {
-				var avatarnode = ui.create.div(node, ".avatar");
-				var avatarbg = lib.mode[lib.config.all.mode[i]].splash;
-				if (avatarbg.startsWith("ext:")) {
-					avatarnode.setBackgroundImage(avatarbg.replace(/^ext:/, "extension/"));
-				} else {
-					avatarnode.setBackgroundDB(avatarbg);
-				}
-			}
-			if (!lib.config.touchscreen) {
-				node.addEventListener("mousedown", downNode);
-				node.addEventListener("mouseup", upNode);
-				node.addEventListener("mouseleave", upNode);
-			}
-			setTimeout(
-				(function (node) {
-					return function () {
-						node.show();
-					};
-				})(node),
-				i * 100
-			);
-		}
-		if (lib.config.mousewheel) {
-			splash.onmousewheel = ui.click.mousewheel;
-		}
-	} else {
-		Reflect.set(window, "resetGameTimeout", resetGameTimeout);
-		proceed().then(lib.other.ignore);
+		if (lib.config.splash_style == undefined) game.saveConfig("splash_style", lib.onloadSplashes[0].id);
+		let splash = lib.onloadSplashes.find(item => item.id == lib.config.splash_style);
+		if (!splash) splash = lib.onloadSplashes[0];
+
+		let node = ui.create.div("#splash", document.body);
+
+		let { promise, resolve } = Promise.withResolvers();
+		await splash.init(node, resolve);
+
+		let result = await promise;
+
+		await splash.dispose(node);
+		node.remove();
+		window.resetGameTimeout = setTimeout(lib.init.reset, 10000);
+		delete window.inSplash;
+		game.saveConfig("mode", result);
+		await importMode(result);
 	}
+
 	localStorage.removeItem(lib.configprefix + "directstart");
 
 	const libOnload2 = lib.onload2;
 	delete lib.onload2;
 	await runCustomContents(libOnload2);
+
+	await proceed();
 }
 
 async function createBackground() {
