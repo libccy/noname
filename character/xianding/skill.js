@@ -6290,7 +6290,7 @@ const skills = {
 			}
 			player.reinitCharacter(get.character(player.name2, 3).includes("dcxunbie") ? player.name2 : player.name1, character);
 			"step 2";
-			player.recover();
+			player.recover(1 - player.hp);
 			player.addTempSkill("dcxunbie_muteki");
 		},
 		subSkill: {
