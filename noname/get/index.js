@@ -19,6 +19,34 @@ export class Get extends GetCompatible {
 	promises = new Promises();
 	Audio = Audio;
 
+	
+	/**
+	* nameList用于检查传入的参数中是否包含指定的玩家id。
+	* 如果未指定玩家名称，则返回所有玩家id的列表。
+	*
+	* @returns {Array|boolean} 如果未指定特定字符串，则返回玩家id列表；
+	* 如果指定了特定字符串，并且列表中存在该字符串，则返回true；否则返回false。
+	*/
+	nameList(...arg){
+		let player, str;
+
+		// 遍历函数接收的所有参数
+		for(let argument of arg) {
+			// 如果参数是玩家对象，则将其赋值给player变量
+			if (get.itemtype(argument) == "player") player = argument;
+			// 如果参数是字符串，则将其赋值给str变量
+			else if (typeof argument == "string") str = argument;
+		}
+
+		// 如果没有player或指定字符串，直接返回玩家名称列表
+		if(!player) return [];
+		// 将玩家的名称添加到列表中，如果存在多个名称
+		const names = ['name', 'name1', 'name2'].filter(prop => player[prop]).map(prop => player[prop]);
+		if (!str) return names;
+		// 如果指定了特定字符串，检查列表中是否包含该字符串
+		// 如果包含，则返回true；否则返回false
+		return names.some(name => name.startsWith(str));
+	};
 	/**
 	 * 将一个传统格式的character转化为Character对象格式
 	 * @param { Array|Object|import("../library/element/character").Character } data
