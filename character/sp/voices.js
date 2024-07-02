@@ -746,8 +746,10 @@ export default {
 	"#xintan2": "人人心中都有一团欲望之火！",
 	"#tianxiang_daxiaoqiao1": "哼，我才不怕你呢~",
 	"#tianxiang_daxiaoqiao2": "替我挡着吧~",
+	/*
 	"#liuli_daxiaoqiao1": "不懂得怜香惜玉么~",
 	"#liuli_daxiaoqiao2": "交给你了。",
+	*/
 	"#zhengnan1": "末将愿承父志，随丞相出征！",
 	"#zhengnan2": "索全凭丞相差遣，万死不辞！",
 	"#wusheng_guansuo1": "逆贼，可识得关氏之勇？",
