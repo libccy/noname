@@ -1,16 +1,15 @@
+import * as fs from "node:fs"
+import * as path from "node:path"
+import * as process from "node:process"
 import { fileURLToPath } from "node:url"
+import express from "express"
+import minimist from "minimist"
+import bodyParser from "body-parser"
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 try {
-	const express = (await import("npm:express")).default;
-	const minimist = (await import("npm:minimist")).default;
-	const bodyParser = (await import("npm:body-parser")).default;
 	const app = express();
-	const fs = await import("node:fs");
-	const path = await import("node:path");
-	const process = await import("node:process");
-
-	const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 	const oneYear = 60 * 1000 * 60 * 24 * 365;
 
 	// 解析命令行参数
