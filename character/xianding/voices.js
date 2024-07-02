@@ -461,8 +461,8 @@ export default {
 	"#shensu1_xiahouba1": "冲杀敌阵，来去如电！",
 	"#shensu1_xiahouba2": "今日有恙在身，须得速战速决！",
 	*/
-	"#tianxiang_daxiaoqiao1": "哼，我才不怕你呢~",
-	"#tianxiang_daxiaoqiao2": "替我挡着吧~",
+	"#retianxiang_daxiaoqiao1": "哼，我才不怕你呢~",
+	"#retianxiang_daxiaoqiao2": "替我挡着吧~",
 	"#liuli_daxiaoqiao1": "不懂得怜香惜玉么~",
 	"#liuli_daxiaoqiao2": "交给你了。",
 	"#yongjue1": "扶幼主，成霸业！",

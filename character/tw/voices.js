@@ -333,8 +333,10 @@ export default {
 	"#tw_fanchou:die": "唉，稚然疑心，甚重……",
 	"#drlt_qingce1": "感明帝之恩，清君侧之贼。",
 	"#drlt_qingce2": "得太后手诏，清奸佞乱臣。",
+	/*
 	"#tianxiang_daxiaoqiao1": "哼，我才不怕你呢~",
 	"#tianxiang_daxiaoqiao2": "替我挡着吧~",
+	*/
 	"#liuli_daxiaoqiao1": "不懂得怜香惜玉么~",
 	"#liuli_daxiaoqiao2": "交给你了。",
 	"#gonghuan1": "曹魏势大，吴蜀当共拒之。",
