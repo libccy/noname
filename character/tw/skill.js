@@ -657,13 +657,13 @@ const skills = {
 					if (
 						!evtx ||
 						evtx.name != "useCard" ||
-						!player.hasHistory("lose", evt => {
+						!event.source.hasHistory("lose", evt => {
 							if (evt.getParent() != evtx) return false;
 							return Object.keys(evt.gaintag_map || {}).includes("huan_zhanghe_A_card");
 						})
 					)
 						return false;
-					return event.source.countCards("h", card => card.hasGaintag("huan_zhanghe_A_card")) > event.target.countCards("h", card => card.hasGaintag("huan_zhanghe_A_card"));
+					return event.source.countCards("h", card => card.hasGaintag("huan_zhanghe_A_card")) > event.player.countCards("h", card => card.hasGaintag("huan_zhanghe_A_card"));
 				},
 				forced: true,
 				logTarget: "source",

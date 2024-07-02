@@ -332,13 +332,19 @@ const skills = {
 				}
 			} else {
 				event.result = await player
-					.chooseTarget(get.prompt("jsrgruzong"), "令任意名角色将手牌数摸至与你相同", (card, player, target) => {
-						return target.countCards("h") < player.countCards("h");
-					})
+					.chooseTarget(
+						get.prompt("jsrgruzong"),
+						"令任意名角色将手牌数摸至与你相同",
+						(card, player, target) => {
+							return target.countCards("h") < player.countCards("h");
+						},
+						[1, Infinity]
+					)
 					.set("ai", target => {
 						const player = get.player();
 						return (get.attitude(player, target) * Math.sqrt(player.countCards("h") - target.countCards("h"))) / (target.hasSkillTag("nogain") ? 1 : 10);
-					});
+					})
+					.forResult();
 			}
 		},
 		async content(event, trigger, player) {
@@ -347,7 +353,7 @@ const skills = {
 				if (num > 0) await player.draw(num);
 			} else {
 				const num = player.countCards("h");
-				game.asyncDraw(event.targets.sortBySeat(), target => {
+				await game.asyncDraw(event.targets.sortBySeat(), target => {
 					return Math.min(5, num - target.countCards("h"));
 				});
 			}
