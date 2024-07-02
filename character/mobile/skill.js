@@ -1192,7 +1192,7 @@ const skills = {
 			const delt = target.getHp(true) - 1,
 				num = Math.abs(delt);
 			await target[delt > 0 ? "loseHp" : "recover"](num);
-			if (num > 0) await target.changeHujia(num, null, true);
+			if (num > 0) await target.changeHujia(num + (player == target ? 2 : 0), null, true);
 		},
 		async contentAfter(event, trigger, player) {
 			game.addGlobalSkill("mbjuejin_xiangsicunwei");
