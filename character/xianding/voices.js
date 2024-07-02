@@ -463,8 +463,10 @@ export default {
 	*/
 	"#retianxiang_daxiaoqiao1": "哼，我才不怕你呢~",
 	"#retianxiang_daxiaoqiao2": "替我挡着吧~",
+	/*
 	"#liuli_daxiaoqiao1": "不懂得怜香惜玉么~",
 	"#liuli_daxiaoqiao2": "交给你了。",
+	*/
 	"#yongjue1": "扶幼主，成霸业！",
 	"#yongjue2": "能救一个是一个！",
 	"#jingong1": "若无老夫之谋，尔等皆化为腐土也。",
