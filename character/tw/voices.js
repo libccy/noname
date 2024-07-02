@@ -328,8 +328,10 @@ export default {
 	"#twluanlve2": "联白波之众，掠河东之地。",
 	"#tw_liwei:die": "安南重任，万不可轻之……",
 	"#tw_yanxiang:die": "若遇明主，或可青史留名……",
+	/*
 	"#mouli1": "澄汰王室，迎立宗子！",
 	"#mouli2": "僣孽为害，吾岂可谋而不行？",
+	*/
 	"#tw_fanchou:die": "唉，稚然疑心，甚重……",
 	/*
 	"#drlt_qingce1": "感明帝之恩，清君侧之贼。",
@@ -339,8 +341,10 @@ export default {
 	*/
 	"#liuli_daxiaoqiao1": "不懂得怜香惜玉么~",
 	"#liuli_daxiaoqiao2": "交给你了。",
+	/*
 	"#gonghuan1": "曹魏势大，吴蜀当共拒之。",
 	"#gonghuan2": "两国得此联姻，邦交更当稳固。",
+	*/
 	"#twfeifu1": "此亦久矣，其能复几！",
 	"#twfeifu2": "以侯归第？终败于其！",
 	"#twzhian1": "此等蝼蚁不除，必溃千丈之堤！",
