@@ -31,6 +31,8 @@ export interface IOnloadSplash {
 	/**
 	 * 选择模式后，进行必要的清理工作
 	 *
+	 * 请注意，无名杀不会清理启动页元素，请自行在此处进行清理工作
+	 *
 	 * @param node - 渲染启动页的 HTML div 元素
 	 * @returns 可为同步，亦可为异步
 	 */
