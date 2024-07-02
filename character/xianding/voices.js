@@ -453,12 +453,14 @@ export default {
 	"#wlcuorui1": "减辎疾行，挫敌军锐气。",
 	"#wlcuorui2": "外物当舍，摄敌为重。",
 	"#wulan:die": "蛮狗，尔敢杀我！",
+	/*
 	"#tiaoxin_xiahouba1": "跪下受降，饶你不死！",
 	"#tiaoxin_xiahouba2": "黄口小儿，可听过将军名号？",
 	"#paoxiao_xiahouba1": "喝啊！",
 	"#paoxiao_xiahouba2": "受死吧！",
 	"#shensu1_xiahouba1": "冲杀敌阵，来去如电！",
 	"#shensu1_xiahouba2": "今日有恙在身，须得速战速决！",
+	*/
 	"#tianxiang_daxiaoqiao1": "哼，我才不怕你呢~",
 	"#tianxiang_daxiaoqiao2": "替我挡着吧~",
 	"#liuli_daxiaoqiao1": "不懂得怜香惜玉么~",
