@@ -331,9 +331,9 @@ export default {
 	"#mouli1": "澄汰王室，迎立宗子！",
 	"#mouli2": "僣孽为害，吾岂可谋而不行？",
 	"#tw_fanchou:die": "唉，稚然疑心，甚重……",
+	/*
 	"#drlt_qingce1": "感明帝之恩，清君侧之贼。",
 	"#drlt_qingce2": "得太后手诏，清奸佞乱臣。",
-	/*
 	"#tianxiang_daxiaoqiao1": "哼，我才不怕你呢~",
 	"#tianxiang_daxiaoqiao2": "替我挡着吧~",
 	*/
