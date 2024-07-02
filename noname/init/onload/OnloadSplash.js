@@ -38,7 +38,7 @@ export default {
 
 				let background = lib.config.all.stockmode.includes(mode) ? props.handle(mode) : lib.mode[mode].splash;
 				let link = lib.init.parseResourceAddress(background);
-				if (link.protocol == "db:") {
+				if (link.protocol === "db:") {
 					avatar.setBackgroundDB(link.href);
 				} else {
 					avatar.setBackgroundImage(link.href);

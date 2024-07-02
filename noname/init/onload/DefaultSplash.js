@@ -62,24 +62,24 @@ export class DefaultSplash {
 	}
 
 	handle(mode) {
-		return `${this.path}/${mode}.jpg`;
+		return lib.path.join(this.path, `${mode}.jpg`);
 	}
 
 	click(mode, node) {
 		node.classList.add("clicked");
 
-		if (game.layout != "mobile" && lib.layoutfixed.indexOf(mode) !== -1) {
+		if (game.layout !== "mobile" && lib.layoutfixed.indexOf(mode) !== -1) {
 			game.layout = "mobile";
 			// @ts-ignore
-			ui.css.layout.href = lib.assetURL + "layout/" + game.layout + "/layout.css";
-		} else if (game.layout == "mobile" && lib.config.layout != "mobile" && lib.layoutfixed.indexOf(mode) === -1) {
+			ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`;
+		} else if (game.layout === "mobile" && lib.config.layout !== "mobile" && lib.layoutfixed.indexOf(mode) === -1) {
 			game.layout = lib.config.layout;
-			if (game.layout == "default") {
+			if (game.layout === "default") {
 				// @ts-ignore
 				ui.css.layout.href = "";
 			} else {
 				// @ts-ignore
-				ui.css.layout.href = lib.assetURL + "layout/" + game.layout + "/layout.css";
+				ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`;
 			}
 		}
 
