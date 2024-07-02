@@ -1157,6 +1157,7 @@ window.noname_character_rank = {
 		"huan_guojia",
 		"huan_jiangwei",
 		"budugen",
+		"jsrg_dongbai",
 	],
 	b: [
 		"huan_zhugeliang",
@@ -2902,6 +2903,7 @@ window.noname_character_rank = {
 			"re_zhongyao",
 			"junk_zhangjiao",
 			"zhupeilan",
+			"jsrg_dongbai",
 		],
 	},
 };

@@ -733,7 +733,7 @@ const skills = {
 		forced: true,
 		locked: false,
 		beginMarkCount: 20,
-		maxMarkCount: 100,
+		maxMarkCount: 99,
 		derivation: ["mbcmqingzheng", "mbcmjiushi", "mbcmfangzhu", "mbjuejin"],
 		addMark(player, num) {
 			num = Math.min(num, lib.skill.mbqianlong.maxMarkCount - player.countMark("mbqianlong"));
@@ -741,7 +741,9 @@ const skills = {
 		},
 		group: ["mbqianlong_begin", "mbqianlong_add", "mbqianlong_die"],
 		async content(event, trigger, player) {
-			player.addAdditionalSkill("mbqianlong", lib.skill.mbqianlong.derivation.slice(0, Math.floor(player.countMark("mbqianlong") / 25)));
+			const derivation = lib.skill.mbqianlong.derivation,
+				skills = player.countMark("mbqianlong") == lib.skill.mbqianlong.maxMarkCount ? derivation : derivation.slice(0, Math.floor(player.countMark("mbqianlong") / 25));
+			player.addAdditionalSkill("mbqianlong", skills);
 		},
 		marktext: "道",
 		intro: {
@@ -847,7 +849,7 @@ const skills = {
 		direct: true,
 		content() {
 			"step 0";
-			var num = 2;
+			var num = 1;
 			var prompt = "###" + get.prompt("sbqingzheng") + "###弃置" + get.cnNumber(num) + "种花色的所有牌";
 			var next = player.chooseButton([prompt, [lib.suit.map(i => ["", "", "lukai_" + i]), "vcard"]], num);
 			next.set("filterButton", button => {
@@ -1029,7 +1031,8 @@ const skills = {
 		persevereSkill: true,
 		inherit: "sbfangzhu",
 		filter(event, player) {
-			return game.hasPlayer(current => current !== player);
+			const target = player.storage.mbcmfangzhu;
+			return game.hasPlayer(current => current !== player && (target ? target != current : true));
 		},
 		usable: 1,
 		chooseButton: {
@@ -1078,12 +1081,15 @@ const skills = {
 					filterTarget(card, player, target) {
 						if (target == player) return false;
 						const num = lib.skill.mbcmfangzhu_backup.num,
-							storage = target.getStorage("mbcmfangzhu_ban");
+							storage = target.getStorage("mbcmfangzhu_ban"),
+							targetx = player.storage.mbcmfangzhu;
+						if (target == targetx) return false;
 						return num != 1 || !storage.length;
 					},
 					async content(event, trigger, player) {
 						const target = event.target;
 						const num = lib.skill.mbcmfangzhu_backup.num;
+						player.storage.mbcmfangzhu = target;
 						switch (num) {
 							case 1:
 								target.addTempSkill("mbcmfangzhu_ban", { player: "phaseEnd" });
