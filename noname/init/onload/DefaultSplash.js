@@ -46,6 +46,8 @@ export class DefaultSplash {
 		node.delete(1000);
 
 		await new Promise(resolve => this.clicked.listenTransition(resolve, 500));
+
+		return true;
 	}
 
 	preview(node) {
