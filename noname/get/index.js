@@ -2493,7 +2493,7 @@ export class Get extends GetCompatible {
 	 * @returns {string[]}
 	 */
 	nameList(player) {
-		return ["name", "name1", "name2"]
+		return (!player||get.itemtype(player)!="player")?[]:["name", "name1", "name2"]
 			.filter(prop => player[prop])
 			.map(prop => player[prop])
 			.toUniqued();
