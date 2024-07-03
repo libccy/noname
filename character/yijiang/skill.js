@@ -6944,7 +6944,7 @@ const skills = {
 		},
 	},
 	xinmieji: {
-		audio: 2,
+		audio: "mieji",
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
