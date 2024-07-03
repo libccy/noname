@@ -392,7 +392,7 @@ const skills = {
 					};
 					if (event.isMine()) func();
 					else if (event.isOnline()) event.player.send(func);
-					let types = trigger.cards.reduce((list, card) => list.add(get.type(card, player)), []);
+					let types = trigger.cards.reduce((list, card) => list.add(get.type2(card, player)), []);
 					let result = await player
 						.chooseButton(["武威：请选择" + get.cnNumber(types.length) + "次以下项", [["摸一张牌", "令目标角色本回合非锁定技失效", "令本回合〖武威〗可发动次数+1"].map((item, i) => [i, item]), "textbutton"]])
 						.set("forced", true)
@@ -7374,8 +7374,8 @@ const skills = {
 				}
 				if (!cards.length) break;
 			}
-			if (bool) return gains.some(card => get.type2(card, false) == "trick");
-			return gains.filter(card => get.type2(card, false) == "trick");
+			if (bool) return gains.some(card => get.type(card) == "trick");
+			return gains.filter(card => get.type(card) == "trick");
 		},
 		isUse: function (event, player) {
 			if (event.name != "cardsDiscard") return event.type == "discard" && event.player == player;

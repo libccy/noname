@@ -2399,7 +2399,7 @@ const skills = {
 				else event.finish();
 			} else event.finish();
 			"step 2";
-			var cardsx = cards.filter(i => get.position(i, true) == "d" && event.loser.hasUseTarget(i));
+			var cardsx = cards.filter(i => get.position(i, true) == "d" && event.loser.hasUseTarget(i) && get.type(i) != "trick");
 			if (!cardsx.length) event.goto(6);
 			else
 				event.loser
@@ -2419,7 +2419,7 @@ const skills = {
 				event.loser.chooseUseTarget(true, card, false);
 			} else event.goto(5);
 			"step 4";
-			if (cards.filter(i => get.position(i, true) == "d" && event.loser.hasUseTarget(i)).length) event.goto(3);
+			if (cards.filter(i => get.position(i, true) == "d" && event.loser.hasUseTarget(i) && get.type(i) != "trick").length) event.goto(2);
 			"step 5";
 			if (get.distance(player, target) != event.distance[0] || get.distance(target, player) != event.distance[1]) {
 				player.restoreSkill("clanxumin");

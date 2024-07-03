@@ -1191,12 +1191,35 @@ const skills = {
 			const target = event.target;
 			const delt = target.getHp(true) - 1,
 				num = Math.abs(delt);
-			await target[delt > 0 ? "loseHp" : "recover"](num);
+			const next = target.changeHp(-delt);
+			next._triggered = null;
+			await next;
 			if (num > 0) await target.changeHujia(num + (player == target ? 2 : 0), null, true);
 		},
 		async contentAfter(event, trigger, player) {
 			game.addGlobalSkill("mbjuejin_xiangsicunwei");
 			player.$fullscreenpop("向死存魏！", "thunder");
+			const cards = ["cardPile", "discardPile"].map(pos => Array.from(ui[pos].childNodes)).flat();
+			const filter = card => ["shan", "tao", "jiu"].includes(card.name);
+			const lose_list = [],
+				players = game.filterPlayer();
+			players.forEach(current => {
+				const pos = "hej";
+				const sishis = current.getCards(pos, filter);
+				if (sishis.length > 0) {
+					current.$throw(sishis);
+					lose_list.push([current, sishis]);
+				}
+			});
+			if (lose_list.length) {
+				await game.loseAsync({ lose_list }).setContent("chooseToCompareLose");
+				await game.asyncDelayx();
+			}
+			const cardx = cards.filter(filter);
+			if (cardx.length) {
+				await game.cardsGotoSpecial(cardx);
+				game.log(cardx, "被移出了游戏");
+			}
 		},
 		ai: {
 			order: 0.1,
@@ -6917,10 +6940,10 @@ const skills = {
 				audio: "mbdaoshu1",
 				enable: "phaseUse",
 				filter: function (event, player) {
-					return game.hasPlayer(target => target != player && target.countCards("h") > 2);
+					return game.hasPlayer(target => target != player && target.countCards("h") >= 2);
 				},
 				filterTarget: function (card, player, target) {
-					return target != player && target.countCards("h") > 2;
+					return target != player && target.countCards("h") >= 2;
 				},
 				usable: 1,
 				prompt: () => lib.translate.mbdaoshu_info,
