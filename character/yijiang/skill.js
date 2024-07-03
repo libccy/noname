@@ -6944,7 +6944,7 @@ const skills = {
 		},
 	},
 	xinmieji: {
-		audio: 2,
+		audio: "mieji",
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -9381,7 +9381,7 @@ const skills = {
 		},
 	},
 	// taoxi:{
-	// 	audio:2,
+	// 	audio: "qingxi",
 	// 	trigger:{player:'useCardToPlayered'},
 	// 	filter:function(event,player){
 	// 		return _status.currentPhase==player&&event.targets.length==1&&
@@ -9472,7 +9472,7 @@ const skills = {
 	// },
 	// taoxi4:{},
 	taoxi: {
-		audio: 2,
+		audio: "qingxi",
 		trigger: { player: "useCardToPlayered" },
 		check: function (event, player) {
 			if (get.attitude(player, event.target) >= 0) return false;
@@ -10028,7 +10028,7 @@ const skills = {
 		filter: function (event, player) {
 			return event.card.name == "sha" && player.isPhaseUsing() && event.target.hp > 0 && event.target.countCards("he") > 0;
 		},
-		audio: 2,
+		audio: "pojun",
 		content: function () {
 			"step 0";
 			player.choosePlayerCard(trigger.target, "he", [1, Math.min(trigger.target.countCards("he"), trigger.target.hp)], get.prompt("xinpojun", trigger.target)).set("forceAuto", true);
@@ -10235,7 +10235,7 @@ const skills = {
 	fencheng: {
 		skillAnimation: "epic",
 		animationColor: "gray",
-		audio: 2,
+		audio: "xinfencheng",
 		enable: "phaseUse",
 		filter: function (event, player) {
 			return !player.storage.fencheng;
@@ -11364,7 +11364,7 @@ const skills = {
 		},
 	},
 	dingpin: {
-		audio: 2,
+		audio: "pindi",
 		enable: "phaseUse",
 		onChooseToUse: function (event) {
 			if (event.type != "phase" || game.online) return;
