@@ -881,10 +881,16 @@ const skills = {
 	clanjianyuan: {
 		inherit: "clanchenya",
 		filter(event, player) {
+			if (event.type != "player") return false;
+			var skill = event.sourceSkill || event.skill;
+			var info = get.info(skill);
+			if (info.charlotte) return false;
+			var translation = get.skillInfoTranslation(skill, event.player);
+			if (!translation || get.plainText(translation).indexOf("出牌阶段限一次") == -1 || !event.player.countCards("he")) return false;
 			for (var phase of lib.phaseName) {
 				var evt = event.getParent(phase);
 				if (evt && evt.name == phase) {
-					if (event.player.getHistory("useCard", evtx => evtx.getParent(phase) == evt).length) return lib.skill.clanchenya.filter(event, player);
+					if (event.player.getHistory("useCard", evtx => evtx.getParent(phase) == evt).length) return true;
 				}
 			}
 			return false;
