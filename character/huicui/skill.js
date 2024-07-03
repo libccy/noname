@@ -634,11 +634,11 @@ const skills = {
 		audio: 2,
 		trigger: { global: "phaseEnd" },
 		filter(event, player) {
-			return player.countCards("h") && game.hasPlayer(target => !target.countCards("h"));
+			return player.countCards("he") && game.hasPlayer(target => !target.countCards("h"));
 		},
 		async cost(event, trigger, player) {
 			const num = Math.min(
-				player.countCards("h"),
+				player.countCards("he"),
 				game.countPlayer(target => !target.countCards("h"))
 			);
 			let list = [];
@@ -649,7 +649,7 @@ const skills = {
 					.chooseCardTarget({
 						prompt: list.length ? "是否继续发动【输粮】？" : get.prompt("dcshuliang"),
 						prompt2: lib.translate.dcshuliang_info,
-						position: "h",
+						position: "he",
 						animate: false,
 						filterCard(card, player) {
 							return !get.event("list").some(list => list[1] == card);
