@@ -88,6 +88,9 @@ const skills = {
 						lib.skill.sbgongqi.updateBlocker(current);
 					});
 				},
+				intro: {
+					content: "所有其他角色不能使用或打出不为$的手牌响应你使用的牌",
+				},
 			},
 			block: {
 				trigger: {
@@ -124,7 +127,17 @@ const skills = {
 						const hs = player.getCards("h"),
 							cards = [card];
 						if (Array.isArray(card.cards)) cards.addArray(card.cards);
-						if (cards.containsSome(...hs) && player.storage.sbgongqi_blocker.includes(color)) return false;
+						if (cards.containsSome(...hs) && !player.storage.sbgongqi_blocker.includes(color)) return false;
+					},
+					cardRespondable(card, player) {
+						if (!player.storage.sbgongqi_blocker) return;
+						const color = get.color(card);
+						if (color == "none") return;
+						const hs = player.getCards("h"),
+							cards = [card];
+						if (Array.isArray(card.cards)) cards.addArray(card.cards);
+						const evt = _status.event;
+						if (evt.name == "chooseToRespond" && cards.containsSome(...hs) && !player.storage.sbgongqi_blocker.includes(color)) return false;
 					},
 				},
 			},
