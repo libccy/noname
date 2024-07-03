@@ -9180,6 +9180,132 @@ export class Player extends HTMLDivElement {
 		}
 		return false;
 	}
+	isMajor() {
+		if (get.mode() == 'guozhan') {
+			if (this.identity == "unknown") return false;
+			var list = game.filterPlayer(function (current) {
+				return current.identity != "unknown" && current.hasSkillTag("forceMajor");
+			});
+			if (list.length) {
+				for (var i of list) {
+					if (i.isFriendOf(this)) return true;
+				}
+				return false;
+			}
+			var map = {},
+				sides = [],
+				pmap = _status.connectMode ? lib.playerOL : game.playerMap,
+				player;
+			for (var i of game.players) {
+				if (i.identity == "unknown") continue;
+				var added = false;
+				for (var j of sides) {
+					if (i.isFriendOf(pmap[j])) {
+						added = true;
+						map[j].push(i);
+						if (i == this) player = j;
+						break;
+					}
+				}
+				if (!added) {
+					map[i.playerid] = [i];
+					sides.push(i.playerid);
+					if (i == this) player = i.playerid;
+				}
+			}
+			if (!player || map[player].length < 2) return false;
+			for (var i in map) {
+				if (map[i].length > map[player].length) return false;
+			}
+			return true;
+		}
+		else {
+			var list = game.filterPlayer(function (current) {
+				return current.hasSkillTag("forceMajor");
+			});
+			if (list.length) {
+				for (var i of list) {
+					if (i.group == this.group) return true;
+				}
+				return false;
+			}
+			var map = {};
+			for (var i of game.players) {
+				if (!map[i.group]) map[i.group] = [];
+				map[i.group].push(i);
+			}
+			for (var i in map) {
+				if (map[i].length > map[this.group].length) return false;
+			}
+			return true;
+		}
+	}
+	isNotMajor() {
+		for (var i = 0; i < game.players.length; i++) {
+			if (game.players[i].isMajor()) {
+				return !this.isMajor();
+			}
+		}
+		return false;
+	}
+	isMinor(nomajor) {
+		if (get.mode() == 'guozhan') {
+			if (this.identity == "unknown" || (!nomajor && this.isMajor())) return false;
+			if (
+				!nomajor &&
+				!game.hasPlayer(function (current) {
+					return current.isMajor();
+				})
+			) {
+				return false;
+			}
+			var map = {},
+				sides = [],
+				pmap = _status.connectMode ? lib.playerOL : game.playerMap,
+				player;
+			for (var i of game.players) {
+				if (i.identity == "unknown") continue;
+				var added = false;
+				for (var j of sides) {
+					if (i.isFriendOf(pmap[j])) {
+						added = true;
+						map[j].push(i);
+						if (i == this) player = j;
+						break;
+					}
+				}
+				if (!added) {
+					map[i.playerid] = [i];
+					sides.push(i.playerid);
+					if (i == this) player = i.playerid;
+				}
+			}
+			for (var i in map) {
+				if (map[i].length < map[player].length) return false;
+			}
+			return true;
+		}
+		else {
+			if (!nomajor && this.isMajor()) return false;
+			if (
+				!nomajor &&
+				!game.hasPlayer(function (current) {
+					return current.isMajor();
+				})
+			) {
+				return false;
+			}
+			var map = {};
+			for (var i of game.players) {
+				if (!map[i.group]) map[i.group] = [];
+				map[i.group].push(i);
+			}
+			for (var i in map) {
+				if (map[i].length < map[this.group].length) return false;
+			}
+			return true;
+		}
+	}
 	checkShow(skill, showonly) {
 		var sourceSkill = get.info(skill);
 		var noshow = false;
