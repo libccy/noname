@@ -392,7 +392,7 @@ const skills = {
 					};
 					if (event.isMine()) func();
 					else if (event.isOnline()) event.player.send(func);
-					let types = trigger.cards.reduce((list, card) => list.add(get.type(card, player)), []);
+					let types = trigger.cards.reduce((list, card) => list.add(get.type2(card, player)), []);
 					let result = await player
 						.chooseButton(["武威：请选择" + get.cnNumber(types.length) + "次以下项", [["摸一张牌", "令目标角色本回合非锁定技失效", "令本回合〖武威〗可发动次数+1"].map((item, i) => [i, item]), "textbutton"]])
 						.set("forced", true)
@@ -687,7 +687,8 @@ const skills = {
 				return list;
 			},
 			check() {
-				const event = get.event(), player = get.player();
+				const event = get.event(),
+					player = get.player();
 				if (
 					game.hasPlayer(current => {
 						return current !== player && get.attitude(player, current) < 0;
@@ -717,7 +718,7 @@ const skills = {
 							.chooseToGive(`${get.translation(player)}对你发动了【讨州】`, "你可以交给其至多三张手牌", [1, 3], player)
 							.set("ai", card => {
 								if (get.event("att") > 0) {
-									if (get.event("chosenNumber") < ui.selected.cards.length + (get.event("getRand")() < 0.5)) {
+									if (get.event("chosenNumber") < ui.selected.cards.length + (get.event().getRand() < 0.5)) {
 										return 5.1 - get.value(card);
 									}
 									return 0;
@@ -781,7 +782,7 @@ const skills = {
 				async content(event, trigger, player) {
 					trigger.num++;
 					player.removeMark("dcsbtaozhou_debuff", 1, false);
-					if (!player.countMark("dcsbtaozhou_debuff")){
+					if (!player.countMark("dcsbtaozhou_debuff")) {
 						player.removeSkill("dcsbtaozhou_debuff");
 					}
 				},
@@ -7373,8 +7374,8 @@ const skills = {
 				}
 				if (!cards.length) break;
 			}
-			if (bool) return gains.some(card => get.type2(card, false) == "trick");
-			return gains.filter(card => get.type2(card, false) == "trick");
+			if (bool) return gains.some(card => get.type(card) == "trick");
+			return gains.filter(card => get.type(card) == "trick");
 		},
 		isUse: function (event, player) {
 			if (event.name != "cardsDiscard") return event.type == "discard" && event.player == player;

@@ -354,12 +354,34 @@ const skills = {
 				})
 			)
 				return false;
-			return event.target != player && event.target.countCards("h");
+			return event.isFirstTarget && event.targets.some(current => current != player && current.countCards("h"));
 		},
-		forced: true,
-		logTarget: "target",
+		locked: true,
+		async cost(event, trigger, player) {
+			if (trigger.targets.length == 1) {
+				event.result = {
+					bool: true,
+					targets: trigger.targets,
+				};
+			} else {
+				event.result = await player
+					.chooseTarget(
+						get.prompt2("dchuoxin"),
+						(card, player, target) => {
+							return target != player && target.countCards("h") && get.event("targets").includes(target);
+						},
+						true
+					)
+					.set("ai", target => {
+						const player = get.player();
+						return -get.attitude(player, target);
+					})
+					.set("targets", trigger.targets)
+					.forResult();
+			}
+		},
 		async content(event, trigger, player) {
-			const target = trigger.target;
+			const target = event.targets[0];
 			const result = await player.choosePlayerCard("h", target, true, "惑心：展示" + get.translation(target) + "的一张手牌").forResult();
 			if (result.bool) {
 				let cards = result.cards.slice();
@@ -12667,7 +12689,7 @@ const skills = {
 		content: function () {
 			"step 0";
 			var hs = player.getCards("h");
-			player.showCards(hs, get.translation(player) + "发动了【帼舞】");
+			player.showCards(hs, get.translation(player) + "发动了【帼武】");
 			var list = [];
 			for (var i of hs) {
 				list.add(get.type2(i, player));
@@ -12712,7 +12734,7 @@ const skills = {
 						return !trigger.targets.includes(current) && lib.filter.targetEnabled2(trigger.card, player, current) && lib.filter.targetInRange(trigger.card, player, current);
 					});
 					player
-						.chooseTarget("帼舞：是否为" + get.translation(trigger.card) + "增加" + (num > 1 ? "至多两个" : "一个") + "目标？", [1, Math.min(2, num)], function (card, player, target) {
+						.chooseTarget("帼武：是否为" + get.translation(trigger.card) + "增加" + (num > 1 ? "至多两个" : "一个") + "目标？", [1, Math.min(2, num)], function (card, player, target) {
 							var trigger = _status.event.getTrigger();
 							var card = trigger.card;
 							return !trigger.targets.includes(target) && lib.filter.targetEnabled2(card, player, target) && lib.filter.targetInRange(card, player, target);

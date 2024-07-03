@@ -881,10 +881,16 @@ const skills = {
 	clanjianyuan: {
 		inherit: "clanchenya",
 		filter(event, player) {
+			if (event.type != "player") return false;
+			var skill = event.sourceSkill || event.skill;
+			var info = get.info(skill);
+			if (info.charlotte) return false;
+			var translation = get.skillInfoTranslation(skill, event.player);
+			if (!translation || get.plainText(translation).indexOf("出牌阶段限一次") == -1 || !event.player.countCards("he")) return false;
 			for (var phase of lib.phaseName) {
 				var evt = event.getParent(phase);
 				if (evt && evt.name == phase) {
-					if (event.player.getHistory("useCard", evtx => evtx.getParent(phase) == evt).length) return lib.skill.clanchenya.filter(event, player);
+					if (event.player.getHistory("useCard", evtx => evtx.getParent(phase) == evt).length) return true;
 				}
 			}
 			return false;
@@ -1356,10 +1362,7 @@ const skills = {
 			var info = get.info(skill);
 			if (info.charlotte) return false;
 			var translation = get.skillInfoTranslation(skill, event.player);
-			if (!translation) return false;
-			var match = translation.match(/“?出牌阶段限一次/g);
-			if (!match || match.every(value => value != "出牌阶段限一次")) return false;
-			return event.player.countCards("h") > 0;
+			return translation && get.plainText(translation).indexOf("出牌阶段限一次") != -1 && event.player.countCards("h") > 0;
 		},
 		check(event, player) {
 			return get.attitude(player, event.player) > 0;
@@ -2419,7 +2422,7 @@ const skills = {
 				event.loser.chooseUseTarget(true, card, false);
 			} else event.goto(5);
 			"step 4";
-			if (cards.filter(i => get.position(i, true) == "d" && event.loser.hasUseTarget(i)).length) event.goto(3);
+			if (cards.filter(i => get.position(i, true) == "d" && event.loser.hasUseTarget(i)).length) event.goto(2);
 			"step 5";
 			if (get.distance(player, target) != event.distance[0] || get.distance(target, player) != event.distance[1]) {
 				player.restoreSkill("clanxumin");

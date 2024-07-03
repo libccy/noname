@@ -253,7 +253,7 @@ const skills = {
 					.set("prompt", "良姻：是否令一名角色回复体力？")
 					.set("ai", function () {
 						const player = _status.event.player,
-							target = _status.event.getParent().target;
+							target = _status.event.getParent().targets[0];
 						let list = _status.event.controls.slice(0),
 							eff1 = 0,
 							eff2 = 0;
@@ -354,7 +354,7 @@ const skills = {
 							.set("prompt", "良姻：是否令一名角色回复体力？")
 							.set("ai", function () {
 								const player = _status.event.player,
-									target = _status.event.getParent().target;
+									target = _status.event.getParent().targets[0];
 								let list = _status.event.controls.slice(0),
 									eff1 = 0,
 									eff2 = 0;

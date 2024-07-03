@@ -733,7 +733,7 @@ const skills = {
 		forced: true,
 		locked: false,
 		beginMarkCount: 20,
-		maxMarkCount: 100,
+		maxMarkCount: 99,
 		derivation: ["mbcmqingzheng", "mbcmjiushi", "mbcmfangzhu", "mbjuejin"],
 		addMark(player, num) {
 			num = Math.min(num, lib.skill.mbqianlong.maxMarkCount - player.countMark("mbqianlong"));
@@ -741,7 +741,9 @@ const skills = {
 		},
 		group: ["mbqianlong_begin", "mbqianlong_add", "mbqianlong_die"],
 		async content(event, trigger, player) {
-			player.addAdditionalSkill("mbqianlong", lib.skill.mbqianlong.derivation.slice(0, Math.floor(player.countMark("mbqianlong") / 25)));
+			const derivation = lib.skill.mbqianlong.derivation,
+				skills = player.countMark("mbqianlong") == lib.skill.mbqianlong.maxMarkCount ? derivation : derivation.slice(0, Math.floor(player.countMark("mbqianlong") / 25));
+			player.addAdditionalSkill("mbqianlong", skills);
 		},
 		marktext: "道",
 		intro: {
@@ -847,7 +849,7 @@ const skills = {
 		direct: true,
 		content() {
 			"step 0";
-			var num = 2;
+			var num = 1;
 			var prompt = "###" + get.prompt("sbqingzheng") + "###弃置" + get.cnNumber(num) + "种花色的所有牌";
 			var next = player.chooseButton([prompt, [lib.suit.map(i => ["", "", "lukai_" + i]), "vcard"]], num);
 			next.set("filterButton", button => {
@@ -1029,7 +1031,8 @@ const skills = {
 		persevereSkill: true,
 		inherit: "sbfangzhu",
 		filter(event, player) {
-			return game.hasPlayer(current => current !== player);
+			const target = player.storage.mbcmfangzhu;
+			return game.hasPlayer(current => current !== player && (target ? target != current : true));
 		},
 		usable: 1,
 		chooseButton: {
@@ -1078,12 +1081,15 @@ const skills = {
 					filterTarget(card, player, target) {
 						if (target == player) return false;
 						const num = lib.skill.mbcmfangzhu_backup.num,
-							storage = target.getStorage("mbcmfangzhu_ban");
+							storage = target.getStorage("mbcmfangzhu_ban"),
+							targetx = player.storage.mbcmfangzhu;
+						if (target == targetx) return false;
 						return num != 1 || !storage.length;
 					},
 					async content(event, trigger, player) {
 						const target = event.target;
 						const num = lib.skill.mbcmfangzhu_backup.num;
+						player.storage.mbcmfangzhu = target;
 						switch (num) {
 							case 1:
 								target.addTempSkill("mbcmfangzhu_ban", { player: "phaseEnd" });
@@ -1185,12 +1191,38 @@ const skills = {
 			const target = event.target;
 			const delt = target.getHp(true) - 1,
 				num = Math.abs(delt);
-			await target[delt > 0 ? "loseHp" : "recover"](num);
-			if (num > 0) await target.changeHujia(num, null, true);
+			if (delt != 0) {
+				const next = target.changeHp(-delt);
+				next._triggered = null;
+				await next;
+			}
+			if (num > 0) await target.changeHujia(num + (player == target ? 2 : 0), null, true);
+			else if (player == target) await target.changeHujia(2, null, true);
 		},
 		async contentAfter(event, trigger, player) {
 			game.addGlobalSkill("mbjuejin_xiangsicunwei");
 			player.$fullscreenpop("向死存魏！", "thunder");
+			const cards = ["cardPile", "discardPile"].map(pos => Array.from(ui[pos].childNodes)).flat();
+			const filter = card => ["shan", "tao", "jiu"].includes(card.name);
+			const lose_list = [],
+				players = game.filterPlayer();
+			players.forEach(current => {
+				const pos = "hej";
+				const sishis = current.getCards(pos, filter);
+				if (sishis.length > 0) {
+					current.$throw(sishis);
+					lose_list.push([current, sishis]);
+				}
+			});
+			if (lose_list.length) {
+				await game.loseAsync({ lose_list }).setContent("chooseToCompareLose");
+				await game.asyncDelayx();
+			}
+			const cardx = cards.filter(filter);
+			if (cardx.length) {
+				await game.cardsGotoSpecial(cardx);
+				game.log(cardx, "被移出了游戏");
+			}
 		},
 		ai: {
 			order: 0.1,
@@ -6911,10 +6943,10 @@ const skills = {
 				audio: "mbdaoshu1",
 				enable: "phaseUse",
 				filter: function (event, player) {
-					return game.hasPlayer(target => target != player && target.countCards("h") > 2);
+					return game.hasPlayer(target => target != player && target.countCards("h") >= 2);
 				},
 				filterTarget: function (card, player, target) {
-					return target != player && target.countCards("h") > 2;
+					return target != player && target.countCards("h") >= 2;
 				},
 				usable: 1,
 				prompt: () => lib.translate.mbdaoshu_info,

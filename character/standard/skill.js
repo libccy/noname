@@ -215,6 +215,7 @@ const skills = {
 		subSkill: {
 			effect: {
 				charlotte: true,
+				onremove: true,
 				mod: {
 					cardEnabled(card, player) {
 						if (player.getStorage("stddaoshu_effect").includes(get.suit(card))) return false;
@@ -636,6 +637,7 @@ const skills = {
 			event.result = await player
 				.chooseCardTarget({
 					prompt: get.prompt2("stdzhiyinmeng"),
+					filterTarget: lib.filter.notMe,
 					filterCard: true,
 					position: "he",
 					selectCard: [1, Infinity],
@@ -681,12 +683,13 @@ const skills = {
 					(card, player, target) => {
 						return target != player && target.countCards("h") == player.countCards("h");
 					},
-					[1, Infinity]
+					[1, 2]
 				)
 				.set("ai", target => {
 					const player = get.event("player");
 					return get.effect(target, { name: "draw" }, player, player);
-				});
+				})
+				.forResult();
 		},
 		locked: true,
 		async content(event, trigger, player) {
