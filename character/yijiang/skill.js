@@ -11364,7 +11364,7 @@ const skills = {
 		},
 	},
 	dingpin: {
-		audio: 2,
+		audio: "pindi",
 		enable: "phaseUse",
 		onChooseToUse: function (event) {
 			if (event.type != "phase" || game.online) return;
