@@ -10235,7 +10235,7 @@ const skills = {
 	fencheng: {
 		skillAnimation: "epic",
 		animationColor: "gray",
-		audio: 2,
+		audio: "xinfencheng",
 		enable: "phaseUse",
 		filter: function (event, player) {
 			return !player.storage.fencheng;
