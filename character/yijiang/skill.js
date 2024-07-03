@@ -9381,7 +9381,7 @@ const skills = {
 		},
 	},
 	// taoxi:{
-	// 	audio:2,
+	// 	audio: "qingxi",
 	// 	trigger:{player:'useCardToPlayered'},
 	// 	filter:function(event,player){
 	// 		return _status.currentPhase==player&&event.targets.length==1&&
@@ -9472,7 +9472,7 @@ const skills = {
 	// },
 	// taoxi4:{},
 	taoxi: {
-		audio: 2,
+		audio: "qingxi",
 		trigger: { player: "useCardToPlayered" },
 		check: function (event, player) {
 			if (get.attitude(player, event.target) >= 0) return false;
