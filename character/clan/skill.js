@@ -1356,10 +1356,7 @@ const skills = {
 			var info = get.info(skill);
 			if (info.charlotte) return false;
 			var translation = get.skillInfoTranslation(skill, event.player);
-			if (!translation) return false;
-			var match = translation.match(/“?出牌阶段限一次/g);
-			if (!match || match.every(value => value != "出牌阶段限一次")) return false;
-			return event.player.countCards("h") > 0;
+			return translation && get.plainText(translation).indexOf("出牌阶段限一次") != -1 && event.player.countCards("h") > 0;
 		},
 		check(event, player) {
 			return get.attitude(player, event.player) > 0;
