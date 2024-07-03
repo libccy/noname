@@ -2493,10 +2493,10 @@ export class Get extends GetCompatible {
 	 * @returns {string[]}
 	 */
 	nameList(player) {
-		return (!player||get.itemtype(player)!="player")?[]:["name", "name1", "name2"]
-			.filter(prop => player[prop])
-			.map(prop => player[prop])
-			.toUniqued();
+		return (!player || get.itemtype(player) != "player") ? [] : ["name", "name1", "name2"]
+					.filter(prop => player[prop])
+					.map(prop => player[prop])
+					.toUniqued();
 	}
 
 	position(card, ordering) {
