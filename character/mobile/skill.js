@@ -1191,10 +1191,13 @@ const skills = {
 			const target = event.target;
 			const delt = target.getHp(true) - 1,
 				num = Math.abs(delt);
-			const next = target.changeHp(-delt);
-			next._triggered = null;
-			await next;
+			if (delt != 0) {
+				const next = target.changeHp(-delt);
+				next._triggered = null;
+				await next;
+			}
 			if (num > 0) await target.changeHujia(num + (player == target ? 2 : 0), null, true);
+			else if (player == target) await target.changeHujia(2, null, true);
 		},
 		async contentAfter(event, trigger, player) {
 			game.addGlobalSkill("mbjuejin_xiangsicunwei");
