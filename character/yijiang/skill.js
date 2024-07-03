@@ -10028,7 +10028,7 @@ const skills = {
 		filter: function (event, player) {
 			return event.card.name == "sha" && player.isPhaseUsing() && event.target.hp > 0 && event.target.countCards("he") > 0;
 		},
-		audio: 2,
+		audio: "pojun",
 		content: function () {
 			"step 0";
 			player.choosePlayerCard(trigger.target, "he", [1, Math.min(trigger.target.countCards("he"), trigger.target.hp)], get.prompt("xinpojun", trigger.target)).set("forceAuto", true);
