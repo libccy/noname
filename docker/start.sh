@@ -1,2 +1,2 @@
-node noname-server.js &
+node noname-server.js --server &
 (cd game && node server.js)
