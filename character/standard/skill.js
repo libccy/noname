@@ -27,7 +27,7 @@ const skills = {
 				trigger: { player: "useCardToPlayered" },
 				filter(event, player) {
 					if (event.card.name != "sha" && get.type(event.card) != "trick") return false;
-					return event.target.isDamaged();
+					return event.target.isDamaged() && player.countCards("he");
 				},
 				forced: true,
 				autodelay: true,
