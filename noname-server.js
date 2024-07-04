@@ -66,7 +66,7 @@ try {
 	});
 
 	// 根据参数设置 maxAge
-	const maxAge = argv.server ? argv.maxAge : 0;
+	const maxAge = (argv.server && !argv.debug) ? argv.maxAge : 0;
 
 	app.use(express.static(__dirname, { maxAge: maxAge }));
 
