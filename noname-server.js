@@ -1,3 +1,5 @@
+#!/usr/bin/env -S deno run --allow-read --allow-net --allow-env
+
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as process from "node:process";
@@ -15,9 +17,20 @@ try {
 	// 解析命令行参数
 	// 示例: -s --maxAge 100 --port 8089
 	const argv = minimist(process.argv.slice(2), {
-		alias: { server: "s" },
-		default: { maxAge: oneYear, port: 8089 },
+		alias: {
+			s: "server"
+		},
+		default: {
+			server: false,
+			maxAge: oneYear,
+			port: 8089,
+			debug: false
+		},
 	});
+
+	if (argv.debug) {
+		console.log(`argv:`, argv);
+	}
 
 	app.use(
 		bodyParser.json({
