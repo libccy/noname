@@ -778,6 +778,6 @@ export default {
 	"#olpijing2": "荆楚多锦绣，安能丧于小儿之手！",
 	"#liupan:die": "今袍泽离散，无以为战……",
 	"#olqingya1": "罡风从虎，威震四方！",
-	"#olqingya1": "铁车过处，寸草不生！",
+	"#olqingya2": "铁车过处，寸草不生！",
 	"#yadan:die": "多谢丞相不杀之恩……",
 };
