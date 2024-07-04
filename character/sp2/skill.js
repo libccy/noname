@@ -2,6 +2,190 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//王戎
+	mpqianlin: {
+		audio: 2,
+		trigger: {
+			global: "phaseAfter",
+		},
+		getCards(player) {
+			const cards = [];
+			game.checkGlobalHistory("cardMove", evt => {
+				if (evt.name == "lose") {
+					if (evt.position !== ui.discardPile) return false;
+				} else if (evt.name !== "cardsDiscard") return false;
+				if (get.info("mpqianlin").isUseOrRespond(evt, player)) {
+					cards.addArray(
+						evt.cards.filter(card => {
+							return get.type(card) == "basic" && get.position(card) === "d";
+						})
+					);
+				}
+			});
+			player.checkHistory("lose", evt => {
+				if (evt.type == "discard") {
+					cards.addArray(
+						evt.cards2.filter(card => {
+							return get.type(card) == "basic" && get.position(card) === "d";
+						})
+					);
+				}
+			});
+			return cards;
+		},
+		isUseOrRespond(event, player) {
+			if (event.name !== "cardsDiscard") return false;
+			const evtx = event.getParent();
+			if (evtx.name !== "orderingDiscard") return false;
+			const evt2 = evtx.relatedEvent || evtx.getParent();
+			return ["useCard", "respond"].includes(evt2.name) && evt2.player == player;
+		},
+		filter(event, player) {
+			return get.info("mpqianlin").getCards(player).length;
+		},
+		async cost(event, trigger, player) {
+			const cards = get.info("mpqianlin").getCards(player);
+			const {
+				result: { bool, links },
+			} = await player.chooseButton(["悭吝：你可以获得其中一张牌", cards]).set("ai", get.buttonValue);
+			event.result = {
+				bool: bool,
+				cost_data: links,
+			};
+		},
+		async content(event, trigger, player) {
+			player.gain(event.cost_data, "gain2");
+		},
+	},
+	mpsixiao: {
+		audio: 2,
+		trigger: {
+			global: "phaseBefore",
+			player: "enterGame",
+		},
+		locked: true,
+		filter(event, player) {
+			return (event.name != "phase" || game.phaseNumber == 0) && game.hasPlayer(current => current != player);
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(true, lib.filter.notMe, "死孝：请选择一名角色当其孝子", "当该角色需要使用或打出除【无懈可击】外的牌时，其可以观看你的手牌并可以使用或打出其中一张牌，然后你摸一张牌")
+				.set("ai", target => {
+					return get.attitude(get.player(), target);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			game.log(player, "成为了", target, "的孝子");
+			target.storage.mpsixiao_use = player;
+			target.addSkill("mpsixiao_use");
+		},
+		subSkill: {
+			use: {
+				charlotte: true,
+				mark: "character",
+				intro: {
+					content: "当你需要使用或打出除【无懈可击】外的牌时，你可以观看$的手牌并可以使用或打出其中一张牌，然后$摸一张牌",
+				},
+				hiddenCard(player, name) {
+					if (name == "wuxie" || !lib.inpile.includes(name) || player.hasSkill("mpsixiao_used", null, null, false)) return false;
+					const target = player.storage.mpsixiao_use;
+					const cards = target.getCards("h");
+					for (var i of cards) {
+						if (get.name(i, target) == name) return true;
+					}
+					return false;
+				},
+				enable: ["chooseToUse", "chooseToRespond"],
+				filter(event, player) {
+					const target = player.storage.mpsixiao_use;
+					const cards = target.getCards("h");
+					if (player.hasSkill("mpsixiao_used", null, null, false)) return false;
+					return cards.some(i =>
+						event.filterCard(
+							{
+								name: get.name(i, target),
+								nature: get.nature(i, target),
+								isCard: true,
+							},
+							player,
+							event
+						)
+					);
+				},
+				chooseButton: {
+					dialog(event, player) {
+						const target = player.storage.mpsixiao_use;
+						const cards = target.getCards("h");
+						return ui.create.dialog("死孝", cards);
+					},
+					filter(button, player) {
+						const evt = _status.event.getParent();
+						const target = player.storage.mpsixiao_use;
+						return evt.filterCard(
+							{
+								name: get.name(button.link, target),
+								nature: get.nature(button.link, target),
+								isCard: true,
+							},
+							player,
+							evt
+						);
+					},
+					check(button) {
+						const player = get.player();
+						const evt = _status.event.getParent();
+						if (evt.dying) return get.attitude(player, evt.dying);
+						if (_status.event.getParent().type != "phase") return 1;
+						return player.getUseValue(get.autoViewAs(button.link), null, true);
+					},
+					backup(links, player) {
+						const target = player.storage.mpsixiao_use;
+						return {
+							viewAs: {
+								name: get.name(links[0], target),
+								nature: get.nature(links[0], target),
+								isCard: true,
+							},
+							card: links[0],
+							filterCard: () => false,
+							selectCard: -1,
+							log: false,
+							async precontent(event, trigger, player) {
+								const card = lib.skill.mpsixiao_use_backup.card,
+									target = player.storage.mpsixiao_use;
+								event.result.card = card;
+								event.result.cards = [card];
+								player.addTempSkill("mpsixiao_used");
+								target
+									.when({ global: ["useCard", "respond"] })
+									.filter(evt => evt.player == player && evt.skill == "mpsixiao_use_backup")
+									.then(() => {
+										player.draw();
+									});
+							},
+						};
+					},
+					ai: {
+						hasSha: true,
+						hasShan: true,
+						skillTagFilter(player, tag) {
+							const name = "s" + tag.slice(4);
+							return lib.skill.mpsixiao_use.hiddenCard(player, name);
+						},
+					},
+				},
+				ai: {
+					order: 8,
+					result: {
+						player: 1,
+					},
+				},
+			},
+			used: {},
+		},
+	},
 	//马铁
 	dczhuiwang: {
 		mod: {

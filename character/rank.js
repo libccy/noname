@@ -150,6 +150,7 @@ window.noname_character_rank = {
 		"xukun",
 		"ol_feiyi",
 		"ol_jiangwan",
+		"bianyue",
 	],
 	a: [
 		"star_caoren",
@@ -404,6 +405,8 @@ window.noname_character_rank = {
 		"dc_sb_guanping",
 		"ol_caifuren",
 		"ol_liubiao",
+		"mp_liuling",
+		"mp_wangrong",
 	],
 	am: [
 		"tw_yanliang",
@@ -2007,6 +2010,7 @@ window.noname_character_rank = {
 			"jsrg_yuanshao",
 		],
 		epic: [
+			"bianyue",
 			"budugen",
 			"huan_guojia",
 			"huan_simayi",
@@ -2849,6 +2853,8 @@ window.noname_character_rank = {
 			"huan_jiangwei",
 			"huan_zhugeliang",
 			"ol_wuguotai",
+			"mp_liuling",
+			"mp_wangrong",
 		],
 		junk: [
 			"ol_peixiu",

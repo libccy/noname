@@ -1,4 +1,5 @@
 const characters = {
+	bianyue: ["female", "wei", 3, ["dcbizu", "dcwuxie"]],
 	zhupeilan: ["female", "wu", 3, ["dccilv", "dctongdao"]],
 	dc_sb_zhangxiu: ["male", "qun", 4, ["dcsbfuxi", "dcsbhaoyi"]],
 	dc_sb_guanping: ["male", "shu", 4, ["dcsbwuwei"]],
