@@ -2484,7 +2484,11 @@ export class Get extends GetCompatible {
 	 * @returns {GameEvent[T]}
 	 */
 	event(key) {
-		return key ? _status.event[key] : _status.event;
+		if (key) {
+			console.warn(`get.event("${key}")写法即将被废弃，请更改为get.event().${key}`);
+			return _status.event[key];
+		}
+		return _status.event;
 	}
 	player() {
 		return _status.event.player;
