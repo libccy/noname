@@ -166,6 +166,10 @@ export class Character {
 	 */
 	isNull = false;
 	/**
+	 * 
+	 */
+	specialName;
+	/**
 	 * @param { Object|[string, string, string|number, string[], any[]|undefined, any[]|undefined] } [data]
 	 */
 	constructor(data) {
@@ -208,6 +212,7 @@ export class Character {
 		this.trashBin = [];
 		this.dieAudios = [];
 		this.tempname = [];
+		this.specialName = [];
 	}
 	/**
 	 * @param { any[] } trash
