@@ -212,7 +212,6 @@ export class Character {
 		this.trashBin = [];
 		this.dieAudios = [];
 		this.tempname = [];
-		this.specialName = [];
 	}
 	/**
 	 * @param { any[] } trash
