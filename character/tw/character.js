@@ -1,5 +1,9 @@
 const characters = {
+<<<<<<< HEAD
 	huan_zhugeliang: ["male", "shu", "3/4", ["huan_zhugeliang_A", "huan_zhugeliang_B", "huan_zhugeliang_C"], ["name:诸葛|亮"]],
+=======
+	huan_zhugeliang: ["male", "shu", "3/4", ["twbeiding", "twjielv", "twhunyou"]],
+>>>>>>> 097849adf6e68c4fc267269af05320ad2537a1c3
 	huan_jiangwei: ["male", "shu", 4, ["huan_jiangwei_A", "huan_jiangwei_B"]],
 	huan_guojia: ["male", "wei", 3, ["huan_guojia_A", "huan_guojia_B"]],
 	huan_zhanghe: ["male", "wei", 4, ["huan_zhanghe_A"]],

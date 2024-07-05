@@ -5354,7 +5354,7 @@ const skills = {
 	rewansha: {
 		audio: "wansha",
 		audioname: ["re_jiaxu", "boss_lvbu3"],
-		audioname2: { shen_simayi: "jilue_wansha" },
+		audioname2: { shen_simayi: "jilue_wansha", xin_simayi: "jilue_wansha" },
 		global: "rewansha_global",
 		trigger: { global: "dyingBegin" },
 		forced: true,
@@ -5567,12 +5567,12 @@ const skills = {
 			return true;
 		},
 		async cost(event, trigger, player) {
-			const selfDraw = lib.skill.rebingyi.filtery(player),
+			const selfDraw = lib.skill.rebingyi.filterx(player) && lib.skill.rebingyi.filtery(player),
 				asyncDraw = lib.skill.rebingyi.filterx(player);
 			if (asyncDraw) {
 				const num = player.countCards("h");
 				const result = await player
-					.chooseTarget(get.prompt("rebingyi"), `展示所有手牌，并选择至多${get.cnNumber(num)}名角色各摸一张牌${selfDraw ? "" : "，然后你摸一张牌"}`, [0, num])
+					.chooseTarget(get.prompt("rebingyi"), `展示所有手牌，并选择至多${get.cnNumber(num)}名角色各摸一张牌${selfDraw ? "，然后你摸一张牌" : ""}`, [0, num])
 					.set("ai", function (target) {
 						return get.attitude(get.player(), target);
 					})
@@ -5588,7 +5588,7 @@ const skills = {
 					};
 			} else {
 				event.result = await player
-					.chooseBool(get.prompt("rebingyi"), `展示所有手牌${selfDraw ? "" : "，然后你摸一张牌"}`)
+					.chooseBool(get.prompt("rebingyi"), `展示所有手牌${selfDraw ? "，然后你摸一张牌" : ""}`)
 					.set("choice", selfDraw)
 					.set("ai", () => get.event().choice)
 					.forResult();
@@ -13146,7 +13146,7 @@ const skills = {
 	},
 	rezhiheng: {
 		audio: 2,
-		audioname2: { shen_caopi: "rezhiheng_shen_caopi" },
+		audioname2: { shen_caopi: "rezhiheng_shen_caopi", xin_simayi: "jilue_zhiheng" },
 		mod: {
 			aiOrder: function (player, card, num) {
 				if (num <= 0 || get.itemtype(card) !== "card" || get.type(card) !== "equip") return num;
@@ -13239,7 +13239,7 @@ const skills = {
 	},
 	rejizhi: {
 		audio: 2,
-		audioname2: { lukang: "rejizhi_lukang" },
+		audioname2: { lukang: "rejizhi_lukang", xin_simayi: "jilue_jizhi" },
 		locked: false,
 		trigger: { player: "useCard" },
 		frequent: true,
@@ -13586,6 +13586,7 @@ const skills = {
 	},
 	reguicai: {
 		audio: 2,
+		audioname2: { xin_simayi: "jilue_guicai" },
 		trigger: { global: "judge" },
 		direct: true,
 		filter: function (event, player) {

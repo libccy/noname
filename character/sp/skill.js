@@ -13608,9 +13608,13 @@ const skills = {
 			var ph = player.countCards("h");
 			if (ph > 0 && targets.some(target => target.isIn() && target.countCards("h") < ph)) {
 				player
-					.chooseTarget("请选择一名手牌数小于自己的目标角色，令其摸一张牌", function (card, player, target) {
-						return _status.event.getParent().targets.includes(target) && target.countCards("h") < player.countCards("h");
-					})
+					.chooseTarget(
+						"请选择一名手牌数小于自己的目标角色，令其摸一张牌",
+						function (card, player, target) {
+							return _status.event.getParent().targets.includes(target) && target.countCards("h") < player.countCards("h");
+						},
+						true
+					)
 					.set("ai", function (target) {
 						var player = _status.event.player;
 						return get.attitude(player, target);

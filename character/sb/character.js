@@ -43,6 +43,7 @@ const characters = {
 	sb_menghuo: ["male", "shu", 4, ["sbhuoshou", "sbzaiqi"]],
 	sb_yl_luzhi: ["male", "qun", 3, ["nzry_mingren", "sbzhenliang"]],
 	sb_xiaoqiao: ["female", "wu", 3, ["sbtianxiang", "xinhongyan"]],
+	sb_luxun: ["male", "wu", 3, ["sbqianxun", "sblianying"]],
 };
 
 export default characters;

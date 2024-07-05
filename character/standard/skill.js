@@ -27,7 +27,7 @@ const skills = {
 				trigger: { player: "useCardToPlayered" },
 				filter(event, player) {
 					if (event.card.name != "sha" && get.type(event.card) != "trick") return false;
-					return event.target.isDamaged();
+					return event.target.isDamaged() && player.countCards("he");
 				},
 				forced: true,
 				autodelay: true,
@@ -45,6 +45,8 @@ const skills = {
 		enable: "phaseUse",
 		filterTarget: true,
 		selectTarget: [1, Infinity],
+		multitarget: true,
+		multiline: true,
 		skillAnimation: true,
 		animationColor: "thunder",
 		async content(event, trigger, player) {
@@ -213,6 +215,7 @@ const skills = {
 		subSkill: {
 			effect: {
 				charlotte: true,
+				onremove: true,
 				mod: {
 					cardEnabled(card, player) {
 						if (player.getStorage("stddaoshu_effect").includes(get.suit(card))) return false;
@@ -551,7 +554,8 @@ const skills = {
 					(card, player, target) => {
 						return target.getHp() == player.getHp();
 					},
-					[1, Infinity]
+					[1, Infinity],
+					true
 				)
 				.set("ai", target => {
 					const player = get.event("player");
@@ -633,6 +637,7 @@ const skills = {
 			event.result = await player
 				.chooseCardTarget({
 					prompt: get.prompt2("stdzhiyinmeng"),
+					filterTarget: lib.filter.notMe,
 					filterCard: true,
 					position: "he",
 					selectCard: [1, Infinity],
@@ -678,12 +683,13 @@ const skills = {
 					(card, player, target) => {
 						return target != player && target.countCards("h") == player.countCards("h");
 					},
-					[1, Infinity]
+					[1, 2]
 				)
 				.set("ai", target => {
 					const player = get.event("player");
 					return get.effect(target, { name: "draw" }, player, player);
-				});
+				})
+				.forResult();
 		},
 		locked: true,
 		async content(event, trigger, player) {
@@ -900,6 +906,7 @@ const skills = {
 	stdtiaohe: {
 		audio: "fyjianyu",
 		enable: "phaseUse",
+		usable: 1,
 		filter(event, player) {
 			return game.hasPlayer(target => {
 				return target.getDiscardableCards(player, "e").some(card => parseInt(get.subtype(card).slice("equip".length)) <= 2);
@@ -1227,6 +1234,9 @@ const skills = {
 	},
 	guicai: {
 		audio: 2,
+		audioname2: {
+			xin_simayi: "jilue_guicai",
+		},
 		trigger: { global: "judge" },
 		preHidden: true,
 		filter(event, player) {
@@ -2231,6 +2241,9 @@ const skills = {
 	jizhi: {
 		audio: 2,
 		audioname: ["jianyong"],
+		audioname2: {
+			xin_simayi: "jilue_jizhi",
+		},
 		trigger: { player: "useCard" },
 		frequent: true,
 		preHidden: true,
@@ -2344,6 +2357,9 @@ const skills = {
 	zhiheng: {
 		audio: 2,
 		audioname: ["gz_jun_sunquan"],
+		audioname2: {
+			xin_simayi: "jilue_zhiheng",
+		},
 		mod: {
 			aiOrder(player, card, num) {
 				if (num <= 0 || get.itemtype(card) !== "card" || get.type(card) !== "equip") return num;
