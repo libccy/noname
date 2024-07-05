@@ -1161,6 +1161,7 @@ window.noname_character_rank = {
 		"huan_jiangwei",
 		"budugen",
 		"jsrg_dongbai",
+		"yj_zhonghui",
 	],
 	b: [
 		"huan_zhugeliang",
@@ -2010,6 +2011,7 @@ window.noname_character_rank = {
 			"jsrg_yuanshao",
 		],
 		epic: [
+			"yj_zhonghui",
 			"bianyue",
 			"budugen",
 			"huan_guojia",

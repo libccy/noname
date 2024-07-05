@@ -3,6 +3,166 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//线下E系列
+	//钟会 先放着
+	psmouchuan: {
+		audio: 2,
+		trigger: {
+			global: "roundStart",
+		},
+		async content(event, trigger, player) {
+			await player.draw(2);
+			if (!player.countCards("he") || !game.hasPlayer(current => current != player)) return;
+			const [cards, targets] = await player
+				.chooseCardTarget({
+					forced: true,
+					prompt: get.prompt("psmouchuan"),
+					prompt2: "将一张牌交给一名其他角色",
+					filterTarget: lib.filter.notMe,
+					filterCard: true,
+					position: "he",
+					ai1(card) {
+						return 6 - get.value(card);
+					},
+					ai2(target) {
+						const player = get.player();
+						return get.attitude(player, target);
+					},
+				})
+				.forResult("cards", "targets");
+			if (!cards || !cards.length || !targets || !targets.length) return;
+			const [target] = targets;
+			await player.give(cards, target);
+			if ([player, target].some(i => !i.countCards("h"))) return;
+			let card1, card2;
+			if (player.countCards("h")) {
+				const cardp = await player.chooseCard("请展示一张手牌", true, "h").forResultCards();
+				await player.showCards(cardp);
+				card1 = cardp[0];
+			}
+			if (target.countCards("h")) {
+				const cardt = await target.chooseCard("请展示一张手牌", true, "h").forResultCards();
+				await target.showCards(cardt);
+				card2 = cardt[0];
+			}
+			if (card1 && card2) {
+				const skill = get.color(card1, player) == get.color(card2, target) ? "psdaohe" : "pszhiyi";
+				await player.addTempSkills(skill, "roundStart");
+			}
+		},
+		derivation: ["psdaohe", "pszhiyi"],
+	},
+	pszizhong: {
+		audio: 2,
+		mod: {
+			maxHandcard(player, num) {
+				return num + get.info("jsrgjuxia").countSkill(player);
+			},
+		},
+		trigger: {
+			player: "useCard",
+		},
+		filter(event, player) {
+			const num = get.info("jsrgjuxia").countSkill(player) - 2;
+			if (!num || get.type(event.card) == "equip") return false;
+			return player.getRoundHistory("useCard", evt => get.name(evt.card) == get.name(event.card)).indexOf(event) == 0;
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			const num = get.info("jsrgjuxia").countSkill(player) - 2;
+			await player.draw(num);
+		},
+	},
+	psjizun: {
+		audio: 2,
+		trigger: {
+			player: "dyingAfter",
+		},
+		filter(event, player) {
+			return player.isDamaged() || !player.hasSkill("psqingsuan");
+		},
+		forced: true,
+		unique: true,
+		juexingji: true,
+		skillAnimation: true,
+		animationColor: "orange",
+		async content(event, trigger, player) {
+			player.awakenSkill("psjizun");
+			if (!player.hasSkill("psqingsuan")) await player.addSkills("psqingsuan");
+			else await player.recoverTo(player.maxHp);
+		},
+	},
+	psqingsuan: {
+		locked: true,
+		zhuSkill: true,
+		getEnemies(player) {
+			const enemies = [];
+			player.checkAllHistory("damage", evt => {
+				if (evt.source && player.group != evt.source.group) enemies.add(evt.source);
+			});
+			return enemies;
+		},
+		mod: {
+			targetInRange(card, player, target) {
+				if (get.info("psqingsuan").getEnemies(player).includes(target)) return true;
+			},
+			cardUsableTarget(card, player, target) {
+				if (get.info("psqingsuan").getEnemies(player).includes(target)) return true;
+			},
+		},
+	},
+	psdaohe: {
+		audio: 2,
+		enable: "phaseUse",
+		usable: 1,
+		filter(event, player) {
+			return game.hasPlayer(current => current != player && current.countCards("h"));
+		},
+		filterTarget(card, player, target) {
+			return target != player && target.countCards("h");
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			await target.chooseToGive(player, "h", [1, Infinity], true).set("ai", card => {
+				const player = get.player(),
+					target = get.event("target"),
+					att = get.attitude(player, target);
+				if (att <= 0) {
+					if (ui.selected.cards.length) return 0;
+					return 6 - get.value(card);
+				}
+				return target.getUseValue(card);
+			});
+			await target.recover();
+		},
+		ai: {
+			order: 6,
+			result: {
+				player(player, target) {
+					if (target.isHealthy()) return get.effect(target, { name: "shunshou_copy2" }, player, player);
+					return get.recoverEffect(target, player, player);
+				},
+			},
+		},
+	},
+	pszhiyi: {
+		audio: 2,
+		enable: "phaseUse",
+		usable: 1,
+		filterTarget: true,
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			await target.draw();
+			await target.damage();
+		},
+		ai: {
+			order: 1,
+			result: {
+				player(player, target) {
+					return get.effect(target, { name: "draw" }, player, player) + get.damageEffect(target, player, player);
+				},
+			},
+		},
+	},
 	//鄂焕
 	psdiwan: {
 		trigger: { player: "useCardToPlayered" },

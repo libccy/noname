@@ -383,7 +383,7 @@ const skills = {
 				charlotte: true,
 				mod: {
 					globalTo(from, to, distance) {
-						return distance + to.countMark("sbyicong_to");
+						return distance + to.countMark("sbyicong_from");
 					},
 				},
 				marktext: "从",

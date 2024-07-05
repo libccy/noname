@@ -1,4 +1,5 @@
 const characters = {
+	yj_zhonghui: ["male", "wei", 4, ["psmouchuan", "pszizhong", "psjizun", "psqingsuan"], ["zhu"]],
 	yj_ehuan: ["male", "qun", 5, ["psdiwan", "pssuiluan", "psconghan"], ["doublegroup:shu:qun"]],
 	yj_zhouji: ["female", "wu", 3, ["psyanmou", "pszhanyan", "psyuhuo"]],
 	drag_guanyu: ["male", "shu", 4, ["dragchaojue", "dragjunshen"]],
