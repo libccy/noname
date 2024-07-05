@@ -166,10 +166,6 @@ export class Character {
 	 */
 	isNull = false;
 	/**
-	 * 
-	 */
-	specialName;
-	/**
 	 * @param { Object|[string, string, string|number, string[], any[]|undefined, any[]|undefined] } [data]
 	 */
 	constructor(data) {
