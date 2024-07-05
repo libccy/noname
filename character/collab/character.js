@@ -10,8 +10,8 @@ const characters = {
 	xiaoyuehankehan: ["male", "qun", 3, ["dctongliao", "dcwudao"], ["die:true","die:3"]],
 	libai: ["male", "qun", 3, ["dclbjiuxian", "dcshixian"], ["die:true", "die:2"]],
 	sunwukong: ["male", "qun", 3, ["dcjinjing", "dccibei", "dcruyi"]],
-	longwang: ["male", "qun", 3, ["dclonggong", "dcsitian"]],
-	taoshen: ["male", "qun", 3, ["dcnutao"]],
+	longwang: ["male", "qun", 3, ["dclonggong", "dcsitian"], ["name:敖|广"]],
+	taoshen: ["male", "qun", 3, ["dcnutao"], ["name:伍|子胥"]],
 	sunyang: ["male", "wu", 4, ["clbshuijian"]],
 	yeshiwen: ["female", "wu", 3, ["clbjisu", "clbshuiyong"]],
 	sp_jiben: ["male", "qun", 3, ["spduanzhi", "spduyi"]],
@@ -22,6 +22,7 @@ const characters = {
 	dc_wuyi: ["male", "shu", 4, ["dcbenxi"]],
 	quyuan: ["male", "qun", 3, ["dcqiusuo", "dclisao"]],
 	xin_sunquan: ["male", "wu", 3, ["dchuiwan", "dchuanli"]],
+	dc_noname: ["male", "qun", 3, ["dcchushan"]],
 };
 
 export default characters;

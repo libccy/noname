@@ -2,7 +2,7 @@ const characters = {
 	noname: ["female", "key", 3, ["noname_zhuyuan", "noname_duocai"]],
 
 	ns_huangchengyan: ["male", "shu", 3, ["nslongyue", "nszhenyin"]],
-	ns_sunchensunjun: ["male", "wu", 5, ["nsxianhai", "nsxingchu"]],
+	ns_sunchensunjun: ["male", "wu", 5, ["nsxianhai", "nsxingchu"], ["name:孙|綝-孙|峻"]],
 	ns_yuanxi: ["male", "qun", 4, ["nsshengyan", "nsdaizhan"]],
 	ns_caoshuang: ["male", "wei", 4, ["nsjiquan", "nsfuwei"]],
 	ns_sunyi: ["male", "wu", 4, ["nsguolie"]],
@@ -14,7 +14,7 @@ const characters = {
 	ns_ruanji: ["male", "wei", 3, ["nsshizui", "nsxiaoye"]],
 	ns_limi: ["male", "jin", 3, ["nstuilun"]],
 	ns_zhonglimu: ["male", "wu", 4, ["nskuanhuai", "nsdingbian"]],
-	prp_zhugeliang: ["male", "shu", 3, ["nsxingyun", "nshanlang"]],
+	prp_zhugeliang: ["male", "shu", 3, ["nsxingyun", "nshanlang"], ["name:诸葛|亮"]],
 
 	ns_zhangwei: ["female", "shu", 3, ["nsqiyue", "nsxuezhu"]],
 	diy_wenyang: ["male", "wei", "4/6", ["lvli", "choujue"]],
@@ -37,9 +37,9 @@ const characters = {
 	//re_huangyueying:['female','shu',3,['rejizhi','qicai']],
 
 	diy_liufu: ["male", "wei", 3, ["zhucheng", "duoqi"]],
-	diy_xizhenxihong: ["male", "shu", 4, ["fuchou", "jinyan"]],
+	diy_xizhenxihong: ["male", "shu", 4, ["fuchou", "jinyan"], ["name:习|珍-习|宏"]],
 	diy_liuzan: ["male", "wu", 4, ["kangyin"]],
-	diy_zaozhirenjun: ["male", "wei", 3, ["liangce", "jianbi", "diyjuntun"]],
+	diy_zaozhirenjun: ["male", "wei", 3, ["liangce", "jianbi", "diyjuntun"], ["name:枣|祗-任|峻"]],
 	diy_yangyi: ["male", "shu", 3, ["choudu", "liduan"]],
 	diy_tianyu: ["male", "wei", 4, ["chezhen", "youzhan"]],
 
@@ -57,12 +57,12 @@ const characters = {
 
 	ns_caocao: ["male", "wei", 4, ["nscaiyi", "nsgefa", "nshaoling"]],
 	ns_caocaosp: ["male", "qun", 3, ["nsjianxiong", "nsxionglue"]],
-	ns_zhugeliang: ["male", "shu", 3, ["nsguanxing", "kongcheng", "nsyunxing"]],
+	ns_zhugeliang: ["male", "shu", 3, ["nsguanxing", "kongcheng", "nsyunxing"], ["name:诸葛|亮"]],
 	ns_wangyue: ["male", "qun", 4, ["nsjianshu", "nscangjian"]],
 	ns_yuji: ["male", "qun", 3, ["nsyaowang", "nshuanhuo"]],
 	ns_xinxianying: ["female", "wei", 3, ["nsdongcha", "nscaijian", "nsgongjian"]],
 	ns_guanlu: ["male", "wei", 3, ["nsbugua", "nstuiyan", "nstianji"]],
-	ns_simazhao: ["male", "wei", 3, ["nszhaoxin", "nsxiuxin", "nsshijun"]],
+	ns_simazhao: ["male", "wei", 3, ["nszhaoxin", "nsxiuxin", "nsshijun"], ["name:司马|昭"]],
 	ns_sunjian: ["male", "wu", 4, ["nswulie", "nshunyou", "nscangxi"]],
 
 	ns_duangui: ["male", "qun", 3, ["nscuanquan", "nsjianning", "nschangshi", "nsbaquan"]],
@@ -80,7 +80,7 @@ const characters = {
 	// ns_zhaoyunshen:['male','qun',3,[]],
 	// ns_lisu:['male','qun',3,[]],
 	// ns_sunhao:['male','qun',3,[]],
-	ns_xinnanhua: ["male", "qun", 3, ["ns_xiandao", "ns_xiuzheng", "ns_chuanshu"]],
+	ns_xinnanhua: ["male", "qun", 3, ["ns_xiandao", "ns_xiuzheng", "ns_chuanshu"], ["name:南华|null"]],
 	ns_caimao: ["male", "qun", 4, ["nsdingzhou"]],
 	ns_luyusheng: ["female", "wu", 3, ["nshuaishuang", "nsfengli"]],
 	ns_chengpu: ["male", "wu", 4, ["decadelihuo", "decadechunlao"]],

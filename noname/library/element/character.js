@@ -146,6 +146,11 @@ export class Character {
 	 **/
 	clans = [];
 	/**
+	 * 武将牌的图片信息
+	 * @type {string | undefined}
+	 */
+	img;
+	/**
 	 * 武将牌拥有的全部阵亡语音
 	 * @type { string[] }
 	 **/
@@ -202,6 +207,7 @@ export class Character {
 		this.hasHiddenSkill = false;
 		this.groupBorder = void 0;
 		this.dualSideCharacter = void 0;
+		this.img = void 0;
 		this.doubleGroup = [];
 		this.clans = [];
 		this.initFilters = [];
@@ -213,7 +219,9 @@ export class Character {
 	 * @param { any[] } trash
 	 */
 	setPropertiesFromTrash(trash) {
-		const keptTrashes = [], clans = [], dieAudios=[];
+		const keptTrashes = [],
+			clans = [],
+			dieAudios = [];
 		for (let i = 0; i < trash.length; i++) {
 			const item = trash[i];
 			if (typeof item !== "string") {
@@ -264,6 +272,8 @@ export class Character {
 				clans.push(item.slice(5));
 			} else if (item.startsWith("InitFilter:")) {
 				this.initFilters = item.slice(11).split(":");
+			} else if (item.startsWith("img:")) {
+				this.img = item.slice(4);
 			} else if (item.startsWith("die:")) {
 				dieAudios.add(item.slice(4));
 			} else if (item.startsWith("die_audio:")) {
@@ -388,13 +398,16 @@ export class Character {
 			trashes.push(`doublegroup:${character.doubleGroup.join(":")}`);
 		}
 		if (character.clans.length > 0) {
-			character.clans.forEach((item) => trashes.push(`clan:${item}`));
+			character.clans.forEach(item => trashes.push(`clan:${item}`));
 		}
 		if (character.initFilters.length > 0) {
 			trashes.push(`InitFilters:${character.initFilters.join(":")}`);
 		}
+		if (character.img) {
+			trashes.push(`img:${character.img}`);
+		}
 		if (character.dieAudios.length > 0) {
-			character.dieAudios.forEach((item) => trashes.push(`die:${item}`));
+			character.dieAudios.forEach(item => trashes.push(`die:${item}`));
 		}
 		if (character.tempname.length > 0) {
 			trashes.push(`tempname:${character.tempname.join(":")}`);
@@ -412,7 +425,7 @@ export class Character {
 				character.initializeTrashProperties();
 				character.setPropertiesFromTrash(target);
 				return result;
-			}
+			},
 		});
 	}
 	set 4(trashBin) {

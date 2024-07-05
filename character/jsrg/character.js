@@ -107,6 +107,7 @@ const characters = {
 		hp: 3,
 		skills: ["jsrgshoushu", "jsrgxundao", "jsrglinghua"],
 		dieAudios: ["nanhualaoxian"],
+		trashBin: ["name:南华|null"],
 	},
 	//承
 	jsrg_sunce: {
@@ -147,6 +148,7 @@ const characters = {
 		hp: 3,
 		skills: ["jsrgguyin", "jsrgzhangdeng"],
 		dieAudios: ["re_zoushi"],
+		trashBin: ["name:邹|null"]
 	},
 	jsrg_guanyu: {
 		sex: "male",
@@ -239,6 +241,7 @@ const characters = {
 		group: "wei",
 		hp: 4,
 		skills: ["jsrgfenjian"],
+		trashBin: ["name:夏侯|荣"]
 	},
 	jsrg_sunshangxiang: {
 		sex: "female",
@@ -275,6 +278,7 @@ const characters = {
 		hp: 4,
 		skills: ["jsrghujian", "jsrgshili"],
 		dieAudios: ["tw_xiahouen"],
+		trashBin: ["name:夏侯|恩"],
 	},
 	jsrg_fanjiangzhangda: {
 		sex: "male",
@@ -282,6 +286,7 @@ const characters = {
 		hp: 5,
 		skills: ["jsrgfushan"],
 		dieAudios: ["fanjiangzhangda"],
+		trashBin: ["name:范|强-张|达"]
 	},
 	//合
 	jsrg_zhugeliang: {
@@ -290,6 +295,7 @@ const characters = {
 		hp: 3,
 		skills: ["jsrgwentian", "jsrgchushi", "jsrgyinlve"],
 		dieAudios: ["zhugeliang"],
+		trashBin: ["name:诸葛|亮"],
 	},
 	jsrg_jiangwei: {
 		sex: "male",
@@ -319,6 +325,7 @@ const characters = {
 		hp: 4,
 		skills: ["jsrgyingshi", "jsrgtuigu"],
 		dieAudios: ["simayi"],
+		trashBin: ["name:司马|懿"],
 	},
 	jsrg_guoxun: {
 		sex: "male",
@@ -361,6 +368,7 @@ const characters = {
 		hp: 4,
 		skills: ["jsrgfuhai"],
 		dieAudios: ["weiwenzhugezhi"],
+		trashBin: ["name:卫|温-诸葛|直"]
 	},
 	jsrg_zhangxuan: {
 		sex: "female",
@@ -396,12 +404,14 @@ const characters = {
 		group: "qun",
 		hp: 3,
 		skills: ["jsrgzonghai", "jsrgjueyin"],
+		trashBin: ["name:曹|节-王|甫"]
 	},
 	jsrg_songhuanghou: {
 		sex: "female",
 		group: "qun",
 		hp: 3,
 		skills: ["jsrgzhongzen", "jsrgxuchong"],
+		trashBin: ["name:宋|null"],
 	},
 	jsrg_zhangjiao: {
 		sex: "male",
