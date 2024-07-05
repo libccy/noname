@@ -22,6 +22,7 @@ const characters = {
 	dc_wuyi: ["male", "shu", 4, ["dcbenxi"]],
 	quyuan: ["male", "qun", 3, ["dcqiusuo", "dclisao"]],
 	xin_sunquan: ["male", "wu", 3, ["dchuiwan", "dchuanli"]],
+	dc_noname: ["male", "qun", 3, ["dcchushan"]],
 };
 
 export default characters;

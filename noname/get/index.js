@@ -348,6 +348,28 @@ export class Get extends GetCompatible {
 		return get.inpile("trick", "trick").randomGets(3);
 	}
 	/**
+	 * 用于获取武将的姓氏和名字
+	 * @param { string } str
+	 * @returns { Array | undefined }
+	 */
+	characterSurname(str){
+		var info = lib.character[str];
+		if (!info) return;
+		var name = info[4].find(current=>current.startsWith('name:'))
+		if (name) {
+			name = name.slice(5);
+			let newList = [];
+			let list = name.split('-');
+			for (const iterator of list) {
+				newList.push(iterator.split('|'));
+			}
+			return newList;
+		} else {
+			let rawName = get.rawName(str)
+			return [[rawName[0], rawName.slice(1)]];
+		}
+	}
+	/**
 	 * 返回角色对应的原角色
 	 * @param { string } str
 	 * @returns { string }
