@@ -48,8 +48,8 @@ export class GetCompatible {
 		if (typeof navigator.userAgentData != "undefined") {
 			// @ts-ignore
 			const userAgentData = navigator.userAgentData;
-			if (userAgentData?.brands?.length) {
-				let brand = userAgentData?.brands?.find(({ brand }) => {
+			if (userAgentData.brands && userAgentData.brands.length) {
+				let brand = userAgentData.brands.find(({ brand }) => {
 					let str = brand.toLowerCase();
 					// 当前支持的浏览器中只有chrome支持userAgentData，故只判断chrome的情况
 					return str.includes("chrome") || str.includes("chromium");
