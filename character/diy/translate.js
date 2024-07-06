@@ -11,6 +11,7 @@ const translates = {
 	diy_huangzhong: "黄汉升",
 	diy_xuhuang: "徐公明",
 	diy_dianwei: "新典韦",
+	diy_dianwei_prefix: "新",
 	diy_weiyan: "魏文长",
 	xicai: "惜才",
 	diyjianxiong: "奸雄",
