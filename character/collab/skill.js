@@ -16,7 +16,7 @@ const skills = {
 			if (!_status.characterlist) lib.skill.pingjian.initList();
 			_status.characterlist.randomSort();
 			const characters = _status.characterlist.randomGets(6);
-			const first = characters.slice(0, 3), last = characters.slice(4, 6);
+			const first = characters.slice(0, 3), last = characters.slice(3, 6);
 			const skills1 = [], skills2 = [];
 			for (let i of first) skills1.push(get.character(i, 3).randomGet());
 			for (let i of last) skills2.push(get.character(i, 3).randomGet());
