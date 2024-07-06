@@ -39,7 +39,7 @@ const characters = {
 	dc_sp_machao: ["male", "qun", 4, ["zhuiji", "dc_olshichou"]],
 	old_huangfusong: ["male", "qun", 4, ["xinfenyue"], ["name:皇甫|嵩"]],
 	dc_xiahouba: ["male", "shu", 4, ["rebaobian"], ["name:夏侯|霸"]],
-	dc_daxiaoqiao: ["female", "wu", 3, ["dcxingwu", "dcluoyan"], ["tempname:daxiaoqiao", "name:大|乔-小|乔"]],
+	dc_daxiaoqiao: ["female", "wu", 3, ["dcxingwu", "dcluoyan"], ["tempname:daxiaoqiao", "name:桥|null-桥|null"]],
 	tianshangyi: ["female", "wei", 3, ["dcposuo", "dcxiaoren"]],
 	sunlingluan: ["female", "wu", 3, ["dclingyue", "dcpandi"]],
 	dc_wangjun: ["male", "qun", 4, ["dctongye", "dcchangqu"]],

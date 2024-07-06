@@ -21,7 +21,7 @@ const characters = {
 	xin_guozhao: ["female", "wei", 3, ["yichong", "wufei"]],
 	xin_zhangyi: ["male", "shu", 4, ["xinwurong", "shizhi"]],
 	xin_sunliang: ["male", "wu", 3, ["xinzhizheng", "xinkuizhu", "xinlijun"], ["zhu"]],
-	re_xiaoqiao: ["female", "wu", 3, ["retianxiang", "xinhongyan"]],
+	re_xiaoqiao: ["female", "wu", 3, ["retianxiang", "xinhongyan"], ["name:桥|null"]],
 	shichangshi: ["male", "qun", 1, ["mbdanggu", "mbmowang"], ["sex:male_castrated", "name:null|null"]],
 	re_zhangzhang: ["male", "wu", 3, ["rezhijian", "guzheng"], ["name:张|昭-张|纮"]],
 	qianzhao: ["male", "wei", 4, ["mbshihe", "mbzhenfu"]],

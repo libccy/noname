@@ -72,7 +72,7 @@ const characters = {
 	tw_madai: ["male", "shu", 4, ["mashu", "twqianxi"]],
 	tw_niujin: ["male", "wei", 4, ["twcuorui", "twliewei"]],
 	tw_guanqiujian: ["male", "wei", 3, ["twzhengrong", "twhongju"], ["name:毌丘|俭"]],
-	tw_daxiaoqiao: ["female", "wu", 3, ["twxingwu", "twpingting"], ["tempname:daxiaoqiao", "name:大|乔-小|乔"]],
+	tw_daxiaoqiao: ["female", "wu", 3, ["twxingwu", "twpingting"], ["tempname:daxiaoqiao", "name:桥|null-桥|null"]],
 	tw_furong: ["male", "shu", 4, ["twxuewei", "twliechi"]],
 	tw_yl_luzhi: ["male", "qun", 3, ["twmingren", "twzhenliang"]],
 	tw_liuzhang: ["male", "qun", 3, ["jutu", "twyaohu", "rehuaibi"], ["zhu"]],

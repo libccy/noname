@@ -60,7 +60,7 @@ const characters = {
 	sp_lvmeng: ["male", "wu", 3, ["tanhu", "mouduan"]],
 	sp_xiahoudun: ["male", "wei", 4, ["fenyong", "xuehen"]],
 	sp_ganning: ["male", "qun", 4, ["yinling", "junwei"]],
-	sp_daqiao: ["female", "wu", 3, ["yanxiao", "anxian"]],
+	sp_daqiao: ["female", "wu", 3, ["yanxiao", "anxian"], ["name:桥|null"]],
 	sp_pangtong: ["male", "qun", 3, ["xinmanjuan", "zuixiang"]],
 	huangjinleishi: ["female", "qun", 3, ["fulu", "fuji"]],
 	jsp_zhaoyun: ["male", "qun", 3, ["chixin", "reyicong", "suiren"]],

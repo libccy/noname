@@ -21,7 +21,7 @@ const characters = {
 	lvmeng: ["male", "wu", 4, ["keji"]],
 	huanggai: ["male", "wu", 4, ["kurou"]],
 	zhouyu: ["male", "wu", 3, ["yingzi", "fanjian"]],
-	daqiao: ["female", "wu", 3, ["guose", "liuli"]],
+	daqiao: ["female", "wu", 3, ["guose", "liuli"], ["name:桥|null"]],
 	luxun: ["male", "wu", 3, ["qianxun", "lianying"]],
 	sunshangxiang: ["female", "wu", 3, ["xiaoji", "jieyin"]],
 	huatuo: ["male", "qun", 3, ["qingnang", "jijiu"]],

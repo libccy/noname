@@ -27,7 +27,7 @@ const characters = {
 	pangde: ["male", "qun", 4, ["mashu", "mengjin"]],
 	ol_huaxiong: ["male", "qun", 6, ["new_reyaowu"]],
 	old_wangyun: ["male", "qun", 4, ["wylianji", "moucheng"], ["clan:太原王氏"]],
-	old_xiaoqiao: ["female", "wu", 3, ["tianxiang", "hongyan"]],
+	old_xiaoqiao: ["female", "wu", 3, ["tianxiang", "hongyan"], ["name:桥|null"]],
 	weiyan: ["male", "shu", 4, ["kuanggu"]],
 	xiahouyuan: ["male", "wei", 4, ["shensu"]],
 	old_zhangxingcai: ["female", "shu", 3, ["oldshenxian", "qiangwu"]],

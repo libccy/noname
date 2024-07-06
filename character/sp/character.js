@@ -140,7 +140,7 @@ const characters = {
 	hanba: ["female", "qun", 4, ["fentian", "zhiri"],["name:null|null"]],
 	zumao: ["male", "wu", 4, ["yinbing", "juedi"]],
 	wenpin: ["male", "wei", 4, ["zhenwei"]],
-	daxiaoqiao: ["female", "wu", 3, ["new_xingwu", "new_luoyan"], ["name:大|乔-小|乔"]],
+	daxiaoqiao: ["female", "wu", 3, ["new_xingwu", "new_luoyan"], ["name:桥|null-桥|null"]],
 
 	guansuo: ["male", "shu", 4, ["zhengnan", "xiefang"]],
 	tadun: ["male", "qun", 4, ["reluanzhan"]],
