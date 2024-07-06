@@ -22,6 +22,7 @@ const characters = {
 	dc_wuyi: ["male", "shu", 4, ["dcbenxi"]],
 	quyuan: ["male", "qun", 3, ["dcqiusuo", "dclisao"], ["name:芈|原"]],
 	xin_sunquan: ["male", "wu", 3, ["dchuiwan", "dchuanli"]],
+	wuhujiang: ["male", "shu", 4, ["huyi"], ["name:关|羽-张|飞-赵|云-马|超-黄|忠"]],
 	dc_noname: ["male", "qun", 3, ["dcchushan"], ["name:null:null"]],
 };
 
