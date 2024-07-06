@@ -23,6 +23,7 @@ const characters = {
 	quyuan: ["male", "qun", 3, ["dcqiusuo", "dclisao"]],
 	xin_sunquan: ["male", "wu", 3, ["dchuiwan", "dchuanli"]],
 	dc_noname: ["male", "qun", 3, ["dcchushan"]],
+	wuhujiang: ["male", "shu", 4, ["huyi"], ["name:关|羽-张|飞-赵|云-马|超-黄|忠"]],
 };
 
 export default characters;
