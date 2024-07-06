@@ -99,11 +99,15 @@ export default class StepCompiler extends ContentCompilerBase {
             return new ModAsyncFunction(...params, body).bind(null, { lib, game, ui, get, ai, _status });
         };
 
+        const packStep = (code: string) => {
+            const compiled = compileStep(code);
+            ErrorManager.setCodeSnippet(compiled, new CodeSnippet(code, 3)); // 记录编译后函数的原代码片段
+            contents.push(compiled)
+        };
+
         //func中要写步骤的话，必须要写step 0
         if (str.indexOf("step 0") == -1) {
-            const compiled = compileStep(str);
-            ErrorManager.setCodeSnippet(compiled, new CodeSnippet(str, 3)); // 记录编译后函数的原代码片段
-            contents.push(compiled);
+            packStep(str);
         } else {
             let skip = 0;
             let step = 0;
@@ -118,9 +122,7 @@ export default class StepCompiler extends ContentCompilerBase {
 
                 if (step > 0) {
                     try {
-                        const compiled = compileStep(head);
-                        ErrorManager.setCodeSnippet(compiled, new CodeSnippet(head, 3)); // 记录编译后函数的原代码片段
-                        contents.push(compiled);
+                        packStep(head);
                     } catch (e) {
                         skip = result.index + result[0].length;
                         continue;
@@ -131,6 +133,8 @@ export default class StepCompiler extends ContentCompilerBase {
                 skip = 0;
                 step++;
             }
+
+            packStep(str);
         }
 
         return ContentCompiler.compile(contents);
