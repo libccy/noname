@@ -1,7 +1,7 @@
-import { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler";
-import { _status, ai, game, get, lib, ui } from "../../../../../noname";
-import ContentCompilerBase from "./ContentCompilerBase";
-import ContentCompiler from "./ContentCompiler";
+import { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler.ts";
+import { _status, ai, game, get, lib, ui } from "../../../../../noname.js";
+import ContentCompilerBase from "./ContentCompilerBase.ts";
+import ContentCompiler from "./ContentCompiler.ts";
 
 export default class YieldCompiler extends ContentCompilerBase {
     get type(): EventContentTypes {
@@ -43,7 +43,7 @@ export default class YieldCompiler extends ContentCompilerBase {
 
                 this.beforeExecute(event);
 
-                if (this.checkPrevented(event))
+                if (!this.isPrevented(event))
                     ({ value, done } = generator.next(result));
 
                 this.afterExecute(event);
@@ -71,5 +71,3 @@ export default class YieldCompiler extends ContentCompilerBase {
         return compiled;
     }
 }
-
-ContentCompiler.compiler(new YieldCompiler());

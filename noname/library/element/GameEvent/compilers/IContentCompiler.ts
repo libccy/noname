@@ -1,4 +1,4 @@
-import { lib } from "../../../../../noname";
+import { lib } from "../../../../../noname.js";
 
 export type EventContentType = "step" | "yield" | "async" | "array";
 export type EventContentTypes = EventContentType | EventContentType[] | null;

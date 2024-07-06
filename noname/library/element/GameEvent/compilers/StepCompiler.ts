@@ -1,11 +1,11 @@
 // 喵喵！step写法的content全在这里处理喵！
 
-import { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler";
-import { _status, ai, game, get, lib, ui } from "../../../../../noname";
-import ContentCompilerBase from "./ContentCompilerBase";
-import ContentCompiler from "./ContentCompiler";
-import security from "../../../../util/security";
-import { CodeSnippet, ErrorManager } from "../../../../util/error";
+import { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler.ts";
+import { _status, ai, game, get, lib, ui } from "../../../../../noname.js";
+import ContentCompilerBase from "./ContentCompilerBase.ts";
+import ContentCompiler from "./ContentCompiler.ts";
+import security from "../../../../util/security.js";
+import { CodeSnippet, ErrorManager } from "../../../../util/error.js";
 
 export default class StepCompiler extends ContentCompilerBase {
     get type(): EventContentTypes {
@@ -59,9 +59,12 @@ export default class StepCompiler extends ContentCompilerBase {
         let hasDebugger = false;
         let insertDebugger = `await event.debugger()`; // yield code=>eval(code) 唔唔不是我干的喵
         let debuggerSkip = 0;
-        let debuggerResult;
+        let debuggerResult: RegExpMatchArray | null;
 
         while ((debuggerResult = str.slice(debuggerSkip).match(regex)) != null) {
+            if (debuggerResult.index == null)
+                throw new Error("匹配到了debugger但是没有索引值");
+            
             let debuggerCopy = str;
             debuggerCopy = debuggerCopy.slice(0, debuggerSkip + debuggerResult.index) + insertDebugger + debuggerCopy.slice(debuggerSkip + debuggerResult.index + debuggerResult[0].length, -1);
             //测试是否有错误
@@ -80,10 +83,16 @@ export default class StepCompiler extends ContentCompilerBase {
         const topVars = ["_status", "lib", "game", "ui", "get", "ai"];
 
         const compileStep = (code: string) => {
-            const params = ["topVars", "event", "trigger", "player", "resultEvent"];
-            const body = `var { ${deconstructs.join(", ")} } = event;\n` + `var { ${topVars.join(", ")} } = topVars;\n` + `var { result } = resultEvent;\n\n` + code + `\nreturn event.next[event.next.length - 1];`;
+            const params = ["topVars", "event", "trigger", "player", "_result"];
+            const body = `
+                var { ${deconstructs.join(", ")} } = event;
+                var { ${topVars.join(", ")} } = topVars;
+                var { result } = _result || {};
+                ${code}\n
+                return event.next[event.next.length - 1];
+            `;
 
-            return new ModAsyncFunction(...params, body).bind({ lib, game, ui, get, ai, _status });
+            return new ModAsyncFunction(...params, body).bind(null, { lib, game, ui, get, ai, _status });
         };
 
         //func中要写步骤的话，必须要写step 0
@@ -121,5 +130,3 @@ export default class StepCompiler extends ContentCompilerBase {
         return ContentCompiler.compile(contents);
     }
 }
-
-ContentCompiler.compiler(new StepCompiler());

@@ -4503,8 +4503,8 @@ export class Game extends GameCompatible {
 	 * @param { GameEventPromise } [triggerEvent]
 	 */
 	createEvent(name, trigger, triggerEvent) {
-		const next = new lib.element.GameEvent(name, trigger).toPromise();
-		(triggerEvent || _status.event).next.push(next);
+		const next = new lib.element.GameEvent(name, trigger);
+		_status.event = next;
 		return next;
 	}
 	/**
@@ -5616,307 +5616,19 @@ export class Game extends GameCompatible {
 		}
 	}
 	/**
-	 * @type { Map<GameEvent, Promise<any>> }
-	 *
-	 * 以Promise储存异步事件的执行链，使async content调用事件时无需必须使用await
-	 *
-	 * 但是需要事件结果的除外
+	 * @param { GameEvent } [event]
 	 */
-	executingAsyncEventMap = new Map();
-	/**
-	 * @type { GameEventPromise[] }
-	 */
-	belongAsyncEventList = [];
-	/**
-	 * @param { GameEventPromise } [belongAsyncEvent]
-	 */
-	async loop(belongAsyncEvent) {
-		if (belongAsyncEvent) {
-			game.belongAsyncEventList.push(belongAsyncEvent);
-		} else if (game.belongAsyncEventList.length) {
-			belongAsyncEvent = game.belongAsyncEventList.at(-1);
-		}
-		while (true) {
-			let event = belongAsyncEvent && belongAsyncEvent.parent == _status.event ? belongAsyncEvent : _status.event;
-			let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result } = event;
-			const _resolve = () => {
-				if (event.async) {
-					if (typeof event.resolve == "function") {
-						event.resolve(event.toEvent());
-					} else {
-						throw new TypeError("异步事件的event.resolve未赋值，使用await时将会被永久等待");
-					}
-				}
-			};
-			if (_status.paused2 || _status.imchoosing) {
-				if (!lib.status.dateDelaying) {
-					lib.status.dateDelaying = new Date();
-				}
-			}
-			if (_status.paused || _status.paused2 || _status.over) {
-				return;
-			}
-			if (_status.paused3) {
-				_status.paused3 = "paused";
-				return;
-			}
-			if (lib.status.dateDelaying) {
-				lib.status.dateDelayed += lib.getUTC(new Date()) - lib.getUTC(lib.status.dateDelaying);
-				delete lib.status.dateDelaying;
-			}
-			if (event.next.length > 0) {
-				var next = event.next.shift();
-				if (next.player && next.player.skipList.includes(next.name)) {
-					event.trigger(next.name + "Skipped");
-					next.player.skipList.remove(next.name);
-					if (lib.phaseName.includes(next.name)) next.player.getHistory("skipped").add(next.name);
-				} else {
-					next.parent = event;
-					_status.event = next;
-					game.getGlobalHistory("everything").push(next);
-				}
-			} else if (event.finished) {
-				if (event._triggered == 1) {
-					if (event.type == "card") event.trigger("useCardToOmitted");
-					event.trigger(event.name + "Omitted");
-					event._triggered = 4;
-				} else if (event._triggered == 2) {
-					if (event.type == "card") event.trigger("useCardToEnd");
-					event.trigger(event.name + "End");
-					event._triggered = 3;
-				} else if (event._triggered == 3) {
-					if (event.type == "card") event.trigger("useCardToAfter");
-					event.trigger(event.name + "After");
-					event._triggered++;
-				} else if (event.after && event.after.length) {
-					var next = event.after.shift();
-					if (next.player && next.player.skipList.includes(next.name)) {
-						event.trigger(next.name + "Skipped");
-						next.player.skipList.remove(next.name);
-						if (lib.phaseName.includes(next.name)) next.player.getHistory("skipped").add(next.name);
-					} else {
-						next.parent = event;
-						_status.event = next;
-						game.getGlobalHistory("everything").push(next);
-					}
-				} else {
-					game.executingAsyncEventMap.delete(event.toEvent());
-					if (event.parent) {
-						if (event.result) {
-							event.parent._result = event.result;
-						}
-						_status.event = event.parent;
-						if (game.belongAsyncEventList.includes(event)) {
-							game.belongAsyncEventList.remove(event);
-						}
-						_resolve();
-						// 此时应该退出了
-						if (belongAsyncEvent && belongAsyncEvent.parent == _status.event) {
-							return;
-						}
-					} else {
-						if (game.belongAsyncEventList.includes(event)) {
-							game.belongAsyncEventList.remove(event);
-						}
-						return _resolve();
-					}
-				}
-			} else {
-				if (event._triggered == 0) {
-					if (event.type == "card") event.trigger("useCardToBefore");
-					event.trigger(event.name + "Before");
-					event._triggered++;
-				} else if (event._triggered == 1) {
-					if (event.type == "card") event.trigger("useCardToBegin");
-					event.trigger(event.name + "Begin");
-					event._triggered++;
-				} else {
-					event.callHandler(event.getDefaultHandlerType(), event, {
-						state: "begin",
-					});
-					const after = () => {
-						event.clearStepCache();
-						event.callHandler(event.getDefaultHandlerType(), event, {
-							state: "end",
-						});
-						if (typeof event.step == "number") ++event.step;
-					};
-					if (player && player.classList.contains("dead") && !event.forceDie && event.name != "phaseLoop") {
-						game.broadcastAll(function () {
-							while (_status.dieClose.length) {
-								_status.dieClose.shift().close();
-							}
-						});
-						if (event._oncancel) {
-							event._oncancel();
-						}
-						event.finish();
-						after();
-					} else if (player && player.removed && event.name != "phaseLoop") {
-						event.finish();
-						after();
-					} else if (player && player.isOut() && event.name != "phaseLoop" && !event.includeOut) {
-						if (event.name == "phase" && player == _status.roundStart && !event.skill) {
-							_status.roundSkipped = true;
-						}
-						event.finish();
-						after();
-					} else {
-						await game
-							.runContent(belongAsyncEvent)
-							.catch(e => {
-								if (_status.withError || lib.config.compatiblemode || (_status.connectMode && !lib.config.debug)) {
-									game.print("游戏出错：" + event.name);
-									game.print(e.toString());
-									console.log(e);
-								} else throw e;
-							})
-							.then(after)
-							.then(() => {
-								if (event.finished) {
-									game.executingAsyncEventMap.delete(event.toEvent());
-								}
-							});
-					}
-				}
-			}
-		}
+	loop(event = _status.event) {
+		return event.start();
 	}
 	/**
-	 * @param { GameEventPromise } [belongAsyncEvent]
+	 * @deprecated
+	 * @param { GameEvent } [event]
 	 */
-	runContent(belongAsyncEvent) {
-		return new Promise(resolve => {
-			let event = belongAsyncEvent && belongAsyncEvent.parent == _status.event ? belongAsyncEvent : _status.event;
-			let { step, source, player, target, targets, card, cards, skill, forced, num, _trigger: trigger, _result: result, _storeEvent } = event;
-			// 数组形式
-			if ("contents" in event && Array.isArray(event.contents)) {
-				/*
-			   event.contents[step](event, trigger, player, _storeEvent).then((evt) => {
-				   if (evt) event._storeEvent = evt;
-				   if (game.executingAsyncEventMap.has(event.toEvent())) {
-					   game.executingAsyncEventMap.set(_status.event.toEvent(), game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
-						   if (event.step >= event.contents.length - 1) event.finish();
-						   resolve();
-					   }));
-				   } else {
-					   if (event.step >= event.contents.length - 1) event.finish();
-					   resolve();
-				   }
-			   });
-			   */
-				// 解决不了问题...就把问题统一
-				const run = async event => {
-					if (typeof event.step !== "number") event.step = 0;
-					while (event.step < event.contents.length && !event.finished) {
-						const evt = await event.contents[event.step](event, event._trigger, event.player, event._tmpStoreEvent);
-						if (evt) event._tmpStoreEvent = evt;
-
-						if (game.executingAsyncEventMap.has(event.toEvent())) {
-							await game.executingAsyncEventMap.get(_status.event.toEvent());
-							await game.executingAsyncEventMap.get(event.toEvent());
-						}
-
-						++event.step;
-					}
-					--event.step;
-				};
-
-				run(event).then(() => {
-					// 其实这个if几乎一定执行了
-					if (game.executingAsyncEventMap.has(event.toEvent())) {
-						if (!game.executingAsyncEventMap.get(_status.event.toEvent())) {
-							console.warn(`game.executingAsyncEventMap中包括了event，但不包括_status.event！`);
-							console.log("event :>> ", event.toEvent());
-							console.log("_status.event :>> ", _status.event.toEvent());
-							// debugger;
-							game.executingAsyncEventMap.set(
-								event.toEvent(),
-								game.executingAsyncEventMap.get(event.toEvent()).then(() => {
-									event.finish();
-									resolve();
-								})
-							);
-						} else {
-							game.executingAsyncEventMap.set(
-								_status.event.toEvent(),
-								game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
-									event.finish();
-									resolve();
-								})
-							);
-						}
-					} else {
-						event.finish();
-						resolve();
-					}
-				});
-			} else if (event.content instanceof GeneratorFunction) {
-				if (!event.debugging) {
-					if (event.generatorContent) event.generatorContent.return();
-					event.generatorContent = event.content(event, step, source, player, target, targets, card, cards, skill, forced, num, trigger, result, _status, lib, game, ui, get, ai);
-				} else {
-					delete event.debugging;
-				}
-				var next = event.generatorContent.next();
-				if (typeof next.value == "function" && next.value.toString() == "code=>eval(code)") {
-					//触发debugger
-					var inputCallback = inputResult => {
-						if (inputResult === false) {
-							event.debugging = true;
-							game.resume2();
-						} else {
-							alert(get.stringify(next.value(inputResult)));
-							game.prompt("", "debugger调试", inputCallback);
-						}
-					};
-					game.prompt("", "debugger调试", inputCallback);
-					return game.pause2();
-				}
-				if (event.finished) event.generatorContent.return();
-				resolve();
-			} else if (event.content instanceof AsyncFunction) {
-				// _status,lib,game,ui,get,ai六个变量由game.import提供
-				// 使用另一种方式来停止event.content
-				const { promise, resolve: resolveContent } = Promise.withResolvers();
-				promise.then(() => {
-					// 其实这个if几乎一定执行了
-					if (game.executingAsyncEventMap.has(event.toEvent())) {
-						if (!game.executingAsyncEventMap.get(_status.event.toEvent())) {
-							console.warn(`game.executingAsyncEventMap中包括了event，但不包括_status.event！`);
-							console.log("event :>> ", event.toEvent());
-							console.log("_status.event :>> ", _status.event.toEvent());
-							game.executingAsyncEventMap.set(
-								event.toEvent(),
-								game.executingAsyncEventMap.get(event.toEvent()).then(() => {
-									event.finish();
-									resolve();
-								})
-							);
-						} else {
-							game.executingAsyncEventMap.set(
-								_status.event.toEvent(),
-								game.executingAsyncEventMap.get(_status.event.toEvent()).then(() => {
-									event.finish();
-									resolve();
-								})
-							);
-						}
-					} else {
-						event.finish();
-						resolve();
-					}
-				});
-				event.resolveContent = resolveContent;
-				event.content(event, trigger, player).finally(() => resolveContent());
-			} else {
-				event.content(event, step, source, player, target, targets, card, cards, skill, forced, num, trigger, result, _status, lib, game, ui, get, ai);
-				resolve();
-			}
-		});
+	runContent(event = _status.event) {
+		return event.content(event).catch(event.onError)
 	}
 	pause() {
-		clearTimeout(_status.timeout);
 		_status.paused = true;
 	}
 	pause2() {
@@ -5924,23 +5636,17 @@ export class Game extends GameCompatible {
 		_status.paused2 = true;
 	}
 	resume() {
-		if (_status.paused) {
-			if (!_status.noclearcountdown) {
-				game.stopCountChoose();
-			}
-			_status.paused = false;
-			delete _status.waitingForTransition;
-			if ((_status.event && _status.event.content instanceof AsyncFunction) || Array.isArray(_status.event.contents)) return;
-			game.loop();
+		if (!_status.paused) return;
+		if (!_status.noclearcountdown) {
+			game.stopCountChoose();
 		}
+		_status.paused = false;
+		delete _status.waitingForTransition;
 	}
 	resume2() {
 		if (_status.connectMode) return;
-		if (_status.paused2) {
-			_status.paused2 = false;
-			if ((_status.event && _status.event.content instanceof AsyncFunction) || Array.isArray(_status.event.contents)) return;
-			game.loop();
-		}
+		if (!_status.paused2) return;
+		_status.paused2 = false;
 	}
 	delaye() {
 		let next = game.createEvent("delay", false);
@@ -5958,21 +5664,16 @@ export class Game extends GameCompatible {
 	 * @param { number } [time]
 	 * @param { number } [time2]
 	 */
-	delay(time, time2) {
-		if (_status.paused) return;
-		game.pause();
-		if (typeof time != "number") time = 1;
-		if (typeof time2 != "number") time2 = 0;
+	delay(time = 1, time2 = 0) {
 		time = time * lib.config.duration + time2;
 		if (lib.config.speed == "vvfast") time /= 3;
-		_status.timeout = setTimeout(game.resume, time);
+		return _status.pauseManager.setDelay(delay(time));
 	}
 	/**
 	 * @param { number } [time]
 	 * @param { number } [time2]
 	 */
-	delayx(time, time2) {
-		if (typeof time != "number") time = 1;
+	delayx(time = 1, time2 = 0) {
 		switch (lib.config.game_speed) {
 			case "vslow":
 				time *= 2.5;
@@ -5993,54 +5694,23 @@ export class Game extends GameCompatible {
 		return game.delay(time, time2);
 	}
 	/**
-	 * 在async content中对game.delay的代替使用方法
-	 *
-	 * 因为async content里不应该使用game.pause和game.resume
-	 *
+	 * @deprecated
 	 * @param { number } [time]
 	 * @param { number } [time2]
 	 */
-	asyncDelay(time, time2) {
-		// if(_status.paused) return;
-		// game.pause();
-		if (typeof time != "number") time = 1;
-		if (typeof time2 != "number") time2 = 0;
-		time = time * lib.config.duration + time2;
-		if (lib.config.speed == "vvfast") time /= 3;
-		//_status.timeout=setTimeout(game.resume,time);
-		return delay(time);
+	asyncDelay(time = 1, time2 = 0) {
+		return game.delay(time, time2);
 	}
 	/**
-	 * 在async content中对game.delayx的代替使用方法
-	 *
-	 * 因为async content里不应该使用game.pause和game.resume
-	 *
+	 * @deprecated
 	 * @param { number } [time]
 	 * @param { number } [time2]
 	 */
-	asyncDelayx(time, time2) {
-		if (typeof time != "number") time = 1;
-		switch (lib.config.game_speed) {
-			case "vslow":
-				time *= 2.5;
-				break;
-			case "slow":
-				time *= 1.5;
-				break;
-			case "fast":
-				time *= 0.7;
-				break;
-			case "vfast":
-				time *= 0.4;
-				break;
-			case "vvfast":
-				time *= 0.2;
-				break;
-		}
-		return game.asyncDelay(time, time2);
+	asyncDelayx(time = 1, time2 = 0) {
+		return game.delayx(time, time2);
 	}
 	/**
-	 * @param { GameEventPromise } [event]
+	 * @param { GameEvent } [event]
 	 */
 	check(event = _status.event) {
 		game.callHook("checkBegin", [event]);

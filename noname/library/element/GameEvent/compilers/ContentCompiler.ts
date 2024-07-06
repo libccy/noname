@@ -1,11 +1,11 @@
-import { lib } from "../../../../../noname";
-import { Uninstantable } from "../../../../util";
-import IContentCompiler, { EventCompileable, EventCompiledContent, EventContent, EventContentType } from "./IContentCompiler";
+import { lib } from "../../../../../noname.js";
+import { Uninstantable } from "../../../../util/index.js";
+import IContentCompiler, { EventCompileable, EventCompiledContent, EventContent, EventContentType } from "./IContentCompiler.ts";
 
-import "./StepCompiler"
-import "./YieldCompiler"
-import "./AsyncCompiler"
-import "./ArrayCompiler"
+import StepCompiler from "./StepCompiler.ts"
+import YieldCompiler from "./YieldCompiler.ts"
+import AsyncCompiler from "./AsyncCompiler.ts"
+import ArrayCompiler from "./ArrayCompiler.ts"
 
 type Class<T> = new (...args: any) => T;
 
@@ -25,7 +25,7 @@ export default class ContentCompiler extends Uninstantable {
      * @todo 应该使用依赖注入替代
      * @param compiler 编译器实例对象
      */
-    static compiler(compiler: IContentCompiler) {
+    static addCompiler(compiler: IContentCompiler) {
         const type = compiler.constructor as Class<IContentCompiler>;
 
         if (typeof type !== "function")
@@ -133,3 +133,9 @@ export default class ContentCompiler extends Uninstantable {
         throw new Error(`没有编译器接受编译: [${type}]\n${String(target)}`);
     }
 }
+
+
+ContentCompiler.addCompiler(new ArrayCompiler());
+ContentCompiler.addCompiler(new AsyncCompiler());
+ContentCompiler.addCompiler(new StepCompiler());
+ContentCompiler.addCompiler(new YieldCompiler());
