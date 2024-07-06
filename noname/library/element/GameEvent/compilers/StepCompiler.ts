@@ -92,7 +92,9 @@ export default class StepCompiler extends ContentCompilerBase {
                 var { ${deconstructs.join(", ")} } = event;
                 var { ${topVars.join(", ")} } = topVars;
                 var { result } = _result || {};
-                ${code}\n
+                {
+                ${code}
+                }
                 return event.next[event.next.length - 1];
             `;
 
