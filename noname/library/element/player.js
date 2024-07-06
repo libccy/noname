@@ -509,7 +509,7 @@ export class Player extends HTMLDivElement {
 				const params = ["topVars", "event", "trigger", "player", "resultEvent"];
 				const body = `var { ${deconstructs.join(", ")} } = event;\n` + `var { ${topVars.join(", ")} } = topVars;\n` + `var { result } = resultEvent;\n${varstr}\n\n` + code + `\nreturn event.next[event.next.length - 1];`;
 
-				return new Function(...params, body).bind({ lib, game, ui, get, ai, _status });
+				return new Function(...params, body).bind(null, { lib, game, ui, get, ai, _status });
 			};
 			const contents = [];
 			contents.push(

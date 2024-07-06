@@ -86,22 +86,21 @@ export default class StepCompiler extends ContentCompilerBase {
         const deconstructs = ["step", "source", "target", "targets", "card", "cards", "skill", "forced", "num", "_result: result"];
         const topVars = ["_status", "lib", "game", "ui", "get", "ai"];
 
-        const compileStep = (code: string) => {
+        const compileStep = (code: string, stepHead?: string | null) => {
             const params = ["topVars", "event", "trigger", "player"];
             const body = `
                 var { ${deconstructs.join(", ")} } = event;
                 var { ${topVars.join(", ")} } = topVars;
-                {
-                ${code}
-                }
+                ${[stepHead, code].filter(Boolean)
+                    .map(c => `{\n${c}\n}\n`).join("")}
                 return event.next[event.next.length - 1];
             `;
 
             return new ModAsyncFunction(...params, body).bind(null, { lib, game, ui, get, ai, _status });
         };
 
-        const packStep = (code: string) => {
-            const compiled = compileStep(code);
+        const packStep = (code: string, stepHead?: string | null) => {
+            const compiled = compileStep(code, stepHead);
             ErrorManager.setCodeSnippet(compiled, new CodeSnippet(code, 3)); // 记录编译后函数的原代码片段
             contents.push(compiled)
         };
@@ -112,6 +111,7 @@ export default class StepCompiler extends ContentCompilerBase {
         } else {
             let skip = 0;
             let step = 0;
+            let stepHead: string | null = null;
             let result: RegExpMatchArray | null;
 
             //去除99个step的限制
@@ -123,11 +123,16 @@ export default class StepCompiler extends ContentCompilerBase {
 
                 if (step > 0) {
                     try {
-                        packStep(head);
+                        packStep(head, stepHead);
                     } catch (e) {
                         skip = result.index + result[0].length;
                         continue;
                     }
+                } else {
+                    stepHead = head.trim();
+
+                    if (stepHead.length == 0)
+                        stepHead = null;
                 }
 
                 str = str.slice(head.length + result[0].length);
@@ -135,7 +140,7 @@ export default class StepCompiler extends ContentCompilerBase {
                 step++;
             }
 
-            packStep(str);
+            packStep(str, stepHead);
         }
 
         return ContentCompiler.compile(contents);
