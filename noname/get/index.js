@@ -2515,6 +2515,11 @@ export class Get extends GetCompatible {
 	 * @returns {string[]}
 	 */
 	nameList(player) {
+		let type;
+		if (typeof player == "undefined" || (type = typeof player, type != "object") || (type = get.itemtype(player), type != "player")) {
+			throw new Error(`函数接受了一个不是Player的东西: ${type}: ${player}`);
+		}
+
 		return ["name", "name1", "name2"]
 			.filter(prop => player[prop])
 			.map(prop => player[prop])

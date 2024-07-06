@@ -10,7 +10,7 @@ const characterReplaces = {
 	wuguotai: ["wuguotai", "xin_wuguotai", "re_wuguotai", "ol_wuguotai"],
 	lingtong: ["lingtong", "xin_lingtong", "ol_lingtong", "re_lingtong", "old_lingtong"],
 	gaoshun: ["gaoshun", "xin_gaoshun", "ol_gaoshun", "re_gaoshun", "sb_gaoshun", "old_gaoshun"],
-	zhonghui: ["zhonghui", "xin_zhonghui", "re_zhonghui", "old_zhonghui", "pe_zhonghui", "clan_zhonghui"],
+	zhonghui: ["zhonghui", "xin_zhonghui", "re_zhonghui", "old_zhonghui", "pe_zhonghui", "clan_zhonghui", "yj_zhonghui"],
 	wangyi: ["wangyi", "ol_wangyi", "re_wangyi", "old_wangyi"],
 	caozhang: ["caozhang", "ol_caozhang", "re_caozhang", "xin_caozhang"],
 	guanzhang: ["guanzhang", "re_guanzhang", "old_guanzhang"],

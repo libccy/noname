@@ -718,7 +718,7 @@ const skills = {
 			neg: true,
 		},
 	},
-	//曹髦  史?!
+	//曹髦  史?! 我求你别改了
 	mbqianlong: {
 		audio: 6,
 		persevereSkill: true,
@@ -765,7 +765,12 @@ const skills = {
 				forced: true,
 				locked: false,
 				async content(event, trigger, player) {
-					lib.skill.mbqianlong.addMark(player, lib.skill.mbqianlong.beginMarkCount);
+					const num = game.hasPlayer(current => {
+						return current !== player && current.group === "wei" && player.hasZhuSkill("mbweitong", current);
+					})
+						? 60
+						: lib.skill.mbqianlong.beginMarkCount;
+					lib.skill.mbqianlong.addMark(player, num);
 				},
 			},
 			add: {
@@ -810,30 +815,12 @@ const skills = {
 	mbweitong: {
 		audio: 1,
 		persevereSkill: true,
-		trigger: {
-			global: "phaseBefore",
-			player: "enterGame",
-		},
-		filter(event, player) {
-			return (
-				(event.name != "phase" || game.phaseNumber == 0) &&
-				game.hasPlayer(current => {
-					return current !== player && current.group === "wei" && player.hasZhuSkill("mbweitong", current);
-				})
-			);
-		},
 		zhuSkill: true,
-		forced: true,
-		locked: false,
-		async content(event, trigger, player) {
-			lib.skill.mbqianlong.addMark(
-				player,
-				20 *
-					game.countPlayer(current => {
-						return current !== player && current.group === "wei" && player.hasZhuSkill("mbweitong", current);
-					})
-			);
+		trigger: {
+			player: "mbqianlong_beginBegin",
 		},
+		forced: true,
+		content() {},
 		ai: {
 			combo: "mbqianlong",
 		},

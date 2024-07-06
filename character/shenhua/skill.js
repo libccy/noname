@@ -3579,8 +3579,8 @@ const skills = {
 				return true;
 			};
 			const bool = await chooseBool.forResultBool();
-			if (!bool && !event.directbool) return;
-			const addToExpansion = player.addToExpansion(event.card, "gain2");
+			if (!bool) return;
+			const addToExpansion = player.addToExpansion(card, "gain2");
 			addToExpansion.gaintag.add("tuntian");
 			await addToExpansion;
 		},
