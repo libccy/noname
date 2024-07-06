@@ -22,6 +22,7 @@ export default class StepCompiler extends ContentCompilerBase {
 
         const compiled = StepCompiler.parseStep(content);
         compiled.type = "step";
+        compiled.original = content;
         return compiled;
     }
 
@@ -53,7 +54,10 @@ export default class StepCompiler extends ContentCompilerBase {
             .trim();
 
         //获取第一个 { 后的所有字符
-        let str = code.slice(code.indexOf("{") + 1);
+        let str = code.slice(code.indexOf("{") + 1).trimEnd();
+        // 因为我们丢掉了开头的`{`，现在要去除尾`}`
+        str = str.slice(0, str.lastIndexOf("}"));
+
         //判断代码中是否有debugger
         let regex = /event\.debugger\(\)/;
         let hasDebugger = false;
@@ -64,7 +68,7 @@ export default class StepCompiler extends ContentCompilerBase {
         while ((debuggerResult = str.slice(debuggerSkip).match(regex)) != null) {
             if (debuggerResult.index == null)
                 throw new Error("匹配到了debugger但是没有索引值");
-            
+
             let debuggerCopy = str;
             debuggerCopy = debuggerCopy.slice(0, debuggerSkip + debuggerResult.index) + insertDebugger + debuggerCopy.slice(debuggerSkip + debuggerResult.index + debuggerResult[0].length, -1);
             //测试是否有错误
@@ -112,13 +116,15 @@ export default class StepCompiler extends ContentCompilerBase {
 
                 const head = str.slice(0, skip + result.index);
 
-                try {
-                    const compiled = compileStep(head);
-                    ErrorManager.setCodeSnippet(compiled, new CodeSnippet(head, 3)); // 记录编译后函数的原代码片段
-                    contents.push(compiled);
-                } catch (e) {
-                    skip = result.index + result[0].length;
-                    continue;
+                if (step > 0) {
+                    try {
+                        const compiled = compileStep(head);
+                        ErrorManager.setCodeSnippet(compiled, new CodeSnippet(head, 3)); // 记录编译后函数的原代码片段
+                        contents.push(compiled);
+                    } catch (e) {
+                        skip = result.index + result[0].length;
+                        continue;
+                    }
                 }
 
                 str = str.slice(head.length + result[0].length);
