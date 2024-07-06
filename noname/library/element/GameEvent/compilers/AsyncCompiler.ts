@@ -20,6 +20,7 @@ export default class AsyncCompiler extends ContentCompilerBase {
         const compiled: EventCompiledContent = ContentCompiler.compile([original]);
 
         compiled.type = "async";
+        compiled.original = content;
         return compiled;
     }
 }

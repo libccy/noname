@@ -6,7 +6,11 @@ export type EventContent = Function | Function[];
 export type EventCompileable = EventContent | Iterable<Function> | keyof typeof lib.element.content;
 
 // 指示标准的事件content应该是只接受event一个参数的异步函数，同时有一个属性指示编译前的content类型
-export type EventCompiledContent = ((e: GameEvent) => Promise<void>) & { type: EventContentType };
+export type EventCompiledContent = ((e: GameEvent) => Promise<void>) & {
+    type: EventContentType;
+    original?: EventContent;
+    originals?: Function[];
+};
 
 export default interface IContentCompiler {
     /**

@@ -22,6 +22,7 @@ export default class StepCompiler extends ContentCompilerBase {
 
         const compiled = StepCompiler.parseStep(content);
         compiled.type = "step";
+        compiled.original = content;
         return compiled;
     }
 
@@ -53,7 +54,10 @@ export default class StepCompiler extends ContentCompilerBase {
             .trim();
 
         //获取第一个 { 后的所有字符
-        let str = code.slice(code.indexOf("{") + 1);
+        let str = code.slice(code.indexOf("{") + 1).trimEnd();
+        // 因为我们丢掉了开头的`{`，现在要去除尾`}`
+        str = str.slice(0, str.lastIndexOf("}"));
+
         //判断代码中是否有debugger
         let regex = /event\.debugger\(\)/;
         let hasDebugger = false;

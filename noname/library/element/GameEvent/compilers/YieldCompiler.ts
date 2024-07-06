@@ -68,6 +68,7 @@ export default class YieldCompiler extends ContentCompilerBase {
         };
 
         compiled.type = "yield";
+        compiled.original = content;
         return compiled;
     }
 }

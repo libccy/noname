@@ -1,7 +1,6 @@
 import ContentCompiler from "./ContentCompiler.ts";
 import ContentCompilerBase from "./ContentCompilerBase.ts";
 import { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler.ts";
-import { GameEvent } from "../../gameEvent.js";
 
 export default class ArrayCompiler extends ContentCompilerBase {
     get type(): EventContentTypes {
@@ -13,18 +12,26 @@ export default class ArrayCompiler extends ContentCompilerBase {
     }
 
     compile(content: EventContent): EventCompiledContent {
-        const compiled: EventCompiledContent & { originals: Function[] } = async (event) => {
+        if(!Array.isArray(content))
+            throw new ReferenceError("content必须是一个数组");
+
+        const compiled: EventCompiledContent = async (event) => {
+            const originals = compiled.originals;
+
+            if(!Array.isArray(originals))
+                throw new ReferenceError("compiled.originals必须是一个数组");
+
             const trigger = event._trigger;
             const player = event.player;
 
             if (!Number.isInteger(event.step))
                 event.step = 0;
 
-            while (event.step < compiled.originals.length && !event.finished) {
+            while (event.step < originals.length && !event.finished) {
                 this.beforeExecute(event);
 
                 if (!this.isPrevented(event)) {
-                    const original = compiled.originals[event.step];
+                    const original = originals[event.step];
                     event._result = await Reflect.apply(
                         original, this, [event, trigger, player, event._result || {}]);
                 }
@@ -33,11 +40,11 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 this.afterExecute(event);
                 event.step++;
 
-                if (event.step >= compiled.originals.length) event.finish();
+                if (event.step >= originals.length) event.finish();
             }
         };
-        compiled.originals = content as Function[];
         compiled.type = "array";
+        compiled.originals = content;
         return compiled;
     }
 }
