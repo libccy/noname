@@ -11,16 +11,17 @@ const characterReplaces = {
 	gaolan: ["gaolan", "dc_gaolan", "sp_gaolan"],
 	cuiyan: ["cuiyan", "sp_cuiyan"],
 	wujing: ["wujing", "tw_wujing"],
-	zhouchu: ["jin_zhouchu", "zhouchu", "tw_zhouchu"],
+	zhouchu: ["jin_zhouchu", "zhouchu", "tw_zhouchu", "std_zhouchu"],
 	liuzhang: ["liuzhang", "tw_liuzhang"],
 	chenzhen: ["sp_chenzhen", "tw_chenzhen"],
-	feiyi: ["ol_feiyi", "feiyi", "tw_feiyi"],
+	feiyi: ["ol_feiyi", "feiyi", "tw_feiyi", "std_feiyi"],
 	wangling: ["dc_wangling", "wangling", "tw_wangling", "clan_wangling"],
 	qiaogong: ["qiaogong", "tw_qiaogong"],
 	sp_chendong: ["sp_chendong", "tw_chendong", "chendong"],
 	sp_jiangqing: ["sp_jiangqing", "tw_jiangqing", "jiangqing"],
 	kongrong: ["dc_kongrong", "sp_kongrong", "jsrg_kongrong", "kongrong"],
 	dc_mifuren: ["dc_mifuren", "sp_mifuren"],
+	sp_jiangwan: ["ol_jiangwan", "sp_jiangwan"],
 };
 
 export default characterReplaces;

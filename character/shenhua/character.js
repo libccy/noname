@@ -1,7 +1,7 @@
 const characters = {
 	re_huangzhong: ["male", "shu", 4, ["xinliegong"]],
 	old_zhoutai: ["male", "wu", 4, ["gzbuqu"]],
-	old_caoren: ["male", "wei", 4, ["jushou"]],
+	old_caoren: ["male", "wei", 4, ["jushou"], ["die:new_caoren"]],
 	re_xuhuang: ["male", "wei", 4, ["duanliang", "jiezi"]],
 	re_pangde: ["male", "qun", 4, ["mashu", "jianchu"]],
 	re_xiahouyuan: ["male", "wei", 4, ["xinshensu"]],
@@ -43,7 +43,7 @@ const characters = {
 	luji: ["male", "wu", 3, ["nzry_huaiju", "nzry_yili", "nzry_zhenglun"], []],
 	sunliang: ["male", "wu", 3, ["nzry_kuizhu", "nzry_zhizheng", "nzry_lijun"], ["zhu"]],
 	xuyou: ["male", "qun", 3, ["nzry_chenglve", "nzry_shicai", "nzry_cunmu"]],
-	yl_luzhi: ["male", "qun", 3, ["nzry_mingren", "nzry_zhenliang"], ["die_audio"]],
+	yl_luzhi: ["male", "qun", 3, ["nzry_mingren", "nzry_zhenliang"], []],
 	kuailiangkuaiyue: ["male", "wei", 3, ["nzry_jianxiang", "nzry_shenshi"], []],
 
 	guanqiujian: ["male", "wei", 4, ["zhengrong", "hongju"]],

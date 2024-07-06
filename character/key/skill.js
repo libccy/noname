@@ -2250,7 +2250,7 @@ const skills = {
 		ai: {
 			threaten: 0.7,
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (card.name == "sha") return 0.7;
 				},
 			},
@@ -2676,7 +2676,7 @@ const skills = {
 	},
 	//佐藤雏
 	hina_shenshi: {
-		groupSkill: true,
+		groupSkill: "shen",
 		trigger: { player: ["phaseUseBegin", "phaseUseEnd"] },
 		frequent: true,
 		filter(event, player) {
@@ -2721,7 +2721,7 @@ const skills = {
 		},
 	},
 	hina_xingzhi: {
-		groupSkill: true,
+		groupSkill: "key",
 		trigger: { player: "yingbian" },
 		usable: 1,
 		filter: (event, player) => player.group == "key" && !event.card.yingbian && lib.yingbian.condition.complex.has("zhuzhan"),
@@ -6041,6 +6041,7 @@ const skills = {
 		filter(event, player) {
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
+		derivation: ["kotori_skill_wei", "kotori_skill_shu", "kotori_skill_wu", "kotori_skill_qun", "kotori_skill_jin", "kotori_skill_key"],
 		content() {
 			var list = ["wei", "shu", "wu", "qun", "jin"];
 			for (var i of list) {
@@ -6484,6 +6485,9 @@ const skills = {
 			"step 2";
 			event.cards = result.cards;
 		},
+		ai: {
+			halfneg: true
+		},
 	},
 	//乙坂有宇
 	yuu_lveduo: {
@@ -6626,6 +6630,10 @@ const skills = {
 			player.loseMaxHp(3);
 			player.draw(3);
 			player.removeSkills("godan_feiqu");
+		},
+		ai: {
+			combo: "godan_feiqu",
+			halfneg: true
 		},
 	},
 	//游佐
@@ -8629,6 +8637,16 @@ const skills = {
 		},
 	},
 	riki_nvzhuang: {
+		init(player) {
+			if (get.character(player.name1, 3).includes("riki_nvzhuang")) {
+				player.storage.riki_nvzhuang = player.sex;
+				if (player.sex === "male") player.sex = "double";
+				else player.sex = "female";
+			}
+		},
+		onremove(player) {
+			if (player.storage.riki_nvzhuang) player.sex = player.storage.riki_nvzhuang;
+		},
 		trigger: { player: "phaseJieshuBegin" },
 		forced: true,
 		content() {
@@ -8785,6 +8803,7 @@ const skills = {
 			else trigger.directHit.add(player);
 		},
 		ai: {
+			halfneg: true,
 			directHit_ai: true,
 			skillTagFilter(player, tag, arg) {
 				return arg.card.name == "sha";
@@ -9790,10 +9809,10 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card, player, target) {
+				target_use(card, player, target) {
 					if (card.name == "sha" && get.color(card) == "red") return [1, 0.6];
 				},
-				player(card, player, target) {
+				player_use(card, player, target) {
 					if (card.name == "sha" && get.color(card) == "red") return [1, 1];
 				},
 			},

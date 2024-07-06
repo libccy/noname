@@ -943,6 +943,7 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
+		changeSeat: true,
 		limited: true,
 		skillAnimation: true,
 		animationColor: "orange",
@@ -1304,7 +1305,7 @@ const skills = {
 		},
 	},
 	spxizhan: {
-		audio: 4,
+		audio: 5,
 		group: "spxizhan_effect",
 		locked: false,
 		subSkill: {
@@ -1351,7 +1352,7 @@ const skills = {
 							suit = get.suit(card, player);
 						if (!lib.suit.includes(suit) || ((!target || !target.isIn()) && suit != "heart")) return;
 						game.broadcastAll(function (suit) {
-							if (lib.config.background_speak) game.playAudio("skill", "spxizhan" + (4 - lib.suit.indexOf(suit)));
+							if (lib.config.background_speak) game.playAudio("skill", "spxizhan" + [null, "spade", null, "heart", "club", "diamond"].indexOf(suit));
 						}, suit);
 						switch (suit) {
 							case "spade":
@@ -1393,7 +1394,12 @@ const skills = {
 									);
 								break;
 						}
-					} else player.loseHp();
+					} else {
+						game.broadcastAll(function () {
+							if (lib.config.background_speak) game.playAudio("skill", "spxizhan2");
+						});
+						player.loseHp();
+					}
 				},
 			},
 		},
@@ -1466,13 +1472,13 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target) {
+				player_use(card, player, target) {
 					var hp = player.hp,
 						evt = _status.event;
 					if (evt.name == "chooseToUse" && evt.player == player && evt.skill == "spjungong" && !ui.selected.cards.length) hp -= (player.getStat("skill").spjungong || 0) + 1;
 					if (card && card.name == "sha" && hp == target.hp) return [1, 0.3];
 				},
-				target: function (card, player, target) {
+				target_use(card, player, target) {
 					if (card && card.name == "sha" && player.hp == target.hp) return [1, 0.3];
 				},
 			},
@@ -1705,7 +1711,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (get.name(card) == "shan") {
 								let num = get.number(card);
 								if (!num || num <= player.storage.shanxie_banned.num) return "zeroplayertarget";
@@ -2114,7 +2120,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (card.name == "sha" && player.hp > target.hp && get.attitude(player, target) < 0) {
 						var num = get.number(card);
 						if (typeof num != "number") return false;
@@ -2637,7 +2643,7 @@ const skills = {
 	},
 	dbzhuifeng: {
 		audio: 2,
-		groupSkill: true,
+		groupSkill: "wei",
 		enable: "chooseToUse",
 		usable: 2,
 		viewAsFilter: function (player) {
@@ -2681,7 +2687,7 @@ const skills = {
 	},
 	dbchongjian: {
 		audio: 2,
-		groupSkill: true,
+		groupSkill: "wu",
 		hiddenCard: function (player, name) {
 			if (
 				player.group == "wu" &&
@@ -3996,6 +4002,9 @@ const skills = {
 		content: function () {
 			game.cardsGotoSpecial(get.cards(), "toRenku");
 		},
+		ai: {
+			combo: "spsongshu"
+		},
 	},
 	spsongshu: {
 		audio: 2,
@@ -4037,6 +4046,9 @@ const skills = {
 				intro: { content: "不能对其他角色使用牌" },
 			},
 		},
+		ai: {
+			combo: "gebo"
+		},
 	},
 	//张机
 	jishi: {
@@ -4073,6 +4085,9 @@ const skills = {
 					player.draw();
 				},
 			},
+		},
+		ai: {
+			combo: "binglun"
 		},
 	},
 	xinliaoyi: {
@@ -4289,6 +4304,7 @@ const skills = {
 			},
 		},
 		ai: {
+			combo: "jishi",
 			order: 2,
 			result: {
 				player: 1,
@@ -5053,6 +5069,67 @@ const skills = {
 		ai: { combo: "boming", halfneg: true },
 		onremove: true,
 		intro: { content: "已对$发动过此技能" },
+	},
+	yuanqing: {
+		audio: 2,
+		trigger: { player: "phaseUseEnd" },
+		forced: true,
+		filter: function (event, player) {
+			return player.hasHistory("useCard", function (evt) {
+				return evt.getParent("phaseUse") == event;
+			});
+		},
+		content: function () {
+			var map = {},
+				cards = [];
+			player.getHistory("useCard", function (evt) {
+				if (evt.getParent("phaseUse") == trigger) {
+					var type = get.type2(evt.card, false);
+					if (!map[type]) map[type] = [];
+				}
+			});
+			for (var i = 0; i < ui.discardPile.childNodes.length; i++) {
+				var card = ui.discardPile.childNodes[i],
+					type = get.type2(card, false);
+				if (map[type]) map[type].push(card);
+			}
+			for (var i in map) {
+				if (map[i].length) cards.push(map[i].randomGet());
+			}
+			if (cards.length) {
+				player.$gain2(cards, false);
+				game.cardsGotoSpecial(cards, "toRenku");
+				game.log(player, "将", cards, "置入了仁库");
+				game.delayx();
+			}
+		},
+		init: function (player) {
+			player.storage.renku = true;
+		},
+		ai: {
+			combo: "shuchen"
+		},
+	},
+	shuchen: {
+		audio: 2,
+		init: function (player) {
+			player.storage.renku = true;
+		},
+		trigger: { global: "dying" },
+		forced: true,
+		filter: function (event, player) {
+			return _status.renku.length > 3;
+		},
+		logTarget: "player",
+		content: function () {
+			player.gain(_status.renku, "gain2", "fromRenku");
+			_status.renku.length = 0;
+			game.updateRenku();
+			trigger.player.recover();
+		},
+		ai: {
+			combo: "yuanqing"
+		},
 	},
 	hxrenshi: {
 		audio: 2,

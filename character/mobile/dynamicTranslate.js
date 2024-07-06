@@ -30,8 +30,8 @@ const dynamicTranslates = {
 		const xuetu = player.storage.mbxuetu,
 			status = player.countMark("mbxuetu_status");
 		if (status === 0) {
-			if (!xuetu) return '转换技。出牌阶段限一次，<span class="bluetext">阴：你可以弃置一张牌，然后令一名角色回复1点体力；</span>阳：你可以失去1点体力，然后令一名角色摸两张牌。';
-			return '转换技。出牌阶段限一次，阴：你可以弃置一张牌，然后令一名角色回复1点体力；<span class="bluetext">阳：你可以失去1点体力，然后令一名角色摸两张牌。</span>';
+			if (!xuetu) return '转换技。出牌阶段限一次，<span class="bluetext">阴：你可以令一名角色回复1点体力；</span>阳：你可以令一名角色摸两张牌。';
+			return '转换技。出牌阶段限一次，阴：你可以令一名角色回复1点体力；<span class="bluetext">阳：你可以令一名角色摸两张牌。</span>';
 		} else if (status === 1) {
 			return lib.translate.mbxuetu_achieve_info;
 		} else {
@@ -40,9 +40,10 @@ const dynamicTranslates = {
 		}
 	},
 	mbzuoyou(player) {
-		const mbzuoyou = player.storage.mbzuoyou;
-		if (mbzuoyou) return '转换技。出牌阶段限一次，阴：你可以令一名角色摸两张牌，然后其弃置一张牌；<span class="bluetext">阳：你可以令一名手牌数不少于二的角色弃置两张手牌，然后其获得1点护甲。</span>';
-		return '转换技。出牌阶段限一次，<span class="bluetext">阴：你可以令一名角色摸两张牌，然后其弃置一张牌；</span>阳：你可以令一名手牌数不少于二的角色弃置两张手牌，然后其获得1点护甲。';
+		const mbzuoyou = player.storage.mbzuoyou,
+			versus = get.mode() == "versus" && _status.mode == "two" ? "角色" : "有手牌的角色弃置一张手牌，然后其";
+		if (mbzuoyou) return '转换技。出牌阶段限一次，阴：你可以令一名角色摸三张牌，然后其弃置两张牌；<span class="bluetext">阳：你可以令一名' + versus + "获得1点护甲。</span>";
+		return '转换技。出牌阶段限一次，<span class="bluetext">阴：你可以令一名角色摸三张牌，然后其弃置两张牌；</span>阳：你可以令一名' + versus + "获得1点护甲。";
 	},
 };
 export default dynamicTranslates;

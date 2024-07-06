@@ -1259,7 +1259,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (
 								target == player &&
 								lib.skill.gaizao.filterx(card, target) &&
@@ -1869,7 +1869,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (get.tag(card, "respondShan")) {
 								var shans = target.countCards("h", "shan");
 								var hs = target.countCards("h");
@@ -1920,7 +1920,7 @@ game.import("character", function () {
 					mingzhi: false,
 					useShan: true,
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (get.tag(card, "respondShan")) {
 								var shans = target.countCards("h", "shan");
 								var hs = target.countCards("h");
@@ -2970,7 +2970,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card) {
+						target_use(card) {
 							if (card.name == "sha") return 1.3;
 						},
 					},
@@ -3133,6 +3133,9 @@ game.import("character", function () {
 				content: function () {
 					trigger.player.addSkill("pingshen2");
 					trigger.player.storage.pingshen = player;
+				},
+				ai: {
+					neg: true
 				},
 			},
 			pingshen2: {
@@ -3307,7 +3310,7 @@ game.import("character", function () {
 				ai: {
 					mingzhi: false,
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (player == _status.currentPhase) return;
 							if (
 								!game.hasPlayer(function (current) {
@@ -3834,22 +3837,24 @@ game.import("character", function () {
 				ai: {
 					maixie: true,
 					maixie_hp: true,
-					effect: function (card, player, target) {
-						if (get.tag(card, "damage")) {
-							if (player.hasSkillTag("jueqing", false, target)) return [1, -0.5];
-							if (!target.hasFriend()) {
-								if (get.mode() == "guozhan") {
-									if (!player.hasFriend()) return;
-								} else {
-									return;
+					effect: {
+						target(card, player, target) {
+							if (get.tag(card, "damage")) {
+								if (player.hasSkillTag("jueqing", false, target)) return [1, -0.5];
+								if (!target.hasFriend()) {
+									if (get.mode() == "guozhan") {
+										if (!player.hasFriend()) return;
+									} else {
+										return;
+									}
 								}
+								if (target.countCards("h") > 2 || target.countCards("e", { color: "black" })) {
+									return [1, 0, 0, -1];
+								}
+								return [1, -0.5];
 							}
-							if (target.countCards("h") > 2 || target.countCards("e", { color: "black" })) {
-								return [1, 0, 0, -1];
-							}
-							return [1, -0.5];
-						}
-					},
+						},
+					}
 				},
 			},
 			xuanyuan: {
@@ -4482,7 +4487,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (player != target) return;
 							if (get.type(card) == "equip" && !player.needsToDiscard()) {
 								return [0, 0, 0, 0];
@@ -4967,7 +4972,6 @@ game.import("character", function () {
 					player.removeSkill("lianji2");
 				},
 			},
-			yinmo: {},
 			miedao: {
 				group: ["miedao1", "miedao2"],
 				ai: {
@@ -8404,7 +8408,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							if (
 								get.color(card) == "black" &&
 								get.attitude(target, player) < 0 &&
@@ -8674,7 +8678,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use(card, player, target) {
 							return 0.7;
 						},
 					},
@@ -10297,7 +10301,6 @@ game.import("character", function () {
 			swd_yeyaxi: "耶亚希",
 			swd_chunyuheng: "淳于恒",
 			swd_duguningke: "独孤宁珂",
-			swd_duguningke2: "魔化宁珂",
 			swd_chenjingchou: "陈靖仇",
 			swd_zhanglie: "张烈",
 			swd_guyue: "古月圣",
@@ -10668,9 +10671,6 @@ game.import("character", function () {
 				"锁定技，出牌阶段结束后，你令随机Ｘ名角色各弃置一张牌，Ｘ为你已损失的体力值且至少为1。",
 			liaochen: "撩尘",
 			liaochen_info: "锁定技，出牌阶段结束后，所有角色需弃置一张牌。",
-			yinmo: "引魔",
-			yinmo_info:
-				"锁定技，当你对场上所有角色发动〖连计〗后，你立即变身为魔化宁珂，然后对所有其他角色造成1点雷电伤害。",
 			huanxing: "幻形",
 			huanxing2: "幻形",
 			huanxing_info:
@@ -10755,7 +10755,7 @@ game.import("character", function () {
 			tuzhen_info_alter: "当你造成一次伤害后，你可以弃置对方手牌中的一张非基本牌。",
 			fengmo: "封魔",
 			fengmo_info:
-				"出牌阶段限一次，你可以弃置场所有武器牌（至少两张），然后令一名未翻面的角色摸等量的牌并翻面。",
+				"出牌阶段限一次，你可以弃置场上所有武器牌（至少两张），然后令一名未翻面的角色摸等量的牌并翻面。",
 			pozhou: "破咒",
 			pozhou_bg: "破",
 			pozhou2: "破咒",
@@ -10942,7 +10942,7 @@ game.import("character", function () {
 				"每当你需要打出一张杀或闪时，你可以弃置一名其他角色装备区内的一张武器牌或防具牌，视为打出一张杀或闪，然后该角色摸一张牌，你弃一张牌。",
 			ningjian_info: "你可以将一张红色牌当闪、黑色牌当杀使用或打出。",
 			taixu_info:
-				"限定技，你可以弃置你的所有牌（至少1张），并对一名体力值大于1为其他角色造成X点火焰伤害，X为你已损失的体力值且至少为1。",
+				"限定技，你可以弃置你的所有牌（至少1张），并对一名体力值大于1的其他角色造成X点火焰伤害，X为你已损失的体力值且至少为1。",
 			duoren_info: "每当你闪避一张杀，你可以立即获得来源的武器牌。",
 			tanlin_info:
 				"出牌阶段限一次，你可以与一名其他角色进行拼点，若你赢，你获得双方拼点牌、对该角色使用卡牌无视距离且可以额外使用一张杀直到回合结束，若你没赢，你受到该角色的1点伤害。",

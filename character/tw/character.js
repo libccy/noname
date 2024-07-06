@@ -1,4 +1,13 @@
 const characters = {
+	huan_zhugeliang: ["male", "shu", "3/4", ["twbeiding", "twjielv", "twhunyou"]],
+	huan_jiangwei: ["male", "shu", 4, ["huan_jiangwei_A", "huan_jiangwei_B"]],
+	huan_guojia: ["male", "wei", 3, ["huan_guojia_A", "huan_guojia_B"]],
+	huan_zhanghe: ["male", "wei", 4, ["huan_zhanghe_A"]],
+	huan_zhaoyun: ["male", "shu", 4, ["huan_zhaoyun_A", "huan_zhaoyun_B"]],
+	huan_simayi: ["male", "wei", 4, ["twzongquan", "twguimou"]],
+	huan_weiyan: ["male", "shu", 4, ["twqiji", "twpiankuang"]],
+	tw_zhugejun: ["male", "qun", 3, ["twshouzhu", "twdaigui", "twcairu"]],
+	simafu: ["male", "wei", 3, ["xunde", "chenjie"]],
 	tw_yanliang: ["male", "qun", 4, ["twduwang", "twylyanshi"]],
 	tw_wenchou: ["male", "qun", 4, ["twjuexing", "twxiayong"]],
 	tw_yuantan: ["male", "qun", 4, ["twqiaosi", "twbaizu"]],

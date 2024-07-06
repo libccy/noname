@@ -7,7 +7,7 @@ import { ui } from "../../ui/index.js";
 export class Character {
 	/**
 	 * 武将牌的性别
-	 * @type { string }
+	 * @type { Sex | "" }
 	 **/
 	sex;
 	/**
@@ -161,6 +161,11 @@ export class Character {
 	 */
 	tempname = [];
 	/**
+	 * 武将牌是否存在(get.character未找到武将使用)
+	 * @type { boolean }
+	 */
+	isNull = false;
+	/**
 	 * @param { Object|[string, string, string|number, string[], any[]|undefined, any[]|undefined] } [data]
 	 */
 	constructor(data) {
@@ -208,8 +213,7 @@ export class Character {
 	 * @param { any[] } trash
 	 */
 	setPropertiesFromTrash(trash) {
-		const keptTrashes = [],
-			clans = [];
+		const keptTrashes = [], clans = [], dieAudios=[];
 		for (let i = 0; i < trash.length; i++) {
 			const item = trash[i];
 			if (typeof item !== "string") {
@@ -260,10 +264,11 @@ export class Character {
 				clans.push(item.slice(5));
 			} else if (item.startsWith("InitFilter:")) {
 				this.initFilters = item.slice(11).split(":");
-			} else if (item.startsWith("die:")){
-				this.dieAudios.push(item.slice(4));
-			} else if (item.startsWith("die_audio:")){
-				this.dieAudios = item.slice(10).split(":");
+			} else if (item.startsWith("die:")) {
+				dieAudios.add(item.slice(4));
+			} else if (item.startsWith("die_audio:")) {
+				console.warn(`die_audio参数已废弃，请使用多个die参数。`);
+				dieAudios.addArray(item.slice(10).split(":"));
 			} else if (item.startsWith("tempname:")) {
 				this.tempname = item.slice(9).split(":");
 			} else {
@@ -271,6 +276,7 @@ export class Character {
 			}
 		}
 		this.clans = clans;
+		this.dieAudios = dieAudios;
 		this.trashBin = keptTrashes;
 	}
 	/**
@@ -388,8 +394,7 @@ export class Character {
 			trashes.push(`InitFilters:${character.initFilters.join(":")}`);
 		}
 		if (character.dieAudios.length > 0) {
-			if (character.dieAudios.length === 1) trashes.push(`die:${character.dieAudios[0]}`)
-			else trashes.push(`die_audio:${character.dieAudios.join(":")}`);
+			character.dieAudios.forEach((item) => trashes.push(`die:${item}`));
 		}
 		if (character.tempname.length > 0) {
 			trashes.push(`tempname:${character.tempname.join(":")}`);

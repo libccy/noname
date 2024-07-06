@@ -7,8 +7,8 @@ const characters = {
 	dc_sunquan: ["male", "wu", 4, ["dczhiheng"]],
 	zhutiexiong: ["male", "qun", 3, ["dcbianzhuang"]],
 	wu_zhutiexiong: ["male", "qun", 3, ["dcbianzhuang"], ["unseen"]],
-	xiaoyuehankehan: ["male", "qun", 3, ["dctongliao", "dcwudao"], ["die_audio:xiaoyuehankehan:xiaoyuehankehan2:xiaoyuehankehan3"]],
-	libai: ["male", "qun", 3, ["dclbjiuxian", "dcshixian"], ["die_audio:libai:libai2"]],
+	xiaoyuehankehan: ["male", "qun", 3, ["dctongliao", "dcwudao"], ["die:true","die:3"]],
+	libai: ["male", "qun", 3, ["dclbjiuxian", "dcshixian"], ["die:true", "die:2"]],
 	sunwukong: ["male", "qun", 3, ["dcjinjing", "dccibei", "dcruyi"]],
 	longwang: ["male", "qun", 3, ["dclonggong", "dcsitian"]],
 	taoshen: ["male", "qun", 3, ["dcnutao"]],
@@ -20,6 +20,8 @@ const characters = {
 	old_lingju: ["female", "qun", 3, ["jieyuan", "fenxin_old"]],
 	sp_mushun: ["male", "qun", 4, ["moukui"]],
 	dc_wuyi: ["male", "shu", 4, ["dcbenxi"]],
+	quyuan: ["male", "qun", 3, ["dcqiusuo", "dclisao"]],
+	xin_sunquan: ["male", "wu", 3, ["dchuiwan", "dchuanli"]],
 };
 
 export default characters;

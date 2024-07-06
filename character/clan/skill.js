@@ -826,10 +826,12 @@ const skills = {
 					var target = event.targets.shift();
 					event.target = target;
 					var list = [];
+					const nameFilter = trigger.card.name == "sha"
+						? name => get.type(name) == "trick"
+						: name => name == "sha";
 					for (var name of lib.inpile) {
 						if (name != "sha" && get.type(name) != "trick") continue;
-						if (trigger.card.name == "sha" && get.type(name) != "trick") continue;
-						if (name == "sha" && get.type(trigger.card) != "trick") continue;
+						if (!nameFilter(name)) continue;
 						if (!player.canUse(get.autoViewAs({ name: name }, []), target)) continue;
 						list.push([get.translation(get.type(name)), "", name]);
 					}
@@ -932,7 +934,7 @@ const skills = {
 		ai: {
 			threaten: 3,
 			effect: {
-				player(card, player, target) {
+				player_use(card, player, target) {
 					if (!target || typeof card !== "object" || player._clanjiejian_mod_temp || get.type(card) === "equip" || get.attitude(player, target) <= 0 || get.cardNameLength(card) !== player.getHistory("useCard").length + 1) return;
 					let targets = [target],
 						evt = _status.event.getParent("useCard");
@@ -1017,20 +1019,13 @@ const skills = {
 		content() {
 			"step 0";
 			player.unmarkSkill("clanyuzhi");
-			if (
-				player.countCards("h", card => {
-					return card.hasGaintag("clanyuzhi") && lib.filter.cardDiscardable(card, player);
-				})
-			) {
+			const cards = player.getCards("h", card => {
+				return card.hasGaintag("clanyuzhi") && lib.filter.cardDiscardable(card, player);
+			});
+			if (cards.length) {
 				event.logged = true;
-				player.chooseToDiscard(
-					player.countCards("h"),
-					"h",
-					(card, player) => {
-						return card.hasGaintag("clanyuzhi");
-					},
-					true
-				).logSkill = "clanyuzhi";
+				player.logSkill("clanyuzhi");
+				player.discard(cards);
 			}
 			"step 1";
 			player.removeGaintag("clanyuzhi");
@@ -1427,6 +1422,7 @@ const skills = {
 			delete event.result.skill;
 		},
 		ai: {
+			combo: "clanzhongliu",
 			order(item, player) {
 				player = player || _status.event.player;
 				var storage = _status.event.player.storage.clanjiexuan;
@@ -2186,13 +2182,10 @@ const skills = {
 					"step 6";
 					var current = targets.shift();
 					current
-						.chooseToUse(
-							function (card, player, event) {
-								if (get.name(card) != "sha") return false;
-								return lib.filter.filterCard.apply(this, arguments);
-							},
-							"联诛：是否对" + get.translation(event.targetx) + "使用一张杀？"
-						)
+						.chooseToUse(function (card, player, event) {
+							if (get.name(card) != "sha") return false;
+							return lib.filter.filterCard.apply(this, arguments);
+						}, "联诛：是否对" + get.translation(event.targetx) + "使用一张杀？")
 						.set("targetRequired", true)
 						.set("complexSelect", true)
 						.set("filterTarget", function (card, player, target) {
@@ -2355,21 +2348,24 @@ const skills = {
 		filter(event, player) {
 			return game.hasPlayer(current => player.canCompare(current));
 		},
-		async cost(event, trigger, player){
-			event.result = await player.chooseTarget(get.prompt("clanliuju"), "与一名其他角色拼点，输的角色可以使用任意张拼点牌中的非基本牌", (card, player, target) => {
-				return player.canCompare(target);
-			}).set("ai", target => {
-				var player = _status.event.player;
-				var ts = target.getCards("h").sort((a, b) => get.number(a) - get.number(b));
-				if (get.attitude(player, target) < 0) {
-					var hs = player.getCards("h").sort((a, b) => get.number(a) - get.number(b));
-					if (!hs.length || !ts.length) return 0;
-					if (get.type(hs[0], null, false) == "basic" && get.value(hs[0]) > 6) return 0;
-					if (get.number(hs[0]) < get.number(ts[0]) || get.type(hs[0], null, false) == "basic") return 1;
-					return Math.random() - 0.7;
-				}
-				return get.type(ts[0]) != "basic";
-			}).forResult();
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt("clanliuju"), "与一名其他角色拼点，输的角色可以使用任意张拼点牌中的非基本牌", (card, player, target) => {
+					return player.canCompare(target);
+				})
+				.set("ai", target => {
+					var player = _status.event.player;
+					var ts = target.getCards("h").sort((a, b) => get.number(a) - get.number(b));
+					if (get.attitude(player, target) < 0) {
+						var hs = player.getCards("h").sort((a, b) => get.number(a) - get.number(b));
+						if (!hs.length || !ts.length) return 0;
+						if (get.type(hs[0], null, false) == "basic" && get.value(hs[0]) > 6) return 0;
+						if (get.number(hs[0]) < get.number(ts[0]) || get.type(hs[0], null, false) == "basic") return 1;
+						return Math.random() - 0.7;
+					}
+					return get.type(ts[0]) != "basic";
+				})
+				.forResult();
 		},
 		content() {
 			"step 0";
@@ -2381,9 +2377,12 @@ const skills = {
 				var loser = result.bool ? target : player;
 				var cards = [];
 				game.getGlobalHistory("cardMove", evt => {
-					if (evt.getParent(2).name === "chooseToCompare" && evt.getParent(3) === event) cards.addArray(evt.cards.filter(i => {
-						return get.position(i, true) == "d" && get.type(i, null, false) != "basic";
-					}));
+					if (evt.getParent(2).name === "chooseToCompare" && evt.getParent(3) === event)
+						cards.addArray(
+							evt.cards.filter(i => {
+								return get.position(i, true) == "d" && get.type(i, null, false) != "basic";
+							})
+						);
 				});
 				event.loser = loser;
 				event.distance = [get.distance(player, target), get.distance(target, player)];
@@ -2393,11 +2392,15 @@ const skills = {
 			"step 2";
 			var cardsx = cards.filter(i => get.position(i, true) == "d" && event.loser.hasUseTarget(i));
 			if (!cardsx.length) event.goto(6);
-			else event.loser.chooseButton(["留驹：是否使用其中的一张牌？", cardsx]).set("filterButton", button => {
-				return _status.event.player.hasUseTarget(button.link);
-			}).set("ai", button => {
-				return _status.event.player.getUseValue(button.link) + 0.1;
-			});
+			else
+				event.loser
+					.chooseButton(["留驹：是否使用其中的一张牌？", cardsx])
+					.set("filterButton", button => {
+						return _status.event.player.hasUseTarget(button.link);
+					})
+					.set("ai", button => {
+						return _status.event.player.getUseValue(button.link) + 0.1;
+					});
 			"step 3";
 			if (result.bool) {
 				var card = result.links[0];
@@ -2705,7 +2708,7 @@ const skills = {
 				if (player.getHistory("useCard", evt => get.type(evt.card) == "equip").length > 0) return false;
 			},
 			effect: {
-				target(card, player, target) {
+				target_use(card, player, target) {
 					if (player == target && get.type(card) == "equip" && !player.getHistory("useCard", evt => get.type(evt.card) == "equip").length == 0) return [1, 3];
 				},
 			},

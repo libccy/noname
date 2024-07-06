@@ -101,10 +101,16 @@ const skills = {
 			effect: {
 				player: function (card, player, target) {
 					if (!get.tag(card, "damage")) return;
-					if (!lib.card[card.name] || !card.cards || !card.cards.length) return [1, 0, 1, -1];
+					if (!lib.card[card.name] || !card.cards || !card.cards.length) return [1, 0, 2, 0];
+					return [1, -1];
+				},
+				target: function (card, player, target) {
+					if (!get.tag(card, "damage")) return;
+					if (!lib.card[card.name] || !card.cards || !card.cards.length) return 2;
 					return [1, -1];
 				},
 			},
+			halfneg: true,
 		},
 		subSkill: {
 			effect: {
@@ -591,7 +597,7 @@ const skills = {
 				onremove: true,
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use(card, player, target) {
 							if (card.name == player.storage.xiongshu_ai) return "zeroplayertarget";
 						},
 					},
@@ -1643,9 +1649,13 @@ const skills = {
 							.getCards("he", function (card) {
 								return lib.filter.canBeDiscarded(card, player, target);
 							})
+							.map(c => ({
+								link: c,
+							}))
 							.sort(function (a, b) {
 								return get.buttonValue(b) - get.buttonValue(a);
-							});
+							})
+							.map(b => b.link);
 						if (
 							target.countCards("h") - player.countCards("h") >=
 							Math.max(
@@ -1741,7 +1751,7 @@ const skills = {
 					if (!skill || skill.juexingji || skill.hiddenSkill || skill.zhuSkill || skill.dutySkill || skill.chargeSkill || lib.skill.bolan.banned.includes(j)) continue;
 					if (skill.init || (skill.ai && (skill.ai.combo || skill.ai.notemp || skill.ai.neg))) continue;
 					var info = lib.translate[j + "_info"];
-					if (info && info.indexOf("出牌阶段限一次") != -1) skills.add(j);
+					if (info && get.plainText(info).indexOf("出牌阶段限一次") != -1) skills.add(j);
 				}
 			}
 			player.storage.bolan = skills;
@@ -2302,6 +2312,9 @@ const skills = {
 			globalFrom: function (player, target, distance) {
 				if (player.getEquips(5).length) return distance - 1;
 			},
+		},
+		ai: {
+			combo: "chexuan"
 		},
 	},
 	cheliji_sichengliangyu: {

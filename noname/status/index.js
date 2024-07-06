@@ -1,20 +1,37 @@
 import { lib } from "../library/index.js";
+import PauseManager from "../game/PauseManager.ts";
 
 export class status {
-	paused = false;
-	paused2 = false;
-	paused3 = false;
-	over = false;
+	imchoosing = false;
 	clicked = false;
 	auto = false;
 	/**
-	 * @type { GameEventPromise }
+	 * @type { GameEvent }
 	 */
-	// @ts-ignore
-	event = null;
+	get event() {
+		//@ts-ignore
+		return this.eventStack.at(-1) || this.#waitingEvent;
+	}
+	set event(event) {
+		if (event == void 0) return;
+		if (this.eventStack.length === 0) this.#waitingEvent = event;
+		//@ts-ignore
+		else _status.event.next.push(event);
+	}
+	/**
+	 * @type { GameEvent | null }
+	 */
+	#waitingEvent;
+	/**
+	 * @type { GameEvent[] }
+	 */
+	eventStack = [];
 	ai = {};
 	lastdragchange = [];
-	skillaudio = [];
+	/**
+	 * @type { string[] }
+	 */
+	skillaudio = []
 	dieClose = [];
 	dragline = [];
 	dying = [];
@@ -52,10 +69,11 @@ export class status {
 	 * @type { boolean | undefined }
 	 */
 	touchconfirmed = undefined;
+	connectMode = false;
 	/**
 	 * @type { boolean | undefined }
 	 */
-	connectMode = undefined;
+	video = undefined
 	/**
 	 * @type { boolean | undefined }
 	 */
@@ -76,6 +94,44 @@ export class status {
 	 * @type { Function | boolean | undefined }
 	 */
 	new_tutorial = undefined;
+	/**
+	 * @type { Player | undefined }
+	 */
+	roundStart = undefined;
+	/**
+	 * @type { boolean }
+	 */
+	roundSkipped;
+
+	pauseManager = new PauseManager();
+	get paused() {
+		return this.pauseManager.pause.isStarted;
+	}
+	set paused(bool) {
+		if (bool) this.pauseManager.pause.start();
+		else this.pauseManager.pause.resolve();
+	}
+	get paused2() {
+		return this.pauseManager.pause2.isStarted;
+	}
+	set paused2(bool) {
+		if (bool) this.pauseManager.pause2.start();
+		else this.pauseManager.pause2.resolve();
+	}
+	get paused3() {
+		return this.pauseManager.pause3.isStarted;
+	}
+	set paused3(bool) {
+		if (bool) this.pauseManager.pause3.start();
+		else this.pauseManager.pause3.resolve();
+	}
+	get over() {
+		return this.pauseManager.over.isStarted;
+	}
+	set over(bool) {
+		if (bool) this.pauseManager.over.start();
+		else this.pauseManager.over.resolve();
+	}
 }
 
 export let _status = new status();

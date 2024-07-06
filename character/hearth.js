@@ -174,7 +174,7 @@ game.import("character", function () {
 			hs_neptulon:
 				'耐普图隆被称为"猎潮者"。他是四大元素领主之一。他和拉格纳罗斯能够联手为你提供最好的桑拿服务。',
 			hs_wvelen:
-				"他被逐出他的家园。他兄弟们都变成了邪恶的主宰......但是除此之外，他好像也没有什么别的可以抱怨的了。",
+				"他被逐出他的家园。他兄弟们都变成了邪恶的主宰……但是除此之外，他好像也没有什么别的可以抱怨的了。",
 			hs_antonidas:
 				"肯瑞托的首席法师，达拉然最伟大的子民，安东尼达斯在被巫妖王阿尔萨斯杀死之前，曾是吉安娜的导师。. 预言者警告他必须迁移到西方去, 但安东尼达斯没有注意。最终导致了自己和达拉然的毁灭。",
 			hs_alakir: "他是四大元素领主中最弱的一个。而另外三个总是会提醒他这一点。",
@@ -215,7 +215,7 @@ game.import("character", function () {
 			hs_shanlingjuren: "他的妈妈说，他只是骨架比较大而已。",
 			hs_aedwin:
 				"他领导石匠协会重建了暴风城，而当贵族们拒绝支付工钱的时候，他将领导迪菲亚兄弟会，嗯，拆掉暴风城。",
-			hs_mijiaojisi: "你绝不知道谁在为这个秘密组织效劳...",
+			hs_mijiaojisi: "你绝不知道谁在为这个秘密组织效劳……",
 			hs_huzhixiannv: "传闻她手中持的便是亚瑟王的断钢剑。",
 			hs_totemic: "事实证明海象人对于图腾的样式一点都不挑剔。",
 			hs_xsylvanas: "没有人比女王更渴望真正地死去。",
@@ -238,7 +238,7 @@ game.import("character", function () {
 			hs_kazhakusi:
 				"暗金教在此严正声明，卡扎库斯教主并非巨龙，也从未染指过违禁药水。任何公开污蔑暗金教与卡扎库斯教主本人的言论，必将遭受法律与龙息药水的严惩。",
 			hs_shaku: "艾雅曾调查过沙库尔，看看他有没有私藏了什么好东西。",
-			hs_laxiao: "什么？身为死亡之翼的儿子，拉西奥居然不是龙牌？你似乎知道的太多了…",
+			hs_laxiao: "什么？身为死亡之翼的儿子，拉西奥居然不是龙牌？你似乎知道的太多了……",
 		},
 		characterTitle: {
 			hs_aiqinvyao: "#bSnonamekill",
@@ -2200,17 +2200,6 @@ game.import("character", function () {
 				content() {
 					trigger.num++;
 				},
-			},
-			qingtian_old: {
-				trigger: { player: "recoverBefore" },
-				forced: true,
-				filter(event, player) {
-					return player.hp > 0 && event.num > 0;
-				},
-				content() {
-					trigger.cancel();
-					player.changeHujia(trigger.num);
-				},
 				ai: {
 					neg: true,
 				},
@@ -2517,7 +2506,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target(card, player, target) {
+						target_use(card, player, target) {
 							if (get.type(card, "trick") == "trick" && player == target) return [1, 1];
 						},
 					},
@@ -10387,8 +10376,8 @@ game.import("character", function () {
 			nuyan2: "怒焰",
 			nuyan_backup: "怒焰",
 			nuyan_info:
-				"出牌阶段限一次，你可以将一张红色牌当作任意一张能造成伤害的牌使用（不得是你本局以此法使用过的牌）。",
-			nuyan2_info: "出牌阶段限三次，你可以失去1点体力，视为使用任意一张能造成伤害的牌”。",
+				"出牌阶段限一次，你可以将一张红色牌当作任意一张具有「伤害」标签的牌使用（不得是你本局以此法使用过的牌）。",
+			nuyan2_info: "出牌阶段限三次，你可以失去1点体力，视为使用任意一张具有「伤害」标签的牌。",
 			chouhuo: "仇火",
 			chouhuo_info:
 				"觉醒技，出牌阶段开始时，若你的怒焰技能已将可用的牌用完，你失去1点体力上限，获得2点护甲，然后将怒焰的描述改为“出牌阶段限三次，你可以失去1点体力，视为使用任意一张能造成伤害的牌”。",

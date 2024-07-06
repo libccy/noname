@@ -1289,7 +1289,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target(card, player, target, current) {
+						target_use(card, player, target, current) {
 							if (get.color(card) == "red" && target.isDamaged()) return [1, 1];
 						},
 					},
@@ -1480,7 +1480,7 @@ game.import("character", function () {
 				ai: {
 					halfneg: true,
 					effect: {
-						player(card, player, target, current) {
+						player_use(card, player, target, current) {
 							if (get.color(card) == "red") return [1, 0, 1, -2];
 						},
 					},
@@ -2923,7 +2923,7 @@ game.import("character", function () {
 				"在你的回合内，你可以弃置一张装备牌，并展示牌堆顶的一张牌，若其为装备牌，你须将其交给任意一张角色并对其造成1点伤害，否则你摸一张牌。",
 			jizhan: "疾战",
 			jizhan_info:
-				"出牌阶段限一次，你可以将移动到任意一名角色的前一位，视为对其使用了一张不计入出杀次数的杀。",
+				"出牌阶段限一次，你可以移动到任意一名角色的前一位，视为对其使用了一张不计入出杀次数的杀。",
 			qianjun: "千军",
 			qianjun_info: "每当你使用一张杀，你可以弃置一张牌，令距离目标1以内的所有角色成为额外目标。",
 			xuanning: "玄凝",

@@ -1,4 +1,6 @@
 const characters = {
+	sb_handang: ["male", "wu", 4, ["sbgongqi", "sbjiefan"]],
+	sb_gongsunzan: ["male", "qun", 4, ["sbyicong", "sbqiaomeng"]],
 	sb_gaoshun: ["male", "qun", 4, ["sbxianzhen", "sbjinjiu"]],
 	sb_xiahoudun: ["male", "wei", 4, ["sbganglie", "sbqingjian"]],
 	sb_xunyu: ["male", "wei", 3, ["sbquhu", "sbjieming"]],
@@ -41,6 +43,7 @@ const characters = {
 	sb_menghuo: ["male", "shu", 4, ["sbhuoshou", "sbzaiqi"]],
 	sb_yl_luzhi: ["male", "qun", 3, ["nzry_mingren", "sbzhenliang"]],
 	sb_xiaoqiao: ["female", "wu", 3, ["sbtianxiang", "xinhongyan"]],
+	sb_luxun: ["male", "wu", 3, ["sbqianxun", "sblianying"]],
 };
 
 export default characters;

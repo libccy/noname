@@ -99,8 +99,9 @@ const characters = {
 	junk_lidian: ["male", "wei", 3, ["xunxun", "junkwangxi"]],
 	junk_duanwei: ["male", "qun", 4, ["junklangmie"]],
 	junk_xuyou: ["male", "qun", 3, ["nzry_chenglve", "junkshicai", "nzry_cunmu"]],
-	junk_zhangjiao: ["male", "shen", 3, ["yizhao", "junksijun", "tianjie"], ["qun", "die_audio:shen_zhangjiao"]],
+	junk_zhangjiao: ["male", "shen", 3, ["yizhao", "junksijun", "tianjie"], ["qun", "die:shen_zhangjiao"]],
 	junk_guanyu: ["male", "shu", 4, ["olsbfumeng", "olsbguidao"]],
+	junk_liuyan: ["male", "qun", "4/6", ["olpianan", "olyinji", "olkuisi"]],
 };
 
 export default characters;
