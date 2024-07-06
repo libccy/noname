@@ -350,10 +350,11 @@ export class Get extends GetCompatible {
 	/**
 	 * 用于获取武将的姓氏和名字
 	 * @param { string } str
+	 * @param { string|undefined } defaultSurname
 	 * @param { string|undefined } defaultName
 	 * @returns { Array | undefined }
 	 */
-	characterSurname(str, defaultName){
+	characterSurname(str, defaultSurname, defaultName){
 		const info = get.character(str).names;
 		if (!info) {
 			let rawName = get.rawName(str);
@@ -364,7 +365,7 @@ export class Get extends GetCompatible {
 		for (let i = 0; i < infoarr.length; i++) {
 			let name = infoarr[i].split("|");
 			if (name[0] === "null") {
-				name[0] = "";
+				name[0] = defaultSurname || "";
 			}
 			if (name[1] === "null") {
 				name[1] = defaultName || "某";
