@@ -112,8 +112,7 @@ export class GameEvent {
 	/**
 	 * @type { Result }
 	 */
-	// @ts-ignore
-	_result = {};
+	_result;
 	/**
 	 * @type { [string, any][] }
 	 */
@@ -312,7 +311,6 @@ export class GameEvent {
 	}
 	finish() {
 		this.finished = true;
-		return this;
 	}
 	putStepCache(key, value) {
 		if (!this._stepCache) {
@@ -978,7 +976,10 @@ export class GameEvent {
 		const event = this;
 		return new Proxy([], {
 			set(target, p, childEvent, receiver) {
-				if (childEvent instanceof GameEvent) childEvent.parent = event;
+				if (childEvent instanceof GameEvent) {
+					childEvent.parent = event;
+					if (event.#inContent && event.finished) childEvent.resolve();
+				}
 				return Reflect.set(target, p, childEvent);
 			}
 		})
@@ -997,7 +998,8 @@ export class GameEvent {
 	 */
 	then(onfulfilled, onrejected) {
 		return (this.parent ? this.parent.waitNext() : this.start()).then(onfulfilled ? () => {
-			const result = { ...this.result, result: this.result };
+			const result = typeof this.result === "object" && this.result !== null ? { ...this.result } : Object(this.result);
+			result.result = this.result;
 			return onfulfilled(result)
 		} : onfulfilled, onrejected);
 	}
@@ -1005,6 +1007,9 @@ export class GameEvent {
 	 * @type { Promise<void> | null }
 	 */
 	#start = null;
+	resolve() {
+		if (!this.#start) this.#start = Promise.resolve();
+	}
 	start() {
 		if (this.#start) return this.#start;
 		this.#start = (async () => {
@@ -1038,7 +1043,7 @@ export class GameEvent {
 				else {
 					this.#inContent = true;
 					await this.content(this)
-						// .catch(this.onError)
+						.catch(this.onError)
 						.finally(() => this.#inContent = false);
 				}
 			} else {
@@ -1068,7 +1073,6 @@ export class GameEvent {
 			while (true) {
 				if (this.next.length <= 1) await _status.pauseManager.waitPause();
 				if (!this.next.length) return;
-				if (this.#inContent && this.finished) continue;
 				const next = this.next[0];
 				await next.start();
 				this.next.shift();

@@ -20,10 +20,7 @@ export default class ArrayCompiler extends ContentCompilerBase {
 
             if(!Array.isArray(originals))
                 throw new ReferenceError("compiled.originals必须是一个数组");
-
-            const trigger = event._trigger;
-            const player = event.player;
-
+            
             if (!Number.isInteger(event.step))
                 event.step = 0;
 
@@ -32,8 +29,8 @@ export default class ArrayCompiler extends ContentCompilerBase {
 
                 if (!this.isPrevented(event)) {
                     const original = originals[event.step];
-                    event._result = await Reflect.apply(
-                        original, this, [event, trigger, player, event._result || {}]);
+                    event._result = (await Reflect.apply(
+                        original, this, [event, event._trigger, event.player]))?.result ?? event._result;
                 }
 
                 await event.waitNext();
