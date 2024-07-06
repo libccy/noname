@@ -42,7 +42,7 @@ const characters = {
 	zhangning: ["female", "qun", 3, ["tianze", "difa"]],
 	tongyuan: ["male", "qun", 4, ["chaofeng", "chuanshu"]],
 	sp_mifangfushiren: ["male", "shu", 4, ["fengshi"], ["name:糜|芳-傅|士仁"]],
-	re_nanhualaoxian: ["male", "qun", 4, ["gongxiu", "jinghe"], ["name:南华|null"]],
+	re_nanhualaoxian: ["male", "qun", 4, ["gongxiu", "jinghe"], ["name:庄|周"]],
 	dufuren: ["female", "wei", 3, ["yise", "shunshi"], ["name:杜|null"]],
 	caoanmin: ["male", "wei", 4, ["xianwei"]],
 	re_zoushi: ["female", "qun", 3, ["rehuoshui", "reqingcheng"], ["name:邹|null"]],

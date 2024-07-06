@@ -70,7 +70,7 @@ const characters = {
 	zhouqun: ["male", "shu", 3, ["tiansuan"]],
 	re_zhurong: ["female", "shu", 4, ["juxiang", "relieren"]],
 	re_jiangwei: ["male", "shu", 4, ["retiaoxin", "zhiji"]],
-	nanhualaoxian: ["male", "qun", 3, ["yufeng", "tianshu"], ["name:南华|null"]],
+	nanhualaoxian: ["male", "qun", 3, ["yufeng", "tianshu"], ["name:庄|周"]],
 	re_handang: ["male", "wu", 4, ["regongji", "jiefan"]],
 	re_dengai: ["male", "wei", 4, ["retuntian", "zaoxian"]],
 	xin_fuhuanghou: ["female", "qun", 3, ["xinzhuikong", "xinqiuyuan"]],
