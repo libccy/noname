@@ -326,9 +326,9 @@ export const Contents = {
 				}
 			}
 		},
-		async (event, _trigger, _player, { result }) => {
-			if (Array.isArray(result)) {
-				event.cards = result;
+		async (event, _trigger, _player) => {
+			if (Array.isArray(event._result)) {
+				event.cards = event._result;
 			}
 		},
 	],

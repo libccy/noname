@@ -83,15 +83,14 @@ export default class StepCompiler extends ContentCompilerBase {
         }
 
         const contents: Function[] = [];
-        const deconstructs = ["step", "source", "target", "targets", "card", "cards", "skill", "forced", "num"];
+        const deconstructs = ["step", "source", "target", "targets", "card", "cards", "skill", "forced", "num", "_result: result"];
         const topVars = ["_status", "lib", "game", "ui", "get", "ai"];
 
         const compileStep = (code: string) => {
-            const params = ["topVars", "event", "trigger", "player", "_result"];
+            const params = ["topVars", "event", "trigger", "player"];
             const body = `
                 var { ${deconstructs.join(", ")} } = event;
                 var { ${topVars.join(", ")} } = topVars;
-                var { result } = _result || {};
                 {
                 ${code}
                 }
