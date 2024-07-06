@@ -76,7 +76,7 @@ const characters = {
 	lvkai: ["male", "shu", 3, ["xinfu_tunan", "xinfu_bijing"], []],
 	zhanggong: ["male", "wei", 3, ["xinfu_zhenxing", "xinfu_qianxin"], []],
 	weiwenzhugezhi: ["male", "wu", 4, ["xinfu_fuhai"], ["name:卫|温-诸葛|直"]],
-	beimihu: ["female", "qun", 3, ["zongkui", "guju", "baijia"]],
+	beimihu: ["female", "qun", 3, ["zongkui", "guju", "baijia"], ["name:卑弥|呼"]],
 	xurong: ["male", "qun", 4, ["xinfu_xionghuo", "xinfu_shajue"], []],
 	zhangqiying: ["female", "qun", 3, ["xinfu_falu", "xinfu_dianhua", "xinfu_zhenyi"], []],
 	sp_liuqi: ["male", "qun", 3, ["rewenji", "sptunjiang"]],
@@ -96,7 +96,7 @@ const characters = {
 	sp_zhanghe: ["male", "qun", 4, ["yuanlve"]],
 	sp_xuyou: ["male", "qun", 3, ["spshicai", "spfushi"]],
 	chunyuqiong: ["male", "qun", 5, ["cangchu", "sushou", "liangying"]],
-	lvkuanglvxiang: ["male", "qun", 4, ["liehou", "qigong"]],
+	lvkuanglvxiang: ["male", "qun", 4, ["liehou", "qigong"], ["name:吕|旷-吕|翔"]],
 };
 
 export default characters;

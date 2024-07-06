@@ -45,7 +45,7 @@ const characters = {
 	dc_wangjun: ["male", "qun", 4, ["dctongye", "dcchangqu"]],
 	zhoubuyi: ["male", "wei", 3, ["dcshiji", "dcsilun"]],
 	dc_duyu: ["male", "wei", 4, ["dcjianguo", "dcdyqingshi"]],
-	ganfurenmifuren: ["female", "shu", 3, ["dcchanjuan", "dcxunbie"]],
+	ganfurenmifuren: ["female", "shu", 3, ["dcchanjuan", "dcxunbie"], ["name:甘|null-糜|null"]],
 	dc_ganfuren: ["female", "shu", 3, ["dcshushen", "dcshenzhi"], ["name:甘|null"]],
 	dc_mifuren: ["female", "shu", 3, ["dcguixiu", "dccunsi"], ["name:糜|null"]],
 	wanglang: ["male", "wei", 3, ["regushe", "rejici"]],

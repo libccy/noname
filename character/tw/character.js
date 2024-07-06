@@ -26,7 +26,7 @@ const characters = {
 	ol_liuyu: ["male", "qun", 2, ["zongzuo", "zhige", "twchongwang"], ["zhu"]],
 	tw_gongsunfan: ["male", "qun", 4, ["twhuiyuan", "twshoushou"], ["name:公孙|范"]],
 	tw_yangang: ["male", "qun", 4, ["twzhiqu", "twxianfeng"]],
-	xia_xiahouzie: ["female", "qun", "3/4", ["twxuechang", "twduoren"]],
+	xia_xiahouzie: ["female", "qun", "3/4", ["twxuechang", "twduoren"], ["name:夏侯|紫萼"]],
 	xia_zhaoe: ["female", "qun", 3, ["twyanshi", "twrenchou"]],
 	xia_lusu: ["male", "qun", 4, ["twkaizeng", "twyangming"]],
 	xia_dianwei: ["male", "qun", 4, ["twliexi", "twshezhong"]],
@@ -107,7 +107,7 @@ const characters = {
 	tw_zhaoxiang: ["female", "shu", 4, ["refanghun", "twfuhan", "twqueshi"]],
 	yuejiu: ["male", "qun", 4, ["cuijin"]],
 	wuban: ["male", "shu", 4, ["jintao"], ["clan:陈留吴氏"]],
-	duosidawang: ["male", "qun", "4/5", ["equan", "manji"]],
+	duosidawang: ["male", "qun", "4/5", ["equan", "manji"], ["name:null|null"]],
 	jiachong: ["male", "qun", 3, ["beini", "dingfa"]],
 	tw_dongzhao: ["male", "wei", 3, ["twmiaolve", "twyingjia"]],
 	tw_gexuan: ["male", "qun", 3, ["twdanfa", "twlingbao", "twsidao"]],
@@ -119,7 +119,7 @@ const characters = {
 	tw_dingfeng: ["male", "wu", 4, ["twqijia", "twzhuchen"]],
 	tw_caohong: ["male", "wei", 4, ["twhuzhu", "twliancai"]],
 	tw_maliang: ["male", "shu", 3, ["twrangyi", "twbaimei"]],
-	kaisa: ["male", "western", 4, ["zhengfu"]],
+	kaisa: ["male", "western", 4, ["zhengfu"], ["name:尤利乌斯|盖乌斯"]],
 };
 
 export default characters;

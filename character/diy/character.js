@@ -1,5 +1,5 @@
 const characters = {
-	noname: ["female", "key", 3, ["noname_zhuyuan", "noname_duocai"]],
+	noname: ["female", "key", 3, ["noname_zhuyuan", "noname_duocai"], ["name:null|无"]],
 
 	ns_huangchengyan: ["male", "shu", 3, ["nslongyue", "nszhenyin"]],
 	ns_sunchensunjun: ["male", "wu", 5, ["nsxianhai", "nsxingchu"], ["name:孙|綝-孙|峻"]],
@@ -13,7 +13,7 @@ const characters = {
 	ns_zanghong: ["male", "qun", 4, ["nsshimeng"]],
 	ns_ruanji: ["male", "wei", 3, ["nsshizui", "nsxiaoye"]],
 	ns_limi: ["male", "jin", 3, ["nstuilun"]],
-	ns_zhonglimu: ["male", "wu", 4, ["nskuanhuai", "nsdingbian"]],
+	ns_zhonglimu: ["male", "wu", 4, ["nskuanhuai", "nsdingbian"], ["name:钟离|牧"]],
 	prp_zhugeliang: ["male", "shu", 3, ["nsxingyun", "nshanlang"], ["name:诸葛|亮"]],
 
 	ns_zhangwei: ["female", "shu", 3, ["nsqiyue", "nsxuezhu"]],
@@ -47,8 +47,8 @@ const characters = {
 	ns_lvzhi: ["female", "qun", 3, ["nsnongquan", "nsdufu"], ["name:吕|雉"]],
 	ns_wangyun: ["male", "qun", 4, ["liangji", "jugong", "chengmou"]],
 	ns_nanhua: ["male", "qun", 3, ["nshuanxian", "nstaiping_nh", "nsshoudao"], ["name:庄|周"]],
-	ns_nanhua_left: ["male", "qun", 2, [], ["unseen"]],
-	ns_nanhua_right: ["female", "qun", 2, [], ["unseen"]],
+	ns_nanhua_left: ["male", "qun", 2, [], ["unseen", "name:null|null"]],
+	ns_nanhua_right: ["female", "qun", 2, [], ["unseen", "name:null|null"]],
 	ns_huamulan: ["female", "qun", 3, ["nscongjun", "xiaoji", "gongji"], ["name:null|null"]],
 	ns_huangzu: ["male", "qun", 4, ["nsjihui", "nsmouyun"]],
 	ns_jinke: ["male", "qun", 4, ["nspinmin", "nsshishou"]],

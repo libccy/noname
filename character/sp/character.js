@@ -106,7 +106,7 @@ const characters = {
 	caohong: ["male", "wei", 4, ["yuanhu"]],
 	xiahouba: ["male", "shu", 4, ["baobian"], ["name:夏侯|霸"]],
 	yuanshu: ["male", "qun", 4, ["yongsi", "weidi"]],
-	sp_diaochan: ["female", "qun", 3, ["lihun", "rebiyue"]],
+	sp_diaochan: ["female", "qun", 3, ["lihun", "rebiyue"], ["name:null|null"]],
 	sp_zhaoyun: ["male", "qun", 3, ["ollongdan", "chongzhen"], ["die:zhaoyun"]],
 	liuxie: ["male", "qun", 3, ["tianming", "mizhao", "twzhuiting"], ["zhu"]],
 	zhugejin: ["male", "wu", 3, ["olhuanshi", "olhongyuan", "olmingzhe"], ["name:诸葛|瑾"]],
@@ -129,7 +129,7 @@ const characters = {
 	zhanglu: ["male", "qun", 3, ["yishe", "bushi", "midao", "twshijun"], ["zhu"]],
 	wutugu: ["male", "qun", 15, ["ranshang", "hanyong"]],
 	sp_caiwenji: ["female", "wei", 3, ["chenqing", "mozhi"]],
-	zhugeguo: ["female", "shu", 3, ["qirang", "yuhua"]],
+	zhugeguo: ["female", "shu", 3, ["qirang", "yuhua"], ["name:诸葛|果"]],
 
 	lingju: ["female", "qun", 3, ["jieyuan", "fenxin"]],
 
@@ -166,7 +166,7 @@ const characters = {
 
 	yuejin: ["male", "wei", 4, ["xiaoguo"]],
 	sp_dongzhuo: ["male", "qun", 5, ["hengzheng"]],
-	hetaihou: ["female", "qun", 3, ["zhendu", "qiluan"]],
+	hetaihou: ["female", "qun", 3, ["zhendu", "qiluan"], ["name:何|null"]],
 	dingfeng: ["male", "wu", 4, ["reduanbing", "refenxun"]],
 	shamoke: ["male", "shu", 4, ["gzjili"]],
 

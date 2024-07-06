@@ -1,5 +1,5 @@
 const characters = {
-	xiahoumao: ["male", "wei", 4, ["tongwei", "cuguo"]],
+	xiahoumao: ["male", "wei", 4, ["tongwei", "cuguo"], ["name:夏侯|楙"]],
 	chenshi: ["male", "shu", 4, ["qingbei"]],
 	sunli: ["male", "wei", 4, ["kangli"]],
 	feiyao: ["male", "wei", 4, ["zhenfeng"]],
@@ -8,11 +8,11 @@ const characters = {
 	yj_qiaozhou: ["male", "shu", 3, ["shiming", "jiangxi"]],
 	yj_sufei: ["male", "wu", 4, ["shuojian"]],
 	liwan: ["female", "wei", 3, ["liandui", "biejun"]],
-	zhugeshang: ["male", "shu", 3, ["sangu", "yizu"]],
+	zhugeshang: ["male", "shu", 3, ["sangu", "yizu"], ["name:诸葛|尚"]],
 	kebineng: ["male", "qun", 4, ["kousheng"]],
 	lukai: ["male", "wu", 4, ["lkbushi", "lkzhongzhuang"]],
 	xin_fazheng: ["male", "shu", 3, ["xinxuanhuo", "xinenyuan"]],
-	guanzhang: ["male", "shu", 4, ["fuhun"]],
+	guanzhang: ["male", "shu", 4, ["fuhun"], ["name:关|兴-张|苞"]],
 	wangyi: ["female", "wei", 3, ["zhenlie", "miji"]],
 	caozhang: ["male", "wei", 4, ["new_jiangchi"]],
 	guohuai: ["male", "wei", 4, ["rejingce"]],
@@ -94,7 +94,7 @@ const characters = {
 	yujin: ["male", "wei", 4, ["rezhenjun"], ["die:ol_yujin.mp3"]],
 
 	linghuyu: ["male", "wei", 4, ["xvzhi"]],
-	yj_simafu: ["male", "wei", 3, ["beiyu", "duchi"]],
+	yj_simafu: ["male", "wei", 3, ["beiyu", "duchi"], ["name:司马|孚"]],
 	yj_xuangongzhu: ["female", "wei", 3, ["yjqimei", "yjzhuiji"], ["name:司马|null"]],
 	xukun: ["male", "wu", 4, ["fazhu"]],
 };

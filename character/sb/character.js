@@ -33,7 +33,7 @@ const characters = {
 	sb_jiangwei: ["male", "shu", "4/4/1", ["sbtiaoxin", "sbzhiji"]],
 	sb_fazheng: ["male", "shu", 3, ["sbxuanhuo", "sbenyuan"]],
 	sb_chengong: ["male", "qun", 3, ["sbmingce", "sbzhichi"]],
-	sb_diaochan: ["female", "qun", 3, ["sblijian", "sbbiyue"]],
+	sb_diaochan: ["female", "qun", 3, ["sblijian", "sbbiyue"], ["name:null|null"]],
 	sb_yuanshao: ["male", "qun", 4, ["sbluanji", "sbxueyi"], ["zhu"]],
 	sb_pangtong: ["male", "shu", 3, ["sblianhuan", "sbniepan"]],
 	sb_sunce: ["male", "wu", 4, ["sbjiang", "sbhunzi", "sbzhiba"], ["zhu"]],

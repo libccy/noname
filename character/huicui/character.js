@@ -39,7 +39,7 @@ const characters = {
 	qiaorui: ["male", "qun", 4, ["dcaishou", "dcsaowei"]],
 	xianglang: ["male", "shu", 3, ["dckanji", "dcqianzheng"]],
 	qinlang: ["male", "wei", 4, ["dchaochong", "dcjinjin"]],
-	furongfuqian: ["male", "shu", "4/6", ["dcxuewei", "dcyuguan"]],
+	furongfuqian: ["male", "shu", "4/6", ["dcxuewei", "dcyuguan"], ["name:傅|肜-傅|佥"]],
 	zhenghun: ["male", "wei", 3, ["dcqiangzhi", "dcpitian"]],
 	dc_zhaotongzhaoguang: ["male", "shu", 4, ["yizan_use", "dcqingren", "dclongyuan"], ["name:赵|统-赵|广"]],
 	dc_huanghao: ["male", "shu", 3, ["dcqinqing", "huisheng", "dccunwei"]],

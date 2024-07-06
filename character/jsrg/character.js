@@ -26,6 +26,7 @@ const characters = {
 		sex: "male",
 		group: "qun",
 		hp: 4,
+		names: "皇甫|嵩",
 		skills: ["jsrgguanhuo", "jsrgjuxia"],
 		dieAudios: ["huangfusong"],
 	},
@@ -338,6 +339,7 @@ const characters = {
 		group: "wu",
 		hp: 3,
 		maxHp: 4,
+		names: "孙|鲁班-孙|鲁育",
 		skills: ["jsrgdaimou", "jsrgfangjie"],
 	},
 	jsrg_caofang: {
