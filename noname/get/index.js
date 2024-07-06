@@ -350,24 +350,29 @@ export class Get extends GetCompatible {
 	/**
 	 * 用于获取武将的姓氏和名字
 	 * @param { string } str
+	 * @param { string|undefined } defaultSurname
+	 * @param { string|undefined } defaultName
 	 * @returns { Array | undefined }
 	 */
-	characterSurname(str){
-		var info = lib.character[str];
-		if (!info) return;
-		var name = info[4].find(current=>current.startsWith('name:'))
-		if (name) {
-			name = name.slice(5);
-			let newList = [];
-			let list = name.split('-');
-			for (const iterator of list) {
-				newList.push(iterator.split('|'));
-			}
-			return newList;
-		} else {
-			let rawName = get.rawName(str)
+	characterSurname(str, defaultSurname, defaultName){
+		const info = get.character(str).names;
+		if (!info) {
+			let rawName = get.rawName(str);
 			return [[rawName[0], rawName.slice(1)]];
 		}
+		let infoarr = info.split('-');
+		let names = [];
+		for (let i = 0; i < infoarr.length; i++) {
+			let name = infoarr[i].split("|");
+			if (name[0] === "null") {
+				name[0] = defaultSurname || "";
+			}
+			if (name[1] === "null") {
+				name[1] = defaultName || "某";
+			}
+			names.push([name[0], name[1]]);
+		}
+		return names;
 	}
 	/**
 	 * 返回角色对应的原角色

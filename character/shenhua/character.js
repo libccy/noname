@@ -6,7 +6,7 @@ const characters = {
 	re_pangde: ["male", "qun", 4, ["mashu", "jianchu"]],
 	re_xiahouyuan: ["male", "wei", 4, ["xinshensu"], ["name:夏侯|渊"]],
 	re_weiyan: ["male", "shu", 4, ["xinkuanggu", "qimou"]],
-	xiaoqiao: ["female", "wu", 3, ["retianxiang", "hongyan"]],
+	xiaoqiao: ["female", "wu", 3, ["retianxiang", "hongyan"], ["name:桥|null"]],
 	sp_zhangjiao: ["male", "qun", 3, ["releiji", "guidao", "huangtian"], ["zhu"]],
 	re_yuji: ["male", "qun", 3, ["xinfu_guhuo"]],
 	// yuji:['male','qun',3,['guhuo']],

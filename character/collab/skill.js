@@ -16,7 +16,7 @@ const skills = {
 			if (!_status.characterlist) lib.skill.pingjian.initList();
 			_status.characterlist.randomSort();
 			const characters = _status.characterlist.randomGets(6);
-			const first = characters.slice(0, 3), last = characters.slice(4, 6);
+			const first = characters.slice(0, 3), last = characters.slice(3, 6);
 			const skills1 = [], skills2 = [];
 			for (let i of first) skills1.push(get.character(i, 3).randomGet());
 			for (let i of last) skills2.push(get.character(i, 3).randomGet());
@@ -28,6 +28,10 @@ const skills = {
 			let name = last[skills2.indexOf(result2.control)];
 			gains.add(result2.control);
 			let newname = get.characterSurname(surname).randomGet()[0] + get.characterSurname(name).randomGet()[1];
+			if (newname === "某") {
+				newname = "无名氏";
+				player.chat("终究还是落得藉藉无名...");
+			}
 			game.broadcastAll(function (player, name) {
 				if (player.name2 == 'dc_noname') player.node.name2.innerHTML = name;
 				else player.node.name.innerHTML = name;
