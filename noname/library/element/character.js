@@ -26,6 +26,11 @@ export class Character {
 	 **/
 	hujia = 0;
 	/**
+	 * 武将姓名
+	 * @type { string|undefined }
+	 */
+	names;
+	/**
 	 * 武将牌的势力
 	 * @type { string }
 	 **/
@@ -260,6 +265,8 @@ export class Character {
 				this.isSpecialInStoneMode = true;
 			} else if (item === "hiddenSkill") {
 				this.hasHiddenSkill = true;
+			} else if (item.startsWith("name:")) {
+				this.names = item.slice(5);
 			} else if (item.startsWith("border:")) {
 				this.groupBorder = item.slice(7);
 			} else if (item.startsWith("dualside:")) {

@@ -18,13 +18,13 @@ try {
 	// 示例: -s --maxAge 100 --port 8089
 	const argv = minimist(process.argv.slice(2), {
 		alias: {
-			s: "server"
+			s: "server",
 		},
 		default: {
 			server: false,
 			maxAge: oneYear,
 			port: 8089,
-			debug: false
+			debug: false,
 		},
 	});
 
@@ -66,7 +66,7 @@ try {
 	});
 
 	// 根据参数设置 maxAge
-	const maxAge = (argv.server && !argv.debug) ? argv.maxAge : 0;
+	const maxAge = argv.server && !argv.debug ? argv.maxAge : 0;
 
 	app.use(express.static(__dirname, { maxAge: maxAge }));
 
