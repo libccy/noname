@@ -22,151 +22,70 @@ export async function onload(resetGameTimeout) {
 
 	if (lib.config.touchscreen) createTouchDraggedFilter();
 
-	// 不拆分，太玄学了
-	if (lib.config.card_style === "custom") {
-		const fileToLoad = await game.getDB("image", "card_style");
-		if (fileToLoad) {
-			const fileLoadedEvent = await new Promise((resolve, reject) => {
-				const fileReader = new FileReader();
-				fileReader.onload = resolve;
-				fileReader.onerror = reject;
-				fileReader.readAsDataURL(fileToLoad, "UTF-8");
-			});
+	// 重构了吗？如构
+	let loadingCustomStyle = [
+		tryLoadCustomStyle("card_style", data => {
 			if (ui.css.card_stylesheet) ui.css.card_stylesheet.remove();
-			ui.css.card_stylesheet = lib.init.sheet(`.card:not(*:empty){background-image:url(${fileLoadedEvent.target.result})}`);
-		}
-	}
-	if (lib.config.cardback_style === "custom") {
-		const fileToLoad1 = await game.getDB("image", "cardback_style");
-		if (fileToLoad1) {
-			const fileLoadedEvent = await new Promise((resolve, reject) => {
-				const fileReader = new FileReader();
-				fileReader.onload = resolve;
-				fileReader.onerror = reject;
-				fileReader.readAsDataURL(fileToLoad1, "UTF-8");
-			});
-			if (ui.css.cardback_stylesheet) ui.css.cardback_stylesheet.remove();
-			ui.css.cardback_stylesheet = lib.init.sheet(`.card:empty,.card.infohidden{background-image:url(${fileLoadedEvent.target.result})}`);
-		}
-
-		const fileToLoad2 = await game.getDB("image", "cardback_style2");
-		if (fileToLoad2) {
-			const fileLoadedEvent = await new Promise((resolve, reject) => {
-				const fileReader = new FileReader();
-				fileReader.onload = resolve;
-				fileReader.onerror = reject;
-				fileReader.readAsDataURL(fileToLoad2, "UTF-8");
-			});
-			if (ui.css.cardback_stylesheet2) ui.css.cardback_stylesheet2.remove();
-			ui.css.cardback_stylesheet2 = lib.init.sheet(`.card.infohidden:not(.infoflip){background-image:url(${fileLoadedEvent.target.result})}`);
-		}
-	}
-	if (lib.config.hp_style === "custom") {
-		const fileToLoad1 = await game.getDB("image", "hp_style1");
-		if (fileToLoad1) {
-			const fileLoadedEvent = await new Promise((resolve, reject) => {
-				const fileReader = new FileReader();
-				fileReader.onload = resolve;
-				fileReader.onerror = reject;
-				fileReader.readAsDataURL(fileToLoad1, "UTF-8");
-			});
-			if (ui.css.hp_stylesheet1) ui.css.hp_stylesheet1.remove();
-			ui.css.hp_stylesheet1 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`);
-		}
-
-		const fileToLoad2 = await game.getDB("image", "hp_style2");
-		if (fileToLoad2) {
-			const fileReader = new FileReader();
-			const fileLoadedEvent = await new Promise((resolve, reject) => {
-				fileReader.onload = resolve;
-				fileReader.onerror = reject;
-				fileReader.readAsDataURL(fileToLoad2, "UTF-8");
-			});
-			if (ui.css.hp_stylesheet2) ui.css.hp_stylesheet2.remove();
-			ui.css.hp_stylesheet2 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`);
-		}
-
-		const fileToLoad3 = await game.getDB("image", "hp_style3");
-		if (fileToLoad3) {
-			const fileReader = new FileReader();
-			const fileLoadedEvent = await new Promise((resolve, reject) => {
-				fileReader.onload = resolve;
-				fileReader.onerror = reject;
-				fileReader.readAsDataURL(fileToLoad3, "UTF-8");
-			});
-			if (ui.css.hp_stylesheet3) ui.css.hp_stylesheet3.remove();
-			ui.css.hp_stylesheet3 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url(${fileLoadedEvent.target.result})}`);
-		}
-
-		const fileToLoad4 = await game.getDB("image", "hp_style4");
-		if (fileToLoad4) {
-			const fileReader = new FileReader();
-			const fileLoadedEvent = await new Promise((resolve, reject) => {
-				fileReader.onload = resolve;
-				fileReader.onerror = reject;
-				fileReader.readAsDataURL(fileToLoad4, "UTF-8");
-			});
-			if (ui.css.hp_stylesheet4) ui.css.hp_stylesheet4.remove();
-			ui.css.hp_stylesheet4 = lib.init.sheet(`.hp:not(.text):not(.actcount)>.lost{background-image:url(${fileLoadedEvent.target.result})}`);
-		}
-	}
-
-	if (lib.config.player_style === "custom") {
-		const fileToLoad = await game.getDB("image", "player_style");
-		if (fileToLoad) {
-			const fileReader = new FileReader();
-			const fileLoadedEvent = await new Promise((resolve, reject) => {
-				fileReader.onload = resolve;
-				fileReader.onerror = reject;
-				fileReader.readAsDataURL(fileToLoad, "UTF-8");
-			});
-			if (ui.css.player_stylesheet) ui.css.player_stylesheet.remove();
-			ui.css.player_stylesheet = lib.init.sheet(`#window .player{background-image:url("${fileLoadedEvent.target.result}");background-size:100% 100%;}`);
-		} else {
-			ui.css.player_stylesheet = lib.init.sheet("#window .player{background-image:none;background-size:100% 100%;}");
-		}
-	}
-	if (lib.config.border_style === "custom") {
-		const fileToLoad = await game.getDB("image", "border_style");
-		if (fileToLoad) {
-			const fileReader = new FileReader();
-			const fileLoadedEvent = await new Promise((resolve, reject) => {
-				fileReader.onload = resolve;
-				fileReader.onerror = reject;
-				fileReader.readAsDataURL(fileToLoad, "UTF-8");
-			});
+			ui.css.card_stylesheet = lib.init.sheet(`.card:not(*:empty){background-image:url(${data})}`);
+		}),
+		tryLoadCustomStyle("cardback_style", {
+			cardback_style(data) {
+				if (ui.css.cardback_stylesheet) ui.css.cardback_stylesheet.remove();
+				ui.css.cardback_stylesheet = lib.init.sheet(`.card:empty,.card.infohidden{background-image:url(${data})}`);
+			},
+			cardback_style2(data) {
+				if (ui.css.cardback_stylesheet2) ui.css.cardback_stylesheet2.remove();
+				ui.css.cardback_stylesheet2 = lib.init.sheet(`.card.infohidden:not(.infoflip){background-image:url(${data})}`);
+			},
+		}),
+		tryLoadCustomStyle("hp_style", {
+			hp_style1(data) {
+				if (ui.css.hp_stylesheet1) ui.css.hp_stylesheet1.remove();
+				ui.css.hp_stylesheet1 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url(${data})}`);
+			},
+			hp_style2(data) {
+				if (ui.css.hp_stylesheet2) ui.css.hp_stylesheet2.remove();
+				ui.css.hp_stylesheet2 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url(${data})}`);
+			},
+			hp_style3(data) {
+				if (ui.css.hp_stylesheet3) ui.css.hp_stylesheet3.remove();
+				ui.css.hp_stylesheet3 = lib.init.sheet(`.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url(${data})}`);
+			},
+			hp_style4(data) {
+				if (ui.css.hp_stylesheet4) ui.css.hp_stylesheet4.remove();
+				ui.css.hp_stylesheet4 = lib.init.sheet(`.hp:not(.text):not(.actcount)>.lost{background-image:url(${data})}`);
+			},
+		}),
+		tryLoadCustomStyle(
+			"player_style",
+			data => {
+				if (ui.css.player_stylesheet) ui.css.player_stylesheet.remove();
+				ui.css.player_stylesheet = lib.init.sheet(`#window .player{background-image:url("${data}");background-size:100% 100%;}`);
+			},
+			() => {
+				ui.css.player_stylesheet = lib.init.sheet("#window .player{background-image:none;background-size:100% 100%;}");
+			}
+		),
+		tryLoadCustomStyle("border_style", data => {
 			if (ui.css.border_stylesheet) ui.css.border_stylesheet.remove();
 			ui.css.border_stylesheet = lib.init.sheet();
-			ui.css.border_stylesheet.sheet.insertRule(`#window .player>.framebg{display:block;background-image:url("${fileLoadedEvent.target.result}")}`, 0);
+			ui.css.border_stylesheet.sheet.insertRule(`#window .player>.framebg{display:block;background-image:url("${data}")}`, 0);
 			ui.css.border_stylesheet.sheet.insertRule(".player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}", 0);
-		}
-	}
-	if (lib.config.control_style === "custom") {
-		const fileToLoad = await game.getDB("image", "control_style");
-		if (fileToLoad) {
-			const fileReader = new FileReader();
-			const fileLoadedEvent = await new Promise((resolve, reject) => {
-				fileReader.onload = resolve;
-				fileReader.onerror = reject;
-				fileReader.readAsDataURL(fileToLoad, "UTF-8");
-			});
+		}),
+		tryLoadCustomStyle("control_style", data => {
 			if (ui.css.control_stylesheet) ui.css.control_stylesheet.remove();
-			ui.css.control_stylesheet = lib.init.sheet(`#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("${fileLoadedEvent.target.result}")}`);
-		}
-	}
-	if (lib.config.menu_style === "custom") {
-		const fileToLoad = await game.getDB("image", "menu_style");
-		if (fileToLoad) {
-			const fileReader = new FileReader();
-			const fileLoadedEvent = await new Promise((resolve, reject) => {
-				fileReader.onload = resolve;
-				fileReader.onerror = reject;
-				fileReader.readAsDataURL(fileToLoad, "UTF-8");
-			});
+			ui.css.control_stylesheet = lib.init.sheet(`#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("${data}")}`);
+		}),
+		tryLoadCustomStyle(menu_style, data => {
 			if (ui.css.menu_stylesheet) ui.css.menu_stylesheet.remove();
 			ui.css.menu_stylesheet = lib.init.sheet(`html #window>.dialog.popped,html .menu,html .menubg{background-image:url("${fileLoadedEvent.target.result}");background-size:cover}`);
-		}
-	}
+		}),
+	];
+
+	lib.onloadSplashes.forEach(splash => {
+		lib.configMenu.appearence.config.splash_style.item[splash.id] = splash.name;
+	});
+	Reflect.set(window, "resetGameTimeout", resetGameTimeout);
 
 	// 改不动，暂时不改了
 	const proceed2 = async () => {
@@ -628,11 +547,8 @@ export async function onload(resetGameTimeout) {
 		}
 	};
 
-	lib.onloadSplashes.forEach(splash => {
-		lib.configMenu.appearence.config.splash_style.item[splash.id] = splash.name;
-	});
+	await Promise.allSettled(loadingCustomStyle);
 
-	Reflect.set(window, "resetGameTimeout", resetGameTimeout);
 	if (!lib.imported.mode?.[lib.config.mode]) {
 		window.inSplash = true;
 		clearTimeout(resetGameTimeout);
@@ -685,7 +601,7 @@ async function createBackground() {
 		try {
 			const fileToLoad = await game.getDB("image", lib.config.image_background);
 			const fileReader = new FileReader();
-			const fileLoadedEvent = await Promise((resolve) => {
+			const fileLoadedEvent = await Promise(resolve => {
 				fileReader.onload = resolve;
 				fileReader.readAsDataURL(fileToLoad, "UTF-8");
 			});
@@ -713,10 +629,7 @@ function createTouchDraggedFilter() {
 	});
 	document.body.addEventListener("touchmove", function (e) {
 		if (_status.dragged) return;
-		if (
-			Math.abs(e.touches[0].clientX / game.documentZoom - this.startX) > 10 ||
-			Math.abs(e.touches[0].clientY / game.documentZoom - this.startY) > 10
-		) {
+		if (Math.abs(e.touches[0].clientX / game.documentZoom - this.startX) > 10 || Math.abs(e.touches[0].clientY / game.documentZoom - this.startY) > 10) {
 			_status.dragged = true;
 		}
 	});
@@ -732,15 +645,53 @@ function runCustomContents(contents) {
 	const mutex = new Mutex();
 
 	const tasks = contents
-		.filter((fn) => typeof fn === "function")
-		.map((fn) => (gnc.is.generatorFunc(fn) ? gnc.of(fn) : fn)) // 将生成器函数转换成genCoroutin
-		.map((fn) => fn(mutex));
+		.filter(fn => typeof fn === "function")
+		.map(fn => (gnc.is.generatorFunc(fn) ? gnc.of(fn) : fn)) // 将生成器函数转换成genCoroutin
+		.map(fn => fn(mutex));
 
-	return Promise.allSettled(tasks).then((results) => {
-		results.forEach((result) => {
+	return Promise.allSettled(tasks).then(results => {
+		results.forEach(result => {
 			if (result.status === "rejected") {
 				console.error(result.reason);
 			}
 		});
 	});
+}
+
+/**
+ * 由于不暴露出去，抽象一点
+ *
+ * 实际上但凡有重载都不会抽象
+ *
+ * @param {string} id
+ * @param {(function(string): void) | Record<string, function(string): void>} keys
+ * @param {function(): void} [fallback]
+ * @returns {Promise<void>}
+ */
+async function tryLoadCustomStyle(id, keys, fallback) {
+	if (typeof keys == "function") {
+		keys = {
+			[id]: keys,
+		};
+	}
+
+	if (lib.config[id] === "custom") {
+		await Promise.allSettled(
+			Object.entries(keys).map(async (key, callback) => {
+				const fileToLoad = await game.getDB("image", key);
+				if (fileToLoad) {
+					const fileLoadedEvent = await new Promise((resolve, reject) => {
+						const fileReader = new FileReader();
+						fileReader.onload = resolve;
+						fileReader.onerror = reject;
+						fileReader.readAsDataURL(fileToLoad, "UTF-8");
+					});
+
+					await callback(fileLoadedEvent.target.result);
+				} else {
+					fallback?.();
+				}
+			})
+		);
+	}
 }
