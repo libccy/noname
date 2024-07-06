@@ -2,8 +2,9 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
-	//五虎将 是了，我们意念合一
-	huyi: {
+	//五虎将
+	//是的孩子们，我们意念合一
+	olhuyi: {
 		audio: 2,
 		getList() {
 			let list,
@@ -35,7 +36,7 @@ const skills = {
 		getBasic(event, player) {
 			const name = event.card.name,
 				skills = get
-					.info("huyi")
+					.info("olhuyi")
 					.getList()
 					.filter(skill => {
 						const translation = get.skillInfoTranslation(skill, player);
@@ -63,14 +64,14 @@ const skills = {
 				if (get.type(event.card) != "basic") return false;
 				if (
 					!get
-						.info("huyi")
+						.info("olhuyi")
 						.getBasic(event, player)
 						.some(skill => !player.hasSkill(skill, null, null, false))
 				)
 					return false;
-				return !player.additionalSkills.huyi || (player.additionalSkills.huyi && player.additionalSkills.huyi.length < 5);
+				return !player.additionalSkills.olhuyi || (player.additionalSkills.olhuyi && player.additionalSkills.olhuyi.length < 5);
 			}
-			const skills = get.info("huyi").getList();
+			const skills = get.info("olhuyi").getList();
 			return (event.name != "phase" || game.phaseNumber == 0) && skills.some(skill => !player.hasSkill(skill, null, null, false));
 		},
 		locked: true,
@@ -81,7 +82,7 @@ const skills = {
 				};
 			} else {
 				const skills = get
-					.info("huyi")
+					.info("olhuyi")
 					.getList()
 					.filter(skill => !player.hasSkill(skill, null, null, false))
 					.randomGets(3);
@@ -94,7 +95,7 @@ const skills = {
 				next.set("ai", button => {
 					const skill = button.link,
 						choice = get.event("choice");
-					if (get.info("huyi").excludedskills.includes(skill)) return 3;
+					if (get.info("olhuyi").excludedskills.includes(skill)) return 3;
 					if (skill == choice) return 2;
 					return 1;
 				});
@@ -114,25 +115,25 @@ const skills = {
 		async content(event, trigger, player) {
 			const skill = ["useCard", "respond"].includes(trigger.name)
 				? get
-						.info("huyi")
+						.info("olhuyi")
 						.getBasic(trigger, player)
 						.filter(skill => !player.hasSkill(skill, null, null, false))
 						.randomGets(1)
 				: event.cost_data;
-			player.addAdditionalSkills("huyi", skill, true);
+			player.addAdditionalSkills("olhuyi", skill, true);
 		},
-		group: "huyi_remove",
+		group: "olhuyi_remove",
 		subSkill: {
 			remove: {
-				audio: "huyi",
+				audio: "olhuyi",
 				trigger: {
 					player: "phaseEnd",
 				},
 				filter(event, player) {
-					return player.additionalSkills.huyi && player.additionalSkills.huyi.length;
+					return player.additionalSkills.olhuyi && player.additionalSkills.olhuyi.length;
 				},
 				async cost(event, trigger, player) {
-					const skills = player.additionalSkills.huyi;
+					const skills = player.additionalSkills.olhuyi;
 					const list = [];
 					for (const skill of skills) {
 						list.push([skill, '<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【' + get.translation(skill) + "】</div><div>" + lib.translate[skill + "_info"] + "</div></div>"]);
@@ -141,7 +142,7 @@ const skills = {
 					next.set("ai", button => {
 						const skill = button.link;
 						let skills = get.event("skills").slice(0);
-						skills.removeArray(get.info("huyi").excludedskills);
+						skills.removeArray(get.info("olhuyi").excludedskills);
 						if (skills.length < 4) return 0;
 						if (skills.includes(skill)) return 2;
 						return Math.random();
@@ -165,9 +166,9 @@ const skills = {
 							})
 						);
 						player.removeSkill(removeSkills);
-						const additionalSkills = player.additionalSkills.huyi;
+						const additionalSkills = player.additionalSkills.olhuyi;
 						additionalSkills.removeArray(removeSkills);
-						if (!additionalSkills.length) delete player.additionalSkills.huyi;
+						if (!additionalSkills.length) delete player.additionalSkills.olhuyi;
 					});
 				},
 			},
@@ -180,22 +181,30 @@ const skills = {
 			player: "enterGame",
 		},
 		filter(event, player) {
-			return event.name != 'phase' || game.phaseNumber == 0;
+			return event.name != "phase" || game.phaseNumber == 0;
 		},
 		forced: true,
 		async content(event, trigger, player) {
 			if (!_status.characterlist) lib.skill.pingjian.initList();
 			_status.characterlist.randomSort();
 			const characters = _status.characterlist.randomGets(6);
-			const first = characters.slice(0, 3), last = characters.slice(3, 6);
-			const skills1 = [], skills2 = [];
+			const first = characters.slice(0, 3),
+				last = characters.slice(3, 6);
+			const skills1 = [],
+				skills2 = [];
 			for (let i of first) skills1.push(get.character(i, 3).randomGet());
 			for (let i of last) skills2.push(get.character(i, 3).randomGet());
-			const result1 = await player.chooseControl(skills1).set("dialog", ["无名：请选择姓氏", [first, "character"]]).forResult();
+			const result1 = await player
+				.chooseControl(skills1)
+				.set("dialog", ["无名：请选择姓氏", [first, "character"]])
+				.forResult();
 			const gains = [];
 			let surname = first[skills1.indexOf(result1.control)];
 			gains.add(result1.control);
-			const result2 = await player.chooseControl(skills2).set("dialog", ["无名：请选择名字", [last, "character"]]).forResult();
+			const result2 = await player
+				.chooseControl(skills2)
+				.set("dialog", ["无名：请选择名字", [last, "character"]])
+				.forResult();
 			let name = last[skills2.indexOf(result2.control)];
 			gains.add(result2.control);
 			let newname = get.characterSurname(surname).randomGet()[0] + get.characterSurname(name).randomGet()[1];
@@ -203,10 +212,14 @@ const skills = {
 				newname = "无名氏";
 				player.chat("终究还是落得藉藉无名...");
 			}
-			game.broadcastAll(function (player, name) {
-				if (player.name2 == 'dc_noname') player.node.name2.innerHTML = name;
-				else player.node.name.innerHTML = name;
-			}, player, newname);
+			game.broadcastAll(
+				(player, name) => {
+					if (player.name == "dc_noname" || player.name1 == "dc_noname") player.node.name.innerHTML = name;
+					if (player.name2 == "dc_noname") player.node.name2.innerHTML = name;
+				},
+				player,
+				newname
+			);
 			await player.addSkills(gains);
 		},
 	},
@@ -558,11 +571,13 @@ const skills = {
 					cardx.sort((a, b) => get.effect(target, b, player, player) - get.effect(target, a, player, player));
 					cardx = cardx.slice(Math.min(cardx.length, player.getCardUsable("sha")), cardx.length);
 					cards.removeArray(cardx);
-					return cards.reduce((sum, card) => {
-						if (player.canUse(card, target)) return sum + get.effect(target, card, player, target);
-						if (player.canUse(card, target, false)) return sum + get.effect(target, card, player, target) / 10;
-						return 0;
-					}, 0) - 10;
+					return (
+						cards.reduce((sum, card) => {
+							if (player.canUse(card, target)) return sum + get.effect(target, card, player, target);
+							if (player.canUse(card, target, false)) return sum + get.effect(target, card, player, target) / 10;
+							return 0;
+						}, 0) - 10
+					);
 				},
 			},
 		},
