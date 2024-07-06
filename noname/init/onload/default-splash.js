@@ -23,7 +23,7 @@ export class DefaultSplash {
 			node.classList.add("touch");
 			lib.setScroll(node);
 		}
-		if (lib.config.player_border != "wide") {
+		if (lib.config.player_border !== "wide") {
 			node.classList.add("slim");
 		}
 
