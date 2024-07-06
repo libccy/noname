@@ -81,7 +81,7 @@ const characters = {
 
 	xinxianying: ["female", "wei", 3, ["zhongjian", "caishi"]],
 	wuxian: ["female", "shu", 3, ["fumian", "daiyan"], ["clan:陈留吴氏"]],
-	xushi: ["female", "wu", 3, ["wengua", "fuzhu"]],
+	xushi: ["female", "wu", 3, ["wengua", "fuzhu"], ["name:徐|null"]],
 	caojie: ["female", "qun", 3, ["shouxi", "huimin"]],
 
 	caiyong: ["male", "qun", 3, ["bizhuan", "tongbo"]],
@@ -95,7 +95,7 @@ const characters = {
 
 	linghuyu: ["male", "wei", 4, ["xvzhi"]],
 	yj_simafu: ["male", "wei", 3, ["beiyu", "duchi"]],
-	yj_xuangongzhu: ["female", "wei", 3, ["yjqimei", "yjzhuiji"]],
+	yj_xuangongzhu: ["female", "wei", 3, ["yjqimei", "yjzhuiji"], ["name:司马|null"]],
 	xukun: ["male", "wu", 4, ["fazhu"]],
 };
 

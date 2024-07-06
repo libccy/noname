@@ -80,7 +80,7 @@ const characters = {
 	// ns_zhaoyunshen:['male','qun',3,[]],
 	// ns_lisu:['male','qun',3,[]],
 	// ns_sunhao:['male','qun',3,[]],
-	ns_xinnanhua: ["male", "qun", 3, ["ns_xiandao", "ns_xiuzheng", "ns_chuanshu"], ["name:南华|null"]],
+	ns_xinnanhua: ["male", "qun", 3, ["ns_xiandao", "ns_xiuzheng", "ns_chuanshu"], ["name:庄|周"]],
 	ns_caimao: ["male", "qun", 4, ["nsdingzhou"]],
 	ns_luyusheng: ["female", "wu", 3, ["nshuaishuang", "nsfengli"]],
 	ns_chengpu: ["male", "wu", 4, ["decadelihuo", "decadechunlao"]],

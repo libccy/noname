@@ -62,7 +62,7 @@ const characters = {
 	sp_ganning: ["male", "qun", 4, ["yinling", "junwei"]],
 	sp_daqiao: ["female", "wu", 3, ["yanxiao", "anxian"], ["name:桥|null"]],
 	sp_pangtong: ["male", "qun", 3, ["xinmanjuan", "zuixiang"]],
-	huangjinleishi: ["female", "qun", 3, ["fulu", "fuji"]],
+	huangjinleishi: ["female", "qun", 3, ["fulu", "fuji"], ["name:null|null-null|null"]],
 	jsp_zhaoyun: ["male", "qun", 3, ["chixin", "reyicong", "suiren"]],
 	sp_xiahoushi: ["female", "shu", 3, ["xinfu_yanyu", "xinfu_xiaode"], ["name:夏侯|null"]],
 	sp_gongsunzan: ["male", "qun", 4, ["spyicong", "sptuji"], ["name:公孙|瓒"]],
