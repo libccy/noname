@@ -8,7 +8,7 @@
  * @typedef { GameEvent & InstanceType<typeof lib.element.GameEventPromise> } GameEventPromise
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
  * @typedef { InstanceType<typeof lib.element.Control> } Control
- * @typedef { import("../init/onload/IOnloadSplash.js").IOnloadSplash } IOnloadSplash
+ * @typedef { import("../init/onload/onload-splash.d.ts").OnloadSplash } IOnloadSplash
  */
 import { nonameInitialized, assetURL, userAgent, GeneratorFunction, AsyncFunction, characterDefaultPicturePath } from "../util/index.js";
 import { ai } from "../ai/index.js";
@@ -28,7 +28,7 @@ import { freezeButExtensible } from "../util/index.js";
 import security from "../util/security.js";
 import { ErrorManager } from "../util/error.js";
 
-import { defaultSplashs } from "../init/onload/mod.js";
+import { defaultSplashs } from "../init/onload/index.js";
 
 export class Library {
 	configprefix = "noname_0.9_";

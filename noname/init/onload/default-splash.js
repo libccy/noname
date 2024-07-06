@@ -4,7 +4,7 @@ import { createApp } from "../../../game/vue.esm-browser.js";
 import OnloadSplash from "./OnloadSplash.js";
 
 /**
- * @typedef {import("./IOnloadSplash").IOnloadSplash} IOnloadSplash
+ * @typedef {import("./onload-splash.js").OnloadSplash} IOnloadSplash
  * @interface IOnloadSplash
  */
 export class DefaultSplash {
