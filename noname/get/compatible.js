@@ -44,6 +44,21 @@ export class GetCompatible {
 	 * @returns {["firefox" | "chrome" | "safari" | "other", number, number, number]}
 	 */
 	coreInfo() {
+		// 如果存在process并且存在process.versions，则默认为node环境
+		if (typeof window.process != "undefined" && typeof window.process.versions == "object") {
+			// 如果存在versions.chrome，默认为electron的versions.chrome
+			if (window.process.versions.chrome) {
+				// @ts-expect-error Type must be right
+				return [
+					"chrome",
+					...window.process.versions.chrome
+						.split(".")
+						.slice(3)
+						.map(item => parseInt(item)),
+				];
+			}
+		}
+
 		// @ts-ignore
 		if (typeof navigator.userAgentData != "undefined") {
 			// @ts-ignore

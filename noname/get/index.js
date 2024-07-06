@@ -354,13 +354,13 @@ export class Get extends GetCompatible {
 	 * @param { string|undefined } defaultName
 	 * @returns { Array | undefined }
 	 */
-	characterSurname(str, defaultSurname, defaultName){
+	characterSurname(str, defaultSurname, defaultName) {
 		const info = get.character(str).names;
 		if (!info) {
 			let rawName = get.rawName(str);
 			return [[rawName[0], rawName.slice(1)]];
 		}
-		let infoarr = info.split('-');
+		let infoarr = info.split("-");
 		let names = [];
 		for (let i = 0; i < infoarr.length; i++) {
 			let name = infoarr[i].split("|");
@@ -2490,7 +2490,8 @@ export class Get extends GetCompatible {
 	 */
 	event(key) {
 		if (key) {
-			console.warn(`get.event("${key}")写法即将被废弃，请更改为get.event().${key}`);
+			// 能跑起来的东西还是不要去动它比较好 --Spmario233
+			// console.warn(`get.event("${key}")写法即将被废弃，请更改为get.event().${key}`);
 			return _status.event[key];
 		}
 		return _status.event;
@@ -2525,7 +2526,7 @@ export class Get extends GetCompatible {
 	 */
 	nameList(player) {
 		let type;
-		if (typeof player == "undefined" || (type = typeof player, type != "object") || (type = get.itemtype(player), type != "player")) {
+		if (typeof player == "undefined" || ((type = typeof player), type != "object") || ((type = get.itemtype(player)), type != "player")) {
 			throw new Error(`函数接受了一个不是Player的东西: ${type}: ${player}`);
 		}
 
@@ -5327,7 +5328,7 @@ export let get = new Get();
 /**
  * @param { InstanceType<typeof Get> } [instance]
  */
-export let setGet = (instance) => {
+export let setGet = instance => {
 	get = instance || new Get();
 	if (lib.config.dev) {
 		window.get = get;
