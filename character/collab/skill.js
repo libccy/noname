@@ -28,6 +28,7 @@ const skills = {
 			let name = last[skills2.indexOf(result2.control)];
 			gains.add(result2.control);
 			let newname = get.characterSurname(surname).randomGet()[0] + get.characterSurname(name).randomGet()[1];
+			if (newname === "某") newname = "无名氏";
 			game.broadcastAll(function (player, name) {
 				if (player.name2 == 'dc_noname') player.node.name2.innerHTML = name;
 				else player.node.name.innerHTML = name;
