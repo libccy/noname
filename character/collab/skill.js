@@ -2,6 +2,39 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//无名
+	dcchushan: {
+		trigger: {
+			global: "phaseBefore",
+			player: "enterGame",
+		},
+		filter(event, player) {
+			return event.name != 'phase' || game.phaseNumber == 0;
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			if (!_status.characterlist) lib.skill.pingjian.initList();
+			_status.characterlist.randomSort();
+			const characters = _status.characterlist.randomGets(6);
+			const first = characters.slice(0, 3), last = characters.slice(4, 6);
+			const skills1 = [], skills2 = [];
+			for (let i of first) skills1.push(get.character(i, 3).randomGet());
+			for (let i of last) skills2.push(get.character(i, 3).randomGet());
+			const result1 = await player.chooseControl(skills1).set("dialog", ["无名：请选择姓氏", [first, "character"]]).forResult();
+			const gains = [];
+			let surname = first[skills1.indexOf(result1.control)];
+			gains.add(result1.control);
+			const result2 = await player.chooseControl(skills2).set("dialog", ["无名：请选择名字", [last, "character"]]).forResult();
+			let name = last[skills2.indexOf(result2.control)];
+			gains.add(result2.control);
+			let newname = get.characterSurname(surname).randomGet()[0] + get.characterSurname(name).randomGet()[1];
+			game.broadcastAll(function (player, name) {
+				if (player.name2 == 'dc_noname') player.node.name2.innerHTML = name;
+				else player.node.name.innerHTML = name;
+			}, player, newname);
+			await player.addSkills(gains);
+		},
+	},
 	//会玩孙权
 	dchuiwan: {
 		audio: 2,
