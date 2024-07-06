@@ -17,7 +17,7 @@ const characters = {
 	sp_jiben: ["male", "qun", 3, ["spduanzhi", "spduyi"]],
 	sp_fuhuanghou: ["female", "qun", 3, ["spcangni", "spmixin"]],
 	sp_fuwan: ["male", "qun", 3, ["spfengyin", "spchizhong"]],
-	old_lingju: ["female", "qun", 3, ["jieyuan", "fenxin_old"]],
+	old_lingju: ["female", "qun", 3, ["jieyuan", "fenxin_old"], ["name:吕|null"]],
 	sp_mushun: ["male", "qun", 4, ["moukui"]],
 	dc_wuyi: ["male", "shu", 4, ["dcbenxi"]],
 	quyuan: ["male", "qun", 3, ["dcqiusuo", "dclisao"]],
