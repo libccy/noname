@@ -838,12 +838,14 @@ const skills = {
 			"step 0";
 			var num = 1;
 			var prompt = "###" + get.prompt("sbqingzheng") + "###弃置" + get.cnNumber(num) + "种花色的所有牌";
-			var next = player.chooseButton([prompt, [lib.suit.map(i => ["", "", "lukai_" + i]), "vcard"]], num);
+			var next = player.chooseButton([prompt, [lib.suit.map(i => ["", "", "lukai_" + i]), "vcard"]], [num, num + 1]);
 			next.set("filterButton", button => {
 				var player = _status.event.player;
+				if (ui.selected.buttons.length >= get.event().num) return false;
 				var cards = player.getCards("h", { suit: button.link[2].slice(6) });
 				return cards.length > 0 && cards.filter(card => lib.filter.cardDiscardable(card, player, "sbqingzheng")).length == cards.length;
 			});
+			next.set("num", num);
 			next.set("ai", button => {
 				var player = _status.event.player;
 				return (
