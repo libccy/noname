@@ -407,6 +407,8 @@ window.noname_character_rank = {
 		"ol_liubiao",
 		"mp_liuling",
 		"mp_wangrong",
+		"mb_wangjing",
+		"zhangbu",
 	],
 	am: [
 		"tw_yanliang",
@@ -2320,6 +2322,8 @@ window.noname_character_rank = {
 			"star_zhangzhao",
 			"dc_sp_zhurong",
 			"xin_simayi",
+			"mb_wangjing",
+			"zhangbu",
 		],
 		rare: [
 			"dc_noname",
