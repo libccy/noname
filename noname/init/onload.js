@@ -7,6 +7,7 @@ import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 import { gnc } from "../gnc/index.js";
 import { importMode } from "./import.js";
+import { jumpToCatchBlock } from "../util/index.js";
 import { Mutex } from "../util/mutex.js";
 
 export async function onload(resetGameTimeout) {
@@ -528,27 +529,8 @@ export async function onload(resetGameTimeout) {
 		}
 		game.loop();
 	};
-	const proceed = async () => {
-		if (!lib.db) {
-			try {
-				lib.storage = JSON.parse(localStorage.getItem(lib.configprefix + lib.config.mode));
-				if (typeof lib.storage !== "object") throw "err";
-				if (lib.storage === null) throw "err";
-			} catch (err) {
-				lib.storage = {};
-				localStorage.setItem(lib.configprefix + lib.config.mode, "{}");
-			}
-			await proceed2();
-		} else {
-			await game.getDB("data", lib.config.mode, async obj => {
-				lib.storage = obj || {};
-				await proceed2();
-			});
-		}
-	};
 
-	await Promise.allSettled(loadingCustomStyle);
-
+	localStorage.removeItem(lib.configprefix + "directstart");
 	if (!lib.imported.mode?.[lib.config.mode]) {
 		window.inSplash = true;
 		clearTimeout(resetGameTimeout);
@@ -572,13 +554,25 @@ export async function onload(resetGameTimeout) {
 		await importMode(result);
 	}
 
-	localStorage.removeItem(lib.configprefix + "directstart");
+	if (!lib.db) {
+		try {
+			lib.storage = JSON.parse(localStorage.getItem(lib.configprefix + lib.config.mode));
+			if (typeof lib.storage != "object" || lib.storage == null) jumpToCatchBlock();
+		} catch (err) {
+			lib.storage = {};
+			localStorage.setItem(lib.configprefix + lib.config.mode, "{}");
+		}
+	} else {
+		let storage = await game.getDB("data", lib.config.mode);
+		lib.storage = storage || {};
+	}
 
 	const libOnload2 = lib.onload2;
 	delete lib.onload2;
 	await runCustomContents(libOnload2);
 
-	await proceed();
+	await Promise.allSettled(loadingCustomStyle);
+	await proceed2();
 }
 
 async function createBackground() {
