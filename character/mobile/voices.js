@@ -12,7 +12,7 @@ export default {
 	"#mbjiejian1": "昔鲁昭公败走失国，陛下因而更宜深虑。",
 	"#mbjiejian2": "今权在其门，为日已久，陛下何以违抗。",
 	"#mbjiejian3": "陛下何急一时，今当忍而待机啊。",
-	"#wangjing:die": "有母此言，今死之无悔。",
+	"#mb_wangjing:die": "有母此言，今死之无悔。",
 	"#mbchengxiong1": "天子殿前，岂容不洁之臣。",
 	"#mbchengxiong2": "陛下有令，还不将其斩之。",
 	"#mbwangzhuang1": "此事若入君耳，后果汝当自知。",
