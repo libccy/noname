@@ -2490,7 +2490,8 @@ export class Get extends GetCompatible {
 	 */
 	event(key) {
 		if (key) {
-			console.warn(`get.event("${key}")写法即将被废弃，请更改为get.event().${key}`);
+			//跑起来没问题的东西就不要乱动！
+			//console.warn(`get.event("${key}")写法即将被废弃，请更改为get.event().${key}`);
 			return _status.event[key];
 		}
 		return _status.event;
