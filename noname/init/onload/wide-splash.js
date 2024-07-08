@@ -1,7 +1,7 @@
-import { DefaultSplash } from "./DefaultSplash.js";
+import { DefaultSplash } from "./default-splash.js";
 
 /**
- * @typedef {import("./IOnloadSplash").IOnloadSplash} IOnloadSplash
+ * @typedef {import("./onload-splash.js").OnloadSplash} IOnloadSplash
  * @interface IOnloadSplash
  */
 export class WideSplash extends DefaultSplash {

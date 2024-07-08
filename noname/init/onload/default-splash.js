@@ -4,7 +4,7 @@ import { createApp } from "../../../game/vue.esm-browser.js";
 import OnloadSplash from "./OnloadSplash.js";
 
 /**
- * @typedef {import("./IOnloadSplash").IOnloadSplash} IOnloadSplash
+ * @typedef {import("./onload-splash.js").OnloadSplash} IOnloadSplash
  * @interface IOnloadSplash
  */
 export class DefaultSplash {
@@ -23,7 +23,7 @@ export class DefaultSplash {
 			node.classList.add("touch");
 			lib.setScroll(node);
 		}
-		if (lib.config.player_border != "wide") {
+		if (lib.config.player_border !== "wide") {
 			node.classList.add("slim");
 		}
 

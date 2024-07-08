@@ -8,7 +8,7 @@
  * 一切启动页信息均需要添加到`lib.onloadSplashes`当中，
  * 请勿直接更改任何相关设置，以免出现兼容问题
  */
-export interface IOnloadSplash {
+export interface OnloadSplash {
 	/**
 	 * 启动页的唯一标识符，先出现的将覆盖后出现的
 	 */

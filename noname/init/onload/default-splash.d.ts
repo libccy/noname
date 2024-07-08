@@ -1,6 +1,6 @@
-import { IOnloadSplash } from "./IOnloadSplash";
+import { OnloadSplash } from "./onload-splash";
 
-export class DefaultSplash implements IOnloadSplash {
+export class DefaultSplash implements OnloadSplash {
 	readonly id: string;
 	readonly name: string;
 
