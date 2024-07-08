@@ -93,7 +93,7 @@ const characters = {
 
 	yujin: ["male", "wei", 4, ["rezhenjun"], ["die:ol_yujin.mp3"]],
 
-	linghuyu: ["male", "wei", 4, ["xvzhi"]],
+	linghuyu: ["male", "wei", 4, ["xvzhi"], ["name:令狐|愚"]],
 	yj_simafu: ["male", "wei", 3, ["beiyu", "duchi"], ["name:司马|孚"]],
 	yj_xuangongzhu: ["female", "wei", 3, ["yjqimei", "yjzhuiji"], ["name:司马|null"]],
 	xukun: ["male", "wu", 4, ["fazhu"]],

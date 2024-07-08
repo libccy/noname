@@ -3,7 +3,7 @@ game.import("character", function () {
 	return {
 		name: "gujian",
 		character: {
-			gjqt_bailitusu: ["male", "shu", 4, ["xuelu", "fanshi", "shahun"]],
+			gjqt_bailitusu: ["male", "shu", 4, ["xuelu", "fanshi", "shahun"], ["name:百里|屠苏"]],
 			gjqt_fengqingxue: ["female", "wu", 3, ["qinglan", "yuehua", "swd_wuxie"]],
 			gjqt_xiangling: ["female", "wu", 3, ["xlqianhuan", "meihu", "xidie"]],
 			gjqt_fanglansheng: ["male", "wu", 3, ["fanyin", "mingkong", "fumo"]],
@@ -11,24 +11,20 @@ game.import("character", function () {
 			gjqt_hongyu: ["female", "shu", 4, ["jianwu", "meiying"]],
 
 			gjqt_yuewuyi: ["male", "wei", 4, ["yanjia", "xiuhua", "liuying"]],
-			gjqt_wenrenyu: ["female", "shu", 4, ["chizhen", "dangping"]],
+			gjqt_wenrenyu: ["female", "shu", 4, ["chizhen", "dangping"], ["name:闻人|羽"]],
 			gjqt_xiayize: ["male", "qun", 3, ["xuanning", "liuguang", "yangming"]],
 			gjqt_aruan: ["female", "wu", 3, ["zhaolu", "jiehuo", "yuling"]],
 
 			gjqt_xunfang: ["female", "shu", 3, ["manwu", "xfanghua"]],
-			gjqt_ouyangshaogong: ["male", "shu", 3, ["yunyin", "shishui", "duhun"]],
+			gjqt_ouyangshaogong: ["male", "shu", 3, ["yunyin", "shishui", "duhun"], ["name:欧阳|少恭"]],
 
 			gjqt_xieyi: ["male", "qun", 3, ["lingyan", "xunjian", "humeng"]],
 			gjqt_yanjiaxieyi: ["male", "qun", 2, ["xianju"], ["unseen"]],
 			gjqt_chuqi: ["male", "qun", 2, ["xuanci"], ["unseen"]],
 
-			// gjqt_xuange:['male','qun',4,['zhenlu','zhuixing']],
 			gjqt_beiluo: ["male", "qun", 4, ["lingnu", "zhenying", "cihong"]],
 			gjqt_yunwuyue: ["female", "wei", 3, ["yange", "woxue", "lianjing"]],
 			gjqt_cenying: ["female", "shu", 3, ["yunyou", "xuanzhen", "qingshu"]],
-			// gjqt_changliu:['male','qun',4,['xiange']],
-			// gjqt_fenglishuang:['female','wei',3,[]],
-			// gjqt_nishang:[],
 		},
 		characterIntro: {
 			gjqt_bailitusu:
