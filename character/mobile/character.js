@@ -109,7 +109,7 @@ const characters = {
 	chendeng: ["male", "qun", 3, ["zhouxuan", "fengji"]],
 	re_heqi: ["male", "wu", 4, ["reqizhou", "reshanxi"]],
 	yangbiao: ["male", "qun", 3, ["zhaohan", "rangjie", "yizheng"]],
-	re_sp_zhugeliang: ["male", "shu", 3, ["bazhen", "rehuoji", "rekanpo"]],
+	re_sp_zhugeliang: ["male", "shu", 3, ["bazhen", "rehuoji", "rekanpo"], ["name:诸葛|亮"]],
 	xin_xiahoudun: ["male", "wei", 4, ["reganglie", "xinqingjian"], ["name:夏侯|惇"]],
 	zhangyì: ["male", "shu", 4, ["rezhiyi"]],
 	jiakui: ["male", "wei", 3, ["zhongzuo", "wanlan"]],

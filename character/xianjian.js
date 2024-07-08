@@ -18,7 +18,7 @@ game.import("character", function () {
 			pal_zixuan: ["female", "wei", 3, ["shuiyun", "wangyou", "changnian"]],
 			pal_changqing: ["male", "wei", 4, ["luanjian", "ctianfu"]],
 
-			pal_nangonghuang: ["male", "wei", 3, ["zhaoyao", "sheling", "zhangmu"]],
+			pal_nangonghuang: ["male", "wei", 3, ["zhaoyao", "sheling", "zhangmu"], ["name:南宫|煌"]],
 			pal_wenhui: ["female", "shu", 4, ["huxi", "longxiang"]],
 			pal_wangpengxu: ["female", "shu", 3, ["duxinshu", "feixu"]],
 			pal_xingxuan: ["male", "wei", 3, ["feizhua", "leiyu", "lingxue"]],
@@ -27,7 +27,7 @@ game.import("character", function () {
 			pal_yuntianhe: ["male", "wu", 4, ["longxi", "zhuyue", "guanri"]],
 			pal_hanlingsha: ["female", "shu", 3, ["tannang", "tuoqiao"]],
 			pal_liumengli: ["female", "wei", 3, ["tianxian", "runxin", "xjzhimeng"]],
-			pal_murongziying: ["male", "wei", 4, ["xuanning", "poyun", "qianfang"]],
+			pal_murongziying: ["male", "wei", 4, ["xuanning", "poyun", "qianfang"], ["name:慕容|紫英"]],
 			pal_xuanxiao: ["male", "wei", 4, ["xuanyan", "ningbin", "xfenxin"]],
 
 			pal_jiangyunfan: ["male", "wei", 4, ["xunying", "liefeng"]],

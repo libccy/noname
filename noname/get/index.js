@@ -352,7 +352,7 @@ export class Get extends GetCompatible {
 	 * @param { string } str
 	 * @param { string|undefined } defaultSurname
 	 * @param { string|undefined } defaultName
-	 * @returns { Array | undefined }
+	 * @returns { Array }
 	 */
 	characterSurname(str, defaultSurname, defaultName){
 		const info = get.character(str).names;

@@ -7,7 +7,7 @@ const characters = {
 	sb_caopi: ["male", "wei", 3, ["sbxingshang", "sbfangzhu", "sbsongwei"], ["zhu"]],
 	sb_guanyu: ["male", "shu", 4, ["sbwusheng", "sbyijue"]],
 	sb_huangyueying: ["female", "shu", 3, ["sbjizhi", "sbqicai"]],
-	sb_sp_zhugeliang: ["male", "shu", 3, ["sbhuoji", "sbkanpo"]],
+	sb_sp_zhugeliang: ["male", "shu", 3, ["sbhuoji", "sbkanpo"], ["name:诸葛|亮"]],
 	sb_zhanghe: ["male", "wei", 4, ["sbqiaobian"]],
 	sb_yujin: ["male", "wei", 4, ["sbxiayuan", "sbjieyue"]],
 	sb_huaxiong: ["male", "qun", "3/4/1", ["new_reyaowu", "sbyangwei"]],

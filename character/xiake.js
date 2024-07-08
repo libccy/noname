@@ -3,7 +3,6 @@ game.import("character", function () {
 	return {
 		name: "xiake",
 		character: {
-			// xk_dongfangweiming:['male','shu',4,[]],
 			xk_guyuexuan: ["male", "qun", 4, ["rouquan", "gzhenji"]],
 			xk_jinji: ["male", "shu", 4, ["zhongzhan", "lianpo"]],
 			// xk_shenxiangyun:['female','wei',3,['zhenjiu']],
@@ -105,7 +104,6 @@ game.import("character", function () {
 			},
 		},
 		translate: {
-			xk_dongfangweiming: "东方未明",
 			xk_guyuexuan: "谷月轩",
 			xk_jinji: "荆棘",
 			xk_shenxiangyun: "沈湘芸",

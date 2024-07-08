@@ -9,7 +9,7 @@ game.import("character", function () {
 			yxs_mozi: ["male", "qun", 3, ["jieyong", "feigong", "jianai"], ["name:墨|翟"]],
 			yxs_bole: ["male", "wu", 3, ["bolehuiyan", "xiangma"], ["name:孙|阳"]],
 			yxs_aijiyanhou: ["female", "qun", 3, ["seyou", "sheshi"], ["name:null|null"]],
-			yxs_diaochan: ["female", "qun", 3, ["fengyi", "wange"]],
+			yxs_diaochan: ["female", "qun", 3, ["fengyi", "wange"], ["name:null|null"]],
 			yxs_yangyuhuan: ["female", "wu", 3, ["fengyan", "nichang"]],
 			yxs_baosi: ["female", "wu", 3, ["jieyin", "fenghuo"], ["name:姒|null"]],
 			yxs_napolun: ["male", "wei", 4, ["tongling", "fanpu"], ["name:波拿巴|拿破仑"]],

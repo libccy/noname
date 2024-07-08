@@ -12,13 +12,13 @@ game.import("character", function () {
 			swd_nicole: ["female", "qun", 3, ["huanjian", "lingwu", "minjing"]],
 			swd_wangsiyue: ["female", "wei", 3, ["duishi", "biyue"]],
 			swd_weida: ["female", "qun", 3, ["yueren", "zhenlie", "duijue"]],
-			swd_xuanyuanjianxian: ["male", "qun", 4, ["pozhou", "huajian", "xuanyuan"]],
+			swd_xuanyuanjianxian: ["male", "qun", 4, ["pozhou", "huajian", "xuanyuan"], ["name:轩辕|null"]],
 
 			swd_chenjingchou: ["male", "wu", 3, ["youyin", "yihua"]],
-			swd_duguningke: ["female", "qun", 3, ["nlianji", "touxi"]],
+			swd_duguningke: ["female", "qun", 3, ["nlianji", "touxi"], ["name:独孤|宁珂"]],
 			swd_guyue: ["male", "wei", 3, ["gtiandao", "gxianyin", "wangchen"]],
-			swd_tuobayuer: ["female", "shu", 4, ["swdliuhong", "poyue", "niepan"]],
-			swd_yuwentuo: ["male", "shu", 4, ["wushuang", "xielei", "kunlunjing"]],
+			swd_tuobayuer: ["female", "shu", 4, ["swdliuhong", "poyue", "niepan"], ["name:拓跋|玉儿"]],
+			swd_yuwentuo: ["male", "shu", 4, ["wushuang", "xielei", "kunlunjing"], ["name:宇文|拓"]],
 			swd_yuxiaoxue: ["female", "wei", 3, ["huanhun", "daixing", "yinyue"]],
 
 			swd_jiliang: ["male", "wu", 3, ["yunchou", "gongxin", "jqimou"]],
@@ -27,7 +27,7 @@ game.import("character", function () {
 			swd_xiyan: ["male", "qun", 3, ["jiefen", "datong"]],
 			swd_cheyun: ["female", "wu", 3, ["cyxianjiang", "cyqiaoxie", "shengong"]],
 			swd_huanyuanzhi: ["male", "qun", 3, ["swdtianshu", "lanzhi", "mufeng"]],
-			swd_murongshi: ["female", "shu", 4, ["duanyi", "guxing"]],
+			swd_murongshi: ["female", "shu", 4, ["duanyi", "guxing"], ["name:慕容|诗"]],
 			swd_jipeng: ["male", "wu", 3, ["reyingzi", "guozao"]],
 			swd_qi: ["male", "qun", 3, ["yaotong", "heihuo", "pojian"]],
 
@@ -56,7 +56,7 @@ game.import("character", function () {
 			swd_zhuoshanzhu: ["male", "wu", 4, ["suiyan", "wanjun"]],
 			swd_jiting: ["female", "wei", 4, ["guanhu", "lingshi"]],
 
-			swd_sikongyu: ["male", "wu", 4, ["sliufeng", "linyun", "hutian"]],
+			swd_sikongyu: ["male", "wu", 4, ["sliufeng", "linyun", "hutian"], ["name:司空|宇"]],
 			swd_muyue: ["female", "wei", 3, ["xingzhui", "lingxian", "shouyin"]],
 			swd_ziqiao: ["female", "shu", 3, ["guaili", "fuyan"]],
 			swd_fengyu: ["male", "shu", 4, ["fzhenwei", "shangxi"]],
@@ -72,18 +72,17 @@ game.import("character", function () {
 			// swd_philis:['male','qun',4,['yicong','wangxi']],
 			// swd_pepin:['male','qun',4,['rejianxiong','quhu']],
 			swd_kangnalishi: ["male", "qun", 1, ["busi", "xuying", "yinguo"]],
-			swd_xuanyuanjiantong: ["male", "qun", 3, ["chengjian", "huanling"]],
+			swd_xuanyuanjiantong: ["male", "qun", 3, ["chengjian", "huanling"], ["name:轩辕|null"]],
 			swd_huiyan: ["male", "qun", 4, ["hwendao", "lingfeng", "hxunzhi"]],
 
 			// swd_chenfu:['male','qun',4,['xuanzhou','bingfeng']],
 			// swd_chengyaojin:['male','qun',4,['jiuchi','jufu']],
 			swd_shanxiaoxiao: ["female", "wu", 3, ["shehun", "xiaomoyu"]],
-			swd_yuchiyanhong: ["female", "shu", 3, ["huanxing", "meihuo"]],
+			swd_yuchiyanhong: ["female", "shu", 3, ["huanxing", "meihuo"], ["name:尉迟|嫣红"]],
 			// swd_hanteng:['male','qun',4,['kuangfu']],
 			// swd_heran:['male','qun',3,['yujian','guiyin','shejie']],
 			// swd_xingtian:['male','qun',8,[]],
 			// swd_qinshubao:['male','qun',3,['huajing','pingxu']],
-			// swd_tuobayueer:['female','shu',3,['shushen','biyue']],
 			// swd_yangshuo:['male','qun',4,['longdan','luomu']],
 			// swd_zhanglie:['male','qun',4,['huajin','poxiao']],
 
@@ -98,7 +97,7 @@ game.import("character", function () {
 
 			swd_youzhao: ["male", "shu", 4, ["longdan", "yuchen"]],
 			swd_shangzhang: ["male", "shu", 4, ["lianwu"]],
-			swd_situqiang: ["female", "shu", 3, ["fengze", "lingyue", "jinlin"]],
+			swd_situqiang: ["female", "shu", 3, ["fengze", "lingyue", "jinlin"], ["name:司徒|蔷"]],
 
 			swd_chunyuheng: ["male", "wei", 2, ["jueqing", "shengshou", "xuying"]],
 			swd_hanlong: ["male", "wei", 4, ["ciqiu", "siji"]],
@@ -10318,7 +10317,6 @@ game.import("character", function () {
 			swd_wangsiyue: "王思月",
 			swd_huanglei: "黄雷",
 			swd_tuobayuer: "拓跋玉儿",
-			swd_tuobayueer: "拓跋月儿",
 			swd_chengyaojin: "程咬金",
 			swd_qinshubao: "秦叔宝",
 			swd_lishimin: "李世民",

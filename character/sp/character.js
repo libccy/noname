@@ -131,7 +131,7 @@ const characters = {
 	sp_caiwenji: ["female", "wei", 3, ["chenqing", "mozhi"]],
 	zhugeguo: ["female", "shu", 3, ["qirang", "yuhua"], ["name:诸葛|果"]],
 
-	lingju: ["female", "qun", 3, ["jieyuan", "fenxin"]],
+	lingju: ["female", "qun", 3, ["jieyuan", "fenxin"], ["name:吕|null"]],
 
 	cuiyan: ["male", "wei", 3, ["yawang", "xunzhi"]],
 	jsp_guanyu: ["male", "wei", 4, ["new_rewusheng", "danji"]],
