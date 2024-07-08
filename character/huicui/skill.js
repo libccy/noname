@@ -11277,9 +11277,7 @@ const skills = {
 					if (att <= 0) {
 						if (
 							!player.hasSkill("yaopei") ||
-							player.hasHistory("useSkill", function (evt) {
-								return evt.skill == "huguan" && evt.targets.includes(target);
-							}) ||
+							!player.countCards("he") ||
 							target.needsToDiscard() - target.needsToDiscard(-target.countCards("h") / 4) > (att > -2 ? 1.6 : 1)
 						)
 							return "cancel2";

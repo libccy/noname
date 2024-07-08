@@ -5,7 +5,7 @@ const characters = {
 		hp: 4,
 		skills: ["mubing", "ziqu", "diaoling"],
 		groupBorder: "key",
-		names: "仲村-由理",
+		names: "仲村|由理",
 	},
 	key_lucia: {
 		sex: "female",
