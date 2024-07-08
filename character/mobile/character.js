@@ -129,7 +129,7 @@ const characters = {
 	pangdegong: ["male", "qun", 3, ["xinfu_pingcai", "xinfu_pdgyingshi"]],
 	old_yuanshu: ["male", "qun", 4, ["xinyongsi", "yjixi"]],
 	zhangbu: ["male", "wu", 4, ["mbchengxiong", "mbwangzhuang"]],
-	wangjing: ["male", "wei", 3, ["mbzujin", "mbjiejian"]],
+	mb_wangjing: ["male", "wei", 3, ["mbzujin", "mbjiejian"]],
 
 	shenpei: ["male", "qun", "2/3", ["shouye", "liezhi"]],
 	re_wangyun: ["male", "qun", 3, ["relianji", "remoucheng"], ["clan:太原王氏"]],

@@ -2491,6 +2491,7 @@ export class Get extends GetCompatible {
 	event(key) {
 		if (key) {
 			// 能跑起来的东西还是不要去动它比较好 --Spmario233
+			// 跑起来没问题的东西就不要乱动！ --Spmario233
 			// console.warn(`get.event("${key}")写法即将被废弃，请更改为get.event().${key}`);
 			return _status.event[key];
 		}
