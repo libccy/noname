@@ -37,8 +37,8 @@ game.import("character", function () {
 
 			swd_zhaoyun: ["male", "shu", 4, ["longdan", "pozhen", "tanlin"]],
 			swd_hengai: ["female", "shu", 3, ["funiao", "ningxian", "hlingbo"]],
-			swd_duanmeng: ["female", "shu", 4, ["xuanying", "lieren"]],
-			swd_jiangwu: ["male", "shu", 4, ["yijue", "dangping"]],
+			swd_duanmeng: ["female", "shu", 4, ["xuanying", "lieren"], ["name:马|蕴"]],
+			swd_jiangwu: ["male", "shu", 4, ["yijue", "dangping"], ["name:严|鹏"]],
 			swd_tuwei: ["male", "shu", 3, ["zhanlu", "susheng"]],
 			swd_yeyaxi: ["female", "shu", 3, ["rexue", "huopu", "shenyan"]],
 
@@ -95,8 +95,8 @@ game.import("character", function () {
 			swd_haidapang: ["female", "wu", 3, ["bingjian", "rumeng"]],
 			swd_shaowei: ["female", "shu", 3, ["jianji", "huangyu"]],
 
-			swd_youzhao: ["male", "shu", 4, ["longdan", "yuchen"]],
-			swd_shangzhang: ["male", "shu", 4, ["lianwu"]],
+			swd_youzhao: ["male", "shu", 4, ["longdan", "yuchen"], ["name:赵|昂"]],
+			swd_shangzhang: ["male", "shu", 4, ["lianwu"], ["name:马|null"]],
 			swd_situqiang: ["female", "shu", 3, ["fengze", "lingyue", "jinlin"], ["name:司徒|蔷"]],
 
 			swd_chunyuheng: ["male", "wei", 2, ["jueqing", "shengshou", "xuying"]],
