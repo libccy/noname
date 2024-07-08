@@ -77,7 +77,7 @@ export async function onload(resetGameTimeout) {
 			if (ui.css.control_stylesheet) ui.css.control_stylesheet.remove();
 			ui.css.control_stylesheet = lib.init.sheet(`#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("${data}")}`);
 		}),
-		tryLoadCustomStyle(menu_style, data => {
+		tryLoadCustomStyle("menu_style", data => {
 			if (ui.css.menu_stylesheet) ui.css.menu_stylesheet.remove();
 			ui.css.menu_stylesheet = lib.init.sheet(`html #window>.dialog.popped,html .menu,html .menubg{background-image:url("${fileLoadedEvent.target.result}");background-size:cover}`);
 		}),
