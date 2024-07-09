@@ -506,7 +506,7 @@ export class Player extends HTMLDivElement {
 				const deconstructs = ["step", "source", "target", "targets", "card", "cards", "skill", "forced", "num"];
 				const topVars = ["_status", "lib", "game", "ui", "get", "ai"];
 
-				const params = ["topVars", "event", "trigger", "player", "resultEvent"];
+				const params = ["topVars", "event", "trigger", "player"];
 				const body = `var { ${deconstructs.join(", ")} } = event;\n` + `var { ${topVars.join(", ")} } = topVars;\n` + `var { result } = resultEvent;\n${varstr}\n\n` + code + `\nreturn event.next[event.next.length - 1];`;
 
 				if (!scope)
