@@ -35,7 +35,7 @@ export default class ArrayCompiler extends ContentCompilerBase {
 
                 await event.waitNext();
                 this.afterExecute(event);
-                event.step++;
+                event.step += 2;
 
                 if (event.step >= originals.length) event.finish();
             }
