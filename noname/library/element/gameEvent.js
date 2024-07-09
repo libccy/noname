@@ -22,9 +22,9 @@ export class GameEvent {
 		this.name = name;
 		const gameEvent = _status.event;
 		if (gameEvent) {
-			const type = `onNext${name[0].toUpperCase()}${name.slice(1)}`;
+			const type = this.getDefaultHandlerType();
 			// @ts-ignore
-			if (gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
+			if (type && gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
 		}
 		game.globalEventHandlers.addHandlerToEvent(this);
 
@@ -1017,6 +1017,7 @@ export class GameEvent {
 	 * @type { Promise<void> | null }
 	 */
 	#start = null;
+	resolved = false;
 	resolve() {
 		if (!this.#start) this.#start = Promise.resolve();
 	}
@@ -1027,6 +1028,7 @@ export class GameEvent {
 				this.player.skipList.remove(this.name);
 				if (lib.phaseName.includes(this.name)) this.player.getHistory("skipped").add(this.name);
 				this.trigger(this.name + "Skipped");
+				this.resolved = true;
 				return;
 			}
 
@@ -1036,6 +1038,7 @@ export class GameEvent {
 			_status.eventStack.push(this);
 			await this.loop().finally(() => {
 				_status.eventStack.pop();
+				this.resolved = true;
 			});
 		})();
 		return this.#start;
