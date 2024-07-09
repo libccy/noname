@@ -6,26 +6,37 @@ export class status {
 	clicked = false;
 	auto = false;
 	/**
+	 * @type { GameEvent[] }
+	 */
+	eventStack = [];
+	/**
 	 * @type { GameEvent }
 	 */
 	get event() {
+		let event;
+		if (this.tempEvent) event = this.tempEvent;
+		else event = this.eventStack.at(-1) || this.rootEvent;
 		//@ts-ignore
-		return this.eventStack.at(-1) || this.#waitingEvent;
+		return event;
+		// throw new Error("Cannot read _status.event before game start.")
 	}
 	set event(event) {
-		if (event == void 0) return;
-		if (this.eventStack.length === 0) this.#waitingEvent = event;
+		if (!(event instanceof lib.element.GameEvent)) return;
+		if (this.eventStack.length === 0) this.rootEvent = event;
 		//@ts-ignore
-		else _status.event.next.push(event);
+		else if (!this.eventStack.includes(event))
+			throw new Error("Cannot assign a value to _status.event that is not in the _status.eventStack.");
+		else this.tempEvent = event;
 	}
 	/**
 	 * @type { GameEvent | null }
 	 */
-	#waitingEvent;
+	rootEvent;
 	/**
-	 * @type { GameEvent[] }
+	 * 
+	 * @type { GameEvent | null }
 	 */
-	eventStack = [];
+	tempEvent = null;
 	ai = {};
 	lastdragchange = [];
 	/**
@@ -102,6 +113,10 @@ export class status {
 	 * @type { boolean }
 	 */
 	roundSkipped;
+	/**
+	 * @type { boolean }
+	 */
+	withError = false;
 
 	pauseManager = new PauseManager();
 	get paused() {
