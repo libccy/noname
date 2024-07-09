@@ -671,7 +671,7 @@ async function tryLoadCustomStyle(id, keys, fallback) {
 
 	if (lib.config[id] === "custom") {
 		await Promise.allSettled(
-			Object.entries(keys).map(async (key, callback) => {
+			Object.entries(keys).map(async ([key, callback]) => {
 				const fileToLoad = await game.getDB("image", key);
 				if (fileToLoad) {
 					const fileLoadedEvent = await new Promise((resolve, reject) => {
@@ -681,7 +681,7 @@ async function tryLoadCustomStyle(id, keys, fallback) {
 						fileReader.readAsDataURL(fileToLoad, "UTF-8");
 					});
 
-					await callback(fileLoadedEvent.target.result);
+					await callback?.(fileLoadedEvent.target.result);
 				} else {
 					fallback?.();
 				}
