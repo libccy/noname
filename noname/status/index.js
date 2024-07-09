@@ -1,5 +1,5 @@
 import { lib } from "../library/index.js";
-import PauseManager from "../game/PauseManager.ts";
+import PauseManager from "../game/PauseManager.js";
 
 export class status {
 	imchoosing = false;

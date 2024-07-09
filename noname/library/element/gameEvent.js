@@ -5,7 +5,7 @@ import { _status } from "../../status/index.js";
 import { ui } from "../../ui/index.js";
 import { AsyncFunction } from "../../util/index.js";
 import security from "../../util/security.js";
-import ContentCompiler from "./GameEvent/compilers/ContentCompiler.ts";
+import ContentCompiler from "./GameEvent/compilers/dist/ContentCompiler.js";
 
 export class GameEvent {
 	/**
@@ -1032,7 +1032,7 @@ export class GameEvent {
 				return;
 			}
 
-			this.parent?.childEvents.push(this);
+			if(this.parent) this.parent.childEvents.push(this);
 			game.getGlobalHistory("everything").push(this);
 			if (_status.eventStack.length === 0) _status.rootEvent = this;
 			_status.eventStack.push(this);

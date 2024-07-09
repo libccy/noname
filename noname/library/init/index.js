@@ -8,7 +8,7 @@ import { LibInitPromises } from "./promises.js";
 import { rootURL } from "../../../noname.js";
 
 import security from "../../util/security.js";
-import ContentCompiler from "../element/GameEvent/compilers/ContentCompiler.ts";
+import ContentCompiler from "../element/GameEvent/compilers/dist/ContentCompiler.js";
 
 export class LibInit {
 	/**
