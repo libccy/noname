@@ -368,18 +368,15 @@ export class GameEvent {
 			this.player.getHistory("skipped").add(this.name);
 		return this.trigger(this.name + "Cancelled");
 	}
-	neutralize(event = _status.event) {
+	async neutralize(event = _status.event) {
 		if (this._neutralized) return this._triggering;
 		this._neutralized = true;
 		this._neutralize_event = event;
-		const next = this.trigger("eventNeutralized");
-		next.then(() => {
-			if (this._neutralized == true) {
-				this.untrigger();
-				this.finish();
-			}
-		});
-		return next;
+		await this.trigger("eventNeutralized");
+		if (this._neutralized == true) {
+			this.untrigger();
+			this.finish();
+		}
 	}
 	unneutralize() {
 		const trigger = this._trigger;
