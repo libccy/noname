@@ -5567,12 +5567,12 @@ const skills = {
 			return true;
 		},
 		async cost(event, trigger, player) {
-			const selfDraw = lib.skill.rebingyi.filtery(player),
+			const selfDraw = lib.skill.rebingyi.filterx(player) && lib.skill.rebingyi.filtery(player),
 				asyncDraw = lib.skill.rebingyi.filterx(player);
 			if (asyncDraw) {
 				const num = player.countCards("h");
 				const result = await player
-					.chooseTarget(get.prompt("rebingyi"), `展示所有手牌，并选择至多${get.cnNumber(num)}名角色各摸一张牌${selfDraw ? "" : "，然后你摸一张牌"}`, [0, num])
+					.chooseTarget(get.prompt("rebingyi"), `展示所有手牌，并选择至多${get.cnNumber(num)}名角色各摸一张牌${selfDraw ? "，然后你摸一张牌" : ""}`, [0, num])
 					.set("ai", function (target) {
 						return get.attitude(get.player(), target);
 					})
@@ -5588,7 +5588,7 @@ const skills = {
 					};
 			} else {
 				event.result = await player
-					.chooseBool(get.prompt("rebingyi"), `展示所有手牌${selfDraw ? "" : "，然后你摸一张牌"}`)
+					.chooseBool(get.prompt("rebingyi"), `展示所有手牌${selfDraw ? "，然后你摸一张牌" : ""}`)
 					.set("choice", selfDraw)
 					.set("ai", () => get.event().choice)
 					.forResult();

@@ -555,7 +555,7 @@ const translates = {
 	reshenxing: "慎行",
 	reshenxing_info: "出牌阶段，你可以弃置X张牌（X为你本阶段内发动过〖慎行〗的次数且至少为0，至多为2），然后摸一张牌。",
 	rebingyi: "秉壹",
-	rebingyi_info: "结束阶段，你可展示所有手牌。若这些牌：颜色均相同，则你可以令至多X名角色各摸一张牌（X为你的手牌数）；点数均相同，则你摸一张牌。",
+	rebingyi_info: "结束阶段，你可展示所有手牌。若这些牌：颜色均相同，则你可以令至多X名角色各摸一张牌（X为你的手牌数）；颜色点数均相同，则你摸一张牌。",
 	re_jiaxu: "界贾诩",
 	re_jiaxu_prefix: "界",
 	rewansha: "完杀",
