@@ -94,10 +94,6 @@ export class GameEvent {
 	 */
 	_trigger;
 	/**
-	 * @type { GameEvent | undefined }
-	 */
-	_triggering;
-	/**
 	 * @type { string }
 	 */
 	triggername;
@@ -127,6 +123,10 @@ export class GameEvent {
 		add: {},
 		replace: {},
 	};
+	/**
+	 * @type { boolean }
+	 */
+	directHit = false;
 	/**
 	 * @type { number }
 	 */
@@ -304,14 +304,6 @@ export class GameEvent {
 			? this.getHandler(type).push(...Array.from(arguments).slice(1))
 			: this.getHandler().push(...arguments);
 	}
-	changeToZero() {
-		this.num = 0;
-		this.numFixed = true;
-		return this;
-	}
-	finish() {
-		this.finished = true;
-	}
 	putStepCache(key, value) {
 		if (!this._stepCache) {
 			this._stepCache = {};
@@ -360,37 +352,44 @@ export class GameEvent {
 		}
 		return this._tempCache[key1][key2];
 	}
-	cancel(arg1, arg2, notrigger) {
-		this.untrigger(arg1, arg2);
-		// this.forceFinish();
-		this.finish();
-		if (typeof this.resolveContent == 'function') {
-			this.resolveContent();
-		}
-		if (notrigger != "notrigger") {
-			if (this.player && lib.phaseName.includes(this.name))
-				this.player.getHistory("skipped").add(this.name);
-			return this.trigger(this.name + "Cancelled");
-		}
-		return null;
-	}
-	neutralize(event) {
-		this.untrigger();
-		this.finish();
-		this._neutralized = true;
-		this.trigger("eventNeutralized");
-		this._neutralize_event = event || _status.event;
+	changeToZero() {
+		this.num = 0;
+		this.numFixed = true;
 		return this;
+	}
+	finish() {
+		this.finished = true;
+	}
+	cancel(all, player, notrigger) {
+		this.untrigger(all, player);
+		this.finish();
+		if (notrigger === "notrigger") return;
+		if (this.player && lib.phaseName.includes(this.name))
+			this.player.getHistory("skipped").add(this.name);
+		return this.trigger(this.name + "Cancelled");
+	}
+	neutralize(event = _status.event) {
+		if (this._neutralized) return this._triggering;
+		this._neutralized = true;
+		this._neutralize_event = event;
+		const next = this.trigger("eventNeutralized");
+		next.then(() => {
+			if (this._neutralized == true) {
+				this.untrigger();
+				this.finish();
+			}
+		});
+		return next;
 	}
 	unneutralize() {
+		const trigger = this._trigger;
+		if (!trigger || !trigger._neutralized) return;
 		this.untrigger();
-		this._neutralized = false;
-		this.finished;
-		if (this.type == "card" && this.card && this.name == "sha") this.directHit = true;
-		return this;
+		trigger._neutralized = false;
+		if (trigger.type == "card" && trigger.card && trigger.name == "sha") trigger.directHit = true;
 	}
 	goto(step) {
-		this.step = step - 1;
+		this.step = step;
 		return this;
 	}
 	redo() {
@@ -431,6 +430,7 @@ export class GameEvent {
 	}
 
 	/**
+	 * @deprecated
 	 * @param {import("./GameEvent/compilers/IContentCompiler.js").EventCompileable} content
 	 */
 	setContents(content) {
@@ -518,14 +518,14 @@ export class GameEvent {
 		return this._rand;
 	}
 	insert(content, map) {
-		const next = new lib.element.GameEvent(`${this.name}Inserted`, false).toPromise();
+		const next = new lib.element.GameEvent(`${this.name}Inserted`, false);
 		this.next.push(next);
 		next.setContent(content);
 		Object.entries(map).forEach((entry) => next.set(entry[0], entry[1]));
 		return next;
 	}
 	insertAfter(content, map) {
-		const next = new lib.element.GameEvent(`${this.name}Inserted`, false).toPromise();
+		const next = new lib.element.GameEvent(`${this.name}Inserted`, false);
 		this.after.push(next);
 		next.setContent(content);
 		Object.entries(map).forEach((entry) => next.set(entry[0], entry[1]));
@@ -912,17 +912,15 @@ export class GameEvent {
 			next.triggername = name;
 			next.playerMap = playerMap;
 			event._triggering = next;
+			next.then(() => event._triggering = void 0);
 			return next;
 		}
 		return null;
 	}
 	untrigger(all = true, player) {
-		const evt = this._triggering;
 		if (all) {
 			if (all !== "currentOnly") this._triggered = 5;
-			if (evt && evt.doingList) {
-				evt.doingList.forEach((doing) => (doing.todoList = []));
-			}
+			if (this._triggering) this._triggering.finish();
 		} else if (player) {
 			this._notrigger.add(player);
 		}
@@ -962,13 +960,28 @@ export class GameEvent {
 	 */
 	finished = false;
 	/**
+	 * @type { boolean }
+	 */
+	_neutralized = false;
+	/**
 	 * @type { number | null }
 	 */
 	_triggered = null;
 	/**
+	 * @type { GameEvent | undefined }
+	 */
+	_triggering;
+	/**
 	 * @type { number }
 	 */
-	step = 0;
+	#step = 0;
+	get step() {
+		return this.#step;
+	}
+	set step(num) {
+		this.#step = num - 1;
+	}
+
 	/**
 	 * @type { GameEvent[] }
 	 */
@@ -1022,6 +1035,7 @@ export class GameEvent {
 
 			this.parent?.childEvents.push(this);
 			game.getGlobalHistory("everything").push(this);
+			if (!_status.rootEvent && _status.eventStack.length === 0) _status.rootEvent = this;
 			_status.eventStack.push(this);
 			await this.loop().finally(() => {
 				_status.eventStack.pop();
@@ -1056,13 +1070,6 @@ export class GameEvent {
 			}
 		}
 	}
-	onError(error) {
-		if (_status.withError || lib.config.compatiblemode || (_status.connectMode && !lib.config.debug)) {
-			game.print("游戏出错：" + this.name);
-			game.print(error.toString());
-			console.error(error);
-		} else throw error;
-	}
 	/**
 	 * @type { Promise<void> | null }
 	 */
@@ -1072,6 +1079,14 @@ export class GameEvent {
 		this.#waitNext = (async () => {
 			while (true) {
 				if (this.next.length <= 1) await _status.pauseManager.waitPause();
+				if (_status.tempEvent){
+					if (_status.tempEvent === this) {
+						_status.tempEvent = null;
+					} else {
+						this.cancel();
+						return;
+					}
+				}
 				if (!this.next.length) return;
 				const next = this.next[0];
 				await next.start();
@@ -1161,6 +1176,14 @@ export class GameEvent {
 	 */
 	forResultLinks() {
 		return this.forResult("links");
+	}
+
+	onError(error) {
+		if (_status.withError || lib.config.compatiblemode || (_status.connectMode && !lib.config.debug)) {
+			game.print("游戏出错：" + this.name);
+			game.print(error.toString());
+			console.error(error);
+		} else throw error;
 	}
 
 	/**

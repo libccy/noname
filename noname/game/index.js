@@ -4500,11 +4500,12 @@ export class Game extends GameCompatible {
 	 *
 	 * @param { string } name
 	 * @param { false } [trigger]
-	 * @param { GameEventPromise } [triggerEvent]
+	 * @param { GameEvent } [triggerEvent]
 	 */
 	createEvent(name, trigger, triggerEvent) {
 		const next = new lib.element.GameEvent(name, trigger);
-		_status.event = next;
+		if (_status.event) _status.event.next.push(next);
+		else _status.event = next;
 		return next;
 	}
 	/**
