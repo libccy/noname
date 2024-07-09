@@ -164,12 +164,18 @@ waitUpdate
 				// 新客户端导入扩展
 				else if (key === "importExtensionName") {
 					lib.config.extensions.add(value);
-					game.saveConfig("extensions", lib.config.extensions);
-					game.saveConfig(`extension_${value}_enable`, true);
+
+					let waitings = [];
+
+					waitings.push(new Promise(resolve => game.saveConfig("extensions", lib.config.extensions, void 0, resolve)));
+					waitings.push(new Promise(resolve => game.saveConfig(`extension_${value}_enable`, true, void 0, resolve)));
 					alert(`扩展${value}已导入成功，点击确定重启游戏`);
-					const url = new URL(location.href);
-					url.searchParams.delete("importExtensionName");
-					location.href = url.toString();
+
+					return Promise.allSettled(waitings).then(() => {
+						const url = new URL(location.href);
+						url.searchParams.delete("importExtensionName");
+						location.href = url.toString();
+					});
 				}
 			}
 		}
