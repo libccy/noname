@@ -502,14 +502,21 @@ export class Player extends HTMLDivElement {
 				if (errVars.includes(key)) throw new Error(`Variable '${key}' should not be referenced by vars objects`);
 				varstr += `var ${key}=lib.skill['${skillName}'].vars['${key}'];\n`;
 			}
-			const compileStep = code => {
+			const compileStep = (code, scope) => {
 				const deconstructs = ["step", "source", "target", "targets", "card", "cards", "skill", "forced", "num"];
 				const topVars = ["_status", "lib", "game", "ui", "get", "ai"];
 
 				const params = ["topVars", "event", "trigger", "player", "resultEvent"];
 				const body = `var { ${deconstructs.join(", ")} } = event;\n` + `var { ${topVars.join(", ")} } = topVars;\n` + `var { result } = resultEvent;\n${varstr}\n\n` + code + `\nreturn event.next[event.next.length - 1];`;
 
-				return new Function(...params, body).bind(null, { lib, game, ui, get, ai, _status });
+				if (!scope)
+					return new Function(...params, body).bind(null, { lib, game, ui, get, ai, _status });
+
+				if (!get.isFunctionBody(body))
+					throw new Error(`无效的函数体: ${body}`);
+
+				return scope(`(function (${params.join(", ")}) {\n${body}\n})`)
+					.bind(null, { lib, game, ui, get, ai, _status });
 			};
 			const contents = [];
 			contents.push(
@@ -537,7 +544,7 @@ export class Player extends HTMLDivElement {
 					} else {
 						recompiledScope = scope || eval;
 					}
-					contents.push(compileStep(recompiledScope(str2)));
+					contents.push(compileStep(str2, recompiledScope));
 				} else contents.push(fun2);
 			}
 			skill.content = ContentCompiler.compile(contents);
