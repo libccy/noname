@@ -511,7 +511,7 @@ export class Player extends HTMLDivElement {
 					var { ${deconstructs.join(", ")} } = event;
 					var { ${topVars.join(", ")} } = topVars;
 					${varstr}
-					${code}
+					{${code}}
 				`;
 
 				if (!scope)
