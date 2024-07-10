@@ -87,7 +87,7 @@ export class LibInit {
 		event._resultid = null;
 		event._result = null;
 		game.pause();
-		("step 1");
+		"step 1";
 		if (result) {
 			if (event._resultid) {
 				result.id = event._resultid;

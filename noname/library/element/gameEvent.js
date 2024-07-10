@@ -1071,12 +1071,13 @@ export class GameEvent {
 		}
 	}
 	/**
-	 * @type { Promise<void> | null }
+	 * @type { Promise<Result | void> | null }
 	 */
 	#waitNext = null;
 	waitNext() {
 		if (this.#waitNext) return this.#waitNext;
 		this.#waitNext = (async () => {
+			let result;
 			while (true) {
 				if (this.next.length <= 1) await _status.pauseManager.waitPause();
 				if (_status.tempEvent){
@@ -1084,12 +1085,13 @@ export class GameEvent {
 						_status.tempEvent = null;
 					} else {
 						this.cancel(true, null, "notrigger");
-						return;
+						return result;
 					}
 				}
-				if (!this.next.length) return;
+				if (!this.next.length) return result;
 				const next = this.next[0];
 				await next.start();
+				result = next.result;
 				this.next.shift();
 			}
 		})().finally(() => this.#waitNext = null);

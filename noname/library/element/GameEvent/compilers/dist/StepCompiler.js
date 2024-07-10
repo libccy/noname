@@ -60,7 +60,6 @@ export default class StepCompiler extends ContentCompilerBase {
                 var { ${topVars.join(", ")} } = topVars;
                 ${[stepHead, code].filter(Boolean)
                 .map(c => `{\n${c}\n}\n`).join("")}
-                return event.next[event.next.length - 1];
             `;
             return new ModAsyncFunction(...params, body).bind(null, { lib, game, ui, get, ai, _status });
         };

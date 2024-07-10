@@ -17,12 +17,14 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 event.step = 0;
             while (event.step < originals.length && !event.finished) {
                 this.beforeExecute(event);
+                let result;
                 if (!this.isPrevented(event)) {
                     const original = originals[event.step];
                     const next = await Reflect.apply(original, this, [event, event._trigger, event.player]);
-                    event._result = next && next.result || event._result;
+                    result = next && next.result;
                 }
-                await event.waitNext();
+                const nextResult = await event.waitNext();
+                event._result = result || nextResult || event._result;
                 this.afterExecute(event);
                 event.step += 2;
                 if (event.step >= originals.length)
