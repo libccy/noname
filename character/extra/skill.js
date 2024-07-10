@@ -303,7 +303,8 @@ const skills = {
 					return lib.filter.cardDiscardable(card, target, "lvxin");
 				});
 				if (cards.length > 0) {
-					const evt = await target.discard(cards.randomGets(round)).set("discarder", target);
+					const evt = target.discard(cards.randomGets(round)).set("discarder", target);
+					await evt;
 					cards2 = evt.done.cards2;
 				}
 			}
