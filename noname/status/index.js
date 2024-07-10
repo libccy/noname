@@ -1,5 +1,5 @@
 import { lib } from "../library/index.js";
-import PauseManager from "../game/PauseManager.ts";
+import PauseManager from "../game/PauseManager.js";
 
 export class status {
 	imchoosing = false;
@@ -42,7 +42,7 @@ export class status {
 	/**
 	 * @type { string[] }
 	 */
-	skillaudio = []
+	skillaudio = [];
 	dieClose = [];
 	dragline = [];
 	dying = [];
@@ -84,13 +84,13 @@ export class status {
 	/**
 	 * @type { boolean | undefined }
 	 */
-	video = undefined
+	video = undefined;
 	/**
 	 * @type { boolean | undefined }
 	 */
 	importingExtension = undefined;
 	/**
-	 * @type { Promise<any>[] | undefined }
+	 * @type { string[] | undefined }
 	 */
 	extensionLoaded = undefined;
 	/**
@@ -154,9 +154,10 @@ export let _status = new status();
 /**
  * @param { InstanceType<typeof status> } [instance]
  */
-export let setStatus = (instance) => {
+export let setStatus = instance => {
 	_status = instance || new status();
 	if (lib.config.dev) {
+		// @ts-ignore
 		window._status = _status;
 	}
 };

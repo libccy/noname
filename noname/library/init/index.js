@@ -8,7 +8,7 @@ import { LibInitPromises } from "./promises.js";
 import { rootURL } from "../../../noname.js";
 
 import security from "../../util/security.js";
-import ContentCompiler from "../element/GameEvent/compilers/ContentCompiler.ts";
+import ContentCompiler from "../element/GameEvent/compilers/dist/ContentCompiler.js";
 
 export class LibInit {
 	/**
@@ -87,7 +87,7 @@ export class LibInit {
 		event._resultid = null;
 		event._result = null;
 		game.pause();
-		("step 1");
+		"step 1";
 		if (result) {
 			if (event._resultid) {
 				result.id = event._resultid;

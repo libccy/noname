@@ -88,6 +88,9 @@ const skills = {
 						lib.skill.sbgongqi.updateBlocker(current);
 					});
 				},
+				intro: {
+					content: "所有其他角色不能使用或打出不为$的手牌响应你使用的牌",
+				},
 			},
 			block: {
 				trigger: {
@@ -124,7 +127,17 @@ const skills = {
 						const hs = player.getCards("h"),
 							cards = [card];
 						if (Array.isArray(card.cards)) cards.addArray(card.cards);
-						if (cards.containsSome(...hs) && player.storage.sbgongqi_blocker.includes(color)) return false;
+						if (cards.containsSome(...hs) && !player.storage.sbgongqi_blocker.includes(color)) return false;
+					},
+					cardRespondable(card, player) {
+						if (!player.storage.sbgongqi_blocker) return;
+						const color = get.color(card);
+						if (color == "none") return;
+						const hs = player.getCards("h"),
+							cards = [card];
+						if (Array.isArray(card.cards)) cards.addArray(card.cards);
+						const evt = _status.event;
+						if (evt.name == "chooseToRespond" && cards.containsSome(...hs) && !player.storage.sbgongqi_blocker.includes(color)) return false;
 					},
 				},
 			},
@@ -370,7 +383,7 @@ const skills = {
 				charlotte: true,
 				mod: {
 					globalTo(from, to, distance) {
-						return distance + to.countMark("sbyicong_to");
+						return distance + to.countMark("sbyicong_from");
 					},
 				},
 				marktext: "从",
@@ -1951,7 +1964,7 @@ const skills = {
 		},
 		filterCardx: function (card, player) {
 			if (player.getStorage("sbqicai").includes(card.name)) return false;
-			return get.type(card) == "equip" && game.hasPlayer(target => target != player && target.hasEmptySlot(get.subtype(card)));
+			return (get.mode() == "doudizhu" ? get.subtype(card) == "equip2" : get.type(card) == "equip") && game.hasPlayer(target => target != player && target.hasEmptySlot(get.subtype(card)));
 		},
 		usable: 1,
 		chooseButton: {
@@ -2723,7 +2736,7 @@ const skills = {
 						target.removeSkill(skills);
 						num += skills.length;
 					});
-					if (get.mode() != "identity") num += 2;
+					if (get.mode() == "versus" && _status.mode == "two") num += 2;
 					player.draw(num);
 				},
 			},

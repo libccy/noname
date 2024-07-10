@@ -1,4 +1,3 @@
-import ContentCompiler from "./ContentCompiler.ts";
 import ContentCompilerBase from "./ContentCompilerBase.ts";
 import { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler.ts";
 
@@ -27,13 +26,15 @@ export default class ArrayCompiler extends ContentCompilerBase {
             while (event.step < originals.length && !event.finished) {
                 this.beforeExecute(event);
 
+                let result: Result | undefined;
                 if (!this.isPrevented(event)) {
                     const original = originals[event.step];
-                    event._result = (await Reflect.apply(
-                        original, this, [event, event._trigger, event.player]))?.result ?? event._result;
+                    result = (await Reflect.apply(
+                        original, this, [event, event._trigger, event.player]))?.result;
                 }
 
-                await event.waitNext();
+                const nextResult = await event.waitNext();
+                event._result = result ?? nextResult ?? event._result;
                 this.afterExecute(event);
                 event.step += 2;
 

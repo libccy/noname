@@ -5,7 +5,7 @@ import { _status } from "../../status/index.js";
 import { ui } from "../../ui/index.js";
 import { AsyncFunction } from "../../util/index.js";
 import security from "../../util/security.js";
-import ContentCompiler from "./GameEvent/compilers/ContentCompiler.ts";
+import ContentCompiler from "./GameEvent/compilers/dist/ContentCompiler.js";
 
 export class GameEvent {
 	/**
@@ -22,9 +22,9 @@ export class GameEvent {
 		this.name = name;
 		const gameEvent = _status.event;
 		if (gameEvent) {
-			const type = `onNext${name[0].toUpperCase()}${name.slice(1)}`;
+			const type = this.getDefaultHandlerType();
 			// @ts-ignore
-			if (gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
+			if (type && gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
 		}
 		game.globalEventHandlers.addHandlerToEvent(this);
 
@@ -986,7 +986,7 @@ export class GameEvent {
 		const event = this;
 		return new Proxy([], {
 			set(target, p, childEvent, receiver) {
-				if (childEvent instanceof GameEvent) {
+				if (childEvent instanceof GameEvent && !target.includes(childEvent)) {
 					childEvent.parent = event;
 					if (event.#inContent && event.finished) childEvent.resolve();
 				}
@@ -1017,6 +1017,7 @@ export class GameEvent {
 	 * @type { Promise<void> | null }
 	 */
 	#start = null;
+	resolved = false;
 	resolve() {
 		if (!this.#start) this.#start = Promise.resolve();
 	}
@@ -1024,18 +1025,20 @@ export class GameEvent {
 		if (this.#start) return this.#start;
 		this.#start = (async () => {
 			if (this.player && this.player.skipList.includes(this.name)) {
-				await this.trigger(this.name + "Skipped");
 				this.player.skipList.remove(this.name);
 				if (lib.phaseName.includes(this.name)) this.player.getHistory("skipped").add(this.name);
+				this.trigger(this.name + "Skipped");
+				this.resolved = true;
 				return;
 			}
 
-			this.parent?.childEvents.push(this);
+			if(this.parent) this.parent.childEvents.push(this);
 			game.getGlobalHistory("everything").push(this);
-			if (!_status.rootEvent && _status.eventStack.length === 0) _status.rootEvent = this;
+			if (_status.eventStack.length === 0) _status.rootEvent = this;
 			_status.eventStack.push(this);
 			await this.loop().finally(() => {
 				_status.eventStack.pop();
+				this.resolved = true;
 			});
 		})();
 		return this.#start;
@@ -1068,25 +1071,27 @@ export class GameEvent {
 		}
 	}
 	/**
-	 * @type { Promise<void> | null }
+	 * @type { Promise<Result | void> | null }
 	 */
 	#waitNext = null;
 	waitNext() {
 		if (this.#waitNext) return this.#waitNext;
 		this.#waitNext = (async () => {
+			let result;
 			while (true) {
 				if (this.next.length <= 1) await _status.pauseManager.waitPause();
 				if (_status.tempEvent){
 					if (_status.tempEvent === this) {
 						_status.tempEvent = null;
 					} else {
-						this.cancel();
-						return;
+						this.cancel(true, null, "notrigger");
+						return result;
 					}
 				}
-				if (!this.next.length) return;
+				if (!this.next.length) return result;
 				const next = this.next[0];
 				await next.start();
+				result = next.result;
 				this.next.shift();
 			}
 		})().finally(() => this.#waitNext = null);
