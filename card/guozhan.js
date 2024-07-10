@@ -159,7 +159,7 @@ game.import("card", function () {
 							_status.event.baseDamage++;
 						});
 					}
-					const result = await next.forResult();
+					const result = await next;
 					if (!result.bool) {
 						target.draw(target[judge] == "shu" ? 2 : 1);
 					}
@@ -198,19 +198,19 @@ game.import("card", function () {
 				async content(event, trigger, player) {
 					const target = event.target, judge = get.mode() == 'guozhan' ? 'identity' : 'group';
 					await target.draw(8);
-					const result = await target.chooseToDiscard("请弃置至少六张手牌", [6, target.countCards("h")], true, "h").forResult();
+					const result = await target.chooseToDiscard("请弃置至少六张手牌", [6, target.countCards("h")], true, "h")
 					if (target[judge] != "wu" || !result.cards || !result.cards.length) return;
 					const give_cards = result.cards.filterInD("d"), give_list = [];
 					if (!give_cards.length) return;
 					while (game.hasPlayer(function (current) {
 						return (current != target && current[judge] == "wu" && !give_list.includes(current));
 					})) {
-						const result2 = await target.chooseButton(["是否将弃置的牌交给其他吴势力角色？", give_cards], [1, 2]).forResult();
+						const result2 = await target.chooseButton(["是否将弃置的牌交给其他吴势力角色？", give_cards], [1, 2]);
 						if (result2.bool) {
 							const cards2 = result2.links;
 							const result3 = await target.chooseTarget(true, "选择获得" + get.translation(cards2) + "的角色", function (card, player, target) {
 								return (target != player && target[judge] == "wu" && !_status.event.targetx.includes(target));
-							}).set("targetx", give_list).forResult();
+							}).set("targetx", give_list);
 							if (result3.bool && result3.targets && result3.targets.length) {
 								const current = result3.targets[0];
 								target.line(current, "green");
@@ -295,7 +295,7 @@ game.import("card", function () {
 						if (type.length < 2 || target.hp < 3) return att > 0 ? 1 : 0;
 						if (hs.length === 2) return att > 0 ? 0 : 1;
 						return att > 0 ? 1 : 0;
-					}).forResult();
+					});
 					let result2;
 					if (result.index == 0) {
 						let list = [], hs = target.getCards("h");
@@ -308,12 +308,12 @@ game.import("card", function () {
 							result2 = await target.chooseToDiscard("h", true, "请弃置两张类型不同的手牌", 2, function (card, player) {
 								if (!ui.selected.cards.length) return true;
 								return (get.type2(card, target) != get.type2(ui.selected.cards[0], target));
-							}).set("complexCard", true).forResult();
+							}).set("complexCard", true);
 						}
-						else if (list.length == 1) result2 = await target.chooseToDiscard("h", true).forResult();
+						else if (list.length == 1) result2 = await target.chooseToDiscard("h", true);
 						else return;
 					}
-					else result2 = await player.discardPlayerCard(target, "h", true, "visible").forResult();
+					else result2 = await player.discardPlayerCard(target, "h", true, "visible");
 					if (target[judge] == "qun" && target.isIn() && !target.countCards('h') && result2.bool) await target.draw(Math.min(5, target.hp));
 				},
 				ai: {

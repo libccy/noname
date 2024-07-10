@@ -92,10 +92,9 @@ export const Content = {
 				newGroups = get.is.double(player.name2, true) || [get.character(player.name2, 1)];
 			}
 			if (newGroups.length > 1) {
-				const newGroup = await player
+				const newGroup = (await player
 					.chooseControl(newGroups)
-					.set("prompt", "请选择一个新的势力")
-					.forResult("control");
+					.set("prompt", "请选择一个新的势力")).control;
 				if (newGroup != player.group) {
 					await player.changeGroup(newGroup);
 				}
@@ -2585,8 +2584,7 @@ export const Content = {
 							event.current.player,
 							trigger,
 							event.current.indexedData
-						)
-						.forResult();
+						);
 					if (get.itemtype(event.doing.player) === "player" && result === "cancelled") {
 						for (let i = 0; i < event.doing.todoList.length; i++) {
 							if (event.current.skill === event.doing.todoList[i].skill) {

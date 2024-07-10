@@ -2514,8 +2514,7 @@ const skills = {
 								})
 						);
 					return eff;
-				})
-				.forResult();
+				});
 		},
 		content: function () {
 			"step 0";

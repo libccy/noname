@@ -71,10 +71,7 @@ const skills = {
 					cost_data: links,
 				};
 			} else {
-				const bool = await player.chooseBool("连破：于此回合结束后获得一个额外回合？").forResultBool();
-				event.result = {
-					bool: bool,
-				};
+				event.result = await player.chooseBool("连破：于此回合结束后获得一个额外回合？");
 			}
 		},
 		async content(event, trigger, player) {
@@ -292,12 +289,11 @@ const skills = {
 				.set("ai", () => {
 					return get.event("choice");
 				})
-				.set("choice", get.attitude(player, target) > 0 ? "摸牌" : "弃牌")
-				.forResult();
+				.set("choice", get.attitude(player, target) > 0 ? "摸牌" : "弃牌");
 			let cards2 = [];
 			const makeDraw = result.index === 0;
 			if (makeDraw) {
-				cards2 = await target.draw(round).forResult();
+				cards2 = await target.draw(round);
 			} else {
 				const cards = target.getCards("h", card => {
 					return lib.filter.cardDiscardable(card, target, "lvxin");
@@ -429,7 +425,7 @@ const skills = {
 				const translation = lib.translate[skillToGain + "_ab"] || get.translation(skillToGain).slice(0, 2);
 				prompt2 += `<div class="skill">【${translation}】</div><div><span style="font-family: yuanli">${get.skillInfoTranslation(skillToGain)}</span></div><br><br>`;
 			}
-			const bool = await target
+			const { bool } = await target
 				.chooseBool(`寰道：是否获得技能〖${get.translation(skillToGain)}〗？`, prompt2)
 				.set(
 					"choice",
@@ -444,12 +440,11 @@ const skills = {
 							return get.skillRank(skill, "inout") < rank;
 						});
 					})()
-				)
-				.forResultBool();
+				);
 			if (!bool) {
 				target.chat("拒绝");
 				game.log(target, "拒绝获得技能", `#g【${get.translation(skillToGain)}】`);
-				await game.asyncDelay();
+				await game.delay();
 				return;
 			}
 			await target.addSkills(skillToGain);
@@ -460,7 +455,7 @@ const skills = {
 				return true;
 			});
 			if (!ownedSkills) return;
-			const control = await target
+			const { control } = await target
 				.chooseControl(ownedSkills)
 				.set(
 					"choiceList",
@@ -488,8 +483,7 @@ const skills = {
 							return get.skillRank(a, "inout") - get.skillRank(b, "inout");
 						})[0];
 					})()
-				)
-				.forResultControl();
+				);
 			await target.removeSkills(control);
 		},
 		ai: {
@@ -675,8 +669,7 @@ const skills = {
 								const toRemoveCount = allIn ? maxCount : Math.ceil(Math.random() * maxCount);
 								return get.cnNumber(toRemoveCount, true);
 							})()
-						)
-						.forResult();
+						);
 					if (result.control === "cancel2") return;
 					const toRemoveCount = result.index + 1;
 					player.logSkill("zhuangpo_effect", target);
@@ -916,7 +909,7 @@ const skills = {
 					}
 				});
 			}
-			await game.asyncDelay();
+			await game.delay();
 		},
 	},
 	//什么均贫卡
@@ -970,7 +963,7 @@ const skills = {
 					lose_list: lose_list,
 				})
 				.setContent("chooseToCompareLose");
-			await game.asyncDelay();
+			await game.delay();
 			cards = cards.filterInD();
 			const pcards = cards.randomGets(Math.ceil(cards.length / 2));
 			const tcards = cards.removeArray(pcards);

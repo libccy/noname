@@ -5575,8 +5575,7 @@ const skills = {
 					.chooseTarget(get.prompt("rebingyi"), `展示所有手牌，并选择至多${get.cnNumber(num)}名角色各摸一张牌${selfDraw ? "，然后你摸一张牌" : ""}`, [0, num])
 					.set("ai", function (target) {
 						return get.attitude(get.player(), target);
-					})
-					.forResult();
+					});
 				if (result.bool)
 					event.result = {
 						bool: result.bool,
@@ -5590,8 +5589,7 @@ const skills = {
 				event.result = await player
 					.chooseBool(get.prompt("rebingyi"), `展示所有手牌${selfDraw ? "，然后你摸一张牌" : ""}`)
 					.set("choice", selfDraw)
-					.set("ai", () => get.event().choice)
-					.forResult();
+					.set("ai", () => get.event().choice);
 				event.result.cost_data = { selfDraw };
 			}
 		},

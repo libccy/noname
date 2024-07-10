@@ -12,7 +12,7 @@ const skills = {
 		async content(event, trigger, player) {
 			await player.draw(2);
 			if (!player.countCards("he") || !game.hasPlayer(current => current != player)) return;
-			const [cards, targets] = await player
+			const { cards, targets } = await player
 				.chooseCardTarget({
 					forced: true,
 					prompt: get.prompt("psmouchuan"),
@@ -27,20 +27,19 @@ const skills = {
 						const player = get.player();
 						return get.attitude(player, target);
 					},
-				})
-				.forResult("cards", "targets");
+				});
 			if (!cards || !cards.length || !targets || !targets.length) return;
 			const [target] = targets;
 			await player.give(cards, target);
 			if ([player, target].some(i => !i.countCards("h"))) return;
 			let card1, card2;
 			if (player.countCards("h")) {
-				const cardp = await player.chooseCard("请展示一张手牌", true, "h").forResultCards();
+				const cardp = (await player.chooseCard("请展示一张手牌", true, "h")).cards;
 				await player.showCards(cardp);
 				card1 = cardp[0];
 			}
 			if (target.countCards("h")) {
-				const cardt = await target.chooseCard("请展示一张手牌", true, "h").forResultCards();
+				const cardt = (await target.chooseCard("请展示一张手牌", true, "h")).cards;
 				await target.showCards(cardt);
 				card2 = cardt[0];
 			}
@@ -200,8 +199,7 @@ const skills = {
 					const player = get.event("player"),
 						event = get.event().getTrigger();
 					return get.effect(target, event.card, player);
-				})
-				.forResult();
+				});
 		},
 		async content(event, trigger, player) {
 			trigger.targets.addArray(event.targets);
@@ -358,7 +356,7 @@ const skills = {
 			let damages = 0,
 				puts = 0;
 			player.line(targets);
-			await game.asyncDelay();
+			await game.delay();
 			for (const target of targets) {
 				let dialog = ["绽焰：将手牌中或弃牌堆中的一张【火攻】或火【杀】置于牌堆顶，或受到1点火焰伤害"];
 				const Tcards = target.getCards("h", card => {
@@ -387,8 +385,7 @@ const skills = {
 							if (get.damageEffect(source, player, player) <= 0 && get.attitude(player, source) <= 0) return 0;
 							if (!get.owner(button.link)) return 114514;
 							return 20 - get.value(button.link);
-						})
-						.forResult();
+						});
 				}
 				if (result.bool) {
 					puts++;
@@ -402,7 +399,7 @@ const skills = {
 					damages++;
 					await target.damage(1, "fire");
 				}
-				await game.asyncDelay(0.5);
+				await game.delay(0.5);
 			}
 			const num = Math.min(damages, puts);
 			if (num) await player.draw(num);
@@ -455,8 +452,7 @@ const skills = {
 					if (!game.hasPlayer(target => get.attitude(player, target) < 0)) return 0;
 					return 7.5 - get.value(card);
 				})
-				.set("logSkill", "dragchaojue")
-				.forResult();
+				.set("logSkill", "dragchaojue");
 		},
 		popup: false,
 		async content(event, trigger, player) {
@@ -573,8 +569,7 @@ const skills = {
 							const evt = get.event().getTrigger();
 							return target != player && !evt.targets.includes(target) && lib.filter.targetEnabled2(evt.card, player, target) && lib.filter.targetInRange(evt.card, player, target);
 						})
-						.set("ai", target => get.effect(target, _status.event.getTrigger().card, _status.event.player))
-						.forResult();
+						.set("ai", target => get.effect(target, _status.event.getTrigger().card, _status.event.player));
 				},
 				content() {
 					trigger.targets.addArray(event.targets);
@@ -609,8 +604,7 @@ const skills = {
 								)
 									return 0;
 								return 1;
-							})
-							.forResult();
+							});
 					if (result.index == 0) {
 						await target.discard(target.getDiscardableCards(target, "e"));
 					} else trigger.increase("num");
@@ -692,7 +686,7 @@ const skills = {
 								if (target != player) {
 									player.$give(card, target, false);
 								}
-								await game.asyncDelay(0.5);
+								await game.delay(0.5);
 								await target.equip(card);
 							} else break;
 						}
@@ -735,7 +729,7 @@ const skills = {
 							for (let j = 0; j < targets.length; j++) {
 								await targets[j].draw("nodelay");
 							}
-							await game.asyncDelayx();
+							await game.delayx();
 						}
 						break;
 					}
@@ -748,7 +742,7 @@ const skills = {
 				for (const target of choices) {
 					target.addTempSkill("draglizhong_effect", "roundStart");
 				}
-				await game.asyncDelayx();
+				await game.delayx();
 			}
 		},
 		subSkill: {
@@ -4560,8 +4554,7 @@ const skills = {
 					}
 					return att;
 				})
-				.set("goon", !player.hasUnknown())
-				.forResult();
+				.set("goon", !player.hasUnknown());
 		},
 		async content(event, trigger, player) {
 			player.awakenSkill("yjyongdi");

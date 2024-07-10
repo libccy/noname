@@ -36,7 +36,7 @@ const skills = {
 				const color = get.event("color");
 				if (target.getCards("e").some(card => get.color(card) == color)) eff += get.damageEffect(target, player, player) / 2;
 				return eff;
-			}).forResult();
+			});
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0];
@@ -45,7 +45,7 @@ const skills = {
 				if (get.attitude(_status.event.player, get.owner(button.link)) > 0) val *= -1;
 				if (get.position(button.link) == "e" && get.color(button.link) == get.event("color")) return val *= 2;
 				return val;
-			}).set("color", get.color(trigger.card)).forResult();
+			}).set("color", get.color(trigger.card));
 			if (result.bool && get.color(result.links[0]) == get.color(trigger.card)) await target.damage();
 		},
 		mod: {
@@ -192,7 +192,7 @@ const skills = {
 						}
 						return att * (target.getUseValue(card) + 4);
 					},
-				}).set("used", used).forResult();
+				}).set("used", used);
 				if (result.bool && result.targets.length) {
 					const id = result.targets[0].playerid,
 						map = give_map;
@@ -357,8 +357,7 @@ const skills = {
 						}
 						return "cancel2";
 					})()
-				)
-				.forResult();
+				);
 			if (result.control !== "cancel2") {
 				event.result = {
 					bool: true,
@@ -496,7 +495,7 @@ const skills = {
 			targets.forEach(current => {
 				current.addSkill("mbkuangli_mark");
 			});
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 		subSkill: {
 			target: {
@@ -522,9 +521,9 @@ const skills = {
 						lose_list: list,
 						discarder: player,
 					}).setContent("discardMultiple");
-					await game.asyncDelayx();
+					await game.delayx();
 					await player.draw(2);
-					await game.asyncDelayx();
+					await game.delayx();
 				},
 				ai: {
 					effect: {
@@ -643,8 +642,7 @@ const skills = {
 				})
 				.set("ai", target => {
 					return -get.attitude(get.player(), target);
-				})
-				.forResult();
+				});
 		},
 		group: ["mbcuizhen_inphase", "mbcuizhen_draw"],
 		async content(event, trigger, player) {
@@ -652,7 +650,7 @@ const skills = {
 			for (const target of targets) {
 				await target.disableEquip(1);
 			}
-			await game.asyncDelay();
+			await game.delay();
 		},
 		subSkill: {
 			inphase: {
@@ -673,7 +671,7 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					await trigger.target.disableEquip(1);
-					await game.asyncDelayx();
+					await game.delayx();
 				},
 			},
 			draw: {
@@ -1205,7 +1203,7 @@ const skills = {
 			});
 			if (lose_list.length) {
 				await game.loseAsync({ lose_list }).setContent("chooseToCompareLose");
-				await game.asyncDelayx();
+				await game.delayx();
 			}
 			const cardx = cards.filter(filter);
 			if (cardx.length) {
@@ -1412,7 +1410,7 @@ const skills = {
 				forced: true,
 				direct: true,
 				async content(event, trigger, player) {
-					const targets = await player
+					const { targets } = await player
 						.chooseTarget("威命：记录一名未记录过的角色", "当你杀死没有被记录过的角色后，则〖威命〗使命成功；如果在你杀死这些角色中的一名之前，有被记录过的角色死亡，则你〖威命〗使命失败。", true)
 						.set("filterTarget", (card, player, target) => {
 							return !player.getStorage("mbweiming").includes(target);
@@ -1420,8 +1418,7 @@ const skills = {
 						.set("ai", target => {
 							if (target === player) return 1;
 							return 1 + (Math.sqrt(Math.abs(get.attitude(player, target))) * Math.abs(get.threaten(target))) / Math.sqrt(target.getHp() + 1) / Math.sqrt(target.countCards("hes") + 1);
-						})
-						.forResultTargets();
+						});
 					if (targets && targets.length > 0) {
 						const target = targets[0];
 						player.logSkill("mbweiming_effect", target);
@@ -1446,7 +1443,7 @@ const skills = {
 					player.awakenSkill("mbweiming");
 					player.storage.mbxuetu_status = 1;
 					player.unmarkSkill("mbxuetu");
-					await game.asyncDelayx();
+					await game.delayx();
 				},
 			},
 			fail: {
@@ -1466,7 +1463,7 @@ const skills = {
 					game.broadcastAll(player => {
 						player.tempname.add("re_yangfeng");
 					}, player);
-					await game.asyncDelayx();
+					await game.delayx();
 				},
 			},
 		},
@@ -7496,7 +7493,7 @@ const skills = {
 					event.result = { bool: false };
 					return;
 			}
-			let result = await player.chooseTarget(get.prompt("bingqing"), prompt, filterTarget).set("ai", ai).forResult();
+			let result = await player.chooseTarget(get.prompt("bingqing"), prompt, filterTarget).set("ai", ai);
 			result.cost_data = num;
 			event.result = result;
 		},
@@ -16822,7 +16819,7 @@ const skills = {
 					return Math.sqrt(target.countCards("he"));
 				}
 				return 0;
-			}).set("goon", goon).forResult();
+			}).set("goon", goon);
 			if(result.bool){
 				result.cost_data = {cardname: event.cardname};
 				event.result = result;

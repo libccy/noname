@@ -1405,8 +1405,7 @@ const skills = {
 					if (name === "wuxie" && target.needsToDiscard(_status.event.cards)) att /= 5;
 					return att / (1 + get.distance(player, target, "absolute"));
 				})
-				.set("cards", trigger.cards)
-				.forResult();
+				.set("cards", trigger.cards);
 		},
 		async content(event, trigger, player) {
 			let list = [];
