@@ -986,7 +986,7 @@ export class GameEvent {
 		const event = this;
 		return new Proxy([], {
 			set(target, p, childEvent, receiver) {
-				if (childEvent instanceof GameEvent) {
+				if (childEvent instanceof GameEvent && !target.includes(childEvent)) {
 					childEvent.parent = event;
 					if (event.#inContent && event.finished) childEvent.resolve();
 				}
