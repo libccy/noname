@@ -1,5 +1,4 @@
-import { lib } from "../../noname.js";
-import { game } from "./index.js";
+import { lib, _status, game } from "../../noname.js";
 
 export class GamePromises {
 	/**
