@@ -88,7 +88,7 @@ waitUpdate
 					if (navigator.notification) {
 						navigator.notification.activityStart("正在导入旧版数据", "请稍候");
 					}
-					game.promises
+					return game.promises
 						.readFileAsText("noname.config.txt")
 						.then(data => {
 							return /** @type {Promise<void>} */ (
