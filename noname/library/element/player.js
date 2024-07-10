@@ -503,11 +503,16 @@ export class Player extends HTMLDivElement {
 				varstr += `var ${key}=lib.skill['${skillName}'].vars['${key}'];\n`;
 			}
 			const compileStep = (code, scope) => {
-				const deconstructs = ["step", "source", "target", "targets", "card", "cards", "skill", "forced", "num"];
+				const deconstructs = ["step", "source", "target", "targets", "card", "cards", "skill", "forced", "num", "_result: result"];
 				const topVars = ["_status", "lib", "game", "ui", "get", "ai"];
 
 				const params = ["topVars", "event", "trigger", "player"];
-				const body = `var { ${deconstructs.join(", ")} } = event;\n` + `var { ${topVars.join(", ")} } = topVars;\n` + `var { result } = resultEvent;\n${varstr}\n\n` + code + `\nreturn event.next[event.next.length - 1];`;
+				const body = `
+					var { ${deconstructs.join(", ")} } = event;
+					var { ${topVars.join(", ")} } = topVars;
+					${varstr}
+					${code}
+				`;
 
 				if (!scope)
 					return new Function(...params, body).bind(null, { lib, game, ui, get, ai, _status });
