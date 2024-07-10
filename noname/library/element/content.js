@@ -1837,6 +1837,7 @@ export const Content = {
 			next.setContent("orderingDiscard");
 		}
 		if (!evt.noOrdering) evt.orderingCards.addArray(cards);
+		event.result = { cards };
 	},
 	cardsGotoSpecial: function () {
 		game.getGlobalHistory().cardMove.push(event);
