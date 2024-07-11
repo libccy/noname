@@ -248,33 +248,45 @@ let skill = {
 };
 ```
 
-我们可以看到分步没有了，取而代之的是每次操作前面附加了一个 `await`；这个 `await`表示的是，会等待后面的代码运行完毕，再执行后续的代码
+我们可以看到分步没有了，取而代之的是每次操作前面附加了一个`await`；这个`await`表示的是，会等待后面的代码运行完毕，再执行后续的代码
 
 而此时，你可能会有疑惑：如果我现在需要获得所摸的牌，我该怎么办？
 
-原先分步情况下你可以在下一步中用 `result`变量来获取上一步事件的结果，而现在，当我们 `await`之后，我们可以这样做：
+原先分步情况下你可以在下一步中用`result`变量来获取上一步事件的结果，而现在，当我们`await`之后，我们可以这样做：
 
 ```javascript
-let cards = await player.draw(2);
+let drawEvent = await player.draw(2);
 ```
 
 你或许也发现了，无论是无名杀的分步，还是Javascript原来的回调异步，都会存在“结果”。就好比你做一件事，就算最后没有因为这件事得到任何东西，此时的情况也是一种“结果”
 
-而 `await`也同理，在等待事件结束后，便会得到这个“结果”。而对于 `player.draw(2)`这种常见的，需要分步得到 `result`的，我们称之为“事件“的东西，`await`后返回的就是事件的结果（即该事件的 `result`属性）。
+而`await`也同理，在等待事件结束后，便会得到这个“结果”。而对于`player.draw(2)`这种常见的，需要分步得到`result`的，我们称之为“事件“的东西，`await`后返回的，是事件本身；而事件的结果，则是该事件的`result`属性
 
-我们把“`await`后会等待后续事物执行完毕，并返回新的东西”的东西，简单的称作能 `await`的东西；在后文中我们会再次讨论这块的内容
+我们把“`await`后会等待后续事物执行完毕，并返回新的东西”的东西，简单的称作能`await`的东西；在后文中我们会再次讨论这块的内容
 
-换句话说，摸牌函数返回的 `draw`事件，是一个可 `await`的东西；而 `await`一个事件，就是等待一个事件运行结束，并获取事件的结果。
+换句话说，摸牌函数返回的`drawEvent`事件，是一个可`await`的东西；而`await`一个事件，就是等待一个事件运行结束，并获取这个事件本身
 
-> 在无名杀的历史中，曾经await一个事件会返回事件本身。所以当时为了方便获取结果，出现了 `forResult`方法：
+故我们接下来就能这样获取我们所摸的牌：
+
+```javascript
+let cards = drawEvent.result;
+```
+
+如果你不需要事件，只需要对应的结果，无名杀提供了对应的方法，你可以使用`forResult`函数：
 
 ```javascript
 let cards = await player.draw(2).forResult();
 ```
 
-> 当然，这个方法现在已经废弃，但是你仍可以使用它。它返回的结果和事件本身的结果没有任何差别。
+当然，Javascript也有对应的语法帮助我们，那就是[解构赋值](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment)：
 
-实际上 `await`没有那么死板，你完全可以把 `await`放在任何你想要的地方，只有能 `await`的情况才会等待，反之会原封不动的将值返回过来
+```javascript
+let { result: cards } = await player.draw(2);
+```
+
+两种方法都能得到结果，只要不混用就行；如果你对Javascript的新语法不熟悉，只需要简单的使用`forResult`就行
+
+实际上`await`没有那么死板，你完全可以把`await`放在任何你想要的地方，只有能`await`的情况才会等待，反之会原封不动的将值返回过来
 
 就比如，你可以：
 
@@ -282,7 +294,7 @@ let cards = await player.draw(2).forResult();
 await player.addTempSkill("jiang");
 ```
 
-`player.addTempSkill`并不需要等待，但你等待也不会出啥问题，此时 `await`后的返回值仍然是 `player.addTempSkill`原有的返回值；`await`只会处理需要等待的东西
+`player.addTempSkill`并不需要等待，但你等待也不会出啥问题，此时`await`后的返回值仍然是`player.addTempSkill`原有的返回值；`await`只会处理需要等待的东西
 
 ### 4. 一些原有操作的代替品
 
