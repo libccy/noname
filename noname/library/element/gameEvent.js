@@ -1017,7 +1017,6 @@ export class GameEvent {
 	 * @type { Promise<void> | null }
 	 */
 	#start = null;
-	resolved = false;
 	resolve() {
 		if (!this.#start) this.#start = Promise.resolve();
 	}
@@ -1038,7 +1037,6 @@ export class GameEvent {
 			_status.eventStack.push(this);
 			await this.loop().finally(() => {
 				_status.eventStack.pop();
-				this.resolved = true;
 			});
 		})();
 		return this.#start;

@@ -10,33 +10,31 @@ export class status {
 	 */
 	eventStack = [];
 	/**
-	 * @type { GameEvent }
+	 * @type { GameEvent | undefined }
 	 */
 	get event() {
 		let event;
 		if (this.tempEvent) event = this.tempEvent;
 		else event = this.eventStack.at(-1) || this.rootEvent;
-		//@ts-ignore
 		return event;
-		// throw new Error("Cannot read _status.event before game start.")
 	}
 	set event(event) {
 		if (!(event instanceof lib.element.GameEvent)) return;
-		if (this.eventStack.length === 0) this.rootEvent = event;
-		//@ts-ignore
-		else if (!this.eventStack.includes(event))
-			throw new Error("Cannot assign a value to _status.event that is not in the _status.eventStack.");
-		else this.tempEvent = event;
+		if (this.eventStack.length === 0){
+			this.rootEvent = event;
+			event.then(() => this.rootEvent = void 0);
+		}
+		else if (this.eventStack.includes(event)) this.tempEvent = event;
+		else throw new Error("Cannot assign a value to _status.event that is not in the _status.eventStack.");
 	}
 	/**
-	 * @type { GameEvent | null }
+	 * @type { GameEvent | undefined }
 	 */
 	rootEvent;
 	/**
-	 * 
-	 * @type { GameEvent | null }
+	 * @type { GameEvent | undefined }
 	 */
-	tempEvent = null;
+	tempEvent;
 	ai = {};
 	lastdragchange = [];
 	/**

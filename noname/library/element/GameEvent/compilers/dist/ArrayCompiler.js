@@ -20,7 +20,7 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 let result;
                 if (!this.isPrevented(event)) {
                     const original = originals[event.step];
-                    const next = await Reflect.apply(original, this, [event, event._trigger, event.player]);
+                    const next = await Reflect.apply(original, event, [event, event._trigger, event.player]);
                     result = next && next.result;
                 }
                 const nextResult = await event.waitNext();
