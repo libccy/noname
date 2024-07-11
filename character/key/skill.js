@@ -9323,7 +9323,6 @@ const skills = {
 	},
 	shiina_retieji: {
 		audio: 1,
-		shaRelated: true,
 		trigger: { player: "useCardToPlayered" },
 		check(event, player) {
 			return get.attitude(player, event.target) < 0;
@@ -9792,7 +9791,6 @@ const skills = {
 	},
 	//由依
 	yui_jiang: {
-		shaRelated: true,
 		audio: 2,
 		audioname: ["sp_lvmeng", "re_sunben", "re_sunce"],
 		trigger: {

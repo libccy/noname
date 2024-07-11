@@ -996,7 +996,6 @@ const skills = {
 		audio: 1,
 		trigger: { global: "useCard" },
 		direct: true,
-		shaRelated: true,
 		filter: function (event, player) {
 			return event.player != player && event.card.name == "sha" && player.countCards("he") > 0 && event.player.isPhaseUsing();
 		},

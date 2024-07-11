@@ -2204,7 +2204,6 @@ const skills = {
 	},
 	tieji: {
 		audio: 2,
-		shaRelated: true,
 		trigger: { player: "useCardToPlayered" },
 		check(event, player) {
 			return get.attitude(player, event.target) <= 0;
@@ -2983,7 +2982,6 @@ const skills = {
 		},
 	},
 	wushuang: {
-		shaRelated: true,
 		audio: 2,
 		audioname: ["re_lvbu", "shen_lvbu", "lvlingqi"],
 		forced: true,

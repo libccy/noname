@@ -8407,7 +8407,6 @@ const skills = {
 			});
 		},
 		direct: true,
-		shaRelated: true,
 		content: function () {
 			"step 0";
 			player
@@ -9637,7 +9636,6 @@ const skills = {
 			if (event.olhuanfu_map && event.olhuanfu_map[player.playerid]) return false;
 			return player.maxHp > 0 && player.countCards("he") > 0;
 		},
-		shaRelated: true,
 		direct: true,
 		content: function () {
 			"step 0";
@@ -11395,7 +11393,6 @@ const skills = {
 			},
 		},
 		trigger: { player: "useCardToPlayered" },
-		shaRelated: true,
 		filter: function (event, player) {
 			return event.card.name == "sha" && event.target.countCards("he") > 0 && get.distance(player, event.target) == 1;
 		},
@@ -24442,7 +24439,6 @@ const skills = {
 		},
 	},
 	fengpo: {
-		shaRelated: true,
 		audio: 2,
 		trigger: {
 			player: "useCardToPlayered",
@@ -26177,7 +26173,6 @@ const skills = {
 		audio: 2,
 	},
 	zniaoxiang: {
-		shaRelated: true,
 		audio: 2,
 		trigger: { player: "useCardToPlayered" },
 		forced: true,
@@ -26991,7 +26986,6 @@ const skills = {
 	},
 	//FW关银屏
 	oldhuxiao: {
-		shaRelated: true,
 		audio: "huxiao",
 		trigger: { player: "shaMiss" },
 		forced: true,

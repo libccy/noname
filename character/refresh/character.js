@@ -78,7 +78,7 @@ const characters = {
 	re_zhuran: ["male", "wu", 4, ["xindanshou"]],
 	ol_pangtong: ["male", "shu", 3, ["ollianhuan", "olniepan"], []],
 	re_zhangyi: ["male", "shu", 5, ["rewurong", "reshizhi"]],
-	xin_wuguotai: ["female", "wu", 3, ["xinganlu", "xinbuyi"]],
+	xin_wuguotai: ["female", "wu", 3, ["xinganlu", "xinbuyi"], ["name:丁|null"]],
 	re_caocao: ["male", "wei", 4, ["new_rejianxiong", "rehujia"], ["zhu"]],
 	re_simayi: ["male", "wei", 3, ["refankui", "reguicai"], ["name:司马|懿"]],
 	re_guojia: ["male", "wei", 3, ["tiandu", "new_reyiji"]],

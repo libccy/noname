@@ -50,7 +50,7 @@ const characters = {
 	sp_jianggan: ["male", "wei", 3, ["mbdaoshu", "spdaizui"]],
 	peixiu: ["male", "qun", 3, ["xingtu", "juezhi"]],
 	re_gaoshun: ["male", "qun", 4, ["rexianzhen", "rejinjiu"]],
-	re_wuguotai: ["female", "wu", 3, ["reganlu", "buyi"]],
+	re_wuguotai: ["female", "wu", 3, ["reganlu", "buyi"], ["name:丁|null"]],
 	xin_sunxiu: ["male", "wu", 3, ["mobileyanzhu", "mobilexingxue", "zhaofu"], ["zhu"]],
 	sp_maojie: ["male", "wei", 3, ["bingqing", "yingfeng"]],
 	yj_huangzhong: ["male", "qun", 4, ["spshidi", "spyishi", "spqishe"]],

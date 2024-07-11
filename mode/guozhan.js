@@ -9835,7 +9835,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					},
 				},
 				trigger: { player: "useCardToPlayered" },
-				shaRelated: true,
 				filter: function (event, player) {
 					return event.card.name == "sha" && player.hp <= event.target.hp;
 				},
@@ -9889,7 +9888,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			gzkuangfu: {
 				audio: "kuangfu",
 				trigger: { player: "useCardToPlayered" },
-				shaRelated: true,
 				preHidden: true,
 				logTarget: "target",
 				filter: function (event, player) {
@@ -9940,7 +9938,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			//吕布
 			gzwushuang: {
-				shaRelated: true,
 				audio: "wushuang",
 				audioname2: { gz_lvlingqi: "wushuang_lvlingqi" },
 				forced: true,

@@ -4529,7 +4529,6 @@ const skills = {
 			}
 		},
 		logTarget: "player",
-		shaRelated: true,
 		content: function () {
 			"step 0";
 			if (player != game.me && !player.isOnline() && !player.isUnderControl()) game.delayx();
@@ -5613,7 +5612,6 @@ const skills = {
 	chuanyun: {
 		audio: true,
 		trigger: { player: "useCardToPlayered" },
-		shaRelated: true,
 		filter: function (event, player) {
 			return event.card.name == "sha" && event.target.countCards("e") > 0;
 		},

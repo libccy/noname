@@ -8126,7 +8126,6 @@ const skills = {
 			}
 			*/
 		},
-		shaRelated: true,
 		ai: {
 			unequip_ai: true,
 			skillTagFilter: function (player, tag, arg) {
@@ -9348,7 +9347,6 @@ const skills = {
 		audio: 2,
 		trigger: { player: "useCardToTargeted" },
 		forced: true,
-		shaRelated: true,
 		filter: function (event, player) {
 			return event.isFirstTarget && event.card.name == "sha" && player.hasEmptySlot(1);
 		},

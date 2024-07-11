@@ -13430,7 +13430,6 @@ const skills = {
 	shawu: {
 		audio: 2,
 		trigger: { player: "useCardToTargeted" },
-		shaRelated: true,
 		direct: true,
 		filter: function (event, player) {
 			return (
