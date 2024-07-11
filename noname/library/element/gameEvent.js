@@ -34,7 +34,9 @@ export class GameEvent {
 		if (trigger && !game.online) this._triggered = 0;
 	}
 	static initialGameEvent() {
-		return new GameEvent().finish();
+		const event = new GameEvent();
+		event.finish();
+		return event;
 	}
 	/**
 	 * @type { Result }
@@ -1029,7 +1031,7 @@ export class GameEvent {
      * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
      * resolved value cannot be modified from the callback.
 	 * @param { (() => void) | null } [onfinally] The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns { Promise<Result & {result: Result}> }
+     * @returns { Promise<Result & {result: Result}> } A Promise for the completion of the callback.
 	 */
 	finally(onfinally) {
 		return this.then((result)=>{
@@ -1054,7 +1056,6 @@ export class GameEvent {
 				this.player.skipList.remove(this.name);
 				if (lib.phaseName.includes(this.name)) this.player.getHistory("skipped").add(this.name);
 				this.trigger(this.name + "Skipped");
-				this.resolved = true;
 				return;
 			}
 

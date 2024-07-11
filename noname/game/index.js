@@ -4504,7 +4504,7 @@ export class Game extends GameCompatible {
 	 */
 	createEvent(name, trigger, triggerEvent) {
 		const next = new lib.element.GameEvent(name, trigger);
-		const parent = triggerEvent || _status.event;
+		const parent = triggerEvent || _status.tempEvent || _status.eventStack.at(-1);
 		if (parent) parent.next.push(next);
 		else _status.event = next;
 		return next;

@@ -13,17 +13,11 @@ export class status {
 	 * @type { GameEvent | undefined }
 	 */
 	get event() {
-		let event;
-		if (this.tempEvent) event = this.tempEvent;
-		else event = this.eventStack.at(-1) || this.rootEvent;
-		return event;
+		return this.tempEvent || this.eventStack.at(-1) || this.rootEvent;
 	}
 	set event(event) {
 		if (!(event instanceof lib.element.GameEvent)) return;
-		if (this.eventStack.length === 0){
-			this.rootEvent = event;
-			event.finally(() => this.rootEvent = void 0);
-		}
+		if (this.eventStack.length === 0) this.rootEvent = event;
 		else if (this.eventStack.includes(event)) this.tempEvent = event;
 		else throw new Error("Cannot assign a value to _status.event that is not in the _status.eventStack.");
 	}
