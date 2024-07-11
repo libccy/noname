@@ -4071,7 +4071,6 @@ const skills = {
 		intro: { content: "已经发动过了#次" },
 	},
 	zhuandui: {
-		shaRelated: true,
 		audio: 2,
 		group: ["zhuandui_respond", "zhuandui_use"],
 		subSkill: {
@@ -8156,7 +8155,6 @@ const skills = {
 	},
 	longyin: {
 		audio: 2,
-		shaRelated: true,
 		init: player => {
 			game.addGlobalSkill("longyin_order");
 		},
@@ -10022,7 +10020,6 @@ const skills = {
 		},
 	},
 	xinpojun: {
-		shaRelated: true,
 		trigger: { player: "useCardToPlayered" },
 		direct: true,
 		filter: function (event, player) {

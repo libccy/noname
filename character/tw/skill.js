@@ -8166,7 +8166,6 @@ const skills = {
 	},
 	twxiangyu: {
 		group: "twxiangyu_lose",
-		shaRelated: true,
 		audio: "zniaoxiang",
 		trigger: { player: "useCardToPlayered" },
 		filter: function (event, player) {

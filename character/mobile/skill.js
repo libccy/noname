@@ -3977,7 +3977,6 @@ const skills = {
 	//赵忠
 	scschiyan: {
 		audio: 1,
-		shaRelated: true,
 		trigger: { player: "useCardToPlayered" },
 		direct: true,
 		filter: function (event, player) {
@@ -9597,7 +9596,6 @@ const skills = {
 		},
 	},
 	relieren: {
-		shaRelated: true,
 		audio: 2,
 		audioname: ["boss_lvbu3"],
 		trigger: { player: "useCardToPlayered" },

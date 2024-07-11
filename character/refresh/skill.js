@@ -5989,7 +5989,6 @@ const skills = {
 	//界关平
 	relongyin: {
 		audio: 2,
-		shaRelated: true,
 		init: player => {
 			game.addGlobalSkill("relongyin_order");
 		},
@@ -8698,7 +8697,6 @@ const skills = {
 		},
 	},
 	decadepojun: {
-		shaRelated: true,
 		audio: 2,
 		trigger: { player: "useCardToPlayered" },
 		direct: true,
@@ -8910,7 +8908,6 @@ const skills = {
 		},
 	},
 	rejianchu: {
-		shaRelated: true,
 		audio: 2,
 		audioname: ["re_pangde"],
 		trigger: { player: "useCardToPlayered" },
@@ -10446,7 +10443,6 @@ const skills = {
 		},
 	},
 	repojun: {
-		shaRelated: true,
 		audio: 2,
 		trigger: { player: "useCardToPlayered" },
 		direct: true,
@@ -14428,7 +14424,6 @@ const skills = {
 		},
 	},
 	retieji: {
-		shaRelated: true,
 		audio: 2,
 		audioname: ["boss_lvbu3"],
 		trigger: { player: "useCardToPlayered" },

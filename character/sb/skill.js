@@ -3047,7 +3047,6 @@ const skills = {
 		check: function (event, player) {
 			return get.attitude(player, event.target) <= 0 || game.hasPlayer(current => get.damageEffect(current, player, player) > 0);
 		},
-		shaRelated: true,
 		logTarget: "target",
 		content: function () {
 			"step 0";
@@ -3175,7 +3174,6 @@ const skills = {
 			player: "useCardToPlayered",
 			target: "useCardToTargeted",
 		},
-		shaRelated: true,
 		filter: function (event, player) {
 			if (!(event.card.name == "juedou" || (event.card.name == "sha" && get.color(event.card) == "red"))) return false;
 			return true;
@@ -5395,7 +5393,6 @@ const skills = {
 				else player.draw(2);
 			}
 		},
-		shaRelated: true,
 		ai: {
 			ignoreSkill: true,
 			skillTagFilter: function (player, tag, arg) {
