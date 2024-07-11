@@ -358,7 +358,7 @@ const skills = {
 			let damages = 0,
 				puts = 0;
 			player.line(targets);
-			await game.asyncDelay();
+			await game.delay();
 			for (const target of targets) {
 				let dialog = ["绽焰：将手牌中或弃牌堆中的一张【火攻】或火【杀】置于牌堆顶，或受到1点火焰伤害"];
 				const Tcards = target.getCards("h", card => {
@@ -402,7 +402,7 @@ const skills = {
 					damages++;
 					await target.damage(1, "fire");
 				}
-				await game.asyncDelay(0.5);
+				await game.delay(0.5);
 			}
 			const num = Math.min(damages, puts);
 			if (num) await player.draw(num);
@@ -692,14 +692,14 @@ const skills = {
 								if (target != player) {
 									player.$give(card, target, false);
 								}
-								await game.asyncDelay(0.5);
+								await game.delay(0.5);
 								await target.equip(card);
 							} else break;
 						}
 						break;
 					}
 					case "团体摸牌": {
-						const { result } = await player
+						const result = await player
 							.chooseTarget(
 								"厉战：令你或任意名装备区有牌的角色摸一张牌",
 								(card, player, target) => {
@@ -735,7 +735,7 @@ const skills = {
 							for (let j = 0; j < targets.length; j++) {
 								await targets[j].draw("nodelay");
 							}
-							await game.asyncDelayx();
+							await game.delayx();
 						}
 						break;
 					}
@@ -748,7 +748,7 @@ const skills = {
 				for (const target of choices) {
 					target.addTempSkill("draglizhong_effect", "roundStart");
 				}
-				await game.asyncDelayx();
+				await game.delayx();
 			}
 		},
 		subSkill: {

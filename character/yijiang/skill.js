@@ -196,7 +196,7 @@ const skills = {
 							],
 						})
 						.setContent("discardMultiple");
-					await game.asyncDelayx();
+					await game.delayx();
 				}
 				let cards = result.reduce((list, evt) => {
 					list.addArray(evt.cards);
@@ -209,7 +209,7 @@ const skills = {
 							const card = cards.shift();
 							if (player.hasUseTarget(card)) {
 								player.$gain2(card, false);
-								await game.asyncDelayx();
+								await game.delayx();
 								await player.chooseUseTarget(true, card, false);
 							}
 						}
@@ -295,7 +295,7 @@ const skills = {
 					if (card) {
 						cards.push(card);
 						target.$gain2(card, false);
-						await game.asyncDelayx();
+						await game.delayx();
 						await target.chooseUseTarget(card, true, "nopopup");
 					} else break;
 				}
@@ -1294,7 +1294,7 @@ const skills = {
 			const history = game.getAllGlobalHistory("useCard");
 			const index = history.indexOf(trigger);
 			const previous = history[index - 1].player;
-			const { result } = await trigger.player
+			const result = await trigger.player
 				.chooseBool("是否对" + get.translation(previous) + "发动【联对】？", "令" + get.translation(previous) + "摸两张牌")
 				.set("ai", () => _status.event.bool)
 				.set("bool", get.effect(previous, { name: "draw" }, trigger.player, trigger.player) > 0);
@@ -3453,7 +3453,7 @@ const skills = {
 			const target = targets[0];
 			player.line(target, "thunder");
 			await target.addSkills("new_canyun");
-			const { result } = await target
+			const result = await target
 				.chooseTarget("是否弃置场上的一张牌，获得技能〖绝响〗？", (card, player, target) => {
 					return target.getDiscardableCards(player, "ej").some(i => get.suit(i) == "club");
 				})
@@ -8724,7 +8724,7 @@ const skills = {
 							player.$throw(cardx, 1000, "nobroadcast");
 						}, target);
 						if (player == game.me) {
-							await game.asyncDelay(0.5);
+							await game.delay(0.5);
 						}
 					}
 				};

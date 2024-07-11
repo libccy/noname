@@ -8,7 +8,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const num = Math.abs(event.targets[0].countCards("e") - event.targets[1].countCards("e"));
 			await event.targets[0].swapEquip(event.targets[1]);
-			await game.asyncDelayx();
+			await game.delayx();
 			if (player.getDamagedHp() < num && player.countCards("e")) await player.chooseToDiscard("he", num, true);
 		},
 	},
@@ -180,7 +180,7 @@ const skills = {
 				if (result.bool) {
 					const card = result.links[0];
 					player.$gain2(card, false);
-					await game.asyncDelayx();
+					await game.delayx();
 					await player.chooseUseTarget(true, card, false);
 				}
 			}
@@ -264,7 +264,7 @@ const skills = {
 					.forResultCards();
 				const card = cards[0];
 				target.$give(card, player, false);
-				await game.asyncDelay(0.5);
+				await game.delay(0.5);
 				await player.equip(card);
 			}
 			if (choices.includes("draw")) await player.draw();
@@ -998,7 +998,7 @@ const skills = {
 			if (bool) {
 				const target = targets[0];
 				player.logSkill("olzhiyan", target);
-				const { result } = await target.draw("visible");
+				const result = await target.draw("visible");
 				if (result) {
 					const card = result[0];
 					if (get.type(card, target) == "equip") {
@@ -1210,7 +1210,7 @@ const skills = {
 			if (get.owner(card)) get.owner(card).$give(card, player, false);
 			else {
 				player.$gain2(card, false);
-				game.delayx();
+				await game.delayx();
 			}
 			player.equip(card);
 		},
@@ -1310,7 +1310,7 @@ const skills = {
 					if (get.owner(card)) get.owner(card).$give(card, player, false);
 					else {
 						player.$gain2(card, false);
-						game.delayx();
+						await game.delayx();
 					}
 					player.equip(card);
 					break;

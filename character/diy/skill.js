@@ -529,7 +529,7 @@ const skills = {
 				if (list[i].indexOf("sha:") == 0) list[i] = ["基本", "", "sha", list[i].slice(4)];
 				else list[i] = [get.type(list[i]), "", list[i]];
 			}
-			const { result } = await player
+			const result = await player
 				.chooseButton([get.prompt("nsxiaoye"), [list, "vcard"]])
 				.set("filterButton", function (button) {
 					return player.hasUseTarget({

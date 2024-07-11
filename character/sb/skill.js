@@ -52,11 +52,11 @@ const skills = {
 		async content(event, trigger, player) {
 			const { cards } = event;
 			await player.discard(cards);
-			await game.asyncDelayx();
+			await game.delayx();
 			player.addTempSkill("sbgongqi_effect", "phaseChange");
 			player.markAuto("sbgongqi_effect", [get.color(cards[0], player)]);
 			player.line(game.filterPlayer());
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 		updateBlocker(player) {
 			const list = [],
@@ -531,7 +531,7 @@ const skills = {
 						}
 						if (player.storage.sbxianzhen_damaged <= 2) {
 							await target.damage();
-							await game.asyncDelayx();
+							await game.delayx();
 						}
 					}
 					const toGain = [];
@@ -837,7 +837,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const targets = [player].addArray(event.targets);
 			targets.sortBySeat();
-			const { result } = await player.chooseCardOL(targets, "he", [1, Infinity], true, "驱虎：请将任意张牌扣置于武将牌上").set("ai", card => {
+			const result = await player.chooseCardOL(targets, "he", [1, Infinity], true, "驱虎：请将任意张牌扣置于武将牌上").set("ai", card => {
 				const player = get.event().getParent(2).player;
 				let value = 5;
 				if (get.player() == player) value -= 0.5;
@@ -863,7 +863,7 @@ const skills = {
 					gaintag: ["sbquhu"],
 				})
 				.setContent(lib.skill.sbquhu.addToExpansionMultiple);
-			await game.asyncDelay(1.5);
+			await game.delay(1.5);
 			const isMin = minLength > myCards.length;
 			const sortedList = lose_list
 				.filter(list => list[0] != player)
@@ -888,7 +888,7 @@ const skills = {
 			});
 			if (isMin) {
 				await mostPlayer.gain(myCards, "give", player);
-				await game.asyncDelay();
+				await game.delay();
 				const gain_list = lose_list.filter(list => list[0] != player);
 				game.loseAsync({
 					gain_list,
@@ -897,9 +897,9 @@ const skills = {
 			} else {
 				mostPlayer.line(secondPlayer, "thunder");
 				await secondPlayer.damage(mostPlayer);
-				await game.asyncDelay();
+				await game.delay();
 				await mostPlayer.gain(myCards, "give", player);
-				await game.asyncDelay();
+				await game.delay();
 				await game
 					.loseAsync({
 						lose_list: sortedList,
@@ -915,7 +915,7 @@ const skills = {
 							next.set("getlx", false);
 						}
 					});
-				await game.asyncDelayx();
+				await game.delayx();
 			}
 		},
 		addToExpansionMultiple() {

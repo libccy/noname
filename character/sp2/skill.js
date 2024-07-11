@@ -833,7 +833,7 @@ const skills = {
 				if (!logged) next.set("logSkill", "starminghui");
 				const result = await next.forResult();
 				if (!result.bool) return;
-				if (!player.isUnderControl(true) && !player.isOnline()) await game.asyncDelayx();
+				if (!player.isUnderControl(true) && !player.isOnline()) await game.delayx();
 				const [bool, targets] = await player
 					.chooseTarget("令一名角色回复1点体力")
 					.set("ai", target => get.recoverEffect(target, get.player(), get.player()))
@@ -2771,7 +2771,7 @@ const skills = {
 				}
 			}
 			if (!skills.length) return;
-			if (!event.isMine() && !event.isOnline()) await game.asyncDelayx();
+			if (!event.isMine() && !event.isOnline()) await game.delayx();
 			skills.forEach(skill => {
 				player.popup(skill, "thunder");
 			});
@@ -3935,7 +3935,7 @@ const skills = {
 					const evt = history.lastItem,
 						cards = evt.cards.filterInD("d");
 					if (cards.length) await player.gain(cards, "gain2");
-					else await game.asyncDelayx();
+					else await game.delayx();
 				},
 			},
 			sha: {
@@ -6993,7 +6993,7 @@ const skills = {
 				while (result.cards.length) {
 					const card = result.cards.shift();
 					target.$give(card, player);
-					await game.asyncDelay();
+					await game.delay();
 					const name = card.viewAs || card.name;
 					if (card.name != name) {
 						await player.addJudge(name, card);
