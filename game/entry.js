@@ -88,7 +88,7 @@ waitUpdate
 					if (navigator.notification) {
 						navigator.notification.activityStart("正在导入旧版数据", "请稍候");
 					}
-					game.promises
+					return game.promises
 						.readFileAsText("noname.config.txt")
 						.then(data => {
 							return /** @type {Promise<void>} */ (
@@ -167,8 +167,8 @@ waitUpdate
 
 					let waitings = [];
 
-					waitings.push(new Promise(resolve => game.saveConfig("extensions", lib.config.extensions, void 0, resolve)));
-					waitings.push(new Promise(resolve => game.saveConfig(`extension_${value}_enable`, true, void 0, resolve)));
+					waitings.push(game.promises.saveConfig("extensions", lib.config.extensions));
+					waitings.push(game.promises.saveConfig(`extension_${value}_enable`, true));
 					alert(`扩展${value}已导入成功，点击确定重启游戏`);
 
 					return Promise.allSettled(waitings).then(() => {
