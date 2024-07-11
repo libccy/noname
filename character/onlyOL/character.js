@@ -15,7 +15,7 @@ const characters = {
 	ol_caifuren: ["female", "qun", 3, ["olqieting", "xianzhou"], ["name:蔡|null"]],
 	ol_liru: ["male", "qun", 3, ["xinjuece", "olmieji", "dcfencheng"]],
 	ol_liubiao: ["male", "qun", 3, ["olzishou", "olzongshi"]],
-	ol_wuguotai: ["female", "wu", 3, ["olganlu", "olbuyi"]],
+	ol_wuguotai: ["female", "wu", 3, ["olganlu", "olbuyi"], ["name:丁|null"]],
 };
 
 export default characters;
