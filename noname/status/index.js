@@ -22,7 +22,7 @@ export class status {
 		if (!(event instanceof lib.element.GameEvent)) return;
 		if (this.eventStack.length === 0){
 			this.rootEvent = event;
-			event.then(() => this.rootEvent = void 0);
+			event.finally(() => this.rootEvent = void 0);
 		}
 		else if (this.eventStack.includes(event)) this.tempEvent = event;
 		else throw new Error("Cannot assign a value to _status.event that is not in the _status.eventStack.");
