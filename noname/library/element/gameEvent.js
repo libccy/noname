@@ -8,12 +8,12 @@ import security from "../../util/security.js";
 import ContentCompiler from "./GameEvent/compilers/dist/ContentCompiler.js";
 
 /**
- * @implements {PromiseLike<Result & {result: Result}>}
+ * @implements { PromiseLike<Result & {result: Result}> }
  */
 export class GameEvent {
 	/**
-	 * @param {string | GameEvent} [name]
-	 * @param {boolean} [trigger]
+	 * @param { string | GameEvent } [name]
+	 * @param { boolean } [trigger]
 	 */
 	constructor(name = "", trigger = true) {
 		if (name instanceof GameEvent) {
