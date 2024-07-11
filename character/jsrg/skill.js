@@ -1512,9 +1512,9 @@ const skills = {
 		async content(event, trigger, player) {
 			const cards = get.cards(5);
 			game.cardsGotoOrdering(cards);
-			const { result } = await player.chooseButton(["问天：将一张牌交给一名其他角色", cards], true);
+			const result = await player.chooseButton(["问天：将一张牌交给一名其他角色", cards], true);
 			if (result.bool) {
-				const { result: result2 } = await player.chooseTarget(`将${get.translation(result.links)}交给一名其他角色`, lib.filter.notMe, true).set("ai", target => {
+				const result2 = await player.chooseTarget(`将${get.translation(result.links)}交给一名其他角色`, lib.filter.notMe, true).set("ai", target => {
 					return get.attitude(get.player(), target);
 				});
 				if (result2.bool) {
@@ -1710,7 +1710,7 @@ const skills = {
 			const natures = ["fire", "thunder"];
 			let index;
 			if (natures.every(n => !player.hasSkill(`jsrgyinlve_${n}`) && trigger.hasNature(n))) {
-				const { result } = await player.chooseControl(["摸牌阶段", "弃牌阶段"]).set("prompt", "请选择要新回合内仅有的阶段");
+				const result = await player.chooseControl(["摸牌阶段", "弃牌阶段"]).set("prompt", "请选择要新回合内仅有的阶段");
 				index = result.index;
 			} else index = [0, 1].find(i => !player.hasSkill(`jsrgyinlve_${natures[i]}`) && trigger.hasNature(natures[i]));
 			player.addTempSkill(`jsrgyinlve_${natures[index]}`, "roundStart");
@@ -1749,7 +1749,7 @@ const skills = {
 						const color = get.color(fixedCards);
 						const { opinion, targets } = result;
 						if (opinion == color) {
-							const { result } = await player
+							const result = await player
 								.chooseTarget("是否令至多两名参与议事的角色将手牌摸至体力上限？", [1, 2], (card, player, target) => {
 									return get.event("targets").includes(target);
 								})
@@ -1942,7 +1942,7 @@ const skills = {
 		},
 		direct: true,
 		async content(event, trigger, player) {
-			const { result } = await player
+			const result = await player
 				.chooseTarget(get.prompt2("jsrgyoujin"), (card, player, target) => {
 					return player.canCompare(target);
 				})
@@ -1955,7 +1955,7 @@ const skills = {
 			const { targets } = result,
 				target = targets[0];
 			player.logSkill("jsrgyoujin", target);
-			const { result: result2 } = await player.chooseToCompare(target).set("small", true);
+			const result2 = await player.chooseToCompare(target).set("small", true);
 			player.addTempSkill("jsrgyoujin_forbid");
 			player.markAuto("jsrgyoujin_forbid", [result2.num1]);
 			target.addTempSkill("jsrgyoujin_forbid");
@@ -2070,7 +2070,7 @@ const skills = {
 		direct: true,
 		async content(event, trigger, player) {
 			const juedou = new lib.element.VCard({ name: "juedou", storage: { jsrglonglin: true } });
-			const { result } = await player
+			const result = await player
 				.chooseToDiscard(get.prompt2("jsrglonglin"), "he")
 				.set("ai", card => {
 					if (get.event("goon")) return 5 - get.value(card);
@@ -2093,7 +2093,7 @@ const skills = {
 				trigger.excluded.addArray(trigger.targets);
 				game.delayx();
 				if (trigger.player.canUse(juedou, player)) {
-					const { result } = await trigger.player.chooseBool(`是否视为对${get.translation(player)}使用一张【决斗】？`).set("choice", get.effect(player, juedou, trigger.player, trigger.player) >= 0);
+					const result = await trigger.player.chooseBool(`是否视为对${get.translation(player)}使用一张【决斗】？`).set("choice", get.effect(player, juedou, trigger.player, trigger.player) >= 0);
 					if (result.bool) {
 						player.addTempSkill("jsrglonglin_source");
 						trigger.player.useCard(juedou, player);
@@ -2893,7 +2893,7 @@ const skills = {
 							if (opinion == "red") {
 								const notDebated = game.filterPlayer().removeArray(targets);
 								if (notDebated.length) {
-									const { result } = await player
+									const result = await player
 										.chooseTarget("获得任意名未议事的角色的各一张手牌", [1, Infinity], true, (card, player, target) => {
 											return get.event("targets").includes(target) && target.countGainableCards(player, "h");
 										})
@@ -3130,7 +3130,7 @@ const skills = {
 					return { bool: true, cards: [hs.randomGet()] };
 				});
 			next._args.remove("glow_result");
-			const { result } = await next;
+			const result = await next;
 			const cards = [];
 			const videoId = lib.status.videoId++;
 			for (let i = 0; i < targets.length; i++) {
@@ -3271,7 +3271,7 @@ const skills = {
 			next.set("ai", function (button) {
 				return get.value(button.link, _status.event.player);
 			});
-			const { result } = await next;
+			const result = await next;
 			if (result.bool && result.links) {
 				const time2 = 1000 - (get.utc() - time);
 				if (time2 > 0) {
@@ -3331,7 +3331,7 @@ const skills = {
 		},
 		frequent: true,
 		async content(event, trigger, player) {
-			const { result } = await player.judge();
+			const result = await player.judge();
 			let num = 0;
 			game.getGlobalHistory("cardMove", evt => {
 				if (evt.name != "cardsDiscard") {

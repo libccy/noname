@@ -2282,7 +2282,7 @@ const skills = {
 				list.push({ name: card.name, isCard: true });
 				if (card.nature) list[i].nature = card.nature;
 			}
-			const { result } = await player
+			const result = await player
 				.chooseTarget(get.prompt("kiyu_rexianyu"), "将以下使用结果告知于一名其他角色：" + get.translation(list), function (card, player, target) {
 					return target != player && !target.hasSkill("kiyu_rexianyu_lastrun", null, null, false);
 				})
@@ -4097,7 +4097,7 @@ const skills = {
 			var list = lib.skill.liyingxia_wumai.derivation.slice(0);
 			list.removeArray(player.getStorage("liyingxia_wumai"));
 			if (list.length) {
-				const { result } = await player.chooseControl(list, "cancel2").set("prompt", get.prompt("liyingxia_wumai")).set("prompt2", "获得一个技能直到本轮结束");
+				const result = await player.chooseControl(list, "cancel2").set("prompt", get.prompt("liyingxia_wumai")).set("prompt2", "获得一个技能直到本轮结束");
 				if (result.control !== "cancel2") {
 					event.result = {
 						bool: true,
@@ -4112,7 +4112,7 @@ const skills = {
 					3,
 					game.countPlayer(current => current.isDamaged())
 				);
-				const { result } = await player.chooseBool(get.prompt("liyingxia_wumai") + "（可摸" + get.cnNumber(num) + "张牌）");
+				const result = await player.chooseBool(get.prompt("liyingxia_wumai") + "（可摸" + get.cnNumber(num) + "张牌）");
 				if (result.bool) {
 					event.result = {
 						bool: true,
@@ -5264,7 +5264,7 @@ const skills = {
 		autodelay: true,
 		async cost(event, trigger, player) {
 			var prompt2 = "为" + get.translation(trigger.card) + "增加一个目标";
-			const { result } = await player
+			const result = await player
 				.chooseTarget(get.prompt("rumi_shuwu"), function (card, player, target) {
 					var player = _status.event.player;
 					return !_status.event.targets.includes(target) && lib.filter.targetEnabled2(_status.event.card, player, target);
@@ -5373,7 +5373,7 @@ const skills = {
 				}
 			}
 			var prompt2 = "为" + get.translation(trigger.card) + "增加一个目标";
-			const { result: result2 } = await player
+			const result2 = await player
 				.chooseTarget(get.prompt("sakuya_junbu"), function (card, player, target) {
 					var player = _status.event.player;
 					return !_status.event.targets.includes(target) && lib.filter.targetEnabled2(_status.event.card, player, target);
@@ -5864,7 +5864,7 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			const list = player.getExpansions("shiroha_yuzhao");
-			const { result } = await player
+			const result = await player
 				.chooseButton([get.translation(trigger.player) + "的" + (trigger.judgestr || "") + "判定为" + get.translation(trigger.player.judging[0]) + "，" + get.prompt("shiroha_jiezhao"), list, "hidden"], function (button) {
 					var card = button.link;
 					var trigger = _status.event.getTrigger();
@@ -6838,7 +6838,7 @@ const skills = {
 				if (list[i].indexOf("sha:") == 0) list[i] = ["基本", "", "sha", list[i].slice(4)];
 				else list[i] = [get.type(list[i]), "", list[i]];
 			}
-			const { result } = await player
+			const result = await player
 				.chooseButton([get.prompt("shiori_huijuan"), [list, "vcard"]])
 				.set("filterButton", function (button) {
 					return player.hasUseTarget({
@@ -7369,7 +7369,7 @@ const skills = {
 			cards = cards.filter(function (card) {
 				if (get.position(card, true) == "d" && get.type(card, null, false) == "equip") return true;
 			});
-			const { result } = await player.chooseButton([get.prompt("kyoko_juwu"), cards], [1, cards.length]).set("ai", function () {
+			const result = await player.chooseButton([get.prompt("kyoko_juwu"), cards], [1, cards.length]).set("ai", function () {
 				return 1;
 			});
 			if (result.bool)
@@ -8296,7 +8296,7 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const target = event.indexedData;
-			const { result } = await target.judge();
+			const result = await target.judge();
 			if (result.color === "red" && target.isIn()) {
 				await target.draw();
 			} else {
@@ -9288,7 +9288,7 @@ const skills = {
 			return player.getExpansions("shiina_qingshen").length > 0 && player.inRange(event.player);
 		},
 		async cost(event, trigger, player) {
-			const { result } = await player
+			const result = await player
 				.chooseButton([get.prompt("shiina_feiyan", trigger.player), player.getExpansions("shiina_qingshen")])
 				.set("goon", get.attitude(player, trigger.player) < 0 ? 1 : -1)
 				.set("ai", function () {

@@ -1084,7 +1084,7 @@ const skills = {
 			return event.card.name == "sha" && event.player != player && !event.targets.includes(player) && event.target.inRange(player) && event.target.countCards("he") > 0;
 		},
 		async cost(event, trigger, player) {
-			const { result } = await trigger.target
+			const result = await trigger.target
 				.chooseCard("he", "是否对" + get.translation(player) + "发动【同疾】？", "弃置一张牌，将" + get.translation(trigger.card) + "转移给" + get.translation(player), lib.filter.cardDiscardable)
 				.set("ai", card => {
 					if (!_status.event.check) return -1;
@@ -1344,7 +1344,7 @@ const skills = {
 		audio: "ganglie",
 		trigger: { player: "damageEnd" },
 		async cost(event, trigger, player) {
-			const { result } = await player
+			const result = await player
 				.chooseTarget(get.prompt2("ganglie_three"), (card, player, target) => {
 					return target.isEnemyOf(player);
 				})
@@ -1396,7 +1396,7 @@ const skills = {
 		async cost(event, trigger, player) {
 			let num = game.countPlayer(current => current != player && current.countCards("h") > 0 && get.attitude(player, current) <= 0);
 			let check = num >= 2;
-			const { result } = await player
+			const result = await player
 				.chooseTarget(
 					get.prompt("tuxi"),
 					"获得其他一至两名角色的各一张手牌",

@@ -699,7 +699,7 @@ const skills = {
 						break;
 					}
 					case "团体摸牌": {
-						const { result } = await player
+						const result = await player
 							.chooseTarget(
 								"厉战：令你或任意名装备区有牌的角色摸一张牌",
 								(card, player, target) => {

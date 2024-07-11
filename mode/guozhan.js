@@ -1064,7 +1064,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						async content(event, trigger, player) {
 							const target = event.target;
 							target.tempBanSkill("fakeduoshi", "roundStart", false);
-							let { result } = await player.chooseUseTarget(
+							let result = await player.chooseUseTarget(
 								true,
 								{ name: "yiyi" },
 								event.cards
@@ -1984,7 +1984,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								if (bool) await player.loseToDiscardpile(links);
 							}
 						} else if (cards.length) {
-							const { result } = await player
+							const result = await player
 								.chooseTarget(
 									"排异：是否对至多" +
 										get.cnNumber(cards.length) +
@@ -3330,7 +3330,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								if (get.cardtag(trigger.card, `yingbian_${tag}`)) continue;
 								if (j[0] == "heart") {
 									if (!forced && !hasYingBian.includes("add")) {
-										const { result } = await lib.yingbian.condition.complex.get(
+										const result = await lib.yingbian.condition.complex.get(
 											"zhuzhan"
 										)(trigger);
 										if (result.bool) {

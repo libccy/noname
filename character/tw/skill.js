@@ -317,7 +317,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const card = event.cards[0],
 				target = event.target;
-			const { result } = await player.chooseToCompare(target).set("fixedResult", { [player.playerid]: card });
+			const result = await player.chooseToCompare(target).set("fixedResult", { [player.playerid]: card });
 			const cards = get.inpileVCardList(info => {
 				if (info[0] != "trick") return false;
 				return player.canUse({ name: info[2] }, target, false);
@@ -1450,7 +1450,7 @@ const skills = {
 					});
 				},
 				async cost(event, trigger, player) {
-					let { result } = await player
+					let result = await player
 						.chooseTarget([1, 3], (_, player, target) => {
 							return (
 								target != player &&
@@ -2002,7 +2002,7 @@ const skills = {
 			let list = [player].concat(targets).filter(target => target.countDiscardableCards(target, "h"));
 			if (list.length) {
 				let discards = [];
-				const { result } = await player
+				const result = await player
 					.chooseCardOL(
 						list,
 						"败族：请弃置一张手牌",
@@ -2404,7 +2404,7 @@ const skills = {
 		frequent: true,
 		async content(event, trigger, player) {
 			const cards = lib.skill.twdengjian.getCards(player, trigger.player);
-			/*const {result:{bool}}=await player.chooseToDiscard(get.prompt('twdengjian'),'he')
+			/*const {bool}=await player.chooseToDiscard(get.prompt('twdengjian'),'he')
 			.set('prompt2','弃置一张牌并随机获得本回合所有造成伤害的牌对应的实体牌的其中一张与你本轮以此法获得的牌的颜色均不同的【杀】')
 			.set('ai',card=>7-get.value(card))
 			.set('logSkill','twdengjian');
