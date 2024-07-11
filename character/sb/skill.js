@@ -45,17 +45,18 @@ const skills = {
 						});
 						return infos.map(info => info[0]);
 					})()
-				);
+				)
+				.forResult();
 		},
 		locked: false,
 		async content(event, trigger, player) {
 			const { cards } = event;
 			await player.discard(cards);
-			await game.delayx();
+			await game.asyncDelayx();
 			player.addTempSkill("sbgongqi_effect", "phaseChange");
 			player.markAuto("sbgongqi_effect", [get.color(cards[0], player)]);
 			player.line(game.filterPlayer());
-			await game.delayx();
+			await game.asyncDelayx();
 		},
 		updateBlocker(player) {
 			const list = [],
@@ -158,7 +159,7 @@ const skills = {
 				return;
 			}
 			const controls = ["选项一", "选项二", "背水！"];
-			const { control } = await target
+			const control = await target
 				.chooseControl(controls)
 				.set("choiceList", [`令所有攻击范围内含有你的角色依次弃置一张牌（${get.translation(targets)}）`, `你摸等同于攻击范围内含有你的角色数的牌（${get.cnNumber(count)}张牌）`, `背水！令${get.translation(player)}的〖解烦〗失效直到其杀死一名角色，然后你依次执行上述所有选项`])
 				.set("ai", () => {
@@ -191,7 +192,8 @@ const skills = {
 						if (eff1 > 3 * eff2) return "选项一";
 						return "选项二";
 					})()
-				);
+				)
+				.forResultControl();
 			game.log(target, "选择了", "#g" + control);
 			if (control === "背水！") {
 				player.tempBanSkill("sbjiefan", { source: "die" });
@@ -264,7 +266,8 @@ const skills = {
 								return 0;
 							return Math.ceil(len / 2) - 1;
 						})()
-					);
+					)
+					.forResult();
 				if (result.control === "cancel2") return;
 				const num = result.index + 1;
 				result2 = await player
@@ -290,7 +293,8 @@ const skills = {
 						const player = get.player();
 						if (player.getHp() > 2 || player.countCards("hsx", ["shan", "caochuan"]) >= 3) return 0;
 						return 1;
-					});
+					})
+					.forResult();
 				if (result2.control !== "返回") break;
 			}
 			if (_status.connectMode) {
@@ -424,7 +428,8 @@ const skills = {
 						if (player.countMark("charge") >= 2 && eff >= 0) return "弃牌";
 						return "蓄力";
 					})()
-				);
+				)
+				.forResult();
 			if (result.control !== "cancel2") {
 				event.result = {
 					bool: true,
@@ -508,7 +513,7 @@ const skills = {
 					const target = trigger.target,
 						card = trigger.card;
 					const next = player.chooseToCompare(target);
-					let result = await next;
+					let result = await next.forResult();
 					if (result.bool) {
 						target.addTempSkill("qinggang2");
 						target.storage.qinggang2.add(card);
@@ -526,7 +531,7 @@ const skills = {
 						}
 						if (player.storage.sbxianzhen_damaged <= 2) {
 							await target.damage();
-							await game.delayx();
+							await game.asyncDelayx();
 						}
 					}
 					const toGain = [];
@@ -766,7 +771,8 @@ const skills = {
 								.set("ai", button => {
 									if (ui.selected.buttons.length) return 0;
 									return get.value(button.link, get.player());
-								});
+								})
+								.forResult();
 						} else if (expansions.length === 1) result = { bool: true, links: expansions.slice(0) };
 						else return;
 						if (!result.bool) return;
@@ -779,7 +785,8 @@ const skills = {
 								else if (att > 0) return Math.max(0.1, att / Math.sqrt(1 + target.countCards("h") + (get.event().getParent().given_map[target.playerid] || 0)));
 								else return Math.max(0.01, (100 + att) / 200);
 							})
-							.set("toEnemy", get.value(toGive[0], player, "raw") < 0);
+							.set("toEnemy", get.value(toGive[0], player, "raw") < 0)
+							.forResult();
 						if (result.bool) {
 							expansions.removeArray(toGive);
 							if (result.targets.length) {
@@ -856,7 +863,7 @@ const skills = {
 					gaintag: ["sbquhu"],
 				})
 				.setContent(lib.skill.sbquhu.addToExpansionMultiple);
-			await game.delay(1.5);
+			await game.asyncDelay(1.5);
 			const isMin = minLength > myCards.length;
 			const sortedList = lose_list
 				.filter(list => list[0] != player)
@@ -881,7 +888,7 @@ const skills = {
 			});
 			if (isMin) {
 				await mostPlayer.gain(myCards, "give", player);
-				await game.delay();
+				await game.asyncDelay();
 				const gain_list = lose_list.filter(list => list[0] != player);
 				game.loseAsync({
 					gain_list,
@@ -890,9 +897,9 @@ const skills = {
 			} else {
 				mostPlayer.line(secondPlayer, "thunder");
 				await secondPlayer.damage(mostPlayer);
-				await game.delay();
+				await game.asyncDelay();
 				await mostPlayer.gain(myCards, "give", player);
-				await game.delay();
+				await game.asyncDelay();
 				await game
 					.loseAsync({
 						lose_list: sortedList,
@@ -908,7 +915,7 @@ const skills = {
 							next.set("getlx", false);
 						}
 					});
-				await game.delayx();
+				await game.asyncDelayx();
 			}
 		},
 		addToExpansionMultiple() {
@@ -1178,7 +1185,8 @@ const skills = {
 					}
 					return att / 3;
 				})
-				.set("nope", player.getHp() + player.countCards("hs", card => player.canSaveCard(card, player)) <= 1 && num > 2);
+				.set("nope", player.getHp() + player.countCards("hs", card => player.canSaveCard(card, player)) <= 1 && num > 2)
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0];
@@ -1446,7 +1454,8 @@ const skills = {
 													return sum + get.rank(target[name], true);
 												}, 0);
 											})
-											.set("deadTarget", true);
+											.set("deadTarget", true)
+											.forResult();
 										if (result.bool) {
 											const target2 = result.targets[0];
 											player.line(target2);
@@ -4774,7 +4783,8 @@ const skills = {
 						return -att * get.threaten(target, player);
 					}
 					return curs.reduce((max, i) => Math.max(max, get.effect(i, new lib.element.VCard({ name: "sha" }), target, player)), -1);
-				});
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			let targets = event.targets;
@@ -4790,7 +4800,8 @@ const skills = {
 					.set("ai", () => {
 						return _status.event.choice;
 					})
-					.set("choice", get.effect(targets[1], { name: "sha" }, targets[0], targets[0]) > get.effect(targets[0], { name: "lebu" }, targets[0], targets[0]) ? 0 : 1);
+					.set("choice", get.effect(targets[1], { name: "sha" }, targets[0], targets[0]) > get.effect(targets[0], { name: "lebu" }, targets[0], targets[0]) ? 0 : 1)
+					.forResult();
 			if (result.index == 0) {
 				targets[0].useCard({ name: "sha", isCard: true }, targets[1], false);
 			} else {
@@ -7771,7 +7782,7 @@ const skills = {
 				const num = Math.min(5, player.getStorage("sbqianxun").length);
 				const result = await player.chooseCard(get.prompt(event.name), "将至多" + get.cnNumber(num) + "张牌置于武将牌上", "he", [1, num]).set("ai", function (card) {
 					return 4 - get.value(card);
-				});
+				}).forResult();
 				if (result.bool) {
 					player.addToExpansion(result.cards, "giveAuto", player).gaintag.add("sbqianxun_gain");
 					player.addSkill("sbqianxun_gain");
@@ -7803,7 +7814,7 @@ const skills = {
 					}).set("filterButton", function (button) {
 						const card = { name: button.link[2], isCard: true };
 						return player.hasUseTarget(card);
-					});
+					}).forResult();
 					event.result = {
 						bool: result.bool,
 						cost_data: result.bool ? result.links[0][2] : [],

@@ -55,7 +55,8 @@ const skills = {
 							)
 						: 0;
 					return 5 + 2 * get.sgn(playerEffect - targetEffect) - get.value(card);
-				});
+				})
+				.forResult();
 			await targets[0].swapHandcards(targets[1], result[0].cards, result[1].cards);
 			if (result[0].cards.length == result[1].cards.length) {
 				await player.draw(2);
@@ -100,7 +101,8 @@ const skills = {
 					let suits = get.event("controls").slice();
 					suits.sort((a, b) => player.countCards("h", { suit: a }) - player.countCards("h", { suit: b }));
 					return suits[0];
-				});
+				})
+				.forResult();
 			if (result.control) {
 				const suit = result.control,
 					cards = player.getCards("h", { suit: suit });
@@ -114,7 +116,8 @@ const skills = {
 							.set("list", [["牌堆底", cards]])
 							.set("processAI", list => {
 								return [list[0][1].slice(0)];
-							});
+							})
+							.forResult();
 					}
 					if (resultx.bool) {
 						const moved = resultx.moved[0];
@@ -181,7 +184,8 @@ const skills = {
 				const result = await player
 					.chooseCardOL(targets, "he", true, 2, "齐眉：请弃置两张牌", (card, player, target) => {
 						return lib.filter.cardDiscardable(card, player);
-					});
+					})
+					.forResult();
 				if (result.length == 1) targets[0].discard(result[0].cards);
 				else {
 					await game
@@ -192,7 +196,7 @@ const skills = {
 							],
 						})
 						.setContent("discardMultiple");
-					await game.delayx();
+					await game.asyncDelayx();
 				}
 				let cards = result.reduce((list, evt) => {
 					list.addArray(evt.cards);
@@ -205,7 +209,7 @@ const skills = {
 							const card = cards.shift();
 							if (player.hasUseTarget(card)) {
 								player.$gain2(card, false);
-								await game.delayx();
+								await game.asyncDelayx();
 								await player.chooseUseTarget(true, card, false);
 							}
 						}
@@ -276,7 +280,8 @@ const skills = {
 							.reduce((sum, i) => sum + target.countEmptySlot(i), 0)
 					);
 				})
-				.set("forceDie", true);
+				.set("forceDie", true)
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0];
@@ -290,7 +295,7 @@ const skills = {
 					if (card) {
 						cards.push(card);
 						target.$gain2(card, false);
-						await game.delayx();
+						await game.asyncDelayx();
 						await target.chooseUseTarget(card, true, "nopopup");
 					} else break;
 				}
@@ -356,7 +361,8 @@ const skills = {
 				.set("filterButton", button => {
 					const card = button.link;
 					return !get.tag(card, "damage") && player.canRecast(card);
-				});
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			await player.recast(event.cards);
@@ -393,7 +399,8 @@ const skills = {
 					})
 					.set("forced", !list.length)
 					.set("list", list)
-					.set("cards", cards);
+					.set("cards", cards)
+					.forResult();
 				if (result.bool) {
 					list.push([result.targets[0], result.cards[0]]);
 					player.addGaintag(result.cards, "olsujian_given");
@@ -3433,14 +3440,15 @@ const skills = {
 				await source.discard(source.getCards("e"));
 				await source.loseHp();
 			}
-			const { targets } = await player
+			const targets = await player
 				.chooseTarget("【绝响】：是否令一名其他角色获得技能〖残韵〗？", lib.filter.notMe)
 				.set("ai", target => {
 					var att = get.attitude(get.player(), target);
 					if (target.countCards("ej", { suit: "club" })) att = att * 2;
 					return 10 + att;
 				})
-				.set("forceDie", true);
+				.set("forceDie", true)
+				.forResultTargets();
 			if (!targets || !targets.length) return;
 			const target = targets[0];
 			player.line(target, "thunder");
@@ -8716,7 +8724,7 @@ const skills = {
 							player.$throw(cardx, 1000, "nobroadcast");
 						}, target);
 						if (player == game.me) {
-							await game.delay(0.5);
+							await game.asyncDelay(0.5);
 						}
 					}
 				};

@@ -960,7 +960,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return 1 / (get.value(card) || 0.5);
 						})
 						.set("logSkill", ["fakexiaoguo", trigger.player])
-						.setHiddenSkill("fakexiaoguo");
+						.setHiddenSkill("fakexiaoguo")
+						.forResult();
 				},
 				popup: false,
 				preHidden: true,
@@ -3453,7 +3454,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							.set("ai", (target) => {
 								const player = get.event("player");
 								return get.attitude(player, target);
-							});
+							})
+							.forResult();
 				},
 				preHidden: true,
 				async content(event, trigger, player) {
@@ -3631,7 +3633,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							if (target == player) return 2;
 							if (get.attitude(player, target) <= 0) return 1;
 							return 0.5;
-						});
+						})
+						.forResult();
 				},
 				async content(event, trigger, player) {
 					const target = event.targets[0];
@@ -4208,7 +4211,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return get.effect(target, { name: "guohe_copy" }, player, player);
 						})
 						.set("complexSelect", true)
-						.set("complexTarget", true);
+						.set("complexTarget", true)
+						.forResult();
 				},
 				popup: false,
 				async content(event, trigger, player) {
@@ -4834,7 +4838,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									return 1 / (get.value(card) || 0.5);
 								})
 								.set("logSkill", ["fakexijue_xiaoguo", trigger.player])
-								.setHiddenSkill("fakexijue_xiaoguo");
+								.setHiddenSkill("fakexijue_xiaoguo")
+								.forResult();
 						},
 						preHidden: true,
 						popup: false,
@@ -5007,7 +5012,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									})
 									.reduce((sum, card) => sum + get.value(card, target), 0)
 							);
-						});
+						})
+						.forResult();
 				},
 				async content(event, trigger, player) {
 					const target = event.targets[0];
@@ -5083,7 +5089,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							})()
 						)
 						.setHiddenSkill("fakeciwei")
-						.set("logSkill", ["fakeciwei", trigger.player]);
+						.set("logSkill", ["fakeciwei", trigger.player])
+						.forResult();
 				},
 				preHidden: true,
 				popup: false,
@@ -5169,7 +5176,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							const num = target.countCards("h");
 							if (num > target.hp) return -att * (num - target.getHp());
 							return att * Math.max(0, target.getHp() - target.countCards("h"));
-						});
+						})
+						.forResult();
 				},
 				preHidden: true,
 				content() {
@@ -5341,7 +5349,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								-get.sgn(get.attitude(player, target)) *
 								get.info("fakeyanxi").ai.result.target(player, target)
 							);
-						});
+						})
+						.forResult();
 				},
 				async content(event, trigger, player) {
 					const target = event.targets[0];
@@ -5439,7 +5448,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								(trigger.targets.includes(target) ? -1 : 1)
 							);
 						})
-						.setHiddenSkill("fakecanmou");
+						.setHiddenSkill("fakecanmou")
+						.forResult();
 				},
 				preHidden: true,
 				async content(event, trigger, player) {
@@ -5718,7 +5728,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						get.color(trigger.getParent(2).card) == get.color(trigger.cards[0])
 					).toString();
 					if (color == "false") {
-						//event.result=await player.chooseBool(get.prompt('fakecaiwang'),'摸一张牌');
+						//event.result=await player.chooseBool(get.prompt('fakecaiwang'),'摸一张牌').forResult();
 						event.result = { bool: true };
 					} else {
 						event.result = await player
@@ -5732,7 +5742,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							.set("ai", (target) => {
 								const player = get.event("player");
 								return get.effect(target, { name: "guohe_copy2" }, player, player);
-							});
+							})
+							.forResult();
 					}
 				},
 				async content(event, trigger, player) {
@@ -6093,7 +6104,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								return get.attitude(_status.event.player, target) - 3;
 							},
 						})
-						.set("hiddenSkill", "fakehuyuan");
+						.set("hiddenSkill", "fakehuyuan")
+						.forResult();
 				},
 				preHidden: true,
 				async content(event, trigger, player) {
@@ -6138,7 +6150,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 									const player = get.event("player");
 									return get.effect(target, { name: "guohe" }, player, player);
 								})
-								.set("hiddenSkill", "fakehuyuan");
+								.set("hiddenSkill", "fakehuyuan")
+								.forResult();
 						},
 						popup: false,
 						async content(event, trigger, player) {
@@ -6192,7 +6205,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							"check",
 							player.countCards("h", { color: "red" }) > 1 ||
 								player.countCards("h", { color: "black" }) > 1
-						);
+						)
+						.forResult();
 				},
 				popup: false,
 				async content(event, trigger, player) {
@@ -6225,7 +6239,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							const result = await player
 								.judge((card) => {
 									return get.color(card) == "red" ? 1 : 0;
-								});
+								})
+								.forResult();
 							if (result.judge > 0) await player.draw();
 						},
 					},

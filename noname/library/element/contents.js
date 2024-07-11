@@ -242,10 +242,10 @@ export const Contents = {
 					if (!player.noPhaseDelay) {
 						// @ts-ignore
 						if (player == game.me) {
-							await game.delay();
+							await game.asyncDelay();
 							// game.delay();
 						} else {
-							await game.delayx();
+							await game.asyncDelayx();
 							// game.delayx();
 						}
 					}

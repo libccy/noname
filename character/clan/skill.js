@@ -142,7 +142,8 @@ const skills = {
 						.set("ai", target => {
 							const player = get.event("player");
 							return get.effect(target, { name: "draw" }, player, player);
-						});
+						})
+						.forResult();
 				},
 				popup: false,
 				content() {
@@ -171,7 +172,8 @@ const skills = {
 					const player = get.event("player");
 					const num = Math.max(...target.getCards("h").map(card => get.cardNameLength(card)));
 					return num + 0.0001 * get.attitude(player, target);
-				});
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0];
@@ -201,7 +203,8 @@ const skills = {
 						const cards1 = list[0][1].slice().sort((a, b) => get.value(a, "raw") * sgn - get.value(b, "raw") * sgn);
 						const cards2 = list[1][1].slice().sort((a, b) => get.value(b, "raw") * sgn - get.value(a, "raw") * sgn);
 						return [cards1.slice().addArray(cards2.slice(0, num)), cards2.slice().addArray(cards1.slice(0, num))];
-					});
+					})
+					.forResult();
 				if (result.bool) {
 					const lose = result.moved[1].slice();
 					const gain = result.moved[0].slice().filter(i => !get.owner(i));
@@ -261,12 +264,13 @@ const skills = {
 				.set("delNum", delNum)
 				.set("ai", target => {
 					return get.damageEffect(target, get.player(), get.player());
-				});
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0];
 			await target.damage();
-			await game.delayx();
+			await game.asyncDelayx();
 		},
 		mod: {
 			aiOrder(player, card, num) {
@@ -332,11 +336,12 @@ const skills = {
 			const evt = event.getParent(2);
 			const names = lib.inpile.filter(name => get.type(name) == "basic" && !player.getStorage("clanshengmo").includes(name)),
 				cards = evt.clanshengmo_cards;
-			const { links } = await player
+			const links = await player
 				.chooseButton(["剩墨：获得其中一张牌", cards], true)
 				.set("ai", button => {
 					return get.value(button.link);
-				});
+				})
+				.forResultLinks();
 			if (!links || !links.length) return;
 			const list = [];
 			for (const name of names) {
@@ -354,11 +359,12 @@ const skills = {
 				}
 			}
 			if (!list.length) return;
-			const { links2 } = await player
+			const links2 = await player
 				.chooseButton(["视为使用一张未以此法使用过的基本牌", [list, "vcard"]], true)
 				.set("ai", button => {
 					return get.player().getUseValue(button.link) + 1;
-				});
+				})
+				.forResultLinks();
 			const name = links2[0][2],
 				nature = links2[0][3];
 			game.broadcastAll(
@@ -474,7 +480,7 @@ const skills = {
 				if (bool) {
 					const card = links[0];
 					player.$gain2(card, false);
-					await game.delayx();
+					await game.asyncDelayx();
 					await player.chooseUseTarget(true, card, false);
 				}
 			}
@@ -1146,7 +1152,8 @@ const skills = {
 					return 0;
 				})
 				.set("num", num)
-				.set("logSkill", "clanxieshu");
+				.set("logSkill", "clanxieshu")
+				.forResult();
 		},
 		popup: false,
 		*content(event, map) {
@@ -2374,7 +2381,8 @@ const skills = {
 						return Math.random() - 0.7;
 					}
 					return get.type(ts[0]) != "basic";
-				});
+				})
+				.forResult();
 		},
 		content() {
 			"step 0";

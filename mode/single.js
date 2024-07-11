@@ -2046,7 +2046,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 					if (withme) {
-						let result = await next;
+						let result = await next.forResult();
 						if (_status.connectMode) {
 							game.me.unwait(result, game.me);
 						} else {
@@ -2116,7 +2116,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						_status.wuxianhuoliProgress,
 						_status.wuxianhuoliLevel
 					);
-					await game.delay();
+					await game.asyncDelay();
 				},
 				getSkills(num = 6) {
 					let allList = _status.characterlist.slice(0);
@@ -2197,7 +2197,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							)
 							.set("displayIndex", false)
 							.set("prompt", "选择获得一个技能");
-						result = await next;
+						result = await next.forResult();
 						if (!result.refresh) break;
 						refreshed = true;
 					}

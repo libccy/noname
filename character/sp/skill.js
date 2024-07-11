@@ -193,7 +193,7 @@ const skills = {
 								const next = lib.skill.olhunjiang.chooseControl(current, player, eventId);
 								const solver = solve(resolve, reject);
 								if (_status.connectMode) game.me.wait(solver);
-								const result = await next;
+								const result = await next.forResult();
 								if (_status.connectMode) game.me.unwait(result, current);
 								else solver(result, current);
 							}
@@ -204,7 +204,7 @@ const skills = {
 			}
 			if (locals.length > 0) {
 				for (const current of locals) {
-					const result = await lib.skill.olhunjiang.chooseControl(current, player);
+					const result = await lib.skill.olhunjiang.chooseControl(current, player).forResult();
 					if (result && typeof result.index == "number") {
 						answer_result[result.index].push(current);
 					}
@@ -217,7 +217,7 @@ const skills = {
 				i.popup(answer_result[0].includes(i) ? "成为目标" : "令其摸牌");
 				game.log(i, "选择了", "#y" + (answer_result[0].includes(i) ? "成为目标" : "令其摸牌"));
 			}
-			await game.delay();
+			await game.asyncDelay();
 			if (answer_result[0].length) {
 				answer_result[0].sortBySeat();
 				player.addTempSkill("olhunjiang_addTarget");
@@ -285,7 +285,8 @@ const skills = {
 							const player = get.event("player"),
 								event = get.event().getTrigger();
 							return get.effect(target, event.card, player);
-						});
+						})
+						.forResult();
 				},
 				async content(event, trigger, player) {
 					trigger.targets.addArray(event.targets);
@@ -461,7 +462,8 @@ const skills = {
 								const player = get.event("player"),
 									card = button.link;
 								return player.getUseValue({ name: card.name, isCard: true }, true);
-							});
+							})
+							.forResult();
 						if (result.bool) {
 							const card = result.links[0];
 							game.broadcastAll(function (card) {
@@ -506,7 +508,8 @@ const skills = {
 								return 0;
 							}
 							return 1 / (get.useful(button.link) || 0.5);
-						});
+						})
+						.forResult();
 					if (result.bool) {
 						const cardx = result.links;
 						await player.loseToDiscardpile(cardx);
@@ -522,7 +525,8 @@ const skills = {
 									const player = get.event("player"),
 										card = button.link;
 									return player.getUseValue({ name: card.name, isCard: true }, true);
-								});
+								})
+								.forResult();
 							if (result2.bool) {
 								const card = result2.links[0];
 								game.broadcastAll(function (card) {
@@ -610,7 +614,7 @@ const skills = {
 				videoId,
 				player
 			);
-			await game.delay(3);
+			await game.asyncDelay(3);
 			game.broadcastAll("closeDialog", videoId);
 			const cards_cardPile = Array.from(ui.cardPile.childNodes).filter(i => i.name == "sha" && get.nature(i, false));
 			const cards_discardPile = Array.from(ui.discardPile.childNodes).filter(i => i.name == "sha" && get.nature(i, false));
@@ -650,7 +654,8 @@ const skills = {
 				.set("processAI", list => {
 					return list.map(i => i[1]);
 				})
-				.set("cards", cards);
+				.set("cards", cards)
+				.forResult();
 			if (result.bool) {
 				const cardsx = result.moved[0];
 				for (let i = 0; i < cardsx.length; i++) {
@@ -699,7 +704,8 @@ const skills = {
 						return -get.effect(target, { name: "tiesuo" }, player, player);
 					}
 					return get.effect(target, { name: "tiesuo" }, player, player);
-				});
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			for (const i of event.targets) {
@@ -884,7 +890,8 @@ const skills = {
 				.set("ai", () => {
 					var evt = _status.event.getTrigger();
 					return lib.skill.olqingya.aiJudge(evt.player, evt.target, true);
-				});
+				})
+				.forResult();
 			if (result.control !== "cancel2") {
 				event.result = {
 					bool: true,
@@ -916,7 +923,7 @@ const skills = {
 				player.line(current);
 				await player.discardPlayerCard(current, true);
 			}
-			await game.delayx();
+			await game.asyncDelayx();
 			let evt = trigger;
 			while (true) {
 				if (!evt.name || lib.phaseName.includes(evt.name)) break;
@@ -1050,7 +1057,8 @@ const skills = {
 						return list;
 					}, []);
 					return Math[att > 0 ? "max" : "min"].apply(Math, effs);
-				});
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0];
@@ -1078,7 +1086,8 @@ const skills = {
 						};
 						return controls.sort((a, b) => getSum(b, player, source) - getSum(a, player, source))[0];
 					})
-					.set("prompt2", get.translation(player) + "将对你依次使用由其手牌中所有此颜色的牌转化的【决斗】");
+					.set("prompt2", get.translation(player) + "将对你依次使用由其手牌中所有此颜色的牌转化的【决斗】")
+					.forResult();
 				const color = result.control;
 				game.broadcastAll(
 					(color, target) => {
@@ -1916,7 +1925,8 @@ const skills = {
 						.set("ai", target => {
 							const player = get.event("player");
 							return get.effect(target, new lib.element.VCard({ name: "shunshou_copy2" }), player, player);
-						});
+						})
+						.forResult();
 				if (result.bool) {
 					const target = result.targets[0];
 					player.line(target);
@@ -2436,7 +2446,8 @@ const skills = {
 						if (player.countCards("he", cardx => player.canSaveCard(cardx, player)) > 0) return att;
 						return 0;
 					},
-				});
+				})
+				.forResult();
 		},
 		limited: true,
 		skillAnimation: true,
@@ -2653,7 +2664,8 @@ const skills = {
 					if (target.hasJudge("lebu")) att /= 2;
 					if (target.hasSkillTag("nogain")) att /= 10;
 					return att / (1 + get.distance(player, target, "absolute"));
-				});
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			const cards = player
@@ -2672,7 +2684,8 @@ const skills = {
 				.set("ai", button => {
 					return get.value(button.link, get.event("target"));
 				})
-				.set("target", target);
+				.set("target", target)
+				.forResult();
 			if (result.bool) {
 				const color = get.color(result.links[0], false);
 				await target.gain(result.links, "gain2").set("gaintag", ["resilv"]);
@@ -6646,7 +6659,8 @@ const skills = {
 					})
 					.set("judge2", result => {
 						return result.bool === false ? true : false;
-					});
+					})
+					.forResult();
 			if (result.bool) await target.draw(2);
 			else {
 				const card = new lib.element.VCard({ name: "sha", nature: "thunder" });
@@ -13464,7 +13478,8 @@ const skills = {
 								return sum;
 							}, 0))
 					);
-				});
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0],
@@ -21811,7 +21826,8 @@ const skills = {
 					}
 					return att;
 				})
-				.set("goon", !player.hasUnknown());
+				.set("goon", !player.hasUnknown())
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			player.awakenSkill("yongdi");

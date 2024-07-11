@@ -144,7 +144,8 @@ const skills = {
 					if (target.hasSkillTag("noh")) att /= 3;
 					return -att / Math.sqrt(target.countCards("h"));
 				})
-				.set("goon", goon);
+				.set("goon", goon)
+				.forResult();
 		},
 		content() {
 			"step 0";
@@ -481,7 +482,7 @@ const skills = {
 				if (suit == _status.event.suit) base += _status.event.val2;
 				return base - get.value(card);
 			});
-			event.result = await next;
+			event.result = await next.forResult();
 		},
 		content() {
 			"step 0";

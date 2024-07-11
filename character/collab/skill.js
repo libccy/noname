@@ -105,7 +105,7 @@ const skills = {
 						return get.skillRank(b, "in") - get.skillRank(a, "in");
 					})[0]
 				);
-				const { links } = await next;
+				const links = await next.forResultLinks();
 				event.result = {
 					bool: true,
 					cost_data: links,
@@ -196,13 +196,15 @@ const skills = {
 			for (let i of last) skills2.push(get.character(i, 3).randomGet());
 			const result1 = await player
 				.chooseControl(skills1)
-				.set("dialog", ["无名：请选择姓氏", [first, "character"]]);
+				.set("dialog", ["无名：请选择姓氏", [first, "character"]])
+				.forResult();
 			const gains = [];
 			let surname = first[skills1.indexOf(result1.control)];
 			gains.add(result1.control);
 			const result2 = await player
 				.chooseControl(skills2)
-				.set("dialog", ["无名：请选择名字", [last, "character"]]);
+				.set("dialog", ["无名：请选择名字", [last, "character"]])
+				.forResult();
 			let name = last[skills2.indexOf(result2.control)];
 			gains.add(result2.control);
 			let newname = get.characterSurname(surname).randomGet()[0] + get.characterSurname(name).randomGet()[1];
@@ -251,7 +253,8 @@ const skills = {
 				.set("ai", button => {
 					if (!get.cardPile2(button.link[2])) return 0;
 					return get.value({ name: button.link[2] }, get.event("player"));
-				});
+				})
+				.forResult();
 			if (result.bool) {
 				result.cost_data = result.links;
 			}
@@ -315,7 +318,8 @@ const skills = {
 								return sum + get.rank(target[name], true);
 							}, 0)
 						);
-					});
+					})
+					.forResult();
 				if (result.bool) {
 					zhangzhang = true;
 					const target = result.targets[0];
@@ -348,7 +352,8 @@ const skills = {
 							}, 0)
 						);
 					})
-					.set("targets", targets);
+					.set("targets", targets)
+					.forResult();
 				if (result.bool) {
 					zhouyu = true;
 					const target = result.targets[0];
@@ -487,7 +492,7 @@ const skills = {
 								const next = lib.skill.dclisao.chooseControl(question, current, eventId);
 								const solver = solve(resolve, reject);
 								if (_status.connectMode) game.me.wait(solver);
-								const result = await next;
+								const result = await next.forResult();
 								if (_status.connectMode && !answer_ok) game.me.unwait(result, current);
 								else solver(result, current);
 							}
@@ -499,7 +504,7 @@ const skills = {
 			//再处理单机的他人控制玩家/AI玩家
 			if (!answer_ok && locals.length > 0) {
 				for (const current of locals) {
-					const result = await lib.skill.dclisao.chooseControl(question, current);
+					const result = await lib.skill.dclisao.chooseControl(question, current).forResult();
 					if (result && result.control) {
 						answered.remove(current);
 						if (result.control == sentences[0].split("，")[1 - goon]) {
@@ -524,7 +529,7 @@ const skills = {
 					game.log(i, "未进行回答");
 				}
 			}
-			await game.delay();
+			await game.asyncDelay();
 			//处理结果
 			if (answer_ok && answer_ok.countCards("h")) await answer_ok.showHandcards();
 			if (gaifa.length) {
@@ -532,7 +537,7 @@ const skills = {
 					i.addTempSkill("dclisao_gaifa");
 					i.markAuto("dclisao_gaifa", [player]);
 				}
-				await game.delay();
+				await game.asyncDelay();
 			}
 		},
 		chooseControl(question, current, eventId) {
@@ -1170,7 +1175,8 @@ const skills = {
 							return 0.5;
 						}
 						return 0;
-					});
+					})
+					.forResult();
 				if (result && result.bool && result.links[0]) {
 					var card = {
 						name: result.links[0][2],
@@ -1326,7 +1332,8 @@ const skills = {
 			var skills = characters.map(i => lib.skill.dcbianzhuang.characterMap[i]);
 			const result = await player
 				.chooseControl(skills)
-				.set("dialog", ["选择获得一个技能并“变装”", [characters, "character"]]);
+				.set("dialog", ["选择获得一个技能并“变装”", [characters, "character"]])
+				.forResult();
 			var skill = result.control;
 			await player.addTempSkills(skill, "dcbianzhuangAfter");
 			for (var i in lib.skill.dcbianzhuang.characterMap) {
@@ -1337,7 +1344,7 @@ const skills = {
 					break;
 				}
 			}
-			const result2 = await player.chooseUseTarget("sha", true, false, "nodistance");
+			const result2 = await player.chooseUseTarget("sha", true, false, "nodistance").forResult();
 			if (result2.bool && !player.storage.dcbianzhuang_inited) {
 				player.addMark("dcbianzhuang", 1, false);
 				if (player.countMark("dcbianzhuang") > 2) {
@@ -1412,11 +1419,12 @@ const skills = {
 				.set("ai", function (card) {
 					var player = _status.event.player;
 					return 1 + Math.max(0, player.getUseValue(card, null, true));
-				});
+				})
+				.forResult();
 			if (result.bool) {
 				await player.logSkill("dctongliao");
 				player.addGaintag(result.cards, "dctongliao");
-				await game.delayx();
+				await game.asyncDelayx();
 			}
 		},
 		mod: {
@@ -1532,7 +1540,8 @@ const skills = {
 					if (!_status.event.check) return 0;
 					return get.effect(target, { name: "sha" }, _status.event.player);
 				})
-				.setHiddenSkill("clbjisu");
+				.setHiddenSkill("clbjisu")
+				.forResult();
 			if (result.bool) {
 				await player.useCard({ name: "sha", isCard: true }, result.targets[0], false, "clbjisu");
 				trigger.cancel();
@@ -1747,7 +1756,8 @@ const skills = {
 				.chooseButton(true, ["请选择执行一个天气", [list.map(i => [i, '<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【' + i + "】</div><div>" + lib.skill.dcsitian.weathers[i].description + "</div></div>"]), "textbutton"]])
 				.set("ai", function (button) {
 					return lib.skill.dcsitian.weathers[button.link].ai(_status.event.player);
-				});
+				})
+				.forResult();
 			if (result.bool) {
 				var choice = result.links[0];
 				game.log(player, "将当前天气变更为", "#g" + choice);
@@ -1819,7 +1829,7 @@ const skills = {
 					player.line(targets, "thunder");
 					for (const target of targets) {
 						if (!target.isIn()) continue;
-						const result = await target.judge(lib.card.shandian.judge, get.translation("shandian")).set("judge2", lib.card.shandian.judge2);
+						const result = await target.judge(lib.card.shandian.judge, get.translation("shandian")).set("judge2", lib.card.shandian.judge2).forResult();
 						var name = "shandian";
 						if (event.cancelled && !event.direct) {
 							if (lib.card[name].cancel) {
@@ -1866,7 +1876,7 @@ const skills = {
 								await player.discardPlayerCard(target, true, "e", num);
 							} else {
 								await target.loseHp();
-								await game.delayx();
+								await game.asyncDelayx();
 							}
 						}
 					}
@@ -1899,7 +1909,8 @@ const skills = {
 								return -Math.sqrt(att) * val;
 							}
 							return get.effect(current, { name: "losehp" }, player, player);
-						});
+						})
+						.forResult();
 					if (result.bool) {
 						var target = result.targets[0];
 						player.line(target, "green");
@@ -2179,9 +2190,10 @@ const skills = {
 						var player = _status.event.player;
 						return get.effect(target, _status.event.card, player, player);
 					})
-					.set("card", trigger.card);
+					.set("card", trigger.card)
+					.forResult();
 				if (result.bool) {
-					if (!event.isMine() && !event.isOnline()) await game.delayx();
+					if (!event.isMine() && !event.isOnline()) await game.asyncDelayx();
 					await player.logSkill("ruyijingubang_effect", result.targets);
 					trigger.targets.addArray(result.targets);
 				}
@@ -2312,7 +2324,8 @@ const skills = {
 					}
 					return att;
 				})
-				.set("du", card.name == "du");
+				.set("du", card.name == "du")
+				.forResult();
 			if (result.bool) {
 				var target = result.targets[0];
 				target.gain(card, "gain2");
@@ -2344,7 +2357,8 @@ const skills = {
 		async content(event, trigger, player) {
 			const result = await player
 				.chooseDrawRecover("###" + get.prompt("spcangni") + "###摸两张牌或回复1点体力，然后将武将牌翻面", 2)
-				.set("logSkill", "spcangni");
+				.set("logSkill", "spcangni")
+				.forResult();
 			if (result.control != "cancel2") await player.turnOver();
 		},
 		group: ["spcangni_gain", "spcangni_lose"],
@@ -2439,7 +2453,8 @@ const skills = {
 					if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
 					return lib.filter.targetEnabled.apply(this, arguments);
 				})
-				.set("sourcex", targets[1]);
+				.set("sourcex", targets[1])
+				.forResult();
 			if (!result.bool && targets[0].countCards("h")) await targets[1].gainPlayerCard(targets[0], "visible", "h", true);
 		},
 		ai: {
@@ -2491,7 +2506,8 @@ const skills = {
 						if (trigger.player.countCards("hs") < trigger.player.hp) return false;
 						return true;
 					})()
-				);
+				)
+				.forResult();
 			if (result.bool) {
 				var target = trigger.player;
 				player.logSkill("spfengyin", target);

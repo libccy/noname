@@ -1812,7 +1812,7 @@ const skills = {
 					let target;
 					if (hs_targets.length == 1) target = hs_targets[0];
 					else {
-						let { targets } = await player
+						let targets = await player
 							.chooseTarget(get.prompt("dddzhengjun"), "令其中一名角色摸一张牌或弃置一张牌", (card, player, target) => {
 								return get.event("targets").includes(target);
 							})
@@ -1820,7 +1820,8 @@ const skills = {
 								const player = get.event("player");
 								return Math.max(get.effect(target, { name: "guohe_copy2" }, target, player), get.effect(target, { name: "draw" }, player, player));
 							})
-							.set("targets", hs_targets);
+							.set("targets", hs_targets)
+							.forResultTargets();
 						if (targets && targets.length) target = targets[0];
 					}
 					if (target) {
@@ -1855,7 +1856,7 @@ const skills = {
 							.set("choice", () => player.canMoveCard(true, true, hs_targets[0]));
 						if (bool) target = hs_targets[0];
 					} else {
-						let { targets } = await player
+						let targets = await player
 							.chooseTarget(get.prompt("dddzhengjun"), "移动其中一名角色的一张装备牌", (card, player, target) => {
 								return get.event("targets").includes(target);
 							})
@@ -1863,7 +1864,8 @@ const skills = {
 								const player = get.event("player");
 								return player.canMoveCard(true, true, target) ? 1 + Math.random() : 0;
 							})
-							.set("targets", es_targets);
+							.set("targets", es_targets)
+							.forResultTargets();
 						if (targets && targets.length) target = targets[0];
 					}
 					if (target) {
