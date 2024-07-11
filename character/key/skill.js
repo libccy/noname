@@ -9507,7 +9507,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const target = event.targets[0];
 			player.awakenSkill("saya_powei");
-			game.delay(3);
+			await game.delay(3);
 			var next = game.createEvent("saya_powei_loop", false, trigger);
 			next.playertrue = player;
 			next.playerfalse = target;

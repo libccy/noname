@@ -1289,7 +1289,7 @@ const skills = {
 			trigger.player.judging[0] = chooseCardResultCards[0];
 			trigger.orderingCards.addArray(chooseCardResultCards);
 			game.log(trigger.player, "的判定牌改为", chooseCardResultCards[0]);
-			game.delay(2);
+			await game.delay(2);
 		},
 		ai: {
 			rejudge: true,
@@ -1417,7 +1417,7 @@ const skills = {
 		async content(event, trigger, player) {
 			player.gainMultiple(event.targets);
 			trigger.changeToZero();
-			game.delay();
+			await game.delay();
 		},
 		ai: {
 			threaten: 2,
@@ -2060,7 +2060,7 @@ const skills = {
 			});
 			player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
 			game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
-			game.delayx();
+			await game.delayx();
 		},
 		ai: {
 			threaten: 1.2,
@@ -2315,7 +2315,7 @@ const skills = {
 		},
 		delay: 0,
 		async content(event, trigger, player) {
-			if (!player.hasSkill("xinzhiheng_delay")) game.delayx();
+			if (!player.hasSkill("xinzhiheng_delay")) await game.delayx();
 			player.draw(event.cards.length);
 		},
 		group: "xinzhiheng_draw",
@@ -3102,7 +3102,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const useCardEvent = event.targets[1].useCard({ name: "juedou", isCard: true }, "nowuxie", event.targets[0], "noai");
 			useCardEvent.animate = false;
-			game.delay(0.5);
+			await game.delay(0.5);
 		},
 		ai: {
 			order: 8,

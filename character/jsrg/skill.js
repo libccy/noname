@@ -1568,7 +1568,7 @@ const skills = {
 			});
 			player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
 			game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
-			game.delayx();
+			await game.delayx();
 		},
 		subSkill: {
 			viewas: {
@@ -2091,7 +2091,7 @@ const skills = {
 				.set("logSkill", ["jsrglonglin", trigger.player]);
 			if (result.bool) {
 				trigger.excluded.addArray(trigger.targets);
-				game.delayx();
+				await game.delayx();
 				if (trigger.player.canUse(juedou, player)) {
 					const result = await trigger.player.chooseBool(`是否视为对${get.translation(player)}使用一张【决斗】？`).set("choice", get.effect(player, juedou, trigger.player, trigger.player) >= 0);
 					if (result.bool) {
@@ -2318,7 +2318,7 @@ const skills = {
 			});
 			player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
 			game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
-			game.delayx();
+			await game.delayx();
 		},
 	},
 	jsrgtuigu: {

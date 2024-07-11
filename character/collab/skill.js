@@ -1919,7 +1919,7 @@ const skills = {
 							player.discardPlayerCard(target, true, "h", num);
 						} else {
 							target.loseHp();
-							game.delayex();
+							await game.delayex();
 						}
 					}
 				},

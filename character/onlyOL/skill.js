@@ -1210,7 +1210,7 @@ const skills = {
 			if (get.owner(card)) get.owner(card).$give(card, player, false);
 			else {
 				player.$gain2(card, false);
-				game.delayx();
+				await game.delayx();
 			}
 			player.equip(card);
 		},
@@ -1310,7 +1310,7 @@ const skills = {
 					if (get.owner(card)) get.owner(card).$give(card, player, false);
 					else {
 						player.$gain2(card, false);
-						game.delayx();
+						await game.delayx();
 					}
 					player.equip(card);
 					break;
