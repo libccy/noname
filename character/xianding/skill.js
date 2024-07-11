@@ -75,7 +75,7 @@ const skills = {
 				card.fix();
 				ui.cardPile.appendChild(card);
 			}
-			await game.asyncDelayx();
+			await game.delayx();
 			if (target.countCards("he")) await target.chooseToDiscard(num, "he", true);
 		},
 	},
@@ -652,7 +652,7 @@ const skills = {
 							const card = result.links[0];
 							cards.remove(card);
 							player.$gain2(card, false);
-							await game.asyncDelayx();
+							await game.delayx();
 							await player.chooseUseTarget(true, card, false);
 						}
 					}
@@ -1235,7 +1235,7 @@ const skills = {
 			const { cards } = event;
 			if (cards && cards.length) await player.discard(cards);
 			else await player.draw(2);
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 	},
 	dcfenhui: {
@@ -1781,7 +1781,7 @@ const skills = {
 								await target.draw(num);
 								await target.recover();
 							}
-							if (!event.isMine() && !event.isOnline()) await game.asyncDelayx();
+							if (!event.isMine() && !event.isOnline()) await game.delayx();
 						}
 					},
 				};
@@ -1937,7 +1937,7 @@ const skills = {
 							if (card) await target.chooseUseTarget(card, true).set("nopopup", true);
 							else {
 								game.log("但是牌堆里没有", target, "的装备！");
-								await game.asyncDelayx();
+								await game.delayx();
 							}
 						}
 						if (target.countCards("h") < game.countPlayer()) return;
@@ -2040,7 +2040,7 @@ const skills = {
 				toGain.push(gainableCards[0]);
 			}
 			if (toGain.length) await player.gain(toGain, "giveAuto");
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 		ai: {
 			threaten: 5.8,
@@ -2407,7 +2407,7 @@ const skills = {
 					if (result.bool) {
 						respondedTargets.push(target);
 						if (!trigger.targets.includes(target)) nonnonTargetResponded = true;
-						await game.asyncDelay();
+						await game.delay();
 					} else if (trigger.targets.includes(target)) unrespondedTargets.push(target);
 				}
 			}
@@ -2726,7 +2726,7 @@ const skills = {
 			player.logSkill("dcanjing", targets);
 			for (const target of targets) await target.draw();
 			const minHp = targets.map(i => i.getHp()).sort((a, b) => a - b)[0];
-			await game.asyncDelayx();
+			await game.delayx();
 			for (const target of targets) {
 				if (!target.isIn()) continue;
 				if (target.getHp() === minHp) await target.recover();
@@ -2864,7 +2864,7 @@ const skills = {
 				const card = links[0];
 				cards.remove(card);
 				player.$gain2(card, false);
-				await game.asyncDelayx();
+				await game.delayx();
 				await player.chooseUseTarget(true, card, false);
 				cards = cards.filterInD();
 				if (cards.length) {
@@ -9058,7 +9058,7 @@ const skills = {
 					const card = new lib.element.VCard({ name });
 					if (player.canUse(card, target)) {
 						await player.useCard(card, target);
-						await game.asyncDelayx();
+						await game.delayx();
 						break;
 					}
 				}

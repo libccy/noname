@@ -231,7 +231,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const target = event.targets[0];
 			await game.asyncDraw([player, target].sortBySeat());
-			await game.asyncDelayx();
+			await game.delayx();
 			let num = player.getExpansions("olkongsheng").length;
 			let check = player => {
 				if (!player.isIn() || player.isHealthy()) return false;
@@ -332,7 +332,7 @@ const skills = {
 					const target = event.targets[0];
 					await player.discard(event.cards);
 					await target.chooseToDiscard("he", true);
-					await game.asyncDelayx();
+					await game.delayx();
 					const num = player.getExpansions("olkongsheng").length;
 					const check = player => {
 						if (!player.isIn() || player.isHealthy()) return false;
@@ -1673,7 +1673,7 @@ const skills = {
 					trigger.player.addTempSkill("nzry_juzhany");
 					player.changeZhuanhuanji("nzry_juzhan");
 					player.addTempSkill("nzry_juzhanx");
-					await game.asyncDelayx();
+					await game.delayx();
 				},
 			},
 			2: {
@@ -2812,7 +2812,7 @@ const skills = {
 			let current = target;
 			let num1 = 0;
 			let num2 = 0;
-			await game.asyncDelay();
+			await game.delay();
 			while (dialog.buttons.length) {
 				let card;
 				if (dialog.buttons.length > 1) {
@@ -2871,7 +2871,7 @@ const skills = {
 					num2++;
 					current = target;
 				}
-				await game.asyncDelay(2);
+				await game.delay(2);
 			}
 			if (!_status.connectMode) {
 				game.log(targets[0], "获得了" + get.cnNumber(num1) + "张牌");
@@ -3536,7 +3536,7 @@ const skills = {
 				player.line(result.targets, "green");
 				if (!result.targets.length) return;
 				await player.gainMultiple(result.targets);
-				await game.asyncDelay();
+				await game.delay();
 			}
 		},
 		ai: { threaten: 3 },
@@ -5320,7 +5320,7 @@ const skills = {
 					.forResultBool();
 				if (!bool) await current.loseHp();
 				current = current.next;
-			} while (!currented.includes(current) && !void (await game.asyncDelay(0.5)));
+			} while (!currented.includes(current) && !void (await game.delay(0.5)));
 		},
 		ai: {
 			order: 1,
@@ -7264,7 +7264,7 @@ const skills = {
 			trigger.player.judging[0] = event.cards[0];
 			trigger.orderingCards.addArray(event.cards);
 			game.log(trigger.player, "的判定牌改为", event.cards[0]);
-			await game.asyncDelay(2);
+			await game.delay(2);
 		},
 		ai: {
 			rejudge: true,
@@ -7636,12 +7636,12 @@ const skills = {
 					target.popup("不质疑", "wood");
 				}
 			}
-			await game.asyncDelayx();
+			await game.delayx();
 			game.broadcastAll(function (onEnd) {
 				_status.event.onEnd01 = onEnd;
 				if (_status.guhuoNode) _status.guhuoNode.listenTransition(onEnd, 300);
 			}, event.onEnd01);
-			await game.asyncDelay(2);
+			await game.delay(2);
 			if (!event.betrayer) return;
 			if (event.fake) {
 				event.betrayer.popup("质疑正确", "wood");
@@ -7653,7 +7653,7 @@ const skills = {
 				event.betrayer.popup("质疑错误", "fire");
 				await event.betrayer.addSkills("chanyuan");
 			}
-			await game.asyncDelay(2);
+			await game.delay(2);
 			if (event.fake) game.broadcastAll(() => ui.clear()); // game.broadcastAll(ui.clear); 原来的代码抽象喵
 		},
 	},

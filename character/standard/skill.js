@@ -694,7 +694,7 @@ const skills = {
 		locked: true,
 		async content(event, trigger, player) {
 			await game.asyncDraw(event.targets);
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 	},
 	//张翼
@@ -1161,7 +1161,7 @@ const skills = {
 						next.set("skillwarn", "替" + get.translation(player) + "打出一张闪");
 						next.autochoose = lib.filter.autoRespondShan;
 						next.set("source", player);
-						bool = (await next).result.bool;
+						bool = await next.forResultBool();
 					}
 				}
 				player.storage.hujiaing = false;
@@ -1289,7 +1289,7 @@ const skills = {
 			trigger.player.judging[0] = chooseCardResultCards[0];
 			trigger.orderingCards.addArray(chooseCardResultCards);
 			game.log(trigger.player, "的判定牌改为", chooseCardResultCards[0]);
-			game.asyncDelay(2);
+			game.delay(2);
 		},
 		ai: {
 			rejudge: true,
@@ -1417,7 +1417,7 @@ const skills = {
 		async content(event, trigger, player) {
 			player.gainMultiple(event.targets);
 			trigger.changeToZero();
-			game.asyncDelay();
+			game.delay();
 		},
 		ai: {
 			threaten: 2,
@@ -1594,7 +1594,7 @@ const skills = {
 				let bool;
 				if (judge > 0) {
 					event.cards.push(card);
-					bool = (await player.chooseBool("是否再次发动【洛神】？").set("frequentSkill", "luoshen")).result.bool;
+					bool = await player.chooseBool("是否再次发动【洛神】？").set("frequentSkill", "luoshen").forResultBool();
 				} else {
 					for (let i = 0; i < event.cards.length; i++) {
 						if (get.position(event.cards[i], true) != "o") {
@@ -1635,7 +1635,7 @@ const skills = {
 				let bool;
 				if (judge > 0) {
 					event.cards.push(card);
-					bool = lib.config.autoskilllist.includes("luoshen") ? (await player.chooseBool("是否再次发动【洛神】？")).result.bool : true;
+					bool = lib.config.autoskilllist.includes("luoshen") ? await player.chooseBool("是否再次发动【洛神】？").forResultBool() : true;
 				} else {
 					for (let i = 0; i < event.cards.length; i++) {
 						if (get.position(event.cards[i]) != "s") {
@@ -1870,7 +1870,7 @@ const skills = {
 					chooseToRespondEvent.set("skillwarn", "替" + get.translation(player) + "打出一张杀");
 					chooseToRespondEvent.noOrdering = true;
 					chooseToRespondEvent.autochoose = lib.filter.autoRespondSha;
-					const { bool, card, cards } = (await chooseToRespondEvent).result;
+					const { bool, card, cards } = await chooseToRespondEvent;
 					if (bool) {
 						trigger.card = card;
 						trigger.cards = cards;
@@ -2060,7 +2060,7 @@ const skills = {
 			});
 			player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
 			game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
-			game.asyncDelayx();
+			game.delayx();
 		},
 		ai: {
 			threaten: 1.2,
@@ -2315,7 +2315,7 @@ const skills = {
 		},
 		delay: 0,
 		async content(event, trigger, player) {
-			if (!player.hasSkill("xinzhiheng_delay")) game.asyncDelayx();
+			if (!player.hasSkill("xinzhiheng_delay")) game.delayx();
 			player.draw(event.cards.length);
 		},
 		group: "xinzhiheng_draw",
@@ -3102,7 +3102,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const useCardEvent = event.targets[1].useCard({ name: "juedou", isCard: true }, "nowuxie", event.targets[0], "noai");
 			useCardEvent.animate = false;
-			game.asyncDelay(0.5);
+			game.delay(0.5);
 		},
 		ai: {
 			order: 8,

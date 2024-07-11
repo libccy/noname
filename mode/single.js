@@ -2116,7 +2116,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						_status.wuxianhuoliProgress,
 						_status.wuxianhuoliLevel
 					);
-					await game.asyncDelay();
+					await game.delay();
 				},
 				getSkills(num = 6) {
 					let allList = _status.characterlist.slice(0);

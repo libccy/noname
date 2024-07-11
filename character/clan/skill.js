@@ -270,7 +270,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const target = event.targets[0];
 			await target.damage();
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 		mod: {
 			aiOrder(player, card, num) {
@@ -480,7 +480,7 @@ const skills = {
 				if (bool) {
 					const card = links[0];
 					player.$gain2(card, false);
-					await game.asyncDelayx();
+					await game.delayx();
 					await player.chooseUseTarget(true, card, false);
 				}
 			}

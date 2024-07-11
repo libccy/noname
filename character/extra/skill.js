@@ -450,7 +450,7 @@ const skills = {
 			if (!bool) {
 				target.chat("拒绝");
 				game.log(target, "拒绝获得技能", `#g【${get.translation(skillToGain)}】`);
-				await game.asyncDelay();
+				await game.delay();
 				return;
 			}
 			await target.addSkills(skillToGain);
@@ -917,7 +917,7 @@ const skills = {
 					}
 				});
 			}
-			await game.asyncDelay();
+			await game.delay();
 		},
 	},
 	//什么均贫卡
@@ -971,7 +971,7 @@ const skills = {
 					lose_list: lose_list,
 				})
 				.setContent("chooseToCompareLose");
-			await game.asyncDelay();
+			await game.delay();
 			cards = cards.filterInD();
 			const pcards = cards.randomGets(Math.ceil(cards.length / 2));
 			const tcards = cards.removeArray(pcards);

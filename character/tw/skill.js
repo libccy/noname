@@ -460,7 +460,7 @@ const skills = {
 							equip = get.cardPile(card => get.subtype(card, false) == sub && player.hasUseTarget(card));
 						if (equip) {
 							player.$gain2(equip);
-							await game.asyncDelayx();
+							await game.delayx();
 							await player.chooseUseTarget(equip, "nothrow", "nopopup", true);
 							break;
 						}
@@ -877,7 +877,7 @@ const skills = {
 			trigger.player.judging[0] = links[0];
 			trigger.orderingCards.addArray(links);
 			game.log(trigger.player, "的判定牌改为", links[0]);
-			await game.asyncDelay(2);
+			await game.delay(2);
 			const next = player.chooseToMove("鬼谋：将卡牌以任意顺序置于牌堆顶");
 			next.set("list", [["牌堆顶", cards]]);
 			next.set("processAI", function (list) {
@@ -1062,7 +1062,7 @@ const skills = {
 			}
 			if (count < 2) return;
 			await game.asyncDraw(targets, 2);
-			await game.asyncDelay();
+			await game.delay();
 			targets.unshift(player);
 			for (const current of targets) {
 				const cards = get.cards(count);
@@ -1095,7 +1095,7 @@ const skills = {
 					await game.cardsDiscard(discard);
 					game.log(current, "将", discard, "置入了弃牌堆");
 				}
-				await game.asyncDelayx();
+				await game.delayx();
 			}
 		},
 	},
@@ -1136,7 +1136,7 @@ const skills = {
 					player.unmarkSkill("beOfOneHeart");
 				})
 				.finish();
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 		marktext: "❤",
 		aiCheck: [
@@ -1188,7 +1188,7 @@ const skills = {
 				cards,
 				videoId
 			);
-			await game.asyncDelay();
+			await game.delay();
 			const chooseableCards = cards.slice();
 			for (const current of targets) {
 				if (!current.isIn() || !chooseableCards.length) continue;
@@ -1482,7 +1482,7 @@ const skills = {
 				async content(event, trigger, player) {
 					const targets = event.targets;
 					await player.draw(targets.length + 1);
-					await game.asyncDelayx();
+					await game.delayx();
 					for (const target of targets) {
 						if (
 							!target.hasCard(card => {
@@ -1509,7 +1509,7 @@ const skills = {
 							})
 							.set("sourcex", player)
 							.set("addCount", false);
-						await game.asyncDelayx();
+						await game.delayx();
 					}
 				},
 			},
@@ -1834,7 +1834,7 @@ const skills = {
 					}
 					if (player.getHp() > 0) await player.draw(player.getHp(), target.getHp() > 0 ? "nodelay" : "").set("gaintag", ["twjuexing"]);
 					if (target.getHp() > 0) await target.draw(target.getHp()).set("gaintag", ["twjuexing"]);
-					await game.asyncDelay();
+					await game.delay();
 				},
 			},
 			lizhan: {

@@ -2306,7 +2306,7 @@ const skills = {
 				player: ["phaseUseAfter"],
 				global: ["roundStart"],
 			});
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 		subSkill: {
 			round: { charlotte: true },
@@ -5907,7 +5907,7 @@ const skills = {
 			trigger.orderingCards.addArray(cards);
 			game.log(trigger.player, "的判定牌改为", cards[0]);
 			await game.cardsDiscard(oldJudgeCard);
-			await game.asyncDelay(2);
+			await game.delay(2);
 			if (!player.getExpansions("shiroha_yuzhao").length) {
 				player.storage.shiroha_jiezhao = true;
 				player.gainMaxHp();
@@ -9507,7 +9507,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const target = event.targets[0];
 			player.awakenSkill("saya_powei");
-			game.asyncDelay(3);
+			game.delay(3);
 			var next = game.createEvent("saya_powei_loop", false, trigger);
 			next.playertrue = player;
 			next.playerfalse = target;

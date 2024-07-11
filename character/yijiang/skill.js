@@ -196,7 +196,7 @@ const skills = {
 							],
 						})
 						.setContent("discardMultiple");
-					await game.asyncDelayx();
+					await game.delayx();
 				}
 				let cards = result.reduce((list, evt) => {
 					list.addArray(evt.cards);
@@ -209,7 +209,7 @@ const skills = {
 							const card = cards.shift();
 							if (player.hasUseTarget(card)) {
 								player.$gain2(card, false);
-								await game.asyncDelayx();
+								await game.delayx();
 								await player.chooseUseTarget(true, card, false);
 							}
 						}
@@ -295,7 +295,7 @@ const skills = {
 					if (card) {
 						cards.push(card);
 						target.$gain2(card, false);
-						await game.asyncDelayx();
+						await game.delayx();
 						await target.chooseUseTarget(card, true, "nopopup");
 					} else break;
 				}
@@ -8724,7 +8724,7 @@ const skills = {
 							player.$throw(cardx, 1000, "nobroadcast");
 						}, target);
 						if (player == game.me) {
-							await game.asyncDelay(0.5);
+							await game.delay(0.5);
 						}
 					}
 				};
