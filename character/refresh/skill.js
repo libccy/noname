@@ -2204,7 +2204,7 @@ const skills = {
 				for (const target of targets) {
 					if (target.isIn()) {
 						player.line(target, "fire");
-						const result = await target
+						const { result } = await target
 							.chooseToDiscard("he", "焚城：弃置至少" + get.cnNumber(num) + "张牌，或受到2点火焰伤害", [num, Infinity])
 							.set("ai", card => {
 								if (ui.selected.cards.length >= get.event("num")) return -1;

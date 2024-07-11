@@ -150,7 +150,7 @@ const skills = {
 				const draw = Array.from({
 					length: limit,
 				}).map((_, i) => get.cnNumber(i + 1, true));
-				const result = await player
+				const { result } = await player
 					.chooseControl(draw, "cancel2")
 					.set("prompt", get.prompt("xinrenjie"))
 					.set("prompt2", `你可以摸至多${get.cnNumber(draw.length)}张牌并移去等量枚“忍”标记`)
@@ -878,7 +878,7 @@ const skills = {
 				}
 				return [listx];
 			});
-			const result = await next;
+			const { result } = await next;
 			if (!result.bool) return;
 			await player.logSkill("tamo");
 			const resultList = result.moved[0].map(info => {

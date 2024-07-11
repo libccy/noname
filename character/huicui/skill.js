@@ -2391,7 +2391,7 @@ const skills = {
 				return list.randomGet();
 			});
 			next.set("list", list);
-			const result = await next;
+			const { result } = await next;
 			if (result.control == "cancel2") await player.loseHp();
 			else await player.disableEquip(result.control);
 			if (!player.isIn()) return;

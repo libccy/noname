@@ -1294,7 +1294,7 @@ const skills = {
 			const history = game.getAllGlobalHistory("useCard");
 			const index = history.indexOf(trigger);
 			const previous = history[index - 1].player;
-			const result = await trigger.player
+			const { result } = await trigger.player
 				.chooseBool("是否对" + get.translation(previous) + "发动【联对】？", "令" + get.translation(previous) + "摸两张牌")
 				.set("ai", () => _status.event.bool)
 				.set("bool", get.effect(previous, { name: "draw" }, trigger.player, trigger.player) > 0);
@@ -3453,7 +3453,7 @@ const skills = {
 			const target = targets[0];
 			player.line(target, "thunder");
 			await target.addSkills("new_canyun");
-			const result = await target
+			const { result } = await target
 				.chooseTarget("是否弃置场上的一张牌，获得技能〖绝响〗？", (card, player, target) => {
 					return target.getDiscardableCards(player, "ej").some(i => get.suit(i) == "club");
 				})

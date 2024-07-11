@@ -2572,7 +2572,7 @@ export const Content = {
 								next.set("forceDie", true);
 								next.set("arrangeSkill", true);
 								next.set("includeOut", true);
-								const result = await next;
+								const { result } = await next;
 								event.current = usableSkills.find((info) => info.skill == result.control);
 							}
 						}
