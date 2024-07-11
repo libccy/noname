@@ -63,7 +63,7 @@ const skills = {
 							chooseToRespondEvent.set("skillwarn", "替" + get.translation(player) + "打出一张" + get.translation(cardName));
 							chooseToRespondEvent.noOrdering = true;
 							chooseToRespondEvent.autochoose = (cardName === "sha" ? lib.filter.autoRespondSha : lib.filter.autoRespondShan);
-							const { bool, card, cards } = await chooseToRespondEvent;
+							const { bool, card, cards } = await chooseToRespondEvent.forResult();
 							if(bool){
 								hasSomeoneUsed = true;
 								event.result.card = card;

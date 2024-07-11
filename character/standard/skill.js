@@ -1870,7 +1870,7 @@ const skills = {
 					chooseToRespondEvent.set("skillwarn", "替" + get.translation(player) + "打出一张杀");
 					chooseToRespondEvent.noOrdering = true;
 					chooseToRespondEvent.autochoose = lib.filter.autoRespondSha;
-					const { bool, card, cards } = await chooseToRespondEvent;
+					const { bool, card, cards } = await chooseToRespondEvent.forResult();
 					if (bool) {
 						trigger.card = card;
 						trigger.cards = cards;
