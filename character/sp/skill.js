@@ -2933,37 +2933,30 @@ const skills = {
 			);
 		},
 		direct: true,
-		content: [
-			(event, map) => {
-				var player = map.player,
-					trigger = map.trigger;
-				var next = player.chooseToUse();
-				next.set("openskilldialog", `###${get.prompt("olsuji")}###将一张黑色牌当【杀】使用${player == trigger.player ? "" : `。若${get.translation(trigger.player)}受到了此【杀】的伤害，你获得其一张牌。`}`);
-				next.set("norestore", true);
-				next.set("_backupevent", "olsuji_backup");
-				next.set("addCount", false);
-				next.set("logSkill", "olsuji");
-				next.set("custom", {
-					add: {},
-					replace: { window: function () {} },
-				});
-				next.backup("olsuji_backup");
-			},
-			(event, map) => {
-				if (map.result.bool) {
-					var player = map.player,
-						trigger = map.trigger;
-					if (
-						trigger.player.isIn() &&
-						trigger.player.hasHistory("damage", evt => {
-							return evt.card && evt.card.storage && evt.card.storage.olsuji;
-						}) &&
-						trigger.player.countGainableCards(player, "he")
-					)
-						player.gainPlayerCard(trigger.player, "he", true);
-				}
-			},
-		],
+		async content(event, trigger, player){
+			const next = player.chooseToUse();
+			next.set("openskilldialog", `###${get.prompt("olsuji")}###将一张黑色牌当【杀】使用${player == trigger.player ? "" : `。若${get.translation(trigger.player)}受到了此【杀】的伤害，你获得其一张牌。`}`);
+			next.set("norestore", true);
+			next.set("_backupevent", "olsuji_backup");
+			next.set("addCount", false);
+			next.set("logSkill", "olsuji");
+			next.set("custom", {
+				add: {},
+				replace: { window: function () {} },
+			});
+			next.backup("olsuji_backup");
+			const result = await next.forResult();
+			if (result.bool) {
+				if (
+					trigger.player.isIn() &&
+					trigger.player.hasHistory("damage", evt => {
+						return evt.card && evt.card.storage && evt.card.storage.olsuji;
+					}) &&
+					trigger.player.countGainableCards(player, "he")
+				)
+					player.gainPlayerCard(trigger.player, "he", true);
+			}
+		},
 		subSkill: {
 			backup: {
 				filterCard: function (card) {
