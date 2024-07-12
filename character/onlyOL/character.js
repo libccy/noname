@@ -10,7 +10,7 @@ const characters = {
 	ol_yufan: ["male", "wu", 3, ["olzongxuan", "olzhiyan"], ["tempname:re_yufan", "die:re_yufan"]],
 	ol_chengpu: ["male", "wu", 4, ["dclihuo", "olchunlao"], ["tempname:xin_chengpu", "die:xin_chengpu"]],
 	ol_wangyi: ["female", "wei", 3, ["olzhenlie", "olmiji"]],
-	ol_sb_pangtong: ["male", "shu", 3, ["olsbhongtu", "olsbqiwu"]],
+	ol_sb_pangtong: ["male", "shu", 3, ["olsbhongtu", "olsbqiwu"], ["die:true", "die:3"]],
 	ol_fazheng: ["male", "shu", 3, ["olxuanhuo", "olenyuan"]],
 	ol_caifuren: ["female", "qun", 3, ["olqieting", "xianzhou"], ["name:蔡|null"]],
 	ol_liru: ["male", "qun", 3, ["xinjuece", "olmieji", "dcfencheng"]],

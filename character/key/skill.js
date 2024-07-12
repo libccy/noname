@@ -2299,7 +2299,7 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			player.addTempSkill("kiyu_rexianyu_round", "roundStart");
-			const tabito = targets[0];
+			const tabito = event.targets[0];
 			tabito.storage.kiyu_rexianyu_lastrun = event.cost_data.list;
 			tabito.storage.amamiya_kiyu = player;
 			tabito.addTempSkill("kiyu_rexianyu_lastrun", {

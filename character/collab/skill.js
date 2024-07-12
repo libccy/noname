@@ -5,7 +5,7 @@ const skills = {
 	//五虎将
 	//是的孩子们，我们意念合一
 	olhuyi: {
-		audio: 2,
+		audio: 5,
 		getList() {
 			let list,
 				skills = [];
