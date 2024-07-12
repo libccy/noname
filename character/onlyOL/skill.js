@@ -272,7 +272,7 @@ const skills = {
 	},
 	//谋庞统
 	olsbhongtu: {
-		audio: 2,
+		audio: 6,
 		trigger: {
 			global: ["phaseZhunbeiEnd", "phaseJudgeEnd", "phaseDrawEnd", "phaseUseEnd", "phaseDiscardEnd", "phaseJieshuEnd"],
 		},
@@ -476,7 +476,7 @@ const skills = {
 		},
 	},
 	olsbqiwu: {
-		audio: 2,
+		audio: 6,
 		trigger: {
 			player: "damageBegin4",
 		},

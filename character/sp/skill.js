@@ -8663,7 +8663,7 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
-			return player.countCards("e") < 5 && game.hasPlayer(current => lib.skill.olshanxi.filterTarget(null, player, current));
+			return player.countCards("e") < 6 && game.hasPlayer(current => lib.skill.olshanxi.filterTarget(null, player, current));
 		},
 		filterTarget: function (card, player, target) {
 			return target != player && player.countCards("h") + target.countCards("h") > 0 && !player.inRangeOf(target);
@@ -8672,7 +8672,7 @@ const skills = {
 			"step 0";
 			var cards1 = player.getCards("h"),
 				cards2 = target.getCards("h");
-			var num = 5 - player.countCards("e");
+			var num = 6 - player.countCards("e");
 			var dialog = ["闪袭：选择展示至多" + get.cnNumber(num) + "张牌"];
 			if (cards1.length > 0) {
 				dialog.push('<div class="text center">你的手牌</div>');
