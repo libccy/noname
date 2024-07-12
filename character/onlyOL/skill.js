@@ -1391,10 +1391,13 @@ const skills = {
 						if (!arg || !arg.target || !player.getStorage("olxianzhen_effect").includes(arg.target)) return false;
 					},
 					effect: {
-						player(card, player, target, current, isLink) {
-							if (isLink || !target) return;
+						player_use(card, player, target, current, isLink) {
+							if (isLink || !target || player._olxianzhen_effect_temp) return;
 							if (!player.getStorage("olxianzhen_effect").includes(target) && ["sha", "guohe", "shunshou", "huogong", "juedou"].includes(card.name)) {
-								if (get.effect(target, card, player, player) > 0) {
+								player._olxianzhen_effect_temp = true;
+								let eff = get.effect(target, card, player, player);
+								delete player._olxianzhen_effect_temp;
+								if (eff > 0) {
 									return [1, 2];
 								}
 							}

@@ -7308,9 +7308,12 @@ const skills = {
 			},
 			effect: {
 				player_use(card, player, target, current, isLink) {
-					if (isLink || !player.storage.xinxianzhen) return;
+					if (isLink || !player.storage.xinxianzhen || player._xinxianzhen_effect_temp) return;
 					if (target != player.storage.xinxianzhen && ["sha", "guohe", "shunshou", "huogong", "juedou"].includes(card.name)) {
-						if (get.effect(player.storage.xinxianzhen, card, player, player) > 0) {
+						player._xinxianzhen_effect_temp = true;
+						let eff = get.effect(player.storage.xinxianzhen, card, player, player);
+						delete player._xinxianzhen_effect_temp;
+						if (eff > 0) {
 							return [1, 2];
 						}
 					}
