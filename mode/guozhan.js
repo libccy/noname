@@ -2188,7 +2188,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (num != 4)
 						return (
 							goon &&
-							[event.player, event.source].some((target) => groups.includes(target.identity))
+							groups.includes(event.source.identity)
 						);
 					return !goon && groups.includes(event.source.identity);
 				},
@@ -2198,7 +2198,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					return event.source == player ? event.player : event.source;
 				},
 				async content(event, trigger, player) {
-					trigger[parseInt(name.slice("damageBegin".length)) == 4 ? "decrease" : "increase"]("num");
+					trigger[parseInt(event.triggername.slice("damageBegin".length)) == 4 ? "decrease" : "increase"]("num");
 				},
 				ai: {
 					combo: "fakeshilu",
