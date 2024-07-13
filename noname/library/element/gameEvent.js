@@ -379,7 +379,7 @@ export class GameEvent {
 		this._neutralized = true;
 		this._neutralize_event = event;
 		const next = this.trigger("eventNeutralized");
-		next.filterStop = function () {
+		if (next) next.filterStop = function () {
 			if (!this._neutralized) {
 				delete this.filterStop;
 				return true;
