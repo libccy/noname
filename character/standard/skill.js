@@ -569,6 +569,32 @@ const skills = {
 				await i.damage();
 			}
 		},
+		ai: {
+			effect: {
+				target(card, player, target) {
+					if (
+						target.hp <= 1 ||
+						!target.hasFriend() ||
+						!_status.currentPhase ||
+						!get.tag(card, "damage")
+					) return;
+					let hp = target.hp - 1;
+					if (game.hasPlayer(cur => {
+						return cur.hp > hp;
+					})) return;
+					let ori = game.countPlayer(cur => {
+						return cur.hp === hp + 1 && get.attitude(target, cur) <= 0;
+					}), now = game.countPlayer(cur => {
+						return cur.hp === hp && get.attitude(target, cur) <= 0;
+					}), seat = 1, tar = _status.currentPhase.next;
+					while (tar !== target) {
+						if (get.attitude(target, tar) <= 0) seat++;
+						tar = tar.next;
+					}
+					return [1, 2 * (now - ori) / seat];
+				}
+			}
+		}
 	},
 	//程普
 	stdchunlao: {
