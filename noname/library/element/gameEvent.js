@@ -113,7 +113,8 @@ export class GameEvent {
 	/**
 	 * @type { Result }
 	 */
-	_result;
+	//@ts-ignore
+	_result = {};
 	/**
 	 * @type { [string, any][] }
 	 */
@@ -1092,9 +1093,10 @@ export class GameEvent {
 				else if (this._triggered == 1) await trigger("Begin", 2);
 				else {
 					this.#inContent = true;
-					await this.content(this)
-						.catch(this.onError)
-						.finally(() => this.#inContent = false);
+					let next = this.content(this);
+					if (_status.withError || lib.config.compatiblemode || (_status.connectMode && !lib.config.debug)) 
+						next = next.catch(this.onError);
+					await next.finally(() => this.#inContent = false);
 				}
 			} else {
 				if (this._triggered == 1) await trigger("Omitted", 4);
@@ -1217,11 +1219,9 @@ export class GameEvent {
 	}
 
 	onError(error) {
-		if (_status.withError || lib.config.compatiblemode || (_status.connectMode && !lib.config.debug)) {
-			game.print("游戏出错：" + this.name);
-			game.print(error.toString());
-			console.error(error);
-		} else throw error;
+		game.print("游戏出错：" + this.name);
+		game.print(error.toString());
+		console.error(error);
 	}
 
 	/**
