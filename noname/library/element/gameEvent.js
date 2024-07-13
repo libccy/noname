@@ -384,11 +384,9 @@ export class GameEvent {
 		}
 	}
 	unneutralize() {
-		const trigger = this._trigger;
-		if (!trigger || !trigger._neutralized) return;
-		this.untrigger();
-		trigger._neutralized = false;
-		if (trigger.type == "card" && trigger.card && trigger.name == "sha") trigger.directHit = true;
+		if (!this._neutralized) return;
+		this._neutralized = false;
+		if (this.type == "card" && this.card && this.name == "sha") this.directHit = true;
 	}
 	goto(step) {
 		this.step = step;
