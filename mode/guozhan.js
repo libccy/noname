@@ -1029,7 +1029,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					global: {
 						audio: "duoshi",
 						forceaudio: true,
-						enable: "chooseToUse",
+						enable: "phaseUse",
 						filter(event, player) {
 							const info = get.info("fakeduoshi").subSkill.global;
 							return (
