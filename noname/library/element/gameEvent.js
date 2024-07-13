@@ -157,7 +157,7 @@ export class GameEvent {
 	 */
 	excludeButton;
 	/**
-	 * @type { (this: GameEvent) => any | undefined | void | null }
+	 * @type { ((this: GameEvent) => boolean) | undefined }
 	 */
 	filterStop;
 	/**
@@ -377,7 +377,15 @@ export class GameEvent {
 		if (this._neutralized) return this._triggering;
 		this._neutralized = true;
 		this._neutralize_event = event;
-		await this.trigger("eventNeutralized");
+		const next = this.trigger("eventNeutralized");
+		next.filterStop = function () {
+			if (!this._neutralized) {
+				delete this.filterStop;
+				return true;
+			}
+			return false;
+		};
+		await next;
 		if (this._neutralized == true) {
 			this.untrigger();
 			this.finish();
@@ -1015,7 +1023,7 @@ export class GameEvent {
 			return onfulfilled(new Proxy(this, {
 				get(target, p, receiver){
 					if(p === "then") return void 0;
-					return target[p];
+					return Reflect.get(target, p, receiver);
 				}
 			}));
 		} : onfulfilled, onrejected);
