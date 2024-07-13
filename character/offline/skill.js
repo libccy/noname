@@ -515,7 +515,7 @@ const skills = {
 				charlotte: true,
 				mod: {
 					cardEnabled2(card, player) {
-						if (player.getStorage("jsrgguanjue_ban").includes(get.suit(card))) return false;
+						if (player.getStorage("dragchaojue_buff").includes(get.suit(card))) return false;
 					},
 				},
 				marktext: "绝",
