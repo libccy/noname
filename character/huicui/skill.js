@@ -6780,9 +6780,11 @@ const skills = {
 		check: function (event, player) {
 			var num = player.getDamagedHp() - 1;
 			if (num <= 0) return false;
-			return game.hasPlayer(target => {
-				return get.attitude(player, target) > 0 && target.maxHp - target.countCards("h") > 1;
-			});
+			return game.countPlayer(target => {
+				if (player === target) return player.maxHp - player.countCards("h") - 1;
+				if (get.attitude(player, target) > 0) return target.maxHp - target.countCards("h");
+				return 0;
+			}) > 1;
 		},
 		content: function () {
 			"step 0";
@@ -6791,7 +6793,7 @@ const skills = {
 			var num = player.getDamagedHp();
 			if (!player.isIn() || !num) event.finish();
 			else
-				player.chooseTarget("御关：令至多" + get.cnNumber(num) + "名角色将手牌摸至体力上限", Math.min(game.countPlayer(), [1, num]), true).set("ai", target => {
+				player.chooseTarget("御关：令至多" + get.cnNumber(num) + "名角色将手牌摸至体力上限", [1, Math.min(game.countPlayer(), num)], true).set("ai", target => {
 					return get.attitude(_status.event.player, target) * Math.max(0.1, target.maxHp - target.countCards("h"));
 				});
 			"step 2";
