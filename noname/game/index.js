@@ -5633,10 +5633,12 @@ export class Game extends GameCompatible {
 	}
 	pause() {
 		_status.paused = true;
+		return _status.pauseManager.pause;
 	}
 	pause2() {
-		if (_status.connectMode) return;
+		if (_status.connectMode) return _status.pauseManager.pause2;
 		_status.paused2 = true;
+		return _status.pauseManager.pause2;
 	}
 	resume() {
 		if (!_status.paused) return;
