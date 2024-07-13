@@ -7879,21 +7879,12 @@ const skills = {
 				.set(
 					"choice",
 					(() => {
-						var effect = 0;
-						if (list.length == 2) {
-							if (list.includes("选项一")) {
-								loses.forEach(i => (effect += get.effect(i, { name: "losehp" }, player, player)));
-								if (effect > 0) return "选项一";
-							} else {
-								recovers.forEach(i => (effect += get.recoverEffect(i, player, player)));
-								if (effect > 0) return "选项二";
-							}
-						} else {
-							loses.forEach(i => (effect += get.effect(i, { name: "losehp" }, player, player)));
-							recovers.forEach(i => (effect += get.recoverEffect(i, player, player)));
-							if (effect > 0) return "选项二";
-							return "选项一";
-						}
+						let eff1 = loses.reduce((prev, val) => prev + get.effect(i, { name: "losehp" }, player, player), 0),
+							eff2 = recovers.reduce((prev, val) => prev + get.recoverEffect(i, player, player), 0),
+							max = Math.max(0, eff1, eff2);
+						if (max === 0) return "cancel2";
+						if (eff1 > eff2) return "选项一";
+						return "选项二";
 					})()
 				);
 			"step 1";
