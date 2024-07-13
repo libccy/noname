@@ -8400,7 +8400,6 @@ const skills = {
 			});
 		},
 		direct: true,
-		shaRelated: true,
 		content: function () {
 			"step 0";
 			player
@@ -8657,7 +8656,7 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
-			return player.countCards("e") < 5 && game.hasPlayer(current => lib.skill.olshanxi.filterTarget(null, player, current));
+			return player.countCards("e") < 6 && game.hasPlayer(current => lib.skill.olshanxi.filterTarget(null, player, current));
 		},
 		filterTarget: function (card, player, target) {
 			return target != player && player.countCards("h") + target.countCards("h") > 0 && !player.inRangeOf(target);
@@ -8666,7 +8665,7 @@ const skills = {
 			"step 0";
 			var cards1 = player.getCards("h"),
 				cards2 = target.getCards("h");
-			var num = 5 - player.countCards("e");
+			var num = 6 - player.countCards("e");
 			var dialog = ["闪袭：选择展示至多" + get.cnNumber(num) + "张牌"];
 			if (cards1.length > 0) {
 				dialog.push('<div class="text center">你的手牌</div>');
@@ -9630,7 +9629,6 @@ const skills = {
 			if (event.olhuanfu_map && event.olhuanfu_map[player.playerid]) return false;
 			return player.maxHp > 0 && player.countCards("he") > 0;
 		},
-		shaRelated: true,
 		direct: true,
 		content: function () {
 			"step 0";
@@ -11388,7 +11386,6 @@ const skills = {
 			},
 		},
 		trigger: { player: "useCardToPlayered" },
-		shaRelated: true,
 		filter: function (event, player) {
 			return event.card.name == "sha" && event.target.countCards("he") > 0 && get.distance(player, event.target) == 1;
 		},
@@ -24435,7 +24432,6 @@ const skills = {
 		},
 	},
 	fengpo: {
-		shaRelated: true,
 		audio: 2,
 		trigger: {
 			player: "useCardToPlayered",
@@ -26170,7 +26166,6 @@ const skills = {
 		audio: 2,
 	},
 	zniaoxiang: {
-		shaRelated: true,
 		audio: 2,
 		trigger: { player: "useCardToPlayered" },
 		forced: true,
@@ -26984,7 +26979,6 @@ const skills = {
 	},
 	//FW关银屏
 	oldhuxiao: {
-		shaRelated: true,
 		audio: "huxiao",
 		trigger: { player: "shaMiss" },
 		forced: true,

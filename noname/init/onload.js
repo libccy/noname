@@ -7,8 +7,8 @@ import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 import { gnc } from "../gnc/index.js";
 import { importMode } from "./import.js";
-import { jumpToCatchBlock } from "../util/index.js";
 import { Mutex } from "../util/mutex.js";
+import { load } from "../util/config.js";
 
 export async function onload() {
 	const libOnload = lib.onload;
@@ -534,8 +534,8 @@ export async function onload() {
 		window.inSplash = true;
 		clearTimeout(window.resetGameTimeout);
 
-		if (lib.config.splash_style == undefined) game.saveConfig("splash_style", lib.onloadSplashes[0].id);
-		let splash = lib.onloadSplashes.find(item => item.id == lib.config.splash_style);
+		if (typeof lib.config.splash_style == "undefined") game.saveConfig("splash_style", lib.onloadSplashes[0].id);
+		let splash = lib.onloadSplashes.find(item => item.id === lib.config.splash_style);
 		if (!splash) splash = lib.onloadSplashes[0];
 
 		let node = ui.create.div("#splash", document.body);
@@ -552,7 +552,9 @@ export async function onload() {
 		game.saveConfig("mode", result);
 		await importMode(result);
 	}
+	lib.storage = (await load(lib.config.mode, "data")) || {};
 
+	/*
 	if (!lib.db) {
 		try {
 			lib.storage = JSON.parse(localStorage.getItem(lib.configprefix + lib.config.mode));
@@ -565,6 +567,7 @@ export async function onload() {
 		let storage = await game.getDB("data", lib.config.mode);
 		lib.storage = storage || {};
 	}
+	 */
 
 	const libOnload2 = lib.onload2;
 	delete lib.onload2;

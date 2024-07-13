@@ -2710,7 +2710,6 @@ const skills = {
 		},
 	},
 	jianchu: {
-		shaRelated: true,
 		audio: 2,
 		audioname: ["re_pangde"],
 		trigger: { player: "useCardToPlayered" },
@@ -3176,7 +3175,6 @@ const skills = {
 		group: "kuanggu_check",
 	},
 	xinliegong: {
-		shaRelated: true,
 		mod: {
 			aiOrder(player, card, num) {
 				if (num > 0 && (card.name === "sha" || get.tag(card, "draw"))) return num + 6;
@@ -3723,7 +3721,6 @@ const skills = {
 		},
 	},
 	jiang: {
-		shaRelated: true,
 		audio: 2,
 		preHidden: true,
 		audioname: ["sp_lvmeng", "re_sunben", "re_sunce"],
@@ -4615,7 +4612,6 @@ const skills = {
 		},
 	},
 	lieren: {
-		shaRelated: true,
 		audio: 2,
 		audioname: ["boss_lvbu3", "ol_zhurong"],
 		trigger: { source: "damageSource" },
@@ -6089,7 +6085,6 @@ const skills = {
 		zhuSkill: true,
 	},
 	mengjin: {
-		shaRelated: true,
 		audio: 2,
 		trigger: { player: "shaMiss" },
 		//priority:-1,
@@ -6411,7 +6406,6 @@ const skills = {
 		},
 	},
 	liegong: {
-		shaRelated: true,
 		audio: 2,
 		audioname: ["re_huangzhong"],
 		trigger: { player: "useCardToPlayered" },

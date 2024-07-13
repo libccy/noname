@@ -24,7 +24,7 @@ const characters = {
 	xin_masu: ["male", "shu", 3, ["olsanyao", "rezhiman"]],
 	zhuran: ["male", "wu", 4, ["danshou"]],
 	xusheng: ["male", "wu", 4, ["xinpojun"]],
-	wuguotai: ["female", "wu", 3, ["ganlu", "buyi"]],
+	wuguotai: ["female", "wu", 3, ["ganlu", "buyi"], ["name:丁|null"]],
 	lingtong: ["male", "wu", 4, ["xuanfeng"]],
 	liubiao: ["male", "qun", 3, ["rezishou", "zongshi"]],
 	yufan: ["male", "wu", 3, ["zhiyan", "zongxuan"]],

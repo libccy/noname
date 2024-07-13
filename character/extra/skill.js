@@ -3048,7 +3048,6 @@ const skills = {
 			},
 		},
 		subSkill: { phase: { charlotte: true } },
-		shaRelated: true,
 	},
 	twwuhun: {
 		audio: 2,
@@ -8698,7 +8697,8 @@ const skills = {
 							att = get.attitude(_status.event.player, target);
 						for (let i in target.skills) {
 							let info = get.info(i);
-							if (info && info.shaRelated) return Math.abs(att);
+							if (!info || info.shaRelated === false) continue;
+							if (info.shaRelated || get.skillInfoTranslation(i, target).includes("【杀】")) return Math.abs(att);
 						}
 						if (att > 0) {
 							if (th > 3 && target.hp > 2) return 0.6 * th;

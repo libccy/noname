@@ -13193,26 +13193,22 @@ const skills = {
 					})
 					.setHiddenSkill("wanggui")
 					.forResult();
-			else
+			else {
 				event.result = await player
 					.chooseBool("望归：是否令与你势力相同的角色各摸一张牌？")
 					.setHiddenSkill("wanggui")
-					.set("logSkill", [
-						"wanggui",
-						game.filterPlayer(current => {
-							return current.isFriendOf(player);
-						}),
-					])
 					.forResult();
+				event.result.targets = game.filterPlayer(current => {
+					return current.isFriendOf(player);
+				});
+			}
 		},
 		async content(event, trigger, player) {
 			if (player.isUnseen(2)) {
 				const target = event.targets[0];
 				target.damage("nocard");
 			} else {
-				const targets = game.filterPlayer(current => {
-					return current.isFriendOf(player);
-				});
+				const targets = event.targets;
 				targets.sortBySeat();
 				game.asyncDraw(targets);
 			}

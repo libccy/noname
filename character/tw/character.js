@@ -78,7 +78,7 @@ const characters = {
 	tw_liuzhang: ["male", "qun", 3, ["jutu", "twyaohu", "rehuaibi"], ["zhu"]],
 	tw_zongyu: ["male", "shu", 3, ["twzhibian", "twyuyan"]],
 	tw_zhouchu: ["male", "wu", 4, ["twguoyi", "twchuhai"]],
-	tw_qiaogong: ["male", "wu", 3, ["twyizhu", "twluanchou"]],
+	tw_qiaogong: ["male", "wu", 3, ["twyizhu", "twluanchou"], ["name:桥|null"]],
 	tw_feiyi: ["male", "shu", 3, ["twshengxi", "twkuanji"]],
 	tw_bianfuren: ["female", "wei", 3, ["twwanwei", "twyuejian"], ["name:卞|null"]],
 	tw_chenzhen: ["male", "shu", 3, ["twmuyue", "twchayi"]],

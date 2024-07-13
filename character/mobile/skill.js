@@ -1181,9 +1181,11 @@ const skills = {
 			const delt = target.getHp(true) - 1,
 				num = Math.abs(delt);
 			if (delt != 0) {
-				const next = target.changeHp(-delt);
-				next._triggered = null;
-				await next;
+				if (delt > 0) {
+					const next = target.changeHp(-delt);
+					next._triggered = null;
+					await next;
+				} else await target.recover(num);
 			}
 			if (num > 0) await target.changeHujia(num + (player == target ? 2 : 0), null, true);
 			else if (player == target) await target.changeHujia(2, null, true);
@@ -1193,24 +1195,14 @@ const skills = {
 			player.$fullscreenpop("向死存魏！", "thunder");
 			const cards = ["cardPile", "discardPile"].map(pos => Array.from(ui[pos].childNodes)).flat();
 			const filter = card => ["shan", "tao", "jiu"].includes(card.name);
-			const lose_list = [],
-				players = game.filterPlayer();
-			players.forEach(current => {
-				const pos = "hej";
-				const sishis = current.getCards(pos, filter);
-				if (sishis.length > 0) {
-					current.$throw(sishis);
-					lose_list.push([current, sishis]);
-				}
-			});
-			if (lose_list.length) {
-				await game.loseAsync({ lose_list }).setContent("chooseToCompareLose");
-				await game.delayx();
-			}
 			const cardx = cards.filter(filter);
 			if (cardx.length) {
 				await game.cardsGotoSpecial(cardx);
 				game.log(cardx, "被移出了游戏");
+			}
+			for (const target of game.filterPlayer()) {
+				const sishis = target.getCards("hej", filter);
+				if (sishis.length) await target.lose(sishis);
 			}
 		},
 		ai: {
@@ -3977,7 +3969,6 @@ const skills = {
 	//赵忠
 	scschiyan: {
 		audio: 1,
-		shaRelated: true,
 		trigger: { player: "useCardToPlayered" },
 		direct: true,
 		filter: function (event, player) {
@@ -9597,7 +9588,6 @@ const skills = {
 		},
 	},
 	relieren: {
-		shaRelated: true,
 		audio: 2,
 		audioname: ["boss_lvbu3"],
 		trigger: { player: "useCardToPlayered" },

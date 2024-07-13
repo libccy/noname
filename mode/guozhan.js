@@ -2188,7 +2188,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (num != 4)
 						return (
 							goon &&
-							[event.player, event.source].some((target) => groups.includes(target.identity))
+							groups.includes(event.source.identity)
 						);
 					return !goon && groups.includes(event.source.identity);
 				},
@@ -2198,7 +2198,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					return event.source == player ? event.player : event.source;
 				},
 				async content(event, trigger, player) {
-					trigger[parseInt(name.slice("damageBegin".length)) == 4 ? "decrease" : "increase"]("num");
+					trigger[parseInt(event.triggername.slice("damageBegin".length)) == 4 ? "decrease" : "increase"]("num");
 				},
 				ai: {
 					combo: "fakeshilu",
@@ -9835,7 +9835,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					},
 				},
 				trigger: { player: "useCardToPlayered" },
-				shaRelated: true,
 				filter: function (event, player) {
 					return event.card.name == "sha" && player.hp <= event.target.hp;
 				},
@@ -9889,7 +9888,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			gzkuangfu: {
 				audio: "kuangfu",
 				trigger: { player: "useCardToPlayered" },
-				shaRelated: true,
 				preHidden: true,
 				logTarget: "target",
 				filter: function (event, player) {
@@ -9940,7 +9938,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			},
 			//吕布
 			gzwushuang: {
-				shaRelated: true,
 				audio: "wushuang",
 				audioname2: { gz_lvlingqi: "wushuang_lvlingqi" },
 				forced: true,

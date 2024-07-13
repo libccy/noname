@@ -2299,7 +2299,7 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			player.addTempSkill("kiyu_rexianyu_round", "roundStart");
-			const tabito = targets[0];
+			const tabito = event.targets[0];
 			tabito.storage.kiyu_rexianyu_lastrun = event.cost_data.list;
 			tabito.storage.amamiya_kiyu = player;
 			tabito.addTempSkill("kiyu_rexianyu_lastrun", {
@@ -9323,7 +9323,6 @@ const skills = {
 	},
 	shiina_retieji: {
 		audio: 1,
-		shaRelated: true,
 		trigger: { player: "useCardToPlayered" },
 		check(event, player) {
 			return get.attitude(player, event.target) < 0;
@@ -9792,7 +9791,6 @@ const skills = {
 	},
 	//由依
 	yui_jiang: {
-		shaRelated: true,
 		audio: 2,
 		audioname: ["sp_lvmeng", "re_sunben", "re_sunce"],
 		trigger: {
