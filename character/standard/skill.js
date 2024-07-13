@@ -934,6 +934,11 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		filter(event, player) {
+			return game.hasPlayer(tar1 => {
+				return tar1.countDiscardableCards(player, "e", i => get.subtype(i) == "equip2") && game.hasPlayer(tar2 => {
+					return tar1 !== tar2 && tar2.countDiscardableCards(player, "e");
+				});
+			});
 			let e = 0, fj = false;
 			game.countPlayer(target => {
 				let es = target.getDiscardableCards(player, "e"), js = target.getDiscardableCards(player, "j", i => get.type(i) == "equip");
@@ -944,6 +949,10 @@ const skills = {
 			return fj && e >= 2;
 		},
 		filterTarget(card, player, target) {
+			if (!ui.selected.targets.length || ui.selected.targets[0].countDiscardableCards(player, "e", i => get.subtype(i) == "equip2")) {
+				return target.countDiscardableCards(player, "e");
+			}
+			return target.countDiscardableCards(player, "e", i => get.subtype(i) == "equip2");
 			let e = 0;
 			let es = target.getDiscardableCards(player, "e"), js = target.getDiscardableCards(player, "j", i => get.type(i) == "equip");
 			if (es.length) e++;
@@ -956,6 +965,7 @@ const skills = {
 			return true;
 		},
 		selectTarget: function() {
+			return 2;
 			if (!ui.selected.targets.length) return [1, 2];
 			let e = 0, player = get.event("player"), target = ui.selected.targets[0];
 			let es = target.getDiscardableCards(player, "e"), js = target.getDiscardableCards(player, "j", i => get.type(i) == "equip");
@@ -989,14 +999,15 @@ const skills = {
 				return;
 			}
 			let canfj = targets.filter(target => {
-				return target.countDiscardableCards(player, "ej", i => get.subtype(i) == "equip2");
+				return target.countDiscardableCards(player, "e", i => get.subtype(i) == "equip2");
 			});
 			for (let i = 0; i < 2; i++) {
-				if (i && canfj.includes(targets[i]) && !targets[i].countDiscardableCards(player, "ej", i => get.subtype(i) == "equip2")) break;
+				if (i && canfj.includes(targets[i]) && !targets[i].countDiscardableCards(player, "e", i => get.subtype(i) == "equip2")) break;
 				const result = await player
-					.discardPlayerCard("ej", targets[i], true)
+					.discardPlayerCard("e", targets[i], true)
 					.set("filterButton", button => {
 						if (get.event("fj")) return get.subtype(button.link) == "equip2";
+						return true;
 						return get.type(button.link) == "equip";
 					})
 					.set("fj", canfj.length === 1 && canfj.includes(targets[i]))
@@ -1008,7 +1019,17 @@ const skills = {
 		},
 		ai: {
 			order: 10,
-			result: { target: -1 },
+			result: {
+				target(player, target) {
+					let att = get.attitude(player, target), es = [];
+					target.countDiscardableCards(player, "e").forEach(i => {
+						es.push(get.value(i, target));
+					});
+					let min = Math.min(...es), max = Math.max(...es), ext = target.hasSkillTag("noe") ? 10 : 0;
+					if (att <= 0) return ext - max;
+					return ext - min;
+				}
+			},
 		},
 	},
 	stdqiansu: {
@@ -1022,6 +1043,7 @@ const skills = {
 			player.draw();
 		},
 		ai: {
+			noe: true,
 			effect: {
 				target(card, player, target) {
 					if (target.countCards("e")) return;
