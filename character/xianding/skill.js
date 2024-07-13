@@ -9455,8 +9455,48 @@ const skills = {
 				},
 				prompt2: "你判定，若结果为红色，你重置〖霞泪〗的观看牌数；若结果为黑色，〖暗织〗于本回合失效，然后你可以令一名非当前回合角色获得本回合进入弃牌堆的两张牌。",
 				content: function () {
-					event.setContent(lib.skill.dcanzhi.content);
-					event.goto(0);
+					"step 0";
+					player.judge(result => {
+						if (get.color(result) == "red") return _status.event.getParent().player.countMark("dcxialei_clear") / 2;
+						return 2;
+					}).judge2 = result => result.bool;
+					"step 1";
+					if (result.color == "red") {
+						player.removeSkill("dcxialei_clear");
+						event.finish();
+					} else if (result.color == "black") {
+						player.addTempSkill("dcanzhi_blocker");
+						player
+							.chooseTarget("暗织：是否令一名非当前回合角色获得本回合进入弃牌堆的两张牌？", (card, player, target) => {
+								return target != _status.currentPhase;
+							})
+							.set("ai", target => {
+								return get.effect(target, { name: "wuzhong" }, _status.event.player);
+							});
+					} else event.finish();
+					"step 2";
+					if (result.bool) {
+						var target = result.targets[0];
+						event.target = target;
+						player.line(target);
+						var cards = [];
+						game.getGlobalHistory("cardMove", evt => {
+							if ((evt.name == "lose" && evt.position == ui.discardPile) || evt.name == "cardsDiscard") {
+								cards.addArray(evt.cards.filterInD("d"));
+							}
+						});
+						if (cards.length) {
+							player.chooseButton(["暗织：选择令" + get.translation(target) + "获得的牌", cards], true, Math.min(cards.length, 2)).set("ai", button => {
+								var player = _status.event.player,
+									target = _status.event.getParent().target;
+								return get.sgnAttitude(player, target) * get.value(button.link, target);
+							});
+						}
+					} else event.finish();
+					"step 3";
+					if (result.bool) {
+						target.gain(result.links, "gain2");
+					}
 				},
 			},
 			blocker: { charlotte: true },

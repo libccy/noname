@@ -427,6 +427,7 @@ export class GameEvent {
 	 * @param {import("./GameEvent/compilers/IContentCompiler.js").EventCompileable} content
 	 */
 	setContent(content) {
+		if(this.#inContent) throw new Error("Cannot set content when content is running");
 		this.content = ContentCompiler.compile(content);
 		return this;
 	}
