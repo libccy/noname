@@ -908,65 +908,75 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		filter(event, player) {
-			return game.hasPlayer(target => {
-				return target.getDiscardableCards(player, "e").some(card => parseInt(get.subtype(card).slice("equip".length)) <= 2);
+			let e = 0, fj = false;
+			game.countPlayer(target => {
+				let es = target.getDiscardableCards(player, "e"), js = target.getDiscardableCards(player, "j", i => get.type(i) == "equip");
+				if (es.length) e++;
+				e += js.length;
+				if (!fj && (es.some(card => get.subtype(card) == "equip2") || js.some(card => get.subtype(card) == "equip2"))) fj = true;
 			});
+			return fj && e >= 2;
 		},
 		filterTarget(card, player, target) {
-			if (!ui.selected.targets.length) {
-				return target.getDiscardableCards(player, "e").some(card => parseInt(get.subtype(card).slice("equip".length)) <= 2);
+			let e = 0;
+			let es = target.getDiscardableCards(player, "e"), js = target.getDiscardableCards(player, "j", i => get.type(i) == "equip");
+			if (es.length) e++;
+			e += js.length;
+			if (!e) return false;
+			if (!ui.selected.targets.length) return true;
+			if (!ui.selected.targets[0].countDiscardableCards(player, "ej", i => get.subtype(i) == "equip2")) {
+				return es.some(card => get.subtype(card) == "equip2") || js.some(card => get.subtype(card) == "equip2");
 			}
-			const cards = ui.selected.targets[0]
-				.getDiscardableCards(player, "e")
-				.filter(card => parseInt(get.subtype(card).slice("equip".length)) <= 2)
-				.map(card => get.subtype(card));
-			if (cards.length == 2) {
-				return target.getDiscardableCards(player, "e").some(card => parseInt(get.subtype(card).slice("equip".length)) <= 2);
-			}
-			let Tcards = target
-				.getDiscardableCards(player, "e")
-				.filter(card => parseInt(get.subtype(card).slice("equip".length)) <= 2)
-				.map(card => get.subtype(card));
-			Tcards.removeArray(cards);
-			return Tcards.length;
+			return true;
 		},
-		selectTarget: [1, 2],
+		selectTarget: function() {
+			if (!ui.selected.targets.length) return [1, 2];
+			let e = 0, player = get.event("player"), target = ui.selected.targets[0];
+			let es = target.getDiscardableCards(player, "e"), js = target.getDiscardableCards(player, "j", i => get.type(i) == "equip");
+			if (es.length) e++;
+			e += js.length;
+			if (e >= 2 && (es.some(card => get.subtype(card) == "equip2") || js.some(card => get.subtype(card) == "equip2"))) return [1, 2];
+			return 2;
+		},
 		complexTarget: true,
 		multitarget: true,
 		multiline: true,
 		async content(event, trigger, player) {
 			const targets = event.targets.slice();
 			if (targets.length == 1) {
-				await player.discardPlayerCard("e", targets[0], true);
+				await player.discardPlayerCard("ej", targets[0], true, 2).set("filterButton", button => {
+					let position = get.position(button.link), subtype = get.subtype(button.link);
+					if (!subtype || !subtype.startsWith("equip")) return false;
+					if (ui.selected.buttons.length) {
+						let pos = get.position(ui.selected.buttons[0].link), sub = get.subtype(ui.selected.buttons[0].link);
+						if (pos == "e" && position == "e") return false;
+						if (sub == "equip2") return true;
+						return subtype == "equip2";
+					}
+					if (position == "e") {
+						if (!get.event("js").some(i => get.subtype(i) == "equip2")) return subtype == "equip2";
+						return true;
+					}
+					if (!get.event("es").length) return subtype == "equip2";
+					return true;
+				}).set("es", targets[0].getDiscardableCards(player, "e", i => get.subtype(i) == "equip2")).set("js", targets[0].getDiscardableCards(player, "j", i => get.type(i) == "equip"));
 				return;
 			}
-			let discardedType = [];
+			let canfj = targets.filter(target => {
+				return target.countDiscardableCards(player, "ej", i => get.subtype(i) == "equip2");
+			});
 			for (let i = 0; i < 2; i++) {
-				const target = targets[i],
-					other = targets[1 - i];
-				let cards = target
-					.getDiscardableCards(player, "e")
-					.filter(card => parseInt(get.subtype(card).slice("equip".length)) <= 2)
-					.map(card => get.subtype(card));
-				const Tcards = other
-					.getDiscardableCards(player, "e")
-					.filter(card => parseInt(get.subtype(card).slice("equip".length)) <= 2)
-					.map(card => get.subtype(card));
-				cards.removeArray(i == 0 ? (Tcards.length == 2 ? [] : Tcards) : discardedType);
-				if (!cards.length) continue;
+				if (i && canfj.includes(targets[i]) && !targets[i].countDiscardableCards(player, "ej", i => get.subtype(i) == "equip2")) break;
 				const result = await player
-					.discardPlayerCard("e", target, true)
+					.discardPlayerCard("ej", targets[i], true)
 					.set("filterButton", button => {
-						return get.event("cards").includes(get.subtype(button.link));
+						if (get.event("fj")) return get.subtype(button.link) == "equip2";
+						return get.type(button.link) == "equip";
 					})
-					.set("cards", cards)
+					.set("fj", canfj.length === 1 && canfj.includes(targets[i]))
 					.forResult();
-				if (result.bool) {
-					discardedType.addArray(
-						result.cards.reduce((list, card) => {
-							return list.add(get.subtype(card));
-						}, [])
-					);
+				if (result.bool && get.subtype(result.cards[0]) == "equip2") {
+					canfj = [];
 				}
 			}
 		},
