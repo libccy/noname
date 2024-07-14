@@ -64,7 +64,7 @@ const characters = {
 	tengfanglan: ["female", "wu", 3, ["luochong", "aichen"]],
 	sp_menghuo: ["male", "qun", 4, ["spmanwang"]],
 	jin_yanghu: ["male", "jin", 4, ["huaiyuan", "chongxin", "dezhang"]],
-	qinghegongzhu: ["female", "wei", 3, ["zengou", "qhzhangji"], ["name:刘|null"]],
+	qinghegongzhu: ["female", "wei", 3, ["zengou", "qhzhangji"], ["name:曹|null"]],
 	fanjiangzhangda: ["male", "wu", 4, ["yuanchou", "juesheng"], ["name:范|疆-张|达"]],
 	tianyu: ["male", "wei", 4, ["saodi", "zhuitao"]],
 	ol_chendeng: ["male", "qun", 4, ["olfengji", "olxuanhui"]],
