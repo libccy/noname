@@ -5,6 +5,11 @@ import { _status } from "../../status/index.js";
 import { ui } from "../../ui/index.js";
 import security from "../../util/security.js";
 import ContentCompiler from "./GameEvent/compilers/dist/ContentCompiler.js";
+import GameEventManager from "./GameEvent/GameEventManager.js";
+export {
+	GameEventManager,
+	ContentCompiler
+};
 
 /**
  * @implements { PromiseLike<Omit<GameEvent,"then">> }
@@ -13,8 +18,9 @@ export class GameEvent {
 	/**
 	 * @param { string | GameEvent } [name]
 	 * @param { boolean } [trigger]
+	 * @param { GameEventManager } [manager]
 	 */
-	constructor(name = "", trigger = true) {
+	constructor(name = "", trigger = true, manager = _status.eventManager) {
 		if (name instanceof GameEvent) {
 			const other = name;
 			name = other.name;
@@ -22,7 +28,8 @@ export class GameEvent {
 		}
 
 		this.name = name;
-		const gameEvent = _status.event;
+		this.manager = manager;
+		const gameEvent = manager.getStatusEvent();
 		if (gameEvent) {
 			const type = this.getDefaultHandlerType();
 			// @ts-ignore
@@ -531,14 +538,14 @@ export class GameEvent {
 		return this._rand;
 	}
 	insert(content, map) {
-		const next = new lib.element.GameEvent(`${this.name}Inserted`, false);
+		const next = new GameEvent(`${this.name}Inserted`, false, this.manager);
 		this.next.push(next);
 		next.setContent(content);
 		Object.entries(map).forEach((entry) => next.set(entry[0], entry[1]));
 		return next;
 	}
 	insertAfter(content, map) {
-		const next = new lib.element.GameEvent(`${this.name}Inserted`, false);
+		const next = new GameEvent(`${this.name}Inserted`, false, this.manager);
 		this.after.push(next);
 		next.setContent(content);
 		Object.entries(map).forEach((entry) => next.set(entry[0], entry[1]));
@@ -951,6 +958,11 @@ export class GameEvent {
 	toEvent() {
 		return this;
 	}
+
+	/**
+	 * @type { GameEventManager }
+	 */
+	manager;
 	/**
 	 * @type { import("./GameEvent/compilers/IContentCompiler.js").EventCompiledContent }
 	 */
@@ -1075,10 +1087,10 @@ export class GameEvent {
 
 			if(this.parent) this.parent.childEvents.push(this);
 			game.getGlobalHistory("everything").push(this);
-			if (_status.eventStack.length === 0) _status.rootEvent = this;
-			_status.eventStack.push(this);
+			if (this.manager.eventStack.length === 0) this.manager.rootEvent = this;
+			this.manager.eventStack.push(this);
 			await this.loop().finally(() => {
-				_status.eventStack.pop();
+				this.manager.eventStack.pop();
 			});
 		})();
 		return this.#start;
@@ -1121,9 +1133,9 @@ export class GameEvent {
 			let result;
 			while (true) {
 				await _status.pauseManager.waitPause();
-				if (_status.tempEvent){
-					if (_status.tempEvent === this) {
-						_status.tempEvent = void 0;
+				if (this.manager.tempEvent){
+					if (this.manager.tempEvent === this) {
+						this.manager.tempEvent = void 0;
 					} else {
 						this.cancel(true, null, "notrigger");
 						return result;

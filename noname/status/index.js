@@ -1,34 +1,21 @@
 import { lib } from "../library/index.js";
 import PauseManager from "../game/PauseManager.js";
+import { GameEventManager } from "../library/element/gameEvent.js";
 
 export class status {
 	imchoosing = false;
 	clicked = false;
 	auto = false;
-	/**
-	 * @type { GameEvent[] }
-	 */
-	eventStack = [];
+	eventManager= new GameEventManager();
 	/**
 	 * @type { GameEvent | undefined }
 	 */
 	get event() {
-		return this.tempEvent || this.eventStack.at(-1) || this.rootEvent;
+		return this.eventManager.getStatusEvent();
 	}
 	set event(event) {
-		if (!(event instanceof lib.element.GameEvent)) return;
-		if (this.eventStack.length === 0) this.rootEvent = event;
-		else if (this.eventStack.includes(event)) this.tempEvent = event;
-		else throw new Error("Cannot assign a value to _status.event that is not in the _status.eventStack.");
+		this.eventManager.setStatusEvent(event);
 	}
-	/**
-	 * @type { GameEvent | undefined }
-	 */
-	rootEvent;
-	/**
-	 * @type { GameEvent | undefined }
-	 */
-	tempEvent;
 	ai = {};
 	lastdragchange = [];
 	/**

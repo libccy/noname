@@ -21,7 +21,7 @@ import { ui } from "../../ui/index.js";
 import { CacheContext } from "../cache/cacheContext.js";
 import { ChildNodesWatcher } from "../cache/childNodesWatcher.js";
 import security from "../../util/security.js";
-import ContentCompiler from "./GameEvent/compilers/dist/ContentCompiler.js";
+import { ContentCompiler } from "./gameEvent.js";
 
 export class Player extends HTMLDivElement {
 	/**
