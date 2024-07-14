@@ -3,7 +3,6 @@ import { game } from "../../game/index.js";
 import { lib } from "../index.js";
 import { _status } from "../../status/index.js";
 import { ui } from "../../ui/index.js";
-import { AsyncFunction } from "../../util/index.js";
 import security from "../../util/security.js";
 import ContentCompiler from "./GameEvent/compilers/dist/ContentCompiler.js";
 
@@ -115,6 +114,10 @@ export class GameEvent {
 	 */
 	//@ts-ignore
 	_result = {};
+	/**
+	 * @type { any[] }
+	 */
+	_args = [];
 	/**
 	 * @type { [string, any][] }
 	 */

@@ -5622,29 +5622,20 @@ export class Game extends GameCompatible {
 	 * @param { GameEvent } [event]
 	 */
 	loop(event = _status.event) {
+		if (!event) throw new Error("There is no _status.event when game.loop.");
 		return event.start();
-	}
-	/**
-	 * @deprecated
-	 * @param { GameEvent } [event]
-	 */
-	runContent(event = _status.event) {
-		return event.content(event).catch(event.onError)
 	}
 	pause() {
 		_status.paused = true;
 		return _status.pauseManager.pause;
 	}
 	pause2() {
-		if (_status.connectMode) return _status.pauseManager.pause2;
-		_status.paused2 = true;
+		if (!_status.connectMode) _status.paused2 = true;
 		return _status.pauseManager.pause2;
 	}
 	resume() {
 		if (!_status.paused) return;
-		if (!_status.noclearcountdown) {
-			game.stopCountChoose();
-		}
+		if (!_status.noclearcountdown) game.stopCountChoose();
 		_status.paused = false;
 		delete _status.waitingForTransition;
 	}
@@ -5653,13 +5644,21 @@ export class Game extends GameCompatible {
 		if (!_status.paused2) return;
 		_status.paused2 = false;
 	}
-	delaye() {
+	/**
+	 * @param { number } [time]
+	 * @param { number } [time2]
+	 */
+	delaye(time = 1, time2 = 0) {
 		let next = game.createEvent("delay", false);
 		next.setContent("delay");
 		next._args = Array.from(arguments);
 		return next;
 	}
-	delayex() {
+	/**
+	 * @param { number } [time]
+	 * @param { number } [time2]
+	 */
+	delayex(time = 1, time2 = 0) {
 		let next = game.createEvent("delayx", false);
 		next.setContent("delay");
 		next._args = Array.from(arguments);
@@ -5700,18 +5699,14 @@ export class Game extends GameCompatible {
 	}
 	/**
 	 * @deprecated
-	 * @param { number } [time]
-	 * @param { number } [time2]
 	 */
-	asyncDelay(time = 1, time2 = 0) {
+	asyncDelay(time, time2) {
 		return game.delay(time, time2);
 	}
 	/**
 	 * @deprecated
-	 * @param { number } [time]
-	 * @param { number } [time2]
 	 */
-	asyncDelayx(time = 1, time2 = 0) {
+	asyncDelayx(time, time2) {
 		return game.delayx(time, time2);
 	}
 	/**
