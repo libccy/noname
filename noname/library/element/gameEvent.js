@@ -1120,7 +1120,7 @@ export class GameEvent {
 		this.#waitNext = (async () => {
 			let result;
 			while (true) {
-				if (this.next.length <= 1) await _status.pauseManager.waitPause();
+				await _status.pauseManager.waitPause();
 				if (_status.tempEvent){
 					if (_status.tempEvent === this) {
 						_status.tempEvent = void 0;
