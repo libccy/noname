@@ -1,4 +1,9 @@
 export default {
+	"#mpqianlin1": "吾性至俭，不能自奉，何况遗人？",
+	"#mpqianlin2": "以财自污，则免清高之祸。",
+	"#mpsixiao1": "风木之悲，痛彻肺腑。",
+	"#mpsixiao2": "外容毁悴，内心神伤。",
+	"#mp_wangrong:die": "自阮、嵇云亡，为世所羁，实有所叹……",
 	"#starliangyan1": "佳燕并头语，不恋雕梁而归于万里。",
 	"#starliangyan2": "灵禽非醴泉不饮，非积善之家不栖。",
 	"#starminghui1": "大智若愚，女子之锦绣常隐于华服。",

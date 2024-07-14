@@ -42,9 +42,9 @@ export class Audio {
         if (skill == void 0) throw new ReferenceError(`skill is not defined`);
 
         const formatedPlayer = player != void 0 ? this.formatPlayer(player) : void 0;
-        let formatedInfo = info;
+        let formatedInfo;
         if (info != void 0 && (typeof info !== "object" || Array.isArray(info))) formatedInfo = { audio: info };
-
+        else formatedInfo = info;
         return new Audio(new SkillAudio(skill, formatedPlayer, formatedInfo));
     }
 
@@ -118,6 +118,10 @@ export class Audio {
      */
     #Audio;
 
+    get name() {
+        return this.#Audio.name;
+    }
+    
     get type() {
         return this.#Audio.type;
     }
@@ -125,10 +129,6 @@ export class Audio {
      * @type { string[] }
      */
     #history = [];
-
-    get name() {
-        return this.#Audio.name;
-    }
     /**
      * @type { AudioInfo }
      */
@@ -172,8 +172,9 @@ export class Audio {
     constructor(audio, history = []) {
         this.#history = history.slice();
         this.#Audio = audio;
-        if (this.checkHistory()) this.#history.unshift(this.#Audio.name);
-        this.#audioInfo = this.#Audio.getAudioInfo();
+        const isExist = this.checkHistory();
+        if (isExist) this.#history.unshift(this.#Audio.name);
+        this.#audioInfo = isExist ? this.#Audio.getAudioInfo() : this.#Audio.defaultInfo;
     }
     getAudio(name, info) {
         const audio = this.#Audio.getAudio(name, info);
@@ -236,9 +237,8 @@ export class Audio {
         let path = this.#Audio.defaultPath;
         const pathIndex = audioInfoString.lastIndexOf("/");
         if (pathIndex !== -1) {
-            path = audioInfoString.slice(0, pathIndex);
-            audioInfoString = audioInfoString.slice(pathIndex);
-            if (!["db:", "ext:", this.#Audio.defaultPath].some(i => path.startsWith(i))) path = this.#Audio.defaultPath + path;
+            path = audioInfoString.slice(0, pathIndex + 1);
+            audioInfoString = audioInfoString.slice(pathIndex + 1);
         }
 
         let ext = ".mp3";
@@ -276,10 +276,10 @@ class AudioBase {
      * @type { string }
      */
     defaultPath;
-    // /**
-    //  * @type { AudioInfo }
-    //  */
-    // defaultInfo;
+    /**
+     * @type { AudioInfo }
+     */
+    defaultInfo;
 
     /**
      * @type { boolean }
@@ -345,9 +345,9 @@ class SkillAudio {
         const result = {
             type: this.type,
             name: this.name,
-        }
-        if (this.filteredAudioName) result.filteredAudioName = this.filteredAudioName;
-        if (this.filteredAudioName2 != void 0) result.player = this.player;
+            filteredAudioName: this.filteredAudioName || void 0,
+            player: this.filteredAudioName2 != void 0 ? this.player : void 0
+        };
         return JSON.stringify(result);
     }
 
@@ -372,7 +372,8 @@ class SkillAudio {
         this.filteredAudioName = this.getName(i => this.audioname.includes(i));
 
         if (this.info.audioname2) {
-            const audioname2 = this.info.audioname2[this.getName(i => this.info.audioname2[i])];
+            const key = this.getName(name => this.info.audioname2 && this.info.audioname2[name]);
+            const audioname2 = this.info.audioname2[key];
             if (audioname2 != void 0) this.filteredAudioName2 = audioname2;
         }
     }
@@ -439,9 +440,9 @@ class DieAudio {
         if (!this.useCache) throw new ReferenceError("Cannot get cache key when not using cache.");
         const result = {
             type: this.type,
-            name: this.name
-        }
-        if (this.name !== this.player.name) result.skin = this.player.skin;
+            name: this.name,
+            skin: this.name !== this.player.name ? this.player.skin : void 0
+        };
         return JSON.stringify(result);
     }
 

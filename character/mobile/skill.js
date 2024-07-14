@@ -63,8 +63,8 @@ const skills = {
 			if (event.card) return false;
 			return [event.source, event.player].includes(player);
 		},
-		logTarget: function () {
-			return _status.currentPhase;
+		logTarget: function (event, player) {
+			return _status.currentPhase || player;
 		},
 		async content(event, trigger, player) {
 			await player.draw(2);
