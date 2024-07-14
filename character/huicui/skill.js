@@ -13203,7 +13203,7 @@ const skills = {
 			} else {
 				const targets = event.targets;
 				targets.sortBySeat();
-				game.asyncDraw(targets);
+				await game.asyncDraw(targets);
 			}
 		},
 	},
