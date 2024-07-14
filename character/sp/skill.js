@@ -13450,22 +13450,17 @@ const skills = {
 		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },
 		filter(event, player) {
-			const list = ["draw", "sha"];
+			if (!player.hasSkill("olfengji_sha") && !player.hasSkill("olfengji_draw")) return false;
 			return game.hasPlayer(target => {
 				if (target == player) return false;
-				const players = [player.storage["olfengji_" + list[0]] || 0, player.storage["olfengji_" + list[1]] || 0];
-				const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
-				return players[0] != targets[0] || players[1] != targets[1];
+				return target.hasSkill("olfengji_sha") || target.hasSkill("olfengji_draw");
 			});
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
 				.chooseTarget(get.prompt("olxuanhui"), "与一名其他角色交换〖丰积〗效果", (card, player, target) => {
-					const list = ["draw", "sha"];
 					if (target == player) return false;
-					const players = [player.storage["olfengji_" + list[0]] || 0, player.storage["olfengji_" + list[1]] || 0];
-					const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
-					return players[0] != targets[0] || players[1] != targets[1];
+					return target.hasSkill("olfengji_sha") || target.hasSkill("olfengji_draw");
 				})
 				.set("ai", target => {
 					const player = get.event().player,

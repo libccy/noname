@@ -424,38 +424,35 @@ const skills = {
 					})
 				) {
 					target.addSkill("olsbhongtu_limit");
-					target.addMark("olsbhongtu_limit", 2, false);
+					if (!target.storage.olsbhongtu_limit) target.storage.olsbhongtu_limit = [0, 0];
+					target.storage.olsbhongtu_limit[0] += 2;
 				} else {
 					skill = "qianxi";
 				}
-				let skillName = null;
 				if (skill) {
-					skillName = `olsbhongtu_${player.playerid}`;
+					let skillName = `olsbhongtu_${player.playerid}`;
 					target.addAdditionalSkills(skillName, [skill]);
-				}
-				target.when({ player: "phaseBegin" }).then(() => {
-					player.storage.olsbhongtu_phased = true;
-				});
-				target
-					.when({ player: "phaseEnd" })
-					.filter(() => {
-						return target.storage.olsbhongtu_phased;
-					})
-					.assign({
-						firstDo: true,
-						priority: Infinity,
-					})
-					.vars({
-						skillName,
-					})
-					.then(() => {
-						delete player.storage.olsbhongtu_phased;
-						if (skillName) {
-							player.removeAdditionalSkills(skillName);
-						} else {
-							player.removeSkill("olsbhongtu_limit");
-						}
+					delete target.storage.olsbhongtu_phased;
+					target.when({ player: "phaseBegin" }).then(() => {
+						player.storage.olsbhongtu_phased = true;
 					});
+					target
+						.when({ player: "phaseEnd" })
+						.filter(() => {
+							return target.storage.olsbhongtu_phased;
+						})
+						.assign({
+							firstDo: true,
+							priority: Infinity,
+						})
+						.vars({
+							skillName,
+						})
+						.then(() => {
+							delete player.storage.olsbhongtu_phased;
+							player.removeAdditionalSkills(skillName);
+						});
+				}
 			}
 		},
 		subSkill: {
@@ -469,9 +466,18 @@ const skills = {
 				charlotte: true,
 				mod: {
 					maxHandcard(player, num) {
-						return num + player.countMark("olsbhongtu_limit");
+						return num + player.storage.olsbhongtu_limit[0];
 					},
 				},
+				trigger: {
+					player: "phaseEnd"
+				},
+				silent: true,
+				lastDo: true,
+				content() {
+					player.storage.olsbhongtu_limit = [player.storage.olsbhongtu_limit[1], 0];
+					if (!player.storage.olsbhongtu_limit[0]) player.removeSkill("olsbhongtu_limit");
+				}
 			},
 		},
 	},
@@ -671,19 +677,26 @@ const skills = {
 			effect: {
 				charlotte: true,
 				onremove: true,
-				intro: { content: "本回合的结束阶段可以发动#次〖秘计〗" },
+				intro: { content: "本回合的结束阶段额外发动#次〖秘计〗" },
+				trigger: { global: "phaseJieshuBegin" },
+				filter(event, player) {
+					if (player.isHealthy()) return false;
+					return player.hasMark("olzhenlie_effect");
+				},
+				getIndex(event, player) {
+					return player.countMark("olzhenlie_effect");
+				},
+				forced: true,
+				inherit: "olmiji"
 			},
 		},
 	},
 	olmiji: {
 		audio: 2,
-		trigger: { global: "phaseJieshuBegin" },
+		trigger: { player: "phaseJieshuBegin" },
 		filter(event, player) {
 			if (player.isHealthy()) return false;
-			return event.player == player || player.hasMark("olzhenlie_effect");
-		},
-		getIndex(event, player) {
-			return player.countMark("olzhenlie_effect") + (event.player == player);
+			return true;
 		},
 		async content(event, trigger, player) {
 			let num = player.getDamagedHp();

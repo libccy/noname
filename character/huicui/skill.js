@@ -7879,8 +7879,8 @@ const skills = {
 				.set(
 					"choice",
 					(() => {
-						let eff1 = loses.reduce((prev, val) => prev + get.effect(i, { name: "losehp" }, player, player), 0),
-							eff2 = recovers.reduce((prev, val) => prev + get.recoverEffect(i, player, player), 0),
+						let eff1 = loses.reduce((prev, i) => prev + get.effect(i, { name: "losehp" }, player, player), 0),
+							eff2 = recovers.reduce((prev, i) => prev + get.recoverEffect(i, player, player), 0),
 							max = Math.max(0, eff1, eff2);
 						if (max === 0) return "cancel2";
 						if (eff1 > eff2) return "选项一";

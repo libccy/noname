@@ -14675,8 +14675,7 @@ const skills = {
 	twlihuo3: {
 		trigger: { player: "useCardAfter" },
 		filter: function (event, player) {
-			return (event.card.twlihuo_buffed =
-				true &&
+			return (event.card.twlihuo_buffed &&
 				player.getHistory("sourceDamage", function (evt) {
 					return evt.card == event.card && evt._dyinged;
 				}).length > 0);
