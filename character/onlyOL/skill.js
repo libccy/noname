@@ -677,19 +677,26 @@ const skills = {
 			effect: {
 				charlotte: true,
 				onremove: true,
-				intro: { content: "本回合的结束阶段可以发动#次〖秘计〗" },
+				intro: { content: "本回合的结束阶段额外发动#次〖秘计〗" },
+				trigger: { global: "phaseJieshuBegin" },
+				filter(event, player) {
+					if (player.isHealthy()) return false;
+					return player.hasMark("olzhenlie_effect");
+				},
+				getIndex(event, player) {
+					return player.countMark("olzhenlie_effect");
+				},
+				forced: true,
+				inherit: "olmiji"
 			},
 		},
 	},
 	olmiji: {
 		audio: 2,
-		trigger: { global: "phaseJieshuBegin" },
+		trigger: { player: "phaseJieshuBegin" },
 		filter(event, player) {
 			if (player.isHealthy()) return false;
-			return event.player == player || player.hasMark("olzhenlie_effect");
-		},
-		getIndex(event, player) {
-			return player.countMark("olzhenlie_effect") + (event.player == player);
+			return true;
 		},
 		async content(event, trigger, player) {
 			let num = player.getDamagedHp();
