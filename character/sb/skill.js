@@ -1267,18 +1267,18 @@ const skills = {
 			},
 			{
 				cost: 5,
-				prompt: () => "获得一名已阵亡角色的所有技能，然后失去〖行殇〗〖放逐〗〖颂威〗",
-				filter: () => game.dead.some(target => target.getSkills(null, false, false).some(i => get.info(i) && !get.info(i).charlotte)),
+				prompt: () => "获得一名已阵亡角色的武将牌上的所有技能，然后失去〖行殇〗〖放逐〗〖颂威〗",
+				filter: () => game.dead.some(target => target.getStockSkills(true, true).some(i => get.info(i) && !get.info(i).charlotte)),
 				filterTarget: false,
 				async content(player) {
 					const result = await player
 						.chooseTarget(
 							"行殇：请选择一名已阵亡角色",
 							(card, player, target) => {
-								return target.isDead() && target.getSkills(null, false, false).some(i => get.info(i) && !get.info(i).charlotte);
+								return target.isDead() && target.getStockSkills(true, true).some(i => get.info(i) && !get.info(i).charlotte);
 							},
 							true,
-							"获得一名已阵亡角色的所有技能，然后失去〖行殇〗〖放逐〗〖颂威〗"
+							"获得一名已阵亡角色的武将牌上的所有技能，然后失去〖行殇〗〖放逐〗〖颂威〗"
 						)
 						.set("ai", target => {
 							return ["name", "name1", "name2"].reduce((sum, name) => {
@@ -1293,7 +1293,7 @@ const skills = {
 						player.line(target);
 						game.log(player, "选择了", target);
 						await player.changeSkills(
-							target.getSkills(null, false, false).filter(i => get.info(i) && !get.info(i).charlotte),
+							target.getStockSkills(true, true).filter(i => get.info(i) && !get.info(i).charlotte),
 							["sbxingshang", "sbfangzhu", "sbsongwei"]
 						);
 					}
