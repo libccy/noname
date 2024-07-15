@@ -4537,7 +4537,7 @@ const skills = {
 							return (
 								!player.getHistory("sourceDamage", evt2 => {
 									return evt2.card && evt2.card == evt.card;
-								}).length && get.tag(evt.card, "damage")
+								}).length && get.tag(evt.card, "damage") > 0.5
 							);
 						})
 						.indexOf(event) >= 2

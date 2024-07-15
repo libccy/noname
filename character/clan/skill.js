@@ -2713,7 +2713,8 @@ const skills = {
 			if (result.bool) {
 				var cards = result.cards;
 				target.give(cards, player);
-				game.delayx();
+				if (!cards.length) event.finish();
+				else game.delayx();
 			} else event.finish();
 			"step 3";
 			if (trigger.cards.filterInD().length) target.gain(trigger.cards.filterInD(), "gain2", "bySelf");

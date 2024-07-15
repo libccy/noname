@@ -2030,7 +2030,7 @@ const skills = {
 				audio: "sbhuoji2.mp3",
 				trigger: { player: "phaseZhunbeiBegin" },
 				filter: function (event, player) {
-					return player.getAllHistory("sourceDamage", evt => evt.hasNature("fire")).reduce((num, evt) => num + evt.num, 0) >= game.players.length + game.dead.length;
+					return player.getAllHistory("sourceDamage", evt => evt.hasNature("fire") && evt.player != player).reduce((num, evt) => num + evt.num, 0) >= game.players.length + game.dead.length;
 				},
 				forced: true,
 				locked: false,
@@ -2066,7 +2066,7 @@ const skills = {
 					player.addTempSkill("sbhuoji_count", {
 						player: ["sbhuoji_achieveBegin", "sbhuoji_failBegin"],
 					});
-					player.storage.sbhuoji_count = player.getAllHistory("sourceDamage", evt => evt.hasNature("fire")).reduce((num, evt) => num + evt.num, 0);
+					player.storage.sbhuoji_count = player.getAllHistory("sourceDamage", evt => evt.hasNature("fire") && evt.player != player).reduce((num, evt) => num + evt.num, 0);
 					player.markSkill("sbhuoji_count");
 				},
 			},

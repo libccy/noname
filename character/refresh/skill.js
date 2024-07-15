@@ -2378,7 +2378,8 @@ const skills = {
 			if (result.bool) {
 				var target = result.targets[0];
 				player.line(target, "green");
-				player.discardPlayerCard(target, "e", true);
+				var card = target.getCards("e").randomGet();
+				if (card) target.discard(card);
 			}
 		},
 		ai: {
