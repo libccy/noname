@@ -1261,7 +1261,7 @@ const skills = {
 				ai: {
 					result: {
 						target(player, target) {
-							return get.effect(target, { name: "draw" }, player, player) * (target == player ? 3 : 1);
+							return get.effect(target, { name: "draw" }, player, player) * (target == player ? 3 : 1) * get.sgn(get.attitude(player, target));
 						},
 					},
 				},
