@@ -3115,7 +3115,6 @@ export const Content = {
 		"step 4";
 		//规则集中的“回合开始后⑤”，进行翻面检测
 		if (player.isTurnedOver() && !event._noTurnOver) {
-			event.cancel();
 			player.turnOver();
 			player.phaseSkipped = true;
 			var players = game.players.slice(0).concat(game.dead);
@@ -3124,6 +3123,7 @@ export const Content = {
 				current.getHistory().isSkipped = true;
 				current.getStat().isSkipped = true;
 			}
+			event.cancel();
 		} else {
 			player.phaseSkipped = false;
 			player.getHistory().isMe = true;
