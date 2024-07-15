@@ -7009,34 +7009,25 @@ const skills = {
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 		},
 		forced: true,
-		filter: function (event, player) {
-			if (event.player == player) {
-				if (event.name == "equip" && get.color(event.card, player) == "black") return true;
-				if (event.name == "addJudge" && get.color(event.cards[0], player) == "black") return true;
-			}
-			var evt = event.getl(player);
-			if (!evt || !evt.es || !evt.js || (!evt.es.length && !evt.js.length)) return false;
-			for (var i of evt.es) {
-				if (get.color(i, player) == "black") return true;
-			}
-			for (var i of evt.js) {
-				if (get.color(i, player) == "black") return true;
-			}
-			return false;
-		},
 		getIndex: function (event, player, triggername) {
+			let num = 0;
 			if (event.player == player) {
-				if (event.name == "equip" && get.color(event.card, player) == "black") return 1;
-				if (event.name == "addJudge" && get.color(event.cards[0], player) == "black") return 1;
+				if (event.name == "equip" && get.color(event.card, player) == "black") num++;
+				if (event.name == "addJudge" && get.color(event.cards[0], player) == "black") num++;
 			}
-			let evt = event.getl(player), num = 0;
-			for (var i of evt.es) {
-				if (get.color(i, player) == "black") num++;
+			if (!event.getl) return num;
+			let evt = event.getl(player);
+			if (evt.es && evt.es.length) {
+				for (var i of evt.es) {
+					if (get.color(i, player) == "black") num++;
+				}
 			}
-			for (var i of evt.js) {
-				if (get.color(i, player) == "black") num++;
+			if (evt.js && evt.js.length) {
+				for (var i of evt.js) {
+					if (get.color(i, player) == "black") num++;
+				}
 			}
-			return num
+			return num;
 		},
 		async content(event, trigger, player) {
 			await player.draw(2);
