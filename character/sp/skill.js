@@ -27770,6 +27770,7 @@ const skills = {
 	},
 	chongzhen: {
 		audio: 2,
+		audioname: ["huan_zhaoyun"],
 		trigger: { player: ["useCard", "respond"] },
 		filter: function (event, player) {
 			if (event.card.name != "sha" && event.card.name != "shan") return false;

@@ -92,6 +92,7 @@ const skills = {
 		group: "twjielv_buff",
 		subSkill: {
 			buff: {
+				audio: "twjielv",
 				trigger: {
 					player: ["loseHpEnd", "damageEnd"],
 				},
@@ -629,7 +630,7 @@ const skills = {
 		},
 	},
 	//幻张郃
-	huan_zhanghe_A: {
+	twkuiduan: {
 		audio: 2,
 		trigger: { player: "useCardToPlayered" },
 		filter(event, player) {
@@ -642,14 +643,14 @@ const skills = {
 			const targets = [player, trigger.target];
 			for (const target of targets) {
 				if (!target.countCards("h")) continue;
-				target.addSkill("huan_zhanghe_A_card");
-				target.addGaintag(target.getCards("h").randomGets(2), "huan_zhanghe_A_card");
+				target.addSkill("twkuiduan_card");
+				target.addGaintag(target.getCards("h").randomGets(2), "twkuiduan_card");
 			}
 		},
-		group: "huan_zhanghe_A_damage",
+		group: "twkuiduan_damage",
 		subSkill: {
 			damage: {
-				audio: "huan_zhanghe_A",
+				audio: "twkuiduan",
 				trigger: { global: "damageBegin1" },
 				filter(event, player) {
 					if (!event.source) return false;
@@ -659,11 +660,11 @@ const skills = {
 						evtx.name != "useCard" ||
 						!event.source.hasHistory("lose", evt => {
 							if (evt.getParent() != evtx) return false;
-							return Object.keys(evt.gaintag_map || {}).includes("huan_zhanghe_A_card");
+							return Object.keys(evt.gaintag_map || {}).includes("twkuiduan_card");
 						})
 					)
 						return false;
-					return event.source.countCards("h", card => card.hasGaintag("huan_zhanghe_A_card")) > event.player.countCards("h", card => card.hasGaintag("huan_zhanghe_A_card"));
+					return event.source.countCards("h", card => card.hasGaintag("twkuiduan_card")) > event.player.countCards("h", card => card.hasGaintag("twkuiduan_card"));
 				},
 				forced: true,
 				logTarget: "source",
@@ -675,20 +676,20 @@ const skills = {
 				charlotte: true,
 				mod: {
 					aiOrder(player, card, num) {
-						if (get.itemtype(card) == "card" && card.hasGaintag("huan_zhanghe_A_card")) return num + 1;
+						if (get.itemtype(card) == "card" && card.hasGaintag("twkuiduan_card")) return num + 1;
 					},
 					cardname(card, player) {
-						if (get.itemtype(card) == "card" && card.hasGaintag("huan_zhanghe_A_card")) return "sha";
+						if (get.itemtype(card) == "card" && card.hasGaintag("twkuiduan_card")) return "sha";
 					},
 					cardnature(card, player) {
-						if (get.itemtype(card) == "card" && card.hasGaintag("huan_zhanghe_A_card")) return false;
+						if (get.itemtype(card) == "card" && card.hasGaintag("twkuiduan_card")) return false;
 					},
 				},
 			},
 		},
 	},
 	//幻赵云
-	huan_zhaoyun_A: {
+	twjiezhan: {
 		audio: 2,
 		trigger: {
 			global: "phaseUseBegin",
@@ -699,7 +700,7 @@ const skills = {
 		check(event, player) {
 			if (get.attitude(player, event.player) > 0) return false;
 			if (player.getEquip("bagua") || player.getEquip("rw_bagua")) return true;
-			if (player.hasSkill("huan_zhaoyun_B", null, null, false) && !player.awakenedSkills.includes("huan_zhaoyun_B")) return true;
+			if (player.hasSkill("twlongjin", null, null, false) && !player.awakenedSkills.includes("twlongjin")) return true;
 			if (player.countCards("hs", "shan") || (player.countCards("hs", "sha") && player.hasSkill("ollongdan", null, null, false))) return true;
 			return get.effect(player, { name: "draw" }, player, player) + get.effect(event.player, { name: "sha" }, event.player, player);
 		},
@@ -711,7 +712,7 @@ const skills = {
 			if (target.canUse(sha, player, false, true)) await target.useCard(sha, player);
 		},
 	},
-	huan_zhaoyun_B: {
+	twlongjin: {
 		audio: 2,
 		trigger: {
 			player: "dying",
@@ -743,7 +744,7 @@ const skills = {
 					global: ["phaseBefore", "phaseAfter"],
 				},
 				filter(event, player, name) {
-					return name == "phaseBefore" || (name == "phaseAfter" && !player.countMark("huan_zhaoyun_B_buff"));
+					return name == "phaseBefore" || (name == "phaseAfter" && !player.countMark("twlongjin_buff"));
 				},
 				forced: true,
 				popup: false,
