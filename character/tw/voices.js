@@ -22,7 +22,7 @@ export default {
 	"#longdan_sha_huan_zhaoyun1": "进退有度，百战无伤！",
 	"#longdan_sha_huan_zhaoyun2": "龙魂缠身，虎威犹在！",
 	"#chongzhen_huan_zhaoyun1": "众将士，且随老夫再战一场！",
-	"#chongzhen_huan_zhaoyun1": "出入千军万马，经年横站八方！",
+	"#chongzhen_huan_zhaoyun2": "出入千军万马，经年横站八方！",
 	"#huan_zhaoyun:die": "转战一生，终得见兴汉之日。",
 	"#twkuiduan1": "蜀军大败，吾等岂能失此战机！",
 	"#twkuiduan2": "求胜心切，竟轻中贼计！",
