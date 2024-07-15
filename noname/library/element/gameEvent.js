@@ -24,20 +24,14 @@ export class GameEvent {
 		if (name instanceof GameEvent) {
 			const other = name;
 			name = other.name;
+			manager = other.manager;
 			trigger = other._triggered !== null;
 		}
 
 		this.name = name;
 		this.manager = manager;
-		const gameEvent = manager.getStatusEvent();
-		if (gameEvent) {
-			const type = this.getDefaultHandlerType();
-			// @ts-ignore
-			if (type && gameEvent.hasHandler(type)) this.pushHandler(...gameEvent.getHandler(type));
-		}
-		game.globalEventHandlers.addHandlerToEvent(this);
-
 		if (trigger && !game.online) this._triggered = 0;
+		game.globalEventHandlers.addHandlerToEvent(this);
 	}
 	static initialGameEvent() {
 		const event = new GameEvent();
@@ -279,6 +273,12 @@ export class GameEvent {
 	getDefaultHandlerType() {
 		const eventName = this.name;
 		if (eventName) return `on${eventName[0].toUpperCase()}${eventName.slice(1)}`;
+		else return "";
+	}
+	getDefaultNextHandlerType() {
+		const eventName = this.name;
+		if (eventName) return `onNext${eventName[0].toUpperCase()}${eventName.slice(1)}`;
+		else return "";
 	}
 	/**
 	 * @param {Parameters<typeof this.hasHandler>[0]} [type]
@@ -1014,8 +1014,12 @@ export class GameEvent {
 		const event = this;
 		return new Proxy([], {
 			set(target, p, childEvent, receiver) {
+				//@ts-ignore
 				if (childEvent instanceof GameEvent && !target.includes(childEvent)) {
 					childEvent.parent = event;
+					const type = childEvent.getDefaultNextHandlerType();
+					//@ts-ignore
+					if (type) childEvent.pushHandler(...event.getHandler(type));
 					if (event.#inContent && event.finished) childEvent.resolve();
 				}
 				return Reflect.set(target, p, childEvent);
