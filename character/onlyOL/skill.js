@@ -1360,7 +1360,7 @@ const skills = {
 				async cost(event, trigger, player) {
 					const targets = game.filterPlayer(target => {
 						if (!player.getStorage("olxianzhen_effect").includes(target)) return false;
-						return trigger.targets.includes(target) && lib.filter.targetEnabled2(trigger.card, player, target);
+						return !trigger.targets.includes(target) && lib.filter.targetEnabled2(trigger.card, player, target);
 					});
 					if (targets.length == 1) {
 						const target = targets[0];
@@ -1371,7 +1371,7 @@ const skills = {
 							.chooseTarget(get.prompt("olxianzhen_effect"), "令任意名【陷阵】拼点成功的目标角色也成为" + get.translation(trigger.card) + "的目标", (card, player, target) => {
 								const trigger = get.event().getTrigger();
 								if (!player.getStorage("olxianzhen_effect").includes(target)) return false;
-								return trigger.targets.includes(target) && lib.filter.targetEnabled2(trigger.card, player, target);
+								return !trigger.targets.includes(target) && lib.filter.targetEnabled2(trigger.card, player, target);
 							})
 							.set("ai", target => {
 								const player = get.event("player"),
