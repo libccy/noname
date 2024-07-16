@@ -16099,7 +16099,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "shiyuanBegin" },
 		filter: function (event, player) {
-			return _status.currentPhase.group == "qun";
+			return _status.currentPhase && _status.currentPhase.group == "qun";
 		},
 		zhuSkill: true,
 		forced: true,
