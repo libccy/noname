@@ -1242,6 +1242,13 @@ const skills = {
 					if (target.isLinked()) await target.link(false);
 					if (target.isTurnedOver()) await target.turnOver(false);
 				},
+				ai: {
+					result: {
+						target(player, target) {
+							return target.isLinked() + target.isTurnedOver();
+						},
+					},
+				},
 			},
 			{
 				cost: 2,
@@ -1250,6 +1257,13 @@ const skills = {
 				filterTarget: true,
 				async content(player, target) {
 					await target.draw(Math.min(5, Math.max(2, game.dead.length)));
+				},
+				ai: {
+					result: {
+						target(player, target) {
+							return get.effect(target, { name: "draw" }, player, player) * (target == player ? 3 : 1);
+						},
+					},
 				},
 			},
 			{
@@ -1263,6 +1277,18 @@ const skills = {
 					let list = Array.from({ length: 13 }).map((_, i) => "equip" + parseFloat(i + 1));
 					list = list.filter(i => target.hasDisabledSlot(i));
 					if (list.length) await target.enableEquip(list.randomGet());
+				},
+				ai: {
+					result: {
+						target(player, target) {
+							return (
+								1 +
+								Array.from({ length: 13 })
+									.map((_, i) => "equip" + parseFloat(i + 1))
+									.some(i => target.hasDisabledSlot(i))
+							);
+						},
+					},
 				},
 			},
 			{
@@ -1298,6 +1324,7 @@ const skills = {
 						);
 					}
 				},
+				ai: {},
 			},
 		],
 		marktext: "颂",
@@ -1329,6 +1356,23 @@ const skills = {
 				const effect = button.link;
 				return player.countMark("sbxingshang") >= effect.cost && effect.filter(player);
 			},
+			check(button) {
+				const player = get.event().player,
+					effect = button.link;
+				return Math.max(
+					...game
+						.filterPlayer(target => {
+							const filterTarget = effect.filterTarget;
+							if (!filterTarget) return target == player;
+							if (typeof filterTarget == "function") return filterTarget(null, player, target);
+							return true;
+						})
+						.map(target => {
+							game.broadcastAll(effect => (lib.skill["sbxingshang_aiSkill"].ai = effect.ai), effect);
+							return get.effect(target, "sbxingshang_aiSkill", player, player);
+						})
+				);
+			},
 			backup(links, player) {
 				const effect = links[0];
 				return {
@@ -1343,6 +1387,7 @@ const skills = {
 						player.removeMark("sbxingshang", effect.cost);
 						await effect.content(player, target);
 					},
+					ai: effect.ai,
 				};
 			},
 			prompt(links, player) {
@@ -1351,8 +1396,37 @@ const skills = {
 				return str + '<div class="text center">' + "移去" + effect.cost + "个“颂”标记，" + effect.prompt() + "</div>";
 			},
 		},
+		ai: {
+			combo: "sbxingshang",
+			order: 8,
+			result: {
+				player(player) {
+					const list = get.info("sbxingshang").getList.filter(effect => {
+						return player.countMark("sbxingshang") >= effect.cost && effect.filter(player);
+					});
+					return Math.max(
+						...list.map(effect => {
+							return Math.max(
+								...game
+									.filterPlayer(target => {
+										const filterTarget = effect.filterTarget;
+										if (!filterTarget) return target == player;
+										if (typeof filterTarget == "function") return filterTarget(null, player, target);
+										return true;
+									})
+									.map(target => {
+										game.broadcastAll(effect => (lib.skill["sbxingshang_aiSkill"].ai = effect.ai), effect);
+										return get.effect(target, "sbxingshang_aiSkill", player, player);
+									})
+							);
+						})
+					);
+				},
+			},
+		},
 		group: "sbxingshang_gain",
 		subSkill: {
+			aiSkill: {},
 			backup: {},
 			gain: {
 				audio: "sbxingshang",
@@ -1381,6 +1455,13 @@ const skills = {
 					target.addTempSkill("sbfangzhu_ban", { player: "phaseEnd" });
 					target.markAuto("sbfangzhu_ban", ["basic"]);
 				},
+				ai: {
+					result: {
+						target(player, target) {
+							return -target.countCards("hs") - 1;
+						},
+					},
+				},
 			},
 			{
 				cost: 2,
@@ -1390,6 +1471,13 @@ const skills = {
 				async content(player, target) {
 					target.addTempSkill("sbfangzhu_ban", { player: "phaseEnd" });
 					target.markAuto("sbfangzhu_ban", ["trick"]);
+				},
+				ai: {
+					result: {
+						target(player, target) {
+							return -target.countCards("hs") - 2;
+						},
+					},
 				},
 			},
 			{
@@ -1401,6 +1489,13 @@ const skills = {
 					target.addTempSkill("sbfangzhu_ban", { player: "phaseEnd" });
 					target.markAuto("sbfangzhu_ban", ["equip"]);
 				},
+				ai: {
+					result: {
+						target(player, target) {
+							return -target.countCards("hs") - 1;
+						},
+					},
+				},
 			},
 			{
 				cost: 2,
@@ -1409,6 +1504,13 @@ const skills = {
 				filterTarget: lib.filter.notMe,
 				async content(player, target) {
 					target.addTempSkill("baiban", { player: "phaseEnd" });
+				},
+				ai: {
+					result: {
+						target(player, target) {
+							return -target.getSkills(null, false).filter(i => get.info(i) && !get.info(i).charlotte).length;
+						},
+					},
 				},
 			},
 			{
@@ -1419,6 +1521,7 @@ const skills = {
 				async content(player, target) {
 					target.addTempSkill("sbfangzhu_kill", { player: "phaseEnd" });
 				},
+				ai: {},
 			},
 			{
 				cost: 3,
@@ -1427,6 +1530,13 @@ const skills = {
 				filterTarget: lib.filter.notMe,
 				async content(player, target) {
 					await target.turnOver();
+				},
+				ai: {
+					result: {
+						target(player, target) {
+							return target.isTurnedOver() ? 1 : -1;
+						},
+					},
 				},
 			},
 		],
@@ -1455,6 +1565,23 @@ const skills = {
 				const effect = button.link;
 				return player.countMark("sbxingshang") >= effect.cost && effect.filter(player);
 			},
+			check(button) {
+				const player = get.event().player,
+					effect = button.link;
+				return Math.max(
+					...game
+						.filterPlayer(target => {
+							const filterTarget = effect.filterTarget;
+							if (!filterTarget) return target == player;
+							if (typeof filterTarget == "function") return filterTarget(null, player, target);
+							return true;
+						})
+						.map(target => {
+							game.broadcastAll(effect => (lib.skill["sbxingshang_aiSkill"].ai = effect.ai), effect);
+							return get.effect(target, "sbxingshang_aiSkill", player, player);
+						})
+				);
+			},
 			backup(links, player) {
 				const effect = links[0];
 				return {
@@ -1466,10 +1593,11 @@ const skills = {
 					filterTarget: effect.filterTarget,
 					async content(event, trigger, player) {
 						const target = event.targets[0],
-							effect = lib.skill.sbxingshang_backup.effect;
+							effect = lib.skill.sbfangzhu_backup.effect;
 						player.removeMark("sbxingshang", effect.cost);
 						await effect.content(player, target);
 					},
+					ai: effect.ai,
 				};
 			},
 			prompt(links, player) {
@@ -1479,7 +1607,32 @@ const skills = {
 			},
 		},
 		ai: {
-			combo: "sbxingshang"
+			combo: "sbxingshang",
+			order: 7,
+			result: {
+				player(player) {
+					const list = get.info("sbfangzhu").getList.filter(effect => {
+						return player.countMark("sbxingshang") >= effect.cost && effect.filter(player);
+					});
+					return Math.max(
+						...list.map(effect => {
+							return Math.max(
+								...game
+									.filterPlayer(target => {
+										const filterTarget = effect.filterTarget;
+										if (!filterTarget) return target == player;
+										if (typeof filterTarget == "function") return filterTarget(null, player, target);
+										return true;
+									})
+									.map(target => {
+										game.broadcastAll(effect => (lib.skill["sbxingshang_aiSkill"].ai = effect.ai), effect);
+										return get.effect(target, "sbxingshang_aiSkill", player, player);
+									})
+							);
+						})
+					);
+				},
+			},
 		},
 		subSkill: {
 			backup: {},

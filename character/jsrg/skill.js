@@ -8058,7 +8058,7 @@ const skills = {
 				})
 				.set("give", (att >= 0 || (target.hp == 1 && target.countCards("hs", "shan") <= 1)) && get.effect(target, { name: "sha" }, player, target) < 0)
 				.set("att", att);
-			("step 1");
+			"step 1";
 			if (result.bool) {
 				target.give(result.cards, player);
 				player.addTempSkill("jsrgpingtao_sha");
@@ -8089,7 +8089,7 @@ const skills = {
 		},
 	},
 	jsrgjuelie: {
-		audio: 2,
+		audio: 4,
 		trigger: { player: "useCardToPlayered" },
 		filter: function (event, player) {
 			return player.countCards("he") && event.card.name == "sha";
@@ -8107,7 +8107,7 @@ const skills = {
 				.set("max", trigger.target.countDiscardableCards(player, "he"))
 				.set("goon", get.attitude(player, trigger.target) < 0)
 				.set("logSkill", ["jsrgjuelie", trigger.target]);
-			("step 1");
+			"step 1";
 			if (result.bool) {
 				var num = result.cards.length;
 				if (trigger.target.countDiscardableCards(player, "he")) player.discardPlayerCard("平讨：弃置" + get.translation(trigger.target) + get.cnNumber(num) + "张牌", num, "he", trigger.target, true);
@@ -9285,7 +9285,7 @@ const skills = {
 	},
 	//刘备
 	jsrgjishan: {
-		audio: 2,
+		audio: 4,
 		trigger: { global: "damageBegin4" },
 		usable: 1,
 		filter: function (event, player) {
@@ -9303,7 +9303,7 @@ const skills = {
 			trigger.cancel();
 			player.loseHp();
 			player.markAuto("jsrgjishan", [trigger.player]);
-			("step 1");
+			"step 1";
 			if (player.isIn() && trigger.player.isIn()) {
 				var targets = [player, trigger.player];
 				targets.sortBySeat(_status.currentPhase);
@@ -9333,7 +9333,7 @@ const skills = {
 						.set("ai", target => {
 							return get.recoverEffect(target, _status.event.player, _status.event.player);
 						});
-					("step 1");
+					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
 						player.logSkill("jsrgjishan_recover", target);
@@ -9638,7 +9638,7 @@ const skills = {
 	},
 	//404曹操
 	jsrgzhenglve: {
-		audio: 2,
+		audio: 4,
 		trigger: { global: "phaseEnd" },
 		filter: function (event, player) {
 			var zhu = get.zhu(player) || game.findPlayer(current => current.getSeatNum() == 1);
@@ -9659,7 +9659,7 @@ const skills = {
 		content: function () {
 			"step 0";
 			player.draw();
-			("step 1");
+			"step 1";
 			var damaged = trigger.player.getHistory("sourceDamage").length > 0;
 			var num = damaged ? 1 : 2;
 			var targets = game.filterPlayer(current => {
@@ -9676,7 +9676,7 @@ const skills = {
 						var att = get.attitude(_status.event.player, target);
 						return 100 - att;
 					});
-			("step 2");
+			"step 2";
 			if (result.bool) {
 				var targets = result.targets;
 				player.line(targets);
@@ -9738,7 +9738,7 @@ const skills = {
 			"step 0";
 			player.awakenSkill("jsrghuilie");
 			player.loseMaxHp();
-			("step 1");
+			"step 1";
 			player.addSkills(["jsrgpingrong", "feiying"]);
 		},
 		ai: {

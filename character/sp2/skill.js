@@ -549,6 +549,7 @@ const skills = {
 		},
 		filter(event, player) {
 			if (
+				!player.isPhaseUsing() ||
 				player.hasHistory("useCard", evt => {
 					if (evt === event.getParent()) return false;
 					const targets = evt.targets;

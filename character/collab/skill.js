@@ -213,12 +213,21 @@ const skills = {
 				player.chat("终究还是落得藉藉无名...");
 			}
 			game.broadcastAll(
-				(player, name) => {
+				(player, name, list) => {
 					if (player.name == "dc_noname" || player.name1 == "dc_noname") player.node.name.innerHTML = name;
 					if (player.name2 == "dc_noname") player.node.name2.innerHTML = name;
+					player.tempname.addArray(
+						list.map(name => {
+							while (get.character(name).tempname.length > 0) {
+								name = get.character(name).tempname[0];
+							}
+							return name;
+						})
+					);
 				},
 				player,
-				newname
+				newname,
+				[surname, name]
 			);
 			await player.addSkills(gains);
 		},
