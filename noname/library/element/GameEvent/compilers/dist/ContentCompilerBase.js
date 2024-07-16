@@ -4,6 +4,7 @@ export default class ContentCompilerBase {
         const handlerType = event.getDefaultHandlerType();
         const option = { state: "begin" };
         event.callHandler(handlerType, event, option);
+        event.updateStep();
     }
     isPrevented(event) {
         const { player } = event;
@@ -36,5 +37,6 @@ export default class ContentCompilerBase {
         const handlerType = event.getDefaultHandlerType();
         const option = { state: "end" };
         event.callHandler(handlerType, event, option);
+        event.updateStep();
     }
 }

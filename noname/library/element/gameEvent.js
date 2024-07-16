@@ -1003,11 +1003,20 @@ export class GameEvent {
 	 * @type { number }
 	 */
 	#step = 0;
+	/**
+	 * @type { number | null }
+	 */
+	#nextStep = null;
 	get step() {
 		return this.#step;
 	}
 	set step(num) {
-		this.#step = num - 1;
+		this.#nextStep = num;
+	}
+	updateStep(){
+		if (this.#nextStep === null) return;
+		this.#step = this.#nextStep;
+		this.#nextStep = null;
 	}
 
 	/**
@@ -1151,7 +1160,7 @@ export class GameEvent {
 				if (!this.next.length) return result;
 				const next = this.next[0];
 				await next.start();
-				if(next.result) result = next.result;
+				if (next.result) result = next.result;
 				this.next.shift();
 			}
 		})().finally(() => this.#waitNext = null);

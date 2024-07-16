@@ -23,22 +23,23 @@ export default class ArrayCompiler extends ContentCompilerBase {
             if (!Number.isInteger(event.step))
                 event.step = 0;
 
-            while (event.step < originals.length && !event.finished) {
+            while (!event.finished) {
+                if (event.step >= originals.length){
+                    event.finish();
+                    break;
+                }
                 this.beforeExecute(event);
-
+                event.step ++;
                 let result: Result | undefined;
                 if (!this.isPrevented(event)) {
                     const original = originals[event.step];
-                    result = (await Reflect.apply(
-                        original, event, [event, event._trigger, event.player]))?.result;
+                    const next = await Reflect.apply(original, event, [event, event._trigger, event.player]);
+                    result = next && next.result;
                 }
-
                 const nextResult = await event.waitNext();
-                event._result = result ?? nextResult ?? event._result;
+                event._result = result || nextResult || event._result;
+                event.updateStep();
                 this.afterExecute(event);
-                event.step += 2;
-
-                if (event.step >= originals.length) event.finish();
             }
         };
         compiled.type = "array";

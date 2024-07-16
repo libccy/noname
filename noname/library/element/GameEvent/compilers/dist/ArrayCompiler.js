@@ -15,8 +15,13 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 throw new ReferenceError("compiled.originals必须是一个数组");
             if (!Number.isInteger(event.step))
                 event.step = 0;
-            while (event.step < originals.length && !event.finished) {
+            while (!event.finished) {
+                if (event.step >= originals.length){
+                    event.finish();
+                    break;
+                }
                 this.beforeExecute(event);
+                event.step ++;
                 let result;
                 if (!this.isPrevented(event)) {
                     const original = originals[event.step];
@@ -25,10 +30,8 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 }
                 const nextResult = await event.waitNext();
                 event._result = result || nextResult || event._result;
+                event.updateStep();
                 this.afterExecute(event);
-                event.step += 2;
-                if (event.step >= originals.length)
-                    event.finish();
             }
         };
         compiled.type = "array";

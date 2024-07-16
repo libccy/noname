@@ -22,6 +22,7 @@ export default abstract class ContentCompilerBase implements IContentCompiler {
         const handlerType = event.getDefaultHandlerType() as `on${Capitalize<string>}`;
         const option: HandlerOption = { state: "begin" };
         event.callHandler(handlerType, event, option);
+        event.updateStep();
     }
 
     /**
@@ -73,5 +74,6 @@ export default abstract class ContentCompilerBase implements IContentCompiler {
         const handlerType = event.getDefaultHandlerType() as `on${Capitalize<string>}`;
         const option: HandlerOption = { state: "end" };
         event.callHandler(handlerType, event, option);
+        event.updateStep();
     }
 }
