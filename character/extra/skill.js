@@ -2237,7 +2237,10 @@ const skills = {
 			if (game.countPlayer() > 2) {
 				if (player == trigger.player && !trigger.skill) {
 					var evt = trigger.getParent();
-					if (evt.name == "phaseLoop" && evt._isStandardLoop) evt.player = player.next;
+					if (evt.name == "phaseLoop" && evt._isStandardLoop) {
+						evt.player = player.previous;
+						_status.lastPhasedPlayer = player.next;
+					}
 				}
 				player
 					.chooseTarget(

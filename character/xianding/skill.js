@@ -9614,7 +9614,8 @@ const skills = {
 							current.getStat().isSkipped = true;
 						});
 					var evt = player.insertPhase();
-					delete evt.skill;
+					if (trigger.skill) evt.skill = trigger.skill;
+					else delete evt.skill;
 					game.broadcastAll(function (player) {
 						player.classList.remove("glow_phase");
 						delete _status.currentPhase;
