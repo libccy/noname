@@ -4332,8 +4332,6 @@ export const Content = {
 					if (hidden.length > 0) player.$giveAuto(hidden, i[0]);
 				}
 				break;
-			default:
-				event.finish();
 		}
 		for (var i of event.gain_list) {
 			if (i[1].length > 0) {
