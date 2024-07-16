@@ -12003,25 +12003,23 @@ const skills = {
 		trigger: {
 			player: ["damageEnd", "phaseJieshuBegin"],
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			player
+		async cost(event, trigger, player) {
+			const result = await player
 				.chooseControl("一张", "两张", "三张", "cancel2")
 				.set("prompt", get.prompt2("xinfu_zhenxing"))
-				.set("", function () {
+				.set("ai", function () {
 					return 0;
-				});
-			"step 1";
-			if (result.control == "cancel2") event.finish();
-			else {
-				player.logSkill("xinfu_zhenxing");
-				event.num = { 一张: 1, 两张: 2, 三张: 3 }[result.control];
-			}
-			"step 2";
-			event.cards = get.cards(num);
-			player
-				.chooseButton(["【镇行】：请选择要获得的牌", event.cards])
+				}).forResult();
+			event.result = {
+				bool: result.control !== "cancel2",
+				cost_data: result.index + 1
+			};
+		},
+		async content(event, trigger, player) {
+			const cards = get.cards(event.cost_data);
+			await game.cardsGotoOrdering(cards);
+			let result = await player
+				.chooseButton(["【镇行】：请选择要获得的牌", cards])
 				.set("filterButton", function (button) {
 					var cards = _status.event.cards;
 					for (var i = 0; i < cards.length; i++) {
@@ -12032,18 +12030,9 @@ const skills = {
 				.set("ai", function (button) {
 					return get.value(button.link);
 				})
-				.set("cards", event.cards);
-			"step 3";
-			var tothrow = [];
-			for (var i = event.cards.length - 1; i >= 0; i--) {
-				if (result.bool && result.links.includes(event.cards[i])) {
-					player.gain(event.cards[i], "gain2");
-				} else {
-					event.cards[i].fix();
-					ui.cardPile.insertBefore(event.cards[i], ui.cardPile.childNodes[0]);
-				}
-			}
-			game.updateRoundNumber();
+				.set("cards", cards)
+				.forResult();
+			if (result.bool) player.gain(result.links, "gain2");
 		},
 	},
 	xinfu_qianxin: {
