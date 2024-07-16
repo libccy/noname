@@ -515,13 +515,20 @@ export class Player extends HTMLDivElement {
 				`;
 
 				if (!scope)
-					return new Function(...params, body).bind(null, { lib, game, ui, get, ai, _status });
+					return function(...args){
+						return new Function(...params, body)
+							//@ts-ignore
+							.apply(this, [{ lib, game, ui, get, ai, _status }, ...args]);
+					}
 
 				if (!get.isFunctionBody(body))
 					throw new Error(`无效的函数体: ${body}`);
 
-				return scope(`(function (${params.join(", ")}) {\n${body}\n})`)
-					.bind(null, { lib, game, ui, get, ai, _status });
+				return function(...args){
+					return scope(`(function (${params.join(", ")}) {\n${body}\n})`)
+						//@ts-ignore
+						.apply(this, [{ lib, game, ui, get, ai, _status }, ...args]);
+				};
 			};
 			const contents = [];
 			contents.push(

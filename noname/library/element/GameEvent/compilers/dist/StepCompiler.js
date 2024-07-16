@@ -61,7 +61,11 @@ export default class StepCompiler extends ContentCompilerBase {
                 ${[stepHead, code].filter(Boolean)
                 .map(c => `{\n${c}\n}\n`).join("")}
             `;
-            return new ModAsyncFunction(...params, body).bind(null, { lib, game, ui, get, ai, _status });
+            return function(...args){
+                return new ModAsyncFunction(...params, body)
+                    //@ts-ignore
+                    .apply(this, [{ lib, game, ui, get, ai, _status }, ...args]);
+            }
         };
         const packStep = (code, stepHead) => {
             const compiled = compileStep(code, stepHead);
