@@ -4724,12 +4724,10 @@ const skills = {
 		},
 		//priority:-5,
 		logTarget: "player",
-		content: function () {
-			"step 0";
-			game.asyncDraw([trigger.player, player]);
-			"step 1";
-			game.delayx();
-			if (player.isIn() && trigger.player.isIn()) {
+		async content(event, trigger, player) {
+			await game.asyncDraw([trigger.player, player]);
+			await game.asyncDelayx();
+			while (player.isIn() && trigger.player.isIn()) {
 				var getGainSuit = function (player) {
 					var last = player.getHistory("gain", function (evt) {
 						return evt.getParent(2) == event;
@@ -4738,11 +4736,10 @@ const skills = {
 						var evt = last.pop();
 						if (evt.cards.length == 1 && player.getCards("h").includes(evt.cards[0])) return get.suit(evt.cards[0], player);
 					} else return player;
-				};
-				if (getGainSuit(player) == getGainSuit(trigger.player)) player.chooseBool("是否继续发动【樵拾】？", "和" + get.translation(trigger.player) + "各摸一张牌");
-			} else event.finish();
-			"step 2";
-			if (result.bool) event.goto(0);
+				}, bool;
+				if (getGainSuit(player) == getGainSuit(trigger.player)) bool = await player.chooseBool("是否继续发动【樵拾】？", "和" + get.translation(trigger.player) + "各摸一张牌").forResultBool();
+				if (!bool) break;
+			}
 		},
 		ai: {
 			expose: 0.1,
