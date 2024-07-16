@@ -1151,7 +1151,7 @@ export class GameEvent {
 				if (!this.next.length) return result;
 				const next = this.next[0];
 				await next.start();
-				result = next.result;
+				if(next.result) result = next.result;
 				this.next.shift();
 			}
 		})().finally(() => this.#waitNext = null);
