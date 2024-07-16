@@ -2495,13 +2495,8 @@ const skills = {
 					return get.distance(player, target) <= 1 && target.countGainableCards(player, "e");
 				})
 				.set("ai", target => {
-					const player = get.event("player"),
-						att = get.attitude(player, target);
-					let num = 0;
-					if (target.hasSkill("gzxiaoji")) num += 2.5;
-					if (target.isDamaged() && target.getEquip("baiyin")) num += 2.5;
-					if (target.hasSkill("xuanlve")) num += 2;
-					return get.sgn(att) * num + (target == player ? 1 : 0);
+					const player = get.event("player");
+					return get.effect(target, { name: "shunshou_copy", position: "e" }, player, player);
 				});
 			if (bool) {
 				const aim = targets[0];
