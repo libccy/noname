@@ -595,9 +595,9 @@ export const Content = {
 		"step 6";
 		//if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
 		if (player.isMin() || !player.canEquip(card)) {
-			event.finish();
 			game.cardsDiscard(card);
 			delete player.equiping;
+			event.finish();
 			return;
 		}
 		var subtype = get.subtype(card);
@@ -3435,6 +3435,7 @@ export const Content = {
 		"step 0";
 		game.log(player, "进入了弃牌阶段");
 		event.num = player.needsToDiscard();
+		event.trigger("phaseDiscard");
 		if (event.num <= 0) event.finish();
 		else {
 			game.broadcastAll(function (player) {
@@ -3443,7 +3444,6 @@ export const Content = {
 				}
 			}, player);
 		}
-		event.trigger("phaseDiscard");
 		"step 1";
 		player.chooseToDiscard(num, true).set("useCache", true);
 		"step 2";
@@ -4961,8 +4961,8 @@ export const Content = {
 			list = event.target.getGainableSkills(event.func);
 		}
 		if (!list.length) {
-			event.finish();
 			event.result = { bool: false };
+			event.finish();
 			return;
 		}
 		event.skillai = function (list) {
@@ -6539,12 +6539,12 @@ export const Content = {
 				game.countChoose();
 				event.choosing = true;
 			} else {
-				event.finish();
 				event.result = "viewed";
 				setTimeout(function () {
 					event.dialog.close();
 				}, 2 * lib.config.duration);
 				game.delayx(2);
+				event.finish();
 			}
 		} else if (event.isOnline()) {
 			event.send();
@@ -8595,8 +8595,8 @@ export const Content = {
 	loseHp: function () {
 		"step 0";
 		if (event.num <= 0) {
-			event.finish();
 			event._triggered = null;
+			event.finish();
 			return;
 		}
 		if (lib.config.background_audio) {

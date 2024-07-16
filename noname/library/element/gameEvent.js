@@ -378,11 +378,14 @@ export class GameEvent {
 	}
 	cancel(all, player, notrigger) {
 		this.untrigger(all, player);
+		let next;
+		if (!notrigger){
+			if (this.player && lib.phaseName.includes(this.name))
+				this.player.getHistory("skipped").add(this.name);
+			next = this.trigger(this.name + "Cancelled");
+		}
 		this.finish();
-		if (notrigger === "notrigger") return;
-		if (this.player && lib.phaseName.includes(this.name))
-			this.player.getHistory("skipped").add(this.name);
-		return this.trigger(this.name + "Cancelled");
+		return next;
 	}
 	async neutralize(event = _status.event) {
 		if (this._neutralized) return this._triggering;
