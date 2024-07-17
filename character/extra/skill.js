@@ -13,7 +13,7 @@ const skills = {
 			if (player.getRoundHistory("useSkill", evt => evt.skill == "xinrenjie").length >= 4) return false;
 			if (event.name == "useCard") {
 				//......
-				if (get.type(event.card) != "trick" || !lib.inpile.includes("wuxie")) return false;
+				if (get.type(event.card) != "trick") return false;
 				const history = game.getGlobalHistory("everything", evt => evt.player == player && ["useCard", "respond"].includes(evt.name));
 				return !history.some(evt => Array.isArray(evt.respondTo) && evt.respondTo[2] == event.card && (evt.card.name == "wuxie" || evt.card.name == "caochuan"));
 			}
