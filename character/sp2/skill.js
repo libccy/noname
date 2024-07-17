@@ -3,7 +3,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//王戎
-	mpqianlin: {
+	mpjianlin: {
 		audio: 2,
 		trigger: {
 			global: "phaseAfter",
@@ -14,7 +14,7 @@ const skills = {
 				if (evt.name == "lose") {
 					if (evt.position !== ui.discardPile) return false;
 				} else if (evt.name !== "cardsDiscard") return false;
-				if (get.info("mpqianlin").isUseOrRespond(evt, player)) {
+				if (get.info("mpjianlin").isUseOrRespond(evt, player)) {
 					cards.addArray(
 						evt.cards.filter(card => {
 							return get.type(card) == "basic" && get.position(card) === "d";
@@ -41,10 +41,10 @@ const skills = {
 			return ["useCard", "respond"].includes(evt2.name) && evt2.player == player;
 		},
 		filter(event, player) {
-			return get.info("mpqianlin").getCards(player).length;
+			return get.info("mpjianlin").getCards(player).length;
 		},
 		async cost(event, trigger, player) {
-			const cards = get.info("mpqianlin").getCards(player);
+			const cards = get.info("mpjianlin").getCards(player);
 			const {
 				result: { bool, links },
 			} = await player.chooseButton(["悭吝：你可以获得其中一张牌", cards]).set("ai", get.buttonValue);

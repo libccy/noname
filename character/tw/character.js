@@ -1,4 +1,5 @@
 const characters = {
+	licuilianzhaoquanding: ["double", "qun", 3, ["twciyin", "twchenglong"], ["name:李|翠莲-赵|全定"]],
 	huan_zhugeliang: ["male", "shu", "3/4", ["twbeiding", "twjielv", "twhunyou"], ["name:诸葛|亮"]],
 	huan_jiangwei: ["male", "shu", 4, ["huan_jiangwei_A", "huan_jiangwei_B"]],
 	huan_guojia: ["male", "wei", 3, ["huan_guojia_A", "huan_guojia_B"]],

@@ -2,6 +2,226 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//李赵
+	twciyin: {
+		audio: 2,
+		global: "beOfOneHeart",
+		oneHeart: true,
+		trigger: {
+			global: "phaseZhunbeiBegin",
+		},
+		filter(event, player) {
+			const target = event.player;
+			return player == target || player.getStorage("beOfOneHeartWith").includes(target);
+		},
+		async content(event, trigger, player) {
+			const num = Math.min(trigger.player.getHp() * 2, 10);
+			const cards = get.cards(num, true);
+			await player.showCards(cards);
+			const gain = cards.filter(card => ["heart", "spade"].includes(get.suit(card)));
+			if (!gain.length) return;
+			const links = await player.chooseButton(["慈荫：你可以将其中任意张黑桃/红桃牌置于武将牌上", gain], [1, Infinity]).set("ai", get.buttonValue).forResultLinks();
+			if (!links || !links.length) return;
+			const next = player.addToExpansion(links);
+			next.gaintag.add("twciyin");
+			await next;
+		},
+		marktext: "荫",
+		intro: {
+			content: "expansion",
+			markcount: "expansion",
+		},
+		onremove(player, skill) {
+			const cards = player.getExpansions(skill);
+			if (cards.length) player.loseToDiscardpile(cards);
+		},
+		group: "twciyin_heart",
+		subSkill: {
+			heart: {
+				audio: "twciyin",
+				trigger: {
+					player: "addToExpansionAfter",
+				},
+				filter(event, player) {
+					if (!event.gaintag.includes("twciyin")) return false;
+					const cards = player.getExpansions("twciyin");
+					const history = game.getAllGlobalHistory("everything", evt => evt.name == "twciyin_heart" && evt.player == player);
+					const limit = history.map(evt => evt.cost_data).flat();
+					return (cards.length % 3 == 0 || event.cards.length > 2) && (!limit.includes("选项一") || (!limit.includes("选项二") && player.countCards("h") < player.maxHp));
+				},
+				async cost(event, trigger, player) {
+					const goon = player.getExpansions("twciyin").length > 5;
+					const history = game.getAllGlobalHistory("everything", evt => evt.name == "twciyin_heart" && evt.player == player);
+					const limit = history.map(evt => evt.cost_data).flat();
+					const choices = [];
+					const choiceList = ["增加1点体力上限并回复1点体力", "将手牌摸至体力上限"];
+					if (!limit.includes("选项一")) choices.push("选项一");
+					else choiceList[0] = '<span style="opacity:0.5;">' + choiceList[0] + "</span>";
+					if (!limit.includes("选项二") && player.countCards("h") < player.maxHp) choices.push("选项二");
+					else choiceList[1] = '<span style="opacity:0.5;">' + choiceList[1] + "</span>";
+					if (goon && !history.length && choices.length == 2) {
+						event.result = {
+							bool: true,
+							cost_data: choices,
+						};
+					} else {
+						const control =
+							choices.length == 1
+								? choices[0]
+								: await player
+										.chooseControl(choices)
+										.set("prompt", get.prompt("twciyin"))
+										.set("choiceList", choiceList)
+										.set("ai", () => {
+											const player = get.player(),
+												num = player.maxHp - player.countCards("h");
+											return get.recoverEffect(player, player, player) > get.effect(player, { name: "draw" }, player, player) * num ? "选项一" : "选项二";
+										})
+										.forResultControl();
+						event.result = {
+							bool: true,
+							cost_data: [control],
+						};
+					}
+				},
+				async content(event, trigger, player) {
+					if (event.cost_data.includes("选项一")) {
+						await player.gainMaxHp();
+						await player.recover();
+					}
+					if (event.cost_data.includes("选项二")) {
+						await player.drawTo(player.maxHp);
+					}
+				},
+			},
+		},
+	},
+	twchenglong: {
+		audio: 2,
+		trigger: {
+			global: "phaseJieshuBegin",
+		},
+		forced: true,
+		juexingji: true,
+		skillAnimation: true,
+		animationColor: "gray",
+		filter(event, player) {
+			return (
+				game
+					.getAllGlobalHistory("everything", evt => evt.name == "twciyin_heart" && evt.player == player)
+					.map(evt => evt.cost_data)
+					.flat().length == 2
+			);
+		},
+		async content(event, trigger, player) {
+			player.awakenSkill("twchenglong");
+			const cards = player.getExpansions("twciyin");
+			if (cards.length) await player.gain(cards, "gain2");
+			await player.removeSkills("twciyin");
+			let list = [];
+			if (_status.characterlist) {
+				for (const name of _status.characterlist) if (["shu", "qun"].includes(lib.character[name][1])) list.push(name);
+			} else if (_status.connectMode) {
+				list = get.charactersOL(name => !["shu", "qun"].includes(lib.character[name][1]));
+			} else {
+				list = get.gainableCharacters(info => ["shu", "qun"].includes(info[1]));
+			}
+			const players = game.players.concat(game.dead);
+			for (var i = 0; i < players.length; i++) {
+				list.remove(players[i].name);
+				list.remove(players[i].name1);
+				list.remove(players[i].name2);
+			}
+			const filter = skill => {
+				const translation = get.skillInfoTranslation(skill, player);
+				if (!translation) return false;
+				const info = get.info(skill);
+				return info && !info.zhuSkill && !info.limited && !info.juexingji && !info.hiddenSkill && !info.charlotte && !info.dutySkill && ["【杀】", "【闪】"].some(str => get.plainText(translation).includes(str));
+			};
+			list = list.filter(name => (lib.character[name][3] || []).some(filter));
+			if (!list.length) return;
+			const skillList = {};
+			for (const name of list.randomGets(4)) skillList[name] = (lib.character[name][3] || []).filter(filter);
+			if (Object.keys(skillList).length) {
+				const next = player.chooseButton(3, ["成龙：获得其中至多两个技能", [Object.keys(skillList), "character"]], true, [1, 2]);
+				next.set("skillList", skillList);
+				next.set("processAI", function () {
+					const map = get.event("skillList");
+					return {
+						links: Object.values(map).flat().randomGets(2),
+						bool: true,
+					};
+				});
+				next.set("custom", {
+					replace: {
+						button(button) {
+							if (!_status.event.isMine()) return;
+							if (button.classList.contains("selectable") == false) return;
+							const dialog = get.event("dialog");
+							const nodes = Array.from(dialog.content.childNodes[1].childNodes);
+							if (nodes.includes(button)) {
+								if (button.classList.contains("selected")) {
+									button.classList.remove("selected");
+									while (dialog.content.childElementCount > 2) dialog.content.removeChild(dialog.content.lastChild);
+									dialog.buttons.splice(nodes.length);
+									ui.update();
+								} else {
+									const node = nodes.find(node => node.classList.contains("selected"));
+									if (node) {
+										node.classList.remove("selected");
+										while (dialog.content.childElementCount > 2) dialog.content.removeChild(dialog.content.lastChild);
+										dialog.buttons.splice(nodes.length);
+										ui.update();
+									}
+									button.classList.add("selected");
+									dialog.add([get.event("skillList")[button.link].map(value => [value, get.translation(value)]), "tdnodes"]);
+									dialog.buttons.forEach(function (button) {
+										if (ui.selected.buttons.some(value => value.link == button.link)) button.classList.add("selected");
+									});
+									game.check();
+								}
+							} else {
+								if (button.classList.contains("selected")) {
+									ui.selected.buttons.remove(button);
+									button.classList.remove("selected");
+									if (_status.multitarget || _status.event.complexSelect) {
+										game.uncheck();
+										game.check();
+									}
+								} else {
+									button.classList.add("selected");
+									ui.selected.buttons.add(button);
+								}
+								const custom = get.event("custom");
+								if (custom && custom.add && custom.add.button) custom.add.button();
+							}
+							game.check();
+							nodes.forEach(button => button.classList.add("selectable"));
+						},
+						window() {
+							const dialog = get.event("dialog");
+							const node = dialog.content.childNodes[1];
+							const selected = Array.from(node.childNodes).find(node => node.classList.contains("selected"));
+							if (selected) {
+								selected.classList.remove("selected");
+								while (dialog.content.lastChild != node) dialog.content.removeChild(dialog.content.lastChild);
+								dialog.buttons.splice(node.childElementCount);
+							}
+							game.uncheck();
+							game.check();
+							ui.update();
+						},
+					},
+					add: next.custom.add,
+				});
+				const links = await next.forResultLinks();
+				await player.addSkills(links);
+			}
+		},
+		ai: {
+			combo: "twciyin",
+		},
+	},
 	//幻诸葛亮
 	twbeiding: {
 		audio: 2,

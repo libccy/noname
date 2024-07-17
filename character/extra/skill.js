@@ -2,6 +2,272 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//应天司马懿！肯定又要修改
+	jilin: {
+		audio: 2,
+		trigger: {
+			global: "gameStart",
+			player: "enterGame",
+		},
+		forced: true,
+		locked: false,
+		filter(event, player) {
+			return event.name != "phase" || game.phaseNumber == 0;
+		},
+		async content(event, trigger, player) {
+			const cards = get.cards(3);
+			const next = player.addToExpansion(cards, "draw");
+			next.gaintag.add(event.name);
+			await next;
+		},
+		marktext: "志",
+		intro: {
+			markcount: "expansion",
+			mark(dialog, content, player) {
+				const cards = player.getExpansions("jilin"),
+					mingzhi = cards.filter(card => card.storage.jilin),
+					hidden = cards.removeArray(mingzhi);
+				if (mingzhi.length) {
+					dialog.addText("已明之志");
+					dialog.addSmall(mingzhi);
+				}
+				if (hidden.length) {
+					if (player == game.me || player.isUnderControl()) {
+						dialog.addText("未明之志");
+						dialog.addSmall(hidden);
+					} else {
+						return "共有" + get.cnNumber(hidden.length) + "张暗“志”";
+					}
+				}
+			},
+			content(content, player) {
+				const cards = player.getExpansions("jilin"),
+					mingzhi = cards.filter(card => card.storage.jilin),
+					hidden = cards.removeArray(mingzhi);
+				if (mingzhi.length) {
+					dialog.addText("已明之志");
+					dialog.addSmall(mingzhi);
+				}
+				if (hidden.length) {
+					if (player == game.me || player.isUnderControl()) {
+						dialog.addText("未明之志");
+						dialog.addSmall(hidden);
+					} else {
+						return "共有" + get.cnNumber(hidden.length) + "张暗“志”";
+					}
+				}
+			},
+		},
+		group: ["jilin_kanpo", "jilin_change"],
+		subSkill: {
+			kanpo: {
+				audio: "jilin",
+				trigger: {
+					target: "useCardToTarget",
+				},
+				filter(event, player) {
+					return event.player != player && player.getExpansions("jilin").some(card => !card.storage.jilin);
+				},
+				async cost(event, trigger, player) {
+					const hidden = player.getExpansions("jilin").filter(card => !card.storage.jilin);
+					const goon = get.effect(player, trigger.card, trigger.player, player) < 0;
+					const suits = player
+						.getExpansions("jilin")
+						.filter(card => card.storage.jilin)
+						.map(card => get.suit(card))
+						.toUniqued();
+					if (hidden.length == 1) {
+						const bool = await player
+							.chooseBool("戢鳞：明置一张“志”", `令${get.translation(trigger.card)}对你无效`)
+							.set("choice", goon)
+							.forResultBool();
+						event.result = {
+							bool: bool,
+							cost_data: hidden,
+						};
+					} else {
+						const {
+							result: { bool, links },
+						} = await player
+							.chooseButton(["戢鳞：明置一张“志”", hidden])
+							.set("ai", button => {
+								const player = get.player(),
+									card = button.link,
+									suits = get.event("suits");
+								if (!get.event("goon")) return 0;
+								if (!suits.includes(get.suit(card))) return 10;
+								return 6 - get.value(card);
+							})
+							.set("suits", suits)
+							.set("goon", goon);
+						event.result = {
+							bool: bool,
+							cost_data: links,
+						};
+					}
+				},
+				async content(event, trigger, player) {
+					event.cost_data[0].storage.jilin = true;
+					trigger.getParent().excluded.add(player);
+				},
+			},
+			change: {
+				audio: "jilin",
+				trigger: {
+					player: "phaseBegin",
+				},
+				filter(event, player) {
+					return player.countCards("h") && player.getExpansions("jilin").some(card => !card.storage.jilin);
+				},
+				async cost(event, trigger, player) {
+					const hidden = player.getExpansions("jilin").filter(card => !card.storage.jilin);
+					const next = player.chooseToMove("戢鳞：是否交换“志”和手牌？");
+					next.set("list", [
+						[get.translation(player) + "（你）的未明之“志”", hidden],
+						["手牌区", player.getCards("h")],
+					]);
+					next.set("filterMove", (from, to) => {
+						return typeof to != "number";
+					});
+					next.set("processAI", list => {
+						let player = get.player(),
+							cards = list[0][1].concat(list[1][1]).sort(function (a, b) {
+								return get.useful(a) - get.useful(b);
+							}),
+							cards2 = cards.splice(0, player.getExpansions("jilin").length);
+						return [cards2, cards];
+					});
+					const {
+						result: { bool, moved },
+					} = await next;
+					event.result = {
+						bool: bool,
+						cost_data: moved,
+					};
+				},
+				async content(event, trigger, player) {
+					const moved = event.cost_data;
+					const pushs = moved[0],
+						gains = moved[1];
+					pushs.removeArray(player.getExpansions("jilin"));
+					gains.removeArray(player.getCards("h"));
+					if (!pushs.length || pushs.length != gains.length) return;
+					const next = player.addToExpansion(pushs);
+					next.gaintag.add("jilin");
+					await next;
+					await player.gain(gains, "draw");
+				},
+			},
+		},
+	},
+	yingyou: {
+		audio: 2,
+		trigger: {
+			player: "phaseUseBegin",
+		},
+		filter(event, player) {
+			return player.countCards("h") && player.getExpansions("jilin").some(card => !card.storage.jilin);
+		},
+		async cost(event, trigger, player) {
+			const hidden = player.getExpansions("jilin").filter(card => !card.storage.jilin);
+			const suits = player
+				.getExpansions("jilin")
+				.filter(card => card.storage.jilin)
+				.map(card => get.suit(card))
+				.toUniqued();
+			const {
+				result: { bool, links },
+			} = await player
+				.chooseButton(["英猷：你可以明志", hidden])
+				.set("ai", button => {
+					const player = get.player(),
+						card = button.link,
+						suits = get.event("suits");
+					const getNum = player => {
+						var list = [];
+						for (var i of lib.suit) list.push(player.countCards("h", { suit: i }) + 3);
+						return list.sort((a, b) => b - a)[0];
+					};
+					if (!suits.includes(get.suit(card))) return 10;
+					if (get.suit(card) == getNum(player)) return 5;
+					return 0;
+				})
+				.set("suits", suits);
+			event.result = {
+				bool: bool,
+				cost_data: links,
+			};
+		},
+		async content(event, trigger, player) {
+			event.cost_data[0].storage.jilin = true;
+			const num = player.getExpansions("jilin").filter(card => card.storage.jilin).length;
+			await player.draw(num);
+		},
+		ai: {
+			combo: "jilin",
+		},
+		group: "yingyou_draw",
+		subSkill: {
+			draw: {
+				trigger: {
+					player: "loseAfter",
+					global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
+				},
+				filter(event, player) {
+					const suits = player
+						.getExpansions("jilin")
+						.filter(card => card.storage.jilin)
+						.map(card => get.suit(card))
+						.toUniqued();
+					const evt = event.getl(player);
+					if (!evt || !evt.cards2 || !evt.cards2.length) return false;
+					return evt.cards2.some(card => {
+						return suits.includes(get.suit(card, player));
+					});
+				},
+				forced: true,
+				locked: false,
+				async content(event, trigger, player) {
+					const suits = player
+						.getExpansions("jilin")
+						.filter(card => card.storage.jilin)
+						.map(card => get.suit(card))
+						.toUniqued();
+					const num = trigger.getl(player).cards2.filter(card => {
+						return suits.includes(get.suit(card, player));
+					}).length;
+					await player.draw(num);
+				},
+			},
+		},
+	},
+	yingtian: {
+		audio: 2,
+		trigger: {
+			global: "dieAfter",
+		},
+		filter(event, player) {
+			return game.countGroup() < 3;
+		},
+		forced: true,
+		juexingji: true,
+		skillAnimation: true,
+		animationColor: "gray",
+		async content(event, trigger, player) {
+			const skill = event.name;
+			player.awakenSkill(skill);
+			await player.changeSkills(get.info(skill).derivation, ["yingyou"]);
+			player.addSkill(skill + "_ effect");
+		},
+		derivation: ["reguicai", "rewansha", "lianpo"],
+		subSkill: {
+			effect: {
+				mod: {
+					targetInRange: () => true,
+				},
+			},
+		},
+	},
 	//手杀神司马？
 	xinrenjie: {
 		audio: "renjie2",
