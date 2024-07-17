@@ -15,7 +15,7 @@ const skills = {
 				//......
 				if (get.type(event.card) != "trick") return false;
 				const history = game.getGlobalHistory("everything", evt => evt.player == player && ["useCard", "respond"].includes(evt.name));
-				return !history.some(evt => Array.isArray(evt.respondTo) && evt.respondTo[2] == event.card && evt.card.name == "wuxie");
+				return !history.some(evt => Array.isArray(evt.respondTo) && evt.respondTo[1] == event.card && evt.card.name == "wuxie");
 			}
 			const evt = event.getParent(2);
 			if (!evt || evt.name != "useCard") return false;
