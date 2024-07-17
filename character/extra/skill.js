@@ -3,17 +3,23 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//手杀神司马？
+	//极略神司马！
 	xinrenjie: {
 		audio: "renjie2",
 		trigger: {
-			global: ["shaDamage", "useCardToEnd"],
+			global: ["useCardAfter",'chooseToUseAfter','chooseToRespondAfter'],
 		},
-		filter(event, player, name) {
+		filter(event, player) {
 			if (player.getRoundHistory("useSkill", evt => evt.skill == "xinrenjie").length >= 4) return false;
-			if (event.type != "card" || !event.target || event.target != player || event.player == player) return false;
-			if (player.hasHistory("useCard", evt => evt.respondTo && evt.respondTo[1] == event.card) || player.hasHistory("respond", evt => evt.respondTo && evt.respondTo[1] == event.card)) return false;
-			if (name == "shaDamage") return true;
-			return event.card.name != "sha" && !event.getParent()._neutralized;
+			if (event.name == "useCard") {
+				//......
+				if (get.type(event.card) != "trick" || !lib.inpile.includes("wuxie")) return false;
+				const history = game.getGlobalHistory("everything", evt => evt.player == player && ["useCard", "respond"].includes(evt.name));
+				return !history.some(evt => Array.isArray(evt.respondTo) && evt.respondTo[2] == event.card && (evt.card.name == "wuxie" || evt.card.name == "caochuan"));
+			}
+			const evt = event.getParent(2);
+			if (!evt || evt.name != "useCard") return false;
+			return !event.result.bool;
 		},
 		forced: true,
 		async content(event, trigger, player) {
