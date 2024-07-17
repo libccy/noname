@@ -4738,7 +4738,9 @@ const skills = {
 						if (evt.cards.length == 1 && player.getCards("h").includes(evt.cards[0])) return get.suit(evt.cards[0], player);
 					} else return player;
 				}, bool;
-				if (getGainSuit(player) == getGainSuit(trigger.player)) bool = await player.chooseBool("是否继续发动【樵拾】？", "和" + get.translation(trigger.player) + "各摸一张牌").forResultBool();
+				if (getGainSuit(player) == getGainSuit(trigger.player)) {
+					bool = await player.chooseBool("是否继续发动【樵拾】？", "和" + get.translation(trigger.player) + "各摸一张牌").forResultBool();
+				} else break;
 				if (!bool) break;
 			}
 		},
