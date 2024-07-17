@@ -345,7 +345,7 @@ const skills = {
 	},
 	//徐琨（菜不菜我不知道）
 	fazhu: {
-		audio: 2,
+		audio: 3,
 		trigger: { player: "phaseZhunbeiBegin" },
 		filter(event, player) {
 			return player.hasCard(card => !get.tag(card, "damage") && player.canRecast(card), "hej");
