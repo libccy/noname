@@ -5001,19 +5001,6 @@ export class Get extends GetCompatible {
 					)
 						temp2 = cache.delegate(temp2.effect).target(card, player, target, result2, isLink);
 					else temp2 = undefined;
-				} else if (typeof temp2.effect == "function") {
-					//考虑废弃
-					console.log("此写法使用频率极低且影响代码可读性，不建议使用");
-					if (
-						!player.hasSkillTag("ignoreSkill", true, {
-							card: card,
-							target: target,
-							skill: skills2[i],
-							isLink: isLink,
-						})
-					)
-						temp2 = cache.delegate(temp2).effect(card, player, target, result2, isLink);
-					else temp2 = undefined;
 				} else temp2 = undefined;
 				if (typeof temp2 == "object") {
 					if (temp2.length == 2 || temp2.length == 4) {
@@ -5055,12 +5042,12 @@ export class Get extends GetCompatible {
 					result2 *= Math.sqrt(Math.sqrt(threaten));
 				}
 				// *** continue here ***
-				if (target.hp == 1) result2 *= 2.5;
+				if (target.hp == 1) result2 *= 3;
 				if (target.hp == 2) result2 *= 1.8;
 				let targetCountCards = target.countCards("h");
 				if (targetCountCards == 0) {
 					if (get.tag(card, "respondSha") || get.tag(card, "respondShan")) {
-						result2 *= 1.7;
+						result2 *= 2.1;
 					} else {
 						result2 *= 1.5;
 					}
