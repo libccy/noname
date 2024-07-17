@@ -6,7 +6,7 @@ const skills = {
 	jilin: {
 		audio: 2,
 		trigger: {
-			global: "gameStart",
+			global: "phaseBefore",
 			player: "enterGame",
 		},
 		forced: true,
@@ -273,7 +273,8 @@ const skills = {
 	xinrenjie: {
 		audio: "renjie2",
 		trigger: {
-			global: ["useCardAfter",'chooseToUseAfter','chooseToRespondAfter'],
+			player: ["chooseToUseAfter", "chooseToRespondAfter"],
+			global: "useCardAfter",
 		},
 		filter(event, player) {
 			if (player.getRoundHistory("useSkill", evt => evt.skill == "xinrenjie").length >= 4) return false;
@@ -296,6 +297,16 @@ const skills = {
 			content: "mark",
 		},
 		marktext: "忍",
+		global: "xinrenjie_global",
+		subSkill: {
+			global: {
+				hiddenCard: () => true,
+				ai: {
+					respondSha: true,
+					respondShan: true,
+				},
+			},
+		},
 	},
 	xinbaiyin: {
 		audio: "sbaiyin",
