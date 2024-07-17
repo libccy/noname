@@ -7783,8 +7783,7 @@ const skills = {
 						const card = { name: button.link[2], isCard: true };
 						return player.getUseValue(card);
 					}).set("filterButton", function (button) {
-						const card = { name: button.link[2], isCard: true };
-						return player.hasUseTarget(card) || get.type(card) == "delay";
+						return true;
 					}).forResult();
 					event.result = {
 						bool: result.bool,
@@ -7795,7 +7794,7 @@ const skills = {
 					const name = event.cost_data;
 					player.unmarkAuto("sbqianxun", [name]);
 					const card = { name: name, isCard: true };
-					if (get.type(card) == "trick") await player.chooseUseTarget(card,`是否视为使用【${get.translation(name)}】？`);
+					if (get.type(card) == "trick" && player.hasUseTarget(card)) await player.chooseUseTarget(card,`是否视为使用【${get.translation(name)}】？`);
 				},
 			},
 			gain: {
