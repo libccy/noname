@@ -78,7 +78,7 @@ const dynamicTranslates = {
 	},
 	dcsbyingmou(player) {
 		var storage = player.storage.dcsbyingmou;
-		var str = "转换技，每回合限一次，当你使用牌指定第一个目标后，你可以选择一名目标角色：";
+		var str = "转换技，每回合限一次，你对其他角色使用牌后，你可以选择其中一名目标角色：";
 		if (!storage) str += '<span class="bluetext">';
 		str += "阴，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】；";
 		if (!storage) str += "</span>";

@@ -608,10 +608,14 @@ export class LibInit {
 		 * @param {Function} func
 		 */
 		function Legacy(func) {
-			const { Marshal } = security.importSandbox();
+			// 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
+			/** @type {(func: Function) => string} */
+			const decompileFunction = security.isSandboxRequired()
+				? security.importSandbox().Marshal.decompileFunction
+				: Function.prototype.call.bind(Function.prototype.toString);
 			//Remove all comments
 			//移除所有注释
-			const code = Marshal.decompileFunction(func)
+			const code = decompileFunction(func)
 				.replace(/((?:(?:^[ \t]*)?(?:\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\/(?:[ \t]*\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/)))?|\/\/(?:[^\\]|\\(?:\r?\n)?)*?(?:\r?\n(?=[ \t]*(?:\r?\n|\/\*|\/\/))|(?=\r?\n))))+)|("(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?:\r?\n|[\s\S])[^/"'\\\s]*)/gm, "$2")
 				.trim();
 			//获取第一个 { 后的所有字符

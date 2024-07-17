@@ -3363,7 +3363,7 @@ export class Click {
 			const dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
 			const skillAudioMap = new Map();
 			nameinfo.skills.forEach(skill => {
-				const voiceMap = game.parseSkillText(skill, name, null, true);
+				const voiceMap = game.parseSkillText(skill, name);
 				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
 			});
 			const derivationSkillAudioMap = new Map();
@@ -3376,7 +3376,7 @@ export class Click {
 					}
 					for(var i=0; i<derivation.length; i++) {
 						if (derivation[i].indexOf('_faq') != -1) continue;
-						const derivationVoiceMap = game.parseSkillText(derivation[i], name, null, true);
+						const derivationVoiceMap = game.parseSkillText(derivation[i], name);
 						if(derivationVoiceMap.length) derivationSkillAudioMap.set(derivation[i], derivationVoiceMap);
 					}
 				}
@@ -3557,7 +3557,7 @@ export class Click {
 				
 				if (lib.config.background_speak && e !== 'init') {
 					if (!this.playAudio) {
-						const audioList = get.Audio.toFile(get.Audio.skill({ skill: this.link, player: playername }));
+						const audioList = get.Audio.skill({ skill: this.link, player: playername }).fileList;
 						this.playAudio = game.tryAudio({
 							audioList,
 							addVideo: false,
@@ -3710,7 +3710,7 @@ export class Click {
 			const dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
 			const skillAudioMap = new Map();
 			nameInfo.skills.forEach(skill => {
-				const voiceMap = game.parseSkillText(skill, name, null, true);
+				const voiceMap = game.parseSkillText(skill, name);
 				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
 			});
 			const derivationSkillAudioMap = new Map();
@@ -3723,7 +3723,7 @@ export class Click {
 					}
 					for(var i=0; i<derivation.length; i++) {
 						if (derivation[i].indexOf('_faq') != -1) continue;
-						const derivationVoiceMap = game.parseSkillText(derivation[i], name, null, true);
+						const derivationVoiceMap = game.parseSkillText(derivation[i], name);
 						if(derivationVoiceMap.length) derivationSkillAudioMap.set(derivation[i], derivationVoiceMap);
 					}
 				}
@@ -3910,7 +3910,7 @@ export class Click {
 				
 				if (lib.config.background_speak && e !== 'init') {
 					if (!this.playAudio) {
-						const audioList = get.Audio.toFile(get.Audio.skill({ skill: this.link, player: playername }));
+						const audioList = get.Audio.skill({ skill: this.link, player: playername }).fileList;
 						this.playAudio = game.tryAudio({
 							audioList,
 							addVideo: false,
@@ -4200,12 +4200,7 @@ export class Click {
 		game.swapPlayer(this);
 	}
 	mousewheel(evt) {
-		if (
-			this.firstChild &&
-			this.firstChild.classList.contains("handcards") &&
-			!this.classList.contains("scrollh")
-		)
-			return;
+		if (this.firstElementChild && this.firstElementChild.classList.contains("handcards") && !this.classList.contains("scrollh")) return;
 		var node = this;
 		var num = this._scrollnum || 6;
 		var speed = this._scrollspeed || 16;

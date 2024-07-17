@@ -12,31 +12,13 @@ import { Audio } from "./audio.js";
 import security from "../util/security.js";
 import { CodeSnippet, ErrorManager } from "../util/error.js";
 
-export class Get {
+import { GetCompatible } from "./compatible.js";
+
+export class Get extends GetCompatible {
 	is = new Is();
 	promises = new Promises();
-	Audio = new Audio();
-	/**
-	 * 获取当前内核版本信息
-	 *
-	 * 目前仅考虑`chrome`, `firefox`和`safari`三种浏览器的信息，其余均归于其他范畴
-	 *
-	 * > 其他后续或许会增加，但`IE`永无可能
-	 *
-	 * @returns {["firefox" | "chrome" | "safari" | "other", number, number, number]}
-	 */
-	coreInfo() {
-		const regex = /(firefox|chrome|safari)\/(\d+(?:\.\d+)+)/;
-		let result;
-		if (!(result = userAgent.match(regex))) return ["other", NaN, NaN, NaN];
-		if (result[1] != "safari") {
-			const [major, minor, patch] = result[2].split(".");
-			return [result[1], parseInt(major), parseInt(minor), parseInt(patch)];
-		}
-		result = userAgent.match(/version\/(\d+(?:\.\d+)+).*safari/);
-		const [major, minor, patch] = result[1].split(".");
-		return ["safari", parseInt(major), parseInt(minor), parseInt(patch)];
-	}
+	Audio = Audio;
+
 	/**
 	 * 将一个传统格式的character转化为Character对象格式
 	 * @param { Array|Object|import("../library/element/character").Character } data
@@ -48,7 +30,7 @@ export class Get {
 	}
 	/**
 	 * 返回 VCard[] 形式的所有牌，用于印卡将遍历
-	 * @param {Function} filter
+	 * @param {Function} [filter]
 	 * @returns {string[][]}
 	 */
 	inpileVCardList(filter) {
@@ -69,6 +51,7 @@ export class Get {
 	/**
 	 * 根据(Player的)座次数n（从1开始）获取对应的“n号位”翻译
 	 * @param {number | Player} seat
+	 * @returns { string }
 	 */
 	seatTranslation(seat) {
 		if (get.itemtype(seat) === "player") seat = seat.getSeatNum() - 1;
@@ -130,6 +113,9 @@ export class Get {
 	 * Get the card name length
 	 *
 	 * 获取此牌的字数
+	 * @param { Card } card
+	 * @param { Player } [player]
+	 * @returns { number }
 	 */
 	cardNameLength(card, player) {
 		const actualCardName = lib.actualCardName,
@@ -174,6 +160,8 @@ export class Get {
 	}
 	/**
 	 * 优先度判断
+	 * @param { string } skill
+	 * @returns { number }
 	 */
 	priority(skill) {
 		const info = get.info(skill);
@@ -341,6 +329,7 @@ export class Get {
 		if (info.chargingSkill) list.add("蓄能技");
 		if (info.charlotte) list.add("Charlotte");
 		if (info.sunbenSkill) list.add("昂扬技");
+		if (info.persevereSkill) list.add("持恒技");
 		if (info.categories) list.addArray(info.categories(skill, player));
 		return list;
 	}
@@ -358,6 +347,41 @@ export class Get {
 		if (list.length) return list;
 		return get.inpile("trick", "trick").randomGets(3);
 	}
+	/**
+	 * 用于获取武将的姓氏和名字
+	 * @param { string } str
+	 * @param { string|undefined } defaultSurname
+	 * @param { string|undefined } defaultName
+	 * @returns { Array }
+	 */
+	characterSurname(str, defaultSurname, defaultName) {
+		const info = get.character(str).names;
+		if (!info) {
+			let rawName = get.rawName(str);
+			return [[rawName[0], rawName.slice(1)]];
+		}
+		let infoarr = info.split("-");
+		let names = [];
+		for (let i = 0; i < infoarr.length; i++) {
+			let name = infoarr[i].split("|");
+			if (name[0] === "null") {
+				name[0] = defaultSurname || "";
+			}
+			if (name[1] === "null") {
+				name[1] = defaultName || "某";
+			}
+			names.push([name[0], name[1]]);
+		}
+		return names;
+	}
+	/**
+	 * 返回角色对应的原角色
+	 * @param { string } str
+	 * @returns { string }
+	 * @example
+	 * //以界曹操为例
+	 * get.sourceCharacter("re_caocao") == "caocao"
+	 */
 	sourceCharacter(str) {
 		if (str) {
 			for (var i in lib.characterReplace) {
@@ -366,6 +390,11 @@ export class Get {
 		}
 		return str;
 	}
+	/**
+	 * 返回玩家是否处于幸运星状态
+	 * @param { Player } player
+	 * @returns { boolean }
+	 */
 	isLuckyStar(player) {
 		if (player && player.hasSkillTag("luckyStar")) return true;
 		if (_status.connectMode) return false;
@@ -416,6 +445,12 @@ export class Get {
 		}
 		return 0;
 	}
+	/**
+	 * 获取牌堆底的牌
+	 * @param { number } [num = 1]
+	 * @param { boolean } [putBack]
+	 * @returns { Card[] }
+	 */
 	bottomCards(num, putBack) {
 		if (_status.waitingForCards) {
 			ui.create.cards.apply(ui.create, _status.waitingForCards);
@@ -629,6 +664,11 @@ export class Get {
 		if (!info) return [];
 		return info.initFilters || [];
 	}
+	/**
+	 * 返回武将介绍
+	 * @param { string } name
+	 * @returns { string }
+	 */
 	characterIntro(name) {
 		if (lib.characterIntro[name]) return lib.characterIntro[name];
 		var tags = get.character(name, 4);
@@ -658,11 +698,22 @@ export class Get {
 		}
 		return nature + "mm";
 	}
+	/**
+	 * 判定数字的正负，若num大于0，返回1，若num小于0，返回-1，若num等于0，返回0
+	 * @param { number } num
+	 * @returns { 1 | -1 | 0 }
+	 */
 	sgn(num) {
 		if (num > 0) return 1;
 		if (num < 0) return -1;
 		return 0;
 	}
+	/**
+	 * 生成随机数，若存在num2，返回num到num2之间的随机数，否则返回0到num之间的随机数
+	 * @param { number } num
+	 * @param { number } [num2]
+	 * @returns { number }
+	 */
 	rand(num, num2) {
 		if (typeof num2 == "number") {
 			return num + Math.floor(Math.random() * (num2 - num + 1));
@@ -673,6 +724,12 @@ export class Get {
 	sort(arr, method, arg) {
 		return method == "seat" ? arr.sortBySeat(arg) : void 0;
 	}
+	/**
+	 * 返回一个按座次排序的玩家数组
+	 * @param { Player[] } arr
+	 * @param { Player } target
+	 * @returns { Player[] }
+	 */
 	sortSeat(arr, target) {
 		return arr.sortBySeat(target);
 	}
@@ -787,6 +844,7 @@ export class Get {
 	}
 	/**
 	 * @param {any} obj
+	 * @param { number } [level = 0]
 	 */
 	stringify(obj, level = 0) {
 		level = level || 0;
@@ -929,10 +987,10 @@ export class Get {
 		const target = constructor
 			? Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object
 				? // @ts-ignore
-				new constructor()
+					new constructor()
 				: constructor.name in window && /\[native code\]/.test(constructor.toString())
 					? // @ts-ignore
-					new constructor(obj)
+						new constructor(obj)
 					: obj
 			: Object.create(null);
 		if (target === obj) return target;
@@ -975,15 +1033,22 @@ export class Get {
 
 		return target;
 	}
+	plainTextMap = new Map();
 	/**
 	 * 用于将HTML代码转换为纯文本。
 	 * @param { string } htmlContent
 	 * @returns { string }
 	 */
 	plainText(htmlContent) {
-		var parser = new DOMParser();
-		var doc = parser.parseFromString(htmlContent || '', 'text/html');
-		return doc.body.textContent || doc.body.innerText;
+		if (htmlContent.includes("<") || htmlContent.includes(">")) {
+			if (this.plainTextMap.has(htmlContent)) return this.plainTextMap.get(htmlContent);
+			const parser = new DOMParser(),
+				doc = parser.parseFromString(htmlContent || "", "text/html");
+			const text = doc.body.textContent || doc.body.innerText;
+			this.plainTextMap.set(htmlContent, text);
+			return text;
+		}
+		return htmlContent;
 	}
 	inpilefull(type) {
 		var list = [];
@@ -1500,26 +1565,57 @@ export class Get {
 	infoPlayersOL(infos) {
 		return Array.from(infos || []).map(get.infoPlayerOL);
 	}
-	/** 箭头函数头 */
-	#arrowPattern = /^(?:async\b\s*)?(?:([\w$]+)|\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\))\s*=>/;
-	/** 标准函数头 */
-	#fullPattern = /^([\w\s*]+)\((\s*[\w$]+(?:\s*=\s*.+?)?(?:\s*,\s*[\w$]+(?:\s*=\s*.+?)?)*\s*)?\)\s*\{/;
+	/** @type {RegExp} */
+	#specialHeadPattern = /^(?:async\b)?\s*[\w$]+\s*=>/;
+	/** @type {RegExp} */
+	#functionHeadPattern = /^(?:async\b\s*)?(?:function\b\s*)?(?:\*\s*)?(?:[\w$]+\b\s*)?\(/;
+	/** @type {RegExp} */
+	#illegalFunctionHeadPattern = /^(?:async\b\s*)?\*\s*\(/;
+	/** @type {RegExp} */
+	#functionNeckPattern = /^\)\s*(?:=>\s*\{|=>|\{)/;
+	/** @type {RegExp} */
+	#identifierPattern = /\b[\w$]+\b/;
+	/** @type {RegExp} */
+	#asyncHeadPattern = /^async[\s\*\(]/;
+	/**
+	 * ```plain
+	 * 测试一段代码是否为函数参数列表
+	 * ```
+	 *
+	 * @param {string} paramstr
+	 * @returns { boolean }
+	 */
+	isFunctionParam(paramstr) {
+		if (paramstr.length == 0) return true;
+		const canCreateFunction = security.isSandboxRequired() && security.importSandbox().Marshal.canCreateFunction;
+		if (canCreateFunction) return canCreateFunction(paramstr, "");
+		try {
+			new Function(paramstr, "");
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
 	/**
 	 * ```plain
 	 * 测试一段代码是否为函数体
 	 * ```
-	 * 
+	 *
 	 * @typedef {"async"|"generator"|"agenerator"|"any"|null} FunctionType
-	 * 
-	 * @param {string} code 
-	 * @param {FunctionType} type 
-	 * @returns {boolean} 
+	 *
+	 * @param {string} code
+	 * @param {FunctionType} type
+	 * @returns {boolean}
 	 */
-	isFunctionBody(code, type = null) {
+	isFunctionBody(code, type = /* (function(){return null})() */ null) {
+		const canCreateFunction = security.isSandboxRequired() && security.importSandbox().Marshal.canCreateFunction;
+		if (canCreateFunction) return canCreateFunction("", code, type);
 		if (type == "any") {
-			return ["async", "generator", "agenerator", null]
-				// @ts-ignore // 突然发现ts-ignore也挺方便的喵
-				.some(t => get.isFunctionBody(code, t));
+			return (
+				["async", "generator", "agenerator", null]
+					// @ts-ignore // 突然发现ts-ignore也挺方便的喵
+					.some(t => get.isFunctionBody(code, t))
+			);
 		}
 		try {
 			switch (type) {
@@ -1545,53 +1641,125 @@ export class Get {
 	 * ```plain
 	 * 清洗函数体代码
 	 * ```
-	 * 
-	 * @param {string} str 
-	 * @param {boolean} log 
-	 * @returns {string} 
+	 *
+	 * @param {string} str
+	 * @param {boolean} log
+	 * @returns {string}
 	 */
 	pureFunctionStr(str, log = false) {
+		const emptyFunction = "function () {}";
 		str = str.trim();
-		const arrowMatch = get.#arrowPattern.exec(str);
-		if (arrowMatch) {
-			let body = str.slice(arrowMatch[0].length).trim();
+		// 对于特殊的箭头函数特殊处理: identifier => ...
+		const specialMatch = get.#specialHeadPattern.exec(str);
+		if (specialMatch) {
+			let body = str.slice(specialMatch[0].length).trim();
 			if (body.startsWith("{") && body.endsWith("}")) body = body.slice(1, -1);
 			else body = `return ${body}`;
 			if (!get.isFunctionBody(body, "any")) {
-				if (log) console.error("发现疑似恶意的远程代码:", str);
-				return `()=>{}`;
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
 			}
-			return `${arrowMatch[0]}{${body}}`;
+			return `${specialMatch[0]}{${body}}`;
 		}
-		if (!str.endsWith("}")) {
+		// 匹配函数头
+		const functionHead = get.#functionHeadPattern.exec(str);
+		if (!functionHead) {
 			if (log) console.warn("发现无法识别的远程代码:", str);
-			return '()=>{}';
+			return emptyFunction;
 		}
-		const fullMatch = get.#fullPattern.exec(str);
-		if (!fullMatch) {
+		// 检查非法函数头
+		if (get.#illegalFunctionHeadPattern.test(functionHead[0])) {
 			if (log) console.warn("发现无法识别的远程代码:", str);
-			return '()=>{}';
+			return emptyFunction;
 		}
-		const head = fullMatch[1];
-		const args = fullMatch[2] || '';
-		const body = str.slice(fullMatch[0].length).slice(0, -1);
-		if (!get.isFunctionBody(body, "any")) {
-			if (log) console.error("发现疑似恶意的远程代码:", str);
-			return '()=>{}';
+		// 遍历字符串来寻找参数列表的关闭括号
+		const headLen = functionHead[0].length;
+		let start = headLen;
+		let foundClose;
+		let verifiedParams = null;
+		while ((foundClose = str.indexOf(")", start)) >= 0) {
+			const tempParams = str.slice(headLen, foundClose);
+			// 检查收集到的参数列表是否是有效的
+			if (get.isFunctionParam(tempParams)) {
+				verifiedParams = tempParams;
+				break;
+			}
+			start = foundClose + 1;
 		}
-		str = `(${args}){${body}}`;
-		if (head.includes("*")) str = "*" + str;
-		str = "function" + str;
-		if (/\basync\b/.test(head)) str = "async " + str;
-		return str;
+		if (verifiedParams == null) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 检查函数连接
+		const neckStart = str.slice(foundClose);
+		const neckMatch = get.#functionNeckPattern.exec(neckStart);
+		if (!neckMatch) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 箭头函数分流检查
+		if (neckMatch[0].includes("=>")) {
+			let funcHead = functionHead[0];
+			let idMatch;
+			while ((idMatch = get.#identifierPattern.exec(funcHead))) {
+				if (idMatch[0] != "async") {
+					if (log) console.warn("发现无法识别的远程代码:", str);
+					return emptyFunction;
+				}
+				funcHead = funcHead.slice(idMatch.index + idMatch[0].length);
+			}
+		} else {
+			let funcHead = functionHead[0];
+			let idMatch;
+			while ((idMatch = get.#identifierPattern.exec(funcHead))) {
+				if (idMatch[0] != "async") break;
+				funcHead = funcHead.slice(idMatch.index + idMatch[0].length);
+			}
+			if (!idMatch) {
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
+			}
+		}
+		// 块类型分流
+		const isBlock = neckMatch[0].endsWith("{");
+		let funcBody;
+		if (isBlock) {
+			if (!str.endsWith("}")) {
+				if (log) console.warn("发现无法识别的远程代码:", str);
+				return emptyFunction;
+			}
+			funcBody = "{" + str.slice(foundClose + neckMatch[0].length);
+		} else {
+			// 将表达式函数体转换成块函数体
+			funcBody = `{ return ${str.slice(foundClose + neckMatch[0].length)}; }`;
+		}
+		// 收集函数类型
+		let funcType = 0;
+		if (functionHead[0].includes("*")) funcType |= 1;
+		if (get.#asyncHeadPattern.test(functionHead[0])) funcType |= 2;
+		// 检查函数体
+		const checkType = [null, "generator", "async", "agenerator"][funcType];
+		// @ts-ignore
+		if (!get.isFunctionBody(funcBody, checkType)) {
+			if (log) console.warn("发现无法识别的远程代码:", str);
+			return emptyFunction;
+		}
+		// 开始构造最终的函数
+		let finalStr = ` (${verifiedParams}) ${funcBody}`;
+		if (funcType & 1) finalStr = "*" + finalStr;
+		finalStr = "function" + finalStr;
+		if (funcType & 2) finalStr = "async " + finalStr;
+		return finalStr;
 	}
 	funcInfoOL(func) {
 		if (typeof func == "function") {
 			if (func._filter_args) {
 				return "_noname_func:" + JSON.stringify(get.stringifiedResult(func._filter_args, 3));
 			}
-			const { Marshal } = security.importSandbox();
-			const str = Marshal.decompileFunction(func);
+			// 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
+			/** @type {(func: Function) => string} */
+			const decompileFunction = security.isSandboxRequired() ? security.importSandbox().Marshal.decompileFunction : Function.prototype.call.bind(Function.prototype.toString);
+			const str = decompileFunction(func);
 			// js内置的函数
 			if (/\{\s*\[native code\]\s*\}/.test(str)) return "_noname_func:function () {}";
 			return "_noname_func:" + get.pureFunctionStr(str);
@@ -1605,7 +1773,7 @@ export class Get {
 		if ("sandbox" in window) console.log("[infoFuncOL] pured:", str);
 		try {
 			// js内置的函数
-			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () { };
+			if (/\{\s*\[native code\]\s*\}/.test(str)) return function () {};
 			if (security.isSandboxRequired()) {
 				const loadStr = `return (${str});`;
 				const box = security.currentSandbox();
@@ -1618,7 +1786,7 @@ export class Get {
 			}
 		} catch (e) {
 			console.error(`${e} in \n${str}`);
-			return function () { };
+			return function () {};
 		}
 		if (Array.isArray(func)) {
 			func = get.filter.apply(this, get.parsedResult(func));
@@ -1628,14 +1796,14 @@ export class Get {
 	eventInfoOL(item, level, noMore) {
 		return get.itemtype(item) == "event"
 			? `_noname_event:${JSON.stringify(
-				Object.entries(item).reduce((stringifying, entry) => {
-					const key = entry[0];
-					if (key == "_trigger") {
-						if (noMore !== false) stringifying[key] = get.eventInfoOL(entry[1], null, false);
-					} else if (!lib.element.GameEvent.prototype[key] && key != "content" && get.itemtype(entry[1]) != "event") stringifying[key] = get.stringifiedResult(entry[1], null, false);
-					return stringifying;
-				}, {})
-			)}`
+					Object.entries(item).reduce((stringifying, entry) => {
+						const key = entry[0];
+						if (key == "_trigger") {
+							if (noMore !== false) stringifying[key] = get.eventInfoOL(entry[1], null, false);
+						} else if (!lib.element.GameEvent.prototype[key] && key != "content" && get.itemtype(entry[1]) != "event") stringifying[key] = get.stringifiedResult(entry[1], null, false);
+						return stringifying;
+					}, {})
+				)}`
 			: "";
 	}
 	/**
@@ -1828,53 +1996,43 @@ export class Get {
 	/**
 	 * @overload
 	 * @returns { void }
-	 */
-	/**
+	 *
 	 * @overload
 	 * @param { string } obj
 	 * @returns { 'position' | 'natures' | 'nature' }
-	 */
-	/**
+	 *
 	 * @overload
 	 * @param { Player[] } obj
 	 * @returns { 'players' }
-	 */
-	/**
+	 *
 	 * @overload
 	 * @param { Card[] } obj
 	 * @returns { 'cards' }
-	 */
-	/**
+	 *
 	 * @overload
 	 * @param { [number, number] } obj
 	 * @returns { 'select' }
-	 */
-	/**
+	 *
 	 * @overload
 	 * @param { [number, number, number, number] } obj
 	 * @returns { 'divposition' }
-	 */
-	/**
+	 *
 	 * @overload
 	 * @param { Button } obj
 	 * @returns { 'button' }
-	 */
-	/**
+	 *
 	 * @overload
 	 * @param { Card } obj
 	 * @returns { 'card' }
-	 */
-	/**
+	 *
 	 * @overload
 	 * @param { Player } obj
 	 * @returns { 'player' }
-	 */
-	/**
+	 *
 	 * @overload
 	 * @param { Dialog } obj
 	 * @returns { 'dialog' }
-	 */
-	/**
+	 *
 	 * @overload
 	 * @param { GameEvent | GameEventPromise } obj
 	 * @returns { 'event' }
@@ -1924,6 +2082,40 @@ export class Get {
 		}
 		return 0;
 	}
+	/**
+	 * 返回对象的实际类型
+	 * @overload
+	 * @param { Array } obj
+	 * @returns { 'array' }
+	 *
+	 * @overload
+	 * @param { Object } obj
+	 * @returns { 'object' }
+	 *
+	 * @overload
+	 * @param { HTMLDivElement } obj
+	 * @returns { 'div' }
+	 *
+	 * @overload
+	 * @param { HTMLTableElement } obj
+	 * @returns { 'table' }
+	 *
+	 * @overload
+	 * @param { HTMLTableRowElement } obj
+	 * @returns { 'tr' }
+	 *
+	 * @overload
+	 * @param { HTMLTableCellElement } obj
+	 * @returns { 'td' }
+	 *
+	 * @overload
+	 * @param { HTMLBodyElement } obj
+	 * @returns { 'td' }
+	 *
+	 * @overload
+	 * @param { DocumentFragment } obj
+	 * @returns { 'fragment' }
+	 */
 	objtype(obj) {
 		if (Object.prototype.toString.call(obj) === "[object Array]") return "array";
 		if (Object.prototype.toString.call(obj) === "[object Object]") return "object";
@@ -1934,6 +2126,20 @@ export class Get {
 		if (Object.prototype.toString.call(obj) === "[object HTMLBodyElement]") return "td";
 		if (Object.prototype.toString.call(obj) === "[object DocumentFragment]") return "fragment";
 	}
+	/**
+	 * 返回牌的类型
+	 * @overload
+	 * @param { string } obj
+	 * @param { 'trick' } [method]
+	 * @param { Player } [player]
+	 * @returns { string }
+	 *
+	 * @overload
+	 * @param { Card } obj
+	 * @param { 'trick' } [method]
+	 * @param { Player } [player]
+	 * @returns { string }
+	 */
 	type(obj, method, player) {
 		if (typeof obj == "string") obj = { name: obj };
 		if (typeof obj != "object") return;
@@ -1955,10 +2161,10 @@ export class Get {
 		return get.type(card, "trick", player);
 	}
 	/**
-	 *
+	 * 返回牌的副类型
 	 * @param { string | Card | VCard | CardBaseUIData } obj
 	 * @param { false | Player } [player]
-	 * @returns { string }
+	 * @returns { string | undefined }
 	 */
 	subtype(obj, player) {
 		if (typeof obj == "string") obj = { name: obj };
@@ -1974,10 +2180,10 @@ export class Get {
 		return 0;
 	}
 	/**
-	 *
+	 * 返回牌的牌名
 	 * @param { Card | VCard | CardBaseUIData } card
 	 * @param { false | Player } [player]
-	 * @returns { string }
+	 * @returns { string | undefined }
 	 */
 	name(card, player) {
 		if (get.itemtype(player) == "player" || (player !== false && get.position(card) == "h")) {
@@ -1989,9 +2195,10 @@ export class Get {
 		return card.name;
 	}
 	/**
+	 * 返回牌的花色
 	 * @param {Card | VCard | Card[] | VCard[]} card
 	 * @param {false | Player} [player]
-	 * @returns {string}
+	 * @returns {string | undefined }
 	 */
 	suit(card, player) {
 		if (typeof card !== "object") return;
@@ -2012,9 +2219,10 @@ export class Get {
 		}
 	}
 	/**
+	 * 返回牌的颜色
 	 * @param {Card | VCard | Card[] | VCard[]} card
 	 * @param {false | Player} [player]
-	 * @returns {string}
+	 * @returns {string | undefined }
 	 */
 	color(card, player) {
 		if (typeof card !== "object") return;
@@ -2039,9 +2247,10 @@ export class Get {
 		}
 	}
 	/**
+	 * 返回牌的点数
 	 * @param {Card | VCard} card
 	 * @param {false | Player} [player]
-	 * @returns {number}
+	 * @returns {number | undefined | "unsure" | null}
 	 */
 	number(card, player) {
 		if (typeof card !== "object") return;
@@ -2094,6 +2303,12 @@ export class Get {
 		if (typeof natures != "string") return [];
 		return natures.split(lib.natureSeparator);
 	}
+	/**
+	 * 返回牌堆顶的牌
+	 * @param { number } [num = 1]
+	 * @param { boolean } [putBack]
+	 * @returns
+	 */
 	cards(num, putBack) {
 		if (_status.waitingForCards) {
 			ui.create.cards.apply(ui.create, _status.waitingForCards);
@@ -2174,8 +2389,8 @@ export class Get {
 		n = game.checkMod(from, to, n, "globalFrom", from);
 		n = game.checkMod(from, to, n, "globalTo", to);
 		const equips1 = from.getCards("e", function (card) {
-			return !ui.selected.cards || !ui.selected.cards.includes(card);
-		}),
+				return !ui.selected.cards || !ui.selected.cards.includes(card);
+			}),
 			equips2 = to.getCards("e", function (card) {
 				return !ui.selected.cards || !ui.selected.cards.includes(card);
 			});
@@ -2274,11 +2489,24 @@ export class Get {
 	 * @returns {GameEvent[T]}
 	 */
 	event(key) {
-		return key ? _status.event[key] : _status.event;
+		if (key) {
+			// 能跑起来的东西还是不要去动它比较好 --Spmario233
+			// 跑起来没问题的东西就不要乱动！ --Spmario233
+			// console.warn(`get.event("${key}")写法即将被废弃，请更改为get.event().${key}`);
+			return _status.event[key];
+		}
+		return _status.event;
 	}
 	player() {
 		return _status.event.player;
 	}
+	/**
+	 * 返回玩家的数组
+	 * @param {*} [sort]
+	 * @param { boolean } [dead] 包含死人
+	 * @param { boolean } [out] 包含移除游戏的人
+	 * @returns { Player[] }
+	 */
 	players(sort, dead, out) {
 		var players = game.players.slice(0);
 		if (sort != false) {
@@ -2289,7 +2517,28 @@ export class Get {
 		if (!out) players = players.filter(current => !current.isOut());
 		return players;
 	}
+
+	/**
+	 * 返回指定角色所有的id，用于统一双将和单将的检查
+	 *
+	 * @author tangXins
+	 * @param {Player} player
+	 * @returns {string[]}
+	 */
+	nameList(player) {
+		let type;
+		if (typeof player == "undefined" || ((type = typeof player), type != "object") || ((type = get.itemtype(player)), type != "player")) {
+			throw new Error(`函数接受了一个不是Player的东西: ${type}: ${player}`);
+		}
+
+		return ["name", "name1", "name2"]
+			.filter(prop => player[prop])
+			.map(prop => player[prop])
+			.toUniqued();
+	}
+
 	position(card, ordering) {
+		//哪个大聪明在返回牌位置的函数写返回玩家位置的功能
 		if (get.itemtype(card) == "player") return parseInt(card.dataset.position);
 		if (card.timeout && card.destiny && card.destiny.classList) {
 			if (card.destiny.classList.contains("equips")) return "e";
@@ -2313,6 +2562,12 @@ export class Get {
 		if (card.parentNode.id == "ordering") return ordering ? "o" : "d";
 		return null;
 	}
+	/**
+	 *
+	 * @param { string } str
+	 * @param { Player } [player]
+	 * @returns { string }
+	 */
 	skillTranslation(str, player) {
 		var str2;
 		if (str.startsWith("re")) {
@@ -2451,6 +2706,11 @@ export class Get {
 		}
 		return game.menuZoom;
 	}
+	/**
+	 * 返回数字在扑克牌中的表示形式
+	 * @param { number } num
+	 * @returns { string }
+	 */
 	strNumber(num) {
 		switch (num) {
 			case 1:
@@ -2465,9 +2725,15 @@ export class Get {
 				return num.toString();
 		}
 	}
+	/**
+	 * 将阿拉伯数字转换为中文的表达形式
+	 * @param { number } num
+	 * @param { boolean } [ordinal]
+	 * @returns { string }
+	 */
 	cnNumber(num, ordinal) {
 		if (isNaN(num)) return "";
-		let numStr = num.toString();
+		let numStr = "" + num;
 		if (numStr === "Infinity") return "∞";
 		if (numStr === "-Infinity") return "-∞";
 		if (!/^\d+$/.test(numStr)) return num;
@@ -2537,6 +2803,7 @@ export class Get {
 		}
 	}
 	/**
+	 * 返回可以选择的按钮
 	 * @param {((a: Button, b: Button) => number)} [sort] 排序函数
 	 * @returns { Button[] }
 	 */
@@ -2555,6 +2822,7 @@ export class Get {
 		return selectable;
 	}
 	/**
+	 * 返回可以选择的牌
 	 * @param {((a: Card, b: Card) => number)} [sort] 排序函数
 	 * @returns { Card[] }
 	 */
@@ -2644,6 +2912,7 @@ export class Get {
 		return list;
 	}
 	/**
+	 * 返回可以选择的目标
 	 * @param {((a: Player, b: Player) => number)} [sort] 排序函数
 	 * @returns { Player[] }
 	 */
@@ -2721,6 +2990,23 @@ export class Get {
 		result._filter_args = [filter, i];
 		return result;
 	}
+	/**
+	 * 返回玩家本回合牌的使用次数
+	 * @overload
+	 * @param { true } card
+	 * @param { Player } [player = _status.event.player]
+	 * @returns { number }
+	 *
+	 * @overload
+	 * @param { Card } card
+	 * @param { Player } [player = _status.event.player]
+	 * @returns { number }
+	 *
+	 * @overload
+	 * @param { string } card 牌名
+	 * @param { Player } [player = _status.event.player]
+	 * @returns { number }
+	 */
 	cardCount(card, player) {
 		var num;
 		if (player == undefined) player = _status.event.player;
@@ -2739,12 +3025,24 @@ export class Get {
 		if (num == undefined) return 0;
 		return num;
 	}
+	/**
+	 * 返回玩家本回合技能的使用次数
+	 * @param { string } skill 技能ID
+	 * @param { Player } [player = _status.event.player]
+	 * @returns { number }
+	 */
 	skillCount(skill, player) {
 		if (player == undefined) player = _status.event.player;
 		var num = player.getStat("skill")[skill];
 		if (num == undefined) return 0;
 		return num;
 	}
+	/**
+	 * 返回牌的所有者
+	 * @param { Card } card
+	 * @param { 'judge' } [method]
+	 * @returns { Player | undefined }
+	 */
 	owner(card, method) {
 		return game.players.concat(game.dead).find(current => {
 			if (current.judging[0] == card && method != "judge") return true;
@@ -2774,6 +3072,7 @@ export class Get {
 	}
 	/**
 	 * @param { Card | VCard } item
+	 * @param { string } tag
 	 */
 	cardtag(item, tag) {
 		return (item.cardid && (get.itemtype(item) == "card" || !item.cards || !item.cards.length || item.name == item.cards[0].name) && _status.cardtag && _status.cardtag[tag] && _status.cardtag[tag].includes(item.cardid)) || (item.cardtags && item.cardtags.includes(tag));
@@ -4890,7 +5189,24 @@ export class Get {
 	attitude2(to) {
 		return get.attitude(_status.event.player, to);
 	}
-
+	/**
+	 * Get the number of a skill's item's length
+	 *
+	 * 获取一个转换技的转换项数
+	 * @param {string} skill 技能名
+	 * @param {Player} player
+	 * @returns {number}
+	 */
+	zhuanhuanItemNum(skill, player) {
+		if (!get.is.zhuanhuanji(skill, player)) return 0;
+		const info = lib.skill[skill];
+		if ("zhuanhuanLimit" in info) {
+			const { zhuanhuanLimit } = info;
+			if (typeof zhuanhuanLimit === "function") return parseInt(zhuanhuanLimit(skill, player));
+			return parseInt(zhuanhuanLimit);
+		}
+		return 2;
+	}
 	/**
 	 * 将URL转换成相对于无名杀根目录的路径
 	 *
@@ -5013,7 +5329,7 @@ export let get = new Get();
 /**
  * @param { InstanceType<typeof Get> } [instance]
  */
-export let setGet = (instance) => {
+export let setGet = instance => {
 	get = instance || new Get();
 	if (lib.config.dev) {
 		window.get = get;

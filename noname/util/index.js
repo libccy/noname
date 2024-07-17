@@ -1,24 +1,23 @@
 /** @type { string } */
 // @ts-ignore
 export const nonameInitialized = localStorage.getItem("noname_inited");
-export const assetURL =
-	location.protocol.startsWith("http") ||
-	typeof nonameInitialized != "string" ||
-	nonameInitialized == "nodejs"
-		? ""
-		: nonameInitialized;
+export const assetURL = location.protocol.startsWith("http") || typeof nonameInitialized != "string" || nonameInitialized === "nodejs" ? "" : nonameInitialized;
 /** @type {typeof Function} */
 // @ts-ignore
-export const GeneratorFunction = (function* () {}).constructor;
+export const GeneratorFunction = function* () {}.constructor;
 /** @type {typeof Function} */
 // @ts-ignore
-export const AsyncFunction = (async function () {}).constructor;
+export const AsyncFunction = async function () {}.constructor;
 /** @type {typeof Function} */
 // @ts-ignore
-export const AsyncGeneratorFunction = (async function* () {}).constructor;
+export const AsyncGeneratorFunction = async function* () {}.constructor;
 export const userAgent = navigator.userAgent.toLowerCase();
-export { Mutex } from "./mutex.js";
+// export { Mutex } from "./mutex.js";
 export const characterDefaultPicturePath = "image/character/default_silhouette_";
+
+export const device = nonameInitialized && nonameInitialized !== "nodejs" ? (userAgent.includes("android") ? "android" : userAgent.includes("iphone") || userAgent.includes("ipad") || userAgent.includes("macintosh") ? "ios" : void 0) : void 0;
+
+export const androidNewStandardApp = device === "android" && typeof window.NonameAndroidBridge != "undefined";
 
 /**
  * 不能被new的类
@@ -35,7 +34,12 @@ export class Uninstantable {
  * @returns { Promise<void> }
  */
 export function delay(ms) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
+	return new Promise(resolve => {
+		let timeout = setTimeout(() => {
+			clearTimeout(timeout);
+			resolve();
+		}, ms);
+	});
 }
 
 /**
@@ -51,9 +55,26 @@ export function freezeButExtensible(record) {
 		for (const [key, descriptor] of Object.entries(descriptors)) {
 			if ("value" in descriptor) descriptor.writable = false;
 			descriptor.configurable = false;
+			// @ts-ignore
 			Reflect.defineProperty(record, key, descriptor);
 		}
 	}
 
 	return record;
+}
+
+// 目前是否还在game.js内运行代码
+export let compatibleEnvironment = true;
+export function leaveCompatibleEnvironment() {
+	compatibleEnvironment = false;
+}
+
+/**
+ *
+ *
+ * @return {never}
+ * @throws {Error}
+ */
+export function jumpToCatchBlock() {
+	throw new Error("");
 }
