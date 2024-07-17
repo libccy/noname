@@ -7778,13 +7778,13 @@ const skills = {
 					});
 				},
 				async cost(event, trigger, player) {
-					const list = player.getStorage("sbqianxun").filter(name => get.type(name) == "trick").map(name => ["锦囊", "", name]);
-					const result = await player.chooseButton([get.prompt("sbqianxun"), "视为使用一张记录的普通锦囊牌", [list, "vcard"]]).set("ai", function (button) {
+					const list = player.getStorage("sbqianxun").map(name => ["锦囊", "", name]);
+					const result = await player.chooseButton([get.prompt("sbqianxun"), "移去一个记录的牌名，若为普通锦囊牌则可以视为使用之", [list, "vcard"]]).set("ai", function (button) {
 						const card = { name: button.link[2], isCard: true };
 						return player.getUseValue(card);
 					}).set("filterButton", function (button) {
 						const card = { name: button.link[2], isCard: true };
-						return player.hasUseTarget(card);
+						return player.hasUseTarget(card) || get.type(card) == "delay";
 					}).forResult();
 					event.result = {
 						bool: result.bool,
@@ -7795,7 +7795,7 @@ const skills = {
 					const name = event.cost_data;
 					player.unmarkAuto("sbqianxun", [name]);
 					const card = { name: name, isCard: true };
-					await player.chooseUseTarget(card, true);
+					if (get.type(card) == "trick") await player.chooseUseTarget(card,`是否视为使用【${get.translation(name)}】？`);
 				},
 			},
 			gain: {
