@@ -7,8 +7,9 @@ export { GameEvent };
 
 // 指示标准的事件content应该是只接受event一个参数的异步函数，同时有一个属性指示编译前的content类型
 export type EventCompiledContent = ((e: GameEvent) => Promise<void>) & {
+    compiled: true;
     type: string;
-    original: EventContent;
+    original: EventCompileable;
     /**
      * array content的原始值
      */
@@ -38,5 +39,5 @@ export default interface IContentCompiler {
      * 
      * @param content 要编译的content
      */
-    compile(content: EventCompileable): EventCompiledContent;
+    compile(content: EventCompileable): ((e: GameEvent) => Promise<void>);
 }

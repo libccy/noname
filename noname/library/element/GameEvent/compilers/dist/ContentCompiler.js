@@ -53,6 +53,7 @@ class ContentCompiler {
      * @param content
      */
     compile(content) {
+        if (content.compiled) return content;
         const target = this.regularize(content);
         const cached = this.#compiledContent.get(target);
         if (cached)
@@ -61,6 +62,9 @@ class ContentCompiler {
             if (!compiler.filter(target))
                 continue;
             const compiled = compiler.compile(target);
+            compiled.compiled = true;
+            compiled.type = compiler.type;
+            compiled.original = content;
             // 对编译结果进行缓存
             this.#compiledContent.set(target, compiled);
             return compiled;

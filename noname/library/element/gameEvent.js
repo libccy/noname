@@ -1,8 +1,4 @@
-import { get } from "../../get/index.js";
-import { game } from "../../game/index.js";
-import { lib } from "../index.js";
-import { _status } from "../../status/index.js";
-import { ui } from "../../ui/index.js";
+import { _status, game, get, lib, ui } from "../../../noname.js";
 import security from "../../util/security.js";
 import ContentCompiler from "./GameEvent/compilers/dist/ContentCompiler.js";
 import GameEventManager from "./GameEvent/GameEventManager.js";
@@ -1120,8 +1116,8 @@ export class GameEvent {
 		while (true) {
 			await this.waitNext();
 			if (!this.finished) {
-				if (this._triggered == 0) await trigger("Before", 1);
-				else if (this._triggered == 1) await trigger("Begin", 2);
+				if (this._triggered === 0) await trigger("Before", 1);
+				else if (this._triggered === 1) await trigger("Begin", 2);
 				else {
 					this.#inContent = true;
 					let next = this.content(this);
@@ -1130,9 +1126,9 @@ export class GameEvent {
 					await next.finally(() => this.#inContent = false);
 				}
 			} else {
-				if (this._triggered == 1) await trigger("Omitted", 4);
-				else if (this._triggered == 2) await trigger("End", 3);
-				else if (this._triggered == 3) await trigger("After", 4);
+				if (this._triggered === 1) await trigger("Omitted", 4);
+				else if (this._triggered === 2) await trigger("End", 3);
+				else if (this._triggered === 3) await trigger("After", 4);
 				//@ts-ignore
 				else if (this.after.length) this.next.push(this.after.shift());
 				else return;

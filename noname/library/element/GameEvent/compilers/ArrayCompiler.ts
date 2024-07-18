@@ -1,5 +1,5 @@
 import ContentCompilerBase from "./ContentCompilerBase.ts";
-import { EventCompiledContent, EventContent } from "./IContentCompiler.ts";
+import { EventContent, GameEvent } from "./IContentCompiler.ts";
 
 export default class ArrayCompiler extends ContentCompilerBase {
     type = "array";
@@ -8,11 +8,11 @@ export default class ArrayCompiler extends ContentCompilerBase {
         return Array.isArray(content);
     }
 
-    compile(content: EventContent): EventCompiledContent {
+    compile(content: EventContent) {
         if(!Array.isArray(content))
             throw new ReferenceError("content必须是一个数组");
 
-        const compiled: EventCompiledContent = async (event) => {
+        return async (event: GameEvent) => {
             if (!Number.isInteger(event.step))
                 event.step = 0;
 
@@ -34,8 +34,5 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 this.afterExecute(event);
             }
         };
-        compiled.type = this.type;
-        compiled.original = content;
-        return compiled;
     }
 }

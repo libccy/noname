@@ -7,7 +7,7 @@ export default class ArrayCompiler extends ContentCompilerBase {
     compile(content) {
         if (!Array.isArray(content))
             throw new ReferenceError("content必须是一个数组");
-        const compiled = async (event) => {
+        return async (event) => {
             if (!Number.isInteger(event.step))
                 event.step = 0;
             while (!event.finished) {
@@ -28,8 +28,5 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 this.afterExecute(event);
             }
         };
-        compiled.type = this.type;
-        compiled.original = content;
-        return compiled;
     }
 }

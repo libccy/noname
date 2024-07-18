@@ -1,7 +1,6 @@
-import { EventCompiledContent, EventContent, GameEvent } from "./IContentCompiler.ts";
+import { EventContent, GameEvent } from "./IContentCompiler.ts";
 import { _status, ai, game, get, lib, ui } from "../../../../../noname.js";
 import ContentCompilerBase from "./ContentCompilerBase.ts";
-import ContentCompiler from "./ContentCompiler.ts";
 
 export default class YieldCompiler extends ContentCompilerBase {
     type = "yield";
@@ -25,12 +24,11 @@ export default class YieldCompiler extends ContentCompilerBase {
         return typeof content === "function" && content.constructor.name === "GeneratorFunction";
     }
 
-    compile(content: EventContent): EventCompiledContent {
-        const original = content as GeneratorFunction;
-        const compiled: EventCompiledContent = async (event) => {
+    compile(content: EventContent) {
+        return async (event: GameEvent) => {
             const args = YieldCompiler.#mapArgs(event);
             const generator: Generator<any, void, any> =
-                Reflect.apply(original, event, [event, args]);
+                Reflect.apply(content as GeneratorFunction, event, [event, args]);
 
             let result: any = null;
 
@@ -63,9 +61,5 @@ export default class YieldCompiler extends ContentCompilerBase {
 
             generator.return();
         };
-
-        compiled.type = this.type;
-        compiled.original = content;
-        return compiled;
     }
 }

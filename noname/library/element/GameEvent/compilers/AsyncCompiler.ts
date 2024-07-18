@@ -2,7 +2,7 @@
 
 import ContentCompiler from "./ContentCompiler.ts";
 import ContentCompilerBase from "./ContentCompilerBase.ts";
-import { EventCompiledContent, EventContent } from "./IContentCompiler.ts";
+import { EventContent } from "./IContentCompiler.ts";
 
 type AsyncFunction<R> = (...args: any[]) => Promise<R>;
 
@@ -14,12 +14,7 @@ export default class AsyncCompiler extends ContentCompilerBase {
         return content.constructor.name === "AsyncFunction" && content.length >= 1;
     }
 
-    compile(content: EventContent): EventCompiledContent {
-        const original = content as AsyncFunction<void>;
-        const compiled: EventCompiledContent = ContentCompiler.compile([original]);
-
-        compiled.type = this.type;
-        compiled.original = content;
-        return compiled;
+    compile(content: EventContent) {
+        return ContentCompiler.compile([content as AsyncFunction<void>]);
     }
 }

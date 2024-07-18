@@ -12,10 +12,7 @@ export default class StepCompiler extends ContentCompilerBase {
     compile(content) {
         if (typeof content != "function")
             throw new Error("StepCompiler只能接受函数");
-        const compiled = StepCompiler.parseStep(content);
-        compiled.type = this.type;
-        compiled.original = content;
-        return compiled;
+        return StepCompiler.parseStep(content);
     }
     static parseStep(func) {
         if (typeof func !== "function")

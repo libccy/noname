@@ -449,11 +449,6 @@ export class Player extends HTMLDivElement {
 		do {
 			skillName = "player_when_" + Math.random().toString(36).slice(-8);
 		} while (lib.skill[skillName] != null);
-		const after = `${skillName}After`;
-		// 追加当前when的失效时机
-		if (!trigger.player) trigger.player = after;
-		else if (Array.isArray(trigger.player)) trigger.player.add(after);
-		else if (typeof trigger.player == "string") trigger.player = [trigger.player, after];
 		const vars = {};
 		/**
 		 * 作用域
@@ -479,18 +474,14 @@ export class Player extends HTMLDivElement {
 				return vars;
 			},
 			get filter() {
-				return (event, player, name) => {
-					if (name == `${skillName}After`) {
-						skill.popup = false;
-						return true;
-					}
-					return skill.filterFuns.every(fun => Boolean(fun(event, player, name))) && skill.filter2(event, player, name);
-				};
+				return (event, player, name) => 
+					skill.filterFuns.every(fun => Boolean(fun(event, player, name)))
+					&& skill.filter2(event, player, name);
 			},
 			get filter2() {
-				return (event, player, name) => {
-					return skill.filter2Funs.length == 0 || skill.filter2Funs.some(fun => Boolean(fun(event, player, name)));
-				};
+				return (event, player, name) => 
+					skill.filter2Funs.length === 0
+					|| skill.filter2Funs.some(fun => Boolean(fun(event, player, name)));
 			},
 		};
 		const warnVars = ["event", "step", "source", "player", "target", "targets", "card", "cards", "skill", "forced", "num", "trigger", "result"];
@@ -513,30 +504,23 @@ export class Player extends HTMLDivElement {
 					var { ${deconstructs.join(", ")} } = event;
 					var { ${topVars.join(", ")} } = topVars;
 					${varstr}
-					{${code}}
+					{
+						${code}
+					}
 				`;
 
-				if (!scope)
-					return new Function(...params, body).bind(null, { lib, game, ui, get, ai, _status });
+				if (!get.isFunctionBody(body)) throw new Error(`无效的函数体: ${body}`);
 
-				if (!get.isFunctionBody(body))
-					throw new Error(`无效的函数体: ${body}`);
+				let compiled;
+				if (!scope) compiled = new Function(...params, body);
+				else compiled = scope(`(function (${params.join(", ")}) {\n${body}\n})`);
 
-				const compiled = scope(`(function (${params.join(", ")}) {\n${body}\n})`);
 				originals.push(compiled);
 				contents.push(function(event, trigger, player){
 					//@ts-ignore
 					return compiled.apply(this, [{ lib, game, ui, get, ai, _status }, event, trigger, player]);
 				});
 			};
-			compileStep(`
-				if(event.triggername=='${skillName}After'){
-					player.removeSkill('${skillName}');
-					delete lib.skill['${skillName}'];
-					delete lib.translate['${skillName}'];
-					return event.finish();
-				}
-			`);
 			for (let i = 0; i < skill.contentFuns.length; i++) {
 				const fun2 = skill.contentFuns[i];
 				if (typeof fun2 === "function") {

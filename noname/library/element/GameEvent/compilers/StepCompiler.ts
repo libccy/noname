@@ -1,6 +1,6 @@
 // 喵喵！step写法的content全在这里处理喵！
 
-import { EventCompiledContent, EventContent } from "./IContentCompiler.ts";
+import { EventContent } from "./IContentCompiler.ts";
 import { _status, ai, game, get, lib, ui } from "../../../../../noname.js";
 import ContentCompilerBase from "./ContentCompilerBase.ts";
 import ContentCompiler from "./ContentCompiler.ts";
@@ -14,14 +14,11 @@ export default class StepCompiler extends ContentCompilerBase {
         return typeof content === 'function' && content.length === 0;
     }
 
-    compile(content: EventContent): EventCompiledContent {
+    compile(content: EventContent) {
         if (typeof content != "function")
             throw new Error("StepCompiler只能接受函数");
 
-        const compiled = StepCompiler.parseStep(content);
-        compiled.type = this.type;
-        compiled.original = content;
-        return compiled;
+        return StepCompiler.parseStep(content);
     }
 
     static parseStep(func: Function) {
@@ -31,7 +28,7 @@ export default class StepCompiler extends ContentCompilerBase {
         // 虽然现在 parsex 被控制到了沙盒，
         // 但是因为默认沙盒还是可以额外操作东西，
         // 故而对不同的运行域做了区分
-        const [ , , ModAsyncFunction] = security.getIsolatedsFrom(func);
+        const [, , ModAsyncFunction] = security.getIsolatedsFrom(func);
 
         //by 诗笺、Tipx-L
         // 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
@@ -96,7 +93,7 @@ export default class StepCompiler extends ContentCompilerBase {
             const compiled = compileStep(code, stepHead);
             ErrorManager.setCodeSnippet(compiled, new CodeSnippet(code, 3)); // 记录编译后函数的原代码片段
             originals.push(compiled);
-            contents.push(function(event, trigger, player){
+            contents.push(function (event, trigger, player) {
                 //@ts-ignore
                 return compiled.apply(this, [{ _status, ai, game, get, lib, ui }, event, trigger, player]);
             });

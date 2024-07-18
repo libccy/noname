@@ -1,6 +1,5 @@
 import { game, _status } from "../../../../../noname.js";
-import IContentCompiler, { EventCompiledContent, EventContent } from "./IContentCompiler.js";
-import { GameEvent } from "../../gameEvent.js";
+import IContentCompiler, { EventContent, GameEvent } from "./IContentCompiler.js";
 
 type HandlerOption = { state?: "begin" | "end" };
 
@@ -10,7 +9,7 @@ type HandlerOption = { state?: "begin" | "end" };
 export default abstract class ContentCompilerBase implements IContentCompiler {
     abstract type: string;
     abstract filter(content: EventContent): boolean;
-    abstract compile(content: EventContent): EventCompiledContent;
+    abstract compile(content: EventContent): ((e: GameEvent) => Promise<void>);
 
     /**
      * ```plain

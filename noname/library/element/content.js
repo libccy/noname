@@ -2754,6 +2754,11 @@ export const Content = {
 		if ("cost_data" in result) next.cost_data = result.cost_data;
 		next.indexedData = event.indexedData;
 		"step 4";
+		if (event.skill.startsWith("player_when_")){
+			player.removeSkill(event.skill);
+			delete lib.skill[event.skill];
+			delete lib.translate[event.skill];
+		}
 		if (!player._hookTrigger) return;
 		if (
 			player._hookTrigger.some((i) => {

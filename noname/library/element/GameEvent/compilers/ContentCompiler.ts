@@ -65,6 +65,9 @@ class ContentCompiler {
      * @param content 
      */
     compile(content: EventCompileable): EventCompiledContent {
+        //@ts-ignore
+        if (content.compiled) return content;
+
         const target = this.regularize(content);
 
         const cached = this.#compiledContent.get(target);
@@ -73,7 +76,10 @@ class ContentCompiler {
 
         for (const compiler of this.#compilers) {
             if (!compiler.filter(target)) continue;
-            const compiled = compiler.compile(target);
+            const compiled = compiler.compile(target) as EventCompiledContent;
+            compiled.compiled = true;
+            compiled.type = compiler.type;
+            compiled.original = content;
             // 对编译结果进行缓存
             this.#compiledContent.set(target, compiled);
             return compiled;

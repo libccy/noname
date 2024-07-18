@@ -16,10 +16,9 @@ export default class YieldCompiler extends ContentCompilerBase {
         return typeof content === "function" && content.constructor.name === "GeneratorFunction";
     }
     compile(content) {
-        const original = content;
-        const compiled = async (event) => {
+        return async (event) => {
             const args = YieldCompiler.#mapArgs(event);
-            const generator = Reflect.apply(original, event, [event, args]);
+            const generator = Reflect.apply(content, event, [event, args]);
             let result = null;
             while (!event.finished) {
                 let value = null;
@@ -39,8 +38,5 @@ export default class YieldCompiler extends ContentCompilerBase {
             }
             generator.return();
         };
-        compiled.type = this.type;
-        compiled.original = content;
-        return compiled;
     }
 }
