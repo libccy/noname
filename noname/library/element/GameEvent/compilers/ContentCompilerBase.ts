@@ -1,5 +1,6 @@
-import { lib, game, _status } from "../../../../../noname.js";
+import { game, _status } from "../../../../../noname.js";
 import IContentCompiler, { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler.js";
+import { GameEvent } from "../../gameEvent.js";
 
 type HandlerOption = { state?: "begin" | "end" };
 

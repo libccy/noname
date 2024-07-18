@@ -162,7 +162,7 @@ export class GameEvent {
 	 */
 	excludeButton;
 	/**
-	 * @type { ((this: GameEvent) => boolean) | undefined }
+	 * @type { ((this: this) => boolean) | undefined }
 	 */
 	filterStop;
 	/**

@@ -1,4 +1,5 @@
 import { lib } from "../../../../../noname.js";
+import { GameEvent } from "../../gameEvent.js";
 
 export type EventContentType = "step" | "yield" | "async" | "array";
 export type EventContentTypes = EventContentType | EventContentType[] | null;

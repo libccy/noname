@@ -38,7 +38,6 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 }
                 const nextResult = await event.waitNext();
                 event._result = result || nextResult || event._result;
-                event.updateStep();
                 this.afterExecute(event);
             }
         };
