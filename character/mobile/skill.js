@@ -4,6 +4,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//司马伷
 	mbbifeng: {
+		audio: 2,
 		trigger: {
 			target: "useCardToTarget",
 			global: "useCardAfter",
@@ -43,6 +44,7 @@ const skills = {
 		},
 	},
 	mbsuwang: {
+		audio: 2,
 		trigger: {
 			global: "phaseEnd",
 		},
@@ -65,6 +67,7 @@ const skills = {
 		group: "mbsuwang_draw",
 		subSkill: {
 			draw: {
+				audio: "mbsuwang",
 				trigger: {
 					player: "phaseDrawBegin1",
 				},

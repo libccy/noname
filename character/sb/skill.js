@@ -153,7 +153,7 @@ const skills = {
 			const targets = game.filterPlayer(current => {
 				return current.inRange(target);
 			});
-			const count = Math.min(2, targets.length);
+			const count = targets.length;
 			if (!count) {
 				target.chat("没人打得到我喔！");
 				return;
@@ -374,6 +374,7 @@ const skills = {
 						return distance - from.countMark("sbyicong_to");
 					},
 				},
+				onremove: true,
 				marktext: "从",
 				intro: {
 					content: "本轮你至其他角色的距离-#",
@@ -386,6 +387,7 @@ const skills = {
 						return distance + to.countMark("sbyicong_from");
 					},
 				},
+				onremove: true,
 				marktext: "从",
 				intro: {
 					content: "本轮其他角色至你的距离+#",
