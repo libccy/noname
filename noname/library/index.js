@@ -13713,6 +13713,20 @@ export class Library {
 			},
 		],
 		[
+			"玄",
+			{
+				color: "#000000",
+				nature: "metalmm",
+			},
+		],
+		[
+			"魂",
+			{
+				color: "#ffff99",
+				nature: "firemm",
+			},
+		],
+		[
 			"幻",
 			{
 				color: "#ffff99",

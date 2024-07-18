@@ -153,7 +153,7 @@ const skills = {
 			const targets = game.filterPlayer(current => {
 				return current.inRange(target);
 			});
-			const count = Math.min(2, targets.length);
+			const count = targets.length;
 			if (!count) {
 				target.chat("没人打得到我喔！");
 				return;
@@ -374,6 +374,7 @@ const skills = {
 						return distance - from.countMark("sbyicong_to");
 					},
 				},
+				onremove: true,
 				marktext: "从",
 				intro: {
 					content: "本轮你至其他角色的距离-#",
@@ -386,6 +387,7 @@ const skills = {
 						return distance + to.countMark("sbyicong_from");
 					},
 				},
+				onremove: true,
 				marktext: "从",
 				intro: {
 					content: "本轮其他角色至你的距离+#",
@@ -7778,13 +7780,12 @@ const skills = {
 					});
 				},
 				async cost(event, trigger, player) {
-					const list = player.getStorage("sbqianxun").filter(name => get.type(name) == "trick").map(name => ["锦囊", "", name]);
-					const result = await player.chooseButton([get.prompt("sbqianxun"), "视为使用一张记录的普通锦囊牌", [list, "vcard"]]).set("ai", function (button) {
+					const list = player.getStorage("sbqianxun").map(name => ["锦囊", "", name]);
+					const result = await player.chooseButton([get.prompt("sbqianxun"), "移去一个记录的牌名，若为普通锦囊牌则可以视为使用之", [list, "vcard"]]).set("ai", function (button) {
 						const card = { name: button.link[2], isCard: true };
 						return player.getUseValue(card);
 					}).set("filterButton", function (button) {
-						const card = { name: button.link[2], isCard: true };
-						return player.hasUseTarget(card);
+						return true;
 					}).forResult();
 					event.result = {
 						bool: result.bool,
@@ -7795,7 +7796,7 @@ const skills = {
 					const name = event.cost_data;
 					player.unmarkAuto("sbqianxun", [name]);
 					const card = { name: name, isCard: true };
-					await player.chooseUseTarget(card, true);
+					if (get.type(card) == "trick" && player.hasUseTarget(card)) await player.chooseUseTarget(card,`是否视为使用【${get.translation(name)}】？`);
 				},
 			},
 			gain: {
