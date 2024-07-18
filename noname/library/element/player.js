@@ -524,9 +524,9 @@ export class Player extends HTMLDivElement {
 
 				const compiled = scope(`(function (${params.join(", ")}) {\n${body}\n})`);
 				originals.push(compiled);
-				contents.push(function(...params){
+				contents.push(function(event, trigger, player){
 					//@ts-ignore
-					return compiled.apply(this, [{ lib, game, ui, get, ai, _status },...params]);
+					return compiled.apply(this, [{ lib, game, ui, get, ai, _status }, event, trigger, player]);
 				});
 			};
 			compileStep(`

@@ -78,9 +78,9 @@ export default class StepCompiler extends ContentCompilerBase {
             const compiled = compileStep(code, stepHead);
             ErrorManager.setCodeSnippet(compiled, new CodeSnippet(code, 3)); // 记录编译后函数的原代码片段
             originals.push(compiled);
-            contents.push(function (...params) {
+            contents.push(function (event, trigger, player) {
                 //@ts-ignore
-                return compiled.apply(this, [{ _status, ai, game, get, lib, ui }, ...params]);
+                return compiled.apply(this, [{ _status, ai, game, get, lib, ui }, event, trigger, player]);
             });
         };
         //func中要写步骤的话，必须要写step 0
