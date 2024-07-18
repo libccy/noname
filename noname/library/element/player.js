@@ -502,6 +502,8 @@ export class Player extends HTMLDivElement {
 				if (errVars.includes(key)) throw new Error(`Variable '${key}' should not be referenced by vars objects`);
 				varstr += `var ${key}=lib.skill['${skillName}'].vars['${key}'];\n`;
 			}
+			const originals = [];
+			const contents = [];
 			const compileStep = (code, scope) => {
 				const deconstructs = ["step", "source", "target", "targets", "card", "cards", "skill", "forced", "num", "_result: result"];
 				const topVars = ["_status", "lib", "game", "ui", "get", "ai"];
@@ -520,23 +522,27 @@ export class Player extends HTMLDivElement {
 				if (!get.isFunctionBody(body))
 					throw new Error(`无效的函数体: ${body}`);
 
-				return scope(`(function (${params.join(", ")}) {\n${body}\n})`)
-					.bind(null, { lib, game, ui, get, ai, _status });
+				const compiled = scope(`(function (${params.join(", ")}) {\n${body}\n})`);
+				originals.push(compiled);
+				contents.push(function(...params){
+					//@ts-ignore
+					return compiled.apply(this, [{ lib, game, ui, get, ai, _status },...params]);
+				});
 			};
-			const contents = [];
-			contents.push(
-				compileStep(`
-					if(event.triggername=='${skillName}After'){
-						player.removeSkill('${skillName}');
-						delete lib.skill['${skillName}'];
-						delete lib.translate['${skillName}'];
-						return event.finish();
-					}
-				`)
-			);
+			compileStep(`
+				if(event.triggername=='${skillName}After'){
+					player.removeSkill('${skillName}');
+					delete lib.skill['${skillName}'];
+					delete lib.translate['${skillName}'];
+					return event.finish();
+				}
+			`);
 			for (let i = 0; i < skill.contentFuns.length; i++) {
 				const fun2 = skill.contentFuns[i];
-				if (typeof fun2 != "function") {
+				if (typeof fun2 === "function") {
+					originals.push(fun2);
+					contents.push(fun2);
+				} else{
 					const a = fun2;
 					//防止传入()=>xxx的情况
 					const begin = a.indexOf("{") == a.indexOf("}") && a.indexOf("{") == -1 && a.indexOf("=>") > -1 ? a.indexOf("=>") + 2 : a.indexOf("{") + 1;
@@ -549,10 +555,12 @@ export class Player extends HTMLDivElement {
 					} else {
 						recompiledScope = scope || eval;
 					}
-					contents.push(compileStep(str2, recompiledScope));
-				} else contents.push(fun2);
+					compileStep(str2, recompiledScope);
+				}
 			}
-			skill.content = ContentCompiler.compile(contents);
+			const content = ContentCompiler.compile(contents);
+			content.original = originals;
+			skill.content = content;
 		};
 		Object.defineProperty(lib.skill, skillName, {
 			configurable: true,
@@ -621,6 +629,7 @@ export class Player extends HTMLDivElement {
 			/**
 			 * ```plain
 			 * 闭包用法的then，不再提供parsex变量，改为使用闭包访问
+			 * 传参为 event, trigger, player
 			 *
 			 * 闭包即你可以直接在when里面访问when外面的变量
 			 * 如下：

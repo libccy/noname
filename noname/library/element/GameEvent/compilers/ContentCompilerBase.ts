@@ -1,5 +1,5 @@
 import { game, _status } from "../../../../../noname.js";
-import IContentCompiler, { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler.js";
+import IContentCompiler, { EventCompiledContent, EventContent } from "./IContentCompiler.js";
 import { GameEvent } from "../../gameEvent.js";
 
 type HandlerOption = { state?: "begin" | "end" };
@@ -8,7 +8,7 @@ type HandlerOption = { state?: "begin" | "end" };
  * 向子类提供统一的公共方法
  */
 export default abstract class ContentCompilerBase implements IContentCompiler {
-    abstract get type(): EventContentTypes;
+    abstract type: string;
     abstract filter(content: EventContent): boolean;
     abstract compile(content: EventContent): EventCompiledContent;
 

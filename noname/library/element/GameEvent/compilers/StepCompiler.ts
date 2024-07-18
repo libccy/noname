@@ -1,6 +1,6 @@
 // 喵喵！step写法的content全在这里处理喵！
 
-import { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler.ts";
+import { EventCompiledContent, EventContent } from "./IContentCompiler.ts";
 import { _status, ai, game, get, lib, ui } from "../../../../../noname.js";
 import ContentCompilerBase from "./ContentCompilerBase.ts";
 import ContentCompiler from "./ContentCompiler.ts";
@@ -8,12 +8,10 @@ import security from "../../../../util/security.js";
 import { CodeSnippet, ErrorManager } from "../../../../util/error.js";
 
 export default class StepCompiler extends ContentCompilerBase {
-    get type(): EventContentTypes {
-        return "step";
-    }
+    type = "step";
 
-    filter(_: EventContent) {
-        return true; // 无需任何额外过滤
+    filter(content: EventContent) {
+        return typeof content === 'function' && content.length === 0;
     }
 
     compile(content: EventContent): EventCompiledContent {
@@ -21,7 +19,7 @@ export default class StepCompiler extends ContentCompilerBase {
             throw new Error("StepCompiler只能接受函数");
 
         const compiled = StepCompiler.parseStep(content);
-        compiled.type = "step";
+        compiled.type = this.type;
         compiled.original = content;
         return compiled;
     }
@@ -33,12 +31,7 @@ export default class StepCompiler extends ContentCompilerBase {
         // 虽然现在 parsex 被控制到了沙盒，
         // 但是因为默认沙盒还是可以额外操作东西，
         // 故而对不同的运行域做了区分
-        const [
-            _ModFunction,
-            _ModGeneratorFunction,
-            ModAsyncFunction,
-            // ModAsyncGeneratorFunction,
-        ] = security.getIsolatedsFrom(func);
+        const [ , , ModAsyncFunction] = security.getIsolatedsFrom(func);
 
         //by 诗笺、Tipx-L
         // 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
@@ -83,6 +76,7 @@ export default class StepCompiler extends ContentCompilerBase {
         }
 
         const contents: Function[] = [];
+        const originals: Function[] = [];
         const deconstructs = ["step", "source", "target", "targets", "card", "cards", "skill", "forced", "num", "_result: result"];
         const topVars = ["_status", "lib", "game", "ui", "get", "ai"];
 
@@ -95,13 +89,17 @@ export default class StepCompiler extends ContentCompilerBase {
                     .map(c => `{\n${c}\n}\n`).join("")}
             `;
 
-            return new ModAsyncFunction(...params, body).bind(null, { lib, game, ui, get, ai, _status });
+            return new ModAsyncFunction(...params, body);
         };
 
         const packStep = (code: string, stepHead?: string | null) => {
             const compiled = compileStep(code, stepHead);
             ErrorManager.setCodeSnippet(compiled, new CodeSnippet(code, 3)); // 记录编译后函数的原代码片段
-            contents.push(compiled)
+            originals.push(compiled);
+            contents.push(function(...params){
+                //@ts-ignore
+                return compiled.apply(this, [{ _status, ai, game, get, lib, ui },...params]);
+            });
         };
 
         //func中要写步骤的话，必须要写step 0
@@ -142,6 +140,8 @@ export default class StepCompiler extends ContentCompilerBase {
             packStep(str, stepHead);
         }
 
-        return ContentCompiler.compile(contents);
+        const result = ContentCompiler.compile(contents);
+        result.originals = originals;
+        return result;
     }
 }

@@ -1,9 +1,7 @@
 import { _status, ai, game, get, lib, ui } from "../../../../../../noname.js";
 import ContentCompilerBase from "./ContentCompilerBase.js";
 export default class YieldCompiler extends ContentCompilerBase {
-    get type() {
-        return "yield";
-    }
+    type = "yield";
     static #mapArgs(event) {
         const { step, source, target, targets, card, cards, skill, forced, num, _result, _trigger, player } = event;
         return {
@@ -14,8 +12,8 @@ export default class YieldCompiler extends ContentCompilerBase {
             _status, lib, game, ui, get, ai,
         };
     }
-    filter(_) {
-        return true;
+    filter(content) {
+        return typeof content === "function" && content.constructor.name === "GeneratorFunction";
     }
     compile(content) {
         const original = content;
@@ -41,7 +39,7 @@ export default class YieldCompiler extends ContentCompilerBase {
             }
             generator.return();
         };
-        compiled.type = "yield";
+        compiled.type = this.type;
         compiled.original = content;
         return compiled;
     }

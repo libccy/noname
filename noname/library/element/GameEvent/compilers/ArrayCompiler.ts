@@ -1,13 +1,11 @@
 import ContentCompilerBase from "./ContentCompilerBase.ts";
-import { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler.ts";
+import { EventCompiledContent, EventContent } from "./IContentCompiler.ts";
 
 export default class ArrayCompiler extends ContentCompilerBase {
-    get type(): EventContentTypes {
-        return "array";
-    }
+    type = "array";
 
-    filter(_: EventContent): boolean {
-        return true;
+    filter(content: EventContent): boolean {
+        return Array.isArray(content);
     }
 
     compile(content: EventContent): EventCompiledContent {
@@ -15,16 +13,11 @@ export default class ArrayCompiler extends ContentCompilerBase {
             throw new ReferenceError("content必须是一个数组");
 
         const compiled: EventCompiledContent = async (event) => {
-            const originals = compiled.originals;
-
-            if(!Array.isArray(originals))
-                throw new ReferenceError("compiled.originals必须是一个数组");
-            
             if (!Number.isInteger(event.step))
                 event.step = 0;
 
             while (!event.finished) {
-                if (event.step >= originals.length){
+                if (event.step >= content.length){
                     event.finish();
                     break;
                 }
@@ -32,7 +25,7 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 event.step ++;
                 let result: Result | undefined;
                 if (!this.isPrevented(event)) {
-                    const original = originals[event.step];
+                    const original = content[event.step];
                     const next = await Reflect.apply(original, event, [event, event._trigger, event.player]);
                     result = next && next.result;
                 }
@@ -41,8 +34,8 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 this.afterExecute(event);
             }
         };
-        compiled.type = "array";
-        compiled.originals = content;
+        compiled.type = this.type;
+        compiled.original = content;
         return compiled;
     }
 }

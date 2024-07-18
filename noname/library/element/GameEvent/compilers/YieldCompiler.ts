@@ -1,13 +1,10 @@
-import { EventCompiledContent, EventContent, EventContentTypes } from "./IContentCompiler.ts";
+import { EventCompiledContent, EventContent, GameEvent } from "./IContentCompiler.ts";
 import { _status, ai, game, get, lib, ui } from "../../../../../noname.js";
 import ContentCompilerBase from "./ContentCompilerBase.ts";
 import ContentCompiler from "./ContentCompiler.ts";
 
 export default class YieldCompiler extends ContentCompilerBase {
-    get type(): EventContentTypes {
-        return "yield";
-    }
-
+    type = "yield";
     static #mapArgs(event: GameEvent): Record<string, any> {
         const {
             step, source, target, targets,
@@ -24,8 +21,8 @@ export default class YieldCompiler extends ContentCompilerBase {
         };
     }
 
-    filter(_: EventContent): boolean {
-        return true;
+    filter(content: EventContent): boolean {
+        return typeof content === "function" && content.constructor.name === "GeneratorFunction";
     }
 
     compile(content: EventContent): EventCompiledContent {
@@ -67,7 +64,7 @@ export default class YieldCompiler extends ContentCompilerBase {
             generator.return();
         };
 
-        compiled.type = "yield";
+        compiled.type = this.type;
         compiled.original = content;
         return compiled;
     }

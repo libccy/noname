@@ -1,30 +1,25 @@
 import ContentCompilerBase from "./ContentCompilerBase.js";
 export default class ArrayCompiler extends ContentCompilerBase {
-    get type() {
-        return "array";
-    }
-    filter(_) {
-        return true;
+    type = "array";
+    filter(content) {
+        return Array.isArray(content);
     }
     compile(content) {
         if (!Array.isArray(content))
             throw new ReferenceError("content必须是一个数组");
         const compiled = async (event) => {
-            const originals = compiled.originals;
-            if (!Array.isArray(originals))
-                throw new ReferenceError("compiled.originals必须是一个数组");
             if (!Number.isInteger(event.step))
                 event.step = 0;
             while (!event.finished) {
-                if (event.step >= originals.length){
+                if (event.step >= content.length) {
                     event.finish();
                     break;
                 }
                 this.beforeExecute(event);
-                event.step ++;
+                event.step++;
                 let result;
                 if (!this.isPrevented(event)) {
-                    const original = originals[event.step];
+                    const original = content[event.step];
                     const next = await Reflect.apply(original, event, [event, event._trigger, event.player]);
                     result = next && next.result;
                 }
@@ -33,8 +28,8 @@ export default class ArrayCompiler extends ContentCompilerBase {
                 this.afterExecute(event);
             }
         };
-        compiled.type = "array";
-        compiled.originals = content;
+        compiled.type = this.type;
+        compiled.original = content;
         return compiled;
     }
 }
