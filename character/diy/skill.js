@@ -2814,6 +2814,15 @@ const skills = {
 			trigger.cancel();
 			//event.finish();
 		},
+		ai: {
+			nofire: true,
+			nothunder: true,
+			effect: {
+				target(card, player, target) {
+					if (get.tag(card, "natureDamage")) return "zerotarget";
+				}
+			}
+		}
 	},
 	ns_xiandao: {
 		forced: true,
