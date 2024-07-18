@@ -4729,12 +4729,12 @@ const skills = {
 			while (player.isIn() && trigger.player.isIn()) {
 				await game.asyncDraw([trigger.player, player]);
 				await game.asyncDelayx();
-				var getGainSuit = function (player) {
-					var last = player.getHistory("gain", function (evt) {
+				let getGainSuit = function (player) {
+					let last = player.getHistory("gain", function (evt) {
 						return evt.getParent(2) == event;
 					});
 					if (last.length) {
-						var evt = last.pop();
+						let evt = last.pop();
 						if (evt.cards.length == 1 && player.getCards("h").includes(evt.cards[0])) return get.suit(evt.cards[0], player);
 					} else return player;
 				}, bool;
