@@ -1054,7 +1054,7 @@ export class Library {
 							delete window.game;
 							delete window.ui;
 							delete window.get;
-							delete window.ai;
+							delete window.nonameAI;
 							delete window.lib;
 							delete window._status;
 						}
@@ -8241,7 +8241,7 @@ export class Library {
 			window.game = game;
 			window.ui = ui;
 			window.get = get;
-			window.ai = ai;
+			window.nonameAI = ai;
 			window.lib = lib;
 			window._status = _status;
 		},
