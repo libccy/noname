@@ -26739,7 +26739,7 @@ const skills = {
 					.set("ai", function (card) {
 						if (_status.event.damage > 0) return 0;
 						if (_status.event.noe) return 12 - get.value(card);
-						return 2 * _status.event.damage - get.value(card);
+						return -_status.event.damage - get.value(card);
 					})
 					.set("damage", get.damageEffect(trigger.player, player, trigger.player))
 					.set("noe", trigger.player.hasSkillTag("noe"));
