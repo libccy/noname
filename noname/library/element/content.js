@@ -1983,7 +1983,12 @@ export const Content = {
 		}
 		"step 1";
 		event.result = { links: result.links };
-		var slots = result.links;
+		var slots = result.links.slice();
+		if (slots.includes("equip3_4")) {
+			slots.remove("equip3_4");
+			slots.add("equip3");
+			slots.add("equip4");
+		}
 		player.disableEquip(slots);
 	},
 	swapEquip: function () {
