@@ -2,6 +2,145 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//荀彧荀攸
+	dczhinang: {
+		getMap() {
+			if (!_status.dczhinang_map) {
+				_status.dczhinang_map = {
+					name: {},
+					info: {},
+				};
+				let list;
+				if (_status.connectMode) {
+					list = get.charactersOL();
+				} else {
+					list = get.gainableCharacters();
+				}
+				list.forEach(name => {
+					if (name !== "dc_xunyuxunyou") {
+						const skills = get.character(name, 3);
+						skills.forEach(skill => {
+							const info = get.info(skill);
+							if (!info || (info.ai && info.ai.combo)) return;
+							if (skill in _status.dczhinang_map) return;
+							if (get.translation(skill).includes("谋")) _status.dczhinang_map.name[skill] = name;
+							const voices = game.parseSkillText(skill, name);
+							if (voices.some(data => data.includes("谋"))) {
+								_status.dczhinang_map.info[skill] = name;
+							}
+						});
+					}
+				});
+			}
+			return _status.dczhinang_map;
+		},
+		trigger: {
+			player: "useCardAfter",
+		},
+		filter(event, player) {
+			return ["trick", "equip"].includes(get.type2(event.card));
+		},
+		frequent: true,
+		async content(event, trigger, player) {
+			const map = lib.skill.dczhinang.getMap(),
+				type = get.type2(trigger.card) == "equip" ? "name" : "info",
+				list = Object.keys(map[type]);
+			if (list.length > 0) {
+				const skill = list.randomGet(),
+					voiceMap = game.parseSkillTextMap(skill, map[type][skill]);
+				if (type == "info") {
+					findaudio: for (let data of voiceMap) {
+						if (!data.text) continue;
+						if (data.text.includes("谋")) {
+							player.chat(data.text);
+							game.broadcastAll(file => game.playAudio(file), data.file);
+							break findaudio;
+						}
+					}
+				}
+				else player.flashAvatar("dczhinang", map[type][skill])
+				player.popup(skill);
+				await player.addSkills(skill);
+			}
+		},
+	},
+	dcgouzhu: {
+		trigger: {
+			player: ["useSkillAfter", "logSkill"],
+		},
+		filter(event, player) {
+			if (["global", "equip"].includes(event.type)) return false;
+			let skill = event.sourceSkill || event.skill;
+			if (!skill || skill == "dcgouzhu") return false;
+			let info = get.info(skill);
+			while (true) {
+				if (!info || info.charlotte || info.equipSkill) return false;
+				if (info && !info.sourceSkill) break;
+				skill = info.sourceSkill;
+				info = get.info(skill);
+			}
+			let list = get.skillCategoriesOf(skill, player);
+			return list.length && list.some(item => item in lib.skill.dcgouzhu.effectMap);
+		},
+		frequent: true,
+		effectMap: {
+			"锁定技": async function () {
+				let player = _status.event.player;
+				if (player.isDamaged()) await player.recover();
+			},
+			"觉醒技": async function () {
+				let player = _status.event.player;
+				let card = get.cardPile(card => get.type(card) == "basic");
+				if (card) await player.gain(card, "gain2");
+			},
+			"限定技": async function () {
+				let player = _status.event.player;
+				let target = game.filterPlayer(current => current != player).randomGet();
+				if (target) {
+					player.line(target, "green");
+					await target.damage(player);
+				}
+			},
+			"转换技": async function () {
+				let player = _status.event.player;
+				player.addMark("dcgouzhu", 1, false);
+				game.log(player, '手牌上限+1');
+				await game.asyncDelay();
+			},
+			"主公技": async function () {
+				let player = _status.event.player;
+				await player.gainMaxHp();
+			},
+		},
+		mod: {
+			maxHandcard: function (player, num) {
+				return num + player.countMark("dcgouzhu");
+			},
+		},
+		intro: {
+			content: "手牌上限+#",
+		},
+		locked: false,
+		onremove: true,
+		async content(event, trigger, player) {
+			let skill = trigger.sourceSkill || trigger.skill,
+				info = get.info(skill);
+			while (true) {
+				if (info && !info.sourceSkill) break;
+				skill = info.sourceSkill;
+				info = get.info(skill);
+			}
+			let list = get.skillCategoriesOf(skill, player);
+			for (const item of list) {
+				if (item in lib.skill.dcgouzhu.effectMap) {
+					const next = game.createEvent("dcgouzhu_effect", false);
+					next.player = player;
+					next.setContent(lib.skill.dcgouzhu.effectMap[item]);
+					await next;
+				}
+			}
+		},
+	},
 	//五虎将
 	//是的孩子们，我们意念合一
 	olhuyi: {

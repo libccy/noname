@@ -1289,6 +1289,11 @@ const skills = {
 						const target = event.target;
 						const num = lib.skill.mbcmfangzhu_backup.num;
 						player.storage.mbcmfangzhu = target;
+						let evt=event.getParent("phaseUse",true);
+						if(evt) evt.fangzhuUsed=true;
+						player.when("phaseUseEnd").filter(evtx=>!evtx.fangzhuUsed).then(()=>{
+							player.storage.mbcmfangzhu = player;
+						});
 						switch (num) {
 							case 1:
 								target.addTempSkill("mbcmfangzhu_ban", { player: "phaseEnd" });
