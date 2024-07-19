@@ -107,5 +107,16 @@ const dynamicTranslates = {
 		if (storage) str += "</span>";
 		return str;
 	},
+	dcxianmou(player) {
+		const storage = player.storage.dcxianmou;
+		var str = "转换技，你失去过牌的回合结束时，你可以：";
+		if (!storage) str += '<span class="bluetext">';
+		str += "阴，观看牌堆顶五张牌并获得至多X张牌，若未获得X张牌则获得【遗计】直到再发动此项；";
+		if (!storage) str += "</span>";
+		if (storage) str += '<span class="bluetext">';
+		str += "阳，观看一名角色手牌并弃置其中至多X张牌，若弃置X张牌则你进行一次【闪电】判定。";
+		if (storage) str += "</span>";
+		return str+="（X为你本回合失去牌数）";
+	},
 };
 export default dynamicTranslates;
