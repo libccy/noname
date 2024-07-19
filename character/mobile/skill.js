@@ -4,7 +4,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//司马伷
 	mbbifeng: {
-		audio: 2,
+		audio: 3,
 		trigger: {
 			target: "useCardToTarget",
 			global: "useCardAfter",

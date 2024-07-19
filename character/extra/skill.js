@@ -4,7 +4,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//应天司马懿！肯定又要修改
 	jilin: {
-		audio: 2,
+		audio: 5,
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
@@ -161,7 +161,7 @@ const skills = {
 		},
 	},
 	yingyou: {
-		audio: 2,
+		audio: 4,
 		trigger: {
 			player: "phaseUseBegin",
 		},
@@ -209,6 +209,7 @@ const skills = {
 		group: "yingyou_draw",
 		subSkill: {
 			draw: {
+				audio: "yingyou",
 				trigger: {
 					player: "loseAfter",
 					global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -257,7 +258,7 @@ const skills = {
 			const skill = event.name;
 			player.awakenSkill(skill);
 			await player.changeSkills(get.info(skill).derivation, ["yingyou"]);
-			player.addSkill(skill + "_ effect");
+			player.addSkill(skill + "_effect");
 		},
 		derivation: ["reguicai", "rewansha", "lianpo"],
 		subSkill: {
@@ -6714,6 +6715,7 @@ const skills = {
 	},
 	lianpo: {
 		audio: 2,
+		audioname2: { new_simayi: "lianpo_new_simayi" },
 		trigger: { global: "phaseAfter" },
 		frequent: true,
 		filter(event, player) {
