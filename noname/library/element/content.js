@@ -1915,14 +1915,12 @@ export const Content = {
 				if (player.hasDisabledSlot(button.link))return true;
 				return false; 
 			})
-			if (!event.ai)
-				event.ai = function (event, player, list) {
-					return list.randomGet();
-				};
-			event.ai = event.ai(event.getParent(), player, list);
-			next.ai = function () {
-				return event.ai;
-			};
+			if (!event.ai) {
+				event.ai = function () {
+					return Math.random();
+				}
+			}
+			next.set("ai", event.ai);
 		}
 		"step 1";
 		event.result = { links: result.links };
@@ -1976,14 +1974,12 @@ export const Content = {
 				if (player.hasEnabledSlot(button.link)) return true;
 				return false; 
 			})
-			if (!event.ai)
-				event.ai = function (event, player, list) {
-					return list.randomGet();
-				};
-			event.ai = event.ai(event.getParent(), player, list);
-			next.ai = function () {
-				return event.ai;
-			};
+			if (!event.ai) {
+				event.ai = function () {
+					return Math.random();
+				}
+			}
+			next.set("ai", event.ai);
 		}
 		"step 1";
 		event.result = { links: result.links };

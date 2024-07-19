@@ -10529,12 +10529,16 @@ const skills = {
 			} else event.goto(3);
 			"step 1";
 			if (result.bool) {
-				player.chooseToEnable().set("ai", function () {
+				player.chooseToEnable().set("ai", function (button) {
 					var player = _status.event.player;
+					var link = button.link;
 					var list = [2, 5, 1, 3, 4];
-					for (var i of list) {
-						if (player.hasDisabledSlot(i)) return "equip" + i;
+					list = list.filter(i=>player.hasDisabledSlot(i));
+					if (`equip${list[0]}` == link) {
+						console.log('true');
+						return 114514;
 					}
+					return -1;
 				});
 			} else {
 				var es = player.countCards("e");
@@ -10549,7 +10553,7 @@ const skills = {
 			}
 			"step 2";
 			var func = function (card) {
-				return get.subtype(card, false) == result.control && player.canUse(card, player) && !get.cardtag(card, "gifts");
+				return get.subtype(card, false) == result.links[0] && player.canUse(card, player) && !get.cardtag(card, "gifts");
 			};
 			var card = get.discardPile(func) || get.cardPile2(func);
 			if (card) {

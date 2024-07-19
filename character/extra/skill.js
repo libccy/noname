@@ -8632,9 +8632,11 @@ const skills = {
 			}
 			event.skills = list;
 			if (player.hasEnabledSlot()) {
-				player.chooseToDisable().ai = function (event, player, list) {
-					if (list.includes("equip5")) return "equip5";
-					return list.randomGet();
+				player.chooseToDisable().ai = function (button) {
+					if (button.link == 'equip5') {
+						return 114514;
+					}
+					return -1;
 				};
 			}
 			"step 1";

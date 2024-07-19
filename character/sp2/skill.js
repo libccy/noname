@@ -6351,7 +6351,10 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
-			player.chooseToDisable().ai = function (event, player, list) {
+			player.chooseToDisable().ai = function (button) {
+				var event = _status.event;
+				var player = event.player;
+				var link = button.link;
 				var getVal = function (num) {
 					var card = player.getEquip(num);
 					if (card) {
@@ -6379,13 +6382,11 @@ const skills = {
 						}
 					}
 				};
-				list.sort(function (a, b) {
-					return getVal(b) - getVal(a);
-				});
-				return list[0];
+				return getVal(link);
 			};
 			"step 1";
-			var cardType = result.control;
+			var cardType = result.links[0];
+			console.log(cardType);
 			event.cardType = cardType;
 			var num = player.countDisabledSlot();
 			if (num < 5) player.draw(5 - num);
