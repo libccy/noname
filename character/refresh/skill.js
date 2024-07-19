@@ -5351,8 +5351,8 @@ const skills = {
 	//贾诩
 	rewansha: {
 		audio: "wansha",
-		audioname: ["re_jiaxu", "boss_lvbu3"],
-		audioname2: { shen_simayi: "jilue_wansha", xin_simayi: "jilue_wansha", new_simayi: "wansha_new_simayi" },
+		audioname: ["re_jiaxu", "boss_lvbu3", "new_simayi"],
+		audioname2: { shen_simayi: "jilue_wansha", xin_simayi: "jilue_wansha" },
 		global: "rewansha_global",
 		trigger: { global: "dyingBegin" },
 		forced: true,
@@ -13580,7 +13580,8 @@ const skills = {
 	},
 	reguicai: {
 		audio: 2,
-		audioname2: { xin_simayi: "jilue_guicai", new_simayi: "reguicai_new_simayi" },
+		audioname2: { xin_simayi: "jilue_guicai" },
+		audioname: ["new_simayi"],
 		trigger: { global: "judge" },
 		direct: true,
 		filter: function (event, player) {
