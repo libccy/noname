@@ -4884,7 +4884,7 @@ export class Game extends GameCompatible {
 			delete lib.config.extensionInfo[extensionName];
 			game.saveConfigValue("extensionInfo");
 		}
-		if (!game.download || keepFile) return;
+		if (!game.readFile || keepFile) return;
 		game.promises.removeDir(`extension/${extensionName}`).catch(console.error);
 	}
 	addRecentCharacter() {

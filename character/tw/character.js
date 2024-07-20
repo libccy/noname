@@ -1,9 +1,10 @@
 const characters = {
+	licuilianzhaoquanding: ["double", "qun", 3, ["twciyin", "twchenglong"], ["name:李|翠莲-赵|全定"]],
 	huan_zhugeliang: ["male", "shu", "3/4", ["twbeiding", "twjielv", "twhunyou"], ["name:诸葛|亮"]],
 	huan_jiangwei: ["male", "shu", 4, ["huan_jiangwei_A", "huan_jiangwei_B"]],
 	huan_guojia: ["male", "wei", 3, ["huan_guojia_A", "huan_guojia_B"]],
 	huan_zhanghe: ["male", "wei", 4, ["twkuiduan"]],
-	huan_zhaoyun: ["male", "shu", 4, ["twjiezhan", "huan_zhaoyun_B"]],
+	huan_zhaoyun: ["male", "shu", 4, ["twjiezhan", "twlongjin"]],
 	huan_simayi: ["male", "wei", 4, ["twzongquan", "twguimou"], ["name:司马|懿"]],
 	huan_weiyan: ["male", "shu", 4, ["twqiji", "twpiankuang"]],
 	tw_zhugejun: ["male", "qun", 3, ["twshouzhu", "twdaigui", "twcairu"], ["name:诸葛|均"]],

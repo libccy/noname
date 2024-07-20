@@ -1,4 +1,5 @@
 const characters = {
+	caoteng: ["male", "qun", 3, ["olyongzu", "olqingliu"]],
 	budugen: ["male", "qun", 4, ["olkouchao"]],
 	mawan: ["male", "qun", 4, ["mashu", "olhunjiang"]],
 	ol_jiangwan: ["male", "shu", 3, ["olziruo", "olxvfa"]],
@@ -137,7 +138,7 @@ const characters = {
 	jsp_guanyu: ["male", "wei", 4, ["new_rewusheng", "danji"]],
 	jsp_huangyueying: ["female", "qun", 3, ["jiqiao", "linglong"]],
 	sunluyu: ["female", "wu", 3, ["new_meibu", "new_mumu"]],
-	hanba: ["female", "qun", 4, ["fentian", "zhiri"],["name:null|null"]],
+	hanba: ["female", "qun", 4, ["fentian", "zhiri"], ["name:null|null"]],
 	zumao: ["male", "wu", 4, ["yinbing", "juedi"]],
 	wenpin: ["male", "wei", 4, ["zhenwei"]],
 	daxiaoqiao: ["female", "wu", 3, ["new_xingwu", "new_luoyan"], ["name:桥|null-桥|null"]],

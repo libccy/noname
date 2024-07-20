@@ -1,4 +1,6 @@
 const characters = {
+	mb_simazhou: ["male", "wei", 4, ["mbbifeng", "mbsuwang"], ["name:司马|伷"]],
+	mb_wenqin: ["male", "wei", 4, ["mbbeiming", "mbchoumang"]],
 	mb_simafu: ["male", "wei", 3, ["mbpanxiang", "mbchenjie"], ["name:司马|孚"]],
 	mb_sp_guanqiujian: ["male", "wei", 4, ["mbcuizhen", "mbkuili"], ["name:毌丘|俭"]],
 	mb_caomao: ["male", "wei", 3, ["mbqianlong", "mbweitong"], ["zhu"]],

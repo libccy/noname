@@ -2,6 +2,194 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//曹腾
+	olyongzu: {
+		audio: 2,
+		trigger: { player: "phaseZhunbeiBegin" },
+		filter(event, player) {
+			return game.hasPlayer(t => t != player);
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt2("olyongzu"), lib.filter.notMe)
+				.set("ai", target => {
+					const player = get.event().player;
+					if (get.attitude(player, target) <= 0) return 0;
+					const list = get
+						.info("olyongzu")
+						.getList(player, target)
+						.map(listx => listx[0][1])
+						.filter(effect => !effect.filter || effect.filter(player));
+					return Math.max(...list.map(effect => effect.ai(player))) + Math.max(...list.map(effect => effect.ai(target)));
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			let list = get.info("olyongzu").getList(player, target),
+				choosed;
+			for (const current of [player, target]) {
+				const result = await current
+					.chooseButton(["拥族：请选择一项执行", [list.filter(effect => choosed !== effect[0][0]), "textbutton"]], true)
+					.set("filterButton", button => {
+						const effect = button.link[1];
+						return !effect.filter || effect.filter(current);
+					})
+					.set("ai", button => {
+						const effect = button.link[1];
+						return effect.ai(get.event().player);
+					})
+					.forResult();
+				if (result.bool) {
+					if (!choosed) choosed = result.links[0][0];
+					await result.links[0][1].content(current, player);
+				}
+			}
+		},
+		getList(player, target) {
+			let list = [
+				[
+					"摸两张牌",
+					{
+						async content(player) {
+							await player.draw(2);
+						},
+						ai(player) {
+							return get.effect(player, { name: "wuzhong" }, player, player);
+						},
+					},
+				],
+				[
+					"回复1点体力",
+					{
+						async content(player) {
+							await player.recover();
+						},
+						ai(player) {
+							return get.recoverEffect(player, player, player);
+						},
+					},
+				],
+				[
+					"复原武将牌",
+					{
+						async content(player) {
+							if (player.isTurnedOver()) {
+								await player.turnOver(false);
+							}
+							if (player.isLinked()) {
+								await player.link(false);
+							}
+						},
+						ai(player) {
+							return (player.isTurnedOver() ? 3 : 0) + player.isLinked();
+						},
+					},
+				],
+			];
+			if (get.mode() == "guozhan" ? target.isFriendOf(player) : target.group == player.group) {
+				list.addArray([
+					[
+						"手牌上限+1",
+						{
+							async content(player) {
+								player.addSkill("olyongzu_hand");
+								player.addMark("olyongzu_hand", 1, false);
+							},
+							ai: () => 1,
+						},
+					],
+					[
+						"若为魏/群势力，则获得【奸雄】/【天命】",
+						{
+							async content(player, source) {
+								source.addTempSkill("olyongzu_skill", { player: "phaseBegin" });
+								source.markAuto("olyongzu_skill", [player]);
+								const group = player[get.mode() == "guozhan" ? "identity" : "group"];
+								const skill = group == "wei" ? "rejianxiong" : "tianming";
+								player.popup(skill);
+								await player.addAdditionalSkills("olyongzu_skill", skill, true);
+							},
+							filter: player => ["wei", "qun"].includes(player[get.mode() == "guozhan" ? "identity" : "group"]),
+							ai(player) {
+								return player[get.mode() == "guozhan" ? "identity" : "group"] == "wei" ? 2 : 3;
+							},
+						},
+					],
+				]);
+			}
+			return list.map(listx => [listx, listx[0]]);
+		},
+		derivation: ["rejianxiong", "tianming"],
+		ai: { threaten: 3.5 },
+		subSkill: {
+			skill: {
+				onremove(player, skill) {
+					const targets = player.getStorage(skill).sortBySeat(player);
+					delete player.storage[skill];
+					if (targets.length) {
+						for (const i of targets) i.removeAdditionalSkills(skill);
+					}
+				},
+			},
+			hand: {
+				charlotte: true,
+				markimage: "image/card/handcard.png",
+				intro: { content: "手牌上限+#" },
+				mod: {
+					maxHandcard(player, num) {
+						return num + player.countMark("olyongzu_hand");
+					},
+				},
+			},
+		},
+	},
+	olqingliu: {
+		audio: 2,
+		trigger: {
+			global: "phaseBefore",
+			player: ["enterGame", "dyingAfter"],
+		},
+		filter(event, player) {
+			if (event.name == "dying") {
+				const group = player.storage.olqingliu;
+				if (!group || player.group == group) return false;
+				return (
+					game
+						.getAllGlobalHistory("everything", evt => {
+							return (
+								evt.name == "dying" &&
+								!game.getAllGlobalHistory("everything", evtx => {
+									return evtx.name == "die" && evtx.getParent() == evt;
+								}).length
+							);
+						})
+						.indexOf(event) == 0
+				);
+			}
+			return event.name != "phase" || game.phaseNumber == 0;
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			if (trigger.name == "dying") await player.changeGroup(player.storage.olqingliu);
+			else {
+				const result = await player
+					.chooseControl("wei", "qun")
+					.set("ai", () => {
+						return get.rand(0, 1);
+					})
+					.set("prompt", "清流：请选择你的势力")
+					.forResult();
+				if (result.control) {
+					const group = result.control;
+					player.popup(group + "2");
+					game.log(player, "选择了", "#y" + get.translation(group + "2"));
+					player.storage.olqingliu = group == "wei" ? "qun" : "wei";
+					if (player.group != group) await player.changeGroup(group);
+				}
+			}
+		},
+	},
 	//步度根
 	//古希腊掌管扣工资的神（bushi
 	olkouchao: {
@@ -4530,7 +4718,7 @@ const skills = {
 							return (
 								!player.getHistory("sourceDamage", evt2 => {
 									return evt2.card && evt2.card == evt.card;
-								}).length && get.tag(evt.card, "damage")
+								}).length && get.tag(evt.card, "damage") > 0.5
 							);
 						})
 						.indexOf(event) >= 2
@@ -26544,7 +26732,7 @@ const skills = {
 					.set("ai", function (card) {
 						if (_status.event.damage > 0) return 0;
 						if (_status.event.noe) return 12 - get.value(card);
-						return 2 * _status.event.damage - get.value(card);
+						return -_status.event.damage - get.value(card);
 					})
 					.set("damage", get.damageEffect(trigger.player, player, trigger.player))
 					.set("noe", trigger.player.hasSkillTag("noe"));

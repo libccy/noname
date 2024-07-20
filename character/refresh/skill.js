@@ -2378,7 +2378,8 @@ const skills = {
 			if (result.bool) {
 				var target = result.targets[0];
 				player.line(target, "green");
-				player.discardPlayerCard(target, "e", true);
+				var card = target.getCards("e").randomGet();
+				if (card) target.discard(card);
 			}
 		},
 		ai: {
@@ -4724,25 +4725,22 @@ const skills = {
 		},
 		//priority:-5,
 		logTarget: "player",
-		content: function () {
-			"step 0";
-			game.asyncDraw([trigger.player, player]);
-			"step 1";
-			game.delayx();
-			if (player.isIn() && trigger.player.isIn()) {
-				var getGainSuit = function (player) {
-					var last = player.getHistory("gain", function (evt) {
+		async content(event, trigger, player) {
+			while (player.isIn() && trigger.player.isIn()) {
+				await game.asyncDraw([trigger.player, player]);
+				await game.asyncDelayx();
+				let getGainSuit = function (player) {
+					let last = player.getHistory("gain", function (evt) {
 						return evt.getParent(2) == event;
 					});
 					if (last.length) {
-						var evt = last.pop();
+						let evt = last.pop();
 						if (evt.cards.length == 1 && player.getCards("h").includes(evt.cards[0])) return get.suit(evt.cards[0], player);
 					} else return player;
-				};
-				if (getGainSuit(player) == getGainSuit(trigger.player)) player.chooseBool("是否继续发动【樵拾】？", "和" + get.translation(trigger.player) + "各摸一张牌");
-			} else event.finish();
-			"step 2";
-			if (result.bool) event.goto(0);
+				}, bool;
+				if (getGainSuit(player) == getGainSuit(trigger.player)) bool = await player.chooseBool("是否继续发动【樵拾】？", "和" + get.translation(trigger.player) + "各摸一张牌").forResultBool();
+				if (!bool) break;
+			}
 		},
 		ai: {
 			expose: 0.1,
@@ -5354,7 +5352,7 @@ const skills = {
 	rewansha: {
 		audio: "wansha",
 		audioname: ["re_jiaxu", "boss_lvbu3"],
-		audioname2: { shen_simayi: "jilue_wansha", xin_simayi: "jilue_wansha" },
+		audioname2: { shen_simayi: "jilue_wansha", xin_simayi: "jilue_wansha", new_simayi: "wansha_new_simayi" },
 		global: "rewansha_global",
 		trigger: { global: "dyingBegin" },
 		forced: true,
@@ -13582,7 +13580,7 @@ const skills = {
 	},
 	reguicai: {
 		audio: 2,
-		audioname2: { xin_simayi: "jilue_guicai" },
+		audioname2: { xin_simayi: "jilue_guicai", new_simayi: "reguicai_new_simayi" },
 		trigger: { global: "judge" },
 		direct: true,
 		filter: function (event, player) {

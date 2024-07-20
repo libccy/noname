@@ -153,15 +153,15 @@ const skills = {
 			const targets = game.filterPlayer(current => {
 				return current.inRange(target);
 			});
-			const count = Math.min(2, targets.length);
-			if (!count) {
+			const count = targets.length+2;
+			if (count<=2) {
 				target.chat("没人打得到我喔！");
 				return;
 			}
 			const controls = ["选项一", "选项二", "背水！"];
 			const control = await target
 				.chooseControl(controls)
-				.set("choiceList", [`令所有攻击范围内含有你的角色依次弃置一张牌（${get.translation(targets)}）`, `你摸等同于攻击范围内含有你的角色数的牌（${get.cnNumber(count)}张牌）`, `背水！令${get.translation(player)}的〖解烦〗失效直到其杀死一名角色，然后你依次执行上述所有选项`])
+				.set("choiceList", [`令所有攻击范围内含有你的角色依次弃置两张牌（${get.translation(targets)}）`, `你摸等同于攻击范围内含有你的角色数+2的牌（${get.cnNumber(count)}张牌）`, `背水！令${get.translation(player)}的〖解烦〗失效直到其杀死一名角色，然后你依次执行上述所有选项`])
 				.set("ai", () => {
 					return get.event("choice");
 				})
@@ -201,6 +201,7 @@ const skills = {
 			if (control !== "选项二") {
 				for (const current of targets) {
 					target.line(current, "thunder");
+					await current.chooseToDiscard("解烦：请弃置一张牌", "he", true);
 					await current.chooseToDiscard("解烦：请弃置一张牌", "he", true);
 				}
 			}
@@ -374,6 +375,7 @@ const skills = {
 						return distance - from.countMark("sbyicong_to");
 					},
 				},
+				onremove: true,
 				marktext: "从",
 				intro: {
 					content: "本轮你至其他角色的距离-#",
@@ -386,6 +388,7 @@ const skills = {
 						return distance + to.countMark("sbyicong_from");
 					},
 				},
+				onremove: true,
 				marktext: "从",
 				intro: {
 					content: "本轮其他角色至你的距离+#",
@@ -1261,7 +1264,7 @@ const skills = {
 				ai: {
 					result: {
 						target(player, target) {
-							return get.effect(target, { name: "draw" }, player, player) * (target == player ? 3 : 1);
+							return get.effect(target, { name: "draw" }, player, player) * (target == player ? 3 : 1) * get.sgn(get.attitude(player, target));
 						},
 					},
 				},
@@ -2183,7 +2186,7 @@ const skills = {
 				audio: "sbhuoji2.mp3",
 				trigger: { player: "phaseZhunbeiBegin" },
 				filter: function (event, player) {
-					return player.getAllHistory("sourceDamage", evt => evt.hasNature("fire")).reduce((num, evt) => num + evt.num, 0) >= game.players.length + game.dead.length;
+					return player.getAllHistory("sourceDamage", evt => evt.hasNature("fire") && evt.player != player).reduce((num, evt) => num + evt.num, 0) >= game.players.length + game.dead.length;
 				},
 				forced: true,
 				locked: false,
@@ -2219,7 +2222,7 @@ const skills = {
 					player.addTempSkill("sbhuoji_count", {
 						player: ["sbhuoji_achieveBegin", "sbhuoji_failBegin"],
 					});
-					player.storage.sbhuoji_count = player.getAllHistory("sourceDamage", evt => evt.hasNature("fire")).reduce((num, evt) => num + evt.num, 0);
+					player.storage.sbhuoji_count = player.getAllHistory("sourceDamage", evt => evt.hasNature("fire") && evt.player != player).reduce((num, evt) => num + evt.num, 0);
 					player.markSkill("sbhuoji_count");
 				},
 			},
@@ -7778,13 +7781,12 @@ const skills = {
 					});
 				},
 				async cost(event, trigger, player) {
-					const list = player.getStorage("sbqianxun").filter(name => get.type(name) == "trick").map(name => ["锦囊", "", name]);
-					const result = await player.chooseButton([get.prompt("sbqianxun"), "视为使用一张记录的普通锦囊牌", [list, "vcard"]]).set("ai", function (button) {
+					const list = player.getStorage("sbqianxun").map(name => ["锦囊", "", name]);
+					const result = await player.chooseButton([get.prompt("sbqianxun"), "移去一个记录的牌名，若为普通锦囊牌则可以视为使用之", [list, "vcard"]]).set("ai", function (button) {
 						const card = { name: button.link[2], isCard: true };
 						return player.getUseValue(card);
 					}).set("filterButton", function (button) {
-						const card = { name: button.link[2], isCard: true };
-						return player.hasUseTarget(card);
+						return true;
 					}).forResult();
 					event.result = {
 						bool: result.bool,
@@ -7795,7 +7797,7 @@ const skills = {
 					const name = event.cost_data;
 					player.unmarkAuto("sbqianxun", [name]);
 					const card = { name: name, isCard: true };
-					await player.chooseUseTarget(card, true);
+					if (get.type(card) == "trick" && player.hasUseTarget(card)) await player.chooseUseTarget(card,`是否视为使用【${get.translation(name)}】？`);
 				},
 			},
 			gain: {

@@ -1,5 +1,5 @@
 const characters = {
-	mp_wangrong: ["male", "wei", 3, ["mpqianlin", "mpsixiao"]],
+	mp_wangrong: ["male", "wei", 3, ["mpjianlin", "mpsixiao"]],
 	matie: ["male", "qun", 4, ["dczhuiwang", "dcquxian"]],
 	hansong: ["male", "qun", 3, ["dcyinbi", "dcshuaiyan"]],
 	chezhou: ["male", "wei", 4, ["dcshefu", "dcpigua"]],

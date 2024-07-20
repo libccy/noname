@@ -2,6 +2,216 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//司马伷
+	mbbifeng: {
+		audio: 3,
+		trigger: {
+			target: "useCardToTarget",
+			global: "useCardAfter",
+		},
+		filter(event, player, name) {
+			if (name == "useCardAfter") return player.getStorage("mbbifeng").includes(event.card);
+			if (event.targets && event.targets.length > 4) return false;
+			return ["trick", "basic"].includes(get.type(event.card));
+		},
+		async cost(event, trigger, player) {
+			if (event.triggername == "useCardAfter") event.result = { bool: true };
+			else {
+				let choice = true;
+				if (get.effect(player, trigger.card, trigger.player, player) >= 0) choice = false;
+				if (get.tag(trigger.card, 'damage') && trigger.targets.length == 1 && player.hp <= 2) choice = false;
+				event.result = await player.chooseBool(get.prompt2("mbbifeng")).set("choice", choice).forResult();
+			}
+		},
+		async content(event, trigger, player) {
+			if (event.triggername == "useCardAfter") {
+				player.unmarkAuto("mbbifeng", trigger.card);
+				if (game.hasPlayer(current => {
+					if (current == player) return false;
+					let respondEvts = [];
+					respondEvts.addArray(current.getHistory("useCard")).addArray(current.getHistory("respond"));
+					respondEvts = respondEvts.filter(i => i.respondTo).map(evt => evt.respondTo);
+					return respondEvts.some(list => {
+						return list[1] == trigger.card;
+					});
+				})) await player.draw(2);
+				else await player.loseHp();
+			}
+			else {
+				trigger.getParent().excluded.add(player);
+				player.markAuto("mbbifeng", trigger.card);
+			}
+		},
+	},
+	mbsuwang: {
+		audio: 2,
+		trigger: {
+			global: "phaseEnd",
+		},
+		filter(event, player) {
+			if (player.getHistory("damage").length) return false;
+			return event.player.hasHistory("useCard", evt => evt.targets && evt.targets.includes(player));
+		},
+		frequent: true,
+		async content(event, trigger, player) {
+			await player.addToExpansion(get.cards(1), "draw").gaintag.add("mbsuwang");
+		},
+		intro: {
+			content: "expansion",
+			markcount: "expansion",
+		},
+		onremove(player, skill) {
+			var cards = player.getExpansions(skill);
+			if (cards.length) player.loseToDiscardpile(cards);
+		},
+		group: "mbsuwang_draw",
+		subSkill: {
+			draw: {
+				audio: "mbsuwang",
+				trigger: {
+					player: "phaseDrawBegin1",
+				},
+				filter(event, player) {
+					return player.getExpansions("mbsuwang").length;
+				},
+				async cost(event, trigger, player) {
+					const cards = player.getExpansions("mbsuwang");
+					event.result = await player.chooseBool(get.prompt("mbsuwang"), "放弃摸牌并获得" + get.translation(cards)).set("choice", trigger.num <= cards.length).forResult();
+				},
+				async content(event, trigger, player) {
+					const cards = player.getExpansions("mbsuwang");
+					trigger.changeToZero();
+					await player.gain(cards, "gain2");
+					if (cards.length >= 3) {
+						const result = await player.chooseTarget("是否令一名其他角色摸两张牌?", lib.filter.notMe).set("ai", function (target) {
+							return get.effect(target, { name: "draw" }, _status.event.player, _status.event.player);
+						}).forResult();
+						if (result.bool) {
+							player.line(result.targets[0], "green");
+							await result.targets[0].draw(2);
+						}
+					}
+				},
+			},
+		},
+	},
+	//文钦
+	mbbeiming:{
+		audio: 2,
+		trigger: {
+			global: "phaseBefore",
+			player: "enterGame",
+		},
+		filter(event, player) {
+			return event.name != "phase" || game.phaseNumber == 0;
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt("mbbeiming"), "令至多两名角色获得武器牌", [1, 2])
+				.set("ai", target => {
+					return get.attitude(get.player(), target);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const targets = event.targets;
+			for (const target of targets) {
+				const suits = [];
+				for (const card of target.getCards("h")) suits.add(get.suit(card));
+				const equip = get.cardPile2(card => {
+					if (get.subtype(card) != "equip1") return false;
+					const info = get.info(card, false);
+					if (!info) return false;
+					if (!info.distance || typeof info.distance.attackFrom != "number") return suits.length == 1;
+					return 1 - info.distance.attackFrom == suits.length;
+				});
+				if (equip) await target.gain(equip, "gain2");
+			}
+		},
+	},
+	mbchoumang: {
+		audio: 2,
+		trigger: {
+			player: "useCardToPlayered",
+			target: "useCardToTargeted",
+		},
+		usable: 1,
+		filter(event, player) {
+			return event.card.name == "sha" && event.targets.length == 1;
+		},
+		async cost(event, trigger, player) {
+			const list = ["选项一", "选项二"], target = event.triggername == "useCardToPlayered" ? trigger.target : trigger.player;
+			if (player.getEquip(1) && target.getEquip(1)) list.push("背水！");
+			list.push("cancel2");
+			const result = await player.chooseControl(list).set("choiceList", [
+				"令此【杀】伤害+1",
+				"若此【杀】被【闪】抵消，你可以获得与你距离为1以内的一名其他角色区域里的一张牌",
+				"背水！弃置你与其装备区的武器牌并执行所有选项",
+			]).set("prompt", get.prompt("mbchoumang")).set("result", function () {
+				let eff = 0;
+				for (const targetx of trigger.targets) eff += get.effect(targetx, trigger.card, trigger.player, player);
+				const bool = game.hasPlayer(current => player != current && get.distance(player, current) <= 1 && get.effect(current, { name: "shunshou_copy2" }, player, player) > 0);
+				if (list.includes("背水！") && eff > 0 && bool) return "背水！";
+				if (bool) return "选项二";
+				if (eff > 0) return "选项一";
+				return "cancel2";
+			}()).set("ai", function () {
+				return _status.event.result;
+			}).forResult();
+			event.result = {
+				bool: result.control != "cancel2",
+				targets: [target],
+				cost_data: result.control,
+			};
+		},
+		async content(event, trigger, player) {
+			const result = event.cost_data, target = event.targets[0];
+			if (result == "背水！") {
+				const list = [];
+				if (player.getEquips(1).length) list.push([player, player.getEquips(1)]);
+				if (target.getEquips(1).length) list.push([target, target.getEquips(1)]);
+				await game.loseAsync({
+					lose_list: list,
+					discarder: player,
+				}).setContent("discardMultiple");
+			}
+			if (result != "选项二") {
+				trigger.getParent().baseDamage++;
+				await game.asyncDelay();
+			}
+			if (result != "选项一") {
+				player.addTempSkill("mbchoumang_effect");
+				player.markAuto("mbchoumang_effect", trigger.card);
+			}
+		},
+		subSkill: {
+			effect: {
+				trigger: {
+					global: "shaMiss",
+				},
+				filter(event, player) {
+					if (!player.getStorage("mbchoumang_effect").includes(event.card)) return false;
+					return game.hasPlayer(current => player != current && get.distance(player, current) <= 1 && current.countCards("hej"));
+				},
+				charlotte: true,
+				onremove: true,
+				async cost(event, trigger, player) {
+					event.result = await player.chooseTarget("仇铓：是否获得与你距离为1以内的一名其他角色区域里的一张牌？", function (card, player, target) {
+						return player != target && get.distance(player, target) <= 1 && target.countCards("hej");
+					}).set("ai", function (target) {
+						const player = _status.event.player;
+						return get.effect(target, { name: "shunshou_copy2" }, player, player);
+					}).forResult();
+				},
+				async content(event, trigger, player) {
+					const target = event.targets[0];
+					await player.gainPlayerCard(target, "hej", true);
+					player.unmarkAuto("mbchoumang_effect", [trigger.card]);
+					if (!player.getStorage("mbchoumang_effect").length) player.removeSkill("mbchoumang_effect");
+				},
+			},
+		},
+	},
 	//张布
 	mbchengxiong: {
 		audio: 2,
@@ -1079,6 +1289,11 @@ const skills = {
 						const target = event.target;
 						const num = lib.skill.mbcmfangzhu_backup.num;
 						player.storage.mbcmfangzhu = target;
+						let evt=event.getParent("phaseUse",true);
+						if(evt) evt.fangzhuUsed=true;
+						player.when("phaseUseEnd").filter(evtx=>!evtx.fangzhuUsed).then(()=>{
+							player.storage.mbcmfangzhu = player;
+						});
 						switch (num) {
 							case 1:
 								target.addTempSkill("mbcmfangzhu_ban", { player: "phaseEnd" });

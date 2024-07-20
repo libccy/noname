@@ -3,6 +3,119 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//新谋郭嘉
+	dcxianmou: {
+		mark: true,
+		marktext: "☯",
+		zhuanhuanji(player, skill) {
+			player.storage[skill] = !player.storage[skill];
+			player.changeSkin({ characterName: "dc_sb_guojia" }, "dc_sb_guojia" + (player.storage[skill] ? "_shadow" : ""));
+		},
+		intro: {
+			content: function (storage) {
+				if (!storage) return "你失去过牌的回合结束时，你可以观看牌堆顶五张牌并获得至多X张牌，若未获得X张牌则获得【遗计】直到再发动此项（X为你本回合失去牌数）";
+				return "你失去过牌的回合结束时，你可以观看一名角色手牌并弃置其中至多X张牌，若弃置X张牌则你进行一次【闪电】判定（X为你本回合失去牌数）";
+			},
+		},
+		audio: 2,
+		audioname: ["dc_sb_guojia_shadow"],
+		trigger: {
+			global: "phaseEnd",
+		},
+		filter(event, player) {
+			return player.getHistory("lose", evt => evt.cards2 && evt.cards2.length).length;
+		},
+		async cost(event, trigger, player) {
+			let num = 0;
+			player.getHistory("lose", evt => {
+				if (evt.cards2) num += evt.cards2.length;
+			});
+			if (player.storage.dcxianmou) {
+				event.result = await player.chooseTarget(get.prompt("dcxianmou"), `观看一名角色手牌并弃置其中至多${num}张牌`, function (card, player, target) {
+					return target.countCards("h");
+				}).set("ai", function (target) {
+					const player = _status.event.player;
+					return get.effect(target, { name: "guohe_copy2" }, player, player);
+				}).forResult();
+			}
+			else {
+				event.result = await player.chooseBool(get.prompt("dcxianmou"), `观看牌堆顶五张牌并获得至多${num}张牌`).forResult();
+			}
+		},
+		async content(event, trigger, player) {
+			let num = 0;
+			player.getHistory("lose", evt => {
+				if (evt.cards2) num += evt.cards2.length;
+			});
+			player.changeZhuanhuanji("dcxianmou");
+			if (player.storage.dcxianmou) {
+				player.addAdditionalSkills("dcxianmou", []);
+				let cards = game.cardsGotoOrdering(get.cards(5)).cards;
+				const result = await player.chooseButton([`是否获得至多${num}张牌？`, cards], [1, num]).set("ai", function (button) {
+					if (ui.selected.buttons.length + 1 >= _status.event.maxNum) return 0;
+					return get.value(button.link);
+				}).set("maxNum", num).forResult();
+				if (result.bool) await player.gain(result.links, "gain2");
+				if (!result.bool || result.links.length < num) await player.addAdditionalSkills("dcxianmou", "new_reyiji");
+			}
+			else {
+				const target = event.targets[0];
+				const result = await player.discardPlayerCard(target, "h", `是否弃置${get.translation(target)}至多${num}张牌?`, [1, num], "visible").set("ai", function (button) {
+					if (ui.selected.buttons.length + 1 >= _status.event.maxNum) return 5 - get.value(button.link);
+					return get.value(button.link);
+				}).set("maxNum", num).forResult();
+				if (result.bool && result.links.length >= num) await player.executeDelayCardEffect("shandian");
+			}
+		},
+		derivation: "new_reyiji",
+		group: "dcxianmou_change",
+		subSkill: {
+			change: {
+				audio: "dcxianmou",
+				audioname: ["dc_sb_guojia_shadow"],
+				trigger: {
+					global: "phaseBefore",
+					player: "enterGame",
+				},
+				filter(event, player) {
+					return event.name != "phase" || game.phaseNumber == 0;
+				},
+				prompt2(event, player) {
+					//无名杀先阳后阴，不要问为什么
+					return "切换【先谋】为状态" + (player.storage.dcsbyingmou ? "阳" : "阴");
+				},
+				check: () => Math.random() > 0.5,
+				content() {
+					player.changeZhuanhuanji("dcxianmou");
+				},
+			},
+		},
+	},
+	dclunshi: {
+		audio: 2,
+		position: "hs",
+		enable: "chooseToUse",
+		filter(event, player) {
+			if (!player.countCards("hs")) return false;
+			if (player.countCards("h", { color: "black" }) != player.countCards("h", { color: "red" })) return false;
+			if (event.type != "wuxie" || !event.respondTo) return false;
+			if (get.type(event.respondTo[1]) != "trick") return false;
+			return event.source != event.respondTo[0];
+		},
+		filterCard: true,
+		viewAs: {
+			name: "wuxie",
+		},
+		viewAsFilter(player) {
+			if (!player.countCards("hs")) return false;
+			if (player.countCards("h", { color: "black" }) != player.countCards("h", { color: "red" })) return false;
+			return true;
+		},
+		prompt: "将一张手牌当无懈可击使用",
+		check: function (card) {
+			return 8 - get.value(card);
+		},
+	},
 	//卞玥
 	dcbizu: {
 		audio: 2,
@@ -2495,13 +2608,8 @@ const skills = {
 					return get.distance(player, target) <= 1 && target.countGainableCards(player, "e");
 				})
 				.set("ai", target => {
-					const player = get.event("player"),
-						att = get.attitude(player, target);
-					let num = 0;
-					if (target.hasSkill("gzxiaoji")) num += 2.5;
-					if (target.isDamaged() && target.getEquip("baiyin")) num += 2.5;
-					if (target.hasSkill("xuanlve")) num += 2;
-					return get.sgn(att) * num + (target == player ? 1 : 0);
+					const player = get.event("player");
+					return get.effect(target, { name: "shunshou_copy", position: "e" }, player, player);
 				});
 			if (bool) {
 				const aim = targets[0];
@@ -9659,7 +9767,8 @@ const skills = {
 							current.getStat().isSkipped = true;
 						});
 					var evt = player.insertPhase();
-					delete evt.skill;
+					if (trigger.skill) evt.skill = trigger.skill;
+					else delete evt.skill;
 					game.broadcastAll(function (player) {
 						player.classList.remove("glow_phase");
 						delete _status.currentPhase;
@@ -16139,7 +16248,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "shiyuanBegin" },
 		filter: function (event, player) {
-			return _status.currentPhase.group == "qun";
+			return _status.currentPhase && _status.currentPhase.group == "qun";
 		},
 		zhuSkill: true,
 		forced: true,

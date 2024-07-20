@@ -3,7 +3,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//王戎
-	mpqianlin: {
+	mpjianlin: {
 		audio: 2,
 		trigger: {
 			global: "phaseAfter",
@@ -14,7 +14,7 @@ const skills = {
 				if (evt.name == "lose") {
 					if (evt.position !== ui.discardPile) return false;
 				} else if (evt.name !== "cardsDiscard") return false;
-				if (get.info("mpqianlin").isUseOrRespond(evt, player)) {
+				if (get.info("mpjianlin").isUseOrRespond(evt, player)) {
 					cards.addArray(
 						evt.cards.filter(card => {
 							return get.type(card) == "basic" && get.position(card) === "d";
@@ -41,10 +41,10 @@ const skills = {
 			return ["useCard", "respond"].includes(evt2.name) && evt2.player == player;
 		},
 		filter(event, player) {
-			return get.info("mpqianlin").getCards(player).length;
+			return get.info("mpjianlin").getCards(player).length;
 		},
 		async cost(event, trigger, player) {
-			const cards = get.info("mpqianlin").getCards(player);
+			const cards = get.info("mpjianlin").getCards(player);
 			const {
 				result: { bool, links },
 			} = await player.chooseButton(["悭吝：你可以获得其中一张牌", cards]).set("ai", get.buttonValue);
@@ -7009,34 +7009,25 @@ const skills = {
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 		},
 		forced: true,
-		filter: function (event, player) {
-			if (event.player == player) {
-				if (event.name == "equip" && get.color(event.card, player) == "black") return true;
-				if (event.name == "addJudge" && get.color(event.cards[0], player) == "black") return true;
-			}
-			var evt = event.getl(player);
-			if (!evt || !evt.es || !evt.js || (!evt.es.length && !evt.js.length)) return false;
-			for (var i of evt.es) {
-				if (get.color(i, player) == "black") return true;
-			}
-			for (var i of evt.js) {
-				if (get.color(i, player) == "black") return true;
-			}
-			return false;
-		},
 		getIndex: function (event, player, triggername) {
+			let num = 0;
 			if (event.player == player) {
-				if (event.name == "equip" && get.color(event.card, player) == "black") return 1;
-				if (event.name == "addJudge" && get.color(event.cards[0], player) == "black") return 1;
+				if (event.name == "equip" && get.color(event.card, player) == "black") num++;
+				if (event.name == "addJudge" && get.color(event.cards[0], player) == "black") num++;
 			}
-			let evt = event.getl(player), num = 0;
-			for (var i of evt.es) {
-				if (get.color(i, player) == "black") num++;
+			if (!event.getl) return num;
+			let evt = event.getl(player);
+			if (evt.es && evt.es.length) {
+				for (var i of evt.es) {
+					if (get.color(i, player) == "black") num++;
+				}
 			}
-			for (var i of evt.js) {
-				if (get.color(i, player) == "black") num++;
+			if (evt.js && evt.js.length) {
+				for (var i of evt.js) {
+					if (get.color(i, player) == "black") num++;
+				}
 			}
-			return num
+			return num;
 		},
 		async content(event, trigger, player) {
 			await player.draw(2);
@@ -12003,25 +11994,23 @@ const skills = {
 		trigger: {
 			player: ["damageEnd", "phaseJieshuBegin"],
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			player
+		async cost(event, trigger, player) {
+			const result = await player
 				.chooseControl("一张", "两张", "三张", "cancel2")
 				.set("prompt", get.prompt2("xinfu_zhenxing"))
-				.set("", function () {
+				.set("ai", function () {
 					return 0;
-				});
-			"step 1";
-			if (result.control == "cancel2") event.finish();
-			else {
-				player.logSkill("xinfu_zhenxing");
-				event.num = { 一张: 1, 两张: 2, 三张: 3 }[result.control];
-			}
-			"step 2";
-			event.cards = get.cards(num);
-			player
-				.chooseButton(["【镇行】：请选择要获得的牌", event.cards])
+				}).forResult();
+			event.result = {
+				bool: result.control !== "cancel2",
+				cost_data: result.index + 1
+			};
+		},
+		async content(event, trigger, player) {
+			const cards = get.cards(event.cost_data);
+			await game.cardsGotoOrdering(cards);
+			let result = await player
+				.chooseButton(["【镇行】：请选择要获得的牌", cards])
 				.set("filterButton", function (button) {
 					var cards = _status.event.cards;
 					for (var i = 0; i < cards.length; i++) {
@@ -12032,18 +12021,9 @@ const skills = {
 				.set("ai", function (button) {
 					return get.value(button.link);
 				})
-				.set("cards", event.cards);
-			"step 3";
-			var tothrow = [];
-			for (var i = event.cards.length - 1; i >= 0; i--) {
-				if (result.bool && result.links.includes(event.cards[i])) {
-					player.gain(event.cards[i], "gain2");
-				} else {
-					event.cards[i].fix();
-					ui.cardPile.insertBefore(event.cards[i], ui.cardPile.childNodes[0]);
-				}
-			}
-			game.updateRoundNumber();
+				.set("cards", cards)
+				.forResult();
+			if (result.bool) player.gain(result.links, "gain2");
 		},
 	},
 	xinfu_qianxin: {

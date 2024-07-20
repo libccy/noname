@@ -11,7 +11,7 @@ const characterSort = {
 	extra_mobilexin: ["shen_taishici", "shen_sunce"],
 	extra_mobileren: ["shen_huatuo", "shen_lusu"],
 	extra_tw: ["tw_shen_guanyu", "tw_shen_lvmeng"],
-	extra_mb: ["xin_simayi"],
+	extra_mb: ["xin_simayi", "new_simayi"],
 	extra_offline: ["shen_diaochan", "boss_zhaoyun", "shen_dianwei", "le_shen_jiaxu"],
 };
 
