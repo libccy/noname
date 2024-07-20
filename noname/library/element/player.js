@@ -2175,6 +2175,10 @@ export class Player extends HTMLDivElement {
 		for (var i = 0; i < arguments.length; i++) {
 			if (get.itemtype(arguments[i]) == "player") {
 				next.source = arguments[i];
+			} else if (get.itemtype(arguments[i]) == "select") {
+				next.selectButton = arguments[i];
+			} else if (typeof arguments[i] == "number") {
+				next.selectButton = [arguments[i], arguments[i]];
 			}
 		}
 		if (next.source == undefined) next.source = this;
@@ -2193,6 +2197,10 @@ export class Player extends HTMLDivElement {
 				next.source = arguments[i];
 			} else if (typeof arguments[i] == "boolean") {
 				next.horse = arguments[i];
+			} else if (get.itemtype(arguments[i]) == "select") {
+				next.selectButton = arguments[i];
+			} else if (typeof arguments[i] == "number") {
+				next.selectButton = [arguments[i], arguments[i]];
 			}
 		}
 		if (next.horse == undefined) next.horse = false;

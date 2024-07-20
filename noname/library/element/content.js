@@ -1874,67 +1874,188 @@ export const Content = {
 		game.getGlobalHistory().cardMove.push(event);
 		if (!event._triggeronly) game.$cardsGotoPile(event);
 	},
-	chooseToEnable: function () {
-		"step 0";
-		var list = [];
-		for (var i = 1; i <= 5; i++) {
-			if (player.hasDisabledSlot(i)) list.push("equip" + i);
-		}
-		if (!list.length) event.finish();
-		else if (list.length == 1) {
-			event.list = list;
-			event._result = { control: list[0] };
+	chooseToEnable: async function (event, trigger, player) {
+		var source = event.source;
+		if (event.selectButton) {
+			var list = [];
+			for (var i = 1; i <= 5; i++) {
+				list.push("equip" + i);
+			}
+			var realList = [];
+			realList = list.filter(current => {
+				if (player.hasDisabledSlot(current)) return true;
+			})
+			if (!list.length) event.finish();
+			else if (event.selectButton[0] >= realList.length) {
+				event.list = list;
+				var result = { links: list };
+			} else {
+				list.sort();
+				list = list.map(current => [current, get.translation(current)]);
+				event.list = list;
+				var str = `请选择恢复${get.translation(player.name)}的`;
+				var selectButton = get.select(event.selectButton);
+				if (selectButton[0] == selectButton[1]) {
+					str += get.cnNumber(selectButton[0]);
+				}
+				else if (selectButton[1] == Infinity) {
+					str += "至少" + get.cnNumber(selectButton[0])
+				} else {
+					str += get.cnNumber(selectButton[0]) + "至" + get.cnNumber(selectButton[1])
+				}
+				str += "个装备栏";
+				var next = source.chooseButton(
+					selectButton,
+					true,
+					[
+						str,
+						[list, "tdnodes"],
+					]
+				);
+				next.set('filterButton', function(button){
+					if (player.hasDisabledSlot(button.link))return true;
+					return false; 
+				})
+				if (!event.ai) {
+					event.ai = function () {
+						return Math.random();
+					}
+				}
+				next.set("ai", event.ai);
+				var result = await next.forResult();
+			}
+			event.result = { links: result.links };
+			var slots = result.links;
+			await player.enableEquip(slots);
 		} else {
-			var next = source.chooseControl(list);
-			next.set("prompt", "请选择恢复" + get.translation(player.name) + "的一个装备栏");
-			if (!event.ai)
-				event.ai = function (event, player, list) {
-					return list.randomGet();
+			var list = [];
+			for (var i = 1; i <= 5; i++) {
+				if (player.hasDisabledSlot(i)) list.push("equip" + i);
+			}
+			if (!list.length) event.finish();
+			else if (list.length == 1) {
+				event.list = list;
+				var result = { control: list[0] };
+			} else {
+				var next = source.chooseControl(list);
+				next.set("prompt", "请选择恢复" + get.translation(player.name) + "的一个装备栏");
+				if (!event.ai)
+					event.ai = function (event, player, list) {
+						return list.randomGet();
+					};
+				event.ai = event.ai(event.getParent(), player, list);
+				next.ai = function () {
+					return event.ai;
 				};
-			event.ai = event.ai(event.getParent(), player, list);
-			next.ai = function () {
-				return event.ai;
-			};
+				var result = await next.forResult();
+			}
+			event.result = { control: result.control };
+			await player.enableEquip(result.control);
 		}
-		"step 1";
-		event.result = { control: result.control };
-		player.enableEquip(result.control);
 	},
-	chooseToDisable: function () {
-		"step 0";
-		var list = [];
-		for (var i = 1; i <= 5; i++) {
-			if (player.hasEnabledSlot(i)) list.push("equip" + i);
-		}
-		if (event.horse) {
-			if (list.includes("equip3") && (get.is.mountCombined() || list.includes("equip4")))
-				list.push("equip3_4");
-			list.remove("equip3");
-			list.remove("equip4");
-		}
-		if (!list.length) event.finish();
-		else if (list.length == 1) {
-			event.list = list;
-			event._result = { control: list[0] };
+	chooseToDisable: async function (event, trigger, player) {
+		var source = event.source;
+		if (event.selectButton) {
+			var list = [];
+			for (var i = 1; i <= 5; i++) {
+				list.push("equip" + i);
+			}
+			var realList = [];
+			realList = list.filter(current => {
+				if (player.hasEnabledSlot(current)) return true;
+			})
+			if (event.horse) {
+				if (list.includes("equip3") && (get.is.mountCombined() || list.includes("equip4"))){
+					list.push("equip3_4");
+					realList.push("equip3_4")
+				}
+				list.remove("equip3", "equip4");
+				realList.remove("equip3", "equip4");
+			}
+			if (!list.length) event.finish();
+			else if (event.selectButton[0] >= realList.length) {
+				event.list = list;
+				var result = { links: list };
+			} else {
+				list.sort();
+				list = list.map(current => [current, get.translation(current)]);
+				event.list = list;
+				var str = `请选择废除${get.translation(player.name)}的`;
+				var selectButton = get.select(event.selectButton);
+				if (selectButton[0] == selectButton[1]) {
+					str += get.cnNumber(selectButton[0]);
+				}
+				else if (selectButton[1] == Infinity) {
+					str += "至少" + get.cnNumber(selectButton[0])
+				} else {
+					str += get.cnNumber(selectButton[0]) + "至" + get.cnNumber(selectButton[1])
+				}
+				str += "个装备栏";
+				var next = source.chooseButton(
+					selectButton,
+					true,
+					[
+						str,
+						[list, "tdnodes"],
+					]
+				);
+				next.set("filterButton", function(button){
+					if (player.hasEnabledSlot(button.link)) return true;
+					return false; 
+				})
+				if (!event.ai) {
+					event.ai = function () {
+						return Math.random();
+					}
+				}
+				next.set("ai", event.ai);
+				var result = await next.forResult();
+			}
+			event.result = { links: result.links };
+			var slots = result.links.slice();
+			if (slots.includes("equip3_4")) {
+				slots.remove("equip3_4");
+				slots.add("equip3");
+				slots.add("equip4");
+			}
+			await player.disableEquip(slots);
 		} else {
-			list.sort();
-			event.list = list;
-			var next = source.chooseControl(list);
-			next.set("prompt", "请选择废除" + get.translation(player.name) + "的一个装备栏");
-			if (!event.ai)
-				event.ai = function (event, player, list) {
-					return list.randomGet();
+			var list = [];
+			for (var i = 1; i <= 5; i++) {
+				if (player.hasEnabledSlot(i)) list.push("equip" + i);
+			}
+			if (event.horse) {
+				if (list.includes("equip3") && (get.is.mountCombined() || list.includes("equip4")))
+					list.push("equip3_4");
+				list.remove("equip3");
+				list.remove("equip4");
+			}
+			if (!list.length) event.finish();
+			else if (list.length == 1) {
+				event.list = list;
+				var result = { control: list[0] };
+			} else {
+				list.sort();
+				event.list = list;
+				var next = source.chooseControl(list);
+				next.set("prompt", "请选择废除" + get.translation(player.name) + "的一个装备栏");
+				if (!event.ai)
+					event.ai = function (event, player, list) {
+						return list.randomGet();
+					};
+				event.ai = event.ai(event.getParent(), player, list);
+				next.ai = function () {
+					return event.ai;
 				};
-			event.ai = event.ai(event.getParent(), player, list);
-			next.ai = function () {
-				return event.ai;
-			};
+				var result = await next.forResult();
+			}
+			event.result = { control: result.control };
+			if (result.control == "equip3_4") {
+				await player.disableEquip(3, 4);
+			} else {
+				await player.disableEquip(result.control);
+			}
 		}
-		"step 1";
-		event.result = { control: result.control };
-		if (result.control == "equip3_4") {
-			player.disableEquip(3, 4);
-		} else player.disableEquip(result.control);
 	},
 	swapEquip: function () {
 		"step 0";
