@@ -43,10 +43,8 @@ const skills = {
 				},
 				sub: true,
 				sourceSkill: "olchishi",
-				"_priority": 1,
 			},
 		},
-		"_priority": 0,
 	},
 	olweimian: {
 		audio: 2,
