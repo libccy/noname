@@ -11571,14 +11571,10 @@ const skills = {
 	reguhuo_phase: {},
 	rechanyuan: {
 		init: function (player, skill) {
-			if (player.hp <= 1) {
-				player.logSkill(skill);
-				player.addSkill("rechanyuan_log");
-			}
+			if (player.hp <= 1) player.logSkill(skill);
 			player.addSkillBlocker(skill);
 		},
 		onremove: function (player, skill) {
-			player.removeSkill("rechanyuan_log");
 			player.removeSkillBlocker(skill);
 		},
 		skillBlocker: function (skill, player) {
@@ -11598,19 +11594,10 @@ const skills = {
 		audio: 2,
 		trigger: { player: "changeHp" },
 		filter: function (event, player) {
-			return player.hp <= 1 != player.hasSkill("rechanyuan_log");
+			return get.sgn(player.hp - 1.5) != get.sgn(player.hp - 1.5 - event.num);
 		},
-		direct: true,
-		locked: true,
-		content: function () {
-			if (player.hp <= 1) {
-				player.logSkill("rechanyuan");
-				player.addSkill("rechanyuan_log");
-			} else player.removeSkill("rechanyuan_log");
-		},
-		subSkill: {
-			log: { charlotte: true },
-		},
+		forced: true,
+		content: function () {},
 	},
 	botu: {
 		audio: 2,
