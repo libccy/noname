@@ -153,6 +153,7 @@ window.noname_character_rank = {
 		"bianyue",
 	],
 	a: [
+		"ol_sunru",
 		"star_caoren",
 		"star_yuanshao",
 		"xia_shitao",
@@ -2020,6 +2021,7 @@ window.noname_character_rank = {
 			"jsrg_yuanshao",
 		],
 		epic: [
+			"ol_sunru",
 			"wuhujiang",
 			"yj_zhonghui",
 			"bianyue",

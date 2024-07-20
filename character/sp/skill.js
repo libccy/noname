@@ -2,6 +2,176 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	olchishi: {
+		usable: 1,
+		trigger: {
+			global: ["loseAfter", "equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
+		},
+		filter: function (event, player) {
+			let z = _status.currentPhase
+			if (!z) return false;
+			let evt = event.getl(z);
+			return evt && ['h', 'e', 'j'].some(i => evt[i + 's'] && evt[i + 's'].length && !z.countCards(i));
+		},
+		check: function (event, player) {
+			return get.attitude(player, event.player) > 0;
+		},
+		async content(event, trigger, player) {
+			let z = _status.currentPhase
+			await z.draw(2)
+			if (!z.storage.olchishi_1) z.storage.olchishi_1 = 2
+			else z.storage.olchishi_1 = z.storage.olchishi_1 + 2
+			z.addTempSkill('olchishi_1')
+		},
+		subSkill: {
+			"1": {
+				mark: true,
+				markimage: "image/card/handcard.png",
+				onremove(player) {
+					player.storage.olchishi_1 = 0
+				},
+				intro: {
+					content(storage, player) {
+						return "手牌上限+" + storage;
+					},
+				},
+				charlotte: true,
+				mod: {
+					maxHandcard(player, num) {
+						return num + player.storage.olchishi_1;
+					},
+				},
+				sub: true,
+				sourceSkill: "olchishi",
+				"_priority": 1,
+			},
+		},
+		"_priority": 0,
+	},
+	olweimian: {
+		audio: 2,
+		enable: "phaseUse",
+		usable: 1,
+		frequent: true,
+		chooseButton: {
+			dialog: function (event, player) {
+				let dialog = ui.create.dialog("慰勉：选择要废除或恢复的装备栏或判定区", "hidden");
+				dialog.classList.add("withbg");
+				dialog.noforcebutton = true;
+				let list = [];
+				for (let i = 1; i < 6; i++) {
+					for (let j = 0; j < player.countEnabledSlot(i); j++) {
+						list.push(i);
+					}
+				}
+				let addTable = function (list, bool) {
+					const adds = [];
+					for (let i of list) {
+						adds.push([[i, bool], get.translation("equip" + i) + "栏"]);
+					}
+					dialog.add([adds, "tdnodes"]);
+				};
+				if (list.length) {
+					dialog.addText("未废除");
+					addTable(list, true);
+				}
+
+				return dialog;
+			},
+			filter: function (button, player) {
+				if (!ui.selected.buttons.length) return true;
+				if (!ui.selected.buttons[0].link[1]) return false;
+				return button.link[1];
+			},
+			check: function (button) {
+				let player = _status.event.player;
+				if (
+					button.link[0] <= 0 ||
+					(!player.hasEmptySlot(button.link[0]))
+				) return 10;
+				if (
+					button.link[0] <= 0 ||
+					!player.hasCard(function (card) {
+						return get.subtype(card) == "equip" + button.link[0] && player.canUse(card, player) && get.effect(player, card, player, player) > 0;
+					}, "hs")) return 5;
+
+
+				return 0;
+			},
+			select: [1, 3],
+			backup: function (links, player) {
+				return {
+					audio: "olweimian",
+					selectCard: -1,
+					filterCard: () => false,
+					filterTarget: true,
+					equip: links.map(i => i[0]).sort(),
+					async content(event, trigger, player) {
+						let list = lib.skill.olweimian_backup.equip,
+							num = list.length;
+						if (list.length > 0) {
+							await player.disableEquip(list);
+							let z = ["选项一：恢复一个被废除的装备栏。", "选项二：回复1点体力。", "选项三：弃置所有手牌，摸四张牌。"], target = event.target, zz = [];
+
+							while (num > 0) {
+								num = num - 1;
+								const { result } = await target.chooseButton(1, [
+									"慰勉：请选择一项",
+									[z.map((item, i) => {
+										return [i, item];
+									}),
+										"textbutton",
+									],
+								]).set("ai", function (button) {
+									let target = _status.event.target;
+									switch (button.link) {
+										case 0:
+											return 2
+									}
+								}).set("filterButton", button => {
+									const selected = ui.selected.buttons.slice().map(i => i.link);
+									return !zz.includes(button.link)
+
+
+								}).set("target", target);
+								zz.add(result.links[0])
+								if (result.links.includes(0)) {
+									await target.chooseToEnable();
+								}
+								if (result.links.includes(1)) {
+									await target.recover();
+								}
+								if (result.links.includes(2)) {
+									await target.discard(target.getCards('h'));
+									await target.draw(4);
+								}
+							}
+						}
+					},
+					ai: {
+						tag: {
+							draw: 1,
+						},
+						result: {
+							target: 2,
+						},
+					},
+				};
+
+			},
+			prompt: function (links, player) {
+				let numc = get.cnNumber(links.length);
+				return "废除" + numc + "个区域并令一名角色执行至多" + numc + "项";
+			},
+		},
+		ai: {
+			order: 8,
+			result: {
+				player: 1,
+			},
+		},
+		subSkill: { backup: {} },
+	},
 	//曹腾
 	olyongzu: {
 		audio: 2,
