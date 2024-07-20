@@ -453,6 +453,7 @@ export default {
 	"#busuan1": "喜仰视星辰，夜不肯寐。",
 	"#busuan2": "今日一卦，便知命数。",
 	"#mingjie1": "戒律循规，不可妄贪。",
+	"#mingjie2": "王道文明，何忧不平。",
 	"#guanlu:die": "怀我好英，心非草木……",
 	"#gxlianhua1": "草木精炼，万物化丹。",
 	"#gxlianhua2": "白日青山，飞升化仙。",
