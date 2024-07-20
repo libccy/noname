@@ -2182,7 +2182,6 @@ export class Player extends HTMLDivElement {
 			}
 		}
 		if (next.source == undefined) next.source = this;
-		if (next.selectButton == undefined) next.selectButton = [1,1];
 		next.player = this;
 		next.setContent("chooseToEnable");
 		return next;
@@ -2206,7 +2205,6 @@ export class Player extends HTMLDivElement {
 		}
 		if (next.horse == undefined) next.horse = false;
 		if (next.source == undefined) next.source = this;
-		if (next.selectButton == undefined) next.selectButton = [1,1];
 		next.player = this;
 		next.setContent("chooseToDisable");
 		return next;
