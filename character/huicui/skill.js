@@ -10701,16 +10701,16 @@ const skills = {
 				content: function () {
 					player.markAuto("fuping", [trigger.card.name]);
 					game.log(player, "记录了", "#y" + get.translation(trigger.card.name));
-					player.chooseToDisable().set("ai", function (button) {
+					player.chooseToDisable().set("ai", function (event, player, list) {
 						var list = [3, 5, 4, 1, 2];
 						for (var i of list) {
 							if (player.hasEnabledSlot(i)) {
 								var card = player.getEquip(i);
-								if (!card || player.hasEmptySlot(i)) return 1;
-								if (get.value(card, player) <= 0) return 1;
+								if (!card || player.hasEmptySlot(i)) return "equip" + i;
+								if (get.value(card, player) <= 0) return "equip" + i;
 							}
 						}
-						return Math.random();
+						return list.randomGet();
 					});
 				},
 			},

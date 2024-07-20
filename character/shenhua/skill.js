@@ -1016,38 +1016,29 @@ const skills = {
 			return player.hasEnabledSlot(1) || player.hasEnabledSlot(2) || player.hasEnabledSlot(5) || player.hasEnabledSlot("horse");
 		},
 		async content(event, trigger, player) {
-			const { links } = await player
+			const { control } = await player
 				.chooseToDisable(true)
-				.set("ai", function (button) {
-					var link = button.link;
-					var event = _status.event;
-					if (link == "equip2") {
-						return 3;
-					}
+				.set("ai", function (event, player, list) {
+					if (list.includes("equip2")) return "equip2";
 					if (
-						link == "equip1" &&
+						list.includes("equip1") &&
 						player.countCards("h", function (card) {
 							return get.name(card, player) == "sha" && player.hasUseTarget(card);
 						}) -
 							player.getCardUsable("sha") >
 							1
-					) {
-						event.selected = true;
-						return 2;
-					}
+					)
+						return "equip1";
 					if (
-						link == "equip5" &&
+						list.includes("equip5") &&
 						player.countCards("h", function (card) {
 							return get.type2(card, player) == "trick" && player.hasUseTarget(card);
 						}) > 1
-					){
-						event.selected = true;
-						return 1;
-					}
-					return -1;
+					)
+						return "equip5";
 				})
 				.forResult();
-			switch (links[0]) {
+			switch (control) {
 				case "equip1":
 					player.addTempSkill("drlt_jueyan1");
 					break;
