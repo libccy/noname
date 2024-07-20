@@ -1224,7 +1224,6 @@ window.noname_asset_list = [
 	"audio/die/xin_zhuran.mp3",
 	"audio/die/xin_zhuzhi.mp3",
 	"audio/die/xinchang.mp3",
-	"audio/die/xinfu_yuji.mp3",
 	"audio/die/xingdaorong.mp3",
 	"audio/die/xinpi.mp3",
 	"audio/die/xinping.mp3",
