@@ -98,9 +98,10 @@ const skills = {
 		filter(event, player) {
 			if (!player.countCards("hs")) return false;
 			if (player.countCards("h", { color: "black" }) != player.countCards("h", { color: "red" })) return false;
-			if (event.type != "wuxie" || !event.respondTo) return false;
-			if (get.type(event.respondTo[1]) != "trick") return false;
-			return event.source != event.respondTo[0];
+			if (event.type != "wuxie") return false;
+			let info = event.info_map;
+			if (!info || get.type(info.card) != "trick") return false;
+			return info.player != info.target;
 		},
 		filterCard: true,
 		viewAs: {
@@ -114,6 +115,23 @@ const skills = {
 		prompt: "将一张手牌当无懈可击使用",
 		check: function (card) {
 			return 8 - get.value(card);
+		},
+		group: "dclunshi_nowuxie",
+		subSkill: {
+			nowuxie: {
+				trigger: {
+					player: "useCard",
+				},
+				forced: true,
+				locked: false,
+				popup: false,
+				filter: function (event, player) {
+					return event.card.name == "wuxie" && event.skill && event.skill == "dclunshi";
+				},
+				content: function () {
+					trigger.directHit.addArray(game.players);
+				},
+			},
 		},
 	},
 	//卞玥
