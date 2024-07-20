@@ -2,8 +2,10 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//孙茹
 	olchishi: {
 		usable: 1,
+		audio: 2,
 		trigger: {
 			global: ["loseAfter", "equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 		},
@@ -27,9 +29,7 @@ const skills = {
 			"1": {
 				mark: true,
 				markimage: "image/card/handcard.png",
-				onremove(player) {
-					player.storage.olchishi_1 = 0
-				},
+				onremove: true,
 				intro: {
 					content(storage, player) {
 						return "手牌上限+" + storage;
@@ -52,10 +52,9 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
-		frequent: true,
 		chooseButton: {
 			dialog: function (event, player) {
-				let dialog = ui.create.dialog("慰勉：选择要废除或恢复的装备栏或判定区", "hidden");
+				let dialog = ui.create.dialog("慰勉：选择要废除的装备栏", "hidden");
 				dialog.classList.add("withbg");
 				dialog.noforcebutton = true;
 				let list = [];
@@ -134,14 +133,16 @@ const skills = {
 
 
 								}).set("target", target);
-								zz.add(result.links[0])
-								if (result.links.includes(0)) {
+								if (result.links) zz.add(result.links[0]);
+								else return;
+								let links = result.links[0];
+								if (links == 0) {
 									await target.chooseToEnable();
 								}
-								if (result.links.includes(1)) {
+								if (links == 1) {
 									await target.recover();
 								}
-								if (result.links.includes(2)) {
+								if (links == 2) {
 									await target.discard(target.getCards('h'));
 									await target.draw(4);
 								}
