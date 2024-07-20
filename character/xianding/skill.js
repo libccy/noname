@@ -17858,7 +17858,7 @@ const skills = {
 		},
 	},
 	mingjie: {
-		audio: 1,
+		audio: 2,
 		trigger: { player: "phaseJieshuBegin" },
 		check: function () {
 			return ui.cardPile.hasChildNodes() && get.color(ui.cardPile.firstChild) != "black";
