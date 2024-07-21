@@ -360,7 +360,7 @@ export default {
 	"#tw_yanxiang:die": "若遇明主，或可青史留名……",
 	"#tw_fanchou:die": "唉，稚然疑心，甚重……",
 	"#liuli_daxiaoqiao1": "不懂得怜香惜玉么~",
-	"#liuli_daxiaoqiao2": "交给你了。",
+	"#liuli_daxiaoqiao2": "呵呵，交给你啦~",
 	"#twfeifu1": "此亦久矣，其能复几！",
 	"#twfeifu2": "以侯归第？终败于其！",
 	"#twzhian1": "此等蝼蚁不除，必溃千丈之堤！",
