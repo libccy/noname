@@ -15,7 +15,7 @@ export default {
 	"#jsrgjishan4": "勿以恶小而为之，勿以善小而不为。",
 	"#jsrgzhenqiao1": "剑出鞘命，引得龙吟海内！",
 	"#jsrgzhenqiao2": "鲲鹏之志，志在天下苍生！",
-	"#jsrg_liubei:die": "楼桑羽葆，黄粱一梦。",
+	"#jsrg_liubei:die": "楼桑羽葆，黄粱一梦……",
 	"#jsrgpingtao1": "今当夷汝三族，县示四海。",
 	"#jsrgpingtao2": "歃血为盟，誓诛此国贼。",
 	"#jsrgjuelie1": "传令所部兵马，定绝董贼后路。",
