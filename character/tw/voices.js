@@ -5,7 +5,7 @@ export default {
 	"#twjielv2": "穷心尽力，亮必以血补天。",
 	"#twhunyou1": "扶汉兴刘，夙夜沥血，忽入草堂梦中。",
 	"#twhunyou2": "一整山河，以明己志，昔日言犹记否？",
-	"#huan_zhugeliang:die": "先帝遗志未竟，吾怎可终于半途。",
+	"#huan_zhugeliang:die": "先帝遗志未竟，吾怎可终于半途……",
 	"#twbeidingx1": "内外不懈如斯，长安不可日下。",
 	"#twbeidingx2": "先帝英灵冥鉴，此番定成夙愿。",
 	"#twjielvx1": "出箕谷，饮河洛，所至长安。",
@@ -23,7 +23,7 @@ export default {
 	"#longdan_sha_huan_zhaoyun2": "龙魂缠身，虎威犹在！",
 	"#chongzhen_huan_zhaoyun1": "众将士，且随老夫再战一场！",
 	"#chongzhen_huan_zhaoyun2": "出入千军万马，经年横站八方！",
-	"#huan_zhaoyun:die": "转战一生，终得见兴汉之日。",
+	"#huan_zhaoyun:die": "转战一生，终得见兴汉之日……",
 	"#twkuiduan1": "蜀军大败，吾等岂能失此战机！",
 	"#twkuiduan2": "求胜心切，竟轻中贼计！",
 	"#huan_zhanghe:die": "老卒迟暮，恨，不能再报于国……",
@@ -36,6 +36,8 @@ export default {
 	"#twduwang2": "勇绝河北，吾足以一柱擎天！",
 	"#twylyanshi1": "今破曹军，明日当直取许都！",
 	"#twylyanshi2": "全军整肃，此战不得有失！",
+	"#twxiayong1_tw_yanliang": "呃啊，马失前蹄，大意了！",
+	"#twxiayong2_tw_yanliang": "哈哈哈，先发制人！",
 	"#tw_yanliang:die": "哥哥，切不可轻敌！",
 	"#twjuexing1": "阿瞒且寄汝首，待吾一骑取之！",
 	"#twjuexing2": "杀！尽奸贼败军之众！",
@@ -356,23 +358,9 @@ export default {
 	"#twluanlve2": "联白波之众，掠河东之地。",
 	"#tw_liwei:die": "安南重任，万不可轻之……",
 	"#tw_yanxiang:die": "若遇明主，或可青史留名……",
-	/*
-	"#mouli1": "澄汰王室，迎立宗子！",
-	"#mouli2": "僣孽为害，吾岂可谋而不行？",
-	*/
 	"#tw_fanchou:die": "唉，稚然疑心，甚重……",
-	/*
-	"#drlt_qingce1": "感明帝之恩，清君侧之贼。",
-	"#drlt_qingce2": "得太后手诏，清奸佞乱臣。",
-	"#tianxiang_daxiaoqiao1": "哼，我才不怕你呢~",
-	"#tianxiang_daxiaoqiao2": "替我挡着吧~",
-	*/
 	"#liuli_daxiaoqiao1": "不懂得怜香惜玉么~",
 	"#liuli_daxiaoqiao2": "交给你了。",
-	/*
-	"#gonghuan1": "曹魏势大，吴蜀当共拒之。",
-	"#gonghuan2": "两国得此联姻，邦交更当稳固。",
-	*/
 	"#twfeifu1": "此亦久矣，其能复几！",
 	"#twfeifu2": "以侯归第？终败于其！",
 	"#twzhian1": "此等蝼蚁不除，必溃千丈之堤！",
