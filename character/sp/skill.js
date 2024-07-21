@@ -25633,7 +25633,6 @@ const skills = {
 		lose: false,
 		delay: false,
 		content: function () {
-			if (!target.storage.rezhoufu2_markcount) target.storage.rezhoufu2_markcount = 0;
 			target.addToExpansion(cards, player, "give").gaintag.add("rezhoufu2");
 			target.addSkill("rezhoufu_judge");
 		},
@@ -25647,6 +25646,10 @@ const skills = {
 		subSkill: {
 			judge: {
 				audio: "zhoufu",
+				init: (player) => {
+					player.storage.rezhoufu_judge = 0;
+				},
+				onremove: true,
 				trigger: { player: "judgeBefore" },
 				forced: true,
 				charlotte: true,
@@ -25656,6 +25659,7 @@ const skills = {
 				content: function () {
 					var cards = [player.getExpansions("rezhoufu2")[0]];
 					trigger.directresult = cards[0];
+					if (player.getExpansions("rezhoufu2").length == 1) player.removeSkill("rezhoufu_judge");
 				},
 			},
 			losehp: {
@@ -25724,9 +25728,9 @@ const skills = {
 			"step 0";
 			player.draw();
 			"step 1";
-			trigger.player.storage.rezhoufu2_markcount++;
-			if (trigger.player.storage.rezhoufu2_markcount >= 2) {
-				delete trigger.player.storage.rezhoufu2_markcount;
+			trigger.player.storage.rezhoufu_judge++;
+			if (trigger.player.storage.rezhoufu_judge >= 2) {
+				trigger.player.removeSkill("rezhoufu_judge");
 				var cards = trigger.player.getExpansions("rezhoufu2");
 				player.gain(cards, trigger.player, "give", "bySelf");
 			} else trigger.player.markSkill("rezhoufu2");
