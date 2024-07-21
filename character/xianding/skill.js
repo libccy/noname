@@ -2923,7 +2923,7 @@ const skills = {
 			order: 7,
 			result: {
 				target(player, target) {
-					return target.countCards("h") < player.countCards("h") ? get.attitude(player, target) : -get.effect(target, { name: "guohe" }, player, player);
+					return target.countCards("h") < player.countCards("h") ? get.effect(target, { name: "draw" }, player, target) : get.effect(target, { name: "guohe" }, player, target);
 				},
 			},
 		},
