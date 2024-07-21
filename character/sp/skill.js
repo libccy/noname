@@ -25623,7 +25623,7 @@ const skills = {
 		},
 		filterCard: true,
 		filterTarget: function (card, player, target) {
-			return target != player && !target.getExpansions("rezhoufu2").length;
+			return target != player && !target.getExpansions("rezhoufu_judge").length;
 		},
 		check: function (card) {
 			return 6 - get.value(card);
@@ -25633,7 +25633,7 @@ const skills = {
 		lose: false,
 		delay: false,
 		content: function () {
-			target.addToExpansion(cards, player, "give").gaintag.add("rezhoufu2");
+			target.addToExpansion(cards, player, "give").gaintag.add("rezhoufu_judge");
 			target.addSkill("rezhoufu_judge");
 		},
 		ai: {
@@ -25647,19 +25647,25 @@ const skills = {
 			judge: {
 				audio: "zhoufu",
 				init: (player) => {
-					player.storage.rezhoufu_judge = 0;
+					player.storage.rezhoufu_judge_markcount = 0;
 				},
-				onremove: true,
+				onremove: (player) => {
+					delete player.storage.rezhoufu_judge_markcount;
+					let cards = player.getExpansions("rezhoufu_judge");
+					if (cards.length) player.loseToDiscardpile(cards);
+				},
+				intro: {
+					content: "expansion",
+				},
 				trigger: { player: "judgeBefore" },
 				forced: true,
 				charlotte: true,
 				filter: function (event, player) {
-					return !event.directresult && player.getExpansions("rezhoufu2").length;
+					return !event.directresult && player.getExpansions("rezhoufu_judge").length;
 				},
 				content: function () {
-					var cards = [player.getExpansions("rezhoufu2")[0]];
-					trigger.directresult = cards[0];
-					if (player.getExpansions("rezhoufu2").length == 1) player.removeSkill("rezhoufu_judge");
+					trigger.directresult = player.getExpansions("rezhoufu_judge")[0];
+					player.storage.rezhoufu_judge_markcount = 0;
 				},
 			},
 			losehp: {
@@ -25671,7 +25677,7 @@ const skills = {
 						return current.hasHistory("lose", function (evt) {
 							if (!evt || !evt.xs || !evt.xs.length) return false;
 							for (var i in evt.gaintag_map) {
-								if (evt.gaintag_map[i].includes("rezhoufu2")) return true;
+								if (evt.gaintag_map[i].includes("rezhoufu_judge")) return true;
 							}
 							return false;
 						});
@@ -25683,7 +25689,7 @@ const skills = {
 							return current.hasHistory("lose", function (evt) {
 								if (!evt || !evt.xs || !evt.xs.length) return false;
 								for (var i in evt.gaintag_map) {
-									if (evt.gaintag_map[i].includes("rezhoufu2")) return true;
+									if (evt.gaintag_map[i].includes("rezhoufu_judge")) return true;
 								}
 								return false;
 							});
@@ -25696,7 +25702,7 @@ const skills = {
 							return current.hasHistory("lose", function (evt) {
 								if (!evt || !evt.xs || !evt.xs.length) return false;
 								for (var i in evt.gaintag_map) {
-									if (evt.gaintag_map[i].includes("rezhoufu2")) return true;
+									if (evt.gaintag_map[i].includes("rezhoufu_judge")) return true;
 								}
 								return false;
 							});
@@ -25709,18 +25715,12 @@ const skills = {
 			},
 		},
 	},
-	rezhoufu2: {
-		intro: {
-			content: "expansion",
-		},
-	},
-	rezhoufu3: {},
 	reyingbing: {
 		audio: "yingbin",
 		trigger: { global: "useCard" },
 		forced: true,
 		filter: function (event, player) {
-			var cards = event.player.getExpansions("rezhoufu2");
+			var cards = event.player.getExpansions("rezhoufu_judge");
 			return cards.length && get.color(cards[0]) == get.color(event.card);
 		},
 		logTarget: "player",
@@ -25728,12 +25728,12 @@ const skills = {
 			"step 0";
 			player.draw();
 			"step 1";
-			trigger.player.storage.rezhoufu_judge++;
-			if (trigger.player.storage.rezhoufu_judge >= 2) {
-				trigger.player.removeSkill("rezhoufu_judge");
-				var cards = trigger.player.getExpansions("rezhoufu2");
+			trigger.player.storage.rezhoufu_judge_markcount++;
+			if (trigger.player.storage.rezhoufu_judge_markcount >= 2) {
+				var cards = trigger.player.getExpansions("rezhoufu_judge");
 				player.gain(cards, trigger.player, "give", "bySelf");
-			} else trigger.player.markSkill("rezhoufu2");
+				trigger.player.removeSkill("rezhoufu_judge");
+			} else trigger.player.markSkill("rezhoufu_judge");
 		},
 		ai: {
 			combo: "rezhoufu",
