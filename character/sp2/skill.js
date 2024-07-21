@@ -683,6 +683,11 @@ const skills = {
 			result: {
 				player(player, target) {
 					let res = 2 * get.effect(player, { name: "draw" }, player, player);
+					if (player.hp <= 1 && !player.hasCard(i => {
+						let name = get.name(i, player);
+						if (name != "tao" && name != "jiu") return false;
+						return lib.filter.cardSavable(i, player, player);
+					}, "hs")) res = -res / 2;
 					if (player !== target) res += get.effect(player, { name: "losehp" }, player, player);
 					return res;
 				},
