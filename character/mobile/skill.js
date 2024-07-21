@@ -177,7 +177,7 @@ const skills = {
 			}
 			if (result != "选项二") {
 				trigger.getParent().baseDamage++;
-				await game.asyncDelay();
+				await game.delay();
 			}
 			if (result != "选项一") {
 				player.addTempSkill("mbchoumang_effect");

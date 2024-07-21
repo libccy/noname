@@ -10,14 +10,14 @@ export default class ContentCompilerBase {
         const { player } = event;
         if (event.name === "phaseLoop")
             return false;
-        if(!player) return false;
+        if (!player) return false;
         if (player.isDead() && !event.forceDie) {
             game.broadcastAll(function () {
                 while (_status.dieClose.length) {
                     _status.dieClose.shift().close();
                 }
             });
-            if(event._oncancel) event._oncancel();
+            if (event._oncancel) event._oncancel();
         }
         else if (player.isOut() && !event.includeOut) {
             if (event.name == "phase"

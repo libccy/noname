@@ -10,7 +10,7 @@ export default class AsyncCompiler extends ContentCompilerBase {
     type = "async";
 
     filter(content: EventContent): boolean {
-        if(typeof content !== 'function') return false;
+        if (typeof content !== 'function') return false;
         return content.constructor.name === "AsyncFunction" && content.length >= 1;
     }
 

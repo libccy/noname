@@ -105,7 +105,7 @@ const skills = {
 				let player = _status.event.player;
 				player.addMark("dcgouzhu", 1, false);
 				game.log(player, '手牌上限+1');
-				await game.asyncDelay();
+				await game.delay();
 			},
 			"主公技": async function () {
 				let player = _status.event.player;

@@ -4,6 +4,9 @@ export default class GameEventManager{
 	eventStack: GameEvent[] = [];
 	rootEvent?: GameEvent;
 	tempEvent?: GameEvent;
+	get event(){
+		return this.getStatusEvent();
+	}
     getStartedEvent(){
         return this.tempEvent || this.eventStack.at(-1);
     }

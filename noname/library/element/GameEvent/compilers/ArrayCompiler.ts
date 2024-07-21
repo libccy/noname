@@ -9,29 +9,31 @@ export default class ArrayCompiler extends ContentCompilerBase {
     }
 
     compile(content: EventContent) {
-        if(!Array.isArray(content))
+        if (!Array.isArray(content))
             throw new ReferenceError("content必须是一个数组");
 
-        return async (event: GameEvent) => {
+        const compiler = this;
+        return async function (event: GameEvent) {
             if (!Number.isInteger(event.step))
                 event.step = 0;
 
             while (!event.finished) {
-                if (event.step >= content.length){
+                if (event.step >= content.length) {
                     event.finish();
                     break;
                 }
-                this.beforeExecute(event);
-                event.step ++;
+                compiler.beforeExecute(event);
+                event.step++;
                 let result: Result | undefined;
-                if (!this.isPrevented(event)) {
+                if (!compiler.isPrevented(event)) {
                     const original = content[event.step];
-                    const next = await Reflect.apply(original, event, [event, event._trigger, event.player]);
-                    result = next && next.result;
+                    //@ts-ignore
+                    const next = await Reflect.apply(original, this, [event, event._trigger, event.player]);
+                    result = next instanceof GameEvent ? next.result : next;
                 }
                 const nextResult = await event.waitNext();
-                event._result = result || nextResult || event._result;
-                this.afterExecute(event);
+                event._result = result ?? nextResult ?? event._result;
+                compiler.afterExecute(event);
             }
         };
     }

@@ -443,7 +443,7 @@ export class GameEvent {
 	 * @param {import("./GameEvent/compilers/IContentCompiler.js").EventCompileable} content
 	 */
 	setContent(content) {
-		if(this.#inContent) throw new Error("Cannot set content when content is running");
+		if (this.#inContent) throw new Error("Cannot set content when content is running");
 		this.content = ContentCompiler.compile(content);
 		return this;
 	}
@@ -1050,7 +1050,7 @@ export class GameEvent {
 		return (this.parent ? this.parent.waitNext() : this.start()).then(onfulfilled ? () => {
 			return onfulfilled(new Proxy(this, {
 				get(target, p, receiver){
-					if(p === "then") return void 0;
+					if (p === "then") return void 0;
 					return Reflect.get(target, p, receiver);
 				}
 			}));
@@ -1073,10 +1073,10 @@ export class GameEvent {
 	 */
 	finally(onfinally) {
 		return this.then((result)=>{
-			if(onfinally) onfinally();
+			if (onfinally) onfinally();
 			return result;
 		}, (err)=>{
-			if(onfinally) onfinally();
+			if (onfinally) onfinally();
 			throw err;
 		});
 	}
@@ -1097,7 +1097,7 @@ export class GameEvent {
 				return;
 			}
 
-			if(this.parent) this.parent.childEvents.push(this);
+			if (this.parent) this.parent.childEvents.push(this);
 			game.getGlobalHistory("everything").push(this);
 			if (this.manager.eventStack.length === 0) this.manager.rootEvent = this;
 			this.manager.eventStack.push(this);
@@ -1267,6 +1267,7 @@ export class GameEvent {
 	 * ```
 	 */
 	async debugger() {
+		if (!lib.config.dev) return;
 		if (security.isSandboxRequired()) throw new Error("当前模式下禁止调试");
 		const runCode = function (event, code) {
 			try {

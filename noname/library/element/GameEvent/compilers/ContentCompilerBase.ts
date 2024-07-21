@@ -38,7 +38,7 @@ export default abstract class ContentCompilerBase implements IContentCompiler {
 
         if (event.name === "phaseLoop") return false;
 
-        if(!player) return false;
+        if (!player) return false;
         if (player.isDead() && !event.forceDie) {
             //@ts-ignore
             game.broadcastAll(function () {

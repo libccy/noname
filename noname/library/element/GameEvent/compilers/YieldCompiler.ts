@@ -25,38 +25,32 @@ export default class YieldCompiler extends ContentCompilerBase {
     }
 
     compile(content: EventContent) {
-        return async (event: GameEvent) => {
+        const compiler = this;
+        return async function(event: GameEvent) {
             const args = YieldCompiler.#mapArgs(event);
             const generator: Generator<any, void, any> =
-                Reflect.apply(content as GeneratorFunction, event, [event, args]);
+                //@ts-ignore
+                Reflect.apply(content as GeneratorFunction, this, [event, args]);
 
             let result: any = null;
+            let done: boolean = false;
 
             while (!event.finished) {
-                let value: any = null;
-                let done: boolean | undefined = false;
-
-                this.beforeExecute(event);
-
-                if (!this.isPrevented(event))
-                    ({ value, done } = generator.next(result));
-
-                this.afterExecute(event);
-
-                const needResult = event.next.includes(value);
-
-                await event.waitNext(); // 等待狂神喵的代码喵
-
-                // return和finish两种情况都可以跳出循环
-                if (done || event.finished) {
+                if (done) {
                     event.finish();
-                    continue;
+                    break;
                 }
+                let value: any = null;
 
-                // 加个判断防止笨蛋的操作喵
-                // 你见过有人yield player.insertPhase()然后来问为什么卡了的喵？
-                if (needResult)
-                    result = value.result;
+                compiler.beforeExecute(event);
+
+                if (!compiler.isPrevented(event))
+                    ({ value, done = false } = generator.next(result));
+
+                await event.waitNext();
+                result = value instanceof GameEvent ? value.result : value;
+
+                compiler.afterExecute(event);
             }
 
             generator.return();

@@ -4416,7 +4416,7 @@ const skills = {
 						source.line(target, "fire");
 						const type = get.type2(event.cards[0]);
 						await source.discard(event.cards).set("discarder", source);
-						//await game.asyncDelayx();
+						//await game.delayx();
 						const cardsToDiscard = target.getExpansions("dcxiaoyin").filter(card => get.type2(card, false) === type);
 						if (cardsToDiscard.length === 1) await target.loseToDiscardpile(cardsToDiscard);
 						else if (cardsToDiscard.length > 1) {

@@ -1,5 +1,6 @@
 import { _status, ai, game, get, lib, ui } from "../../../../../../noname.js";
 import ContentCompilerBase from "./ContentCompilerBase.js";
+import { GameEvent } from "../../../gameEvent.js";
 export default class YieldCompiler extends ContentCompilerBase {
     type = "yield";
     static #mapArgs(event) {
@@ -16,25 +17,25 @@ export default class YieldCompiler extends ContentCompilerBase {
         return typeof content === "function" && content.constructor.name === "GeneratorFunction";
     }
     compile(content) {
-        return async (event) => {
+        const compiler = this;
+        return async function (event) {
             const args = YieldCompiler.#mapArgs(event);
-            const generator = Reflect.apply(content, event, [event, args]);
+            //@ts-ignore
+            const generator = Reflect.apply(content, this, [event, args]);
             let result = null;
+            let done = false;
             while (!event.finished) {
-                let value = null;
-                let done = false;
-                this.beforeExecute(event);
-                if (!this.isPrevented(event))
-                    ({ value, done } = generator.next(result));
-                this.afterExecute(event);
-                const needResult = event.next.includes(value);
-                await event.waitNext();
-                if (done || event.finished) {
+                if (done) {
                     event.finish();
-                    continue;
+                    break;
                 }
-                if (needResult)
-                    result = value.result;
+                let value = null;
+                compiler.beforeExecute(event);
+                if (!compiler.isPrevented(event))
+                    ({ value, done = false } = generator.next(result));
+                await event.waitNext();
+                result = value instanceof GameEvent ? value.result : value;
+                compiler.afterExecute(event);
             }
             generator.return();
         };
