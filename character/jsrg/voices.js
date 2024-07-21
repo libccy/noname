@@ -22,5 +22,5 @@ export default {
 	"#jsrgjuelie2": "董贼势败在即，诸公何故不前。",
 	"#jsrgjuelie3": "火势刻不容缓，全军速速进发。",
 	"#jsrgjuelie4": "洛阳已在眼下，莫让董贼轻逃。",
-	"#jsrg_sunjian:die": "若违此誓，某必为万箭穿心……",
+	"#jsrg_sunjian:die": "若违此誓，某必为万箭穿心！",
 };
