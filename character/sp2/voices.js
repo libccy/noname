@@ -424,5 +424,5 @@ export default {
 	"#starjiaohao2": "站住！且与本姑娘分个高下！",
 	"#starsaying1": "倩影映江汀，巾帼犹飒爽！",
 	"#starsaying2": "我有一袭红袖，欲揾英雄泪！",
-	"#star_sunshangxiang:die": "秋风冷，江水寒。",
+	"#star_sunshangxiang:die": "秋风冷，江水寒……",
 };
