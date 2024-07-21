@@ -466,8 +466,6 @@ export default {
 	"#wlcuorui1": "减辎疾行，挫敌军锐气。",
 	"#wlcuorui2": "外物当舍，摄敌为重。",
 	"#wulan:die": "蛮狗，尔敢杀我！",
-	"#retianxiang_daxiaoqiao1": "哼，我才不怕你呢~",
-	"#retianxiang_daxiaoqiao2": "替我挡着吧~",
 	"#yongjue1": "扶幼主，成霸业！",
 	"#yongjue2": "能救一个是一个！",
 	"#dcshouze": "白绫加之我颈，其罪何患无辞。",
