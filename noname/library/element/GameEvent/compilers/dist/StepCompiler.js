@@ -80,11 +80,10 @@ class StepParser {
         const compiled = new this.functionConstructor(...StepParser.params, `
             var { ${StepParser.deconstructs.join(", ")} } = event;
             var { ${StepParser.topVars.join(", ")} } = topVars;
+
+            ${this.stepHead}
             {
-                ${this.stepHead}
-                {
-                    ${code}
-                }
+                ${code}
             }
         `);
         ErrorManager.setCodeSnippet(compiled, new CodeSnippet(code, 3)); // 记录编译后函数的原代码片段

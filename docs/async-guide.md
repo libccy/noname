@@ -173,7 +173,7 @@ let skill = {
 
 如果不分步就执行 `countCards`，会导致我们读取的是摸牌前的手牌数量（因为此时摸牌还没开始），从而导致效果与描述不一致
 
-在经过动态编译后(1.10.14前)，content函数会变成这样：
+在经过动态编译后(v1.10.15前)，content函数会变成这样：
 
 ```javascript
 let skill = {
@@ -248,11 +248,11 @@ let skill = {
 };
 ```
 
-我们可以看到分步没有了，取而代之的是每次操作前面附加了一个`await`；这个`await`表示的是，会等待后面的代码运行完毕，再执行后续的代码
+我们可以看到分步没有了，取而代之的是每次操作前面附加了一个 `await`；这个 `await`表示的是，会等待后面的代码运行完毕，再执行后续的代码
 
 而此时，你可能会有疑惑：如果我现在需要获得所摸的牌，我该怎么办？
 
-原先分步情况下你可以在下一步中用`result`变量来获取上一步事件的结果，而现在，当我们`await`之后，我们可以这样做：
+原先分步情况下你可以在下一步中用 `result`变量来获取上一步事件的结果，而现在，当我们 `await`之后，我们可以这样做：
 
 ```javascript
 let drawEvent = await player.draw(2);
@@ -260,11 +260,11 @@ let drawEvent = await player.draw(2);
 
 你或许也发现了，无论是无名杀的分步，还是Javascript原来的回调异步，都会存在“结果”。就好比你做一件事，就算最后没有因为这件事得到任何东西，此时的情况也是一种“结果”
 
-而`await`也同理，在等待事件结束后，便会得到这个“结果”。而对于`player.draw(2)`这种常见的，需要分步得到`result`的，我们称之为“事件“的东西，`await`后返回的，是事件本身；而事件的结果，则是该事件的`result`属性
+而 `await`也同理，在等待事件结束后，便会得到这个“结果”。而对于 `player.draw(2)`这种常见的，需要分步得到 `result`的，我们称之为“事件“的东西，`await`后返回的，是事件本身；而事件的结果，则是该事件的 `result`属性
 
-我们把“`await`后会等待后续事物执行完毕，并返回新的东西”的东西，简单的称作能`await`的东西；在后文中我们会再次讨论这块的内容
+我们把“`await`后会等待后续事物执行完毕，并返回新的东西”的东西，简单的称作能 `await`的东西；在后文中我们会再次讨论这块的内容
 
-换句话说，摸牌函数返回的`drawEvent`事件，是一个可`await`的东西；而`await`一个事件，就是等待一个事件运行结束，并获取这个事件本身
+换句话说，摸牌函数返回的 `drawEvent`事件，是一个可 `await`的东西；而 `await`一个事件，就是等待一个事件运行结束，并获取这个事件本身
 
 故我们接下来就能这样获取我们所摸的牌：
 
@@ -272,7 +272,7 @@ let drawEvent = await player.draw(2);
 let cards = drawEvent.result;
 ```
 
-如果你不需要事件，只需要对应的结果，无名杀提供了对应的方法，你可以使用`forResult`函数：
+如果你不需要事件，只需要对应的结果，无名杀提供了对应的方法，你可以使用 `forResult`函数：
 
 ```javascript
 let cards = await player.draw(2).forResult();
@@ -284,9 +284,9 @@ let cards = await player.draw(2).forResult();
 let { result: cards } = await player.draw(2);
 ```
 
-两种方法都能得到结果，只要不混用就行；如果你对Javascript的新语法不熟悉，只需要简单的使用`forResult`就行
+两种方法都能得到结果，只要不混用就行；如果你对Javascript的新语法不熟悉，只需要简单的使用 `forResult`就行
 
-实际上`await`没有那么死板，你完全可以把`await`放在任何你想要的地方，只有能`await`的情况才会等待，反之会原封不动的将值返回过来
+实际上 `await`没有那么死板，你完全可以把 `await`放在任何你想要的地方，只有能 `await`的情况才会等待，反之会原封不动的将值返回过来
 
 就比如，你可以：
 
@@ -294,7 +294,7 @@ let { result: cards } = await player.draw(2);
 await player.addTempSkill("jiang");
 ```
 
-`player.addTempSkill`并不需要等待，但你等待也不会出啥问题，此时`await`后的返回值仍然是`player.addTempSkill`原有的返回值；`await`只会处理需要等待的东西
+`player.addTempSkill`并不需要等待，但你等待也不会出啥问题，此时 `await`后的返回值仍然是 `player.addTempSkill`原有的返回值；`await`只会处理需要等待的东西
 
 ### 4. 一些原有操作的代替品
 
@@ -387,13 +387,13 @@ for (let target of event.targets) {
 
 1. 会触发时机。触发时机意味着可能进行插入结算，你需要等待所有插入结算的完成，故而使用 `await`(包括使用 `event.trigger`来主动触发时机也需要 `await`)
 2. 等待玩家确认。如果有个操作需要玩家点击确认，或者会弹出窗口给玩家查看时，你需要等待玩家确认完毕，所以也使用 `await`
-3. `asyncDelay`/`asyncDelayx`等带 `async`字符的函数，这些操作一般都会返回一个可 `await`的东西，故我们需要 `await`来保证函数执行完毕
+3. `asyncDraw`等带 `async`字符的函数，这些操作一般都会返回一个可 `await`的东西，故我们需要 `await`来保证函数执行完毕
 
 顺带一提，有些异步的情况不能用 `await`来等待，或者说使用 `await`并不会起到效果。这类情况基本上都是无名杀的古老异步代码，因为在那个时代并不存在 `Promise`，且没人尝试在后来适配这些异步代码，所以你只能通过原先给定的特殊方式来等待，比如说回调函数
 
 #### 2. delay与delayx
 
-在 `Async Content`里面，当我们使用 `game.delay`/`game.delayx`时，我们也可以进行 `await`:
+在 `Async Content`里面，当使用 `game.delay`/`game.delayx`时，我们也可以进行 `await`:
 
 ```javascript
 await game.delay();
@@ -523,7 +523,7 @@ await promise; // 等待直到resolve在5秒后被调用
 
 在分步中，如果你要等待玩家按下确定再执行下一步，你需要先执行 `game.pause`，这将启动游戏内暂停，直到你执行 `game.resume`之前，下一步都不会执行
 
-而到了async函数里面，我们可以使用更加优雅的办法(`Promise`)来替代`game.pause`与 `game.resume`:
+而到了async函数里面，我们可以使用更加优雅的办法(`Promise`)来替代 `game.pause`与 `game.resume`:
 
 假设 `button`是一个按钮，我们要等待按钮按下再继续执行，这种代码应该这样写:
 
@@ -582,53 +582,9 @@ function funA() {
 
 `Async Content`相比 `Step Content`的优势上文已经说明，但无名杀实际还存在其他的content形式，故我们再看看其他的content形式与 `Async Content`的对比
 
-### `Array Content`
-
-为了解决不再动态编译，实际上无名杀可以使用一种很原始的分步方法；就比如之前的技能，可以这么写：
-
-```javascript
-{
-    content: [
-        (event, { player }) => {
-            player.addTempSkill("jiang");
-            return player.draw(2);
-        },
-        (event, { player }) => {
-            if (player.countCards("h") > 5)
-                return player.chooseToDiscard(2, true);
-        },
-        (event, { player }) => {
-            player.addMark("jiang");
-        }
-    ]
-}
-```
-
-你应该能看明白，就是将 `Step Content`中的 `content`属性换成了一个数组，数组中每个函数都是一个 `step`，返回需要等待的事件，其中第一个参数则是当前事件，第二个参数是所有 `Step Content`给出的参数，没用上的第三个参数则是需要等待事件的结果——这种参数形式被标记为“旧参数格式”，目前已被 `Async Content`的参数形式取代
-
-这种写法具有 `Step Content`的所有优势，也具备调试功能，但由于过于丑陋，且现阶段并未支持异步功能，故被抛弃
-
-当然你或许听到过一个幽灵...
-
-### `Async Contents`
-
-> 和 `Async Content`仅差了一个单词的 `Async Contents`，从名字看就明白这个形式拥有 `Async Content`的特点，并提供分步功能，但你却从来没看到有人使用过，只有不知道什么人在一遍遍传递这个幽灵的名号
->
-> 因为 `Async Contents`目前还是“废弃中”的状态
->
-> 回到v1.10.6，当 `Async Content`出来之后，我们就希望将无名杀本体的 `Step Content`全部用新的写法代替；但 `Async Content`有个缺点：并不支持跳步，这使得一些必须要跳步的情况无法用 `Async Content`代替。因此，`Async Contents`被提上了议程
->
-> 但在实现过程中，出了个差错：`Async Content`在v1.10.6时存在一个不明显的Bug，这个Bug不会对普通的 `Async Content`造成任何影响，但对基于 `Async Content`的 `Async Contents`造成了非常大的影响，使得 `Async Contents`完全无法发挥原有的功能。故 `Async Contents`最终遭到了废弃，且为了防止错误使用 `Async Contents`，相关代码已被删除
->
-> 导致 `Async Contents`的Bug已被修复，但 `Asnyc Contents`目前已经没人去实现了，本体的残留代码也无法直接使用。现在 `Async Contents`就像个幽灵一样，徘徊在无名杀的代码群中，或许有一天我们还能再次看到这玩意
-
-1.10.14后，`Async Contents`已经可以正常使用。
-
-由于`Async Contents`的强大兼容性，现在`Async Content`和`Step Content`会在运行时被编译为 `Async Contents`，从而更好地进行生命周期管理。
-
 ### `Generator Content`
 
-`Generator Content`和 `Asnyc Content`很像，这个形式通过“生成器”来等待事件结束，使用的是旧函数格式，就比如之前演示的技能，就可以这样写：
+`Generator Content`通过“生成器”来等待事件结束。比如之前演示的技能，就可以这样写：
 
 ```javascript
 {
@@ -644,9 +600,41 @@ function funA() {
 }
 ```
 
+在 `Generator Content`中，`Step Content`中的 `content`属性被换成了一个数组，数组中每个函数都是一个 `step`，返回需要等待的事件，其中第一个参数则是当前事件，第二个参数是所有 `Step Content`给出的参数，没用上的第三个参数则是需要等待事件的结果——这种参数形式被标记为“旧参数格式”，目前已被 `Async Content`的参数形式取代
+
 你会发现，这很像 `Async Content`。实际上，当时 `Generator Content`或许会代替现在 `Async Content`的地位，因为两者的优缺点一致，`Generator Content`也能轻松实现异步功能；但时至今日，我们庆幸最终采用了 `Async Content`，并将事件改成了可 `await`的东西——这使得等待归一，从而使代码能实现更多功能，而 `Generator Content`的 `yield`却无法简单的实现
 
 只不过这一点过于复杂，本章节不会阐述，但额外章节会考虑讲述这一方面的内容
+
+### `Async Contents`
+
+回到v1.10.6，当 `Async Content` 出来之后，我们就希望将无名杀本体的 `Step Content` 全部用新的写法代替；但 `Async Content` 有个缺点：并不支持跳步，这使得一些必须要跳步的情况无法用 `Async Content` 代替。因此，`Async Contents` 被提上了议程
+
+比如之前的技能，就可以这么写：
+
+```javascript
+{
+    content: [
+        async (event, trigger, player) => {
+            player.addTempSkill("jiang");
+            await player.draw(2);
+        },
+        async (event, trigger, player) => {
+            if (player.countCards("h") > 5){
+                //return的事件会自动await，并将结果存入event._result
+                return player.chooseToDiscard(2, true);
+            }
+        },
+        async (event, trigger, player) => {
+            player.addMark("jiang");
+        }
+    ]
+}
+```
+
+由于 `Async Contents`的强大兼容性，在v1.10.15后 `Async Content` 和 `Step Content` 会在运行时被封装为 `Async Contents`，从而更好地进行生命周期管理。
+
+> 在v1.10.6时，`Async Contents` 出了个差错：`Async Content`在存在一个不明显的Bug，这个Bug不会对普通的 `Async Content` 造成任何影响，但对基于 `Async Content` 的 `Async Contents` 造成了非常大的影响，使得 `Async Contents` 完全无法发挥原有的功能。故 `Async Contents` 在当时遭到了废弃。
 
 ---
 
