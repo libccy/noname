@@ -5400,7 +5400,6 @@ const skills = {
 	tianze: {
 		audio: 2,
 		trigger: { global: "useCardAfter" },
-		direct: true,
 		filter: function (event, player) {
 			return (
 				player != event.player &&
@@ -5410,41 +5409,37 @@ const skills = {
 					return evt && evt.hs.length && evt.getParent() == event;
 				}) &&
 				event.player.isPhaseUsing() &&
-				!player.hasSkill("tianze_block")
-			);
-		},
-		content: function () {
-			"step 0";
-			player.addTempSkill("tianze_block");
-			if (
-				!player.hasCard(function (card) {
+				!player.hasSkill("tianze_block") &&
+				player.hasCard(card => {
 					if (_status.connectMode && get.position(card) == "h") return true;
 					return get.color(card, player) == "black";
 				}, "he")
-			)
-				event.finish();
-			else
-				player
-					.chooseToDiscard(
-						"he",
-						function (card, player) {
-							return get.color(card, player) == "black";
-						},
-						get.prompt("tianze", trigger.player),
-						"弃置一张黑色牌并对其造成1点伤害"
-					)
-					.set("ai", function (card) {
-						if (!_status.event.goon) return 0;
-						return 8 - get.value(card);
-					})
-					.set("goon", get.damageEffect(trigger.player, player, player) > 0).logSkill = ["tianze", trigger.player];
-			"step 1";
-			if (result.bool) {
-				if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.2);
-				trigger.player.damage();
-			} else event.finish();
-			"step 2";
-			game.delayx();
+			);
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseToDiscard(
+					"he",
+					function (card, player) {
+						return get.color(card, player) == "black";
+					},
+					get.prompt("tianze", trigger.player),
+					"弃置一张黑色牌并对其造成1点伤害"
+				)
+				.set("ai", function (card) {
+					if (!_status.event.goon) return 0;
+					return 8 - get.value(card);
+				})
+				.set("goon", get.damageEffect(trigger.player, player, player) > 0)
+				.set("logSkill", ["tianze", trigger.player])
+				.forResult();
+		},
+		popup: false,
+		async content(event, trigger, player) {
+			player.addTempSkill("tianze_block");
+			if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.2);
+			await trigger.player.damage();
+			await game.asyncDelayx();
 		},
 		group: "tianze_draw",
 		subSkill: {
