@@ -8262,7 +8262,7 @@ const skills = {
 		direct: true,
 		content: function () {
 			"step 0";
-			var goon = get.effect(player, trigger.card, trigger.player, trigger.player) < 1;
+			var goon = get.effect(player, trigger.card, trigger.player, trigger.player) < 2 * get.effect(player, { name: "draw" }, player, trigger.player);
 			if (goon && !event.isMine() && !event.isOnline()) game.delayx();
 			trigger.player
 				.chooseBool("是否对" + get.translation(player) + "发动【居下】？", "令" + get.translation(trigger.card) + "对其无效，然后其摸两张牌")

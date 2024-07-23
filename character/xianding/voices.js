@@ -453,6 +453,7 @@ export default {
 	"#busuan1": "喜仰视星辰，夜不肯寐。",
 	"#busuan2": "今日一卦，便知命数。",
 	"#mingjie1": "戒律循规，不可妄贪。",
+	"#mingjie2": "王道文明，何忧不平。",
 	"#guanlu:die": "怀我好英，心非草木……",
 	"#gxlianhua1": "草木精炼，万物化丹。",
 	"#gxlianhua2": "白日青山，飞升化仙。",
@@ -465,26 +466,8 @@ export default {
 	"#wlcuorui1": "减辎疾行，挫敌军锐气。",
 	"#wlcuorui2": "外物当舍，摄敌为重。",
 	"#wulan:die": "蛮狗，尔敢杀我！",
-	/*
-	"#tiaoxin_xiahouba1": "跪下受降，饶你不死！",
-	"#tiaoxin_xiahouba2": "黄口小儿，可听过将军名号？",
-	"#paoxiao_xiahouba1": "喝啊！",
-	"#paoxiao_xiahouba2": "受死吧！",
-	"#shensu1_xiahouba1": "冲杀敌阵，来去如电！",
-	"#shensu1_xiahouba2": "今日有恙在身，须得速战速决！",
-	*/
-	"#retianxiang_daxiaoqiao1": "哼，我才不怕你呢~",
-	"#retianxiang_daxiaoqiao2": "替我挡着吧~",
-	/*
-	"#liuli_daxiaoqiao1": "不懂得怜香惜玉么~",
-	"#liuli_daxiaoqiao2": "交给你了。",
-	*/
 	"#yongjue1": "扶幼主，成霸业！",
 	"#yongjue2": "能救一个是一个！",
-	/*
-	"#jingong1": "若无老夫之谋，尔等皆化为腐土也。",
-	"#jingong2": "董贼旧部，可尽诛之！",
-	*/
 	"#dcshouze": "白绫加之我颈，其罪何患无辞。",
 	"#dczimu1": "既为汉吏，当遵汉律。",
 	"#refenyin_wufan1": "奋音鼓劲，片甲不留！",

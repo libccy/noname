@@ -681,7 +681,7 @@ export default {
 	"#wangyun:die": "努力谢关东诸公，勤以国家为念！",
 	"#qianya1": "君子不妄动，动必有道。",
 	"#qianya2": "哎！将军过誉了！",
-	"#shuimeng1": "你我唇齿相依，共御外敌，何如？  ",
+	"#shuimeng1": "你我唇齿相依，共御外敌，何如？",
 	"#shuimeng2": "今兵薄势寡，可遣某为使往说之。",
 	"#sunqian:die": "恨不能……得见皇叔早登大宝，咳咳咳……",
 	"#tiandu_xizhicai1": "既是如此。",
@@ -751,10 +751,6 @@ export default {
 	"#xintan2": "人人心中都有一团欲望之火！",
 	"#tianxiang_daxiaoqiao1": "哼，我才不怕你呢~",
 	"#tianxiang_daxiaoqiao2": "替我挡着吧~",
-	/*
-	"#liuli_daxiaoqiao1": "不懂得怜香惜玉么~",
-	"#liuli_daxiaoqiao2": "交给你了。",
-	*/
 	"#zhengnan1": "末将愿承父志，随丞相出征！",
 	"#zhengnan2": "索全凭丞相差遣，万死不辞！",
 	"#wusheng_guansuo1": "逆贼，可识得关氏之勇？",

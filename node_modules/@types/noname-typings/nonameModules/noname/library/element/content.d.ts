@@ -1,3 +1,5 @@
+import { GameEventPromise } from "../../../../../../../noname/library/element";
+
 export namespace Content {
     function emptyEvent(): void;
     function changeCharacter(event: any, trigger: any, player: any): Promise<void>;
@@ -28,8 +30,8 @@ export namespace Content {
     function cardsGotoOrdering(): void;
     function cardsGotoSpecial(): void;
     function cardsGotoPile(): void;
-    function chooseToEnable(): void;
-    function chooseToDisable(): void;
+    function chooseToEnable(event: GameEventPromise, trigger: GameEventPromise, player: Player): Promise<void>;
+    function chooseToDisable(event: GameEventPromise, trigger: GameEventPromise, player: Player): Promise<void>;
     function swapEquip(): void;
     function disableJudge(): void;
     function enableJudge(): void;

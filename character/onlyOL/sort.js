@@ -3,7 +3,7 @@ const characterSort = {
 	onlyOL_yijiang2: ["ol_caozhang", "ol_chengpu", "ol_wangyi", "ol_liubiao"],
 	onlyOL_yijiang3: ["ol_yufan", "ol_liru"],
 	onlyOL_yijiang4: ["ol_caifuren"],
-	onlyOL_sb: ["ol_sb_jiangwei", "ol_sb_guanyu", "ol_sb_taishici", "ol_sb_yuanshao", "ol_sb_pangtong"],
+	onlyOL_sb: ["ol_sb_jiangwei", "ol_sb_guanyu", "ol_sb_taishici", "ol_sb_yuanshao", "ol_sb_pangtong", "ol_sb_kongrong"],
 };
 
 const characterSortTranslate = {

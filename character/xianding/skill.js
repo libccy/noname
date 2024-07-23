@@ -3,22 +3,96 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//柳婒
+	dcjingyin: {
+		audio: 2,
+		trigger: { global: "useCardAfter" },
+		filter(event, player) {
+			if (!game.hasPlayer(target => target != event.player)) return false;
+			return event.card.name == "sha" && event.cards && event.cards.someInD();
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt("dcjingyin"), "令一名角色获得" + get.translation(trigger.cards.filterInD()), (card, player, target) => {
+					return target != get.event().getTrigger().player;
+				})
+				.set("ai", target => {
+					const player = get.event().player,
+						cards = get.event().getTrigger().cards.filterInD();
+					return cards.reduce((sum, card) => sum + get.value(card, target) * get.value(card, player), 0);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			target.addSkill("dcjingyin_tag");
+			target.gain(trigger.cards.filterInD(), "gain2").set("gaintag", "dcjingyin_tag");
+		},
+		subSkill: {
+			tag: {
+				charlotte: true,
+				mod: {
+					targetInRange(card, player, target) {
+						if (!card.cards) return;
+						if (card.cards.some(i => i.hasGaintag("dcjingyin_tag"))) return true;
+					},
+					cardUsable(card, player, target) {
+						if (!card.cards) return;
+						if (card.cards.some(i => i.hasGaintag("dcjingyin_tag"))) return Infinity;
+					},
+					aiOrder: function (player, card, num) {
+						if (get.itemtype(card) == "card" && card.hasGaintag("dcjingyin_tag")) return num - 0.1;
+					},
+				},
+			},
+		},
+	},
+	dcchixing: {
+		audio: 2,
+		trigger: { global: "phaseUseEnd" },
+		filter(event, player) {
+			return lib.skill.dcchixing.getNum(event).length;
+		},
+		frequent: true,
+		async content(event, trigger, player) {
+			const result = await player.draw(lib.skill.dcchixing.getNum(trigger).length).forResult();
+			if (Array.isArray(result) && result.some(card => get.name(card, false) == "sha")) {
+				await player
+					.chooseToUse(function (card) {
+						const evt = _status.event;
+						if (!lib.filter.cardEnabled(card, evt.player, evt)) return false;
+						let cards = [card];
+						if (Array.isArray(card.cards)) cards.addArray(card.cards);
+						return cards.containsSome(...evt.cards) && get.name(card, false) == "sha";
+					}, "迟行：是否使用一张【杀】？")
+					.set("cards", result);
+			}
+		},
+		getNum(event) {
+			return game
+				.getGlobalHistory("everything", evt => {
+					if (evt.getParent("phaseUse") != event) return false;
+					return evt.name == "cardsDiscard" || (evt.name == "lose" && evt.position == ui.discardPile);
+				})
+				.reduce((list, evt) => list.addArray(evt.cards.filter(i => i.name == "sha")), []);
+		},
+	},
 	//新谋郭嘉
 	dcxianmou: {
 		mark: true,
 		marktext: "☯",
 		zhuanhuanji(player, skill) {
 			player.storage[skill] = !player.storage[skill];
-			player.changeSkin({ characterName: "dc_sb_guojia" }, "dc_sb_guojia" + (player.storage[skill] ? "_shadow" : ""));
+			//player.changeSkin({ characterName: "sb_guojia" }, "sb_guojia" + (player.storage[skill] ? "_shadow" : ""));
 		},
 		intro: {
 			content: function (storage) {
-				if (!storage) return "你失去过牌的回合结束时，你可以观看牌堆顶五张牌并获得至多X张牌，若未获得X张牌则获得【遗计】直到再发动此项（X为你本回合失去牌数）";
+				if (!storage) return "你失去过牌的回合结束时，你可以观看牌堆顶五张牌并获得至多X张牌，若未获得X张牌则获得〖遗计〗直到再发动此项（X为你本回合失去牌数）";
 				return "你失去过牌的回合结束时，你可以观看一名角色手牌并弃置其中至多X张牌，若弃置X张牌则你进行一次【闪电】判定（X为你本回合失去牌数）";
 			},
 		},
 		audio: 2,
-		audioname: ["dc_sb_guojia_shadow"],
+		audioname: ["sb_guojia_shadow"],
 		trigger: {
 			global: "phaseEnd",
 		},
@@ -72,7 +146,7 @@ const skills = {
 		subSkill: {
 			change: {
 				audio: "dcxianmou",
-				audioname: ["dc_sb_guojia_shadow"],
+				audioname: ["sb_guojia_shadow"],
 				trigger: {
 					global: "phaseBefore",
 					player: "enterGame",
@@ -98,9 +172,10 @@ const skills = {
 		filter(event, player) {
 			if (!player.countCards("hs")) return false;
 			if (player.countCards("h", { color: "black" }) != player.countCards("h", { color: "red" })) return false;
-			if (event.type != "wuxie" || !event.respondTo) return false;
-			if (get.type(event.respondTo[1]) != "trick") return false;
-			return event.source != event.respondTo[0];
+			if (event.type != "wuxie") return false;
+			let info = event.info_map;
+			if (!info || get.type(info.card) != "trick") return false;
+			return info.player != info.target;
 		},
 		filterCard: true,
 		viewAs: {
@@ -114,6 +189,23 @@ const skills = {
 		prompt: "将一张手牌当无懈可击使用",
 		check: function (card) {
 			return 8 - get.value(card);
+		},
+		group: "dclunshi_nowuxie",
+		subSkill: {
+			nowuxie: {
+				trigger: {
+					player: "useCard",
+				},
+				forced: true,
+				locked: false,
+				popup: false,
+				filter: function (event, player) {
+					return event.card.name == "wuxie" && event.skill && event.skill == "dclunshi";
+				},
+				content: function () {
+					trigger.directHit.addArray(game.players);
+				},
+			},
 		},
 	},
 	//卞玥
@@ -2905,7 +2997,7 @@ const skills = {
 			order: 7,
 			result: {
 				target(player, target) {
-					return target.countCards("h") < player.countCards("h") ? get.attitude(player, target) : -get.effect(target, { name: "guohe" }, player, player);
+					return target.countCards("h") < player.countCards("h") ? get.effect(target, { name: "draw" }, player, target) : get.effect(target, { name: "guohe" }, player, target);
 				},
 			},
 		},
@@ -17898,7 +17990,7 @@ const skills = {
 		},
 	},
 	mingjie: {
-		audio: 1,
+		audio: 2,
 		trigger: { player: "phaseJieshuBegin" },
 		check: function () {
 			return ui.cardPile.hasChildNodes() && get.color(ui.cardPile.firstChild) != "black";

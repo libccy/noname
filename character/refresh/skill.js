@@ -5351,8 +5351,8 @@ const skills = {
 	//贾诩
 	rewansha: {
 		audio: "wansha",
-		audioname: ["re_jiaxu", "boss_lvbu3"],
-		audioname2: { shen_simayi: "jilue_wansha", xin_simayi: "jilue_wansha", new_simayi: "wansha_new_simayi" },
+		audioname: ["re_jiaxu", "boss_lvbu3", "new_simayi"],
+		audioname2: { shen_simayi: "jilue_wansha", xin_simayi: "jilue_wansha" },
 		global: "rewansha_global",
 		trigger: { global: "dyingBegin" },
 		forced: true,
@@ -11571,14 +11571,10 @@ const skills = {
 	reguhuo_phase: {},
 	rechanyuan: {
 		init: function (player, skill) {
-			if (player.hp <= 1) {
-				player.logSkill(skill);
-				player.addSkill("rechanyuan_log");
-			}
+			if (player.hp <= 1) player.logSkill(skill);
 			player.addSkillBlocker(skill);
 		},
 		onremove: function (player, skill) {
-			player.removeSkill("rechanyuan_log");
 			player.removeSkillBlocker(skill);
 		},
 		skillBlocker: function (skill, player) {
@@ -11598,19 +11594,10 @@ const skills = {
 		audio: 2,
 		trigger: { player: "changeHp" },
 		filter: function (event, player) {
-			return player.hp <= 1 != player.hasSkill("rechanyuan_log");
+			return get.sgn(player.hp - 1.5) != get.sgn(player.hp - 1.5 - event.num);
 		},
-		direct: true,
-		locked: true,
-		content: function () {
-			if (player.hp <= 1) {
-				player.logSkill("rechanyuan");
-				player.addSkill("rechanyuan_log");
-			} else player.removeSkill("rechanyuan_log");
-		},
-		subSkill: {
-			log: { charlotte: true },
-		},
+		forced: true,
+		content: function () {},
 	},
 	botu: {
 		audio: 2,
@@ -13580,7 +13567,8 @@ const skills = {
 	},
 	reguicai: {
 		audio: 2,
-		audioname2: { xin_simayi: "jilue_guicai", new_simayi: "reguicai_new_simayi" },
+		audioname2: { xin_simayi: "jilue_guicai" },
+		audioname: ["new_simayi"],
 		trigger: { global: "judge" },
 		direct: true,
 		filter: function (event, player) {
@@ -14521,6 +14509,7 @@ const skills = {
 	},
 	qiaomeng: {
 		audio: 2,
+		audioname: ["xin_gongsunzan"],
 		trigger: { source: "damageSource" },
 		direct: true,
 		filter: function (event, player) {

@@ -1,4 +1,5 @@
 const characters = {
+	ol_sunru: ["female", "wu", 3, ["olchishi", "olweimian"]],
 	caoteng: ["male", "qun", 3, ["olyongzu", "olqingliu"]],
 	budugen: ["male", "qun", 4, ["olkouchao"]],
 	mawan: ["male", "qun", 4, ["mashu", "olhunjiang"]],

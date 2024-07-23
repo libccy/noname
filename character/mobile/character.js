@@ -87,7 +87,7 @@ const characters = {
 	simashi: ["male", "wei", 4, ["baiyi", "jinglve", "shanli"], ["name:司马|师"]],
 	yanghuiyu: ["female", "wei", 3, ["hongyi", "requanfeng"]],
 	xin_zhuran: ["male", "wu", 4, ["mobiledanshou"]],
-	xin_gongsunzan: ["male", "qun", 4, ["xinyicong", "qiaomeng"], ["name:公孙|瓒"]],
+	xin_gongsunzan: ["male", "qun", 4, ["xinyicong", "qiaomeng"], ["die:gongsunzan", "name:公孙|瓒"]],
 	dingyuan: ["male", "qun", 4, ["beizhu"]],
 	xin_jianyong: ["male", "shu", 3, ["xinqiaoshui", "xinjyzongshi"]],
 	xin_caozhang: ["male", "wei", 4, ["rejiangchi"]],

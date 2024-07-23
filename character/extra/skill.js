@@ -6716,7 +6716,7 @@ const skills = {
 	},
 	lianpo: {
 		audio: 2,
-		audioname2: { new_simayi: "lianpo_new_simayi" },
+		audioname: ["new_simayi"],
 		trigger: { global: "phaseAfter" },
 		frequent: true,
 		filter(event, player) {

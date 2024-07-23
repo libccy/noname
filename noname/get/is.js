@@ -455,6 +455,7 @@ export class Is {
 	}
 	/**
 	 * @param { string } str
+	 * @returns { str is "h" | "e" | "j" | "he" | "hej" | "ej" | "hj" }
 	 */
 	pos(str) {
 		return str == "h" || str == "e" || str == "j" || str == "he" || str == "hj" || str == "ej" || str == "hej";

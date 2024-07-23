@@ -1,4 +1,6 @@
 const characters = {
+	sb_guojia: ["male", "wei", 3, ["dcxianmou", "dclunshi"]],
+	xunyuxunyou: ["male", "wei", 3, ["dczhinang", "dcgouzhu"], ["name:荀|彧-荀|攸"]],
 	xiahoumao: ["male", "wei", 4, ["tongwei", "cuguo"], ["name:夏侯|楙"]],
 	chenshi: ["male", "shu", 4, ["qingbei"]],
 	sunli: ["male", "wei", 4, ["kangli"]],

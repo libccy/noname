@@ -2,6 +2,209 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//OL孙茹
+	//持室神将
+	olchishi: {
+		audio: 2,
+		trigger: { global: ["loseAfter", "equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"] },
+		filter(event, player) {
+			const target = _status.currentPhase;
+			if (!target || !target.isIn()) return false;
+			const evt = event.getl(target);
+			return evt && ["h", "e", "j"].some(pos => (evt[pos + "s"] || []).length > 0 && !target.countCards(pos));
+		},
+		check(event, player) {
+			return get.effect(_status.currentPhase, { name: "draw" }, player, player) > 0;
+		},
+		usable: 1,
+		logTarget: () => _status.currentPhase,
+		async content(event, trigger, player) {
+			const target = _status.currentPhase;
+			await target.draw(2);
+			target.addTempSkill("olchishi_effect");
+			target.addMark("olchishi_effect", 2, false);
+		},
+		subSkill: {
+			effect: {
+				markimage: "image/card/handcard.png",
+				intro: { content: "手牌上限+#" },
+				mod: {
+					maxHandcard(player, num) {
+						return num + player.countMark("olchishi_effect");
+					},
+				},
+			},
+		},
+	},
+	olweimian: {
+		audio: 2,
+		enable: "phaseUse",
+		filter(event, player) {
+			return player.hasEnabledSlot();
+		},
+		usable: 1,
+		chooseButton: {
+			dialog(event, player) {
+				let dialog = ui.create.dialog("###" + get.translation("olweimian") + "###" + lib.translate.olweimian_info, "hidden");
+				let equips = [];
+				for (let i = 1; i < 6; i++) {
+					if (!player.hasEnabledSlot(i)) continue;
+					for (let j = 1; j <= player.countEnabledSlot(i); j++) {
+						equips.push(["equip" + i, get.translation("equip" + i)]);
+					}
+				}
+				if (equips.length > 0) dialog.add([equips, "tdnodes"]);
+				return dialog;
+			},
+			check(button) {
+				const player = get.event().player;
+				if (player.countCards("e") <= 3 && _status.currentPhase === player && ((player.storage.counttrigger || {}).olchishi || 0) <= 0) {
+					if (
+						player
+							.getCards("e")
+							.slice()
+							.map(i => get.subtype(i))
+							.includes(button.link)
+					)
+						return 10;
+				}
+				if (
+					ui.selected.buttons.length >=
+					Math.max(
+						...game.filterPlayer().map(target => {
+							let max = 0;
+							if (get.attitude(player, target) > 0 && (target == player || target.hasDisabledSlot())) max++;
+							if (get.recoverEffect(target, player, player) > 0) max++;
+							if (
+								target.countCards("h") > 0 &&
+								target
+									.getCards("h", card => {
+										return lib.filter.cardDiscardable(card, target);
+									})
+									.reduce((sum, card) => {
+										return sum + get.value(card, t);
+									}, 0) <=
+									get.effect(target, { name: "draw" }, player, player) * 4
+							)
+								max++;
+							return max;
+						})
+					)
+				)
+					return 0;
+				return [2, 1, 4, 3, 5].indexOf(parseInt(button.link.slice("equip".length))) + 1;
+			},
+			select: [1, 3],
+			backup(links, player) {
+				return {
+					types: links.slice().sort((a, b) => parseInt(a.slice("equip".length)) - parseInt(b.slice("equip".length))),
+					filterTarget(card, player, target) {
+						if (target == player) return true;
+						return target.hasDisabledSlot() || target.isDamaged() || target.countCards("h") > 0;
+					},
+					async content(event, trigger, player) {
+						const target = event.target,
+							types = lib.skill.olweimian_backup.types;
+						for (const t of types) await player.disableEquip(t);
+						const num = Math.min(target.hasDisabledSlot() + target.isDamaged() + (target.countCards("h") > 0), types.length);
+						const result = await target
+							.chooseButton(
+								[
+									"慰勉：请选择" + get.cnNumber(num) + "项执行",
+									[
+										[
+											["equip", "恢复一个装备栏"],
+											["recover", "回复1点体力"],
+											["discard", "弃置所有手牌，然后摸四张牌"],
+										],
+										"textbutton",
+									],
+								],
+								num
+							)
+							.set("filterButton", button => {
+								const player = get.event().player;
+								switch (button.link) {
+									case "equip":
+										return player.hasDisabledSlot();
+									case "recover":
+										return player.isDamaged();
+									case "discard":
+										return player.countCards("h");
+								}
+							})
+							.set("ai", button => {
+								const player = get.event().player;
+								switch (button.link) {
+									case "equip":
+										return 1;
+									case "recover":
+										return get.recoverEffect(player, player, player);
+									case "discard":
+										return (
+											get.effect(player, { name: "draw" }, player, player) * 4 -
+											player
+												.getCards("h", card => {
+													return lib.filter.cardDiscardable(card, player);
+												})
+												.reduce((sum, card) => {
+													return sum + get.value(card, t);
+												}, 0)
+										);
+								}
+							})
+							.forResult();
+						if (result.bool) {
+							if (result.links.includes("equip")) {
+								await target.chooseToEnable();
+							}
+							if (result.links.includes("recover")) {
+								await target.recover();
+							}
+							if (result.links.includes("discard")) {
+								const cards = target.getDiscardableCards(target, "h");
+								if (cards.length) await target.discard(cards);
+								await target.draw(4);
+							}
+						}
+					},
+					ai: {
+						result: {
+							target(player, target) {
+								let max = 0;
+								if (get.attitude(player, target) > 0 && (target == player || target.hasDisabledSlot())) max++;
+								if (get.recoverEffect(target, player, player) > 0) max++;
+								if (
+									target.countCards("h") > 0 &&
+									target
+										.getCards("h", card => {
+											return lib.filter.cardDiscardable(card, target);
+										})
+										.reduce((sum, card) => {
+											return sum + get.value(card, t);
+										}, 0) <=
+										get.effect(target, { name: "draw" }, player, player) * 4
+								)
+									max++;
+								return max;
+							},
+						},
+					},
+				};
+			},
+			prompt(links, player) {
+				const types = links.slice().sort((a, b) => parseInt(a.slice("equip".length)) - parseInt(b.slice("equip".length)));
+				return "废除" + types.map(i => get.translation(i) + "栏").join("、") + "，令一名角色选择执行等量项";
+			},
+		},
+		ai: {
+			order: 7,
+			result: { player: 1 },
+		},
+		subSkill: {
+			backup: {},
+		},
+	},
 	//曹腾
 	olyongzu: {
 		audio: 2,
@@ -25616,7 +25819,7 @@ const skills = {
 		},
 		filterCard: true,
 		filterTarget: function (card, player, target) {
-			return target != player && !target.getExpansions("rezhoufu2").length;
+			return target != player && !target.getExpansions("rezhoufu_judge").length;
 		},
 		check: function (card) {
 			return 6 - get.value(card);
@@ -25626,8 +25829,7 @@ const skills = {
 		lose: false,
 		delay: false,
 		content: function () {
-			if (!target.storage.rezhoufu2_markcount) target.storage.rezhoufu2_markcount = 0;
-			target.addToExpansion(cards, player, "give").gaintag.add("rezhoufu2");
+			target.addToExpansion(cards, player, "give").gaintag.add("rezhoufu_judge");
 			target.addSkill("rezhoufu_judge");
 		},
 		ai: {
@@ -25640,15 +25842,26 @@ const skills = {
 		subSkill: {
 			judge: {
 				audio: "zhoufu",
+				init: (player) => {
+					player.storage.rezhoufu_judge_markcount = 0;
+				},
+				onremove: (player) => {
+					delete player.storage.rezhoufu_judge_markcount;
+					let cards = player.getExpansions("rezhoufu_judge");
+					if (cards.length) player.loseToDiscardpile(cards);
+				},
+				intro: {
+					content: "expansion",
+				},
 				trigger: { player: "judgeBefore" },
 				forced: true,
 				charlotte: true,
 				filter: function (event, player) {
-					return !event.directresult && player.getExpansions("rezhoufu2").length;
+					return !event.directresult && player.getExpansions("rezhoufu_judge").length;
 				},
 				content: function () {
-					var cards = [player.getExpansions("rezhoufu2")[0]];
-					trigger.directresult = cards[0];
+					trigger.directresult = player.getExpansions("rezhoufu_judge")[0];
+					player.storage.rezhoufu_judge_markcount = 0;
 				},
 			},
 			losehp: {
@@ -25660,7 +25873,7 @@ const skills = {
 						return current.hasHistory("lose", function (evt) {
 							if (!evt || !evt.xs || !evt.xs.length) return false;
 							for (var i in evt.gaintag_map) {
-								if (evt.gaintag_map[i].includes("rezhoufu2")) return true;
+								if (evt.gaintag_map[i].includes("rezhoufu_judge")) return true;
 							}
 							return false;
 						});
@@ -25672,7 +25885,7 @@ const skills = {
 							return current.hasHistory("lose", function (evt) {
 								if (!evt || !evt.xs || !evt.xs.length) return false;
 								for (var i in evt.gaintag_map) {
-									if (evt.gaintag_map[i].includes("rezhoufu2")) return true;
+									if (evt.gaintag_map[i].includes("rezhoufu_judge")) return true;
 								}
 								return false;
 							});
@@ -25685,7 +25898,7 @@ const skills = {
 							return current.hasHistory("lose", function (evt) {
 								if (!evt || !evt.xs || !evt.xs.length) return false;
 								for (var i in evt.gaintag_map) {
-									if (evt.gaintag_map[i].includes("rezhoufu2")) return true;
+									if (evt.gaintag_map[i].includes("rezhoufu_judge")) return true;
 								}
 								return false;
 							});
@@ -25698,18 +25911,12 @@ const skills = {
 			},
 		},
 	},
-	rezhoufu2: {
-		intro: {
-			content: "expansion",
-		},
-	},
-	rezhoufu3: {},
 	reyingbing: {
 		audio: "yingbin",
 		trigger: { global: "useCard" },
 		forced: true,
 		filter: function (event, player) {
-			var cards = event.player.getExpansions("rezhoufu2");
+			var cards = event.player.getExpansions("rezhoufu_judge");
 			return cards.length && get.color(cards[0]) == get.color(event.card);
 		},
 		logTarget: "player",
@@ -25717,12 +25924,12 @@ const skills = {
 			"step 0";
 			player.draw();
 			"step 1";
-			trigger.player.storage.rezhoufu2_markcount++;
-			if (trigger.player.storage.rezhoufu2_markcount >= 2) {
-				delete trigger.player.storage.rezhoufu2_markcount;
-				var cards = trigger.player.getExpansions("rezhoufu2");
+			trigger.player.storage.rezhoufu_judge_markcount++;
+			if (trigger.player.storage.rezhoufu_judge_markcount >= 2) {
+				var cards = trigger.player.getExpansions("rezhoufu_judge");
 				player.gain(cards, trigger.player, "give", "bySelf");
-			} else trigger.player.markSkill("rezhoufu2");
+				trigger.player.removeSkill("rezhoufu_judge");
+			} else trigger.player.markSkill("rezhoufu_judge");
 		},
 		ai: {
 			combo: "rezhoufu",
