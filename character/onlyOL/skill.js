@@ -280,7 +280,7 @@ const skills = {
 		logTarget: "source",
 		async content(event, trigger, player) {
 			const target = trigger.source;
-			await trigger.cancel();
+			trigger.cancel();
 			await target.draw();
 			player.addSkill("olzongshi_record");
 			player.markAuto("olzongshi_record", [target.group]);

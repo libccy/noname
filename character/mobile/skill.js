@@ -11471,7 +11471,7 @@ const skills = {
 				var character = lib.character[i];
 				if (character && character[3]) {
 					for (var j of character[3]) {
-						if (skills.includes(j) || j == "yuri_wangxi" || target.hasSkill("j")) continue;
+						if (skills.includes(j) || j == "yuri_wangxi" || target.hasSkill(j)) continue;
 						var info = get.info(j);
 						if (info && info.zhuSkill) {
 							skills.add(j);
