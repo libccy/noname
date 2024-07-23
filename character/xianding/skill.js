@@ -8,6 +8,7 @@ const skills = {
 		audio: 2,
 		trigger: { global: "useCardAfter" },
 		filter(event, player) {
+			if (_status.currentPhase === event.player) return false;
 			if (!game.hasPlayer(target => target != event.player)) return false;
 			return event.card.name == "sha" && event.cards && event.cards.someInD();
 		},
