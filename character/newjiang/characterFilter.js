@@ -1,5 +1,5 @@
 import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
-const cards = {};
+const characterFilters = {};
 
-export default cards;
+export default characterFilters;

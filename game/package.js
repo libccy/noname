@@ -4,6 +4,7 @@ window.noname_package = {
 		refresh: "界限突破",
 		shenhua: "神话再临",
 		yijiang: "一将成名",
+		newjiang: "新一将成名",
 		sp: "璀璨星河",
 		onlyOL: "OL专属",
 		yingbian: "文德武备",

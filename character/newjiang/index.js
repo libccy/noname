@@ -14,14 +14,15 @@ import { characterSort, characterSortTranslate } from "./sort.js";
 
 game.import("character", function () {
 	return {
-		name: "yijiang",
+		name: "newjiang",
 		connect: true,
-		// connectBanned:['qinmi'],
 		character: { ...characters },
 		characterSort: {
-			yijiang: characterSort,
+			newjiang: characterSort,
 		},
-		characterSubstitute: {},
+		characterSubstitute: {
+			sb_guojia: [],
+		},
 		characterFilter: { ...characterFilters },
 		characterTitle: {},
 		dynamicTranslate: { ...dynamicTranslates },
