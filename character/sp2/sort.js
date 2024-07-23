@@ -16,7 +16,6 @@ const characterSort = {
 	sp_xiaohu: ["haomeng", "yanfuren", "yanrou", "dc_zhuling"],
 	sp_qunxiong: ["chezhou", "hansong", "matie"],
 	sp_star: ["star_caoren", "star_yuanshu", "star_dongzhuo", "star_yuanshao", "star_zhangchunhua", "star_sunjian", "star_zhangzhao", "star_sunshangxiang"],
-	mini_qixian: ["mp_liuling", "mp_wangrong"],
 	sp2_waitforsort: ["caobuxing", "re_maliang", "dc_jikang"],
 };
 
@@ -39,7 +38,6 @@ const characterSortTranslate = {
 	sp_fenghuo: "烽火连天",
 	sp_danqi: "千里单骑",
 	sp_star: "将星系列",
-	mini_qixian: "小程序·竹林七贤",
 	sp2_waitforsort: "等待分包",
 };
 
