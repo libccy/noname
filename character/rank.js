@@ -644,7 +644,7 @@ window.noname_character_rank = {
 		"sp_jianggan",
 		"tw_caozhao",
 		"xunyuxunyou",
-		"sb_guojia",
+		"yj_sb_guojia",
 		"tw_guohuai",
 		"shen_jiangwei",
 		"dc_luotong",
@@ -2026,7 +2026,7 @@ window.noname_character_rank = {
 		],
 		epic: [
 			"xunyuxunyou",
-			"sb_guojia",
+			"yj_sb_guojia",
 			"wuhujiang",
 			"yj_zhonghui",
 			"bianyue",
