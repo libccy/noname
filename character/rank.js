@@ -151,6 +151,7 @@ window.noname_character_rank = {
 		"ol_feiyi",
 		"ol_jiangwan",
 		"bianyue",
+		"dc_majun",
 	],
 	a: [
 		"star_caoren",
@@ -2029,6 +2030,7 @@ window.noname_character_rank = {
 			"dc_sb_zhangxiu",
 			"ol_jiangwan",
 			"xukun",
+			"dc_majun",
 			"clan_zhongyao",
 			"dc_caoshuang",
 			"tianchou",

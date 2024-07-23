@@ -97,6 +97,7 @@ const characters = {
 	yj_simafu: ["male", "wei", 3, ["beiyu", "duchi"], ["name:司马|孚"]],
 	yj_xuangongzhu: ["female", "wei", 3, ["yjqimei", "yjzhuiji"], ["name:司马|null"]],
 	xukun: ["male", "wu", 4, ["fazhu"]],
+	dc_majun: ["male", "wei", 3, ["dcgongqiao", "dcjingyi"]],
 };
 
 export default characters;
