@@ -1874,6 +1874,11 @@ export const Content = {
 		game.getGlobalHistory().cardMove.push(event);
 		if (!event._triggeronly) game.$cardsGotoPile(event);
 	},
+	/**
+	 * @param {GameEventPromise} event 
+	 * @param {GameEventPromise} trigger 
+	 * @param {Player} player 
+	 */
 	chooseToEnable: async function (event, trigger, player) {
 		var source = event.source;
 		if (event.selectButton) {
@@ -1953,6 +1958,11 @@ export const Content = {
 			await player.enableEquip(result.control);
 		}
 	},
+	/**
+	 * @param {GameEventPromise} event 
+	 * @param {GameEventPromise} trigger 
+	 * @param {Player} player 
+	 */
 	chooseToDisable: async function (event, trigger, player) {
 		var source = event.source;
 		if (event.selectButton) {

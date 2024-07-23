@@ -8051,6 +8051,9 @@ export class Library {
 			game.export(lib.init.encode(JSON.stringify(_status.videoToSave)), "无名杀 - 录像 - " + _status.videoToSave.name[0] + " - " + _status.videoToSave.name[1]);
 		}
 	}
+	/**
+	 * @param {Function} fn 
+	 */
 	genAsync(fn) {
 		return gnc.of(fn);
 	}
