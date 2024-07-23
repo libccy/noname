@@ -3,13 +3,87 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//柳婒
+	dcjingyin: {
+		audio: 2,
+		trigger: { global: "useCardAfter" },
+		filter(event, player) {
+			if (!game.hasPlayer(target => target != event.player)) return false;
+			return event.card.name == "sha" && event.cards && event.cards.someInD();
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt("dcjingyin"), "令一名角色获得" + get.translation(trigger.cards.filterInD()), (card, player, target) => {
+					return target != get.event().getTrigger().player;
+				})
+				.set("ai", target => {
+					const player = get.event().player,
+						cards = get.event().getTrigger().cards.filterInD();
+					return cards.reduce((sum, card) => sum + get.value(card, target) * get.value(card, player), 0);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			target.addSkill("dcjingyin_tag");
+			target.gain(trigger.cards.filterInD(), "gain2").set("gaintag", "dcjingyin_tag");
+		},
+		subSkill: {
+			tag: {
+				charlotte: true,
+				mod: {
+					targetInRange(card, player, target) {
+						if (!card.cards) return;
+						if (card.cards.some(i => i.hasGaintag("dcjingyin_tag"))) return true;
+					},
+					cardUsable(card, player, target) {
+						if (!card.cards) return;
+						if (card.cards.some(i => i.hasGaintag("dcjingyin_tag"))) return Infinity;
+					},
+					aiOrder: function (player, card, num) {
+						if (get.itemtype(card) == "card" && card.hasGaintag("dcjingyin_tag")) return num - 0.1;
+					},
+				},
+			},
+		},
+	},
+	dcchixing: {
+		audio: 2,
+		trigger: { global: "phaseUseEnd" },
+		filter(event, player) {
+			return lib.skill.dcchixing.getNum(event).length;
+		},
+		frequent: true,
+		async content(event, trigger, player) {
+			const result = await player.draw(lib.skill.dcchixing.getNum(trigger).length).forResult();
+			if (Array.isArray(result) && result.some(card => get.name(card, false) == "sha")) {
+				await player
+					.chooseToUse(function (card) {
+						const evt = _status.event;
+						if (!lib.filter.cardEnabled(card, evt.player, evt)) return false;
+						let cards = [card];
+						if (Array.isArray(card.cards)) cards.addArray(card.cards);
+						return cards.containsSome(...evt.cards) && get.name(card, false) == "sha";
+					}, "迟行：是否使用一张【杀】？")
+					.set("cards", result);
+			}
+		},
+		getNum(event) {
+			return game
+				.getGlobalHistory("everything", evt => {
+					if (evt.getParent("phaseUse") != event) return false;
+					return evt.name == "cardsDiscard" || (evt.name == "lose" && evt.position == ui.discardPile);
+				})
+				.reduce((list, evt) => list.addArray(evt.cards.filter(i => i.name == "sha")), []);
+		},
+	},
 	//新谋郭嘉
 	dcxianmou: {
 		mark: true,
 		marktext: "☯",
 		zhuanhuanji(player, skill) {
 			player.storage[skill] = !player.storage[skill];
-			player.changeSkin({ characterName: "dc_sb_guojia" }, "dc_sb_guojia" + (player.storage[skill] ? "_shadow" : ""));
+			//player.changeSkin({ characterName: "sb_guojia" }, "sb_guojia" + (player.storage[skill] ? "_shadow" : ""));
 		},
 		intro: {
 			content: function (storage) {
@@ -18,7 +92,7 @@ const skills = {
 			},
 		},
 		audio: 2,
-		audioname: ["dc_sb_guojia_shadow"],
+		audioname: ["sb_guojia_shadow"],
 		trigger: {
 			global: "phaseEnd",
 		},
@@ -72,7 +146,7 @@ const skills = {
 		subSkill: {
 			change: {
 				audio: "dcxianmou",
-				audioname: ["dc_sb_guojia_shadow"],
+				audioname: ["sb_guojia_shadow"],
 				trigger: {
 					global: "phaseBefore",
 					player: "enterGame",

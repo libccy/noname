@@ -5,7 +5,7 @@ const characterSort = {
 	collab_decade: ["libai", "xiaoyuehankehan", "zhutiexiong", "wu_zhutiexiong"],
 	collab_remake: ["dc_caocao", "dc_liubei", "dc_sunquan", "nezha", "dc_sunce", "dc_zhaoyun", "dc_wuyi"],
 	collab_duanwu_2024: ["quyuan", "xin_sunquan"],
-	collab_dcdoudizhui: ["dc_noname", "dc_xunyuxunyou"],
+	collab_dcdoudizhui: ["dc_noname"],
 	collab_oldoudizhu: ["wuhujiang"],
 };
 

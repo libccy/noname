@@ -655,6 +655,9 @@ const translates = {
 	yjzhuiji_info: "当你死亡时，你可以令一名角色从牌堆和弃牌堆中的随机使用任意装备牌直至其没有空置的装备栏。若如此做，当其失去以此法使用的装备牌后，其废除对应的装备栏。",
 	fazhu: "筏铸",
 	fazhu_info: "准备阶段，你可以重铸你的区域内任意张非伤害牌，然后将以此法获得的牌交给至多等量名角色各一张，这些角色可以依次使用一张无距离限制的【杀】。",
+	xunyuxunyou: "荀彧荀攸",
+	sb_guojia: "谋郭嘉",
+	sb_guojia_prefix: "谋",
 };
 
 export default translates;

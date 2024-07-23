@@ -10,7 +10,7 @@ const characterReplaces = {
 	sufei: ["yj_sufei", "sp_sufei", "xf_sufei"],
 	jiakui: ["jiakui", "old_jiakui"],
 	shenpei: ["shenpei", "sp_shenpei"],
-	sunru: ["dc_sunru", "sunru"],
+	sunru: ["dc_sunru", "ol_sunru", "sunru"],
 	liuye: ["dc_liuye", "liuye"],
 	zhaotongzhaoguang: ["dc_zhaotongzhaoguang", "zhaotongzhaoguang"],
 	yangbiao: ["yangbiao", "dc_yangbiao", "jsrg_yangbiao"],
