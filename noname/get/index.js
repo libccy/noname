@@ -194,6 +194,8 @@ export class Get extends GetCompatible {
 	subtypes(obj, player) {
 		if (typeof obj == "string") obj = { name: obj };
 		if (typeof obj != "object") return;
+		if(obj.subtypes) return obj.subtypes;
+		else if(obj.subtype) return [obj.subtype];
 		var name = get.name(obj, player);
 		if (!lib.card[name]) return [];
 		if (lib.card[name].subtypes) {
@@ -2169,6 +2171,7 @@ export class Get extends GetCompatible {
 	subtype(obj, player) {
 		if (typeof obj == "string") obj = { name: obj };
 		if (typeof obj != "object") return;
+		if(obj.subtype) return obj.subtype;
 		const name = get.name(obj, player);
 		if (!lib.card[name]) return;
 		let subtype = lib.card[name].subtype;
@@ -4021,8 +4024,8 @@ export class Get extends GetCompatible {
 						} else if (lib.card[name] && lib.card[name].type && lib.translate[lib.card[name].type]) {
 							typeinfo += get.translation(lib.card[name].type) + "牌";
 						}
-						if (get.subtype(name, false)) {
-							typeinfo += "-" + get.translation(get.subtype(name, false));
+						if (get.subtype(node, false) || get.subtype(name, false)) {
+							typeinfo += "-" + get.translation(get.subtype(node, false) || get.subtype(name, false));
 						}
 						if (typeinfo) {
 							uiintro.add('<div class="text center">' + typeinfo + "</div>");

@@ -3,6 +3,126 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//新杀马钧-临时写法
+	dcgongqiao: {
+		enable: "phaseUse",
+		usable: 1,
+		init(player, skill) {
+			player.addSkill("dcgongqiao_clear");
+		},
+		filterCard(card, player) {
+			if (get.type(card) == "equip") return player.canEquip(card, true);
+			return player.hasEnabledSlot();
+		},
+		filter(event, player) {
+			return player.countCards("h", card => lib.skill.dcgongqiao.filterCard(card, player));
+		},
+		check(card) {
+			const player = _status.event.player, val = get.value(card);
+			if (!player.countCards("h", cardx => get.type2(cardx) == get.type2(card))) val /= 4;
+			if (get.type2(card) == "trick") return 9 - val;
+			return 6 - val;
+		},
+		discard: false,
+		async content(event, trigger, player) {
+			const card = event.cards[0];
+			player.$give(card, player);
+			if (get.type(card) == "equip") await player.equip(card);
+			else {
+				let list = [];
+				for (let i = 1; i <= 5; i++) {
+					if (player.hasEnabledSlot(i)) list.push(i);
+				}
+				let choices = list.map(i => get.translation(`equip${i}`));
+				const result = await player.chooseControl(choices).set("prompt", `选择要置入${get.translation(card)}的装备栏`).set("ai", function () {
+					const player = _status.event.player;
+					if (!player.getEquips(5).length) return "宝物";
+					const list = [1, 2, 3, 4].filter(i => player.hasEnabledSlot(i) && !player.getEquips(i).length);
+					if (list.length) return get.translation(`equip${list.randomGet()}`);
+					return _status.event.choices.randomGet();
+				}).set("choices", choices).forResult();
+				const subtype = `equip${list[result.index]}`;
+				game.broadcastAll(function (card, subtype) {
+					card.subtype = subtype;
+				}, card, subtype);
+				game.log(player, "将", card, "置入了", `#g${get.translation(subtype)}栏`);
+				await player.equip(card);
+			}
+		},
+		ai: {
+			order: 5,
+			result: {
+				player: 1,
+			},
+		},
+		group: "dcgongqiao_effect",
+		subSkill: {
+			clear: {
+				trigger: {
+					player: "loseAfter",
+					global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
+				},
+				direct: true,
+				charlotte: true,
+				async content(event, trigger, player) {
+					const evt = trigger.getl(player);
+					if (evt && evt.es) {
+						for (let card of evt.es) {
+							if (card.subtype) {
+								game.broadcastAll(function (card) {
+									delete card.subtype;
+								}, card);
+							}
+						}
+					}
+				},
+			},
+			effect: {
+				trigger: {
+					player: ["useCard", "useCardAfter"],
+				},
+				filter(event, player, name) {
+					if (name == "useCard") return get.type(event.card) == "basic" && player.countCards("e", card => get.type(card) == "basic");
+					if (player.getHistory("useCard", evt => get.type2(evt.card) == get.type2(event.card) && evt != event).length) return false;
+					return player.countCards("e", card => get.type2(card) == "trick");
+				},
+				async content(event, trigger, player) {
+					if (event.triggername == "useCard") trigger.baseDamage++;
+					else await player.draw();
+				},
+				forced: true,
+				locked: false,
+				mod: {
+					maxHandcard(player, num) {
+						if (player.countCards("e", card => get.type(card) == "equip")) return num + 3;
+					},
+				},
+			},
+		},
+	},
+	dcjingyi: {
+		trigger: {
+			player: "equipEnd",
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			const num = player.countCards("e");
+			await player.draw(num);
+			await player.chooseToDiscard("he", 2, true).set('ai', card => {
+				if (get.position(card) == "e" || get.type(card) == "equip") return 1;
+				return 9 - get.value(card);
+			});
+		},
+		ai: {
+			effect: {
+				target(card, player, target, current) {
+					const num = player.countCards("e") - 1;
+					if (get.type(card) == "equip" && !get.cardtag(card, "gifts")) return [1, num];
+				},
+			},
+			threaten: 1.3,
+		},
+	},
 	//新谋郭嘉
 	dcxianmou: {
 		mark: true,
