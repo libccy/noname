@@ -4728,7 +4728,7 @@ const skills = {
 		async content(event, trigger, player) {
 			while (player.isIn() && trigger.player.isIn()) {
 				await game.asyncDraw([trigger.player, player]);
-				await game.asyncDelayx();
+				await game.delayx();
 				let getGainSuit = function (player) {
 					let last = player.getHistory("gain", function (evt) {
 						return evt.getParent(2) == event;

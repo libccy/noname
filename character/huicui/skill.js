@@ -224,7 +224,7 @@ const skills = {
 					});
 					player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
 					game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
-					await game.asyncDelayx();
+					await game.delayx();
 				},
 			},
 		},
@@ -1261,7 +1261,7 @@ const skills = {
 			const target = result.targets[0];
 			player.logSkill("dczhenrao", target);
 			await target.damage();
-			await game.asyncDelayx();
+			await game.delayx();
 			if (!player.storage.dczhenrao) {
 				player.when({ global: "phaseAfter" }).then(() => player.unmarkSkill("dczhenrao"));
 			}
@@ -1304,7 +1304,7 @@ const skills = {
 				await game.loseAsync({ lose_list }).setContent("chooseToCompareLose");
 			}
 			sishiList.addArray(cards.filter(isSishi));
-			if (lose_list.length) await game.asyncDelayx();
+			if (lose_list.length) await game.delayx();
 			player.gain(sishiList, "gain2");
 			player
 				.when("phaseEnd")
@@ -1431,7 +1431,7 @@ const skills = {
 						const evtx = evt.event;
 						return evt.skill === "dcjichou" && evtx.givenCards && evtx.givenCards.length;
 					})[0].event.givenCards.length;
-					await game.asyncDelayx();
+					await game.delayx();
 					await player.draw(toDraw);
 				}
 			}
@@ -2179,7 +2179,7 @@ const skills = {
 					const target = targets[0];
 					player.logSkill("dczixi", target);
 					player.$give(card, target, false);
-					await game.asyncDelay(0.5);
+					await game.delay(0.5);
 					target.addJudge({ name: "dczixi_" + cardname }, [card]);
 				}
 			}

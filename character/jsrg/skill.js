@@ -63,7 +63,7 @@ const skills = {
 							chooseToRespondEvent.set("skillwarn", "替" + get.translation(player) + "打出一张" + get.translation(cardName));
 							chooseToRespondEvent.noOrdering = true;
 							chooseToRespondEvent.autochoose = (cardName === "sha" ? lib.filter.autoRespondSha : lib.filter.autoRespondShan);
-							const { bool, card, cards } = (await chooseToRespondEvent).result;
+							const { bool, card, cards } = await chooseToRespondEvent.forResult();
 							if(bool){
 								hasSomeoneUsed = true;
 								event.result.card = card;
@@ -193,7 +193,7 @@ const skills = {
 					target.line(source);
 					trigger.targets.add(target);
 					game.log(target, "也成为了", trigger.card, "的目标");
-					await game.asyncDelayx();
+					await game.delayx();
 				}
 			}
 			await source.showHandcards();
@@ -385,7 +385,7 @@ const skills = {
 			for (const current of targets) {
 				player.line(current);
 				await current.damage("nocard");
-				await game.asyncDelayx();
+				await game.delayx();
 			}
 		},
 		ai: {
@@ -721,7 +721,7 @@ const skills = {
 			} else {
 				get.owner(card).$giveAuto(card, player, false);
 			}
-			await game.asyncDelayx();
+			await game.delayx();
 			await player.addJudge({ name: "xumou_jsrg" }, [card]);
 			if (player.isPhaseUsing()) await player.draw();
 		},
@@ -834,7 +834,7 @@ const skills = {
 					player,
 					target
 				);
-				await game.asyncDelay(3);
+				await game.delay(3);
 				game.broadcastAll("closeDialog", videoId);
 				for (let i = 0; i < 5; i++) {
 					const discarded = await target
@@ -1290,7 +1290,7 @@ const skills = {
 				videoId,
 				player
 			);
-			await game.asyncDelay(4);
+			await game.delay(4);
 			game.broadcastAll("closeDialog", videoId);
 			//展示完了 开始拿牌
 			const suitsMap = {};
@@ -1568,7 +1568,7 @@ const skills = {
 			});
 			player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
 			game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
-			game.asyncDelayx();
+			await game.delayx();
 		},
 		subSkill: {
 			viewas: {
@@ -2091,7 +2091,7 @@ const skills = {
 				.set("logSkill", ["jsrglonglin", trigger.player]);
 			if (result.bool) {
 				trigger.excluded.addArray(trigger.targets);
-				game.asyncDelayx();
+				await game.delayx();
 				if (trigger.player.canUse(juedou, player)) {
 					const { result } = await trigger.player.chooseBool(`是否视为对${get.translation(player)}使用一张【决斗】？`).set("choice", get.effect(player, juedou, trigger.player, trigger.player) >= 0);
 					if (result.bool) {
@@ -2318,7 +2318,7 @@ const skills = {
 			});
 			player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
 			game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
-			game.asyncDelayx();
+			await game.delayx();
 		},
 	},
 	jsrgtuigu: {
@@ -3156,7 +3156,7 @@ const skills = {
 				videoId,
 				player
 			);
-			await game.asyncDelay(4);
+			await game.delay(4);
 			game.broadcastAll("closeDialog", videoId);
 			let clock = -1,
 				anticlock = -1;
@@ -3275,7 +3275,7 @@ const skills = {
 			if (result.bool && result.links) {
 				const time2 = 1000 - (get.utc() - time);
 				if (time2 > 0) {
-					await game.asyncDelay(0, time2);
+					await game.delay(0, time2);
 				}
 				game.broadcastAll("closeDialog", videoId);
 				player.gain(result.links, "gain2");

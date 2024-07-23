@@ -105,7 +105,7 @@ const skills = {
 				let player = _status.event.player;
 				player.addMark("dcgouzhu", 1, false);
 				game.log(player, '手牌上限+1');
-				await game.asyncDelay();
+				await game.delay();
 			},
 			"主公技": async function () {
 				let player = _status.event.player;
@@ -677,7 +677,7 @@ const skills = {
 					game.log(i, "未进行回答");
 				}
 			}
-			await game.asyncDelay();
+			await game.delay();
 			//处理结果
 			if (answer_ok && answer_ok.countCards("h")) await answer_ok.showHandcards();
 			if (gaifa.length) {
@@ -685,7 +685,7 @@ const skills = {
 					i.addTempSkill("dclisao_gaifa");
 					i.markAuto("dclisao_gaifa", [player]);
 				}
-				await game.asyncDelay();
+				await game.delay();
 			}
 		},
 		chooseControl(question, current, eventId) {
@@ -1572,7 +1572,7 @@ const skills = {
 			if (result.bool) {
 				await player.logSkill("dctongliao");
 				player.addGaintag(result.cards, "dctongliao");
-				await game.asyncDelayx();
+				await game.delayx();
 			}
 		},
 		mod: {
@@ -2024,7 +2024,7 @@ const skills = {
 								await player.discardPlayerCard(target, true, "e", num);
 							} else {
 								await target.loseHp();
-								await game.asyncDelayx();
+								await game.delayx();
 							}
 						}
 					}
@@ -2067,7 +2067,7 @@ const skills = {
 							player.discardPlayerCard(target, true, "h", num);
 						} else {
 							target.loseHp();
-							game.delayex();
+							await game.delayex();
 						}
 					}
 				},
@@ -2341,7 +2341,7 @@ const skills = {
 					.set("card", trigger.card)
 					.forResult();
 				if (result.bool) {
-					if (!event.isMine() && !event.isOnline()) await game.asyncDelayx();
+					if (!event.isMine() && !event.isOnline()) await game.delayx();
 					await player.logSkill("ruyijingubang_effect", result.targets);
 					trigger.targets.addArray(result.targets);
 				}

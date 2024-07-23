@@ -242,10 +242,10 @@ export const Contents = {
 					if (!player.noPhaseDelay) {
 						// @ts-ignore
 						if (player == game.me) {
-							await game.asyncDelay();
+							await game.delay();
 							// game.delay();
 						} else {
-							await game.asyncDelayx();
+							await game.delayx();
 							// game.delayx();
 						}
 					}
@@ -326,9 +326,9 @@ export const Contents = {
 				}
 			}
 		},
-		async (event, _trigger, _player, { result }) => {
-			if (Array.isArray(result)) {
-				event.cards = result;
+		async (event, _trigger, _player) => {
+			if (Array.isArray(event._result)) {
+				event.cards = event._result;
 			}
 		},
 	],

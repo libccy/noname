@@ -595,9 +595,9 @@ export const Content = {
 		"step 6";
 		//if(player.isMin() || player.countCards('e',{subtype:get.subtype(card)})){
 		if (player.isMin() || !player.canEquip(card)) {
-			event.finish();
 			game.cardsDiscard(card);
 			delete player.equiping;
+			event.finish();
 			return;
 		}
 		var subtype = get.subtype(card);
@@ -1838,6 +1838,7 @@ export const Content = {
 			next.setContent("orderingDiscard");
 		}
 		if (!evt.noOrdering) evt.orderingCards.addArray(cards);
+		event.result = { cards };
 	},
 	cardsGotoSpecial: function () {
 		game.getGlobalHistory().cardMove.push(event);
@@ -2872,11 +2873,7 @@ export const Content = {
 		next.player = player;
 		next._trigger = trigger;
 		next.triggername = event.triggername;
-		// if ("contents" in info && Array.isArray(info.contents)) {
-		// 	next.setContents(info.contents);
-		// } else {
 		next.setContent(info.content);
-		// }
 
 		next.skillHidden = event.skillHidden;
 		if (info.forceDie) next.forceDie = true;
@@ -2888,6 +2885,11 @@ export const Content = {
 		if ("cost_data" in result) next.cost_data = result.cost_data;
 		next.indexedData = event.indexedData;
 		"step 4";
+		if (event.skill.startsWith("player_when_")){
+			player.removeSkill(event.skill);
+			delete lib.skill[event.skill];
+			delete lib.translate[event.skill];
+		}
 		if (!player._hookTrigger) return;
 		if (
 			player._hookTrigger.some((i) => {
@@ -3245,7 +3247,6 @@ export const Content = {
 		"step 4";
 		//规则集中的“回合开始后⑤”，进行翻面检测
 		if (player.isTurnedOver() && !event._noTurnOver) {
-			event.cancel();
 			player.turnOver();
 			player.phaseSkipped = true;
 			var players = game.players.slice(0).concat(game.dead);
@@ -3254,6 +3255,7 @@ export const Content = {
 				current.getHistory().isSkipped = true;
 				current.getStat().isSkipped = true;
 			}
+			event.cancel();
 		} else {
 			player.phaseSkipped = false;
 			player.getHistory().isMe = true;
@@ -3565,6 +3567,7 @@ export const Content = {
 		"step 0";
 		game.log(player, "进入了弃牌阶段");
 		event.num = player.needsToDiscard();
+		event.trigger("phaseDiscard");
 		if (event.num <= 0) event.finish();
 		else {
 			game.broadcastAll(function (player) {
@@ -3573,7 +3576,6 @@ export const Content = {
 				}
 			}, player);
 		}
-		event.trigger("phaseDiscard");
 		"step 1";
 		player.chooseToDiscard(num, true).set("useCache", true);
 		"step 2";
@@ -4462,8 +4464,6 @@ export const Content = {
 					if (hidden.length > 0) player.$giveAuto(hidden, i[0]);
 				}
 				break;
-			default:
-				event.finish();
 		}
 		for (var i of event.gain_list) {
 			if (i[1].length > 0) {
@@ -5093,8 +5093,8 @@ export const Content = {
 			list = event.target.getGainableSkills(event.func);
 		}
 		if (!list.length) {
-			event.finish();
 			event.result = { bool: false };
+			event.finish();
 			return;
 		}
 		event.skillai = function (list) {
@@ -6671,12 +6671,12 @@ export const Content = {
 				game.countChoose();
 				event.choosing = true;
 			} else {
-				event.finish();
 				event.result = "viewed";
 				setTimeout(function () {
 					event.dialog.close();
 				}, 2 * lib.config.duration);
 				game.delayx(2);
+				event.finish();
 			}
 		} else if (event.isOnline()) {
 			event.send();
@@ -8728,8 +8728,8 @@ export const Content = {
 	loseHp: function () {
 		"step 0";
 		if (event.num <= 0) {
-			event.finish();
 			event._triggered = null;
+			event.finish();
 			return;
 		}
 		if (lib.config.background_audio) {

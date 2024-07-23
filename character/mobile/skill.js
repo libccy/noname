@@ -177,7 +177,7 @@ const skills = {
 			}
 			if (result != "选项二") {
 				trigger.getParent().baseDamage++;
-				await game.asyncDelay();
+				await game.delay();
 			}
 			if (result != "选项一") {
 				player.addTempSkill("mbchoumang_effect");
@@ -706,7 +706,7 @@ const skills = {
 			targets.forEach(current => {
 				current.addSkill("mbkuangli_mark");
 			});
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 		subSkill: {
 			target: {
@@ -732,9 +732,9 @@ const skills = {
 						lose_list: list,
 						discarder: player,
 					}).setContent("discardMultiple");
-					await game.asyncDelayx();
+					await game.delayx();
 					await player.draw(2);
-					await game.asyncDelayx();
+					await game.delayx();
 				},
 				ai: {
 					effect: {
@@ -862,7 +862,7 @@ const skills = {
 			for (const target of targets) {
 				await target.disableEquip(1);
 			}
-			await game.asyncDelay();
+			await game.delay();
 		},
 		subSkill: {
 			inphase: {
@@ -883,7 +883,7 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					await trigger.target.disableEquip(1);
-					await game.asyncDelayx();
+					await game.delayx();
 				},
 			},
 			draw: {
@@ -1653,7 +1653,7 @@ const skills = {
 					player.awakenSkill("mbweiming");
 					player.storage.mbxuetu_status = 1;
 					player.unmarkSkill("mbxuetu");
-					await game.asyncDelayx();
+					await game.delayx();
 				},
 			},
 			fail: {
@@ -1673,7 +1673,7 @@ const skills = {
 					game.broadcastAll(player => {
 						player.tempname.add("re_yangfeng");
 					}, player);
-					await game.asyncDelayx();
+					await game.delayx();
 				},
 			},
 		},

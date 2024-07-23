@@ -608,7 +608,7 @@ const skills = {
 				i.popup(answer_result[0].includes(i) ? "成为目标" : "令其摸牌");
 				game.log(i, "选择了", "#y" + (answer_result[0].includes(i) ? "成为目标" : "令其摸牌"));
 			}
-			await game.asyncDelay();
+			await game.delay();
 			if (answer_result[0].length) {
 				answer_result[0].sortBySeat();
 				player.addTempSkill("olhunjiang_addTarget");
@@ -1005,7 +1005,7 @@ const skills = {
 				videoId,
 				player
 			);
-			await game.asyncDelay(3);
+			await game.delay(3);
 			game.broadcastAll("closeDialog", videoId);
 			const cards_cardPile = Array.from(ui.cardPile.childNodes).filter(i => i.name == "sha" && get.nature(i, false));
 			const cards_discardPile = Array.from(ui.discardPile.childNodes).filter(i => i.name == "sha" && get.nature(i, false));
@@ -1314,7 +1314,7 @@ const skills = {
 				player.line(current);
 				await player.discardPlayerCard(current, true);
 			}
-			await game.asyncDelayx();
+			await game.delayx();
 			let evt = trigger;
 			while (true) {
 				if (!evt.name || lib.phaseName.includes(evt.name)) break;
@@ -3324,37 +3324,30 @@ const skills = {
 			);
 		},
 		direct: true,
-		content: [
-			(event, map) => {
-				var player = map.player,
-					trigger = map.trigger;
-				var next = player.chooseToUse();
-				next.set("openskilldialog", `###${get.prompt("olsuji")}###将一张黑色牌当【杀】使用${player == trigger.player ? "" : `。若${get.translation(trigger.player)}受到了此【杀】的伤害，你获得其一张牌。`}`);
-				next.set("norestore", true);
-				next.set("_backupevent", "olsuji_backup");
-				next.set("addCount", false);
-				next.set("logSkill", "olsuji");
-				next.set("custom", {
-					add: {},
-					replace: { window: function () {} },
-				});
-				next.backup("olsuji_backup");
-			},
-			(event, map) => {
-				if (map.result.bool) {
-					var player = map.player,
-						trigger = map.trigger;
-					if (
-						trigger.player.isIn() &&
-						trigger.player.hasHistory("damage", evt => {
-							return evt.card && evt.card.storage && evt.card.storage.olsuji;
-						}) &&
-						trigger.player.countGainableCards(player, "he")
-					)
-						player.gainPlayerCard(trigger.player, "he", true);
-				}
-			},
-		],
+		async content(event, trigger, player){
+			const next = player.chooseToUse();
+			next.set("openskilldialog", `###${get.prompt("olsuji")}###将一张黑色牌当【杀】使用${player == trigger.player ? "" : `。若${get.translation(trigger.player)}受到了此【杀】的伤害，你获得其一张牌。`}`);
+			next.set("norestore", true);
+			next.set("_backupevent", "olsuji_backup");
+			next.set("addCount", false);
+			next.set("logSkill", "olsuji");
+			next.set("custom", {
+				add: {},
+				replace: { window: function () {} },
+			});
+			next.backup("olsuji_backup");
+			const result = await next.forResult();
+			if (result.bool) {
+				if (
+					trigger.player.isIn() &&
+					trigger.player.hasHistory("damage", evt => {
+						return evt.card && evt.card.storage && evt.card.storage.olsuji;
+					}) &&
+					trigger.player.countGainableCards(player, "he")
+				)
+					player.gainPlayerCard(trigger.player, "he", true);
+			}
+		},
 		subSkill: {
 			backup: {
 				filterCard: function (card) {

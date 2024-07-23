@@ -280,7 +280,7 @@ const skills = {
 				card.fix();
 				ui.cardPile.appendChild(card);
 			}
-			await game.asyncDelayx();
+			await game.delayx();
 			if (target.countCards("he")) await target.chooseToDiscard(num, "he", true);
 		},
 	},
@@ -857,7 +857,7 @@ const skills = {
 							const card = result.links[0];
 							cards.remove(card);
 							player.$gain2(card, false);
-							await game.asyncDelayx();
+							await game.delayx();
 							await player.chooseUseTarget(true, card, false);
 						}
 					}
@@ -1440,7 +1440,7 @@ const skills = {
 			const { cards } = event;
 			if (cards && cards.length) await player.discard(cards);
 			else await player.draw(2);
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 	},
 	dcfenhui: {
@@ -1986,7 +1986,7 @@ const skills = {
 								await target.draw(num);
 								await target.recover();
 							}
-							if (!event.isMine() && !event.isOnline()) await game.asyncDelayx();
+							if (!event.isMine() && !event.isOnline()) await game.delayx();
 						}
 					},
 				};
@@ -2142,7 +2142,7 @@ const skills = {
 							if (card) await target.chooseUseTarget(card, true).set("nopopup", true);
 							else {
 								game.log("但是牌堆里没有", target, "的装备！");
-								await game.asyncDelayx();
+								await game.delayx();
 							}
 						}
 						if (target.countCards("h") < game.countPlayer()) return;
@@ -2245,7 +2245,7 @@ const skills = {
 				toGain.push(gainableCards[0]);
 			}
 			if (toGain.length) await player.gain(toGain, "giveAuto");
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 		ai: {
 			threaten: 5.8,
@@ -2612,7 +2612,7 @@ const skills = {
 					if (result.bool) {
 						respondedTargets.push(target);
 						if (!trigger.targets.includes(target)) nonnonTargetResponded = true;
-						await game.asyncDelay();
+						await game.delay();
 					} else if (trigger.targets.includes(target)) unrespondedTargets.push(target);
 				}
 			}
@@ -2926,7 +2926,7 @@ const skills = {
 			player.logSkill("dcanjing", targets);
 			for (const target of targets) await target.draw();
 			const minHp = targets.map(i => i.getHp()).sort((a, b) => a - b)[0];
-			await game.asyncDelayx();
+			await game.delayx();
 			for (const target of targets) {
 				if (!target.isIn()) continue;
 				if (target.getHp() === minHp) await target.recover();
@@ -3064,7 +3064,7 @@ const skills = {
 				const card = links[0];
 				cards.remove(card);
 				player.$gain2(card, false);
-				await game.asyncDelayx();
+				await game.delayx();
 				await player.chooseUseTarget(true, card, false);
 				cards = cards.filterInD();
 				if (cards.length) {
@@ -4508,7 +4508,7 @@ const skills = {
 						source.line(target, "fire");
 						const type = get.type2(event.cards[0]);
 						await source.discard(event.cards).set("discarder", source);
-						//await game.asyncDelayx();
+						//await game.delayx();
 						const cardsToDiscard = target.getExpansions("dcxiaoyin").filter(card => get.type2(card, false) === type);
 						if (cardsToDiscard.length === 1) await target.loseToDiscardpile(cardsToDiscard);
 						else if (cardsToDiscard.length > 1) {
@@ -9258,7 +9258,7 @@ const skills = {
 					const card = new lib.element.VCard({ name });
 					if (player.canUse(card, target)) {
 						await player.useCard(card, target);
-						await game.asyncDelayx();
+						await game.delayx();
 						break;
 					}
 				}
@@ -9655,8 +9655,48 @@ const skills = {
 				},
 				prompt2: "你判定，若结果为红色，你重置〖霞泪〗的观看牌数；若结果为黑色，〖暗织〗于本回合失效，然后你可以令一名非当前回合角色获得本回合进入弃牌堆的两张牌。",
 				content: function () {
-					event.setContent(lib.skill.dcanzhi.content);
-					event.goto(0);
+					"step 0";
+					player.judge(result => {
+						if (get.color(result) == "red") return _status.event.getParent().player.countMark("dcxialei_clear") / 2;
+						return 2;
+					}).judge2 = result => result.bool;
+					"step 1";
+					if (result.color == "red") {
+						player.removeSkill("dcxialei_clear");
+						event.finish();
+					} else if (result.color == "black") {
+						player.addTempSkill("dcanzhi_blocker");
+						player
+							.chooseTarget("暗织：是否令一名非当前回合角色获得本回合进入弃牌堆的两张牌？", (card, player, target) => {
+								return target != _status.currentPhase;
+							})
+							.set("ai", target => {
+								return get.effect(target, { name: "wuzhong" }, _status.event.player);
+							});
+					} else event.finish();
+					"step 2";
+					if (result.bool) {
+						var target = result.targets[0];
+						event.target = target;
+						player.line(target);
+						var cards = [];
+						game.getGlobalHistory("cardMove", evt => {
+							if ((evt.name == "lose" && evt.position == ui.discardPile) || evt.name == "cardsDiscard") {
+								cards.addArray(evt.cards.filterInD("d"));
+							}
+						});
+						if (cards.length) {
+							player.chooseButton(["暗织：选择令" + get.translation(target) + "获得的牌", cards], true, Math.min(cards.length, 2)).set("ai", button => {
+								var player = _status.event.player,
+									target = _status.event.getParent().target;
+								return get.sgnAttitude(player, target) * get.value(button.link, target);
+							});
+						}
+					} else event.finish();
+					"step 3";
+					if (result.bool) {
+						target.gain(result.links, "gain2");
+					}
 				},
 			},
 			blocker: { charlotte: true },
