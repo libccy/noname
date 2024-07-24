@@ -4550,7 +4550,7 @@ const skills = {
 						if (typeof numz == "number") num2 += numz;
 					});
 					if (num > num2) {
-						var hs = target.getCards("he", function (card) {
+						var hs = target.getCards("h", function (card) {
 							return lib.filter.cardDiscardable(card, target, "yijiao_effect");
 						});
 						if (hs.length) target.discard(hs.randomGets(get.rand(1, 3)));
@@ -4761,21 +4761,31 @@ const skills = {
 		},
 		subSkill: {
 			effect: {
-				trigger: { player: "useCardAfter" },
-				forced: true,
 				charlotte: true,
+				trigger: { player: "useCardAfter" },
 				filter: function (event, player) {
-					return (
-						player.maxHp > 1 &&
-						event.skill == "xiongmang" &&
-						!player.hasHistory("sourceDamage", function (evt) {
-							return evt.card == event.card;
-						})
-					);
+					return event.skill == "xiongmang";
 				},
+				forced: true,
+				popup: false,
 				content: function () {
-					player.loseMaxHp();
+					if (!game.getGlobalHistory("changeHp", evt => evt.getParent().name == 'damage' && evt.getParent().card && evt.getParent().card == trigger.card).length) {
+						player.loseMaxHp();
+					} else {
+						player.addTempSkill("xiongmang_more", ["phaseChange", "phaseAfter"]);
+						player.addMark("xiongmang_more", 1, false);
+					}
 				},
+			},
+			more: {
+				charlotte: true,
+				onremove: true,
+				mod: {
+					cardUsable(card, player, num) {
+						if (card.name == "sha") return num + player.countMark("xiongmang_more");
+					},
+				},
+				intro: { content: "使用【杀】的额定次数+#" },
 			},
 		},
 	},

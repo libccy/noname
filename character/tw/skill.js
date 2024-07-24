@@ -700,7 +700,7 @@ const skills = {
 			};
 		},
 		async content(event, trigger, player) {
-			await trigger.cancel();
+			trigger.cancel();
 			if (event.cost_data == "选项一") await player.gainPlayerCard(trigger.player, "e", true);
 			else {
 				for (let i = 1; i < 7; i++) {

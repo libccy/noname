@@ -5593,12 +5593,16 @@ const skills = {
 			if (event.name == "die") return true;
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
-		content: function () {
+		content: function *(event, map) {
+			const player = map.player;
+			player.removeSkill("dctongye_buff");
 			player.addSkill("dctongye_buff");
 			var num = game.countGroup();
 			if (num <= 4) {
 				player.addMark("dctongye_handcard", 3, false);
 				game.log(player, "手牌上限", "#y+3");
+				player.addMark("dctongye_draw", 4 - num, false);
+				game.log(player, "摸牌阶段额定摸牌数", "#y+" + parseFloat(4 - num));
 			}
 			if (num <= 3) {
 				player.addMark("dctongye_range", 3, false);
@@ -5609,8 +5613,7 @@ const skills = {
 				game.log(player, "使用杀的次数上限", "#y+3");
 			}
 			if (num <= 1) {
-				player.addMark("dctongye_draw", 3, false);
-				game.log(player, "摸牌阶段额定摸牌数", "#y+3");
+				yield player.recover(3);
 			}
 		},
 		subSkill: {
