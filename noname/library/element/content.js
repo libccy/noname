@@ -8,8 +8,8 @@ import { gnc } from "../../gnc/index.js";
 
 // 未来再改
 export const Content = {
-	emptyEvent: () => {
-		event.trigger(event.name);
+	emptyEvent: async (event) => {
+		await event.trigger(event.name);
 	},
 	//变更武将牌
 	async changeCharacter(event, trigger, player) {
@@ -483,7 +483,7 @@ export const Content = {
 		if (lose <= 0) event.goto(3);
 		else {
 			var cards = player.getEquips(slot).filter((card) => {
-				return !event.cards.includes(card) && lib.filter.canBeReplaced(card, player);
+				return !event.cards.includes(card) && !(event.frozenCards?.includes(card)) && lib.filter.canBeReplaced(card, player);
 			});
 			if (cards.length > 0) {
 				if (lose >= left) {
@@ -528,7 +528,164 @@ export const Content = {
 		event.result = cards;
 	},
 	//装备牌
-	equip: function () {
+	equip: async function(event, trigger, player){
+		if (event.cards) {
+			const map = {};
+			for (const i of event.cards) {
+				var owner = get.owner(i, "judge");
+				if (owner && (owner != player || get.position(i) != "e")) {
+					var id = owner.playerid;
+					if (!map[id]) map[id] = [[], [], []];
+					map[id][0].push(i);
+					var position = get.position(i);
+					if (position == "h") map[id][1].push(i);
+					else map[id][2].push(i);
+				} else if (!event.updatePile && get.position(i) == "c") event.updatePile = true;
+				if (event.visible) i.addKnower("everyone");
+			}
+			event.losing_map = map;
+			for (const i in map) {
+				const owner = (_status.connectMode ? lib.playerOL : game.playerMap)[i];
+				const next = owner
+					.lose(map[i][0], ui.special)
+					.set("type", "gain")
+					.set("forceDie", true)
+					.set("getlx", false);
+				if (event.visible == true) {
+					// @ts-ignore
+					next.visible = true;
+				}
+				await next;
+				event.relatedLose = next;
+			}
+		}
+		const replacedEquips = [];
+		const handleEquip = async (card) => {
+			let cards = [];
+			// @ts-ignore
+			if (get.itemtype(card) === "card"){
+				cards = [card];
+				card = get.autoViewAs(card);
+			}
+			else {
+				cards = card.cards ?? [];
+			}
+			if (cards.length) {
+				game.broadcast(function (cards, player) {
+					cards.forEach(card => {
+						if (card.clone) {
+							card.clone.moveDelete(player);
+						}
+					})
+				}, cards, player);
+				cards.forEach(card => {
+					if (card.clone) {
+						card.clone.moveDelete(player);
+						game.addVideo("gain2", player, get.cardsInfo([card.clone]));
+					}
+				})
+			}
+			replacedEquips.addArray(cards);
+			let canMoveOn = true;
+			cards.forEach(card => {
+				if (card.willBeDestroyed("equip", player, event)) {
+					card.selfDestroy(event);
+					canMoveOn = false;
+					return;
+				}
+				else if (canMoveOn) {
+					// @ts-ignore
+					if("hejx".includes(get.position(card, true))){
+						canMoveOn = false;
+						return;
+					}
+				}
+			});
+			if (!canMoveOn) return;
+			if (event.draw) {
+				player.$draw(card);
+				await game.delay(0, 300);
+			}
+			player.equiping = true;
+			let cardInfo = get.info(card, false);
+			const replaceEquipEvent = game.createEvent("replaceEquip");
+			replaceEquipEvent.player = player;
+			replaceEquipEvent.card = card;
+			replaceEquipEvent.setContent(cardInfo.replaceEquip || "replaceEquip");
+			// @ts-ignore
+			replaceEquipEvent.frozenCards = replacedEquips.slice(0);
+			const result = await replaceEquipEvent.forResult();
+			// @ts-ignore
+			if (get.itemtype(result) == "cards") {
+				// @ts-ignore
+				event.swapped = true;
+				replacedEquips.addArray(result);
+				const loseEvent = player.lose(result, "visible").set("type", "equip").set("getlx", false);
+				loseEvent.swapEquip = true;
+				if (cardInfo.loseThrow) {
+					player.$throw(result, 1000);
+				}
+				await loseEvent;
+				// @ts-ignore
+				for (let card of result) {
+					if (card.willBeDestroyed("discardPile", player, event)) {
+						card.selfDestroy(event);
+					}
+				}
+			}
+			if (player.isMin() || !player.canEquip(card)) {
+				await game.cardsDiscard(cards);
+				delete player.equiping;
+				return;
+			}
+			let audioSubtype = get.subtype(card);
+			if (audioSubtype == "equip6") audioSubtype = "equip3";
+			// @ts-ignore
+			game.broadcastAll((type) => {
+				if (lib.config.background_audio) {
+					// @ts-ignore
+					game.playAudio("effect", type);
+				}
+			}, audioSubtype);
+			player.$addEquip(card, cards);
+			//player.$equip(card);
+			game.addVideo("equip", player, get.cardInfo(card));
+			if (event.log != false) game.log(player, "装备了", card);
+			if (cardInfo.onEquip && (!cardInfo.filterEquip || cardInfo.filterEquip(card, player))) {
+				if (Array.isArray(cardInfo.onEquip)) {
+					for (var i = 0; i < cardInfo.onEquip.length; i++) {
+						var next = game.createEvent("equip_" + card.name);
+						next.setContent(cardInfo.onEquip[i]);
+						next.player = player;
+						next.card = card;
+						await next;
+					}
+				} else {
+					var next = game.createEvent("equip_" + card.name);
+					next.setContent(cardInfo.onEquip);
+					next.player = player;
+					next.card = card;
+					await next;
+				}
+				if (cardInfo.equipDelay != false) await game.delayx();
+			}
+			delete player.equiping;
+			if (event.delay) {
+				await game.delayx();
+			}
+		}
+		if(event.card) {
+			await handleEquip(event.card);
+		}
+		else {
+			for(const card of event.cards){
+				event.cards = card;
+				await handleEquip(card);
+			}
+		}
+		if (event.updatePile) game.updateRoundNumber();
+	},
+	equip_old: function () {
 		"step 0";
 		var owner = get.owner(card);
 		if (owner) {
@@ -2418,7 +2575,12 @@ export const Content = {
 			target.addJudge(card, cards);
 	},
 	equipCard: function () {
-		if (cards.length && get.position(cards[0], true) == "o") target.equip(cards[0]);
+		if (!card?.cards.some(card => {
+			return get.position(card, true) !== "o";
+		})){
+			target.equip(card);
+		}
+		//if (cards.length && get.position(cards[0], true) == "o") target.equip(cards[0]);
 	},
 	gameDraw: function () {
 		"step 0";
@@ -8476,11 +8638,17 @@ export const Content = {
 		if (num < cards.length) {
 			if (event.es.includes(cards[num])) {
 				event.loseEquip = true;
-				player.removeEquipTrigger(cards[num]);
-				var info = get.info(cards[num]);
-				if (info.onLose && (!info.filterLose || info.filterLose(cards[num], player))) {
-					event.goto(3);
-					return;
+				const VEquip = player.getVCards("e").find(card => {
+					return card?.cards.includes(cards[num])
+				});
+				if (VEquip) {
+					player.removeVEquip(VEquip);
+					//player.removeEquipTrigger(cards[num]);
+					var info = get.info(VEquip);
+					if (info.onLose && (!info.filterLose || info.filterLose(VEquip, player))) {
+						event.goto(3);
+						return;
+					}
 				}
 			}
 			event.num++;

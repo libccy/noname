@@ -167,6 +167,12 @@ export class Player extends HTMLDivElement {
 		};
 		player.queueCount = 0;
 		player.outCount = 0;
+		//TODO: 添加对应的typedef
+		player.vcardsMap = {
+			handcards: [],
+			equips: [],
+			judges: [],
+		};
 	}
 	buildEventListener(noclick) {
 		let player = this;
@@ -1031,7 +1037,7 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-				this.getEquips(type).reduce((num, card) => {
+				this.getVEquips(type).reduce((num, card) => {
 					let types = get.subtypes(card, false);
 					return num + get.numOf(types, type);
 				}, 0)
@@ -1063,7 +1069,7 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-				this.getEquips(type).reduce((num, card) => {
+				this.getVEquips(type).reduce((num, card) => {
 					let types = get.subtypes(card, false);
 					if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
 					return num;
@@ -1124,17 +1130,32 @@ export class Player extends HTMLDivElement {
 	 * @returns { Card[] }
 	 */
 	getEquips(subtype) {
+		const VEquips = this.getVEquips(subtype);
+		return VEquips.reduce((cards, vcard) => {
+			//@ts-ignore
+			cards.addArray(vcard.cards || []);
+			return cards;
+		}, [])
+	}
+	/**
+	 * 获取一名角色装备区内某种类型的虚拟牌
+	 *
+	 * 参数可以为数字/区域字符串/实体牌/虚拟牌/牌名
+	 * @param { number | string | Card | VCard } subtype
+	 * @returns { VCard[] }
+	 */
+	getVEquips(subtype) {
 		switch (typeof subtype) {
 			case "string":
 				if (subtype == "equip3_4") {
 					const cards = [];
-					cards.addArray(this.getEquips(3));
-					cards.addArray(this.getEquips(4));
+					cards.addArray(this.getVEquips(3));
+					cards.addArray(this.getVEquips(4));
 					return cards;
 				} else if (subtype.startsWith("equip") && parseInt(subtype.slice(5)) > 0) {
 					break;
 				} else if (lib.card[subtype]) {
-					return this.getCards("e", card => card.name == subtype);
+					return this.getVCards("e", card => card.name == subtype);
 				} else return [];
 			case "number":
 				subtype = "equip" + subtype;
@@ -1146,7 +1167,7 @@ export class Player extends HTMLDivElement {
 				return [];
 		}
 		if (!subtype) return [];
-		return this.getCards("e", card => {
+		return this.getVCards("e", card => {
 			// @ts-ignore
 			return get.subtypes(card, false).includes(subtype);
 		});
@@ -1367,7 +1388,7 @@ export class Player extends HTMLDivElement {
 		for (let range of rangex) {
 			let num = this.countEquipableSlot(range);
 			let num2 = get.numOf(rangex, range);
-			if (!replace) num -= this.getEquips(range).filter(card => lib.filter.canBeReplaced(card, this)).length;
+			if (!replace) num -= this.getVEquips(range).filter(card => lib.filter.canBeReplaced(card, this)).length;
 			if (num < num2) return false;
 		}
 		return true;
@@ -1389,7 +1410,7 @@ export class Player extends HTMLDivElement {
 	 * @deprecated
 	 */
 	isEmpty(num) {
-		return this.countEnabledSlot(num) > this.getEquips(num).length;
+		return this.countEnabledSlot(num) > this.getVEquips(num).length;
 	}
 	//以下函数将被废弃
 	/**
@@ -3728,17 +3749,14 @@ export class Player extends HTMLDivElement {
 	 * @param { string | Record<string, any> | ((card: Card) => boolean) } [arg2]
 	 * @returns { Iterable<Card> }
 	 */
-	*iterableGetCards(arg1, arg2) {
+	*iterableGetVCards(arg1, arg2) {
 		if (typeof arg1 != "string") {
 			arg1 = "h";
 		}
 		const getCardName = card => {
-			if (card.parentNode == this.node.judges) {
-				if (card.viewAs) return card.viewAs;
-			}
-			return get.name(card);
+			return get.name(card, false);
 		};
-		let filter;
+		let filter = card => true;
 		if (arg2) {
 			if (typeof arg2 == "string") {
 				filter = card => getCardName(card) == arg2;
@@ -3764,8 +3782,78 @@ export class Player extends HTMLDivElement {
 			} else if (typeof arg2 == "function") {
 				filter = arg2;
 			}
-		} else {
-			filter = card => true;
+		}
+		for (let i = 0; i < arg1.length; i++) {
+			if (arg1[i] == "h") {
+				for (let card of this.vcardsMap?.handcards ?? []) {
+					if (filter(card)) {
+						yield card;
+					}
+				}
+			} else if (arg1[i] == "e") {
+				for (let card of this.vcardsMap?.equips ?? []) {
+					if (filter(card)) {
+						yield card;
+					}
+				}
+			} else if (arg1[i] == "j") {
+				for (let card of this.vcardsMap?.judges ?? []) {
+					if (filter(card)) {
+						yield card;
+					}
+				}
+			}
+		}
+	}
+	/**
+	 * @param { string } [arg1='h']
+	 * @param { string | Record<string, any> | ((card: Card) => boolean) } [arg2]
+	 * @returns { Card[] }
+	 */
+	getVCards(arg1, arg2) {
+		return Array.from(this.iterableGetVCards(arg1, arg2));
+	}
+	/**
+	 * @param { string } [arg1='h']
+	 * @param { string | Record<string, any> | ((card: Card) => boolean) } [arg2]
+	 * @returns { Iterable<Card> }
+	 */
+	*iterableGetCards(arg1, arg2) {
+		if (typeof arg1 != "string") {
+			arg1 = "h";
+		}
+		const getCardName = card => {
+			if (card.parentNode == this.node.judges) {
+				if (card.viewAs) return card.viewAs;
+			}
+			return get.name(card);
+		};
+		let filter = card => true;
+		if (arg2) {
+			if (typeof arg2 == "string") {
+				filter = card => getCardName(card) == arg2;
+			} else if (Array.isArray(arg2)) {
+				filter = card => arg2.includes(getCardName(card));
+			} else if (typeof arg2 == "object") {
+				filter = card => {
+					for (let j in arg2) {
+						var value;
+						if (j == "type" || j == "subtype" || j == "color" || j == "suit" || j == "number") {
+							value = get[j](card);
+						} else if (j == "name") {
+							value = getCardName(card);
+						} else {
+							value = card[j];
+						}
+						if ((typeof arg2[j] == "string" && value != arg2[j]) || (Array.isArray(arg2[j]) && !arg2[j].includes(value))) {
+							return false;
+						}
+					}
+					return true;
+				};
+			} else if (typeof arg2 == "function") {
+				filter = arg2;
+			}
 		}
 		for (let i = 0; i < arg1.length; i++) {
 			if (arg1[i] == "h") {
@@ -3923,19 +4011,13 @@ export class Player extends HTMLDivElement {
 		var es = [];
 		var i, j;
 		if (arg3 !== false) {
-			for (i = 0; i < this.node.equips.childElementCount; i++) {
-				if (!this.node.equips.childNodes[i].classList.contains("removing")) {
-					var equipskills = get.info(this.node.equips.childNodes[i], false).skills;
-					if (equipskills) {
-						es.addArray(equipskills);
-					}
-				}
-			}
+			const VEquips = this.getVCards("e");
+			es.addArray(get.skillsFromEquips(VEquips));
 			if (arg2 == "e") {
 				return es;
 			}
 		}
-		for (var i in this.additionalSkills) {
+		for (let i in this.additionalSkills) {
 			if (Array.isArray(this.additionalSkills[i]) && (arg2 || i.indexOf("hidden:") !== 0)) {
 				for (j = 0; j < this.additionalSkills[i].length; j++) {
 					if (this.additionalSkills[i][j]) {
@@ -3946,13 +4028,13 @@ export class Player extends HTMLDivElement {
 				skills.add(this.additionalSkills[i]);
 			}
 		}
-		for (var i in this.tempSkills) {
+		for (let i in this.tempSkills) {
 			skills.add(i);
 		}
 		if (arg2) skills.addArray(this.hiddenSkills);
 		if (arg2 === false || arg2 == "invisible") skills.addArray(this.invisibleSkills);
 		if (arg3 !== false) skills.addArray(es);
-		for (var i in this.forbiddenSkills) {
+		for (let i in this.forbiddenSkills) {
 			skills.remove(i);
 		}
 		if (arg4 !== false) {
@@ -6506,14 +6588,25 @@ export class Player extends HTMLDivElement {
 	}
 	equip(card, draw) {
 		var next = game.createEvent("equip");
-		next.card = card;
+		//next.card = card;
 		next.player = this;
+		next.setContent(lib.element.content.equip);
+		//if (get.is.object(next.card) && next.card.cards) next.card = next.card.cards[0];
+		//next.cards = [next.card];
+		let itemtype = get.itemtype(card);
+		if (itemtype === "card") {
+			next.cards = [card];
+		}
+		else if (itemtype === "cards"){
+			next.cards = card;
+		}
+		else {
+			next.card = card;
+			if (card?.cards) next.cards = card.cards;
+		}
 		if (draw) {
 			next.draw = true;
 		}
-		next.setContent(lib.element.content.equip);
-		if (get.is.object(next.card) && next.card.cards) next.card = next.card.cards[0];
-		next.cards = [next.card];
 		next.getd = function (player, key, position) {
 			if (!position) position = ui.discardPile;
 			if (!key) key = "cards";
@@ -8134,10 +8227,26 @@ export class Player extends HTMLDivElement {
 		_status.event.clearStepCache();
 		return this;
 	}
+	removeVEquip(VCard) {
+		game.broadcast((VCard, player) => {
+			const cards = player.vcardsMap?.equips;
+			if (cards && cards.includes(VCard)){
+				cards.remove(VCard);
+			}
+		}, VCard, this)
+		const cards = this.vcardsMap?.equips;
+		if (cards && cards.includes(VCard)){
+			this.removeEquipTrigger(VCard);
+			cards.remove(VCard);
+		}
+	}
 	removeEquipTrigger(card) {
 		if (card) {
-			var info = get.info(card);
+			var info = get.info(card, false);
 			var skills = this.getSkills(null, false);
+			const VEquips = this.getVCards("e");
+			VEquips.remove(card);
+			skills.addArray(get.skillsFromEquips(VEquips));
 			if (info.skills) {
 				for (var j = 0; j < info.skills.length; j++) {
 					if (skills.includes(info.skills[j])) continue;
@@ -10710,6 +10819,59 @@ export class Player extends HTMLDivElement {
 					if (_status.discarded) {
 						_status.discarded.remove(card);
 					}
+				}
+			}
+		}
+	}
+	$addEquip(card, cards){
+		const player = this;
+		game.broadcast((player, card, cards) => {
+			player.$addEquip(player, card, cards);
+		}, player, card, cards);
+		player.vcardsMap?.equips.push(card);
+		player.vcardsMap?.equips.sort((a, b) => {
+			return get.equipNum(a) - get.equipNum(b);
+		});
+		if (cards.length) {
+			const beforeCards = [];
+			this.vcardsMap?.equips.some(card2 => {
+				if (card2 === card) return true;
+				beforeCards.addArray(card2.cards ?? []);
+			});
+			let equipped = false;
+			for (let i = 0; i < player.node.equips.childNodes.length; i++) {
+				if (beforeCards.length === 0){
+					equipped = true;
+					cards.forEach(card => {
+						card.fix();
+						card.style.transform = "";
+						card.classList.remove("drawinghidden");
+						delete card._transform;
+						player.node.equips.insertBefore(card, player.node.equips.childNodes[i]);
+					});
+					break;
+				}
+				else {
+					beforeCards.remove(player.node.equips.childNodes[i]);
+				}
+			}
+			if (equipped === false) {
+				cards.reverse();
+				cards.forEach(card => {
+					card.fix();
+					card.style.transform = "";
+					card.classList.remove("drawinghidden");
+					delete card._transform;
+					player.node.equips.appendChild(card);
+				});
+				if (_status.discarded) {
+					_status.discarded.removeArray(cards);
+				}
+			}
+			var info = get.info(card, false);
+			if (info.skills) {
+				for (var i = 0; i < info.skills.length; i++) {
+					player.addSkillTrigger(info.skills[i]);
 				}
 			}
 		}

@@ -18,7 +18,18 @@ export class Get extends GetCompatible {
 	is = new Is();
 	promises = new Promises();
 	Audio = Audio;
-
+	/**
+	 * 获取装备牌对应的技能
+	 * @param { Card[]|VCard[] } cards
+	 * @returns { any[] }
+	 */
+	skillsFromEquips(cards){
+		return cards.reduce((skills, card) => {
+			const info = get.info(card, false);
+			if (info.skills) skills.addArray(info.skills);
+			return skills;
+		}, [])
+	}
 	/**
 	 * 将一个传统格式的character转化为Character对象格式
 	 * @param { Array|Object|import("../library/element/character").Character } data
@@ -193,7 +204,10 @@ export class Get extends GetCompatible {
 	 */
 	subtypes(obj, player) {
 		if (typeof obj == "string") obj = { name: obj };
-		if (typeof obj != "object") return;
+		if (typeof obj != "object" || obj === null) return [];
+		if (Array.isArray(obj.subtypes)) {
+			return get.copy(obj.subtypes);
+		}
 		var name = get.name(obj, player);
 		if (!lib.card[name]) return [];
 		if (lib.card[name].subtypes) {
