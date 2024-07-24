@@ -4550,7 +4550,7 @@ const skills = {
 						if (typeof numz == "number") num2 += numz;
 					});
 					if (num > num2) {
-						var hs = target.getCards("he", function (card) {
+						var hs = target.getCards("h", function (card) {
 							return lib.filter.cardDiscardable(card, target, "yijiao_effect");
 						});
 						if (hs.length) target.discard(hs.randomGets(get.rand(1, 3)));

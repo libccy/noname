@@ -5949,7 +5949,7 @@ const skills = {
 				.forResult();
 		},
 		async content(event, trigger, player) {
-			await trigger.cancel();
+			trigger.cancel();
 			player.skip("phaseDraw");
 			await player.useCard({ name: "sha", isCard: true }, event.targets[0], false);
 		},
@@ -5986,7 +5986,7 @@ const skills = {
 				.forResult();
 		},
 		async content(event, trigger, player) {
-			await trigger.cancel();
+			trigger.cancel();
 			await player.discard(event.cards[0]);
 			await player.useCard({ name: "sha", isCard: true }, event.targets[0]);
 		},
@@ -6008,7 +6008,7 @@ const skills = {
 				.forResult();
 		},
 		async content(event, trigger, player) {
-			await trigger.cancel();
+			trigger.cancel();
 			await player.turnOver();
 			await player.useCard({ name: "sha", isCard: true }, event.targets[0], false);
 		},

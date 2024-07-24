@@ -964,7 +964,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const { giver, cards } = event.cost_data;
 			await giver.give(cards, trigger.source);
-			await trigger.cancel();
+			trigger.cancel();
 		},
 		chooseTarget(target, source, current, eventId, eventNum) {
 			const goon = (() => {
