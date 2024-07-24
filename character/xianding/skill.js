@@ -33,10 +33,12 @@ const skills = {
 			tag: {
 				charlotte: true,
 				mod: {
+					/*
 					targetInRange(card, player, target) {
 						if (!card.cards) return;
 						if (card.cards.some(i => i.hasGaintag("dcjingyin_tag"))) return true;
 					},
+					*/
 					cardUsable(card, player, target) {
 						if (!card.cards) return;
 						if (card.cards.some(i => i.hasGaintag("dcjingyin_tag"))) return Infinity;
