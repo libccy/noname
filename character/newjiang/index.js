@@ -21,7 +21,7 @@ game.import("character", function () {
 			newjiang: characterSort,
 		},
 		characterSubstitute: {
-			sb_guojia: [],
+			yj_sb_guojia: [],
 		},
 		characterFilter: { ...characterFilters },
 		characterTitle: {},
