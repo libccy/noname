@@ -82,7 +82,7 @@ const skills = {
 										return lib.filter.cardDiscardable(card, target);
 									})
 									.reduce((sum, card) => {
-										return sum + get.value(card, t);
+										return sum + get.value(card, target);
 									}, 0) <=
 									get.effect(target, { name: "draw" }, player, player) * 4
 							)
@@ -148,7 +148,7 @@ const skills = {
 													return lib.filter.cardDiscardable(card, player);
 												})
 												.reduce((sum, card) => {
-													return sum + get.value(card, t);
+													return sum + get.value(card, player);
 												}, 0)
 										);
 								}
@@ -181,7 +181,7 @@ const skills = {
 											return lib.filter.cardDiscardable(card, target);
 										})
 										.reduce((sum, card) => {
-											return sum + get.value(card, t);
+											return sum + get.value(card, target);
 										}, 0) <=
 										get.effect(target, { name: "draw" }, player, player) * 4
 								)
