@@ -1,5 +1,4 @@
 const characters = {
-	mp_wangrong: ["male", "wei", 3, ["mpjianlin", "mpsixiao"]],
 	matie: ["male", "qun", 4, ["dczhuiwang", "dcquxian"]],
 	hansong: ["male", "qun", 3, ["dcyinbi", "dcshuaiyan"]],
 	chezhou: ["male", "wei", 4, ["dcshefu", "dcpigua"]],
@@ -12,7 +11,6 @@ const characters = {
 	star_yuanshu: ["male", "qun", 4, ["starcanxi", "starpizhi", "starzhonggu"], ["zhu"]],
 	star_caoren: ["male", "wei", 4, ["starsujun", "starlifeng"]],
 	star_sunshangxiang: ["female", "wu", 3, ["starsaying", "starjiaohao"]],
-	mp_liuling: ["male", "jin", 3, ["mpjiusong", "mpmaotao", "mpbishi"], ["doublegroup:wei:qun:jin"]],
 	dc_jikang: ["male", "wei", 3, ["new_qingxian", "dcjuexiang"]],
 	dc_jsp_guanyu: ["male", "wei", 4, ["new_rewusheng", "dcdanji"]],
 	dc_mengda: ["male", "wei", 4, ["dclibang", "dcwujie"]],

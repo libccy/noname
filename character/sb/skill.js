@@ -245,7 +245,7 @@ const skills = {
 				result = await player
 					.chooseControl(numbers, "cancel2")
 					.set("prompt", get.prompt("sbyicong"))
-					.set("prompt2", "你可以消耗任意点蓄力值并选择一项：⒈你于本轮内至其他角色的距离-X，令系统选择牌堆中的一张【杀】；⒉其他角色于本轮内至你的距离+X，令系统选择牌堆中的一张【闪】（X为你消耗的蓄力值）。然后若你的“扈”数小于4，你将系统选择的牌置于武将牌上，称为“扈”。")
+					.set("prompt2", "你可以消耗任意点蓄力值并选择一项：⒈你于本轮内至其他角色的距离-1，令系统选择牌堆中的X张【杀】；⒉其他角色于本轮内至你的距离+1，令系统选择牌堆中的X张【闪】（X为你消耗的蓄力值）。然后若你的“扈”数小于4，你将系统选择的牌置于武将牌上，称为“扈”。")
 					.set("ai", () => {
 						return get.event("choice");
 					})
@@ -275,19 +275,35 @@ const skills = {
 					.chooseControl(["选项一", "选项二", "返回"])
 					.set("prompt", "义从：请选择一项")
 					.set("choiceList", [
-						`你于本轮内至其他角色的距离-${num}${
+						`你于本轮内至其他角色的距离-1${
 							player.countCards("s", card => {
 								return card.hasGaintag("sbyicong");
 							}) >= 4
 								? ""
-								: "，将牌堆中的一张【杀】置于你的武将牌上，称为“扈”"
+								: `，将牌堆中的${get.cnNumber(
+										Math.min(
+											num,
+											4 -
+												player.countCards("s", card => {
+													return card.hasGaintag("sbyicong");
+												})
+										)
+								  )}张【杀】置于你的武将牌上，称为“扈”`
 						}`,
-						`其他角色于本轮内至你的距离+${num}${
+						`其他角色于本轮内至你的距离+1${
 							player.countCards("s", card => {
 								return card.hasGaintag("sbyicong");
 							}) >= 4
 								? ""
-								: "，将牌堆中的一张【闪】置于你的武将牌上，称为“扈”"
+								: `，将牌堆中的${get.cnNumber(
+										Math.min(
+											num,
+											4 -
+												player.countCards("s", card => {
+													return card.hasGaintag("sbyicong");
+												})
+										)
+								  )}张【闪】置于你的武将牌上，称为“扈”`
 						}`,
 					])
 					.set("ai", () => {
@@ -317,15 +333,19 @@ const skills = {
 			const skill = choice === 0 ? "sbyicong_to" : "sbyicong_from";
 			player.removeMark("charge", num);
 			player.addTempSkill(skill, "roundStart");
-			player.addMark(skill, num, false);
-			if (player.countCards("s", card => card.hasGaintag("sbyicong")) < 4) {
+			player.addMark(skill, 1, false);
+			let cards = [];
+			while (cards.length < num && cards.length + player.countCards("s", card => card.hasGaintag("sbyicong")) < 4) {
 				const name = choice === 0 ? "sha" : "shan";
-				const card = get.cardPile2(name);
-				if (card) {
-					game.log(player, "将", card, "置于了武将牌上");
-					await player.loseToSpecial([card], "sbyicong");
-					player.markSkill("sbyicong");
-				}
+				const card = get.cardPile2(card => card.name == name && !cards.includes(card));
+				if (card) cards.push(card);
+				else break;
+			}
+			if (cards.length) {
+				player.$gain2(cards, false);
+				game.log(player, "将", cards, "置于了武将牌上");
+				await player.loseToSpecial(cards, "sbyicong");
+				player.markSkill("sbyicong");
 			}
 		},
 		marktext: "扈",
@@ -410,7 +430,7 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			const list = ["蓄力", "cancel2"];
-			const choiceList = [`弃置${get.translation(trigger.player)}区域里的一张牌，你摸一张牌`, `获得2点蓄力值`];
+			const choiceList = [`弃置${get.translation(trigger.player)}区域里的一张牌，你摸两张牌`, `获得4点蓄力值`];
 			if (trigger.player.isIn() && trigger.player.countDiscardableCards(player, "hej")) {
 				list.unshift("弃牌");
 			} else {
@@ -447,9 +467,9 @@ const skills = {
 			if (control === "弃牌") {
 				player.line(trigger.player);
 				await player.discardPlayerCard(trigger.player, "hej", true);
-				await player.draw();
+				await player.draw(2);
 			} else {
-				const num = Math.min(2, 4 - player.countMark("charge"));
+				const num = 4 - player.countMark("charge");
 				if (num > 0) player.addMark("charge", num);
 			}
 		},
