@@ -1791,7 +1791,9 @@ const skills = {
 								}).length,
 								targets = game.players.slice().concat(game.dead.slice());
 							for (const target of targets) {
-								num += target.actionHistory[i].useCard.filter(evt => {
+								const historyx = target.actionHistory[target.actionHistory.length - (player.actionHistory.length - i)];
+								if (!historyx) continue;
+								num += historyx.useCard.filter(evt => {
 									return evt.card.name == "juedou" && evt.targets && evt.targets.includes(player);
 								}).length;
 							}
