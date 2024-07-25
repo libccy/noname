@@ -10911,8 +10911,6 @@ export class Player extends HTMLDivElement {
 		//game.addVideo("addVirtualJudge", ???);
 	}
 	$addVirtualJudge(VCard, cards) {
-		console.log("card:", VCard);
-		console.log("cards:", cards);
 		const player = this;
 		const isViewAsCard = (cards.length !== 1 || cards[0].name !== VCard.name), info = get.info(VCard, false);
 		cards.forEach(card => {
