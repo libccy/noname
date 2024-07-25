@@ -11855,7 +11855,11 @@ export class Library {
 							}
 							return 1;
 						},
-						ai2: get.effect_use,
+						ai2: function (target) {
+							let card = ui.selected.cards[0], effect_use = get.effect_use(target, card, player, get.event().player);
+							if (effect_use <= 0) return effect_use;
+							return get.effect(target, card, player, get.event().player);
+						},
 						type: "dying",
 						targetRequired: true,
 						dying: event.dying,
