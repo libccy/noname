@@ -469,7 +469,7 @@ const skills = {
 						player.countCards("h", card => {
 							return !current.hasUseTarget(card);
 						}) >=
-						2 + (player.getHp() > 1)
+							2 + (player.getHp() > 1)
 					);
 				})
 			)
@@ -550,6 +550,12 @@ const skills = {
 					await current.damage("fire");
 				}
 			} else {
+				const numbers = cards
+						.map(card => get.number(card, player))
+						.toUniqued()
+						.sort((a, b) => a - b),
+					min = numbers[0],
+					max = numbers.at(-1);
 				const [card] = links;
 				cards.remove(card);
 				const cardx = get.autoViewAs(
@@ -594,7 +600,7 @@ const skills = {
 					target.addSkill("olsbhongtu_limit");
 					if (!target.storage.olsbhongtu_limit) target.storage.olsbhongtu_limit = [0, 0];
 					target.storage.olsbhongtu_limit[0] += 2;
-				} else {
+				} else if (num != min && num != max) {
 					skill = "qianxi";
 				}
 				if (skill) {
@@ -638,14 +644,14 @@ const skills = {
 					},
 				},
 				trigger: {
-					player: "phaseEnd"
+					player: "phaseEnd",
 				},
 				silent: true,
 				lastDo: true,
 				content() {
 					player.storage.olsbhongtu_limit = [player.storage.olsbhongtu_limit[1], 0];
 					if (!player.storage.olsbhongtu_limit[0]) player.removeSkill("olsbhongtu_limit");
-				}
+				},
 			},
 		},
 	},

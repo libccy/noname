@@ -13566,8 +13566,8 @@ const skills = {
 			event.result = await player
 				.chooseCard(get.prompt2(event.name.slice(0, -5)), "h", [1, player.countCards("h")])
 				.set("ai", card => {
-					if (!game.hasPlayer(target => get.attitude(player, target) > 0)) return 0;
-					return 1 / (get.value(card) || 0.5);
+					if (!game.hasPlayer(target => player != target && get.attitude(player, target) > 0)) return 0;
+					return 4 - get.value(card);
 				})
 				.forResult();
 		},
