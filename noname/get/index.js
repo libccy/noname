@@ -3936,15 +3936,18 @@ export class Get extends GetCompatible {
 			if (node.link && node.link.name && lib.card[node.link.name]) {
 				name = node.link.name;
 			}
-			if (get.position(node) == "j" && node.viewAs && node.viewAs != name) {
+			var cardPosition = get.position(node);
+			if ((cardPosition === "e" || cardPosition === "j") && node.viewAs && node.viewAs != name) {
 				uiintro.add(get.translation(node.viewAs));
-				var cardInfo = lib.card[node.viewAs],
-					showCardIntro = true;
+				var cardInfo = lib.card[node.viewAs], showCardIntro = true;
+				var cardOwner = get.owner(node);
 				if (cardInfo.blankCard) {
-					var cardOwner = get.owner(node);
 					if (cardOwner && !cardOwner.isUnderControl(true)) showCardIntro = false;
 				}
-				if (showCardIntro) uiintro.add('<div class="text center">（' + get.translation(get.translation(node)) + "）</div>");
+				if(cardOwner){
+					var sourceVCard = cardOwner.getVCards(cardPosition).find(card => card.cards?.includes(node));
+					if (showCardIntro && sourceVCard) uiintro.add('<div class="text center">（' + get.translation(get.translation(sourceVCard.cards)) + "）</div>");
+				}
 				// uiintro.add(get.translation(node.viewAs)+'<br><div class="text center" style="padding-top:5px;">（'+get.translation(node)+'）</div>');
 				uiintro.nosub = true;
 				name = node.viewAs;

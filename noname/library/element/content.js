@@ -8423,6 +8423,7 @@ export const Content = {
 		game.delayx();
 		if (event.updatePile) game.updateRoundNumber();
 	},
+	//TODO：将真实牌-虚拟牌的映射Map存储在Lose事件中，并处理多牌转换中仅一张牌被拆的问题
 	lose: function () {
 		"step 0";
 		var evt = event.getParent();
