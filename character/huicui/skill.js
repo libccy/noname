@@ -345,40 +345,26 @@ const skills = {
 	},
 	dchuoxin: {
 		audio: 2,
-		trigger: { player: "useCardToPlayered" },
+		trigger: { player: "useCard" },
 		filter(event, player) {
-			if (
-				!player.hasHistory("lose", evt => {
-					if (evt.getParent() != event.getParent()) return false;
-					return event.cards.some(card => (evt.hs || []).includes(card));
-				})
-			)
-				return false;
-			return event.isFirstTarget && event.targets.some(current => current != player && current.countCards("h"));
+			return get.type(event.card) !== "equip" && game.hasPlayer(current => current.countCards("h"));
 		},
 		locked: true,
 		async cost(event, trigger, player) {
-			if (trigger.targets.length == 1) {
-				event.result = {
-					bool: true,
-					targets: trigger.targets,
-				};
-			} else {
-				event.result = await player
-					.chooseTarget(
-						get.prompt2("dchuoxin"),
-						(card, player, target) => {
-							return target != player && target.countCards("h") && get.event("targets").includes(target);
-						},
-						true
-					)
-					.set("ai", target => {
-						const player = get.player();
-						return -get.attitude(player, target);
-					})
-					.set("targets", trigger.targets)
-					.forResult();
-			}
+			event.result = await player
+				.chooseTarget(
+					"请选择【惑心】的目标",
+					lib.translate.dchuoxin_info,
+					(card, player, target) => {
+						return target.countCards("h");
+					},
+					true
+				)
+				.set("ai", target => {
+					const player = get.player();
+					return -get.attitude(player, target);
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0];
@@ -4845,7 +4831,7 @@ const skills = {
 		check(event, player) {
 			const target = event.targets[0];
 			if (target.hasMark("dcjizhong")) {
-				return get.effect(target, { name: "shunshou_copy" }, event, player) > 0;
+				return get.effect(target, { name: "shunshou_copy" }, player, player) > 0;
 			} else {
 				const card = { name: event.card.name, nature: event.card.nature, isCard: true };
 				let eff = 0;

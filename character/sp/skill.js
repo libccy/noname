@@ -7576,6 +7576,7 @@ const skills = {
 									return lib.filter.filterCard.apply(this, arguments);
 								},
 								prompt: "是否使用一张展示牌，然后重铸所有手牌？",
+								addCount: false,
 							});
 						} else if (event.index == 2) {
 							target.chooseToUse({
@@ -7584,6 +7585,7 @@ const skills = {
 									return lib.filter.filterCard.apply(this, arguments);
 								},
 								prompt: "是否使用一张手牌，然后重铸展示牌？",
+								addCount: false,
 							});
 							event.goto(4);
 						} else event.goto(6);

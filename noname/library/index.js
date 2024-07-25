@@ -11855,7 +11855,11 @@ export class Library {
 							}
 							return 1;
 						},
-						ai2: get.effect_use,
+						ai2: function (target) {
+							let effect_use = get.effect_use(target);
+							if (effect_use <= 0) return effect_use;
+							return get.effect(target);
+						},
 						type: "dying",
 						targetRequired: true,
 						dying: event.dying,

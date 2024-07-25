@@ -373,7 +373,7 @@ const skills = {
 				})
 			)
 				return false;
-			return (event.targets || []).some(target => target !== player && target.isIn());
+			return event.isFirstTarget && (event.targets || []).some(target => target !== player && target.isIn());
 		},
 		locked: false,
 		async cost(event, trigger, player) {

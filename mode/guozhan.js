@@ -13604,8 +13604,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								if (get.attitude(player, target) > 0) return 11 - get.value(card);
 								return 7 - get.value(card);
 							},
-							ai2: function (card, player, target) {
-								var att = get.attitude(player, target);
+							ai2: function (target) {
+								var att = get.attitude(get.event().player, target);
 								if (att < 0) return -att;
 								return 1;
 							},
