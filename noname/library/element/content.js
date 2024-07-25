@@ -8651,9 +8651,10 @@ export const Content = {
 				if (VEquip) {
 					player.removeVEquip(VEquip);
 					//player.removeEquipTrigger(cards[num]);
-					var info = get.info(VEquip);
+					var info = get.info(VEquip, false);
 					if (info.onLose && (!info.filterLose || info.filterLose(VEquip, player))) {
 						event.goto(3);
+						event.currentVEquip = VEquip;
 						return;
 					}
 				}
@@ -8667,25 +8668,28 @@ export const Content = {
 			event.goto(4);
 		}
 		"step 3";
-		var info = get.info(cards[num]);
+		const VEquip = event.currentVEquip;
+		var info = get.info(VEquip, false);
 		if (info.loseDelay != false && (player.isAlive() || info.forceDie)) {
-			player.popup(cards[num].name);
+			player.popup(VEquip.name);
 			game.delayx();
 		}
 		if (Array.isArray(info.onLose)) {
 			for (var i = 0; i < info.onLose.length; i++) {
-				var next = game.createEvent("lose_" + cards[num].name);
+				var next = game.createEvent("lose_" + VEquip.name);
 				next.setContent(info.onLose[i]);
 				if (info.forceDie) next.forceDie = true;
 				next.player = player;
-				next.card = cards[num];
+				next.card = VEquip;
+				next.cards = VEquip.cards;
 			}
 		} else {
-			var next = game.createEvent("lose_" + cards[num].name);
+			var next = game.createEvent("lose_" + VEquip.name);
 			next.setContent(info.onLose);
 			next.player = player;
 			if (info.forceDie) next.forceDie = true;
-			next.card = cards[num];
+			next.card = VEquip;
+			next.cards = VEquip.cards;
 		}
 		event.num++;
 		event.goto(2);

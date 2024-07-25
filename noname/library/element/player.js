@@ -10896,6 +10896,29 @@ export class Player extends HTMLDivElement {
 		const player = this;
 		if (cards.length) {
 			const beforeCards = [];
+			const isViewAsCard = (cards.length !== 1 || cards[0].name !== card.name), info = get.info(card, false);
+			let cardShownName = get.translation(card.name);
+			if (info.subtype === "equip3"){
+				cardShownName += "+";
+			}
+			else if (info.subtype === "equip3"){
+				cardShownName += "-";
+			}
+			cards.forEach(cardx => {
+				cardx.fix();
+				cardx.style.transform = "";
+				cardx.classList.remove("drawinghidden");
+				delete cardx._transform;
+				const suit = get.translation(cardx.suit), number = get.strNumber(cardx.number);
+				if (isViewAsCard) {
+					cardx.viewAs = card.name;
+					cardx.node.name2.innerHTML = `${suit}${number} [${cardShownName}]`;
+				}
+				else {
+					delete cardx.viewAs;
+					cardx.node.name2.innerHTML = `${suit}${number} ${cardShownName}`;
+				}
+			})
 			this.vcardsMap?.equips.some(card2 => {
 				if (card2 === card) return true;
 				beforeCards.addArray(card2.cards ?? []);
@@ -10905,10 +10928,6 @@ export class Player extends HTMLDivElement {
 				if (beforeCards.length === 0){
 					equipped = true;
 					cards.forEach(card => {
-						card.fix();
-						card.style.transform = "";
-						card.classList.remove("drawinghidden");
-						delete card._transform;
 						player.node.equips.insertBefore(card, player.node.equips.childNodes[i]);
 					});
 					break;
@@ -10920,10 +10939,6 @@ export class Player extends HTMLDivElement {
 			if (equipped === false) {
 				cards.reverse();
 				cards.forEach(card => {
-					card.fix();
-					card.style.transform = "";
-					card.classList.remove("drawinghidden");
-					delete card._transform;
 					player.node.equips.appendChild(card);
 				});
 				if (_status.discarded) {
