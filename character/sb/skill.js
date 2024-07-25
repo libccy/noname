@@ -702,24 +702,20 @@ const skills = {
 			const chosen = player
 				.getAllHistory("useSkill", evt => evt.skill === "sbganglie")
 				.map(evt => {
-					return evt.targets;
+					return evt.targets[0];
 				});
 			let targets = player
 				.getAllHistory("damage", evt => evt.source && evt.source.isIn())
 				.map(evt => evt.source)
 				.unique();
-			targets = [...targets, ...targets];
 			targets.removeArray(chosen);
 			event.set("sbganglie_enabledTargets", targets);
 		},
 		filterTarget(card, player, target) {
 			return get.event("sbganglie_enabledTargets").includes(target);
 		},
-		selectTarget: [1, Infinity],
-		multitarget: true,
-		multiline: true,
 		async content(event, trigger, player) {
-			for (const target of event.targets.sortBySeat()) await target.damage(2);
+			await event.targets[0].damage(2);
 		},
 		ai: {
 			order: 6,
@@ -3899,7 +3895,7 @@ const skills = {
 		ai: {
 			effect: {
 				player_use(card, player, target) {
-					if (player != target && target && target.group == "qun" && card.name != "tao") return [1, 0.1];
+					if (player != target && target && target.group == "qun" && player.hasZhuSkill("sbxueyi") && player.countSkill("sbxueyi") < 2) return [1, 0.6];
 				},
 			},
 		},

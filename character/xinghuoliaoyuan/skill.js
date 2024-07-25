@@ -1614,7 +1614,7 @@ const skills = {
 				if (player.countCards("j") && player.inRange(target)) return true;
 			},
 			aiOrder(player, card, num) {
-				if (get.type(card, "delay") && player.canUse(card, player) && player.canAddJudge(card)) return 15;
+				if (get.type(card, null, player) == "trick" && player.canUse(card, player) && player.canAddJudge(card)) return 15;
 			},
 		},
 		locked: false,
