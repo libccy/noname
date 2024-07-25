@@ -531,6 +531,7 @@ export const Content = {
 	},
 	//装备牌
 	equip: async function(event, trigger, player){
+		event.visible = true;
 		if (event.cards) {
 			const map = {};
 			for (const i of event.cards) {
@@ -550,7 +551,7 @@ export const Content = {
 				const owner = (_status.connectMode ? lib.playerOL : game.playerMap)[i];
 				const next = owner
 					.lose(map[i][0], ui.special)
-					.set("type", "gain")
+					.set("type", "equip")
 					.set("forceDie", true)
 					.set("getlx", false);
 				if (event.visible == true) {
@@ -607,6 +608,18 @@ export const Content = {
 			if (event.draw) {
 				player.$draw(card);
 				await game.delay(0, 300);
+			} else {
+				game.broadcastAll((player, card, cards) => {
+					const cardsCloned = cards.filter(card => {
+						return (cards[0].clone && (cards[0].clone.parentNode == player.parentNode || cards[0].clone.parentNode == ui.arena));
+					}) 
+					if (cardsCloned.length) {
+						cardsCloned.forEach(card => {
+							card.clone.moveDelete(player);
+						});
+						game.addVideo("gain2", player, get.cardsInfo(cardsCloned));
+					}
+				}, player, event.card, event.cards);
 			}
 			player.equiping = true;
 			let cardInfo = get.info(card, false);
@@ -2577,8 +2590,11 @@ export const Content = {
 		}
 	},
 	addJudgeCard: function () {
-		if (lib.filter.judge(card, player, target) && cards.length && get.position(cards[0], true) == "o")
+		if (!card?.cards.some(card => {
+			return get.position(card, true) !== "o";
+		})){
 			target.addJudge(card, cards);
+		}
 	},
 	equipCard: function () {
 		if (!card?.cards.some(card => {
@@ -3591,24 +3607,17 @@ export const Content = {
 	phaseJudge: function () {
 		"step 0";
 		game.log(player, "进入了判定阶段");
-		event.cards = player.getCards("j");
+		event.cards = player.getVCards("j");
 		if (!event.cards.length) event.finish();
 		"step 1";
 		if (cards.length) {
 			event.card = cards.shift();
-			var cardName = event.card.viewAs || event.card.name,
-				cardInfo = lib.card[cardName];
-			if (event.card.classList.contains("removing")) {
-				event.card.remove();
-				delete event.card;
-				event.redo();
-			} else if (event.card.classList.contains("feichu")) {
-				event.finish();
-				return;
-			} else if (cardInfo.noEffect || !player.getCards("j").includes(event.card)) {
+			var cardName = event.card.name, cardInfo = lib.card[cardName];
+			var currentCards = player.getCards("j");
+			if (cardInfo.noEffect || event.card.cards?.some(card => !currentCards.includes(card))) {
 				event.redo();
 			} else {
-				player.lose(event.card, "visible", ui.ordering);
+				if (event.card.cards?.length) player.lose(event.card.cards, "visible", ui.ordering);
 				player.$phaseJudge(event.card);
 				event.cancelled = false;
 				event.trigger("phaseJudge");
@@ -8647,7 +8656,7 @@ export const Content = {
 			if (event.es.includes(cards[num])) {
 				event.loseEquip = true;
 				const VEquip = player.getVCards("e").find(card => {
-					return card?.cards.includes(cards[num])
+					return card.cards?.includes(cards[num])
 				});
 				if (VEquip) {
 					player.removeVEquip(VEquip);
@@ -8658,6 +8667,14 @@ export const Content = {
 						event.currentVEquip = VEquip;
 						return;
 					}
+				}
+			}
+			else if(event.js.includes(cards[num])) {
+				const VJudge = player.getVCards("j").find(card => {
+					return card.cards?.includes(cards[num])
+				});
+				if (VJudge) {
+					player.removeVJudge(VJudge);
 				}
 			}
 			event.num++;
@@ -9263,7 +9280,107 @@ export const Content = {
 			source.classList.add("topcount");
 		}
 	},
-	addJudge: function () {
+	//暂时还是只能一次加一张牌，需要后续跟进处理
+	addJudge: async function (event, trigger, player) {
+		let card, cardName;
+		if (typeof event.card == "string") {
+			cardName = event.card;
+			card = get.autoViewAs({name: cardName}, event.cards);
+			event.card = card;
+		}
+		else {
+			cardName = event.card.name;
+			if (get.itemtype(event.card) === "card") {
+				event.cards = [event.card]
+				card = get.autoViewAs({name: cardName, isCard: true}, [event.card]);
+				event.card = card;
+			}
+			else if (!(event.card.cards?.length) && event.cards?.length){
+				card = get.autoViewAs({name: cardName, isCard: true}, event.cards);
+				event.card = card;
+			}
+			else {
+				event.cards = [];
+			}
+		}
+		card = event.card;
+		const cards = event.cards, cardInfo = lib.card[cardName], visible = (cardInfo && !cardInfo.blankCard);
+		event.visible = visible;
+		//失去牌的一长串
+		if (event.cards?.length) {
+			const map = {};
+			for (const i of event.cards) {
+				var owner = get.owner(i, "judge");
+				if (owner && (owner != player || get.position(i) != "e")) {
+					var id = owner.playerid;
+					if (!map[id]) map[id] = [[], [], []];
+					map[id][0].push(i);
+					var position = get.position(i);
+					if (position == "h") map[id][1].push(i);
+					else map[id][2].push(i);
+				} else if (!event.updatePile && get.position(i) == "c") event.updatePile = true;
+				if (event.visible) i.addKnower("everyone");
+			}
+			event.losing_map = map;
+			for (const i in map) {
+				const owner = (_status.connectMode ? lib.playerOL : game.playerMap)[i];
+				const next = owner
+					.lose(map[i][0], ui.special)
+					.set("type", "addJudge")
+					.set("forceDie", true)
+					.set("getlx", false);
+				if (event.visible == true) {
+					// @ts-ignore
+					next.visible = true;
+				}
+				await next;
+				event.relatedLose = next;
+			}
+			let canMoveOn = true;
+			event.cards.forEach(card => {
+				if (card.willBeDestroyed("judge", player, event)) {
+					card.selfDestroy(event);
+					canMoveOn = false;
+					return;
+				}
+				else if (canMoveOn) {
+					// @ts-ignore
+					if("hejx".includes(get.position(card, true))){
+						canMoveOn = false;
+						return;
+					}
+				}
+			});
+			if (!canMoveOn) return;
+		}
+		if (!cardInfo.effect && !cardInfo.noEffect) {
+			if(event.cards.length) await game.cardsDiscard(event.cards);
+			return;
+		}
+		game.broadcastAll((player, card, cards) => {
+			const cardsCloned = cards.filter(card => {
+				return (cards[0].clone && (cards[0].clone.parentNode == player.parentNode || cards[0].clone.parentNode == ui.arena));
+			}) 
+			if (cardsCloned.length) {
+				cardsCloned.forEach(card => {
+					card.clone.moveDelete(player);
+				});
+				game.addVideo("gain2", player, get.cardsInfo(cardsCloned));
+			}
+		}, player, event.card, event.cards);
+		player.addVirtualJudge(event.card, event.cards);
+		const isViewAsCard = (cards?.length !== 1 || cards[0].name !== card.name);
+		if (isViewAsCard && cards?.length) {
+			if (cardInfo.blankCard) {
+				game.log(player, '被扣置了<span class="yellowtext">' + get.translation(cardName) + "</span>");
+			} else {
+				game.log(player, '被贴上了<span class="yellowtext">' + get.translation(cardName) + "</span>（", cards, "）");
+			}
+		} else {
+			game.log(player, "被贴上了", card);
+		}
+	},
+	addJudge_old: function () {
 		"step 0";
 		const cardName = typeof card == "string" ? card : card.name,
 			cardInfo = lib.card[cardName];

@@ -8233,6 +8233,15 @@ export class Player extends HTMLDivElement {
 		_status.event.clearStepCache();
 		return this;
 	}
+	//TODO: 此处写法不完善，存在联机模式下VCard对象不相等的问题，需要后续处理
+	removeVJudge(VCard) {
+		game.broadcastAll((VCard, player) => {
+			const cards = player.vcardsMap?.judges;
+			if (cards && cards.includes(VCard)){
+				cards.remove(VCard);
+			}
+		}, VCard, this);
+	}
 	removeVEquip(VCard) {
 		game.broadcast((VCard, player) => {
 			const cards = player.vcardsMap?.equips;
@@ -10875,6 +10884,43 @@ export class Player extends HTMLDivElement {
 			}
 		}
 	}
+	//TODO: 给addVirtualJudge和addVirtualEquip添加Video录像相关的部分
+	addVirtualJudge(card, cards) {
+		const player = this;
+		game.broadcast((player, card, cards) => {
+			player.addVirtualJudge(player, card, cards);
+		}, player, card, cards);
+		player.vcardsMap?.judges.push(card);
+		if (_status.discarded) {
+			_status.discarded.removeArray(cards);
+		}
+		player.$addVirtualJudge(card, cards);
+		//game.addVideo("addVirtualJudge", ???);
+	}
+	$addVirtualJudge(VCard, cards) {
+		const player = this;
+		const isViewAsCard = (cards.length !== 1 || cards[0].name !== VCard.name), info = get.info(VCard, false);
+		cards.forEach(card => {
+			card.fix();
+			card.style.transform = "";
+			card.classList.remove("drawinghidden");
+			delete card._transform;
+			if (isViewAsCard) {
+				card.viewAs = VCard.name;
+				if (card.classList.contains("fullskin") || card.classList.contains("fullborder")) {
+					card.classList.add("fakejudge");
+					card.node.background.innerHTML =
+						lib.translate[card.viewAs + "_bg"] || get.translation(card.viewAs)[0];
+				}
+			} else {
+				delete card.viewAs;
+				card.classList.remove("fakejudge");
+			}
+			card.classList.add("drawinghidden");
+			player.node.judges.insertBefore(card, player.node.judges.firstChild);
+		});
+		ui.updatej(player);
+	}
 	addVirtualEquip(card, cards) {
 		const player = this;
 		game.broadcast((player, card, cards) => {
@@ -10891,6 +10937,7 @@ export class Player extends HTMLDivElement {
 				player.addSkillTrigger(info.skills[i]);
 			}
 		}
+		//game.addVideo("addVirtualJudge", ???);
 	}
 	$addVirutalEquip(card, cards) {
 		const player = this;
@@ -11515,19 +11562,38 @@ export class Player extends HTMLDivElement {
 	}
 	$phaseJudge(card) {
 		game.addVideo("phaseJudge", this, get.cardInfo(card));
-		var player = this;
-		var clone = player.$throw(card);
-		if (lib.config.low_performance && card && card.clone) {
-			var waitingForTransition = get.time();
-			_status.waitingForTransition = waitingForTransition;
-			card.clone.listenTransition(function () {
-				if (_status.waitingForTransition == waitingForTransition && _status.paused) {
-					game.resume();
-				}
-			});
-			game.pause();
-		} else {
-			game.delay();
+		const player = this;
+		if(card.cards?.length){
+			const cards = card.cards;
+			const clone = player.$throw(cards);
+			if (lib.config.low_performance && cards[0] && cards[0].clone) {
+				const waitingForTransition = get.time();
+				_status.waitingForTransition = waitingForTransition;
+				cards[0].clone.listenTransition(function () {
+					if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+						game.resume();
+					}
+				});
+				game.pause();
+			} else {
+				game.delay();
+			}
+		}
+		else {
+			const VCard = game.createCard(card.name, "虚拟", "");
+			const clone = player.$throw(VCard);
+			if (lib.config.low_performance && VCard && VCard.clone) {
+				const waitingForTransition = get.time();
+				_status.waitingForTransition = waitingForTransition;
+				VCard.clone.listenTransition(function () {
+					if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+						game.resume();
+					}
+				});
+				game.pause();
+			} else {
+				game.delay();
+			}
 		}
 	}
 }
