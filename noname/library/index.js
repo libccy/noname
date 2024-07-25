@@ -12951,8 +12951,10 @@ export class Library {
 
 						player.directgain(info.handcards);
 						lib.playerOL[i] = player;
-						for (var i = 0; i < info.equips.length; i++) {
-							player.$equip(info.equips[i]);
+						if(info.vcardsMap){
+							for (var i = 0; i < info.vcardsMap.equips.length; i++) {
+								player.addVirtualEquip(info.vcardsMap.equips[i]);
+							}
 						}
 						for (var i = 0; i < info.handcards.length; i++) {
 							info.handcards[i].addGaintag(info.gaintag[i]);

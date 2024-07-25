@@ -2129,11 +2129,15 @@ export class Player extends HTMLDivElement {
 		m = n;
 		m = game.checkMod(from, to, m, "attackFrom", from);
 		m = game.checkMod(from, to, m, "attackTo", to);
-		const equips1 = from.getCards("e", function (card) {
-				return !ui.selected.cards || !ui.selected.cards.includes(card);
+		const equips1 = from.getVCards("e", function (card) {
+				return !card.cards?.some(card => {
+					return ui.selected.cards?.includes(card);
+				});
 			}),
-			equips2 = to.getCards("e", function (card) {
-				return !ui.selected.cards || !ui.selected.cards.includes(card);
+			equips2 = to.getVCards("e", function (card) {
+				return !card.cards?.some(card => {
+					return ui.selected.cards?.includes(card);
+				});
 			});
 		for (let i = 0; i < equips1.length; i++) {
 			const info = get.info(equips1[i]).distance;
@@ -3212,6 +3216,7 @@ export class Player extends HTMLDivElement {
 			judges: this.getCards("j"),
 			specials: this.getCards("s"),
 			expansions: this.getCards("x"),
+			vcardsMap: this.vcardsMap,
 			expansion_gaintag: [],
 			disableJudge: this.isDisabledJudge(),
 			disabledSlots: this.disabledSlots,
@@ -5257,6 +5262,7 @@ export class Player extends HTMLDivElement {
 			return false;
 		}
 	}
+	//TODO: 给canMoveCard函数适配虚拟牌的移动
 	canMoveCard(withatt, nojudge) {
 		const player = this;
 		const args = Array.from(arguments).slice(2);
@@ -8212,14 +8218,14 @@ export class Player extends HTMLDivElement {
 	}
 	addEquipTrigger(card) {
 		if (card) {
-			var info = get.info(card);
+			var info = get.info(card, false);
 			if (info.skills) {
 				for (var j = 0; j < info.skills.length; j++) {
 					this.addSkillTrigger(info.skills[j]);
 				}
 			}
 		} else {
-			var es = this.getCards("e");
+			var es = this.getVCards("e");
 			for (var i = 0; i < es.length; i++) {
 				this.addEquipTrigger(es[i]);
 			}
@@ -8260,7 +8266,7 @@ export class Player extends HTMLDivElement {
 				next.card = card;
 			}
 		} else {
-			var es = this.getCards("e");
+			var es = this.getVCards("e");
 			for (var i = 0; i < es.length; i++) {
 				this.removeEquipTrigger(es[i]);
 			}
@@ -8838,8 +8844,10 @@ export class Player extends HTMLDivElement {
 		if (raw) {
 			range = game.checkMod(player, player, range, "globalFrom", player);
 			range = game.checkMod(player, player, range, "attackFrom", player);
-			const equips = player.getCards("e", function (card) {
-				return !ui.selected.cards || !ui.selected.cards.includes(card);
+			const equips = player.getVCards("e", function (card) {
+				return !card.cards?.some(card => {
+					return ui.selected.cards?.includes(card);
+				});
 			});
 			equips.forEach(card => {
 				const info = get.info(card, false).distance;
@@ -8866,8 +8874,10 @@ export class Player extends HTMLDivElement {
 	getEquipRange(cards) {
 		const player = this;
 		if (!cards)
-			cards = player.getCards("e", function (card) {
-				return !ui.selected.cards || !ui.selected.cards.includes(card);
+			cards = player.getVCards("e", function (card) {
+				return !card.cards?.some(card => {
+					return ui.selected.cards?.includes(card);
+				});
 			});
 		const range = cards.reduce((range, card) => {
 			let newRange = false;
@@ -8893,8 +8903,10 @@ export class Player extends HTMLDivElement {
 		var player = this;
 		var range = 0;
 		range = game.checkMod(player, player, range, "globalFrom", player);
-		var equips = player.getCards("e", function (card) {
-			return !ui.selected.cards || !ui.selected.cards.includes(card);
+		var equips = player.getVCards("e", function (card) {
+			return !card.cards?.some(card => {
+				return ui.selected.cards?.includes(card);
+			});
 		});
 		for (var i = 0; i < equips.length; i++) {
 			var info = get.info(equips[i]).distance;
@@ -8909,8 +8921,10 @@ export class Player extends HTMLDivElement {
 		var player = this;
 		var range = 0;
 		range = game.checkMod(player, player, range, "globalTo", player);
-		var equips = player.getCards("e", function (card) {
-			return !ui.selected.cards || !ui.selected.cards.includes(card);
+		var equips = player.getVCards("e", function (card) {
+			return !card.cards?.some(card => {
+				return ui.selected.cards?.includes(card);
+			});
 		});
 		for (var i = 0; i < equips.length; i++) {
 			var info = get.info(equips[i]).distance;
@@ -9844,6 +9858,34 @@ export class Player extends HTMLDivElement {
 			if (this.countCards(position, name)) return true;
 		}
 		return false;
+	}
+	getVEquip(name){
+		var es = this.getVCards("e");
+		if (typeof name == "object" && get.info(name)) {
+			name = get.info(name).subtype;
+			if (name) {
+				name = parseInt(name[5]);
+			}
+		} else if (typeof name == "string" && name.startsWith("equip") && name.length == 6) {
+			name = parseInt(name[5]);
+		}
+		if (!name) {
+			return null;
+		}
+		for (var i = 0; i < es.length; i++) {
+			if (typeof name === "number") {
+				if (get.info(es[i]).subtype === "equip" + name) {
+					return es[i];
+				}
+			} else {
+				if (es[i].name === name) return es[i];
+				var source = get.info(es[i]).source;
+				if (Array.isArray(source) && source.includes(name)) {
+					return es[i];
+				}
+			}
+		}
+		return null;
 	}
 	getEquip(name) {
 		var es = this.getCards("e");
@@ -10823,15 +10865,25 @@ export class Player extends HTMLDivElement {
 			}
 		}
 	}
-	$addEquip(card, cards){
+	addVirtualEquip(card, cards) {
 		const player = this;
 		game.broadcast((player, card, cards) => {
-			player.$addEquip(player, card, cards);
+			player.addVirtualEquip(player, card, cards);
 		}, player, card, cards);
 		player.vcardsMap?.equips.push(card);
 		player.vcardsMap?.equips.sort((a, b) => {
 			return get.equipNum(a) - get.equipNum(b);
 		});
+		player.$addVirutalEquip(card, cards)
+		var info = get.info(card, false);
+		if (info.skills) {
+			for (var i = 0; i < info.skills.length; i++) {
+				player.addSkillTrigger(info.skills[i]);
+			}
+		}
+	}
+	$addVirutalEquip(card, cards) {
+		const player = this;
 		if (cards.length) {
 			const beforeCards = [];
 			this.vcardsMap?.equips.some(card2 => {
@@ -10866,12 +10918,6 @@ export class Player extends HTMLDivElement {
 				});
 				if (_status.discarded) {
 					_status.discarded.removeArray(cards);
-				}
-			}
-			var info = get.info(card, false);
-			if (info.skills) {
-				for (var i = 0; i < info.skills.length; i++) {
-					player.addSkillTrigger(info.skills[i]);
 				}
 			}
 		}

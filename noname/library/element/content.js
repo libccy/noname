@@ -308,6 +308,7 @@ export const Content = {
 		event.recastingGainingEvents.push(...event.next.filter((value) => value.name != "arrangeTrigger"));
 	},
 	//装备栏相关
+	//TODO: 修正此处的牌数判定，处理多牌转换和零牌转换
 	disableEquip: function () {
 		"step 0";
 		event.cards = [];
@@ -442,6 +443,7 @@ export const Content = {
 		player.$syncExpand();
 	},
 	//选择顶装备要顶的牌
+	//TODO: 修正此处的牌数判定，处理多牌转换和零牌转换
 	replaceEquip: function () {
 		"step 0";
 		event.cards = [];
@@ -647,7 +649,7 @@ export const Content = {
 					game.playAudio("effect", type);
 				}
 			}, audioSubtype);
-			player.$addEquip(card, cards);
+			player.addVirtualEquip(card, cards);
 			//player.$equip(card);
 			game.addVideo("equip", player, get.cardInfo(card));
 			if (event.log != false) game.log(player, "装备了", card);
@@ -2225,6 +2227,7 @@ export const Content = {
 			}
 		}
 	},
+	//TODO: 给交换装备牌适配新写法
 	swapEquip: function () {
 		"step 0";
 		game.log(player, "和", target, "交换了装备区中的牌");
@@ -2379,6 +2382,7 @@ export const Content = {
 			player.storage[current].maxHp = player.maxHp;
 			player.storage[current].hujia = player.hujia;
 			player.storage[current].hs = player.getCards("h");
+			//TODO: 修正随从相关内容的虚拟牌处理
 			player.storage[current].es = player.getCards("e");
 			player.lose(player.getCards("he"), ui.special)._triggered = null;
 
@@ -2406,6 +2410,7 @@ export const Content = {
 				player.storage[current].maxHp = player.maxHp;
 				player.storage[current].hujia = player.hujia;
 				player.storage[current].hs = player.getCards("h");
+				//TODO: 修正随从相关内容的虚拟牌处理
 				player.storage[current].es = player.getCards("e");
 				player.lose(player.getCards("he"), ui.special)._triggered = null;
 			}
@@ -2484,6 +2489,7 @@ export const Content = {
 				hujia: player.hujia,
 				skills: event.list.slice(0),
 				hs: player.getCards("h"),
+				//TODO: 修正随从相关内容的虚拟牌处理
 				es: player.getCards("e"),
 				intro2: cfg.intro2,
 				group: player.group,
@@ -6851,6 +6857,7 @@ export const Content = {
 		event.choosing = false;
 		if (event.dialog) event.dialog.close();
 	},
+	//TODO: 修正MoveCard函数的虚拟牌处理
 	moveCard: function () {
 		"step 0";
 		if (

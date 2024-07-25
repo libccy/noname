@@ -2402,11 +2402,15 @@ export class Get extends GetCompatible {
 		}
 		n = game.checkMod(from, to, n, "globalFrom", from);
 		n = game.checkMod(from, to, n, "globalTo", to);
-		const equips1 = from.getCards("e", function (card) {
-				return !ui.selected.cards || !ui.selected.cards.includes(card);
+		const equips1 = from.getVCards("e", function (card) {
+				return !card.cards?.some(card => {
+					return ui.selected.cards?.includes(card);
+				});
 			}),
-			equips2 = to.getCards("e", function (card) {
-				return !ui.selected.cards || !ui.selected.cards.includes(card);
+			equips2 = to.getVCards("e", function (card) {
+				return !card.cards?.some(card => {
+					return ui.selected.cards?.includes(card);
+				});
 			});
 		for (let i = 0; i < equips1.length; i++) {
 			let info = get.info(equips1[i]).distance;
