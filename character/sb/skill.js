@@ -3895,7 +3895,7 @@ const skills = {
 		ai: {
 			effect: {
 				player_use(card, player, target) {
-					if (player != target && target && target.group == "qun" && card.name != "tao") return [1, 0.1];
+					if (player != target && target && target.group == "qun" && player.hasZhuSkill("sbxueyi") && player.countSkill("sbxueyi") < 2) return [1, 0.6];
 				},
 			},
 		},
