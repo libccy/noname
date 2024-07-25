@@ -9859,6 +9859,16 @@ export class Player extends HTMLDivElement {
 		}
 		return false;
 	}
+	hasVCard(name, position) {
+		if (typeof name == "function") {
+			for (let card of this.iterableGetVCards(position, name)) {
+				return true;
+			}
+		} else {
+			if (this.countCards(position, name)) return true;
+		}
+		return false;
+	}
 	getVEquip(name){
 		var es = this.getVCards("e");
 		if (typeof name == "object" && get.info(name)) {
