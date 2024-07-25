@@ -11077,13 +11077,10 @@ const skills = {
 		},
 	},
 	jueqing: {
+		audio: 2,
+		audioname: ["ol_zhangchunhua"],
 		trigger: { source: "damageBefore" },
 		forced: true,
-		audio: 2,
-		//priority:16,
-		check: function () {
-			return false;
-		},
 		content: function () {
 			trigger.cancel();
 			trigger.player.loseHp(trigger.num);
@@ -11094,6 +11091,7 @@ const skills = {
 	},
 	shangshi: {
 		audio: 2,
+		audioname: ["ol_zhangchunhua"],
 		trigger: {
 			player: ["loseAfter", "changeHp", "gainMaxHpAfter", "loseMaxHpAfter"],
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
