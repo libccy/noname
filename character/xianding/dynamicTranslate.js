@@ -98,7 +98,7 @@ const dynamicTranslates = {
 	},
 	dcsbfumou(player) {
 		const storage = player.storage.dcsbfumou;
-		var str = "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其一半手牌：";
+		var str = "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其至多一半手牌：";
 		if (!storage) str += '<span class="bluetext">';
 		str += "阴，并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）；";
 		if (!storage) str += "</span>";

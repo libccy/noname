@@ -7667,7 +7667,7 @@ const skills = {
 						.set("complexSelect", true)
 						.set("filterTarget", function (card, player, target) {
 							if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
-							return lib.filter.targetEnabled.apply(this, arguments);
+							return lib.filter.filterTarget.apply(this, arguments);
 						})
 						.set("sourcex", player)
 						.set("addCount", false);

@@ -1173,7 +1173,7 @@ const skills = {
 				num = Math.ceil(target.countCards("h") / 2);
 			player.changeZhuanhuanji("dcsbfumou");
 			let cards = await player
-				.choosePlayerCard("覆谋：选择展示" + get.translation(target) + "的" + get.cnNumber(num) + "张牌", target, "h", num, true)
+				.choosePlayerCard("覆谋：选择展示" + get.translation(target) + "的至多" + get.cnNumber(num) + "张牌", target, "h", [1, num], true)
 				.set("ai", card => {
 					const player = get.event("player"),
 						storage = get.event("storage"),
@@ -1219,8 +1219,8 @@ const skills = {
 		mark: true,
 		intro: {
 			content(storage) {
-				if (storage) return "转换技，出牌阶段限一次，你可以观看一名其他角色的手牌并展示其一半手牌，令其依次使用这些牌中所有其可以使用的牌（无距离限制且不可被响应）。";
-				return "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其一半手牌并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）。";
+				if (storage) return "转换技，出牌阶段限一次，你可以观看一名其他角色的手牌并展示其至多一半手牌，令其依次使用这些牌中所有其可以使用的牌（无距离限制且不可被响应）。";
+				return "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其至多一半手牌并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）。";
 			},
 		},
 		ai: {
@@ -10870,20 +10870,9 @@ const skills = {
 				marktext: "刚",
 				intro: {
 					name: "刚硬",
-					content: "属性目标：回复体力，或于得到牌后手牌数大于体力值",
+					content: "属性目标：回复体力，或手牌数大于体力值",
 				},
 				charlotte: true,
-				silent: true,
-				forced: true,
-				nopop: true,
-				lastDo: true,
-				trigger: { player: "gainEnd" },
-				filter: function (event, player) {
-					return player.countCards("h") > player.hp;
-				},
-				content: function () {
-					trigger._dctongguan_gangying = true;
-				},
 			},
 			duomou: {
 				marktext: "谋",
@@ -10928,9 +10917,7 @@ const skills = {
 			var target = event.player;
 			if (
 				(target.hasSkill("dctongguan_gangying") &&
-					(target.hasHistory("gain", function (evt) {
-						return evt._dctongguan_gangying == true;
-					}) ||
+					(target.countCards("h") > target.hp ||
 						game.getGlobalHistory("changeHp", function (evt) {
 							return evt.player == target && (evt.getParent().name == "recover" || target.countCards("h") > target.hp);
 						}).length > 0)) ||
@@ -10978,9 +10965,7 @@ const skills = {
 		rules: [
 			target => target.getHistory("sourceDamage").length,
 			target =>
-				target.hasHistory("gain", function (evt) {
-					return evt._dctongguan_gangying;
-				}) ||
+				target.countCards("h") > target.hp ||
 				game.getGlobalHistory("changeHp", function (evt) {
 					return evt.player == target && evt.getParent().name == "recover";
 				}).length > 0 ||
