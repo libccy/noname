@@ -2129,20 +2129,15 @@ export class Get extends GetCompatible {
 	/**
 	 * 返回牌的类型
 	 * @overload
-	 * @param { string } obj
-	 * @param { 'trick' } [method]
-	 * @param { Player } [player]
-	 * @returns { string }
-	 *
-	 * @overload
-	 * @param { Card } obj
-	 * @param { 'trick' } [method]
-	 * @param { Player } [player]
+	 * @param { Card | string } obj
+	 * @param { 'trick' | null} [method]
+	 * @param { Player | false } [player]
 	 * @returns { string }
 	 */
 	type(obj, method, player) {
 		if (typeof obj == "string") obj = { name: obj };
 		if (typeof obj != "object") return;
+		if (method instanceof lib.element.Player) player = method;
 		var name = get.name(obj, player);
 		if (!lib.card[name]) {
 			if (!name.startsWith("sha_")) return;
