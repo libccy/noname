@@ -619,7 +619,7 @@ export const Content = {
 						});
 						game.addVideo("gain2", player, get.cardsInfo(cardsCloned));
 					}
-				}, player, event.card, event.cards);
+				}, player, card, cards);
 			}
 			player.equiping = true;
 			let cardInfo = get.info(card, false);
@@ -3611,7 +3611,7 @@ export const Content = {
 		if (!event.cards.length) event.finish();
 		"step 1";
 		if (cards.length) {
-			event.card = cards.shift();
+			event.card = cards.pop();
 			var cardName = event.card.name, cardInfo = lib.card[cardName];
 			var currentCards = player.getCards("j");
 			if (cardInfo.noEffect || event.card.cards?.some(card => !currentCards.includes(card))) {
@@ -3636,7 +3636,7 @@ export const Content = {
 		"step 2";
 		if (!event.cancelled && !event.nojudge) player.judge(event.card).set("type", "phase");
 		"step 3";
-		var name = event.card.viewAs || event.card.name;
+		var name = event.card.name;
 		if (event.excluded) {
 			delete event.excluded;
 		} else if (event.cancelled && !event.direct) {
@@ -9299,7 +9299,7 @@ export const Content = {
 				card = get.autoViewAs({name: cardName, isCard: true}, event.cards);
 				event.card = card;
 			}
-			else {
+			else if (!event.cards) {
 				event.cards = [];
 			}
 		}

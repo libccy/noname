@@ -2948,6 +2948,11 @@ export class Player extends HTMLDivElement {
 		this.expandedSlots = {};
 		this.disabledSlots = {};
 		this.ai = { friend: [], enemy: [], neutral: [] };
+		this.vcardsMap = {
+			handcards: [],
+			equips: [],
+			judges: [],
+		};
 
 		this.$uninit();
 
@@ -6752,10 +6757,10 @@ export class Player extends HTMLDivElement {
 	}
 	addJudgeNext(card, unlimited) {
 		if (!card.expired) {
-			let target = this.next;
+			let target = this.getNext();
 			const name = card.viewAs || card.name;
-			const cards = get.itemtype(card) == "card" ? [card] : card.cards;
-			if (get.itemtype(cards) != "cards") return;
+			const cards = get.itemtype(card) == "card" ? [card] : (card.cards ?? []);
+			//if (get.itemtype(cards) != "cards") return;
 			let bool = false;
 			if (
 				!unlimited &&
@@ -6772,16 +6777,10 @@ export class Player extends HTMLDivElement {
 					bool = true;
 					break;
 				}
-				target = target.next;
+				target = target.getNext();
 			}
 			if (bool) {
-				if (card.cards && card.cards.length) {
-					target.addJudge(name, card.cards[0]);
-				} else if (card.name != name) {
-					target.addJudge(name, card);
-				} else {
-					target.addJudge(card);
-				}
+				return target.addJudge(card, cards);
 			}
 		} else {
 			card.expired = false;
@@ -6791,7 +6790,7 @@ export class Player extends HTMLDivElement {
 		var next = game.createEvent("judge");
 		next.player = this;
 		for (var i = 0; i < arguments.length; i++) {
-			if (get.itemtype(arguments[i]) == "card") {
+			if (get.itemtype(arguments[i]) == "card" || get.is.object(arguments[i])) {
 				next.card = arguments[i];
 			} else if (typeof arguments[i] == "string") {
 				next.skill = arguments[i];
@@ -9670,12 +9669,12 @@ export class Player extends HTMLDivElement {
 	 * @returns { boolean}
 	 */
 	hasJudge(name) {
-		if (name && typeof name == "object") {
+		if (name && typeof name === "object") {
 			name = name.viewAs || name.name;
 		}
-		var judges = this.getCards("j");
+		var judges = this.getVCards("j");
 		for (var i = 0; i < judges.length; i++) {
-			if ((judges[i].viewAs || judges[i].name) == name) {
+			if (judges[i].name === name) {
 				return true;
 			}
 		}
@@ -9935,14 +9934,28 @@ export class Player extends HTMLDivElement {
 		return null;
 	}
 	/**
-	 * 返回玩家判定区中的牌
+	 * 返回玩家判定区中的虚拟牌
 	 * @param { string } [name]
-	 * @returns { Card[] }
+	 * @returns { VCard|null }
+	 */
+	getVJudge(name) {
+		var judges = this.getVCards("j");
+		for (var i = 0; i < judges.length; i++) {
+			if (judges[i].name == name) {
+				return judges[i];
+			}
+		}
+		return null;
+	}
+	/**
+	 * 返回玩家判定区中的牌
+	 * @deprecated
+	 * @param { string } [name]
+	 * @returns { Card|null }
 	 */
 	getJudge(name) {
-		var judges = this.node.judges.childNodes;
+		var judges = this.getCards("j");
 		for (var i = 0; i < judges.length; i++) {
-			if (judges[i].classList.contains("removing")) continue;
 			if ((judges[i].viewAs || judges[i].name) == name) {
 				return judges[i];
 			}
@@ -10898,6 +10911,8 @@ export class Player extends HTMLDivElement {
 		//game.addVideo("addVirtualJudge", ???);
 	}
 	$addVirtualJudge(VCard, cards) {
+		console.log("card:", VCard);
+		console.log("cards:", cards);
 		const player = this;
 		const isViewAsCard = (cards.length !== 1 || cards[0].name !== VCard.name), info = get.info(VCard, false);
 		cards.forEach(card => {

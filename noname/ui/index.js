@@ -145,6 +145,14 @@ export class UI {
 	 * @type {HTMLDivElement}
 	 */
 	cardPile;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	discardPile;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	ordering;
 	refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}

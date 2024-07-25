@@ -10,8 +10,8 @@ game.import("card", function () {
 				subtype: "equip5",
 				nomod: true,
 				onEquip: function () {
-					if (card && card.cards && card.cards.length) {
-						player.directgains(card.cards, null, "muniu");
+					if (card && card.storages?.length) {
+						player.directgains(card.storages, null, "muniu");
 					}
 					player.markSkill("muniu_skill");
 				},
@@ -19,18 +19,18 @@ game.import("card", function () {
 				onLose: function () {
 					delete player.getStat("skill").muniu_skill;
 					player.unmarkSkill("muniu_skill");
-					if (!card || !card.cards || !card.cards.length) return;
+					if (!card || !card.storages || !card.storages.length) return;
 					if (
 						(!event.getParent(2) || event.getParent(2).name != "swapEquip") &&
 						(event.getParent().type != "equip" || event.getParent().swapEquip)
 					) {
-						player.lose(card.cards, ui.discardPile);
-						player.$throw(card.cards, 1000);
+						player.lose(card.storages, ui.discardPile);
+						player.$throw(card.storages, 1000);
 						player.popup("muniu");
-						game.log(card, "掉落了", card.cards);
-						card.cards.length = 0;
+						game.log(card, "掉落了", card.storages);
+						card.storages.length = 0;
 					} else {
-						player.lose(card.cards, ui.special);
+						player.lose(card.storages, ui.special);
 					}
 				},
 				clearLose: true,
@@ -39,7 +39,7 @@ game.import("card", function () {
 				skills: ["muniu_skill", "muniu_skill7"],
 				ai: {
 					equipValue: function (card) {
-						if (card.card) return 7 + card.card.length;
+						if (card.storages) return 7 + card.storages.length;
 						return 7;
 					},
 					basic: {
@@ -642,20 +642,20 @@ game.import("card", function () {
 					if (game.online) {
 						return;
 					}
-					if (!muniu.cards) {
-						muniu.cards = [];
+					if (!muniu.storages) {
+						muniu.storages = [];
 					}
-					for (var i = 0; i < muniu.cards.length; i++) {
-						if (get.position(muniu.cards[i]) != "s") {
-							muniu.cards.splice(i--, 1);
+					for (var i = 0; i < muniu.storages.length; i++) {
+						if (get.position(muniu.storages[i]) != "s") {
+							muniu.storages.splice(i--, 1);
 						}
 					}
 					game.broadcast(
 						function (muniu, cards) {
-							muniu.cards = cards;
+							muniu.storages = cards;
 						},
 						muniu,
-						muniu.cards
+						muniu.storages
 					);
 				},
 				filter: function (event, player) {
@@ -678,7 +678,7 @@ game.import("card", function () {
 							cards.splice(i--, 1);
 						}
 					}
-					var muniu = player.getEquip("muniu");
+					var muniu = player.getVEquip("muniu");
 					if (!muniu || !cards.length) {
 						for (var i = 0; i < cards.length; i++) {
 							cards[i].discard();
@@ -686,18 +686,18 @@ game.import("card", function () {
 						event.finish();
 						return;
 					}
-					if (muniu.cards == undefined) muniu.cards = [];
-					muniu.cards.push(cards[0]);
+					if (muniu.storages == undefined) muniu.storages = [];
+					muniu.storages.push(cards[0]);
 					game.broadcast(
 						function (muniu, cards) {
-							muniu.cards = cards;
+							muniu.storages = cards;
 						},
 						muniu,
-						muniu.cards
+						muniu.storages
 					);
 					game.delayx();
 					"step 2";
-					var muniu = player.getEquip("muniu");
+					var muniu = player.getVEquip("muniu");
 					var players = game.filterPlayer(function (current) {
 						if (
 							current.canEquip(muniu) &&
@@ -724,7 +724,7 @@ game.import("card", function () {
 					next.set("choice", choice);
 					"step 3";
 					if (result.bool) {
-						var card = player.getEquip("muniu");
+						var card = player.getVEquip("muniu");
 						result.targets[0].equip(card);
 						player.$give(card, result.targets[0]);
 						player.line(result.targets, "green");
@@ -743,11 +743,11 @@ game.import("card", function () {
 				mod: {
 					cardEnabled2: function (card, player) {
 						if (!ui.selected.cards.length) return;
-						var muniu = player.getEquip("muniu");
-						if (!muniu || !muniu.cards || !muniu.cards.length) return;
+						var muniu = player.getVEquip("muniu");
+						if (!muniu || !muniu.storages || !muniu.storages.length) return;
 						for (var i of ui.selected.cards) {
-							if (i == muniu && muniu.cards.includes(card)) return false;
-							if (muniu.cards.includes(i) && card == muniu) return false;
+							if (muniu.cards?.includes(i) && muniu.storages.includes(card)) return false;
+							if (muniu.storages.includes(i) && card == muniu) return false;
 						}
 					},
 				},
@@ -755,26 +755,26 @@ game.import("card", function () {
 				markimage2: "image/card/muniu_small.png",
 				intro: {
 					content: function (storage, player) {
-						var muniu = player.getEquip("muniu");
-						if (!muniu || !muniu.cards || !muniu.cards.length) return "共有零张牌";
+						var muniu = player.getVEquip("muniu");
+						if (!muniu || !muniu.storages || !muniu.storages.length) return "共有零张牌";
 						if (player.isUnderControl(true)) {
-							return get.translation(muniu.cards);
+							return get.translation(muniu.storages);
 						} else {
-							return "共有" + get.cnNumber(muniu.cards.length) + "张牌";
+							return "共有" + get.cnNumber(muniu.storages.length) + "张牌";
 						}
 					},
 					mark: function (dialog, storage, player) {
-						var muniu = player.getEquip("muniu");
-						if (!muniu || !muniu.cards || !muniu.cards.length) return "共有零张牌";
+						var muniu = player.getVEquip("muniu");
+						if (!muniu || !muniu.storages || !muniu.storages.length) return "共有零张牌";
 						if (player.isUnderControl(true)) {
-							dialog.addAuto(muniu.cards);
+							dialog.addAuto(muniu.storages);
 						} else {
-							return "共有" + get.cnNumber(muniu.cards.length) + "张牌";
+							return "共有" + get.cnNumber(muniu.storages.length) + "张牌";
 						}
 					},
 					markcount: function (storage, player) {
-						var muniu = player.getEquip("muniu");
-						if (muniu && muniu.cards) return muniu.cards.length;
+						var muniu = player.getVEquip("muniu");
+						if (muniu && muniu.storages) return muniu.storages.length;
 						return 0;
 					},
 				},
@@ -786,18 +786,18 @@ game.import("card", function () {
 				//silent:true,
 				filter: function (event, player) {
 					if (!event.ss || !event.ss.length || event.parent.name == "lose_muniu") return false;
-					var muniu = player.getEquip("muniu");
-					if (!muniu || !muniu.cards) return false;
+					var muniu = player.getVEquip("muniu");
+					if (!muniu || !muniu.storages) return false;
 					return (
 						event.ss.filter(function (card) {
-							return muniu.cards.includes(card);
+							return muniu.storages.includes(card);
 						}).length > 0
 					);
 				},
 				content: function () {
-					var muniu = player.getEquip("muniu");
-					if (muniu && muniu.cards) {
-						muniu.cards.removeArray(trigger.ss);
+					var muniu = player.getVEquip("muniu");
+					if (muniu && muniu.storages) {
+						muniu.storages.removeArray(trigger.ss);
 						lib.skill.muniu_skill.sync(muniu);
 					}
 					player.updateMarks();
