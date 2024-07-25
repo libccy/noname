@@ -2137,7 +2137,6 @@ export class Get extends GetCompatible {
 	type(obj, method, player) {
 		if (typeof obj == "string") obj = { name: obj };
 		if (typeof obj != "object") return;
-		if (method instanceof lib.element.Player) player = method;
 		var name = get.name(obj, player);
 		if (!lib.card[name]) {
 			if (!name.startsWith("sha_")) return;
