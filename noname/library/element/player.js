@@ -3825,6 +3825,17 @@ export class Player extends HTMLDivElement {
 		return Array.from(this.iterableGetVCards(arg1, arg2));
 	}
 	/**
+	 * @param { Parameters<typeof this['iterableGetCards']>[0] } [arg1]
+	 * @param { Parameters<typeof this['iterableGetCards']>[1] } [arg2]
+	 */
+	countVCards(arg1, arg2) {
+		let count = 0;
+		for (let item of this.iterableGetVCards(arg1, arg2)) {
+			count++;
+		}
+		return count;
+	}
+	/**
 	 * @param { string } [arg1='h']
 	 * @param { string | Record<string, any> | ((card: Card) => boolean) } [arg2]
 	 * @returns { Iterable<Card> }
@@ -5293,7 +5304,7 @@ export class Player extends HTMLDivElement {
 		return sourceTargets.some(current => {
 			const att = get.sgn(get.attitude(player, current));
 			if (!withatt || att != 0) {
-				var es = current.getCards("e", filterCard);
+				var es = current.getVCards("e", filterCard);
 				for (var i = 0; i < es.length; i++) {
 					if (
 						aimTargets.some(current2 => {
@@ -5312,7 +5323,7 @@ export class Player extends HTMLDivElement {
 				}
 			}
 			if (!nojudge && (!withatt || att > 0)) {
-				var js = current.getCards("j", filterCard);
+				var js = current.getVCards("j", filterCard);
 				for (var i = 0; i < js.length; i++) {
 					if (
 						game.hasPlayer(function (current2) {

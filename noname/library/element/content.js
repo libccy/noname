@@ -6972,7 +6972,6 @@ export const Content = {
 		event.choosing = false;
 		if (event.dialog) event.dialog.close();
 	},
-	//TODO: 修正MoveCard函数的虚拟牌处理
 	moveCard: function () {
 		"step 0";
 		if (
@@ -6993,13 +6992,13 @@ export const Content = {
 			if (ui.selected.targets.length) {
 				if (!get.event("aimTargets").includes(target)) return false;
 				var from = ui.selected.targets[0];
-				var js = from.getCards("j", filterCard);
+				var js = from.getVCards("j", filterCard);
 				for (var i = 0; i < js.length; i++) {
 					if (_status.event.nojudge) break;
 					if (target.canAddJudge(js[i])) return true;
 				}
 				if (target.isMin()) return false;
-				var es = from.getCards("e", filterCard);
+				var es = from.getVCards("e", filterCard);
 				for (var i = 0; i < es.length; i++) {
 					if (target.canEquip(es[i], _status.event.canReplace)) return true;
 				}
@@ -7008,7 +7007,7 @@ export const Content = {
 				if (!get.event("sourceTargets").includes(target)) return false;
 				var range = "ej";
 				if (_status.event.nojudge) range = "e";
-				return target.countCards(range, filterCard) > 0;
+				return target.countVCards(range, filterCard) > 0;
 			}
 		});
 		next.set("nojudge", event.nojudge || false);
@@ -7022,7 +7021,7 @@ export const Content = {
 				if (att > 0) {
 					if (
 						!_status.event.nojudge &&
-						target.countCards("j", function (card) {
+						target.countVCards("j", function (card) {
 							if (!filterCard(card)) return false;
 							return game.hasPlayer(function (current) {
 								if (!aimTargets.includes(current)) return false;
@@ -7036,7 +7035,7 @@ export const Content = {
 					)
 						return 14;
 					if (
-						target.countCards("e", function (card) {
+						target.countVCards("e", function (card) {
 							if (!filterCard(card)) return false;
 							return (
 								get.value(card, target) < 0 &&
@@ -7057,7 +7056,7 @@ export const Content = {
 					if (
 						game.hasPlayer(function (current) {
 							if (current != target && get.attitude(player, current) > 0) {
-								var es = target.getCards("e", filterCard);
+								var es = target.getVCards("e", filterCard);
 								for (var i = 0; i < es.length; i++) {
 									if (
 										get.value(es[i], target) > 0 &&
@@ -7077,7 +7076,7 @@ export const Content = {
 				}
 				return 0;
 			}
-			var es = ui.selected.targets[0].getCards("e", filterCard);
+			var es = ui.selected.targets[0].getVCards("e", filterCard);
 			var i;
 			var att2 = get.sgn(get.attitude(player, ui.selected.targets[0]));
 			for (i = 0; i < es.length; i++) {
@@ -7095,7 +7094,7 @@ export const Content = {
 			if (
 				i == es.length &&
 				(_status.event.nojudge ||
-					!ui.selected.targets[0].countCards("j", function (card) {
+					!ui.selected.targets[0].countVCards("j", function (card) {
 						if (!filterCard(card)) return false;
 						return target.canAddJudge(card);
 					}) ||
@@ -7128,64 +7127,83 @@ export const Content = {
 		game.delay();
 		"step 3";
 		if (targets.length == 2) {
-			player
-				.choosePlayerCard(
-					"ej",
-					true,
-					function (button) {
-						var player = _status.event.player;
-						var targets0 = _status.event.targets0;
-						var targets1 = _status.event.targets1;
-						if (get.attitude(player, targets0) > 0 && get.attitude(player, targets1) < 0) {
-							if (get.position(button.link) == "j") return 12;
-							if (
-								get.value(button.link, targets0) < 0 &&
-								get.effect(targets1, button.link, player, targets1) > 0
-							)
-								return 10;
-							return 0;
-						} else {
-							if (get.position(button.link) == "j") return -10;
-							return (
-								get.value(button.link) * get.effect(targets1, button.link, player, targets1)
-							);
-						}
-					},
-					targets[0]
-				)
-				.set("nojudge", event.nojudge || false)
-				.set("targets0", targets[0])
-				.set("targets1", targets[1])
-				.set("filterButton", function (button) {
+			const dialogArgs = ["请选择要移动的牌"];
+			const es = targets[0].getVCards("e", card => {
+				return event.filter(card) && targets[1].canEquip(card, event.canReplace);
+			}), js = event.nojudge ? [] : targets[0].getVCards("j", card => {
+				return event.filter(card) && targets[1].canAddJudge(card);
+			});
+			if (es.length) {
+				dialogArgs.push(`<div class="text center">判定区</div>`);
+				dialogArgs.push([es, "vcard"])
+			}
+			if (js.length) {
+				dialogArgs.push(`<div class="text center">判定区</div>`);
+				dialogArgs.push([js, "vcard"])
+			}
+			if (es.length + js.length === 1) {
+				event._result = {
+					bool: true,
+					links: es.length > 0 ? es : js,
+				}
+			}
+			else player.chooseButton(
+				dialogArgs,
+				true,
+				function (button) {
+					var player = _status.event.player;
+					var targets0 = _status.event.targets0;
 					var targets1 = _status.event.targets1;
-					if (!get.event("filter")(button.link)) return false;
-					if (get.position(button.link) == "j") {
-						if (_status.event.nojudge) return false;
-						return targets1.canAddJudge(button.link);
+					if (get.attitude(player, targets0) > 0 && get.attitude(player, targets1) < 0) {
+						if (get.position(button.link) == "j") return 12;
+						if (
+							get.value(button.link, targets0) < 0 &&
+							get.effect(targets1, button.link, player, targets1) > 0
+						)
+							return 10;
+						return 0;
 					} else {
-						return targets1.canEquip(button.link, _status.event.canReplace);
+						if (get.position(button.link) == "j") return -10;
+						return (
+							get.value(button.link) * get.effect(targets1, button.link, player, targets1)
+						);
 					}
-				})
-				.set("filter", event.filter)
-				.set("canReplace", event.canReplace)
-				.set("custom", get.copy(event.custom));
+				},
+			)
+			.set("target", targets[0])
+			.set("nojudge", event.nojudge || false)
+			.set("targets0", targets[0])
+			.set("targets1", targets[1])
+			/*.set("filterButton", function (button) {
+				var targets1 = _status.event.targets1;
+				if (!get.event("filter")(button.link)) return false;
+				if (get.position(button.link) == "j") {
+					if (_status.event.nojudge) return false;
+					return targets1.canAddJudge(button.link);
+				} else {
+					return targets1.canEquip(button.link, _status.event.canReplace);
+				}
+			})*/
+			.set("filter", event.filter)
+			.set("canReplace", event.canReplace)
+			.set("custom", get.copy(event.custom));
 		} else {
 			event.finish();
 		}
 		"step 4";
 		if (result.bool && result.links.length) {
-			var link = result.links[0];
-			if (get.position(link) == "e") {
+			var link = result.links[0], position = "j";
+			if (event.targets[0].getVCards("e").includes(link)) {
+				if (!link.cards?.length) event.targets[0].removeVEquip(link);
 				event.targets[1].equip(link);
-			} else if (link.viewAs) {
-				event.targets[1].addJudge({ name: link.viewAs }, [link]);
 			} else {
+				if (!link.cards?.length) event.targets[0].removeVJudge(link);
 				event.targets[1].addJudge(link);
 			}
-			event.targets[0].$give(link, event.targets[1], false);
+			if(link.cards?.length) event.targets[0].$give(link.cards, event.targets[1], false);
 			game.log(event.targets[0], "的", link, "被移动给了", event.targets[1]);
 			event.result.card = link;
-			event.result.position = get.position(link);
+			event.result.position = "e";
 			game.delay();
 		}
 	},
