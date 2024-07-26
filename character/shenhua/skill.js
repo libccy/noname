@@ -5519,7 +5519,7 @@ const skills = {
 			if (event.type == "dying") {
 				if (player != event.dying) return false;
 				return true;
-			} else if (event.parent.name == "phaseUse") {
+			} else if (event.getParent().name == "phaseUse") {
 				return true;
 			}
 			return false;
