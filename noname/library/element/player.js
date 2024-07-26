@@ -9636,6 +9636,14 @@ export class Player extends HTMLDivElement {
 		if (typeof respond !== "string") respond = respond ? "respond" : "all";
 		return this.hasUsableCard("shan", respond);
 	}
+	/**
+	 * 以viewer视角猜测Player手里的杀
+	 * @param { Player } [viewer] 
+	 * @param { "use" | "respond" } [type] 
+	 * @param { Card[] | Card | null } [ignore] 
+	 * @param { "bool" | "count" | "odds" } [rvt] 
+	 * @returns { boolean | number }
+	 */
 	mayHaveSha(viewer, type, ignore, rvt) {
 		/**
 		 * type: skill tag type 'use', 'respond'
@@ -9681,6 +9689,14 @@ export class Player extends HTMLDivElement {
 		if (rvt === "odds") return Math.min(1, count);
 		return count > _status.event.getRand("mayHaveSha" + hs + this.playerid);
 	}
+	/**
+	 * 以viewer视角猜测Player手里的闪
+	 * @param { Player } [viewer] 
+	 * @param { "use" | "respond" | object } [type] 
+	 * @param { Card[] | Card | null } [ignore] 
+	 * @param { "bool" | "count" | "odds" } [rvt] 
+	 * @returns { boolean | number }
+	 */
 	mayHaveShan(viewer, type, ignore, rvt) {
 		/**
 		 * type: skill tag type 'use', 'respond' or object
