@@ -1982,7 +1982,7 @@ const skills = {
 			if (bool) {
 				player.logSkill("olpijing", targets);
 				for (const i of targets) {
-					trigger.targets[trigger.targets.includes(i) ? "add" : "remove"](i);
+					trigger.targets[!trigger.targets.includes(i) ? "add" : "remove"](i);
 				}
 				for (const target of targets) {
 					target.addSkill("olpijing_effect");
@@ -10165,13 +10165,13 @@ const skills = {
 				lose_list.push([current, result[i].cards]);
 				cards.push(card);
 			}
+			game.loseAsync({
+				lose_list: lose_list,
+			}).setContent("discardMultiple");
 			var type = get.type2(cards[0]);
 			for (var i = 1; i < cards.length; i++) {
 				if (get.type2(cards[i]) != type) event.finish();
 			}
-			game.loseAsync({
-				lose_list: lose_list,
-			}).setContent("discardMultiple");
 			"step 3";
 			event.goto(1);
 			for (var target of event.list) {
@@ -24097,7 +24097,7 @@ const skills = {
 		filter: function (event, player) {
 			var list = ["fan", "zhong", "nei"];
 			if (get.mode() == "identity") return event.name == "die" && list.includes(event.player.identity) && !player.hasSkill("fenxin_" + event.player.identity);
-			return event.name == "damage" && event.player != player && list.some(identity => !player.hasSkill("fenxin_" + identity)) && event.player.getHistory("damage").indexOf(event) == 0;
+			return event.name == "damage" && event.player != player && list.some(identity => !player.hasSkill("fenxin_" + identity)) && event.player.getAllHistory("damage").indexOf(event) == 0;
 		},
 		forced: true,
 		logTarget: "player",
