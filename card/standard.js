@@ -1059,8 +1059,16 @@ game.import("card", function () {
 						return;
 					}
 					if (event.dialog.buttons.length > 1) {
-						var next = target.chooseButton(true, function (button) {
-							return get.value(button.link, _status.event.player);
+						var next = target.chooseButton(true);
+						next.set("ai", button => {
+							let player = _status.event.player, card = button.link, val = get.value(card, player);
+							if (get.tag(card, "recover")) {
+								val += game.countPlayer(target => {
+									return target.hp < 2 && get.attitude(player, target) > 0 && lib.filter.cardSavable(card, player, target);
+								});
+								if (player.hp <= 2 && game.checkMod(card, player, "unchanged", "cardEnabled2", player)) val *= 2;
+							}
+							return val;
 						});
 						next.set("dialog", event.preResult);
 						next.set("closeDialog", false);
@@ -1166,18 +1174,16 @@ game.import("card", function () {
 					result: {
 						target: function (player, target) {
 							var sorter = _status.currentPhase || player;
+							let opt = 6 + 0.75 * (game.countPlayer() - 2 * get.distance(sorter, target, "absolute"));
 							if (get.is.versus()) {
-								if (target == sorter) return 1.5;
-								return 1;
+								if (target !== sorter && get.attitude(player, player.next) < get.attitude(player, player.previous)) {
+									opt = 6 + 0.75 * (2 * get.distance(sorter, target, "absolute") - game.countPlayer());
+								}
 							}
 							if (player.hasUnknown(2)) {
 								return 0;
 							}
-							return (1 - get.distance(sorter, target, "absolute") / game.countPlayer()) *
-								get.attitude(player, target) >
-								0
-								? 0.5
-								: 0.7;
+							return opt / 6;
 						},
 					},
 					tag: {
