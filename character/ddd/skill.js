@@ -1404,7 +1404,7 @@ const skills = {
 				intro: { content: "本回合不能使用或打出手牌" },
 				mod: {
 					cardEnabled2(card) {
-						return false;
+						if (get.position(card) == "h") return false;
 					},
 				},
 			},

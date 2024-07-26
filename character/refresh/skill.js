@@ -14395,18 +14395,12 @@ const skills = {
 	yijue2: {
 		mark: true,
 		mod: {
-			cardEnabled: function () {
-				return false;
-			},
-			cardRespondable: function () {
-				return false;
-			},
-			cardSavable: function () {
-				return false;
+			cardEnabled2: function (card) {
+				if (get.position(card) == "h") return false;
 			},
 		},
 		intro: {
-			content: "不能使用或打出卡牌",
+			content: "不能使用或打出手牌",
 		},
 	},
 	retieji: {

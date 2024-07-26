@@ -8342,7 +8342,7 @@ const skills = {
 						num = num1 - num2;
 						target
 							.chooseControl()
-							.set("choiceList", ["弃置" + get.cnNumber(num) + "张手牌", "本回合下次受到的伤害+1"])
+							.set("choiceList", ["弃置" + get.cnNumber(num) + "张手牌，且本回合内不能使用或打出手牌", "本回合下次受到的伤害+1"])
 							.set("ai", function () {
 								var player = _status.event.player;
 								if (
@@ -8372,13 +8372,11 @@ const skills = {
 					if (result.index == 0) {
 						if (event.index == 0) target.chooseToDiscard("h", true, num);
 						else target.draw(num);
+						target.addTempSkill("dcquanjian_disable");
 					} else {
 						target.addMark("dcquanjian_effect", 1, false);
 						target.addTempSkill("dcquanjian_effect");
-						event.finish();
 					}
-					"step 2";
-					target.addTempSkill("dcquanjian_disable");
 				},
 				ai: {
 					result: {
@@ -8407,17 +8405,8 @@ const skills = {
 			disable: {
 				charlotte: true,
 				mod: {
-					cardEnabled(card, player) {
-						if (card.cards) {
-							const hs = player.getCards("h");
-							if (card.cards.some(card => hs.includes(card))) return false;
-						}
-					},
-					cardSavable(card, player) {
-						if (card.cards) {
-							const hs = player.getCards("h");
-							if (card.cards.some(card => hs.includes(card))) return false;
-						}
+					cardEnabled2(card, player) {
+						if (get.position(card) == "h") return false;
 					},
 				},
 				mark: true,

@@ -1579,17 +1579,8 @@ game.import("character", function () {
 					player.removeSkill("mianzhen2");
 				},
 				mod: {
-					cardEnabled: function () {
-						return false;
-					},
-					cardUsable: function () {
-						return false;
-					},
-					cardRespondable: function () {
-						return false;
-					},
-					cardSavable: function () {
-						return false;
+					cardEnabled2: function (card) {
+						if (get.position(card) == "h") return false;
 					},
 				},
 				ai: {
