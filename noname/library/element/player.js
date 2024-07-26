@@ -1304,6 +1304,7 @@ export class Player extends HTMLDivElement {
 	 * @param { SMap<number> } [map]
 	 */
 	$syncDisable(map) {
+		//TODO:虚拟装备牌的添加暂时没有考虑到废除装备栏的情况，会出现排序错误的问题。需要手动设置排序。
 		const suits = { equip3: "+1马栏", equip4: "-1马栏", equip6: "特殊栏" };
 		if (get.is.mountCombined()) suits.equip3 = "坐骑栏";
 		if (!map) {
@@ -6609,7 +6610,10 @@ export class Player extends HTMLDivElement {
 			next.cards = [card];
 		}
 		else if (itemtype === "cards"){
-			next.cards = card;
+			next.cards = card.slice(0);
+		}
+		else if (Array.isArray(card)) {
+			next.vcards = card.slice(0);
 		}
 		else {
 			next.card = card;
@@ -10943,7 +10947,7 @@ export class Player extends HTMLDivElement {
 		player.vcardsMap?.equips.sort((a, b) => {
 			return get.equipNum(a) - get.equipNum(b);
 		});
-		player.$addVirutalEquip(card, cards)
+		player.$addVitrualEquip(card, cards)
 		var info = get.info(card, false);
 		if (info.skills) {
 			for (var i = 0; i < info.skills.length; i++) {
@@ -10952,7 +10956,7 @@ export class Player extends HTMLDivElement {
 		}
 		//game.addVideo("addVirtualJudge", ???);
 	}
-	$addVirutalEquip(card, cards) {
+	$addVitrualEquip(card, cards) {
 		const player = this;
 		if (cards.length) {
 			const beforeCards = [];
@@ -10961,7 +10965,7 @@ export class Player extends HTMLDivElement {
 			if (info.subtype === "equip3"){
 				cardShownName += "+";
 			}
-			else if (info.subtype === "equip3"){
+			else if (info.subtype === "equip4"){
 				cardShownName += "-";
 			}
 			cards.forEach(cardx => {

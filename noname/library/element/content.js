@@ -443,8 +443,93 @@ export const Content = {
 		player.$syncExpand();
 	},
 	//选择顶装备要顶的牌
-	//TODO: 修正此处的牌数判定，处理多牌转换和零牌转换
-	replaceEquip: function () {
+	replaceEquip: async function(event, trigger, player) {
+		const vcards = (event.vcards ?? [event.card]);
+		const specializedVCards = [], normalVCards = [];
+		const replacedCards = [];
+		vcards.forEach(card => {
+			const info = get.info(card, false);
+			(info.customSwap ? specializedVCards : normalVCards).push(card);
+		});
+		console.log("normalVCards:", normalVCards);
+		specializedVCards.forEach(card => {
+			const info = get.info(card, false);
+			replacedCards.addArray(player.getVCards("e", card =>  info.customSwap(card)));
+		});
+		const types = normalVCards.reduce((types, card) => {
+			return types.concat(get.subtypes(card, false));
+		}, []);
+		console.log("types:", types);
+		if (types.length > 0) {
+			const slots = types, slotsx = [];
+			if (get.is.mountCombined()) {
+				slots.forEach((type) => {
+					if (type == "equip3" || type == "equip4") slotsx.add("equip3_4");
+					else slotsx.add(type);
+				});
+			} else {
+				slotsx.addArray(slots);
+			}
+			slotsx.sort();
+			for (const slot of slotsx) {
+				let left = player.countEquipableSlot(slot), lose;
+				if (slot == "equip3_4") lose = Math.min(left, Math.max(get.numOf(slots, "equip3"), get.numOf(slots, "equip4")));
+				else lose = Math.min(left, get.numOf(slots, slot));
+				let result;
+				if (lose <= 0) continue;
+				else {
+					const cards = player.getVEquips(slot).filter((card) => {
+						return !replacedCards.includes(card) && lib.filter.canBeReplaced(card, player);
+					});
+					if (cards.length > 0) {
+						if (lose >= left) {
+							result = { bool: true, links: cards };
+						} else if (cards.length > left - lose) {
+							var source = event.source, num = cards.length - (left - lose);
+							if (!source || !source.isIn()) source = player;
+							//TODO: 这里同样需要处理虚拟装备牌发送到联机客户端之后失真的问题
+							const chooseEvent = source
+								.chooseButton(
+									["选择替换掉" + get.cnNumber(num) + "张" + get.translation(slot) + "装备牌",
+										[cards, "vcard"]
+									],
+									true,
+									[1, num]
+								)
+								.set("filterOk", function () {
+									var evt = _status.event;
+									return (
+										ui.selected.buttons.reduce(function (num, button) {
+											if (evt.slot == "equip3_4")
+												return (
+													num +
+													Math.max(
+														get.numOf(get.subtypes(button.link, false), "equip3"),
+														get.numOf(get.subtypes(button.link, false), "equip4")
+													)
+												);
+											return num + get.numOf(get.subtypes(button.link, false), evt.slot);
+										}, 0) == evt.required
+									);
+								})
+								.set("required", num)
+								.set("slot", slot);
+							result = await chooseEvent.forResult();
+						}
+					}
+				}
+				if (result?.links) replacedCards.addArray(result.links);
+			}
+		}
+		event.result = {
+			vcards: replacedCards,
+			cards: replacedCards.reduce((cards, vcard) => {
+				if(vcard.cards) cards.addArray(vcard.cards);
+				return cards;
+			}, []),
+		}
+	},
+	replaceEquip_old: function () {
 		"step 0";
 		event.cards = [];
 		var types = get.subtypes(card, false);
@@ -485,7 +570,7 @@ export const Content = {
 		if (lose <= 0) event.goto(3);
 		else {
 			var cards = player.getEquips(slot).filter((card) => {
-				return !event.cards.includes(card) && !(event.frozenCards?.includes(card)) && lib.filter.canBeReplaced(card, player);
+				return !event.cards.includes(card) && lib.filter.canBeReplaced(card, player);
 			});
 			if (cards.length > 0) {
 				if (lose >= left) {
@@ -532,6 +617,13 @@ export const Content = {
 	//装备牌
 	equip: async function(event, trigger, player){
 		event.visible = true;
+		if (event.vcards && !event.cards) {
+			event.cards = event.vcards.reduce((cards, vcard) => {
+				if (vcard.cards) cards.addArray(vcard);
+				return cards;
+			}, [])
+		}
+		//进行第一轮先行判断，让所有装备牌的原主失去装备牌
 		if (event.cards) {
 			const map = {};
 			for (const i of event.cards) {
@@ -562,7 +654,7 @@ export const Content = {
 				event.relatedLose = next;
 			}
 		}
-		const replacedEquips = [];
+		player.equiping = true;
 		const handleEquip = async (card) => {
 			let cards = [];
 			// @ts-ignore
@@ -573,81 +665,7 @@ export const Content = {
 			else {
 				cards = card.cards ?? [];
 			}
-			if (cards.length) {
-				game.broadcast(function (cards, player) {
-					cards.forEach(card => {
-						if (card.clone) {
-							card.clone.moveDelete(player);
-						}
-					})
-				}, cards, player);
-				cards.forEach(card => {
-					if (card.clone) {
-						card.clone.moveDelete(player);
-						game.addVideo("gain2", player, get.cardsInfo([card.clone]));
-					}
-				})
-			}
-			replacedEquips.addArray(cards);
-			let canMoveOn = true;
-			cards.forEach(card => {
-				if (card.willBeDestroyed("equip", player, event)) {
-					card.selfDestroy(event);
-					canMoveOn = false;
-					return;
-				}
-				else if (canMoveOn) {
-					// @ts-ignore
-					if("hejx".includes(get.position(card, true))){
-						canMoveOn = false;
-						return;
-					}
-				}
-			});
-			if (!canMoveOn) return;
-			if (event.draw) {
-				player.$draw(card);
-				await game.delay(0, 300);
-			} else {
-				game.broadcastAll((player, card, cards) => {
-					const cardsCloned = cards.filter(card => {
-						return (cards[0].clone && (cards[0].clone.parentNode == player.parentNode || cards[0].clone.parentNode == ui.arena));
-					}) 
-					if (cardsCloned.length) {
-						cardsCloned.forEach(card => {
-							card.clone.moveDelete(player);
-						});
-						game.addVideo("gain2", player, get.cardsInfo(cardsCloned));
-					}
-				}, player, card, cards);
-			}
-			player.equiping = true;
 			let cardInfo = get.info(card, false);
-			const replaceEquipEvent = game.createEvent("replaceEquip");
-			replaceEquipEvent.player = player;
-			replaceEquipEvent.card = card;
-			replaceEquipEvent.setContent(cardInfo.replaceEquip || "replaceEquip");
-			// @ts-ignore
-			replaceEquipEvent.frozenCards = replacedEquips.slice(0);
-			const result = await replaceEquipEvent.forResult();
-			// @ts-ignore
-			if (get.itemtype(result) == "cards") {
-				// @ts-ignore
-				event.swapped = true;
-				replacedEquips.addArray(result);
-				const loseEvent = player.lose(result, "visible").set("type", "equip").set("getlx", false);
-				loseEvent.swapEquip = true;
-				if (cardInfo.loseThrow) {
-					player.$throw(result, 1000);
-				}
-				await loseEvent;
-				// @ts-ignore
-				for (let card of result) {
-					if (card.willBeDestroyed("discardPile", player, event)) {
-						card.selfDestroy(event);
-					}
-				}
-			}
 			if (player.isMin() || !player.canEquip(card)) {
 				await game.cardsDiscard(cards);
 				delete player.equiping;
@@ -689,14 +707,104 @@ export const Content = {
 				await game.delayx();
 			}
 		}
-		if(event.card) {
-			await handleEquip(event.card);
-		}
-		else {
-			for(const card of event.cards){
-				event.cards = card;
-				await handleEquip(card);
+		//生成虚拟牌列表
+		if (!event.vcards) {
+			if (event.card) {
+				// @ts-ignore
+				if (get.itemtype(event.card) === "card") event.card = get.autoViewAs(event.card);
+				event.vcards = [event.card];
 			}
+			else event.vcards = event.cards.map(card => get.autoViewAs(card));
+		}
+		//过滤被销毁的装备牌
+		event.vcards = event.vcards.filter(card => {
+			let cards;
+			// @ts-ignore
+			if (get.itemtype(card) === "card"){
+				cards = [card];
+				card = get.autoViewAs(card);
+			}
+			else {
+				cards = card.cards ?? [];
+			}
+			let canMoveOn = true;
+			cards.forEach(card => {
+				if (card.willBeDestroyed("equip", player, event)) {
+					card.selfDestroy(event);
+					canMoveOn = false;
+					return;
+				}
+				else if (canMoveOn) {
+					// @ts-ignore
+					if("hejx".includes(get.position(card, true))){
+						canMoveOn = false;
+						return;
+					}
+				}
+			});
+			return canMoveOn;
+		});
+		event.cards = event.vcards.reduce((cards, vcard) => {
+			if (vcard.cards) cards.addArray(vcard.cards);
+			return cards;
+		}, [])
+		//同时播放所有装备牌的装备动画
+		if (event.cards.length) {
+			if (event.draw) {
+				player.$draw(event.cards);
+				await game.delay(0, 300);
+			}
+			else {
+				// @ts-ignore
+				game.broadcast(function (cards, player) {
+					cards.forEach(card => {
+						if (card.clone) {
+							card.clone.moveDelete(player);
+						}
+					})
+				}, event.cards, player);
+				event.cards.forEach(card => {
+					if (card.clone) {
+						card.clone.moveDelete(player);
+						game.addVideo("gain2", player, get.cardsInfo([card.clone]));
+					}
+				})
+			}
+		}
+		//将多张装备牌的牌替换事件合并为一个，废弃卡牌的replaceEquip自定义事件属性（反正没人用）
+		const replaceEquipEvent = game.createEvent("replaceEquip");
+		replaceEquipEvent.player = player;
+		// @ts-ignore
+		replaceEquipEvent.vcards = event.vcards;
+		replaceEquipEvent.setContent("replaceEquip");
+		const result = await replaceEquipEvent.forResult();
+		// @ts-ignore
+		if (get.itemtype(result?.cards) == "cards") {
+			// @ts-ignore
+			event.swapped = true;
+			const loseEvent = player.lose(result.cards, "visible").set("type", "equip").set("getlx", false);
+			loseEvent.swapEquip = true;
+			if (event.vcards.some(card => {
+				const info = get.info(card, false);
+				return info && info.loseThrow;
+			})) {
+				player.$throw(result.cards, 1000);
+			}
+			await loseEvent;
+			// @ts-ignore
+			for (let card of result.cards) {
+				if (card.willBeDestroyed("discardPile", player, event)) {
+					card.selfDestroy(event);
+				}
+			}
+		}
+		result?.vcards?.forEach(card => {
+			player.removeVEquip(card);
+		})
+		//然后处理每一张装备牌的装备
+		for (const card of event.vcards) {
+			event.card = card;
+			await handleEquip(card);
 		}
 		if (event.updatePile) game.updateRoundNumber();
 	},

@@ -1998,7 +1998,8 @@ const skills = {
 				});
 				player.$gain2(cards);
 				game.delayx();
-				for (var card of cards) player.equip(card);
+				player.equip(cards);
+				//for (var card of cards) player.equip(card);
 			}
 		},
 		$createButton(item, type, position, noclick, node) {
