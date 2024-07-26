@@ -24097,7 +24097,7 @@ const skills = {
 		filter: function (event, player) {
 			var list = ["fan", "zhong", "nei"];
 			if (get.mode() == "identity") return event.name == "die" && list.includes(event.player.identity) && !player.hasSkill("fenxin_" + event.player.identity);
-			return event.name == "damage" && event.player != player && list.some(identity => !player.hasSkill("fenxin_" + identity)) && event.player.getHistory("damage").indexOf(event) == 0;
+			return event.name == "damage" && event.player != player && list.some(identity => !player.hasSkill("fenxin_" + identity)) && event.player.getAllHistory("damage").indexOf(event) == 0;
 		},
 		forced: true,
 		logTarget: "player",
