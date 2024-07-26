@@ -1827,13 +1827,17 @@ export class Player extends HTMLDivElement {
 				switch (num) {
 					case 0:
 						player.classList.remove("unseen");
+						player.classList.remove("unseen_show");
 						break;
 					case 1:
 						player.classList.remove("unseen2");
+						player.classList.remove("unseen2_show");
 						break;
 					case 2:
 						player.classList.remove("unseen");
 						player.classList.remove("unseen2");
+						player.classList.remove("unseen_show");
+						player.classList.remove("unseen2_show");
 						break;
 				}
 				if (!player.isUnseen(2)) {

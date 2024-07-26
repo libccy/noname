@@ -10165,13 +10165,13 @@ const skills = {
 				lose_list.push([current, result[i].cards]);
 				cards.push(card);
 			}
+			game.loseAsync({
+				lose_list: lose_list,
+			}).setContent("discardMultiple");
 			var type = get.type2(cards[0]);
 			for (var i = 1; i < cards.length; i++) {
 				if (get.type2(cards[i]) != type) event.finish();
 			}
-			game.loseAsync({
-				lose_list: lose_list,
-			}).setContent("discardMultiple");
 			"step 3";
 			event.goto(1);
 			for (var target of event.list) {

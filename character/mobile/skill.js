@@ -141,7 +141,7 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			const list = ["选项一", "选项二"], target = event.triggername == "useCardToPlayered" ? trigger.target : trigger.player;
-			if (player.getEquip(1) && target.getEquip(1)) list.push("背水！");
+			if (player.getEquip(1) || target.getEquip(1)) list.push("背水！");
 			list.push("cancel2");
 			const result = await player.chooseControl(list).set("choiceList", [
 				"令此【杀】伤害+1",
