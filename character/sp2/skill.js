@@ -1566,7 +1566,9 @@ const skills = {
 						return result.winner.canUse({ name: 'sha' }, current, false) && get.effect(current, { name: 'sha' }, result.winner, result.winner) > 0;
 					})) return '选项一';
 					const eff1 = result.winner.getUseValue({ name: 'sha' });
-					const eff2 = (get.value(cards[0], result.winner) + get.value(cards[1], result.winner));
+					const eff2 = 0;
+					if (cards[0]) eff2 = get.value(cards[0], result.winner);
+					if (cards[1]) eff2 += get.value(cards[1], result.winner);
 					if (eff1 > eff2 * 2.5) return '选项二';
 					return '选项一';
 				}()).forResult();
