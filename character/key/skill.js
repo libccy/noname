@@ -1145,6 +1145,8 @@ const skills = {
 				storage: {kud_qiaoshou: true},
 			}
 			game.log(player, "声明了", "#y" + get.translation(name));
+			player.$throw(event.cards);
+			await game.delay(0, 300);
 			await player.equip(get.autoViewAs(card, event.cards));
 			player.addTempSkill("kud_qiaoshou_equip", {
 				player: ["phaseUseEnd", "phaseZhunbeiBegin"],
@@ -1237,6 +1239,8 @@ const skills = {
 				storage: {kud_qiaoshou: true},
 			}
 			game.log(player, "声明了", "#y" + get.translation(name));
+			player.$throw(event.cards);
+			await game.delay(0, 300);
 			await player.equip(get.autoViewAs(card, event.cards));
 			player.addTempSkill("kud_qiaoshou_equip", {
 				player: ["phaseUseEnd", "phaseZhunbeiBegin"],

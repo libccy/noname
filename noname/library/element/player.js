@@ -10947,16 +10947,16 @@ export class Player extends HTMLDivElement {
 		player.vcardsMap?.equips.sort((a, b) => {
 			return get.equipNum(a) - get.equipNum(b);
 		});
-		player.$addVitrualEquip(card, cards)
+		player.$addVirtualEquip(card, cards)
 		var info = get.info(card, false);
 		if (info.skills) {
 			for (var i = 0; i < info.skills.length; i++) {
 				player.addSkillTrigger(info.skills[i]);
 			}
 		}
-		//game.addVideo("addVirtualJudge", ???);
+		//game.addVideo("addVirtualEquip", ???);
 	}
-	$addVitrualEquip(card, cards) {
+	$addVirtualEquip(card, cards) {
 		const player = this;
 		if (cards.length) {
 			const beforeCards = [];

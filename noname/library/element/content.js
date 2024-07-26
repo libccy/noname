@@ -619,7 +619,7 @@ export const Content = {
 		event.visible = true;
 		if (event.vcards && !event.cards) {
 			event.cards = event.vcards.reduce((cards, vcard) => {
-				if (vcard.cards) cards.addArray(vcard);
+				if (vcard.cards) cards.addArray(vcard.cards);
 				return cards;
 			}, [])
 		}
@@ -2353,19 +2353,18 @@ export const Content = {
 		"step 0";
 		game.log(player, "和", target, "交换了装备区中的牌");
 		event.cards = [player.getCards("e"), target.getCards("e")];
+		event.vcards = [player.getVCards("e"), target.getVCards("e")]
 		game.loseAsync({
 			player: player,
 			target: target,
 			cards1: event.cards[0],
 			cards2: event.cards[1],
+			vcards1: event.vcards[0],
+			vcards2: event.vcards[1],
 		}).setContent("swapHandcardsx");
 		"step 1";
-		for (var i = 0; i < event.cards[1].length; i++) {
-			if (get.position(event.cards[1][i], true) == "o") player.equip(event.cards[1][i]);
-		}
-		for (var i = 0; i < event.cards[0].length; i++) {
-			if (get.position(event.cards[0][i], true) == "o") target.equip(event.cards[0][i]);
-		}
+		player.equip(event.vcards[1]);
+		target.equip(event.vcards[0]);
 	},
 	disableJudge: function () {
 		"step 0";
@@ -8165,6 +8164,12 @@ export const Content = {
 			next.delay = false;
 		}
 		"step 3";
+		event.vcards1?.forEach(card => {
+			player.removeVEquip(card);
+		});
+		event.vcards2?.forEach(card => {
+			target.removeVEquip(card);
+		});
 		if (!event.delayed) game.delay();
 	},
 	gainMultiple: function () {

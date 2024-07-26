@@ -21,7 +21,7 @@ game.import("card", function () {
 					player.unmarkSkill("muniu_skill");
 					if (!card || !card.storages || !card.storages.length) return;
 					if (
-						(!event.getParent(2) || event.getParent(2).name != "swapEquip") &&
+						(!event.getParent(3) || event.getParent(3).name != "swapEquip") &&
 						(event.getParent().type != "equip" || event.getParent().swapEquip)
 					) {
 						player.lose(card.storages, ui.discardPile);
