@@ -2348,7 +2348,6 @@ export const Content = {
 			}
 		}
 	},
-	//TODO: 给交换装备牌适配新写法
 	swapEquip: function () {
 		"step 0";
 		game.log(player, "和", target, "交换了装备区中的牌");

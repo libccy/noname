@@ -10977,10 +10977,12 @@ export class Player extends HTMLDivElement {
 				if (isViewAsCard) {
 					cardx.viewAs = card.name;
 					cardx.node.name2.innerHTML = `${suit}${number} [${cardShownName}]`;
+					cardx.classList.add("fakeequip");
 				}
 				else {
 					delete cardx.viewAs;
 					cardx.node.name2.innerHTML = `${suit}${number} ${cardShownName}`;
+					cardx.classList.remove("fakeequip");
 				}
 			})
 			this.vcardsMap?.equips.some(card2 => {
