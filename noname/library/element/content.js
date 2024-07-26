@@ -308,7 +308,6 @@ export const Content = {
 		event.recastingGainingEvents.push(...event.next.filter((value) => value.name != "arrangeTrigger"));
 	},
 	//装备栏相关
-	//TODO: 修正此处的牌数判定，处理多牌转换和零牌转换
 	disableEquip: function () {
 		"step 0";
 		event.cards = [];
@@ -683,7 +682,14 @@ export const Content = {
 			player.addVirtualEquip(card, cards);
 			//player.$equip(card);
 			game.addVideo("equip", player, get.cardInfo(card));
-			if (event.log != false) game.log(player, "装备了", card);
+			if (event.log != false) {
+				const isViewAsCard = (cards.length !== 1 || cards[0].name !== card.name);
+				if (isViewAsCard && cards.length) {
+					game.log(player, '装备了<span class="yellowtext">' + get.translation(card) + "</span>（", cards, "）");
+				} else {
+					game.log(player, "装备了", card);
+				}
+			}
 			if (cardInfo.onEquip && (!cardInfo.filterEquip || cardInfo.filterEquip(card, player))) {
 				if (Array.isArray(cardInfo.onEquip)) {
 					for (var i = 0; i < cardInfo.onEquip.length; i++) {

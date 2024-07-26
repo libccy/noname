@@ -2,6 +2,106 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//马钧
+	yjgongqiao: {
+		enable: "phaseUse",
+		usable: 1,
+		locked: false,
+		filter(event, player) {
+			if (!player.countCards("h")) return false;
+			for (let i = 0; i <= 5; i++){
+				if (player.hasEquipableSlot(i)) return true;
+			}
+			return false;
+		},
+		chooseButton: {
+			dialog(event, player){
+				return ui.create.dialog("###工巧###你可将一张手牌置于你的任意装备栏内（可替换原装备牌）");
+			},
+			chooseControl(event, player){
+				const choices = [];
+				for (let i = 0; i <= 5; i++){
+					if (player.hasEquipableSlot(i)) choices.push(`equip${i}`);
+				}
+				choices.push("cancel2");
+				return choices;
+			},
+			backup(result, player){
+				return {
+					audio: "yjgongqiao",
+					slot: result.control,
+					filterCard: true,
+					position: "h",
+					discard: false,
+					lose: false,
+					delay: false,
+					prepare: "throw",
+					async content(event, trigger, player){
+						const card = get.autoViewAs(event.cards[0]);
+						card.subtypes = [lib.skill.yjgongqiao_backup.slot];
+						await player.equip(card);
+					},
+				}
+			},
+			prompt(result, player){
+				return `选择一张手牌置入${get.translation(result.control)}栏`;
+			},
+		},
+		mod: {
+			maxHandcard(player, num){
+				if (player.hasCard(card => {
+					return get.type2(card, false) === "equip";
+				}, "e")) return (num + 3);
+			},
+		},
+		group: ["yjgongqiao_basic", "yjgongqiao_trick"],
+		subSkill: {
+			backup: {},
+			basic: {
+				trigger: {player: "useCard1"},
+				forced: true,
+				popup: false,
+				filter(event, player){
+					return get.type2(event.card, false) === "basic" && player.hasCard(card => {
+						return get.type2(card, false) === "basic";
+					}, "e");
+				},
+				async content(event, trigger, player){
+					trigger.baseDamage++;
+					game.log(player, "使用的", trigger.card, "牌面数值+1")
+				},
+			},
+			trick: {
+				audio: "yjgongqiao",
+				trigger: {player: "useCard"},
+				forced: true,
+				filter(event, player){
+					const type = get.type2(event.card, false);
+					if (player.hasHistory("useCard", evt => {
+						return evt !== event && get.type2(evt.card, false) === type;
+					}, event)) return false;
+					return player.hasCard(card => {
+						return get.type2(card, false) === "trick";
+					}, "e");
+				},
+				async content(event, trigger, player){
+					await player.draw();
+				},
+			},
+		},
+	},
+	yjjingyi: {
+		trigger: {player: "equipAfter"},
+		forced: true,
+		filter(event, player) {
+			return event.cards?.length > 0;
+		},
+		async content(event, trigger, player){
+			const num = player.countCards("e");
+			if (num > 0) await player.draw(num);
+			if (player.countCards("he") > 0) await player.chooseToDiscard(2, "he", true);
+		},
+	},
 	//新谋郭嘉
 	xianmou: {
 		mark: true,

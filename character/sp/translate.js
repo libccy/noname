@@ -158,7 +158,8 @@ const translates = {
 	caoying: "曹婴",
 	simahui: "司马徽",
 	baosanniang: "鲍三娘",
-	majun: "马钧",
+	majun: "手杀马钧",
+	majun_prefix: "手杀",
 	simazhao: "司马昭",
 	wangyuanji: "王元姬",
 

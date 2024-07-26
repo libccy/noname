@@ -2091,8 +2091,9 @@ export class Get extends GetCompatible {
 		if (lib.experimental.symbol.itemType in obj) return obj[lib.experimental.symbol.itemType];
 	}
 	equipNum(card) {
-		if (get.type(card) == "equip") {
-			return parseInt(get.subtype(card)[5]);
+		const subtypes = get.subtypes(card)
+		if (subtypes.length) {
+			return parseInt(subtypes[0].slice(5));
 		}
 		return 0;
 	}

@@ -413,6 +413,7 @@ window.noname_character_rank = {
 		"licuilianzhaoquanding",
 	],
 	am: [
+		"yj_majun",
 		"tw_yanliang",
 		"tw_wenchou",
 		"tw_yuantan",
@@ -2025,6 +2026,7 @@ window.noname_character_rank = {
 			"jsrg_yuanshao",
 		],
 		epic: [
+			"yj_majun",
 			"xunyuxunyou",
 			"yj_sb_guojia",
 			"wuhujiang",
