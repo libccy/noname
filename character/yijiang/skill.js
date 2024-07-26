@@ -4467,7 +4467,7 @@ const skills = {
 			dialog: function (event, player) {
 				var list = [];
 				for (var i of lib.inpile) {
-					var type = get.type(i, false);
+					var type = get.type(i, null, false);
 					if (type == "basic" || type == "trick") {
 						var card = {
 							name: i,
@@ -10618,7 +10618,7 @@ const skills = {
 			next.set("processAI", function (list) {
 				var cards = list[0][1].slice(0),
 					cards2 = cards.filter(function (i) {
-						return get.type(i, false) == "equip";
+						return get.type(i, null, false) == "equip";
 					}),
 					cards3;
 				if (cards2.length) {

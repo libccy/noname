@@ -715,7 +715,7 @@ const skills = {
 		enable: "phaseUse",
 		filter(event, player) {
 			const cards = player.getCards("h", card => {
-				const type = get.type(card, player);
+				const type = get.type(card, null, player);
 				if (type != "basic" && type != "trick") return false;
 				return (
 					lib.filter.cardUsable(card, player) &&
@@ -733,7 +733,7 @@ const skills = {
 		filterCard(card, player) {
 			if (ui.selected.cards.length) return false;
 			const cards = player.getCards("h", card => {
-				const type = get.type(card, player);
+				const type = get.type(card, null, player);
 				if (type != "basic" && type != "trick") return false;
 				return (
 					lib.filter.cardUsable(card, player) &&
@@ -1566,7 +1566,9 @@ const skills = {
 						return result.winner.canUse({ name: 'sha' }, current, false) && get.effect(current, { name: 'sha' }, result.winner, result.winner) > 0;
 					})) return '选项一';
 					const eff1 = result.winner.getUseValue({ name: 'sha' });
-					const eff2 = (get.value(cards[0], result.winner) + get.value(cards[1], result.winner));
+					const eff2 = 0;
+					if (cards[0]) eff2 = get.value(cards[0], result.winner);
+					if (cards[1]) eff2 += get.value(cards[1], result.winner);
 					if (eff1 > eff2 * 2.5) return '选项二';
 					return '选项一';
 				}()).forResult();
@@ -4424,7 +4426,7 @@ const skills = {
 				trigger: { source: ["damageBegin1", "recoverBegin"] },
 				filter: function (event, player) {
 					var evt = event.getParent();
-					return evt.type == "card" && get.type(evt.card, false) == "basic";
+					return evt.type == "card" && get.type(evt.card, null, false) == "basic";
 				},
 				forced: true,
 				logTarget: "player",
@@ -6259,7 +6261,7 @@ const skills = {
 		animationColor: "gray",
 		filter: function (event, player) {
 			return player.countCards("h", function (card) {
-				var type = get.type(card, player);
+				var type = get.type(card, null, player);
 				return (type == "basic" || type == "trick") && get.tag(card, "damage") > 0;
 			});
 		},
@@ -6281,7 +6283,7 @@ const skills = {
 				.set(
 					"aiCards",
 					player.getCards("h", function (card) {
-						var type = get.type(card, player);
+						var type = get.type(card, null, player);
 						return (type == "basic" || type == "trick") && get.tag(card, "damage") > 0;
 					})
 				);
@@ -6291,7 +6293,7 @@ const skills = {
 				player.logSkill("qljsuiren", target);
 				player.give(
 					player.getCards("h", function (card) {
-						var type = get.type(card, player);
+						var type = get.type(card, null, player);
 						return (type == "basic" || type == "trick") && get.tag(card, "damage") > 0;
 					}),
 					target,
@@ -7365,7 +7367,7 @@ const skills = {
 		forced: true,
 		filter: function (event, player) {
 			if (player == _status.currentPhase || player.countCards("h")) return false;
-			return event.card.name == "sha" || get.type(event.card, false) == "trick";
+			return event.card.name == "sha" || get.type(event.card, null, false) == "trick";
 		},
 		content: function () {
 			player.draw(2);
@@ -9084,7 +9086,7 @@ const skills = {
 				},
 				content: function () {
 					var card = get.cardPile2(function (card) {
-						var type = get.type(card, false);
+						var type = get.type(card, null, false);
 						if (type != "basic" && type != "trick") return false;
 						return get.tag(card, "damage") > 0;
 					});

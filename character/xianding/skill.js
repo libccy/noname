@@ -6275,7 +6275,7 @@ const skills = {
 		filter: function (event, player) {
 			if (player != _status.currentPhase) return false;
 			if (!event.isFirstTarget) return false;
-			if (event.card.name != "sha" && get.type(event.card, false) != "trick") return false;
+			if (event.card.name != "sha" && get.type(event.card, null, false) != "trick") return false;
 			if (player.countCards("h") != player.getHistory("useCard").indexOf(event.getParent()) + 1) return false;
 			return event.targets.some(target => {
 				return target != player && target.isIn();
@@ -6318,7 +6318,7 @@ const skills = {
 				var del = player.countCards("h") - cardsh.length - player.getHistory("useCard").length - 1;
 				if (del < 0) return;
 				if (del > 0) {
-					if (card.name == "sha" || get.type(card, false) != "trick") return num / 3;
+					if (card.name == "sha" || get.type(card, null, player) != "trick") return num / 3;
 					return num + 1;
 				}
 				return num + 15;
@@ -6343,7 +6343,7 @@ const skills = {
 				})
 			)
 				return false;
-			if (!["basic", "trick"].includes(get.type(event.card, false))) return false;
+			if (!["basic", "trick"].includes(get.type(event.card, null, false))) return false;
 			if (event.getParent(2).name == "dcchanjuan") return false;
 			return !player.storage.dcchanjuan[event.card.name] || player.storage.dcchanjuan[event.card.name] < 2;
 		},

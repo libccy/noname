@@ -893,7 +893,7 @@ const skills = {
 		trigger: { global: "useCardToTarget" },
 		usable: 1,
 		filter: function (event, player) {
-			return (event.card.name == "sha" || get.type(event.card, false) == "delay") && event.player != player && !event.targets.includes(player) && player.inRange(event.target);
+			return (event.card.name == "sha" || get.type(event.card, null, false) == "delay") && event.player != player && !event.targets.includes(player) && player.inRange(event.target);
 		},
 		logTarget: "target",
 		check: function (event, player) {
@@ -1638,7 +1638,7 @@ const skills = {
 				} else event.finish();
 			}
 			"step 1";
-			if (player.getCards("h").includes(card) && get.type(card, player) == "equip" && player.hasUseTarget(card)) player.chooseUseTarget(card, true, "nopopup");
+			if (player.getCards("h").includes(card) && get.type(card, null, player) == "equip" && player.hasUseTarget(card)) player.chooseUseTarget(card, true, "nopopup");
 			"step 2";
 			var hs = target.getCards("h", function (card) {
 				return target.canUse(get.autoViewAs({ name: "sha" }, [card]), player, false);
@@ -2548,7 +2548,7 @@ const skills = {
 				event.targets.length == 1 &&
 				(event.target.countGainableCards(player, "h") > 0 ||
 					player.hasCard(function (i) {
-						return _status.connectMode || (get.type(i, player) == "basic" && lib.filter.cardDiscardable(i, player, "dbquedi"));
+						return _status.connectMode || (get.type(i, null, player) == "basic" && lib.filter.cardDiscardable(i, player, "dbquedi"));
 					}, "h"))
 			);
 		},
@@ -2560,7 +2560,7 @@ const skills = {
 			if (target.countGainableCards(player, "h") > 0) list.push("选项一");
 			if (
 				player.hasCard(function (i) {
-					return get.type(i, player) == "basic" && lib.filter.cardDiscardable(i, player, "dbquedi");
+					return get.type(i, null, player) == "basic" && lib.filter.cardDiscardable(i, player, "dbquedi");
 				}, "h")
 			)
 				list.push("选项二");
@@ -2579,7 +2579,7 @@ const skills = {
 					var bool1 = target.countGainableCards(player, "h") > 0;
 					var bool2 =
 						player.hasCard(function (i) {
-							return get.type(i, player) == "basic" && lib.filter.cardDiscardable(i, player, "dbquedi") && get.value(card, player) < 5;
+							return get.type(i, null, player) == "basic" && lib.filter.cardDiscardable(i, player, "dbquedi") && get.value(card, player) < 5;
 						}, "h") &&
 						!target.hasSkillTag("filterDamage", null, {
 							player: player,
@@ -2605,7 +2605,7 @@ const skills = {
 			if (
 				(event.control == "选项二" || event.control == "背水！") &&
 				player.hasCard(function (i) {
-					return get.type(i, player) == "basic" && lib.filter.cardDiscardable(i, player, "dbquedi");
+					return get.type(i, null, player) == "basic" && lib.filter.cardDiscardable(i, player, "dbquedi");
 				}, "h")
 			) {
 				player.chooseToDiscard("h", "弃置一张基本牌", { type: "basic" }, true);
@@ -2870,7 +2870,7 @@ const skills = {
 		forced: true,
 		locked: false,
 		filter: function (event, player) {
-			return get.type(event.card, false) != "delay" && !player.getStorage("xingqi").includes(event.card.name);
+			return get.type(event.card, null, false) != "delay" && !player.getStorage("xingqi").includes(event.card.name);
 		},
 		content: function () {
 			player.markAuto("xingqi", [trigger.card.name]);
@@ -4972,7 +4972,7 @@ const skills = {
 					if (player.hasSkill("ejian") && !player.getStorage("ejian").includes(target)) {
 						var dam = get.damageEffect(target, player, target);
 						if (dam > 0) return dam;
-						var type = get.type(card, target),
+						var type = get.type(card, null, target),
 							ts = target.getCards("he", function (card) {
 								return get.type(card) == type;
 							});
@@ -5313,7 +5313,7 @@ const skills = {
 				event.finish();
 			} else player.gain(card, "gain2");
 			"step 3";
-			if (player.isIn() && player.getCards("h").includes(card) && get.type(card, player) == "equip") player.chooseUseTarget(card, true, "nopopup");
+			if (player.isIn() && player.getCards("h").includes(card) && get.type(card, null, player) == "equip") player.chooseUseTarget(card, true, "nopopup");
 		},
 		onremove: true,
 		intro: { content: "已发动过#次" },

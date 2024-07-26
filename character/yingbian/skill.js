@@ -387,7 +387,7 @@ const skills = {
 		audio: "wanyi",
 		trigger: { player: "useCardToTargeted" },
 		filter: function (event, player) {
-			return player != event.target && event.targets.length == 1 && (event.card.name == "sha" || get.type(event.card, false) == "trick") && event.target.countCards("he") > 0;
+			return player != event.target && event.targets.length == 1 && (event.card.name == "sha" || get.type(event.card, null, false) == "trick") && event.target.countCards("he") > 0;
 		},
 		locked: false,
 		logTarget: "target",
@@ -2926,7 +2926,7 @@ const skills = {
 		mod: {
 			cardEnabled2: function (card, player) {
 				var stat = player.getStat("skill");
-				if (stat.xinquanbian && stat.xinquanbian >= player.maxHp && get.position(card) == "h" && get.type(card, player) != "equip") return false;
+				if (stat.xinquanbian && stat.xinquanbian >= player.maxHp && get.position(card) == "h" && get.type(card, null, player) != "equip") return false;
 			},
 		},
 	},
@@ -3833,7 +3833,7 @@ const skills = {
 			}
 			var next = player.chooseToDiscard(`是否弃置一枚“爵”和一张${get.mode() == "guozhan" ? "基本" : "手"}牌，对${get.translation(trigger.player)}发动【骁果】？`, "h", function (card, player) {
 				if (get.mode() != "guozhan") return true;
-				return get.type(card, player) == "basic";
+				return get.type(card, null, player) == "basic";
 			});
 			next.set("ai", function (card) {
 				if (_status.event.nono) return 0;

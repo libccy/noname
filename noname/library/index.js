@@ -9812,7 +9812,7 @@ export class Library {
 		cardGiftable: (card, player, target, strict) => {
 			const mod = game.checkMod(card, player, target, "unchanged", "cardGiftable", player);
 			if (!mod || (strict && ((mod == "unchanged" && (get.position(card) != "h" || !get.cardtag(card, "gifts"))) || player == target))) return false;
-			return get.type(card, false) != "equip" || target.canEquip(card, true);
+			return get.type(card, null, target) != "equip" || target.canEquip(card, true);
 		},
 		/**
 		 * Check if the card is recastable

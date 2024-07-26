@@ -4370,7 +4370,7 @@ const skills = {
 				filter: function (event, player) {
 					if (!player.hasMark("dcgonghu_basic") || !player.hasMark("dcgonghu_damage")) return false;
 					var card = event.card;
-					if (get.color(card, false) != "red" || get.type(card, null, true) != "trick") return false;
+					if (get.color(card, false) != "red" || get.type(card, null, false) != "trick") return false;
 					var info = get.info(card);
 					if (info.allowMultiple == false) return false;
 					if (event.targets && !info.multitarget) {
@@ -6166,7 +6166,7 @@ const skills = {
 						Math.min(
 							5,
 							player.countCards("h", function (card) {
-								return get.type(card, player) == "basic";
+								return get.type(card, null, player) == "basic";
 							})
 						)
 					);
@@ -6184,7 +6184,7 @@ const skills = {
 				var num = Math.min(
 					5,
 					player.countCards("h", function (cardx) {
-						var type = get.type(cardx, player);
+						var type = get.type(cardx, null, player);
 						return (name == "dcneifa_basic") != (type == "basic") && type != "equip";
 					})
 				);
@@ -10415,7 +10415,7 @@ const skills = {
 				charlotte: true,
 				logTarget: "target",
 				filter: function (event, player) {
-					return event.target != player && (event.card.name == "sha" || get.type(event.card, false) == "trick") && event.target.countCards("he") > 0;
+					return event.target != player && (event.card.name == "sha" || get.type(event.card, null, false) == "trick") && event.target.countCards("he") > 0;
 				},
 				content: function () {
 					"step 0";
@@ -10429,7 +10429,7 @@ const skills = {
 				ai: {
 					effect: {
 						player_use(card, player, target) {
-							if (player !== target && get.itemtype(target) === "player" && (card.name === "sha" || get.type(card, false) === "trick") && target.countCards("he") && !target.hasSkillTag("noh")) return [1, 0, 1, -1];
+							if (player !== target && get.itemtype(target) === "player" && (card.name === "sha" || get.type(card, null, false) === "trick") && target.countCards("he") && !target.hasSkillTag("noh")) return [1, 0, 1, -1];
 						},
 					},
 				},
@@ -12824,7 +12824,7 @@ const skills = {
 				filter: function (event, player) {
 					if (!player.hasMark("zhtongyuan_basic") || !player.hasMark("zhtongyuan_trick")) return false;
 					var card = event.card;
-					if (get.color(card, false) != "red" || get.type(card, null, true) != "basic") return false;
+					if (get.color(card, false) != "red" || get.type(card, null, false) != "basic") return false;
 					var info = get.info(card);
 					if (info.allowMultiple == false) return false;
 					if (event.targets && !info.multitarget) {
@@ -13178,7 +13178,7 @@ const skills = {
 		filter: function (event, player) {
 			if (player == event.player || event.targets.length != 1) return false;
 			var bool = function (card) {
-				return (card.name == "sha" || get.type(card, false) == "trick") && get.color(card, false) == "black";
+				return (card.name == "sha" || get.type(card, null, false) == "trick") && get.color(card, false) == "black";
 			};
 			if (!bool(event.card)) return false;
 			var evt = event.getParent("phaseUse");

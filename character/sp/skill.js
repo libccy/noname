@@ -2069,7 +2069,7 @@ const skills = {
 					filterCard: true,
 					position: "h",
 					ai1(card) {
-						if (get.type(card, false) == "equip") return 1 - get.value(card);
+						if (get.type2(card, false) == "equip") return 1 - get.value(card);
 						return 7 - get.value(card);
 					},
 					ai2(target) {
@@ -7333,7 +7333,7 @@ const skills = {
 					for (var cardx of cards2) {
 						var type = get.type2(cardx, player);
 						var card = get.discardPile(function (card) {
-							return get.type(card, false) == type && !cards2.includes(card) && !cards.includes(card);
+							return get.type2(card, false) == type && !cards2.includes(card) && !cards.includes(card);
 						});
 						if (card) cards.push(card);
 					}
@@ -12242,7 +12242,7 @@ const skills = {
 		filter: function (event, player) {
 			return player.hasCard(function (card) {
 				if (_status.connectMode) return true;
-				var type = get.type(card, player);
+				var type = get.type(card, null, player);
 				return type == "basic" || type == "trick";
 			}, "h");
 		},
@@ -12250,7 +12250,7 @@ const skills = {
 			"step 0";
 			player
 				.chooseCard("h", get.prompt("zhaogujing_skill"), "展示并视为使用一张基本牌或普通锦囊牌", function (card, player) {
-					var type = get.type(card, player);
+					var type = get.type(card, null, player);
 					return type == "basic" || type == "trick";
 				})
 				.set("ai", function (card) {
@@ -14956,7 +14956,7 @@ const skills = {
 		usable: 1,
 		filter: function (event, player) {
 			if (event.olfengzi_buff || !event.targets.length || !player.isPhaseUsing() || player.hasSkill("olfengzi_buff")) return false;
-			var type = get.type(event.card, false);
+			var type = get.type(event.card, null, false);
 			if (type != "basic" && type != "trick") return false;
 			return player.hasCard(function (i) {
 				if (_status.connectMode) return true;
@@ -14966,7 +14966,7 @@ const skills = {
 		content: function () {
 			"step 0";
 			if (player != game.me && !player.isUnderControl() && !player.isOnline()) game.delayx();
-			var type = get.type(trigger.card, false);
+			var type = get.type(trigger.card, null, false);
 			player
 				.chooseToDiscard("h", get.prompt("olfengzi"), "弃置一张" + get.translation(type) + "牌，令" + get.translation(trigger.card) + "结算两次", function (card, player) {
 					return get.type2(card, player) == _status.event.type;
@@ -16037,7 +16037,7 @@ const skills = {
 		trigger: { player: "useCard" },
 		forced: true,
 		filter: function (event, player) {
-			return get.type(event.card, false) == "basic";
+			return get.type(event.card, null, false) == "basic";
 		},
 		content: function () {
 			player.addSkill("wangong2");
@@ -17086,7 +17086,7 @@ const skills = {
 				var card = result.cards[0];
 				trigger.player.$throw(card);
 				game.delayx();
-				if (get.type(card, false) == "delay") trigger.player.addJudge(card);
+				if (get.type(card, null, false) == "delay") trigger.player.addJudge(card);
 				else trigger.player.addJudge({ name: get.color(card, false) == "red" ? "lebu" : "bingliang" }, result.cards);
 			}
 		},
@@ -17184,7 +17184,7 @@ const skills = {
 					filterCard: true,
 					position: "h",
 					ai1: function (card) {
-						if (get.type(card, false) == "equip") return 1 - get.value(card);
+						if (get.type2(card, false) == "equip") return 1 - get.value(card);
 						return 7 - get.value(card);
 					},
 					ai2: function (target) {
@@ -17682,7 +17682,7 @@ const skills = {
 						return card != cardx && get.name(card, player) == "sha" && player.hasValueTarget(card);
 					});
 					var numx = player.countCards("h", function (card) {
-						return get.type(card, player) != "basic";
+						return get.type2(card, player) != "basic";
 					});
 					num += Math.min(numx, Math.max(0, shas.length - player.getCardUsable("sha"))) * 0.7;
 					num +=
@@ -17708,7 +17708,7 @@ const skills = {
 						Math.min(
 							5,
 							player.countCards("h", function (card) {
-								return get.type(card, player) == "basic";
+								return get.type2(card, player) == "basic";
 							})
 						)
 					);
@@ -17740,7 +17740,7 @@ const skills = {
 				var num = Math.min(
 					5,
 					player.countCards("h", function (cardx) {
-						return (name == "neifa_basic") != (get.type(cardx, player) == "basic");
+						return (name == "neifa_basic") != (get.type2(cardx, player) == "basic");
 					})
 				);
 				if (num > 0) player.addMark(name, num, false);
@@ -18439,7 +18439,7 @@ const skills = {
 				for (var j = 0; j < history[i].lose.length; j++) {
 					if (history[i].lose[j].parent.name == "useCard") continue;
 					num += history[i].lose[j].cards2.filter(function (card) {
-						return get.type(card, false) == "equip";
+						return get.type(card) == "equip";
 					}).length;
 				}
 			}
@@ -25498,7 +25498,7 @@ const skills = {
 					if (
 						list.includes("trick") &&
 						source.countCards("h", function (card) {
-							return get.type(card, source) == "trick" && source.hasValueTarget(card);
+							return get.type(card, null, source) == "trick" && source.hasValueTarget(card);
 						}) > 1
 					)
 						return "trick";
