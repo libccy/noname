@@ -1787,7 +1787,7 @@ const skills = {
 				names = [];
 			for (let i = 0; i < ui.discardPile.childElementCount; i++) {
 				let card = ui.discardPile.childNodes[i];
-				if (get.type(card, false) == "basic" && !names.includes(card.name)) {
+				if (get.type(card, null, false) == "basic" && !names.includes(card.name)) {
 					gains.push(card);
 					names.push(card.name);
 				}
@@ -4987,7 +4987,7 @@ const skills = {
 				event.redo();
 			}
 			"step 3";
-			var card = get.cardPile2(card => get.type(card, false) == "equip");
+			var card = get.cardPile2(card => get.type(card, null, false) == "equip");
 			if (card) player.gain(card, "gain2");
 		},
 		ai: {
@@ -5470,7 +5470,7 @@ const skills = {
 				direct: true,
 				onremove: true,
 				filter: function (event, player) {
-					var type = get.type(event.card, false);
+					var type = get.type(event.card, null, false);
 					return type == "basic" || type == "trick";
 				},
 				content: function () {
@@ -6045,13 +6045,13 @@ const skills = {
 		audio: 3,
 		liujing_filter: [
 			function (card) {
-				return get.type(card, false) == "trick" && get.tag(card, "damage", null, false) > 0;
+				return get.type(card, null, false) == "trick" && get.tag(card, "damage", null, false) > 0;
 			},
-			card => get.type(card, false) == "basic",
+			card => get.type(card, null, false) == "basic",
 			card => get.name(card, false) == "wuxie",
 			card => get.name(card, false) == "wuzhong",
 			card => get.name(card, false) == "lebu",
-			card => get.type(card, false) == "equip",
+			card => get.type(card, null, false) == "equip",
 		],
 		getLiujing: function (player, index) {
 			var filter = lib.skill.chengye.liujing_filter[index],
@@ -6074,7 +6074,7 @@ const skills = {
 			} else if (event.name != "cardsDiscard") {
 				var cards = event.getd(null, "cards2").filter(function (card) {
 					if (get.position(card, true) != "d") return false;
-					var type = get.type(card, false);
+					var type = get.type(card, null, false);
 					return type == "delay" || type == "equip";
 				});
 				cards.removeArray(event.getd(player, "cards2"));
@@ -6086,7 +6086,7 @@ const skills = {
 				if (evt2.name != "phaseJudge" || evt2.player == player) return;
 				var cards = event.cards.filter(function (card) {
 					if (get.position(card, true) != "d") return false;
-					var type = get.type(card, false);
+					var type = get.type(card, null, false);
 					return type == "delay";
 				});
 				if (!cards.length) return false;
@@ -6107,14 +6107,14 @@ const skills = {
 			} else if (trigger.name != "cardsDiscard") {
 				cards = trigger.getd().filter(function (card) {
 					if (card.original == "j" || get.position(card, true) != "d") return false;
-					var type = get.type(card, false);
+					var type = get.type(card, null, false);
 					return type == "delay" || type == "equip";
 				});
 				cards.removeArray(trigger.getd(player));
 			} else {
 				cards = trigger.cards.filter(function (card) {
 					if (get.position(card, true) != "d") return false;
-					var type = get.type(card, false);
+					var type = get.type(card, null, false);
 					return type == "delay";
 				});
 			}
@@ -6521,7 +6521,7 @@ const skills = {
 		filter: function (event, player) {
 			if (!player.countCards("he")) return false;
 			for (var i of lib.inpile) {
-				if (i != "du" && get.type(i, false) == "basic") {
+				if (i != "du" && get.type(i, null, false) == "basic") {
 					if (event.filterCard({ name: i }, player, event)) return true;
 					if (i == "sha") {
 						for (var j of lib.inpile_nature) {
@@ -6547,7 +6547,7 @@ const skills = {
 				var suit = event.xinjianying_suit || "",
 					str = get.translation(suit);
 				for (var i of lib.inpile) {
-					if (i != "du" && get.type(i, false) == "basic") {
+					if (i != "du" && get.type(i, null, false) == "basic") {
 						if (event.filterCard({ name: i }, player, event)) list.push(["基本", str, i]);
 						if (i == "sha") {
 							for (var j of lib.inpile_nature) {
@@ -8304,7 +8304,7 @@ const skills = {
 		direct: true,
 		filter: function (event, player) {
 			return (
-				get.type(event.card, false) != "delay" &&
+				get.type(event.card, null, false) != "delay" &&
 				game.hasPlayer(function (current) {
 					return player != current && (!player.storage.discretesidi || !player.storage.discretesidi.includes(current));
 				})
@@ -8371,7 +8371,7 @@ const skills = {
 				filter: function (event, player) {
 					if (!player.storage.discretesidi || !player.storage.discretesidi.includes(event.player)) return false;
 					if (event.name == "die") return true;
-					if (get.type(event.card, false) != "delay") {
+					if (get.type(event.card, null, false) != "delay") {
 						var index = player.storage.discretesidi.indexOf(event.player);
 						return index != -1 && (player.storage.discretesidi2[index] != event.target || event.targets.length != 1);
 					}
@@ -8388,7 +8388,7 @@ const skills = {
 				forced: true,
 				locked: false,
 				filter: function (event, player) {
-					if (get.type(event.card, false) == "delay" || !player.storage.discretesidi || event.targets.length != 1) return false;
+					if (get.type(event.card, null, false) == "delay" || !player.storage.discretesidi || event.targets.length != 1) return false;
 					var index = player.storage.discretesidi.indexOf(event.player);
 					return index != -1 && player.storage.discretesidi2[index] == event.target;
 				},
@@ -14852,7 +14852,7 @@ const skills = {
 	xinzhanyi_basic1: {
 		trigger: { player: "useCard" },
 		filter: function (event, player) {
-			return get.type(event.card, false) == "basic" && player.hasMark("xinzhanyi_basic1");
+			return get.type(event.card, null, false) == "basic" && player.hasMark("xinzhanyi_basic1");
 		},
 		forced: true,
 		silent: true,

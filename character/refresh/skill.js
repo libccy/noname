@@ -778,7 +778,7 @@ const skills = {
 			if (result.bool) {
 				var num = result.cards.length;
 				for (var i of result.cards) {
-					if (get.type(i, false) == "equip") num++;
+					if (get.type(i) == "equip") num++;
 				}
 				event.cards = game.cardsGotoOrdering(get.cards(num)).cards;
 				player.showCards(event.cards);
@@ -840,7 +840,7 @@ const skills = {
 				trigger: { player: "useCard" },
 				forced: true,
 				filter: function (event, player) {
-					if (event.card.name != "sha" && get.type(event.card, false) != "trick") return false;
+					if (event.card.name != "sha" && get.type(event.card, null, false) != "trick") return false;
 					for (var i = 2; i < 6; i++) {
 						if (!player.hasEmptySlot(i)) return false;
 					}
@@ -853,7 +853,7 @@ const skills = {
 				ai: {
 					directHit_ai: true,
 					skillTagFilter: function (player, tag, arg) {
-						if (!arg || !arg.card || !arg.target || (arg.card.name != "sha" && get.type(arg.card, false) != "trick")) return false;
+						if (!arg || !arg.card || !arg.target || (arg.card.name != "sha" && get.type(arg.card, null, false) != "trick")) return false;
 						for (var i = 2; i < 6; i++) {
 							if (!player.hasEmptySlot(i)) return false;
 						}
@@ -4275,7 +4275,7 @@ const skills = {
 			var card = result.cards[0],
 				target = trigger.player;
 			player.showCards(card, get.translation(player) + "对" + (player == target ? "自己" : get.translation(target)) + "发动了【补益】");
-			if (get.type(card, target) != "basic") {
+			if (get.type(card, null, target) != "basic") {
 				target.discard(card);
 				target.recover();
 				if (target.countCards("h") == 1) target.draw();

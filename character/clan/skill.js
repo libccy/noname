@@ -773,7 +773,7 @@ const skills = {
 			result: {
 				target(player, target) {
 					var cards = player.getCards("hs", card => {
-						if (get.name(card, player) != "sha" && get.type(card, player) != "trick") return false;
+						if (get.name(card, player) != "sha" && get.type(card, null, player) != "trick") return false;
 						return player.hasValueTarget(card);
 					});
 					if (cards.some(card => player.canUse(card, target) && get.effect(target, card, player, player) > 0)) {

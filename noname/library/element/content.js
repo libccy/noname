@@ -281,7 +281,7 @@ export const Content = {
 		player.$give(card, target, false);
 		game.delay(0.5);
 		event.trigger("giftAccept");
-		if (get.type(card, false) == "equip") target.equip(card).log = false;
+		if (get.type(card) == "equip") target.equip(card).log = false;
 		else target.gain(card, player).visible = true;
 		event.trigger("giftAccepted");
 		"step 3";

@@ -1793,7 +1793,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				filter: function (event, player) {
 					if (player == event.player || event.targets.length != 1 || event.player.countCards("h") >= event.player.hp) return false;
 					var bool = function (card) {
-						return (card.name == "sha" || get.type(card, false) == "trick") && get.color(card, false) == "black";
+						return (card.name == "sha" || get.type(card, null, false) == "trick") && get.color(card, false) == "black";
 					};
 					if (!bool(event.card)) return false;
 					var evt = event.getParent("phaseUse");
@@ -7584,7 +7584,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							if (
 								list.includes("trick") &&
 								source.countCards("h", function (card) {
-									return get.type(card, source) == "trick" && source.hasValueTarget(card);
+									return get.type(card, null, source) == "trick" && source.hasValueTarget(card);
 								}) > 1
 							)
 								return "trick";

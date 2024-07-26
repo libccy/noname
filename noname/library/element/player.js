@@ -908,7 +908,7 @@ export class Player extends HTMLDivElement {
 	 */
 	getGiftAIResultTarget(card, target) {
 		if (!card || target.refuseGifts(card, this)) return 0;
-		if (get.type(card, false) == "equip") return get.effect(target, card, target, target);
+		if (get.type(card, null, target) == "equip") return get.effect(target, card, target, target);
 		if (card.name == "du") return this.hp > target.hp ? -1 : 0;
 		if (target.hasSkillTag("nogain")) return 0;
 		return Math.max(1, get.value(card, this) - get.value(card, target));

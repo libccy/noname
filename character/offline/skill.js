@@ -5121,7 +5121,7 @@ const skills = {
 			event.target.markAuto("yjxiandao_block", [get.suit(event.card, false)]);
 			event.target.addTempSkill("yjxiandao_block");
 			"step 1";
-			var type = get.type(card, false);
+			var type = get.type(card);
 			if (type == "trick") player.draw(2);
 			if (type == "equip") {
 				if (
@@ -5303,7 +5303,7 @@ const skills = {
 						max = 0;
 					for (var i of hs) {
 						val += get.value(i, player);
-						if (get.type(i, player) == "trick") max += 5;
+						if (get.type(i, null, player) == "trick") max += 5;
 					}
 					if (player.hasSkill("zhenjue")) max += 7;
 					return val <= max ? 1 : 0;
