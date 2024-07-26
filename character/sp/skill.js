@@ -1982,7 +1982,7 @@ const skills = {
 			if (bool) {
 				player.logSkill("olpijing", targets);
 				for (const i of targets) {
-					trigger.targets[trigger.targets.includes(i) ? "add" : "remove"](i);
+					trigger.targets[!trigger.targets.includes(i) ? "add" : "remove"](i);
 				}
 				for (const target of targets) {
 					target.addSkill("olpijing_effect");
