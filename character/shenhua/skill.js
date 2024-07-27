@@ -429,13 +429,13 @@ const skills = {
 				filter(event, player) {
 					return (
 						player.getExpansions("olkongsheng").filter(function (card) {
-							return get.type(card, false) != "equip";
+							return get.type(card, null, false) != "equip";
 						}).length > 0
 					);
 				},
 				async content(event, trigger, player) {
 					let cards = player.getExpansions("olkongsheng").filter(function (card) {
-						return get.type(card, false) != "equip";
+						return get.type(card, null, false) != "equip";
 					});
 					if (cards.length) await player.gain(cards, "gain2");
 					cards = player.getExpansions("olkongsheng");
@@ -1626,7 +1626,7 @@ const skills = {
 			player.addTempSkill("kongsheng_ai", "kongsheng2After");
 			while (true) {
 				const cards = player.getExpansions("kongsheng2").filter(function (i) {
-					return get.type(i, false) == "equip" && player.hasUseTarget(i);
+					return get.type(i, null, false) == "equip" && player.hasUseTarget(i);
 				});
 				if (cards.length > 0) {
 					let [card] = cards;
@@ -5519,7 +5519,7 @@ const skills = {
 			if (event.type == "dying") {
 				if (player != event.dying) return false;
 				return true;
-			} else if (event.parent.name == "phaseUse") {
+			} else if (event.getParent().name == "phaseUse") {
 				return true;
 			}
 			return false;

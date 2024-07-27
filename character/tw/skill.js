@@ -700,7 +700,7 @@ const skills = {
 			};
 		},
 		async content(event, trigger, player) {
-			await trigger.cancel();
+			trigger.cancel();
 			if (event.cost_data == "选项一") await player.gainPlayerCard(trigger.player, "e", true);
 			else {
 				for (let i = 1; i < 7; i++) {
@@ -6826,7 +6826,7 @@ const skills = {
 			var cards = [];
 			for (var i = 0; i < ui.cardPile.childNodes.length; i++) {
 				var card = ui.cardPile.childNodes[i];
-				if (get.type(card) == "basic") cards.push(card);
+				if (get.type(card, null, false) == "basic") cards.push(card);
 			}
 			event.set("twmouli", cards);
 		},
@@ -6901,7 +6901,7 @@ const skills = {
 				var list = [];
 				for (var i = 0; i < ui.cardPile.childNodes.length; i++) {
 					var card = ui.cardPile.childNodes[i];
-					if (get.type(card, player) == "basic" && !list.includes(card.name)) list.push(card.name);
+					if (get.type(card, null, false) == "basic" && !list.includes(card.name)) list.push(card.name);
 				}
 				if (tag == "respondSha") return list.includes("sha");
 				if (tag == "respondShan") return list.includes("shan");
@@ -7029,7 +7029,7 @@ const skills = {
 			var evt = event.getl(player);
 			if (!evt || !evt.cards2 || !evt.cards2.length) return false;
 			for (var i of evt.cards2) {
-				if (get.type(i, player) != "basic") return true;
+				if (get.type(i, null, player) != "basic") return true;
 			}
 			return false;
 		},
@@ -7038,7 +7038,7 @@ const skills = {
 			var num = 0,
 				evt = trigger.getl(player);
 			for (var i of evt.cards2) {
-				if (get.type(i, player) != "basic" && num < 5) num++;
+				if (get.type(i, null, player) != "basic" && num < 5) num++;
 			}
 			player.chooseToGuanxing(num);
 			player.chooseBool("羽化：是否摸" + get.cnNumber(num) + "张牌？").set("frequentSkill", "twyuhua");
@@ -7313,7 +7313,7 @@ const skills = {
 					if (get.attitude(player, target) < 0 && player.hasSkill("twejian")) {
 						var dam = get.damageEffect(target, player, target);
 						if (dam > 0) return dam;
-						var type = get.type(card, target),
+						var type = get.type2(card, target),
 							ts = target.getCards("he", function (card) {
 								return get.type(card) == type;
 							});
@@ -14248,7 +14248,7 @@ const skills = {
 		direct: true,
 		usable: 1,
 		filter: function (event, player) {
-			return event.isFirstTarget && event.targets.length > 0 && (event.card.name == "sha" || (get.type(event.card, false) == "trick" && get.tag(event.card, "damage") > 0));
+			return event.isFirstTarget && event.targets.length > 0 && (event.card.name == "sha" || (get.type(event.card, null, false) == "trick" && get.tag(event.card, "damage") > 0));
 		},
 		content: function () {
 			"step 0";
@@ -14752,7 +14752,7 @@ const skills = {
 			} else event.finish();
 			"step 2";
 			var target = trigger.player;
-			if (target.getCards("h").includes(card) && get.type(card, target) == "equip" && target.hasUseTarget(card)) target.chooseUseTarget(card, "nopopup");
+			if (target.getCards("h").includes(card) && get.type(card, null, target) == "equip" && target.hasUseTarget(card)) target.chooseUseTarget(card, "nopopup");
 		},
 	},
 	//Powered by @污言噫对
@@ -16518,7 +16518,7 @@ const skills = {
 				names = [];
 			for (var i = 0; i < ui.discardPile.childNodes.length; i++) {
 				var card = ui.discardPile.childNodes[i];
-				if (get.type(card, false) == "basic" && !names.includes(card.name)) {
+				if (get.type(card, null, false) == "basic" && !names.includes(card.name)) {
 					cards.push(card);
 					names.push(card.name);
 				}
@@ -16535,7 +16535,7 @@ const skills = {
 				names = [];
 			for (var i = 0; i < ui.discardPile.childNodes.length; i++) {
 				var card = ui.discardPile.childNodes[i];
-				if (get.type(card, false) == "basic" && !names.includes(card.name)) {
+				if (get.type(card, null, false) == "basic" && !names.includes(card.name)) {
 					cards.push(card);
 					names.push(card.name);
 				}
@@ -16572,7 +16572,7 @@ const skills = {
 			return (
 				!player.hasSkill("twhengjiang2") &&
 				event.targets.length == 1 &&
-				["basic", "trick"].includes(get.type(event.card, false)) &&
+				["basic", "trick"].includes(get.type(event.card, null, false)) &&
 				player.isPhaseUsing() &&
 				game.hasPlayer(function (current) {
 					return player.inRange(current) && lib.filter.targetEnabled2(event.card, player, current);

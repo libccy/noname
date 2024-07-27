@@ -383,7 +383,7 @@ game.import("card", function () {
 								num = 1;
 							if (isLink) {
 								let cache = _status.event.getTempCache("sha_result", "eff");
-								if (typeof cache !== "object" || cache.card !== get.translation(card))
+								if (typeof cache !== "object" || cache.card !== (card.getCacheKey ? card.getCacheKey("null") : get.translation(card)))
 									return eff;
 								if (cache.odds < 1.35 && cache.bool) return 1.35 * cache.eff;
 								return cache.odds * cache.eff;
@@ -392,7 +392,7 @@ game.import("card", function () {
 								player.hasSkill("jiu") ||
 								player.hasSkillTag("damageBonus", true, {
 									target: target,
-									card: card,
+									card: card
 								})
 							) {
 								if (
@@ -432,7 +432,7 @@ game.import("card", function () {
 									);
 							_status.event.putTempCache("sha_result", "eff", {
 								bool: target.hp > num && get.attitude(player, target) > 0,
-								card: get.translation(card),
+								card: card.getCacheKey ? card.getCacheKey("null") : get.translation(card),
 								eff: eff,
 								odds: odds,
 							});
@@ -1059,8 +1059,16 @@ game.import("card", function () {
 						return;
 					}
 					if (event.dialog.buttons.length > 1) {
-						var next = target.chooseButton(true, function (button) {
-							return get.value(button.link, _status.event.player);
+						var next = target.chooseButton(true);
+						next.set("ai", button => {
+							let player = _status.event.player, card = button.link, val = get.value(card, player);
+							if (get.tag(card, "recover")) {
+								val += game.countPlayer(target => {
+									return target.hp < 2 && get.attitude(player, target) > 0 && lib.filter.cardSavable(card, player, target);
+								});
+								if (player.hp <= 2 && game.checkMod(card, player, "unchanged", "cardEnabled2", player)) val *= 2;
+							}
+							return val;
 						});
 						next.set("dialog", event.preResult);
 						next.set("closeDialog", false);
@@ -1166,18 +1174,16 @@ game.import("card", function () {
 					result: {
 						target: function (player, target) {
 							var sorter = _status.currentPhase || player;
+							let opt = 6 + 0.75 * (game.countPlayer() - 2 * get.distance(sorter, target, "absolute"));
 							if (get.is.versus()) {
-								if (target == sorter) return 1.5;
-								return 1;
+								if (target !== sorter && get.attitude(player, player.next) < get.attitude(player, player.previous)) {
+									opt = 6 + 0.75 * (2 * get.distance(sorter, target, "absolute") - game.countPlayer());
+								}
 							}
 							if (player.hasUnknown(2)) {
 								return 0;
 							}
-							return (1 - get.distance(sorter, target, "absolute") / game.countPlayer()) *
-								get.attitude(player, target) >
-								0
-								? 0.5
-								: 0.7;
+							return opt / 6;
 						},
 					},
 					tag: {
@@ -2712,16 +2718,17 @@ game.import("card", function () {
 							);
 						},
 						target: (player, target, card) => {
-							let targets = [].concat(ui.selected.targets);
+							let targets = ui.selected.targets.slice();
 							if (_status.event.preTarget) targets.add(_status.event.preTarget);
 							if (targets.length) {
-								let preTarget = targets.lastItem,
+								let preTarget = targets.at(-1),
 									pre = _status.event.getTempCache("jiedao_result", preTarget.playerid);
-								if (pre && pre.card === card && pre.target.isIn())
+								if (pre && pre.target.isIn() && pre.card === (card.getCacheKey ? card.getCacheKey("null") : get.translation(card)))
 									return target === pre.target ? pre.eff : 0;
 								return (
-									get.effect(target, { name: "sha" }, preTarget, player) /
-									get.attitude(player, target)
+									get.effect(target, { name: "sha" }, preTarget, target) /
+									get.attitude(target, target) *
+									preTarget.mayHaveSha(player, "use", null, "odds")
 								);
 							}
 							let arms =
@@ -2729,20 +2736,19 @@ game.import("card", function () {
 								target.getEquips(1).reduce((num, i) => {
 									return num + get.value(i, target);
 								}, 0);
-							if (!target.mayHaveSha(player, "use")) return arms;
-							let sha = game.filterPlayer(get.info({ name: "jiedao" }).filterAddedTarget),
+							let sha = game.filterPlayer(cur => {
+									return get.info({ name: "jiedao" }).filterAddedTarget(null, player, cur, target);
+								}),
 								addTar = null;
 							sha = sha.reduce((num, current) => {
 								let eff = get.effect(current, { name: "sha" }, target, player);
 								if (eff <= num) return num;
 								addTar = current;
 								return eff;
-							}, -100);
-							if (!addTar) return arms;
-							sha /= get.attitude(player, target);
+							}, -100) / get.attitude(player, target) * target.mayHaveSha(player, "use", null, "odds");
 							_status.event.putTempCache("jiedao_result", target.playerid, {
-								card: card,
 								target: addTar,
+								card: card.getCacheKey ? card.getCacheKey("null") : get.translation(card),
 								eff: sha,
 							});
 							return Math.max(arms, sha);

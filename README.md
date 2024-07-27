@@ -26,7 +26,7 @@ docker: [docker.md](./docker/docker.md)
 
 网页端推荐使用 Chrome 系内核浏览器游玩，不推荐使用低版本 Firefox 浏览器
 
-请尽量保证游玩的 Chrome 系浏览器或手机 Webview 的`内核版本大于等于77`
+请尽量保证游玩的 Chrome 系浏览器或手机 Webview 的`内核版本大于等于85`
 
 提交 Pull Request 时请推送到"PR-Branch"分支！
 

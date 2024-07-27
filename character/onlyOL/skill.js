@@ -2,6 +2,70 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//OL张春华
+	oljianmie: {
+		audio: 2,
+		enable: "phaseUse",
+		filterTarget: lib.filter.notMe,
+		usable: 1,
+		async content(event, trigger, player) {
+			const target = event.target;
+			let map = {};
+			for (const current of [player, target]) {
+				let colors = ["red", "black"];
+				if (current.getDiscardableCards(current, "h").some(card => get.color(card) == "none")) {
+					colors.push("none2");
+				}
+				const str = get.translation(current == player ? target : player);
+				const result = await current
+					.chooseControl(colors)
+					.set("prompt", "翦灭：请选择一个颜色")
+					.set("prompt2", "弃置选择颜色的手牌，然后若你/" + str + "弃置的牌更多，则你/" + str + "视为对" + str + "/你使用【决斗】")
+					.set("ai", () => {
+						const player = get.event().player;
+						let controls = get.event().controls.slice();
+						return controls.sort((a, b) => {
+							return (
+								player
+									.getDiscardableCards(player, "h")
+									.filter(card => {
+										return get.color(card) == (a == "none2" ? "none" : a);
+									})
+									.reduce((sum, card) => sum + get.value(card, player), 0) -
+								player
+									.getDiscardableCards(player, "h")
+									.filter(card => {
+										return get.color(card) == (b == "none2" ? "none" : b);
+									})
+									.reduce((sum, card) => sum + get.value(card, player), 0)
+							);
+						})[0];
+					})
+					.forResult();
+				if (result.control) map[current.playerid] = result.control == "none2" ? "none" : result.control;
+			}
+			const cards_player = player.getDiscardableCards(player, "h").filter(card => get.color(card) == map[player.playerid]);
+			const cards_target = target.getDiscardableCards(target, "h").filter(card => get.color(card) == map[target.playerid]);
+			if (cards_player.length) await player.discard(cards_player);
+			else player.chat("无牌可弃");
+			if (cards_target.length) await target.discard(cards_target);
+			else target.chat("无牌可弃");
+			if (cards_player.length != cards_target.length) {
+				const user = cards_player.length > cards_target.length ? player : target;
+				const aim = user == player ? target : player;
+				const juedou = new lib.element.VCard({ name: "juedou" });
+				if (user.canUse(juedou, aim, false)) await user.useCard(juedou, aim, false);
+			}
+		},
+		ai: {
+			order: 1,
+			result: {
+				target(player, target) {
+					return get.effect(target, { name: "juedou" }, player, player) * get.sgn(get.attitude(player, target));
+				},
+			},
+		},
+	},
 	//OL谋孔融
 	olsbliwen: {
 		audio: 2,
@@ -11,9 +75,14 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
-				.chooseTarget(get.prompt("olsbliwen"), "移去任意枚“贤”标记并令任意其他角色各获得1枚“贤”标记", (card, player, target) => {
-					return target.countMark("olsbliwen") < 3;
-				}, [1, Infinity])
+				.chooseTarget(
+					get.prompt("olsbliwen"),
+					"移去任意枚“贤”标记并令任意其他角色各获得1枚“贤”标记",
+					(card, player, target) => {
+						return target.countMark("olsbliwen") < 3;
+					},
+					[1, Infinity]
+				)
 				.set("ai", target => get.attitude(get.event().player, target) * (target.countCards("h") + 1))
 				.forResult();
 		},
@@ -177,7 +246,7 @@ const skills = {
 			const num = Math.abs(event.targets[0].countCards("e") - event.targets[1].countCards("e"));
 			await event.targets[0].swapEquip(event.targets[1]);
 			await game.delayx();
-			if (player.getDamagedHp() < num && player.countCards("e")) await player.chooseToDiscard("he", num, true);
+			if (player.getDamagedHp() < num) await player.chooseToDiscard("he", num, true);
 		},
 	},
 	olbuyi: {
@@ -469,7 +538,7 @@ const skills = {
 						player.countCards("h", card => {
 							return !current.hasUseTarget(card);
 						}) >=
-						2 + (player.getHp() > 1)
+							2 + (player.getHp() > 1)
 					);
 				})
 			)
@@ -550,6 +619,12 @@ const skills = {
 					await current.damage("fire");
 				}
 			} else {
+				const numbers = cards
+						.map(card => get.number(card, player))
+						.toUniqued()
+						.sort((a, b) => a - b),
+					min = numbers[0],
+					max = numbers.at(-1);
 				const [card] = links;
 				cards.remove(card);
 				const cardx = get.autoViewAs(
@@ -594,7 +669,7 @@ const skills = {
 					target.addSkill("olsbhongtu_limit");
 					if (!target.storage.olsbhongtu_limit) target.storage.olsbhongtu_limit = [0, 0];
 					target.storage.olsbhongtu_limit[0] += 2;
-				} else {
+				} else if (num != min && num != max) {
 					skill = "qianxi";
 				}
 				if (skill) {
@@ -638,14 +713,14 @@ const skills = {
 					},
 				},
 				trigger: {
-					player: "phaseEnd"
+					player: "phaseEnd",
 				},
 				silent: true,
 				lastDo: true,
 				content() {
 					player.storage.olsbhongtu_limit = [player.storage.olsbhongtu_limit[1], 0];
 					if (!player.storage.olsbhongtu_limit[0]) player.removeSkill("olsbhongtu_limit");
-				}
+				},
 			},
 		},
 	},
@@ -855,7 +930,7 @@ const skills = {
 					return player.countMark("olzhenlie_effect");
 				},
 				forced: true,
-				inherit: "olmiji"
+				inherit: "olmiji",
 			},
 		},
 	},
@@ -1096,8 +1171,8 @@ const skills = {
 			if (event.getParent(3).name != "phaseDiscard") return false;
 			const cards = get.info("olzongxuan").getCards(event, player);
 			return game.hasPlayer(target => {
-				if (cards.some(i => get.type(i, target) == "equip") && (get.attitude(player, target) > 0 || get.recoverEffect(target, player, player) > 0)) return true;
-				if (cards.some(i => get.type(i, target) != "equip") && target.getHp() >= player.getHp() && get.effect(target, { name: "losehp" }, player, player) > 0) return true;
+				if (cards.some(i => get.type(i, null, target) == "equip") && (get.attitude(player, target) > 0 || get.recoverEffect(target, player, player) > 0)) return true;
+				if (cards.some(i => get.type(i, null, target) != "equip") && target.getHp() >= player.getHp() && get.effect(target, { name: "losehp" }, player, player) > 0) return true;
 				return false;
 			});
 		},
@@ -1113,8 +1188,8 @@ const skills = {
 					const cards = list[0][1].slice(),
 						cards2 = cards.filter(card => {
 							return game.hasPlayer(target => {
-								if (get.type(card, target) == "equip" && (get.attitude(player, target) > 0 || get.recoverEffect(target, player, player) > 0)) return true;
-								if (get.type(card, target) != "equip" && target.getHp() >= player.getHp() && get.effect(target, { name: "losehp" }, player, player) > 0) return true;
+								if (get.type(card, null, target) == "equip" && (get.attitude(player, target) > 0 || get.recoverEffect(target, player, player) > 0)) return true;
+								if (get.type(card, null, target) != "equip" && target.getHp() >= player.getHp() && get.effect(target, { name: "losehp" }, player, player) > 0) return true;
 								return false;
 							});
 						}),
@@ -1168,8 +1243,8 @@ const skills = {
 					if (!cards.length) return 0;
 					const card = cards[0],
 						att = get.attitude(player, target);
-					if (get.type(card, target) == "equip" && (get.attitude(player, target) > 0 || get.recoverEffect(target, player, player) > 0)) return get.recoverEffect(target, player, player) * 20 + att / 114514;
-					if (get.type(card, target) != "equip") {
+					if (get.type(card, null, target) == "equip" && (get.attitude(player, target) > 0 || get.recoverEffect(target, player, player) > 0)) return get.recoverEffect(target, player, player) * 20 + att / 114514;
+					if (get.type(card, null, target) != "equip") {
 						if (target.getHp() >= player.getHp()) return get.effect(target, { name: "losehp" }, player, player) * 20 - att / 114514;
 						return get.effect(target, { name: "draw" }, player, player);
 					}
@@ -1182,7 +1257,7 @@ const skills = {
 				const { result } = await target.draw("visible");
 				if (result) {
 					const card = result[0];
-					if (get.type(card, target) == "equip") {
+					if (get.type(card, null, target) == "equip") {
 						if (target.getCards("h").includes(card) && target.hasUseTarget(card)) {
 							const {
 								result: { bool },

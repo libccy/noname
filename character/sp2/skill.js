@@ -373,7 +373,7 @@ const skills = {
 				})
 			)
 				return false;
-			return (event.targets || []).some(target => target !== player && target.isIn());
+			return event.isFirstTarget && (event.targets || []).some(target => target !== player && target.isIn());
 		},
 		locked: false,
 		async cost(event, trigger, player) {
@@ -715,7 +715,7 @@ const skills = {
 		enable: "phaseUse",
 		filter(event, player) {
 			const cards = player.getCards("h", card => {
-				const type = get.type(card, player);
+				const type = get.type(card, null, player);
 				if (type != "basic" && type != "trick") return false;
 				return (
 					lib.filter.cardUsable(card, player) &&
@@ -733,7 +733,7 @@ const skills = {
 		filterCard(card, player) {
 			if (ui.selected.cards.length) return false;
 			const cards = player.getCards("h", card => {
-				const type = get.type(card, player);
+				const type = get.type(card, null, player);
 				if (type != "basic" && type != "trick") return false;
 				return (
 					lib.filter.cardUsable(card, player) &&
@@ -1565,8 +1565,9 @@ const skills = {
 					if (!game.hasPlayer(current => {
 						return result.winner.canUse({ name: 'sha' }, current, false) && get.effect(current, { name: 'sha' }, result.winner, result.winner) > 0;
 					})) return '选项一';
-					const eff1 = result.winner.getUseValue({ name: 'sha' });
-					const eff2 = (get.value(cards[0], result.winner) + get.value(cards[1], result.winner));
+					let eff1 = result.winner.getUseValue({ name: 'sha' }), eff2 = 0;
+					if (cards[0]) eff2 = get.value(cards[0], result.winner);
+					if (cards[1]) eff2 += get.value(cards[1], result.winner);
 					if (eff1 > eff2 * 2.5) return '选项二';
 					return '选项一';
 				}()).forResult();
@@ -4424,7 +4425,7 @@ const skills = {
 				trigger: { source: ["damageBegin1", "recoverBegin"] },
 				filter: function (event, player) {
 					var evt = event.getParent();
-					return evt.type == "card" && get.type(evt.card, false) == "basic";
+					return evt.type == "card" && get.type(evt.card, null, false) == "basic";
 				},
 				forced: true,
 				logTarget: "player",
@@ -4550,7 +4551,7 @@ const skills = {
 						if (typeof numz == "number") num2 += numz;
 					});
 					if (num > num2) {
-						var hs = target.getCards("he", function (card) {
+						var hs = target.getCards("h", function (card) {
 							return lib.filter.cardDiscardable(card, target, "yijiao_effect");
 						});
 						if (hs.length) target.discard(hs.randomGets(get.rand(1, 3)));
@@ -4761,21 +4762,31 @@ const skills = {
 		},
 		subSkill: {
 			effect: {
-				trigger: { player: "useCardAfter" },
-				forced: true,
 				charlotte: true,
+				trigger: { player: "useCardAfter" },
 				filter: function (event, player) {
-					return (
-						player.maxHp > 1 &&
-						event.skill == "xiongmang" &&
-						!player.hasHistory("sourceDamage", function (evt) {
-							return evt.card == event.card;
-						})
-					);
+					return event.skill == "xiongmang";
 				},
+				forced: true,
+				popup: false,
 				content: function () {
-					player.loseMaxHp();
+					if (!game.getGlobalHistory("changeHp", evt => evt.getParent().name == 'damage' && evt.getParent().card && evt.getParent().card == trigger.card).length) {
+						player.loseMaxHp();
+					} else {
+						player.addTempSkill("xiongmang_more", ["phaseChange", "phaseAfter"]);
+						player.addMark("xiongmang_more", 1, false);
+					}
 				},
+			},
+			more: {
+				charlotte: true,
+				onremove: true,
+				mod: {
+					cardUsable(card, player, num) {
+						if (card.name == "sha") return num + player.countMark("xiongmang_more");
+					},
+				},
+				intro: { content: "使用【杀】的额定次数+#" },
 			},
 		},
 	},
@@ -6249,7 +6260,7 @@ const skills = {
 		animationColor: "gray",
 		filter: function (event, player) {
 			return player.countCards("h", function (card) {
-				var type = get.type(card, player);
+				var type = get.type(card, null, player);
 				return (type == "basic" || type == "trick") && get.tag(card, "damage") > 0;
 			});
 		},
@@ -6271,7 +6282,7 @@ const skills = {
 				.set(
 					"aiCards",
 					player.getCards("h", function (card) {
-						var type = get.type(card, player);
+						var type = get.type(card, null, player);
 						return (type == "basic" || type == "trick") && get.tag(card, "damage") > 0;
 					})
 				);
@@ -6281,7 +6292,7 @@ const skills = {
 				player.logSkill("qljsuiren", target);
 				player.give(
 					player.getCards("h", function (card) {
-						var type = get.type(card, player);
+						var type = get.type(card, null, player);
 						return (type == "basic" || type == "trick") && get.tag(card, "damage") > 0;
 					}),
 					target,
@@ -7355,7 +7366,7 @@ const skills = {
 		forced: true,
 		filter: function (event, player) {
 			if (player == _status.currentPhase || player.countCards("h")) return false;
-			return event.card.name == "sha" || get.type(event.card, false) == "trick";
+			return event.card.name == "sha" || get.type(event.card, null, false) == "trick";
 		},
 		content: function () {
 			player.draw(2);
@@ -9074,7 +9085,7 @@ const skills = {
 				},
 				content: function () {
 					var card = get.cardPile2(function (card) {
-						var type = get.type(card, false);
+						var type = get.type(card, null, false);
 						if (type != "basic" && type != "trick") return false;
 						return get.tag(card, "damage") > 0;
 					});

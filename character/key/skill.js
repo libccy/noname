@@ -110,7 +110,7 @@ const skills = {
 			player.showCards(cards, get.translation(player) + "发动了【天全】");
 			game.cardsGotoOrdering(cards).relatedEvent = trigger.getParent();
 			var num = cards.filter(function (card) {
-				return get.type(card, false) == "basic";
+				return get.type(card, null, false) == "basic";
 			}).length;
 			if (num) {
 				if (trigger.card.name == "sha") {
@@ -138,7 +138,7 @@ const skills = {
 					)
 						player.gain(
 							cards.filter(function (card) {
-								return get.type(card, false) != "basic";
+								return get.type(card, null, false) != "basic";
 							}),
 							"gain2"
 						);
@@ -278,7 +278,7 @@ const skills = {
 				charlotte: true,
 				filter(event, player) {
 					if (event.card.name == "sha") return true;
-					return get.type(event.card, false) == "trick" && get.tag(event.card, "damage") > 0;
+					return get.type(event.card, null, false) == "trick" && get.tag(event.card, "damage") > 0;
 				},
 				content() {
 					player.draw();
@@ -591,7 +591,7 @@ const skills = {
 				player.showCards(cards, get.translation(player) + "发动了【天全】");
 				game.cardsGotoOrdering(cards).relatedEvent = trigger.getParent();
 				var num = cards.filter(function (card) {
-					return get.type(card, false) == "basic";
+					return get.type(card, null, false) == "basic";
 				}).length;
 				if (num) {
 					if (trigger.card.name == "sha") {
@@ -626,7 +626,7 @@ const skills = {
 						)
 							player.gain(
 								cards.filter(function (card) {
-									return get.type(card, false) != "basic";
+									return get.type(card, null, false) != "basic";
 								}),
 								"gain2"
 							);
@@ -1735,7 +1735,7 @@ const skills = {
 		promptfunc: () => "出牌阶段，你可以赠予一张“米券”，然后执行一项本回合内未被选择过的效果：⒈对其造成1点伤害；⒉摸两张牌；⒊弃置其的两张牌；⒋亮出牌堆顶的一张牌，然后你可以使用之。",
 		check: card => {
 			const player = _status.event.player;
-			return get.type(card, false) == "equip" && game.hasPlayer(current => player.canGift(card, current, true) && !current.refuseGifts(card, player) && get.effect(current, card, player, player) > 0) ? 2 : 1 + Math.random();
+			return get.type(card) == "equip" && game.hasPlayer(current => player.canGift(card, current, true) && !current.refuseGifts(card, player) && get.effect(current, card, player, player) > 0) ? 2 : 1 + Math.random();
 		},
 		content() {
 			"step 0";
@@ -5277,7 +5277,7 @@ const skills = {
 				return true;
 			if (
 				player.getHistory("sourceDamage", function (evt) {
-					return get.type(evt.card, false) == "trick" && evt.getParent("phaseUse") == event;
+					return get.type(evt.card, null, false) == "trick" && evt.getParent("phaseUse") == event;
 				}).length == 0
 			)
 				return true;
@@ -5294,7 +5294,7 @@ const skills = {
 				num++;
 			if (
 				player.getHistory("sourceDamage", function (evt) {
-					return get.type(evt.card, false) == "trick" && evt.getParent("phaseUse") == trigger;
+					return get.type(evt.card, null, false) == "trick" && evt.getParent("phaseUse") == trigger;
 				}).length == 0
 			)
 				num++;
@@ -5928,7 +5928,7 @@ const skills = {
 				.forResult();
 		},
 		async content(event, trigger, player) {
-			await trigger.cancel();
+			trigger.cancel();
 			player.skip("phaseDraw");
 			await player.useCard({ name: "sha", isCard: true }, event.targets[0], false);
 		},
@@ -5965,7 +5965,7 @@ const skills = {
 				.forResult();
 		},
 		async content(event, trigger, player) {
-			await trigger.cancel();
+			trigger.cancel();
 			await player.discard(event.cards[0]);
 			await player.useCard({ name: "sha", isCard: true }, event.targets[0]);
 		},
@@ -5987,7 +5987,7 @@ const skills = {
 				.forResult();
 		},
 		async content(event, trigger, player) {
-			await trigger.cancel();
+			trigger.cancel();
 			await player.turnOver();
 			await player.useCard({ name: "sha", isCard: true }, event.targets[0], false);
 		},
@@ -6373,7 +6373,7 @@ const skills = {
 				player(player) {
 					if (
 						player.countCards("he", function (card) {
-							if (get.type(card, player) == "equip") return get.value(card) < 6;
+							if (get.type(card, null, player) == "equip") return get.value(card) < 6;
 							return get.value(card) < 5;
 						}) < 2
 					)
@@ -6723,12 +6723,12 @@ const skills = {
 			return player.countCards("he", lib.skill.kaori_siyuan.filterCard);
 		},
 		filterCard(card) {
-			return ["equip", "delay"].includes(get.type(card, false));
+			return ["equip", "delay"].includes(get.type(card));
 		},
 		filterTarget(card, player, target) {
 			if (player == target) return false;
 			var card = ui.selected.cards[0];
-			if (get.type(card, false) == "delay") return target.canAddJudge({ name: card.name });
+			if (get.type(card) == "delay") return target.canAddJudge({ name: get.name(card, player) });
 			return target.canEquip(card);
 		},
 		discard: false,
@@ -6737,8 +6737,8 @@ const skills = {
 		content() {
 			"step 0";
 			var card = cards[0];
-			if (get.type(card, false) == "equip") target.equip(card);
-			else target.addJudge(card);
+			if (get.type(card) == "equip") target.equip(card);
+			else target.addJudge(get.name(card, player), [card]);
 			"step 1";
 			var list = [];
 			for (var i of lib.inpile) {

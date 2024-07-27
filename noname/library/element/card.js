@@ -898,9 +898,12 @@ export class Card extends HTMLDivElement {
 	/**
 	 * 返回一个键值，用于在缓存中作为键名。
 	 *
+	 * @param {string} [id]
+	 *
 	 * @returns {string} cacheKey
 	 */
-	getCacheKey() {
+	getCacheKey(id) {
+		if (id) return this.cardid ? this.cardid : id;
 		return `[c:${this.cardid}]`;
 	}
 	discard(bool) {

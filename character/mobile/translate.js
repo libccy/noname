@@ -127,7 +127,7 @@ const translates = {
 	xin_xiahoudun_prefix: "手杀界",
 	xinqingjian: "清俭",
 	xinqingjian2: "清俭",
-	xinqingjian_info: "每回合限一次。当你不因摸牌阶段的额定摸牌而得到牌后，你可以将任意张牌扣置于武将牌上。回合结束时，你将这些牌交给一名其他角色。若这些牌的数量大于1，你摸一张牌。",
+	xinqingjian_info: "每回合限一次。当你不因摸牌阶段的额定摸牌而得到牌后，你可以将任意张手牌扣置于武将牌上。回合结束时，你将这些牌交给任意名其他角色。若这些牌的数量大于1，你摸一张牌。",
 	zhangyì: "张翼",
 	jiakui: "贾逵",
 	zhiyi: "执义",

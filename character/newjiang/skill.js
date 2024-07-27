@@ -1354,8 +1354,8 @@ const skills = {
 		direct: true,
 		content: function () {
 			"step 0";
-			if (player.hasSkill("shiming_round")) {
-				var zhu = game.findPlayer(i => i.getSeatNum() == 1);
+			var zhu = game.findPlayer(i => i.getSeatNum() == 1);
+			if (zhu && player.hasSkill("shiming_round")) {
 				if (
 					game.getGlobalHistory("changeHp", evt => {
 						return evt.player == zhu && evt._dyinged;

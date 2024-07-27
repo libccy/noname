@@ -2572,7 +2572,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "useCardAfter" },
 		filter(event, player) {
-			if (!event._dccuixin || get.type(event.card, false) == "delay" || get.type(event.card, false) == "equip") return false;
+			if (!event._dccuixin || get.type(event.card, null, false) == "delay" || get.type(event.card, null, false) == "equip") return false;
 			var card = {
 					name: event.card.name,
 					nature: event.card.nature,
@@ -4226,7 +4226,7 @@ const skills = {
 				trigger: { player: "useCardToTargeted" },
 				forced: true,
 				filter(event, player) {
-					if (get.type(event.card, false) != "equip" || player != event.target || event.card.name.indexOf("changandajian_equip") == 0) return false;
+					if (get.type(event.card, null, false) != "equip" || player != event.target || event.card.name.indexOf("changandajian_equip") == 0) return false;
 					if (!player.storage.yuheng) return false;
 					var list = ["xinfu_guanchao", "drlt_jueyan", "lanjiang"];
 					for (var i of list) {

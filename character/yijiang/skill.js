@@ -4467,7 +4467,7 @@ const skills = {
 			dialog: function (event, player) {
 				var list = [];
 				for (var i of lib.inpile) {
-					var type = get.type(i, false);
+					var type = get.type(i, null, false);
 					if (type == "basic" || type == "trick") {
 						var card = {
 							name: i,
@@ -10618,7 +10618,7 @@ const skills = {
 			next.set("processAI", function (list) {
 				var cards = list[0][1].slice(0),
 					cards2 = cards.filter(function (i) {
-						return get.type(i, false) == "equip";
+						return get.type(i, null, false) == "equip";
 					}),
 					cards3;
 				if (cards2.length) {
@@ -11077,13 +11077,10 @@ const skills = {
 		},
 	},
 	jueqing: {
+		audio: 2,
+		audioname: ["ol_zhangchunhua"],
 		trigger: { source: "damageBefore" },
 		forced: true,
-		audio: 2,
-		//priority:16,
-		check: function () {
-			return false;
-		},
 		content: function () {
 			trigger.cancel();
 			trigger.player.loseHp(trigger.num);
@@ -11094,6 +11091,7 @@ const skills = {
 	},
 	shangshi: {
 		audio: 2,
+		audioname: ["ol_zhangchunhua"],
 		trigger: {
 			player: ["loseAfter", "changeHp", "gainMaxHpAfter", "loseMaxHpAfter"],
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],

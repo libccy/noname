@@ -1173,7 +1173,7 @@ const skills = {
 				num = Math.ceil(target.countCards("h") / 2);
 			player.changeZhuanhuanji("dcsbfumou");
 			let cards = await player
-				.choosePlayerCard("覆谋：选择展示" + get.translation(target) + "的" + get.cnNumber(num) + "张牌", target, "h", num, true)
+				.choosePlayerCard("覆谋：选择展示" + get.translation(target) + "的至多" + get.cnNumber(num) + "张牌", target, "h", [1, num], true)
 				.set("ai", card => {
 					const player = get.event("player"),
 						storage = get.event("storage"),
@@ -1219,8 +1219,8 @@ const skills = {
 		mark: true,
 		intro: {
 			content(storage) {
-				if (storage) return "转换技，出牌阶段限一次，你可以观看一名其他角色的手牌并展示其一半手牌，令其依次使用这些牌中所有其可以使用的牌（无距离限制且不可被响应）。";
-				return "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其一半手牌并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）。";
+				if (storage) return "转换技，出牌阶段限一次，你可以观看一名其他角色的手牌并展示其至多一半手牌，令其依次使用这些牌中所有其可以使用的牌（无距离限制且不可被响应）。";
+				return "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其至多一半手牌并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）。";
 			},
 		},
 		ai: {
@@ -5593,12 +5593,16 @@ const skills = {
 			if (event.name == "die") return true;
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
-		content: function () {
+		content: function *(event, map) {
+			const player = map.player;
+			player.removeSkill("dctongye_buff");
 			player.addSkill("dctongye_buff");
 			var num = game.countGroup();
 			if (num <= 4) {
 				player.addMark("dctongye_handcard", 3, false);
 				game.log(player, "手牌上限", "#y+3");
+				player.addMark("dctongye_draw", 4 - num, false);
+				game.log(player, "摸牌阶段额定摸牌数", "#y+" + parseFloat(4 - num));
 			}
 			if (num <= 3) {
 				player.addMark("dctongye_range", 3, false);
@@ -5609,8 +5613,7 @@ const skills = {
 				game.log(player, "使用杀的次数上限", "#y+3");
 			}
 			if (num <= 1) {
-				player.addMark("dctongye_draw", 3, false);
-				game.log(player, "摸牌阶段额定摸牌数", "#y+3");
+				yield player.recover(3);
 			}
 		},
 		subSkill: {
@@ -6272,7 +6275,7 @@ const skills = {
 		filter: function (event, player) {
 			if (player != _status.currentPhase) return false;
 			if (!event.isFirstTarget) return false;
-			if (event.card.name != "sha" && get.type(event.card, false) != "trick") return false;
+			if (event.card.name != "sha" && get.type(event.card, null, false) != "trick") return false;
 			if (player.countCards("h") != player.getHistory("useCard").indexOf(event.getParent()) + 1) return false;
 			return event.targets.some(target => {
 				return target != player && target.isIn();
@@ -6315,7 +6318,7 @@ const skills = {
 				var del = player.countCards("h") - cardsh.length - player.getHistory("useCard").length - 1;
 				if (del < 0) return;
 				if (del > 0) {
-					if (card.name == "sha" || get.type(card, false) != "trick") return num / 3;
+					if (card.name == "sha" || get.type(card, null, player) != "trick") return num / 3;
 					return num + 1;
 				}
 				return num + 15;
@@ -6340,7 +6343,7 @@ const skills = {
 				})
 			)
 				return false;
-			if (!["basic", "trick"].includes(get.type(event.card, false))) return false;
+			if (!["basic", "trick"].includes(get.type(event.card, null, false))) return false;
 			if (event.getParent(2).name == "dcchanjuan") return false;
 			return !player.storage.dcchanjuan[event.card.name] || player.storage.dcchanjuan[event.card.name] < 2;
 		},
@@ -10867,20 +10870,9 @@ const skills = {
 				marktext: "刚",
 				intro: {
 					name: "刚硬",
-					content: "属性目标：回复体力，或于得到牌后手牌数大于体力值",
+					content: "属性目标：回复体力，或手牌数大于体力值",
 				},
 				charlotte: true,
-				silent: true,
-				forced: true,
-				nopop: true,
-				lastDo: true,
-				trigger: { player: "gainEnd" },
-				filter: function (event, player) {
-					return player.countCards("h") > player.hp;
-				},
-				content: function () {
-					trigger._dctongguan_gangying = true;
-				},
 			},
 			duomou: {
 				marktext: "谋",
@@ -10925,9 +10917,7 @@ const skills = {
 			var target = event.player;
 			if (
 				(target.hasSkill("dctongguan_gangying") &&
-					(target.hasHistory("gain", function (evt) {
-						return evt._dctongguan_gangying == true;
-					}) ||
+					(target.countCards("h") > target.hp ||
 						game.getGlobalHistory("changeHp", function (evt) {
 							return evt.player == target && (evt.getParent().name == "recover" || target.countCards("h") > target.hp);
 						}).length > 0)) ||
@@ -10975,9 +10965,7 @@ const skills = {
 		rules: [
 			target => target.getHistory("sourceDamage").length,
 			target =>
-				target.hasHistory("gain", function (evt) {
-					return evt._dctongguan_gangying;
-				}) ||
+				target.countCards("h") > target.hp ||
 				game.getGlobalHistory("changeHp", function (evt) {
 					return evt.player == target && evt.getParent().name == "recover";
 				}).length > 0 ||

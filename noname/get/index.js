@@ -544,6 +544,7 @@ export class Get extends GetCompatible {
 		}
 	}
 	autoViewAs(card, cards, owner) {
+		if (arguments.length === 1 && card instanceof lib.element.VCard) return card; //阻止无限嵌套
 		return new lib.element.VCard(card, cards, void 0, void 0, owner);
 	}
 	/**
@@ -2266,15 +2267,9 @@ export class Get extends GetCompatible {
 	/**
 	 * 返回牌的类型
 	 * @overload
-	 * @param { string } obj
-	 * @param { 'trick' } [method]
-	 * @param { Player } [player]
-	 * @returns { string }
-	 *
-	 * @overload
-	 * @param { Card } obj
-	 * @param { 'trick' } [method]
-	 * @param { Player } [player]
+	 * @param { Card | string } obj
+	 * @param { 'trick' | null} [method]
+	 * @param { Player | false } [player]
 	 * @returns { string }
 	 */
 	type(obj, method, player) {

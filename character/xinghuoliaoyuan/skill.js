@@ -1614,7 +1614,7 @@ const skills = {
 				if (player.countCards("j") && player.inRange(target)) return true;
 			},
 			aiOrder(player, card, num) {
-				if (get.type(card, "delay") && player.canUse(card, player) && player.canAddJudge(card)) return 15;
+				if (get.type(card, null, player) == "trick" && player.canUse(card, player) && player.canAddJudge(card)) return 15;
 			},
 		},
 		locked: false,
@@ -1677,7 +1677,7 @@ const skills = {
 			},
 			effect: {
 				target(card, player, target) {
-					if (target.isPhaseUsing() && typeof card === "object" && get.type(card, target) === "delay" && !target.countCards("j")) {
+					if (target.isPhaseUsing() && typeof card === "object" && get.type(card, null, target) === "delay" && !target.countCards("j")) {
 						let shas =
 							target.getCards("hs", i => {
 								if (card === i || (card.cards && card.cards.includes(i))) return false;

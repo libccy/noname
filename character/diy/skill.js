@@ -216,7 +216,7 @@ const skills = {
 					return player.hasHistory("lose", function (evt) {
 						if (evt.type != "discard" || evt.getParent("phaseDiscard") != event) return false;
 						for (var i of evt.cards2) {
-							if (get.type(i, false) == "basic" && get.position(i, true) == "d" && player.hasUseTarget(i)) return true;
+							if (get.type(i, null, false) == "basic" && get.position(i, true) == "d" && player.hasUseTarget(i)) return true;
 						}
 						return false;
 					});
@@ -227,7 +227,7 @@ const skills = {
 					player.getHistory("lose", function (evt) {
 						if (evt.type != "discard" || evt.getParent("phaseDiscard") != trigger) return false;
 						for (var i of evt.cards2) {
-							if (get.type(i, false) == "basic" && get.position(i, true) == "d") cards.push(i);
+							if (get.type(i, null, false) == "basic" && get.position(i, true) == "d") cards.push(i);
 						}
 						return false;
 					});
@@ -291,7 +291,7 @@ const skills = {
 			"step 1";
 			if (result.index == 0) {
 				var card = get.cardPile2(function (card) {
-					return get.type(card, false) == "basic";
+					return get.type(card, null, false) == "basic";
 				});
 				if (card) player.gain(card, "gain2");
 				event.finish();
@@ -920,7 +920,7 @@ const skills = {
 		delay: false,
 		check(card) {
 			var player = _status.event.player;
-			if (get.type(card, player) == "basic") {
+			if (get.type(card) == "basic") {
 				if (
 					game.hasPlayer(function (current) {
 						return get.attitude(current, player) > 0 && current.getUseValue(card) > player.getUseValue(card, null, true);
