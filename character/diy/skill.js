@@ -3864,20 +3864,36 @@ const skills = {
 		ai: {
 			order: 10,
 			result: {
-				target(player, target) {
-					if (target == game.zhu) return -1;
-					if (get.attitude(player, target) > 3) {
-						var num = game.zhu.hp - target.hp;
-						if (num == 1) {
-							return 1;
-						}
-						if (num > 1) {
-							if (player.hp == 1) return num;
-							if (target.hp == 1) return num;
-							if (num >= 3) return num;
-						}
-					}
+				player(player, target) {
+					if (
+						ui.selected.targets.length &&
+						Math.abs(target.hp - ui.selected.targets[0].hp) === 1
+					) return get.effect(player, {name: "losehp"}, player, player) / 10;
 					return 0;
+				},
+				target(player, target) {
+					let att = get.attitude(player, target), max;
+					if (!ui.selected.targets.length) {
+						let search = false;
+						game.countPlayer(cur => {
+							if (
+								player === cur ||
+								target === cur ||
+								(cur.hp - target.hp) * (get.attitude(player, cur) - att) >= 0
+							) return false;
+							if (!search) {
+								max = Math.min(cur.hp, target.maxHp) - target.hp;
+								search = true;
+							}
+							else if (att > 0) max = Math.max(max, Math.min(cur.hp, target.maxHp) - target.hp);
+							else max = Math.min(max, Math.min(cur.hp, target.maxHp) - target.hp);
+						});
+						if (target === get.zhu(player)) return 2 * max;
+						return max;
+					}
+					max = Math.min(ui.selected.targets[0].hp, target.maxHp) - target.hp;
+					if (target === get.zhu(player)) return 2 * max;
+					return max;
 				},
 			},
 		},
