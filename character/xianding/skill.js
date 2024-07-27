@@ -1249,7 +1249,8 @@ const skills = {
 					return event.name != "phase" || game.phaseNumber == 0;
 				},
 				prompt2(event, player) {
-					return "切换【覆谋】为状态" + (player.storage.dcsbfumou ? "阳" : "阴");
+					//无名杀先阴后阳，不要问为什么
+					return "切换【覆谋】为状态" + (player.storage.dcsbfumou ? "阴" : "阳");
 				},
 				check: () => Math.random() > 0.5,
 				content() {
@@ -2308,8 +2309,8 @@ const skills = {
 					return event.name != "phase" || game.phaseNumber == 0;
 				},
 				prompt2(event, player) {
-					//无名杀先阳后阴，不要问为什么
-					return "切换【权谋】为状态" + (player.storage.dcsbquanmou ? "阳" : "阴");
+					//无名杀先阴后阳，不要问为什么
+					return "切换【权谋】为状态" + (player.storage.dcsbquanmou ? "阴" : "阳");
 				},
 				check: () => Math.random() > 0.5,
 				content() {
@@ -3551,8 +3552,8 @@ const skills = {
 					return event.name != "phase" || game.phaseNumber == 0;
 				},
 				prompt2(event, player) {
-					//无名杀先阳后阴，不要问为什么
-					return "切换【英谋】为状态" + (player.storage.dcsbyingmou ? "阳" : "阴");
+					//无名杀先阴后阳，不要问为什么
+					return "切换【英谋】为状态" + (player.storage.dcsbyingmou ? "阴" : "阳");
 				},
 				check: () => Math.random() > 0.5,
 				content() {
@@ -3801,8 +3802,8 @@ const skills = {
 					return event.name != "phase" || game.phaseNumber == 0;
 				},
 				prompt2(event, player) {
-					//无名杀先阳后阴，不要问为什么
-					return "切换【盟谋】为状态" + (player.storage.dcsbmengmou ? "阳" : "阴");
+					//无名杀先阴后阳，不要问为什么
+					return "切换【盟谋】为状态" + (player.storage.dcsbmengmou ? "阴" : "阳");
 				},
 				check: () => Math.random() > 0.5,
 				content() {
