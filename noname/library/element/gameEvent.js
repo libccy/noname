@@ -1093,7 +1093,7 @@ export class GameEvent {
 			if (this.player && this.player.skipList.includes(this.name)) {
 				this.player.skipList.remove(this.name);
 				if (lib.phaseName.includes(this.name)) this.player.getHistory("skipped").add(this.name);
-				this.trigger(this.name + "Skipped");
+				await this.trigger(this.name + "Skipped");
 				return;
 			}
 
