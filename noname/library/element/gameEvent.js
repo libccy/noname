@@ -34,6 +34,9 @@ export class GameEvent {
 		event.finish();
 		return event;
 	}
+	get [Symbol.toStringTag]() {
+		return 'GameEvent';
+	}
 	/**
 	 * @type { Result }
 	 */
