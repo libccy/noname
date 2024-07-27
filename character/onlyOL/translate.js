@@ -47,6 +47,7 @@ const translates = {
 	olsbshenli_info: "出牌阶段限一次，当你使用【杀】指定目标后，你可以令所有可成为此牌目标的其他角色均成为此牌目标，此牌结算完毕后，若你因此牌造成的伤害值X：大于你的手牌数，你摸X张牌（至多摸五张）；大于你的体力值，你再次对所有目标角色中可以成为此牌目标的角色使用此牌。",
 	olsbyufeng: "玉锋",
 	olsbyufeng_sizhaojian: "思召剑",
+	olsbyufeng_sizhaojian_info: "当你使用有点数的【杀】指定目标后，你令目标角色只能使用无点数或点数大于等于此【杀】的【闪】响应此牌。",
 	olsbyufeng_block: "思召剑",
 	olsbyufeng_info: "游戏开始时，你将【思召剑】置入装备区。",
 	sizhaojian: "思召剑",

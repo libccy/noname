@@ -2692,7 +2692,8 @@ export class Click {
 		}
 		// ui.click.skin(this,player.name);
 		game.pause2();
-		ui.click.charactercard(player.name1 || player.name, null, null, true, this);
+		var audioName=player.skin.name || player.name1 || player.name;
+		ui.click.charactercard(player.name1 || player.name, null, null, true, this, audioName);
 	}
 	avatar2() {
 		if (!lib.config.doubleclick_intro) return;
@@ -2711,7 +2712,7 @@ export class Click {
 		}
 		// ui.click.skin(this,player.name2);
 		game.pause2();
-		ui.click.charactercard(player.name2, null, null, true, this);
+		ui.click.charactercard(player.name2, null, null, true, this, player.skin.name2 || player.name2);
 	}
 	connectroom(e) {
 		if (_status.dragged) return;
@@ -3117,7 +3118,7 @@ export class Click {
 			delete this.logvtimeout;
 		}
 	}
-	charactercard(name, sourcenode, noedit, resume, avatar) {
+	charactercard(name, sourcenode, noedit, resume, avatar, audioName) {
 		if (_status.dragged) return;
 		if (lib.config.theme != "simple") {
 			ui.window.classList.add("shortcutpaused");
@@ -3155,7 +3156,7 @@ export class Click {
 					changeskinfunc();
 				}
 			})
-			.setBackground(name, "character");
+			.setBackground(audioName || name, "character");
 		var changeskinfunc = null;
 		var nameskin = name;
 		var nameskin2 = name;
@@ -3363,7 +3364,8 @@ export class Click {
 			const dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
 			const skillAudioMap = new Map();
 			nameinfo.skills.forEach(skill => {
-				const voiceMap = game.parseSkillText(skill, name);
+				let voiceMap = game.parseSkillText(skill, audioName);
+				if(!voiceMap.length) voiceMap = game.parseSkillText(skill, name);
 				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
 			});
 			const derivationSkillAudioMap = new Map();
@@ -3376,7 +3378,8 @@ export class Click {
 					}
 					for(var i=0; i<derivation.length; i++) {
 						if (derivation[i].indexOf('_faq') != -1) continue;
-						const derivationVoiceMap = game.parseSkillText(derivation[i], name);
+						let derivationVoiceMap = game.parseSkillText(derivation[i], audioName);
+						if(!derivationVoiceMap.length) derivationVoiceMap = game.parseSkillText(derivation[i], name);
 						if(derivationVoiceMap.length) derivationSkillAudioMap.set(derivation[i], derivationVoiceMap);
 					}
 				}
@@ -3557,7 +3560,7 @@ export class Click {
 				
 				if (lib.config.background_speak && e !== 'init') {
 					if (!this.playAudio) {
-						const audioList = get.Audio.skill({ skill: this.link, player: playername }).fileList;
+						const audioList = get.Audio.skill({ skill: this.link, player: audioName || playername }).fileList;
 						this.playAudio = game.tryAudio({
 							audioList,
 							addVideo: false,
@@ -3710,7 +3713,8 @@ export class Click {
 			const dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
 			const skillAudioMap = new Map();
 			nameInfo.skills.forEach(skill => {
-				const voiceMap = game.parseSkillText(skill, name);
+				let voiceMap = game.parseSkillText(skill, audioName);
+				if(!voiceMap.length) voiceMap = game.parseSkillText(skill, name);
 				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
 			});
 			const derivationSkillAudioMap = new Map();
@@ -3723,7 +3727,8 @@ export class Click {
 					}
 					for(var i=0; i<derivation.length; i++) {
 						if (derivation[i].indexOf('_faq') != -1) continue;
-						const derivationVoiceMap = game.parseSkillText(derivation[i], name);
+						let derivationVoiceMap = game.parseSkillText(derivation[i], audioName);
+						if(!derivationVoiceMap.length) derivationVoiceMap = game.parseSkillText(derivation[i], name);
 						if(derivationVoiceMap.length) derivationSkillAudioMap.set(derivation[i], derivationVoiceMap);
 					}
 				}
@@ -3910,7 +3915,7 @@ export class Click {
 				
 				if (lib.config.background_speak && e !== 'init') {
 					if (!this.playAudio) {
-						const audioList = get.Audio.skill({ skill: this.link, player: playername }).fileList;
+						const audioList = get.Audio.skill({ skill: this.link, player: audioName || playername }).fileList;
 						this.playAudio = game.tryAudio({
 							audioList,
 							addVideo: false,
