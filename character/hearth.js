@@ -2666,81 +2666,6 @@ game.import("character", function () {
 					threaten: 1.5,
 				},
 			},
-			mengye_old: {
-				trigger: { player: "phaseAfter" },
-				priority: -50,
-				direct: true,
-				filter(event, player) {
-					if (
-						get.mode() == "identity" &&
-						_status.mode == "zhong" &&
-						game.zhu &&
-						!game.zhu.isZhu &&
-						player == game.zhong
-					) {
-						return false;
-					}
-					if (_status.noswap) {
-						return false;
-					}
-					return !player.isTurnedOver();
-				},
-				content() {
-					"step 0";
-					player.chooseTarget(get.prompt("mengye"), function (card, player, target) {
-						if (target == player) {
-							return false;
-						}
-						if (
-							get.mode() == "identity" &&
-							_status.mode == "zhong" &&
-							game.zhu &&
-							!game.zhu.isZhu
-						) {
-							return target == game.zhong;
-						}
-						if (target.identity == "zhu" || get.is.jun(target)) return false;
-						return true;
-					}).ai = function (target) {
-						var att = -get.attitude(player, target);
-						if (att <= 0) return 0;
-						if (target.needsToDiscard()) att += 3;
-						else if (target.needsToDiscard(1)) att++;
-						else if (target.countCards() <= 3) {
-							return 0;
-						}
-						return att + target.countCards("h") + get.threaten(target);
-					};
-					"step 1";
-					if (result.bool) {
-						var target = result.targets[0];
-						player.logSkill("mengye", target);
-						target.storage.mengye2 = player;
-						target.storage.mengye4 = target.ai.shown;
-						target.addSkill("mengye2");
-						event.target = target;
-						player.turnOver();
-					} else {
-						event.finish();
-					}
-					"step 2";
-					game.delay();
-					"step 3";
-					var target = event.target;
-					if (player == game.me) {
-						game.swapPlayerAuto(target);
-						target.storage.mengye3 = true;
-					} else {
-						target.addSkill("mad");
-						target.unmarkSkill("mad");
-					}
-					player.out("mengye");
-					target.insertPhase();
-				},
-				ai: {
-					threaten: 2,
-				},
-			},
 			mengye2: {
 				temp: true,
 				mark: "character",
@@ -10277,10 +10202,6 @@ game.import("character", function () {
 			mengye: "梦魇",
 			mengye_info:
 				"结束阶段，你可以选择一名有手牌的角色将其一张随机的非毒手牌转化为毒，然后令其获得1点护甲。",
-			mengye_old: "梦魇",
-			mengye_old2: "梦魇",
-			mengye_old_info:
-				"回合结束后，你可以翻面并指定一名的非主公角色，由你控制其进行一个额外的回合。在此回合中，你的本体不参与游戏。",
 			fuhua: "腐化",
 			fuhua2: "腐化",
 			fuhua_info:
