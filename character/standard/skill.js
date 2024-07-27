@@ -1022,7 +1022,7 @@ const skills = {
 			result: {
 				target(player, target) {
 					let att = get.attitude(player, target), es = [];
-					target.countDiscardableCards(player, "e").forEach(i => {
+					target.countDiscardableCards(player, "e", i => {
 						es.push(get.value(i, target));
 					});
 					let min = Math.min(...es), max = Math.max(...es), ext = target.hasSkillTag("noe") ? 10 : 0;
