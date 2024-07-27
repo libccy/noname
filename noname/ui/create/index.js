@@ -392,13 +392,14 @@ export class Create {
 		let node =
 			getApplyNode._tempName || ui.create.div(".tempname", getApplyNode);
 		let datasetNature = "";
+		let cardPosition = get.position(card);
 		getApplyNode._tempName = node;
 		if (cardTempNameConfig != "image") {
 			//清空，避免和下面的image部分有冲突
 			node.innerHTML = "";
 			datasetNature = "fire";
 			if (
-				get.position(card) == "j" &&
+				(cardPosition === "e" || cardPosition === "j") &&
 				card.viewAs &&
 				card.viewAs != card.name
 			) {
@@ -423,7 +424,7 @@ export class Create {
 			}
 		} else {
 			if (
-				get.position(card) == "j" &&
+				(cardPosition === "e" || cardPosition === "j") &&
 				card.viewAs &&
 				card.viewAs != card.name
 			) {
@@ -3213,8 +3214,9 @@ export class Create {
 			if (!noclick) {
 				lib.setIntro(node);
 			}
+			const itemPosition = get.position(item)
 			if (
-				get.position(item) == "j" &&
+				(itemPosition === "e" || itemPosition === "j")  &&
 				item.viewAs &&
 				item.viewAs != item.name &&
 				lib.config.cardtempname != "off"

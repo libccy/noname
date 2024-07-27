@@ -1093,7 +1093,7 @@ export class GameEvent {
 			if (this.player && this.player.skipList.includes(this.name)) {
 				this.player.skipList.remove(this.name);
 				if (lib.phaseName.includes(this.name)) this.player.getHistory("skipped").add(this.name);
-				this.trigger(this.name + "Skipped");
+				await this.trigger(this.name + "Skipped");
 				return;
 			}
 
@@ -1246,7 +1246,7 @@ export class GameEvent {
 	}
 
 	onError(error) {
-		game.print("游戏出错：" + this.name);
+		game.print("游戏出错：" + this?.name); //狂神啊狂神 你为什么不判this是否存在
 		game.print(error.toString());
 		console.error(error);
 	}

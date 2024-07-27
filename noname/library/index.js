@@ -12683,6 +12683,7 @@ export class Library {
 				lib.configOL = config;
 				lib.playerOL = {};
 				lib.cardOL = {};
+				lib.vcardOL = {};
 
 				game.clearArena();
 				game.finishCards();
@@ -12795,6 +12796,7 @@ export class Library {
 				lib.configOL = config;
 				lib.playerOL = {};
 				lib.cardOL = {};
+				lib.vcardOL = {};
 
 				game.loadModeAsync(config.mode, function (mode) {
 					for (var i in mode.ai) {
@@ -12955,8 +12957,13 @@ export class Library {
 
 						player.directgain(info.handcards);
 						lib.playerOL[i] = player;
-						for (var i = 0; i < info.equips.length; i++) {
-							player.$equip(info.equips[i]);
+						if(info.vcardsMap){
+							for (var i = 0; i < info.vcardsMap.equips.length; i++) {
+								player.addVirtualEquip(info.vcardsMap.equips[i], info.vcardsMap.equips[i].cards);
+							}
+							for (var i = 0; i < info.vcardsMap.judges.length; i++) {
+								player.addVirtualJudge(info.vcardsMap.judges[i], info.vcardsMap.judges[i].cards);
+							}
 						}
 						for (var i = 0; i < info.handcards.length; i++) {
 							info.handcards[i].addGaintag(info.gaintag[i]);

@@ -13,6 +13,7 @@ game.import("card", function () {
 				cardimage: "gw_dieyi",
 				type: "equip",
 				subtype: "equip1",
+				//TODO: 维护所有水乎武将的onLose事件
 				onLose: function () {
 					lib.skill.gw_dieyi.process(player);
 				},

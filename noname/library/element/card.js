@@ -104,6 +104,12 @@ export class Card extends HTMLDivElement {
 	 * @type { boolean }
 	 */
 	isCard;
+	/**
+	 * @type { string[] }
+	 * 卡牌“占用的装备栏”
+	 * TODO: 补充对应的typings
+	 */
+	subtypes;
 	//执行销毁一张牌的钩子函数
 	selfDestroy(event) {
 		if (this._selfDestroyed) return;

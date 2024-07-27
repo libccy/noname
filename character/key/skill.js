@@ -1064,7 +1064,7 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		filter(event, player) {
-			return !player.getExpansions("kud_qiaoshou_equip").length && player.countCards("h") > 0;
+			return !player.hasVCard(card => card.storage?.kud_qiaoshou, "e")
 		},
 		chooseButton: {
 			dialog() {
@@ -1138,20 +1138,20 @@ const skills = {
 		check(event, player) {
 			return 6 - get.value(card);
 		},
-		content() {
-			"step 0";
-			player.addToExpansion(cards, player, "give").gaintag.add("kud_qiaoshou_equip");
-			"step 1";
-			if (!player.getExpansions("kud_qiaoshou_equip").length) return;
+		async content(event, trigger, player) {
+			const name = lib.skill.kud_qiaoshou_backup.cardname, card = {
+				name,
+				subtypes: [],
+				storage: {kud_qiaoshou: true},
+			}
+			game.log(player, "声明了", "#y" + get.translation(name));
+			player.$throw(event.cards);
+			await game.delay(0, 300);
+			await player.equip(get.autoViewAs(card, event.cards));
 			player.addTempSkill("kud_qiaoshou_equip", {
 				player: ["phaseUseEnd", "phaseZhunbeiBegin"],
 			});
-			var name = lib.skill.kud_qiaoshou_backup.cardname;
-			player.storage.kud_qiaoshou_equip2 = name;
-			var info = lib.card[name].skills;
-			if (info && info.length) player.addAdditionalSkill("kud_qiaoshou_equip", info);
-			player.draw();
-			game.log(player, "声明了", "#y" + get.translation(name));
+			await player.draw();
 		},
 		ai: {
 			result: {
@@ -1161,27 +1161,12 @@ const skills = {
 	},
 	kud_qiaoshou_equip: {
 		charlotte: true,
-		mod: {
-			globalFrom(from, to, distance) {
-				var info = lib.card[from.storage.kud_qiaoshou_equip2];
-				if (info && info.distance && info.distance.globalFrom) return distance + info.distance.globalFrom;
-			},
-			globalTo(from, to, distance) {
-				var info = lib.card[to.storage.kud_qiaoshou_equip2];
-				if (info && info.distance && info.distance.globalTo) return distance + info.distance.globalTo;
-			},
-			attackRange(from, distance) {
-				var info = lib.card[from.storage.kud_qiaoshou_equip2];
-				if (info && info.distance && info.distance.attackFrom) return distance - info.distance.attackFrom;
-			},
-			attackTo(from, to, distance) {
-				var info = lib.card[to.storage.kud_qiaoshou_equip2];
-				if (info && info.distance && info.distance.attackTo) return distance + info.distance.attackTo;
-			},
-		},
 		onremove(player, skill) {
-			var cards = player.getExpansions(skill);
-			if (cards.length) player.loseToDiscardpile(cards);
+			const cards = player.getVCards("e", card => card.storage?.kud_qiaoshou).reduce((cards, vcard) => {
+				if (vcard?.cards.length) cards.addArray(vcard.cards);
+				return cards;
+			}, []);
+			if(cards.length) player.loseToDiscardpile(cards);
 		},
 		intro: {
 			markcount: "expansion",
@@ -1193,11 +1178,6 @@ const skills = {
 					if (str2.length >= 12) dialog.addText(str2, false);
 					else dialog.addText(str2);
 				}
-			},
-			onunmark(storage, player) {
-				player.removeAdditionalSkill("kud_qiaoshou_equip");
-				delete player.storage.kud_qiaoshou_equip2;
-				player.addEquipTrigger();
 			},
 		},
 	},
@@ -1253,26 +1233,25 @@ const skills = {
 			}
 		},
 		async content(event, trigger, player) {
-			const next = player.addToExpansion(event.cards, player, "give");
-			next.gaintag.add("kud_qiaoshou_equip");
-			await next;
-			if (!player.getExpansions("kud_qiaoshou_equip").length) return;
+			const name = event.cost_data.cardname, card = {
+				name,
+				subtypes: [],
+				storage: {kud_qiaoshou: true},
+			}
+			game.log(player, "声明了", "#y" + get.translation(name));
+			player.$throw(event.cards);
+			await game.delay(0, 300);
+			await player.equip(get.autoViewAs(card, event.cards));
 			player.addTempSkill("kud_qiaoshou_equip", {
 				player: ["phaseUseEnd", "phaseZhunbeiBegin"],
 			});
-			const name = event.cost_data.cardname;
-			player.storage.kud_qiaoshou_equip2 = name;
-			player.markAuto("kud_qiaoshou_equip", event.cards);
-			const info = lib.card[name].skills;
-			if (info && info.length) player.addAdditionalSkill("kud_qiaoshou_equip", info);
-			game.log(player, "声明了", "#y" + get.translation(name));
 			await player.draw();
 		},
 	},
 	kud_buhui: {
 		enable: "chooseToUse",
 		filter(event, player) {
-			return event.type == "dying" && player == event.dying && player.getExpansions("kud_qiaoshou_equip").length + player.countCards("e") > 0;
+			return event.type == "dying" && player == event.dying && player.countCards("e") > 0;
 		},
 		skillAnimation: true,
 		limited: true,
@@ -1280,7 +1259,7 @@ const skills = {
 		content() {
 			"step 0";
 			player.awakenSkill("kud_buhui");
-			var cards = player.getCards("e").concat(player.getExpansions("kud_qiaoshou_equip"));
+			var cards = player.getCards("e");
 			if (cards.length) player.discard(cards);
 			player.removeSkill("kud_qiaoshou_equip");
 			player.draw(cards.length);
