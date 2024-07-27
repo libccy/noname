@@ -1249,8 +1249,7 @@ const skills = {
 					return event.name != "phase" || game.phaseNumber == 0;
 				},
 				prompt2(event, player) {
-					//无名杀先阴后阳，不要问为什么
-					return "切换【覆谋】为状态" + (player.storage.dcsbfumou ? "阴" : "阳");
+					return "切换【覆谋】为状态" + (player.storage.dcsbfumou ? "阳" : "阴");
 				},
 				check: () => Math.random() > 0.5,
 				content() {
@@ -2309,8 +2308,7 @@ const skills = {
 					return event.name != "phase" || game.phaseNumber == 0;
 				},
 				prompt2(event, player) {
-					//无名杀先阴后阳，不要问为什么
-					return "切换【权谋】为状态" + (player.storage.dcsbquanmou ? "阴" : "阳");
+					return "切换【权谋】为状态" + (player.storage.dcsbquanmou ? "阳" : "阴");
 				},
 				check: () => Math.random() > 0.5,
 				content() {
@@ -2362,7 +2360,7 @@ const skills = {
 				mark: true,
 				marktext: "讨",
 				intro: {
-					name: "权谋 - 阳",
+					name: "权谋 - 阴",
 					content: () => {
 						return `当你下次受到${get.translation(_status.currentPhase)}造成的伤害后，其可以对除你之外的至多三名其他角色各造成1点伤害。`;
 					},
@@ -2407,7 +2405,7 @@ const skills = {
 				mark: true,
 				marktext: "抚",
 				intro: {
-					name: "权谋 - 阴",
+					name: "权谋 - 阳",
 					content: () => {
 						return `当你下次受到${get.translation(_status.currentPhase)}造成的伤害时，防止此伤害。`;
 					},
@@ -3552,8 +3550,7 @@ const skills = {
 					return event.name != "phase" || game.phaseNumber == 0;
 				},
 				prompt2(event, player) {
-					//无名杀先阴后阳，不要问为什么
-					return "切换【英谋】为状态" + (player.storage.dcsbyingmou ? "阴" : "阳");
+					return "切换【英谋】为状态" + (player.storage.dcsbyingmou ? "阳" : "阴");
 				},
 				check: () => Math.random() > 0.5,
 				content() {
@@ -3802,8 +3799,7 @@ const skills = {
 					return event.name != "phase" || game.phaseNumber == 0;
 				},
 				prompt2(event, player) {
-					//无名杀先阴后阳，不要问为什么
-					return "切换【盟谋】为状态" + (player.storage.dcsbmengmou ? "阴" : "阳");
+					return "切换【盟谋】为状态" + (player.storage.dcsbmengmou ? "阳" : "阴");
 				},
 				check: () => Math.random() > 0.5,
 				content() {
