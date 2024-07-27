@@ -1090,13 +1090,6 @@ export class GameEvent {
 	start() {
 		if (this.#start) return this.#start;
 		this.#start = (async () => {
-			if (this.player && this.player.skipList.includes(this.name)) {
-				this.player.skipList.remove(this.name);
-				if (lib.phaseName.includes(this.name)) this.player.getHistory("skipped").add(this.name);
-				this.trigger(this.name + "Skipped");
-				return;
-			}
-
 			if (this.parent) this.parent.childEvents.push(this);
 			game.getGlobalHistory("everything").push(this);
 			if (this.manager.eventStack.length === 0) this.manager.rootEvent = this;
@@ -1113,6 +1106,7 @@ export class GameEvent {
 			await this.trigger(this.name + trigger);
 			this._triggered = to;
 		};
+		if (await this.checkSkipped()) return;
 		while (true) {
 			await this.waitNext();
 			if (!this.finished) {
@@ -1134,6 +1128,16 @@ export class GameEvent {
 				else return;
 			}
 		}
+	}
+	
+	async checkSkipped(){
+		if (!this.player || !this.player.skipList.includes(this.name)) return false;
+
+		this.player.skipList.remove(this.name);
+		if (lib.phaseName.includes(this.name)) this.player.getHistory("skipped").add(this.name);
+		this.finish();
+		await this.trigger(this.name + "Skipped");
+		return true;
 	}
 	/**
 	 * @type { Promise<Result | void> | null }
