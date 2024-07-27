@@ -5973,6 +5973,7 @@ export class Player extends HTMLDivElement {
 				cards: [],
 				cards2: [],
 				gaintag_map: {},
+				vcard_map: new Map(),
 			};
 			player.checkHistory("lose", function (evt) {
 				if (evt.parent == that) {
@@ -5987,6 +5988,9 @@ export class Player extends HTMLDivElement {
 						if (!map.gaintag_map[key]) map.gaintag_map[key] = [];
 						map.gaintag_map[key].addArray(evt.gaintag_map[key]);
 					}
+					evt.vcard_map.forEach((value, key)=>{
+						map.vcard_map.set(key, value);
+					});
 				}
 			});
 			return map;
@@ -6057,6 +6061,7 @@ export class Player extends HTMLDivElement {
 				cards: [],
 				cards2: [],
 				gaintag_map: {},
+				vcard_map: new Map(),
 			};
 			player.checkHistory("lose", function (evt) {
 				if (evt.parent == that) {
@@ -6071,6 +6076,9 @@ export class Player extends HTMLDivElement {
 						if (!map.gaintag_map[key]) map.gaintag_map[key] = [];
 						map.gaintag_map[key].addArray(evt.gaintag_map[key]);
 					}
+					evt.vcard_map.forEach((value, key)=>{
+						map.vcard_map.set(key, value);
+					});
 				}
 			});
 			return map;
@@ -6148,8 +6156,10 @@ export class Player extends HTMLDivElement {
 				cards: [],
 				cards2: [],
 				gaintag_map: {},
+				vcard_map: new Map(),
 			};
 		};
+		next.vcard_map = new Map();
 		return next;
 	}
 	/**
@@ -6657,6 +6667,7 @@ export class Player extends HTMLDivElement {
 				cards: [],
 				cards2: [],
 				gaintag_map: {},
+				vcard_map: new Map(),
 			};
 			player.checkHistory("lose", function (evt) {
 				if (evt.parent == that) {
@@ -6671,6 +6682,9 @@ export class Player extends HTMLDivElement {
 						if (!map.gaintag_map[key]) map.gaintag_map[key] = [];
 						map.gaintag_map[key].addArray(evt.gaintag_map[key]);
 					}
+					evt.vcard_map.forEach((value, key)=>{
+						map.vcard_map.set(key, value);
+					});
 				}
 			});
 			return map;
@@ -6722,6 +6736,7 @@ export class Player extends HTMLDivElement {
 				cards: [],
 				cards2: [],
 				gaintag_map: {},
+				vcard_map: new Map(),
 			};
 			player.checkHistory("lose", function (evt) {
 				if (evt.parent == that) {
@@ -6736,6 +6751,9 @@ export class Player extends HTMLDivElement {
 						if (!map.gaintag_map[key]) map.gaintag_map[key] = [];
 						map.gaintag_map[key].addArray(evt.gaintag_map[key]);
 					}
+					evt.vcard_map.forEach((value, key)=>{
+						map.vcard_map.set(key, value);
+					});
 				}
 			});
 			return map;

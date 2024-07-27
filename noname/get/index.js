@@ -543,8 +543,8 @@ export class Get extends GetCompatible {
 			}
 		}
 	}
-	autoViewAs(card, cards) {
-		return new lib.element.VCard(card, cards);
+	autoViewAs(card, cards, owner) {
+		return new lib.element.VCard(card, cards, void 0, void 0, owner);
 	}
 	/**
 	 * @deprecated

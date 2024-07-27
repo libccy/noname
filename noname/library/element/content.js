@@ -188,6 +188,7 @@ export const Content = {
 	},
 	//Execute the delay card effect
 	//执行延时锦囊牌效果
+	//TODO: 修改此处的虚拟牌/实体牌判断
 	executeDelayCardEffect: () => {
 		"step 0";
 		target.$phaseJudge(card);
@@ -659,7 +660,7 @@ export const Content = {
 			// @ts-ignore
 			if (get.itemtype(card) === "card"){
 				cards = [card];
-				card = get.autoViewAs(card);
+				card = get.autoViewAs(card, void 0, false);
 			}
 			else {
 				cards = card.cards ?? [];
@@ -717,10 +718,10 @@ export const Content = {
 		if (!event.vcards) {
 			if (event.card) {
 				// @ts-ignore
-				if (get.itemtype(event.card) === "card") event.card = get.autoViewAs(event.card);
+				if (get.itemtype(event.card) === "card") event.card = get.autoViewAs(event.card, void 0, false);
 				event.vcards = [event.card];
 			}
-			else event.vcards = event.cards.map(card => get.autoViewAs(card));
+			else event.vcards = event.cards.map(card => get.autoViewAs(card, void 0, false));
 		}
 		//过滤被销毁的装备牌
 		event.vcards = event.vcards.filter(card => {
@@ -3755,18 +3756,16 @@ export const Content = {
 			if (lib.card[name].cancel) {
 				var next = game.createEvent(name + "Cancel");
 				next.setContent(lib.card[name].cancel);
-				next.cards = [event.card];
-				if (!event.card.viewAs) next.card = get.autoViewAs(event.card);
-				else next.card = get.autoViewAs({ name: name }, next.cards);
+				next.card = event.card;
+				next.cards = event.card.cards ?? [];
 				next.player = player;
 			}
 		} else {
 			var next = game.createEvent(name);
 			next.setContent(lib.card[name].effect);
 			next._result = result;
-			next.cards = [event.card];
-			if (!event.card.viewAs) next.card = get.autoViewAs(event.card);
-			else next.card = get.autoViewAs({ name: name }, next.cards);
+			next.card = event.card;
+			next.cards = event.card.cards ?? [];
 			next.player = player;
 		}
 		ui.clear();
@@ -8568,7 +8567,6 @@ export const Content = {
 		game.delayx();
 		if (event.updatePile) game.updateRoundNumber();
 	},
-	//TODO：将真实牌-虚拟牌的映射Map存储在Lose事件中，并处理多牌转换中仅一张牌被拆的问题
 	lose: function () {
 		"step 0";
 		var evt = event.getParent();
@@ -8645,20 +8643,37 @@ export const Content = {
 				if (cards[i].parentNode.classList.contains("equips")) {
 					cards[i].original = "e";
 					es.push(cards[i]);
+					const VEquip = player.getVCards("e").find(card => {
+						return card.cards?.includes(cards[i])
+					});
+					if (VEquip) {
+						event.vcard_map.set(cards[i], VEquip);
+					}
+					else event.vcard_map.set(cards[i], get.autoViewAs(cards[i], void 0, false));
 				} else if (cards[i].parentNode.classList.contains("judges")) {
 					cards[i].original = "j";
 					js.push(cards[i]);
+					const VJudge = player.getVCards("j").find(card => {
+						return card.cards?.includes(cards[i])
+					});
+					if (VJudge) {
+						event.vcard_map.set(cards[i], VJudge);
+					}
+					else event.vcard_map.set(cards[i], get.autoViewAs(cards[i], void 0, false));
 				} else if (cards[i].parentNode.classList.contains("expansions")) {
 					cards[i].original = "x";
 					xs.push(cards[i]);
+					event.vcard_map.set(cards[i], get.autoViewAs(cards[i], void 0, false));
 					if (cards[i].gaintag && cards[i].gaintag.length) unmarks.addArray(cards[i].gaintag);
 				} else if (cards[i].parentNode.classList.contains("handcards")) {
 					if (cards[i].classList.contains("glows")) {
 						cards[i].original = "s";
 						ss.push(cards[i]);
+						event.vcard_map.set(cards[i], get.autoViewAs(cards[i], void 0, false));
 					} else {
 						cards[i].original = "h";
 						hs.push(cards[i]);
+						event.vcard_map.set(cards[i], get.autoViewAs(cards[i], void 0, player));
 					}
 				} else {
 					cards[i].original = null;
@@ -9428,7 +9443,7 @@ export const Content = {
 			cardName = event.card.name;
 			if (get.itemtype(event.card) === "card") {
 				event.cards = [event.card]
-				card = get.autoViewAs({name: cardName, isCard: true}, [event.card]);
+				card = get.autoViewAs(event.card, void 0, false);
 				event.card = card;
 			}
 			else if (!(event.card.cards?.length) && event.cards?.length){

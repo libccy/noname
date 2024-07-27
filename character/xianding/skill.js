@@ -17555,6 +17555,39 @@ const skills = {
 				equipValue: 4.5,
 			},
 		},
+		subSkill: {
+			lose: {
+				audio: "pyzhuren_club",
+				forced: true,
+				charlotte: true,
+				equipSkill: true,
+				trigger: {
+					player: "loseAfter",
+					global: [
+						"equipAfter",
+						"addJudgeAfter",
+						"gainAfter",
+						"loseAsyncAfter",
+						"addToExpansionAfter",
+					],
+				},
+				filter: (event, player) => {
+					return (player.isDamaged() && !player.hasSkillTag("unequip2"))
+				},
+				getIndex(event, player){
+					const evt = event.getl(player);
+					const lostCards = [];
+					evt.es.forEach((card) => {
+						const VEquip = evt.vcard_map.get(card);
+						if(VEquip.name === "pyzhuren_club") lostCards.add(VEquip);
+					});
+					return lostCards.length;
+				},
+				async content(event, trigger, player) {
+					await player.recover();
+				},
+			},
+		},
 	},
 	pyzhuren_spade: {
 		audio: true,

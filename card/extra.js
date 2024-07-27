@@ -1045,17 +1045,19 @@ game.import("card", function () {
 							],
 						},
 						filter: (event, player) => {
-							if (player.isHealthy() || player.hasSkillTag("unequip2")) return false;
-							var evt = event.getl(player);
-							return evt && evt.es.some((card) => card.name == "baiyin");
+							return (player.isDamaged() && !player.hasSkillTag("unequip2"))
 						},
-						content: function () {
-							var evt = trigger.getl(player);
+						getIndex(event, player){
+							const evt = event.getl(player);
+							const lostCards = [];
 							evt.es.forEach((card) => {
-								if (card.name == "baiyin") {
-									player.recover();
-								}
+								const VEquip = evt.vcard_map.get(card);
+								if(VEquip.name === "baiyin") lostCards.add(VEquip);
 							});
+							return lostCards.length;
+						},
+						async content(event, trigger, player) {
+							await player.recover();
 						},
 					},
 				},

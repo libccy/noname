@@ -15261,18 +15261,20 @@ const skills = {
 					global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 				},
 				filter: (event, player) => {
-					if (player.hasSkillTag("unequip2")) return false;
-					var evt = event.getl(player);
-					return evt && evt.es.some(card => card.name == "rewrite_baiyin");
+					return !player.hasSkillTag("unequip2");
 				},
-				content: function () {
-					var evt = trigger.getl(player);
-					evt.es.forEach(card => {
-						if (card.name == "rewrite_baiyin") {
-							player.recover();
-							player.draw(2);
-						}
+				getIndex(event, player){
+					const evt = event.getl(player);
+					const lostCards = [];
+					evt.es.forEach((card) => {
+						const VEquip = evt.vcard_map.get(card);
+						if(VEquip.name === "rewrite_baiyin") lostCards.add(VEquip);
 					});
+					return lostCards.length;
+				},
+				async content(event, trigger, player) {
+					await player.recover();
+					await player.draw(2);
 				},
 			},
 		},
