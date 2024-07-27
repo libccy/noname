@@ -1867,17 +1867,15 @@ export class Get extends GetCompatible {
 			});
 			Object.keys(datas).forEach((key) => {
 				const value = datas[key];
-				if (Array.isArray(value)) this[key] = value.slice();
+				if (Array.isArray(value)) vcard[key] = value.slice();
 				vcard[key] = value;
 			});
 			return vcard;
 		}
 		else {
-			console.log("datas:", datas);
 			const card = new lib.element.VCard(datas);
 			// @ts-ignore
 			lib.vcardOL[vid] = card;
-			console.log("vcard:", card);
 			return card;
 		}
 	}
