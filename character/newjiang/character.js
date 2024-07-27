@@ -26,6 +26,7 @@ const characters = {
 	yj_zhoubuyi: ["male", "wei", 3, ["mbhuiyao", "mbquesong"]],
 	mp_wangrong: ["male", "wei", 3, ["mpjianlin", "mpsixiao"]],
 	mp_liuling: ["male", "jin", 3, ["mpjiusong", "mpmaotao", "mpbishi"], ["doublegroup:wei:qun:jin"]],
+	yj_majun: ["male", "wei", 3, ["yjgongqiao", "yjjingyi"]],
 };
 
 export default characters;

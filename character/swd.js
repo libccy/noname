@@ -10806,7 +10806,6 @@ game.import("character", function () {
 			zhuyu: "朱羽",
 			ningshuang: "凝霜",
 			zaowu: "造物",
-			// shouhua:'收化',
 			xielv: "谐率",
 			tianhuo: "天火",
 			huanyin: "幻音",

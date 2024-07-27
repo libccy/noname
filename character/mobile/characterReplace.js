@@ -1,6 +1,6 @@
 const characterReplaces = {
 	caochun: ["caochun", "old_caochun"],
-	majun: ["majun", "old_majun"],
+	majun: ["majun", "yj_majun", "old_majun"],
 	zhanggong: ["zhanggong", "re_zhanggong"],
 	baosanniang: ["xin_baosanniang", "re_baosanniang", "baosanniang"],
 	heqi: ["re_heqi", "heqi"],

@@ -9762,7 +9762,7 @@ const skills = {
 			player.getAllHistory("damage", function (evt) {
 				num += evt.num;
 			});
-			return num > 7;
+			return num >= 7;
 		},
 		content: function () {
 			player.markSkill("rejiushi_mark");

@@ -18,7 +18,18 @@ export class Get extends GetCompatible {
 	is = new Is();
 	promises = new Promises();
 	Audio = Audio;
-
+	/**
+	 * 获取装备牌对应的技能
+	 * @param { Card[]|VCard[] } cards
+	 * @returns { any[] }
+	 */
+	skillsFromEquips(cards){
+		return cards.reduce((skills, card) => {
+			const info = get.info(card, false);
+			if (info.skills) skills.addArray(info.skills);
+			return skills;
+		}, [])
+	}
 	/**
 	 * 将一个传统格式的character转化为Character对象格式
 	 * @param { Array|Object|import("../library/element/character").Character } data
@@ -193,7 +204,10 @@ export class Get extends GetCompatible {
 	 */
 	subtypes(obj, player) {
 		if (typeof obj == "string") obj = { name: obj };
-		if (typeof obj != "object") return;
+		if (typeof obj != "object" || obj === null) return [];
+		if (Array.isArray(obj.subtypes)) {
+			return get.copy(obj.subtypes);
+		}
 		var name = get.name(obj, player);
 		if (!lib.card[name]) return [];
 		if (lib.card[name].subtypes) {
@@ -529,9 +543,9 @@ export class Get extends GetCompatible {
 			}
 		}
 	}
-	autoViewAs(card, cards) {
-		if (!cards && card instanceof lib.element.VCard) return card; //阻止无限嵌套
-		return new lib.element.VCard(card, cards);
+	autoViewAs(card, cards, owner) {
+		if (arguments.length === 1 && card instanceof lib.element.VCard) return card; //阻止无限嵌套
+		return new lib.element.VCard(card, cards, void 0, void 0, owner);
 	}
 	/**
 	 * @deprecated
@@ -1505,20 +1519,87 @@ export class Get extends GetCompatible {
 		return Array.from(infos || []).map(info => game.playerMap[info]);
 	}
 	cardInfo(card) {
-		return [card.suit, card.number, card.name, card.nature];
+		return [card.suit, card.number, card.name, card.nature, card.cardid];
 	}
 	cardsInfo(cards = []) {
 		return Array.from(cards).map(get.cardInfo);
 	}
 	infoCard(info) {
-		var card = ui.create.card();
-		if (info[0]) {
-			card.init(info);
+		if (!lib.cardOL) lib.cardOL = {};
+		let card;
+		try {
+			const id = info[4];
+			if (!id) {
+				card = ui.create.card();
+				if (info && info[2]) card.init(info);
+			} else if (lib.cardOL[id]) {
+				if (lib.cardOL[id].name != info[2]) {
+					if (info && info[2]) lib.cardOL[id].init(info);
+				}
+				card = lib.cardOL[id];
+			} else {
+				card = ui.create.card();
+				card.cardid = id;
+				if (info && info[2]) card.init(info);
+				lib.cardOL[id] = card;
+			}
+		} catch (e) {
+			console.log(e);
 		}
-		return card;
+		return card || info;
 	}
 	infoCards(infos) {
 		return Array.from(infos || []).map(get.infoCard);
+	}
+	vcardInfo(card) {
+		return Object.entries(card).reduce((stringifying, entry) => {
+			const key = entry[0];
+			// @ts-ignore
+			if (key === "cards") stringifying[key] = get.cardsInfo(entry[1]);
+			else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1])
+			return stringifying;
+		}, {})
+	}
+	vcardsInfo(cards = []) {
+		return Array.from(cards).map(get.vcardInfo);
+	}
+	infoVCard(card){
+		// @ts-ignore
+		if (!lib.vcardOL) lib.vcardOL = {};
+		const datas = Object.entries(card).reduce((vcard, entry) => {
+			const key = entry[0];
+			if (key === "cards") vcard[key] = get.infoCards(entry[1]);
+			else if (entry[1] !== void 0) vcard[key] = JSON.parse(entry[1]);
+			return vcard;
+		}, {});
+		// @ts-ignore
+		const vid = datas.vcardID;
+		// @ts-ignore
+		if (!vid || !lib.vcardOL) return new lib.element.VCard(datas);
+		// @ts-ignore
+		if (vid in lib.vcardOL) {
+			// @ts-ignore
+			const vcard = lib.vcardOL[vid];
+			//TODO: 这里暂时偷懒 直接用了delete和直接赋值 不妥
+			Object.keys(vcard).forEach(entry => {
+				delete vcard[entry];
+			});
+			Object.keys(datas).forEach((key) => {
+				const value = datas[key];
+				if (Array.isArray(value)) vcard[key] = value.slice();
+				vcard[key] = value;
+			});
+			return vcard;
+		}
+		else {
+			const card = new lib.element.VCard(datas);
+			// @ts-ignore
+			lib.vcardOL[vid] = card;
+			return card;
+		}
+	}
+	infoVCards(infos) {
+		return Array.from(infos || []).map(get.infoVCard);
 	}
 	cardInfoOL(card) {
 		return "_noname_card:" + JSON.stringify([card.cardid, card.suit, card.number, card.name, card.nature]);
@@ -1822,6 +1903,53 @@ export class Get extends GetCompatible {
 		}
 		return evt || item;
 	}
+	vcardInfoOL(item) {
+		return "_noname_vcard:" + JSON.stringify(Object.entries(item).reduce((stringifying, entry) => {
+			const key = entry[0];
+			stringifying[key] = get.stringifiedResult(entry[1]);
+			return stringifying;
+		}, {}));
+	}
+	vcardsInfoOL(cards) {
+		return Array.from(cards || []).map(get.vcardInfoOL);
+	}
+	infoVCardOL(item) {
+		// @ts-ignore
+		const rawCard = JSON.parse(item.slice(14));
+		const datas = Object.entries(rawCard).reduce((vcard, entry) => {
+			const key = entry[0];
+			vcard[key] = get.parsedResult(entry[1]);
+			return vcard;
+		}, {});
+		
+		const vid = datas.vcardID;
+		// @ts-ignore
+		if (!vid || !lib.vcardOL) return new lib.element.VCard(datas);
+		// @ts-ignore
+		if (vid in lib.vcardOL) {
+			// @ts-ignore
+			const vcard = lib.vcardOL[vid];
+			//TODO: 这里暂时偷懒 直接用了delete和直接赋值 不妥
+			Object.keys(vcard).forEach(entry => {
+				delete vcard[entry];
+			});
+			Object.keys(datas).forEach((key) => {
+				const value = datas[key];
+				if (Array.isArray(value)) vcard[key] = value.slice();
+				vcard[key] = value;
+			});
+			return vcard;
+		}
+		else {
+			const card = new lib.element.VCard(datas);
+			// @ts-ignore
+			lib.vcardOL[vid] = card;
+			return card;
+		}
+	}
+	infoVCardsOL(infos) {
+		return Array.from(infos || []).map(get.infoVCardOL);
+	}
 	stringifiedResult(item, level, nomore) {
 		if (!item) return item;
 		if (typeof item == "function") {
@@ -1832,6 +1960,10 @@ export class Get extends GetCompatible {
 					return get.cardInfoOL(item);
 				case "cards":
 					return get.cardsInfoOL(item);
+				case "vcard":
+					return get.vcardInfoOL(item);
+				case "vcards":
+					return get.vcardsInfoOL(item);
 				case "player":
 					return get.playerInfoOL(item);
 				case "players":
@@ -1878,6 +2010,8 @@ export class Get extends GetCompatible {
 				return get.infoFuncOL(item);
 			} else if (item.startsWith("_noname_card:")) {
 				return get.infoCardOL(item);
+			} else if (item.startsWith("_noname_vcard:")) {
+				return get.infoVCardOL(item);
 			} else if (item.startsWith("_noname_player:")) {
 				return get.infoPlayerOL(item);
 			} else if (item.startsWith("_noname_event:")) {
@@ -2056,6 +2190,7 @@ export class Get extends GetCompatible {
 		if (Array.isArray(obj) && obj.length > 0) {
 			if (obj.every(p => p instanceof lib.element.Player)) return "players";
 			if (obj.every(p => p instanceof lib.element.Card)) return "cards";
+			if (obj.every(p => p instanceof lib.element.VCard)) return "vcards";
 			if (obj.length == 2) {
 				if (typeof obj[0] == "number" && typeof obj[1] == "number") {
 					if (obj[0] <= obj[1] || obj[1] <= -1) return "select";
@@ -2069,6 +2204,7 @@ export class Get extends GetCompatible {
 		}
 		if (obj instanceof lib.element.Button || (obj instanceof HTMLDivElement && obj.classList.contains("button"))) return "button";
 		if (obj instanceof lib.element.Card) return "card";
+		if (obj instanceof lib.element.VCard) return "vcard";
 		if (obj instanceof lib.element.Player) return "player";
 		if (obj instanceof lib.element.Dialog) return "dialog";
 		if (obj instanceof lib.element.GameEvent || obj instanceof lib.element.GameEventPromise) return "event";
@@ -2078,8 +2214,9 @@ export class Get extends GetCompatible {
 		if (lib.experimental.symbol.itemType in obj) return obj[lib.experimental.symbol.itemType];
 	}
 	equipNum(card) {
-		if (get.type(card) == "equip") {
-			return parseInt(get.subtype(card)[5]);
+		const subtypes = get.subtypes(card)
+		if (subtypes.length) {
+			return parseInt(subtypes[0].slice(5));
 		}
 		return 0;
 	}
@@ -2383,11 +2520,15 @@ export class Get extends GetCompatible {
 		}
 		n = game.checkMod(from, to, n, "globalFrom", from);
 		n = game.checkMod(from, to, n, "globalTo", to);
-		const equips1 = from.getCards("e", function (card) {
-				return !ui.selected.cards || !ui.selected.cards.includes(card);
+		const equips1 = from.getVCards("e", function (card) {
+				return !card.cards?.some(card => {
+					return ui.selected.cards?.includes(card);
+				});
 			}),
-			equips2 = to.getCards("e", function (card) {
-				return !ui.selected.cards || !ui.selected.cards.includes(card);
+			equips2 = to.getVCards("e", function (card) {
+				return !card.cards?.some(card => {
+					return ui.selected.cards?.includes(card);
+				});
 			});
 		for (let i = 0; i < equips1.length; i++) {
 			let info = get.info(equips1[i]).distance;
@@ -2535,6 +2676,7 @@ export class Get extends GetCompatible {
 	position(card, ordering) {
 		//哪个大聪明在返回牌位置的函数写返回玩家位置的功能
 		if (get.itemtype(card) == "player") return parseInt(card.dataset.position);
+		if (!card) return null;
 		if (card.timeout && card.destiny && card.destiny.classList) {
 			if (card.destiny.classList.contains("equips")) return "e";
 			if (card.destiny.classList.contains("judges")) return "j";
@@ -3913,15 +4055,18 @@ export class Get extends GetCompatible {
 			if (node.link && node.link.name && lib.card[node.link.name]) {
 				name = node.link.name;
 			}
-			if (get.position(node) == "j" && node.viewAs && node.viewAs != name) {
+			var cardPosition = get.position(node);
+			if ((cardPosition === "e" || cardPosition === "j") && node.viewAs && node.viewAs != name) {
 				uiintro.add(get.translation(node.viewAs));
-				var cardInfo = lib.card[node.viewAs],
-					showCardIntro = true;
+				var cardInfo = lib.card[node.viewAs], showCardIntro = true;
+				var cardOwner = get.owner(node);
 				if (cardInfo.blankCard) {
-					var cardOwner = get.owner(node);
 					if (cardOwner && !cardOwner.isUnderControl(true)) showCardIntro = false;
 				}
-				if (showCardIntro) uiintro.add('<div class="text center">（' + get.translation(get.translation(node)) + "）</div>");
+				if(cardOwner){
+					var sourceVCard = cardOwner.getVCards(cardPosition).find(card => card.cards?.includes(node));
+					if (showCardIntro && sourceVCard) uiintro.add('<div class="text center">（' + get.translation(get.translation(sourceVCard.cards)) + "）</div>");
+				}
 				// uiintro.add(get.translation(node.viewAs)+'<br><div class="text center" style="padding-top:5px;">（'+get.translation(node)+'）</div>');
 				uiintro.nosub = true;
 				name = node.viewAs;
