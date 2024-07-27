@@ -348,13 +348,15 @@ const skills = {
 			return game.hasPlayer(target => player.inRange(target));
 		},
 		usable: 1,
+		filterTarget(card, player, target) {
+			return player.inRange(target);
+		},
+		selectTarget: -1,
+		multitarget: true,
+		multiline: true,
 		delay: 0,
 		async content(event, trigger, player) {
-			const targets = game
-				.filterPlayer(target => {
-					return player.inRange(target);
-				})
-				.sortBySeat();
+			const targets = event.targets.sortBySeat();
 			let damages = 0,
 				puts = 0;
 			player.line(targets);
@@ -398,6 +400,7 @@ const skills = {
 					else ui.discardPile.removeChild(card);
 					ui.cardPile.insertBefore(card, ui.cardPile.firstChild);
 					game.updateRoundNumber();
+					game.log(target, "将" + get.translation(card) + "置于牌堆顶");
 				} else {
 					damages++;
 					await target.damage(1, "fire");

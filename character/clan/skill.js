@@ -294,6 +294,66 @@ const skills = {
 				}
 			},
 		},
+		group: "clantanque_mark",
+		init(player) {
+			var history = player.getAllHistory("useCard");
+			if (history.length) {
+				var trigger = history[history.length - 1];
+				if (typeof get.number(trigger.card, player) != "number") return;
+				player.storage.clantanque_mark = trigger.card;
+				player.markSkill("clantanque_mark");
+				game.broadcastAll(
+					function (player, number) {
+						if (player.marks.clantanque_mark) player.marks.clantanque_mark.firstChild.innerHTML = get.translation(number);
+					},
+					player,
+					get.number(trigger.card, player)
+				);
+			}
+		},
+		onremove(player) {
+			player.unmarkSkill("clantanque_mark");
+			delete player.storage.clantanque_mark;
+		},
+		subSkill: {
+			mark: {
+				charlotte: true,
+				trigger: { player: "useCard1" },
+				forced: true,
+				popup: false,
+				firstDo: true,
+				content() {
+					if (typeof get.number(trigger.card, player) != "number") player.unmarkSkill("clantanque_mark");
+					else {
+						player.storage.clantanque_mark = trigger.card;
+						player.markSkill("clantanque_mark");
+						game.broadcastAll(
+							function (player, number) {
+								if (player.marks.clantanque_mark) player.marks.clantanque_mark.firstChild.innerHTML = get.translation(number);
+							},
+							player,
+							get.number(trigger.card, player)
+						);
+					}
+				},
+				intro: {
+					markcount(card, player) {
+						var num = get.number(card, player);
+						var list = [1, 11, 12, 13];
+						if (list.includes(num)) return ["A", "J", "Q", "K"][list.indexOf(num)];
+						return parseFloat(num);
+					},
+					content(card, player) {
+						var num = get.number(card, player);
+						var str = "<li>上一张牌的点数：";
+						var list = [1, 11, 12, 13];
+						if (list.includes(num)) str += ["A(1)", "J(11)", "Q(12)", "K(13)"][list.indexOf(num)];
+						else str += parseFloat(num);
+						return str;
+					},
+				},
+			},
+		},
 	},
 	clanshengmo: {
 		audio: 2,
@@ -1008,7 +1068,7 @@ const skills = {
 			if (player.getHistory("useSkill", evt => evt.skill == "clanhuanghan").length > 1 && player.hasSkill("clanbaozu", null, false, false) && player.awakenedSkills.includes("clanbaozu")) {
 				player.restoreSkill("clanbaozu");
 				player.popup("保族");
-				game.log(player, "恢复了技能", "#【保族】");
+				game.log(player, "恢复了技能", "#g【保族】");
 			}
 		},
 		ai: {
