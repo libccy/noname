@@ -2318,18 +2318,14 @@ game.import("character", function () {
 				},
 			},
 			bingfeng2: {
+				mark: true,
+				marktext: "封",
+				intro: {
+					content: "不能使用或打出手牌"
+				},
 				mod: {
-					cardEnabled: function () {
-						return false;
-					},
-					cardUsable: function () {
-						return false;
-					},
-					cardRespondable: function () {
-						return false;
-					},
-					cardSavable: function () {
-						return false;
+					cardEnabled2: function (card) {
+						if (get.position(card) == "h") return false;
 					},
 				},
 				trigger: { player: "turnOverAfter" },
@@ -5160,22 +5156,17 @@ game.import("character", function () {
 				},
 			},
 			shejie2: {
-				unique: true,
+				mark: true,
+				marktext: "界",
+				intro: {
+					content: "不能使用或打出手牌直到下一回合开始"
+				},
 				trigger: { player: "phaseBegin" },
 				forced: true,
 				priority: 10,
 				mod: {
-					cardEnabled: function () {
-						return false;
-					},
-					cardUsable: function () {
-						return false;
-					},
-					cardRespondable: function () {
-						return false;
-					},
-					cardSavable: function () {
-						return false;
+					cardEnabled2: function (card) {
+						if (get.position(card) == "h") return false;
 					},
 				},
 				content: function () {
@@ -10481,7 +10472,6 @@ game.import("character", function () {
 			yudun_info: "锁定技，你无法使用锦囊牌；你可以将两张锦囊牌当作一张不计入出杀次数的【杀】使用。",
 			bingfeng: "冰封",
 			bingfeng2: "冰封",
-			bingfeng2_info: "不能使用或打出手牌。",
 			bingfeng_info:
 				"限定技，出牌阶段，你可以指定至多三个目标与其一同翻面，且处于翻面状态时不能使用或打出手牌；若如此做，你失去技能玄咒并减少1点体力上限。",
 			guozao: "聒噪",
@@ -10647,7 +10637,6 @@ game.import("character", function () {
 			shejie: "设界",
 			shejie2: "设界",
 			shejie_info: "每当你受到一次伤害，可以令伤害来源不能使用或打出其手牌，直到其下一回合开始。",
-			shejie2_info: "不能使用或打出手牌，直到下一回合开始。",
 			yinyue: "引月",
 			yinyue_info:
 				"每当有一名角色回复一次体力，你可以令其摸一张牌，若该角色不是你且你的手牌数不大于该角色，你也摸一张牌。",

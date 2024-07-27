@@ -246,7 +246,7 @@ const skills = {
 			const num = Math.abs(event.targets[0].countCards("e") - event.targets[1].countCards("e"));
 			await event.targets[0].swapEquip(event.targets[1]);
 			await game.delayx();
-			if (player.getDamagedHp() < num && player.countCards("e")) await player.chooseToDiscard("he", num, true);
+			if (player.getDamagedHp() < num) await player.chooseToDiscard("he", num, true);
 		},
 	},
 	olbuyi: {

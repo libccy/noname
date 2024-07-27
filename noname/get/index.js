@@ -530,6 +530,7 @@ export class Get extends GetCompatible {
 		}
 	}
 	autoViewAs(card, cards) {
+		if (!cards && card instanceof lib.element.VCard) return card; //阻止无限嵌套
 		return new lib.element.VCard(card, cards);
 	}
 	/**
