@@ -2509,6 +2509,9 @@ export class Game extends GameCompatible {
 				}
 			}
 		},
+		cardtag: function(cardtag) {
+			_status.cardtag = cardtag;
+		},
 		addVirtualEquip: function(player, map) {
 			const card = get.infoVCard(map[0]), cards = get.infoCards(map[1]);
 			player.addVirtualEquip(card, cards);
@@ -3634,14 +3637,16 @@ export class Game extends GameCompatible {
 						for (var j = 0; j < l2.length; j++) {
 							if (l1[i].length === 5) {
 								if (l1[i][4] === l2[j].cardid) {
-									l2[j].addGaintag([]);
+									l2[j].classList.remove("glow");
+									l2[j].classList.remove("glows");
 									l2[j].remove();
 									l2.splice(j--, 1);
 									break;
 								}
 							}
 							else if ((l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2])) {
-								l2[j].addGaintag([]);
+								l2[j].classList.remove("glow");
+								l2[j].classList.remove("glows");
 								l2[j].remove();
 								l2.splice(j--, 1);
 								break;
@@ -3969,7 +3974,7 @@ export class Game extends GameCompatible {
 	}
 	/**
 	 * @param { string } type
-	 * @param { Player } player
+	 * @param { Player|null } player
 	 * @param { any } [content]
 	 * @returns
 	 */
@@ -4004,6 +4009,9 @@ export class Game extends GameCompatible {
 				delay: time - _status.lastVideoLog,
 			});
 			_status.lastVideoLog = time;
+		}
+		if (type === "init") {
+			game.addVideo("cardtag", null, _status.cardtag);
 		}
 	}
 	/**
