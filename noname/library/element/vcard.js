@@ -1,6 +1,7 @@
 import { get } from "../../get/index.js";
 import { lib } from "../index.js";
 import { _status } from "../../status/index.js";
+import { ai } from "../../ai/index.js";
 
 export class VCard {
 	/**
@@ -120,12 +121,26 @@ export class VCard {
 		if (nature == "linked") return natures.some((n) => lib.linked.includes(n));
 		return get.is.sameNature(natures, nature);
 	}
-	getCacheKey() {
-		return `[vc:+${this.name}+${
+	/**
+	 * 返回一个键值，用于在缓存中作为键名。
+	 * @param { boolean } [similar] true伪equals, false统一前缀
+	 * @returns {string} cacheKey
+	 */
+	getCacheKey(similar) {
+		let prefix = "[object:";
+		if (similar !== false) prefix = similar ? "[card:" : "[vcard:";
+		if (this.cardid) return prefix + this.cardid + "]";
+		if (!this.cards.length) return prefix + `${this.name}+${
 			this.suit ? this.suit : (this.color || "none")
 		}+${
 			this.number === undefined ? "none" : this.number
-		}${this.nature ? "+" : ""}${this.nature ? this.nature : ""}]`;
+		}${
+			this.nature ? "+" + this.nature : ""
+		}]`;
+		if (similar !== undefined && this.cards.length === 1) return ai.getCacheKey(this.cards[0], similar);
+		return prefix + "[array:[" + this.cards.map(i => {
+			return ai.getCacheKey(i, similar);
+		}).join("-") + "]]]";
 	}
 	hasGaintag(tag) {
 		return this.gaintag && this.gaintag.includes(tag);

@@ -3680,8 +3680,20 @@ export class Player extends HTMLDivElement {
 		if (typeof num != "number") return 0;
 		return num;
 	}
-	getCacheKey() {
-		return `[p:${this.playerid}]`;
+	/**
+	 * 返回一个键值，用于在缓存中作为键名。
+	 * @param { boolean } [similar] false统一前缀
+	 * @returns {string} cacheKey
+	 */
+	getCacheKey(similar) {
+		let prefix = "[object:";
+		if (similar !== false) prefix = "[player:";
+		if (this.playerid) return prefix + this.playerid + "]";
+		return prefix + `
+			${this.name}+${this.sex}+${this.group}+${this.hp}+${this.maxHp}+${this.hujia}+${
+				"[" + this.skills.join(",") + "]"
+			}+${this.name1}+${this.name2}]
+		`;
 	}
 	/**
 	 * 返回玩家本回合使用某个技能的次数
