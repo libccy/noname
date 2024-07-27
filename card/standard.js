@@ -383,7 +383,7 @@ game.import("card", function () {
 								num = 1;
 							if (isLink) {
 								let cache = _status.event.getTempCache("sha_result", "eff");
-								if (typeof cache !== "object" || cache.card !== (card.getCacheKey ? card.getCacheKey("null") : get.translation(card)))
+								if (typeof cache !== "object" || cache.card !== ai.getCacheKey(card, true))
 									return eff;
 								if (cache.odds < 1.35 && cache.bool) return 1.35 * cache.eff;
 								return cache.odds * cache.eff;
@@ -432,7 +432,7 @@ game.import("card", function () {
 									);
 							_status.event.putTempCache("sha_result", "eff", {
 								bool: target.hp > num && get.attitude(player, target) > 0,
-								card: card.getCacheKey ? card.getCacheKey("null") : get.translation(card),
+								card: ai.getCacheKey(card, true),
 								eff: eff,
 								odds: odds,
 							});
@@ -2723,7 +2723,7 @@ game.import("card", function () {
 							if (targets.length) {
 								let preTarget = targets.at(-1),
 									pre = _status.event.getTempCache("jiedao_result", preTarget.playerid);
-								if (pre && pre.target.isIn() && pre.card === (card.getCacheKey ? card.getCacheKey("null") : get.translation(card)))
+								if (pre && pre.target.isIn() && pre.card === ai.getCacheKey(card, true))
 									return target === pre.target ? pre.eff : 0;
 								return (
 									get.effect(target, { name: "sha" }, preTarget, target) /
@@ -2748,7 +2748,7 @@ game.import("card", function () {
 							}, -100) / get.attitude(player, target) * target.mayHaveSha(player, "use", null, "odds");
 							_status.event.putTempCache("jiedao_result", target.playerid, {
 								target: addTar,
-								card: card.getCacheKey ? card.getCacheKey("null") : get.translation(card),
+								card: ai.getCacheKey(card, true),
 								eff: sha,
 							});
 							return Math.max(arms, sha);

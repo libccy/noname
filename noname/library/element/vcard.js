@@ -120,22 +120,7 @@ export class VCard {
 		if (nature == "linked") return natures.some((n) => lib.linked.includes(n));
 		return get.is.sameNature(natures, nature);
 	}
-	/**
-	 * 返回一个键值，用于在缓存中作为键名。
-	 *
-	 * @param {string} [id]
-	 *
-	 * @returns {string} cacheKey
-	 */
-	getCacheKey(id) {
-		if (id) {
-			if (this.cardid) return this.cardid;
-			if (!this.cards.length) return id;
-			return this.cards.reduce((pre, card) => {
-				if (card.getCacheKey) return pre + card.getCacheKey(id);
-				return pre + id;
-			}, "");
-		}
+	getCacheKey() {
 		return `[vc:+${this.name}+${
 			this.suit ? this.suit : (this.color || "none")
 		}+${
