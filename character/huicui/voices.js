@@ -1,4 +1,9 @@
 export default {
+	"#dcyunzheng1": "佳人弄青丝，柔荑奏鸣筝。",
+	"#dcyunzheng2": "玉柱冷寒雪，清商怨羽声。",
+	"#dchuoxin1": "闻君精通音律，与我合奏一曲如何？",
+	"#dchuoxin2": "知君有心意，此筝寄我情。",
+	"#yue_zoushi:die": "雁归衡阳，良人当还……",
 	"#dcduanti1": "流水不腐，户枢不蠹。",
 	"#dcduanti2": "五禽锻体，百病不侵。",
 	"#dcshicao1": "掌中非药，乃活人之根本。",
