@@ -2509,6 +2509,22 @@ export class Game extends GameCompatible {
 				}
 			}
 		},
+		addVirtualEquip: function(player, map) {
+			const card = get.infoVCard(map[0]), cards = get.infoCards(map[1]);
+			player.addVirtualEquip(card, cards);
+		},
+		addVirtualJudge: function(player, map) {
+			const card = get.infoVCard(map[0]), cards = get.infoCards(map[1]);
+			player.addVirtualJudge(card, cards);
+		},
+		removeVirtualEquip: function (player, card) {
+			card = get.infoVCard(card);
+			player.removeVirtualEquip(card);
+		},
+		removeVirtualJudge: function (player, card) {
+			card = get.infoVCard(card);
+			player.removeVirtualJudge(card);
+		},
 		$syncDisable: function (player, map) {
 			player.disabledSlots = map;
 			player.$syncDisable(map);
@@ -3274,7 +3290,14 @@ export class Game extends GameCompatible {
 				var checkMatch = function (l1, l2) {
 					for (var i = 0; i < l1.length; i++) {
 						for (var j = 0; j < l2.length; j++) {
-							if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
+							if (l1[i].length === 5){
+								if(l1[i][4] === l2[j].cardid) {
+									l2[j].addGaintag(content[1]);
+									l2.splice(j--, 1);
+									break;
+								}
+							}
+							else if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
 								l2[j].addGaintag(content[1]);
 								l2.splice(j--, 1);
 								break;
@@ -3282,7 +3305,7 @@ export class Game extends GameCompatible {
 						}
 					}
 				};
-				checkMatch(content[0], player.getCards("h"));
+				checkMatch(content[0], player.getCards("hs"));
 			} else {
 				console.log(player);
 			}
@@ -3293,8 +3316,15 @@ export class Game extends GameCompatible {
 					const checkMatch = function (l1, l2) {
 						for (var i = 0; i < l1.length; i++) {
 							for (var j = 0; j < l2.length; j++) {
-								if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
-									l2[j].addGaintag(content[0]);
+								if (l1[i].length === 5){
+									if(l1[i][4] === l2[j].cardid) {
+										l2[j].removeGaintag(content[0]);
+										l2.splice(j--, 1);
+										break;
+									}
+								}
+								else if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
+									l2[j].removeGaintag(content[0]);
 									l2.splice(j--, 1);
 									break;
 								}
@@ -3302,7 +3332,7 @@ export class Game extends GameCompatible {
 						}
 					};
 					// player.removeGaintag.apply(player, content);
-					checkMatch(content[1], player.getCards("h"));
+					checkMatch(content[1], player.getCards("hs"));
 				} else player.removeGaintag(content);
 			} else {
 				console.log(player);
@@ -3454,7 +3484,10 @@ export class Game extends GameCompatible {
 		},
 		directgains: function (player, cards) {
 			if (player && cards) {
-				player.directgains(get.infoCards(cards));
+				if (get.is.object(cards)) {
+					player.directgains(get.infoCards(cards.cards), null, cards.gaintag);
+				}
+				else player.directgains(get.infoCards(cards));
 			} else {
 				console.log(player);
 			}
@@ -3587,6 +3620,7 @@ export class Game extends GameCompatible {
 		},
 		lose: function (player, info) {
 			if (player && info) {
+				
 				var hs = info[0] || [],
 					es = info[1] || [],
 					js = info[2] || [],
@@ -3598,7 +3632,16 @@ export class Game extends GameCompatible {
 				var checkMatch = function (l1, l2) {
 					for (var i = 0; i < l1.length; i++) {
 						for (var j = 0; j < l2.length; j++) {
-							if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
+							if (l1[i].length === 5) {
+								if (l1[i][4] === l2[j].cardid) {
+									l2[j].addGaintag([]);
+									l2[j].remove();
+									l2.splice(j--, 1);
+									break;
+								}
+							}
+							else if ((l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2])) {
+								l2[j].addGaintag([]);
 								l2[j].remove();
 								l2.splice(j--, 1);
 								break;

@@ -1518,20 +1518,87 @@ export class Get extends GetCompatible {
 		return Array.from(infos || []).map(info => game.playerMap[info]);
 	}
 	cardInfo(card) {
-		return [card.suit, card.number, card.name, card.nature];
+		return [card.suit, card.number, card.name, card.nature, card.cardid];
 	}
 	cardsInfo(cards = []) {
 		return Array.from(cards).map(get.cardInfo);
 	}
 	infoCard(info) {
-		var card = ui.create.card();
-		if (info[0]) {
-			card.init(info);
+		if (!lib.cardOL) lib.cardOL = {};
+		let card;
+		try {
+			const id = info[4];
+			if (!id) {
+				card = ui.create.card();
+				if (info && info[2]) card.init(info);
+			} else if (lib.cardOL[id]) {
+				if (lib.cardOL[id].name != info[2]) {
+					if (info && info[2]) lib.cardOL[id].init(info);
+				}
+				card = lib.cardOL[id];
+			} else {
+				card = ui.create.card();
+				card.cardid = id;
+				if (info && info[2]) card.init(info);
+				lib.cardOL[id] = card;
+			}
+		} catch (e) {
+			console.log(e);
 		}
-		return card;
+		return card || info;
 	}
 	infoCards(infos) {
 		return Array.from(infos || []).map(get.infoCard);
+	}
+	vcardInfo(card) {
+		return Object.entries(card).reduce((stringifying, entry) => {
+			const key = entry[0];
+			// @ts-ignore
+			if (key === "cards") stringifying[key] = get.cardsInfo(entry[1]);
+			else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1])
+			return stringifying;
+		}, {})
+	}
+	vcardsInfo(cards = []) {
+		return Array.from(cards).map(get.vcardInfo);
+	}
+	infoVCard(card){
+		// @ts-ignore
+		if (!lib.vcardOL) lib.vcardOL = {};
+		const datas = Object.entries(card).reduce((vcard, entry) => {
+			const key = entry[0];
+			if (key === "cards") vcard[key] = get.infoCards(entry[1]);
+			else if (entry[1] !== void 0) vcard[key] = JSON.parse(entry[1]);
+			return vcard;
+		}, {});
+		// @ts-ignore
+		const vid = datas.vcardID;
+		// @ts-ignore
+		if (!vid || !lib.vcardOL) return new lib.element.VCard(datas);
+		// @ts-ignore
+		if (vid in lib.vcardOL) {
+			// @ts-ignore
+			const vcard = lib.vcardOL[vid];
+			//TODO: 这里暂时偷懒 直接用了delete和直接赋值 不妥
+			Object.keys(vcard).forEach(entry => {
+				delete vcard[entry];
+			});
+			Object.keys(datas).forEach((key) => {
+				const value = datas[key];
+				if (Array.isArray(value)) vcard[key] = value.slice();
+				vcard[key] = value;
+			});
+			return vcard;
+		}
+		else {
+			const card = new lib.element.VCard(datas);
+			// @ts-ignore
+			lib.vcardOL[vid] = card;
+			return card;
+		}
+	}
+	infoVCards(infos) {
+		return Array.from(infos || []).map(get.infoVCard);
 	}
 	cardInfoOL(card) {
 		return "_noname_card:" + JSON.stringify([card.cardid, card.suit, card.number, card.name, card.nature]);

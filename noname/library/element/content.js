@@ -679,7 +679,7 @@ export const Content = {
 			}, audioSubtype);
 			player.addVirtualEquip(card, cards);
 			//player.$equip(card);
-			game.addVideo("equip", player, get.cardInfo(card));
+			//game.addVideo("equip", player, get.cardInfo(card));
 			if (event.log != false) {
 				const isViewAsCard = (cards.length !== 1 || cards[0].name !== card.name);
 				if (isViewAsCard && cards.length) {
@@ -803,7 +803,7 @@ export const Content = {
 			}
 		}
 		result?.vcards?.forEach(card => {
-			player.removeVEquip(card);
+			player.removeVirtualEquip(card);
 		})
 		//然后处理每一张装备牌的装备
 		for (const card of event.vcards) {
@@ -2505,8 +2505,7 @@ export const Content = {
 			player.storage[current].maxHp = player.maxHp;
 			player.storage[current].hujia = player.hujia;
 			player.storage[current].hs = player.getCards("h");
-			//TODO: 修正随从相关内容的虚拟牌处理
-			player.storage[current].es = player.getCards("e");
+			player.storage[current].es = player.getVCards("e");
 			player.lose(player.getCards("he"), ui.special)._triggered = null;
 
 			var cfg = player.storage[event.directresult];
@@ -2533,8 +2532,7 @@ export const Content = {
 				player.storage[current].maxHp = player.maxHp;
 				player.storage[current].hujia = player.hujia;
 				player.storage[current].hs = player.getCards("h");
-				//TODO: 修正随从相关内容的虚拟牌处理
-				player.storage[current].es = player.getCards("e");
+				player.storage[current].es = player.getVCards("e");
 				player.lose(player.getCards("he"), ui.special)._triggered = null;
 			}
 			player.reinit(current, player.storage.subplayer.name, [
@@ -2612,8 +2610,7 @@ export const Content = {
 				hujia: player.hujia,
 				skills: event.list.slice(0),
 				hs: player.getCards("h"),
-				//TODO: 修正随从相关内容的虚拟牌处理
-				es: player.getCards("e"),
+				es: player.getVCards("e"),
 				intro2: cfg.intro2,
 				group: player.group,
 			};
@@ -7196,10 +7193,10 @@ export const Content = {
 		if (result.bool && result.links.length) {
 			var link = result.links[0], position = "j";
 			if (event.targets[0].getVCards("e").includes(link)) {
-				if (!link.cards?.length) event.targets[0].removeVEquip(link);
+				if (!link.cards?.length) event.targets[0].removeVirtualEquip(link);
 				event.targets[1].equip(link);
 			} else {
-				if (!link.cards?.length) event.targets[0].removeVJudge(link);
+				if (!link.cards?.length) event.targets[0].removeVirtualJudge(link);
 				event.targets[1].addJudge(link);
 			}
 			if(link.cards?.length) event.targets[0].$give(link.cards, event.targets[1], false);
@@ -8184,10 +8181,10 @@ export const Content = {
 		}
 		"step 3";
 		event.vcards1?.forEach(card => {
-			player.removeVEquip(card);
+			player.removeVirtualEquip(card);
 		});
 		event.vcards2?.forEach(card => {
-			target.removeVEquip(card);
+			target.removeVirtualEquip(card);
 		});
 		if (!event.delayed) game.delay();
 	},
@@ -8807,7 +8804,7 @@ export const Content = {
 					return card.cards?.includes(cards[num])
 				});
 				if (VEquip) {
-					player.removeVEquip(VEquip);
+					player.removeVirtualEquip(VEquip);
 					//player.removeEquipTrigger(cards[num]);
 					var info = get.info(VEquip, false);
 					if (info.onLose && (!info.filterLose || info.filterLose(VEquip, player))) {
@@ -8822,7 +8819,7 @@ export const Content = {
 					return card.cards?.includes(cards[num])
 				});
 				if (VJudge) {
-					player.removeVJudge(VJudge);
+					player.removeVirtualJudge(VJudge);
 				}
 			}
 			event.num++;

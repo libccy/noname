@@ -5787,7 +5787,7 @@ export class Player extends HTMLDivElement {
 	}
 	directequip(cards) {
 		for (var i = 0; i < cards.length; i++) {
-			this.$equip(cards[i]);
+			this.addVirtualEquip(cards[i]);
 		}
 		if (!_status.video) {
 			game.addVideo("directequip", this, get.cardsInfo(cards));
@@ -5888,7 +5888,10 @@ export class Player extends HTMLDivElement {
 		}
 		if (this == game.me || _status.video) ui.updatehl();
 		if (!_status.video) {
-			game.addVideo("directgains", this, get.cardsInfo(cards));
+			game.addVideo("directgains", this, {
+				cards: get.cardsInfo(cards),
+				gaintag
+			});
 			this.update();
 		}
 		if (broadcast !== false)
@@ -8265,22 +8268,29 @@ export class Player extends HTMLDivElement {
 		_status.event.clearStepCache();
 		return this;
 	}
-	removeVJudge(VCard) {
-		game.broadcastAll((VCard, player) => {
+	removeVirtualJudge(VCard) {
+		const player = this;
+		game.addVideo("removeVirtualJudge", player, get.vcardInfo(VCard));
+		game.broadcast((VCard, player) => {
 			const cards = player.vcardsMap?.judges;
 			if (cards && cards.includes(VCard)){
 				cards.remove(VCard);
 			}
-		}, VCard, this);
+		}, VCard, player);
+		const cards = player.vcardsMap?.judges;
+		if (cards && cards.includes(VCard)){
+			cards.remove(VCard);
+		}
 	}
-	removeVEquip(VCard) {
+	removeVirtualEquip(VCard) {
 		const player = this;
-		game.broadcastAll((VCard, player) => {
+		game.addVideo("removeVirtualEquip", player, get.vcardInfo(VCard));
+		game.broadcast((VCard, player) => {
 			const cards = player.vcardsMap?.equips;
 			if (cards && cards.includes(VCard)){
 				cards.remove(VCard);
 			}
-		}, VCard, this);
+		}, VCard, player);
 		const cards = player.vcardsMap?.equips;
 		if (cards && cards.includes(VCard)){
 			player.removeEquipTrigger(VCard);
@@ -8288,6 +8298,7 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	removeEquipTrigger(card) {
+		if (_status.video) return;
 		if (card) {
 			var info = get.info(card, false);
 			var skills = this.getSkills(null, false);
@@ -10930,13 +10941,13 @@ export class Player extends HTMLDivElement {
 			}
 		}
 	}
-	//TODO: 给addVirtualJudge和addVirtualEquip添加Video录像相关的部分
 	addVirtualJudge(card, cards) {
 		card.initID();
 		const player = this;
 		game.broadcast((player, card, cards) => {
 			player.addVirtualJudge(card, cards);
 		}, player, card, cards);
+		game.addVideo("addVirtualJudge", player, [get.vcardInfo(card), get.cardsInfo(cards)]);
 		player.vcardsMap?.judges.push(card);
 		if (_status.discarded) {
 			_status.discarded.removeArray(cards);
@@ -10974,6 +10985,7 @@ export class Player extends HTMLDivElement {
 		game.broadcast((player, card, cards) => {
 			player.addVirtualEquip(card, cards);
 		}, player, card, cards);
+		game.addVideo("addVirtualEquip", player, [get.vcardInfo(card), get.cardsInfo(cards)]);
 		player.vcardsMap?.equips.push(card);
 		player.vcardsMap?.equips.sort((a, b) => {
 			return get.equipNum(a) - get.equipNum(b);
@@ -10985,7 +10997,6 @@ export class Player extends HTMLDivElement {
 				player.addSkillTrigger(info.skills[i]);
 			}
 		}
-		//game.addVideo("addVirtualEquip", ???);
 	}
 	$addVirtualEquip(card, cards) {
 		const player = this;
