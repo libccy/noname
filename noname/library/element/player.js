@@ -8265,7 +8265,6 @@ export class Player extends HTMLDivElement {
 		_status.event.clearStepCache();
 		return this;
 	}
-	//TODO: 此处写法不完善，存在联机模式下VCard对象不相等的问题，需要后续处理
 	removeVJudge(VCard) {
 		game.broadcastAll((VCard, player) => {
 			const cards = player.vcardsMap?.judges;
@@ -8275,15 +8274,16 @@ export class Player extends HTMLDivElement {
 		}, VCard, this);
 	}
 	removeVEquip(VCard) {
-		game.broadcast((VCard, player) => {
+		const player = this;
+		game.broadcastAll((VCard, player) => {
 			const cards = player.vcardsMap?.equips;
 			if (cards && cards.includes(VCard)){
 				cards.remove(VCard);
 			}
-		}, VCard, this)
-		const cards = this.vcardsMap?.equips;
+		}, VCard, this);
+		const cards = player.vcardsMap?.equips;
 		if (cards && cards.includes(VCard)){
-			this.removeEquipTrigger(VCard);
+			player.removeEquipTrigger(VCard);
 			cards.remove(VCard);
 		}
 	}
@@ -10932,9 +10932,10 @@ export class Player extends HTMLDivElement {
 	}
 	//TODO: 给addVirtualJudge和addVirtualEquip添加Video录像相关的部分
 	addVirtualJudge(card, cards) {
+		card.initID();
 		const player = this;
 		game.broadcast((player, card, cards) => {
-			player.addVirtualJudge(player, card, cards);
+			player.addVirtualJudge(card, cards);
 		}, player, card, cards);
 		player.vcardsMap?.judges.push(card);
 		if (_status.discarded) {
@@ -10968,9 +10969,10 @@ export class Player extends HTMLDivElement {
 		ui.updatej(player);
 	}
 	addVirtualEquip(card, cards) {
+		card.initID();
 		const player = this;
 		game.broadcast((player, card, cards) => {
-			player.addVirtualEquip(player, card, cards);
+			player.addVirtualEquip(card, cards);
 		}, player, card, cards);
 		player.vcardsMap?.equips.push(card);
 		player.vcardsMap?.equips.sort((a, b) => {
@@ -10987,7 +10989,7 @@ export class Player extends HTMLDivElement {
 	}
 	$addVirtualEquip(card, cards) {
 		const player = this;
-		if (cards.length) {
+		if (cards?.length) {
 			const beforeCards = [];
 			const isViewAsCard = (cards.length !== 1 || cards[0].name !== card.name), info = get.info(card, false);
 			let cardShownName = get.translation(card.name);

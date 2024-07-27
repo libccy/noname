@@ -129,4 +129,10 @@ export class VCard {
 	hasGaintag(tag) {
 		return this.gaintag && this.gaintag.includes(tag);
 	}
+	initID() {
+		if (!this.vcardID){
+			this.vcardID = get.id();
+			if (lib.vcardOL) lib.vcardOL[this.vcardID] = this;
+		}
+	}
 }

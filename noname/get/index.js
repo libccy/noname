@@ -1835,6 +1835,55 @@ export class Get extends GetCompatible {
 		}
 		return evt || item;
 	}
+	vcardInfoOL(item) {
+		return "_noname_vcard:" + JSON.stringify(Object.entries(item).reduce((stringifying, entry) => {
+			const key = entry[0];
+			stringifying[key] = get.stringifiedResult(entry[1]);
+			return stringifying;
+		}, {}));
+	}
+	vcardsInfoOL(cards) {
+		return Array.from(cards || []).map(get.vcardInfoOL);
+	}
+	infoVCardOL(item) {
+		// @ts-ignore
+		const rawCard = JSON.parse(item.slice(14));
+		const datas = Object.entries(rawCard).reduce((vcard, entry) => {
+			const key = entry[0];
+			vcard[key] = get.parsedResult(entry[1]);
+			return vcard;
+		}, {});
+		
+		const vid = datas.vcardID;
+		// @ts-ignore
+		if (!vid || !lib.vcardOL) return new lib.element.VCard(datas);
+		// @ts-ignore
+		if (vid in lib.vcardOL) {
+			// @ts-ignore
+			const vcard = lib.vcardOL[vid];
+			//TODO: 这里暂时偷懒 直接用了delete和直接赋值 不妥
+			Object.keys(vcard).forEach(entry => {
+				delete vcard[entry];
+			});
+			Object.keys(datas).forEach((key) => {
+				const value = datas[key];
+				if (Array.isArray(value)) this[key] = value.slice();
+				vcard[key] = value;
+			});
+			return vcard;
+		}
+		else {
+			console.log("datas:", datas);
+			const card = new lib.element.VCard(datas);
+			// @ts-ignore
+			lib.vcardOL[vid] = card;
+			console.log("vcard:", card);
+			return card;
+		}
+	}
+	infoVCardsOL(infos) {
+		return Array.from(infos || []).map(get.infoVCardOL);
+	}
 	stringifiedResult(item, level, nomore) {
 		if (!item) return item;
 		if (typeof item == "function") {
@@ -1845,6 +1894,10 @@ export class Get extends GetCompatible {
 					return get.cardInfoOL(item);
 				case "cards":
 					return get.cardsInfoOL(item);
+				case "vcard":
+					return get.vcardInfoOL(item);
+				case "vcards":
+					return get.vcardsInfoOL(item);
 				case "player":
 					return get.playerInfoOL(item);
 				case "players":
@@ -1891,6 +1944,8 @@ export class Get extends GetCompatible {
 				return get.infoFuncOL(item);
 			} else if (item.startsWith("_noname_card:")) {
 				return get.infoCardOL(item);
+			} else if (item.startsWith("_noname_vcard:")) {
+				return get.infoVCardOL(item);
 			} else if (item.startsWith("_noname_player:")) {
 				return get.infoPlayerOL(item);
 			} else if (item.startsWith("_noname_event:")) {
@@ -2069,6 +2124,7 @@ export class Get extends GetCompatible {
 		if (Array.isArray(obj) && obj.length > 0) {
 			if (obj.every(p => p instanceof lib.element.Player)) return "players";
 			if (obj.every(p => p instanceof lib.element.Card)) return "cards";
+			if (obj.every(p => p instanceof lib.element.VCard)) return "vcards";
 			if (obj.length == 2) {
 				if (typeof obj[0] == "number" && typeof obj[1] == "number") {
 					if (obj[0] <= obj[1] || obj[1] <= -1) return "select";
@@ -2082,6 +2138,7 @@ export class Get extends GetCompatible {
 		}
 		if (obj instanceof lib.element.Button || (obj instanceof HTMLDivElement && obj.classList.contains("button"))) return "button";
 		if (obj instanceof lib.element.Card) return "card";
+		if (obj instanceof lib.element.VCard) return "vcard";
 		if (obj instanceof lib.element.Player) return "player";
 		if (obj instanceof lib.element.Dialog) return "dialog";
 		if (obj instanceof lib.element.GameEvent || obj instanceof lib.element.GameEventPromise) return "event";

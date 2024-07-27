@@ -1358,6 +1358,7 @@ export class Game extends GameCompatible {
 		lib.node.torespondtimeout = {};
 		lib.playerOL = {};
 		lib.cardOL = {};
+		lib.vcardOL = {};
 		lib.wsOL = {};
 		ui.create.roomInfo();
 		ui.create.chat();

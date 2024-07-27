@@ -479,7 +479,7 @@ const skills = {
 				filter: function (event, player) {
 					if (player.isHealthy() || player.countCards("e") != player.hp) return false;
 					var evt = event.getl(player);
-					if (event.name == "equip" && event.player == player) return !evt || evt.cards.length != 1;
+					if (event.name == "equip" && event.player == player) return evt.cards.length != (evt.es?.length ?? 0);
 					return evt && evt.es.length;
 				},
 				frequent: true,

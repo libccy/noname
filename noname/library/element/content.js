@@ -451,7 +451,6 @@ export const Content = {
 			const info = get.info(card, false);
 			(info.customSwap ? specializedVCards : normalVCards).push(card);
 		});
-		console.log("normalVCards:", normalVCards);
 		specializedVCards.forEach(card => {
 			const info = get.info(card, false);
 			replacedCards.addArray(player.getVCards("e", card =>  info.customSwap(card)));
@@ -459,7 +458,6 @@ export const Content = {
 		const types = normalVCards.reduce((types, card) => {
 			return types.concat(get.subtypes(card, false));
 		}, []);
-		console.log("types:", types);
 		if (types.length > 0) {
 			const slots = types, slotsx = [];
 			if (get.is.mountCombined()) {
@@ -487,7 +485,6 @@ export const Content = {
 						} else if (cards.length > left - lose) {
 							var source = event.source, num = cards.length - (left - lose);
 							if (!source || !source.isIn()) source = player;
-							//TODO: 这里同样需要处理虚拟装备牌发送到联机客户端之后失真的问题
 							const chooseEvent = source
 								.chooseButton(
 									["选择替换掉" + get.cnNumber(num) + "张" + get.translation(slot) + "装备牌",
