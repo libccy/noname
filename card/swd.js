@@ -3447,65 +3447,6 @@ game.import("card", function () {
 					trigger.player.chooseToDiscard(true, "he");
 				},
 			},
-			shouhua: {
-				mode: ["identity", "infinity"],
-				enable: "phaseUse",
-				filter: function (event, player) {
-					return player == game.me;
-				},
-				usable: 1,
-				filterTarget: function (card, player, target) {
-					return target != game.zhu && target != game.me && target.hp < target.maxHp;
-				},
-				filterCard: true,
-				check: function (card) {
-					return get.value(card);
-				},
-				discard: false,
-				prepare: "throw",
-				content: function () {
-					"step 0";
-					target.$turn2();
-					target.style.left = "calc(50% - 120px)";
-					target.style.top = "calc(50% - 60px)";
-					game.delay(0, 2500);
-					"step 1";
-					target.removeAttribute("style");
-					if (
-						Math.random() <
-						((get.value(cards[0]) + 1) * (target.maxHp - target.hp)) / (60 * target.maxHp)
-					) {
-						event.position = target.dataset.position;
-						target.dataset.position = player.dataset.position;
-						target.delete();
-						event.success = true;
-					}
-					game.delay();
-					"step 2";
-					if (event.success) {
-						player.popup("收化成功");
-						game.log(player, "将", target, "收化");
-						target.dataset.position = event.position;
-						var card = player.getEquip("lianyaohu");
-						if (!card.storage.shouhua) card.storage.shouhua = [];
-						card.storage.shouhua.push(target);
-						game.removePlayer(target);
-						game.checkResult();
-					} else {
-						player.popup("收化失败");
-						target.gain(cards);
-						target.$gain2(cards);
-					}
-					game.delay();
-				},
-				ai: {
-					result: {
-						player: function () {
-							return Math.random() - 0.4;
-						},
-					},
-				},
-			},
 			haotianta: {
 				trigger: { global: "judgeBefore" },
 				direct: true,

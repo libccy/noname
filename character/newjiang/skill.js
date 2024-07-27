@@ -180,7 +180,6 @@ const skills = {
 					return event.name != "phase" || game.phaseNumber == 0;
 				},
 				prompt2(event, player) {
-					//无名杀先阳后阴，不要问为什么
 					return "切换【先谋】为状态" + (player.storage.dcsbyingmou ? "阳" : "阴");
 				},
 				check: () => Math.random() > 0.5,

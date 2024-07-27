@@ -897,14 +897,20 @@ export class Card extends HTMLDivElement {
 	}
 	/**
 	 * 返回一个键值，用于在缓存中作为键名。
-	 *
-	 * @param {string} [id]
-	 *
+	 * @param { boolean } [similar] false统一前缀
 	 * @returns {string} cacheKey
 	 */
-	getCacheKey(id) {
-		if (id) return this.cardid ? this.cardid : id;
-		return `[c:${this.cardid}]`;
+	getCacheKey(similar) {
+		let prefix = "[object:";
+		if (similar !== false) prefix = "[card:";
+		if (this.cardid) return prefix + this.cardid + "]";
+		return prefix + `${this.name}+${
+			this.suit ? this.suit : "none"
+		}+${
+			this.number === undefined ? "none" : this.number
+		}${
+			this.nature ? "+" + this.nature : ""
+		}]`;
 	}
 	discard(bool) {
 		if (!this._selfDestroyed) {

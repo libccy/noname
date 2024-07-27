@@ -383,7 +383,7 @@ game.import("card", function () {
 								num = 1;
 							if (isLink) {
 								let cache = _status.event.getTempCache("sha_result", "eff");
-								if (typeof cache !== "object" || cache.card !== (card.getCacheKey ? card.getCacheKey("null") : get.translation(card)))
+								if (typeof cache !== "object" || cache.card !== ai.getCacheKey(card, true))
 									return eff;
 								if (cache.odds < 1.35 && cache.bool) return 1.35 * cache.eff;
 								return cache.odds * cache.eff;
@@ -432,7 +432,7 @@ game.import("card", function () {
 									);
 							_status.event.putTempCache("sha_result", "eff", {
 								bool: target.hp > num && get.attitude(player, target) > 0,
-								card: card.getCacheKey ? card.getCacheKey("null") : get.translation(card),
+								card: ai.getCacheKey(card, true),
 								eff: eff,
 								odds: odds,
 							});
@@ -2013,7 +2013,7 @@ game.import("card", function () {
 									}),
 									"count"
 								);
-							if (ts < 1 && ts << 3 < Math.pow(player.hp, 2)) return 0;
+							if (ts < 1 && ts * 8 < Math.pow(player.hp, 2)) return 0;
 							if (att > 0) {
 								if (ts < 1) return 0;
 								return -2;
@@ -2723,35 +2723,35 @@ game.import("card", function () {
 							if (targets.length) {
 								let preTarget = targets.at(-1),
 									pre = _status.event.getTempCache("jiedao_result", preTarget.playerid);
-								if (pre && pre.target.isIn() && pre.card === (card.getCacheKey ? card.getCacheKey("null") : get.translation(card)))
-									return target === pre.target ? pre.eff : 0;
+								if (pre && pre.target.isIn() && pre.card === ai.getCacheKey(card, true))
+									return target === pre.target ? pre.res : 0;
 								return (
 									get.effect(target, { name: "sha" }, preTarget, target) /
 									get.attitude(target, target) *
 									preTarget.mayHaveSha(player, "use", null, "odds")
 								);
 							}
-							let arms =
-								(target.hasSkillTag("noe") ? 0.32 : -0.15) *
-								target.getEquips(1).reduce((num, i) => {
-									return num + get.value(i, target);
-								}, 0);
-							let sha = game.filterPlayer(cur => {
+							let odds = target.mayHaveSha(player, "use", null, "odds"),
+								addTar = null,
+								sha = game.filterPlayer(cur => {
 									return get.info({ name: "jiedao" }).filterAddedTarget(null, player, cur, target);
-								}),
-								addTar = null;
-							sha = sha.reduce((num, current) => {
-								let eff = get.effect(current, { name: "sha" }, target, player);
-								if (eff <= num) return num;
-								addTar = current;
-								return eff;
-							}, -100) / get.attitude(player, target) * target.mayHaveSha(player, "use", null, "odds");
+								}).reduce((num, current) => {
+									let eff = get.effect(current, { name: "sha" }, target, player);
+									if (eff < num) return num;
+									addTar = current;
+									return eff;
+								}, 0);
+							if (addTar) sha = get.effect(addTar, { name: "sha" }, target, target) / 10;
+							let res = target.getEquips(1).reduce((num, i) => {
+								return num + get.value(i, target);
+							}, 0) / (target.hasSkillTag("noe") ? -2 : -4);
+							if (odds > 0.06 && sha > res) res += (sha - res) * odds;
 							_status.event.putTempCache("jiedao_result", target.playerid, {
 								target: addTar,
-								card: card.getCacheKey ? card.getCacheKey("null") : get.translation(card),
-								eff: sha,
+								card: ai.getCacheKey(card, true),
+								res: res
 							});
-							return Math.max(arms, sha);
+							return res;
 						},
 					},
 					tag: {
