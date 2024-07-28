@@ -1077,7 +1077,7 @@ const skills = {
 				target(card, player, target) {
 					if (!get.tag(card, "damage") || player.hasSkillTag("jueqing", false, target)) return;
 					let num = get.cardNameLength(card) - target.getDamagedHp();
-					if (num > 0) return [1, num + 0.1];
+					if (num > 0) return [1, 0.8 * num + 0.1];
 				},
 			},
 		},
