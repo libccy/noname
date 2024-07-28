@@ -28603,7 +28603,7 @@ const skills = {
 				var list = [];
 				event.num = 0;
 				["basic", "trick", "equip"].forEach(type => {
-					if (choices.includes(type) == target.hasCard({ type: type }, "h")) event.num++;
+					if (choices.includes(type) == target.hasCard(card => get.type2(card, target) === type, "h")) event.num++;
 				});
 			}
 			"step 3";
