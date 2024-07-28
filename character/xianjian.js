@@ -778,7 +778,7 @@ game.import("character", function () {
 				ai: {
 					effect: {
 						target: function (card, player, target) {
-							if (card.name == "bingliang" || card.name == "caomu") return 0;
+							if (card.name == "bingliang" || card.name == "caomu") return [0, 0];
 						},
 					},
 				},

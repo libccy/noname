@@ -15,7 +15,7 @@ game.import("character", function () {
 				ai: {
 					effect: {
 						target: function (card, player, target, current) {
-							if (card.name == "lebu" && card.name == "bingliang") return 0.8;
+							if (card.name == "lebu" || card.name == "bingliang") return 0.8;
 						},
 					},
 				},

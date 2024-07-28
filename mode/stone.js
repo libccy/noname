@@ -7189,7 +7189,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ai: {
 					effect: {
 						target: function (card) {
-							if (card.name == "bingliang") return 0;
+							if (card.name == "bingliang") return [0, 0];
 						},
 					},
 					noPhaseDelay: 1,
@@ -8308,7 +8308,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ai: {
 					effect: {
 						target: function (card) {
-							if (card.name == "bingliang") return 0;
+							if (card.name == "bingliang") return [0, 0];
 						},
 					},
 					noPhaseDelay: 1,
@@ -9609,7 +9609,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ai: {
 					effect: {
 						target: function (card) {
-							if (card.name == "bingliang") return 0;
+							if (card.name == "bingliang") return [0, 0];
 						},
 					},
 					noPhaseDelay: 1,

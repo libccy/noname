@@ -2680,7 +2680,7 @@ game.import("character", function () {
 					threaten: 0.8,
 					effect: {
 						target(card, player, target) {
-							if (card.name == "bingliang") return 0;
+							if (card.name == "bingliang") return [0, 0];
 							if (card.name == "lebu") return 1.5;
 							if (card.name == "guohe") {
 								if (!target.countCards("e")) return 0;

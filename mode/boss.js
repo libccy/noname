@@ -7921,7 +7921,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ai: {
 					effect: {
 						target: function (card, player, target, current) {
-							if (card.name == "lebu" && card.name == "bingliang") return 0.8;
+							if (card.name == "lebu" || card.name == "bingliang") return 0.8;
 						},
 					},
 				},
@@ -8764,7 +8764,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					threaten: 0.8,
 					effect: {
 						target: function (card) {
-							if (card.name == "bingliang") return "zeroplayertarget";
+							if (card.name == "bingliang") return [0, 0];
 						},
 					},
 				},
