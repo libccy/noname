@@ -1254,7 +1254,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player_use(card, player, target) {
+						player(card, player, target) {
 							var targets = game.filterPlayer(targetx => targetx != player && targetx.getStorage("starcanxi_xiangsi").includes(player.group));
 							if (!targets.length) return;
 							if (get.tag(card, "recover") && target == player && target.hp > 2) return 0;

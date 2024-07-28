@@ -10864,7 +10864,7 @@ const skills = {
 				return arg && arg.jiu == true;
 			},
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (target.hp <= 0 && target.hasSkill("zhenlie_lose") && get.tag(card, "recover")) return [1, 1.2];
 				},
 			},
