@@ -2255,7 +2255,7 @@ const skills = {
 		check(event, player) {
 			if (get.type(event.card) == "equip") {
 				if (get.subtype(event.card) == "equip6") return true;
-				if (get.equipResult(player, player, event.card.name) <= 0) return true;
+				if (get.equipResult(player, player, event.card) <= 0) return true;
 				const eff1 = player.getUseValue(event.card);
 				const subtype = get.subtype(event.card);
 				return (

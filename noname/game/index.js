@@ -7056,7 +7056,7 @@ export class Game extends GameCompatible {
 				if (method == "raw2") return equipValue - value;
 				return Math.max(0.1, equipValue - value);
 			},
-			aiResultTarget = (player, target, card) => get.equipResult(player, target, card.name);
+			aiResultTarget = (player, target, card) => get.equipResult(player, target, card);
 		Object.keys(lib.card).forEach(libCardKey => {
 			const info = `${libCardKey}_info`;
 			if (lib.translate[`${info}_${mode}`]) lib.translate[info] = lib.translate[`${info}_${mode}`];

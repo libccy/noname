@@ -2083,7 +2083,8 @@ export class Get extends GetCompatible {
 	}
 	/**
 	 * @overload
-	 * @returns { void }
+	 * @param { any } obj
+	 * @returns { 'position' | 'natures' | 'nature' | 'players' | 'cards' | 'select' | 'divposition' | 'button' | 'card' | 'vcard' | 'player' | 'dialog' | 'event' | void }
 	 *
 	 * @overload
 	 * @param { string } obj
@@ -2112,6 +2113,10 @@ export class Get extends GetCompatible {
 	 * @overload
 	 * @param { Card } obj
 	 * @returns { 'card' }
+	 * 
+	 * @overload
+	 * @param { VCard } obj
+	 * @returns { 'vcard' }
 	 *
 	 * @overload
 	 * @param { Player } obj
@@ -4716,15 +4721,20 @@ export class Get extends GetCompatible {
 		return result;
 	}
 	equipResult(player, target, name) {
-		var card = get.card();
-		if (!card || card.name != name) {
-			card = { name: name };
+		let card = name;
+		if (typeof name === "string") {
+			card = { name };
 		}
-		var value1 = get.equipValue(card, target);
-		var value2 = 0;
-		if (!player.canEquip(card)) {
-			if (!player.canEquip(card, true)) return 0;
-			var current = target.getEquip(card);
+		else {
+			const itemtype = get.itemtype(card);
+			if (itemtype !== "card" && itemtype !== "vcard") {
+				card = get.card();
+			}
+		}
+		let value1 = get.equipValue(card, target), value2 = 0;
+		if (!target.canEquip(card)) {
+			if (!target.canEquip(card, true)) return 0;
+			let current = target.getVEquip(card);
 			if (current && current != card) {
 				value2 = get.equipValue(current, target);
 				if (value2 > 0 && !target.needsToDiscard() && !get.tag(card, "valueswap")) {
@@ -4735,9 +4745,9 @@ export class Get extends GetCompatible {
 		return Math.max(0, value1 - value2) / 5;
 	}
 	equipValue(card, player) {
-		if (player == undefined || get.itemtype(player) != "player") player = get.owner(card);
-		if (player == undefined || get.itemtype(player) != "player") player = _status.event.player;
-		var info = get.info(card);
+		player = player ?? get.owner(card) ?? get.player();
+		if (get.itemtype(card) === "card") card = player.getVCards("e").find(vcard => vcard.cards?.includes(card)) ?? card;
+		var info = get.info(card, false);
 		if (!info.ai) return 0;
 		var value = info.ai.equipValue;
 		if (value == undefined) {
@@ -4746,6 +4756,7 @@ export class Get extends GetCompatible {
 			} else return 0;
 		}
 		if (typeof value == "number") return value;
+		//此处是否需要将实体牌改为虚拟牌呢？暂时不确定
 		if (typeof value == "function") return value(card, player, null, "raw2");
 		return 0;
 	}

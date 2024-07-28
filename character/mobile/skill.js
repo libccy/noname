@@ -8196,10 +8196,10 @@ const skills = {
 			effect: {
 				target_use(card, player, target, current) {
 					if (get.type(card) == "equip" && !get.tag(card, "gifts") && target.storage.jueyong && target.storage.jueyong[1].length) {
-						var result1 = get.equipResult(player, target, card.name),
+						var result1 = get.equipResult(player, target, card),
 							subtype = get.subtype(card);
 						for (var i of target.storage.jueyong[0]) {
-							if (get.subtype(i, false) == subtype && get.equipResult(target, target, i.name) >= result1) return "zerotarget";
+							if (get.subtype(i, false) == subtype && get.equipResult(target, target, i) >= result1) return "zerotarget";
 						}
 					}
 				},
