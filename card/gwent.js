@@ -1961,7 +1961,7 @@ game.import("card", function () {
 					nodamage: true,
 					effect: {
 						target: function (card, player, target, current) {
-							if (get.tag(card, "damage") && !get.tag(card, "natureDamage")) return [0, 0];
+							if (get.tag(card, "damage") && !get.tag(card, "natureDamage")) return "zeroplayertarget";
 						},
 					},
 				},

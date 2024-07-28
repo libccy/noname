@@ -7262,7 +7262,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					nodamage: true,
 					effect: {
 						target: function (card, player, target, current) {
-							if (get.tag(card, "damage") && !get.tag(card, "thunderDamage")) return [0, 0];
+							if (get.tag(card, "damage") && !get.tag(card, "thunderDamage")) return "zeroplayertarget";
 						},
 					},
 				},
@@ -7359,7 +7359,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					nofire: true,
 					effect: {
 						target: function (card, player, target, current) {
-							if (get.tag(card, "fireDamage")) return 0;
+							if (get.tag(card, "fireDamage")) return "zeroplayertarget";
 						},
 					},
 				},

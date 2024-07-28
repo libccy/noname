@@ -11604,7 +11604,7 @@ export class Library {
 				nodamage: true,
 				effect: {
 					target: function (card, player, target, current) {
-						if (get.tag(card, "damage")) return [0, 0];
+						if (get.tag(card, "damage")) return "zeroplayertarget";
 					},
 				},
 			},

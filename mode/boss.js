@@ -7136,7 +7136,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_zhangwu_ai: {
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use: function (card, player, target) {
 							if (get.tag(card, "recover") && card.name != "recover") {
 								for (var i = 0; i < game.players.length; i++) {
 									if (
@@ -7590,7 +7590,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use: function (card, player, target) {
 							if (get.tag(card, "respondShan")) {
 								var shans = target.countCards("h", "shan");
 								var hs = target.countCards("h");
@@ -7640,7 +7640,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ai: {
 					mingzhi: false,
 					effect: {
-						target: function (card, player, target) {
+						target_use: function (card, player, target) {
 							if (get.tag(card, "respondShan")) {
 								var shans = target.countCards("h", "shan");
 								var hs = target.countCards("h");
@@ -8269,9 +8269,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				ai: {
 					effect: {
-						target_use: function (card, player, target, current) {
+						target: function (card, player, target, current) {
 							if (target.getEquip(2)) return;
-							return lib.skill.tengjia1.ai.effect.target_use.apply(this, arguments);
+							return lib.skill.tengjia1.ai.effect.target.apply(this, arguments);
 						},
 					},
 				},
@@ -8538,7 +8538,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use: function (card, player, target, current) {
 							if (get.tag(card, "respondShan")) {
 								var hastarget = false,
 									players = game.filterPlayer();
@@ -8764,7 +8764,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					threaten: 0.8,
 					effect: {
 						target: function (card) {
-							if (card.name == "bingliang") return 0;
+							if (card.name == "bingliang") return "zeroplayertarget";
 						},
 					},
 				},
@@ -8946,7 +8946,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					effect: {
 						target: function (card) {
 							if (get.tag(card, "fireDamage")) {
-								return [0, 2];
+								return [0, 2, 0, 0];
 							}
 						},
 					},
@@ -9206,7 +9206,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				ai: {
 					effect: {
-						player: function (card) {
+						player_use: function (card) {
 							if (get.color(card) == "black") {
 								return [1, 2];
 							}
