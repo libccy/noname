@@ -3325,11 +3325,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					effect: {
 						target: function (card, player, target, current) {
 							if (!target.hasEmptySlot("equip2")) return;
-							if (card.name == "nanman" || card.name == "wanjian") return "zerotarget";
+							if (card.name == "nanman" || card.name == "wanjian") return "zeroplayertarget";
 							if (card.name == "sha") {
 								var equip1 = player.getEquip(1);
 								if (equip1 && equip1.name == "zhuque") return 1.9;
-								if (!game.hasNature(card)) return "zerotarget";
+								if (!game.hasNature(card)) return "zeroplayertarget";
 							}
 						},
 					},

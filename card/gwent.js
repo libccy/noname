@@ -2003,7 +2003,11 @@ game.import("card", function () {
 					weather: true,
 					effect: {
 						player_use(card, player) {
-							if (!player.needsToDiscard()) return "zeroplayertarget";
+							return [1, (player.needsToDiscard(0, (i, p) => {
+								if (p.canIgnoreHandcard(i)) return false;
+								if (i === card || card.cards && card.cards.includes(i)) return false;
+								return true;
+							}) ? -0.4 : -1)];
 						},
 					},
 				},

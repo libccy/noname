@@ -1825,7 +1825,7 @@ game.import("card", function () {
 								return;
 							if (get.tag(card, "natureDamage")) return "zeroplayertarget";
 							if (card.name == "tiesuo") {
-								return [0, 0];
+								return 0.01;
 							}
 						},
 					},

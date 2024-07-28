@@ -5727,7 +5727,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								_status.shishengshibai % 10 == 9 &&
 								card.name == "tiesuo"
 							)
-								return "zerotarget";
+								return [0, 0, 0, 0];
 						},
 					},
 				},

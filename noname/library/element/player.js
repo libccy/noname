@@ -9592,16 +9592,12 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 *
-	 * @param { number | Card[] | Card } [add]
-	 * @param { (card?: Card, player?: Player) => boolean } [filter]
-	 * @param { boolean } [pure]
+	 * @param { number | Card[] | Card } [add] (逻辑上)同时考虑“获得”的这张/些牌
+	 * @param { (card?: Card, player?: Player) => boolean } [filter] 代替默认策略(计入手牌数的手牌)进行筛选
+	 * @param { boolean } [pure] (手牌上限大于手牌数时)返回负值
+	 * @returns { number } 需要弃置的牌数
 	 */
 	needsToDiscard(add, filter, pure) {
-		/**
-		 * add: (逻辑上)同时考虑“获得”的这张/些牌
-		 * filter(function): 代替默认策略进行筛选
-		 * pure: 返回值可以为负数
-		 */
 		let cards = this.getCards("h"),
 			num = 0;
 		if (typeof add === "number") num = add;
@@ -9837,17 +9833,12 @@ export class Player extends HTMLDivElement {
 	/**
 	 * 以viewer视角猜测Player手里的杀
 	 * @param { Player } [viewer] 
-	 * @param { "use" | "respond" } [type] 
-	 * @param { Card[] | Card | null } [ignore] 
+	 * @param { "use" | "respond" } [type] 此杀用途："use"/"respond"，无则均加入
+	 * @param { Card[] | Card | null } [ignore] 此牌/这些牌不纳入考量
 	 * @param { "bool" | "count" | "odds" } [rvt] 
-	 * @returns { boolean | number }
+	 * @returns { boolean | number } 返回值：rvt:"bool"(默认)是否可能有杀，"count"推测有多少张杀，"odds"有杀的概率
 	 */
 	mayHaveSha(viewer, type, ignore, rvt) {
-		/**
-		 * type: skill tag type 'use', 'respond'
-		 * ignore: ignore cards, ui.selected.cards added
-		 * rvt: return value type 'count', 'odds', 'bool'(default)
-		 */
 		let count = 0;
 		if ((this.hp > 2 || (!this.isZhu && this.hp > 1)) && this.hasSkillTag("respondSha", true, type, true)) {
 			if (rvt === "count") count++;
@@ -9890,17 +9881,12 @@ export class Player extends HTMLDivElement {
 	/**
 	 * 以viewer视角猜测Player手里的闪
 	 * @param { Player } [viewer] 
-	 * @param { "use" | "respond" | object } [type] 
-	 * @param { Card[] | Card | null } [ignore] 
+	 * @param { "use" | "respond" } [type] 此闪用途："use"/"respond"，无则均加入
+	 * @param { Card[] | Card | null } [ignore] 此牌/这些牌不纳入考量
 	 * @param { "bool" | "count" | "odds" } [rvt] 
-	 * @returns { boolean | number }
+	 * @returns { boolean | number } 返回值：rvt:"bool"(默认)是否可能有闪，"count"推测有多少张闪，"odds"有闪的概率
 	 */
 	mayHaveShan(viewer, type, ignore, rvt) {
-		/**
-		 * type: skill tag type 'use', 'respond' or object
-		 * ignore: ignore cards, ui.selected.cards added
-		 * rvt: return value type 'count', 'odds', 'bool'(default)
-		 */
 		let count = 0;
 		if ((this.hp > 2 || (!this.isZhu && this.hp > 1)) && this.hasSkillTag("respondShan", true, type, true)) {
 			if (rvt === "count") count++;

@@ -5244,7 +5244,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ai: {
 					order: 10,
 					effect: {
-						player: function (card, player) {
+						player_use: function (card, player) {
 							var num = 0;
 							for (var i = 0; i < game.players.length; i++) {
 								if (get.attitude(player, game.players[i]) < 0) {
