@@ -73,7 +73,7 @@ const skills = {
 			},
 			trick: {
 				audio: "yjgongqiao",
-				trigger: {player: "useCard"},
+				trigger: {player: "useCardAfter"},
 				forced: true,
 				filter(event, player){
 					const type = get.type2(event.card, false);
