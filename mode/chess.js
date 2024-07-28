@@ -1098,8 +1098,16 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				$phaseJudge: function (card) {
 					game.addVideo("phaseJudge", this, get.cardInfo(card));
-					var clone = card.copy("thrown", this.parentNode).addTempClass("judgestart");
-					var player = this;
+					let cardToThrow;
+					if(card.cards?.length){
+						//TODO: 这里先偷懒，只用其中的第一张牌进行处理，先解决bug
+						cardToThrow = card.cards[0];
+					}
+					else {
+						cardToThrow = game.createCard(card.name, "虚拟", "");
+					}
+					const clone = cardToThrow.copy("thrown", this.parentNode).addTempClass("judgestart");
+					const player = this;
 					clone.style.opacity = 0.6;
 					clone.style.left =
 						Math.random() * 100 -

@@ -509,24 +509,25 @@ game.import("card", function () {
 				},
 			},
 			qixingbaodao: {
-				trigger: { player: "equipBegin" },
+				trigger: { player: "equipAfter" },
 				forced: true,
 				equipSkill: true,
-				filter: function (event, player) {
-					return (
-						event.card.name == "qixingbaodao" &&
-						player.hasCard(function (card) {
-							return card != event.card;
-						}, "ej")
-					);
-				},
-				content: function () {
-					var cards = player.getCards("ej", function (card) {
-						return (
-							card != trigger.card && lib.filter.cardDiscardable(card, player, "qixingbaodao")
-						);
+				filter(event, player){
+					const baodaos = player.getVCards("e").filter(card => {
+						return card.name == "qixingbaodao";
 					});
-					if (cards.length) player.discard(cards);
+					return baodaos.length > 0 && player.hasCard(card => {
+						return !baodaos.some(baodao => baodao.cards?.includes(card)) && lib.filter.cardDiscardable(card, player, "qixingbaodao");
+					}, "ej");
+				},
+				async content(event, trigger, player) {
+					const baodaos = player.getVCards("e").filter(card => {
+						return card.name == "qixingbaodao";
+					});
+					const cards = player.getCards("ej", card => {
+						return !baodaos.some(baodao => baodao.cards?.includes(card)) && lib.filter.cardDiscardable(card, player, "qixingbaodao");
+					});
+					if (cards.length > 0) await player.discard(cards);
 				},
 			},
 			g_du: {
@@ -839,7 +840,7 @@ game.import("card", function () {
 			yitianjian_info:
 				"当你因执行【杀】的效果而造成伤害后，若你已受伤，则你可弃置一张手牌，然后回复1点体力。",
 			qixingbaodao: "七星宝刀",
-			qixingbaodao_info: "锁定技。当此牌进入你的装备区时，你弃置装备区和判定区内的所有其他牌。",
+			qixingbaodao_info: "锁定技。当此牌进入你的装备区后，你弃置装备区和判定区内的所有其他牌。",
 			duanjian: "断剑",
 			duanjian_info: "这是一把坏掉的武器……",
 			duanjian_append: '<span class="text" style="font-family: yuanli">不要因为手快而装给自己。</span>',
