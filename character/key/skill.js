@@ -1664,7 +1664,9 @@ const skills = {
 		viewAs() {
 			return { name: "tao" };
 		},
-		filterCard: { name: "tao" },
+		filterCard(card){
+			return get.name(card, false) === "tao";
+		},
 		ignoreMod: true,
 		filterTarget(card, player, target) {
 			return target != player && target.isDamaged() && target.hasSkill("nao_shouqing");
@@ -1672,17 +1674,18 @@ const skills = {
 		selectTarget() {
 			return game.countPlayer(function (current) {
 				return lib.skill.nao_shouqing2.filterTarget(null, _status.event.player, current);
-			}) > 1
-				? 1
-				: -1;
+			}) > 1 ? 1 : -1;
 		},
 		filter(event, player) {
 			return (
-				player.countCards("hs", "tao") &&
+				player.hasCard(card => get.name(card, false) === "tao", "hs") &&
 				game.hasPlayer(function (current) {
 					return lib.skill.nao_shouqing2.filterTarget(null, player, current);
 				})
 			);
+		},
+		filterOk(){
+			return ui.selected.cards.length === 1 && ui.selected.targets.length === 1;
 		},
 		position: "hs",
 		onuse(links, player) {
