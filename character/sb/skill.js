@@ -1924,7 +1924,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player_use(card, player, target) {
+						player(card, player, target) {
 							if (player.getStorage("sbyijue_effect").includes(target)) return "zeroplayertarget";
 						},
 					},
@@ -3130,7 +3130,7 @@ const skills = {
 			expose: 0.05,
 			effect: {
 				target: function (card) {
-					if (card.name == "nanman") return [0, 1];
+					if (card.name == "nanman") return [0, 1, 0, 0];
 				},
 			},
 		},
@@ -5710,9 +5710,9 @@ const skills = {
 						if (target.hp <= 1) return;
 						if (get.itemtype(cards) != "cards") return;
 						for (var i of cards) {
-							if (get.name(i, target) == "tao") return [1, 5];
+							if (get.name(i, target) == "tao") return [1, 4.5];
 						}
-						if (get.value(cards, target) >= 7 + target.getDamagedHp()) return [1, 3];
+						if (get.value(cards, target) >= 7 + target.getDamagedHp()) return [1, 2];
 						return [1, 0.55 + 0.05 * Math.max(0, 1 - target.countMark("sbjianxiong"))];
 					}
 				},
@@ -6252,7 +6252,7 @@ const skills = {
 										card: card,
 									})
 								)
-									return "zerotarget";
+									return 0.1;
 							}
 						},
 					},
