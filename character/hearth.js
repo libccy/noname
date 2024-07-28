@@ -2251,7 +2251,7 @@ game.import("character", function () {
 							effect: {
 								target(card, player, target, current) {
 									if (get.tag(card, "damage") && !get.tag(card, "fireDamage"))
-										return [0, 0];
+										return "zeroplayertarget";
 								},
 							},
 						},
@@ -5946,7 +5946,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						player(card, player) {
+						player_use(card, player) {
 							if (_status.currentPhase != player) return;
 							if (get.type(card) == "equip" && get.equipValueNumber(card) < 7) {
 								if (player.needsToDiscard(2)) return;
@@ -7182,7 +7182,7 @@ game.import("character", function () {
 					nofire: true,
 					effect: {
 						target(card, player, target, current) {
-							if (get.tag(card, "fireDamage")) return 0;
+							if (get.tag(card, "fireDamage")) return "zeroplayertarget";
 						},
 					},
 				},
@@ -8246,7 +8246,7 @@ game.import("character", function () {
 					expose: 0.3,
 					effect: {
 						target(card, player, target) {
-							if (get.tag(card, "loseCard") && target.countCards("he")) {
+							if (get.tag(card, "discard") && target.countCards("he")) {
 								return 0.7;
 							}
 						},

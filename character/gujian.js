@@ -1464,7 +1464,7 @@ game.import("character", function () {
 				ai: {
 					halfneg: true,
 					effect: {
-						player_use(card, player, target, current) {
+						player(card, player, target, current) {
 							if (get.color(card) == "red") return [1, 0, 1, -2];
 						},
 					},

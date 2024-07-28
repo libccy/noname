@@ -2763,8 +2763,11 @@ const skills = {
 		ai: {
 			threaten: 0.8,
 			effect: {
-				target(card) {
-					if (card.name == "guohe" || card.name == "liuxinghuoyu") return 0.5;
+				player_use(card, player, target) {
+					if (player.countCards("h") === 1) return [1, 0.8];
+				},
+				target(card, player, target) {
+					if (get.tag(card, "loseCard") && target.countCards("h") === 1) return 0.5;
 				},
 			},
 			noh: true,

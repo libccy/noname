@@ -1109,10 +1109,10 @@ game.import("character", function () {
 								target.countCards("he") &&
 								current < 0
 							) {
-								return 0;
+								return [1, 2];
 							}
 						},
-						player(card, player) {
+						player_use(card, player) {
 							if (player.hujia >= 3) return;
 							if (_status.event.name != "chooseToUse" || _status.event.player != player) return;
 							if (get.type(card) == "basic") return;
@@ -1237,7 +1237,7 @@ game.import("character", function () {
 					nodamage: true,
 					effect: {
 						target(card, player, target, current) {
-							if (get.tag(card, "damage")) return [0, 0];
+							if (get.tag(card, "damage")) return "zeroplayertarget";
 						},
 					},
 				},
@@ -2284,7 +2284,7 @@ game.import("character", function () {
 					effect: {
 						target(card, player, target) {
 							if (game.roundNumber % 3 != 0 && get.tag(card, "damage")) {
-								return [0, 0];
+								return "zeroplayertarget";
 							}
 						},
 					},
