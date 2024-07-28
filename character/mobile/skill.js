@@ -15345,9 +15345,9 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target, current) {
+				target(card, player, target, current) {
 					if (["tiesuo", "lulitongxin"].includes(card.name)) {
-						return "zerotarget";
+						return "zeroplayertarget";
 					}
 				},
 			},
@@ -15370,7 +15370,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (typeof card !== "object" || target.hasSkillTag("unequip2")) return;
 					if (
 						player.hasSkillTag("unequip", false, {
@@ -15403,7 +15403,7 @@ const skills = {
 		inherit: "rw_minguangkai_link",
 		ai: {
 			effect: {
-				target_use(card, player, target, current) {
+				target(card, player, target, current) {
 					if (["tiesuo", "lulitongxin"].includes(card.name)) {
 						return "zeroplayertarget";
 					}

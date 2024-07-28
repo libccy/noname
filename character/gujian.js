@@ -1273,7 +1273,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target, current) {
+						target(card, player, target, current) {
 							if (get.color(card) == "red" && target.isDamaged()) return [1, 1];
 						},
 					},

@@ -922,7 +922,7 @@ game.import("card", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target, current) {
+						target(card, player, target, current) {
 							if (target.hasSkillTag("unequip2")) return;
 							if (
 								player.hasSkillTag("unequip", false, {
@@ -937,12 +937,11 @@ game.import("card", function () {
 								})
 							)
 								return;
-							//if(card.name=='nanman'||card.name=='wanjian'||card.name=='chuqibuyi') return 'zerotarget';
-							if (card.name == "nanman" || card.name == "wanjian") return "zerotarget";
+							if (card.name == "nanman" || card.name == "wanjian") return "zeroplayertarget";
 							if (card.name == "sha") {
 								var equip1 = player.getEquip("zhuque");
 								if (equip1 && equip1.name == "zhuque") return 1.9;
-								if (!game.hasNature(card)) return "zerotarget";
+								if (!game.hasNature(card)) return "zeroplayertarget";
 							}
 						},
 					},

@@ -2223,7 +2223,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target, current) {
+				target(card, player, target, current) {
 					if (get.tag(card, "damage") && target != player) {
 						if (_status.event.name == "dckrmingshi") return;
 						if (get.attitude(player, target) > 0 && current < 0) return "zerotarget";

@@ -1258,7 +1258,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target, current) {
+						target(card, player, target, current) {
 							if (
 								target == player &&
 								lib.skill.gaizao.filterx(card, target) &&
@@ -8398,7 +8398,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target) {
+						target(card, player, target) {
 							if (
 								get.color(card) == "black" &&
 								get.attitude(target, player) < 0 &&

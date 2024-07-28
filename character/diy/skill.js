@@ -6757,7 +6757,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (get.color(card) == "red") return [1, 1];
 				},
 			}

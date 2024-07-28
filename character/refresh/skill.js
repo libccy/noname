@@ -13935,7 +13935,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (player == target || !target.hasFriend()) return;
 					var type = get.type(card);
 					var nh = Math.min(

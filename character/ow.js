@@ -266,7 +266,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target, current) {
+						target(card, player, target, current) {
 							if (card.name == "sha") {
 								if (_status.event.name == "qianggu2") return;
 								if (get.attitude(player, target) > 0) return;

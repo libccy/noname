@@ -4157,7 +4157,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target) {
+						target(card, player, target) {
 							if (
 								target.storage.xjzhimeng2 &&
 								get.type(card, "trick") == get.type(target.storage.xjzhimeng2, "trick")

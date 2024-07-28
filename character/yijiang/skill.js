@@ -9180,7 +9180,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (get.type(card) == "trick" && player !== target) return [1, 1];
 				},
 			}

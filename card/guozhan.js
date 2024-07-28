@@ -1463,7 +1463,7 @@ game.import("card", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target, current) {
+						target(card, player, target, current) {
 							if (
 								["huoshaolianying", "huogong"].includes(card.name) ||
 								(card.name == "sha" && game.hasNature(card, "fire"))

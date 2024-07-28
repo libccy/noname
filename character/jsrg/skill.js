@@ -160,7 +160,7 @@ const skills = {
 		check(event, player) {
 			if (
 				event.targets.reduce((p, c) => {
-					return p + get.effect_use(c, event.card, event.player, player) > 0;
+					return p + get.effect(c, event.card, event.player, player);
 				}, 0) >= 0
 			)
 				return false;
@@ -412,7 +412,6 @@ const skills = {
 	jsrgyansha: {
 		trigger: { player: "phaseZhunbeiBegin" },
 		async cost(event, trigger, player) {
-			//AI摆了，交给157了
 			event.result = await player
 				.chooseTarget(get.prompt("jsrgyansha"), "你可以选择任意名角色，视为对这些角色使用【五谷丰登】，然后未被选择的角色依次可以将一张装备牌当作【杀】对目标角色使用。", [1, Infinity], (card, player, target) => {
 					return player.canUse({ name: "wugu", isCard: true }, target);
