@@ -3176,13 +3176,6 @@ game.import("character", function () {
 							return 0;
 						},
 					},
-					effect: {
-						target: function (card, player, target) {
-							if (!target.storage.pingshen2) {
-								if (card.name == "guiyoujie") return [0, 1];
-							}
-						},
-					},
 				},
 			},
 			pingshen3: {
@@ -9961,7 +9954,6 @@ game.import("character", function () {
 				ai: {
 					effect: {
 						target: function (card, player, target, current) {
-							if (card.name == "guiyoujie") return [0, 2];
 							if (target.isTurnedOver()) {
 								if (get.tag(card, "damage")) return 0;
 							}

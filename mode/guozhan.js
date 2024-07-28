@@ -14116,13 +14116,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 					}
 				},
-				ai: {
-					effect: {
-						target: function (card, player, target) {
-							if (card.name == "guiyoujie") return [0, 1];
-						},
-					},
-				},
 			},
 			new_duanliang: {
 				subSkill: {

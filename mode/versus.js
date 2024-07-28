@@ -6872,11 +6872,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				ai: {
 					threaten: 1.5,
-					effect: {
-						target: function (card, player, target) {
-							if (card.name == "guiyoujie") return [0, 1];
-						},
-					},
 				},
 			},
 			boss_zhenwei: {
@@ -7002,13 +6997,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 						event.redo();
 					}
-				},
-				ai: {
-					effect: {
-						target: function (card, player, target) {
-							if (card.name == "guiyoujie") return [0, 1];
-						},
-					},
 				},
 			},
 			boss_tanshi: {

@@ -1348,7 +1348,6 @@ const skills = {
 					},
 					effect: {
 						target: function (card, player, target) {
-							if (card.name == "guiyoujie") return [0, 0.5];
 							if (target.isTurnedOver()) {
 								if (get.tag(card, "damage")) {
 									if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
@@ -9868,7 +9867,6 @@ const skills = {
 			},
 			effect: {
 				target: function (card, player, target) {
-					if (card.name == "guiyoujie") return [0, 0.5];
 					if (target.isTurnedOver()) {
 						if (get.tag(card, "damage")) {
 							if (player.hasSkillTag("jueqing", false, target)) return [1, -2];

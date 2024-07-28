@@ -5234,11 +5234,6 @@ game.import("character", function () {
 				},
 				ai: {
 					threaten: 1.3,
-					effect: {
-						target(card, player, target) {
-							if (card.name == "guiyoujie") return [0, 1];
-						},
-					},
 				},
 			},
 			fbeifa: {

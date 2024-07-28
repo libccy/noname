@@ -2660,13 +2660,6 @@ const skills = {
 				}
 			}
 		},
-		ai: {
-			effect: {
-				target(card, player, target) {
-					if (card.name == "guiyoujie") return [0, 1];
-				},
-			},
-		},
 	},
 	xinjiewei: {
 		audio: 2,
@@ -6379,13 +6372,6 @@ const skills = {
 			await player.draw(3);
 			await player.turnOver();
 		},
-		ai: {
-			effect: {
-				target(card, player, target) {
-					if (card.name == "guiyoujie") return [0, 1];
-				},
-			},
-		},
 	},
 	moon_jushou: {
 		audio: "xinjushou",
@@ -6396,13 +6382,6 @@ const skills = {
 		async content(event, trigger, player) {
 			await player.draw();
 			await player.turnOver();
-		},
-		ai: {
-			effect: {
-				target(card, player, target) {
-					if (card.name == "guiyoujie") return [0, 1];
-				},
-			},
 		},
 	},
 	liegong: {

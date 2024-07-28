@@ -3576,11 +3576,6 @@ game.import("character", function () {
 				},
 				ai: {
 					expose: 0.1,
-					effect: {
-						target: function (card) {
-							if (card.name == "guiyoujie") return [0, 0];
-						},
-					},
 				},
 			},
 			shanxian2: {
