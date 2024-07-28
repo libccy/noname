@@ -2217,10 +2217,10 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use: function (card, player, target, current) {
+				target: function (card, player, target, current) {
 					if (get.tag(card, "damage") && get.attitude(player, target) < 0 && target != player) {
 						if (_status.event.name == "zhouxian") return;
-						if (get.attitude(player, target) > 0 && current < 0) return "zerotarget";
+						if (get.attitude(player, target) > 0 && current < 0) return "zeroplayertarget";
 						var bs = player.getDiscardableCards(player, "he");
 						bs.remove(card);
 						if (card.cards) bs.removeArray(card.cards);
@@ -9222,7 +9222,7 @@ const skills = {
 		ai: {
 			effect: {
 				target: function (card, player, target, current) {
-					if (get.tag(card, "damage") && !player.hasSkillTag("jueqing", false, target)) return "zerotarget";
+					if (get.tag(card, "damage") && !player.hasSkillTag("jueqing", false, target)) return "zeroplayertarget";
 				},
 			},
 		},
@@ -15345,9 +15345,9 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target, current) {
+				target(card, player, target, current) {
 					if (["tiesuo", "lulitongxin"].includes(card.name)) {
-						return "zerotarget";
+						return "zeroplayertarget";
 					}
 				},
 			},
@@ -15370,7 +15370,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (typeof card !== "object" || target.hasSkillTag("unequip2")) return;
 					if (
 						player.hasSkillTag("unequip", false, {
@@ -15403,7 +15403,7 @@ const skills = {
 		inherit: "rw_minguangkai_link",
 		ai: {
 			effect: {
-				target_use(card, player, target, current) {
+				target(card, player, target, current) {
 					if (["tiesuo", "lulitongxin"].includes(card.name)) {
 						return "zeroplayertarget";
 					}
@@ -16485,7 +16485,7 @@ const skills = {
 			nofire: true,
 			effect: {
 				target: function (card, player, target, current) {
-					if (get.tag(card, "fireDamage")) return "zerotarget";
+					if (get.tag(card, "fireDamage")) return "zeroplayertarget";
 				},
 			},
 		},

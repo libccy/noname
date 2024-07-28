@@ -1258,7 +1258,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target, current) {
+						target(card, player, target, current) {
 							if (
 								target == player &&
 								lib.skill.gaizao.filterx(card, target) &&
@@ -3176,13 +3176,6 @@ game.import("character", function () {
 							return 0;
 						},
 					},
-					effect: {
-						target: function (card, player, target) {
-							if (!target.storage.pingshen2) {
-								if (card.name == "guiyoujie") return [0, 1];
-							}
-						},
-					},
 				},
 			},
 			pingshen3: {
@@ -4371,7 +4364,7 @@ game.import("character", function () {
 						},
 					},
 					effect: {
-						player: function (card, player) {
+						player_use: function (card, player) {
 							if (_status.currentPhase != player) return;
 							if (
 								get.type(card) == "equip" &&
@@ -8398,7 +8391,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target) {
+						target(card, player, target) {
 							if (
 								get.color(card) == "black" &&
 								get.attitude(target, player) < 0 &&
@@ -8527,9 +8520,10 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
-							if (card.name == "sha" && get.color(card) == "red") {
-								return [1, -2];
+						player: function (card, player, target, current) {
+							if (get.tag(card, "damage") && !player.hasSkill("xiaomoyu2")) {
+								if (player.isDamaged()) return [1, 1.6];
+								return [1, 0.8];
 							}
 						},
 					},
@@ -9961,9 +9955,8 @@ game.import("character", function () {
 				ai: {
 					effect: {
 						target: function (card, player, target, current) {
-							if (card.name == "guiyoujie") return [0, 2];
 							if (target.isTurnedOver()) {
-								if (get.tag(card, "damage")) return 0;
+								if (get.tag(card, "damage")) return "zeroplayertarget";
 							}
 						},
 					},
@@ -10193,7 +10186,7 @@ game.import("character", function () {
 						player: 1,
 					},
 					effect: {
-						target: function (card, player, target) {
+						target_use: function (card, player, target) {
 							if (player != target) return;
 							if (get.subtype(card) == "equip5") {
 								if (get.equipValue(card) <= 7) return 0;
@@ -10229,7 +10222,7 @@ game.import("character", function () {
 						return get.order({ name: "sha" }) + 0.1;
 					},
 					effect: {
-						target: function (card, player) {
+						target_use: function (card, player) {
 							if (get.subtype(card) == "equip1") {
 								var num = 0,
 									players = game.filterPlayer();

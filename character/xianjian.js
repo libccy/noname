@@ -164,7 +164,7 @@ game.import("character", function () {
 					threaten: 2,
 					expose: 0.2,
 					effect: {
-						player: function (card, player) {
+						player_use: function (card, player) {
 							if (_status.currentPhase != player) return;
 							if (_status.event.name != "chooseToUse" || _status.event.player != player) return;
 							var num = player.needsToDiscard();
@@ -506,7 +506,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use: function (card, player, target) {
 							if (_status.currentPhase != player) return;
 							if (
 								card.name == "sha" &&
@@ -778,7 +778,7 @@ game.import("character", function () {
 				ai: {
 					effect: {
 						target: function (card, player, target) {
-							if (card.name == "bingliang" || card.name == "caomu") return 0;
+							if (card.name == "bingliang" || card.name == "caomu") return [0, 0];
 						},
 					},
 				},
@@ -823,7 +823,7 @@ game.import("character", function () {
 					nodamage: true,
 					effect: {
 						target: function (card, player, target, current) {
-							if (get.tag(card, "damage")) return [0, 0];
+							if (get.tag(card, "damage")) return "zeroplayertarget";
 						},
 					},
 				},
@@ -3074,7 +3074,7 @@ game.import("character", function () {
 						return get.order({ name: "sha" }) + 0.1;
 					},
 					effect: {
-						player: function (card, player) {
+						player_use: function (card, player) {
 							if (_status.currentPhase != player) return;
 							if (
 								card.name == "sha" &&
@@ -3255,7 +3255,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						player: function (card, player) {
+						player_use: function (card, player) {
 							if (_status.currentPhase != player) return;
 							if (get.is.altered("shuiyun")) return;
 							if (
@@ -4157,7 +4157,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target) {
+						target(card, player, target) {
 							if (
 								target.storage.xjzhimeng2 &&
 								get.type(card, "trick") == get.type(target.storage.xjzhimeng2, "trick")
@@ -4328,9 +4328,9 @@ game.import("character", function () {
 					nothunder: true,
 					effect: {
 						target: function (card, player, target, current) {
-							if (card.name == "tiesuo") return 0;
-							if (get.tag(card, "fireDamage")) return 0;
-							if (get.tag(card, "thunderDamage")) return 0;
+							if (card.name == "tiesuo") return [0, 0];
+							if (get.tag(card, "fireDamage")) return [0, 0, 0, 0];
+							if (get.tag(card, "thunderDamage")) return [0, 0, 0, 0];
 						},
 					},
 				},

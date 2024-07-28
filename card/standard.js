@@ -3144,7 +3144,7 @@ game.import("card", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target) {
+						target(card, player, target) {
 							if (typeof card !== "object" || target.hasSkillTag("unequip2")) return;
 							if (
 								player.hasSkillTag("unequip", false, {

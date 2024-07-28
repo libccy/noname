@@ -1091,17 +1091,17 @@ const skills = {
 			maixie_hp: true,
 			effect: {
 				target(card, player, target) {
-					if (player.hasSkillTag("jueqing", false, target)) return [1, -1];
 					if (get.tag(card, "damage") && player != target) {
+						if (player.hasSkillTag("jueqing", false, target)) return [1, -1];
 						var cards = card.cards,
 							evt = _status.event;
 						if (evt.player == target && card.name == "damage" && evt.getParent().type == "card") cards = evt.getParent().cards.filterInD();
 						if (target.hp <= 1) return;
 						if (get.itemtype(cards) != "cards") return;
 						for (var i of cards) {
-							if (get.name(i, target) == "tao") return [1, 5 + player.countMark("dcjianxiong") / 2];
+							if (get.name(i, target) == "tao") return [1, 2.5 + player.countMark("dcjianxiong") / 2];
 						}
-						if (get.value(cards, target) >= 7 - player.countMark("dcjianxiong") / 2 + target.getDamagedHp()) return [1, 3 + player.countMark("dcjianxiong") / 2];
+						if (get.value(cards, target) >= 7 - player.countMark("dcjianxiong") / 2 + target.getDamagedHp()) return [1, 1.5 + player.countMark("dcjianxiong") / 2];
 						return [1, 0.6 + player.countMark("dcjianxiong") / 2];
 					}
 				},
@@ -1572,7 +1572,7 @@ const skills = {
 			nofire: true,
 			effect: {
 				target(card, player, target, current) {
-					if (get.tag(card, "fireDamage")) return "zerotarget";
+					if (get.tag(card, "fireDamage")) return "zeroplayertarget";
 				},
 			},
 		},

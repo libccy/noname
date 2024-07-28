@@ -2494,7 +2494,7 @@ const skills = {
 					if (
 						!get.tag(card, "damage") ||
 						player.countMark("dcxianjin") % 2 ||
-						!player.hasSkillTag("jueqing", false, target)
+						player.hasSkillTag("jueqing", false, target)
 					) return;
 					if (player.isMaxHandcard()) return [1, 1];
 					return [1, Math.min(3, 1 + player.getStorage("dctuoyu").length)];
@@ -3060,7 +3060,12 @@ const skills = {
 				ai: {
 					effect: {
 						target(card, player, target, current) {
-							if (get.tag(card, "damage") && current < 0) return 1.6;
+							if (get.tag(card, "damage") && current < 0 && !target._shencai_losehp_effect) {
+								target._shencai_losehp_effect = true;
+								let eff = get.effect(target, { name: "losehp" }, target, target) / 10;
+								delete target._shencai_losehp_effect;
+								return [1, eff];
+							}
 						},
 					},
 				},
@@ -4065,7 +4070,7 @@ const skills = {
 				ai: {
 					effect: {
 						target(card) {
-							if (get.type(card) == "delay") return "zerotarget";
+							if (get.type(card) == "delay") return "zeroplayertarget";
 						},
 					},
 				},
@@ -4799,7 +4804,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target) {
+						target(card, player, target) {
 							if (card && card.name == "qizhengxiangsheng") return "zeroplayertarget";
 						},
 					},
@@ -4930,7 +4935,7 @@ const skills = {
 							let num = 0,
 								nohave = true;
 							game.countPlayer(i => {
-								if (i.hasSkill("lingce")) {
+								if (i.hasSkill("lingce", null, null, false)) {
 									nohave = false;
 									if (i.isIn() && lib.skill.lingce.filter({ card: card }, i)) num += get.sgnAttitude(player, i);
 								}

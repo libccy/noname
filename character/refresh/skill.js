@@ -1348,7 +1348,6 @@ const skills = {
 					},
 					effect: {
 						target: function (card, player, target) {
-							if (card.name == "guiyoujie") return [0, 0.5];
 							if (target.isTurnedOver()) {
 								if (get.tag(card, "damage")) {
 									if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
@@ -5504,7 +5503,7 @@ const skills = {
 		ai: {
 			effect: {
 				target: function (card, player, target) {
-					if (target == _status.currentPhase && get.tag(card, "damage")) return [0, 1];
+					if (target == _status.currentPhase && get.tag(card, "damage")) return [0, 2, 0, 0];
 				},
 			},
 		},
@@ -7640,8 +7639,8 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use: function (card, player, target) {
-					if (target != _status.currentPhase && target.countCards("h") >= target.getHandcardLimit() && (get.type(card) == "delay" || get.color(card) == "none")) return "zerotarget";
+				target: function (card, player, target) {
+					if (target != _status.currentPhase && target.countCards("h") >= target.getHandcardLimit() && (get.type(card) == "delay" || get.color(card) == "none")) return "zeroplayertarget";
 				},
 			},
 		},
@@ -8001,7 +8000,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player_use: function (card, player, target) {
+				player: function (card, player, target) {
 					if (
 						player == target &&
 						get.type(card) == "equip" &&
@@ -9868,7 +9867,6 @@ const skills = {
 			},
 			effect: {
 				target: function (card, player, target) {
-					if (card.name == "guiyoujie") return [0, 0.5];
 					if (target.isTurnedOver()) {
 						if (get.tag(card, "damage")) {
 							if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
@@ -11644,7 +11642,7 @@ const skills = {
 		ai: {
 			useShan: true,
 			effect: {
-				target: function (card, player, target, current) {
+				target_use: function (card, player, target, current) {
 					let name;
 					if (typeof card == "object") {
 						if (card.viewAs) name = card.viewAs;
@@ -11703,6 +11701,8 @@ const skills = {
 						if (pos == "e") return [1, Math.min((Math.max(1, target.countCards("hs")) * (club + spade)) / 4, Math.max(club, spade))];
 						return [1, (club + spade) / 4];
 					}
+				},
+				target(card, player, target) {
 					if (name == "lebu" || name == "bingliang") return [target.hasSkillTag("rejudge") ? 0.4 : 1, 2, target.hasSkillTag("rejudge") ? 0.4 : 1, 0];
 				},
 			},
@@ -12400,9 +12400,9 @@ const skills = {
 						if (target.hp <= 1) return;
 						if (get.itemtype(cards) != "cards") return;
 						for (var i of cards) {
-							if (get.name(i, target) == "tao") return [1, 5];
+							if (get.name(i, target) == "tao") return [1, 4.5];
 						}
-						if (get.value(cards, target) >= 7 + target.getDamagedHp()) return [1, 3];
+						if (get.value(cards, target) >= 7 + target.getDamagedHp()) return [1, 2.5];
 						return [1, 0.6];
 					}
 				},
@@ -13935,7 +13935,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (player == target || !target.hasFriend()) return;
 					var type = get.type(card);
 					var nh = Math.min(
@@ -14001,8 +14001,11 @@ const skills = {
 		ai: {
 			threaten: 0.8,
 			effect: {
-				target: function (card) {
-					if (card.name == "guohe" || card.name == "liuxinghuoyu") return 0.5;
+				player_use(card, player, target) {
+					if (player.countCards("h") === 1) return [1, 0.8];
+				},
+				target(card, player, target) {
+					if (get.tag(card, "loseCard") && target.countCards("h") === 1) return 0.5;
 				},
 			},
 			noh: true,

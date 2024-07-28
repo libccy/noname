@@ -5727,7 +5727,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								_status.shishengshibai % 10 == 9 &&
 								card.name == "tiesuo"
 							)
-								return "zerotarget";
+								return [0, 0, 0, 0];
 						},
 					},
 				},
@@ -6872,11 +6872,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				ai: {
 					threaten: 1.5,
-					effect: {
-						target: function (card, player, target) {
-							if (card.name == "guiyoujie") return [0, 1];
-						},
-					},
 				},
 			},
 			boss_zhenwei: {
@@ -7002,13 +6997,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						}
 						event.redo();
 					}
-				},
-				ai: {
-					effect: {
-						target: function (card, player, target) {
-							if (card.name == "guiyoujie") return [0, 1];
-						},
-					},
 				},
 			},
 			boss_tanshi: {
@@ -7262,7 +7250,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					nodamage: true,
 					effect: {
 						target: function (card, player, target, current) {
-							if (get.tag(card, "damage") && !get.tag(card, "thunderDamage")) return [0, 0];
+							if (get.tag(card, "damage") && !get.tag(card, "thunderDamage")) return "zeroplayertarget";
 						},
 					},
 				},
@@ -7359,7 +7347,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					nofire: true,
 					effect: {
 						target: function (card, player, target, current) {
-							if (get.tag(card, "fireDamage")) return 0;
+							if (get.tag(card, "fireDamage")) return "zeroplayertarget";
 						},
 					},
 				},

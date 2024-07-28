@@ -2819,7 +2819,7 @@ const skills = {
 			nothunder: true,
 			effect: {
 				target(card, player, target) {
-					if (get.tag(card, "natureDamage")) return "zerotarget";
+					if (get.tag(card, "natureDamage")) return "zeroplayertarget";
 				}
 			}
 		}
@@ -4631,7 +4631,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target, current) {
+						target(card, player, target, current) {
 							if (get.type(card, "trick") == "trick" && _status.currentPhase == player) return "zeroplayertarget";
 						},
 					},
@@ -6268,7 +6268,7 @@ const skills = {
 			effect: {
 				target_use(card, player, target) {
 					if (get.tag(card, "multineg")) {
-						return "zerotarget";
+						return "zeroplayertarget";
 					}
 					if (get.tag(card, "multitarget")) {
 						var info = get.info(card);
@@ -6757,7 +6757,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (get.color(card) == "red") return [1, 1];
 				},
 			}
@@ -7059,7 +7059,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target(card) {
+				target_use(card) {
 					if (get.type(card) == "delay") return [0, 0.5];
 				},
 			},
@@ -7159,8 +7159,8 @@ const skills = {
 		ai: {
 			effect: {
 				target(card, player, target, current) {
-					if (card.name == "tiesuo") return 0;
-					if (get.tag(card, "thunderDamage")) return 0;
+					if (card.name == "tiesuo") return 0.1;
+					if (get.tag(card, "thunderDamage")) return "zeroplayertarget";
 				},
 			},
 			threaten: 0.5,
@@ -7654,7 +7654,7 @@ const skills = {
 		ai: {
 			effect: {
 				target(card, player, target) {
-					if (get.type(card) == "delay") return "zerotarget";
+					if (get.type(card) == "delay") return "zeroplayertarget";
 				},
 			},
 		},

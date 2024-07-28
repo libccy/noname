@@ -9800,7 +9800,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player_use(card, player, target) {
+						player(card, player, target) {
 							if (get.tag(card, "recover") && target.hp > 0) return 0;
 							if (get.tag(card, "damage")) return 0.5;
 						},

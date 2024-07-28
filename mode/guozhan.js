@@ -11409,8 +11409,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ai: {
 					threaten: 3,
 					effect: {
-						target: function (card, player, target, current) {
-							if (lib.skill.gzxingzhao.getNum() > 3 && get.type(card) == "equip" && !get.cardtag(card, "gifts")) return [1, 3];
+						target_use: function (card, player, target, current) {
+							if (lib.skill.gzxingzhao.getNum() > 3 && get.type(card) == "equip" && !get.cardtag(card, "gifts")) return [1, 2];
 						},
 					},
 					reverseEquip: true,
@@ -14115,13 +14115,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							player.discard(result.cards[0]);
 						}
 					}
-				},
-				ai: {
-					effect: {
-						target: function (card, player, target) {
-							if (card.name == "guiyoujie") return [0, 1];
-						},
-					},
 				},
 			},
 			new_duanliang: {
@@ -18128,7 +18121,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						},
 					},
 					effect: {
-						target: function (card, player, target) {
+						target_use: function (card, player, target) {
 							if (player == target && get.type(card) == "equip") {
 								if (player.countCards("e", { subtype: get.subtype(card) })) {
 									var players = game.filterPlayer();

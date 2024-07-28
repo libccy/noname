@@ -25963,13 +25963,6 @@ const skills = {
 			player.draw(2 + num);
 			player.addSkill("kuiwei2");
 		},
-		ai: {
-			effect: {
-				target: function (card) {
-					if (card.name == "guiyoujie") return [0, 2];
-				},
-			},
-		},
 	},
 	kuiwei2: {
 		trigger: { player: "phaseDrawBegin" },
@@ -28230,11 +28223,6 @@ const skills = {
 				},
 			},
 			threaten: 1.5,
-			effect: {
-				target: function (card) {
-					if (card.name == "guiyoujie") return [0, 2];
-				},
-			},
 		},
 	},
 	lihun2: {

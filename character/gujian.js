@@ -1273,7 +1273,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target, current) {
+						target(card, player, target, current) {
 							if (get.color(card) == "red" && target.isDamaged()) return [1, 1];
 						},
 					},
@@ -1464,7 +1464,7 @@ game.import("character", function () {
 				ai: {
 					halfneg: true,
 					effect: {
-						player_use(card, player, target, current) {
+						player(card, player, target, current) {
 							if (get.color(card) == "red") return [1, 0, 1, -2];
 						},
 					},
@@ -2680,7 +2680,7 @@ game.import("character", function () {
 					threaten: 0.8,
 					effect: {
 						target(card, player, target) {
-							if (card.name == "bingliang") return 0;
+							if (card.name == "bingliang") return [0, 0];
 							if (card.name == "lebu") return 1.5;
 							if (card.name == "guohe") {
 								if (!target.countCards("e")) return 0;

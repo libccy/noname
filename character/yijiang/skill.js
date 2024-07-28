@@ -9180,7 +9180,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (get.type(card) == "trick" && player !== target) return [1, 1];
 				},
 			}
@@ -10864,7 +10864,7 @@ const skills = {
 				return arg && arg.jiu == true;
 			},
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (target.hp <= 0 && target.hasSkill("zhenlie_lose") && get.tag(card, "recover")) return [1, 1.2];
 				},
 			},
@@ -11259,7 +11259,6 @@ const skills = {
 			},
 			effect: {
 				target: function (card, player, target) {
-					if (card.name == "guiyoujie") return [0, 0.5];
 					if (target.isTurnedOver()) {
 						if (get.tag(card, "damage")) {
 							if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
