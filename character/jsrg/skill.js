@@ -8832,7 +8832,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use: function (card, player, target, current) {
 					if (get.type(card) == "delay" && current < 0) {
 						if (target.countCards("j")) return;
 						return "zerotarget";

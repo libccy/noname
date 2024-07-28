@@ -2217,10 +2217,10 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use: function (card, player, target, current) {
+				target: function (card, player, target, current) {
 					if (get.tag(card, "damage") && get.attitude(player, target) < 0 && target != player) {
 						if (_status.event.name == "zhouxian") return;
-						if (get.attitude(player, target) > 0 && current < 0) return "zerotarget";
+						if (get.attitude(player, target) > 0 && current < 0) return "zeroplayertarget";
 						var bs = player.getDiscardableCards(player, "he");
 						bs.remove(card);
 						if (card.cards) bs.removeArray(card.cards);
@@ -9222,7 +9222,7 @@ const skills = {
 		ai: {
 			effect: {
 				target: function (card, player, target, current) {
-					if (get.tag(card, "damage") && !player.hasSkillTag("jueqing", false, target)) return "zerotarget";
+					if (get.tag(card, "damage") && !player.hasSkillTag("jueqing", false, target)) return "zeroplayertarget";
 				},
 			},
 		},
@@ -16485,7 +16485,7 @@ const skills = {
 			nofire: true,
 			effect: {
 				target: function (card, player, target, current) {
-					if (get.tag(card, "fireDamage")) return "zerotarget";
+					if (get.tag(card, "fireDamage")) return "zeroplayertarget";
 				},
 			},
 		},

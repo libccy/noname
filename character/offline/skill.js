@@ -428,7 +428,7 @@ const skills = {
 			nofire: true,
 			effect: {
 				target(card, player, target, current) {
-					if (get.tag(card, "fireDamage")) return "zerotarget";
+					if (get.tag(card, "fireDamage")) return "zeroplayertarget";
 				},
 			},
 		},
@@ -2018,7 +2018,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (card.name === "sha" && game.hasNature(card) && target.hasEmptySlot(2)) return "zeroplayertarget";
 					if (get.subtype(card) == "equip2" && target.isEmpty(2)) return [0.6, -0.8];
 				},
@@ -2731,7 +2731,7 @@ const skills = {
 			threaten: 1.1,
 			combo: "psshiyin",
 			effect: {
-				target_use(card, player, target, current) {
+				target(card, player, target, current) {
 					var list = target.getExpansions("psshiyin");
 					for (var cardx of list) {
 						if (get.suit(cardx) == get.suit(card)) return "zeroplayertarget";
@@ -5517,7 +5517,7 @@ const skills = {
 				},
 			},
 			effect: {
-				target: function (card, player, target) {
+				target_use: function (card, player, target) {
 					if (player == target && get.type(card) == "equip") {
 						if (player.countCards("e", { subtype: get.subtype(card) })) {
 							if (
@@ -6877,7 +6877,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					var type = get.type2(card);
 					var list = target.getExpansions("zuixiang2");
 					for (var i of list) {
@@ -6948,8 +6948,8 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
-					if (get.type(card) == "delay" && target.hasJudge("yanxiao_card")) return [0, 0, 0, 0.1];
+				target_use: function (card, player, target) {
+					if (get.type(card) == "delay" && target.hasJudge("yanxiao_card")) return [0, 0.1];
 				},
 			},
 		},
@@ -7223,7 +7223,7 @@ const skills = {
 			nodamage: true,
 			effect: {
 				target: function (card, player, target, current) {
-					if (get.tag(card, "damage")) return [0, 0];
+					if (get.tag(card, "damage")) return "zeroplayertarget";
 				},
 			},
 		},

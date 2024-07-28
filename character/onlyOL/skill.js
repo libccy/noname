@@ -1113,7 +1113,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player(card, player, target) {
+				player_use(card, player, target) {
 					if (_status.currentPhase != player) return;
 					if (card.name == "sha" && !player.getExpansions("olchunlao").length && target.hp > 1) {
 						return "zeroplayertarget";
@@ -1328,27 +1328,29 @@ const skills = {
 		global: "olsbhetao_ai",
 		subSkill: {
 			ai: {
-				effect: {
-					player_use(card, player) {
-						if (
-							!game.hasPlayer(target => {
-								return target.hasSkill("olsbhetao") && (get.attitude(player, target) < 0 || get.attitude(target, player) < 0);
-							}) ||
-							game.countPlayer(target => {
-								return player.canUse(card, target);
-							}) < 2
-						)
-							return;
-						const select = get.copy(get.info(card).selectTarget);
-						let range;
-						if (select == undefined) range = [1, 1];
-						else if (typeof select == "number") range = [select, select];
-						else if (get.itemtype(select) == "select") range = select;
-						else if (typeof select == "function") range = select(card, player);
-						game.checkMod(card, player, range, "selectTarget", player);
-						if (range[1] == -1 || (range[1] > 1 && ui.selected.targets && ui.selected.targets.length)) return "zeroplayertarget";
+				ai: {
+					effect: {
+						player_use(card, player) {
+							if (
+								!game.hasPlayer(target => {
+									return target.hasSkill("olsbhetao") && (get.attitude(player, target) < 0 || get.attitude(target, player) < 0);
+								}) ||
+								game.countPlayer(target => {
+									return player.canUse(card, target);
+								}) < 2
+							)
+								return;
+							const select = get.copy(get.info(card).selectTarget);
+							let range;
+							if (select == undefined) range = [1, 1];
+							else if (typeof select == "number") range = [select, select];
+							else if (get.itemtype(select) == "select") range = select;
+							else if (typeof select == "function") range = select(card, player);
+							game.checkMod(card, player, range, "selectTarget", player);
+							if (range[1] == -1 || (range[1] > 1 && ui.selected.targets && ui.selected.targets.length)) return "zeroplayertarget";
+						},
 					},
-				},
+				}
 			},
 		},
 	},
