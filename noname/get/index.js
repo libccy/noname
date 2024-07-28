@@ -858,110 +858,63 @@ export class Get extends GetCompatible {
 		console.log("time2: " + (toc - tic));
 	}
 	/**
-	 * @param {any} obj
+	 * 此方法仅用作将技能/卡牌代码转为字符串，返回值无法直接进行反序列化
+	 * @param { any } obj
 	 * @param { number } [level = 0]
 	 */
 	stringify(obj, level = 0) {
-		level = level || 0;
 		let indent = "";
-		let str;
-		for (let i = 0; i < level; i++) {
-			indent += "    ";
-		}
-		if (get.objtype(obj) == "object" || obj instanceof lib.element.GameEventPromise) {
-			str = "{\n";
-			for (let i in obj) {
-				/**
-				 * @type {string}
-				 */
-				let insertDefaultString;
-				let insertFunctionString = indent + "    " + get.stringify(obj[i], level + 1) + ",\n";
-				let parseFunction = (/** @type {string} */ i) => {
-					// let string = obj[i].toString();
-					i = i.replaceAll("$", "\\$");
-					let execResult;
-					if (obj[i] instanceof GeneratorFunction) {
-						// *content(){}
-						execResult = new RegExp(`\\*\\s*${i}[\\s\\S]*?\\(`).exec(obj[i]);
-						if (execResult && execResult.index === 0) {
-							return insertFunctionString;
-						}
-						// content:function*(){}
-						else {
-							return insertDefaultString;
-						}
-					} else if (obj[i] instanceof AsyncFunction) {
-						execResult = new RegExp(`async\\s*${i}[\\s\\S]*?\\(`).exec(obj[i]);
+		for (let i = 0; i < level; i++) indent += "    ";
+		try {
+			if (get.objtype(obj) === "object"/*  || obj instanceof lib.element.GameEvent */) {
+				const isMethod = (/** @type {string} */ key) => {
+					const value = obj[key];
+					if (!(typeof value === "function")) return false;
+					key = key.replaceAll("$", "\\$");
+					let reg;
+					if (value instanceof GeneratorFunction) {
+						// content*(){}
+						reg = new RegExp(`\\*\\s*${key}[\\s\\S]*?\\(`);
+					} else if (value instanceof AsyncFunction) {
 						// async content(){}
-						if (execResult && execResult.index === 0) {
-							return insertFunctionString;
-						}
-						// content:async function(){}
-						else {
-							return insertDefaultString;
-						}
+						reg = new RegExp(`async\\s*${key}[\\s\\S]*?\\(`);
 					} else {
-						execResult = new RegExp(`${i}[\\s\\S]*?\\(`).exec(obj[i]);
 						// content(){}
-						if (execResult && execResult.index === 0) {
-							return insertFunctionString;
-						}
-						// content:function(){}
-						else {
-							return insertDefaultString;
-						}
+						reg = new RegExp(`${key}[\\s\\S]*?\\(`)
 					}
+					return reg.exec(value)?.index === 0;
 				};
-				if (/[^a-zA-Z]/.test(i)) {
-					insertDefaultString = indent + '    "' + i + '":' + get.stringify(obj[i], level + 1) + ",\n";
-					if (typeof obj[i] !== "function") {
-						str += insertDefaultString;
-					} else {
-						str += parseFunction(i);
-					}
-				} else {
-					insertDefaultString = indent + "    " + i + ":" + get.stringify(obj[i], level + 1) + ",\n";
-					if (typeof obj[i] !== "function") {
-						str += insertDefaultString;
-					} else {
-						str += parseFunction(i);
-					}
+
+				let str = "{\n";
+				for (const key in obj) {
+					let keyString = (/[^a-zA-Z]/.test(key) ? `"${key}"` : key) + ": ";
+					const valueString = get.stringify(obj[key], level + 1);
+					if (isMethod(key)) keyString = "";
+					str += indent + "    " + keyString + valueString + ",\n";
 				}
-			}
-			str += indent + "}";
-			return str;
-		} else {
-			if (typeof obj == "function") {
-				str = obj.toString();
-				str = str.replace(/\t/g, "    ");
-				let i = str.lastIndexOf("\n");
-				let num = 0;
-				for (let j = i + 1; j < str.length && str[j] == " "; j++) {
-					num++;
+				str += indent + "}";
+				return str;
+
+			} else if (typeof obj === "function") {
+				let str = obj.toString().replace(/\t/g, "    ");
+				let lastLine = str.slice(str.lastIndexOf("\n"));
+				let originIndent = Math.floor((/\S/.exec(lastLine)?.index ?? lastLine.length) / 4);
+				for (let i = 0; i < Math.abs(originIndent - level); i++) {
+					if (originIndent >= level) str = str.replace(/\n {4}/g, "\n");
+					else str = str.replace(/\n/g, "\n    ");
 				}
-				num = Math.floor(num / 4);
-				for (i = 0; i < num - level; i++) {
-					str = str.replace(/\n {4}/g, "\n");
-				}
+				return str;
+			} else if (Array.isArray(obj)) {
+				const rand = parseInt(get.id());
+				obj = obj.map(i => i === Infinity ? rand : i === -Infinity ? -rand : i);
+				return JSON.stringify(obj).replace(new RegExp(rand.toString(), "g"), "Infinity");
 			} else {
-				try {
-					if (Array.isArray(obj) && obj.includes(Infinity)) {
-						obj = obj.slice(0);
-						let rand = get.id();
-						for (let i = 0; i < obj.length; i++) {
-							if (obj[i] === Infinity) {
-								obj[i] = parseInt(rand);
-							}
-						}
-						str = JSON.stringify(obj).replace(new RegExp(rand, "g"), "Infinity");
-					} else {
-						str = JSON.stringify(obj) || "";
-					}
-				} catch (e) {
-					str = "";
-				}
+				if (obj === Infinity) return "Infinity";
+				if (obj === -Infinity) return "-Infinity";
+				return JSON.stringify(obj);
 			}
-			return str;
+		} catch (e) {
+			return "";
 		}
 	}
 	/**
