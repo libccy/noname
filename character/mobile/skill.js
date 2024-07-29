@@ -892,12 +892,7 @@ const skills = {
 				forced: true,
 				locked: false,
 				filter(event, player) {
-					return (
-						!event.numFixed &&
-						game.hasPlayer(current => {
-							return current.hasDisabledSlot(1);
-						})
-					);
+					return !event.numFixed;
 				},
 				async content(event, trigger, player) {
 					trigger.num += Math.min(

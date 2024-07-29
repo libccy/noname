@@ -413,6 +413,10 @@ window.noname_character_rank = {
 		"licuilianzhaoquanding",
 	],
 	am: [
+		"jx_shen_caoren",
+		"jx_shen_liubiao",
+		"jx_zhouyu",
+		"jx_guanyu",
 		"yj_majun",
 		"tw_yanliang",
 		"tw_wenchou",
@@ -742,6 +746,7 @@ window.noname_character_rank = {
 		"new_simayi",
 	],
 	bp: [
+		"jx_sunjian",
 		"ol_peixiu",
 		"caimao",
 		"yj_ehuan",
@@ -2028,6 +2033,10 @@ window.noname_character_rank = {
 			"jsrg_yuanshao",
 		],
 		epic: [
+			"jx_shen_caoren",
+			"jx_shen_liubiao",
+			"jx_zhouyu",
+			"jx_guanyu",
 			"yj_majun",
 			"xunyuxunyou",
 			"yj_sb_guojia",
@@ -2346,6 +2355,7 @@ window.noname_character_rank = {
 			"new_simayi",
 		],
 		rare: [
+			"jx_sunjian",
 			"liutan",
 			"dc_noname",
 			"ol_liubiao",
