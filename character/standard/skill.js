@@ -144,10 +144,9 @@ const skills = {
 				.set("ai", target => {
 					const player = get.event("player"),
 						aim = get.event().getTrigger().player;
-					if (get.attitude(player, aim) > 0 || get.damageEffect(aim, player, player) < 0) return 0;
-					if (aim.countCards("he")) return -5;
-					if (player.getDiscardableCards(player, "he").some(card => get.suit(card) == "diamond")) return 1;
-					return 0;
+					let eff = get.damageEffect(aim, player, player);
+					if (aim === player && player.getDiscardableCards(player, "he", card => get.suit(card) == "diamond")) eff /= 4;
+					return eff + get.effect(target, { name: "guohe" }, player, player);
 				})
 				.forResult();
 		},
