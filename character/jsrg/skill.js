@@ -3308,16 +3308,20 @@ const skills = {
 		ai: {
 			order: 6,
 			result: {
-				target(player, target) {
+				player(player, target) {
 					const targets = game.filterPlayer(current => target.inRange(current) && current != player);
 					let eff = 0;
 					for (const targetx of targets) {
-						let effx = get.effect(targetx, { name: "guohe_copy2" }, player, target);
-						if (get.attitude(player, targetx) < 0) effx /= 2;
+						let effx = get.effect(targetx, { name: "guohe_copy2" }, targetx, player);
 						eff += effx;
 					}
-					return eff * (get.attitude(player, target) <= 0 ? 0.75 : 1);
+					return eff;
 				},
+				target(player, target) {
+					return game.countPlayer(current => {
+						return current !== player && target.inRange(current) && current.countCards("h");
+					}) / 2 * get.effect(target, { name: "draw" }, target, target);
+				}
 			},
 		},
 	},
