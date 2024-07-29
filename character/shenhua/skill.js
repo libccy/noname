@@ -5763,14 +5763,65 @@ const skills = {
 		},
 	},
 	qiangxix: {
-		inherit: "reqiangxi",
-		audioname: ["boss_lvbu3"],
 		audio: "qiangxi",
+		audioname: ["boss_lvbu3"],
+		mod: {
+			aiOrder(player, card, num) {
+				if (
+					player.getEquips(1).length ||
+					get.subtype(card, player) !== "equip1" ||
+					!player.hasSkillTag("noe")
+				) return num;
+				return 10;
+			}
+		},
+		enable: "phaseUse",
 		usable: 2,
-		filterTarget(card, player, target) {
-			if (player == target) return false;
-			if (target.hasSkill("reqiangxi_off")) return false;
-			return true;
+		locked: false,
+		filter: function (event, player) {
+			if (player.hp < 1 && !player.hasCard(card => lib.skill.qiangxix.filterCard(card), "he")) return false;
+			return game.hasPlayer(current => lib.skill.qiangxix.filterTarget(null, player, current));
+		},
+		filterCard: function (card) {
+			return get.subtype(card) == "equip1";
+		},
+		position: "he",
+		filterTarget: function (card, player, target) {
+			if (target == player) return false;
+			var stat = player.getStat()._qiangxix;
+			return !stat || !stat.includes(target);
+		},
+		selectCard: function () {
+			if (_status.event.player.hp < 1) return 1;
+			return [0, 1];
+		},
+		content: function () {
+			var stat = player.getStat();
+			if (!stat._qiangxix) stat._qiangxix = [];
+			stat._qiangxix.push(target);
+			if (!cards.length) player.loseHp();
+			target.damage("nocard");
+		},
+		ai: {
+			damage: true,
+			order: 8,
+			result: {
+				player: function (player, target) {
+					if (ui.selected.cards.length) return 0;
+					if (player.hp >= target.hp) return -0.9;
+					if (player.hp <= 2) return -10;
+					return get.effect(player, { name: "losehp"}, player, player);
+				},
+				target: function (player, target) {
+					if (!ui.selected.cards.length) {
+						if (player.hp < 2) return 0;
+						if (player.hp == 2 && target.hp >= 2) return 0;
+						if (target.hp > player.hp) return 0;
+					}
+					return get.damageEffect(target, player, target);
+				},
+			},
+			threaten: 1.5,
 		},
 	},
 	qiangxi: {
