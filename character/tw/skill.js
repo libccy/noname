@@ -5087,7 +5087,7 @@ const skills = {
 					if (wq[0][1] === card[1]) continue;
 					other.push(card);
 				}
-				if (can < 2 * eff - other.reduce((acc, val) => acc + val[0], 0)) {
+				if (can < 2 * eff - other.reduce((acc, val) => acc + val[0], 0)) { //换一张武器牌的收益
 					can = 2 * eff - other.reduce((acc, val) => acc + val[0], 0);
 					allcards = other.map(i => i[1]);
 				}
@@ -5095,7 +5095,7 @@ const skills = {
 					can = dui;
 					allcards = [wq[0][1]];
 				}
-				if (can > 0) targets.push([cur, can, allcards]);
+				if (can > 0) targets.push([cur, can, allcards]); //这个时候can应该都是正的了，懒得再测了
 			});
 			if (targets.length) return targets.sort((a, b) => {
 				return b[1] - a[1];
