@@ -4591,7 +4591,7 @@ const skills = {
 				target: (card, player, target) => {
 					if (!get.tag(card, "damage")) return;
 					if (target.hp < 2 || player.hasSkillTag("jueqing", false, target)) return 1.5;
-					return [1, 1];
+					return [1, 0.8];
 				},
 			},
 		},
@@ -5599,7 +5599,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target) {
+				player_use: function (card, player, target) {
 					if (_status.currentPhase != player) return;
 					if (card.name == "sha" && !player.needsToDiscard() && !player.getExpansions("chunlao").length && target.hp > 1) {
 						return "zeroplayertarget";
@@ -7043,7 +7043,7 @@ const skills = {
 			damage: true,
 			order: 1,
 			effect: {
-				player: function (card, player, target) {
+				player_use: function (card, player, target) {
 					if (_status.event.skill == "zhanjue") {
 						if (
 							player.hasSkillTag(
@@ -10889,10 +10889,10 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target, current) {
+				target(card, player, target, current) {
 					if (get.type(card) == "trick" && player != target) return "zeroplayertarget";
 				},
-				player_use(card, player, target, current) {
+				player(card, player, target, current) {
 					if (get.type(card) == "trick" && player != target) return "zeroplayertarget";
 				},
 			},
@@ -11066,12 +11066,12 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (player == target && get.subtypes(card).includes("equip2")) {
 						if (get.equipValue(card) <= 8) return 0;
 					}
 					if (!player.hasEmptySlot(2)) return;
-					if (card.name == "sha" && get.color(card) == "black") return "zerotarget";
+					if (card.name == "sha" && get.color(card) == "black") return "zeroplayertarget";
 				},
 			},
 		},
