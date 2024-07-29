@@ -6953,10 +6953,26 @@ export class Library {
 					restart: true,
 					frequent: true,
 				},
-				connect_change_card: {
-					name: "启用手气卡",
-					init: false,
-					frequent: true,
+				connect_double_character: {
+					name: "启用双将",
+					init: "single",
+					item: {
+						single: "不启用",
+						double: "启用双将",
+						singble: "单双任选",
+					},
+					restart: true,
+				},
+				connect_double_hp: {
+					name: "双将体力上限",
+					init: "pingjun",
+					item: {
+						hejiansan: "和减三",
+						pingjun: "平均值",
+						zuidazhi: "最大值",
+						zuixiaozhi: "最小值",
+						zonghe: "相加",
+					},
 					restart: true,
 				},
 				update: function (config, map) {
@@ -6969,6 +6985,13 @@ export class Library {
 						map.connect_change_card.hide();
 					} else {
 						map.connect_change_card.show();
+					}
+					if (config.connect_single_mode != "dianjiang") {
+						map.connect_double_character.hide();
+						map.connect_double_hp.hide();
+					} else {
+						map.connect_double_character.show();
+						map.connect_double_hp.show();
 					}
 				},
 			},
@@ -7002,6 +7025,28 @@ export class Library {
 						unlimited: "无限",
 					},
 				},
+				double_character: {
+					name: "启用双将",
+					init: "single",
+					item: {
+						single: "不启用",
+						double: "启用双将",
+						singble: "单双任选",
+					},
+					restart: true,
+				},
+				double_hp: {
+					name: "双将体力上限",
+					init: "pingjun",
+					item: {
+						hejiansan: "和减三",
+						pingjun: "平均值",
+						zuidazhi: "最大值",
+						zuixiaozhi: "最小值",
+						zonghe: "相加",
+					},
+					restart: true,
+				},
 				update: function (config, map) {
 					if (config.single_mode != "normal") {
 						map.enable_jin.hide();
@@ -7012,6 +7057,13 @@ export class Library {
 						map.change_card.hide();
 					} else {
 						map.change_card.show();
+					}
+					if (config.single_mode != "dianjiang") {
+						map.double_character.hide();
+						map.double_hp.hide();
+					} else {
+						map.double_character.show();
+						map.double_hp.show();
 					}
 				},
 			},
@@ -9969,9 +10021,12 @@ export class Library {
 			return true;
 		},
 		characterDisabled: function (i, libCharacter) {
-			if (!lib.character[i] || lib.character[i].isAiForbidden) return true;
+			const args = Array.from(arguments).slice(2);
+			if (!lib.character[i]) return true;
 			if (lib.character[i].isUnseen) return true;
-			if (lib.config.forbidai.includes(i)) return true;
+			if (!args.includes("ignoreForibidden")) {
+				if (lib.config.forbidai.includes(i) || lib.character[i].isAiForbidden) return true;
+			}
 			if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) return true;
 			if (_status.connectMode) {
 				if (lib.configOL.banned.includes(i) || lib.connectBanned.includes(i)) return true;
@@ -10023,13 +10078,14 @@ export class Library {
 		},
 		characterDisabled2: function (i) {
 			var info = lib.character[i];
+			const args = Array.from(arguments).slice(1);
 			if (!info) return true;
 			if (info[4]) {
 				if (info.isBoss) return true;
 				if (info.isHiddenBoss) return true;
 				if (info.isMinskin) return true;
 				if (info.isUnseen) return true;
-				if (info.isAiForbidden && (!_status.event.isMine || !_status.event.isMine())) return true;
+				if (!args.includes("ignoreForibidden") && info.isAiForbidden && (!_status.event.isMine || !_status.event.isMine())) return true;
 				if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) return true;
 			}
 			return false;
