@@ -9694,7 +9694,7 @@ export class Player extends HTMLDivElement {
 	 * @param {string} tag
 	 * @param {Parameters<this['getSkills']>[0]} [hidden]
 	 * @param {Parameters<SkillAI['skillTagFilter']>[2]} [arg]
-	 * @param {boolean} [globalskill]
+	 * @param {boolean} [globalskill] 只有为false才不添加全局技能ai进行筛选
 	 */
 	hasSkillTag(tag, hidden, arg, globalskill) {
 		var skills = this.getSkills(hidden);

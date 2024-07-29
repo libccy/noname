@@ -1426,15 +1426,6 @@ game.import("card", function () {
 					result: {
 						player(player, target) {
 							if (player._nanman_temp || player.hasSkillTag("jueqing", false, target)) return 0;
-							player._nanman_temp = true;
-							let eff = get.effect(
-								target,
-								new lib.element.VCard({ name: "nanman" }),
-								player,
-								target
-							);
-							delete player._nanman_temp;
-							if (eff >= 0) return 0;
 							if (
 								target.hp > 2 ||
 								(target.hp > 1 &&
@@ -1444,6 +1435,15 @@ game.import("card", function () {
 									target != game.falseZhu)
 							)
 								return 0;
+							player._nanman_temp = true;
+							let eff = get.effect(
+								target,
+								new lib.element.VCard({ name: "nanman" }),
+								player,
+								target
+							);
+							delete player._nanman_temp;
+							if (eff >= 0) return 0;
 							if (target.hp > 1 && target.hasSkillTag("respondSha", true, "respond", true))
 								return 0;
 							let known = target.getKnownCards(player);
@@ -1720,15 +1720,6 @@ game.import("card", function () {
 						player(player, target) {
 							if (player._wanjian_temp || player.hasSkillTag("jueqing", false, target))
 								return 0;
-							player._wanjian_temp = true;
-							let eff = get.effect(
-								target,
-								new lib.element.VCard({ name: "wanjian" }),
-								player,
-								target
-							);
-							delete player._wanjian_temp;
-							if (eff >= 0) return 0;
 							if (
 								target.hp > 2 ||
 								(target.hp > 1 &&
@@ -1738,6 +1729,15 @@ game.import("card", function () {
 									target != game.falseZhu)
 							)
 								return 0;
+							player._wanjian_temp = true;
+							let eff = get.effect(
+								target,
+								new lib.element.VCard({ name: "wanjian" }),
+								player,
+								target
+							);
+							delete player._wanjian_temp;
+							if (eff >= 0) return 0;
 							if (target.hp > 1 && target.hasSkillTag("respondShan", true, "respond", true))
 								return 0;
 							let known = target.getKnownCards(player);
