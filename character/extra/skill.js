@@ -2,6 +2,199 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//神黄忠
+	//丁真神将，赤矢神将，爆头神将，吃人神将
+	"1！5！": {
+		audio: 2,
+		trigger: { source: "damageSource" },
+		filter(event, player) {
+			return event.player.isIn() && event.source != event.player;
+		},
+		logTarget: "player",
+		prompt2: (event, player) => ("获得一个“赤”标记" + player.getStorage("1！5！_used").length >= 7 ? "" : "，然后可以击伤其一个部位"),
+		async content(event, trigger, player) {
+			player.addMark("1！5！", 1);
+			const target = trigger.player;
+			const places = lib.skill["1！5！"].derivation
+				.slice()
+				.filter(i => {
+					return !player.getStorage("1！5！_used").includes(i) && !target.getStorage("1！5！_injury").includes(i);
+				})
+				.randomGets(player.countMark("1！5！"));
+			if (!places.length) return;
+			const result = await player
+				.chooseButton(["毅武：是否击伤" + get.translation(target) + "的一个部位？", [places.slice().map(skill => [skill, '<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【' + get.translation(skill) + "】</div><div>" + lib.translate[skill + "_info"] + "</div></div>"]), "textbutton"]])
+				.set("ai", () => {
+					const player = get.player(),
+						target = get.event().getTrigger().player;
+					if (get.attitude(player, target) > 0) return 0;
+					return Math.random() + 1; //插眼，PZ157
+				})
+				.forResult();
+			if (result.bool) {
+				player.line(target);
+				const place = result.links[0];
+				player.popup(place, "fire");
+				game.log(player, "击伤了", target, "的", "#y" + get.translation(place));
+				target.addSkill("1！5！_injury");
+				target.markAuto("1！5！_injury", [place]);
+				switch (parseInt(place.slice("1！5！_place".length))) {
+					case 1:
+						if (target.getHp() > 0) await target.loseHp(target.getHp());
+						break;
+					case 2:
+						const cards = target
+							.getEquips(1)
+							.slice()
+							.concat(target.getEquips("equip3_4"))
+							.filter(card => lib.filter.canBeDiscarded(card, player, target));
+						if (cards.length) await target.discard(cards).set("discarder", player);
+						break;
+					case 3:
+						target.addTempSkill("1！5！_maxhand", { player: "phaseEnd" });
+						break;
+					case 4:
+						const cardx = target.getDiscardableCards(target, "h");
+						if (cardx.length) await target.discard(cardx.randomGets(2));
+						break;
+					case 5:
+						target.addTempSkill("1！5！_damage", { player: "phaseEnd" });
+						break;
+					case 6:
+						target.addTempSkill("1！5！_use", { player: "phaseEnd" });
+						break;
+					case 7:
+						target.addTempSkill("1！5！_respond", { player: "phaseEnd" });
+						break;
+				}
+			}
+		},
+		marktext: "赤",
+		intro: { content: "mark" },
+		frequent: true,
+		subfrequent: ["effect"],
+		derivation: ["1！5！_place1", "1！5！_place2", "1！5！_place3", "1！5！_place4", "1！5！_place5", "1！5！_place6", "1！5！_place7"],
+		group: ["1！5！_equip", "1！5！_effect"],
+		subSkill: {
+			equip: {
+				audio: "1！5！",
+				trigger: { player: "useCard" },
+				filter(event, player) {
+					return event.card.name == "sha" && player.getEquips(1).length > 0;
+				},
+				forced: true,
+				locked: false,
+				content() {
+					trigger.directHit.addArray(game.players);
+					game.log(trigger.card, "不可被响应");
+				},
+				ai: {
+					directHit_ai: true,
+					skillTagFilter(player, _, arg) {
+						return player.getEquips(1).length > 0 && arg.card?.name == "sha";
+					},
+				},
+			},
+			effect: {
+				audio: "1！5！",
+				trigger: { player: "useCardAfter" },
+				filter(event, player) {
+					return event.card.name == "sha" && !player.hasHistory("sourceDamage", evt => evt?.card == event.card);
+				},
+				prompt: "是否发动【毅武】摸两张牌？",
+				content() {
+					player.draw(2);
+				},
+			},
+			injury: {
+				charlotte: true,
+				mark: true,
+				intro: { content: "$已被击伤" },
+			},
+			maxhand: {
+				charlotte: true,
+				mark: true,
+				marktext: "伤",
+				intro: {
+					name: "中伤 - 手部",
+					content: "手牌上限变为原来的一半（向下取整）",
+				},
+				mod: {
+					maxHandcard(player, num) {
+						if (_status["1！5！_maxhand"]) return;
+						_status["1！5！_maxhand"] = true;
+						const numx = player.getHandcardLimit();
+						delete _status["1！5！_maxhand"];
+						return num - Math.ceil(numx);
+					},
+				},
+			},
+			damage: {
+				charlotte: true,
+				mark: true,
+				marktext: "伤",
+				intro: {
+					name: "中伤 - 下肢",
+					content: "体力值大于1时，受到的伤害+1",
+				},
+				trigger: { player: "damageBegin2" },
+				filter(event, player) {
+					return player.getHp() > 1;
+				},
+				forced: true,
+				popup: false,
+				content() {
+					trigger.num++;
+				},
+			},
+			use: {
+				charlotte: true,
+				mark: true,
+				marktext: "伤",
+				intro: {
+					name: "中伤 - 胸部",
+					content: (_, player) => (_status.currentPhase === player ? "" : "下回合") + "不能使用伤害牌",
+				},
+				mod: {
+					cardEnabled(card, player) {
+						if (_status.currentPhase !== player) return;
+						if (get.tag(card, "damage")) return false;
+					},
+				},
+			},
+			respond: {
+				charlotte: true,
+				mark: true,
+				marktext: "伤",
+				intro: {
+					name: "中伤 - 腹部",
+					content: (_, player) => "不能使用【闪】和【桃】",
+				},
+				mod: {
+					cardEnabled(card) {
+						if (card.name == "shan" || card.name == "tao") return false;
+					},
+					cardSavable(card) {
+						if (card.name == "tao") return false;
+					},
+				},
+			},
+		},
+	},
+	chiren: {
+		audio: 2,
+		trigger: { player: "phaseJieshuBegin" },
+		filter(event, player) {
+			return player.countMark("1！5！") >= player.getDamagedHp();
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			const num = player.countMark("1！5！");
+			await player.recoverTo(4);
+			player.clearMark("1！5！");
+			await player.draw(num);
+		},
+	},
 	//应天司马懿！肯定又要修改
 	jilin: {
 		audio: 5,

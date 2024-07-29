@@ -444,6 +444,22 @@ const translates = {
 	psdaohe_info: "出牌阶段限一次，你可以令一名其他角色交给你至少一张手牌，然后你令其回复1点体力。",
 	pszhiyi: "志异",
 	pszhiyi_info: "出牌阶段限一次，你可以令一名角色摸一张牌并对其造成1点伤害。",
+	shen_caoren: "神曹仁",
+	shen_caoren_prefix: "神",
+	shen_liubiao: "神刘表",
+	shen_liubiao_prefix: "神",
+	jingxiangshengshi: "荆襄盛世",
+	jingxiangshengshi_info: "出牌阶段，对X名其他角色使用，亮出牌堆顶存活角色数张牌，令这些角色依次获得其中一张，然后你获得剩余的牌（X为全场势力数）。",
+	jxjushou: "据守",
+	jxjushou_info: "结束阶段，你可以翻面并摸X张牌（X为场上存活人数），然后你可令全场角色翻面并各摸三张牌，若如此做你弃置场上所有装备牌，失去〖据守〗并获得〖突围〗。",
+	jxtuwei: "突围",
+	jxtuwei_info: "出牌阶段，你可将弃牌堆的一张装备牌置入一名角色对应的装备栏内，然后若其不为你，你可以令其摸一张牌或对其造成1点伤害。（每名角色限一次）",
+	jxxiongju: "雄踞",
+	jxxiongju_info: "锁定技，游戏开始时，你从游戏外获得两张【荆襄盛世】并摸X张牌，然后增加X点体力上限并恢复等量体力；你的手牌上限+X（X为场上势力数）。",
+	jxfujing: "富荆",
+	jxfujing_info: "锁定技，摸牌阶段开始前，你跳过此阶段并视为使用一张【荆襄盛世】；以此法获得牌的其他角色本轮首次对你使用牌时需弃置一张牌。",
+	jxyongrong: "雍容",
+	jxyongrong_info: "每回合限一次，你造成/受到伤害时，若受伤角色/伤害来源的手牌数小于你，你可以交给其一张牌令此伤害+1/-1。",
 };
 
 export default translates;

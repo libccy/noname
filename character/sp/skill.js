@@ -363,7 +363,7 @@ const skills = {
 							return (
 								evt.name == "dying" &&
 								!game.getAllGlobalHistory("everything", evtx => {
-									return evtx.name == "die" && evtx.getParent() == evt;
+									return evtx.name == "die" && evtx.getParent().name == 'dying';
 								}).length
 							);
 						})
