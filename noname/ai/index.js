@@ -11,23 +11,26 @@ export class AI {
 	 * @returns { string } cacheKey
 	 */
 	getCacheKey(obj, similar) {
-		let str = "";
+		let str = "[" + typeof obj + ":";
 		if (typeof obj !== "object" || obj === null) {
-			if (similar) str = "[" + typeof obj + ":";
-			return String(obj);
+			return str + String(obj) + "]";
 		}
 		if (Array.isArray(obj)) {
 			return "[array:[" + obj.map(i => {
-				return this.getCacheKey(i);
+				return this.getCacheKey(i, similar);
 			}).join("-") + "]]";
 		}
 		if (typeof obj.getCacheKey === "function") {
 			return obj.getCacheKey(similar);
 		}
+		if (similar !== false) {
+			if (get.itemtype(obj)) str = "[" + get.itemtype(obj) + ":";
+			else if (!similar) str = "[undefined:";
+		}
 		try {
-			return JSON.stringify(obj);
+			return str + JSON.stringify(obj) + "]";
 		} catch (error) {
-			return get.translation(obj);
+			return str + get.translation(obj) + "]";
 		}
 	}
 }

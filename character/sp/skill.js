@@ -393,6 +393,8 @@ const skills = {
 			}
 		},
 	},
+	rejianxiong_caoteng: { audio: true },
+	tianming_caoteng: { audio: true },
 	//步度根
 	//古希腊掌管扣工资的神（bushi
 	olkouchao: {
@@ -5232,15 +5234,15 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target) {
-					if (get.type(card) == "delay") return "zerotarget";
+				target_use: function (card, player, target) {
+					if (get.type(card) == "delay") return 0.1;
 				},
 			},
 		},
 		subSkill: {
 			skip: {
 				mark: true,
-				intro: { content: "跳过下个的判定阶段" },
+				intro: { content: "跳过下个判定阶段" },
 			},
 		},
 	},
@@ -5914,7 +5916,7 @@ const skills = {
 			diamond_ai: {
 				ai: {
 					effect: {
-						player_use(card, player, target) {
+						player(card, player, target) {
 							if (get.name(card) == "sha" && !player.hasSkill("oltianhou_diamond") && target != player.getNext() && target != player.getPrevious()) {
 								let num = get.number(card),
 									max = _status.aiyh_MAXNUM || 13;
@@ -8391,7 +8393,7 @@ const skills = {
 			threaten: 0.8,
 			neg: true,
 			effect: {
-				player_use(card, player, target) {
+				player(card, player, target) {
 					if ((!card.isCard || !card.cards) && get.itemtype(card) != "card") return;
 					let cs = 0;
 					if (
@@ -10093,7 +10095,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, current) {
+				target_use: function (card, player, target, current) {
 					if (card.name == "sha" && target.hp > 0 && current < 0 && target.countCards("he") > 0) return 0.7;
 				},
 			},
@@ -12351,7 +12353,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (card.name != "sha") return;
 					if (
 						target.hasSkillTag("unequip2") ||
@@ -12367,7 +12369,7 @@ const skills = {
 						})
 					)
 						return;
-					return "zerotarget";
+					return "zeroplayertarget";
 				},
 			},
 		},
@@ -12432,7 +12434,7 @@ const skills = {
 							card: card,
 						})
 					)
-						return "zerotarget";
+						return "zeroplayertarget";
 				},
 			},
 		},
@@ -16356,7 +16358,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target, current, isLink) {
+				player_use: function (card, player, target, current, isLink) {
 					if (!isLink && card.name == "sha") {
 						if (player._reduanbingtmp) return;
 						player._reduanbingtmp = true;
@@ -20975,7 +20977,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target, current, isLink) {
+				player_use: function (card, player, target, current, isLink) {
 					if (!isLink && card.name == "sha") {
 						if (player._duanbingtmp) return;
 						player._duanbingtmp = true;
@@ -25585,7 +25587,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card) {
+				target(card) {
 					if (get.type(card) != "trick") return;
 					if (card.name == "tiesuo") return [0, 0];
 					if (card.name == "yihuajiemu") return [0, 1];
@@ -28331,6 +28333,7 @@ const skills = {
 	},
 	tianming: {
 		audio: 2,
+		audioname2: { caoteng: "tianming_caoteng" },
 		trigger: { target: "useCardToTargeted" },
 		check: function (event, player) {
 			var cards = player.getCards("h");
@@ -29238,7 +29241,7 @@ const skills = {
 						if (get.equipValue(card) <= 8) return 0;
 					}
 					if (!target.hasEmptySlot(2)) return;
-					if (get.tag(card, "natureDamage")) return "zerotarget";
+					if (get.tag(card, "natureDamage")) return "zeroplayertarget";
 					if (get.type(card) == "trick" && get.tag(card, "damage")) {
 						return "zeroplayertarget";
 					}

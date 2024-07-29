@@ -1711,7 +1711,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player_use(card, player, target) {
+						player(card, player, target) {
 							if (get.name(card) == "shan") {
 								let num = get.number(card);
 								if (!num || num <= player.storage.shanxie_banned.num) return "zeroplayertarget";
@@ -2120,7 +2120,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target, current) {
+				target(card, player, target, current) {
 					if (card.name == "sha" && player.hp > target.hp && get.attitude(player, target) < 0) {
 						var num = get.number(card);
 						if (typeof num != "number") return false;

@@ -1390,7 +1390,7 @@ const skills = {
 			const prompt2 = `交给其一张牌并令此伤害${event.triggername == "damageBegin1" ? '+' : '-'}1`;
 			const result = await player.chooseCard(get.prompt("jxyongrong", target), prompt2, "he")
 				.set("ai", function (card) {
-					const eff = _status.event.eff, isPlayer = status.event.isPlayer;
+					const eff = _status.event.eff, isPlayer = _status.event.isPlayer;
 					if (isPlayer && eff < 0 || !isPlayer && eff > 0) return 6 - get.value(card);
 					return 0;
 				}).set("eff", get.damageEffect(trigger.player, trigger.source, player)).set("isPlayer", player == trigger.player).forResult();
@@ -1724,7 +1724,7 @@ const skills = {
 					let cards = trigger.getg(player);
 					await player.showCards(cards, get.translation(player) + "发动了【炎谋】");
 					cards = cards.filter(card => {
-						if (!player.hasUseTarget(card)) return false;
+						if (!player.hasUseTarget(card) || get.owner(card) !== player) return false;
 						return get.name(card) == "huogong" || (get.name(card) == "sha" && game.hasNature(card, "fire"));
 					});
 					if (cards.length) {

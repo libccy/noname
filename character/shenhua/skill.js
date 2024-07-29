@@ -941,7 +941,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					let hs = player.getCards("h", i => i !== card && (!card.cards || !card.cards.includes(i))),
 						num = player.getCardUsable("sha");
 					if ((card.name !== "sha" && card.name !== "juedou") || hs.length < target.countCards("h")) return 1;
@@ -2045,7 +2045,7 @@ const skills = {
 		ai: {
 			effect: {
 				player(card, player, target) {
-					if (get.tag(card, "damage") && !player.inRangeOf(target)) return "zerotarget";
+					if (get.tag(card, "damage") && !player.inRangeOf(target)) return "zeroplayertarget";
 				},
 			},
 		},
@@ -2229,6 +2229,20 @@ const skills = {
 	},
 	nzry_shicai: {
 		audio: "nzry_shicai_2",
+		locked: false,
+		mod: {
+			aiOrder(player, card, num) {
+				if (num <= 0 || player.nzry_shicai_aiOrder || get.itemtype(card) !== "card" || player.hasSkillTag("abnormalDraw")) return num;
+				let type = get.type2(card, false);
+				if (player.hasHistory("useCard", evt => {
+					return get.type2(evt.card, false) == type;
+				})) return num;
+				player.nzry_shicai_aiOrder = true;
+				let val = player.getUseValue(card, true, true);
+				delete player.nzry_shicai_aiOrder;
+				return 20 * val;
+			}
+		},
 		trigger: { player: ["useCardAfter", "useCardToTargeted"] },
 		prompt2(event, player) {
 			const cards = event.cards.filterInD("oe");
@@ -2323,6 +2337,12 @@ const skills = {
 		async content(event, trigger, player) {
 			trigger.bottom = true;
 		},
+		ai: {
+			abnormalDraw: true,
+			skillTagFilter: function (player, tag, arg) {
+				if (tag === "abnormalDraw") return !arg || arg === "bottom";
+			}
+		}
 	},
 	nzry_mingren: {
 		audio: "nzry_mingren_1",
@@ -3317,7 +3337,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target, current) {
+				target(card, player, target, current) {
 					if (card.name == "sha" && get.attitude(player, target) < 0) {
 						if (_status.event.name == "xiangle") return;
 						if (get.attitude(player, target) > 0 && current < 0) return "zerotarget";
@@ -4491,7 +4511,7 @@ const skills = {
 		ai: {
 			effect: {
 				target(card, player, target) {
-					if (card.name == "nanman") return 0;
+					if (card.name == "nanman") return "zeroplayertarget";
 				},
 			},
 		},
@@ -4574,7 +4594,7 @@ const skills = {
 		ai: {
 			effect: {
 				target(card) {
-					if (card.name == "nanman") return [0, 1];
+					if (card.name == "nanman") return [0, 1, 0, 0];
 				},
 			},
 		},
@@ -5743,14 +5763,65 @@ const skills = {
 		},
 	},
 	qiangxix: {
-		inherit: "reqiangxi",
-		audioname: ["boss_lvbu3"],
 		audio: "qiangxi",
+		audioname: ["boss_lvbu3"],
+		mod: {
+			aiOrder(player, card, num) {
+				if (
+					player.getEquips(1).length ||
+					get.subtype(card, player) !== "equip1" ||
+					!player.hasSkillTag("noe")
+				) return num;
+				return 10;
+			}
+		},
+		enable: "phaseUse",
 		usable: 2,
-		filterTarget(card, player, target) {
-			if (player == target) return false;
-			if (target.hasSkill("reqiangxi_off")) return false;
-			return true;
+		locked: false,
+		filter: function (event, player) {
+			if (player.hp < 1 && !player.hasCard(card => lib.skill.qiangxix.filterCard(card), "he")) return false;
+			return game.hasPlayer(current => lib.skill.qiangxix.filterTarget(null, player, current));
+		},
+		filterCard: function (card) {
+			return get.subtype(card) == "equip1";
+		},
+		position: "he",
+		filterTarget: function (card, player, target) {
+			if (target == player) return false;
+			var stat = player.getStat()._qiangxix;
+			return !stat || !stat.includes(target);
+		},
+		selectCard: function () {
+			if (_status.event.player.hp < 1) return 1;
+			return [0, 1];
+		},
+		content: function () {
+			var stat = player.getStat();
+			if (!stat._qiangxix) stat._qiangxix = [];
+			stat._qiangxix.push(target);
+			if (!cards.length) player.loseHp();
+			target.damage("nocard");
+		},
+		ai: {
+			damage: true,
+			order: 8,
+			result: {
+				player: function (player, target) {
+					if (ui.selected.cards.length) return 0;
+					if (player.hp >= target.hp) return -0.9;
+					if (player.hp <= 2) return -10;
+					return get.effect(player, { name: "losehp"}, player, player);
+				},
+				target: function (player, target) {
+					if (!ui.selected.cards.length) {
+						if (player.hp < 2) return 0;
+						if (player.hp == 2 && target.hp >= 2) return 0;
+						if (target.hp > player.hp) return 0;
+					}
+					return get.damageEffect(target, player, target);
+				},
+			},
+			threaten: 1.5,
 		},
 	},
 	qiangxi: {
@@ -6185,7 +6256,7 @@ const skills = {
 		ai: {
 			useShan: true,
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (
 						get.tag(card, "respondShan") &&
 						!player.hasSkillTag(
@@ -7153,7 +7224,7 @@ const skills = {
 			mingzhi: false,
 			useShan: true,
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (
 						get.tag(card, "respondShan") &&
 						!player.hasSkillTag(

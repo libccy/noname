@@ -17,11 +17,12 @@ const cards = {
 		},
 	},
 	jingxiangshengshi: {
-		audio:true,
-		fullskin:true,
-		type:"trick",
-		enable:true,
-		filterTarget:lib.filter.notMe,
+		audio: true,
+		fullskin: true,
+		derivation: "shen_liubiao",
+		type: "trick",
+		enable: true,
+		filterTarget: lib.filter.notMe,
 		selectTarget(){
 			return game.countGroup();
 		},
@@ -178,9 +179,11 @@ const cards = {
 				useful: 0.5,
 			},
 			result: {
+				player(player, target) {
+					return game.countPlayer() / game.countGroup() - 1;
+				},
 				target(player, target) {
-					const att = get.attitude(player, target);
-					return att > 0 ? att : -0.1;
+					return 1.8 / Math.sqrt(1 + get.distance(player, target, "absolute"));
 				},
 			},
 			tag: {

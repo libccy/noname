@@ -3075,7 +3075,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target) {
+				player_use: function (card, player, target) {
 					if (card.name != "juedou") return;
 					if (
 						player.hasSkillTag(
@@ -7326,7 +7326,7 @@ const skills = {
 								card: card,
 							})
 						)
-							return "zerotarget";
+							return "zeroplayertarget";
 						return [0.5, 0, 0.5, 0];
 					}
 					if (num === 1 && get.color(card) == "black") return "zeroplayertarget";
@@ -10823,12 +10823,14 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target) {
+				player_use: function (card, player, target) {
 					if (target != player.storage.yinju2) return;
 					if (card.name == "lebu") return;
-					if (card.name !== "huogong" && get.tag(card, "damage") && target.isDamaged()) [1, 0.6, 0, 2.4];
 					return [1, 0.6, 1, 0.6];
 				},
+				player(card, player, target) {
+					if (card.name !== "huogong" && get.tag(card, "damage") && target.isDamaged()) [1, 0, 0, 2];
+				}
 			},
 		},
 	},

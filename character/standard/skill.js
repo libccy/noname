@@ -798,7 +798,7 @@ const skills = {
 				},
 			},
 			effect: {
-				target(card, player, target) {
+				target_use(card, player, target) {
 					if (player == target && get.type(card) == "equip") {
 						if (player.countCards("e", { subtype: get.subtype(card) })) {
 							const players = game.filterPlayer();

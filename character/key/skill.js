@@ -10951,6 +10951,12 @@ const skills = {
 				else trigger.bottom = true;
 			} else trigger.directresult = get.bottomCards()[0];
 		},
+		ai: {
+			abnormalDraw: true,
+			skillTagFilter: function (player, tag, arg) {
+				if (tag === "abnormalDraw") return !arg || arg === "bottom";
+			}
+		}
 	},
 	//此花露西娅
 	lucia_duqu: {

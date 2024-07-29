@@ -1426,15 +1426,6 @@ game.import("card", function () {
 					result: {
 						player(player, target) {
 							if (player._nanman_temp || player.hasSkillTag("jueqing", false, target)) return 0;
-							player._nanman_temp = true;
-							let eff = get.effect(
-								target,
-								new lib.element.VCard({ name: "nanman" }),
-								player,
-								target
-							);
-							delete player._nanman_temp;
-							if (eff >= 0) return 0;
 							if (
 								target.hp > 2 ||
 								(target.hp > 1 &&
@@ -1444,6 +1435,15 @@ game.import("card", function () {
 									target != game.falseZhu)
 							)
 								return 0;
+							player._nanman_temp = true;
+							let eff = get.effect(
+								target,
+								new lib.element.VCard({ name: "nanman" }),
+								player,
+								target
+							);
+							delete player._nanman_temp;
+							if (eff >= 0) return 0;
 							if (target.hp > 1 && target.hasSkillTag("respondSha", true, "respond", true))
 								return 0;
 							let known = target.getKnownCards(player);
@@ -1720,15 +1720,6 @@ game.import("card", function () {
 						player(player, target) {
 							if (player._wanjian_temp || player.hasSkillTag("jueqing", false, target))
 								return 0;
-							player._wanjian_temp = true;
-							let eff = get.effect(
-								target,
-								new lib.element.VCard({ name: "wanjian" }),
-								player,
-								target
-							);
-							delete player._wanjian_temp;
-							if (eff >= 0) return 0;
 							if (
 								target.hp > 2 ||
 								(target.hp > 1 &&
@@ -1738,6 +1729,15 @@ game.import("card", function () {
 									target != game.falseZhu)
 							)
 								return 0;
+							player._wanjian_temp = true;
+							let eff = get.effect(
+								target,
+								new lib.element.VCard({ name: "wanjian" }),
+								player,
+								target
+							);
+							delete player._wanjian_temp;
+							if (eff >= 0) return 0;
 							if (target.hp > 1 && target.hasSkillTag("respondShan", true, "respond", true))
 								return 0;
 							let known = target.getKnownCards(player);
@@ -2723,7 +2723,7 @@ game.import("card", function () {
 							if (targets.length) {
 								let preTarget = targets.at(-1),
 									pre = _status.event.getTempCache("jiedao_result", preTarget.playerid);
-								if (pre && pre.target.isIn() && pre.card === ai.getCacheKey(card, true))
+								if (pre && pre.target && pre.target.isIn() && pre.card === ai.getCacheKey(card, true))
 									return target === pre.target ? pre.res : 0;
 								return (
 									get.effect(target, { name: "sha" }, preTarget, target) /
@@ -2740,7 +2740,7 @@ game.import("card", function () {
 									if (eff < num) return num;
 									addTar = current;
 									return eff;
-								}, 0);
+								}, -Infinity);
 							if (addTar) sha = get.effect(addTar, { name: "sha" }, target, target) / 10;
 							let res = target.getEquips(1).reduce((num, i) => {
 								return num + get.value(i, target);

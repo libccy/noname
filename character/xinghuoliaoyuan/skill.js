@@ -515,7 +515,7 @@ const skills = {
 		ai: {
 			reverseEquip: true,
 			effect: {
-				target: function (card, player, target, current) {
+				target_use: function (card, player, target, current) {
 					if (get.type(card) == "equip" && player == target && player == _status.currentPhase && get.subtype(card) == "equip1") return [1, 3];
 				},
 			},

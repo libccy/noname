@@ -2228,7 +2228,7 @@ const skills = {
 				},
 				ai: {
 					effect: {
-						player_use(card, player, target, current) {
+						player(card, player, target, current) {
 							if (get.type(card) == "trick" && player.getStorage("dcjujian_forbid").includes(target)) return "zeroplayertarget";
 						},
 					},
@@ -4532,7 +4532,7 @@ const skills = {
 							return [1, -2];
 						} else {
 							if (get.attitude(player, target) > 0 && target.hp > 1) {
-								return 0;
+								return "zeroplayertarget";
 							}
 							if (get.attitude(player, target) < 0 && !player.hasSkillTag("damageBonus")) {
 								if (card.name == "sha") return;
@@ -4557,7 +4557,7 @@ const skills = {
 									if (enemies.length == 1 && enemies[0] == target && player.needsToDiscard()) {
 										return;
 									}
-									return 0;
+									return "zeroplayertarget";
 								}
 							}
 						}
@@ -6866,7 +6866,7 @@ const skills = {
 				if (name != "phase") return false;
 			},
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (player === target || typeof card !== "object" || get.color(card) !== "black") return;
 					if (target.hasSkill("jiu")) {
 						if (
@@ -8187,7 +8187,7 @@ const skills = {
 			effect: {
 				player_use(card, player, target) {
 					var evt = player.getLastUsed();
-					if (evt && evt.targets.includes(target)) return [1.5, 0];
+					if (evt && evt.targets.includes(target)) return [1, 1];
 				},
 			},
 		},
@@ -8773,7 +8773,7 @@ const skills = {
 				target: function (card, player, target, current) {
 					if (get.type(card) == "delay" && current < 0) {
 						var current = _status.currentPhase;
-						if (current.getSeatNum() > target.getSeatNum()) return "zerotarget";
+						if (current.getSeatNum() > target.getSeatNum()) return 0.1;
 					}
 				},
 			},
@@ -10076,7 +10076,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					if (player === target) return;
 					if (
 						game.hasPlayer2(current => {
@@ -10625,7 +10625,10 @@ const skills = {
 							if (typeof card != "object") return;
 							var storage = player.getStorage("olddcxiangmian_countdown");
 							for (var i = 0; i < storage.length / 3; i++) {
-								if (get.suit(card, player) == storage[i * 3 + 1] && storage[i * 3 + 2] == 1 && !player.canSave(player) && !get.tag(card, "save")) return "zeroplayertarget";
+								if (get.suit(card, player) == storage[i * 3 + 1] && storage[i * 3 + 2] == 1) {
+									if (!player.canSave(player) && !get.tag(card, "save")) return [0, -100, 0, 0];
+									return [1, -2 * player.hp, 1, 0];
+								}
 							}
 						},
 					},
@@ -10727,7 +10730,10 @@ const skills = {
 							if (typeof card != "object") return;
 							var storage = player.getStorage("dcxiangmian_countdown");
 							for (var i = 0; i < storage.length / 3; i++) {
-								if ((storage[i * 3 + 2] == 1 || get.suit(card, player) == storage[i * 3 + 1]) && !player.canSave(player) && !get.tag(card, "save")) return "zeroplayertarget";
+								if ((storage[i * 3 + 2] == 1 || get.suit(card, player) == storage[i * 3 + 1])) {
+									if (!player.canSave(player) && !get.tag(card, "save")) return [0, -100, 0, 0];
+									return [1, -2 * player.hp, 1, 0];
+								}
 							}
 						},
 					},
@@ -14293,7 +14299,7 @@ const skills = {
 							return evtx && evtx.name == "xinyingbing" && evtx._trigger.target == target;
 						})
 					)
-						return [1, 1];
+						return [1, 2];
 				},
 			},
 			combo: "xinzhoufu",
@@ -16677,7 +16683,7 @@ const skills = {
 		ai: {
 			effect: {
 				target: function (card) {
-					if (card.name == "nanman") return "zerotarget";
+					if (card.name == "nanman") return "zeroplayertarget";
 				},
 			},
 		},
