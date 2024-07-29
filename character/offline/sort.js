@@ -10,6 +10,7 @@ const characterSort = {
 	offline_piracyK: ["pk_sp_duyu"],
 	offline_vtuber: ["vtb_xiaosha", "vtb_xiaoshan", "vtb_xiaotao", "vtb_xiaole", "vtb_xiaojiu"],
 	offline_longyutao: ["drag_guanyu", "drag_caoren", "drag_lvchang"],
+	offline_jingxiang: ["shen_caoren", "shen_liubiao"],
 	//offline_others:[""],
 };
 
@@ -28,6 +29,7 @@ const characterSortTranslate = {
 	offline_piracyK: "官盗K系列",
 	offline_others: "线下其他系列",
 	offline_longyutao: "龙起襄樊",
+	offline_jingxiang: "荆襄风云",
 };
 
 export { characterSort, characterSortTranslate };

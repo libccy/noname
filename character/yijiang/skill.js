@@ -2743,7 +2743,7 @@ const skills = {
 					}
 				}
 			}
-			var next = player.chooseToMove("通博：是否交换“书”和手牌？").set("four", four).set("suits2", suits2).set("nofour", nofour);
+			var next = player.chooseToMove("通博：是否交换“书”和手牌？").set("four", four).set("nofour", nofour);
 			next.set("list", [
 				[get.translation(player) + "（你）的“书”", expansions],
 				["你的牌", player.getCards("he")],
