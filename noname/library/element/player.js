@@ -8312,6 +8312,7 @@ export class Player extends HTMLDivElement {
 			player.removeEquipTrigger(VCard);
 			cards.remove(VCard);
 		}
+		if (lib.config.equip_span) player.$handleEquipChange();
 	}
 	removeEquipTrigger(card) {
 		if (_status.video) return;
