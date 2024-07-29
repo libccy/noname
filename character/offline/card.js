@@ -17,11 +17,12 @@ const cards = {
 		},
 	},
 	jingxiangshengshi: {
-		audio:true,
-		fullskin:true,
-		type:"trick",
-		enable:true,
-		filterTarget:lib.filter.notMe,
+		audio: true,
+		fullskin: true,
+		derivation: "shen_liubiao",
+		type: "trick",
+		enable: true,
+		filterTarget: lib.filter.notMe,
 		selectTarget(){
 			return game.countGroup();
 		},

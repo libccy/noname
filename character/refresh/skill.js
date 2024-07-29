@@ -14165,6 +14165,7 @@ const skills = {
 	rejianxiong: {
 		audio: 2,
 		audioname: ["shen_caopi"],
+		audioname2: { caoteng: "rejianxiong_caoteng" },
 		trigger: { player: "damageEnd" },
 		filter: function (event, player) {
 			return get.itemtype(event.cards) == "cards" && get.position(event.cards[0], true) == "o";

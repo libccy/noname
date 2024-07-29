@@ -393,6 +393,8 @@ const skills = {
 			}
 		},
 	},
+	rejianxiong_caoteng: { audio: true },
+	tianming_caoteng: { audio: true },
 	//步度根
 	//古希腊掌管扣工资的神（bushi
 	olkouchao: {
@@ -28330,6 +28332,7 @@ const skills = {
 	},
 	tianming: {
 		audio: 2,
+		audioname2: { caoteng: "tianming_caoteng" },
 		trigger: { target: "useCardToTargeted" },
 		check: function (event, player) {
 			var cards = player.getCards("h");
