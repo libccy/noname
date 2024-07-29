@@ -8116,10 +8116,6 @@ export class Game extends GameCompatible {
 	}
 	/**
 	 * @overload
-	 * @returns { Player[] }
-	 */
-	/**
-	 * @overload
 	 * @param { (player: Player) => boolean } func
 	 * @param { Player[] } [list]
 	 * @param { boolean } [includeOut]
@@ -8130,10 +8126,6 @@ export class Game extends GameCompatible {
 		if (typeof func != "function") func = lib.filter.all;
 		return list.addArray(game.players.filter(value => (includeOut || !value.isOut()) && func(value)));
 	}
-	/**
-	 * @overload
-	 * @returns { Player[] }
-	 */
 	/**
 	 * @overload
 	 * @param { (player: Player) => boolean } func

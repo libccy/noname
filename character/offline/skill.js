@@ -544,7 +544,7 @@ const skills = {
 					let cards = trigger.getg(player);
 					await player.showCards(cards, get.translation(player) + "发动了【炎谋】");
 					cards = cards.filter(card => {
-						if (!player.hasUseTarget(card)) return false;
+						if (!player.hasUseTarget(card) || get.owner(card) !== player) return false;
 						return get.name(card) == "huogong" || (get.name(card) == "sha" && game.hasNature(card, "fire"));
 					});
 					if (cards.length) {

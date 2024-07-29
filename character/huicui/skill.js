@@ -566,6 +566,15 @@ const skills = {
 			canBeDiscarded(card, player) {
 				if (get.position(card) == "h") return false;
 			},
+			aiOrder(player, card, num) {
+				if (num > 0 && get.name(card, player) == "huogong") return 0;
+			},
+			aiValue(player, card, num) {
+				if (num > 0 && get.name(card, player) == "huogong") return 0.01;
+			},
+			aiUseful(player, card, num) {
+				if (num > 0 && get.name(card, player) == "huogong") return 0;
+			}
 		},
 		group: "dctunchu_limit",
 		subSkill: {
@@ -1834,7 +1843,7 @@ const skills = {
 						player
 							.when(["phaseBegin", "dieBegin"])
 							.then(() => {
-								target.removeMark("dcfuli_range", 1, false);
+								target.removeMark("dcfuli_range", target.countMark("dcfuli_range"), false);
 								if (!target.hasMark("dcfuli_range")) target.removeSkill("dcfuli_range");
 							})
 							.vars({ target: target });

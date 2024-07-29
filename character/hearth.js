@@ -9546,7 +9546,12 @@ game.import("character", function () {
 				ai: {
 					order: 9.5,
 					result: {
-						player: 1,
+						player: (player, target) => {
+							return lib.card.shunshou.ai.result.player(player, target) - 3 / game.countPlayer();
+						},
+						target: (player, target) => {
+							return lib.card.shunshou.ai.result.target(player, target);
+						}
 					},
 					tag: {
 						multitarget: 1,
