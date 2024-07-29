@@ -7642,13 +7642,6 @@ export class Player extends HTMLDivElement {
 			this.classList.remove("linked");
 		}
 	}
-	/**
-	 * @param { string | Card | VCard } card
-	 * @param { Player } target
-	 * @param { boolean } [distance]
-	 * @param { GameEventPromise | boolean } [includecard]
-	 * @returns { boolean }
-	 */
 	canUse(card, target, distance, includecard) {
 		if (typeof card == "string") card = { name: card, isCard: true };
 		var info = get.info(card);

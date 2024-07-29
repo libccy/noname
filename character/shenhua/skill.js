@@ -941,7 +941,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target) {
+				target(card, player, target) {
 					let hs = player.getCards("h", i => i !== card && (!card.cards || !card.cards.includes(i))),
 						num = player.getCardUsable("sha");
 					if ((card.name !== "sha" && card.name !== "juedou") || hs.length < target.countCards("h")) return 1;
@@ -2045,7 +2045,7 @@ const skills = {
 		ai: {
 			effect: {
 				player(card, player, target) {
-					if (get.tag(card, "damage") && !player.inRangeOf(target)) return "zerotarget";
+					if (get.tag(card, "damage") && !player.inRangeOf(target)) return "zeroplayertarget";
 				},
 			},
 		},
@@ -2229,6 +2229,20 @@ const skills = {
 	},
 	nzry_shicai: {
 		audio: "nzry_shicai_2",
+		locked: false,
+		mod: {
+			aiOrder(player, card, num) {
+				if (num <= 0 || player.nzry_shicai_aiOrder || get.itemtype(card) !== "card" || player.hasSkillTag("abnormalDraw")) return num;
+				let type = get.type2(card, false);
+				if (player.hasHistory("useCard", evt => {
+					return get.type2(evt.card, false) == type;
+				})) return num;
+				player.nzry_shicai_aiOrder = true;
+				let val = player.getUseValue(card, true, true);
+				delete player.nzry_shicai_aiOrder;
+				return 20 * val;
+			}
+		},
 		trigger: { player: ["useCardAfter", "useCardToTargeted"] },
 		prompt2(event, player) {
 			const cards = event.cards.filterInD("oe");
@@ -2323,6 +2337,12 @@ const skills = {
 		async content(event, trigger, player) {
 			trigger.bottom = true;
 		},
+		ai: {
+			abnormalDraw: true,
+			skillTagFilter: function (player, tag, arg) {
+				if (tag === "abnormalDraw") return !arg || arg === "bottom";
+			}
+		}
 	},
 	nzry_mingren: {
 		audio: "nzry_mingren_1",
@@ -3317,7 +3337,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target_use(card, player, target, current) {
+				target(card, player, target, current) {
 					if (card.name == "sha" && get.attitude(player, target) < 0) {
 						if (_status.event.name == "xiangle") return;
 						if (get.attitude(player, target) > 0 && current < 0) return "zerotarget";
@@ -4491,7 +4511,7 @@ const skills = {
 		ai: {
 			effect: {
 				target(card, player, target) {
-					if (card.name == "nanman") return 0;
+					if (card.name == "nanman") return "zeroplayertarget";
 				},
 			},
 		},
@@ -4574,7 +4594,7 @@ const skills = {
 		ai: {
 			effect: {
 				target(card) {
-					if (card.name == "nanman") return [0, 1];
+					if (card.name == "nanman") return [0, 1, 0, 0];
 				},
 			},
 		},
@@ -6185,7 +6205,7 @@ const skills = {
 		ai: {
 			useShan: true,
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (
 						get.tag(card, "respondShan") &&
 						!player.hasSkillTag(
@@ -7153,7 +7173,7 @@ const skills = {
 			mingzhi: false,
 			useShan: true,
 			effect: {
-				target(card, player, target, current) {
+				target_use(card, player, target, current) {
 					if (
 						get.tag(card, "respondShan") &&
 						!player.hasSkillTag(
