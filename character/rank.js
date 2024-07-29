@@ -1136,6 +1136,7 @@ window.noname_character_rank = {
 		"jsrg_sunlubansunluyu",
 		"jsrg_weiwenzhugezhi",
 		"shen_xuzhu",
+		"shen_huangzhong",
 		"dc_jiangji",
 		"dc_wangling",
 		"yangfeng",
@@ -2891,6 +2892,7 @@ window.noname_character_rank = {
 			"licuilianzhaoquanding",
 		],
 		junk: [
+			"shen_huangzhong",
 			"ol_peixiu",
 			"ol_sb_guanyu",
 			"junk_guanyu",
