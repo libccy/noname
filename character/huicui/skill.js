@@ -1843,7 +1843,7 @@ const skills = {
 						player
 							.when(["phaseBegin", "dieBegin"])
 							.then(() => {
-								target.removeMark("dcfuli_range", 1, false);
+								target.removeMark("dcfuli_range", target.countMark("dcfuli_range"), false);
 								if (!target.hasMark("dcfuli_range")) target.removeSkill("dcfuli_range");
 							})
 							.vars({ target: target });
