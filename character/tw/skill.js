@@ -5042,57 +5042,81 @@ const skills = {
 			return player.countCards("he");
 		},
 		direct: true,
+		chooseAi: (event, player) => {
+			let cards = [], wq = []; //把武器牌和其他能弃置的牌分别按value从小到大排序
+			player.getCards("he", card => { //[价值, id, 是否为武器牌]
+				if (!lib.filter.cardDiscardable(card, player)) return false;
+				if (get.subtype(card) == "equip1") wq.push([get.value(card, player), card.cardid, true]);
+				else cards.push([get.value(card, player), card.cardid]);
+			});
+			cards.sort((a, b) => {
+				return a[0] - b[0];
+			});
+			wq.sort((a, b) => {
+				return a[0] - b[0];
+			});
+			let targets = [], //适合目标：[目标, 收益, 牌组]
+				damage = get.damageEffect(player, player, event.player);
+			game.countPlayer(cur => {
+				if (player === cur) return false;
+				let eff = get.damageEffect(cur, player, event.player);
+				let dui = eff + damage - 2 * (wq.length ? wq[0][0] : cards[0][0]); //对砸
+				if (eff <= 0) {
+					if (dui > 0) targets.push([cur, dui, [wq.length ? wq[0][1] : cards[0][1]]]); //这都能卖血？！
+					return false;
+				}
+				if (
+					cards.length + wq.length <= cur.hp && //牌不够弃且没有武器可砸或者有但是太亏的不选
+					(!wq.length || dui <= 0)
+				) return false;
+				let allcards = cards.concat(wq).sort((a, b) => {
+						return a[0] - b[0];
+					}), can; //所有可弃牌再从小到大排序
+				if (allcards.length <= cur.hp) { //牌不够弃拿一张武器崩血的
+					targets.push([cur, dui, [wq[0][1]]]);
+					return false;
+				}
+				can = eff - allcards.slice(0, cur.hp + 1).reduce((acc, val) => acc + val[0], 0);
+				if (!wq.length) { //没武器只能凑数砸的
+					if (can > 0) targets.push([cur, can, allcards.slice(0, cur.hp + 1).map(i => i[1])]);
+					return false;
+				}
+				let other = [wq[0]]; //拿最便宜的武器补刀
+				for (let card of allcards) {
+					if (other.length > cur.hp) break;
+					if (wq[0][1] === card[1]) continue;
+					other.push(card);
+				}
+				if (can < 2 * eff - other.reduce((acc, val) => acc + val[0], 0)) {
+					can = 2 * eff - other.reduce((acc, val) => acc + val[0], 0);
+					allcards = other.map(i => i[1]);
+				}
+				if (dui > can) {
+					can = dui;
+					allcards = [wq[0][1]];
+				}
+				if (can > 0) targets.push([cur, can, allcards]);
+			});
+			if (targets.length) return targets.sort((a, b) => {
+				return b[1] - a[1];
+			})[0];
+			return [null, 0, []];
+		},
 		content: function () {
 			"step 0";
-			var list = [[], []];
-			for (var current of game.players) {
-				if (current == player) continue;
-				var cards = [];
-				var weapon = false;
-				for (var card of player.getCards("he")) {
-					if (!lib.filter.cardDiscardable(card, player)) continue;
-					if (get.subtype(card) == "equip1" && !ui.selected.cards.some(i => get.subtype(i) == "equip1")) {
-						if (16 - get.value(card) > 0) {
-							cards.push(card);
-							weapon = true;
-						}
-					}
-					if (7 - get.value(card) > 0) cards.push(card);
-				}
-				if (cards.length > current.hp) {
-					var val = 0;
-					for (var card of cards) {
-						if (get.subtype(card) != "equip1") val += get.value(card);
-					}
-					if (val < 30) list[0].push(current);
-				}
-				if ((weapon && player.hp > 2) || get.damageEffect(player, current, player) > 10) list[1].push(current);
-			}
-			list[0].sort((a, b) => {
-				return get.damageEffect(b, player, player) - get.damageEffect(a, player, player);
-			});
 			player.chooseCardTarget({
 				filterCard: lib.filter.cardDiscardable,
 				selectCard: [1, Infinity],
 				position: "he",
 				filterTarget: lib.filter.notMe,
 				prompt: get.prompt2("twliexi"),
-				targetsx: [list[0][0], list[1][0]],
+				aiSelected: lib.skill.twliexi.chooseAi(_status.event, player),
 				ai1: function (card) {
-					var targetx = _status.event.targetsx[0];
-					var hasWeapon = ui.selected.cards.some(i => get.subtype(i) == "equip1");
-					if (!targetx) {
-						var targetx = _status.event.targetsx[1];
-						if (get.subtype(card) == "equip1" && !hasWeapon) return 30 - get.value(card);
-						return -get.value(card);
-					}
-					if (ui.selected.cards.length > targetx.hp) return 0;
-					if (get.subtype(card) == "equip1" && !hasWeapon) return 30 - get.value(card);
-					return 7 - get.value(card);
+					if (get.event().aiSelected[2].includes(card.cardid)) return 30 - get.value(card);
+					return 0;
 				},
 				ai2: function (target) {
-					var targetx = _status.event.targetsx[0] || _status.event.targetsx[1];
-					if (targetx == target) return 10;
+					if (get.event().aiSelected[0] === target) return 10;
 					return 0;
 				},
 			});
