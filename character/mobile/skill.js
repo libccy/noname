@@ -7033,8 +7033,7 @@ const skills = {
 					global: "loseAsyncAfter",
 				},
 				filter: function (event, player, name) {
-					if (!player.countCards("h")) return false;
-					return name == "useCard1" || event.getg(player).length;
+					return name == "useCard1" || event.getg(player).length && player.countCards("h");
 				},
 				direct: true,
 				firstDo: true,
