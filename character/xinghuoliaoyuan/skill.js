@@ -871,7 +871,7 @@ const skills = {
 			game.addGlobalSkill("xinfu_guanwei_ai");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("xinfu_guanwei"), true)) game.removeGlobalSkill("xinfu_guanwei_ai");
+			if (!game.hasPlayer(i => i.hasSkill("xinfu_guanwei", null, null, false), true)) game.removeGlobalSkill("xinfu_guanwei_ai");
 		},
 		trigger: {
 			global: "phaseUseEnd",
@@ -920,7 +920,7 @@ const skills = {
 			ai: {
 				trigger: { player: "dieAfter" },
 				filter: () => {
-					return !game.hasPlayer(i => i.hasSkill("xinfu_guanwei"), true);
+					return !game.hasPlayer(i => i.hasSkill("xinfu_guanwei", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,

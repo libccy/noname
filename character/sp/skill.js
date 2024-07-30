@@ -7850,7 +7850,7 @@ const skills = {
 			game.addGlobalSkill("olkangrui_ai");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("olkangrui"), true)) game.removeGlobalSkill("olkangrui_ai");
+			if (!game.hasPlayer(i => i.hasSkill("olkangrui", null, null, false), true)) game.removeGlobalSkill("olkangrui_ai");
 		},
 		trigger: { global: "damageEnd" },
 		filter: function (event, player) {
@@ -7956,7 +7956,7 @@ const skills = {
 			ai: {
 				trigger: { player: "dieAfter" },
 				filter: () => {
-					return !game.hasPlayer(i => i.hasSkill("olkangrui"), true);
+					return !game.hasPlayer(i => i.hasSkill("olkangrui", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,
@@ -26622,6 +26622,9 @@ const skills = {
 		init(player) {
 			game.addGlobalSkill("shoucheng_draw", player);
 		},
+		onremove: () => {
+			if (!game.hasPlayer(i => i.hasSkill("shoucheng", null, null, false), true)) game.removeGlobalSkill("shoucheng_draw");
+		},
 		trigger: {
 			global: ["equipAfter", "addJudgeAfter", "loseAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 		},
@@ -26668,7 +26671,7 @@ const skills = {
 				trigger: { player: "dieAfter" },
 				filter(event, player) {
 					return !game.hasPlayer(current => {
-						return current.hasSkill("shoucheng");
+						return current.hasSkill("shoucheng", null, null, false);
 					}, true);
 				},
 				content() {

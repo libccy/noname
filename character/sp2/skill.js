@@ -3542,7 +3542,7 @@ const skills = {
 			game.addGlobalSkill("dcchongyi_ai");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("dcchongyi"), true)) game.removeGlobalSkill("dcchongyi_ai");
+			if (!game.hasPlayer(i => i.hasSkill("dcchongyi", null, null, false), true)) game.removeGlobalSkill("dcchongyi_ai");
 		},
 		trigger: { global: "useCard" },
 		logTarget: "player",
@@ -3592,7 +3592,7 @@ const skills = {
 				},
 				trigger: { player: "dieAfter" },
 				filter: () => {
-					return !game.hasPlayer(i => i.hasSkill("dcchongyi"), true);
+					return !game.hasPlayer(i => i.hasSkill("dcchongyi", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,
@@ -9127,14 +9127,14 @@ const skills = {
 		init(player) {
 			game.addGlobalSkill("gangzhi_jueqing");
 		},
-		onremove(player) {
-			game.removeGlobalSkill("gangzhi_jueqing");
+		onremove() {
+			if (!game.hasPlayer(cur => cur.hasSkill("gangzhi", null, null, false), true)) game.removeGlobalSkill("gangzhi_jueqing");
 		},
 		subSkill: {
 			jueqing: {
 				trigger: {player: "dieAfter"},
 				filter(event, player) {
-					return !game.hasPlayer(cur => cur.hasSkill("gangzhi"));
+					return !game.hasPlayer(cur => cur.hasSkill("gangzhi", null, null, false));
 				},
 				silent: true,
 				forceDie: true,

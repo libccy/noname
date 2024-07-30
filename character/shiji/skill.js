@@ -6509,7 +6509,7 @@ const skills = {
 			game.addGlobalSkill("spshanxi_bj");
 		},
 		onremove: function (player) {
-			if (!game.hasPlayer(current => current.hasSkill("spshanxi"), true)) game.removeGlobalSkill("spshanxi_bj");
+			if (!game.hasPlayer(current => current.hasSkill("spshanxi", null, null, false), true)) game.removeGlobalSkill("spshanxi_bj");
 		},
 		trigger: { player: "phaseUseBegin" },
 		direct: true,
@@ -6578,7 +6578,7 @@ const skills = {
 		trigger: { player: "dieAfter" },
 		filter: function (event, player) {
 			for (let i of game.players) {
-				if (i.hasSkill("spshanxi_suoming")) return false;
+				if (i.hasSkill("spshanxi_suoming", null, null, false)) return false;
 			}
 			return true;
 		},

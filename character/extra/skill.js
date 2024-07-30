@@ -1791,7 +1791,7 @@ const skills = {
 			game.addGlobalSkill("jxlianpo_global");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("jxlianpo"), true)) game.removeGlobalSkill("jxlianpo_global");
+			if (!game.hasPlayer(i => i.hasSkill("jxlianpo", null, null, false), true)) game.removeGlobalSkill("jxlianpo_global");
 		},
 		trigger: { global: "dieAfter" },
 		filter(event, player) {
@@ -1980,7 +1980,7 @@ const skills = {
 				},
 				trigger: { player: "dieAfter" },
 				filter: () => {
-					return !game.hasPlayer(i => i.hasSkill("jxlianpo"), true);
+					return !game.hasPlayer(i => i.hasSkill("jxlianpo", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,

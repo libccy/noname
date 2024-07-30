@@ -4655,7 +4655,7 @@ const skills = {
 			game.addGlobalSkill("oldmoyu_ai");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("oldmoyu"), true)) game.removeGlobalSkill("oldmoyu_ai");
+			if (!game.hasPlayer(i => i.hasSkill("oldmoyu", null, null, false), true)) game.removeGlobalSkill("oldmoyu_ai");
 		},
 		enable: "phaseUse",
 		filter: function (event, player) {
@@ -4711,7 +4711,7 @@ const skills = {
 			ai: {
 				trigger: { player: "dieAfter" },
 				filter: () => {
-					return !game.hasPlayer(i => i.hasSkill("oldmoyu"), true);
+					return !game.hasPlayer(i => i.hasSkill("oldmoyu", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,
@@ -12538,7 +12538,7 @@ const skills = {
 			game.addGlobalSkill("fengxiang_use");
 		},
 		onremove: function (player) {
-			if (!game.hasPlayer(current => current.hasSkill("fengxiang"), true)) game.removeGlobalSkill("fengxiang_use");
+			if (!game.hasPlayer(current => current.hasSkill("fengxiang", null, null, false), true)) game.removeGlobalSkill("fengxiang_use");
 		},
 		trigger: { player: "damageEnd" },
 		forced: true,
@@ -12586,7 +12586,7 @@ const skills = {
 				},
 				trigger: { player: "dieAfter" },
 				filter: function (event, player) {
-					return !game.hasPlayer(current => current.hasSkill("fengxiang"), true);
+					return !game.hasPlayer(current => current.hasSkill("fengxiang", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,

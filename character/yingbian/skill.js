@@ -2590,7 +2590,7 @@ const skills = {
 			game.addGlobalSkill("ciwei_ai");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("ciwei"), true)) game.removeGlobalSkill("ciwei_ai");
+			if (!game.hasPlayer(i => i.hasSkill("ciwei", null, null, false), true)) game.removeGlobalSkill("ciwei_ai");
 		},
 		trigger: { global: "useCard" },
 		direct: true,
@@ -2652,7 +2652,7 @@ const skills = {
 		},
 		trigger: { player: "dieAfter" },
 		filter: () => {
-			return !game.hasPlayer(i => i.hasSkill("ciwei"), true);
+			return !game.hasPlayer(i => i.hasSkill("ciwei", null, null, false), true);
 		},
 		silent: true,
 		forceDie: true,
