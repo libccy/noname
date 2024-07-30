@@ -892,12 +892,7 @@ const skills = {
 				forced: true,
 				locked: false,
 				filter(event, player) {
-					return (
-						!event.numFixed &&
-						game.hasPlayer(current => {
-							return current.hasDisabledSlot(1);
-						})
-					);
+					return !event.numFixed;
 				},
 				async content(event, trigger, player) {
 					trigger.num += Math.min(
@@ -7038,8 +7033,7 @@ const skills = {
 					global: "loseAsyncAfter",
 				},
 				filter: function (event, player, name) {
-					if (!player.countCards("h")) return false;
-					return name == "useCard1" || event.getg(player).length;
+					return name == "useCard1" || event.getg(player).length && player.countCards("h");
 				},
 				direct: true,
 				firstDo: true,

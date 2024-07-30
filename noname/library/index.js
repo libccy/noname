@@ -13790,6 +13790,22 @@ export class Library {
 			},
 		],
 		[
+			"荆",
+			{
+				color: "#00ff00",
+				nature: "firemm",
+			},
+		],
+		[
+			"荆神",
+			{
+				/**
+				 * @returns {string}
+				 */
+				getSpan: () => `${get.prefixSpan("荆")}${get.prefixSpan("神")}`,
+			},
+		],
+		[
 			"魂",
 			{
 				color: "#ffff99",

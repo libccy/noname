@@ -910,9 +910,8 @@ const skills = {
 				event.finish();
 			}
 			"step 2";
-			var next = trigger.player.phaseUse();
-			event.next.remove(next);
-			trigger.getParent("phase").next.push(next);
+			var evt=trigger.getParent("phase",true);
+			if(evt) evt.phaseList.splice(evt.num, 0, "phaseUse|xinfu_guanwei");
 		},
 		ai: {
 			expose: 0.5,

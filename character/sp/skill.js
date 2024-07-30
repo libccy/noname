@@ -2802,6 +2802,7 @@ const skills = {
 					filterCard: true,
 					selectCard: [1, Infinity],
 					filterTarget: lib.filter.notMe,
+					position: "he",
 					complexCard: true,
 					complexTarget: true,
 					complexSelect: true,

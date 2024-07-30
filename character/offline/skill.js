@@ -3,6 +3,135 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//荆襄风云
+	jxxiongzi: {
+		audio: "reyingzi",
+		trigger: {
+			player: "phaseDrawBegin2",
+		},
+		forced: true,
+		preHidden: true,
+		filter: function (event, player) {
+			return !event.numFixed;
+		},
+		content: function () {
+			trigger.num += player.hp;
+		},
+		ai: {
+			threaten: 1.5,
+		},
+		mod: {
+			maxHandcard: function (player, num) {
+				return num + player.hp;
+			},
+		},
+	},
+	jxzhanyan: {
+		enable: "phaseUse",
+		usable: 1,
+		audio: "dcsbronghuo",
+		filter(event, player) {
+			return player.countCards("h");
+		},
+		filterTarget: lib.filter.notMe,
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			let list = Array.from(Array(player.countCards("h") + 1)).map((i, p) => p);
+			let dialog = [`猜测${get.translation(player)}拥有的红色手牌数量`];
+			while (list.length) {
+				let nums = list.slice(0, Math.min(10, list.length));
+				list.removeArray(nums);
+				dialog.push([nums, "tdnodes"]);
+			}
+			const result = await target.chooseButton(dialog, true).set("ai", () => Math.random()).forResult();
+			if (result.bool) {
+				target.chat(`我猜你有${result.links[0]}张红色牌！`);
+				game.log(target, "猜测", player, "有红色牌", "#g" + result.links[0] + "张");
+				if (event.isMine() && !event.isOnline()) await game.delay();
+				await player.showHandcards(player, "发动了【绽焰】");
+				const num = Math.min(3, Math.abs(result.links[0] - player.countCards("h", card => get.color(card, player) == "red")));
+				const redCards = player.getCards("he", card => get.color(card, player) == "red");
+				if (redCards.length) await player.give(redCards, target);
+				if (num > 0) await target.damage("fire", num);
+			}
+		},
+		ai: {
+			order: 3,
+			result: {
+				target(player, target) {
+					return get.damageEffect(target, player, target) + player.countCards("he", { color: "red" });
+				},
+			},
+		},
+	},
+	jxwusheng: {
+		mod: {
+			targetInRange: function (card) {
+				if (get.suit(card) == "diamond" && card.name == "sha") return true;
+			},
+		},
+		locked: false,
+		audio: "wusheng",
+		enable: ["chooseToUse", "chooseToRespond"],
+		filter(event, player) {
+			return get
+				.inpileVCardList(info => {
+					const name = info[2];
+					if (info[3]) return false;
+					if (name != "sha" && name != "jiu") return false;
+					return get.type(name) == "basic";
+				})
+				.some(card => player.hasCard(cardx => get.color(cardx, player) == "red" && event.filterCard({ name: card[2], nature: card[3], cards: [cardx] }, player, event), "hes"));
+		},
+		chooseButton: {
+			dialog(event, player) {
+				const list = get
+					.inpileVCardList(info => {
+						const name = info[2];
+						if (info[3]) return false;
+						if (name != "sha" && name != "jiu") return false;
+						return get.type(name) == "basic";
+					})
+					.filter(card => player.hasCard(cardx => get.color(cardx, player) == "red" && event.filterCard({ name: card[2], nature: card[3], cards: [cardx] }, player, event), "hes"));
+				return ui.create.dialog("武圣", [list, "vcard"]);
+			},
+			filter(button, player) {
+				return _status.event.getParent().filterCard({ name: button.link[2], nature: button.link[3] }, player, _status.event.getParent());
+			},
+			check(button) {
+				if (_status.event.getParent().type != "phase") return 1;
+				const player = get.event("player"),
+					value = player.getUseValue({ name: button.link[2], nature: button.link[3] });
+				return value;
+			},
+			backup(links, player) {
+				return {
+					audio: "wusheng",
+					filterCard(card, player) {
+						return get.color(card, player) == "red";
+					},
+					popname: true,
+					check(card) {
+						return 6 - get.value(card);
+					},
+					position: "hse",
+					viewAs: { name: links[0][2], nature: links[0][3] },
+				};
+			},
+			prompt(links, player) {
+				return "将一张牌当作" + (get.translation(links[0][3]) || "") + "【" + get.translation(links[0][2]) + "】使用或打出";
+			},
+		},
+		hiddenCard(player, name) {
+			if (name != "jiu") return false;
+			return player.countCards("hes", { color: "red" });
+		},
+		ai: {
+			skillTagFilter(player) {
+				if (!player.countCards("hes", { color: "red" })) return false;
+			},
+			respondSha: true,
+		},
+	},
 	//神曹仁
 	jxjushou: {
 		trigger: {

@@ -1,6 +1,9 @@
 const characters = {
-	shen_caoren: ["male", "shen", 4, ["jxjushou"], ["wei"]],
-	shen_liubiao: ["male", "shen", 2, ["jxxiongju", "jxfujing", "jxyongrong"], ["qun"]],
+	jx_sunjian: ["male", "wu", "4/5", ["gzyinghun", "wulie", "twpolu"]],
+	jx_zhouyu: ["male", "wu", 4, ["jxxiongzi", "jxzhanyan"]],
+	jx_guanyu: ["male", "shu", 4, ["jxwusheng", "jsrgguanjue", "nuzhan"]],
+	jx_shen_caoren: ["male", "shen", 4, ["jxjushou"], ["wei"]],
+	jx_shen_liubiao: ["male", "shen", 2, ["jxxiongju", "jxfujing", "jxyongrong"], ["qun"]],
 	yj_zhonghui: ["male", "wei", 4, ["psmouchuan", "pszizhong", "psjizun", "psqingsuan"], ["zhu"]],
 	yj_ehuan: ["male", "qun", 5, ["psdiwan", "pssuiluan", "psconghan"], ["doublegroup:shu:qun"]],
 	yj_zhouji: ["female", "wu", 3, ["psyanmou", "pszhanyan", "psyuhuo"], ["name:周|null"]],

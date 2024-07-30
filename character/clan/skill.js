@@ -3582,7 +3582,7 @@ const skills = {
 		filter(event, player) {
 			if (event.phaseList[event.num].startsWith("phaseUse")) return false;
 			var num1 = player.getHandcardLimit() - 1,
-				num2 = event.num;
+				num2 = event.num - player.getHistory("skipped").length;
 			return num1 == num2;
 		},
 		content() {

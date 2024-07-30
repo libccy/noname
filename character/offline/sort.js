@@ -10,7 +10,7 @@ const characterSort = {
 	offline_piracyK: ["pk_sp_duyu"],
 	offline_vtuber: ["vtb_xiaosha", "vtb_xiaoshan", "vtb_xiaotao", "vtb_xiaole", "vtb_xiaojiu"],
 	offline_longyutao: ["drag_guanyu", "drag_caoren", "drag_lvchang"],
-	offline_jingxiang: ["shen_caoren", "shen_liubiao"],
+	offline_jingxiang: ["jx_shen_caoren", "jx_shen_liubiao", "jx_sunjian", "jx_zhouyu", "jx_guanyu"],
 	//offline_others:[""],
 };
 
