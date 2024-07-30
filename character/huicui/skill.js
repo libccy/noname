@@ -1719,11 +1719,23 @@ const skills = {
 			}
 		},
 		ai: {
+			order() {
+				return get.order({ name: "sha" }) + 1;
+			},
 			result: {
+				player(player, target) {
+					let eff = get.effect(player, { name: "juedou" }, target, player),
+						shas = target.mayHaveSha(player, "respond", null, "count") - player.mayHaveSha(player, "respond", null, "count");
+					if (shas > 0) eff += shas * get.effect(target, { name: "shunshou"}, player, player);
+					return eff;
+				},
 				target(player, target) {
-					const [juedouEff, loseEff] = [get.effect(player, { name: "juedou" }, target, player), get.effect(target, { name: "losehp" }, target, player)];
-					if (juedouEff > 0) return (loseEff * get.attitude(player, target)) / 10;
-					return 0;
+					let eff = get.effect(player, { name: "juedou" }, target, target),
+						shas = target.mayHaveSha(player, "respond", null, "count") - player.mayHaveSha(player, "respond", null, "count");
+					if (shas < -1)
+						eff += get.effect(target, { name: "losehp" }, target, target);
+					else if (shas > 0) eff += shas * get.effect(target, { name: "shunshou"}, player, target);
+					return eff;
 				},
 			},
 		},
