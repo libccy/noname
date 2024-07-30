@@ -653,11 +653,10 @@ const skills = {
 							return !target.countCards("h") && !get.event("list").some(list => list[0] == target);
 						},
 						ai1(card) {
-							if (!ui.selected.targets.length) return false;
-							const target = ui.selected.targets[0];
-							if (card.name == "du" && !target.hasSkillTag("nodu") && get.attitude(player, target) < 0) return 200;
-							if (target.canUse(card, target) && get.attitude(player, target) > 0) return 5 + target.getUseValue(card);
-							return 1 + Math.random();
+							if (card.name == "du") return 200;
+							let info = get.info(card);
+							if (info && info.toself) return 10;
+							return get.unuseful(card);
 						},
 						ai2(target) {
 							const player = get.event("player"),
