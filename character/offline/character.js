@@ -83,22 +83,6 @@ const characters = {
 	yj_caoang: ["male", "wei", 4, ["yjxuepin"]],
 	ns_caoanmin: ["male", "wei", 4, ["nskuishe"]],
 	jsp_liubei: ["male", "qun", 4, ["jsprende"]],
-	std_sunhao: ["male", "wu", 5, ["stdcanshi", "chouhai", "guiming"], ["zhu"]],
-	std_mateng: ["male", "qun", 4, ["stdxiongyi", "mashu", "stdyouji"], ["zhu"]],
-	std_mayunlu: ["female", "shu", 4, ["stdfengpo", "mashu"]],
-	std_jianggan: ["male", "wei", 3, ["stddaoshu", "stddaizui"]],
-	std_zhouchu: ["male", "wu", 4, ["stdxiongxia"]],
-	std_lvlingqi: ["female", "qun", 4, ["stdhuizhan"]],
-	std_dc_yanghu: ["male", "wei", 4, ["stdmingfa"]],
-	std_dc_luotong: ["male", "wu", 3, ["stdjinjian", "stdrenzheng"]],
-	std_lijue: ["male", "qun", 5, ["stdxiongsuan"]],
-	std_chengpu: ["male", "wu", 4, ["stdchunlao"]],
-	std_db_wenyang: ["male", "wei", 4, ["stdquedi"]],
-	std_re_dengzhi: ["male", "shu", 3, ["stdzhiyinmeng", "stdhehe"]],
-	std_zhangyì: ["male", "shu", 4, ["stdzhiyi"]],
-	std_chengyu: ["male", "wei", 3, ["stdshefu", "stdyibing"]],
-	std_fanyufeng: ["female", "qun", 3, ["stdbazhan", "stdzhanying"]],
-	std_feiyi: ["male", "shu", 3, ["stdtiaohe", "stdqiansu"]],
 };
 
 export default characters;

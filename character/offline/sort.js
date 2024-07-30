@@ -11,7 +11,6 @@ const characterSort = {
 	offline_vtuber: ["vtb_xiaosha", "vtb_xiaoshan", "vtb_xiaotao", "vtb_xiaole", "vtb_xiaojiu"],
 	offline_longyutao: ["drag_guanyu", "drag_caoren", "drag_lvchang"],
 	offline_jingxiang: ["jx_shen_caoren", "jx_shen_liubiao", "jx_sunjian", "jx_zhouyu", "jx_guanyu"],
-	offline_shaoyin: ["std_sunhao", "std_mateng", "std_mayunlu", "std_jianggan", "std_zhouchu", "std_lvlingqi", "std_dc_yanghu", "std_dc_luotong", "std_lijue", "std_chengpu", "std_db_wenyang", "std_re_dengzhi", "std_zhangyì", "std_chengyu", "std_fanyufeng", "std_feiyi"],
 	//offline_others:[""],
 };
 
@@ -31,7 +30,6 @@ const characterSortTranslate = {
 	offline_others: "线下其他系列",
 	offline_longyutao: "龙起襄樊",
 	offline_jingxiang: "荆襄风云",
-	offline_shaoyin: "四象封印·少阴",
 };
 
 export { characterSort, characterSortTranslate };
