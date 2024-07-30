@@ -3,6 +3,7 @@ const characterReplaces = {
 	wuxian: ["wuxian", "clan_wuxian"],
 	simafu: ["mb_simafu", "simafu", "yj_simafu"],
 	xuangongzhu: ["yj_xuangongzhu", "xuangongzhu"],
+	kebineng: ["kebineng", "ol_kebineng", "ddd_kebineng"],
 };
 
 export default characterReplaces;

@@ -1182,6 +1182,9 @@ window.noname_character_rank = {
 		"yj_zhonghui",
 		"wuhujiang",
 		"dc_noname",
+		"ol_caochong",
+		"ol_kebineng",
+		"ol_yuanji",
 	],
 	b: [
 		"liutan",
@@ -2900,6 +2903,9 @@ window.noname_character_rank = {
 			"mp_liuling",
 			"mp_wangrong",
 			"licuilianzhaoquanding",
+			"ol_caochong",
+			"ol_kebineng",
+			"ol_yuanji",
 		],
 		junk: [
 			"shen_huangzhong",
