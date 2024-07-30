@@ -8312,6 +8312,7 @@ export class Player extends HTMLDivElement {
 			player.removeEquipTrigger(VCard);
 			cards.remove(VCard);
 		}
+		if (lib.config.equip_span) player.$handleEquipChange();
 	}
 	removeEquipTrigger(card) {
 		if (_status.video) return;
@@ -10898,62 +10899,42 @@ export class Player extends HTMLDivElement {
 	}
 	$handleEquipChange() {
 		let player = this;
-		const cards = Array.from(this.node.equips.childNodes);
-		const cardsResume = cards.slice(0);
-		cards.forEach(card => {
-			if (card.name.indexOf("empty_equip") == 0) {
-				let num = get.equipNum(card);
-				let remove = false;
-				if ((num == 4 || num == 3) && get.is.mountCombined()) {
-					remove = !this.hasEmptySlot("equip3_4") || this.getEquips("equip3_4").length;
-				} else if (!this.hasEmptySlot(num) || this.getEquips(num).length) {
-					remove = true;
-				}
-				if (remove) {
-					this.node.equips.removeChild(card);
-					cardsResume.remove(card);
-				}
+		const cards = Array.from(player.node.equips.childNodes);
+		for (const cardx of cards) {
+			if (cardx.name.indexOf("empty_equip") == 0) {
+				player.node.equips.removeChild(cardx);
 			}
-		});
-		for (let i = 1; i <= 4; i++) {
-			let add = false;
-			if ((i == 4 || i == 3) && get.is.mountCombined()) {
-				add = this.hasEmptySlot("equip3_4") && !this.getEquips("equip3_4").length;
-			} else {
-				add = this.hasEmptySlot(i) && !this.getEquips(i).length;
-			}
-			if (
-				add &&
-				!cardsResume.some(card => {
-					let num = get.equipNum(card);
-					if ((i == 4 || i == 3) && get.is.mountCombined()) {
-						return num == 4 || num == 3;
-					} else {
-						return num == i;
+		}
+		for (let i = 1; i <= 5; i++) {
+			const goon = (i == 4 || i == 3) && get.is.mountCombined();
+			if (player.hasEmptySlot(goon ? "equip3_4" : i)) {
+				let sum = player.countEmptySlot(goon ? "equip3_4" : i);
+				while (sum > 0) {
+					sum--;
+					const card = game.createCard("empty_equip" + i, "", "");
+					card.fix();
+					//console.log('add '+card.name);
+					card.style.transform = "";
+					card.classList.remove("drawinghidden");
+					card.classList.add("emptyequip");
+					card.classList.add("hidden");
+					delete card._transform;
+					const equipNum = get.equipNum(card);
+					let equipped = false;
+					for (let j = 0; j < player.node.equips.childNodes.length; j++) {
+						const card2 = player.vcardsMap.equips.find(i => i.cards?.includes(player.node.equips.childNodes[j]));
+						const cardx = card2 ? card2 : player.node.equips.childNodes[j];
+						if (get.equipNum(cardx) >= equipNum) {
+							player.node.equips.insertBefore(card, player.node.equips.childNodes[j]);
+							equipped = true;
+							break;
+						}
 					}
-				})
-			) {
-				const card = game.createCard("empty_equip" + i, "", "");
-				card.fix();
-				//console.log('add '+card.name);
-				card.style.transform = "";
-				card.classList.remove("drawinghidden");
-				card.classList.add("emptyequip");
-				card.classList.add("hidden");
-				delete card._transform;
-				const equipNum = get.equipNum(card);
-				let equipped = false;
-				for (let j = 0; j < player.node.equips.childNodes.length; j++) {
-					if (get.equipNum(player.node.equips.childNodes[j]) >= equipNum) {
-						player.node.equips.insertBefore(card, player.node.equips.childNodes[j]);
-						equipped = true;
-						break;
-					}
-				}
-				if (!equipped) {
-					player.node.equips.appendChild(card);
-					if (_status.discarded) {
-						_status.discarded.remove(card);
+					if (!equipped) {
+						player.node.equips.appendChild(card);
+						if (_status.discarded) {
+							_status.discarded.remove(card);
+						}
 					}
 				}
 			}

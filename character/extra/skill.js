@@ -101,6 +101,7 @@ const skills = {
 				filter(event, player) {
 					return event.card.name == "sha" && !player.hasHistory("sourceDamage", evt => evt?.card == event.card);
 				},
+				frequent: true,
 				prompt: "是否发动【毅武】摸两张牌？",
 				content() {
 					player.draw(2);
@@ -185,7 +186,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "phaseJieshuBegin" },
 		filter(event, player) {
-			return player.countMark("1！5！") >= player.getDamagedHp();
+			return player.countMark("1！5！") >= Math.max(1, player.getDamagedHp());
 		},
 		forced: true,
 		async content(event, trigger, player) {
