@@ -33,6 +33,10 @@ const characterReplaces = {
 	yuanshu: ["yuanshu", "re_yuanshu", "yl_yuanshu", "old_yuanshu", "ol_yuanshu", "star_yuanshu"],
 	gongsunzan: ["gongsunzan", "re_gongsunzan", "dc_gongsunzan", "xin_gongsunzan", "sb_gongsunzan"],
 	re_lidian: ["re_lidian", "old_re_lidian", "junk_lidian"],
+	sunhao: ["sunhao", "std_sunhao"],
+	lvlingqi: ["lvlingqi", "std_lvlingqi"],
+	chengyu: ["chengyu", "std_chengyu"],
+	fanyufeng: ["fanyufeng", "std_fanyufeng"],
 };
 
 export default characterReplaces;
