@@ -1048,7 +1048,7 @@ const skills = {
 				target(card, player, target) {
 					if (target.countCards("e")) return;
 					if (target == player && get.type(card) == "equip" && get.equipValue(card) < 5) return 0;
-					if (get.type2(card) == "trick") return [1, 2];
+					if (get.type2(card) == "trick") return [1, 0.6];
 				},
 			},
 		},
