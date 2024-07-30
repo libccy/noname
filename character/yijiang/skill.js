@@ -6221,7 +6221,7 @@ const skills = {
 			game.addGlobalSkill("longyin_order");
 		},
 		onremove: player => {
-			if (!game.hasPlayer(current => current.hasSkill("longyin"), true)) game.removeGlobalSkill("longyin_order");
+			if (!game.hasPlayer(current => current.hasSkill("longyin", null, null, false), true)) game.removeGlobalSkill("longyin_order");
 		},
 		trigger: { global: "useCard" },
 		direct: true,
@@ -6305,7 +6305,7 @@ const skills = {
 				},
 				trigger: { player: "dieAfter" },
 				filter: (event, player) => {
-					return !game.hasPlayer(current => current.hasSkill("longyin"), true);
+					return !game.hasPlayer(current => current.hasSkill("longyin", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,

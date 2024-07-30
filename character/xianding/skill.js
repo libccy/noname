@@ -4700,7 +4700,7 @@ const skills = {
 			game.addGlobalSkill("dcshangyu_ai");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("dcshangyu"), true)) game.removeGlobalSkill("dcshangyu_ai");
+			if (!game.hasPlayer(i => i.hasSkill("dcshangyu", null, null, false), true)) game.removeGlobalSkill("dcshangyu_ai");
 		},
 		trigger: {
 			global: "phaseBefore",
@@ -4787,7 +4787,7 @@ const skills = {
 					player: "dieAfter",
 				},
 				filter: () => {
-					return !game.hasPlayer(i => i.hasSkill("dcshangyu"), true);
+					return !game.hasPlayer(i => i.hasSkill("dcshangyu", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,
@@ -8425,7 +8425,7 @@ const skills = {
 			game.addGlobalSkill("dcyuandi_ai");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("dcyuandi"), true)) game.removeGlobalSkill("dcyuandi_ai");
+			if (!game.hasPlayer(i => i.hasSkill("dcyuandi", null, null, false), true)) game.removeGlobalSkill("dcyuandi_ai");
 		},
 		trigger: { global: "useCard" },
 		filter: function (event, player) {
@@ -8496,7 +8496,7 @@ const skills = {
 				},
 				trigger: { player: "dieAfter" },
 				filter: () => {
-					return !game.hasPlayer(i => i.hasSkill("dcyuandi"), true);
+					return !game.hasPlayer(i => i.hasSkill("dcyuandi", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,
@@ -8785,7 +8785,7 @@ const skills = {
 			game.addGlobalSkill("dcaichen_hit");
 		},
 		onremove: function (player) {
-			if (!game.hasPlayer(current => current.hasSkill("dcaichen"), true)) game.removeGlobalSkill("dcaichen_hit");
+			if (!game.hasPlayer(current => current.hasSkill("dcaichen", null, null, false), true)) game.removeGlobalSkill("dcaichen_hit");
 		},
 		trigger: {
 			player: ["loseAfter", "phaseDiscardBefore"],
@@ -8814,7 +8814,7 @@ const skills = {
 			hit: {
 				trigger: { player: "dieAfter" },
 				filter: function (event, player) {
-					return !game.hasPlayer(current => current.hasSkill("dcaichen"), true);
+					return !game.hasPlayer(current => current.hasSkill("dcaichen", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,

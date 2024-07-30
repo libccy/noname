@@ -653,11 +653,10 @@ const skills = {
 							return !target.countCards("h") && !get.event("list").some(list => list[0] == target);
 						},
 						ai1(card) {
-							if (!ui.selected.targets.length) return false;
-							const target = ui.selected.targets[0];
-							if (card.name == "du" && !target.hasSkillTag("nodu") && get.attitude(player, target) < 0) return 200;
-							if (target.canUse(card, target) && get.attitude(player, target) > 0) return 5 + target.getUseValue(card);
-							return 1 + Math.random();
+							if (card.name == "du") return 200;
+							let info = get.info(card);
+							if (info && info.toself) return 10;
+							return get.unuseful(card);
 						},
 						ai2(target) {
 							const player = get.event("player"),
@@ -1843,8 +1842,10 @@ const skills = {
 						.set("ai", target => {
 							const player = get.event("player"),
 								num = target.getAttackRange();
-							if (get.event("goon")) return -num;
-							return -get.sgn(get.attitude(player, target)) * (target.getAttackRange() + (num <= 0 ? -num + 0.5 : num));
+							if (get.attitude(player, target) > 0) return -1;
+							if (get.event("goon")) return num;
+							if (num < 1) return 1 / (1 - num);
+							return 5 / num;
 						})
 						.set("goon", goon);
 					if (bool) {
@@ -4654,7 +4655,7 @@ const skills = {
 			game.addGlobalSkill("oldmoyu_ai");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("oldmoyu"), true)) game.removeGlobalSkill("oldmoyu_ai");
+			if (!game.hasPlayer(i => i.hasSkill("oldmoyu", null, null, false), true)) game.removeGlobalSkill("oldmoyu_ai");
 		},
 		enable: "phaseUse",
 		filter: function (event, player) {
@@ -4710,7 +4711,7 @@ const skills = {
 			ai: {
 				trigger: { player: "dieAfter" },
 				filter: () => {
-					return !game.hasPlayer(i => i.hasSkill("oldmoyu"), true);
+					return !game.hasPlayer(i => i.hasSkill("oldmoyu", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,
@@ -8344,12 +8345,7 @@ const skills = {
 			},
 			draw: {
 				audio: "dcquanjian",
-				filterTarget: function (card, player, target) {
-					if (target == player) return false;
-					var num = target.countCards("h");
-					if (num > target.getHandcardLimit()) return true;
-					return num < Math.min(5, target.getHandcardLimit());
-				},
+				filterTarget: lib.filter.notMe,
 				filterCard: () => false,
 				selectCard: -1,
 				content: function () {
@@ -8379,14 +8375,18 @@ const skills = {
 					} else {
 						event.index = 1;
 						num = Math.min(num2, 5) - num1;
-						if (num <= 0) event.finish();
-						else
-							target
-								.chooseControl()
-								.set("choiceList", ["摸" + get.cnNumber(num) + "张牌，且本回合内不能使用或打出手牌", "本回合下次受到的伤害+1"])
-								.set("ai", function () {
-									return 0;
-								});
+						target
+							.chooseControl()
+							.set("choiceList", [
+								(num > 0 ? "摸" + get.cnNumber(num) + "张牌且" : "") + "本回合内不能使用或打出手牌",
+								"本回合下次受到的伤害+1"
+							])
+							.set("ai", () => get.event().idx)
+							.set("idx", function () {
+								if (num > 0) return 0;
+								if (get.damageEffect(target, player, target) > 20) return 0;
+								return 1;
+							}());
 					}
 					event.num = num;
 					"step 1";
@@ -12538,7 +12538,7 @@ const skills = {
 			game.addGlobalSkill("fengxiang_use");
 		},
 		onremove: function (player) {
-			if (!game.hasPlayer(current => current.hasSkill("fengxiang"), true)) game.removeGlobalSkill("fengxiang_use");
+			if (!game.hasPlayer(current => current.hasSkill("fengxiang", null, null, false), true)) game.removeGlobalSkill("fengxiang_use");
 		},
 		trigger: { player: "damageEnd" },
 		forced: true,
@@ -12586,7 +12586,7 @@ const skills = {
 				},
 				trigger: { player: "dieAfter" },
 				filter: function (event, player) {
-					return !game.hasPlayer(current => current.hasSkill("fengxiang"), true);
+					return !game.hasPlayer(current => current.hasSkill("fengxiang", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,

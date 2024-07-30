@@ -3980,12 +3980,12 @@ const skills = {
 	twchungang: {
 		audio: 2,
 		init: () => {
-			game.addGlobalSkill("twchungang_global");
+			game.addGlobalSkill("twchungang_global", null, null, false);
 		},
 		onremove: player => {
 			if (
 				!game.hasPlayer(i => {
-					return player !== i && i.hasSkill("twchungang");
+					return i.hasSkill("twchungang");
 				}, true)
 			)
 				game.removeGlobalSkill("twchungang_global");
@@ -4017,7 +4017,7 @@ const skills = {
 					player: "dieAfter",
 				},
 				filter(event, player) {
-					return !game.hasPlayer(i => i.hasSkill("twchungang"), true);
+					return !game.hasPlayer(i => i.hasSkill("twchungang", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,
@@ -4070,9 +4070,10 @@ const skills = {
 				content: function () {
 					"step 0";
 					player.draw();
+					"step 1";
 					if (player.countCards("he")) player.chooseCard("将一张牌置于" + get.translation(target) + "的武将牌上", "he", true);
 					else event.finish();
-					"step 1";
+					"step 2";
 					if (result.bool) target.addToExpansion(result.cards, player, "give").gaintag.add("yishe");
 				},
 				ai: {
@@ -15902,7 +15903,7 @@ const skills = {
 			game.addGlobalSkill("twzhian_ai");
 		},
 		onremove: function (player) {
-			if (!game.hasPlayer(current => current.hasSkill("twzhian"), true)) game.removeGlobalSkill("twzhian_ai");
+			if (!game.hasPlayer(current => current.hasSkill("twzhian", null, null, false), true)) game.removeGlobalSkill("twzhian_ai");
 		},
 		usable: 1,
 		trigger: { global: "useCardAfter" },
@@ -16003,7 +16004,7 @@ const skills = {
 			ai: {
 				trigger: { player: "dieAfter" },
 				filter: function (event, player) {
-					return !game.hasPlayer(current => current.hasSkill("twzhian"), true);
+					return !game.hasPlayer(current => current.hasSkill("twzhian", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,

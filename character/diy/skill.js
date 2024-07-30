@@ -1487,7 +1487,7 @@ const skills = {
 			game.addGlobalSkill("nslongyue_ai");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("nslongyue"), true)) game.removeGlobalSkill("nslongyue_ai");
+			if (!game.hasPlayer(i => i.hasSkill("nslongyue", null, null, false), true)) game.removeGlobalSkill("nslongyue_ai");
 		},
 		trigger: { global: "useCard" },
 		filter(event, player) {
@@ -1519,7 +1519,7 @@ const skills = {
 		},
 		trigger: { player: "dieAfter" },
 		filter: () => {
-			return !game.hasPlayer(i => i.hasSkill("nslongyue"), true);
+			return !game.hasPlayer(i => i.hasSkill("nslongyue", null, null, false), true);
 		},
 		silent: true,
 		forceDie: true,

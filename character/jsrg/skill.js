@@ -622,6 +622,7 @@ const skills = {
 				player(player, target) {
 					let tars = _status.event.getTempCache("jsrgguanshi", "targets");
 					if (!tars) return lib.card.juedou.ai.result.player(player, target);
+					return 0;
 				},
 				target(player, target) {
 					let tars = _status.event.getTempCache("jsrgguanshi", "targets");
@@ -4216,7 +4217,7 @@ const skills = {
 			game.addGlobalSkill("jsrgninghan_frozen");
 		},
 		onremove: player => {
-			if (!game.hasPlayer(current => current.hasSkill("jsrgninghan"), true)) game.removeGlobalSkill("jsrgninghan_frozen");
+			if (!game.hasPlayer(current => current.hasSkill("jsrgninghan", null, null, false), true)) game.removeGlobalSkill("jsrgninghan_frozen");
 		},
 		trigger: { global: "damageEnd" },
 		filter: function (event, player) {
@@ -4243,7 +4244,7 @@ const skills = {
 				},
 				trigger: { player: "dieAfter" },
 				filter: (event, player) => {
-					return !game.hasPlayer(current => !current.hasSkill("jsrgninghan"), true);
+					return !game.hasPlayer(current => !current.hasSkill("jsrgninghan", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,
@@ -5363,7 +5364,7 @@ const skills = {
 			game.addGlobalSkill("jsrgjiemeng_effect");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("jsrgjiemeng"), true)) game.removeGlobalSkill("jsrgjiemeng_effect");
+			if (!game.hasPlayer(i => i.hasSkill("jsrgjiemeng", null, null, false), true)) game.removeGlobalSkill("jsrgjiemeng_effect");
 		},
 		subSkill: {
 			effect: {
@@ -5376,7 +5377,7 @@ const skills = {
 				},
 				trigger: { player: "dieAfter" },
 				filter: () => {
-					return !game.hasPlayer(i => i.hasSkill("jsrgjiemeng"), true);
+					return !game.hasPlayer(i => i.hasSkill("jsrgjiemeng", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,

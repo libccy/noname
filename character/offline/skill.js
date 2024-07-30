@@ -5333,7 +5333,7 @@ const skills = {
 			game.addGlobalSkill("yjdumou_du");
 		},
 		onremove: () => {
-			if (!game.hasPlayer(i => i.hasSkill("yjdumou"), true)) game.removeGlobalSkill("yjdumou_du");
+			if (!game.hasPlayer(i => i.hasSkill("yjdumou", null, null, false), true)) game.removeGlobalSkill("yjdumou_du");
 		},
 		subSkill: {
 			du: {
@@ -5347,7 +5347,7 @@ const skills = {
 				},
 				trigger: { player: "dieAfter" },
 				filter: () => {
-					return !game.hasPlayer(i => i.hasSkill("yjdumou"), true);
+					return !game.hasPlayer(i => i.hasSkill("yjdumou", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,

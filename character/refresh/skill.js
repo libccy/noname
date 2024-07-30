@@ -5990,7 +5990,7 @@ const skills = {
 			game.addGlobalSkill("relongyin_order");
 		},
 		onremove: player => {
-			if (!game.hasPlayer(current => current.hasSkill("relongyin"), true)) game.removeGlobalSkill("relongyin_order");
+			if (!game.hasPlayer(current => current.hasSkill("relongyin", null, null, false), true)) game.removeGlobalSkill("relongyin_order");
 		},
 		trigger: { global: "useCard" },
 		direct: true,
@@ -6074,7 +6074,7 @@ const skills = {
 				},
 				trigger: { player: "dieAfter" },
 				filter: (event, player) => {
-					return !game.hasPlayer(current => current.hasSkill("relongyin"), true);
+					return !game.hasPlayer(current => current.hasSkill("relongyin", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,
