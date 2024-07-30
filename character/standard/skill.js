@@ -144,10 +144,9 @@ const skills = {
 				.set("ai", target => {
 					const player = get.event("player"),
 						aim = get.event().getTrigger().player;
-					if (get.attitude(player, aim) > 0 || get.damageEffect(aim, player, player) < 0) return 0;
-					if (aim.countCards("he")) return -5;
-					if (player.getDiscardableCards(player, "he").some(card => get.suit(card) == "diamond")) return 1;
-					return 0;
+					let eff = get.damageEffect(aim, player, player);
+					if (aim === player && player.getDiscardableCards(player, "he", card => get.suit(card) == "diamond")) eff /= 4;
+					return eff + get.effect(target, { name: "guohe" }, player, player);
 				})
 				.forResult();
 		},
@@ -157,10 +156,11 @@ const skills = {
 				.discardPlayerCard(target, "he", true)
 				.set("ai", button => {
 					const suit = get.suit(button.link);
-					return (suit == "diamond" ? 5 : 1) * get.value(button.link);
+					return get.event().att * (suit == "diamond" ? 5 : 1) * get.value(button.link, player);
 				})
 				.set("prompt", "凤魄：弃置" + (target != player ? get.translation(target) : "") + "一张牌")
 				.set("prompt2", "若弃置了方片牌，则此伤害+1")
+				.set("att", get.sgnAttitude(player, target))
 				.forResult();
 			if (result.bool) {
 				if (result.cards && result.cards.some(i => get.suit(i, target) == "diamond")) {
