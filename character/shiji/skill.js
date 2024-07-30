@@ -1236,7 +1236,7 @@ const skills = {
 			else target.moveCard();
 		},
 		ai: {
-			order: 8,
+			order: 10,
 			result: {
 				target: function (player, target) {
 					if (target.canMoveCard(true)) return 3;
