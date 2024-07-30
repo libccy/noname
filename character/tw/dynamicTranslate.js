@@ -44,5 +44,13 @@ const dynamicTranslates = {
 	twylyanshi(player) {
 		return lib.translate[(player.storage.twduwang_ylyanshi ? "twylyanshix" : "twylyanshi") + "_info"];
 	},
+	twjielv(player) {
+		if(player.storage.isInHuan) return lib.translate.twjielvx_info;
+		return lib.translate.twjielv_info;
+	},
+	twbeiding(player) {
+		if(player.storage.isInHuan) return lib.translate.twbeidingx_info;
+		return lib.translate.twbeiding_info;
+	},
 };
 export default dynamicTranslates;
