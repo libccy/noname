@@ -8344,12 +8344,7 @@ const skills = {
 			},
 			draw: {
 				audio: "dcquanjian",
-				filterTarget: function (card, player, target) {
-					if (target == player) return false;
-					var num = target.countCards("h");
-					if (num > target.getHandcardLimit()) return true;
-					return num < Math.min(5, target.getHandcardLimit());
-				},
+				filterTarget: lib.filter.notMe,
 				filterCard: () => false,
 				selectCard: -1,
 				content: function () {
@@ -8379,14 +8374,18 @@ const skills = {
 					} else {
 						event.index = 1;
 						num = Math.min(num2, 5) - num1;
-						if (num <= 0) event.finish();
-						else
-							target
-								.chooseControl()
-								.set("choiceList", ["摸" + get.cnNumber(num) + "张牌，且本回合内不能使用或打出手牌", "本回合下次受到的伤害+1"])
-								.set("ai", function () {
-									return 0;
-								});
+						target
+							.chooseControl()
+							.set("choiceList", [
+								(num > 0 ? "摸" + get.cnNumber(num) + "张牌且" : "") + "本回合内不能使用或打出手牌",
+								"本回合下次受到的伤害+1"
+							])
+							.set("ai", () => get.event().idx)
+							.set("idx", function () {
+								if (num > 0) return 0;
+								if (get.damageEffect(target, player, target) > 20) return 0;
+								return 1;
+							}());
 					}
 					event.num = num;
 					"step 1";
