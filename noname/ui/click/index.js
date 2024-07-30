@@ -3119,6 +3119,7 @@ export class Click {
 		}
 	}
 	charactercard(name, sourcenode, noedit, resume, avatar, audioName) {
+		if(!audioName) audioName = name;
 		if (_status.dragged) return;
 		if (lib.config.theme != "simple") {
 			ui.window.classList.add("shortcutpaused");
@@ -3361,7 +3362,8 @@ export class Click {
 			}
 			
 			// 添加台词部分
-			const dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
+			let dieAudios = game.parseDieTextMap(audioName).map(i => i.text).filter(Boolean);
+			if(!dieAudios.length) dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
 			const skillAudioMap = new Map();
 			nameinfo.skills.forEach(skill => {
 				let voiceMap = game.parseSkillText(skill, audioName);
@@ -3710,7 +3712,8 @@ export class Click {
 			Array.from(htmlParser.childNodes).forEach((value) => introduction.appendChild(value));
 			
 			// 添加台词部分
-			const dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
+			let dieAudios = game.parseDieTextMap(audioName).map(i => i.text).filter(Boolean);
+			if(!dieAudios.length) dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
 			const skillAudioMap = new Map();
 			nameInfo.skills.forEach(skill => {
 				let voiceMap = game.parseSkillText(skill, audioName);
