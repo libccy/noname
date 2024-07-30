@@ -7059,7 +7059,7 @@ const skills = {
 			}
 		},
 		ai: {
-			order: 1,
+			order: 10,
 			result: {
 				target(player, target) {
 					let sgn = 0,
