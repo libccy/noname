@@ -1782,10 +1782,10 @@ const skills = {
 			let att = get.attitude(player, target);
 			if (att === 0) return 0;
 			let getv = function (name, player, arg) {
-				let v = event.getTempCache("sangu", player.id + name);
+				let v = event.getTempCache("sangu", player.playerid + name);
 				if (typeof v === "number") return v;
 				v = player.getUseValue({ name: name, storage: { sangu: true } }, arg);
-				event.putTempCache("sangu", player.id + name, v);
+				event.putTempCache("sangu", player.playerid + name, v);
 				return v;
 			};
 			if (att < 0) {
@@ -1862,10 +1862,10 @@ const skills = {
 						target = _status.event.getParent().target,
 						trigger = _status.event.getTrigger(),
 						getv = (name, player) => {
-							let v = trigger.getTempCache("sangu", player.id + name);
+							let v = trigger.getTempCache("sangu", player.playerid + name);
 							if (typeof v === "number") return v;
 							v = player.getUseValue({ name: name, storage: { sangu: true } });
-							trigger.putTempCache("sangu", player.id + name, v);
+							trigger.putTempCache("sangu", player.playerid + name, v);
 							return v;
 						};
 					if (get.attitude(player, target) < 0) {

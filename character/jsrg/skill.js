@@ -622,6 +622,7 @@ const skills = {
 				player(player, target) {
 					let tars = _status.event.getTempCache("jsrgguanshi", "targets");
 					if (!tars) return lib.card.juedou.ai.result.player(player, target);
+					return 0;
 				},
 				target(player, target) {
 					let tars = _status.event.getTempCache("jsrgguanshi", "targets");
