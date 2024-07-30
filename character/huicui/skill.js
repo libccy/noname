@@ -1843,8 +1843,10 @@ const skills = {
 						.set("ai", target => {
 							const player = get.event("player"),
 								num = target.getAttackRange();
-							if (get.event("goon")) return -num;
-							return -get.sgn(get.attitude(player, target)) * (target.getAttackRange() + (num <= 0 ? -num + 0.5 : num));
+							if (get.attitude(player, target) > 0) return -1;
+							if (get.event("goon")) return num;
+							if (num < 1) return 1 / (1 - num);
+							return 5 / num;
 						})
 						.set("goon", goon);
 					if (bool) {
