@@ -4070,9 +4070,10 @@ const skills = {
 				content: function () {
 					"step 0";
 					player.draw();
+					"step 1";
 					if (player.countCards("he")) player.chooseCard("将一张牌置于" + get.translation(target) + "的武将牌上", "he", true);
 					else event.finish();
-					"step 1";
+					"step 2";
 					if (result.bool) target.addToExpansion(result.cards, player, "give").gaintag.add("yishe");
 				},
 				ai: {
