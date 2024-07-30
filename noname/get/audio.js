@@ -464,10 +464,11 @@ class DieAudio {
                 }
             }
             const skinName = player.skin.name;
-            if (!skinName || skinName === player.name) useDefaultInfo();
-            else if (!lib.characterSubstitute[skinName]) useDefaultInfo();
+            const rawName = player.name;
+            if (!skinName || skinName === rawName) useDefaultInfo();
+            else if (!lib.characterSubstitute[rawName]) useDefaultInfo();
             else {
-                const skin = lib.characterSubstitute[skinName].find(i => i[0] === skinName);
+                const skin = lib.characterSubstitute[rawName].find(i => i[0] === skinName);
                 if (!skin) useDefaultInfo();
                 else {
                     this.name = skinName;
