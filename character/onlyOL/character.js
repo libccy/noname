@@ -18,6 +18,9 @@ const characters = {
 	ol_wuguotai: ["female", "wu", 3, ["olganlu", "olbuyi"], ["name:丁|null"]],
 	ol_sb_kongrong: ["male", "qun", 4, ["olsbliwen", "olsbzhengyi"]],
 	ol_zhangchunhua: ["female", "wei", 3, ["jueqing", "shangshi", "oljianmie"]],
+	ol_caochong: ["male", "wei", 3, ["olchengxiang", "olrenxin"]],
+	ol_kebineng: ["male", "qun", 4, ["olpingduan"], ["zhu"]],
+	ol_yuanji: ["female", "wu", 3, ["oljieyan", "oljinghua", "olshuiyue"], ["name:袁|null"]],
 };
 
 export default characters;

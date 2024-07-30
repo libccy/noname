@@ -21,7 +21,7 @@ const characterReplaces = {
 	chengpu: ["chengpu", "ol_chengpu", "re_chengpu", "xin_chengpu", "tw_chengpu", "ns_chengpu", "std_chengpu"],
 	liubiao: ["liubiao", "xin_liubiao", "re_liubiao", "jsrg_liubiao", "sb_liubiao", "oldre_liubiao", "old_liubiao", "ol_liubiao"],
 	manchong: ["manchong", "re_manchong"],
-	caochong: ["caochong", "re_caochong", "old_caochong"],
+	caochong: ["caochong", "re_caochong", "old_caochong", "ol_caochong"],
 	guohuai: ["guohuai", "re_guohuai", "xin_guohuai", "tw_guohuai", "ol_guohuai"],
 	jianyong: ["jianyong", "ol_jianyong", "re_jianyong", "xin_jianyong"],
 	panzhangmazhong: ["panzhangmazhong", "re_panzhangmazhong", "xin_panzhangmazhong"],
