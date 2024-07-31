@@ -124,18 +124,6 @@ const translates = {
 	olchengxiang_info: "当你受到1点伤害后，你可以亮出牌堆顶的四张牌，然后获得其中任意张点数之和不大于13的牌。",
 	olrenxin: "仁心",
 	olrenxin_info: "当一名其他角色进入濒死状态时，你可以翻面并弃置一张装备牌，然后令该角色回复体力至1点。",
-	ol_kebineng: "OL轲比能",
-	ol_kebineng_prefix: "OL",
-	olpingduan: "平端",
-	olpingduan_info: "出牌阶段限一次，你可以令一名角色依次执行：1.使用一张基本牌；2.重铸一张锦囊牌；3.可令你获得其装备区内一张牌。其每以此法执行一项便摸一张牌。",
-	ol_yuanji: "OL袁姬",
-	ol_yuanji_prefix: "OL",
-	oljieyan: "节言",
-	oljieyan_info: "准备阶段，你可以对一名角色造成1点伤害，然后其选择一项：1.跳过下个弃牌阶段；2.回复1点体力，其下个弃牌阶段手牌上限-2且你可以将其此阶段弃置的牌交给另一名角色。",
-	oljinghua: "镜花",
-	oljinghua_info: "当其他角色获得你的牌后，其回复1点体力。当你失去最后的手牌后，你可以将此技能描述中的“回复”改为“失去”。",
-	olshuiyue: "水月",
-	olshuiyue_info: "当其他角色受到你造成的伤害后，其摸一张牌。当你令其他角色进入濒死状态后，你可以将此技能描述中的“摸”改为“弃置”。",
 };
 
 export default translates;

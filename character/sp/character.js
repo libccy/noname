@@ -1,4 +1,6 @@
 const characters = {
+	ol_kebineng: ["male", "qun", 4, ["olpingduan"], ["name:科比|罐头"]],
+	ol_yuanji: ["female", "wu", 3, ["oljieyan", "oljinghua", "olshuiyue"], ["name:袁|null"]],
 	ol_sunru: ["female", "wu", 3, ["olchishi", "olweimian"]],
 	caoteng: ["male", "qun", 3, ["olyongzu", "olqingliu"]],
 	budugen: ["male", "qun", 4, ["olkouchao"]],
