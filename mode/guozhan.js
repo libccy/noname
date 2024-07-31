@@ -13821,16 +13821,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						position: "h",
 						filterCard: true,
 						check: function (card) {
-							var player = _status.event.player;
-							if (player.hasSkill("gzpaoxiao", true) || player.getEquip("zhuge")) return 0;
-							if (
-								player.countCards("h", function (cardx) {
+							let player = _status.event.player,
+								shas = player.countCards("h", cardx => {
 									return cardx != card && cardx.name == "sha" && player.hasUseTarget(cardx);
-								}) <
-								player.getCardUsable("sha") + 1
-							)
-								return 0;
-							return 7 - get.value(card);
+								}),
+								count = player.getCardUsable("sha"),
+								val = (get.name(card) == "sha" ? 2 : 1) * get.value(card);
+							if (!shas || count - shas > 1) return (player.needsToDiscard() ? 7 : 1) - val;
+							return 7 - val;
 						},
 						content: function () {
 							"step 0";
@@ -13838,9 +13836,18 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							player
 								.chooseControl(list)
 								.set("ai", function () {
-									if (list.includes("gzpaoxiao")) return "gzpaoxiao";
-									return list.randomGet();
+									let res = get.event().res;
+									if (list.includes(res)) return res;
+									return 0;
 								})
+								.set("res", function () {
+									let shas = player.mayHaveSha(player, "use", null, "count"),
+										count = player.getCardUsable("sha");
+									if (shas > count) return "gzpaoxiao";
+									if (shas < count) return "new_rewusheng";
+									if (!shas) return "xinkuanggu";
+									return ["new_longdan", "new_tieji", "liegong"].randomGet(); //脑子不够用了
+								}())
 								.set("prompt", "选择并获得一项技能直到回合结束");
 							("step 1");
 							player.popup(result.control);
