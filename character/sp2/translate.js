@@ -371,7 +371,7 @@ const translates = {
 	nhlundao: "论道",
 	nhlundao_info: "当你受到伤害后，若伤害来源比你手牌多，你可以弃置其一张牌；若伤害来源比你手牌少，你摸一张牌。",
 	nhguanyue: "观月",
-	nhguanyue_info: "结束阶段，你可以观看牌堆顶两张牌，然后获得其中—张，另一张放回牌堆顶。",
+	nhguanyue_info: "结束阶段，你可以观看牌堆顶两张牌，然后获得其中一张，另一张放回牌堆顶。",
 	nhyanzheng: "言政",
 	nhyanzheng_info: "准备阶段，若你的手牌数大于1，你可以保留一张手牌并弃置其余的牌，然后选择至多等于弃牌数量的角色，对这些角色各造成1点伤害。",
 	sp_mifangfushiren: "糜芳傅士仁",
