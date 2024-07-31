@@ -1582,9 +1582,7 @@ export class Game extends GameCompatible {
 			if (typeof special == "number" && special <= audioList.length) {
 				audioList = [audioList[special - 1]];
 			}
-			else if (typeof special == "string" && audioList.includes(special)) {
-				audioList = [special];
-			}
+			else if (typeof special == "string") audioList = [special];//player.logSkill('rende',......,'skill/wusheng1.mp3')[doge]
 		}
 		return game.tryAudio({ audioList });
 	}

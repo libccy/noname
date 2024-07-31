@@ -2896,12 +2896,14 @@ const skills = {
 	spshidi: {
 		audio: 2,
 		trigger: { player: ["phaseZhunbeiBegin", "phaseJieshuBegin"] },
-		forced: true,
 		zhuanhuanji: "number",
 		filter: function (event, player) {
 			return player.countMark("spshidi") % 2 == ["phaseJieshu", "phaseZhunbei"].indexOf(event.name);
 		},
+		forced: true,
+		popup: false,
 		content: function () {
+			player.logSkill('spshidi', null, null, null, 2 - player.countMark("spshidi") % 2);
 			player.changeZhuanhuanji("spshidi");
 		},
 		mod: {
@@ -2932,6 +2934,7 @@ const skills = {
 		group: ["spshidi_use", "spshidi_beused"],
 		subSkill: {
 			use: {
+				audio: "spshidi1.mp3",
 				trigger: { player: "useCard" },
 				forced: true,
 				filter: function (event, player) {
@@ -2942,6 +2945,7 @@ const skills = {
 				},
 			},
 			beused: {
+				audio: "spshidi2.mp3",
 				trigger: { target: "useCardToTargeted" },
 				forced: true,
 				filter: function (event, player) {

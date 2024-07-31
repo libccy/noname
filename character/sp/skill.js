@@ -9945,8 +9945,10 @@ const skills = {
 			return event.skill == "olbixin" && player.countMark("olbixin") < 3;
 		},
 		forced: true,
+		popup: false,
 		content: function () {
 			player.addMark("olbixin", 1, false);
+			player.logSkill('olximo', null, null, null, player.countMark("olbixin"));
 			game.log(player, "删除了", "#g【笔心】", "描述的前五个字符");
 			if (player.countMark("olbixin") == 3) {
 				game.log(player, "交换了", "#g【笔心】", "方括号中的两个数字");
@@ -24255,6 +24257,7 @@ const skills = {
 		},
 	},
 	jieyuan: {
+		audio: ["jieyuan_more.mp3", "jieyuan_less.mp3"],
 		group: ["jieyuan_more", "jieyuan_less"],
 		subSkill: {
 			more: {
