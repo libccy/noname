@@ -9945,8 +9945,10 @@ const skills = {
 			return event.skill == "olbixin" && player.countMark("olbixin") < 3;
 		},
 		forced: true,
+		popup: false,
 		content: function () {
 			player.addMark("olbixin", 1, false);
+			player.logSkill('olximo', null, null, null, player.countMark("olbixin"));
 			game.log(player, "删除了", "#g【笔心】", "描述的前五个字符");
 			if (player.countMark("olbixin") == 3) {
 				game.log(player, "交换了", "#g【笔心】", "方括号中的两个数字");
@@ -22510,7 +22512,7 @@ const skills = {
 		},
 		callback: function () {
 			"step 0";
-			if (event.num1 <= event.num2) {
+			if (event.winner !== player) {
 				target.chat(lib.skill.gushe.chat[player.countMark("regushe")]);
 				game.delay();
 				player.addMark("regushe", 1);
@@ -22519,17 +22521,15 @@ const skills = {
 				}
 			} else player.addMark("regushe2", 1, false);
 			"step 1";
-			if (event.num1 <= event.num2) {
+			if (event.winner !== player) {
 				player.chooseToDiscard("he", "弃置一张牌，或摸一张牌").set("ai", function () {
 					return -1;
 				});
 			} else event.goto(3);
 			"step 2";
-			if (!result.bool) {
-				player.draw();
-			}
+			if (!result.bool) player.draw();
 			"step 3";
-			if (event.num1 >= event.num2) {
+			if (event.winner !== target) {
 				target
 					.chooseToDiscard("he", "弃置一张牌，或令" + get.translation(player) + "摸一张牌")
 					.set("ai", function (card) {
@@ -22656,7 +22656,7 @@ const skills = {
 		chat: ["粗鄙之语", "天地不容", "谄谀之臣", "皓首匹夫，苍髯老贼", "二臣贼子", "断脊之犬", "我从未见过有如此厚颜无耻之人！"],
 		callback: function () {
 			"step 0";
-			if (event.num1 <= event.num2) {
+			if (event.winner !== player) {
 				target.chat(lib.skill.gushe.chat[player.countMark("gushe")]);
 				game.delay();
 				player.addMark("gushe", 1);
@@ -22665,7 +22665,7 @@ const skills = {
 				}
 			}
 			"step 1";
-			if (event.num1 <= event.num2) {
+			if (event.winner !== player) {
 				player.chooseToDiscard("he", "弃置一张牌，或摸一张牌").set("ai", function () {
 					return -1;
 				});
@@ -22675,7 +22675,7 @@ const skills = {
 				player.draw();
 			}
 			"step 3";
-			if (event.num1 >= event.num2) {
+			if (event.winner !== target) {
 				target
 					.chooseToDiscard("he", "弃置一张牌，或令" + get.translation(player) + "摸一张牌")
 					.set("ai", function (card) {
@@ -24257,6 +24257,7 @@ const skills = {
 		},
 	},
 	jieyuan: {
+		audio: ["jieyuan_more.mp3", "jieyuan_less.mp3"],
 		group: ["jieyuan_more", "jieyuan_less"],
 		subSkill: {
 			more: {
@@ -28307,25 +28308,21 @@ const skills = {
 		filter: function (event, player) {
 			if (!player.storage.songci) return true;
 			return game.hasPlayer(function (current) {
-				return !player.storage.songci.includes(current);
+				return !player.getStorage("songci").includes(current);
 			});
 		},
-		init: function (player) {
-			if (!player.storage.songci) player.storage.songci = [];
-		},
 		filterTarget: function (card, player, target) {
-			return !player.storage.songci || !player.storage.songci.includes(target);
+			return !player.getStorage("songci").includes(target);
 		},
-		content: function () {
-			if (target.countCards("h") > target.hp) {
-				target.chooseToDiscard(2, "he", true);
+		async content(event, trigger, player) {
+			const target = event.target,
+				goon = target.countCards("h") > target.hp;
+			player.markAuto("songci", [target]);
+			if (goon) {
+				await target.chooseToDiscard(2, "he", true);
 			} else {
-				target.draw(2);
+				await target.draw(2);
 			}
-			if (!player.storage.songci) player.storage.songci = [];
-			player.storage.songci.push(target);
-			player.storage.songci.sortBySeat();
-			player.markSkill("songci");
 		},
 		intro: {
 			content: "已对$发动过〖颂词〗",

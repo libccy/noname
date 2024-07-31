@@ -4960,6 +4960,7 @@ export const Content = {
 			delete event.player;
 			event.trigger("compare");
 		} else {
+			event.iwhile = 0;
 			game.delay(0, 1000);
 			event.goto(9);
 		}
@@ -4982,18 +4983,35 @@ export const Content = {
 		event.iwhile++;
 		event.goto(6);
 		"step 9";
+		event.player = event.tempplayer;
+		event.trigger("compareFixing");
+		"step 10";
+		if (event.player) delete event.player;
+		if (event.iwhile < targets.length) {
+			event.target = targets[event.iwhile];
+			event.card2 = event.cardlist[event.iwhile];
+			event.num2 = event.result.num2[event.iwhile];
+			event.trigger("compareFixing");
+		} else {
+			event.goto(12);
+		}
+		"step 11";
+		event.iwhile++;
+		event.goto(10);
+		"step 12";
 		var player = event.tempplayer;
 		event.player = player;
 		delete event.tempplayer;
 		var str = "无人拼点成功";
-		if (event.winner) {
-			event.result.winner = event.winner;
-			str = get.translation(event.winner) + "拼点成功";
-			game.log(event.winner, "拼点成功");
-			event.winner.popup("胜");
+		const winner = event.forceWinner || event.winner;
+		if (winner) {
+			event.result.winner = winner;
+			str = get.translation(winner) + "拼点成功";
+			game.log(winner, "拼点成功");
+			winner.popup("胜");
 		} else game.log("#b无人", "拼点成功");
 		var list = [player].addArray(targets);
-		list.remove(event.winner);
+		list.remove(winner);
 		for (var i of list) {
 			i.popup("负");
 		}
@@ -5007,9 +5025,9 @@ export const Content = {
 			}, str);
 		}
 		game.delay(3);
-		"step 10";
+		"step 13";
 		game.broadcastAll(ui.clear);
-		"step 11";
+		"step 14";
 		event.cards.add(event.card1);
 	},
 	chooseToCompareMultiple: function () {
@@ -5118,22 +5136,28 @@ export const Content = {
 			event.trigger("compare");
 			game.delay(0, 1500);
 		} else {
-			event.goto(9);
+			event.goto(10);
 		}
 		"step 6";
-		event.result.num1[event.iwhile] = event.num1;
-		event.result.num2[event.iwhile] = event.num2;
+		event.iiwhile = event.iwhile;
+		delete event.iwhile;
+		event.trigger("compareFixing");
+		"step 7";
+		event.result.num1[event.iiwhile] = event.num1;
+		event.result.num2[event.iiwhile] = event.num2;
 		var str;
-		if (event.num1 > event.num2) {
+		if (event.forceWinner === player || (event.forceWinner !== target && event.num1 > event.num2)) {
+			event.winner = player;
 			str = get.translation(player) + "拼点成功";
 			player.popup("胜");
 			target.popup("负");
 		} else {
 			str = get.translation(player) + "拼点失败";
-			if (event.num1 == event.num2) {
+			if (event.forceWinner !== target && event.num1 == event.num2) {
 				player.popup("平");
 				target.popup("平");
 			} else {
+				event.winner = target;
 				player.popup("负");
 				target.popup("胜");
 			}
@@ -5146,7 +5170,7 @@ export const Content = {
 			}, 1000);
 		}, str);
 		game.delay(2);
-		"step 7";
+		"step 8";
 		if (event.callback) {
 			game.broadcastAll(
 				function (card1, card2) {
@@ -5166,11 +5190,13 @@ export const Content = {
 			next.setContent(event.callback);
 			event.compareMultiple = true;
 		}
-		"step 8";
-		game.broadcastAll(ui.clear);
-		event.iwhile++;
-		event.goto(5);
 		"step 9";
+		game.broadcastAll(ui.clear);
+		delete event.winner;
+		delete event.forceWinner;
+		event.iwhile = event.iiwhile + 1;
+		event.goto(5);
+		"step 10";
 		event.cards.add(event.card1);
 	},
 	chooseToCompare: function () {
@@ -5319,8 +5345,10 @@ export const Content = {
 			num1: event.num1,
 			num2: event.num2,
 		};
+		event.trigger("compareFixing");
+		"step 8";
 		var str;
-		if (event.num1 > event.num2) {
+		if (event.forceWinner === player || (event.forceWinner !== target && event.num1 > event.num2)) {
 			event.result.bool = true;
 			event.result.winner = player;
 			str = get.translation(player) + "拼点成功";
@@ -5329,7 +5357,7 @@ export const Content = {
 		} else {
 			event.result.bool = false;
 			str = get.translation(player) + "拼点失败";
-			if (event.num1 == event.num2) {
+			if (event.forceWinner !== target && event.num1 == event.num2) {
 				event.result.tie = true;
 				player.popup("平");
 				target.popup("平");
@@ -5347,7 +5375,7 @@ export const Content = {
 			}, 1000);
 		}, str);
 		game.delay(2);
-		"step 8";
+		"step 9";
 		if (typeof event.target.ai.shown == "number" && event.target.ai.shown <= 0.85 && event.addToAI) {
 			event.target.ai.shown += 0.1;
 		}

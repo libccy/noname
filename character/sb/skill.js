@@ -430,7 +430,7 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			const list = ["蓄力", "cancel2"];
-			const choiceList = [`弃置${get.translation(trigger.player)}区域里的一张牌，你摸两张牌`, `获得4点蓄力值`];
+			const choiceList = [`弃置${get.translation(trigger.player)}区域里的一张牌，你摸一张牌`, `获得3点蓄力值`];
 			if (trigger.player.isIn() && trigger.player.countDiscardableCards(player, "hej")) {
 				list.unshift("弃牌");
 			} else {
@@ -467,9 +467,9 @@ const skills = {
 			if (control === "弃牌") {
 				player.line(trigger.player);
 				await player.discardPlayerCard(trigger.player, "hej", true);
-				await player.draw(2);
+				await player.draw();
 			} else {
-				const num = 4 - player.countMark("charge");
+				const num = Math.min(3, 4 - player.countMark("charge"));
 				if (num > 0) player.addMark("charge", num);
 			}
 		},

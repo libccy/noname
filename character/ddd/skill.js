@@ -3965,6 +3965,7 @@ const skills = {
 				delete event.player;
 				event.trigger("compare");
 			} else {
+				event.iwhile = 0;
 				game.delay(0, 1000);
 				event.goto(9);
 			}
@@ -3975,13 +3976,27 @@ const skills = {
 			event.goto(7);
 			"step 9";
 			event.player = event.tempplayer;
+			event.trigger("compareFixing");
+			"step 10";
+			if (event.player) delete event.player;
+			if (event.iwhile < targets.length) {
+				event.target = targets[event.iwhile];
+				event.trigger("compareFixing");
+			} else {
+				event.goto(12);
+			}
+			"step 11";
+			event.iwhile++;
+			event.goto(10);
+			"step 12";
+			event.player = event.tempplayer;
 			delete event.tempplayer;
 			var str;
 			var num1 = event.result.num1.reduce((p, c) => p + c, 0) / event.result.num1.length,
 				num2 = event.result.num2.reduce((p, c) => p + c, 0) / event.result.num2.length;
 			game.log(event.player, "方的点数均值为", "#y" + Math.floor(num1 * 100) / 100);
 			game.log(event.targetx, "方的点数均值为", "#y" + Math.floor(num2 * 100) / 100);
-			if (num1 > num2) {
+			if (event.players.includes(event.forceWinner) || (!event.targetsx.includes(event.forceWinner) && num1 > num2)) {
 				str = get.translation(event.players) + "拼点成功";
 				event.players.forEach(i => i.popup("胜"));
 				event.targetsx.forEach(i => i.popup("负"));
@@ -3989,7 +4004,7 @@ const skills = {
 				event.result.loser = event.targetsx;
 			} else {
 				str = get.translation(event.players) + "拼点失败";
-				if (num1 == num2) {
+				if (!event.targetsx.includes(event.forceWinner) && num1 == num2) {
 					event.players.forEach(i => i.popup("平"));
 					event.targetsx.forEach(i => i.popup("平"));
 					event.result.loser = event.players.addArray(event.targetsx);
@@ -4008,9 +4023,9 @@ const skills = {
 				}, 1000);
 			}, str);
 			game.delay(3);
-			("step 10");
+			"step 13";
 			game.broadcastAll(ui.clear);
-			("step 11");
+			"step 14";
 			event.cards.add(event.card1);
 		},
 		contentx() {
