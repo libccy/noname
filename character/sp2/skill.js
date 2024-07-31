@@ -12303,10 +12303,10 @@ const skills = {
 					);
 				})
 				.set("ai", target => {
-					const player = get.event("player");
-					const card = get.event().getTrigger().card;
-					if (!get.info("dcmffengshi").check({ card: card, target: target })) return 0;
-					return get.effect(target, { name: "guohe_copy2" }, player, player);
+					let trigger = get.event().getTrigger(), player = trigger.player;
+					let eff = get.effect(player, { name: "guohe" }, player, get.event().player) + get.effect(target, { name: "guohe" }, player, get.event().player);
+					if (get.tag(trigger.card, "damage")) eff += get.damageEffect(target, trigger.card, trigger.player, get.event().player);
+					return eff;
 				});
 			if (bool) {
 				const target = targets[0];
@@ -12377,22 +12377,12 @@ const skills = {
 			return "弃置你与" + get.translation(target) + "的各一张牌，然后令" + get.translation(event.card) + "的伤害+1";
 		},
 		check: function (event, player) {
-			var viewer = player,
-				player = event.player,
-				target = event.target;
-			if (viewer == player) {
-				if (get.attitude(viewer, target) >= 0) return false;
-				if (player.countCards("he", card => get.value(card, player) < 5)) return true;
-				var card = get.event().getTrigger().card;
-				if ((get.tag(card, "damage") || target.countCards("he", card => get.value(card, target) > 6)) && player.countCards("he", card => get.value(card, player) < 7)) return true;
-				return false;
-			} else {
-				if (get.attitude(viewer, player) >= 0) return false;
-				if (!get.tag(card, "damage")) return false;
-				if (viewer.countCards("he") > player.countCards("he")) return true;
-				if (viewer.countCards("he", card => get.value(card, target) > 6)) return false;
-				return true;
-			}
+			let viewer = get.event().player,
+				user = event.player,
+				target = event.target,
+				eff = get.effect(user, { name: "guohe" }, user, viewer) + get.effect(target, { name: "guohe" }, user, viewer);
+			if (get.tag(event.card, "damage")) eff += get.damageEffect(target, event.card, player, viewer);
+			return eff > 0;
 		},
 		content: function () {
 			if (get.tag(trigger.card, "damage")) trigger.getParent().baseDamage++;
@@ -12422,24 +12412,13 @@ const skills = {
 			var str;
 			if (player == trigger.player) str = "弃置自己的和该角色";
 			else str = "令其弃置其与你的";
-			var next = trigger.player.chooseBool("是否对" + get.translation(trigger.target) + "发动【锋势】？", str + "的各一张牌，然后令" + get.translation(trigger.card) + "的伤害+1").set("ai", function () {
-				var player = _status.event.getParent().player;
-				var target = _status.event.getParent().target;
-				var viewer = _status.event.player;
-				if (viewer == player) {
-					if (get.attitude(viewer, target) >= 0) return false;
-					if (player.countCards("he", card => get.value(card, player) < 5)) return true;
-					var card = _status.event.getTrigger().card;
-					if ((get.tag(card, "damage") || target.countCards("he", card => get.value(card, target) > 6)) && player.countCards("he", card => get.value(card, player) < 7)) return true;
-					return false;
-				} else {
-					if (get.attitude(viewer, player) >= 0) return false;
-					if (!get.tag(card, "damage")) return false;
-					if (viewer.countCards("he") > player.countCards("he")) return true;
-					if (viewer.countCards("he", card => get.value(card, target) > 6)) return false;
-					return true;
-				}
-			});
+			var next = trigger.player.chooseBool("是否对" + get.translation(trigger.target) + "发动【锋势】？", str + "的各一张牌，然后令" + get.translation(trigger.card) + "的伤害+1")
+				.set("ai", () => get.event().bool)
+				.set("bool", function () {
+					let eff = get.effect(trigger.player, { name: "guohe" }, player, trigger.player) + get.effect(trigger.target, { name: "guohe" }, player, trigger.player);
+					if (get.tag(trigger.card, "damage")) eff += get.damageEffect(trigger.target, trigger.card, trigger.player, trigger.player);
+					return eff > 0;
+				}());
 			if (player == next.player) next.setHiddenSkill("mffengshi");
 			"step 1";
 			if (result.bool) {

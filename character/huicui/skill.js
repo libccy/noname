@@ -3020,7 +3020,7 @@ const skills = {
 		},
 		prompt2: function (event, player) {
 			const num = Math.pow(2, player.countMark("dccaisi_more"));
-			return `从${player == _status.currentPhase ? "牌堆" : "弃牌"}堆中随机获得${get.cnNumber(num)}张非基本牌`;
+			return `从${player == _status.currentPhase ? "" : "弃"}牌堆中随机获得${get.cnNumber(num)}张非基本牌`;
 		},
 		content: function* (event, map) {
 			const player = map.player,
