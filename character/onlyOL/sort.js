@@ -7,7 +7,7 @@ const characterSort = {
 	onlyOL_sb_wudong: ["ol_sb_guanyu"],
 	onlyOL_sb_fenwu: ["ol_sb_taishici", "ol_sb_yuanshao"],
 	onlyOL_sb_shiren: ["ol_sb_kongrong"],
-	onlyOL_waitingforsort: ["ol_kebineng", "ol_yuanji"],
+	onlyOL_waitingforsort: [],
 };
 
 const characterSortTranslate = {

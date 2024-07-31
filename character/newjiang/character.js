@@ -11,7 +11,7 @@ const characters = {
 	yj_sufei: ["male", "wu", 4, ["shuojian"]],
 	liwan: ["female", "wei", 3, ["liandui", "biejun"]],
 	zhugeshang: ["male", "shu", 3, ["sangu", "yizu"], ["name:诸葛|尚"]],
-	kebineng: ["male", "qun", 4, ["kousheng"], ["zhu"]],
+	kebineng: ["male", "qun", 4, ["kousheng"], ["name:科比|罐头"]],
 	lukai: ["male", "wu", 4, ["lkbushi", "lkzhongzhuang"]],
 	linghuyu: ["male", "wei", 4, ["xvzhi"], ["name:令狐|愚"]],
 	yj_simafu: ["male", "wei", 3, ["beiyu", "duchi"], ["name:司马|孚"]],
