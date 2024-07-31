@@ -717,7 +717,9 @@ const skills = {
 				},
 				forced: true,
 				logTarget: "target",
-				usable: 2,
+				get usable() {
+					return get.mode() == "doudizhu" ? 1 : 2;
+				},
 				async content(event, trigger, player) {
 					const target = trigger.target, list = [];
 					const playerCards = player.getCards("he", card => {
@@ -846,7 +848,7 @@ const skills = {
 			);
 		},
 		async cost(event, trigger, player) {
-			const num = get.mode() === "identity" ? 3 : 2;
+			const num = 3;
 			event.result = await player
 				.chooseTarget(get.prompt("mbcuizhen"), "废除至多" + get.cnNumber(num) +"名其他角色的武器栏", [1, num], (card, player, target) => {
 					return target !== player && target.hasEnabledSlot(1);
@@ -896,10 +898,10 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					trigger.num += Math.min(
-						4,
+						3,
 						game.countPlayer(current => {
 							return current.countDisabledSlot(1);
-						}) + (get.mode() === "identity" ? 1 : 2)
+						}) + 1
 					);
 				},
 			},
