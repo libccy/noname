@@ -6953,6 +6953,11 @@ export class Library {
 					restart: true,
 					frequent: true,
 				},
+				connect_change_card: {
+					name: "启用手气卡",
+					init: false,
+					frequent: true,
+				},
 				connect_double_character: {
 					name: "启用双将",
 					init: "single",
