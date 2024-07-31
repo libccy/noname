@@ -4649,7 +4649,6 @@ export class Player extends HTMLDivElement {
 			if (check) next.ai = check;
 			else
 				next.ai = function (card) {
-					const player = get.player();
 					if (typeof card == "string" && lib.skill[card]) {
 						var ais =
 							lib.skill[card].check ||
