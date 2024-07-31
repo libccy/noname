@@ -2423,7 +2423,7 @@ export class Player extends HTMLDivElement {
 			var hujia2 = info2.hujia;
 			this.hujia += hujia2;
 			var double_hp;
-			if (_status.connectMode || get.mode() == "single") {
+			if (_status.connectMode || (get.mode() == "single" && _status.mode == "changban")) {
 				double_hp = "pingjun";
 			} else {
 				double_hp = get.config("double_hp");
