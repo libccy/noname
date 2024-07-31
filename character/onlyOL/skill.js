@@ -1131,22 +1131,29 @@ const skills = {
 	olchunlao: {
 		audio: "chunlao",
 		audioname: ["xin_chengpu"],
-		trigger: {
-			player: "loseAfter",
-			global: "loseAsyncAfter",
-		},
+		trigger: { global: ["loseAfter", "loseAsyncAfter"] },
 		filter(event, player) {
 			if (event.type != "discard" || event.getlx === false) return false;
-			const evt = event.getl(player);
-			return evt && evt.cards2 && evt.cards2.some(i => i.name == "sha" && get.position(i) == "d");
+			return game.hasPlayer(target => {
+				if (![player.getPrevious(), player, player.getNext()].includes(target)) return false;
+				return event.getl(target)?.cards2?.some(i => i.name == "sha" && get.position(i) == "d");
+			});
 		},
 		forced: true,
 		locked: false,
 		content() {
-			const evt = trigger.getl(player);
 			player
 				.addToExpansion(
-					evt.cards2.filter(i => i.name == "sha" && get.position(i) == "d"),
+					game
+						.filterPlayer(target => {
+							if (![player.getPrevious(), player, player.getNext()].includes(target)) return false;
+							return trigger.getl(target)?.cards2?.some(i => i.name == "sha" && get.position(i) == "d");
+						})
+						.map(target => {
+							return trigger.getl(target).cards2.filter(i => i.name == "sha" && get.position(i) == "d");
+						})
+						.flat()
+						.unique(),
 					"gain2"
 				)
 				.gaintag.add("olchunlao");
@@ -1169,7 +1176,7 @@ const skills = {
 			var cards = player.getExpansions(skill);
 			if (cards.length) player.loseToDiscardpile(cards);
 		},
-		group: "olchunlao_save",
+		group: ["olchunlao_save", "olchunlao_gain"],
 		subSkill: {
 			save: {
 				inherit: "chunlao2",
@@ -1195,6 +1202,28 @@ const skills = {
 					},
 					order: 6,
 					result: { target: 1 },
+				},
+			},
+			gain: {
+				audio: "chunlao",
+				audioname: ["xin_chengpu"],
+				trigger: { global: "loseHpEnd" },
+				filter(event, player) {
+					return player.getExpansions("olchunlao").length;
+				},
+				async cost(event, trigger, player) {
+					const cards = player.getExpansions("olchunlao");
+					event.result = await player
+						.chooseButton(["###" + get.prompt("olchunlao") + "###获得至多两张“醇”？", cards], [1, 2])
+						.set("ai", button => {
+							const player = get.event().player;
+							return player.hasSha() ? 0 : get.value(button.link);
+						})
+						.forResult();
+					if (event.result.bool) event.result.cards = event.result.links;
+				},
+				async content(event, trigger, player) {
+					await player.gain(event.cards, player, "give");
 				},
 			},
 		},
@@ -1390,7 +1419,7 @@ const skills = {
 							if (range[1] == -1 || (range[1] > 1 && ui.selected.targets && ui.selected.targets.length)) return "zeroplayertarget";
 						},
 					},
-				}
+				},
 			},
 		},
 	},
