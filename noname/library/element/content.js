@@ -4989,6 +4989,8 @@ export const Content = {
 		if (event.player) delete event.player;
 		if (event.iwhile < targets.length) {
 			event.target = targets[event.iwhile];
+			event.card2 = event.cardlist[event.iwhile];
+			event.num2 = event.getNum(event.card2);
 			event.trigger("compareFixing");
 		} else {
 			event.goto(12);
