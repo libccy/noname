@@ -11969,7 +11969,13 @@ const skills = {
 			},
 		},
 		ai: {
-			order: 4,
+			order: (item, player) => {
+				if (game.hasPlayer(cur => {
+					if (player === cur || get.attitude(player, cur) <= 0) return false;
+					return Math.min(5, target.maxHp) - cur.countCards("h") > 2;
+				})) return get.order({ name: "nanman" }, player) - 0.1;
+				return 10;
+			},
 			result: {
 				target: function (player, target) {
 					if (get.attitude(player, target) > 0) return Math.max(0, Math.min(5, target.maxHp) - target.countCards("h"));
