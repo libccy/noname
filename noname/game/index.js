@@ -1579,7 +1579,7 @@ export class Game extends GameCompatible {
 
 		let audioList = get.Audio.skill({ skill, player, info: skillInfo }).fileList;
 		if (special && audioList.length > 0) {
-			if (typeof special == "number" && special <= audioList.length + 1) {
+			if (typeof special == "number" && special <= audioList.length) {
 				audioList = [audioList[special - 1]];
 			}
 			else if (typeof special == "string" && audioList.includes(special)) {

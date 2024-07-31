@@ -4990,7 +4990,7 @@ export const Content = {
 		if (event.iwhile < targets.length) {
 			event.target = targets[event.iwhile];
 			event.card2 = event.cardlist[event.iwhile];
-			event.num2 = event.getNum(event.card2);
+			event.num2 = event.result.num2[event.iwhile];
 			event.trigger("compareFixing");
 		} else {
 			event.goto(12);
