@@ -22510,7 +22510,7 @@ const skills = {
 		},
 		callback: function () {
 			"step 0";
-			if (event.num1 <= event.num2) {
+			if (event.winner !== player) {
 				target.chat(lib.skill.gushe.chat[player.countMark("regushe")]);
 				game.delay();
 				player.addMark("regushe", 1);
@@ -22519,17 +22519,15 @@ const skills = {
 				}
 			} else player.addMark("regushe2", 1, false);
 			"step 1";
-			if (event.num1 <= event.num2) {
+			if (event.winner !== player) {
 				player.chooseToDiscard("he", "弃置一张牌，或摸一张牌").set("ai", function () {
 					return -1;
 				});
 			} else event.goto(3);
 			"step 2";
-			if (!result.bool) {
-				player.draw();
-			}
+			if (!result.bool) player.draw();
 			"step 3";
-			if (event.num1 >= event.num2) {
+			if (event.winner !== target) {
 				target
 					.chooseToDiscard("he", "弃置一张牌，或令" + get.translation(player) + "摸一张牌")
 					.set("ai", function (card) {
@@ -22656,7 +22654,7 @@ const skills = {
 		chat: ["粗鄙之语", "天地不容", "谄谀之臣", "皓首匹夫，苍髯老贼", "二臣贼子", "断脊之犬", "我从未见过有如此厚颜无耻之人！"],
 		callback: function () {
 			"step 0";
-			if (event.num1 <= event.num2) {
+			if (event.winner !== player) {
 				target.chat(lib.skill.gushe.chat[player.countMark("gushe")]);
 				game.delay();
 				player.addMark("gushe", 1);
@@ -22665,7 +22663,7 @@ const skills = {
 				}
 			}
 			"step 1";
-			if (event.num1 <= event.num2) {
+			if (event.winner !== player) {
 				player.chooseToDiscard("he", "弃置一张牌，或摸一张牌").set("ai", function () {
 					return -1;
 				});
@@ -22675,7 +22673,7 @@ const skills = {
 				player.draw();
 			}
 			"step 3";
-			if (event.num1 >= event.num2) {
+			if (event.winner !== target) {
 				target
 					.chooseToDiscard("he", "弃置一张牌，或令" + get.translation(player) + "摸一张牌")
 					.set("ai", function (card) {

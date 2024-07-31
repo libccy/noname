@@ -2236,6 +2236,12 @@ const skills = {
 		onCompare: function (player) {
 			return game.cardsGotoOrdering(get.cards()).cards;
 		},
+		ai: {
+			forceWin: true,
+			skillTagFilter(player, tag, arg) {
+				return arg.card && get.suit(arg.card, false) == 'heart';
+			},
+		},
 		group: "tianbian_number",
 		subSkill: {
 			number: {
