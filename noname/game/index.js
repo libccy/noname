@@ -1568,8 +1568,8 @@ export class Game extends GameCompatible {
 	 * @param { any } [skillInfo]
 	 * @returns
 	 */
-	trySkillAudio(skill, player, directaudio, nobroadcast, skillInfo) {
-		if (!nobroadcast) game.broadcast(game.trySkillAudio, skill, player, directaudio, nobroadcast, skillInfo);
+	trySkillAudio(skill, player, directaudio, nobroadcast, skillInfo, special) {
+		if (!nobroadcast) game.broadcast(game.trySkillAudio, skill, player, directaudio, nobroadcast, skillInfo, special);
 		if (!lib.config.background_speak) return;
 
 		const info = skillInfo || lib.skill[skill];
@@ -1577,7 +1577,15 @@ export class Game extends GameCompatible {
 		if (info.direct && !directaudio) return;
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
 
-		const audioList = get.Audio.skill({ skill, player, info: skillInfo }).fileList;
+		let audioList = get.Audio.skill({ skill, player, info: skillInfo }).fileList;
+		if (special && audioList.length > 0) {
+			if (typeof special == "number" && special <= audioList.length + 1) {
+				audioList = [audioList[special - 1]];
+			}
+			else if (typeof special == "string" && audioList.includes(special)) {
+				audioList = [special];
+			}
+		}
 		return game.tryAudio({ audioList });
 	}
 	/**

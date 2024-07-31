@@ -2149,42 +2149,28 @@ const skills = {
 	twxiayong: {
 		audio: 2,
 		audioname: ["tw_yanliang"],
-		locked: true,
-		group: "twxiayong_effect",
-		subSkill: {
-			effect: {
-				trigger: { global: "damageBegin1" },
-				filter(event, player) {
-					if (event.getParent().type != "card" || event.card.name != "juedou" || !event.player.isIn()) return false;
-					const evt = event.getParent()
-					if (evt && evt.targets && (event.player != player || player.countCards("h") > 0)) {
-						return (evt.player === player || evt.targets.includes(player));
-					}
-					return false;
-				},
-				forced: true,
-				popup: false,
-				async content(event, trigger, player) {
-					player.logSkill("twxiayong" + (trigger.player === player ? "1" : "2"), trigger.player);
-					if (trigger.player === player) {
-						const cards = player.getCards("h", card => {
-							return lib.filter.cardDiscardable(card, player, "twxiayong");
-						});
-						if (cards.length > 0) player.discard(cards.randomGet());
-					} else {
-						trigger.increase("num");
-					}
-				},
-			},
+		trigger: { global: "damageBegin1" },
+		filter(event, player) {
+			if (event.getParent().type != "card" || event.card.name != "juedou" || !event.player.isIn()) return false;
+			const evt = event.getParent()
+			if (evt && evt.targets && (event.player != player || player.countCards("h") > 0)) {
+				return (evt.player === player || evt.targets.includes(player));
+			}
+			return false;
 		},
-	},
-	twxiayong1: {
-		audio: true,
-		audioname: ["tw_yanliang"],
-		sourceSkill: "twxiayong",
-	},
-	twxiayong2: {
-		inherit: "twxiayong1",
+		forced: true,
+		popup: false,
+		async content(event, trigger, player) {
+			player.logSkill("twxiayong", trigger.player, null, null, trigger.player === player ? 1 : 2);
+			if (trigger.player === player) {
+				const cards = player.getCards("h", card => {
+					return lib.filter.cardDiscardable(card, player, "twxiayong");
+				});
+				if (cards.length > 0) player.discard(cards.randomGet());
+			} else {
+				trigger.increase("num");
+			}
+		},
 	},
 	//袁谭
 	twqiaosi: {

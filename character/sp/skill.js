@@ -28305,25 +28305,21 @@ const skills = {
 		filter: function (event, player) {
 			if (!player.storage.songci) return true;
 			return game.hasPlayer(function (current) {
-				return !player.storage.songci.includes(current);
+				return !player.getStorage("songci").includes(current);
 			});
 		},
-		init: function (player) {
-			if (!player.storage.songci) player.storage.songci = [];
-		},
 		filterTarget: function (card, player, target) {
-			return !player.storage.songci || !player.storage.songci.includes(target);
+			return !player.getStorage("songci").includes(target);
 		},
-		content: function () {
-			if (target.countCards("h") > target.hp) {
-				target.chooseToDiscard(2, "he", true);
+		async content(event, trigger, player) {
+			const target = event.target,
+				goon = target.countCards("h") > target.hp;
+			player.markAuto("songci", [target]);
+			if (goon) {
+				await target.chooseToDiscard(2, "he", true);
 			} else {
-				target.draw(2);
+				await target.draw(2);
 			}
-			if (!player.storage.songci) player.storage.songci = [];
-			player.storage.songci.push(target);
-			player.storage.songci.sortBySeat();
-			player.markSkill("songci");
 		},
 		intro: {
 			content: "已对$发动过〖颂词〗",
