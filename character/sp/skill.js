@@ -18420,9 +18420,22 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
-			player.chooseControl(lib.suit).set("prompt", "请选择一个花色").ai = function () {
+			player.chooseControl(lib.suit).set("prompt", "请选择一个花色").set("ai", () => get.event().chosen).set("chosen", function () {
+				let suits = {}, msuit, mcount = 0;
+				target.getKnownCards(player).forEach(i => {
+					let suit = get.suit(i);
+					if (suits[suit]) suits[suit]++;
+					else suits[suit] = 1;
+				});
+				for (let i in suits) {
+					if (suits[i] > mcount && lib.suit.includes(i)) {
+						msuit = i;
+						mcount = suits[i];
+					}
+				}
+				if (msuit) return msuit;
 				return lib.suit.randomGet();
-			};
+			}());
 			"step 1";
 			event.suit = result.control;
 			player.popup(event.suit + 2);
