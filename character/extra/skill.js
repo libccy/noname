@@ -203,12 +203,14 @@ const skills = {
 			global: "phaseBefore",
 			player: "enterGame",
 		},
-		forced: true,
-		locked: false,
 		filter(event, player) {
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
+		forced: true,
+		popup: false,
+		locked: false,
 		async content(event, trigger, player) {
+			player.logSkill('jilin', null, null, null, 1);
 			const cards = get.cards(3);
 			const next = player.addToExpansion(cards, "draw");
 			next.gaintag.add(event.name);
@@ -255,7 +257,7 @@ const skills = {
 		group: ["jilin_kanpo", "jilin_change"],
 		subSkill: {
 			kanpo: {
-				audio: "jilin",
+				audio: ["jilin2.mp3", "jilin3.mp3"],
 				trigger: {
 					target: "useCardToTarget",
 				},
@@ -306,7 +308,7 @@ const skills = {
 				},
 			},
 			change: {
-				audio: "jilin",
+				audio: ["jilin4.mp3", "jilin5.mp3"],
 				trigger: {
 					player: "phaseBegin",
 				},
@@ -392,7 +394,9 @@ const skills = {
 				cost_data: links,
 			};
 		},
+		popup: false,
 		async content(event, trigger, player) {
+			player.logSkill('yingyou', null, null, null, get.rand(1, 2));
 			event.cost_data[0].storage.jilin = true;
 			const num = player.getExpansions("jilin").filter(card => card.storage.jilin).length;
 			await player.draw(num);
@@ -403,7 +407,7 @@ const skills = {
 		group: "yingyou_draw",
 		subSkill: {
 			draw: {
-				audio: "yingyou",
+				audio: ["yingyou3.mp3", "yingyou4.mp3"],
 				trigger: {
 					player: "loseAfter",
 					global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -5260,7 +5264,7 @@ const skills = {
 		group: ["tspowei_init", "tspowei_move", "tspowei_achieve", "tspowei_fail", "tspowei_use", "tspowei_remove"],
 		subSkill: {
 			remove: {
-				audio: "tspowei3",
+				audio: "tspowei3.mp3",
 				trigger: { global: "damageEnd" },
 				filter(event, player) {
 					return event.player && event.player.isIn() && event.player.hasMark("dulie");
@@ -5272,7 +5276,7 @@ const skills = {
 				},
 			},
 			use: {
-				audio: "tspowei3",
+				audio: "tspowei3.mp3",
 				trigger: { global: "phaseBegin" },
 				direct: true,
 				filter(event, player) {
@@ -5335,7 +5339,7 @@ const skills = {
 				},
 			},
 			init: {
-				audio: "tspowei3",
+				audio: "tspowei3.mp3",
 				trigger: {
 					global: "phaseBefore",
 					player: "enterGame",
@@ -5353,7 +5357,7 @@ const skills = {
 				},
 			},
 			move: {
-				audio: "tspowei3",
+				audio: "tspowei3.mp3",
 				trigger: { player: "phaseBegin" },
 				forced: true,
 				filter(event, player) {
@@ -5375,7 +5379,7 @@ const skills = {
 				},
 			},
 			achieve: {
-				audio: "tspowei1",
+				audio: "tspowei1.mp3",
 				trigger: { player: "phaseBegin" },
 				forced: true,
 				skillAnimation: true,
@@ -5392,7 +5396,7 @@ const skills = {
 				},
 			},
 			fail: {
-				audio: "tspowei2",
+				audio: "tspowei2.mp3",
 				trigger: { player: "dying" },
 				forced: true,
 				content() {
@@ -5407,9 +5411,6 @@ const skills = {
 			},
 		},
 	},
-	tspowei1: { audio: true },
-	tspowei2: { audio: true },
-	tspowei3: { audio: true },
 	shenzhu: {
 		audio: 2,
 		trigger: { player: "useCardAfter" },

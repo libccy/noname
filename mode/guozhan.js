@@ -3386,7 +3386,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					if (gains.length) await player.gain(gains, "gain2");
 					if (
 						game.getGlobalHistory("everything", evt => {
-							return evt.name == "die" && evt.getParent(6).name == "fakezhouting" && evt.getParent(6).player == player;
+							return evt.name == "die" && evt.getParent(6) == event && evt.getParent(6).player == player;
 						}).length
 					)
 						player.restoreSkill("fakezhouting");

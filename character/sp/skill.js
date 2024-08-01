@@ -1968,7 +1968,7 @@ const skills = {
 						type = get.type(name),
 						infox = get.info({ name: name });
 					if (type != "basic" && type != "trick") return false;
-					if (type == "trick" && (!infox || !infox.filterTarget)) return false;
+					if (type == "trick" && (!infox || !infox.filterTarget || get.info("xunshi").isXunshi({ name: name }))) return false;
 					return (type != "basic") == (player.storage.olxuanzhu || false);
 				})
 				.some(card => event.filterCard({ name: card[2], nature: card[3] }, player, event));
@@ -1982,7 +1982,7 @@ const skills = {
 							type = get.type(name),
 							infox = get.info({ name: name });
 						if (type != "basic" && type != "trick") return false;
-						if (type == "trick" && (!infox || !infox.filterTarget)) return false;
+						if (type == "trick" && (!infox || !infox.filterTarget || get.info("xunshi").isXunshi({ name: name }))) return false;
 						return (type != "basic") == (player.storage.olxuanzhu || false);
 					})
 					.filter(card => event.filterCard({ name: card[2], nature: card[3] }, player, event));
@@ -2073,7 +2073,7 @@ const skills = {
 						type = get.type(name),
 						infox = get.info({ name: name });
 					if (type != "basic" && type != "trick") return false;
-					if (type == "trick" && (!infox || !infox.filterTarget)) return false;
+					if (type == "trick" && (!infox || !infox.filterTarget || get.info("xunshi").isXunshi({ name: name }))) return false;
 					return (type != "basic") == (player.storage.olxuanzhu || false);
 				})
 				.map(card => card[2])
