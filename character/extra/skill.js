@@ -8328,9 +8328,8 @@ const skills = {
 			if (filter(get.autoViewAs({ name: "wuxie" }, "unsure"), player, event) && player.countCards("hs", { suit: "spade" })) return true;
 			return false;
 		},
-		precontent() {
-			delete event.result.skill;
-			player.logSkill("longhun" + (4 - lib.suit.indexOf(get.suit(event.result.cards[0], player))));
+		logAudio(event,player){
+			return 4 - lib.suit.indexOf(get.suit(event.cards[0], player));
 		},
 		ai: {
 			respondSha: true,

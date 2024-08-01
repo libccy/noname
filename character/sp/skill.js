@@ -19605,30 +19605,33 @@ const skills = {
 			global: "phaseBefore",
 			player: "enterGame",
 		},
-		forced: true,
+		locked: true,
 		filter: function (event, player) {
 			return game.hasPlayer(current => current != player) && (event.name != "phase" || game.phaseNumber == 0);
 		},
 		audio: 6,
-		content: function () {
-			"step 0";
-			player
-				.chooseTarget("请选择【先辅】的目标", lib.translate.xianfu_info, true, function (card, player, target) {
-					return target != player && (!player.storage.xianfu2 || !player.storage.xianfu2.includes(target));
-				})
-				.set("ai", function (target) {
-					var att = get.attitude(_status.event.player, target);
-					if (att > 0) return att + 1;
-					if (att == 0) return Math.random();
-					return att;
-				}).animate = false;
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				if (!player.storage.xianfu2) player.storage.xianfu2 = [];
-				player.storage.xianfu2.push(target);
-				player.addSkill("xianfu2");
-			}
+		async cost(event,trigger,player){
+			event.result=await player
+			.chooseTarget("请选择【先辅】的目标", lib.translate.xianfu_info, true, function (card, player, target) {
+				return target != player && (!player.storage.xianfu2 || !player.storage.xianfu2.includes(target));
+			})
+			.set("ai", function (target) {
+				let att = get.attitude(_status.event.player, target);
+				if (att > 0) return att + 1;
+				if (att == 0) return Math.random();
+				return att;
+			})
+			.set("animate", false)
+			.forResult();
+		},
+		logAudio(){
+			return [1, 2].randomGet();
+		},
+		async content(event,trigger,player) {
+			let target = event.targets[0];
+			if (!player.storage.xianfu2) player.storage.xianfu2 = [];
+			player.storage.xianfu2.push(target);
+			player.addSkill("xianfu2");
 		},
 	},
 	xianfu_mark: {
@@ -19647,6 +19650,10 @@ const skills = {
 			if (event.player.isDead() || !player.storage.xianfu2 || !player.storage.xianfu2.includes(event.player) || event.num <= 0) return false;
 			if (event.name == "damage") return true;
 			return player.isDamaged();
+		},
+		logAudio(event, player){
+			if(event.name=="damage") return [5, 6].randomGet();
+			return [3, 4].randomGet();
 		},
 		logTarget: "player",
 		content: function () {
@@ -28313,6 +28320,10 @@ const skills = {
 		},
 		filterTarget: function (card, player, target) {
 			return !player.getStorage("songci").includes(target);
+		},
+		logAudio(event, player) {
+			const target = event.targets[0], goon = target.countCards("h") > target.hp;;
+			return goon ? 2 : 1;
 		},
 		async content(event, trigger, player) {
 			const target = event.target,
