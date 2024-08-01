@@ -19611,7 +19611,7 @@ const skills = {
 		},
 		audio: 6,
 		async cost(event,trigger,player){
-			event.result=await player
+			const result=await player
 			.chooseTarget("请选择【先辅】的目标", lib.translate.xianfu_info, true, function (card, player, target) {
 				return target != player && (!player.storage.xianfu2 || !player.storage.xianfu2.includes(target));
 			})
@@ -19623,12 +19623,16 @@ const skills = {
 			})
 			.set("animate", false)
 			.forResult();
+			event.result={
+				bool: true,
+				cost_data: result.targets[0],
+			};
 		},
 		logAudio(){
 			return [1, 2].randomGet();
 		},
 		async content(event,trigger,player) {
-			let target = event.targets[0];
+			let target = event.cost_data;
 			if (!player.storage.xianfu2) player.storage.xianfu2 = [];
 			player.storage.xianfu2.push(target);
 			player.addSkill("xianfu2");
@@ -19652,8 +19656,8 @@ const skills = {
 			return player.isDamaged();
 		},
 		logAudio(event, player){
-			if(event.name=="damage") return [5, 6].randomGet();
-			return [3, 4].randomGet();
+			if(event.name=="damage") return [5, 4].randomGet();
+			return [3, 6].randomGet();
 		},
 		logTarget: "player",
 		content: function () {
