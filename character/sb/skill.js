@@ -5164,9 +5164,10 @@ const skills = {
 	},
 	//徐晃
 	sbduanliang: {
-		audio: 1,
+		audio: 4,
 		enable: "phaseUse",
 		usable: 1,
+		logAudio: 1,
 		filterTarget: lib.filter.notMe,
 		content: function () {
 			"step 0";
@@ -5207,9 +5208,18 @@ const skills = {
 			},
 		},
 		subSkill: {
-			true1: { audio: true },
-			true2: { audio: true },
-			false: { audio: true },
+			true1: {
+				audio: "sbduanliang",
+				logAudio: 2,
+			},
+			true2: {
+				audio: "sbduanliang",
+				logAudio: 3,
+			},
+			false: {
+				audio: "sbduanliang",
+				logAudio: 4,
+			},
 		},
 	},
 	sbshipo: {
@@ -5353,9 +5363,10 @@ const skills = {
 	},
 	//马超
 	sbtieji: {
-		audio: 1,
+		audio: 4,
 		trigger: { player: "useCardToPlayered" },
 		logTarget: "target",
+		logAudio: 1,
 		filter: function (event, player) {
 			return player != event.target && event.card.name == "sha" && event.target.isIn();
 		},
@@ -5399,9 +5410,18 @@ const skills = {
 			directHit_ai: true,
 		},
 		subSkill: {
-			true1: { audio: true },
-			true2: { audio: true },
-			false: { audio: true },
+			true1: {
+				audio: "sbtieji",
+				logAudio: 2,
+			},
+			true2: {
+				audio: "sbtieji",
+				logAudio: 3,
+			},
+			false: {
+				audio: "sbtieji",
+				logAudio: 4,
+			},
 		},
 	},
 	//甘宁

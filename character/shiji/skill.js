@@ -1292,102 +1292,78 @@ const skills = {
 	},
 	spxizhan: {
 		audio: 5,
-		group: "spxizhan_effect",
-		locked: false,
+		trigger: { global: "phaseBegin" },
+		filter: function (event, player) {
+			return player != event.player;
+		},
+		logAudio(event, player, name, indexedData, costResult) {
+			if (!costResult.cards.length) return 2;
+			let suit = get.suit(costResult.cards[0]);
+			return [null, "spade", null, "heart", "club", "diamond"].indexOf(suit);
+		},
+		async cost(event, trigger, player) {
+			const result = await player.chooseToDiscard("he", "嬉战：弃置一张牌或失去1点体力", "根据弃置的牌对" + get.translation(trigger.player) + "视为使用如下牌：<br>♠，其使用【酒】；♥，你使用【无中生有】<br>♣，对其使用【铁索连环】；♦：对其使用火【杀】").set("ai", function (card) {
+				var player = _status.event.player,
+					target = _status.event.getTrigger().player;
+				var suit = get.suit(card, player),
+					list;
+				switch (suit) {
+					case "spade":
+						list = [{ name: "jiu" }, target, target];
+						break;
+					case "heart":
+						list = [{ name: "wuzhong" }, player, player];
+						break;
+					case "club":
+						list = [{ name: "tiesuo" }, player, target];
+						break;
+					case "diamond":
+						list = [{ name: "sha", nature: "fire" }, player, target];
+						break;
+				}
+				list[0].isCard = true;
+				var eff = 0;
+				if (list[1].canUse(list[0], list[2], false)) eff = get.effect(list[2], list[0], list[1], player);
+				if (eff >= 0 || suit == "club") eff = Math.max(eff, 5);
+				return eff * 1.5 - get.value(card);
+			}).set("chooseonly", true).forResult();
+			event.result = {
+				bool: true,
+				cards: result.cards || [],
+				targets: [trigger.player],
+			};
+		},
+		async content(event, trigger, player) {
+			if (event.cards && event.cards.length) {
+				await player.discard(event.cards);
+				player.addTempSkill("spxizhan_spfangzong");
+				var target = trigger.player,
+					card = event.cards[0],
+					suit = get.suit(card, player);
+				if (!lib.suit.includes(suit) || ((!target || !target.isIn()) && suit != "heart")) return;
+				switch (suit) {
+					case "spade":
+						await target.chooseUseTarget("jiu", true);
+						break;
+					case "heart":
+						await player.chooseUseTarget("wuzhong", true);
+						break;
+					case "club":
+						if (player.canUse("tiesuo", target)) await player.useCard({ name: "tiesuo", isCard: true }, target);
+						break;
+					case "diamond":
+						if (player.canUse({ name: "sha", isCard: true, nature: "fire" }, target, false)) {
+							await player.useCard({ name: "sha", isCard: true, nature: "fire", }, target, false);
+						}
+						break;
+				}
+			}
+			else {
+				await player.loseHp();
+			}
+		},
 		subSkill: {
 			spfangzong: { charlotte: true },
-			effect: {
-				trigger: { global: "phaseBegin" },
-				filter: function (event, player) {
-					return player != event.player;
-				},
-				forced: true,
-				logTarget: "player",
-				content: function () {
-					"step 0";
-					player.chooseToDiscard("he", "嬉战：弃置一张牌或失去1点体力", "根据弃置的牌对" + get.translation(trigger.player) + "视为使用如下牌：<br>♠，其使用【酒】；♥，你使用【无中生有】<br>♣，对其使用【铁索连环】；♦：对其使用火【杀】").set("ai", function (card) {
-						var player = _status.event.player,
-							target = _status.event.getTrigger().player;
-						var suit = get.suit(card, player),
-							list;
-						switch (suit) {
-							case "spade":
-								list = [{ name: "jiu" }, target, target];
-								break;
-							case "heart":
-								list = [{ name: "wuzhong" }, player, player];
-								break;
-							case "club":
-								list = [{ name: "tiesuo" }, player, target];
-								break;
-							case "diamond":
-								list = [{ name: "sha", nature: "fire" }, player, target];
-								break;
-						}
-						list[0].isCard = true;
-						var eff = 0;
-						if (list[1].canUse(list[0], list[2], false)) eff = get.effect(list[2], list[0], list[1], player);
-						if (eff >= 0 || suit == "club") eff = Math.max(eff, 5);
-						return eff * 1.5 - get.value(card);
-					});
-					"step 1";
-					if (result.bool) {
-						player.addTempSkill("spxizhan_spfangzong");
-						var target = trigger.player,
-							card = result.cards[0],
-							suit = get.suit(card, player);
-						if (!lib.suit.includes(suit) || ((!target || !target.isIn()) && suit != "heart")) return;
-						game.broadcastAll(function (suit) {
-							if (lib.config.background_speak) game.playAudio("skill", "spxizhan" + [null, "spade", null, "heart", "club", "diamond"].indexOf(suit));
-						}, suit);
-						switch (suit) {
-							case "spade":
-								target.chooseUseTarget("jiu", true);
-								break;
-							case "heart":
-								player.chooseUseTarget("wuzhong", true);
-								break;
-							case "club":
-								if (player.canUse("tiesuo", target))
-									player.useCard(
-										{
-											name: "tiesuo",
-											isCard: true,
-										},
-										target
-									);
-								break;
-							case "diamond":
-								if (
-									player.canUse(
-										{
-											name: "sha",
-											isCard: true,
-											nature: "fire",
-										},
-										target,
-										false
-									)
-								)
-									player.useCard(
-										{
-											name: "sha",
-											isCard: true,
-											nature: "fire",
-										},
-										target,
-										false
-									);
-								break;
-						}
-					} else {
-						game.broadcastAll(function () {
-							if (lib.config.background_speak) game.playAudio("skill", "spxizhan2");
-						});
-						player.loseHp();
-					}
-				},
-			},
 		},
 	},
 	//高览
