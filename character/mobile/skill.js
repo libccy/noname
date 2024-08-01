@@ -441,7 +441,7 @@ const skills = {
 				cost_data: list,
 			};
 		},
-		popup: false,
+		logAudio: ()=> 1,
 		async content(event, trigger, player) {
 			player.logSkill('mbjiejian', event.targets, null, null, 1);
 			const list = event.cost_data;
@@ -590,19 +590,20 @@ const skills = {
 		},
 		logTarget: "player",
 		onremove: true,
-		popup: false,
+		logAudio(_, __, ___, ___, evt) {
+			const { control } = evt.cost_data;
+			return control == "减伤" ? get.rand(1, 2) : get.rand(3, 4);
+		},
 		async content(event, trigger, player) {
 			const { control } = event.cost_data;
 			const { player: target, source } = trigger;
 			if (!player.storage.mbpanxiang) player.storage.mbpanxiang = {};
 			player.storage.mbpanxiang[target.playerid] = control;
 			if (control === "减伤") {
-				player.logSkill('mbpanxiang', null, null, null, get.rand(1, 2));
 				trigger.num--;
 				game.log(player, "令此伤害", "#y-1");
 				if (source && source.isIn()) await source.draw(2);
 			} else {
-				player.logSkill('mbpanxiang', null, null, null, get.rand(3, 4));
 				trigger.num++;
 				game.log(player, "令此伤害", "#y+1");
 				await target.draw(3);
@@ -2916,16 +2917,15 @@ const skills = {
 			return player.maxHp >= num;
 		},
 		forced: true,
-		popup: false,
+		logAudio(event, player) {
+			if (event.name == "damage") get.rand(1, 2);
+			return 3;
+		},
 		content: function () {
 			if (trigger.name == "damage") {
-				player.logSkill('laishou', null, null, null, get.rand(1, 2));
 				player.gainMaxHp(trigger.num);
 				trigger.cancel();
-			} else {
-				player.logSkill('laishou', null, null, null, 3);
-				player.die();
-			}
+			} else player.die();
 		},
 	},
 	luanqun: {
@@ -2939,6 +2939,7 @@ const skills = {
 			"step 0";
 			var targets = game.filterPlayer(current => current.countCards("h")).sortBySeat();
 			event.targets = targets;
+			player.line(targets);
 			var next = player
 				.chooseCardOL(targets, "乱群：请选择要展示的牌", true)
 				.set("ai", function (card) {
@@ -5029,10 +5030,9 @@ const skills = {
 			game.log(player, (num > 0 ? "获得了" : "减少了") + get.cnNumber(Math.abs(num)) + "点“达命”值");
 		},
 		forced: true,
-		popup: false,
 		locked: false,
+		logAudio: ()=> get.rand(1, 2),
 		content: function () {
-			player.logSkill('spdaming', null, null, null, get.rand(1, 2));
 			lib.skill.spdaming.change(player, 1);
 		},
 		intro: {
@@ -6740,11 +6740,10 @@ const skills = {
 			if (att == 0) return !player.inRangeOf(target);
 			return true;
 		},
-		popup: false,
+		logAudio: ()=> 1,
 		content: function () {
 			"step 0";
 			event.target = trigger.player;
-			player.logSkill("spdaoshu", event.target, null, null, 1);
 			event.target.chooseUseTarget("jiu", true);
 			"step 1";
 			if (!target.countCards("h")) {

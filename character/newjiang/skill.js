@@ -2900,10 +2900,11 @@ const skills = {
 		filter: function (event, player) {
 			return player.countMark("spshidi") % 2 == ["phaseJieshu", "phaseZhunbei"].indexOf(event.name);
 		},
+		logAudio(event, player) {
+			return 1 + player.countMark("spshidi") % 2;
+		},
 		forced: true,
-		popup: false,
 		content: function () {
-			player.logSkill('spshidi', null, null, null, 2 - player.countMark("spshidi") % 2);
 			player.changeZhuanhuanji("spshidi");
 		},
 		mod: {

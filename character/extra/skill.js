@@ -394,9 +394,8 @@ const skills = {
 				cost_data: links,
 			};
 		},
-		popup: false,
+		logAudio: ()=> get.rand(1, 2),
 		async content(event, trigger, player) {
-			player.logSkill('yingyou', null, null, null, get.rand(1, 2));
 			event.cost_data[0].storage.jilin = true;
 			const num = player.getExpansions("jilin").filter(card => card.storage.jilin).length;
 			await player.draw(num);
