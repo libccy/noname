@@ -494,7 +494,7 @@ game.import("card", function () {
 					}, "he")
 				},
 				content: () => {
-					player.chooseToDiscard(true, (card) => get.event().getTrigger().cards?.includes(card), "he");
+					player.chooseToDiscard(true, (card) => !get.event().getTrigger().cards?.includes(card), "he");
 				},
 				subSkill: {
 					lose: {
