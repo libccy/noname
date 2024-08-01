@@ -3322,6 +3322,9 @@ const skills = {
 			return event.hasNature();
 		},
 		forced: true,
+		logAudio(event, player, name) {
+			return name == "damageBegin2" ? 2 : 1;
+		},
 		content: function () {
 			"step 0";
 			if (event.triggername == "damageBegin2") {
@@ -6750,19 +6753,16 @@ const skills = {
 			}
 			return true;
 		},
+		logAudio: ()=> 1,
+		skillAnimation: true,
+		animationColor: "water",
 		content: function () {
 			player.awakenSkill("twmibei");
-			player.logSkill("twmibei_achieve");
 			game.log(player, "成功完成使命");
 			player.addSkills("twmouli");
 		},
 		intro: { content: "已使用牌名：$" },
 		subSkill: {
-			achieve: {
-				audio: "mibei1",
-				skillAnimation: true,
-				animationColor: "water",
-			},
 			mark: {
 				trigger: { player: "useCard1" },
 				filter: function (event, player) {
@@ -6777,7 +6777,7 @@ const skills = {
 				},
 			},
 			fail: {
-				audio: "mibei2",
+				audio: "mibei2.mp3",
 				trigger: { player: "phaseUseEnd" },
 				forced: true,
 				filter: function (event, player) {
@@ -13143,6 +13143,7 @@ const skills = {
 			return game.hasPlayer(current => current != player) && (event.name != "phase" || game.phaseNumber == 0);
 		},
 		forced: true,
+		logAudio: ()=> 1,
 		content: function () {
 			"step 0";
 			player.chooseTarget("请选择【随征】的目标", lib.translate.twsuizheng_info, lib.filter.notMe, true).set("ai", function (target) {
@@ -13164,7 +13165,7 @@ const skills = {
 		subSkill: {
 			draw: {
 				charlotte: true,
-				audio: "twsuizheng",
+				audio: "twsuizheng3.mp3",
 				trigger: { global: "damageSource" },
 				filter: function (event, player) {
 					return player.getStorage("twsuizheng").includes(event.source);
@@ -13176,7 +13177,7 @@ const skills = {
 				},
 			},
 			xianfu: {
-				audio: "twsuizheng",
+				audio: "twsuizheng2.mp3",
 				trigger: { global: "damageEnd" },
 				filter: function (event, player) {
 					return player.getStorage("twsuizheng").includes(event.player) && event.player.isIn();

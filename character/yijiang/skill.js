@@ -11723,7 +11723,8 @@ const skills = {
 		group: ["enyuan1", "enyuan2"],
 	},
 	enyuan1: {
-		audio: ["enyuan3.mp3", "enyuan4.mp3"],
+		audio: "enyuan",
+		logAudio: ()=> get.rand(3, 4),
 		trigger: { player: "damageEnd" },
 		forced: true,
 		filter: function (event, player) {
@@ -11762,7 +11763,8 @@ const skills = {
 		},
 	},
 	enyuan2: {
-		audio: ["enyuan1.mp3", "enyuan2.mp3"],
+		audio: "enyuan",
+		logAudio: ()=> get.rand(1, 2),
 		trigger: { player: "recoverEnd" },
 		forced: true,
 		logTarget: "source",

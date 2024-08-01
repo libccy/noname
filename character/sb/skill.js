@@ -5086,7 +5086,7 @@ const skills = {
 			"step 1";
 			if (result.bool) {
 				var target = result.targets[0];
-				player.logSkill("sbxieji", target);
+				player.logSkill("sbxieji", target, null, null, get.rand(1, 2));
 				//选择对方的协击条件
 				player.chooseCooperationFor(target, "sbxieji").set("ai", function (button) {
 					var base = 0;
@@ -5114,7 +5114,7 @@ const skills = {
 		},
 		subSkill: {
 			effect: {
-				audio: "sbxieji",
+				audio: "sbxieji3.mp3",
 				charlotte: true,
 				trigger: { global: "phaseJieshuBegin" },
 				direct: true,
@@ -6877,6 +6877,7 @@ const skills = {
 		filter: function (event, player) {
 			return game.hasPlayer(current => current.hasMark("sbjieyin_mark"));
 		},
+		logAudio: ()=> get.rand(1, 2),
 		content: function () {
 			"step 0";
 			var targets = game.filterPlayer(current => current.hasMark("sbjieyin_mark"));
@@ -6927,7 +6928,7 @@ const skills = {
 		},
 		subSkill: {
 			fail: {
-				audio: "sbjieyin",
+				audio: "sbjieyin2.mp3",
 				trigger: { global: "dieAfter" },
 				dutySkill: true,
 				forced: true,
@@ -6959,7 +6960,7 @@ const skills = {
 			},
 			marked: { charlotte: true },
 			init: {
-				audio: "sbjieyin",
+				audio: "sbjieyin1.mp3",
 				trigger: {
 					global: "phaseBefore",
 					player: "enterGame",

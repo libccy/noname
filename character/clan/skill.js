@@ -1238,6 +1238,9 @@ const skills = {
 			aiOrder(player, card, num) {
 				if (player.isPhaseUsing() && get.type(card) == "equip" && get.equipValue(card, player) > 0) return num + 3;
 			},
+			cardUsable(card) {
+				if (card.storage?.clanfuxun) return Infinity;
+			},
 		},
 		locked: false,
 		audio: 2,
@@ -1333,6 +1336,7 @@ const skills = {
 				var card = {
 					name: result.links[0][2],
 					nature: result.links[0][3],
+					storage: { clanfuxun: true },
 				};
 				game.broadcastAll(function (card) {
 					lib.skill.clanfuxun_backup.viewAs = card;

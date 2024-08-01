@@ -1968,7 +1968,7 @@ const skills = {
 						type = get.type(name),
 						infox = get.info({ name: name });
 					if (type != "basic" && type != "trick") return false;
-					if (type == "trick" && (!infox || !infox.filterTarget)) return false;
+					if (type == "trick" && (!infox || !infox.filterTarget || get.info("xunshi").isXunshi({ name: name }))) return false;
 					return (type != "basic") == (player.storage.olxuanzhu || false);
 				})
 				.some(card => event.filterCard({ name: card[2], nature: card[3] }, player, event));
@@ -1982,7 +1982,7 @@ const skills = {
 							type = get.type(name),
 							infox = get.info({ name: name });
 						if (type != "basic" && type != "trick") return false;
-						if (type == "trick" && (!infox || !infox.filterTarget)) return false;
+						if (type == "trick" && (!infox || !infox.filterTarget || get.info("xunshi").isXunshi({ name: name }))) return false;
 						return (type != "basic") == (player.storage.olxuanzhu || false);
 					})
 					.filter(card => event.filterCard({ name: card[2], nature: card[3] }, player, event));
@@ -2073,7 +2073,7 @@ const skills = {
 						type = get.type(name),
 						infox = get.info({ name: name });
 					if (type != "basic" && type != "trick") return false;
-					if (type == "trick" && (!infox || !infox.filterTarget)) return false;
+					if (type == "trick" && (!infox || !infox.filterTarget || get.info("xunshi").isXunshi({ name: name }))) return false;
 					return (type != "basic") == (player.storage.olxuanzhu || false);
 				})
 				.map(card => card[2])
@@ -9945,10 +9945,11 @@ const skills = {
 			return event.skill == "olbixin" && player.countMark("olbixin") < 3;
 		},
 		forced: true,
-		popup: false,
+		logAudio(event, player) {
+			return 1 + player.countMark("olbixin");
+		},
 		content: function () {
 			player.addMark("olbixin", 1, false);
-			player.logSkill('olximo', null, null, null, player.countMark("olbixin"));
 			game.log(player, "删除了", "#g【笔心】", "描述的前五个字符");
 			if (player.countMark("olbixin") == 3) {
 				game.log(player, "交换了", "#g【笔心】", "方括号中的两个数字");

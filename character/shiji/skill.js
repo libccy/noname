@@ -268,38 +268,34 @@ const skills = {
 	},
 	houfeng: {
 		audio: 3,
-		group: "houfeng_zhengsu",
+		trigger: { global: "phaseUseBegin" },
+		filter: function (event, player) {
+			if (!["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].some(i => !event.player.hasSkill(i))) return false;
+			return player.inRange(event.player);
+		},
+		check: function (event, player) {
+			return get.attitude(player, event.player) > 0;
+		},
+		round: 1,
+		logAudio: ()=> 1,
+		logTarget: "player",
+		content: function () {
+			"step 0";
+			player.chooseButton(["选择" + get.translation(trigger.player) + "要进行的整肃类型", [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !trigger.player.hasSkill(i)), "vcard"]], true).set("ai", () => Math.random());
+			"step 1";
+			if (result.bool) {
+				var name = result.links[0][2],
+					target = trigger.player;
+				target.addTempSkill("houfeng_share", {
+					player: ["phaseDiscardAfter", "phaseAfter"],
+				});
+				target.markAuto("houfeng_share", [player]);
+				target.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
+				target.popup(name, "thunder");
+				game.delayx();
+			}
+		},
 		subSkill: {
-			zhengsu: {
-				audio: "houfeng1",
-				trigger: { global: "phaseUseBegin" },
-				filter: function (event, player) {
-					if (!["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].some(i => !event.player.hasSkill(i))) return false;
-					return player.inRange(event.player);
-				},
-				check: function (event, player) {
-					return get.attitude(player, event.player) > 0;
-				},
-				prompt2: () => lib.translate.houfeng_info,
-				round: 1,
-				logTarget: "player",
-				content: function () {
-					"step 0";
-					player.chooseButton(["选择" + get.translation(trigger.player) + "要进行的整肃类型", [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !trigger.player.hasSkill(i)), "vcard"]], true).set("ai", () => Math.random());
-					"step 1";
-					if (result.bool) {
-						var name = result.links[0][2],
-							target = trigger.player;
-						target.addTempSkill("houfeng_share", {
-							player: ["phaseDiscardAfter", "phaseAfter"],
-						});
-						target.markAuto("houfeng_share", [player]);
-						target.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
-						target.popup(name, "thunder");
-						game.delayx();
-					}
-				},
-			},
 			share: {
 				charlotte: true,
 				onremove: true,
@@ -356,31 +352,27 @@ const skills = {
 	//手杀皇甫嵩
 	spzhengjun: {
 		audio: 3,
-		group: "spzhengjun_zhengsu",
+		trigger: { player: "phaseUseBegin" },
+		filter: function (event, player) {
+			return ["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].some(i => !player.hasSkill(i));
+		},
+		direct: true,
+		content: function () {
+			"step 0";
+			player.chooseButton([get.prompt("spzhengjun"), [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !player.hasSkill(i)), "vcard"]]).set("ai", () => Math.random());
+			"step 1";
+			if (result.bool) {
+				player.logSkill("spzhengjun_zhengsu", player, null, null, 1);
+				var name = result.links[0][2];
+				player.addTempSkill("spzhengjun_share", {
+					player: ["phaseDiscardAfter", "phaseAfter"],
+				});
+				player.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
+				player.popup(name, "thunder");
+				game.delayx();
+			}
+		},
 		subSkill: {
-			zhengsu: {
-				audio: "spzhengjun1",
-				trigger: { player: "phaseUseBegin" },
-				filter: function (event, player) {
-					return ["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].some(i => !player.hasSkill(i));
-				},
-				direct: true,
-				content: function () {
-					"step 0";
-					player.chooseButton([get.prompt("spzhengjun"), [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !player.hasSkill(i)), "vcard"]]).set("ai", () => Math.random());
-					"step 1";
-					if (result.bool) {
-						player.logSkill("spzhengjun_zhengsu", player);
-						var name = result.links[0][2];
-						player.addTempSkill("spzhengjun_share", {
-							player: ["phaseDiscardAfter", "phaseAfter"],
-						});
-						player.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
-						player.popup(name, "thunder");
-						game.delayx();
-					}
-				},
-			},
 			share: {
 				charlotte: true,
 				trigger: { player: "phaseDiscardEnd" },
@@ -436,7 +428,6 @@ const skills = {
 			},
 		},
 	},
-	spzhengjun1: { audio: true },
 	spshiji: {
 		audio: 2,
 		trigger: { source: "damageBegin2" },
@@ -773,31 +764,27 @@ const skills = {
 	},
 	spyanji: {
 		audio: 3,
-		group: "spyanji_zhengsu",
+		trigger: { player: "phaseUseBegin" },
+		filter: function (event, player) {
+			return ["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].some(i => !player.hasSkill(i));
+		},
+		direct: true,
+		content: function () {
+			"step 0";
+			player.chooseButton([get.prompt("spyanji"), [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !player.hasSkill(i)), "vcard"]]).set("ai", () => Math.random());
+			"step 1";
+			if (result.bool) {
+				player.logSkill("spyanji", player, null, null, 1);
+				var name = result.links[0][2];
+				player.addTempSkill("spyanji_share", {
+					player: ["phaseDiscardAfter", "phaseAfter"],
+				});
+				player.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
+				player.popup(name, "thunder");
+				game.delayx();
+			}
+		},
 		subSkill: {
-			zhengsu: {
-				audio: "spyanji",
-				trigger: { player: "phaseUseBegin" },
-				filter: function (event, player) {
-					return ["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].some(i => !player.hasSkill(i));
-				},
-				direct: true,
-				content: function () {
-					"step 0";
-					player.chooseButton([get.prompt("spyanji"), [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !player.hasSkill(i)), "vcard"]]).set("ai", () => Math.random());
-					"step 1";
-					if (result.bool) {
-						player.logSkill("spyanji_zhengsu", player);
-						var name = result.links[0][2];
-						player.addTempSkill("spyanji_share", {
-							player: ["phaseDiscardAfter", "phaseAfter"],
-						});
-						player.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
-						player.popup(name, "thunder");
-						game.delayx();
-					}
-				},
-			},
 			share: {
 				charlotte: true,
 				trigger: { player: "phaseDiscardEnd" },
@@ -823,7 +810,6 @@ const skills = {
 			},
 		},
 	},
-	spyanji1: { audio: true },
 	//蒋钦
 	spjianyi: {
 		audio: 2,
@@ -2315,7 +2301,8 @@ const skills = {
 		derivation: "zhangming",
 		subSkill: {
 			chuhai: {
-				audio: ["chuhai", 2],
+				audio: "chuhai",
+				logAudio: ()=> 1,
 				inherit: "chuhai",
 				prompt: "与一名其他角色进行拼点",
 			},
@@ -2333,7 +2320,7 @@ const skills = {
 				},
 			},
 			achieve: {
-				audio: ["chuhai", 2],
+				audio: "chuhai2.mp3",
 				trigger: { player: "equipAfter" },
 				forced: true,
 				skillAnimation: true,
@@ -2349,7 +2336,7 @@ const skills = {
 				},
 			},
 			fail: {
-				audio: "chuhai3",
+				audio: "chuhai3.mp3",
 				trigger: { player: "chooseToCompareAfter" },
 				forced: true,
 				filter: function (event, player) {
@@ -2362,7 +2349,6 @@ const skills = {
 			},
 		},
 	},
-	chuhai3: { audio: true },
 	zhangming: {
 		audio: 2,
 		trigger: { player: "useCard" },
@@ -2966,7 +2952,6 @@ const skills = {
 		dutySkill: true,
 		forced: true,
 		locked: false,
-		direct: true,
 		filter: function (event, player) {
 			if (!player.storage.xingqi || !player.storage.xingqi.length) return false;
 			var map = { basic: 0, trick: 0, equip: 0 };
@@ -2979,11 +2964,13 @@ const skills = {
 			}
 			return true;
 		},
+		logAudio: ()=> 1,
+		skillAnimation: true,
+		animationColor: "water",
 		content: function () {
 			"step 0";
-			player.logSkill("twmibei_achieve");
-			game.log(player, "成功完成使命");
 			player.awakenSkill("mibei");
+			game.log(player, "成功完成使命");
 			var list = ["basic", "equip", "trick"],
 				cards = [];
 			for (var i of list) {
@@ -3016,7 +3003,7 @@ const skills = {
 			},
 			mark: { charlotte: true },
 			fail: {
-				audio: "mibei2",
+				audio: "mibei2.mp3",
 				trigger: { player: "phaseJieshuBegin" },
 				filter: function (event, player) {
 					return !player.getStorage("xingqi").length && player.hasSkill("mibei_mark");
@@ -3030,8 +3017,6 @@ const skills = {
 			},
 		},
 	},
-	mibei1: { audio: true },
-	mibei2: { audio: true },
 	xinmouli: {
 		audio: "mouli",
 		enable: "phaseUse",
@@ -3424,7 +3409,7 @@ const skills = {
 		group: ["qingyu_achieve", "qingyu_fail", "qingyu_defend"],
 		subSkill: {
 			defend: {
-				audio: "qingyu1",
+				audio: "qingyu1.mp3",
 				trigger: { player: "damageBegin2" },
 				filter: function (event, player) {
 					return (
@@ -3440,7 +3425,7 @@ const skills = {
 				},
 			},
 			achieve: {
-				audio: "qingyu3",
+				audio: "qingyu3.mp3",
 				trigger: { player: "phaseZhunbeiBegin" },
 				forced: true,
 				skillAnimation: true,
@@ -3455,7 +3440,7 @@ const skills = {
 				},
 			},
 			fail: {
-				audio: "qingyu2",
+				audio: "qingyu2.mp3",
 				trigger: { player: "dying" },
 				forced: true,
 				content: function () {
@@ -3467,9 +3452,6 @@ const skills = {
 		},
 		derivation: "xuancun",
 	},
-	qingyu1: { audio: true },
-	qingyu2: { audio: true },
-	qingyu3: { audio: true },
 	xuancun: {
 		audio: 2,
 		trigger: { global: "phaseEnd" },
