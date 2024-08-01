@@ -207,10 +207,9 @@ const skills = {
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
 		forced: true,
-		popup: false,
 		locked: false,
+		logAudio: ()=> 1,
 		async content(event, trigger, player) {
-			player.logSkill('jilin', null, null, null, 1);
 			const cards = get.cards(3);
 			const next = player.addToExpansion(cards, "draw");
 			next.gaintag.add(event.name);
@@ -257,7 +256,8 @@ const skills = {
 		group: ["jilin_kanpo", "jilin_change"],
 		subSkill: {
 			kanpo: {
-				audio: ["jilin2.mp3", "jilin3.mp3"],
+				audio: "jilin",
+				logAudio: ()=> get.rand(2, 3),
 				trigger: {
 					target: "useCardToTarget",
 				},
@@ -308,7 +308,8 @@ const skills = {
 				},
 			},
 			change: {
-				audio: ["jilin4.mp3", "jilin5.mp3"],
+				audio: "jilin",
+				logAudio: ()=> get.rand(4, 5),
 				trigger: {
 					player: "phaseBegin",
 				},
@@ -406,7 +407,8 @@ const skills = {
 		group: "yingyou_draw",
 		subSkill: {
 			draw: {
-				audio: ["yingyou3.mp3", "yingyou4.mp3"],
+				audio: "yingyou",
+				logAudio: ()=> get.rand(3, 4),
 				trigger: {
 					player: "loseAfter",
 					global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],

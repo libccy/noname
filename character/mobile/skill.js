@@ -5347,7 +5347,8 @@ const skills = {
 				},
 			},
 			damage: {
-				audio: ["sbanguo1.mp3", "sbanguo2.mp3"],
+				audio: "sbanguo",
+				logAudio: ()=> get.rand(1, 2),
 				forced: true,
 				locked: false,
 				trigger: { player: "damageBegin4" },

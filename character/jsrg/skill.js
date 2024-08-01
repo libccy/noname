@@ -8110,7 +8110,7 @@ const skills = {
 				})
 				.set("max", trigger.target.countDiscardableCards(player, "he"))
 				.set("goon", get.attitude(player, trigger.target) < 0)
-				.set("logSkill", ["jsrgjuelie", trigger.target]);
+				.set("logSkill", ["jsrgjuelie", trigger.target, null, null, get.rand(3, 4)]);
 			"step 1";
 			if (result.bool) {
 				var num = result.cards.length;
@@ -8148,6 +8148,8 @@ const skills = {
 		group: "jsrgjuelie_pojun",
 		subSkill: {
 			pojun: {
+				audio: "jsrgjuelie",
+				logAudio: ()=> get.rand(1, 2),
 				trigger: { source: "damageBegin1" },
 				filter: function (event, player) {
 					if (!player.isMinHandcard() && !player.isMinHp()) return false;
@@ -9301,6 +9303,7 @@ const skills = {
 		check: function (event, player) {
 			return get.damageEffect(event.player, event.source, _status.event.player, event.nature) * event.num < get.effect(player, { name: "losehp" }, player, _status.event.player) + get.effect(player, { name: "draw" }, player, _status.event.player) + get.effect(event.player, { name: "draw" }, player, _status.event.player) / 2;
 		},
+		logAudio: ()=> get.rand(1, 2),
 		group: "jsrgjishan_recover",
 		content: function () {
 			"step 0";
@@ -9340,7 +9343,7 @@ const skills = {
 					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
-						player.logSkill("jsrgjishan_recover", target);
+						player.logSkill("jsrgjishan_recover", target, null, null, get.rand(3, 4));
 						target.recover();
 					} else player.storage.counttrigger.jsrgjishan_recover--;
 				},
@@ -9660,6 +9663,7 @@ const skills = {
 			if (num == 0) return "你可以摸一张牌";
 			return "你可以摸一张牌并令" + get.cnNumber(num) + "名角色获得“猎”标记";
 		},
+		logAudio: ()=> get.rand(1, 2),
 		content: function () {
 			"step 0";
 			player.draw();
@@ -9698,6 +9702,7 @@ const skills = {
 		subSkill: {
 			damage: {
 				audio: "jsrgzhenglve",
+				logAudio: ()=> get.rand(3, 4),
 				trigger: { source: "damageSource" },
 				usable: 1,
 				filter: function (event, player) {
@@ -9750,7 +9755,7 @@ const skills = {
 		},
 	},
 	jsrgpingrong: {
-		audio: 2,
+		audio: 3,
 		trigger: { global: "phaseEnd" },
 		filter: function (event, player) {
 			return !player.hasSkill("jsrgpingrong_used") && game.hasPlayer(current => current.hasMark("jsrgzhenglve_mark"));
@@ -9765,10 +9770,10 @@ const skills = {
 				.set("ai", target => {
 					return get.attitude(_status.event.player, target);
 				});
-			("step 1");
+			"step 1";
 			if (result.bool) {
 				var target = result.targets[0];
-				player.logSkill("jsrgpingrong", target);
+				player.logSkill("jsrgpingrong", target, null, null, get.rand(1, 2));
 				player.addTempSkill("jsrgpingrong_used", "roundStart");
 				target.removeMark("jsrgzhenglve_mark", target.countMark("jsrgzhenglve_mark"));
 				player.insertPhase();
@@ -9778,13 +9783,13 @@ const skills = {
 		subSkill: {
 			used: { charlotte: true },
 			check: {
-				audio: "jsrgpingrong",
-				trigger: { player: "phaseAfter" },
 				charlotte: true,
-				forced: true,
+				audio: "jsrgpingrong3.mp3",
+				trigger: { player: "phaseAfter" },
 				filter: function (event, player) {
 					return event.skill == "jsrgpingrong" && !player.getHistory("sourceDamage").length;
 				},
+				forced: true,
 				content: function () {
 					player.loseHp();
 				},
