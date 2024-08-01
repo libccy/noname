@@ -1917,7 +1917,7 @@ export const Content = {
 		}, str);
 		let special, skill = event.getParent().name + "_" + (event.result.bool ? "true" + mes : "false");
 		let info = get.info(skill);
-		if(info.logAudio){
+		if(info && info.logAudio){
 			if(typeof info.logAudio === "function") special = info.logAudio(event, player);
 			else special = info.logAudio;
 		}
