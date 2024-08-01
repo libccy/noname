@@ -1575,13 +1575,23 @@ const skills = {
 					return game.hasPlayer(current => {
 						if (current === player) return false;
 						const evt = event.getl(current);
-						return evt && evt.hs.length + evt.es.length + evt.js.length > 0;
+						if (!evt) return false;
+						return evt.hs.some(i => cards.includes(i)) || evt.es.some(i => cards.includes(i)) || evt.js.some(i => cards.includes(i));
 					});
 				},
 				forced: true,
 				locked: false,
 				async content(event, trigger, player) {
-					player.addGaintag(trigger.getg(player), "dcjuewu_two");
+					let gcards = trigger.getg(player), cards = [];
+					game.countPlayer(current => {
+						if (current === player) return false;
+						const evt = trigger.getl(current);
+						if (!evt) return false;
+						cards.addArray(evt.hs.filter(i => gcards.includes(i)));
+						cards.addArray(evt.es.filter(i => gcards.includes(i)));
+						cards.addArray(evt.js.filter(i => gcards.includes(i)));
+					});
+					player.addGaintag(cards, "dcjuewu_two");
 					player.addSkill("dcjuewu_two");
 				},
 			},
