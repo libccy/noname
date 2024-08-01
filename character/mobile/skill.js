@@ -590,7 +590,7 @@ const skills = {
 		},
 		logTarget: "player",
 		onremove: true,
-		logAudio(_, __, ___, ___, evt) {
+		logAudio(event, player, name, indexedData, evt) {
 			const { control } = evt.cost_data;
 			return control == "减伤" ? get.rand(1, 2) : get.rand(3, 4);
 		},
