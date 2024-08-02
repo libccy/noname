@@ -15988,6 +15988,8 @@ const skills = {
 			if (!player.storage.rezhongjian2) return true;
 			return !player.storage.rezhongjian2[0].includes(target) && !player.storage.rezhongjian2[1].includes(target);
 		},
+		line: false,
+		log: "notarget",
 		content: function () {
 			"step 0";
 			player
@@ -16068,8 +16070,7 @@ const skills = {
 						dialog.add([storage[1], "player"]);
 					}
 				} else {
-					var list = storage[0].concat(storage[1]).sortBySeat(player);
-					dialog.add([list, "player"]);
+					dialog.addText(get.translation(player) + "共选择了" + get.cnNumber(storage[0].length + storage[1].length) + "人");
 				}
 			},
 		},
