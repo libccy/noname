@@ -5127,7 +5127,10 @@ export class Player extends HTMLDivElement {
 				if (next.ai) next.filterButton = arguments[i];
 				else next.ai = arguments[i];
 			} else if (typeof arguments[i] == "object" && arguments[i]) {
-				next.filterButton = get.filter(arguments[i]);
+				var filter = get.filter(arguments[i]);
+				next.filterButton = function(button){
+					return filter(button.link);
+				};
 			} else if (typeof arguments[i] == "string") {
 				next.prompt = arguments[i];
 			}
@@ -5167,7 +5170,10 @@ export class Player extends HTMLDivElement {
 				if (next.ai) next.filterButton = arguments[i];
 				else next.ai = arguments[i];
 			} else if (typeof arguments[i] == "object" && arguments[i]) {
-				next.filterButton = get.filter(arguments[i]);
+				var filter = get.filter(arguments[i]);
+				next.filterButton = function(button){
+					return filter(button.link);
+				};
 			} else if (typeof arguments[i] == "string") {
 				next.prompt = arguments[i];
 			}
@@ -5209,7 +5215,10 @@ export class Player extends HTMLDivElement {
 				if (next.ai) next.filterButton = arguments[i];
 				else next.ai = arguments[i];
 			} else if (typeof arguments[i] == "object" && arguments[i]) {
-				next.filterButton = get.filter(arguments[i]);
+				var filter = get.filter(arguments[i]);
+				next.filterButton = function(button){
+					return filter(button.link);
+				};
 			} else if (typeof arguments[i] == "string") {
 				next.prompt = arguments[i];
 			}
