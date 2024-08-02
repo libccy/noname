@@ -5191,11 +5191,17 @@ const skills = {
 					return hs.includes(i) && get.color(i, player) == "red" && lib.filter.cardDiscardable(i, player, "difa");
 				});
 			if (!cards.length) event.finish();
-			else {
-				event.cards = cards;
-				player.discard(cards);
-			}
+			else if (cards.length === 1) event._result = {
+				bool: true,
+				cards: cards
+			};
+			else player.chooseCard("地法：请选择要弃置的牌", true, card => {
+				return get.event().cards.includes(card);
+			}).set("ai", card => get.value(card)).set("cards", cards);
 			"step 1";
+			if (result.bool) player.discard(result.cards);
+			else event.finish();
+			"step 2";
 			var list = lib.inpile.filter(function (i) {
 				return get.type2(i, false) == "trick";
 			});
@@ -5222,7 +5228,7 @@ const skills = {
 								return list;
 							}, [])
 					);
-			"step 2";
+			"step 3";
 			var card = get.cardPile(function (i) {
 				return i.name == result.links[0][2] && !event.cards.includes(i);
 			});

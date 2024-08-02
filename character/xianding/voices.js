@@ -3,7 +3,7 @@ export default {
 	"#dcsbkangyong2": "歃血为誓，城在则人在。",
 	"#dcsbkuangzhan1": "平生不修礼乐，唯擅杀人放火。",
 	"#dcsbkuangzhan2": "宛城乃曹公掌中之物，谁敢染指。",
-	"#dc_sb_dianwei": "主公无恙，韦虽死犹生。",
+	"#dc_sb_dianwei:die": "主公无恙，韦虽死犹生。",
 	"#dcsbsushen1": "谋先于行则昌，行先于谋则亡。",
 	"#dcsbsushen2": "天行五色，雪覆林间睡狐，独我执白。",
 	"#dcsbsushen_dc_sb_jiaxu_shadow1": "我有三窟之筹谋，不蹈背水之维谷。",
