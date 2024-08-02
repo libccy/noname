@@ -3,6 +3,115 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//谋汉尼拔
+	dcshizha: {
+		audio: 2,
+		trigger: {
+			global: "useCard",
+		},
+		usable: 1,
+		filter(event, player) {
+			if(event.player == player) return false;
+			let history = game.getGlobalHistory("everything");
+			for(let i = history.length - 1; i >= 0; i--) {
+				const evt = history[i];
+				if(evt == event || evt.player != event.player) continue;
+				if(evt.name == "useCard" ) return false;
+				if(evt.name == "changeHp") return true;
+			}
+			return false;
+		},
+		logTarget:"player",
+		async content(event, trigger, player) {
+			trigger.targets.length = 0;
+            trigger.all_excluded = true;
+			if(trigger.cards && trigger.cards.someInD()) await player.gain(trigger.cards.filterInD(), "gain2");
+		},
+	},
+	dcgaojian: {
+		audio: 2,
+		trigger: {
+			global: "cardsDiscardAfter",
+		},
+		filter(event, player) {
+			if(!player.isPhaseUsing()) return false;
+			var evt = event.getParent();
+			if (evt.name != "orderingDiscard") return false;
+			var evtx = evt.relatedEvent || evt.getParent();
+			return evtx.name == "useCard" && evtx.player == player && get.type2(evtx.card) == "trick";
+		},
+		async cost(event, trigger, player) {
+			event.result = await player.chooseTarget(get.prompt2("dcgaojian"), lib.filter.notMe).set("ai", target => {
+				return get.attitude(get.player(), target);
+			}).forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			let showCards = [], useCard;
+			while(showCards.length<5) {
+				const cards = game.cardsGotoOrdering(get.cards()).cards;
+				showCards.addArray(cards);
+        		target.showCards(cards, get.translation(player) + "发动了【告谏】");
+				if(get.type2(cards[0]) == "trick") {
+					useCard = cards[0];
+					break;
+				}
+			}
+			if(useCard && target.hasUseTarget(useCard)) {
+				const result = await target.chooseControl("使用牌", "交换牌").set("choiceList", [
+					`使用${get.translation(useCard)}`,
+					`使用任意张手牌与${get.translation(showCards)}中的等量牌交换`,
+				]).set("ai", () => {
+					if(_status.event.useValue > 2) return "使用牌";
+					return "交换牌";
+				}).set("useValue", target.getUseValue(useCard)).forResult();
+				if(result.control == "使用牌"){
+					await target.chooseUseTarget(useCard, true);
+					return;
+				}
+			}
+			if(!target.countCards("h") || !showCards.length) return;
+			const result = await target
+                .chooseToMove("告谏：是否交换其中任意张牌？")
+                .set("list", [
+                    ["你的手牌", target.getCards("h"), "dcgaojian_tag"],
+                    ["展示牌", showCards],
+                ])
+                .set("filterMove", (from, to) => {
+                    return typeof to != "number";
+                })
+                .set("filterOk", moved => {
+                    return moved[1].some(card => get.owner(card));
+                })
+                .set("processAI", list => {
+                    const num = Math.min(list[0][1].length, list[1][1].length);
+                    const player = get.event("player");
+                    const cards1 = list[0][1].slice().sort((a, b) => get.value(a, "raw") - get.value(b, "raw"));
+                    const cards2 = list[1][1].slice().sort((a, b) => get.value(b, "raw") - get.value(a, "raw"));
+                    return [cards1.slice().addArray(cards2.slice(0, num)), cards2.slice().addArray(cards1.slice(0, num))];
+                })
+                .forResult();
+            if (result.bool) {
+                const lose = result.moved[1].slice();
+                const gain = result.moved[0].slice().filter(i => !get.owner(i));
+                if (lose.some(i => get.owner(i)))
+                    await target.lose(
+                        lose.filter(i => get.owner(i)),
+                        ui.special
+                    );
+                for (let i = lose.length - 1; i--; i >= 0) {
+                    ui.cardPile.insertBefore(lose[i], ui.cardPile.firstChild);
+                }
+                game.updateRoundNumber();
+                if (gain.length) await target.gain(gain, "draw");
+            } else {
+                for (let i = topCards.length - 1; i--; i >= 0) {
+                    ui.cardPile.insertBefore(topCards[i], ui.cardPile.firstChild);
+                }
+                game.updateRoundNumber();
+            }
+		},
+	},
 	//诸葛京
 	dcyanzuo: {
 		audio: 2,

@@ -663,6 +663,13 @@ const translates = {
 	dc_lingcao_prefix: "新杀",
 	dcdufeng: "独锋",
 	dcdufeng_info: "锁定技。出牌阶段开始时，你失去1点体力或废除一个装备栏，摸X张牌，然后你的攻击范围与使用【杀】的次数上限均为X直到回合结束（X为你已废除的装备栏数与损失的体力值之和，至多为你的体力上限）。",
+	dc_sb_chengyu: "新杀谋程昱",
+	dc_sb_chengyu_prefix: "新杀谋",
+	dcshizha: "识诈",
+	dcshizha_info: "每回合限一次，其他角色使用牌时，若此牌是其本回合体力变化后使用的首张牌，你可令此牌无效并获得此牌。",
+	dcgaojian: "告谏",
+	dcgaojian_info: "出牌阶段，你使用锦囊牌结算完成进入弃牌堆后，可以选择一名其他角色。其依次展示牌堆顶的牌直到出现锦囊牌（至多展示五张），然后选择一项：1.使用此牌，2.用任意张手牌与等量展示牌交换。",
+	dcgaojian_tag: "手牌",
 };
 
 export default translates;
