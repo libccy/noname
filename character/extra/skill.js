@@ -1058,24 +1058,22 @@ const skills = {
 				if (current.hasMark("zhengqing")) current.clearMark("zhengqing");
 			});
 			const [num, players] = lib.skill.zhengqing.getMostInfoLastRound();
-			player.line(players, "thunder");
-			const onlyMe = players.length === 1 && players[0] === player;
+			let target;
+			if (players.length === 1) target = players[0];
+			else if (players.includes(player)) target = player;
+			else target = players.randomGet();
+			player.line(target, "thunder");
 			const isMax =
 				(player
 					.getAllHistory("custom", evt => evt && evt.zhengqing_count)
 					.map(evt => evt.zhengqing_count)
 					.sort((a, b) => b - a)[0] || 0) <= num;
-			players.forEach(current => {
-				current.addMark("zhengqing", num);
-			});
-			if (onlyMe && isMax) {
+			target.addMark("zhengqing", num);
+			if (target === player && isMax) {
 				player.draw(Math.min(5, num));
 				player.getHistory("custom").push({ zhengqing_count: num });
 			} else {
-				const drawers = [player].concat(players).sortBySeat(trigger.player);
-				for (const drawer of drawers) {
-					await drawer.draw();
-				}
+				await game.asyncDraw([player, target].sortBySeat(trigger.player));
 			}
 		},
 		marktext: "擎",
