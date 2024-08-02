@@ -1800,38 +1800,40 @@ const skills = {
 		},
 		trigger: { global: "dieAfter" },
 		filter(event, player) {
-			if (lib.skill.jxlianpo.getMax().length <= 1) return false;
+			if (lib.skill.jxlianpo.getMax(event.player).length <= 1) return false;
 			return event.source && event.source.isIn();
 		},
 		forced: true,
 		logTarget: "source",
-		getMax: () => {
+		getMax: (dead) => {
+			let curs = game.players.slice(0);
+			if (get.itemtype(dead) === "player" && !curs.includes(dead)) curs.push(dead);
 			const map = {
-				zhu: game.countPlayer(current => {
+				zhu: curs.filter(current => {
 					const identity = current.identity;
 					let num = 0;
 					if (identity == "zhu" || identity == "zhong" || identity == "mingzhong") num++;
 					num += current.countMark("jxlianpo_mark_zhong");
 					return num;
-				}),
-				fan: game.countPlayer(current => {
+				}).length,
+				fan: curs.filter(current => {
 					let num = 0;
 					if (current.identity == "fan") num++;
 					num += current.countMark("jxlianpo_mark_fan");
 					return num;
-				}),
-				nei: game.countPlayer(current => {
+				}).length,
+				nei: curs.filter(current => {
 					let num = 0;
 					if (current.identity == "nei") num++;
 					num += current.countMark("jxlianpo_mark_nei");
 					return num;
-				}),
-				commoner: game.countPlayer(current => {
+				}).length,
+				commoner: curs.filter(current => {
 					let num = 0;
 					if (current.identity == "commoner") num++;
 					num += current.countMark("jxlianpo_mark_commoner");
 					return num;
-				}),
+				}).length,
 			};
 			let population = 0,
 				identities = [];
