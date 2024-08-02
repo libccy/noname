@@ -414,6 +414,7 @@ window.noname_character_rank = {
 		"licuilianzhaoquanding",
 	],
 	am: [
+		"dc_sb_chengyu",
 		"jx_shen_caoren",
 		"jx_shen_liubiao",
 		"jx_zhouyu",
