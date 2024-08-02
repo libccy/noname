@@ -51,6 +51,7 @@ window.noname_character_rank = {
 		"dc_zhaoyun",
 	],
 	ap: [
+		"zhugejing",
 		"xia_guanyu",
 		"ol_sb_yuanshao",
 		"gjqt_aruan",
@@ -413,6 +414,7 @@ window.noname_character_rank = {
 		"licuilianzhaoquanding",
 	],
 	am: [
+		"dc_sb_chengyu",
 		"jx_shen_caoren",
 		"jx_shen_liubiao",
 		"jx_zhouyu",
@@ -1833,6 +1835,7 @@ window.noname_character_rank = {
 	],
 	rarity: {
 		legend: [
+			"zhugejing",
 			"ol_feiyi",
 			"dc_wuyi",
 			"sp_sunce",

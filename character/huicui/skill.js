@@ -2346,56 +2346,6 @@ const skills = {
 			},
 		},
 	},
-	//凌操
-	dcdufeng: {
-		audio: 2,
-		trigger: { player: "phaseUseBegin" },
-		forced: true,
-		async content(event, trigger, player) {
-			const list = [];
-			for (let i = 1; i < 6; i++) {
-				if (player.isDisabled(i)) continue;
-				list.push("equip" + i);
-			}
-			list.push("cancel2");
-			const next = player.chooseControl(list);
-			next.set("prompt", "独锋：请废除一个装备栏，或点击“取消”失去1点体力");
-			next.set("ai", () => {
-				const list = get.event().list.slice(),
-					player = get.player();
-				if (player.hp <= 2 && list.length > 1) list.remove("cancel2");
-				const listx = list.filter(subtype => !player.getEquips(subtype).length);
-				if (listx.length) return listx.randomGet();
-				return list.randomGet();
-			});
-			next.set("list", list);
-			const { result } = await next;
-			if (result.control == "cancel2") await player.loseHp();
-			else await player.disableEquip(result.control);
-			if (!player.isIn()) return;
-			const num = Math.min(player.countDisabled() + player.getDamagedHp(), player.maxHp);
-			await player.draw(num);
-			player.addTempSkill("dcdufeng_effect");
-			player.addMark("dcdufeng_effect", num, false);
-		},
-		subSkill: {
-			effect: {
-				charlotte: true,
-				onremove: true,
-				intro: {
-					content: "本回合攻击范围与使用【杀】的次数上限均为#",
-				},
-				mod: {
-					attackRangeBase(player, num) {
-						return player.countMark("dcdufeng_effect");
-					},
-					cardUsable(card, player, num) {
-						if (card.name == "sha") return player.countMark("dcdufeng_effect");
-					},
-				},
-			},
-		},
-	},
 	//小乔
 	dcqiqin: {
 		audio: 2,
