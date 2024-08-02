@@ -2456,6 +2456,89 @@ const skills = {
 			},
 		},
 	},
+	ruilian: {
+		audio: "twruilian",
+		trigger: { global: "roundStart" },
+		async cost(event, trigger, player) {
+			event.result = await player.chooseTarget(get.prompt2("ruilian")).set("ai", target => {
+				let player = _status.event.player,
+					att = get.attitude(player, target),
+					eff = att / (player == target ? 2 : 1) + 1;
+				if (att >= 0) {
+					if (target.hasSkill("yongsi")) return eff * 5;
+					if (target.hasSkill("zhiheng") || target.hasSkill("rezhiheng")) return eff * 4;
+					if (target.hasSkill("rekurou")) return eff * 3;
+					if (target.hasSkill("xinlianji") || target.hasSkill("dclianji")) return eff * 2;
+					if (target.needsToDiscard()) return eff * 1.5;
+					return eff;
+				}
+				return 0;
+			}).forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			player.addSkill("ruilian_target");
+			player.markAuto("ruilian_target", [target]);
+		},
+		subSkill: {
+			target: {
+				onremove: true,
+				intro: { content: "已选择$" },
+				trigger: { global: "phaseEnd" },
+				filter: function (event, player) {
+					return player.getStorage("ruilian_target").includes(event.player);
+				},
+				direct: true,
+				charlotte: true,
+				async content(event, trigger, player) {
+					const target = trigger.player;
+					let cards = [];
+					player.removeSkill("ruilian_target");
+					target.getHistory("lose", evt => {
+						if (evt.type == "discard") cards.addArray(evt.cards2);
+					});
+					if (!cards.length) return;
+					let list = [];
+					for (let type of ["basic", "trick", "equip"]) {
+						for (let card of cards) {
+							if (get.type2(card) == type) {
+								list.push(type);
+								break;
+							}
+						}
+					}
+					list.push("cancel2");
+					const result = await player
+						.chooseControl(list)
+						.set("prompt", "睿敛：是否与" + get.translation(target) + "各获得一种类型的牌？")
+						.set("ai", function () {
+							let player = _status.event.player,
+								list = _status.event.controls;
+							if (player.hp <= 3 && !player.countCards("h", { name: ["shan", "tao"] }) && list.includes("basic")) return "basic";
+							if (player.countCards("he", { type: "equip" }) < 2 && list.includes("equip")) return "equip";
+							if (list.includes("trick")) return "trick";
+							return list.remove("cancel2").randomGet();
+						})
+						.forResult();
+					if (result.control != "cancel2") {
+						player.logSkill("ruilian_target", target);
+						let type = result.control;
+						list = [target, player].sortBySeat(_status.currentPhase);
+						cards = [];
+						for (let current of list) {
+							let card = get.discardPile(function (card) {
+								return get.type2(card) == type && !cards.includes(card);
+							});
+							if (card) {
+								cards.push(card);
+								await current.gain(card, "gain2");
+							}
+						}
+					}
+				},
+			}
+		}
+	},
 	//手杀差异化孙鲁育
 	mbmumu: {
 		audio: "mumu",
