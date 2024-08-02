@@ -4004,10 +4004,16 @@ const skills = {
 						if (player.name1 == "shichangshi") {
 							player.smoothAvatar(false);
 							player.node.avatar.setBackground(player.name1, "character");
+							if (!lib.skill.mbdanggu.isSingleShichangshi(player)) {
+								player.skin.name = player.name1;
+							}
 						}
 						if (player.name2 == "shichangshi") {
 							player.smoothAvatar(true);
 							player.node.avatar2.setBackground(player.name2, "character");
+							if (!lib.skill.mbdanggu.isSingleShichangshi(player)) {
+								player.skin.name2 = player.name2;
+							}
 						}
 					}, trigger.player);
 					"step 1";
