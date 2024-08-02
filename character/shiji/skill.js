@@ -291,31 +291,32 @@ const skills = {
 				});
 				target.markAuto("houfeng_share", [player]);
 				target.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
+				target.markAuto("houfeng", name);
 				target.popup(name, "thunder");
 				game.delayx();
 			}
 		},
 		subSkill: {
 			share: {
+				audio: "houfeng",
 				charlotte: true,
 				onremove: true,
 				trigger: { player: "phaseDiscardEnd" },
 				forced: true,
-				popup: false,
+				logAudio(event, player) {
+					if (!lib.skill.zhengsu.filterx("houfeng", player)) return 3;
+					return 2;
+				},
 				content: function () {
 					"step 0";
-					if (!lib.skill.zhengsu.filter(trigger, player)) {
-						game.broadcastAll(function () {
-							if (lib.config.background_speak) game.playAudio("skill", "houfeng3");
-						});
+					if (!lib.skill.zhengsu.filterx("houfeng", player)) {
+						delete player.storage.houfeng;
 						player.popup("整肃失败", "fire");
 						game.log(player, "整肃失败");
 						event.finish();
 						return;
 					}
-					game.broadcastAll(function () {
-						if (lib.config.background_speak) game.playAudio("skill", "houfeng2");
-					});
+					delete player.storage.houfeng;
 					player.popup("整肃成功", "wood");
 					game.log(player, "整肃成功");
 					var list = player.getStorage("houfeng_share").filter(i => i.isIn());
@@ -356,42 +357,44 @@ const skills = {
 		filter: function (event, player) {
 			return ["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].some(i => !player.hasSkill(i));
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			player.chooseButton([get.prompt("spzhengjun"), [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !player.hasSkill(i)), "vcard"]]).set("ai", () => Math.random());
-			"step 1";
-			if (result.bool) {
-				player.logSkill("spzhengjun_zhengsu", player, null, null, 1);
-				var name = result.links[0][2];
-				player.addTempSkill("spzhengjun_share", {
-					player: ["phaseDiscardAfter", "phaseAfter"],
-				});
-				player.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
-				player.popup(name, "thunder");
-				game.delayx();
-			}
+		async cost(event, trigger, player) {
+			const { result } = await player.chooseButton([get.prompt("spzhengjun"), [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !player.hasSkill(i)), "vcard"]]).set("ai", () => Math.random());
+			event.result = {
+				bool: result.bool,
+				cost_data: result.links[0][2],
+			};
+		},
+		logAudio: ()=> 1,
+		async content(event, trigger, player) {
+			const name = event.cost_data;
+			player.addTempSkill("spzhengjun_share", {
+				player: ["phaseDiscardAfter", "phaseAfter"],
+			});
+			player.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
+			player.markAuto("spzhengjun", name);
+			player.popup(name, "thunder");
+			await game.delayx();
 		},
 		subSkill: {
 			share: {
+				audio: "spzhengjun",
 				charlotte: true,
 				trigger: { player: "phaseDiscardEnd" },
 				forced: true,
-				popup: false,
+				logAudio(event, player) {
+					if (!lib.skill.zhengsu.filterx("spzhengjun", player)) return 3;
+					return 2;
+				},
 				content: function () {
 					"step 0";
-					if (!lib.skill.zhengsu.filter(trigger, player)) {
-						game.broadcastAll(function () {
-							if (lib.config.background_speak) game.playAudio("skill", "spzhengjun3");
-						});
+					if (!lib.skill.zhengsu.filterx("spzhengjun", player)) {
+						delete player.storage.spzhengjun;
 						player.popup("整肃失败", "fire");
 						game.log(player, "整肃失败");
 						event.finish();
 						return;
 					}
-					game.broadcastAll(function () {
-						if (lib.config.background_speak) game.playAudio("skill", "spzhengjun2");
-					});
+					delete player.storage.spzhengjun;
 					player.popup("整肃成功", "wood");
 					game.log(player, "整肃成功");
 					player.chooseDrawRecover(2, "整肃奖励：摸两张牌或回复1点体力");
@@ -768,41 +771,43 @@ const skills = {
 		filter: function (event, player) {
 			return ["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].some(i => !player.hasSkill(i));
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			player.chooseButton([get.prompt("spyanji"), [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !player.hasSkill(i)), "vcard"]]).set("ai", () => Math.random());
-			"step 1";
-			if (result.bool) {
-				player.logSkill("spyanji", player, null, null, 1);
-				var name = result.links[0][2];
-				player.addTempSkill("spyanji_share", {
-					player: ["phaseDiscardAfter", "phaseAfter"],
-				});
-				player.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
-				player.popup(name, "thunder");
-				game.delayx();
-			}
+		logAudio: () => 1,
+		async cost(event, trigger, player) {
+			const { result } = await player.chooseButton([get.prompt("spyanji"), [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !player.hasSkill(i)), "vcard"]]).set("ai", () => Math.random());
+			event.result = {
+				bool: result.bool,
+				cost_data: result.links[0][2],
+			};
+		},
+		async content(event, trigger, player) {
+			const name = event.cost_data;
+			player.addTempSkill("spyanji_share", {
+				player: ["phaseDiscardAfter", "phaseAfter"],
+			});
+			player.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
+			player.markAuto("spyanji", name);
+			player.popup(name, "thunder");
+			await game.delayx();
 		},
 		subSkill: {
 			share: {
+				audio: "spyanji",
 				charlotte: true,
 				trigger: { player: "phaseDiscardEnd" },
 				forced: true,
-				popup: false,
+				logAudio(event, player) {
+					if (!lib.skill.zhengsu.filterx("spyanji", player)) return 3;
+					return 2;
+				},
 				content: function () {
-					if (!lib.skill.zhengsu.filter(trigger, player)) {
-						game.broadcastAll(function () {
-							if (lib.config.background_speak) game.playAudio("skill", "spyanji3");
-						});
+					if (!lib.skill.zhengsu.filterx("spyanji", player)) {
+						delete player.storage.spyanji;
 						player.popup("整肃失败", "fire");
 						game.log(player, "整肃失败");
 						event.finish();
 						return;
 					}
-					game.broadcastAll(function () {
-						if (lib.config.background_speak) game.playAudio("skill", "spyanji2");
-					});
+					delete player.storage.spyanji;
 					player.popup("整肃成功", "wood");
 					game.log(player, "整肃成功");
 					player.chooseDrawRecover(2, "整肃奖励：摸两张牌或回复1点体力");

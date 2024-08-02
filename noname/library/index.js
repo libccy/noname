@@ -11107,6 +11107,11 @@ export class Library {
 			filter: function (event, player) {
 				return player.storage.zhengsu_leijin || player.storage.zhengsu_bianzhen || player.storage.zhengsu_mingzhi;
 			},
+			filterx: function (skill, player) {
+				const zhengsus = player.storage[skill];
+				if(!zhengsus || !zhengsus.length) return false;
+				return zhengsus.some(zhengsu => player.storage[zhengsu]);
+			},
 			content: function () {
 				player.chooseDrawRecover(2, "整肃奖励：摸两张牌或回复1点体力");
 			},
