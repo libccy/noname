@@ -2081,7 +2081,7 @@ const skills = {
 								type = get.type(name),
 								infox = get.info({ name: name });
 							if (type != "basic" && type != "trick") return false;
-							if (type == "trick" && (!infox || !infox.filterTarget)) return false;
+							if (type == "trick" && (!infox || !infox.filterTarget || get.info("xunshi").isXunshi({ name: name }))) return false;
 							return (type != "basic") == (player.storage.olxuanzhu || false);
 						})
 						.map(card => {
