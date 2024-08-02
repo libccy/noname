@@ -7137,7 +7137,7 @@ const skills = {
 			}
 			event.map = map;
 			player
-				.chooseTarget(get.prompt("olzhuyan"), "令一名角色将{体力值/手牌数}调整至与其上个准备阶段相同(“--”表示已对其发动过该分支)", (card, player, target) => {
+				.chooseTarget(get.prompt("olzhuyan"), "令一名角色将{体力值/手牌数}调整至与其上个结束阶段相同(“--”表示已对其发动过该分支)", (card, player, target) => {
 					var list = _status.event.map[target.playerid];
 					return list && (list[0] || list[1]);
 				})
