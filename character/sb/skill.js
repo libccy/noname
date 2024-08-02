@@ -6216,6 +6216,7 @@ const skills = {
 			return 6.5 - get.value(card);
 		},
 		position: "he",
+		logAudio: ()=> 1,
 		group: ["sbjushou_damage", "sbjushou_draw"],
 		content: function () {
 			player.turnOver();
@@ -6229,7 +6230,7 @@ const skills = {
 		},
 		subSkill: {
 			damage: {
-				audio: "sbjushou",
+				audio: "sbjushou2.mp3",
 				trigger: {
 					player: "damageEnd",
 				},
@@ -6252,7 +6253,7 @@ const skills = {
 						event.finish();
 						return;
 					}
-					player.logSkill("sbjushou");
+					player.logSkill("sbjushou_damage");
 					if (result.control == "翻面") {
 						player.turnOver();
 					} else {
@@ -6279,7 +6280,7 @@ const skills = {
 				},
 			},
 			draw: {
-				audio: "sbjushou",
+				audio: "sbjushou3.mp3",
 				trigger: { player: "turnOverAfter" },
 				forced: true,
 				locked: false,
@@ -6897,7 +6898,7 @@ const skills = {
 		filter: function (event, player) {
 			return game.hasPlayer(current => current.hasMark("sbjieyin_mark"));
 		},
-		logAudio: ()=> get.rand(1, 2),
+		logAudio: ()=> 1,
 		content: function () {
 			"step 0";
 			var targets = game.filterPlayer(current => current.hasMark("sbjieyin_mark"));

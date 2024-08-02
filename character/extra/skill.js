@@ -210,7 +210,7 @@ const skills = {
 		locked: false,
 		logAudio: ()=> 1,
 		async content(event, trigger, player) {
-			const cards = get.cards(3);
+			const cards = get.cards(2);
 			const next = player.addToExpansion(cards, "draw");
 			next.gaintag.add(event.name);
 			await next;
@@ -480,12 +480,12 @@ const skills = {
 			if (player.getRoundHistory("useSkill", evt => evt.skill == "xinrenjie").length >= 4) return false;
 			if (event.name == "useCard") {
 				//......
-				if (get.type(event.card) != "trick") return false;
+				if (event.player == player || get.type(event.card) != "trick") return false;
 				const history = game.getGlobalHistory("everything", evt => evt.player == player && ["useCard", "respond"].includes(evt.name));
 				return !history.some(evt => Array.isArray(evt.respondTo) && evt.respondTo[1] == event.card && evt.card.name == "wuxie");
 			}
 			const evt = event.getParent(2);
-			if (!evt || evt.name != "useCard") return false;
+			if (!evt || evt.name != "useCard" || evt.player == player) return false;
 			return !event.result.bool;
 		},
 		forced: true,
@@ -8330,7 +8330,7 @@ const skills = {
 			if (filter(get.autoViewAs({ name: "wuxie" }, "unsure"), player, event) && player.countCards("hs", { suit: "spade" })) return true;
 			return false;
 		},
-		logAudio(event,player){
+		logAudio(event, player){
 			return 4 - lib.suit.indexOf(get.suit(event.cards[0], player));
 		},
 		ai: {

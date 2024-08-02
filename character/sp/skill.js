@@ -28562,9 +28562,9 @@ const skills = {
 			});
 			"step 1";
 			if (result.bool) {
-				player.logSkill("yuanhu", result.targets);
 				var thisTarget = result.targets[0];
 				var thisCard = result.cards[0];
+				player.logSkill("yuanhu", thisTarget, null, null, get.equipNum(thisCard) > 2 ? get.equipNum(thisCard) : 3);
 				thisTarget.equip(thisCard);
 				event.target = thisTarget;
 				if (thisTarget != player) {
@@ -29221,6 +29221,7 @@ const skills = {
 		filter: function (event, player) {
 			return player.phaseNumber <= 1 && game.hasPlayer(current => current != player);
 		},
+		logAudio: ()=> get.rand(1, 2),
 		content: function () {
 			"step 0";
 			player.chooseTarget("荐杰：选择一名其他角色获得“龙印”", lib.filter.notMe, true).set("ai", target => {
@@ -29301,6 +29302,7 @@ const skills = {
 					}
 					return true;
 				},
+				logAudio: ()=> get.rand(1, 2),
 				selectTarget: 2,
 				complexSelect: true,
 				complexTarget: true,

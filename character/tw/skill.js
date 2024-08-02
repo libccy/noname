@@ -10449,6 +10449,7 @@ const skills = {
 			}
 			return 10 - get.value(card);
 		},
+		logAudio: ()=> 1,
 		content: function () {
 			player.give(cards, target).gaintag.add("twkujianx");
 			player.addSkill("twkujian_draw");
@@ -10491,7 +10492,7 @@ const skills = {
 		},
 		subSkill: {
 			draw: {
-				audio: "twkujian",
+				audio: "twkujian2.mp3",
 				trigger: { global: ["useCardAfter", "respondAfter"] },
 				forced: true,
 				logTarget: "player",
@@ -10512,7 +10513,7 @@ const skills = {
 				},
 			},
 			discard: {
-				audio: "twkujian",
+				audio: "twkujian3.mp3",
 				trigger: {
 					global: ["loseAfter", "equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 				},
@@ -16697,6 +16698,9 @@ const skills = {
 		check: function (card) {
 			if (get.position(card) == "h") return 9 - get.value(card);
 			return 7 - get.value(card);
+		},
+		logAudio(event, player) {
+			return get.equipNum(event.cards[0]) > 2 ? get.equipNum(event.cards[0]) : 3;
 		},
 		content: function () {
 			"step 0";
