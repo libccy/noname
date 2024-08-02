@@ -3469,6 +3469,7 @@ const skills = {
 			if (lib.skill.mbdanggu.isSingleShichangshi(player)) {
 				game.broadcastAll(function (player) {
 					player.name1 = player.name;
+					player.skin.name = player.name;
 					player.smoothAvatar(false);
 					player.node.avatar.setBackground(player.name, "character");
 					player.node.name.innerHTML = get.slimName(player.name);
@@ -3607,6 +3608,7 @@ const skills = {
 							player.node.avatar.setBackground(first, "character");
 							player.node.name.innerHTML = get.slimName(first);
 							player.name2 = chosen;
+							player.skin.name = first;
 							player.classList.add("fullskin2");
 							player.node.avatar2.classList.remove("hidden");
 							player.node.avatar2.setBackground(chosen, "character");
@@ -3673,6 +3675,7 @@ const skills = {
 					if (lib.skill.mbdanggu.isSingleShichangshi(player)) {
 						game.broadcastAll(function (player) {
 							player.name1 = player.name;
+							player.skin.name = player.name;
 							player.smoothAvatar(false);
 							player.node.avatar.setBackground(player.name, "character");
 							player.node.name.innerHTML = get.slimName(player.name);
@@ -3814,10 +3817,12 @@ const skills = {
 						player.classList.add("out");
 						if (list.includes(player.name1) || player.name1 == "shichangshi") {
 							player.smoothAvatar(false);
+							player.skin.name = player.name1 + "_dead";
 							player.node.avatar.setBackground(player.name1 + "_dead", "character");
 						}
 						if (list.includes(player.name2) || player.name2 == "shichangshi") {
 							player.smoothAvatar(true);
+							player.skin.name2 = player.name2 + "_dead";
 							player.node.avatar2.setBackground(player.name2 + "_dead", "character");
 						}
 					},
@@ -3872,6 +3877,7 @@ const skills = {
 						if (!player.getStorage("mbdanggu").length) {
 							game.broadcastAll(function (player) {
 								player.name1 = player.name;
+								player.skin.name = player.name + "_dead";
 								player.smoothAvatar(false);
 								player.node.avatar.setBackground(player.name + "_dead", "character");
 								player.node.name.innerHTML = get.slimName(player.name);
