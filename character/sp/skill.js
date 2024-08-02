@@ -560,11 +560,10 @@ const skills = {
 						},
 					],
 					[
-						"若为魏/群势力，则获得【奸雄】/【天命】",
+						"若为魏/群势力，则获得【奸雄】/【天命】直到你的下个回合开始",
 						{
 							async content(player, source) {
 								source.addTempSkill("olyongzu_skill", { player: "phaseBegin" });
-								source.markAuto("olyongzu_skill", [player]);
 								const group = player[get.mode() == "guozhan" ? "identity" : "group"];
 								const skill = group == "wei" ? "rejianxiong" : "tianming";
 								player.popup(skill);
@@ -584,13 +583,7 @@ const skills = {
 		ai: { threaten: 3.5 },
 		subSkill: {
 			skill: {
-				onremove(player, skill) {
-					const targets = player.getStorage(skill).sortBySeat(player);
-					delete player.storage[skill];
-					if (targets.length) {
-						for (const i of targets) i.removeAdditionalSkills(skill);
-					}
-				},
+				charlotte: true
 			},
 			hand: {
 				charlotte: true,
