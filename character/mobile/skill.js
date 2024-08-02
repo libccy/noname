@@ -14643,7 +14643,6 @@ const skills = {
 			game.updateRoundNumber();
 			var list = ["nanman", "wanjian", "huogong", "juedou", "sha"];
 			var list2 = game.players.slice(0);
-			list2.remove(player);
 			for (var i = 0; i < list.length; i++) {
 				if (!targets[0].canUse(list[i], targets[1], false)) list.splice(i--, 1);
 			}
