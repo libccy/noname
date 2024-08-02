@@ -3,6 +3,172 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//诸葛京
+	dcyanzuo: {
+		audio: 2,
+		enable: "phaseUse",
+		usable: 3,
+		filter(event, player) {
+			var count = player.getStat("skill").dcyanzuo;
+			if (count && count > player.countMark("dcyanzuo_zuyin")) return false;
+			return player.countCards("h", card=>["trick", "basic"].includes(get.type(card, player)));
+		},
+		filterCard(card, player) {
+			return ["trick", "basic"].includes(get.type(card, player));
+		},
+		check(card) {
+			const player = _status.event.player;
+			return player.getUseValue(card) + 3;
+		},
+		lose: false,
+		discard: false,
+		async content(event, trigger, player) {
+			const next = player.addToExpansion(event.cards, player, "give");
+			next.gaintag.add("dcyanzuo");
+			await next;
+			const cards = player.getExpansions("dcyanzuo");
+			const result = await player.chooseButton(["是否视为使用其中一张牌？", cards]).set("filterButton", button => {
+				const player = _status.event.player;
+				const card = {
+					name: get.name(button.link),
+					nature: get.nature(button.link),
+					isCard:true,
+				};
+				return player.hasUseTarget(card);
+			}).set("ai", button => {
+				const player = _status.event.player;
+				const card = {
+					name: get.name(button.link),
+					nature: get.nature(button.link),
+					isCard:true,
+				};
+				return player.getUseValue(card);
+			}).forResult();
+			if(result.bool){
+				const card = {
+					name: get.name(result.links[0]),
+					nature: get.nature(result.links[0]),
+					isCard:true,
+				}
+				await player.chooseUseTarget(card, true, false);
+			}
+		},
+		ai: {
+			order: 9,
+			result: {
+				player: 1,
+			},
+		},
+		onremove(player, skill) {
+			const cards = player.getExpansions(skill);
+			if (cards.length) player.loseToDiscardpile(cards);
+			player.clearMark("dcyanzuo_zuyin", false);
+		},
+		intro: {
+			markcount: "expansion",
+			content: "expansion",
+			mark(dialog, storage, player) {
+				const cards = player.getExpansions("dcyanzuo");
+				if (cards.length) dialog.addSmall(cards);
+				const marks=player.countMark("dcyanzuo_zuyin");
+				if(marks>0) dialog.addText(`〖研作〗发动次数+${marks}`);
+			},
+		},
+	},
+	dczuyin: {
+		audio: 2,
+		forced: true,
+		trigger: {
+			target: "useCardToTargeted",
+		},
+		filter(event, player) {
+			if(event.player == player) return false;
+			return event.card.name == "sha" || get.type(event.card) == "trick";
+		},
+		async content(event, trigger, player) {
+			const cards = player.getExpansions("dcyanzuo");
+			if(cards.some(card => card.name == trigger.card.name)) {
+				trigger.getParent().excluded.add(player);
+				const discards = cards.filter(card => card.name == trigger.card.name);
+				if(discards.length) await player.loseToDiscardpile(discards);
+			}
+			else {
+				const card = get.cardPile(card => card.name == trigger.card.name);
+				if(card) await player.addToExpansion(card, "gain2").gaintag.add("dcyanzuo");
+				if (player.countMark("dcyanzuo_zuyin") < 2 && player.hasSkill("dcyanzuo", null, null, false)) player.addMark("dcyanzuo_zuyin", 1, false);
+			}
+		},
+	},
+	dcpijian: {
+		audio: 2,
+		trigger: {
+			player: "phaseEnd",
+		},
+		filter(event, player) {
+			return player.getExpansions("dcyanzuo").length >= game.countPlayer();
+		},
+		async cost(event, trigger, player) {
+			event.result = await player.chooseTarget(get.prompt2("dcpijian")).set("ai", target => {
+				const player = _status.event.player;
+				return get.damageEffect(target, player, player);
+			}).forResult();
+		},
+		async content(event, trigger, player) {
+			await player.loseToDiscardpile(player.getExpansions("dcyanzuo"));
+			const target = event.targets[0];
+			await target.damage(2);
+		},
+	},
+	//凌操
+	dcdufeng: {
+		audio: 2,
+		trigger: { player: "phaseUseBegin" },
+		forced: true,
+		async content(event, trigger, player) {
+			const list = [];
+			for (let i = 1; i < 6; i++) {
+				if (player.isDisabled(i)) continue;
+				list.push("equip" + i);
+			}
+			list.push("cancel2");
+			const next = player.chooseControl(list);
+			next.set("prompt", "独锋：请废除一个装备栏，或点击“取消”失去1点体力");
+			next.set("ai", () => {
+				const list = get.event().list.slice(),
+					player = get.player();
+				if (player.hp <= 2 && list.length > 1) list.remove("cancel2");
+				const listx = list.filter(subtype => !player.getEquips(subtype).length);
+				if (listx.length) return listx.randomGet();
+				return list.randomGet();
+			});
+			next.set("list", list);
+			const { result } = await next;
+			if (result.control == "cancel2") await player.loseHp();
+			else await player.disableEquip(result.control);
+			if (!player.isIn()) return;
+			const num = Math.min(player.countDisabled() + player.getDamagedHp(), player.maxHp);
+			await player.draw(num);
+			player.addTempSkill("dcdufeng_effect");
+			player.addMark("dcdufeng_effect", num, false);
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				onremove: true,
+				intro: {
+					content: "本回合攻击范围与使用【杀】的次数上限均为#",
+				},
+				mod: {
+					attackRangeBase(player, num) {
+						return player.countMark("dcdufeng_effect");
+					},
+					cardUsable(card, player, num) {
+						if (card.name == "sha") return player.countMark("dcdufeng_effect");
+					},
+				},
+			},
+		},
+	},
 	//柳婒
 	dcjingyin: {
 		audio: 2,
