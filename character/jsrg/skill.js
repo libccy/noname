@@ -1155,7 +1155,7 @@ const skills = {
 		},
 		check(event, player) {
 			//理论上是小完杀+卖血
-			//先粗略地写一写，后面等157补
+			//我没意见
 			return get.attitude(player, event.player) < 0;
 		},
 		async content(event, trigger, player) {
@@ -1183,19 +1183,12 @@ const skills = {
 					target.markAuto("jsrgzonghai_blocker", [id]);
 				}
 			});
-			target
-				.when("dyingAfter")
-				.vars({ id, allPlayers, targets, source: player })
-				.assign({ forceDie: true })
-				.then(() => {
-					allPlayers.forEach(target => {
-						target.unmarkAuto("jsrgzonghai_blocker", [id]);
-						if (!target.getStorage("jsrgzonghai_blocker").length) target.removeSkill("jsrgzonghai_blocker");
-					});
-					if (source.isIn()) {
-						targets.forEach(target => target.damage(source));
-					}
-				});
+			target.addTempSkill("jsrgzonghai_damage");
+			target.storage.jsrgzonghai_damage = {
+				id: id,
+				targets: targets,
+				source: player
+			};
 		},
 		subSkill: {
 			blocker: {
@@ -1206,6 +1199,26 @@ const skills = {
 					cardEnabled: () => false,
 				},
 			},
+			damage: {
+				trigger: {
+					player: "dyingAfter"
+				},
+				silent: true,
+				forceDie: true,
+				charlotte: true,
+				async content(event, trigger, player) {
+					let storage = player.storage.jsrgzonghai_damage;
+					game.countPlayer(target => {
+						target.unmarkAuto("jsrgzonghai_blocker", [storage.id]);
+						if (!target.getStorage("jsrgzonghai_blocker").length) target.removeSkill("jsrgzonghai_blocker");
+					});
+					if (storage.source.isIn()) while (storage.targets.length) {
+						let target = storage.targets.shift();
+						await target.damage(storage.source);
+					}
+					delete player.storage.jsrgzonghai_damage;
+				}
+			}
 		},
 	},
 	jsrgjueyin: {

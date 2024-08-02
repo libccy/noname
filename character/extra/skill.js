@@ -1058,24 +1058,22 @@ const skills = {
 				if (current.hasMark("zhengqing")) current.clearMark("zhengqing");
 			});
 			const [num, players] = lib.skill.zhengqing.getMostInfoLastRound();
-			player.line(players, "thunder");
-			const onlyMe = players.length === 1 && players[0] === player;
+			let target;
+			if (players.length === 1) target = players[0];
+			else if (players.includes(player)) target = player;
+			else target = players.randomGet();
+			player.line(target, "thunder");
 			const isMax =
 				(player
 					.getAllHistory("custom", evt => evt && evt.zhengqing_count)
 					.map(evt => evt.zhengqing_count)
 					.sort((a, b) => b - a)[0] || 0) <= num;
-			players.forEach(current => {
-				current.addMark("zhengqing", num);
-			});
-			if (onlyMe && isMax) {
+			target.addMark("zhengqing", num);
+			if (target === player && isMax) {
 				player.draw(Math.min(5, num));
 				player.getHistory("custom").push({ zhengqing_count: num });
 			} else {
-				const drawers = [player].concat(players).sortBySeat(trigger.player);
-				for (const drawer of drawers) {
-					await drawer.draw();
-				}
+				await game.asyncDraw([player, target].sortBySeat(trigger.player));
 			}
 		},
 		marktext: "擎",
@@ -1800,38 +1798,40 @@ const skills = {
 		},
 		trigger: { global: "dieAfter" },
 		filter(event, player) {
-			if (lib.skill.jxlianpo.getMax().length <= 1) return false;
+			if (lib.skill.jxlianpo.getMax(event.player).length <= 1) return false;
 			return event.source && event.source.isIn();
 		},
 		forced: true,
 		logTarget: "source",
-		getMax: () => {
+		getMax: (dead) => {
+			let curs = game.players.slice(0);
+			if (get.itemtype(dead) === "player" && !curs.includes(dead)) curs.push(dead);
 			const map = {
-				zhu: game.countPlayer(current => {
+				zhu: curs.filter(current => {
 					const identity = current.identity;
 					let num = 0;
 					if (identity == "zhu" || identity == "zhong" || identity == "mingzhong") num++;
 					num += current.countMark("jxlianpo_mark_zhong");
 					return num;
-				}),
-				fan: game.countPlayer(current => {
+				}).length,
+				fan: curs.filter(current => {
 					let num = 0;
 					if (current.identity == "fan") num++;
 					num += current.countMark("jxlianpo_mark_fan");
 					return num;
-				}),
-				nei: game.countPlayer(current => {
+				}).length,
+				nei: curs.filter(current => {
 					let num = 0;
 					if (current.identity == "nei") num++;
 					num += current.countMark("jxlianpo_mark_nei");
 					return num;
-				}),
-				commoner: game.countPlayer(current => {
+				}).length,
+				commoner: curs.filter(current => {
 					let num = 0;
 					if (current.identity == "commoner") num++;
 					num += current.countMark("jxlianpo_mark_commoner");
 					return num;
-				}),
+				}).length,
 			};
 			let population = 0,
 				identities = [];
