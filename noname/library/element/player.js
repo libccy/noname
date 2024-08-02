@@ -11017,6 +11017,12 @@ export class Player extends HTMLDivElement {
 		const player = this;
 		if (cards?.length) {
 			const beforeCards = [];
+			const disableEquips = Array.from(player.node.equips.childNodes).filter(cardx => {
+				return cardx.name?.startsWith("feichu_");
+			});
+			if (disableEquips.length) {
+				for (const cardx of disableEquips) player.node.equips.removeChild(cardx);
+			}
 			const isViewAsCard = cards.length !== 1 || cards[0].name !== card.name,
 				info = get.info(card, false);
 			let cardShownName = get.translation(card.name);
@@ -11063,8 +11069,25 @@ export class Player extends HTMLDivElement {
 				cards.forEach(card => {
 					player.node.equips.appendChild(card);
 				});
-				if (_status.discarded) {
-					_status.discarded.removeArray(cards);
+				if (_status.discarded) _status.discarded.removeArray(cards);
+			}
+			if (disableEquips.length) {
+				for (const cardx of disableEquips) {
+					const equipNum = get.equipNum(cardx);
+					let equipped = false;
+					for (let j = 0; j < player.node.equips.childNodes.length; j++) {
+						const card2 = player.vcardsMap.equips.find(i => i.cards?.includes(player.node.equips.childNodes[j]));
+						const card3 = card2 ? card2 : player.node.equips.childNodes[j];
+						if (get.equipNum(card3) >= equipNum) {
+							player.node.equips.insertBefore(cardx, player.node.equips.childNodes[j]);
+							equipped = true;
+							break;
+						}
+					}
+					if (!equipped) {
+						player.node.equips.appendChild(cardx);
+						if (_status.discarded) _status.discarded.remove(cardx);
+					}
 				}
 			}
 		}
