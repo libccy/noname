@@ -173,6 +173,7 @@ const characters = {
 		hp: 4,
 		skills: ["jsrgcangchu", "jsrgshishou"],
 		dieAudios: ["re_chunyuqiong"],
+		names: "淳于|琼",
 	},
 	//转
 	jsrg_guojia: {

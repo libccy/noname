@@ -96,7 +96,7 @@ const characters = {
 	dc_caiyang: ["male", "wei", 4, ["dcxunji", "dcjiaofeng"]],
 	xiahoujie: ["male", "wei", 5, ["liedan", "zhuangdan"], ["name:夏侯|杰"]],
 	caoxing: ["male", "qun", 4, ["cxliushi", "zhanwan"]],
-	re_chunyuqiong: ["male", "qun", 4, ["recangchu", "reliangying", "reshishou"]],
+	re_chunyuqiong: ["male", "qun", 4, ["recangchu", "reliangying", "reshishou"], ["name:淳于|琼"]],
 	xingdaorong: ["male", "qun", "4/6", ["xuxie"]],
 	re_panfeng: ["male", "qun", 4, ["xinkuangfu"]],
 	jiangfei: ["male", "shu", 3, ["dcshengxi", "dcshoucheng"], ["name:蒋|琬-费|祎"]],
