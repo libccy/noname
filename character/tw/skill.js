@@ -564,7 +564,6 @@ const skills = {
 			player.changeSkin({ characterName: "huan_zhugeliang" }, "huan_zhugeliang");
 			await player.changeSkills(get.info("twchanggui").derivation, get.info("twhunyou").derivation);
 		},
-		derivation: ["twhunyou"],
 	},
 	//幻姜维
 	huan_jiangwei_A: {

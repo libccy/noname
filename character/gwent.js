@@ -208,6 +208,7 @@ game.import("character", function () {
 				filter(event, player) {
 					return player.countCards("h") > 0;
 				},
+				derivation: ["sqlongnu", "sqlonghuo"],
 				content() {
 					"step 0";
 					var max = 1;
@@ -1249,6 +1250,7 @@ game.import("character", function () {
 				},
 				unique: true,
 				onremove: true,
+				derivation: "gwzhongmo",
 				group: "gwfutian_discard",
 				subSkill: {
 					discard: {
@@ -1517,6 +1519,7 @@ game.import("character", function () {
 			gwchenshui: {
 				trigger: { player: "damageBefore", source: "damageBefore" },
 				forced: true,
+				derivation: "gwliedi",
 				init(player) {
 					player.storage.gwchenshui = 0;
 				},

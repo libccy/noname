@@ -19113,10 +19113,24 @@ const skills = {
 			} else {
 				if (event.e) {
 					player.gain(event.e, event.target, "give", "bySelf");
-					player.addTempSkill("new_mumu2");
+					player.addTempSkill("new_mumu_notsha");
 				}
 			}
 		},
+		subSkill: {
+			notsha: {
+				mark: true,
+				intro: {
+					content: "不能使用【杀】"
+				},
+				charlotte: true,
+				mod: {
+					cardEnabled: function (card) {
+						if (card.name == "sha") return false;
+					},
+				},
+			}
+		}
 	},
 	new_zhixi: {
 		mod: {
@@ -19162,14 +19176,6 @@ const skills = {
 			pretao: true,
 			neg: true,
 			nokeep: true,
-		},
-	},
-	new_mumu2: {
-		charlotte: true,
-		mod: {
-			cardEnabled: function (card) {
-				if (card.name == "sha") return false;
-			},
 		},
 	},
 	qingzhong: {

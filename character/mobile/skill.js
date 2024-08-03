@@ -2587,7 +2587,7 @@ const skills = {
 			} else {
 				if (event.e) {
 					player.gain(event.e, event.target, "give", "bySelf");
-					player.addTempSkill("new_mumu2");
+					player.addTempSkill("new_mumu_notsha");
 				}
 			}
 		},

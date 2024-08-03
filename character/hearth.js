@@ -2953,38 +2953,6 @@ game.import("character", function () {
 					event.goto(1);
 				},
 			},
-			gfuhun: {
-				trigger: { player: "phaseEnd" },
-				direct: true,
-				filter(event, player) {
-					return player.countCards("h") > 0 && !player.isTurnedOver();
-				},
-				content() {
-					"step 0";
-					player.chooseTarget(get.prompt("gfuhun"), function (card, player, target) {
-						return target != player && target.countCards("h") > 0;
-					}).ai = function (target) {
-						return -get.attitude(player, target);
-					};
-					"step 1";
-					if (result.bool) {
-						player.logSkill("gfuhun", result.targets);
-						event.target = result.targets[0];
-						player.chooseToCompare(event.target);
-					} else {
-						event.finish();
-					}
-					"step 2";
-					if (result.bool) {
-						event.target.goMad({ player: "phaseAfter" });
-						if (!player.isTurnedOver()) player.turnOver();
-					}
-				},
-				ai: {
-					expose: 0.2,
-					threaten: 1.5,
-				},
-			},
 			qianhou: {
 				trigger: { player: "phaseBegin" },
 				forced: true,
@@ -10209,9 +10177,6 @@ game.import("character", function () {
 			moxie: "魔血",
 			moxie_info:
 				"锁定技，当你因【毒】失去体力时，你改为摸两张牌；结束阶段，你将一张随机手牌转化为毒。",
-			gfuhun: "附魂",
-			gfuhun_info:
-				"结束阶段，若你未翻面，你可以和一名其他角色拼点，若你赢，你将武将牌翻至背面，该角色进入混乱状态直到下一回合结束。",
 			hlongyi: "龙裔",
 			hlongyi_info: "锁定技，你的黑色牌不占用手牌上限。",
 			zhongji: "重击",

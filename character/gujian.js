@@ -664,6 +664,7 @@ game.import("character", function () {
 				},
 				forced: true,
 				unique: true,
+				derivation: "tongtian",
 				skillAnimation: true,
 				content() {
 					player.awakenSkill("xunjian");
@@ -2336,43 +2337,6 @@ game.import("character", function () {
 					order: 4,
 				},
 			},
-			qianjun: {
-				trigger: { player: "useCard" },
-				direct: true,
-				filter(event, player) {
-					if (event.card.name != "sha") return false;
-					if (event.targets.length != 1) return false;
-					if (!player.countCards("he")) return false;
-					var target = event.targets[0];
-					return game.hasPlayer(function (current) {
-						return player != current && target != current && get.distance(target, current) <= 1;
-					});
-				},
-				content() {
-					"step 0";
-					event.targets = game.filterPlayer(function (current) {
-						var target = trigger.targets[0];
-						return player != current && target != current && get.distance(target, current) <= 1;
-					});
-					var num = 0;
-					for (var i = 0; i < event.targets.length; i++) {
-						num += get.effect(event.targets[i], { name: "sha" }, player, player);
-					}
-					var next = player.chooseToDiscard(get.prompt("qianjun", event.targets), "he");
-					next.logSkill = ["qianjun", event.targets];
-					next.ai = function (card) {
-						if (num <= 0) return -1;
-						return 7 - get.value(card);
-					};
-					"step 1";
-					if (result.bool) {
-						for (var i = 0; i < targets.length; i++) {
-							trigger.targets.add(targets[i]);
-							// targets[i].classList.add('selected');
-						}
-					}
-				},
-			},
 			xuanning: {
 				group: ["xuanning1", "xuanning2"],
 				intro: {
@@ -2908,8 +2872,6 @@ game.import("character", function () {
 			jizhan: "疾战",
 			jizhan_info:
 				"出牌阶段限一次，你可以移动到任意一名角色的前一位，视为对其使用了一张不计入出杀次数的【杀】。",
-			qianjun: "千军",
-			qianjun_info: "每当你使用一张【杀】，你可以弃置一张牌，令距离目标1以内的所有角色成为额外目标。",
 			xuanning: "玄凝",
 			xuanning1: "玄凝",
 			xuanning2: "玄凝",

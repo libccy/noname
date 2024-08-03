@@ -2613,38 +2613,6 @@ game.import("character", function () {
 					expose: 0.2,
 				},
 			},
-			feiming: {
-				trigger: { player: "damageEnd" },
-				check: function (event, player) {
-					return get.attitude(player, event.source) <= 0;
-				},
-				filter: function (event, player) {
-					return event.source && event.source != player;
-				},
-				content: function () {
-					"step 0";
-					trigger.source.chooseCard("交出一张红桃牌或失去1点体力", function (card) {
-						return get.suit(card) == "heart";
-					}).ai = function (card) {
-						return 6 - get.value(card);
-					};
-					"step 1";
-					if (result.bool) {
-						player.gain(result.cards[0], trigger.source);
-						trigger.source.$give(1, player);
-					} else {
-						trigger.source.loseHp();
-					}
-				},
-				ai: {
-					maixie_defend: true,
-					effect: {
-						target: function (card, player, target) {
-							if (get.tag(card, "damage")) return [1, 0, 0, -1];
-						},
-					},
-				},
-			},
 			jianai: {
 				trigger: { player: "recoverEnd" },
 				check: function (event, player) {
@@ -3347,9 +3315,6 @@ game.import("character", function () {
 			jieyong_info: "你使用的卡牌结算完成后，你可以弃置一张黑色牌并重新获得之。（每回合限一次）",
 			shangtong: "尚同",
 			shangtong_info: "每当你令其他角色恢复1点血量或掉1点血量时，你可以摸一张牌（摸牌上限为4）。",
-			feiming: "非命",
-			feiming_info:
-				"其他角色对你造成伤害时，你可以令该角色须选择1项执行：1，将1张红桃花色手牌交给你；2，失去1点血量。",
 			yxsrenwang: "人望",
 			yxsrenwang_info:
 				"出牌阶段，你可以弃置两张牌并指定一名手牌数大于你的角色，你摸牌至与该角色手牌数相等，每阶段限一次。",
