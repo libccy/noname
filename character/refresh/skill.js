@@ -11576,7 +11576,7 @@ const skills = {
 			player.removeSkillBlocker(skill);
 		},
 		skillBlocker: function (skill, player) {
-			return skill != "chanyuan" && skill != "rechanyuan" && !lib.skill[skill].charlotte && player.hp <= 1;
+			return skill != "chanyuan" && skill != "rechanyuan" && !lib.skill[skill].charlotte && !lib.skill[skill].persevereSkill && player.hp <= 1;
 		},
 		mark: true,
 		intro: {
