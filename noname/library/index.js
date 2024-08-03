@@ -36,7 +36,7 @@ export class Library {
 	updateURLS = updateURLs;
 	updateURL = updateURLs.github;
 	mirrorURL = updateURLs.coding;
-	hallURL = "47.99.105.222";
+	hallURL = "";
 	assetURL = assetURL;
 	userAgent = userAgent;
 	characterDefaultPicturePath = characterDefaultPicturePath;
