@@ -1264,7 +1264,10 @@ const skills = {
 				ai: {
 					result: {
 						target(player, target) {
-							return target.isLinked() + target.isTurnedOver();
+							let res = 0;
+							if (target.isLinked()) res = 0.3;
+							if (target.isTurnedOver()) res += 3.5 * get.threaten(target, player);
+							return res;
 						},
 					},
 				},
@@ -1280,7 +1283,7 @@ const skills = {
 				ai: {
 					result: {
 						target(player, target) {
-							return get.effect(target, { name: "draw" }, player, player) * (target == player ? 3 : 1) * get.sgn(get.attitude(player, target));
+							return Math.min(5, Math.max(2, game.dead.length));
 						},
 					},
 				},
@@ -1300,12 +1303,14 @@ const skills = {
 				ai: {
 					result: {
 						target(player, target) {
-							return (
-								1 +
-								Array.from({ length: 13 })
-									.map((_, i) => "equip" + parseFloat(i + 1))
-									.some(i => target.hasDisabledSlot(i))
-							);
+							let res = 0.2;
+							if (target.isHealthy()) res += 0.4;
+							if (
+								Array.from({ length: 5 })
+								.map((_, i) => "equip" + parseFloat(i + 1))
+								.some(i => target.hasDisabledSlot(i))
+							) res += 0.3;
+							return res + get.recoverEffect(target, target, target) / 16;
 						},
 					},
 				},
@@ -1477,7 +1482,7 @@ const skills = {
 				ai: {
 					result: {
 						target(player, target) {
-							return -target.countCards("hs") - 1;
+							return -(target.countCards("hs") + 2) / 3;
 						},
 					},
 				},
@@ -1494,7 +1499,7 @@ const skills = {
 				ai: {
 					result: {
 						target(player, target) {
-							return -target.countCards("hs") - 2;
+							return -(target.countCards("hs") + 2) / 2;
 						},
 					},
 				},
@@ -1511,7 +1516,7 @@ const skills = {
 				ai: {
 					result: {
 						target(player, target) {
-							return -target.countCards("hs") - 1;
+							return -target.countCards("hs") - 2;
 						},
 					},
 				},
@@ -1527,7 +1532,7 @@ const skills = {
 				ai: {
 					result: {
 						target(player, target) {
-							return -target.getSkills(null, false).filter(i => get.info(i) && !get.info(i).charlotte).length;
+							return -target.getSkills(null, false).filter(i => get.info(i) && !get.info(i).charlotte).length * get.threaten(target, player);
 						},
 					},
 				},
@@ -1540,7 +1545,13 @@ const skills = {
 				async content(player, target) {
 					target.addTempSkill("sbfangzhu_kill", { player: "phaseEnd" });
 				},
-				ai: {},
+				ai: {
+					result: {
+						target(player, target) {
+							return -(target.countCards("hs") + 2) / target.hp;
+						} 
+					}
+				},
 			},
 			{
 				cost: 3,
@@ -1553,7 +1564,7 @@ const skills = {
 				ai: {
 					result: {
 						target(player, target) {
-							return target.isTurnedOver() ? 1 : -1;
+							return target.isTurnedOver() ? 3.5 : -3.5;
 						},
 					},
 				},
