@@ -6314,6 +6314,7 @@ const skills = {
 		},
 	},
 	reshizhi: {
+		audio: 2,
 		mod: {
 			cardname: function (card, player) {
 				if (card.name == "shan" && player.hp == 1) return "sha";

@@ -10843,6 +10843,7 @@ const skills = {
 	},
 	//韩遂
 	xinniluan: {
+		audio: "niluan",
 		trigger: { global: "phaseJieshuBegin" },
 		direct: true,
 		filter: function (event, player) {

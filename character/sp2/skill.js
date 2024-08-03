@@ -5180,14 +5180,14 @@ const skills = {
 				}),
 				tricks = [];
 			for(let i = 0; i < ui.cardPile.childNodes.length; i++){
-				let type = get.type2(i, false);
+				let card = ui.cardPile.childNodes[i], type = get.type2(card, false);
 				if (type != "trick" || tricks.includes(type)) continue;
-				tricks.push([i, get.event().player.getUseValue(i)]);
+				tricks.push([card.name, get.event().player.getUseValue(card)]);
 			}
 			for(let i = 0; i < ui.discardPile.childNodes.length; i++){
-				let type = get.type2(i, false);
+				let card = ui.discardPile.childNodes[i], type = get.type2(i, false);
 				if (type != "trick" || tricks.includes(type)) continue;
-				tricks.push([i, get.event().player.getUseValue(i)]);
+				tricks.push([card.name, get.event().player.getUseValue(card)]);
 			}
 			tricks.sort((a, b) => b[1] - a[1]);
 			let result = await player.chooseToDiscard(get.prompt2("difa"), card => {
