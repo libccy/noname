@@ -48,21 +48,17 @@ const skills = {
 				const { result: result2 } = await target.draw();
 				let cards = result.concat(result2).filter(i => get.owner(i) == target && target.hasUseTarget(i));
 				while (cards.length) {
-					const {
-						result: { bool, links },
-					} = await target
-						.chooseButton(["佐军：是否使用其中的一张牌？", cards])
-						.set("filterButton", button => {
-							return get.player().hasUseTarget(button.link);
-						})
-						.set("ai", button => {
-							return get.player().getUseValue(button.link);
-						});
-					if (bool) {
-						const card = links[0];
-						cards.remove(card);
+					const result = await target
+						.chooseToUse(function (card, player, event) {
+							if (get.itemtype(card) != "card" || !get.event("cards").includes(card)) return false;
+							return lib.filter.filterCard.apply(this, arguments);
+						}, "佐军：是否使用其中的一张牌？")
+						.set("cards", cards)
+						.set("addCount", false)
+						.forResult();
+					if (result.bool) {
+						cards.removeArray(result.cards);
 						await game.delayx();
-						await target.chooseUseTarget(true, card, false);
 					} else break;
 				}
 				if (cards.length) await target.discard(cards);
