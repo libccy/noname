@@ -124,7 +124,7 @@ const skills = {
 			source: "damageBegin1",
 		},
 		filter(event, player) {
-			if (!event.source || event.source == event.player) return false;
+			if (!event.source || event.source == event.player || !event.cards || !event.cards.length) return false;
 			const evt = event.getParent(2);
 			return evt && evt.name == "useCard";
 		},
