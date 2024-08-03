@@ -5180,12 +5180,12 @@ const skills = {
 				}),
 				tricks = [];
 			for(let i = 0; i < ui.cardPile.childNodes.length; i++){
-				let type = get.type2(card, false);
+				let type = get.type2(i, false);
 				if (type != "trick" || tricks.includes(type)) continue;
 				tricks.push([i, get.event().player.getUseValue(i)]);
 			}
 			for(let i = 0; i < ui.discardPile.childNodes.length; i++){
-				let type = get.type2(card, false);
+				let type = get.type2(i, false);
 				if (type != "trick" || tricks.includes(type)) continue;
 				tricks.push([i, get.event().player.getUseValue(i)]);
 			}
