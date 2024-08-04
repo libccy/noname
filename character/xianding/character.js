@@ -1,4 +1,5 @@
 const characters = {
+	dc_sb_jushou: ["male", "qun", 3, ["dcsbzuojun", "dcsbmuwang"]],
 	dc_sb_chengyu: ["male", "wei", 3, ["dcshizha", "dcgaojian"]],
 	dc_lingcao: ["male", "wu", "4/5", ["dcdufeng"]],
 	zhugejing: ["male", "qun", 3, ["dcyanzuo", "dczuyin", "dcpijian"], ["name:诸葛|京"]],

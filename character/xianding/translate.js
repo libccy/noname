@@ -670,6 +670,12 @@ const translates = {
 	dcgaojian: "告谏",
 	dcgaojian_info: "出牌阶段，你使用锦囊牌结算完成进入弃牌堆后，可以选择一名其他角色。其依次展示牌堆顶的牌直到出现锦囊牌（至多展示五张），然后选择一项：1.使用此牌，2.用任意张手牌与等量展示牌交换。",
 	dcgaojian_tag: "手牌",
+	dc_sb_jushou: "新杀谋沮授",
+	dc_sb_jushou_prefix: "新杀谋",
+	dcsbzuojun: "佐军",
+	dcsbzuojun_info: "出牌阶段限一次，你可以令一名角色摸三张牌并令其选择一项：1.直到其下个回合结束，其不能使用这些牌且这些牌不计入手牌上限；2.失去1点体力，摸一张牌并使用因此获得的任意张牌，然后弃置其余牌。",
+	dcsbmuwang: "暮往",
+	dcsbmuwang_info: "锁定技，当你每回合首次失去的基本牌或普通锦囊牌进入弃牌堆时，你获得之。当你本回合再次失去这些牌后，你弃置一张牌。",
 };
 
 export default translates;
