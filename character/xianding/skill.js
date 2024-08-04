@@ -307,18 +307,34 @@ const skills = {
 			const next = player.addToExpansion(event.cards, player, "give");
 			next.gaintag.add("dcyanzuo");
 			await next;
-			const cards = get.inpileVCardList(info => {
-				if (!["basic", "trick"].includes(info[0]) || info[3]) return false;
-				return player.getExpansions("dcyanzuo").some(card => card.name == info[2] && player.hasUseTarget(card));
-			});
-			if (!cards.length) return;
-			const {
-				result: { bool, links },
-			} = await player.chooseButton(["是否视为使用其中一张牌？", [cards, "vcard"]]).set("ai", button => {
-				return get.player().getUseValue(button.link[2]);
-			});
-			if (bool) {
-				const card = get.autoViewAs({ name: links[0][2], isCard: true });
+			const cards = player.getExpansions("dcyanzuo");
+			const result = await player
+				.chooseButton(["是否视为使用其中一张牌？", cards])
+				.set("filterButton", button => {
+					const player = _status.event.player;
+					const card = {
+						name: get.name(button.link),
+						suit: get.suit(button.link),
+						isCard: true,
+					};
+					return player.hasUseTarget(card);
+				})
+				.set("ai", button => {
+					const player = _status.event.player;
+					const card = {
+						name: get.name(button.link),
+						suit: get.suit(button.link),
+						isCard: true,
+					};
+					return player.getUseValue(card);
+				})
+				.forResult();
+			if (result.bool) {
+				const card = {
+					name: get.name(result.links[0]),
+					suit: get.suit(result.links[0]),
+					isCard: true,
+				};
 				await player.chooseUseTarget(card, true, false);
 			}
 		},
