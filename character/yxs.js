@@ -3151,7 +3151,6 @@ game.import("character", function () {
 			kuangchan: "狂禅",
 			kuangchan_info: "锁定技，你做主公时，不增加体力上限。",
 			yxsdili: "底力",
-			// yxsdili_info:'锁定技，摸牌阶段，你额外摸X张牌，X为你已损失的体力值。',
 			yxsdili_info: "锁定技，摸牌阶段，你额外摸X张牌，X为你已损失的体力值的一半，向上取整且最多为2。",
 			chujia: "初嫁",
 			chujia_info:
@@ -3164,7 +3163,6 @@ game.import("character", function () {
 			yinyang: "阴阳",
 			yinyang_info: "出牌阶段限一次，你可以弃置两张手牌并选择3名角色，分别横置或重置这些角色。",
 			xiushen: "修身",
-			// xiushen_info:'锁定技，结束阶段，若场上有横置角色，你摸两张牌。',
 			xiushen_info: "锁定技，出牌阶段结束时，若场上有横置角色，你摸两张牌。",
 			yanyi: "演绎",
 			yanyi_info:

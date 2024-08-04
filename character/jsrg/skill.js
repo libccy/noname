@@ -7823,6 +7823,7 @@ const skills = {
 		enable: "phaseUse",
 		limited: true,
 		filterTarget: lib.filter.notMe,
+		derivation: ["jsrgfeiyang", "jsrgbahu"],
 		skillAnimation: true,
 		animationColor: "soil",
 		content: function () {

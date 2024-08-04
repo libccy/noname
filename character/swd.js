@@ -64,7 +64,7 @@ game.import("character", function () {
 			// swd_wushi:['male','wei',3,['zhoufu','yingbin','xuying']],
 			// swd_lanmoshen:['female','wei',3,['bingjian','lieren']],
 			swd_huanglei: ["male", "qun", 3, ["jilve", "gongshen", "gaizao"]],
-			// swd_libai:['female','qun',3,['miaobi','zhexian']],
+			// swd_libai:['male','qun',3,['miaobi','zhexian']],
 			swd_kendi: ["male", "qun", 3, ["zhanxing", "kbolan"]],
 			// swd_lijing:['male','qun',4,['tianyi','zhuhai']],
 			swd_lilian: ["female", "qun", 3, ["swd_wuxie", "lqingcheng"]],
@@ -1715,84 +1715,6 @@ game.import("character", function () {
 					player.die();
 				},
 			},
-			hjifeng: {
-				enable: "phaseUse",
-				filter: function (event, player) {
-					if (!player.countCards("h")) return false;
-					if (player.countCards("h", { type: "jiqi" })) return false;
-					return true;
-				},
-				discard: false,
-				prepare: "throw2",
-				usable: 1,
-				check: function (card) {
-					return 6 - get.value(card);
-				},
-				filterCard: true,
-				content: function () {
-					var name = get.suit(cards[0]);
-					ui.cardPile.insertBefore(cards[0], ui.cardPile.firstChild);
-					switch (name) {
-						case "spade":
-							name = "qinglongzhigui";
-							break;
-						case "club":
-							name = "baishouzhihu";
-							break;
-						case "diamond":
-							name = "zhuquezhizhang";
-							break;
-						case "heart":
-							name = "xuanwuzhihuang";
-							break;
-					}
-					player.gain(get.cardPile(name) || game.createCard(name), "draw");
-				},
-				ai: {
-					order: 4,
-					result: {
-						player: 1,
-					},
-				},
-			},
-			hjifeng_old: {
-				trigger: { player: "phaseEnd" },
-				filter: function (event, player) {
-					if (!player.countCards("he", { type: "equip" })) return false;
-					if (player.countCards("h", { type: "jiqi" })) return false;
-					if (
-						get.cardPile(function (card) {
-							return get.type(card) == "jiqi";
-						})
-					)
-						return true;
-					return false;
-				},
-				direct: true,
-				content: function () {
-					"step 0";
-					player
-						.chooseToDiscard("he", "祭风：是否弃置一张装备牌并获得一张祭器牌？", {
-							type: "equip",
-						})
-						.set("ai", function (card) {
-							return 6 - get.value(card);
-						}).logSkill = "hjifeng";
-					"step 1";
-					if (result.bool) {
-						var card =
-							get.cardPile(function (card) {
-								return get.type(card) == "jiqi" && card.name.indexOf("yuchan") != 0;
-							}) ||
-							get.cardPile(function (card) {
-								return get.type(card) == "jiqi";
-							});
-						if (card) {
-							player.gain(card, "draw");
-						}
-					}
-				},
-			},
 			lmazui: {
 				audio: "mazui",
 				enable: "phaseUse",
@@ -2088,21 +2010,6 @@ game.import("character", function () {
 					threaten: 1.5,
 				},
 			},
-			zaowu: {
-				enable: "phaseUse",
-				usable: 1,
-				filter: function (event, player) {
-					return player.countCards("h", { suit: ["spade", "heart"] }) > 0;
-				},
-				filterCard: { suit: ["spade", "heart"] },
-				viewAs: { name: "fengyinzhidan" },
-				check: function (card) {
-					return 7 - get.value(card);
-				},
-				ai: {
-					order: 8.5,
-				},
-			},
 			huanxia: {
 				enable: "chooseToUse",
 				filterCard: function (card) {
@@ -2173,31 +2080,6 @@ game.import("character", function () {
 							delete player.storage.huanxia_draw;
 						},
 					},
-				},
-			},
-			kongmo: {
-				trigger: { player: "useCardAfter" },
-				forced: true,
-				filter: function (event, player) {
-					if (event.parent.name == "kongmo") return false;
-					if (!event.targets || !event.card) return false;
-					var type = get.type(event.card);
-					if (type != "basic" && type != "trick") return false;
-					var card = game.createCard(event.card.name, event.card.suit, event.card.number);
-					for (var i = 0; i < event.targets.length; i++) {
-						if (!event.targets[i].isAlive()) return false;
-						if (!player.canUse({ name: event.card.name }, event.targets[i], false, false)) {
-							return false;
-						}
-					}
-					return true;
-				},
-				content: function () {
-					var card = game.createCard(trigger.card.name, trigger.card.suit, trigger.card.number);
-					player.useCard(card, trigger.targets);
-				},
-				ai: {
-					threaten: 2,
 				},
 			},
 			huajing: {
@@ -7639,51 +7521,6 @@ game.import("character", function () {
 					},
 				},
 			},
-			zaowu_old: {
-				enable: "phaseUse",
-				usable: 1,
-				position: "he",
-				filterCard: function (card, player, target) {
-					if (ui.selected.cards.length == 0) return true;
-					for (var i = 0; i < ui.selected.cards.length; i++) {
-						if (get.type(ui.selected.cards[i], "trick") == get.type(card, "trick")) return false;
-					}
-					return true;
-				},
-				selectCard: 3,
-				check: function (card) {
-					return 10 - get.value(card);
-				},
-				content: function () {
-					"step 0";
-					var list = [];
-					var suit = ["heart", "diamond", "club", "spade"].randomGet();
-					var number = Math.floor(Math.random() * 13) + 1;
-					for (var i in lib.card) {
-						if (lib.card[i].mode && lib.card[i].mode.includes(lib.config.mode) == false) continue;
-						if (get.value({ name: i }) >= 10) continue;
-						if (i != "list") list.push([suit, number, i]);
-					}
-					var dialog = ui.create.dialog([list, "vcard"]);
-					player.chooseButton(dialog, 2, true, function (button) {
-						return get.value({ name: button.link[2] }, player);
-					});
-					"step 1";
-					var cards = [ui.create.card(), ui.create.card()];
-					cards[0].init(result.buttons[0].link);
-					cards[1].init(result.buttons[1].link);
-					player.gain(cards);
-					player.$gain(cards);
-					game.delay();
-				},
-				ai: {
-					order: 8,
-					result: {
-						player: 1,
-					},
-					threaten: 1.6,
-				},
-			},
 			xielv: {
 				trigger: { player: "phaseDiscardEnd" },
 				filter: function (event, player) {
@@ -8234,11 +8071,50 @@ game.import("character", function () {
 					}
 				},
 			},
+			swd_xiuluo: {
+				trigger: { player: "phaseZhunbeiBegin" },
+				filter: function (event, player) {
+					return player.countCards("j") > 0;
+				},
+				direct: true,
+				content: function () {
+					var next = player.discardPlayerCard(
+						player,
+						2,
+						"hj",
+						"是否一张手牌来弃置一张花色相同的判定牌？"
+					);
+					next.filterButton = function (button) {
+						var card = button.link;
+						if (!lib.filter.cardDiscardable(card, player)) return false;
+						if (ui.selected.buttons.length == 0) return true;
+						if (get.position(ui.selected.buttons[0].link) == "h") {
+							if (get.position(card) != "j") return false;
+						}
+						if (get.position(ui.selected.buttons[0].link) == "j") {
+							if (get.position(card) != "h") return false;
+						}
+						return get.suit(card) == get.suit(ui.selected.buttons[0].link);
+					};
+					next.ai = function (button) {
+						var card = button.link;
+						if (get.position(card) == "h") {
+							return 11 - get.value(card);
+						}
+						if (card.name == "lebu") return 5;
+						if (card.name == "bingliang") return 4;
+						if (card.name == "guiyoujie") return 3;
+						return 2;
+					};
+					next.logSkill = "swd_xiuluo";
+				},
+			},
 			mohua2: {
 				unique: true,
 				trigger: { player: "dying" },
 				priority: 10,
 				forced: true,
+				derivation: ["moyan", "miedao", "jifeng", "swd_xiuluo"],
 				content: function () {
 					"step 0";
 					player.removeSkill("miles_xueyi");
@@ -8275,6 +8151,7 @@ game.import("character", function () {
 				priority: 10,
 				forced: true,
 				mode: ["identity"],
+				derivation: ["wuying", "xiehun", "jumo"],
 				content: function () {
 					"step 0";
 					var skills = ["wuying", "xiehun", "jumo"];
@@ -9643,8 +9520,6 @@ game.import("character", function () {
 				"限定技，出牌阶段，你可以令任意名角色各获得3点护甲，获得护甲的角色于每个准备阶段失去1点护甲，直到首次失去所有护甲或累计以此法失去3点护甲。",
 			huanxia: "幻霞",
 			huanxia_info: "你可以将一张红色牌当作【杀】使用，若此【杀】未造成伤害，你在结束阶段收回此牌。",
-			kongmo: "恐魔",
-			kongmo_info: "锁定技，你使用基本牌或普通锦囊牌后将额外结算一次卡牌效果。",
 			jufu: "巨斧",
 			jufu_info: "锁定技，当你有武器牌时，【杀】造成的伤害+1。",
 			huajing: "化精",
@@ -9836,9 +9711,6 @@ game.import("character", function () {
 			mufeng_info_alter: "结束阶段，你可以将手牌数补至当前体力值。",
 			mufeng_old2_info:
 				"在一名角色的结束阶段，若你的手牌数比其少，你可以将手牌补至与该角色相同（最多补至5），每轮限一次。",
-			hjifeng: "祭风",
-			hjifeng_info:
-				"出牌阶段限一次，若你手牌中没有祭器牌，你可以将一张手牌置于牌堆顶，并根据其花色获得对应祭器：黑桃-青龙之圭；梅花-白兽之琥；方片-朱雀之璋；红桃-玄武之璜。",
 			mufeng_old_info:
 				"锁定技，每当你于回合外失去牌，你的防御距离+1；若防御距离的变化值超过了存活角色数的一半，则降至0。",
 			lexue: "乐学",
@@ -9944,7 +9816,6 @@ game.import("character", function () {
 			xuehuang_bg: "凰",
 			zhuyu: "朱羽",
 			ningshuang: "凝霜",
-			zaowu: "造物",
 			xielv: "谐率",
 			tianhuo: "天火",
 			huanyin: "幻音",
@@ -9999,7 +9870,7 @@ game.import("character", function () {
 				"准备阶段，若你的体力值小于上回合结束时的体力值，你可以将场上所有牌还原到你上一回合结束时的位置。",
 			kunlunjing_info_alter:
 				"准备阶段，若你的体力值小于上回合结束时的体力值，你可以将场上所有牌还原到你上一回合结束时的位置，然后失去1点体力。",
-			swd_xiuluo_info: "准备阶段，你可以弃一张手牌来弃置你判断区里的一张延时类锦囊（必须花色相同）。",
+			swd_xiuluo_info: "准备阶段，你可以弃一张手牌来弃置你判定区里的一张延时类锦囊（必须花色相同）。",
 			xianyin_info: "出牌阶段，你可以令所有判定区内有牌的角色弃置判定区内的牌，然后交给你一张手牌。",
 			mailun_info: "准备阶段，你可以选择一个脉轮效果直到下一回合开始。",
 			guiyan_info:
@@ -10070,7 +9941,6 @@ game.import("character", function () {
 				"结束阶段，你可以弃置一张牌并从三名随机武将中选择一个，在2X回合后你将其所有技能加入你的天书列表，X为其技能数；在技能加入天书列表时，或于出牌阶段，你可以装备一项天书列表中的技能。",
 			swdtianshu_info:
 				"出牌阶段，你可以弃置一张锦囊牌，然后获得一名其他角色的一项技能直到该角色死亡（替换以此法获得的前一个技能）。",
-			zaowu_info: "出牌阶段限一次，你可以将一张黑桃或红桃手牌当作封印之蛋使用。",
 			luomei_info: "每当你使用或打出一张梅花花色的牌，你可以摸一张牌。",
 			xingdian_info: "出牌阶段限一次，你可以弃置一张手牌，然后随机弃置两名敌人各一张牌。",
 			yulin_info: "每当你即将受到伤害，你可以弃置一张装备牌抵消此伤害。",
@@ -10082,7 +9952,6 @@ game.import("character", function () {
 			zhuyu_info: "每当一名横置的角色即将受到伤害时，你可以弃置一张红色牌令此伤害+1并变为火属性。",
 			ningshuang_info:
 				"每当你成为黑色牌的目标，你可以弃置一张黑色牌将其横置，并摸一张牌，若其已经模置则改为将其翻面。",
-			zaowu_old_info: "出牌阶段，你可以弃置三张不同类型的牌，创造任意两张牌并获得之。",
 			xielv_info:
 				"弃牌阶段结束后，若你的所有手牌（至少两张）颜色均相同，你可以展示所有手牌，然后回复1点体力并弃置场上的所有判定牌。",
 		},

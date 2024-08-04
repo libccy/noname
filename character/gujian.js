@@ -657,21 +657,6 @@ game.import("character", function () {
 					},
 				},
 			},
-			xunjian_old: {
-				trigger: { player: "phaseEnd" },
-				filter(event, player) {
-					return player.storage.lingyan && player.storage.lingyan.length == 13;
-				},
-				forced: true,
-				unique: true,
-				derivation: "tongtian",
-				skillAnimation: true,
-				content() {
-					player.awakenSkill("xunjian");
-					player.removeSkill("lingyan");
-					player.addSkill("tongtian");
-				},
-			},
 			xunjian: {
 				trigger: { player: ["useCard", "respond"] },
 				forced: true,
@@ -684,33 +669,6 @@ game.import("character", function () {
 					var card = get.cardPile2(trigger.card.name);
 					if (card) {
 						player.gain(card, "gain2");
-					}
-				},
-			},
-			tongtian: {
-				trigger: { player: ["useCardAfter", "respondAfter"] },
-				forced: true,
-				filter(event, player) {
-					var name = event.card.name;
-					var enemies = player.getEnemies();
-					for (var i = 0; i < enemies.length; i++) {
-						if (enemies[i].countCards("h", name)) {
-							return true;
-						}
-					}
-				},
-				content() {
-					var list = [];
-					var name = trigger.card.name;
-					var enemies = player.getEnemies();
-					for (var i = 0; i < enemies.length; i++) {
-						list.addArray(enemies[i].getCards("h", name));
-					}
-					if (list.length) {
-						var card = list.randomGet();
-						var owner = get.owner(card);
-						player.line(owner, "green");
-						owner.give(card, player, true);
 					}
 				},
 			},
@@ -2313,30 +2271,6 @@ game.import("character", function () {
 					threaten: 1.1,
 				},
 			},
-			jizhan: {
-				enable: "phaseUse",
-				usable: 1,
-				changeSeat: true,
-				filterTarget(card, player, target) {
-					return player != target && player.next != target && player.canUse("sha", target, false);
-				},
-				filter(event, player) {
-					var min = Math.max(1, player.maxHp - player.hp);
-					return lib.filter.filterCard({ name: "sha" }, player);
-				},
-				content() {
-					game.swapSeat(player, target, true, true);
-					player.useCard({ name: "sha" }, target, false);
-				},
-				ai: {
-					result: {
-						target(player, target) {
-							return get.effect(target, { name: "sha" }, player, target);
-						},
-					},
-					order: 4,
-				},
-			},
 			xuanning: {
 				group: ["xuanning1", "xuanning2"],
 				intro: {
@@ -2765,9 +2699,6 @@ game.import("character", function () {
 			xunjian: "寻剑",
 			xunjian_info:
 				"锁定技，每当你使用或打出一张牌，若牌堆中有同名牌，你有X的机率获得之，X为你的“灵偃”牌数/13。",
-			xunjian_old_info: "觉醒技，结束阶段，若你武将牌上有十三张牌，你失去技能灵偃并获得技能通天。",
-			tongtian: "通天",
-			tongtian_info: "锁定技，在你使用或打出一张牌后，若敌方角色手中有同名牌，你随机获得其中一张。",
 			xianju: "仙居",
 			xianju_info:
 				"锁定技，奇数游戏轮次开始时，你获得潜行直到下一轮开始；偶数游戏轮次开始时，你随机获得一张机关牌。",
@@ -2869,9 +2800,6 @@ game.import("character", function () {
 			boyun2: "拨云",
 			boyun_info:
 				"在你的回合内，你可以弃置一张装备牌，并展示牌堆顶的一张牌，若其为装备牌，你须将其交给任意一张角色并对其造成1点伤害，否则你摸一张牌。",
-			jizhan: "疾战",
-			jizhan_info:
-				"出牌阶段限一次，你可以移动到任意一名角色的前一位，视为对其使用了一张不计入出杀次数的【杀】。",
 			xuanning: "玄凝",
 			xuanning1: "玄凝",
 			xuanning2: "玄凝",

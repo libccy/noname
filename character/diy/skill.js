@@ -693,6 +693,7 @@ const skills = {
 		discard: false,
 		lose: false,
 		delay: false,
+		derivation: ["noname_retieji", "noname_jiang"],
 		content() {
 			"step 0";
 			var stat = player.getStat();

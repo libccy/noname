@@ -23694,6 +23694,7 @@ const skills = {
 	},
 	luoyan: {
 		group: ["luoyan_tianxiang", "luoyan_liuli"],
+		derivation: ["tianxiang", "liuli"],
 		ai: {
 			combo: "xingwu",
 		},

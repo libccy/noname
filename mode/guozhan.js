@@ -394,7 +394,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				gz_pangde: ["male", "qun", 4, ["mashu", "jianchu"]],
 				gz_zhangjiao: ["male", "qun", 3, ["leiji", "guidao"]],
 				gz_caiwenji: ["female", "qun", 3, ["beige", "gzduanchang"]],
-				gz_mateng: ["male", "qun", 4, ["mashu2", "xiongyi"]],
+				gz_mateng: ["male", "qun", 4, ["mashu", "xiongyi"]],
 				gz_kongrong: ["male", "qun", 3, ["gzmingshi", "lirang"]],
 				gz_jiling: ["male", "qun", 4, ["shuangren"]],
 				gz_tianfeng: ["male", "qun", 3, ["sijian", "gzsuishi"]],
@@ -411,7 +411,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 
 				gz_re_lidian: ["male", "wei", 3, ["xunxun", "wangxi"]],
 				gz_zangba: ["male", "wei", 4, ["rehengjiang"]],
-				gz_madai: ["male", "shu", 4, ["mashu2", "qianxi"], ["gzskin"]],
+				gz_madai: ["male", "shu", 4, ["mashu", "qianxi"], ["gzskin"]],
 				gz_mifuren: ["female", "shu", 3, ["gzguixiu", "gzcunsi"]],
 				gz_sunce: ["male", "wu", 4, ["jiang", "yingyang", "baka_hunshang"], ["gzskin"]],
 				gz_chendong: ["male", "wu", 4, ["duanxie", "fakefenming"]],

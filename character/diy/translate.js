@@ -58,7 +58,6 @@ const translates = {
 	ns_lvmeng: "吕蒙",
 
 	ns_yujisp: "于吉",
-	ns_lisu: "李肃",
 	ns_yangyi: "杨仪",
 	ns_liuzhang: "刘璋",
 	ns_xinnanhua: "南华老仙",
