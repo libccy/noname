@@ -1518,6 +1518,7 @@ const skills = {
 			if (!lib.skill[skill]) {
 				lib.skill[skill] = {
 					charlotte: true,
+					onremove: true,
 					mark: true,
 					marktext: "戒",
 					intro: {
@@ -1537,17 +1538,22 @@ const skills = {
 		enable: "phaseUse",
 		limited: true,
 		filterTarget(card, player, target) {
-			return !target.hasSkill("clanmingjiex_" + player.playerid);
+			return !Object.keys(target.storage).some(skill => {
+				return skill.startsWith("clanmingjiex_" + player.playerid + "_") && target.storage[skill] === 1 + (_status.currentPhase === target);
+			});
 		},
 		skillAnimation: true,
 		animationColor: "thunder",
 		content() {
 			player.awakenSkill("clanmingjie");
 			player.addSkill("clanmingjie_effect");
-			var skill = "clanmingjiex_" + player.playerid;
+			let skill;
+			do {
+				skill = "clanmingjiex_" + player.playerid + "_" + Math.random().toString(36).slice(-8);
+			} while (lib.skill[skill] != null);
 			game.broadcastAll(lib.skill.clanmingjie.initSkill, skill);
 			target.addSkill(skill);
-			target.storage[skill] = [player, _status.currentPhase === target ? 2 : 1];
+			target.storage[skill] = _status.currentPhase === target ? 2 : 1;
 		},
 		ai: {
 			order: 10,
@@ -1593,7 +1599,7 @@ const skills = {
 					if (info.allowMultiple == false) return false;
 					if (event.targets && !info.multitarget) {
 						return game.filterPlayer().some(current => {
-							if (!current.hasSkill("clanmingjiex_" + player.playerid)) return false;
+							if (!Object.keys(current.storage).some(skill => skill.startsWith("clanmingjiex_" + player.playerid + "_"))) return false;
 							return !event.targets.includes(current) && lib.filter.targetEnabled2(card, player, current) && lib.filter.targetInRange(card, player, current);
 						});
 					}
@@ -1608,7 +1614,7 @@ const skills = {
 							"令任意【铭戒】目标角色成为" + get.translation(trigger.card) + "的目标",
 							function (card, player, target) {
 								var trigger = _status.event.getTrigger();
-								if (trigger.targets.includes(target) || !target.isIn() || !target.hasSkill("clanmingjiex_" + player.playerid)) return false;
+								if (trigger.targets.includes(target) || !Object.keys(target.storage).some(skill => skill.startsWith("clanmingjiex_" + player.playerid + "_"))) return false;
 								return lib.filter.targetEnabled2(trigger.card, player, target) && lib.filter.targetInRange(trigger.card, player, target);
 							},
 							[1, Infinity]
@@ -1640,8 +1646,8 @@ const skills = {
 				content() {
 					const storages = Object.keys(player.storage).filter(i => i.startsWith("clanmingjiex_"));
 					for (const skill of storages) {
-						player.storage[skill][1]--;
-						if (!player.storage[skill][1]) player.removeSkill(skill);
+						player.storage[skill]--;
+						if (!player.storage[skill]) player.removeSkill(skill);
 					}
 				},
 			},
@@ -1649,7 +1655,9 @@ const skills = {
 				charlotte: true,
 				trigger: { global: "phaseEnd" },
 				filter(event, player) {
-					if (!event.player.hasSkill("clanmingjiex_" + player.playerid) || event.player.storage["clanmingjiex_" + player.playerid][1] != 1) return false;
+					if (!Object.keys(event.player.storage).some(skill => {
+						return skill.startsWith("clanmingjiex_" + player.playerid + "_") && event.player.storage[skill] == 1;
+					})) return false;
 					return player.getStorage("clanmingjie_record").someInD("d");
 				},
 				forced: true,
