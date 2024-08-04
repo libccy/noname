@@ -219,7 +219,7 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const cards = player.getExpansions("dcyanzuo");
-			if (cards.some(card => card.name == trigger.card.name)) {
+			if(cards.some(card => card.name == trigger.card.name)) {
 				trigger.getParent().all_excluded = true;
 				trigger.getParent().targets.length = 0;
 				const discards = cards.filter(card => card.name == trigger.card.name);
