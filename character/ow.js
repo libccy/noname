@@ -234,6 +234,7 @@ game.import("character", function () {
 					return event.card.name == "sha";
 				},
 				mark: true,
+				marktext: "固",
 				intro: {
 					content: "其他角色对你使用杀时需要弃置一张基本牌，否则杀对你无效",
 				},
@@ -1895,34 +1896,6 @@ game.import("character", function () {
 					},
 				},
 			},
-			zhuagou: {
-				enable: "phaseUse",
-				usable: 1,
-				changeSeat: true,
-				filterTarget: function (card, player, target) {
-					return player != target && player.next != target;
-				},
-				filterCard: true,
-				check: function (card) {
-					return 4 - get.value(card);
-				},
-				content: function () {
-					while (player.next != target) {
-						game.swapSeat(player, player.next);
-					}
-				},
-				ai: {
-					order: 5,
-					result: {
-						player: function (player, target) {
-							var att = get.attitude(player, target);
-							if (target == player.previous && att > 0) return 1;
-							if (target == player.next.next && get.attitude(player, player.next) < 0) return 1;
-							return 0;
-						},
-					},
-				},
-			},
 			bingqiang: {
 				enable: "phaseUse",
 				position: "he",
@@ -2165,23 +2138,6 @@ game.import("character", function () {
 						if (typeof from.storage.bingqiang5 == "number")
 							return distance + from.storage.bingqiang5;
 					},
-				},
-			},
-			shuangqiang: {
-				trigger: { source: "damageBegin" },
-				check: function (event, player) {
-					var att = get.attitude(player, event.player);
-					if (event.player.hp == 1) return att > 0;
-					return att <= 0;
-				},
-				logTarget: "player",
-				filter: function (event, player) {
-					return !event.player.isTurnedOver() && event.num > 0;
-				},
-				content: function () {
-					trigger.num--;
-					trigger.player.draw();
-					trigger.player.turnOver();
 				},
 			},
 			jidong: {
@@ -3660,8 +3616,6 @@ game.import("character", function () {
 			qianggu_info:
 				"出牌阶段限一次，你可以弃置两张牌并获得2点护甲，若如此做，直到你的下个回合开始，其他角色对你使用【杀】时需要弃置一张基本牌，否则此【杀】对你无效。",
 			qianggu2: "强固",
-			qianggu2_bg: "固",
-			qianggu2_info: "其他角色对你使用【杀】时需要弃置一张基本牌，否则此【杀】对你无效。",
 			pingzhang: "屏障",
 			pingzhang_info:
 				"每轮各限一次，当你受到伤害时，你可以弃置一张红桃牌令伤害-1；当一名其他角色受到伤害时，你可以弃置一张黑桃牌令伤害-1。",
@@ -3762,14 +3716,10 @@ game.import("character", function () {
 			duwen: "毒吻",
 			duwen2: "毒吻",
 			duwen_info: "锁定技，当你造成伤害时，若你的手牌数与受伤害角色相等，此伤害+1。",
-			zhuagou: "抓钩",
-			zhuagou_info: "出牌阶段限一次，你可以弃置一张手牌并将你的座位移到任意位置。",
 			dulei: "诡雷",
 			dulei2: "诡雷",
 			dulei_info:
 				"出牌阶段，若你武将牌上没有牌，你可以将一张牌背面朝上置于你的武将牌上，当一名角色使用与该牌花色相同的牌指定你为目标时，你展示并移去此牌，然后该角色失去1点体力并随机弃置一张牌。",
-			shuangqiang: "霜枪",
-			shuangqiang_info: "每当你对一名未翻面的角色造成伤害，你可以令伤害-1，然后令受伤害角色翻面。",
 			baoxue: "暴雪",
 			baoxue_info:
 				"限定技，出牌阶段，若你未翻面，你可以展示并弃置你的所有黑色牌，然后令至多X名其他角色随机弃置一张牌并将武将牌翻至背面，X为你的弃牌数；结算后你将武将牌翻至背面。",

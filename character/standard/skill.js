@@ -2246,13 +2246,6 @@ const skills = {
 			},
 		},
 	},
-	mashu2: {
-		mod: {
-			globalFrom(from, to, distance) {
-				return distance - 1;
-			},
-		},
-	},
 	feiying: {
 		mod: {
 			globalTo(from, to, distance) {

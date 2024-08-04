@@ -432,7 +432,7 @@ const skills = {
 				.then(() => {
 					player.storage.isInHuan=true;
 					player.changeSkin({ characterName: "huan_zhugeliang" }, "huan_zhugeliang_shadow");
-					player.changeSkills(get.info("twhunyou").derivation, get.info("twchanggui").derivation);
+					player.changeSkills(get.info("twhunyou").derivation, ["twhunyou"]);
 				});
 		},
 		derivation: ["twhuanji", "twchanggui"],
@@ -562,9 +562,8 @@ const skills = {
 			await player[num > 0 ? "loseMaxHp" : "gainMaxHp"](Math.abs(num));
 			delete player.storage.isInHuan;
 			player.changeSkin({ characterName: "huan_zhugeliang" }, "huan_zhugeliang");
-			await player.changeSkills(get.info("twchanggui").derivation, get.info("twhunyou").derivation);
+			await player.changeSkills(["twhunyou"], get.info("twhunyou").derivation);
 		},
-		derivation: ["twhunyou"],
 	},
 	//幻姜维
 	huan_jiangwei_A: {

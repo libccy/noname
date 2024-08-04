@@ -739,6 +739,7 @@ game.import("card", function () {
 					if (!player.needsToDiscard() && get.position(card) == "h") return 0;
 					return 1 + Math.random();
 				},
+				prompt: "出牌阶段，你可将一张拥有“赠”标签的手牌区装备牌置于一名其他角色的装备区内，或将一张拥有“赠”标签的手牌区非装备牌正面朝上交给一名其他角色。",
 				content: () => {
 					player.gift(cards, target);
 				},
@@ -862,8 +863,6 @@ game.import("card", function () {
 			xinge_append: '<span class="text" style="font-family: yuanli">咕咕咕。</span>',
 
 			_gifting: "赠予",
-			_gifting_info:
-				"出牌阶段，你可将一张拥有“赠”标签的手牌区装备牌置于一名其他角色的装备区内，或将一张拥有“赠”标签的手牌区非装备牌正面朝上交给一名其他角色。",
 		},
 		list: [
 			["spade", 1, "guaguliaodu"],

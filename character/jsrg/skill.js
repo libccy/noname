@@ -1161,7 +1161,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const target = trigger.player;
 			const targets = await target
-				.chooseTarget([1, 2], true, "请选择至多两名角色", `${get.translation(player)}对你发动了【纵害】。你可以选择至多两名角色，只有这两名角色可以使用牌拯救你，且当此次濒死结算结束后，这两名角色均会受到来自${get.translation(player)}的1点伤害。`)
+				.chooseTarget([1, 2], true, "请选择至多两名角色", `${get.translation(player)}对你发动了【纵害】。你可以选择至多两名角色，只有他（们）可以使用牌拯救你，且当此次濒死结算结束后，他（们均）会受到来自${get.translation(player)}的1点伤害。`)
 				.set("ai", target => {
 					//自救还要挨一刀，最好的反制方法就是跟对面爆了
 					const evt = get.event(),
@@ -1183,40 +1183,62 @@ const skills = {
 					target.markAuto("jsrgzonghai_blocker", [id]);
 				}
 			});
-			target.addTempSkill("jsrgzonghai_damage");
-			target.storage.jsrgzonghai_damage = {
+			target.addSkill("jsrgzonghai_damage");
+			if (!target.storage.jsrgzonghai_damage) target.storage.jsrgzonghai_damage = [];
+			target.storage.jsrgzonghai_damage.push({
 				id: id,
 				targets: targets,
 				source: player
-			};
+			});
 		},
 		subSkill: {
 			blocker: {
 				charlotte: true,
 				onremove: true,
 				mod: {
-					cardSavable: () => false,
-					cardEnabled: () => false,
+					cardSavable: (card, player) => {
+						if (player.getStorage("jsrgzonghai_blocker").includes(get.event().getParent()._jsrgzonghai_id))
+							return false;
+					},
+					cardEnabled: (card, player) => {
+						if (player.getStorage("jsrgzonghai_blocker").includes(get.event().getParent()._jsrgzonghai_id))
+							return false;
+					},
 				},
 			},
 			damage: {
 				trigger: {
 					player: "dyingAfter"
 				},
+				filter(event, player) {
+					let storage = player.getStorage("jsrgzonghai_damage");
+					for (let i of storage) {
+						if (i.id == event._jsrgzonghai_id) return true;
+					}
+					return false;
+				},
 				silent: true,
 				forceDie: true,
 				charlotte: true,
 				async content(event, trigger, player) {
-					let storage = player.storage.jsrgzonghai_damage;
+					let storage;
+					for (let i = 0; i < player.storage.jsrgzonghai_damage.length; i++) {
+						if (player.storage.jsrgzonghai_damage[i].id == trigger._jsrgzonghai_id) {
+							storage = player.storage.jsrgzonghai_damage[i];
+							player.storage.jsrgzonghai_damage.splice(i, 1);
+							break;
+						}
+					}
+					if (!storage) return;
 					game.countPlayer(target => {
 						target.unmarkAuto("jsrgzonghai_blocker", [storage.id]);
 						if (!target.getStorage("jsrgzonghai_blocker").length) target.removeSkill("jsrgzonghai_blocker");
 					});
 					if (storage.source.isIn()) while (storage.targets.length) {
 						let target = storage.targets.shift();
-						await target.damage(storage.source);
+						if (target.isIn()) await target.damage(storage.source);
 					}
-					delete player.storage.jsrgzonghai_damage;
+					if (!player.storage.jsrgzonghai_damage.length) player.removeSkill("jsrgzonghai_damage");
 				}
 			}
 		},
@@ -7801,6 +7823,7 @@ const skills = {
 		enable: "phaseUse",
 		limited: true,
 		filterTarget: lib.filter.notMe,
+		derivation: ["jsrgfeiyang", "jsrgbahu"],
 		skillAnimation: true,
 		animationColor: "soil",
 		content: function () {

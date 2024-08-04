@@ -208,6 +208,7 @@ game.import("character", function () {
 				filter(event, player) {
 					return player.countCards("h") > 0;
 				},
+				derivation: ["sqlongnu", "sqlonghuo"],
 				content() {
 					"step 0";
 					var max = 1;
@@ -1249,6 +1250,7 @@ game.import("character", function () {
 				},
 				unique: true,
 				onremove: true,
+				derivation: "gwzhongmo",
 				group: "gwfutian_discard",
 				subSkill: {
 					discard: {
@@ -1517,6 +1519,7 @@ game.import("character", function () {
 			gwchenshui: {
 				trigger: { player: "damageBefore", source: "damageBefore" },
 				forced: true,
+				derivation: "gwliedi",
 				init(player) {
 					player.storage.gwchenshui = 0;
 				},
@@ -3161,58 +3164,6 @@ game.import("character", function () {
 					player.draw();
 				},
 			},
-			gwchuanxin_old: {
-				trigger: { player: "shaAfter" },
-				filter(event, player) {
-					if (player.storage.gwchuanxin && player.storage.gwchuanxin.length >= 4) return false;
-					return event.target.isAlive();
-				},
-				check(event, player) {
-					return get.effect(event.target, { name: "sha" }, player, player) > 0;
-				},
-				logTarget: "target",
-				logLine: false,
-				content() {
-					"step 0";
-					event.card = get.cards()[0];
-					player.showCards(
-						event.card,
-						get.translation(player) + "对" + get.translation(trigger.player) + "发动了【穿心】"
-					);
-					"step 1";
-					if (
-						player.storage.gwchuanxin &&
-						!player.storage.gwchuanxin.includes(get.suit(event.card))
-					) {
-						player.useCard({ name: "sha" }, [event.card], trigger.target, false);
-					}
-				},
-				group: ["gwchuanxin_count1", "gwchuanxin_count2"],
-				subSkill: {
-					count1: {
-						trigger: { global: "phaseBegin" },
-						silent: true,
-						content() {
-							player.storage.gwchuanxin = [];
-						},
-					},
-					count2: {
-						trigger: { player: "useCard" },
-						silent: true,
-						// filter(event){
-						// 	return event.card&&event.card.name=='sha';
-						// },
-						content() {
-							for (var i = 0; i < trigger.cards.length; i++) {
-								player.storage.gwchuanxin.add(get.suit(trigger.cards[i]));
-							}
-						},
-					},
-				},
-				ai: {
-					presha: true,
-				},
-			},
 			gwchuanxin: {
 				trigger: { player: "shaAfter" },
 				filter(event, player) {
@@ -4774,7 +4725,6 @@ game.import("character", function () {
 			kuanglie: "狂猎",
 			kuanglie_info:
 				"锁定技，每当你使用黑色牌指定其他角色为目标后，目标随机弃置一张牌；每当你以此法累计弃置两张牌后，你摸一张牌。",
-			// kuanglie_info:'锁定技，每当一名敌方角色成为你的黑色牌的目标，你视为对其使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】的影响后，你随机获得一张【狂猎】牌。',
 			lingshuang: "凛霜",
 			lingshuang_info:
 				"每当你失去最后一张基本牌，你可以视为对距离2以内的所有敌方角色使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】影响时，你可以弃置一张手牌将其效果改为“摸牌数-2”。",

@@ -693,6 +693,7 @@ const skills = {
 		discard: false,
 		lose: false,
 		delay: false,
+		derivation: ["noname_retieji", "noname_jiang"],
 		content() {
 			"step 0";
 			var stat = player.getStat();
@@ -2731,6 +2732,58 @@ const skills = {
 			},
 		},
 	},
+	ns_xiandao: {
+		audio: ["huashen", 2],
+		forced: true,
+		noRemove: true,
+		trigger: {
+			player: "damageBefore",
+		},
+		filter(event, player) {
+			return event.nature;
+		},
+		content() {
+			trigger.cancel();
+		},
+		ai: {
+			nofire: true,
+			nothunder: true,
+			effect: {
+				target(card, player, target) {
+					if (get.tag(card, "natureDamage")) return "zeroplayertarget";
+				}
+			}
+		},
+		group: "ns_xiandao_add",
+		subSkill: {
+			add: {
+				audio: ["huashen", 2],
+				forced: true,
+				priority: 10,
+				trigger: {
+					global: "gameStart",
+					player: ["phaseEnd", "enterGame"],
+				},
+				content() {
+					var n = [1, 2].randomGet();
+					if (n == 1) {
+						player.addTempSkill("releiji", {
+							player: "phaseUseBegin",
+						});
+						player.markSkill("releiji", {
+							player: "phaseUseBegin",
+						});
+					}
+					else {
+						player.addTempSkill("guidao", {
+							player: "phaseUseBegin",
+						});
+						player.markSkill("guidao", { player: "phaseUseBegin" });
+					}
+				},
+			},
+		}
+	},
 	ns_chuanshu: {
 		audio: ["xingshuai", 2],
 		trigger: {
@@ -2762,75 +2815,6 @@ const skills = {
 			trigger.player.addSkill("ns_chuanshu2");
 			player.awakenSkill("ns_chuanshu");
 		},
-	},
-	ns_xiandao1: {
-		audio: ["huashen", 2],
-		forced: true,
-		//noLose:true,
-		//locked:true,
-		//noRemove:true,
-		//noDisable:true,
-		priority: 10,
-		trigger: {
-			global: "gameStart",
-			player: ["phaseEnd", "enterGame"],
-		},
-		//filter (event,player){
-		//	return player.isAlive();
-		//},
-		content() {
-			var n = [1, 2].randomGet();
-			if (n == 1) {
-				player.addTempSkill("releiji", {
-					player: "phaseUseBegin",
-				});
-				player.markSkill("releiji", {
-					player: "phaseUseBegin",
-				});
-			}
-			if (n == 2) {
-				player.addTempSkill("guidao", {
-					player: "phaseUseBegin",
-				});
-				player.markSkill("guidao", { player: "phaseUseBegin" });
-			}
-		},
-	},
-	ns_xiandao2: {
-		audio: ["huashen", 2],
-		forced: true,
-		//noLose:true,
-		//locked:true,
-		//noRemove:true,
-		//noDisable:true,
-		trigger: {
-			player: "damageBefore",
-		},
-		filter(event, player) {
-			if (!event.nature) return false;
-			return true;
-		},
-		content() {
-			trigger.cancel();
-			//event.finish();
-		},
-		ai: {
-			nofire: true,
-			nothunder: true,
-			effect: {
-				target(card, player, target) {
-					if (get.tag(card, "natureDamage")) return "zeroplayertarget";
-				}
-			}
-		}
-	},
-	ns_xiandao: {
-		forced: true,
-		//noLose:true,
-		//locked:true,
-		noRemove: true,
-		//noDisable:true,
-		group: ["ns_xiandao1", "ns_xiandao2"],
 	},
 	ns_chuanshu2: {
 		audio: ["songwei", 2],
@@ -6819,32 +6803,6 @@ const skills = {
 		},
 		ai: {
 			threaten: 1.3,
-		},
-	},
-	diyzaiqi: {
-		trigger: { player: "phaseDrawBegin" },
-		forced: true,
-		filter(event, player) {
-			return player.hp < player.maxHp;
-		},
-		content() {
-			trigger.num += player.maxHp - player.hp;
-		},
-		ai: {
-			threaten(player, target) {
-				if (target.hp == 1) return 2.5;
-				if (target.hp == 2) return 1.8;
-				return 0.5;
-			},
-			maixie: true,
-			effect: {
-				target(card, player, target) {
-					if (get.tag(card, "damage")) {
-						if (target.hp == target.maxHp) return [0, 1];
-					}
-					if (get.tag(card, "recover") && player.hp >= player.maxHp - 1) return [0, 0];
-				},
-			},
 		},
 	},
 	diykuanggu: {

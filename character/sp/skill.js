@@ -7109,8 +7109,9 @@ const skills = {
 			if (!_status.olzhuyan || !_status.olzhuyan[player.playerid]) return 0;
 			var num = _status.olzhuyan[player.playerid][status ? 1 : 0];
 			if (status) {
+				let no = num > 5;
 				num -= player.countCards("h");
-				if (num + player.countCards("h") > 5) num = 5 - player.countCards("h");
+				if (no) num = Math.min(0, num);
 			} else {
 				num -= player.hp;
 				if (num + player.hp < 1) num = 1 - player.hp;
@@ -19113,10 +19114,24 @@ const skills = {
 			} else {
 				if (event.e) {
 					player.gain(event.e, event.target, "give", "bySelf");
-					player.addTempSkill("new_mumu2");
+					player.addTempSkill("new_mumu_notsha");
 				}
 			}
 		},
+		subSkill: {
+			notsha: {
+				mark: true,
+				intro: {
+					content: "不能使用【杀】"
+				},
+				charlotte: true,
+				mod: {
+					cardEnabled: function (card) {
+						if (card.name == "sha") return false;
+					},
+				},
+			}
+		}
 	},
 	new_zhixi: {
 		mod: {
@@ -19162,14 +19177,6 @@ const skills = {
 			pretao: true,
 			neg: true,
 			nokeep: true,
-		},
-	},
-	new_mumu2: {
-		charlotte: true,
-		mod: {
-			cardEnabled: function (card) {
-				if (card.name == "sha") return false;
-			},
 		},
 	},
 	qingzhong: {
@@ -23688,6 +23695,7 @@ const skills = {
 	},
 	luoyan: {
 		group: ["luoyan_tianxiang", "luoyan_liuli"],
+		derivation: ["tianxiang", "liuli"],
 		ai: {
 			combo: "xingwu",
 		},

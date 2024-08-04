@@ -124,7 +124,7 @@ const skills = {
 			source: "damageBegin1",
 		},
 		filter(event, player) {
-			if (!event.source || event.source == event.player) return false;
+			if (!event.source || event.source == event.player || !event.cards || !event.cards.length) return false;
 			const evt = event.getParent(2);
 			return evt && evt.name == "useCard";
 		},
@@ -5173,66 +5173,61 @@ const skills = {
 			}
 			return false;
 		},
-		usable: 1,
-		check: function (event, player) {
-			var hs = player.getCards("h"),
-				cards = event.cards.filter(function (i) {
-					return hs.includes(i) && get.color(i, player) == "red" && lib.filter.cardDiscardable(i, player, "difa");
-				});
-			var value = get.value(hs, player);
-			return Array.from(ui.cardPile.childNodes).some(function (card) {
-				return get.type2(card, false) == "trick" && get.value(card, player) > value;
-			});
-		},
-		content: function () {
-			"step 0";
-			var hs = player.getCards("h"),
+		async cost(event, trigger, player) {
+			let hs = player.getCards("h"),
 				cards = trigger.cards.filter(function (i) {
 					return hs.includes(i) && get.color(i, player) == "red" && lib.filter.cardDiscardable(i, player, "difa");
-				});
-			if (!cards.length) event.finish();
-			else if (cards.length === 1) event._result = {
-				bool: true,
-				cards: cards
-			};
-			else player.chooseCard("地法：请选择要弃置的牌", true, card => {
+				}),
+				tricks = [];
+			for(let i = 0; i < ui.cardPile.childNodes.length; i++){
+				let card = ui.cardPile.childNodes[i], type = get.type2(card, false);
+				if (type != "trick" || tricks.includes(type)) continue;
+				tricks.push([card.name, get.event().player.getUseValue(card)]);
+			}
+			for(let i = 0; i < ui.discardPile.childNodes.length; i++){
+				let card = ui.discardPile.childNodes[i], type = get.type2(card, false);
+				if (type != "trick" || tricks.includes(type)) continue;
+				tricks.push([card.name, get.event().player.getUseValue(card)]);
+			}
+			tricks.sort((a, b) => b[1] - a[1]);
+			let result = await player.chooseToDiscard(get.prompt2("difa"), card => {
 				return get.event().cards.includes(card);
-			}).set("ai", card => get.value(card)).set("cards", cards);
-			"step 1";
-			if (result.bool) player.discard(result.cards);
-			else event.finish();
-			"step 2";
-			var list = lib.inpile.filter(function (i) {
+			}).set("ai", card => {
+				let val = get.event().val;
+				if (typeof val !== "number") return 0;
+				return val - get.value(card);
+			}).set("val", function () {
+				if (!tricks.length) return false;
+				return 3 * tricks[0][1];
+			}()).set("cards", cards).forResult();
+			event.result = {
+				bool: result.bool,
+				cost_data: tricks
+			};
+		},
+		usable: 1,
+		async content(event, trigger, player) {
+			let list = lib.inpile.filter(function (i) {
 				return get.type2(i, false) == "trick";
 			});
-			if (!list.length) event.finish();
-			else
-				player
-					.chooseButton(["选择获得一种锦囊牌", [list.map(i => ["锦囊", "", i]), "vcard"]], true)
-					.set("ai", function (button) {
-						var card = { name: button.link[2] };
-						if (!_status.event.list.includes(card.name)) return 0;
-						return _status.event.player.getUseValue(card);
-					})
-					.set(
-						"list",
-						Array.from(ui.cardPile.childNodes)
-							.filter(function (card) {
-								return get.type2(card, false) == "trick";
-							})
-							.map(function (card) {
-								return card.name;
-							})
-							.reduce(function (list, name) {
-								if (!list.includes(name)) list.add(name);
-								return list;
-							}, [])
-					);
-			"step 3";
-			var card = get.cardPile(function (i) {
-				return i.name == result.links[0][2] && !event.cards.includes(i);
-			});
-			if (card) player.gain(card, "gain2");
+			if (!list.length) return;
+			const result = await player
+				.chooseButton(["选择获得一种锦囊牌", [list.map(i => ["锦囊", "", i]), "vcard"]], true)
+				.set("ai", function (button) {
+					var name = button.link[2];
+					for (let i of get.event().list) {
+						if (i[0] == name) return i[1];
+					}
+					return 0;
+				})
+				.set("list", event.cost_data)
+				.forResult();
+			if (result.bool) {
+				let card = get.cardPile(i => {
+					return i.name == result.links[0][2];
+				});
+				if (card) await player.gain(card, "gain2");
+			}
 		},
 	},
 	//童渊

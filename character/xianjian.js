@@ -94,11 +94,6 @@ game.import("character", function () {
 			pal_xuanxiao:
 				"天赋异禀，资质极佳，是万中无一的修仙奇才，和夙玉用双剑束缚幻瞑界吸取灵力并引发琼华派与妖界之战。因夙玉离开昆仑，修炼双剑中断，他被邪火入侵而走火入魔，打伤数名师兄弟，被夙瑶联合青阳、重光与宗炼长老冰封19年，因此逢缘与云天河结拜。",
 
-			// pal_jiangyunfan:'',
-			// pal_tangyurou:'',
-			// pal_longyou:'',
-			// pal_xiaoman:'',
-
 			pal_xiahoujinxuan:
 				"夏侯世家的少主。因不喜舞枪弄剑，专爱趣闻逸史，让父亲深感恨铁不成钢；好在他对于仙术符法也有所涉略，没沦落到手无缚鸡之力的境地。",
 			pal_muchanglan:

@@ -3520,7 +3520,6 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				"re_zhurong",
 				"re_fazheng",
 				"re_masu",
-				"guanxingzhangbao",
 				"xin_liaohua",
 				"old_madai",
 				"re_jianyong",

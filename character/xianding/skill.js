@@ -14469,6 +14469,7 @@ const skills = {
 		trigger: { global: "roundStart" },
 		forced: true,
 		locked: false,
+		derivation: "iwasawa_refenyin",
 		content: function () {
 			"step 0";
 			var next = player

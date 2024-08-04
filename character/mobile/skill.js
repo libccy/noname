@@ -2587,7 +2587,7 @@ const skills = {
 			} else {
 				if (event.e) {
 					player.gain(event.e, event.target, "give", "bySelf");
-					player.addTempSkill("new_mumu2");
+					player.addTempSkill("new_mumu_notsha");
 				}
 			}
 		},
@@ -10843,6 +10843,7 @@ const skills = {
 	},
 	//韩遂
 	xinniluan: {
+		audio: "niluan",
 		trigger: { global: "phaseJieshuBegin" },
 		direct: true,
 		filter: function (event, player) {
