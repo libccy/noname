@@ -23,7 +23,7 @@ const characters = {
 	re_xunyou: ["male", "wei", 3, ["reqice", "rezhiyu"], ["clan:颍川荀氏"]],
 	dc_liru: ["male", "qun", 3, ["xinjuece", "dcmieji", "dcfencheng"]],
 	re_zhuhuan: ["male", "wu", 4, ["refenli", "repingkou"]],
-	ol_dianwei: ["male", "wei", 4, ["olqiangxi", "olningwu"]],
+	ol_dianwei: ["male", "wei", 4, ["olqiangxi", "olninge"]],
 	re_sp_taishici: ["male", "qun", 4, ["rejixu"], ["name:太史|慈"]],
 	re_liufeng: ["male", "shu", 4, ["rexiansi"]],
 	ol_xunyu: ["male", "wei", 3, ["quhu", "oljieming"], ["clan:颍川荀氏"]],

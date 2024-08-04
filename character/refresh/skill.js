@@ -2441,7 +2441,7 @@ const skills = {
 			threaten: 1.5,
 		},
 	},
-	olningwu: {
+	olninge: {
 		audio: 2,
 		trigger: { global: "damageEnd" },
 		filter: function (event, player) {
