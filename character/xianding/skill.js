@@ -46,8 +46,8 @@ const skills = {
 			} else {
 				await target.loseHp();
 				const { result: result2 } = await target.draw();
-				let cards = result.concat(result2).filter(i => get.owner(i) == target && target.hasUseTarget(i));
-				while (cards.length) {
+				let cards = result.slice().concat(result2);
+				while (cards.some(i => get.owner(i) == target && target.hasUseTarget(i))) {
 					const result = await target
 						.chooseToUse(function (card, player, event) {
 							if (get.itemtype(card) != "card" || !get.event("cards").includes(card)) return false;
@@ -61,6 +61,7 @@ const skills = {
 						await game.delayx();
 					} else break;
 				}
+				cards = cards.filter(i => get.owner(i) == target);
 				if (cards.length) await target.discard(cards);
 			}
 		},
