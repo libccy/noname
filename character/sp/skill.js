@@ -7109,8 +7109,9 @@ const skills = {
 			if (!_status.olzhuyan || !_status.olzhuyan[player.playerid]) return 0;
 			var num = _status.olzhuyan[player.playerid][status ? 1 : 0];
 			if (status) {
+				let no = num > 5;
 				num -= player.countCards("h");
-				if (num + player.countCards("h") > 5) num = 5 - player.countCards("h");
+				if (no) num = Math.min(0, num);
 			} else {
 				num -= player.hp;
 				if (num + player.hp < 1) num = 1 - player.hp;

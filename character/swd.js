@@ -379,158 +379,6 @@ game.import("character", function () {
 					},
 				},
 			},
-			cyzhencha: {
-				enable: "phaseUse",
-				usable: 1,
-				filter: function (event, player) {
-					if (
-						!game.hasPlayer(function (current) {
-							return current != player && current.countCards("h");
-						})
-					) {
-						return false;
-					}
-					if (!player.countCards("h", { type: "basic" })) return false;
-					var es = player.getCards("e");
-					for (var i = 0; i < es.length; i++) {
-						if (
-							!es[i].classList.contains("epic") &&
-							!es[i].classList.contains("legend") &&
-							!es[i].classList.contains("gold")
-						) {
-							return true;
-						}
-					}
-					return false;
-				},
-				filterCard: { type: "basic" },
-				filterTarget: function (card, player, target) {
-					return target != player && target.countCards("h");
-				},
-				check: function (card) {
-					return 7 - get.value(card);
-				},
-				content: function () {
-					"step 0";
-					player.viewHandcards(target);
-					"step 1";
-					if (target.countCards("h", { color: get.color(cards[0]) })) {
-						var es = player.getCards("e");
-						es.randomSort();
-						for (var i = 0; i < es.length; i++) {
-							if (
-								!es[i].classList.contains("epic") &&
-								!es[i].classList.contains("legend") &&
-								!es[i].classList.contains("gold")
-							) {
-								es[i].classList.add("gold");
-								es[i].nopower = true;
-								es[i].storage.cyzhencha = true;
-								break;
-							}
-						}
-						var num = 0;
-						for (var i = 0; i < es.length; i++) {
-							if (es[i].storage.cyzhencha) {
-								num++;
-							}
-						}
-						var list = ["shuiyun", "liuzi", "yijin", "qingling", "qiandian"];
-						for (var i = 0; i < list.length; i++) {
-							if (i < num) {
-								player.addSkill("cyzhencha_" + list[i]);
-							}
-						}
-					} else {
-						player.draw();
-					}
-				},
-				ai: {
-					order: 2,
-					result: {
-						player: function (player, target) {
-							return target.countCards("h");
-						},
-					},
-				},
-			},
-			cyzhencha_shuiyun: {
-				trigger: { player: "phaseBegin" },
-				direct: true,
-				thundertext: true,
-				content: function () {
-					"step 0";
-					player
-						.chooseTarget(
-							[1, 1],
-							"水云：你可以弃置一名角色的一张牌",
-							function (card, player, target) {
-								if (player == target) return false;
-								return target.countCards("he") > 0;
-							}
-						)
-						.set("autodelay", 0.5).ai = function (target) {
-						return -get.attitude(player, target);
-					};
-					"step 1";
-					if (result.bool) {
-						player.logSkill("cyzhencha_shuiyun", result.targets);
-						player.discardPlayerCard(result.targets[0], "he", true);
-					} else {
-						event.finish();
-					}
-				},
-				onremove: function (player) {
-					_status.event.insert(lib.skill.cyzhencha_shuiyun.content, { player: player });
-				},
-			},
-			cyzhencha_liuzi: {
-				trigger: { player: "phaseDrawBegin" },
-				frequent: true,
-				thundertext: true,
-				content: function () {
-					trigger.num++;
-				},
-				onremove: function (player) {
-					player.draw();
-				},
-			},
-			cyzhencha_yijin: {
-				trigger: { player: "phaseBegin" },
-				direct: true,
-				thundertext: true,
-				content: function () {
-					"step 0";
-					player
-						.chooseTarget(
-							[1, 1],
-							"水云：你可以弃置一名角色的一张牌",
-							function (card, player, target) {
-								if (player == target) return false;
-								return target.countCards("he") > 0;
-							}
-						)
-						.set("autodelay", 0.5).ai = function (target) {
-						return -get.attitude(player, target);
-					};
-					"step 1";
-					if (result.bool) {
-						player.logSkill("cyzhencha_shuiyun", result.targets);
-						player.discardPlayerCard(result.targets[0], "he", true);
-					} else {
-						event.finish();
-					}
-				},
-				onremove: function (player) {
-					_status.event.insert(lib.skill.cyzhencha_shuiyun.content, { player: player });
-				},
-			},
-			cyzhencha_qingling: {
-				inhert: "cyzhencha_shuiyun",
-			},
-			cyzhencha_qiandian: {
-				inhert: "cyzhencha_shuiyun",
-			},
 			cyqiaoxie_old: {
 				enable: "phaseUse",
 				filterCard: function (card) {
@@ -8146,132 +7994,6 @@ game.import("character", function () {
 					player.draw(2);
 				},
 			},
-			mohua: {
-				trigger: { player: "dying" },
-				priority: 10,
-				forced: true,
-				mode: ["identity"],
-				derivation: ["wuying", "xiehun", "jumo"],
-				content: function () {
-					"step 0";
-					var skills = ["wuying", "xiehun", "jumo"];
-					if (lib.config.mode_choice.double_character) {
-						skills.push("swd_xiuluo");
-					}
-					lib.character.swd_satan = ["", "qun", 6, skills, ["temp"]];
-					if (!_status.ai.customAttitude) _status.ai.customAttitude = [];
-					_status.ai.customAttitude.push(function (from, to) {
-						if (from.storage.xiehun) {
-							if (to == game.zhu) return 10;
-							return -10;
-						}
-						if (to.storage.xiehun) {
-							return 0;
-						}
-					});
-					player.uninit();
-					player.init("swd_satan");
-					player.hp = game.players.length;
-					player.update();
-					game.zhu = player;
-					player.identity = "zhu";
-					player.setIdentity("魔");
-					player.identityShown = true;
-					var players = get.players(false, true);
-					for (var i = 0; i < players.length; i++) {
-						if (players[i] != player) {
-							players[i].identity = "fan";
-							players[i].setIdentity("人");
-							players[i].identityShown = true;
-						}
-					}
-					player.draw(2);
-					"step 1";
-					while (_status.event.name != "phaseLoop") {
-						_status.event = _status.event.parent;
-					}
-					_status.event.player = player;
-					_status.event.step = 0;
-					ui.clear();
-				},
-			},
-			wuying: {
-				mod: {
-					selectTarget: function (card, player, range) {
-						if (card.name == "sha") {
-							range[0] = -1;
-							range[1] = -1;
-						}
-						if (get.type(card) == "trick" && (range[0] == 1) & (range[1] == 1)) {
-							range[0] = -1;
-							range[1] = -1;
-						}
-					},
-				},
-			},
-			xiehun: {
-				group: ["xiehun1", "xiehun2"],
-				intro: {
-					content: "已陷入混乱状态",
-					show: true,
-				},
-			},
-			xiehun1: {
-				trigger: { player: "phaseBegin" },
-				forced: true,
-				popup: false,
-				content: function () {
-					if (game.me.storage.xiehun) ui.auto.show();
-					for (var i = 0; i < game.players.length; i++) {
-						delete game.players[i].storage.xiehun;
-					}
-					if (ui.auto.innerHTML == "托管") _status.auto = false;
-				},
-			},
-			xiehun2: {
-				trigger: { source: "damageBegin" },
-				filter: function (event, player) {
-					return event.player != player;
-				},
-				forced: true,
-				content: function () {
-					trigger.player.storage.xiehun = true;
-					if (trigger.player == game.me) {
-						_status.auto = true;
-						ui.auto.hide();
-					}
-					// player.chooseToDiscard(true,'h');
-				},
-			},
-			jumo2: {
-				trigger: { player: "phaseDrawBegin" },
-				forced: true,
-				priority: -10,
-				content: function () {
-					var num = Math.max(2, game.players.length - 1);
-					if (lib.config.mode_choice.double_character) {
-						num++;
-					}
-					trigger.num = Math.min(4, num);
-				},
-			},
-			jumo: {
-				trigger: { player: "phaseEnd" },
-				forced: true,
-				content: function () {
-					var num = 0;
-					for (var i = 0; i < game.players.length; i++) {
-						if (player != game.players[i] && !game.players[i].storage.xiehun) num++;
-					}
-					num = 2 * num - game.players.length;
-					if (get.config("double_character")) {
-						num++;
-					}
-					if (num > 0) {
-						player.draw(num);
-					}
-				},
-			},
 			duijue: {
 				enable: "phaseUse",
 				mark: true,
@@ -9428,9 +9150,6 @@ game.import("character", function () {
 			cyqiaoxie_info: "每当你失去一张装备牌（使用除外），你可以随机观看三张机关牌，并使用其中一张。",
 			cyqiaoxie_info_alter:
 				"每当你装备一件装备，若你的手牌数不大于体力值，你可以摸一张牌；每当你失去一件装备牌，你可以随机观看2张机关牌，并使用其中一张。",
-			cyzhencha: "侦察",
-			cyzhencha_info:
-				"出牌阶段限一次，若你的装备区内的可强化装备，你可以弃置一张基本牌并观看一名其他角色的手牌，若其中有与你弃置的牌颜色相同的牌，你随机升级装备区内的一件装备，否则你摸一张牌；你根据装备区内升级的装备数获得额外技能。",
 			cylingjia: "灵甲",
 			cylingjia_info:
 				"出牌阶段限一次，你可以弃置一张装备牌，然后令云狐随机装备一件装备（不替换现有装备）并将其强化。",
@@ -9828,14 +9547,7 @@ game.import("character", function () {
 			guxing1: "孤星",
 			guxing2: "孤星",
 			poxing: "破星",
-			mohua: "魔化",
 			miles_xueyi: "血裔",
-			wuying: "无影",
-			xiehun: "邪魂",
-			xiehun1: "邪魂",
-			xiehun2: "邪魂",
-			xiehun3: "邪魂",
-			jumo: "聚魔",
 			duijue: "对决",
 			duijue_bg: "决",
 			yueren: "月刃",
@@ -9884,15 +9596,8 @@ game.import("character", function () {
 				"每当你使用一张【杀】，可以进行一次判定，若结果为黑色，你弃置目标一张牌，若结果为红色，你将此【杀】收回，每回合限发动一次。",
 			duijue_info:
 				"限定技，出牌阶段，你可以指定一名体力值大于1的其他角色，你结束出牌阶段，并在回合结束后将所有其他角色移出游戏，然后该角色与你轮流进行回合，直到有一方死亡或一共进行六个回合为止。",
-			wuying_info: "锁定技，你的【杀】和单体x锦囊目标锁定为范围内的所有角色。",
-			xiehun_info:
-				"锁定技，受到来自你伤害的角色进入混乱状态，行为不受控制，且会攻击队友，直到你的下一回合开始。",
-			jumo_info:
-				"锁定技，结束阶段，你摸X-1张牌，X为未进入混乱状态的角色数与进入混乱状态的角色数之差（若为双将则改为X）。",
 			jifeng_info:
 				"你的【杀】和单体锦囊可以额外指定任意个目标，若如此做，此卡牌有一定机率失效，指定的目标越多失效的概率越大。",
-			mohua_info:
-				"锁定技，在身份局中，当你进入濒死状态时，你立即变身为撒旦，体力上限变为现存角色数（至少为4），并成为其他所有角色的共同敌人。",
 			miles_xueyi_info: "锁定技，你防止即将受到的伤害，然后失去1点体力。",
 			duanyi_info:
 				"出牌阶段限一次，你可以弃置两张【杀】，对一名角色造成1点伤害，然后其随机弃置X张牌，X为其已损失的体力值。",

@@ -6805,32 +6805,6 @@ const skills = {
 			threaten: 1.3,
 		},
 	},
-	diyzaiqi: {
-		trigger: { player: "phaseDrawBegin" },
-		forced: true,
-		filter(event, player) {
-			return player.hp < player.maxHp;
-		},
-		content() {
-			trigger.num += player.maxHp - player.hp;
-		},
-		ai: {
-			threaten(player, target) {
-				if (target.hp == 1) return 2.5;
-				if (target.hp == 2) return 1.8;
-				return 0.5;
-			},
-			maixie: true,
-			effect: {
-				target(card, player, target) {
-					if (get.tag(card, "damage")) {
-						if (target.hp == target.maxHp) return [0, 1];
-					}
-					if (get.tag(card, "recover") && player.hp >= player.maxHp - 1) return [0, 0];
-				},
-			},
-		},
-	},
 	diykuanggu: {
 		trigger: { source: "damageEnd" },
 		forced: true,
