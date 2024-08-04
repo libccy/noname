@@ -161,7 +161,7 @@ const skills = {
 					const player = _status.event.player;
 					const card = {
 						name: get.name(button.link),
-						nature: get.nature(button.link),
+						suit: get.suit(button.link),
 						isCard: true,
 					};
 					return player.hasUseTarget(card);
@@ -170,7 +170,7 @@ const skills = {
 					const player = _status.event.player;
 					const card = {
 						name: get.name(button.link),
-						nature: get.nature(button.link),
+						suit: get.suit(button.link),
 						isCard: true,
 					};
 					return player.getUseValue(card);
@@ -179,7 +179,7 @@ const skills = {
 			if (result.bool) {
 				const card = {
 					name: get.name(result.links[0]),
-					nature: get.nature(result.links[0]),
+					suit: get.suit(result.links[0]),
 					isCard: true,
 				};
 				await player.chooseUseTarget(card, true, false);
@@ -220,7 +220,8 @@ const skills = {
 		async content(event, trigger, player) {
 			const cards = player.getExpansions("dcyanzuo");
 			if (cards.some(card => card.name == trigger.card.name)) {
-				trigger.getParent().excluded.add(player);
+				trigger.getParent().all_excluded = true;
+				trigger.getParent().targets.length = 0;
 				const discards = cards.filter(card => card.name == trigger.card.name);
 				if (discards.length) await player.loseToDiscardpile(discards);
 			} else {
