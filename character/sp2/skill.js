@@ -5185,7 +5185,7 @@ const skills = {
 				tricks.push([card.name, get.event().player.getUseValue(card)]);
 			}
 			for(let i = 0; i < ui.discardPile.childNodes.length; i++){
-				let card = ui.discardPile.childNodes[i], type = get.type2(i, false);
+				let card = ui.discardPile.childNodes[i], type = get.type2(card, false);
 				if (type != "trick" || tricks.includes(type)) continue;
 				tricks.push([card.name, get.event().player.getUseValue(card)]);
 			}
