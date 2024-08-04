@@ -326,15 +326,18 @@ const skills = {
 			},
 			backup: function (links, player) {
 				return {
+					audio: "mbzujin",
 					filterCard: card => get.type(card) == "basic",
 					popname: true,
 					check: function (card) {
 						return 8 - get.value(card);
 					},
+					logAudio(event, player){
+						return ['sha', 'shan', 'wuxie'].indexOf(event.card.name) + 1;
+					},
 					position: "hse",
 					viewAs: { name: links[0][2], nature: links[0][3] },
 					precontent: function () {
-						player.logSkill("mbzujin");
 						if (!player.storage.mbzujin) {
 							player.storage.mbzujin = [];
 							player.when({ global: "phaseEnd" }).then(() => {
@@ -371,6 +374,7 @@ const skills = {
 				},
 			},
 		},
+		subSkill: { backup: {} },
 	},
 	mbjiejian: {
 		audio: 3,
@@ -2427,6 +2431,7 @@ const skills = {
 		audio: "twkujian",
 		inherit: "twkujian",
 		selectCard: [1, 2],
+		logAudio: ()=> 1,
 		content: function () {
 			player.give(cards, target).gaintag.add("twkujianx");
 			player.addSkill("kujian_draw");
@@ -2435,7 +2440,7 @@ const skills = {
 		subSkill: {
 			draw: {
 				charlotte: true,
-				audio: "twkujian",
+				audio: "twkujian2.mp3",
 				trigger: { global: ["useCardAfter", "respondAfter"] },
 				filter: function (event, player) {
 					return event.player.hasHistory("lose", evt => {
@@ -3557,6 +3562,7 @@ const skills = {
 					player.node.avatar.setBackground(player.name, "character");
 					player.node.name.innerHTML = get.slimName(player.name);
 					delete player.name2;
+					delete player.skin.name2;
 					player.classList.remove("fullskin2");
 					player.node.avatar2.classList.add("hidden");
 					player.node.name2.innerHTML = "";
@@ -4004,10 +4010,16 @@ const skills = {
 						if (player.name1 == "shichangshi") {
 							player.smoothAvatar(false);
 							player.node.avatar.setBackground(player.name1, "character");
+							if (!lib.skill.mbdanggu.isSingleShichangshi(player)) {
+								player.skin.name = player.name1;
+							}
 						}
 						if (player.name2 == "shichangshi") {
 							player.smoothAvatar(true);
 							player.node.avatar2.setBackground(player.name2, "character");
+							if (!lib.skill.mbdanggu.isSingleShichangshi(player)) {
+								player.skin.name2 = player.name2;
+							}
 						}
 					}, trigger.player);
 					"step 1";
@@ -11432,6 +11444,7 @@ const skills = {
 		filterTarget: function (card, player, target) {
 			return target != player && target.countCards("h") > 0;
 		},
+		logAudio: ()=> get.rand(1, 2),
 		content: function () {
 			"step 0";
 			player.addTempSkill("beizhu_draw");
@@ -11491,13 +11504,13 @@ const skills = {
 		},
 	},
 	beizhu_draw: {
-		trigger: { player: "damageEnd" },
-		forced: true,
-		popup: false,
 		charlotte: true,
+		audio: "beizhu3.mp3",
+		trigger: { player: "damageEnd" },
 		filter: function (event, player) {
-			return event.card && event.card.beizhu;
+			return event.card?.beizhu;
 		},
+		forced: true,
 		content: function () {
 			player.draw(trigger.num);
 		},

@@ -14513,7 +14513,7 @@ const skills = {
 		direct: true,
 		filter: function (event, player) {
 			if (event._notrigger.includes(event.player)) return false;
-			return event.card && event.card.name == "sha" && event.cards && get.color(event.cards) == "black" && event.player.countDiscardableCards(player, "hej");
+			return event.card && event.card.name == "sha" && event.cards && get.color(event.cards) == "black" && event.player.countDiscardableCards(player, "e");
 		},
 		content: function () {
 			"step 0";
