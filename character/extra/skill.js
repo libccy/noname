@@ -22,18 +22,145 @@ const skills = {
 				})
 				.randomGets(player.countMark("1！5！"));
 			if (!places.length) return;
-			const result = await player
-				.chooseButton(["毅武：是否击伤" + get.translation(target) + "的一个部位？", [places.slice().map(skill => [skill, '<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【' + get.translation(skill) + "】</div><div>" + lib.translate[skill + "_info"] + "</div></div>"]), "textbutton"]])
-				.set("ai", () => {
-					const player = get.player(),
-						target = get.event().getTrigger().player;
-					if (get.attitude(player, target) > 0) return 0;
-					return Math.random() + 1; //插眼，PZ157
-				})
-				.forResult();
+			//射击部位-by 鸽子
+			//牢萌负责精修断后
+			//一个团队要有XX的X，YY的Y，ZZ的Z...
+			await Promise.all(event.next);
+			event.videoId = lib.status.videoId++;
+			if (player.isUnderControl()) game.swapPlayerAuto(player);
+			const switchToAuto = function () {
+				setTimeout(function () {
+					_status.imchoosing = false;
+					if (event.dialog) event.dialog.close();
+					if (event.control) event.control.close();
+					game.resume();
+					return Promise.resolve({
+						bool: true,
+						hurt: places.randomGet(),
+					});
+				}, 5000);
+			};
+			const chooseButton = (places, target) => {
+				const { promise, resolve } = Promise.withResolvers();
+				const event = _status.event;
+				event.switchToAuto = function () {
+					_status.imchoosing = false;
+					resolve({
+						bool: true,
+						hurt: places.randomGet(),
+					});
+					if (event.dialog) event.dialog.close();
+				};
+				const dialog = ui.create.dialog("forcebutton", "hidden");
+				event.dialog = dialog;
+				//白底大图不加textPrompt了
+				//dialog.textPrompt = dialog.add('<div class="text center">毅武：选择击伤' + get.translation(target) +'的一个部位</div>');
+				dialog.style.display = "flex";
+				dialog.style.justifyContent = "center";
+				dialog.style.alignItems = "center";
+				dialog.style.position = "relative";
+				dialog.style.width = "100%";
+				dialog.style.height = "100%";
+				dialog.id = "1!5!";
+				dialog.classList.add("fixed");
+				dialog.classList.add("scroll1");
+				dialog.classList.add("scroll2");
+				dialog.classList.add("center");
+				dialog.classList.add("scroll3");
+				dialog.classList.add("fullwidth");
+				dialog.classList.add("fullheight");
+				const target_img = document.createElement("div");
+				const position = lib.skill["1！5！"].derivation;
+				target_img.style.width = "50%";
+				target_img.style.height = "100%";
+				target_img.style.position = "relative";
+				target_img.style.overflow = "visible";
+				target_img.style.boxSizing = "border-box";
+				target_img.style.border = "1px solid black";
+				target_img.style.backgroundColor = "rgb(255,255,255)";
+				dialog.appendChild(target_img);
+				target_img.style.backgroundImage = "url('image/card/yiwu_" + (target.hasSex("male") ? "male" : "female") + ".png')";
+				target_img.style.backgroundSize = "cover";
+				target_img.style.backgroundRepeat = "no-repeat";
+				target_img.style.backgroundSize = "contain";
+				target_img.style.backgroundRepeat = "no-repeat";
+				target_img.style.backgroundPosition = "center center";
+				const number = target.hasSex("male")
+					? [
+							["7", "1"],
+							["5", "3"],
+							["4", "7"],
+							["9", "5"],
+							["9", "13"],
+							["7", "3"],
+							["7", "6"],
+					  ]
+					: [
+							["7", "1"],
+							["8", "3"],
+							["4", "7"],
+							["9", "5"],
+							["9", "13"],
+							["6", "3"],
+							["6", "6"],
+					  ];
+				let list = [];
+				for (let i = 0; i < position.length; i++) {
+					const num_px = document.createElement("div");
+					num_px.style.width = "15%";
+					num_px.style.height = "15%";
+					num_px.id = position[i];
+					num_px.style.position = "absolute";
+					num_px.style.left = `${number[i][0] * 6}%`;
+					num_px.style.top = `${number[i][1] * 6}%`;
+					num_px.style.boxSizing = "border-box";
+					num_px.style.backgroundImage = "url('image/card/yiwu_click.png')";
+					num_px.style.backgroundSize = "cover";
+					num_px.style.backgroundRepeat = "no-repeat";
+					num_px.style.backgroundSize = "contain";
+					num_px.style.backgroundRepeat = "no-repeat";
+					num_px.style.backgroundPosition = "center center";
+					num_px.addEventListener("click", a => {
+						event._result = {
+							bool: true,
+							hurt: a.target.id,
+						};
+						dialog.close();
+						game.resume();
+						dialog.close();
+						game.resume();
+						_status.imchoosing = false;
+						resolve(event._result);
+					});
+					list.push(num_px);
+				}
+				const selectedList = list.filter(i => places.includes(i.id)).randomGets(Math.min(places.length, event.player.countMark("1！5！")));
+				for (const i of selectedList) target_img.appendChild(i);
+				dialog.open();
+				game.pause();
+				game.countChoose();
+				return promise;
+			};
+			let next;
+			if (event.isMine()) {
+				next = chooseButton(places, target);
+			} else if (event.isOnline()) {
+				const { promise, resolve } = Promise.withResolvers();
+				event.player.send(chooseButton, places, target);
+				event.player.wait(async result => {
+					if (result == "ai") result = await switchToAuto();
+					resolve(result);
+				});
+				game.pause();
+				next = promise;
+			} else {
+				next = switchToAuto();
+			}
+			const result = await next;
+			game.resume();
 			if (result.bool) {
 				player.line(target);
-				const place = result.links[0];
+				const place = result.hurt;
 				player.popup(place, "fire");
 				game.log(player, "击伤了", target, "的", "#y" + get.translation(place));
 				target.addSkill("1！5！_injury");
@@ -208,7 +335,7 @@ const skills = {
 		},
 		forced: true,
 		locked: false,
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		async content(event, trigger, player) {
 			const cards = get.cards(2);
 			const next = player.addToExpansion(cards, "draw");
@@ -257,7 +384,7 @@ const skills = {
 		subSkill: {
 			kanpo: {
 				audio: "jilin",
-				logAudio: ()=> get.rand(2, 3),
+				logAudio: () => get.rand(2, 3),
 				trigger: {
 					target: "useCardToTarget",
 				},
@@ -309,7 +436,7 @@ const skills = {
 			},
 			change: {
 				audio: "jilin",
-				logAudio: ()=> get.rand(4, 5),
+				logAudio: () => get.rand(4, 5),
 				trigger: {
 					player: "phaseBegin",
 				},
@@ -395,7 +522,7 @@ const skills = {
 				cost_data: links,
 			};
 		},
-		logAudio: ()=> get.rand(1, 2),
+		logAudio: () => get.rand(1, 2),
 		async content(event, trigger, player) {
 			event.cost_data[0].storage.jilin = true;
 			const num = player.getExpansions("jilin").filter(card => card.storage.jilin).length;
@@ -408,7 +535,7 @@ const skills = {
 		subSkill: {
 			draw: {
 				audio: "yingyou",
-				logAudio: ()=> get.rand(3, 4),
+				logAudio: () => get.rand(3, 4),
 				trigger: {
 					player: "loseAfter",
 					global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -685,7 +812,7 @@ const skills = {
 						["shu", "rejizhi"],
 						["wu", "rezhiheng"],
 						["qun", "rewansha"],
-						["key", "hiroto_zonglve"]
+						["key", "hiroto_zonglve"],
 					]);
 					if (Array.from(groupList.keys()).includes(player.group)) skills.push(groupList.get(player.group));
 					skills = skills.filter(skill => !player.hasSkill(skill, null, null, false));
@@ -1803,7 +1930,7 @@ const skills = {
 		},
 		forced: true,
 		logTarget: "source",
-		getMax: (dead) => {
+		getMax: dead => {
 			let curs = game.players.slice(0);
 			if (get.itemtype(dead) === "player" && !curs.includes(dead)) curs.push(dead);
 			const map = {
@@ -2690,15 +2817,11 @@ const skills = {
 		ai: {
 			effect: {
 				player(card, player, target) {
-					if (
-						!get.tag(card, "damage") ||
-						player.countMark("dcxianjin") % 2 ||
-						player.hasSkillTag("jueqing", false, target)
-					) return;
+					if (!get.tag(card, "damage") || player.countMark("dcxianjin") % 2 || player.hasSkillTag("jueqing", false, target)) return;
 					if (player.isMaxHandcard()) return [1, 1];
 					return [1, Math.min(3, 1 + player.getStorage("dctuoyu").length)];
-				}
-			}
+				},
+			},
 		},
 	},
 	dcqijing: {
@@ -4471,7 +4594,7 @@ const skills = {
 			},
 		},
 		ai: {
-			combo: "yuheng"
+			combo: "yuheng",
 		},
 	},
 	yuheng: {
@@ -4765,7 +4888,7 @@ const skills = {
 					return 0;
 				},
 			},
-			combo: "tianren"
+			combo: "tianren",
 		},
 		subSkill: {
 			effect: {
@@ -6322,7 +6445,7 @@ const skills = {
 					? event.numFixed
 					: !game.hasPlayer(function (current) {
 							return current.hasEnabledSlot();
-						})
+					  })
 			)
 				return false;
 			return (
@@ -6481,7 +6604,8 @@ const skills = {
 			effect: {
 				target: (card, player, target) => {
 					if (!target.hasFriend()) return;
-					let rec = get.tag(card, "recover"), damage = get.tag(card, "damage");
+					let rec = get.tag(card, "recover"),
+						damage = get.tag(card, "damage");
 					if (!rec && !damage) return;
 					if (damage && player.hasSkillTag("jueqing", false, target)) return 1.7;
 					let die = [null, 1],
@@ -7059,7 +7183,7 @@ const skills = {
 			combo: "sbaiyin",
 			effect: {
 				target(card, player, target) {
-					if (!target.hasSkill("sbaiyin") && !target.hasSkill("jilue") || !target.hasFriend()) return;
+					if ((!target.hasSkill("sbaiyin") && !target.hasSkill("jilue")) || !target.hasFriend()) return;
 					if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
 					if (get.tag(card, "damage")) {
 						if (target.hp == target.maxHp) {
@@ -8330,7 +8454,7 @@ const skills = {
 			if (filter(get.autoViewAs({ name: "wuxie" }, "unsure"), player, event) && player.countCards("hs", { suit: "spade" })) return true;
 			return false;
 		},
-		logAudio(event, player){
+		logAudio(event, player) {
 			return 4 - lib.suit.indexOf(get.suit(event.cards[0], player));
 		},
 		ai: {
