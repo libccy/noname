@@ -3562,6 +3562,7 @@ const skills = {
 					player.node.avatar.setBackground(player.name, "character");
 					player.node.name.innerHTML = get.slimName(player.name);
 					delete player.name2;
+					delete player.skin.name2;
 					player.classList.remove("fullskin2");
 					player.node.avatar2.classList.add("hidden");
 					player.node.name2.innerHTML = "";

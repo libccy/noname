@@ -139,7 +139,7 @@ const skills = {
 		filter(event, player) {
 			var count = player.getStat("skill").dcyanzuo;
 			if (count && count > player.countMark("dcyanzuo_zuyin")) return false;
-			return player.countCards("h", card => ["trick", "basic"].includes(get.type(card, player)));
+			return player.countCards("he", card => ["trick", "basic"].includes(get.type(card, player)));
 		},
 		filterCard(card, player) {
 			return ["trick", "basic"].includes(get.type(card, player));
