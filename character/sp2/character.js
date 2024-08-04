@@ -93,7 +93,7 @@ const characters = {
 	xunchen: ["male", "qun", 3, ["fenglve", "mouzhi"], ["clan:颍川荀氏"]],
 	sp_zhanghe: ["male", "qun", 4, ["yuanlve"]],
 	sp_xuyou: ["male", "qun", 3, ["spshicai", "spfushi"]],
-	chunyuqiong: ["male", "qun", 5, ["cangchu", "sushou", "liangying"]],
+	chunyuqiong: ["male", "qun", 5, ["cangchu", "sushou", "liangying"], ["name:淳于|琼"]],
 	lvkuanglvxiang: ["male", "qun", 4, ["liehou", "qigong"], ["name:吕|旷-吕|翔"]],
 };
 

@@ -40,7 +40,7 @@ const characterSortTranslate = {
 	sp2_zhonghu: "冢虎狼顾",
 	sp2_zijing: "子敬邀刀",
 	sp2_dushi: "毒士鸩计",
-	sp2_zhoulang: "周郎妙计",
+	sp2_zhoulang: "周郎将计",
 	sp2_waitingforsort: "等待分包",
 };
 
