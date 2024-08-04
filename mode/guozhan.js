@@ -3545,7 +3545,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				subSkill: {
 					backup: {
-						filterCard: true,
+						filterCard(card) {
+							return get.itemtype(card) == "card";
+						},
 						check(card) {
 							return 7.5 - get.value(card);
 						},

@@ -29324,6 +29324,11 @@ const skills = {
 						mark = result.control == "龙印" ? "huoji" : "lianhuan";
 					skill.removeMark(mark, player, targets[0]);
 					skill.addMark(mark, player, targets[1]);
+					if (skill.hasMark("huoji", player, targets[1]) && skill.hasMark("lianhuan", player, targets[1])) {
+						game.broadcastAll(function () {
+							if (lib.config.background_speak) game.playAudio("skill", "xinfu_jianjie3");
+						});
+					}
 					game.delayx();
 				},
 				ai: {
@@ -29361,7 +29366,11 @@ const skills = {
 						var target = result.targets[0];
 						player.line(target, "fire");
 						lib.skill.jianjie.addMark("huoji", player, target);
-						event.target = target;
+						if (lib.skill.jianjie.hasMark("huoji", player, target) && lib.skill.jianjie.hasMark("lianhuan", player, target)) {
+							game.broadcastAll(function () {
+								if (lib.config.background_speak) game.playAudio("skill", "xinfu_jianjie3");
+							});
+						}
 						game.delayx();
 					} else event.finish();
 					"step 2";
@@ -29375,6 +29384,11 @@ const skills = {
 						var target = result.targets[0];
 						player.line(target, "thunder");
 						lib.skill.jianjie.addMark("lianhuan", player, target);
+						if (lib.skill.jianjie.hasMark("huoji", player, target) && lib.skill.jianjie.hasMark("lianhuan", player, target)) {
+							game.broadcastAll(function () {
+								if (lib.config.background_speak) game.playAudio("skill", "xinfu_jianjie3");
+							});
+						}
 						game.delayx();
 					}
 				},
