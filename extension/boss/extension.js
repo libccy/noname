@@ -4,7 +4,6 @@ game.import("play", function () {
 		name: "boss",
 		init: function () {
 			if (get.mode() == "tafang") return;
-			const Character = lib.element.Character;
 			var storage = localStorage.getItem("boss_storage_playpackconfig");
 			try {
 				storage = JSON.parse(storage) || {};
@@ -37,7 +36,6 @@ game.import("play", function () {
 			) {
 				lib.characterPack.mode_extension_jiange = list2;
 				for (var i in lib.characterPack.mode_extension_jiange) {
-					// lib.characterPack.mode_extension_jiange[i] = list2[i];
 					lib.characterPack.mode_extension_jiange[i][4].push(
 						"mode:versus"
 					);
