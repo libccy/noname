@@ -778,6 +778,15 @@ game.import("card", function () {
 				type: "equip",
 				subtype: "equip3",
 				distance: { globalTo: 1 },
+				battleOfWancheng() {
+					//宛城之战
+					const date = new Date();
+					if (date.getMonth() != 6) return false;
+					let day = date.getDate();
+					if (day == 5) return date.getHours() >= 8;
+					return day > 5 && day < 22;
+				},
+				global: "jueying_wancheng"
 			},
 			dilu: {
 				fullskin: true,
@@ -3702,6 +3711,35 @@ game.import("card", function () {
 					},
 				},
 			},
+			jueying_wancheng: {
+				trigger: {
+					player: "damageBegin4"
+				},
+				filter(event, player) {
+					return player.getEquips("jueying").length && lib.card.jueying.battleOfWancheng();
+				},
+				check(event, player) {
+					if (event.num <= 0) return false;
+					let eff = get.damageEffect(player, event.source, get.event().player, event.nature);
+					if (
+						eff >= 0 ||
+						event.source &&
+						event.source.isIn() &&
+						get.attitude(get.event().player, event.source) > 0 &&
+						get.damageEffect(player, event.source, event.source, event.nature) > 0
+					) return false;
+					if (event.num >= player.hp + (event.source && event.source.hasSkillTag("jueqing", false, player) ? 0 : player.hujia)) return true;
+					return eff + player.getEquips("jueying").reduce((acc, i) => acc + get.value(i, player), 0) < 0;
+				},
+				prompt: "是否发动〖绝影〗，将装备区内的【绝影】置入弃牌堆并防止此伤害？",
+				async content(event, trigger, player) {
+					var e3 = player.getEquips("jueying");
+					if (e3.length) {
+						await player.loseToDiscardpile(e3);
+					}
+					trigger.cancel();
+				},
+			},
 			_wuxie: {
 				trigger: { player: ["useCardToBegin", "phaseJudge"] },
 				priority: 5,
@@ -4510,6 +4548,7 @@ game.import("card", function () {
 			bagua_bg: "卦",
 			bagua_skill: "八卦阵",
 			jueying: "绝影",
+			jueying_wancheng: "绝影",
 			dilu: "的卢",
 			zhuahuang: "爪黄飞电",
 			jueying_bg: "+马",
