@@ -35,12 +35,11 @@ game.import("play", function () {
 				get.config("versus_mode") != "jiange"
 			) {
 				lib.characterPack.mode_extension_jiange = list2;
-				for (var i in list2) {
-					lib.characterPack.mode_extension_jiange[i] = list2[i];
+				for (var i in lib.characterPack.mode_extension_jiange) {
 					lib.characterPack.mode_extension_jiange[i][4].push(
 						"mode:versus"
 					);
-					lib.character[i] = list2[i];
+					lib.character[i] = lib.characterPack.mode_extension_jiange[i];
 					if (typeof lib.character[i][2] != "number") {
 						lib.character[i][2] = Infinity;
 					}

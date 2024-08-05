@@ -3153,7 +3153,7 @@ export class Create {
 	}
 	buttonPresets = {
 		/**
-		 * @returns { import("../library/index.js").Button }
+		 * @returns { import("../../library/index.js").Button }
 		 */
 		tdnodes: (item, type, position, noclick, node) => {
 			node = ui.create.div(
@@ -3170,7 +3170,7 @@ export class Create {
 			return node;
 		},
 		/**
-		 * @returns { import("../library/index.js").Button }
+		 * @returns { import("../../library/index.js").Button }
 		 */
 		blank: (item, type, position, noclick, node) => {
 			node = ui.create.div(".button.card", position);
@@ -3189,7 +3189,7 @@ export class Create {
 			return node;
 		},
 		/**
-		 * @returns { import("../library/index.js").Button }
+		 * @returns { import("../../library/index.js").Button }
 		 */
 		card: (item, type, position, noclick, node) => {
 			if (typeof item.copy == "function") {
@@ -3226,7 +3226,7 @@ export class Create {
 			return node;
 		},
 		/**
-		 * @returns { import("../library/index.js").Button }
+		 * @returns { import("../../library/index.js").Button }
 		 */
 		vcard: (item, type, position, noclick, node) => {
 			if (typeof item == "string") {
@@ -3239,7 +3239,7 @@ export class Create {
 			return node;
 		},
 		/**
-		 * @returns { import("../library/index.js").Button }
+		 * @returns { import("../../library/index.js").Button }
 		 */
 		character: (item, type, position, noclick, node) => {
 			if (node) {
@@ -3417,7 +3417,7 @@ export class Create {
 			return node;
 		},
 		/**
-		 * @returns { import("../library/index.js").Button }
+		 * @returns { import("../../library/index.js").Button }
 		 */
 		characterx: (item, type, position, noclick, node) => {
 			return ui.create.buttonPresets.character(
@@ -3429,7 +3429,7 @@ export class Create {
 			);
 		},
 		/**
-		 * @returns { import("../library/index.js").Button }
+		 * @returns { import("../../library/index.js").Button }
 		 */
 		player: (item, type, position, noclick, node) => {
 			if (node) {
