@@ -2,6 +2,7 @@
 // 然后生成zip文件
 // 使用 node game/listChangedFiles.js commitHash
 // 命令参数是对应commit的SHA
+// 生成的压缩包在game目录下
 const { exec } = require("child_process");
 const path = require("path");
 const fs = require("fs");
@@ -80,13 +81,11 @@ function compareFilesWithCommit(commitHash = "HEAD") {
 
 		filesArray.push(...collectFilesSync([joinRootPath("card"), joinRootPath("character"), joinRootPath("extension"), joinRootPath("game"), joinRootPath("layout"), joinRootPath("mode"), joinRootPath("noname"), joinRootPath("theme"), joinRootPath("index.html"), joinRootPath("LICENSE"), joinRootPath("noname-compatible.js"), joinRootPath("noname.js"), joinRootPath("README.md"), joinRootPath("service-worker.js"), joinRootPath("tsconfig.json")]));
 
-		filesArray = [...new Set(filesArray)]
-			.sort((a, b) => {
-				if (a > b) return 1;
-				if (a < b) return -1;
-				return 0;
-			})
-			.map(v => path.normalize(v));
+		filesArray = [...new Set(filesArray.map(v => v.replace(/\\/g, "/")))].sort((a, b) => {
+			if (a > b) return 1;
+			if (a < b) return -1;
+			return 0;
+		});
 
 		// fs.writeFileSync(path.join(__dirname, "filesArray.txt"), filesArray.join('\n'));
 
