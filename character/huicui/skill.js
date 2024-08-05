@@ -313,12 +313,14 @@ const skills = {
 					)
 						return false;
 					return game.hasPlayer(target => {
+						if (player === target) return false;
 						return target.hasCard(card => card.hasGaintag("dcyunzheng_tag"), "h") == !target.hasSkill("dcyunzheng_block");
 					});
 				},
 				logTarget(event, player) {
 					return game
 						.filterPlayer(target => {
+							if (player === target) return false;
 							return target.hasCard(card => card.hasGaintag("dcyunzheng_tag"), "h") == !target.hasSkill("dcyunzheng_block");
 						})
 						.sortBySeat();
@@ -327,6 +329,7 @@ const skills = {
 				content() {
 					const targets = game
 						.filterPlayer(target => {
+							if (player === target) return false;
 							return target.hasCard(card => card.hasGaintag("dcyunzheng_tag"), "h") == !target.hasSkill("dcyunzheng_block");
 						})
 						.sortBySeat();
@@ -8520,15 +8523,23 @@ const skills = {
 			}
 		},
 		ai: {
-			order: 1,
+			order(item, player) {
+				if (player.hasUnknown()) return 0;
+				let list = [];
+				for (let i of cards) {
+					list.add(get.suit(i, player));
+					if (list.length >= 3) return 10;
+				}
+				return 0;
+			},
 			result: {
+				player: 1.8,
 				target: function (player, target) {
-					if (player.hasUnknown()) return 0;
-					var zhu = get.zhu(player);
+					let zhu = get.zhu(player);
 					if (zhu && get.attitude(player, zhu) > 0) {
 						if (target == zhu) return 4;
 					}
-					return 1;
+					return 1.8;
 				},
 			},
 		},

@@ -2759,49 +2759,66 @@ const skills = {
 			player.addTempSkill("rezhanjue_effect", "phaseUseEnd");
 		},
 		ai: {
-			order: 1,
+			order(item, player) {
+				if (player.countCards("h") > 1) return 0.8;
+				return 8;
+			},
 			tag: {
 				respond: 2,
 				respondSha: 2,
 				damage: 1,
 			},
 			result: {
-				target: -1.5,
-				player: function (player, target) {
-					if (
-						player.hasSkillTag(
-							"directHit_ai",
-							true,
-							{
-								target: target,
-								card: { name: "juedou" },
-							},
-							true
-						)
-					) {
-						return 0;
+				player(player, target) {
+					let td = get.damageEffect(target, player, target);
+					if (!td) return 0;
+					let hs = player.getCards("h"), 
+						val = hs.reduce((acc, i) => acc - get.value(i, player), 0) / 6 + 1;
+					if (td > 0) return val;
+					if (player.hasSkillTag(
+						"directHit_ai",
+						true,
+						{
+							target: target,
+							card: get.autoViewAs({ name: "juedou" }, hs),
+						}
+					)) return val;
+					let pd = get.damageEffect(player, target, player),
+						att = get.attitude(player, target);
+					if (att > 0 && get.damageEffect(target, player, player) > pd) return val;
+					let ts = target.mayHaveSha(player, "respond", null, "count");
+					if (ts < 1 && ts * 8 < Math.pow(player.hp, 2)) return val;
+					let damage = pd / get.attitude(player, player),
+						ps = player.mayHaveSha(player, "respond", hs, "count");
+					if (att > 0) {
+						if (ts < 1) return val;
+						return val + damage + 1;
 					}
-					if (get.damageEffect(target, player, target) > 0 && get.attitude(player, target) > 0 && get.attitude(target, player) > 0) {
-						return 0;
-					}
-					var hs1 = target.getCards("h", "sha");
-					var hs2 = player.getCards("h", function (card) {
-						return card.hasGaintag("reqinwang") && get.name(card) == "sha";
-					});
-					if (hs1.length > hs2.length + 1) {
-						return -2;
-					}
-					var hsx = target.getCards("h");
-					if (hsx.length > 2 && hs2.length == 0 && hsx[0].number < 6) {
-						return -2;
-					}
-					if (hsx.length > 3 && hs2.length == 0) {
-						return -2;
-					}
-					if (hs1.length > hs2.length && (!hs2.length || hs1[0].number > hs2[0].number)) {
-						return -2;
-					}
-					return -0.5;
+					if (pd >= 0) return val + damage + 1;
+					if (ts - ps + Math.exp(0.8 - player.hp) < 1) return val - ts;
+					return val + damage + 1 - ts;
+				},
+				target(player, target) {
+					let td = get.damageEffect(target, player, target) / get.attitude(target, target);
+					if (!td) return 0;
+					let hs = player.getCards("h");
+					if (td > 0 || player.hasSkillTag(
+						"directHit_ai",
+						true,
+						{
+							target: target,
+							card: get.autoViewAs({ name: "juedou" }, hs),
+						}
+					)) return td + 1;
+					let pd = get.damageEffect(player, target, player),
+						att = get.attitude(player, target);
+					if (att > 0) return td + 1;
+					let ts = target.mayHaveSha(player, "respond", null, "count"),
+						ps = player.mayHaveSha(player, "respond", hs, "count");
+					if (ts < 1) return td + 1;
+					if (pd >= 0) return 0;
+					if (ts - ps < 1) return td + 1 - ts;
+					return -ts;
 				},
 			},
 			nokeep: true,
@@ -6744,20 +6761,18 @@ const skills = {
 				forced: true,
 				charlotte: true,
 				filter: function (event, player) {
-					return (
-						player.getHistory("sourceDamage", function (evxt) {
-							var evt = evxt.getParent();
-							return evt && evt.name == "sha" && evt.skill == "changbiao" && evt.getParent("phaseUse") == event;
-						}).length > 0
-					);
+					return player.hasHistory("sourceDamage", function (evxt) {
+						var evt = evxt.getParent();
+						return evt && evt.name == "sha" && evt.skill == "changbiao" && evt.getParent("phaseUse") == event;
+					});
 				},
 				content: function () {
-					var num = 0;
+					let cards = [];
 					player.getHistory("sourceDamage", function (evxt) {
 						var evt = evxt.getParent();
-						if (evt && evt.name == "sha" && evt.skill == "changbiao" && evt.getParent("phaseUse") == trigger) num += evt.cards.length;
+						if (evt && evt.name == "sha" && evt.skill == "changbiao" && evt.getParent("phaseUse") == trigger) cards.addArray(evt.cards);
 					});
-					player.draw(num);
+					if (cards.length) player.draw(cards.length);
 				},
 			},
 		},
