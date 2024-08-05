@@ -4664,7 +4664,7 @@ export class Player extends HTMLDivElement {
 					var event = _status.event.getParent();
 					var getn = function (card) {
 						//会赢吗？会赢的！
-						if (player.hasSkillTag("forceWin", null, {card})) return 13 * (Boolean(event.small) ? -1 : 1);
+						if (player.hasSkillTag("forceWin", null, { card })) return 13 * (Boolean(event.small) ? -1 : 1);
 						return get.number(card) * (Boolean(event.small) ? -1 : 1);
 					};
 					if (source && source != player) {
@@ -5128,7 +5128,7 @@ export class Player extends HTMLDivElement {
 				else next.ai = arguments[i];
 			} else if (typeof arguments[i] == "object" && arguments[i]) {
 				var filter = get.filter(arguments[i]);
-				next.filterButton = function(button){
+				next.filterButton = function (button) {
 					return filter(button.link);
 				};
 			} else if (typeof arguments[i] == "string") {
@@ -5171,7 +5171,7 @@ export class Player extends HTMLDivElement {
 				else next.ai = arguments[i];
 			} else if (typeof arguments[i] == "object" && arguments[i]) {
 				var filter = get.filter(arguments[i]);
-				next.filterButton = function(button){
+				next.filterButton = function (button) {
 					return filter(button.link);
 				};
 			} else if (typeof arguments[i] == "string") {
@@ -5216,7 +5216,7 @@ export class Player extends HTMLDivElement {
 				else next.ai = arguments[i];
 			} else if (typeof arguments[i] == "object" && arguments[i]) {
 				var filter = get.filter(arguments[i]);
-				next.filterButton = function(button){
+				next.filterButton = function (button) {
 					return filter(button.link);
 				};
 			} else if (typeof arguments[i] == "string") {
@@ -6818,7 +6818,7 @@ export class Player extends HTMLDivElement {
 		if (!card.expired) {
 			let target = this.getNext();
 			const name = card.viewAs || card.name;
-			const cards = get.itemtype(card) == "card" ? [card] : card.cards ?? [];
+			const cards = get.itemtype(card) == "card" ? [card] : (card.cards ?? []);
 			//if (get.itemtype(cards) != "cards") return;
 			let bool = false;
 			if (
@@ -7741,6 +7741,10 @@ export class Player extends HTMLDivElement {
 		}
 		return min;
 	}
+	/**
+	 * 添加随从
+	 * @param { { hs?: Card[], es?: Card[], skills?: string[], hp?: number, maxHp?: number, hujia?: number, sex?: Sex, group?: string, skill?: string, source?: string  } } cfg
+	 */
 	addSubPlayer(cfg) {
 		var skill = "subplayer_" + cfg.name + "_" + get.id();
 		game.log(this, "获得了随从", "#g" + get.translation(cfg.name));
