@@ -2018,8 +2018,8 @@ game.import("card", function () {
 								if (ts < 1) return 0;
 								return -2;
 							}
-							if (ts - ps + Math.exp(0.8 - player.hp) < 1) return -ts;
 							if (pd >= 0) return pd / get.attitude(player, player);
+							if (ts - ps + Math.exp(0.8 - player.hp) < 1) return -ts;
 							return -2 - ts;
 						},
 						target(player, target, card) {
@@ -2055,8 +2055,8 @@ game.import("card", function () {
 								);
 							if (ts < 1) return -1.5;
 							if (att > 0) return -2;
-							if (ts - ps < 1) return -2 - ts;
 							if (pd >= 0) return -1;
+							if (ts - ps < 1) return -2 - ts;
 							return -ts;
 						},
 					},
