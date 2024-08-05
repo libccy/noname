@@ -2,6 +2,7 @@
 // 然后生成zip文件
 // 使用 node game/listChangedFiles.js commitHash
 // 命令参数是对应commit的SHA
+// 生成的压缩包在game目录下
 const { exec } = require("child_process");
 const path = require("path");
 const fs = require("fs");
@@ -10,10 +11,10 @@ const JSZip = require("./jszip.js");
 const joinRootPath = p => path.join(__dirname, "../", p);
 
 function formatDate(date = new Date()) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() 返回的是0-11，所以需要加1
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}${month}${day}`;
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() 返回的是0-11，所以需要加1
+	const day = String(date.getDate()).padStart(2, "0");
+	return `${year}${month}${day}`;
 }
 
 function collectFilesSync(paths) {
@@ -37,10 +38,7 @@ function collectFilesSync(paths) {
 				}
 			}
 		} catch (error) {
-			console.error(
-				`Error processing directory ${directoryPath}:`,
-				error
-			);
+			console.error(`Error processing directory ${directoryPath}:`, error);
 		}
 	}
 
@@ -60,7 +58,7 @@ function collectFilesSync(paths) {
 		}
 	}
 
-	return fileList.map(v => v.slice(path.join(__dirname, '..').length + 1));
+	return fileList.map(v => v.slice(path.join(__dirname, "..").length + 1));
 }
 
 function compareFilesWithCommit(commitHash = "HEAD") {
@@ -73,50 +71,34 @@ function compareFilesWithCommit(commitHash = "HEAD") {
 
 		const zip = new JSZip();
 
-        let filesArray = stdout.split("\n").filter((v) => {
+		let filesArray = stdout.split("\n").filter(v => {
 			const filePath = path.join(__dirname, "../", v);
-            if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) {
+			if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) {
 				return true;
 			}
-            return false;
+			return false;
 		});
 
-        filesArray.push(...collectFilesSync([
-            joinRootPath("card"),
-            joinRootPath("character"),
-            joinRootPath("extension"),
-            joinRootPath("game"),
-            joinRootPath("layout"),
-            joinRootPath("mode"),
-            joinRootPath("noname"),
-            joinRootPath("theme"),
-            joinRootPath("index.html"),
-            joinRootPath("LICENSE"),
-            joinRootPath("noname-compatible.js"),
-            joinRootPath("noname.js"),
-            joinRootPath("README.md"),
-            joinRootPath("service-worker.js"),
-            joinRootPath("tsconfig.json"),
-        ]));
+		filesArray.push(...collectFilesSync([joinRootPath("card"), joinRootPath("character"), joinRootPath("extension"), joinRootPath("game"), joinRootPath("layout"), joinRootPath("mode"), joinRootPath("noname"), joinRootPath("theme"), joinRootPath("index.html"), joinRootPath("LICENSE"), joinRootPath("noname-compatible.js"), joinRootPath("noname.js"), joinRootPath("README.md"), joinRootPath("service-worker.js"), joinRootPath("tsconfig.json")]));
 
-        filesArray = [...new Set(filesArray)].sort((a, b) => {
-            if (a > b) return 1;
-            if (a < b) return -1;
-            return 0;
-        }).map(v => path.normalize(v));
+		filesArray = [...new Set(filesArray.map(v => v.replace(/\\/g, "/")))].sort((a, b) => {
+			if (a > b) return 1;
+			if (a < b) return -1;
+			return 0;
+		});
 
-        // fs.writeFileSync(path.join(__dirname, "filesArray.txt"), filesArray.join('\n'));
+		// fs.writeFileSync(path.join(__dirname, "filesArray.txt"), filesArray.join('\n'));
 
-		filesArray.forEach((v) => {
-            const filePath = path.join(__dirname, "../", v);
-            if (fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory()) {
-                zip.folder(v);
-                return;
-            }
-            if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) {
+		filesArray.forEach(v => {
+			const filePath = path.join(__dirname, "../", v);
+			if (fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory()) {
+				zip.folder(v);
+				return;
+			}
+			if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) {
 				if (zip.file(v) === null) {
-                    zip.file(v, fs.readFileSync(filePath));
-                }
+					zip.file(v, fs.readFileSync(filePath));
+				}
 			}
 		});
 
