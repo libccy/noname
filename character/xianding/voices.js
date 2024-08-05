@@ -1,4 +1,9 @@
 export default {
+	"#dcshizha1": "不好，江东鼠辈欲乘东风来袭！ ",
+	"#dcshizha2": "江上起东风，恐战局生变。",
+	"#dcgaojian1": "江东不乏能人，主公不可小觑。",
+	"#dcgaojian2": "狮子搏兔，亦须尽其全力。",
+	"#dc_sb_chengyu:die": "乌鹊南飞，何枝可依啊……",
 	"#dcsbkangyong1": "此猛士之血，其与醇酒孰烈乎？",
 	"#dcsbkangyong2": "歃血为誓，城在则人在。",
 	"#dcsbkuangzhan1": "平生不修礼乐，唯擅杀人放火。",
