@@ -6761,20 +6761,18 @@ const skills = {
 				forced: true,
 				charlotte: true,
 				filter: function (event, player) {
-					return (
-						player.getHistory("sourceDamage", function (evxt) {
-							var evt = evxt.getParent();
-							return evt && evt.name == "sha" && evt.skill == "changbiao" && evt.getParent("phaseUse") == event;
-						}).length > 0
-					);
+					return player.hasHistory("sourceDamage", function (evxt) {
+						var evt = evxt.getParent();
+						return evt && evt.name == "sha" && evt.skill == "changbiao" && evt.getParent("phaseUse") == event;
+					});
 				},
 				content: function () {
-					var num = 0;
+					let cards = [];
 					player.getHistory("sourceDamage", function (evxt) {
 						var evt = evxt.getParent();
-						if (evt && evt.name == "sha" && evt.skill == "changbiao" && evt.getParent("phaseUse") == trigger) num += evt.cards.length;
+						if (evt && evt.name == "sha" && evt.skill == "changbiao" && evt.getParent("phaseUse") == trigger) cards.addArray(evt.cards);
 					});
-					player.draw(num);
+					if (cards.length) player.draw(cards.length);
 				},
 			},
 		},
