@@ -1,5 +1,5 @@
 const characters = {
-	jd_sb_sunquan: ["male", "wu", 4, ["jdsbzhiheng", "jdsbtongye", "jdsbjiuyuan"], ["zhu", "character:sb_sunquan", "die:sunquan"]],
+	jd_sb_sunquan: ["male", "wu", 4, ["jdsbzhiheng", "jdsbtongye", "jdsbjiuyuan"], ["zhu", "character:sb_sunquan", "die:sb_sunquan"]],
 	jd_sb_xiaoqiao: ["female", "wu", 3, ["jdsbtianxiang", "jdsbhongyan"], ["character:sb_xiaoqiao", "die:sb_xiaoqiao"]],
 	jd_sb_guanyu: ["male", "shu", 4, ["jdsbwusheng", "jdsbyijue"], ["character:sb_guanyu", "die:sb_guanyu"]],
 	jd_sb_jiangwei: ["male", "shu", 4, ["jdsbtiaoxin", "jdsbzhiji"], ["character:sb_jiangwei", "die:sb_jiangwei"]],
