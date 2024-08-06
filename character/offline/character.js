@@ -1,4 +1,5 @@
 const characters = {
+	jd_simayan: ["male", "jin", 3, ["jdjuqi", "jdfengtu", "jdtaishi"], ["zhu"]],
 	jx_sunjian: ["male", "wu", "4/5", ["gzyinghun", "wulie", "twpolu"]],
 	jx_zhouyu: ["male", "wu", 4, ["jxxiongzi", "jxzhanyan"]],
 	jx_guanyu: ["male", "shu", 4, ["jxwusheng", "jsrgguanjue", "nuzhan"]],

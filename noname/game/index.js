@@ -1400,7 +1400,7 @@ export class Game extends GameCompatible {
 				: {
 						path: args.filter(arg => typeof arg === "string" || typeof arg === "number").join("/"),
 						onError: args.find(arg => typeof arg === "function"),
-					};
+				  };
 
 		const {
 			path = "",
@@ -1582,11 +1582,9 @@ export class Game extends GameCompatible {
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
 
 		let audioList = get.Audio.skill({ skill, player, info: skillInfo }).fileList;
-		if (special && audioList.length > 0) {
-			if (typeof special == "number" && special <= audioList.length) {
-				audioList = [audioList[special - 1]];
-			}
-			else if (typeof special == "string") audioList = [special];//player.logSkill('rende',......,'skill/wusheng1.mp3')[doge]
+		if (special) {
+			if (typeof special == "string") audioList = [special]; //player.logSkill('rende',......,'skill/wusheng1.mp3')[doge]
+			else if (typeof special == "number" && special <= audioList.length) audioList = [audioList[special - 1]];
 		}
 		return game.tryAudio({ audioList });
 	}
@@ -2519,15 +2517,17 @@ export class Game extends GameCompatible {
 				}
 			}
 		},
-		cardtag: function(cardtag) {
+		cardtag: function (cardtag) {
 			_status.cardtag = cardtag;
 		},
-		addVirtualEquip: function(player, map) {
-			const card = get.infoVCard(map[0]), cards = get.infoCards(map[1]);
+		addVirtualEquip: function (player, map) {
+			const card = get.infoVCard(map[0]),
+				cards = get.infoCards(map[1]);
 			player.addVirtualEquip(card, cards);
 		},
-		addVirtualJudge: function(player, map) {
-			const card = get.infoVCard(map[0]), cards = get.infoCards(map[1]);
+		addVirtualJudge: function (player, map) {
+			const card = get.infoVCard(map[0]),
+				cards = get.infoCards(map[1]);
 			player.addVirtualJudge(card, cards);
 		},
 		removeVirtualEquip: function (player, card) {
@@ -3303,14 +3303,13 @@ export class Game extends GameCompatible {
 				var checkMatch = function (l1, l2) {
 					for (var i = 0; i < l1.length; i++) {
 						for (var j = 0; j < l2.length; j++) {
-							if (l1[i].length === 5){
-								if(l1[i][4] === l2[j].cardid) {
+							if (l1[i].length === 5) {
+								if (l1[i][4] === l2[j].cardid) {
 									l2[j].addGaintag(content[1]);
 									l2.splice(j--, 1);
 									break;
 								}
-							}
-							else if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
+							} else if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
 								l2[j].addGaintag(content[1]);
 								l2.splice(j--, 1);
 								break;
@@ -3329,14 +3328,13 @@ export class Game extends GameCompatible {
 					const checkMatch = function (l1, l2) {
 						for (var i = 0; i < l1.length; i++) {
 							for (var j = 0; j < l2.length; j++) {
-								if (l1[i].length === 5){
-									if(l1[i][4] === l2[j].cardid) {
+								if (l1[i].length === 5) {
+									if (l1[i][4] === l2[j].cardid) {
 										l2[j].removeGaintag(content[0]);
 										l2.splice(j--, 1);
 										break;
 									}
-								}
-								else if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
+								} else if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
 									l2[j].removeGaintag(content[0]);
 									l2.splice(j--, 1);
 									break;
@@ -3499,8 +3497,7 @@ export class Game extends GameCompatible {
 			if (player && cards) {
 				if (get.is.object(cards)) {
 					player.directgains(get.infoCards(cards.cards), null, cards.gaintag);
-				}
-				else player.directgains(get.infoCards(cards));
+				} else player.directgains(get.infoCards(cards));
 			} else {
 				console.log(player);
 			}
@@ -3633,7 +3630,6 @@ export class Game extends GameCompatible {
 		},
 		lose: function (player, info) {
 			if (player && info) {
-				
 				var hs = info[0] || [],
 					es = info[1] || [],
 					js = info[2] || [],
@@ -3653,8 +3649,7 @@ export class Game extends GameCompatible {
 									l2.splice(j--, 1);
 									break;
 								}
-							}
-							else if ((l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2])) {
+							} else if (l2[j].suit == l1[i][0] && l2[j].number == l1[i][1] && l2[j].name == l1[i][2]) {
 								l2[j].classList.remove("glow");
 								l2[j].classList.remove("glows");
 								l2[j].remove();
@@ -6107,9 +6102,7 @@ export class Game extends GameCompatible {
 		let players = get.players(lib.sort.position);
 		let position = parseInt(player.dataset.position);
 		for (let i = 0; i < players.length; i++) {
-			if (parseInt(players[i].dataset.position) >= position) {
-				return players[i];
-			}
+			if (parseInt(players[i].dataset.position) >= position) return players[i];
 		}
 		return players[0];
 	}
@@ -6705,7 +6698,7 @@ export class Game extends GameCompatible {
 			for (let i = 0; i < event.config.size; i++) {
 				ui.window.appendChild(event.nodes[i]);
 			}
-			("step 1");
+			"step 1";
 			let rand1 = event.config.first;
 			if (rand1 == "rand") {
 				rand1 = Math.random() < 0.5;
@@ -6742,7 +6735,7 @@ export class Game extends GameCompatible {
 			}
 			game.delay();
 			lib.init.onfree();
-			("step 2");
+			"step 2";
 			if (event.checkredo()) return;
 			if (event._skiprest) return;
 			if (event.side < 2) {
@@ -6758,7 +6751,7 @@ export class Game extends GameCompatible {
 				event.aiMove();
 				game.delay();
 			}
-			("step 3");
+			"step 3";
 			if (typeof event.fast == "number" && get.time() - event.fast <= 1000) {
 				event.fast = true;
 			} else {
@@ -6793,7 +6786,7 @@ export class Game extends GameCompatible {
 					game.delay();
 				}
 			}
-			("step 4");
+			"step 4";
 			if (event.checkredo()) return;
 			if (event.skipnode) event.skipnode.delete();
 			if (event.replacenode) event.replacenode.delete();
@@ -6812,7 +6805,7 @@ export class Game extends GameCompatible {
 				}
 			}
 			game.delay();
-			("step 5");
+			"step 5";
 			event.prompt("选择" + get.cnNumber(event.config.num) + "名出场武将");
 			event.enemylist = [];
 			for (let i = 0; i < event.avatars.length; i++) {
@@ -6842,7 +6835,7 @@ export class Game extends GameCompatible {
 				event.nodes[i].hide();
 			}
 			game.pause();
-			("step 6");
+			"step 6";
 			event.promptbar.delete();
 			if (ui.cardPileButton) ui.cardPileButton.style.display = "";
 			lib.onresize.remove(event.resize);
@@ -6887,8 +6880,7 @@ export class Game extends GameCompatible {
 				else if (Array.isArray(num)) num2 = num[index];
 				else if (typeof num === "function") num2 = num(player);
 
-				if (drawDeck && drawDeck.drawDeck)
-					return player.draw(num2, false, drawDeck);
+				if (drawDeck && drawDeck.drawDeck) return player.draw(num2, false, drawDeck);
 				if (bottom) return player.draw(num2, "nodelay", "bottom");
 				return player.draw(num2, "nodelay");
 			})
@@ -7553,7 +7545,7 @@ export class Game extends GameCompatible {
 							game.reload2();
 							resolve(result);
 						};
-					}
+				  }
 				: (resolve, reject) => {
 						lib.status.reload++;
 						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
@@ -7583,7 +7575,7 @@ export class Game extends GameCompatible {
 							game.reload2();
 							resolve(object);
 						};
-					}
+				  }
 		);
 	}
 	/**
@@ -7637,7 +7629,7 @@ export class Game extends GameCompatible {
 						game.reload2();
 						resolve(event);
 					};
-				})
+			  })
 			: game.getDB(storeName).then(object => {
 					const keys = Object.keys(object);
 					lib.status.reload += keys.length;
@@ -7658,7 +7650,7 @@ export class Game extends GameCompatible {
 								})
 						)
 					);
-				});
+			  });
 	}
 	/**
 	 * @param { string } key

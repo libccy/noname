@@ -49,6 +49,7 @@ window.noname_character_rank = {
 		"dc_zhouxuān",
 		"key_iriya",
 		"dc_zhaoyun",
+		"jd_simayan",
 	],
 	ap: [
 		"zhugejing",
@@ -2038,6 +2039,7 @@ window.noname_character_rank = {
 			"guanyue",
 			"key_mia",
 			"jsrg_yuanshao",
+			"jd_simayan",
 		],
 		epic: [
 			"jx_shen_caoren",
