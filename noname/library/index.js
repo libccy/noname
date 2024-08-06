@@ -13833,7 +13833,23 @@ export class Library {
 			"标",
 			{
 				color: "#912cee",
-				nature: "purple",
+				nature: "metalmm",
+			},
+		],
+		[
+			"牢",
+			{
+				color: "#EEEE00",
+				nature: "black",
+			},
+		],
+		[
+			"牢神",
+			{
+				/**
+				 * @returns {string}
+				 */
+				getSpan: () => `${get.prefixSpan("牢")}${get.prefixSpan("神")}`,
 			},
 		],
 	]);

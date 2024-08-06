@@ -7,7 +7,7 @@ const characterReplaces = {
 	dingyuan: ["ol_dingyuan", "dingyuan"],
 	quyi: ["quyi", "re_quyi"],
 	hansui: ["hansui", "re_hansui", "xin_hansui", "jsrg_hansui"],
-	jin_simashi: ["dc_simashi", "jin_simashi", "simashi"],
+	jin_simashi: ["dc_simashi", "jin_simashi", "simashi", "std_simashi"],
 	jin_yanghuiyu: ["jin_yanghuiyu", "yanghuiyu"],
 	taoqian: ["re_taoqian", "taoqian"],
 	jsp_liubei: ["jsrg_liubei", "jsp_liubei"],
