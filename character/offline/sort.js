@@ -11,7 +11,7 @@ const characterSort = {
 	offline_vtuber: ["vtb_xiaosha", "vtb_xiaoshan", "vtb_xiaotao", "vtb_xiaole", "vtb_xiaojiu"],
 	offline_longyutao: ["drag_guanyu", "drag_caoren", "drag_lvchang"],
 	offline_jingxiang: ["jx_shen_caoren", "jx_shen_liubiao", "jx_sunjian", "jx_zhouyu", "jx_guanyu"],
-	offline_jiudin: ["jd_simayan", "yj_zhonghui"],
+	offline_jiudin: ["jd_simayan", "yj_zhonghui", "jd_sb_sunquan", "jd_sb_xiaoqiao", "jd_sb_guanyu", "jd_sb_jiangwei", "jd_sb_daqiao"],
 	//offline_others:[""],
 };
 

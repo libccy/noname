@@ -1189,6 +1189,11 @@ window.noname_character_rank = {
 		"ol_kebineng",
 		"ol_yuanji",
 		"dc_sb_jushou",
+		"jd_sb_sunquan",
+		"jd_sb_xiaoqiao",
+		"jd_sb_guanyu",
+		"jd_sb_jiangwei",
+		"jd_sb_daqiao",
 	],
 	b: [
 		"liutan",
@@ -2913,6 +2918,11 @@ window.noname_character_rank = {
 			"ol_kebineng",
 			"ol_yuanji",
 			"dc_sb_jushou",
+			"jd_sb_sunquan",
+			"jd_sb_xiaoqiao",
+			"jd_sb_guanyu",
+			"jd_sb_jiangwei",
+			"jd_sb_daqiao",
 		],
 		junk: [
 			"shen_huangzhong",
