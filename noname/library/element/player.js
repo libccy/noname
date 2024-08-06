@@ -4664,7 +4664,7 @@ export class Player extends HTMLDivElement {
 					var event = _status.event.getParent();
 					var getn = function (card) {
 						//会赢吗？会赢的！
-						if (player.hasSkillTag("forceWin", null, {card})) return 13 * (Boolean(event.small) ? -1 : 1);
+						if (player.hasSkillTag("forceWin", null, { card })) return 13 * (Boolean(event.small) ? -1 : 1);
 						return get.number(card) * (Boolean(event.small) ? -1 : 1);
 					};
 					if (source && source != player) {
@@ -5128,7 +5128,7 @@ export class Player extends HTMLDivElement {
 				else next.ai = arguments[i];
 			} else if (typeof arguments[i] == "object" && arguments[i]) {
 				var filter = get.filter(arguments[i]);
-				next.filterButton = function(button){
+				next.filterButton = function (button) {
 					return filter(button.link);
 				};
 			} else if (typeof arguments[i] == "string") {
@@ -5171,7 +5171,7 @@ export class Player extends HTMLDivElement {
 				else next.ai = arguments[i];
 			} else if (typeof arguments[i] == "object" && arguments[i]) {
 				var filter = get.filter(arguments[i]);
-				next.filterButton = function(button){
+				next.filterButton = function (button) {
 					return filter(button.link);
 				};
 			} else if (typeof arguments[i] == "string") {
@@ -5216,7 +5216,7 @@ export class Player extends HTMLDivElement {
 				else next.ai = arguments[i];
 			} else if (typeof arguments[i] == "object" && arguments[i]) {
 				var filter = get.filter(arguments[i]);
-				next.filterButton = function(button){
+				next.filterButton = function (button) {
 					return filter(button.link);
 				};
 			} else if (typeof arguments[i] == "string") {
