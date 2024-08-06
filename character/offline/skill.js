@@ -40,10 +40,16 @@ const skills = {
 				.forResult();
 		},
 		async content(event, trigger, player) {
+			if (!lib.onround.includes(lib.skill.jdfengtu.onRound)) {
+				lib.onround.push(lib.skill.jdfengtu.onRound);
+			}
 			const target = event.targets[0];
 			await target.loseMaxHp();
 			target.addSkill("jdfengtu_phase");
 			target.markAuto("jdfengtu_phase", [trigger.player]);
+		},
+		onRound(event) {
+			return (event.relatedEvent || event.getParent(2)).name != "jdfengtu_phase";
 		},
 		check(source, player) {
 			const players = game.players
@@ -80,7 +86,7 @@ const skills = {
 		trigger: { global: "phaseZhunbeiBegin" },
 		filter(event, player) {
 			const storage = player.storage.jdjuqi;
-			return event.player == player || event.player.countCards("he", card => (get.color(card, event.player) == storage ? "red" : "black"));
+			return event.player == player || event.player.countCards("h", card => _status.connectMode || (get.color(card, event.player) == storage ? "red" : "black"));
 		},
 		async cost(event, trigger, player) {
 			const target = trigger.player;
@@ -89,7 +95,7 @@ const skills = {
 			} else {
 				const color = player.storage.jdjuqi ? "red" : "black";
 				event.result = await target
-					.chooseCard((card, player) => get.color(card, player) == color, "he", `举棋：你可以交给${get.translation(player)}一张${get.translation(color)}牌`)
+					.chooseCard((card, player) => get.color(card, player) == color, `举棋：你可以交给${get.translation(player)}一张${get.translation(color)}手牌`)
 					.set("ai", card => {
 						const player = get.player(),
 							target = get.event("target");
@@ -102,8 +108,8 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const target = trigger.player;
-			if (trigger.player == player) {
-				player.changeZhuanhuanji(event.name);
+			player.changeZhuanhuanji(event.name);
+			if (target == player) {
 				if (player.storage[event.name]) await player.draw(3);
 				else player.addTempSkill(event.name + "_effect");
 			} else {

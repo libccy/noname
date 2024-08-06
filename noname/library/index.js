@@ -107,6 +107,11 @@ export class Library {
 	onresize = [];
 	onphase = [];
 	onwash = [];
+	onround = [
+		function roundSkillCheck(event) {
+			return !event.skill;
+		},
+	];
 	onover = [];
 	ondb = [];
 	ondb2 = [];
@@ -324,28 +329,28 @@ export class Library {
 														return ai - get.value(cardx);
 													} else if (get.attitude(player, source) <= 0) return 0;
 													return 5 - get.value(cardx);
-												},
+											  },
 								});
 								if (!game.online) return;
 								_status.event._resultid = id;
 								game.resume();
 							};
-							("step 1");
+							"step 1";
 							var type = get.type2(card);
 							event.list = game.filterPlayer(current => current != player && current.countCards("h") && (_status.connectMode || current.hasCard(cardx => get.type2(cardx) == type, "h"))).sortBySeat(_status.currentPhase || player);
 							event.id = get.id();
-							("step 2");
+							"step 2";
 							if (!event.list.length) event.finish();
 							else if (_status.connectMode && (event.list[0].isOnline() || event.list[0] == game.me)) event.goto(4);
 							else event.send((event.current = event.list.shift()), event.card, player, trigger.targets, event.id, trigger.parent.id, trigger.yingbianZhuzhanAI);
-							("step 3");
+							"step 3";
 							if (result.bool) {
 								event.zhuzhanresult = event.current;
 								event.zhuzhanresult2 = result;
 								if (event.current != game.me) game.delayx();
 								event.goto(8);
 							} else event.goto(2);
-							("step 4");
+							"step 4";
 							var id = event.id,
 								sendback = (result, player) => {
 									if (result && result.id == id && !event.zhuzhanresult && result.bool) {
@@ -382,16 +387,16 @@ export class Library {
 									if (value != player) value.showTimer();
 								});
 							event.withol = withol;
-							("step 5");
+							"step 5";
 							if (!result || !result.bool || event.zhuzhanresult) return;
 							game.broadcast("cancel", event.id);
 							event.zhuzhanresult = game.me;
 							event.zhuzhanresult2 = result;
-							("step 6");
+							"step 6";
 							if (event.withol && !event.resultOL) game.pause();
-							("step 7");
+							"step 7";
 							game.players.forEach(value => value.hideTimer());
-							("step 8");
+							"step 8";
 							if (event.zhuzhanresult) {
 								var target = event.zhuzhanresult;
 								target.line(player, "green");
@@ -8109,7 +8114,7 @@ export class Library {
 		}
 	}
 	/**
-	 * @param {Function} fn 
+	 * @param {Function} fn
 	 */
 	genAsync(fn) {
 		return gnc.of(fn);
@@ -8120,7 +8125,7 @@ export class Library {
 					for (const content of item) {
 						yield content;
 					}
-				})()
+			  })()
 			: Promise.resolve(item);
 	}
 	gnc = {
@@ -10709,7 +10714,7 @@ export class Library {
 								storage: {
 									stratagem_buffed: 1,
 								},
-							})
+						  })
 						: new lib.element.VCard();
 				}
 				return null;
@@ -11109,7 +11114,7 @@ export class Library {
 			},
 			filterx: function (skill, player) {
 				const zhengsus = player.storage[skill];
-				if(!zhengsus || !zhengsus.length) return false;
+				if (!zhengsus || !zhengsus.length) return false;
 				return zhengsus.some(zhengsu => player.storage[zhengsu]);
 			},
 			content: function () {
@@ -11878,7 +11883,7 @@ export class Library {
 				"step 0";
 				event.dying = trigger.player;
 				if (!event.acted) event.acted = [];
-				("step 1");
+				"step 1";
 				if (trigger.player.isDead()) {
 					event.finish();
 					return;
@@ -11933,7 +11938,7 @@ export class Library {
 				} else {
 					event._result = { bool: false };
 				}
-				("step 2");
+				"step 2";
 				if (result.bool) {
 					var player = trigger.player;
 					if (player.hp <= 0 && !trigger.nodying && !player.nodying && player.isAlive() && !player.isOut() && !player.removed) event.goto(0);
@@ -12023,7 +12028,7 @@ export class Library {
 			content: function () {
 				"step 0";
 				event.logvid = trigger.getLogv();
-				("step 1");
+				"step 1";
 				event.targets = game.filterPlayer(function (current) {
 					return current != event.player && current.isLinked();
 				});
@@ -12033,7 +12038,7 @@ export class Library {
 				event._args = [trigger.num, trigger.nature, trigger.cards, trigger.card];
 				if (trigger.source) event._args.push(trigger.source);
 				else event._args.push("nosource");
-				("step 2");
+				"step 2";
 				if (event.targets.length) {
 					var target = event.targets.shift();
 					if (target.isLinked()) target.damage.apply(target, event._args.slice(0));
@@ -13023,7 +13028,7 @@ export class Library {
 
 						player.directgain(info.handcards);
 						lib.playerOL[i] = player;
-						if(info.vcardsMap){
+						if (info.vcardsMap) {
 							for (var i = 0; i < info.vcardsMap.equips.length; i++) {
 								player.addVirtualEquip(info.vcardsMap.equips[i], info.vcardsMap.equips[i].cards);
 							}
