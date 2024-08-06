@@ -20,7 +20,7 @@ const characterReplaces = {
 	zhangxingcai: ["zhangxingcai", "old_zhangxingcai"],
 	lisu: ["ol_lisu", "lisu"],
 	fuwan: ["fuwan", "tw_fuwan", "sp_fuwan"],
-	huaxin: ["ol_huaxin", "huaxin", "sp_huaxin"],
+	huaxin: ["ol_huaxin", "huaxin", "sp_huaxin", "std_huaxin"],
 	xujing: ["xujing", "dc_xujing", "sp_xujing", "tw_xujing"],
 	zhaoxiang: ["zhaoxiang", "dc_zhaoxiang", "tw_zhaoxiang"],
 	dengzhi: ["ol_dengzhi", "re_dengzhi", "dengzhi", "tw_dengzhi", "std_re_dengzhi"],
