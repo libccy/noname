@@ -12474,7 +12474,8 @@ const skills = {
 			dc_guansuo: "wusheng_guansuo",
 			guanzhang: "wusheng_guanzhang",
 			guansuo: "wusheng_guansuo",
-			gz_jun_liubei: "shouyue_wusheng"
+			gz_jun_liubei: "shouyue_wusheng",
+			std_guanxing: "wusheng_guanzhang",
 		},
 		enable: ["chooseToRespond", "chooseToUse"],
 		filterCard: function (card, player) {

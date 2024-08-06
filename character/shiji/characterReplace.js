@@ -1,6 +1,6 @@
 const characterReplaces = {
 	wangcan: ["wangcan", "sp_wangcan", "tw_wangcan"],
-	sunshao: ["sunshao", "sp_sunshao"],
+	sunshao: ["sunshao", "sp_sunshao", "std_sunshao"],
 	xunchen: ["xunchen", "re_xunchen", "sp_xunchen", "tw_xunchen", "clan_xunchen"],
 	xinpi: ["xinpi", "sp_xinpi"],
 	duyu: ["duyu", "dc_duyu", "sp_duyu", "pk_sp_duyu"],
@@ -12,7 +12,7 @@ const characterReplaces = {
 	cuiyan: ["cuiyan", "sp_cuiyan"],
 	wujing: ["wujing", "tw_wujing"],
 	zhouchu: ["jin_zhouchu", "zhouchu", "tw_zhouchu", "std_zhouchu"],
-	liuzhang: ["liuzhang", "tw_liuzhang"],
+	liuzhang: ["liuzhang", "tw_liuzhang", "std_liuzhang"],
 	chenzhen: ["sp_chenzhen", "tw_chenzhen"],
 	feiyi: ["ol_feiyi", "feiyi", "tw_feiyi", "std_feiyi"],
 	wangling: ["dc_wangling", "wangling", "tw_wangling", "clan_wangling"],
@@ -21,7 +21,7 @@ const characterReplaces = {
 	sp_jiangqing: ["sp_jiangqing", "tw_jiangqing", "jiangqing"],
 	kongrong: ["ol_sb_kongrong", "dc_kongrong", "sp_kongrong", "jsrg_kongrong", "kongrong"],
 	dc_mifuren: ["dc_mifuren", "sp_mifuren"],
-	sp_jiangwan: ["ol_jiangwan", "sp_jiangwan"],
+	sp_jiangwan: ["ol_jiangwan", "sp_jiangwan", "std_jiangwan"],
 };
 
 export default characterReplaces;

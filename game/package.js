@@ -5,6 +5,7 @@ window.noname_package = {
 		shenhua: "神话再临",
 		yijiang: "一将成名",
 		newjiang: "新一将成名",
+		sixiang: "四象封印",
 		sp: "璀璨星河",
 		onlyOL: "OL专属",
 		yingbian: "文德武备",
