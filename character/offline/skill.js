@@ -10,10 +10,10 @@ const skills = {
 		},
 		trigger: { global: "dieAfter" },
 		filter(event, player) {
-			if (game.players.includes(event.player)) return false;
+			//if (game.players.includes(event.player)) return false;
 			return game.hasPlayer(target => {
 				return !game.getAllGlobalHistory("everything", evt => {
-					return evt.name == "loseMaxHp" && evt.getParent().name == "jdfengtu" && evt.targets.includes(target);
+					return evt.name == "loseMaxHp" && evt.getParent().name == "jdfengtu" && evt.player == target;
 				}).length;
 			});
 		},
@@ -33,7 +33,7 @@ const skills = {
 					"targets",
 					game.filterPlayer(target => {
 						return !game.getAllGlobalHistory("everything", evt => {
-							return evt.name == "loseMaxHp" && evt.getParent().name == "jdfengtu" && evt.targets.includes(target);
+							return evt.name == "loseMaxHp" && evt.getParent().name == "jdfengtu" && evt.player == target;
 						}).length;
 					})
 				)
