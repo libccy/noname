@@ -6681,7 +6681,7 @@ export const Content = {
 							return event.filter(card) && targets[1].canAddJudge(card);
 					  });
 			if (es.length) {
-				dialogArgs.push(`<div class="text center">判定区</div>`);
+				dialogArgs.push(`<div class="text center">装备区</div>`);
 				dialogArgs.push([es, "vcard"]);
 			}
 			if (js.length) {
