@@ -1642,12 +1642,11 @@ const skills = {
 					source: trigger.player,
 					card: trigger.card,
 				})
-				.setHiddenSkill(event.name)
+				.setHiddenSkill(event.name.slice(0, -5))
 				.forResult();
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0];
-			player.logSkill(event.name, target);
 			player.discard(event.cards);
 			const evt = trigger.getParent();
 			evt.triggeredTargets2.remove(player);

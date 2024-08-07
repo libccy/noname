@@ -1,4 +1,9 @@
 const characters = {
+	jd_sb_sunquan: ["male", "wu", 4, ["jdsbzhiheng", "jdsbtongye", "jdsbjiuyuan"], ["zhu", "character:sb_sunquan", "die:sb_sunquan"]],
+	jd_sb_xiaoqiao: ["female", "wu", 3, ["jdsbtianxiang", "jdsbhongyan"], ["character:sb_xiaoqiao", "die:sb_xiaoqiao"]],
+	jd_sb_guanyu: ["male", "shu", 4, ["jdsbwusheng", "jdsbyijue"], ["character:sb_guanyu", "die:sb_guanyu"]],
+	jd_sb_jiangwei: ["male", "shu", 4, ["jdsbtiaoxin", "jdsbzhiji"], ["character:sb_jiangwei", "die:sb_jiangwei"]],
+	jd_sb_daqiao: ["female", "wu", 3, ["jdsbguose", "jdsbliuli"], ["character:sb_daqiao", "die:sb_daqiao"]],
 	jd_simayan: ["male", "jin", 3, ["jdjuqi", "jdfengtu", "jdtaishi"], ["zhu"]],
 	jx_sunjian: ["male", "wu", "4/5", ["gzyinghun", "wulie", "twpolu"]],
 	jx_zhouyu: ["male", "wu", 4, ["jxxiongzi", "jxzhanyan"]],

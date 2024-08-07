@@ -13878,6 +13878,13 @@ export class Library {
 				getSpan: () => `${get.prefixSpan("牢")}${get.prefixSpan("神")}`,
 			},
 		],
+		[
+			"鼎",
+			{
+				color: "#ffccff",
+				nature: "black",
+			},
+		],
 	]);
 	groupnature = {
 		shen: "shen",
