@@ -1,10 +1,10 @@
 const characterReplaces = {
 	caozhi: ["caozhi", "dc_caozhi", "re_caozhi", "ps_caozhi"],
 	zhangchunhua: ["zhangchunhua", "re_zhangchunhua", "ol_zhangchunhua", "jin_zhangchunhua", "star_zhangchunhua"],
-	yujin: ["yujin", "yujin_yujin", "ol_yujin", "sb_yujin", "xin_yujin", "re_yujin"],
+	yujin: ["yujin", "yujin_yujin", "ol_yujin", "sb_yujin", "xin_yujin", "re_yujin", "jd_sb_yujin"],
 	dc_xushu: ["re_xushu", "dc_xushu"],
 	xushu: ["xin_xushu", "xushu", "std_xushu"],
-	fazheng: ["xin_fazheng", "ol_fazheng", "re_fazheng", "sb_fazheng", "tw_re_fazheng", "fazheng"],
+	fazheng: ["xin_fazheng", "ol_fazheng", "re_fazheng", "sb_fazheng", "tw_re_fazheng", "fazheng", "jd_sb_fazheng"],
 	masu: ["xin_masu", "re_masu", "masu"],
 	xusheng: ["xusheng", "xin_xusheng", "re_xusheng", "old_xusheng"],
 	wuguotai: ["wuguotai", "xin_wuguotai", "re_wuguotai", "ol_wuguotai"],

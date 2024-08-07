@@ -1,4 +1,11 @@
 const characters = {
+	jd_sb_menghuo: ["male", "qun", 4, ["jdsbhuoshou", "jdsbzaiqi"], ["character:sb_menghuo", "die:sb_menghuo"]],
+	jd_sb_yuanshao: ["male", "qun", 4, ["jdsbluanji", "jdsbxueyi"], ["zhu", "character:sb_yuanshao", "die:sb_yuanshao"]],
+	jd_sb_yujin: ["male", "qun", 4, ["sbxiayuan", "jdsbjieyue"], ["character:sb_yujin", "die:sb_yujin"]],
+	jd_sb_sunshangxiang: ["female", "shu", 4, ["jdsbjieyin", "jdsbliangzhu", "sbxiaoji"], ["character:sb_sunshangxiang", "die:sb_sunshangxiang", "border:wu"]],
+	jd_sb_liubei: ["male", "shu", 4, ["sbrende", "jdsbzhangwu", "sbjijiang"], ["zhu", "character:sb_liubei", "die:sb_liubei"]],
+	jd_sb_fazheng: ["male", "shu", 3, ["sbxuanhuo", "jdsbenyuan"], ["character:sb_fazheng", "die:sb_fazheng"]],
+	jd_sb_zhangfei: ["male", "shu", 4, ["jdsbpaoxiao", "sbxieji"], ["character:sb_zhangfei", "die:sb_zhangfei"]],
 	jd_sb_sunquan: ["male", "wu", 4, ["jdsbzhiheng", "jdsbtongye", "jdsbjiuyuan"], ["zhu", "character:sb_sunquan", "die:sb_sunquan"]],
 	jd_sb_xiaoqiao: ["female", "wu", 3, ["jdsbtianxiang", "jdsbhongyan"], ["character:sb_xiaoqiao", "die:sb_xiaoqiao"]],
 	jd_sb_guanyu: ["male", "shu", 4, ["jdsbwusheng", "jdsbyijue"], ["character:sb_guanyu", "die:sb_guanyu"]],
