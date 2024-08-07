@@ -248,6 +248,9 @@ export class Library {
 
 	objectURL = new Map();
 	hookmap = {};
+	/**
+	 * @type { { character?: SMap<importCharacterConfig>, card?: SMap<importCardConfig>, mode?: SMap<importModeConfig>, player?: SMap<importPlayerConfig>, extension?: SMap<importExtensionConfig>, play?: SMap<importPlayConfig> } }
+	 */
 	imported = {};
 	layoutfixed = ["chess", "tafang", "stone"];
 	pinyins = {

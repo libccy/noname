@@ -6108,20 +6108,45 @@ export class Game extends GameCompatible {
 	}
 	/**
 	 * @param { string } name
-	 * @param { Function } callback
+	 * @param { (exports: importModeConfig) => any } callback
+	 * @returns { Promise<importModeConfig> }
 	 */
-	loadModeAsync(name, callback) {
+	loadModeAsync(name, callback = () => {}) {
 		window.game = game;
-		let script = lib.init.js(lib.assetURL + "mode", name, async () => {
+		return import(`../../mode/${name}.js`).then(async exports => {
+			// esm模式
+			if (Object.keys(exports).length > 0) {
+				if (typeof exports.default == 'function') {
+					game.import('mode', exports.default);
+				}
+				else {
+					throw new Error(`导入的模式[${name}]格式不正确！`);
+				}
+			}
+			// 普通模式
+			else {
+				await new Promise((resolve, reject) => {
+					let script = lib.init.js(`${lib.assetURL}mode`, name, async () => {
+						script?.remove();
+						resolve(null);
+					}, () => {
+						reject(`导入的模式[${name}]不存在！`);
+					});
+				});
+			}
 			await Promise.allSettled(_status.importing.mode);
 			if (!lib.config.dev) delete window.game;
-			script.remove();
-			let content = lib.imported.mode[name];
+			const content = lib.imported.mode[name];
+			if (!content) throw new Error(`导入的模式[${name}]格式不正确！`);
 			delete lib.imported.mode[name];
 			if (get.is.empty(lib.imported.mode)) {
 				delete lib.imported.mode;
 			}
 			callback(content);
+			return content;
+		}).catch((e) => {
+			console.error(`导入的模式[${name}]不存在！`);
+			return e;
 		});
 	}
 	/**
@@ -6138,52 +6163,47 @@ export class Game extends GameCompatible {
 				}
 			}
 		}
-		window.game = game;
-		let script = lib.init.js(lib.assetURL + "mode", name, async () => {
-			await Promise.allSettled(_status.importing.mode);
-			if (!lib.config.dev) delete window.game;
-			script.remove();
-			let mode = lib.imported.mode;
+		game.loadModeAsync(name, async exports => {
+			let mode = exports;
 			_status.sourcemode = lib.config.mode;
 			lib.config.mode = name;
 
-			let i, j, k;
-			for (i in mode[lib.config.mode].element) {
+			for (let i in exports.element) {
 				if (!lib.element[i]) lib.element[i] = [];
-				for (j in mode[lib.config.mode].element[i]) {
+				for (let j in exports.element[i]) {
 					if (j == "init") {
 						if (!lib.element[i].inits) lib.element[i].inits = [];
-						lib.element[i].inits.push(mode[lib.config.mode].element[i][j]);
+						lib.element[i].inits.push(exports.element[i][j]);
 					} else {
-						lib.element[i][j] = mode[lib.config.mode].element[i][j];
+						lib.element[i][j] = exports.element[i][j];
 					}
 				}
 			}
-			for (i in mode[lib.config.mode].ai) {
-				if (typeof mode[lib.config.mode].ai[i] == "object") {
+			for (let i in exports.ai) {
+				if (typeof exports.ai[i] == "object") {
 					if (ai[i] == undefined) ai[i] = {};
-					for (j in mode[lib.config.mode].ai[i]) {
-						ai[i][j] = mode[lib.config.mode].ai[i][j];
+					for (let j in exports.ai[i]) {
+						ai[i][j] = exports.ai[i][j];
 					}
 				} else {
-					ai[i] = mode[lib.config.mode].ai[i];
+					ai[i] = exports.ai[i];
 				}
 			}
-			for (i in mode[lib.config.mode].ui) {
-				if (typeof mode[lib.config.mode].ui[i] == "object") {
+			for (let i in exports.ui) {
+				if (typeof exports.ui[i] == "object") {
 					if (ui[i] == undefined) ui[i] = {};
-					for (j in mode[lib.config.mode].ui[i]) {
-						ui[i][j] = mode[lib.config.mode].ui[i][j];
+					for (let j in exports.ui[i]) {
+						ui[i][j] = exports.ui[i][j];
 					}
 				} else {
-					ui[i] = mode[lib.config.mode].ui[i];
+					ui[i] = exports.ui[i];
 				}
 			}
-			for (i in mode[lib.config.mode].game) {
-				game[i] = mode[lib.config.mode].game[i];
+			for (let i in exports.game) {
+				game[i] = exports.game[i];
 			}
-			for (i in mode[lib.config.mode].get) {
-				get[i] = mode[lib.config.mode].get[i];
+			for (let i in exports.get) {
+				get[i] = exports.get[i];
 			}
 			if (game.onwash) {
 				lib.onwash.push(game.onwash);
@@ -6196,18 +6216,11 @@ export class Game extends GameCompatible {
 			lib.config.banned = lib.config[lib.config.mode + "_banned"] || [];
 			lib.config.bannedcards = lib.config[lib.config.mode + "_bannedcards"] || [];
 
-			for (i in mode[lib.config.mode]) {
-				if (i == "element") continue;
-				if (i == "game") continue;
-				if (i == "ai") continue;
-				if (i == "ui") continue;
-				if (i == "get") continue;
-				if (i == "config") continue;
-				if (i == "start") continue;
-				if (i == "startBefore") continue;
-				if (lib[i] == undefined) lib[i] = Array.isArray(mode[lib.config.mode][i]) ? [] : {};
-				for (j in mode[lib.config.mode][i]) {
-					lib[i][j] = mode[lib.config.mode][i][j];
+			for (let i in exports) {
+				if (["element", "game", "ai", "ui", "get", "config", "start", "startBefore"].includes(i)) continue;
+				if (lib[i] == undefined) lib[i] = Array.isArray(exports[i]) ? [] : {};
+				for (let j in exports[i]) {
+					lib[i][j] = exports[i][j];
 				}
 			}
 
@@ -6251,7 +6264,7 @@ export class Game extends GameCompatible {
 						lib.card.list = lib.card.list.concat(lib.cardPackList[i]);
 					}
 				}
-				for (i = 0; i < lib.card.list.length; i++) {
+				for (let i = 0; i < lib.card.list.length; i++) {
 					if (lib.card.list[i][2] == "huosha") {
 						lib.card.list[i] = lib.card.list[i].slice(0);
 						lib.card.list[i][2] = "sha";
@@ -6277,15 +6290,14 @@ export class Game extends GameCompatible {
 				ui.playerids.style.display = "";
 			}
 
-			if (mode[lib.config.mode].startBefore) mode[lib.config.mode].startBefore();
-			game.createEvent("game", false).setContent(mode[lib.config.mode].start);
+			if (exports.startBefore) exports.startBefore();
+			game.createEvent("game", false).setContent(exports.start);
 			if (lib.mode[lib.config.mode] && lib.mode[lib.config.mode].fromextension) {
-				let startstr = mode[lib.config.mode].start.toString();
+				let startstr = exports.start.toString();
 				if (startstr.indexOf("onfree") == -1) {
 					setTimeout(lib.init.onfree, 500);
 				}
 			}
-			delete lib.imported.mode[name];
 
 			if (!lib.db) {
 				try {
@@ -6298,7 +6310,7 @@ export class Game extends GameCompatible {
 				}
 				game.loop();
 			} else {
-				game.getDB("data", lib.config.mode, function (obj) {
+				game.getDB("data", lib.config.mode, obj => {
 					lib.storage = obj || {};
 					game.loop();
 				});

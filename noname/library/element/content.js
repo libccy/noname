@@ -2705,15 +2705,11 @@ export const Content = {
 		}
 		event.goto(0);
 	},
-	loadMode: function () {
-		"step 0";
-		window.game = game;
-		lib.init.js(lib.assetURL + "mode", event.mode, game.resume);
-		game.pause();
-		"step 1";
-		if (!lib.config.dev) delete window.game;
-		event.result = lib.imported.mode[event.mode];
-		delete lib.imported.mode[event.mode];
+	async loadMode(event) {
+		await game.loadModeAsync(event.mode).then(exports => {
+			event.result = exports;
+			if (lib.imported.mode[event.mode]) delete lib.imported.mode[event.mode];
+		}).catch(_ => {});
 	},
 	forceOver: function () {
 		"step 0";

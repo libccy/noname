@@ -1,9 +1,13 @@
-"use strict";
-game.import("mode", function (lib, game, ui, get, ai, _status) {
+import { lib, game, ui, get, ai, _status } from '../noname.js';
+export const type = 'mode';
+/**
+ * @type { () => importModeConfig }
+ */
+export default () => {
 	return {
 		name: "tafang",
 		canvasUpdates2: [],
-		start: function () {
+		start() {
 			"step 0";
 			_status.gameDrawed = true;
 			lib.init.css(lib.assetURL + "layout/mode", "chess");
@@ -138,7 +142,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			ui.chesswidth = _status.map.size[0];
 			ui.chessheight = _status.map.size[1];
 			game.initChess();
-
+	
 			var grids = [];
 			var gridnum = ui.chessheight * ui.chesswidth;
 			for (var i = 0; i < gridnum; i++) {
@@ -176,7 +180,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.obs.push(cg.toString());
 				}
 			}
-
+	
 			if (lib.config.show_handcardbutton) {
 				lib.setPopped(
 					ui.create.system("手牌", null, true),
@@ -203,16 +207,16 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					220
 				);
 			}
-
+	
 			ui.create.me();
 			ui.create.fakeme();
-
+	
 			ui.chessinfo = ui.create.div(".fakeme.player", ui.me, function (e) {
 				e.stopPropagation();
 			});
 			ui.create.div(ui.chessinfo);
 			lib.setScroll(ui.chessinfo.firstChild);
-
+	
 			game.arrangePlayers();
 			"step 4";
 			ui.control.style.display = "";
@@ -234,10 +238,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			if (event.obs) {
 				game.addVideo("initobs", null, event.obs);
 			}
-
+	
 			ui.me.querySelector(".fakeme.player").hide();
 			ui.me.querySelector(".fakeme.avatar").hide();
-
+	
 			var list = [];
 			for (i in lib.character) {
 				if (i.indexOf("treasure_") == 0) continue;
@@ -256,7 +260,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			_status.turnTotal = parseInt(get.config("tafang_turn"));
 			ui.turnCount = ui.create.system("", null, true);
 			_status.remainingCount = 0;
-
+	
 			_status.tafangend = [];
 			for (var i = 0; i < ui.chesswidth; i++) {
 				var tafangdes = ui.chesswidth * (ui.chessheight - 1) + i;
@@ -1181,10 +1185,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			trueColor: "zhu",
 			falseColor: "wei",
 			_chessmove: "移动",
-
+	
 			mode_tafang_character_config: "塔防模式",
 			mode_tafang_card_config: "塔防模式",
-
+	
 			tafang_mech_weixingxianjing: "小型陷阱",
 			tafang_mech_weixingxianjing_skill: "捕猎",
 			tafang_mech_weixingxianjing_skill_info: "每一轮令距离你2格以内的一名随机敌人翻面。",
@@ -1205,7 +1209,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			tafang_mech_guangmingquan: "光明泉",
 			tafang_mech_guangmingquan_skill: "圣疗",
 			tafang_mech_guangmingquan_skill_info: "每一轮令距离2格以内的所有友方角色各回复1点体力。",
-
+	
 			tafang_mech_dubiaoxianjing: "毒镖陷阱",
 			tafang_mech_dubiaoxianjing_skill: "毒镖",
 			tafang_mech_dubiaoxianjing_skill_info: "每当距离2格以内的一名敌方角色。",
@@ -1223,7 +1227,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				// tafang_mech_shenmidiaoxiang:['','',4,[],['boss'],5],
 				// tafang_mech_shiyuansu:['','',4,[],['boss'],5],
 				// tafang_mech_jiqishi:['','',4,[],['boss'],5],
-
+	
 				tafang_mech_guangmingquan: ["", "", 3, [], ["boss"], 3],
 				tafang_mech_nengliangqiu: ["", "", 3, [], ["boss"], 3],
 				tafang_mech_jiguanren: ["", "", 3, [], ["boss"], 3],
@@ -1244,5 +1248,5 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				"战场上最多出现3个相同的机关，每个机关在置入战场3轮后消失。战场上最多招募5名友方角色。<li>" +
 				"敌方角色到达底部出口时游戏失败，已方角色到达底部出口，将被移出游戏",
 		},
-	};
-});
+	}
+}
