@@ -19649,6 +19649,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								game.players[i].identity = "unknown";
 								game.players[i].node.name.show();
 								game.players[i].node.name2.show();
+								for (var j = 0; j < game.players[i].hiddenSkills.length; j++) {
+									game.players[i].addSkillTrigger(game.players[i].hiddenSkills[j], true);
+								}
 							}
 							setTimeout(function () {
 								ui.arena.classList.remove("choose-character");
@@ -21531,6 +21534,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					for (var i = 0; i < _status.characterlist.length; i++) {
 						var goon = false,
 							group2 = lib.character[_status.characterlist[i]][1];
+						if (game.hasPlayer2(current => get.nameList(current).includes(_status.characterlist[i]))) continue;
 						if (group == "ye") {
 							if (group2 != "ye") goon = true;
 						} else {
@@ -21578,6 +21582,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.tochange = [];
 					for (var i = 0; i < _status.characterlist.length; i++) {
 						if (_status.characterlist[i].indexOf("gz_jun_") == 0) continue;
+						if (game.hasPlayer2(current => get.nameList(current).includes(_status.characterlist[i]))) continue;
 						var goon = false,
 							group2 = lib.character[_status.characterlist[i]][1];
 						if (group == "ye") {
