@@ -2,6 +2,30 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//九鼎-司马师
+	jdtairan: {
+		audio: "tairan",
+		inherit: "tairan",
+		trigger: {
+			player: "phaseJieshuBegin",
+		},
+		async content(event, trigger, player) {
+			const maxHp = player.maxHp;
+			const hp = maxHp - player.getHp();
+			if (hp > 0) await player.recoverTo(maxHp);
+			const num = maxHp - player.countCards("h");
+			if (num > 0) await player.drawTo(maxHp);
+			player
+				.when("phaseUseBegin")
+				.then(() => {
+					if (hp > 0) player.loseHp(hp);
+				})
+				.then(() => {
+					if (player.countCards("h") && num > 0) player.chooseToDiscard("h", num, true);
+				})
+				.vars({ hp: hp, num: num });
+		},
+	},
 	//九鼎-张飞
 	jdsbpaoxiao: {
 		audio: "sbpaoxiao",
@@ -829,7 +853,7 @@ const skills = {
 		onremove(player) {
 			player.removeAdditionalSkill("jdsbtongye");
 		},
-		derivation: ["yingzi", "guzheng"],
+		derivation: ["sbyingzi", "olguzheng"],
 		locked: true,
 	},
 	jdsbjiuyuan: {

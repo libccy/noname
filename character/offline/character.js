@@ -1,4 +1,5 @@
 const characters = {
+	jd_jin_simashi: ["male", "jin", "3/4", ["taoyin", "yimie", "jdtairan", "ruilve"], ["zhu", "character:jin_simashi", "die:jin_simashi"]],
 	jd_sb_menghuo: ["male", "qun", 4, ["jdsbhuoshou", "jdsbzaiqi"], ["character:sb_menghuo", "die:sb_menghuo"]],
 	jd_sb_yuanshao: ["male", "qun", 4, ["jdsbluanji", "jdsbxueyi"], ["zhu", "character:sb_yuanshao", "die:sb_yuanshao"]],
 	jd_sb_yujin: ["male", "qun", 4, ["sbxiayuan", "jdsbjieyue"], ["character:sb_yujin", "die:sb_yujin"]],
