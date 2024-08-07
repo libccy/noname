@@ -96,7 +96,7 @@ const translates = {
 	std_wanglang_prefix: "标",
 	std_zhonghui: "标钟会",
 	std_zhonghui_prefix: "标",
-	std_fuhuanghou: "标伏皇后",
+	std_fuhuanghou: "标伏寿",
 	std_fuhuanghou_prefix: "标",
 	std_liubiao: "标刘表",
 	std_liubiao_prefix: "标",
