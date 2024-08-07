@@ -140,7 +140,7 @@
 		) {
 			window.initReadWriteFunction = async function (game) {
 				return new Promise((resolve, reject) => {
-					fetch(`./readFile?fileName=noname.js`)
+					fetch(`./checkFile?fileName=noname.js`)
 						.then((response) => {
 							return response.json();
 						})
