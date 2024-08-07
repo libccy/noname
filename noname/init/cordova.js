@@ -142,7 +142,63 @@ export async function cordovaReady() {
 	 * @param {(err: Error) => void} [onerror] - 接收错误的回调函数
 	 * @return {void} - 由于三端的异步需求和历史原因，文件管理必须为回调异步函数
 	 */
-	game.checkFile = function (fileName, callback, onerror) {};
+	game.checkFile = function (fileName, callback, onerror) {
+		let paths = fileName.split("/");
+
+		/**
+		 *
+		 * @type {Promise<Entry>}
+		 */
+		let loadRoot = new Promise(resolve => {
+			window.resolveLocalFileSystemURL(nonameInitialized, resolve);
+		});
+
+		loadRoot
+			.then(async root => {
+				let currentPath = /** @type {DirectoryEntry} */ (/** @type {unknown} */ root);
+
+				pathIter: for (let i = 0; i < paths.length; ++i) {
+					let path = paths[i];
+					let reader = currentPath.createReader();
+
+					/**
+					 * @type {Entry[]}
+					 */
+					let entries;
+					// noinspection CommaExpressionJS
+					while (((entries = await read(reader)), entries.length > 0)) {
+						let item = entries.find(entry => entry.name === path);
+						if (!item) continue;
+
+						if (i === paths.length - 1) {
+							callback?.(item.isFile ? 1 : 0);
+							break pathIter;
+						} else {
+							if (item.isFile || !item.isDirectory) {
+								callback?.(-1);
+								break pathIter;
+							} else {
+								currentPath = /** @type {DirectoryEntry} */ (/** @type {unknown} */ item);
+								continue pathIter;
+							}
+						}
+					}
+					callback?.(-1);
+					break;
+				}
+			})
+			.catch(onerror);
+
+		/**
+		 * @param {DirectoryReader} reader
+		 * @return {Promise<Entry[]>}
+		 */
+		function read(reader) {
+			return new Promise(resolve => {
+				reader.readEntries(resolve);
+			});
+		}
+	};
 
 	game.readFile = function (filename, callback, onerror) {
 		window.resolveLocalFileSystemURL(
