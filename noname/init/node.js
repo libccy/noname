@@ -74,7 +74,7 @@ export function nodeReady() {
 	 *
 	 * @param {string} filename - 需要查询的路径
 	 * @param {(result: -1 | 0 | 1) => void} callback - 回调函数；接受的参数意义如下:
-	 *  - `-1`: 文件不存在或无法访问
+	 *  - `-1`: 路径不存在或无法访问
 	 *  - `0`: 路径的内容不是文件
 	 *  - `1`: 路径的内容是文件
 	 * @param {(err: Error) => void} onerror - 接收错误的回调函数
@@ -99,6 +99,39 @@ export function nodeReady() {
 			}
 
 			callback(stat.isFile() ? 1 : 0);
+		});
+	}
+
+	/**
+	 * 检查指定的路径是否是一个目录
+	 *
+	 * @param {string} dir - 需要查询的路径
+	 * @param {(result: -1 | 0 | 1) => void} callback - 回调函数；接受的参数意义如下:
+	 *  - `-1`: 路径不存在或无法访问
+	 *  - `0`: 路径的内容不是目录
+	 *  - `1`: 路径的内容是目录
+	 * @param {(err: Error) => void} onerror - 接收错误的回调函数
+	 * @return {void} - 由于三端的异步需求和历史原因，文件管理必须为回调异步函数
+	 */
+	game.checkDir = function (dir, callback, onerror) {
+		let dirPath = __dirname + "/" + dir;
+
+		// 如果路径不存在，则无需再尝试获取信息
+		if (!lib.node.fs.existsSync(dirPath)) {
+			callback(-1);
+			return;
+		}
+
+		lib.node.fs.stat(dirPath, (err, stat) => {
+			if (err) {
+				// 如果是无法访问的情况，则按照函数需求返回-1
+				if (err.code === "EACCES") callback(-1);
+				// 反之则直接将err传入onerror
+				else onerror(err);
+				return;
+			}
+
+			callback(stat.isDirectory() ? 1 : 0);
 		});
 	}
 
