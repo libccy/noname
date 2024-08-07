@@ -33,6 +33,7 @@ const characters = {
 	std_wangyuanji: ["female", "wei", 3, ["stdqianchong", "stdshangjian"]],
 	std_wanglang: ["male", "wei", 3, ["stdgushe", "stdjici"]],
 	std_zhonghui: ["male", "wei", 4, ["stdxingfa"], ["clan:颍川钟氏"]],
+	std_huaxin: ["male", "wei", 3, ["stdyuanqing", "stdshuchen"]],
 };
 
 export default characters;

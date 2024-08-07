@@ -11475,7 +11475,6 @@ const skills = {
 		trigger: { player: "damageEnd" },
 		filter: (event, player) => player != _status.currentPhase,
 		forced: true,
-		locked: false,
 		content: function () {
 			if (!player.storage.shanduan) player.storage.shanduan = [1, 2, 3, 4];
 			var list = player.storage.shanduan;
@@ -11505,7 +11504,6 @@ const skills = {
 				audio: "shanduan",
 				trigger: { player: "phaseDrawBegin" },
 				forced: true,
-				locked: false,
 				filter: function (event, player) {
 					var list = event.getParent()._shanduan;
 					return !list || list.length > 0;
@@ -11538,7 +11536,6 @@ const skills = {
 				audio: "shanduan",
 				trigger: { player: "phaseUseBegin" },
 				forced: true,
-				locked: false,
 				filter: function (event, player) {
 					var list = event.getParent()._shanduan;
 					return !list || list.length > 0;
@@ -11631,7 +11628,6 @@ const skills = {
 				audio: "shanduan",
 				trigger: { player: "phaseDiscardBegin" },
 				forced: true,
-				locked: false,
 				filter: function (event, player) {
 					var list = event.getParent()._shanduan;
 					return !list || list.length > 0;

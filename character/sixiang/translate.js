@@ -113,6 +113,8 @@ const translates = {
 	std_simashi_prefix: "标",
 	std_guanxing: "标关兴",
 	std_guanxing_prefix: "标",
+	std_huaxin: "标华歆",
+	std_huaxin_prefix: "标",
 	stdwuyou: "武佑",
 	stdwuyou_info: "出牌阶段限一次，你可以与一名角色进行拼点，若你没赢，你本回合视为拥有〖武圣〗。然后拼点没赢的角色视为没赢的角色使用一张【决斗】。",
 	stdqiuyuan: "求援",
@@ -178,6 +180,10 @@ const translates = {
 	stdjici_info: "当你亮出拼点牌时，你可以失去1点体力，令此牌点数视为k。",
 	stdxingfa: "兴伐",
 	stdxingfa_info: "准备阶段，若你的手牌数不小于体力值，你可以对一名其他角色造成1点伤害。",
+	stdyuanqing: "渊清",
+	stdyuanqing_info: "回合结束时，你可以令所有角色依次选择并获得弃牌堆中其于此回合内失去的一张牌。",
+	stdshuchen: "疏陈",
+	stdshuchen_info: "你的回合外，你可以将超出手牌上限的手牌当【桃】使用。",
 };
 
 export default translates;

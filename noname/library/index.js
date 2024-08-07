@@ -11401,6 +11401,27 @@ export class Library {
 				trigger.player.loseMaxHp(trigger.num).source = player;
 			},
 		},
+		_doublegroup_choice: {
+			trigger: {
+				global: "gameStart",
+				player: "enterGame",
+			},
+			firstDo: true,
+			forced: true,
+			popup: false,
+			priority: 25,
+			charlotte: true,
+			filter: function (event, player) {
+				return get.mode() != "guozhan" && get.is.double(player.name1) && !player._groupChosen;
+			},
+			content: function () {
+				"step 0";
+				player._groupChosen = true;
+				player.chooseControl(get.is.double(player.name1, true)).set("prompt", "请选择你的势力");
+				"step 1";
+				player.changeGroup(result.control);
+			},
+		},
 		aozhan: {
 			charlotte: true,
 			mod: {

@@ -3,6 +3,62 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//四象封印·太阴
+	//华歆
+	stdyuanqing: {
+		audio: "yuanqing",
+		trigger: {
+			player: "phaseEnd",
+		},
+		getCards(player) {
+			let cards = [];
+			player.getHistory("lose", evt => {
+				if (evt.cards2 && evt.cards2.some(i => get.position(i) == "d")) {
+					cards.addArray(evt.cards2.filter(i => get.position(i) == "d"));
+				}
+			});
+			return cards;
+		},
+		filter(event, player) {
+			let targets = lib.skill.stdyuanqing.logTarget(event, player);
+			return targets && targets.length;
+		},
+		logTarget(event, player) {
+			return game.filterPlayer(current => {
+				let cards = lib.skill.stdyuanqing.getCards(current);
+				return cards && cards.length;
+			});
+		},
+		async content(event, trigger, player) {
+			for (const target of event.targets) {
+				let cards = lib.skill.stdyuanqing.getCards(target);
+				if (!cards.length) continue;
+				const result = await target.chooseButton(["获得其中一张牌", cards], true).forResult();
+				if (result.bool) {
+					await target.gain(result.links, 'gain2');
+				}
+			}
+		},
+	},
+	stdshuchen: {
+		audio: "shuchen",
+		enable: "chooseToUse",
+		viewAsFilter(player) {
+			return player != _status.currentPhase && player.countCards("h") > player.getHandcardLimit();
+		},
+		filterCard: true,
+		position: "h",
+		selectCard() {
+			const player = get.player();
+			return player.countCards("h") - player.getHandcardLimit();
+		},
+		viewAs: {
+			name: "tao",
+		},
+		prompt: "将超出手牌上限的手牌当桃使用",
+		check(card) {
+			return 15 - get.value(card);
+		},
+	},
 	//玩姬
 	stdqianchong: {
 		mod: {
