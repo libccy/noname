@@ -63,7 +63,7 @@ function collectFilesSync(paths) {
 
 function compareFilesWithCommit(commitHash = "HEAD") {
 	console.log(`exec git diff --name-only ${commitHash}`);
-	exec(`git diff --name-only ${commitHash}`, (error, stdout, stderr) => {
+	exec(`git diff --name-only ${commitHash}`, async (error, stdout) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
 			return;
@@ -73,10 +73,8 @@ function compareFilesWithCommit(commitHash = "HEAD") {
 
 		let filesArray = stdout.split("\n").filter(v => {
 			const filePath = path.join(__dirname, "../", v);
-			if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) {
-				return true;
-			}
-			return false;
+			return fs.existsSync(filePath) && fs.lstatSync(filePath).isFile();
+
 		});
 
 		filesArray.push(...collectFilesSync([joinRootPath("card"), joinRootPath("character"), joinRootPath("extension"), joinRootPath("game"), joinRootPath("layout"), joinRootPath("mode"), joinRootPath("noname"), joinRootPath("theme"), joinRootPath("index.html"), joinRootPath("LICENSE"), joinRootPath("noname-compatible.js"), joinRootPath("noname.js"), joinRootPath("README.md"), joinRootPath("service-worker.js"), joinRootPath("tsconfig.json")]));
@@ -102,7 +100,7 @@ function compareFilesWithCommit(commitHash = "HEAD") {
 			}
 		});
 
-		const result = zip.generate({ type: "nodebuffer" });
+		const result = await zip.generateAsync({ type: "nodebuffer" });
 		fs.writeFileSync(path.join(__dirname, `测试包-${formatDate()}.zip`), result);
 	});
 }
