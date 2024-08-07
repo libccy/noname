@@ -11,7 +11,7 @@ const characterSort = {
 	offline_vtuber: ["vtb_xiaosha", "vtb_xiaoshan", "vtb_xiaotao", "vtb_xiaole", "vtb_xiaojiu"],
 	offline_longyutao: ["drag_guanyu", "drag_caoren", "drag_lvchang"],
 	offline_jingxiang: ["jx_shen_caoren", "jx_shen_liubiao", "jx_sunjian", "jx_zhouyu", "jx_guanyu"],
-	offline_jiudin: ["jd_simayan", "yj_zhonghui", "jd_sb_sunquan", "jd_sb_xiaoqiao", "jd_sb_guanyu", "jd_sb_jiangwei", "jd_sb_daqiao", "jd_sb_menghuo", "jd_sb_yuanshao", "jd_sb_yujin", "jd_sb_sunshangxiang", "jd_sb_liubei", "jd_sb_fazheng", "jd_sb_zhangfei", "jd_jin_simashi"],
+	offline_jiudin: ["jd_sp_yangwan", "jd_sb_huangyueying", "jd_sb_zhaoyun", "jd_sb_ganning", "jd_sb_pangtong", "jd_hanlong", "jd_jin_xiahouhui", "jd_jin_simazhao", "jd_sb_caocao", "jd_sb_sp_zhugeliang", "jd_simayan", "yj_zhonghui", "jd_sb_sunquan", "jd_sb_xiaoqiao", "jd_sb_guanyu", "jd_sb_jiangwei", "jd_sb_daqiao", "jd_sb_menghuo", "jd_sb_yuanshao", "jd_sb_yujin", "jd_sb_sunshangxiang", "jd_sb_liubei", "jd_sb_fazheng", "jd_sb_zhangfei", "jd_jin_simashi"],
 	//offline_others:[""],
 };
 
