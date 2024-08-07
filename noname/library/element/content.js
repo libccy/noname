@@ -6737,7 +6737,7 @@ export const Content = {
 				event.targets[1].equip(link);
 			} else {
 				if (!link.cards?.length) event.targets[0].removeVirtualJudge(link);
-				event.targets[1].addJudge(link);
+				event.targets[1].addJudge(link, link?.cards);
 			}
 			if (link.cards?.length) event.targets[0].$give(link.cards, event.targets[1], false);
 			game.log(event.targets[0], "的", link, "被移动给了", event.targets[1]);
