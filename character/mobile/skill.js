@@ -16865,27 +16865,6 @@ const skills = {
 			player.discardPlayerCard(trigger.player, "e", true, trigger.player.countCards("e"));
 		},
 	},
-	_doublegroup_choice: {
-		trigger: {
-			global: "gameStart",
-			player: "enterGame",
-		},
-		forced: true,
-		charlotte: true,
-		firstDo: true,
-		popup: false,
-		forceLoad:true,
-		filter: function (event, player) {
-			return get.mode() != "guozhan" && get.is.double(player.name1) && !player._groupChosen;
-		},
-		content: function () {
-			"step 0";
-			player._groupChosen = true;
-			player.chooseControl(get.is.double(player.name1, true)).set("prompt", "请选择你的势力");
-			"step 1";
-			player.changeGroup(result.control);
-		},
-	},
 };
 
 export default skills;
