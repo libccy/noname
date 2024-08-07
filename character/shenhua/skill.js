@@ -42,7 +42,7 @@ const skills = {
 				use = false;
 			const cardx = get.autoViewAs({ name: "tiesuo" }, [card]);
 			if (event.type == "phase" && player.canRecast(card)) recast = true;
-			if (game.checkMod(card, player, "unchanged", "cardEnabled2", player) !== false) {
+			if (card && game.checkMod(card, player, "unchanged", "cardEnabled2", player) !== false) {
 				if (backup.filterCard(cardx, player, event)) use = true;
 			}
 			if (!use) return [0, 0];
@@ -62,7 +62,7 @@ const skills = {
 				use = false;
 			const cardx = get.autoViewAs({ name: "tiesuo" }, [card]);
 			if (event.type == "phase" && player.canRecast(card)) recast = true;
-			if (game.checkMod(card, player, "unchanged", "cardEnabled2", player) !== false) {
+			if (card && game.checkMod(card, player, "unchanged", "cardEnabled2", player) !== false) {
 				if (backup.filterCard(cardx, player, event)) use = true;
 			}
 			if (recast && selected == 0) {
