@@ -3228,7 +3228,7 @@ export const Content = {
 		}
 		//规则集中的“回合开始后①”，更新游戏轮数，触发“一轮游戏开始时”
 		var isRound = false;
-		if (!event.skill) {
+		if (lib.onround.every(i => i(event, player))) {
 			isRound = _status.roundSkipped;
 			if (_status.isRoundFilter) {
 				isRound = _status.isRoundFilter(event, player);
