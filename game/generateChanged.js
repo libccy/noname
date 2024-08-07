@@ -17,7 +17,7 @@ function formatDate(date = new Date()) {
 	return `${year}${month}${day}`;
 }
 
-function collectFilesSync(paths) {
+function collectFilesSync(paths, filter = () => true) {
 	const fileList = [];
 
 	function collectFilesInDirectory(directoryPath) {
@@ -28,6 +28,8 @@ function collectFilesSync(paths) {
 
 			for (const entry of entries) {
 				const fullPath = path.join(directoryPath, entry.name);
+				// 添加过滤函数
+				if (!filter(fullPath)) continue;
 
 				if (entry.isDirectory()) {
 					// 如果是目录，则递归进入
@@ -77,7 +79,12 @@ function compareFilesWithCommit(commitHash = "HEAD") {
 
 		});
 
-		filesArray.push(...collectFilesSync([joinRootPath("card"), joinRootPath("character"), joinRootPath("extension"), joinRootPath("game"), joinRootPath("layout"), joinRootPath("mode"), joinRootPath("noname"), joinRootPath("theme"), joinRootPath("index.html"), joinRootPath("LICENSE"), joinRootPath("noname-compatible.js"), joinRootPath("noname.js"), joinRootPath("README.md"), joinRootPath("service-worker.js"), joinRootPath("tsconfig.json")]));
+		const nonameExtensions = ["boss", "cardpile", "coin", "wuxing"].map(name => joinRootPath("extension", name));
+
+		filesArray.push(...collectFilesSync([joinRootPath("card"), joinRootPath("character"), joinRootPath("game"), joinRootPath("layout"), joinRootPath("mode"), joinRootPath("noname"), joinRootPath("theme"), joinRootPath("index.html"), joinRootPath("LICENSE"), joinRootPath("noname-compatible.js"), joinRootPath("noname.js"), joinRootPath("README.md"), joinRootPath("service-worker.js"), joinRootPath("tsconfig.json")]));
+
+		// 单独处理extension目录，使扩展不会被打包
+		filesArray.push(...collectFilesSync([joinRootPath("extension")], path => nonameExtensions.some(extPath => path.startsWith(extPath))));
 
 		filesArray = [...new Set(filesArray.map(v => v.replace(/\\/g, "/")))].sort((a, b) => {
 			if (a > b) return 1;
