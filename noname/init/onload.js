@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { ai } from "../ai/index.js";
 import { get } from "../get/index.js";
-import { lib } from "../library/index.js";
+import { lib, Library, setLibrary } from "../library/index.js"
 import { game } from "../game/index.js";
 import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
@@ -127,7 +127,9 @@ export async function onload() {
 	 * @type {importModeConfig}
 	 */
 	let mode = lib.imported.mode[lib.config.mode];
-	modeMixinElement(mode, lib.element);
+	setLibrary(modeMixinLibrary(mode, lib));
+
+	delete window.noname_character_rank;
 }
 
 async function createBackground() {
@@ -248,7 +250,37 @@ async function tryLoadCustomStyle(id, keys, fallback) {
 /**
  *
  * @param {importModeConfig} mode
+ * @param {Library} lib
+ * @return {Library}
+ */
+function modeMixinLibrary(mode, lib) {
+	const KeptWords = ["element", "game", "ai", "ui", "get", "config", "onreinit", "start", "startBefore"];
+
+	let newElement = modeMixinElement(mode, lib.element);
+	let newLibClass = class extends lib.constructor {
+		banned = lib.config[`${lib.config.mode}_banned`] || [];
+		bannedcards = lib.config[`${lib.config.mode}_bannedcards`] || [];
+		element = newElement;
+		rank = window.noname_character_rank;
+	};
+
+	let newLib = Object.assign(new newLibClass(), lib);
+
+	for (let name in mode) {
+		if (KeptWords.includes(name)) continue;
+		if (newLib[name] == null) newLib[name] = Array.isArray(mode[name]) ? [] : {};
+
+		Object.assign(newLib[name], mode[name]);
+	}
+
+	return newLib;
+}
+
+/**
+ *
+ * @param {importModeConfig} mode
  * @param {Record<string, Object>} element
+ * @return {Record<string, Object>}
  */
 function modeMixinElement(mode, element) {
 	let newElement = { ...element };
@@ -281,17 +313,7 @@ const originProceed2 = async () => {
 	var play = lib.imported.play;
 	delete window.game;
 	var i, j, k;
-	for (i in mode[lib.config.mode].element) {
-		if (!lib.element[i]) lib.element[i] = [];
-		for (j in mode[lib.config.mode].element[i]) {
-			if (j == "init") {
-				if (!lib.element[i].inits) lib.element[i].inits = [];
-				lib.element[i].inits.push(mode[lib.config.mode].element[i][j]);
-			} else {
-				lib.element[i][j] = mode[lib.config.mode].element[i][j];
-			}
-		}
-	}
+	// for (i in mode[lib.config.mode].element)
 	for (i in mode[lib.config.mode].ai) {
 		if (typeof mode[lib.config.mode].ai[i] == "object") {
 			if (ai[i] == undefined) ai[i] = {};
@@ -328,26 +350,7 @@ const originProceed2 = async () => {
 		lib.onover.push(game.onover);
 		delete game.onover;
 	}
-	lib.config.banned = lib.config[lib.config.mode + "_banned"] || [];
-	lib.config.bannedcards = lib.config[lib.config.mode + "_bannedcards"] || [];
 
-	lib.rank = window.noname_character_rank;
-	delete window.noname_character_rank;
-	for (i in mode[lib.config.mode]) {
-		if (i == "element") continue;
-		if (i == "game") continue;
-		if (i == "ai") continue;
-		if (i == "ui") continue;
-		if (i == "get") continue;
-		if (i == "config") continue;
-		if (i == "onreinit") continue;
-		if (i == "start") continue;
-		if (i == "startBefore") continue;
-		if (lib[i] == undefined) lib[i] = Array.isArray(mode[lib.config.mode][i]) ? [] : {};
-		for (j in mode[lib.config.mode][i]) {
-			lib[i][j] = mode[lib.config.mode][i][j];
-		}
-	}
 	if (typeof mode[lib.config.mode].init == "function") {
 		mode[lib.config.mode].init();
 	}
