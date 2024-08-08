@@ -2,6 +2,72 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//九鼎-华歆
+	jdcaozhao: {
+		audio: "caozhao",
+		trigger: { global: "phaseUseBegin" },
+		filter(event, player) {
+			if (
+				lib.inpile.every(i => {
+					return player.getStorage("jdcaozhao").includes(i);
+				})
+			)
+				return false;
+			return event.player.countCards("h") && event.player.getHp() <= player.getHp();
+		},
+		async cost(event, trigger, player) {
+			const target = trigger.player;
+			event.result = await player
+				.choosePlayerCard(target, "h", get.prompt2("jdcaozhao", target))
+				.set("ai", () => {
+					const player = get.player(),
+						target = get.event().getTrigger().player;
+					if (lib.inpile.some(i => !player.getStorage("jdcaozhao").includes(i) && target.getUseValue(i) * get.attitude(player, target) > 0)) return 1 + Math.random();
+					return 0;
+				})
+				.forResult();
+		},
+		logTarget: "player",
+		round: 1,
+		async content(event, trigger, player) {
+			const target = trigger.player;
+			await player.showCards(event.cards, get.translation(player) + "对" + get.translation(target) + "发动了【草诏】");
+			const result = await player
+				.chooseButton(
+					[
+						"草诏：请选择一个基本牌或锦囊牌",
+						[
+							lib.inpile.filter(i => {
+								return !player.getStorage("jdcaozhao").includes(i);
+							}),
+							"vcard",
+						],
+					],
+					true
+				)
+				.set("ai", button => {
+					const player = get.player(),
+						target = get.event().getTrigger().player,
+						sgn = get.sgn(get.attitude(player, target));
+					const cards = get.event().getParent().cards,
+						card = get.autoViewAs({ name: button.link[2] }, cards);
+					if (!target.hasUseTarget(card) || target.getUseValue(card) * sgn <= 0) Math.random();
+					return 5 + target.getUseValue(card) * sgn;
+				})
+				.forResult();
+			if (result.bool) {
+				const name = result.links[0][2];
+				player.markAuto("jdcaozhao", [name]);
+				player.popup(name, "thunder");
+				game.log(player, "声明了", "#y" + get.translation(name));
+				const card = get.autoViewAs({ name: name }, event.cards);
+				let resultx;
+				if (!target.hasUseTarget(card)) resultx = { bool: false };
+				else resultx = await target.chooseUseTarget('###草诏###<div class="text center">使用' + get.translation(card) + "（" + get.translation(event.cards) + "），或失去1点体力</div>", card, false).set("cards", event.cards).forResult();
+				if (!resultx.bool) await target.loseHp();
+			}
+		},
+	},
 	//九鼎-杨婉
 	jdmingxuan: {
 		audio: "spmingxuan",

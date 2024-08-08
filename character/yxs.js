@@ -2821,7 +2821,7 @@ game.import("character", function () {
 					if (result.bool) {
 						event.card = get.autoViewAs({ name: result.links[0].name }, event.cards);
 						player
-							.chooseTarget("神工：选择一个角色装备" + get.translation(event.card), function (card, player, target) {
+							.chooseTarget("神工：选择一个角色装备" + get.translation(event.card) + "（" + get.translation(event.cards) + "）", function (card, player, target) {
 								return target.canEquip(get.event().getParent().card, true);
 							})
 							.set("ai", target => {

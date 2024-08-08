@@ -1230,6 +1230,7 @@ window.noname_character_rank = {
 		"jd_jin_simazhao",
 		"jd_sb_caocao",
 		"jd_sb_sp_zhugeliang",
+		"jd_ol_huaxin",
 	],
 	b: [
 		"liutan",
@@ -2994,6 +2995,7 @@ window.noname_character_rank = {
 			"jd_sb_ganning",
 			"jd_jin_xiahouhui",
 			"jd_jin_simazhao",
+			"jd_ol_huaxin",
 		],
 		junk: [
 			"std_pengyang",

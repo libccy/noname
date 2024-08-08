@@ -600,6 +600,10 @@ const translates = {
 	jd_sp_yangwan_prefix: "鼎",
 	jdmingxuan: "瞑昡",
 	jdmingxuan_info: "锁定技。出牌阶段开始时，你须选择至多X张花色各不相同的手牌（X为未选择过选项一的角色）展示之。然后从你的下家开始，未选择过选项一的角色依次选择获得其中的一张牌，然后选择一项：⒈对你使用一张【杀】。⒉交给你一张牌，然后你摸一张牌。",
+	jd_ol_huaxin: "鼎华歆",
+	jd_ol_huaxin_prefix: "鼎",
+	jdcaozhao: "草诏",
+	jdcaozhao_info: "每轮限一次，体力值小于等于你的角色的出牌阶段开始时，你可以展示其一张手牌，选择一个你本局游戏未以此法声明过的基本牌或普通锦囊牌，然后令其选择一项：1.将此牌当作你声明的牌使用；2.失去1点体力。",
 };
 
 export default translates;
