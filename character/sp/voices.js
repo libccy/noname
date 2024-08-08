@@ -295,6 +295,8 @@ export default {
 	"#tianyu:die": "命数之沙，已尽矣……",
 	"#olfengji1": "取舍有道，待机而赢。",
 	"#olfengji2": "此退彼进，月亏待盈。",
+	"#olxuanhui1": "今日，怕是要辜负温侯美意了。",
+	"#olxuanhui2": "前盖以惑敌，今图穷而匕现。",
 	"#ol_chendeng:die": "可无命，不可无脍……",
 	"#jixian1": "全军出击，速攻敌城。",
 	"#jixian2": "勿以我为念，攻城！",
