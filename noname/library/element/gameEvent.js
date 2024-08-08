@@ -2,10 +2,7 @@ import { _status, game, get, lib, ui } from "../../../noname.js";
 import security from "../../util/security.js";
 import ContentCompiler from "./GameEvent/compilers/dist/ContentCompiler.js";
 import GameEventManager from "./GameEvent/GameEventManager.js";
-export {
-	GameEventManager,
-	ContentCompiler
-};
+export { GameEventManager, ContentCompiler };
 
 /**
  * @implements { PromiseLike<Omit<GameEvent,"then">> }
@@ -35,7 +32,7 @@ export class GameEvent {
 		return event;
 	}
 	get [Symbol.toStringTag]() {
-		return 'GameEvent';
+		return "GameEvent";
 	}
 	/**
 	 * @type { Result }
@@ -264,7 +261,7 @@ export class GameEvent {
 	 */
 	callHandler(type, event, option) {
 		if (this.hasHandler(type))
-			this.getHandler(type).forEach((handler) => {
+			this.getHandler(type).forEach(handler => {
 				if (typeof handler == "function") handler(event, option);
 			});
 		return this;
@@ -315,9 +312,7 @@ export class GameEvent {
 	 * @returns {number}
 	 */
 	pushHandler(type) {
-		return typeof type == "string"
-			? this.getHandler(type).push(...Array.from(arguments).slice(1))
-			: this.getHandler().push(...arguments);
+		return typeof type == "string" ? this.getHandler(type).push(...Array.from(arguments).slice(1)) : this.getHandler().push(...arguments);
 	}
 	putStepCache(key, value) {
 		if (!this._stepCache) {
@@ -378,9 +373,8 @@ export class GameEvent {
 	cancel(all, player, notrigger) {
 		this.untrigger(all, player);
 		let next;
-		if (!notrigger){
-			if (this.player && lib.phaseName.includes(this.name))
-				this.player.getHistory("skipped").add(this.name);
+		if (!notrigger) {
+			if (this.player && lib.phaseName.includes(this.name)) this.player.getHistory("skipped").add(this.name);
 			next = this.trigger(this.name + "Cancelled");
 		}
 		this.finish();
@@ -391,13 +385,14 @@ export class GameEvent {
 		this._neutralized = true;
 		this._neutralize_event = event;
 		const next = this.trigger("eventNeutralized");
-		if (next) next.filterStop = function () {
-			if (!this._neutralized) {
-				delete this.filterStop;
-				return true;
-			}
-			return false;
-		};
+		if (next)
+			next.filterStop = function () {
+				if (!this._neutralized) {
+					delete this.filterStop;
+					return true;
+				}
+				return false;
+			};
 		await next;
 		if (this._neutralized == true) {
 			this.untrigger();
@@ -449,14 +444,6 @@ export class GameEvent {
 		if (this.#inContent) throw new Error("Cannot set content when content is running");
 		this.content = ContentCompiler.compile(content);
 		return this;
-	}
-
-	/**
-	 * @deprecated
-	 * @param {import("./GameEvent/compilers/IContentCompiler.js").EventCompileable} content
-	 */
-	setContents(content) {
-		return this.setContent(content);
 	}
 
 	getLogv() {
@@ -511,12 +498,7 @@ export class GameEvent {
 		let i = 0;
 		const toreturn = forced ? null : {};
 		const historys = [];
-		const filter =
-			typeof level === "function"
-				? level
-				: typeof level === "number"
-					? (evt) => i === level
-					: (evt) => evt.name === level;
+		const filter = typeof level === "function" ? level : typeof level === "number" ? evt => i === level : evt => evt.name === level;
 		while (true) {
 			if (!event) return toreturn;
 			historys.push(event);
@@ -528,7 +510,7 @@ export class GameEvent {
 		}
 	}
 	getTrigger() {
-		return this.getParent((e) => e._trigger, false, true)._trigger;
+		return this.getParent(e => e._trigger, false, true)._trigger;
 	}
 	getRand(name) {
 		if (name) {
@@ -543,14 +525,14 @@ export class GameEvent {
 		const next = new GameEvent(`${this.name}Inserted`, false, this.manager);
 		this.next.push(next);
 		next.setContent(content);
-		Object.entries(map).forEach((entry) => next.set(entry[0], entry[1]));
+		Object.entries(map).forEach(entry => next.set(entry[0], entry[1]));
 		return next;
 	}
 	insertAfter(content, map) {
 		const next = new GameEvent(`${this.name}Inserted`, false, this.manager);
 		this.after.push(next);
 		next.setContent(content);
-		Object.entries(map).forEach((entry) => next.set(entry[0], entry[1]));
+		Object.entries(map).forEach(entry => next.set(entry[0], entry[1]));
 		return next;
 	}
 	backup(skill) {
@@ -726,15 +708,15 @@ export class GameEvent {
 		while (true) {
 			evt = evt.getParent("arrangeTrigger");
 			if (!evt || evt.name != "arrangeTrigger" || !evt.doingList) return this;
-			const doing = evt.doingList.find((i) => i.player === player);
-			const firstDo = evt.doingList.find((i) => i.player === "firstDo");
-			const lastDo = evt.doingList.find((i) => i.player === "lastDo");
+			const doing = evt.doingList.find(i => i.player === player);
+			const firstDo = evt.doingList.find(i => i.player === "firstDo");
+			const lastDo = evt.doingList.find(i => i.player === "lastDo");
 
-			skills.forEach((skill) => {
+			skills.forEach(skill => {
 				const info = lib.skill[skill];
 				if (!info.trigger) return;
 				if (
-					!Object.keys(info.trigger).some((i) => {
+					!Object.keys(info.trigger).some(i => {
 						if (Array.isArray(info.trigger[i])) return info.trigger[i].includes(evt.triggername);
 						return info.trigger[i] === evt.triggername;
 					})
@@ -748,14 +730,10 @@ export class GameEvent {
 				};
 				const map = info.firstDo ? firstDo : info.lastDo ? lastDo : doing;
 				if (!map) return;
-				if (map.doneList.some((i) => i.skill === toadd.skill && i.player === toadd.player)) return;
-				if (map.todoList.some((i) => i.skill === toadd.skill && i.player === toadd.player)) return;
+				if (map.doneList.some(i => i.skill === toadd.skill && i.player === toadd.player)) return;
+				if (map.todoList.some(i => i.skill === toadd.skill && i.player === toadd.player)) return;
 				map.todoList.add(toadd);
-				if (typeof map.player === "string")
-					map.todoList.sort(
-						(a, b) =>
-							b.priority - a.priority || evt.playerMap.indexOf(a) - evt.playerMap.indexOf(b)
-					);
+				if (typeof map.player === "string") map.todoList.sort((a, b) => b.priority - a.priority || evt.playerMap.indexOf(a) - evt.playerMap.indexOf(b));
 				else map.todoList.sort((a, b) => b.priority - a.priority);
 			});
 		}
@@ -768,22 +746,22 @@ export class GameEvent {
 		while (true) {
 			evt = evt.getParent("arrangeTrigger");
 			if (!evt || evt.name != "arrangeTrigger" || !evt.doingList) return this;
-			const doing = evt.doingList.find((i) => i.player == player);
-			const firstDo = evt.doingList.find((i) => i.player == "firstDo");
-			const lastDo = evt.doingList.find((i) => i.player == "lastDo");
+			const doing = evt.doingList.find(i => i.player == player);
+			const firstDo = evt.doingList.find(i => i.player == "firstDo");
+			const lastDo = evt.doingList.find(i => i.player == "lastDo");
 
-			skills.forEach((skill) =>
-				[doing, firstDo, lastDo].forEach((map) => {
+			skills.forEach(skill =>
+				[doing, firstDo, lastDo].forEach(map => {
 					if (!map) return;
-					const toremove = map.todoList.filter((i) => i.skill == skill && i.player == player);
+					const toremove = map.todoList.filter(i => i.skill == skill && i.player == player);
 					if (toremove.length > 0) map.todoList.removeArray(toremove);
 				})
 			);
 		}
 	}
 	/**
-	 * 
-	 * @param { string } name 
+	 *
+	 * @param { string } name
 	 * @returns { GameEvent }
 	 */
 	trigger(name) {
@@ -802,9 +780,7 @@ export class GameEvent {
 		if (!game.players || !game.players.length) return;
 		const event = this;
 		if (event.filterStop && event.filterStop()) return;
-		let start = [_status.currentPhase, event.source, event.player, game.me, game.players[0]].find(
-			(i) => get.itemtype(i) == "player"
-		);
+		let start = [_status.currentPhase, event.source, event.player, game.me, game.players[0]].find(i => get.itemtype(i) == "player");
 		if (!start) return;
 		if (!game.players.includes(start) && !game.dead.includes(start)) start = game.findNext(start);
 		const firstDo = {
@@ -830,20 +806,16 @@ export class GameEvent {
 				listAdded: {},
 				addList(skill) {
 					if (!skill) return;
-					if (Array.isArray(skill)) return skill.forEach((i) => this.addList(i));
+					if (Array.isArray(skill)) return skill.forEach(i => this.addList(i));
 					if (this.listAdded[skill]) return;
 					this.listAdded[skill] = true;
 
 					const info = lib.skill[skill];
-					const list = info.firstDo
-						? firstDo.todoList
-						: info.lastDo
-							? lastDo.todoList
-							: this.todoList;
+					const list = info.firstDo ? firstDo.todoList : info.lastDo ? lastDo.todoList : this.todoList;
 					if (typeof info.getIndex === "function") {
 						const indexedResult = info.getIndex(event, player, name);
 						if (Array.isArray(indexedResult)) {
-							indexedResult.forEach((indexedData) => {
+							indexedResult.forEach(indexedData => {
 								list.push({
 									skill: skill,
 									player: this.player,
@@ -868,10 +840,7 @@ export class GameEvent {
 							priority: get.priority(skill),
 						});
 					}
-					if (typeof list.player == "string")
-						list.sort(
-							(a, b) => b.priority - a.priority || playerMap.indexOf(a) - playerMap.indexOf(b)
-						);
+					if (typeof list.player == "string") list.sort((a, b) => b.priority - a.priority || playerMap.indexOf(a) - playerMap.indexOf(b));
 					else list.sort((a, b) => b.priority - a.priority);
 					allbool = true;
 				},
@@ -882,38 +851,35 @@ export class GameEvent {
 				if (!j.startsWith("hidden:")) notemp.addArray(player.additionalSkills[j]);
 			}
 			Object.keys(player.tempSkills)
-				.filter((skill) => {
+				.filter(skill => {
 					if (notemp.includes(skill)) return false;
 					const expire = player.tempSkills[skill];
 					if (typeof expire === "function") return expire(event, player, name);
 					if (get.objtype(expire) === "object")
-						return roles.some((role) => {
+						return roles.some(role => {
 							if (role !== "global" && player !== event[role]) return false;
 							if (Array.isArray(expire[role])) return expire[role].includes(name);
 							return expire[role] === name;
 						});
 				})
-				.forEach((skill) => {
+				.forEach(skill => {
 					delete player.tempSkills[skill];
 					player.removeSkill(skill);
 				});
 
 			if (lib.config.compatiblemode) {
 				doing.addList(
-					game
-						.expandSkills(player.getSkills("invisible").concat(lib.skill.global))
-						.filter((skill) => {
-							const info = get.info(skill);
-							if (!info || !info.trigger) return false;
-							return roles.some((role) => {
-								if (info.trigger[role] === name) return true;
-								if (Array.isArray(info.trigger[role]) && info.trigger[role].includes(name))
-									return true;
-							});
-						})
+					game.expandSkills(player.getSkills("invisible").concat(lib.skill.global)).filter(skill => {
+						const info = get.info(skill);
+						if (!info || !info.trigger) return false;
+						return roles.some(role => {
+							if (info.trigger[role] === name) return true;
+							if (Array.isArray(info.trigger[role]) && info.trigger[role].includes(name)) return true;
+						});
+					})
 				);
 			} else
-				roles.forEach((role) => {
+				roles.forEach(role => {
 					doing.addList(lib.hook.globalskill[role + "_" + name]);
 					doing.addList(lib.hook[player.playerid + "_" + role + "_" + name]);
 				});
@@ -934,7 +900,7 @@ export class GameEvent {
 			next.triggername = name;
 			next.playerMap = playerMap;
 			event._triggering = next;
-			next.then(() => event._triggering = void 0);
+			next.then(() => (event._triggering = void 0));
 			return next;
 		}
 		return null;
@@ -1012,7 +978,7 @@ export class GameEvent {
 	set step(num) {
 		this.#nextStep = num;
 	}
-	updateStep(){
+	updateStep() {
 		if (this.#nextStep === null) return;
 		this.#step = this.#nextStep;
 		this.#nextStep = null;
@@ -1034,8 +1000,8 @@ export class GameEvent {
 					if (event.#inContent && event.finished) childEvent.resolve();
 				}
 				return Reflect.set(target, p, childEvent);
-			}
-		})
+			},
+		});
 	})();
 	/**
 	 * @type { GameEvent[] }
@@ -1043,45 +1009,55 @@ export class GameEvent {
 	after = [];
 	/**
 	 * @template TResult1
-	 * @template TResult2 
+	 * @template TResult2
 	 * Attaches callbacks for the resolution and/or rejection of the Promise.
 	 * @param { ((event: Omit<GameEvent,"then">) => TResult1 | Promise<TResult1>) | null } [onfulfilled] The callback to execute when the Promise is resolved.
 	 * @param { ((reason: any) => TResult2 | Promise<TResult2>) | null } [onrejected] The callback to execute when the Promise is rejected.
 	 * @returns { Promise<TResult1 | TResult2> } A Promise for the completion of which ever callback is executed.
 	 */
 	then(onfulfilled, onrejected) {
-		return (this.parent ? this.parent.waitNext() : this.start()).then(onfulfilled ? () => {
-			return onfulfilled(new Proxy(this, {
-				get(target, p, receiver){
-					if (p === "then") return void 0;
-					return Reflect.get(target, p, receiver);
-				}
-			}));
-		} : onfulfilled, onrejected);
+		return (this.parent ? this.parent.waitNext() : this.start()).then(
+			onfulfilled
+				? () => {
+						return onfulfilled(
+							new Proxy(this, {
+								get(target, p, receiver) {
+									if (p === "then") return void 0;
+									return Reflect.get(target, p, receiver);
+								},
+							})
+						);
+					}
+				: onfulfilled,
+			onrejected
+		);
 	}
 	/**
 	 * @template TResult
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.* @param { ((reason: any) => TResult | Promise<TResult>) | null } [onrejected] The callback to execute when the Promise is rejected.
+	 * Attaches a callback for only the rejection of the Promise.
+	 * @param onrejected The callback to execute when the Promise is rejected.* @param { ((reason: any) => TResult | Promise<TResult>) | null } [onrejected] The callback to execute when the Promise is rejected.
 	 * @returns { Promise<Omit<GameEvent,"then"> | TResult> } A Promise for the completion of which ever callback is executed.
 	 */
 	catch(onrejected) {
 		return this.then(void 0, onrejected);
 	}
 	/**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
+	 * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+	 * resolved value cannot be modified from the callback.
 	 * @param { (() => void) | null } [onfinally] The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns { Promise<Omit<GameEvent,"then">> } A Promise for the completion of the callback.
+	 * @returns { Promise<Omit<GameEvent,"then">> } A Promise for the completion of the callback.
 	 */
 	finally(onfinally) {
-		return this.then((result)=>{
-			if (onfinally) onfinally();
-			return result;
-		}, (err)=>{
-			if (onfinally) onfinally();
-			throw err;
-		});
+		return this.then(
+			result => {
+				if (onfinally) onfinally();
+				return result;
+			},
+			err => {
+				if (onfinally) onfinally();
+				throw err;
+			}
+		);
 	}
 	/**
 	 * @type { Promise<void> | null }
@@ -1125,7 +1101,7 @@ export class GameEvent {
 							console.error(error);
 						});
 					}
-					await next.finally(() => this.#inContent = false);
+					await next.finally(() => (this.#inContent = false));
 				}
 			} else {
 				if (this._triggered === 1) await trigger("Omitted", 4);
@@ -1137,8 +1113,8 @@ export class GameEvent {
 			}
 		}
 	}
-	
-	async checkSkipped(){
+
+	async checkSkipped() {
 		if (!this.player || !this.player.skipList.includes(this.name)) return false;
 		this.player.skipList.remove(this.name);
 		if (lib.phaseName.includes(this.name)) this.player.getHistory("skipped").add(this.name);
@@ -1157,7 +1133,7 @@ export class GameEvent {
 			let result;
 			while (true) {
 				await _status.pauseManager.waitPause();
-				if (this.manager.tempEvent){
+				if (this.manager.tempEvent) {
 					if (this.manager.tempEvent === this) {
 						this.manager.tempEvent = void 0;
 					} else {
@@ -1171,7 +1147,7 @@ export class GameEvent {
 				if (next.result) result = next.result;
 				this.next.shift();
 			}
-		})().finally(() => this.#waitNext = null);
+		})().finally(() => (this.#waitNext = null));
 		return this.#waitNext;
 	}
 	/**
@@ -1210,7 +1186,7 @@ export class GameEvent {
 		await this;
 		if (params.length == 0) return this.result;
 		if (params.length == 1) return this.result[params[0]];
-		return Array.from(params).map((key) => this.result[key]);
+		return Array.from(params).map(key => this.result[key]);
 	}
 	/**
 	 * 返回result中的bool项
