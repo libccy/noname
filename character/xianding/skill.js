@@ -575,47 +575,54 @@ const skills = {
 	dcwuxie: {
 		audio: 2,
 		trigger: {
-			player: "gainAfter",
-			global: "loseAsyncAfter",
+			player: "phaseUseEnd",
 		},
 		filter(event, player) {
-			const cards = event.getg(player).filter(i => get.owner(i) == player && get.position(i) == "h" && get.tag(i, "damage"));
-			return cards.length;
+			return game.hasPlayer(current => current != player && current.countCards("h"));
 		},
-		usable: 1,
 		async cost(event, trigger, player) {
-			const cards = trigger.getg(player).filter(i => get.owner(i) == player && get.position(i) == "h" && get.tag(i, "damage"));
 			event.result = await player
-				.chooseCardTarget({
-					prompt: get.prompt("dcwuxie"),
-					prompt2: "将获得的任意张伤害牌置于牌堆底并令一名其他角色弃置等量的牌",
-					filterTarget: lib.filter.notMe,
-					filterCard: card => get.event().cards.includes(card),
-					cards: cards,
-					selectCard: [1, cards.length],
-					ai1(card) {
-						return 3 / (Math.abs(get.value(card)) + 0.1);
-					},
-					ai2(target) {
-						const player = get.player();
-						return get.effect(target, { name: "guohe_copy2" }, player, player) * ui.selected.cards.length;
-					},
+				.chooseTarget(get.prompt2("dcwuxie"), function (card, player, target) {
+					return target != player && target.countCards("h");
 				})
-				.set("cards", cards)
+				.set("ai", target => {
+					const player = get.player();
+					return -get.attitude(player, target) * target.countCards("h");
+				})
 				.forResult();
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0],
-				cards = event.cards,
-				num = cards.length;
-			await player.lose(cards, ui.cardPile);
-			for (let i = 0; i < cards.length; i++) {
-				const card = cards[i];
-				card.fix();
-				ui.cardPile.appendChild(card);
+				cards1 = player.getCards("h", card => get.tag(card, "damage")),
+				cards2 = target.getCards("h", card => get.tag(card, "damage"));
+			if (cards1.length) {
+				player.$throw(cards1.length, 1000);
+				await player.lose(cards1, ui.cardPile);
+				for (let i = 0; i < cards1.length; i++) {
+					const card = cards1[i];
+					card.fix();
+					ui.cardPile.appendChild(card);
+				}
+			}
+			if (cards2.length) {
+				target.$throw(cards2.length, 1000);
+				await target.lose(cards2, ui.cardPile);
+				for (let i = 0; i < cards2.length; i++) {
+					const card = cards2[i];
+					card.fix();
+					ui.cardPile.appendChild(card);
+				}
 			}
 			await game.delayx();
-			if (target.countCards("he")) await target.chooseToDiscard(num, "he", true);
+			if (cards1.length != cards2.length) {
+				const recover = cards1.length < cards2.length ? target : player;
+				if (!recover.isDamaged()) return;
+				const result = await player
+					.chooseBool("是否令" + get.translation(recover) + "回复1点体力？")
+					.set("choice", get.recoverEffect(recover, player, player) > 0)
+					.forResult();
+				if (result.bool) await recover.recover();
+			}
 		},
 	},
 	//朱佩兰

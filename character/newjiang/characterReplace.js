@@ -4,6 +4,7 @@ const characterReplaces = {
 	simafu: ["mb_simafu", "simafu", "yj_simafu"],
 	xuangongzhu: ["yj_xuangongzhu", "xuangongzhu"],
 	kebineng: ["kebineng", "ol_kebineng", "ddd_kebineng"],
+	hanlong: ["hanlong", "jd_hanlong"],
 };
 
 export default characterReplaces;
