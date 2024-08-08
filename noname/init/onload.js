@@ -1,10 +1,10 @@
 // @ts-nocheck
-import { ai } from "../ai/index.js";
-import { get } from "../get/index.js";
-import { lib, Library, setLibrary } from "../library/index.js"
-import { game } from "../game/index.js";
+import { ai, setAI } from "../ai/index.js";
+import { get, setGet } from "../get/index.js";
+import { lib, Library, setLibrary } from "../library/index.js";
+import { game, setGame } from "../game/index.js";
 import { _status } from "../status/index.js";
-import { ui } from "../ui/index.js";
+import { setUI, ui } from "../ui/index.js";
 import { gnc } from "../gnc/index.js";
 import { importMode } from "./import.js";
 import { Mutex } from "../util/mutex.js";
@@ -128,6 +128,10 @@ export async function onload() {
 	 */
 	let mode = lib.imported.mode[lib.config.mode];
 	setLibrary(modeMixinLibrary(mode, lib));
+	setGame(modeMixinGeneral(mode, "game", game));
+	setUI(modeMixinGeneral(mode, "ui", ui));
+	setGet(modeMixinGeneral(mode, "get", get));
+	setAI(modeMixinGeneral(mode, "ai", ai));
 
 	delete window.noname_character_rank;
 }
@@ -248,6 +252,26 @@ async function tryLoadCustomStyle(id, keys, fallback) {
 }
 
 /**
+ * @template T
+ * @param {importModeConfig} mode
+ * @param {string} name
+ * @param {T} where
+ * @return {T}
+ */
+function modeMixinGeneral(mode, name, where) {
+	let newItem = Object.assign(new where.constructor(), where);
+
+	if (mode[name]) {
+		for (let key in mode[name]) {
+			let value = mode[name][key];
+			newItem[name] = typeof value == "object" ? Object.assign(newItem[name] ?? {}, value) : value;
+		}
+	}
+
+	return newItem;
+}
+
+/**
  *
  * @param {importModeConfig} mode
  * @param {Library} lib
@@ -297,7 +321,7 @@ function modeMixinElement(mode, element) {
 					if (!target.inits) target.inits = [];
 					target.inits.push(source[key]);
 				} else {
-					target[key] = source[key]
+					target[key] = source[key];
 				}
 			}
 		}
@@ -314,32 +338,10 @@ const originProceed2 = async () => {
 	delete window.game;
 	var i, j, k;
 	// for (i in mode[lib.config.mode].element)
-	for (i in mode[lib.config.mode].ai) {
-		if (typeof mode[lib.config.mode].ai[i] == "object") {
-			if (ai[i] == undefined) ai[i] = {};
-			for (j in mode[lib.config.mode].ai[i]) {
-				ai[i][j] = mode[lib.config.mode].ai[i][j];
-			}
-		} else {
-			ai[i] = mode[lib.config.mode].ai[i];
-		}
-	}
-	for (i in mode[lib.config.mode].ui) {
-		if (typeof mode[lib.config.mode].ui[i] == "object") {
-			if (ui[i] == undefined) ui[i] = {};
-			for (j in mode[lib.config.mode].ui[i]) {
-				ui[i][j] = mode[lib.config.mode].ui[i][j];
-			}
-		} else {
-			ui[i] = mode[lib.config.mode].ui[i];
-		}
-	}
-	for (i in mode[lib.config.mode].game) {
-		game[i] = mode[lib.config.mode].game[i];
-	}
-	for (i in mode[lib.config.mode].get) {
-		get[i] = mode[lib.config.mode].get[i];
-	}
+	// for (i in mode[lib.config.mode].ai)
+	// for (i in mode[lib.config.mode].ui)
+	// for (i in mode[lib.config.mode].game)
+	// for (i in mode[lib.config.mode].get)
 	lib.init.start = mode[lib.config.mode].start;
 	lib.init.startBefore = mode[lib.config.mode].startBefore;
 	if (game.onwash) {
