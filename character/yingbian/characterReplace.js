@@ -5,6 +5,7 @@ const characterReplaces = {
 	yangzhi: ["yangzhi", "old_yangzhi"],
 	zhongyan: ["zhongyan", "clan_zhongyan"],
 	simazhou: ["simazhou", "mb_simazhou"],
+	jin_xiahouhui: ["jin_xiahouhui", "jd_jin_xiahouhui"],
 };
 
 export default characterReplaces;

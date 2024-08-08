@@ -957,15 +957,7 @@ const skills = {
 		trigger: { player: "showCharacterAfter" },
 		hiddenSkill: true,
 		filter: function (event, player) {
-			return (
-				event.toShow.some(name => {
-					return get.character(name, 3).includes("gaoling");
-				}) &&
-				player != _status.currentPhase &&
-				game.hasPlayer(function (current) {
-					return current.isDamaged();
-				})
-			);
+			return event.toShow?.some(i => get.character(i).skills?.includes("gaoling")) && player != _status.currentPhase && game.hasPlayer(current => current.isDamaged());
 		},
 		direct: true,
 		content: function () {
@@ -1904,7 +1896,7 @@ const skills = {
 		hiddenSkill: true,
 		filter: function (event, player) {
 			var target = _status.currentPhase;
-			return event.toShow.includes("jin_simayi") && target && target != player && target.countGainableCards(player, "he") > 0;
+			return event.toShow?.some(i => get.character(i).skills?.includes("buchen")) && target && target != player && target.countGainableCards(player, "he") > 0;
 		},
 		direct: true,
 		content: function () {
@@ -2314,7 +2306,7 @@ const skills = {
 			},
 		},
 		ai: {
-			combo: "chexuan"
+			combo: "chexuan",
 		},
 	},
 	cheliji_sichengliangyu: {
@@ -2554,8 +2546,7 @@ const skills = {
 		forced: true,
 		filter: function (event, player) {
 			return (
-				event.toShow &&
-				event.toShow.includes("jin_yanghuiyu") &&
+				event.toShow?.some(i => get.character(i).skills?.includes("huirong")) &&
 				game.hasPlayer(function (target) {
 					var num = target.countCards("h");
 					return num > target.hp || num < Math.min(5, target.hp);
@@ -2939,7 +2930,7 @@ const skills = {
 		},
 		filter: function (event, player) {
 			var target = _status.currentPhase;
-			return target && target != player && target.isAlive();
+			return player != target && target && target.isAlive() && event.toShow?.some(i => get.character(i).skills?.includes("taoyin"));
 		},
 		check: function (event, player) {
 			return get.attitude(player, _status.currentPhase) < 0;
@@ -3126,7 +3117,7 @@ const skills = {
 		forced: true,
 		hiddenSkill: true,
 		filter: function (event, player) {
-			return event.toShow && event.toShow.includes("jin_xiahouhui");
+			return event.toShow?.some(i => get.character(i).skills?.includes("baoqie"));
 		},
 		content: function () {
 			"step 0";
@@ -3240,7 +3231,7 @@ const skills = {
 		hiddenSkill: true,
 		filter: function (event, player) {
 			var target = _status.currentPhase;
-			return player != target && target && target.isAlive() && event.toShow && event.toShow.includes("jin_simazhao");
+			return player != target && target && target.isAlive() && event.toShow?.some(i => get.character(i).skills?.includes("tuishi"));
 		},
 		content: function () {
 			player.addTempSkill("tuishi2");
@@ -3502,7 +3493,7 @@ const skills = {
 			return _status.currentPhase;
 		},
 		filter: function (event, player) {
-			if (!event.toShow || !event.toShow.includes("jin_wangyuanji")) return false;
+			if (!event.toShow?.some(i => get.character(i).skills?.includes("shiren"))) return false;
 			var target = _status.currentPhase;
 			return target && target != player && target.isAlive() && target.countCards("h") > 0;
 		},
@@ -3728,13 +3719,18 @@ const skills = {
 		},
 		forced: true,
 		filter: function (event, player) {
-			if (player._xijue) return false;
-			if (get.mode() == "guozhan") return event.name == "showCharacter" && event.toShow && event.toShow.includes("gz_zhanghuyuechen");
+			if (get.mode() == "guozhan")
+				return (
+					game
+						.getAllGlobalHistory("everything", evt => {
+							return evt.name == "showCharacter" && evt.toShow?.some(i => get.character(i).skills?.includes("xijue"));
+						})
+						.indexOf(event) == 0
+				);
 			return event.name != "showCharacter" && (event.name != "phase" || game.phaseNumber == 0);
 		},
 		content: function () {
 			player.addMark("xijue", 4);
-			player._xijue = true;
 		},
 		intro: {
 			name2: "爵",
@@ -3953,7 +3949,7 @@ const skills = {
 		forced: true,
 		hiddenSkill: true,
 		filter: function (event, player) {
-			return event.toShow.includes("jin_zhangchunhua") && player != _status.currentPhase;
+			return event.toShow?.some(i => get.character(i).skills?.includes("xuanmu")) && player != _status.currentPhase;
 		},
 		content: function () {
 			player.addTempSkill("xuanmu2");

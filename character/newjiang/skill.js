@@ -1445,12 +1445,12 @@ const skills = {
 		group: "cibei_fullyReady",
 		content: function () {
 			"step 0";
-			player.chooseButton(["###" + get.prompt("cibei") + '###<div class="text center">将一张“刺”置入弃牌堆，并将' + get.translation(trigger.cards.filterInD("d")) + "置入“刺”</div>", player.getExpansions("duwang")]).set("filterButton", button => {
+			player.chooseButton(["###" + get.prompt(event.name) + '###<div class="text center">将一张“刺”置入弃牌堆，并将' + get.translation(trigger.cards.filterInD("d")) + "置入“刺”</div>", player.getExpansions("duwang")]).set("filterButton", button => {
 				return button.link.name != "sha";
 			});
 			"step 1";
 			if (result.bool) {
-				player.logSkill("cibei");
+				player.logSkill(event.name);
 				player.loseToDiscardpile(result.links);
 				player.addToExpansion(trigger.cards.filterInD("d"), "gain2").gaintag.add("duwang");
 				if (game.hasPlayer(current => current.countDiscardableCards(player, "hej") > 0))

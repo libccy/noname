@@ -45,6 +45,9 @@ game.import("character", function () {
 			ps_caozhi: "S2081",
 			ps_shen_machao: "SX015",
 		},
+		characterSubstitute: {
+			jd_sb_sp_zhugeliang: [["sb_zhugeliang", []]],
+		},
 		dynamicTranslate: { ...dynamicTranslates },
 		characterIntro: { ...characterIntros },
 		characterReplace: { ...characterReplaces },

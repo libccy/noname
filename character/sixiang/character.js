@@ -26,7 +26,7 @@ const characters = {
 	std_jiangwan: ["male", "shu", 3, ["stdruwu", "stdchengshi"]],
 	std_maliang: ["male", "shu", 3, ["stdxiemu", "stdnaman"]],
 	old_shen_zhaoyun: ["male", "shen", 2, ["oldjuejing", "oldlonghun"], ["shu"]],
-	std_pengyang: ["male", "shu", 3, ["stdxiaofan", "stdtuishi"]],
+	std_pengyang: ["male", "shu", 3, ["stdxiaofan", "stdtuishi"], ["unseen"]],//不想你，diy牢彭羕
 	std_xushu: ["male", "shu", 3, ["stdwuyan", "stdjujian"], ["border:wei"]],
 	std_xuezong: ["male", "wu", 3, ["stdfunan", "stdxunjie"]],
 	std_liuzhang: ["male", "qun", 3, ["stdyinge", "stdshiren", "stdjuyi"], ["zhu"]],

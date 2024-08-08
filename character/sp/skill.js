@@ -283,6 +283,8 @@ const skills = {
 		},
 		subSkill: {
 			effect: {
+				charlotte: true,
+				onremove: true,
 				markimage: "image/card/handcard.png",
 				intro: { content: "手牌上限+#" },
 				mod: {

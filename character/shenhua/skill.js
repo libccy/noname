@@ -2234,14 +2234,17 @@ const skills = {
 			aiOrder(player, card, num) {
 				if (num <= 0 || player.nzry_shicai_aiOrder || get.itemtype(card) !== "card" || player.hasSkillTag("abnormalDraw")) return num;
 				let type = get.type2(card, false);
-				if (player.hasHistory("useCard", evt => {
-					return get.type2(evt.card, false) == type;
-				})) return num;
+				if (
+					player.hasHistory("useCard", evt => {
+						return get.type2(evt.card, false) == type;
+					})
+				)
+					return num;
 				player.nzry_shicai_aiOrder = true;
 				let val = player.getUseValue(card, true, true);
 				delete player.nzry_shicai_aiOrder;
 				return 20 * val;
-			}
+			},
 		},
 		trigger: { player: ["useCardAfter", "useCardToTargeted"] },
 		prompt2(event, player) {
@@ -2341,8 +2344,8 @@ const skills = {
 			abnormalDraw: true,
 			skillTagFilter: function (player, tag, arg) {
 				if (tag === "abnormalDraw") return !arg || arg === "bottom";
-			}
-		}
+			},
+		},
 	},
 	nzry_mingren: {
 		audio: "nzry_mingren_1",
@@ -3254,13 +3257,10 @@ const skills = {
 		async content(event, trigger, player) {
 			const target = event.target;
 			const { result } = await target
-				.chooseToUse(
-					function (card, player, event) {
-						if (get.name(card) != "sha") return false;
-						return lib.filter.filterCard.apply(this, arguments);
-					},
-					"挑衅：对" + get.translation(player) + "使用一张杀，或令其弃置你的一张牌"
-				)
+				.chooseToUse(function (card, player, event) {
+					if (get.name(card) != "sha") return false;
+					return lib.filter.filterCard.apply(this, arguments);
+				}, "挑衅：对" + get.translation(player) + "使用一张杀，或令其弃置你的一张牌")
 				.set("targetRequired", true)
 				.set("complexSelect", true)
 				.set("filterTarget", function (card, player, target) {
@@ -4417,8 +4417,7 @@ const skills = {
 				const { promise, resolve } = Promise.withResolvers();
 				event.player.send(chooseButton, event.player, cards, event.logged);
 				event.player.wait(async result => {
-					if(result =="ai")
-						result = await switchToAuto();
+					if (result == "ai") result = await switchToAuto();
 
 					resolve(result);
 				}); // 不再 game.resume 防止 game.loop 被重复执行
@@ -4986,7 +4985,7 @@ const skills = {
 		audioname2: {
 			re_sunyi: "gzyinghun_re_sunyi",
 			tw_ol_sunjian: "yinghun_ol_sunjian",
-			boss_sunce: "yinghun_sunce"
+			boss_sunce: "yinghun_sunce",
 		},
 		mod: {
 			aiOrder(player, card, num) {
@@ -5400,7 +5399,7 @@ const skills = {
 			if (get.color(event.card) != "black") return false;
 			return (event.card.name == "nanman" && player != event.player) || (event.card.name == "wanjian" && player != event.player) || (event.card.name == "taoyuan" && player.hp < player.maxHp) || event.card.name == "wugu";
 		},
-		async content() { },
+		async content() {},
 		mod: {
 			targetEnabled(card) {
 				if ((get.type(card) == "trick" || get.type(card) == "delay") && get.color(card) == "black") return false;
@@ -5518,6 +5517,7 @@ const skills = {
 	niepan: {
 		audio: 2,
 		audioname: ["re_pangtong"],
+		audioname2: { sb_pangtong: "sbniepan" },
 		unique: true,
 		enable: "chooseToUse",
 		mark: true,
@@ -5571,6 +5571,7 @@ const skills = {
 	},
 	oldniepan: {
 		audio: "niepan",
+		audioname2: { sb_pangtong: "sbniepan" },
 		unique: true,
 		enable: "chooseToUse",
 		mark: true,
@@ -5767,13 +5768,9 @@ const skills = {
 		audioname: ["boss_lvbu3"],
 		mod: {
 			aiOrder(player, card, num) {
-				if (
-					player.getEquips(1).length ||
-					get.subtype(card, player) !== "equip1" ||
-					!player.hasSkillTag("noe")
-				) return num;
+				if (player.getEquips(1).length || get.subtype(card, player) !== "equip1" || !player.hasSkillTag("noe")) return num;
 				return 10;
-			}
+			},
 		},
 		enable: "phaseUse",
 		usable: 2,
@@ -5810,7 +5807,7 @@ const skills = {
 					if (ui.selected.cards.length) return 0;
 					if (player.hp >= target.hp) return -0.9;
 					if (player.hp <= 2) return -10;
-					return get.effect(player, { name: "losehp"}, player, player);
+					return get.effect(player, { name: "losehp" }, player, player);
 				},
 				target: function (player, target) {
 					if (!ui.selected.cards.length) {
