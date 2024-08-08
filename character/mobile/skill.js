@@ -3698,6 +3698,7 @@ const skills = {
 							player.node.name.innerHTML = get.slimName(first);
 							player.name2 = chosen;
 							player.skin.name = first;
+							player.skin.name2 = chosen;
 							player.classList.add("fullskin2");
 							player.node.avatar2.classList.remove("hidden");
 							player.node.avatar2.setBackground(chosen, "character");
@@ -3769,6 +3770,7 @@ const skills = {
 							player.node.avatar.setBackground(player.name, "character");
 							player.node.name.innerHTML = get.slimName(player.name);
 							delete player.name2;
+							delete player.skin.name2;
 							player.classList.remove("fullskin2");
 							player.node.avatar2.classList.add("hidden");
 							player.node.name2.innerHTML = "";
@@ -3790,7 +3792,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "dieBefore" },
 		filter: function (event, player) {
-			return player.getStorage("mbdanggu").length && event.getParent().name != "giveup" && player.maxHp > 0;
+			return event.getParent().name != "giveup" && player.maxHp > 0;
 		},
 		derivation: "mbmowang_faq",
 		forced: true,
@@ -3801,12 +3803,15 @@ const skills = {
 			if (_status.mbmowang_return && _status.mbmowang_return[player.playerid]) {
 				trigger.cancel();
 			} else {
-				player.logSkill("mbmowang");
-				game.broadcastAll(function () {
-					if (lib.config.background_speak) game.playAudio("die", "shichangshiRest");
-				});
-				trigger.setContent(lib.skill.mbmowang.dieContent);
-				trigger.includeOut = true;
+				if(player.getStorage("mbdanggu").length){
+					player.logSkill("mbmowang");
+					game.broadcastAll(function () {
+						if (lib.config.background_speak) game.playAudio("die", "shichangshiRest");
+					});
+					trigger.setContent(lib.skill.mbmowang.dieContent);
+					trigger.includeOut = true;
+				}
+				else player.changeSkin("mbmowang", "shichangshi_dead");
 			}
 		},
 		ai: {
@@ -3971,6 +3976,7 @@ const skills = {
 								player.node.avatar.setBackground(player.name + "_dead", "character");
 								player.node.name.innerHTML = get.slimName(player.name);
 								delete player.name2;
+								delete player.skin.name2;
 								player.classList.remove("fullskin2");
 								player.node.avatar2.classList.add("hidden");
 								player.node.name2.innerHTML = "";
