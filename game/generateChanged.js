@@ -17,7 +17,7 @@ function formatDate(date = new Date()) {
 	return `${year}${month}${day}`;
 }
 
-function collectFilesSync(paths) {
+function collectFilesSync(paths, filter = (_path) => true) {
 	const fileList = [];
 
 	function collectFilesInDirectory(directoryPath) {
@@ -28,6 +28,8 @@ function collectFilesSync(paths) {
 
 			for (const entry of entries) {
 				const fullPath = path.join(directoryPath, entry.name);
+				// 添加过滤函数
+				if (!filter(fullPath)) continue;
 
 				if (entry.isDirectory()) {
 					// 如果是目录，则递归进入
@@ -63,7 +65,7 @@ function collectFilesSync(paths) {
 
 function compareFilesWithCommit(commitHash = "HEAD") {
 	console.log(`exec git diff --name-only ${commitHash}`);
-	exec(`git diff --name-only ${commitHash}`, (error, stdout, stderr) => {
+	exec(`git diff --name-only ${commitHash}`, (error, stdout) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
 			return;
@@ -73,13 +75,16 @@ function compareFilesWithCommit(commitHash = "HEAD") {
 
 		let filesArray = stdout.split("\n").filter(v => {
 			const filePath = path.join(__dirname, "../", v);
-			if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) {
-				return true;
-			}
-			return false;
+			return fs.existsSync(filePath) && fs.lstatSync(filePath).isFile();
+
 		});
 
-		filesArray.push(...collectFilesSync([joinRootPath("card"), joinRootPath("character"), joinRootPath("extension"), joinRootPath("game"), joinRootPath("layout"), joinRootPath("mode"), joinRootPath("noname"), joinRootPath("theme"), joinRootPath("index.html"), joinRootPath("LICENSE"), joinRootPath("noname-compatible.js"), joinRootPath("noname.js"), joinRootPath("README.md"), joinRootPath("service-worker.js"), joinRootPath("tsconfig.json")]));
+		const nonameExtensions = ["boss", "cardpile", "coin", "wuxing"].map(name => joinRootPath(`extension/${name}`));
+
+		filesArray.push(...collectFilesSync([joinRootPath("card"), joinRootPath("character"), joinRootPath("game"), joinRootPath("layout"), joinRootPath("mode"), joinRootPath("noname"), joinRootPath("theme"), joinRootPath("index.html"), joinRootPath("LICENSE"), joinRootPath("noname-compatible.js"), joinRootPath("noname.js"), joinRootPath("README.md"), joinRootPath("service-worker.js"), joinRootPath("tsconfig.json")]));
+
+		// 单独处理extension目录，使扩展不会被打包
+		filesArray.push(...collectFilesSync([joinRootPath("extension")], path => nonameExtensions.some(extPath => path.startsWith(extPath))));
 
 		filesArray = [...new Set(filesArray.map(v => v.replace(/\\/g, "/")))].sort((a, b) => {
 			if (a > b) return 1;
@@ -102,6 +107,7 @@ function compareFilesWithCommit(commitHash = "HEAD") {
 			}
 		});
 
+		// noinspection JSDeprecatedSymbols
 		const result = zip.generate({ type: "nodebuffer" });
 		fs.writeFileSync(path.join(__dirname, `测试包-${formatDate()}.zip`), result);
 	});

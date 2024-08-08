@@ -3228,7 +3228,7 @@ export const Content = {
 		}
 		//规则集中的“回合开始后①”，更新游戏轮数，触发“一轮游戏开始时”
 		var isRound = false;
-		if (!event.skill) {
+		if (lib.onround.every(i => i(event, player))) {
 			isRound = _status.roundSkipped;
 			if (_status.isRoundFilter) {
 				isRound = _status.isRoundFilter(event, player);
@@ -6681,7 +6681,7 @@ export const Content = {
 							return event.filter(card) && targets[1].canAddJudge(card);
 					  });
 			if (es.length) {
-				dialogArgs.push(`<div class="text center">判定区</div>`);
+				dialogArgs.push(`<div class="text center">装备区</div>`);
 				dialogArgs.push([es, "vcard"]);
 			}
 			if (js.length) {
@@ -6737,7 +6737,7 @@ export const Content = {
 				event.targets[1].equip(link);
 			} else {
 				if (!link.cards?.length) event.targets[0].removeVirtualJudge(link);
-				event.targets[1].addJudge(link);
+				event.targets[1].addJudge(link, link?.cards);
 			}
 			if (link.cards?.length) event.targets[0].$give(link.cards, event.targets[1], false);
 			game.log(event.targets[0], "的", link, "被移动给了", event.targets[1]);

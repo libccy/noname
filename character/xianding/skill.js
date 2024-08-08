@@ -10202,6 +10202,7 @@ const skills = {
 							current.getStat().isSkipped = true;
 						});
 					var evt = player.insertPhase();
+					evt.relatedEvent = trigger.relatedEvent || trigger.getParent(2);
 					if (trigger.skill) evt.skill = trigger.skill;
 					else delete evt.skill;
 					game.broadcastAll(function (player) {
