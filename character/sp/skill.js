@@ -14106,7 +14106,7 @@ const skills = {
 					if (typeof player.storage["olfengji_" + skill] == "number") eff += player.storage["olfengji_" + skill];
 					if (typeof target.storage["olfengji_" + skill] == "number") eff -= target.storage["olfengji_" + skill];
 				}
-				if(get.attitude(player, target)<=0 || target.getSeatNum()<player.getSeatNum()) eff*=-1;
+				if (get.attitude(player, target) <= 0 || target.getSeatNum() < player.getSeatNum()) eff *= -1;
 				sum += eff;
 			}
 			return sum > 0;
@@ -14123,7 +14123,7 @@ const skills = {
 					target.storage[skill] = num;
 					target.markSkill(skill);
 					player.markSkill(skill);
-					game.log(player, "与", target, "交换了", `#g【丰积·${effect=="draw"?"摸牌":"出杀"}】`, "的数值");
+					game.log(player, "与", target, "交换了", `#g【丰积·${effect == "draw" ? "摸牌" : "出杀"}】`, "的数值");
 				}
 			}
 			player.tempBanSkill("olxuanhui", "dieAfter");
