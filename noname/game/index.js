@@ -1400,7 +1400,7 @@ export class Game extends GameCompatible {
 				: {
 						path: args.filter(arg => typeof arg === "string" || typeof arg === "number").join("/"),
 						onError: args.find(arg => typeof arg === "function"),
-				  };
+					};
 
 		const {
 			path = "",
@@ -1583,7 +1583,8 @@ export class Game extends GameCompatible {
 
 		let audioList = get.Audio.skill({ skill, player, info: skillInfo }).fileList;
 		if (special) {
-			if (typeof special == "string") audioList = [special]; //player.logSkill('rende',......,'skill/wusheng1.mp3')[doge]
+			if (typeof special == "string")
+				audioList = [special]; //player.logSkill('rende',......,'skill/wusheng1.mp3')[doge]
 			else if (typeof special == "number" && special <= audioList.length) audioList = [audioList[special - 1]];
 		}
 		return game.tryAudio({ audioList });
@@ -1823,7 +1824,7 @@ export class Game extends GameCompatible {
 			const promise = Promise.resolve((gnc.is.generator(content) ? gnc.of(content) : content)(lib, game, ui, get, ai, _status)).then(content2 => {
 				if (content2.name) {
 					lib.imported[type][content2.name] = content2;
-					delete content2.name;
+					// delete content2.name;
 				}
 			});
 			if (typeof _status.importing == "undefined") _status.importing = {};
@@ -6113,41 +6114,47 @@ export class Game extends GameCompatible {
 	 */
 	loadModeAsync(name, callback = () => {}) {
 		window.game = game;
-		return import(`../../mode/${name}.js`).then(async exports => {
-			// esm模式
-			if (Object.keys(exports).length > 0) {
-				if (typeof exports.default == 'function') {
-					game.import('mode', exports.default);
+		return import(`../../mode/${name}.js`)
+			.then(async exports => {
+				// esm模式
+				if (Object.keys(exports).length > 0) {
+					if (typeof exports.default == "function") {
+						game.import("mode", exports.default);
+					} else {
+						throw new Error(`导入的模式[${name}]格式不正确！`);
+					}
 				}
+				// 普通模式
 				else {
-					throw new Error(`导入的模式[${name}]格式不正确！`);
-				}
-			}
-			// 普通模式
-			else {
-				await new Promise((resolve, reject) => {
-					let script = lib.init.js(`${lib.assetURL}mode`, name, async () => {
-						script?.remove();
-						resolve(null);
-					}, () => {
-						reject(`导入的模式[${name}]不存在！`);
+					await new Promise((resolve, reject) => {
+						let script = lib.init.js(
+							`${lib.assetURL}mode`,
+							name,
+							async () => {
+								script?.remove();
+								resolve(null);
+							},
+							() => {
+								reject(`导入的模式[${name}]不存在！`);
+							}
+						);
 					});
-				});
-			}
-			await Promise.allSettled(_status.importing.mode);
-			if (!lib.config.dev) delete window.game;
-			const content = lib.imported.mode[name];
-			if (!content) throw new Error(`导入的模式[${name}]格式不正确！`);
-			delete lib.imported.mode[name];
-			if (get.is.empty(lib.imported.mode)) {
-				delete lib.imported.mode;
-			}
-			callback(content);
-			return content;
-		}).catch((e) => {
-			console.error(`导入的模式[${name}]不存在！`);
-			return e;
-		});
+				}
+				await Promise.allSettled(_status.importing.mode);
+				if (!lib.config.dev) delete window.game;
+				const content = lib.imported.mode[name];
+				if (!content) throw new Error(`导入的模式[${name}]格式不正确！`);
+				delete lib.imported.mode[name];
+				if (get.is.empty(lib.imported.mode)) {
+					delete lib.imported.mode;
+				}
+				callback(content);
+				return content;
+			})
+			.catch(e => {
+				console.error(`导入的模式[${name}]不存在！`);
+				return e;
+			});
 	}
 	/**
 	 * @param { string } name
@@ -6710,7 +6717,7 @@ export class Game extends GameCompatible {
 			for (let i = 0; i < event.config.size; i++) {
 				ui.window.appendChild(event.nodes[i]);
 			}
-			"step 1";
+			("step 1");
 			let rand1 = event.config.first;
 			if (rand1 == "rand") {
 				rand1 = Math.random() < 0.5;
@@ -6747,7 +6754,7 @@ export class Game extends GameCompatible {
 			}
 			game.delay();
 			lib.init.onfree();
-			"step 2";
+			("step 2");
 			if (event.checkredo()) return;
 			if (event._skiprest) return;
 			if (event.side < 2) {
@@ -6763,7 +6770,7 @@ export class Game extends GameCompatible {
 				event.aiMove();
 				game.delay();
 			}
-			"step 3";
+			("step 3");
 			if (typeof event.fast == "number" && get.time() - event.fast <= 1000) {
 				event.fast = true;
 			} else {
@@ -6798,7 +6805,7 @@ export class Game extends GameCompatible {
 					game.delay();
 				}
 			}
-			"step 4";
+			("step 4");
 			if (event.checkredo()) return;
 			if (event.skipnode) event.skipnode.delete();
 			if (event.replacenode) event.replacenode.delete();
@@ -6817,7 +6824,7 @@ export class Game extends GameCompatible {
 				}
 			}
 			game.delay();
-			"step 5";
+			("step 5");
 			event.prompt("选择" + get.cnNumber(event.config.num) + "名出场武将");
 			event.enemylist = [];
 			for (let i = 0; i < event.avatars.length; i++) {
@@ -6847,7 +6854,7 @@ export class Game extends GameCompatible {
 				event.nodes[i].hide();
 			}
 			game.pause();
-			"step 6";
+			("step 6");
 			event.promptbar.delete();
 			if (ui.cardPileButton) ui.cardPileButton.style.display = "";
 			lib.onresize.remove(event.resize);
@@ -7557,7 +7564,7 @@ export class Game extends GameCompatible {
 							game.reload2();
 							resolve(result);
 						};
-				  }
+					}
 				: (resolve, reject) => {
 						lib.status.reload++;
 						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
@@ -7587,7 +7594,7 @@ export class Game extends GameCompatible {
 							game.reload2();
 							resolve(object);
 						};
-				  }
+					}
 		);
 	}
 	/**
@@ -7641,7 +7648,7 @@ export class Game extends GameCompatible {
 						game.reload2();
 						resolve(event);
 					};
-			  })
+				})
 			: game.getDB(storeName).then(object => {
 					const keys = Object.keys(object);
 					lib.status.reload += keys.length;
@@ -7662,7 +7669,7 @@ export class Game extends GameCompatible {
 								})
 						)
 					);
-			  });
+				});
 	}
 	/**
 	 * @param { string } key

@@ -61,7 +61,7 @@ function modeMixinGeneral(mode, name, where) {
  * @return {void}
  */
 function modeMixinLibrary(mode, lib) {
-	const KeptWords = ["element", "game", "ai", "ui", "get", "config", "onreinit", "start", "startBefore"];
+	const KeptWords = ["name", "element", "game", "ai", "ui", "get", "config", "onreinit", "start", "startBefore"];
 
 	// @ts-ignore
 	lib.element = modeMixinElement(mode, lib.element);

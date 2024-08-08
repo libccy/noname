@@ -143,7 +143,7 @@ export async function onload() {
 				else lib.characterPack[i] = character[i].character;
 			}
 			for (j in character[i]) {
-				if (j == "mode" || j == "forbid") continue;
+				if (j == "mode" || j == "forbid" || j == "name") continue;
 				if (j == "connect") {
 					connectCharacterPack.push(i);
 					continue;
@@ -251,7 +251,7 @@ export async function onload() {
 				}
 			}
 			for (j in card[i]) {
-				if (j == "mode" || j == "forbid") continue;
+				if (j == "name" || j == "mode" || j == "forbid") continue;
 				if (j == "connect") {
 					connectCardPack.push(i);
 					continue;
@@ -367,7 +367,7 @@ export async function onload() {
 					get[j] = play[i].get[j];
 				}
 				for (j in play[i]) {
-					if (j == "mode" || j == "forbid" || j == "init" || j == "element" || j == "game" || j == "get" || j == "ui" || j == "arenaReady") continue;
+					if (j == "name" || j == "mode" || j == "forbid" || j == "init" || j == "element" || j == "game" || j == "get" || j == "ui" || j == "arenaReady") continue;
 					for (k in play[i][j]) {
 						if (j == "translate" && k == i) {
 							// lib[j][k+'_play_config']=play[i][j][k];
