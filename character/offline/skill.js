@@ -497,6 +497,7 @@ const skills = {
 			await player.recoverTo(2);
 			await player.loseMaxHp();
 			await player.addSkills("jdsbbeifa");
+			if(player.isMinCard()) await player.draw(2);
 		},
 		derivation: "jdsbbeifa",
 	},
