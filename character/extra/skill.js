@@ -2319,7 +2319,7 @@ const skills = {
 					list
 				);
 				var cards = list.map(function (name) {
-					var card = game.createCard("qiexie_" + name, "none", get.infoMaxHp(lib.character[name][2]));
+					var card = game.createCard("qiexie_" + name, "none", "none");
 					return card;
 				});
 				player.$gain2(cards);
