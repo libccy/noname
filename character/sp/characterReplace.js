@@ -64,6 +64,7 @@ const characterReplaces = {
 	kanze: ["kanze", "re_kanze"],
 	lvfan: ["lvfan", "sp_lvfan"],
 	dongbai: ["dongbai", "re_dongbai", "jsrg_dongbai"],
+	sp_jiaxu: ["dc_sp_jiaxu", "yj_jiaxu"],
 };
 
 export default characterReplaces;
