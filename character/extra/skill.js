@@ -61,7 +61,7 @@ const skills = {
 				dialog.style.position = "relative";
 				dialog.style.width = "100%";
 				dialog.style.height = "100%";
-				dialog.id = "1!5!";
+				dialog.id = "1！5！";
 				dialog.classList.add("fixed");
 				dialog.classList.add("scroll1");
 				dialog.classList.add("scroll2");
@@ -77,9 +77,9 @@ const skills = {
 				target_img.style.overflow = "visible";
 				target_img.style.boxSizing = "border-box";
 				target_img.style.border = "1px solid black";
-				target_img.style.backgroundColor = "rgb(255,255,255)";
+				target_img.style.backgroundColor = "rgb(255,178,102)";
 				dialog.appendChild(target_img);
-				target_img.style.backgroundImage = "url('image/card/yiwu_" + (target.hasSex("male") ? "male" : "female") + ".png')";
+				target_img.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_" + (target.hasSex("male") ? "male" : "female") + ".png)";
 				target_img.style.backgroundSize = "cover";
 				target_img.style.backgroundRepeat = "no-repeat";
 				target_img.style.backgroundSize = "contain";
@@ -114,7 +114,7 @@ const skills = {
 					num_px.style.left = `${number[i][0] * 6}%`;
 					num_px.style.top = `${number[i][1] * 6}%`;
 					num_px.style.boxSizing = "border-box";
-					num_px.style.backgroundImage = "url('image/card/yiwu_click.png')";
+					num_px.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_click.png)";
 					num_px.style.backgroundSize = "cover";
 					num_px.style.backgroundRepeat = "no-repeat";
 					num_px.style.backgroundSize = "contain";

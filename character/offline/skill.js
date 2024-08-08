@@ -1547,7 +1547,7 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
-				.chooseTarget(get.prompt(event.name.slice(0, -5)), "选择一其他角色，令其展示所有手牌，本阶段对其使用【杀】无距离和次数限制且结算后摸一张牌", (card, player, target) => {
+				.chooseTarget(get.prompt(event.name.slice(0, -5)), "令一名其他角色展示所有手牌，本阶段对其使用的前X张【杀】无距离和次数限制且结算后你摸一张牌（X为其以此法展示的♥手牌数）", (card, player, target) => {
 					return target != player && target.countCards("h");
 				})
 				.set("ai", target => {
@@ -1575,11 +1575,11 @@ const skills = {
 				mod: {
 					targetInRange(card, player, target) {
 						if (card.name !== "sha" || typeof player.storage.jdsbwusheng_effect[target.playerid] !== "number") return;
-						return player.storage.jdsbwusheng_effect[target.playerid] > 0;
+						if (player.storage.jdsbwusheng_effect[target.playerid] > 0) return true;
 					},
 					cardUsableTarget(card, player, target) {
 						if (card.name !== "sha" || typeof player.storage.jdsbwusheng_effect[target.playerid] !== "number") return;
-						return player.storage.jdsbwusheng_effect[target.playerid] > 0;
+						if (player.storage.jdsbwusheng_effect[target.playerid] > 0) return true;
 					},
 				},
 				audio: "sbwusheng",
@@ -1592,9 +1592,10 @@ const skills = {
 				},
 				forced: true,
 				async content(event, trigger, player) {
-					await player.draw();
-					const targets = trigger.targets.filter(target => typeof player.storage.jdsbwusheng_effect[target.playerid] == "number");
-					targets.forEach(target => player.storage.jdsbwusheng_effect[target.playerid]--);
+					const targets = trigger.targets.filter(target => typeof player.storage.jdsbwusheng_effect[target.playerid] == "number" && player.storage.jdsbwusheng_effect[target.playerid] > 0);
+					player.line(targets);
+					await player.draw(targets.length);
+					for (const target of targets) player.storage.jdsbwusheng_effect[target.playerid]--;
 				},
 			},
 		},
