@@ -250,9 +250,8 @@ const skills = {
 	jdlongdan: {
 		audio: "sblongdan",
 		enable: ["chooseToUse", "chooseToRespond"],
-		chargeSkill: true,
 		filter(event, player) {
-			if (event.type == "wuxie" || !player.hasMark("charge")) return false;
+			if (event.type == "wuxie") return false;
 			var marked = player.hasSkill("sblongdan_mark", null, null, false);
 			for (var name of lib.inpile) {
 				if (!marked && name != "sha" && name != "shan") continue;
@@ -290,7 +289,7 @@ const skills = {
 				if (_status.event.getParent().type != "phase") return 1;
 				var player = _status.event.player,
 					card = { name: button.link[2], nature: button.link[3] };
-				if (card.name == "jiu" && Math.min(player.countMark("charge"), player.countCards("h", { type: "basic" })) < 2) return 0;
+				if (card.name == "jiu" && player.countCards("h", { type: "basic" }) < 2) return 0;
 				return player.getUseValue(card, null, true);
 			},
 			backup(links, player) {
@@ -306,7 +305,6 @@ const skills = {
 						return 6 / Math.max(1, get.value(card));
 					},
 					precontent() {
-						player.removeMark("charge", 1);
 						player.addTempSkill("jdlongdan_draw");
 					},
 				};
@@ -323,7 +321,7 @@ const skills = {
 			},
 		},
 		hiddenCard(player, name) {
-			if (get.type(name) != "basic" || !player.hasMark("charge")) return false;
+			if (get.type(name) != "basic") return false;
 			var marked = player.hasSkill("sblongdan_mark", null, null, false);
 			if (!marked && name != "sha" && name != "shan") return false;
 			return player.hasCard(lib.skill.jdlongdan.getFilter(name, player), "hs");
@@ -350,7 +348,6 @@ const skills = {
 			}
 			return { type: "basic" };
 		},
-		group: "jdlongdan_charge",
 		derivation: "jdlongdanx",
 		onremove(player) {
 			player.removeSkill("sblongdan_mark");
@@ -371,21 +368,6 @@ const skills = {
 					const player = map.player;
 					const result = yield player.draw(2);
 					if (Array.isArray(result) && result.length) player.addTempSkill("jdlongdan_mark", ["phaseChange", "phaseAfter"]);
-				},
-			},
-			charge: {
-				audio: "sblongdan",
-				trigger: {
-					global: ["phaseBefore", "phaseEnd"],
-					player: "enterGame",
-				},
-				filter(event, player, name) {
-					if (player.countMark("charge") > 2) return false;
-					return name != "phaseBefore" || game.phaseNumber == 0;
-				},
-				forced: true,
-				content() {
-					player.addMark("charge", 1);
 				},
 			},
 		},
