@@ -608,7 +608,7 @@ function funA() {
 
 ### `Array Content`
 
-在v1.10.15中，新的`Array Content`取代了原有的`Array Content`和成为幽灵的`Async Contents`，成为了目前无名杀解决跳步残留的方法之一
+在v1.10.15中，由于旧的`Array Content`并没有人用，故新的`Array Content`取代了原有的`Array Content`，成为了目前无名杀解决跳步残留的方法之一
 
 比如之前的技能，就可以这么写：
 
