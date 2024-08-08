@@ -160,6 +160,35 @@ export async function cordovaReady() {
 		);
 	};
 
+	/**
+	 * 检查指定的路径是否是一个目录
+	 *
+	 * @param {string} dir - 需要查询的路径
+	 * @param {(result: -1 | 0 | 1) => void} [callback] - 回调函数；接受的参数意义如下:
+	 *  - `-1`: 路径不存在或无法访问
+	 *  - `0`: 路径的内容不是目录
+	 *  - `1`: 路径的内容是目录
+	 * @param {(err: Error) => void} [onerror] - 接收错误的回调函数
+	 * @return {void} - 由于三端的异步需求和历史原因，文件管理必须为回调异步函数
+	 */
+	game.checkDir = function (dir, callback, onerror) {
+		let path = lib.path.join(nonameInitialized, dir);
+
+		window.resolveLocalFileSystemURL(
+			path,
+			entry => {
+				callback?.(entry.isDirectory ? 1 : 0);
+			},
+			error => {
+				if ([FileError.NOT_FOUND_ERR, FileError.NOT_READABLE_ERR].includes(error.code)) {
+					callback?.(-1);
+				} else {
+					onerror?.(new Error(`Code: ${error.code}`));
+				}
+			}
+		);
+	};
+
 	game.readFile = function (filename, callback, onerror) {
 		window.resolveLocalFileSystemURL(
 			nonameInitialized,
