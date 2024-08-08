@@ -1547,22 +1547,24 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
-				.chooseTarget(get.prompt(event.name.slice(0, -5)), "令一名其他角色展示所有手牌，本阶段对其使用的前X张【杀】无距离和次数限制且结算后你摸一张牌（X为其以此法展示的♥手牌数）", (card, player, target) => {
+				.chooseTarget(get.prompt(event.name.slice(0, -5)), "令一名其他角色展示所有手牌，本阶段对其使用的前X张【杀】无距离和次数限制且结算后你摸一张牌（X为其以此法展示的红色手牌数）", (card, player, target) => {
 					return target != player && target.countCards("h");
 				})
 				.set("ai", target => {
 					const player = get.player();
-					return get.effect(target, { name: "sha" }, player, player) * (1 + target.countCards("h", { suit: "heart" }));
+					return get.effect(target, { name: "sha" }, player, player) * (1 + target.countCards("h", { color: "red" }));
 				})
 				.forResult();
 		},
 		async content(event, trigger, player) {
-			const target = event.targets[0],
-				num = target.getCards("h").filter(card => get.suit(card, target) === "heart").length;
+			const target = event.targets[0];
 			await target.showHandcards();
 			if (get.mode() !== "identity" || player.identity !== "nei") player.addExpose(0.25);
-			player.addTempSkill("jdsbwusheng_effect", { player: "phaseUseAfter" });
-			player.storage.jdsbwusheng_effect[target.playerid] = num;
+			const num = target.countCards("h", { color: "red" });
+			if (num > 0) {
+				player.addTempSkill("jdsbwusheng_effect", { player: "phaseUseAfter" });
+				player.storage.jdsbwusheng_effect[target.playerid] = num;
+			}
 		},
 		group: "sbwusheng_wusheng",
 		subSkill: {
