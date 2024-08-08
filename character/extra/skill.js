@@ -120,7 +120,7 @@ const skills = {
 					num_px.style.backgroundSize = "contain";
 					num_px.style.backgroundRepeat = "no-repeat";
 					num_px.style.backgroundPosition = "center center";
-					num_px.addEventListener("click", a => {
+					num_px.addEventListener(lib.config.touchscreen ? "touchend" : "click", a => {
 						event._result = {
 							bool: true,
 							hurt: a.target.id,
