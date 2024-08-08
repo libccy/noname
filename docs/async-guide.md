@@ -606,9 +606,9 @@ function funA() {
 
 只不过这一点过于复杂，本章节不会阐述，但额外章节会考虑讲述这一方面的内容
 
-### `Async Contents`
+### `Array Content`
 
-回到v1.10.6，当 `Async Content` 出来之后，我们就希望将无名杀本体的 `Step Content` 全部用新的写法代替；但 `Async Content` 有个缺点：并不支持跳步，这使得一些必须要跳步的情况无法用 `Async Content` 代替。因此，`Async Contents` 被提上了议程
+在v1.10.15中，新的`Array Content`取代了原有的`Array Content`和成为幽灵的`Async Contents`，成为了目前无名杀解决跳步残留的方法之一
 
 比如之前的技能，就可以这么写：
 
@@ -632,9 +632,7 @@ function funA() {
 }
 ```
 
-由于 `Async Contents`的强大兼容性，在v1.10.15后 `Async Content` 和 `Step Content` 会在运行时被封装为 `Async Contents`，从而更好地进行生命周期管理。
-
-> 在v1.10.6时，`Async Contents` 出了个差错：`Async Content`在存在一个不明显的Bug，这个Bug不会对普通的 `Async Content` 造成任何影响，但对基于 `Async Content` 的 `Async Contents` 造成了非常大的影响，使得 `Async Contents` 完全无法发挥原有的功能。故 `Async Contents` 在当时遭到了废弃。
+由于 `Array Content`的强大兼容性，在v1.10.15后 `Async Content` 和 `Step Content` 会在运行时被封装为 `Array Content`，从而更好地进行生命周期管理
 
 ---
 
