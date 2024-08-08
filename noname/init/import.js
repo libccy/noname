@@ -1,5 +1,7 @@
-import { game } from "../game/index.js";
-import { lib } from "../library/index.js";
+// noinspection ES6PreferShortImport
+
+import { game } from "../game/index.js"
+import { lib, Library } from "../library/index.js"
 
 /**
  * @param {string} name - 卡牌包名
@@ -167,4 +169,74 @@ async function createEmptyExtension(name) {
 			audio: [],
 		},
 	};
+}
+
+/**
+ *
+ * @param {importModeConfig} mode
+ * @return {Promise<void>}
+ */
+async function legacyMixin(mode) {
+}
+
+/**
+ *
+ * @param {importModeConfig} mode
+ * @return {typeof Library}
+ */
+function legacyMixinLibrary(mode) {
+	// mixin element;
+	let newElement = legacyMixinElement(mode, lib.element);
+
+
+}
+
+/**
+ *
+ * @param {importModeConfig} mode
+ * @param {Object} originElement
+ * @return {Object}
+ */
+function legacyMixinElement(mode, originElement = {}) {
+	let newElement = { ...originElement };
+
+	if (mode.element) {
+		let modeElements = Object.entries(mode.element);
+
+		for (let [name, source] of modeElements) {
+			if (!newElement[name]) newElement[name] = [];
+
+			let target = newElement[name];
+			// 如果是原生的类型
+			// 水乎震撼不想拆了，总之就是直接覆盖
+			if (Array.isArray(target) || target.constructor == null || target.constructor === Object) {
+				for (let key in source) {
+					if (key === "init") {
+						if (!target.inits) target.inits = [];
+						target.inits.push(source[key]);
+					} else {
+						target[key] = source[key];
+					}
+				}
+			} else {
+				target = newElement[name] = class extends target {
+					constructor(...props) {
+						super(...props);
+
+						if (source.init) {
+							if (!this.inits) this.inits = [];
+							this.inits.push(source.init);
+						}
+					}
+				};
+
+				for (let key in source) {
+					if (key === "init") continue;
+					target.prototype[key] = source[key];
+				}
+			}
+		}
+	}
+
+	return newElement;
 }
