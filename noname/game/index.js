@@ -6108,30 +6108,27 @@ export class Game extends GameCompatible {
 	}
 	/**
 	 * @param { string } name
-	 * @param { (exports: importModeConfig) => any } callback
-	 * @returns { Promise<importModeConfig> }
+	 * @param { (exports: importModeConfig) => any } [callback]
+	 * @param { (error: unknown) => any } [onerror]
 	 */
-	loadModeAsync(name, callback = () => {}) {
-		window.game = game;
-		return import(`../../mode/${name}.js`).then(async exports => {
+	loadModeAsync(name, callback, onerror = e => console.error(e)) {
+		let promise = (async () => {
+			window.game = game;
+			const exports = await import(`../../mode/${name}.js`);
 			// esm模式
 			if (Object.keys(exports).length > 0) {
-				if (typeof exports.default == 'function') {
-					game.import('mode', exports.default);
-				}
-				else {
+				if (typeof exports.default !== 'function') {
 					throw new Error(`导入的模式[${name}]格式不正确！`);
 				}
+				game.import('mode', exports.default);
 			}
 			// 普通模式
 			else {
 				await new Promise((resolve, reject) => {
-					let script = lib.init.js(`${lib.assetURL}mode`, name, async () => {
+					let script = lib.init.js(`${lib.assetURL}mode`, name, () => {
 						script?.remove();
 						resolve(null);
-					}, () => {
-						reject(`导入的模式[${name}]不存在！`);
-					});
+					}, e => reject(e.error));
 				});
 			}
 			await Promise.allSettled(_status.importing.mode);
@@ -6142,12 +6139,10 @@ export class Game extends GameCompatible {
 			if (get.is.empty(lib.imported.mode)) {
 				delete lib.imported.mode;
 			}
-			callback(content);
 			return content;
-		}).catch((e) => {
-			console.error(`导入的模式[${name}]不存在！`);
-			return e;
-		});
+		})();
+		if (callback) promise = promise.then(callback, onerror);
+		return promise;
 	}
 	/**
 	 * @param { string } name

@@ -2706,10 +2706,10 @@ export const Content = {
 		event.goto(0);
 	},
 	async loadMode(event) {
-		await game.loadModeAsync(event.mode).then(exports => {
+		await game.loadModeAsync(event.mode, exports => {
 			event.result = exports;
 			if (lib.imported.mode[event.mode]) delete lib.imported.mode[event.mode];
-		}).catch(_ => {});
+		});
 	},
 	forceOver: function () {
 		"step 0";
