@@ -613,7 +613,7 @@ const skills = {
 			}
 			const evt = event.getParent(2);
 			if (!evt || evt.name != "useCard" || evt.player == player) return false;
-			return !event.result.bool;
+			return event.respondTo && !event.result.bool;
 		},
 		forced: true,
 		async content(event, trigger, player) {
