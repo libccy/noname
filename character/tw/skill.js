@@ -930,7 +930,9 @@ const skills = {
 						evtx.name != "useCard" ||
 						!event.source.hasHistory("lose", evt => {
 							if (evt.getParent() != evtx) return false;
-							return Object.keys(evt.gaintag_map || {}).includes("twkuiduan_card");
+							for (var i in evt.gaintag_map) {
+								if (evt.gaintag_map[i].includes("twkuiduan_card")) return true;
+							}
 						})
 					)
 						return false;

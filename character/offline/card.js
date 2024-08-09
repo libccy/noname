@@ -192,13 +192,13 @@ const cards = {
 			},
 		},
 	},
-	jingbian: {
+	xingbian: {
 		audio: true,
 		fullskin: true,
 		derivation: "yj_tianchuan",
 		type: "equip",
 		subtype: "equip6",
-		skills: ["jingbian_skill"],
+		skills: ["xingbian_skill"],
 		async content(event, trigger, player) {
 			if (!event.card.subtypes) {
 				const choices = [];
@@ -207,7 +207,7 @@ const cards = {
 				}
 				if (!choices.length) return;
 				const result = await player.chooseControl(choices)
-					.set("prompt", "请选择置入【荆鞭】的装备栏")
+					.set("prompt", "请选择置入【刑鞭】的装备栏")
 					.set("ai", () => _status.event.controls.randomGet())
 					.forResult();
 				event.card.subtypes = [result.control];

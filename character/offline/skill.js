@@ -9213,26 +9213,26 @@ const skills = {
 		async content(event, trigger, player) {
 			let cards = [], num = trigger.name == "die" ? 1 : 2;
 			while (cards.length < num) {
-				const card = game.createCard2("jingbian", "spade", 9);
+				const card = game.createCard2("xingbian", "spade", 9);
 				cards.push(card);
 			}
 			if (cards.length) await player.gain(cards, "gain2");
 		},
 		mod: {
 			ignoredHandcard(card, player) {
-				if (card.name == "jingbian") {
+				if (card.name == "xingbian") {
 					return true;
 				}
 			},
 			cardDiscardable(card, player, name) {
-				if (name == "phaseDiscard" && card.name == "jingbian") {
+				if (name == "phaseDiscard" && card.name == "xingbian") {
 					return false;
 				}
 			},
 			globalTo(from, to, num) {
 				let count = 0;
 				game.filterPlayer(current => {
-					count += current.countCards("ej", card => card.name == "jingbian");
+					count += current.countCards("ej", card => card.name == "xingbian");
 				});
 				return num + count;
 			},
@@ -9244,17 +9244,17 @@ const skills = {
 			source: "damageSource",
 		},
 		filter(event, player) {
-			if (!player.countCards("h", card => card.name == "jingbian")) return false;
+			if (!player.countCards("h", card => card.name == "xingbian")) return false;
 			return game.hasPlayer(current => current.hasEnabledSlot());
 		},
 		async cost(event, trigger, player) {
 			event.result = await player.chooseCardTarget({
 				filterCard(card) {
-					return card.name == "jingbian";
+					return card.name == "xingbian";
 				},
 				position: "h",
 				prompt: get.prompt("psqianjing"),
-				prompt2: "将手牌中的一张【荆鞭】置入一名角色装备区",
+				prompt2: "将手牌中的一张【刑鞭】置入一名角色装备区",
 				filterTarget(card, player, target) {
 					return target.hasEnabledSlot();
 				},
@@ -9277,7 +9277,7 @@ const skills = {
 			}
 			if (!choices.length) return;
 			const result = await player.chooseControl(choices)
-				.set("prompt", `请选择为${get.translation(target)}置入【荆鞭】的装备栏`)
+				.set("prompt", `请选择为${get.translation(target)}置入【刑鞭】的装备栏`)
 				.set("ai", () => _status.event.controls.randomGet())
 				.forResult();
 			const card = get.autoViewAs(cardx);
@@ -9292,21 +9292,21 @@ const skills = {
 				enable: "chooseToUse",
 				filter(event, player) {
 					if (!event.filterCard(get.autoViewAs({ name: "sha" }, "unsure"), player, event)) return false;
-					if (player.countCards("h", card => card.name == "jingbian")) return true;
+					if (player.countCards("h", card => card.name == "xingbian")) return true;
 					return game.hasPlayer(current => {
-						return current.countCards("ej", card => card.name == "jingbian");
+						return current.countCards("ej", card => card.name == "xingbian");
 					});
 				},
 				delay: false,
 				locked: false,
-				prompt: "将场上或你手牌中的一张【荆鞭】当作【杀】使用",
+				prompt: "将场上或你手牌中的一张【刑鞭】当作【杀】使用",
 				filterTarget(card, player, target) {
 					let event = _status.event,
 						evt = event;
 					if (event._backup) evt = event._backup;
 					const pos = target == player ? "hej" : "ej";
 					return target.countCards(pos, card => {
-						if (card.name != "jingbian") return false;
+						if (card.name != "xingbian") return false;
 						let sha = get.autoViewAs({ name: "sha", storage: { qianjing: true } }, [card]);
 						if (evt.filterCard(sha, player, event)) {
 							return game.hasPlayer(function (current) {
@@ -9317,10 +9317,10 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					var evt = event.getParent(2), target = event.targets[0];
-					evt.set("jingbian", true);
+					evt.set("xingbian", true);
 					const result = await player.choosePlayerCard(true, target, target == player ? "hej" : "ej").set("filterButton", function (button) {
 						var card = button.link;
-						return card.name == "jingbian";
+						return card.name == "xingbian";
 					}).forResult();
 					game.broadcastAll(
 						function (result, name) {
@@ -9347,7 +9347,7 @@ const skills = {
 				ai: {
 					respondSha: true,
 					skillTagFilter(player, tag) {
-						var func = (card) => card.name == "jingbian";
+						var func = (card) => card.name == "xingbian";
 						return game.hasPlayer(function (current) {
 							return current.countCards(current == player ? "hej" : "ej", func);
 						});
@@ -9392,7 +9392,7 @@ const skills = {
 		animationColor: "metal",
 		logTarget(event, player) {
 			return game.filterPlayer(current => {
-				return current.countCards("ej", card => card.name == "jingbian");
+				return current.countCards("ej", card => card.name == "xingbian");
 			});
 		},
 		filter(event, player) {
@@ -9409,7 +9409,7 @@ const skills = {
 			player.awakenSkill(event.name);
 			const lose_list = [];
 			for (const target of event.targets) {
-				lose_list.push([target, target.getCards("ej", card => card.name == "jingbian")]);
+				lose_list.push([target, target.getCards("ej", card => card.name == "xingbian")]);
 			}
 			await game.loseAsync({
 				lose_list: lose_list,
@@ -9485,12 +9485,12 @@ const skills = {
 			},
 		},
 	},
-	jingbian_skill: {
+	xingbian_skill: {
 		equipSkill: true,
 		mod: {
 			attackRange: function (player, distance) {
 				return (
-					distance + player.countCards("e", card => card.name == "jingbian")
+					distance + player.countCards("e", card => card.name == "xingbian")
 				);
 			},
 		},
@@ -9511,12 +9511,12 @@ const skills = {
 			return game.filterPlayer(current => get.nameList(current).includes("yj_tianchuan"));
 		},
 		filter(event, player) {
-			const targets = lib.skill.jingbian_skill.logTarget(event, player);
+			const targets = lib.skill.xingbian_skill.logTarget(event, player);
 			return targets && targets.length;
 		},
 		async content(event, trigger, player) {
 			for (const target of event.targets) {
-				const result = await target.chooseTarget(`荆鞭：为${get.translation(player)}指定塔塔开目标`, true, function (card, player, targetx) {
+				const result = await target.chooseTarget(`刑鞭：为${get.translation(player)}指定塔塔开目标`, true, function (card, player, targetx) {
 					return targetx != _status.event.owner;
 				})
 					.set("owner", player)
@@ -9524,9 +9524,9 @@ const skills = {
 						return get.distance(_status.event.owner, target) + 1;
 					}).forResult();
 				if (result.bool) {
-					if (!player.getStorage("jingbian_skill").length) {
+					if (!player.getStorage("xingbian_skill").length) {
 						player.when("phaseJieshuBegin").then(() => {
-							const args = player.storage.jingbian_skill.shift();
+							const args = player.storage.xingbian_skill.shift();
 							let damage = true;
 							if (player.getHistory("useCard", evt => evt.card.name == "sha" && evt.targets?.includes(args[1])).length) damage = false;
 							if (player.getHistory("sourceDamage", evt => evt.player == args[1]).length) damage = false;
@@ -9535,17 +9535,17 @@ const skills = {
 								args[0].line(player, "green");
 								player.damage(player);
 							}
-							if (player.storage.jingbian_skill.length) event.redo();
+							if (player.storage.xingbian_skill.length) event.redo();
 							else {
-								player.unmarkSkill("jingbian_skill");
-								delete player.storage.jingbian_skill;
+								player.unmarkSkill("xingbian_skill");
+								delete player.storage.xingbian_skill;
 							}
 						});
-						player.storage.jingbian_skill = [];
+						player.storage.xingbian_skill = [];
 					}
 					target.line(result.targets[0], "green");
-					player.storage.jingbian_skill.push([target, result.targets[0]]);
-					player.markSkill("jingbian_skill");
+					player.storage.xingbian_skill.push([target, result.targets[0]]);
+					player.markSkill("xingbian_skill");
 				}
 			}
 		},
