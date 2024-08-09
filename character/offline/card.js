@@ -23,16 +23,16 @@ const cards = {
 		type: "trick",
 		enable: true,
 		filterTarget: lib.filter.notMe,
-		selectTarget(){
+		selectTarget() {
 			return game.countGroup();
 		},
-		complexTarget:true,
-		contentBefore(){
-			if(!targets.length){
+		complexTarget: true,
+		contentBefore() {
+			if (!targets.length) {
 				event.finish();
 				return;
 			}
-			var num = game.countPlayer(),cards = get.cards(num);
+			var num = game.countPlayer(), cards = get.cards(num);
 			game.cardsGotoOrdering(cards).relatedEvent = event.getParent();
 			var dialog = ui.create.dialog("荆襄盛世", cards, true);
 			_status.dieClose.push(dialog);
@@ -167,7 +167,7 @@ const cards = {
 			}, event.preResult);
 			game.addVideo("cardDialog", null, event.preResult);
 			"step 1"
-			if(event.remained.length) player.gain(event.remained, "gain2");
+			if (event.remained.length) player.gain(event.remained, "gain2");
 		},
 		//ai简略，待补充
 		ai: {
@@ -189,6 +189,46 @@ const cards = {
 			tag: {
 				draw: 1,
 				multitarget: 1,
+			},
+		},
+	},
+	jingbian: {
+		audio: true,
+		fullskin: true,
+		derivation: "yj_tianchuan",
+		type: "equip",
+		subtype: "equip6",
+		skills: ["jingbian_skill"],
+		async content(event, trigger, player) {
+			if (!event.card.subtypes) {
+				const choices = [];
+				for (let i = 0; i <= 5; i++) {
+					if (player.hasEquipableSlot(i)) choices.push(`equip${i}`);
+				}
+				if (!choices.length) return;
+				const result = await player.chooseControl(choices)
+					.set("prompt", "请选择置入【荆鞭】的装备栏")
+					.set("ai", () => _status.event.controls.randomGet())
+					.forResult();
+				event.card.subtypes = [result.control];
+			}
+			if (
+				!event.card?.cards.some(card => {
+					return get.position(card, true) !== "o";
+				})
+			) {
+				await event.target.equip(event.card);
+			}
+		},
+		ai: {
+			equipValue: function (card, player) {
+				if (get.nameList(player).includes("yj_tianchuan")) {
+					return 5;
+				}
+				return 0;
+			},
+			basic: {
+				equipValue: 5,
 			},
 		},
 	},

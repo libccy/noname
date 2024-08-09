@@ -18,6 +18,7 @@ const characters = {
 	jx_guanyu: ["male", "shu", 4, ["jxwusheng", "jsrgguanjue", "nuzhan"]],
 	jx_shen_caoren: ["male", "shen", 4, ["jxjushou"], ["wei"]],
 	jx_shen_liubiao: ["male", "shen", 2, ["jxxiongju", "jxfujing", "jxyongrong"], ["qun"]],
+	yj_tianchuan: ["female", "qun", 3 ,["pshuying", "psqianjing", "psbianchi"]],
 	yj_zhonghui: ["male", "wei", 4, ["psmouchuan", "pszizhong", "psjizun", "psqingsuan"], ["zhu"]],
 	yj_ehuan: ["male", "qun", 5, ["psdiwan", "pssuiluan", "psconghan"], ["doublegroup:shu:qun"]],
 	yj_zhouji: ["female", "wu", 3, ["psyanmou", "pszhanyan", "psyuhuo"], ["name:周|null"]],
