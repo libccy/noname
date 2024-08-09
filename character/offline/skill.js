@@ -1621,7 +1621,7 @@ const skills = {
 				const bool = !target.countCards("he")
 					? false
 					: await target
-							.chooseToGive(player, "he", `交给${get.translation(player)}一张牌，本回合当你受到其的【杀】的造成的伤害时，防止之`)
+							.chooseToGive(player, "he", `交给${get.translation(player)}一张牌，本回合当你首次受到其的【杀】的造成的伤害时，防止之`)
 							.set("ai", card => {
 								const player = get.event("player"),
 									target = get.event().getParent().player;
@@ -1644,7 +1644,7 @@ const skills = {
 				charlotte: true,
 				onremove: true,
 				intro: {
-					content: "本回合$受到你的【杀】的造成的伤害时，你防止之",
+					content: "本回合$首次受到你的【杀】的造成的伤害时，你防止之",
 				},
 				trigger: {
 					global: "damageBegin4",
@@ -1657,6 +1657,7 @@ const skills = {
 				popup: false,
 				async content(event, trigger, player) {
 					trigger.cancel();
+					player.unmarkAuto(event.name, [trigger.player]);
 				},
 			},
 		},
