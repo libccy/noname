@@ -7637,6 +7637,14 @@ export class Player extends HTMLDivElement {
 			this.classList.remove("linked");
 		}
 	}
+	/**
+	 * 能否对target使用card
+	 * @param { Card | VCard | object | string } card
+	 * @param { Player } target
+	 * @param { false } [distance] false：无距离限制
+	 * @param { boolean | GameEvent } [includecard] 是否受使用次数限制，可以填入用于检测的事件
+	 * @returns 
+	 */
 	canUse(card, target, distance, includecard) {
 		if (typeof card == "string") card = { name: card, isCard: true };
 		var info = get.info(card);
@@ -7651,12 +7659,26 @@ export class Player extends HTMLDivElement {
 		if (distance !== false && !lib.filter.targetInRange(card, this, target)) return false;
 		return lib.filter[includecard ? "targetEnabledx" : "targetEnabled"](card, this, target);
 	}
+	/**
+	 * 场上是否存在能对其使用card的目标
+	 * @param { Card | VCard | object | string } card
+	 * @param { false } [distance] false：无距离限制
+	 * @param { boolean | GameEvent } [includecard] 是否受使用次数限制，可以填入用于检测的事件
+	 * @returns { boolean }
+	 */
 	hasUseTarget(card, distance, includecard) {
 		var player = this;
 		return game.hasPlayer(function (current) {
 			return player.canUse(card, current, distance, includecard);
 		});
 	}
+	/**
+	 * 场上是否存在收益为正的目标
+	 * @param { Card | VCard | object | string } card
+	 * @param { false } [distance] false：无距离限制
+	 * @param { boolean | GameEvent } [includecard] 是否受使用次数限制，可以填入用于检测的事件
+	 * @returns { boolean }
+	 */
 	hasValueTarget(card, distance, includecard) {
 		if (typeof card == "string") {
 			card = { name: card, isCard: true };
@@ -7698,6 +7720,13 @@ export class Player extends HTMLDivElement {
 		}
 		return min > 0;
 	}
+	/**
+	 * card使用价值
+	 * @param { Card | VCard | object | string } card
+	 * @param { false } [distance] false：无距离限制
+	 * @param { boolean | GameEvent } [includecard] 是否受使用次数限制，可以填入用于检测的事件
+	 * @returns { number } 无可选或正收益目标返回0
+	 */
 	getUseValue(card, distance, includecard) {
 		if (typeof card == "string") {
 			card = { name: card, isCard: true };
