@@ -9,7 +9,7 @@ import { gnc } from "../gnc/index.js";
 import { importMode } from "./import.js";
 import { Mutex } from "../util/mutex.js";
 import { load } from "../util/config.js";
-import { loadMode } from "./loading.js";
+import { loadCharacter, loadMode } from "./loading.js";
 
 export async function onload() {
 	const libOnload = lib.onload;
@@ -136,6 +136,7 @@ export async function onload() {
 
 		var connectCharacterPack = [];
 		var connectCardPack = [];
+		/*
 		for (i in character) {
 			if (character[i].character) {
 				const characterPack = lib.characterPack[i];
@@ -220,6 +221,7 @@ export async function onload() {
 				}
 			}
 		}
+		*/
 		var connect_avatar_list = [];
 		for (var i in lib.character) {
 			connect_avatar_list.push(i);
@@ -384,14 +386,16 @@ export async function onload() {
 			}
 		}
 
-		lib.connectCharacterPack = [];
-		lib.connectCardPack = [];
+		// lib.connectCharacterPack = [];
+		// lib.connectCardPack = [];
+		/*
 		for (var i = 0; i < lib.config.all.characters.length; i++) {
 			var packname = lib.config.all.characters[i];
 			if (connectCharacterPack.includes(packname)) {
 				lib.connectCharacterPack.push(packname);
 			}
 		}
+		 */
 		for (var i = 0; i < lib.config.all.cards.length; i++) {
 			var packname = lib.config.all.cards[i];
 			if (connectCardPack.includes(packname)) {
@@ -497,7 +501,14 @@ export async function onload() {
 		game.loop();
 	};
 
+	lib.connectCharacterPack = [];
+	lib.connectCardPack = [];
+
 	loadMode(lib.imported.mode[lib.config.mode]);
+	for (let character of Object.values(lib.imported.character)) {
+		loadCharacter(character);
+	}
+
 	await originProceed2();
 }
 

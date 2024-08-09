@@ -14,6 +14,122 @@ import { Mutex } from "../util/mutex.js";
 import { load } from "../util/config.js";
 
 /**
+ * @param {importCharacterConfig} character
+ */
+export function loadCharacter(character) {
+	let name = character.name;
+
+	if (character.character) {
+		const characterPack = lib.characterPack[name];
+		if (characterPack) {
+			Object.assign(characterPack, character.character);
+		} else {
+			lib.characterPack[name] = character.character;
+		}
+	}
+
+	// 摆了
+	for (let key in character) {
+		let value = character[key];
+
+		switch (key) {
+			case "name":
+			case "mode":
+			case "forbid":
+				break;
+			case "connect":
+				// @ts-ignore
+				lib.connectCharacterPack.push(name);
+				break;
+			case "character":
+				if (!lib.config.characters.includes(name) && lib.config.mode !== "connect") {
+					if (lib.config.mode === "chess" && get.config("chess_mode") === "leader" && get.config("chess_leader_allcharacter")) {
+						for (let charaName in value) {
+							// @ts-ignore
+							lib.hiddenCharacters.push(charaName);
+						}
+					} else if (lib.config.mode !== "boss" || name !== "boss") {
+						break;
+					}
+				}
+			// [falls through]
+			default:
+				if (Array.isArray(lib[key]) && Array.isArray(value)) {
+					lib[key].addArray(value);
+					break;
+				}
+
+				for (let key2 in value) {
+					let value2 = value[key2];
+
+					if (key === "character") {
+						if (lib.config.forbidai_user && lib.config.forbidai_user.includes(key2)) {
+							lib.config.forbidai.add(key2);
+						}
+						if (Array.isArray(value2)) {
+							if (!value2[4]) {
+								value2[4] = [];
+							}
+							if (value2[4].includes("boss") || value2[4].includes("hiddenboss")) {
+								lib.config.forbidai.add(key2);
+							}
+							for (let skill of value2[3]) {
+								lib.skilllist.add(skill);
+							}
+						} else {
+							if (value2.isBoss || value2.isHiddenBoss) {
+								lib.config.forbidai.add(key2);
+							}
+							if (value2.skills) {
+								for (let skill of value2.skills) {
+									lib.skilllist.add(skill);
+								}
+							}
+						}
+					}
+
+					if (key === "skill" && key2[0] === "_" && (lib.config.mode !== "connect" ? !lib.config.characters.includes(name) : !character.connect)) {
+						continue;
+					}
+
+					if (key === "translate" && key2 === name) {
+						lib[key][`${key2}_character_config`] = value2;
+					} else {
+						if (lib[key][key2] == null) {
+							if (key === "skill" && !value2.forceLoad && lib.config.mode === "connect" && !character.connect) {
+								lib[key][key2] = {
+									nopop: value2.nopop,
+									derivation: value2.derivation,
+								};
+							} else if (key === "character") {
+								lib.character[key2] = value2;
+							} else {
+								// @ts-ignore
+								Object.defineProperty(lib[key], key2, Object.getOwnPropertyDescriptor(character[key], key2));
+							}
+							if (key === "card" && lib[key][key2].derivation) {
+								// @ts-ignore
+								if (!lib.cardPack.mode_derivation) {
+									// @ts-ignore
+									lib.cardPack.mode_derivation = [key2];
+								} else {
+									// @ts-ignore
+									lib.cardPack.mode_derivation.push(key2);
+								}
+							}
+						} else if (Array.isArray(lib[key][key2]) && Array.isArray(value2)) {
+							lib[key][key2].addArray(value2);
+						} else {
+							console.log(`duplicated ${key} in character ${name}:\n${key2}:\nlib.${key}.${key2}`, lib[key][key2], `\ncharacter.${name}.${key}.${key2}`, value2);
+						}
+					}
+				}
+				break;
+		}
+	}
+}
+
+/**
  * @param {importModeConfig} mode
  */
 export function loadMode(mode) {
