@@ -1314,7 +1314,7 @@ const skills = {
 						att = get.attitude(player, target);
 					if (get.type(card, null, target) == "equip" && (get.attitude(player, target) > 0 || get.recoverEffect(target, player, player) > 0)) return get.recoverEffect(target, player, player) * 20 + att / 114514;
 					if (get.type(card, null, target) != "equip") {
-						if (target.getHp() >= player.getHp()) return get.effect(target, { name: "losehp" }, player, player) * 20 - att / 114514;
+						if (target.getHp() !== player.getHp()) return get.effect(target, { name: "losehp" }, player, player) * 20 - att / 114514;
 						return get.effect(target, { name: "draw" }, player, player);
 					}
 					return 0;
@@ -1333,7 +1333,7 @@ const skills = {
 							} = await target.chooseUseTarget(card, true, "nopopup");
 							if (bool) await target.recover();
 						}
-					} else if (target.getHp() >= player.getHp()) await target.loseHp();
+					} else if (target.getHp() !== player.getHp()) await target.loseHp();
 				}
 			}
 		},

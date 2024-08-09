@@ -195,7 +195,7 @@ export async function boot() {
 			//但这种方式只允许修改game的文件读写函数。
 			if (typeof window.initReadWriteFunction == "function") {
 				const g = {};
-				const ReadWriteFunctionName = ["download", "readFile", "readFileAsText", "writeFile", "removeFile", "getFileList", "ensureDirectory", "createDir", "removeDir"];
+				const ReadWriteFunctionName = ["download", "checkFile", "checkDir", "readFile", "readFileAsText", "writeFile", "removeFile", "getFileList", "ensureDirectory", "createDir", "removeDir"];
 				ReadWriteFunctionName.forEach(prop => {
 					Object.defineProperty(g, prop, {
 						configurable: true,

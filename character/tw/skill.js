@@ -566,7 +566,7 @@ const skills = {
 		},
 	},
 	//幻姜维
-	huan_jiangwei_A: {
+	twqinghan: {
 		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
@@ -629,7 +629,7 @@ const skills = {
 				},
 			},
 		},
-		group: "huan_jiangwei_A_compare",
+		group: "twqinghan_compare",
 		subSkill: {
 			compare: {
 				trigger: {
@@ -656,7 +656,7 @@ const skills = {
 			},
 		},
 	},
-	huan_jiangwei_B: {
+	twzhihuan: {
 		audio: 2,
 		trigger: {
 			source: "damageBegin2",
@@ -688,7 +688,7 @@ const skills = {
 			else choiceList[1] = '<span style="opacity:0.5;">' + choiceList[1] + "</span>";
 			const control = await player
 				.chooseControl(choices, "cancel2")
-				.set("prompt", get.prompt("huan_jiangwei_B"))
+				.set("prompt", get.prompt("twzhihuan"))
 				.set("choiceList", choiceList)
 				.set("ai", () => {
 					const choices = get.event("controls").slice();

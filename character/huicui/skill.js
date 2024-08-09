@@ -1257,12 +1257,12 @@ const skills = {
 			if (!result.bool) return;
 			const target = result.targets[0];
 			player.logSkill("dczhenrao", target);
-			await target.damage();
-			await game.delayx();
 			if (!player.storage.dczhenrao) {
 				player.when({ global: "phaseAfter" }).then(() => player.unmarkSkill("dczhenrao"));
 			}
 			player.markAuto("dczhenrao", target);
+			await target.damage();
+			await game.delayx();
 		},
 		intro: {
 			content: "已以此法对$造成过伤害",

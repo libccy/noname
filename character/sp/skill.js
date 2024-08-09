@@ -283,6 +283,8 @@ const skills = {
 		},
 		subSkill: {
 			effect: {
+				charlotte: true,
+				onremove: true,
 				markimage: "image/card/handcard.png",
 				intro: { content: "手牌上限+#" },
 				mod: {
@@ -14088,56 +14090,44 @@ const skills = {
 		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },
 		filter(event, player) {
-			if (!player.hasSkill("olfengji_sha") && !player.hasSkill("olfengji_draw")) return false;
-			return game.hasPlayer(target => {
+			const targets = lib.skill.olxuanhui.logTarget(event, player);
+			return targets && targets.length;
+		},
+		logTarget(event, player) {
+			return game.filterPlayer(target => {
 				if (target == player) return false;
-				return target.hasSkill("olfengji_sha") || target.hasSkill("olfengji_draw");
+				return player.hasSkill("olfengji_sha") && target.hasSkill("olfengji_sha") || player.hasSkill("olfengji_draw") && target.hasSkill("olfengji_draw");
 			});
 		},
-		async cost(event, trigger, player) {
-			event.result = await player
-				.chooseTarget(get.prompt("olxuanhui"), "与一名其他角色交换〖丰积〗效果", (card, player, target) => {
-					if (target == player) return false;
-					return target.hasSkill("olfengji_sha") || target.hasSkill("olfengji_draw");
-				})
-				.set("ai", target => {
-					const player = get.event().player,
-						list = ["draw", "sha"];
-					return (
-						get.sgn(get.attitude(player, target)) *
-						(list.reduce((sum, skill) => {
-							if (typeof player.storage["olfengji_" + skill] == "number") sum += player.storage["olfengji_" + skill];
-							return sum;
-						}, 0) -
-							list.reduce((sum, skill) => {
-								if (typeof target.storage["olfengji_" + skill] == "number") sum += target.storage["olfengji_" + skill];
-								return sum;
-							}, 0))
-					);
-				})
-				.forResult();
+		check(event, player) {
+			const targets = lib.skill.olxuanhui.logTarget(event, player), list = ["sha", "draw"];
+			let sum = 0;
+			for (const target of targets) {
+				let eff = 0;
+				for (const skill of list) {
+					if (typeof player.storage["olfengji_" + skill] == "number") eff += player.storage["olfengji_" + skill];
+					if (typeof target.storage["olfengji_" + skill] == "number") eff -= target.storage["olfengji_" + skill];
+				}
+				if (get.attitude(player, target) <= 0 || target.getSeatNum() < player.getSeatNum()) eff *= -1;
+				sum += eff;
+			}
+			return sum > 0;
 		},
 		async content(event, trigger, player) {
-			const target = event.targets[0],
-				list = ["draw", "sha"];
-			const players = [player.storage["olfengji_" + list[0]] || 0, player.storage["olfengji_" + list[1]] || 0];
-			const targets = [target.storage["olfengji_" + list[0]] || 0, target.storage["olfengji_" + list[1]] || 0];
-			for (let i = 0; i <= 1; i++) {
-				const skill = "olfengji_" + list[i];
-				if (!players[i]) target.removeSkill(skill);
-				else {
-					target.addTempSkill(skill, "roundStart");
-					target.storage[skill] = players[i];
+			for (const target of event.targets) {
+				const list = ["draw", "sha"];
+				for (const effect of list) {
+					const skill = `olfengji_${effect}`;
+					if (typeof player.storage[skill] != "number") continue;
+					if (typeof target.storage[skill] != "number") continue;
+					const num = player.storage[skill];
+					player.storage[skill] = target.storage[skill];
+					target.storage[skill] = num;
 					target.markSkill(skill);
-				}
-				if (!targets[i]) player.removeSkill(skill);
-				else {
-					player.addTempSkill(skill, "roundStart");
-					player.storage[skill] = targets[i];
 					player.markSkill(skill);
+					game.log(player, "与", target, "交换了", `#g【丰积·${effect == "draw" ? "摸牌" : "出杀"}】`, "的数值");
 				}
 			}
-			game.log(player, "与", target, "交换了", "#g【丰积】", "的数值");
 			player.tempBanSkill("olxuanhui", "dieAfter");
 		},
 	},
@@ -17001,7 +16991,12 @@ const skills = {
 				}
 				return 1;
 			},
-			result: { player: 1 },
+			result: {
+				player: function (player) {
+					if (_status.event.dying) return get.attitude(player, _status.event.dying);
+					return 1;
+				},
+			},
 		},
 	},
 	youlong_true: { charlotte: true },

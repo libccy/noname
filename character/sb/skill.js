@@ -2571,7 +2571,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: ["damageBegin3", "damageBegin4"] },
 		filter: function (event, player, name) {
-			if (!player.hasSkill("sbguanxing")) return false;
+			if (!player.hasSkill("sbguanxing") && !player.hasSkill("jdguanxing")) return false;
 			const num = player.countCards("s", card => card.hasGaintag("sbguanxing"));
 			if (name == "damageBegin3" && !num) return true;
 			if (name == "damageBegin4" && num) return true;
