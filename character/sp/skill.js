@@ -17122,8 +17122,10 @@ const skills = {
 		content: function () {
 			player.line(game.players, "green");
 			game.addGlobalSkill("spyanhuo_damage");
-			if (!_status.yanhuo) _status.yanhuo = 0;
-			_status.yanhuo++;
+			game.broadcastAll(() => {
+				if (!_status.yanhuo) _status.yanhuo = 0;
+				_status.yanhuo++;
+			});
 		},
 		subSkill: {
 			damage: {

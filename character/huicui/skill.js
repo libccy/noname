@@ -10119,6 +10119,7 @@ const skills = {
 							player.chooseControl(list).set("ai", function () {
 								var controls = _status.event.controls;
 								if (controls.includes("cslilu")) return "cslilu";
+								if (controls.includes("zhichi")) return "zhichi";
 								return controls[0];
 							});
 						}

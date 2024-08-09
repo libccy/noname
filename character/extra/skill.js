@@ -613,7 +613,7 @@ const skills = {
 			}
 			const evt = event.getParent(2);
 			if (!evt || evt.name != "useCard" || evt.player == player) return false;
-			return !event.result.bool;
+			return event.respondTo && !event.result.bool;
 		},
 		forced: true,
 		async content(event, trigger, player) {
@@ -2319,7 +2319,7 @@ const skills = {
 					list
 				);
 				var cards = list.map(function (name) {
-					var card = game.createCard("qiexie_" + name, "none", get.infoMaxHp(lib.character[name][2]));
+					var card = game.createCard("qiexie_" + name, "none", "none");
 					return card;
 				});
 				player.$gain2(cards);

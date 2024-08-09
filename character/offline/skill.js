@@ -1854,7 +1854,7 @@ const skills = {
 					return get.event().targets.includes(target);
 				})
 				.set("ai", target => {
-					const player = get.event(player),
+					const player = get.event("player"),
 						att = get.attitude(player, target);
 					if (target.maxHp <= 1) return 114514119810 * get.sgn(-att);
 					if (player.identity == "nei" && target != player) return 0;
@@ -2425,12 +2425,16 @@ const skills = {
 			},
 		},
 		trigger: {
-			player: "useCard",
+			player: ["useCard", "respond"]
 		},
 		filter(event, player) {
 			const num = get.info("jsrgjuxia").countSkill(player) - 2;
-			if (!num || get.type(event.card) == "equip") return false;
-			return player.getRoundHistory("useCard", evt => get.name(evt.card) == get.name(event.card)).indexOf(event) == 0;
+			if (num <= 0 || get.type(event.card) == "equip") return false;
+			return !player.getRoundHistory("useCard", evt => {
+				get.name(evt.card) == get.name(event.card) && evt != event;
+			}).length && !player.getRoundHistory("useCard", evt => {
+				get.name(evt.card) == get.name(event.card) && evt != event;
+			}).length;
 		},
 		forced: true,
 		async content(event, trigger, player) {

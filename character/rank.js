@@ -1196,7 +1196,7 @@ window.noname_character_rank = {
 		"huan_weiyan",
 		"huan_simayi",
 		"huan_zhaoyun",
-		"huan_guojia",
+		"huan_zhugeguo",
 		"huan_jiangwei",
 		"budugen",
 		"jsrg_dongbai",
@@ -1233,6 +1233,7 @@ window.noname_character_rank = {
 		"jd_ol_huaxin",
 	],
 	b: [
+		"liuxiecaojie",
 		"liutan",
 		"huan_zhugeliang",
 		"huan_zhanghe",
@@ -2095,7 +2096,7 @@ window.noname_character_rank = {
 			"yj_zhonghui",
 			"bianyue",
 			"budugen",
-			"huan_guojia",
+			"huan_zhugeguo",
 			"huan_simayi",
 			"dc_sb_zhangxiu",
 			"ol_jiangwan",
@@ -2998,6 +2999,7 @@ window.noname_character_rank = {
 			"jd_ol_huaxin",
 		],
 		junk: [
+			"liuxiecaojie",
 			"std_pengyang",
 			"shen_huangzhong",
 			"ol_peixiu",
