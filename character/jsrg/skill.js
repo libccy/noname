@@ -9195,10 +9195,10 @@ const skills = {
 						}
 					},
 					cardRespondable: function (card, player) {
-						return lib.skill.jsrgfendi.cardEnabled.apply(this, arguments);
+						return lib.skill.jsrgfendi_blocker.mod.cardEnabled.apply(this, arguments);
 					},
 					cardSavable: function (card, player) {
-						return lib.skill.jsrgfendi.cardEnabled.apply(this, arguments);
+						return lib.skill.jsrgfendi_blocker.mod.cardEnabled.apply(this, arguments);
 					},
 				},
 			},

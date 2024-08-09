@@ -2553,6 +2553,7 @@ const skills = {
 				var source = ui[event.index == 0 ? "discardPile" : "cardPile"].childNodes;
 				var list = [];
 				for (var i = 0; i < source.length; i++) list.push(source[i]);
+				if(event.index == 0) list.reverse();
 				player.chooseButton(["请选择要移动的卡牌", list], true).ai = get.buttonValue;
 			}
 			"step 2";
@@ -2608,7 +2609,7 @@ const skills = {
 			}
 			"step 6";
 			if (event.index2 != 2) {
-				var node = ui[event.index == 0 ? "discardPile" : "cardPile"];
+				var node = ui[event.index2 == 0 ? "discardPile" : "cardPile"];
 				if (event.target1) {
 					var next = event.target1.lose(card, event.position);
 					if (event.way == "顶部") next.insert_card = true;
