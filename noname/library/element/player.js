@@ -6788,13 +6788,8 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 返回某些牌是否能进入玩家的判定区
-	 *
 	 * @overload
-	 * @param { string } card
-	 * @returns { boolean }
-	 *
-	 * @overload
-	 * @param { Card } card
+	 * @param { string | Card } card
 	 * @returns { boolean }
 	 */
 	canAddJudge(card) {
@@ -8501,13 +8496,9 @@ export class Player extends HTMLDivElement {
 		});
 	}
 	/**
+	 * 添加临时技能
 	 * @overload
-	 * @param { string } skill
-	 * @param { SkillTrigger | string | (event:GameEventPromise, player:Player, name:string) => boolean } [expire]
-	 * @param { boolean } [checkConflict]
-	 *
-	 * @overload
-	 * @param { string[] } skill 技能名数组
+	 * @param { string | string[] } skill 技能名(数组)
 	 * @param { SkillTrigger | string | (event:GameEventPromise, player:Player, name:string) => boolean } [expire]
 	 * @param { boolean } [checkConflict]
 	 */
@@ -9725,15 +9716,10 @@ export class Player extends HTMLDivElement {
 		return false;
 	}
 	/**
-	 * 返回玩家是否有某个牌名的牌
-	 *
-	 * @overload
-	 * @param { Card } name
-	 * @returns { boolean }
-	 *
+	 * 
 	 * @overload
 	 * @param { string } name
-	 * @returns { boolean}
+	 * @returns { boolean} 返回玩家判定区是否有某(种牌名的)牌
 	 */
 	hasJudge(name) {
 		if (name && typeof name === "object") {
