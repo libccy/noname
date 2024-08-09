@@ -1477,8 +1477,7 @@ const skills = {
 	},
 	//杨奉
 	mbxuetu: {
-		audio: 2,
-		audioname: ["re_yangfeng"],
+		audio: 4,
 		enable: "phaseUse",
 		usable: 2,
 		filter(event, player) {
@@ -1488,10 +1487,12 @@ const skills = {
 		zhuanhuanji2(skill, player) {
 			return player && player.countMark("mbxuetu_status") !== 1;
 		},
+		logAudio(event, player) {
+			return player.countMark("mbxuetu_status") == 2 ? get.rand(3, 4) : get.rand(1, 2);
+		},
 		position: "he",
 		onremove: ["mbxuetu", "mbxuetu_status"],
 		derivation: ["mbxuetu_achieve", "mbxuetu_fail"],
-		
 		chooseButton: {
 			dialog() {
 				const dialog = ui.create.dialog("###血途###请选择要执行的项");
@@ -1685,9 +1686,6 @@ const skills = {
 					game.log(player, "使命失败");
 					player.awakenSkill("mbweiming");
 					player.storage.mbxuetu_status = 2;
-					game.broadcastAll(player => {
-						player.tempname.add("re_yangfeng");
-					}, player);
 					await game.delayx();
 				},
 			},
@@ -5870,7 +5868,6 @@ const skills = {
 			if (result.bool) {
 				var target = result.targets[0];
 				event.target = target;
-				player.logSkill("yijin", target);
 				var kane = lib.skill.yijin.getKane(player);
 				var choiceList = kane.map(i => {
 					return '<div class="skill">【' + get.translation(lib.translate[i + "_ab"] || get.translation(i).slice(0, 2)) + "】</div>" + "<div>" + get.skillInfoTranslation(i, player) + "</div>";
@@ -15738,7 +15735,8 @@ const skills = {
 				game.delay();
 			}
 		},
-		audio: true,
+		audio: 5,
+		logAudio: 1,
 		enable: "phaseUse",
 		usable: 1,
 		chooseButton: {
@@ -16048,16 +16046,16 @@ const skills = {
 		},
 	},
 	pcaudio_wolong_card: {
-		audio: true,
+		audio: "xinfu_pingcai2.mp3",
 	},
 	pcaudio_fengchu_card: {
-		audio: true,
+		audio: "xinfu_pingcai3.mp3",
 	},
 	pcaudio_shuijing_card: {
-		audio: true,
+		audio: "xinfu_pingcai4.mp3",
 	},
 	pcaudio_xuanjian_card: {
-		audio: true,
+		audio: "xinfu_pingcai5.mp3",
 	},
 	yizan_use: {
 		audio: "yizan_respond_shan",
