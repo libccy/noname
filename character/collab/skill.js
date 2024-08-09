@@ -24,8 +24,12 @@ const skills = {
 			const player = get.player();
 			return "将性别变更为" + (Boolean(player.storage["dcqixin"]) ? "刘协--男" : "曹节--女");
 		},
-		content() {
+		*content(event, map) {
+			const player = map.player;
 			player.changeZhuanhuanji("dcqixin");
+			player.storage.dcqixin_hp[1 - Boolean(player.storage["dcqixin"])] = player.hp;
+			const hp = player.storage.dcqixin_hp[0 + Boolean(player.storage["dcqixin"])];
+			if (player.hp != hp) yield player.changeHp(hp - player.hp);
 			player.tempBanSkill(
 				"dcqixin",
 				{
@@ -47,6 +51,9 @@ const skills = {
 		mark: true,
 		zhuanhuanji: true,
 		markimage: "image/character/liuxie.jpg",
+		init(player) {
+			if (_status.gameStarted && !player.storage.dcqixin_hp) player.storage.dcqixin_hp = [player.maxHp, player.maxHp];
+		},
 		$zhuanhuanji(skill, player) {
 			const image = Boolean(player.storage[skill]) ? "caojie" : "liuxie";
 			const mark = player.marks[skill];
@@ -54,8 +61,9 @@ const skills = {
 		},
 		intro: {
 			content(storage, player) {
-				if (player.storage.dcqixin_die) return "当前性别：" + (Boolean(!storage) ? "刘协--男" : "曹节--女");
-				return "出牌阶段，你可以将性别变更为" + (Boolean(storage) ? "刘协--男" : "曹节--女");
+				const str = "当前性别：" + (Boolean(!storage) ? "刘协--男" : "曹节--女");
+				const hp = player.storage.dcqixin_hp || [player.maxHp, player.maxHp];
+				return player.storage.dcqixin_die ? str : "<li>" + str + "<br><li>" + (Boolean(storage) ? "刘协" : "曹节") + "体力值：" + hp[1 - Boolean(storage)];
 			},
 		},
 		ai: {
@@ -83,7 +91,8 @@ const skills = {
 				},
 			},
 		},
-		group: "dcqixin_die",
+		derivation: "dcqixin_faq",
+		group: ["dcqixin_die", "dcqixin_mark"],
 		subSkill: {
 			die: {
 				audio: "dcqixin",
@@ -106,7 +115,23 @@ const skills = {
 						sex
 					);
 					game.log(player, "将性别变为了", "#y" + get.translation(sex) + "性");
-					player.recoverTo(player.maxHp);
+					player.storage.dcqixin_hp[1 - Boolean(player.storage["dcqixin"])] = player.hp;
+					const hp = player.storage.dcqixin_hp[0 + Boolean(player.storage["dcqixin"])];
+					if (player.hp != hp) player.changeHp(hp - player.hp);
+				},
+			},
+			//双武将牌--梦回橙续缘双面武将
+			mark: {
+				charlotte: true,
+				trigger: { global: "gameStart" },
+				filter(event, player) {
+					return !player.storage.dcqixin_hp;
+				},
+				forced: true,
+				popup: false,
+				firstDo: true,
+				content() {
+					player.storage.dcqixin_hp = [player.maxHp, player.maxHp];
 				},
 			},
 		},

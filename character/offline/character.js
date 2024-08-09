@@ -1,4 +1,5 @@
 const characters = {
+	jd_jin_wangyuanji: ["female", "jin", 3, ["jdshiren", "jdyanxi"], ["hiddenSkill", "character:jin_wangyuanji", "die:jin_wangyuanji"]],
 	jd_ol_huaxin: ["male", "wei", 3, ["jdcaozhao", "olxibing"], ["character:ol_huaxin", "die:ol_huaxin"]],
 	jd_sp_yangwan: ["female", "qun", 3, ["jdmingxuan", "spxianchou"], ["character:sp_yangwan", "die:sp_yangwan"]],
 	jd_sb_huangyueying: ["female", "shu", 3, ["jdjizhi", "jdqicai"], ["character:sb_huangyueying", "die:sb_huangyueying"]],

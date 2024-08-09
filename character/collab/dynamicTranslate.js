@@ -19,7 +19,7 @@ const dynamicTranslates = {
 		if (storage) str += '<span class="bluetext">';
 		str += "阳，刘协--男。";
 		if (storage) str += "</span>";
-		return str + "②当你即将死亡时，你取消之并将性别变更为〖齐心①〗的剩余分支，将体力值回复至体力上限，然后你本局游戏不能发动〖齐心〗。";
+		return str + "②当你即将死亡时，你取消之并将性别变更为〖齐心①〗的转换状态，将体力调整至此状态的体力，然后你本局游戏不能发动〖齐心〗。";
 	},
 };
 export default dynamicTranslates;
