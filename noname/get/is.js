@@ -381,12 +381,7 @@ export class Is {
 	}
 	/**
 	 * @overload
-	 * @param { Function } func
-	 * @returns { false }
-	 */
-	/**
-	 * @overload
-	 * @param { number | [number, number] } func
+	 * @param { Function | number | [number, number] } func
 	 * @returns { boolean }
 	 */
 	singleSelect(func) {
