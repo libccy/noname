@@ -604,6 +604,12 @@ const translates = {
 	jd_ol_huaxin_prefix: "鼎",
 	jdcaozhao: "草诏",
 	jdcaozhao_info: "每轮限一次，体力值小于等于你的角色的出牌阶段开始时，你可以展示其一张手牌，选择一个你本局游戏未以此法声明过的基本牌或普通锦囊牌，然后令其选择一项：1.将此牌当作你声明的牌使用；2.失去1点体力。",
+	jd_jin_wangyuanji: "鼎王元姬",
+	jd_jin_wangyuanji_prefix: "鼎",
+	jdshiren: "识人",
+	jdshiren_info: "隐匿技，当你于其他角色的回合内登场时，若其有手牌，则你可对其发动〖宴戏〗。",
+	jdyanxi: "宴戏",
+	jdyanxi_info: "出牌阶段，你可以选择一名有手牌的其他角色，其将此牌给场上其他角色展示，然后你将此牌与牌堆顶的两张牌混合后展示，然后你选择其中一张。若你以此法选择的是该角色展示的手牌，则你获得这三张牌；否则你获得选择的牌，然后将剩余的牌以任意顺序置于牌堆顶。",
 };
 
 export default translates;

@@ -2,6 +2,114 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//九鼎--王元姬
+	jdshiren: {
+		audio: "shiren",
+		trigger: { player: "showCharacterAfter" },
+		filter(event, player) {
+			if (!event.toShow?.some(i => get.character(i).skills?.includes("jdshiren"))) return false;
+			const target = _status.currentPhase;
+			return target && target != player && target.isAlive() && target.countCards("h") > 0;
+		},
+		logTarget: () => _status.currentPhase,
+		hiddenSkill: true,
+		content() {
+			const next = game.createEvent("jdyanxi", false);
+			next.player = player;
+			next.target = _status.currentPhase;
+			next.setContent(lib.skill["jdyanxi"].content);
+		},
+	},
+	jdyanxi: {
+		audio: "yanxi",
+		inherit: "yanxi",
+		async content(event, trigger, player) {
+			const target = event.target;
+			const [card] = await player.choosePlayerCard(target, "h", true).forResult("cards");
+			if (card) {
+				const videoId = lib.status.videoId++;
+				game.addVideo("showCards", player, [`${get.translation(player)}对${get.translation(target)}发动了【宴戏】`, get.cardsInfo([card])]);
+				game.broadcastAll(
+					(card, id, player, target) => {
+						let dialog;
+						if (player === game.me) dialog = ui.create.dialog(`${get.translation(target)}手牌展示中...`);
+						else dialog = ui.create.dialog(`${get.translation(player)}对${get.translation(target)}发动了【宴戏】`, [card]);
+						dialog.forcebutton = true;
+						dialog.videoId = id;
+					},
+					card,
+					videoId,
+					player,
+					target
+				);
+				await game.delay(2);
+				game.broadcastAll("closeDialog", videoId);
+				let cards = [card].concat(get.cards(2)).randomSort();
+				game.log(player, "展示了", cards);
+				const videoIdx = lib.status.videoId++;
+				const str = get.translation(player) + "对" + get.translation(target) + "发动了【宴戏】";
+				game.broadcastAll(
+					(str, id, cards) => {
+						const dialog = ui.create.dialog(str, cards);
+						dialog.videoId = id;
+					},
+					str,
+					videoIdx,
+					cards
+				);
+				game.addVideo("showCards", player, [str, get.cardsInfo(cards)]);
+				const func = function (id, target) {
+					const dialog = get.idDialog(id);
+					if (dialog) dialog.content.firstChild.innerHTML = "猜猜哪张是" + get.translation(target) + "的手牌？";
+				};
+				if (player == game.me) func(videoIdx, target);
+				else if (player.isOnline()) player.send(func, videoIdx, target);
+				const next = player.chooseButton(true);
+				next.set("dialog", videoIdx);
+				next.set("ai", button => {
+					const evt = get.event();
+					if (evt.answer) return button.link == evt.answer ? 1 : 0;
+					return get.value(button.link, evt.player);
+				});
+				if (player.hasSkillTag("viewHandcard", null, target, true)) next.set("answer", card);
+				const result = await next.forResult();
+				game.broadcastAll("closeDialog", videoIdx);
+				if (result.bool) {
+					const card2 = result.links[0];
+					cards.remove(card2);
+					if (card2 == card) {
+						player.popup("洗具");
+						player.$gain2(cards);
+						await player.gain(cards, "log");
+						await player.gain(card, target, "bySelf", "give");
+					} else {
+						player.popup("杯具");
+						await player.gain(card2, "gain2");
+						const { result } = await player
+							.chooseToMove("宴戏：将剩余的牌以任意顺序置于牌堆顶", true)
+							.set("list", [["牌堆顶", cards]])
+							.set("reverse", _status.currentPhase && _status.currentPhase.next && get.attitude(player, _status.currentPhase.next) > 0)
+							.set("processAI", list => {
+								const cards = list[0][1].slice(0);
+								cards.sort((a, b) => {
+									return (_status.event.reverse ? 1 : -1) * (get.value(b) - get.value(a));
+								});
+								return [cards];
+							});
+						if (!result.bool) return;
+						cards = result.moved[0];
+						cards.reverse();
+						if (cards.includes(card)) {
+							target.$throw(1, 1000);
+							await target.lose([card], ui.special);
+						}
+						await game.cardsGotoPile(cards, "insert");
+						game.log(player, "将", cards, "置于了牌堆顶");
+					}
+				}
+			}
+		},
+	},
 	//九鼎-华歆
 	jdcaozhao: {
 		audio: "caozhao",
@@ -63,7 +171,11 @@ const skills = {
 				const card = get.autoViewAs({ name: name }, event.cards);
 				let resultx;
 				if (!target.hasUseTarget(card)) resultx = { bool: false };
-				else resultx = await target.chooseUseTarget('###草诏###<div class="text center">使用' + get.translation(card) + "（" + get.translation(event.cards) + "），或失去1点体力</div>", card, false).set("cards", event.cards).forResult();
+				else
+					resultx = await target
+						.chooseUseTarget('###草诏###<div class="text center">使用' + get.translation(card) + "（" + get.translation(event.cards) + "），或失去1点体力</div>", card, false)
+						.set("cards", event.cards)
+						.forResult();
 				if (!resultx.bool) await target.loseHp();
 			}
 		},
@@ -1445,7 +1557,7 @@ const skills = {
 			await player.recoverTo(2);
 			await player.loseMaxHp();
 			await player.addSkills("jdsbbeifa");
-			if(player.isMinCard()) await player.draw(2);
+			if (player.isMinCard()) await player.draw(2);
 		},
 		derivation: "jdsbbeifa",
 	},
@@ -2425,16 +2537,19 @@ const skills = {
 			},
 		},
 		trigger: {
-			player: ["useCard", "respond"]
+			player: ["useCard", "respond"],
 		},
 		filter(event, player) {
 			const num = get.info("jsrgjuxia").countSkill(player) - 2;
 			if (num <= 0 || get.type(event.card) == "equip") return false;
-			return !player.getRoundHistory("useCard", evt => {
-				get.name(evt.card) == get.name(event.card) && evt != event;
-			}).length && !player.getRoundHistory("useCard", evt => {
-				get.name(evt.card) == get.name(event.card) && evt != event;
-			}).length;
+			return (
+				!player.getRoundHistory("useCard", evt => {
+					get.name(evt.card) == get.name(event.card) && evt != event;
+				}).length &&
+				!player.getRoundHistory("useCard", evt => {
+					get.name(evt.card) == get.name(event.card) && evt != event;
+				}).length
+			);
 		},
 		forced: true,
 		async content(event, trigger, player) {

@@ -12,7 +12,7 @@ const characterReplaces = {
 	panfeng: ["panfeng", "re_panfeng", "std_panfeng"],
 	sunluyu: ["sunluyu", "re_sunluyu", "mb_sunluyu"],
 	jin_simazhao: ["jin_simazhao", "simazhao", "sp_simazhao", "jd_jin_simazhao"],
-	jin_wangyuanji: ["jin_wangyuanji", "wangyuanji", "sp_wangyuanji", "std_wangyuanji"],
+	jin_wangyuanji: ["jin_wangyuanji", "wangyuanji", "sp_wangyuanji", "std_wangyuanji", "jd_jin_wangyuanji"],
 	wangyun: ["clan_wangyun", "wangyun", "dc_wangyun", "re_wangyun", "jsrg_wangyun", "old_wangyun", "pe_wangyun"],
 	zhangliang: ["xin_zhangliang", "re_zhangliang", "zhangliang"],
 	lingju: ["lingju", "old_lingju"],
