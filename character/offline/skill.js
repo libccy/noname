@@ -1854,7 +1854,7 @@ const skills = {
 					return get.event().targets.includes(target);
 				})
 				.set("ai", target => {
-					const player = get.event(player),
+					const player = get.event("player"),
 						att = get.attitude(player, target);
 					if (target.maxHp <= 1) return 114514119810 * get.sgn(-att);
 					if (player.identity == "nei" && target != player) return 0;
