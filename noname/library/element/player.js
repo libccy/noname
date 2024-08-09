@@ -11037,7 +11037,6 @@ export class Player extends HTMLDivElement {
 			}
 			cards.forEach(cardx => {
 				cardx.fix();
-				if(get.subtypes(card, player)?.length) cardx.subtypes = get.subtypes(card, player);
 				cardx.style.transform = "";
 				cardx.classList.remove("drawinghidden");
 				delete cardx._transform;
