@@ -749,6 +749,7 @@ window.noname_character_rank = {
 		"new_simayi",
 	],
 	bp: [
+		"yj_tianchuan",
 		"jx_sunjian",
 		"ol_peixiu",
 		"caimao",
@@ -2411,6 +2412,7 @@ window.noname_character_rank = {
 			"jd_sb_sp_zhugeliang",
 		],
 		rare: [
+			"yj_tianchuan",
 			"jx_sunjian",
 			"liutan",
 			"dc_noname",

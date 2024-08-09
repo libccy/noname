@@ -714,7 +714,7 @@ const skills = {
 				}
 				if (skill) {
 					let skillName = `olsbhongtu_${player.playerid}`;
-					target.addAdditionalSkills(skillName, [skill]);
+					target.addAdditionalSkills(skillName, [skill], true);
 					delete target.storage.olsbhongtu_phased;
 					target.when({ player: "phaseBegin" }).then(() => {
 						player.storage.olsbhongtu_phased = true;

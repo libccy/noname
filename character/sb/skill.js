@@ -6909,6 +6909,7 @@ const skills = {
 		filter: function (event, player) {
 			return game.hasPlayer(current => current.hasMark("sbjieyin_mark"));
 		},
+		audio: 2,
 		logAudio: ()=> 1,
 		content: function () {
 			"step 0";

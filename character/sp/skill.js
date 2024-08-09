@@ -1903,6 +1903,10 @@ const skills = {
 						player.$throw(puts, 1000);
 						await player.lose(puts, ui.special);
 						await player.gain(gains, "gain2");
+						//调整手牌顺序
+						player.getCards("h").forEach(i => i.goto(ui.special));
+						player.directgain(moved[1].reverse(), false);
+
 						cards = moved[0].slice();
 						if (cards.length) {
 							await game.cardsGotoOrdering(cards);

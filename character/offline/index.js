@@ -15,7 +15,7 @@ game.import("character", function () {
 	return {
 		name: "offline",
 		connect: true,
-		connectBanned: ["zhangliang"],
+		connectBanned: ["zhangliang", "yj_tianchuan"],
 		character: { ...characters },
 		characterSort: {
 			offline: characterSort,
