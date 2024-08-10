@@ -28565,7 +28565,9 @@ const skills = {
 			if (result.bool) {
 				var thisTarget = result.targets[0];
 				var thisCard = result.cards[0];
-				player.logSkill("yuanhu", thisTarget, null, null, get.equipNum(thisCard) > 2 ? get.equipNum(thisCard) : 3);
+				var num = get.equipNum(thisCard);
+				if(num > 2) num = 3;
+				player.logSkill("yuanhu", thisTarget, null, null, num);
 				thisTarget.equip(thisCard);
 				event.target = thisTarget;
 				if (thisTarget != player) {
