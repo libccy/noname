@@ -7800,7 +7800,7 @@ const skills = {
 		},
 	},
 	jsrgchaozheng: {
-		audio: 2,
+		audio: 4,
 		trigger: { player: "phaseZhunbeiBegin" },
 		logTarget: function (event, player) {
 			return game.filterPlayer(i => i != player);
@@ -7916,7 +7916,7 @@ const skills = {
 		},
 	},
 	jsrgjulian: {
-		audio: 2,
+		audio: 4,
 		trigger: { player: "phaseJieshuBegin" },
 		filter: function (event, player) {
 			return player.hasZhuSkill("jsrgjulian") && lib.skill.jsrgjulian.logTarget(null, player).length;
@@ -9427,7 +9427,7 @@ const skills = {
 	},
 	//王允
 	jsrgshelun: {
-		audio: 2,
+		audio: 4,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {

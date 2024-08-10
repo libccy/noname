@@ -302,13 +302,6 @@ const skills = {
 				if (typeof get.number(trigger.card, player) != "number") return;
 				player.storage.clantanque_mark = trigger.card;
 				player.markSkill("clantanque_mark");
-				game.broadcastAll(
-					function (player, number) {
-						if (player.marks.clantanque_mark) player.marks.clantanque_mark.firstChild.innerHTML = get.translation(number);
-					},
-					player,
-					get.number(trigger.card, player)
-				);
 			}
 		},
 		onremove(player) {
@@ -327,13 +320,6 @@ const skills = {
 					else {
 						player.storage.clantanque_mark = trigger.card;
 						player.markSkill("clantanque_mark");
-						game.broadcastAll(
-							function (player, number) {
-								if (player.marks.clantanque_mark) player.marks.clantanque_mark.firstChild.innerHTML = get.translation(number);
-							},
-							player,
-							get.number(trigger.card, player)
-						);
 					}
 				},
 				intro: {
