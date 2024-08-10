@@ -1581,6 +1581,8 @@ export class Game extends GameCompatible {
 		if (info.direct && !directaudio) return;
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
 
+		if (!info.audio && info.sourceSkill) skill = info.sourceSkill.toString();
+
 		let audioList = get.Audio.skill({ skill, player, info: skillInfo }).fileList;
 		if (special) {
 			if (typeof special == "string")
