@@ -15226,7 +15226,7 @@ const skills = {
 		},
 	},
 	xinfu_qianchong: {
-		audio: 3,
+		audio: 1,
 		group: ["qc_weimu", "qc_mingzhe"],
 		subSkill: {
 			effect: {
@@ -15248,6 +15248,7 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		direct: true,
+		derivation: ["qc_weimu", "qc_mingzhe"],
 		filter: function (event, player) {
 			var es = player.getCards("e");
 			if (!es.length) return true;
@@ -15283,7 +15284,7 @@ const skills = {
 		},
 	},
 	qc_weimu: {
-		audio: "xinfu_qianchong",
+		audio: true,
 		mod: {
 			targetEnabled: function (card, player, target) {
 				var bool = true;
@@ -15297,7 +15298,7 @@ const skills = {
 		},
 	},
 	qc_mingzhe: {
-		audio: "xinfu_qianchong",
+		audio: true,
 		trigger: {
 			player: ["useCard", "respond", "loseAfter"],
 			global: "loseAsyncAfter",
