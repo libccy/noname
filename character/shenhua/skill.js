@@ -5222,7 +5222,7 @@ const skills = {
 			return false;
 		},
 		filter(event, player) {
-			return !player.isMinHp() && !player.hasSkill("rejiuchi_air") && !player.hasSkill("oljiuchi_air");
+			return !player.isMinHp();
 		},
 		async content(event, trigger, player) {
 			const control = await player

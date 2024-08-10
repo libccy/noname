@@ -4082,9 +4082,6 @@ const skills = {
 		trigger: { player: "useCard" },
 		forced: true,
 		zhuanhuanji: true,
-		filter: function (event, player) {
-			return !player.hasSkill("piaoping_blocker", null, null, false);
-		},
 		content: function () {
 			player.changeZhuanhuanji("piaoping");
 			var num = Math.min(
@@ -4112,7 +4109,6 @@ const skills = {
 				return "转换技，锁定技。当你使用一张牌时，你摸X张牌。（X为你本阶段内发动过〖漂萍〗的次数且至多等于你的体力值）";
 			},
 		},
-		subSkill: { blocker: { charlotte: true } },
 	},
 	tuoxian: {
 		audio: 2,
@@ -4171,7 +4167,7 @@ const skills = {
 			if (result.index == 0) {
 				if (target.countCards("j") > 0) target.discardPlayerCard(target, cards.length, true, "hej");
 				else target.chooseToDiscard("he", true, cards.length);
-			} else player.addTempSkill("piaoping_blocker");
+			} else player.tempBanSkill("piaoping");
 		},
 		init(player) {
 			player.addMark("tuoxian", 1, false);
@@ -4185,19 +4181,18 @@ const skills = {
 		filter: function (event, player) {
 			if (player == event.player || get.color(event.card) != "black") return false;
 			if (!player.hasSkill("piaoping", null, null, false)) return false;
-			return player.storage.piaoping == true || !player.hasSkill("chuaili_blocker", null, null, false);
+			return player.storage.piaoping == true;
 		},
 		content: function () {
 			if (player.storage.piaoping == true) {
 				player.changeZhuanhuanji("piaoping");
 			} else {
 				player.addMark("tuoxian", 1, false);
-				if (player.countCards("tuoxian") > 3) player.addTempSkill("chuaili_blocker");
+				if (player.countCards("tuoxian") > 3) player.tempBanSkill("chuaili");
 			}
 			game.delayx();
 		},
 		ai: { combo: "piaoping" },
-		subSkill: { blocker: { charlotte: true } },
 	},
 	//闫柔
 	choutao: {
@@ -7522,7 +7517,7 @@ const skills = {
 		trigger: { target: "useCardToTargeted" },
 		forced: true,
 		filter: function (event, player) {
-			return player != event.player && !player.hasSkill("weipo3") && player.countCards("h") < Math.min(5, player.maxHp) && (event.card.name == "sha" || get.type(event.card) == "trick");
+			return player != event.player && player.countCards("h") < Math.min(5, player.maxHp) && (event.card.name == "sha" || get.type(event.card) == "trick");
 		},
 		content: function () {
 			"step 0";
@@ -7544,7 +7539,7 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
-			player.addTempSkill("weipo3", { player: "phaseBegin" });
+			player.tempBanSkill("weipo", { player: "phaseBegin" });
 			if (player.countCards("h") && trigger.player.isIn()) {
 				player.chooseCard("h", true, "将一张手牌交给" + get.translation(trigger.player));
 			} else event.finish();
@@ -7554,7 +7549,6 @@ const skills = {
 			}
 		},
 	},
-	weipo3: { charlotte: true },
 	refuqi: {
 		audio: "fuqi",
 		forced: true,
@@ -10527,7 +10521,7 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		filter: function (event, player) {
-			return !player.hasSkill("songshu_reflectionblue", null, null, false) && player.countCards("h") > 0;
+			return player.countCards("h") > 0;
 		},
 		filterTarget: function (card, player, target) {
 			return target != player && player.canCompare(target);
@@ -10539,7 +10533,7 @@ const skills = {
 			if (!result.bool) {
 				player.draw(2, "nodelay");
 				target.draw(2);
-				player.addTempSkill("songshu_reflectionblue", "phaseUseAfter");
+				player.tempBanSkill("songshu", "phaseUseAfter");
 			} else {
 				target.addTempSkill("songshu_ai");
 			}
@@ -10571,7 +10565,6 @@ const skills = {
 		},
 	},
 	songshu_ai: { charlotte: true },
-	songshu_reflectionblue: { charlotte: true },
 	sibian: {
 		audio: 2,
 		trigger: { player: "phaseDrawBegin1" },

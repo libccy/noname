@@ -515,7 +515,7 @@ const translates = {
 	tianming: "天命",
 	mizhao: "密诏",
 	duwu: "黩武",
-	duwu3: "黩武",
+	duwu2: "黩武",
 	mingzhe: "明哲",
 	huanshi: "缓释",
 	hongyuan: "弘援",

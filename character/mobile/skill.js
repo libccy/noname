@@ -11842,14 +11842,11 @@ const skills = {
 		locked: false,
 		audio: "jiuchi",
 		filter: function (event, player) {
-			return event.card && event.card.name == "sha" && event.getParent(2).jiu == true && !player.hasSkill("rejiuchi_air");
+			return event.card && event.card.name == "sha" && event.getParent(2).jiu == true && !player.isTempBanned("benghuai");
 		},
 		content: function () {
-			player.logSkill("jiuchi");
-			player.addTempSkill("rejiuchi_air");
-		},
-		subSkill: {
-			air: {},
+			player.logSkill("rejiuchi");
+			player.tempBanSkill("benghuai");
 		},
 	},
 	//苏飞，新贾逵
@@ -14876,9 +14873,6 @@ const skills = {
 		group: "liezhi_damage",
 		trigger: { player: "phaseZhunbeiBegin" },
 		direct: true,
-		filter: function (event, player) {
-			return !player.hasSkill("liezhi_disable");
-		},
 		content: function () {
 			"step 0";
 			player.chooseTarget(get.prompt("liezhi"), "弃置至多两名其他角色区域内的各一张牌", [1, 2], function (card, player, target) {
@@ -14900,25 +14894,13 @@ const skills = {
 			if (targets.length) event.redo();
 		},
 		subSkill: {
-			disable: {
-				sub: true,
-				trigger: { player: "phaseAfter" },
-				forced: true,
-				silent: true,
-				popup: false,
-				charlotte: true,
-				//filter:function(event){return !event.liezhi},
-				content: function () {
-					player.removeSkill("liezhi_disable");
-				},
-			},
 			damage: {
 				trigger: { player: "damage" },
 				forced: true,
 				silent: true,
 				popup: false,
 				content: function () {
-					player.addSkill("liezhi_disable");
+					player.tempBanSkill("liezhi", { player: "phaseAfter" });
 				},
 			},
 		},

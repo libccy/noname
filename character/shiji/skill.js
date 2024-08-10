@@ -1281,17 +1281,17 @@ const skills = {
 		trigger: { player: "phaseJieshuBegin" },
 		forced: true,
 		filter: function (event, player) {
-			return !player.hasSkill("spxizhan_spfangzong") && player.countCards("h") < Math.min(8, game.countPlayer());
+			return player.countCards("h") < Math.min(8, game.countPlayer());
 		},
 		content: function () {
 			player.drawTo(Math.min(8, game.countPlayer()));
 		},
 		mod: {
 			playerEnabled: function (card, player, target) {
-				if (player == _status.currentPhase && get.tag(card, "damage") > 0 && !player.hasSkill("spxizhan_spfangzong") && player.inRange(target)) return false;
+				if (player == _status.currentPhase && get.tag(card, "damage") > 0 && !player.isTempBanned("spfangzong") && player.inRange(target)) return false;
 			},
 			targetEnabled: function (card, player, target) {
-				if (get.tag(card, "damage") > 0 && !target.hasSkill("spxizhan_spfangzong") && player.inRange(target)) return false;
+				if (get.tag(card, "damage") > 0 && !target.isTempBanned("spfangzong") && player.inRange(target)) return false;
 			},
 		},
 	},
@@ -1341,7 +1341,7 @@ const skills = {
 		async content(event, trigger, player) {
 			if (event.cards && event.cards.length) {
 				await player.discard(event.cards);
-				player.addTempSkill("spxizhan_spfangzong");
+				player.tempBanSkill("spfangzong");
 				var target = trigger.player,
 					card = event.cards[0],
 					suit = get.suit(card, player);
@@ -1367,16 +1367,13 @@ const skills = {
 				await player.loseHp();
 			}
 		},
-		subSkill: {
-			spfangzong: { charlotte: true },
-		},
 	},
 	//高览
 	spjungong: {
 		enable: "phaseUse",
 		filter: function (event, player) {
 			var num = player.getStat("skill").spjungong || 0;
-			return (num < player.hp || num <= player.countCards("he")) && !player.hasSkill("spjungong_block");
+			return (num < player.hp || num <= player.countCards("he"));
 		},
 		filterTarget: function (card, player, target) {
 			return target != player && player.canUse("sha", target, false);
@@ -1410,7 +1407,7 @@ const skills = {
 					return evtx.card == card && evtx.getParent() == event;
 				})
 			)
-				player.addTempSkill("spjungong_block");
+				player.tempBanSkill("spjungong");
 		},
 		ai: {
 			order: function (item, player) {
@@ -1423,7 +1420,6 @@ const skills = {
 				},
 			},
 		},
-		subSkill: { block: { charlotte: true } },
 	},
 	spdengli: {
 		trigger: {
@@ -2647,7 +2643,7 @@ const skills = {
 				},
 				content: function () {
 					trigger.cancel();
-					player.getStat().skill.dbzhuifeng = 2;
+					player.tempBanSkill("dbzhuifeng", { player: "phaseUseEnd" });
 				},
 			},
 		},

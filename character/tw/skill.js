@@ -2631,7 +2631,6 @@ const skills = {
 		audio: 2,
 		trigger: { global: "phaseDiscardEnd" },
 		filter(event, player) {
-			if (player.hasSkill("twdengjian_ban")) return false;
 			return event.player != player && lib.skill.twdengjian.getCards(player, event.player).length;
 		},
 		getCards(player, target) {
@@ -2673,7 +2672,6 @@ const skills = {
 		},
 		group: "twdengjian_buff",
 		subSkill: {
-			ban: { charlotte: true },
 			buff: {
 				mod: {
 					aiOrder(player, card, num) {
@@ -2719,7 +2717,6 @@ const skills = {
 			if (!player.hasSkill("twxinshou_0")) return goon;
 			if (!player.hasSkill("twxinshou_1")) return goon && game.hasPlayer(target => target != player);
 			return (
-				!player.hasSkill("twdengjian_ban") &&
 				game.hasPlayer(target => {
 					if (target == player) return false;
 					return !target.hasSkill("twdengjian", null, null, false);
@@ -2756,12 +2753,11 @@ const skills = {
 				if (bool) {
 					const target = targets[0];
 					player.logSkill("twxinshou", target);
-					player.addSkill("twdengjian_ban");
+					player.tempBanSkill("twdengjian", "forever");
 					target.addAdditionalSkills("twxinshou_" + player.playerid, "twdengjian");
 					player.popup("登剑");
 					target.popup("登剑");
 					game.log(player, "将", "#g【登剑】", "传授给了", target);
-					game.log(player, "的", "#g【登剑】", "被失效了");
 					player
 						.when("phaseBegin")
 						.then(() => {
@@ -2773,7 +2769,7 @@ const skills = {
 								const evt = history[i];
 								if (evt.name == "damage" && evt.card && evt.source && evt.card.name == "sha" && evt.source == target) {
 									player.popup("洗具");
-									player.removeSkill("twdengjian_ban");
+									delete player.storage[`temp_ban_twdengjian`];
 									game.log(player, "结束了", "#g【登剑】", "的失效状态");
 									return;
 								}

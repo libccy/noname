@@ -7195,7 +7195,7 @@ export default () => {
 					if (player.checkMainSkill("gzpozhu")) player.removeMaxHp();
 				},
 				viewAsFilter(player) {
-					return !player.hasSkill("pozhu3", null, null, false) && player.countMark("gzsanchen") > 0 && player.countCards("hs") > 0;
+					return player.countMark("gzsanchen") > 0 && player.countCards("hs") > 0;
 				},
 				viewAs: { name: "chuqibuyi" },
 				filterCard: true,

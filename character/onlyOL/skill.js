@@ -2145,7 +2145,6 @@ const skills = {
 			player: ["phaseZhunbeiEnd", "phaseJudgeEnd", "phaseDrawEnd", "phaseUseEnd", "phaseDiscardEnd", "phaseJieshuEnd"],
 		},
 		filter: function (event, player) {
-			if (player.hasSkill("olsbzhuri_block")) return false;
 			if (!game.hasPlayer(target => player.canCompare(target))) return false;
 			return player.getHistory("gain", evt => evt.getParent(event.name) == event).length + player.getHistory("lose", evt => evt.getParent(event.name) == event && evt.hs.length).length;
 		},
@@ -2203,6 +2202,7 @@ const skills = {
 						})
 						.set("list", list.slice(trigger.getParent().num, list.length));
 					player[result3.control == "失去体力" ? "loseHp" : "addTempSkill"](result3.control == "失去体力" ? 1 : "olsbzhuri_block");
+					player.tempBanSkill("olsbzhuri");
 				}
 			}
 		},
@@ -2398,7 +2398,7 @@ const skills = {
 		audio: "reqiaoshui",
 		inherit: "reqiaoshui",
 		filter(event, player) {
-			return player.countCards("h") > 0 && !player.hasSkill("olqiaoshui_used");
+			return player.countCards("h") > 0;
 		},
 		async content(event, trigger, player) {
 			const target = event.target;
@@ -2407,6 +2407,7 @@ const skills = {
 			else {
 				player.addTempSkill("qiaoshui2");
 				player.addTempSkill("olqiaoshui_used");
+				player.tempBanSkill("olqiaoshui");
 			}
 		},
 		subSkill: {

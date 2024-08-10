@@ -12773,9 +12773,6 @@ const skills = {
 			off: {
 				sub: true,
 			},
-			off2: {
-				sub: true,
-			},
 		},
 		audio: 2,
 		enable: "phaseUse",
@@ -12792,16 +12789,13 @@ const skills = {
 				return 3 - get.value(card);
 			return 9 - get.value(card);
 		},
-		filter: function (event, player) {
-			return !player.hasSkill("new_reqingnang_off2");
-		},
 		filterTarget: function (card, player, target) {
 			if (target.hp >= target.maxHp || target.hasSkill("new_reqingnang_off")) return false;
 			return true;
 		},
 		content: function () {
 			target.addTempSkill("new_reqingnang_off");
-			if (get.color(cards[0]) == "black") player.addTempSkill("new_reqingnang_off2");
+			if (get.color(cards[0]) == "black") player.tempBanSkill("new_reqingnang");
 			target.recover();
 		},
 		ai: {
@@ -15338,14 +15332,11 @@ const skills = {
 		forced: true,
 		filter: function (event, player) {
 			if (event.name == "chooseToUse") return player.hasCard(card => get.suit(card) == "spade", "hs");
-			return event.card && event.card.name == "sha" && event.getParent(2).jiu == true && !player.hasSkill("oljiuchi_air");
+			return event.card && event.card.name == "sha" && event.getParent(2).jiu == true && !player.isTempBanned("benghuai");
 		},
 		content: function () {
 			player.logSkill("oljiuchi");
-			player.addTempSkill("oljiuchi_air");
-		},
-		subSkill: {
-			air: {},
+			player.tempBanSkill("benghuai");
 		},
 	},
 	rezaiqi: {

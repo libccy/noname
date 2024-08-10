@@ -3684,7 +3684,7 @@ const skills = {
 	pozhu: {
 		enable: "phaseUse",
 		viewAsFilter: function (player) {
-			return !player.hasSkill("pozhu3", null, null, false) && player.countCards("hs") > 0;
+			return player.countCards("hs") > 0;
 		},
 		viewAs: { name: "chuqibuyi" },
 		filterCard: true,
@@ -3707,10 +3707,9 @@ const skills = {
 			);
 		},
 		content: function () {
-			player.addTempSkill("pozhu3");
+			player.tempBanSkill("pozhu");
 		},
 	},
-	pozhu3: { charlotte: true },
 	xijue: {
 		audio: 2,
 		trigger: {
