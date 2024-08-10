@@ -1487,6 +1487,9 @@ const skills = {
 		zhuanhuanji2(skill, player) {
 			return player && player.countMark("mbxuetu_status") !== 1;
 		},
+		logAudio(event, player) {
+			return player.countMark("mbxuetu_status") == 2 ? get.rand(3, 4) : get.rand(1, 2);
+		},
 		position: "he",
 		onremove: ["mbxuetu", "mbxuetu_status"],
 		derivation: ["mbxuetu_achieve", "mbxuetu_fail"],
@@ -1514,9 +1517,6 @@ const skills = {
 			backup(result, player) {
 				return {
 					audio: "mbxuetu",
-					logAudio(event, player) {
-						return player.countMark("mbxuetu_status") == 2 ? get.rand(3, 4) : get.rand(1, 2);
-					},
 					choice: result.control.includes("回复") ? 0 : 1,
 					filterCard: () => false,
 					selectCard: -1,
@@ -15770,7 +15770,7 @@ const skills = {
 			},
 			backup: function (links, player) {
 				return {
-					audio: "xinfu_pingcai1.mp3",
+					audio: "xinfu_pingcai",
 					filterCard: () => false,
 					selectCard: -1,
 					takara: links[0][2],
