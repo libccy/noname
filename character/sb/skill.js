@@ -6019,7 +6019,7 @@ const skills = {
 		group: "sbguidao_defend",
 		filter: function (event, player) {
 			if (player.countMark("sbguidao") >= 8) return false;
-			if (event.name == "damage") return event.hasNature() && !player.hasSkill("sbguidao_forbid");
+			if (event.name == "damage") return event.hasNature();
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
 		content: function () {
@@ -6049,11 +6049,10 @@ const skills = {
 					trigger.cancel();
 					player.removeMark("sbguidao", 2);
 					if (player != _status.currentPhase) {
-						player.addTempSkill("sbguidao_forbid", { player: "phaseBegin" });
+						player.tempBanSkill("sbguidao", { player: "phaseBegin" });
 					}
 				},
 			},
-			forbid: { charlotte: true },
 		},
 	},
 	sbhuangtian: {
@@ -6370,9 +6369,6 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		usable: 5,
-		filter: function (event, player) {
-			return !player.hasSkill("sbfanjian_ban");
-		},
 		chooseButton: {
 			dialog: function () {
 				return ui.create.dialog("###反间###" + get.translation("sbfanjian_info"));
@@ -6449,7 +6445,7 @@ const skills = {
 							target.loseHp();
 						} else {
 							if (result.index != 2) game.log(target, "猜测", "#g正确");
-							player.addTempSkill("sbfanjian_ban");
+							player.tempBanSkill("sbfanjian");
 						}
 					},
 					ai: {
@@ -6472,7 +6468,6 @@ const skills = {
 		},
 		subSkill: {
 			guessed: { onremove: true, charlotte: true },
-			ban: { charlotte: true },
 			backup: {},
 		},
 		ai: {
@@ -7340,11 +7335,9 @@ const skills = {
 	sbyangwei: {
 		audio: 3,
 		enable: "phaseUse",
-		filter: function (event, player) {
-			return !player.hasSkill("sbyangwei_counter", null, null, false);
-		},
 		content: function () {
 			player.draw(2);
+			player.tempBanSkill("sbyangwei", "forever");
 			player.addTempSkill("sbyangwei_effect");
 			player.addSkill("sbyangwei_counter");
 		},
@@ -7380,7 +7373,10 @@ const skills = {
 				onremove: true,
 				content: function () {
 					if (!player.storage.sbyangwei_counter) player.storage.sbyangwei_counter = true;
-					else player.removeSkill("sbyangwei_counter");
+					else {
+						player.removeSkill("sbyangwei_counter");
+						delete player.storage[`temp_ban_sbyangwei`];
+					}
 				},
 			},
 		},

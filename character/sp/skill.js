@@ -7904,7 +7904,7 @@ const skills = {
 		audio: 2,
 		enable: "chooseToUse",
 		viewAsFilter: function (player) {
-			return !player.hasSkill("olmiuyan_blocker") && player.hasCard(card => get.color(card) == "black", "hes");
+			return player.hasCard(card => get.color(card) == "black", "hes");
 		},
 		viewAs: { name: "huogong" },
 		filterCard: { color: "black" },
@@ -8027,11 +8027,9 @@ const skills = {
 					);
 				},
 				content: function () {
-					player.addTempSkill("olmiuyan_blocker", "roundStart");
-					game.log(player, "的", "#g【谬焰】", "失效了");
+					player.tempBanSkill("olmiuyan", "roundStart");
 				},
 			},
-			blocker: { charlotte: true },
 		},
 	},
 	olshilu: {
@@ -28127,7 +28125,6 @@ const skills = {
 		enable: "phaseUse",
 		filter: function (event, player) {
 			return (
-				player.hasSkill("duwu2") == false &&
 				game.hasPlayer(function (current) {
 					return current.hp > 0 && current.hp <= player.countCards("he") && player.inRange(current);
 				})
@@ -28164,7 +28161,7 @@ const skills = {
 			}
 		},
 		content: function () {
-			player.addTempSkill("duwu3");
+			player.addTempSkill("duwu2");
 			target.damage("nocard");
 		},
 		ai: {
@@ -28179,8 +28176,7 @@ const skills = {
 			expose: 0.3,
 		},
 	},
-	duwu2: { charlotte: true },
-	duwu3: {
+	duwu2: {
 		trigger: { global: "dyingAfter" },
 		forced: true,
 		popup: false,
@@ -28190,7 +28186,7 @@ const skills = {
 		},
 		content: function () {
 			player.loseHp();
-			player.addTempSkill("duwu2");
+			player.tempBanSkill("duwu");
 		},
 	},
 	yicong: {
@@ -28569,7 +28565,9 @@ const skills = {
 			if (result.bool) {
 				var thisTarget = result.targets[0];
 				var thisCard = result.cards[0];
-				player.logSkill("yuanhu", thisTarget, null, null, get.equipNum(thisCard) > 2 ? get.equipNum(thisCard) : 3);
+				var num = get.equipNum(thisCard);
+				if(num > 2) num = 3;
+				player.logSkill("yuanhu", thisTarget, null, null, num);
 				thisTarget.equip(thisCard);
 				event.target = thisTarget;
 				if (thisTarget != player) {

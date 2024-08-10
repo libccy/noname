@@ -7494,7 +7494,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "useCard" },
 		filter: function (event, player) {
-			if (!player.isPhaseUsing() || player.hasSkill("dcqingshi_blocker")) return false;
+			if (!player.isPhaseUsing()) return false;
 			if (player.getStorage("dcqingshi_clear").includes(event.card.name)) return false;
 			if (
 				player.hasCard(card => {
@@ -7608,7 +7608,7 @@ const skills = {
 		content3: function () {
 			"step 0";
 			player.draw(3);
-			player.addTempSkill("dcqingshi_blocker");
+			player.tempBanSkill("dcqingshi");
 		},
 		subSkill: {
 			ex: {
@@ -7636,7 +7636,6 @@ const skills = {
 				onremove: true,
 				charlotte: true,
 			},
-			blocker: { charlotte: true },
 		},
 		ai: {
 			threaten: 6,
@@ -9880,7 +9879,7 @@ const skills = {
 							"bool",
 							(function () {
 								if (!player.hasSkill("dcanzhi")) return Math.random() < 0.5;
-								if (player.hasSkill("dcanzhi_blocker")) {
+								if (player.isTempBanned("dcanzhi")) {
 									var next = _status.currentPhase.getNext();
 									var judges = next.getCards("j");
 									var val = 0;
@@ -9933,9 +9932,6 @@ const skills = {
 	},
 	dcanzhi: {
 		enable: "phaseUse",
-		filter: function (event, player) {
-			return !player.hasSkill("dcanzhi_blocker");
-		},
 		group: "dcanzhi_damage",
 		content: function () {
 			"step 0";
@@ -9948,7 +9944,7 @@ const skills = {
 				player.removeSkill("dcxialei_clear");
 				event.finish();
 			} else if (result.color == "black") {
-				player.addTempSkill("dcanzhi_blocker");
+				player.tempBanSkill("dcanzhi");
 				player
 					.chooseTarget("暗织：是否令一名非当前回合角色获得本回合进入弃牌堆的两张牌？", (card, player, target) => {
 						return target != _status.currentPhase;
@@ -9998,9 +9994,6 @@ const skills = {
 			damage: {
 				audio: "dcanzhi",
 				trigger: { player: "damageEnd" },
-				filter: function (event, player) {
-					return !player.hasSkill("dcanzhi_blocker");
-				},
 				check: function (event, player) {
 					return game.hasPlayer(current => {
 						return get.attitude(player, current) > 0 && current != _status.currentPhase;
@@ -10018,7 +10011,7 @@ const skills = {
 						player.removeSkill("dcxialei_clear");
 						event.finish();
 					} else if (result.color == "black") {
-						player.addTempSkill("dcanzhi_blocker");
+						player.tempBanSkill("dcanzhi");
 						player
 							.chooseTarget("暗织：是否令一名非当前回合角色获得本回合进入弃牌堆的两张牌？", (card, player, target) => {
 								return target != _status.currentPhase;
@@ -10052,7 +10045,6 @@ const skills = {
 					}
 				},
 			},
-			blocker: { charlotte: true },
 		},
 	},
 	//十周年王允

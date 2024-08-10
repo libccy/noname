@@ -5223,7 +5223,6 @@ const skills = {
 		audio: 2,
 		trigger: { global: "phaseEnd" },
 		filter: function (event, player) {
-			if (player.hasSkill("dcsigong_round")) return false;
 			if (event.player == player || !event.player.isIn()) return false;
 			if (!player.canUse("sha", event.player, false)) return false;
 			var respondEvts = [];
@@ -5280,7 +5279,6 @@ const skills = {
 			}
 		},
 		subSkill: {
-			round: { charlotte: true },
 			check: {
 				charlotte: true,
 				forced: true,
@@ -5290,7 +5288,7 @@ const skills = {
 					return event.card && event.card.name == "sha" && event.getParent(3).name == "dcsigong";
 				},
 				content: function () {
-					player.addTempSkill("dcsigong_round", "roundStart");
+					player.tempBanSkill("dcsigong", "roundStart");
 				},
 			},
 		},
@@ -13771,7 +13769,7 @@ const skills = {
 		trigger: { global: "phaseZhunbeiBegin" },
 		forced: true,
 		filter: function (event, player) {
-			return (player != event.player || player.countMark("liedan") > 4) && !player.hasSkill("zhuangdan_mark");
+			return (player != event.player || player.countMark("liedan") > 4);
 		},
 		logTarget: "player",
 		content: function () {
@@ -13802,6 +13800,7 @@ const skills = {
 		},
 		content: function () {
 			player.addTempSkill("zhuangdan_mark", { player: "phaseEnd" });
+			player.tempBanSkill("liedan", { player: "phaseEnd" });
 		},
 		ai: {
 			combo: "zhuangdan",
