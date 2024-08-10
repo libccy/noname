@@ -16697,7 +16697,9 @@ const skills = {
 			return 7 - get.value(card);
 		},
 		logAudio(event, player) {
-			return get.equipNum(event.cards[0]) > 2 ? get.equipNum(event.cards[0]) : 3;
+			const num = get.equipNum(event.cards[0]);
+			if(num > 2) return 3;
+			return num;
 		},
 		content: function () {
 			"step 0";
