@@ -176,7 +176,7 @@ const skills = {
 								if (event.name != "die") {
 									return false;
 								}
-								return event.getParent("1！5！").name == "1！5！";
+								return event.getParent("1！5！").name == "1！5！" && event.player == target;
 							}).length > 0) {
 								await player.gainMaxHp();
 							}
