@@ -17,8 +17,8 @@ const skills = {
 			const places = lib.skill["1！5！"].derivation
 				.slice()
 				.filter(i => {
-					var list = ["4", "5", "6", "7"];
-					var storage = target.getStorage("1！5！_injury");
+					let list = ["4", "5", "6", "7"];
+					let storage = target.getStorage("1！5！_injury");
 					if (storage.length) {
 						list.push("1");
 					}
@@ -298,8 +298,8 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		cost:async function (event, trigger, player) {
-			var list = ["摸体力值张牌，此阶段【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复1点体力。"];
-			var result = await player.chooseControlList(list).set("ai", function(){
+			let list = ["摸体力值张牌，此阶段【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复1点体力。"];
+			let result = await player.chooseControlList(list).set("ai", function(){
 				//等157优化）
 				return Math.random();
 			}).forResult();
