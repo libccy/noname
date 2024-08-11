@@ -321,6 +321,7 @@ const skills = {
 		},
 		subSkill:{
 			directHit: {
+				charlotte:true,
 				forced:true,
 				mod:{
 					targetInRange:function(card){
@@ -343,6 +344,7 @@ const skills = {
 					source: "damageSource",
 				},
 				forced:true,
+				charlotte:true,
 				filter:function(event, player){
 					return player.isDamaged();
 				},
