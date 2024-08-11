@@ -217,8 +217,6 @@ const skills = {
 		subSkill: {
 			injury: {
 				charlotte: true,
-				mark: true,
-				intro: { content: "$已被击伤" },
 			},
 			maxhand: {
 				charlotte: true,
