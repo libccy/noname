@@ -1467,10 +1467,8 @@ const skills = {
 				game.log(source, forceTargets.includes(source) ? "自愿选择" : "选择了", current, "作为讨伐目标");
 				ticketsMap.set(current, (ticketsMap.get(current) || 0) + 1);
 			});
-			console.log(ticketsMap);
 			let maxTicket = 0;
 			const target = ticketsMap.entries().reduce((target, data) => {
-				console.log(data);
 				const [current, ticket] = data;
 				if (ticket > maxTicket) {
 					maxTicket = ticket;
@@ -1480,7 +1478,7 @@ const skills = {
 			}, false);
 			//上Buff
 			if (target) {
-				game.log(target, "成为了", "#g【执盟】", "的讨伐目标");
+				game.log(target, "成为了", "#g【诛逆】", "的讨伐目标");
 				player.addTempSkill("jsrgzhuni_effect");
 				player.markAuto("jsrgzhuni_effect", [target]);
 			}
