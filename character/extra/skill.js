@@ -172,7 +172,12 @@ const skills = {
 					case 1:
 						if (target.getHp() > 0) {
 							await target.loseHp(target.getHp());
-							if (!target.isAlive()) {
+							if (game.getGlobalHistory("everything",function(event){
+								if (event.name != "die") {
+									return false;
+								}
+								return event.getParent("1！5！").name == "1！5！";
+							}).length > 0) {
 								await player.gainMaxHp();
 							}
 						}
@@ -295,7 +300,7 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		cost:async function (event, trigger, player) {
-			var list = ["摸已损失体力值张牌，此阶段【杀】无距离限制且不能被响应。", "摸体力值张牌，此阶段造成伤害后，回复1点体力。"];
+			var list = ["摸体力值张牌，此阶段【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复1点体力。"];
 			var result = await player.chooseControlList(list).set("ai", function(){
 				//等157优化）
 				return Math.random();
@@ -307,10 +312,10 @@ const skills = {
 		},
 		content:async function (event, trigger, player) {
 			if (event.cost_data == "选项一") {
-				player.draw(player.getDamagedHp());
+				player.draw(player.getHp());
 				player.addTempSkill("chiren_directHit", {player:"phaseUseEnd"});
 			} else {
-				player.draw(player.getHp());
+				player.draw(player.getDamagedHp());
 				player.addTempSkill("chiren_recover", {player:"phaseUseEnd"});
 			}
 		},
