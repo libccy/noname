@@ -11,7 +11,7 @@ const skills = {
 			return event.player.isIn() && event.source != event.player;
 		},
 		logTarget: "player",
-		prompt2: (event, player) => ("获得一个“赤”标记" + player.getStorage("1！5！_used").length >= 7 ? "" : "，然后可以击伤其一个部位"),
+		prompt2: (event, player) => ("击伤其一个部位"),
 		async content(event, trigger, player) {
 			const target = trigger.player;
 			const places = lib.skill["1！5！"].derivation
