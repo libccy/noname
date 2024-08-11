@@ -11,16 +11,19 @@ const skills = {
 			return event.player.isIn() && event.source != event.player;
 		},
 		logTarget: "player",
-		prompt2: (event, player) => ("获得一个“赤”标记" + player.getStorage("1！5！_used").length >= 7 ? "" : "，然后可以击伤其一个部位"),
+		prompt2: (event, player) => ("击伤其一个部位"),
 		async content(event, trigger, player) {
-			player.addMark("1！5！", 1);
 			const target = trigger.player;
 			const places = lib.skill["1！5！"].derivation
 				.slice()
 				.filter(i => {
-					return !player.getStorage("1！5！_used").includes(i) && !target.getStorage("1！5！_injury").includes(i);
+					let list = ["4", "5", "6", "7"];
+					let storage = target.getStorage("1！5！_injury");
+					if (storage.length) {
+						list.push("1");
+					}
+					return list.includes(i.substr(-1));
 				})
-				.randomGets(player.countMark("1！5！"));
 			if (!places.length) return;
 			//射击部位-by 鸽子
 			//牢萌负责精修断后
@@ -134,7 +137,7 @@ const skills = {
 					});
 					list.push(num_px);
 				}
-				const selectedList = list.filter(i => places.includes(i.id)).randomGets(Math.min(places.length, event.player.countMark("1！5！")));
+				const selectedList = list.filter(i => places.includes(i.id))
 				for (const i of selectedList) target_img.appendChild(i);
 				dialog.open();
 				game.pause();
@@ -167,7 +170,17 @@ const skills = {
 				target.markAuto("1！5！_injury", [place]);
 				switch (parseInt(place.slice("1！5！_place".length))) {
 					case 1:
-						if (target.getHp() > 0) await target.loseHp(target.getHp());
+						if (target.getHp() > 0) {
+							await target.loseHp(target.getHp());
+							if (game.getGlobalHistory("everything",function(event){
+								if (event.name != "die") {
+									return false;
+								}
+								return event.getParent("1！5！").name == "1！5！" && event.player == target;
+							}).length > 0) {
+								await player.gainMaxHp();
+							}
+						}
 						break;
 					case 2:
 						const cards = target
@@ -182,7 +195,8 @@ const skills = {
 						break;
 					case 4:
 						const cardx = target.getDiscardableCards(target, "h");
-						if (cardx.length) await target.discard(cardx.randomGets(2));
+						const num = Math.floor(cardx.length);
+						if (cardx.length) await target.discard(cardx.randomGets(num));
 						break;
 					case 5:
 						target.addTempSkill("1！5！_damage", { player: "phaseEnd" });
@@ -199,45 +213,10 @@ const skills = {
 		marktext: "赤",
 		intro: { content: "mark" },
 		frequent: true,
-		subfrequent: ["effect"],
 		derivation: ["1！5！_place1", "1！5！_place2", "1！5！_place3", "1！5！_place4", "1！5！_place5", "1！5！_place6", "1！5！_place7"],
-		group: ["1！5！_equip", "1！5！_effect"],
 		subSkill: {
-			equip: {
-				audio: "1！5！",
-				trigger: { player: "useCard" },
-				filter(event, player) {
-					return event.card.name == "sha" && player.getEquips(1).length > 0;
-				},
-				forced: true,
-				locked: false,
-				content() {
-					trigger.directHit.addArray(game.players);
-					game.log(trigger.card, "不可被响应");
-				},
-				ai: {
-					directHit_ai: true,
-					skillTagFilter(player, _, arg) {
-						return player.getEquips(1).length > 0 && arg.card?.name == "sha";
-					},
-				},
-			},
-			effect: {
-				audio: "1！5！",
-				trigger: { player: "useCardAfter" },
-				filter(event, player) {
-					return event.card.name == "sha" && !player.hasHistory("sourceDamage", evt => evt?.card == event.card);
-				},
-				frequent: true,
-				prompt: "是否发动【毅武】摸两张牌？",
-				content() {
-					player.draw(2);
-				},
-			},
 			injury: {
 				charlotte: true,
-				mark: true,
-				intro: { content: "$已被击伤" },
 			},
 			maxhand: {
 				charlotte: true,
@@ -277,18 +256,22 @@ const skills = {
 			},
 			use: {
 				charlotte: true,
+				forced:true,
 				mark: true,
 				marktext: "伤",
 				intro: {
 					name: "中伤 - 胸部",
-					content: (_, player) => (_status.currentPhase === player ? "" : "下回合") + "不能使用伤害牌",
+					content: (_, player) => (_status.currentPhase === player ? "" : "下回合") + "使用伤害牌造成的伤害-1",
 				},
-				mod: {
-					cardEnabled(card, player) {
-						if (_status.currentPhase !== player) return;
-						if (get.tag(card, "damage")) return false;
-					},
+				trigger:{
+					source: "damageBegin2",
 				},
+				filter:function(event, player){
+					if (get.tag(event.card, "damage")) return true;
+				},
+				content:async function (event, trigger, player) {
+					trigger.num -= 1;
+				}
 			},
 			respond: {
 				charlotte: true,
@@ -311,17 +294,63 @@ const skills = {
 	},
 	chiren: {
 		audio: 2,
-		trigger: { player: "phaseJieshuBegin" },
-		filter(event, player) {
-			return player.countMark("1！5！") >= Math.max(1, player.getDamagedHp());
+		trigger:{
+			player: "phaseUseBegin",
 		},
-		forced: true,
-		async content(event, trigger, player) {
-			const num = player.countMark("1！5！");
-			await player.recoverTo(4);
-			player.clearMark("1！5！");
-			await player.draw(num);
+		cost:async function (event, trigger, player) {
+			let list = ["摸体力值张牌，此阶段【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复1点体力。"];
+			let result = await player.chooseControlList(list).set("ai", function(){
+				//等157优化）
+				return Math.random();
+			}).forResult();
+			event.result = {
+				bool: result.control != "cancel2",
+				cost_data: result.control,
+			}
 		},
+		content:async function (event, trigger, player) {
+			if (event.cost_data == "选项一") {
+				player.draw(player.getHp());
+				player.addTempSkill("chiren_directHit", {player:"phaseUseEnd"});
+			} else {
+				player.draw(player.getDamagedHp());
+				player.addTempSkill("chiren_recover", {player:"phaseUseEnd"});
+			}
+		},
+		subSkill:{
+			directHit: {
+				charlotte:true,
+				forced:true,
+				mod:{
+					targetInRange:function(card){
+						if(card.name == "sha") return true;
+					}
+				},
+				trigger: {
+					player: "useCard",
+				},
+				filter:function(event, player){
+					return event.card.name == "sha";
+				},
+				content:async function (event, trigger, player) {
+					trigger.directHit.addArray(game.players);
+					game.log(trigger.card, "不可被响应");
+				}
+			},
+			recover: {
+				trigger: {
+					source: "damageSource",
+				},
+				forced:true,
+				charlotte:true,
+				filter:function(event, player){
+					return player.isDamaged();
+				},
+				content:async function (event, trigger, player) {
+					player.recover();
+				}
+			},
+		}
 	},
 	//应天司马懿！肯定又要修改
 	jilin: {
