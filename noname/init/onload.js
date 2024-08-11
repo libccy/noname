@@ -9,7 +9,7 @@ import { gnc } from "../gnc/index.js";
 import { importMode } from "./import.js";
 import { Mutex } from "../util/mutex.js";
 import { load } from "../util/config.js";
-import { loadCharacter, loadMode } from "./loading.js";
+import { loadCardPile, loadCharacter, loadMode } from "./loading.js";
 
 export async function onload() {
 	const libOnload = lib.onload;
@@ -222,6 +222,8 @@ export async function onload() {
 			}
 		}
 		*/
+
+		/*
 		var connect_avatar_list = [];
 		for (var i in lib.character) {
 			connect_avatar_list.push(i);
@@ -231,6 +233,9 @@ export async function onload() {
 			var ia = connect_avatar_list[i];
 			lib.mode.connect.config.connect_avatar.item[ia] = lib.translate[ia];
 		}
+		 */
+
+		/*
 		if (lib.config.mode != "connect") {
 			var pilecfg = lib.config.customcardpile[get.config("cardpilename") || "当前牌堆"];
 			if (pilecfg) {
@@ -243,6 +248,7 @@ export async function onload() {
 		} else {
 			lib.cardPackList = {};
 		}
+		 */
 		for (i in card) {
 			const cardPack = lib.cardPack[i] ? lib.cardPack[i] : (lib.cardPack[i] = []);
 			if (card[i].card) {
@@ -508,6 +514,14 @@ export async function onload() {
 	for (let character of Object.values(lib.imported.character)) {
 		loadCharacter(character);
 	}
+	loadCardPile();
+
+	// 我不好说，但我尊重水乎的想法
+	Object.keys(lib.character)
+		.toSorted(lib.sort.capt)
+		.forEach(character => {
+			lib.mode.connect.config.connect_avatar.item[character] = lib.translate[character];
+		});
 
 	await originProceed2();
 }

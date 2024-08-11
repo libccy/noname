@@ -13,6 +13,22 @@ import { importMode } from "./import.js";
 import { Mutex } from "../util/mutex.js";
 import { load } from "../util/config.js";
 
+export function loadCardPile() {
+	if (lib.config.mode === "connect") {
+		// @ts-ignore
+		lib.cardPackList = {};
+	} else {
+		var pilecfg = lib.config.customcardpile[get.config("cardpilename") || "当前牌堆"];
+		if (pilecfg) {
+			lib.config.bannedpile = get.copy(pilecfg[0] || {});
+			lib.config.addedpile = get.copy(pilecfg[1] || {});
+		} else {
+			lib.config.bannedpile = {};
+			lib.config.addedpile = {};
+		}
+	}
+}
+
 /**
  * @param {importCharacterConfig} character
  */
