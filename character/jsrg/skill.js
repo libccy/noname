@@ -1467,10 +1467,8 @@ const skills = {
 				game.log(source, forceTargets.includes(source) ? "自愿选择" : "选择了", current, "作为讨伐目标");
 				ticketsMap.set(current, (ticketsMap.get(current) || 0) + 1);
 			});
-			console.log(ticketsMap);
 			let maxTicket = 0;
 			const target = ticketsMap.entries().reduce((target, data) => {
-				console.log(data);
 				const [current, ticket] = data;
 				if (ticket > maxTicket) {
 					maxTicket = ticket;
@@ -1480,7 +1478,7 @@ const skills = {
 			}, false);
 			//上Buff
 			if (target) {
-				game.log(target, "成为了", "#g【执盟】", "的讨伐目标");
+				game.log(target, "成为了", "#g【诛逆】", "的讨伐目标");
 				player.addTempSkill("jsrgzhuni_effect");
 				player.markAuto("jsrgzhuni_effect", [target]);
 			}
@@ -2031,12 +2029,14 @@ const skills = {
 		async content(event, trigger, player) {
 			await player.showHandcards();
 			await player.draw(2);
-			const evt = event.getParent("phase");
+			const evt = event.getParent("phase", true);
 			if (evt) {
-				game.resetSkills();
-				_status.event = evt;
-				_status.event.finish();
-				_status.event.untrigger(true);
+				game.log(player, "结束了回合");
+				evt.finish();
+			}
+			const evtx = event.getParent("phaseUse", true);
+			if (evtx) {
+				evtx.skipped = true;
 			}
 		},
 		ai: {
@@ -7798,7 +7798,7 @@ const skills = {
 		},
 	},
 	jsrgchaozheng: {
-		audio: 2,
+		audio: 4,
 		trigger: { player: "phaseZhunbeiBegin" },
 		logTarget: function (event, player) {
 			return game.filterPlayer(i => i != player);
@@ -7914,7 +7914,7 @@ const skills = {
 		},
 	},
 	jsrgjulian: {
-		audio: 2,
+		audio: 4,
 		trigger: { player: "phaseJieshuBegin" },
 		filter: function (event, player) {
 			return player.hasZhuSkill("jsrgjulian") && lib.skill.jsrgjulian.logTarget(null, player).length;
@@ -9193,10 +9193,10 @@ const skills = {
 						}
 					},
 					cardRespondable: function (card, player) {
-						return lib.skill.jsrgfendi.cardEnabled.apply(this, arguments);
+						return lib.skill.jsrgfendi_blocker.mod.cardEnabled.apply(this, arguments);
 					},
 					cardSavable: function (card, player) {
-						return lib.skill.jsrgfendi.cardEnabled.apply(this, arguments);
+						return lib.skill.jsrgfendi_blocker.mod.cardEnabled.apply(this, arguments);
 					},
 				},
 			},
@@ -9425,7 +9425,7 @@ const skills = {
 	},
 	//王允
 	jsrgshelun: {
-		audio: 2,
+		audio: 4,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {

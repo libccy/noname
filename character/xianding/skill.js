@@ -575,47 +575,54 @@ const skills = {
 	dcwuxie: {
 		audio: 2,
 		trigger: {
-			player: "gainAfter",
-			global: "loseAsyncAfter",
+			player: "phaseUseEnd",
 		},
 		filter(event, player) {
-			const cards = event.getg(player).filter(i => get.owner(i) == player && get.position(i) == "h" && get.tag(i, "damage"));
-			return cards.length;
+			return game.hasPlayer(current => current != player && current.countCards("h"));
 		},
-		usable: 1,
 		async cost(event, trigger, player) {
-			const cards = trigger.getg(player).filter(i => get.owner(i) == player && get.position(i) == "h" && get.tag(i, "damage"));
 			event.result = await player
-				.chooseCardTarget({
-					prompt: get.prompt("dcwuxie"),
-					prompt2: "将获得的任意张伤害牌置于牌堆底并令一名其他角色弃置等量的牌",
-					filterTarget: lib.filter.notMe,
-					filterCard: card => get.event().cards.includes(card),
-					cards: cards,
-					selectCard: [1, cards.length],
-					ai1(card) {
-						return 3 / (Math.abs(get.value(card)) + 0.1);
-					},
-					ai2(target) {
-						const player = get.player();
-						return get.effect(target, { name: "guohe_copy2" }, player, player) * ui.selected.cards.length;
-					},
+				.chooseTarget(get.prompt2("dcwuxie"), function (card, player, target) {
+					return target != player && target.countCards("h");
 				})
-				.set("cards", cards)
+				.set("ai", target => {
+					const player = get.player();
+					return -get.attitude(player, target) * target.countCards("h");
+				})
 				.forResult();
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0],
-				cards = event.cards,
-				num = cards.length;
-			await player.lose(cards, ui.cardPile);
-			for (let i = 0; i < cards.length; i++) {
-				const card = cards[i];
-				card.fix();
-				ui.cardPile.appendChild(card);
+				cards1 = player.getCards("h", card => get.tag(card, "damage")),
+				cards2 = target.getCards("h", card => get.tag(card, "damage"));
+			if (cards1.length) {
+				player.$throw(cards1.length, 1000);
+				await player.lose(cards1, ui.cardPile);
+				for (let i = 0; i < cards1.length; i++) {
+					const card = cards1[i];
+					card.fix();
+					ui.cardPile.appendChild(card);
+				}
+			}
+			if (cards2.length) {
+				target.$throw(cards2.length, 1000);
+				await target.lose(cards2, ui.cardPile);
+				for (let i = 0; i < cards2.length; i++) {
+					const card = cards2[i];
+					card.fix();
+					ui.cardPile.appendChild(card);
+				}
 			}
 			await game.delayx();
-			if (target.countCards("he")) await target.chooseToDiscard(num, "he", true);
+			if (cards1.length != cards2.length) {
+				const recover = cards1.length < cards2.length ? target : player;
+				if (!recover.isDamaged()) return;
+				const result = await player
+					.chooseBool("是否令" + get.translation(recover) + "回复1点体力？")
+					.set("choice", get.recoverEffect(recover, player, player) > 0)
+					.forResult();
+				if (result.bool) await recover.recover();
+			}
 		},
 	},
 	//朱佩兰
@@ -7487,7 +7494,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "useCard" },
 		filter: function (event, player) {
-			if (!player.isPhaseUsing() || player.hasSkill("dcqingshi_blocker")) return false;
+			if (!player.isPhaseUsing()) return false;
 			if (player.getStorage("dcqingshi_clear").includes(event.card.name)) return false;
 			if (
 				player.hasCard(card => {
@@ -7601,7 +7608,7 @@ const skills = {
 		content3: function () {
 			"step 0";
 			player.draw(3);
-			player.addTempSkill("dcqingshi_blocker");
+			player.tempBanSkill("dcqingshi");
 		},
 		subSkill: {
 			ex: {
@@ -7629,7 +7636,6 @@ const skills = {
 				onremove: true,
 				charlotte: true,
 			},
-			blocker: { charlotte: true },
 		},
 		ai: {
 			threaten: 6,
@@ -8583,28 +8589,31 @@ const skills = {
 				onremove: true,
 				charlotte: true,
 				direct: true,
-				content: function () {
-					"step 0";
-					event.cards = player.getStorage("dcshexue_study");
-					"step 1";
-					var card = cards.pop();
-					if (trigger.player.hasUseTarget(card, false)) {
-						game.broadcastAll(function (card) {
-							lib.skill.dcshexue_backup.viewAs = card;
-							lib.skill.dcshexue_backup.prompt = "设学：是否将一张牌当做" + get.translation(card) + "使用？";
-						}, card);
-						var next = trigger.player.chooseToUse();
-						next.set("openskilldialog", `###${get.prompt("dcshexue_study")}###将一张牌当做${get.translation(card.nature) || ""}【${get.translation(card.name)}】使用`);
-						next.set("norestore", true);
-						next.set("addCount", false);
-						next.set("_backupevent", "dcshexue_backup");
-						next.set("custom", {
+				async content(event, trigger, player) {
+					let cards = player.getStorage("dcshexue_study");
+					const result = await player.chooseButton(["设学：是否将一张牌当作其中一张牌使用？", [cards, "vcard"]])
+						.set("ai", button => {
+							return get.event().player.getUseValue(button.link, false);
+						})
+						.forResult();
+					if (!result.bool) return;
+					const card = result.links[0];
+					if (!trigger.player.hasUseTarget(card, false)) return;
+					game.broadcastAll(function (card) {
+						lib.skill.dcshexue_backup.viewAs = card;
+						lib.skill.dcshexue_backup.prompt = "设学：是否将一张牌当做" + get.translation(card) + "使用？";
+					}, card);
+					await trigger.player.chooseToUse()
+						.set("openskilldialog", `###${get.prompt("dcshexue_study")}###
+							将一张牌当做${get.translation(card.nature) || ""}【${get.translation(card.name)}】使用`)
+						.set("norestore", true)
+						.set("addCount", false)
+						.set("_backupevent", "dcshexue_backup")
+						.set("custom", {
 							add: {},
 							replace: { window: function () {} },
-						});
-						next.backup("dcshexue_backup");
-					}
-					if (cards.length) event.redo();
+						})
+						.backup("dcshexue_backup");
 				},
 			},
 			studyclear: {
@@ -9870,7 +9879,7 @@ const skills = {
 							"bool",
 							(function () {
 								if (!player.hasSkill("dcanzhi")) return Math.random() < 0.5;
-								if (player.hasSkill("dcanzhi_blocker")) {
+								if (player.isTempBanned("dcanzhi")) {
 									var next = _status.currentPhase.getNext();
 									var judges = next.getCards("j");
 									var val = 0;
@@ -9923,9 +9932,6 @@ const skills = {
 	},
 	dcanzhi: {
 		enable: "phaseUse",
-		filter: function (event, player) {
-			return !player.hasSkill("dcanzhi_blocker");
-		},
 		group: "dcanzhi_damage",
 		content: function () {
 			"step 0";
@@ -9938,7 +9944,7 @@ const skills = {
 				player.removeSkill("dcxialei_clear");
 				event.finish();
 			} else if (result.color == "black") {
-				player.addTempSkill("dcanzhi_blocker");
+				player.tempBanSkill("dcanzhi");
 				player
 					.chooseTarget("暗织：是否令一名非当前回合角色获得本回合进入弃牌堆的两张牌？", (card, player, target) => {
 						return target != _status.currentPhase;
@@ -9988,9 +9994,6 @@ const skills = {
 			damage: {
 				audio: "dcanzhi",
 				trigger: { player: "damageEnd" },
-				filter: function (event, player) {
-					return !player.hasSkill("dcanzhi_blocker");
-				},
 				check: function (event, player) {
 					return game.hasPlayer(current => {
 						return get.attitude(player, current) > 0 && current != _status.currentPhase;
@@ -10008,7 +10011,7 @@ const skills = {
 						player.removeSkill("dcxialei_clear");
 						event.finish();
 					} else if (result.color == "black") {
-						player.addTempSkill("dcanzhi_blocker");
+						player.tempBanSkill("dcanzhi");
 						player
 							.chooseTarget("暗织：是否令一名非当前回合角色获得本回合进入弃牌堆的两张牌？", (card, player, target) => {
 								return target != _status.currentPhase;
@@ -10042,7 +10045,6 @@ const skills = {
 					}
 				},
 			},
-			blocker: { charlotte: true },
 		},
 	},
 	//十周年王允

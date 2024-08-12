@@ -1427,7 +1427,6 @@ const skills = {
 		},
 		enable: "phaseUse",
 		filter: function (event, player) {
-			if (player.hasSkill("xinfu_kannan_phase")) return false;
 			if (player.getStat().skill.xinfu_kannan >= player.hp) return false;
 			return player.countCards("h") > 0;
 		},
@@ -1465,7 +1464,7 @@ const skills = {
 			player.chooseToCompare(target);
 			"step 1";
 			if (result.bool) {
-				player.addTempSkill("xinfu_kannan_phase");
+				player.tempBanSkill("xinfu_kannan");
 				if (!player.hasSkill("kannan_eff")) {
 					player.addSkill("kannan_eff");
 				} else {

@@ -1581,6 +1581,8 @@ export class Game extends GameCompatible {
 		if (info.direct && !directaudio) return;
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
 
+		if (!info.audio && info.sourceSkill) skill = info.sourceSkill.toString();
+
 		let audioList = get.Audio.skill({ skill, player, info: skillInfo }).fileList;
 		if (special) {
 			if (typeof special == "string")
@@ -1985,6 +1987,33 @@ export class Game extends GameCompatible {
 	 * @type { undefined | ((url: string, folder: string, onsuccess?: Function, onerror?: (e: Error) => void, dev?: 'nodev', onprogress?: Function) => void) }
 	 */
 	download;
+
+	/**
+	 * 检查指定的路径是否是一个文件
+	 *
+	 * @param {string} fileName - 需要查询的路径
+	 * @param {(result: -1 | 0 | 1) => void} [callback] - 回调函数；接受的参数意义如下:
+	 *  - `-1`: 路径不存在或无法访问
+	 *  - `0`: 路径的内容不是文件
+	 *  - `1`: 路径的内容是文件
+	 * @param {(err: Error) => void} [onerror] - 接收错误的回调函数
+	 * @return {void} - 由于三端的异步需求和历史原因，文件管理必须为回调异步函数
+	 */
+	checkFile;
+
+	/**
+	 * 检查指定的路径是否是一个目录
+	 *
+	 * @param {string} dir - 需要查询的路径
+	 * @param {(result: -1 | 0 | 1) => void} [callback] - 回调函数；接受的参数意义如下:
+	 *  - `-1`: 路径不存在或无法访问
+	 *  - `0`: 路径的内容不是目录
+	 *  - `1`: 路径的内容是目录
+	 * @param {(err: Error) => void} [onerror] - 接收错误的回调函数
+	 * @return {void} - 由于三端的异步需求和历史原因，文件管理必须为回调异步函数
+	 */
+	checkDir;
+
 	/**
 	 * 读取文件为arraybuffer
 	 * @type { undefined | ((filename: string, callback?: (data: Buffer | ArrayBuffer) => any, onerror?: (e: Error) => void) => void) }
@@ -6109,52 +6138,41 @@ export class Game extends GameCompatible {
 	}
 	/**
 	 * @param { string } name
-	 * @param { (exports: importModeConfig) => any } callback
-	 * @returns { Promise<importModeConfig> }
+	 * @param { (exports: importModeConfig) => any } [callback]
+	 * @param { (error: unknown) => any } [onerror]
 	 */
-	loadModeAsync(name, callback = () => {}) {
-		window.game = game;
-		return import(`../../mode/${name}.js`)
-			.then(async exports => {
-				// esm模式
-				if (Object.keys(exports).length > 0) {
-					if (typeof exports.default == "function") {
-						game.import("mode", exports.default);
-					} else {
-						throw new Error(`导入的模式[${name}]格式不正确！`);
-					}
+	loadModeAsync(name, callback, onerror = e => console.error(e)) {
+		let promise = (async () => {
+			window.game = game;
+			const exports = await import(`../../mode/${name}.js`);
+			// esm模式
+			if (Object.keys(exports).length > 0) {
+				if (typeof exports.default !== 'function') {
+					throw new Error(`导入的模式[${name}]格式不正确！`);
 				}
-				// 普通模式
-				else {
-					await new Promise((resolve, reject) => {
-						let script = lib.init.js(
-							`${lib.assetURL}mode`,
-							name,
-							async () => {
-								script?.remove();
-								resolve(null);
-							},
-							() => {
-								reject(`导入的模式[${name}]不存在！`);
-							}
-						);
-					});
-				}
-				await Promise.allSettled(_status.importing.mode);
-				if (!lib.config.dev) delete window.game;
-				const content = lib.imported.mode[name];
-				if (!content) throw new Error(`导入的模式[${name}]格式不正确！`);
-				delete lib.imported.mode[name];
-				if (get.is.empty(lib.imported.mode)) {
-					delete lib.imported.mode;
-				}
-				callback(content);
-				return content;
-			})
-			.catch(e => {
-				console.error(`导入的模式[${name}]不存在！`);
-				return e;
-			});
+				game.import('mode', exports.default);
+			}
+			// 普通模式
+			else {
+				await new Promise((resolve, reject) => {
+					let script = lib.init.js(`${lib.assetURL}mode`, name, () => {
+						script?.remove();
+						resolve(null);
+					}, e => reject(e.error));
+				});
+			}
+			await Promise.allSettled(_status.importing.mode);
+			if (!lib.config.dev) delete window.game;
+			const content = lib.imported.mode[name];
+			if (!content) throw new Error(`导入的模式[${name}]格式不正确！`);
+			delete lib.imported.mode[name];
+			if (get.is.empty(lib.imported.mode)) {
+				delete lib.imported.mode;
+			}
+			return content;
+		})();
+		if (callback) promise = promise.then(callback, onerror);
+		return promise;
 	}
 	/**
 	 * @param { string } name

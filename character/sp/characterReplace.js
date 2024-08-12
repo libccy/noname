@@ -11,8 +11,8 @@ const characterReplaces = {
 	tw_beimihu: ["beimihu", "tw_beimihu"],
 	panfeng: ["panfeng", "re_panfeng", "std_panfeng"],
 	sunluyu: ["sunluyu", "re_sunluyu", "mb_sunluyu"],
-	jin_simazhao: ["jin_simazhao", "simazhao", "sp_simazhao"],
-	jin_wangyuanji: ["jin_wangyuanji", "wangyuanji", "sp_wangyuanji", "std_wangyuanji"],
+	jin_simazhao: ["jin_simazhao", "simazhao", "sp_simazhao", "jd_jin_simazhao"],
+	jin_wangyuanji: ["jin_wangyuanji", "wangyuanji", "sp_wangyuanji", "std_wangyuanji", "jd_jin_wangyuanji"],
 	wangyun: ["clan_wangyun", "wangyun", "dc_wangyun", "re_wangyun", "jsrg_wangyun", "old_wangyun", "pe_wangyun"],
 	zhangliang: ["xin_zhangliang", "re_zhangliang", "zhangliang"],
 	lingju: ["lingju", "old_lingju"],
@@ -20,7 +20,7 @@ const characterReplaces = {
 	zhangxingcai: ["zhangxingcai", "old_zhangxingcai"],
 	lisu: ["ol_lisu", "lisu"],
 	fuwan: ["fuwan", "tw_fuwan", "sp_fuwan"],
-	huaxin: ["ol_huaxin", "huaxin", "sp_huaxin", "std_huaxin"],
+	huaxin: ["ol_huaxin", "huaxin", "sp_huaxin", "std_huaxin", "jd_ol_huaxin"],
 	xujing: ["xujing", "dc_xujing", "sp_xujing", "tw_xujing"],
 	zhaoxiang: ["zhaoxiang", "dc_zhaoxiang", "tw_zhaoxiang"],
 	dengzhi: ["ol_dengzhi", "re_dengzhi", "dengzhi", "tw_dengzhi", "std_re_dengzhi"],
@@ -42,7 +42,7 @@ const characterReplaces = {
 	zhaoyǎn: ["zhaoyǎn", "dc_zhaoyǎn"],
 	furong: ["ol_furong", "furong", "tw_furong"],
 	daxiaoqiao: ["daxiaoqiao", "dc_daxiaoqiao", "tw_daxiaoqiao"],
-	zhugeguo: ["zhugeguo", "tw_zhugeguo", "yue_zhugeguo"],
+	zhugeguo: ["zhugeguo", "tw_zhugeguo", "yue_zhugeguo", "huan_zhugeguo"],
 	wanglang: ["ol_wanglang", "wanglang", "old_wanglang", "std_wanglang"],
 	tengfanglan: ["tengfanglan", "dc_tengfanglan"],
 	zhangyì: ["ol_zhangyì", "zhangyì", "std_zhangyì"],
@@ -64,6 +64,7 @@ const characterReplaces = {
 	kanze: ["kanze", "re_kanze"],
 	lvfan: ["lvfan", "sp_lvfan"],
 	dongbai: ["dongbai", "re_dongbai", "jsrg_dongbai"],
+	sp_jiaxu: ["dc_sp_jiaxu", "yj_jiaxu"],
 };
 
 export default characterReplaces;

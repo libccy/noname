@@ -1,4 +1,9 @@
 export default {
+	"#olchishi1": "柴米油盐之细，不逊兵家之谋。",
+	"#olchishi2": "治大家如烹小鲜，须面面俱到。",
+	"#olweimian1": "不过二三小事，夫君何须烦恼。",
+	"#olweimian2": "宦海疾风大浪，家为避风之塘。",
+	"#ol_sunru:die": "从来无情者，皆出帝王家。",
 	"#olyongzu1": "既拜我为父，咱家当视汝为骨肉。",
 	"#olyongzu2": "天地君亲师，此五者最须尊崇。",
 	"#rejianxiong_caoteng": "躬行禁闱，不敢争一时之气。",
@@ -295,6 +300,8 @@ export default {
 	"#tianyu:die": "命数之沙，已尽矣……",
 	"#olfengji1": "取舍有道，待机而赢。",
 	"#olfengji2": "此退彼进，月亏待盈。",
+	"#olxuanhui1": "今日，怕是要辜负温侯美意了。",
+	"#olxuanhui2": "前盖以惑敌，今图穷而匕现。",
 	"#ol_chendeng:die": "可无命，不可无脍……",
 	"#jixian1": "全军出击，速攻敌城。",
 	"#jixian2": "勿以我为念，攻城！",

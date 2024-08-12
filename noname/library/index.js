@@ -3692,7 +3692,7 @@ export class Library {
 					init: false,
 					unfrequent: true,
 					onclick(bool) {
-						game.saveConfig("show_statusbar", bool);
+						game.saveConfig("show_statusbar_android", bool);
 						if (window.StatusBar && lib.device == "android") {
 							if (bool) {
 								window.StatusBar.overlaysWebView(false);
@@ -7004,7 +7004,11 @@ export class Library {
 						map.connect_double_hp.hide();
 					} else {
 						map.connect_double_character.show();
-						map.connect_double_hp.show();
+						if (["double", "singble"].includes(config.connect_double_character)) {
+							map.connect_double_hp.show();
+						} else {
+							map.connect_double_hp.hide();
+						}
 					}
 				},
 			},
@@ -7076,7 +7080,11 @@ export class Library {
 						map.double_hp.hide();
 					} else {
 						map.double_character.show();
-						map.double_hp.show();
+						if (["double", "singble"].includes(config.double_character)) {
+							map.double_hp.show();
+						} else {
+							map.double_hp.hide();
+						}
 					}
 				},
 			},
@@ -9615,7 +9623,6 @@ export class Library {
 
 	element = {
 		content: Element.Content,
-		contents: Element.Contents,
 		Player: Element.Player,
 		Card: Element.Card,
 		VCard: Element.VCard,

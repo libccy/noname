@@ -6788,13 +6788,8 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 返回某些牌是否能进入玩家的判定区
-	 *
 	 * @overload
-	 * @param { string } card
-	 * @returns { boolean }
-	 *
-	 * @overload
-	 * @param { Card } card
+	 * @param { string | Card } card
 	 * @returns { boolean }
 	 */
 	canAddJudge(card) {
@@ -7642,6 +7637,14 @@ export class Player extends HTMLDivElement {
 			this.classList.remove("linked");
 		}
 	}
+	/**
+	 * 能否对target使用card
+	 * @param { Card | VCard | object | string } card
+	 * @param { Player } target
+	 * @param { false } [distance] false：无距离限制
+	 * @param { boolean | GameEvent } [includecard] 是否受使用次数限制，可以填入用于检测的事件
+	 * @returns 
+	 */
 	canUse(card, target, distance, includecard) {
 		if (typeof card == "string") card = { name: card, isCard: true };
 		var info = get.info(card);
@@ -7656,12 +7659,26 @@ export class Player extends HTMLDivElement {
 		if (distance !== false && !lib.filter.targetInRange(card, this, target)) return false;
 		return lib.filter[includecard ? "targetEnabledx" : "targetEnabled"](card, this, target);
 	}
+	/**
+	 * 场上是否存在能对其使用card的目标
+	 * @param { Card | VCard | object | string } card
+	 * @param { false } [distance] false：无距离限制
+	 * @param { boolean | GameEvent } [includecard] 是否受使用次数限制，可以填入用于检测的事件
+	 * @returns { boolean }
+	 */
 	hasUseTarget(card, distance, includecard) {
 		var player = this;
 		return game.hasPlayer(function (current) {
 			return player.canUse(card, current, distance, includecard);
 		});
 	}
+	/**
+	 * 场上是否存在收益为正的目标
+	 * @param { Card | VCard | object | string } card
+	 * @param { false } [distance] false：无距离限制
+	 * @param { boolean | GameEvent } [includecard] 是否受使用次数限制，可以填入用于检测的事件
+	 * @returns { boolean }
+	 */
 	hasValueTarget(card, distance, includecard) {
 		if (typeof card == "string") {
 			card = { name: card, isCard: true };
@@ -7703,6 +7720,13 @@ export class Player extends HTMLDivElement {
 		}
 		return min > 0;
 	}
+	/**
+	 * card使用价值
+	 * @param { Card | VCard | object | string } card
+	 * @param { false } [distance] false：无距离限制
+	 * @param { boolean | GameEvent } [includecard] 是否受使用次数限制，可以填入用于检测的事件
+	 * @returns { number } 无可选或正收益目标返回0
+	 */
 	getUseValue(card, distance, includecard) {
 		if (typeof card == "string") {
 			card = { name: card, isCard: true };
@@ -8501,13 +8525,9 @@ export class Player extends HTMLDivElement {
 		});
 	}
 	/**
+	 * 添加临时技能
 	 * @overload
-	 * @param { string } skill
-	 * @param { SkillTrigger | string | (event:GameEventPromise, player:Player, name:string) => boolean } [expire]
-	 * @param { boolean } [checkConflict]
-	 *
-	 * @overload
-	 * @param { string[] } skill 技能名数组
+	 * @param { string | string[] } skill 技能名(数组)
 	 * @param { SkillTrigger | string | (event:GameEventPromise, player:Player, name:string) => boolean } [expire]
 	 * @param { boolean } [checkConflict]
 	 */
@@ -9725,15 +9745,10 @@ export class Player extends HTMLDivElement {
 		return false;
 	}
 	/**
-	 * 返回玩家是否有某个牌名的牌
-	 *
-	 * @overload
-	 * @param { Card } name
-	 * @returns { boolean }
-	 *
+	 * 
 	 * @overload
 	 * @param { string } name
-	 * @returns { boolean}
+	 * @returns { boolean} 返回玩家判定区是否有某(种牌名的)牌
 	 */
 	hasJudge(name) {
 		if (name && typeof name === "object") {

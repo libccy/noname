@@ -3082,7 +3082,18 @@ game.import("card", function () {
 					var target = event.player;
 					var eff = get.damageEffect(target, player, player, event.nature);
 					if (get.attitude(player, target) > 0) {
-						if (eff >= 0) return false;
+						if (
+							eff >= 0 ||
+							event.nature &&
+							target.isLinked() &&
+							game.hasPlayer(cur => {
+								return (
+									cur !== target &&
+									cur.isLinked() &&
+									get.damageEffect(cur, player, player, event.nature) > 0
+								);
+							})
+						) return false;
 						return true;
 					}
 					if (eff <= 0) return true;

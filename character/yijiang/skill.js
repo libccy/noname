@@ -1135,13 +1135,12 @@ const skills = {
 	},
 	xintaoluan: {
 		hiddenCard: function (player, name) {
-			return !player.getStorage("xintaoluan").includes(name) && player.countCards("hes") > 0 && !player.hasSkill("xintaoluan3") && lib.inpile.includes(name);
+			return !player.getStorage("xintaoluan").includes(name) && player.countCards("hes") > 0 && lib.inpile.includes(name);
 		},
 		audio: "taoluan",
 		enable: "chooseToUse",
 		filter: function (event, player) {
 			return (
-				!player.hasSkill("xintaoluan3") &&
 				player.hasCard(card =>
 					lib.inpile.some(name => {
 						if (player.getStorage("xintaoluan").includes(name)) return false;
@@ -1218,7 +1217,7 @@ const skills = {
 			respondSha: true,
 			respondShan: true,
 			skillTagFilter: function (player, tag, arg) {
-				if (!player.countCards("hes") || player.hasSkill("taoluan3")) return false;
+				if (!player.countCards("hes") || player.isTempBanned("xintaoluan")) return false;
 				if (tag == "respondSha" || tag == "respondShan") {
 					if (arg == "respond") return false;
 					return !player.getStorage("taoluan").includes(tag == "respondSha" ? "sha" : "shan");
@@ -1294,12 +1293,11 @@ const skills = {
 			if (result.bool) {
 				target.give(result.cards, player, "give");
 			} else {
-				player.addTempSkill("xintaoluan3");
+				player.tempBanSkill("xintaoluan");
 				player.loseHp(num);
 			}
 		},
 	},
-	xintaoluan3: { charlotte: true },
 	xintaoluan_backup: {},
 	xincaishi: {
 		trigger: {
@@ -3789,13 +3787,12 @@ const skills = {
 	},
 	taoluan: {
 		hiddenCard: function (player, name) {
-			return !player.getStorage("taoluan").includes(name) && player.countCards("hes") > 0 && !player.hasSkill("taoluan3") && lib.inpile.includes(name);
+			return !player.getStorage("taoluan").includes(name) && player.countCards("hes") > 0 && lib.inpile.includes(name);
 		},
 		audio: 2,
 		enable: "chooseToUse",
 		filter: function (event, player) {
 			return (
-				!player.hasSkill("taoluan3") &&
 				player.hasCard(card =>
 					lib.inpile.some(name => {
 						if (player.getStorage("taoluan").includes(name)) return false;
@@ -3859,7 +3856,7 @@ const skills = {
 			respondSha: true,
 			respondShan: true,
 			skillTagFilter: function (player, tag, arg) {
-				if (!player.countCards("hes") || player.hasSkill("taoluan3")) return false;
+				if (!player.countCards("hes") || player.isTempBanned("taoluan")) return false;
 				if (tag == "respondSha" || tag == "respondShan") {
 					if (arg == "respond") return false;
 					return !player.getStorage("taoluan").includes(tag == "respondSha" ? "sha" : "shan");
@@ -3938,12 +3935,11 @@ const skills = {
 			if (result.bool) {
 				target.give(result.cards, player);
 			} else {
-				player.addTempSkill("taoluan3");
+				player.tempBanSkill("taoluan");
 				player.loseHp();
 			}
 		},
 	},
-	taoluan3: { charlotte: true },
 	taoluan_backup: {},
 	jishe: {
 		audio: 2,
@@ -4134,14 +4130,14 @@ const skills = {
 			if (mode == "identity" && _status.mode == "purple") return false;
 		},
 		getZhu: player => {
-			if (get.mode == "doudizhu") return game.findPlayer(i => i.identity == "zhu");
+			if (get.mode() == "doudizhu") return game.findPlayer(i => i.identity == "zhu");
 			return get.zhu(player);
 		},
 		trigger: { player: "phaseJieshuBegin" },
 		direct: true,
 		filter: function (event, player) {
 			var zhu = get.info("qinqing").getZhu(player);
-			if (!zhu || (get.mode != "doudizhu" && !zhu.isZhu)) return false;
+			if (!zhu || (get.mode() != "doudizhu" && !zhu.isZhu)) return false;
 			return game.hasPlayer(function (current) {
 				return current != zhu && current.inRange(zhu);
 			});
@@ -9575,7 +9571,6 @@ const skills = {
 		audio: 2,
 		trigger: { player: "useCardToPlayer" },
 		filter: function (event, player) {
-			if (player.hasSkill("rechanhui2")) return false;
 			if (event.targets.length > 1) return false;
 			var card = event.card;
 			if (card.name == "sha" || get.type(card) == "trick") return true;
@@ -9618,12 +9613,10 @@ const skills = {
 			} else {
 				game.log(event.target, "成为了", trigger.card, "的额外目标");
 				trigger.getParent().targets.push(event.target);
-				player.addTempSkill("rechanhui2");
+				player.tempBanSkill("rechanhui");
 			}
 		},
 	},
-	rechanhui2: { charlotte: true },
-	rejiaojin2: { charlotte: true },
 	rejiaojin: {
 		audio: 2,
 		trigger: { target: "useCardToTargeted" },
@@ -9633,8 +9626,7 @@ const skills = {
 				event.player != player &&
 				player.countCards("he", function (card) {
 					return _status.connectMode || get.type(card) == "equip";
-				}) &&
-				!player.hasSkill("rejiaojin2")
+				})
 			);
 		},
 		direct: true,
@@ -9657,7 +9649,7 @@ const skills = {
 				var cards = trigger.cards.filterInD();
 				if (cards.length) player.gain(cards, "gain2", "log");
 				trigger.excluded.push(player);
-				if (trigger.player.hasSex("female")) player.addTempSkill("rejiaojin2");
+				if (trigger.player.hasSex("female")) player.tempBanSkill("rejiaojin");
 			}
 		},
 	},
