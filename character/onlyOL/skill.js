@@ -714,7 +714,7 @@ const skills = {
 				}
 				if (skill) {
 					let skillName = `olsbhongtu_${player.playerid}`;
-					target.addAdditionalSkills(skillName, [skill]);
+					target.addAdditionalSkills(skillName, [skill], true);
 					delete target.storage.olsbhongtu_phased;
 					target.when({ player: "phaseBegin" }).then(() => {
 						player.storage.olsbhongtu_phased = true;
@@ -1314,7 +1314,7 @@ const skills = {
 						att = get.attitude(player, target);
 					if (get.type(card, null, target) == "equip" && (get.attitude(player, target) > 0 || get.recoverEffect(target, player, player) > 0)) return get.recoverEffect(target, player, player) * 20 + att / 114514;
 					if (get.type(card, null, target) != "equip") {
-						if (target.getHp() >= player.getHp()) return get.effect(target, { name: "losehp" }, player, player) * 20 - att / 114514;
+						if (target.getHp() !== player.getHp()) return get.effect(target, { name: "losehp" }, player, player) * 20 - att / 114514;
 						return get.effect(target, { name: "draw" }, player, player);
 					}
 					return 0;
@@ -1333,7 +1333,7 @@ const skills = {
 							} = await target.chooseUseTarget(card, true, "nopopup");
 							if (bool) await target.recover();
 						}
-					} else if (target.getHp() >= player.getHp()) await target.loseHp();
+					} else if (target.getHp() !== player.getHp()) await target.loseHp();
 				}
 			}
 		},
@@ -2145,7 +2145,6 @@ const skills = {
 			player: ["phaseZhunbeiEnd", "phaseJudgeEnd", "phaseDrawEnd", "phaseUseEnd", "phaseDiscardEnd", "phaseJieshuEnd"],
 		},
 		filter: function (event, player) {
-			if (player.hasSkill("olsbzhuri_block")) return false;
 			if (!game.hasPlayer(target => player.canCompare(target))) return false;
 			return player.getHistory("gain", evt => evt.getParent(event.name) == event).length + player.getHistory("lose", evt => evt.getParent(event.name) == event && evt.hs.length).length;
 		},
@@ -2203,6 +2202,7 @@ const skills = {
 						})
 						.set("list", list.slice(trigger.getParent().num, list.length));
 					player[result3.control == "失去体力" ? "loseHp" : "addTempSkill"](result3.control == "失去体力" ? 1 : "olsbzhuri_block");
+					player.tempBanSkill("olsbzhuri");
 				}
 			}
 		},
@@ -2398,7 +2398,7 @@ const skills = {
 		audio: "reqiaoshui",
 		inherit: "reqiaoshui",
 		filter(event, player) {
-			return player.countCards("h") > 0 && !player.hasSkill("olqiaoshui_used");
+			return player.countCards("h") > 0;
 		},
 		async content(event, trigger, player) {
 			const target = event.target;
@@ -2407,6 +2407,7 @@ const skills = {
 			else {
 				player.addTempSkill("qiaoshui2");
 				player.addTempSkill("olqiaoshui_used");
+				player.tempBanSkill("olqiaoshui");
 			}
 		},
 		subSkill: {

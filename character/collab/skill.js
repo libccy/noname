@@ -2,6 +2,140 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//刘协曹节
+	//我们意念合一×2
+	dcjuanlv: {
+		audio: 2,
+		equipSkill: false,
+		inherit: "cixiong_skill",
+		filter(event, player) {
+			return player.differentSexFrom(event.target);
+		},
+	},
+	dcqixin: {
+		audio: 2,
+		enable: "phaseUse",
+		filter(event, player) {
+			return !player.storage.dcqixin_die;
+		},
+		filterCard: false,
+		selectCard: [0, 1],
+		prompt() {
+			const player = get.player();
+			return "将性别变更为" + (Boolean(player.storage["dcqixin"]) ? "刘协--男" : "曹节--女");
+		},
+		*content(event, map) {
+			const player = map.player;
+			player.changeZhuanhuanji("dcqixin");
+			player.storage.dcqixin_hp[1 - Boolean(player.storage["dcqixin"])] = player.hp;
+			const hp = player.storage.dcqixin_hp[0 + Boolean(player.storage["dcqixin"])];
+			if (player.hp != hp) yield player.changeHp(hp - player.hp);
+			player.tempBanSkill(
+				"dcqixin",
+				{
+					player: ["useCard1", "useSkillBegin", "phaseUseEnd"],
+					global: ["phaseAfter", "phaseBeforeStart"],
+				},
+				false
+			);
+			const sex = player.storage["dcqixin"] ? "female" : "male";
+			game.broadcastAll(
+				(player, sex) => {
+					player.sex = sex;
+				},
+				player,
+				sex
+			);
+			game.log(player, "将性别变为了", "#y" + get.translation(sex) + "性");
+		},
+		mark: true,
+		zhuanhuanji: true,
+		markimage: "image/character/liuxie.jpg",
+		init(player) {
+			if (_status.gameStarted && !player.storage.dcqixin_hp) player.storage.dcqixin_hp = [player.maxHp, player.maxHp];
+		},
+		$zhuanhuanji(skill, player) {
+			const image = Boolean(player.storage[skill]) ? "caojie" : "liuxie";
+			const mark = player.marks[skill];
+			if (mark) mark.setBackground(image, "character");
+		},
+		intro: {
+			content(storage, player) {
+				const str = "当前性别：" + (Boolean(!storage) ? "刘协--男" : "曹节--女");
+				const hp = player.storage.dcqixin_hp || [player.maxHp, player.maxHp];
+				return player.storage.dcqixin_die ? str : "<li>" + str + "<br><li>" + (Boolean(storage) ? "刘协" : "曹节") + "体力值：" + hp[1 - Boolean(storage)];
+			},
+		},
+		ai: {
+			order: 10,
+			result: {
+				player(player) {
+					const cards = player.getCards("hs");
+					const target = game
+						.filterPlayer(i => i != player)
+						.sort((a, b) => {
+							return (
+								cards
+									.filter(j => player.canUse(j, b, true, true) && get.effect(b, j, player, player) > 0)
+									.reduce((sum, card) => {
+										return sum + get.effect(card, b, player, player);
+									}, 0) -
+								cards
+									.filter(j => player.canUse(j, a, true, true) && get.effect(a, j, player, player) > 0)
+									.reduce((sum, card) => {
+										return sum + get.effect(card, a, player, player);
+									}, 0)
+							);
+						})[0];
+					return player.differentSexFrom(target) ? 0 : 1;
+				},
+			},
+		},
+		derivation: "dcqixin_faq",
+		group: ["dcqixin_die", "dcqixin_mark"],
+		subSkill: {
+			die: {
+				audio: "dcqixin",
+				trigger: { player: "dieBefore" },
+				filter(event, player) {
+					return !player.storage.dcqixin_die && player.maxHp > 0;
+				},
+				forced: true,
+				locked: false,
+				content() {
+					trigger.cancel();
+					player.storage.dcqixin_die = true;
+					player.changeZhuanhuanji("dcqixin");
+					const sex = player.storage["dcqixin"] ? "female" : "male";
+					game.broadcastAll(
+						(player, sex) => {
+							player.sex = sex;
+						},
+						player,
+						sex
+					);
+					game.log(player, "将性别变为了", "#y" + get.translation(sex) + "性");
+					player.storage.dcqixin_hp[1 - Boolean(player.storage["dcqixin"])] = player.hp;
+					const hp = player.storage.dcqixin_hp[0 + Boolean(player.storage["dcqixin"])];
+					if (player.hp != hp) player.changeHp(hp - player.hp);
+				},
+			},
+			//双武将牌--梦回橙续缘双面武将
+			mark: {
+				charlotte: true,
+				trigger: { global: "gameStart" },
+				filter(event, player) {
+					return !player.storage.dcqixin_hp;
+				},
+				forced: true,
+				popup: false,
+				firstDo: true,
+				content() {
+					player.storage.dcqixin_hp = [player.maxHp, player.maxHp];
+				},
+			},
+		},
+	},
 	//五虎将
 	//是的孩子们，我们意念合一
 	olhuyi: {

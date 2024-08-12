@@ -2,7 +2,7 @@ const characterReplaces = {
 	wenyang: ["wenyang", "db_wenyang", "diy_wenyang", "std_db_wenyang"],
 	gexuan: ["gexuan", "tw_gexuan"],
 	panshu: ["panshu", "re_panshu"],
-	yangwan: ["yangwan", "sp_yangwan"],
+	yangwan: ["yangwan", "sp_yangwan", "jd_sp_yangwan"],
 	sunyi: ["re_sunyi", "sunyi", "tw_sunyi"],
 	fengfangnv: ["fengfangnv", "re_fengfangnv"],
 	luotong: ["dc_luotong", "luotong", "std_dc_luotong"],

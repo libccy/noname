@@ -4119,8 +4119,9 @@ export class Get extends GetCompatible {
 						} else if (lib.card[name] && lib.card[name].type && lib.translate[lib.card[name].type]) {
 							typeinfo += get.translation(lib.card[name].type) + "牌";
 						}
-						if (get.subtype(name, false)) {
-							typeinfo += "-" + get.translation(get.subtype(name, false));
+						let vcard = get.owner(node)?.getVCards(get.position(node))?.find(card => card.cards?.includes(node));
+						if (get.subtypes(vcard || node, get.owner(node))?.length) {
+							typeinfo += "-" + get.subtypes(vcard || node, get.owner(node)).map(type => get.translation(type)).join("/");
 						}
 						if (typeinfo) {
 							uiintro.add('<div class="text center">' + typeinfo + "</div>");

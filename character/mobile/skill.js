@@ -1477,8 +1477,7 @@ const skills = {
 	},
 	//杨奉
 	mbxuetu: {
-		audio: 2,
-		audioname: ["re_yangfeng"],
+		audio: 4,
 		enable: "phaseUse",
 		usable: 2,
 		filter(event, player) {
@@ -1491,7 +1490,6 @@ const skills = {
 		position: "he",
 		onremove: ["mbxuetu", "mbxuetu_status"],
 		derivation: ["mbxuetu_achieve", "mbxuetu_fail"],
-		
 		chooseButton: {
 			dialog() {
 				const dialog = ui.create.dialog("###血途###请选择要执行的项");
@@ -1516,6 +1514,9 @@ const skills = {
 			backup(result, player) {
 				return {
 					audio: "mbxuetu",
+					logAudio(event, player) {
+						return player.countMark("mbxuetu_status") == 2 ? get.rand(3, 4) : get.rand(1, 2);
+					},
 					choice: result.control.includes("回复") ? 0 : 1,
 					filterCard: () => false,
 					selectCard: -1,
@@ -1685,9 +1686,6 @@ const skills = {
 					game.log(player, "使命失败");
 					player.awakenSkill("mbweiming");
 					player.storage.mbxuetu_status = 2;
-					game.broadcastAll(player => {
-						player.tempname.add("re_yangfeng");
-					}, player);
 					await game.delayx();
 				},
 			},
@@ -3698,6 +3696,7 @@ const skills = {
 							player.node.name.innerHTML = get.slimName(first);
 							player.name2 = chosen;
 							player.skin.name = first;
+							player.skin.name2 = chosen;
 							player.classList.add("fullskin2");
 							player.node.avatar2.classList.remove("hidden");
 							player.node.avatar2.setBackground(chosen, "character");
@@ -3769,6 +3768,7 @@ const skills = {
 							player.node.avatar.setBackground(player.name, "character");
 							player.node.name.innerHTML = get.slimName(player.name);
 							delete player.name2;
+							delete player.skin.name2;
 							player.classList.remove("fullskin2");
 							player.node.avatar2.classList.add("hidden");
 							player.node.name2.innerHTML = "";
@@ -3790,7 +3790,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "dieBefore" },
 		filter: function (event, player) {
-			return player.getStorage("mbdanggu").length && event.getParent().name != "giveup" && player.maxHp > 0;
+			return event.getParent().name != "giveup" && player.maxHp > 0;
 		},
 		derivation: "mbmowang_faq",
 		forced: true,
@@ -3801,12 +3801,15 @@ const skills = {
 			if (_status.mbmowang_return && _status.mbmowang_return[player.playerid]) {
 				trigger.cancel();
 			} else {
-				player.logSkill("mbmowang");
-				game.broadcastAll(function () {
-					if (lib.config.background_speak) game.playAudio("die", "shichangshiRest");
-				});
-				trigger.setContent(lib.skill.mbmowang.dieContent);
-				trigger.includeOut = true;
+				if(player.getStorage("mbdanggu").length){
+					player.logSkill("mbmowang");
+					game.broadcastAll(function () {
+						if (lib.config.background_speak) game.playAudio("die", "shichangshiRest");
+					});
+					trigger.setContent(lib.skill.mbmowang.dieContent);
+					trigger.includeOut = true;
+				}
+				else player.changeSkin("mbmowang", "shichangshi_dead");
 			}
 		},
 		ai: {
@@ -3971,6 +3974,7 @@ const skills = {
 								player.node.avatar.setBackground(player.name + "_dead", "character");
 								player.node.name.innerHTML = get.slimName(player.name);
 								delete player.name2;
+								delete player.skin.name2;
 								player.classList.remove("fullskin2");
 								player.node.avatar2.classList.add("hidden");
 								player.node.name2.innerHTML = "";
@@ -5864,7 +5868,6 @@ const skills = {
 			if (result.bool) {
 				var target = result.targets[0];
 				event.target = target;
-				player.logSkill("yijin", target);
 				var kane = lib.skill.yijin.getKane(player);
 				var choiceList = kane.map(i => {
 					return '<div class="skill">【' + get.translation(lib.translate[i + "_ab"] || get.translation(i).slice(0, 2)) + "】</div>" + "<div>" + get.skillInfoTranslation(i, player) + "</div>";
@@ -11839,14 +11842,11 @@ const skills = {
 		locked: false,
 		audio: "jiuchi",
 		filter: function (event, player) {
-			return event.card && event.card.name == "sha" && event.getParent(2).jiu == true && !player.hasSkill("rejiuchi_air");
+			return event.card && event.card.name == "sha" && event.getParent(2).jiu == true && !player.isTempBanned("benghuai");
 		},
 		content: function () {
-			player.logSkill("jiuchi");
-			player.addTempSkill("rejiuchi_air");
-		},
-		subSkill: {
-			air: {},
+			player.logSkill("rejiuchi");
+			player.tempBanSkill("benghuai");
 		},
 	},
 	//苏飞，新贾逵
@@ -14873,9 +14873,6 @@ const skills = {
 		group: "liezhi_damage",
 		trigger: { player: "phaseZhunbeiBegin" },
 		direct: true,
-		filter: function (event, player) {
-			return !player.hasSkill("liezhi_disable");
-		},
 		content: function () {
 			"step 0";
 			player.chooseTarget(get.prompt("liezhi"), "弃置至多两名其他角色区域内的各一张牌", [1, 2], function (card, player, target) {
@@ -14897,25 +14894,13 @@ const skills = {
 			if (targets.length) event.redo();
 		},
 		subSkill: {
-			disable: {
-				sub: true,
-				trigger: { player: "phaseAfter" },
-				forced: true,
-				silent: true,
-				popup: false,
-				charlotte: true,
-				//filter:function(event){return !event.liezhi},
-				content: function () {
-					player.removeSkill("liezhi_disable");
-				},
-			},
 			damage: {
 				trigger: { player: "damage" },
 				forced: true,
 				silent: true,
 				popup: false,
 				content: function () {
-					player.addSkill("liezhi_disable");
+					player.tempBanSkill("liezhi", { player: "phaseAfter" });
 				},
 			},
 		},
@@ -15241,7 +15226,7 @@ const skills = {
 		},
 	},
 	xinfu_qianchong: {
-		audio: 3,
+		audio: 1,
 		group: ["qc_weimu", "qc_mingzhe"],
 		subSkill: {
 			effect: {
@@ -15263,6 +15248,7 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		direct: true,
+		derivation: ["qc_weimu", "qc_mingzhe"],
 		filter: function (event, player) {
 			var es = player.getCards("e");
 			if (!es.length) return true;
@@ -15298,7 +15284,7 @@ const skills = {
 		},
 	},
 	qc_weimu: {
-		audio: "xinfu_qianchong",
+		audio: true,
 		mod: {
 			targetEnabled: function (card, player, target) {
 				var bool = true;
@@ -15312,7 +15298,7 @@ const skills = {
 		},
 	},
 	qc_mingzhe: {
-		audio: "xinfu_qianchong",
+		audio: true,
 		trigger: {
 			player: ["useCard", "respond", "loseAfter"],
 			global: "loseAsyncAfter",
@@ -15732,7 +15718,7 @@ const skills = {
 				game.delay();
 			}
 		},
-		audio: true,
+		audio: 5,
 		enable: "phaseUse",
 		usable: 1,
 		chooseButton: {
@@ -15766,7 +15752,7 @@ const skills = {
 			},
 			backup: function (links, player) {
 				return {
-					audio: "xinfu_pingcai",
+					audio: "xinfu_pingcai1.mp3",
 					filterCard: () => false,
 					selectCard: -1,
 					takara: links[0][2],
@@ -16042,16 +16028,16 @@ const skills = {
 		},
 	},
 	pcaudio_wolong_card: {
-		audio: true,
+		audio: "xinfu_pingcai2.mp3",
 	},
 	pcaudio_fengchu_card: {
-		audio: true,
+		audio: "xinfu_pingcai3.mp3",
 	},
 	pcaudio_shuijing_card: {
-		audio: true,
+		audio: "xinfu_pingcai4.mp3",
 	},
 	pcaudio_xuanjian_card: {
-		audio: true,
+		audio: "xinfu_pingcai5.mp3",
 	},
 	yizan_use: {
 		audio: "yizan_respond_shan",

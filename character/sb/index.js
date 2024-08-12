@@ -22,9 +22,7 @@ game.import("character", function () {
 		characterFilter: { ...characterFilters },
 		characterTitle: {},
 		characterSubstitute: {
-			sb_sp_zhugeliang: [
-				["sb_zhugeliang", []],
-		],
+			sb_sp_zhugeliang: [["sb_zhugeliang", []]],
 		},
 		dynamicTranslate: { ...dynamicTranslates },
 		characterIntro: { ...characterIntros },

@@ -1257,12 +1257,12 @@ const skills = {
 			if (!result.bool) return;
 			const target = result.targets[0];
 			player.logSkill("dczhenrao", target);
-			await target.damage();
-			await game.delayx();
 			if (!player.storage.dczhenrao) {
 				player.when({ global: "phaseAfter" }).then(() => player.unmarkSkill("dczhenrao"));
 			}
 			player.markAuto("dczhenrao", target);
+			await target.damage();
+			await game.delayx();
 		},
 		intro: {
 			content: "已以此法对$造成过伤害",
@@ -5223,7 +5223,6 @@ const skills = {
 		audio: 2,
 		trigger: { global: "phaseEnd" },
 		filter: function (event, player) {
-			if (player.hasSkill("dcsigong_round")) return false;
 			if (event.player == player || !event.player.isIn()) return false;
 			if (!player.canUse("sha", event.player, false)) return false;
 			var respondEvts = [];
@@ -5280,7 +5279,6 @@ const skills = {
 			}
 		},
 		subSkill: {
-			round: { charlotte: true },
 			check: {
 				charlotte: true,
 				forced: true,
@@ -5290,7 +5288,7 @@ const skills = {
 					return event.card && event.card.name == "sha" && event.getParent(3).name == "dcsigong";
 				},
 				content: function () {
-					player.addTempSkill("dcsigong_round", "roundStart");
+					player.tempBanSkill("dcsigong", "roundStart");
 				},
 			},
 		},
@@ -10119,6 +10117,7 @@ const skills = {
 							player.chooseControl(list).set("ai", function () {
 								var controls = _status.event.controls;
 								if (controls.includes("cslilu")) return "cslilu";
+								if (controls.includes("zhichi")) return "zhichi";
 								return controls[0];
 							});
 						}
@@ -13770,7 +13769,7 @@ const skills = {
 		trigger: { global: "phaseZhunbeiBegin" },
 		forced: true,
 		filter: function (event, player) {
-			return (player != event.player || player.countMark("liedan") > 4) && !player.hasSkill("zhuangdan_mark");
+			return (player != event.player || player.countMark("liedan") > 4);
 		},
 		logTarget: "player",
 		content: function () {
@@ -13801,6 +13800,7 @@ const skills = {
 		},
 		content: function () {
 			player.addTempSkill("zhuangdan_mark", { player: "phaseEnd" });
+			player.tempBanSkill("liedan", { player: "phaseEnd" });
 		},
 		ai: {
 			combo: "zhuangdan",

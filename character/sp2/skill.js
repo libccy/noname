@@ -2377,20 +2377,54 @@ const skills = {
 				}, "he");
 			});
 		},
+		getSkills(skills, len) {
+			skills = skills.filter(skill => {
+				let str = get.skillInfoTranslation(skill, get.event().player);
+				if (str.indexOf("当你于出牌阶段") != -1) return true;
+				let ss = game.expandSkills([skill]);
+				if (ss.some(skillx => {
+					let info = get.info(skillx);
+					if (!info || !info.enable) return false;
+					if (
+						info.enable != "phaseUse" &&
+						info.enable != "chooseToUse" &&
+						(
+							!Array.isArray(info.enable) ||
+							!info.enable.includes("phaseUse") &&
+							!info.enable.includes("chooseToUse")
+						)
+					) return false;
+					if (info.juexingji || info.hiddenSkill || info.charlotte || info.limited || info.dutySkill) return false;
+					if (info.ai && info.ai.notemp) return false;
+					return true;
+				})) return true;
+				return false;
+			});
+			if (len && !skills.length) {
+				if (!_status.characterlist) lib.skill.pingjian.initList();
+				let allList = _status.characterlist.slice(0);
+				allList.randomSort();
+				for (const name of allList) {
+					const curSkills = lib.character[name][3];
+					const filteredSkills = lib.skill.longsong.getSkills(curSkills);
+					if (filteredSkills.length > 0) return filteredSkills.randomGets(1);
+				}
+			}
+			return skills;
+		},
 		async cost(event, trigger, player) {
 			event.result = await player
 				.chooseCardTarget({
 					prompt: get.prompt2("longsong"),
 					filterTarget(card, player, target) {
 						if (target === player) return false;
-						const skills = lib.skill.dclongsong.getSkills(target).map(skill => get.translation(skill));
+						const skills = lib.skill.longsong.getSkills(target.getSkills(null, false)).map(skill => get.translation(skill));
 						if (skills.length) {
 							target.prompt(skills.join("<br>"));
 						}
 						return (
 							ui.selected.cards.length ||
 							target.hasCard(card => {
-								if (get.position(card) == "h") return true;
 								return get.color(card) == "red" && lib.filter.canBeGained(card, player, target);
 							}, "he")
 						);
@@ -2413,7 +2447,7 @@ const skills = {
 						const player = get.event("player"),
 							att = get.attitude(player, target);
 						if (att > 0 && !target.getGainableCards(player, "he").some(card => get.color(card) == "red")) return 0;
-						return lib.skill.dclongsong.getSkills(target).length + (att > 0 ? 0 : Math.max(0, get.effect(target, { name: "shunshou_copy2" }, player, player)));
+						return lib.skill.longsong.getSkills(target.getSkills(null, false)).length + (att > 0 ? 0 : Math.max(0, get.effect(target, { name: "shunshou_copy2" }, player, player)));
 					},
 				})
 				.forResult();
@@ -2453,43 +2487,28 @@ const skills = {
 					game.log("但是", target, "没有红色牌可被" + get.translation(player) + "获得！");
 				}
 			}
-			let skills = lib.skill.dclongsong.getSkills(target),
-				fromTarget = true;
-			if (!skills.length) {
-				if (!_status.characterlist) {
-					lib.skill.pingjian.initList();
-				}
-				const allList = _status.characterlist.slice(0);
-				allList.randomSort();
-				for (const name of allList) {
-					const curSkills = lib.character[name][3];
-					const filteredSkills = lib.skill.dclongsong.getSkills(null, curSkills);
-					if (filteredSkills.length > 0) {
-						skills = filteredSkills.randomGets(1);
-						fromTarget = false;
-						break;
-					}
-				}
-			}
-			if (!skills.length) return;
+			let skills = lib.skill.longsong.getSkills(target.getSkills(null, false), true);
 			if (!event.isMine() && !event.isOnline()) await game.delayx();
-			skills.forEach(skill => {
-				player.popup(skill, "thunder");
-			});
-			if (fromTarget) {
-				target.disableSkill("dclongsong_back", skills);
-				target.markAuto("dclongsong_back", skills);
-				target.addTempSkill("dclongsong_back", ["phaseUseAfter", "phaseAfter"]);
-				let str = "";
-				for (let i = 0; i < skills.length; i++) {
-					str += "【" + get.translation(skills[i]) + "】";
-					if (i != skills.length - 1) str += "、";
-				}
-				game.log(target, "的技能", "#g" + str, "失效了");
-			}
+			if (!skills.length) return;
+			let skill;
+			if (skills.length == 1) skill = skills[0];
+			else skill = await player.chooseControl(skill)
+				.set('choiceList', skills.map(i => {
+					return '<div class="skill">' + (lib.translate[i + '_ab'] || lib.translate[i]) + '</div><div>' + get.skillInfoTranslation(i, player) + '</div>';
+				}))
+				.set("displayIndex", false)
+				.set("prompt", "龙诵：请选择你要获得的技能")
+				.set("ai", () => {
+					var list = _status.event.controls.slice();
+					return list.sort((a, b) => {
+						return get.skillRank(b, "in") - get.skillRank(a, "in");
+					})[0];
+				})
+				.forResultControl();
+			player.popup(skill, "thunder");
 			player.addTempSkill("dclongsong_remove", ["phaseUseAfter", "phaseAfter"]);
-			player.markAuto("dclongsong_remove", skills);
-			await player.addTempSkills(skills, ["phaseUseAfter", "phaseAfter"]);
+			player.markAuto("dclongsong_remove", [skill]);
+			await player.addTempSkills(skill, ["phaseUseAfter", "phaseAfter"]);
 		},
 	},
 	//伏完
@@ -4063,9 +4082,6 @@ const skills = {
 		trigger: { player: "useCard" },
 		forced: true,
 		zhuanhuanji: true,
-		filter: function (event, player) {
-			return !player.hasSkill("piaoping_blocker", null, null, false);
-		},
 		content: function () {
 			player.changeZhuanhuanji("piaoping");
 			var num = Math.min(
@@ -4093,7 +4109,6 @@ const skills = {
 				return "转换技，锁定技。当你使用一张牌时，你摸X张牌。（X为你本阶段内发动过〖漂萍〗的次数且至多等于你的体力值）";
 			},
 		},
-		subSkill: { blocker: { charlotte: true } },
 	},
 	tuoxian: {
 		audio: 2,
@@ -4152,7 +4167,7 @@ const skills = {
 			if (result.index == 0) {
 				if (target.countCards("j") > 0) target.discardPlayerCard(target, cards.length, true, "hej");
 				else target.chooseToDiscard("he", true, cards.length);
-			} else player.addTempSkill("piaoping_blocker");
+			} else player.tempBanSkill("piaoping");
 		},
 		init(player) {
 			player.addMark("tuoxian", 1, false);
@@ -4166,19 +4181,18 @@ const skills = {
 		filter: function (event, player) {
 			if (player == event.player || get.color(event.card) != "black") return false;
 			if (!player.hasSkill("piaoping", null, null, false)) return false;
-			return player.storage.piaoping == true || !player.hasSkill("chuaili_blocker", null, null, false);
+			return player.storage.piaoping == true;
 		},
 		content: function () {
 			if (player.storage.piaoping == true) {
 				player.changeZhuanhuanji("piaoping");
 			} else {
 				player.addMark("tuoxian", 1, false);
-				if (player.countCards("tuoxian") > 3) player.addTempSkill("chuaili_blocker");
+				if (player.countCards("tuoxian") > 3) player.tempBanSkill("chuaili");
 			}
 			game.delayx();
 		},
 		ai: { combo: "piaoping" },
-		subSkill: { blocker: { charlotte: true } },
 	},
 	//闫柔
 	choutao: {
@@ -5313,6 +5327,17 @@ const skills = {
 			player.addSkills(lib.skill.chuanshu.derivation);
 		},
 		derivation: ["ollongdan", "drlt_congjian", "chuanyun"],
+		ai: {
+			maixie_hp: true,
+			effect: {
+				target(card, player, target) {
+					if (get.tag(card, "damage")) {
+						if (target.isHealthy()) return [1, 3];
+					}
+					else if (get.tag(card, "recover") && target.getDamagedHp() == 1) return [0, 0];
+				}
+			}
+		}
 	},
 	longdan_tongyuan: { audio: true },
 	ocongjian_tongyuan: { audio: true },
@@ -7492,7 +7517,7 @@ const skills = {
 		trigger: { target: "useCardToTargeted" },
 		forced: true,
 		filter: function (event, player) {
-			return player != event.player && !player.hasSkill("weipo3") && player.countCards("h") < Math.min(5, player.maxHp) && (event.card.name == "sha" || get.type(event.card) == "trick");
+			return player != event.player && player.countCards("h") < Math.min(5, player.maxHp) && (event.card.name == "sha" || get.type(event.card) == "trick");
 		},
 		content: function () {
 			"step 0";
@@ -7514,7 +7539,7 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
-			player.addTempSkill("weipo3", { player: "phaseBegin" });
+			player.tempBanSkill("weipo", { player: "phaseBegin" });
 			if (player.countCards("h") && trigger.player.isIn()) {
 				player.chooseCard("h", true, "将一张手牌交给" + get.translation(trigger.player));
 			} else event.finish();
@@ -7524,7 +7549,6 @@ const skills = {
 			}
 		},
 	},
-	weipo3: { charlotte: true },
 	refuqi: {
 		audio: "fuqi",
 		forced: true,
@@ -10497,7 +10521,7 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		filter: function (event, player) {
-			return !player.hasSkill("songshu_reflectionblue", null, null, false) && player.countCards("h") > 0;
+			return player.countCards("h") > 0;
 		},
 		filterTarget: function (card, player, target) {
 			return target != player && player.canCompare(target);
@@ -10509,7 +10533,7 @@ const skills = {
 			if (!result.bool) {
 				player.draw(2, "nodelay");
 				target.draw(2);
-				player.addTempSkill("songshu_reflectionblue", "phaseUseAfter");
+				player.tempBanSkill("songshu", "phaseUseAfter");
 			} else {
 				target.addTempSkill("songshu_ai");
 			}
@@ -10541,7 +10565,6 @@ const skills = {
 		},
 	},
 	songshu_ai: { charlotte: true },
-	songshu_reflectionblue: { charlotte: true },
 	sibian: {
 		audio: 2,
 		trigger: { player: "phaseDrawBegin1" },

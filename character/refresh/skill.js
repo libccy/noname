@@ -12773,9 +12773,6 @@ const skills = {
 			off: {
 				sub: true,
 			},
-			off2: {
-				sub: true,
-			},
 		},
 		audio: 2,
 		enable: "phaseUse",
@@ -12792,16 +12789,13 @@ const skills = {
 				return 3 - get.value(card);
 			return 9 - get.value(card);
 		},
-		filter: function (event, player) {
-			return !player.hasSkill("new_reqingnang_off2");
-		},
 		filterTarget: function (card, player, target) {
 			if (target.hp >= target.maxHp || target.hasSkill("new_reqingnang_off")) return false;
 			return true;
 		},
 		content: function () {
 			target.addTempSkill("new_reqingnang_off");
-			if (get.color(cards[0]) == "black") player.addTempSkill("new_reqingnang_off2");
+			if (get.color(cards[0]) == "black") player.tempBanSkill("new_reqingnang");
 			target.recover();
 		},
 		ai: {
@@ -13034,7 +13028,7 @@ const skills = {
 				var subtype = get.subtype(card);
 				if (
 					!game.hasPlayer(function (current) {
-						return current != player && current.hp != player.hp && get.attitude(player, current) > 0 && !current.countCards("e", { subtype: subtype });
+						return current != player && get.attitude(player, current) > 0 && !current.countCards("e", { subtype: subtype });
 					})
 				) {
 					return 0;
@@ -13091,29 +13085,23 @@ const skills = {
 				return 2;
 			},
 			result: {
+				player(player, target) {
+					let card = ui.selected.cards[0], val = -get.value(card, player) / 6;
+					if (get.position(card) == "e") val += 2;
+					if (player.hp > target.hp) val++;
+					else if (player.hp < target.hp && player.isDamaged()) {
+						val += get.recoverEffect(player, player, player) / get.attitude(player, player);
+					}
+					return val;
+				},
 				target: function (player, target) {
-					var goon = function () {
-						var es = player.getCards("e");
-						for (var i = 0; i < es.length; i++) {
-							if (player.countCards("h", { subtype: get.subtype(es[i]) })) return true;
-						}
-						return false;
-					};
-					if (player.hp < target.hp) {
-						if (player.isHealthy()) {
-							if (!player.needsToDiscard(1) || goon()) return 0.1;
-							return 0;
-						}
-						return 1.5;
+					let card = ui.selected.cards[0],
+						val = get.position(card) == "e" ? get.value(card, target) / 6 : 0;
+					if (target.hp > player.hp) val++;
+					else if (target.hp < player.hp && target.isDamaged()) {
+						val += get.recoverEffect(target, target, target) / get.attitude(target, target);
 					}
-					if (player.hp > target.hp) {
-						if (target.isHealthy()) {
-							if (!player.needsToDiscard(1) || goon()) return 0.1;
-							return 0;
-						}
-						return 1;
-					}
-					return 0;
+					return val;
 				},
 			},
 		},
@@ -15344,14 +15332,11 @@ const skills = {
 		forced: true,
 		filter: function (event, player) {
 			if (event.name == "chooseToUse") return player.hasCard(card => get.suit(card) == "spade", "hs");
-			return event.card && event.card.name == "sha" && event.getParent(2).jiu == true && !player.hasSkill("oljiuchi_air");
+			return event.card && event.card.name == "sha" && event.getParent(2).jiu == true && !player.isTempBanned("benghuai");
 		},
 		content: function () {
 			player.logSkill("oljiuchi");
-			player.addTempSkill("oljiuchi_air");
-		},
-		subSkill: {
-			air: {},
+			player.tempBanSkill("benghuai");
 		},
 	},
 	rezaiqi: {
