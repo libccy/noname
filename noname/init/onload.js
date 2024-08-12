@@ -121,7 +121,7 @@ export async function onload() {
 	delete window.game;
 
 	// 可惜由于无名杀的水乎震撼层层相套，proceed2最终还是苟延残喘着
-	const originProceed2 = async () => {
+	const _originProceed2 = async () => {
 		let mode = lib.imported.mode;
 		var card = lib.imported.card;
 		var character = lib.imported.character;
@@ -509,25 +509,6 @@ export async function onload() {
 		delete lib.extensions;
 
 		 */
-
-		if (lib.init.startBefore) {
-			lib.init.startBefore();
-			delete lib.init.startBefore;
-		}
-		ui.create.arena();
-		game.createEvent("game", false).setContent(lib.init.start);
-		if (lib.mode[lib.config.mode] && lib.mode[lib.config.mode].fromextension) {
-			var startstr = mode[lib.config.mode].start.toString();
-			if (startstr.indexOf("onfree") == -1) {
-				setTimeout(lib.init.onfree, 500);
-			}
-		}
-		delete lib.init.start;
-		if (Array.isArray(_status.onprepare) && _status.onprepare.length) {
-			await Promise.allSettled(_status.onprepare);
-			delete _status.onprepare;
-		}
-		game.loop();
 	};
 
 	lib.connectCharacterPack = [];
@@ -609,7 +590,26 @@ export async function onload() {
 		lib.extensions.forEach(loadExtension);
 	}
 
-	await originProceed2();
+	if (lib.init.startBefore) {
+		lib.init.startBefore();
+		delete lib.init.startBefore;
+	}
+
+	ui.create.arena();
+	game.createEvent("game", false).setContent(lib.init.start);
+	if (lib.mode[lib.config.mode] && lib.mode[lib.config.mode].fromextension) {
+		var startstr = mode[lib.config.mode].start.toString();
+		if (startstr.indexOf("onfree") === -1) {
+			setTimeout(lib.init.onfree, 500);
+		}
+	}
+	delete lib.init.start;
+	if (Array.isArray(_status.onprepare) && _status.onprepare.length) {
+		await Promise.allSettled(_status.onprepare);
+		delete _status.onprepare;
+	}
+
+	game.loop();
 }
 
 async function createBackground() {

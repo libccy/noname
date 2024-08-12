@@ -255,6 +255,17 @@ export async function loadExtension(extension) {
 				content.name = extension[0];
 				content.translate ??= {};
 				content.translate[content.name] = content.name;
+
+				if (lib.imported.character) {
+					lib.imported.character[extension[0]] = content;
+				}
+
+				if (!lib.config[`@Experimental.extension.${extension[0]}.character`]) {
+					game.saveConfig(`@Experimental.extension.${extension[0]}.character`, true);
+					lib.config.characters.add(extension[0]);
+					await game.promises.saveConfigValue("characters");
+				}
+
 				loadCharacter(content);
 			}
 			if (extension[4].card) {
@@ -262,6 +273,17 @@ export async function loadExtension(extension) {
 				content.name = extension[0];
 				content.translate ??= {};
 				content.translate[content.name] = content.name;
+
+				if (lib.imported.card) {
+					lib.imported.card[extension[0]] = content;
+				}
+
+				if (!lib.config[`@Experimental.extension.${extension[0]}.card`]) {
+					game.saveConfig(`@Experimental.extension.${extension[0]}.card`, true);
+					lib.config.cards.add(extension[0]);
+					await game.promises.saveConfigValue("cards");
+				}
+
 				loadCard(content);
 			}
 			if (extension[4].skill) {
