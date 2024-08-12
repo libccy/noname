@@ -196,7 +196,7 @@ export async function onload() {
 	}
 
 	if (Array.isArray(lib.extensions)) {
-		lib.extensions.forEach(loadExtension);
+		await Promise.allSettled(lib.extensions.map(loadExtension));
 	}
 
 	if (lib.init.startBefore) {

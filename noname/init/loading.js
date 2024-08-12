@@ -14,6 +14,7 @@ import { Mutex } from "../util/mutex.js";
 import { load } from "../util/config.js";
 
 /**
+ * 读取导入的卡牌包信息
  *
  * @param {importCardConfig} cardConfig
  */
@@ -100,6 +101,9 @@ export function loadCard(cardConfig) {
 	}
 }
 
+/**
+ * 读取牌堆信息
+ */
 export function loadCardPile() {
 	if (lib.config.mode === "connect") {
 		// @ts-ignore
@@ -117,6 +121,8 @@ export function loadCardPile() {
 }
 
 /**
+ * 读取导入的武将包信息
+ *
  * @param {importCharacterConfig} character
  */
 export function loadCharacter(character) {
@@ -320,6 +326,8 @@ export async function loadExtension(extension) {
 }
 
 /**
+ * 读取当前的模式信息
+ *
  * @param {importModeConfig} mode
  */
 export function loadMode(mode) {
@@ -345,6 +353,7 @@ export function loadMode(mode) {
 }
 
 /**
+ * 读取导入的play信息
  *
  * @param {importPlayConfig} playConfig
  */
@@ -410,6 +419,7 @@ function mixinGeneral(config, name, where) {
 }
 
 /**
+ * `lib`的内容注入
  *
  * @param {importModeConfig | importPlayConfig} config
  * @param {Library} lib
@@ -436,6 +446,7 @@ function mixinLibrary(config, lib) {
 }
 
 /**
+ * `lib.element`的内容注入
  *
  * @param {importModeConfig | importPlayConfig} config
  * @param {Record<string, Object>} element
