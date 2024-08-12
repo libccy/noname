@@ -207,7 +207,7 @@ export async function onload() {
 	ui.create.arena();
 	game.createEvent("game", false).setContent(lib.init.start);
 	if (lib.mode[lib.config.mode] && lib.mode[lib.config.mode].fromextension) {
-		var startstr = mode[lib.config.mode].start.toString();
+		var startstr = currentMode.start.toString();
 		if (startstr.indexOf("onfree") === -1) {
 			setTimeout(lib.init.onfree, 500);
 		}
