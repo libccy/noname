@@ -13,6 +13,93 @@ import { importMode } from "./import.js";
 import { Mutex } from "../util/mutex.js";
 import { load } from "../util/config.js";
 
+/**
+ *
+ * @param {importCardConfig} cardConfig
+ */
+export function loadCard(cardConfig) {
+	const cardConfigName = cardConfig.name;
+
+	lib.cardPack[cardConfigName] ??= [];
+	if (cardConfig.card) {
+		for (let [cardPackName, cardPack2] of Object.entries(cardConfig.card)) {
+			if (!(!cardPack2.hidden && cardConfig.translate[`${cardPackName}_info`])) continue;
+			lib.cardPack[cardConfigName].add(cardPackName);
+		}
+	}
+
+	for (const [configName, configItem] of Object.entries(cardConfig)) {
+		switch (configName) {
+			case "name":
+			case "mode":
+			case "forbid":
+				break;
+			case "connect":
+				// @ts-ignore
+				lib.connectCardPack.push(cardConfigName);
+				break;
+			case "list":
+				if (lib.config.mode === "connect") {
+					// @ts-ignore
+					lib.cardPackList[cardConfigName] ??= [];
+					// @ts-ignore
+					lib.cardPackList[cardConfigName].addArray(configItem);
+				} else if (lib.config.cards.includes(cardConfigName)) {
+					/**
+					 * @type {any[]}
+					 */
+					let pile = typeof configItem == "function" ? configItem() : configItem;
+
+					lib.cardPile[cardConfigName] ??= [];
+					lib.cardPile[cardConfigName].addArray(pile);
+
+					if (lib.config.bannedpile[cardConfigName]) {
+						pile = pile.filter((_value, index) => !lib.config.bannedpile[cardConfigName].includes(index));
+					}
+
+					if (lib.config.addedpile[cardConfigName]) {
+						pile = [...pile, ...lib.config.addedpile[cardConfigName]];
+					}
+
+					lib.card.list.addArray(pile);
+				}
+				break;
+			default:
+				for (const [itemName, item] of Object.entries(configItem)) {
+					if (configName === "skill" && itemName[0] === "_" && !item.forceLoad && (lib.config.mode !== "connect" ? !lib.config.cards.includes(cardConfigName) : !cardConfig.connect)) {
+						continue;
+					}
+
+					if (configName === "translate" && itemName === cardConfigName) {
+						lib[configName][`${itemName}_card_config`] = item;
+					} else {
+						if (lib[configName][itemName] == null) {
+							if (configName === "skill" && !item.forceLoad && lib.config.mode === "connect" && !cardConfig.connect) {
+								lib[configName][itemName] = {
+									nopop: item.nopop,
+									derivation: item.derivation,
+								};
+							} else {
+								// @ts-ignore
+								Object.defineProperty(lib[configName], itemName, Object.getOwnPropertyDescriptor(configItem, itemName));
+							}
+						} else {
+							console.log(`duplicated ${configName} in card ${cardConfigName}:\n${itemName}:\nlib.${configName}.${itemName}`, lib[configName][itemName], `\ncard.${cardConfigName}.${configName}.${itemName}`, item);
+						}
+
+						if (configName === "card" && lib[configName][itemName].derivation) {
+							// @ts-ignore
+							lib.cardPack.mode_derivation ??= [];
+							// @ts-ignore
+							lib.cardPack.mode_derivation.push(itemName);
+						}
+					}
+				}
+				break;
+		}
+	}
+}
+
 export function loadCardPile() {
 	if (lib.config.mode === "connect") {
 		// @ts-ignore
@@ -171,6 +258,10 @@ export function loadMode(mode) {
 }
 
 /**
+ * 通用形式的内容注入
+ *
+ * 由于历史原因，故直接覆盖对应的变量
+ *
  * @template {Object} T
  * @param {importModeConfig} mode
  * @param {string} name
@@ -178,11 +269,10 @@ export function loadMode(mode) {
  * @return {void}
  */
 function modeMixinGeneral(mode, name, where) {
-	if (mode[name]) {
-		for (let key in mode[name]) {
-			let value = mode[name][key];
-			where[key] = typeof value == "object" ? Object.assign(where[key] ?? {}, value) : value;
-		}
+	if (!mode[name]) return;
+
+	for (let [key, value] of Object.entries(mode[name])) {
+		where[key] = typeof value == "object" ? Object.assign(where[key] ?? {}, value) : value;
 	}
 }
 

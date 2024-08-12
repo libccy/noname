@@ -9,7 +9,7 @@ import { gnc } from "../gnc/index.js";
 import { importMode } from "./import.js";
 import { Mutex } from "../util/mutex.js";
 import { load } from "../util/config.js";
-import { loadCardPile, loadCharacter, loadMode } from "./loading.js";
+import { loadCard, loadCardPile, loadCharacter, loadMode } from "./loading.js";
 
 export async function onload() {
 	const libOnload = lib.onload;
@@ -249,6 +249,7 @@ export async function onload() {
 			lib.cardPackList = {};
 		}
 		 */
+		/*
 		for (i in card) {
 			const cardPack = lib.cardPack[i] ? lib.cardPack[i] : (lib.cardPack[i] = []);
 			if (card[i].card) {
@@ -330,6 +331,7 @@ export async function onload() {
 				}
 			}
 		}
+		 */
 		if (lib.cardPack.mode_derivation) {
 			for (var i = 0; i < lib.cardPack.mode_derivation.length; i++) {
 				if (typeof lib.card[lib.cardPack.mode_derivation[i]].derivation == "string" && !lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]) {
@@ -401,13 +403,13 @@ export async function onload() {
 				lib.connectCharacterPack.push(packname);
 			}
 		}
-		 */
 		for (var i = 0; i < lib.config.all.cards.length; i++) {
 			var packname = lib.config.all.cards[i];
 			if (connectCardPack.includes(packname)) {
 				lib.connectCardPack.push(packname);
 			}
 		}
+		 */
 		if (lib.config.mode != "connect") {
 			for (i = 0; i < lib.card.list.length; i++) {
 				if (lib.card.list[i][2] == "huosha") {
@@ -515,6 +517,9 @@ export async function onload() {
 		loadCharacter(character);
 	}
 	loadCardPile();
+	for (let card of Object.values(lib.imported.card)) {
+		loadCard(card);
+	}
 
 	// 我不好说，但我尊重水乎的想法
 	Object.keys(lib.character)
