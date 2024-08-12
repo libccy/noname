@@ -232,6 +232,71 @@ export function loadCharacter(character) {
 	}
 }
 
+export async function loadExtension(extension) {
+	if (!extension[5] && lib.config.mode === "connect") return;
+
+	try {
+		_status.extension = extension[0];
+		// @ts-ignore
+		_status.evaluatingExtension = extension[3];
+		if (typeof extension[1] == "function") {
+			try {
+				await (gnc.is.coroutine(extension[1]) ? gnc.of(extension[1]) : extension[1]).call(extension, extension[2], extension[4]);
+			} catch (e) {
+				console.log(`加载《${extension[0]}》扩展的content时出现错误。`, e);
+				// @ts-ignore
+				if (!lib.config.extension_alert) alert(`加载《${extension[0]}》扩展的content时出现错误。\n该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。\n${decodeURI(e.stack)}`);
+			}
+		}
+
+		if (extension[4]) {
+			if (extension[4].character) {
+				const content = { ...extension[4].character };
+				content.name = extension[0];
+				content.translate ??= {};
+				content.translate[content.name] = content.name;
+				loadCharacter(content);
+			}
+			if (extension[4].card) {
+				const content = { ...extension[4].card };
+				content.name = extension[0];
+				content.translate ??= {};
+				content.translate[content.name] = content.name;
+				loadCard(content);
+			}
+			if (extension[4].skill) {
+				for (const [skillName, skillInfo] of Object.entries(extension[4].skill.skill)) {
+					if (lib.skill[skillName]) {
+						console.log(`duplicated skill in extension ${extension[0]}:\n${skillName}:\nlib.skill.${skillName}`, lib.skill[skillName], `\nextension.${extension[0]}.skill.skill.${skillName}`, skillInfo);
+						continue;
+					}
+
+					const info = { ...skillInfo };
+					if (typeof info.audio == "number" || typeof info.audio == "boolean") {
+						info.audio = `ext:${extension[0]}:${info.audio}`;
+					}
+
+					lib.skill[skillName] = info;
+				}
+
+				for (const [transName, translate] of Object.entries(extension[4].skill.translate)) {
+					if (lib.translate[transName]) {
+						console.log(`duplicated translate in extension ${extension[0]}:\n${transName}:\nlib.translate.${transName}`, lib.translate[transName], `\nextension.${extension[0]}.skill.translate.${transName}`, translate);
+						continue;
+					}
+
+					lib.translate[transName] = translate;
+				}
+			}
+		}
+		delete _status.extension;
+		// @ts-ignore
+		delete _status.evaluatingExtension;
+	} catch (e) {
+		console.error(e);
+	}
+}
+
 /**
  * @param {importModeConfig} mode
  */

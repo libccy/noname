@@ -9,7 +9,7 @@ import { gnc } from "../gnc/index.js";
 import { importMode } from "./import.js";
 import { Mutex } from "../util/mutex.js";
 import { load } from "../util/config.js";
-import { loadCard, loadCardPile, loadCharacter, loadMode, loadPlay } from "./loading.js";
+import { loadCard, loadCardPile, loadCharacter, loadExtension, loadMode, loadPlay } from "./loading.js";
 
 export async function onload() {
 	const libOnload = lib.onload;
@@ -416,6 +416,7 @@ export async function onload() {
 			}
 		}
 		 */
+		/*
 		if (lib.config.mode != "connect") {
 			for (i = 0; i < lib.card.list.length; i++) {
 				if (lib.card.list[i][2] == "huosha") {
@@ -440,12 +441,17 @@ export async function onload() {
 		if (lib.config.mode == "connect") {
 			_status.connectMode = true;
 		}
+
+		 */
+		/*
 		if (window.isNonameServer) {
 			lib.cheat.i();
 		} else if (lib.config.dev && (!_status.connectMode || lib.config.debug)) {
 			lib.cheat.i();
 		}
 		lib.config.sort_card = get.sortCard(lib.config.sort);
+
+		 */
 		/*
 		delete lib.imported.character;
 		delete lib.imported.card;
@@ -453,11 +459,15 @@ export async function onload() {
 		delete lib.imported.play;
 
 		 */
+		/*
 		for (var i in lib.init) {
 			if (i.startsWith("setMode_")) {
 				delete lib.init[i];
 			}
 		}
+
+		 */
+		/*
 		if (!_status.connectMode) {
 			for (var i = 0; i < lib.extensions.length; i++) {
 				try {
@@ -497,6 +507,8 @@ export async function onload() {
 			}
 		}
 		delete lib.extensions;
+
+		 */
 
 		if (lib.init.startBefore) {
 			lib.init.startBefore();
@@ -557,9 +569,44 @@ export async function onload() {
 		}
 	}
 
-	// 出于适配问题，还是先不要放到联机里为好
-	if (lib.config.mode !== "connect" && lib.imported.play != null) {
-		Object.values(lib.imported.play).forEach(loadPlay);
+	if (lib.config.mode === "connect") {
+		_status.connectMode = true;
+	} else {
+		if (lib.imported.play != null) {
+			Object.values(lib.imported.play).forEach(loadPlay);
+		}
+
+		lib.card.list = lib.card.list
+			.filter(cardData => cardData[2] && !lib.card[cardData[2]].mode?.includes(lib.config.mode))
+			.map(cardData => {
+				if (cardData[2] === "huosha") {
+					cardData = cardData.slice(0);
+					cardData[2] = "sha";
+					cardData[3] = "fire";
+				} else if (cardData[2] === "leisha") {
+					cardData = cardData.slice(0);
+					cardData[2] = "sha";
+					cardData[3] = "thunder";
+				}
+				return cardData;
+			});
+	}
+
+	if (window.isNonameServer) {
+		lib.cheat.i();
+	} else if (lib.config.dev && (!_status.connectMode || lib.config.debug)) {
+		lib.cheat.i();
+	}
+	lib.config.sort_card = get.sortCard(lib.config.sort);
+
+	for (let funcName in lib.init) {
+		if (funcName.startsWith("setMode_")) {
+			delete lib.init[funcName];
+		}
+	}
+
+	if (Array.isArray(lib.extensions)) {
+		lib.extensions.forEach(loadExtension);
 	}
 
 	await originProceed2();
