@@ -1489,7 +1489,7 @@ const skills = {
 			threaten: 1.8,
 		},
 		chooseTarget(player, source) {
-			const next = player.chooseTarget(`${get.translation(source)}发动了【执盟】，请选择一名讨伐目标`, (card, player, target) => target !== source, true);
+			const next = player.chooseTarget(`${get.translation(source)}发动了【诛逆】，请选择一名讨伐目标`, (card, player, target) => target !== source, true);
 			next.set("ai", target => -get.attitude(get.player(), target));
 			next.set("animate", false);
 			next.set("_global_waiting", true);
