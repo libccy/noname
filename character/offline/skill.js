@@ -2672,7 +2672,7 @@ const skills = {
 				!player.getRoundHistory("useCard", evt => {
 					get.name(evt.card) == get.name(event.card) && evt != event;
 				}).length &&
-				!player.getRoundHistory("useCard", evt => {
+				!player.getRoundHistory("respond", evt => {
 					get.name(evt.card) == get.name(event.card) && evt != event;
 				}).length
 			);
