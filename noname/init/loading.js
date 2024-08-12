@@ -430,10 +430,8 @@ function mixinLibrary(config, lib) {
 
 	// @ts-ignore
 	lib.element = mixinElement(config, lib.element);
-	// @ts-ignore
-	lib.banned = lib.config[`${lib.config.mode}_banned`] || [];
-	// @ts-ignore
-	lib.bannedcards = lib.config[`${lib.config.mode}_bannedcards`] || [];
+	lib.config.banned = lib.config[`${lib.config.mode}_banned`] || [];
+	lib.config.bannedcards = lib.config[`${lib.config.mode}_bannedcards`] || [];
 	// @ts-ignore
 	lib.rank = window.noname_character_rank;
 
