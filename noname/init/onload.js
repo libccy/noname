@@ -9,7 +9,7 @@ import { gnc } from "../gnc/index.js";
 import { importMode } from "./import.js";
 import { Mutex } from "../util/mutex.js";
 import { load } from "../util/config.js";
-import { loadCard, loadCardPile, loadCharacter, loadMode } from "./loading.js";
+import { loadCard, loadCardPile, loadCharacter, loadMode, loadPlay } from "./loading.js";
 
 export async function onload() {
 	const libOnload = lib.onload;
@@ -332,6 +332,7 @@ export async function onload() {
 			}
 		}
 		 */
+		/*
 		if (lib.cardPack.mode_derivation) {
 			for (var i = 0; i < lib.cardPack.mode_derivation.length; i++) {
 				if (typeof lib.card[lib.cardPack.mode_derivation[i]].derivation == "string" && !lib.character[lib.card[lib.cardPack.mode_derivation[i]].derivation]) {
@@ -344,6 +345,9 @@ export async function onload() {
 				delete lib.cardPack.mode_derivation;
 			}
 		}
+
+		 */
+		/*
 		if (lib.config.mode != "connect") {
 			for (i in play) {
 				if (lib.config.hiddenPlayPack.includes(i)) continue;
@@ -394,6 +398,8 @@ export async function onload() {
 			}
 		}
 
+		 */
+
 		// lib.connectCharacterPack = [];
 		// lib.connectCardPack = [];
 		/*
@@ -440,10 +446,13 @@ export async function onload() {
 			lib.cheat.i();
 		}
 		lib.config.sort_card = get.sortCard(lib.config.sort);
+		/*
 		delete lib.imported.character;
 		delete lib.imported.card;
 		delete lib.imported.mode;
 		delete lib.imported.play;
+
+		 */
 		for (var i in lib.init) {
 			if (i.startsWith("setMode_")) {
 				delete lib.init[i];
@@ -512,13 +521,14 @@ export async function onload() {
 	lib.connectCharacterPack = [];
 	lib.connectCardPack = [];
 
-	loadMode(lib.imported.mode[lib.config.mode]);
-	for (let character of Object.values(lib.imported.character)) {
-		loadCharacter(character);
-	}
-	loadCardPile();
-	for (let card of Object.values(lib.imported.card)) {
-		loadCard(card);
+	const currentMode = lib.imported.mode[lib.config.mode];
+	loadMode(currentMode);
+	// 为了模式扩展，两个东西删不了
+	lib.init.start = currentMode.start;
+	lib.init.startBefore = currentMode.startBefore;
+
+	if (lib.imported.character != null) {
+		Object.values(lib.imported.character).forEach(loadCharacter);
 	}
 
 	// 我不好说，但我尊重水乎的想法
@@ -527,6 +537,30 @@ export async function onload() {
 		.forEach(character => {
 			lib.mode.connect.config.connect_avatar.item[character] = lib.translate[character];
 		});
+
+	loadCardPile();
+
+	if (lib.imported.card != null) {
+		Object.values(lib.imported.card).forEach(loadCard);
+	}
+
+	if (lib.cardPack.mode_derivation) {
+		lib.cardPack.mode_derivation = lib.cardPack.mode_derivation.filter(item => {
+			if (typeof lib.card[item].derivation == "string" && !lib.character[lib.card[item].derivation]) {
+				return false;
+			}
+			return !(typeof lib.card[item].derivationpack == "string" && !lib.config.cards.includes(lib.card[item].derivationpack));
+		});
+
+		if (lib.cardPack.mode_derivation.length === 0) {
+			delete lib.cardPack.mode_derivation;
+		}
+	}
+
+	// 出于适配问题，还是先不要放到联机里为好
+	if (lib.config.mode !== "connect" && lib.imported.play != null) {
+		Object.values(lib.imported.play).forEach(loadPlay);
+	}
 
 	await originProceed2();
 }

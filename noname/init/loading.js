@@ -236,11 +236,11 @@ export function loadCharacter(character) {
  * @param {importModeConfig} mode
  */
 export function loadMode(mode) {
-	modeMixinLibrary(mode, lib);
-	modeMixinGeneral(mode, "game", game);
-	modeMixinGeneral(mode, "ui", ui);
-	modeMixinGeneral(mode, "get", get);
-	modeMixinGeneral(mode, "ai", ai);
+	mixinLibrary(mode, lib);
+	mixinGeneral(mode, "game", game);
+	mixinGeneral(mode, "ui", ui);
+	mixinGeneral(mode, "get", get);
+	mixinGeneral(mode, "ai", ai);
 
 	// @ts-ignore
 	delete window.noname_character_rank;
@@ -258,35 +258,81 @@ export function loadMode(mode) {
 }
 
 /**
+ *
+ * @param {importPlayConfig} playConfig
+ */
+export function loadPlay(playConfig) {
+	const i = playConfig.name;
+
+	if (lib.config.hiddenPlayPack.includes(i)) return;
+	if (playConfig.forbid && playConfig.forbid.includes(lib.config.mode)) return;
+	if (playConfig.mode && !playConfig.mode.includes(lib.config.mode)) return;
+
+	// @ts-ignore
+	lib.element = mixinElement(playConfig, lib.element);
+	mixinGeneral(playConfig, "game", game);
+	mixinGeneral(playConfig, "ui", ui);
+	mixinGeneral(playConfig, "get", get);
+	for (const [configName, configItem] of Object.entries(playConfig)) {
+		switch (configName) {
+			case "name":
+			case "mode":
+			case "forbid":
+			case "init":
+			case "element":
+			case "game":
+			case "get":
+			case "ui":
+			case "arenaReady":
+				break;
+			default:
+				for (const [itemName, item] of Object.entries(configItem)) {
+					// lib[j][k+'_play_config']=play[i][j][k];
+					if (configName !== "translate" || itemName !== i) {
+						if (lib[configName][itemName] != null) {
+							console.log(`duplicated ${configName} in play ${i}:\n${itemName}:\nlib.${configName}.${itemName}`, lib[configName][itemName], `\nplay.${i}.${configName}.${itemName}`, item);
+						}
+						lib[configName][itemName] = item;
+					}
+				}
+				break;
+		}
+	}
+
+	if (typeof playConfig.init == "function") playConfig.init();
+	if (typeof playConfig.arenaReady == "function") lib.arenaReady?.push(playConfig.arenaReady);
+}
+
+/**
  * 通用形式的内容注入
  *
  * 由于历史原因，故直接覆盖对应的变量
  *
  * @template {Object} T
- * @param {importModeConfig} mode
+ * @param {importModeConfig | importPlayConfig} config
  * @param {string} name
  * @param {T} where
  * @return {void}
  */
-function modeMixinGeneral(mode, name, where) {
-	if (!mode[name]) return;
+function mixinGeneral(config, name, where) {
+	if (!config[name]) return;
 
-	for (let [key, value] of Object.entries(mode[name])) {
+	for (let [key, value] of Object.entries(config[name])) {
 		where[key] = typeof value == "object" ? Object.assign(where[key] ?? {}, value) : value;
 	}
 }
 
 /**
  *
- * @param {importModeConfig} mode
+ * @param {importModeConfig | importPlayConfig} config
  * @param {Library} lib
  * @return {void}
  */
-function modeMixinLibrary(mode, lib) {
+function mixinLibrary(config, lib) {
 	const KeptWords = ["name", "element", "game", "ai", "ui", "get", "config", "onreinit", "start", "startBefore"];
 
 	// @ts-ignore
-	lib.element = modeMixinElement(mode, lib.element);
+	lib.element = mixinElement(config, lib.element);
 	// @ts-ignore
 	lib.banned = lib.config[`${lib.config.mode}_banned`] || [];
 	// @ts-ignore
@@ -294,34 +340,28 @@ function modeMixinLibrary(mode, lib) {
 	// @ts-ignore
 	lib.rank = window.noname_character_rank;
 
-	for (let name in mode) {
+	for (let name in config) {
 		if (KeptWords.includes(name)) continue;
-		if (lib[name] == null) lib[name] = Array.isArray(mode[name]) ? [] : {};
+		if (lib[name] == null) lib[name] = Array.isArray(config[name]) ? [] : {};
 
-		Object.assign(lib[name], mode[name]);
+		Object.assign(lib[name], config[name]);
 	}
-
-	// 为了模式扩展，两个东西删不了
-	// @ts-ignore
-	lib.init.start = mode.start;
-	// @ts-ignore
-	lib.init.startBefore = mode.startBefore;
 }
 
 /**
  *
- * @param {importModeConfig} mode
+ * @param {importModeConfig | importPlayConfig} config
  * @param {Record<string, Object>} element
  * @return {Record<string, Object>}
  */
-function modeMixinElement(mode, element) {
+function mixinElement(config, element) {
 	let newElement = { ...element };
 
-	if (mode.element) {
-		for (let name in mode.element) {
+	if (config.element) {
+		for (let name in config.element) {
 			if (!newElement[name]) newElement[name] = [];
 
-			let source = mode.element[name];
+			let source = config.element[name];
 			let target = newElement[name];
 
 			for (let key in source) {
