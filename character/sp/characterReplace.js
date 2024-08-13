@@ -65,6 +65,11 @@ const characterReplaces = {
 	lvfan: ["lvfan", "sp_lvfan"],
 	dongbai: ["dongbai", "re_dongbai", "jsrg_dongbai"],
 	sp_jiaxu: ["dc_sp_jiaxu", "yj_jiaxu"],
+	duji: ["duji", "re_duji", "ns_duji"],
+	sp_taishici: ["sp_taishici", "re_sp_taishici"],
+	mazhong: ["mazhong", "re_mazhong"],
+	wenpin: ["wenpin", "re_wenpin"],
+	liuyan: ["liuyan", "jsrg_liuyan", "junk_liuyan"],
 };
 
 export default characterReplaces;

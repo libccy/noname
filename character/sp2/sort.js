@@ -1,4 +1,5 @@
 const characterSort = {
+	sp_xhly: ["duji", "lvdai", "liuyao", "sp_taishici", "re_zhangliang"],
 	sp_whlw: ["xurong", "lijue", "zhangji", "fanchou", "guosi", "duanwei", "liangxing", "zhangheng", "tangji", "niufu", "dongxie", "liqueguosi"],
 	sp_zlzy: ["zhangqiying", "lvkai", "zhanggong", "weiwenzhugezhi", "beimihu"],
 	sp_longzhou: ["xf_tangzi", "xf_huangquan", "xf_sufei", "sp_liuqi"],
@@ -20,6 +21,7 @@ const characterSort = {
 };
 
 const characterSortTranslate = {
+	sp_xhly: "星火燎原",
 	sp_whlw: "文和乱武",
 	sp_zlzy: "逐鹿中原",
 	sp_longzhou: "同舟共济",
