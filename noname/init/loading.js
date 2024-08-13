@@ -291,7 +291,7 @@ export async function loadExtension(extension) {
 						lib.skilllist.add(skill);
 					}
 				}
-				if (content.skill) {
+				if (typeof content.skill == "object") {
 					for (const skillInfo of Object.values(content.skill)) {
 						extSkillInject(extension[0], skillInfo);
 					}
@@ -315,6 +315,30 @@ export async function loadExtension(extension) {
 				content.translate ??= {};
 				content.translate[content.name] = content.name;
 
+				// ~~到最后，还得遍历一遍~~
+				// 我就是被拷打，成为新的1103，受到白鼠群的嘲笑谩骂，我也绝不再次遍历！
+				for (const [cardName, card] of Object.entries(content.card)) {
+					if (card.audio === true) {
+						card.audio = `ext:${content.name}`;
+					}
+					if (!card.image) {
+						if (card.fullskin || card.fullimage) {
+							const suffix = card.fullskin ? "png" : "jpg";
+
+							if (extension[3]) {
+								card.image = `db:extension-${extension[0]}:${cardName}.${suffix}`;
+							} else {
+								card.image = `ext:${extension[0]}/${cardName}.${suffix}`;
+							}
+						}
+					}
+				}
+				if (typeof content.skill == "object") {
+					for (const skillInfo of Object.values(content.skill)) {
+						extSkillInject(extension[0], skillInfo);
+					}
+				}
+
 				if (lib.imported.card) {
 					lib.imported.card[extension[0]] = content;
 				}
@@ -337,13 +361,15 @@ export async function loadExtension(extension) {
 					extSkillInject(extension[0], skillInfo);
 				}
 
-				for (const [transName, translate] of Object.entries(extension[4].skill.translate)) {
-					if (lib.translate[transName]) {
-						console.log(`duplicated translate in extension ${extension[0]}:\n${transName}:\nlib.translate.${transName}`, lib.translate[transName], `\nextension.${extension[0]}.skill.translate.${transName}`, translate);
-						continue;
-					}
+				if (typeof extension[4].skill.translate == "object") {
+					for (const [transName, translate] of Object.entries(extension[4].skill.translate)) {
+						if (lib.translate[transName]) {
+							console.log(`duplicated translate in extension ${extension[0]}:\n${transName}:\nlib.translate.${transName}`, lib.translate[transName], `\nextension.${extension[0]}.skill.translate.${transName}`, translate);
+							continue;
+						}
 
-					lib.translate[transName] = translate;
+						lib.translate[transName] = translate;
+					}
 				}
 			}
 		}
