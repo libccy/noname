@@ -359,6 +359,7 @@ export async function loadExtension(extension) {
 					}
 
 					extSkillInject(extension[0], skillInfo);
+					lib.skill[skillName] = skillInfo;
 				}
 
 				if (typeof extension[4].skill.translate == "object") {
