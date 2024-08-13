@@ -4131,7 +4131,7 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		group: "sbxuanhuo_rob",
-		filterTarget: function (card, player, target) {
+		filterTarget(card, player, target) {
 			return !target.hasMark("sbxuanhuo_mark") && player != target;
 		},
 		filterCard: true,
@@ -4139,33 +4139,33 @@ const skills = {
 		discard: false,
 		lose: false,
 		delay: false,
-		onremove: function (player) {
+		onremove(player) {
 			delete player.storage.sbxuanhuo;
 			player.unmarkSkill("sbxuanhuo");
 		},
-		check: function (card) {
+		check(card) {
 			return 6.5 - get.value(card);
 		},
-		content: function () {
-			"step 0";
-			player.give(cards, target);
-			if (player.storage.sbxuanhuo && player.storage.sbxuanhuo[target.playerid]) delete player.storage.sbxuanhuo[target.playerid];
-			"step 1";
-			target.addMark("sbxuanhuo_mark");
+		async content(event, trigger, player) {
+			const target = event.targets[0],
+				cards = event.cards;
+			await player.give(cards, target);
+			if (player.storage[event.name] && player.storage[event.name][target.playerid]) delete player.storage[event.name][target.playerid];
+			target.addMark(event.name + "_mark");
 			var history = target.getAllHistory("lose");
 			if (history.length) {
-				history[history.length - 1].sbxuanhuo_mark = true;
+				history[history.length - 1][event.name + "_mark"] = true;
 			}
 		},
-		getNum: function (current, skill) {
+		getNum(current, skill, mark) {
 			var num = 0;
 			var history = current.getAllHistory("lose");
 			if (history.length) {
 				for (var i = history.length - 1; i >= 0; i--) {
 					var evt = history[i];
-					if (evt.sbxuanhuo_mark) break;
+					if (evt[mark]) break;
 					if (typeof skill == "string") {
-						if (evt.getParent(2).name == skill) num += evt.cards2.length;
+						if (evt.getParent(2).name == skill || evt.getParent(3).name == skill) num += evt.cards2.length;
 					} else {
 						var evtx = evt.getParent(),
 							player = skill;
@@ -4186,14 +4186,14 @@ const skills = {
 		ai: {
 			order: 9,
 			result: {
-				target: function (player, target) {
+				target(player, target) {
 					return -Math.sqrt(Math.max(target.hp, 1));
 				},
 			},
 		},
 		marktext: "惑",
 		intro: {
-			content: function (storage, player) {
+			content(storage, player) {
 				if (!storage || get.is.empty(storage)) return "未得到过牌";
 				var map = _status.connectMode ? lib.playerOL : game.playerMap;
 				var str = "已得到";
@@ -4218,84 +4218,76 @@ const skills = {
 				trigger: {
 					global: ["gainAfter", "loseAsyncAfter"],
 				},
+				filter(event, player, name, target) {
+					const evt = event.getParent("phaseDraw");
+					if (evt && evt.name == "phaseDraw") return false;
+					if (!event.getg(target).length || !target.hasMark("sbxuanhuo_mark")) return false;
+					if (evt && evt.player == target) return false;
+					if (lib.skill.sbxuanhuo.getNum(target, "sbxuanhuo_rob", "sbxuanhuo_mark") >= 5) return false;
+					return target.hasCard(card => lib.filter.canBeGained(card, target, player), "he");
+				},
+				getIndex(event, player) {
+					const evt = event.getParent("phaseDraw");
+					if (evt && evt.name == "phaseDraw") return false;
+					return game
+						.filterPlayer(current => {
+							if (!event.getg(current).length || !current.hasMark("sbxuanhuo_mark")) return false;
+							if (evt && evt.player == current) return false;
+							if (lib.skill.sbxuanhuo.getNum(current, "sbxuanhuo_rob", "sbxuanhuo_mark") >= 5) return false;
+							return current.hasCard(card => lib.filter.canBeGained(card, current, player), "he");
+						})
+						.sortBySeat();
+				},
+				logTarget(event, player, triggername, target) {
+					return target;
+				},
 				forced: true,
 				locked: false,
-				direct: true,
-				filter: function (event, player) {
-					var evt = event.getParent("phaseDraw");
-					if (evt && evt.name == "phaseDraw") return false;
-					return game.hasPlayer(current => {
-						if (!event.getg(current).length || !current.hasMark("sbxuanhuo_mark")) return false;
-						if (evt && evt.player == current) return false;
-						if (lib.skill.sbxuanhuo.getNum(current, "sbxuanhuo_rob") >= 5) return false;
-						return current.hasCard(card => lib.filter.canBeGained(card, current, player), "he");
-					});
-				},
-				content: function () {
-					"step 0";
-					var evt = trigger.getParent("phaseDraw");
-					var targets = game.filterPlayer(current => {
-						if (!trigger.getg(current).length || !current.hasMark("sbxuanhuo_mark")) return false;
-						if (evt && evt.player == current) return false;
-						if (lib.skill.sbxuanhuo.getNum(current, "sbxuanhuo_rob") >= 5) return false;
-						return current.hasCard(card => lib.filter.canBeGained(card, current, player), "he");
-					});
-					event.targets = targets;
-					"step 1";
-					var target = targets.shift();
-					player.logSkill("sbxuanhuo", target);
-					var hs = target.getCards("h", card => lib.filter.canBeGained(card, target, player));
+				async content(event, trigger, player) {
+					const target = event.targets[0],
+						hs = target.getCards("h", card => lib.filter.canBeGained(card, target, player));
 					if (hs.length) {
-						player.gain(hs.randomGet(), target, "giveAuto");
+						await player.gain(hs.randomGet(), target, "giveAuto");
 						if (!player.storage.sbxuanhuo) player.storage.sbxuanhuo = {};
-						player.storage.sbxuanhuo[target.playerid] = lib.skill.sbxuanhuo.getNum(target, "sbxuanhuo_rob") + 1;
+						player.storage.sbxuanhuo[target.playerid] = lib.skill.sbxuanhuo.getNum(target, "sbxuanhuo_rob", "sbxuanhuo_mark");
 						player.markSkill("sbxuanhuo");
 					}
-					if (targets.length > 0) event.redo();
 				},
 			},
 		},
 	},
 	sbenyuan: {
 		audio: 2,
-		forced: true,
-		direct: true,
 		trigger: { player: "phaseZhunbeiBegin" },
-		filter: function (event, player) {
-			return game.hasPlayer(current => current.hasMark("sbxuanhuo_mark"));
+		filter(event, player, name, target) {
+			return target?.isIn() && target.hasMark("sbxuanhuo_mark");
 		},
-		content: function () {
-			"step 0";
-			var targets = game.filterPlayer(current => current.hasMark("sbxuanhuo_mark"));
-			event.targets = targets;
-			"step 1";
-			var target = targets.shift();
-			event.target = target;
-			player.logSkill("sbenyuan", target);
-			target.removeMark("sbxuanhuo_mark", target.countMark("sbxuanhuo_mark"));
-			game.players.forEach(current => {
-				var storage = current.storage.sbxuanhuo;
+		getIndex(event, player) {
+			return game.filterPlayer(target => target.hasMark("sbxuanhuo_mark")).sortBySeat();
+		},
+		logTarget(event, player, triggername, target) {
+			return target;
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			target.clearMark("sbxuanhuo_mark");
+			for (const current of game.players) {
+				const storage = current.storage.sbxuanhuo;
 				if (storage && storage[target.playerid]) delete storage[target.playerid];
 				if (storage && get.is.empty(storage)) {
 					delete current.storage.sbxuanhuo;
 					current.unmarkSkill("sbxuanhuo");
 				}
-			});
-			var num = lib.skill.sbxuanhuo.getNum(target, player);
-			if (num >= 3) {
-				var cards = player.getCards("he");
-				if (!cards.length) event._result = { bool: false };
-				else if (cards.length <= 3) event._result = { bool: true, cards: cards };
-				else player.chooseCard("恩怨：交给" + get.translation(target) + "三张牌", true, 3, "he");
-			} else {
-				target.loseHp();
-				player.recover();
-				event.goto(3);
 			}
-			"step 2";
-			if (result.bool) player.give(result.cards, target);
-			"step 3";
-			if (targets.length) event.goto(1);
+			const num = lib.skill.sbxuanhuo.getNum(target, player, "sbxuanhuo_mark");
+			if (num >= 3) {
+				const num = Math.min(player.countCards("he"), 3);
+				if (num) await player.chooseToGive(target, `恩怨：交给${get.translation(target)}${get.cnNumber(num)}张牌`, true, num, "he");
+			} else {
+				await target.loseHp();
+				await player.recover();
+			}
 		},
 		ai: {
 			combo: "sbxuanhuo",

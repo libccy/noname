@@ -28182,7 +28182,9 @@ const skills = {
 		popup: false,
 		charlotte: true,
 		filter: function (event, player) {
-			return event.player.isIn() && event.reason && event.reason.getParent().name == "duwu";
+			if (!event.player.isIn() || !event.reason) return false;
+			let evt = event.reason.getParent();
+			return evt.name == "duwu" && evt.player == player;
 		},
 		content: function () {
 			player.loseHp();
