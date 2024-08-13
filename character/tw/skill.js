@@ -1283,16 +1283,33 @@ const skills = {
 	},
 	twpiankuang: {
 		audio: 2,
-		getNum: (event, player) => Math.min(3, player.getHistory("sourceDamage", evt => evt.card && evt.card.name == event.card.name && evt.card != event.card).length),
 		trigger: {
+			player: "useCardAfter",
 			source: "damageBegin1",
 		},
 		filter(event, player) {
-			return event.card && event.getParent().type == "card" && get.info("twpiankuang").getNum(event, player) > 0;
+			if (event.name == "useCard") return event.card.name == "sha" && player == _status.currentPhase && !player.hasHistory("sourceDamage", evt => evt.card == event.card);
+			return event.card?.name == "sha" && event.getParent().type == "card" && player.hasHistory("sourceDamage", evt => evt.card?.name == "sha");
 		},
 		forced: true,
 		async content(event, trigger, player) {
-			trigger.num += get.info("twpiankuang").getNum(trigger, player);
+			if (trigger.name == "useCard") {
+				player.addTempSkill(event.name + "_effect");
+				player.addMark(event.name + "_effect", 1, false);
+			} else trigger.num++;
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				onremove: true,
+				markimage: "image/card/handcard.png",
+				intro: { content: "手牌上限-#" },
+				mod: {
+					maxHandcard(player, num) {
+						return num - player.countMark("twpiankuang_effect");
+					},
+				},
+			},
 		},
 	},
 	//诸葛均
