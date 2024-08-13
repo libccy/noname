@@ -1754,14 +1754,8 @@ export const Content = {
 				dialog.close();
 			}, 1000);
 		}, str);
-		let special,
-			skill = event.getParent().name + "_" + (event.result.bool ? "true" + mes : "false");
-		let info = get.info(skill);
-		if (info && info.logAudio) {
-			if (typeof info.logAudio === "function") special = info.logAudio(event, player);
-			else special = info.logAudio;
-		}
-		game.trySkillAudio(skill, player, true, null, null, special);
+		const skill = event.getParent().name + "_" + (event.result.bool ? "true" + mes : "false");
+		game.trySkillAudio(skill, player, true, null, null, [event, event.player]);
 		game.delay(2);
 		"step 6";
 		game.broadcastAll(function () {
@@ -2907,15 +2901,9 @@ export const Content = {
 			targets = [targets];
 		}
 		if (info.popup != false && !info.direct && !("skill_popup" in result && !Boolean(result["skill_popup"]))) {
-			let popup_info = event.skill,
-				special;
-			if (typeof info.popup === "string") popup_info = [event.skill, info.popup];
-			if (info.logAudio) {
-				if (typeof info.logAudio === "function") special = info.logAudio(trigger, player, event.triggername, event.indexedData, result);
-				else special = info.logAudio;
-			}
-			if (info.logLine === false) player.logSkill(popup_info, false, info.line, null, special);
-			else player.logSkill(popup_info, targets, info.line, null, special);
+			const popup_info = typeof info.popup === "string" ? [event.skill, info.popup] : event.skill;
+			const args = [trigger, player, event.triggername, event.indexedData, result];
+			player.logSkill(popup_info, info.logLine === false ? false: targets, info.line, null, args);
 		}
 		var next = game.createEvent(event.skill);
 		if (typeof info.usable == "number") {
@@ -6771,13 +6759,7 @@ export const Content = {
 				cardaudio = false;
 			}
 			if (lib.skill[event.skill].log != false) {
-				let special,
-					info = get.info(event.skill);
-				if (info && info.logAudio) {
-					if (typeof info.logAudio === "function") special = info.logAudio(event, player);
-					else special = info.logAudio;
-				}
-				player.logSkill(event.skill, false, null, null, special);
+				player.logSkill(event.skill, false, null, null, [event, event.player]);
 			}
 			if (get.info(event.skill).popname) {
 				player.tryCardAnimate(card, event.card.name, "metal", true);
@@ -7225,12 +7207,7 @@ export const Content = {
 		if (!info.noForceDie) event.forceDie = true;
 		if (!info.noForceOut) event.includeOut = true;
 		event._skill = event.skill;
-		let special;
-		if (info.logAudio) {
-			if (typeof info.logAudio === "function") special = info.logAudio(event, player);
-			else special = info.logAudio;
-		}
-		game.trySkillAudio(event.skill, player, true, null, null, special);
+		game.trySkillAudio(event.skill, player, true, null, null, [event, event.player]);
 		var checkShow = player.checkShow(event.skill);
 		if (info.discard != false && info.lose != false && !info.viewAs) {
 			player.discard(cards).delay = false;
