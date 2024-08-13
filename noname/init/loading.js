@@ -262,6 +262,43 @@ export async function loadExtension(extension) {
 				content.translate ??= {};
 				content.translate[content.name] = content.name;
 
+				// ~~到最后，还得遍历一遍~~
+				// 我就是被拷打，成为新的1103，受到白鼠群的嘲笑谩骂，我也绝不再次遍历！
+				if (content.mode === "guozhan") {
+					lib.characterGuozhanFilter.add(content.name);
+				}
+				for (const [charaName, character] of Object.entries(content.character)) {
+					if (!character[4]) {
+						character[4] = [];
+					}
+
+					if (!character[4].some(str => typeof str == "string" && /^(?:db:extension-.+?|ext|img):.+/.test(str))) {
+						const img = extension[3] ? `db:extension-${content.name}:${charaName}.jpg` : `ext:${content.name}/${charaName}.jpg`;
+						character[4].add(img);
+					}
+					if (!character[4].some(str => typeof str == "string" && /^die:.+/.test(str))) {
+						const audio = `die:ext:${content.name}/${charaName}.mp3`;
+						character[4].add(audio);
+					}
+
+					const boss = character[4].includes("boss") || character[4].includes("hiddenboss");
+					const userForbidAI = lib.config.forbidai_user?.includes(charaName);
+					if (boss || userForbidAI) {
+						lib.config.forbidai.add(charaName);
+					}
+
+					for (const skill of character[3]) {
+						lib.skilllist.add(skill);
+					}
+				}
+				if (content.skill) {
+					for (const skillInfo of Object.values(content.skill)) {
+						if (typeof skillInfo.audio == "number" || typeof skillInfo.audio == "boolean") {
+							skillInfo.audio = `ext:${content.name}:${Number(skillInfo.audio)}`;
+						}
+					}
+				}
+
 				if (lib.imported.character) {
 					lib.imported.character[extension[0]] = content;
 				}
