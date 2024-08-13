@@ -6624,7 +6624,6 @@ const skills = {
 		enable: ["chooseToUse", "chooseToRespond"],
 		filter: function (event, player) {
 			if (!player.countCards("hes")) return false;
-			if (player.hasSkill("jsrgnianen_blocker")) return false;
 			for (var name of lib.inpile) {
 				if (get.type2(name) != "basic") continue;
 				var card = { name: name };
@@ -6681,6 +6680,7 @@ const skills = {
 						delete event.result.skill;
 						var card = event.result.card;
 						if (get.color(card, player) != "red" || get.name(card) != "sha" || get.natureList(card).length) {
+							player.tempBanSkill("jsrgnianen");
 							player.addTempSkill("jsrgnianen_blocker");
 							player.addAdditionalSkill("jsrgnianen_blocker", "mashu");
 						}
@@ -6694,14 +6694,14 @@ const skills = {
 		hiddenCard: function (player, name) {
 			if (!lib.inpile.includes(name)) return false;
 			var type = get.type2(name);
-			return type == "basic" && player.countCards("hes") > 0 && !player.hasSkill("jsrgnianen_blocker");
+			return type == "basic" && player.countCards("hes") > 0 && !player.isTempBanned("jsrgnianen");
 		},
 		ai: {
 			fireAttack: true,
 			respondSha: true,
 			respondShan: true,
 			skillTagFilter: function (player) {
-				if (!player.countCards("hes") || player.hasSkill("jsrgnianen_blocker")) return false;
+				if (!player.countCards("hes") || player.isTempBanned("jsrgnianen")) return false;
 			},
 			order: 1,
 			result: {
@@ -7461,7 +7461,6 @@ const skills = {
 			global: "phaseJieshuBegin",
 		},
 		filter: function (event, player) {
-			if (player.hasSkill("jsrgshishou_blocker")) return false;
 			return player.getHistory("gain").length;
 		},
 		direct: true,
@@ -7544,6 +7543,7 @@ const skills = {
 					return event.hasNature("fire");
 				},
 				content: function () {
+					player.tempBanSkill("jsrgshishou", { player: "phaseEnd" });
 					player.addTempSkill("jsrgshishou_blocker", { player: "phaseEnd" });
 				},
 			},

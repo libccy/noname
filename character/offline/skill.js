@@ -7463,9 +7463,6 @@ const skills = {
 	yjjielve: {
 		audio: 2,
 		enable: "phaseUse",
-		filter(event, player) {
-			return !player.hasSkill("yjjielve_ban");
-		},
 		viewAs: { name: "chenghuodajie" },
 		filterCard(card, player) {
 			if (ui.selected.cards.length) return get.color(card) == get.color(ui.selected.cards[0]);
@@ -7494,10 +7491,9 @@ const skills = {
 					return event.card && event.card.name == "chenghuodajie" && event.getParent().skill == "yjjielve";
 				},
 				content() {
-					player.addTempSkill("yjjielve_ban");
+					player.tempBanSkill("yjjielve");
 				},
 			},
-			ban: { charlotte: true },
 		},
 	},
 	//用间beta张飞

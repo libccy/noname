@@ -19,6 +19,11 @@ game.import("character", function () {
 		characterSort: {
 			collab: characterSort,
 		},
+		characterSubstitute: {
+			liuxiecaojie: [
+				["liuxiecaojie_shadow", []],
+			],
+		},
 		characterFilter: { ...characterFilters },
 		characterInitFilter: { ...characterInitFilters },
 		characterTitle: {},
