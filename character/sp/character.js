@@ -183,6 +183,14 @@ const characters = {
 	quyi: ["male", "qun", 4, ["fuqi", "jiaozi"]],
 
 	luzhi: ["male", "wei", 3, ["qingzhong", "weijing"]],
+	
+	wangcan: ["male", "qun", 3, ["xinfu_sanwen", "xinfu_qiai", "xinfu_denglou"]],
+	re_jsp_pangtong: ["male", "wu", 3, ["xinfu_guolun", "xinfu_songsang"]],
+	lvqian: ["male", "wei", 4, ["xinfu_weilu", "xinfu_zengdao"]],
+	panjun: ["male", "wu", 3, ["xinfu_guanwei", "xinfu_gongqing"]],
+	zhoufang: ["male", "wu", 3, ["xinfu_duanfa", "xinfu_youdi"]],
+	yanjun: ["male", "wu", 3, ["xinfu_guanchao", "xinfu_xunxian"]],
+	liuyan: ["male", "qun", 3, ["xinfu_tushe", "xinfu_limu"]],
 };
 
 export default characters;
