@@ -2585,7 +2585,10 @@ const skills = {
 					player.changeZhuanhuanji("nzry_shenshi");
 					await player.give(event.cards, target);
 					await target.damage("nocard");
-					if (target.isIn()) return;
+					if (!game.getGlobalHistory("everything", evt => {
+						if (evt.name != "die" || evt.player != target) return false;
+						return evt.reason?.getParent() == event;
+					}).length) return;
 					const { result } = await player
 						.chooseTarget("令一名角色将手牌摸至四张", function (card, player, target) {
 							return target.countCards("h") < 4;

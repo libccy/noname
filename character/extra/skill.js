@@ -171,11 +171,9 @@ const skills = {
 					case 1:
 						if (target.getHp() > 0) {
 							await target.loseHp(target.getHp());
-							if (game.getGlobalHistory("everything",function(event){
-								if (event.name != "die") {
-									return false;
-								}
-								return event.getParent("1！5！").name == "1！5！" && event.player == target;
+							if (game.getGlobalHistory("everything", evt => {
+								if (evt.name != "die" || evt.player != target) return false;
+								return evt.reason?.getParent() == event;
 							}).length > 0) {
 								await player.gainMaxHp();
 							}
