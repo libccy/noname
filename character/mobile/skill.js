@@ -333,7 +333,7 @@ const skills = {
 						return 8 - get.value(card);
 					},
 					logAudio(event, player){
-						return ['sha', 'shan', 'wuxie'].indexOf(event.card.name) + 1;
+						return "mbzujin" + (['sha', 'shan', 'wuxie'].indexOf(event.card.name) + 1) + ".mp3";
 					},
 					position: "hse",
 					viewAs: { name: links[0][2], nature: links[0][3] },
@@ -445,7 +445,7 @@ const skills = {
 				cost_data: list,
 			};
 		},
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		async content(event, trigger, player) {
 			player.logSkill('mbjiejian', event.targets, null, null, 1);
 			const list = event.cost_data;
@@ -596,7 +596,7 @@ const skills = {
 		onremove: true,
 		logAudio(event, player, name, indexedData, evt) {
 			const { control } = evt.cost_data;
-			return control == "减伤" ? get.rand(1, 2) : get.rand(3, 4);
+			return control == "减伤" ? ["mbpanxiang1.mp3", "mbpanxiang2.mp3"] : ["mbpanxiang3.mp3", "mbpanxiang4.mp3"];
 		},
 		async content(event, trigger, player) {
 			const { control } = event.cost_data;
@@ -1515,7 +1515,7 @@ const skills = {
 				return {
 					audio: "mbxuetu",
 					logAudio(event, player) {
-						return player.countMark("mbxuetu_status") == 2 ? get.rand(3, 4) : get.rand(1, 2);
+						return player.countMark("mbxuetu_status") == 2 ? ["mbxuetu3.mp3", "mbxuetu4.mp3"] : ["mbxuetu1.mp3", "mbxuetu2.mp3"];
 					},
 					choice: result.control.includes("回复") ? 0 : 1,
 					filterCard: () => false,
@@ -2429,7 +2429,7 @@ const skills = {
 		audio: "twkujian",
 		inherit: "twkujian",
 		selectCard: [1, 2],
-		logAudio: ()=> 1,
+		logAudio: () => "twkujian1.mp3",
 		content: function () {
 			player.give(cards, target).gaintag.add("twkujianx");
 			player.addSkill("kujian_draw");
@@ -3004,8 +3004,8 @@ const skills = {
 		},
 		forced: true,
 		logAudio(event, player) {
-			if (event.name == "damage") get.rand(1, 2);
-			return 3;
+			if (event.name == "damage") 2;
+			return "laishou3.mp3";
 		},
 		content: function () {
 			if (trigger.name == "damage") {
@@ -5136,7 +5136,7 @@ const skills = {
 		},
 		forced: true,
 		locked: false,
-		logAudio: ()=> get.rand(1, 2),
+		logAudio: () => 2,
 		content: function () {
 			lib.skill.spdaming.change(player, 1);
 		},
@@ -5453,7 +5453,7 @@ const skills = {
 			},
 			damage: {
 				audio: "sbanguo",
-				logAudio: ()=> get.rand(1, 2),
+				logAudio: () => ["sbanguo1.mp3", "sbanguo2.mp3"],
 				forced: true,
 				locked: false,
 				trigger: { player: "damageBegin4" },
@@ -6845,7 +6845,7 @@ const skills = {
 			if (att == 0) return !player.inRangeOf(target);
 			return true;
 		},
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		content: function () {
 			"step 0";
 			event.target = trigger.player;
@@ -11447,7 +11447,7 @@ const skills = {
 		filterTarget: function (card, player, target) {
 			return target != player && target.countCards("h") > 0;
 		},
-		logAudio: ()=> get.rand(1, 2),
+		logAudio: () => 2,
 		content: function () {
 			"step 0";
 			player.addTempSkill("beizhu_draw");

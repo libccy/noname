@@ -2901,7 +2901,7 @@ const skills = {
 			return player.countMark("spshidi") % 2 == ["phaseJieshu", "phaseZhunbei"].indexOf(event.name);
 		},
 		logAudio(event, player) {
-			return 2 - player.countMark("spshidi") % 2;
+			return "spshidi" + (2 - player.countMark("spshidi") % 2) +".mp3";
 		},
 		forced: true,
 		content: function () {

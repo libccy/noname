@@ -9943,7 +9943,7 @@ const skills = {
 		},
 		forced: true,
 		logAudio(event, player) {
-			return 1 + player.countMark("olbixin");
+			return "olximo" +(1 + player.countMark("olbixin")) +".mp3";
 		},
 		content: function () {
 			player.addMark("olbixin", 1, false);
@@ -19645,9 +19645,7 @@ const skills = {
 				cost_data: result.targets[0],
 			};
 		},
-		logAudio() {
-			return [1, 2].randomGet();
-		},
+		logAudio: () => 2,
 		async content(event, trigger, player) {
 			let target = event.cost_data;
 			if (!player.storage.xianfu2) player.storage.xianfu2 = [];
@@ -19673,8 +19671,8 @@ const skills = {
 			return player.isDamaged();
 		},
 		logAudio(event, player) {
-			if (event.name == "damage") return [5, 4].randomGet();
-			return [3, 6].randomGet();
+			if (event.name == "damage") return ["xianfu4.mp3", "xianfu5.mp3"];
+			return ["xianfu3.mp3", "xianfu6.mp3"];
 		},
 		logTarget: "player",
 		content: function () {
@@ -28346,7 +28344,7 @@ const skills = {
 		logAudio(event, player) {
 			const target = event.targets[0],
 				goon = target.countCards("h") > target.hp;
-			return goon ? 2 : 1;
+			return goon ? "songci2.mp3" : "songci1.mp3";
 		},
 		async content(event, trigger, player) {
 			const target = event.target,
@@ -29226,7 +29224,7 @@ const skills = {
 		filter: function (event, player) {
 			return player.phaseNumber <= 1 && game.hasPlayer(current => current != player);
 		},
-		logAudio: ()=> get.rand(1, 2),
+		logAudio: () => ["xinfu_jianjie1.mp3", "xinfu_jianjie2.mp3"],
 		content: function () {
 			"step 0";
 			player.chooseTarget("荐杰：选择一名其他角色获得“龙印”", lib.filter.notMe, true).set("ai", target => {
@@ -29307,7 +29305,7 @@ const skills = {
 					}
 					return true;
 				},
-				logAudio: ()=> get.rand(1, 2),
+				logAudio: () => ["xinfu_jianjie1.mp3", "xinfu_jianjie2.mp3"],
 				selectTarget: 2,
 				complexSelect: true,
 				complexTarget: true,

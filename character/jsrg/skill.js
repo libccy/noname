@@ -8185,7 +8185,7 @@ const skills = {
 		subSkill: {
 			pojun: {
 				audio: "jsrgjuelie",
-				logAudio: ()=> get.rand(1, 2),
+				logAudio: () => ["jsrgjuelie1.mp3", "jsrgjuelie2.mp3"],
 				trigger: { source: "damageBegin1" },
 				filter: function (event, player) {
 					if (!player.isMinHandcard() && !player.isMinHp()) return false;
@@ -9339,7 +9339,7 @@ const skills = {
 		check: function (event, player) {
 			return get.damageEffect(event.player, event.source, _status.event.player, event.nature) * event.num < get.effect(player, { name: "losehp" }, player, _status.event.player) + get.effect(player, { name: "draw" }, player, _status.event.player) + get.effect(event.player, { name: "draw" }, player, _status.event.player) / 2;
 		},
-		logAudio: ()=> get.rand(1, 2),
+		logAudio: () => 2,
 		group: "jsrgjishan_recover",
 		content: function () {
 			"step 0";
@@ -9699,7 +9699,7 @@ const skills = {
 			if (num == 0) return "你可以摸一张牌";
 			return "你可以摸一张牌并令" + get.cnNumber(num) + "名角色获得“猎”标记";
 		},
-		logAudio: ()=> get.rand(1, 2),
+		logAudio: () => 2,
 		content: function () {
 			"step 0";
 			player.draw();
@@ -9738,7 +9738,7 @@ const skills = {
 		subSkill: {
 			damage: {
 				audio: "jsrgzhenglve",
-				logAudio: ()=> get.rand(3, 4),
+				logAudio: () => ["jsrgzhenglve3.mp3", "jsrgzhenglve4.mp3"],
 				trigger: { source: "damageSource" },
 				usable: 1,
 				filter: function (event, player) {

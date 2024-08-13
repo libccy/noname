@@ -3320,7 +3320,7 @@ const skills = {
 		},
 		forced: true,
 		logAudio(event, player, name) {
-			return name == "damageBegin2" ? 2 : 1;
+			return name == "damageBegin2" ? "twfenwang2.mp3" : "twfenwang1.mp3";
 		},
 		content: function () {
 			"step 0";
@@ -6750,7 +6750,7 @@ const skills = {
 			}
 			return true;
 		},
-		logAudio: ()=> 1,
+		logAudio: () => "mibei1.mp3",
 		skillAnimation: true,
 		animationColor: "water",
 		content: function () {
@@ -10446,7 +10446,7 @@ const skills = {
 			}
 			return 10 - get.value(card);
 		},
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		content: function () {
 			player.give(cards, target).gaintag.add("twkujianx");
 			player.addSkill("twkujian_draw");
@@ -13141,7 +13141,7 @@ const skills = {
 			return game.hasPlayer(current => current != player) && (event.name != "phase" || game.phaseNumber == 0);
 		},
 		forced: true,
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		content: function () {
 			"step 0";
 			player.chooseTarget("请选择【随征】的目标", lib.translate.twsuizheng_info, lib.filter.notMe, true).set("ai", function (target) {
@@ -16697,9 +16697,8 @@ const skills = {
 			return 7 - get.value(card);
 		},
 		logAudio(event, player) {
-			const num = get.equipNum(event.cards[0]);
-			if (num > 2) return 3;
-			return num;
+			const num = Math.max(get.equipNum(event.cards[0]), 3);
+			return "yuanhu" + num + ".mp3";
 		},
 		content: function () {
 			"step 0";

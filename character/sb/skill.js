@@ -5170,7 +5170,7 @@ const skills = {
 		audio: 4,
 		enable: "phaseUse",
 		usable: 1,
-		logAudio: 1,
+		logAudio: () => 1,
 		filterTarget: lib.filter.notMe,
 		content: function () {
 			"step 0";
@@ -5213,15 +5213,15 @@ const skills = {
 		subSkill: {
 			true1: {
 				audio: "sbduanliang",
-				logAudio: 2,
+				logAudio: () => "sbduanliang2.mp3",
 			},
 			true2: {
 				audio: "sbduanliang",
-				logAudio: 3,
+				logAudio: () => "sbduanliang3.mp3",
 			},
 			false: {
 				audio: "sbduanliang",
-				logAudio: 4,
+				logAudio: () => "sbduanliang4.mp3",
 			},
 		},
 	},
@@ -5369,7 +5369,7 @@ const skills = {
 		audio: 4,
 		trigger: { player: "useCardToPlayered" },
 		logTarget: "target",
-		logAudio: 1,
+		logAudio: () => 1,
 		filter: function (event, player) {
 			return player != event.target && event.card.name == "sha" && event.target.isIn();
 		},
@@ -5415,15 +5415,15 @@ const skills = {
 		subSkill: {
 			true1: {
 				audio: "sbtieji",
-				logAudio: 2,
+				logAudio: () => "sbtieji2.mp3",
 			},
 			true2: {
 				audio: "sbtieji",
-				logAudio: 3,
+				logAudio: () => "sbtieji3.mp3",
 			},
 			false: {
 				audio: "sbtieji",
-				logAudio: 4,
+				logAudio: () => "sbtieji4.mp3",
 			},
 		},
 	},
@@ -6218,7 +6218,7 @@ const skills = {
 			return 6.5 - get.value(card);
 		},
 		position: "he",
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		group: ["sbjushou_damage", "sbjushou_draw"],
 		content: function () {
 			player.turnOver();
@@ -6897,8 +6897,7 @@ const skills = {
 		filter: function (event, player) {
 			return game.hasPlayer(current => current.hasMark("sbjieyin_mark"));
 		},
-		audio: 2,
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		content: function () {
 			"step 0";
 			var targets = game.filterPlayer(current => current.hasMark("sbjieyin_mark"));
