@@ -363,7 +363,7 @@ const skills = {
 		locked: false,
 		logAudio: () => 1,
 		async content(event, trigger, player) {
-			const cards = get.cards(2);
+			const cards = get.cards(get.mode() == "doudizhu" ? 1 : 2);
 			const next = player.addToExpansion(cards, "draw");
 			next.gaintag.add(event.name);
 			await next;
