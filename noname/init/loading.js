@@ -256,7 +256,7 @@ export async function loadExtension(extension) {
 		}
 
 		if (extension[4]) {
-			if (extension[4].character) {
+			if (extension[4].character?.character && Object.keys(extension[4].character.character).length > 0) {
 				const content = { ...extension[4].character };
 				content.name = extension[0];
 				content.translate ??= {};
@@ -274,7 +274,7 @@ export async function loadExtension(extension) {
 
 				loadCharacter(content);
 			}
-			if (extension[4].card) {
+			if (extension[4].card?.card && Object.keys(extension[4].card).length > 0) {
 				const content = { ...extension[4].card };
 				content.name = extension[0];
 				content.translate ??= {};
@@ -292,7 +292,7 @@ export async function loadExtension(extension) {
 
 				loadCard(content);
 			}
-			if (extension[4].skill) {
+			if (extension[4].skill?.skill && Object.keys(extension[4].skill.skill).length > 0) {
 				for (const [skillName, skillInfo] of Object.entries(extension[4].skill.skill)) {
 					if (lib.skill[skillName]) {
 						console.log(`duplicated skill in extension ${extension[0]}:\n${skillName}:\nlib.skill.${skillName}`, lib.skill[skillName], `\nextension.${extension[0]}.skill.skill.${skillName}`, skillInfo);
