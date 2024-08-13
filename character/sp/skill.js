@@ -4204,7 +4204,7 @@ const skills = {
 		frequent: true,
 		content: function () {
 			"step 0";
-			player.showHandcards(get.translation(player) + "发动了【技能】");
+			player.showHandcards(get.translation(player) + "发动了【和衷】");
 			event.num = get.number(player.getCards("h")[0], player);
 			"step 1";
 			player.draw();
