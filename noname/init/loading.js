@@ -256,7 +256,7 @@ export async function loadExtension(extension) {
 		}
 
 		if (extension[4]) {
-			if (extension[4].character?.character && Object.keys(extension[4].character.character).length > 0) {
+			if (typeof extension[4].character?.character == "object" && Object.keys(extension[4].character.character).length > 0) {
 				const content = { ...extension[4].character };
 				content.name = extension[0];
 				content.translate ??= {};
@@ -293,9 +293,7 @@ export async function loadExtension(extension) {
 				}
 				if (content.skill) {
 					for (const skillInfo of Object.values(content.skill)) {
-						if (typeof skillInfo.audio == "number" || typeof skillInfo.audio == "boolean") {
-							skillInfo.audio = `ext:${content.name}:${Number(skillInfo.audio)}`;
-						}
+						extSkillInject(extension[0], skillInfo);
 					}
 				}
 
@@ -311,7 +309,7 @@ export async function loadExtension(extension) {
 
 				loadCharacter(content);
 			}
-			if (extension[4].card?.card && Object.keys(extension[4].card).length > 0) {
+			if (typeof extension[4].card?.card == "object" && Object.keys(extension[4].card).length > 0) {
 				const content = { ...extension[4].card };
 				content.name = extension[0];
 				content.translate ??= {};
@@ -329,19 +327,14 @@ export async function loadExtension(extension) {
 
 				loadCard(content);
 			}
-			if (extension[4].skill?.skill && Object.keys(extension[4].skill.skill).length > 0) {
+			if (typeof extension[4].skill?.skill == "object" && Object.keys(extension[4].skill.skill).length > 0) {
 				for (const [skillName, skillInfo] of Object.entries(extension[4].skill.skill)) {
 					if (lib.skill[skillName]) {
 						console.log(`duplicated skill in extension ${extension[0]}:\n${skillName}:\nlib.skill.${skillName}`, lib.skill[skillName], `\nextension.${extension[0]}.skill.skill.${skillName}`, skillInfo);
 						continue;
 					}
 
-					const info = { ...skillInfo };
-					if (typeof info.audio == "number" || typeof info.audio == "boolean") {
-						info.audio = `ext:${extension[0]}:${info.audio}`;
-					}
-
-					lib.skill[skillName] = info;
+					extSkillInject(extension[0], skillInfo);
 				}
 
 				for (const [transName, translate] of Object.entries(extension[4].skill.translate)) {
@@ -434,6 +427,12 @@ export function loadPlay(playConfig) {
 
 	if (typeof playConfig.init == "function") playConfig.init();
 	if (typeof playConfig.arenaReady == "function") lib.arenaReady?.push(playConfig.arenaReady);
+}
+
+function extSkillInject(extName, skillInfo) {
+	if (typeof skillInfo.audio == "number" || typeof skillInfo.audio == "boolean") {
+		skillInfo.audio = `ext:${extName}:${Number(skillInfo.audio)}`;
+	}
 }
 
 /**
