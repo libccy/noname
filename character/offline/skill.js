@@ -633,7 +633,7 @@ const skills = {
 			while (suits.length > 0) {
 				const control = await target
 					.chooseControl(suits)
-					.set("prompt", "奇袭：猜测" + get.translation(player) + "手牌中最多的花色")
+					.set("prompt", "奇袭：猜测" + get.translation(player) + "选择的牌的花色")
 					.set("ai", () => {
 						var player = _status.event.getParent().player,
 							controls = _status.event.controls;
