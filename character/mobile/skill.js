@@ -5152,6 +5152,7 @@ const skills = {
 			give: {
 				audio: ["spdaming", 2],
 				enable: "phaseUse",
+				forceaudio: true,
 				nopop: true,
 				filter: function (event, player) {
 					if (!player.countCards("he")) return false;
@@ -5196,7 +5197,6 @@ const skills = {
 				},
 				content: function () {
 					"step 0";
-					target.logSkill("spdaming_give");
 					player.give(cards, target);
 					if (!game.hasPlayer(current => current != player && current != target)) event.finish();
 					target.addTempSkill("spdaming_used", "phaseUseAfter");
