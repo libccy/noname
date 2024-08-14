@@ -1483,7 +1483,6 @@ const skills = {
 		audio: "dcmingfa",
 		enable: "phaseUse",
 		filter(event, player) {
-			if (player.hasSkill("stdmingfa_used")) return false;
 			return game.hasPlayer(target => target.getHp() > 1);
 		},
 		filterTarget(card, player, target) {
@@ -1493,6 +1492,7 @@ const skills = {
 			const target = event.target;
 			await target.damage();
 			if (target.isIn()) {
+				player.tempBanSkill("stdmingfa", "forever");
 				player.addSkill("stdmingfa_used");
 				player.markAuto("stdmingfa_used", [target]);
 			}
@@ -1508,6 +1508,7 @@ const skills = {
 				forced: true,
 				popup: false,
 				content() {
+					delete player.storage[`temp_ban_stdmingfa`];
 					player.popup("明伐");
 					game.log(player, "恢复了技能", "#g【明伐】");
 					player.removeSkill("stdmingfa_used");

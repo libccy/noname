@@ -17,12 +17,11 @@ const skills = {
 			const places = lib.skill["1！5！"].derivation
 				.slice()
 				.filter(i => {
-					let list = ["4", "5", "6", "7"];
 					let storage = target.getStorage("1！5！_injury");
-					if (storage.length) {
-						list.push("1");
+					if (!storage.length && i == "1！5！_place1") {
+						return false;
 					}
-					return list.includes(i.substr(-1));
+					return true;
 				})
 			if (!places.length) return;
 			//射击部位-by 鸽子
@@ -91,8 +90,8 @@ const skills = {
 				const number = target.hasSex("male")
 					? [
 							["7", "1"],
-							["5", "3"],
-							["4", "7"],
+							//["5", "3"],
+							//["4", "7"],
 							["9", "5"],
 							["9", "13"],
 							["7", "3"],
@@ -100,8 +99,8 @@ const skills = {
 					  ]
 					: [
 							["7", "1"],
-							["8", "3"],
-							["4", "7"],
+							//["8", "3"],
+							//["4", "7"],
 							["9", "5"],
 							["9", "13"],
 							["6", "3"],
@@ -193,7 +192,7 @@ const skills = {
 						break;
 					case 4:
 						const cardx = target.getDiscardableCards(target, "h");
-						const num = Math.floor(cardx.length);
+						const num = Math.floor(cardx.length / 2);
 						if (cardx.length) await target.discard(cardx.randomGets(num));
 						break;
 					case 5:
@@ -211,7 +210,7 @@ const skills = {
 		marktext: "赤",
 		intro: { content: "mark" },
 		frequent: true,
-		derivation: ["1！5！_place1", "1！5！_place2", "1！5！_place3", "1！5！_place4", "1！5！_place5", "1！5！_place6", "1！5！_place7"],
+		derivation: ["1！5！_place1", "1！5！_place4", "1！5！_place5", "1！5！_place6", "1！5！_place7"],
 		subSkill: {
 			injury: {
 				charlotte: true,
@@ -264,10 +263,10 @@ const skills = {
 				trigger:{
 					source: "damageBegin2",
 				},
-				filter:function(event, player){
+				filter(event, player){
 					if (get.tag(event.card, "damage")) return true;
 				},
-				content:async function (event, trigger, player) {
+				async content(event, trigger, player) {
 					trigger.num -= 1;
 				}
 			},
@@ -295,7 +294,7 @@ const skills = {
 		trigger:{
 			player: "phaseUseBegin",
 		},
-		cost:async function (event, trigger, player) {
+		async cost (event, trigger, player) {
 			let list = ["摸体力值张牌，此阶段【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复1点体力。"];
 			let result = await player.chooseControlList(list).set("ai", function(){
 				//等157优化）
@@ -306,7 +305,7 @@ const skills = {
 				cost_data: result.control,
 			}
 		},
-		content:async function (event, trigger, player) {
+		async content(event, trigger, player) {
 			if (event.cost_data == "选项一") {
 				player.draw(player.getHp());
 				player.addTempSkill("chiren_directHit", {player:"phaseUseEnd"});
@@ -364,7 +363,7 @@ const skills = {
 		locked: false,
 		logAudio: () => 1,
 		async content(event, trigger, player) {
-			const cards = get.cards(2);
+			const cards = get.cards(get.mode() == "doudizhu" ? 1 : 2);
 			const next = player.addToExpansion(cards, "draw");
 			next.gaintag.add(event.name);
 			await next;

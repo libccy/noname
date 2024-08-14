@@ -58,6 +58,7 @@ const skills = {
 			const image = Boolean(player.storage[skill]) ? "caojie" : "liuxie";
 			const mark = player.marks[skill];
 			if (mark) mark.setBackground(image, "character");
+			player.changeSkin({ characterName: "liuxiecaojie" }, "liuxiecaojie" + (player.storage[skill] ? "_shadow" : ""));
 		},
 		intro: {
 			content(storage, player) {

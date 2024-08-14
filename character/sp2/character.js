@@ -95,6 +95,12 @@ const characters = {
 	sp_xuyou: ["male", "qun", 3, ["spshicai", "spfushi"]],
 	chunyuqiong: ["male", "qun", 5, ["cangchu", "sushou", "liangying"], ["name:淳于|琼"]],
 	lvkuanglvxiang: ["male", "qun", 4, ["liehou", "qigong"], ["name:吕|旷-吕|翔"]],
+
+	duji: ["male", "wei", 3, ["xinfu_andong", "xinfu_yingshi"]],
+	liuyao: ["male", "qun", 4, ["xinfu_kannan", "twniju"], ["zhu"]],
+	lvdai: ["male", "wu", 4, ["xinfu_qinguo"]],
+	sp_taishici: ["male", "qun", 4, ["xinfu_jixu"], ["name:太史|慈"]],
+	re_zhangliang: ["male", "qun", 4, ["xinfu_jijun", "xinfu_fangtong"]],
 };
 
 export default characters;

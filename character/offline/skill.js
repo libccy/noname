@@ -633,7 +633,7 @@ const skills = {
 			while (suits.length > 0) {
 				const control = await target
 					.chooseControl(suits)
-					.set("prompt", "奇袭：猜测" + get.translation(player) + "手牌中最多的花色")
+					.set("prompt", "奇袭：猜测" + get.translation(player) + "选择的牌的花色")
 					.set("ai", () => {
 						var player = _status.event.getParent().player,
 							controls = _status.event.controls;
@@ -7463,9 +7463,6 @@ const skills = {
 	yjjielve: {
 		audio: 2,
 		enable: "phaseUse",
-		filter(event, player) {
-			return !player.hasSkill("yjjielve_ban");
-		},
 		viewAs: { name: "chenghuodajie" },
 		filterCard(card, player) {
 			if (ui.selected.cards.length) return get.color(card) == get.color(ui.selected.cards[0]);
@@ -7494,10 +7491,9 @@ const skills = {
 					return event.card && event.card.name == "chenghuodajie" && event.getParent().skill == "yjjielve";
 				},
 				content() {
-					player.addTempSkill("yjjielve_ban");
+					player.tempBanSkill("yjjielve");
 				},
 			},
-			ban: { charlotte: true },
 		},
 	},
 	//用间beta张飞

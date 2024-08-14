@@ -153,6 +153,7 @@ window.noname_character_rank = {
 		"ol_feiyi",
 		"ol_jiangwan",
 		"bianyue",
+		"kongshu",
 	],
 	a: [
 		"star_caoren",
@@ -1367,6 +1368,7 @@ window.noname_character_rank = {
 		"re_jiangwei",
 		"re_caiwenji",
 		"ol_liushan",
+		"huan_liushan",
 		"re_zhangzhang",
 		"re_masu",
 		"old_madai",
@@ -2413,6 +2415,7 @@ window.noname_character_rank = {
 			"jd_sb_caocao",
 			"jd_sb_sp_zhugeliang",
 			"jd_jin_wangyuanji",
+			"kongshu",
 		],
 		rare: [
 			"yj_tianchuan",
@@ -2695,6 +2698,7 @@ window.noname_character_rank = {
 			"ol_dongzhuo",
 			"re_jiangwei",
 			"ol_liushan",
+			"huan_liushan",
 			"re_zhangzhang",
 			"re_caiwenji",
 			"re_caozhi",

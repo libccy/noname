@@ -23,4 +23,11 @@ export default {
 	dongbai: ["dongzhuo"],
 	cuimao: ["caopi"],
 	simazhao: ["wangyuanji"],
+	lijue: ["guosi", "jiaxu"],
+	zhangji: ["zhangxiu", "drlt_zhangxiu", "zoushi"],
+	xf_sufei: ["ganning"],
+	simahui: ["pangdegong"],
+	zhangqiying: ["zhanglu"],
+	pangtong: ["zhugejin"],
+	taishici: ["liuyao", "kongrong"],
 };
