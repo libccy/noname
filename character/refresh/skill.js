@@ -1270,7 +1270,7 @@ const skills = {
 			player.addTempSkill("dcjiushi_sha", { player: "phaseEnd" });
 			player.addMark("dcjiushi_sha", 1, false);
 		},
-		group: ["dcjiushi_use", "dcjiushi_record", "dcjiushi_damage"],
+		group: ["dcjiushi_use", "dcjiushi_damage"],
 		subSkill: {
 			use: {
 				audio: "dcjiushi",
@@ -1357,17 +1357,6 @@ const skills = {
 							}
 						},
 					},
-				},
-			},
-			record: {
-				trigger: { player: "damageBegin3" },
-				silent: true,
-				firstDo: true,
-				filter: function (event, player) {
-					return player.isTurnedOver();
-				},
-				content: function () {
-					trigger.dcjiushi = true;
 				},
 			},
 			damage: {
@@ -9793,7 +9782,7 @@ const skills = {
 	rejiushi: {
 		audio: 2,
 		audioname: ["mb_caomao"],
-		group: ["rejiushi1", "rejiushi2", "rejiushi3", "rejiushi_gain"],
+		group: ["rejiushi1", "rejiushi3", "rejiushi_gain"],
 		subfrequent: ["gain"],
 		subSkill: {
 			gain: {
@@ -9894,17 +9883,6 @@ const skills = {
 			},
 		},
 	},
-	rejiushi2: {
-		trigger: { player: "damageBegin3" },
-		silent: true,
-		firstDo: true,
-		filter: function (event, player) {
-			return player.classList.contains("turnedover");
-		},
-		content: function () {
-			trigger.rejiushi = true;
-		},
-	},
 	rejiushi3: {
 		audio: "rejiushi",
 		trigger: { player: "damageEnd" },
@@ -9938,7 +9916,7 @@ const skills = {
 		mark: true,
 		marktext: "改",
 		intro: {
-			content: "当你需要使用【酒】时，若你的武将牌正面向上，你可以翻面，视为使用一张【酒】。当你受到伤害后，若你的武将牌背面向上，你可以翻面。当你翻面时，你获得牌堆中的一张随机锦囊。",
+			content: "当你需要使用【酒】时，若你的武将牌正面向上，你可以翻面，视为使用一张【酒】。当你受到伤害后，若你的武将牌于受到伤害时背面向上，你可以翻面。当你翻面时，你获得牌堆中的一张随机锦囊牌。",
 		},
 	},
 	rehongyan: {
@@ -15399,6 +15377,18 @@ const skills = {
 			} else event.current.draw();
 			game.delay();
 			if (targets.length) event.goto(2);
+		},
+	},
+	_dcjiushi_record: {
+		trigger: { player: "damageBegin3" },
+		silent: true,
+		firstDo: true,
+		filter: function (event, player) {
+			return player.isTurnedOver();
+		},
+		content: function () {
+			trigger.dcjiushi = true;
+			trigger.rejiushi = true;
 		},
 	},
 };

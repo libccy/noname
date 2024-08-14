@@ -1191,19 +1191,8 @@ const skills = {
 		audio: "rejiushi",
 		inherit: "rejiushi",
 		persevereSkill: true,
-		group: ["rejiushi1", "mbcmjiushi_check", "mbcmjiushi_turnback", "mbcmjiushi_gain"],
+		group: ["rejiushi1", "mbcmjiushi_turnback", "mbcmjiushi_gain"],
 		subSkill: {
-			check: {
-				trigger: { player: "damageBegin3" },
-				silent: true,
-				firstDo: true,
-				filter(event, player) {
-					return player.isTurnedOver();
-				},
-				content() {
-					trigger.mbcmjiushi = true;
-				},
-			},
 			turnback: {
 				audio: "rejiushi",
 				audioname: ["mb_caomao"],
@@ -16849,6 +16838,17 @@ const skills = {
 		logTarget: "player",
 		content: function () {
 			player.discardPlayerCard(trigger.player, "e", true, trigger.player.countCards("e"));
+		},
+	},
+	_mbcmjiushi_check: {
+		trigger: { player: "damageBegin3" },
+		silent: true,
+		firstDo: true,
+		filter(event, player) {
+			return player.isTurnedOver();
+		},
+		content() {
+			trigger.mbcmjiushi = true;
 		},
 	},
 };
