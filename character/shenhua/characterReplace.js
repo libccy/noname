@@ -22,7 +22,7 @@ const characterReplaces = {
 	menghuo: ["menghuo", "re_menghuo", "sb_menghuo", "tw_menghuo", "sp_menghuo", "dc_sp_menghuo", "jd_sb_menghuo"],
 	zhurong: ["zhurong", "ol_zhurong", "re_zhurong", "sb_zhurong"],
 	sunjian: ["sunjian", "ol_sunjian", "re_sunjian", "tw_ol_sunjian", "star_sunjian", "jx_sunjian"],
-	jiaxu: ["jiaxu", "re_jiaxu", "ns_jiaxu", "ps_jiaxu", "dc_sb_jiaxu"],
+	jiaxu: ["jiaxu", "re_jiaxu", "ns_jiaxu", "ps_jiaxu", "dc_sb_jiaxu", "sb_jiaxu"],
 	dongzhuo: ["dongzhuo", "ol_dongzhuo", "re_dongzhuo", "star_dongzhuo", "jsrg_dongzhuo", "sp_dongzhuo", "yj_dongzhuo"],
 	dengai: ["dengai", "ol_dengai", "re_dengai"],
 	sp_ol_zhanghe: ["sp_ol_zhanghe", "yj_zhanghe", "sp_zhanghe", "jsrg_zhanghe", "huan_zhanghe"],

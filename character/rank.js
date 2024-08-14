@@ -1235,6 +1235,8 @@ window.noname_character_rank = {
 		"jd_ol_huaxin",
 		"jd_jin_wangyuanji",
 		"jd_sb_xuhuang",
+		"mb_jiachong",
+		"sb_jiaxu",
 	],
 	b: [
 		"liuxiecaojie",
@@ -3007,6 +3009,8 @@ window.noname_character_rank = {
 			"jd_jin_simazhao",
 			"jd_ol_huaxin",
 			"jd_sb_xuhuang",
+			"mb_jiachong",
+			"sb_jiaxu",
 		],
 		junk: [
 			"liuxiecaojie",

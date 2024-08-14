@@ -17850,30 +17850,28 @@ const skills = {
 	dingfa: {
 		audio: 2,
 		trigger: { player: "phaseDiscardAfter" },
-		direct: true,
-		filter: function (event, player) {
-			var num = 0;
-			player.getHistory("lose", function (evt) {
+		filter(event, player) {
+			let num = 0;
+			player.getHistory("lose", evt => {
 				num += evt.cards2.length;
 			});
 			return num >= player.hp;
 		},
-		content: function () {
-			"step 0";
-			player
-				.chooseTarget(get.prompt("dingfa"), "操作提示：选择自己以回复体力，或选择其他角色以造成伤害", function (card, player, target) {
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt(event.name.slice(0, -5)), "操作提示：选择自己以回复体力，或选择其他角色以造成伤害", (card, player, target) => {
 					return target == player ? player.isDamaged() : true;
 				})
-				.set("ai", function (target) {
+				.set("ai", target => {
+					const player = get.player();
 					return target != player ? get.damageEffect(target, player, player) : get.recoverEffect(player, player, player);
-				});
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("dingfa", target);
-				if (target == player) player.recover();
-				else target.damage();
-			}
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			if (target == player) await player.recover();
+			else await target.damage();
 		},
 	},
 	dz_mantianguohai: {
