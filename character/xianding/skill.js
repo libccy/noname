@@ -6829,7 +6829,7 @@ const skills = {
 				})
 			)
 				return false;
-			if (get.type(event.card, null, false) != "trick" && event.card.name != "sha") return false;
+			if (!["basic", "trick"].includes(get.type(event.card, null, false))) return false;
 			if (event.getParent(2).name == "dcchanjuan") return false;
 			return !player.storage.dcchanjuan[event.card.name] || player.storage.dcchanjuan[event.card.name] < 2;
 		},
