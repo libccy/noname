@@ -2,6 +2,123 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//贾充
+	mbbeini: {
+		audio: 2,
+		inherit: "beini",
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			const str = get.translation(target);
+			const {
+				result: { index },
+			} = await player
+				.chooseControl()
+				.set("choiceList", [`摸两张牌，然后令${str}视为对自己使用【杀】或弃置自己场上一张牌`, `令${str}摸两张牌，然后视为对其使用【杀】或弃置其场上一张牌`])
+				.set("ai", () => {
+					const evt = _status.event.getParent(),
+						player = evt.player,
+						target = evt.target;
+					const card = { name: "sha", isCard: true },
+						att = get.attitude(player, target) > 0;
+					if (!target.canUse(card, player, false) || get.effect(player, card, target, player) >= 0) return 0;
+					if (att && (!player.canUse(card, target, false) || get.effect(target, card, player, player) >= 0)) return 1;
+					if (target.hasSkill("nogain") && player.canUse(card, target, false) && get.effect(target, card, player, player) > 0) return 1;
+					if (player.hasShan()) return 0;
+					if (att && target.hasShan()) return 1;
+					return 0;
+				});
+			const list = [player, target];
+			if (index == 1) list.reverse();
+			await list[0].draw(2);
+			const sha = get.autoViewAs({ name: "sha", isCard: true });
+			const choices = [];
+			const choiceList = [`视为对${get.translation(list[0])}使用一张【杀】`, `弃置${get.translation(list[0])}场上一张牌`];
+			if (list[1].canUse("sha", list[0], false)) choices.push("选项一");
+			else choiceList[0] = '<span style="opacity:0.5">' + choiceList[0] + "</span>";
+			if (list[0].countDiscardableCards(list[1], "ej")) choices.push("选项二");
+			else choiceList[1] = '<span style="opacity:0.5">' + choiceList[1] + "</span>";
+			if (!choices.length) return;
+			const control =
+				choices.length == 1
+					? choices[0]
+					: await list[1]
+							.chooseControl(choices)
+							.set("choiceList", choiceList)
+							.set("prompt", "悖逆：请选择一项")
+							.set("ai", () => {
+								const player = get.player(),
+									target = get.event("target");
+								const eff2 = get.effect(target, { name: "sha" }, player, player),
+									eff1 = get.effect(target, { name: "guohe_copy2" }, player, player);
+								return eff1 > eff2 ? "选项一" : "选项二";
+							})
+							.set("target", list[0])
+							.forResultControl();
+			if (control == "选项一") await list[1].useCard(sha, list[0], false, "noai");
+			else await list[1].discardPlayerCard(list[0], "ej", true);
+		},
+	},
+	mbdingfa: {
+		audio: 2,
+		trigger: {
+			player: "phaseDiscardAfter",
+		},
+		filter(event, player) {
+			let num = 0;
+			player.getHistory("lose", evt => {
+				num += evt.cards2.length;
+			});
+			return num >= player.hp && (player.isDamaged() || game.hasPlayer(current => current.countDiscardableCards(player, "he")));
+		},
+		async cost(event, trigger, player) {
+			const choices = [];
+			const choiceList = ["回复1点体力", "弃置一名角色至多两张牌"];
+			if (player.isDamaged()) choices.push("选项一");
+			else choiceList[0] = '<span style="opacity:0.5">' + choiceList[0] + "</span>";
+			if (game.hasPlayer(current => current.countDiscardableCards(player, "he"))) choices.push("选项二");
+			else choiceList[1] = '<span style="opacity:0.5">' + choiceList[1] + "</span>";
+			const control = await player
+				.chooseControl(choices, "cancel2")
+				.set("choiceList", choiceList)
+				.set("prompt", get.prompt(event.name.slice(0, -5)))
+				.set("ai", () => {
+					const player = get.player();
+					const choices = get.event().controls.slice().remove("cancel2");
+					const eff = get.recoverEffect(player, player, player);
+					if (!game.hasPlayer(current => get.effect(current, { name: "guohe_copy2" }, player, player) > eff)) choices.remove("选项二");
+					else if (choices.includes("选项二")) return "选项二";
+					if (eff <= 0) choices.remove("选项一");
+					if (!choices.length) return "cancel2";
+					return choices.randomGet();
+				})
+				.forResultControl();
+			event.result = {
+				bool: control != "cancel2",
+				cost_data: control,
+			};
+		},
+		async content(event, trigger, player) {
+			if (event.cost_data == "选项一") await player.recover();
+			else {
+				const targets = await player
+					.chooseTarget(
+						"选择一名角色弃置其至多两张牌",
+						(card, player, target) => {
+							return target.countDiscardableCards(player, "he");
+						},
+						true
+					)
+					.set("ai", target => {
+						const player = get.player();
+						return get.effect(target, { name: "guohe_copy2" }, player, player);
+					})
+					.forResultTargets();
+				if (!targets || !targets.length) return;
+				const target = targets[0];
+				await player.discardPlayerCard(target, "he", true, [1, 2]);
+			}
+		},
+	},
 	//司马伷
 	mbbifeng: {
 		audio: 3,

@@ -2,6 +2,193 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//贾诩
+	sbwansha: {
+		audio: 2,
+		trigger: {
+			global: "dying",
+		},
+		filter(event, player) {
+			const position = player.storage.sbwansha ? "hej" : "h";
+			return event.player.countCards(position);
+		},
+		check(event, player) {
+			return get.attitude(player, event.player) <= 0;
+		},
+		logTarget: "player",
+		async content(event, trigger, player) {
+			const target = trigger.player,
+				position = player.storage.sbwansha ? "hej" : "h";
+			let cards = await player.choosePlayerCard(target, position, [0, 2], true).set("visible", true).forResultCards();
+			if (cards.length) {
+				let result;
+				if (target.getCards(position).some(card => !cards.includes(card)))
+					result = await target
+						.chooseControl()
+						.set("choiceList", [`${get.translation(player)}将${get.translation(cards)}分配给其他角色`, `弃置不为${get.translation(cards)}的牌`])
+						.set("ai", () => {
+							return get.event("goon") ? 0 : 1;
+						})
+						.set("goon", 2 * cards.length <= target.countCards(position) || get.attitude(target, player) > 0)
+						.forResult();
+				else result = { index: 0 };
+				if (result.index == 0) {
+					if (_status.connectMode) game.broadcastAll(() => (_status.noclearcountdown = true));
+					let given_map = {};
+					while (cards.length) {
+						let result;
+						if (cards.length == 1) result = { bool: true, links: cards.slice() };
+						else {
+							result = await player
+								.chooseCardButton("完杀：请选择要分配的牌", cards, [1, cards.length], true)
+								.set("ai", button => {
+									if (!ui.selected.buttons.length) return get.buttonValue(button);
+									return 0;
+								})
+								.forResult();
+						}
+						const gives = result.links;
+						const result2 = await player
+							.chooseTarget("选择获得" + get.translation(gives) + "的角色", cards.length == 1, (card, player, target) => {
+								return target != get.event().getTrigger().player;
+							})
+							.set("ai", target => {
+								return get.attitude(get.event("player"), target) * get.sgn(get.sgn(get.event("goon")) + 0.5);
+							})
+							.set(
+								"goon",
+								gives.reduce((sum, card) => sum + get.value(card), 0)
+							)
+							.forResult();
+						if (result2.bool) {
+							cards.removeArray(gives);
+							const id = result2.targets[0].playerid;
+							if (!given_map[id]) given_map[id] = [];
+							given_map[id].addArray(gives);
+						}
+					}
+					if (_status.connectMode) game.broadcastAll(() => delete _status.noclearcountdown);
+					let list = [];
+					for (const i in given_map) {
+						const source = (_status.connectMode ? lib.playerOL : game.playerMap)[i];
+						player.line(source, "green");
+						game.log(source, "获得了", given_map[i]);
+						list.push([source, given_map[i]]);
+					}
+					await game
+						.loseAsync({
+							gain_list: list,
+							giver: player,
+							animate: "gain2",
+						})
+						.setContent("gaincardMultiple");
+				} else await target.discard(target.getCards(position).removeArray(cards));
+			} else {
+				await target.discard(target.getCards(position).removeArray(cards));
+			}
+		},
+		global: "sbwansha_global",
+		subSkill: {
+			global: {
+				mod: {
+					cardEnabled(card, player) {
+						var source = _status.currentPhase;
+						if (card.name == "tao" && source && source != player && source.hasSkill("sbwansha") && !player.isDying()) return false;
+					},
+					cardSavable(card, player) {
+						var source = _status.currentPhase;
+						if (card.name == "tao" && source && source != player && source.hasSkill("sbwansha") && !player.isDying()) return false;
+					},
+				},
+			},
+		},
+	},
+	sbluanwu: {
+		audio: "luanwu",
+		inherit: "luanwu",
+		contentBefore() {
+			player.addTempSkill("sbluanwu_add");
+		},
+		subSkill: {
+			add: {
+				trigger: {
+					global: "loseHpEnd",
+				},
+				filter(event, player) {
+					if (event.getParent().name != "sbluanwu") return false;
+					return ["sbwansha", "sbweimu"].some(skill => player.hasSkill(skill, null, null, false) && !player.storage[skill]);
+				},
+				async cost(event, trigger, player) {
+					const choices = [],
+						list = ["sbwansha", "sbweimu"];
+					const choiceList = ["修改【完杀】", "修改【帷幕】"];
+					for (let i = 0; i < 2; i++) {
+						if (!player.hasSkill(list[i], null, null, false) || player.storage[list[i]]) {
+							choiceList[i] = '<span style="opacity:0.5;">' + choiceList[i] + "</span>";
+						} else choices.push(`选项${get.cnNumber(i + 1, true)}`);
+					}
+					const control = await player
+						.chooseControl(choices, "cancel2")
+						.set("choiceList", choiceList)
+						.set("prompt", get.prompt(event.name.slice(0, -5)))
+						.set("ai", () => {
+							const choices = get.event().controls.slice().remove("cancel2");
+							return choices.randomGet();
+						})
+						.forResultControl();
+					event.result = {
+						bool: control != "cancel2",
+						cost_data: control,
+					};
+				},
+				async content(event, trigger, player) {
+					const list = ["sbwansha", "sbweimu"],
+						index = ["选项一", "选项二"].indexOf(event.cost_data);
+					player.storage[list[index]] = true;
+				},
+			},
+		},
+		derivation: ["sbwansha_rewrite", "sbweimu_rewrite"],
+	},
+	sbweimu: {
+		audio: 2,
+		trigger: {
+			player: "addJudgeBefore",
+			target: "useCardToTarget",
+			global: "roundStart",
+		},
+		filter(event, player) {
+			if (event.name == "useCardToTarget") return get.type(event.card, null, false) == "trick" && get.color(event.card) == "black";
+			if (event.name == "addJudge") return get.color(event.card) == "black";
+			if (!player.storage.sbweimu || game.roundNumber < 2) return false;
+			let num = 0;
+			game.countPlayer2(current => {
+				if (player == current) return false;
+				num += current.getRoundHistory("useCard", evt => evt.targets?.includes(player), 1).length;
+			});
+			return num <= 2 && Array.from(ui.discardPile.childNodes).some(card => get.info("sbweimu").filterCardx(card));
+		},
+		filterCardx(card) {
+			return get.subtype(card) == "equip2" || (get.type(card) == "trick" && get.color(card) == "black");
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			if (trigger.name == "useCardToTarget") {
+				trigger.targets.remove(player);
+				trigger.getParent().triggeredTargets2.remove(player);
+				trigger.untrigger();
+			} else if (trigger.name == "addJudge") {
+				trigger.cancel();
+				const owner = get.owner(trigger.card);
+				if (owner?.getCards("hej").includes(trigger.card)) await owner.lose(trigger.card, ui.discardPile);
+				else await game.cardsDiscard(trigger.card);
+				game.log(trigger.card, "进入了弃牌堆");
+			} else {
+				const cards = Array.from(ui.discardPile.childNodes).filter(card => get.info("sbweimu").filterCardx(card));
+				await player.gain(cards.randomGet(), "gain2");
+			}
+		},
+	},
 	//韩当
 	sbgongqi: {
 		audio: 2,

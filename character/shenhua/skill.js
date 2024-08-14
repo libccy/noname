@@ -5283,7 +5283,7 @@ const skills = {
 	},
 	luanwu: {
 		audio: 2,
-		audioname: ["re_jiaxu"],
+		audioname: ["re_jiaxu", "sb_jiaxu"],
 		unique: true,
 		enable: "phaseUse",
 		limited: true,
@@ -5296,7 +5296,7 @@ const skills = {
 		multitarget: true,
 		multiline: true,
 		async content(event, trigger, player) {
-			player.awakenSkill("luanwu");
+			player.awakenSkill(event.name);
 			const currented = [player];
 			let current = player.next;
 			do {
