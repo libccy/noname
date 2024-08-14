@@ -4883,6 +4883,7 @@ export const Content = {
 			next.card2 = event.card2;
 			next.num1 = event.num1;
 			next.num2 = event.num2;
+			next.winner = event.winner;
 			next.setContent(event.callback);
 			event.compareMultiple = true;
 		}
