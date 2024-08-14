@@ -11156,7 +11156,7 @@ const skills = {
 	},
 	jiushi: {
 		audio: "jiushi1",
-		group: ["jiushi1", "jiushi2", "jiushi3"],
+		group: ["jiushi1", "jiushi3"],
 	},
 	jiushi1: {
 		audio: 2,
@@ -11236,17 +11236,6 @@ const skills = {
 					}
 				},
 			},
-		},
-	},
-	jiushi2: {
-		trigger: { player: "damageBegin3" },
-		silent: true,
-		firstDo: true,
-		filter: function (event, player) {
-			return player.classList.contains("turnedover");
-		},
-		content: function () {
-			trigger.jiushi = true;
 		},
 	},
 	jiushi3: {
@@ -12793,6 +12782,17 @@ const skills = {
 		},
 		ai: {
 			combo: "zyexin",
+		},
+	},
+	_jiushi_check: {
+		trigger: { player: "damageBegin3" },
+		silent: true,
+		firstDo: true,
+		filter: function (event, player) {
+			return player.classList.contains("turnedover");
+		},
+		content: function () {
+			trigger.jiushi = true;
 		},
 	},
 };

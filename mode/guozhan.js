@@ -13899,6 +13899,7 @@ export default () => {
 			fz_xinkuanggu: {
 				audio: true,
 				inherit: "xinkuanggu",
+				global: "_xinkuanggu_check",
 			},
 			fz_new_longdan: {
 				audio: true,

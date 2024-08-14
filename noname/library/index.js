@@ -13829,6 +13829,15 @@ export class Library {
 			},
 		],
 		[
+			"龙神",
+			{
+				/**
+				 * @returns {string}
+				 */
+				getSpan: () => `${get.prefixSpan("龙")}${get.prefixSpan("神")}`,
+			},
+		],
+		[
 			"玄",
 			{
 				color: "#000000",
