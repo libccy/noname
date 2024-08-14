@@ -148,6 +148,7 @@ const skills = {
 				},
 			},
 		},
+		derivation: ["sbwansha_rewrite", "sbweimu_rewrite"],
 	},
 	sbweimu: {
 		audio: 2,
