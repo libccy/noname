@@ -232,5 +232,32 @@ const cards = {
 			},
 		},
 	},
+	tiejili: {
+		fullskin: true,
+		derivation: "ty_shamoke",
+		type: "equip",
+		subtype: "equip1",
+		distance: {
+			attackRange(card,player){
+				return player.storage.tiejili_skill||2;
+			},
+			attackFrom:-1,
+		},
+		ai: {
+			basic: {
+				equipValue: 2,
+			},
+		},
+		skills: ["tiejili_skill"],
+		onLose() {
+			delete player.storage.tiejili_skill;
+			player.unmarkSkill("tiejili_skill");
+		},
+		onEquip() {
+			if (!card.storage.tiejili_skill) card.storage.tiejili_skill = 2;
+			player.storage.tiejili_skill = card.storage.tiejili_skill;
+			player.markSkill("tiejili_skill");
+		},
+	},
 };
 export default cards;
