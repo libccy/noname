@@ -3021,11 +3021,13 @@ const skills = {
 			return player.countCards("h");
 		},
 		usable: 1,
+		contentBefore: function () {
+			player.line(game.filterPlayer(current => current.countCards("h")));
+		},
 		content: function () {
 			"step 0";
 			var targets = game.filterPlayer(current => current.countCards("h")).sortBySeat();
 			event.targets = targets;
-			player.line(targets);
 			var next = player
 				.chooseCardOL(targets, "乱群：请选择要展示的牌", true)
 				.set("ai", function (card) {
@@ -3069,7 +3071,7 @@ const skills = {
 			var cardx = cards.filter(cardy => cardy != card && get.color(cardy, targets[cards.indexOf(cardy)]) == get.color(card, player));
 			if (cardx.length) {
 				player
-					.chooseButton(["乱群：是否获得其中的一张牌", cardx])
+					.chooseButton(["乱群：是否获得其中至多四张牌", cardx])
 					.set("forceAuto", true)
 					.set("ai", function (button) {
 						var cards = _status.event.list[0];
@@ -3078,13 +3080,11 @@ const skills = {
 						if (get.attitude(player, targets[cards.indexOf(button.link)]) > 0) return 0;
 						return get.value(button.link, player);
 					})
+					.set("selectButton", [1, 4])
 					.set("list", [cards, targets]);
 			} else event.goto(4);
 			"step 3";
-			if (result.bool) {
-				var card = result.links[0];
-				player.gain(card, get.owner(card), "give");
-			}
+			if (result.bool) player.gain(result.links, "give");
 			"step 4";
 			var card = cards[targets.indexOf(player)];
 			targets = targets.filter(target => get.color(cards[targets.indexOf(target)], target) != get.color(card, player));
