@@ -2327,10 +2327,13 @@ const skills = {
 			}
 			return false;
 		},
-		forced: true,
+		logTarget: "player",
+		logAudio(event, player){
+			return "twxiayong" + (event.player === player ? 1 : 2) + ".mp3";
+		},
+		locked: true,
 		popup: false,
 		async content(event, trigger, player) {
-			player.logSkill("twxiayong", trigger.player, null, null, trigger.player === player ? 1 : 2);
 			if (trigger.player === player) {
 				const cards = player.getCards("h", card => {
 					return lib.filter.cardDiscardable(card, player, "twxiayong");

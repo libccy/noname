@@ -34,11 +34,11 @@ export class Audio {
      * @param info 使用指定的skillInfo/audioInfo
      * @param args
      */
-    static skill({ skill, player, info, args = [] }: {
+    static skill({ skill, player, info, args }: {
         skill: string;
         player: Player | string;
         info?: AudioInfo | SkillInfo;
-        args: any[];
+        args?: any[];
     }): Audio {
         if (skill == void 0) throw new ReferenceError(`skill is not defined`);
 
@@ -58,10 +58,10 @@ export class Audio {
      * @param info 使用指定的audioInfo
      * @param args
      */
-    static die({ player, info, args = [] }: {
+    static die({ player, info, args }: {
         player: Player | string;
         info?: AudioInfo;
-        args: any[];
+        args?: any[];
     }): Audio {
         if (player == void 0) throw new ReferenceError(`player is not defined`);
 
@@ -143,7 +143,7 @@ export class Audio {
         }
     }
 
-    constructor(audio: AudioBase, args: any[] = [], history: string[] = []) {
+    constructor(audio: AudioBase, args?: any[], history: string[] = []) {
         this.#history = history.slice();
         this.#Audio = audio;
         const useDefaultInfo = !this.checkHistory();
@@ -243,7 +243,7 @@ interface AudioBase {
     defaultInfo: AudioInfo;
     useCache: boolean;
     getCacheKey: () => string;
-    getAudioInfo: (useDefaultInfo: boolean, args: any[]) => AudioInfo;
+    getAudioInfo: (useDefaultInfo: boolean, args?: any[]) => AudioInfo;
     getReferenceAudio: (name: string, info?: AudioInfo) => AudioBase;
     textMap: (path: string, ext: string, name: string) => TextMap;
     textMapWithIndex: (path: string, ext: string, index?: number) => TextMap;
@@ -315,11 +315,11 @@ class SkillAudio implements AudioBase {
         else if (this.info.logAudio) this.useCache = false;
     }
 
-    getAudioInfo(useDefaultInfo: boolean, args: any[]): AudioInfo {
+    getAudioInfo(useDefaultInfo: boolean, args?: any[]): AudioInfo {
         if (useDefaultInfo) return this.defaultInfo;
-        if (this.filteredLogAudio2) return this.filteredLogAudio2(...args);
+        if (this.filteredLogAudio2 && args) return this.filteredLogAudio2(...args);
         else if (this.filteredAudioName2 != void 0) return this.filteredAudioName2;
-        else if (this.info.logAudio) return this.info.logAudio(...args);
+        else if (this.info.logAudio && args) return this.info.logAudio(...args);
         else if (this.info.audio != void 0) return this.info.audio;
         return this.defaultInfo;
     }
@@ -426,7 +426,7 @@ class DieAudio implements AudioBase {
         }
     }
 
-    getAudioInfo(useDefaultInfo: boolean, args: any[]): AudioInfo {
+    getAudioInfo(useDefaultInfo: boolean, args?: any[]): AudioInfo {
         if (useDefaultInfo) return this.defaultInfo;
         const audioInfo = this.info.dieAudios;
         if (audioInfo == void 0) return this.defaultInfo;

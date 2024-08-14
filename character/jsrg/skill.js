@@ -8134,10 +8134,10 @@ const skills = {
 		filter: function (event, player) {
 			return player.countCards("he") && event.card.name == "sha";
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			player
+		logTarget: "target",
+		logAudio: () => ["jsrgjuelie3.mp3", "jsrgjuelie4.mp3"],
+		async cost(event, trigger, player){
+			event.result = await player
 				.chooseToDiscard(get.prompt("jsrgjuelie", trigger.target), "当你使用【杀】指定一名角色为目标后，你可以弃置任意张牌，然后弃置其等量的牌", [1, Infinity], "he")
 				.set("ai", card => {
 					if (ui.selected.cards.length >= _status.event.max) return 0;
@@ -8146,12 +8146,13 @@ const skills = {
 				})
 				.set("max", trigger.target.countDiscardableCards(player, "he"))
 				.set("goon", get.attitude(player, trigger.target) < 0)
-				.set("logSkill", ["jsrgjuelie", trigger.target, null, null, get.rand(3, 4)]);
-			"step 1";
-			if (result.bool) {
-				var num = result.cards.length;
-				if (trigger.target.countDiscardableCards(player, "he")) player.discardPlayerCard("平讨：弃置" + get.translation(trigger.target) + get.cnNumber(num) + "张牌", num, "he", trigger.target, true);
-			}
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const num = event.cards.length;
+			if (trigger.target.countDiscardableCards(player, "he"))
+				await player.discardPlayerCard("平讨：弃置" + get.translation(trigger.target) + get.cnNumber(num) + "张牌", num, "he", trigger.target, true);
+			
 			/*
 			else event.finish();
 			'step 2'
@@ -9366,22 +9367,19 @@ const skills = {
 					});
 				},
 				usable: 1,
-				direct: true,
-				content: function () {
-					"step 0";
-					player
+				logAudio: () => ["jsrgjishan3.mp3", "jsrgjishan4.mp3"],
+				async cost(event, trigger, player){
+					event.result = await player
 						.chooseTarget(get.prompt("jsrgjishan_recover"), "令一名体力值最小且你对其发动过〖积善①〗的角色回复1点体力", (card, player, target) => {
 							return target.isMinHp() && player.getStorage("jsrgjishan").includes(target);
 						})
 						.set("ai", target => {
 							return get.recoverEffect(target, _status.event.player, _status.event.player);
-						});
-					"step 1";
-					if (result.bool) {
-						var target = result.targets[0];
-						player.logSkill("jsrgjishan_recover", target, null, null, get.rand(3, 4));
-						target.recover();
-					} else player.storage.counttrigger.jsrgjishan_recover--;
+						})
+						.forResult();
+				},
+				async content(event, trigger, player) {
+					await event.targets[0].recover();
 				},
 			},
 		},
@@ -9796,25 +9794,23 @@ const skills = {
 		filter: function (event, player) {
 			return !player.hasSkill("jsrgpingrong_used") && game.hasPlayer(current => current.hasMark("jsrgzhenglve_mark"));
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			player
+		logAudio: () => 2,
+		async cost(event, trigger, player){
+			event.result = await player
 				.chooseTarget(get.prompt("jsrghuilie"), "移去一名角色的“猎”，然后你执行一个额外回合。若你在此额外回合内未造成伤害，则你失去1点体力。", (card, player, target) => {
 					return target.hasMark("jsrgzhenglve_mark");
 				})
 				.set("ai", target => {
 					return get.attitude(_status.event.player, target);
-				});
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("jsrgpingrong", target, null, null, get.rand(1, 2));
-				player.addTempSkill("jsrgpingrong_used", "roundStart");
-				target.removeMark("jsrgzhenglve_mark", target.countMark("jsrgzhenglve_mark"));
-				player.insertPhase();
-				player.addSkill("jsrgpingrong_check");
-			}
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = result.targets[0];
+			player.addTempSkill("jsrgpingrong_used", "roundStart");
+			target.removeMark("jsrgzhenglve_mark", target.countMark("jsrgzhenglve_mark"));
+			player.insertPhase();
+			player.addSkill("jsrgpingrong_check");
 		},
 		subSkill: {
 			used: { charlotte: true },

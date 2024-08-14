@@ -1,7 +1,7 @@
 import { lib, get } from "../../noname.js";
 export class Audio {
     static #audioCache = {};
-    static skill({ skill, player, info, args = [] }) {
+    static skill({ skill, player, info, args }) {
         if (skill == void 0)
             throw new ReferenceError(`skill is not defined`);
         const formatedPlayer = player != void 0 ? this.formatPlayer(player) : void 0;
@@ -12,7 +12,7 @@ export class Audio {
             formatedInfo = info;
         return new Audio(new SkillAudio(skill, formatedPlayer, formatedInfo), args);
     }
-    static die({ player, info, args = [] }) {
+    static die({ player, info, args }) {
         if (player == void 0)
             throw new ReferenceError(`player is not defined`);
         let formatedInfo;
@@ -85,7 +85,7 @@ export class Audio {
             this.#audioList = JSON.parse(JSON.stringify(result));
         }
     }
-    constructor(audio, args = [], history = []) {
+    constructor(audio, args, history = []) {
         this.#history = history.slice();
         this.#Audio = audio;
         const useDefaultInfo = !this.checkHistory();
@@ -235,11 +235,11 @@ class SkillAudio {
     getAudioInfo(useDefaultInfo, args) {
         if (useDefaultInfo)
             return this.defaultInfo;
-        if (this.filteredLogAudio2)
+        if (this.filteredLogAudio2 && args)
             return this.filteredLogAudio2(...args);
         else if (this.filteredAudioName2 != void 0)
             return this.filteredAudioName2;
-        else if (this.info.logAudio)
+        else if (this.info.logAudio && args)
             return this.info.logAudio(...args);
         else if (this.info.audio != void 0)
             return this.info.audio;

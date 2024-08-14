@@ -5080,40 +5080,38 @@ const skills = {
 	sbxieji: {
 		audio: 3,
 		trigger: { player: "phaseZhunbeiBegin" },
-		direct: true,
-		content: function () {
-			"step 0";
-			player.chooseTarget(lib.filter.notMe, get.prompt("sbxieji"), "和一名其他角色进行“协力”").set("ai", function (target) {
+		logAudio : () => 2,
+		async cost(event, trigger, player){
+			event.result = await player.chooseTarget(lib.filter.notMe, get.prompt("sbxieji"), "和一名其他角色进行“协力”")
+			.set("ai", function (target) {
 				return get.threaten(target) * Math.sqrt(1 + target.countCards("h")) * (target.isTurnedOver() || target.hasJudge("lebu") ? 0.1 : 1);
+			})
+			.forResult();
+		},
+		async content(event, trigger, player){
+			const target = event.targets[0];
+			//保证技能cooperation被移除之后 失去该技能
+			player.addAdditionalSkill("cooperation", "sbxieji_effect");
+			//选择对方的协击条件
+			await player.chooseCooperationFor(target, "sbxieji").set("ai", function (button) {
+				var base = 0;
+				switch (button.link) {
+					case "cooperation_damage":
+						base = 0.8;
+						break;
+					case "cooperation_draw":
+						base = 0.1;
+						break;
+					case "cooperation_discard":
+						base = 0.1;
+						break;
+					case "cooperation_use":
+						base = 0.1;
+						break;
+				}
+				return base + Math.random();
 			});
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("sbxieji", target, null, null, get.rand(1, 2));
-				//选择对方的协击条件
-				player.chooseCooperationFor(target, "sbxieji").set("ai", function (button) {
-					var base = 0;
-					switch (button.link) {
-						case "cooperation_damage":
-							base = 0.8;
-							break;
-						case "cooperation_draw":
-							base = 0.1;
-							break;
-						case "cooperation_discard":
-							base = 0.1;
-							break;
-						case "cooperation_use":
-							base = 0.1;
-							break;
-					}
-					return base + Math.random();
-				});
-				//保证技能cooperation被移除之后 失去该技能
-				player.addAdditionalSkill("cooperation", "sbxieji_effect");
-			} else event.finish();
-			"step 2";
-			game.delayx();
+			await game.delayx();
 		},
 		subSkill: {
 			effect: {

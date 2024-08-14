@@ -14,6 +14,7 @@ const skills = {
 			if (event.targets && event.targets.length > 4) return false;
 			return ["trick", "basic"].includes(get.type(event.card));
 		},
+		logAudio: index => typeof index === "number" ? "mbbifeng" + index + ".mp3" : 3,
 		async cost(event, trigger, player) {
 			if (event.triggername == "useCardAfter") event.result = { bool: true };
 			else {
@@ -36,16 +37,16 @@ const skills = {
 						return list[1] == trigger.card;
 					});
 				})) {
-					player.logSkill('mbbifeng', null, null, null, 3);
+					player.logSkill('mbbifeng', null, null, null, [3]);
 					await player.draw(2);
 				}
 				else {
-					player.logSkill('mbbifeng', null, null, null, 2);
+					player.logSkill('mbbifeng', null, null, null, [2]);
 					await player.loseHp();
 				}
 			}
 			else {
-				player.logSkill('mbbifeng', null, null, null, 1);
+				player.logSkill('mbbifeng', null, null, null, [1]);
 				trigger.getParent().excluded.add(player);
 				player.markAuto("mbbifeng", trigger.card);
 			}
@@ -447,7 +448,6 @@ const skills = {
 		},
 		logAudio: () => 1,
 		async content(event, trigger, player) {
-			player.logSkill('mbjiejian', event.targets, null, null, 1);
 			const list = event.cost_data;
 			await game.loseAsync({
 				gain_list: list,
@@ -3004,7 +3004,7 @@ const skills = {
 		},
 		forced: true,
 		logAudio(event, player) {
-			if (event.name == "damage") 2;
+			if (event.name == "damage") return 2;
 			return "laishou3.mp3";
 		},
 		content: function () {
@@ -5150,7 +5150,7 @@ const skills = {
 		subSkill: {
 			used: { charlotte: true },
 			give: {
-				audio: 2,
+				audio: ["spdaming", 2],
 				enable: "phaseUse",
 				nopop: true,
 				filter: function (event, player) {
@@ -5196,7 +5196,7 @@ const skills = {
 				},
 				content: function () {
 					"step 0";
-					game.trySkillAudio("spdaming", target, null, null, null, get.rand(1, 2));
+					target.logSkill("spdaming_give");
 					player.give(cards, target);
 					if (!game.hasPlayer(current => current != player && current != target)) event.finish();
 					target.addTempSkill("spdaming_used", "phaseUseAfter");
@@ -5370,24 +5370,19 @@ const skills = {
 	sbanguo: {
 		audio: 3,
 		trigger: { global: "phaseBefore", player: "enterGame" },
-		forced: true,
-		locked: false,
-		direct: true,
 		group: ["sbanguo_move", "sbanguo_damage", "sbanguo_dying"],
+		logAudio: () => 2,
 		filter: function (event, player) {
 			return game.hasPlayer(current => current != player) && (event.name != "phase" || game.phaseNumber == 0);
 		},
+		async cost(event, trigger, player){
+			event.result = await player.chooseTarget("安国：令一名其他角色获得“安国”标记", lib.filter.notMe, true).forResult();
+		},
 		content: function () {
-			"step 0";
-			player.chooseTarget("安国：令一名其他角色获得“安国”标记", lib.filter.notMe, true);
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("sbanguo", target, null, null, get.rand(1, 2));
-				target.addMark("sbanguo_mark", 1, false);
-				target.addAdditionalSkill("sbanguo_" + player.playerid, "sbanguo_mark");
-				target.addMark("sbanguo_marked", 1, false);
-			}
+			const target = event.targets[0];
+			target.addMark("sbanguo_mark", 1, false);
+			target.addAdditionalSkill("sbanguo_" + player.playerid, "sbanguo_mark");
+			target.addMark("sbanguo_marked", 1, false);
 		},
 		subSkill: {
 			mark: {
@@ -5530,12 +5525,10 @@ const skills = {
 		filter: function (event, player) {
 			return player.countDiscardableCards(player, "he") > 0;
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			player
+		logAudio: () => 1,
+		async cost(event, trigger, player){
+			event.result = await player
 				.chooseToDiscard(get.prompt2("sbbenxi"), [1, Infinity], "he")
-				.set("logSkill", ["sbbenxi", null, null, null, 1])
 				.set("ai", card => {
 					var player = _status.event.player;
 					if (ui.selected.cards.length < _status.event.num) return 100 - (get.useful(card, player) + player.getUseValue(card) / 3);
@@ -5578,14 +5571,14 @@ const skills = {
 						if (!list2.length) return 0;
 						return list2.sort((a, b) => b[0] - a[0])[0][1];
 					})()
-				);
-			"step 1";
-			if (result.bool) {
-				var num = result.cards.length;
-				player.addTempSkill("sbbenxi_effect", "phaseUseAfter");
-				player.addTempSkill("sbbenxi_effect2", "phaseUseAfter");
-				player.addMark("sbbenxi_effect2", num, false);
-			}
+				)
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const num = event.cards.length;
+			player.addTempSkill("sbbenxi_effect", "phaseUseAfter");
+			player.addTempSkill("sbbenxi_effect2", "phaseUseAfter");
+			player.addMark("sbbenxi_effect2", num, false);
 		},
 		subSkill: {
 			effect: {
@@ -5805,8 +5798,10 @@ const skills = {
 	yijin: {
 		audio: 3,
 		trigger: { player: "phaseUseBegin" },
-		forced: true,
-		direct: true,
+		locked: true,
+		logAudio(_1, _2, _3, _4, result){
+			return "yijin" + (['yijin_jinmi', 'yijin_guxiong', 'yijin_yongbi'].includes(result.cost_data) ? 2 : 1) + ".mp3";
+		},
 		group: ["yijin_upstart", "yijin_die"],
 		filter: function (event, player) {
 			if (!game.hasPlayer(current => current != player && !lib.skill.yijin.getKane(current).length)) return false;
@@ -5846,10 +5841,8 @@ const skills = {
 					return (Math.min(5, 2 + target.getDamagedHp()) * get.recoverEffect(target, player, target)) / dis;
 			}
 		},
-		content: function () {
-			"step 0";
-			player
-				.chooseTarget("亿金：令一名其他角色获得1枚“金”", true, (card, player, target) => {
+		async cost(event, trigger, player){
+			const { targets } = await player.chooseTarget("亿金：令一名其他角色获得1枚“金”", true, (card, player, target) => {
 					return player != target && !lib.skill.yijin.getKane(target).length;
 				})
 				.set("ai", target => {
@@ -5863,37 +5856,44 @@ const skills = {
 							return att * lib.skill.yijin.getValue(player, i, target);
 						})
 					);
-				});
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				event.target = target;
-				var kane = lib.skill.yijin.getKane(player);
-				var choiceList = kane.map(i => {
+				}).forResult();
+			if (!targets.length){
+				event.result = { bool: false };
+				return;
+			}
+			const target = targets[0];
+			event.target = target;
+			const kane = lib.skill.yijin.getKane(player);
+			const { control } = await player
+				.chooseControl(kane)
+				.set("choiceList", kane.map(i => {
 					return '<div class="skill">【' + get.translation(lib.translate[i + "_ab"] || get.translation(i).slice(0, 2)) + "】</div>" + "<div>" + get.skillInfoTranslation(i, player) + "</div>";
-				});
-				player
-					.chooseControl(kane)
-					.set("choiceList", choiceList)
-					.set("displayIndex", false)
-					.set("prompt", "选择令" + get.translation(target) + "获得的“金”")
-					.set("ai", () => {
-						let controls = _status.event.controls,
-							player = _status.event.player,
-							target = _status.event.getParent().target,
-							att = get.attitude(player, target);
-						if (Math.abs(att) > 1) att = Math.sign(att) * Math.sqrt(Math.abs(att));
-						let list = controls.map(i => {
-							return [i, att * lib.skill.yijin.getValue(player, i, target)];
-						});
-						list.sort((a, b) => b[1] - a[1]);
-						if (list.length) return list[0][0];
-						return controls.randomGet();
+				}))
+				.set("displayIndex", false)
+				.set("prompt", "选择令" + get.translation(target) + "获得的“金”")
+				.set("ai", () => {
+					let controls = _status.event.controls,
+						player = _status.event.player,
+						target = _status.event.getParent().target,
+						att = get.attitude(player, target);
+					if (Math.abs(att) > 1) att = Math.sign(att) * Math.sqrt(Math.abs(att));
+					let list = controls.map(i => {
+						return [i, att * lib.skill.yijin.getValue(player, i, target)];
 					});
-			} else event.finish();
-			"step 2";
-			var kane = result.control;
-			player.logSkill("yijin", target, null, null, ['yijin_jinmi', 'yijin_guxiong', 'yijin_yongbi'].includes(result.control) ? 2 : 1);
+					list.sort((a, b) => b[1] - a[1]);
+					if (list.length) return list[0][0];
+					return controls.randomGet();
+				})
+				.forResult();
+				event.result = {
+					bool: true,
+					targets,
+					cost_data: control
+				}
+		},
+		async content(event, trigger, player) {
+			const kane = event.cost_data;
+			const target = event.targets[0];
 			player.removeMark(kane, 1);
 			player.popup(kane, "metal");
 			player.addSkill("yijin_clear");
