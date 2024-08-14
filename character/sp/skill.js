@@ -10184,7 +10184,7 @@ const skills = {
 		},
 		forced: true,
 		logAudio(event, player) {
-			return 1 + player.countMark("olbixin");
+			return "olximo" +(1 + player.countMark("olbixin")) +".mp3";
 		},
 		content: function () {
 			player.addMark("olbixin", 1, false);
@@ -19887,9 +19887,7 @@ const skills = {
 				cost_data: result.targets[0],
 			};
 		},
-		logAudio() {
-			return [1, 2].randomGet();
-		},
+		logAudio: () => 2,
 		async content(event, trigger, player) {
 			let target = event.cost_data;
 			if (!player.storage.xianfu2) player.storage.xianfu2 = [];
@@ -19915,8 +19913,8 @@ const skills = {
 			return player.isDamaged();
 		},
 		logAudio(event, player) {
-			if (event.name == "damage") return [5, 4].randomGet();
-			return [3, 6].randomGet();
+			if (event.name == "damage") return ["xianfu4.mp3", "xianfu5.mp3"];
+			return ["xianfu3.mp3", "xianfu6.mp3"];
 		},
 		logTarget: "player",
 		content: function () {
@@ -20266,7 +20264,7 @@ const skills = {
 							if (target.getEquip(1)) {
 								num = 0.6;
 							}
-							if (target.hasSkillTag("noe")) 2 * num;
+							if (target.hasSkillTag("noe")) num *= 2;
 							return num;
 						}
 					}
@@ -28586,7 +28584,7 @@ const skills = {
 		logAudio(event, player) {
 			const target = event.targets[0],
 				goon = target.countCards("h") > target.hp;
-			return goon ? 2 : 1;
+			return goon ? "songci2.mp3" : "songci1.mp3";
 		},
 		async content(event, trigger, player) {
 			const target = event.target,
@@ -28781,13 +28779,14 @@ const skills = {
 	yuanhu: {
 		audio: 3,
 		trigger: { player: "phaseJieshuBegin" },
-		direct: true,
 		filter: function (event, player) {
 			return player.countCards("he", { type: "equip" }) > 0;
 		},
-		content: function () {
-			"step 0";
-			player.chooseCardTarget({
+		logAudio(_1, _2, _3, _4, result){
+			return "yuanhu" + Math.max(get.equipNum(result.cards[0]), 3) + ".mp3";
+		},
+		async cost(event, trigger, player){
+			event.result = await player.chooseCardTarget({
 				filterCard: function (card) {
 					return get.type(card) == "equip";
 				},
@@ -28802,31 +28801,24 @@ const skills = {
 					return get.attitude(_status.event.player, target) - 3;
 				},
 				prompt: get.prompt2("yuanhu"),
-			});
-			"step 1";
-			if (result.bool) {
-				var thisTarget = result.targets[0];
-				var thisCard = result.cards[0];
-				var num = get.equipNum(thisCard);
-				if (num > 2) num = 3;
-				player.logSkill("yuanhu", thisTarget, null, null, num);
-				thisTarget.equip(thisCard);
-				event.target = thisTarget;
-				if (thisTarget != player) {
-					player.$give(thisCard, thisTarget, false);
+			}).forResult();
+		},
+		async content(event, trigger, player) {
+				const target = result.targets[0];
+				const card = result.cards[0];
+				target.equip(card);
+				if (target != player) {
+					player.$give(card, target, false);
 				}
-				switch (get.subtype(thisCard)) {
+				switch (get.subtype(card)) {
 					case "equip1": {
 						if (
 							!game.hasPlayer(function (current) {
-								return get.distance(thisTarget, current) <= 1;
+								return get.distance(target, current) <= 1;
 							})
-						) {
-							event.finish();
-							return;
-						}
-						game.delay();
-						player
+						) return;
+						await game.delay();
+						const { targets } = await player
 							.chooseTarget(true, function (card, player, target) {
 								return get.distance(_status.event.thisTarget, target) <= 1 && target.countCards("hej");
 							})
@@ -28837,31 +28829,14 @@ const skills = {
 								}
 								return -attitude;
 							})
-							.set("thisTarget", thisTarget);
+							.set("thisTarget", target).forResult();
+						if(targets.length) await player.discardPlayerCard(true, targets[0], "hej");
 						return;
 					}
-					case "equip2": {
-						thisTarget.draw();
-						event.finish();
-						return;
-					}
-					case "equip5": {
-						event.finish();
-						return;
-					}
-					default: {
-						thisTarget.recover();
-						event.finish();
-						return;
-					}
+					case "equip2": await target.draw(); return;
+					case "equip5": return;
+					default: await target.recover(); return;
 				}
-			} else {
-				event.finish();
-			}
-			"step 2";
-			if (result.targets.length) {
-				player.discardPlayerCard(true, result.targets[0], "hej");
-			}
 		},
 	},
 	tianming: {
@@ -29466,7 +29441,7 @@ const skills = {
 		filter: function (event, player) {
 			return player.phaseNumber <= 1 && game.hasPlayer(current => current != player);
 		},
-		logAudio: () => get.rand(1, 2),
+		logAudio: () => ["xinfu_jianjie1.mp3", "xinfu_jianjie2.mp3"],
 		content: function () {
 			"step 0";
 			player.chooseTarget("荐杰：选择一名其他角色获得“龙印”", lib.filter.notMe, true).set("ai", target => {
@@ -29547,7 +29522,7 @@ const skills = {
 					}
 					return true;
 				},
-				logAudio: () => get.rand(1, 2),
+				logAudio: () => ["xinfu_jianjie1.mp3", "xinfu_jianjie2.mp3"],
 				selectTarget: 2,
 				complexSelect: true,
 				complexTarget: true,

@@ -277,7 +277,7 @@ const skills = {
 			return get.attitude(player, event.player) > 0;
 		},
 		round: 1,
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		logTarget: "player",
 		content: function () {
 			"step 0";
@@ -304,8 +304,8 @@ const skills = {
 				trigger: { player: "phaseDiscardEnd" },
 				forced: true,
 				logAudio(event, player) {
-					if (!lib.skill.zhengsu.filterx("houfeng", player)) return 3;
-					return 2;
+					if (!lib.skill.zhengsu.filterx("houfeng", player)) return "houfeng3.mp3";
+					return "houfeng2.mp3";
 				},
 				content: function () {
 					"step 0";
@@ -364,7 +364,7 @@ const skills = {
 				cost_data: result.links[0][2],
 			};
 		},
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		async content(event, trigger, player) {
 			const name = event.cost_data;
 			player.addTempSkill("spzhengjun_share", {
@@ -382,8 +382,8 @@ const skills = {
 				trigger: { player: "phaseDiscardEnd" },
 				forced: true,
 				logAudio(event, player) {
-					if (!lib.skill.zhengsu.filterx("spzhengjun", player)) return 3;
-					return 2;
+					if (!lib.skill.zhengsu.filterx("spzhengjun", player)) return "spzhengjun3.mp3";
+					return "spzhengjun2.mp3";
 				},
 				content: function () {
 					"step 0";
@@ -796,8 +796,8 @@ const skills = {
 				trigger: { player: "phaseDiscardEnd" },
 				forced: true,
 				logAudio(event, player) {
-					if (!lib.skill.zhengsu.filterx("spyanji", player)) return 3;
-					return 2;
+					if (!lib.skill.zhengsu.filterx("spyanji", player)) return "spyanji3.mp3";
+					return "spyanji2.mp3";
 				},
 				content: function () {
 					if (!lib.skill.zhengsu.filterx("spyanji", player)) {
@@ -1302,9 +1302,9 @@ const skills = {
 			return player != event.player;
 		},
 		logAudio(event, player, name, indexedData, costResult) {
-			if (!costResult.cards.length) return 2;
+			if (!costResult.cards.length) return "spxizhan2.mp3";
 			let suit = get.suit(costResult.cards[0]);
-			return [null, "spade", null, "heart", "club", "diamond"].indexOf(suit);
+			return "spxizhan" + [null, "spade", null, "heart", "club", "diamond"].indexOf(suit) + ".mp3";
 		},
 		async cost(event, trigger, player) {
 			const result = await player.chooseToDiscard("he", "嬉战：弃置一张牌或失去1点体力", "根据弃置的牌对" + get.translation(trigger.player) + "视为使用如下牌：<br>♠，其使用【酒】；♥，你使用【无中生有】<br>♣，对其使用【铁索连环】；♦：对其使用火【杀】").set("ai", function (card) {
@@ -2279,7 +2279,7 @@ const skills = {
 		subSkill: {
 			chuhai: {
 				audio: "chuhai",
-				logAudio: ()=> 1,
+				logAudio: () => "chuhai1.mp3",
 				inherit: "chuhai",
 				prompt: "与一名其他角色进行拼点",
 			},
@@ -2941,7 +2941,7 @@ const skills = {
 			}
 			return true;
 		},
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		skillAnimation: true,
 		animationColor: "water",
 		content: function () {

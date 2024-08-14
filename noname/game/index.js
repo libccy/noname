@@ -1570,10 +1570,11 @@ export class Game extends GameCompatible {
 	 * @param { boolean } [directaudio]
 	 * @param { boolean } [nobroadcast]
 	 * @param { any } [skillInfo]
+	 * @param { any[] } [args] logAudio的参数
 	 * @returns
 	 */
-	trySkillAudio(skill, player, directaudio, nobroadcast, skillInfo, special) {
-		if (!nobroadcast) game.broadcast(game.trySkillAudio, skill, player, directaudio, nobroadcast, skillInfo, special);
+	trySkillAudio(skill, player, directaudio, nobroadcast, skillInfo, args) {
+		if (!nobroadcast) game.broadcast(game.trySkillAudio, skill, player, directaudio, nobroadcast, skillInfo, args);
 		if (!lib.config.background_speak) return;
 
 		const info = skillInfo || lib.skill[skill];
@@ -1581,14 +1582,9 @@ export class Game extends GameCompatible {
 		if (info.direct && !directaudio) return;
 		if (lib.skill.global.includes(skill) && !info.forceaudio) return;
 
-		if (!info.audio && info.sourceSkill) skill = info.sourceSkill.toString();
+		// if (!info.audio && info.sourceSkill) skill = info.sourceSkill.toString();
 
-		let audioList = get.Audio.skill({ skill, player, info: skillInfo }).fileList;
-		if (special) {
-			if (typeof special == "string")
-				audioList = [special]; //player.logSkill('rende',......,'skill/wusheng1.mp3')[doge]
-			else if (typeof special == "number" && special <= audioList.length) audioList = [audioList[special - 1]];
-		}
+		let audioList = get.Audio.skill({ skill, player, info: skillInfo, args }).fileList;
 		return game.tryAudio({ audioList });
 	}
 	/**

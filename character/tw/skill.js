@@ -2327,10 +2327,13 @@ const skills = {
 			}
 			return false;
 		},
-		forced: true,
+		logTarget: "player",
+		logAudio(event, player){
+			return "twxiayong" + (event.player === player ? 1 : 2) + ".mp3";
+		},
+		locked: true,
 		popup: false,
 		async content(event, trigger, player) {
-			player.logSkill("twxiayong", trigger.player, null, null, trigger.player === player ? 1 : 2);
 			if (trigger.player === player) {
 				const cards = player.getCards("h", card => {
 					return lib.filter.cardDiscardable(card, player, "twxiayong");
@@ -3487,7 +3490,7 @@ const skills = {
 		},
 		forced: true,
 		logAudio(event, player, name) {
-			return name == "damageBegin2" ? 2 : 1;
+			return name == "damageBegin2" ? "twfenwang2.mp3" : "twfenwang1.mp3";
 		},
 		content: function () {
 			"step 0";
@@ -6925,7 +6928,7 @@ const skills = {
 			}
 			return true;
 		},
-		logAudio: () => 1,
+		logAudio: () => "mibei1.mp3",
 		skillAnimation: true,
 		animationColor: "water",
 		content: function () {
@@ -16867,9 +16870,8 @@ const skills = {
 			return 7 - get.value(card);
 		},
 		logAudio(event, player) {
-			const num = get.equipNum(event.cards[0]);
-			if (num > 2) return 3;
-			return num;
+			const num = Math.max(get.equipNum(event.cards[0]), 3);
+			return "yuanhu" + num + ".mp3";
 		},
 		content: function () {
 			"step 0";

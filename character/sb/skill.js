@@ -5080,40 +5080,38 @@ const skills = {
 	sbxieji: {
 		audio: 3,
 		trigger: { player: "phaseZhunbeiBegin" },
-		direct: true,
-		content: function () {
-			"step 0";
-			player.chooseTarget(lib.filter.notMe, get.prompt("sbxieji"), "和一名其他角色进行“协力”").set("ai", function (target) {
+		logAudio : () => 2,
+		async cost(event, trigger, player){
+			event.result = await player.chooseTarget(lib.filter.notMe, get.prompt("sbxieji"), "和一名其他角色进行“协力”")
+			.set("ai", function (target) {
 				return get.threaten(target) * Math.sqrt(1 + target.countCards("h")) * (target.isTurnedOver() || target.hasJudge("lebu") ? 0.1 : 1);
+			})
+			.forResult();
+		},
+		async content(event, trigger, player){
+			const target = event.targets[0];
+			//保证技能cooperation被移除之后 失去该技能
+			player.addAdditionalSkill("cooperation", "sbxieji_effect");
+			//选择对方的协击条件
+			await player.chooseCooperationFor(target, "sbxieji").set("ai", function (button) {
+				var base = 0;
+				switch (button.link) {
+					case "cooperation_damage":
+						base = 0.8;
+						break;
+					case "cooperation_draw":
+						base = 0.1;
+						break;
+					case "cooperation_discard":
+						base = 0.1;
+						break;
+					case "cooperation_use":
+						base = 0.1;
+						break;
+				}
+				return base + Math.random();
 			});
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("sbxieji", target, null, null, get.rand(1, 2));
-				//选择对方的协击条件
-				player.chooseCooperationFor(target, "sbxieji").set("ai", function (button) {
-					var base = 0;
-					switch (button.link) {
-						case "cooperation_damage":
-							base = 0.8;
-							break;
-						case "cooperation_draw":
-							base = 0.1;
-							break;
-						case "cooperation_discard":
-							base = 0.1;
-							break;
-						case "cooperation_use":
-							base = 0.1;
-							break;
-					}
-					return base + Math.random();
-				});
-				//保证技能cooperation被移除之后 失去该技能
-				player.addAdditionalSkill("cooperation", "sbxieji_effect");
-			} else event.finish();
-			"step 2";
-			game.delayx();
+			await game.delayx();
 		},
 		subSkill: {
 			effect: {
@@ -5170,7 +5168,7 @@ const skills = {
 		audio: 4,
 		enable: "phaseUse",
 		usable: 1,
-		logAudio: 1,
+		logAudio: () => 1,
 		filterTarget: lib.filter.notMe,
 		content: function () {
 			"step 0";
@@ -5213,15 +5211,15 @@ const skills = {
 		subSkill: {
 			true1: {
 				audio: "sbduanliang",
-				logAudio: 2,
+				logAudio: () => "sbduanliang2.mp3",
 			},
 			true2: {
 				audio: "sbduanliang",
-				logAudio: 3,
+				logAudio: () => "sbduanliang3.mp3",
 			},
 			false: {
 				audio: "sbduanliang",
-				logAudio: 4,
+				logAudio: () => "sbduanliang4.mp3",
 			},
 		},
 	},
@@ -5369,7 +5367,7 @@ const skills = {
 		audio: 4,
 		trigger: { player: "useCardToPlayered" },
 		logTarget: "target",
-		logAudio: 1,
+		logAudio: () => 1,
 		filter: function (event, player) {
 			return player != event.target && event.card.name == "sha" && event.target.isIn();
 		},
@@ -5415,15 +5413,15 @@ const skills = {
 		subSkill: {
 			true1: {
 				audio: "sbtieji",
-				logAudio: 2,
+				logAudio: () => "sbtieji2.mp3",
 			},
 			true2: {
 				audio: "sbtieji",
-				logAudio: 3,
+				logAudio: () => "sbtieji3.mp3",
 			},
 			false: {
 				audio: "sbtieji",
-				logAudio: 4,
+				logAudio: () => "sbtieji4.mp3",
 			},
 		},
 	},
@@ -6218,7 +6216,7 @@ const skills = {
 			return 6.5 - get.value(card);
 		},
 		position: "he",
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		group: ["sbjushou_damage", "sbjushou_draw"],
 		content: function () {
 			player.turnOver();
@@ -6897,8 +6895,7 @@ const skills = {
 		filter: function (event, player) {
 			return game.hasPlayer(current => current.hasMark("sbjieyin_mark"));
 		},
-		audio: 2,
-		logAudio: ()=> 1,
+		logAudio: () => 1,
 		content: function () {
 			"step 0";
 			var targets = game.filterPlayer(current => current.hasMark("sbjieyin_mark"));

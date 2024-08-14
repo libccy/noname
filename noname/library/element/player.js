@@ -7035,7 +7035,7 @@ export class Player extends HTMLDivElement {
 	 * @param { boolean | string } [nature]
 	 * @param { boolean } [logv]
 	 */
-	logSkill(name, targets, nature, logv, special) {
+	logSkill(name, targets, nature, logv, args) {
 		if (get.itemtype(targets) == "player") targets = [targets];
 		var nopop = false;
 		var popname = name;
@@ -7076,7 +7076,7 @@ export class Player extends HTMLDivElement {
 			this.syncStorage(roundname);
 			this.markSkill(roundname);
 		}
-		game.trySkillAudio(name, this, true, null, null, special);
+		game.trySkillAudio(name, this, true, null, null, args);
 		if (game.chess) {
 			this.chessFocus();
 		}

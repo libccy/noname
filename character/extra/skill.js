@@ -410,7 +410,7 @@ const skills = {
 		subSkill: {
 			kanpo: {
 				audio: "jilin",
-				logAudio: () => get.rand(2, 3),
+				logAudio: () => ["jilin2.mp3", "jilin3.mp3"],
 				trigger: {
 					target: "useCardToTarget",
 				},
@@ -462,7 +462,7 @@ const skills = {
 			},
 			change: {
 				audio: "jilin",
-				logAudio: () => get.rand(4, 5),
+				logAudio: () => ["jilin4.mp3", "jilin5.mp3"],
 				trigger: {
 					player: "phaseBegin",
 				},
@@ -548,7 +548,7 @@ const skills = {
 				cost_data: links,
 			};
 		},
-		logAudio: () => get.rand(1, 2),
+		logAudio: () => 2,
 		async content(event, trigger, player) {
 			event.cost_data[0].storage.jilin = true;
 			const num = player.getExpansions("jilin").filter(card => card.storage.jilin).length;
@@ -561,7 +561,7 @@ const skills = {
 		subSkill: {
 			draw: {
 				audio: "yingyou",
-				logAudio: () => get.rand(3, 4),
+				logAudio: () => ["yingyou3.mp3", "yingyou4.mp3"],
 				trigger: {
 					player: "loseAfter",
 					global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -8481,7 +8481,7 @@ const skills = {
 			return false;
 		},
 		logAudio(event, player) {
-			return 4 - lib.suit.indexOf(get.suit(event.cards[0], player));
+			return "longhun" + (4 - lib.suit.indexOf(get.suit(event.cards[0], player))) + ".mp3";
 		},
 		ai: {
 			respondSha: true,
