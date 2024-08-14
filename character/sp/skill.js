@@ -20,15 +20,7 @@ const skills = {
 				num = 0,
 				keep = true;
 			while (i < game.roundNumber) {
-				if (
-					player.getRoundHistory(
-						"useSkill",
-						evt => {
-							return evt.skill == "olleiluan_backup" || evt.skill == "olleiluan_effect";
-						},
-						i
-					).length > 0
-				) {
+				if (player.getRoundHistory("useSkill", evt => evt.skill == "olleiluan_backup", i).length + player.getRoundHistory("useSkill", evt => evt.skill == "olleiluan_effect", i - 1).length > 0) {
 					keep = false;
 					num++;
 				} else if (!keep) break;
@@ -88,29 +80,13 @@ const skills = {
 			},
 		},
 		hiddenCard(player, name) {
+			if (player.getStat("skill").olleiluan) return false;
 			let basic = lib.inpile.filter(i => get.type(i) == "basic");
 			player.getRoundHistory("useCard", evt => {
 				if (get.type(evt.card) == "basic") basic.remove(evt.card.name);
 			});
-			let i = 0,
-				num = 0,
-				keep = true;
-			while (i < game.roundNumber) {
-				if (
-					player.getRoundHistory(
-						"useSkill",
-						evt => {
-							return evt.skill == "olleiluan_backup" || evt.skill == "olleiluan_round";
-						},
-						i
-					).length > 0
-				) {
-					keep = false;
-					num++;
-				} else if (!keep) break;
-				i++;
-			}
-			return basic.includes(name) && !player.getStat("skill").olleiluan && player.countCards("he") >= Math.max(1, num);
+			const num = lib.skill.olleiluan.getNum(player);
+			return basic.includes(name) && player.countCards("he") >= num;
 		},
 		ai: {
 			order(item, player) {
@@ -150,9 +126,13 @@ const skills = {
 				filter(event, player) {
 					if (game.roundNumber <= 1) return false;
 					return (
-						player.getRoundHistory("useCard", evt => {
-							return get.type(evt.card) == "basic";
-						}, 1).length >= lib.skill.olleiluan.getNum(player)
+						player.getRoundHistory(
+							"useCard",
+							evt => {
+								return get.type(evt.card) == "basic";
+							},
+							1
+						).length >= lib.skill.olleiluan.getNum(player)
 					);
 				},
 				frequent: true,
@@ -160,7 +140,7 @@ const skills = {
 					return "摸" + get.cnNumber(lib.skill.olleiluan.getNum(player)) + "张牌，然后视为使用一张上一轮进入弃牌堆的普通锦囊牌";
 				},
 				async content(event, trigger, player) {
-					await player.draw(lib.skill.olleiluan.getNum(player) - 1);
+					await player.draw(lib.skill.olleiluan.getNum(player));
 					let cards = [];
 					const historys = _status.globalHistory;
 					for (let i = historys.length - 2; i >= 0; i--) {
@@ -30369,12 +30349,9 @@ const skills = {
 						}
 						player.$give(cards[0], target);
 						if (cards.length > 1) {
-							setTimeout(
-								function () {
-									target.$gain2(cards.slice(1));
-								},
-								get.delayx(200, 200)
-							);
+							setTimeout(function () {
+								target.$gain2(cards.slice(1));
+							}, get.delayx(200, 200));
 							game.log(target, "从牌堆获得了", cards.slice(1));
 						}
 						game.delay(0, get.delayx(500, 500));
@@ -31210,8 +31187,8 @@ const skills = {
 				event.finish();
 			}
 			"step 2";
-			var evt=trigger.getParent("phase",true);
-			if(evt) evt.phaseList.splice(evt.num, 0, "phaseUse|xinfu_guanwei");
+			var evt = trigger.getParent("phase", true);
+			if (evt) evt.phaseList.splice(evt.num, 0, "phaseUse|xinfu_guanwei");
 		},
 		ai: {
 			expose: 0.5,
@@ -31537,10 +31514,7 @@ const skills = {
 					aiOrder: function (player, card, num) {
 						if (typeof card.number != "number") return;
 						var history = player.getHistory("useCard", function (evt) {
-							return (
-								evt.isPhaseUsing() &&
-								evt.getParent("phaseUse") === _status.event.getParent("phaseUse")
-							);
+							return evt.isPhaseUsing() && evt.getParent("phaseUse") === _status.event.getParent("phaseUse");
 						});
 						if (history.length == 0) return num + 10 * (14 - card.number);
 						var num = get.number(history[0].card);
@@ -31555,10 +31529,7 @@ const skills = {
 				},
 				filter: function (event, player) {
 					var history = player.getHistory("useCard", function (evt) {
-						return (
-							evt.isPhaseUsing() &&
-							evt.getParent("phaseUse") === event.getParent("phaseUse")
-						);
+						return evt.isPhaseUsing() && evt.getParent("phaseUse") === event.getParent("phaseUse");
 					});
 					if (history.length < 2) return false;
 					var num = get.number(history[0].card);
@@ -31596,10 +31567,7 @@ const skills = {
 					aiOrder: function (player, card, num) {
 						if (typeof card.number != "number") return;
 						var history = player.getHistory("useCard", function (evt) {
-							return (
-								evt.isPhaseUsing() &&
-								evt.getParent("phaseUse") === _status.event.getParent("phaseUse")
-							);
+							return evt.isPhaseUsing() && evt.getParent("phaseUse") === _status.event.getParent("phaseUse");
 						});
 						if (history.length == 0) return num + 10 * card.number;
 						var num = get.number(history[0].card);
@@ -31614,10 +31582,7 @@ const skills = {
 				},
 				filter: function (event, player) {
 					var history = player.getHistory("useCard", function (evt) {
-						return (
-							evt.isPhaseUsing() &&
-							evt.getParent("phaseUse") === event.getParent("phaseUse")
-						);
+						return evt.isPhaseUsing() && evt.getParent("phaseUse") === event.getParent("phaseUse");
 					});
 					if (history.length < 2) return false;
 					var num = get.number(history[0].card);
