@@ -302,6 +302,7 @@ const skills = {
 			event.result.targets = [trigger.source];
 		},
 		async content(event, trigger, player) {
+			await player.discard(event.cards);
 			player.addTempSkill("tyzhaowu_wusheng", "roundStart");
 			player.markAuto("tyzhaowu_wusheng", event.targets);
 		},
