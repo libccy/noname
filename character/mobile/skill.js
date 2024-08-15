@@ -49,7 +49,7 @@ const skills = {
 					.set("nojudge", true)
 					.set("logSkill", "mbquchong");
 			} else {
-				const numbers = Array.from({ length: 13 }).map((_, i) => parseFloat(i + 1));
+				const numbers = Array.from({ length: 13 }).map((_, i) => get.strNumber(i + 1));
 				const costMark = [0, 5, 10, 10][player.getAllHistory("custom", evt => evt.name == "mbquchong").length];
 				const result = await player
 					.chooseButton(
@@ -79,7 +79,7 @@ const skills = {
 					const equips = result.links.sort((a, b) => {
 						return lib.suit.includes(a) + (numbers.includes(a) ? 2 : 0) - (lib.suit.includes(b) + (numbers.includes(b) ? 2 : 0));
 					});
-					const card = game.createCard(equips[0], equips[1], parseInt(equips[2]));
+					const card = game.createCard(equips[0], equips[1], get.numString(equips[2]));
 					if (!card.storage) card.storage = {};
 					if (typeof card.storage.mbquchong != "number") {
 						card.storage.mbquchong = card.name == "dagongche_attack" ? 1 : 3;
