@@ -1559,7 +1559,7 @@ const skills = {
 			}
 			const next = player.chooseToMove();
 			next.set("list", [["牌堆顶", cards.filterInD()], ["牌堆底"]]);
-			next.set("prompt", "问天：点击将牌移动到牌堆顶或牌堆底");
+			next.set("prompt", "问天：点击或拖动将牌移动到牌堆顶或牌堆底");
 			next.processAI = list => {
 				const cards = list[0][1],
 					player = _status.event.player;
@@ -2311,7 +2311,7 @@ const skills = {
 			game.cardsGotoOrdering(cards);
 			const next = player.chooseToMove();
 			next.set("list", [["牌堆顶"], ["牌堆底", cards.reverse()]]);
-			next.set("prompt", "鹰眎：点击将牌移动到牌堆顶或牌堆底");
+			next.set("prompt", "鹰眎：点击或拖动将牌移动到牌堆顶或牌堆底");
 			next.processAI = list => {
 				const cards = list[1][1],
 					player = _status.event.player;
