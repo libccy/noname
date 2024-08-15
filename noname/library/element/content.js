@@ -8911,7 +8911,7 @@ export const Content = {
 			const map = {};
 			for (const i of event.cards) {
 				var owner = get.owner(i, "judge");
-				if (owner && (owner != player || get.position(i) != "e")) {
+				if (owner/* && (owner != player || get.position(i) != "e")*/) {
 					var id = owner.playerid;
 					if (!map[id]) map[id] = [[], [], []];
 					map[id][0].push(i);
