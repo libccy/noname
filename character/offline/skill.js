@@ -3,6 +3,318 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//桃园挽歌
+	//桃神关羽
+	tywushen: {
+		audio: "wushen",
+		enable: ["chooseToRespond", "chooseToUse"],
+		filterCard(card, player) {
+			return get.suit(card) == "heart";
+		},
+		position: "hes",
+		viewAs: {
+			name: "sha",
+			storage:{
+				tywushen:true,
+			},
+		},
+		viewAsFilter(player) {
+			if (!player.countCards("hes", { suit: "heart" })) return false;
+		},
+		prompt: "将一张红桃牌当杀使用或打出",
+		check(card) {
+			const val = get.value(card);
+			if (_status.event.name == "chooseToRespond") return 1 / Math.max(0.1, val);
+			return 5 - val;
+		},
+		ai: {
+			skillTagFilter(player) {
+				if (!player.countCards("hes", { suit: "heart" })) return false;
+			},
+			respondSha: true,
+		},
+		locked:false,
+		mod:{
+			cardUsable(card,player){
+				if(card?.storage?.tywushen) return Infinity;
+			},
+			targetInRange(card,player){
+				if(card?.storage?.tywushen) return true;
+			},
+		},
+		group:"tywushen_respond",
+		subSkill:{
+			respond:{
+				trigger: { player: "useCard" },
+				direct: true,
+				forced:true,
+				filter(event, player) {
+					return event.card?.storage?.tywushen;
+				},
+				content() {
+					trigger.directHit.addArray(game.players);
+					if (trigger.addCount !== false) {
+						trigger.addCount = false;
+						if (player.stat[player.stat.length - 1].card.sha > 0) {
+							player.stat[player.stat.length - 1].card.sha--;
+						}
+					}
+				},
+			},
+		},
+	},
+	tywuhun: {
+		audio: "wuhun2",
+		trigger: { player: "damageEnd" },
+		filter(event, player) {
+			return event.source && event.source.isIn();
+		},
+		forced: true,
+		logTarget: "source",
+		content() {
+			trigger.source.addMark("tywuhun", trigger.num);
+		},
+		group: "tywuhun_die",
+		ai: {
+			notemp: true,
+			effect: {
+				target: (card, player, target) => {
+					if (!target.hasFriend()) return;
+					let rec = get.tag(card, "recover"),
+						damage = get.tag(card, "damage");
+					if (!rec && !damage) return;
+					if (damage && player.hasSkillTag("jueqing", false, target)) return 1.7;
+					let die = [null, 1],
+						temp;
+					game.filterPlayer(i => {
+						temp = i.countMark("new_wuhun");
+						if (i === player && target.hp + target.hujia > 1) temp++;
+						if (temp > die[1]) die = [i, temp];
+						else if (temp === die[1]) {
+							if (!die[0]) die = [i, temp];
+							else if (get.attitude(target, i) < get.attitude(target, die[0])) die = [i, temp];
+						}
+					});
+					if (die[0]) {
+						if (damage) return [1, 0, 1, (-6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp)];
+						return [1, (6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp)];
+					}
+				},
+			},
+		},
+		marktext: "魇",
+		intro: {
+			name: "梦魇",
+			content: "mark",
+			onunmark: true,
+		},
+		subSkill: {
+			die: {
+				audio: "wuhun2",
+				trigger: { player: "die" },
+				filter(event, player) {
+					return event.source || game.hasPlayer(function (current) {
+						return current != player && current.hasMark("tywuhun");
+					});
+				},
+				forced: true,
+				direct: true,
+				forceDie: true,
+				skillAnimation: true,
+				animationColor: "soil",
+				content() {
+					"step 0";
+					var num = 0;
+					for (var i = 0; i < game.players.length; i++) {
+						var current = game.players[i];
+						if (current != player && current.countMark("tywuhun") > num) {
+							num = current.countMark("tywuhun");
+						}
+					}
+					player
+						.chooseTarget(true, "请选择【武魂】的目标", "令其进行判定，若判定结果不为【桃】，则其死亡", function (card, player, target) {
+							return target != player && (target == _status.event.getTrigger().source || target.countMark("tywuhun") == _status.event.num);
+						})
+						.set("ai", function (target) {
+							return -get.attitude(_status.event.player, target);
+						})
+						.set("forceDie", true)
+						.set("num", num);
+					"step 1";
+					if (result.bool) {
+						var target = result.targets[0];
+						event.target = target;
+						player.logSkill("tywuhun_die", target);
+						player.line(target, { color: [255, 255, 0] });
+						game.delay(2);
+					}
+					"step 2";
+					target.judge(function (card) {
+						if (["tao"].includes(card.name)) return 10;
+						return -10;
+					}).judge2 = function (result) {
+						return result.bool == false ? true : false;
+					};
+					"step 3";
+					if (!result.bool) target.die();
+				},
+			},
+		},
+	},
+	//桃神张飞
+	tyshencai: {
+		audio: "shencai",
+		enable: "phaseUse",
+		usable: 5,
+		filter(event, player) {
+			var count = player.getStat("skill").tyshencai;
+			if (count && count > player.countMark("shencai")) return false;
+			return true;
+		},
+		filterTarget: lib.filter.notMe,
+		onremove: true,
+		prompt: "选择一名其他角色进行地狱审判",
+		content() {
+			var next = target.judge();
+			next.callback = lib.skill.shencai.contentx;
+		},
+		ai: {
+			order: 8,
+			result: { target: -1 },
+		},
+		group: "tyshencai_wusheng",
+		subSkill: {
+			wusheng: {
+				audio: "shencai",
+				enable: ["chooseToRespond", "chooseToUse"],
+				filterCard(card, player) {
+					return get.suit(card) == "none";
+				},
+				position: "hes",
+				viewAs: {
+					name: "sha",
+					color: "none",
+					suit: "none",
+				},
+				viewAsFilter(player) {
+					if (!player.countCards("hes", { suit: "none" })) return false;
+				},
+				prompt: "将一张无色牌当杀使用或打出",
+				check(card) {
+					const val = get.value(card);
+					if (_status.event.name == "chooseToRespond") return 1 / Math.max(0.1, val);
+					return 5 - val;
+				},
+				ai: {
+					skillTagFilter(player) {
+						if (!player.countCards("hes", { color: "none" })) return false;
+					},
+					respondSha: true,
+				},
+			},
+		},
+	},
+	tyxunshi: {
+		audio: "xunshi",
+		mod: {
+			suit(card) {
+				if (lib.skill.xunshi.isXunshi(card)) return "none";
+			},
+			targetInRange(card) {
+				const suit = get.color(card);
+				if (suit == "none" || suit == "unsure") return true;
+			},
+			cardUsable(card) {
+				const suit = get.color(card);
+				if (suit == "none" || suit == "unsure") return Infinity;
+			},
+		},
+		init(player, skill) {
+			player.addSkill("tyxunshi_mark");
+		},
+		onremove(player, skill) {
+			player.removeSkill("tyxunshi_mark");
+		},
+		trigger: { player: "useCard2" },
+		forced: true,
+		filter(event, player) {
+			return get.color(event.card) == "none";
+		},
+		content() {
+			"step 0";
+			if (player.countMark("shencai") < 4 && player.hasSkill("tyshencai", null, null, false)) player.addMark("shencai", 1, false);
+			if (trigger.addCount !== false) {
+				trigger.addCount = false;
+				var stat = player.getStat().card,
+					name = trigger.card.name;
+				if (typeof stat[name] == "number") stat[name]--;
+			}
+			var info = get.info(trigger.card);
+			if (info.allowMultiple == false) event.finish();
+			else if (trigger.targets && !info.multitarget) {
+				if (
+					!game.hasPlayer(function (current) {
+						return !trigger.targets.includes(current) && lib.filter.targetEnabled2(trigger.card, player, current);
+					})
+				)
+					event.finish();
+			} else event.finish();
+			"step 1";
+			var prompt2 = "为" + get.translation(trigger.card) + "增加任意个目标";
+			player
+				.chooseTarget(
+					get.prompt("xunshi"),
+					function (card, player, target) {
+						var player = _status.event.player;
+						return !_status.event.targets.includes(target) && lib.filter.targetEnabled2(_status.event.card, player, target);
+					},
+					[1, Infinity]
+				)
+				.set("prompt2", prompt2)
+				.set("ai", function (target) {
+					var trigger = _status.event.getTrigger();
+					var player = _status.event.player;
+					return get.effect(target, trigger.card, player, player);
+				})
+				.set("card", trigger.card)
+				.set("targets", trigger.targets);
+			"step 2";
+			if (result.bool) {
+				if (!event.isMine() && !event.isOnline()) game.delayx();
+				event.targets = result.targets;
+			} else {
+				event.finish();
+			}
+			"step 3";
+			if (event.targets) {
+				player.line(event.targets, "fire");
+				trigger.targets.addArray(event.targets);
+			}
+		},
+		subSkill: {
+			mark: {
+				charlotte: true,
+				trigger: {
+					player: "gainAfter",
+					global: "loseAsyncAfter",
+				},
+				filter(event, player, name) {
+					return event.getg(player).length && player.countCards("h");
+				},
+				direct: true,
+				firstDo: true,
+				content() {
+					let cards1 = [], cards2 = [];
+					player.getCards("h").forEach(card => {
+						let bool1 = lib.skill.xunshi.isXunshi(card), bool2 = card.hasGaintag("tyxunshi_tag");
+						if (bool1 && !bool2) cards1.add(card);
+						if (!bool1 && bool2) cards2.add(card);
+					});
+					if (cards1.length) player.addGaintag(cards1, "tyxunshi_tag");
+					if (cards2.length) cards2.forEach(card => card.removeGaintag("tyxunshi_tag"));
+				},
+			},
+		},
+	},
 	//范强张达
 	tybianta: {
 		trigger: {

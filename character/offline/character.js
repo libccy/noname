@@ -7,6 +7,8 @@ const characters = {
 	ty_ganning: ["male", "wu", 4, ["tyqixi", "tyfenwei"]],
 	ty_luxun: ["male", "wu", 3, ["tyqianshou", "tytanlong", "tyxibei"]],
 	ty_shen_liubei: ["male", "shen", 6, ["tylongnu", "nzry_jieying", "tytaoyuan"], ["shu"]],
+	ty_shen_zhangfei: ["male", "shen", 4, ["tyshencai", "tyxunshi"], ["shu"]],
+	ty_shen_guanyu: ["male", "shen", 5, ["tywushen", "tywuhun"], ["shu"]],
 	ty_guanyinping: ["female", "shu", 3, ["xueji", "huxiao", "tywuji"]],
 	ty_shamoke: ["male", "shu", 4, ["gzjili", "tymanyong"]],
 	ty_guanxing: ["male", "shu", 4, ["tyconglong", "tyzhaowu"]],
