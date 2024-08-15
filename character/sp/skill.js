@@ -15111,8 +15111,13 @@ const skills = {
 			});
 			if (list.length) {
 				var next = player.chooseButton(["视为对" + get.translation(target) + "使用一张牌", [list, "vcard"]]).set("ai", function (button) {
-					var evt = _status.event.getParent();
-					return get.effect(evt.target, { name: button.link[2] }, evt.player, evt.player);
+					let evt = _status.event.getParent(),
+						eff =  get.effect(evt.target, { name: button.link[2] }, evt.player, evt.player);
+					if (
+						evt.target.hp < 2 ||
+						get.attitude(evt.player, evt.target) > 0 ||
+						evt.target.hp < 3 && get.tag(button.link, "damage")) return eff;
+					return eff + get.effect(evt.player, { name: "sha" }, evt.target, evt.player);
 				});
 				if (event.count == 0) next.set("forced", true);
 			} else {
