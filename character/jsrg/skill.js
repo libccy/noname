@@ -7814,7 +7814,7 @@ const skills = {
 				var opinion = result.opinion,
 					targets = result.red.map(i => i[0]);
 				targets.sortBySeat();
-				if (opinion == "red" || opinion == "black") player.logSkill('jsrgchaozheng', targets, null, null, [opinion == "red" ? 3 : 4]);
+				if (opinion) player.logSkill('jsrgchaozheng', targets, null, null, [opinion == "red" ? 3 : 4]);
 				targets.forEach(i => i[opinion == "red" ? "recover" : "loseHp"]());
 				if (targets.length == 0 || result.black.length == 0) player.draw(result.targets.length);
 			}
@@ -9450,7 +9450,7 @@ const skills = {
 					if (result.bool && result.opinion) {
 						var opinion = result.opinion;
 						var target = event.getParent(2).target;
-						if (opinion == "red" || opinion == "black") player.logSkill('jsrgshelun', target, null, null, [opinion == "red" ? 3 : 4]);
+						if (opinion) player.logSkill('jsrgshelun', target, null, null, [opinion == "red" ? 3 : 4]);
 						if (opinion == "red") player.discardPlayerCard(target, "he", true);
 						else target.damage();
 					}
