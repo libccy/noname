@@ -22395,7 +22395,7 @@ const skills = {
 					return target != player;
 				})
 				.set("ai", function (target) {
-					return get.attitude(player, target);
+					return get.attitude(get.player(), target);
 				});
 			"step 1";
 			if (result.bool) {
