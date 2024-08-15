@@ -304,8 +304,8 @@ const skills = {
 					if (player.hasSkillTag("jueqing", false, target)) return;
 					const num = get.tag(card, "damage");
 					if (num) {
-						if (num > 1) return 0.5;
-						return 0;
+						if (num > 1) return 0.55;
+						return 0.05;
 					}
 				},
 			},
