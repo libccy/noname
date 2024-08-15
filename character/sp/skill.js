@@ -1120,7 +1120,15 @@ const skills = {
 				.set("source", source)
 				.set("id", eventId)
 				.set("_global_waiting", true)
-				.set("ai", () => Math.max(0, get.sgn(get.attitude(get.event().player, get.event().source))));
+				.set("ai", () => get.event().idx)
+				.set("idx", function() {
+					let cha = get.effect(player, {name: "sha"}, source, player) *
+						source.mayHaveSha(player, "use", null, "odds") -
+						get.effect(player, {name: "draw"}, source, player);
+					if (Math.abs(cha) < player.hp * player.hp) return [0, 1].randomGet();
+					if (cha > 0) return 0;
+					return 1;
+				}());
 		},
 		subSkill: {
 			addTarget: {
