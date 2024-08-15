@@ -3351,7 +3351,7 @@ const skills = {
 			const cards = get.info("mpjianlin").getCards(player);
 			const {
 				result: { bool, links },
-			} = await player.chooseButton(["悭吝：你可以获得其中一张牌", cards]).set("ai", get.buttonValue);
+			} = await player.chooseButton(["俭吝：你可以获得其中一张牌", cards]).set("ai", get.buttonValue);
 			event.result = {
 				bool: bool,
 				cost_data: links,
