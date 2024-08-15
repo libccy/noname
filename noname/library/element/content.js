@@ -1388,6 +1388,8 @@ export const Content = {
 			var elementOffsetX = 0;
 			var elementOffsetY = 0;
 			var currentElement;
+			// 首次触发move事件的元素
+			var firstOnDragElement;
 			/**
 			 * 每次移动后更新数据
 			 */
@@ -1434,6 +1436,7 @@ export const Content = {
 					if (!target.copy) {
 						target.copy = target.cloneNode(true);
 						target.copy.style.opacity = '0.5';
+						target.copy.style.pointerEvents = 'none';
 					}
 					touchStartX = (e instanceof MouseEvent ? e.clientX : e.touches[0].clientX) / game.documentZoom;
 					touchStartY = (e instanceof MouseEvent ? e.clientY : e.touches[0].clientY) / game.documentZoom;
@@ -1461,6 +1464,14 @@ export const Content = {
 					if (e.touches.length != 1) return;
 				}
 				if (!currentElement || !currentElement.copy) return;
+				if (!firstOnDragElement) {
+					if (!currentElement.contains(e.target)) {
+						return;
+					}
+					else {
+						firstOnDragElement = currentElement;
+					}
+				}
 				// 拖动离开了这个牌的区域，进行赋值
 				// if (!currentElement.contains(e.target)) {
 					
@@ -1492,6 +1503,7 @@ export const Content = {
 				if (e instanceof TouchEvent) {
 					if (e.changedTouches.length != 1) return;
 				}
+				firstOnDragElement = null;
 				buttonss.forEach(btn => {
 					Array.from(btn.children).forEach(element => {
 						if (element.copy && ui.window.contains(element.copy)) {
