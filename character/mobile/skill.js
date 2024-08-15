@@ -29,16 +29,9 @@ const skills = {
 		direct: true,
 		async content(event, trigger, player) {
 			if (
-				player.canMoveCard(
-					null,
-					true,
-					game.filterPlayer(target => {
-						return target.hasCard(card => card.name.startsWith("dagongche_"), "e");
-					}),
-					(card, player) => {
-						return card.name.startsWith("dagongche_");
-					}
-				)
+				game.hasPlayer(target => {
+					return target.hasCard(card => card.name.startsWith("dagongche_"), "e");
+				})
 			) {
 				await player
 					.moveCard(
