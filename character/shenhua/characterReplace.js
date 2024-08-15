@@ -21,7 +21,7 @@ const characterReplaces = {
 	xuhuang: ["re_xuhuang", "ol_xuhuang", "sb_xuhuang", "xuhuang", "jd_sb_xuhuang"],
 	menghuo: ["menghuo", "re_menghuo", "sb_menghuo", "tw_menghuo", "sp_menghuo", "dc_sp_menghuo", "jd_sb_menghuo"],
 	zhurong: ["zhurong", "ol_zhurong", "re_zhurong", "sb_zhurong"],
-	sunjian: ["sunjian", "ol_sunjian", "re_sunjian", "tw_ol_sunjian", "star_sunjian", "jx_sunjian"],
+	sunjian: ["sunjian", "ol_sunjian", "re_sunjian", "tw_ol_sunjian", "star_sunjian", "jx_sunjian", "ol_sb_sunjian"],
 	jiaxu: ["jiaxu", "re_jiaxu", "ns_jiaxu", "ps_jiaxu", "dc_sb_jiaxu", "sb_jiaxu"],
 	dongzhuo: ["dongzhuo", "ol_dongzhuo", "re_dongzhuo", "star_dongzhuo", "jsrg_dongzhuo", "sp_dongzhuo", "yj_dongzhuo"],
 	dengai: ["dengai", "ol_dengai", "re_dengai"],

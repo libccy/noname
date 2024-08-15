@@ -124,6 +124,12 @@ const translates = {
 	olchengxiang_info: "当你受到1点伤害后，你可以亮出牌堆顶的四张牌，然后获得其中任意张点数之和不大于13的牌。",
 	olrenxin: "仁心",
 	olrenxin_info: "当一名其他角色进入濒死状态时，你可以翻面并弃置一张装备牌，然后令该角色回复体力至1点。",
+	ol_sb_sunjian: "OL谋孙坚",
+	ol_sb_sunjian_prefix: "OL谋",
+	olsbhulie: "虎烈",
+	olsbhulie_info: "每回合各限一次，当你使用【杀】或【决斗】指定唯一目标后，你可以令此牌伤害值基数+1。若此牌未造成伤害，你可以目标角色视为对你使用一张【杀】。",
+	olsbyipo: "毅魄",
+	olsbyipo_info: "你的体力值变化后，若你体力值大于0且为你首次达到，你可以选择一名角色并选择一项：1.令其摸X张牌，然后弃置弃置一张牌；2.令其摸一张牌，然后其弃置X张牌（X为你已损失体力值且至少为1）。",
 };
 
 export default translates;

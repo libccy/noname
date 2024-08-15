@@ -3397,7 +3397,7 @@ const skills = {
 					});
 				})
 				.set("fang", fang)
-				.setHiddenSkill(event.name)
+				.setHiddenSkill(event.name.slice(0,-5))
 				.forResult();
 		},
 		async content(event, trigger, player) {
@@ -5030,7 +5030,7 @@ const skills = {
 					}
 					return 1;
 				})
-				.setHiddenSkill(event.name)
+				.setHiddenSkill(event.name.slice(0,-5))
 				.forResult();
 		},
 		async content(event, trigger, player) {
@@ -5120,7 +5120,7 @@ const skills = {
 					}
 					return 1;
 				})
-				.setHiddenSkill(event.name)
+				.setHiddenSkill(event.name.slice(0,-5))
 				.forResult();
 		},
 		async content(event, trigger, player) {
@@ -6654,7 +6654,7 @@ const skills = {
 					prompt: get.prompt("retianxiang"),
 					prompt2: lib.translate.retianxiang_info,
 				})
-				.setHiddenSkill(event.name)
+				.setHiddenSkill(event.name.slice(0,-5))
 				.forResult();
 		},
 		async content(event, trigger, player) {
@@ -7207,7 +7207,7 @@ const skills = {
 		preHidden: true,
 		line: "thunder",
 		async cost(event, trigger, player) {
-			const next = player.chooseTarget(get.prompt2("leiji")).setHiddenSkill(event.name);
+			const next = player.chooseTarget(get.prompt2("leiji")).setHiddenSkill(event.name.slice(0,-5));
 			next.ai = function (target) {
 				if (target.hasSkill("hongyan")) return 0;
 				return get.damageEffect(target, _status.event.player, _status.event.player, "thunder");

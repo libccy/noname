@@ -2,6 +2,116 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//谋孙坚
+	olsbhulie: {
+		audio: 2,
+		trigger: {
+			player: "useCardToPlayered",
+		},
+		filter(event, player) {
+			if (event.targets.length != 1 || !["sha", "juedou"].includes(event.card.name)) return false;
+			var evtx = event.getParent();
+			return !player.hasHistory(
+				"useCard",
+				evt => {
+					return evt != evtx && evt.card.name == event.card.name;
+				},
+				evtx
+			);
+		},
+		check(event, player) {
+			return get.attitude(player, event.targets[0]) <= 0;
+		},
+		logTarget: event => event.targets[0],
+		async content(event, trigger, player) {
+			const evt = trigger.getParent();
+			if (typeof evt.baseDamage != "number") evt.baseDamage = 1;
+			evt.baseDamage++;
+			const target = trigger.targets[0],
+				sha = get.autoViewAs({ name: "sha", isCard: true });
+			player
+				.when("useCardAfter")
+				.filter(
+					evt =>
+						evt == trigger.getParent() &&
+						target.canUse(sha, player, false) &&
+						!game.hasPlayer2(current => {
+							return (
+								current.hasHistory("damage", evtx => {
+									return;
+								}).length > 0
+							);
+						})
+				)
+				.step(async (event, trigger, player) => {
+					const bool = await player
+						.chooseBool("虎烈", `是否令${get.translation(target)}视为对你使用一张杀？`)
+						.set("choice", get.effect(player, sha, target, player) > 0)
+						.forResultBool();
+					if (bool) await target.useCard(sha, player, false);
+				});
+		},
+	},
+	olsbyipo: {
+		audio: 2,
+		trigger: {
+			player: "changeHp",
+		},
+		filter(event, player) {
+			const hp = player.getHp();
+			if (hp <= 0) return false;
+			return !player
+				.getAllHistory("custom", evt => evt.olsbyipo_num)
+				.map(evt => evt.olsbyipo_num)
+				.includes(hp);
+		},
+		async cost(event, trigger, player) {
+			player.getHistory("custom").push({
+				olsbyipo_num: player.getHp(),
+			});
+			event.result = await player
+				.chooseTarget(get.prompt2(event.name.slice(0, -5)))
+				.set("ai", target => {
+					const player = get.player();
+					if (player.getDamagedHp() == 1 && target.countCards("he") == 0) {
+						return 0;
+					}
+					if (get.attitude(player, target) > 0) {
+						return 10 + get.attitude(player, target);
+					}
+					if (player.getDamagedHp() == 1) {
+						return -1;
+					}
+					return 1;
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const num = Math.max(player.getDamagedHp(), 1);
+			const [target] = event.targets;
+			let directcontrol = num == 1;
+			if (!directcontrol) {
+				const str1 = "摸" + get.cnNumber(num, true) + "弃一";
+				const str2 = "摸一弃" + get.cnNumber(num, true);
+				directcontrol =
+					str1 ==
+					(await player
+						.chooseControl(str1, str2, function (event, player) {
+							return _status.event.choice;
+						})
+						.set("choice", get.attitude(player, target) > 0 ? str1 : str2)
+						.set("prompt", "毅魄：请选择一项")
+						.forResultControl());
+			}
+			if (directcontrol) {
+				await target.draw(num);
+				await target.chooseToDiscard(true, "he");
+			} else {
+				await target.draw();
+				await target.chooseToDiscard(num, true, "he");
+			}
+		},
+	},
 	//OL界曹冲
 	olchengxiang: {
 		audio: 2,
