@@ -171,7 +171,7 @@ const skills = {
 				async content(event, trigger, player) {
 					if (event.triggername == "mbquchongOnRemove") {
 						const cards = player.getCards("e", card => card.name.startsWith("dagongche_") && card.storage?.mbquchong <= 0);
-						await game.cardsGotoSpecial(cards);
+						await player.lose(cards, ui.special);
 						game.log(cards, "被移出了游戏");
 					} else if (trigger.name == "equip") {
 						if (event.triggername == "equipBefore") trigger.cancel();
