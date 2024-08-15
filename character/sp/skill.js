@@ -1120,7 +1120,15 @@ const skills = {
 				.set("source", source)
 				.set("id", eventId)
 				.set("_global_waiting", true)
-				.set("ai", () => Math.max(0, get.sgn(get.attitude(get.event().player, get.event().source))));
+				.set("ai", () => get.event().idx)
+				.set("idx", function() {
+					let cha = get.effect(player, {name: "sha"}, source, player) *
+						source.mayHaveSha(player, "use", null, "odds") -
+						get.effect(player, {name: "draw"}, source, player);
+					if (Math.abs(cha) < player.hp * player.hp) return [0, 1].randomGet();
+					if (cha > 0) return 0;
+					return 1;
+				}());
 		},
 		subSkill: {
 			addTarget: {
@@ -15099,8 +15107,13 @@ const skills = {
 			});
 			if (list.length) {
 				var next = player.chooseButton(["视为对" + get.translation(target) + "使用一张牌", [list, "vcard"]]).set("ai", function (button) {
-					var evt = _status.event.getParent();
-					return get.effect(evt.target, { name: button.link[2] }, evt.player, evt.player);
+					let evt = _status.event.getParent(),
+						eff =  get.effect(evt.target, { name: button.link[2] }, evt.player, evt.player);
+					if (
+						evt.target.hp < 2 ||
+						get.attitude(evt.player, evt.target) > 0 ||
+						evt.target.hp < 3 && get.tag(button.link, "damage")) return eff;
+					return eff + get.effect(evt.player, { name: "sha" }, evt.target, evt.player);
 				});
 				if (event.count == 0) next.set("forced", true);
 			} else {
@@ -27398,10 +27411,12 @@ const skills = {
 		},
 		ai: {
 			result: {
-				target: -1,
-				player: function (player) {
+				player(player) {
 					return player.isLinked() ? 0 : -0.8;
 				},
+				target(player, target) {
+					return get.effect(target, { name: "tiesuo" }, player, target) / get.attitude(target, target);
+				}
 			},
 			order: 2,
 			expose: 0.3,
@@ -27412,6 +27427,7 @@ const skills = {
 					}
 				},
 			},
+
 		},
 	},
 	xiaoguo: {

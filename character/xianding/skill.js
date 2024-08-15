@@ -2954,16 +2954,12 @@ const skills = {
 									return get.order(card);
 								return -1;
 							}
-							//如果自己没有其他的闪桃就不响应
-							else {
-								const needsTao = player.hp <= 1;
-								const shanAndTao = player.getCards("hs", card => {
-									const name = get.name(card);
-									return name == "shan" || (needsTao && name == "shan");
-								});
-								shanAndTao.remove(card);
-								if (card.cards) shanAndTao.removeArray(card.cards);
-								if (!shanAndTao.length) return 0;
+							else { //不残或者没有其他的闪就不响应
+								if (player.hp > 1 || !player.hasCard("hs", i => {
+									if (i == card || card.cards && card.cards.includes(i)) return false;
+									let name = get.name(i, player);
+									return name == "shan" || name == "tao" || name == "jiu";
+								})) return 0;
 							}
 							return event.getRand("dcsbpingliao") > 1 / Math.max(1, player.hp) ? 0 : get.order(card);
 						})
@@ -9594,7 +9590,7 @@ const skills = {
 			const cards = [];
 			game.countPlayer2(current => {
 				current.getHistory("lose", evt => {
-					if (evt.type == "discard") cards.addArray(evt.cards2.filterInD("d"));
+					if (evt.type == "discard") cards.addArray(evt.cards.filterInD("d"));
 				});
 			});
 			return cards;
@@ -10263,6 +10259,23 @@ const skills = {
 				},
 			},
 			all: {
+				mod: {
+					aiOrder(player, card, num) {
+						if (num <= 0) return;
+						if (get.tag(card, "recover") && !_status.event.dying && player.hp > 0) return 0;
+						if (get.tag(card, "damage")) {
+							if (card.name == "sha" && game.hasPlayer(cur => {
+								return (
+									cur.hp < 2 &&
+									player.canUse(card, cur, null, true) &&
+									get.effect(cur, card, player, player) > 0
+								);
+							})) return num;
+							if (player.needsToDiscard()) return num / 5;
+							return 0;
+						}
+					}
+				},
 				trigger: { player: "dieAfter" },
 				filter: function (event, player) {
 					return !game.hasPlayer(current => current.hasSkill("dcwumei_wake"), true);
@@ -10271,14 +10284,6 @@ const skills = {
 				forceDie: true,
 				content: function () {
 					game.removeGlobalSkill("dcwumei_all");
-				},
-				ai: {
-					effect: {
-						player(card, player, target) {
-							if (get.tag(card, "recover") && target.hp > 0) return 0;
-							if (get.tag(card, "damage")) return 0.5;
-						},
-					},
 				},
 			},
 		},

@@ -22,7 +22,7 @@ const characterReplaces = {
 	luxun: ["luxun", "re_luxun", "jsrg_luxun", "sb_luxun"],
 	lvmeng: ["lvmeng", "re_lvmeng", "sb_lvmeng"],
 	huanggai: ["huanggai", "re_huanggai", "sb_huanggai"],
-	daqiao: ["daqiao", "re_daqiao", "sb_daqiao", "jd_sb_daqiao"],
+	daqiao: ["daqiao", "re_daqiao", "sb_daqiao", "jd_sb_daqiao", "yue_daqiao"],
 	sunshangxiang: ["sunshangxiang", "re_sunshangxiang", "sb_sunshangxiang", "jsrg_sunshangxiang", "star_sunshangxiang", "jd_sb_sunshangxiang"],
 	ganning: ["ganning", "re_ganning", "sb_ganning", "yongjian_ganning", "jd_sb_ganning"],
 	yj_ganning: ["yj_ganning", "sp_ganning"],

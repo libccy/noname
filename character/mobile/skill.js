@@ -2006,7 +2006,7 @@ const skills = {
 								const { choice } = get.info("mbxuetu_backup");
 								const status = player.countMark("mbxuetu_status");
 								if (status > 1) {
-									if (player.storage.mbxuetu) return -get.damageEffect(target, player, player) / 10;
+									if (player.storage.mbxuetu) return get.damageEffect(target, player, target) / 10;
 									return -2;
 								}
 								if (choice === 1) return 2;

@@ -570,7 +570,7 @@ const skills = {
 				charlotte: true,
 				forced: true,
 				filter: function (event, player) {
-					return event.source && event.source.isIn() && event.source.hasSkill("mingjian2");
+					return event.source && event.source.isIn() && event.source.hasSkill("remingjian_buff");
 				},
 				content: function () {
 					player.restoreSkill("rexingshuai");
