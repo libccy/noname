@@ -1,4 +1,5 @@
 const characters = {
+	mb_sp_zhenji: ["female", "qun", 3, ["mbbojian", "mbjiwei"]],
 	mb_jiachong: ["male", "qun", 3, ["mbbeini", "mbdingfa"]],
 	mb_simazhou: ["male", "wei", 4, ["mbbifeng", "mbsuwang"], ["name:司马|伷"]],
 	mb_wenqin: ["male", "wei", 4, ["mbbeiming", "mbchoumang"]],

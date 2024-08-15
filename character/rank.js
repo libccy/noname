@@ -154,6 +154,7 @@ window.noname_character_rank = {
 		"ol_jiangwan",
 		"bianyue",
 		"kongshu",
+		"mb_sp_zhenji",
 	],
 	a: [
 		"star_caoren",
@@ -2438,6 +2439,7 @@ window.noname_character_rank = {
 			"jd_sb_sp_zhugeliang",
 			"jd_jin_wangyuanji",
 			"kongshu",
+			"mb_sp_zhenji",
 		],
 		rare: [
 			"ty_guanyinping",

@@ -84,7 +84,7 @@ const skills = {
 						.setContent("gaincardMultiple");
 				} else await target.discard(target.getCards(position).removeArray(cards));
 			} else {
-				await target.discard(target.getCards(position).removeArray(cards));
+				await target.discard(target.getCards(position));
 			}
 		},
 		global: "sbwansha_global",
@@ -5185,7 +5185,7 @@ const skills = {
 				forced: true,
 				logTarget: "player",
 				filter: function (event, player) {
-					return player.checkCooperationStatus(event.player, "sbjizhu") && player.hasSkill("sblongdan", null, null, false);
+					return player.checkCooperationStatus(event.player, "sbjizhu") && ["sblongdan", "jdlongdan"].some(skill => player.hasSkill(skill, null, null, false));
 				},
 				content: function () {
 					game.log(player, "和", trigger.player, "的协力成功");
