@@ -17,6 +17,7 @@ const characterReplaces = {
 	caoang: ["caoang", "dc_sb_caoang"],
 	zhangxiu: ["zhangxiu", "dc_sb_zhangxiu"],
 	yuanji: ["yuanji", "ol_yuanji"],
+	zhangfen: ["zhangfen", "mb_zhangfen"],
 };
 
 export default characterReplaces;
