@@ -2684,7 +2684,7 @@ const skills = {
 				player
 					.chooseToMove()
 					.set("list", [["你的“星”", cards], ["牌堆顶"]])
-					.set("prompt", "观星：点击将牌移动到牌堆顶")
+					.set("prompt", "观星：点击或拖动将牌移动到牌堆顶")
 					.set("processAI", function (list) {
 						var cards = list[0][1].slice(),
 							player = _status.event.player;

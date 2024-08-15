@@ -4696,7 +4696,7 @@ export default () => {
 					game.cardsGotoOrdering(cards);
 					var next = player.chooseToMove();
 					next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
-					next.set("prompt", "观星：点击将牌移动到牌堆顶或牌堆底");
+					next.set("prompt", "观星：点击或拖动将牌移动到牌堆顶或牌堆底");
 					next.processAI = function (list) {
 						var cards = list[0][1],
 							player = _status.event.player;

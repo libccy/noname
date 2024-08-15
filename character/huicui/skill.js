@@ -182,7 +182,7 @@ const skills = {
 					await game.cardsGotoOrdering(cards);
 					const next = player.chooseToMove();
 					next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
-					next.set("prompt", "羲笛：点击将牌移动到牌堆顶或牌堆底");
+					next.set("prompt", "羲笛：点击或拖动将牌移动到牌堆顶或牌堆底");
 					next.processAI = list => {
 						const cards = list[0][1],
 							player = _status.event.player;
