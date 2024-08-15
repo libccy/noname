@@ -20,5 +20,13 @@ const dynamicTranslates = {
 		str+=yang;
 		return str;
 	},
+	tyqianshou(player){
+		let str="转换技，其他角色的回合开始时，若其体力值大于你，或其未处于横置状态，",
+			yin="阴：你可展示并交给其一张红色牌，本回合你不能使用手牌且你与其不能成为牌的目标；",
+			yang="阳：你可令其展示并交给你一张牌，若此牌不为黑色，你失去一点体力。";
+		if(player.storage.tyqianshou) yang="<span class='firetext'>"+yang+"</span>";
+		else yin="<span class='bluetext'>"+yin+"</span>";
+		return str+yin+yang;
+	},
 };
 export default dynamicTranslates;

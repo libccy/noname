@@ -1,4 +1,11 @@
 const characters = {
+	ty_fanjiang: ["male", "wu", 4, ["tybianta", "tybenxiang", "tyxiezhan"]],
+	ty_zhangda: ["male", "wu", 4, ["tyxingsha", "tyxianshou", "tyxiezhan"]],
+	ty_liue: ["male", "wu", 4, ["tyxiyu"]],
+	ty_tanxiong: ["male", "wu", 4, ["tylengjian", "tysheju"]],
+	ty_buzhi: ["male", "wu", 3, ["tyhongde", "tydingpan"]],
+	ty_ganning: ["male", "wu", 4, ["tyqixi", "tyfenwei"]],
+	ty_luxun: ["male", "wu", 3, ["tyqianshou", "tytanlong", "tyxibei"]],
 	ty_shen_liubei: ["male", "shen", 6, ["tylongnu", "nzry_jieying", "tytaoyuan"], ["shu"]],
 	ty_guanyinping: ["female", "shu", 3, ["xueji", "huxiao", "tywuji"]],
 	ty_shamoke: ["male", "shu", 4, ["gzjili", "tymanyong"]],

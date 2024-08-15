@@ -13829,12 +13829,19 @@ export class Library {
 			},
 		],
 		[
-			"龙神",
+			"桃",
+			{
+				color: "#FFC0CB",
+				nature: "firemm",
+			},
+		],
+		[
+			"桃神",
 			{
 				/**
 				 * @returns {string}
 				 */
-				getSpan: () => `${get.prefixSpan("龙")}${get.prefixSpan("神")}`,
+				getSpan: () => `${get.prefixSpan("桃")}${get.prefixSpan("神")}`,
 			},
 		],
 		[

@@ -197,7 +197,6 @@ const cards = {
 		fullskin: true,
 		derivation: "yj_tianchuan",
 		type: "equip",
-		subtype: "equip6",
 		skills: ["xingbian_skill"],
 		async content(event, trigger, player) {
 			if (!event.card.subtypes) {
@@ -238,10 +237,10 @@ const cards = {
 		type: "equip",
 		subtype: "equip1",
 		distance: {
-			attackRange(card,player){
-				return player.storage.tiejili_skill||2;
+			attackRange(card, player) {
+				return player.storage.tiejili_skill || 2;
 			},
-			attackFrom:-1,
+			attackFrom: -1,
 		},
 		ai: {
 			basic: {
@@ -257,6 +256,151 @@ const cards = {
 			if (!card.storage.tiejili_skill) card.storage.tiejili_skill = 2;
 			player.storage.tiejili_skill = card.storage.tiejili_skill;
 			player.markSkill("tiejili_skill");
+		},
+	},
+	lx_huoshaolianying: {
+		audio: true,
+		fullskin: true,
+		type: "trick",
+		enable: true,
+		filterTarget(card, player, target) {
+			return target.countCards("he") > 0;
+		},
+		async content(event, trigger, player) {
+			const target = event.target;
+			if (target.countCards("he") == 0) return;
+			let result;
+			if (target.countCards("he") == 1) result = { cards: target.getCards("he") };
+			else {
+				result = await player
+					.choosePlayerCard(target, true, "he")
+					.set("ai", function (card) {
+						if (_status.event.getRand() < 0.5) return Math.random();
+						return get.value(card);
+					})
+					.forResult();
+			}
+			if (!result || !result.bool) return;
+			await target.showCards(result.cards).setContent(function () { });
+			event.dialog = ui.create.dialog(get.translation(target) + "展示的手牌", result.cards);
+			event.videoId = lib.status.videoId++;
+
+			game.broadcast(
+				"createDialog",
+				event.videoId,
+				get.translation(target) + "展示的手牌",
+				result.cards
+			);
+			game.addVideo("cardDialog", null, [
+				get.translation(target) + "展示的手牌",
+				get.cardsInfo(result.cards),
+				event.videoId,
+			]);
+			game.log(target, "展示了", result.cards);
+			game.addCardKnower(result.cards, "everyone");
+			const result2 = await player
+				.chooseToDiscard({ suit: get.suit(result.cards[0]) }, function (card) {
+					var evt = _status.event.getParent();
+					if (get.damageEffect(evt.target, evt.player, evt.player, "fire") > 0) {
+						return 6.2 + Math.min(4, evt.player.hp) - get.value(card, evt.player);
+					}
+					return -1;
+				})
+				.set("prompt", false)
+				.forResult();
+			await game.delay();
+			if (result2.bool) {
+				await target.discard(result.cards);
+				await target.damage("fire");
+				if (target.isLinked() && event.cards?.someInD()) await player.gain(event.cards.filterInD(),"gain2");
+			}
+			else target.addTempSkill("huogong2");
+			event.dialog.close();
+			game.addVideo("cardDialog", null, event.videoId);
+			game.broadcast("closeDialog", event.videoId);
+		},
+		ai: {
+			basic: {
+				order: 9.2,
+				value: [3, 1],
+				useful: 0.6,
+			},
+			wuxie: function (target, card, player, viewer, status) {
+				if (get.attitude(viewer, player._trueMe || player) > 0) return 0;
+				if (
+					status *
+					get.attitude(viewer, target) *
+					get.effect(target, card, player, target) >=
+					0
+				)
+					return 0;
+				if (_status.event.getRand("huogong_wuxie") * 4 > player.countCards("h")) return 0;
+			},
+			result: {
+				player: function (player) {
+					var nh = player.countCards("h");
+					if (nh <= player.hp && nh <= 4 && _status.event.name == "chooseToUse") {
+						if (
+							typeof _status.event.filterCard == "function" &&
+							_status.event.filterCard(
+								new lib.element.VCard({ name: "lx_huoshaolianying" }),
+								player,
+								_status.event
+							)
+						) {
+							return -10;
+						}
+						if (_status.event.skill) {
+							var viewAs = get.info(_status.event.skill).viewAs;
+							if (viewAs == "lx_huoshaolianying") return -10;
+							if (viewAs && viewAs.name == "huogong") return -10;
+						}
+					}
+					return 0;
+				},
+				target: function (player, target) {
+					if (target.hasSkill("huogong2") || target.countCards("h") == 0) return 0;
+					if (player.countCards("h") <= 1) return 0;
+					if (_status.event.player == player) {
+						if (target.isAllCardsKnown(player)) {
+							if (
+								!target.countCards("h", (card) => {
+									return player.countCards("h", (card2) => {
+										return get.suit(card2) == get.suit(card);
+									});
+								})
+							) {
+								return 0;
+							}
+						}
+					}
+					if (target == player) {
+						if (
+							typeof _status.event.filterCard == "function" &&
+							_status.event.filterCard(
+								new lib.element.VCard({ name: "lx_huoshaolianying" }),
+								player,
+								_status.event
+							)
+						) {
+							return -1.15;
+						}
+						if (_status.event.skill) {
+							var viewAs = get.info(_status.event.skill).viewAs;
+							if (viewAs == "lx_huoshaolianying") return -1.15;
+							if (viewAs && viewAs.name == "lx_huoshaolianying") return -1.15;
+						}
+						return 0;
+					}
+					return -1.15;
+				},
+			},
+			tag: {
+				damage: 1,
+				fireDamage: 1,
+				natureDamage: 1,
+				norepeat: 1,
+			},
 		},
 	},
 };
