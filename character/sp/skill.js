@@ -4462,10 +4462,8 @@ const skills = {
 				marktext: "＞",
 				intro: {
 					markcount: list => {
-						var list2 = [1, 11, 12, 13];
 						return list.reduce((str, num) => {
-							if (list2.includes(num)) return str + ["A", "J", "Q", "K"][list2.indexOf(num)];
-							return str + parseFloat(num);
+							return str + get.strNumber(num);
 						}, "");
 					},
 					content: "使用的下一张点数大于$的普通锦囊牌额外结算一次",
@@ -4499,10 +4497,8 @@ const skills = {
 				marktext: "<",
 				intro: {
 					markcount: list => {
-						var list2 = [1, 11, 12, 13];
 						return list.reduce((str, num) => {
-							if (list2.includes(num)) return str + ["A", "J", "Q", "K"][list2.indexOf(num)];
-							return str + parseFloat(num);
+							return str + get.strNumber(num);
 						}, "");
 					},
 					content: "使用的下一张点数小于$的普通锦囊牌额外结算一次",

@@ -324,18 +324,10 @@ const skills = {
 				},
 				intro: {
 					markcount(card, player) {
-						var num = get.number(card, player);
-						var list = [1, 11, 12, 13];
-						if (list.includes(num)) return ["A", "J", "Q", "K"][list.indexOf(num)];
-						return parseFloat(num);
+						return get.strNumber(get.number(card, player));
 					},
 					content(card, player) {
-						var num = get.number(card, player);
-						var str = "<li>上一张牌的点数：";
-						var list = [1, 11, 12, 13];
-						if (list.includes(num)) str += ["A(1)", "J(11)", "Q(12)", "K(13)"][list.indexOf(num)];
-						else str += parseFloat(num);
-						return str;
+						return "上一张牌的点数：" + get.strNumber(get.number(card, player));
 					},
 				},
 			},

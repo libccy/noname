@@ -1150,7 +1150,7 @@ const skills = {
 		discard: false,
 		lose: false,
 		delay: false,
-		prompt: "将一张装备牌置入弃牌堆并摸一张牌",
+		prompt: "重铸一张装备牌",
 		ai: {
 			order: 10,
 			result: {

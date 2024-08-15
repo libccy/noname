@@ -2821,6 +2821,25 @@ export class Get extends GetCompatible {
 		}
 	}
 	/**
+	 * 返回扑克牌中的表示形式对应的数字
+	 * @param { string } str
+	 * @returns { number }
+	 */
+	numString(str) {
+		switch (str) {
+			case "A":
+				return 1;
+			case "J":
+				return 11;
+			case "Q":
+				return 12;
+			case "K":
+				return 13;
+			default:
+				return parseInt(str);
+		}
+	}
+	/**
 	 * 将阿拉伯数字转换为中文的表达形式
 	 * @param { number } num
 	 * @param { boolean } [ordinal]

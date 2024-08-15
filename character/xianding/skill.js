@@ -13102,9 +13102,8 @@ const skills = {
 				var list = player.storage.dcgeyuan.filter(i => lib.skill.dcgeyuan.filterNumber(player, i));
 				if (!list.length) return 0;
 				list = list.map(num => {
-					var list = [1, 10, 11, 12, 13];
-					if (list.includes(num)) return ["A", "X", "J", "Q", "K"][list.indexOf(num)];
-					return parseFloat(num);
+					if (num == 10) return "X";
+					return get.strNumber(num);
 				});
 				return list.reduce((str, num) => {
 					return str + num;

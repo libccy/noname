@@ -8539,22 +8539,7 @@ const skills = {
 					var td = ui.create.div(".shadowed.reduce_radius.pointerdiv.tdnode");
 					td.link = numbers[i];
 					table2.appendChild(td);
-					var num = numbers[i];
-					switch (num) {
-						case 1:
-							num = "A";
-							break;
-						case 11:
-							num = "J";
-							break;
-						case 12:
-							num = "Q";
-							break;
-						case 13:
-							num = "K";
-							break;
-					}
-					td.innerHTML = "<span>" + num + "</span>";
+					td.innerHTML = "<span>" + get.strNumber(numbers[i]) + "</span>";
 					td.addEventListener(lib.config.touchscreen ? "touchend" : "click", function () {
 						if (_status.dragged) return;
 						if (_status.justdragged) return;
