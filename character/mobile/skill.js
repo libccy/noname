@@ -23,7 +23,8 @@ const skills = {
 				}),
 				(card, player) => {
 					return card.name.startsWith("dagongche_");
-				}
+				},
+				"canReplace"
 			);
 		},
 		direct: true,
@@ -42,7 +43,8 @@ const skills = {
 						},
 						game.filterPlayer(target => {
 							return target.hasCard(card => card.name.startsWith("dagongche_"), "e");
-						})
+						}),
+						"canReplace"
 					)
 					.set("nojudge", true)
 					.set("logSkill", "mbquchong");
@@ -146,13 +148,19 @@ const skills = {
 			effect: {
 				equipSkill: true,
 				trigger: {
-					player: ["loseBefore", "mbquchongOnRemove", "equipBefore"],
+					player: ["loseBefore", "mbquchongOnRemove", "equipBefore", "equipAfter"],
 				},
 				filter(event, player, name) {
 					if (name == "mbquchongOnRemove") {
 						return player.hasCard(card => card.name.startsWith("dagongche_") && card.storage?.mbquchong <= 0, "e");
 					}
-					if (event.name == "equip") return true;
+					if (event.name == "equip") {
+						if (name == "equipBefore") return true;
+						if (!event.card.name.startsWith("dagongche_")) return false;
+						return player.hasCard(card => {
+							return !event.cards.includes(card) && lib.filter.cardDiscardable(card, player);
+						}, "e");
+					}
 					if (event.getParent(3).name == "mbquchong" || event.getParent(3).name == "mbquchong_recast") return false;
 					return player.hasCard(card => {
 						if (!event.cards.includes(card)) return false;
@@ -165,7 +173,12 @@ const skills = {
 						const cards = player.getCards("e", card => card.name.startsWith("dagongche_") && card.storage?.mbquchong <= 0);
 						await game.cardsGotoSpecial(cards);
 						game.log(cards, "被移出了游戏");
-					} else if (trigger.name == "equip") trigger.cancel();
+					} else if (trigger.name == "equip") {
+						if (event.triggername == "equipBefore") trigger.cancel();
+						else await player.discard(player.getCards("e", card => {
+							return !trigger.cards.includes(card) && lib.filter.cardDiscardable(card, player);
+						}));
+					}
 					else {
 						const cards = player.getCards("e", card => {
 							if (!trigger.cards.includes(card)) return false;
