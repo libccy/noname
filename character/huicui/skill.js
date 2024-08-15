@@ -4082,8 +4082,8 @@ const skills = {
 			effect: {
 				player_use: function (card, player, target, current) {
 					if (_status.currentPhase != player) return;
-					if (get.type(card) == "equip" && get.cardtag(card, "gifts")) return;
-					if (player.countCards("h") > Math.max(1, player.countCards("e"))) return [1, 3];
+					let cha = player.countCards("h") - Math.max(1, player.countCards("e"));
+					if (cha == 0 || cha < 0 && !player.hasSkill("dczuowei_ban")) return [1, 2];
 				},
 			},
 		},

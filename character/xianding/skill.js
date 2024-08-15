@@ -9590,7 +9590,7 @@ const skills = {
 			const cards = [];
 			game.countPlayer2(current => {
 				current.getHistory("lose", evt => {
-					if (evt.type == "discard") cards.addArray(evt.cards2.filterInD("d"));
+					if (evt.type == "discard") cards.addArray(evt.cards.filterInD("d"));
 				});
 			});
 			return cards;
