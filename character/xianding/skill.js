@@ -10259,6 +10259,23 @@ const skills = {
 				},
 			},
 			all: {
+				mod: {
+					aiOrder(player, card, num) {
+						if (num <= 0) return;
+						if (get.tag(card, "recover") && !_status.event.dying && player.hp > 0) return 0;
+						if (get.tag(card, "damage")) {
+							if (card.name == "sha" && game.hasPlayer(cur => {
+								return (
+									cur.hp < 2 &&
+									player.canUse(card, cur, null, true) &&
+									get.effect(cur, card, player, player) > 0
+								);
+							})) return num;
+							if (player.needsToDiscard()) return num / 5;
+							return 0;
+						}
+					}
+				},
 				trigger: { player: "dieAfter" },
 				filter: function (event, player) {
 					return !game.hasPlayer(current => current.hasSkill("dcwumei_wake"), true);
@@ -10267,14 +10284,6 @@ const skills = {
 				forceDie: true,
 				content: function () {
 					game.removeGlobalSkill("dcwumei_all");
-				},
-				ai: {
-					effect: {
-						player(card, player, target) {
-							if (get.tag(card, "recover") && target.hp > 0) return 0;
-							if (get.tag(card, "damage")) return 0.5;
-						},
-					},
 				},
 			},
 		},
