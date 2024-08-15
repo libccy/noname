@@ -172,6 +172,11 @@ const skills = {
 					if (event.triggername == "mbquchongOnRemove") {
 						const cards = player.getCards("e", card => card.name.startsWith("dagongche_") && card.storage?.mbquchong <= 0);
 						await player.lose(cards, ui.special);
+						for (const card of cards) {
+							card.fix();
+							card.remove();
+							card.destroyed = true;
+						}
 						game.log(cards, "被移出了游戏");
 					} else if (trigger.name == "equip") {
 						if (event.triggername == "equipBefore") trigger.cancel();

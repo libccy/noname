@@ -170,6 +170,7 @@ const cards = {
 		derivation: "mb_zhangfen",
 		type: "equip",
 		subtype: "equip1",
+		destroyLog: false,
 		distance: { attackFrom: -8 },
 		ai: { basic: { equipValue: 10 } },
 		cardPrompt(card) {
@@ -185,6 +186,7 @@ const cards = {
 		derivation: "mb_zhangfen",
 		type: "equip",
 		subtype: "equip1",
+		destroyLog: false,
 		distance: { attackFrom: -8 },
 		ai: { basic: { equipValue: 10 } },
 		cardPrompt(card) {
