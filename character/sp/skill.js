@@ -27402,10 +27402,12 @@ const skills = {
 		},
 		ai: {
 			result: {
-				target: -1,
-				player: function (player) {
+				player(player) {
 					return player.isLinked() ? 0 : -0.8;
 				},
+				target(player, target) {
+					return get.effect(target, { name: "tiesuo" }, player, target) / get.attitude(target, target);
+				}
 			},
 			order: 2,
 			expose: 0.3,
@@ -27416,6 +27418,7 @@ const skills = {
 					}
 				},
 			},
+
 		},
 	},
 	xiaoguo: {

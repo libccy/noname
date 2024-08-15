@@ -2954,16 +2954,12 @@ const skills = {
 									return get.order(card);
 								return -1;
 							}
-							//如果自己没有其他的闪桃就不响应
-							else {
-								const needsTao = player.hp <= 1;
-								const shanAndTao = player.getCards("hs", card => {
-									const name = get.name(card);
-									return name == "shan" || (needsTao && name == "shan");
-								});
-								shanAndTao.remove(card);
-								if (card.cards) shanAndTao.removeArray(card.cards);
-								if (!shanAndTao.length) return 0;
+							else { //不残或者没有其他的闪就不响应
+								if (player.hp > 1 || !player.hasCard("hs", i => {
+									if (i == card || card.cards && card.cards.includes(i)) return false;
+									let name = get.name(i, player);
+									return name == "shan" || name == "tao" || name == "jiu";
+								})) return 0;
 							}
 							return event.getRand("dcsbpingliao") > 1 / Math.max(1, player.hp) ? 0 : get.order(card);
 						})

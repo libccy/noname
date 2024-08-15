@@ -3120,9 +3120,8 @@ const skills = {
 							const player = get.event("player"),
 								target = get.event().getParent().player;
 							const att = get.attitude(player, target);
-							if (att > 0) return 7.5 - get.value(card);
-							if (att == 0 && get.attitude(target, player) == 0) return 0;
-							if (att < 0 && player.getHp() > 2) return 0;
+							if (att >= 0) return 0;
+							if (player.getHp() > 1 || !target.canUse({ name: "sha" }, player, true, true)) return 0;
 							return 7.5 - get.value(card);
 						})
 						.forResultBool();
@@ -4361,7 +4360,7 @@ const skills = {
 								target = get.event().getParent().player;
 							const att = get.attitude(player, target);
 							if (att > 0) return 7.5 - get.value(card);
-							if (att == 0 && get.attitude(target, player) == 0) return 0;
+							if (att > -1) return 0;
 							if (
 								att < 0 &&
 								get.attitude(target, player) < 0 &&
@@ -4370,10 +4369,9 @@ const skills = {
 									const info = get.info(skill);
 									return info && info.ai && (info.ai.maixie || info.ai.maixie_hp || info.ai.maixie_defend);
 								}) &&
-								player.getHp() > 2
-							)
-								return 0;
-							return 7.5 - get.value(card);
+								player.getHp() <= 2
+							) return 7.5 - get.value(card);
+							return 0;
 						})
 						.set("prompt", "超绝：交给" + get.translation(player) + "一张" + get.translation(suits) + "手牌，或本回合非锁定技失效");
 					if (!bool) target.addTempSkill("fengyin");

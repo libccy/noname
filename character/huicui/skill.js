@@ -12008,7 +12008,7 @@ const skills = {
 		trigger: { target: "useCardToTargeted" },
 		filter: function (event, player) {
 			if (player == event.player || event.targets.length != 1) return false;
-			return player.countCards("h") >= 2;
+			return event.player.isIn() && player.countCards("h") >= 2;
 		},
 		usable: 2,
 		async cost(event, trigger, player) {
