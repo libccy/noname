@@ -109,7 +109,7 @@ export function loadCardPile() {
 		// @ts-ignore
 		lib.cardPackList = {};
 	} else {
-		var pilecfg = lib.config.customcardpile[get.config("cardpilename") || "当前牌堆"];
+		let pilecfg = lib.config.customcardpile[get.config("cardpilename") || "当前牌堆"];
 		if (pilecfg) {
 			lib.config.bannedpile = get.copy(pilecfg[0] || {});
 			lib.config.addedpile = get.copy(pilecfg[1] || {});
@@ -309,7 +309,7 @@ export async function loadExtension(extension) {
 
 				loadCharacter(content);
 			}
-			if (typeof extension[4].card?.card == "object" && Object.keys(extension[4].card).length > 0) {
+			if (typeof extension[4].card?.card == "object" && Object.keys(extension[4].card.card).length > 0) {
 				const content = { ...extension[4].card };
 				content.name = extension[0];
 				content.translate ??= {};
