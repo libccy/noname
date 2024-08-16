@@ -1423,7 +1423,7 @@ export const Content = {
 					if (e.which != 1) return;
 				}
 				// 单个手指按下
-				if (e instanceof TouchEvent) {
+				if (window.TouchEvent && e instanceof TouchEvent) {
 					if (e.touches.length != 1) return;
 				}
 				// 判断按下的元素是否是card
@@ -1460,7 +1460,7 @@ export const Content = {
 				if (e instanceof MouseEvent) {
 					if (e.which != 1) return;
 				}
-				if (e instanceof TouchEvent) {
+				if (window.TouchEvent && e instanceof TouchEvent) {
 					if (e.touches.length != 1) return;
 				}
 				if (!currentElement || !currentElement.copy) return;
@@ -1500,7 +1500,7 @@ export const Content = {
 				if (e instanceof MouseEvent) {
 					if (e.which != 1) return;
 				}
-				if (e instanceof TouchEvent) {
+				if (window.TouchEvent && e instanceof TouchEvent) {
 					if (e.changedTouches.length != 1) return;
 				}
 				firstOnDragElement = null;
@@ -1529,7 +1529,12 @@ export const Content = {
 				// 与card交换位置
 				var card = children.find(element => element.contains(target));
 				// 判断是否可以移动
-				if (!filterMove(button, ui.selected.guanxing_button, event.moved)) return;
+				if (!card) {
+					if (!filterMove(ui.selected.guanxing_button, button._link, event.moved)) return;
+				}
+				else {
+					if (!filterMove(card, ui.selected.guanxing_button, event.moved)) return;
+				}
 				// FLIP动画
 				// first
 				buttonss.forEach(btn => {
@@ -1553,7 +1558,7 @@ export const Content = {
 						else button.appendChild(ui.selected.guanxing_button);
 					}
 					else button.appendChild(ui.selected.guanxing_button);
-				} 
+				}
 				else {
 					// 是交换而不是到card前面
 					var par1 = ui.selected.guanxing_button.parentNode,
@@ -1581,7 +1586,7 @@ export const Content = {
 							return new Promise(resolve => {
 								element.classList.remove("glow2");
 								element.style.transition = '';
-								if (element.style.transform != 'translateX(0px) translateY(0px)') {
+								if (element.style.transform != 'translateX(0px) translateY(0px)' && element.style.transform != '') {
 									element.style.transform = 'translateX(0px) translateY(0px)';
 									element.addEventListener('transitionend',() => {
 										resolve();
@@ -1678,7 +1683,7 @@ export const Content = {
 			if (moved)
 				result = {
 					bool: true,
-					moved: moved,
+					moved,
 				};
 			else result = { bool: false };
 		}
