@@ -930,7 +930,7 @@ const skills = {
 							let player = get.player(),
 								eff = player.getUseValue(get.autoViewAs({ name: "sha" }, "unsure"), false);
 							if (eff <= 0) return 0;
-							return 8 - player.getUseValue(card);
+							return player.getHp() - player.getUseValue(button.link);
 						})
 						.forResult();
 					event.result = {
