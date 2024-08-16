@@ -171,7 +171,7 @@ const skills = {
 			},
 		},
 	},
-//幻刘禅
+	//幻刘禅
 	twguihan: {
 		audio: 2,
 		enable: "phaseUse",
