@@ -109,7 +109,7 @@ export function loadCardPile() {
 		// @ts-ignore
 		lib.cardPackList = {};
 	} else {
-		var pilecfg = lib.config.customcardpile[get.config("cardpilename") || "当前牌堆"];
+		let pilecfg = lib.config.customcardpile[get.config("cardpilename") || "当前牌堆"];
 		if (pilecfg) {
 			lib.config.bannedpile = get.copy(pilecfg[0] || {});
 			lib.config.addedpile = get.copy(pilecfg[1] || {});
