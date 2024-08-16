@@ -13752,6 +13752,15 @@ export class Library {
 			},
 		],
 		[
+			"手杀SP",
+			{
+				/**
+				 * @returns {string}
+				 */
+				getSpan: () => `${get.prefixSpan("手杀")}${get.prefixSpan("SP")}`,
+			},
+		],
+		[
 			"战役篇神",
 			{
 				/**

@@ -25535,7 +25535,7 @@ const skills = {
 		audio: "lixia",
 		trigger: { global: "phaseJieshuBegin" },
 		filter: function (event, player) {
-			return event.player.isIn() && event.player != player && get.distance(event.player, player, "attack") > 1;
+			return event.player.isIn() && event.player != player && !event.player.inRange(player);
 		},
 		forced: true,
 		content: function () {
