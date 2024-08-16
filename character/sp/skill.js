@@ -19748,14 +19748,12 @@ const skills = {
 	qianya: {
 		audio: 2,
 		trigger: { target: "useCardToTargeted" },
-		direct: true,
 		filter: function (event, player) {
 			return get.type(event.card, "trick") == "trick" && player.countCards("h");
 		},
-		content: function () {
-			"step 0";
-			var nh = player.countCards("h");
-			player.chooseCardTarget({
+		async cost(event, trigger, player) {
+			let nh = player.countCards("h");
+			event.result = await player.chooseCardTarget({
 				filterCard: true,
 				filterTarget: function (card, player, target) {
 					return target != player;
@@ -19826,16 +19824,17 @@ const skills = {
 				du: player.hasCard(function (card) {
 					return get.value(card, player, "raw") < 0;
 				}),
-				shuimeng: trigger.getParent(2).name == "shuimeng",
+				shuimeng: function () {
+					if (trigger.card.name == "guohe") return trigger.getParent(2).name == "shuimeng";
+					if (trigger.card.name == "wuzhong") return trigger.getParent(3).name == "shuimeng";
+				}(),
 				nh: nh,
 				cardname: trigger.card.name,
 				prompt: get.prompt2("qianya"),
-			});
-			"step 1";
-			if (result.bool) {
-				player.logSkill("qianya", result.targets);
-				player.give(result.cards, result.targets[0]);
-			}
+			}).forResult();
+		},
+		async content (event, trigger, player) {
+			player.give(event.cards, event.targets[0]);
 		},
 	},
 	xianfu: {
