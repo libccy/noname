@@ -19902,8 +19902,8 @@ const skills = {
 			return player.isDamaged();
 		},
 		logAudio(event, player) {
-			if (event.name == "damage") return ["xianfu4.mp3", "xianfu5.mp3"];
-			return ["xianfu3.mp3", "xianfu6.mp3"];
+			if (event.name == "damage") return ["xianfu5.mp3", "xianfu6.mp3"];
+			return ["xianfu3.mp3", "xianfu4.mp3"];
 		},
 		logTarget: "player",
 		content: function () {

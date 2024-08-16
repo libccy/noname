@@ -6848,7 +6848,17 @@ export const Content = {
 		"step 1";
 		event.result = result;
 		if (result.bool) {
-			if (event.logSkill) player.logSkill(event.logSkill, result.targets, false);
+			if (event.logSkill) {
+				if (typeof event.logSkill == "string") {
+					player.logSkill(event.logSkill, result.targets, false);
+				} else if (Array.isArray(event.logSkill)) {
+					if (event.logSkill.length >= 3) {
+						event.logSkill[1] = result.targets;
+						event.logSkill[2] = false;
+					} else if (event.logSkill.length) event.logSkill = [event.logSkill[0], result.targets, false];
+					player.logSkill.apply(player, event.logSkill);
+				}
+			}
 			player.line2(result.targets, "green");
 			event.targets = result.targets;
 		} else {
