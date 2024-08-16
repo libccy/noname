@@ -1529,7 +1529,12 @@ export const Content = {
 				// 与card交换位置
 				var card = children.find(element => element.contains(target));
 				// 判断是否可以移动
-				if (!filterMove(button, ui.selected.guanxing_button, event.moved)) return;
+				if (!card) {
+					if (!filterMove(ui.selected.guanxing_button, button._link, event.moved)) return;
+				}
+				else {
+					if (!filterMove(card, ui.selected.guanxing_button, event.moved)) return;
+				}
 				// FLIP动画
 				// first
 				buttonss.forEach(btn => {
@@ -1644,7 +1649,6 @@ export const Content = {
 				}
 			};
 			event.custom.replace.confirm = function (bool) {
-				if (event.isPlayingAnimation) return;
 				if (bool)
 					event._result = {
 						bool: true,
@@ -1679,7 +1683,7 @@ export const Content = {
 			if (moved)
 				result = {
 					bool: true,
-					moved: moved,
+					moved,
 				};
 			else result = { bool: false };
 		}
