@@ -2,7 +2,7 @@ const characterReplaces = {
 	caoren: ["caoren", "old_caoren", "sb_caoren", "new_caoren", "star_caoren"],
 	sp_caoren: ["sp_caoren", "jsp_caoren"],
 	xiahouyuan: ["re_xiahouyuan", "ol_xiahouyuan", "xiahouyuan"],
-	huangzhong: ["re_huangzhong", "ol_huangzhong", "sb_huangzhong", "huangzhong", "jsrg_huangzhong", "yj_huangzhong", "wuhujiang"],
+	huangzhong: ["re_huangzhong", "ol_huangzhong", "sb_huangzhong", "huangzhong", "jsrg_huangzhong", "yj_huangzhong", "wuhujiang", "ty_huangzhong"],
 	weiyan: ["re_weiyan", "ol_weiyan", "weiyan", "huan_weiyan"],
 	zhoutai: ["zhoutai", "xin_zhoutai", "old_zhoutai"],
 	xiaoqiao: ["xiaoqiao", "ol_xiaoqiao", "re_xiaoqiao", "sb_xiaoqiao", "old_xiaoqiao", "jd_sb_xiaoqiao", "yue_xiaoqiao"],
