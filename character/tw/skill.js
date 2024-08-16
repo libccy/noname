@@ -2,7 +2,176 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
-	//幻刘禅
+	//幻陆逊
+	twlifeng: {
+		enable: "phaseUse",
+		filter(event, player) {
+			if (!player.countCards("he")) return false;
+			let cardx = player.getCards("he").randomGet();
+			return player.countCards("he", card => get.number(card, player) != get.number(cardx, player));
+		},
+		filterCard(card, player) {
+			if (ui.selected.cards.length) return get.number(card, player) != get.number(ui.selected.cards[0], player);
+			return true;
+		},
+		position: "he",
+		selectCard: 2,
+		filterTarget(card, player, target) {
+			if (ui.selected.cards.length < 2) return false;
+			let cards = ui.selected.cards,
+				num = Math.abs(get.number(cards[0], player) - get.number(cards[1], player));
+			return get.distance(player, target) <= num;
+		},
+		check(card) {
+			return 7 - get.value(card);
+		},
+		complexSelect: true,
+		async content(event, player, target) {
+			await event.target.damage();
+		},
+		group: "twlifeng_effect",
+		subSkill: {
+			effect: {
+				trigger: {
+					source: "damageBegin3",
+				},
+				filter(event, player) {
+					return event.getParent().name == "twlifeng";
+				},
+				async cost(event, trigger, player) {
+					const target = trigger.player,
+						cards = trigger.getParent().cards,
+						num1 = get.number(cards[0]),
+						num2 = get.number(cards[1]);
+					if (target.countCards("h")) {
+						let max = num1 > num2;
+						const result = await target
+							.chooseCard("是否重铸一张手牌？", `若此牌点数位于${num1}和${num2}之间，防止此伤害`)
+							.set("ai", card => {
+								const maxNum = get.event("maxNum"),
+									minNum = get.event("minNum");
+								if (get.damageEffect(get.player(), get.event().getTrigger().source, get.player()) > 0) return 0;
+								if (get.number(card) >= minNum && get.number(card) <= minNum) return 15 - get.value(card);
+								return 8 - get.value(card);
+							})
+							.set("maxNum", max ? num1 : num2)
+							.set("minNum", max ? num2 : num1)
+							.forResult();
+						event.result = {
+							bool: result.bool,
+							cards: result.cards,
+						};
+					}
+					else {
+						const result = await target
+							.chooseBool("是否摸一张牌？", `若此牌点数位于${num1}和${num2}之间，防止此伤害`)
+							.forResult();
+						event.result = {
+							bool: result.bool,
+						};
+					}
+					event.result.cost_data = [num1, num2];
+					event.result.skill_popup = false;
+				},
+				async content(event, trigger, player) {
+					let card,
+						nums = event.cost_data,
+						target = trigger.player;
+					if (event.cards?.length > 0) {
+						await target.recast(event.cards);
+						card = event.cards[0];
+					}
+					else {
+						const { result } = await target.draw();
+						card = result[0];
+					}
+					if (nums[0] > nums[1]) nums.reverse();
+					if (nums[0] <= get.number(card) && nums[1] >= get.number(card)) {
+						trigger.cancel();
+						player.tempBanSkill("twlifeng");
+					}
+				},
+			},
+		},
+		ai: {
+			order: 5,
+			result: {
+				target(player, target) {
+					return get.damageEffect(target, player, player);
+				},
+			},
+		},
+	},
+	twniwo: {
+		trigger: {
+			player: "phaseUseBegin",
+		},
+		filter(event, player) {
+			return player.countCards("h") && game.hasPlayer(current => {
+				return current != player && current.countCards("h");
+			});
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt2(event.name.slice(0, -5)), lib.filter.notMe)
+				.set("ai", target => {
+					return -get.attitude(get.player(), target) / (target.countCards("h") + 1);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			const dialog = ["选择你与" + get.translation(target) + "的等量张手牌"];
+			if (player.countCards("h")) {
+				dialog.add("你的手牌");
+				dialog.add(player.getCards("h"));
+			}
+			if (target.countCards("h")) {
+				dialog.add(get.translation(target) + "的手牌");
+				let hs = target.getCards("h");
+				if (player.hasSkillTag("viewHandcard", null, target, true)) dialog.add(hs);
+				else dialog.add([hs, "blank"])
+			}
+			const result = await player
+				.chooseButton(dialog, true, [2, Infinity])
+				.set("filterOk", () => {
+					const buttons = ui.selected.buttons;
+					return buttons.filter(i => get.owner(i.link) == get.player()).length * 2 == buttons.length;
+				})
+				.set("cards", function () {
+					let cards = player.getCards("h").slice(0).sort((a, b) => get.value(a) - get.value(b));
+					let result = [];
+					while (result.length < target.countCards("h")) {
+						let card = cards.shift();
+						if (get.value(card) <= 5) result.push(card);
+						else break;
+					}
+					return result.concat(target.getCards("h").randomGets(result.length));
+				}())
+				.set("ai", button => {
+					return get.event("cards").includes(button.link);
+				})
+				.forResult();
+			for (const owner of [player, target]) {
+				owner.addTempSkill("twniwo_block");
+				owner.addGaintag(result.links.filter(i => get.owner(i) == owner), "twniwo");
+			}
+		},
+		subSkill: {
+			block: {
+				charlotte: true,
+				onremove(player) {
+					player.removeGaintag("twniwo");
+				},
+				mod: {
+					cardEnabled2(card) {
+						if (card.hasGaintag("twniwo")) return false;
+					},
+				},
+			},
+		},
+	},
+//幻刘禅
 	twguihan: {
 		audio: 2,
 		enable: "phaseUse",
