@@ -247,7 +247,7 @@ const skills = {
 					list = get.gainableCharacters();
 				}
 				list.forEach(name => {
-					if (name !== "dc_xunyuxunyou") {
+					if (name !== "xunyuxunyou") {
 						const skills = get.character(name, 3);
 						skills.forEach(skill => {
 							const info = get.info(skill);
