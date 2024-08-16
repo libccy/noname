@@ -835,8 +835,9 @@ const skills = {
 						.getAllGlobalHistory("everything", evt => {
 							return (
 								evt.name == "dying" &&
+								evt.player == player &&
 								!game.getAllGlobalHistory("everything", evtx => {
-									return evtx.name == "die" && evtx.getParent().name == "dying";
+									return evtx.name == "die" && evtx.player == player && evtx.getParent().name == "dying";
 								}).length
 							);
 						})
@@ -1121,14 +1122,15 @@ const skills = {
 				.set("id", eventId)
 				.set("_global_waiting", true)
 				.set("ai", () => get.event().idx)
-				.set("idx", function() {
-					let cha = get.effect(player, {name: "sha"}, source, player) *
-						source.mayHaveSha(player, "use", null, "odds") -
-						get.effect(player, {name: "draw"}, source, player);
-					if (Math.abs(cha) < player.hp * player.hp) return [0, 1].randomGet();
-					if (cha > 0) return 0;
-					return 1;
-				}());
+				.set(
+					"idx",
+					(function () {
+						let cha = get.effect(player, { name: "sha" }, source, player) * source.mayHaveSha(player, "use", null, "odds") - get.effect(player, { name: "draw" }, source, player);
+						if (Math.abs(cha) < player.hp * player.hp) return [0, 1].randomGet();
+						if (cha > 0) return 0;
+						return 1;
+					})()
+				);
 		},
 		subSkill: {
 			addTarget: {
@@ -10168,7 +10170,7 @@ const skills = {
 		},
 		forced: true,
 		logAudio(event, player) {
-			return "olximo" +(1 + player.countMark("olbixin")) +".mp3";
+			return "olximo" + (1 + player.countMark("olbixin")) + ".mp3";
 		},
 		content: function () {
 			player.addMark("olbixin", 1, false);
@@ -15108,11 +15110,8 @@ const skills = {
 			if (list.length) {
 				var next = player.chooseButton(["视为对" + get.translation(target) + "使用一张牌", [list, "vcard"]]).set("ai", function (button) {
 					let evt = _status.event.getParent(),
-						eff =  get.effect(evt.target, { name: button.link[2] }, evt.player, evt.player);
-					if (
-						evt.target.hp < 2 ||
-						get.attitude(evt.player, evt.target) > 0 ||
-						evt.target.hp < 3 && get.tag(button.link, "damage")) return eff;
+						eff = get.effect(evt.target, { name: button.link[2] }, evt.player, evt.player);
+					if (evt.target.hp < 2 || get.attitude(evt.player, evt.target) > 0 || (evt.target.hp < 3 && get.tag(button.link, "damage"))) return eff;
 					return eff + get.effect(evt.player, { name: "sha" }, evt.target, evt.player);
 				});
 				if (event.count == 0) next.set("forced", true);
@@ -27416,7 +27415,7 @@ const skills = {
 				},
 				target(player, target) {
 					return get.effect(target, { name: "tiesuo" }, player, target) / get.attitude(target, target);
-				}
+				},
 			},
 			order: 2,
 			expose: 0.3,
@@ -27427,7 +27426,6 @@ const skills = {
 					}
 				},
 			},
-
 		},
 	},
 	xiaoguo: {
@@ -28774,61 +28772,70 @@ const skills = {
 		filter: function (event, player) {
 			return player.countCards("he", { type: "equip" }) > 0;
 		},
-		logAudio(_1, _2, _3, _4, result){
+		logAudio(_1, _2, _3, _4, result) {
 			return "yuanhu" + Math.max(get.equipNum(result.cards[0]), 3) + ".mp3";
 		},
-		async cost(event, trigger, player){
-			event.result = await player.chooseCardTarget({
-				filterCard: function (card) {
-					return get.type(card) == "equip";
-				},
-				position: "he",
-				filterTarget: function (card, player, target) {
-					return target.canEquip(card);
-				},
-				ai1: function (card) {
-					return 6 - get.value(card);
-				},
-				ai2: function (target) {
-					return get.attitude(_status.event.player, target) - 3;
-				},
-				prompt: get.prompt2("yuanhu"),
-			}).forResult();
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseCardTarget({
+					filterCard: function (card) {
+						return get.type(card) == "equip";
+					},
+					position: "he",
+					filterTarget: function (card, player, target) {
+						return target.canEquip(card);
+					},
+					ai1: function (card) {
+						return 6 - get.value(card);
+					},
+					ai2: function (target) {
+						return get.attitude(_status.event.player, target) - 3;
+					},
+					prompt: get.prompt2("yuanhu"),
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
-				const target = result.targets[0];
-				const card = result.cards[0];
-				target.equip(card);
-				if (target != player) {
-					player.$give(card, target, false);
-				}
-				switch (get.subtype(card)) {
-					case "equip1": {
-						if (
-							!game.hasPlayer(function (current) {
-								return get.distance(target, current) <= 1;
-							})
-						) return;
-						await game.delay();
-						const { targets } = await player
-							.chooseTarget(true, function (card, player, target) {
-								return get.distance(_status.event.thisTarget, target) <= 1 && target.countCards("hej");
-							})
-							.set("ai", function (target) {
-								var attitude = get.attitude(_status.event.player, target);
-								if (attitude > 0 && target.countCards("j")) {
-									return attitude * 1.5;
-								}
-								return -attitude;
-							})
-							.set("thisTarget", target).forResult();
-						if(targets.length) await player.discardPlayerCard(true, targets[0], "hej");
+			const target = result.targets[0];
+			const card = result.cards[0];
+			target.equip(card);
+			if (target != player) {
+				player.$give(card, target, false);
+			}
+			switch (get.subtype(card)) {
+				case "equip1": {
+					if (
+						!game.hasPlayer(function (current) {
+							return get.distance(target, current) <= 1;
+						})
+					)
 						return;
-					}
-					case "equip2": await target.draw(); return;
-					case "equip5": return;
-					default: await target.recover(); return;
+					await game.delay();
+					const { targets } = await player
+						.chooseTarget(true, function (card, player, target) {
+							return get.distance(_status.event.thisTarget, target) <= 1 && target.countCards("hej");
+						})
+						.set("ai", function (target) {
+							var attitude = get.attitude(_status.event.player, target);
+							if (attitude > 0 && target.countCards("j")) {
+								return attitude * 1.5;
+							}
+							return -attitude;
+						})
+						.set("thisTarget", target)
+						.forResult();
+					if (targets.length) await player.discardPlayerCard(true, targets[0], "hej");
+					return;
 				}
+				case "equip2":
+					await target.draw();
+					return;
+				case "equip5":
+					return;
+				default:
+					await target.recover();
+					return;
+			}
 		},
 	},
 	tianming: {
