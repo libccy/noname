@@ -1,4 +1,11 @@
 export default {
+	"#mbquchong1": "器有九距之备，亦有九攻之变。",
+	"#mbquchong2": "攻城之机变，于此车皆可解之！",
+	"#mbquchong3": "大攻起兮，可辟山海之艰！",
+	"#mbquchong4": "破坚阵如朽木，履高城如平地。",
+	"#mbxunjie1": "藏于心者竭爱，动于身者竭恭。",
+	"#mbxunjie2": "修身如藏器，大巧若无工。",
+	"#mb_zhangfen:die": "而立之年，未立功名，实憾也……",
 	"#qiaomeng_xin_gongsunzan1": "夺汝兵刃战马，尔等必败无疑。",
 	"#qiaomeng_xin_gongsunzan2": "摧敌似折枯，荡寇如反掌。",
 	"#mbbifeng1": "众士暂避其锋，万不可冲撞圣驾。",

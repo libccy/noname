@@ -4,7 +4,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//张奋
 	mbquchong: {
-		audio: 2,
+		audio: 4,
 		trigger: { player: "phaseUseBegin" },
 		filter(event, player) {
 			if (
@@ -28,6 +28,7 @@ const skills = {
 			);
 		},
 		direct: true,
+		logAudio: index => (typeof index === "number" ? "mbquchong" + index + ".mp3" : 4),
 		async content(event, trigger, player) {
 			if (
 				game.hasPlayer(target => {
@@ -47,7 +48,7 @@ const skills = {
 						"canReplace"
 					)
 					.set("nojudge", true)
-					.set("logSkill", "mbquchong");
+					.set("logSkill", ["mbquchong", null, null, null, [4]]);
 			} else {
 				const numbers = Array.from({ length: 13 }).map((_, i) => get.strNumber(i + 1));
 				const costMark = [0, 5, 10, 10][player.getAllHistory("custom", evt => evt.name == "mbquchong").length];
@@ -97,7 +98,7 @@ const skills = {
 						.forResult();
 					if (resultx.bool) {
 						const target = resultx.targets[0];
-						player.logSkill("mbquchong", target);
+						player.logSkill("mbquchong", target, null, null, [card.name == "dagongche_attack" ? 3 : 2]);
 						if (costMark > 0) player.removeMark("mbquchong", costMark);
 						player.getHistory("custom").push({ name: "mbquchong" });
 						await target.gain(card, "gain2");
@@ -126,11 +127,11 @@ const skills = {
 		derivation: ["dagongche_attack", "dagongche_defend"],
 		subSkill: {
 			recast: {
-				audio: "mbquchong",
+				audio: "mbquchong1.mp3",
 				inherit: "drlt_huairou",
 			},
 			remove: {
-				audio: "mbquchong",
+				audio: "mbquchong1.mp3",
 				trigger: { global: "phaseEnd" },
 				filter(event, player) {
 					return get.discardPile(i => get.type(i, false) == "equip");
