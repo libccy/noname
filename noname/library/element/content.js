@@ -6852,8 +6852,10 @@ export const Content = {
 				if (typeof event.logSkill == "string") {
 					player.logSkill(event.logSkill, result.targets, false);
 				} else if (Array.isArray(event.logSkill)) {
-					event.logSkill[1] = result.targets;
-					event.logSkill[2] = false;
+					if (event.logSkill.length >= 3) {
+						event.logSkill[1] = result.targets;
+						event.logSkill[2] = false;
+					} else if (event.logSkill.length) event.logSkill = [event.logSkill[0], result.targets, false];
 					player.logSkill.apply(player, event.logSkill);
 				}
 			}
