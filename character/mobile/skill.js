@@ -2,6 +2,171 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//SP甄宓
+	mbbojian: {
+		audio: 2,
+		init(player) {
+			player.addSkill("mbbojian_record");
+		},
+		trigger: {
+			player: "phaseUseEnd",
+		},
+		filter(event, player) {
+			const record = _status.mbbojian;
+			if (!record || !record[player.playerid]) return false;
+			const history = player.getHistory("useCard", evt => evt.getParent("phaseUse", true));
+			const num1 = history.length,
+				num2 = history.map(evt => get.suit(evt.card)).toUniqued().length,
+				cards = history.reduce((list, evt) => list.addArray(evt.cards.filterInD("d")), []);
+			return (num1 != record[player.playerid][0] && num2 != record[player.playerid][1]) || cards.length;
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			const record = _status.mbbojian;
+			const history = player.getHistory("useCard", evt => evt.getParent("phaseUse", true));
+			const num1 = history.length,
+				num2 = history.map(evt => get.suit(evt.card)).toUniqued().length,
+				cards = history.reduce((list, evt) => list.addArray(evt.cards.filterInD("d")), []);
+			if (num1 != record[player.playerid][0] && num2 != record[player.playerid][1]) await player.draw(2);
+			else {
+				const links =
+					cards.length == 1
+						? cards
+						: await player
+								.chooseButton(["博鉴：请选择要分配的牌", cards], true)
+								.set("ai", button => {
+									return get.value(button.link);
+								})
+								.forResultLinks();
+				const togive = links[0];
+				const { result } = await player.chooseTarget("选择获得" + get.translation(togive) + "的角色", true).set("ai", target => {
+					const player = get.player();
+					return get.attitude(player, target);
+				});
+				if (result.bool) {
+					await result.targets[0].gain(togive, "gain2");
+				}
+			}
+		},
+		subSkill: {
+			record: {
+				trigger: {
+					player: "phaseUseAfter",
+				},
+				firstDo: true,
+				charlotte: true,
+				forced: true,
+				popup: false,
+				async content(event, trigger, player) {
+					const history = player.getHistory("useCard", evt => evt.getParent("phaseUse", true));
+					const num1 = history.length,
+						num2 = history.map(evt => get.suit(evt.card)).toUniqued().length;
+					if (!_status.mbbojian) _status.mbbojian = {};
+					_status.mbbojian[player.playerid] = [num1, num2];
+					player.markSkill(event.name);
+				},
+				intro: {
+					markcount: () => 0,
+					content(storage, player) {
+						const record = _status.mbbojian;
+						if (!record || !record[player.playerid]) return "无信息";
+						return "上个出牌阶段使用牌情况：①牌数：" + record[player.playerid][0] + "；②花色数：" + record[player.playerid][1];
+					},
+				},
+			},
+		},
+	},
+	mbjiwei: {
+		audio: 2,
+		getNum(event, player) {
+			let num = 0;
+			if (game.countPlayer2(current => current.hasHistory("lose")) > 1) num++;
+			if (game.countPlayer2(current => current.hasHistory("damage")) > 1) num++;
+			if (event.name == "phase") return num;
+			return Math.max(game.countPlayer(), player.getHp());
+		},
+		trigger: {
+			player: "phaseZhunbeiBegin",
+			global: "phaseEnd",
+		},
+		filter(event, player) {
+			const num = get.info("mbjiwei").getNum(event, player);
+			if (event.name == "phaseZhunbei") return player.countCards("h") >= num && game.hasPlayer(current => current != player);
+			return event.player != player && num > 0;
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			const num = get.info("mbjiwei").getNum(trigger, player);
+			if (trigger.name == "phase") await player.draw(num);
+			else {
+				const cards = player.getCards("h"),
+					map = {};
+				for (let color of ["red", "black", "none"]) {
+					if (typeof map[color] != "number") map[color] = 0;
+					map[color] += cards.filter(card => get.color(card) == color).length;
+				}
+				const list = [];
+				for (var i in map) {
+					if (map[i] > 0) list.push([`${i}2`, map[i]]);
+				}
+				list.sort((a, b) => b[1] - a[1]);
+				let colors = list.filter(i => i[1] == list[0][1]).map(i => i[0]);
+				const control = colors.length == 1 ? colors[0] : await player.chooseControl(colors).set("prompt", "济危：请选择一个颜色").forResultControl();
+				let togive = player.getCards("h").filter(card => get.color(card) == control.slice(0, -1));
+				if (_status.connectMode) game.broadcastAll(() => (_status.noclearcountdown = true));
+				let given_map = [];
+				while (togive.length) {
+					const {
+						result: { bool, cards, targets },
+					} = await player.chooseCardTarget({
+						forced: true,
+						filterCard(card, player) {
+							return get.event("togive").includes(card) && !card.hasGaintag("olsujian_given");
+						},
+						selectCard: [1, Infinity],
+						position: "h",
+						filterTarget: lib.filter.notMe,
+						prompt: "济危：请选择要分配的卡牌和目标",
+						ai1(card) {
+							return !ui.selected.cards.length && card.name == "du" ? 1 : 0;
+						},
+						ai2(target) {
+							const player = get.event("player");
+							const card = ui.selected.cards[0];
+							if (card) return get.value(card, target) * get.attitude(player, target);
+							return 0;
+						},
+						togive: togive,
+					});
+					if (bool) {
+						togive.removeArray(cards);
+						const target = targets[0];
+						if (given_map.some(i => i[0] == target)) {
+							given_map[given_map.indexOf(given_map.find(i => i[0] == target))][1].addArray(cards);
+						} else given_map.push([target, cards]);
+						player.addGaintag(cards, "olsujian_given");
+					} else break;
+				}
+				if (_status.connectMode) {
+					game.broadcastAll(() => {
+						delete _status.noclearcountdown;
+						game.stopCountChoose();
+					});
+				}
+				if (given_map.length) {
+					await game
+						.loseAsync({
+							gain_list: given_map,
+							player: player,
+							cards: given_map.slice().map(list => list[1]),
+							giver: player,
+							animate: "giveAuto",
+						})
+						.setContent("gaincardMultiple");
+				}
+			}
+		},
+	},
 	//张奋
 	mbquchong: {
 		audio: 2,
