@@ -4955,23 +4955,19 @@ const skills = {
 				.chooseControl("弃牌，+1", "摸牌，-1", "cancel2")
 				.set("choiceList", ["令" + str + "弃置一张牌，且其本回合手牌上限+1", "令" + str + "摸一张牌，且其本回合手牌上限-1"])
 				.set("ai", function () {
-					var player = _status.event.player;
-					var trigger = _status.event.getTrigger();
-					var target = trigger.player;
-					var num1 = target.countCards("h"),
-						num2 = target.getHandcardLimit();
-					switch (get.sgn(get.attitude(player, target))) {
-						case 0:
-							return 2;
-						case 1:
-							if (num1 - 1 >= num2) return 0;
-							if (num1 + 1 <= num2) return 1;
-							return 2;
-						case -1:
-							if (num1 - 2 <= num2) return 0;
-							if (num1 + 3 >= num2) return 1;
-							return 2;
-					}
+					let player = _status.event.player,
+						target = _status.event.getTrigger().player,
+						att = get.sgn(get.attitude(player, target));
+					if (!att) return 2;
+					let dis = target.needsToDiscard(0, null, true),
+						res = [
+							-att * (1 + Math.max(0, dis - (target.hasCard(i => {
+								return get.value(i, target) <= 6;
+							}, "e") ? 1 : 2))),
+							att * (1 - Math.max(0, dis + 2)),
+							-att * dis
+						];
+					return res.indexOf(Math.max(...res));
 				})
 				.set("prompt", get.prompt("olrunwei", trigger.player));
 			"step 1";
@@ -4979,9 +4975,15 @@ const skills = {
 				player.logSkill("olrunwei", trigger.player);
 				if (result.index == 0) {
 					trigger.player.chooseToDiscard("he", true).set("ai", card => {
-						if (get.position(card) == "e") return -get.value(card);
+						if (get.position(card) == "e") return get.event().e-get.value(card);
 						return 1 / (get.value(card) || 0.5);
-					});
+					}).set("e", function () {
+						if (!trigger.player.hasCard(i => {
+							return get.value(i, trigger.player) <= 6;
+						}, "e")) return 0;
+						if (!trigger.player.needsToDiscard(-2)) return 0;
+						return 6.2;
+					}());
 					trigger.player.addTempSkill("olrunwei_+");
 					trigger.player.addMark("olrunwei_+", 1, false);
 				}
@@ -19758,14 +19760,12 @@ const skills = {
 	qianya: {
 		audio: 2,
 		trigger: { target: "useCardToTargeted" },
-		direct: true,
 		filter: function (event, player) {
 			return get.type(event.card, "trick") == "trick" && player.countCards("h");
 		},
-		content: function () {
-			"step 0";
-			var nh = player.countCards("h");
-			player.chooseCardTarget({
+		async cost(event, trigger, player) {
+			let nh = player.countCards("h");
+			event.result = await player.chooseCardTarget({
 				filterCard: true,
 				filterTarget: function (card, player, target) {
 					return target != player;
@@ -19836,16 +19836,17 @@ const skills = {
 				du: player.hasCard(function (card) {
 					return get.value(card, player, "raw") < 0;
 				}),
-				shuimeng: trigger.getParent(2).name == "shuimeng",
+				shuimeng: function () {
+					if (trigger.card.name == "guohe") return trigger.getParent(2).name == "shuimeng";
+					if (trigger.card.name == "wuzhong") return trigger.getParent(3).name == "shuimeng";
+				}(),
 				nh: nh,
 				cardname: trigger.card.name,
 				prompt: get.prompt2("qianya"),
-			});
-			"step 1";
-			if (result.bool) {
-				player.logSkill("qianya", result.targets);
-				player.give(result.cards, result.targets[0]);
-			}
+			}).forResult();
+		},
+		async content (event, trigger, player) {
+			player.give(event.cards, event.targets[0]);
 		},
 	},
 	xianfu: {
