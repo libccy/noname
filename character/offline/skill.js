@@ -50,7 +50,7 @@ const skills = {
 			}
 		},
 	},
-	//刺客×4
+	//刺客×4 孩子，我们分身
 	tyliupo: {
 		mark: true,
 		zhuanhuanji: true,
@@ -2592,6 +2592,7 @@ const skills = {
 			return player.countCards("h") > 1;
 		},
 		check(card) {
+			const player = get.player();
 			if (ui.selected.cards.length >= 2) return 0;
 			if (player.getUseValue(card)) return 10 - get.value(card);
 			return 6 - get.value(card);
@@ -2602,8 +2603,9 @@ const skills = {
 		discard: false,
 		filterTarget: lib.filter.notMe,
 		async content(event, trigger, player) {
-			const target = event.target, cards = event.cards;
-			await player.showCards(get.translation(player) + '发动了【臣德】', cards);
+			const target = event.target,
+				cards = event.cards;
+			await player.showCards(get.translation(player) + "发动了【臣德】", cards);
 			await player.give(cards, target, true);
 			let list = [];
 			for (let card of cards) {

@@ -768,6 +768,7 @@ const translates = {
 	tywuhun: "武魂",
 	tywuhun_info: "锁定技，你受到1点伤害后，令伤害来源获得1枚“梦魇”标记；当你死亡时，你令杀人凶手或拥有“梦魇”标记最多的一名其他角色进行判定，若结果不为【桃】，其死亡。",
 	ty_anying: "暗影",
+	ty_anyingx: "暗影",
 	ty_wuque: "乌鹊",
 	ty_yanque: "阎鹊",
 	ty_wangque: "亡鹊",
