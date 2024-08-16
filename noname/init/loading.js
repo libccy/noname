@@ -309,7 +309,7 @@ export async function loadExtension(extension) {
 
 				loadCharacter(content);
 			}
-			if (typeof extension[4].card?.card == "object" && Object.keys(extension[4].card).length > 0) {
+			if (typeof extension[4].card?.card == "object" && Object.keys(extension[4].card.card).length > 0) {
 				const content = { ...extension[4].card };
 				content.name = extension[0];
 				content.translate ??= {};
