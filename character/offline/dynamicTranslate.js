@@ -28,5 +28,13 @@ const dynamicTranslates = {
 		else yin="<span class='bluetext'>"+yin+"</span>";
 		return str+yin+yang;
 	},
+	tyliupo(player){
+		let str="转换技，回合开始时，你令本轮：",
+			yin="阴：所有角色不能使用【桃】；",
+			yang="阳：所有即将造成的伤害均视为体力流失。";
+		if(player.storage.tyliupo) yang="<span class='firetext'>"+yang+"</span>";
+		else yin="<span class='bluetext'>"+yin+"</span>";
+		return str+yin+yang;
+	},
 };
 export default dynamicTranslates;

@@ -752,6 +752,10 @@ window.noname_character_rank = {
 		"new_simayi",
 	],
 	bp: [
+		"ty_anying",
+		"ty_wuque",
+		"ty_yanque",
+		"ty_wangque",
 		"ty_shen_liubei",
 		"ty_shen_zhangfei",
 		"ty_shen_guanyu",
@@ -2120,6 +2124,7 @@ window.noname_character_rank = {
 			"jd_simayan",
 		],
 		epic: [
+			"ty_anying",
 			"ty_shen_liubei",
 			"ty_shen_zhangfei",
 			"ty_shen_guanyu",
@@ -2458,6 +2463,9 @@ window.noname_character_rank = {
 			"ol_sb_sunjian",
 		],
 		rare: [
+			"ty_wuque",
+			"ty_yanque",
+			"ty_wangque",
 			"ty_fanjiang",
 			"ty_zhangda",
 			"ty_liue",

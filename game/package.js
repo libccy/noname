@@ -58,6 +58,7 @@ window.noname_package = {
 		hearth: "炉石传说",
 		gwent: "昆特牌",
 		mtg: "万智牌",
+		xianxia: "线下卡牌",
 		huanlekapai: "欢乐卡牌",
 	},
 	play: {
