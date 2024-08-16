@@ -2954,16 +2954,12 @@ const skills = {
 									return get.order(card);
 								return -1;
 							}
-							//如果自己没有其他的闪桃就不响应
-							else {
-								const needsTao = player.hp <= 1;
-								const shanAndTao = player.getCards("hs", card => {
-									const name = get.name(card);
-									return name == "shan" || (needsTao && name == "shan");
-								});
-								shanAndTao.remove(card);
-								if (card.cards) shanAndTao.removeArray(card.cards);
-								if (!shanAndTao.length) return 0;
+							else { //不残或者没有其他的闪就不响应
+								if (player.hp > 1 || !player.hasCard("hs", i => {
+									if (i == card || card.cards && card.cards.includes(i)) return false;
+									let name = get.name(i, player);
+									return name == "shan" || name == "tao" || name == "jiu";
+								})) return 0;
 							}
 							return event.getRand("dcsbpingliao") > 1 / Math.max(1, player.hp) ? 0 : get.order(card);
 						})
@@ -7400,7 +7396,7 @@ const skills = {
 			game.cardsGotoOrdering(cards);
 			var next = player.chooseToMove();
 			next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
-			next.set("prompt", "尽瘁：点击将牌移动到牌堆顶或牌堆底");
+			next.set("prompt", "尽瘁：点击或拖动将牌移动到牌堆顶或牌堆底");
 			next.processAI = function (list) {
 				var cards = list[0][1],
 					player = _status.event.player;
@@ -9594,7 +9590,7 @@ const skills = {
 			const cards = [];
 			game.countPlayer2(current => {
 				current.getHistory("lose", evt => {
-					if (evt.type == "discard") cards.addArray(evt.cards2.filterInD("d"));
+					if (evt.type == "discard") cards.addArray(evt.cards.filterInD("d"));
 				});
 			});
 			return cards;
@@ -10263,6 +10259,23 @@ const skills = {
 				},
 			},
 			all: {
+				mod: {
+					aiOrder(player, card, num) {
+						if (num <= 0) return;
+						if (get.tag(card, "recover") && !_status.event.dying && player.hp > 0) return 0;
+						if (get.tag(card, "damage")) {
+							if (card.name == "sha" && game.hasPlayer(cur => {
+								return (
+									cur.hp < 2 &&
+									player.canUse(card, cur, null, true) &&
+									get.effect(cur, card, player, player) > 0
+								);
+							})) return num;
+							if (player.needsToDiscard()) return num / 5;
+							return 0;
+						}
+					}
+				},
 				trigger: { player: "dieAfter" },
 				filter: function (event, player) {
 					return !game.hasPlayer(current => current.hasSkill("dcwumei_wake"), true);
@@ -10271,14 +10284,6 @@ const skills = {
 				forceDie: true,
 				content: function () {
 					game.removeGlobalSkill("dcwumei_all");
-				},
-				ai: {
-					effect: {
-						player(card, player, target) {
-							if (get.tag(card, "recover") && target.hp > 0) return 0;
-							if (get.tag(card, "damage")) return 0.5;
-						},
-					},
 				},
 			},
 		},
@@ -13102,9 +13107,8 @@ const skills = {
 				var list = player.storage.dcgeyuan.filter(i => lib.skill.dcgeyuan.filterNumber(player, i));
 				if (!list.length) return 0;
 				list = list.map(num => {
-					var list = [1, 10, 11, 12, 13];
-					if (list.includes(num)) return ["A", "X", "J", "Q", "K"][list.indexOf(num)];
-					return parseFloat(num);
+					if (num == 10) return "X";
+					return get.strNumber(num);
 				});
 				return list.reduce((str, num) => {
 					return str + num;
@@ -14562,7 +14566,7 @@ const skills = {
 			game.cardsGotoOrdering(cards);
 			var next = player.chooseToMove();
 			next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
-			next.set("prompt", "天运：点击将牌移动到牌堆顶或牌堆底");
+			next.set("prompt", "天运：点击或拖动将牌移动到牌堆顶或牌堆底");
 			next.processAI = function (list) {
 				var cards = list[0][1];
 				return [[], cards];
@@ -17390,15 +17394,15 @@ const skills = {
 					.forResult();
 			}
 		},
-		async content(event,trigger,player){
-			const target=event.targets[0];
-			const result= await player.discardPlayerCard(target, "hej", true).forResult();
-			const card=result.cards[0];
-			const str=["identity", "guozhan"].includes(get.mode())?"另一名其他角色":"对手";
-			const filter=["identity", "guozhan"].includes(get.mode())?(current)=>{
-				if(current==player||current==target) return false;
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			const result = await player.discardPlayerCard(target, "hej", true).forResult();
+			const card = result.cards[0];
+			const str = ["identity", "guozhan"].includes(get.mode()) ? "另一名其他角色" : "对手";
+			const filter = ["identity", "guozhan"].includes(get.mode()) ? (current) => {
+				if (current == player || current == target) return false;
 				return true;
-			}:(current)=>{
+			} : (current) => {
 				return current.isEnemyOf(player);
 			};
 			const list = [];
@@ -17411,12 +17415,12 @@ const skills = {
 			if (!list.length) return;
 			let result2;
 			if (list.length == 1) result2 = { control: list[0] };
-			else{
-				result2=await player
+			else {
+				result2 = await player
 					.chooseControl(list)
-					.set("prompt", "挫锐：展示"+str+"的至多两张手牌，或弃置"+str+"装备区内至多两张" + get.translation(get.color(card)) + "牌")
+					.set("prompt", "挫锐：展示" + str + "的至多两张手牌，或弃置" + str + "装备区内至多两张" + get.translation(get.color(card)) + "牌")
 					.set("resultx", function () {
-						let color =get.color(card);
+						let color = get.color(card);
 						if (
 							game.countPlayer(function (current) {
 								if (!filter(current)) return false;
@@ -17428,10 +17432,10 @@ const skills = {
 							return 1;
 						return 0;
 					}())
-					.set("ai",()=>_status.event.resultx)
+					.set("ai", () => _status.event.resultx)
 					.forResult();
 			}
-			if(result2.control=="展示手牌"){
+			if (result2.control == "展示手牌") {
 				let dialog = ["请选择要展示的牌"];
 				let targets = game
 					.filterPlayer(function (current) {
@@ -17443,16 +17447,16 @@ const skills = {
 					if (player.hasSkillTag("viewHandcard", null, i, true)) dialog.push(i.getCards("h"));
 					else dialog.push([i.getCards("h"), "blank"]);
 				}
-				const result2 =await player
+				const result2 = await player
 					.chooseButton([1, 2], true)
 					.set("createDialog", dialog)
-					.set("color",get.color(card))
-					.set("filterButton",button=>{
-						if(!["identity", "guozhan"].includes(get.mode())) return true;
-						if(!ui.selected.buttons.length) return true;
-						return get.owner(button.link)==get.owner(ui.selected.buttons[0].link);
+					.set("color", get.color(card))
+					.set("filterButton", button => {
+						if (!["identity", "guozhan"].includes(get.mode())) return true;
+						if (!ui.selected.buttons.length) return true;
+						return get.owner(button.link) == get.owner(ui.selected.buttons[0].link);
 					})
-					.set("ai", button=> {
+					.set("ai", button => {
 						let color = get.color(button.link) == _status.event.color;
 						return color ? Math.random() : 0.35;
 					})
@@ -17475,11 +17479,11 @@ const skills = {
 					game.log(player, "展示了", source, "的", map[i]);
 				}
 			}
-			else{
+			else {
 				let dialog = ["请选择要弃置的牌"];
 				let targets = game
 					.filterPlayer(function (current) {
-						return filter(current)&&current.countCards("e", function (cardx) {
+						return filter(current) && current.countCards("e", function (cardx) {
 							return get.color(card) == get.color(cardx);
 						});
 					})
@@ -17492,13 +17496,13 @@ const skills = {
 						})
 					);
 				}
-				const result2=await player
+				const result2 = await player
 					.chooseButton([1, 2], true)
 					.set("createDialog", dialog)
-					.set("filterButton",button=>{
-						if(!["identity", "guozhan"].includes(get.mode())) return true;
-						if(!ui.selected.buttons.length) return true;
-						return get.owner(button.link)==get.owner(ui.selected.buttons[0].link);
+					.set("filterButton", button => {
+						if (!["identity", "guozhan"].includes(get.mode())) return true;
+						if (!ui.selected.buttons.length) return true;
+						return get.owner(button.link) == get.owner(ui.selected.buttons[0].link);
 					})
 					.set("ai", function (button) {
 						let owner = get.owner(button.link);
@@ -17513,7 +17517,7 @@ const skills = {
 					map[id].push(i);
 				}
 				for (let i in map) {
-					const next=(_status.connectMode ? lib.playerOL : game.playerMap)[i].discard(map[i], "notBySelf");
+					const next = (_status.connectMode ? lib.playerOL : game.playerMap)[i].discard(map[i], "notBySelf");
 					next.discarder = player;
 					await next;
 				}

@@ -570,7 +570,7 @@ const skills = {
 				charlotte: true,
 				forced: true,
 				filter: function (event, player) {
-					return event.source && event.source.isIn() && event.source.hasSkill("mingjian2");
+					return event.source && event.source.isIn() && event.source.hasSkill("remingjian_buff");
 				},
 				content: function () {
 					player.restoreSkill("rexingshuai");
@@ -3313,20 +3313,14 @@ const skills = {
 					}
 				},
 				intro: {
-					markcount: function (card, player) {
-						var num = get.number(card, player);
-						var list = [1, 11, 12, 13];
-						if (list.includes(num)) return ["A", "J", "Q", "K"][list.indexOf(num)];
-						return parseFloat(num);
+					markcount(card, player) {
+						return get.strNumber(get.number(card, player));
 					},
 					content: function (card, player) {
 						var suit = get.suit(card, player);
 						var num = get.number(card, player);
 						var str = "<li>上一张牌的花色：" + get.translation(suit);
-						str += "<br><li>上一张牌的点数：";
-						var list = [1, 11, 12, 13];
-						if (list.includes(num)) str += ["A(1)", "J(11)", "Q(12)", "K(13)"][list.indexOf(num)];
-						else str += parseFloat(num);
+						str += "<br><li>上一张牌的点数：" + get.strNumber(num);
 						return str;
 					},
 				},
@@ -12858,7 +12852,7 @@ const skills = {
 			game.cardsGotoOrdering(cards);
 			var next = player.chooseToMove();
 			next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
-			next.set("prompt", "观星：点击将牌移动到牌堆顶或牌堆底");
+			next.set("prompt", "观星：点击或拖动将牌移动到牌堆顶或牌堆底");
 			next.processAI = function (list) {
 				var cards = list[0][1],
 					player = _status.event.player;

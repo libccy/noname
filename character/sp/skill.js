@@ -1120,7 +1120,15 @@ const skills = {
 				.set("source", source)
 				.set("id", eventId)
 				.set("_global_waiting", true)
-				.set("ai", () => Math.max(0, get.sgn(get.attitude(get.event().player, get.event().source))));
+				.set("ai", () => get.event().idx)
+				.set("idx", function() {
+					let cha = get.effect(player, {name: "sha"}, source, player) *
+						source.mayHaveSha(player, "use", null, "odds") -
+						get.effect(player, {name: "draw"}, source, player);
+					if (Math.abs(cha) < player.hp * player.hp) return [0, 1].randomGet();
+					if (cha > 0) return 0;
+					return 1;
+				}());
 		},
 		subSkill: {
 			addTarget: {
@@ -4462,10 +4470,8 @@ const skills = {
 				marktext: "＞",
 				intro: {
 					markcount: list => {
-						var list2 = [1, 11, 12, 13];
 						return list.reduce((str, num) => {
-							if (list2.includes(num)) return str + ["A", "J", "Q", "K"][list2.indexOf(num)];
-							return str + parseFloat(num);
+							return str + get.strNumber(num);
 						}, "");
 					},
 					content: "使用的下一张点数大于$的普通锦囊牌额外结算一次",
@@ -4499,10 +4505,8 @@ const skills = {
 				marktext: "<",
 				intro: {
 					markcount: list => {
-						var list2 = [1, 11, 12, 13];
 						return list.reduce((str, num) => {
-							if (list2.includes(num)) return str + ["A", "J", "Q", "K"][list2.indexOf(num)];
-							return str + parseFloat(num);
+							return str + get.strNumber(num);
 						}, "");
 					},
 					content: "使用的下一张点数小于$的普通锦囊牌额外结算一次",
@@ -15103,8 +15107,13 @@ const skills = {
 			});
 			if (list.length) {
 				var next = player.chooseButton(["视为对" + get.translation(target) + "使用一张牌", [list, "vcard"]]).set("ai", function (button) {
-					var evt = _status.event.getParent();
-					return get.effect(evt.target, { name: button.link[2] }, evt.player, evt.player);
+					let evt = _status.event.getParent(),
+						eff =  get.effect(evt.target, { name: button.link[2] }, evt.player, evt.player);
+					if (
+						evt.target.hp < 2 ||
+						get.attitude(evt.player, evt.target) > 0 ||
+						evt.target.hp < 3 && get.tag(button.link, "damage")) return eff;
+					return eff + get.effect(evt.player, { name: "sha" }, evt.target, evt.player);
 				});
 				if (event.count == 0) next.set("forced", true);
 			} else {
@@ -22395,7 +22404,7 @@ const skills = {
 					return target != player;
 				})
 				.set("ai", function (target) {
-					return get.attitude(player, target);
+					return get.attitude(get.player(), target);
 				});
 			"step 1";
 			if (result.bool) {
@@ -24911,7 +24920,7 @@ const skills = {
 			game.cardsGotoOrdering(cards);
 			var next = player.chooseToMove();
 			next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
-			next.set("prompt", "羽化：点击将牌移动到牌堆顶或牌堆底");
+			next.set("prompt", "羽化：点击或拖动将牌移动到牌堆顶或牌堆底");
 			next.processAI = function (list) {
 				var cards = list[0][1],
 					player = _status.event.player;
@@ -27402,10 +27411,12 @@ const skills = {
 		},
 		ai: {
 			result: {
-				target: -1,
-				player: function (player) {
+				player(player) {
 					return player.isLinked() ? 0 : -0.8;
 				},
+				target(player, target) {
+					return get.effect(target, { name: "tiesuo" }, player, target) / get.attitude(target, target);
+				}
 			},
 			order: 2,
 			expose: 0.3,
@@ -27416,6 +27427,7 @@ const skills = {
 					}
 				},
 			},
+
 		},
 	},
 	xiaoguo: {
@@ -30022,7 +30034,7 @@ const skills = {
 			game.cardsGotoOrdering(cards);
 			var next = player.chooseToMove();
 			next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
-			next.set("prompt", "点化：点击将牌移动到牌堆顶或牌堆底");
+			next.set("prompt", "点化：点击或拖动将牌移动到牌堆顶或牌堆底");
 			next.processAI = function (list) {
 				var cards = list[0][1],
 					player = _status.event.player;
