@@ -4960,7 +4960,13 @@ const skills = {
 						att = get.sgn(get.attitude(player, target));
 					if (!att) return 2;
 					let dis = target.needsToDiscard(0, null, true),
-						res = [-att * (1 + Math.max(0, dis - 2)), att * (1 - Math.max(0, dis + 2)), -att * dis];
+						res = [
+							-att * (1 + Math.max(0, dis - (target.hasCard(i => {
+								return get.value(i, target) <= 6;
+							}, "e") ? 1 : 2))),
+							att * (1 - Math.max(0, dis + 2)),
+							-att * dis
+						];
 					return res.indexOf(Math.max(...res));
 				})
 				.set("prompt", get.prompt("olrunwei", trigger.player));
@@ -4969,9 +4975,15 @@ const skills = {
 				player.logSkill("olrunwei", trigger.player);
 				if (result.index == 0) {
 					trigger.player.chooseToDiscard("he", true).set("ai", card => {
-						if (get.position(card) == "e") return -get.value(card);
+						if (get.position(card) == "e") return get.event().e-get.value(card);
 						return 1 / (get.value(card) || 0.5);
-					});
+					}).set("e", function () {
+						if (!trigger.player.hasCard(i => {
+							return get.value(i, trigger.player) <= 6;
+						}, "e")) return 0;
+						if (!trigger.player.needsToDiscard(-2)) return 0;
+						return 6.2;
+					}());
 					trigger.player.addTempSkill("olrunwei_+");
 					trigger.player.addMark("olrunwei_+", 1, false);
 				}
