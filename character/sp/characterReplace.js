@@ -1,5 +1,6 @@
 const characterReplaces = {
-	guanyinping: ["guanyinping", "old_guanyinping"],
+	shamoke: ["shamoke", "ty_shamoke"],
+	guanyinping: ["guanyinping", "old_guanyinping", "ty_guanyinping"],
 	shixie: ["shixie", "dc_shixie", "old_shixie"],
 	caoshuang: ["caoshuang", "dc_caoshuang", "ns_caoshuang"],
 	caoang: ["caoang", "yj_caoang", "tw_caoang"],
@@ -70,6 +71,7 @@ const characterReplaces = {
 	mazhong: ["mazhong", "re_mazhong"],
 	wenpin: ["wenpin", "re_wenpin"],
 	liuyan: ["liuyan", "jsrg_liuyan", "junk_liuyan"],
+	buzhi: ["buzhi", "ty_buzhi"],
 };
 
 export default characterReplaces;

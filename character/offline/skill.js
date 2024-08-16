@@ -3,6 +3,53 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//桃园挽歌
+	//铠甲合体
+	_taoyuanwange: {
+		trigger: {
+			global: "phaseBefore",
+			player: "enterGame",
+		},
+		filter(event, player) {
+			if (event.name == "phase" && game.phaseNumber != 0) return false;
+			return Object.keys(lib.skill._taoyuanwange.getEquip).some(name => {
+				return get.nameList(player).includes(name);
+			});
+		},
+		direct: true,
+		getEquip: {
+			ty_liubei: ["dilu", "ty_feilongduofeng"],
+			ty_luxun: ["shangfangbaojian"],
+			ty_sunquan: ["qingmingjian"],
+		},
+		getAudio:{
+			ty_liubei: "jizhao2",
+			ty_luxun: "nzry_cuike2",
+			ty_sunquan: "sbzhiheng2",
+		},
+		async content(event, trigger, player) {
+			let list = get.nameList(player),
+				info=lib.skill._taoyuanwange,
+				names = Object.keys(info.getEquip);
+			for (const name of names) {
+				if (list.includes(name)) {
+					let equips = [];
+					for (let card of info.getEquip[name]) {
+						let cardx = get.cardPile(cardx => cardx.name == card && player.canEquip(cardx));
+						if (cardx) equips.push(cardx);
+					}
+					if (equips.length) {
+						game.broadcastAll(function (audio) {
+							if (lib.config.background_speak) {
+								game.playAudio("skill", audio);
+							}
+						},info.getAudio[name]);
+						player.$gain2(equips);
+						await player.equip(equips);
+					}
+				}
+			}
+		},
+	},
 	//刺客×4
 	tyliupo: {
 		mark: true,
@@ -216,7 +263,7 @@ const skills = {
 		},
 	},
 	tyansha: {
-		inherit:"tysiji",
+		inherit: "tysiji",
 		filter: function (event, player) {
 			return (
 				player.countCards("hes") &&
@@ -233,32 +280,32 @@ const skills = {
 		subSkill: {
 			range: {
 				trigger: {
-					player:"useCardAfter",
+					player: "useCardAfter",
 				},
-				filter(event,player){
-					return event.skill=="tyansha_backup"&&event.targets?.some(i=>{
-						return i.isIn()&&!player.getStorage("tyansha_range").includes(i);
+				filter(event, player) {
+					return event.skill == "tyansha" && event.targets?.some(i => {
+						return i.isIn() && !player.getStorage("tyansha_range").includes(i);
 					});
 				},
-				direct:true,
-				content(){
-					if(!player.getStorage("tyansha_range").length){
-						player.when({global:"roundStart"}).then(()=>{
-							player.unmarkAuto("tyansha_range",player.getStorage("tyansha_range"));
+				direct: true,
+				content() {
+					if (!player.getStorage("tyansha_range").length) {
+						player.when({ global: "roundStart" }).then(() => {
+							player.unmarkAuto("tyansha_range", player.getStorage("tyansha_range"));
 						});
 					}
-					let targets=trigger.targets.filter(i=>{
-						return i.isIn()&&!player.getStorage("tyansha_range").includes(i);
+					let targets = trigger.targets.filter(i => {
+						return i.isIn() && !player.getStorage("tyansha_range").includes(i);
 					});
-					player.markAuto("tyansha_range",targets);
+					player.markAuto("tyansha_range", targets);
 				},
-				intro:{
-					content:"$本轮计算与你的距离视为1",
+				intro: {
+					content: "$本轮计算与你的距离视为1",
 				},
-				firstDo:true,
-				onremove:true,
-				locked:false,
-				mod:{
+				firstDo: true,
+				onremove: true,
+				locked: false,
+				mod: {
 					globalTo(from, to, num) {
 						if (to.getStorage("tyansha_range").includes(from)) {
 							return -Infinity;
@@ -276,9 +323,12 @@ const skills = {
 				},
 				selectCard: 1,
 				position: "hes",
-				filterTarget(card,player,target){
+				filterTarget(card, player, target) {
 					if (target != _status.event.useTarget && !ui.selected.targets.includes(_status.event.useTarget)) return false;
 					return lib.filter.targetEnabled.apply(this, arguments);
+				},
+				precontent() {
+					event.result.skill = event.getParent(2).name;
 				},
 				ai1(card) {
 					return 7 - get.value(card);
@@ -287,48 +337,48 @@ const skills = {
 		},
 	},
 	tycangshen: {
-		forced:true,
-		trigger:{
-			player:"useCardAfter",
+		forced: true,
+		trigger: {
+			player: "useCardAfter",
 		},
-		filter(event,player){
-			return event.card.name=="sha";
+		filter(event, player) {
+			return event.card.name == "sha";
 		},
-		async content(event,trigger,player){
-			player.tempBanSkill("tycangshen","roundStart");
+		async content(event, trigger, player) {
+			player.tempBanSkill("tycangshen", "roundStart");
 		},
-		mod:{
+		mod: {
 			globalTo(from, to, num) {
-				if(!to.isTempBanned("tycangshen")) return num+1;
+				if (!to.isTempBanned("tycangshen")) return num + 1;
 			},
 		},
 	},
 	tyxiongren: {
-		trigger:{
-			source:"damageBegin1",
+		trigger: {
+			source: "damageBegin1",
 		},
-		filter(event,player){
-			if(get.distance(event.player,player)<=1) return false;
-			return event.card?.name=="sha";
+		filter(event, player) {
+			if (get.distance(event.player, player) <= 1) return false;
+			return event.card?.name == "sha";
 		},
-		forced:true,
-		async content(event,trigger,player){
+		forced: true,
+		async content(event, trigger, player) {
 			trigger.num++;
 		},
-		mod:{
+		mod: {
 			cardUsableTarget(card, player, target) {
-				if (get.distance(target,player)<=1) return Infinity;
+				if (get.distance(target, player) <= 1) return Infinity;
 			},
 			targetInRange(card, player, target) {
-				if (get.distance(target,player)<=1) return true;
+				if (get.distance(target, player) <= 1) return true;
 			},
 		},
 	},
 	tysiji: {
 		trigger: { global: "phaseJieshuBegin" },
 		filter: function (event, player) {
-			if(!event.player.hasHistory("lose",evt=>{
-				return !["useCard","respond"].includes(evt.getParent().name);
+			if (!event.player.hasHistory("lose", evt => {
+				return !["useCard", "respond"].includes(evt.getParent().name);
 			})) return false;
 			return (
 				player.countCards("hes") &&
@@ -343,10 +393,10 @@ const skills = {
 			);
 		},
 		direct: true,
-		async content(event,trigger,player) {
+		async content(event, trigger, player) {
 			var next = player.chooseToUse();
-			next.set("useTarget",trigger.player);
-			next.set("openskilldialog", `###${get.prompt(event.name,trigger.player)}###${lib.translate[event.name+"_info"]}`);
+			next.set("useTarget", trigger.player);
+			next.set("openskilldialog", `###${get.prompt(event.name, trigger.player)}###${lib.translate[event.name + "_info"]}`);
 			next.set("norestore", true);
 			next.set("_backupevent", "tyansha_backup");
 			next.set("addCount", false);
@@ -358,9 +408,9 @@ const skills = {
 		},
 	},
 	tydaifa: {
-		inherit:"tysiji",
+		inherit: "tysiji",
 		filter: function (event, player) {
-			if(!game.hasPlayer2(current => {
+			if (!game.hasPlayer2(current => {
 				if (current == event.player) return false;
 				if (current.hasHistory("lose", evt => {
 					if (evt.type != "gain") return false;
@@ -1375,18 +1425,17 @@ const skills = {
 			}
 			player.addMark("tytanlong", 1, false);
 			const target = event.target;
-			const result = await player
-				.chooseToCompare(target)
-				.set("small", get.attitude(player, target) > 0)
-				.forResult();
+			const next = player.chooseToCompare(target);
+			if (get.attitude(player, target) > 0) next.set("small", true);
+			const result = await next.forResult();
 			if (result.tie) return;
 			let winner = result.bool ? player : target, card = result[result.bool ? "target" : "player"];
 			if (winner?.isIn() && card && [card].filterInD("d")) {
 				let bool = get.attitude(winner, player) > 0;
-				if (winner.getUseValue(card) >= get.effect(winner, { name: "tiesuo" }, winner, winner)) bool = true;
+				if (winner.getUseValue(card) >= 4) bool = true;
 				const result2 = await winner
 					.chooseBool(`是否获得${get.translation(card)}并视为对自己使用一张【铁索连环】？`)
-					.set("choice", boll)
+					.set("choice", bool)
 					.forResult();
 				if (!result2.bool) return;
 				await winner.gain(card, "gain2");

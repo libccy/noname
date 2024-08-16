@@ -327,6 +327,7 @@ const skills = {
 							return !event.cards.includes(card) && lib.filter.cardDiscardable(card, player);
 						}, "e");
 					}
+					if(event.getParent(2).name=="disableEquip") return false;
 					if (event.getParent(3).name == "mbquchong" || event.getParent(3).name == "mbquchong_recast") return false;
 					return player.hasCard(card => {
 						if (!event.cards.includes(card)) return false;

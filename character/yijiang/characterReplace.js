@@ -15,7 +15,7 @@ const characterReplaces = {
 	caozhang: ["caozhang", "ol_caozhang", "re_caozhang", "xin_caozhang"],
 	guanzhang: ["guanzhang", "re_guanzhang", "old_guanzhang"],
 	madai: ["old_madai", "re_madai", "tw_madai", "madai"],
-	liaohua: ["liaohua", "re_liaohua", "xin_liaohua"],
+	liaohua: ["liaohua", "re_liaohua", "xin_liaohua", "ty_liaohua"],
 	bulianshi: ["bulianshi", "dc_bulianshi", "re_bulianshi", "old_bulianshi"],
 	handang: ["handang", "xin_handang", "re_handang", "tw_handang", "sb_handang", "old_handang"],
 	chengpu: ["chengpu", "ol_chengpu", "re_chengpu", "xin_chengpu", "tw_chengpu", "ns_chengpu", "std_chengpu"],
