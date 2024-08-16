@@ -4955,23 +4955,13 @@ const skills = {
 				.chooseControl("弃牌，+1", "摸牌，-1", "cancel2")
 				.set("choiceList", ["令" + str + "弃置一张牌，且其本回合手牌上限+1", "令" + str + "摸一张牌，且其本回合手牌上限-1"])
 				.set("ai", function () {
-					var player = _status.event.player;
-					var trigger = _status.event.getTrigger();
-					var target = trigger.player;
-					var num1 = target.countCards("h"),
-						num2 = target.getHandcardLimit();
-					switch (get.sgn(get.attitude(player, target))) {
-						case 0:
-							return 2;
-						case 1:
-							if (num1 - 1 >= num2) return 0;
-							if (num1 + 1 <= num2) return 1;
-							return 2;
-						case -1:
-							if (num1 - 2 <= num2) return 0;
-							if (num1 + 3 >= num2) return 1;
-							return 2;
-					}
+					let player = _status.event.player,
+						target = _status.event.getTrigger().player,
+						att = get.sgn(get.attitude(player, target));
+					if (!att) return 2;
+					let dis = target.needsToDiscard(0, null, true),
+						res = [-att * (1 + Math.max(0, dis - 2)), att * (1 - Math.max(0, dis + 2)), -att * dis];
+					return res.indexOf(Math.max(...res));
 				})
 				.set("prompt", get.prompt("olrunwei", trigger.player));
 			"step 1";
