@@ -1603,6 +1603,7 @@ const skills = {
 					effect: {
 						player_use(card, player) {
 							if (
+								typeof card != "object" ||
 								!game.hasPlayer(target => {
 									return target.hasSkill("olsbhetao") && (get.attitude(player, target) < 0 || get.attitude(target, player) < 0);
 								}) ||
@@ -1611,7 +1612,7 @@ const skills = {
 								}) < 2
 							)
 								return;
-							const select = get.copy(get.info(card).selectTarget);
+							const select = get.info(card).selectTarget;
 							let range;
 							if (select == undefined) range = [1, 1];
 							else if (typeof select == "number") range = [select, select];
