@@ -1,5 +1,6 @@
 const characters = {
-	ty_anying: ["male", "qun", 4 , ["tyliupo", "tyzhuiling", "tyxihun", "tyxianqi", "tyfansheng"]],
+	ty_anyingx: ["male", "qun", 4, ["tyzhuiling", "tyxihun", "tyxianqi", "tyfansheng"]],
+	ty_anying: ["male", "qun", 4 , ["tyliupo", "tyzhuiling", "tyxihun", "tyxianqi"]],
 	ty_wuque: ["male", "qun", 4 , ["tyansha", "tycangshen", "tyxiongren"]],
 	ty_yanque: ["male", "qun", 4 , ["tysiji", "tycangshen"]],
 	ty_wangque: ["male", "qun", 3 , ["tydaifa", "tycangshen"]],

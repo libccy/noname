@@ -753,6 +753,7 @@ window.noname_character_rank = {
 	],
 	bp: [
 		"ty_anying",
+		"ty_anyingx",
 		"ty_wuque",
 		"ty_yanque",
 		"ty_wangque",
@@ -2126,6 +2127,7 @@ window.noname_character_rank = {
 		],
 		epic: [
 			"ty_anying",
+			"ty_anyingx",
 			"ty_shen_liubei",
 			"ty_shen_zhangfei",
 			"ty_shen_guanyu",
