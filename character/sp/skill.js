@@ -151,6 +151,7 @@ const skills = {
 								cards.addArray(evt.cards.filterInD("d").reverse());
 							}
 						}
+						if(historys[i].isRound) break;
 					}
 					cards.reverse();
 					cards = cards.filter(card => get.type(card, false) == "trick" && player.hasUseTarget(card));
