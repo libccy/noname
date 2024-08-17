@@ -567,7 +567,7 @@ game.import("card", function () {
             ["diamond", 6, "suibozhuliu"],
             ["diamond", 9, "suibozhuliu"],
             ["spade", 2, "ty_feilongduofeng"],
-            ["heart", 2, "lx_huoshaolianying"],
+            ["heart", 3, "lx_huoshaolianying"],
             ["spade", 5, "shangfangbaojian"],
             ["spade", 5, "qingmingjian"],
             ["club", 5, "mengchong"],
