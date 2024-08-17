@@ -1460,7 +1460,10 @@ const skills = {
 			if (!event.getg) return [];
 			return game.filterPlayer(current => {
 				if (current == player) return false;
-				return event.getg(current)?.some(card => card.original != "c");
+				if (event.name == "gain") return event.getg(current)?.length && event.notFromCardpile;
+				return event.getg(current)?.some(card => {
+					return card.original != "c";
+				});
 			}).sortBySeat();
 		},
 		logTarget(event, player, name, target) {
@@ -1486,7 +1489,23 @@ const skills = {
 			}, result.cards);
 			player.addTempSkill("tyxibei_viewAs");
 		},
+		group: "tyxibei_record",
 		subSkill: {
+			record: {
+				trigger: { global: "gainBefore" },
+				direct: true,
+				filter(event, player) {
+					if (player == event.player) return false;
+					if (event.cards.length) {
+						if (event.getParent().name == "draw") return false;
+						for (var i = 0; i < event.cards.length; i++) if (get.position(event.cards[i]) != "c" || (!get.position(event.cards[i]) && event.cards[i].original != "c")) return true;
+					}
+					return false;
+				},
+				content() {
+					trigger.notFromCardpile = true;
+				},
+			},
 			viewAs: {
 				mod: {
 					cardname(card, player) {
@@ -1633,16 +1652,22 @@ const skills = {
 		usable: 1,
 		filterCard: true,
 		selectCard: 2,
+		position: "he",
 		filterTarget: true,
+		check(card){
+			return 4-get.value(card);
+		},
 		async content(event, trigger, player) {
 			const card = game.createCard("taoyuan", "heart", 1);
 			if (card) await event.target.gain(card, "gain2");
 		},
 		ai: {
 			order: 4,
-			result(player, target) {
-				if (target.getUseValue("taoyuan") * get.sgnAttitude(player, target) > player.getUseValue("wuzhong")) return 1;
-				return 0;
+			result:{
+				target(player, target) {
+					if (target.getUseValue("taoyuan") * get.sgnAttitude(player, target) >= player.getUseValue("wuzhong")) return 1;
+					return 0;
+				},
 			},
 		},
 	},

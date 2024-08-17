@@ -2969,7 +2969,7 @@ const skills = {
 			}
 			if (player.countCards("h", card => card.hasGaintag("dcjiaowei_tag")) <= len) {
 				player.storage.counttrigger.dcfeibai--;
-				game.log(player, "重置了", "#【飞白】");
+				game.log(player, "重置了", "#g【飞白】");
 			}
 		},
 		mod: {

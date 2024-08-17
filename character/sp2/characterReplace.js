@@ -26,16 +26,16 @@ const characterReplaces = {
 	caoanmin: ["caoanmin", "ns_caoanmin"],
 	duanwei: ["duanwei", "junk_duanwei"],
 	xushao: ["xushao", "jsrg_xushao"],
-	huban: ["ol_huban", "dc_huban", "mb_huban"],
-	mengda: ["ol_mengda", "dc_mengda", "pe_mengda"],
+	ol_huban: ["ol_huban", "dc_huban", "mb_huban"],
+	ol_mengda: ["ol_mengda", "dc_mengda", "pe_mengda"],
 	jsp_guanyu: ["jsp_guanyu", "dc_jsp_guanyu", "jsrg_guanyu"],
 	mushun: ["mushun", "sp_mushun"],
 	wangjun: ["dc_wangjun", "wangjun"],
 	re_zoushi: ["yue_zoushi", "re_zoushi", "jsrg_zoushi"],
-	zhangmancheng: ["dc_zhangmancheng", "tw_zhangmancheng"],
+	dc_zhangmancheng: ["dc_zhangmancheng", "tw_zhangmancheng"],
 	xf_huangquan: ["xf_huangquan", "dc_huangquan"],
 	re_zoushi: ["re_zoushi", "jsrg_zoushi", "yue_zoushi"],
-	lvkulvkuanglvxiang: ["lvkuanglvxiang", "dc_lvkuanglvxiang"],
+	lvkuanglvxiang: ["lvkuanglvxiang", "dc_lvkuanglvxiang"],
 };
 
 export default characterReplaces;
