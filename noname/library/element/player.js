@@ -8695,7 +8695,7 @@ export class Player extends HTMLDivElement {
 				let currentHistory = history[i];
 				if (key) currentHistory = currentHistory[key];
 				if (filter) currentHistory = currentHistory.filter(filter);
-				evts.addArray(currentHistory.slice());
+				evts.addArray(currentHistory.slice().reverse());
 			}
 			if (history[i].isRound) {
 				if (num > 0) num--;
