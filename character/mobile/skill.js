@@ -33,11 +33,11 @@ const skills = {
 					cards.length == 1
 						? cards
 						: await player
-								.chooseButton(["博鉴：请选择要分配的牌", cards], true)
-								.set("ai", button => {
-									return get.value(button.link);
-								})
-								.forResultLinks();
+							.chooseButton(["博鉴：请选择要分配的牌", cards], true)
+							.set("ai", button => {
+								return get.value(button.link);
+							})
+							.forResultLinks();
 				const togive = links[0];
 				const { result } = await player.chooseTarget("选择获得" + get.translation(togive) + "的角色", true).set("ai", target => {
 					const player = get.player();
@@ -77,7 +77,7 @@ const skills = {
 		},
 	},
 	mbjiwei: {
-		audio: 2,
+		audio: 4,
 		getNum(event, player) {
 			let num = 0;
 			if (game.countPlayer2(current => current.hasHistory("lose")) > 1) num++;
@@ -93,6 +93,10 @@ const skills = {
 			const num = get.info("mbjiwei").getNum(event, player);
 			if (event.name == "phaseZhunbei") return player.countCards("h") >= num && game.hasPlayer(current => current != player);
 			return event.player != player && num > 0;
+		},
+		logAudio(event, player) {
+			if (event.name == "phaseZhunbei") return ["mbjiwei3.mp3", "mbjiwei4.mp3"];
+			return ["mbjiwei1.mp3", "mbjiwei2.mp3"];
 		},
 		forced: true,
 		async content(event, trigger, player) {

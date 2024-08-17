@@ -110,6 +110,9 @@ const skills = {
 			player.addTempSkill("sbluanwu_add");
 		},
 		subSkill: {
+			jiaxu: {
+				audio: 4,
+			},
 			add: {
 				trigger: {
 					global: "loseHpEnd",
@@ -151,7 +154,7 @@ const skills = {
 		derivation: ["sbwansha_rewrite", "sbweimu_rewrite"],
 	},
 	sbweimu: {
-		audio: 2,
+		audio: 4,
 		trigger: {
 			player: "addJudgeBefore",
 			target: "useCardToTarget",

@@ -7,7 +7,7 @@ const characterReplaces = {
 	weiwenzhugezhi: ["weiwenzhugezhi", "re_weiwenzhugezhi", "jsrg_weiwenzhugezhi"],
 	xugong: ["xugong", "re_xugong", "jsrg_xugong"],
 	liuzan: ["re_liuzan", "liuzan"],
-	sufei: ["yj_sufei", "sp_sufei", "xf_sufei"],
+	yj_sufei: ["yj_sufei", "sp_sufei", "xf_sufei"],
 	jiakui: ["jiakui", "old_jiakui"],
 	shenpei: ["shenpei", "sp_shenpei"],
 	sunru: ["dc_sunru", "ol_sunru", "sunru"],

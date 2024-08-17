@@ -5294,7 +5294,10 @@ const skills = {
 	},
 	luanwu: {
 		audio: 2,
-		audioname: ["re_jiaxu", "sb_jiaxu"],
+		audioname: ["re_jiaxu"],
+		audioname2: {
+			"sb_jiaxu": "sbluanwu_jiaxu",
+		},
 		unique: true,
 		enable: "phaseUse",
 		limited: true,
