@@ -484,7 +484,7 @@ const skills = {
 	},
 	//贾充
 	mbbeini: {
-		audio: 2,
+		audio: "beini",
 		inherit: "beini",
 		async content(event, trigger, player) {
 			const target = event.targets[0];
@@ -539,7 +539,7 @@ const skills = {
 		},
 	},
 	mbdingfa: {
-		audio: 2,
+		audio: "dingfa",
 		trigger: {
 			player: "phaseDiscardAfter",
 		},

@@ -41,7 +41,7 @@ const characters = {
 	jd_jin_xiahouhui: ["female", "jin", 3, ["jdbaoqie", "jyishi", "shiduo"], ["hiddenSkill", "character:jin_xiahouhui", "die:jin_xiahouhui", "name:夏侯|徽"]],
 	jd_jin_simazhao: ["male", "jin", 3, ["tuishi", "choufa", "zhaoran", "chengwu"], ["zhu", "hiddenSkill", "character:jin_simazhao", "die:jin_simazhao", "name:司马|昭"]],
 	jd_sb_caocao: ["male", "wei", 4, ["jdjianxiong", "sbqingzheng", "sbhujia"], ["zhu", "character:sb_caocao", "die:sb_caocao"]],
-	jd_sb_sp_zhugeliang: ["male", "shu", 3, ["jdhuoji", "jdkanpo"], ["character:sb_sp_zhugeliang", "die:sb_sp_zhugeliang"]],
+	jd_sb_sp_zhugeliang: ["male", "shu", 3, ["jdhuoji", "jdkanpo"], ["character:sb_sp_zhugeliang", "die:sb_sp_zhugeliang", "name:诸葛|亮"]],
 	jd_jin_simashi: ["male", "jin", "3/4", ["taoyin", "yimie", "jdtairan", "ruilve"], ["zhu", "hiddenSkill", "character:jin_simashi", "die:jin_simashi", "name:司马|师"]],
 	jd_sb_menghuo: ["male", "shu", 4, ["jdsbhuoshou", "jdsbzaiqi"], ["character:sb_menghuo", "die:sb_menghuo"]],
 	jd_sb_yuanshao: ["male", "qun", 4, ["jdsbluanji", "jdsbxueyi"], ["zhu", "character:sb_yuanshao", "die:sb_yuanshao"]],

@@ -19,7 +19,7 @@ const cards = {
 	jingxiangshengshi: {
 		audio: true,
 		fullskin: true,
-		derivation: "shen_liubiao",
+		derivation: "jx_shen_liubiao",
 		type: "trick",
 		enable: true,
 		filterTarget: lib.filter.notMe,
