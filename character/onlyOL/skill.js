@@ -36,11 +36,7 @@ const skills = {
 						evt == trigger.getParent() &&
 						target.canUse(sha, player, false) &&
 						!game.hasPlayer2(current => {
-							return (
-								current.hasHistory("damage", evtx => {
-									return;
-								}).length > 0
-							);
+							return current.hasHistory("damage", evtx => evtx.card === evt.card);
 						})
 				)
 				.step(async (event, trigger, player) => {
