@@ -410,11 +410,12 @@ class DieAudio implements AudioBase {
                     this.info = {};
                 }
             };
+            const rawName = player.name;
             const skinName = player.skin.name;
-            if (!skinName || skinName === player.name) useDefaultInfo();
-            else if (!lib.characterSubstitute[skinName]) useDefaultInfo();
+            if (!skinName || skinName === rawName) useDefaultInfo();
+            else if (!lib.characterSubstitute[rawName]) useDefaultInfo();
             else {
-                const skin = lib.characterSubstitute[skinName].find(
+                const skin = lib.characterSubstitute[rawName].find(
                     (i) => i[0] === skinName
                 );
                 if (!skin) useDefaultInfo();

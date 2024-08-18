@@ -327,13 +327,14 @@ class DieAudio {
                     this.info = {};
                 }
             };
+            const rawName = player.name;
             const skinName = player.skin.name;
-            if (!skinName || skinName === player.name)
+            if (!skinName || skinName === rawName)
                 useDefaultInfo();
-            else if (!lib.characterSubstitute[skinName])
+            else if (!lib.characterSubstitute[rawName])
                 useDefaultInfo();
             else {
-                const skin = lib.characterSubstitute[skinName].find((i) => i[0] === skinName);
+                const skin = lib.characterSubstitute[rawName].find((i) => i[0] === skinName);
                 if (!skin)
                     useDefaultInfo();
                 else {
