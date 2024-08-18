@@ -6031,7 +6031,8 @@ const skills = {
 				},
 			},
 			move: {
-				audio: "sbanguo3.mp3",
+				audio: "sbanguo",
+				logAudio: () => ["sbanguo1.mp3", "sbanguo2.mp3"],
 				direct: true,
 				trigger: { player: "phaseUseBegin" },
 				filter: function (event, player) {
@@ -6107,7 +6108,7 @@ const skills = {
 				},
 			},
 			dying: {
-				audio: "sbanguo",
+				audio: "sbanguo3.mp3",
 				forced: true,
 				locked: false,
 				trigger: { global: "dying" },
