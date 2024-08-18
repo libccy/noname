@@ -191,6 +191,13 @@ const skills = {
 				await player.gain(cards.randomGet(), "gain2");
 			}
 		},
+		ai: {
+			effect: {
+				target: function (card, player, target, current) {
+					if (get.type(card, "trick") == "trick" && get.color(card) == "black") return "zeroplayertarget";
+				},
+			},
+		},
 	},
 	//韩当
 	sbgongqi: {

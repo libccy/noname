@@ -387,7 +387,11 @@ const skills = {
 				if (discards.length) await player.loseToDiscardpile(discards);
 			} else {
 				const card = get.cardPile(card => card.name == trigger.card.name);
-				if (card) await player.addToExpansion(card, "gain2").gaintag.add("dcyanzuo");
+				if (card){
+					const next = player.addToExpansion(card, "gain2");
+					next.gaintag.add("dcyanzuo");
+					await next;
+				}
 				if (player.countMark("dcyanzuo_zuyin") < 2 && player.hasSkill("dcyanzuo", null, null, false)) player.addMark("dcyanzuo_zuyin", 1, false);
 			}
 		},

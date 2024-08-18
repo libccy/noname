@@ -59,7 +59,7 @@ const characterReplaces = {
 	simalang: ["re_simalang", "simalang"],
 	zhugedan: ["re_zhugedan", "zhugedan"],
 	zhangren: ["jsrg_zhangren", "zhangren"],
-	ol_wenqin: ["ol_wenqin", "pe_wenqin"],
+	ol_wenqin: ["ol_wenqin", "pe_wenqin", "mb_wenqin"],
 	lukai: ["ol_lukai", "lukai"],
 	liupi: ["ol_liupi", "liupi"],
 	kanze: ["kanze", "re_kanze"],
