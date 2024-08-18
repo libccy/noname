@@ -1,6 +1,6 @@
 const characterReplaces = {
 	caoren: ["caoren", "old_caoren", "sb_caoren", "new_caoren", "star_caoren"],
-	sp_caoren: ["sp_caoren", "jsp_caoren"],
+	sp_caoren: ["sp_caoren", "jsp_caoren", "drag_caoren"],
 	xiahouyuan: ["re_xiahouyuan", "ol_xiahouyuan", "xiahouyuan"],
 	huangzhong: ["re_huangzhong", "ol_huangzhong", "sb_huangzhong", "huangzhong", "jsrg_huangzhong", "yj_huangzhong", "wuhujiang", "ty_huangzhong"],
 	weiyan: ["re_weiyan", "ol_weiyan", "weiyan", "huan_weiyan"],

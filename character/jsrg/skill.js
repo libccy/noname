@@ -5309,6 +5309,7 @@ const skills = {
 					var damaged = get.event("damaged");
 					return damaged.includes(target) ^ (ui.selected.cards.length > 0);
 				},
+				complexSelect: true,
 				selectTarget: 1,
 				ai1: function (card) {
 					if (get.event("damaged").includes(get.event("aiTarget"))) return 0;

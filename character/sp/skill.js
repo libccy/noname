@@ -578,6 +578,7 @@ const skills = {
 			select: [1, 3],
 			backup(links, player) {
 				return {
+					audio: "olweimian",
 					types: links.slice().sort((a, b) => parseInt(a.slice("equip".length)) - parseInt(b.slice("equip".length))),
 					filterTarget(card, player, target) {
 						if (target == player) return true;
