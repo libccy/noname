@@ -9929,8 +9929,11 @@ const skills = {
 				player.storage.tiansuan3 = "tiansuan2_" + num;
 				player.addTempSkill("tiansuan2", { player: "phaseBegin" });
 				target.addSkill("tiansuan2_" + num);
-				if (num < 2 && target.countGainableCards(player, target == player ? "e" : "he") > 0) {
-					var next = player.gainPlayerCard(target, target == player ? "e" : "he", true);
+				var pos = "e";
+				if (target != player) pos += "h";
+				if (num == 0) pos += "j";
+				if (num < 2 && target.countGainableCards(player, pos) > 0) {
+					var next = player.gainPlayerCard(target, pos, true);
 					if (num == 0) next.visible = true;
 				} else game.delayx();
 			}
@@ -13846,7 +13849,10 @@ const skills = {
 		},
 		filterCard: true,
 		position: "he",
-		filterTarget: lib.filter.notMe,
+		filterTarget(card, player, target) {
+			if (!["identity", "doudizhu"].includes(get.mode()) && target.isFriendOf(player)) return false;
+			return target != player;
+		},
 		check: function (card) {
 			return 6 - get.value(card);
 		},

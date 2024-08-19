@@ -16622,6 +16622,7 @@ const skills = {
 				return ui.create.dialog("锦织", [list, "vcard"], "hidden");
 			},
 			check: function (button) {
+				if (_status.event.getParent().type != "phase") return 1;
 				if (button.link[2] == "shan") return 3;
 				var player = _status.event.player;
 				if (button.link[2] == "jiu") {

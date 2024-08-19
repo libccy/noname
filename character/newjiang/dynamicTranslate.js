@@ -29,7 +29,7 @@ const dynamicTranslates = {
 		const storage = player.storage.xianmou;
 		var str = "转换技，你失去过牌的回合结束时，你可以：";
 		if (!storage) str += '<span class="bluetext">';
-		str += "阳，观看牌堆顶五张牌并获得至多X张牌，若未获得X张牌则获得〖遗计〗直到再发动此项；";
+		str += "阳，观看牌堆顶五张牌并获得至多X张牌，若未获得X张牌则获得〖遗计〗直到再发动此技能；";
 		if (!storage) str += "</span>";
 		if (storage) str += '<span class="bluetext">';
 		str += "阴，观看一名角色手牌并弃置其中至多X张牌，若弃置X张牌则你进行一次【闪电】判定。";
