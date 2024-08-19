@@ -1,6 +1,6 @@
-import { _status, ai, game, get, lib, ui } from "../../../../../../noname.js";
+import { _status, ai, game, get, lib, ui } from "../../../../../noname.js";
 import ContentCompilerBase from "./ContentCompilerBase.js";
-import { GameEvent } from "../../../gameEvent.js";
+import { GameEvent } from "../../gameEvent.js";
 export default class YieldCompiler extends ContentCompilerBase {
     type = "yield";
     static #mapArgs(event) {

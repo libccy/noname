@@ -1,6 +1,6 @@
 import { _status, game, get, lib, ui } from "../../../noname.js";
 import security from "../../util/security.js";
-import ContentCompiler from "./GameEvent/compilers/dist/ContentCompiler.js";
+import ContentCompiler from "./GameEvent/compilers/ContentCompiler.js";
 import GameEventManager from "./GameEvent/GameEventManager.js";
 export { GameEventManager, ContentCompiler };
 

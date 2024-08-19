@@ -1,4 +1,4 @@
-import { lib } from "../../../../../../noname.js";
+import { lib } from "../../../../../noname.js";
 import StepCompiler from "./StepCompiler.js";
 import YieldCompiler from "./YieldCompiler.js";
 import AsyncCompiler from "./AsyncCompiler.js";

@@ -1,5 +1,5 @@
 import ContentCompilerBase from "./ContentCompilerBase.js";
-import { GameEvent } from "../../../gameEvent.js";
+import { GameEvent } from "../../gameEvent.js";
 export default class ArrayCompiler extends ContentCompilerBase {
     type = "array";
     filter(content) {
