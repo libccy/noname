@@ -1263,7 +1263,8 @@ const skills = {
 						if (player.storage.olziruo) cards.reverse();
 						return [cards];
 					});
-					const result = await next;
+					const result = await next.forResult();
+					if (!result || result.bool) return;
 					let hs = result.moved[0].reverse();
 					game.addVideo("lose", player, [get.cardsInfo(hs), [], [], []]);
 					hs.forEach(i => i.goto(ui.special));
