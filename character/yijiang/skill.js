@@ -9486,6 +9486,25 @@ const skills = {
 		ai: {
 			expose: 0.2,
 		},
+		global: "faen_global",
+		subSkill: {
+			global: {
+				ai: {
+					effect: {
+						target(card, player, target) {
+							if (card.name == "tiesuo" && !target.isLinked()) return [1, 0.6 * game.countPlayer(cur => {
+								return (
+									cur.hasSkill("faen") ||
+									cur.hasSkill("oldfaen") ||
+									cur.hasSkill("refaen") ||
+									cur.hasSkill("dcfaen")
+								) && get.attitude(target, cur) > 0;
+							})];
+						}
+					}
+				}
+			}
+		},
 	},
 	jiaojin: {
 		audio: 2,
