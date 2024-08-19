@@ -6428,6 +6428,7 @@ const skills = {
 		content: function () {
 			trigger.player.draw();
 		},
+		global: "faen_global",
 	},
 	dcfaen: {
 		audio: "refaen",
@@ -6444,6 +6445,7 @@ const skills = {
 		content: function () {
 			trigger.player.draw();
 		},
+		global: "faen_global",
 	},
 	//界曹彰
 	xinjiangchi: {

@@ -893,6 +893,7 @@ const skills = {
 		ai: {
 			expose: 0.2,
 		},
+		global: "faen_global",
 	},
 	oldxuanfeng: {
 		audio: "xuanfeng",
