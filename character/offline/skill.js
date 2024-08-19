@@ -2291,7 +2291,6 @@ const skills = {
 	tyzhuan: {
 		audio: "qingbei",
 		enable: "phaseUse",
-		usable: 1,
 		filterCard(card, player) {
 			return get.name(card, player) == "sha";
 		},
