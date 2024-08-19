@@ -1504,9 +1504,9 @@ const skills = {
 			]);
 			next.set("toSortPlayers", toSortPlayers.slice(0));
 			next.set("processAI", () => {
-				const players = get.event("toSortPlayers"),player = get.player();
-				players.randomSort().sort((a,b)=>get.attitude(player,b)-get.attitude(player,a));
-				return [players.map(i=>`${i.getSeatNum()}|${i.name}`)];
+				const players = get.event("toSortPlayers"), player = get.player();
+				players.randomSort().sort((a, b) => get.attitude(player, b) - get.attitude(player, a));
+				return [players.map(i => `${i.getSeatNum()}|${i.name}`)];
 			});
 			const { result } = await next;
 			if (!result.bool) return;
