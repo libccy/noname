@@ -11442,6 +11442,12 @@ export class Player extends HTMLDivElement {
 		}
 		game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, 700, "recover");
 	}
+	/**
+	 * @param {*} str 
+	 * @param {*} [nature] 
+	 * @param {*} [avatar] 
+	 * @param { false } [broadcast] 
+	 */
 	$fullscreenpop(str, nature, avatar, broadcast) {
 		if (broadcast !== false)
 			game.broadcast(

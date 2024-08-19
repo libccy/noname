@@ -41,6 +41,10 @@ export class UI {
 	/**
 	 * @type { HTMLDivElement }
 	 */
+	system;
+	/**
+	 * @type { HTMLDivElement }
+	 */
 	arena;
 	/**
 	 * @type { Control[] }
@@ -153,6 +157,14 @@ export class UI {
 	 * @type {HTMLDivElement}
 	 */
 	ordering;
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	coin;
+	/**
+	 * @type {SMap<HTMLLinkElement | HTMLStyleElement>}
+	 */
+	css;
 	refresh(node) {
 		void window.getComputedStyle(node, null).getPropertyValue("opacity");
 	}
