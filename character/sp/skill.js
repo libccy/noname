@@ -151,7 +151,7 @@ const skills = {
 								cards.addArray(evt.cards.filterInD("d").reverse());
 							}
 						}
-						if(historys[i].isRound) break;
+						if (historys[i].isRound) break;
 					}
 					cards.reverse();
 					cards = cards.filter(card => get.type(card, false) == "trick" && player.hasUseTarget(card));
@@ -1244,25 +1244,34 @@ const skills = {
 				filter(event, player) {
 					return player.countCards("h") > 1 && !player.hasSkillTag("noSortCard");
 				},
-				filterCard: true,
-				selectCard: 2,
-				position: "h",
 				direct: true,
 				lose: false,
 				discard: false,
 				delay: 0,
-				prompt: "选择两张手牌，更换这两张手牌的顺序",
-				content() {
-					let h = player.getCards("h"),
-						hs = h.slice();
-					const list = [hs.indexOf(cards[0]), hs.indexOf(cards[1])];
-					hs[list[0]] = cards[1];
-					hs[list[1]] = cards[0];
-					hs.reverse();
-					game.addVideo("lose", player, [get.cardsInfo(hs), [], [], []]);
-					h.forEach(i => i.goto(ui.special));
-					player.directgain(hs, false);
+				prompt: "整理手牌顺序",
+				async content(event, trigger, player) {
 					event.getParent(2).goto(0);
+					if (_status.connectMode || !event.isMine()) {
+						player.tempBanSkill("olziruo_sort", { player: ["useCard1", "useSkillBegin", "chooseToUseEnd"] });
+					}
+					const next = player.chooseToMove("自若：请整理手牌顺序", true);
+					next.set("list", [["手牌", player.getCards("h")]]);
+					next.set("processAI", list => {
+						let player = get.player(),
+							cards = list[0][1].slice(0);
+						cards.sort((a, b) => get.useful(b, player) - get.useful(a, player));
+						if (player.storage.olziruo) cards.reverse();
+						return [cards];
+					});
+					const result = await next;
+					let hs = result.moved[0].reverse();
+					game.addVideo("lose", player, [get.cardsInfo(hs), [], [], []]);
+					hs.forEach(i => i.goto(ui.special));
+					player.directgain(hs, false);
+				},
+				ai: {
+					order: 10,
+					result: { player: 1 },
 				},
 			},
 		},
@@ -4965,11 +4974,19 @@ const skills = {
 					if (!att) return 2;
 					let dis = target.needsToDiscard(0, null, true),
 						res = [
-							-att * (1 + Math.max(0, dis - (target.hasCard(i => {
-								return get.value(i, target) <= 6;
-							}, "e") ? 1 : 2))),
+							-att *
+								(1 +
+									Math.max(
+										0,
+										dis -
+											(target.hasCard(i => {
+												return get.value(i, target) <= 6;
+											}, "e")
+												? 1
+												: 2)
+									)),
 							att * (1 - Math.max(0, dis + 2)),
-							-att * dis
+							-att * dis,
 						];
 					return res.indexOf(Math.max(...res));
 				})
@@ -4978,16 +4995,25 @@ const skills = {
 			if (result.index != 2) {
 				player.logSkill("olrunwei", trigger.player);
 				if (result.index == 0) {
-					trigger.player.chooseToDiscard("he", true).set("ai", card => {
-						if (get.position(card) == "e") return get.event().e-get.value(card);
-						return 1 / (get.value(card) || 0.5);
-					}).set("e", function () {
-						if (!trigger.player.hasCard(i => {
-							return get.value(i, trigger.player) <= 6;
-						}, "e")) return 0;
-						if (!trigger.player.needsToDiscard(-2)) return 0;
-						return 6.2;
-					}());
+					trigger.player
+						.chooseToDiscard("he", true)
+						.set("ai", card => {
+							if (get.position(card) == "e") return get.event().e - get.value(card);
+							return 1 / (get.value(card) || 0.5);
+						})
+						.set(
+							"e",
+							(function () {
+								if (
+									!trigger.player.hasCard(i => {
+										return get.value(i, trigger.player) <= 6;
+									}, "e")
+								)
+									return 0;
+								if (!trigger.player.needsToDiscard(-2)) return 0;
+								return 6.2;
+							})()
+						);
 					trigger.player.addTempSkill("olrunwei_+");
 					trigger.player.addMark("olrunwei_+", 1, false);
 				}
@@ -5230,7 +5256,7 @@ const skills = {
 		content: function () {
 			"step 0";
 			var evt = event.getParent(2);
-			evt.set("olxiaofan", true);
+			if (_status.connectMode || !event.isMine()) evt.set("olxiaofan", true);
 			var cards = get.bottomCards(lib.skill.olxiaofan.getNum(player) + 1, true);
 			var aozhan = player.hasSkill("aozhan");
 			player
@@ -19766,87 +19792,89 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			let nh = player.countCards("h");
-			event.result = await player.chooseCardTarget({
-				filterCard: true,
-				filterTarget: function (card, player, target) {
-					return target != player;
-				},
-				selectCard: [1, nh],
-				ai1: function (card) {
-					var player = _status.event.player;
-					var cardname = _status.event.cardname;
-					if (_status.event.du) return -get.value(card, player, "raw");
-					else if (_status.event.shuimeng) {
-						if (cardname == "wuzhong") {
-							if (
-								player.needsToDiscard(2, (i, player) => {
-									return !ui.selected.cards.includes(i) && !player.canIgnoreHandcard(i);
-								})
-							)
-								return 10 - get.value(card, player, "raw");
-						} else if (cardname == "guohe") {
-							if (
-								player.needsToDiscard(-1, (i, player) => {
-									return !ui.selected.cards.includes(i) && !player.canIgnoreHandcard(i);
-								})
-							)
-								return 10 - get.value(card, player, "raw");
-						}
-						return 0;
-					} else if (cardname == "lebu") {
-						if (
-							player.needsToDiscard(1, (i, player) => {
-								return !ui.selected.cards.includes(i) && !player.canIgnoreHandcard(i);
-							})
-						) {
-							return 8 - get.value(card, player, "raw");
-						} else {
-							if (!ui.selected.cards.length) {
-								return 6 - get.value(card, player, "raw");
+			event.result = await player
+				.chooseCardTarget({
+					filterCard: true,
+					filterTarget: function (card, player, target) {
+						return target != player;
+					},
+					selectCard: [1, nh],
+					ai1: function (card) {
+						var player = _status.event.player;
+						var cardname = _status.event.cardname;
+						if (_status.event.du) return -get.value(card, player, "raw");
+						else if (_status.event.shuimeng) {
+							if (cardname == "wuzhong") {
+								if (
+									player.needsToDiscard(2, (i, player) => {
+										return !ui.selected.cards.includes(i) && !player.canIgnoreHandcard(i);
+									})
+								)
+									return 10 - get.value(card, player, "raw");
+							} else if (cardname == "guohe") {
+								if (
+									player.needsToDiscard(-1, (i, player) => {
+										return !ui.selected.cards.includes(i) && !player.canIgnoreHandcard(i);
+									})
+								)
+									return 10 - get.value(card, player, "raw");
 							}
 							return 0;
+						} else if (cardname == "lebu") {
+							if (
+								player.needsToDiscard(1, (i, player) => {
+									return !ui.selected.cards.includes(i) && !player.canIgnoreHandcard(i);
+								})
+							) {
+								return 8 - get.value(card, player, "raw");
+							} else {
+								if (!ui.selected.cards.length) {
+									return 6 - get.value(card, player, "raw");
+								}
+								return 0;
+							}
+						} else if (cardname == "shunshou") {
+							if (_status.event.nh <= 2) return get.value(card, player, "raw");
+						} else if (cardname == "huogong") {
+							if (player.hp == 1) return get.value(card, player, "raw");
 						}
-					} else if (cardname == "shunshou") {
-						if (_status.event.nh <= 2) return get.value(card, player, "raw");
-					} else if (cardname == "huogong") {
-						if (player.hp == 1) return get.value(card, player, "raw");
-					}
-					if (ui.selected.cards.length) return 0;
-					return 7 - get.value(card, player, "raw");
-				},
-				ai2: function (target) {
-					var att = get.attitude(_status.event.player, target);
-					var nh2 = target.countCards("h");
-					var num = Math.sqrt(1 + nh2);
-					var cardname = _status.event.cardname;
-					if (_status.event.du) return 0.5 - att;
-					else if (_status.event.shuimeng) {
-						return att / num;
-					} else if (cardname == "lebu") {
-						return att / num;
-					} else if (cardname == "shunshou") {
-						if (_status.event.nh <= 2) return att / num;
-					} else if (cardname == "huogong") {
-						if (_status.event.player.hp == 1) return att / num;
-					}
-					if (_status.event.nh > nh2 + 1) {
-						return att / num;
-					}
-					return 0;
-				},
-				du: player.hasCard(function (card) {
-					return get.value(card, player, "raw") < 0;
-				}),
-				shuimeng: function () {
-					if (trigger.card.name == "guohe") return trigger.getParent(2).name == "shuimeng";
-					if (trigger.card.name == "wuzhong") return trigger.getParent(3).name == "shuimeng";
-				}(),
-				nh: nh,
-				cardname: trigger.card.name,
-				prompt: get.prompt2("qianya"),
-			}).forResult();
+						if (ui.selected.cards.length) return 0;
+						return 7 - get.value(card, player, "raw");
+					},
+					ai2: function (target) {
+						var att = get.attitude(_status.event.player, target);
+						var nh2 = target.countCards("h");
+						var num = Math.sqrt(1 + nh2);
+						var cardname = _status.event.cardname;
+						if (_status.event.du) return 0.5 - att;
+						else if (_status.event.shuimeng) {
+							return att / num;
+						} else if (cardname == "lebu") {
+							return att / num;
+						} else if (cardname == "shunshou") {
+							if (_status.event.nh <= 2) return att / num;
+						} else if (cardname == "huogong") {
+							if (_status.event.player.hp == 1) return att / num;
+						}
+						if (_status.event.nh > nh2 + 1) {
+							return att / num;
+						}
+						return 0;
+					},
+					du: player.hasCard(function (card) {
+						return get.value(card, player, "raw") < 0;
+					}),
+					shuimeng: (function () {
+						if (trigger.card.name == "guohe") return trigger.getParent(2).name == "shuimeng";
+						if (trigger.card.name == "wuzhong") return trigger.getParent(3).name == "shuimeng";
+					})(),
+					nh: nh,
+					cardname: trigger.card.name,
+					prompt: get.prompt2("qianya"),
+				})
+				.forResult();
 		},
-		async content (event, trigger, player) {
+		async content(event, trigger, player) {
 			player.give(event.cards, event.targets[0]);
 		},
 	},
