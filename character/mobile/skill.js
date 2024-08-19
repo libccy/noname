@@ -7578,9 +7578,10 @@ const skills = {
 				audio: "mbdaoshu1",
 				enable: "phaseUse",
 				filter: function (event, player) {
-					return game.hasPlayer(target => target != player && target.countCards("h") >= 2);
+					return game.hasPlayer(target => lib.skill.mbdaoshu_use.filterTarget(event, player, target));
 				},
 				filterTarget: function (card, player, target) {
+					if (!["guozhan", "identity"].includes(get.mode()) && target.isFriendOf(player)) return false;
 					return target != player && target.countCards("h") >= 2;
 				},
 				usable: 1,
