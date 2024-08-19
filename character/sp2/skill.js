@@ -4630,6 +4630,7 @@ const skills = {
 		content: function () {
 			"step 0";
 			player.give(cards, target);
+			player.addTempSkill("channi_effect");
 			"step 1";
 			if (target.countCards("h") > 0) {
 				game.broadcastAll(function (num) {
@@ -4642,37 +4643,39 @@ const skills = {
 				next.set("_backupevent", "channi_backup");
 				next.set("custom", {
 					add: {},
-					replace: { window: function () {} },
+					replace: { window: function () { } },
 				});
 				next.backup("channi_backup");
-			} else event.finish();
+			}
 			"step 2";
-			if (result.bool) {
-				var evts = target.getHistory("useCard", function (evt) {
-					return evt.card.name == "juedou" && evt.getParent(2) == event;
-				});
-				if (!evts.length) {
-					event.finish();
-					return;
-				}
-				var num = evts[0].cards.length;
-				if (
-					target.hasHistory("sourceDamage", function (evt) {
-						return evt.card && evt.card.name == "juedou" && evt.getParent(4) == event;
-					})
-				)
-					target.draw(num);
-			} else event.finish();
-			"step 3";
-			if (
-				player.countCards("h") > 0 &&
-				target.hasHistory("damage", function (evt) {
-					return evt.card && evt.card.name == "juedou" && evt.getParent(4) == event;
-				})
-			)
-				player.chooseToDiscard("h", true, player.countCards("h"));
+			player.removeSkill("channi_effect");
 		},
 		subSkill: {
+			effect: {
+				trigger: {
+					global: ["damageSource", "damageEnd"],
+				},
+				filter(event, player, name) {
+					if (!event.card || event.card.name != "juedou") return false;
+					let evt = event.getParent(2);
+					if (!evt || evt.name != "useCard" || evt.card.name != "juedou") return false;
+					let user = evt.player;
+					let evtx = event.getParent("channi", true);
+					if (!evtx || evtx.player != player) return false;
+					if (name == "damageSource") return event.source == user && evt.cards.length;
+					return event.player == user && player.countCards("h");
+				},
+				forced: true,
+				charlotte: true,
+				logTarget(event, player, name) {
+					return event[name == "damageSource" ? "source" : "player"];
+				},
+				content() {
+					let evt = trigger.getParent(2);
+					if (event.triggername == "damageSource") evt.player.draw(evt.cards.length);
+					else player.chooseToDiscard("h", true, player.countCards("h"));
+				},
+			},
 			backup: {
 				filterCard: function (card) {
 					return get.itemtype(card) == "card";

@@ -11756,6 +11756,37 @@ const skills = {
 				player.draw();
 			}
 		},
+		ai: { threaten: 3.5 },
+		global: "sphuangen_ai",
+		subSkill: {
+			ai: {
+				ai: {
+					effect: {
+						player_use(card, player) {
+							if (
+								typeof card != "object" ||
+								!game.hasPlayer(target => {
+									return target.hasSkill("sphuangen") && (get.attitude(player, target) < 0 || get.attitude(target, player) < 0);
+								}) ||
+								game.countPlayer(target => {
+									return player.canUse(card, target);
+								}) < 2
+							)
+								return;
+							if (get.info(card)?.type != "trick") return;
+							const select = get.info(card).selectTarget;
+							let range;
+							if (select == undefined) range = [1, 1];
+							else if (typeof select == "number") range = [select, select];
+							else if (get.itemtype(select) == "select") range = select;
+							else if (typeof select == "function") range = select(card, player);
+							game.checkMod(card, player, range, "selectTarget", player);
+							if (range[1] == -1 || (range[1] > 1 && ui.selected.targets && ui.selected.targets.length)) return "zeroplayertarget";
+						},
+					},
+				},
+			},
+		},
 	},
 	spyicong: {
 		trigger: { player: "phaseDiscardEnd" },
@@ -13467,7 +13498,7 @@ const skills = {
 					player: "phaseUseBefore",
 				},
 				filter(event, player) {
-					return !player._trueMe && event?.owner?.[1].isIn();
+					return !player._trueMe && event?.owner?.[1].isIn() && player != event.owner[1];
 				},
 				content() {
 					const owner = trigger.owner[1];
@@ -13494,12 +13525,14 @@ const skills = {
 					},
 				},
 				onremove(player) {
-					if (player == game.me) {
-						if (!game.notMe) game.swapPlayerAuto(player._trueMe);
-						else delete game.notMe;
-						if (_status.auto) ui.click.auto();
+					if (player._trueMe) {
+						if (player == game.me) {
+							if (!game.notMe) game.swapPlayerAuto(player._trueMe);
+							else delete game.notMe;
+							if (_status.auto) ui.click.auto();
+						}
+						delete player._trueMe;
 					}
-					delete player._trueMe;
 				},
 			},
 		},
