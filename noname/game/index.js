@@ -7171,7 +7171,7 @@ export class Game extends GameCompatible {
 		return arg[arg.length - 1];
 	}
 	/**
-	 * @param { number } num
+	 * @param { number } [num]
 	 */
 	prepareArena(num) {
 		_status.prepareArena = true;
@@ -8141,7 +8141,7 @@ export class Game extends GameCompatible {
 	 * @param { (player: Player) => boolean } func
 	 * @param { boolean } [includeOut]
 	 */
-	countPlayer2(func, includeOut) {
+	countPlayer2(func = lib.filter.all, includeOut) {
 		if (typeof func != "function") func = lib.filter.all;
 		return game.players.concat(game.dead).reduce((previousValue, currentValue) => {
 			if (!includeOut && currentValue.isOut()) return previousValue;

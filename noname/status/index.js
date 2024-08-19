@@ -96,7 +96,22 @@ export class status {
 	 * @type { boolean }
 	 */
 	withError = false;
-
+	/**
+	 * @type { string | undefined }
+	 */
+	mode = undefined;
+	/**
+	 * @type { { [key: string]: any } | undefined }
+	 */
+	brawl = undefined;
+	/**
+	 * @type { string | undefined }
+	 */
+	playback = undefined;
+	/**
+	 * @type { number | undefined }
+	 */
+	coinCoeff = undefined;
 	pauseManager = new PauseManager();
 	get paused() {
 		return this.pauseManager.pause.isStarted;
