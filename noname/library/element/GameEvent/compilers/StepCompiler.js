@@ -1,9 +1,9 @@
 // 喵喵！step写法的content全在这里处理喵！
-import { _status, ai, game, get, lib, ui } from "../../../../../../noname.js";
+import { _status, ai, game, get, lib, ui } from "../../../../../noname.js";
 import ContentCompilerBase from "./ContentCompilerBase.js";
 import ContentCompiler from "./ContentCompiler.js";
-import security from "../../../../../util/security.js";
-import { CodeSnippet, ErrorManager } from "../../../../../util/error.js";
+import security from "../../../../util/security.js";
+import { CodeSnippet, ErrorManager } from "../../../../util/error.js";
 export default class StepCompiler extends ContentCompilerBase {
     type = "step";
     filter(content) {

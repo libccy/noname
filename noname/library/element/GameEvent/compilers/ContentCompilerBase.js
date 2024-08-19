@@ -1,4 +1,4 @@
-import { game, _status } from "../../../../../../noname.js";
+import { game, _status } from "../../../../../noname.js";
 export default class ContentCompilerBase {
     beforeExecute(event) {
         const handlerType = event.getDefaultHandlerType();
