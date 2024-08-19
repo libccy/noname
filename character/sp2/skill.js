@@ -11381,11 +11381,15 @@ const skills = {
 		ai: {
 			order: 9,
 			result: {
-				target: function (player, target) {
+				player(player, target) {
+					if (target.countCards("hej")) return 0.92;
+					return 0;
+				},
+				target(player, target) {
 					var numj = target.countCards("j");
 					var numhe = target.countCards("he");
-					if (numhe == 0) return numj > 0 ? 6 : -6;
-					return -6 - (numj + 1) / numhe;
+					if (numhe + numj > 0) return (1.6 * numj - numhe) / (numj + numhe) - 0.3;
+					return -0.3;
 				},
 			},
 			threaten: 1.1,

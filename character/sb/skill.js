@@ -1429,18 +1429,8 @@ const skills = {
 					if (get.tag(card, "damage") && target.hp > 1) {
 						if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
 						if (!target.hasFriend()) return;
-						let max = 0;
-						const num = Math.max(1, player.getDamagedHp());
-						if (num > 2) return [1, -2];
-						const players = game.filterPlayer();
-						for (const current of players) {
-							if (get.attitude(target, current) > 0) {
-								max = Math.max(current.countCards("he"), max);
-							}
-						}
-						return [1, Math.max(1, 1 + Math.min(2, max / 3))];
+						return [1, 0.6 * (4 - 0.9 * Math.max(1, player.getDamagedHp()))];
 					}
-					if ((card.name == "tao" || card.name == "caoyao") && target.hp > 1 && target.countCards("h") <= target.hp) return [0, 0];
 				},
 			},
 		},
