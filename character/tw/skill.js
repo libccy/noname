@@ -61,11 +61,8 @@ const skills = {
 							bool: result.bool,
 							cards: result.cards,
 						};
-					}
-					else {
-						const result = await target
-							.chooseBool("是否摸一张牌？", `若此牌点数位于${num1}和${num2}之间，防止此伤害`)
-							.forResult();
+					} else {
+						const result = await target.chooseBool("是否摸一张牌？", `若此牌点数位于${num1}和${num2}之间，防止此伤害`).forResult();
 						event.result = {
 							bool: result.bool,
 						};
@@ -80,8 +77,7 @@ const skills = {
 					if (event.cards?.length > 0) {
 						await target.recast(event.cards);
 						card = event.cards[0];
-					}
-					else {
+					} else {
 						const { result } = await target.draw();
 						card = result[0];
 					}
@@ -107,9 +103,12 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		filter(event, player) {
-			return player.countCards("h") && game.hasPlayer(current => {
-				return current != player && current.countCards("h");
-			});
+			return (
+				player.countCards("h") &&
+				game.hasPlayer(current => {
+					return current != player && current.countCards("h");
+				})
+			);
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
@@ -130,7 +129,7 @@ const skills = {
 				dialog.add(get.translation(target) + "的手牌");
 				let hs = target.getCards("h");
 				if (player.hasSkillTag("viewHandcard", null, target, true)) dialog.add(hs);
-				else dialog.add([hs, "blank"])
+				else dialog.add([hs, "blank"]);
 			}
 			const result = await player
 				.chooseButton(dialog, true, [2, Infinity])
@@ -138,23 +137,32 @@ const skills = {
 					const buttons = ui.selected.buttons;
 					return buttons.filter(i => get.owner(i.link) == get.player()).length * 2 == buttons.length;
 				})
-				.set("cards", function () {
-					let cards = player.getCards("h").slice(0).sort((a, b) => get.value(a) - get.value(b));
-					let result = [];
-					while (result.length < target.countCards("h")) {
-						let card = cards.shift();
-						if (get.value(card) <= 5) result.push(card);
-						else break;
-					}
-					return result.concat(target.getCards("h").randomGets(result.length));
-				}())
+				.set(
+					"cards",
+					(function () {
+						let cards = player
+							.getCards("h")
+							.slice(0)
+							.sort((a, b) => get.value(a) - get.value(b));
+						let result = [];
+						while (result.length < target.countCards("h")) {
+							let card = cards.shift();
+							if (get.value(card) <= 5) result.push(card);
+							else break;
+						}
+						return result.concat(target.getCards("h").randomGets(result.length));
+					})()
+				)
 				.set("ai", button => {
 					return get.event("cards").includes(button.link);
 				})
 				.forResult();
 			for (const owner of [player, target]) {
 				owner.addTempSkill("twniwo_block");
-				owner.addGaintag(result.links.filter(i => get.owner(i) == owner), "twniwo");
+				owner.addGaintag(
+					result.links.filter(i => get.owner(i) == owner),
+					"twniwo"
+				);
 			}
 		},
 		subSkill: {
@@ -1065,6 +1073,93 @@ const skills = {
 		},
 	},
 	//幻诸葛果
+	rexianyuan: {
+		audio: "twxianyuan",
+		trigger: { global: "phaseUseBegin" },
+		filter(event, player) {
+			return event.player.hasMark("rexianyuan");
+		},
+		forced: true,
+		locked: false,
+		logTarget: "player",
+		async content(event, trigger, player) {
+			const target = trigger.player,
+				str = get.translation(target);
+			const num = target.countMark("rexianyuan");
+			let choice;
+			if (!target.countCards("h")) choice = 1;
+			else
+				choice = await player
+					.chooseControl()
+					.set("choiceList", ["观看" + str + "的手牌并将其中至多" + get.cnNumber(num) + "张牌置于牌堆顶", "令" + str + "摸" + get.cnNumber(num) + "张牌"])
+					.set("ai", () => (get.attitude(get.player(), get.event().getTrigger().player) > 0 ? 1 : 0))
+					.forResult("index");
+			if (typeof choice != "number") return;
+			if (choice == 0) {
+				const result = await player.choosePlayerCard(target, "h", "visible", [1, num], true, '###仙援###<div class="text center">将其中至多' + get.cnNumber(num) + "张牌置于牌堆顶（先选择的在上）</div>").forResult();
+				if (result.bool && result.cards?.length) {
+					const cards = result.cards.slice();
+					target.$throw(cards.length, 1000);
+					await target.lose(cards, ui.cardPile, "insert");
+				}
+			} else await target.draw(num);
+			if (_status.currentPhase !== player) target.clearMark("rexianyuan");
+		},
+		limit: 3,
+		intro: { content: "mark" },
+		group: ["rexianyuan_give", "rexianyuan_gain"],
+		subSkill: {
+			give: {
+				audio: "twxianyuan",
+				enable: "phaseUse",
+				filter(event, player) {
+					return player.hasMark("rexianyuan") && game.hasPlayer(i => lib.skill.rexianyuan.subSkill.give.filterTarget(null, player, i));
+				},
+				filterTarget(card, player, target) {
+					return target != player && target.countMark("rexianyuan") < lib.skill.rexianyuan.limit;
+				},
+				prompt: "将“仙援”标记分配给其他角色",
+				async content(event, trigger, player) {
+					const target = event.target;
+					const gives = Array.from({ length: player.countMark("rexianyuan") }).map((_, i) => get.cnNumber(i + 1) + "枚");
+					let give;
+					if (gives.length == 1) give = 0;
+					else
+						give = await player
+							.chooseControl(gives)
+							.set("ai", () => 0)
+							.set("prompt", "仙援：将任意枚“仙援”标记分配给" + get.translation(target))
+							.forResult("index");
+					if (typeof give != "number") return;
+					give++;
+					player.removeMark("rexianyuan", give);
+					target.addMark("rexianyuan", give);
+				},
+				ai: {
+					order: 1,
+					result: {
+						player: 1,
+						target(player, target) {
+							const sgn = get.sgn(get.attitude(player, target));
+							return sgn == 0 ? 0.5 : sgn * (2 - sgn);
+						},
+					},
+				},
+			},
+			gain: {
+				audio: "twxianyuan",
+				trigger: { global: "roundStart" },
+				filter(event, player) {
+					return player.countMark("rexianyuan") < lib.skill.rexianyuan.limit;
+				},
+				forced: true,
+				locked: false,
+				content() {
+					player.addMark("rexianyuan", lib.skill.rexianyuan.limit - player.countMark("rexianyuan"));
+				},
+			},
+		},
+	},
 	twxianyuan: {
 		audio: 2,
 		enable: "phaseUse",
@@ -2497,7 +2592,7 @@ const skills = {
 			return false;
 		},
 		logTarget: "player",
-		logAudio(event, player){
+		logAudio(event, player) {
 			return "twxiayong" + (event.player === player ? 1 : 2) + ".mp3";
 		},
 		locked: true,
