@@ -1586,10 +1586,14 @@ export const Content = {
 							return new Promise(resolve => {
 								element.classList.remove("glow2");
 								element.style.transition = '';
-								if (element.style.transform != 'translateX(0px) translateY(0px)' && element.style.transform != '') {
+								const transformValue = element.style.transform;
+								if (transformValue !== 'translateX(0px) translateY(0px)' && transformValue !== '') {
 									element.style.transform = 'translateX(0px) translateY(0px)';
-									element.addEventListener('transitionend',() => {
-										resolve();
+									element.addEventListener('transitionend', event => {
+										// 确保 transitionend 事件是针对当前元素的 transform 属性
+										if (event.propertyName === 'transform') {
+											resolve();
+										}
 									}, { once: true });
 								}
 								else resolve();
