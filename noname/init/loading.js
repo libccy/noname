@@ -307,7 +307,6 @@ export async function loadExtension(extension) {
 					await game.promises.saveConfigValue("characters");
 				}
 
-				console.log(content);
 				loadCharacter(content);
 			}
 			if (typeof extension[4].card?.card == "object" && Object.keys(extension[4].card.card).length > 0) {
@@ -350,7 +349,6 @@ export async function loadExtension(extension) {
 					await game.promises.saveConfigValue("cards");
 				}
 
-				console.log(content);
 				loadCard(content);
 			}
 			if (typeof extension[4].skill?.skill == "object" && Object.keys(extension[4].skill.skill).length > 0) {
