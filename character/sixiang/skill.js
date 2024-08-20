@@ -1304,7 +1304,8 @@ const skills = {
 				})
 				.set("ai", target => {
 					const player = get.event("player");
-					return -1 / target.countCards("h");
+					if (get.attitude(player, target) >= 0) return 0;
+					return 1 / target.countCards("h");
 				})
 				.forResult();
 		},

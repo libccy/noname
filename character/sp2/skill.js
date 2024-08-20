@@ -4530,11 +4530,9 @@ const skills = {
 				.chooseControl("10个", "20个", "30个", "40个")
 				.set("prompt", "要令" + get.translation(target) + "获得多少标记？")
 				.set("ai", function () {
-					var player = _status.event.player,
+					let player = _status.event.player,
 						target = _status.event.getParent().target;
-					/*if(get.attitude(player,target)<0&&game.hasPlayer(function(current){
-					return current!=player&&current!=target&&!current.hasMark('yijiao')&&get.attitude(player,current)<0;
-				})) return 3;*/
+					if (get.attitude(player, target) < 0) return 3;
 					return 0;
 				});
 			"step 1";

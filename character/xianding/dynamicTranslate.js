@@ -66,7 +66,7 @@ const dynamicTranslates = {
 	},
 	dcsbmengmou(player) {
 		var storage = player.storage.dcsbmengmou;
-		var str = "转换技，每回合每项各限一次，当你得到其他角色的牌后，或其他角色得到你的牌后：";
+		var str = "转换技，①游戏开始时，你可以转换此技能状态；②每回合每项各限一次，当你得到其他角色的牌后，或其他角色得到你的牌后：";
 		if (!storage) str += '<span class="bluetext">';
 		str += "阳，你可以令该角色使用至多X张【杀】，且其每以此法造成1点伤害，其回复1点体力；";
 		if (!storage) str += "</span>";
@@ -78,7 +78,7 @@ const dynamicTranslates = {
 	},
 	dcsbyingmou(player) {
 		var storage = player.storage.dcsbyingmou;
-		var str = "转换技，每回合限一次，你对其他角色使用牌后，你可以选择其中一名目标角色：";
+		var str = "转换技，①游戏开始时，你可以转换此技能状态；②每回合限一次，你对其他角色使用牌后，你可以选择其中一名目标角色：";
 		if (!storage) str += '<span class="bluetext">';
 		str += "阳，你将手牌数摸至与其相同（至多摸五张），然后视为对其使用一张【火攻】；";
 		if (!storage) str += "</span>";
@@ -88,8 +88,8 @@ const dynamicTranslates = {
 		return str;
 	},
 	dcsbquanmou(player) {
-		if (player.storage.dcsbquanmou) return '转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。阳：当你于本阶段内下次对其造成伤害时，取消之；<span class="bluetext">阴：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。</span>';
-		return '转换技。出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。<span class="bluetext">阳：当你于本阶段内下次对其造成伤害时，取消之；</span>阴：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。';
+		if (player.storage.dcsbquanmou) return '转换技。①游戏开始时，你可以转换此技能状态；②出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。阳：当你于本阶段内下次对其造成伤害时，取消之；<span class="bluetext">阴：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。</span>';
+		return '转换技。①游戏开始时，你可以转换此技能状态；②出牌阶段每名角色限一次，你可以令一名攻击范围内的其他角色交给你一张牌。<span class="bluetext">阳：当你于本阶段内下次对其造成伤害时，取消之；</span>阴：当你于本阶段内下次对其造成伤害后，你可以选择除其外的至多三名其他角色，对这些角色依次造成1点伤害。';
 	},
 	dcshouzhi(player) {
 		let skillName = "dcshouzhi";
@@ -98,7 +98,7 @@ const dynamicTranslates = {
 	},
 	dcsbfumou(player) {
 		const storage = player.storage.dcsbfumou;
-		var str = "转换技，出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其至多一半手牌：";
+		var str = "转换技，①游戏开始时，你可以转换此技能状态；②出牌阶段限一次，你可以观看一名其他角色A的手牌并展示其至多一半手牌：";
 		if (!storage) str += '<span class="bluetext">';
 		str += "阳，并将这些牌交给另一名其他角色B，然后你与A各摸X张牌（X为A以此法失去的手牌数）；";
 		if (!storage) str += "</span>";

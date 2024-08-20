@@ -17134,7 +17134,7 @@ const skills = {
 			return 7 - get.value(card);
 		},
 		logAudio(event, player) {
-			const num = Math.max(get.equipNum(event.cards[0]), 3);
+			const num = Math.min(get.equipNum(event.cards[0]), 3);
 			return "yuanhu" + num + ".mp3";
 		},
 		content: function () {
