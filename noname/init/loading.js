@@ -477,7 +477,20 @@ function mixinGeneral(config, name, where) {
 	if (!config[name]) return;
 
 	for (let [key, value] of Object.entries(config[name])) {
-		where[key] = typeof value == "object" ? Object.assign(where[key] ?? {}, value) : value;
+		if (["ui", "ai"].includes(name)) {
+			if (typeof value == "object") {
+				// 我甚至不敢把这个双等于改了，怕了
+				// noinspection EqualityComparisonWithCoercionJS
+				if (where[key] == undefined) where[key] = {};
+				for (let [key2, value2] of Object.entries(value)) {
+					where[key][key2] = value2;
+				}
+			} else {
+				where[key] = value;
+			}
+		} else {
+			where[key] = value;
+		}
 	}
 }
 
