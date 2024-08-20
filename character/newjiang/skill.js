@@ -108,7 +108,7 @@ const skills = {
 		marktext: "☯",
 		zhuanhuanji(player, skill) {
 			player.storage[skill] = !player.storage[skill];
-			//player.changeSkin({ characterName: "yj_sb_guojia" }, "yj_sb_guojia" + (player.storage[skill] ? "_shadow" : ""));
+			player.changeSkin({ characterName: "yj_sb_guojia" }, "yj_sb_guojia" + (player.storage[skill] ? "_shadow" : ""));
 		},
 		intro: {
 			content: function (storage) {
@@ -146,15 +146,22 @@ const skills = {
 			player.getHistory("lose", evt => {
 				if (evt.cards2) num += evt.cards2.length;
 			});
+			player.addAdditionalSkills("xianmou", []);
 			player.changeZhuanhuanji("xianmou");
 			if (player.storage.xianmou) {
-				player.addAdditionalSkills("xianmou", []);
 				let cards = game.cardsGotoOrdering(get.cards(5)).cards;
 				const result = await player.chooseButton([`是否获得至多${num}张牌？`, cards], [1, num]).set("ai", function (button) {
 					if (ui.selected.buttons.length + 1 >= _status.event.maxNum) return 0;
 					return get.value(button.link);
 				}).set("maxNum", num).forResult();
-				if (result.bool) await player.gain(result.links, "gain2");
+				if (result.bool){
+					await player.gain(result.links, "gain2");
+					cards.removeArray(result.links);
+				}
+				cards.reverse();
+				for (var i = 0; i < cards.length; i++) {
+					ui.cardPile.insertBefore(cards[i], ui.cardPile.firstChild);
+				}
 				if (!result.bool || result.links.length < num) await player.addAdditionalSkills("xianmou", "new_reyiji");
 			}
 			else {

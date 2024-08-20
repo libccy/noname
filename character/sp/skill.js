@@ -4383,7 +4383,7 @@ const skills = {
 		check: function (card) {
 			var player = _status.event.player;
 			if (player.hasSkill("hezhong") && !(player.hasSkill("hezhong_0") && player.hasSkill("hezhong_1"))) {
-				if (player.countCards("h") - ui.selected.cards.length > 2) return 1 / (get.value(card) || 0.5);
+				if (player.countCards("h") - ui.selected.cards.length > 1) return 1 / (get.value(card) || 0.5);
 				return 0;
 			}
 			if (ui.selected.cards.length < player.countCards("h") / 2) return 5 - get.value(card);
@@ -16649,6 +16649,7 @@ const skills = {
 				return ui.create.dialog("锦织", [list, "vcard"], "hidden");
 			},
 			check: function (button) {
+				if (_status.event.getParent().type != "phase") return 1;
 				if (button.link[2] == "shan") return 3;
 				var player = _status.event.player;
 				if (button.link[2] == "jiu") {

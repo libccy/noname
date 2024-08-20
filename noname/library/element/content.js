@@ -7426,7 +7426,7 @@ export const Content = {
 		if (!info.noForceDie) event.forceDie = true;
 		if (!info.noForceOut) event.includeOut = true;
 		event._skill = event.skill;
-		game.trySkillAudio(event.skill, player, true, null, null, [event, event.player]);
+		game.trySkillAudio(event.skill, player, null, null, null, [event, event.player]);
 		var checkShow = player.checkShow(event.skill);
 		if (info.discard != false && info.lose != false && !info.viewAs) {
 			player.discard(cards).delay = false;

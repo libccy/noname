@@ -7578,9 +7578,10 @@ const skills = {
 				audio: "mbdaoshu1",
 				enable: "phaseUse",
 				filter: function (event, player) {
-					return game.hasPlayer(target => target != player && target.countCards("h") >= 2);
+					return game.hasPlayer(target => lib.skill.mbdaoshu_use.filterTarget(event, player, target));
 				},
 				filterTarget: function (card, player, target) {
+					if (!["guozhan", "identity"].includes(get.mode()) && target.isFriendOf(player)) return false;
 					return target != player && target.countCards("h") >= 2;
 				},
 				usable: 1,
@@ -9903,11 +9904,11 @@ const skills = {
 					return Math.random() < 0.5 ? 0 : 4;
 				});
 			"step 1";
-			var list = [0, 1, 1, 2, 2, 2, 3, 3, 4];
+			let list = [0, 1, 1, 2, 2, 2, 3, 3, 4];
 			if (result.control != "cancel2") list.push(result.index);
-			var num = list.randomGet();
+			let num = list.randomGet();
 			event.num = num;
-			var str = get.translation(player) + "抽取的命运签为：" + lib.skill["tiansuan2_" + num].name;
+			let str = get.translation(player) + "抽取的命运签为：" + lib.skill["tiansuan2_" + num].name;
 			game.log(player, "抽取出了", "#g" + lib.skill["tiansuan2_" + num].name);
 			event.dialog = ui.create.dialog(str);
 			event.videoId = lib.status.videoId++;
@@ -9922,15 +9923,18 @@ const skills = {
 			player.chooseTarget(true, "令一名角色获得“" + lib.skill["tiansuan2_" + num].name + "”").set("ai", lib.skill["tiansuan2_" + num].aiCheck);
 			"step 3";
 			if (result.bool) {
-				var target = result.targets[0];
+				let target = result.targets[0];
 				player.line(target, "green");
 				game.log(player, "令", target, "获得了命运签");
 				player.storage.tiansuan2 = target;
 				player.storage.tiansuan3 = "tiansuan2_" + num;
 				player.addTempSkill("tiansuan2", { player: "phaseBegin" });
 				target.addSkill("tiansuan2_" + num);
-				if (num < 2 && target.countGainableCards(player, target == player ? "e" : "he") > 0) {
-					var next = player.gainPlayerCard(target, target == player ? "e" : "he", true);
+				let pos = "e";
+				if (target != player) pos += "h";
+				if (num == 0) pos += "j";
+				if (num < 2 && target.countGainableCards(player, pos) > 0) {
+					let next = player.gainPlayerCard(target, pos, true);
 					if (num == 0) next.visible = true;
 				} else game.delayx();
 			}
@@ -13846,7 +13850,10 @@ const skills = {
 		},
 		filterCard: true,
 		position: "he",
-		filterTarget: lib.filter.notMe,
+		filterTarget(card, player, target) {
+			if (!["identity", "doudizhu"].includes(get.mode()) && target.isFriendOf(player)) return false;
+			return target != player;
+		},
 		check: function (card) {
 			return 6 - get.value(card);
 		},

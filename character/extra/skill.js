@@ -1502,15 +1502,11 @@ const skills = {
 					],
 				],
 			]);
-			next.set("processAI", list => {
-				const listx = list[0][1][0];
-				const me = listx.find(info => parseInt(info.split("|")[0]) == get.player().getSeatNum());
-				listx.randomSort();
-				if (me) {
-					listx.remove(me);
-					listx.unshift(me);
-				}
-				return [listx];
+			next.set("toSortPlayers", toSortPlayers.slice(0));
+			next.set("processAI", () => {
+				const players = get.event("toSortPlayers"), player = get.player();
+				players.randomSort().sort((a, b) => get.attitude(player, b) - get.attitude(player, a));
+				return [players.map(i => `${i.getSeatNum()}|${i.name}`)];
 			});
 			const { result } = await next;
 			if (!result.bool) return;
