@@ -28806,7 +28806,7 @@ const skills = {
 			return player.countCards("he", { type: "equip" }) > 0;
 		},
 		logAudio(_1, _2, _3, _4, result) {
-			return "yuanhu" + Math.max(get.equipNum(result.cards[0]), 3) + ".mp3";
+			return "yuanhu" + Math.min(get.equipNum(result.cards[0]), 3) + ".mp3";
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
@@ -28829,9 +28829,9 @@ const skills = {
 				.forResult();
 		},
 		async content(event, trigger, player) {
-			const target = result.targets[0];
-			const card = result.cards[0];
-			target.equip(card);
+			const target = event.targets[0];
+			const card = event.cards[0];
+			await target.equip(card);
 			if (target != player) {
 				player.$give(card, target, false);
 			}
@@ -28847,7 +28847,7 @@ const skills = {
 					const { targets } = await player
 						.chooseTarget(true, function (card, player, target) {
 							return get.distance(_status.event.thisTarget, target) <= 1 && target.countCards("hej");
-						})
+						}, "选择一名与" + get.translation(target) + "距离1以内的角色，弃置其一张牌")
 						.set("ai", function (target) {
 							var attitude = get.attitude(_status.event.player, target);
 							if (attitude > 0 && target.countCards("j")) {

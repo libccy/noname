@@ -6956,7 +6956,7 @@ const skills = {
 			},
 			dialog: function (event, player) {
 				var num = (player.getStat("skill").buxu || 0) + 1;
-				return ui.create.dialog("###补叙###弃置" + get.cnNumber(num) + "张牌并补充一张“六经”");
+				return ui.create.dialog("###补续###弃置" + get.cnNumber(num) + "张牌并补充一张“六经”");
 			},
 			prompt: function (links, player) {
 				var num = (player.getStat("skill").buxu || 0) + 1;
@@ -6982,7 +6982,7 @@ const skills = {
 					ai2: () => 1,
 					content: function () {
 						var filter = lib.skill.chengye.liujing_filter[lib.skill.buxu_backup.index];
-						var card = get.cardPile(filter);
+						var card = get.cardPile2(filter);
 						if (card) player.addToExpansion(card, "gain2").gaintag.add("chengye");
 					},
 					ai: { result: { player: 1 } },
