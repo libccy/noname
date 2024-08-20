@@ -2164,7 +2164,7 @@ const skills = {
 				if (player.getEquips("ruyijingubang").includes(card)) return false;
 			},
 			canBeReplaced(card, player) {
-				if (player.getEquips("ruyijingubang").includes(card)) return false;
+				if (player.getVEquips("ruyijingubang").includes(card)) return false;
 			},
 			cardname(card) {
 				if (get.subtype(card, false) == "equip1") return "sha";
