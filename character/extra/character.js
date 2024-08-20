@@ -1,4 +1,5 @@
 const characters = {
+	shen_huangzhong: ["male", "shen", 4, ["1！5！", 'chiren'], ["shu"]],
 	new_simayi: ["male", "shen", 4, ["jilin", "yingyou", "yingtian"], ["wei", "name:司马|懿"]],
 	xin_simayi: ["male", "shen", 4, ["xinrenjie", "xinbaiyin", "xinlianpo"], ["tempname:shen_simayi", "wei", "name:司马|懿"]],
 	dc_shen_huatuo: ["male", "shen", 3, ["jingyu", "lvxin", "huandao"], ["qun"]],

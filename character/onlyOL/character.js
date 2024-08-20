@@ -1,4 +1,5 @@
 const characters = {
+	ol_sb_sunjian: ["male", "wu", 4, ["olsbhulie", "olsbyipo"]],
 	ol_sb_jiangwei: ["male", "shu", 4, ["olsbzhuri", "olsbranji"]],
 	ol_caozhang: ["male", "wei", 4, ["oljiangchi"], ["die:xin_caozhang"]],
 	ol_jianyong: ["male", "shu", 3, ["olqiaoshui", "jyzongshi"], ["tempname:re_jianyong", "die:re_jianyong"]],
@@ -16,6 +17,9 @@ const characters = {
 	ol_liru: ["male", "qun", 3, ["xinjuece", "olmieji", "dcfencheng"]],
 	ol_liubiao: ["male", "qun", 3, ["olzishou", "olzongshi"]],
 	ol_wuguotai: ["female", "wu", 3, ["olganlu", "olbuyi"], ["name:丁|null"]],
+	ol_sb_kongrong: ["male", "qun", 4, ["olsbliwen", "olsbzhengyi"]],
+	ol_zhangchunhua: ["female", "wei", 3, ["jueqing", "shangshi", "oljianmie"]],
+	ol_caochong: ["male", "wei", 3, ["olchengxiang", "olrenxin"]],
 };
 
 export default characters;

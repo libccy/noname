@@ -7,7 +7,7 @@ const characterReplaces = {
 	dingyuan: ["ol_dingyuan", "dingyuan"],
 	quyi: ["quyi", "re_quyi"],
 	hansui: ["hansui", "re_hansui", "xin_hansui", "jsrg_hansui"],
-	jin_simashi: ["dc_simashi", "jin_simashi", "simashi"],
+	jin_simashi: ["dc_simashi", "jin_simashi", "simashi", "std_simashi", "jd_jin_simashi"],
 	jin_yanghuiyu: ["jin_yanghuiyu", "yanghuiyu"],
 	taoqian: ["re_taoqian", "taoqian"],
 	jsp_liubei: ["jsrg_liubei", "jsp_liubei"],
@@ -26,15 +26,16 @@ const characterReplaces = {
 	caoanmin: ["caoanmin", "ns_caoanmin"],
 	duanwei: ["duanwei", "junk_duanwei"],
 	xushao: ["xushao", "jsrg_xushao"],
-	huban: ["ol_huban", "dc_huban", "mb_huban"],
-	mengda: ["ol_mengda", "dc_mengda", "pe_mengda"],
+	ol_huban: ["ol_huban", "dc_huban", "mb_huban"],
+	ol_mengda: ["ol_mengda", "dc_mengda", "pe_mengda"],
 	jsp_guanyu: ["jsp_guanyu", "dc_jsp_guanyu", "jsrg_guanyu"],
 	mushun: ["mushun", "sp_mushun"],
 	wangjun: ["dc_wangjun", "wangjun"],
 	re_zoushi: ["yue_zoushi", "re_zoushi", "jsrg_zoushi"],
-	zhangmancheng: ["dc_zhangmancheng", "tw_zhangmancheng"],
+	dc_zhangmancheng: ["dc_zhangmancheng", "tw_zhangmancheng"],
 	xf_huangquan: ["xf_huangquan", "dc_huangquan"],
 	re_zoushi: ["re_zoushi", "jsrg_zoushi", "yue_zoushi"],
+	lvkuanglvxiang: ["lvkuanglvxiang", "dc_lvkuanglvxiang"],
 };
 
 export default characterReplaces;

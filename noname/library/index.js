@@ -36,7 +36,7 @@ export class Library {
 	updateURLS = updateURLs;
 	updateURL = updateURLs.github;
 	mirrorURL = updateURLs.coding;
-	hallURL = "47.99.105.222";
+	hallURL = "";
 	assetURL = assetURL;
 	userAgent = userAgent;
 	characterDefaultPicturePath = characterDefaultPicturePath;
@@ -107,6 +107,11 @@ export class Library {
 	onresize = [];
 	onphase = [];
 	onwash = [];
+	onround = [
+		function roundSkillCheck(event) {
+			return !event.skill;
+		},
+	];
 	onover = [];
 	ondb = [];
 	ondb2 = [];
@@ -243,6 +248,9 @@ export class Library {
 
 	objectURL = new Map();
 	hookmap = {};
+	/**
+	 * @type { { character?: SMap<importCharacterConfig>, card?: SMap<importCardConfig>, mode?: SMap<importModeConfig>, player?: SMap<importPlayerConfig>, extension?: SMap<importExtensionConfig>, play?: SMap<importPlayConfig> } }
+	 */
 	imported = {};
 	layoutfixed = ["chess", "tafang", "stone"];
 	pinyins = {
@@ -324,28 +332,28 @@ export class Library {
 														return ai - get.value(cardx);
 													} else if (get.attitude(player, source) <= 0) return 0;
 													return 5 - get.value(cardx);
-												},
+											  },
 								});
 								if (!game.online) return;
 								_status.event._resultid = id;
 								game.resume();
 							};
-							("step 1");
+							"step 1";
 							var type = get.type2(card);
 							event.list = game.filterPlayer(current => current != player && current.countCards("h") && (_status.connectMode || current.hasCard(cardx => get.type2(cardx) == type, "h"))).sortBySeat(_status.currentPhase || player);
 							event.id = get.id();
-							("step 2");
+							"step 2";
 							if (!event.list.length) event.finish();
 							else if (_status.connectMode && (event.list[0].isOnline() || event.list[0] == game.me)) event.goto(4);
 							else event.send((event.current = event.list.shift()), event.card, player, trigger.targets, event.id, trigger.parent.id, trigger.yingbianZhuzhanAI);
-							("step 3");
+							"step 3";
 							if (result.bool) {
 								event.zhuzhanresult = event.current;
 								event.zhuzhanresult2 = result;
 								if (event.current != game.me) game.delayx();
 								event.goto(8);
 							} else event.goto(2);
-							("step 4");
+							"step 4";
 							var id = event.id,
 								sendback = (result, player) => {
 									if (result && result.id == id && !event.zhuzhanresult && result.bool) {
@@ -382,16 +390,16 @@ export class Library {
 									if (value != player) value.showTimer();
 								});
 							event.withol = withol;
-							("step 5");
+							"step 5";
 							if (!result || !result.bool || event.zhuzhanresult) return;
 							game.broadcast("cancel", event.id);
 							event.zhuzhanresult = game.me;
 							event.zhuzhanresult2 = result;
-							("step 6");
+							"step 6";
 							if (event.withol && !event.resultOL) game.pause();
-							("step 7");
+							"step 7";
 							game.players.forEach(value => value.hideTimer());
-							("step 8");
+							"step 8";
 							if (event.zhuzhanresult) {
 								var target = event.zhuzhanresult;
 								target.line(player, "green");
@@ -3684,7 +3692,7 @@ export class Library {
 					init: false,
 					unfrequent: true,
 					onclick(bool) {
-						game.saveConfig("show_statusbar", bool);
+						game.saveConfig("show_statusbar_android", bool);
 						if (window.StatusBar && lib.device == "android") {
 							if (bool) {
 								window.StatusBar.overlaysWebView(false);
@@ -6957,6 +6965,27 @@ export class Library {
 					name: "启用手气卡",
 					init: false,
 					frequent: true,
+				},
+				connect_double_character: {
+					name: "启用双将",
+					init: "single",
+					item: {
+						single: "不启用",
+						double: "启用双将",
+						singble: "单双任选",
+					},
+					restart: true,
+				},
+				connect_double_hp: {
+					name: "双将体力上限",
+					init: "pingjun",
+					item: {
+						hejiansan: "和减三",
+						pingjun: "平均值",
+						zuidazhi: "最大值",
+						zuixiaozhi: "最小值",
+						zonghe: "相加",
+					},
 					restart: true,
 				},
 				update: function (config, map) {
@@ -6969,6 +6998,17 @@ export class Library {
 						map.connect_change_card.hide();
 					} else {
 						map.connect_change_card.show();
+					}
+					if (config.connect_single_mode != "dianjiang") {
+						map.connect_double_character.hide();
+						map.connect_double_hp.hide();
+					} else {
+						map.connect_double_character.show();
+						if (["double", "singble"].includes(config.connect_double_character)) {
+							map.connect_double_hp.show();
+						} else {
+							map.connect_double_hp.hide();
+						}
 					}
 				},
 			},
@@ -7002,6 +7042,28 @@ export class Library {
 						unlimited: "无限",
 					},
 				},
+				double_character: {
+					name: "启用双将",
+					init: "single",
+					item: {
+						single: "不启用",
+						double: "启用双将",
+						singble: "单双任选",
+					},
+					restart: true,
+				},
+				double_hp: {
+					name: "双将体力上限",
+					init: "pingjun",
+					item: {
+						hejiansan: "和减三",
+						pingjun: "平均值",
+						zuidazhi: "最大值",
+						zuixiaozhi: "最小值",
+						zonghe: "相加",
+					},
+					restart: true,
+				},
 				update: function (config, map) {
 					if (config.single_mode != "normal") {
 						map.enable_jin.hide();
@@ -7012,6 +7074,17 @@ export class Library {
 						map.change_card.hide();
 					} else {
 						map.change_card.show();
+					}
+					if (config.single_mode != "dianjiang") {
+						map.double_character.hide();
+						map.double_hp.hide();
+					} else {
+						map.double_character.show();
+						if (["double", "singble"].includes(config.double_character)) {
+							map.double_hp.show();
+						} else {
+							map.double_hp.hide();
+						}
 					}
 				},
 			},
@@ -8051,6 +8124,9 @@ export class Library {
 			game.export(lib.init.encode(JSON.stringify(_status.videoToSave)), "无名杀 - 录像 - " + _status.videoToSave.name[0] + " - " + _status.videoToSave.name[1]);
 		}
 	}
+	/**
+	 * @param {Function} fn
+	 */
 	genAsync(fn) {
 		return gnc.of(fn);
 	}
@@ -8060,7 +8136,7 @@ export class Library {
 					for (const content of item) {
 						yield content;
 					}
-				})()
+			  })()
 			: Promise.resolve(item);
 	}
 	gnc = {
@@ -9547,7 +9623,6 @@ export class Library {
 
 	element = {
 		content: Element.Content,
-		contents: Element.Contents,
 		Player: Element.Player,
 		Card: Element.Card,
 		VCard: Element.VCard,
@@ -9809,7 +9884,7 @@ export class Library {
 		cardGiftable: (card, player, target, strict) => {
 			const mod = game.checkMod(card, player, target, "unchanged", "cardGiftable", player);
 			if (!mod || (strict && ((mod == "unchanged" && (get.position(card) != "h" || !get.cardtag(card, "gifts"))) || player == target))) return false;
-			return get.type(card, false) != "equip" || target.canEquip(card, true);
+			return get.type(card, null, target) != "equip" || target.canEquip(card, true);
 		},
 		/**
 		 * Check if the card is recastable
@@ -9966,9 +10041,12 @@ export class Library {
 			return true;
 		},
 		characterDisabled: function (i, libCharacter) {
-			if (!lib.character[i] || lib.character[i].isAiForbidden) return true;
+			const args = Array.from(arguments).slice(2);
+			if (!lib.character[i]) return true;
 			if (lib.character[i].isUnseen) return true;
-			if (lib.config.forbidai.includes(i)) return true;
+			if (!args.includes("ignoreForibidden")) {
+				if (lib.config.forbidai.includes(i) || lib.character[i].isAiForbidden) return true;
+			}
 			if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) return true;
 			if (_status.connectMode) {
 				if (lib.configOL.banned.includes(i) || lib.connectBanned.includes(i)) return true;
@@ -10020,13 +10098,14 @@ export class Library {
 		},
 		characterDisabled2: function (i) {
 			var info = lib.character[i];
+			const args = Array.from(arguments).slice(1);
 			if (!info) return true;
 			if (info[4]) {
 				if (info.isBoss) return true;
 				if (info.isHiddenBoss) return true;
 				if (info.isMinskin) return true;
 				if (info.isUnseen) return true;
-				if (info.isAiForbidden && (!_status.event.isMine || !_status.event.isMine())) return true;
+				if (!args.includes("ignoreForibidden") && info.isAiForbidden && (!_status.event.isMine || !_status.event.isMine())) return true;
 				if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) return true;
 			}
 			return false;
@@ -10645,7 +10724,7 @@ export class Library {
 								storage: {
 									stratagem_buffed: 1,
 								},
-							})
+						  })
 						: new lib.element.VCard();
 				}
 				return null;
@@ -11043,6 +11122,11 @@ export class Library {
 			filter: function (event, player) {
 				return player.storage.zhengsu_leijin || player.storage.zhengsu_bianzhen || player.storage.zhengsu_mingzhi;
 			},
+			filterx: function (skill, player) {
+				const zhengsus = player.storage[skill];
+				if (!zhengsus || !zhengsus.length) return false;
+				return zhengsus.some(zhengsu => player.storage[zhengsu]);
+			},
 			content: function () {
 				player.chooseDrawRecover(2, "整肃奖励：摸两张牌或回复1点体力");
 			},
@@ -11332,6 +11416,27 @@ export class Library {
 				trigger.player.loseMaxHp(trigger.num).source = player;
 			},
 		},
+		_doublegroup_choice: {
+			trigger: {
+				global: "gameStart",
+				player: "enterGame",
+			},
+			firstDo: true,
+			forced: true,
+			popup: false,
+			priority: 25,
+			charlotte: true,
+			filter: function (event, player) {
+				return get.mode() != "guozhan" && get.is.double(player.name1) && !player._groupChosen;
+			},
+			content: function () {
+				"step 0";
+				player._groupChosen = true;
+				player.chooseControl(get.is.double(player.name1, true)).set("prompt", "请选择你的势力");
+				"step 1";
+				player.changeGroup(result.control);
+			},
+		},
 		aozhan: {
 			charlotte: true,
 			mod: {
@@ -11601,7 +11706,7 @@ export class Library {
 				nodamage: true,
 				effect: {
 					target: function (card, player, target, current) {
-						if (get.tag(card, "damage")) return [0, 0];
+						if (get.tag(card, "damage")) return "zeroplayertarget";
 					},
 				},
 			},
@@ -11809,7 +11914,7 @@ export class Library {
 				"step 0";
 				event.dying = trigger.player;
 				if (!event.acted) event.acted = [];
-				("step 1");
+				"step 1";
 				if (trigger.player.isDead()) {
 					event.finish();
 					return;
@@ -11852,7 +11957,11 @@ export class Library {
 							}
 							return 1;
 						},
-						ai2: get.effect_use,
+						ai2: function (target) {
+							let effect_use = get.effect_use(target);
+							if (effect_use <= 0) return effect_use;
+							return get.effect(target);
+						},
 						type: "dying",
 						targetRequired: true,
 						dying: event.dying,
@@ -11860,7 +11969,7 @@ export class Library {
 				} else {
 					event._result = { bool: false };
 				}
-				("step 2");
+				"step 2";
 				if (result.bool) {
 					var player = trigger.player;
 					if (player.hp <= 0 && !trigger.nodying && !player.nodying && player.isAlive() && !player.isOut() && !player.removed) event.goto(0);
@@ -11950,7 +12059,7 @@ export class Library {
 			content: function () {
 				"step 0";
 				event.logvid = trigger.getLogv();
-				("step 1");
+				"step 1";
 				event.targets = game.filterPlayer(function (current) {
 					return current != event.player && current.isLinked();
 				});
@@ -11960,7 +12069,7 @@ export class Library {
 				event._args = [trigger.num, trigger.nature, trigger.cards, trigger.card];
 				if (trigger.source) event._args.push(trigger.source);
 				else event._args.push("nosource");
-				("step 2");
+				"step 2";
 				if (event.targets.length) {
 					var target = event.targets.shift();
 					if (target.isLinked()) target.damage.apply(target, event._args.slice(0));
@@ -12676,6 +12785,7 @@ export class Library {
 				lib.configOL = config;
 				lib.playerOL = {};
 				lib.cardOL = {};
+				lib.vcardOL = {};
 
 				game.clearArena();
 				game.finishCards();
@@ -12788,6 +12898,7 @@ export class Library {
 				lib.configOL = config;
 				lib.playerOL = {};
 				lib.cardOL = {};
+				lib.vcardOL = {};
 
 				game.loadModeAsync(config.mode, function (mode) {
 					for (var i in mode.ai) {
@@ -12948,8 +13059,13 @@ export class Library {
 
 						player.directgain(info.handcards);
 						lib.playerOL[i] = player;
-						for (var i = 0; i < info.equips.length; i++) {
-							player.$equip(info.equips[i]);
+						if (info.vcardsMap) {
+							for (var i = 0; i < info.vcardsMap.equips.length; i++) {
+								player.addVirtualEquip(info.vcardsMap.equips[i], info.vcardsMap.equips[i].cards);
+							}
+							for (var i = 0; i < info.vcardsMap.judges.length; i++) {
+								player.addVirtualJudge(info.vcardsMap.judges[i], info.vcardsMap.judges[i].cards);
+							}
 						}
 						for (var i = 0; i < info.handcards.length; i++) {
 							info.handcards[i].addGaintag(info.gaintag[i]);
@@ -13636,6 +13752,15 @@ export class Library {
 			},
 		],
 		[
+			"手杀SP",
+			{
+				/**
+				 * @returns {string}
+				 */
+				getSpan: () => `${get.prefixSpan("手杀")}${get.prefixSpan("SP")}`,
+			},
+		],
+		[
 			"战役篇神",
 			{
 				/**
@@ -13713,10 +13838,42 @@ export class Library {
 			},
 		],
 		[
+			"桃",
+			{
+				color: "#FFC0CB",
+				nature: "firemm",
+			},
+		],
+		[
+			"桃神",
+			{
+				/**
+				 * @returns {string}
+				 */
+				getSpan: () => `${get.prefixSpan("桃")}${get.prefixSpan("神")}`,
+			},
+		],
+		[
 			"玄",
 			{
 				color: "#000000",
 				nature: "metalmm",
+			},
+		],
+		[
+			"荆",
+			{
+				color: "#00ff00",
+				nature: "firemm",
+			},
+		],
+		[
+			"荆神",
+			{
+				/**
+				 * @returns {string}
+				 */
+				getSpan: () => `${get.prefixSpan("荆")}${get.prefixSpan("神")}`,
 			},
 		],
 		[
@@ -13737,7 +13894,30 @@ export class Library {
 			"标",
 			{
 				color: "#912cee",
-				nature: "purple",
+				nature: "metalmm",
+			},
+		],
+		[
+			"牢",
+			{
+				color: "#EEEE00",
+				nature: "black",
+			},
+		],
+		[
+			"牢神",
+			{
+				/**
+				 * @returns {string}
+				 */
+				getSpan: () => `${get.prefixSpan("牢")}${get.prefixSpan("神")}`,
+			},
+		],
+		[
+			"鼎",
+			{
+				color: "#ffccff",
+				nature: "black",
 			},
 		],
 	]);

@@ -1,6 +1,6 @@
 const characterSort = {
 	old_standard: ["ol_yuanshu"],
-	old_shenhua: ["old_shen_zhaoyun", "old_caocao", "yuji", "zhangjiao", "old_zhugezhan", "old_guanqiujian", "xiahouyuan", "weiyan", "old_xiaoqiao", "pangde", "xuhuang", "junk_sunquan", "huangzhong", "new_caoren", "old_chendao"],
+	old_shenhua: ["old_caocao", "yuji", "zhangjiao", "old_zhugezhan", "old_guanqiujian", "xiahouyuan", "weiyan", "old_xiaoqiao", "pangde", "xuhuang", "junk_sunquan", "huangzhong", "new_caoren", "old_chendao"],
 	old_refresh: ["old_zhangfei", "old_huatuo", "old_zhaoyun", "ol_huaxiong", "old_guanyu"],
 	old_yijiang1: ["masu", "xushu", "xin_yujin", "old_xusheng", "old_lingtong", "fazheng", "old_gaoshun", "re_yujin"],
 	old_yijiang2: ["old_zhonghui", "madai", "old_handang", "old_liubiao", "oldre_liubiao", "old_guanzhang", "old_wangyi"],

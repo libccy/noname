@@ -489,7 +489,7 @@ var CodeMirror = (function () {
         // (when the bar is hidden). If it is still visible, we keep
         // it enabled, if it's hidden, we disable pointer events.
         var box = bar.getBoundingClientRect();
-        var elt = document.elementFromPoint(box.left + 1, box.bottom - 1);
+        var elt = document.elementint(box.left + 1, box.bottom - 1);
         if (elt != bar) bar.style.pointerEvents = "none";
         else delay.set(1000, maybeDisable);
       }
