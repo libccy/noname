@@ -258,9 +258,9 @@ export async function loadExtension(extension) {
 		if (extension[4]) {
 			if (typeof extension[4].character?.character == "object" && Object.keys(extension[4].character.character).length > 0) {
 				const content = { ...extension[4].character };
-				content.name = `mode_extension_${extension[0]}`;
+				content.name = extension[0];
 				content.translate ??= {};
-				content.translate[content.name] = content.name;
+				content.translate[content.name] = extension[0];
 
 				// ~~到最后，还得遍历一遍~~
 				// 我就是被拷打，成为新的1103，受到白鼠群的嘲笑谩骂，我也绝不再次遍历！
@@ -273,11 +273,11 @@ export async function loadExtension(extension) {
 					}
 
 					if (!character[4].some(str => typeof str == "string" && /^(?:db:extension-.+?|ext|img):.+/.test(str))) {
-						const img = extension[3] ? `db:extension-${content.name}:${charaName}.jpg` : `ext:${content.name}/${charaName}.jpg`;
+						const img = extension[3] ? `db:extension-${extension[0]}:${charaName}.jpg` : `ext:${extension[0]}/${charaName}.jpg`;
 						character[4].add(img);
 					}
 					if (!character[4].some(str => typeof str == "string" && /^die:.+/.test(str))) {
-						const audio = `die:ext:${content.name}/${charaName}.mp3`;
+						const audio = `die:ext:${extension[0]}/${charaName}.mp3`;
 						character[4].add(audio);
 					}
 
@@ -307,19 +307,20 @@ export async function loadExtension(extension) {
 					await game.promises.saveConfigValue("characters");
 				}
 
+				console.log(content);
 				loadCharacter(content);
 			}
 			if (typeof extension[4].card?.card == "object" && Object.keys(extension[4].card.card).length > 0) {
 				const content = { ...extension[4].card };
-				content.name = `mode_extension_${extension[0]}`;
+				content.name = extension[0];
 				content.translate ??= {};
-				content.translate[content.name] = content.name;
+				content.translate[content.name] = extension[0];
 
 				// ~~到最后，还得遍历一遍~~
 				// 我就是被拷打，成为新的1103，受到白鼠群的嘲笑谩骂，我也绝不再次遍历！
 				for (const [cardName, card] of Object.entries(content.card)) {
 					if (card.audio === true) {
-						card.audio = `ext:${content.name}`;
+						card.audio = `ext:${extension[0]}`;
 					}
 					if (!card.image) {
 						if (card.fullskin || card.fullimage) {
@@ -349,6 +350,7 @@ export async function loadExtension(extension) {
 					await game.promises.saveConfigValue("cards");
 				}
 
+				console.log(content);
 				loadCard(content);
 			}
 			if (typeof extension[4].skill?.skill == "object" && Object.keys(extension[4].skill.skill).length > 0) {
