@@ -3,7 +3,7 @@ game.import("character", function () {
 	return {
 		name: "gujian",
 		character: {
-			gjqt_bailitusu: ["male", "shu", 4, ["xuelu", "fanshi", "shahun"]],
+			gjqt_bailitusu: ["male", "shu", 4, ["xuelu", "fanshi", "shahun"], ["name:百里|屠苏"]],
 			gjqt_fengqingxue: ["female", "wu", 3, ["qinglan", "yuehua", "swd_wuxie"]],
 			gjqt_xiangling: ["female", "wu", 3, ["xlqianhuan", "meihu", "xidie"]],
 			gjqt_fanglansheng: ["male", "wu", 3, ["fanyin", "mingkong", "fumo"]],
@@ -11,24 +11,20 @@ game.import("character", function () {
 			gjqt_hongyu: ["female", "shu", 4, ["jianwu", "meiying"]],
 
 			gjqt_yuewuyi: ["male", "wei", 4, ["yanjia", "xiuhua", "liuying"]],
-			gjqt_wenrenyu: ["female", "shu", 4, ["chizhen", "dangping"]],
+			gjqt_wenrenyu: ["female", "shu", 4, ["chizhen", "dangping"], ["name:闻人|羽"]],
 			gjqt_xiayize: ["male", "qun", 3, ["xuanning", "liuguang", "yangming"]],
 			gjqt_aruan: ["female", "wu", 3, ["zhaolu", "jiehuo", "yuling"]],
 
 			gjqt_xunfang: ["female", "shu", 3, ["manwu", "xfanghua"]],
-			gjqt_ouyangshaogong: ["male", "shu", 3, ["yunyin", "shishui", "duhun"]],
+			gjqt_ouyangshaogong: ["male", "shu", 3, ["yunyin", "shishui", "duhun"], ["name:欧阳|少恭"]],
 
 			gjqt_xieyi: ["male", "qun", 3, ["lingyan", "xunjian", "humeng"]],
 			gjqt_yanjiaxieyi: ["male", "qun", 2, ["xianju"], ["unseen"]],
 			gjqt_chuqi: ["male", "qun", 2, ["xuanci"], ["unseen"]],
 
-			// gjqt_xuange:['male','qun',4,['zhenlu','zhuixing']],
 			gjqt_beiluo: ["male", "qun", 4, ["lingnu", "zhenying", "cihong"]],
 			gjqt_yunwuyue: ["female", "wei", 3, ["yange", "woxue", "lianjing"]],
 			gjqt_cenying: ["female", "shu", 3, ["yunyou", "xuanzhen", "qingshu"]],
-			// gjqt_changliu:['male','qun',4,['xiange']],
-			// gjqt_fenglishuang:['female','wei',3,[]],
-			// gjqt_nishang:[],
 		},
 		characterIntro: {
 			gjqt_bailitusu:
@@ -661,20 +657,6 @@ game.import("character", function () {
 					},
 				},
 			},
-			xunjian_old: {
-				trigger: { player: "phaseEnd" },
-				filter(event, player) {
-					return player.storage.lingyan && player.storage.lingyan.length == 13;
-				},
-				forced: true,
-				unique: true,
-				skillAnimation: true,
-				content() {
-					player.awakenSkill("xunjian");
-					player.removeSkill("lingyan");
-					player.addSkill("tongtian");
-				},
-			},
 			xunjian: {
 				trigger: { player: ["useCard", "respond"] },
 				forced: true,
@@ -687,33 +669,6 @@ game.import("character", function () {
 					var card = get.cardPile2(trigger.card.name);
 					if (card) {
 						player.gain(card, "gain2");
-					}
-				},
-			},
-			tongtian: {
-				trigger: { player: ["useCardAfter", "respondAfter"] },
-				forced: true,
-				filter(event, player) {
-					var name = event.card.name;
-					var enemies = player.getEnemies();
-					for (var i = 0; i < enemies.length; i++) {
-						if (enemies[i].countCards("h", name)) {
-							return true;
-						}
-					}
-				},
-				content() {
-					var list = [];
-					var name = trigger.card.name;
-					var enemies = player.getEnemies();
-					for (var i = 0; i < enemies.length; i++) {
-						list.addArray(enemies[i].getCards("h", name));
-					}
-					if (list.length) {
-						var card = list.randomGet();
-						var owner = get.owner(card);
-						player.line(owner, "green");
-						owner.give(card, player, true);
 					}
 				},
 			},
@@ -1163,20 +1118,8 @@ game.import("character", function () {
 							var info = lib.skill[list[i]];
 							if (!info) continue;
 							if (info.shaRelated) return true;
-							if (info.trigger) {
-								for (var j in info.trigger) {
-									if (j == "player" || j == "global") {
-										var cond = info.trigger[j];
-										if (typeof cond == "string") {
-											cond = [cond];
-										}
-										if (cond.indexOf("shaBefore") != -1) return true;
-										if (cond.indexOf("shaBegin") != -1) return true;
-										if (cond.indexOf("shaEnd") != -1) return true;
-										if (cond.indexOf("shaAfter") != -1) return true;
-									}
-								}
-							}
+							if (info.shaRelated === false) return false;
+							if (get.skillInfoTranslation(list[i], player).includes("【杀】")) return true;
 						}
 						return false;
 					};
@@ -1289,7 +1232,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target, current) {
+						target(card, player, target, current) {
 							if (get.color(card) == "red" && target.isDamaged()) return [1, 1];
 						},
 					},
@@ -1480,7 +1423,7 @@ game.import("character", function () {
 				ai: {
 					halfneg: true,
 					effect: {
-						player_use(card, player, target, current) {
+						player(card, player, target, current) {
 							if (get.color(card) == "red") return [1, 0, 1, -2];
 						},
 					},
@@ -2328,67 +2271,6 @@ game.import("character", function () {
 					threaten: 1.1,
 				},
 			},
-			jizhan: {
-				enable: "phaseUse",
-				usable: 1,
-				changeSeat: true,
-				filterTarget(card, player, target) {
-					return player != target && player.next != target && player.canUse("sha", target, false);
-				},
-				filter(event, player) {
-					var min = Math.max(1, player.maxHp - player.hp);
-					return lib.filter.filterCard({ name: "sha" }, player);
-				},
-				content() {
-					game.swapSeat(player, target, true, true);
-					player.useCard({ name: "sha" }, target, false);
-				},
-				ai: {
-					result: {
-						target(player, target) {
-							return get.effect(target, { name: "sha" }, player, target);
-						},
-					},
-					order: 4,
-				},
-			},
-			qianjun: {
-				trigger: { player: "useCard" },
-				direct: true,
-				filter(event, player) {
-					if (event.card.name != "sha") return false;
-					if (event.targets.length != 1) return false;
-					if (!player.countCards("he")) return false;
-					var target = event.targets[0];
-					return game.hasPlayer(function (current) {
-						return player != current && target != current && get.distance(target, current) <= 1;
-					});
-				},
-				content() {
-					"step 0";
-					event.targets = game.filterPlayer(function (current) {
-						var target = trigger.targets[0];
-						return player != current && target != current && get.distance(target, current) <= 1;
-					});
-					var num = 0;
-					for (var i = 0; i < event.targets.length; i++) {
-						num += get.effect(event.targets[i], { name: "sha" }, player, player);
-					}
-					var next = player.chooseToDiscard(get.prompt("qianjun", event.targets), "he");
-					next.logSkill = ["qianjun", event.targets];
-					next.ai = function (card) {
-						if (num <= 0) return -1;
-						return 7 - get.value(card);
-					};
-					"step 1";
-					if (result.bool) {
-						for (var i = 0; i < targets.length; i++) {
-							trigger.targets.add(targets[i]);
-							// targets[i].classList.add('selected');
-						}
-					}
-				},
-			},
 			xuanning: {
 				group: ["xuanning1", "xuanning2"],
 				intro: {
@@ -2696,7 +2578,7 @@ game.import("character", function () {
 					threaten: 0.8,
 					effect: {
 						target(card, player, target) {
-							if (card.name == "bingliang") return 0;
+							if (card.name == "bingliang") return [0, 0];
 							if (card.name == "lebu") return 1.5;
 							if (card.name == "guohe") {
 								if (!target.countCards("e")) return 0;
@@ -2817,15 +2699,12 @@ game.import("character", function () {
 			xunjian: "寻剑",
 			xunjian_info:
 				"锁定技，每当你使用或打出一张牌，若牌堆中有同名牌，你有X的机率获得之，X为你的“灵偃”牌数/13。",
-			xunjian_old_info: "觉醒技，结束阶段，若你武将牌上有十三张牌，你失去技能灵偃并获得技能通天。",
-			tongtian: "通天",
-			tongtian_info: "锁定技，在你使用或打出一张牌后，若敌方角色手中有同名牌，你随机获得其中一张。",
 			xianju: "仙居",
 			xianju_info:
 				"锁定技，奇数游戏轮次开始时，你获得潜行直到下一轮开始；偶数游戏轮次开始时，你随机获得一张机关牌。",
 			xuanci: "旋刺",
 			xuanci_info:
-				"出牌阶段限一次，你可以将一张梅花牌当作飞镖使用；锁定技，你使用飞镖无距离限制，你使用飞镖后对目标结算后视为对目标使用一张杀。",
+				"出牌阶段限一次，你可以将一张梅花牌当作飞镖使用；锁定技，你使用飞镖无距离限制，你使用飞镖后对目标结算后视为对目标使用一张【杀】。",
 			humeng: "湖梦",
 			humeng_sub: "偃甲谢衣",
 			humeng_info:
@@ -2844,7 +2723,7 @@ game.import("character", function () {
 			cihong: "刺鸿",
 			cihong_bg: "鸿",
 			cihong_info:
-				"每三轮限一次，结束阶段，你可以指定一名其他角色并可以依次选择：1. 弃置一张红色牌；2. 失去1点体力；3. 将武将牌翻至背面；每选择一项，视为对目标使用一张杀。",
+				"每三轮限一次，结束阶段，你可以指定一名其他角色并可以依次选择：1. 弃置一张红色牌；2. 失去1点体力；3. 将武将牌翻至背面；每选择一项，视为对目标使用一张【杀】。",
 			lianjing: "莲境",
 			lianjing_info:
 				"每两轮限一次，回合结束后，你可以选择至多2名其他角色，将其他角色移出游戏，然后你与所选的角色依次进行一个回合。",
@@ -2866,7 +2745,7 @@ game.import("character", function () {
 				"濒死阶段，你可以与一名体力值不超过你的体力上限的角色拼点，若你赢，你失去1点体力上限并将体力值回复至与该角色相同；若你没赢，你立即死亡。",
 			chizhen: "驰阵",
 			chizhen_info:
-				"出牌阶段开始时，你可以摸X张牌并弃置X张牌，若你弃置了杀，可以视为使用一张决斗（X为你已损失的体力值且至少为1）。",
+				"出牌阶段开始时，你可以摸X张牌并弃置X张牌，若你弃置了【杀】，可以视为使用一张决斗（X为你已损失的体力值且至少为1）。",
 			xidie: "戏蝶",
 			xidie2: "戏蝶",
 			xidie_info:
@@ -2875,12 +2754,12 @@ game.import("character", function () {
 			meihu2: "魅狐",
 			meihu_info: "当你受到伤害后，可令伤害来源交给你一张手牌。",
 			jianwu: "剑舞",
-			jianwu_info: "锁定技，攻击范围不含你的角色无法闪避你的杀。",
+			jianwu_info: "锁定技，攻击范围不含你的角色无法闪避你的【杀】。",
 			meiying: "魅影",
 			meiying_info:
-				"一名其他角色的回合结束时，若其未于此回合内使用过指定另一名角色为目标的牌，你可以弃置一张红色牌视为对其使用一张杀。",
+				"一名其他角色的回合结束时，若其未于此回合内使用过指定另一名角色为目标的牌，你可以弃置一张红色牌视为对其使用一张【杀】。",
 			zuizhan: "乱斩",
-			zuizhan_info: "每当你使用一张杀，可以摸一张牌，然后此杀随机增加一个额外目标。",
+			zuizhan_info: "每当你使用一张【杀】，可以摸一张牌，然后此【杀】随机增加一个额外目标。",
 			xlqianhuan: "千幻",
 			xlqianhuan_info:
 				"回合结束后，若你已受伤，你可以回复1点体力并将武将牌翻面。若你的武将牌背面朝上，你不能使用卡牌，也不能成为卡牌的目标。",
@@ -2915,17 +2794,12 @@ game.import("character", function () {
 			xiuhua_info: "每当一件其他角色的装备因被替换或弃置进入弃牌堆，你可以获得之。",
 			liuying: "流影",
 			liuying_info:
-				"每当你使用一张杀结算完毕后，你可以指定一名本回合未成为过你的杀的目标的角色，并亮出牌堆顶的一张牌，若为黑色，你对该角色使用一张杀。",
+				"每当你使用一张【杀】结算完毕后，你可以指定一名本回合未成为过你的【杀】的目标的角色，并亮出牌堆顶的一张牌，若为黑色，你对该角色使用一张【杀】。",
 			boyun: "拨云",
 			boyun1: "拨云",
 			boyun2: "拨云",
 			boyun_info:
 				"在你的回合内，你可以弃置一张装备牌，并展示牌堆顶的一张牌，若其为装备牌，你须将其交给任意一张角色并对其造成1点伤害，否则你摸一张牌。",
-			jizhan: "疾战",
-			jizhan_info:
-				"出牌阶段限一次，你可以移动到任意一名角色的前一位，视为对其使用了一张不计入出杀次数的杀。",
-			qianjun: "千军",
-			qianjun_info: "每当你使用一张杀，你可以弃置一张牌，令距离目标1以内的所有角色成为额外目标。",
 			xuanning: "玄凝",
 			xuanning1: "玄凝",
 			xuanning2: "玄凝",

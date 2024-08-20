@@ -31,5 +31,20 @@ const dynamicTranslates = {
 		if (storage) str += "</span>";
 		return str;
 	},
+	sbwansha(player) {
+		const storage = player.storage.sbwansha;
+		var str = "①你的回合内，不处于濒死状态的其他角色不能使用【桃】。②一名角色进入濒死状态时，你可以观看其手牌并选择其";
+		str += storage ? "区域内" : "中";
+		str += "零至两张牌，然后其选择一项：1.你将这些牌分配给任意名不为其的角色；2.其弃置除这些牌以外的牌。";
+		return str;
+	},
+	sbweimu(player) {
+		const storage = player.storage.sbweimu;
+		var str = "锁定技。";
+		str += storage ? "①" : "";
+		str += "当你成为黑色锦囊牌的目标时，取消之。";
+		if (storage) str += "②每轮开始时，若你上一轮成为其他角色使用牌的目标的次数不大于2，你从弃牌堆中随机获得一张黑色锦囊牌或防具牌。";
+		return str;
+	},
 };
 export default dynamicTranslates;

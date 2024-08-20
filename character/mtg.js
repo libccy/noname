@@ -4,25 +4,16 @@ game.import("character", function () {
 		name: "mtg",
 		character: {
 			mtg_jiding: ["male", "qun", 4, ["mbaizhan", "msilian"]],
-			// mtg_qianzhuo:['female','shu',3,[]],
 			mtg_jiesi: ["male", "wei", 3, ["mtongnian", "msuoling", "mhuanyi"]],
 			mtg_lilianna: ["female", "qun", 3, ["lingyong", "mduohun"]],
-			// mtg_nisha:['female','wu',3,[]],
-			// mtg_ayeni:['male','qun',4,[]],
 		},
 		characterIntro: {
 			mtg_jiding:
 				"这名白色魔法的使用者极其注重忠诚，正义和荣誉。他曾全力追捕茜卓纳拉，如今已不可思议地与这位火焰法师成为伙伴。",
-			mtg_qianzhuo:
-				"茜卓纳拉是使用红色法术力的旅法师。她擅长使用火焰：除了火焰，还是火焰。茜卓性格冲动、易怒、富有激情，不断增长的火焰法术能力随时都准备爆发。她的火花在还很年轻时便已点燃，如今已是相当有经验的烈焰术士和旅法师。",
 			mtg_jiesi:
 				"杰斯贝连是使用蓝色法术的鹏洛客。他擅长心灵法术：读取心灵，幻影，知识，以及欺瞒的咒语。",
 			mtg_lilianna:
 				"莉莲娜维斯是一位精通死灵术的旅法师，她擅长用黑色法术力来复活死者，腐化生者，并从死亡中召唤力量。",
-			mtg_nisha:
-				"赞迪卡妖精部落玖瑞加的一名战士，做事倾尽全力，与大地有密切的联系，还擅使元素魔法。她能够引导时空的魔法生机地脉，为土地赋予生命。",
-			mtg_ayeni:
-				"金鬃阿耶尼是使用白色法术的鹏洛客。他长于净化身体与心灵的法术：用咒语来治疗、强化盟友，以及唤醒他人内在的心灵精华。",
 		},
 		skill: {
 			mduohun: {
@@ -481,11 +472,8 @@ game.import("character", function () {
 		},
 		translate: {
 			mtg_jiding: "基定",
-			mtg_qianzhuo: "茜卓",
 			mtg_jiesi: "杰斯",
 			mtg_lilianna: "莉莲娜",
-			mtg_nisha: "妮莎",
-			mtg_ayeni: "阿耶尼",
 
 			mduohun: "夺魂",
 			mduohun_info: "锁定技，当你解除濒死状态后，令你进入濒死状态的角色失去1点体力。",

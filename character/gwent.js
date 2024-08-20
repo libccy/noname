@@ -208,6 +208,7 @@ game.import("character", function () {
 				filter(event, player) {
 					return player.countCards("h") > 0;
 				},
+				derivation: ["sqlongnu", "sqlonghuo"],
 				content() {
 					"step 0";
 					var max = 1;
@@ -1109,10 +1110,10 @@ game.import("character", function () {
 								target.countCards("he") &&
 								current < 0
 							) {
-								return 0;
+								return [1, 2];
 							}
 						},
-						player(card, player) {
+						player_use(card, player) {
 							if (player.hujia >= 3) return;
 							if (_status.event.name != "chooseToUse" || _status.event.player != player) return;
 							if (get.type(card) == "basic") return;
@@ -1237,7 +1238,7 @@ game.import("character", function () {
 					nodamage: true,
 					effect: {
 						target(card, player, target, current) {
-							if (get.tag(card, "damage")) return [0, 0];
+							if (get.tag(card, "damage")) return "zeroplayertarget";
 						},
 					},
 				},
@@ -1249,6 +1250,7 @@ game.import("character", function () {
 				},
 				unique: true,
 				onremove: true,
+				derivation: "gwzhongmo",
 				group: "gwfutian_discard",
 				subSkill: {
 					discard: {
@@ -1517,6 +1519,7 @@ game.import("character", function () {
 			gwchenshui: {
 				trigger: { player: "damageBefore", source: "damageBefore" },
 				forced: true,
+				derivation: "gwliedi",
 				init(player) {
 					player.storage.gwchenshui = 0;
 				},
@@ -1538,7 +1541,7 @@ game.import("character", function () {
 					trigger.cancel();
 					player.storage.gwchenshui++;
 					player.updateMarks();
-					if (trigger.source != trigger.player && trigger.source.isIn() && trigger.player.isIn()) {
+					if (trigger.source && trigger.source != trigger.player && trigger.source.isIn() && trigger.player.isIn()) {
 						var cards = trigger.player.getCards("he");
 						if (cards.length) {
 							trigger.player.give(cards.randomGet(), trigger.source);
@@ -2284,7 +2287,7 @@ game.import("character", function () {
 					effect: {
 						target(card, player, target) {
 							if (game.roundNumber % 3 != 0 && get.tag(card, "damage")) {
-								return [0, 0];
+								return "zeroplayertarget";
 							}
 						},
 					},
@@ -3159,58 +3162,6 @@ game.import("character", function () {
 				popup: false,
 				content() {
 					player.draw();
-				},
-			},
-			gwchuanxin_old: {
-				trigger: { player: "shaAfter" },
-				filter(event, player) {
-					if (player.storage.gwchuanxin && player.storage.gwchuanxin.length >= 4) return false;
-					return event.target.isAlive();
-				},
-				check(event, player) {
-					return get.effect(event.target, { name: "sha" }, player, player) > 0;
-				},
-				logTarget: "target",
-				logLine: false,
-				content() {
-					"step 0";
-					event.card = get.cards()[0];
-					player.showCards(
-						event.card,
-						get.translation(player) + "对" + get.translation(trigger.player) + "发动了【穿心】"
-					);
-					"step 1";
-					if (
-						player.storage.gwchuanxin &&
-						!player.storage.gwchuanxin.includes(get.suit(event.card))
-					) {
-						player.useCard({ name: "sha" }, [event.card], trigger.target, false);
-					}
-				},
-				group: ["gwchuanxin_count1", "gwchuanxin_count2"],
-				subSkill: {
-					count1: {
-						trigger: { global: "phaseBegin" },
-						silent: true,
-						content() {
-							player.storage.gwchuanxin = [];
-						},
-					},
-					count2: {
-						trigger: { player: "useCard" },
-						silent: true,
-						// filter(event){
-						// 	return event.card&&event.card.name=='sha';
-						// },
-						content() {
-							for (var i = 0; i < trigger.cards.length; i++) {
-								player.storage.gwchuanxin.add(get.suit(trigger.cards[i]));
-							}
-						},
-					},
-				},
-				ai: {
-					presha: true,
 				},
 			},
 			gwchuanxin: {
@@ -4774,7 +4725,6 @@ game.import("character", function () {
 			kuanglie: "狂猎",
 			kuanglie_info:
 				"锁定技，每当你使用黑色牌指定其他角色为目标后，目标随机弃置一张牌；每当你以此法累计弃置两张牌后，你摸一张牌。",
-			// kuanglie_info:'锁定技，每当一名敌方角色成为你的黑色牌的目标，你视为对其使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】的影响后，你随机获得一张【狂猎】牌。',
 			lingshuang: "凛霜",
 			lingshuang_info:
 				"每当你失去最后一张基本牌，你可以视为对距离2以内的所有敌方角色使用【刺骨寒霜】；在一名角色受到【刺骨寒霜】影响时，你可以弃置一张手牌将其效果改为“摸牌数-2”。",
@@ -4788,15 +4738,15 @@ game.import("character", function () {
 			gwjinli_info: "出牌阶段限一次，你可以弃置一张手牌，并将一张先祖麦酒置于一名角色的武将牌上。",
 			gw_xianzumaijiu: "先祖麦酒",
 			gw_xianzumaijiu_info:
-				"出牌阶段对自己使用，你使用下一张杀造成伤害后，令所有友方角色摸一张牌；濒死阶段，对自己使用，回复1点体力。",
+				"出牌阶段对自己使用，你使用下一张【杀】造成伤害后，令所有友方角色摸一张牌；濒死阶段，对自己使用，回复1点体力。",
 			gwliaotian: "燎天",
 			gwliaotian_info:
-				"出牌阶段限2次，若你有至少两张手牌且颜色均相同，你可以重铸你的全部手牌，并视为对一名随机敌方角色使用一张不计入出杀次数的杀。",
+				"出牌阶段限2次，若你有至少两张手牌且颜色均相同，你可以重铸你的全部手牌，并视为对一名随机敌方角色使用一张不计入出杀次数的【杀】。",
 			gwmaoxian_yioufeisi: "伊欧菲斯",
-			gwmaoxian_yioufeisi_info: "选择两名角色，令目标依次视为对对方使用一张杀，然后结束出牌阶段。",
+			gwmaoxian_yioufeisi_info: "选择两名角色，令目标依次视为对对方使用一张【杀】，然后结束出牌阶段。",
 			gwmaoxian_luoqi: "罗契",
 			gwmaoxian_luoqi_info:
-				"选择一名角色视为对其使用一张不计入出杀次数的杀，然后所有其他角色可以对目标使用一张杀，然后结束出牌阶段。",
+				"选择一名角色视为对其使用一张不计入出杀次数的【杀】，然后所有其他角色可以对目标使用一张【杀】，然后结束出牌阶段。",
 			gwmaoxian_jieluote: "杰洛特",
 			gwmaoxian_jieluote_info:
 				"对一名角色造成1点伤害，若目标体力值大于2且为全场最多，改为造成2点伤害，然后结束出牌阶段。",
@@ -4806,7 +4756,7 @@ game.import("character", function () {
 			gwmaoxian_telisi_info: "对至多3名随机友方角色施加一个随机正面效果，然后结束出牌阶段。",
 			gwmaoxian_hengsaite: "亨赛特",
 			gwmaoxian_hengsaite_info:
-				"视为使用一张万箭齐发，每当有一名角色因此受到伤害，你获得一张杀，然后结束出牌阶段。",
+				"视为使用一张万箭齐发，每当有一名角色因此受到伤害，你获得一张【杀】，然后结束出牌阶段。",
 			gwmaoxian_fuertaisite: "弗尔泰斯特",
 			gwmaoxian_fuertaisite_info: "令至多两名角色各获得1点护甲，然后结束出牌阶段。",
 			gwmaoxian_laduoweide: "拉多维德",
@@ -4830,7 +4780,7 @@ game.import("character", function () {
 			gwmaoxian_gaier: "盖尔",
 			gwmaoxian_gaier_info: "令一名角色增加或减少1点体力和体力上限，然后结束出牌阶段。",
 			gwmaoxian_airuiting: "艾瑞汀",
-			gwmaoxian_airuiting_info: "令所有其他角色选择一项：使用一张杀，或失去1点体力，然后结束出牌阶段。",
+			gwmaoxian_airuiting_info: "令所有其他角色选择一项：使用一张【杀】，或失去1点体力，然后结束出牌阶段。",
 			gwmaoxian_aisinie: "埃丝涅",
 			gwmaoxian_aisinie_info: "回复1点体力并获得任意一张银卡法术，然后结束出牌阶段。",
 			gwmaoxian_falanxisika: "法兰茜斯卡",
@@ -4866,7 +4816,7 @@ game.import("character", function () {
 			gwgouhun_info:
 				"出牌阶段限一次，你可以交给一名有手牌的其他角色一张手牌，然后令其选择一项：1. 将手牌中与此牌花色相同的牌（至少一张）交给你；2. 弃置手牌中与此牌花色不同的牌（至少一张）；3. 进入混乱状态直到下一回合结束。",
 			gw_wuyao: "雾妖",
-			gw_wuyao_info: "在你行动时可当作杀使用；回合结束后，从手牌中消失。",
+			gw_wuyao_info: "在你行动时可当作【杀】使用；回合结束后，从手牌中消失。",
 			gw_lang: "狼",
 			gw_lang_info: "在你行动时可当作酒使用；回合结束后，从手牌中消失。",
 			gwyewu: "叶舞",
@@ -4884,7 +4834,7 @@ game.import("character", function () {
 			gwchenshui: "沉睡",
 			gwchenshui_bg: "睡",
 			gwchenshui_info:
-				"锁定技，你防止即将造成或受到的伤害，改为令伤害来随机源获得对方一张牌；结束阶段，若你自上次沉睡起累计发动了至少3次沉睡效果，你解除沉睡状态，对所有敌方角色造成1点伤害，然后切换至觉醒状态。",
+				"锁定技，你防止即将造成或受到的伤害，然后令伤害来源随机获得对方一张牌；结束阶段，若你自上次沉睡起累计发动了至少3次沉睡效果，你解除沉睡状态，对所有敌方角色造成1点伤害，然后切换至觉醒状态。",
 			gwliedi: "裂地",
 			gwliedi_info:
 				"锁定技，你造成的伤害+X，X为你到该角色距离的一半，向下取整；结束阶段，若你连续两轮未造成伤害，你切换至沉睡状态。",
@@ -4936,9 +4886,9 @@ game.import("character", function () {
 				"准备阶段，你可以令一名角色选择一项：回复1点体力，或从弃牌堆中获得一张非金法术牌（直到洗牌入牌堆前该牌不能再以此法获得）。",
 			junchi: "骏驰",
 			junchi_info:
-				"每当一名其他角色使用一张杀，若目标不是你，你可以对杀的目标使用一张牌，并摸一张牌，每回合限一次。",
+				"每当一名其他角色使用一张【杀】，若目标不是你，你可以对【杀】的目标使用一张牌，并摸一张牌，每回合限一次。",
 			junchi_old_info:
-				"当一名其他角色使用杀对一个目标结算后，该角色可以交给你一张牌，然后你可以对杀的目标使用一张牌，若如此做，你回复1点体力，杀的使用者摸一张牌。",
+				"当一名其他角色使用【杀】对一个目标结算后，该角色可以交给你一张牌，然后你可以对【杀】的目标使用一张牌，若如此做，你回复1点体力，【杀】的使用者摸一张牌。",
 			gw_dudayuanshuai1: "杜达元帅",
 			gw_dudayuanshuai1_info:
 				"当你成为其他角色使用牌的目标时，你可以使用此牌取消之，然后获得对你使用的牌。",
@@ -4962,7 +4912,7 @@ game.import("character", function () {
 				"出牌阶段限两次，你可以弃置一张牌对场上体力值最高（或之一）的一名角色造成1点伤害。",
 			gwjiquan: "集权",
 			gwjiquan_info:
-				"出牌阶段限一次，你可以从任意名角色处各获得一张牌，每拿一张牌，被拿牌的角色视为对你使用一张杀。",
+				"出牌阶段限一次，你可以从任意名角色处各获得一张牌，每拿一张牌，被拿牌的角色视为对你使用一张【杀】。",
 			nuhou: "怒吼",
 			nuhou_info:
 				"每当你受到一次伤害，你可以弃置一张牌，然后对一名随机敌人造成1点伤害并随机弃置其一张牌。",
@@ -4971,13 +4921,13 @@ game.import("character", function () {
 				"出牌阶段限一次，你可以弃置至多三张牌然后摸三张牌；若你弃置了至少两张牌，你本回合使用牌无视距离；若你弃置了三张牌，你回复1点体力。",
 			gwzhanjiang: "斩将",
 			gwzhanjiang_info:
-				"每轮限一次，在一名角色的准备阶段，你可以弃置一张牌，然后所有角色可以对该角色使用一张杀，出杀的角色在响应时摸一张牌，当有至少两名角色响应后终止结算。",
+				"每轮限一次，在一名角色的准备阶段，你可以弃置一张牌，然后所有角色可以对该角色使用一张【杀】，出杀的角色在响应时摸一张牌，当有至少两名角色响应后终止结算。",
 			gwchuanxin: "穿心",
 			gwchuanxin_info:
-				"你的攻击范围基数为你当前体力值；每当你对一名角色使用杀结算完毕后，你可以亮出牌堆顶的一张牌，若为黑色，视为对目标再使用一张杀。",
+				"你的攻击范围基数为你当前体力值；每当你对一名角色使用【杀】结算完毕后，你可以亮出牌堆顶的一张牌，若为黑色，视为对目标再使用一张【杀】。",
 			fengjian: "风剑",
 			fengjian_info:
-				"每当你使用一张锦囊牌，你可以视为对一名不是此牌目标的角色使用一张雷杀，若如此做，你获得潜行直到下一回合开始。",
+				"每当你使用一张锦囊牌，你可以视为对一名不是此牌目标的角色使用一张雷【杀】，若如此做，你获得潜行直到下一回合开始。",
 			huandie: "幻蝶",
 			huandie_info:
 				"准备阶段，你可以摸一张牌，并令任意名其他角色摸两张牌，若如此做，此回合结束时，所有手牌数大于体力值的角色需弃置两张手牌。",
@@ -4986,7 +4936,7 @@ game.import("character", function () {
 				"准备阶段，你可以选择一项效果直到下一回合开始：1. 每当一名其他角色在一个回合中首次受到伤害，该角色失去1点体力，你回复1点体力；2. 每当一名其他角色在一个回合中首次造成伤害，该角色失去1点体力，你（若不是受伤害角色）回复1点体力。",
 			fayin: "法印",
 			fayin_info:
-				"每当你使用一张杀，你可以弃置一张牌并获得一个随机法印效果：1. 目标随机弃置两张牌；2. 目标进入混乱状态直到下一回合开始；3. 对目标造成1点火属性伤害；4. 获得1点护甲；5. 令目标翻面并摸一张牌。",
+				"每当你使用一张【杀】，你可以弃置一张牌并获得一个随机法印效果：1. 目标随机弃置两张牌；2. 目标进入混乱状态直到下一回合开始；3. 对目标造成1点火属性伤害；4. 获得1点护甲；5. 令目标翻面并摸一张牌。",
 			gwbaquan: "霸权",
 			gwbaquan_info:
 				"出牌阶段限一次，你可以获得一名其他角色的所有牌，然后还给其等量的牌，若你归还的牌均为你得到的牌且该角色体力值不小于你，你对其造成1点伤害。",

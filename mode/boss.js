@@ -1,8 +1,12 @@
-"use strict";
-game.import("mode", function (lib, game, ui, get, ai, _status) {
+import { lib, game, ui, get, ai, _status } from '../noname.js';
+export const type = 'mode';
+/**
+ * @type { () => importModeConfig }
+ */
+export default () => {
 	return {
 		name: "boss",
-		start: function () {
+		start() {
 			"step 0";
 			var playback = localStorage.getItem(lib.configprefix + "playback");
 			if (playback) {
@@ -70,7 +74,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			game.onresume = onresume;
 			game.onresume2 = onresume;
 			ui.create.div(bosslist);
-
+	
 			event.current = null;
 			var list = [];
 			if (lib.storage.current == undefined) lib.storage.current = "boss_hundun";
@@ -105,7 +109,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					player.node.identity.dataset.color = info[5];
 					// bosslistlinks[cfg]=player;
 					player.classList.add("bossplayer");
-
+	
 					if (lib.storage.current == i) {
 						event.current = player;
 						player.classList.add("highlight");
@@ -115,7 +119,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							_status.bosschoice.link = lib.boss[i].controlid || i;
 						}
 					}
-
+	
 					// if(!get.config(cfg)){
 					//		player.style.display='none';
 					// }
@@ -142,9 +146,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			setTimeout(function () {
 				ui.control.style.transitionProperty = "";
 			}, 1000);
-
+	
 			ui.window.appendChild(bosslist);
-
+	
 			setTimeout(function () {
 				if (event.current) {
 					var left = event.current.offsetLeft - (ui.window.offsetWidth - 180) / 2;
@@ -206,7 +210,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			for (var i in lib.boss[event.current.name]) {
 				game.bossinfo[i] = lib.boss[event.current.name][i];
 			}
-
+	
 			setTimeout(function () {
 				ui.control.classList.remove("bosslist");
 			}, 500);
@@ -308,7 +312,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ui.arena.classList.add("single-handcard");
 				ui.window.classList.add("single-handcard");
 				game.onSwapControl();
-
+	
 				if (lib.config.show_handcardbutton) {
 					lib.setPopped(
 						ui.create.system("手牌", null, true),
@@ -339,10 +343,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					ui.create.system("重整", null, true),
 					function () {
 						var uiintro = ui.create.dialog("hidden");
-
+	
 						uiintro.add("重整");
 						var table = ui.create.div(".bosschongzheng");
-
+	
 						var tr,
 							td,
 							added = false;
@@ -397,7 +401,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			if (get.config("single_control") || game.me == game.boss) {
 				ui.single_swap.style.display = "none";
 			}
-
+	
 			ui.arena.appendChild(boss);
 			if (boss.bossinginfo) {
 				var rect = boss.getBoundingClientRect();
@@ -415,14 +419,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					boss.node.equips.style.opacity = "";
 				}, 500);
 			}
-
+	
 			event.bosslist.delete();
-
+	
 			game.arrangePlayers();
 			for (var i = 0; i < game.players.length; i++) {
 				game.players[i].node.action.innerHTML = "行动";
 			}
-
+	
 			var players = get.players(lib.sort.position);
 			var info = [];
 			for (var i = 0; i < players.length; i++) {
@@ -869,7 +873,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["qun", "hiddenboss", "bossallowed"],
 					"qun",
 				],
-
+	
 				boss_xiangliu: [
 					"male",
 					"qun",
@@ -902,7 +906,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["qun", "boss", "bossallowed"],
 					"qun",
 				],
-
+	
 				boss_qingmushilian: [
 					"male",
 					"",
@@ -933,7 +937,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["boss_shenyi", "boss_shenen", "boss_qingyi"],
 					["wu", "hiddenboss", "bossallowed"],
 				],
-
+	
 				boss_chiyanshilian: [
 					"male",
 					"",
@@ -970,7 +974,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["boss_shenyi", "boss_shenen", "boss_chiyi"],
 					["shu", "hiddenboss", "bossallowed"],
 				],
-
+	
 				boss_baimangshilian: [
 					"male",
 					"",
@@ -1007,7 +1011,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["boss_shenyi", "boss_shenen", "boss_baiyi"],
 					["qun", "hiddenboss", "bossallowed"],
 				],
-
+	
 				boss_xuanlinshilian: [
 					"male",
 					"",
@@ -1044,7 +1048,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["boss_shenyi", "boss_shenen", "boss_zaoyi"],
 					["wei", "hiddenboss", "bossallowed"],
 				],
-
+	
 				boss_zhuoguiquxie: [
 					"male",
 					"",
@@ -1099,7 +1103,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["shu", "hiddenboss", "bossallowed"],
 					"shu",
 				],
-
+	
 				boss_baiwuchang: [
 					"male",
 					"shen",
@@ -1170,7 +1174,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["boss_guimei", "boss_guihuo", "boss_minbao", "boss_bianshen2"],
 					["shu", "hiddenboss", "bossallowed"],
 				],
-
+	
 				boss_qinguangwang: [
 					"male",
 					"qun",
@@ -1257,7 +1261,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["shu", "hiddenboss", "bossallowed"],
 				],
 				//boss_shikieiki:['female','qun',8,['boss_yingzhong'],['qun','hiddenboss','bossallowed']],
-
+	
 				boss_lvbu1: [
 					"male",
 					"shen",
@@ -1282,7 +1286,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["qun", "hiddenboss", "bossallowed"],
 					"qun",
 				],
-
+	
 				boss_caocao: [
 					"male",
 					"shen",
@@ -1315,7 +1319,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["wei", "boss", "bossallowed"],
 					"wei",
 				],
-
+	
 				boss_liubei: [
 					"male",
 					"shen",
@@ -1348,7 +1352,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["shu", "boss", "bossallowed"],
 					"zhu",
 				],
-
+	
 				boss_zhouyu: [
 					"male",
 					"shen",
@@ -1357,7 +1361,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["wu", "boss", "bossallowed"],
 					"zhu",
 				],
-
+	
 				boss_caiwenji: [
 					"female",
 					"shen",
@@ -1375,7 +1379,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"shu",
 				],
 				boss_zuoci: ["male", "shen", 0, ["huanhua"], ["qun", "boss", "bossallowed"], "shu"],
-
+	
 				boss_diaochan: [
 					"female",
 					"shen",
@@ -1400,7 +1404,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["qun", "boss", "bossallowed"],
 					"shu",
 				],
-
+	
 				boss_sunce: [
 					"male",
 					"shen",
@@ -1409,7 +1413,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					["qun", "boss", "bossallowed", "InitFilter:noZhuHp:noZhuSkill", "die:sunce"],
 					"wu",
 				],
-
+	
 				// boss_nianshou:['male','shen',Infinity,['boss_nianrui','boss_qixiang','boss_damagecount'],['boss'],'shu'],
 				// boss_yuji:['male','qun',8,[],['boss','bossallowed'],'nei'],
 				// boss_shuijing:['male','qun',8,[],['boss','bossallowed'],'wei'],
@@ -1435,7 +1439,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				"gubuzifeng",
 			],
 		},
-		init: function () {
+		init() {
 			for (var i in lib.characterPack.mode_boss) {
 				if (lib.characterPack.mode_boss[i].isHiddenBoss) continue;
 				lib.mode.boss.config[i + "_boss_config"] = {
@@ -1465,7 +1469,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					player = game.boss;
 					delete game.boss;
 				}
-
+	
 				player.delete();
 				game.players.remove(player);
 				game.dead.remove(player);
@@ -1584,7 +1588,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					ui.versushighlight = game.me;
 					game.me.classList.add("current_action");
 					// game.me.line(ui.fakeme,{opacity:0.5,dashed:true});
-
+	
 					ui.fakeme.style.backgroundImage = game.me.node.avatar.style.backgroundImage;
 					// ui.fakeme.style.backgroundSize='cover';
 				}
@@ -1672,7 +1676,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							game.changeCoin(-3);
 						}
 						list.randomSort();
-
+	
 						var buttons = ui.create.div(".buttons");
 						var node = _status.event.dialog.buttons[0].parentNode;
 						_status.event.dialog.buttons = ui.create.buttons(
@@ -1683,7 +1687,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						_status.event.dialog.content.insertBefore(buttons, node);
 						buttons.addTempClass("start");
 						node.remove();
-
+	
 						game.uncheck();
 						game.check();
 					};
@@ -1754,7 +1758,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					};
 					if (!ui.cheat && get.config("change_choice")) ui.create.cheat();
 					if (!ui.cheat2 && get.config("free_choose")) ui.create.cheat2();
-
+	
 					event.asboss = ui.create.control("应战", function () {
 						event.boss = true;
 						event.enemy = [];
@@ -2013,7 +2017,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						var dialog = control.dialog;
 						dialog.content.removeChild(control.backup1);
 						dialog.buttons.removeArray(control.backup2);
-
+	
 						game.uncheck();
 						game.check();
 					} else {
@@ -2042,7 +2046,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 								dialog.buttons.addArray(this.backup2);
 							}
 							this.classList.toggle("glow");
-
+	
 							game.uncheck();
 							game.check();
 						});
@@ -2543,8 +2547,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							return target.isFriendOf(player);
 						})
 						.set("forceDie", true).ai = function (target) {
-						return get.attitude(_status.event.player, target);
-					};
+							return get.attitude(_status.event.player, target);
+						};
 					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
@@ -2749,8 +2753,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							get.prompt("noda_axe", trigger.target),
 							2,
 							"弃置两张牌，令" +
-								get.translation(trigger.target) +
-								"本回合内不能使用或打出牌且防具技能无效。",
+							get.translation(trigger.target) +
+							"本回合内不能使用或打出牌且防具技能无效。",
 							function (card, player) {
 								return card != player.getEquip(1);
 							}
@@ -2921,8 +2925,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							.chooseControl(list)
 							.set("prompt", "请选择下一个出战的角色")
 							.set("forceDie", true).ai = function () {
-							return list.randomGet();
-						};
+								return list.randomGet();
+							};
 					"step 2";
 					_status.shidianyanluo_level++;
 					game.changeBoss(result.control);
@@ -3211,8 +3215,8 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 							}
 						)
 						.set("forceDie", true).ai = function (target) {
-						return -get.attitude(_status.event.player, target);
-					};
+							return -get.attitude(_status.event.player, target);
+						};
 					"step 1";
 					if (result.bool) {
 						var target = result.targets[0];
@@ -3325,11 +3329,11 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					effect: {
 						target: function (card, player, target, current) {
 							if (!target.hasEmptySlot("equip2")) return;
-							if (card.name == "nanman" || card.name == "wanjian") return "zerotarget";
+							if (card.name == "nanman" || card.name == "wanjian") return "zeroplayertarget";
 							if (card.name == "sha") {
 								var equip1 = player.getEquip(1);
 								if (equip1 && equip1.name == "zhuque") return 1.9;
-								if (!game.hasNature(card)) return "zerotarget";
+								if (!game.hasNature(card)) return "zeroplayertarget";
 							}
 						},
 					},
@@ -3352,7 +3356,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					target.damage("fire");
 				},
 			},
-
+	
 			boss_huoxing: {
 				trigger: { player: "die" },
 				forceDie: true,
@@ -4209,7 +4213,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					},
 				},
 			},
-
+	
 			boss_yaoshou: {
 				mod: {
 					globalFrom: function (from, to, distance) {
@@ -6906,15 +6910,15 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						.set("prompt", get.prompt("boss_yuance"))
 						.set("choiceList", [
 							"若判定结果为黑色，" +
-								playername +
-								"失去1点体力，否则" +
-								sourcename +
-								"失去1点体力",
+							playername +
+							"失去1点体力，否则" +
+							sourcename +
+							"失去1点体力",
 							"若判定结果为红色，" +
-								playername +
-								"回复1点体力，否则" +
-								sourcename +
-								"回复1点体力",
+							playername +
+							"回复1点体力，否则" +
+							sourcename +
+							"回复1点体力",
 						]);
 					"step 1";
 					var att1 = get.attitude(player, trigger.player);
@@ -7136,7 +7140,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_zhangwu_ai: {
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use: function (card, player, target) {
 							if (get.tag(card, "recover") && card.name != "recover") {
 								for (var i = 0; i < game.players.length; i++) {
 									if (
@@ -7171,10 +7175,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 						return player.countCards("h") == 0;
 					},
 					x6: function (player, event) {
-						if(event.hasNature) return event.hasNature("fire");
+						if (event.hasNature) return event.hasNature("fire");
 					},
 					x5: function (player, event) {
-						if(event.hasNature) return event.hasNature("thunder");
+						if (event.hasNature) return event.hasNature("thunder");
 					},
 					x4: function (player, event) {
 						return event.name == "loseHp";
@@ -7369,7 +7373,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					event.dialog = ui.create.dialog(judgestr);
 					event.dialog.classList.add("center");
 					event.dialog.videoId = event.videoId;
-
+	
 					game.addVideo("judge1", player, [get.cardInfo(card), judgestr, event.videoId]);
 					for (var i = 0; i < event.cards.length; i++) event.cards[i].discard();
 					// var node=card.copy('thrown','center',ui.arena).addTempClass('start');
@@ -7428,12 +7432,12 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					"step 0";
 					player.chooseCard(
 						get.translation(trigger.player) +
-							"的" +
-							(trigger.judgestr || "") +
-							"判定为" +
-							get.translation(trigger.player.judging[0]) +
-							"，" +
-							get.prompt("tiandao"),
+						"的" +
+						(trigger.judgestr || "") +
+						"判定为" +
+						get.translation(trigger.player.judging[0]) +
+						"，" +
+						get.prompt("tiandao"),
 						"he"
 					).ai = function (card) {
 						var trigger = _status.event.parent._trigger;
@@ -7590,7 +7594,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target) {
+						target_use: function (card, player, target) {
 							if (get.tag(card, "respondShan")) {
 								var shans = target.countCards("h", "shan");
 								var hs = target.countCards("h");
@@ -7640,7 +7644,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ai: {
 					mingzhi: false,
 					effect: {
-						target: function (card, player, target) {
+						target_use: function (card, player, target) {
 							if (get.tag(card, "respondShan")) {
 								var shans = target.countCards("h", "shan");
 								var hs = target.countCards("h");
@@ -7921,7 +7925,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				ai: {
 					effect: {
 						target: function (card, player, target, current) {
-							if (card.name == "lebu" && card.name == "bingliang") return 0.8;
+							if (card.name == "lebu" || card.name == "bingliang") return 0.8;
 						},
 					},
 				},
@@ -8269,9 +8273,9 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				ai: {
 					effect: {
-						target_use: function (card, player, target, current) {
+						target: function (card, player, target, current) {
 							if (target.getEquip(2)) return;
-							return lib.skill.tengjia1.ai.effect.target_use.apply(this, arguments);
+							return lib.skill.tengjia1.ai.effect.target.apply(this, arguments);
 						},
 					},
 				},
@@ -8538,7 +8542,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use: function (card, player, target, current) {
 							if (get.tag(card, "respondShan")) {
 								var hastarget = false,
 									players = game.filterPlayer();
@@ -8764,7 +8768,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					threaten: 0.8,
 					effect: {
 						target: function (card) {
-							if (card.name == "bingliang") return 0;
+							if (card.name == "bingliang") return [0, 0];
 						},
 					},
 				},
@@ -8946,7 +8950,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 					effect: {
 						target: function (card) {
 							if (get.tag(card, "fireDamage")) {
-								return [0, 2];
+								return [0, 2, 0, 0];
 							}
 						},
 					},
@@ -9206,7 +9210,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				},
 				ai: {
 					effect: {
-						player: function (card) {
+						player_use: function (card) {
 							if (get.color(card) == "black") {
 								return [1, 2];
 							}
@@ -9838,7 +9842,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			zhu: "神",
 			cai: "盟",
 			zhong: "从",
-
+	
 			boss_chi: "魑",
 			boss_mo: "魅",
 			boss_wang: "魍",
@@ -9850,14 +9854,14 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_luocha: "罗刹",
 			boss_yecha: "夜叉",
 			boss_zhuoguiquxie: "捉鬼驱邪",
-
+	
 			boss_nianshou: "年兽",
 			boss_nianshou_heti: "年兽",
 			boss_nianshou_jingjue: "警觉年兽",
 			boss_nianshou_renxing: "任性年兽",
 			boss_nianshou_baonu: "暴怒年兽",
 			boss_nianshou_ruizhi: "睿智年兽",
-
+	
 			boss_shuijing: "水镜先生",
 			boss_huangyueying: "奇智女杰",
 			boss_zhangchunhua: "冷血皇后",
@@ -9880,13 +9884,13 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_diaochan: "绝代妖姬",
 			boss_guojia: "世之奇士",
 			boss_caocao: "魏武大帝",
-
+	
 			boss_chiyanshilian: "夏之试炼",
 			boss_zhuque: "朱雀",
 			boss_huoshenzhurong: "火神祝融",
 			boss_yanling: "焰灵",
 			boss_yandi: "炎帝",
-
+	
 			boss_hundun: "混沌",
 			boss_qiongqi: "穷奇",
 			boss_taowu: "梼杌",
@@ -9896,12 +9900,12 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_zhuyan: "朱厌",
 			boss_bifang: "毕方",
 			boss_yingzhao: "英招",
-
+	
 			boss_yaoshou: "妖兽",
 			boss_yaoshou_info: "锁定技，你与其他角色计算-2。",
 			boss_duqu: "毒躯",
 			boss_duqu_info:
-				"锁定技，你受到伤害时，伤害来源获得1枚“蛇毒”标记；你自身不会拥有“蛇毒”标记；你的“桃”均视为“杀”。“蛇毒”标记：锁定技，拥有“蛇毒”标记的角色回合开始时，需要选择弃置X张牌或者失去X点体力，然后弃置一枚“蛇毒”标记。X为其拥有的“蛇毒”标记个数。",
+				"锁定技，你受到伤害时，伤害来源获得1枚“蛇毒”标记；你自身不会拥有“蛇毒”标记；你的【桃】均视为【杀】。“蛇毒”标记：锁定技，拥有“蛇毒”标记的角色回合开始时，需要选择弃置X张牌或者失去X点体力，然后弃置一枚“蛇毒”标记。X为其拥有的“蛇毒”标记个数。",
 			boss_shedu: "蛇毒",
 			boss_jiushou: "九首",
 			boss_jiushou_info:
@@ -9912,10 +9916,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				"体力值首次减少至一半或更少时激活此技能。锁定技，除你之外的其他角色使用“桃”或“酒”时，获得1枚“蛇毒”标记。",
 			boss_bingxian: "兵燹",
 			boss_bingxian_info:
-				"锁定技，其他角色的回合结束时，若其回合内没有使用杀，则视为你对其使用一张“杀”。",
+				"锁定技，其他角色的回合结束时，若其回合内没有使用【杀】，则视为你对其使用一张【杀】。",
 			boss_juyuan: "巨猿",
 			boss_juyuan_info:
-				"锁定技，你的体力上限+5，你的出牌阶段内，若你的体力少于上一次你的回合结束时的体力，则你本回合使用“杀”可额外指定1个目标。",
+				"锁定技，你的体力上限+5，你的出牌阶段内，若你的体力少于上一次你的回合结束时的体力，则你本回合使用【杀】可额外指定1个目标。",
 			boss_xushi_switch: "蓄势",
 			boss_xushi: "蓄势",
 			boss_xushi_info:
@@ -9939,7 +9943,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_sipu_switch: "司圃",
 			boss_sipu_info:
 				"体力值首次减少至一半或更少时激活此技能。锁定技，你的出牌阶段内，若你使用的牌数小于等于2张，其他角色无法使用或打出牌。",
-
+	
 			boss_wuzang: "无脏",
 			boss_wuzang_info:
 				"锁定技，摸牌阶段，你的摸牌基数改为X（X为你的体力值一半且至少为5）；你的手牌上限基数为0。",
@@ -10002,25 +10006,25 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			honghuangzhili_cbg: "洪",
 			honghuangzhili_info:
 				"若该角色的势力是神，你获得其一张牌，其〖神裔〗无效直到其下家的回合（这个下家是动态变化的，会随着一个人的死或者复活而变化）开始；若该角色的势力不是神，其翻面。",
-
+	
 			boss_qingmushilian: "春之试炼",
 			boss_qinglong: "青龙",
 			boss_mushengoumang: "木神勾芒",
 			boss_shujing: "树精",
 			boss_taihao: "太昊",
-
+	
 			boss_baimangshilian: "秋之试炼",
 			boss_baihu: "白虎",
 			boss_jinshenrushou: "金神蓐收",
 			boss_mingxingzhu: "明刑柱",
 			boss_shaohao: "少昊",
-
+	
 			boss_xuanlinshilian: "冬之试炼",
 			boss_xuanwu: "玄武",
 			boss_shuishenxuanming: "水神玄冥",
 			boss_shuishengonggong: "水神共工",
 			boss_zhuanxu: "颛顼",
-
+	
 			boss_lingqu: "灵躯",
 			boss_lingqu_info:
 				"锁定技，当你受到伤害后，你摸一张牌，然后手牌上限+1；防止你受到的大于1点的伤害。",
@@ -10083,7 +10087,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_qingyi: "青仪",
 			boss_qingyi_info:
 				"锁定技，第三轮开始时，己方角色各回复1点体力；第五轮开始时，敌方角色各失去1点体力；第七轮开始时，复活木神勾芒和树精，使其各摸三张牌，各+1体力上限，然后各回复3点体力。",
-
+	
 			boss_guimou: "鬼谋",
 			boss_guimou_info: "结束阶段，你可以令一名随机的其他角色进入混乱状态直到其下一回合结束。",
 			boss_yuance: "远策",
@@ -10118,7 +10122,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				"锁定技，在你的判定牌生效前，你观看牌堆顶的七张牌并选择一张作为判定结果，此结果不可更改。",
 			fengqi: "风起",
 			fengqi_info: "准备阶段和结束阶段，你可以视为使用任意一张普通锦囊牌。",
-
+	
 			jiaoxia: "皎霞",
 			jiaoxia_info: "每当你成为红色牌的目标，你可以摸一张牌。",
 			lingbo: "凌波",
@@ -10136,7 +10140,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			mazui2: "麻醉",
 			mazui_info:
 				"出牌阶段限一次，你可以将一张黑色手牌置于一名角色的武将牌上，该角色造成的下一次伤害-1，然后获得此牌。",
-
+	
 			boss_nbianshen: "变形",
 			boss_nbianshenx: "变形",
 			boss_nbianshenx_info: "你从第二轮开始，每一轮幻化为警觉、任性、睿智、暴怒四种随机状态中的一种。",
@@ -10155,7 +10159,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				"锁定技，摸牌阶段，你改为摸X张牌（X为4到你体力值间的随机数）；若你的体力值小于5，则你使用【杀】造成的伤害+1且无次数限制。",
 			boss_shouyi: "兽裔",
 			boss_shouyi_info: "锁定技，你使用牌无距离限制。",
-
+	
 			boss_nianrui: "年瑞",
 			boss_nianrui_info: "锁定技，摸牌阶段，你额外摸两张牌。",
 			boss_qixiang: "祺祥",
@@ -10163,12 +10167,12 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_qixiang2: "祺祥",
 			boss_qixiang_info:
 				"乐不思蜀判定时，你的方块判定牌视为红桃；兵粮寸断判定时，你的黑桃判定牌视为草花。",
-
+	
 			qiwu: "栖梧",
 			qiwu_info: "锁定技。每当你使用一张梅花牌，你回复1点体力。",
 			jizhen: "激阵",
 			jizhen_info: "结束阶段，你可以令所至多两名已受伤角色摸一张牌。",
-
+	
 			boss_yushou: "驭兽",
 			boss_yushou_info: "出牌阶段开始时，你可以对所有敌方角色使用一张【南蛮入侵】。",
 			boss_moyany: "魔炎",
@@ -10180,7 +10184,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_mojian_info: "出牌阶段开始时，你可以对所有敌方角色使用一张【万箭齐发】。",
 			boss_danshu: "丹术",
 			boss_danshu_info: "每当你于回合外失去牌时，你可以进行一次判定，若结果为红色，你回复1点体力。",
-
+	
 			boss_zuijiu: "醉酒",
 			boss_zuijiu_info: "锁定技，你因【杀】造成伤害时，此伤害+1。",
 			boss_taiping: "太平",
@@ -10189,7 +10193,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_suoming_info: "结束阶段，将任意名未被横置的其他角色的武将牌横置。",
 			boss_xixing: "吸星",
 			boss_xixing_info: "准备阶段，对任意一名横置的其他角色造成1点雷电伤害，然后回复1点体力。",
-
+	
 			boss_baolian: "暴敛",
 			boss_baolian_info: "锁定技，结束阶段，你摸两张牌。",
 			boss_manjia: "蛮甲",
@@ -10200,7 +10204,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_guiji_info: "锁定技，准备阶段结束时，若你的判定区内有牌，你随机弃置其中一张牌。",
 			boss_lianyu: "炼狱",
 			boss_lianyu_info: "结束阶段，你可以对所有敌方角色造成1点火焰伤害。",
-
+	
 			boss_guihuo: "鬼火",
 			boss_guihuo_info: "结束阶段，你可以对一名其他角色造成1点火焰伤害。",
 			boss_minbao: "冥爆",
@@ -10215,7 +10219,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_didong_info: "结束阶段，你可以选择一名敌方角色将其武将牌翻面。",
 			boss_shanbeng: "山崩",
 			boss_shanbeng_info: "锁定技，当你死亡时，你令所有其他角色弃置其装备区内的所有牌。",
-
+	
 			boss_chiyan_intro1: "&nbsp;第一关",
 			boss_chiyan_intro1_info: "挑战朱雀",
 			boss_chiyan_intro2: "&nbsp;第二关",
@@ -10224,7 +10228,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_chiyan_intro3_info: "挑战炎帝、火神祝融、焰灵",
 			boss_chiyan_intro3_append:
 				"每通过一关，游戏轮数清零，阵亡角色复活，所有角色重置武将和区域内的牌，并获得4-X张起始手牌，X为阵亡角色数。",
-
+	
 			boss_qingmu_intro1: "&nbsp;第一关",
 			boss_qingmu_intro1_info: "挑战青龙",
 			boss_qingmu_intro2: "&nbsp;第二关",
@@ -10233,7 +10237,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_qingmu_intro3_info: "挑战太昊、木神勾芒、树精",
 			boss_qingmu_intro3_append:
 				"每通过一关，游戏轮数清零，阵亡角色复活，所有角色重置武将和区域内的牌，并获得4-X张起始手牌，X为阵亡角色数。",
-
+	
 			boss_xuanlin_intro1: "&nbsp;第一关",
 			boss_xuanlin_intro1_info: "挑战玄武",
 			boss_xuanlin_intro2: "&nbsp;第二关",
@@ -10242,7 +10246,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_xuanlin_intro3_info: "挑战颛顼、水神玄冥、水神共工",
 			boss_xuanlin_intro3_append:
 				"每通过一关，游戏轮数清零，阵亡角色复活，所有角色重置武将和区域内的牌，并获得4-X张起始手牌，X为阵亡角色数。",
-
+	
 			boss_baimang_intro1: "&nbsp;第一关",
 			boss_baimang_intro1_info: "挑战白虎",
 			boss_baimang_intro2: "&nbsp;第二关",
@@ -10251,7 +10255,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_baimang_intro3_info: "挑战少昊、金神蓐收、明刑柱",
 			boss_baimang_intro3_append:
 				"每通过一关，游戏轮数清零，阵亡角色复活，所有角色重置武将和区域内的牌，并获得4-X张起始手牌，X为阵亡角色数。",
-
+	
 			boss_bianshen_intro1: "&nbsp;第一关",
 			boss_bianshen_intro1_info: "挑战魑、魅、魍、魉中的随机一个",
 			boss_bianshen_intro2: "&nbsp;第二关",
@@ -10266,7 +10270,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			// boss_bianshen3_info:'你死亡后，随机召唤白无常、黑无常中的一个。',
 			// boss_bianshen4:'后援',
 			// boss_bianshen4_info:'你死亡后，随机召唤罗刹、夜叉中的一个。',
-
+	
 			boss_qiangzheng: "强征",
 			boss_qiangzheng_info: "锁定技，结束阶段，你获得每个敌方角色的一张手牌。",
 			boss_baolin: "暴凌",
@@ -10277,7 +10281,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_shengshou_info: "每当你使用一张牌，你可以进行一次判定，若为红色，你回复1点体力。",
 			wuqin: "五禽戏",
 			wuqin_info: "结束阶段，若你没有手牌，可以摸三张牌。",
-
+	
 			boss_konghun: "控心",
 			boss_konghun_info:
 				"结束阶段，你可以指定一名敌人令其进入混乱状态（不受对方控制，并将队友视为敌人）直到下一回合开始。",
@@ -10287,18 +10291,18 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			fengwu_info:
 				"出牌阶段限一次，可令除你外的所有角色依次对与其距离最近的另一名角色使用一张【杀】，无法如此做者失去1点体力。",
 			boss_wange: "笙歌",
-
+	
 			huanhua: "幻化",
 			huanhua_info:
 				"锁定技，游戏开始时，你获得其他角色的所有技能，体力上限变为其他角色之和；其他角色于摸牌阶段摸牌时，你摸等量的牌；其他角色于弃牌阶段弃牌时，你弃置等量的手牌。",
-
+	
 			boss_leiji: "雷击",
 			boss_leiji_info:
 				"每当你使用或打出一张【闪】，可令任意一名角色进行一次判定，若结果为黑色，其受到1点雷电伤害，然后你摸一张牌。",
 			jidian: "亟电",
 			jidian_info:
 				"每当你造成一次伤害，可以指定距离受伤害角色1以内的一名其他角色进行判定，若结果为黑色，该角色受到1点雷电伤害。",
-
+	
 			tinqin: "听琴",
 			boss_guihan: "归汉",
 			boss_guihan_info:
@@ -10316,24 +10320,24 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_xianyin: "仙音",
 			boss_xianyin_info:
 				"每当你于回合外失去牌，你可以进行一次判定，若为红色，你令一名敌人失去1点体力。",
-
+	
 			boss_yuhuo: "浴火",
 			boss_yuhuo_info: "觉醒技，在你涅槃后，你获得技能〖神威〗、〖朱羽〗。",
 			boss_tianyu: "天狱",
 			boss_tianyu_info: "锁定技，结束阶段，你解除横置状态，除你之外的所有角色进入横置状态。",
-
+	
 			boss_jizhi: "集智",
 			boss_jizhi_info: "每当你使用一张非转化的非基本牌，你可以摸一张牌并展示之。",
 			boss_guiyin: "归隐",
 			boss_guiyin_info: "锁定技，体力值比你多的角色无法在回合内对你使用卡牌。",
 			boss_gongshen: "工神",
 			boss_gongshen_info: "锁定技，除你之外的角色没有装备区；你不能成为其他角色的延时锦囊牌的目标。",
-
+	
 			fanghua: "芳华",
 			fanghua_info: "结束阶段，你可以令所有已翻面角色失去1点体力。",
 			tashui: "踏水",
 			tashui_info: "每当你使用或打出一张黑色牌，你可以令一名其他角色翻面。",
-
+	
 			boss_wuxin: "无心",
 			boss_wuxin_info:
 				"锁定技，你防止即将受到的伤害，改为失去1点体力；你不能成为其他角色的延时锦囊的目标。",
@@ -10341,7 +10345,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			shangshix2: "伤逝",
 			shangshix_info:
 				"锁定技，你的手牌数至少为4，结束阶段，若你的体力值大于1，你令场上所有角色失去1点体力。",
-
+	
 			boss_baonu: "暴怒",
 			boss_baonu_info:
 				"锁定技，当你的体力值降至4或更低时，你变身为暴怒战神或神鬼无前，并立即开始你的回合。",
@@ -10357,13 +10361,13 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			jiwu: "极武",
 			jiwu_info:
 				"出牌阶段，你可以弃置一张牌，然后获得获得以下一项技能直到回合结束：〖强袭〗、〖铁骑〗、〖旋风〗、〖完杀〗。",
-
+	
 			boss_jingjia: "精甲",
 			boss_jingjia_info: "锁定技，游戏开始时，将本局游戏中加入的装备随机置入你的装备区。",
 			boss_aozhan: "鏖战",
 			boss_aozhan_info:
 				"锁定技，若你装备区内有：武器牌，你可以多使用一张【杀】；防具牌，防止你受到的超过1点的伤害；坐骑牌，摸牌阶段多摸一张牌；宝物牌，跳过你的判定阶段。",
-
+	
 			boss_qinguangwang_ab: "秦广王",
 			boss_qinguangwang: "秦广王·蒋子文",
 			boss_panguan: "判官",
@@ -10491,7 +10495,7 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			"boss_sdyl_playerlevel4_info":"摸牌阶段多摸一张牌，起始手牌+1。",
 			"boss_sdyl_playerlevel5":"重生",
 			"boss_sdyl_playerlevel5_info":"限定技，当你处于濒死状态时，你可以弃置所有判定区牌，然后复原你的武将牌，将手牌补充至手牌体力上限（至多为5），将体力回复至体力上限。",
-
+	
 			"boss_sdyl_bosslevel1":"一阶",
 			"boss_sdyl_bosslevel1_info":"",
 			"boss_sdyl_bosslevel2":"二阶",
@@ -10515,12 +10519,12 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 			boss_taoni: "讨逆",
 			boss_taoni_info:
 				"锁定技，游戏开始时，每名角色回合开始时或你死亡时，你检查存活角色的合法性。若有角色存在非法行为，则你终止本局游戏。",
-
+	
 			boss_xhuanren: "关卡说明",
 			boss_xhuanren_info: "",
 			boss_xhuanren_info_boss:
 				"第一关：挑战秦广王<br>第二关：挑战楚江王，宋帝王，五官王，阎罗王中的一个<br>第三关：挑战卞城王，泰山王，都市王，平等王中的一个<br>第四关：挑战转轮王",
-
+	
 			boss_newhuanren: "关卡说明",
 			boss_newhuanren_info: "",
 			boss_newhuanren_info_boss:
@@ -10559,10 +10563,10 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				"当你减少1点体力上限后，你可令一名其他角色增加1点体力上限并回复1点体力。",
 			shenzhixiunvfu: "神之修女服",
 			shenzhixiunvfu_info: "没什么实际作用的衣服，仅仅是显得像个神而已。",
-
+	
 			mode_boss_card_config: "挑战卡牌",
 			mode_boss_character_config: "挑战武将",
-			
+	
 			// 台词部分
 			"#boss_lvbu1:die": "虎牢关，失守了……",
 			"#xiuluo1": "准备受死吧！",
@@ -10592,5 +10596,5 @@ game.import("mode", function (lib, game, ui, get, ai, _status) {
 				return from.side === to.side ? num : -num;
 			},
 		},
-	};
-});
+	}
+}

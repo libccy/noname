@@ -270,7 +270,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const target = event.targets[0];
 			await target.damage();
-			await game.asyncDelayx();
+			await game.delayx();
 		},
 		mod: {
 			aiOrder(player, card, num) {
@@ -292,6 +292,44 @@ const skills = {
 					if (hp != delNum) continue;
 					return num + 10 + pairs.filter(pair => pair[0] === hp).sort((a, b) => b[1] - a[1])[0][1] / 20;
 				}
+			},
+		},
+		group: "clantanque_mark",
+		init(player) {
+			var history = player.getAllHistory("useCard");
+			if (history.length) {
+				var trigger = history[history.length - 1];
+				if (typeof get.number(trigger.card, player) != "number") return;
+				player.storage.clantanque_mark = trigger.card;
+				player.markSkill("clantanque_mark");
+			}
+		},
+		onremove(player) {
+			player.unmarkSkill("clantanque_mark");
+			delete player.storage.clantanque_mark;
+		},
+		subSkill: {
+			mark: {
+				charlotte: true,
+				trigger: { player: "useCard1" },
+				forced: true,
+				popup: false,
+				firstDo: true,
+				content() {
+					if (typeof get.number(trigger.card, player) != "number") player.unmarkSkill("clantanque_mark");
+					else {
+						player.storage.clantanque_mark = trigger.card;
+						player.markSkill("clantanque_mark");
+					}
+				},
+				intro: {
+					markcount(card, player) {
+						return get.strNumber(get.number(card, player));
+					},
+					content(card, player) {
+						return "上一张牌的点数：" + get.strNumber(get.number(card, player));
+					},
+				},
 			},
 		},
 	},
@@ -480,7 +518,7 @@ const skills = {
 				if (bool) {
 					const card = links[0];
 					player.$gain2(card, false);
-					await game.asyncDelayx();
+					await game.delayx();
 					await player.chooseUseTarget(true, card, false);
 				}
 			}
@@ -773,7 +811,7 @@ const skills = {
 			result: {
 				target(player, target) {
 					var cards = player.getCards("hs", card => {
-						if (get.name(card, player) != "sha" && get.type(card, player) != "trick") return false;
+						if (get.name(card, player) != "sha" && get.type(card, null, player) != "trick") return false;
 						return player.hasValueTarget(card);
 					});
 					if (cards.some(card => player.canUse(card, target) && get.effect(target, card, player, player) > 0)) {
@@ -835,9 +873,7 @@ const skills = {
 					var target = event.targets.shift();
 					event.target = target;
 					var list = [];
-					const nameFilter = trigger.card.name == "sha"
-						? name => get.type(name) == "trick"
-						: name => name == "sha";
+					const nameFilter = trigger.card.name == "sha" ? name => get.type(name) == "trick" : name => name == "sha";
 					for (var name of lib.inpile) {
 						if (name != "sha" && get.type(name) != "trick") continue;
 						if (!nameFilter(name)) continue;
@@ -881,10 +917,18 @@ const skills = {
 	clanjianyuan: {
 		inherit: "clanchenya",
 		filter(event, player) {
+			if (event.type != "player") return false;
+			var skill = event.sourceSkill || event.skill;
+			var info = get.info(skill);
+			if (info.charlotte) return false;
+			var translation = get.skillInfoTranslation(skill, event.player);
+			if (!translation) return false;
+			var match = get.plainText(translation).match(/“?出牌阶段限一次/g);
+			if (!match || match.every(value => value != "出牌阶段限一次") || !event.player.countCards("he")) return false;
 			for (var phase of lib.phaseName) {
 				var evt = event.getParent(phase);
 				if (evt && evt.name == phase) {
-					if (event.player.getHistory("useCard", evtx => evtx.getParent(phase) == evt).length) return lib.skill.clanchenya.filter(event, player);
+					if (event.player.getHistory("useCard", evtx => evtx.getParent(phase) == evt).length) return true;
 				}
 			}
 			return false;
@@ -1000,7 +1044,7 @@ const skills = {
 			if (player.getHistory("useSkill", evt => evt.skill == "clanhuanghan").length > 1 && player.hasSkill("clanbaozu", null, false, false) && player.awakenedSkills.includes("clanbaozu")) {
 				player.restoreSkill("clanbaozu");
 				player.popup("保族");
-				game.log(player, "恢复了技能", "#【保族】");
+				game.log(player, "恢复了技能", "#g【保族】");
 			}
 		},
 		ai: {
@@ -1009,7 +1053,7 @@ const skills = {
 				target(card, player, target) {
 					if (!get.tag(card, "damage") || player.hasSkillTag("jueqing", false, target)) return;
 					let num = get.cardNameLength(card) - target.getDamagedHp();
-					if (num > 0) return [1, num + 0.1];
+					if (num > 0) return [1, 0.8 * num + 0.1];
 				},
 			},
 		},
@@ -1170,6 +1214,9 @@ const skills = {
 			aiOrder(player, card, num) {
 				if (player.isPhaseUsing() && get.type(card) == "equip" && get.equipValue(card, player) > 0) return num + 3;
 			},
+			cardUsable(card) {
+				if (card.storage?.clanfuxun) return Infinity;
+			},
 		},
 		locked: false,
 		audio: 2,
@@ -1265,6 +1312,7 @@ const skills = {
 				var card = {
 					name: result.links[0][2],
 					nature: result.links[0][3],
+					storage: { clanfuxun: true },
 				};
 				game.broadcastAll(function (card) {
 					lib.skill.clanfuxun_backup.viewAs = card;
@@ -1357,7 +1405,7 @@ const skills = {
 			if (info.charlotte) return false;
 			var translation = get.skillInfoTranslation(skill, event.player);
 			if (!translation) return false;
-			var match = translation.match(/“?出牌阶段限一次/g);
+			var match = get.plainText(translation).match(/“?出牌阶段限一次/g);
 			if (!match || match.every(value => value != "出牌阶段限一次")) return false;
 			return event.player.countCards("h") > 0;
 		},
@@ -1448,9 +1496,14 @@ const skills = {
 			if (!lib.skill[skill]) {
 				lib.skill[skill] = {
 					charlotte: true,
+					onremove: true,
 					mark: true,
 					marktext: "戒",
-					intro: { content: "已被$指定为【铭戒】目标" },
+					intro: {
+						markcount: () => 0,
+						content: storage => "已被" + get.translation(storage[0]) + "指定为【铭戒】目标",
+					},
+					group: "clanmingjie_clear",
 				};
 				lib.translate[skill] = "铭戒";
 				lib.translate[skill + "_bg"] = "戒";
@@ -1463,17 +1516,22 @@ const skills = {
 		enable: "phaseUse",
 		limited: true,
 		filterTarget(card, player, target) {
-			return !target.hasSkill("clanmingjie_" + player.playerid);
+			return !Object.keys(target.storage).some(skill => {
+				return skill.startsWith("clanmingjiex_" + player.playerid + "_") && target.storage[skill] === 1 + (_status.currentPhase === target);
+			});
 		},
 		skillAnimation: true,
 		animationColor: "thunder",
 		content() {
 			player.awakenSkill("clanmingjie");
 			player.addSkill("clanmingjie_effect");
-			var skill = "clanmingjie_" + player.playerid;
+			let skill;
+			do {
+				skill = "clanmingjiex_" + player.playerid + "_" + Math.random().toString(36).slice(-8);
+			} while (lib.skill[skill] != null);
 			game.broadcastAll(lib.skill.clanmingjie.initSkill, skill);
-			target.addTempSkill(skill, { player: "phaseAfter" });
-			target.storage[skill] = player;
+			target.addSkill(skill);
+			target.storage[skill] = _status.currentPhase === target ? 2 : 1;
 		},
 		ai: {
 			order: 10,
@@ -1519,7 +1577,7 @@ const skills = {
 					if (info.allowMultiple == false) return false;
 					if (event.targets && !info.multitarget) {
 						return game.filterPlayer().some(current => {
-							if (!current.hasSkill("clanmingjie_" + player.playerid)) return false;
+							if (!Object.keys(current.storage).some(skill => skill.startsWith("clanmingjiex_" + player.playerid + "_"))) return false;
 							return !event.targets.includes(current) && lib.filter.targetEnabled2(card, player, current) && lib.filter.targetInRange(card, player, current);
 						});
 					}
@@ -1534,7 +1592,7 @@ const skills = {
 							"令任意【铭戒】目标角色成为" + get.translation(trigger.card) + "的目标",
 							function (card, player, target) {
 								var trigger = _status.event.getTrigger();
-								if (trigger.targets.includes(target) || !target.isIn() || !target.hasSkill("clanmingjie_" + player.playerid)) return false;
+								if (trigger.targets.includes(target) || !Object.keys(target.storage).some(skill => skill.startsWith("clanmingjiex_" + player.playerid + "_"))) return false;
 								return lib.filter.targetEnabled2(trigger.card, player, target) && lib.filter.targetInRange(trigger.card, player, target);
 							},
 							[1, Infinity]
@@ -1554,30 +1612,31 @@ const skills = {
 				},
 				group: "clanmingjie_targeted",
 			},
+			clear: {
+				charlotte: true,
+				trigger: { player: "phaseAfter" },
+				filter(event, player) {
+					return Object.keys(player.storage).some(i => i.startsWith("clanmingjiex_"));
+				},
+				forced: true,
+				popup: false,
+				firstDo: true,
+				content() {
+					const storages = Object.keys(player.storage).filter(i => i.startsWith("clanmingjiex_"));
+					for (const skill of storages) {
+						player.storage[skill]--;
+						if (!player.storage[skill]) player.removeSkill(skill);
+					}
+				},
+			},
 			targeted: {
 				charlotte: true,
 				trigger: { global: "phaseEnd" },
 				filter(event, player) {
-					var cards = player.getStorage("clanmingjie_record").slice();
-					cards = cards.filterInD("d");
-					if (!cards.length) return false;
-					var history = player.getHistory("useSkill", evt => evt.skill == "clanmingjie");
-					if (history.length) {
-						var targets = history.reduce((list, evt) => list.addArray(evt.targets), []);
-						if (event.player != player && targets.includes(event.player)) return true;
-					}
-					if (player.actionHistory.length >= 2) {
-						for (var i = player.actionHistory.length - 2; i >= 0; i--) {
-							if (!player.actionHistory[i].isMe) continue;
-							var history2 = player.actionHistory[i].useSkill.filter(evt => evt.skill == "clanmingjie");
-							if (history2.length) {
-								var targets2 = history2.reduce((list, evt) => list.addArray(evt.targets), []);
-								if (targets2.includes(event.player)) return true;
-							}
-							break;
-						}
-					}
-					return false;
+					if (!Object.keys(event.player.storage).some(skill => {
+						return skill.startsWith("clanmingjiex_" + player.playerid + "_") && event.player.storage[skill] == 1;
+					})) return false;
+					return player.getStorage("clanmingjie_record").someInD("d");
 				},
 				forced: true,
 				popup: false,
@@ -1615,25 +1674,28 @@ const skills = {
 			record: {
 				charlotte: true,
 				trigger: {
-					global: ["shaMiss", "eventNeutralized", "useCard1", "phaseAfter"],
+					global: ["useCard", "respond", "useCard1", "phaseAfter"],
 				},
-				filter(event, player) {
-					if (event.name == "useCard") {
-						return get.suit(event.card) == "spade";
-					}
+				filter(event, player, name) {
+					if (name == "useCard1") return get.suit(event.card) == "spade";
 					if (event.name == "phase") return true;
-					if (event.type != "card") return false;
-					return true;
+					if (!Array.isArray(event.respondTo)) return false;
+					return get.type(event.respondTo[1]) != "trick" || ["caochuan", "wuxie"].includes(event.card.name);
 				},
 				silent: true,
 				forced: true,
 				content() {
-					"step 0";
 					if (trigger.name == "phase") {
 						delete player.storage.clanmingjie_record;
-						return;
+					} else {
+						player.markAuto(
+							"clanmingjie_record",
+							game.getGlobalHistory("everything", evt => {
+								if (event.triggername == "useCard1") return evt == trigger;
+								return evt.name == "useCard" && evt.card == trigger.respondTo[1];
+							})[0].cards
+						);
 					}
-					player.markAuto("clanmingjie_record", trigger.cards);
 				},
 			},
 		},
@@ -2419,7 +2481,7 @@ const skills = {
 				event.loser.chooseUseTarget(true, card, false);
 			} else event.goto(5);
 			"step 4";
-			if (cards.filter(i => get.position(i, true) == "d" && event.loser.hasUseTarget(i)).length) event.goto(3);
+			if (cards.filter(i => get.position(i, true) == "d" && event.loser.hasUseTarget(i)).length) event.goto(2);
 			"step 5";
 			if (get.distance(player, target) != event.distance[0] || get.distance(target, player) != event.distance[1]) {
 				player.restoreSkill("clanxumin");
@@ -2705,7 +2767,8 @@ const skills = {
 			if (result.bool) {
 				var cards = result.cards;
 				target.give(cards, player);
-				game.delayx();
+				if (!cards.length) event.finish();
+				else game.delayx();
 			} else event.finish();
 			"step 3";
 			if (trigger.cards.filterInD().length) target.gain(trigger.cards.filterInD(), "gain2", "bySelf");
@@ -3513,7 +3576,7 @@ const skills = {
 		filter(event, player) {
 			if (event.phaseList[event.num].startsWith("phaseUse")) return false;
 			var num1 = player.getHandcardLimit() - 1,
-				num2 = event.num;
+				num2 = event.num - player.getHistory("skipped").length;
 			return num1 == num2;
 		},
 		content() {

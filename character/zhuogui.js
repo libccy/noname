@@ -15,7 +15,7 @@ game.import("character", function () {
 				ai: {
 					effect: {
 						target: function (card, player, target, current) {
-							if (card.name == "lebu" && card.name == "bingliang") return 0.8;
+							if (card.name == "lebu" || card.name == "bingliang") return 0.8;
 						},
 					},
 				},
@@ -200,7 +200,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target: function (card, player, target, current) {
+						target_use: function (card, player, target, current) {
 							if (get.type(card) == "delay" && target.countCards("j") == 0) return 0.1;
 						},
 					},
@@ -330,7 +330,7 @@ game.import("character", function () {
 			qiangzheng: "强征",
 			qiangzheng_info: "锁定技，结束阶段，你获得一名其他角色的一张手牌。",
 			zuijiu: "醉酒",
-			zuijiu_info: "锁定技，你的黑杀造成的伤害+1，造成伤害后须弃置一张手牌。",
+			zuijiu_info: "锁定技，你的黑【杀】造成的伤害+1，造成伤害后须弃置一张手牌。",
 
 			heiwuchang: "黑无常",
 			suoling: "索令",

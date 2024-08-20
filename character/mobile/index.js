@@ -26,7 +26,11 @@ game.import("character", function () {
 		characterIntro: { ...characterIntros },
 		characterReplace: { ...characterReplaces },
 		characterSubstitute: {
-			mb_caomao: [],
+			mb_caomao: [
+				["mb_caomao_shadow", ["die:mb_caomao"]],
+				["mb_caomao_dead", ["die:mb_caomao"]],
+			],
+			shichangshi: [["shichangshi_dead", []]],
 		},
 		card: { ...cards },
 		skill: { ...skills },

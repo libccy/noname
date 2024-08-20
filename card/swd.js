@@ -15,55 +15,6 @@ game.import("card", function () {
 					useful: [7.5, 5, 2],
 				},
 			},
-			// yihuajiemu:{
-			// 	fullskin:true,
-			// 	type:'trick',
-			// 	enable:true,
-			// 	singleCard:true,
-			// 	filterTarget:function(card,player,target){
-			// 		if(target.isMin()) return false;
-			// 		if(ui.selected.targets.length){
-			// 			return target.getCards('e',{subtype:'equip5'}).length==0;
-			// 		}
-			// 		else{
-			// 			return target.getCards('e',{subtype:'equip5'}).length>0;
-			// 		}
-			// 	},
-			// 	selectTarget:2,
-			// 	multitarget:true,
-			// 	complexTarget:true,
-			// 	multicheck:function(){
-			// 		return game.hasPlayer(function(current){
-			// 			return current.getEquip(5);
-			// 		})&&game.hasPlayer(function(current){
-			// 			return !current.getEquip(5);
-			// 		});
-			// 	},
-			// 	content:function(){
-			// 		if(target.getEquip(5)){
-			// 			target.$give(target.getEquip(5),event.addedTarget);
-			// 			event.addedTarget.equip(target.getEquip(5));
-			// 			game.delay();
-			// 		}
-			// 	},
-			// 	ai:{
-			// 		order:1,
-			// 		result:{
-			// 			target:function(player,target){
-			// 				if(target.getCards('e',{subtype:'equip5'}).length){
-			// 					if(get.attitude(target,player)>0){
-			// 						return -0.5;
-			// 					}
-			// 					return -1;
-			// 				}
-			// 				return 1;
-			// 			}
-			// 		},
-			// 		tag:{
-			// 			loseCard:1
-			// 		}
-			// 	}
-			// },
 			liuxinghuoyu: {
 				fullskin: true,
 				type: "trick",
@@ -3447,65 +3398,6 @@ game.import("card", function () {
 					trigger.player.chooseToDiscard(true, "he");
 				},
 			},
-			shouhua: {
-				mode: ["identity", "infinity"],
-				enable: "phaseUse",
-				filter: function (event, player) {
-					return player == game.me;
-				},
-				usable: 1,
-				filterTarget: function (card, player, target) {
-					return target != game.zhu && target != game.me && target.hp < target.maxHp;
-				},
-				filterCard: true,
-				check: function (card) {
-					return get.value(card);
-				},
-				discard: false,
-				prepare: "throw",
-				content: function () {
-					"step 0";
-					target.$turn2();
-					target.style.left = "calc(50% - 120px)";
-					target.style.top = "calc(50% - 60px)";
-					game.delay(0, 2500);
-					"step 1";
-					target.removeAttribute("style");
-					if (
-						Math.random() <
-						((get.value(cards[0]) + 1) * (target.maxHp - target.hp)) / (60 * target.maxHp)
-					) {
-						event.position = target.dataset.position;
-						target.dataset.position = player.dataset.position;
-						target.delete();
-						event.success = true;
-					}
-					game.delay();
-					"step 2";
-					if (event.success) {
-						player.popup("收化成功");
-						game.log(player, "将", target, "收化");
-						target.dataset.position = event.position;
-						var card = player.getEquip("lianyaohu");
-						if (!card.storage.shouhua) card.storage.shouhua = [];
-						card.storage.shouhua.push(target);
-						game.removePlayer(target);
-						game.checkResult();
-					} else {
-						player.popup("收化失败");
-						target.gain(cards);
-						target.$gain2(cards);
-					}
-					game.delay();
-				},
-				ai: {
-					result: {
-						player: function () {
-							return Math.random() - 0.4;
-						},
-					},
-				},
-			},
 			haotianta: {
 				trigger: { global: "judgeBefore" },
 				direct: true,
@@ -5214,8 +5106,6 @@ game.import("card", function () {
 			g_hufu_shan: "符闪",
 			g_hufu_jiu: "符酒",
 			hufu_info: "你可以将一张玉符当作杀、闪或酒使用或打出。",
-			// yihuajiemu:'移花接木',
-			// yihuajiemu_info:'对一名装备区内有宝物的角色使用，将其宝物牌转移至另一名角色。',
 			liuxinghuoyu: "流星火羽",
 			liuxinghuoyu_info: "出牌阶段，对一名角色使用，令目标弃置两张牌，或受到1点火焰伤害。",
 			g_yuchan_equip: "玉蝉",
@@ -5642,9 +5532,6 @@ game.import("card", function () {
 			["heart", 1, "hufu"],
 			["spade", 1, "hufu"],
 			["club", 1, "qiankundai"],
-			// ['heart',3,'yihuajiemu'],
-			// ['diamond',1,'yihuajiemu'],
-			// ['diamond',7,'yihuajiemu'],
 
 			["diamond", 3, "liuxinghuoyu", "fire"],
 			["heart", 6, "liuxinghuoyu", "fire"],
