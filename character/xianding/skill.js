@@ -16066,6 +16066,7 @@ const skills = {
 			var list = [];
 			event.addIndex = 0;
 			var str = get.translation(target);
+			event.target = target;
 			if (target.isDamaged()) list.push("令" + str + "回复1点体力");
 			else event.addIndex++;
 			if (target.isLinked() || target.isTurnedOver()) list.push("令" + get.translation(target) + "复原武将牌");
@@ -16077,7 +16078,7 @@ const skills = {
 					.set("ai", function () {
 						var evt = _status.event.getParent();
 						if (get.attitude(evt.player, evt.target) < 0) return "cancel2";
-						if (target.hp > 1 && target.isTurnedOver()) return 1 - evt.addIndex;
+						if (evt.target.hp > 1 && evt.target.isTurnedOver()) return 1 - evt.addIndex;
 						return 0;
 					});
 			"step 2";
