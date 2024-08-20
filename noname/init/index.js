@@ -195,7 +195,7 @@ export async function boot() {
 			//但这种方式只允许修改game的文件读写函数。
 			if (typeof window.initReadWriteFunction == "function") {
 				const g = {};
-				const ReadWriteFunctionName = ["download", "readFile", "readFileAsText", "writeFile", "removeFile", "getFileList", "ensureDirectory", "createDir", "removeDir"];
+				const ReadWriteFunctionName = ["download", "checkFile", "checkDir", "readFile", "readFileAsText", "writeFile", "removeFile", "getFileList", "ensureDirectory", "createDir", "removeDir"];
 				ReadWriteFunctionName.forEach(prop => {
 					Object.defineProperty(g, prop, {
 						configurable: true,
@@ -264,6 +264,7 @@ export async function boot() {
 	config.get("all").plays = [];
 	config.get("all").mode = [];
 
+	if (!config.get("errstop") || config.get("compatiblemode")) _status.withError = true;
 	if (config.get("debug")) {
 		await lib.init.promises.js(`${lib.assetURL}game`, "asset");
 		if (window.noname_skin_list) {
@@ -1020,12 +1021,6 @@ async function setOnError() {
 		Reflect.set(window, "ec", column);
 		Reflect.set(window, "eo", err);
 		if (promiseErrorHandler.onErrorFinish) promiseErrorHandler.onErrorFinish();
-		// @ts-ignore
-		if (!lib.config.errstop && _status && _status.event) {
-			if (_status.event.content instanceof AsyncFunction || Array.isArray(_status.event.contents)) return;
-			_status.withError = true;
-			game.loop();
-		}
 	};
 
 	return promiseErrorHandler;

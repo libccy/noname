@@ -1,5 +1,4 @@
 const characters = {
-	mp_wangrong: ["male", "wei", 3, ["mpjianlin", "mpsixiao"]],
 	matie: ["male", "qun", 4, ["dczhuiwang", "dcquxian"]],
 	hansong: ["male", "qun", 3, ["dcyinbi", "dcshuaiyan"]],
 	chezhou: ["male", "wei", 4, ["dcshefu", "dcpigua"]],
@@ -12,7 +11,6 @@ const characters = {
 	star_yuanshu: ["male", "qun", 4, ["starcanxi", "starpizhi", "starzhonggu"], ["zhu"]],
 	star_caoren: ["male", "wei", 4, ["starsujun", "starlifeng"]],
 	star_sunshangxiang: ["female", "wu", 3, ["starsaying", "starjiaohao"]],
-	mp_liuling: ["male", "jin", 3, ["mpjiusong", "mpmaotao", "mpbishi"], ["doublegroup:wei:qun:jin"]],
 	dc_jikang: ["male", "wei", 3, ["new_qingxian", "dcjuexiang"]],
 	dc_jsp_guanyu: ["male", "wei", 4, ["new_rewusheng", "dcdanji"]],
 	dc_mengda: ["male", "wei", 4, ["dclibang", "dcwujie"]],
@@ -95,8 +93,14 @@ const characters = {
 	xunchen: ["male", "qun", 3, ["fenglve", "mouzhi"], ["clan:颍川荀氏"]],
 	sp_zhanghe: ["male", "qun", 4, ["yuanlve"]],
 	sp_xuyou: ["male", "qun", 3, ["spshicai", "spfushi"]],
-	chunyuqiong: ["male", "qun", 5, ["cangchu", "sushou", "liangying"]],
+	chunyuqiong: ["male", "qun", 5, ["cangchu", "sushou", "liangying"], ["name:淳于|琼"]],
 	lvkuanglvxiang: ["male", "qun", 4, ["liehou", "qigong"], ["name:吕|旷-吕|翔"]],
+
+	duji: ["male", "wei", 3, ["xinfu_andong", "xinfu_yingshi"]],
+	liuyao: ["male", "qun", 4, ["xinfu_kannan", "twniju"], ["zhu"]],
+	lvdai: ["male", "wu", 4, ["xinfu_qinguo"]],
+	sp_taishici: ["male", "qun", 4, ["xinfu_jixu"], ["name:太史|慈"]],
+	re_zhangliang: ["male", "qun", 4, ["xinfu_jijun", "xinfu_fangtong"]],
 };
 
 export default characters;

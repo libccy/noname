@@ -94,11 +94,6 @@ game.import("character", function () {
 			pal_xuanxiao:
 				"天赋异禀，资质极佳，是万中无一的修仙奇才，和夙玉用双剑束缚幻瞑界吸取灵力并引发琼华派与妖界之战。因夙玉离开昆仑，修炼双剑中断，他被邪火入侵而走火入魔，打伤数名师兄弟，被夙瑶联合青阳、重光与宗炼长老冰封19年，因此逢缘与云天河结拜。",
 
-			// pal_jiangyunfan:'',
-			// pal_tangyurou:'',
-			// pal_longyou:'',
-			// pal_xiaoman:'',
-
 			pal_xiahoujinxuan:
 				"夏侯世家的少主。因不喜舞枪弄剑，专爱趣闻逸史，让父亲深感恨铁不成钢；好在他对于仙术符法也有所涉略，没沦落到手无缚鸡之力的境地。",
 			pal_muchanglan:
@@ -164,7 +159,7 @@ game.import("character", function () {
 					threaten: 2,
 					expose: 0.2,
 					effect: {
-						player: function (card, player) {
+						player_use: function (card, player) {
 							if (_status.currentPhase != player) return;
 							if (_status.event.name != "chooseToUse" || _status.event.player != player) return;
 							var num = player.needsToDiscard();
@@ -506,7 +501,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						player: function (card, player, target) {
+						player_use: function (card, player, target) {
 							if (_status.currentPhase != player) return;
 							if (
 								card.name == "sha" &&
@@ -778,7 +773,7 @@ game.import("character", function () {
 				ai: {
 					effect: {
 						target: function (card, player, target) {
-							if (card.name == "bingliang" || card.name == "caomu") return 0;
+							if (card.name == "bingliang" || card.name == "caomu") return [0, 0];
 						},
 					},
 				},
@@ -823,7 +818,7 @@ game.import("character", function () {
 					nodamage: true,
 					effect: {
 						target: function (card, player, target, current) {
-							if (get.tag(card, "damage")) return [0, 0];
+							if (get.tag(card, "damage")) return "zeroplayertarget";
 						},
 					},
 				},
@@ -2810,7 +2805,7 @@ game.import("character", function () {
 				forced: true,
 				unique: true,
 				forceunique: true,
-				filter: function () {
+				filter: function (event, player) {
 					return Math.random() < 0.5 && [player.name1, player.name2].includes("pal_longkui");
 				},
 				derivation: ["diesha", "guijiang"],
@@ -3074,7 +3069,7 @@ game.import("character", function () {
 						return get.order({ name: "sha" }) + 0.1;
 					},
 					effect: {
-						player: function (card, player) {
+						player_use: function (card, player) {
 							if (_status.currentPhase != player) return;
 							if (
 								card.name == "sha" &&
@@ -3255,7 +3250,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						player: function (card, player) {
+						player_use: function (card, player) {
 							if (_status.currentPhase != player) return;
 							if (get.is.altered("shuiyun")) return;
 							if (
@@ -4157,7 +4152,7 @@ game.import("character", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target) {
+						target(card, player, target) {
 							if (
 								target.storage.xjzhimeng2 &&
 								get.type(card, "trick") == get.type(target.storage.xjzhimeng2, "trick")
@@ -4328,9 +4323,9 @@ game.import("character", function () {
 					nothunder: true,
 					effect: {
 						target: function (card, player, target, current) {
-							if (card.name == "tiesuo") return 0;
-							if (get.tag(card, "fireDamage")) return 0;
-							if (get.tag(card, "thunderDamage")) return 0;
+							if (card.name == "tiesuo") return [0, 0];
+							if (get.tag(card, "fireDamage")) return [0, 0, 0, 0];
+							if (get.tag(card, "thunderDamage")) return [0, 0, 0, 0];
 						},
 					},
 				},

@@ -1404,7 +1404,7 @@ const skills = {
 				intro: { content: "本回合不能使用或打出手牌" },
 				mod: {
 					cardEnabled2(card) {
-						return false;
+						if (get.position(card) == "h") return false;
 					},
 				},
 			},
@@ -2029,7 +2029,7 @@ const skills = {
 			if (event.type != "discard") return false;
 			var cards = event.getd();
 			for (var i of cards) {
-				if (get.position(i, true) == "d" && get.color(i, false) == "black" && get.type(i, null, true) == "basic") {
+				if (get.position(i, true) == "d" && get.color(i, false) == "black" && get.type(i) == "basic") {
 					var card = get.autoViewAs({ name: "bingliang" }, [i]);
 					if (
 						game.hasPlayer(function (current) {
@@ -2045,7 +2045,7 @@ const skills = {
 			"step 0";
 			if (!event.cards) event.cards = [];
 			var cards = trigger.getd().filter(function (i) {
-				if (!event.cards.includes(i) && get.position(i, true) == "d" && get.color(i, false) == "black" && get.type(i, null, true) == "basic") {
+				if (!event.cards.includes(i) && get.position(i, true) == "d" && get.color(i, false) == "black" && get.type(i) == "basic") {
 					var card = get.autoViewAs({ name: "bingliang" }, [i]);
 					if (
 						game.hasPlayer(function (current) {
@@ -3965,6 +3965,7 @@ const skills = {
 				delete event.player;
 				event.trigger("compare");
 			} else {
+				event.iwhile = 0;
 				game.delay(0, 1000);
 				event.goto(9);
 			}
@@ -3975,13 +3976,27 @@ const skills = {
 			event.goto(7);
 			"step 9";
 			event.player = event.tempplayer;
+			event.trigger("compareFixing");
+			"step 10";
+			if (event.player) delete event.player;
+			if (event.iwhile < targets.length) {
+				event.target = targets[event.iwhile];
+				event.trigger("compareFixing");
+			} else {
+				event.goto(12);
+			}
+			"step 11";
+			event.iwhile++;
+			event.goto(10);
+			"step 12";
+			event.player = event.tempplayer;
 			delete event.tempplayer;
 			var str;
 			var num1 = event.result.num1.reduce((p, c) => p + c, 0) / event.result.num1.length,
 				num2 = event.result.num2.reduce((p, c) => p + c, 0) / event.result.num2.length;
 			game.log(event.player, "方的点数均值为", "#y" + Math.floor(num1 * 100) / 100);
 			game.log(event.targetx, "方的点数均值为", "#y" + Math.floor(num2 * 100) / 100);
-			if (num1 > num2) {
+			if (event.players.includes(event.forceWinner) || (!event.targetsx.includes(event.forceWinner) && num1 > num2)) {
 				str = get.translation(event.players) + "拼点成功";
 				event.players.forEach(i => i.popup("胜"));
 				event.targetsx.forEach(i => i.popup("负"));
@@ -3989,7 +4004,7 @@ const skills = {
 				event.result.loser = event.targetsx;
 			} else {
 				str = get.translation(event.players) + "拼点失败";
-				if (num1 == num2) {
+				if (!event.targetsx.includes(event.forceWinner) && num1 == num2) {
 					event.players.forEach(i => i.popup("平"));
 					event.targetsx.forEach(i => i.popup("平"));
 					event.result.loser = event.players.addArray(event.targetsx);
@@ -4008,9 +4023,9 @@ const skills = {
 				}, 1000);
 			}, str);
 			game.delay(3);
-			("step 10");
+			"step 13";
 			game.broadcastAll(ui.clear);
-			("step 11");
+			"step 14";
 			event.cards.add(event.card1);
 		},
 		contentx() {
@@ -5589,7 +5604,7 @@ const skills = {
 		filter(event, player) {
 			if (event.player == player) return false;
 			if (event.name == "recover") return player.isDamaged();
-			return get.type(event.card, false) == "equip" && event.cards.some(i => get.position(i, true) == "o" && player.canEquip(i, true));
+			return get.type(event.card, null, false) == "equip" && event.cards.some(i => get.position(i, true) == "o" && player.canEquip(i, true));
 		},
 		limited: true,
 		skillAnimation: true,
@@ -5621,7 +5636,7 @@ const skills = {
 				trigger: { player: ["recoverAfter", "useCardAfter"] },
 				filter(event, player) {
 					if (event.getParent().name == "dddjiexing") return false;
-					if (event.name == "useCard") return get.type(event.card, false) == "equip";
+					if (event.name == "useCard") return get.type(event.card, null, false) == "equip";
 					return true;
 				},
 				forced: true,

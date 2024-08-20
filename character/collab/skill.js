@@ -2,143 +2,139 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
-	//荀彧荀攸
-	dczhinang: {
-		getMap() {
-			if (!_status.dczhinang_map) {
-				_status.dczhinang_map = {
-					name: {},
-					info: {},
-				};
-				let list;
-				if (_status.connectMode) {
-					list = get.charactersOL();
-				} else {
-					list = get.gainableCharacters();
-				}
-				list.forEach(name => {
-					if (name !== "dc_xunyuxunyou") {
-						const skills = get.character(name, 3);
-						skills.forEach(skill => {
-							const info = get.info(skill);
-							if (!info || (info.ai && info.ai.combo)) return;
-							if (skill in _status.dczhinang_map) return;
-							if (get.translation(skill).includes("谋")) _status.dczhinang_map.name[skill] = name;
-							const voices = game.parseSkillText(skill, name);
-							if (voices.some(data => data.includes("谋"))) {
-								_status.dczhinang_map.info[skill] = name;
-							}
-						});
-					}
-				});
-			}
-			return _status.dczhinang_map;
-		},
-		trigger: {
-			player: "useCardAfter",
-		},
+	//刘协曹节
+	//我们意念合一×2
+	dcjuanlv: {
+		audio: 2,
+		equipSkill: false,
+		inherit: "cixiong_skill",
 		filter(event, player) {
-			return ["trick", "equip"].includes(get.type2(event.card));
-		},
-		frequent: true,
-		async content(event, trigger, player) {
-			const map = lib.skill.dczhinang.getMap(),
-				type = get.type2(trigger.card) == "equip" ? "name" : "info",
-				list = Object.keys(map[type]);
-			if (list.length > 0) {
-				const skill = list.randomGet(),
-					voiceMap = game.parseSkillTextMap(skill, map[type][skill]);
-				if (type == "info") {
-					findaudio: for (let data of voiceMap) {
-						if (!data.text) continue;
-						if (data.text.includes("谋")) {
-							player.chat(data.text);
-							game.broadcastAll(file => game.playAudio(file), data.file);
-							break findaudio;
-						}
-					}
-				}
-				else player.flashAvatar("dczhinang", map[type][skill])
-				player.popup(skill);
-				await player.addSkills(skill);
-			}
+			return player.differentSexFrom(event.target);
 		},
 	},
-	dcgouzhu: {
-		trigger: {
-			player: ["useSkillAfter", "logSkill"],
-		},
+	dcqixin: {
+		audio: 2,
+		enable: "phaseUse",
 		filter(event, player) {
-			if (["global", "equip"].includes(event.type)) return false;
-			let skill = event.sourceSkill || event.skill;
-			if (!skill || skill == "dcgouzhu") return false;
-			let info = get.info(skill);
-			while (true) {
-				if (!info || info.charlotte || info.equipSkill) return false;
-				if (info && !info.sourceSkill) break;
-				skill = info.sourceSkill;
-				info = get.info(skill);
-			}
-			let list = get.skillCategoriesOf(skill, player);
-			return list.length && list.some(item => item in lib.skill.dcgouzhu.effectMap);
+			return !player.storage.dcqixin_die;
 		},
-		frequent: true,
-		effectMap: {
-			"锁定技": async function () {
-				let player = _status.event.player;
-				if (player.isDamaged()) await player.recover();
-			},
-			"觉醒技": async function () {
-				let player = _status.event.player;
-				let card = get.cardPile(card => get.type(card) == "basic");
-				if (card) await player.gain(card, "gain2");
-			},
-			"限定技": async function () {
-				let player = _status.event.player;
-				let target = game.filterPlayer(current => current != player).randomGet();
-				if (target) {
-					player.line(target, "green");
-					await target.damage(player);
-				}
-			},
-			"转换技": async function () {
-				let player = _status.event.player;
-				player.addMark("dcgouzhu", 1, false);
-				game.log(player, '手牌上限+1');
-				await game.asyncDelay();
-			},
-			"主公技": async function () {
-				let player = _status.event.player;
-				await player.gainMaxHp();
-			},
+		filterCard: false,
+		selectCard: [0, 1],
+		prompt() {
+			const player = get.player();
+			return "将性别变更为" + (Boolean(player.storage["dcqixin"]) ? "刘协--男" : "曹节--女");
 		},
-		mod: {
-			maxHandcard: function (player, num) {
-				return num + player.countMark("dcgouzhu");
-			},
+		*content(event, map) {
+			const player = map.player;
+			player.changeZhuanhuanji("dcqixin");
+			player.storage.dcqixin_hp[1 - Boolean(player.storage["dcqixin"])] = player.hp;
+			const hp = player.storage.dcqixin_hp[0 + Boolean(player.storage["dcqixin"])];
+			if (player.hp != hp) yield player.changeHp(hp - player.hp);
+			player.tempBanSkill(
+				"dcqixin",
+				{
+					player: ["useCard1", "useSkillBegin", "phaseUseEnd"],
+					global: ["phaseAfter", "phaseBeforeStart"],
+				},
+				false
+			);
+			const sex = player.storage["dcqixin"] ? "female" : "male";
+			game.broadcastAll(
+				(player, sex) => {
+					player.sex = sex;
+				},
+				player,
+				sex
+			);
+			game.log(player, "将性别变为了", "#y" + get.translation(sex) + "性");
+		},
+		mark: true,
+		zhuanhuanji: true,
+		markimage: "image/character/liuxie.jpg",
+		init(player) {
+			if (_status.gameStarted && !player.storage.dcqixin_hp) player.storage.dcqixin_hp = [player.maxHp, player.maxHp];
+		},
+		$zhuanhuanji(skill, player) {
+			const image = Boolean(player.storage[skill]) ? "caojie" : "liuxie";
+			const mark = player.marks[skill];
+			if (mark) mark.setBackground(image, "character");
+			player.changeSkin({ characterName: "liuxiecaojie" }, "liuxiecaojie" + (player.storage[skill] ? "_shadow" : ""));
 		},
 		intro: {
-			content: "手牌上限+#",
+			content(storage, player) {
+				const str = "当前性别：" + (Boolean(!storage) ? "刘协--男" : "曹节--女");
+				const hp = player.storage.dcqixin_hp || [player.maxHp, player.maxHp];
+				return player.storage.dcqixin_die ? str : "<li>" + str + "<br><li>" + (Boolean(storage) ? "刘协" : "曹节") + "体力值：" + hp[1 - Boolean(storage)];
+			},
 		},
-		locked: false,
-		onremove: true,
-		async content(event, trigger, player) {
-			let skill = trigger.sourceSkill || trigger.skill,
-				info = get.info(skill);
-			while (true) {
-				if (info && !info.sourceSkill) break;
-				skill = info.sourceSkill;
-				info = get.info(skill);
-			}
-			let list = get.skillCategoriesOf(skill, player);
-			for (const item of list) {
-				if (item in lib.skill.dcgouzhu.effectMap) {
-					const next = game.createEvent("dcgouzhu_effect", false);
-					next.player = player;
-					next.setContent(lib.skill.dcgouzhu.effectMap[item]);
-					await next;
-				}
-			}
+		ai: {
+			order: 10,
+			result: {
+				player(player) {
+					const cards = player.getCards("hs");
+					const target = game
+						.filterPlayer(i => i != player)
+						.sort((a, b) => {
+							return (
+								cards
+									.filter(j => player.canUse(j, b, true, true) && get.effect(b, j, player, player) > 0)
+									.reduce((sum, card) => {
+										return sum + get.effect(card, b, player, player);
+									}, 0) -
+								cards
+									.filter(j => player.canUse(j, a, true, true) && get.effect(a, j, player, player) > 0)
+									.reduce((sum, card) => {
+										return sum + get.effect(card, a, player, player);
+									}, 0)
+							);
+						})[0];
+					return player.differentSexFrom(target) ? 0 : 1;
+				},
+			},
+		},
+		derivation: "dcqixin_faq",
+		group: ["dcqixin_die", "dcqixin_mark"],
+		subSkill: {
+			die: {
+				audio: "dcqixin",
+				trigger: { player: "dieBefore" },
+				filter(event, player) {
+					return !player.storage.dcqixin_die && player.maxHp > 0;
+				},
+				forced: true,
+				locked: false,
+				content() {
+					trigger.cancel();
+					player.storage.dcqixin_die = true;
+					player.changeZhuanhuanji("dcqixin");
+					const sex = player.storage["dcqixin"] ? "female" : "male";
+					game.broadcastAll(
+						(player, sex) => {
+							player.sex = sex;
+						},
+						player,
+						sex
+					);
+					game.log(player, "将性别变为了", "#y" + get.translation(sex) + "性");
+					player.storage.dcqixin_hp[1 - Boolean(player.storage["dcqixin"])] = player.hp;
+					const hp = player.storage.dcqixin_hp[0 + Boolean(player.storage["dcqixin"])];
+					if (player.hp != hp) player.changeHp(hp - player.hp);
+				},
+			},
+			//双武将牌--梦回橙续缘双面武将
+			mark: {
+				charlotte: true,
+				trigger: { global: "gameStart" },
+				filter(event, player) {
+					return !player.storage.dcqixin_hp;
+				},
+				forced: true,
+				popup: false,
+				firstDo: true,
+				content() {
+					player.storage.dcqixin_hp = [player.maxHp, player.maxHp];
+				},
+			},
 		},
 	},
 	//五虎将
@@ -677,7 +673,7 @@ const skills = {
 					game.log(i, "未进行回答");
 				}
 			}
-			await game.asyncDelay();
+			await game.delay();
 			//处理结果
 			if (answer_ok && answer_ok.countCards("h")) await answer_ok.showHandcards();
 			if (gaifa.length) {
@@ -685,7 +681,7 @@ const skills = {
 					i.addTempSkill("dclisao_gaifa");
 					i.markAuto("dclisao_gaifa", [player]);
 				}
-				await game.asyncDelay();
+				await game.delay();
 			}
 		},
 		chooseControl(question, current, eventId) {
@@ -1230,17 +1226,17 @@ const skills = {
 			maixie_hp: true,
 			effect: {
 				target(card, player, target) {
-					if (player.hasSkillTag("jueqing", false, target)) return [1, -1];
 					if (get.tag(card, "damage") && player != target) {
+						if (player.hasSkillTag("jueqing", false, target)) return [1, -1];
 						var cards = card.cards,
 							evt = _status.event;
 						if (evt.player == target && card.name == "damage" && evt.getParent().type == "card") cards = evt.getParent().cards.filterInD();
 						if (target.hp <= 1) return;
 						if (get.itemtype(cards) != "cards") return;
 						for (var i of cards) {
-							if (get.name(i, target) == "tao") return [1, 5 + player.countMark("dcjianxiong") / 2];
+							if (get.name(i, target) == "tao") return [1, 2.5 + player.countMark("dcjianxiong") / 2];
 						}
-						if (get.value(cards, target) >= 7 - player.countMark("dcjianxiong") / 2 + target.getDamagedHp()) return [1, 3 + player.countMark("dcjianxiong") / 2];
+						if (get.value(cards, target) >= 7 - player.countMark("dcjianxiong") / 2 + target.getDamagedHp()) return [1, 1.5 + player.countMark("dcjianxiong") / 2];
 						return [1, 0.6 + player.countMark("dcjianxiong") / 2];
 					}
 				},
@@ -1572,7 +1568,7 @@ const skills = {
 			if (result.bool) {
 				await player.logSkill("dctongliao");
 				player.addGaintag(result.cards, "dctongliao");
-				await game.asyncDelayx();
+				await game.delayx();
 			}
 		},
 		mod: {
@@ -1711,7 +1707,7 @@ const skills = {
 			nofire: true,
 			effect: {
 				target(card, player, target, current) {
-					if (get.tag(card, "fireDamage")) return "zerotarget";
+					if (get.tag(card, "fireDamage")) return "zeroplayertarget";
 				},
 			},
 		},
@@ -2024,7 +2020,7 @@ const skills = {
 								await player.discardPlayerCard(target, true, "e", num);
 							} else {
 								await target.loseHp();
-								await game.asyncDelayx();
+								await game.delayx();
 							}
 						}
 					}
@@ -2067,7 +2063,7 @@ const skills = {
 							player.discardPlayerCard(target, true, "h", num);
 						} else {
 							target.loseHp();
-							game.delayex();
+							await game.delayex();
 						}
 					}
 				},
@@ -2168,7 +2164,7 @@ const skills = {
 				if (player.getEquips("ruyijingubang").includes(card)) return false;
 			},
 			canBeReplaced(card, player) {
-				if (player.getEquips("ruyijingubang").includes(card)) return false;
+				if (player.getVEquips("ruyijingubang").includes(card)) return false;
 			},
 			cardname(card) {
 				if (get.subtype(card, false) == "equip1") return "sha";
@@ -2341,7 +2337,7 @@ const skills = {
 					.set("card", trigger.card)
 					.forResult();
 				if (result.bool) {
-					if (!event.isMine() && !event.isOnline()) await game.asyncDelayx();
+					if (!event.isMine() && !event.isOnline()) await game.delayx();
 					await player.logSkill("ruyijingubang_effect", result.targets);
 					trigger.targets.addArray(result.targets);
 				}

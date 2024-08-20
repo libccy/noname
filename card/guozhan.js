@@ -463,20 +463,7 @@ game.import("card", function () {
 				},
 				loseDelay: false,
 				onLose: function () {
-					var next = game.createEvent("taipingyaoshu");
-					event.next.remove(next);
-					var evt = event.getParent();
-					if (evt.getlx === false) evt = evt.getParent();
-					evt.after.push(next);
-					next.player = player;
-					next.setContent(lib.card.taipingyaoshu.onLosex);
-				},
-				onLosex: function () {
-					"step 0";
-					player.logSkill("taipingyaoshu");
-					player.draw(2);
-					"step 1";
-					if (player.hp > 1) player.loseHp();
+					player.addTempSkill("taipingyaoshu_lose");
 				},
 			},
 			yuxi: {
@@ -1476,7 +1463,7 @@ game.import("card", function () {
 				},
 				ai: {
 					effect: {
-						target_use(card, player, target, current) {
+						target(card, player, target, current) {
 							if (
 								["huoshaolianying", "huogong"].includes(card.name) ||
 								(card.name == "sha" && game.hasNature(card, "fire"))
@@ -1838,8 +1825,42 @@ game.import("card", function () {
 								return;
 							if (get.tag(card, "natureDamage")) return "zeroplayertarget";
 							if (card.name == "tiesuo") {
-								return [0, 0];
+								return 0.01;
 							}
+						},
+					},
+				},
+				subSkill: {
+					lose: {
+						audio: "taipingyaoshu",
+						forced: true,
+						charlotte: true,
+						equipSkill: true,
+						trigger: {
+							player: "loseAfter",
+							global: [
+								"equipAfter",
+								"addJudgeAfter",
+								"gainAfter",
+								"loseAsyncAfter",
+								"addToExpansionAfter",
+							],
+						},
+						filter: (event, player) => {
+							return !player.hasSkillTag("unequip2")
+						},
+						getIndex(event, player){
+							const evt = event.getl(player);
+							const lostCards = [];
+							evt.es.forEach((card) => {
+								const VEquip = evt.vcard_map.get(card);
+								if(VEquip.name === "taipingyaoshu") lostCards.add(VEquip);
+							});
+							return lostCards.length;
+						},
+						async content(event, trigger, player) {
+							await player.draw(2);
+							if (player.hp > 1) await player.loseHp();
 						},
 					},
 				},

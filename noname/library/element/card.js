@@ -104,6 +104,12 @@ export class Card extends HTMLDivElement {
 	 * @type { boolean }
 	 */
 	isCard;
+	/**
+	 * @type { string[] }
+	 * 卡牌“占用的装备栏”
+	 * TODO: 补充对应的typings
+	 */
+	subtypes;
 	//执行销毁一张牌的钩子函数
 	selfDestroy(event) {
 		if (this._selfDestroyed) return;
@@ -891,11 +897,20 @@ export class Card extends HTMLDivElement {
 	}
 	/**
 	 * 返回一个键值，用于在缓存中作为键名。
-	 *
+	 * @param { boolean } [similar] false统一前缀
 	 * @returns {string} cacheKey
 	 */
-	getCacheKey() {
-		return `[c:${this.cardid}]`;
+	getCacheKey(similar) {
+		let prefix = "[object:";
+		if (similar !== false) prefix = "[card:";
+		if (this.cardid) return prefix + this.cardid + "]";
+		return prefix + `${this.name}+${
+			this.suit ? this.suit : "none"
+		}+${
+			this.number === undefined ? "none" : this.number
+		}${
+			this.nature ? "+" + this.nature : ""
+		}]`;
 	}
 	discard(bool) {
 		if (!this._selfDestroyed) {
