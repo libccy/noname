@@ -3957,17 +3957,22 @@ export const Content = {
 						ui.click.cancel();
 					}
 				}
-			} else if (event.skill && !event.norestore) {
+			} 
+			else if (event.skill && !event.norestore) {
 				var skill = event.skill;
 				ui.click.cancel();
 				event._aiexclude.add(skill);
+				if (skill.endsWith('_backup')) {
+					event._aiexclude.add(skill.slice(0, -7));
+				}//QQQ
 				var info = get.info(skill);
 				if (info.sourceSkill) {
 					event._aiexclude.add(info.sourceSkill);
 				}
 				event.redo();
 				game.resume();
-			} else {
+			}//skill是jsrgzhendan_viewas_backup,sourceskill是jsrgzhendan,_aiexclude没有加入jsrgzhendan_viewas,导致所有在子技能的backup里面转化牌的都会概率卡死
+			else {
 				ui.click.cancel();
 			}
 			if (event.aidelay && event.result && event.result.bool) {
