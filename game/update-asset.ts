@@ -37,7 +37,19 @@ async function main(argv: string[]): Promise<number> {
 		return assetSuffixFilter[type]?.some(suffix => path.endsWith(suffix));
 	});
 
-	const newAssetList = [...assetList.slice(1), ...assetNewFiles].toSorted();
+	const newAssetList: string[] = [];
+	for (const oldAsset of assetList) {
+		if (oldAsset.startsWith("v")) continue;
+		if (!newAssetList.includes(oldAsset)) {
+			newAssetList.push(oldAsset);
+		}
+	}
+	for (const newAsset of assetNewFiles) {
+		if (!newAssetList.includes(newAsset)) {
+			newAssetList.push(newAsset);
+		}
+	}
+	newAssetList.sort();
 
 	// 对素材进行分组
 	const group = Map.groupBy(newAssetList, path => {
