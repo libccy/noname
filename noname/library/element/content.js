@@ -8518,7 +8518,7 @@ export const Content = {
 		}
 		"step 2";
 		if (num < cards.length) {
-			if (event.es.includes(cards[num]) || card.cards?.some(i => event.es.includes(i))) {
+			if (event.es.includes(cards[num]) || cards[num].cards?.some(i => event.es.includes(i))) {
 				event.loseEquip = true;
 				const VEquip = cards[num].card;
 				if (VEquip) {
