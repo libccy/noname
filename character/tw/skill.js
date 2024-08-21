@@ -799,12 +799,6 @@ const skills = {
 			},
 		},
 	},
-	twbeidingx: {
-		audio: 2,
-	},
-	twjielvx: {
-		audio: 2,
-	},
 	twhuanji: {
 		audio: 2,
 		enable: "phaseUse",
