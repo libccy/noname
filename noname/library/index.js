@@ -8,7 +8,6 @@
  * @typedef { GameEvent & InstanceType<typeof lib.element.GameEventPromise> } GameEventPromise
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
  * @typedef { InstanceType<typeof lib.element.Control> } Control
- * @typedef { import("../init/onload/onload-splash.d.ts").OnloadSplash } IOnloadSplash
  */
 import { nonameInitialized, assetURL, userAgent, GeneratorFunction, AsyncFunction, characterDefaultPicturePath } from "../util/index.js";
 import { ai } from "../ai/index.js";
@@ -55,6 +54,12 @@ export class Library {
 	characterPack = new Proxy(
 		{},
 		{
+			get(target, prop, receiver) {
+				if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
+				return Reflect.get(target, prop, receiver);
+			},
 			set(target, prop, newValue) {
 				if (typeof prop == "string") {
 					// 新增武将包，且不是“收藏”和“禁用”
@@ -62,6 +67,10 @@ export class Library {
 						Promise.resolve().then(() => {
 							ui.updateCharacterPackMenu.forEach(fun => fun(prop));
 						});
+					}
+
+					if (prop.startsWith("mode_extension_")) {
+						prop = prop.slice("mode_extension_".length);
 					}
 				}
 				const newPack = new Proxy(
@@ -78,7 +87,23 @@ export class Library {
 		}
 	);
 	characterFilter = {};
-	characterSort = {};
+	characterSort = new Proxy(
+		{},
+		{
+			get(target, prop, receiver) {
+				if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
+				return Reflect.get(target, prop, receiver);
+			},
+			set(target, prop, value, receiver) {
+				if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
+				return Reflect.set(target, prop, value, receiver);
+			}
+		}
+	);
 	characterReplace = {};
 	characterSubstitute = {};
 	characterInitFilter = {};
