@@ -1687,8 +1687,7 @@ const skills = {
 		},
 	},
 	mbcmqingzheng: {
-		audio: "sbqingzheng",
-		audioname: ["mb_caomao"],
+		audio: 2,
 		persevereSkill: true,
 		trigger: { player: "phaseUseBegin" },
 		filter(event, player) {
@@ -1786,7 +1785,7 @@ const skills = {
 			if (result.bool) {
 				var target = result.targets[0];
 				event.target = target;
-				player.logSkill("sbqingzheng", target);
+				player.logSkill("mbcmqingzheng", target);
 				player.discard(cards);
 				var list = [];
 				var dialog = ["清正：弃置" + get.translation(target) + "一种花色的所有牌"];
@@ -1824,14 +1823,93 @@ const skills = {
 		},
 	},
 	mbcmjiushi: {
-		audio: "rejiushi",
+		audio: 2,
 		inherit: "rejiushi",
 		persevereSkill: true,
-		group: ["rejiushi1", "mbcmjiushi_turnback", "mbcmjiushi_gain"],
+		group: ["mbcmjiushi_use", "mbcmjiushi_turnback", "mbcmjiushi_gain"],
 		subSkill: {
+			use: {
+				hiddenCard: function (player, name) {
+					if (name == "jiu") return !player.isTurnedOver();
+					return false;
+				},
+				audio: "mbcmjiushi",
+				enable: "chooseToUse",
+				filter: function (event, player) {
+					if (player.classList.contains("turnedover")) return false;
+					return event.filterCard({ name: "jiu", isCard: true }, player, event);
+				},
+				content: function () {
+					if (_status.event.getParent(2).type == "dying") {
+						event.dying = player;
+						event.type = "dying";
+					}
+					player.turnOver();
+					player.useCard({ name: "jiu", isCard: true }, player);
+				},
+				ai: {
+					order: 5,
+					result: {
+						player: function (player) {
+							if (_status.event.parent.name == "phaseUse") {
+								if (player.countCards("h", "jiu") > 0) return 0;
+								if (player.getEquip("zhuge") && player.countCards("h", "sha") > 1) return 0;
+								if (!player.countCards("h", "sha")) return 0;
+								var targets = [];
+								var target;
+								var players = game.filterPlayer();
+								for (var i = 0; i < players.length; i++) {
+									if (get.attitude(player, players[i]) < 0) {
+										if (player.canUse("sha", players[i], true, true)) {
+											targets.push(players[i]);
+										}
+									}
+								}
+								if (targets.length) {
+									target = targets[0];
+								} else {
+									return 0;
+								}
+								var num = get.effect(target, { name: "sha" }, player, player);
+								for (var i = 1; i < targets.length; i++) {
+									var num2 = get.effect(targets[i], { name: "sha" }, player, player);
+									if (num2 > num) {
+										target = targets[i];
+										num = num2;
+									}
+								}
+								if (num <= 0) return 0;
+								var e2 = target.getEquip(2);
+								if (e2) {
+									if (e2.name == "tengjia") {
+										if (!player.countCards("h", { name: "sha", nature: "fire" }) && !player.getEquip("zhuque")) return 0;
+									}
+									if (e2.name == "renwang") {
+										if (!player.countCards("h", { name: "sha", color: "red" })) return 0;
+									}
+									if (e2.name == "baiyin") return 0;
+								}
+								if (player.getEquip("guanshi") && player.countCards("he") > 2) return 1;
+								return target.countCards("h") > 3 ? 0 : 1;
+							}
+							if (player == _status.event.dying || player.isTurnedOver()) return 3;
+						},
+					},
+					effect: {
+						target: function (card, player, target) {
+							if (target.isTurnedOver()) {
+								if (get.tag(card, "damage")) {
+									if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
+									if (target.hp == 1) return;
+									return [1, target.countCards("h") / 2];
+								}
+							}
+						},
+					},
+				},
+			},
 			turnback: {
-				audio: "rejiushi",
-				audioname: ["mb_caomao"],
+				audio: "mbcmjiushi",
 				persevereSkill: true,
 				trigger: { player: "damageEnd" },
 				check(event, player) {
@@ -1849,8 +1927,7 @@ const skills = {
 				},
 			},
 			gain: {
-				audio: "rejiushi",
-				audioname: ["mb_caomao"],
+				audio: "mbcmjiushi",
 				persevereSkill: true,
 				trigger: { player: "turnOverAfter" },
 				frequent: true,
@@ -1865,8 +1942,7 @@ const skills = {
 		},
 	},
 	mbcmfangzhu: {
-		audio: "sbfangzhu",
-		audioname: ["mb_caomao"],
+		audio: 2,
 		persevereSkill: true,
 		inherit: "sbfangzhu",
 		filter(event, player) {
@@ -1914,7 +1990,7 @@ const skills = {
 			backup(links, player) {
 				return {
 					num: links[0],
-					audio: "sbfangzhu",
+					audio: "mbcmfangzhu",
 					filterCard: () => false,
 					selectCard: -1,
 					filterTarget(card, player, target) {

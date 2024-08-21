@@ -104,15 +104,12 @@ const skills = {
 		},
 	},
 	sbluanwu: {
-		audio: "luanwu",
+		audio: 4,
 		inherit: "luanwu",
 		contentBefore() {
 			player.addTempSkill("sbluanwu_add");
 		},
 		subSkill: {
-			jiaxu: {
-				audio: 4,
-			},
 			add: {
 				trigger: {
 					global: "loseHpEnd",
@@ -1758,7 +1755,6 @@ const skills = {
 			},
 		],
 		audio: 2,
-		audioname: ["mb_caomao"],
 		enable: "phaseUse",
 		filter(event, player) {
 			return get.info("sbfangzhu").getList.some(effect => {
@@ -5964,7 +5960,6 @@ const skills = {
 	},
 	sbqingzheng: {
 		audio: 2,
-		audioname: ["mb_caomao"],
 		trigger: { player: "phaseUseBegin" },
 		filter: function (event, player) {
 			return player.countCards("h") > 0;
