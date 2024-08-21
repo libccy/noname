@@ -12,7 +12,7 @@ const assetListPath: string = join(__dirname, "./asset.js");
 const supportAudioSuffix = [".mp3", ".ogg", ".wav"];
 const supportImageSuffix = [".jpg", ".jpeg", ".png", ".webp"];
 const supportFontSuffix = [".woff2"];
-const assetSuffixFilter: Record<string, string[] | undefined> = {
+const assetSuffixFilter: Record<string, string[]> = {
 	audio: supportAudioSuffix,
 	font: supportFontSuffix,
 	image: supportImageSuffix,
