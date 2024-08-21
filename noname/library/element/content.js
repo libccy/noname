@@ -8518,7 +8518,7 @@ export const Content = {
 		}
 		"step 2";
 		if (num < cards.length) {
-			if (event.es.includes(cards[num])) {
+			if (event.es.includes(cards[num]) || card.cards?.some(i => event.es.includes(i))) {
 				event.loseEquip = true;
 				const VEquip = cards[num].card;
 				if (VEquip) {
@@ -8574,6 +8574,7 @@ export const Content = {
 		event.num++;
 		event.goto(2);
 		"step 4";
+		event.cards = cards.map(i => i.cards ? i.cards : [i]).flat();
 		if (event.toRenku) {
 			_status.renku.addArray(
 				cards.filter(function (card) {
