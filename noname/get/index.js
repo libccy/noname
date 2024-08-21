@@ -3721,7 +3721,7 @@ export class Get extends GetCompatible {
 				for (var i = 0; i < es.length; i++) {
 					const special = [es[i]].concat(es[i].cards || []).find(j => j.name == es[i].name && lib.card[j.name]?.cardPrompt);
 					var str = special ? lib.card[special.name].cardPrompt(special) : lib.translate[es[i].name + "_info"];
-					uiintro.add('<div><div class="skill">' + game.createCard(es[i]).outerHTML + "</div><div>" + str + "</div></div>");
+					uiintro.add('<div><div class="skill">' + es[i].outerHTML + "</div><div>" + str + "</div></div>");
 					uiintro.content.lastChild.querySelector(".skill>.card").style.transform = "";
 
 					if (lib.translate[es[i].name + "_append"]) {
