@@ -550,7 +550,7 @@ const skills = {
 	//幻诸葛亮
 	twbeiding: {
 		audio: 2,
-		audioname2: { huan_zhugeliang_shadow: "twbeidingx" },
+		audioname: ["huan_zhugeliang_shadow"],
 		intro: {
 			content: "已记录牌名：$",
 		},
@@ -567,6 +567,7 @@ const skills = {
 			},
 		},
 		onremove: true,
+		derivation: "twbeidingx",
 		group: ["twbeiding_record", "twbeiding_use", "twbeiding_huan"],
 		subSkill: {
 			record: {
@@ -683,7 +684,8 @@ const skills = {
 	},
 	twjielv: {
 		audio: 2,
-		audioname2: { huan_zhugeliang_shadow: "twjielvx" },
+		audioname: ["huan_zhugeliang_shadow"],
+		derivation: "twjielvx",
 		group: ["twjielv_lose", "twjielv_buff", "twjielv_huan"],
 		subSkill: {
 			lose: {
