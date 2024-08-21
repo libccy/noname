@@ -11039,79 +11039,73 @@ export class Player extends HTMLDivElement {
 	}
 	$addVirtualEquip(card, cards) {
 		const player = this;
-		if (cards?.length) {
-			const beforeCards = [];
-			const disableEquips = Array.from(player.node.equips.childNodes).filter(cardx => {
-				return cardx.name?.startsWith("feichu_");
-			});
-			if (disableEquips.length) {
-				for (const cardx of disableEquips) player.node.equips.removeChild(cardx);
+		let beforeCards = [];
+		const disableEquips = Array.from(player.node.equips.childNodes).filter(cardx => {
+			return cardx.name?.startsWith("feichu_");
+		});
+		if (disableEquips.length) {
+			for (const cardx of disableEquips) player.node.equips.removeChild(cardx);
+		}
+		const isViewAsCard = cards.length !== 1 || cards[0].name !== card.name,
+			info = get.info(card, false);
+		let cardShownName = get.translation(card.name);
+		if (info.subtype === "equip3") {
+			cardShownName += "+";
+		} else if (info.subtype === "equip4") {
+			cardShownName += "-";
+		}
+		const cardx = isViewAsCard ? game.createCard(card) : cards[0];
+		cardx.fix();
+		cardx.card = card;
+		cardx.style.transform = "";
+		cardx.classList.remove("drawinghidden");
+		delete cardx._transform;
+		const suit = get.translation(cardx.suit),
+			number = get.strNumber(cardx.number);
+		if (isViewAsCard) {
+			cardx.cards = cards || [];
+			cardx.viewAs = card.name;
+			cardx.node.name2.innerHTML = `${suit}${number} [${cardShownName}]`;
+			cardx.classList.add("fakeequip");
+		} else {
+			delete cardx.viewAs;
+			cardx.node.name2.innerHTML = `${suit}${number} ${cardShownName}`;
+			cardx.classList.remove("fakeequip");
+		}
+		this.vcardsMap?.equips.some(card2 => {
+			if (card2 === card) return true;
+			beforeCards.add(card);
+		});
+		let equipped = false;
+		for (let i = 0; i < player.node.equips.childNodes.length; i++) {
+			if (beforeCards.length === 0) {
+				equipped = true;
+				player.node.equips.insertBefore(cardx, player.node.equips.childNodes[i]);
+				break;
+			} else {
+				beforeCards.remove(player.node.equips.childNodes[i]);
 			}
-			const isViewAsCard = cards.length !== 1 || cards[0].name !== card.name,
-				info = get.info(card, false);
-			let cardShownName = get.translation(card.name);
-			if (info.subtype === "equip3") {
-				cardShownName += "+";
-			} else if (info.subtype === "equip4") {
-				cardShownName += "-";
-			}
-			cards.forEach(cardx => {
-				cardx.fix();
-				cardx.style.transform = "";
-				cardx.classList.remove("drawinghidden");
-				delete cardx._transform;
-				const suit = get.translation(cardx.suit),
-					number = get.strNumber(cardx.number);
-				if (isViewAsCard) {
-					cardx.viewAs = card.name;
-					cardx.node.name2.innerHTML = `${suit}${number} [${cardShownName}]`;
-					cardx.classList.add("fakeequip");
-				} else {
-					delete cardx.viewAs;
-					cardx.node.name2.innerHTML = `${suit}${number} ${cardShownName}`;
-					cardx.classList.remove("fakeequip");
-				}
-			});
-			this.vcardsMap?.equips.some(card2 => {
-				if (card2 === card) return true;
-				beforeCards.addArray(card2.cards ?? []);
-			});
-			let equipped = false;
-			for (let i = 0; i < player.node.equips.childNodes.length; i++) {
-				if (beforeCards.length === 0) {
-					equipped = true;
-					cards.forEach(card => {
-						player.node.equips.insertBefore(card, player.node.equips.childNodes[i]);
-					});
-					break;
-				} else {
-					beforeCards.remove(player.node.equips.childNodes[i]);
-				}
-			}
-			if (equipped === false) {
-				cards.reverse();
-				cards.forEach(card => {
-					player.node.equips.appendChild(card);
-				});
-				if (_status.discarded) _status.discarded.removeArray(cards);
-			}
-			if (disableEquips.length) {
-				for (const cardx of disableEquips) {
-					const equipNum = get.equipNum(cardx);
-					let equipped = false;
-					for (let j = 0; j < player.node.equips.childNodes.length; j++) {
-						const card2 = player.vcardsMap.equips.find(i => i.cards?.includes(player.node.equips.childNodes[j]));
-						const card3 = card2 ? card2 : player.node.equips.childNodes[j];
-						if (get.equipNum(card3) >= equipNum) {
-							player.node.equips.insertBefore(cardx, player.node.equips.childNodes[j]);
-							equipped = true;
-							break;
-						}
+		}
+		if (equipped === false) {
+			player.node.equips.appendChild(cardx);
+			if (cards?.length && _status.discarded) _status.discarded.removeArray(cards);
+		}
+		if (disableEquips.length) {
+			for (const cardx of disableEquips) {
+				const equipNum = get.equipNum(cardx);
+				let equipped = false;
+				for (let j = 0; j < player.node.equips.childNodes.length; j++) {
+					const card2 = player.vcardsMap.equips.find(i => i.cards?.includes(player.node.equips.childNodes[j]));
+					const card3 = card2 ? card2 : player.node.equips.childNodes[j];
+					if (get.equipNum(card3) >= equipNum) {
+						player.node.equips.insertBefore(cardx, player.node.equips.childNodes[j]);
+						equipped = true;
+						break;
 					}
-					if (!equipped) {
-						player.node.equips.appendChild(cardx);
-						if (_status.discarded) _status.discarded.remove(cardx);
-					}
+				}
+				if (!equipped) {
+					player.node.equips.appendChild(cardx);
+					if (_status.discarded) _status.discarded.remove(cardx);
 				}
 			}
 		}
