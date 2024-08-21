@@ -8370,10 +8370,12 @@ export const Content = {
 			} else if (cards[i].parentNode) {
 				if (cards[i].parentNode.classList.contains("equips")) {
 					cards[i].original = "e";
-					es.push(cards[i]);
 					let loseCards = cards[i].cards ? cards[i].cards : [cards[i]];
 					cardx.addArray(loseCards);
-					event.vcard_map.set(loseCards, cards[i].card || get.autoViewAs(cards[i], void 0, false));
+					loseCards.forEach(cardi => {
+						es.push(cardi);
+						event.vcard_map.set(cardi, cards[i].card || get.autoViewAs(cards[i], void 0, false));
+					});
 				} else if (cards[i].parentNode.classList.contains("judges")) {
 					cards[i].original = "j";
 					js.push(cards[i]);
