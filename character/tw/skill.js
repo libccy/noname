@@ -567,7 +567,6 @@ const skills = {
 			},
 		},
 		onremove: true,
-		derivation: "twbeidingx",
 		group: ["twbeiding_record", "twbeiding_use", "twbeiding_huan"],
 		subSkill: {
 			record: {
@@ -685,7 +684,6 @@ const skills = {
 	twjielv: {
 		audio: 2,
 		audioname2: { huan_zhugeliang_shadow: "twjielvx" },
-		derivation: "twjielvx",
 		group: ["twjielv_lose", "twjielv_buff", "twjielv_huan"],
 		subSkill: {
 			lose: {
@@ -1194,7 +1192,7 @@ const skills = {
 		lose: false,
 		discard: false,
 		delay: 0,
-		prompt: "将至多两张牌标记为“技一”并交给一名本轮未以此法交给其牌的角色",
+		prompt: "将至多两张牌标记为“仙援”并交给一名本轮未以此法交给其牌的角色",
 		content() {
 			const ID = player.playerid;
 			const skill = "twxianyuan_effect",
@@ -1202,7 +1200,7 @@ const skills = {
 			if (!lib.skill[skillID]) {
 				game.broadcastAll(skillID => {
 					lib.skill[skillID] = { charlotte: true };
-					lib.translate[skillID] = "技一";
+					lib.translate[skillID] = "仙援";
 				}, skillID);
 			}
 			if (!target.storage[skill]) {
@@ -1243,7 +1241,7 @@ const skills = {
 					const target = trigger.player,
 						num = target.storage["twxianyuan_effect"][player.playerid];
 					const result = await player
-						.chooseToMove("技一：将" + get.translation(target) + "的至多" + get.cnNumber(num) + "张牌以任意顺序置于牌堆顶", true)
+						.chooseToMove("仙援：将" + get.translation(target) + "的至多" + get.cnNumber(num) + "张牌以任意顺序置于牌堆顶", true)
 						.set("list", [[get.translation(target) + "的手牌", target.getCards("h"), "dcsushou_tag"], ["牌堆顶"]])
 						.set("filterOk", moved => {
 							const num = get.event().num;
@@ -1296,7 +1294,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const cards = get.cards(1, true),
 				card = cards[0];
-			await player.showCards(cards, get.translation(player) + "发动了【技二】");
+			await player.showCards(cards, get.translation(player) + "发动了【灵隐】");
 			if (get.color(card) == get.color(trigger.card)) {
 				await player.gain(cards, "gain2");
 			}

@@ -11359,6 +11359,8 @@ const skills = {
 					content: "属性目标：回复体力，或手牌数大于体力值",
 				},
 				charlotte: true,
+				silent: true,
+				nopop: true,
 			},
 			duomou: {
 				marktext: "谋",
