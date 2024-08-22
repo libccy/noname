@@ -5495,14 +5495,12 @@ const skills = {
 		filter(event, player) {
 			const num = get.info("jsrgjuxia").countSkill(player) - 2;
 			if (num <= 0 || get.type(event.card) == "equip") return false;
-			return (
-				!player.getRoundHistory("useCard", evt => {
-					get.name(evt.card) == get.name(event.card) && evt != event;
-				}).length &&
-				!player.getRoundHistory("respond", evt => {
-					get.name(evt.card) == get.name(event.card) && evt != event;
-				}).length
-			);
+			let name = get.name(event.card), stat = player.getRoundHistory("useCard", evt => {
+				return evt != event && get.name(evt.card) == name;
+			}).length + player.getRoundHistory("respond", evt => {
+				return evt != event && get.name(evt.card) == name;
+			}).length;
+			return stat == 0;
 		},
 		forced: true,
 		async content(event, trigger, player) {

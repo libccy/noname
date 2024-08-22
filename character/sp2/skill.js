@@ -1788,7 +1788,7 @@ const skills = {
 				},
 				direct: true,
 				content: function () {
-					player.chooseUseTarget(trigger.cards[0], get.prompt("dcjiaoxia"), false, false).set("prompt2", "使用" + get.translation(card)).logSkill = "dcjiaoxia";
+					player.chooseUseTarget(trigger.cards[0], get.prompt("dcjiaoxia"), false, false).set("prompt2", "使用" + get.translation(trigger.cards[0])).logSkill = "dcjiaoxia";
 				},
 			},
 		},
