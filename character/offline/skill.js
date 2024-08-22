@@ -4995,13 +4995,14 @@ const skills = {
 			} else {
 				const color = player.storage.jdjuqi ? "red" : "black";
 				event.result = await target
-					.chooseCard((card, player) => get.color(card, player) == color, `举棋：你可以交给${get.translation(player)}一张${get.translation(color)}手牌`)
+					.chooseCard((card, player) => get.color(card, player) == _status.event.color, `举棋：你可以交给${get.translation(player)}一张${get.translation(color)}手牌`)
 					.set("ai", card => {
 						const player = get.player(),
 							target = get.event("target");
 						if (get.attitude(player, target) <= 0) return 0;
 						return 6 - get.value(card);
 					})
+					.set("color", color)
 					.set("target", player)
 					.forResult();
 			}

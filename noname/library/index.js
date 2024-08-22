@@ -12163,7 +12163,7 @@ export class Library {
 						this.closed = true;
 					} else if (game.phaseNumber && lib.configOL.observe) {
 						lib.node.observing.push(this);
-						this.send("reinit", lib.configOL, get.arenaState(), game.getState ? game.getState() : {}, game.ip, game.players[0].playerid, null, _status.cardtag);
+						this.send("reinit", lib.configOL, get.arenaState(), game.getState ? game.getState() : {}, game.ip, game.players[0].playerid, null, _status.cardtag, _status.postReconnect);
 						// 没有系统提示的接口喵？
 						game.log("玩家 ", `#y${get.plainText(config.nickname)}`, " 进入房间观战");
 						game.me.chat(`玩家 <span style="font-weight: bold; color: rgb(126, 180, 255)">${get.plainText(config.nickname)}</span> 进入房间观战`);
