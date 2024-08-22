@@ -12,7 +12,7 @@ const skills = {
 		},
 		logTarget: "player",
 		prompt2: (event, player) => ("击伤其一个部位"),
-		async content(event, trigger, player) {
+		async cost(event, trigger, player) {
 			const target = trigger.player;
 			const places = lib.skill["1！5！"].derivation
 				.slice()
@@ -35,6 +35,7 @@ const skills = {
 					_status.imchoosing = false;
 					if (event.dialog) event.dialog.close();
 					if (event.control) event.control.close();
+					if (event.control2) event.control2.close();
 					game.resume();
 					return Promise.resolve({
 						bool: true,
@@ -52,11 +53,31 @@ const skills = {
 						hurt: places.randomGet(),
 					});
 					if (event.dialog) event.dialog.close();
+					if (event.control) event.control.close();
+					if (event.control2) event.control2.close();
 				};
+				event.control = ui.create.control("cancel2", function (link) {
+					event.dialog.close();
+					event.control.close();
+					if(event.control2) event.control2.close();
+					game.resume();
+					_status.imchoosing = false;
+					event._result={bool:false};
+					resolve(event._result);
+				});
+				event.control2 = ui.create.control("ok", function (link) {
+					event.dialog.close();
+					event.control.close();
+					event.control2.close();
+					game.resume();
+					_status.imchoosing = false;
+					resolve(event._result);
+				});
+				event.control2.close();
 				const dialog = ui.create.dialog("forcebutton", "hidden");
 				event.dialog = dialog;
 				//白底大图不加textPrompt了
-				//dialog.textPrompt = dialog.add('<div class="text center">毅武：选择击伤' + get.translation(target) +'的一个部位</div>');
+				dialog.textPrompt = dialog.add('<div class="text center">毅武：是否击伤' + get.translation(target) +'的一个部位？</div>');
 				dialog.style.display = "flex";
 				dialog.style.justifyContent = "center";
 				dialog.style.alignItems = "center";
@@ -79,7 +100,7 @@ const skills = {
 				target_img.style.overflow = "visible";
 				target_img.style.boxSizing = "border-box";
 				target_img.style.border = "1px solid black";
-				target_img.style.backgroundColor = "rgb(255,178,102)";
+				target_img.style.backgroundColor = "rgb(255,178,102,0.5)";
 				dialog.appendChild(target_img);
 				target_img.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_" + (target.hasSex("male") ? "male" : "female") + ".png)";
 				target_img.style.backgroundSize = "cover";
@@ -123,16 +144,27 @@ const skills = {
 					num_px.style.backgroundRepeat = "no-repeat";
 					num_px.style.backgroundPosition = "center center";
 					num_px.addEventListener(lib.config.touchscreen ? "touchend" : "click", a => {
+						let hurt = event._result?.position;
 						event._result = {
 							bool: true,
 							hurt: a.target.id,
+							position: a.target,
 						};
-						dialog.close();
-						game.resume();
-						dialog.close();
-						game.resume();
-						_status.imchoosing = false;
-						resolve(event._result);
+						let bool=true;
+						if(hurt){
+							hurt.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_click.png)";
+							if(hurt==a.target){
+								event._result={bool:false};
+								if(event.control2) event.control2.close();
+								if(event.control) event.control.open();
+								bool=false;
+							}
+						}
+						if(bool){
+							a.target.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_click_chosen.png)";
+							if(event.control) event.control.close();
+							if(event.control2) event.control2.open();
+						}
 					});
 					list.push(num_px);
 				}
@@ -160,51 +192,57 @@ const skills = {
 			}
 			const result = await next;
 			game.resume();
-			if (result.bool) {
-				player.line(target);
-				const place = result.hurt;
-				player.popup(place, "fire");
-				game.log(player, "击伤了", target, "的", "#y" + get.translation(place));
-				target.addSkill("1！5！_injury");
-				target.markAuto("1！5！_injury", [place]);
-				switch (parseInt(place.slice("1！5！_place".length))) {
-					case 1:
-						if (target.getHp() > 0) {
-							await target.loseHp(target.getHp());
-							if (game.getGlobalHistory("everything", evt => {
-								if (evt.name != "die" || evt.player != target) return false;
-								return evt.reason?.getParent() == event;
-							}).length > 0) {
-								await player.gainMaxHp();
-							}
+			event.result={
+				bool:result.bool,
+				targets:[target],
+				cost_data:result.hurt,
+			};
+			event.result.targets=[target];
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			const place = event.cost_data;
+			player.popup(place, "fire");
+			game.log(player, "击伤了", target, "的", "#y" + get.translation(place));
+			target.addSkill("1！5！_injury");
+			target.markAuto("1！5！_injury", [place]);
+			switch (parseInt(place.slice("1！5！_place".length))) {
+				case 1:
+					if (target.getHp() > 0) {
+						await target.loseHp(target.getHp());
+						if (game.getGlobalHistory("everything", evt => {
+							if (evt.name != "die" || evt.player != target) return false;
+							return evt.reason?.getParent() == event;
+						}).length > 0) {
+							await player.gainMaxHp();
 						}
-						break;
-					case 2:
-						const cards = target
-							.getEquips(1)
-							.slice()
-							.concat(target.getEquips("equip3_4"))
-							.filter(card => lib.filter.canBeDiscarded(card, player, target));
-						if (cards.length) await target.discard(cards).set("discarder", player);
-						break;
-					case 3:
-						target.addTempSkill("1！5！_maxhand", { player: "phaseEnd" });
-						break;
-					case 4:
-						const cardx = target.getDiscardableCards(target, "h");
-						const num = Math.floor(cardx.length / 2);
-						if (cardx.length) await target.discard(cardx.randomGets(num));
-						break;
-					case 5:
-						target.addTempSkill("1！5！_damage", { player: "phaseEnd" });
-						break;
-					case 6:
-						target.addTempSkill("1！5！_use", { player: "phaseEnd" });
-						break;
-					case 7:
-						target.addTempSkill("1！5！_respond", { player: "phaseEnd" });
-						break;
-				}
+					}
+					break;
+				case 2:
+					const cards = target
+						.getEquips(1)
+						.slice()
+						.concat(target.getEquips("equip3_4"))
+						.filter(card => lib.filter.canBeDiscarded(card, player, target));
+					if (cards.length) await target.discard(cards).set("discarder", player);
+					break;
+				case 3:
+					target.addTempSkill("1！5！_maxhand", { player: "phaseEnd" });
+					break;
+				case 4:
+					const cardx = target.getDiscardableCards(target, "h");
+					const num = Math.floor(cardx.length / 2);
+					if (cardx.length) await target.discard(cardx.randomGets(num));
+					break;
+				case 5:
+					target.addTempSkill("1！5！_damage", { player: "phaseEnd" });
+					break;
+				case 6:
+					target.addTempSkill("1！5！_use", { player: "phaseEnd" });
+					break;
+				case 7:
+					target.addTempSkill("1！5！_respond", { player: "phaseEnd" });
+					break;
 			}
 		},
 		marktext: "赤",

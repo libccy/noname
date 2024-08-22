@@ -2185,6 +2185,10 @@ const skills = {
 		enable: "phaseUse",
 		usable: 2,
 		filter(event, player) {
+			if (!game.hasPlayer(current => current.isDamaged())) {
+				if (player.countMark("mbxuetu_status") == 1 && player.getStorage("mbxuetu_used").includes(1)) return false;
+				if (player.countMark("mbxuetu_status") == 0 && !player.storage.mbxuetu) return false;
+			}
 			if (player.countMark("mbxuetu_status") !== 1 && player.getStat("skill").mbxuetu) return false;
 			return true;
 		},
@@ -2206,6 +2210,7 @@ const skills = {
 					list[player.storage.mbxuetu ? "shift" : "pop"]();
 				} else {
 					list = list.filter((choice, index) => {
+						if (index == 0 && !game.hasPlayer(current => current.isDamaged())) return false;
 						return !player.getStorage("mbxuetu_used").includes(index);
 					});
 				}
@@ -2224,7 +2229,11 @@ const skills = {
 					choice: result.control.includes("回复") ? 0 : 1,
 					filterCard: () => false,
 					selectCard: -1,
-					filterTarget: true,
+					filterTarget(card, player, target) {
+						const { choice } = get.info("mbxuetu_backup");
+						if (player.countMark("mbxuetu_status") !== 2 && choice == 0) return target.isDamaged();
+						return true;
+					},
 					async content(event, trigger, player) {
 						const { choice } = get.info("mbxuetu_backup");
 						const target = event.targets[0];
@@ -2333,27 +2342,31 @@ const skills = {
 				},
 				filter(event, player) {
 					return game.hasPlayer(current => {
-						return !player.getStorage("mbweiming").includes(current);
+						return !player.getStorage("mbweiming").includes(current) && current != player;
 					});
 				},
-				forced: true,
-				direct: true,
-				async content(event, trigger, player) {
-					const targets = await player
-						.chooseTarget("威命：记录一名未记录过的角色", "当你杀死没有被记录过的角色后，则〖威命〗使命成功；如果在你杀死这些角色中的一名之前，有被记录过的角色死亡，则你〖威命〗使命失败。", true)
-						.set("filterTarget", (card, player, target) => {
-							return !player.getStorage("mbweiming").includes(target);
-						})
-						.set("ai", target => {
-							if (target === player) return 1;
-							return 1 + (Math.sqrt(Math.abs(get.attitude(player, target))) * Math.abs(get.threaten(target))) / Math.sqrt(target.getHp() + 1) / Math.sqrt(target.countCards("hes") + 1);
-						})
-						.forResultTargets();
-					if (targets && targets.length > 0) {
-						const target = targets[0];
-						player.logSkill("mbweiming_effect", target);
-						player.markAuto("mbweiming", target);
+				locked: true,
+				async cost(event, trigger, player) {
+					const targets = game.filterPlayer(current => !player.getStorage("mbweiming").includes(current) && current != player);
+					if (targets.length == 1) {
+						event.result = { bool: true, targets: targets };
 					}
+					else {
+						event.result = await player
+							.chooseTarget("威命：记录一名未记录过的其他角色", "当你杀死没有被记录过的角色后，则〖威命〗使命成功；如果在你杀死这些角色中的一名之前，有被记录过的角色死亡，则你〖威命〗使命失败。", true)
+							.set("filterTarget", (card, player, target) => {
+								return !player.getStorage("mbweiming").includes(target) && target != player;
+							})
+							.set("ai", target => {
+								if (target === player) return 1;
+								return 1 + (Math.sqrt(Math.abs(get.attitude(player, target))) * Math.abs(get.threaten(target))) / Math.sqrt(target.getHp() + 1) / Math.sqrt(target.countCards("hes") + 1);
+							})
+							.forResult();
+					}
+				},
+				async content(event, trigger, player) {
+					const targets = event.targets;
+					if (targets?.length) player.markAuto("mbweiming", targets[0]);
 				},
 			},
 			achieve: {
