@@ -2178,16 +2178,6 @@ game.import("character", function () {
 					},
 				},
 			},
-			xiuhua_old: {
-				changeSeat: true,
-				trigger: { player: "shaHit" },
-				filter(event, player) {
-					return event.target != player.previous;
-				},
-				content() {
-					game.swapSeat(trigger.target, player, true, true);
-				},
-			},
 			shahun: {
 				enable: "chooseToUse",
 				skillAnimation: true,

@@ -6959,6 +6959,7 @@ const skills = {
 				return current != player && current.inRange(zhu);
 			});
 		},
+		seatRelated: true,
 		content: function () {
 			"step 0";
 			player

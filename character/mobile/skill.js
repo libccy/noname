@@ -11637,6 +11637,7 @@ const skills = {
 		multitarget: true,
 		multiline: true,
 		changeSeat: true,
+		seatRelated: true,
 		contentBefore: function () {
 			player.$fullscreenpop("败移", "thunder");
 		},
