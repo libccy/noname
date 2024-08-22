@@ -1418,6 +1418,7 @@ const skills = {
 		},
 		direct: true,
 		changeSeat: true,
+		seatRelated: true,
 		derivation: "tamo_faq",
 		async content(event, trigger, player) {
 			const toSortPlayers = game.filterPlayer(current => {
@@ -2856,6 +2857,7 @@ const skills = {
 		skillAnimation: true,
 		animationColor: "orange",
 		changeSeat: true,
+		seatRelated: true,
 		content() {
 			"step 0";
 			player.awakenSkill("dcqijing");

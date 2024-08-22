@@ -1857,58 +1857,6 @@ game.import("character", function () {
 					order: 2,
 				},
 			},
-			fanpu_old: {
-				enable: "phaseUse",
-				usable: 1,
-				filter: function (event, player) {
-					return player.storage.tongling >= 3;
-				},
-				promptfunc: function () {
-					return "令自己在本轮内不能成为出杀的目标（选择自己），或对攻击范围内的至多两名角色使用一张杀";
-				},
-				filterTarget: function (card, player, target) {
-					return player == target || get.distance(player, target, "attack") <= 1;
-				},
-				content: function () {
-					if (target == player) {
-						target.addTempSkill("fanpu_disable", { player: "phaseBegin" });
-					} else {
-						target.damage();
-					}
-					player.storage.tongling -= 3;
-					player.unmarkSkill("tongling");
-					player.syncStorage("tongling");
-				},
-				subSkill: {
-					disable: {
-						mark: true,
-						intro: {
-							content: "不能成为杀的目标",
-						},
-						mod: {
-							targetEnabled: function (card, player, target, now) {
-								if (card.name == "sha") return false;
-							},
-						},
-					},
-				},
-				ai: {
-					combo: "tongling",
-					order: 2,
-					result: {
-						target: function (player, target) {
-							if (player == target) {
-								if (player.hp <= 2 && !player.countCards("h", "shan")) {
-									return 2;
-								}
-								return 0;
-							} else {
-								return get.damageEffect(target, player, target);
-							}
-						},
-					},
-				},
-			},
 			fenghuo: {
 				enable: "chooseToUse",
 				filter: function (event, player) {
@@ -2344,6 +2292,7 @@ game.import("character", function () {
 				enable: "phaseUse",
 				usable: 1,
 				changeSeat: true,
+				seatRelated: true,
 				filterTarget: function (card, player, target) {
 					return player != target && player.next != target;
 				},

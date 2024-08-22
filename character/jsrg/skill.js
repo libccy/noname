@@ -731,6 +731,7 @@ const skills = {
 		trigger: { player: "phaseZhunbeiBegin" },
 		forced: true,
 		juexingji: true,
+		seatRelated: true,
 		skillAnimation: true,
 		animationColor: "gray",
 		filter(event, player) {
@@ -9690,8 +9691,7 @@ const skills = {
 		audio: 4,
 		trigger: { global: "phaseEnd" },
 		filter: function (event, player) {
-			var zhu = get.zhu(player) || game.findPlayer(current => current.getSeatNum() == 1);
-			return event.player == zhu;
+			return event.player == get.zhu(player);
 		},
 		locked: false,
 		group: "jsrgzhenglve_damage",

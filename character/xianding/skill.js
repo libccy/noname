@@ -13725,6 +13725,7 @@ const skills = {
 			});
 			return num >= 2;
 		},
+		seatRelated: true,
 		logTarget: "player",
 		check: function (event, player) {
 			return get.attitude(player, event.player) <= 0;
@@ -14557,6 +14558,7 @@ const skills = {
 		filter: function (event, player) {
 			return event.player.getSeatNum() == game.roundNumber && player.countCards("h") > 0;
 		},
+		seatRelated: true,
 		content: function () {
 			"step 0";
 			var suits = [],

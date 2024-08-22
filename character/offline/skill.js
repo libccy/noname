@@ -1861,6 +1861,7 @@ const skills = {
 			if (player.countCards("h")) return true;
 			return false;
 		},
+		seatRelated: true,
 		async cost(event, trigger, player) {
 			const result = await player
 				.chooseControl("选项一", "选项二", "cancel2")
@@ -2788,6 +2789,7 @@ const skills = {
 			if (get.nameList(event.player).some(name => get.rawName(name) == "刘备")) return true;
 		},
 		usable: 1,
+		seatRelated: true,
 		async cost(event, trigger, player) {
 			event.result = await player.chooseCardTarget({
 				prompt: get.prompt("tyfuwei", trigger.player),
@@ -5495,14 +5497,12 @@ const skills = {
 		filter(event, player) {
 			const num = get.info("jsrgjuxia").countSkill(player) - 2;
 			if (num <= 0 || get.type(event.card) == "equip") return false;
-			return (
-				!player.getRoundHistory("useCard", evt => {
-					get.name(evt.card) == get.name(event.card) && evt != event;
-				}).length &&
-				!player.getRoundHistory("respond", evt => {
-					get.name(evt.card) == get.name(event.card) && evt != event;
-				}).length
-			);
+			let name = get.name(event.card), stat = player.getRoundHistory("useCard", evt => {
+				return evt != event && get.name(evt.card) == name;
+			}).length + player.getRoundHistory("respond", evt => {
+				return evt != event && get.name(evt.card) == name;
+			}).length;
+			return stat == 0;
 		},
 		forced: true,
 		async content(event, trigger, player) {
@@ -5691,6 +5691,7 @@ const skills = {
 		},
 		direct: true,
 		groupSkill: "shu",
+		seatRelated: true,
 		content() {
 			player
 				.chooseToUse(function (card, player, event) {
@@ -10113,12 +10114,12 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		filter(event, player) {
-			var zhu = get.zhu(player) || game.filterPlayer(i => i.getSeatNum() == 1)[0];
+			var zhu = get.zhu(player);
 			if (!zhu) return false;
 			return zhu.countGainableCards(player, zhu == player ? "ej" : "hej");
 		},
 		filterTarget(card, player, target) {
-			var zhu = get.zhu(player) || game.filterPlayer(i => i.getSeatNum() == 1)[0];
+			var zhu = get.zhu(player);
 			return target == zhu;
 		},
 		selectTarget: 1,

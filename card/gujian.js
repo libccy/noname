@@ -537,45 +537,6 @@ game.import("card", function () {
 					},
 				},
 			},
-			dinvxuanshuang_old: {
-				fullskin: true,
-				type: "basic",
-				enable: true,
-				// range:{global:1},
-				filterTarget: function (card, player, target) {
-					return !target.hujia;
-				},
-				content: function () {
-					target.storage.dinvxuanshuang_skill = game.createCard("dinvxuanshuang");
-					target.addSkill("dinvxuanshuang_skill");
-					if (cards && cards.length) {
-						card = cards[0];
-					}
-					if (
-						target == targets[0] &&
-						card.clone &&
-						(card.clone.parentNode == player.parentNode || card.clone.parentNode == ui.arena)
-					) {
-						card.clone.moveDelete(target);
-						game.addVideo("gain2", target, get.cardsInfo([card]));
-					}
-				},
-				ai: {
-					basic: {
-						order: 7,
-						useful: 5,
-						value: [8, 6.5, 5, 4],
-					},
-					result: {
-						target: function (player, target) {
-							var num =
-								1 / Math.sqrt(1 + target.hp) + 0.1 / Math.sqrt(target.countCards("h") + 1);
-							if (player == target) num *= 1.2;
-							return num;
-						},
-					},
-				},
-			},
 			ziyangdan: {
 				fullskin: true,
 				type: "basic",
@@ -1598,22 +1559,6 @@ game.import("card", function () {
 					player.removeSkill("yunvyuanshen_skill");
 				},
 			},
-			dinvxuanshuang_skill: {
-				mark: "card",
-				intro: {
-					content: "下个结束阶段获得1点护甲，若你体力值为全场最少之一，你摸一张牌",
-				},
-				trigger: { player: "phaseEnd" },
-				forced: true,
-				onremove: true,
-				content: function () {
-					player.changeHujia();
-					if (player.isMinHp()) {
-						player.draw();
-					}
-					player.removeSkill("dinvxuanshuang_skill");
-				},
-			},
 			heilonglinpian: {
 				mark: true,
 				marktext: "鳞",
@@ -1887,7 +1832,6 @@ game.import("card", function () {
 			feibiao_info: "出牌阶段，对一名距离1以外的角色使用，令其弃置一张黑色手牌或失去1点体力。",
 
 			dinvxuanshuang: "帝女玄霜",
-			dinvxuanshuang_skill: "帝女玄霜",
 			dinvxuanshuang_info:
 				"对一名濒死状态的角色使用，目标回复1点体力，然后可以弃置任意张牌并摸等量的牌。",
 			yunvyuanshen: "玉女元参",

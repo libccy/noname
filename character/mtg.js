@@ -217,106 +217,6 @@ game.import("character", function () {
 					}
 				},
 			},
-			msuoling_old: {
-				enable: "phaseUse",
-				usable: 1,
-				subSkill: {
-					ai: {
-						onremove: true,
-					},
-				},
-				filter: function (event, player) {
-					var nh = player.countCards("h");
-					if (nh <= 1 || nh >= 5) return false;
-					return lib.skill.msuoling.getc(player).number > 0;
-				},
-				getc: function (player) {
-					var hs = player.getCards("h");
-					for (var i = 0; i < hs.length; i++) {
-						if (hs[i].mtongnian_link) {
-							return hs[i];
-						}
-					}
-					return -1;
-				},
-				getn: function (player) {
-					var hs = player.getCards("h");
-					var ns = [];
-					for (var i = 0; i < hs.length; i++) {
-						if (!hs[i].mtongnian_link) {
-							ns.push(hs[i].number);
-						}
-					}
-					return ns;
-				},
-				test: function (player) {
-					var cs = lib.skill.msuoling.getc(player).number;
-					var ns = lib.skill.msuoling.getn(player);
-					return lib.skill.msuoling.calc(ns, cs);
-				},
-				calc: function (arr, num) {
-					for (var i = 0; i < arr.length; i++) {
-						if (arr[i] == num) {
-							return true;
-						}
-					}
-					if (arr.length > 1) {
-						for (var i = 0; i < arr.length - 1; i++) {
-							for (var j = i + 1; j < arr.length; j++) {
-								var brr = [];
-								for (var k = 0; k < arr.length; k++) {
-									if (k != i && k != j) {
-										brr.push(arr[k]);
-									}
-								}
-								if (lib.skill.msuoling.calc(brr.concat([arr[i] + arr[j]]), num)) return true;
-								if (lib.skill.msuoling.calc(brr.concat([arr[i] - arr[j]]), num)) return true;
-								if (lib.skill.msuoling.calc(brr.concat([arr[i] * arr[j]]), num)) return true;
-								if (lib.skill.msuoling.calc(brr.concat([arr[i] / arr[j]]), num)) return true;
-							}
-						}
-					}
-					return false;
-				},
-				check: function (card) {
-					// if(player.isUnderControl(true)) return 0;
-					var player = _status.event.player;
-					if (player.hasSkill("msuoling_ai")) {
-						return false;
-					}
-					if (lib.skill.msuoling.test(player)) {
-						return true;
-					} else {
-						player.addTempSkill("msuoling_ai", { player: ["gainAfter", "phaseAfter"] });
-						return false;
-					}
-				},
-				content: function () {
-					"step 0";
-					player.showHandcards();
-					"step 1";
-					if (lib.skill.msuoling.test(player)) {
-						var card = lib.skill.msuoling.getc(player);
-						card.classList.remove("glow");
-						delete card.mtongnian_link;
-						delete card._destroy;
-
-						var list = lib.skill.mtongnian.getList(player);
-						if (list.length) {
-							var card = list.randomGet();
-							var fake = game.createCard(card);
-							fake.mtongnian_link = card;
-							player.gain(fake, "draw")._triggered = null;
-							fake.classList.add("glow");
-							fake._destroy = "mtongnian";
-						}
-					}
-				},
-				selectCard: [1, Infinity],
-				ai: {
-					order: 11,
-				},
-			},
 			mtongnian: {
 				trigger: { player: "phaseUseBegin" },
 				forced: true,
@@ -494,8 +394,6 @@ game.import("character", function () {
 			msuoling: "塑灵",
 			msuoling_info:
 				"每轮限一次，当一名其他角色使用一张非转化的普通锦囊牌时，你可以弃置一张与之花色相同的牌取消之，然后你视为使用该锦囊牌。",
-			msuoling_old_info:
-				"出牌阶段限一次，若你手牌中有替身牌且手牌数不超过5，你可以展示手牌，若其中的非替身手牌能通过四则运算得到你的替身牌的点数，你将替身牌转化为非替身牌，然后获得一张新的替身牌（此技能托管无效）。",
 			mhuanyi: "幻逸",
 			mhuanyi_info:
 				"每两轮限一次，结束阶段，你可以选择一名其他角色和一种卡牌类型（选择结果对其他角色不可见），直到下一回合开始，当你首次成为该类型卡牌的惟一目标时，你将目标转移给你指定的角色（目标须合法）。",
