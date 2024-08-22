@@ -9777,7 +9777,6 @@ const skills = {
 	},
 	rejiushi: {
 		audio: 2,
-		audioname: ["mb_caomao"],
 		group: ["rejiushi1", "rejiushi3", "rejiushi_gain"],
 		subfrequent: ["gain"],
 		subSkill: {
@@ -9804,7 +9803,6 @@ const skills = {
 			return false;
 		},
 		audio: "rejiushi",
-		audioname: ["mb_caomao"],
 		enable: "chooseToUse",
 		filter: function (event, player) {
 			if (player.classList.contains("turnedover")) return false;

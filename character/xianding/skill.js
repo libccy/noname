@@ -10207,12 +10207,19 @@ const skills = {
 					evt.relatedEvent = trigger.relatedEvent || trigger.getParent(2);
 					if (trigger.skill) evt.skill = trigger.skill;
 					else delete evt.skill;
+					evt.wumei_phase = true;
+					if (!lib.onround.includes(lib.skill.dcwumei.onRound)) {
+						lib.onround.push(lib.skill.dcwumei.onRound);
+					}
 					game.broadcastAll(function (player) {
 						player.classList.remove("glow_phase");
 						delete _status.currentPhase;
 					}, player);
 				}
 			}
+		},
+		onRound(event) {
+			return !event.wumei_phase;
 		},
 		subSkill: {
 			used: { charlotte: true },

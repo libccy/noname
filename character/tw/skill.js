@@ -1296,7 +1296,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const cards = get.cards(1, true),
 				card = cards[0];
-			await player.showCards(cards, get.translation(player) + "发动了【技二】");
+			await player.showCards(cards, get.translation(player) + "发动了【灵隐】");
 			if (get.color(card) == get.color(trigger.card)) {
 				await player.gain(cards, "gain2");
 			}

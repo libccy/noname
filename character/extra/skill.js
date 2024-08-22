@@ -12,7 +12,7 @@ const skills = {
 		},
 		logTarget: "player",
 		prompt2: (event, player) => ("击伤其一个部位"),
-		async content(event, trigger, player) {
+		async cost(event, trigger, player) {
 			const target = trigger.player;
 			const places = lib.skill["1！5！"].derivation
 				.slice()
@@ -50,11 +50,31 @@ const skills = {
 						hurt: places.randomGet(),
 					});
 					if (event.dialog) event.dialog.close();
+					if (event.control) event.control.close();
+					if (event.control2) event.control2.close();
 				};
+				event.control = ui.create.control("cancel2", function (link) {
+					event.dialog.close();
+					event.control.close();
+					if(event.control2) event.control2.close();
+					game.resume();
+					_status.imchoosing = false;
+					event._result={bool:false};
+					resolve(event._result);
+				});
+				event.control2 = ui.create.control("ok", function (link) {
+					event.dialog.close();
+					event.control.close();
+					event.control2.close();
+					game.resume();
+					_status.imchoosing = false;
+					resolve(event._result);
+				});
+				event.control2.close();
 				const dialog = ui.create.dialog("forcebutton", "hidden");
 				event.dialog = dialog;
 				//白底大图不加textPrompt了
-				//dialog.textPrompt = dialog.add('<div class="text center">毅武：选择击伤' + get.translation(target) +'的一个部位</div>');
+				dialog.textPrompt = dialog.add('<div class="text center">毅武：是否击伤' + get.translation(target) +'的一个部位？</div>');
 				dialog.style.display = "flex";
 				dialog.style.justifyContent = "center";
 				dialog.style.alignItems = "center";
@@ -77,7 +97,7 @@ const skills = {
 				target_img.style.overflow = "visible";
 				target_img.style.boxSizing = "border-box";
 				target_img.style.border = "1px solid black";
-				target_img.style.backgroundColor = "rgb(255,178,102)";
+				target_img.style.backgroundColor = "rgb(255,178,102,0.5)";
 				dialog.appendChild(target_img);
 				target_img.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_" + (target.hasSex("male") ? "male" : "female") + ".png)";
 				target_img.style.backgroundSize = "cover";
@@ -121,16 +141,27 @@ const skills = {
 					num_px.style.backgroundRepeat = "no-repeat";
 					num_px.style.backgroundPosition = "center center";
 					num_px.addEventListener(lib.config.touchscreen ? "touchend" : "click", a => {
+						let hurt = event._result?.position;
 						event._result = {
 							bool: true,
 							hurt: a.target.id,
+							position: a.target,
 						};
-						dialog.close();
-						game.resume();
-						dialog.close();
-						game.resume();
-						_status.imchoosing = false;
-						resolve(event._result);
+						let bool=true;
+						if(hurt){
+							hurt.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_click.png)";
+							if(hurt==a.target){
+								event._result={bool:false};
+								if(event.control2) event.control2.close();
+								if(event.control) event.control.open();
+								bool=false;
+							}
+						}
+						if(bool){
+							a.target.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_click_chosen.png)";
+							if(event.control) event.control.close();
+							if(event.control2) event.control2.open();
+						}
 					});
 					list.push(num_px);
 				}
@@ -157,52 +188,59 @@ const skills = {
 				next = switchToAuto();
 			}
 			const result = await next;
+			if (event.control2) event.control2.close();
 			game.resume();
-			if (result.bool) {
-				player.line(target);
-				const place = result.hurt;
-				player.popup(place, "fire");
-				game.log(player, "击伤了", target, "的", "#y" + get.translation(place));
-				target.addSkill("1！5！_injury");
-				target.markAuto("1！5！_injury", [place]);
-				switch (parseInt(place.slice("1！5！_place".length))) {
-					case 1:
-						if (target.getHp() > 0) {
-							await target.loseHp(target.getHp());
-							if (game.getGlobalHistory("everything", evt => {
-								if (evt.name != "die" || evt.player != target) return false;
-								return evt.reason?.getParent() == event;
-							}).length > 0) {
-								await player.gainMaxHp();
-							}
+			event.result={
+				bool:result.bool,
+				targets:[target],
+				cost_data:result.hurt,
+			};
+			event.result.targets=[target];
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			const place = event.cost_data;
+			player.popup(place, "fire");
+			game.log(player, "击伤了", target, "的", "#y" + get.translation(place));
+			target.addSkill("1！5！_injury");
+			target.markAuto("1！5！_injury", [place]);
+			switch (parseInt(place.slice("1！5！_place".length))) {
+				case 1:
+					if (target.getHp() > 0) {
+						await target.loseHp(target.getHp());
+						if (game.getGlobalHistory("everything", evt => {
+							if (evt.name != "die" || evt.player != target) return false;
+							return evt.reason?.getParent() == event;
+						}).length > 0) {
+							await player.gainMaxHp();
 						}
-						break;
-					case 2:
-						const cards = target
-							.getEquips(1)
-							.slice()
-							.concat(target.getEquips("equip3_4"))
-							.filter(card => lib.filter.canBeDiscarded(card, player, target));
-						if (cards.length) await target.discard(cards).set("discarder", player);
-						break;
-					case 3:
-						target.addTempSkill("1！5！_maxhand", { player: "phaseEnd" });
-						break;
-					case 4:
-						const cardx = target.getDiscardableCards(target, "h");
-						const num = Math.floor(cardx.length / 2);
-						if (cardx.length) await target.discard(cardx.randomGets(num));
-						break;
-					case 5:
-						target.addTempSkill("1！5！_damage", { player: "phaseEnd" });
-						break;
-					case 6:
-						target.addTempSkill("1！5！_use", { player: "phaseEnd" });
-						break;
-					case 7:
-						target.addTempSkill("1！5！_respond", { player: "phaseEnd" });
-						break;
-				}
+					}
+					break;
+				case 2:
+					const cards = target
+						.getEquips(1)
+						.slice()
+						.concat(target.getEquips("equip3_4"))
+						.filter(card => lib.filter.canBeDiscarded(card, player, target));
+					if (cards.length) await target.discard(cards).set("discarder", player);
+					break;
+				case 3:
+					target.addTempSkill("1！5！_maxhand", { player: "phaseEnd" });
+					break;
+				case 4:
+					const cardx = target.getDiscardableCards(target, "h");
+					const num = Math.ceil(cardx.length / 2);
+					if (cardx.length) await target.discard(cardx.randomGets(num));
+					break;
+				case 5:
+					target.addTempSkill("1！5！_damage", { player: "phaseEnd" });
+					break;
+				case 6:
+					target.addTempSkill("1！5！_use", { player: "phaseEnd" });
+					break;
+				case 7:
+					target.addTempSkill("1！5！_respond", { player: "phaseEnd" });
+					break;
 			}
 		},
 		marktext: "赤",
@@ -256,15 +294,23 @@ const skills = {
 				marktext: "伤",
 				intro: {
 					name: "中伤 - 胸部",
-					content: (_, player) => (_status.currentPhase === player ? "" : "下回合") + "使用伤害牌造成的伤害-1",
+					content: (_, player) => (_status.currentPhase === player ? "" : "下回合") + "使用下一张伤害牌造成的伤害-1",
 				},
 				trigger:{
 					source: "damageBegin2",
 				},
 				filter(event, player){
-					if (get.tag(event.card, "damage")) return true;
+					if (event.card&&get.tag(event.card, "damage")) return true;
+					return false;
 				},
 				async content(event, trigger, player) {
+					let evt=trigger.getParent("useCard",true);
+					if(evt&&!evt.yiwuMarked){
+						evt.yiwuMarked=true;
+						player.when("useCardAfter").filter(evtx=>evtx.yiwuMarked).then(()=>{
+							player.removeSkill("1！5！_use");
+						});
+					}
 					trigger.num -= 1;
 				}
 			},
@@ -274,14 +320,17 @@ const skills = {
 				marktext: "伤",
 				intro: {
 					name: "中伤 - 腹部",
-					content: (_, player) => "不能使用【闪】和【桃】",
+					content: (_, player) => "不能使用或打出红桃牌",
 				},
 				mod: {
 					cardEnabled(card) {
-						if (card.name == "shan" || card.name == "tao") return false;
+						if (get.suit(card)=="heart") return false;
 					},
 					cardSavable(card) {
-						if (card.name == "tao") return false;
+						if (get.suit(card)=="heart") return false;
+					},
+					cardRespondable(card){
+						if (get.suit(card)=="heart") return false;
 					},
 				},
 			},
@@ -293,7 +342,7 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		async cost (event, trigger, player) {
-			let list = ["摸体力值张牌，此阶段【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复1点体力。"];
+			let list = ["摸体力值张牌，此阶段使用的下一张【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复1点体力。"];
 			let result = await player.chooseControlList(list).set("ai", function(){
 				//等157优化）
 				return Math.random();
@@ -324,12 +373,13 @@ const skills = {
 				trigger: {
 					player: "useCard",
 				},
-				filter:function(event, player){
+				filter(event, player){
 					return event.card.name == "sha";
 				},
-				content:async function (event, trigger, player) {
+				async content(event, trigger, player) {
 					trigger.directHit.addArray(game.players);
 					game.log(trigger.card, "不可被响应");
+					player.removeSkill(event.name);
 				}
 			},
 			recover: {

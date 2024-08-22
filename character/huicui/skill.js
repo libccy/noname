@@ -1355,16 +1355,15 @@ const skills = {
 	//王凌
 	dcjichou: {
 		audio: 2,
-		trigger: { player: "phaseUseEnd" },
+		trigger: { player: "phaseJieshuBegin" },
 		filter(event, player) {
-			const evts = player.getHistory("useCard", evt => evt.getParent("phaseUse") === event);
+			const evts = player.getHistory("useCard");
 			const names = evts.map(evt => evt.card.name).unique();
 			return evts.length > 0 && evts.length === names.length && evts.some(evt => evt.cards.some(card => get.position(card) === "d"));
 		},
 		async content(event, trigger, player) {
 			const cards = [];
 			player.checkHistory("useCard", evt => {
-				if (evt.getParent("phaseUse") !== trigger) return;
 				cards.addArray(evt.cards.filterInD("d"));
 			});
 			const num = Math.min(cards.length, game.countPlayer());
@@ -4759,30 +4758,21 @@ const skills = {
 		usable: 1,
 		filterTarget: lib.filter.notMe,
 		selectTarget: 1,
-		content: function () {
-			"step 0";
-			target.draw(2);
-			"step 1";
-			var marked = target.hasMark("dcjizhong");
-			var cards = target.getCards("h");
-			if (marked) {
-				if (cards.length <= 3) event._result = { bool: true, cards: cards };
-				else target.chooseCard(`集众：交给${get.translation(player)}三张手牌`, 3, true);
-			} else {
-				target
-					.chooseCard(`集众：交给${get.translation(player)}三张手牌，或点击“取消”获得“信众”标记`, 3)
-					.set("ai", card => {
-						if (get.event("goon")) return 20 - get.value(card);
-						return 1 - get.value(card);
-					})
-					.set("goon", get.attitude(target, player) > 0);
+		async content(event, trigger, player) {
+			const target = event.target;
+			await target.draw(2);
+			if (!target.hasMark("dcjizhong")) {
+				const result = await target
+					.chooseBool(`集众：令${get.translation(player)}获得你三张牌，或点击“取消”获得“信众”标记`)
+					.set("choice", get.attitude(target, player) >= 0)
+					.forResult();
+				if (!result.bool) {
+					target.addMark("dcjizhong", 1);
+					return;
+				}
 			}
-			"step 2";
-			if (!result.bool) {
-				target.addMark("dcjizhong", 1);
-			} else {
-				target.give(result.cards, player);
-			}
+			let num = Math.min(target.countCards("he"), 3);
+			if (num > 0) await player.gainPlayerCard(target, "he", num, true);
 		},
 		marktext: "信",
 		intro: {
@@ -4863,7 +4853,7 @@ const skills = {
 		},
 		forced: true,
 		content: function () {
-			player.draw(2);
+			player.draw(game.filterPlayer().reduce((sum, current) => sum += current.countMark("dcjizhong"), 0));
 			player.loseHp();
 		},
 		ai: {

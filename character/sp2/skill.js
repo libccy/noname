@@ -2759,7 +2759,7 @@ const skills = {
 			},
 			*/
 			attackRange: function (player, num) {
-				if (!player.getEquips(1).length) return num + 1;
+				return num + 1;
 			},
 			selectTarget: function (card, player, range) {
 				if (card.name == "sha") {

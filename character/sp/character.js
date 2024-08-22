@@ -175,7 +175,7 @@ const characters = {
 	dingfeng: ["male", "wu", 4, ["reduanbing", "refenxun"]],
 	shamoke: ["male", "shu", 4, ["gzjili"]],
 
-	zhangren: ["male", "qun", 4, ["chuanxin", "zfengshi"]],
+	//zhangren: ["male", "qun", 4, ["chuanxin", "zfengshi"]],
 
 	wangyun: ["male", "qun", 4, ["xinlianji", "xinmoucheng"], ["clan:太原王氏"]],
 	sunqian: ["male", "shu", 3, ["qianya", "shuimeng"]],

@@ -189,7 +189,7 @@ const skills = {
 					});
 			return skills;
 		},
-		excludedskills: ["boss_juejing", "xinlonghun", "relonghun", "sbwusheng", "jsrgnianen", "jsrgguanjue", "shencai", "sbpaoxiao", "sbliegong", "pshengwu"],
+		prioritySkills: ["boss_juejing", "xinlonghun", "relonghun", "sbwusheng", "jsrgnianen", "jsrgguanjue", "shencai", "sbpaoxiao", "sbliegong", "pshengwu"],
 		trigger: {
 			global: "phaseBefore",
 			player: ["enterGame", "useCardAfter", "respondAfter"],
@@ -230,7 +230,7 @@ const skills = {
 				next.set("ai", button => {
 					const skill = button.link,
 						choice = get.event("choice");
-					if (get.info("olhuyi").excludedskills.includes(skill)) return 3;
+					if (get.info("olhuyi").prioritySkills.includes(skill)) return 3;
 					if (skill == choice) return 2;
 					return 1;
 				});
@@ -277,7 +277,7 @@ const skills = {
 					next.set("ai", button => {
 						const skill = button.link;
 						let skills = get.event("skills").slice(0);
-						skills.removeArray(get.info("olhuyi").excludedskills);
+						skills.removeArray(get.info("olhuyi").prioritySkills);
 						if (skills.length < 4) return 0;
 						if (skills.includes(skill)) return 2;
 						return Math.random();

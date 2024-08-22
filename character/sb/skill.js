@@ -104,15 +104,12 @@ const skills = {
 		},
 	},
 	sbluanwu: {
-		audio: "luanwu",
+		audio: 4,
 		inherit: "luanwu",
 		contentBefore() {
 			player.addTempSkill("sbluanwu_add");
 		},
 		subSkill: {
-			jiaxu: {
-				audio: 4,
-			},
 			add: {
 				trigger: {
 					global: "loseHpEnd",
@@ -935,7 +932,7 @@ const skills = {
 				if (
 					!game.hasPlayer(current => {
 						const evt = event.getl(current);
-						return evt.cards && evt.cards.length > 0;
+						return evt.cards?.someInD("od");
 					})
 				)
 					return false;
@@ -947,12 +944,12 @@ const skills = {
 		},
 		group: "sbqingjian_give",
 		async content(event, trigger, player) {
-			let cards = trigger.cards.slice();
+			let cards = trigger.cards.filterInD("od").slice();
 			const maxNum = Math.max(1, player.getHp() - 1);
 			const myLen = player.getExpansions("sbqingjian").length,
 				cardsLen = trigger.cards.length;
-			const overflow = myLen + cardsLen - maxNum;
-			if (overflow > 0) cards.randomRemove(overflow);
+			const num = Math.min(cardsLen, maxNum - myLen);
+			if (num > 0) cards = cards.randomGets(num);
 			const next = player.addToExpansion(cards, "gain2");
 			next.gaintag.add("sbqingjian");
 			await next;
@@ -1758,7 +1755,6 @@ const skills = {
 			},
 		],
 		audio: 2,
-		audioname: ["mb_caomao"],
 		enable: "phaseUse",
 		filter(event, player) {
 			return get.info("sbfangzhu").getList.some(effect => {
@@ -5964,7 +5960,6 @@ const skills = {
 	},
 	sbqingzheng: {
 		audio: 2,
-		audioname: ["mb_caomao"],
 		trigger: { player: "phaseUseBegin" },
 		filter: function (event, player) {
 			return player.countCards("h") > 0;
