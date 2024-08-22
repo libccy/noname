@@ -31,17 +31,15 @@ const skills = {
 			event.videoId = lib.status.videoId++;
 			if (player.isUnderControl()) game.swapPlayerAuto(player);
 			const switchToAuto = function () {
-				setTimeout(function () {
-					_status.imchoosing = false;
-					if (event.dialog) event.dialog.close();
-					if (event.control) event.control.close();
-					if (event.control2) event.control2.close();
-					game.resume();
-					return Promise.resolve({
-						bool: true,
-						hurt: places.randomGet(),
-					});
-				}, 5000);
+				_status.imchoosing = false;
+				if (event.dialog) event.dialog.close();
+				if (event.control) event.control.close();
+				if (event.control2) event.control2.close();
+				game.resume();
+				return Promise.resolve({
+					bool: true,
+					hurt: places.randomGet(),
+				});
 			};
 			const chooseButton = (places, target) => {
 				const { promise, resolve } = Promise.withResolvers();
