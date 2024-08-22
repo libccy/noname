@@ -1370,6 +1370,7 @@ const skills = {
 	},
 	//高览
 	spjungong: {
+		audio: 2,
 		enable: "phaseUse",
 		filter: function (event, player) {
 			var num = player.getStat("skill").spjungong || 0;
@@ -1422,6 +1423,7 @@ const skills = {
 		},
 	},
 	spdengli: {
+		audio: 2,
 		trigger: {
 			player: "useCardToPlayered",
 			target: "useCardToTargeted",
@@ -1687,6 +1689,7 @@ const skills = {
 	},
 	//吴景流兵
 	liubing: {
+		audio: 2,
 		trigger: { player: "useCard1" },
 		forced: true,
 		filter: function (event, player) {
@@ -3308,6 +3311,7 @@ const skills = {
 		},
 	},
 	splirang: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -6601,6 +6605,7 @@ const skills = {
 		},
 	},
 	fubi: {
+		audio: 2,
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
@@ -6642,6 +6647,7 @@ const skills = {
 		intro: { content: "若$存活，则手牌上限+3" },
 	},
 	zuici: {
+		audio: 2,
 		trigger: { player: "dying" },
 		direct: true,
 		filter: function (event, player) {

@@ -2127,7 +2127,7 @@ const skills = {
 	},
 	//颜良文丑，但是颜良+文丑
 	twduwang: {
-		audio: 3,
+		audio: 2,
 		dutySkill: true,
 		derivation: ["twxiayong", "twylyanshix"],
 		global: "twduwang_global",
@@ -6074,6 +6074,7 @@ const skills = {
 		init: function (player) {
 			lib.skill.baonvezhi.change(player, 0);
 		},
+		audio: 2,
 		trigger: { source: "damageSource" },
 		forced: true,
 		usable: 1,
@@ -12206,7 +12207,7 @@ const skills = {
 	},
 	//卞夫人
 	twwanwei: {
-		audio: "wanwei",
+		audio: "spwanwei",
 		trigger: { global: "damageBegin4" },
 		filter: function (event, player) {
 			return event.player.isMinHp();
@@ -12243,7 +12244,7 @@ const skills = {
 		},
 		subSkill: {
 			effect: {
-				audio: "wanwei",
+				audio: "spwanwei",
 				charlotte: true,
 				trigger: { global: "phaseJieshuBegin" },
 				prompt2: "获得牌堆顶的牌并亮出牌堆底的牌，若展示的牌能被使用，你使用之",
@@ -12262,7 +12263,7 @@ const skills = {
 		},
 	},
 	twyuejian: {
-		audio: "yuejian",
+		audio: "spyuejian",
 		enable: "phaseUse",
 		filterCard: true,
 		selectCard: function () {
@@ -18438,6 +18439,7 @@ const skills = {
 		},
 	},
 	twlingbao: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {

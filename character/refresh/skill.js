@@ -3889,6 +3889,7 @@ const skills = {
 		},
 	},
 	xsqianxin: {
+		audio: 2,
 		trigger: { source: "damageSource" },
 		juexingji: true,
 		forced: true,
@@ -5149,6 +5150,7 @@ const skills = {
 	},
 	//鲁肃
 	olhaoshi: {
+		audio: 2,
 		trigger: { player: "phaseDrawBegin2" },
 		filter: function (event, player) {
 			return !event.numFixed;
@@ -5281,6 +5283,7 @@ const skills = {
 		},
 	},
 	oldimeng: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -9016,6 +9019,7 @@ const skills = {
 			},
 		},
 		locked: false,
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		position: "he",
@@ -9746,6 +9750,7 @@ const skills = {
 		},
 	},
 	chengzhang: {
+		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },
 		derivation: "rejiushi_mark",
 		forced: true,
@@ -10079,6 +10084,7 @@ const skills = {
 		},
 	},
 	rewurong: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -10274,6 +10280,7 @@ const skills = {
 		},
 	},
 	shebian: {
+		audio: 2,
 		trigger: { player: "turnOverEnd" },
 		check: function (event, player) {
 			return player.canMoveCard(true, true);

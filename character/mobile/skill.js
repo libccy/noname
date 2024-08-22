@@ -1489,6 +1489,7 @@ const skills = {
 	},
 	//SP母兵脸
 	mbcuizhen: {
+		audio: 2,
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
@@ -7740,6 +7741,7 @@ const skills = {
 	},
 	//裴秀
 	xingtu: {
+		audio: 2,
 		trigger: { player: "useCard" },
 		filter: function (event, player) {
 			var evt = lib.skill.dcjianying.getLastUsed(player, event);
@@ -7829,6 +7831,7 @@ const skills = {
 		},
 	},
 	juezhi: {
+		audio: 2,
 		enable: "phaseUse",
 		filter: function (event, player) {
 			return player.countCards("he") > 1;
@@ -8246,6 +8249,7 @@ const skills = {
 	},
 	//孙寒华
 	chongxu: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		content: function () {
@@ -8688,6 +8692,7 @@ const skills = {
 		},
 	},
 	bihuo: {
+		audio: 2,
 		trigger: { global: "dyingAfter" },
 		logTarget: "player",
 		limited: true,
@@ -11624,6 +11629,7 @@ const skills = {
 	//司马师夫妇
 	//垃圾
 	baiyi: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filterTarget: lib.filter.notMe,
@@ -16945,6 +16951,7 @@ const skills = {
 		},
 	},
 	xinfu_qiaosi: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		content: function () {
