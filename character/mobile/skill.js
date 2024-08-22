@@ -3149,29 +3149,53 @@ const skills = {
 		logAudio: () => "twkujian1.mp3",
 		content: function () {
 			player.give(cards, target).gaintag.add("twkujianx");
-			player.addSkill("kujian_draw");
-			player.addSkill("twkujian_discard");
+			player.addSkill("kujian_discard");
 		},
 		subSkill: {
-			draw: {
-				charlotte: true,
-				audio: "twkujian2.mp3",
-				trigger: { global: ["useCardAfter", "respondAfter"] },
-				filter: function (event, player) {
-					return event.player.hasHistory("lose", evt => {
-						if (event != evt.getParent()) return false;
-						for (var i in evt.gaintag_map) {
-							if (evt.gaintag_map[i].includes("twkujianx")) return true;
-						}
-					});
+			discard: {
+				trigger: {
+					global: ["loseAfter", "equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 				},
 				forced: true,
-				logTarget: "player",
-				content: function () {
-					"step 0";
-					game.asyncDraw([player, trigger.player], 2);
-					"step 1";
-					game.delayx();
+				getIndex(event, player) {
+					let list=[],players=game.filterPlayer().sortBySeat();
+					for(const current of players){
+						let bool = ["useCard","respond"].includes(event.getParent().name);
+						if(current == player) continue;
+						var evt = event.getl(current);
+						if (!evt || !evt.hs || !evt.hs.length) continue;
+						if (event.name == "lose") {
+							for (var i in event.gaintag_map) {
+								if (event.gaintag_map[i].includes("twkujianx")) list.push([current,bool]);
+							}
+							continue;
+						}
+						current.getHistory("lose", evt=>{
+							if (event != evt.getParent()) return false;
+							for (var i in evt.gaintag_map) {
+								if (evt.gaintag_map[i].includes("twkujianx")) list.push([current,bool]);
+							}
+						});
+					}
+					return list;
+				},
+				charlotte: true,
+				logTarget(event,player,name,data){
+					return data[0];
+				},
+				logAudio(event,player,name,data){
+					let type = data[1];
+					if(type) return "twkujian2.mp3";
+					return "twkujian3.mp3";
+				},
+				async content(event,trigger,player) {
+					const target=event.targets[0];
+					const type=event.indexedData[1];
+					if(type) await game.asyncDraw([player,target],2);
+					else{
+						if(player.countCards("h")) await player.chooseToDiscard(1,true,"h");
+						if(target.countCards("h")) await target.chooseToDiscard(1,true,"h");
+					}
 				},
 			},
 		},

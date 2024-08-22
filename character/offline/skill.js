@@ -21,14 +21,14 @@ const skills = {
 			ty_luxun: ["shangfangbaojian"],
 			ty_sunquan: ["qingmingjian"],
 		},
-		getAudio:{
+		getAudio: {
 			ty_liubei: "jizhao2",
 			ty_luxun: "nzry_cuike2",
 			ty_sunquan: "sbzhiheng2",
 		},
 		async content(event, trigger, player) {
 			let list = get.nameList(player),
-				info=lib.skill._taoyuanwange,
+				info = lib.skill._taoyuanwange,
 				names = Object.keys(info.getEquip);
 			for (const name of names) {
 				if (list.includes(name)) {
@@ -42,7 +42,7 @@ const skills = {
 							if (lib.config.background_speak) {
 								game.playAudio("skill", audio);
 							}
-						},info.getAudio[name]);
+						}, info.getAudio[name]);
 						player.$gain2(equips);
 						await player.equip(equips);
 					}
@@ -599,16 +599,16 @@ const skills = {
 	tyshencai: {
 		audio: "shencai",
 		enable: "phaseUse",
-		usable: 5,
 		filter(event, player) {
-			var count = player.getStat("skill").tyshencai;
-			if (count && count > player.countMark("shencai")) return false;
+			if (player.countMark("tyshencai") > player.countMark("shencai")) return false;
 			return true;
 		},
 		filterTarget: lib.filter.notMe,
 		onremove: true,
 		prompt: "选择一名其他角色进行地狱审判",
 		content() {
+			player.addMark("tyshencai", 1, false);
+			player.addTempSkill("tyshencai_clear");
 			var next = target.judge();
 			next.callback = lib.skill.shencai.contentx;
 		},
@@ -618,6 +618,10 @@ const skills = {
 		},
 		group: "tyshencai_wusheng",
 		subSkill: {
+			clear: {
+				onremove: ["tyshencai"],
+				charlotte: true,
+			},
 			wusheng: {
 				audio: "shencai",
 				enable: ["chooseToRespond", "chooseToUse"],
@@ -1654,8 +1658,8 @@ const skills = {
 		selectCard: 2,
 		position: "he",
 		filterTarget: true,
-		check(card){
-			return 4-get.value(card);
+		check(card) {
+			return 4 - get.value(card);
 		},
 		async content(event, trigger, player) {
 			const card = game.createCard("taoyuan", "heart", 1);
@@ -1663,7 +1667,7 @@ const skills = {
 		},
 		ai: {
 			order: 4,
-			result:{
+			result: {
 				target(player, target) {
 					if (target.getUseValue("taoyuan") * get.sgnAttitude(player, target) >= player.getUseValue("wuzhong")) return 1;
 					return 0;

@@ -34,7 +34,6 @@ const skills = {
 				_status.imchoosing = false;
 				if (event.dialog) event.dialog.close();
 				if (event.control) event.control.close();
-				if (event.control2) event.control2.close();
 				game.resume();
 				return Promise.resolve({
 					bool: true,
@@ -189,6 +188,7 @@ const skills = {
 				next = switchToAuto();
 			}
 			const result = await next;
+			if (event.control2) event.control2.close();
 			game.resume();
 			event.result={
 				bool:result.bool,
