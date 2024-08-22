@@ -3,6 +3,166 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//蒋钦
+	dcshangyi: {
+		audio: 2,
+		enable: "phaseUse",
+		usable: 1,
+		filter: function (event, player) {
+			return player.countCards("he") > 0 && game.hasPlayer(current => lib.skill.dcshangyi.filterTarget(null, player, current));
+		},
+		filterTarget(card, player, target) {
+			return target != player;
+		},
+		async content(event, trigger, player) {
+			const target = event.target;
+			await target.viewHandcards(player);
+			if (!target.countCards("h")) return;
+			await player
+				.discardPlayerCard(target, "h", 2, "visible", "是否弃置弃置♠♣花色的牌各一张？")
+				.set("filterButton", button => {
+					if (!["spade", "club"].includes(get.suit(button.link))) return false;
+					return ui.selected.buttons?.every(buttonx => {
+						return get.suit(buttonx.link) != get.suit(button.link);
+					});
+				});
+		},
+		ai: {
+			order: 6,
+			result: {
+				player: 0.5,
+				target(player, target) {
+					if (!target.countCards("h")) return 1;
+					return -2;
+				},
+			},
+		},
+	},
+	dcniaoxiang: {
+		audio: 2,
+		trigger: { player: "useCardToPlayered" },
+		forced: true,
+		filter(event, player) {
+			if (!event.target.inRange(player)) return false;
+			return event.card.name == "sha" && !event.getParent().directHit.includes(event.target);
+		},
+		logTarget: "target",
+		async content(event, trigger, player) {
+			const id = trigger.target.playerid;
+			const map = trigger.getParent().customArgs;
+			if (!map[id]) map[id] = {};
+			if (typeof map[id].shanRequired == "number") {
+				map[id].shanRequired++;
+			} else {
+				map[id].shanRequired = 2;
+			}
+		},
+		ai: {
+			directHit_ai: true,
+			skillTagFilter(player, tag, arg) {
+				if (!arg.target.inRange(player)) return false;
+				if (arg.card.name != "sha" || arg.target.countCards("h", "shan") > 1) return false;
+			},
+		},
+	},
+	//田丰
+	dcsuishi: {
+		audio: 2,
+		trigger: {
+			global: ["dying", "dieAfter"],
+		},
+		forced: true,
+		filter(event, player) {
+			if (event.player == player) return false;
+			if (event.name == "dying") {
+				return event.reason?.name == "damage" && event.reason?.source.group == player.group;
+			}
+			return event.player?.group == player.group && player.countCards("h");
+		},
+		async content(event, trigger, player) {
+			if (trigger.name == "dying") await player.draw();
+			else {
+				await player
+					.chooseToDiscard("h", [1, Infinity], true)
+					.set("ai", card => {
+						if (get.player().countCards("h") - ui.selected.cards.length > 1) return 2 - get.value(card);
+						return 4 - get.value(card);
+					});
+			}
+		},
+		ai: {
+			halfneg: true,
+		},
+	},
+	//张任
+	dcchuanxin: {
+		audio: 2,
+		trigger: { source: "damageBegin2" },
+		filter(event, player) {
+			if (_status.currentPhase != player) return false;
+			if (!_status.event.getParent("phaseUse")) return false;
+			return event.card&&["sha", "juedou"].includes(event.card.name)&&event.getParent().name==event.card.name;
+		},
+		logTarget: "player",
+		check(event, player) {
+			if (get.attitude(player, event.player) < 0) {
+				if (event.player.hp == 1 && event.player.countCards("e") < 2 && event.player.name2 != "gz_pangtong") return false;
+				return true;
+			}
+			return false;
+		},
+		async content(event,trigger,player) {
+			trigger.cancel();
+			let result;
+			const target=event.targets[0];
+			if (target.countCards("e")) {
+				result=await target
+					.chooseControl(function (event, player) {
+						if (player.hp == 1) return 1;
+						if (player.hp == 2 && player.countCards("e") >= 2) return 1;
+						return 0;
+					})
+					.set("choiceList", [
+						"弃置装备区内的所有牌并失去1点体力", 
+						"弃置两张手牌，然后非锁定技本回合失效",
+					])
+					.forResult();
+			} else {
+				result = { index: 1 };
+			}
+			if (result.index == 1) {
+				await target.chooseToDiscard("h",2,true);
+				target.addTempSkill("fengyin");
+			} else {
+				target.discard(trigger.player.getCards("e"));
+				target.loseHp();
+			}
+		},
+	},
+	dcfengshi: {
+		audio: 2,
+		trigger: { player: "useCardToPlayered" },
+		filter: function (event, player) {
+			if (event.card.name != "sha" || event.target.inRange(player)) return false;
+			return event.target.getCards("e",card=>["equip2","equip3"].includes(get.subtype(card))).length;			
+		},
+		async cost(event,trigger,player){
+			event.result=await player
+				.choosePlayerCard("e",trigger.target,get.prompt2("dcfengshi",trigger.target))
+				.set("filterButton",button=>{
+					return ["equip2","equip3"].includes(get.subtype(button.link));
+				})
+				.set("ai",button=>{
+					if(get.attitude(get.player(),get.event().getTrigger().target)>0) return 0;
+					return get.value(button.link)+1;
+				})
+				.forResult();
+			event.result.targets=[trigger.target];
+		},
+		async content(event,trigger,player){
+			await event.targets[0].discard(event.cards);
+		},
+	},
 	//谋沮授
 	dcsbzuojun: {
 		audio: 2,
