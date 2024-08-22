@@ -231,7 +231,7 @@ const skills = {
 					break;
 				case 4:
 					const cardx = target.getDiscardableCards(target, "h");
-					const num = Math.floor(cardx.length / 2);
+					const num = Math.ceil(cardx.length / 2);
 					if (cardx.length) await target.discard(cardx.randomGets(num));
 					break;
 				case 5:
@@ -296,15 +296,23 @@ const skills = {
 				marktext: "伤",
 				intro: {
 					name: "中伤 - 胸部",
-					content: (_, player) => (_status.currentPhase === player ? "" : "下回合") + "使用伤害牌造成的伤害-1",
+					content: (_, player) => (_status.currentPhase === player ? "" : "下回合") + "使用下一张伤害牌造成的伤害-1",
 				},
 				trigger:{
 					source: "damageBegin2",
 				},
 				filter(event, player){
-					if (get.tag(event.card, "damage")) return true;
+					if (event.card&&get.tag(event.card, "damage")) return true;
+					return false;
 				},
 				async content(event, trigger, player) {
+					let evt=trigger.getParent("useCard",true);
+					if(evt&&!evt.yiwuMarked){
+						evt.yiwuMarked=true;
+						player.when("useCardAfter").filter(evtx=>evtx.yiwuMarked).then(()=>{
+							player.removeSkill("1！5！_use");
+						});
+					}
 					trigger.num -= 1;
 				}
 			},
@@ -314,14 +322,17 @@ const skills = {
 				marktext: "伤",
 				intro: {
 					name: "中伤 - 腹部",
-					content: (_, player) => "不能使用【闪】和【桃】",
+					content: (_, player) => "不能使用或打出红桃牌",
 				},
 				mod: {
 					cardEnabled(card) {
-						if (card.name == "shan" || card.name == "tao") return false;
+						if (get.suit(card)=="heart") return false;
 					},
 					cardSavable(card) {
-						if (card.name == "tao") return false;
+						if (get.suit(card)=="heart") return false;
+					},
+					cardRespondable(card){
+						if (get.suit(card)=="heart") return false;
 					},
 				},
 			},
@@ -333,7 +344,7 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		async cost (event, trigger, player) {
-			let list = ["摸体力值张牌，此阶段【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复1点体力。"];
+			let list = ["摸体力值张牌，此阶段使用的下一张【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复1点体力。"];
 			let result = await player.chooseControlList(list).set("ai", function(){
 				//等157优化）
 				return Math.random();
@@ -364,12 +375,13 @@ const skills = {
 				trigger: {
 					player: "useCard",
 				},
-				filter:function(event, player){
+				filter(event, player){
 					return event.card.name == "sha";
 				},
-				content:async function (event, trigger, player) {
+				async content(event, trigger, player) {
 					trigger.directHit.addArray(game.players);
 					game.log(trigger.card, "不可被响应");
+					player.removeSkill(event.name);
 				}
 			},
 			recover: {
