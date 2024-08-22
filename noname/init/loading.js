@@ -260,7 +260,7 @@ export async function loadExtension(extension) {
 				const content = { ...extension[4].character };
 				content.name = extension[0];
 				content.translate ??= {};
-				content.translate[content.name] = extension[0];
+				content.translate[content.name] ??= extension[0];
 
 				// ~~到最后，还得遍历一遍~~
 				// 我就是被拷打，成为新的1103，受到白鼠群的嘲笑谩骂，我也绝不再次遍历！
@@ -313,7 +313,7 @@ export async function loadExtension(extension) {
 				const content = { ...extension[4].card };
 				content.name = extension[0];
 				content.translate ??= {};
-				content.translate[content.name] = extension[0];
+				content.translate[content.name] ??= extension[0];
 
 				// ~~到最后，还得遍历一遍~~
 				// 我就是被拷打，成为新的1103，受到白鼠群的嘲笑谩骂，我也绝不再次遍历！

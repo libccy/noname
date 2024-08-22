@@ -436,10 +436,8 @@ export default () => {
 								map[i][j].classList.add("pointerdiv");
 								if (map[i][j].count > count) {
 									map[i][j].classList.add("unselectable");
-									map[i][j].classList.remove("pointerdiv");
 								} else if (i == "zhaomu" && _status.friends.length + selectedZhaomu >= 5) {
 									map[i][j].classList.add("unselectable");
-									map[i][j].classList.remove("pointerdiv");
 								} else if (i == "bufang") {
 									var numbufang = 0;
 									for (var k = 0; k < game.treasures.length; k++) {

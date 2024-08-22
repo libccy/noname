@@ -7957,6 +7957,7 @@ export const Content = {
 			event.finish();
 		}
 		"step 1";
+		event.cards = cards = cards.map(i => i.cards ? i.cards : [i]).flat();
 		for (var i = 0; i < cards.length; i++) {
 			if (cards[i].willBeDestroyed("handcard", player, event)) {
 				cards[i].selfDestroy(event);
@@ -8307,15 +8308,16 @@ export const Content = {
 			evt.discardid = lib.status.videoId++;
 			game.broadcastAll(
 				function (player, cards, id, visible) {
-					player.$throw(cards, null, "nobroadcast");
+					const cardx = cards.slice().map(i => i.cards ? i.cards : [i]).flat();
+					player.$throw(cardx, null, "nobroadcast");
 					var cardnodes = [];
 					cardnodes._discardtime = get.time();
-					for (var i = 0; i < cards.length; i++) {
-						if (cards[i].clone) {
-							cardnodes.push(cards[i].clone);
+					for (var i = 0; i < cardx.length; i++) {
+						if (cardx[i].clone) {
+							cardnodes.push(cardx[i].clone);
 							if (!visible) {
-								cards[i].clone.classList.add("infohidden");
-								cards[i].clone.classList.add("infoflip");
+								cardx[i].clone.classList.add("infohidden");
+								cardx[i].clone.classList.add("infoflip");
 							}
 						}
 					}
@@ -8361,6 +8363,7 @@ export const Content = {
 		var hej = player.getCards("hejsx");
 		event.stockcards = cards.slice(0);
 		for (var i = 0; i < cards.length; i++) {
+			let cardx = [cards[i]];
 			if (!hej.includes(cards[i])) {
 				cards.splice(i--, 1);
 				continue;
@@ -8368,12 +8371,9 @@ export const Content = {
 				if (cards[i].parentNode.classList.contains("equips")) {
 					cards[i].original = "e";
 					es.push(cards[i]);
-					const VEquip = player.getVCards("e").find(card => {
-						return card.cards?.includes(cards[i]);
-					});
-					if (VEquip) {
-						event.vcard_map.set(cards[i], VEquip);
-					} else event.vcard_map.set(cards[i], get.autoViewAs(cards[i], void 0, false));
+					let loseCards = cards[i].cards ? cards[i].cards : [cards[i]];
+					cardx.addArray(loseCards);
+					event.vcard_map.set(loseCards, cards[i].card || get.autoViewAs(cards[i], void 0, false));
 				} else if (cards[i].parentNode.classList.contains("judges")) {
 					cards[i].original = "j";
 					js.push(cards[i]);
@@ -8402,55 +8402,57 @@ export const Content = {
 					cards[i].original = null;
 				}
 			}
-			if (cards[i].gaintag && cards[i].gaintag.length) {
-				event.gaintag_map[cards[i].cardid] = cards[i].gaintag.slice(0);
-				cards[i].removeGaintag(true);
-			}
-
-			cards[i].style.transform += " scale(0.2)";
-			cards[i].classList.remove("glow");
-			cards[i].classList.remove("glows");
-			cards[i].recheck();
-
-			var info = lib.card[cards[i].name];
-			if ("_destroy" in cards[i]) {
-				if (cards[i]._destroy) {
-					cards[i].delete();
-					cards[i].destroyed = cards[i]._destroy;
-					continue;
+			for (var j = 0; j < cardx.length; j++) {
+				if (cardx[j].gaintag && cardx[j].gaintag.length) {
+					event.gaintag_map[cardx[j].cardid] = cardx[j].gaintag.slice(0);
+					cardx[j].removeGaintag(true);
 				}
-			} else if ("destroyed" in cards[i]) {
-				if (event.getlx !== false && event.position && cards[i].willBeDestroyed(event.position.id, null, event)) {
-					cards[i].selfDestroy(event);
-					continue;
-				}
-			} else if (info.destroy) {
-				cards[i].delete();
-				cards[i].destroyed = info.destroy;
-				continue;
-			}
-			if (event.position) {
-				if (_status.discarded) {
-					if (event.position == ui.discardPile) {
-						_status.discarded.add(cards[i]);
-					} else {
-						_status.discarded.remove(cards[i]);
+	
+				cardx[j].style.transform += " scale(0.2)";
+				cardx[j].classList.remove("glow");
+				cardx[j].classList.remove("glows");
+				cardx[j].recheck();
+	
+				var info = lib.card[cardx[j].name];
+				if ("_destroy" in cardx[j]) {
+					if (cardx[j]._destroy) {
+						cardx[j].delete();
+						cardx[j].destroyed = cardx[j]._destroy;
+						continue;
 					}
+				} else if ("destroyed" in cardx[j]) {
+					if (event.getlx !== false && event.position && cardx[j].willBeDestroyed(event.position.id, null, event)) {
+						cardx[j].selfDestroy(event);
+						continue;
+					}
+				} else if (info.destroy) {
+					cardx[j].delete();
+					cardx[j].destroyed = info.destroy;
+					continue;
 				}
-				if (event.insert_index) {
-					cards[i].fix();
-					event.position.insertBefore(cards[i], event.insert_index(event, cards[i]));
-				} else if (event.insert_card) {
-					cards[i].fix();
-					event.position.insertBefore(cards[i], event.position.firstChild);
-				} else if (event.position == ui.cardPile) {
-					cards[i].fix();
-					event.position.appendChild(cards[i]);
-				} else cards[i].goto(event.position);
-			} else {
-				cards[i].remove();
+				if (event.position) {
+					if (_status.discarded) {
+						if (event.position == ui.discardPile) {
+							_status.discarded.add(cardx[j]);
+						} else {
+							_status.discarded.remove(cardx[j]);
+						}
+					}
+					if (event.insert_index) {
+						cardx[j].fix();
+						event.position.insertBefore(cardx[j], event.insert_index(event, cardx[j]));
+					} else if (event.insert_card) {
+						cardx[j].fix();
+						event.position.insertBefore(cardx[j], event.position.firstChild);
+					} else if (event.position == ui.cardPile) {
+						cardx[j].fix();
+						event.position.appendChild(cardx[j]);
+					} else cardx[j].goto(event.position);
+				} else {
+					cardx[j].remove();
+				}
+				//if(ss.includes(cardx[j])) cards.splice(i--,1);
 			}
-			//if(ss.includes(cards[i])) cards.splice(i--,1);
 		}
 		if (player == game.me) ui.updatehl();
 		ui.updatej(player);
@@ -8516,9 +8518,7 @@ export const Content = {
 		if (num < cards.length) {
 			if (event.es.includes(cards[num])) {
 				event.loseEquip = true;
-				const VEquip = player.getVCards("e").find(card => {
-					return card.cards?.includes(cards[num]);
-				});
+				const VEquip = cards[num].card;
 				if (VEquip) {
 					player.removeVirtualEquip(VEquip);
 					//player.removeEquipTrigger(cards[num]);
