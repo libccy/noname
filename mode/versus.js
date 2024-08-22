@@ -2008,11 +2008,7 @@ export default () => {
 							} else {
 								dialog =
 									event.xdialog ||
-									ui.create.characterDialog(
-										"heightset",
-										event.filterChoice,
-										"character"
-									);
+									ui.create.characterDialog("heightset", event.filterChoice);
 							}
 						}
 						var names = [];

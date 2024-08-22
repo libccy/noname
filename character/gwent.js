@@ -597,159 +597,6 @@ game.import("character", function () {
 					},
 				},
 			},
-			gwmaoxian_old: {
-				trigger: { global: "gameStart", player: ["enterGame", "phaseBefore"] },
-				forced: true,
-				filter(event, player) {
-					return !player.storage.gwmaoxian;
-				},
-				content() {
-					player.storage.gwmaoxian = 10;
-					player.storage.gwmaoxian_skill = [];
-					event.insert(lib.skill.gwmaoxian.learn, { player: player });
-				},
-				learn() {
-					var list = {
-						draw: {
-							bronze: [1, "准备阶段，你获得一张随机铜卡法术"],
-							basic: [1, "准备阶段，你从牌堆中获得一张杀"],
-							silver: [2, "结束阶段，你获得一张随机银卡法术"],
-							trick: [3, "结束阶段，你发现一张普通锦囊牌"],
-							gold: [3, "出牌阶段开始时，你获得一张随机金卡法术"],
-							equip: [3, "出牌阶段开始时，你在装备区内的空余位置装备一件随机装备"],
-						},
-						attack: {
-							sha: [1, "你可以将一张手牌当作杀使用"],
-							huogong: [1, "你可以将一张手牌当作火攻使用"],
-							aoe: [2, "出牌阶段限一次，你可以弃置两张牌，视为使用一张南蛮入侵"],
-							shas: [2, "每当你使用一张杀，你可以追加一名无视距离的目标"],
-						},
-						defend: {},
-						assist: {},
-						control: {},
-					};
-				},
-			},
-			gwminxiang_old: {
-				group: ["gwminxiang_count", "gwminxiang_clear", "gwminxiang_use"],
-				subSkill: {
-					count: {
-						trigger: { player: "phaseBegin" },
-						silent: true,
-						content() {
-							player.storage.gwminxiang = [];
-						},
-					},
-					clear: {
-						trigger: { player: "phaseAfter" },
-						silent: true,
-						content() {
-							delete player.storage.gwminxiang;
-						},
-					},
-					use: {
-						trigger: { player: "useCardAfter" },
-						silent: true,
-						filter(event, player) {
-							if (_status.currentPhase != player) return false;
-							var type = get.type(event.card);
-							if (type != "trick" && type != "basic") return false;
-							if (get.info(event.card).multitarget) return false;
-							if (!player.storage.gwminxiang) return false;
-							return true;
-						},
-						content() {
-							player.storage.gwminxiang.add(trigger.card);
-						},
-					},
-				},
-				trigger: { player: "phaseEnd" },
-				direct: true,
-				filter(event, player) {
-					if (player.storage.gwminxiang) {
-						for (var i = 0; i < player.storage.gwminxiang.length; i++) {
-							var card = player.storage.gwminxiang[i];
-							if (
-								game.countPlayer(function (current) {
-									return (
-										current != player && lib.filter.targetEnabled3(card, player, current)
-									);
-								}) > 1
-							) {
-								return true;
-							}
-						}
-					}
-					return false;
-				},
-				content() {
-					"step 0";
-					var list = [];
-					for (var i = 0; i < player.storage.gwminxiang.length; i++) {
-						var card = player.storage.gwminxiang[i];
-						if (
-							game.countPlayer(function (current) {
-								return current != player && lib.filter.targetEnabled3(card, player, current);
-							}) > 1
-						) {
-							list.push(card);
-						}
-					}
-					var skip = ["shunshou", "huogong", "shandianjian", "jiu"];
-					player.chooseCardButton(get.prompt("gwminxiang"), list).set("ai", function (button) {
-						if (skip.includes(button.link.name)) return 0;
-						var val = get.value(button.link);
-						if (get.tag(button.link, "damage")) {
-							val += 3;
-						}
-						return val;
-					});
-					"step 1";
-					if (result.bool) {
-						var card = result.links[0];
-						event.card = card;
-						player
-							.chooseTarget(
-								"选择两个目标互相使用" + get.translation(event.card),
-								2,
-								function (cardx, player, target) {
-									return (
-										target != player && lib.filter.targetEnabled3(card, player, target)
-									);
-								}
-							)
-							.set("ai", function (target) {
-								if (ui.selected.targets.length) {
-									return get.effect(target, card, ui.selected.targets[0], player);
-								}
-								return get.effect(target, card, target, player);
-							})
-							.set("targetprompt", ["先出牌", "后出牌"]);
-					} else {
-						event.finish();
-					}
-					"step 2";
-					if (result.bool) {
-						player.$throw(event.card);
-						player.logSkill("gwminxiang", result.targets);
-						event.target1 = result.targets[0];
-						event.target2 = result.targets[1];
-						game.delay();
-					} else {
-						event.finish();
-					}
-					"step 3";
-					event.target1.useCard(event.card, event.target2, "noai");
-					"step 4";
-					if (event.target1.isIn() && event.target2.isIn()) {
-						event.target2.useCard(event.card, event.target1, "noai");
-					}
-				},
-				ai: {
-					expose: 0.4,
-					threaten: 1.6,
-				},
-			},
 			gwminxiang: {
 				enable: "phaseUse",
 				usable: 1,
@@ -1984,38 +1831,6 @@ game.import("character", function () {
 					player.gain(game.createCard("gw_shizizhaohuan"), "gain2");
 				},
 			},
-			jielue_old: {
-				trigger: { player: "useCard" },
-				frequent: true,
-				oncancel(event, player) {
-					player.addTempSkill("jielue2");
-				},
-				usable: 1,
-				filter(event, player) {
-					if (event.card.isCard) {
-						return (
-							!player.hasSkill("jielue2") &&
-							get.type(event.card) == "basic" &&
-							!event.card.storage.jielue
-						);
-					}
-					return false;
-				},
-				check(event, player) {
-					return get.value(event.card) > 3;
-				},
-				content() {
-					var card1 = game.createCard(trigger.card);
-					var card2 = game.createCard(trigger.card);
-					card1.storage.jielue = true;
-					card2.storage.jielue = true;
-					player.gain([card1, card2], "gain2");
-				},
-				ai: {
-					pretao: true,
-				},
-			},
-			jielue2: {},
 			bolang: {
 				trigger: { player: "phaseBegin" },
 				frequent: true,
@@ -2426,64 +2241,6 @@ game.import("character", function () {
 				},
 				// group:'junchi_gold'
 			},
-			junchi_old: {
-				trigger: { global: "shaAfter" },
-				forced: true,
-				popup: false,
-				filter(event, player) {
-					return (
-						event.player != player &&
-						event.target != player &&
-						event.player.isIn() &&
-						event.player.countCards("he") > 0
-					);
-				},
-				content() {
-					"step 0";
-					var att = get.attitude(trigger.player, player);
-					trigger.player.chooseCard("he", "是否交给" + get.translation(player) + "一张牌？").ai =
-						function (card) {
-							if (att > 1) {
-								if (trigger.target.isIn()) {
-									return 9 - get.value(card);
-								}
-								return 4 - get.value(card);
-							}
-							return 0;
-						};
-					"step 1";
-					if (result.bool) {
-						player.logSkill("junchi");
-						player.gain(result.cards, trigger.player);
-						if (get.position(result.cards[0]) == "h") {
-							trigger.player.$giveAuto(result.cards, player);
-						} else {
-							trigger.player.$give(result.cards, player);
-						}
-						trigger.player.addExpose(0.2);
-						trigger.player.line(player, "green");
-					} else {
-						event.finish();
-					}
-					"step 2";
-					if (trigger.target.isIn()) {
-						var next = player
-							.chooseToUse(
-								"是否对" + get.translation(trigger.target) + "使用一张牌？",
-								trigger.target,
-								-1
-							)
-							.set("targetRequired", true);
-						next.filterCard = function (card) {
-							return player.canUse(card, trigger.target, false) && !get.info(card).multitarget;
-						};
-						next.oncard = function () {
-							player.recover();
-							trigger.player.draw();
-						};
-					}
-				},
-			},
 			hupeng: {
 				enable: "phaseUse",
 				usable: 1,
@@ -2706,7 +2463,6 @@ game.import("character", function () {
 				},
 			},
 			hunmo2: {},
-			hunmo3: {},
 			shuijian: {
 				trigger: { player: "phaseBegin" },
 				direct: true,
@@ -2961,38 +2717,6 @@ game.import("character", function () {
 							}
 							return -1;
 						},
-					},
-				},
-			},
-			nuhou_old: {
-				enable: "phaseUse",
-				usable: 1,
-				position: "he",
-				filterCard: true,
-				check(card) {
-					return 7 - get.value(card);
-				},
-				content() {
-					"step 0";
-					var list = player.getEnemies();
-					list.sortBySeat();
-					event.list = list;
-					"step 1";
-					if (event.list.length) {
-						var current = event.list.shift();
-						var he = current.getCards("he");
-						player.line(current, "green");
-						if (he.length) {
-							current.discard(he.randomGet());
-							current.addExpose(0.2);
-						}
-						event.redo();
-					}
-				},
-				ai: {
-					order: 8.5,
-					result: {
-						player: 1,
 					},
 				},
 			},
@@ -3484,76 +3208,6 @@ game.import("character", function () {
 							return -Math.sqrt(target.countCards("h"));
 						},
 					},
-				},
-			},
-			hunmo_old: {
-				enable: "phaseUse",
-				usable: 1,
-				filterTarget(card, player, target) {
-					return target.countCards("h") != Math.min(3, player.hp);
-				},
-				selectTarget: [1, 3],
-				content() {
-					var dh = Math.min(3, player.hp) - target.countCards("h");
-					if (dh > 0) {
-						target.draw(dh, false);
-						target.$draw(dh);
-						game.delay(0.5);
-					} else if (dh < 0) {
-						target.chooseToDiscard(-dh, true);
-						if (player != target) player.useCard({ name: "sha" }, target, false);
-					}
-				},
-				ai: {
-					order: 11,
-					result: {
-						target(player, target) {
-							var dh = Math.min(3, player.hp) - target.countCards("h");
-							if (dh < 0) {
-								dh += get.sgn(get.effect(target, { name: "sha" }, player, target));
-							}
-							return dh;
-						},
-					},
-				},
-			},
-			hunmo_old2: {
-				trigger: { player: ["phaseBegin", "phaseEnd"] },
-				direct: true,
-				content() {
-					"step 0";
-					player.chooseTarget(
-						get.prompt("hunmo"),
-						[1, game.countPlayer()],
-						function (card, player, target) {
-							return target.countCards("h") != Math.min(3, target.hp);
-						}
-					).ai = function (target) {
-						return (
-							get.attitude(player, target) * (Math.min(3, target.hp) - target.countCards("h"))
-						);
-					};
-					"step 1";
-					if (result.bool) {
-						player.logSkill("hunmo", result.targets);
-						event.targets = result.targets.slice(0);
-						event.targets.sortBySeat();
-					} else {
-						event.finish();
-					}
-					"step 2";
-					if (event.targets.length) {
-						var target = event.targets.shift();
-						var dh = Math.min(3, target.hp) - target.countCards("h");
-						if (dh > 0) {
-							target.draw(dh, false);
-							target.$draw(dh);
-						} else if (dh < 0) {
-							target.chooseToDiscard(-dh, true).delay = false;
-						}
-						game.delay(0.5);
-						event.redo();
-					}
 				},
 			},
 			huihun: {
@@ -4792,8 +4446,6 @@ game.import("character", function () {
 			gwhuanbi_info:
 				"出牌阶段限一次，你可以弃置一张牌，并创造一张冒险牌，然后随机选择一名有手牌的角色，被选中的角色可以交给你一张手牌并获得一张该牌的复制。",
 			gwminxiang: "冥想",
-			gwminxiang_old_info:
-				"结束阶段，你可以选择一张本回合使用过的基本牌或普通锦囊牌并选择两名其他角色，令目标分别视为对对方使用一张此牌的复制。",
 			gwminxiang_info:
 				"出牌阶段限一次，你可以弃置一张基本牌或普通锦囊牌并摸一张牌，然后选择其他两名角色，令目标分别视为对对方使用一张你弃置的牌的同名牌。",
 			gwlangshi: "狼噬",
@@ -4863,8 +4515,6 @@ game.import("character", function () {
 			jielue: "劫掠",
 			jielue_info:
 				"锁定技，出牌阶段开始时，你从两个随机队友处各获得一张可使用的牌并依次使用之，然后被拿牌的队友摸一张牌。",
-			jielue_old_info:
-				"当你于回合内首次使用基本牌时，你可以获得两张该牌的复制（使用复制的牌时不触发此技能）。",
 			gwfengchi: "风驰",
 			gwfengchi_info:
 				"锁定技，出牌阶段开始时，你随机观看3个可以在出牌阶段使用的技能，并获得其中一个技能直到此阶段结束。",
@@ -4887,8 +4537,6 @@ game.import("character", function () {
 			junchi: "骏驰",
 			junchi_info:
 				"每当一名其他角色使用一张【杀】，若目标不是你，你可以对【杀】的目标使用一张牌，并摸一张牌，每回合限一次。",
-			junchi_old_info:
-				"当一名其他角色使用【杀】对一个目标结算后，该角色可以交给你一张牌，然后你可以对【杀】的目标使用一张牌，若如此做，你回复1点体力，【杀】的使用者摸一张牌。",
 			gw_dudayuanshuai1: "杜达元帅",
 			gw_dudayuanshuai1_info:
 				"当你成为其他角色使用牌的目标时，你可以使用此牌取消之，然后获得对你使用的牌。",
