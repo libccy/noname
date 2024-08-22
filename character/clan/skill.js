@@ -2307,6 +2307,7 @@ const skills = {
 			return game.hasPlayer(current => !current.isLinked());
 		},
 		direct: true,
+		seatRelated: true,
 		content() {
 			"step 0";
 			player

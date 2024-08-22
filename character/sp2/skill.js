@@ -1788,7 +1788,7 @@ const skills = {
 				},
 				direct: true,
 				content: function () {
-					player.chooseUseTarget(trigger.cards[0], get.prompt("dcjiaoxia"), false, false).set("prompt2", "使用" + get.translation(card)).logSkill = "dcjiaoxia";
+					player.chooseUseTarget(trigger.cards[0], get.prompt("dcjiaoxia"), false, false).set("prompt2", "使用" + get.translation(trigger.cards[0])).logSkill = "dcjiaoxia";
 				},
 			},
 		},
@@ -2759,7 +2759,7 @@ const skills = {
 			},
 			*/
 			attackRange: function (player, num) {
-				if (!player.getEquips(1).length) return num + 1;
+				return num + 1;
 			},
 			selectTarget: function (card, player, range) {
 				if (card.name == "sha") {

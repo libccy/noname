@@ -10209,12 +10209,19 @@ const skills = {
 					evt.relatedEvent = trigger.relatedEvent || trigger.getParent(2);
 					if (trigger.skill) evt.skill = trigger.skill;
 					else delete evt.skill;
+					evt.wumei_phase = true;
+					if (!lib.onround.includes(lib.skill.dcwumei.onRound)) {
+						lib.onround.push(lib.skill.dcwumei.onRound);
+					}
 					game.broadcastAll(function (player) {
 						player.classList.remove("glow_phase");
 						delete _status.currentPhase;
 					}, player);
 				}
 			}
+		},
+		onRound(event) {
+			return !event.wumei_phase;
 		},
 		subSkill: {
 			used: { charlotte: true },
@@ -13733,6 +13740,7 @@ const skills = {
 			});
 			return num >= 2;
 		},
+		seatRelated: true,
 		logTarget: "player",
 		check: function (event, player) {
 			return get.attitude(player, event.player) <= 0;
@@ -14565,6 +14573,7 @@ const skills = {
 		filter: function (event, player) {
 			return event.player.getSeatNum() == game.roundNumber && player.countCards("h") > 0;
 		},
+		seatRelated: true,
 		content: function () {
 			"step 0";
 			var suits = [],

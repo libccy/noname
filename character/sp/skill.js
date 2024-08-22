@@ -13993,12 +13993,16 @@ const skills = {
 		ai: {
 			result: {
 				player: function (player, target) {
-					return (target.getAllHistory("useCard", evt => evt.card.name == "sha").length + 1) * lib.card.juedou.ai.result.player.apply(this, arguments);
+					let num = target.getAllHistory("useCard", evt => evt.card.name == "sha").length + 1;
+					if (num < target.hp) return 0;
+					return num * lib.card.juedou.ai.result.player.apply(this, arguments);
 				},
 				target: function (player, target) {
-					var num = target.getAllHistory("useCard", evt => evt.card.name == "sha").length + 1;
+					let num = target.getAllHistory("useCard", evt => evt.card.name == "sha").length + 1;
 					if (num < target.hp) return 0;
-					return num * lib.card.juedou.ai.result.target;
+					let res = num * lib.card.juedou.ai.result.target.apply(this, arguments);
+					if (res >= 0) return 0;
+					return res;
 				},
 			},
 		},

@@ -935,6 +935,7 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		changeSeat: true,
+		seatRelated: true,
 		limited: true,
 		skillAnimation: true,
 		animationColor: "orange",

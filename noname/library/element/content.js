@@ -8370,10 +8370,12 @@ export const Content = {
 			} else if (cards[i].parentNode) {
 				if (cards[i].parentNode.classList.contains("equips")) {
 					cards[i].original = "e";
-					es.push(cards[i]);
 					let loseCards = cards[i].cards ? cards[i].cards : [cards[i]];
 					cardx.addArray(loseCards);
-					event.vcard_map.set(loseCards, cards[i].card || get.autoViewAs(cards[i], void 0, false));
+					loseCards.forEach(cardi => {
+						es.push(cardi);
+						event.vcard_map.set(cardi, cards[i].card || get.autoViewAs(cards[i], void 0, false));
+					});
 				} else if (cards[i].parentNode.classList.contains("judges")) {
 					cards[i].original = "j";
 					js.push(cards[i]);
@@ -8516,7 +8518,7 @@ export const Content = {
 		}
 		"step 2";
 		if (num < cards.length) {
-			if (event.es.includes(cards[num])) {
+			if (event.es.includes(cards[num]) || cards[num].cards?.some(i => event.es.includes(i))) {
 				event.loseEquip = true;
 				const VEquip = cards[num].card;
 				if (VEquip) {
@@ -8572,6 +8574,7 @@ export const Content = {
 		event.num++;
 		event.goto(2);
 		"step 4";
+		event.cards = cards.map(i => i.cards ? i.cards : [i]).flat();
 		if (event.toRenku) {
 			_status.renku.addArray(
 				cards.filter(function (card) {

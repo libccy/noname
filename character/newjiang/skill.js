@@ -1358,6 +1358,7 @@ const skills = {
 			);
 		},
 		direct: true,
+		seatRelated: true,
 		content: function () {
 			"step 0";
 			var zhu = game.findPlayer(i => i.getSeatNum() == 1);

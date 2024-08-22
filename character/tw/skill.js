@@ -10929,12 +10929,22 @@ const skills = {
 				logTarget: "player",
 				charlotte: true,
 				filter: function (event, player) {
-					return event.player.hasHistory("lose", evt => {
+					return player !== event.player && event.player.hasHistory("lose", evt => {
 						if (event != evt.getParent()) return false;
 						for (var i in evt.gaintag_map) {
 							if (evt.gaintag_map[i].includes("twkujianx")) return true;
 						}
 					});
+				},
+				getIndex(event, player) {
+					let num = 0;
+					event.player.getHistory("lose", evt => {
+						if (event != evt.getParent()) return false;
+						for (let i in evt.gaintag_map) {
+							if (evt.gaintag_map[i].includes("twkujianx")) num++;
+						}
+					});
+					return num;
 				},
 				content: function () {
 					"step 0";
@@ -10949,30 +10959,10 @@ const skills = {
 					global: ["loseAfter", "equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 				},
 				forced: true,
-				logTarget: function (event, player) {
-					return game.filterPlayer(function (current) {
-						var evt = event.getl(current);
-						if (!evt || !evt.hs || !evt.hs.length) return false;
-						if (event.name == "lose") {
-							var name = event.getParent().name;
-							if (name == "useCard" || name == "respond") return false;
-							for (var i in event.gaintag_map) {
-								if (event.gaintag_map[i].includes("twkujianx")) return true;
-							}
-							return false;
-						}
-						return current.hasHistory("lose", function (evt) {
-							if (event != evt.getParent()) return false;
-							for (var i in evt.gaintag_map) {
-								if (evt.gaintag_map[i].includes("twkujianx")) return true;
-							}
-							return false;
-						});
-					});
-				},
 				charlotte: true,
 				filter: function (event, player) {
 					return game.hasPlayer(function (current) {
+						if (player === current) return false;
 						var evt = event.getl(current);
 						if (!evt || !evt.hs || !evt.hs.length) return false;
 						if (event.name == "lose") {
@@ -10992,35 +10982,38 @@ const skills = {
 						});
 					});
 				},
-				content: function () {
-					"step 0";
-					var event = trigger;
-					var targets = game.filterPlayer(function (current) {
-						var evt = event.getl(current);
+				getIndex(event, player) {
+					let targets = [];
+					game.filterPlayer(current => {
+						if (player === current) return false;
+						let evt = event.getl(current);
 						if (!evt || !evt.hs || !evt.hs.length) return false;
 						if (event.name == "lose") {
-							var name = event.getParent().name;
+							let name = event.getParent().name;
 							if (name == "useCard" || name == "respond") return false;
-							for (var i in event.gaintag_map) {
-								if (event.gaintag_map[i].includes("twkujianx")) return true;
+							for (let i in event.gaintag_map) {
+								if (event.gaintag_map[i].includes("twkujianx")) targets.push(current);
 							}
 							return false;
 						}
 						return current.hasHistory("lose", function (evt) {
 							if (event != evt.getParent()) return false;
-							for (var i in evt.gaintag_map) {
-								if (evt.gaintag_map[i].includes("twkujianx")) return true;
+							for (let i in evt.gaintag_map) {
+								if (evt.gaintag_map[i].includes("twkujianx")) targets.push(current);
 							}
 							return false;
 						});
 					});
-					targets.add(player);
-					targets.sortBySeat();
-					_status.event.targets = targets;
-					"step 1";
-					var target = targets.shift();
-					if (target.countCards("he") > 0) target.chooseToDiscard("he", true);
-					if (targets.length > 0) event.redo();
+					return targets.sortBySeat();
+				},
+				logTarget(event, player, triggername, target) {
+					return target;
+				},
+				async content(event, trigger, player) {
+					let targets = [player, event.targets[0]].sortBySeat();
+					for (let tar of targets) {
+						if (tar.countCards("he") > 0) await tar.chooseToDiscard("he", true);
+					}
 				},
 			},
 			ai: {
