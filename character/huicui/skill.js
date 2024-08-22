@@ -2,49 +2,6 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
-	//马腾
-	dcxiongyi: {
-		skillAnimation: true,
-		animationColor: "gray",
-		unique: true,
-		enable: "phaseUse",
-		audio: 2,
-		limited: true,
-		filterTarget: lib.filter.notMe,
-		async content(event,trigger,player) {
-			player.awakenSkill(event.name);
-			await game.asyncDraw([event.target,player], 3);
-			if(game.getAllGlobalHistory("everything",evt=>{
-				return evt.name==event.name&&evt.player==player;
-			}).indexOf(event)==0&&player.isMinHp(true)){
-				if(player.isDamaged()) await player.recover();
-			}
-			player.addAdditionalSkill(event.name,"dcxiongyi_restore");
-		},
-		ai: {
-			order: 1,
-			result: {
-				target: 1,
-			},
-		},
-		subSkill:{
-			restore:{
-					trigger:{
-						player:"dyingAfter",
-					},
-					charlotte:true,
-					direct:true,
-					filter(event,player){
-						return player.isIn();
-					},
-					async content(event,trigger,player){
-						game.log(player,"重置了","#g【雄异】");
-						player.restoreSkill("dcxiongyi");
-						player.addAdditionalSkill("dcxiongyi",[]);
-					},
-			},
-		},
-	},
 	//群祝融 
 	dcmanhou: {
 		audio: 2,

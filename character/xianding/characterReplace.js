@@ -18,7 +18,6 @@ const characterReplaces = {
 	zhangxiu: ["zhangxiu", "dc_sb_zhangxiu"],
 	yuanji: ["yuanji", "ol_yuanji"],
 	zhangfen: ["zhangfen", "mb_zhangfen"],
-	dc_tianfeng: ["dc_tianfeng", "tianfeng"],
 };
 
 export default characterReplaces;

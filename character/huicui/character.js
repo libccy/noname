@@ -1,5 +1,4 @@
 const characters = {
-	dc_mateng: ["male", "qun", 4, ["mashu", "dcxiongyi"]],
 	dc_sp_zhurong: ["female", "qun", 4, ["dcmanhou"]],
 	yue_zhugeguo: ["female", "shu", 3, ["dcxidi", "dcchengyan"], ["name:诸葛|果"]],
 	yue_zoushi: ["female", "qun", 3, ["dcyunzheng", "dchuoxin"], ["name:邹|null"]],
