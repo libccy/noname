@@ -566,6 +566,7 @@ const skills = {
 					return true;
 			},
 		},
+		locked:false,
 		onremove: true,
 		derivation: "twbeidingx",
 		group: ["twbeiding_record", "twbeiding_use", "twbeiding_huan"],
@@ -687,6 +688,7 @@ const skills = {
 		audioname: ["huan_zhugeliang_shadow"],
 		derivation: "twjielvx",
 		group: ["twjielv_lose", "twjielv_buff", "twjielv_huan"],
+		locked:true,
 		subSkill: {
 			lose: {
 				audio: "twjielv",
