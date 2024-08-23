@@ -9834,7 +9834,7 @@ const skills = {
 				.forResult();
 		},
 		async content(event, trigger, player) {
-			const target = result.targets[0];
+			const target = event.targets[0];
 			player.addTempSkill("jsrgpingrong_used", "roundStart");
 			target.removeMark("jsrgzhenglve_mark", target.countMark("jsrgzhenglve_mark"));
 			player.insertPhase();
