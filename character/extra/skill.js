@@ -802,10 +802,10 @@ const skills = {
 				const next = player.chooseButton(2, ["连破：请选择你要移去的“忍”标记数和相应操作", '<div class="text center">移去“忍”标记数</div>', [choices, "tdnodes"], '<div class="text center">执行的操作</div>', [skills.map(i => [i, `获得【${get.translation(i)}】`]).concat(["摸牌"]), "tdnodes"]]);
 				next.set("filterButton", button => {
 					const link = button.link;
-					if (!ui.selected.buttons.length && typeof link == "number") return false;
+					if (Boolean(ui.selected.buttons.length) !== (typeof link == "number")) return false;
 					if (ui.selected.buttons.length) {
-						if (typeof link !== "number") return false;
-						return ui.selected.buttons[0].link == "摸牌" || link == get.event("num") - 1;
+						if (ui.selected.buttons[0].link == "摸牌") return link <= 1;
+						return link == get.event("num") - 1;
 					}
 					return true;
 				});
@@ -832,19 +832,19 @@ const skills = {
 				};
 			} else {
 				const draw = Array.from({
-					length: limit,
+					length: Math.min(2, limit),
 				}).map((_, i) => get.cnNumber(i + 1, true));
 				const { result } = await player
 					.chooseControl(draw, "cancel2")
 					.set("prompt", get.prompt("xinrenjie"))
-					.set("prompt2", `你可以摸至多${get.cnNumber(draw.length)}张牌并移去等量枚“忍”标记`)
+					.set("prompt2", `你可以移去至多${get.cnNumber(draw.length)}枚“忍”标记并摸等量张牌`)
 					.set("ai", () => {
 						return get.event("choice");
 					})
 					.set(
 						"choice",
 						(function () {
-							if (!player.hasSkill("jizhi", null, null, false)) return "cancel2";
+							if (!player.hasSkill("rejizhi", null, null, false)) return "cancel2";
 							return choices.length - 1;
 						})()
 					);
