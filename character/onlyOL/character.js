@@ -1,5 +1,5 @@
 const characters = {
-	ol_sb_sunjian: ["male", "wu", 4, ["olsbhulie", "olsbyipo"]],
+	ol_sb_sunjian: ["male", "wu", "4/5", ["olsbhulie", "olsbyipo"]],
 	ol_sb_jiangwei: ["male", "shu", 4, ["olsbzhuri", "olsbranji"]],
 	ol_caozhang: ["male", "wei", 4, ["oljiangchi"], ["die:xin_caozhang"]],
 	ol_jianyong: ["male", "shu", 3, ["olqiaoshui", "jyzongshi"], ["tempname:re_jianyong", "die:re_jianyong"]],
