@@ -672,20 +672,20 @@ game.import("card", function () {
 					if (game.online) {
 						return;
 					}
-					if (!muniu.storages) {
-						muniu.storages = [];
+					if (!muniu.storagesCards) {
+						muniu.storagesCards = [];
 					}
-					for (var i = 0; i < muniu.storages.length; i++) {
-						if (get.position(muniu.storages[i]) != "s") {
-							muniu.storages.splice(i--, 1);
+					for (var i = 0; i < muniu.storagesCards.length; i++) {
+						if (get.position(muniu.storagesCards[i]) != "s") {
+							muniu.storagesCards.splice(i--, 1);
 						}
 					}
 					game.broadcast(
 						function (muniu, cards) {
-							muniu.storages = cards;
+							muniu.storagesCards = cards;
 						},
 						muniu,
-						muniu.storages
+						muniu.storagesCards
 					);
 				},
 				filter: function (event, player) {
@@ -716,14 +716,14 @@ game.import("card", function () {
 						event.finish();
 						return;
 					}
-					if (muniu.storages == undefined) muniu.storages = [];
-					muniu.storages.push(cards[0]);
+					if (muniu.storagesCards == undefined) muniu.storagesCards = [];
+					muniu.storagesCards.push(cards[0]);
 					game.broadcast(
 						function (muniu, cards) {
-							muniu.storages = cards;
+							muniu.storagesCards = cards;
 						},
 						muniu,
-						muniu.storages
+						muniu.storagesCards
 					);
 					game.delayx();
 					"step 2";
@@ -774,10 +774,10 @@ game.import("card", function () {
 					cardEnabled2: function (card, player) {
 						if (!ui.selected.cards.length) return;
 						var muniu = player.getEquip("muniu");
-						if (!muniu || !muniu.storages || !muniu.storages.length) return;
+						if (!muniu || !muniu.storagesCards || !muniu.storagesCards.length) return;
 						for (var i of ui.selected.cards) {
-							if (muniu.cards?.includes(i) && muniu.storages.includes(card)) return false;
-							if (muniu.storages.includes(i) && card == muniu) return false;
+							if (muniu.cards?.includes(i) && muniu.storagesCards.includes(card)) return false;
+							if (muniu.storagesCards.includes(i) && card == muniu) return false;
 						}
 					},
 				},
@@ -786,25 +786,25 @@ game.import("card", function () {
 				intro: {
 					content: function (storage, player) {
 						var muniu = player.getEquip("muniu");
-						if (!muniu || !muniu.storages || !muniu.storages.length) return "共有零张牌";
+						if (!muniu || !muniu.storagesCards || !muniu.storagesCards.length) return "共有零张牌";
 						if (player.isUnderControl(true)) {
-							return get.translation(muniu.storages);
+							return get.translation(muniu.storagesCards);
 						} else {
-							return "共有" + get.cnNumber(muniu.storages.length) + "张牌";
+							return "共有" + get.cnNumber(muniu.storagesCards.length) + "张牌";
 						}
 					},
 					mark: function (dialog, storage, player) {
 						var muniu = player.getEquip("muniu");
-						if (!muniu || !muniu.storages || !muniu.storages.length) return "共有零张牌";
+						if (!muniu || !muniu.storagesCards || !muniu.storagesCards.length) return "共有零张牌";
 						if (player.isUnderControl(true)) {
-							dialog.addAuto(muniu.storages);
+							dialog.addAuto(muniu.storagesCards);
 						} else {
-							return "共有" + get.cnNumber(muniu.storages.length) + "张牌";
+							return "共有" + get.cnNumber(muniu.storagesCards.length) + "张牌";
 						}
 					},
 					markcount: function (storage, player) {
 						var muniu = player.getEquip("muniu");
-						if (muniu && muniu.storages) return muniu.storages.length;
+						if (muniu && muniu.storagesCards) return muniu.storagesCards.length;
 						return 0;
 					},
 				},
@@ -817,17 +817,17 @@ game.import("card", function () {
 				filter: function (event, player) {
 					if (!event.ss || !event.ss.length || event.parent.name == "lose_muniu") return false;
 					var muniu = player.getEquip("muniu");
-					if (!muniu || !muniu.storages) return false;
+					if (!muniu || !muniu.storagesCards) return false;
 					return (
 						event.ss.filter(function (card) {
-							return muniu.storages.includes(card);
+							return muniu.storagesCards.includes(card);
 						}).length > 0
 					);
 				},
 				content: function () {
 					var muniu = player.getEquip("muniu");
-					if (muniu && muniu.storages) {
-						muniu.storages.removeArray(trigger.ss);
+					if (muniu && muniu.storagesCards) {
+						muniu.storagesCards.removeArray(trigger.ss);
 						lib.skill.muniu_skill.sync(muniu);
 					}
 					player.updateMarks();
