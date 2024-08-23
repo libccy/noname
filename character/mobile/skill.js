@@ -16978,11 +16978,7 @@ const skills = {
 				}
 			}
 		},
-	},
-	xinfu_jingxie1: {
-		group: ["xinfu_jingxie2"],
 		position: "he",
-		audio: "xinfu_jingxie",
 		enable: "phaseUse",
 		filter: function (event, player) {
 			var he = player.getCards("he");
@@ -17006,19 +17002,17 @@ const skills = {
 			"step 1";
 			var card = cards[0];
 			var bool = get.position(card) == "e";
-			if (bool) player.removeEquipTrigger(card);
+			if (bool) player.removeEquipTrigger(card.card || card);
 			game.addVideo("skill", player, ["xinfu_jingxie", [bool, get.cardInfo(card)]]);
-			game.broadcastAll(function (card) {
+			game.broadcastAll(function (card, bool) {
 				card.init([card.suit, card.number, "rewrite_" + card.name]);
-			}, card);
-			if (bool) {
-				var info = get.info(card);
-				if (info.skills) {
-					for (var i = 0; i < info.skills.length; i++) {
-						player.addSkillTrigger(info.skills[i]);
-					}
+				if (bool && card.card && player.vcardsMap?.equips) {
+					const cardx = game.createCard("rewrite_" + card.card.name, card.card.suit, card.card.number);
+					player.vcardsMap.equips[player.vcardsMap.equips.indexOf(card.card)] = cardx;
+					card.card = cardx;
 				}
-			}
+			}, card, bool);
+			if (bool) player.addEquipTrigger(card.card || card);
 		},
 		ai: {
 			basic: {
@@ -17028,38 +17022,41 @@ const skills = {
 				player: 1,
 			},
 		},
-	},
-	xinfu_jingxie2: {
-		prompt: "重铸一张防具牌，然后将体力回复至1点。",
-		audio: "xinfu_jingxie",
-		enable: "chooseToUse",
-		filterCard: (card, player) => get.subtype(card) == "equip2" && player.canRecast(card),
-		filter: (event, player) => {
-			if (event.type != "dying") return false;
-			if (player != event.dying) return false;
-			return player.hasCard(card => lib.skill.xinfu_jingxie2.filterCard(card, player), "he");
-		},
-		position: "he",
-		discard: false,
-		lose: false,
-		delay: false,
-		content: function () {
-			"step 0";
-			player.recast(cards);
-			"step 1";
-			var num = 1 - player.hp;
-			if (num) player.recover(num);
-		},
-		ai: {
-			order: 0.5,
-			skillTagFilter: function (player, arg, target) {
-				if (player != target) return false;
-				return player.hasCard(card => (_status.connectMode && get.position(card) == "h") || (get.subtype(card) == "equip2" && player.canRecast(card)), "he");
-			},
-			save: true,
-			result: {
-				player: function (player) {
-					return 10;
+		group: ["xinfu_jingxie_recast"],
+		subSkill: {
+			recast: {
+				audio: "xinfu_jingxie",
+				enable: "chooseToUse",
+				filterCard: (card, player) => get.subtype(card) == "equip2" && player.canRecast(card),
+				filter: (event, player) => {
+					if (event.type != "dying") return false;
+					if (player != event.dying) return false;
+					return player.hasCard(card => lib.skill.xinfu_jingxie.subSkill.recast.filterCard(card, player), "he");
+				},
+				position: "he",
+				discard: false,
+				lose: false,
+				delay: false,
+				prompt: "重铸一张防具牌，然后将体力回复至1点。",
+				content: function () {
+					"step 0";
+					player.recast(cards);
+					"step 1";
+					var num = 1 - player.hp;
+					if (num) player.recover(num);
+				},
+				ai: {
+					order: 0.5,
+					skillTagFilter: function (player, arg, target) {
+						if (player != target) return false;
+						return player.hasCard(card => (_status.connectMode && get.position(card) == "h") || (get.subtype(card) == "equip2" && player.canRecast(card)), "he");
+					},
+					save: true,
+					result: {
+						player: function (player) {
+							return 10;
+						},
+					},
 				},
 			},
 		},
