@@ -973,6 +973,7 @@ const skills = {
 		},
 	},
 	drlt_qianjie: {
+		audio: 2,
 		group: ["drlt_qianjie_1", "drlt_qianjie_2", "drlt_qianjie_3"],
 		locked: true,
 		ai: {

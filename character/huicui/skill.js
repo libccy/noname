@@ -7691,6 +7691,7 @@ const skills = {
 	},
 	//陈矫
 	dcxieshou: {
+		audio: 2,
 		trigger: {
 			global: "damageEnd",
 		},
@@ -7756,6 +7757,7 @@ const skills = {
 		},
 	},
 	dcqingyan: {
+		audio: 2,
 		trigger: {
 			target: "useCardToTargeted",
 		},
@@ -8915,6 +8917,7 @@ const skills = {
 		subSkill: { backup: {} },
 	},
 	xianwang: {
+		audio: 2,
 		mod: {
 			globalTo: function (source, player, distance) {
 				var num = player.countDisabledSlot();
@@ -10313,6 +10316,7 @@ const skills = {
 		},
 	},
 	lieyi: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -10367,6 +10371,7 @@ const skills = {
 	},
 	//马日磾
 	bingjie: {
+		audio: 2,
 		trigger: { player: "phaseUseBegin" },
 		check: function (event, player) {
 			return (
@@ -11916,6 +11921,7 @@ const skills = {
 		},
 	},
 	boyan: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filterTarget: function (card, player, target) {
@@ -12624,6 +12630,7 @@ const skills = {
 	},
 	//吕玲绮
 	guowu: {
+		audio: 2,
 		trigger: { player: "phaseUseBegin" },
 		filter: function (event, player) {
 			return player.countCards("h") > 0;
@@ -12702,6 +12709,7 @@ const skills = {
 	},
 	zhuangrong: {
 		derivation: ["llqshenwei", "wushuang"],
+		audio: 2,
 		trigger: { global: "phaseEnd" },
 		forced: true,
 		juexingji: true,
@@ -13082,6 +13090,7 @@ const skills = {
 		group: "spwanggui_draw",
 		subSkill: {
 			draw: {
+				audio: "wanggui",
 				trigger: { player: "damageEnd" },
 				async cost(event, trigger, player) {
 					event.result = await player

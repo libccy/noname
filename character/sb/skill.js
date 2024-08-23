@@ -6320,6 +6320,7 @@ const skills = {
 		},
 	},
 	sbyanyu: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 2,
 		filterCard: { name: "sha" },
@@ -7504,7 +7505,7 @@ const skills = {
 	},
 	//华雄
 	sbyangwei: {
-		audio: 3,
+		audio: 2,
 		enable: "phaseUse",
 		content: function () {
 			player.draw(2);

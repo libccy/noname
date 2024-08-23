@@ -3682,7 +3682,7 @@ const skills = {
 	},
 	//牛辅
 	dcxiaoxi: {
-		auto: 2,
+		audio: 2,
 		trigger: { player: "phaseUseBegin" },
 		forced: true,
 		filter: function (event, player) {
@@ -4993,6 +4993,7 @@ const skills = {
 	},
 	//韩猛
 	jieliang: {
+		audio: 2,
 		trigger: { global: "phaseDrawBegin2" },
 		direct: true,
 		filter: function (event, player) {
@@ -5095,6 +5096,7 @@ const skills = {
 		},
 	},
 	zhongjie: {
+		audio: 2,
 		trigger: { player: "die" },
 		direct: true,
 		forceDie: true,
@@ -5178,6 +5180,7 @@ const skills = {
 		},
 	},
 	difa: {
+		audio: 2,
 		trigger: { player: "gainAfter" },
 		filter: function (event, player) {
 			if (player != _status.currentPhase) return false;
@@ -5357,6 +5360,7 @@ const skills = {
 	},
 	//南华老仙
 	jinghe: {
+		audio: 2,
 		enable: "phaseUse",
 		filter: function (event, player) {
 			return !player.hasSkill("jinghe_clear");
@@ -5444,6 +5448,7 @@ const skills = {
 		},
 	},
 	gongxiu: {
+		audio: 2,
 		trigger: { player: "phaseJieshuBegin" },
 		direct: true,
 		filter: function (event, player) {
@@ -5990,6 +5995,7 @@ const skills = {
 		},
 	},
 	shunshi: {
+		audio: 2,
 		trigger: { player: ["damageEnd", "phaseZhunbeiBegin"] },
 		direct: true,
 		filter: function (event, player) {
@@ -6451,6 +6457,7 @@ const skills = {
 	},
 	//董承
 	xuezhao: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -6687,6 +6694,7 @@ const skills = {
 	},
 	//张横
 	dangzai: {
+		audio: 2,
 		trigger: { player: "phaseUseBegin" },
 		filter: function (event, player) {
 			return (
@@ -6736,6 +6744,7 @@ const skills = {
 		},
 	},
 	liangjue: {
+		audio: 2,
 		trigger: {
 			player: "loseAfter",
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -6768,6 +6777,7 @@ const skills = {
 	},
 	//狼灭
 	langmie: {
+		audio: 2,
 		trigger: { global: "phaseUseEnd" },
 		//forced:true,
 		filter: function (event, player) {
@@ -6859,6 +6869,7 @@ const skills = {
 	},
 	//张邈
 	mouni: {
+		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },
 		direct: true,
 		filter: function (event, player) {
@@ -6958,6 +6969,7 @@ const skills = {
 	},
 	zongfan: {
 		derivation: "zhangu",
+		audio: 2,
 		trigger: { player: "phaseJieshuBegin" },
 		juexingji: true,
 		forced: true,
@@ -7022,6 +7034,7 @@ const skills = {
 		},
 	},
 	zhangu: {
+		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },
 		forced: true,
 		filter: function (event, player) {

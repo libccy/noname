@@ -2301,6 +2301,7 @@ const skills = {
 	},
 	//神典韦
 	juanjia: {
+		audio: 2,
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
@@ -2315,6 +2316,7 @@ const skills = {
 		},
 	},
 	qiexie: {
+		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },
 		forced: true,
 		filter(event, player) {
@@ -2557,6 +2559,7 @@ const skills = {
 		},
 	},
 	cuijue: {
+		audio: 2,
 		enable: "phaseUse",
 		filter(event, player) {
 			return player.countCards("he") > 0; //&&game.hasPlayer(target=>lib.skill.cuijue.filterTarget('SB',player,target));

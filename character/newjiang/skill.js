@@ -2989,6 +2989,7 @@ const skills = {
 		},
 	},
 	spqishe: {
+		audio: 2,
 		enable: "chooseToUse",
 		viewAs: { name: "jiu" },
 		filterCard: { type: "equip" },

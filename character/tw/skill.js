@@ -550,7 +550,7 @@ const skills = {
 	//幻诸葛亮
 	twbeiding: {
 		audio: 2,
-		audioname2: { huan_zhugeliang_shadow: "twbeidingx" },
+		audioname: ["huan_zhugeliang_shadow"],
 		intro: {
 			content: "已记录牌名：$",
 		},
@@ -684,7 +684,7 @@ const skills = {
 	},
 	twjielv: {
 		audio: 2,
-		audioname2: { huan_zhugeliang_shadow: "twjielvx" },
+		audioname: ["huan_zhugeliang_shadow"],
 		derivation: "twjielvx",
 		group: ["twjielv_lose", "twjielv_buff", "twjielv_huan"],
 		subSkill: {
@@ -798,12 +798,6 @@ const skills = {
 				player: 1,
 			},
 		},
-	},
-	twbeidingx: {
-		audio: 2,
-	},
-	twjielvx: {
-		audio: 2,
 	},
 	twhuanji: {
 		audio: 2,
@@ -1194,7 +1188,7 @@ const skills = {
 		lose: false,
 		discard: false,
 		delay: 0,
-		prompt: "将至多两张牌标记为“技一”并交给一名本轮未以此法交给其牌的角色",
+		prompt: "将至多两张牌标记为“仙援”并交给一名本轮未以此法交给其牌的角色",
 		content() {
 			const ID = player.playerid;
 			const skill = "twxianyuan_effect",
@@ -1202,7 +1196,7 @@ const skills = {
 			if (!lib.skill[skillID]) {
 				game.broadcastAll(skillID => {
 					lib.skill[skillID] = { charlotte: true };
-					lib.translate[skillID] = "技一";
+					lib.translate[skillID] = "仙援";
 				}, skillID);
 			}
 			if (!target.storage[skill]) {
@@ -1243,7 +1237,7 @@ const skills = {
 					const target = trigger.player,
 						num = target.storage["twxianyuan_effect"][player.playerid];
 					const result = await player
-						.chooseToMove("技一：将" + get.translation(target) + "的至多" + get.cnNumber(num) + "张牌以任意顺序置于牌堆顶", true)
+						.chooseToMove("仙援：将" + get.translation(target) + "的至多" + get.cnNumber(num) + "张牌以任意顺序置于牌堆顶", true)
 						.set("list", [[get.translation(target) + "的手牌", target.getCards("h"), "dcsushou_tag"], ["牌堆顶"]])
 						.set("filterOk", moved => {
 							const num = get.event().num;
@@ -2133,7 +2127,7 @@ const skills = {
 	},
 	//颜良文丑，但是颜良+文丑
 	twduwang: {
-		audio: 3,
+		audio: 2,
 		dutySkill: true,
 		derivation: ["twxiayong", "twylyanshix"],
 		global: "twduwang_global",
@@ -6080,6 +6074,7 @@ const skills = {
 		init: function (player) {
 			lib.skill.baonvezhi.change(player, 0);
 		},
+		audio: 2,
 		trigger: { source: "damageSource" },
 		forced: true,
 		usable: 1,
@@ -12205,7 +12200,7 @@ const skills = {
 	},
 	//卞夫人
 	twwanwei: {
-		audio: "wanwei",
+		audio: "spwanwei",
 		trigger: { global: "damageBegin4" },
 		filter: function (event, player) {
 			return event.player.isMinHp();
@@ -12242,7 +12237,7 @@ const skills = {
 		},
 		subSkill: {
 			effect: {
-				audio: "wanwei",
+				audio: "spwanwei",
 				charlotte: true,
 				trigger: { global: "phaseJieshuBegin" },
 				prompt2: "获得牌堆顶的牌并亮出牌堆底的牌，若展示的牌能被使用，你使用之",
@@ -12261,7 +12256,7 @@ const skills = {
 		},
 	},
 	twyuejian: {
-		audio: "yuejian",
+		audio: "spyuejian",
 		enable: "phaseUse",
 		filterCard: true,
 		selectCard: function () {
@@ -18437,6 +18432,7 @@ const skills = {
 		},
 	},
 	twlingbao: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
