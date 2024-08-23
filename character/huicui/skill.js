@@ -1913,20 +1913,19 @@ const skills = {
 		forced: true,
 		async content(event, trigger, player) {
 			const list = lib.inpile.filter(name => {
-				if (get.type(name) === "delay") return false;
+				if (get.type(name) === "delay" || player.getStorage("dcdehua").includes(name)) return false;
 				const card = new lib.element.VCard({ name: name });
 				return get.tag(card, "damage") && player.hasUseTarget(card);
 			});
 			if (list.length) {
 				const {
 					result: { bool, links },
-				} = await player.chooseButton(['###德化###<div class="text center">视为使用一张仍可以使用的伤害类卡牌</div>', [list, "vcard"]], true).set("ai", button => {
+				} = await player.chooseButton(['###德化###<div class="text center">视为使用一张未以此法选择过且可以使用的伤害类卡牌</div>', [list, "vcard"]], true).set("ai", button => {
 					const name = button.link[2],
 						player = get.player();
 					let value = player.getUseValue({ name, isCard: true }, null, true);
 					if (player.countCards("h", card => get.name(card) === name && player.hasUseTarget(card))) value /= 3;
 					if (name === "sha") value /= 2;
-					if (player.getStorage("dcdehua").includes("sha")) value = Math.max(0.1, value);
 					return value;
 				});
 				if (bool) {
@@ -1966,14 +1965,14 @@ const skills = {
 		},
 		intro: {
 			content(storage) {
-				return "<li>手牌上限+" + storage.length + "<br><li>不能从手牌中使用" + get.translation(storage);
+				return "<li>手牌上限+" + storage.length + "<br><li>不能使用手牌中的" + get.translation(storage);
 			},
 		},
 		subSkill: {
 			hand: {
 				charlotte: true,
 				mark: true,
-				intro: { content: "伤害牌不计入手牌上限" },
+				intro: { content: "伤害牌不计入手牌数" },
 				mod: {
 					ignoredHandcard(card) {
 						if (get.tag(card, "damage")) return true;
