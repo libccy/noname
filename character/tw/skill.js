@@ -1149,7 +1149,7 @@ const skills = {
 				forced: true,
 				locked: false,
 				content() {
-					player.addMark("rexianyuan", lib.skill.rexianyuan.limit - player.countMark("rexianyuan"));
+					player.addMark("rexianyuan", Math.min(2, lib.skill.rexianyuan.limit - player.countMark("rexianyuan")));
 				},
 			},
 		},

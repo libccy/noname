@@ -708,7 +708,7 @@ game.import("card", function () {
 							cards.splice(i--, 1);
 						}
 					}
-					var muniu = player.getVEquip("muniu");
+					var muniu = player.getEquip("muniu");
 					if (!muniu || !cards.length) {
 						for (var i = 0; i < cards.length; i++) {
 							cards[i].discard();
@@ -727,7 +727,7 @@ game.import("card", function () {
 					);
 					game.delayx();
 					"step 2";
-					var muniu = player.getVEquip("muniu");
+					var muniu = player.getEquip("muniu");
 					var players = game.filterPlayer(function (current) {
 						if (
 							current.canEquip(muniu) &&
@@ -754,9 +754,9 @@ game.import("card", function () {
 					next.set("choice", choice);
 					"step 3";
 					if (result.bool) {
-						var card = player.getVEquip("muniu");
+						var card = player.getEquip("muniu");
 						result.targets[0].equip(card);
-						player.$give(card.cards, result.targets[0]);
+						player.$give(card, result.targets[0]);
 						player.line(result.targets, "green");
 						game.delay();
 					} else {
@@ -773,7 +773,7 @@ game.import("card", function () {
 				mod: {
 					cardEnabled2: function (card, player) {
 						if (!ui.selected.cards.length) return;
-						var muniu = player.getVEquip("muniu");
+						var muniu = player.getEquip("muniu");
 						if (!muniu || !muniu.storages || !muniu.storages.length) return;
 						for (var i of ui.selected.cards) {
 							if (muniu.cards?.includes(i) && muniu.storages.includes(card)) return false;
@@ -785,7 +785,7 @@ game.import("card", function () {
 				markimage2: "image/card/muniu_small.png",
 				intro: {
 					content: function (storage, player) {
-						var muniu = player.getVEquip("muniu");
+						var muniu = player.getEquip("muniu");
 						if (!muniu || !muniu.storages || !muniu.storages.length) return "共有零张牌";
 						if (player.isUnderControl(true)) {
 							return get.translation(muniu.storages);
@@ -794,7 +794,7 @@ game.import("card", function () {
 						}
 					},
 					mark: function (dialog, storage, player) {
-						var muniu = player.getVEquip("muniu");
+						var muniu = player.getEquip("muniu");
 						if (!muniu || !muniu.storages || !muniu.storages.length) return "共有零张牌";
 						if (player.isUnderControl(true)) {
 							dialog.addAuto(muniu.storages);
@@ -803,7 +803,7 @@ game.import("card", function () {
 						}
 					},
 					markcount: function (storage, player) {
-						var muniu = player.getVEquip("muniu");
+						var muniu = player.getEquip("muniu");
 						if (muniu && muniu.storages) return muniu.storages.length;
 						return 0;
 					},
@@ -816,7 +816,7 @@ game.import("card", function () {
 				//silent:true,
 				filter: function (event, player) {
 					if (!event.ss || !event.ss.length || event.parent.name == "lose_muniu") return false;
-					var muniu = player.getVEquip("muniu");
+					var muniu = player.getEquip("muniu");
 					if (!muniu || !muniu.storages) return false;
 					return (
 						event.ss.filter(function (card) {
@@ -825,7 +825,7 @@ game.import("card", function () {
 					);
 				},
 				content: function () {
-					var muniu = player.getVEquip("muniu");
+					var muniu = player.getEquip("muniu");
 					if (muniu && muniu.storages) {
 						muniu.storages.removeArray(trigger.ss);
 						lib.skill.muniu_skill.sync(muniu);

@@ -58,7 +58,7 @@ const characters = {
 	jin_guohuai: ["female", "jin", 3, ["zhefu", "yidu"]],
 	xiahouxuan: ["male", "wei", 3, ["olhuanfu", "olqingyi", "olzeyue"], ["name:夏侯|玄"]],
 	dengzhong: ["male", "wei", 4, ["dzkanpo", "dzgengzhan"]],
-	wangyan: ["male", "jin", 3, ["yangkuang", "cihuang", "sanku"]],
+	wangyan: ["male", "jin", 4, ["yangkuang", "cihuang", "sanku"]],
 	huojun: ["male", "shu", 4, ["qiongshou", "fenrui"]],
 	caoxiancaohua: ["female", "qun", 3, ["huamu", "qianmeng", "liangyuan", "jisi"], ["name:曹|宪-曹|华"]],
 	jin_zhouchu: ["male", "jin", 4, ["shanduan", "yilie"]],
