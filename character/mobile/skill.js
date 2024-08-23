@@ -80,8 +80,8 @@ const skills = {
 		audio: 4,
 		getNum(event, player) {
 			let num = 0;
-			if (game.countPlayer2(current => current.hasHistory("lose")) > 1) num++;
-			if (game.countPlayer2(current => current.hasHistory("damage")) > 1) num++;
+			if (game.countPlayer2(current => current.hasHistory("lose")) >= 1) num++;
+			if (game.countPlayer2(current => current.hasHistory("damage")) >= 1) num++;
 			if (event.name == "phase") return num;
 			return Math.max(game.countPlayer(), player.getHp());
 		},
