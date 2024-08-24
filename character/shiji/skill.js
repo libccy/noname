@@ -6125,6 +6125,7 @@ const skills = {
 				charlotte: true,
 				trigger: { global: "useCardToPlayer" },
 				filter: function (event, player) {
+					if (!event.player.isPhaseUsing()) return false;
 					return event.player != event.target && event.player.hasMark("fyjianyu_" + player.playerid) && event.target.hasMark("fyjianyu_" + player.playerid) && event.target.isIn();
 				},
 				forced: true,
