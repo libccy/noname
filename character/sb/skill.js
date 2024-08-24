@@ -3306,7 +3306,7 @@ const skills = {
 					if (!lib.inpile.includes("nanman")) lib.inpile.add("nanman");
 				});
 			}
-			player.chooseTarget(get.prompt("sbjuxiang"), "将游戏外的随机一张【南蛮入侵】交给一名角色（剩余" + get.cnNumber(_status.sbjuxiang_nanman.length) + "张）").set("ai", target => {
+			player.chooseTarget("请选择【巨象】的目标", "将游戏外的随机一张【南蛮入侵】交给一名角色（剩余" + get.cnNumber(_status.sbjuxiang_nanman.length) + "张）", true).set("ai", target => {
 				var player = _status.event.player;
 				return Math.max(0, target.getUseValue({ name: "nanman" })) * get.attitude(player, target) * (target == player ? 0.5 : 1);
 			});

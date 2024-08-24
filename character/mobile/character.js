@@ -121,7 +121,7 @@ const characters = {
 	zhuling: ["male", "wei", 4, ["xinzhanyi"]],
 	liuye: ["male", "wei", 3, ["polu", "choulve"]],
 	zhaotongzhaoguang: ["male", "shu", 4, ["yizan_use", "xinfu_longyuan"], ["name:赵|统-赵|广"]],
-	majun: ["male", "wei", 3, ["xinfu_jingxie1", "qiaosi"]],
+	majun: ["male", "wei", 3, ["xinfu_jingxie", "qiaosi"]],
 	simazhao: ["male", "wei", 3, ["xinfu_daigong", "xinfu_zhaoxin"], ["name:司马|昭"]],
 	wangyuanji: ["female", "wei", 3, ["xinfu_qianchong", "xinfu_shangjian"]],
 	pangdegong: ["male", "qun", 3, ["xinfu_pingcai", "xinfu_pdgyingshi"]],
