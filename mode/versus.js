@@ -4319,7 +4319,7 @@ export default () => {
 					var swap = [],
 						swap2 = [];
 					for (var i = 0; i < game.players.length; i++) {
-						if (game.players[i].isOut()) continue;
+						//if (game.players[i].isOut()) continue;
 						if (!game.players[i].classList.contains("acted")) {
 							if (game.players[i].side == target.side) {
 								swap.push(game.players[i]);
@@ -4334,7 +4334,7 @@ export default () => {
 							swap = swap2;
 						} else {
 							for (var i = 0; i < game.players.length; i++) {
-								if (game.players[i].isOut()) continue;
+								//if (game.players[i].isOut()) continue;
 								game.players[i].classList.remove("acted");
 							}
 							delete _status.roundStart;
