@@ -27,7 +27,7 @@ export default {
 	"#dcbianzhuang1": "须知少日凌云志，曾许人间第一流。",
 	"#dcbianzhuang2": "愿尽绵薄之力，盼国风盛行。",
 	"#zhutiexiong:die": "那些看似很可笑的梦，是我们用尽全力守护的光……",
-	"#wu_zhutiexiong:die": "愿得此身长报国，何须生入玉门关……",
+	"#zhutiexiong2:die": "愿得此身长报国，何须生入玉门关……",
 	"#dctongliao1": "发动偷袭。",
 	"#dctongliao2": "不够心狠手辣，怎配江山如画。",
 	"#dctongliao3": "必须出重拳，而且是物理意义上的出重拳。",
