@@ -1493,7 +1493,7 @@ const skills = {
 				player.addMark("dcbianzhuang", 1, false);
 				if (player.countMark("dcbianzhuang") > 2) {
 					player.storage.dcbianzhuang_inited = true;
-					await player.reinitCharacter(get.character(player.name2, 3).includes("dcbianzhuang") ? player.name2 : player.name1, "wu_zhutiexiong");
+					player.changeSkin({ characterName: "zhutiexiong" }, "wu_zhutiexiong");
 				}
 			}
 		},
