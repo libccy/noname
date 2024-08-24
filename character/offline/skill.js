@@ -600,15 +600,13 @@ const skills = {
 		audio: "shencai",
 		enable: "phaseUse",
 		filter(event, player) {
-			if (player.countMark("tyshencai") > player.countMark("shencai")) return false;
+			if (player.countSkill("tyshencai") > player.countMark("shencai")) return false;
 			return true;
 		},
 		filterTarget: lib.filter.notMe,
 		onremove: true,
 		prompt: "选择一名其他角色进行地狱审判",
 		content() {
-			player.addMark("tyshencai", 1, false);
-			player.addTempSkill("tyshencai_clear");
 			var next = target.judge();
 			next.callback = lib.skill.shencai.contentx;
 		},
@@ -618,10 +616,6 @@ const skills = {
 		},
 		group: "tyshencai_wusheng",
 		subSkill: {
-			clear: {
-				onremove: ["tyshencai"],
-				charlotte: true,
-			},
 			wusheng: {
 				audio: "shencai",
 				enable: ["chooseToRespond", "chooseToUse"],

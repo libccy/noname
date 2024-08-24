@@ -350,22 +350,27 @@ const skills = {
 		audio: 2,
 		trigger: { player: "useCard" },
 		filter(event, player) {
-			return get.type(event.card) !== "equip" && game.hasPlayer(current => current.countCards("h"));
+			return get.type(event.card) !== "equip" && game.hasPlayer(current => {
+				return player !== current && current.countCards("h");
+			});
 		},
-		locked: true,
 		async cost(event, trigger, player) {
 			event.result = await player
 				.chooseTarget(
 					"请选择【惑心】的目标",
 					lib.translate.dchuoxin_info,
 					(card, player, target) => {
-						return target.countCards("h");
+						return player !== target && target.countCards("h");
 					},
-					true
 				)
 				.set("ai", target => {
-					const player = get.player();
-					return -get.attitude(player, target);
+					let att = get.attitude(get.player(), target);
+					if (att >= 0) return att;
+					if (!target.hasSkill("dcyunzheng_block")) att *= (target.getSkills(null, false, false)
+						.filter(i => {
+							return lib.skill.dcyunzheng_block.skillBlocker(i, target);
+						}).length + 1);
+					return att;
 				})
 				.forResult();
 		},
