@@ -4278,8 +4278,8 @@ const skills = {
 	mjweipo: {
 		audio: 2,
 		enable: "phaseUse",
-		usable: 1,
 		filter: function (event, player) {
+			if (player.hasSkill("mjweipo_used")) return false;
 			return game.hasPlayer(function (current) {
 				return !current.hasSkill("mjweipo_effect");
 			});
@@ -4289,6 +4289,7 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
+			player.addTempSkill("mjweipo_used");
 			var list = ["binglinchengxiax"];
 			list.addArray(get.zhinangs());
 			player.chooseButton(["危迫：选择一个智囊", [list, "vcard"]], true).set("ai", function (button) {
@@ -4303,6 +4304,11 @@ const skills = {
 				target.addSkill("mjweipo_effect");
 				game.delayx();
 			}
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+			},
 		},
 		ai: {
 			order: 7.1,

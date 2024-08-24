@@ -50,7 +50,7 @@ const translates = {
 	mjweipo: "危迫",
 	mjweipo_effect: "危迫",
 	mjweipo_remove: "危迫",
-	mjweipo_info: "出牌阶段限一次。你可以选择一个智囊或【兵临城下】，令一名没有〖危迫〗效果的角色获得如下一次性效果直到你下回合开始：其可于出牌阶段弃置一张【杀】，并获得一张你选择的牌。",
+	mjweipo_info: "每回合限一次，出牌阶段，你可以选择一个智囊或【兵临城下】，令一名没有〖危迫〗效果的角色获得如下一次性效果直到你下回合开始：其可于出牌阶段弃置一张【杀】，并获得一张你选择的牌。",
 	mjchenshi: "陈势",
 	mjchenshi_player: "陈势",
 	mjchenshi_target: "陈势",
