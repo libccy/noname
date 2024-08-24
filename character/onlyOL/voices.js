@@ -1,4 +1,9 @@
 export default {
+	"#olchengxiang1": "谁知道称大象需要几步？",
+	"#olchengxiang2": "象虽大，然可并舟称之。",
+	"#olrenxin1": "待三日中，然后自归。",
+	"#olrenxin2": "王者仁心，尚性善之本。",
+	"#ol_caochong:die": "性慧早夭，为之奈何？",
 	"#olxuanhuo1": "眩惑之术，非为迷惑，乃为明辨贤愚。",
 	"#olxuanhuo2": "以眩惑试人心，以真情待贤才，方能得天下。",
 	"#olenyuan1": "恩重如山，必报之以雷霆之势！",
