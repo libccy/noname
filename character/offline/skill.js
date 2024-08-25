@@ -856,7 +856,7 @@ const skills = {
 					respondSha: true,
 					respondShan: true,
 					skillTagFilter(player, tag) {
-						let name = tag.slice(7);
+						let name = tag.slice(7).toLowerCase();
 						if (!player.getExpansions("tybianta").length) return false;
 						return get.name(player.getExpansions("tybianta")[0], false) == name;
 					}
@@ -4929,7 +4929,7 @@ const skills = {
 						att = get.attitude(player, target);
 					if (target.maxHp <= 1) return 114514119810 * get.sgn(-att);
 					if (player.identity == "nei" && target != player) return 0;
-					return target.maxHp - 1;
+					return (target.maxHp - 1) * att;
 				})
 				.set(
 					"targets",
