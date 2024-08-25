@@ -307,37 +307,23 @@ const skills = {
 		audio: 2,
 		trigger: { player: "phaseEnd" },
 		filter(event, player) {
-			return player.hasMark("olsbliwen") && game.hasPlayer(t => t != player && t.countMark("olsbliwen") < 5);
+			return game.hasPlayer(t => t.hasMark("olsbliwen"));
 		},
-		async cost(event, trigger, player) {
-			event.result = await player
-				.chooseTarget(get.prompt("olsbliwen"), "将任意枚“贤”标记分配给任意其他角色", (card, player, target) => {
-					return target !== player && target.countMark("olsbliwen") < 5;
-				})
-				.set("ai", target => get.attitude(get.event().player, target) * (target.countCards("h") + 1))
-				.forResult();
-			event.result.bool = true;
-		},
-		popup: false,
+		forced: true,
+		locked: false,
 		async content(event, trigger, player) {
-			player.logSkill("olsbliwen");
-			if (event.targets?.length > 0) {
-				player.line(event.targets);
-				player.removeMark("olsbliwen", 1);
-				event.targets[0].addMark("olsbliwen", 1);
-				while (lib.skill.olsbliwen.filter(null, player)) {
-					const result = await player
-						.chooseTarget("是否继续发动【立文】？", "将任意枚“贤”标记分配给任意其他角色", (card, player, target) => {
-							return target !== player && target.countMark("olsbliwen") < 5;
-						})
-						.set("ai", target => get.attitude(get.event().player, target) * (target.countCards("h") + 1))
-						.forResult();
-					if (result.bool) {
-						player.line(result.targets);
-						player.removeMark("olsbliwen", 1);
-						result.targets[0].addMark("olsbliwen", 1);
-					} else break;
-				}
+			while (player.hasMark("olsbliwen") && game.hasPlayer(t => t != player && t.countMark("olsbliwen") < 5)) {
+				const result = await player
+					.chooseTarget("是否发动【立文】？", "将任意枚“贤”标记分配给任意其他角色", (card, player, target) => {
+						return target !== player && target.countMark("olsbliwen") < 5;
+					})
+					.set("ai", target => get.attitude(get.event().player, target) * (target.countCards("h") + 1))
+					.forResult();
+				if (result.bool) {
+					player.line(result.targets);
+					player.removeMark("olsbliwen", 1);
+					result.targets[0].addMark("olsbliwen", 1);
+				} else break;
 			}
 			const targets = game.filterPlayer(target => target.hasMark("olsbliwen")).sort((a, b) => b.countMark("olsbliwen") - a.countMark("olsbliwen"));
 			if (!targets.length) return;
