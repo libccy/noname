@@ -892,10 +892,10 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		filter(event, player) {
-			return player.countCards("he", { type: "equip" }) && game.hasPlayer(current => player.canCompare(current));
+			return player.countCards("he", { type: "equip" }) && game.hasPlayer(current => player.canCompare(current, true));
 		},
 		filterTarget(card, player, target) {
-			return player.canCompare(target);
+			return player.canCompare(target, true);
 		},
 		filterCard: { type: "equip" },
 		position: "he",

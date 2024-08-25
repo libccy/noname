@@ -727,6 +727,7 @@ game.import("card", function () {
 					);
 					game.delayx();
 					"step 2";
+					player.updateMarks();
 					var muniu = player.getVEquip("muniu");
 					var players = game.filterPlayer(function (current) {
 						if (
