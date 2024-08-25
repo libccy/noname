@@ -5053,10 +5053,8 @@ const skills = {
 			var map = {},
 				cards = [];
 			player.getHistory("useCard", function (evt) {
-				if (evt.getParent("phaseUse") == trigger) {
-					var type = get.type2(evt.card, false);
-					if (!map[type]) map[type] = [];
-				}
+				let type = get.type2(evt.card, false);
+				if (!map[type]) map[type] = [];
 			});
 			for (var i = 0; i < ui.discardPile.childNodes.length; i++) {
 				var card = ui.discardPile.childNodes[i],
@@ -5311,7 +5309,7 @@ const skills = {
 		filter: function (event, player) {
 			if (
 				!player.hasSkill("muzhen1") &&
-				player.countCards("e") > 0 &&
+				player.hasCard("he", i => get.type(i) == "e") &&
 				game.hasPlayer(function (current) {
 					return current != player && current.countCards("h") > 0;
 				})
@@ -5343,7 +5341,7 @@ const skills = {
 				if (button.link == 0)
 					return (
 						!player.hasSkill("muzhen1") &&
-						player.countCards("e") > 0 &&
+						player.hasCard("he", i => get.type(i) == "e") &&
 						game.hasPlayer(function (current) {
 							return current != player && current.countCards("h") > 0;
 						})
@@ -5369,15 +5367,16 @@ const skills = {
 					][links[0]],
 					filterCard: [
 						function (card, player) {
+							if (get.type(card) != "equip") return false;
 							if (ui.selected.targets.length) return ui.selected.targets[0].canEquip(card);
 							return game.hasPlayer(function (current) {
 								return current.countCards("h") > 0 && current.canEquip(card);
 							});
 						},
 						true,
-					],
+					][links[0]],
 					selectCard: 1 + links[0],
-					position: "eh"[links[0]],
+					position: "he",
 					discard: false,
 					lose: false,
 					delay: false,
