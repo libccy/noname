@@ -849,7 +849,7 @@ const skills = {
 				ai: {
 					respondSha: true,
 					respondShan: true,
-					skillTagFilter(player, target, arg) {
+					skillTagFilter(player, tag) {
 						let name = tag.slice(7);
 						if (!player.getExpansions("tybianta").length) return false;
 						return get.name(player.getExpansions("tybianta")[0], false) == name;
