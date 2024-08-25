@@ -79,12 +79,12 @@ const skills = {
 								cards
 									.filter(j => player.canUse(j, b, true, true) && get.effect(b, j, player, player) > 0)
 									.reduce((sum, card) => {
-										return sum + get.effect(card, b, player, player);
+										return sum + get.effect(b, card, player, player);
 									}, 0) -
 								cards
 									.filter(j => player.canUse(j, a, true, true) && get.effect(a, j, player, player) > 0)
 									.reduce((sum, card) => {
-										return sum + get.effect(card, a, player, player);
+										return sum + get.effect(a, card, player, player);
 									}, 0)
 							);
 						})[0];
