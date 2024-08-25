@@ -1,17 +1,21 @@
-#!/usr/bin/env -S deno run --allow-env --allow-read --allow-run --allow-write
+// import { exec } from "node:child_process";
+const { exec } = require("node:child_process");
+// import { copyFile, writeFile } from "node:fs/promises";
+const { copyFile, writeFile } = require("node:fs/promises");
+// import { basename, dirname, join, sep } from "node:path";
+const { basename, dirname, join, sep } = require("node:path");
+// import { argv, exit } from "node:process";
+const { argv, exit } = require("node:process");
+// import { fileURLToPath } from "node:url";
+const { fileURLToPath } = require("node:url");
 
-import { exec } from "node:child_process";
-import { copyFile, writeFile } from "node:fs/promises";
-import { basename, dirname, join, sep, relative } from "node:path";
-import { argv, exit } from "node:process";
-import { fileURLToPath } from "node:url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
 
 // @ts-ignore
 if (typeof Map.groupBy !== 'function') {
-	await import('./core-js-bundle.js');
+	// await import('./core-js-bundle.js');
+	require('./core-js-bundle.js');
 }
 
 const assetListPath = join(__dirname, "./asset.js");
@@ -170,5 +174,8 @@ async function genAssetSource(version, assetGroup, splitCache) {
 }
 
 if (argv[1] === __filename) {
-	exit(await main(argv.slice(2)));
+	// exit(await main(argv.slice(2)));
+	main(argv.slice(2)).then(result => {
+		exit(result);
+	});
 }
