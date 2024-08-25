@@ -6908,10 +6908,10 @@ const skills = {
 		trigger: { player: "phaseJieshuBegin" },
 		frequent: true,
 		filter: function (event, player) {
-			return player.hasHistory("useSkill", evt => ["yizan_use", "yizan_use_backup"].includes(evt.sourceSkill || evt.skill));
+			return player.hasHistory("useSkill", evt => ["yizan_use", "yizan_use_backup"].includes(get.sourceSkillFor(evt)));
 		},
 		content: function () {
-			player.draw(player.getHistory("useSkill", evt => ["yizan_use", "yizan_use_backup"].includes(evt.sourceSkill || evt.skill)).length);
+			player.draw(player.getHistory("useSkill", evt => ["yizan_use", "yizan_use_backup"].includes(get.sourceSkillFor(evt))).length);
 		},
 		ai: {
 			combo: "yizan_use",

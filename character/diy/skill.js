@@ -7540,7 +7540,7 @@ const skills = {
 		forced: true,
 		filter(event, player) {
 			if (event.type != "player") return false;
-			var skill = event.sourceSkill || event.skill;
+			var skill = get.sourceSkillFor(event);
 			if (get.is.locked(skill)) return false;
 			var info = get.info(skill);
 			return !info.charlotte;

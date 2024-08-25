@@ -2354,12 +2354,12 @@ const skills = {
 				popup: false,
 				onremove: true,
 				filter: function (event, player) {
-					var skill = event.sourceSkill || event.skill;
+					var skill = get.sourceSkillFor(event);
 					return player.getStorage("dclongsong_remove").includes(skill) && !player.getStockSkills(false, true).includes(skill);
 				},
 				content: function () {
 					"step 0";
-					var skill = trigger.sourceSkill || trigger.skill;
+					var skill = get.sourceSkillFor(trigger);
 					player.removeSkills(skill);
 					player.unmarkAuto("dclongsong_remove", [skill]);
 				},
@@ -10477,14 +10477,14 @@ const skills = {
 		filter: function (event, player) {
 			var info = get.info(event.skill);
 			if (info && info.charlotte) return false;
-			var skill = event.sourceSkill || event.skill;
+			var skill = get.sourceSkillFor(event);
 			return player.storage.pingjian_check[skill];
 		},
 		direct: true,
 		firstDo: true,
 		priority: Infinity,
 		content: function () {
-			var skill = trigger.sourceSkill || trigger.skill;
+			var skill = get.sourceSkillFor(trigger);
 			player.removeSkill(skill);
 			const names = player.tempname && player.tempname.filter(i => lib.character[i][3].includes(skill));
 			if (names) game.broadcastAll((player, names) => player.tempname.removeArray(names), player, names);

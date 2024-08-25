@@ -903,7 +903,7 @@ const skills = {
 		},
 		filter(event, player) {
 			if (["global", "equip"].includes(event.type)) return false;
-			let skill = event.sourceSkill || event.skill;
+			let skill = get.sourceSkillFor(event);
 			if (!skill || skill === "jingyu") return false;
 			let info = get.info(skill);
 			while (true) {
@@ -924,7 +924,7 @@ const skills = {
 					})
 					.then(() => delete player.storage.jingyu_used);
 			}
-			let skill = trigger.sourceSkill || trigger.skill,
+			let skill = get.sourceSkillFor(trigger),
 				info = get.info(skill);
 			while (true) {
 				if (info && !info.sourceSkill) break;
@@ -1011,7 +1011,7 @@ const skills = {
 				filter(event, player) {
 					if (["global", "equip"].includes(event.type)) return false;
 					if ((get.info(event.skill) || {}).charlotte) return false;
-					const skill = event.sourceSkill || event.skill;
+					const skill = get.sourceSkillFor(event);
 					const info = get.info(skill);
 					return info && !info.charlotte && !info.equipSkill;
 				},
@@ -1033,7 +1033,7 @@ const skills = {
 				filter(event, player) {
 					if (["global", "equip"].includes(event.type)) return false;
 					if ((get.info(event.skill) || {}).charlotte) return false;
-					const skill = event.sourceSkill || event.skill;
+					const skill = get.sourceSkillFor(event);
 					const info = get.info(skill);
 					return info && !info.charlotte && !info.equipSkill;
 				},
