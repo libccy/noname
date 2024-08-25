@@ -856,7 +856,7 @@ const skills = {
 					respondSha: true,
 					respondShan: true,
 					skillTagFilter(player, tag) {
-						let name = tag.slice(7);
+						let name = tag.slice(7).toLowerCase();
 						if (!player.getExpansions("tybianta").length) return false;
 						return get.name(player.getExpansions("tybianta")[0], false) == name;
 					}

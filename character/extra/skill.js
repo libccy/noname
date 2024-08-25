@@ -1260,7 +1260,8 @@ const skills = {
 			});
 			const [num, players] = lib.skill.zhengqing.getMostInfoLastRound();
 			let target;
-			if (players.length === 1) target = players[0];
+			if (!players.length) return;
+			else if (players.length === 1) target = players[0];
 			else if (players.includes(player)) target = player;
 			else target = players.randomGet();
 			player.line(target, "thunder");
