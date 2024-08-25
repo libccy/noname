@@ -1,4 +1,7 @@
 export default {
+	"#olpingduan1": "草原儿郎，张弓善射，勇不可当。",
+	"#olpingduan2": "策马逐雄鹰，孤当与尔等共分天下。",
+	"#ol_kebineng:die": "未驱青马饮于黄河，死难瞑目。",
 	"#olchishi1": "柴米油盐之细，不逊兵家之谋。",
 	"#olchishi2": "治大家如烹小鲜，须面面俱到。",
 	"#olweimian1": "不过二三小事，夫君何须烦恼。",

@@ -685,6 +685,7 @@ const skills = {
 		limited: true,
 		animationColor: "fire",
 		changeSeat: true,
+		seatRelated: true,
 		async content(event, trigger, player) {
 			const target = event.targets[0];
 			player.awakenSkill(event.name);
@@ -1304,7 +1305,8 @@ const skills = {
 				})
 				.set("ai", target => {
 					const player = get.event("player");
-					return -1 / target.countCards("h");
+					if (get.attitude(player, target) >= 0) return 0;
+					return 1 / target.countCards("h");
 				})
 				.forResult();
 		},

@@ -1579,9 +1579,6 @@ export class Player extends HTMLDivElement {
 	 */
 	getSeatNum() {
 		if (typeof this.seatNum == "number") return this.seatNum;
-		if (get.mode() === "boss") {
-			return get.distance(game.bossinfo.loopFirst ? game.bossinfo.loopFirst() : game.boss, this, "absolute") + 1;
-		}
 		return 0;
 	}
 	/**
@@ -2952,11 +2949,13 @@ export class Player extends HTMLDivElement {
 		this.expandedSlots = {};
 		this.disabledSlots = {};
 		this.ai = { friend: [], enemy: [], neutral: [] };
+		/*
 		this.vcardsMap = {
 			handcards: [],
 			equips: [],
 			judges: [],
 		};
+		*/
 
 		this.$uninit();
 
@@ -4885,10 +4884,10 @@ export class Player extends HTMLDivElement {
 			if (!this.forced) return false;
 			if (typeof this.selectCard == "function") return false;
 			if (this.complexCard || this.complexSelect || this.filterOk) return false;
-			let evt=this.getParent();
-			while(evt?.name){
-				if(evt.name.startsWith("chooseToCompare")) return false;
-				evt=evt.getParent();
+			let evt = this.getParent();
+			while (evt?.name) {
+				if (evt.name.startsWith("chooseToCompare")) return false;
+				evt = evt.getParent();
 			}
 			var cards = this.player.getCards(this.position);
 			if (cards.some(card => !this.filterCard(card, this.player, this))) return false;
@@ -6818,7 +6817,7 @@ export class Player extends HTMLDivElement {
 		if (!card.expired) {
 			let target = this.getNext();
 			const name = card.viewAs || card.name;
-			const cards = get.itemtype(card) == "card" ? [card] : (card.cards ?? []);
+			const cards = get.itemtype(card) == "card" ? [card] : card.cards ?? [];
 			//if (get.itemtype(cards) != "cards") return;
 			let bool = false;
 			if (
@@ -7648,7 +7647,7 @@ export class Player extends HTMLDivElement {
 	 * @param { Player } target
 	 * @param { false } [distance] false：无距离限制
 	 * @param { boolean | GameEvent } [includecard] 是否受使用次数限制，可以填入用于检测的事件
-	 * @returns 
+	 * @returns
 	 */
 	canUse(card, target, distance, includecard) {
 		if (typeof card == "string") card = { name: card, isCard: true };
@@ -9750,7 +9749,7 @@ export class Player extends HTMLDivElement {
 		return false;
 	}
 	/**
-	 * 
+	 *
 	 * @overload
 	 * @param { string } name
 	 * @returns { boolean} 返回玩家判定区是否有某(种牌名的)牌
@@ -10928,43 +10927,63 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	$handleEquipChange() {
-		let player = this;
+		const player = this;
 		const cards = Array.from(player.node.equips.childNodes);
-		for (const cardx of cards) {
-			if (cardx.name.indexOf("empty_equip") == 0) {
-				player.node.equips.removeChild(cardx);
+		const cardsResume = cards.slice(0);
+		cards.forEach(card => {
+			if (card.name.indexOf("empty_equip") == 0) {
+				let num = get.equipNum(card);
+				let remove = false;
+				if ((num == 4 || num == 3) && get.is.mountCombined()) {
+					remove = !player.hasEmptySlot("equip3_4") || player.getEquips("equip3_4").length;
+				} else if (!player.hasEmptySlot(num) || player.getEquips(num).length) {
+					remove = true;
+				}
+				if (remove) {
+					player.node.equips.removeChild(card);
+					cardsResume.remove(card);
+				}
 			}
-		}
+		});
 		for (let i = 1; i <= 5; i++) {
-			const goon = (i == 4 || i == 3) && get.is.mountCombined();
-			if (player.hasEmptySlot(goon ? "equip3_4" : i)) {
-				let sum = player.countEmptySlot(goon ? "equip3_4" : i);
-				while (sum > 0) {
-					sum--;
-					const card = game.createCard("empty_equip" + i, "", "");
-					card.fix();
-					//console.log('add '+card.name);
-					card.style.transform = "";
-					card.classList.remove("drawinghidden");
-					card.classList.add("emptyequip");
-					card.classList.add("hidden");
-					delete card._transform;
-					const equipNum = get.equipNum(card);
-					let equipped = false;
-					for (let j = 0; j < player.node.equips.childNodes.length; j++) {
-						const card2 = player.vcardsMap.equips.find(i => i.cards?.includes(player.node.equips.childNodes[j]));
-						const cardx = card2 ? card2 : player.node.equips.childNodes[j];
-						if (get.equipNum(cardx) >= equipNum) {
-							player.node.equips.insertBefore(card, player.node.equips.childNodes[j]);
-							equipped = true;
-							break;
-						}
+			let add = false;
+			if ((i == 4 || i == 3) && get.is.mountCombined()) {
+				add = player.hasEmptySlot("equip3_4") && !player.getEquips("equip3_4").length;
+			} else {
+				add = player.hasEmptySlot(i) && !player.getEquips(i).length;
+			}
+			if (
+				add &&
+				!cardsResume.some(card => {
+					let num = get.equipNum(card);
+					if ((i == 4 || i == 3) && get.is.mountCombined()) {
+						return num == 4 || num == 3;
+					} else {
+						return num == i;
 					}
-					if (!equipped) {
-						player.node.equips.appendChild(card);
-						if (_status.discarded) {
-							_status.discarded.remove(card);
-						}
+				})
+			) {
+				const card = game.createCard("empty_equip" + i, "", "");
+				card.fix();
+				//console.log('add '+card.name);
+				card.style.transform = "";
+				card.classList.remove("drawinghidden");
+				card.classList.add("emptyequip");
+				card.classList.add("hidden");
+				delete card._transform;
+				const equipNum = get.equipNum(card);
+				let equipped = false;
+				for (let j = 0; j < player.node.equips.childNodes.length; j++) {
+					if (get.equipNum(player.node.equips.childNodes[j]) >= equipNum) {
+						player.node.equips.insertBefore(card, player.node.equips.childNodes[j]);
+						equipped = true;
+						break;
+					}
+				}
+				if (!equipped) {
+					player.node.equips.appendChild(card);
+					if (_status.discarded) {
+						_status.discarded.remove(card);
 					}
 				}
 			}
@@ -11039,81 +11058,47 @@ export class Player extends HTMLDivElement {
 	}
 	$addVirtualEquip(card, cards) {
 		const player = this;
-		if (cards?.length) {
-			const beforeCards = [];
-			const disableEquips = Array.from(player.node.equips.childNodes).filter(cardx => {
-				return cardx.name?.startsWith("feichu_");
-			});
-			if (disableEquips.length) {
-				for (const cardx of disableEquips) player.node.equips.removeChild(cardx);
-			}
-			const isViewAsCard = cards.length !== 1 || cards[0].name !== card.name,
-				info = get.info(card, false);
-			let cardShownName = get.translation(card.name);
-			if (info.subtype === "equip3") {
-				cardShownName += "+";
-			} else if (info.subtype === "equip4") {
-				cardShownName += "-";
-			}
-			cards.forEach(cardx => {
-				cardx.fix();
-				cardx.style.transform = "";
-				cardx.classList.remove("drawinghidden");
-				delete cardx._transform;
-				const suit = get.translation(cardx.suit),
-					number = get.strNumber(cardx.number);
-				if (isViewAsCard) {
-					cardx.viewAs = card.name;
-					cardx.node.name2.innerHTML = `${suit}${number} [${cardShownName}]`;
-					cardx.classList.add("fakeequip");
-				} else {
-					delete cardx.viewAs;
-					cardx.node.name2.innerHTML = `${suit}${number} ${cardShownName}`;
-					cardx.classList.remove("fakeequip");
-				}
-			});
-			this.vcardsMap?.equips.some(card2 => {
-				if (card2 === card) return true;
-				beforeCards.addArray(card2.cards ?? []);
-			});
-			let equipped = false;
+		const isViewAsCard = cards.length !== 1 || cards[0].name !== card.name,
+			info = get.info(card, false);
+		let cardShownName = get.translation(card.name);
+		if (info.subtype === "equip3") {
+			cardShownName += "+";
+		} else if (info.subtype === "equip4") {
+			cardShownName += "-";
+		}
+		const cardx = isViewAsCard ? game.createCard(card.name, cards.length == 1 ? get.suit(cards[0]) : "none", cards.length == 1 ? get.number(cards[0]) : 0) : cards[0];
+		cardx.fix();
+		cardx.card = card;
+		if (card.subtypes) cardx.subtypes = card.subtypes;
+		cardx.style.transform = "";
+		cardx.classList.remove("drawinghidden");
+		delete cardx._transform;
+		const suit = get.translation(cardx.suit),
+			number = get.strNumber(cardx.number);
+		if (isViewAsCard) {
+			cardx.cards = cards || [];
+			cardx.viewAs = card.name;
+			cardx.node.name2.innerHTML = `${suit}${number} [${cardShownName}]`;
+			cardx.classList.add("fakeequip");
+		} else {
+			delete cardx.viewAs;
+			cardx.node.name2.innerHTML = `${suit}${number} ${cardShownName}`;
+			cardx.classList.remove("fakeequip");
+		}
+		let equipped = false,
+			equipNum = get.equipNum(cardx);
+		if (player.node.equips.childNodes.length) {
 			for (let i = 0; i < player.node.equips.childNodes.length; i++) {
-				if (beforeCards.length === 0) {
+				if (get.equipNum(player.node.equips.childNodes[i]) >= equipNum) {
 					equipped = true;
-					cards.forEach(card => {
-						player.node.equips.insertBefore(card, player.node.equips.childNodes[i]);
-					});
+					player.node.equips.insertBefore(cardx, player.node.equips.childNodes[i]);
 					break;
-				} else {
-					beforeCards.remove(player.node.equips.childNodes[i]);
 				}
 			}
-			if (equipped === false) {
-				cards.reverse();
-				cards.forEach(card => {
-					player.node.equips.appendChild(card);
-				});
-				if (_status.discarded) _status.discarded.removeArray(cards);
-			}
-			if (disableEquips.length) {
-				for (const cardx of disableEquips) {
-					const equipNum = get.equipNum(cardx);
-					let equipped = false;
-					for (let j = 0; j < player.node.equips.childNodes.length; j++) {
-						const card2 = player.vcardsMap.equips.find(i => i.cards?.includes(player.node.equips.childNodes[j]));
-						const card3 = card2 ? card2 : player.node.equips.childNodes[j];
-						if (get.equipNum(card3) >= equipNum) {
-							player.node.equips.insertBefore(cardx, player.node.equips.childNodes[j]);
-							equipped = true;
-							break;
-						}
-					}
-					if (!equipped) {
-						player.node.equips.appendChild(cardx);
-						if (_status.discarded) _status.discarded.remove(cardx);
-					}
-				}
-			}
+		}
+		if (equipped === false) {
+			player.node.equips.appendChild(cardx);
+			if (cards?.length && _status.discarded) _status.discarded.removeArray(cards);
 		}
 	}
 	$equip(card) {
@@ -11443,10 +11428,10 @@ export class Player extends HTMLDivElement {
 		game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, 700, "recover");
 	}
 	/**
-	 * @param {*} str 
-	 * @param {*} [nature] 
-	 * @param {*} [avatar] 
-	 * @param { false } [broadcast] 
+	 * @param {*} str
+	 * @param {*} [nature]
+	 * @param {*} [avatar]
+	 * @param { false } [broadcast]
 	 */
 	$fullscreenpop(str, nature, avatar, broadcast) {
 		if (broadcast !== false)

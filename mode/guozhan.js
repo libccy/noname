@@ -9702,7 +9702,7 @@ export default () => {
 					order: (item, player) => {
 						if (game.hasPlayer(cur => {
 							if (player === cur || get.attitude(player, cur) <= 0) return false;
-							return Math.min(5, target.maxHp) - cur.countCards("h") > 2;
+							return Math.min(5, cur.maxHp) - cur.countCards("h") > 2;
 						})) return get.order({ name: "nanman" }, player) - 0.1;
 						return 10;
 					},
@@ -13899,7 +13899,6 @@ export default () => {
 			fz_xinkuanggu: {
 				audio: true,
 				inherit: "xinkuanggu",
-				global: "_xinkuanggu_check",
 			},
 			fz_new_longdan: {
 				audio: true,
@@ -18571,6 +18570,18 @@ export default () => {
 				},
 				intro: {
 					content: "手牌上限+#",
+				},
+			},
+			_gzkuanggu_check: {
+				charlotte: true,
+				trigger: { source: "damage" },
+				filter(event, player) {
+					return get.distance(player, event.player) <= 1;
+				},
+				firstDo: true,
+				silent: true,
+				content() {
+					trigger.xinkuangguCheck = true;
 				},
 			},
 		},
