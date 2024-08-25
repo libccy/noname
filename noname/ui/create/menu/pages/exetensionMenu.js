@@ -420,17 +420,15 @@ export const extensionMenu = function (connectMenu) {
 					}
 					str += ",files:" + JSON.stringify(files);
 					str += "}";
-					var extension = {
-						"extension.js":
-							'import { lib, game, ui, get, ai, _status } from "../../noname.js";\ngame.import("extension",function(){\n\treturn ' +
-							str +
-							"\n});",
+					const extension = {
+						"extension.js": `import { lib, game, ui, get, ai, _status } from "../../noname.js";\nexport const type = "extension";\n export default function(){\n\treturn ${str}\n};`,
 						"info.json": JSON.stringify({
+							intro: introExtLine.querySelector("input").value ?? "",
 							name: page.currentExtension,
-							author: authorExtLine.querySelector("input").value || "",
-							diskURL: diskExtLine.querySelector("input").value || "",
-							forumURL: forumExtLine.querySelector("input").value || "",
-							version: versionExtLine.querySelector("input").value || ""
+							author: authorExtLine.querySelector("input").value ?? "",
+							diskURL: diskExtLine.querySelector("input").value ?? "",
+							forumURL: forumExtLine.querySelector("input").value ?? "",
+							version: versionExtLine.querySelector("input").value ?? ""
 						}),
 					};
 					for (var i in dash1.content.image) {
