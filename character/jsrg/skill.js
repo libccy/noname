@@ -2747,6 +2747,7 @@ const skills = {
 					game.filterPlayer(i => i != player),
 					player,
 					card => {
+						if (card.cards) return get.position(card.cards[0]) == "j";
 						return get.position(card) == "j";
 					}
 				)
@@ -2793,6 +2794,7 @@ const skills = {
 								game.filterPlayer(i => i != player),
 								player,
 								card => {
+									if (card.cards) return get.position(card.cards[0]) == "j";
 									return get.position(card) == "j";
 								}
 							)

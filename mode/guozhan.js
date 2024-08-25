@@ -13899,7 +13899,6 @@ export default () => {
 			fz_xinkuanggu: {
 				audio: true,
 				inherit: "xinkuanggu",
-				global: "_xinkuanggu_check",
 			},
 			fz_new_longdan: {
 				audio: true,
@@ -18571,6 +18570,18 @@ export default () => {
 				},
 				intro: {
 					content: "手牌上限+#",
+				},
+			},
+			_gzkuanggu_check: {
+				charlotte: true,
+				trigger: { source: "damage" },
+				filter(event, player) {
+					return get.distance(player, event.player) <= 1;
+				},
+				firstDo: true,
+				silent: true,
+				content() {
+					trigger.xinkuangguCheck = true;
 				},
 			},
 		},
