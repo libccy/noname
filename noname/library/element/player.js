@@ -11066,7 +11066,7 @@ export class Player extends HTMLDivElement {
 		} else if (info.subtype === "equip4") {
 			cardShownName += "-";
 		}
-		const cardx = isViewAsCard ? game.createCard(card) : cards[0];
+		const cardx = isViewAsCard ? game.createCard(card.name, cards.length == 1 ? get.suit(cards[0]) : "none", cards.length == 1 ? get.number(cards[0]) : 0) : cards[0];
 		cardx.fix();
 		cardx.card = card;
 		if (card.subtypes) cardx.subtypes = card.subtypes;
