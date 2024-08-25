@@ -307,25 +307,38 @@ const skills = {
 		audio: 2,
 		trigger: { player: "phaseEnd" },
 		filter(event, player) {
-			return player.hasMark("olsbliwen") && game.hasPlayer(t => t != player);
+			return player.hasMark("olsbliwen") && game.hasPlayer(t => t != player && t.countMark("olsbliwen") < 5);
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
-				.chooseTarget(
-					get.prompt("olsbliwen"),
-					"移去任意枚“贤”标记并令任意其他角色各获得1枚“贤”标记",
-					(card, player, target) => {
-						return target.countMark("olsbliwen") < 5;
-					},
-					[1, Infinity]
-				)
+				.chooseTarget(get.prompt("olsbliwen"), "将任意枚“贤”标记分配给任意其他角色", (card, player, target) => {
+					return target !== player && target.countMark("olsbliwen") < 5;
+				})
 				.set("ai", target => get.attitude(get.event().player, target) * (target.countCards("h") + 1))
 				.forResult();
+			event.result.bool = true;
 		},
+		popup: false,
 		async content(event, trigger, player) {
-			const ts = event.targets.sortBySeat();
-			player.removeMark("olsbliwen", ts.length);
-			for (const t of ts) t.addMark("olsbliwen", 1);
+			player.logSkill("olsbliwen");
+			if (event.targets?.length > 0) {
+				player.line(event.targets);
+				player.removeMark("olsbliwen", 1);
+				event.targets[0].addMark("olsbliwen", 1);
+				while (lib.skill.olsbliwen.filter(null, player)) {
+					const result = await player
+						.chooseTarget("是否继续发动【立文】？", "将任意枚“贤”标记分配给任意其他角色", (card, player, target) => {
+							return target !== player && target.countMark("olsbliwen") < 5;
+						})
+						.set("ai", target => get.attitude(get.event().player, target) * (target.countCards("h") + 1))
+						.forResult();
+					if (result.bool) {
+						player.line(result.targets);
+						player.removeMark("olsbliwen", 1);
+						result.targets[0].addMark("olsbliwen", 1);
+					} else break;
+				}
+			}
 			const targets = game.filterPlayer(target => target.hasMark("olsbliwen")).sort((a, b) => b.countMark("olsbliwen") - a.countMark("olsbliwen"));
 			if (!targets.length) return;
 			player.line(targets);
@@ -359,7 +372,7 @@ const skills = {
 					if (player.countMark("olsbliwen") >= 5) return false;
 					let history = player.getAllHistory("useCard");
 					if (history.length <= 1) return false;
-					const evt=history[history.length - 2];
+					const evt = history[history.length - 2];
 					if (!evt || !evt.card) return false;
 					return get.suit(evt.card) == get.suit(event.card) || get.type2(evt.card) == get.type2(event.card);
 				},
