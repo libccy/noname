@@ -7602,8 +7602,8 @@ const skills = {
 		getSkills: function (characters, player) {
 			var skills = [];
 			for (var name of characters) {
-				if (Array.isArray(lib.character[name].skills)) {
-					for (var skill of lib.character[name].skills) {
+				if (Array.isArray(get.character(name).skills)) {
+					for (var skill of get.character(name).skills) {
 						var list = get.skillCategoriesOf(skill, player);
 						list.remove("锁定技");
 						if (list.length > 0) continue;
@@ -7678,14 +7678,14 @@ const skills = {
 		forced: true,
 		locked: false,
 		filter: function (event, player) {
-			var skill = event.sourceSkill || event.skill;
+			var skill = get.sourceSkillFor(event);
 			return player.invisibleSkills.includes(skill) && lib.skill.sbyingmen.getSkills(player.getStorage("sbyingmen"), player).includes(skill);
 		},
 		content: function () {
 			"step 0";
 			var visitors = player.getStorage("sbyingmen").slice(0);
 			var drawers = visitors.filter(function (name) {
-				return lib.character[name].skills && lib.character[name].skills.includes(trigger.sourceSkill);
+				return get.character(name).skills?.includes(get.sourceSkillFor(trigger));
 			});
 			event.drawers = drawers;
 			if (visitors.length == 1) event._result = { bool: true, links: visitors };

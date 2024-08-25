@@ -714,6 +714,21 @@ export class Get extends GetCompatible {
 		return nature + "mm";
 	}
 	/**
+	 * Get the source of the skill or event
+	 *
+	 * 获取一个技能或事件的源技能
+	 */
+	sourceSkillFor(skill) {
+		if (typeof skill !== "string") skill = skill.sourceSkill || skill.skill;
+		let info = get.info(skill);
+		while (true) {
+			if (info && !info.sourceSkill) break;
+			skill = info.sourceSkill;
+			info = get.info(skill);
+		}
+		return skill;
+	}
+	/**
 	 * 判定数字的正负，若num大于0，返回1，若num小于0，返回-1，若num等于0，返回0
 	 * @param { number } num
 	 * @returns { 1 | -1 | 0 }

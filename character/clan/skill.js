@@ -918,7 +918,7 @@ const skills = {
 		inherit: "clanchenya",
 		filter(event, player) {
 			if (event.type != "player") return false;
-			var skill = event.sourceSkill || event.skill;
+			var skill = get.sourceSkillFor(event);
 			var info = get.info(skill);
 			if (info.charlotte) return false;
 			var translation = get.skillInfoTranslation(skill, event.player);
@@ -1400,7 +1400,7 @@ const skills = {
 		},
 		filter(event, player) {
 			if (event.type != "player") return false;
-			var skill = event.sourceSkill || event.skill;
+			var skill = get.sourceSkillFor(event);
 			var info = get.info(skill);
 			if (info.charlotte) return false;
 			var translation = get.skillInfoTranslation(skill, event.player);
@@ -3050,7 +3050,7 @@ const skills = {
 			if (player.getStorage("clanfenchai").length > 0) return;
 			var history = player.getHistory("useSkill", evt => {
 				if (evt.type != "player") return false;
-				var skill = evt.sourceSkill || evt.skill,
+				var skill = get.sourceSkillFor(evt),
 					targets = evt.targets;
 				var info = get.info(skill);
 				if (!info || info.charlotte) return false;
@@ -3083,7 +3083,7 @@ const skills = {
 			if (event.type != "player") return false;
 			var targets = event.targets;
 			if (!targets || !targets.length) return false;
-			var info = get.info(event.sourceSkill || event.skill);
+			var info = get.info(get.sourceSkillFor(event));
 			if (!info || info.charlotte) return false;
 			if (player.getStorage("clanfenchai").length != 0) return false;
 			return targets.filter(i => player.differentSexFrom(i)).length > 0;

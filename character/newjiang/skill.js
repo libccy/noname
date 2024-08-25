@@ -307,7 +307,7 @@ const skills = {
 		},
 		filter(event, player) {
 			if (["global", "equip"].includes(event.type)) return false;
-			let skill = event.sourceSkill || event.skill;
+			let skill = get.sourceSkillFor(event);
 			if (!skill || skill == "gouzhu") return false;
 			let info = get.info(skill);
 			while (true) {
@@ -360,7 +360,7 @@ const skills = {
 		locked: false,
 		onremove: true,
 		async content(event, trigger, player) {
-			let skill = trigger.sourceSkill || trigger.skill,
+			let skill = get.sourceSkillFor(trigger),
 				info = get.info(skill);
 			while (true) {
 				if (info && !info.sourceSkill) break;
