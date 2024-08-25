@@ -1,6 +1,5 @@
 window.noname_asset_list = [
 	"v1.10.15.1",
-	/* background audio start */
 	"audio/background/aozhan_chaoming.mp3",
 	"audio/background/aozhan_online.mp3",
 	"audio/background/aozhan_rewrite.mp3",
@@ -11,9 +10,6 @@ window.noname_asset_list = [
 	"audio/background/music_jilve.mp3",
 	"audio/background/music_phliosophy.mp3",
 	"audio/background/music_shezhan.mp3",
-	/* background audio end */
-
-	/* card audio start */
 	"audio/card/default.mp3",
 	"audio/card/female/bagua.mp3",
 	"audio/card/female/baiyin.mp3",
@@ -178,9 +174,6 @@ window.noname_asset_list = [
 	"audio/card/male/zhujinqiyuan.mp3",
 	"audio/card/male/zhuque.mp3",
 	"audio/card/male/zixin.mp3",
-	/* card audio end */
-
-	/* die audio start */
 	"audio/die/ahuinan.mp3",
 	"audio/die/bailingyun.mp3",
 	"audio/die/baosanniang.mp3",
@@ -487,7 +480,6 @@ window.noname_asset_list = [
 	"audio/die/huatuo.mp3",
 	"audio/die/huaxin.mp3",
 	"audio/die/huaxiong.mp3",
-	"audio/die/huaxiong.mp3",
 	"audio/die/hucheer.mp3",
 	"audio/die/hujinding.mp3",
 	"audio/die/huojun.mp3",
@@ -550,7 +542,6 @@ window.noname_asset_list = [
 	"audio/die/liaohua.mp3",
 	"audio/die/libai.mp3",
 	"audio/die/libai2.mp3",
-	"audio/die/licaiwei.mp3",
 	"audio/die/licaiwei.mp3",
 	"audio/die/lidian.mp3",
 	"audio/die/lifeng.mp3",
@@ -845,7 +836,6 @@ window.noname_asset_list = [
 	"audio/die/re_sunluban.mp3",
 	"audio/die/re_sunquan.mp3",
 	"audio/die/re_sunshangxiang.mp3",
-	"audio/die/re_sunshangxiang.mp3",
 	"audio/die/re_sunxiu.mp3",
 	"audio/die/re_sunyi.mp3",
 	"audio/die/re_taishici.mp3",
@@ -921,7 +911,6 @@ window.noname_asset_list = [
 	"audio/die/sb_pangtong.mp3",
 	"audio/die/sb_sp_zhugeliang.mp3",
 	"audio/die/sb_sunce.mp3",
-	"audio/die/sb_sunquan.mp3",
 	"audio/die/sb_sunquan.mp3",
 	"audio/die/sb_sunshangxiang.mp3",
 	"audio/die/sb_xiahoudun.mp3",
@@ -1007,7 +996,6 @@ window.noname_asset_list = [
 	"audio/die/sp_jiaxu.mp3",
 	"audio/die/sp_key_kanade.mp3",
 	"audio/die/sp_kongrong.mp3",
-	"audio/die/sp_lvfan.mp3",
 	"audio/die/sp_lvfan.mp3",
 	"audio/die/sp_machao.mp3",
 	"audio/die/sp_maojie.mp3",
@@ -1439,9 +1427,6 @@ window.noname_asset_list = [
 	"audio/die/zumao.mp3",
 	"audio/die/zuoci.mp3",
 	"audio/die/zuofen.mp3",
-	/* die audio end */
-
-	/* skill audio start */
 	"audio/skill/Ivxin1.mp3",
 	"audio/skill/Ivxin2.mp3",
 	"audio/skill/abyusa_dunying1.mp3",
@@ -2549,7 +2534,6 @@ window.noname_asset_list = [
 	"audio/skill/dczhuiyi1.mp3",
 	"audio/skill/dczhuiyi2.mp3",
 	"audio/skill/dczhuoli1.mp3",
-	"audio/skill/dczhuoli2.mp3",
 	"audio/skill/dczhuoli2.mp3",
 	"audio/skill/dczifu1.mp3",
 	"audio/skill/dczifu2.mp3",
@@ -4075,8 +4059,6 @@ window.noname_asset_list = [
 	"audio/skill/olniepan1.mp3",
 	"audio/skill/olniepan2.mp3",
 	"audio/skill/olninge1.mp3",
-	"audio/skill/olninge1.mp3",
-	"audio/skill/olninge2.mp3",
 	"audio/skill/olninge2.mp3",
 	"audio/skill/olnishou1.mp3",
 	"audio/skill/olnishou2.mp3",
@@ -4343,8 +4325,6 @@ window.noname_asset_list = [
 	"audio/skill/qiaoyan2.mp3",
 	"audio/skill/qibaodao2.mp3",
 	"audio/skill/qibie1.mp3",
-	"audio/skill/qibie1.mp3",
-	"audio/skill/qibie2.mp3",
 	"audio/skill/qibie2.mp3",
 	"audio/skill/qice1.mp3",
 	"audio/skill/qice2.mp3",
@@ -4715,8 +4695,6 @@ window.noname_asset_list = [
 	"audio/skill/reshishou1.mp3",
 	"audio/skill/reshishou2.mp3",
 	"audio/skill/reshizhi1.mp3",
-	"audio/skill/reshizhi1.mp3",
-	"audio/skill/reshizhi2.mp3",
 	"audio/skill/reshizhi2.mp3",
 	"audio/skill/residi1.mp3",
 	"audio/skill/residi2.mp3",
@@ -4909,8 +4887,6 @@ window.noname_asset_list = [
 	"audio/skill/sbjinjiu1.mp3",
 	"audio/skill/sbjinjiu2.mp3",
 	"audio/skill/sbjiuyuan1.mp3",
-	"audio/skill/sbjiuyuan1.mp3",
-	"audio/skill/sbjiuyuan2.mp3",
 	"audio/skill/sbjiuyuan2.mp3",
 	"audio/skill/sbjizhi1.mp3",
 	"audio/skill/sbjizhi2.mp3",
@@ -4999,8 +4975,6 @@ window.noname_asset_list = [
 	"audio/skill/sbtieji_true1.mp3",
 	"audio/skill/sbtieji_true2.mp3",
 	"audio/skill/sbtongye1.mp3",
-	"audio/skill/sbtongye1.mp3",
-	"audio/skill/sbtongye2.mp3",
 	"audio/skill/sbtongye2.mp3",
 	"audio/skill/sbwansha1.mp3",
 	"audio/skill/sbwansha2.mp3",
@@ -5051,8 +5025,6 @@ window.noname_asset_list = [
 	"audio/skill/sbzhichi1.mp3",
 	"audio/skill/sbzhichi2.mp3",
 	"audio/skill/sbzhiheng1.mp3",
-	"audio/skill/sbzhiheng1.mp3",
-	"audio/skill/sbzhiheng2.mp3",
 	"audio/skill/sbzhiheng2.mp3",
 	"audio/skill/sbzhiji1.mp3",
 	"audio/skill/sbzhiji2.mp3",
@@ -5199,8 +5171,6 @@ window.noname_asset_list = [
 	"audio/skill/shizhan1.mp3",
 	"audio/skill/shizhan2.mp3",
 	"audio/skill/shizhi1.mp3",
-	"audio/skill/shizhi1.mp3",
-	"audio/skill/shizhi2.mp3",
 	"audio/skill/shizhi2.mp3",
 	"audio/skill/shoucheng1.mp3",
 	"audio/skill/shoucheng2.mp3",
@@ -5286,12 +5256,8 @@ window.noname_asset_list = [
 	"audio/skill/spdengli1.mp3",
 	"audio/skill/spdengli2.mp3",
 	"audio/skill/spdiancai1.mp3",
-	"audio/skill/spdiancai1.mp3",
-	"audio/skill/spdiancai2.mp3",
 	"audio/skill/spdiancai2.mp3",
 	"audio/skill/spdiaodu1.mp3",
-	"audio/skill/spdiaodu1.mp3",
-	"audio/skill/spdiaodu2.mp3",
 	"audio/skill/spdiaodu2.mp3",
 	"audio/skill/spdifei1.mp3",
 	"audio/skill/spdifei2.mp3",
@@ -5371,10 +5337,7 @@ window.noname_asset_list = [
 	"audio/skill/spyajun1.mp3",
 	"audio/skill/spyajun2.mp3",
 	"audio/skill/spyanji1.mp3",
-	"audio/skill/spyanji1.mp3",
 	"audio/skill/spyanji2.mp3",
-	"audio/skill/spyanji2.mp3",
-	"audio/skill/spyanji3.mp3",
 	"audio/skill/spyanji3.mp3",
 	"audio/skill/spyanjiao1.mp3",
 	"audio/skill/spyanjiao2.mp3",
@@ -5976,12 +5939,9 @@ window.noname_asset_list = [
 	"audio/skill/xhzhiyan2.mp3",
 	"audio/skill/xianfu1.mp3",
 	"audio/skill/xianfu2.mp3",
-	"audio/skill/xianfu2.mp3",
 	"audio/skill/xianfu3.mp3",
 	"audio/skill/xianfu4.mp3",
-	"audio/skill/xianfu4.mp3",
 	"audio/skill/xianfu5.mp3",
-	"audio/skill/xianfu6.mp3",
 	"audio/skill/xianfu6.mp3",
 	"audio/skill/xianghai1.mp3",
 	"audio/skill/xianghai2.mp3",
@@ -6034,8 +5994,6 @@ window.noname_asset_list = [
 	"audio/skill/xiaowu1.mp3",
 	"audio/skill/xiaowu2.mp3",
 	"audio/skill/xiaoxi_hansui1.mp3",
-	"audio/skill/xiaoxi_hansui1.mp3",
-	"audio/skill/xiaoxi_hansui2.mp3",
 	"audio/skill/xiaoxi_hansui2.mp3",
 	"audio/skill/xiaoxi_machao1.mp3",
 	"audio/skill/xiaoxi_machao2.mp3",
@@ -6147,9 +6105,7 @@ window.noname_asset_list = [
 	"audio/skill/xinfu_qiai1.mp3",
 	"audio/skill/xinfu_qiai2.mp3",
 	"audio/skill/xinfu_qianchong1.mp3",
-	"audio/skill/xinfu_qianchong1.mp3",
 	"audio/skill/xinfu_qianchong2.mp3",
-	"audio/skill/xinfu_qianchong3.mp3",
 	"audio/skill/xinfu_qianchong3.mp3",
 	"audio/skill/xinfu_qianxin1.mp3",
 	"audio/skill/xinfu_qianxin2.mp3",
@@ -6432,8 +6388,6 @@ window.noname_asset_list = [
 	"audio/skill/yaopei1.mp3",
 	"audio/skill/yaopei2.mp3",
 	"audio/skill/yaowu1.mp3",
-	"audio/skill/yaowu1.mp3",
-	"audio/skill/yaowu2.mp3",
 	"audio/skill/yaowu2.mp3",
 	"audio/skill/yashi1.mp3",
 	"audio/skill/yashi2.mp3",
@@ -6462,8 +6416,6 @@ window.noname_asset_list = [
 	"audio/skill/yiji1.mp3",
 	"audio/skill/yiji2.mp3",
 	"audio/skill/yijiao1.mp3",
-	"audio/skill/yijiao1.mp3",
-	"audio/skill/yijiao2.mp3",
 	"audio/skill/yijiao2.mp3",
 	"audio/skill/yijie1.mp3",
 	"audio/skill/yijie2.mp3",
@@ -6890,9 +6842,6 @@ window.noname_asset_list = [
 	"audio/skill/zuoxing3.mp3",
 	"audio/skill/zyqiao1.mp3",
 	"audio/skill/zyqiao2.mp3",
-	/* skill audio end */
-
-	/* voice audio start */
 	"audio/voice/female/0.mp3",
 	"audio/voice/female/1.mp3",
 	"audio/voice/female/10.mp3",
@@ -6939,15 +6888,12 @@ window.noname_asset_list = [
 	"audio/voice/male/7.mp3",
 	"audio/voice/male/8.mp3",
 	"audio/voice/male/9.mp3",
-	/* voice audio end */
-
 	"font/huangcao.woff2",
 	"font/shousha.woff2",
 	"font/xiaozhuan.woff2",
 	"font/xingkai.woff2",
 	"font/xinwei.woff2",
 	"font/yuanli.woff2",
-	/* background image start */
 	"image/background/beipan_bg.jpg",
 	"image/background/heaven_bg.jpg",
 	"image/background/huangtian_bg.jpg",
@@ -6975,9 +6921,6 @@ window.noname_asset_list = [
 	"image/background/zhanhuo_bg.jpg",
 	"image/background/zhanyun_bg.jpg",
 	"image/background/zhulin_bg.jpg",
-	/* background image end */
-
-	/* card image start */
 	"image/card/bagua.png",
 	"image/card/baihupifeng.png",
 	"image/card/baishouzhihu.png",
@@ -7463,9 +7406,6 @@ window.noname_asset_list = [
 	"image/card/zixin.png",
 	"image/card/ziyangdan.png",
 	"image/card/zong.png",
-	/* card image end */
-
-	/* character image start */
 	"image/character/ahuinan.jpg",
 	"image/character/bailingyun.jpg",
 	"image/character/baiwuchang.jpg",
@@ -7607,8 +7547,6 @@ window.noname_asset_list = [
 	"image/character/dc_sb_dianwei.jpg",
 	"image/character/dc_sb_guanping.jpg",
 	"image/character/dc_sb_jiaxu.jpg",
-	"image/character/dc_sb_jiaxu.jpg",
-	"image/character/dc_sb_jiaxu_shadow.jpg",
 	"image/character/dc_sb_jiaxu_shadow.jpg",
 	"image/character/dc_sb_jushou.jpg",
 	"image/character/dc_sb_lusu.jpg",
@@ -8318,7 +8256,6 @@ window.noname_asset_list = [
 	"image/character/liufeng.jpg",
 	"image/character/liuhong.jpg",
 	"image/character/liuhui.jpg",
-	"image/character/liuhui.jpg",
 	"image/character/liupan.jpg",
 	"image/character/liupi.jpg",
 	"image/character/liuqi.jpg",
@@ -8965,7 +8902,6 @@ window.noname_asset_list = [
 	"image/character/shen_caopi.jpg",
 	"image/character/shen_dengai.jpg",
 	"image/character/shen_dianwei.jpg",
-	"image/character/shen_dianwei.jpg",
 	"image/character/shen_diaochan.jpg",
 	"image/character/shen_ganning.jpg",
 	"image/character/shen_guanyu.jpg",
@@ -8978,7 +8914,6 @@ window.noname_asset_list = [
 	"image/character/shen_luxun.jpg",
 	"image/character/shen_lvbu.jpg",
 	"image/character/shen_lvmeng.jpg",
-	"image/character/shen_machao.jpg",
 	"image/character/shen_machao.jpg",
 	"image/character/shen_simayi.jpg",
 	"image/character/shen_sunce.jpg",
@@ -9719,9 +9654,6 @@ window.noname_asset_list = [
 	"image/character/zumao.jpg",
 	"image/character/zuoci.jpg",
 	"image/character/zuofen.jpg",
-	/* character image end */
-
-	/* emotion image start */
 	"image/emotion/guojia_emotion/1.gif",
 	"image/emotion/guojia_emotion/10.gif",
 	"image/emotion/guojia_emotion/11.gif",
@@ -9871,9 +9803,6 @@ window.noname_asset_list = [
 	"image/emotion/zhenji_emotion/7.gif",
 	"image/emotion/zhenji_emotion/8.gif",
 	"image/emotion/zhenji_emotion/9.gif",
-	/* emotion image end */
-
-	/* mode image start */
 	"image/mode/boss/card/boss_mengpohuihun.png",
 	"image/mode/boss/card/chixueqingfeng.png",
 	"image/mode/boss/card/chiyanzhenhunqin.png",
@@ -10342,9 +10271,6 @@ window.noname_asset_list = [
 	"image/mode/versus/character/boss_yunpingqinglong.jpg",
 	"image/mode/versus/character/liuqi.jpg",
 	"image/mode/versus/character/tangzi.jpg",
-	/* mode image end */
-
-	/* splash image start */
 	"image/splash/style1.jpg",
 	"image/splash/style1/boss.jpg",
 	"image/splash/style1/brawl.jpg",
@@ -10369,8 +10295,6 @@ window.noname_asset_list = [
 	"image/splash/style2/stone.jpg",
 	"image/splash/style2/tafang.jpg",
 	"image/splash/style2/versus.jpg",
-	/* splash image end */
-
 	"theme/music/grid.png",
 	"theme/music/wood.png",
 	"theme/music/wood3.png",
