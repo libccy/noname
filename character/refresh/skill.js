@@ -13066,6 +13066,7 @@ const skills = {
 			},
 			result: {
 				player(player, target) {
+					if(!ui.selected.cards.length) return 0;
 					let card = ui.selected.cards[0], val = -get.value(card, player) / 6;
 					if (get.position(card) == "e") val += 2;
 					if (player.hp > target.hp) val++;
@@ -13075,6 +13076,7 @@ const skills = {
 					return val;
 				},
 				target: function (player, target) {
+					if(!ui.selected.cards.length) return 0;
 					let card = ui.selected.cards[0],
 						val = get.position(card) == "e" ? get.value(card, target) / 6 : 0;
 					if (target.hp > player.hp) val++;

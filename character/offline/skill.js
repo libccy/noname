@@ -4929,7 +4929,7 @@ const skills = {
 						att = get.attitude(player, target);
 					if (target.maxHp <= 1) return 114514119810 * get.sgn(-att);
 					if (player.identity == "nei" && target != player) return 0;
-					return target.maxHp - 1;
+					return (target.maxHp - 1) * att;
 				})
 				.set(
 					"targets",

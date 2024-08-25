@@ -1565,10 +1565,11 @@ const skills = {
 					if (get.attitude(player, result.winner) <= 0) return 'cancel2';
 					if (!game.hasPlayer(current => {
 						return result.winner.canUse({ name: 'sha' }, current, false) && get.effect(current, { name: 'sha' }, result.winner, result.winner) > 0;
-					})) return '选项一';
+					}) || !cards.length) return '选项一';
 					let eff1 = result.winner.getUseValue({ name: 'sha' }), eff2 = 0;
-					if (cards[0]) eff2 = get.value(cards[0], result.winner);
-					if (cards[1]) eff2 += get.value(cards[1], result.winner);
+					for (let card of cards) {
+						eff2 += get.value(card, result.winner);
+					}
 					if (eff1 > eff2 * 2.5) return '选项二';
 					return '选项一';
 				}()).forResult();
