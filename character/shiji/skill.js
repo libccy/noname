@@ -5309,7 +5309,7 @@ const skills = {
 		filter: function (event, player) {
 			if (
 				!player.hasSkill("muzhen1") &&
-				player.hasCard("he", i => get.type(i) == "e") &&
+				player.hasCard(i => get.type(i) == "e", "he") &&
 				game.hasPlayer(function (current) {
 					return current != player && current.countCards("h") > 0;
 				})
@@ -5341,7 +5341,7 @@ const skills = {
 				if (button.link == 0)
 					return (
 						!player.hasSkill("muzhen1") &&
-						player.hasCard("he", i => get.type(i) == "e") &&
+						player.hasCard(i => get.type(i) == "e", "he") &&
 						game.hasPlayer(function (current) {
 							return current != player && current.countCards("h") > 0;
 						})

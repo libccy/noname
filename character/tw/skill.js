@@ -3535,12 +3535,15 @@ const skills = {
 					const card = new lib.element.VCard({ name: "sha" });
 					player
 						.when("useCard2")
-						.filter(evt => evt.getParent(2) == event && game.hasPlayer(target => !evt.targets.includes(target) && player.canUse(evt.card, target)))
+						.filter(evt => evt.getParent(2) == event)
 						.assign({
 							firstDo: true,
 						})
 						.then(() => {
 							trigger.baseDamage++;
+							if (!game.hasPlayer(target => {
+								return !trigger.targets.includes(target) && player.canUse(trigger.card, target);
+							})) return;
 							player
 								.chooseTarget("额外指定至多" + get.cnNumber(num) + "名目标", [1, num], (card, player, target) => {
 									const trigger = _status.event.getTrigger();
