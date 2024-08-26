@@ -13286,7 +13286,7 @@ const skills = {
 				.forResult();
 			const card = get.autoViewAs(cardx);
 			card.subtypes = [result.control];
-			player.$give(card, target);
+			player.$give(card, target, false);
 			await target.equip(card);
 			if (target == player) await player.draw();
 		},

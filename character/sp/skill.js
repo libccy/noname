@@ -22127,7 +22127,7 @@ const skills = {
 					});
 				if (cardsx.length > 0) {
 					current.addSkill("xiehui2");
-					current.addGaintag(cards, "xiehui");
+					current.addGaintag(cardsx, "xiehui");
 				}
 			});
 		},

@@ -391,7 +391,7 @@ const skills = {
 					source: "damageSource",
 				},
 				filter(event, player) {
-					return player.countCards("e") == player.countCards("h", card => card.hasGaintag("dcjigu")) && player.getRoundHistory("useSkill", evt => evt.skill == "dcjigu_temp").length < game.roundNumber;
+					return player.countCards("e") == player.countCards("h", card => card.hasGaintag("dcjigu"));
 				},
 				prompt2(event, player) {
 					return (
@@ -410,6 +410,11 @@ const skills = {
 							.map((_, i) => i + 1)
 							.reduce((sum, i) => sum + player.countEmptySlot(i), 0)
 					);
+					let num1 = player.getRoundHistory("useSkill", evt => evt.skill == "dcjigu_temp").length;
+					let num2 = game.countPlayer2(current => {
+						return current.actionHistory.some(i => i.isMe && !i.isSkipped);
+					});
+					if (num1 >= num2) player.tempBanSkill(event.name, "roundStart");
 				},
 			},
 		},
@@ -7526,8 +7531,8 @@ const skills = {
 				.set("choiceList", ["失去1点体力，本阶段使用牌不可被响应", "减1点体力上限，本阶段使用牌不可被响应", "失去〖夙仇〗"])
 				.set("ai", () => {
 					const player = get.event("player");
-					if (player.isHealthy()) return player.maxHp <= 2 ? 3 : 0;
-					return 2;
+					if (player.isHealthy()) return player.maxHp <= 2 ? 2 : 0;
+					return 1;
 				})
 				.forResult("index");
 			switch (index) {
@@ -10301,7 +10306,6 @@ const skills = {
 					return get.order(button.link);
 				});
 			} else {
-				event.finish();
 				if (cards.length) player.loseToDiscardpile(cards);
 				if (
 					target.isIn() &&
@@ -10310,6 +10314,7 @@ const skills = {
 					})
 				)
 					player.loseHp();
+				event.finish();
 			}
 			"step 1";
 			player.useCard(result.links[0], target, false);

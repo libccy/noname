@@ -125,7 +125,7 @@ const skills = {
 			} else cards = trigger.cards.filterInD("d");
 			cards = cards.filter(card => ["basic", "trick"].includes(get.type(card)));
 			if (cards.length) {
-				const next = player.gain(cards, "gain2");
+				const next = player.gain(cards.randomGet(), "gain2");
 				next.gaintag.add("dcsbmuwang_tag");
 				await next;
 				player.addTempSkill("dcsbmuwang_lose");
@@ -9642,8 +9642,9 @@ const skills = {
 				const list = nameList.slice().randomSort();
 				for (const name of list) {
 					const card = new lib.element.VCard({ name });
-					if (player.canUse(card, target)) {
-						await player.useCard(card, target);
+					let targets = [player, target].filter(current => player.canUse(card, current));
+					if (targets.length) {
+						await player.useCard(card, targets);
 						await game.delayx();
 						break;
 					}
@@ -10228,6 +10229,7 @@ const skills = {
 				}
 				target.markSkill("dcwumei_wake");
 				if (!trigger._finished) {
+					player.phaseNumber--;
 					trigger.finish();
 					trigger.untrigger(true);
 					trigger._triggered = 5;

@@ -1448,7 +1448,7 @@ game.import("card", function () {
 				equipSkill: true,
 				mod: {
 					canBeReplaced: function (card, player) {
-						if (player.getEquips("liulongcanjia").includes(card)) return false;
+						if (player.getVEquips("liulongcanjia").includes(card)) return false;
 					},
 				},
 			},
