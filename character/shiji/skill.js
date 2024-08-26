@@ -1264,14 +1264,14 @@ const skills = {
 						})
 					);
 				},
-				content: function () {
-					"step 0";
-					if (player != trigger.player && trigger.player.isIn()) game.asyncDraw([player, trigger.player].sortBySeat());
-					else {
-						player.draw();
-						event.finish();
-					}
-					"step 1";
+				async content(event, trigger, player) {
+					let sources = game.filterPlayer(cur => {
+						return cur.hasHistory("damage", evt => {
+							return evt.card == trigger.card;
+						});
+					});
+					sources.push(player);
+					await game.asyncDraw(sources.sortBySeat());
 					game.delayx();
 				},
 			},
