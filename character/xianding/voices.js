@@ -1,4 +1,9 @@
 export default {
+	"#dcsbzuojun1": "彼不得安，我取其逸，则大局可定。",
+	"#dcsbzuojun2": "义者无敌，骄者先败，今非用兵之时。",
+	"#dcsbmuwang1": "授熟读十万书，腹中唯无降字。",
+	"#dcsbmuwang2": "长河没日，天岂无再明之时！",
+	"#dc_sb_jushou:die": "身虽死，忠魂不灭。",
 	"#dcbizu1": "花既繁于枝，当为众乔灌荫。",
 	"#dcbizu2": "手执金麾伞，可为我族遮风挡雨。",
 	"#dcwuxie1": "一介弱质女流，安能登辇拔剑？",
