@@ -2186,6 +2186,7 @@ const skills = {
 		enable: "phaseUse",
 		usable: 2,
 		filter(event, player) {
+			if (player.countMark("mbxuetu_status") == 2 && !game.hasPlayer(current => current != player)) return false;
 			if (!game.hasPlayer(current => current.isDamaged())) {
 				if (player.countMark("mbxuetu_status") == 1 && player.getStorage("mbxuetu_used").includes(1)) return false;
 				if (player.countMark("mbxuetu_status") == 0 && !player.storage.mbxuetu) return false;
@@ -2212,6 +2213,7 @@ const skills = {
 				} else {
 					list = list.filter((choice, index) => {
 						if (index == 0 && !game.hasPlayer(current => current.isDamaged())) return false;
+						if (player.countMark("mbxuetu_status") == 2 && current == player) return false;
 						return !player.getStorage("mbxuetu_used").includes(index);
 					});
 				}
@@ -2233,6 +2235,7 @@ const skills = {
 					filterTarget(card, player, target) {
 						const { choice } = get.info("mbxuetu_backup");
 						if (player.countMark("mbxuetu_status") !== 2 && choice == 0) return target.isDamaged();
+						if (player.countMark("mbxuetu_status") == 2) return target != player;
 						return true;
 					},
 					async content(event, trigger, player) {
@@ -2294,7 +2297,7 @@ const skills = {
 				if (status < 2) {
 					str += "令一名角色" + (choice ? "摸两张牌" : "回复1点体力");
 				} else {
-					str += choice ? "摸一张牌，然后对一名角色造成1点伤害" : "回复1点体力，然后令一名角色弃置两张牌";
+					str += choice ? "摸一张牌，然后对一名其他角色造成1点伤害" : "回复1点体力，然后令一名其他角色弃置两张牌";
 				}
 				return `###血途###<div class="text center">${str}</div>`;
 			},
@@ -2310,8 +2313,8 @@ const skills = {
 					if (storage) return "转换技。出牌阶段限一次，你可以令一名角色摸两张牌。";
 					return "转换技。出牌阶段限一次，你可以令一名角色回复1点体力。";
 				} else {
-					if (storage) return "转换技。出牌阶段限一次，你可以摸一张牌，然后对一名角色造成1点伤害。";
-					return "转换技。出牌阶段限一次，你可以回复1点体力，然后令一名角色弃置两张牌。";
+					if (storage) return "转换技。出牌阶段限一次，你可以摸一张牌，然后对一名其他角色造成1点伤害。";
+					return "转换技。出牌阶段限一次，你可以回复1点体力，然后令一名其他角色弃置两张牌。";
 				}
 			},
 		},
@@ -15493,10 +15496,13 @@ const skills = {
 			game.delay(0.5);
 			if (!targets[0].hasEquipableSlot(1)) event.goto(2);
 			"step 1";
-			var target = targets[0];
-			var equip1 = get.cardPile2(function (card) {
-				return get.subtype(card) == "equip1" && target.canUse(card, target);
-			});
+			let target = targets[0];
+			let equip1 = get.cardPile2(card=>card.name=="qinggang");
+			if(!equip1 || Math.random()>0.5){
+				equip1 = get.cardPile2(function (card) {
+					return get.subtype(card) == "equip1" && target.canUse(card, target);
+				});
+			}
 			if (!equip1) {
 				player.popup("连计失败");
 				game.log("牌堆中无装备");
@@ -15504,8 +15510,9 @@ const skills = {
 				return;
 			}
 			if (equip1.name == "qinggang" && !lib.inpile.includes("qibaodao")) {
-				equip1.remove();
-				equip1 = game.createCard("qibaodao", equip1.suit, equip1.number);
+				game.broadcastAll(function (card) {
+					card.init([card.suit, card.number, "qibaodao"]);
+				}, equip1);
 			}
 			target.$draw(equip1);
 			target.chooseUseTarget(equip1, "noanimate", "nopopup", true);
