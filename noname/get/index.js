@@ -716,14 +716,17 @@ export class Get extends GetCompatible {
 	/**
 	 * Get the source of the skill or event
 	 *
-	 * 获取一个技能或事件的源技能
+	 * 获取一个技能或事件的某个属性的源技能
+	 *
+	 * 第二个参数为获取属性，不填写默认获取sourceSkill
 	 */
-	sourceSkillFor(skill) {
-		if (typeof skill !== "string") skill = skill.sourceSkill || skill.skill;
+	sourceSkillFor(skill, text) {
+		if (!text) text = "sourceSkill";
+		if (typeof skill !== "string") skill = skill[text] || skill.skill;
 		let info = get.info(skill);
 		while (true) {
-			if (info && !info.sourceSkill) break;
-			skill = info.sourceSkill;
+			if (!info || typeof info[text] !== "string") break;
+			skill = info[text];
 			info = get.info(skill);
 		}
 		return skill;
