@@ -3535,12 +3535,15 @@ const skills = {
 					const card = new lib.element.VCard({ name: "sha" });
 					player
 						.when("useCard2")
-						.filter(evt => evt.getParent(2) == event && game.hasPlayer(target => !evt.targets.includes(target) && player.canUse(evt.card, target)))
+						.filter(evt => evt.getParent(2) == event)
 						.assign({
 							firstDo: true,
 						})
 						.then(() => {
 							trigger.baseDamage++;
+							if (!game.hasPlayer(target => {
+								return !trigger.targets.includes(target) && player.canUse(trigger.card, target);
+							})) return;
 							player
 								.chooseTarget("额外指定至多" + get.cnNumber(num) + "名目标", [1, num], (card, player, target) => {
 									const trigger = _status.event.getTrigger();
@@ -7503,18 +7506,15 @@ const skills = {
 			}
 			return false;
 		},
-		content: function () {
-			"step 0";
-			var num = 0,
+		async content(event, trigger, player) {
+			let num = 0,
 				evt = trigger.getl(player);
-			for (var i of evt.cards2) {
+			for (let i of evt.cards2) {
 				if (get.type(i, null, player) != "basic" && num < 5) num++;
 			}
-			player.chooseToGuanxing(num);
-			player.chooseBool("羽化：是否摸" + get.cnNumber(num) + "张牌？").set("frequentSkill", "twyuhua");
-			event.num = num;
-			"step 1";
-			if (result.bool) player.draw(num);
+			await player.chooseToGuanxing(num);
+			const result = await player.chooseBool("羽化：是否摸" + get.cnNumber(num) + "张牌？").set("frequentSkill", "twyuhua");
+			if (result.bool) await player.draw(num);
 		},
 		mod: {
 			ignoredHandcard: function (card, player) {

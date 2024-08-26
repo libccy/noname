@@ -9428,23 +9428,89 @@ export const Content = {
 		game.cardsGotoOrdering(cards);
 		var next = player.chooseToMove();
 		next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
-		next.set("prompt", "点击或拖动将牌移动到牌堆顶或牌堆底");
+		next.set("prompt", event.prompt || "点击或拖动将牌移动到牌堆顶或牌堆底");
 		next.processAI =
 			event.processAI ||
 			function (list) {
-				var cards = list[0][1],
-					player = _status.event.player;
-				var top = [];
-				var bottom;
-				cards.sort(function (a, b) {
-					return get.value(b, player) - get.value(a, player);
-				});
-				while (cards.length) {
-					if (get.value(cards[0], player) <= 5) break;
-					top.unshift(cards.shift());
+				let cards = list[0][1],
+					player = _status.event.player,
+					target = _status.currentPhase || player,
+					name = _status.event.getTrigger().name,
+					countWuxie = (current) => {
+						let num = current.getKnownCards(player, card => {
+							return get.name(card, current) === "wuxie";
+						});
+						if (num && current !== player) return num;
+						let skills = current.getSkills("invisible").concat(lib.skill.global);
+						game.expandSkills(skills);
+						for (let i = 0; i < skills.length; i++) {
+							let ifo = get.info(skills[i]);
+							if (!ifo) continue;
+							if (ifo.viewAs && typeof ifo.viewAs != "function" && ifo.viewAs.name == "wuxie") {
+								if (!ifo.viewAsFilter || ifo.viewAsFilter(current)) {
+									num++;
+									break;
+								}
+							} else {
+								let hiddenCard = ifo.hiddenCard;
+								if (typeof hiddenCard == "function" && hiddenCard(current, "wuxie")) {
+									num++;
+									break;
+								}
+							}
+						}
+						return num;
+					},
+					top = [];
+				switch (name) {
+					case "phaseJieshu":
+						target = target.next;
+					case "phaseZhunbei":
+						let att = get.sgn(get.attitude(player, target)),
+							judges = target.getCards("j"),
+							needs = 0,
+							wuxie = countWuxie(target);
+						for (let i = Math.min(cards.length, judges.length) - 1; i >= 0; i--) {
+							let j = judges[i], cardj = j.viewAs ? { name: j.viewAs, cards: j.cards || [j] } : j;
+							if (wuxie > 0 && get.effect(target, j, target, target) < 0) {
+								wuxie--;
+								continue;
+							}
+							let judge = get.judge(j);
+							cards.sort((a, b) => {
+								return (judge(b) - judge(a)) * att;
+							});
+							if (judge(cards[0]) * att < 0) {
+								needs++;
+								continue;
+							} else {
+								top.unshift(cards.shift());
+							}
+						}
+						if (needs > 0 && needs >= judges.length) {
+							return [top, cards];
+						}
+						cards.sort((a, b) => {
+							return (get.value(b, target) - get.value(a, target)) * att;
+						});
+						while (needs--) {
+							top.unshift(cards.shift());
+						}
+						while (cards.length) {
+							if (get.value(cards[0], target) > 6 == att > 0) top.unshift(cards.shift());
+							else break;
+						}
+						return [top, cards];
+					default:
+						cards.sort((a, b) => {
+							return get.value(b, target) - get.value(a, target);
+						});
+						while (cards.length) {
+							if (get.value(cards[0], target) > 6) top.unshift(cards.shift());
+							else break;
+						}
+						return [top, cards];
 				}
-				bottom = cards;
-				return [top, bottom];
 			};
 		"step 1";
 		var top = result.moved[0];
@@ -9456,6 +9522,10 @@ export const Content = {
 		for (i = 0; i < bottom.length; i++) {
 			ui.cardPile.appendChild(bottom[i]);
 		}
+		event.result = {
+			bool: true,
+			moved: [top, bottom]
+		};
 		game.addCardKnower(top, player);
 		game.addCardKnower(bottom, player);
 		player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
