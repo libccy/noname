@@ -24967,68 +24967,16 @@ const skills = {
 		trigger: { player: ["phaseZhunbeiBegin", "phaseJieshuBegin"] },
 		forced: true,
 		audio: 2,
-		content: function () {
-			"step 0";
-			var num = 1,
+		async content(event, trigger, player) {
+			let num = 1,
 				evt = trigger.getParent();
 			if (evt.qirang_num) num += evt.qirang_num;
-			var cards = get.cards(Math.min(5, num));
-			game.cardsGotoOrdering(cards);
-			var next = player.chooseToMove();
-			next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
-			next.set("prompt", "羽化：点击或拖动将牌移动到牌堆顶或牌堆底");
-			next.processAI = function (list) {
-				var cards = list[0][1],
-					player = _status.event.player;
-				var target = _status.event.getTrigger().name == "phaseZhunbei" ? player : player.next;
-				var att = get.sgn(get.attitude(player, target));
-				var top = [];
-				var judges = target.getCards("j");
-				var stopped = false;
-				if (player != target || !target.hasWuxie()) {
-					for (var i = 0; i < judges.length; i++) {
-						var judge = get.judge(judges[i]);
-						cards.sort(function (a, b) {
-							return (judge(b) - judge(a)) * att;
-						});
-						if (judge(cards[0]) * att < 0) {
-							stopped = true;
-							break;
-						} else {
-							top.unshift(cards.shift());
-						}
-					}
-				}
-				var bottom;
-				if (!stopped) {
-					cards.sort(function (a, b) {
-						return (get.value(b, player) - get.value(a, player)) * att;
-					});
-					while (cards.length) {
-						if (get.value(cards[0], player) <= 5 == att > 0) break;
-						top.unshift(cards.shift());
-					}
-				}
-				bottom = cards;
-				return [top, bottom];
-			};
-			"step 1";
-			var top = result.moved[0];
-			var bottom = result.moved[1];
-			top.reverse();
-			for (var i = 0; i < top.length; i++) {
-				ui.cardPile.insertBefore(top[i], ui.cardPile.firstChild);
+			const result = await player.chooseToGuanxing(Math.min(5, num))
+				.set("prompt", "观星：点击或拖动将牌移动到牌堆顶或牌堆底")
+				.forResult();
+			if ((!result.bool || !result.moved[0].length) && event.triggername == "phaseZhunbeiBegin") {
+				player.addTempSkill("guanxing_fail");
 			}
-			for (i = 0; i < bottom.length; i++) {
-				ui.cardPile.appendChild(bottom[i]);
-			}
-			if (event.triggername == "phaseZhunbeiBegin" && top.length == 0) {
-				player.addTempSkill("reguanxing_on");
-			}
-			player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
-			game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
-			game.updateRoundNumber();
-			game.delayx();
 		},
 		mod: {
 			ignoredHandcard: function (card, player) {
@@ -25040,6 +24988,9 @@ const skills = {
 				if (name == "phaseDiscard" && get.type(card) != "basic") return false;
 			},
 		},
+		ai: {
+			guanxing: true
+		}
 	},
 	chenqing: {
 		audio: 2,

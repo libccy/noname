@@ -325,7 +325,7 @@ const translates = {
 	ps_zhugeliang: "★诸葛亮",
 	ps_zhugeliang_prefix: "★",
 	psguanxing: "观星",
-	psguanxing_info: "准备阶段，你可以观看牌堆顶的五张牌，并将其以任意顺序置于牌堆项或牌堆底。",
+	psguanxing_info: "准备阶段，你可以观看牌堆顶的五张牌，并将其以任意顺序置于牌堆顶或牌堆底。",
 	pslongyin: "龙吟",
 	pslongyin_info: "每回合限一次。你可以将任意张点数和为13的牌当做任意一张基本牌或普通锦囊牌使用或打出。",
 	ps2066_zhugeliang: "武将传诸葛亮",

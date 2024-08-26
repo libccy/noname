@@ -1266,7 +1266,7 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					let sources = game.filterPlayer(cur => {
-						return cur.hasHistory("damage", evt => {
+						return cur.hasHistory("sourceDamage", evt => {
 							return evt.card == trigger.card;
 						});
 					});

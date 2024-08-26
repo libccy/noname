@@ -177,55 +177,18 @@ const skills = {
 				locked: false,
 				preHidden: true,
 				async content(event, trigger, player) {
-					const num = player.countCards("h", card => card.hasGaintag("dcxidi_tag"));
-					const cards = get.cards(Math.min(num, 5));
-					await game.cardsGotoOrdering(cards);
-					const next = player.chooseToMove();
-					next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
-					next.set("prompt", "羲笛：点击或拖动将牌移动到牌堆顶或牌堆底");
-					next.processAI = list => {
-						const cards = list[0][1],
-							player = _status.event.player;
-						const top = [];
-						const judges = player.getCards("j");
-						let stopped = false;
-						if (!player.hasWuxie()) {
-							for (let i = 0; i < judges.length; i++) {
-								const judge = get.judge(judges[i]);
-								cards.sort((a, b) => judge(b) - judge(a));
-								if (judge(cards[0]) < 0) {
-									stopped = true;
-									break;
-								} else {
-									top.unshift(cards.shift());
-								}
-							}
-						}
-						let bottom;
-						if (!stopped) {
-							cards.sort((a, b) => get.value(b, player) - get.value(a, player));
-							while (cards.length) {
-								if (get.value(cards[0], player) <= 5) break;
-								top.unshift(cards.shift());
-							}
-						}
-						bottom = cards;
-						return [top, bottom];
-					};
-					const {
-						result: { moved },
-					} = await next;
-					const top = moved[0];
-					const bottom = moved[1];
-					top.reverse();
-					await game.cardsGotoPile(top.concat(bottom), ["top_cards", top], (event, card) => {
-						if (event.top_cards.includes(card)) return ui.cardPile.firstChild;
-						return null;
-					});
-					player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
-					game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
-					await game.delayx();
+					const num = Math.min(5, player.countCards("h", card => card.hasGaintag("dcxidi_tag")));
+					const result = player.chooseToGuanxing(num)
+						.set("prompt", "羲笛：点击或拖动将牌移动到牌堆顶或牌堆底")
+						.forResult();
+					if (!result.bool || !result.moved[0].length) player.addTempSkill("guanxing_fail");
 				},
+				ai: {
+					guanxing: true,
+					skillTagFilter(player, tag, arg) {
+						if (tag === "guanxing") return player.hasCard(card => card.hasGaintag("dcxidi_tag"), "h");
+					}
+				}
 			},
 		},
 	},

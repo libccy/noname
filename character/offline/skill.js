@@ -8694,64 +8694,13 @@ const skills = {
 		trigger: { player: "phaseZhunbeiBegin" },
 		frequent: true,
 		preHidden: true,
-		content() {
-			"step 0";
-			var num = 5;
-			var cards = get.cards(num);
-			game.cardsGotoOrdering(cards);
-			var next = player.chooseToMove();
-			next.set("list", [["牌堆顶", cards], ["牌堆底"]]);
-			next.set("prompt", "观星：点击或拖动将牌移动到牌堆顶或牌堆底");
-			next.processAI = function (list) {
-				var cards = list[0][1],
-					player = _status.event.player;
-				var top = [];
-				var judges = player.getCards("j");
-				var stopped = false;
-				if (!player.hasWuxie()) {
-					for (var i = 0; i < judges.length; i++) {
-						var judge = get.judge(judges[i]);
-						cards.sort(function (a, b) {
-							return judge(b) - judge(a);
-						});
-						if (judge(cards[0]) < 0) {
-							stopped = true;
-							break;
-						} else {
-							top.unshift(cards.shift());
-						}
-					}
-				}
-				var bottom;
-				if (!stopped) {
-					cards.sort(function (a, b) {
-						return get.value(b, player) - get.value(a, player);
-					});
-					while (cards.length) {
-						if (get.value(cards[0], player) <= 5) break;
-						top.unshift(cards.shift());
-					}
-				}
-				bottom = cards;
-				return [top, bottom];
-			};
-			"step 1";
-			var top = result.moved[0];
-			var bottom = result.moved[1];
-			top.reverse();
-			for (var i = 0; i < top.length; i++) {
-				ui.cardPile.insertBefore(top[i], ui.cardPile.firstChild);
-			}
-			for (i = 0; i < bottom.length; i++) {
-				ui.cardPile.appendChild(bottom[i]);
-			}
-			player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下");
-			game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
-			game.updateRoundNumber();
-			game.delayx();
+		async content(event, trigger, player) {
+			const result = await player.chooseToGuanxing(5).set("prompt", "观星：点击或拖动将牌移动到牌堆顶或牌堆底").forResult();
+			if (!result.bool || !result.moved[0].length) player.addTempSkill("guanxing_fail");
 		},
 		ai: {
 			threaten: 1.2,
+			guanxing: true
 		},
 	},
 	pslongyin: {
