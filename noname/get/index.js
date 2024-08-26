@@ -715,10 +715,11 @@ export class Get extends GetCompatible {
 	}
 	/**
 	 * Get the source of the skill or event
-	 *
+	 * 
 	 * 获取一个技能或事件的某个属性的源技能
-	 *
-	 * 第二个参数为获取属性，不填写默认获取sourceSkill
+	 * @param { string | Object } skill - 传入的技能或事件
+	 * @param { string } text - 要获取的属性（不填写默认获取sourceSkill）
+	 * @returns { string }
 	 */
 	sourceSkillFor(skill, text) {
 		if (!text) text = "sourceSkill";
