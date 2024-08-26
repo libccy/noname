@@ -10196,6 +10196,7 @@ const skills = {
 				}
 				target.markSkill("dcwumei_wake");
 				if (!trigger._finished) {
+					player.phaseNumber--;
 					trigger.finish();
 					trigger.untrigger(true);
 					trigger._triggered = 5;

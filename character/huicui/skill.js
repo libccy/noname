@@ -428,7 +428,7 @@ const skills = {
 					source: "damageSource",
 				},
 				filter(event, player) {
-					return player.countCards("e") == player.countCards("h", card => card.hasGaintag("dcjigu")) && player.getRoundHistory("useSkill", evt => evt.skill == "dcjigu_temp").length < game.roundNumber;
+					return player.countCards("e") == player.countCards("h", card => card.hasGaintag("dcjigu"));
 				},
 				prompt2(event, player) {
 					return (
@@ -447,6 +447,11 @@ const skills = {
 							.map((_, i) => i + 1)
 							.reduce((sum, i) => sum + player.countEmptySlot(i), 0)
 					);
+					let num1 = player.getRoundHistory("useSkill", evt => evt.skill == "dcjigu_temp").length;
+					let num2 = game.countPlayer2(current => {
+						return current.actionHistory.some(i => i.isMe && !i.isSkipped);
+					});
+					if (num1 >= num2) player.tempBanSkill(event.name, "roundStart");
 				},
 			},
 		},
