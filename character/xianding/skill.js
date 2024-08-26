@@ -125,7 +125,7 @@ const skills = {
 			} else cards = trigger.cards.filterInD("d");
 			cards = cards.filter(card => ["basic", "trick"].includes(get.type(card)));
 			if (cards.length) {
-				const next = player.gain(cards, "gain2");
+				const next = player.gain(cards.randomGet(), "gain2");
 				next.gaintag.add("dcsbmuwang_tag");
 				await next;
 				player.addTempSkill("dcsbmuwang_lose");
