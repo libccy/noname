@@ -1606,7 +1606,7 @@ export class Create {
 			}
 			let list = [];
 			for (let btn of dialog.buttons) {
-				let reg =  new RegExp(value, "g");
+				let reg = new RegExp(value, "g");
 				if (reg.test(get.translation(btn.link)) || reg.test(lib.translate[`${btn.link}_ab`])) {
 					btn.classList.remove("nodisplay");
 				} else {
