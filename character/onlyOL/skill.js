@@ -433,7 +433,7 @@ const skills = {
 							}
 						});
 					})
-				).catch(() => {});
+				).catch(() => { });
 				game.broadcastAll("cancel", eventId);
 			}
 			if (locals.length > 0) {
@@ -775,7 +775,7 @@ const skills = {
 						player.countCards("h", card => {
 							return !current.hasUseTarget(card);
 						}) >=
-							2 + (player.getHp() > 1)
+						2 + (player.getHp() > 1)
 					);
 				})
 			)
@@ -857,9 +857,9 @@ const skills = {
 				}
 			} else {
 				const numbers = cards
-						.map(card => get.number(card, player))
-						.toUniqued()
-						.sort((a, b) => a - b),
+					.map(card => get.number(card, player))
+					.toUniqued()
+					.sort((a, b) => a - b),
 					min = numbers[0],
 					max = numbers.at(-1);
 				const [card] = links;
@@ -2399,8 +2399,11 @@ const skills = {
 							return "技能失效";
 						})
 						.set("list", list.slice(trigger.getParent().num, list.length));
-					player[result3.control == "失去体力" ? "loseHp" : "addTempSkill"](result3.control == "失去体力" ? 1 : "olsbzhuri_block");
-					player.tempBanSkill("olsbzhuri");
+					if (result3.control == "失去体力") player.loseHp(1);
+					else {
+						player.addTempSkill("olsbzhuri_block");
+						player.tempBanSkill("olsbzhuri");
+					}
 				}
 			}
 		},
