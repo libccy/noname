@@ -51,7 +51,7 @@ const translates = {
 	stdmingfa: "明伐",
 	stdmingfa_info: "出牌阶段，你可以对一名体力值大于1的角色造成1点伤害，然后此技能失效直至其死亡或回复体力。",
 	stdjinjian: "进谏",
-	stdjinjian_info: "每回合每项各限一次，当你造成/受到伤害时，你可令防止此伤害，然后你本回合内下一次造成/受到的伤害+1。",
+	stdjinjian_info: "每回合每项各限一次，当你造成/受到伤害时，你可防止此伤害，然后你本回合内下一次造成/受到的伤害+1。",
 	stdrenzheng: "仁政",
 	stdrenzheng_info: "锁定技，当有伤害被防止时，你令当前回合角色摸一张牌。",
 	stdxiongsuan: "凶算",
