@@ -202,7 +202,7 @@ const skills = {
 			const place = event.cost_data;
 			player.popup(place, "fire");
 			game.log(player, "击伤了", target, "的", "#y" + get.translation(place));
-			target.addSkill("1！5！_injury");
+			target.addTempSkill("1！5！_injury");
 			target.markAuto("1！5！_injury", [place]);
 			switch (parseInt(place.slice("1！5！_place".length))) {
 				case 1:
@@ -250,6 +250,7 @@ const skills = {
 		subSkill: {
 			injury: {
 				charlotte: true,
+				onremove: true,
 			},
 			maxhand: {
 				charlotte: true,
@@ -342,7 +343,7 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		async cost (event, trigger, player) {
-			let list = ["摸体力值张牌，此阶段使用的下一张【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复1点体力。"];
+			let list = ["摸体力值张牌，此阶段使用的下一张【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复等量体力。"];
 			let result = await player.chooseControlList(list).set("ai", function(){
 				//等157优化）
 				return Math.random();
@@ -392,7 +393,7 @@ const skills = {
 					return player.isDamaged();
 				},
 				content:async function (event, trigger, player) {
-					player.recover();
+					player.recover(trigger.num);
 				}
 			},
 		}
