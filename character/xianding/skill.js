@@ -9609,8 +9609,9 @@ const skills = {
 				const list = nameList.slice().randomSort();
 				for (const name of list) {
 					const card = new lib.element.VCard({ name });
-					if (player.canUse(card, target)) {
-						await player.useCard(card, target);
+					let targets = [player, target].filter(current => player.canUse(card, current));
+					if (targets.length) {
+						await player.useCard(card, targets);
 						await game.delayx();
 						break;
 					}

@@ -6918,25 +6918,29 @@ const skills = {
 		filterTarget: function (card, player, target) {
 			return target.countCards("h");
 		},
-		content: function () {
-			"step 0";
-			event.togive = target.getNext();
-			var cards = target.getCards("h", { name: "sha" });
+		async content(event, trigger, player) {
+			let togive = event.target.getNext();
+			let cards = event.target.getCards("h", { name: "sha" });
 			if (!cards.length) {
-				game.log("但", target, "没有", "#y杀", "！");
-				event.finish();
+				game.log("但", event.target, "没有", "#y杀", "！");
+				return;
 			}
-			"step 1";
-			var cards = target.getCards("h", { name: "sha" }),
-				card = cards.randomRemove(1)[0];
-			target.give(card, event.togive);
-			if (cards.length) {
-				event.togive = event.togive.getNext();
-				event.redo();
+			let gained;
+			while (true) {
+				let card = event.target.getCards("h", { name: "sha" }).randomGet();
+				if (togive == gained) break;
+				if (togive.isIn()) {
+					await event.target.give(card, togive);
+					gained = togive;
+				}
+				let num = togive == event.target ? 1 : 0;
+				if (event.target.countCards("h", { name: "sha" }) > num) togive = togive.getNext();
+				else break;
 			}
-			"step 2";
-			target.line(event.togive);
-			event.togive.damage(Math.min(2, event.togive.countCards("h", { name: "sha" })), target);
+			event.target.line(togive);
+			let num = togive.countCards("h", { name: "sha" });
+			if (!num) return;
+			await togive.damage(Math.min(2, num), event.target);
 		},
 		ai: {
 			order: 10,
