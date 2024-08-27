@@ -10534,7 +10534,9 @@ const skills = {
 		},
 	},
 	zhichi2: {
+		audio: 'zhichi',
 		trigger: { target: "useCardToBefore" },
+		audioname: ["re_chengong"],
 		forced: true,
 		charlotte: true,
 		priority: 15,

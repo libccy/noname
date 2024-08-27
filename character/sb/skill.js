@@ -7744,6 +7744,7 @@ const skills = {
 		group: "splveying_add",
 		subSkill: {
 			add: {
+				audio: "splveying",
 				trigger: { player: "useCardToPlayered" },
 				forced: true,
 				usable: 2,
@@ -7773,6 +7774,7 @@ const skills = {
 		ai: { combo: "splveying" },
 		subSkill: {
 			add: {
+				audio: 'spyingwu',
 				trigger: { player: "useCardToPlayered" },
 				forced: true,
 				locked: false,
