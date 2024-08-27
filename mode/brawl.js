@@ -2507,7 +2507,7 @@ export default () => {
 								"step 0";
 								ui.arena.classList.add("choose-character");
 								for (var i in lib.skill) {
-									if (lib.skill[i].changeSeat) {
+									if (lib.skill[i].seatRelated) {
 										lib.skill[i] = {};
 										if (lib.translate[i + "_info"]) {
 											lib.translate[i + "_info"] = "此模式下不可用";
@@ -3563,7 +3563,7 @@ export default () => {
 								"step 0";
 								for (var i in lib.skill) {
 									if (lib.skill[i].audio && !lib.skill[i].equipSkill) lib.skill[i].audio = false;
-									if (lib.skill[i].changeSeat) {
+									if (lib.skill[i].seatRelated) {
 										lib.skill[i] = {};
 										if (lib.translate[i + "_info"]) {
 											lib.translate[i + "_info"] = "此模式下不可用";

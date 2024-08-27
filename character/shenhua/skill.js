@@ -973,6 +973,7 @@ const skills = {
 		},
 	},
 	drlt_qianjie: {
+		audio: 2,
 		group: ["drlt_qianjie_1", "drlt_qianjie_2", "drlt_qianjie_3"],
 		locked: true,
 		ai: {
@@ -5295,9 +5296,6 @@ const skills = {
 	luanwu: {
 		audio: 2,
 		audioname: ["re_jiaxu"],
-		audioname2: {
-			"sb_jiaxu": "sbluanwu_jiaxu",
-		},
 		unique: true,
 		enable: "phaseUse",
 		limited: true,

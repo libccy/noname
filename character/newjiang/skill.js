@@ -307,7 +307,7 @@ const skills = {
 		},
 		filter(event, player) {
 			if (["global", "equip"].includes(event.type)) return false;
-			let skill = event.sourceSkill || event.skill;
+			let skill = get.sourceSkillFor(event);
 			if (!skill || skill == "gouzhu") return false;
 			let info = get.info(skill);
 			while (true) {
@@ -360,7 +360,7 @@ const skills = {
 		locked: false,
 		onremove: true,
 		async content(event, trigger, player) {
-			let skill = trigger.sourceSkill || trigger.skill,
+			let skill = get.sourceSkillFor(trigger),
 				info = get.info(skill);
 			while (true) {
 				if (info && !info.sourceSkill) break;
@@ -1126,6 +1126,7 @@ const skills = {
 					})()
 				);
 			"step 1";
+			var type = get.type2(trigger.card, trigger.player);
 			var guessedNum = result.index;
 			player.chat("我猜" + get.cnNumber(guessedNum) + "张");
 			game.log(player, "猜测", trigger.player, "有", get.cnNumber(guessedNum) + "张" + get.translation(type) + "牌");
@@ -1358,6 +1359,7 @@ const skills = {
 			);
 		},
 		direct: true,
+		seatRelated: true,
 		content: function () {
 			"step 0";
 			var zhu = game.findPlayer(i => i.getSeatNum() == 1);
@@ -2988,6 +2990,7 @@ const skills = {
 		},
 	},
 	spqishe: {
+		audio: 2,
 		enable: "chooseToUse",
 		viewAs: { name: "jiu" },
 		filterCard: { type: "equip" },

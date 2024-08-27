@@ -2178,16 +2178,6 @@ game.import("character", function () {
 					},
 				},
 			},
-			xiuhua_old: {
-				changeSeat: true,
-				trigger: { player: "shaHit" },
-				filter(event, player) {
-					return event.target != player.previous;
-				},
-				content() {
-					game.swapSeat(trigger.target, player, true, true);
-				},
-			},
 			shahun: {
 				enable: "chooseToUse",
 				skillAnimation: true,
@@ -2243,32 +2233,6 @@ game.import("character", function () {
 					} else {
 						player.die();
 					}
-				},
-			},
-			yanjia_old: {
-				enable: "chooseToUse",
-				filter(event, player) {
-					return player.countCards("he", { type: "equip" }) > 0;
-				},
-				filterCard(card) {
-					return get.type(card) == "equip";
-				},
-				position: "he",
-				viewAs: { name: "wuzhong" },
-				prompt: "将一张装备牌当无中生有使用",
-				check(card) {
-					var player = _status.currentPhase;
-					if (player.countCards("he", { subtype: get.subtype(card) }) > 1) {
-						return 11 - get.equipValue(card);
-					}
-					if (player.countCards("h") < player.hp) {
-						return 6 - get.value(card);
-					}
-					return 2 - get.equipValue(card);
-				},
-				ai: {
-					order: 9,
-					threaten: 1.1,
 				},
 			},
 			xuanning: {
@@ -2524,37 +2488,6 @@ game.import("character", function () {
 							return get.damageEffect(target, player, player, "fire");
 						},
 					},
-				},
-			},
-			jiehuo_old: {
-				unique: true,
-				forbid: ["infinity"],
-				skillAnimation: true,
-				animationColor: "fire",
-				init(player) {
-					player.storage.jiehuo = false;
-				},
-				enable: "phaseUse",
-				filter(event, player) {
-					//if(player.maxHp<=1) return false;
-					return !player.storage.jiehuo;
-				},
-				intro: {
-					content: "limited",
-				},
-				// mark:true,
-				line: "fire",
-				filterTarget(card, player, target) {
-					return player != target;
-				},
-				selectTarget: -1,
-				content() {
-					if (!player.storage.jiehuo2) {
-						player.storage.jiehuo2 = player.maxHp;
-						player.addSkill("jiehuo2");
-					}
-					player.storage.jiehuo = true;
-					target.damage(Math.min(target.hp, player.storage.jiehuo2), "fire");
 				},
 			},
 			jiehuo2: {

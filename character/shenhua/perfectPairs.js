@@ -3,7 +3,7 @@ export default {
 	re_yuanshao: ["yanwen", "tianfeng"],
 	menghuo: ["zhurong"],
 	sp_zhugeliang: ["pangtong", "huangyueying"],
-	sunce: ["zhouyu", "taishici", "daqiao"],
+	sunce: ["zhouyu", "taishici", "re_taishici", "daqiao"],
 	zuoci: ["yuji"],
 	xunyu: ["xunyou"],
 	lukang: ["luxun"],

@@ -700,7 +700,8 @@ export class Game extends GameCompatible {
 		if (type != "cards" && type != "card") return;
 		var next = game.createEvent("cardsDiscard");
 		// @ts-ignore
-		next.cards = type == "cards" ? cards.slice(0) : [cards];
+		if (type == "card") cards = [cards];
+		next.cards = cards.slice(0).map(i => i.cards ? i.cards : [i]).flat();
 		next.setContent("cardsDiscard");
 		next.getd = function (player, key, position) {
 			return this.cards.slice(0);

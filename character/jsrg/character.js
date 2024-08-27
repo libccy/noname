@@ -383,7 +383,7 @@ const characters = {
 	jsrg_zhangjiao: {
 		sex: "male",
 		group: "qun",
-		hp: 3,
+		hp: 4,
 		skills: ["jsrgxiangru", "jsrgwudao"],
 	},
 	jsrg_yangqiu: {
@@ -401,7 +401,7 @@ const characters = {
 	jsrg_zhanghuan: {
 		sex: "male",
 		group: "qun",
-		hp: 3,
+		hp: 4,
 		skills: ["jsrgzhushou", "jsrgyangge"],
 	},
 	jsrg_liubiao: {

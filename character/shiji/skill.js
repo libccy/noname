@@ -935,6 +935,7 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		changeSeat: true,
+		seatRelated: true,
 		limited: true,
 		skillAnimation: true,
 		animationColor: "orange",
@@ -1370,6 +1371,7 @@ const skills = {
 	},
 	//高览
 	spjungong: {
+		audio: 2,
 		enable: "phaseUse",
 		filter: function (event, player) {
 			var num = player.getStat("skill").spjungong || 0;
@@ -1422,6 +1424,7 @@ const skills = {
 		},
 	},
 	spdengli: {
+		audio: 2,
 		trigger: {
 			player: "useCardToPlayered",
 			target: "useCardToTargeted",
@@ -1687,6 +1690,7 @@ const skills = {
 	},
 	//吴景流兵
 	liubing: {
+		audio: 2,
 		trigger: { player: "useCard1" },
 		forced: true,
 		filter: function (event, player) {
@@ -3308,6 +3312,7 @@ const skills = {
 		},
 	},
 	splirang: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -4273,8 +4278,8 @@ const skills = {
 	mjweipo: {
 		audio: 2,
 		enable: "phaseUse",
-		usable: 1,
 		filter: function (event, player) {
+			if (player.hasSkill("mjweipo_used")) return false;
 			return game.hasPlayer(function (current) {
 				return !current.hasSkill("mjweipo_effect");
 			});
@@ -4284,6 +4289,7 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
+			player.addTempSkill("mjweipo_used");
 			var list = ["binglinchengxiax"];
 			list.addArray(get.zhinangs());
 			player.chooseButton(["危迫：选择一个智囊", [list, "vcard"]], true).set("ai", function (button) {
@@ -4298,6 +4304,11 @@ const skills = {
 				target.addSkill("mjweipo_effect");
 				game.delayx();
 			}
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+			},
 		},
 		ai: {
 			order: 7.1,
@@ -5467,60 +5478,60 @@ const skills = {
 			global: ["phaseBefore", "dieAfter"],
 			player: "enterGame",
 		},
-		direct: true,
-		filter: function (event, player) {
-			if (event.name == "die") return event.player == player.storage.xunyi2;
-			return !player.storage.xunyi2 && (event.name != "phase" || game.phaseNumber == 0);
-		},
-		content: function () {
-			"step 0";
-			player.removeSkill("xunyi2");
-			player.chooseTarget(lib.filter.notMe, get.prompt2("xunyi")).set("ai", function (target) {
-				var player = _status.event.player;
-				return Math.max(1 + get.attitude(player, target) * get.threaten(target), Math.random());
-			});
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("xunyi", target);
-				player.storage.xunyi2 = target;
-				player.addSkill("xunyi2");
-			}
-		},
-	},
-	xunyi2: {
-		audio: "xunyi",
-		trigger: { global: "damageSource" },
-		forced: true,
-		charlotte: true,
-		filter: function (event, player) {
-			var list = [player, player.storage.xunyi2];
-			return list.includes(event.source) && !list.includes(event.player);
-		},
-		logTarget: function (event, player) {
-			return player.storage.xunyi2;
-		},
-		content: function () {
-			(player == trigger.source ? player.storage.xunyi2 : player).draw(trigger.num);
-		},
-		group: "xunyi3",
-		mark: true,
 		intro: { content: "效果目标：$" },
-	},
-	xunyi3: {
-		audio: "xunyi",
-		trigger: { global: "damageEnd" },
-		forced: true,
-		charlotte: true,
 		filter: function (event, player) {
-			var list = [player, player.storage.xunyi2];
-			return event.num && list.includes(event.player) && !list.includes(event.source) && (player == event.player ? player.storage.xunyi2 : player).countCards("he") > 0;
+			if (event.name == "die") return player.getStorage("xunyi").includes(event.player);
+			return !player.getStorage("xunyi").length && (event.name != "phase" || game.phaseNumber == 0);
 		},
-		logTarget: function (event, player) {
-			return player.storage.xunyi2;
+		async cost(event, trigger, player) {
+			player.removeSkill("xunyi_effect");
+			let prompt = trigger.name == "die" ? "是否令一名其他角色获得“义”？" : "令一名其他角色获得“义”";
+			event.result = await player
+				.chooseTarget(lib.filter.notMe, "殉义", prompt, trigger.name != "die")
+				.set("ai", function (target) {
+					var player = _status.event.player;
+					return Math.max(1 + get.attitude(player, target) * get.threaten(target), Math.random());
+				})
+				.forResult();
 		},
-		content: function () {
-			(player == trigger.player ? player.storage.xunyi2 : player).chooseToDiscard("he", trigger.num, true);
+		async content(event, trigger, player) {
+			player.markAuto("xunyi", event.targets);
+			player.addSkill("xunyi_effect");
+		},
+		subSkill: {
+			effect: {
+				audio: "xunyi",
+				trigger: {
+					global: ["damageSource", "damageEnd"],
+				},
+				forced: true,
+				charlotte: true,
+				onremove(player) {
+					player.unmarkAuto("xunyi", player.getStorage("xunyi"));
+				},
+				getIndex(event) {
+					return event.num;
+				},
+				filter(event, player, name) {
+					if (!player.getStorage("xunyi").length) return false;
+					let viewer = event[name == "damageEnd" ? "player" : "source"];
+					let list = player.getStorage("xunyi").concat([player]);
+					if (!list.includes(viewer)) return false;
+					let target = list.find(current => current != viewer);
+					if (!target || name == "damageEnd" && !target.countCards("he")) return false;
+					return target.isIn() && target != event[name != "damageEnd" ? "player" : "source"];
+				},
+				logTarget(event, player, name) {
+					return player.getStorage("xunyi")[0];
+				},
+				async content(event, trigger, player) {
+					const bool = event.triggername == "damageEnd";
+					let viewer = trigger[bool ? "player" : "source"];
+					let target = viewer == player ? event.targets[0] : player;
+					if (bool) await target.chooseToDiscard("he", true);
+					else await target.draw();
+				},
+			},
 		},
 	},
 	//狗剩
@@ -6120,6 +6131,7 @@ const skills = {
 				charlotte: true,
 				trigger: { global: "useCardToPlayer" },
 				filter: function (event, player) {
+					if (!event.player.isPhaseUsing()) return false;
 					return event.player != event.target && event.player.hasMark("fyjianyu_" + player.playerid) && event.target.hasMark("fyjianyu_" + player.playerid) && event.target.isIn();
 				},
 				forced: true,
@@ -6601,6 +6613,7 @@ const skills = {
 		},
 	},
 	fubi: {
+		audio: 2,
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
@@ -6642,6 +6655,7 @@ const skills = {
 		intro: { content: "若$存活，则手牌上限+3" },
 	},
 	zuici: {
+		audio: 2,
 		trigger: { player: "dying" },
 		direct: true,
 		filter: function (event, player) {

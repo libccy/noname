@@ -554,6 +554,15 @@ export const Content = {
 		//进行第一轮先行判断，让所有装备牌的原主失去装备牌
 		if (event.cards) {
 			const map = {};
+			//第一轮初判断的event.cards会在后面的步骤被覆盖，所以此处安心修改
+			if (event.card) {
+				const cardx = get.cardPile(cardx => {
+					if (cardx.card !== event.card) return false;
+					const owner = get.owner(cardx, "judge");
+					return owner && (owner != player || get.position(cardx) != "e");
+				}, "field");
+				if (cardx) event.cards.add(cardx);
+			}
 			for (const i of event.cards) {
 				var owner = get.owner(i, "judge");
 				if (owner && (owner != player || get.position(i) != "e")) {
@@ -1198,12 +1207,9 @@ export const Content = {
 						addNode();
 					}, getTimeout());
 				} else {
-					setTimeout(
-						function () {
-							event.settle();
-						},
-						speed * 110 + 100
-					);
+					setTimeout(function () {
+						event.settle();
+					}, speed * 110 + 100);
 				}
 			};
 			//点击时的判断操作
@@ -1246,14 +1252,11 @@ export const Content = {
 
 			game.pause();
 			game.countChoose();
-			setTimeout(
-				() => {
-					if (!lib.config.background_audio) return;
-					if (beatmap.filename.startsWith("ext:")) game.playAudio(beatmap.filename);
-					else game.playAudio("effect", beatmap.filename);
-				},
-				Math.floor(speed * 100 * (0.9 + beatmap.judgebar_height)) + beatmap.current
-			);
+			setTimeout(() => {
+				if (!lib.config.background_audio) return;
+				if (beatmap.filename.startsWith("ext:")) game.playAudio(beatmap.filename);
+				else game.playAudio("effect", beatmap.filename);
+			}, Math.floor(speed * 100 * (0.9 + beatmap.judgebar_height)) + beatmap.current);
 			setTimeout(function () {
 				addNode();
 			}, getTimeout());
@@ -1398,7 +1401,7 @@ export const Content = {
 					// 更新每次移动后的对应实体牌的位置
 					event.moved[i._link] = get.links(Array.from(i.childNodes));
 					// 更新这个buttons的提示文本
-					if (typeof i.textPrompt == 'function') i.previousSibling.innerHTML = '<div class="text center">' + i.textPrompt(event.moved[i._link]) + "</div>";
+					if (typeof i.textPrompt == "function") i.previousSibling.innerHTML = '<div class="text center">' + i.textPrompt(event.moved[i._link]) + "</div>";
 				}
 				if (filterOk(event.moved)) {
 					ui.create.confirm("o");
@@ -1410,13 +1413,13 @@ export const Content = {
 
 			/**
 			 * 确认是否是拖拽开始
-			 * 
+			 *
 			 * 按下时，是不能判断出是否拖拽开始的，得在move事件才可以
-			 * 
+			 *
 			 * @this buttons
-			 * @param { TouchEvent | MouseEvent } e 
+			 * @param { TouchEvent | MouseEvent } e
 			 */
-			var dragStart = function(e) {
+			var dragStart = function (e) {
 				if (event.isPlayingAnimation) return;
 				// 左键按下
 				if (e instanceof MouseEvent) {
@@ -1435,8 +1438,8 @@ export const Content = {
 				if (target) {
 					if (!target.copy) {
 						target.copy = target.cloneNode(true);
-						target.copy.style.opacity = '0.5';
-						target.copy.style.pointerEvents = 'none';
+						target.copy.style.opacity = "0.5";
+						target.copy.style.pointerEvents = "none";
 					}
 					touchStartX = (e instanceof MouseEvent ? e.clientX : e.touches[0].clientX) / game.documentZoom;
 					touchStartY = (e instanceof MouseEvent ? e.clientY : e.touches[0].clientY) / game.documentZoom;
@@ -1449,13 +1452,13 @@ export const Content = {
 
 			/**
 			 * 判断出是否拖拽开始
-			 * 
+			 *
 			 * move事件是在button元素上监听的，而不是在dialog.content上。
-			 * 
+			 *
 			 * @this dialog
-			 * @param { TouchEvent | MouseEvent } e 
+			 * @param { TouchEvent | MouseEvent } e
 			 */
-			var onDrag = function(e) {
+			var onDrag = function (e) {
 				if (event.isPlayingAnimation) return;
 				if (e instanceof MouseEvent) {
 					if (e.which != 1) return;
@@ -1467,17 +1470,16 @@ export const Content = {
 				if (!firstOnDragElement) {
 					if (!currentElement.contains(e.target)) {
 						return;
-					}
-					else {
+					} else {
 						firstOnDragElement = currentElement;
 					}
 				}
 				// 拖动离开了这个牌的区域，进行赋值
 				// if (!currentElement.contains(e.target)) {
-					
+
 				// }
 				// 移除高亮
-				ui.selected.guanxing_button?.classList.remove('glow2');
+				ui.selected.guanxing_button?.classList.remove("glow2");
 				ui.selected.guanxing_button = currentElement;
 				ui.selected.guanxing_button.classList.add("glow2");
 				// 显示拖拽的元素
@@ -1486,16 +1488,16 @@ export const Content = {
 				 */
 				var copy = currentElement.copy;
 				if (!ui.window.contains(copy)) {
-					copy.style.position = 'absolute';
-					copy.style.transition = 'none';
-					copy.style.zIndex = '100';
+					copy.style.position = "absolute";
+					copy.style.transition = "none";
+					copy.style.zIndex = "100";
 					ui.window.appendChild(copy);
 				}
 				copy.style.left = `${(e instanceof MouseEvent ? e.clientX : e.touches[0].clientX) / game.documentZoom}px`;
 				copy.style.top = `${(e instanceof MouseEvent ? e.clientY : e.touches[0].clientY) / game.documentZoom}px`;
 			};
 
-			var dragEnd = function(e) {
+			var dragEnd = function (e) {
 				if (event.isPlayingAnimation) return;
 				if (e instanceof MouseEvent) {
 					if (e.which != 1) return;
@@ -1531,15 +1533,14 @@ export const Content = {
 				// 判断是否可以移动
 				if (!card) {
 					if (!filterMove(ui.selected.guanxing_button, button._link, event.moved)) return;
-				}
-				else {
+				} else {
 					if (!filterMove(card, ui.selected.guanxing_button, event.moved)) return;
 				}
 				// FLIP动画
 				// first
 				buttonss.forEach(btn => {
 					Array.from(btn.children).forEach(element => {
-						element.style.transition = 'none';
+						element.style.transition = "none";
 						element._rect = element.getBoundingClientRect();
 					});
 				});
@@ -1547,24 +1548,20 @@ export const Content = {
 				// 如果拖拽到一个空区域内
 				if (!button.hasChildNodes()) {
 					button.appendChild(ui.selected.guanxing_button);
-				}
-				else if (!card) {
+				} else if (!card) {
 					// 判断是加在第一个还是最后一个
 					if (children.length > 0) {
 						var firstChild = children[0];
 						if (clientX < firstChild.getBoundingClientRect().left / game.documentZoom) {
 							button.insertBefore(ui.selected.guanxing_button, firstChild);
-						}
-						else button.appendChild(ui.selected.guanxing_button);
-					}
-					else button.appendChild(ui.selected.guanxing_button);
-				}
-				else {
+						} else button.appendChild(ui.selected.guanxing_button);
+					} else button.appendChild(ui.selected.guanxing_button);
+				} else {
 					// 是交换而不是到card前面
 					var par1 = ui.selected.guanxing_button.parentNode,
-					ind1 = ui.selected.guanxing_button.nextSibling,
-					par2 = card.parentNode,
-					ind2 = card.nextSibling;
+						ind1 = ui.selected.guanxing_button.nextSibling,
+						par2 = card.parentNode,
+						ind2 = card.nextSibling;
 					ui.selected.guanxing_button.classList.remove("glow2");
 					par1.insertBefore(card, ind1);
 					par2.insertBefore(ui.selected.guanxing_button, ind2);
@@ -1573,8 +1570,7 @@ export const Content = {
 				buttonss.forEach(btn => {
 					Array.from(btn.children).forEach(element => {
 						element._rect2 = element.getBoundingClientRect();
-						element.style.transform = 
-							`translateX(${(element._rect.left - element._rect2.left) / game.documentZoom}px) translateY(${(element._rect.top - element._rect2.top) / game.documentZoom}px)`;
+						element.style.transform = `translateX(${(element._rect.left - element._rect2.left) / game.documentZoom}px) translateY(${(element._rect.top - element._rect2.top) / game.documentZoom}px)`;
 					});
 				});
 				// play
@@ -1582,23 +1578,31 @@ export const Content = {
 				setTimeout(() => {
 					Promise.race([
 						new Promise(resolve => setTimeout(resolve, 700)),
-						Promise.all(buttonss.map(btn => Array.from(btn.children)).flat(1).map(element => {
-							return new Promise(resolve => {
-								element.classList.remove("glow2");
-								element.style.transition = '';
-								const transformValue = element.style.transform;
-								if (transformValue !== 'translateX(0px) translateY(0px)' && transformValue !== '') {
-									element.style.transform = 'translateX(0px) translateY(0px)';
-									element.addEventListener('transitionend', event => {
-										// 确保 transitionend 事件是针对当前元素的 transform 属性
-										if (event.propertyName === 'transform') {
-											resolve();
-										}
-									}, { once: true });
-								}
-								else resolve();
-							})
-						}))
+						Promise.all(
+							buttonss
+								.map(btn => Array.from(btn.children))
+								.flat(1)
+								.map(element => {
+									return new Promise(resolve => {
+										element.classList.remove("glow2");
+										element.style.transition = "";
+										const transformValue = element.style.transform;
+										if (transformValue !== "translateX(0px) translateY(0px)" && transformValue !== "") {
+											element.style.transform = "translateX(0px) translateY(0px)";
+											element.addEventListener(
+												"transitionend",
+												event => {
+													// 确保 transitionend 事件是针对当前元素的 transform 属性
+													if (event.propertyName === "transform") {
+														resolve();
+													}
+												},
+												{ once: true }
+											);
+										} else resolve();
+									});
+								})
+						),
 					]).then(() => {
 						delete ui.selected.guanxing_button;
 						event.isPlayingAnimation = false;
@@ -1612,9 +1616,9 @@ export const Content = {
 				var tex = event.dialog.add('<div class="text center">' + list[i][0] + "</div>");
 				tex.classList.add("choosetomove");
 				var buttons = ui.create.div(".buttons", event.dialog.content);
-				buttons.addEventListener(lib.config.touchscreen ? 'touchstart' : 'mousedown', dragStart, true);
-				event.dialog.addEventListener(lib.config.touchscreen ? 'touchmove' : 'mousemove', onDrag, true);
-				event.dialog.addEventListener(lib.config.touchscreen ? 'touchend' : 'mouseup', dragEnd, true);
+				buttons.addEventListener(lib.config.touchscreen ? "touchstart" : "mousedown", dragStart, true);
+				event.dialog.addEventListener(lib.config.touchscreen ? "touchmove" : "mousemove", onDrag, true);
+				event.dialog.addEventListener(lib.config.touchscreen ? "touchend" : "mouseup", dragEnd, true);
 				buttonss.push(buttons);
 				buttons.classList.add("popup");
 				buttons.classList.add("guanxing");
@@ -3111,7 +3115,7 @@ export const Content = {
 		if (info.popup != false && !info.direct && !("skill_popup" in result && !Boolean(result["skill_popup"]))) {
 			const popup_info = typeof info.popup === "string" ? [event.skill, info.popup] : event.skill;
 			const args = [trigger, player, event.triggername, event.indexedData, result];
-			player.logSkill(popup_info, info.logLine === false ? false: targets, info.line, null, args);
+			player.logSkill(popup_info, info.logLine === false ? false : targets, info.line, null, args);
 		}
 		var next = game.createEvent(event.skill);
 		if (typeof info.usable == "number") {
@@ -4041,7 +4045,7 @@ export const Content = {
 			if (result.bool || (result.control && result.control != "cancel2")) {
 				var info = get.info(event.buttoned).chooseButton;
 				lib.skill[event.buttoned + "_backup"] = info.backup(info.chooseControl ? result : result.links, player);
-				lib.skill[event.buttoned + "_backup"].sourceSkill = lib.skill[event.buttoned].sourceSkill ? lib.skill[event.buttoned].sourceSkill : event.buttoned;
+				lib.skill[event.buttoned + "_backup"].sourceSkill = event.buttoned;
 				if (game.online) {
 					event._sendskill = [event.buttoned + "_backup", lib.skill[event.buttoned + "_backup"]];
 				} else {
@@ -4244,7 +4248,7 @@ export const Content = {
 			if (result.bool || (result.control && result.control != "cancel2")) {
 				var info = get.info(event.buttoned).chooseButton;
 				lib.skill[event.buttoned + "_backup"] = info.backup(info.chooseControl ? result : result.links, player);
-				lib.skill[event.buttoned + "_backup"].sourceSkill = lib.skill[event.buttoned].sourceSkill ? lib.skill[event.buttoned].sourceSkill : event.buttoned;
+				lib.skill[event.buttoned + "_backup"].sourceSkill = event.buttoned;
 				if (game.online) {
 					event._sendskill = [event.buttoned + "_backup", lib.skill[event.buttoned + "_backup"]];
 				} else {
@@ -6885,7 +6889,7 @@ export const Content = {
 					? []
 					: targets[0].getVCards("j", card => {
 							return event.filter(card) && targets[1].canAddJudge(card);
-						});
+					  });
 			if (es.length) {
 				dialogArgs.push(`<div class="text center">装备区</div>`);
 				dialogArgs.push([es, "vcard"]);
@@ -7957,6 +7961,7 @@ export const Content = {
 			event.finish();
 		}
 		"step 1";
+		event.cards = cards = cards.map(i => (i.cards ? i.cards : [i])).flat();
 		for (var i = 0; i < cards.length; i++) {
 			if (cards[i].willBeDestroyed("handcard", player, event)) {
 				cards[i].selfDestroy(event);
@@ -8044,51 +8049,42 @@ export const Content = {
 		if (event.animate == "draw") {
 			player.$draw(cards.length);
 			game.pause();
-			setTimeout(
-				function () {
-					addv();
-					player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild);
-					player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild);
-					player.update();
-					if (player == game.me) ui.updatehl();
-					broadcast();
-					game.resume();
-				},
-				get.delayx(500, 500)
-			);
+			setTimeout(function () {
+				addv();
+				player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild);
+				player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild);
+				player.update();
+				if (player == game.me) ui.updatehl();
+				broadcast();
+				game.resume();
+			}, get.delayx(500, 500));
 		} else if (event.animate == "gain") {
 			player.$gain(cards, event.log);
 			game.pause();
-			setTimeout(
-				function () {
-					addv();
-					player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild);
-					player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild);
-					player.update();
-					if (player == game.me) ui.updatehl();
-					broadcast();
-					game.resume();
-				},
-				get.delayx(700, 700)
-			);
+			setTimeout(function () {
+				addv();
+				player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild);
+				player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild);
+				player.update();
+				if (player == game.me) ui.updatehl();
+				broadcast();
+				game.resume();
+			}, get.delayx(700, 700));
 		} else if (event.animate == "gain2" || event.animate == "draw2") {
 			var gain2t = 300;
 			if (player.$gain2(cards, event.log) && player == game.me) {
 				gain2t = 500;
 			}
 			game.pause();
-			setTimeout(
-				function () {
-					addv();
-					player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild);
-					player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild);
-					player.update();
-					if (player == game.me) ui.updatehl();
-					broadcast();
-					game.resume();
-				},
-				get.delayx(gain2t, gain2t)
-			);
+			setTimeout(function () {
+				addv();
+				player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild);
+				player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild);
+				player.update();
+				if (player == game.me) ui.updatehl();
+				broadcast();
+				game.resume();
+			}, get.delayx(gain2t, gain2t));
 		} else if (event.animate == "give" || event.animate == "giveAuto") {
 			var evtmap = event.losing_map;
 			if (event.animate == "give") {
@@ -8104,33 +8100,27 @@ export const Content = {
 				}
 			}
 			game.pause();
-			setTimeout(
-				function () {
-					addv();
-					player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild);
-					player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild);
-					player.update();
-					if (player == game.me) ui.updatehl();
-					broadcast();
-					game.resume();
-				},
-				get.delayx(500, 500)
-			);
+			setTimeout(function () {
+				addv();
+				player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild);
+				player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild);
+				player.update();
+				if (player == game.me) ui.updatehl();
+				broadcast();
+				game.resume();
+			}, get.delayx(500, 500));
 		} else if (typeof event.animate == "function") {
 			var time = event.animate(event);
 			game.pause();
-			setTimeout(
-				function () {
-					addv();
-					player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild);
-					player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild);
-					player.update();
-					if (player == game.me) ui.updatehl();
-					broadcast();
-					game.resume();
-				},
-				get.delayx(time, time)
-			);
+			setTimeout(function () {
+				addv();
+				player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild);
+				player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild);
+				player.update();
+				if (player == game.me) ui.updatehl();
+				broadcast();
+				game.resume();
+			}, get.delayx(time, time));
 		} else {
 			addv();
 			player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild);
@@ -8212,39 +8202,30 @@ export const Content = {
 			player.$draw(cards.length);
 			if (event.log) game.log(player, "将", get.cnNumber(cards.length), "张牌置于了武将牌上");
 			game.pause();
-			setTimeout(
-				function () {
-					player.$addToExpansion(cards, null, event.gaintag);
-					for (var i of event.gaintag) player.markSkill(i);
-					game.resume();
-				},
-				get.delayx(500, 500)
-			);
+			setTimeout(function () {
+				player.$addToExpansion(cards, null, event.gaintag);
+				for (var i of event.gaintag) player.markSkill(i);
+				game.resume();
+			}, get.delayx(500, 500));
 		} else if (event.animate == "gain") {
 			player.$gain(cards, false);
 			game.pause();
-			setTimeout(
-				function () {
-					player.$addToExpansion(cards, null, event.gaintag);
-					for (var i of event.gaintag) player.markSkill(i);
-					game.resume();
-				},
-				get.delayx(700, 700)
-			);
+			setTimeout(function () {
+				player.$addToExpansion(cards, null, event.gaintag);
+				for (var i of event.gaintag) player.markSkill(i);
+				game.resume();
+			}, get.delayx(700, 700));
 		} else if (event.animate == "gain2" || event.animate == "draw2") {
 			var gain2t = 300;
 			if (player.$gain2(cards) && player == game.me) {
 				gain2t = 500;
 			}
 			game.pause();
-			setTimeout(
-				function () {
-					player.$addToExpansion(cards, null, event.gaintag);
-					for (var i of event.gaintag) player.markSkill(i);
-					game.resume();
-				},
-				get.delayx(gain2t, gain2t)
-			);
+			setTimeout(function () {
+				player.$addToExpansion(cards, null, event.gaintag);
+				for (var i of event.gaintag) player.markSkill(i);
+				game.resume();
+			}, get.delayx(gain2t, gain2t));
 		} else if (event.animate == "give" || event.animate == "giveAuto") {
 			var evtmap = event.losing_map;
 			if (event.animate == "give") {
@@ -8267,25 +8248,19 @@ export const Content = {
 				}
 			}
 			game.pause();
-			setTimeout(
-				function () {
-					player.$addToExpansion(cards, null, event.gaintag);
-					for (var i of event.gaintag) player.markSkill(i);
-					game.resume();
-				},
-				get.delayx(500, 500)
-			);
+			setTimeout(function () {
+				player.$addToExpansion(cards, null, event.gaintag);
+				for (var i of event.gaintag) player.markSkill(i);
+				game.resume();
+			}, get.delayx(500, 500));
 		} else if (typeof event.animate == "function") {
 			var time = event.animate(event);
 			game.pause();
-			setTimeout(
-				function () {
-					player.$addToExpansion(cards, null, event.gaintag);
-					for (var i of event.gaintag) player.markSkill(i);
-					game.resume();
-				},
-				get.delayx(time, time)
-			);
+			setTimeout(function () {
+				player.$addToExpansion(cards, null, event.gaintag);
+				for (var i of event.gaintag) player.markSkill(i);
+				game.resume();
+			}, get.delayx(time, time));
 		} else {
 			player.$addToExpansion(cards, null, event.gaintag);
 			for (var i of event.gaintag) player.markSkill(i);
@@ -8307,15 +8282,19 @@ export const Content = {
 			evt.discardid = lib.status.videoId++;
 			game.broadcastAll(
 				function (player, cards, id, visible) {
-					player.$throw(cards, null, "nobroadcast");
+					const cardx = cards
+						.slice()
+						.map(i => (i.cards ? i.cards : [i]))
+						.flat();
+					player.$throw(cardx, null, "nobroadcast");
 					var cardnodes = [];
 					cardnodes._discardtime = get.time();
-					for (var i = 0; i < cards.length; i++) {
-						if (cards[i].clone) {
-							cardnodes.push(cards[i].clone);
+					for (var i = 0; i < cardx.length; i++) {
+						if (cardx[i].clone) {
+							cardnodes.push(cardx[i].clone);
 							if (!visible) {
-								cards[i].clone.classList.add("infohidden");
-								cards[i].clone.classList.add("infoflip");
+								cardx[i].clone.classList.add("infohidden");
+								cardx[i].clone.classList.add("infoflip");
 							}
 						}
 					}
@@ -8361,19 +8340,19 @@ export const Content = {
 		var hej = player.getCards("hejsx");
 		event.stockcards = cards.slice(0);
 		for (var i = 0; i < cards.length; i++) {
+			let cardx = [cards[i]];
 			if (!hej.includes(cards[i])) {
 				cards.splice(i--, 1);
 				continue;
 			} else if (cards[i].parentNode) {
 				if (cards[i].parentNode.classList.contains("equips")) {
 					cards[i].original = "e";
-					es.push(cards[i]);
-					const VEquip = player.getVCards("e").find(card => {
-						return card.cards?.includes(cards[i]);
+					let loseCards = cards[i].cards ? cards[i].cards : [cards[i]];
+					cardx.addArray(loseCards);
+					loseCards.forEach(cardi => {
+						es.push(cardi);
+						event.vcard_map.set(cardi, cards[i].card || get.autoViewAs(cards[i], void 0, false));
 					});
-					if (VEquip) {
-						event.vcard_map.set(cards[i], VEquip);
-					} else event.vcard_map.set(cards[i], get.autoViewAs(cards[i], void 0, false));
 				} else if (cards[i].parentNode.classList.contains("judges")) {
 					cards[i].original = "j";
 					js.push(cards[i]);
@@ -8402,55 +8381,57 @@ export const Content = {
 					cards[i].original = null;
 				}
 			}
-			if (cards[i].gaintag && cards[i].gaintag.length) {
-				event.gaintag_map[cards[i].cardid] = cards[i].gaintag.slice(0);
-				cards[i].removeGaintag(true);
-			}
-
-			cards[i].style.transform += " scale(0.2)";
-			cards[i].classList.remove("glow");
-			cards[i].classList.remove("glows");
-			cards[i].recheck();
-
-			var info = lib.card[cards[i].name];
-			if ("_destroy" in cards[i]) {
-				if (cards[i]._destroy) {
-					cards[i].delete();
-					cards[i].destroyed = cards[i]._destroy;
-					continue;
+			for (var j = 0; j < cardx.length; j++) {
+				if (cardx[j].gaintag && cardx[j].gaintag.length) {
+					event.gaintag_map[cardx[j].cardid] = cardx[j].gaintag.slice(0);
+					cardx[j].removeGaintag(true);
 				}
-			} else if ("destroyed" in cards[i]) {
-				if (event.getlx !== false && event.position && cards[i].willBeDestroyed(event.position.id, null, event)) {
-					cards[i].selfDestroy(event);
-					continue;
-				}
-			} else if (info.destroy) {
-				cards[i].delete();
-				cards[i].destroyed = info.destroy;
-				continue;
-			}
-			if (event.position) {
-				if (_status.discarded) {
-					if (event.position == ui.discardPile) {
-						_status.discarded.add(cards[i]);
-					} else {
-						_status.discarded.remove(cards[i]);
+
+				cardx[j].style.transform += " scale(0.2)";
+				cardx[j].classList.remove("glow");
+				cardx[j].classList.remove("glows");
+				cardx[j].recheck();
+
+				var info = lib.card[cardx[j].name];
+				if ("_destroy" in cardx[j]) {
+					if (cardx[j]._destroy) {
+						cardx[j].delete();
+						cardx[j].destroyed = cardx[j]._destroy;
+						continue;
 					}
+				} else if ("destroyed" in cardx[j]) {
+					if (event.getlx !== false && event.position && cardx[j].willBeDestroyed(event.position.id, null, event)) {
+						cardx[j].selfDestroy(event);
+						continue;
+					}
+				} else if (info.destroy) {
+					cardx[j].delete();
+					cardx[j].destroyed = info.destroy;
+					continue;
 				}
-				if (event.insert_index) {
-					cards[i].fix();
-					event.position.insertBefore(cards[i], event.insert_index(event, cards[i]));
-				} else if (event.insert_card) {
-					cards[i].fix();
-					event.position.insertBefore(cards[i], event.position.firstChild);
-				} else if (event.position == ui.cardPile) {
-					cards[i].fix();
-					event.position.appendChild(cards[i]);
-				} else cards[i].goto(event.position);
-			} else {
-				cards[i].remove();
+				if (event.position) {
+					if (_status.discarded) {
+						if (event.position == ui.discardPile) {
+							_status.discarded.add(cardx[j]);
+						} else {
+							_status.discarded.remove(cardx[j]);
+						}
+					}
+					if (event.insert_index) {
+						cardx[j].fix();
+						event.position.insertBefore(cardx[j], event.insert_index(event, cardx[j]));
+					} else if (event.insert_card) {
+						cardx[j].fix();
+						event.position.insertBefore(cardx[j], event.position.firstChild);
+					} else if (event.position == ui.cardPile) {
+						cardx[j].fix();
+						event.position.appendChild(cardx[j]);
+					} else cardx[j].goto(event.position);
+				} else {
+					cardx[j].remove();
+				}
+				//if(ss.includes(cardx[j])) cards.splice(i--,1);
 			}
-			//if(ss.includes(cards[i])) cards.splice(i--,1);
 		}
 		if (player == game.me) ui.updatehl();
 		ui.updatej(player);
@@ -8514,11 +8495,9 @@ export const Content = {
 		}
 		"step 2";
 		if (num < cards.length) {
-			if (event.es.includes(cards[num])) {
+			if (event.es.includes(cards[num]) || cards[num].cards?.some(i => event.es.includes(i))) {
 				event.loseEquip = true;
-				const VEquip = player.getVCards("e").find(card => {
-					return card.cards?.includes(cards[num]);
-				});
+				const VEquip = cards[num].card;
 				if (VEquip) {
 					player.removeVirtualEquip(VEquip);
 					//player.removeEquipTrigger(cards[num]);
@@ -8572,6 +8551,7 @@ export const Content = {
 		event.num++;
 		event.goto(2);
 		"step 4";
+		event.cards = cards.map(i => (i.cards ? i.cards : [i])).flat();
 		if (event.toRenku) {
 			_status.renku.addArray(
 				cards.filter(function (card) {
@@ -9129,7 +9109,7 @@ export const Content = {
 			const map = {};
 			for (const i of event.cards) {
 				var owner = get.owner(i, "judge");
-				if (owner/* && (owner != player || get.position(i) != "e")*/) {
+				if (owner /* && (owner != player || get.position(i) != "e")*/) {
 					var id = owner.playerid;
 					if (!map[id]) map[id] = [[], [], []];
 					map[id][0].push(i);

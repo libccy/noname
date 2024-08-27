@@ -10,7 +10,7 @@ const characterSort = {
 	sp_qifu: ["ol_jiangwan", "ol_feiyi", "caoying", "panshu", "caochun", "yuantanyuanshang", "caoshuang", "wolongfengchu", "guansuo", "baosanniang", "fengfangnv", "jin_zhouchu"],
 	sp_wanglang: ["ol_wanglang", "ol_puyuan", "ol_zhouqun"],
 	sp_zhongdan: ["cuiyan", "huangfusong"],
-	sp_guozhan2: ["sp_dongzhuo", "zhangren"],
+	sp_guozhan2: ["sp_dongzhuo"],
 	sp_others: ["hanba", "caiyang", "ol_peixiu"],
 	sp_waitforsort: ["kongshu", "ol_tw_zhangji", "mawan"],
 };

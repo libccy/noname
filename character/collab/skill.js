@@ -79,12 +79,12 @@ const skills = {
 								cards
 									.filter(j => player.canUse(j, b, true, true) && get.effect(b, j, player, player) > 0)
 									.reduce((sum, card) => {
-										return sum + get.effect(card, b, player, player);
+										return sum + get.effect(b, card, player, player);
 									}, 0) -
 								cards
 									.filter(j => player.canUse(j, a, true, true) && get.effect(a, j, player, player) > 0)
 									.reduce((sum, card) => {
-										return sum + get.effect(card, a, player, player);
+										return sum + get.effect(a, card, player, player);
 									}, 0)
 							);
 						})[0];
@@ -189,7 +189,7 @@ const skills = {
 					});
 			return skills;
 		},
-		excludedskills: ["boss_juejing", "xinlonghun", "relonghun", "sbwusheng", "jsrgnianen", "jsrgguanjue", "shencai", "sbpaoxiao", "sbliegong", "pshengwu"],
+		prioritySkills: ["boss_juejing", "xinlonghun", "relonghun", "sbwusheng", "jsrgnianen", "jsrgguanjue", "shencai", "sbpaoxiao", "sbliegong", "pshengwu"],
 		trigger: {
 			global: "phaseBefore",
 			player: ["enterGame", "useCardAfter", "respondAfter"],
@@ -230,7 +230,7 @@ const skills = {
 				next.set("ai", button => {
 					const skill = button.link,
 						choice = get.event("choice");
-					if (get.info("olhuyi").excludedskills.includes(skill)) return 3;
+					if (get.info("olhuyi").prioritySkills.includes(skill)) return 3;
 					if (skill == choice) return 2;
 					return 1;
 				});
@@ -277,7 +277,7 @@ const skills = {
 					next.set("ai", button => {
 						const skill = button.link;
 						let skills = get.event("skills").slice(0);
-						skills.removeArray(get.info("olhuyi").excludedskills);
+						skills.removeArray(get.info("olhuyi").prioritySkills);
 						if (skills.length < 4) return 0;
 						if (skills.includes(skill)) return 2;
 						return Math.random();
@@ -1493,7 +1493,7 @@ const skills = {
 				player.addMark("dcbianzhuang", 1, false);
 				if (player.countMark("dcbianzhuang") > 2) {
 					player.storage.dcbianzhuang_inited = true;
-					await player.reinitCharacter(get.character(player.name2, 3).includes("dcbianzhuang") ? player.name2 : player.name1, "wu_zhutiexiong");
+					player.changeSkin({ characterName: "zhutiexiong" }, "wu_zhutiexiong");
 				}
 			}
 		},

@@ -23,12 +23,12 @@ export class Get extends GetCompatible {
 	 * @param { Card[]|VCard[] } cards
 	 * @returns { any[] }
 	 */
-	skillsFromEquips(cards){
+	skillsFromEquips(cards) {
 		return cards.reduce((skills, card) => {
 			const info = get.info(card, false);
 			if (info.skills) skills.addArray(info.skills);
 			return skills;
-		}, [])
+		}, []);
 	}
 	/**
 	 * 将一个传统格式的character转化为Character对象格式
@@ -714,6 +714,21 @@ export class Get extends GetCompatible {
 		return nature + "mm";
 	}
 	/**
+	 * Get the source of the skill or event
+	 *
+	 * 获取一个技能或事件的源技能
+	 */
+	sourceSkillFor(skill) {
+		if (typeof skill !== "string") skill = skill.sourceSkill || skill.skill;
+		let info = get.info(skill);
+		while (true) {
+			if (info && !info.sourceSkill) break;
+			skill = info.sourceSkill;
+			info = get.info(skill);
+		}
+		return skill;
+	}
+	/**
 	 * 判定数字的正负，若num大于0，返回1，若num小于0，返回-1，若num等于0，返回0
 	 * @param { number } num
 	 * @returns { 1 | -1 | 0 }
@@ -866,7 +881,7 @@ export class Get extends GetCompatible {
 		let indent = "";
 		for (let i = 0; i < level; i++) indent += "    ";
 		try {
-			if (get.objtype(obj) === "object"/*  || obj instanceof lib.element.GameEvent */) {
+			if (get.objtype(obj) === "object" /*  || obj instanceof lib.element.GameEvent */) {
 				const isMethod = (/** @type {string} */ key) => {
 					const value = obj[key];
 					if (!(typeof value === "function")) return false;
@@ -880,7 +895,7 @@ export class Get extends GetCompatible {
 						reg = new RegExp(`async\\s*${key}[\\s\\S]*?\\(`);
 					} else {
 						// content(){}
-						reg = new RegExp(`${key}[\\s\\S]*?\\(`)
+						reg = new RegExp(`${key}[\\s\\S]*?\\(`);
 					}
 					return reg.exec(value)?.index === 0;
 				};
@@ -894,7 +909,6 @@ export class Get extends GetCompatible {
 				}
 				str += indent + "}";
 				return str;
-
 			} else if (typeof obj === "function") {
 				let str = obj.toString().replace(/\t/g, "    ");
 				let lastLine = str.slice(str.lastIndexOf("\n"));
@@ -906,7 +920,7 @@ export class Get extends GetCompatible {
 				return str;
 			} else if (Array.isArray(obj)) {
 				const rand = parseInt(get.id());
-				obj = obj.map(i => i === Infinity ? rand : i === -Infinity ? -rand : i);
+				obj = obj.map(i => (i === Infinity ? rand : i === -Infinity ? -rand : i));
 				return JSON.stringify(obj).replace(new RegExp(rand.toString(), "g"), "Infinity");
 			} else {
 				if (obj === Infinity) return "Infinity";
@@ -955,11 +969,11 @@ export class Get extends GetCompatible {
 		const target = constructor
 			? Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object
 				? // @ts-ignore
-					new constructor()
+				  new constructor()
 				: constructor.name in window && /\[native code\]/.test(constructor.toString())
-					? // @ts-ignore
-						new constructor(obj)
-					: obj
+				? // @ts-ignore
+				  new constructor(obj)
+				: obj
 			: Object.create(null);
 		if (target === obj) return target;
 
@@ -1509,14 +1523,14 @@ export class Get extends GetCompatible {
 			const key = entry[0];
 			// @ts-ignore
 			if (key === "cards") stringifying[key] = get.cardsInfo(entry[1]);
-			else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1])
+			else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);
 			return stringifying;
-		}, {})
+		}, {});
 	}
 	vcardsInfo(cards = []) {
 		return Array.from(cards).map(get.vcardInfo);
 	}
-	infoVCard(card){
+	infoVCard(card) {
 		// @ts-ignore
 		if (!lib.vcardOL) lib.vcardOL = {};
 		const datas = Object.entries(card).reduce((vcard, entry) => {
@@ -1537,14 +1551,13 @@ export class Get extends GetCompatible {
 			Object.keys(vcard).forEach(entry => {
 				delete vcard[entry];
 			});
-			Object.keys(datas).forEach((key) => {
+			Object.keys(datas).forEach(key => {
 				const value = datas[key];
 				if (Array.isArray(value)) vcard[key] = value.slice();
 				vcard[key] = value;
 			});
 			return vcard;
-		}
-		else {
+		} else {
 			const card = new lib.element.VCard(datas);
 			// @ts-ignore
 			lib.vcardOL[vid] = card;
@@ -1838,7 +1851,7 @@ export class Get extends GetCompatible {
 						} else if (!lib.element.GameEvent.prototype[key] && key != "content" && get.itemtype(entry[1]) != "event") stringifying[key] = get.stringifiedResult(entry[1], null, false);
 						return stringifying;
 					}, {})
-				)}`
+			  )}`
 			: "";
 	}
 	/**
@@ -1857,11 +1870,16 @@ export class Get extends GetCompatible {
 		return evt || item;
 	}
 	vcardInfoOL(item) {
-		return "_noname_vcard:" + JSON.stringify(Object.entries(item).reduce((stringifying, entry) => {
-			const key = entry[0];
-			stringifying[key] = get.stringifiedResult(entry[1]);
-			return stringifying;
-		}, {}));
+		return (
+			"_noname_vcard:" +
+			JSON.stringify(
+				Object.entries(item).reduce((stringifying, entry) => {
+					const key = entry[0];
+					stringifying[key] = get.stringifiedResult(entry[1]);
+					return stringifying;
+				}, {})
+			)
+		);
 	}
 	vcardsInfoOL(cards) {
 		return Array.from(cards || []).map(get.vcardInfoOL);
@@ -1874,7 +1892,7 @@ export class Get extends GetCompatible {
 			vcard[key] = get.parsedResult(entry[1]);
 			return vcard;
 		}, {});
-		
+
 		const vid = datas.vcardID;
 		// @ts-ignore
 		if (!vid || !lib.vcardOL) return new lib.element.VCard(datas);
@@ -1886,14 +1904,13 @@ export class Get extends GetCompatible {
 			Object.keys(vcard).forEach(entry => {
 				delete vcard[entry];
 			});
-			Object.keys(datas).forEach((key) => {
+			Object.keys(datas).forEach(key => {
 				const value = datas[key];
 				if (Array.isArray(value)) vcard[key] = value.slice();
 				vcard[key] = value;
 			});
 			return vcard;
-		}
-		else {
+		} else {
 			const card = new lib.element.VCard(datas);
 			// @ts-ignore
 			lib.vcardOL[vid] = card;
@@ -2113,7 +2130,7 @@ export class Get extends GetCompatible {
 	 * @overload
 	 * @param { Card } obj
 	 * @returns { 'card' }
-	 * 
+	 *
 	 * @overload
 	 * @param { VCard } obj
 	 * @returns { 'vcard' }
@@ -2172,7 +2189,7 @@ export class Get extends GetCompatible {
 		if (lib.experimental.symbol.itemType in obj) return obj[lib.experimental.symbol.itemType];
 	}
 	equipNum(card) {
-		const subtypes = get.subtypes(card)
+		const subtypes = get.subtypes(card);
 		if (subtypes.length) {
 			return parseInt(subtypes[0].slice(5));
 		}
@@ -3717,9 +3734,9 @@ export class Get extends GetCompatible {
 			if (!simple || get.is.phoneLayout()) {
 				var es = node.getCards("e");
 				for (var i = 0; i < es.length; i++) {
-					var cardinfo = lib.card[es[i].name];
-					if (cardinfo && cardinfo.cardPrompt) uiintro.add('<div><div class="skill">' + es[i].outerHTML + "</div><div>" + cardinfo.cardPrompt(es[i]) + "</div></div>");
-					else uiintro.add('<div><div class="skill">' + es[i].outerHTML + "</div><div>" + lib.translate[es[i].name + "_info"] + "</div></div>");
+					const special = [es[i]].concat(es[i].cards || []).find(j => j.name == es[i].name && lib.card[j.name]?.cardPrompt);
+					var str = special ? lib.card[special.name].cardPrompt(special) : lib.translate[es[i].name + "_info"];
+					uiintro.add('<div><div class="skill">' + es[i].outerHTML + "</div><div>" + str + "</div></div>");
 					uiintro.content.lastChild.querySelector(".skill>.card").style.transform = "";
 
 					if (lib.translate[es[i].name + "_append"]) {
@@ -4035,12 +4052,13 @@ export class Get extends GetCompatible {
 			var cardPosition = get.position(node);
 			if ((cardPosition === "e" || cardPosition === "j") && node.viewAs && node.viewAs != name) {
 				uiintro.add(get.translation(node.viewAs));
-				var cardInfo = lib.card[node.viewAs], showCardIntro = true;
+				var cardInfo = lib.card[node.viewAs],
+					showCardIntro = true;
 				var cardOwner = get.owner(node);
 				if (cardInfo.blankCard) {
 					if (cardOwner && !cardOwner.isUnderControl(true)) showCardIntro = false;
 				}
-				if(cardOwner){
+				if (cardOwner) {
 					var sourceVCard = cardOwner.getVCards(cardPosition).find(card => card.cards?.includes(node));
 					if (showCardIntro && sourceVCard) uiintro.add('<div class="text center">（' + get.translation(get.translation(sourceVCard.cards)) + "）</div>");
 				}
@@ -4138,9 +4156,17 @@ export class Get extends GetCompatible {
 						} else if (lib.card[name] && lib.card[name].type && lib.translate[lib.card[name].type]) {
 							typeinfo += get.translation(lib.card[name].type) + "牌";
 						}
-						let vcard = get.owner(node)?.getVCards(get.position(node))?.find(card => card.cards?.includes(node));
+						let vcard = get
+							.owner(node)
+							?.getVCards(get.position(node))
+							?.find(card => card.cards?.includes(node));
 						if (get.subtypes(vcard || node, get.owner(node))?.length) {
-							typeinfo += "-" + get.subtypes(vcard || node, get.owner(node)).map(type => get.translation(type)).join("/");
+							typeinfo +=
+								"-" +
+								get
+									.subtypes(vcard || node, get.owner(node))
+									.map(type => get.translation(type))
+									.join("/");
 						}
 						if (typeinfo) {
 							uiintro.add('<div class="text center">' + typeinfo + "</div>");
@@ -4744,14 +4770,14 @@ export class Get extends GetCompatible {
 		let card = name;
 		if (typeof name === "string") {
 			card = { name };
-		}
-		else {
+		} else {
 			const itemtype = get.itemtype(card);
 			if (itemtype !== "card" && itemtype !== "vcard") {
 				card = get.card();
 			}
 		}
-		let value1 = get.equipValue(card, target), value2 = 0;
+		let value1 = get.equipValue(card, target),
+			value2 = 0;
 		if (!target.canEquip(card)) {
 			if (!target.canEquip(card, true)) return 0;
 			let current = target.getVEquip(card);

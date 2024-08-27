@@ -884,6 +884,7 @@ const skills = {
 		},
 	},
 	dezhang: {
+		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },
 		derivation: "weishu",
 		juexingji: true,
@@ -2436,6 +2437,7 @@ const skills = {
 	},
 	//李肃
 	qiaoyan: {
+		audio: 2,
 		trigger: { player: "damageBegin2" },
 		forced: true,
 		filter: function (event, player) {
@@ -2482,6 +2484,7 @@ const skills = {
 		},
 	},
 	xianzhu: {
+		audio: 2,
 		trigger: { player: "phaseUseBegin" },
 		locked: true,
 		filter: function (event, player) {
@@ -2542,6 +2545,7 @@ const skills = {
 		ai: { combo: "qiaoyan" },
 	},
 	huirong: {
+		audio: 2,
 		trigger: { player: "showCharacterAfter" },
 		forced: true,
 		filter: function (event, player) {
@@ -2583,6 +2587,7 @@ const skills = {
 		onremove: () => {
 			if (!game.hasPlayer(i => i.hasSkill("ciwei", null, null, false), true)) game.removeGlobalSkill("ciwei_ai");
 		},
+		audio: 2,
 		trigger: { global: "useCard" },
 		direct: true,
 		preHidden: true,
@@ -2652,6 +2657,7 @@ const skills = {
 		},
 	},
 	caiyuan: {
+		audio: 2,
 		trigger: { player: "phaseEnd" },
 		forced: true,
 		preHidden: true,
@@ -3473,6 +3479,7 @@ const skills = {
 		},
 	},
 	chengwu: {
+		audio: 2,
 		zhuSkill: true,
 		mod: {
 			inRange: function (from, to) {
@@ -3487,6 +3494,7 @@ const skills = {
 		},
 	},
 	shiren: {
+		audio: 2,
 		trigger: { player: "showCharacterAfter" },
 		hiddenSkill: true,
 		logTarget: function () {
@@ -3505,6 +3513,7 @@ const skills = {
 		},
 	},
 	yanxi: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filterTarget: function (card, player, target) {
@@ -3602,6 +3611,7 @@ const skills = {
 		},
 	},
 	sanchen: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -3663,6 +3673,7 @@ const skills = {
 	},
 	zhaotao: {
 		forbid: ["guozhan"],
+		audio: 2,
 		trigger: { player: "phaseZhunbeiBegin" },
 		forced: true,
 		juexingji: true,
@@ -3682,6 +3693,7 @@ const skills = {
 		},
 	},
 	pozhu: {
+		audio: 2,
 		enable: "phaseUse",
 		viewAsFilter: function (player) {
 			return player.countCards("hs") > 0;
