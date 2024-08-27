@@ -10,14 +10,7 @@ const skills = {
 		},
 		filter(event, player) {
 			if (event.targets.length != 1 || !["sha", "juedou"].includes(event.card.name)) return false;
-			var evtx = event.getParent();
-			return !player.hasHistory(
-				"useCard",
-				evt => {
-					return evt != evtx && evt.card.name == event.card.name;
-				},
-				evtx
-			);
+			return !player.getStorage("olsbhulie_used").includes(event.card.name);
 		},
 		check(event, player) {
 			return get.attitude(player, event.targets[0]) <= 0;
@@ -27,6 +20,8 @@ const skills = {
 			const evt = trigger.getParent();
 			if (typeof evt.baseDamage != "number") evt.baseDamage = 1;
 			evt.baseDamage++;
+			player.addTempSkill("olsbhulie_used");
+			player.markAuto("olsbhulie_used", trigger.card.name);
 			const target = trigger.targets[0],
 				sha = get.autoViewAs({ name: "sha", isCard: true });
 			player
@@ -46,6 +41,12 @@ const skills = {
 						.forResultBool();
 					if (bool) await target.useCard(sha, player, false);
 				});
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 		},
 	},
 	olsbyipo: {
