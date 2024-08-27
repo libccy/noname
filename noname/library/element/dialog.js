@@ -70,6 +70,216 @@ export class Dialog extends HTMLDivElement {
 		dialog._args = args;
 		return dialog;
 	}
+	addNewRow(...args) {
+		//参数归一化
+		let itemOptions = parameterNormolize()
+		//加载必要的css
+		loadCss()
+		//设置比例字符串
+		let ratioStr = itemOptions.map(o => o.ratio || 1).join('fr ') + 'fr'
+		//定义一个属性记录加入的所有的框，框的links是加入时真实数据，方便最后获取数据，这里可以设计一下别的数据格式向外暴露结果
+		if (!this.itemContainers) this.itemContainers = []
+		let that = this
+		//创建一个行的父容器
+		let rowContainer = createRowContainer(this)
+		//遍历参数
+		for (let itemOption of itemOptions) {
+
+			//为每个列创建一个子容器
+			let itemContainer = createItemContainer(itemOption)
+			//将项目加入到每个子容器中
+			let item = itemOption.item
+			let addedItems = addItemToItemContainer(item, itemContainer, itemOption)
+			BindEvent(itemOption, addedItems, itemContainer)
+			//检查溢出处理的逻辑
+			checkOverflow(itemOption, itemContainer, addedItems)
+			//自定义添加元素
+			if (itemOption.custom) itemOption(itemContainer)
+			//注册点击事件
+
+
+			this.itemContainers.push(itemContainer)
+		}
+		function createItemContainer(itemOption) {
+			let itemContainer = ui.create.div('.item-container', rowContainer)
+			itemContainer.links = itemOption.item
+			if (itemOption.itemContainerCss) itemContainer.css(itemOption.itemContainerCss)
+			return itemContainer
+		}
+		function BindEvent(itemOption, addedItems, itemContainer) {
+			if (itemOption.clickItem && !itemOption.ItemNoclick) {
+				addedItems.forEach(item => {
+					item.addEventListener('click', (ev) => {
+
+						console.count()
+						ev.stopPropagation()
+						itemOption.clickItem(item, itemContainer, that.itemContainers, ev)
+					})
+				})
+			}
+			if (itemOption.clickItemContainer) {
+				itemContainer.addEventListener('click', (e) => {
+					e.stopPropagation()
+					itemOption.clickItemContainer(itemContainer, itemOption.item, that.itemContainers, e)
+				})
+			}
+		}
+		function checkOverflow(itemOption, itemContainer, addedItems) {
+			if (itemOption.overflow == 'scroll') {
+				itemContainer.css({ overflowX: 'scroll' })
+			} else if (itemOption.overflow == 'hidden') {
+				itemContainer.css({ overflow: 'hidden' })
+			} else if (addedItems?.length) {
+
+				const L = itemContainer.getBoundingClientRect().width
+				const W = addedItems[0].getBoundingClientRect().width
+				const n = addedItems.length
+				if (L < n * W) {
+					const ml = Math.min(((n * W - L + 75) / (n - 1)), 70)
+					itemContainer.style.setProperty('--ml', "-" + ml + 'px')
+				}
+
+			}
+
+		}
+		function loadCss() {
+			if (!ui.css.curpong) {
+				let style = document.createElement('style')
+				style.innerHTML = `.dialog:has(.row-container) {
+   --bgColor: #222225bf;
+   height: fit-content;
+   width: 80%;
+   height: 50% !important;
+   background: var(--bgColor);
+   left: 50%;
+   transform: translate(-50%, -20%) !important;
+   border-radius: 10px;
+}
+
+.dialog:has(.row-container)>.content-container {
+   border-radius: 10px;
+   background-color: var(--bgColor);
+}
+
+.dialog:has(.row-container)>.content-container>.content {
+   background-color: var(--bgColor);
+
+}
+
+
+.row-container {
+   display: grid;
+   height: fit-content;
+   margin: 10px auto !important;
+   width: 95%;
+}
+
+
+.row-container>* {
+   position: relative;
+}
+
+.item-container>.caption {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+.item-container:has(.caption) {
+   border: none;
+}
+
+.item-container {
+   border: solid 2px #a5a29db5;
+   width: 90%;
+   height: 95%;
+   margin: auto;
+   display: flex;
+   justify-content: center;
+   border-radius: 10px;
+   padding: 3px 3px;
+   overflow: hidden
+}
+
+.item-container>* {
+   flex-shrink: 0;
+   position: relative;
+}
+
+.item-container>div:not(:first-child) {
+   margin-left: var(--ml, 3px) !important;
+}`
+				document.head.appendChild(style)
+				ui.css.curpond = style
+			}
+		}
+
+		function parameterNormolize() {
+			let itemOptions = []
+			if (args.length == 0) {
+				throw new Error('参数不能为空')
+			} else if (args.length == 1) {
+				if (isOption(args[0])) {
+					itemOptions = [args[0]]
+				} else {
+					itemOptions = [{
+						item: args[0]
+					}]
+				}
+			} else {
+				if (args.every(arg => isOption(arg))) {
+					itemOptions = args
+				} else {
+					itemOptions = args.map(arg => {
+						return {
+							item: arg
+						}
+					})
+
+				}
+			}
+			return itemOptions
+		}
+		function isOption(obj) {
+			if (['card', 'player', 'cards', 'players'].includes(get.itemtype(obj))) return false
+			return typeof obj == 'object' && ('item' in obj)
+		}
+		function createRowContainer(dialog) {
+			let rowContainer = ui.create.div('.row-container', dialog.content)
+			rowContainer.css({
+				gridTemplateColumns: ratioStr
+			})
+			return rowContainer
+		}
+		//添加元素到子容器中，并返回添加后的元素
+		function addItemToItemContainer(item, itemContainer, itemOption) {
+			if (!item) return
+			/**@type {HTMLDivElement[]} */
+			let items = []
+			if (typeof item == 'string') {
+				let caption = ui.create.caption(item, itemContainer)
+				caption.css(itemOption.itemCss ?? {})
+				items.push(caption)
+			} else if (typeof item == 'function') {
+				let item = item()
+				itemContainer.links = item
+				itemContainer.append(item)
+				items.push(item)
+			} else if (!Array.isArray(item)) {
+				let button = ui.create.button(item, get.itemtype(item), itemContainer, itemOption.ItemNoclick)
+				button.css(itemOption.itemCss ?? {})
+				items.push(button)
+			} else {
+				for (let i of item) {
+					items.addArray(addItemToItemContainer(i, itemContainer, itemOption))
+				}
+			}
+
+
+			return items
+
+		}
+	}
 	/**
 	 *
 	 * @param { string | HTMLDivElement | Card[] | Player[] } item
