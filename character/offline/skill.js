@@ -809,7 +809,7 @@ const skills = {
 						}
 						else break;
 					}
-					player.removeTempSkill("tybianta_use");
+					player.removeSkill("tybianta_use");
 				},
 			},
 			use: {

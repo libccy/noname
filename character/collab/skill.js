@@ -372,11 +372,18 @@ const skills = {
 		audio: 2,
 		trigger: { player: "drawBegin" },
 		filter(event, player) {
-			return lib.inpile.some(name => {
-				const type = get.type(name);
-				if (type != "basic" && type != "trick") return false;
-				return !player.getStorage("dchuiwan_used").includes(name);
-			});
+			return lib.skill.dchuiwan.gainCards(player)?.length;
+		},
+		gainCards(player) {
+			const cards = Array.from(ui.cardPile.childNodes).slice(0);
+			const list = [];
+			for (const card of cards) {
+				const name = get.name(card);
+				const type = get.type(card);
+				if (type != "basic" && type != "trick") continue;
+				if (!player.getStorage("dchuiwan_used").includes(name)) list.add(name);
+			}
+			return list;
 		},
 		async cost(event, trigger, player) {
 			let result = await player
@@ -384,11 +391,7 @@ const skills = {
 					[
 						get.prompt2("dchuiwan"),
 						[
-							lib.inpile.filter(name => {
-								const type = get.type(name);
-								if (type != "basic" && type != "trick") return false;
-								return !player.getStorage("dchuiwan_used").includes(name);
-							}),
+							lib.skill.dchuiwan.gainCards(player),
 							"vcard",
 						],
 					],
@@ -405,7 +408,7 @@ const skills = {
 			event.result = result;
 		},
 		async content(event, trigger, player) {
-			trigger.cancel();
+			trigger.num -= event.cost_data.length;
 			if (!player.storage.dchuiwan_used) {
 				player.when({ global: "phaseAfter" }).then(() => delete player.storage.dchuiwan_used);
 			}
