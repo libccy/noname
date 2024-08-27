@@ -3227,6 +3227,7 @@ const skills = {
 		},
 		ai: {
 			combo: "dcjinjian",
+			halfneg: true
 		},
 	},
 	//赵俨

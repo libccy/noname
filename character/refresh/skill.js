@@ -15009,6 +15009,7 @@ const skills = {
 			},
 			nodiscard: true,
 			nolose: true,
+			combo: "jixi"
 		},
 	},
 	rebeige: {

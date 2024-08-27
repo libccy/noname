@@ -25489,6 +25489,7 @@ const skills = {
 		},
 		ai: {
 			combo: "biluan",
+			halfneg: true
 		},
 	},
 	olbiluan: {
@@ -25569,6 +25570,7 @@ const skills = {
 		},
 		ai: {
 			combo: "rebiluan",
+			halfneg: true
 		},
 	},
 	rebiluan2: {
@@ -25710,6 +25712,7 @@ const skills = {
 		},
 		ai: {
 			combo: "olbiluan",
+			halfneg: true
 		},
 	},
 	guiming: {
@@ -29433,6 +29436,9 @@ const skills = {
 				);
 			}
 		},
+		ai: {
+			combo: "xinfu_xionghuo"
+		}
 	},
 	xinfu_jianjie: { audio: 3 },
 	jianjie: {

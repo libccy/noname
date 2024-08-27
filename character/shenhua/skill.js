@@ -3681,6 +3681,7 @@ const skills = {
 			},
 			nodiscard: true,
 			nolose: true,
+			combo: "jixi"
 		},
 	},
 	zaoxian: {
@@ -4523,6 +4524,7 @@ const skills = {
 		group: ["huoshou1", "huoshou2"],
 		preHidden: ["huoshou1", "huoshou2"],
 		ai: {
+			halfneg: true,
 			effect: {
 				target(card, player, target) {
 					if (card.name == "nanman") return "zeroplayertarget";

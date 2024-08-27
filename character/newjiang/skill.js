@@ -3257,6 +3257,8 @@ const skills = {
 					return 0;
 				},
 			},
+			combo: "mbquesong",
+			halfneg: true
 		},
 	},
 	mbquesong: {

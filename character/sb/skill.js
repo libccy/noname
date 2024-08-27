@@ -1605,7 +1605,6 @@ const skills = {
 			},
 		},
 		ai: {
-			combo: "sbxingshang",
 			order: 8,
 			result: {
 				player(player) {
@@ -3119,6 +3118,9 @@ const skills = {
 				},
 				content: function () {
 					trigger.getParent().customArgs.default.customSource = player;
+				},
+				ai: {
+					halfneg: true
 				},
 			},
 			nanmaned: {
