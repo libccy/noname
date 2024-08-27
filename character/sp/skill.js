@@ -329,7 +329,11 @@ const skills = {
 								return att;
 							})
 							.forResultTargets();
-						if (targets && targets.length) await targets[0].gain(cards, "gain2");
+						if (targets && targets.length) {
+							const next = targets[0].gain(cards, "gain2");
+							next.giver = player;
+							await next;
+						}
 					}
 					if (!player.getStorage("oljieyan_gain").length) player.removeSkill("oljieyan_gain");
 				},
@@ -343,26 +347,18 @@ const skills = {
 			player: "loseAsyncAfter",
 		},
 		filter(event, player, triggername, target) {
-			if (!target || !target.isIn() || target == player) return false;
-			if (event.name == "loseAsync") {
-				if (event.type != "gain") return false;
-			}
-			const cards = event.getl(player).cards2;
-			if (!cards.length) return false;
-			if (!player.storage.oljinghua && target.isHealthy()) return false;
-			const cardsx = event.getg(target);
-			return cards.some(card => cardsx.includes(card));
+			if (event.name == "loseAsync" && event.type != "gain") return false;
+			return target?.isIn();
 		},
 		getIndex(event, player) {
-			const cards = event.getl(player).cards2;
-			return game
-				.filterPlayer(target => {
-					if (target == player) return false;
-					if (!player.storage.oljinghua && target.isHealthy()) return false;
-					const cardsx = event.getg(target);
-					return cards.some(card => cardsx.includes(card));
-				})
-				.sortBySeat();
+			return game.filterPlayer(target => {
+				if (target == player) return false;
+				if (!player.storage.oljinghua && target.isHealthy()) return false;
+				const cards = event.getg(target);
+				if (!cards.length) return false;
+				if (event.giver === player) return true;
+				return event.getl && event.getl(player)?.cards2?.some(card => cards.includes(card));
+			}).sortBySeat();
 		},
 		logTarget(event, player, triggername, target) {
 			return target;
