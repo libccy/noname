@@ -117,6 +117,89 @@ export class Game extends GameCompatible {
 			});
 		}
 	})();
+	/**
+	 * 交换两个元素的位置，附带过渡动画
+	 * @param {HTMLDivElement} e1 
+	 * @param {HTMLDivElement} e2 
+	 * @param {number} duration //动画完成的时间 ms
+	 * @param {'linear'|'ease-in-out'} timefun //动画过度的时间曲线,很多，这里只列举两个
+	 * @returns {Promise<void>}
+	 * @author Curpond
+	 */
+	$swapElement(e1, e2, duration = 400, timefun = 'linear') {
+		return new Promise((resolve) => {
+			let e1p = e1.parentElement;
+			let e2p = e2.parentElement;
+			let old1_overflow = e1p.style.overflow
+			let old2_overflow = e2p.style.overflow
+			e1p.style.overflow = 'visible'
+			e2p.style.overflow = 'visible'
+			let e1n = e1.nextElementSibling;
+			let e2n = e2.nextElementSibling;
+
+
+			let originalPosition1 = e1.getBoundingClientRect();
+			let originalPosition2 = e2.getBoundingClientRect();
+
+			e1p.insertBefore(e2, e1n);
+			e2p.insertBefore(e1, e2n);
+
+
+			requestAnimationFrame(() => {
+
+				let newPosition1 = e1.getBoundingClientRect();
+				let newPosition2 = e2.getBoundingClientRect();
+
+				let offsetX1 = newPosition1.x - originalPosition1.x;
+				let offsetY1 = newPosition1.y - originalPosition1.y;
+				let offsetX2 = newPosition2.x - originalPosition2.x;
+				let offsetY2 = newPosition2.y - originalPosition2.y;
+
+
+				e1.style.transition = 'none';
+				e2.style.transition = 'none';
+				e1.style.transform = `translate(${-offsetX1}px, ${-offsetY1}px)`;
+				e2.style.transform = `translate(${-offsetX2}px, ${-offsetY2}px)`;
+
+
+				e1.offsetHeight;
+				e2.offsetHeight;
+
+				e1.style.transition = `transform ${duration}ms ${timefun}`;
+				e2.style.transition = `transform ${duration}ms ${timefun}`;
+				e1.style.transform = 'translate(0, 0)';
+				e2.style.transform = 'translate(0, 0)';
+
+				let transitionEndHandler = () => {
+					e1.removeEventListener('transitionend', transitionEndHandler);
+					e2.removeEventListener('transitionend', transitionEndHandler);
+					e1p.style.overflow = old1_overflow
+					e2p.style.overflow = old2_overflow
+					resolve();
+				};
+
+				e1.addEventListener('transitionend', transitionEndHandler, { once: true });
+				e2.addEventListener('transitionend', transitionEndHandler, { once: true });
+			});
+		});
+	};
+	/**
+	* 元素添加到新的父容器中，附带过渡动画
+	* @param {HTMLDivElement} element 
+	* @param {HTMLDivElement} newParent 
+	* @param {number} duration 动画完成的时间 ms
+	* @param {'linear'|'ease-in-out'} timefun 动画过度的时间曲线,很多，这里只列举两个
+	* @returns {Promise<void>}
+	* @author Curpond
+	*/
+	$elementGoto(element, newParent, duration = 400, timefun = 'linear') {
+		let tempElement = element.cloneNode(true)
+		tempElement.style.visibility = 'hidden'
+		newParent.appendChild(tempElement)
+		return game.$swapElement(element, tempElement, duration, timefun).then(() => {
+			tempElement.remove()
+		})
+	}
 	//Stratagem
 	//谋攻
 	setStratagemBuffCost(cardName, cost) {
