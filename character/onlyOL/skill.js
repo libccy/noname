@@ -2,6 +2,230 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//谋袁术
+	olsbjinming: {
+		audio: 2,
+		trigger: {
+			player: "phaseBegin",
+		},
+		init(player, skill) {
+			player.storage[skill] = [1, 2, 3, 4];
+		},
+		onremove: true,
+		filter(event, player) {
+			return player.getStorage("olsbjinming").length;
+		},
+		async cost(event, trigger, player) {
+			let choiceList = [
+				"1.回复过1点体力",
+				"2.造成过2点伤害",
+				"3.使用过3种类型的牌",
+				"4.弃置过4张牌",
+			];
+			let list = ["回复体力", "造成伤害", "使用牌", "弃置牌"].filter((key, index) => {
+				return player.getStorage("olsbjinming").includes(index + 1);
+			});
+			for (let i = 0; i < choiceList.length; i++) {
+				if (!player.getStorage("olsbjinming").includes(i + 1)) {
+					choiceList[i] = `<span style="text-decoration: line-through;">${choiceList[i]}</span>`;
+				}
+			}
+			list.push("cancel2");
+			const result = await player
+				.chooseControl(list)
+				.set("choiceList", choiceList)
+				.set("prompt", get.prompt2("olsbjinming"))
+				.set("chosen", function () {
+					if (list.includes("使用牌") && ["trick", "equip"].every(type => {
+						return player.countCards("h", card => get.type2(card) == type && player.getUseValue(card) > 0);
+					})) return "使用牌";
+					return list.randomGet();
+				}())
+				.set("ai", () => get.event("chosen"))
+				.forResult();
+			event.result = {
+				bool: result.control != "cancel2",
+				cost_data: choiceList.find(i => i.indexOf(result.control.slice(0, 2)) != -1),
+			};
+		},
+		async content(event, trigger, player) {
+			const choice = event.cost_data;
+			player.addTempSkill("olsbjinming_target");
+			player.storage.olsbjinming_target = choice;
+			player.markSkill("olsbjinming_target");
+		},
+		subSkill: {
+			target: {
+				onremove: true,
+				trigger: {
+					player: "phaseEnd",
+				},
+				charlotte: true,
+				forced: true,
+				intro: {
+					markcount(storage, player) {
+						if (!storage) return null;
+						return parseInt(storage.slice(0, 1));
+					},
+					content(storage, player) {
+						if (!storage) return "本回合没有〖矜名〗目标";
+						return `本回合需要${storage.slice(2)}`;
+					},
+				},
+				checkTarget(player, key) {
+					let num = [];
+					switch (key) {
+						case 1: {
+							game.getGlobalHistory("everything", evt => {
+								if (evt.name == "recover" && evt.player == player && evt.num > 0) num += evt.num;
+							});
+							break;
+						}
+						case 2: {
+							player.getHistory("sourceDamage", evt => {
+								if (evt.num > 0) num += evt.num;
+							});
+							break;
+						}
+						case 3: {
+							let types = [];
+							player.getHistory("useCard", evt => {
+								let type = get.type2(evt.card);
+								if (!types.includes(type)) types.add(type);
+							});
+							num = types.length;
+							break;
+						}
+						case 4: {
+							player.getHistory("lose", evt => {
+								if (evt.type == "discard" && evt.cards2?.length) num += evt.cards2.length;
+							});
+							break;
+						}
+					}
+					return num >= key;
+				},
+				async content(event, trigger, player) {
+					const choice = player.storage[event.name],
+						num = parseInt(choice.slice(0, 1));
+					await player.draw(num);
+					if (lib.skill.olsbjinming_target.checkTarget(player, num)) {
+						player.popup("成功", "wood");
+						return;
+					}
+					player.popup("失败", "fire");
+					await player.loseHp();
+					player.storage.olsbjinming.remove(num);
+					game.log(player, "删除了", "#g【矜名】", "的选项", `#y${choice}`);
+				},
+			},
+		},
+	},
+	olsbxiaoshi: {
+		audio: 2,
+		trigger: {
+			player: "useCard2",
+		},
+		usable: 1,
+		filter(event, player) {
+			if (!player.isPhaseUsing() || !player.storage.olsbjinming_target) return false;
+			if (!["trick", "basic"].includes(get.type(event.card))) return false;
+			const num = parseInt(player.storage.olsbjinming_target.slice(0, 1));
+			return game.hasPlayer(current => {
+				if (current.getAttackRange() != num) return false;
+				return !event.targets.includes(current) && lib.filter.targetEnabled2(event.card, player, current);
+			});
+		},
+		async cost(event, trigger, player) {
+			const num = parseInt(player.storage.olsbjinming_target.slice(0, 1));
+			event.result = await player
+				.chooseTarget(get.prompt("olsbxiaoshi"), `令一名攻击范围为${num}的角色成为此牌额外目标并摸${num}张牌`, function (card, player, target) {
+					const trigger = get.event().getTrigger();
+					if (target.getAttackRange() != get.event("num")) return false;
+					if (trigger.targets.includes(target)) return false;
+					return lib.filter.targetEnabled2(trigger.card, get.player(), target);
+				})
+				.set("num", num)
+				.set("ai", target => {
+					const trigger = get.event().getTrigger();
+					const eff1 = get.effect(target,trigger.card, trigger.player, get.player());
+					const eff2 = get.effect(target, { name: "draw" }, get.player(), get.player());
+					if ((eff1 + eff2 * get.event("num")) <= 0) return 0;
+					return eff1 + eff2;
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			trigger.targets.addArray(event.targets);
+			for (let target of event.targets) await target.draw(target.getAttackRange());
+		},
+	},
+	olsbyanliang: {
+		audio: 2,
+		zhuSkill: true,
+		global: "olsbyanliang_give",
+		subSkill: {
+			used: {
+				charlotte: true,
+			},
+			give: {
+				audio: "olsbyanliang",
+				enable: "phaseUse",
+				discard: false,
+				lose: false,
+				delay: false,
+				line: true,
+				prepare(cards, player, targets) {
+					targets[0].logSkill("olsbyanliang");
+				},
+				prompt() {
+					let player = _status.event.player;
+					let list = game.filterPlayer(target => {
+						return target != player && target.hasZhuSkill("olsbyanliang", player) && !target.hasSkill("olsbyanliang_used");
+					});
+					let str = "将一张装备牌交给" + get.translation(list);
+					if (list.length > 1) str += "中的一人";
+					str += "，然后视为使用一张【酒】";
+					return str;
+				},
+				filter(event, player) {
+					if (player.group != "qun") return false;
+					if (
+						!game.hasPlayer(target => {
+							return target != player && target.hasZhuSkill("olsbyanliang", player) && !target.hasSkill("olsbyanliang_used");
+						})
+					)
+						return false;
+					if (!player.canUse({ name: "jiu", isCard: true }, player, true, true)) return false;
+					return player.hasCard(card => {
+						return lib.skill.olsbyanliang_give.filterCard(card, player);
+					}, "h");
+				},
+				filterCard(card, player) {
+					return get.type(card) == "equip";
+				},
+				log: false,
+				visible: true,
+				filterTarget(card, player, target) {
+					return target != player && target.hasZhuSkill("olsbyanliang", player) && !target.hasSkill("olsbyanliang_used");
+				},
+				async content(event, trigger, player) {
+					player.give(event.cards, event.target);
+					await player.useCard({ name: "jiu", isCard: true }, player);
+					event.target.addTempSkill("olsbyanliang_used", "phaseUseEnd");
+				},
+				ai: {
+					expose: 0.3,
+					order() {
+						return get.order({ name: "jiu" }) + 0.2;
+					},
+					result: {
+						target: 5,
+					},
+				},
+			},
+		},
+	},
 	//谋孙坚
 	olsbhulie: {
 		audio: 2,
@@ -10,14 +234,7 @@ const skills = {
 		},
 		filter(event, player) {
 			if (event.targets.length != 1 || !["sha", "juedou"].includes(event.card.name)) return false;
-			var evtx = event.getParent();
-			return !player.hasHistory(
-				"useCard",
-				evt => {
-					return evt != evtx && evt.card.name == event.card.name;
-				},
-				evtx
-			);
+			return !player.getStorage("olsbhulie_used").includes(event.card.name);
 		},
 		check(event, player) {
 			return get.attitude(player, event.targets[0]) <= 0;
@@ -27,6 +244,8 @@ const skills = {
 			const evt = trigger.getParent();
 			if (typeof evt.baseDamage != "number") evt.baseDamage = 1;
 			evt.baseDamage++;
+			player.addTempSkill("olsbhulie_used");
+			player.markAuto("olsbhulie_used", trigger.card.name);
 			const target = trigger.targets[0],
 				sha = get.autoViewAs({ name: "sha", isCard: true });
 			player
@@ -46,6 +265,12 @@ const skills = {
 						.forResultBool();
 					if (bool) await target.useCard(sha, player, false);
 				});
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 		},
 	},
 	olsbyipo: {

@@ -809,7 +809,7 @@ const skills = {
 						}
 						else break;
 					}
-					player.removeTempSkill("tybianta_use");
+					player.removeSkill("tybianta_use");
 				},
 			},
 			use: {
@@ -2329,7 +2329,7 @@ const skills = {
 		group: "tyzhuan_draw",
 		subSkill: {
 			draw: {
-				audio: "qingbei",
+				audio: "tyzhuan",
 				trigger: { global: "useCardAfter" },
 				filter(event, player) {
 					return get.type(event.card, null, false) == "equip";

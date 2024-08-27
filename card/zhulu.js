@@ -687,7 +687,7 @@ game.import("card", function () {
 					if (
 						event.getParent(2) &&
 						event.getParent(2).name != "swapEquip" &&
-						get.position(card) != "d" &&
+						get.position(card?.cards?.[0]) != "d" &&
 						event.parent.type != "equip" &&
 						_status.jinhe &&
 						_status.jinhe[id]

@@ -676,6 +676,22 @@ const translates = {
 	dcsbzuojun_info: "出牌阶段限一次，你可以令一名角色摸三张牌并令其选择一项：1.直到其下个回合结束，其不能使用这些牌且这些牌不计入手牌上限；2.失去1点体力，摸一张牌并使用因此获得的任意张牌，然后弃置其余牌。",
 	dcsbmuwang: "暮往",
 	dcsbmuwang_info: "锁定技，当你每回合首次失去的基本牌或普通锦囊牌进入弃牌堆时，你获得其中一张。当你本回合再次失去这张牌后，你弃置一张牌。",
+	dc_zhangren: "新杀张任",
+	dc_zhangren_prefix: "新杀",
+	dc_tianfeng: "新杀田丰",
+	dc_tianfeng_prefix: "新杀",
+	dc_jiangqing: "新杀蒋钦",
+	dc_jiangqing_prefix: "新杀",
+	dcshangyi: "尚义",
+	dcshangyi_info: "出牌阶段限一次，你可以令一名其他角色观看你的手牌，然后你观看其手牌并可以弃置其中♠♣花色的牌各一张。",
+	dcniaoxiang: "鸟翔",
+	dcniaoxiang_info: "锁定技，你使用【杀】指定目标后，若你在其攻击范围内，其需要额外使用一张【闪】来抵消此【杀】。",
+	dcchuanxin: "穿心",
+	dcchuanxin_info: "当你于出牌阶段使用【杀】或【决斗】对一名角色造成伤害时，你可以防止此伤害，令其选择一项：1.弃置装备区里的所有牌，然后失去1点体力；2.弃置两张手牌，然后非锁定技失效直到回合结束。",
+	dcfengshi: "锋矢",
+	dcfengshi_info: "你使用【杀】指定目标后，若你不在其攻击范围内，你可以弃置该角色装备区里的一张防具或防御马。",
+	dcsuishi: "随势",
+	dcsuishi_info: "锁定技，其他角色进入濒死时，若伤害来源与你势力相同，你摸一张牌；其他角色死亡时，若其势力与你相同，你弃置至少1张手牌。",
 };
 
 export default translates;

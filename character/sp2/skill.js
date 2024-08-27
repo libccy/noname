@@ -2494,7 +2494,7 @@ const skills = {
 			if (!skills.length) return;
 			let skill;
 			if (skills.length == 1) skill = skills[0];
-			else skill = await player.chooseControl(skill)
+			else skill = await player.chooseControl(skills)
 				.set('choiceList', skills.map(i => {
 					return '<div class="skill">' + (lib.translate[i + '_ab'] || lib.translate[i]) + '</div><div>' + get.skillInfoTranslation(i, player) + '</div>';
 				}))
