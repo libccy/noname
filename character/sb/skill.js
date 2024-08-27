@@ -3119,6 +3119,9 @@ const skills = {
 				content: function () {
 					trigger.getParent().customArgs.default.customSource = player;
 				},
+				ai: {
+					halfneg: true
+				},
 			},
 			nanmaned: {
 				trigger: {
