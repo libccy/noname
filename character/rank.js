@@ -420,6 +420,7 @@ window.noname_character_rank = {
 		"zhangbu",
 		"licuilianzhaoquanding",
 		"ol_sb_sunjian",
+		"ol_sb_yuanshu",
 	],
 	am: [
 		"dc_sb_chengyu",
@@ -2468,6 +2469,7 @@ window.noname_character_rank = {
 			"kongshu",
 			"mb_sp_zhenji",
 			"ol_sb_sunjian",
+			"ol_sb_yuanshu",
 		],
 		rare: [
 			"dc_mateng",

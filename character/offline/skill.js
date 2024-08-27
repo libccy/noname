@@ -2329,7 +2329,7 @@ const skills = {
 		group: "tyzhuan_draw",
 		subSkill: {
 			draw: {
-				audio: "qingbei",
+				audio: "tyzhuan",
 				trigger: { global: "useCardAfter" },
 				filter(event, player) {
 					return get.type(event.card, null, false) == "equip";
