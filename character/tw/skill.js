@@ -2592,7 +2592,7 @@ const skills = {
 			return "twxiayong" + (event.player === player ? 1 : 2) + ".mp3";
 		},
 		locked: true,
-		popup: false,
+		forced: true,
 		async content(event, trigger, player) {
 			if (trigger.player === player) {
 				const cards = player.getCards("h", card => {
