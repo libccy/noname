@@ -1605,7 +1605,6 @@ const skills = {
 			},
 		},
 		ai: {
-			combo: "sbxingshang",
 			order: 8,
 			result: {
 				player(player) {

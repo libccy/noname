@@ -1479,7 +1479,6 @@ const skills = {
 			delete event.result.skill;
 		},
 		ai: {
-			combo: "clanzhongliu",
 			order(item, player) {
 				player = player || _status.event.player;
 				var storage = _status.event.player.storage.clanjiexuan;

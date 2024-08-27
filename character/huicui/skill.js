@@ -305,9 +305,6 @@ const skills = {
 				inherit: "fengyin",
 			},
 		},
-		ai: {
-			combo: "dchuoxin"
-		},
 	},
 	dchuoxin: {
 		audio: 2,
@@ -4830,6 +4827,7 @@ const skills = {
 		},
 		ai: {
 			combo: "dcjizhong",
+			halfneg: true
 		},
 	},
 	//董绾

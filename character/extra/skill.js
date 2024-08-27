@@ -5006,7 +5006,6 @@ const skills = {
 		locked: false,
 		//global:'yingba_mark',
 		ai: {
-			combo: "scfuhai",
 			threaten: 3,
 			order: 11,
 			result: {
