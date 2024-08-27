@@ -475,6 +475,9 @@ const skills = {
 				.set("id", eventId)
 				.set("_global_waiting", true);
 		},
+		ai: {
+			combo: "olsbliwen"
+		},
 	},
 	//OL界吴国太
 	olganlu: {
