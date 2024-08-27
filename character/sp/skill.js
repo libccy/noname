@@ -29436,6 +29436,9 @@ const skills = {
 				);
 			}
 		},
+		ai: {
+			combo: "xinfu_xionghuo"
+		}
 	},
 	xinfu_jianjie: { audio: 3 },
 	jianjie: {

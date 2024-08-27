@@ -13814,6 +13814,9 @@ const skills = {
 		content: function () {
 			player.addMark("recangchu", Math.min(3, game.countPlayer() - player.countMark("recangchu")));
 		},
+		ai: {
+			combo: "reliangying"
+		},
 		intro: { content: "mark", name: "粮" },
 		mod: {
 			maxHandcard: function (player, num) {

@@ -5149,6 +5149,7 @@ const skills = {
 		},
 		ai: {
 			threaten: 4,
+			combo: "dcxiongmu"
 		},
 		subSkill: {
 			all: {
