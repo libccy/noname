@@ -117,6 +117,140 @@ export class Game extends GameCompatible {
 			});
 		}
 	})();
+	/**
+	 * 交换任意两个元素的位置，附带过渡动画
+	 * @param {HTMLDivElement} e1 
+	 * @param {HTMLDivElement} e2 
+	 * @param {number} duration //动画完成的时间 ms
+	 * @param {'linear'|'ease-in-out'} timefun //动画过度的时间曲线,很多，这里只列举两个
+	 * @returns {Promise<void>}
+	 * @author Curpond
+	 */
+	$swapElement(e1, e2, duration = 400, timefun = 'linear') {
+		return new Promise((resolve) => {
+			let e1p = e1.parentElement;
+			let e2p = e2.parentElement;
+			let old1_overflow = e1p.style.overflow
+			let old2_overflow = e2p.style.overflow
+			/**@type {HTMLDivElement[]} */
+			let watchedElements = [...e1p.children, ...e2p.children].unique()
+			e1p.style.overflow = 'auto'
+			e2p.style.overflow = 'auto'
+			let e1n = e1.nextElementSibling;
+			let e2n = e2.nextElementSibling;
+
+			//first
+			let originalPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]))
+
+			//last
+			e1p.insertBefore(e2, e1n);
+			e2p.insertBefore(e1, e2n);
+			let newPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]))
+			let change = new Map(watchedElements.map(e => {
+				return [e,
+					{
+						dx: originalPosition.get(e).x - newPosition.get(e).x,
+						dy: originalPosition.get(e).y - newPosition.get(e).y
+					}
+				]
+			}))
+
+			//invert
+			change.forEach(({ dx, dy }, e) => {
+				e.style.transition = `none`;
+				e.style.transform = `translate(${dx}px, ${dy}px)`
+
+
+			});
+			e1.offsetHeight;
+			//play
+			requestAnimationFrame(() => {
+				change.forEach(({ dx, dy }, e) => {
+					e.style.transition = `${duration}ms ${timefun}`;
+					e.style.removeProperty('transform')
+				});
+				let transitionEndHandler = () => {
+					change.forEach(({ dx, dy }, e) => e.removeEventListener('transitionend', transitionEndHandler));
+					e1p.style.overflow = old1_overflow
+					e2p.style.overflow = old2_overflow
+					resolve();
+				};
+				change.forEach(({ dx, dy }, e) => e.addEventListener('transitionend', transitionEndHandler, { once: true }));
+			});
+		});
+	};
+	/**
+	* 元素去到某个父元素的某个位置，附带过度动画
+	* @param {HTMLDivElement} element 
+	* @param {HTMLDivElement} Parent 
+	* @param {number|'first'|'last'|Node} position 新的父容器中元素去的位置
+	* @param {number} duration 动画完成的时间 ms
+	* @param {'linear'|'ease-in-out'} timefun 动画过度的时间曲线,很多，这里只列举两个
+	* @returns {Promise<void>}
+	* @author Curpond
+	*/
+	$elementGoto(element, Parent, position = 'last', duration = 400, timefun = 'linear') {
+		return new Promise((resolve) => {
+			let e1p = element.parentElement;
+			let e2p = Parent;
+			let old1_overflow = e1p.style.overflow
+			let old2_overflow = e2p.style.overflow
+			/**@type {HTMLDivElement[]} */
+			let watchedElements = [...e1p.children, ...e2p.children].unique()
+			e1p.style.overflow = 'auto'
+			e2p.style.overflow = 'auto'
+			//first
+			let originalPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]))
+			//last
+			if (position == "first") {
+				e2p.insertBefore(element, e2p.firstChild);
+
+			} else if (position == 'last') {
+				e2p.appendChild(element);
+
+			} else if (typeof position == 'number') {
+				e2p.insertBefore(element, e2p.children[position]);
+
+			} else if (e2p.contains(position)) {
+				e2p.insertBefore(element, position);
+
+			} else {
+				e2p.appendChild(element);
+			}
+			let newPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]))
+			let change = new Map(watchedElements.map(e => {
+				return [e,
+					{
+						dx: originalPosition.get(e).x - newPosition.get(e).x,
+						dy: originalPosition.get(e).y - newPosition.get(e).y
+					}
+				]
+			}))
+
+			//invert
+			change.forEach(({ dx, dy }, e) => {
+				e.style.transition = `none`;
+				e.style.transform = `translate(${dx}px, ${dy}px)`
+			});
+			element.offsetHeight;
+
+			//play
+			requestAnimationFrame(() => {
+				change.forEach(({ dx, dy }, e) => {
+					e.style.transition = `${duration}ms ${timefun}`;
+					e.style.removeProperty('transform')
+				});
+				let transitionEndHandler = () => {
+					change.forEach(({ dx, dy }, e) => e.removeEventListener('transitionend', transitionEndHandler));
+					e1p.style.overflow = old1_overflow
+					e2p.style.overflow = old2_overflow
+					resolve();
+				};
+				change.forEach(({ dx, dy }, e) => e.addEventListener('transitionend', transitionEndHandler, { once: true }));
+			});
+		})
+
+	}
 	//Stratagem
 	//谋攻
 	setStratagemBuffCost(cardName, cost) {
@@ -1399,9 +1533,9 @@ export class Game extends GameCompatible {
 			args.length === 1 && get.objtype(args[0]) === "object"
 				? args[0]
 				: {
-						path: args.filter(arg => typeof arg === "string" || typeof arg === "number").join("/"),
-						onError: args.find(arg => typeof arg === "function"),
-					};
+					path: args.filter(arg => typeof arg === "string" || typeof arg === "number").join("/"),
+					onError: args.find(arg => typeof arg === "function"),
+				};
 
 		const {
 			path = "",
@@ -2090,8 +2224,8 @@ export class Game extends GameCompatible {
 				);
 			}
 			const blob = zip.generate({
-					type: "blob",
-				}),
+				type: "blob",
+			}),
 				fileNameToSaveAs = `${exportExtension.replace(/\\|\/|:|\?|"|\*|<|>|\|/g, "-")}.zip`;
 
 			if (lib.device) {
@@ -3970,7 +4104,7 @@ export class Game extends GameCompatible {
 	}
 	reloadCurrent() {
 		let names = [game.me.name1 || game.me.name, game.me.name2];
-		if(game.me.name1 != game.me.name) names = [game.me.name];
+		if (game.me.name1 != game.me.name) names = [game.me.name];
 		game.saveConfig("continue_name", names);
 		game.saveConfig("mode", lib.config.mode);
 		localStorage.setItem(lib.configprefix + "directstart", true);
@@ -4089,7 +4223,7 @@ export class Game extends GameCompatible {
 			}
 		}
 		if (!callback) {
-			callback = function () {};
+			callback = function () { };
 		}
 		//try{
 		//	if(noinput){
@@ -7559,59 +7693,59 @@ export class Game extends GameCompatible {
 		return new Promise(
 			query
 				? (resolve, reject) => {
-						lib.status.reload++;
-						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).get(query);
-						idbRequest.onerror = event => {
-							if (typeof onError == "function") {
-								onError(event);
-								game.reload2();
-								resolve();
-							} else {
-								game.reload2();
-								reject(event);
-							}
-						};
-						idbRequest.onsuccess = event => {
-							const result = event.target.result;
-							if (typeof onSuccess == "function") {
-								_status.dburgent = true;
-								onSuccess(result);
-								delete _status.dburgent;
-							}
+					lib.status.reload++;
+					const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).get(query);
+					idbRequest.onerror = event => {
+						if (typeof onError == "function") {
+							onError(event);
 							game.reload2();
-							resolve(result);
-						};
-					}
+							resolve();
+						} else {
+							game.reload2();
+							reject(event);
+						}
+					};
+					idbRequest.onsuccess = event => {
+						const result = event.target.result;
+						if (typeof onSuccess == "function") {
+							_status.dburgent = true;
+							onSuccess(result);
+							delete _status.dburgent;
+						}
+						game.reload2();
+						resolve(result);
+					};
+				}
 				: (resolve, reject) => {
-						lib.status.reload++;
-						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
-							object = {};
-						idbRequest.onerror = event => {
-							if (typeof onError == "function") {
-								onError(event);
-								game.reload2();
-								resolve();
-							} else {
-								game.reload2();
-								reject(event);
-							}
-						};
-						idbRequest.onsuccess = event => {
-							const result = event.target.result;
-							if (result) {
-								object[result.key] = result.value;
-								result.continue();
-								return;
-							}
-							if (typeof onSuccess == "function") {
-								_status.dburgent = true;
-								onSuccess(object);
-								delete _status.dburgent;
-							}
+					lib.status.reload++;
+					const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
+						object = {};
+					idbRequest.onerror = event => {
+						if (typeof onError == "function") {
+							onError(event);
 							game.reload2();
-							resolve(object);
-						};
-					}
+							resolve();
+						} else {
+							game.reload2();
+							reject(event);
+						}
+					};
+					idbRequest.onsuccess = event => {
+						const result = event.target.result;
+						if (result) {
+							object[result.key] = result.value;
+							result.continue();
+							return;
+						}
+						if (typeof onSuccess == "function") {
+							_status.dburgent = true;
+							onSuccess(object);
+							delete _status.dburgent;
+						}
+						game.reload2();
+						resolve(object);
+					};
+				}
 		);
 	}
 	/**
@@ -7648,45 +7782,45 @@ export class Game extends GameCompatible {
 			);
 		return query
 			? new Promise((resolve, reject) => {
-					lib.status.reload++;
-					const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).delete(query);
-					record.onerror = event => {
-						if (typeof onError == "function") {
-							onError(event);
-							game.reload2();
-							resolve();
-						} else {
-							game.reload2();
-							reject(event);
-						}
-					};
-					record.onsuccess = event => {
-						if (typeof onSuccess == "function") onSuccess(event);
+				lib.status.reload++;
+				const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).delete(query);
+				record.onerror = event => {
+					if (typeof onError == "function") {
+						onError(event);
 						game.reload2();
-						resolve(event);
-					};
-				})
+						resolve();
+					} else {
+						game.reload2();
+						reject(event);
+					}
+				};
+				record.onsuccess = event => {
+					if (typeof onSuccess == "function") onSuccess(event);
+					game.reload2();
+					resolve(event);
+				};
+			})
 			: game.getDB(storeName).then(object => {
-					const keys = Object.keys(object);
-					lib.status.reload += keys.length;
-					const store = lib.db.transaction([storeName], "readwrite").objectStore(storeName);
-					return Promise.allSettled(
-						keys.map(
-							key =>
-								new Promise((resolve, reject) => {
-									const request = store.delete(key);
-									request.onerror = event => {
-										game.reload2();
-										reject(event);
-									};
-									request.onsuccess = event => {
-										game.reload2();
-										resolve(event);
-									};
-								})
-						)
-					);
-				});
+				const keys = Object.keys(object);
+				lib.status.reload += keys.length;
+				const store = lib.db.transaction([storeName], "readwrite").objectStore(storeName);
+				return Promise.allSettled(
+					keys.map(
+						key =>
+							new Promise((resolve, reject) => {
+								const request = store.delete(key);
+								request.onerror = event => {
+									game.reload2();
+									reject(event);
+								};
+								request.onsuccess = event => {
+									game.reload2();
+									resolve(event);
+								};
+							})
+					)
+				);
+			});
 	}
 	/**
 	 * @param { string } key

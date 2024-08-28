@@ -1,0 +1,71 @@
+.dialog:has(.row-container) {
+    --bgColor: #2f2f3557;
+    width: 80%;
+    background: var(--bgColor);
+    left: 10%;
+    border-radius: 10px;
+
+
+}
+
+.dialog:has(.row-container):not(.fullheight) {
+    top: 10% !important;
+    max-height: 55%;
+}
+
+.dialog:has(.row-container)>.content-container {
+    border-radius: 10px;
+    background-color: var(--bgColor);
+}
+
+.dialog:has(.row-container)>.content-container>.content {
+    background-color: var(--bgColor);
+
+}
+
+
+.row-container {
+    display: grid;
+    height: fit-content;
+    margin: 10px auto !important;
+    width: 95%;
+}
+
+.row-container>* {
+    position: relative;
+}
+
+.item-container>.caption {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: initial;
+
+}
+
+.item-container:has(.caption) {
+    border: none;
+}
+
+.item-container {
+    border: solid 2px #a5a29db5;
+    width: 90%;
+    height: 95%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    border-radius: 10px;
+    padding: 3px 3px;
+    overflow: auto;
+    max-width: 90%;
+
+}
+
+.item-container>* {
+    flex-shrink: 0;
+    position: relative;
+}
+
+.item-container>div:not(:first-child) {
+    margin-left: var(--ml, 3px);
+}

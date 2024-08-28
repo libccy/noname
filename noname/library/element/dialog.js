@@ -71,6 +71,186 @@ export class Dialog extends HTMLDivElement {
 		return dialog;
 	}
 	/**
+	 * 类型定义：SingleOrArray
+	 * @template T - 类型参数
+	 * @typedef {T | T[]} SingleOrArray
+	 */
+
+	/**
+	 * 类型定义：Row_Item
+	 * @typedef {SingleOrArray<Card | Player> | string} Row_Item
+	 */
+
+	/**
+	 * 类型定义：Row_Item_Option
+	 * @template T - 类型参数，默认为 Row_Item
+	 * @typedef {Object} Row_Item_Option
+	 * @property {T} [item] - 每项的内容
+	 * @property {CSSStyleDeclaration} [itemContainerCss] - 项目容器的自定义样式
+	 * @property {CSSStyleDeclaration} [itemCss] - 容器中每个项目的自定义样式
+	 * @property {(itemContainer: HTMLDivElement) => void} [custom] - 自定义函数，可以用来添加其他的元素
+	 * @property {number} [ratio] - 所占的比例
+	 * @property {boolean} [ItemNoclick] - 容器中的每个项目是否可以点击
+	 * @property {(item: HTMLDivElement, itemContainer: HTMLDivElement, AllItemConatainers: HTMLDivElement[], e: MouseEvent) => void} [clickItem] - 项目的点击事件
+	 * @property {(itemContainer: HTMLDivElement, item: T, AllItemConatainers: HTMLDivElement[], e: MouseEvent) => void} [clickItemContainer] - 点击容器的回调事件
+	 * @property {'fold' | 'scroll' | 'hidden'} [overflow] - 项目过多时，如何显示，折叠|滚动|隐藏
+	 */
+
+	/**
+	 * 类型定义：RowItem
+	 * @typedef {Row_Item | Row_Item_Option<Row_Item>} RowItem
+	 */
+	/**
+	 * 
+	 * @param  {RowItem[]} args 
+	 */
+	addNewRow(...args) {
+		//参数归一化
+		let itemOptions = parameterNormolize()
+		//设置比例字符串
+		let ratioStr = itemOptions.map(o => o.ratio || 1).join('fr ') + 'fr'
+		//定义一个属性记录加入的所有的框，框的links是加入时真实数据，方便最后获取数据，这里可以设计一下别的数据格式向外暴露结果
+		if (!this.itemContainers) this.itemContainers = []
+		let that = this
+		//创建一个行的父容器
+		let rowContainer = createRowContainer(this)
+		//遍历参数
+		for (let itemOption of itemOptions) {
+			//为每个列创建一个子容器
+			let itemContainer = createItemContainer(itemOption)
+			//将项目加入到每个子容器中
+			let item = itemOption.item
+			let addedItems = addItemToItemContainer(item, itemContainer, itemOption)
+			//注册点击事件
+			BindEvent(itemOption, addedItems, itemContainer)
+			//检查溢出处理的逻辑
+			checkOverflow(itemOption, itemContainer, addedItems)
+			//自定义添加元素
+			if (itemOption.custom) itemOption(itemContainer)
+			observeItemContainer(itemOption, itemContainer)
+			this.itemContainers.push(itemContainer)
+
+		}
+		//监视容器，实现当itemcontainer的子元素发生变化时，重新调用checkOverflow
+		function observeItemContainer(itemOption, itemContainer) {
+			itemContainer.Observer = new MutationObserver((mutationsList) => {
+				for (const mutation of mutationsList) {
+					if (mutation.type === 'childList') {
+						checkOverflow(itemOption, itemContainer, Array.from(itemContainer.children), mutation.addedNodes?.length)
+					}
+				}
+			})
+			itemContainer.Observer.observe(itemContainer, { childList: true })
+		}
+
+
+		function observerItemContainers(elemnts) {
+
+		}
+		function createItemContainer(itemOption) {
+			let itemContainer = ui.create.div('.item-container', rowContainer)
+			itemContainer.links = itemOption.item
+			if (itemOption.itemContainerCss) itemContainer.css(itemOption.itemContainerCss)
+			return itemContainer
+		}
+		function BindEvent(itemOption, addedItems, itemContainer) {
+			if (itemOption.clickItem && !itemOption.ItemNoclick) {
+				addedItems.forEach(item => {
+					item.addEventListener('click', (ev) => {
+						ev.stopPropagation()
+						itemOption.clickItem(item, itemContainer, that.itemContainers, ev)
+					})
+				})
+			}
+			if (itemOption.clickItemContainer) {
+				itemContainer.addEventListener('click', (e) => {
+					e.stopPropagation()
+					itemOption.clickItemContainer(itemContainer, itemOption.item, that.itemContainers, e)
+				})
+			}
+		}
+		function checkOverflow(itemOption, itemContainer, addedItems, flag = false) {
+			if (itemOption.overflow == 'scroll') {
+				itemContainer.css({ overflowX: 'scroll' })
+			} else if (itemOption.overflow == 'hidden') {
+				itemContainer.css({ overflow: 'hidden' })
+			} else if (addedItems?.length) {
+
+				const L = itemContainer.getBoundingClientRect().width
+				const W = addedItems[0].getBoundingClientRect().width
+				let n = addedItems.length
+				if (flag) n = n + 1
+				if (L < n * W) {
+					const ml = Math.min(((n * W - L + 75) / (n - 1)), 70)
+					itemContainer.style.setProperty('--ml', "-" + ml + 'px')
+				}
+			}
+		}
+		function parameterNormolize() {
+			let itemOptions = []
+			if (args.length == 0) {
+				throw new Error('参数不能为空')
+			} else if (args.length == 1) {
+				if (isOption(args[0])) {
+					itemOptions = [args[0]]
+				} else {
+					itemOptions = [{
+						item: args[0]
+					}]
+				}
+			} else {
+				if (args.every(arg => isOption(arg))) {
+					itemOptions = args
+				} else {
+					itemOptions = args.map(arg => {
+						return {
+							item: arg
+						}
+					})
+
+				}
+			}
+			return itemOptions
+		}
+		function isOption(obj) {
+			if (['card', 'player', 'cards', 'players'].includes(get.itemtype(obj))) return false
+			return typeof obj == 'object' && ('item' in obj)
+		}
+		function createRowContainer(dialog) {
+			let rowContainer = ui.create.div('.row-container', dialog.content)
+			rowContainer.css({
+				gridTemplateColumns: ratioStr
+			})
+			return rowContainer
+		}
+		//添加元素到子容器中，并返回添加后的元素
+		function addItemToItemContainer(item, itemContainer, itemOption) {
+			if (!item) return
+			/**@type {HTMLDivElement[]} */
+			let items = []
+			if (typeof item == 'string') {
+				let caption = ui.create.caption(item, itemContainer)
+				caption.css(itemOption.itemCss ?? {})
+				items.push(caption)
+			} else if (typeof item == 'function') {
+				let item = item()
+				itemContainer.links = item
+				itemContainer.append(item)
+				items.push(item)
+			} else if (!Array.isArray(item)) {
+				let button = ui.create.button(item, get.itemtype(item), itemContainer, itemOption.ItemNoclick)
+				button.css(itemOption.itemCss ?? {})
+				items.push(button)
+			} else {
+				for (let i of item) {
+					items.addArray(addItemToItemContainer(i, itemContainer, itemOption))
+				}
+			}
+			return items
+
+		}
+	}
+	/**
 	 *
 	 * @param { string | HTMLDivElement | Card[] | Player[] } item
 	 * @param {*} [noclick]
