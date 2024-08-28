@@ -107,7 +107,6 @@ export class Dialog extends HTMLDivElement {
 	addNewRow(...args) {
 		//参数归一化
 		let itemOptions = parameterNormolize()
-
 		//设置比例字符串
 		let ratioStr = itemOptions.map(o => o.ratio || 1).join('fr ') + 'fr'
 		//定义一个属性记录加入的所有的框，框的links是加入时真实数据，方便最后获取数据，这里可以设计一下别的数据格式向外暴露结果
@@ -117,7 +116,6 @@ export class Dialog extends HTMLDivElement {
 		let rowContainer = createRowContainer(this)
 		//遍历参数
 		for (let itemOption of itemOptions) {
-
 			//为每个列创建一个子容器
 			let itemContainer = createItemContainer(itemOption)
 			//将项目加入到每个子容器中
@@ -129,7 +127,6 @@ export class Dialog extends HTMLDivElement {
 			checkOverflow(itemOption, itemContainer, addedItems)
 			//自定义添加元素
 			if (itemOption.custom) itemOption(itemContainer)
-
 			this.itemContainers.push(itemContainer)
 		}
 		function createItemContainer(itemOption) {
@@ -142,8 +139,6 @@ export class Dialog extends HTMLDivElement {
 			if (itemOption.clickItem && !itemOption.ItemNoclick) {
 				addedItems.forEach(item => {
 					item.addEventListener('click', (ev) => {
-
-						console.count()
 						ev.stopPropagation()
 						itemOption.clickItem(item, itemContainer, that.itemContainers, ev)
 					})
@@ -170,12 +165,8 @@ export class Dialog extends HTMLDivElement {
 					const ml = Math.min(((n * W - L + 75) / (n - 1)), 70)
 					itemContainer.style.setProperty('--ml', "-" + ml + 'px')
 				}
-
 			}
-
 		}
-
-
 		function parameterNormolize() {
 			let itemOptions = []
 			if (args.length == 0) {
@@ -236,8 +227,6 @@ export class Dialog extends HTMLDivElement {
 					items.addArray(addItemToItemContainer(i, itemContainer, itemOption))
 				}
 			}
-
-
 			return items
 
 		}
