@@ -9,7 +9,8 @@
 }
 
 .dialog:has(.row-container):not(.fullheight) {
-    top: 10% !important
+    top: 10% !important;
+    max-height: 55%;
 }
 
 .dialog:has(.row-container)>.content-container {
@@ -55,7 +56,9 @@
     justify-content: center;
     border-radius: 10px;
     padding: 3px 3px;
-    overflow: hidden
+    overflow: auto;
+    max-width: 90%;
+
 }
 
 .item-container>* {

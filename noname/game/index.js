@@ -134,8 +134,8 @@ export class Game extends GameCompatible {
 			let old2_overflow = e2p.style.overflow
 			/**@type {HTMLDivElement[]} */
 			let watchedElements = [...e1p.children, ...e2p.children].unique()
-			e1p.style.overflow = 'visible'
-			e2p.style.overflow = 'visible'
+			e1p.style.overflow = 'auto'
+			e2p.style.overflow = 'auto'
 			let e1n = e1.nextElementSibling;
 			let e2n = e2.nextElementSibling;
 
@@ -197,8 +197,8 @@ export class Game extends GameCompatible {
 			let old2_overflow = e2p.style.overflow
 			/**@type {HTMLDivElement[]} */
 			let watchedElements = [...e1p.children, ...e2p.children].unique()
-			e1p.style.overflow = 'visible'
-			e2p.style.overflow = 'visible'
+			e1p.style.overflow = 'auto'
+			e2p.style.overflow = 'auto'
 			//first
 			let originalPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]))
 			//last

@@ -127,7 +127,25 @@ export class Dialog extends HTMLDivElement {
 			checkOverflow(itemOption, itemContainer, addedItems)
 			//自定义添加元素
 			if (itemOption.custom) itemOption(itemContainer)
+			observeItemContainer(itemOption, itemContainer)
 			this.itemContainers.push(itemContainer)
+
+		}
+		//监视容器，实现当itemcontainer的子元素发生变化时，重新调用checkOverflow
+		function observeItemContainer(itemOption, itemContainer) {
+			itemContainer.Observer = new MutationObserver((mutationsList) => {
+				for (const mutation of mutationsList) {
+					if (mutation.type === 'childList') {
+						checkOverflow(itemOption, itemContainer, Array.from(itemContainer.children), mutation.addedNodes?.length)
+					}
+				}
+			})
+			itemContainer.Observer.observe(itemContainer, { childList: true })
+		}
+
+
+		function observerItemContainers(elemnts) {
+
 		}
 		function createItemContainer(itemOption) {
 			let itemContainer = ui.create.div('.item-container', rowContainer)
@@ -151,7 +169,7 @@ export class Dialog extends HTMLDivElement {
 				})
 			}
 		}
-		function checkOverflow(itemOption, itemContainer, addedItems) {
+		function checkOverflow(itemOption, itemContainer, addedItems, flag = false) {
 			if (itemOption.overflow == 'scroll') {
 				itemContainer.css({ overflowX: 'scroll' })
 			} else if (itemOption.overflow == 'hidden') {
@@ -160,7 +178,8 @@ export class Dialog extends HTMLDivElement {
 
 				const L = itemContainer.getBoundingClientRect().width
 				const W = addedItems[0].getBoundingClientRect().width
-				const n = addedItems.length
+				let n = addedItems.length
+				if (flag) n = n + 1
 				if (L < n * W) {
 					const ml = Math.min(((n * W - L + 75) / (n - 1)), 70)
 					itemContainer.style.setProperty('--ml', "-" + ml + 'px')
