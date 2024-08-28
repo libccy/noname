@@ -1,7 +1,7 @@
 const characters = {
-	dc_jiangqing: ["male", "wu", 4, ["dcshangyi", "dcniaoxiang"]],
-	dc_tianfeng: ["male", "qun", 3, ["sijian", "dcsuishi"]],
-	dc_zhangren: ["male", "qun", 4, ["dcchuanxin", "dcfengshi"]],
+	dc_jiangqing: ["male", "wu", 4, ["dcshangyi", "dcniaoxiang"], ["die:jiangqin.mp3"]],
+	dc_tianfeng: ["male", "qun", 3, ["sijian", "dcsuishi"], ["die:tianfeng"]],
+	dc_zhangren: ["male", "qun", 4, ["dcchuanxin", "dcfengshi"], ["die:zhangren"]],
 	dc_sb_jushou: ["male", "qun", 3, ["dcsbzuojun", "dcsbmuwang"]],
 	dc_sb_chengyu: ["male", "wei", 3, ["dcshizha", "dcgaojian"]],
 	dc_lingcao: ["male", "wu", "3/5", ["dcdufeng"]],

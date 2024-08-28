@@ -8,7 +8,7 @@ const skills = {
 		animationColor: "gray",
 		unique: true,
 		enable: "phaseUse",
-		audio: 2,
+		audio: "xiongyi",
 		limited: true,
 		filterTarget: lib.filter.notMe,
 		async content(event,trigger,player) {

@@ -5,7 +5,7 @@ import cards from "../sp2/card.js";
 const skills = {
 	//蒋钦
 	dcshangyi: {
-		audio: 2,
+		audio: "shangyi",
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -39,7 +39,7 @@ const skills = {
 		},
 	},
 	dcniaoxiang: {
-		audio: 2,
+		audio: "zniaoxiang",
 		trigger: { player: "useCardToPlayered" },
 		forced: true,
 		filter(event, player) {
@@ -67,7 +67,7 @@ const skills = {
 	},
 	//田丰
 	dcsuishi: {
-		audio: 2,
+		audio: "suishi",
 		trigger: {
 			global: ["dying", "dieAfter"],
 		},
@@ -96,7 +96,7 @@ const skills = {
 	},
 	//张任
 	dcchuanxin: {
-		audio: 2,
+		audio: "chuanxin",
 		trigger: { source: "damageBegin2" },
 		filter(event, player) {
 			if (_status.currentPhase != player) return false;
@@ -140,7 +140,7 @@ const skills = {
 		},
 	},
 	dcfengshi: {
-		audio: 2,
+		audio: "zfengshi",
 		trigger: { player: "useCardToPlayered" },
 		filter: function (event, player) {
 			if (event.card.name != "sha" || event.target.inRange(player)) return false;
