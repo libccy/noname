@@ -8,7 +8,9 @@
 
 }
 
-
+.dialog:has(.row-container):not(.fullheight) {
+    top: 10% !important
+}
 
 .dialog:has(.row-container)>.content-container {
     border-radius: 10px;
