@@ -9571,7 +9571,7 @@ export const Content = {
 			event.dialog.classList.add("scroll1");
 			event.dialog.classList.add("scroll2");
 			event.dialog.classList.add("fullwidth");
-			if (event.list.length > 1) {
+			if (event.list.length > 2) {
 				ui.arena.classList.add("choose-to-move");
 				event.dialog.classList.add("fullheight");
 			}
@@ -9638,7 +9638,7 @@ export const Content = {
 					...currentList
 						.slice()
 						.map(listx => {
-							return [{ item: listx[0], ratio: 1, itemCss: { color: "red" } }, listx[1]?.length ? { item: listx[1], ratio: 6 / currentList.length, itemContainerCss, clickItem, clickItemContainer } : { item: listx[1], ratio: 6 / currentList.length, itemContainerCss, clickItemContainer }];
+							return [{ item: listx[0], ratio: 1 }, listx[1]?.length ? { item: listx[1], ratio: 6 / currentList.length, itemContainerCss, clickItem, clickItemContainer } : { item: listx[1], ratio: 6 / currentList.length, itemContainerCss, clickItemContainer }];
 						})
 						.flat()
 				);

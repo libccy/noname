@@ -2635,10 +2635,10 @@ const skills = {
 				tags = ["dctuoyu_fengtian", "dctuoyu_qingqu", "dctuoyu_junshan"];
 			var storage = player.getStorage("dctuoyu");
 			var list = [
-				["未分配手牌（对话框较长，请下滑操作）", []],
-				["丰田（伤害/回复值+1）", []],
-				["清渠（无次数和距离限制）", []],
-				["峻山（不可被响应）", []],
+				["未分配手牌", []],
+				[get.translation(tags[0] + "_tag") + '<div class="text center">伤害/回复值+1</div>', []],
+				[get.translation(tags[1] + "_tag") + '<div class="text center">无次数和距离限制</div>', []],
+				[get.translation(tags[2] + "_tag") + '<div class="text center">不可被响应</div>', []],
 			];
 			for (var card of hs) {
 				var added = false;
@@ -2651,13 +2651,12 @@ const skills = {
 				}
 				if (!added) list[0][1].push(card);
 			}
-			for (var row of list) {
-				for (var i = 0; i < tags.length; i++) {
-					if (!storage.includes(tags[i])) {
-						list[i + 1][0] = get.translation(tags[i]) + "（尚未激活）";
-					}
+			for (var i = 0; i < tags.length; i++) {
+				if (!storage.includes(tags[i])) {
+					list[i + 1][0] = get.translation(tags[i] + "_tag") + '<div class="text center">尚未激活</div>';
 				}
 			}
+			list = [list[0], list.slice(1)];
 			var next = player.chooseToMove("拓域：请分配你的手牌", true);
 			next.set("list", list);
 			next.set("filterMove", function (from, to, moved) {
@@ -2718,6 +2717,7 @@ const skills = {
 				moved[0].addArray(hs2);
 				return moved;
 			});
+			next.setContent("chooseToMove_new");
 			"step 1";
 			if (result.bool) {
 				game.broadcastAll(
@@ -3079,15 +3079,17 @@ const skills = {
 						player.markSkill("twshelie_count");
 						player.syncStorage("twshelie_count");
 					}
-					return event.name != "useCard" && list.length >= player.hp;
+					return event.name != "useCard" && list.length >= 4;
 				},
 				forced: true,
 				locked: false,
 				content() {
 					"step 0";
 					player.addTempSkill("twshelie_round", "roundStart");
-					player.chooseControl("摸牌阶段", "出牌阶段").set("prompt", "涉猎：请选择要执行的额外阶段");
+					if (typeof player.storage.twshelie == 'number') event._result = { index: player.storage.twshelie };
+                    else player.chooseControl("摸牌阶段", "出牌阶段").set("prompt", "涉猎：请选择要执行的额外阶段");
 					"step 1";
+                    player.storage.twshelie = 1 - result.index;
 					if (result.index == 0) {
 						var next = player.phaseDraw();
 						event.next.remove(next);
@@ -3121,18 +3123,22 @@ const skills = {
 			}, []).length;
 			"step 1";
 			var cards = target.getCards("h");
-			player
-				.chooseButton(2, ["攻心", cards, [["弃置此牌", "置于牌堆顶"], "tdnodes"]])
-				.set("filterButton", function (button) {
-					var type = typeof button.link;
-					if (ui.selected.buttons.length && type == typeof ui.selected.buttons[0].link) return false;
-					return true;
-				})
-				.set("ai", function (button) {
-					var target = _status.event.target;
-					var type = typeof button.link;
-					if (type == "object") return get.value(button.link, target);
-				});
+			var next = player.chooseToMove("攻心");
+			next.set("list",[
+				[get.translation(target)+'的手牌',cards],
+				[["弃置"],["置于牌堆顶"]],
+			]);
+			next.set("filterOk", moved => {
+				return moved[1].slice().concat(moved[2]).length == 1;
+			});
+			next.set("processAI", list => {
+				let card=list[0][1].slice().sort((a,b)=>{
+					return get.value(b)-get.value(a);
+				})[0];
+				if(!card) return false;
+				return [list[0][1].slice().remove(card),[card],[]];
+			});
+			next.setContent("chooseToMove_new");
 			"step 2";
 			if (result.bool) {
 				if (typeof result.links[0] != "string") result.links.reverse();
@@ -3146,32 +3152,12 @@ const skills = {
 				}
 			}
 			"step 3";
-			if (
-				event.num ==
-				target.getCards("h").reduce(function (arr, card) {
-					return arr.add(get.suit(card, player)), arr;
-				}, []).length
-			)
-				event.finish();
-			"step 4";
-			var num1 = 0;
-			for (var card of target.getCards("h")) {
-				if (get.color(card) == "red") num1++;
-			}
-			var num2 = target.countCards("h") - num1;
-			player
-				.chooseControl(["红色", "黑色", "cancel2"])
-				.set("prompt", "是否令" + get.translation(target) + "本回合无法使用一种颜色的牌？")
-				.set("ai", function () {
-					return num1 >= num2 ? "红色" : "黑色";
-				});
-			"step 5";
-			if (result.control != "cancel2") {
+			if (event.num > target.getCards('h').reduce(function (arr, card) {
+				return arr.add(get.suit(card, target)), arr;
+			}, []).length) {
 				player.line(target);
-				target.addTempSkill("twgongxin2");
-				target.markAuto("twgongxin2", [result.control == "红色" ? "red" : "black"]);
-				game.log(target, "本回合无法使用" + result.control + "牌");
-				if (!event.isMine() && !event.isOnline()) game.delayx();
+				player.addTempSkill('twgongxin3', { player: ['twgongxin3After', 'phaseAfter'] });
+				player.markAuto('twgongxin3', [target]);
 			}
 		},
 		ai: {
@@ -3194,6 +3180,22 @@ const skills = {
 		charlotte: true,
 		onremove: true,
 		intro: { content: "本回合内不能使用或打出$牌" },
+	},
+	twgongxin3: {
+		charlotte: true,
+		onremove: true,
+		intro: { content: '$不可响应你本回合使用的下一张牌' },
+		trigger: { player: 'useCard' },
+		forced: true,
+		popup: false,
+		content: function () {
+			'step 0'
+			game.delayx();
+			'step 1'
+			var targets = player.getStorage('twgongxin3');
+			player.line(targets, 'fire');
+			trigger.directHit.addArray(targets);
+		},
 	},
 	//神张角
 	yizhao: {
@@ -8673,20 +8675,30 @@ const skills = {
 		content() {
 			"step 0";
 			var cards = target.getCards("h");
-			player.chooseButton(2, ["攻心", cards, [["弃置此牌", "置于牌堆顶"], "tdnodes"]]).set("filterButton", function (button) {
-				var type = typeof button.link;
-				if (ui.selected.buttons.length && type == typeof ui.selected.buttons[0].link) return false;
-				return type == "string" || get.suit(button.link) == "heart";
+			var next = player.chooseToMove("攻心");
+			next.set("list",[
+				[get.translation(target)+'的手牌',cards],
+				[["弃置"],["置于牌堆顶"]],
+			]);
+			next.set("filterOk", moved => {
+				return moved[1].slice().concat(moved[2]).filter(card => get.suit(card) == "heart").length == 1;
 			});
+			next.set("processAI", list => {
+				let card=list[0][1].slice().filter(card=>{
+					return get.suit(card)=="heart";
+				}).sort((a,b)=>{
+					return get.value(b)-get.value(a);
+				})[0];
+				if(!card) return false;
+				return [list[0][1].slice().remove(card),[card],[]];
+			});
+			next.setContent("chooseToMove_new");
 			"step 1";
 			if (result.bool) {
-				if (typeof result.links[0] != "string") result.links.reverse();
-				var card = result.links[1],
-					choice = result.links[0];
-				if (choice == "弃置此牌") target.discard(card);
+				if (result.moved[1].length) target.discard(result.moved[1]);
 				else {
-					player.showCards(card, get.translation(player) + "对" + get.translation(target) + "发动了【攻心】");
-					target.lose(card, ui.cardPile, "visible", "insert");
+					player.showCards(result.moved[2], get.translation(player) + "对" + get.translation(target) + "发动了【攻心】");
+					target.lose(result.moved[2], ui.cardPile, "visible", "insert");
 				}
 			}
 		},

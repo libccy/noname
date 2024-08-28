@@ -6058,14 +6058,26 @@ const skills = {
 				event.target = target;
 				player.logSkill("sbqingzheng", target);
 				player.discard(cards);
-				var list = [];
-				var dialog = ["清正：弃置" + get.translation(target) + "一种花色的所有牌"];
-				for (var suit of lib.suit.concat("none")) {
-					if (target.countCards("h", { suit: suit })) {
-						dialog.push('<div class="text center">' + get.translation(suit + "2") + "牌</div>");
-						dialog.push(target.getCards("h", { suit: suit }));
-						list.push(suit);
-					}
+				var list = lib.suit.slice().reverse().concat("none").filter(i=>target.hasCard({suit:i},'h'));
+				var dialog = ui.create.dialog("清正：弃置" + get.translation(target) + "一种花色的所有牌");
+				dialog.addNewRow(
+					{ item: get.translation('heart'), retio: 1 },
+					{ item: target.getCards('h', { suit: 'heart' }), ratio: 3 },
+					{ item: get.translation('diamond'), retio: 1 },
+					{ item: target.getCards('h', { suit: 'diamond' }), ratio: 3 },
+				);
+				dialog.addNewRow(
+					{ item: get.translation('spade'), retio: 1 },
+					{ item: target.getCards('h', { suit: 'spade' }), ratio: 3 },
+					{ item: get.translation('club'), retio: 1 },
+					{ item: target.getCards('h', { suit: 'club' }), ratio: 3 },
+				);
+				if (list.includes("none")) {
+					dialog.classList.add('fullheight');
+					dialog.addNewRow(
+						{ item: get.translation('none'), retio: 1 },
+						{ item: target.getCards('h', { suit: 'none' }), ratio: 8 },
+					);
 				}
 				if (list.length) {
 					player
