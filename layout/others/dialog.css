@@ -28,7 +28,6 @@
     width: 95%;
 }
 
-
 .row-container>* {
     position: relative;
 }
@@ -37,6 +36,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: initial;
+
 }
 
 .item-container:has(.caption) {
