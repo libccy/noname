@@ -70,11 +70,44 @@ export class Dialog extends HTMLDivElement {
 		dialog._args = args;
 		return dialog;
 	}
+	/**
+	 * 类型定义：SingleOrArray
+	 * @template T - 类型参数
+	 * @typedef {T | T[]} SingleOrArray
+	 */
+
+	/**
+	 * 类型定义：Row_Item
+	 * @typedef {SingleOrArray<Card | Player> | string} Row_Item
+	 */
+
+	/**
+	 * 类型定义：Row_Item_Option
+	 * @template T - 类型参数，默认为 Row_Item
+	 * @typedef {Object} Row_Item_Option
+	 * @property {T} [item] - 每项的内容
+	 * @property {CSSStyleDeclaration} [itemContainerCss] - 项目容器的自定义样式
+	 * @property {CSSStyleDeclaration} [itemCss] - 容器中每个项目的自定义样式
+	 * @property {(itemContainer: HTMLDivElement) => void} [custom] - 自定义函数，可以用来添加其他的元素
+	 * @property {number} [ratio] - 所占的比例
+	 * @property {boolean} [ItemNoclick] - 容器中的每个项目是否可以点击
+	 * @property {(item: HTMLDivElement, itemContainer: HTMLDivElement, AllItemConatainers: HTMLDivElement[], e: MouseEvent) => void} [clickItem] - 项目的点击事件
+	 * @property {(itemContainer: HTMLDivElement, item: T, AllItemConatainers: HTMLDivElement[], e: MouseEvent) => void} [clickItemContainer] - 点击容器的回调事件
+	 * @property {'fold' | 'scroll' | 'hidden'} [overflow] - 项目过多时，如何显示，折叠|滚动|隐藏
+	 */
+
+	/**
+	 * 类型定义：RowItem
+	 * @typedef {Row_Item | Row_Item_Option<Row_Item>} RowItem
+	 */
+	/**
+	 * 
+	 * @param  {RowItem[]} args 
+	 */
 	addNewRow(...args) {
 		//参数归一化
 		let itemOptions = parameterNormolize()
-		//加载必要的css
-		loadCss()
+
 		//设置比例字符串
 		let ratioStr = itemOptions.map(o => o.ratio || 1).join('fr ') + 'fr'
 		//定义一个属性记录加入的所有的框，框的links是加入时真实数据，方便最后获取数据，这里可以设计一下别的数据格式向外暴露结果
@@ -90,13 +123,12 @@ export class Dialog extends HTMLDivElement {
 			//将项目加入到每个子容器中
 			let item = itemOption.item
 			let addedItems = addItemToItemContainer(item, itemContainer, itemOption)
+			//注册点击事件
 			BindEvent(itemOption, addedItems, itemContainer)
 			//检查溢出处理的逻辑
 			checkOverflow(itemOption, itemContainer, addedItems)
 			//自定义添加元素
 			if (itemOption.custom) itemOption(itemContainer)
-			//注册点击事件
-
 
 			this.itemContainers.push(itemContainer)
 		}
@@ -142,77 +174,7 @@ export class Dialog extends HTMLDivElement {
 			}
 
 		}
-		function loadCss() {
-			if (!ui.css.curpong) {
-				let style = document.createElement('style')
-				style.innerHTML = `.dialog:has(.row-container) {
-   --bgColor: #222225bf;
-   height: fit-content;
-   width: 80%;
-   height: 50% !important;
-   background: var(--bgColor);
-   left: 50%;
-   transform: translate(-50%, -20%) !important;
-   border-radius: 10px;
-}
 
-.dialog:has(.row-container)>.content-container {
-   border-radius: 10px;
-   background-color: var(--bgColor);
-}
-
-.dialog:has(.row-container)>.content-container>.content {
-   background-color: var(--bgColor);
-
-}
-
-
-.row-container {
-   display: grid;
-   height: fit-content;
-   margin: 10px auto !important;
-   width: 95%;
-}
-
-
-.row-container>* {
-   position: relative;
-}
-
-.item-container>.caption {
-   display: flex;
-   align-items: center;
-   justify-content: center;
-}
-
-.item-container:has(.caption) {
-   border: none;
-}
-
-.item-container {
-   border: solid 2px #a5a29db5;
-   width: 90%;
-   height: 95%;
-   margin: auto;
-   display: flex;
-   justify-content: center;
-   border-radius: 10px;
-   padding: 3px 3px;
-   overflow: hidden
-}
-
-.item-container>* {
-   flex-shrink: 0;
-   position: relative;
-}
-
-.item-container>div:not(:first-child) {
-   margin-left: var(--ml, 3px) !important;
-}`
-				document.head.appendChild(style)
-				ui.css.curpond = style
-			}
-		}
 
 		function parameterNormolize() {
 			let itemOptions = []
