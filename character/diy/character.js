@@ -81,7 +81,7 @@ const characters = {
 	ns_chengpu: ["male", "wu", 4, ["decadelihuo", "decadechunlao"]],
 	ns_sundeng: ["male", "wu", 4, ["xinkuangbi"]],
 	ns_duji: ["male", "wei", 3, ["xinfu_andong", "xinyingshi"]],
-	old_majun: ["male", "wei", 3, ["xinfu_jingxie1", "xinfu_qiaosi"]],
+	old_majun: ["male", "wei", 3, ["xinfu_jingxie", "xinfu_qiaosi"]],
 	ns_mengyou: ["male", "qun", 4, ["nsmanzhi"]],
 
 	old_jiakui: ["male", "wei", 4, ["tongqu", "xinwanlan"]],
