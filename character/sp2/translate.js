@@ -6,8 +6,6 @@ const translates = {
 	lvkai: "吕凯",
 	zhanggong: "张恭",
 	weiwenzhugezhi: "卫温诸葛直",
-	xurong: "徐荣",
-	zhangqiying: "张琪瑛",
 	sp_liuqi: "刘琦",
 	xf_tangzi: "唐咨",
 	gz_xf_huangquan: "黄权",

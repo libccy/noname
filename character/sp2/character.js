@@ -75,8 +75,6 @@ const characters = {
 	zhanggong: ["male", "wei", 3, ["xinfu_zhenxing", "xinfu_qianxin"], []],
 	weiwenzhugezhi: ["male", "wu", 4, ["xinfu_fuhai"], ["name:卫|温-诸葛|直"]],
 	beimihu: ["female", "qun", 3, ["zongkui", "guju", "baijia"], ["name:卑弥|呼"]],
-	xurong: ["male", "qun", 4, ["xinfu_xionghuo", "xinfu_shajue"], []],
-	zhangqiying: ["female", "qun", 3, ["xinfu_falu", "xinfu_dianhua", "xinfu_zhenyi"], []],
 	sp_liuqi: ["male", "qun", 3, ["rewenji", "sptunjiang"]],
 	xf_tangzi: ["male", "wei", 4, ["xinfu_xingzhao"], []],
 	xf_huangquan: ["male", "shu", 3, ["xinfu_dianhu", "xinfu_jianji"], []],

@@ -43,6 +43,8 @@ const characters = {
 	dc_zhaoxiang: ["female", "shu", 4, ["refanghun", "refuhan"]],
 	dc_guansuo: ["male", "shu", 4, ["xinzhengnan", "xiefang"]],
 	xin_baosanniang: ["female", "shu", 3, ["decadewuniang", "decadexushen"]],
+	xurong: ["male", "qun", 4, ["xinfu_xionghuo", "xinfu_shajue"], []],
+	zhangqiying: ["female", "qun", 3, ["xinfu_falu", "xinfu_dianhua", "xinfu_zhenyi"], []],
 	dc_shixie: ["male", "qun", 3, ["rebiluan", "ollixia"]],
 	dc_sp_machao: ["male", "qun", 4, ["zhuiji", "dc_olshichou"]],
 	old_huangfusong: ["male", "qun", 4, ["xinfenyue"], ["name:皇甫|嵩"]],

@@ -463,6 +463,8 @@ const translates = {
 	dc_guansuo_prefix: "新杀",
 	dc_zhaoxiang: "新杀赵襄",
 	dc_zhaoxiang_prefix: "新杀",
+	xurong: "徐荣",
+	zhangqiying: "张琪瑛",
 	dc_xujing: "许靖",
 	dcshangyu: "赏誉",
 	dcshangyu_tag: "赏誉",
