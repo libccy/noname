@@ -13548,6 +13548,9 @@ const skills = {
 			trigger.player.recover();
 			trigger.player.draw();
 		},
+		ai: {
+			combo: "dcsushou"
+		},
 	},
 	dcsushou: {
 		audio: 2,

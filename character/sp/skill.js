@@ -24591,6 +24591,7 @@ const skills = {
 					if (hs > target.hp && target.hp > 3 && (card.name === "shan" || card.name === "wuxie")) return "zeroplayertarget";
 				},
 			},
+			combo: "new_rewusheng"
 		},
 	},
 	nuzhan: {

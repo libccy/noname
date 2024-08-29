@@ -1295,6 +1295,10 @@ const skills = {
 				if (get.tag(card, "damage") > 0 && !target.isTempBanned("spfangzong") && player.inRange(target)) return false;
 			},
 		},
+		ai: {
+			combo: "spxizhan",
+			halfneg: true
+		},
 	},
 	spxizhan: {
 		audio: 5,
@@ -1367,6 +1371,9 @@ const skills = {
 			else {
 				await player.loseHp();
 			}
+		},
+		ai: {
+			halfneg: true
 		},
 	},
 	//高览

@@ -8942,6 +8942,9 @@ const skills = {
 				if (num > 0) return distance - (num > 2 ? 2 : 1);
 			},
 		},
+		ai: {
+			combo: "midu"
+		},
 	},
 	//刘巴
 	dczhubi: {

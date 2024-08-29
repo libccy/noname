@@ -3407,6 +3407,7 @@ const skills = {
 		ai: {
 			order: 9,
 			result: { target: -1 },
+			combo: "twjieqiu"
 		},
 	},
 	//侠关羽
@@ -18054,6 +18055,9 @@ const skills = {
 			if (player.hp <= trigger.player.hp) player.recover();
 			if (player.hp >= trigger.player.hp) player.draw();
 		},
+		ai: {
+			combo: "equan"
+		},
 	},
 	beini: {
 		audio: 2,
@@ -19013,6 +19017,9 @@ const skills = {
 				player.changeGroup(group);
 			}
 		},
+		ai: {
+			combo: "twbaobian"
+		},
 	},
 	twbaobian: {
 		audio: 2,
@@ -19077,6 +19084,9 @@ const skills = {
 				player.logSkill("chijie");
 				player.changeGroup(result.control);
 			}
+		},
+		ai: {
+			combo: "waishi"
 		},
 	},
 	waishi: {
