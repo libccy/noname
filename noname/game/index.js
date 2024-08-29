@@ -159,9 +159,7 @@ export class Game extends GameCompatible {
 			e2p.style.overflow = 'visible'
 			change.forEach(({ dx, dy }, e) => {
 				e.style.transition = `none`;
-				e.style.transform = `translate(${dx}px, ${dy}px)`
-
-
+				e.style.transform = `translate(${dx / game.documentZoom}px, ${dy / game.documentZoom}px)`
 			});
 			e1.offsetHeight;
 			//play
@@ -233,7 +231,7 @@ export class Game extends GameCompatible {
 			e1p.style.overflow = 'visible'
 			change.forEach(({ dx, dy }, e) => {
 				e.style.transition = `none`;
-				e.style.transform = `translate(${dx}px, ${dy}px)`
+				e.style.transform = `translate(${dx / game.documentZoom}px, ${dy / game.documentZoom}px)`
 			});
 			element.offsetHeight;
 

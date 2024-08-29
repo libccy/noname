@@ -144,6 +144,7 @@ export class Dialog extends HTMLDivElement {
 		}
 		function createItemContainer(itemOption) {
 			let itemContainer = ui.create.div('.item-container', rowContainer)
+			itemContainer.originWidth = itemContainer.getBoundingClientRect().width
 			itemContainer.links = itemOption.item
 			if (itemOption.itemContainerCss) itemContainer.css(itemOption.itemContainerCss)
 			return itemContainer
@@ -170,18 +171,18 @@ export class Dialog extends HTMLDivElement {
 			} else if (itemOption.overflow == 'hidden') {
 				itemContainer.css({ overflow: 'hidden' })
 			} else if (addedItems?.length) {
-
-				const L = itemContainer.getBoundingClientRect().width
+				//计算压缩折叠的量
+				const gap = 3
+				const L = itemContainer.originWidth - 6
 				const W = addedItems[0].getBoundingClientRect().width
 				let n = addedItems.length
-				if (flag) n = n + 1
-				if (L < n * W) {
-					const ml = Math.min(((n * W - L + 75) / (n - 1)), 70)
-					itemContainer.style.setProperty('--ml', "-" + ml + 'px')
-				} else {
-					itemContainer.style.removeProperty('--ml')
-				}
 
+				if (n * W + (n + 1) * gap < L) {
+					itemContainer.style.setProperty('--ml', gap + 'px')
+				} else {
+					const ml = Math.min(((n * W - L + gap) / (n - 1)), W - 8)
+					itemContainer.style.setProperty('--ml', "-" + ml + 'px')
+				}
 			}
 		}
 		function parameterNormolize() {
