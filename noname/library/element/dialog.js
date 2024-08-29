@@ -126,7 +126,7 @@ export class Dialog extends HTMLDivElement {
 			//检查溢出处理的逻辑
 			checkOverflow(itemOption, itemContainer, addedItems)
 			//自定义添加元素
-			if (itemOption.custom) itemOption(itemContainer)
+			if (itemOption.custom) itemOption.custom(itemContainer)
 			observeItemContainer(itemOption, itemContainer)
 			this.itemContainers.push(itemContainer)
 
@@ -136,16 +136,11 @@ export class Dialog extends HTMLDivElement {
 			itemContainer.Observer = new MutationObserver((mutationsList) => {
 				for (const mutation of mutationsList) {
 					if (mutation.type === 'childList') {
-						checkOverflow(itemOption, itemContainer, Array.from(itemContainer.children), mutation.addedNodes?.length)
+						checkOverflow(itemOption, itemContainer, Array.from(itemContainer.querySelectorAll('.item')), mutation.addedNodes?.length)
 					}
 				}
 			})
 			itemContainer.Observer.observe(itemContainer, { childList: true })
-		}
-
-
-		function observerItemContainers(elemnts) {
-
 		}
 		function createItemContainer(itemOption) {
 			let itemContainer = ui.create.div('.item-container', rowContainer)
@@ -248,6 +243,9 @@ export class Dialog extends HTMLDivElement {
 					items.addArray(addItemToItemContainer(i, itemContainer, itemOption))
 				}
 			}
+			items.forEach(item => {
+				item.classList.add('item')
+			})
 			return items
 
 		}
