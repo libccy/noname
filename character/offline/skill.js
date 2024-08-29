@@ -4858,6 +4858,18 @@ const skills = {
 	jdsbzhiheng: {
 		audio: "sbzhiheng",
 		inherit: "sbzhiheng",
+		check(card) {
+			let player = _status.event.player;
+			if (get.position(card) == "e") {
+				if (ui.selected.cards.some(i => {
+					return get.position(i) == "e";
+				})) return 0;
+				let subs = get.subtypes(card);
+				if (subs.includes("equip2") || subs.includes("equip3")) return 2 * player.getHp() - get.value(card);
+				return 12 - get.value(card);
+			}
+			return 6 - get.value(card);
+		},
 		prompt() {
 			return "出牌阶段限一次。你可以弃置任意张牌并摸等量的牌，若你以此法弃置的牌包括你装备区的牌，则你多摸一张牌";
 		},

@@ -1372,16 +1372,20 @@ const skills = {
 			return !skill.dczhiheng || skill.dczhiheng < 1 + player.getStorage("dczhiheng_hit").length;
 		},
 		check(card) {
-			var player = _status.event.player;
+			let player = _status.event.player;
 			if (
 				get.position(card) == "h" &&
 				!player.countCards("h", "du") &&
-				(player.hp > 2 ||
-					!player.countCards("h", function (card) {
-						return get.value(card) >= 8;
-					}))
-			) {
-				return 1;
+				(
+					player.hp > 2 ||
+					!player.countCards("h", i => {
+						return get.value(i) >= 8;
+					})
+				)
+			) return 1;
+			if (get.position(card) == "e") {
+				let subs = get.subtypes(card);
+				if (subs.includes("equip2") || subs.includes("equip3")) return player.getHp() - get.value(card);
 			}
 			return 6 - get.value(card);
 		},

@@ -7462,37 +7462,11 @@ const skills = {
 	},
 	jilue_zhiheng: {
 		audio: 1,
-		mod: {
-			aiOrder(player, card, num) {
-				if (num <= 0 || get.itemtype(card) != "card" || get.type(card) != "equip") return num;
-				let eq = player.getEquip(get.subtype(card));
-				if (eq && get.equipValue(card) - get.equipValue(eq) < Math.max(1.2, 6 - player.hp)) return 0;
-			},
-		},
-		enable: "phaseUse",
-		usable: 1,
+		inherit: "rezhiheng",
 		filter(event, player) {
 			return player.hasMark("renjie");
 		},
-		position: "he",
-		filterCard: lib.filter.cardDiscardable,
-		discard: false,
-		lose: false,
-		delay: false,
-		selectCard: [1, Infinity],
 		prompt: "弃置一枚“忍”，然后弃置任意张牌并摸等量的牌。若弃置了所有的手牌，则可以多摸一张牌。",
-		check(card) {
-			var player = _status.event.player;
-			if (
-				get.position(card) == "h" &&
-				!player.countCards("h", function (card) {
-					return get.value(card) >= 8;
-				})
-			) {
-				return 8 - get.value(card);
-			}
-			return 6 - get.value(card);
-		},
 		content() {
 			"step 0";
 			player.removeMark("renjie", 1);
