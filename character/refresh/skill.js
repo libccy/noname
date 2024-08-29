@@ -1218,7 +1218,7 @@ const skills = {
 			game.log(target, "展示了", event.card2);
 			event._result = {};
 			player
-				.chooseToDiscard({ color: get.color(event.card2) }, "he", function (card) {
+				.chooseToDiscard({ color: get.color(event.card2) }, "h", function (card) {
 					var evt = _status.event.getParent();
 					if (get.damageEffect(evt.target, evt.player, evt.player, "fire") > 0) {
 						return 7 - get.value(card, evt.player);
@@ -9333,6 +9333,8 @@ const skills = {
 				game.addVideo("judge2", null, event.videoId);
 				ui.arena.classList.remove("thrownhighlight");
 			}
+			let cards = [event.card].filterInD("od");
+			if(cards.length) game.cardsGotoPile(cards, "insert");
 		},
 		ai: {
 			effect: {

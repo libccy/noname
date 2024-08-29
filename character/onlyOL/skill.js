@@ -897,7 +897,7 @@ const skills = {
 		filter(event, player) {
 			const target = event.player;
 			if (target == player || !target.isIn()) return false;
-			return !target.hasHistory("useCard", evt => evt.targets && evt.targets.some(i => i != target)) || !target.hasHistory("sourceDamage", evt => evt.player != target);
+			return !target.hasHistory("sourceDamage", evt => evt.player != target);
 		},
 		async cost(event, trigger, player) {
 			const target = trigger.player;
