@@ -21,6 +21,7 @@ const characters = {
 	ol_sb_kongrong: ["male", "qun", 4, ["olsbliwen", "olsbzhengyi"]],
 	ol_zhangchunhua: ["female", "wei", 3, ["jueqing", "shangshi", "oljianmie"]],
 	ol_caochong: ["male", "wei", 3, ["olchengxiang", "olrenxin"]],
+	ol_caozhi: ["male", "wei", 3, ["reluoying", "oljiushi"]],
 };
 
 export default characters;

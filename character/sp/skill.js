@@ -2,6 +2,87 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//王匡
+	olrenxia: {
+		enable: "phaseUse",
+		usable: 1,
+		chooseButton: {
+			dialog(event, player) {
+				var dialog = ui.create.dialog("任侠：请选择一项", "hidden");
+				dialog.add([
+					[
+						["discard", "重复弃置两张牌，直至手牌中没有【杀】或伤害类锦囊牌"],
+						["draw", "重复摸两张牌，直至手牌中有【杀】或伤害类锦囊牌"],
+					],
+					"textbutton",
+				]);
+				return dialog;
+			},
+			filter(button, player) {
+				if (button.link == "discard" && !player.countCards("he")) return false;
+				return true;
+			},
+			check(button) {
+				const player = get.player();
+				if (player.countCards("he") && button.link == "draw") return 0;
+				return 2;
+			},
+			backup(links) {
+				return get.copy(lib.skill["olrenxia_" + links[0]]);
+			},
+		},
+		subSkill: {
+			backup: { audio: "olrenxia" },
+			discard: {
+				audio: "olrenxia",
+				async content(event, trigger, player) {
+					while (true) {
+						await player
+							.chooseToDiscard(2, "he", true)
+							.set("ai", card => {
+								let player = get.player();
+								let bool = card => get.type(card) == "trick" && get.tag(card, "damage");
+								if (player.countCards("h", bool) == 1 && bool(card)) return 10 - get.value(card);
+								else if (card.name == "sha") return 9 - get.value(card);
+								return 5 - get.value(card);
+							});
+						if (!player.countCards("h", card => card.name == "sha")) break;
+						if (!player.countCards("h", card => get.type(card) == "trick" && get.tag(card, "damage"))) break;
+					}
+					const evt = event.getParent("phaseUse", true);
+					if (!evt || event.name == "renxia_discard") return;
+					player.when("phaseUseEnd").filter(evtx => evtx == evt).then(() => {
+						const next = game.createEvent("renxia_draw", false);
+						next.player = player;
+						next.setContent(lib.skill.olrenxia_draw.content);
+					});
+				},
+			},
+			draw: {
+				audio: "olrenxia",
+				async content(event, trigger, player) {
+					while (true) {
+						await player.draw(2);
+						if (player.countCards("h", card => card.name == "sha")) break;
+						if (player.countCards("h", card => get.type(card) == "trick" && get.tag(card, "damage"))) break;
+					}
+					const evt = event.getParent("phaseUse", true);
+					if (!evt || event.name == "renxia_draw") return;
+					player.when("phaseUseEnd").filter(evtx => evtx == evt).then(() => {
+						const next = game.createEvent("renxia_discard", false);
+						next.player = player;
+						next.setContent(lib.skill.olrenxia_discard.content);
+					});
+				},
+			},
+		},
+		ai: {
+			order: 2,
+			result: {
+				player: 1,
+			},
+		},
+	},
 	//孔淑
 	olleiluan: {
 		audio: 2,

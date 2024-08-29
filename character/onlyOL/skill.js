@@ -2,6 +2,190 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//界曹植
+	oljiushi: {
+		audio: 2,
+		trigger: {
+			player: "useCard",
+		},
+		filter: function (event, player) {
+			if(!player.isTurnedOver()) return false;
+			return event.player.hasHistory("lose", function (evt) {
+				if (evt.getParent() != event) return false;
+				for (var i in evt.gaintag_map) {
+					if (evt.gaintag_map[i].includes("reluoying")) return true;
+				}
+				return false;
+			});
+		},
+		async content(event, trigger, player) {
+			trigger.directHit.addArray(game.players);
+		},
+		forced: true,
+		locked: false,
+		mod: {
+			targetInRange(card, player, target) {
+				if(!player.isTurnedOver()) return;
+				if (!card.cards) return;
+				for (var i of card.cards) {
+					if (i.hasGaintag("reluoying")) return true;
+				}
+			},
+		},
+		init(player) {
+			player.addSkill("oljiushi_gain");
+		},
+		onremove(player) {
+			player.removeSkill("oljiushi_gain");
+		},
+		group: ["oljiushi_use", "oljiushi_damage", "oljiushi_gain"],
+		subSkill: {
+			gain: {
+				audio: "oljiushi",
+				trigger: {
+					player: ["gainAfter", "phaseEnd"],
+				},
+				onremove: true,
+				filter(event, player) {
+					if (event.name == "phase") return true;
+					return event.getParent().name.indexOf("reluoying") != -1;
+				},
+				charlotte: true,
+				async cost(event, trigger, player) {
+					event.result = { bool: false };
+					if (trigger.name != "phase") {
+						player.addGaintag(trigger.cards, "reluoying");
+						let bool = player.isTurnedOver();
+						player.markAuto("oljiushi_gain", trigger.cards);
+						if (bool && player.getStorage("oljiushi_gain").length >= player.maxHp) {
+							const result = await player.chooseBool("是否发动【酒诗】，将武将牌翻面？").forResult();
+							event.result = result;
+						}
+					}
+					else player.unmarkAuto("oljiushi_gain", player.getStorage("oljiushi_gain"));
+				},
+				async content(event, trigger, player) {
+					await player.turnOver();
+				},
+			},
+			use: {
+				audio: "oljiushi",
+				enable: "chooseToUse",
+				hiddenCard: function (player, name) {
+					if (name == "jiu") return !player.isTurnedOver();
+					return false;
+				},
+				filter: function (event, player) {
+					if (player.isTurnedOver()) return false;
+					return event.filterCard({ name: "jiu", isCard: true }, player, event);
+				},
+				content: function () {
+					if (_status.event.getParent(2).type == "dying") {
+						event.dying = player;
+						event.type = "dying";
+					}
+					player.turnOver();
+					player.useCard({ name: "jiu", isCard: true }, player);
+				},
+				ai: {
+					order: 5,
+					result: {
+						player: function (player) {
+							if (_status.event.parent.name == "phaseUse") {
+								if (player.countCards("h", "jiu") > 0) return 0;
+								if (player.getEquip("zhuge") && player.countCards("h", "sha") > 1) return 0;
+								if (!player.countCards("h", "sha")) return 0;
+								var targets = [];
+								var target;
+								var players = game.filterPlayer();
+								for (var i = 0; i < players.length; i++) {
+									if (get.attitude(player, players[i]) < 0) {
+										if (player.canUse("sha", players[i], true, true)) {
+											targets.push(players[i]);
+										}
+									}
+								}
+								if (targets.length) {
+									target = targets[0];
+								} else {
+									return 0;
+								}
+								var num = get.effect(target, { name: "sha" }, player, player);
+								for (var i = 1; i < targets.length; i++) {
+									var num2 = get.effect(targets[i], { name: "sha" }, player, player);
+									if (num2 > num) {
+										target = targets[i];
+										num = num2;
+									}
+								}
+								if (num <= 0) return 0;
+								var e2 = target.getEquip(2);
+								if (e2) {
+									if (e2.name == "tengjia") {
+										if (
+											!player.countCards("h", {
+												name: "sha",
+												nature: "fire",
+											}) &&
+											!player.getEquip("zhuque")
+										)
+											return 0;
+									}
+									if (e2.name == "renwang") {
+										if (!player.countCards("h", { name: "sha", color: "red" })) return 0;
+									}
+									if (e2.name == "baiyin") return 0;
+								}
+								if (player.getEquip("guanshi") && player.countCards("he") > 2) return 1;
+								return target.countCards("h") > 3 ? 0 : 1;
+							}
+							if (player == _status.event.dying || player.isTurnedOver()) return 3;
+						},
+					},
+					effect: {
+						target: function (card, player, target) {
+							if (target.isTurnedOver()) {
+								if (get.tag(card, "damage")) {
+									if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
+									if (target.hp == 1) return;
+									return [1, target.countCards("h") / 2];
+								}
+							}
+						},
+					},
+				},
+			},
+			damage: {
+				audio: "oljiushi",
+				trigger: { player: "damageEnd" },
+				check: function (event, player) {
+					return player.isTurnedOver();
+				},
+				prompt: "是否发动【酒诗】，将武将牌翻面？",
+				filter: function (event, player) {
+					if (event.oljiushi) {
+						return true;
+					}
+					return false;
+				},
+				content: function () {
+					delete trigger.oljiushi;
+					player.turnOver();
+				},
+			},
+		},
+	},
+	_oljiushi_record: {
+		trigger: { player: "damageBegin3" },
+		silent: true,
+		firstDo: true,
+		filter: function (event, player) {
+			return player.isTurnedOver();
+		},
+		content: function () {
+			trigger.oljiushi = true;
+		},
+	},
 	//谋袁术
 	olsbjinming: {
 		audio: 2,
