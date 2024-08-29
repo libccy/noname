@@ -677,7 +677,7 @@ const translates = {
 	tydangxian: "当先",
 	tydangxian_info: "锁定技，回合开始时，你执行一个额外的出牌阶段并从弃牌堆中选择一张【杀】获得。",
 	tyfuli: "伏枥",
-	tyfuli_info: "限定技，当你处于濒死状态时，你可以回复体力至2点并将手牌模至两张。",
+	tyfuli_info: "限定技，当你处于濒死状态时，你可以回复体力至2点并将手牌摸至两张。",
 	ty_huangzhong: "桃黄忠",
 	ty_huangzhong_prefix: "桃",
 	tyyizhuang: "益壮",

@@ -1185,6 +1185,7 @@ const skills = {
 		selectCard: [1, Infinity],
 		prompt: "弃置任意张牌并摸等量的牌",
 		check(card) {
+			let player = _status.event.player;
 			if (get.position(card) == "e") {
 				let subs = get.subtypes(card);
 				if (subs.includes("equip2") || subs.includes("equip3")) return player.getHp() - get.value(card);
