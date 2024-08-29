@@ -38,7 +38,8 @@
     align-items: center;
     justify-content: center;
     flex-shrink: initial;
-
+    flex-wrap: wrap;
+    align-content: center
 }
 
 .item-container:has(.caption) {
@@ -64,6 +65,6 @@
     position: relative;
 }
 
-.item-container>div:not(:first-child) {
+.item-container>.item:not(:first-of-type) {
     margin-left: var(--ml, 3px);
 }
