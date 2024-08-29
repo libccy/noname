@@ -134,8 +134,7 @@ export class Game extends GameCompatible {
 			let old2_overflow = e2p.style.overflow
 			/**@type {HTMLDivElement[]} */
 			let watchedElements = [...e1p.children, ...e2p.children].unique()
-			e1p.style.overflow = 'auto'
-			e2p.style.overflow = 'auto'
+
 			let e1n = e1.nextElementSibling;
 			let e2n = e2.nextElementSibling;
 
@@ -156,6 +155,8 @@ export class Game extends GameCompatible {
 			}))
 
 			//invert
+			e1p.style.overflow = 'visible'
+			e2p.style.overflow = 'visible'
 			change.forEach(({ dx, dy }, e) => {
 				e.style.transition = `none`;
 				e.style.transform = `translate(${dx}px, ${dy}px)`
@@ -165,6 +166,7 @@ export class Game extends GameCompatible {
 			e1.offsetHeight;
 			//play
 			requestAnimationFrame(() => {
+
 				change.forEach(({ dx, dy }, e) => {
 					e.style.transition = `${duration}ms ${timefun}`;
 					e.style.removeProperty('transform')
@@ -197,8 +199,7 @@ export class Game extends GameCompatible {
 			let old2_overflow = e2p.style.overflow
 			/**@type {HTMLDivElement[]} */
 			let watchedElements = [...e1p.children, ...e2p.children].unique()
-			e1p.style.overflow = 'auto'
-			e2p.style.overflow = 'auto'
+
 			//first
 			let originalPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]))
 			//last
@@ -228,6 +229,8 @@ export class Game extends GameCompatible {
 			}))
 
 			//invert
+			e2p.style.overflow = 'visible'
+			e1p.style.overflow = 'visible'
 			change.forEach(({ dx, dy }, e) => {
 				e.style.transition = `none`;
 				e.style.transform = `translate(${dx}px, ${dy}px)`
@@ -236,6 +239,7 @@ export class Game extends GameCompatible {
 
 			//play
 			requestAnimationFrame(() => {
+
 				change.forEach(({ dx, dy }, e) => {
 					e.style.transition = `${duration}ms ${timefun}`;
 					e.style.removeProperty('transform')

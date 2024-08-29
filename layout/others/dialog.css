@@ -1,11 +1,9 @@
 .dialog:has(.row-container) {
     --bgColor: #2f2f3557;
     width: 80%;
-    background: var(--bgColor);
+    /* background: var(--bgColor); */
     left: 10%;
     border-radius: 10px;
-
-
 }
 
 .dialog:has(.row-container):not(.fullheight) {
@@ -15,11 +13,11 @@
 
 .dialog:has(.row-container)>.content-container {
     border-radius: 10px;
-    background-color: var(--bgColor);
+    /* background-color: var(--bgColor); */
 }
 
 .dialog:has(.row-container)>.content-container>.content {
-    background-color: var(--bgColor);
+    /* background-color: var(--bgColor); */
 
 }
 
@@ -48,7 +46,7 @@
 }
 
 .item-container {
-    border: solid 2px #a5a29db5;
+    /* border: solid 2px #a5a29db5; */
     width: 90%;
     height: 95%;
     margin: auto;
