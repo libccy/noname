@@ -8135,6 +8135,10 @@ const skills = {
 		content() {
 			trigger.source.draw();
 		},
+		ai: {
+			combo: "noda_xunxin",
+			halfneg: true
+		},
 	},
 	noda_xunxin: {
 		audio: 2,

@@ -8349,6 +8349,7 @@ const skills = {
 			trigger.phaseList.splice(trigger.num, 0, "phaseUse|oldianjun");
 		},
 		ai: {
+			combo: "olkangrui",
 			halfneg: true,
 		},
 	},
@@ -27486,9 +27487,9 @@ const skills = {
 		trigger: { global: "dying" },
 		forced: true,
 		popup: false,
-		//priority:12,
-		check: function () {
-			return false;
+		logAudio(event, player, name) {
+			if (name == "dying") return "suishi1.mp3";
+			return "suishi2.mp3";
 		},
 		filter: function (event, player) {
 			return event.player != player && event.parent.name == "damage" && event.parent.source && event.parent.source != event.player;
@@ -27523,9 +27524,6 @@ const skills = {
 		trigger: { global: "dieAfter" },
 		forced: true,
 		popup: false,
-		check: function () {
-			return false;
-		},
 		filter: function (event, player) {
 			return event.player != player && event.source && event.source != player && event.source != event.player;
 		},

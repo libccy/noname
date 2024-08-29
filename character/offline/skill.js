@@ -7432,12 +7432,9 @@ const skills = {
 		preHidden: ["gzsuishi2"],
 		trigger: { global: "dying" },
 		forced: true,
-		//priority:6.5,
-		check() {
-			return false;
-		},
+		logAudio: () => 1,
 		filter(event, player) {
-			return event.player != player && event.parent.name == "damage" && event.parent.source && event.parent.source.isFriendOf(player);
+			return event.player != player && event.parent.name == "damage" && event.parent.source && event.parent.source.group == player.group;
 		},
 		content() {
 			player.draw();
@@ -7451,11 +7448,9 @@ const skills = {
 		audio: "suishi",
 		trigger: { global: "dieAfter" },
 		forced: true,
-		check() {
-			return false;
-		},
+		logAudio: () => 2,
 		filter(event, player) {
-			return event.player.isFriendOf(player);
+			return event.player.group == player.group;
 		},
 		content() {
 			player.loseHp();

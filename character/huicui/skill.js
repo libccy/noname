@@ -368,12 +368,12 @@ const skills = {
 				)
 				.set("ai", target => {
 					let att = get.attitude(get.player(), target);
-					if (att >= 0) return att;
+					if (att > 0) return 0;
 					if (!target.hasSkill("dcyunzheng_block")) att *= (target.getSkills(null, false, false)
 						.filter(i => {
 							return lib.skill.dcyunzheng_block.skillBlocker(i, target);
 						}).length + 1);
-					return att;
+					return 1 - att;
 				})
 				.forResult();
 		},
@@ -1694,6 +1694,7 @@ const skills = {
 			await player.loseHp();
 		},
 		ai: {
+			combo: "dckuizhen",
 			halfneg: true,
 		},
 	},
