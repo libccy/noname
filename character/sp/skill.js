@@ -1986,6 +1986,7 @@ const skills = {
 					color,
 					target
 				);
+				await player.showHandcards();
 				while (
 					target.isIn() &&
 					player.hasCard(card => lib.skill.olliantao_backup.filterCard(card, player)) &&

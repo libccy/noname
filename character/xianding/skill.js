@@ -8190,10 +8190,11 @@ const skills = {
 			const gains = game
 				.getAllGlobalHistory("everything", evt => {
 					if (evt.name == "lose" || evt.name == "loseAsync") {
+						if(!evt.getl) return false;
 						if (evt.type != "discard" || evt.getlx === false) return false;
 						return evt.getl(player)?.cards2?.length > 0;
 					}
-					return evt.player == player && evt.cards?.length > 0;
+					return evt.name == "useCard" && evt.player == player && evt.cards?.length > 0;
 				})
 				.reduce((list, evt) => {
 					if (evt.name == "useCard") return list.addArray(evt.cards);
