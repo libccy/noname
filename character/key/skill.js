@@ -7234,6 +7234,10 @@ const skills = {
 			if (get.position(card) == "h") {
 				return 8 - get.value(card);
 			}
+			if (get.position(card) == "e") {
+				let subs = get.subtypes(card);
+				if (subs.includes("equip2") || subs.includes("equip3")) return player.getHp() - get.value(card);
+			}
 			return 6 - get.value(card);
 		},
 		content() {

@@ -1266,7 +1266,11 @@ const skills = {
 		check(card) {
 			const player = _status.event.player;
 			if (get.is.altered("xinzhiheng") && get.position(card) == "h" && !player.countCards("h", card => get.value(card) >= 8)) {
-				return 8 - get.value(card);
+				return 1;
+			}
+			if (get.position(card) == "e") {
+				let subs = get.subtypes(card);
+				if (subs.includes("equip2") || subs.includes("equip3")) return player.getHp() - get.value(card);
 			}
 			return 6 - get.value(card);
 		},
@@ -1332,6 +1336,10 @@ const skills = {
 		selectCard: [1, Infinity],
 		prompt: "弃置任意张牌并摸等量的牌",
 		check(card) {
+			if (get.position(card) == "e") {
+				let subs = get.subtypes(card);
+				if (subs.includes("equip2") || subs.includes("equip3")) return player.getHp() - get.value(card);
+			}
 			return 6 - get.value(card);
 		},
 		async content(event, trigger, player) {
