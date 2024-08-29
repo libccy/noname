@@ -20509,6 +20509,7 @@ export default () => {
 			guozhan_others: "其他",
 	
 			// 台词部分
+			"#gz_jiangqing:die": "竟……破我阵法……",
 			"#gz_zhonghui:die": "吾机关算尽，却还是棋错一着……",
 			"#gzzhaoxin1": "行明动正，何惧他人讥毁。",
 			"#gzzhaoxin2": "大业之举，岂因宵小而动？",
