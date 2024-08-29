@@ -8193,8 +8193,7 @@ const skills = {
 						if (evt.type != "discard" || evt.getlx === false) return false;
 						return evt.getl(player)?.cards2?.length > 0;
 					}
-					if (evt.name == "useCard") return evt.cards?.length > 0;
-					return false;
+					return evt.player == player && evt.cards?.length > 0;
 				})
 				.reduce((list, evt) => {
 					if (evt.name == "useCard") return list.addArray(evt.cards);
@@ -15142,8 +15141,14 @@ const skills = {
 			var cards = get.cards(event.list[1]);
 			event.cards = cards;
 			game.cardsGotoOrdering(cards);
-			var next = player.chooseToMove(true, "隅泣（若对话框显示不完整，可下滑操作）");
-			next.set("list", [["牌堆顶的牌", cards], ["交给" + get.translation(trigger.player) + "（至少一张" + (event.list[2] > 1 ? "，至多" + get.cnNumber(event.list[2]) + "张" : "") + "）"], ["交给自己（至多" + get.cnNumber(event.list[3]) + "张）"]]);
+			var next = player.chooseToMove(true, "隅泣");
+			next.set("list", [
+				["牌堆顶的牌", cards],
+				[
+					["交给" + get.translation(trigger.player) + '<div class="text center">至少一张' + (event.list[2] > 1 ? "<br>至多" + get.cnNumber(event.list[2]) + "张" : "") + "</div>"],
+					['交给自己<div class="text center">至多' + get.cnNumber(event.list[3]) + "张</div>"],
+				],
+			]);
 			next.set("filterMove", function (from, to, moved) {
 				var info = lib.skill.yuqi.getInfo(_status.event.player);
 				if (to == 1) return moved[1].length < info[2];
@@ -15166,6 +15171,7 @@ const skills = {
 			next.set("filterOk", function (moved) {
 				return moved[1].length > 0;
 			});
+			next.setContent("chooseToMove_new");
 			"step 1";
 			if (result.bool) {
 				var moved = result.moved;

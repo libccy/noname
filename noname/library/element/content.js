@@ -1367,7 +1367,7 @@ export const Content = {
 			event.dialog.classList.add("scroll1");
 			event.dialog.classList.add("scroll2");
 			event.dialog.classList.add("fullwidth");
-			if (list.length > 1) {
+			if (list.length > 2) {
 				ui.arena.classList.add("choose-to-move");
 				event.dialog.classList.add("fullheight");
 			}
@@ -9436,7 +9436,7 @@ export const Content = {
 					player = _status.event.player,
 					target = _status.currentPhase || player,
 					name = _status.event.getTrigger().name,
-					countWuxie = (current) => {
+					countWuxie = current => {
 						let num = current.getKnownCards(player, card => {
 							return get.name(card, current) === "wuxie";
 						});
@@ -9471,7 +9471,8 @@ export const Content = {
 							needs = 0,
 							wuxie = countWuxie(target);
 						for (let i = Math.min(cards.length, judges.length) - 1; i >= 0; i--) {
-							let j = judges[i], cardj = j.viewAs ? { name: j.viewAs, cards: j.cards || [j] } : j;
+							let j = judges[i],
+								cardj = j.viewAs ? { name: j.viewAs, cards: j.cards || [j] } : j;
 							if (wuxie > 0 && get.effect(target, j, target, target) < 0) {
 								wuxie--;
 								continue;
@@ -9524,7 +9525,7 @@ export const Content = {
 		}
 		event.result = {
 			bool: true,
-			moved: [top, bottom]
+			moved: [top, bottom],
 		};
 		game.addCardKnower(top, player);
 		game.addCardKnower(bottom, player);
@@ -9532,5 +9533,161 @@ export const Content = {
 		game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
 		game.updateRoundNumber();
 		game.delayx();
+	},
+	chooseToMove_new: function () {
+		"step 0";
+		//联机时间
+		if (event.chooseTime && _status.connectMode && !game.online) {
+			event.time = lib.configOL.choose_timeout;
+			game.broadcastAll(function (time) {
+				lib.configOL.choose_timeout = time;
+			}, event.chooseTime);
+		}
+		if (event.isMine()) {
+			//自动选择
+			event.switchToAuto = function () {
+				if (!filterOk(event.moved)) {
+					if (!event.forced) event._result = { bool: false };
+					else event._result = "ai";
+				} else {
+					event._result = {
+						bool: true,
+						moved: event.moved,
+					};
+				}
+				event.dialog.close();
+				if (ui.confirm) ui.confirm.close();
+				game.resume();
+				_status.imchoosing = false;
+				setTimeout(function () {
+					ui.arena.classList.remove("choose-to-move");
+				}, 500);
+			};
+			//创造dialog
+			event.dialog = ui.create.dialog();
+			event.dialog.addNewRow(event.prompt || "请选择要操作的牌");
+			event.dialog.selectedCard = null;
+			event.dialog.isBusy = false;
+			event.dialog.classList.add("scroll1");
+			event.dialog.classList.add("scroll2");
+			event.dialog.classList.add("fullwidth");
+			if (event.list.length > 2) {
+				ui.arena.classList.add("choose-to-move");
+				event.dialog.classList.add("fullheight");
+			}
+			//刷新，确认是否返回结果
+			function updateButtons() {
+				event.moved = Array.from({
+					length: event.list.slice().reduce((sum, currentList) => {
+						if (!Array.isArray(currentList[0])) currentList = [currentList];
+						return (sum += currentList.length);
+					}, 0),
+				}).map((_, i) => {
+					const num = 2 * (i + 1);
+					return Array.from(event.dialog.itemContainers[num].children).map(e => e.link);
+				});
+				if (event.filterOk(event.moved)) {
+					ui.create.confirm("o");
+				} else {
+					if (!event.forced) ui.create.confirm("c");
+					else if (ui.confirm) ui.confirm.close();
+				}
+			}
+			//点击每个卡的事件
+			function clickItem(card, container, allContainers) {
+				if (event.dialog.isBusy) return;
+				if (event.dialog.selectedCard) {
+					if (card !== event.dialog.selectedCard && event.filterMove(event.dialog.selectedCard, card, event.moved)) {
+						event.dialog.isBusy = true;
+						game.$swapElement(card, event.dialog.selectedCard, 300).then(() => {
+							event.dialog.isBusy = false;
+							updateButtons();
+						});
+					}
+					event.dialog.selectedCard.classList.remove("selected");
+					event.dialog.selectedCard = null;
+				} else {
+					event.dialog.selectedCard = card;
+					card.classList.add("selected");
+				}
+			}
+			//点击容器的事件回调
+			function clickItemContainer(itemContainer, i, allContainers) {
+				if (event.dialog.isBusy || !event.dialog.selectedCard) return;
+				if (itemContainer.contains(event.dialog.selectedCard)) return;
+				let index = Array.from(event.dialog.itemContainers).indexOf(itemContainer) / 2 - 1;
+				if (event.filterMove(event.dialog.selectedCard, index, event.moved)) {
+					event.dialog.isBusy = true;
+					game.$elementGoto(event.dialog.selectedCard, itemContainer, 300).then(() => {
+						event.dialog.isBusy = false;
+						updateButtons();
+					});
+				}
+				event.dialog.selectedCard.classList.remove("selected");
+				event.dialog.selectedCard = null;
+			}
+			//框的部分属性
+			let itemContainerCss = event.itemContainerCss || {
+				justifyContent: "start",
+				minHeight: "100px",
+			};
+			for (let i = 0; i < event.list.length; i++) {
+				let currentList = event.list[i].slice();
+				if (!Array.isArray(currentList[0])) currentList = [currentList];
+				event.dialog.addNewRow(
+					...currentList
+						.slice()
+						.map(listx => {
+							return [{ item: listx[0], ratio: 1 }, listx[1]?.length ? { item: listx[1], ratio: 6 / currentList.length, itemContainerCss, clickItem, clickItemContainer } : { item: listx[1], ratio: 6 / currentList.length, itemContainerCss, clickItemContainer }];
+						})
+						.flat()
+				);
+			}
+			event.dialog.open();
+			updateButtons();
+			//获取结果
+			event.custom.replace.confirm = function (bool) {
+				if (bool)
+					event._result = {
+						bool: true,
+						moved: event.moved,
+					};
+				else event._result = { bool: false };
+				event.dialog.close();
+				if (ui.confirm) ui.confirm.close();
+				game.resume();
+				_status.imchoosing = false;
+				setTimeout(function () {
+					ui.arena.classList.remove("choose-to-move");
+				}, 500);
+			};
+			//开搞
+			game.pause();
+			game.countChoose();
+			event.choosing = true;
+		} else if (event.isOnline()) {
+			event.send();
+		} else {
+			event.result = "ai";
+		}
+		"step 1";
+		//时间限制
+		if (event.time) {
+			game.broadcastAll(function (time) {
+				lib.configOL.choose_timeout = time;
+			}, event.time);
+		}
+		//结果获取
+		var result = event.result || result;
+		if ((!result || result == "ai" || (event.forced && !result.bool)) && event.processAI) {
+			var moved = event.processAI(event.list);
+			if (moved)
+				result = {
+					bool: true,
+					moved: moved,
+				};
+			else result = { bool: false };
+		}
+		event.result = result;
 	},
 };

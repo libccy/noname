@@ -183,7 +183,10 @@ export class Dialog extends HTMLDivElement {
 				if (L < n * W) {
 					const ml = Math.min(((n * W - L + 75) / (n - 1)), 70)
 					itemContainer.style.setProperty('--ml', "-" + ml + 'px')
+				} else {
+					itemContainer.style.removeProperty('--ml')
 				}
+
 			}
 		}
 		function parameterNormolize() {
@@ -225,19 +228,18 @@ export class Dialog extends HTMLDivElement {
 		}
 		//添加元素到子容器中，并返回添加后的元素
 		function addItemToItemContainer(item, itemContainer, itemOption) {
-			if (!item) return
+			if (!item) {
+				itemContainer.classList.add('popup')
+				return
+			}
 			/**@type {HTMLDivElement[]} */
 			let items = []
 			if (typeof item == 'string') {
 				let caption = ui.create.caption(item, itemContainer)
 				caption.css(itemOption.itemCss ?? {})
 				items.push(caption)
-			} else if (typeof item == 'function') {
-				let item = item()
-				itemContainer.links = item
-				itemContainer.append(item)
-				items.push(item)
 			} else if (!Array.isArray(item)) {
+				itemContainer.classList.add('popup')
 				let button = ui.create.button(item, get.itemtype(item), itemContainer, itemOption.ItemNoclick)
 				button.css(itemOption.itemCss ?? {})
 				items.push(button)
