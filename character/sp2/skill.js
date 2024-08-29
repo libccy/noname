@@ -7130,6 +7130,10 @@ const skills = {
 		content: function () {
 			trigger.num++;
 		},
+		ai: {
+			combo: "lulve",
+			halfneg: true
+		},
 	},
 	//陶谦和曹嵩
 	reyirang: {

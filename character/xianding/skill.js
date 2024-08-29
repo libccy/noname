@@ -72,6 +72,10 @@ const skills = {
 			global: ["dying", "dieAfter"],
 		},
 		forced: true,
+		logAudio(event, player, name) {
+			if (name == "dying") return "suishi1.mp3";
+			return "suishi2.mp3";
+		},
 		filter(event, player) {
 			if (event.player == player) return false;
 			if (event.name == "dying") {

@@ -1694,6 +1694,7 @@ const skills = {
 			await player.loseHp();
 		},
 		ai: {
+			combo: "dckuizhen",
 			halfneg: true,
 		},
 	},
