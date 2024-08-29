@@ -8193,8 +8193,7 @@ const skills = {
 						if (evt.type != "discard" || evt.getlx === false) return false;
 						return evt.getl(player)?.cards2?.length > 0;
 					}
-					if (evt.name == "useCard") return evt.cards?.length > 0;
-					return false;
+					return evt.player == player && evt.cards?.length > 0;
 				})
 				.reduce((list, evt) => {
 					if (evt.name == "useCard") return list.addArray(evt.cards);
