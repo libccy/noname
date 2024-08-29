@@ -38,7 +38,8 @@
     align-items: center;
     justify-content: center;
     flex-shrink: initial;
-
+    flex-wrap: wrap;
+    align-content: center
 }
 
 .item-container:has(.caption) {
