@@ -3279,7 +3279,6 @@ const skills = {
 			await player.give(event.cards, target);
 			const result = await target
 				.chooseCard(
-					player,
 					2,
 					"he",
 					card => {
@@ -3287,6 +3286,11 @@ const skills = {
 					},
 					"奇才：交给" + str + "两张非装备牌，或令" + str + "获得两张普通锦囊牌"
 				)
+				.set("ai", card => {
+					if (get.event("att") >= 0) return -1;
+					return 7 - get.value(card);
+				})
+			.set("att", get.attitude(target, player))
 				.forResult();
 			if (!result.bool) {
 				let gains = [];
