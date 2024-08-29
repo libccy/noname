@@ -3290,7 +3290,7 @@ const skills = {
 					if (get.event("att") >= 0) return -1;
 					return 7 - get.value(card);
 				})
-			.set("att", get.attitude(target, player))
+				.set("att", get.attitude(target, player))
 				.forResult();
 			if (!result.bool) {
 				let gains = [];
