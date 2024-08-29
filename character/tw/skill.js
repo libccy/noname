@@ -229,7 +229,7 @@ const skills = {
 				})
 				.set("num", num)
 				.forResult("index");
-			if (index == 0 && num > 0) await player.draw(3);
+			if (index == 0 && num > 0) await player.draw(num);
 			else if (ui.cardPile.childElementCount > num) {
 				const gains = Array.from(ui.cardPile.childNodes).slice(num).slice(0, 3);
 				if (gains.length > 0) await player.gain(gains, "gain2");

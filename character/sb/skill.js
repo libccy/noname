@@ -895,9 +895,9 @@ const skills = {
 			const player = event.player;
 			const chosen = player
 				.getAllHistory("useSkill", evt => evt.skill === "sbganglie")
-				.map(evt => {
-					return evt.targets[0];
-				});
+				.reduce((list, evt) => {
+					if (evt.targets) return list.addArray(evt.targets);
+				}, []);
 			let targets = player
 				.getAllHistory("damage", evt => evt.source && evt.source.isIn())
 				.map(evt => evt.source)
@@ -908,8 +908,9 @@ const skills = {
 		filterTarget(card, player, target) {
 			return get.event("sbganglie_enabledTargets").includes(target);
 		},
+		selectTarget: [1, Infinity],
 		async content(event, trigger, player) {
-			await event.targets[0].damage(2);
+			await event.target.damage(2);
 		},
 		ai: {
 			order: 6,
@@ -1656,7 +1657,7 @@ const skills = {
 			{
 				cost: 1,
 				prompt: () => "令一名其他角色于手牌中只能使用基本牌直到其回合结束",
-				filter: player => get.mode() != "doudizhu" && game.hasPlayer(target => target != player && !target.getStorage("sbfangzhu_ban").includes("basic")),
+				filter: player => game.hasPlayer(target => target != player && !target.getStorage("sbfangzhu_ban").includes("basic")),
 				filterTarget: (card, player, target) => target != player && !target.getStorage("sbfangzhu_ban").includes("basic"),
 				async content(player, target) {
 					target.addTempSkill("sbfangzhu_ban", { player: "phaseEnd" });
@@ -1723,7 +1724,7 @@ const skills = {
 			{
 				cost: 2,
 				prompt: () => "令一名其他角色不能响应除其外的角色使用的牌直到其回合结束",
-				filter: player => get.mode() != "doudizhu" && game.hasPlayer(target => target != player && !target.hasSkill("sbfangzhu_kill")),
+				filter: player => game.hasPlayer(target => target != player && !target.hasSkill("sbfangzhu_kill")),
 				filterTarget: lib.filter.notMe,
 				async content(player, target) {
 					target.addTempSkill("sbfangzhu_kill", { player: "phaseEnd" });
@@ -6104,7 +6105,7 @@ const skills = {
 			"step 4";
 			if (event.cards2.length < cards.length) target.damage();
 			"step 5";
-			if (player.countMark("sbjianxiong") < 2 && player.hasSkill("sbjianxiong")) {
+			if (player.countMark("sbjianxiong") < 2 && (player.hasSkill("sbjianxiong") || player.hasSkill("jdjianxiong"))) {
 				player.chooseBool("是否获得1枚“治世”？").set("ai", () => (Math.random() < 0.5 ? 0 : 1));
 			} else event.finish();
 			"step 6";

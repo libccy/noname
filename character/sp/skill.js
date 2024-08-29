@@ -2,6 +2,87 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//王匡
+	olrenxia: {
+		enable: "phaseUse",
+		usable: 1,
+		chooseButton: {
+			dialog(event, player) {
+				var dialog = ui.create.dialog("任侠：请选择一项", "hidden");
+				dialog.add([
+					[
+						["discard", "重复弃置两张牌，直至手牌中没有【杀】或伤害类锦囊牌"],
+						["draw", "重复摸两张牌，直至手牌中有【杀】或伤害类锦囊牌"],
+					],
+					"textbutton",
+				]);
+				return dialog;
+			},
+			filter(button, player) {
+				if (button.link == "discard" && !player.countCards("he")) return false;
+				return true;
+			},
+			check(button) {
+				const player = get.player();
+				if (player.countCards("he") && button.link == "draw") return 0;
+				return 2;
+			},
+			backup(links) {
+				return get.copy(lib.skill["olrenxia_" + links[0]]);
+			},
+		},
+		subSkill: {
+			backup: { audio: "olrenxia" },
+			discard: {
+				audio: "olrenxia",
+				async content(event, trigger, player) {
+					while (true) {
+						await player
+							.chooseToDiscard(2, "he", true)
+							.set("ai", card => {
+								let player = get.player();
+								let bool = card => get.type(card) == "trick" && get.tag(card, "damage");
+								if (player.countCards("h", bool) == 1 && bool(card)) return 10 - get.value(card);
+								else if (card.name == "sha") return 9 - get.value(card);
+								return 5 - get.value(card);
+							});
+						if (!player.countCards("h", card => card.name == "sha")) break;
+						if (!player.countCards("h", card => get.type(card) == "trick" && get.tag(card, "damage"))) break;
+					}
+					const evt = event.getParent("phaseUse", true);
+					if (!evt || event.name == "renxia_discard") return;
+					player.when("phaseUseEnd").filter(evtx => evtx == evt).then(() => {
+						const next = game.createEvent("renxia_draw", false);
+						next.player = player;
+						next.setContent(lib.skill.olrenxia_draw.content);
+					});
+				},
+			},
+			draw: {
+				audio: "olrenxia",
+				async content(event, trigger, player) {
+					while (true) {
+						await player.draw(2);
+						if (player.countCards("h", card => card.name == "sha")) break;
+						if (player.countCards("h", card => get.type(card) == "trick" && get.tag(card, "damage"))) break;
+					}
+					const evt = event.getParent("phaseUse", true);
+					if (!evt || event.name == "renxia_draw") return;
+					player.when("phaseUseEnd").filter(evtx => evtx == evt).then(() => {
+						const next = game.createEvent("renxia_discard", false);
+						next.player = player;
+						next.setContent(lib.skill.olrenxia_discard.content);
+					});
+				},
+			},
+		},
+		ai: {
+			order: 2,
+			result: {
+				player: 1,
+			},
+		},
+	},
 	//孔淑
 	olleiluan: {
 		audio: 2,
@@ -577,18 +658,17 @@ const skills = {
 					audio: "olweimian",
 					types: links.slice().sort((a, b) => parseInt(a.slice("equip".length)) - parseInt(b.slice("equip".length))),
 					filterTarget(card, player, target) {
-						if (target == player) return true;
-						return target.hasDisabledSlot() || target.isDamaged() || target.countCards("h") > 0;
+						return true;
 					},
 					async content(event, trigger, player) {
 						const target = event.target,
 							types = lib.skill.olweimian_backup.types;
 						for (const t of types) await player.disableEquip(t);
-						const num = Math.min(target.hasDisabledSlot() + target.isDamaged() + (target.countCards("h") > 0), types.length);
+						const num = Math.min(target.hasDisabledSlot() + target.isDamaged() + 1, types.length);
 						const result = await target
 							.chooseButton(
 								[
-									"慰勉：请选择" + get.cnNumber(num) + "项执行",
+									"慰勉：请选择至多" + get.cnNumber(num) + "项执行",
 									[
 										[
 											["equip", "恢复一个装备栏"],
@@ -598,7 +678,7 @@ const skills = {
 										"textbutton",
 									],
 								],
-								num
+								[1, num]
 							)
 							.set("filterButton", button => {
 								const player = get.event().player;
@@ -608,7 +688,7 @@ const skills = {
 									case "recover":
 										return player.isDamaged();
 									case "discard":
-										return player.countCards("h");
+										return true;
 								}
 							})
 							.set("ai", button => {
@@ -1500,66 +1580,47 @@ const skills = {
 			);
 			await game.delay(3);
 			game.broadcastAll("closeDialog", videoId);
+			const result = await player.chooseBool("是否将这些牌与牌堆或弃牌堆中的属性杀交换？").forResult();
+			if (!result.bool) return;
 			const cards_cardPile = Array.from(ui.cardPile.childNodes).filter(i => i.name == "sha" && get.nature(i, false));
 			const cards_discardPile = Array.from(ui.discardPile.childNodes).filter(i => i.name == "sha" && get.nature(i, false));
-			if (!Boolean(cards_cardPile.length + cards_discardPile.length)) {
-				player.popup("杯具");
-				player.chat("我属性【杀】呢？！");
-				game.log("但牌堆和弃牌堆都没有属性【杀】！");
-				return;
-			}
-			const result = await player
-				.chooseToMove("佐练：选择交换展示牌和牌堆或弃牌堆中的属性【杀】")
-				.set(
-					"list",
-					(function (cards, cardPile, discardPile) {
-						let list = [["展示手牌", cards, "olzuolian_tag"]];
-						if (cardPile.length) {
-							list.push(["牌堆", cardPile]);
-						}
-						if (discardPile.length) {
-							list.push(["弃牌堆", discardPile]);
-						}
-						return list;
-					})(cards, cards_cardPile, cards_discardPile)
-				)
-				.set("filterMove", (from, to, moved) => {
-					if (typeof to == "number") return false;
-					const cards = get.event("cards");
-					if (cards.includes(from.link) == cards.includes(to.link)) return false;
-					for (const pl of [
-						[from.link, to.link],
-						[to.link, from.link],
-					]) {
-						if (cards.includes(pl[0]) && moved[0].includes(pl[1]) && cards.indexOf(pl[0]) != moved[0].indexOf(pl[1])) return false;
-					}
-					return true;
-				})
-				.set("processAI", list => {
-					return list.map(i => i[1]);
-				})
-				.set("cards", cards)
-				.forResult();
-			if (result.bool) {
-				const cardsx = result.moved[0];
-				for (let i = 0; i < cardsx.length; i++) {
-					const current = targets[i],
-						card = cardsx[i];
-					if (!cards.includes(card)) {
-						if (cards_cardPile.includes(card)) {
-							current.$throw([cards[i]], 1000);
-							await current
-								.lose([cards[i]], ui.cardPile)
-								.set("insert_index", () => {
-									return ui.cardPile.childNodes[get.event("num")];
-								})
-								.set("num", cards_cardPile.indexOf(card));
-						} else if (cards_discardPile.includes(card)) {
-							await current.loseToDiscardpile(cards[i]);
-						}
-						await current.gain(card, "gain2");
+			let hasFire = true;
+			for (let i = 0; i < targets.length; i++) {
+				let target = targets[i];
+				let card = cards[i];
+				let cardx;
+				if (hasFire) {
+					let cardxs = get.cardPile(card => {
+						return card.name == "sha" && game.hasNature(card, "fire");
+					});
+					if (cardxs) cardx = cardxs;
+					else hasFire = false;
+				}
+				if (!hasFire) {
+					let cardxs = get.cardPile(card => {
+						return card.name == "sha" && get.nature(card, false);
+					});
+					if (cardxs) cardx = cardxs;
+					else {
+						player.popup("杯具");
+						player.chat("我属性【杀】呢？！");
+						game.log("但牌堆和弃牌堆都没有属性【杀】！");
+						return;
 					}
 				}
+				if (!cardx) return;
+				if (cards_cardPile.includes(cardx)) {
+					target.$throw([card], 1000);
+					await target
+						.lose([card], ui.cardPile)
+						.set("insert_index", () => {
+							return ui.cardPile.childNodes[get.event("num")];
+						})
+						.set("num", cards_cardPile.indexOf(cardx));
+				} else if (cards_discardPile.includes(cardx)) {
+					await target.loseToDiscardpile(card);
+				}
+				await target.gain(cardx, "gain2");
 			}
 		},
 		ai: {
@@ -1986,6 +2047,7 @@ const skills = {
 					color,
 					target
 				);
+				await player.showHandcards();
 				while (
 					target.isIn() &&
 					player.hasCard(card => lib.skill.olliantao_backup.filterCard(card, player)) &&

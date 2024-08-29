@@ -994,7 +994,7 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					let card = get.autoViewAs({ name: "sha" }, event.cards);
-					await player.chooseUseTarget(card, event.cards, false);
+					await player.chooseUseTarget(card, event.cards, false, "nodistance");
 				},
 			},
 		},
@@ -3904,13 +3904,17 @@ const skills = {
 							}
 						})
 						.forResult();
-					if (result.bool) await player.addToExpansion(result.cards, player, "give").set("gaintag", ["jdkanpo"]);
+					if (result.bool) await player.addToExpansion(result.cards, player, "giveAuto").set("gaintag", ["jdkanpo"]);
 				}
 			}
 		},
 		marktext: "谋",
 		intro: {
-			content: "expansion",
+			mark(dialog, storage, player) {
+				var cards = player.getExpansions("jdkanpo");
+				if (player.isUnderControl(true)) dialog.addAuto(cards);
+				else return "共有" + get.cnNumber(cards.length) + "张牌";
+			},
 			markcount: "expansion",
 		},
 		onremove(player, skill) {

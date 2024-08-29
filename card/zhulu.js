@@ -548,14 +548,14 @@ game.import("card", function () {
 					if (
 						player.sex == "male" &&
 						player.countCards("he", function (cardx) {
-							return cardx != card;
+							return card.cards && !card.cards.includes(cardx);
 						})
 					)
 						player
 							.chooseToDiscard(
 								true,
 								function (card) {
-									return card != _status.event.card;
+									return !_status.event.card?.cards.includes(card);
 								},
 								"he"
 							)

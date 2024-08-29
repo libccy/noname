@@ -421,6 +421,7 @@ window.noname_character_rank = {
 		"licuilianzhaoquanding",
 		"ol_sb_sunjian",
 		"ol_sb_yuanshu",
+		"wangkuang",
 	],
 	am: [
 		"dc_sb_chengyu",
@@ -1708,6 +1709,7 @@ window.noname_character_rank = {
 		"re_gaoshun",
 		"ol_gaoshun",
 		"re_caozhi",
+		"ol_caozhi",
 		"re_lingtong",
 		"xin_xusheng",
 		"xin_fazheng",
@@ -2470,6 +2472,7 @@ window.noname_character_rank = {
 			"mb_sp_zhenji",
 			"ol_sb_sunjian",
 			"ol_sb_yuanshu",
+			"wangkuang",
 		],
 		rare: [
 			"dc_mateng",
@@ -2782,6 +2785,7 @@ window.noname_character_rank = {
 			"re_zhangzhang",
 			"re_caiwenji",
 			"re_caozhi",
+			"ol_caozhi",
 			"yujin_yujin",
 			"tw_yujin",
 			"gaoshun",

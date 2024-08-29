@@ -1378,7 +1378,7 @@ const skills = {
 			},
 			damage: {
 				audio: "zhuangpo",
-				trigger: { source: "damageBegin1" },
+				trigger: { global: "damageBegin1" },
 				filter(event, player) {
 					const card = event.card;
 					if (!card || !card.storage || !card.storage.zhuangpo) return false;
@@ -9160,6 +9160,7 @@ const skills = {
 				filter(event, player) {
 					if (!player.hasDisabledSlot()) return false;
 					const opposite = event.source;
+					if (!event.source.isDamaged()) return false;
 					return opposite && opposite.isIn() && opposite.inRangeOf(player);
 				},
 				content() {
