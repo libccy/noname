@@ -891,17 +891,17 @@ export const Content = {
 				.set(
 					"ai",
 					event.ai ||
-						function (card) {
-							return Math.random();
-						}
+					function (card) {
+						return Math.random();
+					}
 				)
 				.set(
 					"aiCard",
 					event.aiCard ||
-						function (target) {
-							var hs = target.getCards("h");
-							return { bool: true, cards: [hs.randomGet()] };
-						}
+					function (target) {
+						var hs = target.getCards("h");
+						return { bool: true, cards: [hs.randomGet()] };
+					}
 				);
 			next._args.remove("glow_result");
 		}
@@ -1018,9 +1018,9 @@ export const Content = {
 		next.set(
 			"ai",
 			event.ai ||
-				function () {
-					return Math.random();
-				}
+			function () {
+				return Math.random();
+			}
 		);
 		"step 1";
 		if (result.bool) {
@@ -1097,7 +1097,7 @@ export const Content = {
 			var dialog = ui.create.dialog("forcebutton", "hidden");
 			event.dialog = dialog;
 			event.dialog.textPrompt = event.dialog.add('<div class="text center">' + (beatmap.prompt || "在音符滑条和底部判定区重合时点击屏幕！") + "</div>");
-			event.switchToAuto = function () {};
+			event.switchToAuto = function () { };
 			event.dialog.classList.add("fixed");
 			event.dialog.classList.add("scroll1");
 			event.dialog.classList.add("scroll2");
@@ -1783,11 +1783,11 @@ export const Content = {
 			next.set(
 				"filterTarget",
 				event.filterTarget ||
-					function (card, player, target) {
-						if (!_status.event.targets.includes(target)) return false;
-						if (!_status.event.nodistance && !lib.filter.targetInRange(card, player, target)) return false;
-						return lib.filter.targetEnabledx(card, player, target);
-					}
+				function (card, player, target) {
+					if (!_status.event.targets.includes(target)) return false;
+					if (!_status.event.nodistance && !lib.filter.targetInRange(card, player, target)) return false;
+					return lib.filter.targetEnabledx(card, player, target);
+				}
 			);
 			next.set("ai", event.ai || get.effect_use);
 			next.set("selectTarget", event.selectTarget || lib.filter.selectTarget);
@@ -1879,7 +1879,7 @@ export const Content = {
 							true,
 						],
 					],
-					function () {},
+					function () { },
 					event.ai
 				)
 				.set("switchToAuto", function () {
@@ -2016,7 +2016,7 @@ export const Content = {
 							true,
 						],
 					],
-					function () {},
+					function () { },
 					function () {
 						return 1 + Math.random();
 					}
@@ -4001,9 +4001,9 @@ export const Content = {
 						next.set(
 							"ai",
 							info.chooseButton.check ||
-								function () {
-									return 0;
-								}
+							function () {
+								return 0;
+							}
 						);
 						if (event.id) next._parent_id = event.id;
 						next.type = "chooseToUse_button";
@@ -4014,16 +4014,16 @@ export const Content = {
 						next.set(
 							"ai",
 							info.chooseButton.check ||
-								function () {
-									return 1;
-								}
+							function () {
+								return 1;
+							}
 						);
 						next.set(
 							"filterButton",
 							info.chooseButton.filter ||
-								function () {
-									return true;
-								}
+							function () {
+								return true;
+							}
 						);
 						next.set("selectButton", info.chooseButton.select || 1);
 						next.set("complexSelect", info.chooseButton.complexSelect !== false);
@@ -4209,9 +4209,9 @@ export const Content = {
 						next.set(
 							"ai",
 							info.chooseButton.check ||
-								function () {
-									return 0;
-								}
+							function () {
+								return 0;
+							}
 						);
 					} else {
 						var next = player.chooseButton(dialog);
@@ -4220,16 +4220,16 @@ export const Content = {
 						next.set(
 							"ai",
 							info.chooseButton.check ||
-								function () {
-									return 1;
-								}
+							function () {
+								return 1;
+							}
 						);
 						next.set(
 							"filterButton",
 							info.chooseButton.filter ||
-								function () {
-									return true;
-								}
+							function () {
+								return true;
+							}
 						);
 						next.set("selectButton", info.chooseButton.select || 1);
 						next.set("filterOk", info.chooseButton.filterOk || (() => true));
@@ -6641,7 +6641,7 @@ export const Content = {
 			return;
 		}
 		var cards = player.getCards("h");
-		player.showCards(cards).setContent(function () {});
+		player.showCards(cards).setContent(function () { });
 		var str = get.translation(player.name) + "的手牌";
 		if (typeof event.prompt == "string") {
 			str = event.prompt;
@@ -6883,13 +6883,13 @@ export const Content = {
 		if (targets.length == 2) {
 			const dialogArgs = ["请选择要移动的牌"];
 			const es = targets[0].getVCards("e", card => {
-					return event.filter(card) && targets[1].canEquip(card, event.canReplace);
-				}),
+				return event.filter(card) && targets[1].canEquip(card, event.canReplace);
+			}),
 				js = event.nojudge
 					? []
 					: targets[0].getVCards("j", card => {
-							return event.filter(card) && targets[1].canAddJudge(card);
-					  });
+						return event.filter(card) && targets[1].canAddJudge(card);
+					});
 			if (es.length) {
 				dialogArgs.push(`<div class="text center">装备区</div>`);
 				dialogArgs.push([es, "vcard"]);
@@ -8843,7 +8843,7 @@ export const Content = {
 				event.num = num;
 			}
 			switch (
-				event.type //log moved here
+			event.type //log moved here
 			) {
 				case "damage":
 					game.log(player, "的护甲抵挡了" + get.cnNumber(-num) + "点伤害");
@@ -9628,7 +9628,7 @@ export const Content = {
 			}
 			//框的部分属性
 			let itemContainerCss = event.itemContainerCss || {
-				justifyContent: "start",
+				justifyContent: "center",
 				minHeight: "100px",
 			};
 			for (let i = 0; i < event.list.length; i++) {
