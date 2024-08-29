@@ -1056,10 +1056,10 @@ export const extensionMenu = function (connectMenu) {
 					var aa = a,
 						bb = b;
 					if (aa.includes("_")) {
-						aa = aa.slice(aa.indexOf("_") + 1);
+						aa = aa.slice(aa.lastIndexOf("_") + 1);
 					}
 					if (bb.includes("_")) {
-						bb = bb.slice(bb.indexOf("_") + 1);
+						bb = bb.slice(bb.lastIndexOf("_") + 1);
 					}
 					if (aa != bb) {
 						return aa > bb ? 1 : -1;
@@ -1597,10 +1597,10 @@ export const extensionMenu = function (connectMenu) {
 					var aa = a,
 						bb = b;
 					if (aa.includes("_")) {
-						aa = aa.slice(aa.indexOf("_") + 1);
+						aa = aa.slice(aa.lastIndexOf("_") + 1);
 					}
 					if (bb.includes("_")) {
-						bb = bb.slice(bb.indexOf("_") + 1);
+						bb = bb.slice(bb.lastIndexOf("_") + 1);
 					}
 					if (aa != bb) {
 						return aa > bb ? 1 : -1;
@@ -2200,10 +2200,10 @@ export const extensionMenu = function (connectMenu) {
 					var aa = a,
 						bb = b;
 					if (aa.includes("_")) {
-						aa = aa.slice(aa.indexOf("_") + 1);
+						aa = aa.slice(aa.lastIndexOf("_") + 1);
 					}
 					if (bb.includes("_")) {
-						bb = bb.slice(bb.indexOf("_") + 1);
+						bb = bb.slice(bb.lastIndexOf("_") + 1);
 					}
 					if (aa != bb) {
 						return aa > bb ? 1 : -1;

@@ -4142,10 +4142,10 @@ export default () => {
 							var aa = a,
 								bb = b;
 							if (aa.indexOf("_") != -1) {
-								aa = aa.slice(aa.indexOf("_") + 1);
+								aa = aa.slice(aa.lastIndexOf("_") + 1);
 							}
 							if (bb.indexOf("_") != -1) {
-								bb = bb.slice(bb.indexOf("_") + 1);
+								bb = bb.slice(bb.lastIndexOf("_") + 1);
 							}
 							if (aa != bb) {
 								return aa > bb ? 1 : -1;
