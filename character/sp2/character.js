@@ -2,6 +2,7 @@ const characters = {
 	matie: ["male", "qun", 4, ["dczhuiwang", "dcquxian"]],
 	hansong: ["male", "qun", 3, ["dcyinbi", "dcshuaiyan"]],
 	chezhou: ["male", "wei", 4, ["dcshefu", "dcpigua"]],
+	star_xunyu: ["male", "wei", 3, ["staranshu", "starkuangzuo"], ["clan:颍川荀氏"]],
 	star_zhangzhao: ["male", "wu", 3, ["starzhongyan", "starjinglun"]],
 	star_sunjian: ["male", "qun", "4/5", ["starruijun", "stargangyi"]],
 	liqueguosi: ["male", "qun", 4, ["xiongsuan"], ["name:李|傕-郭|汜"]],

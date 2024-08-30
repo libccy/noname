@@ -146,9 +146,9 @@ const skills = {
 			player.getHistory("lose", evt => {
 				if (evt.cards2) num += evt.cards2.length;
 			});
-			player.addAdditionalSkills("xianmou", []);
 			player.changeZhuanhuanji("xianmou");
 			if (player.storage.xianmou) {
+				player.addAdditionalSkills("xianmou", []);
 				let cards = game.cardsGotoOrdering(get.cards(5)).cards;
 				const result = await player.chooseButton([`是否获得至多${num}张牌？`, cards], [1, num]).set("ai", function (button) {
 					if (ui.selected.buttons.length + 1 >= _status.event.maxNum) return 0;

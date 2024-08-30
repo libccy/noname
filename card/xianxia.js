@@ -48,10 +48,6 @@ game.import("card", function () {
                     else {
                         result = await player
                             .choosePlayerCard(target, true, "he")
-                            .set("ai", function (card) {
-                                if (_status.event.getRand() < 0.5) return Math.random();
-                                return get.value(card);
-                            })
                             .forResult();
                     }
                     if (!result || !result.bool) return;

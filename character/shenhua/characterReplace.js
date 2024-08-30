@@ -9,7 +9,7 @@ const characterReplaces = {
 	yuji: ["xin_yuji", "re_yuji", "yuji"],
 	zhangjiao: ["sp_zhangjiao", "re_zhangjiao", "sb_zhangjiao", "jsrg_zhangjiao", "zhangjiao"],
 	dianwei: ["dianwei", "ol_dianwei", "re_dianwei", "dc_sb_dianwei", "xia_dianwei"],
-	xunyu: ["xunyu", "ol_xunyu", "re_xunyu", "sb_xunyu"],
+	xunyu: ["xunyu", "ol_xunyu", "re_xunyu", "sb_xunyu", "star_xunyu"],
 	sp_zhugeliang: ["sp_zhugeliang", "ol_sp_zhugeliang", "re_sp_zhugeliang", "sb_sp_zhugeliang", "jd_sb_sp_zhugeliang"],
 	pangtong: ["pangtong", "ol_pangtong", "re_pangtong", "ol_sb_pangtong", "sb_pangtong", "jd_sb_pangtong"],
 	re_jsp_pangtong: ["re_jsp_pangtong", "jsrg_pangtong", "sp_pangtong"],

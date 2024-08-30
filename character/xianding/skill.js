@@ -3,6 +3,123 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//这是俺拾嘞
+	dcsbkongwu: {
+		audio: 2,
+		enable: "phaseUse",
+		usable: 1,
+		filterCard: true,
+		selectCard() {
+			const player = get.player();
+			return [1, player.maxHp];
+		},
+		zhuanhuanji: true,
+		marktext: "☯",
+		mark: true,
+		intro: {
+			content: function (storage, player) {
+				return "出牌阶段限一次，你可以弃置至多体力上限张牌并选择一名其他角色，" + (storage ? "视为对其使用等量张【杀】" : "弃置其等量张牌。") + "若此阶段结束时其手牌数和体力值均不大于你，其下回合摸牌阶段少摸一张牌且装备技能失效。";
+			},
+		},
+		filterTarget: lib.filter.notMe,
+		async content(event, trigger, player) {
+			const target = event.target;
+			player.changeZhuanhuanji(event.name);
+			if (player.storage.dcsbkongwu) {
+				const num = Math.min(event.cards.length, target.countCards("he"));
+				if (num > 0) await player.discardPlayerCard("he", target, true, num);
+			}
+			else {
+				let used = 0,
+					card = { name: "sha", isCard: true };
+				while (used < event.cards.length && target.isIn() && player.canUse(card, target, false)) {
+					used++;
+					await player.useCard(card, target, false);
+				}
+			}
+			player.when("phaseUseEnd").then(() => {
+				if (target.isIn() && target.hp <= player.hp && target.countCards("h") <= player.countCards("h")) {
+					player.line(target, "green");
+					target.addTempSkill("dcsbkongwu_effect", { player: "phaseEnd" });
+				}
+			}).vars({ target: target });
+		},
+		//这里需要写ai，但是地方太小我写不下
+		check(card) {
+			return 4 - get.value(card);
+		},
+		ai: {
+			order: 5,
+			result: {
+				target: -1,
+			},
+		},
+		getSkills(player) {
+			return player
+				.getCards("e")
+				.reduce((list, card) => {
+					const info = get.info(card);
+					if (info && info.skills) return list.addArray(info.skills);
+					return list;
+				}, []);
+		},
+		subSkill: {
+			effect: {
+				trigger: {
+					player: ["phaseDrawBegin", "phaseBegin", "equipAfter"],
+				},
+				direct: true,
+				forced: true,
+				charlotte: true,
+				filter(event, player) {
+					if (event.name == "phaseDraw") return !event.numFixed;
+					return true;
+				},
+				content() {
+					if (trigger.name == "phaseDraw") {
+						trigger.num--;
+						player.logSkill(event.name);
+					}
+					else player.disableSkill(event.name, lib.skill.dcsbkongwu.getSkills(player));
+				},
+				onremove(player, skill) {
+					player.enableSkill(skill);
+				},
+				mark: true,
+				marktext: "※",
+				intro: {
+					content: "摸牌阶段少摸一张牌，装备牌失效",
+				},
+				mod: {
+					attackRange(player, num) {
+						if (player != _status.currentPhase) return;
+						return num + 1 - player.getEquipRange();
+					},
+					globalFrom(from, to, distance) {
+						if (from != _status.currentPhase) return;
+						let num = 0;
+						for (let i of from.getVCards("e")) {
+							const info = get.info(i).distance;
+							if (!info) continue;
+							if (info.globalFrom) num += info.globalFrom;
+						}
+						return distance - num;
+					},
+					globalTo(from, to, distance) {
+						if (to != _status.currentPhase) return;
+						let num = 0;
+						for (let i of to.getVCards("e")) {
+							const info = get.info(i).distance;
+							if (!info) continue;
+							if (info.globalTo) num += info.globalTo;
+							if (info.attackTo) num += info.attackTo;
+						}
+						return distance - num;
+					},
+				},
+			},
+		},
+	},
 	//蒋钦
 	dcshangyi: {
 		audio: "shangyi",
