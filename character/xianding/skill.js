@@ -10667,7 +10667,7 @@ const skills = {
 		content: function () {
 			"step 0";
 			target.addTempSkill("dcjingzao_temp");
-			var cards = game.cardsGotoOrdering(get.cards(3 + player.countMark("dcjingzao_add") - player.countMark("dcjingzao_ban"))).cards;
+			var cards = get.cards(3 + player.countMark("dcjingzao_add") - player.countMark("dcjingzao_ban"), true);
 			event.cards = cards;
 			game.log(player, "亮出了", event.cards);
 			event.videoId = lib.status.videoId++;
@@ -10683,7 +10683,7 @@ const skills = {
 				event.cards
 			);
 			game.addVideo("showCards", player, [get.translation(player) + "发动了【经造】", get.cardsInfo(event.cards)]);
-			game.delay(cards.length - 1);
+			game.delay();
 			"step 1";
 			target
 				.chooseToDiscard("he")
@@ -18507,10 +18507,13 @@ const skills = {
 				var name = lib.inpile[i];
 				var type = get.type(name, "trick");
 				if (["basic", "trick"].includes(type)) list.push([type, "", name]);
+				if (name == "sha") {
+					for (let nature of lib.inpile_nature) list.push([type, "", name, nature]);
+				}
 			}
 			player.chooseButton(["选择至多两种牌", [list, "vcard"]], true, [1, 2]).set("ai", function (button) {
 				var target = _status.event.getParent().target;
-				var card = { name: button.link[2] };
+				var card = { name: button.link[2], nature: button.link[3] };
 				if (get.type(card) == "basic" || !target.hasUseTarget(card)) return false;
 				return get.attitude(_status.event.player, target) * (target.getUseValue(card) - 0.1);
 			});
@@ -18548,7 +18551,10 @@ const skills = {
 			var cards = [];
 			for (var i = 0; i < Math.min(trigger.num, list.length); i++) {
 				var card = get.cardPile(function (cardx) {
-					return !cards.includes(cardx) && cardx.name == list[Math.min(i, list.length - 1)][2];
+					if (cards.includes(cardx)) return false;
+					if (cardx.name != list[Math.min(i, list.length - 1)][2]) return false;
+					if (get.nature(cardx, false) != list[Math.min(i, list.length - 1)][3]) return false;
+					return true;
 				});
 				if (card) {
 					player.storage.busuan_angelbeats.splice(i--, 1);
@@ -18574,7 +18580,7 @@ const skills = {
 			"step 0";
 			event.count = 0;
 			"step 1";
-			player.draw("visible");
+			player.draw();
 			"step 2";
 			if (Array.isArray(result)) {
 				event.count += result.length;
