@@ -1413,9 +1413,9 @@ const skills = {
 				.set("ai", card => {
 					if (get.event("nope")) return 0;
 					if (ui.selected.cards.length >= get.event("num")) return 0;
-					return 6 - get.value(card);
+					return 9 - get.value(card);
 				})
-				.set("nope", get.attitude(target, player) * get.effect(player, { name: "losehp" }, player, target) >= 0)
+				.set("nope", get.effect(player, { name: "losehp" }, player, target) >= 0)
 				.set("num", num);
 			if (!bool || cards.length < num) player.loseHp();
 		},
