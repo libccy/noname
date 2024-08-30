@@ -542,6 +542,15 @@ const skills = {
 		global: "jsrgyangge_mizhao",
 		derivation: "mizhao",
 		subSkill: {
+			used: {
+				mark: true,
+				marktext: "戈",
+				intro: {
+					content: "本轮已被发动过〖密诏〗",
+				},
+				charlotte: true,
+				onremove: ["jsrgyangge"],
+			},
 			mizhao: {
 				//直接继承mizhao
 				inherit: "mizhao",
@@ -552,6 +561,10 @@ const skills = {
 				filterTarget(card, player, target) {
 					if (player === target) return false;
 					return target.hasSkill("jsrgyangge") && !target.hasMark("jsrgyangge");
+				},
+				contentBefore() {
+					targets[0].addTempSkill("jsrgyangge_used", "roundStart");
+					targets[0].addMark("jsrgyangge");
 				},
 				prompt() {
 					const player = get.player();
