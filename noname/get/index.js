@@ -25,6 +25,12 @@ export class Get extends GetCompatible {
 	 */
 	skillsFromEquips(cards) {
 		return cards.reduce((skills, card) => {
+			//@ts-ignore
+			if (Array.isArray(card.skills)) {
+				//@ts-ignore
+				skills.addArray(card.skills);
+				return skills;
+			}
 			const info = get.info(card, false);
 			if (info.skills) skills.addArray(info.skills);
 			return skills;
