@@ -6229,6 +6229,9 @@ const skills = {
 				}
 			}
 		},
+		ai: {
+			combo: "moon_jushou"
+		},
 	},
 	releiji: {
 		audio: 2,

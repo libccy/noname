@@ -5139,6 +5139,9 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "youlong"
+		},
 	},
 	//铃木央人
 	hiroto_huyu: {
@@ -8860,6 +8863,9 @@ const skills = {
 				return "当前性别：" + get.translation(player.sex);
 			},
 		},
+		ai: {
+			combo: "sunohara_jianren"
+		},
 	},
 	sunohara_chengshuang_phase: {
 		trigger: {
@@ -9792,6 +9798,9 @@ const skills = {
 			player.enableEquip(list);
 			if (!player.storage.kengo_guidui2) player.storage.kengo_guidui2 = [];
 			player.storage.kengo_guidui2.addArray(list);
+		},
+		ai: {
+			combo: "kengo_weishang"
 		},
 	},
 	kengo_guidui2: { onremove: true },

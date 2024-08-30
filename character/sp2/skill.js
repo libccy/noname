@@ -8270,6 +8270,9 @@ const skills = {
 				player.addSkill("tuxing2");
 			}
 		},
+		ai: {
+			combo: "yujue"
+		},
 	},
 	tuxing2: {
 		audio: "tuxing",

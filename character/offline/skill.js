@@ -1707,12 +1707,13 @@ const skills = {
 	},
 	//沙和尚
 	tymanyong: {
+		onremove: true,
 		trigger: {
 			player: ["phaseZhunbeiBegin", "phaseJieshuBegin"],
 		},
 		filter(event, player) {
 			let hasCard = player.getEquips("tiejili").length > 0;
-			if (event.name == "phaseZhunbei") return !hasCard;
+			if (event.name == "phaseZhunbei") return !hasCard && !player.storage.tymanyong;
 			return hasCard;
 		},
 		async content(event, trigger, player) {
@@ -1721,6 +1722,7 @@ const skills = {
 				if (card) {
 					player.$gain2(card);
 					await player.equip(card);
+					player.storage.tymanyong = true;
 				}
 			}
 			else {

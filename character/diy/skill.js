@@ -7532,6 +7532,9 @@ const skills = {
 			list = list.slice(0, Math.min(skills.length, list.length));
 			player.addSkills(list);
 		},
+		ai: {
+			combo: "junkyuheng"
+		},
 		derivation: ["junkshengzhi", "junkquandao", "junkchigang"],
 	},
 	junkshengzhi: {

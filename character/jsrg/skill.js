@@ -2356,6 +2356,9 @@ const skills = {
 			game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶");
 			await game.delayx();
 		},
+		ai: {
+			combo: "jsrgtuigu"
+		},
 	},
 	jsrgtuigu: {
 		audio: 2,
@@ -6550,6 +6553,9 @@ const skills = {
 		locked: false,
 		content: function () {
 			player.turnOver(false);
+		},
+		ai: {
+			combo: "jsrgguyin"
 		},
 		subSkill: {
 			jiu: {
