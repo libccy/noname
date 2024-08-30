@@ -7532,7 +7532,7 @@ const skills = {
 			content: "mark",
 		},
 		ai: {
-			combo: "pksanchen",
+			combo: "pkmiewu",
 			threaten: 3.6,
 		},
 	},
@@ -9185,6 +9185,9 @@ const skills = {
 			maxHandcard(player, num) {
 				return num + player.getExpansions("zyquanji").length;
 			},
+		},
+		ai: {
+			notemp: true
 		},
 	},
 	zypaiyi: {

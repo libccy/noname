@@ -610,7 +610,7 @@ const skills = {
 			},
 		},
 		ai: {
-			combo: "sbqiaomeng"
+			notemp: true
 		},
 	},
 	sbqiaomeng: {

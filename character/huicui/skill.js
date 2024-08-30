@@ -10069,7 +10069,7 @@ const skills = {
 				for (var j of lib.character[i][3]) {
 					var skill = lib.skill[j];
 					if (!skill || skill.zhuSkill || banned.includes(j)) continue;
-					if (skill.ai && (skill.ai.combo || skill.ai.notemp || skill.ai.neg)) continue;
+					if (skill.ai && (skill.ai.combo || skill.ai.neg)) continue;
 					var info = get.translation(j);
 					for (var ix = 0; ix < info.length; ix++) {
 						if (/仁|义|礼|智|信/.test(info[ix]) == true) {
@@ -10278,7 +10278,7 @@ const skills = {
 			},
 		},
 		ai: {
-			combo: "zhishi"
+			notemp: true
 		},
 	},
 	zhishi: {
@@ -13839,6 +13839,9 @@ const skills = {
 			}
 		},
 		intro: { content: "mark" },
+		ai: {
+			halfneg: true
+		},
 	},
 	zhuangdan: {
 		audio: 2,
@@ -13852,7 +13855,7 @@ const skills = {
 			player.tempBanSkill("liedan", { player: "phaseEnd" });
 		},
 		ai: {
-			combo: "zhuangdan",
+			combo: "liedan",
 		},
 	},
 	zhuangdan_mark: {
@@ -13874,7 +13877,7 @@ const skills = {
 			player.addMark("recangchu", Math.min(3, game.countPlayer() - player.countMark("recangchu")));
 		},
 		ai: {
-			combo: "reliangying"
+			notemp: true
 		},
 		intro: { content: "mark", name: "粮" },
 		mod: {

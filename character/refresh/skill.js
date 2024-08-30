@@ -1739,6 +1739,9 @@ const skills = {
 				return num + player.getExpansions("rebizhuan").length;
 			},
 		},
+		ai: {
+			notemp: true
+		},
 	},
 	retongbo: {
 		audio: 2,
@@ -2311,6 +2314,9 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "repingkou"
+		},
 	},
 	repingkou: {
 		audio: 2,
@@ -2377,6 +2383,7 @@ const skills = {
 					if (card.name == "lebu" || card.name == "bingliang") return 0.5;
 				},
 			},
+			combo: "refenli"
 		},
 	},
 	//典韦
@@ -5678,6 +5685,7 @@ const skills = {
 		ai: {
 			maixie: true,
 			maixie_hp: true,
+			notemp: true,
 			threaten: 0.8,
 			effect: {
 				target: function (card, player, target) {
@@ -6846,6 +6854,9 @@ const skills = {
 				return num + player.getExpansions("gzquanji").length;
 			},
 		},
+		ai: {
+			notemp: true
+		},
 	},
 	gzpaiyi: {
 		audio: 2,
@@ -6906,6 +6917,7 @@ const skills = {
 			result: {
 				player: 1,
 			},
+			combo: "gzquanji"
 		},
 	},
 	gzquanji2: { charlotte: true },
@@ -7127,7 +7139,9 @@ const skills = {
 			if (cards.length) player.loseToDiscardpile(cards);
 		},
 		group: "residi_push",
-		ai: { notemp: true },
+		ai: {
+			notemp: true
+		},
 	},
 	residi_push: {
 		trigger: { global: "phaseUseBegin" },
@@ -15016,7 +15030,7 @@ const skills = {
 			},
 			nodiscard: true,
 			nolose: true,
-			combo: "jixi"
+			notemp: true
 		},
 	},
 	rebeige: {

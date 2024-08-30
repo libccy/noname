@@ -1307,6 +1307,9 @@ export default () => {
 						return num + player.getExpansions("fakequanji").length;
 					},
 				},
+				ai: {
+					notemp: true
+				},
 			},
 			fakepaiyi: {
 				audio: "gzpaiyi",
@@ -1390,6 +1393,7 @@ export default () => {
 							});
 						},
 					},
+					combo: "fakequanji"
 				},
 			},
 			fakeshilu: {

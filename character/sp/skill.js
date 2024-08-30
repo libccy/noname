@@ -17082,7 +17082,9 @@ const skills = {
 			player.addMark("reluanzhan", 1, false);
 		},
 		intro: { content: "mark" },
-		ai: { notemp: true },
+		ai: {
+			notemp: true
+		},
 		group: ["reluanzhan_add", "reluanzhan_remove"],
 	},
 	reluanzhan_add: {
@@ -17792,7 +17794,6 @@ const skills = {
 			game.delayx();
 		},
 		ai: {
-			notemp: true,
 			order: 1,
 			result: {
 				player: function (player) {
@@ -20890,7 +20891,6 @@ const skills = {
 		},
 		ai: {
 			maixie_defend: true,
-			notemp: true,
 		},
 	},
 	rehengjiang2: {
@@ -22619,7 +22619,6 @@ const skills = {
 		audio: 2,
 		trigger: { player: "damageEnd" },
 		direct: true,
-		notemp: true,
 		filter: function (event, player) {
 			return player.countCards("he") > 0;
 		},
@@ -22649,6 +22648,7 @@ const skills = {
 			threaten: 0.8,
 			maixie: true,
 			maixie_hp: true,
+			notemp: true,
 		},
 	},
 	tuifeng2: {

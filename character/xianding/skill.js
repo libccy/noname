@@ -11023,6 +11023,7 @@ const skills = {
 		},
 		ai: {
 			combo: "dclingfang",
+			neg: true
 		},
 	},
 	//袁姬

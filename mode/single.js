@@ -2036,7 +2036,7 @@ export default () => {
 							for (let k = 0; k < list2.length; k++) {
 								let info = lib.skill[list2[k]];
 								if (!info || info.silent || info.juexingji || info.hiddenSkill || info.dutySkill || info.zhuSkill || info.unique || info.groupSkill) continue;
-								if (info.ai && (info.ai.combo || info.ai.notemp || info.ai.neg)) continue;
+								if (info.ai && (info.ai.combo || info.ai.neg)) continue;
 								list.add(name);
 								if (!map[name]) map[name] = [];
 								map[name].push(skills2[j]);

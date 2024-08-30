@@ -5250,7 +5250,6 @@ game.import("character", function () {
 			},
 			yishan: {
 				group: "yishan2",
-				notemp: true,
 				trigger: { player: "damageEnd" },
 				filter: function (event, player) {
 					var content = player.storage.yishan;
