@@ -27699,45 +27699,54 @@ const skills = {
 		filter: function (event, player) {
 			return event.player.countCards("h") <= 1 && (player == event.player || player.hasSkill("junbing"));
 		},
-		direct: true,
-		checkx: function (target, player) {
-			if (target) {
-				var num = target.countCards("h");
-				var att = get.attitude(player, target);
-				if (num == 0) return true;
-				if (num == 1) return att > -1;
-				if (num == 2) return att > 0;
-				return att > 1;
-			}
-			return false;
+		async cost(event, trigger, player) {
+			event.result = await trigger.player
+				.chooseBool(
+					player == trigger.player ? get.prompt("rejunbing") : "是否响应" + get.translation(player) + "的【郡兵】？",
+					"摸一张牌" + (player == trigger.player ? "" : "，将所有手牌交给" + get.translation(player) + "，然后其交给你等量张牌")
+				)
+				.set("ai", () => get.event("choice"))
+				.set("choice", function() {
+					let num = player.countCards("h"), att = get.attitude(trigger.player, player);
+					if (num == 0) return true;
+					if (num == 1) return att > -1;
+					if (num == 2) return att > 0;
+					return att > 1;
+				}())
+				.forResult();
 		},
-		content: function () {
-			"step 0";
-			event.target = player;
-			event.player = trigger.player;
-			var prompt;
-			if (player == event.player) prompt = "是否发动【郡兵】摸一张牌？";
-			else prompt = "###是否对" + get.translation(event.target) + "发动【郡兵】？###" + (event.player == event.target ? "摸一张牌" : "摸一张牌，将所有手牌交给该角色，然后该角色交给你等量的手牌");
-			event.player.chooseBool(prompt).set("choice", lib.skill.junbing.checkx(event.target, event.player));
-			"step 1";
-			if (!result.bool) {
-				event.finish();
+		async content(event, trigger, player) {
+			const target = trigger.player;
+			if (target != player) game.log(target, "响应了", player, "的", "#g【郡兵】");
+			await target.draw();
+			let cards = target.getCards("h");
+			if (target == player || !cards.length) {
 				return;
 			}
-			target.logSkill("junbing", player);
-			if (player == target) event.finish();
-			player.draw();
-			"step 2";
-			var cards = player.getCards("h");
-			player.give(cards, target);
-			event.num = cards.length;
-			"step 3";
-			var he = target.getCards("he");
-			if (!he.length) event.finish();
-			else if (he.length <= num) event._result = { cards: he };
-			else target.chooseCard("选择还给" + get.translation(player) + "的牌", true, event.num, "he");
-			"step 4";
-			target.give(result.cards, player);
+			await target.give(cards, player);
+			let num = cards.length, result;
+			if (player.countCards("he") > num) result = await player
+				.chooseCard(
+					"郡兵：请还给" + get.translation(target) + get.translation(num) + "张牌",
+					"he",
+					true,
+					num
+				)
+				.set("ai", card => {
+					let player = _status.event.player, target = get.event("target");
+					if (get.attitude(player, target) <= 0) {
+						if (card.name == "du") return 30;
+						return -get.value(card);
+					}
+					return 6 - get.value(card);
+				})
+				.set("target", target)
+				.forResult();
+			else result = {
+				bool: player.hasCard(i => true, "he"),
+				cards: player.getCards("he")
+			};
+			if (result.bool) await player.give(result.cards, target);
 		},
 	},
 	xiongyi: {

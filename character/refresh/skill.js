@@ -354,44 +354,45 @@ const skills = {
 		filter: function (event, player) {
 			return event.player.countCards("h") < event.player.getHp();
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			var target = trigger.player;
-			event.player = player;
-			event.target = target;
-			target.chooseBool(target == player ? get.prompt("rejunbing") : "是否响应" + get.translation(player) + "的【郡兵】？", "摸一张牌" + (target == player ? "" : "，将所有手牌交给" + get.translation(player) + "，然后其可以交给你等量张牌")).set("choice", get.attitude(target, player) > 0);
-			"step 1";
-			if (result.bool) {
-				player.logSkill("rejunbing", target);
-				if (target != player) game.log(target, "响应了", player, "的", "#g【郡兵】");
-				target.draw();
-			} else event.finish();
-			"step 2";
-			var cards = target.getCards("h");
+		async cost(event, trigger, player) {
+			event.result = await trigger.player
+				.chooseBool(
+					player == trigger.player ? get.prompt("rejunbing") : "是否响应" + get.translation(player) + "的【郡兵】？",
+					"摸一张牌" + (player == trigger.player ? "" : "，将所有手牌交给" + get.translation(player) + "，然后其可以交给你等量张牌")
+				)
+				.set("ai", () => get.event("choice"))
+				.set("choice", get.attitude(trigger.player, player) > 0)
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = trigger.player;
+			if (target != player) game.log(target, "响应了", player, "的", "#g【郡兵】");
+			await target.draw();
+			let cards = target.getCards("h");
 			if (target == player || !cards.length) {
-				event.finish();
 				return;
 			}
-			target.give(cards, player);
-			event.num = cards.length;
-			"step 3";
-			if (player.countCards("he") < num) event.finish();
-			else
-				player
-					.chooseCard("郡兵：是否还给" + get.translation(target) + get.translation(num) + "张牌？", "he", num)
+			await target.give(cards, player);
+			const num = cards.length;
+			if (player.countCards("he") >= num) {
+				const result = await player
+					.chooseCard(
+						"郡兵：是否还给" + get.translation(target) + get.translation(num) + "张牌？",
+						"he",
+						num
+					)
 					.set("ai", card => {
-						var player = _status.event.player;
-						var target = _status.event.target;
+						let player = _status.event.player, target = get.event("target");
 						if (get.attitude(player, target) <= 0) {
 							if (card.name == "du") return 1145141919810;
 							return -get.value(card);
 						}
-						return 6 - get.value(card);
+						return 8 - Math.sqrt(target.hp) - get.value(card);
 					})
-					.set("target", target);
-			"step 4";
-			if (result.bool) player.give(result.cards, target);
+					.set("target", target)
+					.forResult();
+				if (result.bool) await player.give(result.cards, target);
+			}
 		},
 	},
 	//界诸葛诞
