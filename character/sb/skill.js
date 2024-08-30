@@ -7201,6 +7201,9 @@ const skills = {
 						player.logSkill("sbjieyin_init", target);
 						target.addSkill("sbjieyin_mark");
 						target.addMark("sbjieyin_mark", 1);
+						if (player != target && target.identityShown) {
+							if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.3);
+						}
 					}
 					"step 2";
 					game.delayx();

@@ -5682,6 +5682,9 @@ const skills = {
 				player.line(targets);
 				for (var i = 0; i < targets.length; i++) {
 					targets[i].addMark(event.marks[i]);
+					if (player != targets[i] && targets[i].identityShown) {
+						if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.3);
+					}
 				}
 			}
 			event.goto(5);
@@ -5709,6 +5712,9 @@ const skills = {
 			if (result.bool) {
 				var marks = result.links;
 				for (var mark of marks) target.addMark(mark, 1);
+				if (player != target && target.identityShown) {
+					if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.3);
+				}
 				event.marks.removeArray(marks);
 				for (var mark of event.marks) player.addMark(mark, 1);
 			}
@@ -5858,6 +5864,9 @@ const skills = {
 					player.line2(targets, mark == "dcyinlu_zhangqi" ? "fire" : "green");
 					targets[0].removeMark(mark, count);
 					targets[1].addMark(mark, count);
+					if (player != targets[1] && targets[1].identityShown) {
+						if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.3);
+					}
 					event.finish();
 					"step 3";
 					player
@@ -5877,6 +5886,9 @@ const skills = {
 						var count = trigger.player.countMark(event.marks[0]);
 						trigger.player.removeMark(event.marks[0], count, false);
 						target.addMark(event.marks[0], count);
+						if (player != target && target.identityShown) {
+							if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.3);
+						}
 					}
 					"step 5";
 					event.marks.shift();
