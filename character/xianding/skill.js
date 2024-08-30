@@ -18583,7 +18583,7 @@ const skills = {
 			"step 0";
 			event.count = 0;
 			"step 1";
-			player.draw("visible");
+			player.draw();
 			"step 2";
 			if (Array.isArray(result)) {
 				event.count += result.length;
