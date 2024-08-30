@@ -6583,6 +6583,9 @@ const skills = {
 			if (result.bool) {
 				var target = result.targets[0];
 				player.logSkill("kangge", target);
+				if (get.mode() != "identity" || player.identity != "nei") {
+					if (target.identityShown || typeof target.ai.expose == "number" && target.ai.expose > 0.5) player.addExpose(0.4);
+				}
 				player.addSkill("kangge_clear");
 				player.storage.kangge = target;
 				player.markSkill("kangge");
@@ -12173,6 +12176,7 @@ const skills = {
 				var target = result.targets[0];
 				player.line(target, "green");
 				game.log(target, "成为了", "【点虎】", "的目标");
+				if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.25);
 				target.storage.xinfu_dianhu2 = player;
 				target.addTempSkill("xinfu_dianhu2", { player: "die" });
 			}

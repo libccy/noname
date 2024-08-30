@@ -4532,7 +4532,13 @@ const skills = {
 			"step 0";
 			player.draw();
 			"step 1";
-			if (player.hasCard(card => lib.filter.cardDiscardable(card, player, "reqianxi"), "he")) player.chooseToDiscard("he", true);
+			if (player.hasCard(card => {
+				return lib.filter.cardDiscardable(card, player, "reqianxi");
+			}, "he")) player.chooseToDiscard("he", true).set("ai", card => {
+				let player = get.event("player");
+				if (get.color(card, player)) return 7 - get.value(card, player);
+				return 4 - get.value(card, player);
+			});
 			else event.finish();
 			"step 2";
 			if (result.bool && game.hasPlayer(current => current != player && get.distance(player, current) <= 1)) {

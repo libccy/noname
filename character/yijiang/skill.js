@@ -8610,7 +8610,11 @@ const skills = {
 		content: function () {
 			"step 0";
 			player.draw();
-			player.chooseToDiscard("he", true);
+			player.chooseToDiscard("he", true).set("ai", card => {
+				let player = get.event("player");
+				if (get.color(card, player)) return 7 - get.value(card, player);
+				return 4 - get.value(card, player);
+			});
 			"step 1";
 			if (!result.bool) {
 				event.finish();

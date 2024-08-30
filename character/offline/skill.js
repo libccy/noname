@@ -5922,6 +5922,7 @@ const skills = {
 				.set("ai", card => {
 					const player = get.event("player");
 					if (!game.hasPlayer(target => get.attitude(player, target) < 0)) return 0;
+					if (get.suit(card, player) == "diamond") return 8 - get.value(card);
 					return 7.5 - get.value(card);
 				})
 				.set("logSkill", "dragchaojue")
