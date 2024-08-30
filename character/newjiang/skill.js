@@ -2,6 +2,89 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//向秀
+	mpmiaoxi: {
+		enable: "phaseUse",
+		usable: 1,
+		filterCard: true,
+		position: "h",
+		filterTarget(card, player, target) {
+			return target.countCards("h") && target != player;
+		},
+		discard: false,
+		lose: false,
+		delay: false,
+		async content(event, trigger, player) {
+			const target = event.target;
+			const carda = event.cards[0];
+			const result = await player.choosePlayerCard(target, "h", true).forResult();
+			if (result.bool) {
+				const cardb = result.cards[0];
+				player.$throw(carda);
+				target.$throw(cardb);
+				game.log(player, "展示了", player, "的", carda, "和", target, "的", cardb);
+				await player.showCards([carda, cardb], get.translation(player) + "发动了【妙析】");
+				if (get.color(carda) == get.color(cardb)) {
+					await game.loseAsync({
+						lose_list: [
+							[player, [carda]],
+							[target, [cardb]],
+						],
+						discarder: player,
+					}).setContent("discardMultiple");
+				}
+				if (get.suit(carda) == get.suit(cardb)) await target.loseHp();
+				if (get.name(carda) == get.name(cardb)) {
+					if (get.owner(cardb)) await get.owner(cardb).give(cardb, player);
+					else await player.gain(cardb, "gain2");
+				}
+				if (get.number(carda) == get.number(cardb)) player.getStat("skill").mpmiaoxi--;
+			}
+		},
+		ai: {
+			order: 5,
+			result: {
+				target: -1,
+			},
+		},
+	},
+	mpsijiu: {
+		trigger: {
+			global: "roundStart",
+		},
+		filter(event, player) {
+			return game.hasPlayer(current=>{
+				if (current == player) return false;
+				return current.getRoundHistory("lose", evt => {
+					let evtx = evt.getParent();
+					if (!evtx.getg) return false;
+					var cards = evtx.getg(player);
+					if (!cards.length) return false;
+					var cards2 = evt.cards2;
+					for (var card of cards2) {
+						if (cards.includes(card)) return true;
+					}
+					return false;
+				},1).length>0;
+			});
+		},
+		frequent: true,
+		async content(event, trigger, player) {
+			await player.draw();
+			const result = await player
+				.chooseTarget("是否观看一名角色的手牌？", function (card, player, target) {
+					return target != player && target.countCards("h");
+				})
+				.set("ai", target => {
+					return 11 - get.attitude(get.player(), target);
+				})
+				.forResult();
+			if (result.bool) {
+				const target = result.targets[0];
+				await player.viewHandcards(target);
+			}
+		},
+	},
 	//马钧
 	yjgongqiao: {
 		enable: "phaseUse",

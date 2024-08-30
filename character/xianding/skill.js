@@ -13,6 +13,7 @@ const skills = {
 			const player = get.player();
 			return [1, player.maxHp];
 		},
+		position: "he",
 		zhuanhuanji: true,
 		marktext: "☯",
 		mark: true,
