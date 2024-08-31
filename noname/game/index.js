@@ -27,6 +27,7 @@ import { GameCompatible } from "./compatible.js";
 import { save } from "../util/config.js";
 
 export class Game extends GameCompatible {
+	documentZoom;
 	online = false;
 	onlineID = null;
 	onlineKey = null;
