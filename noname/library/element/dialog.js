@@ -173,14 +173,14 @@ export class Dialog extends HTMLDivElement {
 			} else if (addedItems?.length) {
 				//计算压缩折叠的量
 				const gap = 3
-				const L = itemContainer.originWidth - 6
+				const L = itemContainer.originWidth - 2 * gap
 				const W = addedItems[0].getBoundingClientRect().width
 				let n = addedItems.length
 
 				if (n * W + (n + 1) * gap < L) {
 					itemContainer.style.setProperty('--ml', gap + 'px')
 				} else {
-					const ml = Math.min(((n * W - L + gap) / (n - 1)), W - 8)
+					const ml = Math.min(((n * W - L + gap) / (n - 1)), W - 16)
 					itemContainer.style.setProperty('--ml', "-" + ml + 'px')
 				}
 			}
