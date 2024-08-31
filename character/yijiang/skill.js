@@ -7925,29 +7925,44 @@ const skills = {
 		},
 	},
 	duodao: {
+		audio: 2,
 		trigger: { player: "damageEnd" },
 		filter: function (event, player) {
 			return player.countCards("he") > 0 && event.source && event.card && event.card.name == "sha";
 		},
-		direct: true,
-		//priority:5,
-		audio: 2,
-		content: function () {
-			"step 0";
-			var prompt = "弃置一张牌";
-			if (trigger.source.getEquips(1).length) prompt += "，然后获得" + get.translation(trigger.source) + "装备区中的" + get.translation(trigger.source.getEquips(1));
-			var next = player.chooseToDiscard("he", get.prompt("duodao", trigger.source), prompt);
-			next.logSkill = ["duodao", trigger.source];
-			next.set("ai", function (card) {
-				if (!_status.event.getTrigger().source.getEquip(1)) return 0;
-				if (get.attitude(_status.event.player, _status.event.getTrigger().source) <= 0) {
-					return 6 - get.value(card);
-				}
-				return 0;
+		async cost(event, trigger, player) {
+			let prompt = "弃置一张牌，然后", cards = trigger.source.getEquips(1).filter(card => {
+				return lib.filter.canBeGained(card, player, trigger.source);
 			});
-			"step 1";
-			if (result.bool && trigger.source.getEquips(1).length) {
-				player.gain(trigger.source.getEquips(1), trigger.source, "give", "bySelf");
+			if (cards.length) prompt += "获得" + get.translation(trigger.source) + "装备区中的" + get.translation(cards);
+			else prompt += "无事发生";
+			event.result = await player
+				.chooseToDiscard("he", get.prompt("duodao", trigger.source), prompt)
+				.set("ai", function (card) {
+					let eff = get.event("eff");
+					if (typeof eff === "number") return eff - get.value(card);
+					return 0;
+				})
+				.set("eff", function () {
+					let es = trigger.source.getEquips(1).filter(card => {
+						return lib.filter.canBeGained(card, player, trigger.source);
+					});
+					if (!es.length) return false;
+					if (get.attitude(player, trigger.source) > 0) return -2 * es.reduce((acc, card) => {
+						return acc + get.value(card, trigger.source);
+					}, 0);
+					return es.reduce((acc, card) => {
+						return acc + get.value(card, player);
+					}, 0);
+				}());
+		},
+		logTarget: "source",
+		async content(event, trigger, player) {
+			const cards = trigger.source.getEquips(1).filter(card => {
+				return lib.filter.canBeGained(card, player, trigger.source);
+			});
+			if (cards.length) {
+				player.gain(cards, trigger.source, "give", "bySelf");
 			}
 		},
 		ai: {
@@ -8025,29 +8040,44 @@ const skills = {
 		},
 	},
 	reduodao: {
+		audio: 2,
 		trigger: { target: "useCardToTargeted" },
 		filter: function (event, player) {
 			return event.card.name == "sha" && (get.color(event.card) == "red" ? event.player.getEquips(1).length > 0 : player.countCards("he") > 0);
 		},
-		direct: true,
-		audio: 2,
-		content: function () {
-			"step 0";
-			var prompt = "弃置一张牌";
-			if (trigger.player.getEquips(1).length) prompt += "，然后获得" + get.translation(trigger.player) + "装备区中的" + get.translation(trigger.player.getEquips(1));
-			var next = player.chooseToDiscard("he", get.prompt("reduodao", trigger.player), prompt);
-			next.logSkill = ["reduodao", trigger.player];
-			next.set("ai", function (card) {
-				if (!_status.event.getTrigger().player.getEquips(1).length) return 0;
-				if (get.attitude(_status.event.player, _status.event.getTrigger().player) * get.value(_status.event.getTrigger().player.getEquips(1)) <= 0) {
-					return 6 - get.value(card);
-				}
-				return 0;
+		async cost(event, trigger, player) {
+			let prompt = "弃置一张牌，然后", cards = trigger.player.getEquips(1).filter(card => {
+				return lib.filter.canBeGained(card, player, trigger.player);
 			});
-			"step 1";
-			if (result.bool && trigger.player.getEquips(1).length) {
-				if (!result.cards || !result.cards.length) player.logSkill("reduodao", trigger.player);
-				player.gain(trigger.player.getEquips(1), trigger.player, "give", "bySelf");
+			if (cards.length) prompt += "获得" + get.translation(trigger.player) + "装备区中的" + get.translation(cards);
+			else prompt += "无事发生";
+			event.result = await player
+				.chooseToDiscard("he", get.prompt("reduodao", trigger.player), prompt)
+				.set("ai", function (card) {
+					let eff = get.event("eff");
+					if (typeof eff === "number") return eff - get.value(card);
+					return 0;
+				})
+				.set("eff", function () {
+					let es = trigger.player.getEquips(1).filter(card => {
+						return lib.filter.canBeGained(card, player, trigger.player);
+					});
+					if (!es.length) return false;
+					if (get.attitude(player, trigger.player) > 0) return -2 * es.reduce((acc, card) => {
+						return acc + get.value(card, trigger.player);
+					}, 0);
+					return 2 * es.reduce((acc, card) => {
+						return acc + get.value(card, player);
+					}, 0);
+				}());
+		},
+		logTarget: "player",
+		async content(event, trigger, player) {
+			const cards = trigger.player.getEquips(1).filter(card => {
+				return lib.filter.canBeGained(card, player, trigger.player);
+			});
+			if (cards.length) {
+				player.gain(cards, trigger.player, "give", "bySelf");
 			}
 		},
 	},

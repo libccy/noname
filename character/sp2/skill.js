@@ -12346,6 +12346,7 @@ const skills = {
 				})
 				.set("ai", target => {
 					let trigger = get.event().getTrigger(), player = trigger.player;
+					if (get.attitude(player, target) > 0) return 0;
 					let eff = get.effect(player, { name: "guohe" }, player, get.event().player) + get.effect(target, { name: "guohe" }, player, get.event().player);
 					if (get.tag(trigger.card, "damage")) eff += get.damageEffect(target, trigger.card, trigger.player, get.event().player);
 					return eff;
@@ -12421,8 +12422,9 @@ const skills = {
 		check: function (event, player) {
 			let viewer = get.event().player,
 				user = event.player,
-				target = event.target,
-				eff = get.effect(user, { name: "guohe" }, user, viewer) + get.effect(target, { name: "guohe" }, user, viewer);
+				target = event.target;
+			if (get.attitude(player, target) > 0) return 0;
+			let eff = get.effect(user, { name: "guohe" }, user, viewer) + get.effect(target, { name: "guohe" }, user, viewer);
 			if (get.tag(event.card, "damage")) eff += get.damageEffect(target, event.card, player, viewer);
 			return eff > 0;
 		},
@@ -12457,6 +12459,7 @@ const skills = {
 			var next = trigger.player.chooseBool("是否对" + get.translation(trigger.target) + "发动【锋势】？", str + "的各一张牌，然后令" + get.translation(trigger.card) + "的伤害+1")
 				.set("ai", () => get.event().bool)
 				.set("bool", function () {
+					if (get.attitude(trigger.player, player) > 0) return 0;
 					let eff = get.effect(trigger.player, { name: "guohe" }, player, trigger.player) + get.effect(trigger.target, { name: "guohe" }, player, trigger.player);
 					if (get.tag(trigger.card, "damage")) eff += get.damageEffect(trigger.target, trigger.card, trigger.player, trigger.player);
 					return eff > 0;
