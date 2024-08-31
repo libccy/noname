@@ -2372,10 +2372,11 @@ const skills = {
 		trigger: { player: "phaseUseBegin" },
 		filter(event, player) {
 			return game.hasPlayer(target => {
-				if (target == player) return false;
 				return target.hasCard(card => {
 					if (get.position(card) == "h") return true;
-					return get.color(card) == "red" && lib.filter.canBeGained(card, player, target);
+					if (get.color(card) != "red") return false;
+					if (player == target) return true;
+					return lib.filter.canBeGained(card, player, target);
 				}, "he");
 			});
 		},
@@ -3429,7 +3430,7 @@ const skills = {
 			"step 2";
 			if (
 				target.hasCard(function (card) {
-					return lib.filter.canBeGained(card, target, player);
+					return lib.filter.canBeGained(card, player, target);
 				}, "he") &&
 				player.hasHistory("sourceDamage", function (evt) {
 					var evtx = evt.getParent("useCard");
