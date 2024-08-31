@@ -9334,7 +9334,8 @@ const skills = {
 				game.addVideo("judge2", null, event.videoId);
 				ui.arena.classList.remove("thrownhighlight");
 			}
-			let cards = [event.card].filterInD("od");
+			"step 2"
+			let cards = [event.card].filterInD();
 			if(cards.length) game.cardsGotoPile(cards, "insert");
 		},
 		ai: {

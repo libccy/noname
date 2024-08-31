@@ -38,7 +38,7 @@ const skills = {
 		onremove(player) {
 			player.removeSkill("oljiushi_gain");
 		},
-		group: ["oljiushi_use", "oljiushi_damage", "oljiushi_gain"],
+		group: ["oljiushi_use", "oljiushi_damage"],
 		subSkill: {
 			gain: {
 				audio: "oljiushi",
@@ -55,7 +55,7 @@ const skills = {
 					event.result = { bool: false };
 					if (trigger.name != "phase") {
 						player.addGaintag(trigger.cards, "reluoying");
-						let bool = player.isTurnedOver();
+						let bool = player.isTurnedOver() && player != _status.currentPhase && player.hasSkill("oljiushi", null, false);
 						player.markAuto("oljiushi_gain", trigger.cards);
 						if (bool && player.getStorage("oljiushi_gain").length >= player.maxHp) {
 							const result = await player.chooseBool("是否发动【酒诗】，将武将牌翻面？").forResult();
@@ -1081,13 +1081,13 @@ const skills = {
 		filter(event, player) {
 			const target = event.player;
 			if (target == player || !target.isIn()) return false;
-			return !target.hasHistory("sourceDamage", evt => evt.player != target);
+			return !target.hasHistory("sourceDamage", evt => evt.player != target) || !target.hasHistory("useCard", evt => evt.targets && evt.targets.some(i => i != target));
 		},
 		async cost(event, trigger, player) {
 			const target = trigger.player;
 			let num = 0;
-			if (!target.hasHistory("useCard", evt => evt.targets && evt.targets.some(i => i != target))) num++;
-			if (!target.hasHistory("sourceDamage", evt => evt.player != target)) num++;
+			if (!target.hasHistory("useCard", evt => evt.targets && evt.targets.some(i => i != target))) num += 2;
+			if (!target.hasHistory("sourceDamage", evt => evt.player != target)) num += 1;
 			const next = player.chooseButton([
 				"窃听：请选择" + (num > 1 ? "一至两" : "一") + "项",
 				[
