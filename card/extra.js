@@ -138,7 +138,7 @@ game.import("card", function () {
 						let usable = player.getCardUsable("sha");
 						if (usable < 2 && player.hasCard(i => {
 							return get.name(i, player) == "zhuge";
-						}, "h")) usable = Infinity;
+						}, "hs")) usable = Infinity;
 						let shas = Math.min(usable, player.mayHaveSha(player, "use", item, "count"));
 						if (
 							shas != 1 ||
