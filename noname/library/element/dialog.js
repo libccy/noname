@@ -2,6 +2,7 @@ import { get } from "../../get/index.js";
 import { lib } from "../index.js";
 import { _status } from "../../status/index.js";
 import { ui } from "../../ui/index.js";
+import { game } from "../../../noname.js";
 
 export class Dialog extends HTMLDivElement {
 	/** @type { HTMLDivElement } */
@@ -136,7 +137,7 @@ export class Dialog extends HTMLDivElement {
 			itemContainer.Observer = new MutationObserver((mutationsList) => {
 				for (const mutation of mutationsList) {
 					if (mutation.type === 'childList') {
-						checkOverflow(itemOption, itemContainer, Array.from(itemContainer.querySelectorAll('.item')), mutation.addedNodes?.length)
+						checkOverflow(itemOption, itemContainer, Array.from(itemContainer.querySelectorAll('.item')))
 					}
 				}
 			})
@@ -165,7 +166,7 @@ export class Dialog extends HTMLDivElement {
 				})
 			}
 		}
-		function checkOverflow(itemOption, itemContainer, addedItems, flag = false) {
+		function checkOverflow(itemOption, itemContainer, addedItems) {
 			if (itemOption.overflow == 'scroll') {
 				itemContainer.css({ overflowX: 'scroll' })
 			} else if (itemOption.overflow == 'hidden') {
@@ -173,14 +174,14 @@ export class Dialog extends HTMLDivElement {
 			} else if (addedItems?.length) {
 				//计算压缩折叠的量
 				const gap = 3
-				const L = itemContainer.originWidth - 6
-				const W = addedItems[0].getBoundingClientRect().width
+				const L = (itemContainer.originWidth - 2 * gap) / game.documentZoom
+				const W = addedItems[0].getBoundingClientRect().width / game.documentZoom
 				let n = addedItems.length
-
+				const r = 16 //为偏移留出的空间，如果r为0，可能会把前面的卡牌全遮住
 				if (n * W + (n + 1) * gap < L) {
 					itemContainer.style.setProperty('--ml', gap + 'px')
 				} else {
-					const ml = Math.min(((n * W - L + gap) / (n - 1)), W - 8)
+					const ml = Math.min(((n * W - L + gap) / (n - 1)), W - r / game.documentZoom)
 					itemContainer.style.setProperty('--ml', "-" + ml + 'px')
 				}
 			}
