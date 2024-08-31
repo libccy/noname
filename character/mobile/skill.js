@@ -11232,7 +11232,15 @@ const skills = {
 			return "获得其装备区中的" + get.translation(cards);
 		},
 		check: function (event, player) {
-			return (get.attitude(player, event.source) + 0.1) * get.value(event.source.getEquip(1), event.source);
+			let es = event.source.getEquips(1).filter(card => {
+				return lib.filter.canBeGained(card, player, event.source);
+			});
+			if (get.attitude(player, event.source) > 0) return es.reduce((acc, card) => {
+				return acc + get.value(card, event.source);
+			}, 0) < 0 || event.source.hasSkillTag("noe");
+			return es.reduce((acc, card) => {
+				return acc + get.value(card, player);
+			}, 0);
 		},
 		content: function () {
 			var source = trigger.source;
