@@ -715,6 +715,9 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "xinjilve"
+		},
 	},
 	xinbaiyin: {
 		audio: "sbaiyin",
@@ -900,6 +903,9 @@ const skills = {
 					if (skills.length) await player.addSkills(skills);
 				},
 			},
+		},
+		ai: {
+			notemp: true
 		},
 	},
 	//十周年神华佗
@@ -6444,7 +6450,9 @@ const skills = {
 			var cards = player.getExpansions(skill);
 			if (cards.length) player.loseToDiscardpile(cards);
 		},
-		ai: { combo: "dengji" },
+		ai: {
+			notemp: true
+		},
 	},
 	dengji: {
 		audio: 2,
@@ -7248,8 +7256,6 @@ const skills = {
 		trigger: { player: "damageEnd" },
 		forced: true,
 		group: "renjie2",
-		notemp: true,
-		//mark:true,
 		filter(event) {
 			return event.num > 0;
 		},
@@ -7264,7 +7270,7 @@ const skills = {
 		ai: {
 			maixie: true,
 			maixie_hp: true,
-			combo: "sbaiyin",
+			combo: "jilue",
 			effect: {
 				target(card, player, target) {
 					if ((!target.hasSkill("sbaiyin") && !target.hasSkill("jilue")) || !target.hasFriend()) return;
@@ -7781,7 +7787,9 @@ const skills = {
 			},
 		},
 		group: ["qixing2"],
-		ai: { combo: "dawu" },
+		ai: {
+			notemp: true
+		},
 	},
 	qixing2: {
 		trigger: { player: "phaseDrawAfter" },
@@ -7876,7 +7884,9 @@ const skills = {
 			"step 2";
 			player.loseToDiscardpile(result.links);
 		},
-		ai: { combo: "qixing" },
+		ai: {
+			combo: "qixing"
+		},
 	},
 	dawu2: {
 		charlotte: true,
@@ -7945,7 +7955,9 @@ const skills = {
 			"step 2";
 			player.loseToDiscardpile(result.links);
 		},
-		ai: { combo: "qixing" },
+		ai: {
+			combo: "qixing"
+		},
 	},
 	kuangfeng2: {
 		charlotte: true,
@@ -8861,7 +8873,6 @@ const skills = {
 		intro: {
 			content: "当前有#个标记",
 		},
-		//mark:true,
 		trigger: {
 			player: "damageAfter",
 			source: "damageSource",
@@ -8923,7 +8934,7 @@ const skills = {
 			}
 		},
 		ai: {
-			combo: "nzry_junlve",
+			notemp: true
 		},
 	},
 	nzry_dinghuo: {

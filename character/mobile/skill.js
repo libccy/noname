@@ -5864,6 +5864,7 @@ const skills = {
 					if (card.name == "lebu" || card.name == "bingliang") return 0.5;
 				},
 			},
+			combo: "fenli"
 		},
 	},
 	// 彭羕
@@ -9600,35 +9601,20 @@ const skills = {
 		trigger: { player: ["damageEnd", "phaseUseEnd"] },
 		frequent: true,
 		locked: false,
-		notemp: true,
 		filter: function (event, player) {
 			if (event.name == "phaseUse") return player.countCards("h") > player.hp;
 			return event.num > 0;
 		},
-		content: function () {
-			"step 0";
-			event.count = trigger.num || 1;
-			"step 1";
-			event.count--;
-			player.draw();
-			"step 2";
+		getIndex(event, player) {
+			return event.num;
+		},
+		async content(event, trigger, player) {
+			await player.draw();
 			if (player.countCards("h")) {
-				player.chooseCard("将一张手牌置于武将牌上作为“权”", true);
-			} else {
-				event.goto(4);
-			}
-			"step 3";
-			if (result.cards && result.cards.length) {
-				player.addToExpansion(result.cards, player, "give").gaintag.add("quanji");
-			}
-			"step 4";
-			if (event.count > 0 && player.hasSkill(event.name) && !get.is.blocked(event.name, player)) {
-				player.chooseBool(get.prompt2("requanji")).set("frequentSkill", event.name);
-			} else event.finish();
-			"step 5";
-			if (result.bool) {
-				player.logSkill("requanji");
-				event.goto(1);
+				const result = await player.chooseCard("将一张手牌置于武将牌上作为“权”", true).forResult();
+				if (result.bool && result.cards.length) {
+					await player.addToExpansion(result.cards, player, "give").gaintag.add("quanji");
+				}
 			}
 		},
 		mod: {
@@ -9647,6 +9633,7 @@ const skills = {
 		ai: {
 			maixie: true,
 			maixie_hp: true,
+			notemp: true,
 			threaten: 0.8,
 			effect: {
 				target: function (card, player, target) {
@@ -15102,7 +15089,9 @@ const skills = {
 				}
 			},
 		},
-		ai: { notemp: true },
+		ai: {
+			notemp: true
+		},
 		group: ["rebiaozhao2", "rebiaozhao3"],
 	},
 	rebiaozhao2: {

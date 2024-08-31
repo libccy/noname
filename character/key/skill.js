@@ -9052,8 +9052,7 @@ const skills = {
 		},
 		group: "shiina_retieji",
 		ai: {
-			notemp: true,
-			combo: "shiina_feiyan",
+			combo: "shiina_qingshen",
 		},
 	},
 	shiina_retieji: {

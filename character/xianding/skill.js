@@ -772,6 +772,7 @@ const skills = {
 				})
 				.forResult();
 		},
+		usable: 1,
 		async content(event, trigger, player) {
 			const target = event.targets[0];
 			target.addSkill("dcjingyin_tag");
@@ -11141,6 +11142,7 @@ const skills = {
 		},
 		ai: {
 			combo: "dclingfang",
+			neg: true
 		},
 	},
 	//袁姬

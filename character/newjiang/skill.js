@@ -1525,6 +1525,7 @@ const skills = {
 			return (
 				evtx.name == "useCard" &&
 				evtx.card.name == "sha" &&
+				evtx.card.isCard &&
 				event.cards.filterInD("d").length &&
 				game.hasPlayer2(current =>
 					current.hasHistory("sourceDamage", evtxx => {

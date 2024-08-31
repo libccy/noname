@@ -1790,7 +1790,9 @@ const skills = {
 			var cards = player.getExpansions(skill);
 			if (cards.length) player.loseToDiscardpile(cards);
 		},
-		ai: { combo: "yaohu" },
+		ai: {
+			combo: "yaohu"
+		},
 	},
 	yaohu: {
 		audio: "yinlang",
@@ -1852,7 +1854,9 @@ const skills = {
 				player.markSkill("yaohu");
 			}
 		},
-		ai: { combo: "jutu" },
+		ai: {
+			combo: "jutu"
+		},
 		intro: { content: "已选择了$势力" },
 		group: "yaohu_gain",
 		subSkill: {
@@ -6247,7 +6251,7 @@ const skills = {
 			content: "mark",
 		},
 		ai: {
-			combo: "spsanchen",
+			combo: "spmiewu",
 			threaten: 3.6,
 		},
 	},
@@ -6268,7 +6272,7 @@ const skills = {
 			player.addSkills("spmiewu");
 		},
 		ai: {
-			combo: "wuku",
+			combo: "spwuku",
 		},
 		derivation: "spmiewu",
 	},

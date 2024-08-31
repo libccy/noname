@@ -2362,7 +2362,7 @@ const skills = {
 		},
 		group: ["nzry_mingren_1", "nzry_mingren_2"],
 		ai: {
-			combo: "nzry_zhenliang",
+			notemp: true
 		},
 		subSkill: {
 			1: {
@@ -3681,7 +3681,7 @@ const skills = {
 			},
 			nodiscard: true,
 			nolose: true,
-			combo: "jixi"
+			notemp: true
 		},
 	},
 	zaoxian: {

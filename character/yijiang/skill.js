@@ -1006,6 +1006,10 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "xinfuli",
+			halfneg: true
+		},
 	},
 	xinjunxing: {
 		inherit: "junxing",
@@ -1787,6 +1791,9 @@ const skills = {
 				},
 			},
 		},
+		ai: {
+			combo: "pingkou"
+		},
 	},
 	pingkou: {
 		audio: 2,
@@ -1824,6 +1831,7 @@ const skills = {
 					if (card.name == "lebu" || card.name == "bingliang") return 0.5;
 				},
 			},
+			combo: "fenli"
 		},
 	},
 	xinanguo: {
@@ -2723,6 +2731,9 @@ const skills = {
 			maxHandcard: function (player, num) {
 				return num + player.getExpansions("bizhuan").length;
 			},
+		},
+		ai: {
+			notemp: true
 		},
 	},
 	tongbo: {
@@ -8599,7 +8610,11 @@ const skills = {
 		content: function () {
 			"step 0";
 			player.draw();
-			player.chooseToDiscard("he", true);
+			player.chooseToDiscard("he", true).set("ai", card => {
+				let player = get.event("player");
+				if (get.color(card, player)) return 7 - get.value(card, player);
+				return 4 - get.value(card, player);
+			});
 			"step 1";
 			if (!result.bool) {
 				event.finish();
@@ -9679,7 +9694,6 @@ const skills = {
 		trigger: { player: "damageEnd" },
 		frequent: true,
 		locked: false,
-		notemp: true,
 		filter: function (event) {
 			return event.num > 0;
 		},
@@ -9725,6 +9739,7 @@ const skills = {
 		ai: {
 			maixie: true,
 			maixie_hp: true,
+			notemp: true,
 			threaten: 0.8,
 			effect: {
 				target: function (card, player, target) {

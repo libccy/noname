@@ -6035,8 +6035,6 @@ const skills = {
 		},
 		usable: 1,
 		frequent: true,
-		locked: false,
-		notemp: true,
 		marktext: "功",
 		init(player) {
 			player.storage.jugong = [];

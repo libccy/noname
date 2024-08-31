@@ -5922,6 +5922,7 @@ const skills = {
 				.set("ai", card => {
 					const player = get.event("player");
 					if (!game.hasPlayer(target => get.attitude(player, target) < 0)) return 0;
+					if (get.suit(card, player) == "diamond") return 8 - get.value(card);
 					return 7.5 - get.value(card);
 				})
 				.set("logSkill", "dragchaojue")
@@ -7532,7 +7533,7 @@ const skills = {
 			content: "mark",
 		},
 		ai: {
-			combo: "pksanchen",
+			combo: "pkmiewu",
 			threaten: 3.6,
 		},
 	},
@@ -9185,6 +9186,9 @@ const skills = {
 			maxHandcard(player, num) {
 				return num + player.getExpansions("zyquanji").length;
 			},
+		},
+		ai: {
+			notemp: true
 		},
 	},
 	zypaiyi: {
