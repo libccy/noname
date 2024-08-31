@@ -10,6 +10,7 @@ const characters = {
 	bianyue: ["female", "wei", 3, ["dcbizu", "dcwuxie"]],
 	zhupeilan: ["female", "wu", 3, ["dccilv", "dctongdao"]],
 	dc_sb_zhangxiu: ["male", "qun", 4, ["dcsbfuxi", "dcsbhaoyi"]],
+	dc_sb_hucheer: ["male", "qun", 4, ["dcsbkongwu"]],
 	dc_sb_guanping: ["male", "shu", 4, ["dcsbwuwei"]],
 	dc_sb_caoang: ["male", "wei", 4, ["dcsbfengmin", "dcsbzhiwang"]],
 	dc_sb_dianwei: ["male", "wei", "4/5", ["dcsbkuangzhan", "dcsbkangyong"]],

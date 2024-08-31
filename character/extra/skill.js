@@ -9127,8 +9127,9 @@ const skills = {
 				},
 				forced: true,
 				filter(event, player) {
-					if (event.turn === player || !player.hasDisabledSlot()) return false;
+					if (!event.turn || event.turn === player || !player.hasDisabledSlot()) return false;
 					const opposite = event.player === player ? event.target : event.player;
+					if (!opposite.isDamaged()) return false;
 					return opposite && opposite.isIn() && opposite.inRangeOf(player);
 				},
 				content() {
@@ -9157,6 +9158,7 @@ const skills = {
 							return false;
 						}
 					}
+					if (!opposite.isDamaged()) return false;
 					return opposite && opposite.isIn() && opposite.inRangeOf(player);
 				},
 				forced: true,
@@ -9171,7 +9173,7 @@ const skills = {
 				filter(event, player) {
 					if (!player.hasDisabledSlot()) return false;
 					const opposite = event.source;
-					if (!event.source.isDamaged()) return false;
+					if (!opposite.isDamaged()) return false;
 					return opposite && opposite.isIn() && opposite.inRangeOf(player);
 				},
 				content() {

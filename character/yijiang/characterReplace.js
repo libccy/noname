@@ -1,5 +1,5 @@
 const characterReplaces = {
-	caozhi: ["caozhi", "dc_caozhi", "re_caozhi", "ps_caozhi"],
+	caozhi: ["caozhi", "dc_caozhi", "re_caozhi", "ps_caozhi", "ol_caozhi"],
 	zhangchunhua: ["zhangchunhua", "re_zhangchunhua", "ol_zhangchunhua", "jin_zhangchunhua", "star_zhangchunhua"],
 	yujin: ["yujin", "yujin_yujin", "ol_yujin", "sb_yujin", "xin_yujin", "re_yujin", "jd_sb_yujin", "tw_yujin"],
 	dc_xushu: ["re_xushu", "dc_xushu", "xia_xushu"],

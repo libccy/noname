@@ -91,7 +91,7 @@ const translates = {
 	ol_caifuren: "OL界蔡夫人",
 	ol_caifuren_prefix: "OL界",
 	olqieting: "窃听",
-	olqieting_info: "其他角色的回合结束后，若其本回合未对其他角色造成伤害，你可以选择一项：1.将其装备区的一张牌置入你的装备区；2.摸一张牌（若其本回合未对其他角色使用过牌，可额外选择一项）。",
+	olqieting_info: "其他角色的回合结束后，若其本回合未对其他角色造成伤害/使用过牌，你可以选择一项/至多两项：1.将其装备区的一张牌置入你的装备区；2.摸一张牌。",
 	ol_liru: "OL界李儒",
 	ol_liru_prefix: "OL界",
 	olmieji: "灭计",

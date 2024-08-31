@@ -2,6 +2,285 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//荀彧
+	staranshu: {
+		audio: 2,
+		trigger: {
+			global: "roundStart",
+		},
+		filter(event, player) {
+			return game.roundNumber > 1;
+		},
+		async cost(event, trigger, player) {
+			game.players.forEach(current => current.removeSkill("staranshu_remove"));
+			const cards = Array.from(ui.discardPile.childNodes).filter(card => get.type(card) == "basic");
+			if (cards.length) {
+				const result = await player
+					.chooseButton([get.prompt2("staranshu"), cards], [1, Infinity])
+					.set("filterButton", button => {
+						if (ui.selected.buttons?.some(buttonx => buttonx.link.name == button.link.name)) return false;
+						return true;
+					})
+					.set("ai", card => Math.random())
+					.forResult();
+				event.result = {
+					bool: result.bool,
+					cards: result.links,
+				};
+			}
+			else event.result = { bool: false };
+		},
+		async content(event, trigger, player) {
+			game.players.forEach(current => current.addTempSkill("staranshu_remove", "roundStart"));
+			await game.cardsGotoPile(event.cards, "insert");
+			player
+				.when({ global: "useCardToTargeted" })
+				.filter(evt => evt.card?.anshu && evt?.targets?.length == evt.getParent()?.triggeredTargets4?.length)
+				.then(() => {
+					delete trigger.card.anshu;
+					const targets = game.filterPlayer(current => current == player || current.isDamaged());
+					if (targets.length > 1) {
+						player
+							.chooseTarget("请选择【五谷丰登】的起点", true, function (card, player, target) {
+								return get.event("targets").includes(target);
+							})
+							.set("targets", targets)
+							.set("ai", target => {
+								return get.attitude(get.player(), target);
+							});
+					}
+				})
+				.then(() => {
+					let target = player;
+					if (result?.targets) target = result.targets[0];
+					trigger.getParent().targets = trigger.getParent().targets.sortBySeat(target);
+					trigger.getParent().triggeredTargets4 = trigger.getParent().triggeredTargets4.sortBySeat(target);
+				});
+			await player.chooseUseTarget({ name: "wugu", isCard: true, anshu: true }, true);
+		},
+		group: "staranshu_draw",
+		subSkill: {
+			draw: {
+				audio: "staranshu",
+				trigger: {
+					global: "phaseEnd",
+				},
+				getIndex(event, player) {
+					return game.filterPlayer(current => {
+						return current.hasHistory("lose", evt => {
+							for (var i in evt.gaintag_map) {
+								if (evt.gaintag_map[i].includes("staranshu")) return true;
+							}
+							return false;
+						});
+					}).sortBySeat();
+				},
+				filter(event, player, name, target) {
+					return target.countCards("h") < target.maxHp;
+				},
+				logTarget(event, player, name, target) {
+					return target;
+				},
+				prompt2: "令其将手牌摸至体力上限（至多摸五张）",
+				async content(event, trigger, player) {
+					const target = event.targets[0];
+					const num = Math.min(5, target.maxHp - target.countCards("h"));
+					if (num > 0) await target.draw(num);
+				},
+			},
+			remove: {
+				trigger: {
+					player: "gainAfter",
+				},
+				filter(event, player) {
+					return event.getParent("staranshu", true) && event.getParent("wugu", true);
+				},
+				charlotte: true,
+				direct: true,
+				onremove(player) {
+					player.removeGaintag("staranshu");
+				},
+				async content(event, trigger, player) {
+					player.addGaintag(trigger.cards, "staranshu");
+				},
+			},
+		},
+	},
+	starkuangzuo: {
+		audio: 2,
+		enable: "phaseUse",
+		limited: true,
+		skillAnimation: true,
+		animationColor: "water",
+		filterTarget: true,
+		async content(event, trigger, player) {
+			player.awakenSkill("starkuangzuo");
+			const target = event.target;
+			await target.addSkills("starchengfeng");
+			if (target.isZhu2() && !target.getSkills(null, false, false).filter(skill => {
+				var info = get.info(skill);
+				if (!info || info.charlotte || !info.zhuSkill || get.skillInfoTranslation(skill, player).length == 0) return false;
+				return true;
+			}).length) await target.addSkills("startongyin");
+			const targets = game.filterPlayer(current => current != target && current.countCards("he"));
+			let targetx;
+			if (!targets.length) return;
+			else if (targets.length == 1) targetx = targets[0];
+			else {
+				const result = await player
+					.chooseTarget(`令另一名角色将牌置于${get.translation(target)}武将牌上`, true, function (card, player, target) {
+						return target != get.event("gainer") && target.countCards("he");
+					})
+					.set("gainer", target)
+					.set("ai", target => {
+						return get.attitude(get.player(), target) * target.countCards("he");
+					})
+					.forResult();
+				if (result.bool) targetx = result.targets[0];
+				else return;
+			}
+			let suits = [];
+			for (let card of targetx.getCards("he")) suits.add(get.suit(card));
+			const result = await targetx
+				.chooseCard("he", true, suits.length)
+				.set("complexCard", true)
+				.set("filterCard", card => {
+					return ui.selected.cards.every(cardx => get.suit(cardx) != get.suit(card));
+				})
+				.forResult();
+			if (result.bool) {
+				const next = target.addToExpansion(result.cards, targetx, "give");
+				next.gaintag.add("starchengfeng");
+				await next;
+			}
+		},
+		ai: {
+			order: 10,
+			result: {
+				target: 1,
+			},
+		},
+		derivation: ["starchengfeng", "startongyin"],
+	},
+	starchengfeng: {
+		marktext: "匡",
+		intro: {
+			name: "匡祚",
+			markcount: "expansion",
+			content: "expansion",
+		},
+		audio: 2,
+		usable: 1,
+		enable: "chooseToUse",
+		filter(event, player) {
+			for (const name of ["shan", "wuxie"]) {
+				if (name == "wuxie") {
+					let info = event.info_map;
+					if (info && player != info.target) continue;
+				}
+				else if (!event.respondTo) continue;
+				const color = name == "shan" ? "red" : "black";
+				if (!event.filterCard(get.autoViewAs({ name: name }, "unsure"), player, event)) continue;
+				if (player.getExpansions("starchengfeng").some(card => get.color(card) == color)) return true;
+			}
+			return false;
+		},
+		chooseButton: {
+			dialog(event, player) {
+				return ui.create.dialog("承奉", player.getExpansions("starchengfeng"), "hidden");
+			},
+			filter(button, player) {
+				const card = button.link;
+				if (!game.checkMod(card, player, "unchanged", "cardEnabled2", player)) return false;
+				const evt = _status.event.getParent();
+				const name = get.color(card) == "red" ? "shan" : "wuxie";
+				return evt.filterCard(get.autoViewAs({ name: name }, [card]), player, evt);
+			},
+			check: function (button) {
+				if (_status.event.getParent().type != "phase") return 1;
+				var player = _status.event.player;
+				return player.getUseValue({
+					name: button.link[2],
+					nature: button.link[3],
+				});
+			},
+			backup: function (links, player) {
+				return {
+					audio: "starchengfeng",
+					selectCard: -1,
+					position: "x",
+					filterCard: card => card == lib.skill.starchengfeng_backup.card,
+					viewAs(cards, player) {
+						const name = get.color(cards[0]) == "red" ? "shan" : "wuxie";
+						return { name: name };
+					},
+					card: links[0],
+				};
+			},
+			prompt: function (links, player) {
+				return "将一张基本牌当做" + get.translation(links[0][2]) + "使用";
+			},
+		},
+		hiddenCard: function (player, name) {
+			const color = name == "shan" ? "red" : "black";
+			if (player.getExpansions("starchengfeng").some(card => get.color(card) == color)) return true;
+		},
+		ai: {
+			respondShan: true,
+			skillTagFilter: function (player, tag) {
+				if (player.getExpansions("starchengfeng").some(card => get.color(card) == "red")) return true;
+			},
+			order: 1,
+			result: {
+				player: function (player) {
+					if (_status.event.dying) return get.attitude(player, _status.event.dying);
+					return 1;
+				},
+			},
+		},
+		group: "starchengfeng_use",
+		subSkill: {
+			backup: {},
+			use: {
+				trigger: { player: "useCardAfter" },
+				filter(event, player) {
+					let colors = [];
+					for (let card of player.getExpansions("starchengfeng")) colors.add(get.color(card));
+					return event.skill == "starchengfeng_backup" && colors.length < 2;
+				},
+				prompt2: "将牌堆顶一张牌置入“匡祚”",
+				content() {
+					player.addToExpansion(get.cards(1), "gain2").gaintag.add("starchengfeng");
+				},
+			},
+		},
+	},
+	startongyin: {
+		audio: 2,
+		trigger: {
+			player: "damageEnd",
+		},
+		filter(event, player) {
+			if (!event.source || !event.card) return false;
+			if (event.source == player) return false;
+			if (event.source.group == player.group) return event.cards?.length;
+			return event.source.countCards("he");
+		},
+		zhuSkill: true,
+		logTarget: "source",
+		async content(event, trigger, player) {
+			let next;
+			if (trigger.source.group == player.group) next = player.addToExpansion(trigger.cards, "gain2");
+			else {
+				const result = await player
+					.choosePlayerCard(trigger.source, "he", true)
+					.forResult();
+				next = player.addToExpansion(result.cards, trigger.source, "give");
+			}
+			next.gaintag.add("starchengfeng");
+			await next;
+		},
+	},
 	//马铁
 	dczhuiwang: {
 		mod: {

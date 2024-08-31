@@ -455,11 +455,11 @@ const skills = {
 		async content(event, trigger, player) {
 			const result = await player
 				.judge(card => {
-					return get.suit(card) == "spade" ? -2 : 2;
+					return get.color(card) == "red" ? 2 : -2;
 				})
 				.set("judge2", result => Boolean(result.bool))
 				.forResult();
-			if (result.suit != "spade") trigger.num--;
+			if (result.color == "red") trigger.num--;
 		},
 		ai: {
 			combo: "mbquchong",
