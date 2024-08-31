@@ -416,7 +416,7 @@ game.import("card", function () {
 									target.hasSkillTag("filterDamage", null, {
 										player: player,
 										card: card,
-										jiu: true,
+										jiu: player.hasSkill("jiu")
 									})
 								) num = 1;
 								return odds * eff * num;
@@ -432,7 +432,7 @@ game.import("card", function () {
 									target.hasSkillTag("filterDamage", null, {
 										player: player,
 										card: card,
-										jiu: true,
+										jiu: player.hasSkill("jiu")
 									})
 								)
 									eff = -0.5;
