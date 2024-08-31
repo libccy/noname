@@ -1438,13 +1438,13 @@ export const Content = {
 				if (target) {
 					if (!target.copy) {
 						target.copy = target.cloneNode(true);
-						target.copy.style.opacity = "0.5";
+						target.copy.style.opacity = "0.75";
 						target.copy.style.pointerEvents = "none";
 					}
 					touchStartX = (e instanceof MouseEvent ? e.clientX : e.touches[0].clientX) / game.documentZoom;
 					touchStartY = (e instanceof MouseEvent ? e.clientY : e.touches[0].clientY) / game.documentZoom;
-					elementOffsetX = target.offsetLeft - touchStartX;
-					elementOffsetY = target.offsetTop - touchStartY;
+					elementOffsetX = target.getBoundingClientRect().x / game.documentZoom - touchStartX;
+					elementOffsetY = target.getBoundingClientRect().y / game.documentZoom - touchStartY;
 					currentElement = target;
 					e.stopPropagation();
 				}
@@ -1459,6 +1459,7 @@ export const Content = {
 			 * @param { TouchEvent | MouseEvent } e
 			 */
 			var onDrag = function (e) {
+
 				if (event.isPlayingAnimation) return;
 				if (e instanceof MouseEvent) {
 					if (e.which != 1) return;
@@ -1491,10 +1492,18 @@ export const Content = {
 					copy.style.position = "absolute";
 					copy.style.transition = "none";
 					copy.style.zIndex = "100";
+					copy.css({
+						boxShadow: '0px 0px 7px 2px rgba(233, 30, 77, 0.95)'
+					})
 					ui.window.appendChild(copy);
 				}
-				copy.style.left = `${(e instanceof MouseEvent ? e.clientX : e.touches[0].clientX) / game.documentZoom}px`;
-				copy.style.top = `${(e instanceof MouseEvent ? e.clientY : e.touches[0].clientY) / game.documentZoom}px`;
+				e = e instanceof MouseEvent ? e : e.touches[0]
+
+				const ex = e.clientX / game.documentZoom
+				const ey = e.clientY / game.documentZoom
+				copy.style.left = `${(ex + elementOffsetX)}px`;
+				copy.style.top = `${(ey + elementOffsetY)}px`;
+
 			};
 
 			var dragEnd = function (e) {
@@ -1536,6 +1545,21 @@ export const Content = {
 				} else {
 					if (!filterMove(card, ui.selected.guanxing_button, event.moved)) return;
 				}
+				//后续这里可以增加拖动到空白位置的效果
+				/*
+
+				 if (拖动到空白) {
+					game.$elementGoto().then(){
+						delete ui.selected.guanxing_button;
+						event.isPlayingAnimation = false;
+						updateButtons();
+					}
+					return
+
+				
+				}
+				
+				*/
 				// FLIP动画
 				// first
 				buttonss.forEach(btn => {
@@ -1657,6 +1681,7 @@ export const Content = {
 				}
 			};
 			event.custom.replace.confirm = function (bool) {
+				if (event.isPlayingAnimation) return
 				if (bool)
 					event._result = {
 						bool: true,
