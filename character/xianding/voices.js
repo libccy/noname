@@ -1,4 +1,7 @@
 export default {
+	"#dcsbkongwu1": "莫说兵器，取汝首级也易如反掌。",
+	"#dcsbkongwu2": "臂有千斤力，何惧万人敌。",
+	"#dc_sb_hucheer:die": "典……典将军，您还没睡啊。",
 	"#xinfu_xionghuo1": "此镬加之于你，定有所伤！",
 	"#xinfu_xionghuo2": "凶镬沿袭，怎会轻易无伤？",
 	"#xinfu_shajue1": "杀伐决绝，不留后患。",
