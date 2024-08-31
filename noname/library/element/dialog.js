@@ -225,7 +225,7 @@ export class Dialog extends HTMLDivElement {
 		}
 		//添加元素到子容器中，并返回添加后的元素
 		function addItemToItemContainer(item, itemContainer, itemOption) {
-			if (!item) {
+			if (!item || (Array.isArray(item) && !item.length)) {
 				itemContainer.classList.add('popup')
 				return
 			}
