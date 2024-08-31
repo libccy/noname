@@ -1,9 +1,57 @@
+/* addNewRow的对话框的样式 */
 .dialog:has(.row-container) {
     --bgColor: #2f2f3557;
     width: 80%;
     /* background: var(--bgColor); */
     left: 10%;
     border-radius: 10px;
+
+    .row-container {
+        display: grid;
+        height: fit-content;
+        margin: 10px auto !important;
+        width: 95%;
+    }
+
+    .row-container>* {
+        position: relative;
+    }
+
+    .item-container>.caption {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: initial;
+        flex-wrap: wrap;
+        align-content: center
+    }
+
+    .item-container:has(.caption) {
+        border: none;
+    }
+
+    .item-container {
+        /* border: solid 2px #a5a29db5; */
+        width: 90%;
+        height: 95%;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        border-radius: 10px;
+        padding: 3px 3px;
+        overflow: auto;
+        max-width: 90%;
+
+    }
+
+    .item-container>* {
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .item-container>.item:not(:first-of-type) {
+        margin-left: var(--ml, 3px);
+    }
 }
 
 .dialog:has(.row-container):not(.fullheight) {
@@ -21,50 +69,8 @@
 
 }
 
-
-.row-container {
-    display: grid;
-    height: fit-content;
-    margin: 10px auto !important;
-    width: 95%;
-}
-
-.row-container>* {
-    position: relative;
-}
-
-.item-container>.caption {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: initial;
-    flex-wrap: wrap;
-    align-content: center
-}
-
-.item-container:has(.caption) {
-    border: none;
-}
-
-.item-container {
-    /* border: solid 2px #a5a29db5; */
-    width: 90%;
-    height: 95%;
-    margin: auto;
-    display: flex;
-    justify-content: center;
-    border-radius: 10px;
-    padding: 3px 3px;
-    overflow: auto;
-    max-width: 90%;
-
-}
-
-.item-container>* {
-    flex-shrink: 0;
-    position: relative;
-}
-
-.item-container>.item:not(:first-of-type) {
-    margin-left: var(--ml, 3px);
+/* 自由选将搜索框中文字的样式 */
+.searcher.caption>input::placeholder {
+    font-weight: lighter;
+    color: rgba(126, 114, 114, 0.724)
 }
