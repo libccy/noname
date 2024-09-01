@@ -2,7 +2,7 @@
 .dialog.addNewRow {
     --bgColor: #2f2f3557;
     width: 80%;
-    /* background: var(--bgColor); */
+
     left: 10%;
     border-radius: 10px;
 }
@@ -27,10 +27,8 @@
     align-content: center
 }
 
-
-
 .dialog.addNewRow .item-container {
-    
+
     width: 90%;
     height: 95%;
     margin: auto;
@@ -61,7 +59,6 @@
     /* background-color: var(--bgColor); */
 }
 
-
 /* 自由选将搜索框中文字的样式 */
 .searcher.caption>input::placeholder {
     font-weight: lighter;
@@ -69,157 +66,163 @@
 }
 
 /*记牌器相关的样式*/
-.popupContainer:has(.deckMonitor) {
-    * {
-        text-shadow: none;
-        box-sizing: border-box;
-    }
+.popupContainer.deckMonitor {
+
 
     width: 100%;
     height: 100%;
     background-color: rgb(44 39 39 / 38%);
     z-index: 9;
 
-    .deckMonitor {
-        --bgColor: rgb(87 151 164);
-        width: 80%;
-        height: 80%;
-        background-color: var(--bgColor);
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-
-        .title {
-            width: 100%;
-            height: 10%;
-            top: 0%;
-            background-color: var(--bgColor);
-            font-size: 2em;
-            color: #fff5f5;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            span {
-                text-decoration: underline;
-                font-size: 0.8em;
-                color: yellow;
-                font-weight: lighter;
-
-            }
-        }
-
-        .contentContainer {
-            width: 100%;
-            height: 90%;
-            bottom: 0%;
-            display: flex;
-            justify-content: space-around;
-            background: #59bac4;
-            padding: 5px;
-            box-sizing: border-box;
-
-            * {
-                position: relative;
-            }
 
 
-            .columnContainer {
-                background-color: #9137c0;
-                height: 100%;
-                flex-grow: 1;
-                flex-shrink: 1;
-                flex-basis: 100px;
-                margin: 0 5px;
-                padding: 3px;
-                display: flex;
-                flex-direction: column;
-                box-sizing: border-box;
+}
 
-                .subtitle {
-                    width: 100%;
-                    text-align: center;
-                    flex-grow: 0;
-                    height: 10%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    font-size: 1.2em;
-                    flex-shrink: 0;
+.popupContainer.deckMonitor * {
+    text-shadow: none;
+    box-sizing: border-box;
+}
+
+.popupContainer.deckMonitor .deckMonitor {
+    --bgColor: rgb(87 151 164);
+    width: 80%;
+    height: 80%;
+    background-color: var(--bgColor);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 
 
-                }
+}
+
+.popupContainer.deckMonitor .deckMonitor .title {
+    width: 100%;
+    height: 10%;
+    top: 0%;
+    background-color: var(--bgColor);
+    font-size: 2em;
+    color: #fff5f5;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
 
-                .itemContainer {
-                    display: flex;
-                    flex-direction: column;
-                    flex-grow: 1;
-                    align-items: center;
-                    overflow: auto;
+}
+
+.popupContainer.deckMonitor .deckMonitor .title span {
+    text-decoration: underline;
+    font-size: 0.8em;
+    color: yellow;
+    font-weight: lighter;
+
+}
+
+.popupContainer.deckMonitor .deckMonitor .contentContainer {
+    width: 100%;
+    height: 90%;
+    bottom: 0%;
+    display: flex;
+    justify-content: space-around;
+    background: #59bac4;
+    padding: 5px;
+    box-sizing: border-box;
+
+}
+
+.popupContainer.deckMonitor .deckMonitor .contentContainer * {
+    position: relative;
+}
+
+.popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer {
+    background-color: #9137c0;
+    height: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 100px;
+    margin: 0 5px;
+    padding: 3px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+
+}
+
+.popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .subtitle {
+    width: 100%;
+    text-align: center;
+    flex-grow: 0;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    flex-shrink: 0;
+
+}
+
+.popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .itemContainer {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    align-items: center;
+    overflow: auto;
+}
+
+.popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .itemContainer .itemCount {
+    display: flex;
+    flex-grow: 1;
+    width: 30%;
+    flex-shrink: 0;
+    overflow: hidden;
+    font-size: 0.9em;
+
+}
+
+.popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .itemContainer .item {
+
+    background-color: #2f2e2e;
+    display: flex;
+    width: 94%;
+    margin-top: 4px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    align-items: center;
+    border-radius: 3px;
+    transition: 0.2s;
 
 
+}
 
-                    .item {
+.popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .itemContainer .item:hover {
+    box-shadow: 0 0 4px 3px yellow;
+}
 
-                        background-color: #2f2e2e;
-                        display: flex;
-                        width: 94%;
-                        margin-top: 4px;
-                        padding: 2px 5px;
-                        border-radius: 3px;
-                        align-items: center;
-                        border-radius: 3px;
-                        transition: 0.2s;
+.popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .itemContainer .item .itemName {
+    display: flex;
+    /* flex-grow: 2; */
+    justify-content: center;
+    background: #d6cece;
+    margin: 3px;
+    margin: 5px 2px;
+    border-radius: 5px;
+    width: 70%;
+    color: black;
+    text-shadow: none;
+    padding: 2px;
+    font-size: 0.9em;
+}
 
-                        &:hover {
-                            box-shadow: 0 0 4px 3px yellow;
-                        }
-
-                        .itemName {
-                            display: flex;
-                            /* flex-grow: 2; */
-                            justify-content: center;
-                            background: #d6cece;
-                            margin: 3px;
-                            margin: 5px 2px;
-                            border-radius: 5px;
-                            width: 70%;
-                            color: black;
-                            text-shadow: none;
-                            padding: 2px;
-                            font-size: 0.9em;
-                        }
-
-                        .tip {
-                            position: absolute;
-                            background: #f5eded;
-                            width: 102%;
-                            height: fit-content;
-                            z-index: 1;
-                            padding: 6px;
-                            color: black;
-                            border: 3px solid #143308;
-                            border-radius: 3px;
-                            left: 0;
-                            display: none;
-                        }
-                    }
-
-                    .itemCount {
-                        display: flex;
-                        flex-grow: 1;
-                        width: 30%;
-                        flex-shrink: 0;
-                        overflow: hidden;
-                        font-size: 0.9em;
-
-                    }
-                }
-
-            }
-        }
-    }
-
+.popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .itemContainer .item .tip {
+    position: absolute;
+    background: #f5eded;
+    width: 102%;
+    height: fit-content;
+    z-index: 1;
+    padding: 6px;
+    color: black;
+    border: 3px solid #143308;
+    border-radius: 3px;
+    left: 0;
+    display: none;
 }

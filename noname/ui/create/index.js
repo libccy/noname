@@ -2286,7 +2286,7 @@ export class Create {
 			game.pause2()
 			let drawPile = ui.cardPile.children
 			let discardPile = ui.discardPile.children
-			let popupContainer = ui.create.div('.popupContainer', ui.window, function () {
+			let popupContainer = ui.create.div('.popupContainer.deckMonitor', ui.window, function () {
 				this.delete(400)
 				game.resume2()
 			})
