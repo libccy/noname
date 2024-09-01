@@ -2311,26 +2311,28 @@ export class Create {
 				renderSuitColumn();
 				renderTypeColumns();
 				function renderNumberColumn() {
-					let numberResult = Object.groupBy(cards, get.number);
+					let numberResult = Object.groupBy(cards, card => get.number(card));
 					for (let i = 1; i <= 13; i++) {
 						if (!numberResult[i]) numberResult[i] = [];
 					}
 					createColumnContainer(numberResult, '点数', cards.length);
 				}
 				function renderSuitColumn() {
-					let suitResult = Object.groupBy(cards, get.suit);
-					Object.assign(suitResult, Object.groupBy(cards, (c) => {
-						if (get.suit(c) == 'spade' && get.number(c) <= 9 && get.number(c) >= 2) {
+					let suitResult = Object.groupBy(cards, card => get.suit(card));
+					Object.assign(suitResult, Object.groupBy(cards, card => {
+						if (get.suit(card) == 'spade' && get.number(card) <= 9 && get.number(card) >= 2) {
 							return '黑桃2-9';
 						}
 					}));
+					// @ts-ignore
+					delete suitResult[void 0];
 					for (let suit of lib.suit) {
 						if (!suitResult[suit]) suitResult[suit] = [];
 					}
 					createColumnContainer(suitResult, '花色', cards.length);
 				}
 				function renderTypeColumns() {
-					let typeResult = Object.groupBy(cards, get.type);
+					let typeResult = Object.groupBy(cards, card => get.type(card));
 					typeResult.basic ??= [];
 					typeResult.trick ??= [];
 					typeResult.equip ??= [];
@@ -2340,20 +2342,21 @@ export class Create {
 						return arr.indexOf(a) - arr.indexOf(b)
 
 					})) {
-						let result = Object.groupBy(typeResult[key], get.name);
+						let result = Object.groupBy(typeResult[key], card => get.name(card));
 						if (key == 'basic') {
 
-							Object.assign(result, Object.groupBy(typeResult[key], (c) => {
-								if (get.name(c) !== 'sha') return;
-								return get.translation(get.color(c)) + '杀';
-
+							Object.assign(result, Object.groupBy(typeResult[key], card => {
+								if (get.name(card) !== 'sha') return;
+								return get.translation(get.color(card)) + '杀';
 							}));
-							Object.assign(result, Object.groupBy(typeResult[key], (c) => {
-								if (get.name(c) !== 'sha') return;
-								let perfix = get.translation(get.nature(c))
+							Object.assign(result, Object.groupBy(typeResult[key], card => {
+								if (get.name(card) !== 'sha') return;
+								let perfix = get.translation(get.nature(card))
 								if (perfix == '') perfix = '普通'
 								return perfix + '杀'
 							}));
+							// @ts-ignore
+							delete result[void 0];
 							createColumnContainer(result, get.translation(key), typeResult[key].length);
 
 						} else {
