@@ -106,6 +106,7 @@ export class Dialog extends HTMLDivElement {
 	 * @param  {RowItem[]} args 
 	 */
 	addNewRow(...args) {
+		this.classList.add('addNewRow')
 		//参数归一化
 		let itemOptions = parameterNormolize()
 		//设置比例字符串
