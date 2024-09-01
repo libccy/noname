@@ -1105,7 +1105,7 @@ export default () => {
 								player.flashAvatar("fakeyigui", character);
 								player.unmarkAuto("fakeyigui", [character]);
 								_status.characterlist.add(character);
-								game.log(player, "移除了", "#g“魂”", "#y" + get.translation(character));
+								game.log(player, "移去了一张", "#g“魂（" + get.translation(character) + "）”");
 								if (!player.storage.fakeyigui2) {
 									player.when({ global: "phaseBefore" }).then(() => delete player.storage.fakeyigui2);
 								}

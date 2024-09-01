@@ -1,4 +1,11 @@
 export default {
+	"#staranshu1": "与民休养生息，则国可得安泰。",
+	"#staranshu2": "春种其粟，秋得其实。",
+	"#starkuangzuo1": "吾辈向汉，当矢志不渝，不可坐视神州陆沉。",
+	"#starkuangzuo2": "家国兴衰，系于一肩之上，朝纲待重整之时。",
+	"#starchengfeng1": "承天子之任，奉天子之统。",
+	"#starchengfeng2": "臣簇于君侧，为耳目，为股肱。",
+	"#star_xunyu:die": "臣固忠于国，非一家之臣。",
 	"#mpjianlin1": "吾性至俭，不能自奉，何况遗人？",
 	"#mpjianlin2": "以财自污，则免清高之祸。",
 	"#mpsixiao1": "风木之悲，痛彻肺腑。",
