@@ -2321,7 +2321,7 @@ export class Create {
 					let suitResult = Object.groupBy(cards, card => get.suit(card));
 					Object.assign(suitResult, Object.groupBy(cards, card => {
 						if (get.suit(card) == 'spade' && get.number(card) <= 9 && get.number(card) >= 2) {
-							return '黑桃2-9';
+							return '♠2-9';
 						}
 					}));
 					// @ts-ignore
