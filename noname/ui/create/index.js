@@ -11,6 +11,7 @@ import { optionsMenu } from "./menu/pages/optionsMenu.js";
 import { otherMenu } from "./menu/pages/otherMenu.js";
 import { startMenu } from "./menu/pages/startMenu.js";
 
+
 export class Create {
 	/**
 	 * @type {(video: Videos, before: boolean) => void}
@@ -856,6 +857,7 @@ export class Create {
 			true
 		);
 	}
+
 	groupControl(dialog) {
 		return ui.create.control("wei", "shu", "wu", "qun", "jin", "western", "key", function (link, node) {
 			if (link == "全部") {
@@ -1960,7 +1962,7 @@ export class Create {
 				});
 			}
 		}
-		lib.init.js(lib.assetURL + "game", "keyWords", function () {});
+		lib.init.js(lib.assetURL + "game", "keyWords", function () { });
 
 		lib.updateURL = lib.updateURLS[lib.config.update_link] || lib.updateURLS.coding;
 
@@ -2278,6 +2280,127 @@ export class Create {
 		if (!lib.config.show_sortcard) {
 			ui.sortCard.style.display = "none";
 		}
+		//------添加记牌器 by Curpond-------
+		ui.deckMonitor = ui.create.system('记牌器', function () {
+			if (!_status.gameStarted) return
+			game.pause2()
+			let drawPile = ui.cardPile.children
+			let discardPile = ui.discardPile.children
+			let popupContainer = ui.create.div('.popupContainer.deckMonitor', ui.window, function () {
+				this.delete(400)
+				game.resume2()
+			})
+			let container = ui.create.div('.deckMonitor', popupContainer, function (e) {
+				e.stopPropagation()
+			})
+			let flag = true
+			let titleContainer = ui.create.div('.title', container, function (e) {
+				if (flag) {
+					statistic(discardPile, '弃牌牌堆')
+				} else {
+					statistic(drawPile, '摸牌牌堆')
+				}
+				flag = !flag
+			})
+			let contentContainer = ui.create.div('.contentContainer', container)
+			statistic(drawPile, '摸牌牌堆')
+			function statistic(cards, title) {
+				titleContainer.innerHTML = `${title}【${cards.length}张】 <span>(点击切换)</span>`
+				contentContainer.innerHTML = ''
+				renderNumberColumn();
+				renderSuitColumn();
+				renderTypeColumns();
+				function renderNumberColumn() {
+					let numberResult = game.classify(cards, get.number);
+					for (let i = 1; i <= 13; i++) {
+						if (!numberResult[i]) numberResult[i] = [];
+					}
+					createColumnContainer(numberResult, '点数', cards.length);
+				}
+				function renderSuitColumn() {
+					let suitResult = game.classify(cards, get.suit);
+					Object.assign(suitResult, game.classify(cards, (c) => {
+						if (get.suit(c) == 'spade' && get.number(c) <= 9 && get.number(c) >= 2) {
+							return '黑桃2-9';
+						}
+					}));
+					for (let suit of lib.suit) {
+						if (!suitResult[suit]) suitResult[suit] = [];
+					}
+					createColumnContainer(suitResult, '花色', cards.length);
+				}
+				function renderTypeColumns() {
+					let typeResult = game.classify(cards, get.type);
+					typeResult.basic ??= [];
+					typeResult.trick ??= [];
+					typeResult.equip ??= [];
+					typeResult.delay ??= [];
+					for (let key of Object.keys(typeResult).sort((a, b) => {
+						let arr = ['basic', 'trick', 'equip', 'delay']
+						return arr.indexOf(a) - arr.indexOf(b)
+
+					})) {
+						let result = game.classify(typeResult[key], get.name);
+						if (key == 'basic') {
+
+							Object.assign(result, game.classify(typeResult[key], (c) => {
+								if (get.name(c) !== 'sha') return;
+								return get.translation(get.color(c)) + '杀';
+
+							}));
+							Object.assign(result, game.classify(typeResult[key], (c) => {
+								if (get.name(c) !== 'sha') return;
+								let perfix = get.translation(get.nature(c))
+								if (perfix == '') perfix = '普通'
+								return perfix + '杀'
+							}));
+							createColumnContainer(result, get.translation(key), typeResult[key].length);
+
+						} else {
+							createColumnContainer(result, get.translation(key), typeResult[key].length);
+						}
+					}
+				}
+				function createColumnContainer(result, title, count) {
+					let column = ui.create.div('.columnContainer', contentContainer)
+					let subtitle = ui.create.div('.subtitle', column)
+					subtitle.textContent = `${title}(${count})`
+					let itemContainer = ui.create.div('.itemContainer', column)
+					for (let key in result) {
+						let item = ui.create.div('.item', itemContainer)
+						let tip = ui.create.div('.tip', item)
+						tip.innerHTML = handleColor(result[key].reduce((a, c) => {
+							return a + `${get.translation(get.suit(c))}${get.number(c)} `
+						}, ''))
+						item.addEventListener('mouseenter', function (e) {
+							if (tip.innerHTML == '') return
+							tip.style.display = 'block'
+							let rect = item.getBoundingClientRect();
+							if (rect.top < window.innerHeight / 2) {
+								tip.style.top = '110%'
+							} else {
+								tip.style.bottom = '110%'
+							}
+						})
+						item.addEventListener('mouseleave', function (e) {
+							tip.style.display = 'none'
+
+						})
+						let itemName = ui.create.div('.itemName', item)
+						let itemCount = ui.create.div('.itemCount', item)
+						itemName.innerHTML = handleColor(get.translation(key))
+						itemCount.textContent = `×${result[key].length}`
+					}
+					function handleColor(str) {
+						let red = `[${get.translation('diamond')}${get.translation('heart')}]`
+						let black = `[${get.translation('club')}${get.translation('spade')}]`
+						return str.replace(new RegExp(red, 'g'), '<span style="color:red">$&</span>').replace(new RegExp(black, 'g'), '<span style="color:black">$&</span>')
+					}
+
+				}
+			}
+		}, true, true)
+		//---------------------------------
 		ui.playerids = ui.create.system(
 			"显示身份",
 			function () {
