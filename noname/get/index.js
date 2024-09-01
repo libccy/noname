@@ -5069,12 +5069,18 @@ export class Get extends GetCompatible {
 			if (!info || !info.ai || !info.ai.canLink) {
 				if (target.isLinked())
 					game.players.forEach(function (current) {
-						if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, true);
+						if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, { source: target });
 					});
-			} else if (info.ai.canLink(player, target, card)) {
-				game.players.forEach(function (current) {
-					if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, true);
-				});
+			}
+			else {
+				let canLink = info.ai.canLink(player, target, card);
+				if (canLink) {
+					if (typeof canLink !== "object") canLink = {};
+					canLink.source = target;
+					game.players.forEach(function (current) {
+						if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, canLink);
+					});
+				}
 			}
 		}
 		return final;
@@ -5234,12 +5240,18 @@ export class Get extends GetCompatible {
 			if (!info || !info.ai || !info.ai.canLink) {
 				if (target.isLinked())
 					game.players.forEach(function (current) {
-						if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, true);
+						if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, { source: target });
 					});
-			} else if (info.ai.canLink(player, target, card)) {
-				game.players.forEach(function (current) {
-					if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, true);
-				});
+			}
+			else {
+				let canLink = info.ai.canLink(player, target, card);
+				if (canLink) {
+					if (typeof canLink !== "object") canLink = {};
+					canLink.source = target;
+					game.players.forEach(function (current) {
+						if (current != target && current.isLinked()) final += cache.get.effect(current, card, player, player2, canLink);
+					});
+				}
 			}
 		}
 		return final;

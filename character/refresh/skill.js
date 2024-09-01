@@ -6310,7 +6310,7 @@ const skills = {
 				return num;
 			},
 		},
-		trigger: { player: "phaseDiscardBegin" },
+		trigger: { player: "phaseDiscardEnd" },
 		forced: true,
 		charlotte: true,
 		filter: function (event, player) {

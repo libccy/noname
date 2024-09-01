@@ -345,7 +345,7 @@ game.import("card", function () {
 						}
 						return base;
 					},
-					canLink: function (player, target, card) {
+					canLink(player, target, card) {
 						if (!target.isLinked() && !player.hasSkill("wutiesuolian_skill")) return false;
 						if (
 							player.hasSkill("jueqing") ||
@@ -353,7 +353,33 @@ game.import("card", function () {
 							target.hasSkill("gangzhi")
 						)
 							return false;
-						return true;
+						let obj = { };
+						if (get.attitude(player, target) > 0 && get.attitude(target, player) > 0) {
+							if (
+								(
+									player.hasSkill("jiu") ||
+									player.hasSkillTag("damageBonus", true, {
+										target: target,
+										card: card
+									})
+								) &&
+								!target.hasSkillTag("filterDamage", null, {
+									player: player,
+									card: card,
+									jiu: player.hasSkill("jiu")
+								})
+							) obj.num = 2;
+							if (target.hp > obj.num) obj.odds = 1;
+						}
+						if (!obj.odds) obj.odds = 1 - target.mayHaveShan(
+							player,
+							"use",
+							target.getCards("h", (i) => {
+								return i.hasGaintag("sha_notshan");
+							}),
+							"odds"
+						);
+						return obj;
 					},
 					basic: {
 						useful: [5, 3, 1],
@@ -382,11 +408,18 @@ game.import("card", function () {
 								odds = 1.35,
 								num = 1;
 							if (isLink) {
-								let cache = _status.event.getTempCache("sha_result", "eff");
-								if (typeof cache !== "object" || cache.card !== ai.getCacheKey(card, true))
-									return eff;
-								if (cache.odds < 1.35 && cache.bool) return 1.35 * cache.eff;
-								return cache.odds * cache.eff;
+								eff = isLink.eff || -2;
+								odds = isLink.odds || 0.65;
+								num = isLink.num || 1;
+								if (
+									num > 1 &&
+									target.hasSkillTag("filterDamage", null, {
+										player: player,
+										card: card,
+										jiu: player.hasSkill("jiu")
+									})
+								) num = 1;
+								return odds * eff * num;
 							}
 							if (
 								player.hasSkill("jiu") ||
@@ -399,7 +432,7 @@ game.import("card", function () {
 									target.hasSkillTag("filterDamage", null, {
 										player: player,
 										card: card,
-										jiu: true,
+										jiu: player.hasSkill("jiu")
 									})
 								)
 									eff = -0.5;

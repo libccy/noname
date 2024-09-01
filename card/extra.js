@@ -131,25 +131,28 @@ game.import("card", function () {
 							return 3;
 						},
 					},
-					order: () => {
+					order(item, player) {
 						if (_status.event.dying) return 9;
 						let sha = get.order({ name: "sha" });
-						if (sha > 0) return sha + 0.2;
-						return 0;
+						if (sha <= 0) return 0;
+						let usable = player.getCardUsable("sha");
+						if (usable < 2 && player.hasCard(i => {
+							return get.name(i, player) == "zhuge";
+						}, "hs")) usable = Infinity;
+						let shas = Math.min(usable, player.mayHaveSha(player, "use", item, "count"));
+						if (
+							shas != 1 ||
+							(lib.config.mode === "stone" &&
+								!player.isMin() &&
+								player.getActCount() + 1 >= player.actcount)
+						)
+							return 0;
+						return sha + 0.2;
 					},
 					result: {
 						target: (player, target, card) => {
 							if (target && target.isDying()) return 2;
 							if (!target || target._jiu_temp || !target.isPhaseUsing()) return 0;
-							let usable = target.getCardUsable("sha");
-							if (
-								!usable ||
-								(lib.config.mode === "stone" &&
-									!player.isMin() &&
-									player.getActCount() + 1 >= player.actcount) ||
-								!target.mayHaveSha(player, "use", card)
-							)
-								return 0;
 							let effs = { order: 0 },
 								temp;
 							target.getCards("hs", (i) => {
@@ -194,15 +197,16 @@ game.import("card", function () {
 										},
 										true
 									) ||
-									(usable === 1 &&
-										(target.needsToDiscard() > Math.max(0, 3 - target.hp) ||
-											!effs[i].target.mayHaveShan(
-												player,
-												"use",
-												effs[i].target.getCards((i) => {
-													return i.hasGaintag("sha_notshan");
-												})
-											)))
+									//(Math.min(target.getCardUsable("sha"), target.mayHaveSha(player, "use", item, "count")) === 1 && (
+									target.needsToDiscard() > Math.max(0, 3 - target.hp) ||
+									!effs[i].target.mayHaveShan(
+										player,
+										"use",
+										effs[i].target.getCards((i) => {
+											return i.hasGaintag("sha_notshan");
+										})
+									)
+									//))
 								) {
 									delete target._jiu_temp;
 									return 1;
