@@ -124,6 +124,12 @@ export class Library {
 	cardPack = new Proxy(
 		{},
 		{
+			get(target, prop, receiver) {
+				if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
+				return Reflect.get(target, prop, receiver);
+			},
 			set(target, prop, newValue) {
 				if (typeof prop == "string") {
 					if (!Reflect.has(target, prop)) {
@@ -132,7 +138,16 @@ export class Library {
 						});
 					}
 				}
+				if (prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
 				return Reflect.set(target, prop, newValue);
+			},
+			defineProperty(target, prop, descriptor) {
+				if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
+				return Reflect.defineProperty(target, prop, descriptor);
 			},
 		}
 	);
