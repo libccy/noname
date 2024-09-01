@@ -119,6 +119,29 @@ export class Game extends GameCompatible {
 		}
 	})();
 	/**
+	 * 将给定的可迭代对象进行分类,并返回分类结果
+	 * @template T
+	 * @param {Iterable<T>} items 待分类的集合
+	 * @param {string|((item:T)=>string)} classifyBasis 分类的依据
+	 * @returns {SMap<T>}
+	 * @example
+	 * game.classify(cards,get.suit)
+	 * @author Curpond
+	 */
+	classify(items, classifyBasis) {
+		if (typeof classifyBasis == 'string') {
+			classifyBasis = (item) => item[classifyBasis]
+		}
+		let result = {}
+		for (const item of items) {
+			const key = classifyBasis(item)
+			if (!key) continue;
+			if (!result[key]) result[key] = []
+			result[key].push(item);
+		}
+		return result
+	}
+	/**
 	 * 交换任意两个元素的位置，附带过渡动画
 	 * @param {HTMLDivElement} e1 
 	 * @param {HTMLDivElement} e2 

@@ -74,3 +74,159 @@
     font-weight: lighter;
     color: rgba(126, 114, 114, 0.724)
 }
+
+/*记牌器相关的样式*/
+.popupContainer:has(.deckMonitor) {
+    * {
+        text-shadow: none;
+        box-sizing: border-box;
+    }
+
+    width: 100%;
+    height: 100%;
+    background-color: rgb(44 39 39 / 38%);
+    z-index: 9;
+
+    .deckMonitor {
+        --bgColor: rgb(87 151 164);
+        width: 80%;
+        height: 80%;
+        background-color: var(--bgColor);
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+
+        .title {
+            width: 100%;
+            height: 10%;
+            top: 0%;
+            background-color: var(--bgColor);
+            font-size: 2em;
+            color: #fff5f5;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            span {
+                text-decoration: underline;
+                font-size: 0.8em;
+                color: yellow;
+                font-weight: lighter;
+
+            }
+        }
+
+        .contentContainer {
+            width: 100%;
+            height: 90%;
+            bottom: 0%;
+            display: flex;
+            justify-content: space-around;
+            background: #59bac4;
+            padding: 5px;
+            box-sizing: border-box;
+
+            * {
+                position: relative;
+            }
+
+
+            .columnContainer {
+                background-color: #9137c0;
+                height: 100%;
+                flex-grow: 1;
+                flex-shrink: 1;
+                flex-basis: 100px;
+                margin: 0 5px;
+                padding: 3px;
+                display: flex;
+                flex-direction: column;
+                box-sizing: border-box;
+
+                .subtitle {
+                    width: 100%;
+                    text-align: center;
+                    flex-grow: 0;
+                    height: 10%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 1.2em;
+                    flex-shrink: 0;
+
+
+                }
+
+
+                .itemContainer {
+                    display: flex;
+                    flex-direction: column;
+                    flex-grow: 1;
+                    align-items: center;
+                    overflow: auto;
+
+
+
+                    .item {
+
+                        background-color: #2f2e2e;
+                        display: flex;
+                        width: 94%;
+                        margin-top: 4px;
+                        padding: 2px 5px;
+                        border-radius: 3px;
+                        align-items: center;
+                        border-radius: 3px;
+                        transition: 0.2s;
+
+                        &:hover {
+                            box-shadow: 0 0 4px 3px yellow;
+                        }
+
+                        .itemName {
+                            display: flex;
+                            /* flex-grow: 2; */
+                            justify-content: center;
+                            background: #d6cece;
+                            margin: 3px;
+                            margin: 5px 2px;
+                            border-radius: 5px;
+                            width: 70%;
+                            color: black;
+                            text-shadow: none;
+                            padding: 2px;
+                            font-size: 0.9em;
+                        }
+
+                        .tip {
+                            position: absolute;
+                            background: #f5eded;
+                            width: 102%;
+                            height: fit-content;
+                            z-index: 1;
+                            padding: 6px;
+                            color: black;
+                            border: 3px solid #143308;
+                            border-radius: 3px;
+                            left: 0;
+                            display: none;
+                        }
+                    }
+
+                    .itemCount {
+                        display: flex;
+                        flex-grow: 1;
+                        width: 30%;
+                        flex-shrink: 0;
+                        overflow: hidden;
+                        font-size: 0.9em;
+
+                    }
+                }
+
+            }
+        }
+    }
+
+}
