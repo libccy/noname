@@ -2311,15 +2311,15 @@ export class Create {
 				renderSuitColumn();
 				renderTypeColumns();
 				function renderNumberColumn() {
-					let numberResult = game.classify(cards, get.number);
+					let numberResult = Object.groupBy(cards, get.number);
 					for (let i = 1; i <= 13; i++) {
 						if (!numberResult[i]) numberResult[i] = [];
 					}
 					createColumnContainer(numberResult, '点数', cards.length);
 				}
 				function renderSuitColumn() {
-					let suitResult = game.classify(cards, get.suit);
-					Object.assign(suitResult, game.classify(cards, (c) => {
+					let suitResult = Object.groupBy(cards, get.suit);
+					Object.assign(suitResult, Object.groupBy(cards, (c) => {
 						if (get.suit(c) == 'spade' && get.number(c) <= 9 && get.number(c) >= 2) {
 							return '黑桃2-9';
 						}
@@ -2330,7 +2330,7 @@ export class Create {
 					createColumnContainer(suitResult, '花色', cards.length);
 				}
 				function renderTypeColumns() {
-					let typeResult = game.classify(cards, get.type);
+					let typeResult = Object.groupBy(cards, get.type);
 					typeResult.basic ??= [];
 					typeResult.trick ??= [];
 					typeResult.equip ??= [];
@@ -2340,15 +2340,15 @@ export class Create {
 						return arr.indexOf(a) - arr.indexOf(b)
 
 					})) {
-						let result = game.classify(typeResult[key], get.name);
+						let result = Object.groupBy(typeResult[key], get.name);
 						if (key == 'basic') {
 
-							Object.assign(result, game.classify(typeResult[key], (c) => {
+							Object.assign(result, Object.groupBy(typeResult[key], (c) => {
 								if (get.name(c) !== 'sha') return;
 								return get.translation(get.color(c)) + '杀';
 
 							}));
-							Object.assign(result, game.classify(typeResult[key], (c) => {
+							Object.assign(result, Object.groupBy(typeResult[key], (c) => {
 								if (get.name(c) !== 'sha') return;
 								let perfix = get.translation(get.nature(c))
 								if (perfix == '') perfix = '普通'
