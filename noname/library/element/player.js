@@ -9785,6 +9785,11 @@ export class Player extends HTMLDivElement {
 		}
 		return false;
 	}
+	/**
+	 * 场上是否有至少num/1个不明身份角色
+	 * @param { number } [num] 允许最多有num个不明身份角色
+	 * @returns { boolean }
+	 */
 	hasUnknown(num) {
 		var mode = get.mode();
 		if (typeof num != "number") {
