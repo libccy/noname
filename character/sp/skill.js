@@ -22840,7 +22840,7 @@ const skills = {
 					}
 					return att;
 				})
-				.set("goon", !player.hasUnknown())
+				.set("goon", !player.hasUnknown(Math.round(game.players.length / 4 - 0.2)))
 				.forResult();
 		},
 		async content(event, trigger, player) {

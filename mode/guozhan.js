@@ -9609,6 +9609,7 @@ export default () => {
 					if (Math.min(target.maxHp, target.countCards("h")) > 3) return true;
 					return false;
 				},
+				usable: 1,
 				preHidden: true,
 				content: function () {
 					"step 0";
@@ -19871,7 +19872,7 @@ export default () => {
 			gzlianpian: "联翩",
 			gzlianpian_info: "①结束阶段，若你于此回合内弃置过所有角色的牌数之和大于你的体力值，你可令一名与你势力相同的角色将手牌补至X张（X为其体力上限）。②其他角色的结束阶段，若其于此回合内弃置过所有角色的牌数之和大于你的体力值，其可选择：1.弃置你的一张牌；2.令你回复1点体力。",
 			gzyusui: "玉碎",
-			gzyusui_info: "当你成为其他势力的角色使用黑色牌的目标后，你可以失去1点体力，然后选择一项：①令其弃置X张手牌（X为其体力上限）；②令其失去Y点体力（Y为其的体力值减去你的体力值，不为正时不可选择）。",
+			gzyusui_info: "每回合限一次，当你成为其他势力的角色使用黑色牌的目标后，你可以失去1点体力，然后选择一项：①令其弃置X张手牌（X为其体力上限）；②令其失去Y点体力（Y为其的体力值减去你的体力值，不为正时不可选择）。",
 			gzboyan: "驳言",
 			gzboyan_info: "出牌阶段限一次，你可令一名其他角色将手牌摸至体力上限（至多摸五张），然后其本回合不能使用或打出手牌。",
 			gzboyan_zongheng: "驳言·纵横",

@@ -11919,6 +11919,7 @@ const skills = {
 			if (Math.min(target.countCards("h") - player.countCards("h"), target.countCards("h")) > 3) return true;
 			return false;
 		},
+		usable: 1,
 		preHidden: true,
 		content: function () {
 			"step 0";
