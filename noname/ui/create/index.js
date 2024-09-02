@@ -2321,7 +2321,7 @@ export class Create {
 					let suitResult = game.classify(cards, get.suit);
 					Object.assign(suitResult, game.classify(cards, (c) => {
 						if (get.suit(c) == 'spade' && get.number(c) <= 9 && get.number(c) >= 2) {
-							return '黑桃2-9';
+							return get.translation('spade') + '2-9';
 						}
 					}));
 					for (let suit of lib.suit) {
@@ -2336,9 +2336,8 @@ export class Create {
 					typeResult.equip ??= [];
 					typeResult.delay ??= [];
 					for (let key of Object.keys(typeResult).sort((a, b) => {
-						let arr = ['basic', 'trick', 'equip', 'delay']
+						let arr = ['basic', 'trick', 'equip', 'delay', 'jiqi', 'spell', 'zhenfa', 'food', 'jiguan', 'land']
 						return arr.indexOf(a) - arr.indexOf(b)
-
 					})) {
 						let result = game.classify(typeResult[key], get.name);
 						if (key == 'basic') {
