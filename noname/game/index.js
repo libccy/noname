@@ -119,163 +119,139 @@ export class Game extends GameCompatible {
 		}
 	})();
 	/**
-	 * 将给定的可迭代对象进行分类,并返回分类结果
-	 * @template T
-	 * @param {Iterable<T>} items 待分类的集合
-	 * @param {string|((item:T)=>string)} classifyBasis 分类的依据
-	 * @returns {SMap<T>}
-	 * @example
-	 * game.classify(cards,get.suit)
-	 * @author Curpond
-	 */
-	classify(items, classifyBasis) {
-		if (typeof classifyBasis == 'string') {
-			classifyBasis = (item) => item[classifyBasis]
-		}
-		let result = {}
-		for (const item of items) {
-			const key = classifyBasis(item)
-			if (!key) continue;
-			if (!result[key]) result[key] = []
-			result[key].push(item);
-		}
-		return result
-	}
-	/**
 	 * 交换任意两个元素的位置，附带过渡动画
-	 * @param {HTMLDivElement} e1 
-	 * @param {HTMLDivElement} e2 
+	 * @param {HTMLDivElement} e1
+	 * @param {HTMLDivElement} e2
 	 * @param {number} duration //动画完成的时间 ms
 	 * @param {'linear'|'ease-in-out'} timefun //动画过度的时间曲线,很多，这里只列举两个
 	 * @returns {Promise<void>}
 	 * @author Curpond
 	 */
-	$swapElement(e1, e2, duration = 400, timefun = 'linear') {
-		return new Promise((resolve) => {
+	$swapElement(e1, e2, duration = 400, timefun = "linear") {
+		return new Promise(resolve => {
 			let e1p = e1.parentElement;
 			let e2p = e2.parentElement;
-			let old1_overflow = e1p.style.overflow
-			let old2_overflow = e2p.style.overflow
+			let old1_overflow = e1p.style.overflow;
+			let old2_overflow = e2p.style.overflow;
 			/**@type {HTMLDivElement[]} */
-			let watchedElements = [...e1p.children, ...e2p.children].unique()
+			let watchedElements = [...e1p.children, ...e2p.children].unique();
 
 			let e1n = e1.nextElementSibling;
 			let e2n = e2.nextElementSibling;
 
 			//first
-			let originalPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]))
+			let originalPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]));
 
 			//last
 			e1p.insertBefore(e2, e1n);
 			e2p.insertBefore(e1, e2n);
-			let newPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]))
-			let change = new Map(watchedElements.map(e => {
-				return [e,
-					{
-						dx: originalPosition.get(e).x - newPosition.get(e).x,
-						dy: originalPosition.get(e).y - newPosition.get(e).y
-					}
-				]
-			}))
+			let newPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]));
+			let change = new Map(
+				watchedElements.map(e => {
+					return [
+						e,
+						{
+							dx: originalPosition.get(e).x - newPosition.get(e).x,
+							dy: originalPosition.get(e).y - newPosition.get(e).y,
+						},
+					];
+				})
+			);
 
 			//invert
-			e1p.style.overflow = 'visible'
-			e2p.style.overflow = 'visible'
+			e1p.style.overflow = "visible";
+			e2p.style.overflow = "visible";
 			change.forEach(({ dx, dy }, e) => {
 				e.style.transition = `none`;
-				e.style.transform = `translate(${dx / game.documentZoom}px, ${dy / game.documentZoom}px)`
+				e.style.transform = `translate(${dx / game.documentZoom}px, ${dy / game.documentZoom}px)`;
 			});
 			e1.offsetHeight;
 			//play
 			requestAnimationFrame(() => {
-
 				change.forEach(({ dx, dy }, e) => {
 					e.style.transition = `${duration}ms ${timefun}`;
-					e.style.removeProperty('transform')
+					e.style.removeProperty("transform");
 				});
 				let transitionEndHandler = () => {
-					change.forEach(({ dx, dy }, e) => e.removeEventListener('transitionend', transitionEndHandler));
-					e1p.style.overflow = old1_overflow
-					e2p.style.overflow = old2_overflow
+					change.forEach(({ dx, dy }, e) => e.removeEventListener("transitionend", transitionEndHandler));
+					e1p.style.overflow = old1_overflow;
+					e2p.style.overflow = old2_overflow;
 					resolve();
 				};
-				change.forEach(({ dx, dy }, e) => e.addEventListener('transitionend', transitionEndHandler, { once: true }));
+				change.forEach(({ dx, dy }, e) => e.addEventListener("transitionend", transitionEndHandler, { once: true }));
 			});
 		});
-	};
+	}
 	/**
-	* 元素去到某个父元素的某个位置，附带过度动画
-	* @param {HTMLDivElement} element 
-	* @param {HTMLDivElement} Parent 
-	* @param {number|'first'|'last'|Node} position 新的父容器中元素去的位置
-	* @param {number} duration 动画完成的时间 ms
-	* @param {'linear'|'ease-in-out'} timefun 动画过度的时间曲线,很多，这里只列举两个
-	* @returns {Promise<void>}
-	* @author Curpond
-	*/
-	$elementGoto(element, Parent, position = 'last', duration = 400, timefun = 'linear') {
-		return new Promise((resolve) => {
+	 * 元素去到某个父元素的某个位置，附带过度动画
+	 * @param {HTMLDivElement} element
+	 * @param {HTMLDivElement} Parent
+	 * @param {number|'first'|'last'|Node} position 新的父容器中元素去的位置
+	 * @param {number} duration 动画完成的时间 ms
+	 * @param {'linear'|'ease-in-out'} timefun 动画过度的时间曲线,很多，这里只列举两个
+	 * @returns {Promise<void>}
+	 * @author Curpond
+	 */
+	$elementGoto(element, Parent, position = "last", duration = 400, timefun = "linear") {
+		return new Promise(resolve => {
 			let e1p = element.parentElement;
 			let e2p = Parent;
-			let old1_overflow = e1p.style.overflow
-			let old2_overflow = e2p.style.overflow
+			let old1_overflow = e1p.style.overflow;
+			let old2_overflow = e2p.style.overflow;
 			/**@type {HTMLDivElement[]} */
-			let watchedElements = [...e1p.children, ...e2p.children].unique()
+			let watchedElements = [...e1p.children, ...e2p.children].unique();
 
 			//first
-			let originalPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]))
+			let originalPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]));
 			//last
 			if (position == "first") {
 				e2p.insertBefore(element, e2p.firstChild);
-
-			} else if (position == 'last') {
+			} else if (position == "last") {
 				e2p.appendChild(element);
-
-			} else if (typeof position == 'number') {
+			} else if (typeof position == "number") {
 				e2p.insertBefore(element, e2p.children[position]);
-
 			} else if (e2p.contains(position)) {
 				e2p.insertBefore(element, position);
-
 			} else {
 				e2p.appendChild(element);
 			}
-			let newPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]))
-			let change = new Map(watchedElements.map(e => {
-				return [e,
-					{
-						dx: originalPosition.get(e).x - newPosition.get(e).x,
-						dy: originalPosition.get(e).y - newPosition.get(e).y
-					}
-				]
-			}))
+			let newPosition = new Map(watchedElements.map(e => [e, e.getBoundingClientRect()]));
+			let change = new Map(
+				watchedElements.map(e => {
+					return [
+						e,
+						{
+							dx: originalPosition.get(e).x - newPosition.get(e).x,
+							dy: originalPosition.get(e).y - newPosition.get(e).y,
+						},
+					];
+				})
+			);
 
 			//invert
-			e2p.style.overflow = 'visible'
-			e1p.style.overflow = 'visible'
+			e2p.style.overflow = "visible";
+			e1p.style.overflow = "visible";
 			change.forEach(({ dx, dy }, e) => {
 				e.style.transition = `none`;
-				e.style.transform = `translate(${dx / game.documentZoom}px, ${dy / game.documentZoom}px)`
+				e.style.transform = `translate(${dx / game.documentZoom}px, ${dy / game.documentZoom}px)`;
 			});
 			element.offsetHeight;
 
 			//play
 			requestAnimationFrame(() => {
-
 				change.forEach(({ dx, dy }, e) => {
 					e.style.transition = `${duration}ms ${timefun}`;
-					e.style.removeProperty('transform')
+					e.style.removeProperty("transform");
 				});
 				let transitionEndHandler = () => {
-					change.forEach(({ dx, dy }, e) => e.removeEventListener('transitionend', transitionEndHandler));
-					e1p.style.overflow = old1_overflow
-					e2p.style.overflow = old2_overflow
+					change.forEach(({ dx, dy }, e) => e.removeEventListener("transitionend", transitionEndHandler));
+					e1p.style.overflow = old1_overflow;
+					e2p.style.overflow = old2_overflow;
 					resolve();
 				};
-				change.forEach(({ dx, dy }, e) => e.addEventListener('transitionend', transitionEndHandler, { once: true }));
+				change.forEach(({ dx, dy }, e) => e.addEventListener("transitionend", transitionEndHandler, { once: true }));
 			});
-		})
-
+		});
 	}
 	//Stratagem
 	//谋攻
@@ -861,7 +837,10 @@ export class Game extends GameCompatible {
 		var next = game.createEvent("cardsDiscard");
 		// @ts-ignore
 		if (type == "card") cards = [cards];
-		next.cards = cards.slice(0).map(i => i.cards ? i.cards : [i]).flat();
+		next.cards = cards
+			.slice(0)
+			.map(i => (i.cards ? i.cards : [i]))
+			.flat();
 		next.setContent("cardsDiscard");
 		next.getd = function (player, key, position) {
 			return this.cards.slice(0);
@@ -1559,9 +1538,9 @@ export class Game extends GameCompatible {
 			args.length === 1 && get.objtype(args[0]) === "object"
 				? args[0]
 				: {
-					path: args.filter(arg => typeof arg === "string" || typeof arg === "number").join("/"),
-					onError: args.find(arg => typeof arg === "function"),
-				};
+						path: args.filter(arg => typeof arg === "string" || typeof arg === "number").join("/"),
+						onError: args.find(arg => typeof arg === "function"),
+					};
 
 		const {
 			path = "",
@@ -2250,8 +2229,8 @@ export class Game extends GameCompatible {
 				);
 			}
 			const blob = zip.generate({
-				type: "blob",
-			}),
+					type: "blob",
+				}),
 				fileNameToSaveAs = `${exportExtension.replace(/\\|\/|:|\?|"|\*|<|>|\|/g, "-")}.zip`;
 
 			if (lib.device) {
@@ -4249,7 +4228,7 @@ export class Game extends GameCompatible {
 			}
 		}
 		if (!callback) {
-			callback = function () { };
+			callback = function () {};
 		}
 		//try{
 		//	if(noinput){
@@ -4766,7 +4745,7 @@ export class Game extends GameCompatible {
 			character = [information.sex, information.group, information.hp, information.skills || [], [_status.evaluatingExtension ? `db:extension-${extensionName}:${name}.jpg` : `ext:${extensionName}/${name}.jpg`, `die:ext:${extensionName}/${name}.mp3`]];
 		if (information.tags) character[4] = character[4].concat(information.tags);
 		lib.character[name] = character;
-		const packName = `mode_extension_${extensionName}`;
+		const packName = extensionName;
 		if (!lib.characterPack[packName]) lib.characterPack[packName] = {};
 		lib.translate[name] = information.translate;
 		lib.characterPack[packName][name] = character;
@@ -4829,7 +4808,7 @@ export class Game extends GameCompatible {
 				}
 			}
 		}
-		let packname = "mode_extension_" + packagename;
+		let packname = packagename;
 		lib.characterPack[packname] = pack.character;
 		lib.translate[packname + "_character_config"] = packagename;
 		if (gzFlag) lib.characterGuozhanFilter.add(packname);
@@ -4873,7 +4852,7 @@ export class Game extends GameCompatible {
 				lib.card.list.push([suits[Math.floor(Math.random() * suits.length)], Math.ceil(Math.random() * 13), name]);
 			}
 		}
-		let packname = "mode_extension_" + extname;
+		let packname = extname;
 		if (!lib.cardPack[packname]) {
 			lib.cardPack[packname] = [];
 			lib.translate[packname + "_card_config"] = extname;
@@ -4887,7 +4866,7 @@ export class Game extends GameCompatible {
 	addCardPack(pack, packagename) {
 		let extname = _status.extension || "扩展";
 		packagename = packagename || extname;
-		let packname = "mode_extension_" + packagename;
+		let packname = packagename;
 		lib.cardPack[packname] = [];
 		lib.cardPackInfo[packname] = pack;
 		lib.translate[packname + "_card_config"] = packagename;
@@ -6306,18 +6285,23 @@ export class Game extends GameCompatible {
 			const exports = await import(`../../mode/${name}.js`);
 			// esm模式
 			if (Object.keys(exports).length > 0) {
-				if (typeof exports.default !== 'function') {
+				if (typeof exports.default !== "function") {
 					throw new Error(`导入的模式[${name}]格式不正确！`);
 				}
-				game.import('mode', exports.default);
+				game.import("mode", exports.default);
 			}
 			// 普通模式
 			else {
 				await new Promise((resolve, reject) => {
-					let script = lib.init.js(`${lib.assetURL}mode`, name, () => {
-						script?.remove();
-						resolve(null);
-					}, e => reject(e.error));
+					let script = lib.init.js(
+						`${lib.assetURL}mode`,
+						name,
+						() => {
+							script?.remove();
+							resolve(null);
+						},
+						e => reject(e.error)
+					);
 				});
 			}
 			await Promise.allSettled(_status.importing.mode);
@@ -7719,59 +7703,59 @@ export class Game extends GameCompatible {
 		return new Promise(
 			query
 				? (resolve, reject) => {
-					lib.status.reload++;
-					const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).get(query);
-					idbRequest.onerror = event => {
-						if (typeof onError == "function") {
-							onError(event);
+						lib.status.reload++;
+						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).get(query);
+						idbRequest.onerror = event => {
+							if (typeof onError == "function") {
+								onError(event);
+								game.reload2();
+								resolve();
+							} else {
+								game.reload2();
+								reject(event);
+							}
+						};
+						idbRequest.onsuccess = event => {
+							const result = event.target.result;
+							if (typeof onSuccess == "function") {
+								_status.dburgent = true;
+								onSuccess(result);
+								delete _status.dburgent;
+							}
 							game.reload2();
-							resolve();
-						} else {
-							game.reload2();
-							reject(event);
-						}
-					};
-					idbRequest.onsuccess = event => {
-						const result = event.target.result;
-						if (typeof onSuccess == "function") {
-							_status.dburgent = true;
-							onSuccess(result);
-							delete _status.dburgent;
-						}
-						game.reload2();
-						resolve(result);
-					};
-				}
+							resolve(result);
+						};
+					}
 				: (resolve, reject) => {
-					lib.status.reload++;
-					const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
-						object = {};
-					idbRequest.onerror = event => {
-						if (typeof onError == "function") {
-							onError(event);
+						lib.status.reload++;
+						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
+							object = {};
+						idbRequest.onerror = event => {
+							if (typeof onError == "function") {
+								onError(event);
+								game.reload2();
+								resolve();
+							} else {
+								game.reload2();
+								reject(event);
+							}
+						};
+						idbRequest.onsuccess = event => {
+							const result = event.target.result;
+							if (result) {
+								object[result.key] = result.value;
+								result.continue();
+								return;
+							}
+							if (typeof onSuccess == "function") {
+								_status.dburgent = true;
+								onSuccess(object);
+								delete _status.dburgent;
+							}
 							game.reload2();
-							resolve();
-						} else {
-							game.reload2();
-							reject(event);
-						}
-					};
-					idbRequest.onsuccess = event => {
-						const result = event.target.result;
-						if (result) {
-							object[result.key] = result.value;
-							result.continue();
-							return;
-						}
-						if (typeof onSuccess == "function") {
-							_status.dburgent = true;
-							onSuccess(object);
-							delete _status.dburgent;
-						}
-						game.reload2();
-						resolve(object);
-					};
-				}
+							resolve(object);
+						};
+					}
 		);
 	}
 	/**
@@ -7808,45 +7792,45 @@ export class Game extends GameCompatible {
 			);
 		return query
 			? new Promise((resolve, reject) => {
-				lib.status.reload++;
-				const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).delete(query);
-				record.onerror = event => {
-					if (typeof onError == "function") {
-						onError(event);
+					lib.status.reload++;
+					const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).delete(query);
+					record.onerror = event => {
+						if (typeof onError == "function") {
+							onError(event);
+							game.reload2();
+							resolve();
+						} else {
+							game.reload2();
+							reject(event);
+						}
+					};
+					record.onsuccess = event => {
+						if (typeof onSuccess == "function") onSuccess(event);
 						game.reload2();
-						resolve();
-					} else {
-						game.reload2();
-						reject(event);
-					}
-				};
-				record.onsuccess = event => {
-					if (typeof onSuccess == "function") onSuccess(event);
-					game.reload2();
-					resolve(event);
-				};
-			})
+						resolve(event);
+					};
+				})
 			: game.getDB(storeName).then(object => {
-				const keys = Object.keys(object);
-				lib.status.reload += keys.length;
-				const store = lib.db.transaction([storeName], "readwrite").objectStore(storeName);
-				return Promise.allSettled(
-					keys.map(
-						key =>
-							new Promise((resolve, reject) => {
-								const request = store.delete(key);
-								request.onerror = event => {
-									game.reload2();
-									reject(event);
-								};
-								request.onsuccess = event => {
-									game.reload2();
-									resolve(event);
-								};
-							})
-					)
-				);
-			});
+					const keys = Object.keys(object);
+					lib.status.reload += keys.length;
+					const store = lib.db.transaction([storeName], "readwrite").objectStore(storeName);
+					return Promise.allSettled(
+						keys.map(
+							key =>
+								new Promise((resolve, reject) => {
+									const request = store.delete(key);
+									request.onerror = event => {
+										game.reload2();
+										reject(event);
+									};
+									request.onsuccess = event => {
+										game.reload2();
+										resolve(event);
+									};
+								})
+						)
+					);
+				});
 	}
 	/**
 	 * @param { string } key

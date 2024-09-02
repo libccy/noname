@@ -68,7 +68,7 @@ const skills = {
 							}, 0) >= get.cardNameLength(lib.skill.clanchengqi_backup.viewAs.name)
 						);
 					},
-					check(card) {
+					ai1(card) {
 						const player = get.event("player");
 						const name = lib.skill.clanchengqi_backup.viewAs.name;
 						if (ui.selected.cards.length > 1 || card.name == name) return 0;
@@ -209,10 +209,7 @@ const skills = {
 					const lose = result.moved[1].slice();
 					const gain = result.moved[0].slice().filter(i => !get.owner(i));
 					if (lose.some(i => get.owner(i)))
-						await target.lose(
-							lose.filter(i => get.owner(i)),
-							ui.special
-						);
+						await game.cardsGotoOrdering(lose.filter(i => get.owner(i)));
 					for (let i = lose.length - 1; i--; i >= 0) {
 						ui.cardPile.insertBefore(lose[i], ui.cardPile.firstChild);
 					}

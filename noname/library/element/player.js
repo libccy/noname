@@ -7349,6 +7349,12 @@ export class Player extends HTMLDivElement {
 		if (mark) this.markAuto(name);
 		return value;
 	}
+	/**
+	 * 获取this.storage[name]的值
+	 * @param { string } name 
+	 * @param { any } defaultValue 预设值，默认为[]（不修改原storage）
+	 * @returns 
+	 */
 	getStorage(name, defaultValue = []) {
 		return this.storage[name] || defaultValue;
 	}
@@ -9779,6 +9785,11 @@ export class Player extends HTMLDivElement {
 		}
 		return false;
 	}
+	/**
+	 * 场上是否有至少num/1个不明身份角色
+	 * @param { number } [num] 允许最多有num个不明身份角色
+	 * @returns { boolean }
+	 */
 	hasUnknown(num) {
 		var mode = get.mode();
 		if (typeof num != "number") {

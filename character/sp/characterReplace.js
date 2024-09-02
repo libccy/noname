@@ -68,7 +68,7 @@ const characterReplaces = {
 	sp_jiaxu: ["dc_sp_jiaxu", "yj_jiaxu", "sp_jiaxu"],
 	duji: ["duji", "re_duji", "ns_duji"],
 	sp_taishici: ["sp_taishici", "re_sp_taishici"],
-	mazhong: ["mazhong", "re_mazhong"],
+	mazhong: ["mazhong", "re_mazhong", "tw_mazhong"],
 	wenpin: ["wenpin", "re_wenpin"],
 	liuyan: ["liuyan", "jsrg_liuyan", "junk_liuyan"],
 	buzhi: ["buzhi", "ty_buzhi"],

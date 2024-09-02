@@ -415,7 +415,7 @@ export default {
 	"#stargangyi1": "不见狼居胥，何妨马革裹尸。",
 	"#stargangyi2": "既无功，不受禄。",
 	"#star_sunjian:die": "身怀宝器，必受群狼觊觎……",
-	"#starjiaohao1": "倚嗅杏雨黄花，心怀西风烈马！",
+	"#starjiaohao1": "身虽为碧玉，手不怠锟铻！",
 	"#starjiaohao2": "站住！且与本姑娘分个高下！",
 	"#starsaying1": "倩影映江汀，巾帼犹飒爽！",
 	"#starsaying2": "我有一袭红袖，欲揾英雄泪！",

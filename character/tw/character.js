@@ -1,4 +1,11 @@
 const characters = {
+	tw_sunluban: ['female', 'wu', 3, ['twzenhui', 'xinjiaojin'], ['die:xin_sunluban']],
+	tw_mazhong: ['male', 'shu', 4, ['twfuman'], ['die:mazhong']],
+	tw_jsp_guanyu: ['male', 'wei', 4, ['wusheng', 'twdanji'], ['die:jsp_guanyu','tempname:jsp_guanyu']],
+	tw_fuhuanghou: ['female', 'qun', 3, ['rezhuikong', 'xinqiuyuan'], ['die:xin_fuhuanghou']],
+	tw_qiaozhou: ['male', 'shu', 3, ['zhiming', 'twxingbu'], ['die:qiaozhou']],
+	tw_yj_zhanghe: ['male', 'qun', 4, ['zhilve'], ['die:yj_zhanghe']],
+	old_jiakui: ["male", "wei", 3, ["zhongzuo", "wanlan"]],
 	huan_luxun: ["male", "wu", 3, ["twlifeng", "twniwo"]],
 	huan_liushan: ["male", "shu", 3, ["twguihan", "twrenxian", "twyanzuo"], ["zhu"]],
 	licuilianzhaoquanding: ["double", "qun", 3, ["twciyin", "twchenglong"], ["name:李|翠莲-赵|全定"]],

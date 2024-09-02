@@ -124,6 +124,12 @@ export class Library {
 	cardPack = new Proxy(
 		{},
 		{
+			get(target, prop, receiver) {
+				if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
+				return Reflect.get(target, prop, receiver);
+			},
 			set(target, prop, newValue) {
 				if (typeof prop == "string") {
 					if (!Reflect.has(target, prop)) {
@@ -132,7 +138,16 @@ export class Library {
 						});
 					}
 				}
+				if (prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
 				return Reflect.set(target, prop, newValue);
+			},
+			defineProperty(target, prop, descriptor) {
+				if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
+				return Reflect.defineProperty(target, prop, descriptor);
 			},
 		}
 	);
@@ -362,14 +377,14 @@ export class Library {
 										typeof yingbianZhuzhanAI == "function"
 											? yingbianZhuzhanAI(player, card, source, targets)
 											: cardx => {
-												var info = get.info(card);
-												if (info && info.ai && info.ai.yingbian) {
-													var ai = info.ai.yingbian(card, source, targets, player);
-													if (!ai) return 0;
-													return ai - get.value(cardx);
-												} else if (get.attitude(player, source) <= 0) return 0;
-												return 5 - get.value(cardx);
-											},
+													var info = get.info(card);
+													if (info && info.ai && info.ai.yingbian) {
+														var ai = info.ai.yingbian(card, source, targets, player);
+														if (!ai) return 0;
+														return ai - get.value(cardx);
+													} else if (get.attitude(player, source) <= 0) return 0;
+													return 5 - get.value(cardx);
+												},
 								});
 								if (!game.online) return;
 								_status.event._resultid = id;
@@ -4132,7 +4147,6 @@ export class Library {
 					init: true,
 					unfrequent: true,
 					onclick(bool) {
-						game.saveConfig("show_deckMonitor", bool);
 						game.saveConfig("show_deckMonitor", bool);
 						if (lib.config.show_deckMonitor) {
 							ui.deckMonitor.style.display = "";
@@ -8184,10 +8198,10 @@ export class Library {
 	genAwait(item) {
 		return gnc.is.generator(item)
 			? gnc.of(function* () {
-				for (const content of item) {
-					yield content;
-				}
-			})()
+					for (const content of item) {
+						yield content;
+					}
+				})()
 			: Promise.resolve(item);
 	}
 	gnc = {
@@ -10782,16 +10796,16 @@ export class Library {
 					const cardName = get.name(cards[0], player);
 					return cardName
 						? new lib.element.VCard({
-							name: cardName,
-							nature: get.nature(cards[0], player),
-							suit: get.suit(cards[0], player),
-							number: get.number(cards[0], player),
-							isCard: true,
-							cards: [cards[0]],
-							storage: {
-								stratagem_buffed: 1,
-							},
-						})
+								name: cardName,
+								nature: get.nature(cards[0], player),
+								suit: get.suit(cards[0], player),
+								number: get.number(cards[0], player),
+								isCard: true,
+								cards: [cards[0]],
+								storage: {
+									stratagem_buffed: 1,
+								},
+							})
 						: new lib.element.VCard();
 				}
 				return null;
@@ -12777,7 +12791,7 @@ export class Library {
 								navigator.clipboard
 									.readText()
 									.then(read)
-									.catch(_ => { });
+									.catch(_ => {});
 							} else {
 								var input = ui.create.node("textarea", ui.window, { opacity: "0" });
 								input.select();

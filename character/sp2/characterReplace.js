@@ -28,7 +28,7 @@ const characterReplaces = {
 	xushao: ["xushao", "jsrg_xushao"],
 	ol_huban: ["ol_huban", "dc_huban", "mb_huban"],
 	ol_mengda: ["ol_mengda", "dc_mengda", "pe_mengda"],
-	jsp_guanyu: ["jsp_guanyu", "dc_jsp_guanyu", "jsrg_guanyu"],
+	jsp_guanyu: ["jsp_guanyu", "dc_jsp_guanyu", "tw_jsp_guanyu", "jsrg_guanyu"],
 	mushun: ["mushun", "sp_mushun"],
 	wangjun: ["dc_wangjun", "wangjun"],
 	re_zoushi: ["yue_zoushi", "re_zoushi", "jsrg_zoushi"],
