@@ -10,6 +10,7 @@ const skills = {
 		filter(event, player) {
 			return event.player.isIn() && event.source != event.player;
 		},
+		frequent: true,
 		logTarget: "player",
 		prompt2: (event, player) => "击伤其一个部位",
 		async cost(event, trigger, player) {
@@ -158,7 +159,13 @@ const skills = {
 						if (bool) {
 							a.target.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_click_chosen.png)";
 							if (event.control) event.control.close();
-							if (event.control2) event.control2.open();
+							if (!lib.config.autoskilllist.includes("1！5！")) {
+								event.dialog.close();
+								game.resume();
+								_status.imchoosing = false;
+								resolve(event._result);
+							}
+							else if (event.control2) event.control2.open();
 						}
 					});
 					list.push(num_px);
@@ -276,16 +283,14 @@ const skills = {
 				marktext: "伤",
 				intro: {
 					name: "中伤 - 下肢",
-					content: "体力值大于1时，受到的伤害+1",
+					content: "下次受到的伤害+1",
 				},
 				trigger: { player: "damageBegin2" },
-				filter(event, player) {
-					return player.getHp() > 1;
-				},
 				forced: true,
 				popup: false,
 				content() {
 					trigger.num++;
+					player.removeSkill(event.name);
 				},
 			},
 			use: {
@@ -295,27 +300,15 @@ const skills = {
 				marktext: "伤",
 				intro: {
 					name: "中伤 - 胸部",
-					content: (_, player) => (_status.currentPhase === player ? "" : "下回合") + "使用下一张伤害牌造成的伤害-1",
+					content: (_, player) => (_status.currentPhase === player ? "" : "下回合") + "使用的下一张牌无效",
 				},
 				trigger: {
-					source: "damageBegin2",
-				},
-				filter(event, player) {
-					if (event.card && get.tag(event.card, "damage")) return true;
-					return false;
+					player: "useCard",
 				},
 				async content(event, trigger, player) {
-					let evt = trigger.getParent("useCard", true);
-					if (evt && !evt.yiwuMarked) {
-						evt.yiwuMarked = true;
-						player
-							.when("useCardAfter")
-							.filter(evtx => evtx.yiwuMarked)
-							.then(() => {
-								player.removeSkill("1！5！_use");
-							});
-					}
-					trigger.num -= 1;
+					trigger.all_excluded = true;
+					trigger.targets.length = 0;
+					player.removeSkill("1！5！_use");
 				},
 			},
 			respond: {
@@ -346,12 +339,43 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		async cost(event, trigger, player) {
-			let list = ["摸体力值张牌，此阶段使用的下一张【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段造成伤害后，回复等量体力。"];
+			let list = ["摸体力值张牌，此阶段使用的下一张【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段下一次造成伤害后，回复等量体力。"];
 			let result = await player
 				.chooseControlList(list)
 				.set("ai", function () {
-					//等157优化）
-					return Math.random();
+					let player = get.event("player"), damaged = player.getDamagedHp();
+					if (damaged) damaged += 0.6 * (player.countCard("hs", card => {
+						if (card.name == "sha" || !get.tag(card, "damage")) return 0;
+						let info = get.info(card);
+						if (!info || info.type != "trick") return false;
+						if (info.notarget) return false;
+						if (info.selectTarget != undefined) {
+							if (Array.isArray(info.selectTarget)) {
+								if (info.selectTarget[1] == -2) return 1;
+								if (info.selectTarget[1] == -1) {
+									let func = info.filterTarget;
+									if (typeof func != "function") func = () => true;
+									return game.countPlayer(cur => {
+										return func(card, player, cur);
+									});
+								}
+								return Math.max(1, info.selectTarget[0], info.selectTarget[1]);
+							} else {
+								if (info.selectTarget == -2) return 1;
+								if (info.selectTarget == -1) {
+									let func = info.filterTarget;
+									if (typeof func != "function") func = () => true;
+									return game.countPlayer(cur => {
+										return func(card, player, cur);
+									});
+								}
+								return Math.max(1, info.selectTarget);
+							}
+						}
+						return 1;
+					}) + Math.max(player.getCardUsable("sha"), player.countCards("hs", "sha")));
+					if (damaged > player.hp) return "选项二";
+					return "选项一";
 				})
 				.forResult();
 			event.result = {
@@ -395,11 +419,9 @@ const skills = {
 				},
 				forced: true,
 				charlotte: true,
-				filter: function (event, player) {
-					return player.isDamaged();
-				},
 				content: async function (event, trigger, player) {
-					player.recover(trigger.num);
+					if(player.isDamaged()) player.recover(trigger.num);
+					player.removeSkill(event.name);
 				},
 			},
 		},

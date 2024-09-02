@@ -322,20 +322,22 @@ const skills = {
 					var list = player.getStorage("houfeng_share").filter(i => i.isIn());
 					list.unshift(player);
 					event.list = list;
-					var num1 = 0,
-						num2 = 0,
-						num3 = 0;
-					for (var target of list) {
-						num1 += 2 * get.effect(target, { name: "draw" }, player, player);
-						num2 += get.recoverEffect(target, player, player);
+					if (list.some(i => i.isDamaged())) {
+						var num1 = 0,
+							num2 = 0;
+						for (var target of list) {
+							num1 += 2 * get.effect(target, { name: "draw" }, player, player);
+							num2 += get.recoverEffect(target, player, player);
+						}
+						trigger.player
+							.chooseControl("摸两张牌", "回复体力")
+							.set("prompt", "整肃奖励：请选择" + get.translation(list) + "的整肃奖励")
+							.set("ai", function () {
+								return ["摸两张牌", "回复体力"][_status.event.goon.indexOf(Math.max.apply(Math, _status.event.goon))];
+							})
+							.set("goon", [num1, num2]);
 					}
-					trigger.player
-						.chooseControl("摸两张牌", "回复体力", "cancel2")
-						.set("prompt", "整肃奖励：请选择" + get.translation(list) + "的整肃奖励")
-						.set("ai", function () {
-							return ["摸两张牌", "回复体力", "cancel2"][_status.event.goon.indexOf(Math.max.apply(Math, _status.event.goon))];
-						})
-						.set("goon", [num1, num2, num3]);
+					else event._result = { control: "摸两张牌" };
 					"step 1";
 					if (result.control != "cancel2") {
 						if (result.control == "摸两张牌") game.asyncDraw(event.list, 2);
@@ -397,7 +399,7 @@ const skills = {
 					delete player.storage.spzhengjun;
 					player.popup("整肃成功", "wood");
 					game.log(player, "整肃成功");
-					player.chooseDrawRecover(2, "整肃奖励：摸两张牌或回复1点体力");
+					player.chooseDrawRecover(2, "整肃奖励：摸两张牌或回复1点体力", true);
 					"step 1";
 					if (result.control == "cancel2") {
 						event.finish();
