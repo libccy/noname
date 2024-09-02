@@ -350,8 +350,39 @@ const skills = {
 			let result = await player
 				.chooseControlList(list)
 				.set("ai", function () {
-					//等157优化）
-					return Math.random();
+					let player = get.event("player"), damaged = player.getDamagedHp();
+					if (damaged) damaged += 0.6 * (player.countCard("hs", card => {
+						if (card.name == "sha" || !get.tag(card, "damage")) return 0;
+						let info = get.info(card);
+						if (!info || info.type != "trick") return false;
+						if (info.notarget) return false;
+						if (info.selectTarget != undefined) {
+							if (Array.isArray(info.selectTarget)) {
+								if (info.selectTarget[1] == -2) return 1;
+								if (info.selectTarget[1] == -1) {
+									let func = info.filterTarget;
+									if (typeof func != "function") func = () => true;
+									return game.countPlayer(cur => {
+										return func(card, player, cur);
+									});
+								}
+								return Math.max(1, info.selectTarget[0], info.selectTarget[1]);
+							} else {
+								if (info.selectTarget == -2) return 1;
+								if (info.selectTarget == -1) {
+									let func = info.filterTarget;
+									if (typeof func != "function") func = () => true;
+									return game.countPlayer(cur => {
+										return func(card, player, cur);
+									});
+								}
+								return Math.max(1, info.selectTarget);
+							}
+						}
+						return 1;
+					}) + Math.max(player.getCardUsable("sha"), player.countCards("hs", "sha")));
+					if (damaged > player.hp) return "选项二";
+					return "选项一";
 				})
 				.forResult();
 			event.result = {

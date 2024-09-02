@@ -3818,8 +3818,9 @@ const skills = {
 			var card = cards[targets.indexOf(player)];
 			var cardx = cards.filter(cardy => cardy != card && get.color(cardy, targets[cards.indexOf(cardy)]) == get.color(card, player));
 			if (cardx.length) {
+				const num = get.mode() == "identity" ? 4 : 2;
 				player
-					.chooseButton(["乱群：是否获得其中至多四张牌", cardx])
+					.chooseButton(["乱群：是否获得其中至多" + get.cnNumber(num) + "张牌", cardx])
 					.set("forceAuto", true)
 					.set("ai", function (button) {
 						var cards = _status.event.list[0];
@@ -3828,7 +3829,7 @@ const skills = {
 						if (get.attitude(player, targets[cards.indexOf(button.link)]) > 0) return 0;
 						return get.value(button.link, player);
 					})
-					.set("selectButton", [1, 4])
+					.set("selectButton", [1, num])
 					.set("list", [cards, targets]);
 			} else event.goto(4);
 			"step 3";
@@ -3841,6 +3842,8 @@ const skills = {
 				targets.forEach(target => {
 					target.addTempSkill("luanqun_effect", { player: "phaseUseAfter" });
 					target.markAuto("luanqun_effect", [player]);
+					target.addTempSkill("luanqun_directHit", { player: "phaseEnd" });
+					target.markAuto("luanqun_directHit", [player]);
 				});
 			}
 		},
@@ -3857,21 +3860,36 @@ const skills = {
 			effect: {
 				charlotte: true,
 				onremove: true,
-				intro: { content: "出牌阶段第一张【杀】只能指定$为目标，且此牌不可被响应" },
 				mod: {
-					playerEnabled: function (card, player, target) {
+					playerEnabled(card, player, target) {
 						if (!player.isPhaseUsing()) return;
 						if (card.name == "sha" && !player.getStorage("luanqun_effect").includes(target)) return false;
 					},
 				},
 				trigger: { player: "useCard1" },
-				filter: function (event, player) {
+				filter(event, player) {
 					return player.isPhaseUsing() && event.card.name == "sha";
 				},
+				firstDo: true,
 				forced: true,
-				content: function () {
-					trigger.directHit.addArray(player.getStorage("luanqun_effect"));
+				content() {
 					player.removeSkill("luanqun_effect");
+				},
+			},
+			directHit: {
+				charlotte: true,
+				onremove: true,
+				intro: { content: "出牌阶段第一张【杀】只能指定$为目标，且其不可响应你回合内使用的【杀】" },
+				trigger: { player: "useCard1" },
+				filter: function (event, player) {
+					return player == _status.currentPhase && event.card.name == "sha";
+				},
+				forced: true,
+				logTarget(event, player) {
+					return player.getStorage("luanqun_directHit");
+				},
+				content: function () {
+					trigger.directHit.addArray(player.getStorage("luanqun_directHit"));
 				},
 			},
 		},

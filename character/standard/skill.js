@@ -282,7 +282,7 @@ const skills = {
 		popup: false,
 		async content(event, trigger, player) {
 			const chooseCardResultCards = event.cost_data.cards;
-			player.respond(chooseCardResultCards, "guicai", "highlight", "noOrdering");
+			await player.respond(chooseCardResultCards, "guicai", "highlight", "noOrdering");
 			if (trigger.player.judging[0].clone) {
 				trigger.player.judging[0].clone.classList.remove("thrownhighlight");
 				game.broadcast(function (card) {
