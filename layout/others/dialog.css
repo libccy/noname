@@ -86,7 +86,7 @@
 .popupContainer.deckMonitor .deckMonitor {
     --bgColor: rgb(87 151 164);
     width: 80%;
-    height: 80%;
+    height: 75%;
     background-color: var(--bgColor);
     left: 50%;
     top: 50%;
@@ -123,11 +123,12 @@
     height: 90%;
     bottom: 0%;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     background: #59bac4;
     padding: 5px;
     box-sizing: border-box;
-
+    /* 滚动方案开启，压缩方案关闭 */
+    overflow-x: scroll;
 }
 
 .popupContainer.deckMonitor .deckMonitor .contentContainer * {
@@ -145,7 +146,9 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-
+    max-width: calc(100% / 6);
+    /* 滚动方案开启，压缩方案关闭 */
+    min-width: calc(100% / 7);
 }
 
 .popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .subtitle {
@@ -158,7 +161,7 @@
     align-items: center;
     font-size: 1.2em;
     flex-shrink: 0;
-
+    overflow: scroll;
 }
 
 .popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .itemContainer {
@@ -171,11 +174,11 @@
 
 .popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .itemContainer .itemCount {
     display: flex;
-    flex-grow: 1;
-    width: 30%;
+    flex: 1 3 30px;
     flex-shrink: 0;
-    overflow: hidden;
+    overflow: visible;
     font-size: 0.9em;
+    justify-content: center;
 
 }
 
@@ -183,9 +186,9 @@
 
     background-color: #2f2e2e;
     display: flex;
-    width: 94%;
+    width: 96%;
     margin-top: 4px;
-    padding: 2px 5px;
+    padding: 2px 2px;
     border-radius: 3px;
     align-items: center;
     border-radius: 3px;
@@ -199,18 +202,17 @@
 }
 
 .popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .itemContainer .item .itemName {
-    display: flex;
-    /* flex-grow: 2; */
-    justify-content: center;
     background: #d6cece;
     margin: 3px;
     margin: 5px 2px;
     border-radius: 5px;
-    width: 70%;
     color: black;
     text-shadow: none;
     padding: 2px;
     font-size: 0.9em;
+    flex: 1 5 50px;
+    justify-content: center;
+    display: flex;
 }
 
 .popupContainer.deckMonitor .deckMonitor .contentContainer .columnContainer .itemContainer .item .tip {

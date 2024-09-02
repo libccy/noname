@@ -1961,7 +1961,7 @@ export class Create {
 				});
 			}
 		}
-		lib.init.js(lib.assetURL + "game", "keyWords", function () {});
+		lib.init.js(lib.assetURL + "game", "keyWords", function () { });
 
 		lib.updateURL = lib.updateURLS[lib.config.update_link] || lib.updateURLS.coding;
 
@@ -2342,7 +2342,7 @@ export class Create {
 						typeResult.equip ??= [];
 						typeResult.delay ??= [];
 						for (let key of Object.keys(typeResult).sort((a, b) => {
-							let arr = ["basic", "trick", "equip", "delay"];
+							let arr = ['basic', 'trick', 'equip', 'delay', 'jiqi', 'spell', 'zhenfa', 'food', 'jiguan', 'land'];
 							return arr.indexOf(a) - arr.indexOf(b);
 						})) {
 							let result = Object.groupBy(typeResult[key], card => get.name(card));

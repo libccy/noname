@@ -1682,6 +1682,14 @@ export const Content = {
 			};
 			event.custom.replace.confirm = function (bool) {
 				if (event.isPlayingAnimation) return
+				event.buttonss.forEach(btn => {
+					Array.from(btn.children).forEach(element => {
+						if (element.copy && ui.window.contains(element.copy)) {
+							ui.window.removeChild(element.copy);
+							delete element.copy
+						}
+					});
+				});
 				if (bool)
 					event._result = {
 						bool: true,
