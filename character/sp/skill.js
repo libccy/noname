@@ -6700,10 +6700,11 @@ const skills = {
 			return targets.length == 3 && targets.includes(player);
 		},
 		content: function () {
-			"step 0";
+			"step 0"
 			player.awakenSkill("olhuiqi");
+			if(player.isDamaged()) player.recover();
+			"step 1"
 			player.addSkills("olxieju");
-			player.insertPhase();
 		},
 	},
 	olxieju: {
@@ -6731,13 +6732,15 @@ const skills = {
 		},
 		selectTarget: [1, Infinity],
 		content: function () {
-			var card = {
-				name: "sha",
-				isCard: true,
-			};
-			if (target.hasUseTarget(card, true)) {
-				target.chooseUseTarget(card, true, false);
-			}
+			let next = target.chooseToUse();
+			next.set("openskilldialog", "偕举：是否将一张黑色牌当杀使用？");
+			next.set("norestore", true);
+			next.set("_backupevent", "olxieju_backup");
+			next.set("custom", {
+				add: {},
+				replace: { window: function () { } },
+			});
+			next.backup("olxieju_backup");
 		},
 		ai: {
 			order: 1,
@@ -6745,6 +6748,21 @@ const skills = {
 				target: function (player, target) {
 					var val = target.getUseValue({ name: "sha" }, true);
 					return Math.sign(val);
+				},
+			},
+		},
+		subSkill: {
+			backup: {
+				filterCard: function (card) {
+					return get.itemtype(card) == "card" && get.color(card) == "black";
+				},
+				position: "hes",
+				viewAs: {
+					name: "sha",
+				},
+				prompt: "将一张黑色牌当杀使用",
+				check: function (card) {
+					return 7 - get.value(card);
 				},
 			},
 		},

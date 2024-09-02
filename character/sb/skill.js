@@ -8070,12 +8070,14 @@ const skills = {
 		trigger: {
 			global: "phaseEnd",
 		},
-		filter:function(event,player){
-			if(player==event.player) return false;
-			return player.getHistory("lose",evt=>evt.cards2 && evt.cards2.length ).length;
+		filter: function (event, player) {
+			if (player == event.player) return false;
+			if (get.mode() == "doudizhu") return true;
+			return player.getHistory("lose", evt => evt.cards2 && evt.cards2.length).length;
 		},
-		async content(event,trigger,player){
+		async content(event, trigger, player) {
 			let num = 0;
+			if (get.mode() == "doudizhu") num++;
 			player.getHistory("lose", evt => {
 				if (evt.cards2) num += evt.cards2.length;
 			});

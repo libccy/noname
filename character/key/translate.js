@@ -411,7 +411,7 @@ const translates = {
 	asara_yingwei: "影威",
 	asara_yingwei_info: "你可以如手牌般使用或打出“影”。锁定技，当你使用“影”时，强制触发对应的应变效果。",
 	kotomi_qinji: "琴击",
-	kotomi_qinji_info: "出牌阶段开始时，你可视为使用使用【万箭齐发】。你以此法使用【万箭齐发】造成的伤害视为失去体力。",
+	kotomi_qinji_info: "出牌阶段开始时，你可视为使用【万箭齐发】。你以此法使用【万箭齐发】造成的伤害视为失去体力。",
 	kotomi_chuanxiang: "传箱",
 	kotomi_chuanxiang2: "传箱",
 	kotomi_chuanxiang_info: "其他角色的出牌阶段限一次，其可以将装备区内的一张牌移动到另一名角色的装备区内，然后你摸一张牌。若你是目标角色，则你改为摸两张牌。",
