@@ -7349,6 +7349,12 @@ export class Player extends HTMLDivElement {
 		if (mark) this.markAuto(name);
 		return value;
 	}
+	/**
+	 * 获取this.storage[name]的值
+	 * @param { string } name 
+	 * @param { any } defaultValue 预设值，默认为[]（不修改原storage）
+	 * @returns 
+	 */
 	getStorage(name, defaultValue = []) {
 		return this.storage[name] || defaultValue;
 	}
