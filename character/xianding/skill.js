@@ -137,7 +137,7 @@ const skills = {
 			await target.viewHandcards(player);
 			if (!target.countCards("h")) return;
 			await player
-				.discardPlayerCard(target, "h", 2, "visible", "是否弃置弃置♠♣花色的牌各一张？")
+				.discardPlayerCard(target, "h", 2, "visible", "是否弃置♠♣花色的牌各一张？")
 				.set("filterButton", button => {
 					if (!["spade", "club"].includes(get.suit(button.link))) return false;
 					return ui.selected.buttons?.every(buttonx => {

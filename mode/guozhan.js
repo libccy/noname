@@ -8142,7 +8142,7 @@ export default () => {
 				content: function () {
 					"step 0";
 					player
-						.chooseTarget(get.prompt("gzshensu"), "失去1点体力并跳过弃牌阶段，视为对一名其他角色使用使用一张无距离限制的【杀】", function (card, player, target) {
+						.chooseTarget(get.prompt("gzshensu"), "失去1点体力并跳过弃牌阶段，视为对一名其他角色使用一张无距离限制的【杀】", function (card, player, target) {
 							return player.canUse("sha", target, false);
 						})
 						.setHiddenSkill("gzshensu")
