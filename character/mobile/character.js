@@ -110,7 +110,7 @@ const characters = {
 	re_sp_zhugeliang: ["male", "shu", 3, ["bazhen", "rehuoji", "rekanpo"], ["name:诸葛|亮"]],
 	xin_xiahoudun: ["male", "wei", 4, ["reganglie", "xinqingjian"], ["name:夏侯|惇"]],
 	zhangyì: ["male", "shu", 4, ["rezhiyi"]],
-	jiakui: ["male", "wei", 3, ["zhongzuo", "wanlan"]],
+	jiakui: ["male", "wei", 4, ["tongqu", "xinwanlan"]],
 	re_jikang: ["male", "wei", 3, ["new_qingxian", "new_juexiang"]],
 	miheng: ["male", "qun", 3, ["kuangcai", "shejian"]],
 	taoqian: ["male", "qun", 3, ["zhaohuo", "yixiang", "yirang"]],

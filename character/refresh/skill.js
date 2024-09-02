@@ -7326,6 +7326,7 @@ const skills = {
 	rehuaiyi2: {},
 	rezhuikong: {
 		audio: 2,
+		audioname2: { tw_fuhuanghou: "xinzhuikong" },
 		trigger: { global: "phaseZhunbeiBegin" },
 		check: function (event, player) {
 			if (get.attitude(player, event.player) < -2) {

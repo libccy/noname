@@ -14,7 +14,7 @@ const characterReplaces = {
 	liuye: ["dc_liuye", "liuye"],
 	zhaotongzhaoguang: ["dc_zhaotongzhaoguang", "zhaotongzhaoguang"],
 	yangbiao: ["yangbiao", "dc_yangbiao", "jsrg_yangbiao"],
-	qiaozhou: ["yj_qiaozhou", "qiaozhou"],
+	qiaozhou: ["yj_qiaozhou", "qiaozhou", "tw_qiaozhou"],
 	sunhanhua: ["dc_sunhanhua", "sunhanhua"],
 	zhoubuyi: ["zhoubuyi", "yj_zhoubuyi"],
 	xianglang: ["xianglang", "mb_xianglang"],

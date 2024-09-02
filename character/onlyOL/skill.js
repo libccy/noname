@@ -2155,26 +2155,6 @@ const skills = {
 			ol_sb_yuanshao_shadow: {
 				audio: 1,
 			},
-			sizhaojian: {
-				equipSkill: true,
-				mod: {
-					aiOrder(player, card, num) {
-						if (card.name == "sha" && typeof get.number(card) == "number") return num + get.number(card) / 114514;
-					},
-				},
-				trigger: { player: "useCardToPlayered" },
-				filter(event, player) {
-					return event.card.name == "sha" && typeof get.number(event.card) == "number";
-				},
-				forced: true,
-				locked: false,
-				logTarget: "target",
-				async content(event, trigger, player) {
-					const target = trigger.target;
-					target.addTempSkill("olsbyufeng_block");
-					target.markAuto("olsbyufeng_block", [trigger.card]);
-				},
-			},
 			block: {
 				mod: {
 					cardEnabled(card, player) {
@@ -2208,6 +2188,26 @@ const skills = {
 					if (!player.getStorage("olsbyufeng_block").length) player.removeSkill("olsbyufeng_block");
 				},
 			},
+		},
+	},
+	sizhaojian_skill: {
+		equipSkill: true,
+		mod: {
+			aiOrder(player, card, num) {
+				if (card.name == "sha" && typeof get.number(card) == "number") return num + get.number(card) / 114514;
+			},
+		},
+		trigger: { player: "useCardToPlayered" },
+		filter(event, player) {
+			return event.card.name == "sha" && typeof get.number(event.card) == "number";
+		},
+		forced: true,
+		locked: false,
+		logTarget: "target",
+		async content(event, trigger, player) {
+			const target = trigger.target;
+			target.addTempSkill("olsbyufeng_block");
+			target.markAuto("olsbyufeng_block", [trigger.card]);
 		},
 	},
 	olsbshishou: {
