@@ -4,6 +4,7 @@ import { game } from "../game/index.js";
 import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 
+
 // 废弃覆盖原型的HTMLDivElement.prototype.animate
 // 改为HTMLDivElement.prototype.addTempClass
 /**

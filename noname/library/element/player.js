@@ -369,6 +369,47 @@ export class Player extends HTMLDivElement {
 	 * @type { boolean }
 	 */
 	removed;
+	/**
+	 * @type {Map<string,HTMLDivElement>}
+	 */
+	tips;
+
+	/**
+	 * 设置提示文字，有则更改，无则加之。
+	 * @param {string} index 给标记起一个名字，名字任意
+	 * @param {string} message 设置提示标记的内容
+	 * @param { boolean } [isTemp] 若为ture,表示临时的，则会在回合结束自动清除标记。否则除非手动清除，不然一直存在
+	 * @param { object } [css] 自定义的样式
+	 * @returns { HTMLDivElement }
+	 * @author Curpond
+	 */
+	setTip(index, message, isTemp = false, css = {}) {
+		this.node.tipContainer ??= ui.create.div('.tipContainer', this);
+		this.tips ??= new Map();
+		if (!this.tips.has(index)) this.tips.set(index, ui.create.div('.tip', this.node.tipContainer));
+		this.tips.get(index).innerHTML = message.replace(/ /g, '&nbsp;').replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
+		this.tips.get(index).css(css);
+		let player = this;
+		if (isTemp) player.when({ global: 'phaseEnd' }).apply(code => eval(code)).then(() => player.removeTip(index));
+		return this.tips.get(index);
+	}
+	/**
+	 * 清除标记，不传参数可以清空所有标记
+	 * @param {string} [index] 标记的名字，不传则清空所有标记
+	 * @author Curpond
+	 */
+	removeTip(index) {
+		if (index == undefined) {
+			this.tips?.clear();
+		} else {
+			if (this.tips?.has(index)) {
+				this.tips.get(index).remove();
+				this.tips.delete(index);
+			}
+		}
+		if (!this.tips?.size) this.node.tipContainer?.remove();
+		delete this.node.tipContainer;
+	}
 	//新函数
 	/**
 	 * 怒气
@@ -1033,10 +1074,10 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-				this.getVEquips(type).reduce((num, card) => {
-					let types = get.subtypes(card, false);
-					return num + get.numOf(types, type);
-				}, 0)
+			this.getVEquips(type).reduce((num, card) => {
+				let types = get.subtypes(card, false);
+				return num + get.numOf(types, type);
+			}, 0)
 		);
 	}
 	/**
@@ -1065,11 +1106,11 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-				this.getVEquips(type).reduce((num, card) => {
-					let types = get.subtypes(card, false);
-					if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
-					return num;
-				}, 0)
+			this.getVEquips(type).reduce((num, card) => {
+				let types = get.subtypes(card, false);
+				if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
+				return num;
+			}, 0)
 		);
 	}
 	/**
@@ -1413,11 +1454,11 @@ export class Player extends HTMLDivElement {
 	/**
 	 * @deprecated
 	 */
-	$disableEquip() {}
+	$disableEquip() { }
 	/**
 	 * @deprecated
 	 */
-	$enableEquip() {}
+	$enableEquip() { }
 	//装备区End
 	chooseToDebate() {
 		var next = game.createEvent("chooseToDebate");
@@ -2131,10 +2172,10 @@ export class Player extends HTMLDivElement {
 		m = game.checkMod(from, to, m, "attackFrom", from);
 		m = game.checkMod(from, to, m, "attackTo", to);
 		const equips1 = from.getVCards("e", function (card) {
-				return !card.cards?.some(card => {
-					return ui.selected.cards?.includes(card);
-				});
-			}),
+			return !card.cards?.some(card => {
+				return ui.selected.cards?.includes(card);
+			});
+		}),
 			equips2 = to.getVCards("e", function (card) {
 				return !card.cards?.some(card => {
 					return ui.selected.cards?.includes(card);
