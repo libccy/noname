@@ -7494,7 +7494,7 @@ const skills = {
 			result: { player: 7 },
 		},
 		group: ["xinjianying_draw"],
-		init: function (player) {
+		init(player) {
 			if (player.isPhaseUsing()) {
 				var evt = _status.event.getParent("phaseUse");
 				var history = player.getHistory("useCard", function (evt2) {
@@ -7503,13 +7503,12 @@ const skills = {
 				if (history.length) {
 					var trigger = history[history.length - 1];
 					if (get.suit(trigger.card) == "none" || typeof get.number(trigger.card) != "number") return;
-					player.addTempSkill("jianying_mark", "phaseUseAfter");
-					player.addTip("jianying_mark", "渐营 " + lib.skill.jianying.getTranslation(trigger.card));
+					player.addTip("jianying", "渐营 " + lib.skill.jianying.getTranslation(trigger.card), "phaseUseAfter");
 				}
 			}
 		},
-		onremove: function (player) {
-			player.removeTip("jianying_mark");
+		onremove(player) {
+			player.removeTip("jianying");
 		},
 		subSkill: {
 			draw: { inherit: "jianying", audio: "xinjianying" },
@@ -8307,21 +8306,12 @@ const skills = {
 					.unique();
 				if (suits.length) {
 					suits.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
-					player.addTempSkill("bingqing_count", "phaseUseAfter");
-					player.addTip("bingqing_count", "秉清 " + suits.reduce((str, suit) => str + get.translation(suit), ""));
+					player.addTip("bingqing", "秉清 " + suits.reduce((str, suit) => str + get.translation(suit), ""), "phaseUseAfter");
 				}
 			}
 		},
-		onremove(player) {
-			player.removeSkill("bingqing_count");
-		},
-		subSkill: {
-			count: {
-				charlotte: true,
-				onremove(player, skill) {
-					player.removeTip(skill);
-				},
-			},
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 	},
 	yingfeng: {

@@ -2804,20 +2804,11 @@ const skills = {
 				}, [])
 				.map(type => get.translation(type)[0] || "");
 			if (types.length) {
-				player.addTempSkill("clansankuang_count", "roundStart");
-				player.addTip("clansankuang_count", "三恇 " + types.slice().join(" "));
+				player.addTip("clansankuang", "三恇 " + types.slice().join(" "), "roundStart");
 			}
 		},
-		onremove(player) {
-			player.removeSkill("clansankuang_count");
-		},
-		subSkill: {
-			count: {
-				charlotte: true,
-				onremove(player, skill) {
-					player.removeTip(skill);
-				},
-			},
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 	},
 	clanbeishi: {
@@ -3351,12 +3342,11 @@ const skills = {
 				}, [])
 				.sort((a, b) => lib.suits.indexOf(b) - lib.suits.indexOf(a));
 			if (suits.length) {
-				player.addTempSkill("clandianzhan_count", "roundStart");
-				player.addTip("clandianzhan_count", "点盏 " + suits.reduce((str, suit) => str + get.translation(suit), ""));
+				player.addTip("clandianzhan", "点盏 " + suits.reduce((str, suit) => str + get.translation(suit), ""), "roundStart");
 			}
 		},
-		onremove(player) {
-			player.removeSkill("clandianzhan_count");
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 	},
 	clanhuanyin: {

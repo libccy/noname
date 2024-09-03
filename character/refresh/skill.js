@@ -3271,8 +3271,7 @@ const skills = {
 			return false;
 		},
 		filter: function (event, player) {
-			player.addSkill("dcjianying_mark");
-			player.addTip("dcjianying_mark", "渐营 " + lib.skill.jianying.getTranslation(event.card));
+			player.addTip("dcjianying", "渐营 " + lib.skill.jianying.getTranslation(event.card));
 			var evt = lib.skill.dcjianying.getLastUsed(player, event);
 			if (!evt || !evt.card) return false;
 			return (lib.suit.includes(get.suit(evt.card)) && get.suit(evt.card) == get.suit(event.card)) || (typeof get.number(evt.card, false) == "number" && get.number(evt.card, false) == get.number(event.card));
@@ -3280,23 +3279,14 @@ const skills = {
 		content: function () {
 			player.draw();
 		},
-		init: function (player) {
+		init(player) {
 			var trigger = lib.skill.dcjianying.getLastUsed(player);
 			if (trigger) {
-				player.addSkill("dcjianying_mark");
-				player.addTip("dcjianying_mark", "渐营 " + lib.skill.jianying.getTranslation(trigger.card));
+				player.addTip("dcjianying", "渐营 " + lib.skill.jianying.getTranslation(trigger.card));
 			}
 		},
-		onremove: function (player) {
-			player.removeTip("dcjianying_mark");
-		},
-		subSkill: {
-			mark: {
-				charlotte: true,
-				onremove(player, skill) {
-					player.removeTip(skill);
-				},
-			},
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 	},
 	//十周年步练师
@@ -4139,8 +4129,7 @@ const skills = {
 			if (event.name !== "phase") {
 				if (suits.length) {
 					suits.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
-					player.addTempSkill("rebotu_mark");
-					player.addTip("rebotu_mark", "博图 " + suits.reduce((str, suit) => str + get.translation(suit), ""));
+					player.addTip("rebotu", "博图 " + suits.reduce((str, suit) => str + get.translation(suit), ""), true);
 				}
 				return false;
 			}
@@ -4164,12 +4153,11 @@ const skills = {
 			});
 			if (suits.length) {
 				suits.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
-				player.addTempSkill("rebotu_mark");
-				player.addTip("rebotu_mark", "博图 " + suits.reduce((str, suit) => str + get.translation(suit), ""));
+				player.addTip("rebotu", "博图 " + suits.reduce((str, suit) => str + get.translation(suit), ""), true);
 			}
 		},
-		onremove(player) {
-			player.removeSkill("rebotu_mark");
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 		content: function () {
 			player.addTempSkill("rebotu_count", "roundStart");

@@ -3095,12 +3095,11 @@ const skills = {
 				list.sort(function (a, b) {
 					return lib.suit.indexOf(b) - lib.suit.indexOf(a);
 				});
-				player.addTempSkill("twshelie_count");
-				player.addTip("twshelie_count", "涉猎 " + list.reduce((str, suit) => str + get.translation(suit), ""));
+				player.addTip("twshelie", "涉猎 " + list.reduce((str, suit) => str + get.translation(suit), ""), true);
 			}
 		},
-		onremove(player) {
-			player.removeTip("twshelie_count");
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 		subSkill: {
 			round: { charlotte: true },
@@ -3124,8 +3123,7 @@ const skills = {
 							list.sort(function (a, b) {
 								return lib.suit.indexOf(b) - lib.suit.indexOf(a);
 							});
-							player.addTempSkill("twshelie_count");
-							player.addTip("twshelie_count", "涉猎 " + list.reduce((str, suit) => str + get.translation(suit), ""));
+							player.addTip("twshelie", "涉猎 " + list.reduce((str, suit) => str + get.translation(suit), ""), true);
 						}
 						return false;
 					}

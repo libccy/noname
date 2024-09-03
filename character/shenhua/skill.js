@@ -2317,12 +2317,11 @@ const skills = {
 				.map(evt => get.translation(get.type2(evt.card, false))[0] || "")
 				.unique();
 			if (types.length) {
-				player.addTempSkill("nzry_shicai_2");
-				player.addTip("nzry_shicai_2", "恃才 " + types.slice().join(" "));
+				player.addTip("nzry_shicai", "恃才 " + types.slice().join(" "), true);
 			}
 		},
-		onremove(player) {
-			player.removeSkill("nzry_shicai_2");
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 		subSkill: {
 			2: {

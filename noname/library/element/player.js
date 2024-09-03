@@ -378,7 +378,7 @@ export class Player extends HTMLDivElement {
 	 * 设置提示文字，有则更改，无则加之。
 	 * @param {string} index 给标记起一个名字，名字任意
 	 * @param {string} message 设置提示标记的内容
-	 * @param { boolean } [isTemp] 若为ture,表示临时的，则会在回合结束自动清除标记。否则除非手动清除，不然一直存在
+	 * @param { SkillTrigger | string | boolean | (event:GameEventPromise, player:Player, name:string) => boolean } isTemp 确定失去的时间阶段，不填则不失去
 	 * @param { object } [css] 自定义的样式
 	 * @returns { HTMLDivElement }
 	 * @author Curpond
@@ -398,11 +398,26 @@ export class Player extends HTMLDivElement {
 			message,
 			css
 		);
-		if (isTemp)
+		if (isTemp && !player.storage[`temp_tip_${index}`]) {
+			player.storage[`temp_tip_${index}`] = true;
+			let expire;
+			if (isTemp === true) expire = { global: ["phaseAfter", "phaseBeforeStart"] };
+			else if (typeof isTemp == "string" || Array.isArray(isTemp)) expire = { global: isTemp };
 			player
-				.when({ global: "phaseEnd" })
-				.apply(code => eval(code))
-				.then(() => player.removeTip(index));
+				.when(expire, false)
+				.assign({
+					firstDo: true,
+					priority: Infinity,
+				})
+				.vars({
+					index,
+				})
+				.then(() => {
+					delete player.storage[`temp_tip_${index}`];
+					player.removeTip(index);
+				})
+				.finish();
+		}
 		return player.tips.get(index);
 	}
 	/**

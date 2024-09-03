@@ -18996,8 +18996,7 @@ const skills = {
 		preHidden: true,
 		filter: function (event, player) {
 			let all = player.getHistory("useCard").length + player.getHistory("respond").length;
-			player.addTempSkill("gzjili_count");
-			player.addTip("gzjili_count", "蒺藜 " + all.toString());
+			player.addTip("gzjili", "蒺藜 " + all.toString(), true);
 			return all == player.getAttackRange();
 		},
 		audio: 2,
@@ -19006,13 +19005,10 @@ const skills = {
 		},
 		init(player) {
 			let all = player.getHistory("useCard").length + player.getHistory("respond").length;
-			if (all) {
-				player.addTempSkill("gzjili_count");
-				player.addTip("gzjili_count", "蒺藜 " + all.toString());
-			}
+			if (all) player.addTip("gzjili", "蒺藜 " + all.toString(), true);
 		},
-		onremove(player) {
-			player.removeTip("gzjili_count");
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 		ai: {
 			threaten: 1.8,
