@@ -22150,7 +22150,7 @@ const skills = {
 			},
 		},
 	},
-	xiehui: {
+	xiahui: {
 		mod: {
 			ignoredHandcard: function (card, player) {
 				if (get.color(card) == "black") {
@@ -22203,23 +22203,23 @@ const skills = {
 						return hs.includes(card) && cards.includes(card) && get.color(card, player) == "black";
 					});
 				if (cardsx.length > 0) {
-					current.addSkill("xiehui2");
-					current.addGaintag(cardsx, "xiehui");
+					current.addSkill("xiahui2");
+					current.addGaintag(cardsx, "xiahui");
 				}
 			});
 		},
 	},
-	xiehui2: {
+	xiahui2: {
 		mark: true,
 		intro: {
 			content: "不能使用、打出或弃置得到的黑色牌",
 		},
 		mod: {
 			cardDiscardable: function (card, player) {
-				if (card.hasGaintag("xiehui")) return false;
+				if (card.hasGaintag("xiahui")) return false;
 			},
 			cardEnabled2: function (card, player) {
-				if (get.itemtype(card) == "card" && card.hasGaintag("xiehui")) return false;
+				if (get.itemtype(card) == "card" && card.hasGaintag("xiahui")) return false;
 			},
 		},
 		trigger: { player: "changeHp" },
@@ -22230,10 +22230,10 @@ const skills = {
 			return event.num < 0;
 		},
 		content: function () {
-			player.removeSkill("xiehui2");
+			player.removeSkill("xiahui2");
 		},
 		onremove: function (player) {
-			player.removeGaintag("xiehui");
+			player.removeGaintag("xiahui");
 		},
 	},
 	shanjia: {

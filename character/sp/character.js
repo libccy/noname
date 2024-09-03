@@ -162,7 +162,7 @@ const characters = {
 
 	caochun: ["male", "wei", 4, ["xinshanjia"]],
 
-	dongbai: ["female", "qun", 3, ["lianzhu", "xiehui"]],
+	dongbai: ["female", "qun", 3, ["lianzhu", "xiahui"]],
 
 	zhaoxiang: ["female", "shu", 4, ["fanghun", "fuhan"]],
 	mazhong: ["male", "shu", 4, ["fuman"]],

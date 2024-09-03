@@ -9255,7 +9255,7 @@ const skills = {
 	},
 	//孙綝
 	zyshilu: {
-		audio: "gzshilu",
+		audio: 2,
 		preHidden: true,
 		trigger: { global: "dieAfter" },
 		prompt2(event, player) {
