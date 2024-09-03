@@ -208,8 +208,7 @@ const skills = {
 				if (result.bool) {
 					const lose = result.moved[1].slice();
 					const gain = result.moved[0].slice().filter(i => !get.owner(i));
-					if (lose.some(i => get.owner(i)))
-						await game.cardsGotoOrdering(lose.filter(i => get.owner(i)));
+					if (lose.some(i => get.owner(i))) await game.cardsGotoOrdering(lose.filter(i => get.owner(i)));
 					for (let i = lose.length - 1; i--; i >= 0) {
 						ui.cardPile.insertBefore(lose[i], ui.cardPile.firstChild);
 					}
@@ -1629,9 +1628,12 @@ const skills = {
 				charlotte: true,
 				trigger: { global: "phaseEnd" },
 				filter(event, player) {
-					if (!Object.keys(event.player.storage).some(skill => {
-						return skill.startsWith("clanmingjiex_" + player.playerid + "_") && event.player.storage[skill] == 1;
-					})) return false;
+					if (
+						!Object.keys(event.player.storage).some(skill => {
+							return skill.startsWith("clanmingjiex_" + player.playerid + "_") && event.player.storage[skill] == 1;
+						})
+					)
+						return false;
 					return player.getStorage("clanmingjie_record").someInD("d");
 				},
 				forced: true,
@@ -2709,19 +2711,30 @@ const skills = {
 	//族荀谌
 	clansankuang: {
 		audio: 2,
-		trigger: { player: "useCardAfter" },
+		trigger: { player: ["useCardAfter", "useCard1"] },
 		direct: true,
 		forced: true,
-		filter(event, player) {
-			if (!game.hasPlayer(current => current != player)) return false;
+		filter(event, player, name) {
 			const type = get.type2(event.card);
-			return player.getRoundHistory("useCard", evt => get.type2(evt.card) == type).indexOf(event) == 0;
+			if (player.getRoundHistory("useCard", evt => get.type2(evt.card) == type).indexOf(event) !== 0) return false;
+			if (name === "useCard1") {
+				lib.skill.clansankuang.init(player);
+				return false;
+			}
+			return game.hasPlayer(current => current != player);
 		},
 		getNum(player) {
 			return (player.countCards("ej") > 0) + player.isDamaged() + (Math.max(0, player.hp) < player.countCards("h"));
 		},
 		content() {
 			"step 0";
+			var func = function () {
+				game.countPlayer(function (target) {
+					if (target != player) target.prompt("三恇" + lib.skill.clansankuang.getNum(target));
+				});
+			};
+			if (event.player == game.me) func();
+			else if (event.isOnline()) player.send(func);
 			var cards = trigger.cards.filterInD("oe");
 			player
 				.chooseTarget("三恇：选择一名其他角色", "令其交给你至少X张牌" + (cards.length ? "，然后其获得" + get.translation(cards) : "") + "（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）", true, lib.filter.notMe)
@@ -2782,6 +2795,29 @@ const skills = {
 				},
 			},
 			threaten: 1.6,
+		},
+		init(player) {
+			const types = player
+				.getRoundHistory("useCard")
+				.reduce((list, evt) => {
+					return list.add(get.type2(evt.card));
+				}, [])
+				.map(type => get.translation(type)[0] || "");
+			if (types.length) {
+				player.addTempSkill("clansankuang_count", "roundStart");
+				player.addTip("clansankuang_count", "三恇 " + types.slice().join(" "));
+			}
+		},
+		onremove(player) {
+			player.removeSkill("clansankuang_count");
+		},
+		subSkill: {
+			count: {
+				charlotte: true,
+				onremove(player, skill) {
+					player.removeTip(skill);
+				},
+			},
 		},
 	},
 	clanbeishi: {
