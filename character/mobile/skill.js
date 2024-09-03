@@ -1917,13 +1917,12 @@ const skills = {
 					return player.isTurnedOver();
 				},
 				filter(event, player) {
-					return event.mbcmjiushi;
+					return event.checkJiushi;
 				},
 				prompt(event, player) {
 					return "是否发动【酒诗】，将武将牌翻面？";
 				},
 				content() {
-					delete trigger.mbcmjiushi;
 					player.turnOver();
 				},
 			},
@@ -17643,17 +17642,6 @@ const skills = {
 		logTarget: "player",
 		content: function () {
 			player.discardPlayerCard(trigger.player, "e", true, trigger.player.countCards("e"));
-		},
-	},
-	_mbcmjiushi_check: {
-		trigger: { player: "damageBegin3" },
-		silent: true,
-		firstDo: true,
-		filter(event, player) {
-			return player.isTurnedOver();
-		},
-		content() {
-			trigger.mbcmjiushi = true;
 		},
 	},
 };

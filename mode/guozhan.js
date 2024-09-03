@@ -18575,18 +18575,6 @@ export default () => {
 					content: "手牌上限+#",
 				},
 			},
-			_gzkuanggu_check: {
-				charlotte: true,
-				trigger: { source: "damage" },
-				filter(event, player) {
-					return get.distance(player, event.player) <= 1;
-				},
-				firstDo: true,
-				silent: true,
-				content() {
-					trigger.xinkuangguCheck = true;
-				},
-			},
 		},
 		game: {
 			canReplaceViewpoint: () => true,

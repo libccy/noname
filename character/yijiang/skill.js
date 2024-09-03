@@ -11313,13 +11313,12 @@ const skills = {
 		},
 		prompt: "是否发动【酒诗】，将武将牌翻面？",
 		filter: function (event, player) {
-			if (event.jiushi) {
+			if (event.checkJiushi) {
 				return true;
 			}
 			return false;
 		},
 		content: function () {
-			delete trigger.jiushi;
 			player.turnOver();
 		},
 	},
@@ -12843,17 +12842,6 @@ const skills = {
 		},
 		ai: {
 			combo: "zyexin",
-		},
-	},
-	_jiushi_check: {
-		trigger: { player: "damageBegin3" },
-		silent: true,
-		firstDo: true,
-		filter: function (event, player) {
-			return player.classList.contains("turnedover");
-		},
-		content: function () {
-			trigger.jiushi = true;
 		},
 	},
 };

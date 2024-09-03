@@ -3162,7 +3162,7 @@ const skills = {
 		audioname: ["re_weiyan", "ol_weiyan"],
 		trigger: { source: "damageSource" },
 		filter(event, player) {
-			return event.xinkuangguCheck && event.num > 0;
+			return event.checkKuanggu && event.num > 0;
 		},
 		getIndex(event, player, triggername) {
 			return event.num;
@@ -3192,18 +3192,6 @@ const skills = {
 			event.result = { bool: true }; // 好像在content里面不能中断getIndex喵
 		},
 		async content(event, trigger, player) {},
-	},
-	_xinkuanggu_check: {
-		charlotte: true,
-		trigger: { source: "damage" },
-		filter(event, player) {
-			return get.distance(player, event.player) <= 1;
-		},
-		firstDo: true,
-		silent: true,
-		content() {
-			trigger.xinkuangguCheck = true;
-		},
 	},
 	xinliegong: {
 		mod: {
@@ -6510,22 +6498,10 @@ const skills = {
 		trigger: { source: "damageSource" },
 		forced: true,
 		filter(event, player) {
-			return event.kuangguCheck && player.isDamaged();
+			return event.checkKuanggu && player.isDamaged();
 		},
 		async content(event, trigger, player) {
 			await player.recover(trigger.num);
-		},
-	},
-	_kuanggu_check: {
-		charlotte: true,
-		trigger: { source: "damage" },
-		filter(event, player) {
-			return get.distance(player, event.player) <= 1;
-		},
-		firstDo: true,
-		silent: true,
-		content() {
-			trigger.kuangguCheck = true;
 		},
 	},
 	tianxiang: {
