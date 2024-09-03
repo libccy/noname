@@ -2803,9 +2803,7 @@ const skills = {
 					return list.add(get.type2(evt.card));
 				}, [])
 				.map(type => get.translation(type)[0] || "");
-			if (types.length) {
-				player.addTip("clansankuang", "三恇 " + types.slice().join(" "), "roundStart");
-			}
+			if (types.length) player.addTip("clansankuang", "三恇 " + types.slice().join(" "), "roundStart");
 		},
 		onremove(player, skill) {
 			player.removeTip(skill);
@@ -3341,9 +3339,7 @@ const skills = {
 					return list.add(get.suit(evt.card));
 				}, [])
 				.sort((a, b) => lib.suits.indexOf(b) - lib.suits.indexOf(a));
-			if (suits.length) {
-				player.addTip("clandianzhan", "点盏 " + suits.reduce((str, suit) => str + get.translation(suit), ""), "roundStart");
-			}
+			if (suits.length) player.addTip("clandianzhan", "点盏 " + suits.reduce((str, suit) => str + get.translation(suit), ""), "roundStart");
 		},
 		onremove(player, skill) {
 			player.removeTip(skill);
