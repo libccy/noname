@@ -13448,8 +13448,9 @@ const skills = {
 			},
 		},
 	},
+	//谁家丈育
 	rexiahui: {
-		audio: "xiahui",
+		audio: "xiehui",
 		mod: {
 			ignoredHandcard: function (card, player) {
 				if (get.color(card, player) == "black") return true;

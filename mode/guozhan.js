@@ -1397,7 +1397,7 @@ export default () => {
 				},
 			},
 			fakeshilu: {
-				audio: "gzshilu",
+				audio: "zyshilu",
 				trigger: { player: ["phaseZhunbeiBegin", "phaseUseEnd"] },
 				filter(event, player) {
 					if (event.name == "phaseZhunbei") return player.getStorage("fakeshilu").length;
@@ -8593,7 +8593,7 @@ export default () => {
 			},
 			//孙綝
 			gzshilu: {
-				audio: 2,
+				audio: "zyshilu",
 				preHidden: true,
 				trigger: { global: "dieAfter" },
 				prompt2: function (event, player) {
