@@ -384,13 +384,13 @@ export class Player extends HTMLDivElement {
 	 * @author Curpond
 	 */
 	setTip(index, message, isTemp = false, css = {}) {
-		this.node.tipContainer ??= ui.create.div('.tipContainer', this)
-		this.tips ??= new Map()
-		if (!this.tips.has(index)) this.tips.set(index, ui.create.div('.tip', this.node.tipContainer))
-		this.tips.get(index).innerHTML = message.replace(/ /g, '&nbsp;').replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>')
-		this.tips.get(index).css(css)
-		let player = this
-		if (isTemp) player.when({ global: 'phaseEnd' }).apply(code => eval(code)).then(() => player.removeTip(index))
+		this.node.tipContainer ??= ui.create.div('.tipContainer', this);
+		this.tips ??= new Map();
+		if (!this.tips.has(index)) this.tips.set(index, ui.create.div('.tip', this.node.tipContainer));
+		this.tips.get(index).innerHTML = message.replace(/ /g, '&nbsp;').replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
+		this.tips.get(index).css(css);
+		let player = this;
+		if (isTemp) player.when({ global: 'phaseEnd' }).apply(code => eval(code)).then(() => player.removeTip(index));
 		return this.tips.get(index);
 	}
 	/**
@@ -400,15 +400,15 @@ export class Player extends HTMLDivElement {
 	 */
 	removeTip(index) {
 		if (index == undefined) {
-			this.tips?.clear()
+			this.tips?.clear();
 		} else {
 			if (this.tips?.has(index)) {
 				this.tips.get(index).remove();
 				this.tips.delete(index);
 			}
 		}
-		if (!this.tips?.size) this.node.tipContainer?.remove()
-		delete this.node.tipContainer
+		if (!this.tips?.size) this.node.tipContainer?.remove();
+		delete this.node.tipContainer;
 	}
 	//新函数
 	/**

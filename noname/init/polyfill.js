@@ -4,20 +4,6 @@ import { game } from "../game/index.js";
 import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 
-Number.prototype.toCardNumStr = function () {
-	switch (Number(this)) {
-		case 1:
-			return 'A';
-		case 11:
-			return 'J';
-		case 12:
-			return 'Q';
-		case 13:
-			return 'K';
-		default:
-			return this.toString()
-	}
-};
 
 // 废弃覆盖原型的HTMLDivElement.prototype.animate
 // 改为HTMLDivElement.prototype.addTempClass

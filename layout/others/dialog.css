@@ -229,8 +229,14 @@
     display: none;
 }
 
-/* 人物tip相关的样式 方案一 */
-/* .player .tipContainer {
+
+/* 人物tip相关的样式 */
+.player[data-position="0"] .tipContainer {
+    max-width: 120px;
+}
+
+/* 方案一 */
+.player .tipContainer {
     --bg: #2b2b28;
     position: absolute;
     width: 100%;
@@ -258,10 +264,10 @@
     align-items: center;
     color: #e0dddd;
     text-shadow: none;
-} */
+}
 
-/* 人物tip相关的样式 方案二 */
-.player .tipContainer {
+/* 人物tip相关的样式 方案二(仿手杀) */
+/* .player .tipContainer {
     --bg: #2b2116de;
     position: absolute;
     width: 98%;
@@ -277,10 +283,7 @@
     border-radius: 3px;
 }
 
-/* 真是服了一号玩家的宽度竟然和其他不一致，需要单独设置，扩展中可以不要下面这一段 */
-.player[data-position="0"] .tipContainer {
-    max-width: 120px;
-}
+
 
 .player .tipContainer>.tip {
     position: relative;
@@ -294,4 +297,4 @@
     align-items: center;
     color: #e0dddd;
     text-shadow: none;
-}
+} */
