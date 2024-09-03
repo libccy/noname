@@ -344,7 +344,7 @@ const skills = {
 				.chooseControlList(list)
 				.set("ai", function () {
 					let player = get.event("player"), damaged = player.getDamagedHp();
-					if (damaged) damaged += 0.6 * (player.countCard("hs", card => {
+					if (damaged) damaged += 0.6 * (player.countCards("hs", card => {
 						if (card.name == "sha" || !get.tag(card, "damage")) return 0;
 						let info = get.info(card);
 						if (!info || info.type != "trick") return false;
