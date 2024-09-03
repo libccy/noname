@@ -20036,6 +20036,15 @@ const skills = {
 			if (!player.storage.xianfu2) player.storage.xianfu2 = [];
 			player.storage.xianfu2.push(target);
 			player.addSkill("xianfu2");
+
+			const func = (player, target) => {
+				if (!target.storage.xianfu_mark) target.storage.xianfu_mark = [];
+				target.storage.xianfu_mark.add(player);
+				target.storage.xianfu_mark.sortBySeat();
+				target.markSkill("xianfu_mark", null, null, true);
+			};
+			if (event.isMine()) func(player, target);
+			else if (player.isOnline2()) player.send(func, player, target);
 		},
 	},
 	xianfu_mark: {

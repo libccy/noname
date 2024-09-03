@@ -1368,13 +1368,12 @@ const skills = {
 				},
 				prompt: "是否发动【酒诗】，将武将牌翻面？",
 				filter: function (event, player) {
-					if (event.dcjiushi) {
+					if (event.checkJiushi) {
 						return true;
 					}
 					return false;
 				},
 				content: function () {
-					delete trigger.dcjiushi;
 					player.turnOver();
 				},
 			},
@@ -9868,7 +9867,7 @@ const skills = {
 			return player.isTurnedOver();
 		},
 		filter: function (event, player) {
-			if (event.rejiushi) {
+			if (event.checkJiushi) {
 				return true;
 			}
 			return false;
@@ -9880,7 +9879,6 @@ const skills = {
 			return str;
 		},
 		content: function () {
-			delete trigger.rejiushi;
 			player.turnOver();
 			if (!player.storage.chengzhang) {
 				var card = get.cardPile2(function (card) {
@@ -15317,18 +15315,6 @@ const skills = {
 			} else event.current.draw();
 			game.delay();
 			if (targets.length) event.goto(2);
-		},
-	},
-	_dcjiushi_record: {
-		trigger: { player: "damageBegin3" },
-		silent: true,
-		firstDo: true,
-		filter: function (event, player) {
-			return player.isTurnedOver();
-		},
-		content: function () {
-			trigger.dcjiushi = true;
-			trigger.rejiushi = true;
 		},
 	},
 };

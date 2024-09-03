@@ -163,27 +163,15 @@ const skills = {
 				},
 				prompt: "是否发动【酒诗】，将武将牌翻面？",
 				filter: function (event, player) {
-					if (event.oljiushi) {
+					if (event.checkJiushi) {
 						return true;
 					}
 					return false;
 				},
 				content: function () {
-					delete trigger.oljiushi;
 					player.turnOver();
 				},
 			},
-		},
-	},
-	_oljiushi_record: {
-		trigger: { player: "damageBegin3" },
-		silent: true,
-		firstDo: true,
-		filter: function (event, player) {
-			return player.isTurnedOver();
-		},
-		content: function () {
-			trigger.oljiushi = true;
 		},
 	},
 	//谋袁术
@@ -438,6 +426,7 @@ const skills = {
 					evt =>
 						evt == trigger.getParent() &&
 						target.canUse(sha, player, false) &&
+						target.isIn() &&
 						!game.hasPlayer2(current => {
 							return current.hasHistory("damage", evtx => evtx.card === evt.card);
 						})
