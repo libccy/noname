@@ -3271,6 +3271,8 @@ const skills = {
 			return false;
 		},
 		filter: function (event, player) {
+			player.addSkill("dcjianying_mark");
+			player.addTip("dcjianying_mark", "渐营 " + lib.skill.jianying.getTranslation(event.card));
 			var evt = lib.skill.dcjianying.getLastUsed(player, event);
 			if (!evt || !evt.card) return false;
 			return (lib.suit.includes(get.suit(evt.card)) && get.suit(evt.card) == get.suit(event.card)) || (typeof get.number(evt.card, false) == "number" && get.number(evt.card, false) == get.number(event.card));
@@ -3278,59 +3280,21 @@ const skills = {
 		content: function () {
 			player.draw();
 		},
-		group: "dcjianying_mark",
 		init: function (player) {
-			var history = player.getAllHistory("useCard");
-			if (history.length) {
-				var trigger = history[history.length - 1];
-				if (get.suit(trigger.card, player) == "none" || typeof get.number(trigger.card, player) != "number") return;
-				player.storage.dcjianying_mark = trigger.card;
-				player.markSkill("dcjianying_mark");
-				game.broadcastAll(
-					function (player, suit) {
-						if (player.marks.dcjianying_mark) player.marks.dcjianying_mark.firstChild.innerHTML = get.translation(suit);
-					},
-					player,
-					get.suit(trigger.card, player)
-				);
+			var trigger = lib.skill.dcjianying.getLastUsed(player);
+			if (trigger) {
+				player.addSkill("dcjianying_mark");
+				player.addTip("dcjianying_mark", "渐营 " + lib.skill.jianying.getTranslation(trigger.card));
 			}
 		},
 		onremove: function (player) {
-			player.unmarkSkill("dcjianying_mark");
-			delete player.storage.dcjianying_mark;
+			player.removeTip("dcjianying_mark");
 		},
 		subSkill: {
 			mark: {
 				charlotte: true,
-				trigger: { player: "useCard1" },
-				forced: true,
-				popup: false,
-				firstDo: true,
-				content: function () {
-					if (get.suit(trigger.card, player) == "none" || typeof get.number(trigger.card, player) != "number") player.unmarkSkill("dcjianying_mark");
-					else {
-						player.storage.dcjianying_mark = trigger.card;
-						player.markSkill("dcjianying_mark");
-						game.broadcastAll(
-							function (player, suit) {
-								if (player.marks.dcjianying_mark) player.marks.dcjianying_mark.firstChild.innerHTML = get.translation(suit);
-							},
-							player,
-							get.suit(trigger.card, player)
-						);
-					}
-				},
-				intro: {
-					markcount(card, player) {
-						return get.strNumber(get.number(card, player));
-					},
-					content: function (card, player) {
-						var suit = get.suit(card, player);
-						var num = get.number(card, player);
-						var str = "<li>上一张牌的花色：" + get.translation(suit);
-						str += "<br><li>上一张牌的点数：" + get.strNumber(num);
-						return str;
-					},
+				onremove(player, skill) {
+					player.removeTip(skill);
 				},
 			},
 		},
@@ -4151,9 +4115,13 @@ const skills = {
 	},
 	rebotu: {
 		audio: "botu",
-		trigger: { player: "phaseEnd" },
+		trigger: {
+			global: ["loseAfter", "cardsDiscardAfter"],
+			player: "phaseEnd",
+		},
 		frequent: true,
 		filter: function (event, player) {
+			if (_status.currentPhase !== player) return false;
 			if (player.countMark("rebotu_count") >= Math.min(3, game.countPlayer())) return false;
 			var suits = [];
 			game.getGlobalHistory("cardMove", function (evt) {
@@ -4168,57 +4136,55 @@ const skills = {
 					}
 				}
 			});
+			if (event.name !== "phase") {
+				if (suits.length) {
+					suits.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
+					player.addTempSkill("rebotu_mark");
+					player.addTip("rebotu_mark", "博图 " + suits.reduce((str, suit) => str + get.translation(suit), ""));
+				}
+				return false;
+			}
 			return suits.length >= 4;
+		},
+		init(player) {
+			if (_status.currentPhase !== player) return;
+			if (player.countMark("rebotu_count") >= Math.min(3, game.countPlayer())) return;
+			var suits = [];
+			game.getGlobalHistory("cardMove", function (evt) {
+				if (suits.length >= 4) return;
+				if (evt.name == "lose") {
+					if (evt.position == ui.discardPile) {
+						for (var i of evt.cards) suits.add(get.suit(i, false));
+					}
+				} else {
+					if (evt.name == "cardsDiscard") {
+						for (var i of evt.cards) suits.add(get.suit(i, false));
+					}
+				}
+			});
+			if (suits.length) {
+				suits.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
+				player.addTempSkill("rebotu_mark");
+				player.addTip("rebotu_mark", "博图 " + suits.reduce((str, suit) => str + get.translation(suit), ""));
+			}
+		},
+		onremove(player) {
+			player.removeSkill("rebotu_mark");
 		},
 		content: function () {
 			player.addTempSkill("rebotu_count", "roundStart");
 			player.addMark("rebotu_count", 1, false);
 			player.insertPhase();
 		},
-		group: "rebotu_mark",
 		subSkill: {
 			count: {
 				onremove: true,
 				charlotte: true,
 			},
 			mark: {
-				trigger: {
-					global: ["loseAfter", "cardsDiscardAfter"],
-					player: "phaseAfter",
-				},
-				forced: true,
-				firstDo: true,
-				silent: true,
-				filter: function (event, player) {
-					if (event.name == "phase") return true;
-					if (player != _status.currentPhase) return false;
-					if (event.name == "lose") return event.position == ui.discardPile;
-					return true;
-				},
-				content: function () {
-					if (trigger.name == "phase") {
-						player.unmarkSkill("rebotu_mark");
-						return;
-					}
-					var suits = [];
-					game.getGlobalHistory("cardMove", function (evt) {
-						if (suits.length >= 4) return;
-						if (evt.name == "lose") {
-							if (evt.position == ui.discardPile) {
-								for (var i of evt.cards) suits.add(get.suit(i, false));
-							}
-						} else {
-							if (evt.name == "cardsDiscard") {
-								for (var i of evt.cards) suits.add(get.suit(i, false));
-							}
-						}
-					});
-					player.storage.rebotu_mark = suits;
-					player.markSkill("rebotu_mark");
-				},
-				intro: {
-					onunmark: true,
-					content: "本回合已有$花色的牌进入过弃牌堆",
+				charlotte: true,
+				onremove(player, skill) {
+					player.removeTip(skill);
 				},
 			},
 		},

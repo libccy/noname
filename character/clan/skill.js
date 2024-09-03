@@ -3271,16 +3271,16 @@ const skills = {
 	},
 	clandianzhan: {
 		audio: 2,
-		intro: {
-			content: "已使用过的花色：$",
-			onunmark: true,
-		},
-		trigger: { player: "useCardAfter" },
+		trigger: { player: ["useCard1", "useCardAfter"] },
 		forced: true,
-		filter(event, player) {
+		filter(event, player, name) {
 			if (!lib.suit.includes(get.suit(event.card))) return false;
 			const suit = get.suit(event.card);
 			if (player.getRoundHistory("useCard", evt => get.suit(evt.card) == suit).indexOf(event) != 0) return false;
+			if (name === "useCard1") {
+				lib.skill.clandianzhan.init(player);
+				return false;
+			}
 			return (event.targets && event.targets.length == 1 && !event.targets[0].isLinked()) || player.hasCard(card => get.suit(card) == get.suit(event.card) && player.canRecast(card), "h");
 		},
 		content() {
@@ -3297,34 +3297,11 @@ const skills = {
 			"step 1";
 			if (event.link && event.recast) player.draw();
 		},
-		group: "clandianzhan_count",
 		subSkill: {
 			count: {
 				charlotte: true,
-				trigger: { player: "useCardAfter" },
-				filter(event, player) {
-					let suit = get.suit(event.card);
-					return lib.suits.includes(suit) && !player.getStorage("clandianzhan").includes(suit);
-				},
-				forced: true,
-				silent: true,
-				content() {
-					let suits = player
-						.getRoundHistory("useCard", evt => {
-							return lib.suits.includes(get.suit(evt.card));
-						})
-						.reduce((list, evt) => {
-							return list.add(get.suit(evt.card));
-						}, [])
-						.sort((a, b) => lib.suits.indexOf(a) - lib.suits.indexOf(b));
-					if (!player.storage.clandianzhan) {
-						player.when({ global: "roundStart" }).then(() => {
-							delete player.storage.clandianzhan;
-							player.unmarkSkill("clandianzhan");
-						});
-					}
-					player.storage.clandianzhan = suits;
-					player.markSkill("clandianzhan");
+				onremove(player, skill) {
+					player.removeTip(skill);
 				},
 			},
 		},
@@ -3336,17 +3313,14 @@ const skills = {
 				.reduce((list, evt) => {
 					return list.add(get.suit(evt.card));
 				}, [])
-				.sort((a, b) => lib.suits.indexOf(a) - lib.suits.indexOf(b));
+				.sort((a, b) => lib.suits.indexOf(b) - lib.suits.indexOf(a));
 			if (suits.length) {
-				if (!player.storage.clandianzhan) {
-					player.when({ global: "roundStart" }).then(() => {
-						delete player.storage.clandianzhan;
-						player.unmarkSkill("clandianzhan");
-					});
-				}
-				player.storage.clandianzhan = suits;
-				player.markSkill("clandianzhan");
+				player.addTempSkill("clandianzhan_count", "roundStart");
+				player.addTip("clandianzhan_count", "点盏 " + suits.reduce((str, suit) => str + get.translation(suit), ""));
 			}
+		},
+		onremove(player) {
+			player.removeSkill("clandianzhan_count");
 		},
 	},
 	clanhuanyin: {

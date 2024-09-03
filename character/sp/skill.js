@@ -5169,7 +5169,7 @@ const skills = {
 				var info = lib.skill.olgangshu.getInfo(player);
 				info[result.index] = Math.min(5, info[result.index] + 1);
 				game.log(player, "的", result.control.slice(0, result.control.indexOf("(")), "#y+1");
-				player.markSkill("olgangshu_buff");
+				player.addTip("olgangshu_buff", "刚述 " + info.slice().join(" "));
 			}
 		},
 		ai: {
@@ -5179,7 +5179,10 @@ const skills = {
 			buff: {
 				trigger: { player: "phaseDrawBegin2" },
 				charlotte: true,
-				onremove: true,
+				onremove(player, skill) {
+					player.removeTip(skill);
+					delete player.storage[skill];
+				},
 				forced: true,
 				filter: function (event, player) {
 					var info = lib.skill.olgangshu.getInfo(player);
@@ -5190,7 +5193,7 @@ const skills = {
 					var info = lib.skill.olgangshu.getInfo(player);
 					trigger.num += info[1];
 					info[1] = 0;
-					player.markSkill("olgangshu_buff");
+					player.addTip("olgangshu_buff", "刚述 " + info.slice().join(""));
 				},
 				mod: {
 					attackRange: function (player, range) {
@@ -5201,23 +5204,6 @@ const skills = {
 						if (card.name != "sha") return;
 						var info = lib.skill.olgangshu.getInfo(player);
 						if (info) return num + info[2];
-					},
-				},
-				mark: true,
-				intro: {
-					markcount: function (storage, player) {
-						var info = lib.skill.olgangshu.getInfo(player);
-						var str = "";
-						info.forEach(num => (str += parseFloat(num)));
-						return str;
-					},
-					content: function (storage, player) {
-						var info = lib.skill.olgangshu.getInfo(player);
-						var str = "";
-						if (info[0] > 0) str += "<li>攻击范围+" + info[0];
-						if (info[1] > 0) str += "<li>下个摸牌阶段摸牌数+" + info[1];
-						if (info[2] > 0) str += "<li>使用【杀】的次数上限+" + info[2];
-						return str;
 					},
 				},
 			},
@@ -18984,11 +18970,24 @@ const skills = {
 		locked: false,
 		preHidden: true,
 		filter: function (event, player) {
-			return player.getHistory("useCard").length + player.getHistory("respond").length == player.getAttackRange();
+			let all = player.getHistory("useCard").length + player.getHistory("respond").length;
+			player.addTempSkill("gzjili_count");
+			player.addTip("gzjili_count", "蒺藜 " + all.toString());
+			return all == player.getAttackRange();
 		},
 		audio: 2,
 		content: function () {
 			player.draw(player.getHistory("useCard").length + player.getHistory("respond").length);
+		},
+		init(player) {
+			let all = player.getHistory("useCard").length + player.getHistory("respond").length;
+			if (all) {
+				player.addTempSkill("gzjili_count");
+				player.addTip("gzjili_count", "蒺藜 " + all.toString());
+			}
+		},
+		onremove(player) {
+			player.removeTip("gzjili_count");
 		},
 		ai: {
 			threaten: 1.8,
@@ -19038,6 +19037,14 @@ const skills = {
 					} else if (get.tag(card, "respondSha") > 0) {
 						if (current < 0 && used == target.getAttackRange() - 1 && target.mayHaveSha(player)) return [1, (used + 1) / 2];
 					}
+				},
+			},
+		},
+		subSkill: {
+			count: {
+				charlotte: true,
+				onremove(player, skill) {
+					player.removeTip(skill);
 				},
 			},
 		},
