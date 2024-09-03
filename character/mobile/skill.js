@@ -2981,16 +2981,22 @@ const skills = {
 		direct: true,
 		content: function () {
 			"step 0";
-			player.chooseTarget(get.prompt2("mbyilie"), lib.filter.notMe).set("ai", function (target) {
-				var player = _status.event.player;
+			player.chooseTarget(get.prompt2("mbyilie"), lib.filter.notMe, true).set("ai", function (target) {
+				let player = _status.event.player;
 				return Math.max(1 + get.attitude(player, target) * get.threaten(target), Math.random());
-			});
+			}).set("animate", false);
 			"step 1";
 			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("mbyilie", target);
+				let target = result.targets[0];
+				player.logSkill("mbyilie");
 				player.storage.mbyilie2 = target;
 				player.addSkill("mbyilie2");
+
+				const func = (player, target) => {
+					target.markSkillCharacter("mbyilie2", player, "义烈", `${get.translation(player)}决定追随于你`, true);
+				};
+				if (event.isMine()) func(player, target);
+				else if (player.isOnline2()) player.send(func, player, target);
 			}
 		},
 		marktext: "烈",
@@ -3006,8 +3012,8 @@ const skills = {
 		trigger: { global: ["damageBegin4", "damageSource"] },
 		filter: function (event, player, name) {
 			var target = player.storage.mbyilie2;
-			if (name == "damageSource") return event.source == target && event.player != target && player.isDamaged();
-			return event.player == target && player.countMark("mbyilie") < 2;
+			if (name == "damageSource") return event.source == target && event.player != player && player.isDamaged();
+			return event.player == target && !player.countMark("mbyilie");
 		},
 		forced: true,
 		logTarget: function (event, player) {
@@ -3016,6 +3022,7 @@ const skills = {
 		content: function () {
 			if (event.triggername == "damageSource") player.recover();
 			else {
+				event.targets[0].markSkillCharacter("mbyilie2", player, "义烈", `${get.translation(player)}决定追随于你`);
 				player.addMark("mbyilie", trigger.num);
 				trigger.cancel();
 			}

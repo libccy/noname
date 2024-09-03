@@ -426,6 +426,7 @@ const skills = {
 					evt =>
 						evt == trigger.getParent() &&
 						target.canUse(sha, player, false) &&
+						target.isIn() &&
 						!game.hasPlayer2(current => {
 							return current.hasHistory("damage", evtx => evtx.card === evt.card);
 						})
