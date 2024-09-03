@@ -9331,7 +9331,7 @@ const skills = {
 		},
 	},
 	zyxiongnve: {
-		audio: "gzxiongnve",
+		audio: 2,
 		trigger: { player: "phaseUseBegin" },
 		direct: true,
 		filter(event, player) {
