@@ -30,10 +30,7 @@ export interface NonameHookType {
 	 * @param event - 当前检查的事件
 	 * @param config - 一些配置
 	 */
-	checkEnd(
-		event: GameEvent & GameEventPromise,
-		config: { ok: boolean; auto: boolean; autoConfirm: boolean }
-	): any;
+	checkEnd(event: GameEvent & GameEventPromise, config: { ok: boolean; auto: boolean; autoConfirm: boolean }): any;
 
 	/**
 	 *
@@ -61,20 +58,14 @@ export interface NonameHookType {
 	 * @param event - 当前检查的事件
 	 * @param args - 要取消检查的对象
 	 */
-	uncheckBegin(
-		event: GameEvent & GameEventPromise,
-		args: ("button" | "card" | "target")[] = ["button", "card", "target"]
-	): any;
+	uncheckBegin(event: GameEvent & GameEventPromise, args: ("button" | "card" | "target")[] = ["button", "card", "target"]): any;
 
 	/**
 	 *
 	 * @param event - 当前检查的事件
 	 * @param args - 要取消检查的对象
 	 */
-	uncheckEnd(
-		event: GameEvent & GameEventPromise,
-		args: ("button" | "card" | "target")[] = ["button", "card", "target"]
-	): any;
+	uncheckEnd(event: GameEvent & GameEventPromise, args: ("button" | "card" | "target")[] = ["button", "card", "target"]): any;
 
 	/**
 	 *
@@ -96,5 +87,13 @@ export interface NonameHookType {
 	 * @param event - 当前检查的事件
 	 */
 	uncheckTarget(target: Player, event: GameEvent & GameEventPromise): any;
+	// #endregion
+
+	/**
+	 *
+	 * @param target - 取消检查的玩家
+	 * @param event - 当前检查的事件
+	 */
+	checkOverflow(itemOption: Dialog, itemContainer: Dialog, addedItems: Dialog, game: GameEvent & GameEventPromise): any;
 	// #endregion
 }

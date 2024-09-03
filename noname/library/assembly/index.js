@@ -133,6 +133,8 @@ export const defaultHookcompatition = {
 	uncheckTarget: new NonameAssembly("uncheckTarget"),
 	uncheckButton: new NonameAssembly("uncheckButton"),
 	uncheckEnd: new NonameAssembly("uncheckEnd"),
+
+	checkOverflow: new NonameAssembly("checkOverflow"),
 };
 
 export const defaultAssemblys = {
