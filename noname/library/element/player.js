@@ -392,6 +392,9 @@ export class Player extends HTMLDivElement {
 				if (!player.tips.has(index)) player.tips.set(index, ui.create.div(".tip", player.node.tipContainer));
 				player.tips.get(index).innerHTML = message.replace(/ /g, "&nbsp;").replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
 				player.tips.get(index).css(css);
+				const width = player.node.avatar.clientWidth;
+				let w = width* (player.classList.contains('fullskin2')?2:1)
+				player.style.setProperty('--w', `${w}px`);
 			},
 			player,
 			index,
