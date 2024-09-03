@@ -277,6 +277,11 @@
     border-radius: 3px;
 }
 
+/* 真是服了一号玩家的宽度竟然和其他不一致，需要单独设置，扩展中可以不要下面这一段 */
+.player[data-position="0"] .tipContainer {
+    max-width: 120px;
+}
+
 .player .tipContainer>.tip {
     position: relative;
     box-sizing: border-box;
