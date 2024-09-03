@@ -383,7 +383,7 @@ export class Player extends HTMLDivElement {
 	 * @returns { HTMLDivElement }
 	 * @author Curpond
 	 */
-	setTip(index, message, isTemp = false, css = {}) {
+	addTip(index, message, isTemp = false, css = {}) {
 		this.node.tipContainer ??= ui.create.div('.tipContainer', this);
 		this.tips ??= new Map();
 		if (!this.tips.has(index)) this.tips.set(index, ui.create.div('.tip', this.node.tipContainer));

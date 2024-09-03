@@ -1529,7 +1529,7 @@ export default () => {
 				},
 			},
 			fakexiongnve: {
-				audio: "gzxiongnve",
+				audio: "zyxiongnve",
 				trigger: {
 					source: "damageBegin1",
 					player: ["damageBegin3", "damageBegin4"],
@@ -8669,7 +8669,7 @@ export default () => {
 				},
 			},
 			gzxiongnve: {
-				audio: 2,
+				audio: "zyxiongnve",
 				trigger: { player: "phaseUseBegin" },
 				direct: true,
 				filter: function (event, player) {
@@ -8758,7 +8758,7 @@ export default () => {
 						promptx: "造成的伤害+1",
 						charlotte: true,
 						onremove: true,
-						audio: "gzxiongnve",
+						audio: "zyxiongnve",
 						intro: {
 							content: "对$势力的角色造成的伤害+1",
 						},
@@ -8776,7 +8776,7 @@ export default () => {
 						promptx: "造成伤害后，获得对方的一张牌",
 						charlotte: true,
 						onremove: true,
-						audio: "gzxiongnve",
+						audio: "zyxiongnve",
 						intro: {
 							content: "对$势力的角色造成伤害后，获得对方的一张牌",
 						},
@@ -8805,7 +8805,7 @@ export default () => {
 					},
 					effect3: {
 						charlotte: true,
-						audio: "gzxiongnve",
+						audio: "zyxiongnve",
 						mark: true,
 						intro: {
 							content: "其他角色对你造成伤害时，此伤害-1",

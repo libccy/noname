@@ -61,8 +61,8 @@ export default {
 	"#sp_pangtong:die": "纵有治世才，难遇治世主……",
 	"#zyshilu": "以杀立威，谁敢反我？",
 	"#zyshilu2": "将这些乱臣贼子，尽皆诛之！",
-	"#gzxiongnve1": "当今天子乃我所立，他敢怎样？",
-	"#gzxiongnve2": "我兄弟三人同掌禁军，有何所惧？",
+	"#zyxiongnve1": "当今天子乃我所立，他敢怎样？",
+	"#zyxiongnve2": "我兄弟三人同掌禁军，有何所惧？",
 	"#ns_lijue:die": "若无内讧，也不至如此……",
 	"#ns_fanchou:die": "唉，稚然疑心，甚重……",
 };
