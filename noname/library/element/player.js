@@ -411,16 +411,22 @@ export class Player extends HTMLDivElement {
 	 * @author Curpond
 	 */
 	removeTip(index) {
-		if (index == undefined) {
-			this.tips?.clear();
-		} else {
-			if (this.tips?.has(index)) {
-				this.tips.get(index).remove();
-				this.tips.delete(index);
-			}
-		}
-		if (!this.tips?.size) this.node.tipContainer?.remove();
-		delete this.node.tipContainer;
+		game.broadcastAll(
+			(player, index) => {
+				if (index == undefined) {
+					player.tips?.clear();
+				} else {
+					if (player.tips?.has(index)) {
+						player.tips.get(index).remove();
+						player.tips.delete(index);
+					}
+				}
+				if (!player.tips?.size) player.node.tipContainer?.remove();
+				delete player.node.tipContainer;
+			},
+			this,
+			index
+		);
 	}
 	//新函数
 	/**
