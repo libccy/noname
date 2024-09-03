@@ -384,14 +384,26 @@ export class Player extends HTMLDivElement {
 	 * @author Curpond
 	 */
 	addTip(index, message, isTemp = false, css = {}) {
-		this.node.tipContainer ??= ui.create.div('.tipContainer', this);
-		this.tips ??= new Map();
-		if (!this.tips.has(index)) this.tips.set(index, ui.create.div('.tip', this.node.tipContainer));
-		this.tips.get(index).innerHTML = message.replace(/ /g, '&nbsp;').replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
-		this.tips.get(index).css(css);
-		let player = this;
-		if (isTemp) player.when({ global: 'phaseEnd' }).apply(code => eval(code)).then(() => player.removeTip(index));
-		return this.tips.get(index);
+		const player = this;
+		game.broadcastAll(
+			(player, index, message, css) => {
+				player.node.tipContainer ??= ui.create.div(".tipContainer", player);
+				player.tips ??= new Map();
+				if (!player.tips.has(index)) player.tips.set(index, ui.create.div(".tip", player.node.tipContainer));
+				player.tips.get(index).innerHTML = message.replace(/ /g, "&nbsp;").replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
+				player.tips.get(index).css(css);
+			},
+			player,
+			index,
+			message,
+			css
+		);
+		if (isTemp)
+			player
+				.when({ global: "phaseEnd" })
+				.apply(code => eval(code))
+				.then(() => player.removeTip(index));
+		return player.tips.get(index);
 	}
 	/**
 	 * 清除标记，不传参数可以清空所有标记
@@ -1074,10 +1086,10 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-			this.getVEquips(type).reduce((num, card) => {
-				let types = get.subtypes(card, false);
-				return num + get.numOf(types, type);
-			}, 0)
+				this.getVEquips(type).reduce((num, card) => {
+					let types = get.subtypes(card, false);
+					return num + get.numOf(types, type);
+				}, 0)
 		);
 	}
 	/**
@@ -1106,11 +1118,11 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-			this.getVEquips(type).reduce((num, card) => {
-				let types = get.subtypes(card, false);
-				if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
-				return num;
-			}, 0)
+				this.getVEquips(type).reduce((num, card) => {
+					let types = get.subtypes(card, false);
+					if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
+					return num;
+				}, 0)
 		);
 	}
 	/**
@@ -1454,11 +1466,11 @@ export class Player extends HTMLDivElement {
 	/**
 	 * @deprecated
 	 */
-	$disableEquip() { }
+	$disableEquip() {}
 	/**
 	 * @deprecated
 	 */
-	$enableEquip() { }
+	$enableEquip() {}
 	//装备区End
 	chooseToDebate() {
 		var next = game.createEvent("chooseToDebate");
@@ -2172,10 +2184,10 @@ export class Player extends HTMLDivElement {
 		m = game.checkMod(from, to, m, "attackFrom", from);
 		m = game.checkMod(from, to, m, "attackTo", to);
 		const equips1 = from.getVCards("e", function (card) {
-			return !card.cards?.some(card => {
-				return ui.selected.cards?.includes(card);
-			});
-		}),
+				return !card.cards?.some(card => {
+					return ui.selected.cards?.includes(card);
+				});
+			}),
 			equips2 = to.getVCards("e", function (card) {
 				return !card.cards?.some(card => {
 					return ui.selected.cards?.includes(card);
@@ -7392,9 +7404,9 @@ export class Player extends HTMLDivElement {
 	}
 	/**
 	 * 获取this.storage[name]的值
-	 * @param { string } name 
+	 * @param { string } name
 	 * @param { any } defaultValue 预设值，默认为[]（不修改原storage）
-	 * @returns 
+	 * @returns
 	 */
 	getStorage(name, defaultValue = []) {
 		return this.storage[name] || defaultValue;
