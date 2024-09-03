@@ -2247,28 +2247,32 @@ const skills = {
 				return 20 * val;
 			},
 		},
-		trigger: { player: ["useCardAfter", "useCardToTargeted"] },
+		trigger: { player: ["useCardAfter", "useCardToTargeted", "useCard1"] },
 		prompt2(event, player) {
 			const cards = event.cards.filterInD("oe");
 			return "你可以将" + get.translation(cards) + (cards.length > 1 ? "以任意顺序" : "") + "置于牌堆顶，然后摸一张牌";
 		},
-		filter(event, player) {
-			if (!event.cards.someInD()) return false;
-			let evt = event,
-				type = get.type2(evt.card, false);
-			if (event.name == "useCardToTargeted") {
-				if (type != "equip" || player != event.target) return false;
-				evt = evt.getParent();
-			} else {
-				if (type == "equip") return false;
+		filter(event, player, name) {
+			let evt = event.name == "useCardToTargeted" ? event : event.getParent();
+			let type = get.type2(evt.card, false);
+			if (
+				player.hasHistory(
+					"useCard",
+					evtx => {
+						return evtx != evt && get.type2(evtx.card, false) == type;
+					},
+					evt
+				)
+			)
+				return false;
+			if (name === "useCard1") {
+				lib.skill.nzry_shicai.init(player);
+				return false;
 			}
-			return !player.hasHistory(
-				"useCard",
-				evtx => {
-					return evtx != evt && get.type2(evtx.card, false) == type;
-				},
-				evt
-			);
+			if (!event.cards.someInD("oe")) return false;
+			if (event.name == "useCardToTargeted") {
+				return type == "equip" && player == event.target;
+			} else return type !== "equip";
 		},
 		check(event, player) {
 			if (get.type(event.card) == "equip") {
@@ -2306,7 +2310,29 @@ const skills = {
 			game.log(player, "将", cards, "置于了牌堆顶");
 			await player.draw();
 		},
-		subSkill: { 2: { audio: 2 } },
+		init(player) {
+			const types = player
+				.getHistory("useCard")
+				.slice()
+				.map(evt => get.translation(get.type2(evt.card, false))[0] || "")
+				.unique();
+			if (types.length) {
+				player.addTempSkill("nzry_shicai_2");
+				player.addTip("nzry_shicai_2", "恃才 " + types.slice().join(" "));
+			}
+		},
+		onremove(player) {
+			player.removeSkill("nzry_shicai_2");
+		},
+		subSkill: {
+			2: {
+				audio: 2,
+				charlotte: true,
+				onremove(player, skill) {
+					player.removeTip(skill);
+				},
+			},
+		},
 		ai: {
 			reverseOrder: true,
 			skillTagFilter(player) {
@@ -2362,7 +2388,7 @@ const skills = {
 		},
 		group: ["nzry_mingren_1", "nzry_mingren_2"],
 		ai: {
-			notemp: true
+			notemp: true,
 		},
 		subSkill: {
 			1: {
@@ -2586,10 +2612,13 @@ const skills = {
 					player.changeZhuanhuanji("nzry_shenshi");
 					await player.give(event.cards, target);
 					await target.damage("nocard");
-					if (!game.getGlobalHistory("everything", evt => {
-						if (evt.name != "die" || evt.player != target) return false;
-						return evt.reason?.getParent() == event;
-					}).length) return;
+					if (
+						!game.getGlobalHistory("everything", evt => {
+							if (evt.name != "die" || evt.player != target) return false;
+							return evt.reason?.getParent() == event;
+						}).length
+					)
+						return;
 					const { result } = await player
 						.chooseTarget("令一名角色将手牌摸至四张", function (card, player, target) {
 							return target.countCards("h") < 4;
@@ -3398,7 +3427,7 @@ const skills = {
 					});
 				})
 				.set("fang", fang)
-				.setHiddenSkill(event.name.slice(0,-5))
+				.setHiddenSkill(event.name.slice(0, -5))
 				.forResult();
 		},
 		async content(event, trigger, player) {
@@ -3681,7 +3710,7 @@ const skills = {
 			},
 			nodiscard: true,
 			nolose: true,
-			notemp: true
+			notemp: true,
 		},
 	},
 	zaoxian: {
@@ -5033,7 +5062,7 @@ const skills = {
 					}
 					return 1;
 				})
-				.setHiddenSkill(event.name.slice(0,-5))
+				.setHiddenSkill(event.name.slice(0, -5))
 				.forResult();
 		},
 		async content(event, trigger, player) {
@@ -5123,7 +5152,7 @@ const skills = {
 					}
 					return 1;
 				})
-				.setHiddenSkill(event.name.slice(0,-5))
+				.setHiddenSkill(event.name.slice(0, -5))
 				.forResult();
 		},
 		async content(event, trigger, player) {
@@ -6230,7 +6259,7 @@ const skills = {
 			}
 		},
 		ai: {
-			combo: "moon_jushou"
+			combo: "moon_jushou",
 		},
 	},
 	releiji: {
@@ -6660,7 +6689,7 @@ const skills = {
 					prompt: get.prompt("retianxiang"),
 					prompt2: lib.translate.retianxiang_info,
 				})
-				.setHiddenSkill(event.name.slice(0,-5))
+				.setHiddenSkill(event.name.slice(0, -5))
 				.forResult();
 		},
 		async content(event, trigger, player) {
@@ -7213,7 +7242,7 @@ const skills = {
 		preHidden: true,
 		line: "thunder",
 		async cost(event, trigger, player) {
-			const next = player.chooseTarget(get.prompt2("leiji")).setHiddenSkill(event.name.slice(0,-5));
+			const next = player.chooseTarget(get.prompt2("leiji")).setHiddenSkill(event.name.slice(0, -5));
 			next.ai = function (target) {
 				if (target.hasSkill("hongyan")) return 0;
 				return get.damageEffect(target, _status.event.player, _status.event.player, "thunder");
