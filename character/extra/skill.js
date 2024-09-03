@@ -7498,6 +7498,7 @@ const skills = {
 	},
 	jilue_zhiheng: {
 		audio: 1,
+		audioname2: {},
 		inherit: "rezhiheng",
 		filter(event, player) {
 			return player.hasMark("renjie");
