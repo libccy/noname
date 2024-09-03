@@ -33,11 +33,11 @@ const skills = {
 					cards.length == 1
 						? cards
 						: await player
-							.chooseButton(["博鉴：请选择要分配的牌", cards], true)
-							.set("ai", button => {
-								return get.value(button.link);
-							})
-							.forResultLinks();
+								.chooseButton(["博鉴：请选择要分配的牌", cards], true)
+								.set("ai", button => {
+									return get.value(button.link);
+								})
+								.forResultLinks();
 				const togive = links[0];
 				const { result } = await player.chooseTarget("选择获得" + get.translation(togive) + "的角色", true).set("ai", target => {
 					const player = get.player();
@@ -331,7 +331,7 @@ const skills = {
 							return !event.cards.includes(card) && lib.filter.cardDiscardable(card, player);
 						}, "e");
 					}
-					if(event.getParent(2).name=="disableEquip") return false;
+					if (event.getParent(2).name == "disableEquip") return false;
 					if (event.getParent(3).name == "mbquchong" || event.getParent(3).name == "mbquchong_recast") return false;
 					return player.hasCard(card => {
 						if (!event.cards.includes(card)) return false;
@@ -351,11 +351,13 @@ const skills = {
 						game.log(cards, "被移出了游戏");
 					} else if (trigger.name == "equip") {
 						if (event.triggername == "equipBefore") trigger.cancel();
-						else await player.discard(player.getCards("e", card => {
-							return !trigger.cards.includes(card) && lib.filter.cardDiscardable(card, player);
-						}));
-					}
-					else {
+						else
+							await player.discard(
+								player.getCards("e", card => {
+									return !trigger.cards.includes(card) && lib.filter.cardDiscardable(card, player);
+								})
+							);
+					} else {
 						const cards = player.getCards("e", card => {
 							if (!trigger.cards.includes(card)) return false;
 							return card.name.startsWith("dagongche_") && card.storage?.mbquchong > 0;
@@ -363,7 +365,7 @@ const skills = {
 						trigger.cards.removeArray(cards);
 						for (const card of cards) {
 							card.storage.mbquchong--;
-							game.log(card, '减少了', '#y1点', '#g耐久值');
+							game.log(card, "减少了", "#y1点", "#g耐久值");
 							lib.skill.mbquchong.broadcast(card);
 						}
 						await event.trigger("mbquchongOnRemove");
@@ -406,7 +408,7 @@ const skills = {
 			});
 			for (const card of cards) {
 				card.storage.mbquchong--;
-				game.log(card, '减少了', '#y1点', '#g耐久值');
+				game.log(card, "减少了", "#y1点", "#g耐久值");
 				lib.skill.mbquchong.broadcast(card);
 			}
 			await event.trigger("mbquchongOnRemove");
@@ -434,7 +436,7 @@ const skills = {
 				const num = Math.min(trigger.num, card.storage.mbquchong);
 				trigger.num -= num;
 				card.storage.mbquchong -= num;
-				game.log(card, '减少了', '#y' + num +'点', '#g耐久值');
+				game.log(card, "减少了", "#y" + num + "点", "#g耐久值");
 				lib.skill.mbquchong.broadcast(card);
 				if (trigger.num <= 0) break;
 			}
@@ -2354,8 +2356,7 @@ const skills = {
 					const targets = game.filterPlayer(current => !player.getStorage("mbweiming").includes(current) && current != player);
 					if (targets.length == 1) {
 						event.result = { bool: true, targets: targets };
-					}
-					else {
+					} else {
 						event.result = await player
 							.chooseTarget("威命：记录一名未记录过的其他角色", "当你杀死没有被记录过的角色后，则〖威命〗使命成功；如果在你杀死这些角色中的一名之前，有被记录过的角色死亡，则你〖威命〗使命失败。", true)
 							.set("filterTarget", (card, player, target) => {
@@ -3162,43 +3163,44 @@ const skills = {
 				},
 				forced: true,
 				getIndex(event, player) {
-					let list=[],players=game.filterPlayer().sortBySeat();
-					for(const current of players){
-						let bool = ["useCard","respond"].includes(event.getParent().name);
-						if(current == player) continue;
+					let list = [],
+						players = game.filterPlayer().sortBySeat();
+					for (const current of players) {
+						let bool = ["useCard", "respond"].includes(event.getParent().name);
+						if (current == player) continue;
 						var evt = event.getl(current);
 						if (!evt || !evt.hs || !evt.hs.length) continue;
 						if (event.name == "lose") {
 							for (var i in event.gaintag_map) {
-								if (event.gaintag_map[i].includes("twkujianx")) list.push([current,bool]);
+								if (event.gaintag_map[i].includes("twkujianx")) list.push([current, bool]);
 							}
 							continue;
 						}
-						current.getHistory("lose", evt=>{
+						current.getHistory("lose", evt => {
 							if (event != evt.getParent()) return false;
 							for (var i in evt.gaintag_map) {
-								if (evt.gaintag_map[i].includes("twkujianx")) list.push([current,bool]);
+								if (evt.gaintag_map[i].includes("twkujianx")) list.push([current, bool]);
 							}
 						});
 					}
 					return list;
 				},
 				charlotte: true,
-				logTarget(event,player,name,data){
+				logTarget(event, player, name, data) {
 					return data[0];
 				},
-				logAudio(event,player,name,data){
+				logAudio(event, player, name, data) {
 					let type = data[1];
-					if(type) return "twkujian2.mp3";
+					if (type) return "twkujian2.mp3";
 					return "twkujian3.mp3";
 				},
-				async content(event,trigger,player) {
-					const target=event.targets[0];
-					const type=event.indexedData[1];
-					if(type) await game.asyncDraw([player,target],2);
-					else{
-						if(player.countCards("h")) await player.chooseToDiscard(1,true,"h");
-						if(target.countCards("h")) await target.chooseToDiscard(1,true,"h");
+				async content(event, trigger, player) {
+					const target = event.targets[0];
+					const type = event.indexedData[1];
+					if (type) await game.asyncDraw([player, target], 2);
+					else {
+						if (player.countCards("h")) await player.chooseToDiscard(1, true, "h");
+						if (target.countCards("h")) await target.chooseToDiscard(1, true, "h");
 					}
 				},
 			},
@@ -5882,7 +5884,7 @@ const skills = {
 					if (card.name == "lebu" || card.name == "bingliang") return 0.5;
 				},
 			},
-			combo: "fenli"
+			combo: "fenli",
 		},
 	},
 	// 彭羕
@@ -7491,8 +7493,8 @@ const skills = {
 			},
 			result: { player: 7 },
 		},
-		group: ["xinjianying_draw", "jianying_mark"],
-		init: function (player) {
+		group: ["xinjianying_draw"],
+		init(player) {
 			if (player.isPhaseUsing()) {
 				var evt = _status.event.getParent("phaseUse");
 				var history = player.getHistory("useCard", function (evt2) {
@@ -7500,25 +7502,13 @@ const skills = {
 				});
 				if (history.length) {
 					var trigger = history[history.length - 1];
-					player.storage.jianying_mark = trigger.card;
-					player.markSkill("jianying_mark");
-					game.broadcastAll(
-						function (player, suit) {
-							if (player.marks.jianying_mark) player.marks.jianying_mark.firstChild.innerHTML = get.translation(suit);
-						},
-						player,
-						get.suit(trigger.card, player)
-					);
-					player.when("phaseUseAfter").then(() => {
-						player.unmarkSkill("jianying_mark");
-						delete player.storage.jianying_mark;
-					});
+					if (get.suit(trigger.card) == "none" || typeof get.number(trigger.card) != "number") return;
+					player.addTip("jianying", "渐营 " + lib.skill.jianying.getTranslation(trigger.card), "phaseUseAfter");
 				}
 			}
 		},
-		onremove: function (player) {
-			player.unmarkSkill("jianying_mark");
-			delete player.storage.jianying_mark;
+		onremove(player) {
+			player.removeTip("jianying");
 		},
 		subSkill: {
 			draw: { inherit: "jianying", audio: "xinjianying" },
@@ -8201,8 +8191,8 @@ const skills = {
 	//毛玠
 	bingqing: {
 		audio: 2,
-		trigger: { player: "useCardAfter" },
-		filter(event, player) {
+		trigger: { player: ["useCardAfter", "useCard1"] },
+		filter(event, player, name) {
 			const evt = event.getParent("phaseUse");
 			if (!evt || !evt.player || evt.player != player) return false;
 			const suit = get.suit(event.card);
@@ -8215,6 +8205,10 @@ const skills = {
 					.indexOf(event) != 0
 			)
 				return false;
+			if (name === "useCard1") {
+				lib.skill.bingqing.init(player);
+				return false;
+			}
 			return Array.from({ length: 3 })
 				.map((_, i) => i + 2)
 				.includes(
@@ -8297,6 +8291,27 @@ const skills = {
 					await target.damage();
 					break;
 			}
+		},
+		init(player) {
+			if (player.isPhaseUsing()) {
+				const evt = _status.event.getParent("phaseUse");
+				let suits = player
+					.getHistory("useCard", evtx => {
+						const suit = get.suit(evtx.card);
+						if (!lib.suit.includes(suit)) return false;
+						return evtx.getParent("phaseUse") == evt;
+					})
+					.slice()
+					.map(evtx => get.suit(evtx.card))
+					.unique();
+				if (suits.length) {
+					suits.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
+					player.addTip("bingqing", "秉清 " + suits.reduce((str, suit) => str + get.translation(suit), ""), "phaseUseAfter");
+				}
+			}
+		},
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 	},
 	yingfeng: {
@@ -11253,9 +11268,12 @@ const skills = {
 			let es = event.source.getEquips(1).filter(card => {
 				return lib.filter.canBeGained(card, player, event.source);
 			});
-			if (get.attitude(player, event.source) > 0) return es.reduce((acc, card) => {
-				return acc + get.value(card, event.source);
-			}, 0) < 0 || event.source.hasSkillTag("noe");
+			if (get.attitude(player, event.source) > 0)
+				return (
+					es.reduce((acc, card) => {
+						return acc + get.value(card, event.source);
+					}, 0) < 0 || event.source.hasSkillTag("noe")
+				);
 			return es.reduce((acc, card) => {
 				return acc + get.value(card, player);
 			}, 0);
@@ -15116,7 +15134,7 @@ const skills = {
 			},
 		},
 		ai: {
-			notemp: true
+			notemp: true,
 		},
 		group: ["rebiaozhao2", "rebiaozhao3"],
 	},
@@ -15512,8 +15530,8 @@ const skills = {
 			if (!targets[0].hasEquipableSlot(1)) event.goto(2);
 			"step 1";
 			let target = targets[0];
-			let equip1 = get.cardPile2(card=>card.name=="qinggang");
-			if(!equip1 || Math.random()>0.5){
+			let equip1 = get.cardPile2(card => card.name == "qinggang");
+			if (!equip1 || Math.random() > 0.5) {
 				equip1 = get.cardPile2(function (card) {
 					return get.subtype(card) == "equip1" && target.canUse(card, target);
 				});
@@ -17026,14 +17044,18 @@ const skills = {
 			var bool = get.position(card) == "e";
 			if (bool) player.removeEquipTrigger(card.card || card);
 			game.addVideo("skill", player, ["xinfu_jingxie", [bool, get.cardInfo(card)]]);
-			game.broadcastAll(function (card, bool) {
-				card.init([card.suit, card.number, "rewrite_" + card.name]);
-				if (bool && card.card && player.vcardsMap?.equips) {
-					const cardx = game.createCard("rewrite_" + card.card.name, card.card.suit, card.card.number);
-					player.vcardsMap.equips[player.vcardsMap.equips.indexOf(card.card)] = cardx;
-					card.card = cardx;
-				}
-			}, card, bool);
+			game.broadcastAll(
+				function (card, bool) {
+					card.init([card.suit, card.number, "rewrite_" + card.name]);
+					if (bool && card.card && player.vcardsMap?.equips) {
+						const cardx = game.createCard("rewrite_" + card.card.name, card.card.suit, card.card.number);
+						player.vcardsMap.equips[player.vcardsMap.equips.indexOf(card.card)] = cardx;
+						card.card = cardx;
+					}
+				},
+				card,
+				bool
+			);
 			if (bool) player.addEquipTrigger(card.card || card);
 		},
 		ai: {

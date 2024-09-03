@@ -15317,12 +15317,12 @@ const skills = {
 				}).setContent("gaincardMultiple");
 			}
 		},
-		mark: true,
-		intro: {
-			content: function (storage, player) {
-				var info = lib.skill.yuqi.getInfo(player);
-				return '<div class="text center"><span class=thundertext>蓝色：' + info[0] + "</span>　<span class=firetext>红色：" + info[1] + "</span><br><span class=greentext>绿色：" + info[2] + "</span>　<span class=yellowtext>黄色：" + info[3] + "</span></div>";
-			},
+		init(player) {
+			var list = lib.skill.yuqi.getInfo(player);
+			player.addTip("yuqi", "隅泣 " + list.slice().join(" "));
+		},
+		onremove(player, name) {
+			player.removeTip(name);
 		},
 		ai: {
 			threaten: 8.8,
@@ -15369,7 +15369,7 @@ const skills = {
 				var list = lib.skill.yuqi.getInfo(player);
 				list[result.index] = Math.min(5, list[result.index] + 2);
 				game.log(player, "将", result.control, "数字改为", "#y" + list[result.index]);
-				player.markSkill("yuqi");
+				player.addTip("yuqi", "隅泣 " + list.slice().join(" "));
 				if (event.goon) player.recover();
 			}
 		},
@@ -15415,7 +15415,7 @@ const skills = {
 				var list = lib.skill.yuqi.getInfo(player);
 				list[result.index] = Math.min(5, list[result.index] + 1);
 				game.log(player, "将", result.control, "数字改为", "#y" + list[result.index]);
-				player.markSkill("yuqi");
+				player.addTip("yuqi", "隅泣 " + list.slice().join(" "));
 				if (player.isDamaged()) event.finish();
 			} else event.finish();
 			"step 2";
@@ -15449,7 +15449,7 @@ const skills = {
 				var list = lib.skill.yuqi.getInfo(player);
 				list[result.index] = Math.min(5, list[result.index] + 1);
 				game.log(player, "将", result.control, "数字改为", "#y" + list[result.index]);
-				player.markSkill("yuqi");
+				player.addTip("yuqi", "隅泣 " + list.slice().join(" "));
 			}
 		},
 		ai: {

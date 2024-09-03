@@ -12556,9 +12556,12 @@ const skills = {
 		trigger: { player: "useCard" },
 		frequent: true,
 		filter: function (event, player) {
+			if (!player.isPhaseUsing()) return false;
+			if (get.suit(event.card) !== "none" && typeof get.number(event.card) === "number") {
+				player.addTip("jianying", "渐营 " + lib.skill.jianying.getTranslation(event.card), "phaseUseAfter");
+			}
 			var evt = player.getLastUsed(1);
 			if (!evt || !evt.card) return false;
-			if (!player.isPhaseUsing()) return false;
 			var evt2 = evt.getParent("phaseUse");
 			if (!evt2 || evt2.name != "phaseUse" || evt2 !== event.getParent("phaseUse")) return false;
 			return (get.suit(evt.card) != "none" && get.suit(evt.card) == get.suit(event.card)) || (typeof get.number(evt.card, false) == "number" && get.number(evt.card, false) == get.number(event.card));
@@ -12566,8 +12569,10 @@ const skills = {
 		content: function () {
 			player.draw();
 		},
-		group: "jianying_mark",
-		init: function (player) {
+		getTranslation(card) {
+			return get.translation(get.suit(card)) + get.strNumber(get.number(card));
+		},
+		init(player) {
 			if (player.isPhaseUsing()) {
 				var evt = _status.event.getParent("phaseUse");
 				var history = player.getHistory("useCard", function (evt2) {
@@ -12575,68 +12580,13 @@ const skills = {
 				});
 				if (history.length) {
 					var trigger = history[history.length - 1];
-					if (get.suit(trigger.card, player) == "none" || typeof get.number(trigger.card, player) != "number") return;
-					player.storage.jianying_mark = trigger.card;
-					player.markSkill("jianying_mark");
-					game.broadcastAll(
-						function (player, suit) {
-							if (player.marks.jianying_mark) player.marks.jianying_mark.firstChild.innerHTML = get.translation(suit);
-						},
-						player,
-						get.suit(trigger.card, player)
-					);
-					player.when("phaseUseAfter").then(() => {
-						player.unmarkSkill("jianying_mark");
-						delete player.storage.jianying_mark;
-					});
+					if (get.suit(trigger.card) == "none" || typeof get.number(trigger.card) != "number") return;
+					player.addTip("jianying", "渐营 " + lib.skill.jianying.getTranslation(trigger.card), "phaseUseAfter");
 				}
 			}
 		},
-		onremove: function (player) {
-			player.unmarkSkill("jianying_mark");
-			delete player.storage.jianying_mark;
-		},
-		subSkill: {
-			mark: {
-				charlotte: true,
-				trigger: { player: "useCard1" },
-				filter: function (event, player) {
-					return player.isPhaseUsing();
-				},
-				forced: true,
-				popup: false,
-				firstDo: true,
-				content: function () {
-					if (get.suit(trigger.card, player) == "none" || typeof get.number(trigger.card, player) != "number") player.unmarkSkill("jianying_mark");
-					else {
-						player.storage.jianying_mark = trigger.card;
-						player.markSkill("jianying_mark");
-						game.broadcastAll(
-							function (player, suit) {
-								if (player.marks.jianying_mark) player.marks.jianying_mark.firstChild.innerHTML = get.translation(suit);
-							},
-							player,
-							get.suit(trigger.card, player)
-						);
-						player.when("phaseUseAfter").then(() => {
-							player.unmarkSkill("jianying_mark");
-							delete player.storage.jianying_mark;
-						});
-					}
-				},
-				intro: {
-					markcount(card, player) {
-						return get.strNumber(get.number(card, player));
-					},
-					content: function (card, player) {
-						var suit = get.suit(card, player);
-						var num = get.number(card, player);
-						var str = "<li>上一张牌的花色：" + get.translation(suit);
-						str += "<br><li>上一张牌的点数：" + get.strNumber(num);
-						return str;
-					},
-				},
-			},
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 	},
 	zzhenggong: {
