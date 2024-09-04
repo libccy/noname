@@ -369,10 +369,6 @@ export class Player extends HTMLDivElement {
 	 * @type { boolean }
 	 */
 	removed;
-	/**
-	 * @type {Map<string,HTMLDivElement>}
-	 */
-	tips;
 
 	//新函数
 	/**
