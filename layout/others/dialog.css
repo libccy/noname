@@ -235,12 +235,6 @@
     display: none;
 }
 
-
-/* 人物tip相关的样式 */
-.player[data-position="0"] .tipContainer {
-    max-width: 120px;
-}
-
 /* 方案一 */
 .player .tipContainer {
     --bg: #2b2b28;

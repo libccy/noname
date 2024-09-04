@@ -96,4 +96,37 @@ export interface NonameHookType {
 	 */
 	checkOverflow(itemOption: Dialog, itemContainer: Dialog, addedItems: Dialog, game: GameEvent & GameEventPromise): any;
 	// #endregion
+	
+	/**
+	 *
+	 * @param event - 当前检查的伤害事件
+	 * @param player - 当前检查的玩家
+	 */
+	checkDamage1(event: GameEvent & GameEventPromise, player: Player ): any;
+	// #endregion
+	
+	/**
+	 *
+	 * @param event - 当前检查的伤害事件
+	 * @param player - 当前检查的玩家
+	 */
+	checkDamage2(event: GameEvent & GameEventPromise, player: Player ): any;
+	// #endregion
+	
+	/**
+	 *
+	 * @param event - 当前检查的伤害事件
+	 * @param player - 当前检查的玩家
+	 */
+	checkDamage3(event: GameEvent & GameEventPromise, player: Player ): any;
+	// #endregion
+	
+	/**
+	 *
+	 * @param event - 当前检查的伤害事件
+	 * @param player - 当前检查的玩家
+	 */
+	checkDamage4(event: GameEvent & GameEventPromise, player: Player ): any;
+	// #endregion
+
 }

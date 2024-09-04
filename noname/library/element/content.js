@@ -8618,12 +8618,16 @@ export const Content = {
 			event.goto(4);
 			return;
 		}
+		game.callHook("checkDamage1", [event, player]);
 		event.trigger("damageBegin1");
 		"step 1";
+		game.callHook("checkDamage2", [event, player]);
 		event.trigger("damageBegin2");
 		"step 2";
+		game.callHook("checkDamage3", [event, player]);
 		event.trigger("damageBegin3");
 		"step 3";
+		game.callHook("checkDamage4", [event, player]);
 		event.trigger("damageBegin4");
 		"step 4";
 		//moved changeHujia to changeHp
@@ -9471,7 +9475,7 @@ export const Content = {
 				let cards = list[0][1],
 					player = _status.event.player,
 					target = _status.currentPhase || player,
-					name = _status.event.getTrigger().name,
+					name = _status.event.getTrigger()?.name,
 					countWuxie = current => {
 						let num = current.getKnownCards(player, card => {
 							return get.name(card, current) === "wuxie";

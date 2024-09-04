@@ -185,7 +185,7 @@ game.import("card", function () {
 				},
 				modTarget: true,
 				async content(event, trigger, player) {
-					const target = event.targets[0];
+					const target = event.target;
 					await target.chooseToGuanxing(2);
 					await target.draw(2);
 				},

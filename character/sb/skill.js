@@ -1475,12 +1475,12 @@ const skills = {
 			},
 			{
 				cost: 5,
-				prompt: () => "令一名体力上限小于10的角色增加1点体力上限，回复1点体力，随机恢复一个废除的装备栏",
+				prompt: () => "令一名体力上限小于10的角色回复1点体力，增加1点体力上限，随机恢复一个废除的装备栏",
 				filter: () => game.hasPlayer(target => target.maxHp < 10),
 				filterTarget: true,
 				async content(player, target) {
-					await target.gainMaxHp();
 					await target.recover();
+					await target.gainMaxHp();
 					let list = Array.from({ length: 13 }).map((_, i) => "equip" + parseFloat(i + 1));
 					list = list.filter(i => target.hasDisabledSlot(i));
 					if (list.length) await target.enableEquip(list.randomGet());

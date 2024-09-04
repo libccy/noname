@@ -3085,36 +3085,49 @@ const skills = {
 		prompt2: () => lib.translate.shelie_info,
 		group: "twshelie_jingce",
 		//什么精策技能啊喂！
+		init(player) {
+			if (player.hasSkill("twshelie_round") || player !== _status.currentPhase) return;
+			var list = [];
+			player.getHistory("useCard", function (evt) {
+				if (lib.suit.includes(get.suit(evt.card)) && !list.includes(get.suit(evt.card))) list.push(get.suit(evt.card));
+			});
+			if (list.length) {
+				list.sort(function (a, b) {
+					return lib.suit.indexOf(b) - lib.suit.indexOf(a);
+				});
+				player.addTip("twshelie", "涉猎 " + list.reduce((str, suit) => str + get.translation(suit), ""), true);
+			}
+		},
+		onremove(player, skill) {
+			player.removeTip(skill);
+		},
 		subSkill: {
 			round: { charlotte: true },
 			count: {
 				charlotte: true,
-				onremove: true,
-				intro: {
-					markcount(storage) {
-						return storage.length;
-					},
-					content: "本回合已使用$花色的牌",
+				onremove(player, skill) {
+					player.removeTip(skill);
 				},
 			},
 			jingce: {
 				audio: "shelie",
 				trigger: { player: ["phaseJieshuBegin", "useCard1"] },
 				filter(event, player) {
-					if (player.hasSkill("twshelie_round") || player != _status.currentPhase) return false;
+					if (player.hasSkill("twshelie_round") || player !== _status.currentPhase) return false;
 					var list = [];
 					player.getHistory("useCard", function (evt) {
 						if (lib.suit.includes(get.suit(evt.card)) && !list.includes(get.suit(evt.card))) list.push(get.suit(evt.card));
 					});
-					if (list.length) {
-						player.addTempSkill("twshelie_count");
-						player.storage.twshelie_count = list.sort(function (a, b) {
-							return lib.suit.indexOf(b) - lib.suit.indexOf(a);
-						});
-						player.markSkill("twshelie_count");
-						player.syncStorage("twshelie_count");
+					if (event.name == "useCard") {
+						if (list.length) {
+							list.sort(function (a, b) {
+								return lib.suit.indexOf(b) - lib.suit.indexOf(a);
+							});
+							player.addTip("twshelie", "涉猎 " + list.reduce((str, suit) => str + get.translation(suit), ""), true);
+						}
+						return false;
 					}
-					return event.name != "useCard" && list.length >= 4;
+					return list.length >= 4;
 				},
 				forced: true,
 				locked: false,

@@ -124,3 +124,31 @@ export const checkOverflow = {
 		}
 	},
 };
+
+/**
+ * @type {(import("./interface.js").NonameAssemblyType["checkDamage1"])}
+ */
+export const checkDamage1 = {
+	kuanggu(event, player) {
+		if(get.distance(event.source, player) <= 1) event.checkKuanggu = true;
+	},
+};
+
+/**
+ * @type {(import("./interface.js").NonameAssemblyType["checkDamage2"])}
+ */
+export const checkDamage2 = {};
+
+/**
+ * @type {(import("./interface.js").NonameAssemblyType["checkDamage3"])}
+ */
+export const checkDamage3 = {
+	jiushi(event, player) {
+		if(player.isTurnedOver()) event.checkJiushi = true;
+	},
+};
+
+/**
+ * @type {(import("./interface.js").NonameAssemblyType["checkDamage4"])}
+ */
+export const checkDamage4 = {};
