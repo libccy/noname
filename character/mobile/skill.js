@@ -7494,22 +7494,6 @@ const skills = {
 			result: { player: 7 },
 		},
 		group: ["xinjianying_draw"],
-		init(player) {
-			if (player.isPhaseUsing()) {
-				var evt = _status.event.getParent("phaseUse");
-				var history = player.getHistory("useCard", function (evt2) {
-					return evt2.getParent("phaseUse") == evt;
-				});
-				if (history.length) {
-					var trigger = history[history.length - 1];
-					if (get.suit(trigger.card) == "none" || typeof get.number(trigger.card) != "number") return;
-					player.addTip("jianying", "渐营 " + lib.skill.jianying.getTranslation(trigger.card), "phaseUseAfter");
-				}
-			}
-		},
-		onremove(player) {
-			player.removeTip("jianying");
-		},
 		subSkill: {
 			draw: { inherit: "jianying", audio: "xinjianying" },
 		},
@@ -8191,8 +8175,8 @@ const skills = {
 	//毛玠
 	bingqing: {
 		audio: 2,
-		trigger: { player: ["useCardAfter", "useCard1"] },
-		filter(event, player, name) {
+		trigger: { player: "useCardAfter" },
+		filter(event, player) {
 			const evt = event.getParent("phaseUse");
 			if (!evt || !evt.player || evt.player != player) return false;
 			const suit = get.suit(event.card);
@@ -8205,10 +8189,6 @@ const skills = {
 					.indexOf(event) != 0
 			)
 				return false;
-			if (name === "useCard1") {
-				lib.skill.bingqing.init(player);
-				return false;
-			}
 			return Array.from({ length: 3 })
 				.map((_, i) => i + 2)
 				.includes(
@@ -8291,27 +8271,6 @@ const skills = {
 					await target.damage();
 					break;
 			}
-		},
-		init(player) {
-			if (player.isPhaseUsing()) {
-				const evt = _status.event.getParent("phaseUse");
-				let suits = player
-					.getHistory("useCard", evtx => {
-						const suit = get.suit(evtx.card);
-						if (!lib.suit.includes(suit)) return false;
-						return evtx.getParent("phaseUse") == evt;
-					})
-					.slice()
-					.map(evtx => get.suit(evtx.card))
-					.unique();
-				if (suits.length) {
-					suits.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
-					player.addTip("bingqing", "秉清 " + suits.reduce((str, suit) => str + get.translation(suit), ""), "phaseUseAfter");
-				}
-			}
-		},
-		onremove(player, skill) {
-			player.removeTip(skill);
 		},
 	},
 	yingfeng: {

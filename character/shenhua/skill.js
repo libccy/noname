@@ -2247,28 +2247,14 @@ const skills = {
 				return 20 * val;
 			},
 		},
-		trigger: { player: ["useCardAfter", "useCardToTargeted", "useCard1"] },
+		trigger: { player: ["useCardAfter", "useCardToTargeted"] },
 		prompt2(event, player) {
 			const cards = event.cards.filterInD("oe");
 			return "你可以将" + get.translation(cards) + (cards.length > 1 ? "以任意顺序" : "") + "置于牌堆顶，然后摸一张牌";
 		},
-		filter(event, player, name) {
-			let evt = event.name == "useCardToTargeted" ? event : event.getParent();
-			let type = get.type2(evt.card, false);
-			if (
-				player.hasHistory(
-					"useCard",
-					evtx => {
-						return evtx != evt && get.type2(evtx.card, false) == type;
-					},
-					evt
-				)
-			)
-				return false;
-			if (name === "useCard1") {
-				lib.skill.nzry_shicai.init(player);
-				return false;
-			}
+		filter(event, player) {
+			let type = get.type2(evt.card);
+			if (player.getHistory("useCard", evtx => get.type2(evtx.card) == type).indexOf(event.name == "useCardToTargeted" ? event.getParent() : event) !== 0) return false;
 			if (!event.cards.someInD("oe")) return false;
 			if (event.name == "useCardToTargeted") {
 				return type == "equip" && player == event.target;
@@ -2309,19 +2295,6 @@ const skills = {
 			await game.cardsGotoPile(cards, "insert");
 			game.log(player, "将", cards, "置于了牌堆顶");
 			await player.draw();
-		},
-		init(player) {
-			const types = player
-				.getHistory("useCard")
-				.slice()
-				.map(evt => get.translation(get.type2(evt.card, false))[0] || "")
-				.unique();
-			if (types.length) {
-				player.addTip("nzry_shicai", "恃才 " + types.slice().join(" "), true);
-			}
-		},
-		onremove(player, skill) {
-			player.removeTip(skill);
 		},
 		subSkill: {
 			2: {

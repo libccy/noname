@@ -5175,7 +5175,6 @@ const skills = {
 				var info = lib.skill.olgangshu.getInfo(player);
 				info[result.index] = Math.min(5, info[result.index] + 1);
 				game.log(player, "的", result.control.slice(0, result.control.indexOf("(")), "#y+1");
-				player.addTip("olgangshu_buff", "刚述 " + info.slice().join(" "));
 			}
 		},
 		ai: {
@@ -5199,7 +5198,6 @@ const skills = {
 					var info = lib.skill.olgangshu.getInfo(player);
 					trigger.num += info[1];
 					info[1] = 0;
-					player.addTip("olgangshu_buff", "刚述 " + info.slice().join(""));
 				},
 				mod: {
 					attackRange: function (player, range) {
@@ -11812,10 +11810,6 @@ const skills = {
 		init(player, name) {
 			let list = [1, 2, 3, 4];
 			player.storage[name] = list;
-			player.addTip("shanduan", "善断 " + list.slice().join(" "));
-		},
-		onremove(player, name) {
-			player.removeTip(name);
 		},
 		trigger: { player: "damageEnd" },
 		filter: (event, player) => player != _status.currentPhase,
@@ -11837,7 +11831,6 @@ const skills = {
 					break;
 				}
 			}
-			player.addTip("shanduan", "善断 " + player.storage.shanduan.slice().join(" "));
 			game.delayx();
 		},
 		group: ["shanduan_draw", "shanduan_use", "shanduan_discard"],
@@ -11860,7 +11853,6 @@ const skills = {
 					if (!list) {
 						trigger.getParent()._shanduan = (player.storage.shanduan || [1, 2, 3, 4]).slice(0);
 						player.storage.shanduan = [1, 2, 3, 4];
-						player.addTip("shanduan", "善断 " + trigger.getParent()._shanduan.slice().join(" "));
 					}
 					"step 1";
 					var list = trigger.getParent()._shanduan;
@@ -11876,7 +11868,6 @@ const skills = {
 					var num = list[result.index];
 					trigger.num = num;
 					list.remove(num);
-					player.addTip("shanduan", "善断 " + (list.length ? list : player.storage.shanduan).slice().join(" "));
 					game.log(player, "给", "#g摸牌阶段的摸牌数", "分配的数值是", "#y" + num);
 				},
 			},
@@ -11939,7 +11930,6 @@ const skills = {
 					player.storage.shanduan_effect.range = num;
 					player.addTempSkill("shanduan_effect");
 					list.remove(num);
-					player.addTip("shanduan", "善断 " + (list.length ? list : player.storage.shanduan).slice().join(" "));
 					game.log(player, "给", "#g攻击范围的基数", "分配的数值是", "#y" + num);
 					if (list.length == 0) event.finish();
 					else if (list.length == 1) event._result = { index: 0 };
@@ -11970,7 +11960,6 @@ const skills = {
 					if (!player.storage.shanduan_effect) player.storage.shanduan_effect = {};
 					player.storage.shanduan_effect.sha = num;
 					list.remove(num);
-					player.addTip("shanduan", "善断 " + (list.length ? list : player.storage.shanduan).slice().join(" "));
 					game.log(player, "给", "#g使用【杀】的次数上限", "分配的数值是", "#y" + num);
 				},
 			},
@@ -12005,7 +11994,6 @@ const skills = {
 					player.storage.shanduan_effect.limit = num;
 					player.addTempSkill("shanduan_effect");
 					list.remove(num);
-					player.addTip("shanduan", "善断 " + (list.length ? list : player.storage.shanduan).slice().join(" "));
 					game.log(player, "给", "#g手牌上限的基数", "分配的数值是", "#y" + num);
 				},
 			},
@@ -18995,20 +18983,11 @@ const skills = {
 		locked: false,
 		preHidden: true,
 		filter: function (event, player) {
-			let all = player.getHistory("useCard").length + player.getHistory("respond").length;
-			player.addTip("gzjili", "蒺藜 " + all.toString(), true);
-			return all == player.getAttackRange();
+			return player.getHistory("useCard").length + player.getHistory("respond").length == player.getAttackRange();
 		},
 		audio: 2,
 		content: function () {
 			player.draw(player.getHistory("useCard").length + player.getHistory("respond").length);
-		},
-		init(player) {
-			let all = player.getHistory("useCard").length + player.getHistory("respond").length;
-			if (all) player.addTip("gzjili", "蒺藜 " + all.toString(), true);
-		},
-		onremove(player, skill) {
-			player.removeTip(skill);
 		},
 		ai: {
 			threaten: 1.8,

@@ -3271,22 +3271,12 @@ const skills = {
 			return false;
 		},
 		filter: function (event, player) {
-			player.addTip("dcjianying", "渐营 " + lib.skill.jianying.getTranslation(event.card));
 			var evt = lib.skill.dcjianying.getLastUsed(player, event);
 			if (!evt || !evt.card) return false;
 			return (lib.suit.includes(get.suit(evt.card)) && get.suit(evt.card) == get.suit(event.card)) || (typeof get.number(evt.card, false) == "number" && get.number(evt.card, false) == get.number(event.card));
 		},
 		content: function () {
 			player.draw();
-		},
-		init(player) {
-			var trigger = lib.skill.dcjianying.getLastUsed(player);
-			if (trigger) {
-				player.addTip("dcjianying", "渐营 " + lib.skill.jianying.getTranslation(trigger.card));
-			}
-		},
-		onremove(player, skill) {
-			player.removeTip(skill);
 		},
 	},
 	//十周年步练师
@@ -4106,12 +4096,10 @@ const skills = {
 	rebotu: {
 		audio: "botu",
 		trigger: {
-			global: ["loseAfter", "cardsDiscardAfter"],
 			player: "phaseEnd",
 		},
 		frequent: true,
 		filter: function (event, player) {
-			if (_status.currentPhase !== player) return false;
 			if (player.countMark("rebotu_count") >= Math.min(3, game.countPlayer())) return false;
 			var suits = [];
 			game.getGlobalHistory("cardMove", function (evt) {
@@ -4126,38 +4114,7 @@ const skills = {
 					}
 				}
 			});
-			if (event.name !== "phase") {
-				if (suits.length) {
-					suits.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
-					player.addTip("rebotu", "博图 " + suits.reduce((str, suit) => str + get.translation(suit), ""), true);
-				}
-				return false;
-			}
 			return suits.length >= 4;
-		},
-		init(player) {
-			if (_status.currentPhase !== player) return;
-			if (player.countMark("rebotu_count") >= Math.min(3, game.countPlayer())) return;
-			var suits = [];
-			game.getGlobalHistory("cardMove", function (evt) {
-				if (suits.length >= 4) return;
-				if (evt.name == "lose") {
-					if (evt.position == ui.discardPile) {
-						for (var i of evt.cards) suits.add(get.suit(i, false));
-					}
-				} else {
-					if (evt.name == "cardsDiscard") {
-						for (var i of evt.cards) suits.add(get.suit(i, false));
-					}
-				}
-			});
-			if (suits.length) {
-				suits.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
-				player.addTip("rebotu", "博图 " + suits.reduce((str, suit) => str + get.translation(suit), ""), true);
-			}
-		},
-		onremove(player, skill) {
-			player.removeTip(skill);
 		},
 		content: function () {
 			player.addTempSkill("rebotu_count", "roundStart");
