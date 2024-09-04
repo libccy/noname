@@ -12556,9 +12556,6 @@ const skills = {
 		frequent: true,
 		filter: function (event, player) {
 			if (!player.isPhaseUsing()) return false;
-			if (get.suit(event.card) !== "none" && typeof get.number(event.card) === "number") {
-				player.addTip("jianying", "渐营 " + lib.skill.jianying.getTranslation(event.card), "phaseUseAfter");
-			}
 			var evt = player.getLastUsed(1);
 			if (!evt || !evt.card) return false;
 			var evt2 = evt.getParent("phaseUse");
@@ -12570,22 +12567,6 @@ const skills = {
 		},
 		getTranslation(card) {
 			return get.translation(get.suit(card)) + get.strNumber(get.number(card));
-		},
-		init(player) {
-			if (player.isPhaseUsing()) {
-				var evt = _status.event.getParent("phaseUse");
-				var history = player.getHistory("useCard", function (evt2) {
-					return evt2.getParent("phaseUse") == evt;
-				});
-				if (history.length) {
-					var trigger = history[history.length - 1];
-					if (get.suit(trigger.card) == "none" || typeof get.number(trigger.card) != "number") return;
-					player.addTip("jianying", "渐营 " + lib.skill.jianying.getTranslation(trigger.card), "phaseUseAfter");
-				}
-			}
-		},
-		onremove(player, skill) {
-			player.removeTip(skill);
 		},
 	},
 	zzhenggong: {
