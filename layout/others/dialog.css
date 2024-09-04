@@ -49,6 +49,12 @@
     margin-left: var(--ml, 3px);
 }
 
+.dialog.addNewRow .item-container>.item.card:hover {
+    z-index: 99;
+    scale: 1.1;
+
+}
+
 .dialog.addNewRow:not(.fullheight) {
     top: 10% !important;
     max-height: 55%;
