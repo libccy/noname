@@ -241,7 +241,7 @@
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    z-index: 3;
+    /* z-index: 2; */
 }
 
 .player[data-position="0"] .tipContainer {
@@ -297,3 +297,7 @@
     color: #e0dddd;
     text-shadow: none;
 } */
+
+.player .equips {
+    z-index: 3
+}
