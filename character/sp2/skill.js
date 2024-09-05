@@ -81,6 +81,9 @@ const skills = {
 				logTarget(event, player, name, target) {
 					return target;
 				},
+				check(event, player, name, target) {
+					return get.attitude(player, target) > 0;
+				},
 				prompt2: "令其将手牌摸至体力上限（至多摸五张）",
 				async content(event, trigger, player) {
 					const target = event.targets[0];

@@ -523,7 +523,7 @@ const skills = {
 		filterTarget: true,
 		async content(event, trigger, player) {
 			const target = event.targets[0],
-				str = player != target ? `${get.translation(player)}对你发动了【平端】，` : `【平端】：`;
+				str = player != target ? `###${get.translation(player)}对你发动了【平端】###` : `###平端###`;
 			const use = await target
 				.chooseToUse(function (card, player, event) {
 					return get.type(card) == "basic" && lib.filter.cardEnabled.apply(this, arguments);
@@ -547,12 +547,15 @@ const skills = {
 			await target.recast(cards);
 			await target.draw();
 			if (!target.countGainableCards(player, "e")) return;
-			const bool = await target
-				.chooseBool(str + `你可以令${get.translation(player)}获得你装备区的一张牌，然后摸一张牌`)
-				.set("choice", get.attitude(target, player) > 0)
-				.forResultBool();
-			if (!bool) return;
-			await player.gainPlayerCard(target, "e", true);
+			const result = await target
+				.chooseToGive(str + `你可以交给${get.translation(player)}你装备区的一张牌，然后摸一张牌`, player, "e")
+				.set("ai", card => {
+					if (get.attitude(get.player(), get.event("target")) > 0) return get.value(card);
+					return 0;
+				})
+				.set("target", player)
+				.forResult();
+			if (!result.bool) return;
 			await target.draw();
 		},
 		ai: {
@@ -5175,6 +5178,7 @@ const skills = {
 				var info = lib.skill.olgangshu.getInfo(player);
 				info[result.index] = Math.min(5, info[result.index] + 1);
 				game.log(player, "的", result.control.slice(0, result.control.indexOf("(")), "#y+1");
+				player.markSkill("olgangshu_buff");
 			}
 		},
 		ai: {
@@ -5185,7 +5189,6 @@ const skills = {
 				trigger: { player: "phaseDrawBegin2" },
 				charlotte: true,
 				onremove(player, skill) {
-					player.removeTip(skill);
 					delete player.storage[skill];
 				},
 				forced: true,
@@ -5198,6 +5201,7 @@ const skills = {
 					var info = lib.skill.olgangshu.getInfo(player);
 					trigger.num += info[1];
 					info[1] = 0;
+					player.markSkill("olgangshu_buff");
 				},
 				mod: {
 					attackRange: function (player, range) {
@@ -5208,6 +5212,23 @@ const skills = {
 						if (card.name != "sha") return;
 						var info = lib.skill.olgangshu.getInfo(player);
 						if (info) return num + info[2];
+					},
+				},
+				mark: true,
+				intro: {
+					markcount: function (storage, player) {
+						var info = lib.skill.olgangshu.getInfo(player);
+						var str = "";
+						info.forEach(num => (str += parseFloat(num)));
+						return str;
+					},
+					content: function (storage, player) {
+						var info = lib.skill.olgangshu.getInfo(player);
+						var str = "";
+						if (info[0] > 0) str += "<li>攻击范围+" + info[0];
+						if (info[1] > 0) str += "<li>下个摸牌阶段摸牌数+" + info[1];
+						if (info[2] > 0) str += "<li>使用【杀】的次数上限+" + info[2];
+						return str;
 					},
 				},
 			},
