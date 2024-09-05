@@ -9604,7 +9604,7 @@ const skills = {
 			return event.num > 0;
 		},
 		getIndex(event, player) {
-			return event.num;
+			return event.num || 1;
 		},
 		async content(event, trigger, player) {
 			await player.draw();
