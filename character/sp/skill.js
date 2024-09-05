@@ -812,7 +812,7 @@ const skills = {
 					.forResult();
 				if (result.bool) {
 					if (!choosed) choosed = result.links[0][0];
-					await result.links[0][1].content(current, player);
+					await result.links[0][1].content(current);
 				}
 			}
 		},
@@ -872,8 +872,8 @@ const skills = {
 					[
 						"若为魏/群势力，则获得【奸雄】/【天命】直到你的下个回合开始",
 						{
-							async content(player, source) {
-								source.addTempSkill("olyongzu_skill", { player: "phaseBegin" });
+							async content(player) {
+								player.addTempSkill("olyongzu_skill", { player: "phaseBegin" });
 								const group = player[get.mode() == "guozhan" ? "identity" : "group"];
 								const skill = group == "wei" ? "rejianxiong" : "tianming";
 								player.popup(skill);
