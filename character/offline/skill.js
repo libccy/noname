@@ -1713,7 +1713,7 @@ const skills = {
 		},
 		filter(event, player) {
 			let hasCard = player.getEquips("tiejili").length > 0;
-			if (event.name == "phaseZhunbei") return !hasCard && !player.storage.tymanyong;
+			if (event.name == "phaseZhunbei") return !hasCard;
 			return hasCard;
 		},
 		async content(event, trigger, player) {
@@ -1722,7 +1722,6 @@ const skills = {
 				if (card) {
 					player.$gain2(card);
 					await player.equip(card);
-					player.storage.tymanyong = true;
 				}
 			}
 			else {
