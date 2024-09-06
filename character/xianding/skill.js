@@ -3,6 +3,112 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//文鸳
+	dckengqiang: {
+		audio: 2,
+		trigger: {
+			source: "damageBegin1",
+		},
+		filter(event, player) {
+			const num = player.storage.dcshangjue ? 2 : 1;
+			return player.getStorage("dckengqiang_used").length < num;
+		},
+		async cost(event, trigger, player) {
+			const result = await player
+				.chooseButton([get.prompt("dckengqiang", trigger.player), [[
+					["draw", "摸体力上限张牌"],
+					["damage", "令此伤害+1" + (trigger.cards?.length ? `并获得${get.translation(trigger.cards)}` : "")],
+				], "textbutton"]])
+				.set("filterButton", button => {
+					const player = get.player();
+					return !player.getStorage("dckengqiang_used").includes(button.link);
+				})
+				.set("ai", button => {
+					const player = get.player();
+					if (button.link == "draw") return player.maxHp;
+					return get.damageEffect(get.event().getTrigger().player, player);
+				})
+				.forResult();
+			event.result = {
+				bool: result.bool,
+				cost_data: result.links,
+			};
+		},
+		async content(event, trigger, player) {
+			const result = event.cost_data[0];
+			player.addTempSkill("dckengqiang_used");
+			player.markAuto("dckengqiang_used", result);
+			if (result == "draw") await player.draw(player.maxHp);
+			else {
+				trigger.num++;
+				if (trigger.cards?.length) await player.gain(trigger.cards, "gain2");
+				else await game.delay();
+			}
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
+		},
+	},
+	dckuichi: {
+		audio: 2,
+		trigger: {
+			player: "phaseEnd",
+		},
+		filter(event, player) {
+			if (player.getHistory("gain", evt => {
+				return evt.getParent().name == "draw" && evt.cards.length;
+			}).reduce((sum, evt) => sum + evt.cards.length, 0) < player.maxHp) return false;
+			if (player.getHistory("sourceDamage", evt => {
+				return evt.num > 0;
+			}).reduce((sum, evt) => sum + evt.num, 0) < player.maxHp) return false;
+			return true;
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			await player.loseHp();
+		},
+	},
+	dcshangjue: {
+		skillAnimation: true,
+		animationColor: "fire",
+		unique: true,
+		juexingji: true,
+		audio: 2,
+		derivation: "dckunli",
+		trigger: { player: "dying" },
+		forced: true,
+		filter(event, player) {
+			return player.hp < 1;
+		},
+		async content(event, trigger, player) {
+			player.awakenSkill(event.name);
+			player.storage[event.name] = true;
+			await player.recoverTo(1);
+			await player.gainMaxHp();
+			await player.addSkills("dckunli");
+		},
+	},
+	dckunli: {
+		skillAnimation: true,
+		animationColor: "fire",
+		unique: true,
+		juexingji: true,
+		audio: 2,
+		trigger: { player: "dying" },
+		forced: true,
+		filter(event, player) {
+			return player.hp < 2;
+		},
+		async content(event, trigger, player) {
+			player.awakenSkill(event.name);
+			await player.recoverTo(2);
+			await player.gainMaxHp();
+			await player.removeSkills("dckuichi");
+		},
+	},
 	//这是俺拾嘞
 	dcsbkongwu: {
 		audio: 2,
@@ -19,7 +125,7 @@ const skills = {
 		mark: true,
 		intro: {
 			content: function (storage, player) {
-				return "出牌阶段限一次，你可以弃置至多体力上限张牌并选择一名其他角色，" + (storage ? "视为对其使用等量张【杀】" : "弃置其等量张牌。") + "若此阶段结束时其手牌数和体力值均不大于你，其下回合摸牌阶段少摸一张牌且装备技能失效。";
+				return "出牌阶段限一次，你可以弃置至多体力上限张牌并选择一名其他角色，" + (storage ? "视为对其使用等量张【杀】。" : "弃置其等量张牌。") + "若此阶段结束时其手牌数和体力值均不大于你，其下回合摸牌阶段少摸一张牌且装备技能失效。";
 			},
 		},
 		filterTarget: lib.filter.notMe,
