@@ -1,6 +1,11 @@
 import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 const dynamicTranslates = {
+	dckengqiang(player) {
+		let str = player.storage.dcshangjue ? "每回合每项各限一次" : "每回合限一次";
+		str += "，当你造成伤害时，你可以：1.摸体力上限张牌；2.令此伤害+1并获得造成伤害的牌。";
+		return str;
+	},
 	xinlvli(player) {
 		var str = "每回合限一次";
 		if (player.storage.choujue) str += "（自己的回合内则改为限两次）";

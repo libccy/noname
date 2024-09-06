@@ -1,4 +1,5 @@
 const characters = {
+	wenyuan: ["female", "shu", 3, ["dckengqiang", "dckuichi", "dcshangjue"]],
 	dc_jiangqing: ["male", "wu", 4, ["dcshangyi", "dcniaoxiang"], ["die:jiangqin.mp3"]],
 	dc_tianfeng: ["male", "qun", 3, ["sijian", "dcsuishi"], ["die:tianfeng"]],
 	dc_zhangren: ["male", "qun", 4, ["dcchuanxin", "dcfengshi"], ["die:zhangren"]],

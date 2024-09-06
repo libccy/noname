@@ -698,6 +698,15 @@ const translates = {
 	dc_sb_hucheer_prefix: "新杀谋",
 	dcsbkongwu: "孔武",
 	dcsbkongwu_info: "转换技，出牌阶段限一次，你可以弃置至多体力上限张牌，选择一名其他角色：阴，弃置其至多等量张牌；阳，视为对其使用等量张【杀】。此阶段结束时，若其手牌数和体力值均不大于你，其下回合摸牌阶段摸牌数-1且装备区里的所有牌失效。",
+	wenyuan: "文鸳",
+	dckengqiang: "铿锵",
+	dckengqiang_info: "每回合限一次，当你造成伤害时，你可以：1.摸体力上限张牌；2.令此伤害+1并获得造成伤害的牌。",
+	dckuichi: "匮饬",
+	dckuichi_info: "锁定技，回合结束时，若你本回合摸牌数和造成伤害值均不小于体力上限，你失去1点体力。",
+	dcshangjue: "殇决",
+	dcshangjue_info: "觉醒技，你进入濒死状态时，回复体力至1点，增加1点体力上限并获得〖困励〗，然后修改〖铿锵〗为“每回合每项各限一次”。",
+	dckunli: "困励",
+	dckunli_info: "觉醒技，你进入濒死状态时，回复体力至2点，增加1点体力上限并失去〖匮饬〗。",
 };
 
 export default translates;
