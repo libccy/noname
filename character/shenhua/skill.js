@@ -2253,7 +2253,7 @@ const skills = {
 			return "你可以将" + get.translation(cards) + (cards.length > 1 ? "以任意顺序" : "") + "置于牌堆顶，然后摸一张牌";
 		},
 		filter(event, player) {
-			let type = get.type2(evt.card);
+			let type = get.type2(event.card);
 			if (player.getHistory("useCard", evtx => get.type2(evtx.card) == type).indexOf(event.name == "useCardToTargeted" ? event.getParent() : event) !== 0) return false;
 			if (!event.cards.someInD("oe")) return false;
 			if (event.name == "useCardToTargeted") {

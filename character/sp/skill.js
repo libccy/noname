@@ -247,8 +247,8 @@ const skills = {
 								const card = {
 									name: get.name(button.link, false),
 									nature: get.nature(button.link, false),
-									suit: get.suit(button.link, false),
-									number: get.number(button.link, false),
+									suit: "none",
+									number: null,
 									isCard: true,
 								};
 								return get.player().getUseValue(card);
@@ -258,8 +258,8 @@ const skills = {
 							const card = {
 								name: get.name(result.links[0], false),
 								nature: get.nature(result.links[0], false),
-								suit: get.suit(result.links[0], false),
-								number: get.number(result.links[0], false),
+								suit: "none",
+								number: null,
 								isCard: true,
 							};
 							if (player.hasUseTarget(card)) await player.chooseUseTarget(card, false, true);
