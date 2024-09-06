@@ -80,7 +80,7 @@ const skills = {
 		derivation: "dckunli",
 		trigger: { player: "dying" },
 		forced: true,
-		filterInD(event, player) {
+		filter(event, player) {
 			return player.hp < 1;
 		},
 		async content(event, trigger, player) {
@@ -99,7 +99,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "dying" },
 		forced: true,
-		filterInD(event, player) {
+		filter(event, player) {
 			return player.hp < 2;
 		},
 		async content(event, trigger, player) {
@@ -109,7 +109,7 @@ const skills = {
 			await player.removeSkills("dckuichi");
 		},
 	},
-//这是俺拾嘞
+	//这是俺拾嘞
 	dcsbkongwu: {
 		audio: 2,
 		enable: "phaseUse",
