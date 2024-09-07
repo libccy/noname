@@ -510,6 +510,7 @@ const translates = {
 	songci_draw: "颂词",
 	baobian: "豹变",
 	lihun: "离魂",
+	lihun2: "离魂",
 	chongzhen: "冲阵",
 	yuanhu: "援护",
 	tianming: "天命",

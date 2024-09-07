@@ -28856,6 +28856,7 @@ const skills = {
 		},
 		filterCard: true,
 		position: "he",
+		logAudio: () => 1,
 		content: function () {
 			player.gainPlayerCard(target, true, "h", target.countCards("h"));
 			player.turnOver();
@@ -28883,8 +28884,8 @@ const skills = {
 	lihun2: {
 		trigger: { player: "phaseUseEnd" },
 		forced: true,
-		popup: false,
-		audio: false,
+		audio: "lihun2.mp3",
+		sourceSkill: "lihun",
 		content: function () {
 			"step 0";
 			var cards = player.getCards("he");
