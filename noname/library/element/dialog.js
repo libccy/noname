@@ -71,36 +71,6 @@ export class Dialog extends HTMLDivElement {
 		return dialog;
 	}
 	/**
-	 * 类型定义：SingleOrArray
-	 * @template T - 类型参数
-	 * @typedef {T | T[]} SingleOrArray
-	 */
-
-	/**
-	 * 类型定义：Row_Item
-	 * @typedef {SingleOrArray<Card | Player> | string} Row_Item
-	 */
-
-	/**
-	 * 类型定义：Row_Item_Option
-	 * @template T - 类型参数，默认为 Row_Item
-	 * @typedef {Object} Row_Item_Option
-	 * @property {T} [item] - 每项的内容
-	 * @property {CSSStyleDeclaration} [itemContainerCss] - 项目容器的自定义样式
-	 * @property {CSSStyleDeclaration} [itemCss] - 容器中每个项目的自定义样式
-	 * @property {(itemContainer: HTMLDivElement) => void} [custom] - 自定义函数，可以用来添加其他的元素
-	 * @property {number} [ratio] - 所占的比例
-	 * @property {boolean} [ItemNoclick] - 容器中的每个项目是否可以点击
-	 * @property {(item: HTMLDivElement, itemContainer: HTMLDivElement, AllItemConatainers: HTMLDivElement[], e: MouseEvent) => void} [clickItem] - 项目的点击事件
-	 * @property {(itemContainer: HTMLDivElement, item: T, AllItemConatainers: HTMLDivElement[], e: MouseEvent) => void} [clickItemContainer] - 点击容器的回调事件
-	 * @property {'fold' | 'scroll' | 'hidden'} [overflow] - 项目过多时，如何显示，折叠|滚动|隐藏
-	 */
-
-	/**
-	 * 类型定义：RowItem
-	 * @typedef {Row_Item | Row_Item_Option<Row_Item>} RowItem
-	 */
-	/**
 	 *
 	 * @param  {RowItem[]} args
 	 */

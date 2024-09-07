@@ -4,12 +4,12 @@ import { get } from "../../get/index.js";
 import { _status } from "../../status/index.js";
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["checkBegin"])}
+ * @type {(NonameAssemblyType["checkBegin"])}
  */
 export const checkBegin = {};
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["checkCard"])}
+ * @type {(NonameAssemblyType["checkCard"])}
  */
 export const checkCard = {
 	updateTempname(card, event) {
@@ -21,7 +21,7 @@ export const checkCard = {
 };
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["checkTarget"])}
+ * @type {(NonameAssemblyType["checkTarget"])}
  */
 export const checkTarget = {
 	updateInstance(target, event) {
@@ -40,12 +40,12 @@ export const checkTarget = {
 };
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["checkButton"])}
+ * @type {(NonameAssemblyType["checkButton"])}
  */
 export const checkButton = {};
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["checkEnd"])}
+ * @type {(NonameAssemblyType["checkEnd"])}
  */
 export const checkEnd = {
 	autoConfirm(event, { ok, auto, autoConfirm }) {
@@ -63,12 +63,12 @@ export const checkEnd = {
 };
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["uncheckBegin"])}
+ * @type {(NonameAssemblyType["uncheckBegin"])}
  */
 export const uncheckBegin = {};
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["uncheckCard"])}
+ * @type {(NonameAssemblyType["uncheckCard"])}
  */
 export const uncheckCard = {
 	removeTempname(card, event) {
@@ -82,7 +82,7 @@ export const uncheckCard = {
 };
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["uncheckTarget"])}
+ * @type {(NonameAssemblyType["uncheckTarget"])}
  */
 export const uncheckTarget = {
 	removeInstance(target, event) {
@@ -96,17 +96,17 @@ export const uncheckTarget = {
 };
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["uncheckButton"])}
+ * @type {(NonameAssemblyType["uncheckButton"])}
  */
 export const uncheckButton = {};
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["uncheckEnd"])}
+ * @type {(NonameAssemblyType["uncheckEnd"])}
  */
 export const uncheckEnd = {};
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["checkOverflow"])}
+ * @type {(NonameAssemblyType["checkOverflow"])}
  */
 export const checkOverflow = {
 	updateDialog(itemOption, itemContainer, addedItems, game) {
@@ -126,7 +126,7 @@ export const checkOverflow = {
 };
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["checkDamage1"])}
+ * @type {(NonameAssemblyType["checkDamage1"])}
  */
 export const checkDamage1 = {
 	kuanggu(event, player) {
@@ -135,12 +135,12 @@ export const checkDamage1 = {
 };
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["checkDamage2"])}
+ * @type {(NonameAssemblyType["checkDamage2"])}
  */
 export const checkDamage2 = {};
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["checkDamage3"])}
+ * @type {(NonameAssemblyType["checkDamage3"])}
  */
 export const checkDamage3 = {
 	jiushi(event, player) {
@@ -149,6 +149,6 @@ export const checkDamage3 = {
 };
 
 /**
- * @type {(import("./interface.js").NonameAssemblyType["checkDamage4"])}
+ * @type {(NonameAssemblyType["checkDamage4"])}
  */
 export const checkDamage4 = {};
