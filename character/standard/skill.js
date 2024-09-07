@@ -1786,9 +1786,11 @@ const skills = {
 	},
 	new_jiangchi: {
 		audio: 2,
+		nopop: true,
 		trigger: {
 			player: "phaseDrawEnd",
 		},
+		logAudio: index => (typeof index === "number" ? "new_jiangchi" + index + ".mp3" : 2),
 		async cost(event, trigger, player) {
 			const list = ["弃牌", "摸牌", "cancel2"];
 			if (!player.countCards("he")) list.remove("弃牌");
@@ -1820,6 +1822,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const control = event.cost_data;
 
+			player.logSkill("new_jiangchi", null, null, null, [(control == "弃牌" ? 1 : 2)]);
 			if (control == "弃牌") {
 				player.chooseToDiscard(true, "he");
 				player.addTempSkill("jiangchi2", "phaseUseEnd");

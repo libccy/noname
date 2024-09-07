@@ -1940,8 +1940,7 @@ const skills = {
 	//OL谋袁绍
 	//真·四世三公——袁神，启动
 	olsbhetao: {
-		audio: 3,
-		audioname: ["ol_sb_yuanshao_shadow"],
+		audio: 6,
 		trigger: { global: "useCardToPlayered" },
 		filter(event, player) {
 			return (
@@ -2023,8 +2022,7 @@ const skills = {
 		},
 	},
 	olsbshenli: {
-		audio: 3,
-		audioname: ["ol_sb_yuanshao_shadow"],
+		audio: 6,
 		trigger: { player: "useCardToPlayered" },
 		filter(event, player) {
 			if (!player.isPhaseUsing() || player.hasSkill("olsbshenli_used")) return false;
@@ -2114,10 +2112,7 @@ const skills = {
 		subSkill: { used: { charlotte: true } },
 	},
 	olsbyufeng: {
-		audio: 2,
-		audioname2: {
-			ol_sb_yuanshao_shadow: "olsbyufeng_ol_sb_yuanshao_shadow",
-		},
+		audio: 3,
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
@@ -2141,9 +2136,6 @@ const skills = {
 			player.equip(card);
 		},
 		subSkill: {
-			ol_sb_yuanshao_shadow: {
-				audio: 1,
-			},
 			block: {
 				mod: {
 					cardEnabled(card, player) {
@@ -2201,8 +2193,7 @@ const skills = {
 	},
 	olsbshishou: {
 		unique: true,
-		audio: 3,
-		audioname: ["ol_sb_yuanshao_shadow"],
+		audio: 6,
 		trigger: {
 			global: ["loseAfter", "equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 		},
@@ -2932,6 +2923,7 @@ const skills = {
 		audio: "rejiangchi",
 		trigger: { player: "phaseDrawEnd" },
 		direct: true,
+		logAudio: index => (typeof index === "number" ? "rejiangchi" + index + ".mp3" : 2),
 		content: function* (event, map) {
 			var player = map.player;
 			var choiceList = ["摸一张牌，本回合使用【杀】的次数上限-1，且【杀】不计入手牌上限。", "重铸一张牌，本回合使用【杀】无距离限制，且使用【杀】的次数上限+1。"],
@@ -2950,7 +2942,7 @@ const skills = {
 				.set("choiceList", choiceList)
 				.set("prompt", get.prompt("oljiangchi"));
 			if (result.control != "cancel2") {
-				player.logSkill("oljiangchi");
+				player.logSkill("oljiangchi", null, null, null, [(result.control == "摸牌，-1" ? 1 : 2)]);
 				if (result.control == "摸牌，-1") {
 					player.draw();
 					player.addTempSkill("oljiangchi_less");
