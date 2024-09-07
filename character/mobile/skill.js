@@ -9604,7 +9604,7 @@ const skills = {
 			return event.num > 0;
 		},
 		getIndex(event, player) {
-			return event.num;
+			return event.num || 1;
 		},
 		async content(event, trigger, player) {
 			await player.draw();
@@ -12443,6 +12443,7 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		direct: true,
+		logAudio: index => (typeof index === "number" ? "rejiangchi" + index + ".mp3" : 2),
 		content: function () {
 			"step 0";
 			var list = ["弃牌", "摸牌", "取消"];
@@ -12465,14 +12466,13 @@ const skills = {
 				})
 				.set("prompt", get.prompt2("rejiangchi"));
 			"step 1";
+			player.logSkill("rejiangchi", null, null, null, [(result.control == "弃牌" ? 2 : 1)]);
 			if (result.control == "弃牌") {
 				player.chooseToDiscard(true, "he");
 				player.addTempSkill("jiangchi2", "phaseUseEnd");
-				player.logSkill("rejiangchi");
 			} else if (result.control == "摸牌") {
 				player.draw();
 				player.addTempSkill("rejiangchi3", "phaseUseEnd");
-				player.logSkill("rejiangchi");
 			}
 		},
 	},

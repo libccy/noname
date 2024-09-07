@@ -8,7 +8,7 @@ const characters = {
 	ol_sb_guanyu: ["male", "shu", 4, ["olsbweilin", "olsbduoshou"]],
 	ol_sb_taishici: ["male", "wu", 4, ["olsbdulie", "olsbdouchan"], ["name:太史|慈"]],
 	ol_gaoshun: ["male", "qun", 4, ["olxianzhen", "decadejinjiu"], ["die:re_gaoshun"]],
-	ol_sb_yuanshao: ["male", "qun", 4, ["olsbhetao", "olsbshenli", "olsbyufeng", "olsbshishou"], ["zhu"]],
+	ol_sb_yuanshao: ["male", "qun", 4, ["olsbhetao", "olsbshenli", "olsbyufeng", "olsbshishou"], ["die:true", "die:2", "zhu"]],
 	ol_yufan: ["male", "wu", 3, ["olzongxuan", "olzhiyan"], ["tempname:re_yufan", "die:re_yufan"]],
 	ol_chengpu: ["male", "wu", 4, ["dclihuo", "olchunlao"], ["tempname:xin_chengpu", "die:xin_chengpu"]],
 	ol_wangyi: ["female", "wei", 3, ["olzhenlie", "olmiji"]],
