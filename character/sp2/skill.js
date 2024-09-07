@@ -2665,6 +2665,7 @@ const skills = {
 		getSkills(skills, len) {
 			skills = skills.filter(skill => {
 				let str = get.skillInfoTranslation(skill, get.event().player);
+				if (str.indexOf("当你于出牌阶段外") != -1) return false;
 				if (str.indexOf("当你于出牌阶段") != -1) return true;
 				let ss = game.expandSkills([skill]);
 				if (ss.some(skillx => {
