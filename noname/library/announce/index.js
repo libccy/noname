@@ -5,17 +5,6 @@
  */
 const vm = new WeakMap();
 
-/**
- * @template T
- * @typedef {import("./index").AnnounceSubscriberType<T>} AnnounceSubscriberType
- */
-/**
- * @typedef {import("./index").IAnnounceSubscriber} IAnnounceSubscriber
- */
-
-/**
- *
- */
 export class Announce {
 	/**
 	 * @type {EventTarget}
