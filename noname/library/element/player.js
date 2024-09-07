@@ -2580,6 +2580,7 @@ export class Player extends HTMLDivElement {
 			map = { skill: map };
 		}
 		for (const i of ["name", "name1", "name2"]) {
+			if (i == "name" && get.mode() == "guozhan") continue;
 			if (i == "name1" && this.name === this.name1) continue;
 			const list = lib.characterSubstitute[this[i]];
 			if (this[i] && list) {
@@ -8226,7 +8227,7 @@ export class Player extends HTMLDivElement {
 		if (!nounmark) this.unmarkSkill(skill);
 		this.disableSkill(skill + "_awake", skill);
 		this.awakenedSkills.add(skill);
-		if (this.storage[skill] === false) this.storage[skill] = true;
+		if (!this.storage[skill]) this.storage[skill] = true;
 		_status.event.clearStepCache();
 		return this;
 	}
