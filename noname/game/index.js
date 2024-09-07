@@ -355,20 +355,17 @@ export class Game extends GameCompatible {
 		return id;
 	}
 	/**
-	 * @typedef {import("../library/hooks/interface.js").NonameHookType} NonameHookType
-	 */
-	/**
 	 * 通用的调用钩子函数
 	 *
 	 * @template {NonameHookType} HookType
-	 * @template {keyof HookType} Name
+	 * @template {keyof NonameHookType} Name
 	 * @param {Name} name
 	 * @param {Parameters<HookType[Name]>} args
 	 */
 	callHook(name, args) {
 		const callHook = () => {
 			for (const hook of lib.hooks[name]) {
-				if (hook != null && typeof hook == "function") {
+				if (typeof hook == "function") {
 					hook(...args);
 				}
 			}
