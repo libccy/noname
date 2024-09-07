@@ -30632,7 +30632,7 @@ const skills = {
 			targets[event.num].chooseBool("是否押杀？").ai = function (event, player) {
 				var evt = _status.event.getParent();
 				if (get.attitude(targets[event.num], evt.player) > 0) return evt.player.countCards("h", "sha") ? false : true;
-				return Math.random() < 0.5;
+				return Math.random() < (evt.player.countCards("h") / 4);
 			};
 			"step 2";
 			if (result.bool) {

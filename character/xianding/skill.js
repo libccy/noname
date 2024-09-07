@@ -16700,7 +16700,7 @@ const skills = {
 					return "red";
 				});
 			"step 2";
-			player.storage.pianchong2 = result.control;
+			player.markAuto("pianchong2", result.control);
 			player.addTempSkill("pianchong2", { player: "phaseBeginStart" });
 			player.popup(result.control, result.control == "red" ? "fire" : "thunder");
 			game.log(player, "声明了", "#y" + get.translation(result.control));
@@ -16722,19 +16722,20 @@ const skills = {
 			var evt = event.getl(player);
 			if (!evt || !evt.cards2 || !evt.cards2.length) return false;
 			for (var i of evt.cards2) {
-				if (get.color(i, player) == player.storage.pianchong2) return true;
+				if (player.getStorage("pianchong2").includes(get.color(i, player))) return true;
 			}
 			return false;
 		},
 		content: function () {
 			"step 0";
-			var num = trigger.getl(player).cards2.filter(function (card) {
-				return get.color(card, player) == player.storage.pianchong2;
-			}).length;
-			var cards = [];
-			while (num--) {
+			let cardsx = trigger.getl(player).cards2.filter(function (card) {
+				return player.getStorage("pianchong2").includes(get.color(card, player));
+			}).slice(0);
+			let cards = [];
+			while (cardsx.length) {
+				let precard = cardsx.shift();
 				var card = get.cardPile2(function (card) {
-					return !cards.includes(card) && get.color(card, false) != player.storage.pianchong2;
+					return !cards.includes(card) && get.color(card, false) != get.color(precard, false);
 				});
 				if (card) cards.push(card);
 				else break;

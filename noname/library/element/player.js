@@ -1974,8 +1974,8 @@ export class Player extends HTMLDivElement {
 			this,
 			bool
 		);
-		if (bool) this.popup("判定生效", "wood", false);
-		else this.popup("判定失效", "fire", false);
+		if (bool) this.popup("判定生效", "wood");
+		else this.popup("判定失效", "fire");
 	}
 	/**
 	 * @param { string } name
