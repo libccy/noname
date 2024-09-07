@@ -2787,7 +2787,7 @@ export default () => {
 				subSkill: {
 					mark: {
 						charlotte: true,
-						trigger: { player: ["hideCharacterEnd", "showCharacterEnd"] },
+						trigger: { player: ["hideCharacterBegin", "showCharacterEnd"] },
 						filter(event, player) {
 							return get.character(event[event.name == "hideCharacter" ? "toHide" : "toShow"], 3).includes("fakejuzhan");
 						},
@@ -3170,23 +3170,28 @@ export default () => {
 			fakechongxin: {
 				audio: "chongxin",
 				enable: "phaseUse",
+				viewAs: {
+					name: "yiyi",
+					isCard: true,
+				},
+				usable: 1,
 				filter(event, player) {
 					const card = new lib.element.VCard({ name: "yiyi" });
 					return (
 						lib.filter.targetEnabled2(card, player, player) &&
-						game.hasPlayer(target => {
-							return lib.filter.targetEnabled2(card, player, target) && target.isEnemyOf(player);
-						})
+						game.hasPlayer(target => lib.skill.fakechongxin.filterTarget(card, player, target))
 					);
 				},
-				filterTarget(cardx, player, target) {
-					const card = new lib.element.VCard({ name: "yiyi" });
-					return lib.filter.targetEnabled2(card, player, target) && target.isEnemyOf(player);
+				selectTarget: 1,
+				filterTarget(card, player, target) {
+					if (game.checkMod(card, player, target, "unchanged", "playerEnabled", player) == false) return false;
+					if (game.checkMod(card, player, target, "unchanged", "targetEnabled", target) == false) return false;
+					return target.isEnemyOf(player);
 				},
-				usable: 1,
-				async content(event, trigger, player) {
-					const card = new lib.element.VCard({ name: "yiyi" });
-					await player.useCard(card, [player].concat(event.targets), false);
+				filterCard: () => false,
+				selectCard: -1,
+				precontent() {
+					event.result.targets.add(player);
 				},
 				ai: {
 					order(item, player) {
@@ -3252,7 +3257,7 @@ export default () => {
 				subSkill: {
 					mark: {
 						charlotte: true,
-						trigger: { player: ["hideCharacterEnd", "showCharacterEnd"] },
+						trigger: { player: ["hideCharacterBegin", "showCharacterEnd"] },
 						filter(event, player) {
 							return get.character(event[event.name == "hideCharacter" ? "toHide" : "toShow"], 3).includes("fakeweirong");
 						},
@@ -15256,6 +15261,9 @@ export default () => {
 				},
 				forced: true,
 				preHidden: true,
+				check: function (event, player) {
+					return true;
+				},
 				filter: function (event, player) {
 					if (event.num <= 0 || !event.source) return false;
 					var n1 = player.getNext();

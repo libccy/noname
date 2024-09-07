@@ -8075,6 +8075,7 @@ const skills = {
 			if (get.mode() == "doudizhu") return true;
 			return player.getHistory("lose", evt => evt.cards2 && evt.cards2.length).length;
 		},
+		frequent: true,
 		async content(event, trigger, player) {
 			let num = 0;
 			if (get.mode() == "doudizhu") num++;
@@ -8083,11 +8084,6 @@ const skills = {
 			});
 			num = Math.min(5, num);
 			const { cards } = await game.cardsGotoOrdering(get.cards(num));
-			if (_status.connectMode)
-				game.broadcastAll(function () {
-					_status.noclearcountdown = true;
-				});
-			const give_map = {};
 			if (!cards.length) return;
 			do {
 				const {
@@ -8117,31 +8113,9 @@ const skills = {
 						}
 					})
 					.set("enemy", get.value(togive[0], player, "raw") < 0);
-				if (targets.length) {
-					const id = targets[0].playerid,
-						map = give_map;
-					if (!map[id]) map[id] = [];
-					map[id].addArray(togive);
-				}
-			} while (cards.length > 0);
-			if (_status.connectMode) {
-				game.broadcastAll(function () {
-					delete _status.noclearcountdown;
-					game.stopCountChoose();
-				});
+				if (targets.length) await targets[0].gain(togive, "gain2");
 			}
-			const list = [];
-			for (const i in give_map) {
-				const source = (_status.connectMode ? lib.playerOL : game.playerMap)[i];
-				player.line(source, "green");
-				if (player !== source && (get.mode() !== "identity" || player.identity !== "nei")) player.addExpose(0.2);
-				list.push([source, give_map[i]]);
-			}
-			game.loseAsync({
-				gain_list: list,
-				giver: player,
-				animate: "draw",
-			}).setContent("gaincardMultiple");
+			while (cards.length > 0);
 		},
 	},
 };

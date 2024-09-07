@@ -2481,7 +2481,7 @@ const skills = {
 				) {
 					return true;
 				}
-				return Math.random() < 0.5;
+				return Math.random() < (evt.player.countCards("h") / 4);
 			};
 			"step 2";
 			if (result.bool) {

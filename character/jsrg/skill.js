@@ -1678,11 +1678,11 @@ const skills = {
 		usable: 1,
 		filter(event, player) {
 			const zhu = get.zhu(player);
-			if (!zhu || !zhu.isZhu2() || !zhu.countCards("h")) return false;
+			if (!zhu || !zhu.isZhu2() || !zhu.isIn() || !zhu.countCards("h")) return false;
 			return !player.isZhu2() && player.countCards("h");
 		},
 		async content(event, trigger, player) {
-			player
+			const next = player
 				.chooseToDebate(
 					game.filterPlayer(current => {
 						return (current == player || current.isZhu2()) && current.countCards("h");
@@ -1713,6 +1713,35 @@ const skills = {
 						}
 					}
 				});
+			if (get.attitude(get.zhu(player), player) > 0) {
+				//听话的主公应该忠臣给啥你亮啥
+				next.ai = function (card) {
+					const target = get.zhu(player),
+						history = target.getHistory("gain", evt => evt.getParent("jsrgwentian", true)?.player == player);
+					if (history.length && get.color(card) == get.color(history[0].cards[0])) return 2 + Math.random();
+					return Math.random();
+				};
+			}
+			await next;
+		},
+		ai: {
+			order(item, player) {
+				if (!player) player = get.player();
+				const target = get.zhu(player);
+				if (!target) return 0.1;
+				if (get.attitude(player, target) <= 0) return 0.1;
+				const history = target.getHistory("gain", evt => evt.getParent("jsrgwentian", true)?.player == player);
+				if (!history.length) return 5;
+				if (get.color(history[0].cards[0]) == "red") return 1;
+				return 11;
+			},
+			result: {
+				player(player) {
+					const target = get.zhu(player);
+					if (!target) return 0;
+					return get.attitude(player, target);
+				},
+			},
 		},
 		subSkill: {
 			add: {
