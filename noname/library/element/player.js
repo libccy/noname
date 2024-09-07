@@ -1969,13 +1969,13 @@ export class Player extends HTMLDivElement {
 	tryJudgeAnimate(bool) {
 		game.broadcast(
 			function (player, bool) {
-				player.trySkillAnimate(bool);
+				player.tryJudgeAnimate(bool);
 			},
 			this,
 			bool
 		);
-		if (bool) this.popup("判定生效", "wood");
-		else this.popup("判定失效", "fire");
+		if (bool) this.popup("判定生效", "wood", false);
+		else this.popup("判定失效", "fire", false);
 	}
 	/**
 	 * @param { string } name
