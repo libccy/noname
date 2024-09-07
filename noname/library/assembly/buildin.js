@@ -5,11 +5,18 @@ import { _status } from "../../status/index.js";
 
 /**
  * @type {(NonameAssemblyType["checkBegin"])}
+ * 
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const checkBegin = {};
 
 /**
  * @type {(NonameAssemblyType["checkCard"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const checkCard = {
 	updateTempname(card, event) {
@@ -22,6 +29,9 @@ export const checkCard = {
 
 /**
  * @type {(NonameAssemblyType["checkTarget"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const checkTarget = {
 	updateInstance(target, event) {
@@ -41,21 +51,29 @@ export const checkTarget = {
 
 /**
  * @type {(NonameAssemblyType["checkButton"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const checkButton = {};
 
 /**
  * @type {(NonameAssemblyType["checkEnd"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const checkEnd = {
 	autoConfirm(event, { ok, auto, autoConfirm }) {
 		if (!event.isMine()) return;
 		const skillinfo = get.info(event.skill) || {};
+		// @ts-ignore
 		if (ok && auto && (autoConfirm || skillinfo.direct) && !_status.touchnocheck && !_status.mousedown && (!_status.mousedragging || !_status.mouseleft)) {
 			if (ui.confirm) ui.confirm.close();
 			// @ts-ignore
 			if (event.skillDialog === true) event.skillDialog = false;
 			ui.click.ok();
+			// @ts-ignore
 			_status.mousedragging = null;
 			if (skillinfo.preservecancel) ui.create.confirm("c");
 		}
@@ -64,11 +82,17 @@ export const checkEnd = {
 
 /**
  * @type {(NonameAssemblyType["uncheckBegin"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const uncheckBegin = {};
 
 /**
  * @type {(NonameAssemblyType["uncheckCard"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const uncheckCard = {
 	removeTempname(card, event) {
@@ -83,6 +107,9 @@ export const uncheckCard = {
 
 /**
  * @type {(NonameAssemblyType["uncheckTarget"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const uncheckTarget = {
 	removeInstance(target, event) {
@@ -97,28 +124,41 @@ export const uncheckTarget = {
 
 /**
  * @type {(NonameAssemblyType["uncheckButton"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const uncheckButton = {};
 
 /**
  * @type {(NonameAssemblyType["uncheckEnd"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const uncheckEnd = {};
 
 /**
  * @type {(NonameAssemblyType["checkOverflow"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const checkOverflow = {
 	updateDialog(itemOption, itemContainer, addedItems, game) {
 		//计算压缩折叠的量
 		const gap = 3;
+		// @ts-ignore
 		const L = (itemContainer.originWidth - 2 * gap) / game.documentZoom;
+		// @ts-ignore
 		const W = addedItems[0].getBoundingClientRect().width / game.documentZoom;
+		// @ts-ignore
 		let n = addedItems.length;
 		const r = 16; //为偏移留出的空间，如果r为0，可能会把前面的卡牌全遮住
 		if (n * W + (n + 1) * gap < L) {
 			itemContainer.style.setProperty("--ml", gap + "px");
 		} else {
+			// @ts-ignore
 			const ml = Math.min((n * W - L + gap) / (n - 1), W - r / game.documentZoom);
 			itemContainer.style.setProperty("--ml", "-" + ml + "px");
 		}
@@ -127,28 +167,42 @@ export const checkOverflow = {
 
 /**
  * @type {(NonameAssemblyType["checkDamage1"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const checkDamage1 = {
 	kuanggu(event, player) {
+		// @ts-ignore
 		if(get.distance(event.source, player) <= 1) event.checkKuanggu = true;
 	},
 };
 
 /**
  * @type {(NonameAssemblyType["checkDamage2"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const checkDamage2 = {};
 
 /**
  * @type {(NonameAssemblyType["checkDamage3"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const checkDamage3 = {
 	jiushi(event, player) {
+		// @ts-ignore
 		if(player.isTurnedOver()) event.checkJiushi = true;
 	},
 };
 
 /**
  * @type {(NonameAssemblyType["checkDamage4"])}
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const checkDamage4 = {};

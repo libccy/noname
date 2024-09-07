@@ -123,6 +123,10 @@ export class NonameAssembly extends Array {
 
 /**
  * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const defaultHookcompatition = {
 	checkBegin: new NonameAssembly("checkBegin"),
