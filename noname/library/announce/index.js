@@ -135,7 +135,6 @@ export class AnnounceSubscriber {
 	subscribe(name) {
 		// @ts-expect-error MustHave
 		vm.get(this).addEventListener(name, this.#content);
-		// @ts-expect-error NonameDefine
 		this.#listening.add(name);
 	}
 
@@ -145,7 +144,6 @@ export class AnnounceSubscriber {
 	unsubscribe(name) {
 		// @ts-expect-error MustHave
 		vm.get(this).removeEventListener(name, this.#content);
-		// @ts-expect-error NonameDefine
 		this.#listening.remove(name);
 	}
 }
