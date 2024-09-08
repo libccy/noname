@@ -8128,6 +8128,28 @@ const skills = {
 	},
 	longhun: {
 		audio: 4,
+		mod: {
+			aiOrder(player, card, num) {
+				if (num <= 0 || !player.isPhaseUsing() || player.needsToDiscard() < 2) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num - 3.6;
+			},
+			aiValue(player, card, num) {
+				if (num <= 0) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num + 3.6;
+				if (suit === "club") return num + 1;
+				if (suit === "spade") return num + 1.8;
+			},
+			aiUseful(player, card, num) {
+				if (num <= 0) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num + 3;
+				if (suit === "club") return num + 1;
+				if (suit === "spade") return num + 1;
+			},
+		},
+		locked: false,
 		group: ["longhun1", "longhun2", "longhun3", "longhun4"],
 		ai: {
 			fireAttack: true,
@@ -8258,6 +8280,11 @@ const skills = {
 			maxHandcard(player, num) {
 				return 2 + num;
 			},
+			aiOrder(player, card, num) {
+				if (num <= 0 || !player.isPhaseUsing() || !get.tag(card, "recover")) return num;
+				if (player.needsToDiscard() > 1) return num;
+				return 0;
+			},
 		},
 		audio: true,
 		trigger: { player: "phaseDrawBegin2" },
@@ -8272,6 +8299,28 @@ const skills = {
 	},
 	relonghun: {
 		audio: 2,
+		mod: {
+			aiOrder(player, card, num) {
+				if (num <= 0 || !player.isPhaseUsing() || player.needsToDiscard() < 2) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num - 3.6;
+			},
+			aiValue(player, card, num) {
+				if (num <= 0) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num + 3.6;
+				if (suit === "club") return num + 1;
+				if (suit === "spade") return num + 1.8;
+			},
+			aiUseful(player, card, num) {
+				if (num <= 0) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num + 3;
+				if (suit === "club") return num + 1;
+				if (suit === "spade") return num + 1;
+			},
+		},
+		locked: false,
 		//技能发动时机
 		enable: ["chooseToUse", "chooseToRespond"],
 		//发动时提示的技能描述
@@ -8464,6 +8513,28 @@ const skills = {
 	},
 	xinlonghun: {
 		audio: "longhun",
+		mod: {
+			aiOrder(player, card, num) {
+				if (num <= 0 || !player.isPhaseUsing() || player.needsToDiscard() < 2) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num - 3.6;
+			},
+			aiValue(player, card, num) {
+				if (num <= 0) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num + 3.6;
+				if (suit === "club") return num + 1;
+				if (suit === "spade") return num + 1.8;
+			},
+			aiUseful(player, card, num) {
+				if (num <= 0) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num + 3;
+				if (suit === "club") return num + 1;
+				if (suit === "spade") return num + 1;
+			},
+		},
+		locked: false,
 		enable: ["chooseToUse", "chooseToRespond"],
 		prompt: "将♦手牌当做火【杀】，♥手牌当做【桃】，♣手牌当做【闪】，♠手牌当做【无懈可击】使用或打出",
 		viewAs(cards, player) {
@@ -8595,6 +8666,11 @@ const skills = {
 		mod: {
 			maxHandcard(player, num) {
 				return 2 + num;
+			},
+			aiOrder(player, card, num) {
+				if (num <= 0 || !player.isPhaseUsing() || !get.tag(card, "recover")) return num;
+				if (player.needsToDiscard() > 1) return num;
+				return 0;
 			},
 		},
 		audio: 2,

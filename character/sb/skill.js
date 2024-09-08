@@ -2211,8 +2211,8 @@ const skills = {
 						result: {
 							target: function (player, target) {
 								var att = get.attitude(player, target);
-								if (att > 0) return 3;
-								if (att < 0) return -1;
+								if (att > 0) return 1;
+								if (att < 0) return -3;
 								return 0;
 							},
 						},
