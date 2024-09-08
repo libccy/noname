@@ -9059,17 +9059,18 @@ export class Player extends HTMLDivElement {
 		num = game.checkMod(this, num, "maxHandcardFinal", this);
 		return Math.max(0, num);
 	}
-	getEnemies(func) {
+	getEnemies(func, includeDie) {
 		var player = this;
 		var targets;
 		var mode = get.mode();
+		let method = includeDie ? "filterPlayer2" : "filterPlayer";
 		if (mode == "identity") {
 			if (_status.mode == "purple") {
 				switch (player.identity) {
 					case "bZhu":
 					case "bZhong":
 					case "rNei":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["rZhu", "rZhong", "bNei"].includes(target.identity);
 						});
@@ -9077,14 +9078,14 @@ export class Player extends HTMLDivElement {
 					case "rZhu":
 					case "rZhong":
 					case "bNei":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["bZhu", "bZhong", "rNei"].includes(target.identity);
 						});
 						break;
 					case "rYe":
 					case "bYe":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return !["rYe", "bYe"].includes(target.identity);
 						});
@@ -9096,14 +9097,14 @@ export class Player extends HTMLDivElement {
 					case "zhu":
 					case "zhong":
 					case "mingzhong":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							if (num >= 3) return target.identity == "fan";
 							return target.identity == "nei" || target.identity == "fan";
 						});
 						break;
 					case "nei":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							if (num >= 3) return target.identity == "fan";
 							if (game.players.length == 2) return target != player;
@@ -9111,13 +9112,13 @@ export class Player extends HTMLDivElement {
 						});
 						break;
 					case "fan":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return target.identity != "fan";
 						});
 						break;
 					case "commoner":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							if (num >= 3) return target.identity != "fan";
 							return target.identity == "fan";
@@ -9127,24 +9128,24 @@ export class Player extends HTMLDivElement {
 			}
 		} else if (mode == "guozhan") {
 			if (player.identity == "ye") {
-				targets = game.filterPlayer(function (target) {
+				targets = game[method](function (target) {
 					if (func && !func(target)) return false;
 					return true;
 				});
 			} else {
 				var group = lib.character[player.name1][1];
-				targets = game.filterPlayer(function (target) {
+				targets = game[method](function (target) {
 					if (func && !func(target)) return false;
 					return target.identity == "ye" || lib.character[target.name1][1] != group;
 				});
 			}
 		} else if (mode == "doudizhu") {
-			targets = game.filterPlayer(function (target) {
+			targets = game[method](function (target) {
 				if (func && !func(target)) return false;
 				return target.identity != player.identity;
 			});
 		} else {
-			targets = game.filterPlayer(function (target) {
+			targets = game[method](function (target) {
 				if (func && !func(target)) return false;
 				return target.side != player.side;
 			});
@@ -9152,7 +9153,7 @@ export class Player extends HTMLDivElement {
 		targets.remove(player);
 		return targets;
 	}
-	getFriends(func) {
+	getFriends(func, includeDie) {
 		var player = this;
 		var targets = [];
 		var mode = get.mode();
@@ -9161,13 +9162,14 @@ export class Player extends HTMLDivElement {
 			func = null;
 			self = true;
 		}
+		let method = includeDie ? "filterPlayer2" : "filterPlayer";
 		if (mode == "identity") {
 			if (_status.mode == "purple") {
 				switch (player.identity) {
 					case "rZhu":
 					case "rZhong":
 					case "bNei":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["rZhu", "rZhong", "bNei"].includes(target.identity);
 						});
@@ -9175,14 +9177,14 @@ export class Player extends HTMLDivElement {
 					case "bZhu":
 					case "bZhong":
 					case "rNei":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["bZhu", "bZhong", "rNei"].includes(target.identity);
 						});
 						break;
 					case "rYe":
 					case "bYe":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["rYe", "bYe"].includes(target.identity);
 						});
@@ -9193,7 +9195,7 @@ export class Player extends HTMLDivElement {
 					case "zhu":
 					case "zhong":
 					case "mingzhong":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["zhu", "zhong", "mingzhong"].includes(target.identity);
 						});
@@ -9202,13 +9204,13 @@ export class Player extends HTMLDivElement {
 						targets = [];
 						break;
 					case "fan":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return target.identity == "fan";
 						});
 						break;
 					case "commoner":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return true;
 						});
@@ -9220,18 +9222,18 @@ export class Player extends HTMLDivElement {
 				targets = [];
 			} else {
 				var group = lib.character[player.name1][1];
-				targets = game.filterPlayer(function (target) {
+				targets = game[method](function (target) {
 					if (func && !func(target)) return false;
 					return target.identity != "ye" && lib.character[target.name1][1] == group;
 				});
 			}
 		} else if (mode == "doudizhu") {
-			targets = game.filterPlayer(function (target) {
+			targets = game[method](function (target) {
 				if (func && !func(target)) return false;
 				return target.identity == player.identity;
 			});
 		} else {
-			targets = game.filterPlayer(function (target) {
+			targets = game[method](function (target) {
 				if (func && !func(target)) return false;
 				return target.side == player.side;
 			});
@@ -9262,11 +9264,11 @@ export class Player extends HTMLDivElement {
 		}
 		return this == player;
 	}
-	isFriendsOf(player) {
-		return player.getFriends(true).includes(this);
+	isFriendsOf(player, includeDie) {
+		return player.getFriends(true, includeDie).includes(this);
 	}
-	isEnemiesOf(player) {
-		return player.getEnemies().includes(this);
+	isEnemiesOf(player, includeDie) {
+		return player.getEnemies(null, includeDie).includes(this);
 	}
 	isAlive() {
 		return this.classList.contains("dead") == false;
