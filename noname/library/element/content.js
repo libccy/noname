@@ -912,8 +912,16 @@ export const Content = {
 		for (var i = 0; i < event.targets.length; i++) {
 			var card = result[i].cards[0],
 				target = event.targets[i];
-			if (get.color(card, target) == "red") red.push([target, card]);
+			if (card == "red" || get.color(card, target) == "red") red.push([target, card]);
 			else black.push([target, card]);
+		}
+		if(event.fixedResult) {
+			for (var i = 0; i < event.fixedResult.length; i++) {
+				var list = event.fixedResult[i];
+				if (list[1] == "red" || get.color(list[1], list[0]) == "red") red.push(list);
+				else black.push(list);
+				event.targets.push(list[0]);
+			}
 		}
 		event.red = red;
 		event.black = black;
@@ -922,27 +930,26 @@ export const Content = {
 		var red = event.red,
 			black = event.black;
 		if (red.length) {
+			let cards = red.filter(i => get.itemtype(i[1]) == "card");
 			game.log(
 				red.map(function (i) {
 					return i[0];
-				}),
-				'意见为<span class="firetext">红色</span>，展示了',
-				red.map(function (i) {
-					return i[1];
-				})
+				}).unique(),
+				'意见为<span class="firetext">红色</span>',
+				cards.length ? "，展示了" : "",
+				cards.map(i => i[1]),
 			);
 		} else game.log("#b无人", '意见为<span class="firetext">红色</span>');
 		if (black.length) {
+			let cards = black.filter(i => get.itemtype(i[1]) == "card");
 			game.log(
 				black.map(function (i) {
 					return i[0];
-				}),
+				}).unique(),
 				"意见为",
 				"#g黑色",
-				"，展示了",
-				black.map(function (i) {
-					return i[1];
-				})
+				cards.length ? "，展示了" : "",
+				cards.map(i => i[1]),
 			);
 		} else game.log("#b无人", "意见为", "#g黑色");
 		game.broadcastAll(
@@ -970,13 +977,19 @@ export const Content = {
 					return get.translation(name);
 				};
 				for (var i = 0; i < redArgs.length; i++) {
-					var list = redArgs[i];
-					var button = ui.create.button(list[1], "card", dialog.buttonss[0]);
+					var list = redArgs[i], button;
+					if (typeof list[1] == 'string') {
+						button = ui.create.button(["", "", list[1]], "vcard", dialog.buttonss[0]);
+					}
+					else button = ui.create.button(list[1], "card", dialog.buttonss[0]);
 					button.querySelector(".info").innerHTML = func(list[0]);
 				}
 				for (var i = 0; i < blackArgs.length; i++) {
 					var list = blackArgs[i];
-					var button = ui.create.button(list[1], "card", dialog.buttonss[1]);
+					if (typeof list[1] == 'string') {
+						button = ui.create.button(["", "", list[1]], "vcard", dialog.buttonss[1]);
+					}
+					else button = ui.create.button(list[1], "card", dialog.buttonss[1]);
 					button.querySelector(".info").innerHTML = func(list[0]);
 				}
 				dialog.open();

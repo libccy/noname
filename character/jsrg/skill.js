@@ -10158,6 +10158,146 @@ const skills = {
 			threaten: 2.8,
 		},
 	},
+	//江山如故·兴
+	//贾南风
+	jsrgfuyu: {
+		audio: 4,
+		enable: "phaseUse",
+		usable: 1,
+		filter(event, player) {
+			return game.hasPlayer(current => current != player);
+		},
+		filterTarget(card, player, target) {
+			return player != target;
+		},
+		selectTarget: [1, Infinity],
+		multitarget: true,
+		multiline: true,
+		async content(event, trigger, player) {
+			await player
+				.chooseToDebate(event.targets.concat([player]))
+				.set("callback", lib.skill.jsrgfuyu.callback);
+		},
+		async callback(event, trigger, player) {
+			const result = event.debateResult;
+			if (result.bool && result.opinion) {
+				if (result[result.opinion].some(i => i[0] == player)) {
+					const prompt = "是否分别对一名与你意见不同和未参与议事的角色各造成1点伤害？";
+					const resultx = await player
+						.chooseTarget(prompt, [1, 2], function (card, player, target) {
+							const bool1 = current => !get.event("targets1").includes(current),
+								bool2 = current => get.event("targets2").includes(current);
+							if (!ui.selected.targets.length) return bool1(target) || bool2(target);
+							const select = ui.selected.targets[0];
+							if (bool2(select)) return bool1(target);
+							return bool2(target);
+						})
+						.set("complexTarget", true)
+						.set("targets1", result.targets)
+						.set("targets2", result[result.opinion == "red" ? "black" : "red"].map(i => i[0]))
+						.set("ai", target => {
+							return get.damageEffect(target, get.player()) >= 0;
+						})
+						.forResult();
+					if (resultx.bool) {
+						player.line(resultx.targets.sortBySeat(), "green");
+						for (let target of resultx.targets.sortBySeat()) await target.damage();
+					}
+				}
+			}
+		},
+		ai: {
+			order: 8,
+			result: {
+				target(player, target) {
+					return 0.5 - Math.random();
+				},
+			},
+		},
+	},
+	jsrgshanzheng: {
+		audio: 2,
+		trigger: {
+			global: "chooseToDebateBegin",
+		},
+		filter(event, player) {
+			return event.list.includes(player) && (player.isMaxHp() || player.isMaxHandcard());
+		},
+		forced: true,
+		locked: false,
+		async content(event, trigger, player) {
+			trigger.list.remove(player);
+			const result = await player
+				.chooseControl("red", "black")
+				.set("ai", () => ["red", "black"].randomGet())
+				.set("prompt", get.translation(trigger.player) + "发起了议事，请选择你要展示的颜色")
+				.forResult();
+			if (!trigger.fixedResult) trigger.fixedResult = [];
+			trigger.fixedResult.push([player, result.control]);
+		},
+		group: "jsrgshanzheng_bazhen",
+		subSkill: {
+			bazhen: {
+				audio: "jsrgshanzheng",
+				trigger: { global: "debateShowOpinion" },
+				filter(event, player) {
+					if (!event.targets.includes(player)) return false;
+					return (player.isMaxHp() || player.isMaxHandcard());
+				},
+				direct: true,
+				async content(event, trigger, player) {
+					const colors = ["red", "black"];
+					for (const color of colors) {
+						for (const key of trigger[color].slice(0)) {
+							if (key[0] == player) trigger[color].push(key);
+						}
+					}
+				},
+			},
+		},
+	},
+	jsrgxiongbao: {
+		audio: 2,
+		forced: true,
+		trigger: {
+			player: "useCard",
+		},
+		filter(event, player) {
+			return game.hasPlayer(function (current) {
+				return current != player && (current.hasSex("female") || current.countCards("h") < player.countCards("h"));
+			});
+		},
+		async content(event, trigger, player) {
+			trigger.directHit.addArray(
+				game.filterPlayer(function (current) {
+					return current != player && (current.hasSex("female") || current.countCards("h") < player.countCards("h"));
+				})
+			);
+		},
+		ai: {
+			directHit_ai: true,
+			skillTagFilter(player, tag, arg) {
+				return (arg.target.hasSex("female") || arg.target.countCards("h") < player.countCards("h"));
+			},
+		},
+	},
+	jsrgliedu: {
+		audio: 2,
+		usable: 1,
+		trigger: {
+			source: "damageBegin1",
+		},
+		filter(event, player) {
+			return (event.player.hp < player.hp && event.player.hasSex("female") || event.player.hp == 1);
+		},
+		check(event, player) {
+			return get.damageEffect(event.player, player, player) > 0;
+		},
+		logTarget: "player",
+		async content(event, trigger, player) {
+			trigger.num *= 2;
+		},
+	},
 };
 
 export default skills;

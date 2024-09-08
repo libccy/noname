@@ -13541,6 +13541,13 @@ export class Library {
 			},
 		],
 		[
+			"兴",
+			{
+				color: "#c3f9ff",
+				nature: "thundermm",
+			},
+		],
+		[
 			"梦",
 			{
 				color: "#6affe2",
