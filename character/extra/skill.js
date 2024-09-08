@@ -3210,6 +3210,7 @@ const skills = {
 		trigger: { player: "useCard" },
 		forced: true,
 		popup: false,
+		sourceSkill: "twgongxin",
 		content: function () {
 			"step 0";
 			game.delayx();
@@ -6075,6 +6076,7 @@ const skills = {
 	},
 	boss_juejing2: {
 		audio: "juejing",
+		sourceSkill: "boss_juejing",
 		audioname2: {
 			dc_zhaoyun: "dcjuejing",
 		},
@@ -6236,6 +6238,7 @@ const skills = {
 		audio: "huoxin",
 		forced: true,
 		trigger: { global: "phaseBeginStart" },
+		sourceSkill: "huoxin",
 		filter(event, player) {
 			return player != event.player && !event.player._trueMe && event.player.countMark("huoxin") > 1;
 		},
@@ -6263,6 +6266,7 @@ const skills = {
 		forceDie: true,
 		forced: true,
 		silent: true,
+		sourceSkill: "huoxin",
 		content() {
 			player.removeSkill("huoxin2");
 		},
@@ -7315,6 +7319,7 @@ const skills = {
 			global: "loseAsyncAfter",
 		},
 		forced: true,
+		sourceSkill: "renjie",
 		filter(event, player) {
 			if (event.type != "discard" || event.getlx === false) return false;
 			var evt = event.getParent("phaseDiscard"),
@@ -7805,6 +7810,7 @@ const skills = {
 	qixing2: {
 		trigger: { player: "phaseDrawAfter" },
 		direct: true,
+		sourceSkill: "qixing",
 		filter(event, player) {
 			return player.getExpansions("qixing").length > 0 && player.countCards("h") > 0;
 		},
@@ -7918,6 +7924,7 @@ const skills = {
 	},
 	dawu3: {
 		trigger: { global: "damageBegin4" },
+		sourceSkill: "dawu",
 		filter(event, player) {
 			return !event.hasNature("thunder") && event.player.getStorage("dawu2").includes(player);
 		},
@@ -7987,6 +7994,7 @@ const skills = {
 	},
 	kuangfeng3: {
 		trigger: { global: "damageBegin3" },
+		sourceSkill: "kuangfeng",
 		filter(event, player) {
 			return event.hasNature("fire") && event.player.getStorage("kuangfeng2").includes(player);
 		},
@@ -8168,6 +8176,7 @@ const skills = {
 	longhun1: {
 		audio: true,
 		enable: ["chooseToUse", "chooseToRespond"],
+		sourceSkill: "longhun",
 		prompt() {
 			return "将" + get.cnNumber(Math.max(1, _status.event.player.hp)) + "张红桃牌当作桃使用";
 		},
@@ -8190,6 +8199,7 @@ const skills = {
 	longhun2: {
 		audio: true,
 		enable: ["chooseToUse", "chooseToRespond"],
+		sourceSkill: "longhun",
 		prompt() {
 			return "将" + get.cnNumber(Math.max(1, _status.event.player.hp)) + "张方片当作火杀使用或打出";
 		},
@@ -8212,6 +8222,7 @@ const skills = {
 	longhun3: {
 		audio: true,
 		enable: ["chooseToUse", "chooseToRespond"],
+		sourceSkill: "longhun",
 		prompt() {
 			return "将" + get.cnNumber(Math.max(1, _status.event.player.hp)) + "张黑桃牌当作无懈可击使用";
 		},
@@ -8234,6 +8245,7 @@ const skills = {
 	longhun4: {
 		audio: true,
 		enable: ["chooseToUse", "chooseToRespond"],
+		sourceSkill: "longhun",
 		prompt() {
 			return "将" + get.cnNumber(Math.max(1, _status.event.player.hp)) + "张梅花牌当作闪使用或打出";
 		},

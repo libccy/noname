@@ -1186,6 +1186,7 @@ const skills = {
 	nsweiyuan_use: {
 		enable: "phaseUse",
 		charlotte: true,
+		sourceSkill: "nsweiyuan",
 		mod: {
 			cardUsable() {
 				if (_status.event.skill == "nsweiyuan_use_backup") return Infinity;
@@ -1305,6 +1306,7 @@ const skills = {
 		trigger: { player: "phaseDrawBefore" },
 		forced: true,
 		charlotte: true,
+		sourceSkill: "nsjuxian",
 		content() {
 			player.removeSkill("nsjuxian2");
 			trigger.cancel();
@@ -1461,6 +1463,7 @@ const skills = {
 		},
 		trigger: { player: "phaseJieshuBegin" },
 		forced: true,
+		sourceSkill: "nsguolie",
 		filter(event, player) {
 			var cards = [];
 			game.getGlobalHistory("cardMove", function (evt) {
@@ -1960,6 +1963,7 @@ const skills = {
 	nszhihuang_damage: {
 		trigger: { source: "damageBegin1" },
 		forced: true,
+		sourceSkill: "nszhihuang",
 		filter(event, player) {
 			var zhu = get.zhu(player);
 			return zhu && player.countCards("h") > zhu.countCards("h") && event.getParent().type == "card";
@@ -2449,6 +2453,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		charlotte: true,
+		sourceSkill: "junktaoluan",
 		filter(event, player) {
 			if (!game.hasPlayer(current => current != player)) return false;
 			return event.skill == "junktaoluan_backup";
@@ -2503,6 +2508,7 @@ const skills = {
 		trigger: { player: "phaseEnd" },
 		forced: true,
 		popup: false,
+		sourceSkill: "junktaoluan",
 		content() {
 			player.loseHp();
 		},
@@ -2568,6 +2574,7 @@ const skills = {
 		},
 		direct: true,
 		charlotte: true,
+		sourceSkill: "nsfengli",
 		filter(event, player, name) {
 			if (event.name == "hideShownCards") {
 				const hs = player.countCards("h");
@@ -2619,6 +2626,7 @@ const skills = {
 	nsfengli_clear: {
 		trigger: { player: "phaseBegin" },
 		forced: true,
+		sourceSkill: "nsfengli",
 		filter(event, player) {
 			return player.hasSkill("nsfengli2");
 		},
@@ -2649,6 +2657,7 @@ const skills = {
 		enable: ["chooseToUse", "chooseToRespond"],
 		charlotte: true,
 		onremove: true,
+		sourceSkill: "nsfengli",
 		filter(event, player) {
 			if (player == _status.currentPhase) return false;
 			var target = player.storage.nsfengli_use;
@@ -2829,6 +2838,7 @@ const skills = {
 		},
 		forced: true,
 		popup: false,
+		sourceSkill: "ns_chuanshu",
 		filter(event, player) {
 			return player.storage.ns_chuanshu2 && player.storage.ns_chuanshu2.isIn() && event.num > 0;
 		},
@@ -2851,6 +2861,7 @@ const skills = {
 		},
 		silent: true,
 		onremove: true,
+		sourceSkill: "ns_chuanshu",
 		filter(event, player) {
 			return player.storage.ns_chuanshu2 && player.storage.ns_chuanshu2.isIn();
 		},
@@ -3691,6 +3702,7 @@ const skills = {
 		priority: 10,
 		mark: "card",
 		popup: false,
+		sourceSkill: "nsfuhuo",
 		filter(event, player) {
 			return event.card && event.card.name == "shan" && player.storage.nsfuhuo3 && player.storage.nsfuhuo3.isIn();
 		},
@@ -4278,6 +4290,7 @@ const skills = {
 	},
 	nscangxi2: {
 		trigger: { player: "phaseDiscardEnd" },
+		sourceSkill: "nscangxi",
 		filter(event, player) {
 			if (!event.cards || event.cards.length <= 1) return false;
 			if (player.group != "wu") return false;
@@ -6179,6 +6192,7 @@ const skills = {
 	liangce2: {
 		trigger: { global: "wuguRemained" },
 		direct: true,
+		sourceSkill: "liangce",
 		filter(event) {
 			return event.remained.filterInD().length > 0;
 		},
@@ -6475,6 +6489,7 @@ const skills = {
 		},
 		forced: true,
 		trigger: { global: "phaseAfter" },
+		sourceSkill: "fuchou",
 		filter(event, player) {
 			for (var i = 0; i < player.storage.fuchou2.length; i++) {
 				if (player.storage.fuchou2[i].isAlive()) return true;
@@ -6698,6 +6713,7 @@ const skills = {
 	},
 	zhucheng2: {
 		trigger: { target: "shaBefore" },
+		sourceSkill: "zhucheng",
 		check(event, player) {
 			if (get.attitude(event.player, player) <= 0) return true;
 			return get.effect(player, event.card, event.player, player) <= 0;
@@ -6824,6 +6840,7 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		discard: false,
+		sourceSkill: "diyduanliang",
 		filter(event, player) {
 			var cards = player.getCards("he", { color: "black" });
 			for (var i = 0; i < cards.length; i++) {
@@ -6935,6 +6952,7 @@ const skills = {
 	luweiyan2: {
 		trigger: { player: "useCardAfter" },
 		direct: true,
+		sourceSkill: "luweiyan",
 		filter(event, player) {
 			if (event.skill != "luweiyan") return false;
 			for (var i = 0; i < event.targets.length; i++) {
@@ -7124,6 +7142,7 @@ const skills = {
 	},
 	tiangong2: {
 		trigger: { source: "damageAfter" },
+		sourceSkill: "tiangong",
 		filter(event) {
 			if (event.nature == "thunder") return true;
 		},
