@@ -196,6 +196,14 @@ const skills = {
 				"canReplace"
 			);
 		},
+		mod: {
+			aiValue(player, card, num) {
+				if (!player.countCards(cardx => cardx.name.startsWith("dagongche_"), "e")) return num;
+				if (card.name.startsWith("dagongche_")) return num;
+				if (get.type(card) == "equip" && num > 0) return 0.3;
+			},
+		},
+		locked: false,
 		direct: true,
 		logAudio: index => (typeof index === "number" ? "mbquchong" + index + ".mp3" : 4),
 		async content(event, trigger, player) {

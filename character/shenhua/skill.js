@@ -1142,6 +1142,7 @@ const skills = {
 		filter: (event, player) => player.hasCard(card => lib.skill.drlt_huairou.filterCard(card, player), lib.skill.drlt_huairou.position),
 		filterCard: (card, player) => get.type(card) == "equip" && player.canRecast(card),
 		check(card) {
+			if (get.position(card) == "e") return 0.5 - get.value(card, get.player());
 			if (!_status.event.player.canEquip(card)) return 5;
 			return 3 - get.value(card);
 		},
