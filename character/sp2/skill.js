@@ -7093,6 +7093,7 @@ const skills = {
 		audio: "langmie",
 		trigger: { global: "phaseEnd" },
 		direct: true,
+		sourceSkill: "langmie",
 		filter: function (event, player) {
 			return event.player != player && (event.player.getStat("damage") || 0) > 1 && player.countCards("he") > 0;
 		},
@@ -7249,6 +7250,7 @@ const skills = {
 		forced: true,
 		firstDo: true,
 		popup: false,
+		sourceSkill: "mouni",
 		filter: function (event, player) {
 			var evt = event.getParent("mouni");
 			return evt && evt.player == player && evt.target == event.player;
@@ -7568,6 +7570,7 @@ const skills = {
 		},
 		forced: true,
 		charlotte: true,
+		sourceSkill: "csyizheng",
 		logTarget: function (event) {
 			return event.name == "damage" ? event.source : event.player;
 		},
@@ -7754,6 +7757,7 @@ const skills = {
 		trigger: { player: "useCard2" },
 		direct: true,
 		charlotte: true,
+		sourceSkill: "hfjieying",
 		filter: function (event, player) {
 			if (player != _status.currentPhase || event.targets.length != 1) return false;
 			var card = event.card;
@@ -7813,6 +7817,7 @@ const skills = {
 		trigger: { source: "damageSource" },
 		forced: true,
 		popup: false,
+		sourceSkill: "hfjieying",
 		filter: function (event, player) {
 			return !player.storage.hfjieying2 && player == _status.currentPhase;
 		},
@@ -7842,6 +7847,7 @@ const skills = {
 		trigger: { global: "useCardAfter" },
 		forced: true,
 		popup: false,
+		sourceSkill: "weipo",
 		filter: function (event, player) {
 			return event.weipo && event.weipo[player.playerid] != undefined && event.weipo[player.playerid] > player.countCards("h");
 		},
@@ -8310,6 +8316,7 @@ const skills = {
 		trigger: { source: "damageBegin1" },
 		forced: true,
 		logTarget: "player",
+		sourceSkill: "panshi",
 		filter: function (event, player) {
 			return player.isPhaseUsing() && event.card && event.card.name == "sha" && event.player.hasSkill("cixiao");
 		},
@@ -8366,6 +8373,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		charlotte: true,
+		sourceSkill: "decadexushen",
 		filter: function (event, player) {
 			return (
 				event.decadexushen == true &&
@@ -8480,6 +8488,7 @@ const skills = {
 	},
 	yujuex: {
 		audio: "yujue",
+		sourceSkill: "yujue",
 		async content(event, trigger, player) {
 			await player.disableEquip(lib.skill.yujue_backup.position);
 			if (
@@ -8536,6 +8545,7 @@ const skills = {
 		firstDo: true,
 		charlotte: true,
 		silent: true,
+		sourceSkill: "zhihu",
 		filter: function (event, player) {
 			return event.player == player.storage.zhihu_mark;
 		},
@@ -8566,6 +8576,7 @@ const skills = {
 		trigger: { source: "damageBegin1" },
 		forced: true,
 		charlotte: true,
+		sourceSkill: "tuxing",
 		content: function () {
 			trigger.num++;
 		},
@@ -8693,6 +8704,7 @@ const skills = {
 		forced: true,
 		charlotte: true,
 		usable: 1,
+		sourceSkill: "rexiemu",
 		filter: function (event, player) {
 			return (
 				(event.player == player || event.player.hasMark("rexiemu")) &&
@@ -8723,6 +8735,7 @@ const skills = {
 		charlotte: true,
 		silent: true,
 		firstDo: true,
+		sourceSkill: "rexiemu",
 		content: function () {
 			player.removeSkill("rexiemu2");
 			game.countPlayer(function (current) {
@@ -8986,6 +8999,7 @@ const skills = {
 		},
 		group: "juanhui3",
 		enable: "phaseUse",
+		sourceSkill: "juanhui",
 		filter: function (event, player) {
 			return player.getStorage("juanhui3").length > 0 && player.countCards("hs") > 0;
 		},
@@ -9070,6 +9084,7 @@ const skills = {
 			player: ["phaseUseEnd", "phaseUseSkipped", "useCardAfter"],
 		},
 		silent: true,
+		sourceSkill: "juanhui",
 		filter: function (event, player, name) {
 			if (event.name == "phaseUse") return true;
 			else if (name == "useCardAfter") return event.getParent().juanhui;
@@ -9508,6 +9523,7 @@ const skills = {
 		trigger: { player: "phaseBegin" },
 		silent: true,
 		firstDo: true,
+		sourceSkill: "beizhan",
 		content: function () {
 			player.removeSkill("beizhan2");
 			if (player.isMaxHandcard()) player.addTempSkill("zishou2");
@@ -9592,6 +9608,7 @@ const skills = {
 			player: "chooseToCompareAfter",
 			target: "chooseToCompareAfter",
 		},
+		sourceSkill: "fenglve",
 		check: function (event, player) {
 			var card, target;
 			if (player == event.player) {
@@ -9714,6 +9731,7 @@ const skills = {
 		intro: {
 			content: "出牌阶段内第一次对一名其他角色造成伤害时，$摸一张牌",
 		},
+		sourceSkill: "mouzhi",
 		filter: function (event, player) {
 			var evt2 = event.getParent("phaseUse");
 			if (!evt2 || evt2.player != player) return false;
@@ -9828,6 +9846,7 @@ const skills = {
 		trigger: { player: "phaseUseBegin" },
 		silent: true,
 		firstDo: true,
+		sourceSkill: "spshicai",
 		content: function () {
 			player.addTempSkill("spshicai2", "phaseUseEnd");
 		},
@@ -10287,6 +10306,7 @@ const skills = {
 		},
 		forced: true,
 		audio: "biaozhao",
+		sourceSkill: "biaozhao",
 		filter: function (event, player) {
 			if (event.name == "loseAsyncAfter" && event.type != "discard") return false;
 			if (event.name == "lose" && (event.getlx === false || event.position != ui.discardPile)) return false;
@@ -10319,6 +10339,7 @@ const skills = {
 		forced: true,
 		charlotte: true,
 		audio: "biaozhao",
+		sourceSkill: "biaozhao",
 		filter: function (event, player) {
 			return player.getExpansions("biaozhao").length > 0;
 		},
@@ -10391,6 +10412,7 @@ const skills = {
 			global: "phaseAfter",
 		},
 		forced: true,
+		sourceSkill: "yechou",
 		content: function () {
 			player.loseHp();
 		},
@@ -10687,6 +10709,7 @@ const skills = {
 		audio: "pingjian",
 		enable: "phaseUse",
 		usable: 1,
+		sourceSkill: "pingjian",
 		prompt: () => lib.translate.pingjian_info,
 		content: function () {
 			"step 0";
@@ -10770,6 +10793,7 @@ const skills = {
 	pingjian_check: {
 		charlotte: true,
 		trigger: { player: ["useSkill", "logSkillBegin"] },
+		sourceSkill: "pingjian",
 		filter: function (event, player) {
 			var info = get.info(event.skill);
 			if (info && info.charlotte) return false;
@@ -10791,6 +10815,7 @@ const skills = {
 	pingjian_check2: {
 		charlotte: true,
 		trigger: { player: ["phaseUseEnd", "damageEnd", "phaseJieshuBegin"] },
+		sourceSkill: "pingjian",
 		filter: function (event, player) {
 			return Object.keys(player.storage.pingjian_check).find(function (skill) {
 				if (event.name != "damage") return player.storage.pingjian_check[skill] == event.name;
@@ -10920,6 +10945,7 @@ const skills = {
 		audio: "lslixun",
 		trigger: { player: "phaseUseBegin" },
 		forced: true,
+		sourceSkill: "lslixun",
 		filter: function (event, player) {
 			return player.countMark("lslixun") > 0;
 		},
@@ -11052,6 +11078,7 @@ const skills = {
 	xpchijie2: {
 		trigger: { global: "useCardAfter" },
 		audio: "xpchijie",
+		sourceSkill: "xpchijie",
 		filter: function (event, player) {
 			return (
 				event.player != player &&
@@ -11877,6 +11904,7 @@ const skills = {
 	},
 	xinfu_sidaox: {
 		audio: "xinfu_sidao",
+		sourceSkill: "xinfu_sidao",
 		filterCard: function (card) {
 			return get.itemtype(card) == "card";
 		},
@@ -12140,6 +12168,7 @@ const skills = {
 		locked: false,
 		audio: "xinfu_qianxin",
 		logTarget: "player",
+		sourceSkill: "xinfu_qianxin",
 		trigger: {
 			global: "phaseDiscardBegin",
 		},
@@ -12297,6 +12326,7 @@ const skills = {
 		forced: true,
 		silent: true,
 		popup: false,
+		sourceSkill: "xinfu_fuhai",
 		filter: function (event, player) {
 			return player.storage.xinfu_fuhai != undefined;
 		},
@@ -12403,6 +12433,7 @@ const skills = {
 	},
 	xinfu_xingzhao2: {
 		audio: "xinfu_xingzhao",
+		sourceSkill: "xinfu_xingzhao",
 		trigger: {
 			player: ["phaseJudgeBefore", "phaseDiscardBefore"],
 		},
@@ -12420,6 +12451,7 @@ const skills = {
 	},
 	xinfu_xingzhao3: {
 		audio: "xinfu_xingzhao",
+		sourceSkill: "xinfu_xingzhao",
 		trigger: {
 			source: "damageBegin1",
 		},
@@ -12478,6 +12510,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		charlotte: true,
+		sourceSkill: "xinfu_dianhu",
 		filter: function (event, player) {
 			if (player.storage.xinfu_dianhu2 && player.storage.xinfu_dianhu2.isIn()) {
 				if (event.name == "damage") return event.source == player.storage.xinfu_dianhu2;

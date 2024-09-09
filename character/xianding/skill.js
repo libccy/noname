@@ -16139,6 +16139,7 @@ const skills = {
 		charlotte: true,
 		forced: true,
 		onremove: true,
+		sourceSkill: "zhuihuan",
 		filter: function (event, player) {
 			if (player.storage.zhuihuan2_new) {
 				for (var source of player.storage.zhuihuan2_new) {
@@ -16190,6 +16191,7 @@ const skills = {
 		forced: true,
 		charlotte: true,
 		logTarget: "source",
+		sourceSkill: "zhuihuan",
 		filter: function (event, player) {
 			var source = event.source;
 			if (source.hp > player.hp) return true;
@@ -16287,6 +16289,7 @@ const skills = {
 		direct: true,
 		charlotte: true,
 		onremove: true,
+		sourceSkill: "xingzuo",
 		filter: function (event, player) {
 			return game.hasPlayer(function (target) {
 				return target.countCards("h") > 0;
@@ -16614,6 +16617,7 @@ const skills = {
 		silent: true,
 		firstDo: true,
 		charlotte: true,
+		sourceSkill: "jiaoying",
 		filter: function (event, player) {
 			return player.storage.jiaoying3.includes(event.player);
 		},
@@ -16627,6 +16631,7 @@ const skills = {
 		trigger: { global: "phaseEnd" },
 		direct: true,
 		charlotte: true,
+		sourceSkill: "jiaoying",
 		filter: function (event, player) {
 			return (
 				player.getStorage("jiaoying3").length > 0 &&
@@ -16718,6 +16723,7 @@ const skills = {
 		forced: true,
 		charlotte: true,
 		onremove: true,
+		sourceSkill: "pianchong",
 		filter: function (event, player) {
 			var evt = event.getl(player);
 			if (!evt || !evt.cards2 || !evt.cards2.length) return false;
@@ -16964,6 +16970,7 @@ const skills = {
 			global: ["damageSource", "damageEnd"],
 		},
 		forced: true,
+		sourceSkill: "rezhongjian",
 		filter: function (event, player, name) {
 			var num = name == "damageSource" ? 0 : 1;
 			var logTarget = name == "damageSource" ? event.source : event.player;
@@ -17357,6 +17364,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		priority: 35,
+		sourceSkill: "lvli",
 		filter: function (event, player) {
 			return event.skill == "lvli_backup" || event.skill == "lvli5" || event.skill == "lvli4";
 		},
@@ -17393,6 +17401,7 @@ const skills = {
 		forced: true,
 		silent: true,
 		popup: false,
+		sourceSkill: "lvli",
 		content: function () {
 			player.storage.lvli = 0;
 		},
@@ -17400,6 +17409,7 @@ const skills = {
 	lvli4: {
 		log: false,
 		enable: "chooseToUse",
+		sourceSkill: "lvli",
 		viewAsFilter: function (player) {
 			if (player.storage.lvli > 1) return false;
 			if (player.storage.lvli > 0 && (player != _status.currentPhase || !player.storage.choujue)) return false;
@@ -17423,6 +17433,7 @@ const skills = {
 	lvli5: {
 		log: false,
 		enable: "chooseToUse",
+		sourceSkill: "lvli",
 		viewAsFilter: function (player) {
 			if (player.storage.lvli > 1) return false;
 			if (player.storage.lvli > 0 && (player != _status.currentPhase || !player.storage.choujue)) return false;
@@ -17437,6 +17448,7 @@ const skills = {
 	lvli6: {
 		trigger: { player: "damageEnd" },
 		direct: true,
+		sourceSkill: "lvli",
 		filter: function (event, player) {
 			if (!player.storage.beishui) return false;
 			if (player.storage.lvli > 1) return false;
@@ -17666,6 +17678,7 @@ const skills = {
 		usable: 1,
 		filterCard: true,
 		selectCard: -1,
+		sourceSkill: "mansi",
 		filter: function (event, player) {
 			var hs = player.getCards("h");
 			if (!hs.length) return false;
@@ -18206,6 +18219,7 @@ const skills = {
 		prompt: "将装备区里的一张牌移动至其他角色的装备区",
 		enable: "phaseUse",
 		position: "e",
+		sourceSkill: "pytianjiang",
 		filter: function (event, player) {
 			return player.countCards("e") > 0;
 		},
@@ -18775,6 +18789,7 @@ const skills = {
 		},
 		trigger: { player: "drawBefore" },
 		forced: true,
+		sourceSkill: "busuan",
 		filter: function (event, player) {
 			return event.getParent().name == "phaseDraw";
 		},

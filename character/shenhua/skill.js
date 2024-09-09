@@ -794,6 +794,7 @@ const skills = {
 		forced: true,
 		charlotte: true,
 		logTarget: "player",
+		sourceSkill: "drlt_zhenggu",
 		filter(event, player) {
 			return event.player.storage.drlt_zhenggu_mark && event.player.storage.drlt_zhenggu_mark.includes(player);
 		},
@@ -1618,6 +1619,7 @@ const skills = {
 		trigger: {
 			player: "phaseJieshuBegin",
 		},
+		sourceSkill: "kongsheng",
 		filter(event, player) {
 			return player.getExpansions("kongsheng2").length > 0;
 		},
@@ -2649,6 +2651,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		charlotte: true,
+		sourceSkill: "nzry_shenshi",
 		filter(event, player) {
 			return player.storage.nzry_shenshi1 != undefined && player.storage.nzry_shenshi2 != undefined;
 		},
@@ -3404,6 +3407,7 @@ const skills = {
 		audio: false,
 		//priority:-50,
 		onremove: true,
+		sourceSkill: "fangquan",
 		getIndex(event, player) {
 			return player.countMark("fangquan2") || 1;
 		},
@@ -3435,6 +3439,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		audio: false,
+		sourceSkill: "fangquan",
 		async content(event, trigger, player) {
 			player.unmarkSkill("fangquan");
 			player.removeSkill("fangquan3");
@@ -4527,6 +4532,7 @@ const skills = {
 		trigger: { target: "useCardToBefore" },
 		forced: true,
 		priority: 15,
+		sourceSkill: "huoshou",
 		filter(event, player) {
 			return event.card.name == "nanman";
 		},
@@ -4539,6 +4545,7 @@ const skills = {
 		audioname: ["re_menghuo"],
 		trigger: { global: "useCard" },
 		forced: true,
+		sourceSkill: "huoshou",
 		filter(event, player) {
 			return event.card && event.card.name == "nanman" && event.player != player;
 		},
@@ -4610,6 +4617,7 @@ const skills = {
 		trigger: { target: "useCardToBefore" },
 		forced: true,
 		priority: 15,
+		sourceSkill: "juxiang",
 		filter(event, player) {
 			return event.card.name == "nanman";
 		},
@@ -4622,6 +4630,7 @@ const skills = {
 		audioname: ["re_zhurong", "ol_zhurong"],
 		trigger: { global: "useCardAfter" },
 		forced: true,
+		sourceSkill: "juxiang",
 		filter(event, player) {
 			return event.card.name == "nanman" && event.player != player && event.cards.someInD();
 		},
@@ -4742,6 +4751,7 @@ const skills = {
 		audioname: ["re_caopi"],
 		forceaudio: true,
 		trigger: { global: "judgeEnd" },
+		sourceSkill: "songwei",
 		filter(event, player) {
 			if (event.player == player || event.player.group != "wei") return false;
 			if (event.result.color != "black") return false;
@@ -4789,6 +4799,7 @@ const skills = {
 		audio: 2,
 		audioname: ["re_xuhuang"],
 		enable: "chooseToUse",
+		sourceSkill: "duanliang",
 		filterCard(card) {
 			if (get.type(card) != "basic" && get.type(card) != "equip") return false;
 			return get.color(card) == "black";
@@ -4864,6 +4875,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		audio: false,
+		sourceSkill: "haoshi",
 		async content(event, trigger, player) {
 			player.removeSkill("haoshi2");
 			if (player.countCards("h") <= 5) return;
@@ -5259,6 +5271,7 @@ const skills = {
 		audioname: ["re_dongzhuo"],
 		//forceaudio:true,
 		trigger: { global: "damageSource" },
+		sourceSkill: "baonue",
 		filter(event, player) {
 			if (player == event.source || !event.source || event.source.group != "qun") return false;
 			return player.hasZhuSkill("baonue", event.source);
@@ -5447,6 +5460,7 @@ const skills = {
 		equipSkill: true,
 		noHidden: true,
 		inherit: "bagua_skill",
+		sourceSkill: "bazhen",
 		filter(event, player) {
 			if (!lib.skill.bagua_skill.filter(event, player)) return false;
 			if (!player.hasEmptySlot(2)) return false;
@@ -6013,6 +6027,7 @@ const skills = {
 	shuangxiong1: {
 		audio: true,
 		trigger: { player: "phaseDrawBegin1" },
+		sourceSkill: "shuangxiong",
 		check(event, player) {
 			if (player.countCards("h") > player.hp) return true;
 			if (player.countCards("h") > 3) return true;
@@ -6043,6 +6058,7 @@ const skills = {
 		enable: "chooseToUse",
 		viewAs: { name: "juedou" },
 		position: "hs",
+		sourceSkill: "shuangxiong",
 		viewAsFilter(player) {
 			return player.hasCard(card => lib.skill.shuangxiong2.filterCard(card, player), "hs");
 		},
@@ -6341,6 +6357,7 @@ const skills = {
 			dc_xiahouba: "shensu1_xiahouba",
 		},
 		trigger: { player: "phaseJudgeBefore" },
+		sourceSkill: "shensu",
 		async cost(event, trigger, player) {
 			event.result = await player
 				.chooseTarget(get.prompt("shensu"), "跳过判定阶段和摸牌阶段，视为对一名其他角色使用一张【杀】", function (card, player, target) {
@@ -6368,6 +6385,7 @@ const skills = {
 			dc_xiahouba: "shensu1_xiahouba",
 		},
 		trigger: { player: "phaseUseBefore" },
+		sourceSkill: "shensu",
 		filter(event, player) {
 			return (
 				player.countCards("he", function (card) {
@@ -6419,6 +6437,7 @@ const skills = {
 			dc_xiahouba: "shensu1_xiahouba",
 		},
 		trigger: { player: "phaseDiscardBefore" },
+		sourceSkill: "shensu",
 		async cost(event, trigger, player) {
 			const check = player.needsToDiscard() || player.isTurnedOver() || (player.hasSkill("shebian") && player.canMoveCard(true, true));
 			event.result = await player
@@ -6586,6 +6605,7 @@ const skills = {
 		audio: false,
 		vanish: true,
 		charlotte: true,
+		sourceSkill: "tianxiang",
 		async content(event, trigger, player) {
 			player.removeSkill("tianxiang2");
 			player.popup("tianxiang");
@@ -6686,6 +6706,7 @@ const skills = {
 		trigger: { player: "loseHpAfter" },
 		forced: true,
 		popup: false,
+		sourceSkill: "retianxiang",
 		filter(event) {
 			return event.type == "retianxiang";
 		},
@@ -6706,6 +6727,7 @@ const skills = {
 		trigger: { player: "damageAfter" },
 		forced: true,
 		popup: false,
+		sourceSkill: "retianxiang",
 		filter(event) {
 			return event.type == "retianxiang";
 		},
@@ -6795,6 +6817,7 @@ const skills = {
 		popup: false,
 		audio: false,
 		vanish: true,
+		sourceSkill: "xintianxiang",
 		async content(event, trigger, player) {
 			const source = player.storage.xintianxiang;
 			if (source.isDead()) return;
@@ -6833,6 +6856,7 @@ const skills = {
 	xintianxiang3: {
 		trigger: { player: ["phaseZhunbeiBegin", "dieBegin"] },
 		silent: true,
+		sourceSkill: "xintianxiang",
 		async content(event, trigger, player) {
 			if (player.storage.xintianxiang3) {
 				player.storage.xintianxiang3.removeSkill("xintianxiang4");
@@ -6849,6 +6873,7 @@ const skills = {
 			content: "防止造成和受到的一切伤害",
 		},
 		priority: 15,
+		sourceSkill: "xintianxiang",
 		async content(event, trigger, player) {
 			trigger.cancel();
 		},

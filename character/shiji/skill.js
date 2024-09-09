@@ -2193,6 +2193,7 @@ const skills = {
 		forced: true,
 		charlotte: true,
 		onremove: true,
+		sourceSkill: "fengjie",
 		filter: function (event, player) {
 			if (!player.storage.fengjie2 || !player.storage.fengjie2.isIn()) return false;
 			var num1 = player.countCards("h"),
@@ -2492,6 +2493,7 @@ const skills = {
 		forced: true,
 		charlotte: true,
 		onremove: true,
+		sourceSkill: "chuhai",
 		filter: function (event, player) {
 			if (event.player != player.storage.chuhai2) return false;
 			for (var i = 1; i < 6; i++) {
@@ -4336,6 +4338,7 @@ const skills = {
 	mjweipo_effect: {
 		audio: "mjweipo",
 		enable: "phaseUse",
+		sourceSkill: "mjweipo",
 		filter: function (event, player) {
 			return player.countCards("h", "sha") > 0;
 		},
@@ -4385,6 +4388,7 @@ const skills = {
 		forced: true,
 		firstDo: true,
 		popup: false,
+		sourceSkill: "mjweipo",
 		filter: function (event, player) {
 			return event.player == player.storage.mjweipo_source;
 		},
@@ -4400,6 +4404,7 @@ const skills = {
 	mjchenshi_player: {
 		trigger: { player: "useCardToPlayered" },
 		direct: true,
+		sourceSkill: "mjchenshi",
 		filter: function (event, player) {
 			if (!event.card || event.card.name != "binglinchengxiax" || !event.isFirstTarget) return false;
 			return (
@@ -4466,6 +4471,7 @@ const skills = {
 	mjchenshi_target: {
 		trigger: { target: "useCardToTargeted" },
 		direct: true,
+		sourceSkill: "mjchenshi",
 		filter: function (event, player) {
 			if (!event.card || event.card.name != "binglinchengxiax") return false;
 			return (
@@ -5674,6 +5680,7 @@ const skills = {
 		trigger: { player: "phaseZhunbeiBegin" },
 		forced: true,
 		charlotte: true,
+		sourceSkill: "spyinju",
 		content: function () {
 			player.skip("phaseUse");
 			player.skip("phaseDiscard");
@@ -5766,6 +5773,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		onremove: true,
+		sourceSkill: "spcunsi",
 		filter: function (event, player) {
 			return event.card.name == "sha";
 		},
@@ -6017,6 +6025,7 @@ const skills = {
 	},
 	rezuicix: {
 		audio: "zuici",
+		sourceSkill: "rezuici",
 		content: function () {
 			"step 0";
 			player.disableEquip(lib.skill.rezuici_backup.position);
@@ -6360,6 +6369,7 @@ const skills = {
 		forced: true,
 		charlotte: true,
 		popup: false,
+		sourceSkill: "spmiewu",
 		filter: function (event, player) {
 			return event.skill == "spmiewu_backup";
 		},
@@ -6420,6 +6430,7 @@ const skills = {
 		silent: true,
 		firstDo: true,
 		noHidden: true,
+		sourceSkill: "qinzheng",
 		content: function () {
 			player.storage.qinzheng = player.getAllHistory("useCard").length + player.getAllHistory("respond").length;
 			player.markSkill("qinzheng");
@@ -6541,6 +6552,7 @@ const skills = {
 		audio: "spshanxi",
 		trigger: { global: "recoverAfter" },
 		forced: true,
+		sourceSkill: "spshanxi",
 		filter: function (event, player) {
 			return event.player.hasMark("spshanxi") && event.player.hp > 0;
 		},
@@ -6559,6 +6571,7 @@ const skills = {
 	},
 	spshanxi_bj: {
 		trigger: { player: "dieAfter" },
+		sourceSkill: "spshanxi",
 		filter: function (event, player) {
 			for (let i of game.players) {
 				if (i.hasSkill("spshanxi_suoming", null, null, false)) return false;

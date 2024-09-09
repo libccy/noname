@@ -9530,6 +9530,7 @@ const skills = {
 		mark: true,
 		intro: { content: "使用$花色的杀无任何次数限制" },
 		trigger: { player: "useCard1" },
+		sourceSkill: "twgongji",
 		filter: function (event, player) {
 			if (_status.currentPhase == player && event.card.name == "sha" && player.getStorage("twgongji2").includes(get.suit(event.card)) && event.addCount !== false) return true;
 			return false;
@@ -9616,6 +9617,7 @@ const skills = {
 		charlotte: true,
 		onremove: true,
 		trigger: { global: "dying" },
+		sourceSkill: "twjiefan",
 		filter: function (event, player) {
 			return player.getStorage("twjiefan2").includes(event.player);
 		},
@@ -9854,6 +9856,7 @@ const skills = {
 			global: ["gainAfter", "loseAsyncAfter"],
 		},
 		direct: true,
+		sourceSkill: "twenyuan",
 		filter: function (event, player) {
 			var cards = event.getg(player);
 			if (!cards.length || cards.length < 2) return false;
@@ -9923,6 +9926,7 @@ const skills = {
 		audio: "reenyuan",
 		trigger: { player: "damageEnd" },
 		logTarget: "source",
+		sourceSkill: "twenyuan",
 		filter: function (event, player) {
 			return event.source && event.source.isIn();
 		},
@@ -11369,6 +11373,7 @@ const skills = {
 		direct: true,
 		charlotte: true,
 		onremove: true,
+		sourceSkill: "twruilian",
 		filter: function (event, player) {
 			return player.getStorage("twruilian2").includes(event.player);
 		},
@@ -14254,6 +14259,7 @@ const skills = {
 	},
 	twgongsun_shadow: {
 		global: "twgongsun_shadow2",
+		sourceSkill: "twgongsun",
 		init: function (player, skill) {
 			if (!player.storage[skill]) player.storage[skill] = [];
 		},
@@ -15168,6 +15174,7 @@ const skills = {
 			name: "wuxie",
 			isCard: true,
 		},
+		sourceSkill: "twyingji",
 		viewAsFilter: function (player) {
 			return player != _status.currentPhase && player.countCards("h") == 0;
 		},
@@ -15627,6 +15634,7 @@ const skills = {
 	},
 	twlihuo2: {
 		trigger: { player: "useCard2" },
+		sourceSkill: "twlihuo",
 		filter: function (event, player) {
 			if (event.card.name != "sha" || !game.hasNature(event.card, "fire")) return false;
 			return game.hasPlayer(function (current) {
@@ -15660,6 +15668,7 @@ const skills = {
 	},
 	twlihuo3: {
 		trigger: { player: "useCardAfter" },
+		sourceSkill: "twlihuo",
 		filter: function (event, player) {
 			return (
 				event.card.twlihuo_buffed &&
@@ -17347,6 +17356,7 @@ const skills = {
 		trigger: { player: "useCardAfter" },
 		forced: true,
 		popup: false,
+		sourceSkill: "twhengjiang",
 		filter: function (event, player) {
 			return (
 				event.twhengjiang_buffed &&
@@ -18975,6 +18985,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		charlotte: true,
+		sourceSkill: "twrangyi",
 		filter: function (event, player) {
 			var evt = event.getParent(2);
 			return (
