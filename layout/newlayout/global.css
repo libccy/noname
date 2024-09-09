@@ -820,7 +820,7 @@
 }
 .dialog.nobutton {
 	bottom: auto !important;
-	top: 200px !important;
+	top: 200px;
 }
 #arena.stone:not(.choose-character) .dialog {
 	width: calc(90% - 440px);
