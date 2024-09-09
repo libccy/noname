@@ -12284,17 +12284,17 @@ const skills = {
 		ai: {
 			maixie: true,
 			maixie_hp: true,
-			result: {
-				effect: function (card, player, target) {
+			effect: {
+				target(card, player, target) {
 					if (get.tag(card, "damage")) {
 						if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
 						if (!target.hasFriend()) return;
-						var num = 1;
+						let num = 1;
 						if (get.attitude(player, target) > 0) {
 							if (player.needsToDiscard()) num = 0.7;
 							else num = 0.5;
 						}
-						if (player.hp >= 4) return [1, num * 2];
+						if (target.hp >= 4) return [1, num * 2];
 						if (target.hp == 3) return [1, num * 1.5];
 						if (target.hp == 2) return [1, num * 0.5];
 					}
@@ -14180,8 +14180,8 @@ const skills = {
 		ai: {
 			maixie: true,
 			maixie_hp: true,
-			result: {
-				effect: function (card, player, target) {
+			effect: {
+				target: function (card, player, target) {
 					if (get.tag(card, "damage")) {
 						if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
 						if (!target.hasFriend()) return;
