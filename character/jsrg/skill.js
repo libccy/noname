@@ -5073,6 +5073,9 @@ const skills = {
 				player.removeSkill("jsrgmanjuan_in");
 			}
 		},
+		onremove(player) {
+			player.removeSkill("jsrgmanjuan_in");
+		},
 		subSkill: {
 			in: {
 				audio: "jsrgmanjuan",

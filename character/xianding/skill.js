@@ -96,9 +96,6 @@ const skills = {
 				}
 			},
 		},
-		onremove(player) {
-			player.removeSkill("dclianjie_used");
-		},
 		subSkill: {
 			used: {
 				charlotte: true,
@@ -168,7 +165,7 @@ const skills = {
 						const str = lib.skill.dcjiangxian_backup.str;
 						if (str == "dcchaozhen") {
 							player.removeSkills("dcchaozhen");
-							if (player.maxHp < 5) player.gainMaxHp(5 - player.maxHp);
+							if (player.maxHp < 5) await player.gainMaxHp(5 - player.maxHp);
 							player.addSkill("dcjiangxian_" + str);
 						}
 						else player.addTempSkill("dcjiangxian_" + str);
