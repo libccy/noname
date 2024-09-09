@@ -10557,8 +10557,9 @@ const skills = {
 				if (player != trigger.player) str += "对" + get.translation(trigger.player);
 				str += "发动了【忧恤】";
 				player.showCards(card, str);
+				if (!game.hasPlayer(current => current != trigger.player)) event.finish();
 				player
-					.chooseTarget("令一名角色获得" + get.translation(card), "若其体力值为全场最少，则其回复1点体力", function (card, player, target) {
+					.chooseTarget("令一名角色获得" + get.translation(card), "若其体力值为全场最少，则其回复1点体力", true, function (card, player, target) {
 						return target != _status.event.getTrigger().player;
 					})
 					.set("ai", function (target) {

@@ -3,7 +3,7 @@ import * as buildin from "./buildin.js";
 /**
  * > 这玩意因为狂神还得是数组
  *
- * @template {import("./interface.d.ts").NonameAssemblyType} AssemblyType
+ * @template {NonameAssemblyType} AssemblyType
  * @template {keyof AssemblyType} Name
  * @extends {Array<AssemblyType[Name][keyof AssemblyType[Name]]>}
  */
@@ -121,6 +121,13 @@ export class NonameAssembly extends Array {
 	}
 }
 
+/**
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ * 
+ * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
+ */
 export const defaultHookcompatition = {
 	checkBegin: new NonameAssembly("checkBegin"),
 	checkCard: new NonameAssembly("checkCard"),

@@ -247,8 +247,8 @@ const skills = {
 								const card = {
 									name: get.name(button.link, false),
 									nature: get.nature(button.link, false),
-									suit: get.suit(button.link, false),
-									number: get.number(button.link, false),
+									suit: "none",
+									number: null,
 									isCard: true,
 								};
 								return get.player().getUseValue(card);
@@ -258,8 +258,8 @@ const skills = {
 							const card = {
 								name: get.name(result.links[0], false),
 								nature: get.nature(result.links[0], false),
-								suit: get.suit(result.links[0], false),
-								number: get.number(result.links[0], false),
+								suit: "none",
+								number: null,
 								isCard: true,
 							};
 							if (player.hasUseTarget(card)) await player.chooseUseTarget(card, false, true);
@@ -523,7 +523,7 @@ const skills = {
 		filterTarget: true,
 		async content(event, trigger, player) {
 			const target = event.targets[0],
-				str = player != target ? `${get.translation(player)}对你发动了【平端】，` : `【平端】：`;
+				str = player != target ? `###${get.translation(player)}对你发动了【平端】###` : `###平端###`;
 			const use = await target
 				.chooseToUse(function (card, player, event) {
 					return get.type(card) == "basic" && lib.filter.cardEnabled.apply(this, arguments);
@@ -547,12 +547,15 @@ const skills = {
 			await target.recast(cards);
 			await target.draw();
 			if (!target.countGainableCards(player, "e")) return;
-			const bool = await target
-				.chooseBool(str + `你可以令${get.translation(player)}获得你装备区的一张牌，然后摸一张牌`)
-				.set("choice", get.attitude(target, player) > 0)
-				.forResultBool();
-			if (!bool) return;
-			await player.gainPlayerCard(target, "e", true);
+			const result = await target
+				.chooseToGive(str + `你可以交给${get.translation(player)}你装备区的一张牌，然后摸一张牌`, player, "e")
+				.set("ai", card => {
+					if (get.attitude(get.player(), get.event("target")) > 0) return get.value(card);
+					return 0;
+				})
+				.set("target", player)
+				.forResult();
+			if (!result.bool) return;
 			await target.draw();
 		},
 		ai: {
@@ -809,7 +812,7 @@ const skills = {
 					.forResult();
 				if (result.bool) {
 					if (!choosed) choosed = result.links[0][0];
-					await result.links[0][1].content(current, player);
+					await result.links[0][1].content(current);
 				}
 			}
 		},
@@ -869,8 +872,8 @@ const skills = {
 					[
 						"若为魏/群势力，则获得【奸雄】/【天命】直到你的下个回合开始",
 						{
-							async content(player, source) {
-								source.addTempSkill("olyongzu_skill", { player: "phaseBegin" });
+							async content(player) {
+								player.addTempSkill("olyongzu_skill", { player: "phaseBegin" });
 								const group = player[get.mode() == "guozhan" ? "identity" : "group"];
 								const skill = group == "wei" ? "rejianxiong" : "tianming";
 								player.popup(skill);
@@ -5175,6 +5178,7 @@ const skills = {
 				var info = lib.skill.olgangshu.getInfo(player);
 				info[result.index] = Math.min(5, info[result.index] + 1);
 				game.log(player, "的", result.control.slice(0, result.control.indexOf("(")), "#y+1");
+				player.markSkill("olgangshu_buff");
 			}
 		},
 		ai: {
@@ -5185,7 +5189,6 @@ const skills = {
 				trigger: { player: "phaseDrawBegin2" },
 				charlotte: true,
 				onremove(player, skill) {
-					player.removeTip(skill);
 					delete player.storage[skill];
 				},
 				forced: true,
@@ -5198,6 +5201,7 @@ const skills = {
 					var info = lib.skill.olgangshu.getInfo(player);
 					trigger.num += info[1];
 					info[1] = 0;
+					player.markSkill("olgangshu_buff");
 				},
 				mod: {
 					attackRange: function (player, range) {
@@ -5208,6 +5212,23 @@ const skills = {
 						if (card.name != "sha") return;
 						var info = lib.skill.olgangshu.getInfo(player);
 						if (info) return num + info[2];
+					},
+				},
+				mark: true,
+				intro: {
+					markcount: function (storage, player) {
+						var info = lib.skill.olgangshu.getInfo(player);
+						var str = "";
+						info.forEach(num => (str += parseFloat(num)));
+						return str;
+					},
+					content: function (storage, player) {
+						var info = lib.skill.olgangshu.getInfo(player);
+						var str = "";
+						if (info[0] > 0) str += "<li>攻击范围+" + info[0];
+						if (info[1] > 0) str += "<li>下个摸牌阶段摸牌数+" + info[1];
+						if (info[2] > 0) str += "<li>使用【杀】的次数上限+" + info[2];
+						return str;
 					},
 				},
 			},
@@ -28835,6 +28856,7 @@ const skills = {
 		},
 		filterCard: true,
 		position: "he",
+		logAudio: () => 1,
 		content: function () {
 			player.gainPlayerCard(target, true, "h", target.countCards("h"));
 			player.turnOver();
@@ -28862,8 +28884,8 @@ const skills = {
 	lihun2: {
 		trigger: { player: "phaseUseEnd" },
 		forced: true,
-		popup: false,
-		audio: false,
+		audio: "lihun2.mp3",
+		sourceSkill: "lihun",
 		content: function () {
 			"step 0";
 			var cards = player.getCards("he");
@@ -30611,7 +30633,7 @@ const skills = {
 			targets[event.num].chooseBool("是否押杀？").ai = function (event, player) {
 				var evt = _status.event.getParent();
 				if (get.attitude(targets[event.num], evt.player) > 0) return evt.player.countCards("h", "sha") ? false : true;
-				return Math.random() < 0.5;
+				return Math.random() < (evt.player.countCards("h") / 4);
 			};
 			"step 2";
 			if (result.bool) {

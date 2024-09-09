@@ -1285,6 +1285,7 @@ window.noname_character_rank = {
 	b: [
 		"liuxiecaojie",
 		"liutan",
+		"wenyuan",
 		"huan_zhugeliang",
 		"huan_zhanghe",
 		"star_zhangzhao",
@@ -2517,6 +2518,7 @@ window.noname_character_rank = {
 			"yj_tianchuan",
 			"jx_sunjian",
 			"liutan",
+			"wenyuan",
 			"dc_noname",
 			"ol_liubiao",
 			"huan_weiyan",

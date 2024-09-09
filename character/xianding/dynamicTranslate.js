@@ -1,6 +1,19 @@
 import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 const dynamicTranslates = {
+	dcsbkongwu(player) {
+		let str = "转换技，出牌阶段限一次，你可以弃置至多体力上限张牌，选择一名其他角色：",
+			yin = "阴，弃置其至多等量张牌；",
+			yang = "阳，视为对其使用等量张【杀】。";
+		if (player.storage.dcsbkongwu) yang = `<span class="firetext">${yang}</span>`;
+		else yin = `<span class="bluetext">${yin}</span>`;
+		return str + yin + yang + "此阶段结束时，若其手牌数和体力值均不大于你，其下回合摸牌阶段摸牌数-1且装备区里的所有牌失效。";
+	},
+	dckengqiang(player) {
+		let str = player.storage.dcshangjue ? "每回合每项各限一次" : "每回合限一次";
+		str += "，当你造成伤害时，你可以：1.摸体力上限张牌；2.令此伤害+1并获得造成伤害的牌。";
+		return str;
+	},
 	xinlvli(player) {
 		var str = "每回合限一次";
 		if (player.storage.choujue) str += "（自己的回合内则改为限两次）";

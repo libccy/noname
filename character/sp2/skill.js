@@ -81,6 +81,9 @@ const skills = {
 				logTarget(event, player, name, target) {
 					return target;
 				},
+				check(event, player, name, target) {
+					return get.attitude(player, target) > 0;
+				},
 				prompt2: "令其将手牌摸至体力上限（至多摸五张）",
 				async content(event, trigger, player) {
 					const target = event.targets[0];
@@ -2662,6 +2665,7 @@ const skills = {
 		getSkills(skills, len) {
 			skills = skills.filter(skill => {
 				let str = get.skillInfoTranslation(skill, get.event().player);
+				if (str.indexOf("当你于出牌阶段外") != -1) return false;
 				if (str.indexOf("当你于出牌阶段") != -1) return true;
 				let ss = game.expandSkills([skill]);
 				if (ss.some(skillx => {
