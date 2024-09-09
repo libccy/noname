@@ -1606,7 +1606,7 @@ const skills = {
 			},
 		},
 		ai: {
-			order: 8,
+			order: 6.5,
 			result: {
 				player(player) {
 					const list = get.info("sbxingshang").getList.filter(effect => {
