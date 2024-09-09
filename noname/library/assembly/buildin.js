@@ -157,10 +157,12 @@ export const checkOverflow = {
 		const r = 16; //为偏移留出的空间，如果r为0，可能会把前面的卡牌全遮住
 		if (n * W + (n + 1) * gap < L) {
 			itemContainer.style.setProperty("--ml", gap + "px");
+			itemContainer.classList.remove('zoom');
 		} else {
 			// @ts-ignore
 			const ml = Math.min((n * W - L + gap) / (n - 1), W - r / game.documentZoom);
 			itemContainer.style.setProperty("--ml", "-" + ml + "px");
+			itemContainer.classList.add('zoom');
 		}
 	},
 };
@@ -174,7 +176,7 @@ export const checkOverflow = {
 export const checkDamage1 = {
 	kuanggu(event, player) {
 		// @ts-ignore
-		if(get.distance(event.source, player) <= 1) event.checkKuanggu = true;
+		if (get.distance(event.source, player) <= 1) event.checkKuanggu = true;
 	},
 };
 
@@ -195,7 +197,7 @@ export const checkDamage2 = {};
 export const checkDamage3 = {
 	jiushi(event, player) {
 		// @ts-ignore
-		if(player.isTurnedOver()) event.checkJiushi = true;
+		if (player.isTurnedOver()) event.checkJiushi = true;
 	},
 };
 
