@@ -467,6 +467,7 @@ const skills = {
 					if (_status.currentPhase != player) return false;
 					return player.getHistory("sourceDamage").indexOf(event) == 0 && player.getStorage("remingjian_buff").some(i => i.isIn());
 				},
+				direct: true,
 				content: function* (event, map) {
 					const player = map.player;
 					const masters = player
@@ -477,10 +478,6 @@ const skills = {
 					while (masters.length) {
 						const master = masters.shift();
 						if (!master.isIn()) continue;
-						const result = yield player.chooseBool(`是否令${get.translation(master)}发动一次〖恢拓〗？`).set("choice", get.attitude(player, master) > 0);
-						if (!result.bool) continue;
-						if (!player.isUnderControl(true) && !event.isOnline()) game.delayx();
-						player.logSkill("remingjian_buff", master);
 						const next = game.createEvent("huituo");
 						next.setContent(lib.skill.huituo.content);
 						next.player = master;
