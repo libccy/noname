@@ -753,10 +753,12 @@ const skills = {
 				player.chooseDrawRecover(true);
 			}
 		},
+		mark: true,
 		intro: {
-			markcount(storage) {
+			markcount(storage = {}) {
 				return Object.keys(storage).length;
 			},
+			/*
 			content(storage) {
 				if (!storage) return "当前暂无记录";
 				const keys = Object.keys(storage).map(i => i.split("+"));
@@ -769,6 +771,35 @@ const skills = {
 						return `<li>${get.translation(item[0])}+${get.translation(item[1])}:【${get.translation(storage[item.join("+")])}】`;
 					})
 					.join("<br>");
+			},
+			*/
+			mark(dialog, storage = {}) {
+				const addNewRow = lib.element.dialog.addNewRow.bind(dialog);
+				dialog.css({ width: "30%" });
+				let types = ["basic", "trick", "equip"].concat(Object.keys(storage).map(list => list.split("+")[1])).toUniqued();
+				let suits = lib.suit
+					.slice()
+					.reverse()
+					.concat(Object.keys(storage).map(list => list.split("+")[0]))
+					.toUniqued();
+				addNewRow(
+					...["花色"].concat(types.map(i => get.translation(i))).map(type => {
+						return { item: type, ratio: type == "花色" ? 1 : 2 };
+					})
+				);
+				for (const suit of suits) {
+					let list = [{ item: get.translation(suit), ratio: 1 }];
+					for (const type of types) {
+						list.add({
+							item: ((suit, type, storage) => {
+								if (storage[suit + "+" + type]) return get.translation(storage[suit + "+" + type]);
+								return null;
+							})(suit, type, storage),
+							ratio: 2,
+						});
+					}
+					addNewRow(...list);
+				}
 			},
 		},
 	},
