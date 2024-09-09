@@ -6227,6 +6227,7 @@ const skills = {
 			},
 		},
 		trigger: { player: "useCard2" },
+		sourceSkill: "dcneifa",
 		filter: function (event, player) {
 			if (event.card.name != "sha") return false;
 			return game.hasPlayer(function (current) {
@@ -6276,6 +6277,7 @@ const skills = {
 			name: "内伐 - 锦囊牌",
 			content: "本回合内不能使用基本牌，且使用普通锦囊牌选择目标时可以增加或减少一个目标。",
 		},
+		sourceSkill: "dcneifa",
 		filter: function (event, player) {
 			if (get.type(event.card) != "trick") return false;
 			if (event.targets && event.targets.length > 0) return true;
@@ -13011,6 +13013,7 @@ const skills = {
 		charlotte: true,
 		onremove: true,
 		mark: "character",
+		sourceSkill: "zhiwei",
 		intro: {
 			content: "$造成伤害后你摸一张牌；$受到伤害后你弃置一张牌；你于弃牌阶段弃置牌后交给$",
 		},
@@ -13897,6 +13900,7 @@ const skills = {
 		},
 		forced: true,
 		usable: 1,
+		sourceSkill: "recangchu",
 		filter: function (event, player) {
 			return player != _status.currentPhase && player.countMark("recangchu") < game.countPlayer() && event.getg(player).length > 0;
 		},
@@ -13908,6 +13912,7 @@ const skills = {
 		audio: "recangchu",
 		trigger: { global: "die" },
 		forced: true,
+		sourceSkill: "recangchu",
 		filter: function (event, player) {
 			return player.countMark("recangchu") > game.countPlayer();
 		},
@@ -14023,6 +14028,7 @@ const skills = {
 		audio: "reshishou",
 		trigger: { player: "phaseZhunbeiBegin" },
 		forced: true,
+		sourceSkill: "reshishou",
 		filter: function (event, player) {
 			return !player.countMark("recangchu");
 		},
@@ -14223,6 +14229,7 @@ const skills = {
 		trigger: { player: "phaseUseEnd" },
 		forced: true,
 		locked: false,
+		sourceSkill: "xuxie",
 		filter: function (event, player) {
 			return game.hasPlayer(function (current) {
 				return current.maxHp > player.maxHp;

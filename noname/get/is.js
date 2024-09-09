@@ -462,6 +462,7 @@ export class Is {
 	 */
 	locked(skill, player) {
 		const info = lib.skill[skill];
+		if (!info) return false;
 		if (typeof info.locked == "function") return info.locked(skill, player);
 		if (info.locked == false) return false;
 		if (info.trigger && info.forced) return true;

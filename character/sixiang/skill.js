@@ -453,6 +453,11 @@ const skills = {
 		},
 		mod: {
 			maxHandcard: (player, num) => num + 2,
+			aiOrder(player, card, num) {
+				if (num <= 0 || !player.isPhaseUsing() || !get.tag(card, "recover")) return num;
+				if (player.needsToDiscard() > 1) return num;
+				return 0;
+			},
 		},
 	},
 	oldlonghun: {

@@ -865,6 +865,28 @@ const skills = {
 	//打赢复活赛的牢达[哭]
 	dclonghun: {
 		audio: 2,
+		mod: {
+			aiOrder(player, card, num) {
+				if (num <= 0 || !player.isPhaseUsing() || player.needsToDiscard() < 2) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num - 3.6;
+			},
+			aiValue(player, card, num) {
+				if (num <= 0) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num + 3.6;
+				if (suit === "club") return num + 1;
+				if (suit === "spade") return num + 1.8;
+			},
+			aiUseful(player, card, num) {
+				if (num <= 0) return num;
+				let suit = get.suit(card, player);
+				if (suit === "heart") return num + 3;
+				if (suit === "club") return num + 1;
+				if (suit === "spade") return num + 1;
+			},
+		},
+		locked: false,
 		enable: ["chooseToUse", "chooseToRespond"],
 		prompt: "将♦牌当做火【杀】，♥牌当做【桃】，♣牌当做【闪】，♠牌当做【无懈可击】使用或打出",
 		viewAs(cards, player) {

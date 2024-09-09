@@ -1606,7 +1606,7 @@ const skills = {
 			},
 		},
 		ai: {
-			order: 8,
+			order: 6.5,
 			result: {
 				player(player) {
 					const list = get.info("sbxingshang").getList.filter(effect => {
@@ -2211,8 +2211,8 @@ const skills = {
 						result: {
 							target: function (player, target) {
 								var att = get.attitude(player, target);
-								if (att > 0) return 3;
-								if (att < 0) return -1;
+								if (att > 0) return 1;
+								if (att < 0) return -3;
 								return 0;
 							},
 						},

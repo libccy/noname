@@ -440,6 +440,17 @@ const translates = {
 	jsrgqiluan_info: "每回合限两次。当你需要使用【杀】或【闪】时，你可以弃置任意张牌，并令至多等两名其他角色选择是否代替你使用之。若有角色响应，则你摸等同与你弃置牌数的牌。",
 	jsrgxiangjia: "相假",
 	jsrgxiangjia_info: "出牌阶段限一次。若你的装备区内有武器牌，则你可以视为使用一张【借刀杀人】。然后此牌的目标角色可以视为对你使用一张【借刀杀人】。",
+	//江山如故·兴
+	jsrg_jiananfeng: "兴贾南风",
+	jsrg_jiananfeng_prefix: "兴",
+	jsrgfuyu: "覆雨",
+	jsrgfuyu_info: "出牌阶段限一次，你可以与任意名角色议事，若结果与你的意见一致，你可以分别对一名意见不同和未参与议事的角色各造成1点伤害。",
+	jsrgshanzheng: "擅政",
+	jsrgshanzheng_info: "你参与议事选择议事牌前，若你手牌数或体力值为全场最大，则你此次议事无需展示手牌，仅声明颜色，且你的意见视为两名角色的意见。",
+	jsrgxiongbao: "凶暴",
+	jsrgxiongbao_info: "锁定技，其他女性角色和手牌数小于你的角色不能响应你使用的牌。",
+	jsrgliedu: "烈妒",
+	jsrgliedu_info: "每回合限一次，当你对体力值小于你的女性角色或体力值为1的角色造成伤害时，你可以令此伤害值翻倍。",
 };
 
 export default translates;
