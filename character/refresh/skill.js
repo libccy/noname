@@ -10075,6 +10075,10 @@ const skills = {
 			}
 			"step 5";
 			player.chooseControl("bazhen", "olhuoji", "olkanpo").set("prompt", "选择获得一个技能").ai = function () {
+				let player = get.event("player"), threaten = get.threaten(player);
+				if (!player.hasEmptySlot(2)) return "olhuoji";
+				if (threaten < 0.8) return "olkanpo";
+				if (threaten < 1.6) return "bazhen";
 				return ["olhuoji", "bazhen"].randomGet();
 			};
 			"step 6";
