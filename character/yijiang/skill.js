@@ -194,6 +194,7 @@ const skills = {
 		trigger: { player: "loseEnd" },
 		silent: true,
 		firstDo: true,
+		sourceSkill: "rejingce",
 		filter: function (event, player) {
 			if (event.getParent().name != "useCard" || player != _status.currentPhase) return false;
 			var list = player.getStorage("rejingce2");
@@ -311,6 +312,7 @@ const skills = {
 	reshangshi_2nd: {
 		trigger: { player: "damageBegin3" },
 		direct: true,
+		sourceSkill: "reshangshi",
 		filter: function (event, player) {
 			return player.countCards("he") > 0;
 		},
@@ -1249,6 +1251,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		charlotte: true,
+		sourceSkill: "xintaoluan",
 		filter: function (event, player) {
 			if (!game.hasPlayer(current => current != player)) return false;
 			return event.skill == "xintaoluan_backup";
@@ -3755,6 +3758,7 @@ const skills = {
 	xinsidi2: {
 		mark: true,
 		group: ["xinsidi2_end"],
+		sourceSkill: "xinsidi",
 		subSkill: {
 			end: {
 				trigger: { player: "phaseUseEnd" },
@@ -3898,6 +3902,7 @@ const skills = {
 	taoluan2: {
 		charlotte: true,
 		trigger: { player: "useCardAfter" },
+		sourceSkill: "taoluan",
 		filter: function (event, player) {
 			if (!game.hasPlayer(current => current != player)) return false;
 			return event.skill == "taoluan_backup";
@@ -3993,6 +3998,7 @@ const skills = {
 		audio: "jishe",
 		trigger: { player: "phaseJieshuBegin" },
 		direct: true,
+		sourceSkill: "jishe",
 		filter: function (event, player) {
 			if (player.countCards("h")) return false;
 			return game.hasPlayer(function (current) {
@@ -4319,6 +4325,7 @@ const skills = {
 	jiyu2: {
 		trigger: { player: ["phaseUseBegin", "phaseUseAfter"] },
 		silent: true,
+		sourceSkill: "jiyu",
 		content: function () {
 			player.storage.jiyu = [];
 			player.storage.jiyu2 = [];
@@ -4445,6 +4452,7 @@ const skills = {
 		enable: "phaseUse",
 		audio: "jiaozhao",
 		charlotte: true,
+		sourceSkill: "jiaozhao",
 		filter: function (event, player) {
 			if (!player.storage.jiaozhao || !lib.skill.jiaozhao2.viewAs) return false;
 			var name = lib.skill.jiaozhao2.viewAs.name;
@@ -4473,6 +4481,7 @@ const skills = {
 	jiaozhao3: {
 		audio: "jiaozhao",
 		enable: "phaseUse",
+		sourceSkill: "jiaozhao",
 		filter: function (event, player) {
 			return (player.getStat("skill").jiaozhao || 0) + (player.getStat("skill").jiaozhao3 || 0) < player.countMark("xindanxin") - 1 && player.countCards("h") > 0;
 		},
@@ -4877,6 +4886,7 @@ const skills = {
 		audio: false,
 		onremove: true,
 		charlotte: true,
+		sourceSkill: "duliang",
 		init: function (player, skill) {
 			if (!player.storage[skill]) player.storage[skill] = 0;
 		},
@@ -5164,6 +5174,7 @@ const skills = {
 			target: ["shaMiss", "useCardToExcluded"],
 		},
 		charlotte: true,
+		sourceSkill: "reqingxi",
 		filter: function (event, player) {
 			return player.storage.reqingxi2 && event.card && player.storage.reqingxi2.includes(event.card);
 		},
@@ -5393,6 +5404,7 @@ const skills = {
 			},
 		},
 		trigger: { player: "useCard2" },
+		sourceSkill: "xinxianzhen",
 		filter: function (event, player) {
 			return player.storage.xinxianzhen && player.storage.xinxianzhen.isIn() && (event.card.name == "sha" || get.type(event.card) == "trick") && event.targets && event.targets.length == 1 && !event.targets.includes(player.storage.xinxianzhen);
 		},
@@ -5539,6 +5551,7 @@ const skills = {
 	},
 	lihuo2: {
 		trigger: { player: "useCard2" },
+		sourceSkill: "lihuo",
 		filter: function (event, player) {
 			if (event.card.name != "sha" || !game.hasNature(event.card, "fire")) return false;
 			return game.hasPlayer(function (current) {
@@ -5573,6 +5586,7 @@ const skills = {
 	lihuo3: {
 		trigger: { player: "useCardAfter" },
 		vanish: true,
+		sourceSkill: "lihuo",
 		filter: function (event, player) {
 			return event.card.name == "sha";
 		},
@@ -5625,6 +5639,7 @@ const skills = {
 	},
 	chunlao2: {
 		enable: "chooseToUse",
+		sourceSkill: "chunlao",
 		filter: function (event, player) {
 			return event.type == "dying" && event.dying && event.dying.hp <= 0 && player.getExpansions("chunlao").length > 0;
 		},
@@ -5660,6 +5675,7 @@ const skills = {
 	},
 	chunlao2_old: {
 		trigger: { global: "dying" },
+		sourceSkill: "chunlao",
 		//priority:6,
 		filter: function (event, player) {
 			return event.player.hp <= 0 && player.storage.chunlao.length > 0;
@@ -5974,6 +5990,7 @@ const skills = {
 		trigger: { source: "damage" },
 		forced: true,
 		popup: false,
+		sourceSkill: "yonglve",
 		filter: function (event) {
 			return event.parent.skill == "yonglve";
 		},
@@ -6046,6 +6063,7 @@ const skills = {
 	},
 	sidi2: {
 		trigger: { global: "phaseUseBegin" },
+		sourceSkill: "sidi",
 		filter: function (event, player) {
 			if (event.player == player || event.player.isDead()) return false;
 			if (!player.getExpansions("sidi").length) return false;
@@ -6672,6 +6690,7 @@ const skills = {
 		trigger: { player: "damageBegin3" },
 		forced: true,
 		onremove: true,
+		sourceSkill: "reyanzhu",
 		content: function () {
 			trigger.num += player.countMark("reyanzhu2");
 			game.log(player, "受到的伤害+" + player.countMark("reyanzhu2"));
@@ -7148,6 +7167,7 @@ const skills = {
 		audio: false,
 		trigger: { player: "phaseBefore" },
 		silent: true,
+		sourceSkill: "zhanjue",
 		content: function () {
 			player.storage.zhanjue = 0;
 		},
@@ -7157,6 +7177,7 @@ const skills = {
 		trigger: { player: "damageAfter", source: "damageAfter" },
 		forced: true,
 		popup: false,
+		sourceSkill: "zhanjue",
 		filter: function (event, player) {
 			return event.parent.skill == "zhanjue";
 		},
@@ -7169,6 +7190,7 @@ const skills = {
 		trigger: { player: "useCardAfter" },
 		forced: true,
 		popup: false,
+		sourceSkill: "zhanjue",
 		filter: function (event, player) {
 			return event.skill == "zhanjue";
 		},
@@ -7259,6 +7281,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: ["useCardBegin", "respondBegin"] },
 		logTarget: "targets",
+		sourceSkill: "qinwang",
 		filter: function (event, player) {
 			return event.skill == "qinwang";
 		},
@@ -7354,6 +7377,7 @@ const skills = {
 	zuoding3: {
 		trigger: { global: "damage" },
 		silent: true,
+		sourceSkill: "zuoding",
 		content: function () {
 			player.addTempSkill("zuoding2");
 		},
@@ -7863,6 +7887,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		charlotte: true,
+		sourceSkill: "mingjian_old",
 		content: function () {
 			if (lib.config.glow_phase) {
 				if (_status.currentPhase) {
@@ -7998,6 +8023,7 @@ const skills = {
 	},
 	reanjian2: {
 		firstDo: true,
+		sourceSkill: "reanjian",
 		ai: { unequip2: true },
 		init: function (player, skill) {
 			if (!player.storage[skill]) player.storage[skill] = [];
@@ -8032,6 +8058,7 @@ const skills = {
 		forced: true,
 		silent: true,
 		firstDo: true,
+		sourceSkill: "reanjian",
 		filter: function (event, player) {
 			return (event.getParent(2).reanjian_buffed = true);
 		},
@@ -8129,6 +8156,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		charlotte: true,
+		sourceSkill: "xinpojun",
 		filter: function (event, player) {
 			return player.getExpansions("xinpojun2").length > 0;
 		},
@@ -8196,6 +8224,7 @@ const skills = {
 			);
 		},
 		direct: true,
+		sourceSkill: "yanyu",
 		content: function () {
 			"step 0";
 			player
@@ -8293,6 +8322,7 @@ const skills = {
 		audioname: ["re_guanzhang"],
 		trigger: { source: "damageSource" },
 		forced: true,
+		sourceSkill: "fuhun",
 		filter: function (event, player) {
 			if (["new_rewusheng", "olpaoxiao"].every(skill => player.hasSkill(skill, null, false, false))) return false;
 			return event.getParent().skill == "fuhun";
@@ -8702,6 +8732,7 @@ const skills = {
 		forced: true,
 		mark: true,
 		audio: false,
+		sourceSkill: "qianxi",
 		content: function () {
 			player.removeSkill("qianxi2");
 			delete player.storage.qianxi2;
@@ -9092,6 +9123,7 @@ const skills = {
 			ol_jianyong: "olqiaoshui",
 		},
 		trigger: { player: "useCard2" },
+		sourceSkill: "qiaoshui",
 		filter: function (event, player) {
 			var type = get.type(event.card);
 			return type == "basic" || type == "trick";
@@ -9323,6 +9355,7 @@ const skills = {
 	xiantu1: {
 		audio: true,
 		trigger: { global: "phaseUseBegin" },
+		sourceSkill: "xiantu",
 		filter: function (event, player) {
 			return event.player != player;
 		},
@@ -9362,6 +9395,7 @@ const skills = {
 		forced: true,
 		audio: false,
 		onremove: true,
+		sourceSkill: "xiantu",
 		init: function (player, skill) {
 			if (!player.storage[skill]) player.storage[skill] = [];
 		},
@@ -9381,6 +9415,7 @@ const skills = {
 		trigger: { source: "dieAfter" },
 		forced: true,
 		audio: false,
+		sourceSkill: "xiantu",
 		content: function () {
 			player.removeSkill("xiantu4");
 		},
@@ -9426,6 +9461,7 @@ const skills = {
 		popup: false,
 		charlotte: true,
 		prompt: "是否执行【强识】的效果摸一张牌？",
+		sourceSkill: "qiangzhi",
 		filter: function (event, player) {
 			return get.type(event.card, "trick") == player.storage.qiangzhi_draw;
 		},
@@ -10585,6 +10621,7 @@ const skills = {
 		forced: true,
 		charlotte: true,
 		priority: 15,
+		sourceSkill: "zhichi",
 		filter: function (event, player) {
 			return get.type(event.card) == "trick" || event.card.name == "sha";
 		},
@@ -11228,6 +11265,7 @@ const skills = {
 	jiushi1: {
 		audio: 2,
 		enable: "chooseToUse",
+		sourceSkill: "jiushi",
 		hiddenCard: function (player, name) {
 			if (name == "jiu") return !player.isTurnedOver();
 			return false;
@@ -11308,6 +11346,7 @@ const skills = {
 	jiushi3: {
 		audio: "jiushi1",
 		trigger: { player: "damageEnd" },
+		sourceSkill: "jiushi",
 		check: function (event, player) {
 			return player.isTurnedOver();
 		},
@@ -11759,6 +11798,7 @@ const skills = {
 	xinenyuan1: {
 		audio: true,
 		trigger: { player: "gainEnd" },
+		sourceSkill: "xinenyuan",
 		filter: function (event, player) {
 			return event.source && event.source.isIn() && event.source != player && event.cards.length >= 2;
 		},
@@ -11776,6 +11816,7 @@ const skills = {
 	xinenyuan2: {
 		audio: true,
 		trigger: { player: "damageEnd" },
+		sourceSkill: "xinenyuan",
 		check: function (event, player) {
 			var att = get.attitude(player, event.source);
 			var num = event.source.countCards("h");
@@ -11835,6 +11876,7 @@ const skills = {
 		logAudio: () => ["enyuan3.mp3", "enyuan4.mp3"],
 		trigger: { player: "damageEnd" },
 		forced: true,
+		sourceSkill: "enyuan",
 		filter: function (event, player) {
 			return event.source && event.source != player && event.source.isIn();
 		},
@@ -11876,6 +11918,7 @@ const skills = {
 		trigger: { player: "recoverEnd" },
 		forced: true,
 		logTarget: "source",
+		sourceSkill: "enyuan",
 		filter: function (event, player) {
 			return event.source && event.source != player && event.source.isIn();
 		},
@@ -12668,6 +12711,7 @@ const skills = {
 		delay: false,
 		selectCard: [1, Infinity],
 		filterCard: true,
+		sourceSkill: "zyexin",
 		filter: function (event, player) {
 			return player.getExpansions("zyexin").length > 0;
 		},

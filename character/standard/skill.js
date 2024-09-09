@@ -450,6 +450,7 @@ const skills = {
 	},
 	luoyi2: {
 		trigger: { source: "damageBegin1" },
+		sourceSkill: "luoyi",
 		filter(event) {
 			return event.card && (event.card.name == "sha" || event.card.name == "juedou") && event.notLink();
 		},
@@ -759,6 +760,7 @@ const skills = {
 	rende1: {
 		trigger: { player: "phaseUseBegin" },
 		silent: true,
+		sourceSkill: "rende",
 		async content(event, trigger, player) {
 			player.storage.rende = 0;
 		},
@@ -794,6 +796,7 @@ const skills = {
 		audioname: ["liushan", "re_liubei", "re_liushan", "ol_liushan"],
 		trigger: { player: ["useCardBegin", "respondBegin"] },
 		logTarget: "targets",
+		sourceSkill: "jijiang",
 		filter(event, player) {
 			return event.skill == "jijiang";
 		},
@@ -838,6 +841,7 @@ const skills = {
 		trigger: { global: ["useCardAfter", "useSkillAfter", "phaseAfter"] },
 		silent: true,
 		charlotte: true,
+		sourceSkill: "jijiang",
 		filter(event) {
 			return event.skill != "jijiang" && event.skill != "qinwang";
 		},
@@ -910,6 +914,7 @@ const skills = {
 		forced: true,
 		popup: false,
 		logTarget: "source",
+		sourceSkill: "zhongyi",
 		filter(event, player) {
 			return event.getParent().name == "sha" && event.source && event.source.isFriendOf(player);
 		},
@@ -999,6 +1004,7 @@ const skills = {
 		forced: true,
 		firstDo: true,
 		audioname: ["re_zhugeliang"],
+		sourceSkill: "kongcheng",
 		filter(event, player) {
 			if (player.countCards("h")) return false;
 			for (let i = 0; i < event.cards.length; i++) {
@@ -1624,6 +1630,7 @@ const skills = {
 		audioname: ["re_lvbu", "shen_lvbu", "lvlingqi"],
 		trigger: { player: "useCardToPlayered" },
 		forced: true,
+		sourceSkill: "wushuang",
 		filter(event, player) {
 			return event.card.name == "sha" && !event.getParent().directHit.includes(event.target);
 		},
@@ -1651,6 +1658,7 @@ const skills = {
 		audioname: ["re_lvbu", "shen_lvbu", "lvlingqi"],
 		trigger: { player: "useCardToPlayered", target: "useCardToTargeted" },
 		forced: true,
+		sourceSkill: "wushuang",
 		logTarget(trigger, player) {
 			return player == trigger.player ? trigger.target : trigger.player;
 		},

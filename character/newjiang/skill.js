@@ -1314,6 +1314,7 @@ const skills = {
 		intro: {
 			content: "下回合的摸牌阶段额外摸#张牌",
 		},
+		sourceSkill: "dcduliang",
 		content: function () {
 			trigger.num += player.countMark("dcduliang2");
 		},
@@ -2450,6 +2451,7 @@ const skills = {
 	},
 	xinzhilve_move: {
 		audio: "zhilve",
+		sourceSkill: "xinzhilve",
 		filterCard: function () {
 			return false;
 		},
@@ -2620,6 +2622,7 @@ const skills = {
 	},
 	xinzhilve_use: {
 		audio: "zhilve",
+		sourceSkill: "xinzhilve",
 		filterCard: function () {
 			return false;
 		},
@@ -2796,6 +2799,7 @@ const skills = {
 		},
 		forced: true,
 		popup: false,
+		sourceSkill: "weifeng",
 		filter: function (event, player) {
 			if (event.name != "damage") return true;
 			return event.player != player && typeof event.player.storage.weifeng2 == "string";
@@ -2916,6 +2920,7 @@ const skills = {
 		audio: "gnjinfan",
 		trigger: { player: "loseAfter" },
 		forced: true,
+		sourceSkill: "gnjinfan",
 		filter: function (event, player) {
 			if (!event.ss || !event.ss.length) return false;
 			for (var i in event.gaintag_map) {

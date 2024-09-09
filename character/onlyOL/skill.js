@@ -1490,9 +1490,11 @@ const skills = {
 	},
 	olenyuan1: {
 		inherit: "xinenyuan1",
+		sourceSkill: "olenyuan",
 	},
 	olenyuan2: {
 		inherit: "xinenyuan2",
+		sourceSkill: "olenyuan",
 		prompt2: event => "令" + get.translation(event.source) + "交给你一张红色手牌或失去1点体力",
 		getIndex: event => event.num,
 		async content(event, trigger, player) {
