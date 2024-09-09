@@ -3,6 +3,243 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//武皇甫嵩
+	dcchaozhen: {
+		audio: 2,
+		trigger: {
+			player: ["phaseZhunbeiBegin", "dying"],
+		},
+		async cost(event, trigger, player) {
+			const list = ["场上", "牌堆", "cancel2"];
+			if (!game.hasPlayer(function (current) {
+				return current.countCards("ej");
+			})) list.remove("场上");
+			const control = await player
+				.chooseControl(list, () => {
+					const player = _status.event.player;
+					if (game.hasPlayer(current => {
+						if (get.attitude(player, current) > 0) return current.countCards("j", card => (card.viewAs || card.name) != "jsrg_xumou");
+						return current.countCards("ej", card => player.getUseValue(card) > 4);
+					})) return "场上";
+					return "牌堆";
+				})
+				.set("prompt", get.prompt2("dcchaozhen"))
+				.forResultControl();
+			event.result = {
+				bool: control != "cancel2",
+				cost_data: control,
+			};
+		},
+		async content(event, trigger, player) {
+			const control = event.cost_data;
+			var num = 1, card;
+
+			if (control == "场上") {
+				let cards = game.filterPlayer().reduce((arr, current) => {
+					if (current.countCards("ej")) arr.addArray(current.getCards("ej"));
+					return arr;
+				}, []).sort((a, b) => get.number(a, false) - get.number(b, false));
+				num = get.number(cards[0], false);
+				card = cards.filter(card => get.number(card, false) == num).randomGet();
+			}
+			else {
+				while (num < 14) {
+					let cardx = get.cardPile2(card => get.number(card, false) == num);
+					if (cardx) {
+						card = cardx;
+						break;
+					}
+					else num++;
+				}
+			}
+			if (card) {
+				await player.gain(card, get.owner(card) ? "give" : "gain2");
+				if (num == 1) {
+					await player.recover();
+					player.tempBanSkill("dcchaozhen");
+				}
+				else await player.loseMaxHp();
+			}
+		},
+	},
+	dclianjie: {
+		audio: 2,
+		trigger: {
+			player: "useCardToPlayered",
+		},
+		locked: false,
+		filter(event, player) {
+			if (!player.hasHistory("lose", evt => {
+				if (evt.getParent() != event.getParent()) return false;
+				return event.cards.some(card => (evt.hs || []).includes(card));
+			}) || player.countCards("h") >= player.maxHp) return false;
+			const num = get.number(event.card, player) || 0;
+			if (player.countCards("h", card => {
+				return get.number(card, player) < num;
+			}) || !player.countCards("h")) return false;
+			return !player.getStorage("dclianjie_used").includes(num);
+		},
+		async content(event, trigger, player) {
+			player.addTempSkill("dclianjie_used");
+			player.markAuto("dclianjie_used", [get.number(trigger.card) || 0])
+			const result = await player.drawTo(player.maxHp).forResult();
+			if (result) player.addGaintag(result, "dclianjie");
+		},
+		mod: {
+			aiOrder: function (player, card, num) {
+				var number = get.number(card, player);
+				if (player.countCards("h") < player.maxHp) {
+					return num + number / 10;
+				}
+				else if (!player.getStorage("dclianjie_used").includes(number)) {
+					return num - 0.5;
+				}
+			},
+		},
+		onremove(player) {
+			player.removeSkill("dclianjie_used");
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove(player, skill) {
+					delete player.storage[skill];
+					player.removeGaintag("dclianjie");
+				},
+				mod: {
+					targetInRange(card, player, target) {
+						if (get.suit(card) == "unsure") return true;
+						if (!card.cards) return;
+						for (var i of card.cards) {
+							if (i.hasGaintag("dclianjie")) return true;
+						}
+					},
+					cardUsable(card, player, num) {
+						if (get.suit(card) == "unsure") return Infinity;
+						if (!card.cards) return;
+						for (var i of card.cards) {
+							if (i.hasGaintag("dclianjie")) return Infinity;
+						}
+					},
+				},
+				intro: {
+					content: (storage, player) => `已摸点数：${get.translation(storage)}`,
+				},
+			},
+		},
+	},
+	dcjiangxian: {
+		audio: 2,
+		enable: "phaseUse",
+		limited: true,
+		skillAnimation: false,
+		chooseButton: {
+			dialog(event, player) {
+				const dialog = ui.create.dialog("将贤：你可以选择一项", "hidden");
+				dialog.add([
+					[
+						["dcchaozhen", "失去〖朝镇〗，将体力上限和手牌上限增加至5"],
+						["dclianjie", "本回合因使用〖连捷〗摸的牌造成的伤害+X（X为你本回合造成伤害的次数且至多为5），回合结束后失去〖连捷〗"],
+					],
+					"textbutton",
+				]);
+				return dialog;
+			},
+			check(button) {
+				const player = get.player();
+				if (button.link == "dcchaozhen")
+					return 5 - player.maxHp;
+				if (button.link == "dclianjie")
+					return 3;
+				return 0.1;
+			},
+			backup(links) {
+				return {
+					audio: "dcjiangxian",
+					filterCard: () => false,
+					selectCard: -1,
+					str: links[0],
+					filterTarget: () => false,
+					selectTarget: -1,
+					skillAnimation: true,
+					animationColor: "metal",
+					async content(event, trigger, player) {
+						player.awakenSkill("dcjiangxian");
+						const str = lib.skill.dcjiangxian_backup.str;
+						if (str == "dcchaozhen") {
+							player.removeSkills("dcchaozhen");
+							if (player.maxHp < 5) player.gainMaxHp(5 - player.maxHp);
+							player.addSkill("dcjiangxian_" + str);
+						}
+						else player.addTempSkill("dcjiangxian_" + str);
+					},
+				};
+			},
+			prompt(links) {
+				return `点击“确定”，${links[0] === "dcchaozhen" ? "失去〖朝镇〗，将体力上限和手牌上限增加至5" : "本回合因使用〖连捷〗摸的牌造成的伤害+X（X为你本回合造成伤害的次数且至多为5），回合结束后失去〖连捷〗"}`;
+			},
+		},
+		subSkill: {
+			backup: {},
+			dcchaozhen: {
+				charlotte: true,
+				mark: true,
+				intro: {
+					content: "手牌上限增至5",
+				},
+				mod: {
+					maxHandcard: (player, num) => Math.max(5, num),
+				},
+			},
+			dclianjie: {
+				charlotte: true,
+				mark: true,
+				intro: {
+					content: "本回合因使用〖连捷〗摸的牌造成的伤害+X（X为你本回合造成伤害的次数且至多为5），回合结束后失去〖连捷〗",
+				},
+				onremove(player) {
+					player.removeSkills("dclianjie");
+				},
+				trigger: {
+					source: "damageBegin1",
+				},
+				filter(event, player) {
+					if (!player.hasHistory("lose", evt => {
+						let gaintag = false;
+						if (evt.getParent() != event.getParent("useCard")) return false;
+						for (var i in evt.gaintag_map) {
+							if (evt.gaintag_map[i].includes("dclianjie")) gaintag = true;
+						}
+						return gaintag && event.cards.some(card => (evt.hs || []).includes(card));
+					})) return false;
+					return player.getHistory("sourceDamage").length > 0;
+				},
+				forced: true,
+				locked: false,
+				async content(event, trigger, player) {
+					trigger.num += Math.min(5, player.getHistory("sourceDamage").length);
+				},
+			},
+		},
+		ai: {
+			order: 10,
+			threaten: 2.9,
+			result: {
+				player(player) {
+					const enemies = game.filterPlayer(current => {
+						return (!get.rawAttitude || get.rawAttitude(player, current) < 0) && get.attitude(player, current) >= 0;
+					}),
+						knownEnemies = game.filterPlayer(current => {
+							return get.attitude(player, current) < 0;
+						});
+					if ((!knownEnemies.length && player.countCards("e") > 1) || (player.getHp() > 3 && enemies.length > 0 && knownEnemies.length < 2 && knownEnemies.length < enemies.length && !knownEnemies.some(enemy => get.attitude(player, enemy) <= -9))) return 0;
+					const val1 = 5 - player.maxHp;
+					const val2 = 3;
+					return Math.max(val1, val2) > 20 ? 4 : 0;
+				},
+			},
+		},
+	},
 	//文鸳
 	dckengqiang: {
 		audio: 2,
