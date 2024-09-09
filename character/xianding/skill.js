@@ -8570,7 +8570,7 @@ const skills = {
 			"step 1";
 			player.chooseTarget(get.prompt2("dcfumou"), [1, player.getDamagedHp()]).set("ai", target => {
 				var att = get.attitude(_status.event.player, target);
-				if (target.countCards("h") >= 3 || (target.countCards("e") && !target.isDamaged())) {
+				if (target.countCards("h") >= 3 && (!target.isDamaged() || !target.countCards("e"))) {
 					if (!target.canMoveCard()) return -att;
 					else if (!target.canMoveCard(true)) return -att / 5;
 				}
@@ -8623,16 +8623,20 @@ const skills = {
 								switch (choice) {
 									case "选项一":
 										if (target.canMoveCard(true)) return 5;
-										return 3;
+										return 0;
 									case "选项二":
-										if (target.countCards("h") < 2 && get.value(target.getCards("h")[0]) < 6) return 4.5;
-										return 4.5 - target.countCards("h");
+										return 4 - target.getCards("h").reduce((acc, card) => {
+											return acc + get.value(card);
+										}, 0) / 3;
 									case "选项三":
 										var e2 = target.getEquip(2);
-										if (target.hp + target.countCards("hs", ["tao", "jiu"]) < 2 && !e2) return 5.5;
-										if (get.recoverEffect(target, target, target) <= 0) return 3;
-										if (!e2) return 4.4;
-										return 5 - 1.5 * target.countCards("e");
+										if (target.isHealthy()) return -1.8 * target.countCards("e") - (e2 ? 1 : 0);
+										if (!e2 && target.hp + target.countCards("hs", ["tao", "jiu"]) < 2) return 6;
+										let rec = get.recoverEffect(target, target, target) / 4 - target.getCards("e").reduce((acc, card) => {
+											return acc + get.value(card);
+										}, 0) / 3;
+										if (!e2) rec += 2;
+										return rec;
 								}
 							};
 							var choicesx = choices.map(i => [i, func(i, target)]).sort((a, b) => b[1] - a[1]);
