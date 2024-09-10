@@ -2332,13 +2332,24 @@ const skills = {
 		ai: {
 			order: 7,
 			result: {
+				player(player, target) {
+					const storage = player.storage.dcsbfumou;
+					if (!storage && !ui.selected.targets.length) {
+						return Math.ceil(target.countCards("h") / 2);
+					}
+					return 0;
+				},
 				target(player, target) {
 					const storage = player.storage.dcsbfumou;
-					const sgn = get.sgn(get.attitude(player, target));
-					if (!storage && !ui.selected.targets.length) {
-						return (sgn * (2 + sgn)) / (target.countCards("h") + 1);
+					if (storage) return target.countCards("h") * get.threaten(target, player);
+					let att = get.attitude(player, target);
+					if (!ui.selected.targets.length) {
+						if (att > 0 && game.hasPlayer(cur => {
+							return cur !== player && cur !== target && get.attitude(player, cur) > 0;
+						})) return target.countCards("h") / get.threaten(target, player) / 10;
+						return -Math.ceil(target.countCards("h") / 2);
 					}
-					return (sgn * (2 + sgn)) / (target.countCards("h") + 1);
+					return Math.ceil(ui.selected.targets[0].countCards("h") / 2);
 				},
 			},
 		},
