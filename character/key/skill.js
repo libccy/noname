@@ -4746,7 +4746,8 @@ const skills = {
 		filter: (event, player) => player.hasCard(card => lib.skill.chihaya_huairou.filterCard(card, player), lib.skill.chihaya_huairou.position),
 		filterCard: (card, player) => get.type(card) == "equip" && player.canRecast(card),
 		check(card) {
-			if (!_status.event.player.hasEquipableSlot(get.subtype(card))) return 5;
+			if (get.position(card) == "e") return 0.5 - get.value(card, get.player());
+			if (!get.player().hasEquipableSlot(get.subtype(card))) return 5;
 			return 3 - get.value(card);
 		},
 		content() {

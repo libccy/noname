@@ -17671,6 +17671,7 @@ const skills = {
 		},
 	},
 	ly_piliche: {
+		equipSkill: true,
 		trigger: { source: "damageSource" },
 		check: function (event, player) {
 			return get.attitude(player, event.player) * get.value(event.player.getDiscardableCards(player, "e"), event.player) <= 0;

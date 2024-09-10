@@ -13108,6 +13108,7 @@ const skills = {
 		},
 	},
 	bintieshuangji_skill: {
+		equipSkill: true,
 		trigger: { player: "shaMiss" },
 		filter: function (event, player) {
 			return player.hp > 0;

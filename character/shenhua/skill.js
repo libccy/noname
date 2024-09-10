@@ -1144,7 +1144,7 @@ const skills = {
 		filterCard: (card, player) => get.type(card) == "equip" && player.canRecast(card),
 		check(card) {
 			if (get.position(card) == "e") return 0.5 - get.value(card, get.player());
-			if (!_status.event.player.canEquip(card)) return 5;
+			if (!get.player().canEquip(card)) return 5;
 			return 3 - get.value(card);
 		},
 		async content(event, trigger, player) {
