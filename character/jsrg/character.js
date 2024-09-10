@@ -435,6 +435,31 @@ const characters = {
 		hp: 3,
 		skills: ["jsrgfuyu", "jsrgshanzheng", "jsrgxiongbao", "jsrgliedu"],
 	},
+	jsrg_wenyang: {
+		sex: "male",
+		group: "wei",
+		hp: 4,
+		skills: ["jsrgfuzhen"],
+	},
+	jsrg_zhugedan: {
+		sex: "male",
+		group: "wei",
+		hp: 4,
+		skills: ["jsrgbeizhi", "jsrgshenji"],
+		names: "诸葛|诞",
+	},
+	jsrg_wangjun: {
+		sex: "male",
+		group: "jin",
+		hp: 4,
+		skills: ["jsrgchengliu", "jsrgjianlou"],
+	},
+	jsrg_limi: {
+		sex: "male",
+		group: "jin",
+		hp: 3,
+		skills: ["jsrgnanquan", "jsrgminfeng"],
+	},
 };
 
 export default characters;

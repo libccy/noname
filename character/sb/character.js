@@ -1,4 +1,5 @@
 const characters = {
+	sb_zhugejin: ["male", "wu", 3, ["sbhuanshi", "sbhongyuan", "sbmingzhe"], ["name:诸葛|瑾"]],
 	sb_jiaxu: ["male", "qun", 3, ["sbwansha", "sbluanwu", "sbweimu"]],
 	sb_handang: ["male", "wu", 4, ["sbgongqi", "sbjiefan"]],
 	sb_gongsunzan: ["male", "qun", 4, ["sbyicong", "sbqiaomeng"], ["name:公孙|瓒"]],

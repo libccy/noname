@@ -2371,6 +2371,10 @@ export class Get extends GetCompatible {
 	 */
 	number(card, player) {
 		if (typeof card !== "object") return;
+		if (Array.isArray(card)) {
+			if (card.length == 1) return get.number(card[0], player);
+			return null;
+		}
 		//狗卡你是真敢出啊
 		var number = null;
 		if ("number" in card) {

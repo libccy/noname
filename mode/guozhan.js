@@ -1347,7 +1347,7 @@ export default () => {
 										return sum + (get.damageEffect(target, source, source) - get.damageEffect(target, source, player)) / 2;
 									}, 0);
 								})(player, target, all);
-								return Math.max(0, get.sgn(eff1 - eff2));
+								return Math.max(0, get.sgn(eff2 - eff1));
 							});
 						const cards = player.getExpansions("fakequanji");
 						if (index == 0) {

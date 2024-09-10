@@ -3612,6 +3612,50 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/**
+	 * 获得蓄力点
+	 * @param { number } [num = 1] 获得蓄力点数
+	 * @param { boolean } [log] false: 不进行广播
+	 */
+	addCharge(num, log) {
+		if (typeof num != "number" || !num) num = 1;
+		let maxCharge = this.getMaxCharge();
+		num = Math.min(num, maxCharge - this.countMark("charge"));
+		if(num > 0) this.addMark("charge", num, log);
+	}
+	/**
+	 * 移去蓄力点
+	 * @param { number } [num = 1] 移去蓄力点数
+	 * @param { boolean } [log] false: 不进行广播
+	 */
+	removeCharge(num, log) {
+		if (typeof num != "number" || !num) num = 1;
+		num = Math.min(num, this.countMark("charge"));
+		if(num > 0) this.removeMark("charge", num, log);
+	}
+	/**
+	 * 返回玩家的蓄力点数
+	 * @param { boolean } [max] true: 返回当前蓄力点与上限之差
+	 * @returns { number }
+	 */
+	countCharge(max) {
+		if(max) return this.getMaxCharge() - this.countMark("charge");
+		return this.countMark("charge");
+	}
+	/**
+	 * 获取蓄力点上限
+	 */
+	getMaxCharge() {
+		let skills = game.expandSkills(this.getSkills().concat(lib.skill.global));
+		let max = 0;
+		for(let skill of skills) {
+			let info = get.info(skill);
+			if(!info.chargeSkill || typeof info.chargeSkill != "number") continue;
+			max += info.chargeSkill;
+		}
+		max = game.checkMod(this, max, "maxCharge", this);
+		return max;
+	}
+	/**
 	 * @deprecated
 	 */
 	num(arg1, arg2, arg3) {

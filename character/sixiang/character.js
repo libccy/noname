@@ -5,7 +5,7 @@ const characters = {
 	std_jianggan: ["male", "wei", 3, ["stddaoshu", "stddaizui"]],
 	std_zhouchu: ["male", "wu", 4, ["stdxiongxia"]],
 	std_lvlingqi: ["female", "qun", 4, ["stdhuizhan"]],
-	std_dc_yanghu: ["male", "wei", 4, ["stdmingfa"]],
+	std_dc_yanghu: ["male", "wei", 4, ["stdmingfa"], ["border:jin"]],
 	std_dc_luotong: ["male", "wu", 3, ["stdjinjian", "stdrenzheng"]],
 	std_lijue: ["male", "qun", 5, ["stdxiongsuan"]],
 	std_chengpu: ["male", "wu", 4, ["stdchunlao"]],

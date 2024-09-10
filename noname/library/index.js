@@ -10914,7 +10914,10 @@ export class Library {
 		charge: {
 			markimage: "image/card/charge.png",
 			intro: {
-				content: "当前蓄力点数：#",
+				content(storage, player) {
+					const max = player.getMaxCharge();
+					return `当前蓄力点数：${storage}/${max}`;
+				},
 			},
 		},
 		cooperation: {

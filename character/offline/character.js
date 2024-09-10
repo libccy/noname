@@ -84,7 +84,7 @@ const characters = {
 	jiling: ["male", "qun", 4, ["shuangren"]],
 	kongrong: ["male", "qun", 3, ["zymingshi", "lirang"]],
 	jiangqing: ["male", "wu", 4, ["zyshangyi"]],
-	pk_sp_duyu: ["male", "qun", 4, ["pkwuku", "pksanchen"]],
+	pk_sp_duyu: ["male", "qun", 4, ["pkwuku", "pksanchen"], ["border:jin"]],
 	ps_lvbu: ["male", "qun", 4, ["wushuang", "pssheji"]],
 	ps_jiaxu: ["male", "qun", 4, ["wansha", "psqupo", "psbaoquan"]],
 	ps_machao: ["male", "shu", 4, ["mashu", "tieji", "psweihou"]],
