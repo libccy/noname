@@ -4165,34 +4165,24 @@ const skills = {
 	//清河公主
 	dczhangji: {
 		audio: 2,
-		trigger: { global: "useCard" },
+		trigger: { global: "useCardToTargeted" },
 		filter: function (event, player) {
-			return event.targets && event.targets.length > 1 && event.targets.includes(player);
+			if(!event.targets || event.targets.length <= 1) return false;
+			if(event.targets.length != event.getParent().triggeredTargets4.length) return false;
+			return event.targets.includes(player);
 		},
 		forced: true,
 		logTarget: "player",
-		content: function* (event, map) {
-			const player = map.player,
-				trigger = map.trigger,
-				target = trigger.player;
-			let targets = trigger.targets.slice();
-			targets.sortBySeat(_status.currentPhase || target);
-			targets.remove(player);
-			player
-				.when({ global: "useCardToTargeted" })
-				.filter(evt => targets.length && evt.getParent() == trigger && evt.targets.length == evt.getParent().triggeredTargets4.length)
-				.then(() => {
-					trigger.getParent().targets = [player].concat(targets);
-					trigger.getParent().triggeredTargets4 = [player].concat(targets);
-				})
-				.vars({ targets: targets });
+		async content(event, trigger, player) {
+			const evt = trigger.getParent();
+			evt.targets = [player, ...evt.targets.remove(player)];
+			evt.triggeredTargets4 = [player, ...evt.triggeredTargets4.remove(player)];
 			player
 				.when({ target: ["useCardToEnd", "useCardToExcluded"] })
-				.filter(evt => targets.length && evt.getParent() == trigger)
+				.filter(evt => evt.targets?.length && evt.getParent() == trigger.getParent())
 				.then(() => {
-					player.draw(targets.length);
-				})
-				.vars({ targets: targets });
+					player.draw(trigger.targets.length);
+				});
 		},
 	},
 	dczengou: {

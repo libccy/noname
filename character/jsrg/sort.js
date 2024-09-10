@@ -4,7 +4,7 @@ const characterSort = {
 	jiangshanrugu_zhuan: ["jsrg_guojia", "jsrg_zhangfei", "jsrg_machao", "jsrg_lougui", "jsrg_zhangren", "jsrg_huangzhong", "jsrg_xiahourong", "jsrg_sunshangxiang", "jsrg_pangtong", "jsrg_hansui", "jsrg_zhangchu", "jsrg_xiahouen", "jsrg_fanjiangzhangda"],
 	jiangshanrugu_he: ["jsrg_zhugeliang", "jsrg_jiangwei", "jsrg_luxun", "jsrg_zhaoyun", "jsrg_simayi", "jsrg_guoxun", "jsrg_sunlubansunluyu", "jsrg_caofang", "jsrg_sunjun", "jsrg_liuyong", "jsrg_weiwenzhugezhi", "jsrg_zhangxuan", "jsrg_gaoxiang", "jsrg_guozhao"],
 	jiangshanrugu_shuai: ["jsrg_yuanshao", "jsrg_caojiewangfu", "jsrg_songhuanghou", "jsrg_zhangjiao", "jsrg_dongzhuo", "jsrg_yangqiu", "jsrg_zhanghuan", "jsrg_liubiao", "jsrg_yl_luzhi", "jsrg_chenfan", "jsrg_zhangju"],
-	jiangshanrugu_xing: ["jsrg_jiananfeng"],
+	jiangshanrugu_xing: ["jsrg_jiananfeng", "jsrg_wenyang", "jsrg_zhugedan", "jsrg_wangjun", "jsrg_limi"],
 };
 
 const characterSortTranslate = {
