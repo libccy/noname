@@ -2,6 +2,220 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//诸葛瑾
+	sbhuanshi: {
+		audio: 2,
+		trigger: { global: "judge" },
+		filter(event, player) {
+			return (player.countCards("hs") + player.hp) > 0;
+		},
+		async cost(event, trigger, player) {
+			let cardsx = get.cards(player.hp, true).map(card => {
+				var cardx = ui.create.card();
+				cardx.init(get.cardInfo(card));
+				cardx._cardid = card.cardid;
+				cardx.preCard = card;
+				return cardx;
+			});
+			if (cardsx.length) player.directgains(cardsx, null, "sbhuanshi_tag");
+			let {
+				result: { bool, cards },
+			} = await player
+				.chooseCard(get.translation(trigger.player) + "的" + (trigger.judgestr || "") + "判定为" + get.translation(trigger.player.judging[0]) + "，" + get.prompt("sbhuanshi"), "hs", card => {
+					const player = _status.event.player;
+					const mod2 = game.checkMod(card, player, "unchanged", "cardEnabled2", player);
+					if (mod2 != "unchanged") return mod2;
+					const mod = game.checkMod(card, player, "unchanged", "cardRespondable", player);
+					if (mod != "unchanged") return mod;
+					return true;
+				})
+				.set("ai", card => {
+					const trigger = _status.event.getTrigger();
+					const player = _status.event.player;
+					const judging = _status.event.judging;
+					const result = trigger.judge(card) - trigger.judge(judging);
+					const attitude = get.attitude(player, trigger.player);
+					if (attitude == 0 || result == 0) return 0;
+					if (attitude > 0) {
+						return result - get.value(card) / 2;
+					} else {
+						return -result - get.value(card) / 2;
+					}
+				})
+				.set("judging", trigger.player.judging[0]);
+
+			cardsx = player.getCards("s", card => card.hasGaintag("sbhuanshi_tag"));
+			if (cardsx.length) {
+				if (cards) {
+					cards = cards.map(card => {
+						if (cardsx.includes(card)) return card.preCard;
+						return card;
+					});
+				}
+				if (player.isOnline2()) {
+					player.send(function (cards, player) {
+						cards.forEach(i => i.delete());
+						if (player == game.me) ui.updatehl();
+					}, cardsx, player);
+				}
+				cardsx.forEach(i => i.delete());
+				if (player == game.me) ui.updatehl();
+			}
+
+			event.result = {
+				bool: bool,
+				cards: cards,
+				skill_popup: false,
+			};
+		},
+		async content(event, trigger, player) {
+			const cards = event.cards;
+			await player.respond(cards, "sbhuanshi", "highlight", "noOrdering");
+			if (trigger.player.judging[0].clone) {
+				trigger.player.judging[0].clone.classList.remove("thrownhighlight");
+				game.broadcast(function (card) {
+					if (card.clone) {
+						card.clone.classList.remove("thrownhighlight");
+					}
+				}, trigger.player.judging[0]);
+				game.addVideo("deletenode", player, get.cardsInfo([trigger.player.judging[0].clone]));
+			}
+			game.cardsDiscard(trigger.player.judging[0]);
+			trigger.player.judging[0] = cards[0];
+			trigger.orderingCards.addArray(cards);
+			game.log(trigger.player, "的判定牌改为", cards[0]);
+			await game.delay(2);
+		},
+		locked: false,
+		mod: {
+			cardRespondable(card, player) {
+				if (!card.preCard) return;
+				return _status.event?.getParent()?.name == "sbhuanshi_cost";
+			},
+		},
+		ai: {
+			rejudge: true,
+			tag: {
+				rejudge: 1,
+			},
+		},
+	},
+	sbhongyuan: {
+		audio: 2,
+		trigger: {
+			global: ["gainAfter", "loseAsyncAfter"],
+		},
+		chargeSkill: 4,
+		getIndex(event, player) {
+			if (!player.countCharge()) return [];
+			let list = [];
+			if (event.getg && event.getg(player)?.length > 1) list.push([player, "gain"]);
+			if (!event.getl) return list;
+			for (let target of game.players) {
+				let evt = event.getl(target);
+				if (!evt || !evt.cards2 || !evt.cards2.length) continue;
+			}
+			return game.filterPlayer(current => {
+				if (current == player) return event.getg && event.getg(player)?.length > 1;
+				if (!event.getl) return false;
+				let evt = event.getl(current);
+				if (!evt || !evt.cards2) return false;
+				return evt.cards2.length > 1;
+			}).sortBySeat();
+		},
+		filter(event, player) {
+			return player.countCharge();
+		},
+		async cost(event, trigger, player) {
+			const target = event.indexedData;
+			if (target == player) {
+				event.result = await player
+					.chooseTarget([1, 2], get.prompt("sbhongyuan"), "令至多两名角色各摸一张牌")
+					.set("ai", target => {
+						const player = get.player();
+						return get.effect(target, { name: "draw" }, player, player);
+					})
+					.forResult();
+				event.result.cost_data = "gain";
+			}
+			else {
+				event.result = await player
+					.chooseBool(get.prompt("sbhongyuan", target), "令其摸两张牌")
+					.set("choice", get.effect(target, { name: "draw" }, player, player) > 0)
+					.forResult();
+				event.result.targets = [target];
+				event.result.cost_data = "lose";
+			}
+		},
+		async content(event, trigger, player) {
+			player.removeCharge();
+			if (event.cost_data == "gain") {
+				const targets = event.targets;
+				await game.asyncDraw(targets);
+			}
+			else {
+				const target = event.targets[0];
+				await target.draw(2);
+			}
+		},
+		group: "sbhongyuan_init",
+		subSkill: {
+			init: {
+				audio: "sbhongyuan",
+				trigger: {
+					player: "enterGame",
+					global: "phaseBefore",
+				},
+				filter(event, player) {
+					return event.name != "phase" || game.phaseNumber == 0;
+				},
+				forced: true,
+				locked: false,
+				async content(event, trigger, player) {
+					player.gainCharge();
+				},
+			},
+		},
+	},
+	sbmingzhe: {
+		audio: 2,
+		trigger: {
+			player: "loseAfter",
+			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
+		},
+		locked: true,
+		filter: function (event, player) {
+			if (player == _status.currentPhase) return false;
+			if (player.countMark("sbmingzhe_used") >= 3) return false;
+			var evt = event.getl(player);
+			return evt.cards2?.length;
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt2("sbmingzhe"), true)
+				.set("ai", target => {
+					const player = get.player();
+					let eff = get.effect(target, { name: "draw" }, player, player);
+					if (target.countCharge(true) > 0) eff *= 1.5;
+					return eff;
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			player.addTempSkill("sbmingzhe_used", "roundStart");
+			player.addMark("sbmingzhe_used", 1, false);
+			const target = event.targets[0];
+			const cards = trigger.getl(player).cards2;
+			await target.draw(cards.length);
+			if (cards.some(card => get.type(card) != "basic") && target.countCharge(true)) target.gainCharge();
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
+		},
+	},
 	//贾诩
 	sbwansha: {
 		audio: 2,
