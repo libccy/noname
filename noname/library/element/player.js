@@ -11127,7 +11127,9 @@ export class Player extends HTMLDivElement {
 		}
 		const cardx = isViewAsCard ? game.createCard(card.name, cards.length == 1 ? get.suit(cards[0]) : "none", cards.length == 1 ? get.number(cards[0]) : 0) : cards[0];
 		cardx.fix();
-		cardx.card = card;
+		const cardSymbol = Symbol("card");
+		cardx.cardSymbol = cardSymbol;
+		cardx[cardSymbol] = card;
 		if (card.subtypes) cardx.subtypes = card.subtypes;
 		cardx.style.transform = "";
 		cardx.classList.remove("drawinghidden");

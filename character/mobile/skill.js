@@ -2992,10 +2992,13 @@ const skills = {
 		direct: true,
 		content: function () {
 			"step 0";
-			player.chooseTarget(get.prompt2("mbyilie"), lib.filter.notMe, true).set("ai", function (target) {
-				let player = _status.event.player;
-				return Math.max(1 + get.attitude(player, target) * get.threaten(target), Math.random());
-			}).set("animate", false);
+			player
+				.chooseTarget(get.prompt2("mbyilie"), lib.filter.notMe, true)
+				.set("ai", function (target) {
+					let player = _status.event.player;
+					return Math.max(1 + get.attitude(player, target) * get.threaten(target), Math.random());
+				})
+				.set("animate", false);
 			"step 1";
 			if (result.bool) {
 				let target = result.targets[0];
@@ -9314,6 +9317,137 @@ const skills = {
 			},
 		},
 	},
+	//数学家
+	mbsidi: {
+		audio: "disordersidi",
+		trigger: { player: "useCardAfter" },
+		filter: function (event, player) {
+			return (
+				get.type(event.card, false) != "delay" &&
+				game.hasPlayer(function (current) {
+					return player != current && (!player.storage.mbsidi || !player.storage.mbsidi.includes(current));
+				})
+			);
+		},
+		direct: true,
+		content: function () {
+			"step 0";
+			player
+				.chooseTarget(get.prompt("mbsidi"), "选择一名角色，为其选择一名“司敌”目标角色", function (card, player, target) {
+					return target != player && (!player.storage.mbsidi || !player.storage.mbsidi.includes(target));
+				})
+				.set("ai", function (target) {
+					var player = _status.event.player;
+					if (target.getEnemies().length == 1) return 2 + Math.random();
+					return 1 + Math.random();
+				}).animate = false;
+			"step 1";
+			if (result.bool) {
+				var target = result.targets[0];
+				event.target = target;
+				player
+					.chooseTarget("为" + get.translation(target) + "选择一名“司敌”目标角色")
+					.set("ai", function (target) {
+						var player = _status.event.player;
+						var targetx = _status.event.target;
+						if (targetx.getEnemies().includes(target) && targetx.inRange(target)) return Math.random() + 1.5;
+						return targetx == target ? 1 : -1;
+					})
+					.set("target", target).animate = false;
+			} else event.finish();
+			"step 2";
+			if (result.bool) {
+				result.targets.unshift();
+				player.logSkill("mbsidi", target);
+				if (!player.storage.mbsidi) player.storage.mbsidi = [];
+				if (!player.storage.mbsidi2) player.storage.mbsidi2 = [];
+				player.storage.mbsidi.push(target);
+				player.storage.mbsidi2.push(result.targets[0]);
+				player.markSkill("mbsidi");
+				game.delayx();
+			}
+		},
+		intro: {
+			content: function (storage, player) {
+				if ((player == game.me || player.isUnderControl()) && !game.observe) {
+					var storage2 = player.storage.mbsidi2,
+						str = "";
+					for (var i = 0; i < storage.length; i++) {
+						str += get.translation(storage[i]) + "=>" + get.translation(storage2[i]);
+						if (i < storage.length - 1) str += "<br>";
+					}
+					return str;
+				}
+				return "已指定" + get.translation(storage) + "为目标";
+			},
+		},
+		onremove: function (player) {
+			delete player.storage.mbsidi;
+			delete player.storage.mbsidi2;
+		},
+		group: ["mbsidi_clear", "mbsidi_exec"],
+		subSkill: {
+			clear: {
+				trigger: { global: ["useCardToPlayered", "die"] },
+				filter: function (event, player) {
+					if (!player.storage.mbsidi || !player.storage.mbsidi.includes(event.player)) return false;
+					if (event.name == "die") return true;
+					if (get.type(event.card, false) != "delay") {
+						var index = player.storage.mbsidi.indexOf(event.player);
+						return index != -1 && (player.storage.mbsidi2[index] != event.target || event.targets.length != 1);
+					}
+					return false;
+				},
+				forced: true,
+				locked: false,
+				popup: false,
+				content: function () {
+					player.storage.mbsidi2.splice(player.storage.mbsidi.indexOf(trigger.player), 1);
+					player.unmarkAuto("mbsidi", [trigger.player]);
+				},
+			},
+			exec: {
+				audio: "disordersidi",
+				trigger: { global: "useCardToPlayered" },
+				filter: function (event, player) {
+					if (get.type(event.card, false) == "delay" || !player.storage.mbsidi || event.targets.length != 1) return false;
+					var index = player.storage.mbsidi.indexOf(event.player);
+					return index != -1 && player.storage.mbsidi2[index] == event.target;
+				},
+				logTarget: "player",
+				forced: true,
+				locked: false,
+				content: function () {
+					"step 0";
+					player.storage.mbsidi2.splice(player.storage.mbsidi.indexOf(trigger.player), 1);
+					player.unmarkAuto("mbsidi", [trigger.player]);
+					if (trigger.target == player) {
+						player.draw();
+						event.finish();
+						return;
+					}
+					var target = trigger.player;
+					event.target = target;
+					player
+						.chooseControl("cancel2")
+						.set("choiceList", ["取消" + get.translation(trigger.card) + "的所有目标" + (_status.dying.length ? "" : "，然后对" + get.translation(target) + "造成1点伤害"), "摸两张牌"])
+						.set("ai", function () {
+							var player = _status.event.player,
+								evt = _status.event.getTrigger();
+							if (get.damageEffect(evt.player, player, player) > 0 && get.effect(evt.target, evt.card, evt.player, player) < 0) return 0;
+							return 1;
+						});
+					"step 1";
+					if (result.index == 0) {
+						trigger.cancel();
+						trigger.targets.length = 0;
+						trigger.getParent().triggeredTargets1.length = 0;
+						if (!_status.dying.length) target.damage();
+					} else if (result.index == 1) player.draw(2);
+				},
+			},
+		},
+	},
 	//孙鲁班
 	xinzenhui: {
 		audio: 2,
@@ -12498,7 +12632,7 @@ const skills = {
 				})
 				.set("prompt", get.prompt2("rejiangchi"));
 			"step 1";
-			player.logSkill("rejiangchi", null, null, null, [(result.control == "弃牌" ? 2 : 1)]);
+			player.logSkill("rejiangchi", null, null, null, [result.control == "弃牌" ? 2 : 1]);
 			if (result.control == "弃牌") {
 				player.chooseToDiscard(true, "he");
 				player.addTempSkill("jiangchi2", "phaseUseEnd");

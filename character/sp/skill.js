@@ -5311,33 +5311,52 @@ const skills = {
 	olxiaofan: {
 		audio: 2,
 		enable: "chooseToUse",
-		hiddenCard: function (player, name) {
-			if (name != "wuxie" && lib.inpile.includes(name)) return true;
-		},
-		getNum: player => player.getHistory("useCard").reduce((list, evt) => list.add(get.type2(evt.card)), []).length,
-		filter: function (event, player) {
-			if (event.responded || event.type == "wuxie" || event.olxiaofan) return false;
-			for (var i of lib.inpile) {
-				if (i != "wuxie" && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event)) return true;
+		onChooseToUse(event) {
+			const sum = ui.cardPile.childNodes.length;
+			if (game.online || !sum || !event.player.hasSkill("olxiaofan") || event.player.isTempBanned("olxiaofan")) return;
+			const cards = [],
+				num = lib.skill.olxiaofan.getNum(event.player) + 1;
+			for (let i = 0; i < num; i++) {
+				const card = ui.cardPile.childNodes[sum - 1 - i];
+				if (card) cards.push(card);
+				else break;
 			}
-			return false;
+			event.set("olxiaofan_cards", cards);
+		},
+		hiddenCard(player, name) {
+			if (player.isTempBanned("olxiaofan")) return false;
+			return name != "wuxie" && lib.inpile.includes(name);
+		},
+		getNum(player) {
+			return player.getHistory("useCard").reduce((list, evt) => list.add(get.type2(evt.card)), []).length;
+		},
+		filter(event, player) {
+			if (!Array.isArray(event.olxiaofan_cards) || event.responded || event.type == "wuxie" || event.olxiaofan) return false;
+			return lib.inpile.some(i => i != "wuxie" && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event));
 		},
 		delay: false,
-		content: function () {
-			"step 0";
-			var evt = event.getParent(2);
-			if (_status.connectMode || !event.isMine()) evt.set("olxiaofan", true);
-			var cards = get.bottomCards(lib.skill.olxiaofan.getNum(player) + 1, true);
-			var aozhan = player.hasSkill("aozhan");
-			player
-				.chooseButton(["嚣翻：选择要使用的牌", cards])
-				.set("filterButton", function (button) {
-					return _status.event.cards.includes(button.link);
-				})
+		async content(event, trigger, player) {
+			const evt = event.getParent(2);
+			const cardsx = evt.olxiaofan_cards.slice().map(card => {
+				const cardx = ui.create.card();
+				cardx.init(get.cardInfo(card));
+				cardx._cardid = card.cardid;
+				return cardx;
+			});
+			if (!event.isMine() || _status.connectMode) evt.set("olxiaofan", true);
+			player.directgains(cardsx, null, "olxiaofan_hs");
+			const result = await player
+				.chooseCard(
+					"嚣翻：选择要使用的牌",
+					(card, player) => {
+						return get.event().cards.includes(card);
+					},
+					"s"
+				)
 				.set(
 					"cards",
-					cards.filter(function (card) {
-						if (aozhan && card.name == "tao") {
+					cardsx.filter(card => {
+						if (player.hasSkill("aozhan") && card.name == "tao") {
 							return (
 								evt.filterCard(
 									{
@@ -5362,25 +5381,40 @@ const skills = {
 						return evt.filterCard(card, evt.player, evt);
 					})
 				)
-				.set("ai", function (button) {
-					if (get.type(button.link) == "equip") return 0;
-					var evt = _status.event.getParent(3),
-						player = _status.event.player;
-					if (evt.type == "phase" && !player.hasValueTarget(button.link, null, true)) return 0;
+				.set("ai", card => {
+					if (get.type(card) == "equip") return 0;
+					const evt = get.event().getParent(3),
+						player = get.event().player;
+					if (evt.type == "phase" && !player.hasValueTarget(card, null, true)) return 0;
 					if (evt && evt.ai) {
-						var tmp = _status.event;
+						const tmp = _status.event;
 						_status.event = evt;
-						var result = (evt.ai || event.ai1)(button.link, _status.event.player, evt);
+						const result = (evt.ai || event.ai1)(card, player, evt);
 						_status.event = tmp;
 						return result;
 					}
 					return 1;
-				});
-			"step 1";
-			var evt = event.getParent(2);
-			if (result.bool && result.links && result.links.length) {
-				var card = result.links[0];
-				var name = card.name,
+				})
+				.forResult();
+			let card;
+			if (result.bool) {
+				card = evt.olxiaofan_cards.find(card => card.cardid === result.cards[0]._cardid);
+			}
+			const cards2 = player.getCards("s", card => card.hasGaintag("olxiaofan_hs"));
+			if (player.isOnline2()) {
+				player.send(
+					(cards, player) => {
+						cards.forEach(i => i.delete());
+						if (player == game.me) ui.updatehl();
+					},
+					cards2,
+					player
+				);
+			}
+			cards2.forEach(i => i.delete());
+			if (player == game.me) ui.updatehl();
+			if (card) {
+				let name = card.name,
 					aozhan = player.hasSkill("aozhan") && name == "tao";
 				if (aozhan) {
 					name = evt.filterCard(
@@ -5396,12 +5430,8 @@ const skills = {
 						: "shan";
 				}
 				game.broadcastAll(
-					function (result, name) {
-						lib.skill.olxiaofan_backup.viewAs = {
-							name: name,
-							cards: [result],
-							isCard: true,
-						};
+					(result, name) => {
+						lib.skill.olxiaofan_backup.viewAs = { name: name, cards: [result], isCard: true };
 					},
 					card,
 					name
@@ -28188,39 +28218,42 @@ const skills = {
 			},
 		},
 	},
+	//诸葛恪
 	aocai: {
 		audio: 2,
 		audioname: ["gz_zhugeke"],
 		enable: ["chooseToUse", "chooseToRespond"],
-		hiddenCard: function (player, name) {
+		hiddenCard(player, name) {
 			if (player != _status.currentPhase && get.type(name) == "basic" && lib.inpile.includes(name)) return true;
 		},
-		filter: function (event, player) {
+		filter(event, player) {
 			if (event.responded || player == _status.currentPhase || event.aocai) return false;
-			for (var i of lib.inpile) {
-				if (get.type(i) == "basic" && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event)) return true;
-			}
-			return false;
+			return lib.inpile.some(i => get.type(i) == "basic" && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event));
 		},
 		delay: false,
-		content: function () {
-			"step 0";
-			var evt = event.getParent(2);
+		async content(event, trigger, player) {
+			const evt = event.getParent(2);
+			const cards = get.cards(get.mode() != "guozhan" && player.countCards("h") == 0 ? 4 : 2, true);
+			const cardsx = cards.slice().map(card => {
+				const cardx = ui.create.card();
+				cardx.init(get.cardInfo(card));
+				cardx._cardid = card.cardid;
+				return cardx;
+			});
 			evt.set("aocai", true);
-			var cards = get.cards(get.mode() != "guozhan" && player.countCards("h") == 0 ? 4 : 2);
-			for (var i = cards.length - 1; i >= 0; i--) {
-				ui.cardPile.insertBefore(cards[i].fix(), ui.cardPile.firstChild);
-			}
-			var aozhan = player.hasSkill("aozhan");
-			player
-				.chooseButton(["傲才：选择要" + (evt.name == "chooseToUse" ? "使用" : "打出") + "的牌", cards])
-				.set("filterButton", function (button) {
-					return _status.event.cards.includes(button.link);
-				})
+			player.directgains(cardsx, null, "aocai_hs");
+			const result = await player
+				.chooseCard(
+					"傲才：选择要" + (evt.name == "chooseToUse" ? "使用" : "打出") + "的牌",
+					(card, player) => {
+						return get.event().cards.includes(card);
+					},
+					"s"
+				)
 				.set(
 					"cards",
-					cards.filter(function (card) {
-						if (aozhan && card.name == "tao") {
+					cardsx.filter(card => {
+						if (player.hasSkill("aozhan") && card.name == "tao") {
 							return (
 								evt.filterCard(
 									{
@@ -28245,22 +28278,40 @@ const skills = {
 						return evt.filterCard(card, evt.player, evt);
 					})
 				)
-				.set("ai", function (button) {
-					var evt = _status.event.getParent(3);
+				.set("ai", card => {
+					if (get.type(card) == "equip") return 0;
+					const evt = get.event().getParent(3),
+						player = get.event().player;
+					if (evt.type == "phase" && !player.hasValueTarget(card, null, true)) return 0;
 					if (evt && evt.ai) {
-						var tmp = _status.event;
+						const tmp = _status.event;
 						_status.event = evt;
-						var result = (evt.ai || event.ai1)(button.link, _status.event.player, evt);
+						const result = (evt.ai || event.ai1)(card, player, evt);
 						_status.event = tmp;
 						return result;
 					}
 					return 1;
-				});
-			"step 1";
-			var evt = event.getParent(2);
-			if (result.bool && result.links && result.links.length) {
-				var card = result.links[0];
-				var name = card.name,
+				})
+				.forResult();
+			let card;
+			if (result.bool) {
+				card = cards.find(card => card.cardid === result.cards[0]._cardid);
+			}
+			const cards2 = player.getCards("s", card => card.hasGaintag("aocai_hs"));
+			if (player.isOnline2()) {
+				player.send(
+					(cards, player) => {
+						cards.forEach(i => i.delete());
+						if (player == game.me) ui.updatehl();
+					},
+					cards2,
+					player
+				);
+			}
+			cards2.forEach(i => i.delete());
+			if (player == game.me) ui.updatehl();
+			if (card) {
+				let name = card.name,
 					aozhan = player.hasSkill("aozhan") && name == "tao";
 				if (aozhan) {
 					name = evt.filterCard(
@@ -28277,12 +28328,8 @@ const skills = {
 				}
 				if (evt.name == "chooseToUse") {
 					game.broadcastAll(
-						function (result, name) {
-							lib.skill.aocai_backup.viewAs = {
-								name: name,
-								cards: [result],
-								isCard: true,
-							};
+						(result, name) => {
+							lib.skill.aocai_backup.viewAs = { name: name, cards: [result], isCard: true };
 						},
 						card,
 						name
@@ -28293,9 +28340,9 @@ const skills = {
 				} else {
 					delete evt.result.skill;
 					delete evt.result.used;
-					evt.result.card = get.autoViewAs(result.links[0]);
+					evt.result.card = get.autoViewAs(card);
 					if (aozhan) evt.result.card.name = name;
-					evt.result.cards = [result.links[0]];
+					evt.result.cards = [card];
 					evt.redo();
 					return;
 				}
@@ -28304,7 +28351,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, effect) {
+				target(card, player, target, effect) {
 					if (get.tag(card, "respondShan")) return 0.7;
 					if (get.tag(card, "respondSha")) return 0.7;
 				},
@@ -28313,30 +28360,29 @@ const skills = {
 			respondShan: true,
 			respondSha: true,
 			result: {
-				player: function (player) {
+				player(player) {
 					if (_status.event.dying) return get.attitude(player, _status.event.dying);
 					return 1;
 				},
 			},
 		},
-	},
-	aocai_backup: {
-		sourceSkill: "aocai",
-		precontent: function () {
-			delete event.result.skill;
-			var name = event.result.card.name,
-				cards = event.result.card.cards.slice(0);
-			event.result.cards = cards;
-			var rcard = cards[0],
-				card;
-			if (rcard.name == name) card = get.autoViewAs(rcard);
-			else card = get.autoViewAs({ name, isCard: true });
-			event.result.card = card;
+		subSkill: {
+			backup: {
+				precontent() {
+					delete event.result.skill;
+					var name = event.result.card.name,
+						cards = event.result.card.cards.slice(0);
+					event.result.cards = cards;
+					var rcard = cards[0],
+						card;
+					if (rcard.name == name) card = get.autoViewAs(rcard);
+					else card = get.autoViewAs({ name, isCard: true });
+					event.result.card = card;
+				},
+				filterCard: () => false,
+				selectCard: -1,
+			},
 		},
-		filterCard: function () {
-			return false;
-		},
-		selectCard: -1,
 	},
 	hongyuan: {
 		trigger: { player: "phaseDrawBegin2" },
@@ -30693,7 +30739,7 @@ const skills = {
 			targets[event.num].chooseBool("是否押杀？").ai = function (event, player) {
 				var evt = _status.event.getParent();
 				if (get.attitude(targets[event.num], evt.player) > 0) return evt.player.countCards("h", "sha") ? false : true;
-				return Math.random() < (evt.player.countCards("h") / 4);
+				return Math.random() < evt.player.countCards("h") / 4;
 			};
 			"step 2";
 			if (result.bool) {

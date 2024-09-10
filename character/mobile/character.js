@@ -61,7 +61,7 @@ const characters = {
 	yanpu: ["male", "qun", 3, ["huantu", "bihuo"]],
 	mayuanyi: ["male", "qun", 4, ["jibing", "wangjing", "moucuan"]],
 	fuqian: ["male", "shu", 4, ["jueyong", "poxiang"]],
-	xin_caozhen: ["male", "wei", 4, ["discretesidi"]],
+	xin_caozhen: ["male", "wei", 4, ["mbsidi"]],
 	xin_sunluban: ["female", "wu", 3, ["xinzenhui", "xinjiaojin"]],
 	qiaozhou: ["male", "shu", 3, ["zhiming", "xingbu"]],
 	xin_guyong: ["male", "wu", 3, ["xinshenxing", "xinbingyi"]],
