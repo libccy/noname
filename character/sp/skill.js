@@ -1355,7 +1355,7 @@ const skills = {
 					game.broadcastAll(
 						function (hs, player) {
 							hs.forEach(i => i.goto(ui.special));
-							player.directgain(cards, false);
+							player.directgain(hs, false);
 						},
 						hs,
 						player
