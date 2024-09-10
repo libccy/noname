@@ -28217,39 +28217,42 @@ const skills = {
 			},
 		},
 	},
+	//诸葛恪
 	aocai: {
 		audio: 2,
 		audioname: ["gz_zhugeke"],
 		enable: ["chooseToUse", "chooseToRespond"],
-		hiddenCard: function (player, name) {
+		hiddenCard(player, name) {
 			if (player != _status.currentPhase && get.type(name) == "basic" && lib.inpile.includes(name)) return true;
 		},
-		filter: function (event, player) {
+		filter(event, player) {
 			if (event.responded || player == _status.currentPhase || event.aocai) return false;
-			for (var i of lib.inpile) {
-				if (get.type(i) == "basic" && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event)) return true;
-			}
-			return false;
+			return lib.inpile.some(i => get.type(i) == "basic" && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event));
 		},
 		delay: false,
-		content: function () {
-			"step 0";
-			var evt = event.getParent(2);
+		async content(event, trigger, player) {
+			const evt = event.getParent(2);
+			const cards = get.cards(get.mode() != "guozhan" && player.countCards("h") == 0 ? 4 : 2, true);
+			const cardsx = cards.slice().map(card => {
+				const cardx = ui.create.card();
+				cardx.init(get.cardInfo(card));
+				cardx._cardid = card.cardid;
+				return cardx;
+			});
 			evt.set("aocai", true);
-			var cards = get.cards(get.mode() != "guozhan" && player.countCards("h") == 0 ? 4 : 2);
-			for (var i = cards.length - 1; i >= 0; i--) {
-				ui.cardPile.insertBefore(cards[i].fix(), ui.cardPile.firstChild);
-			}
-			var aozhan = player.hasSkill("aozhan");
-			player
-				.chooseButton(["傲才：选择要" + (evt.name == "chooseToUse" ? "使用" : "打出") + "的牌", cards])
-				.set("filterButton", function (button) {
-					return _status.event.cards.includes(button.link);
-				})
+			player.directgains(cardsx, null, "aocai_hs");
+			const result = await player
+				.chooseCard(
+					"傲才：选择要" + (evt.name == "chooseToUse" ? "使用" : "打出") + "的牌",
+					(card, player) => {
+						return get.event().cards.includes(card);
+					},
+					"s"
+				)
 				.set(
 					"cards",
-					cards.filter(function (card) {
-						if (aozhan && card.name == "tao") {
+					cardsx.filter(card => {
+						if (player.hasSkill("aozhan") && card.name == "tao") {
 							return (
 								evt.filterCard(
 									{
@@ -28274,22 +28277,40 @@ const skills = {
 						return evt.filterCard(card, evt.player, evt);
 					})
 				)
-				.set("ai", function (button) {
-					var evt = _status.event.getParent(3);
+				.set("ai", card => {
+					if (get.type(card) == "equip") return 0;
+					const evt = get.event().getParent(3),
+						player = get.event().player;
+					if (evt.type == "phase" && !player.hasValueTarget(card, null, true)) return 0;
 					if (evt && evt.ai) {
-						var tmp = _status.event;
+						const tmp = _status.event;
 						_status.event = evt;
-						var result = (evt.ai || event.ai1)(button.link, _status.event.player, evt);
+						const result = (evt.ai || event.ai1)(card, player, evt);
 						_status.event = tmp;
 						return result;
 					}
 					return 1;
-				});
-			"step 1";
-			var evt = event.getParent(2);
-			if (result.bool && result.links && result.links.length) {
-				var card = result.links[0];
-				var name = card.name,
+				})
+				.forResult();
+			let card;
+			if (result.bool) {
+				card = cards.find(card => card.cardid === result.cards[0]._cardid);
+			}
+			const cards2 = player.getCards("s", card => card.hasGaintag("aocai_hs"));
+			if (player.isOnline2()) {
+				player.send(
+					(cards, player) => {
+						cards.forEach(i => i.delete());
+						if (player == game.me) ui.updatehl();
+					},
+					cards2,
+					player
+				);
+			}
+			cards2.forEach(i => i.delete());
+			if (player == game.me) ui.updatehl();
+			if (card) {
+				let name = card.name,
 					aozhan = player.hasSkill("aozhan") && name == "tao";
 				if (aozhan) {
 					name = evt.filterCard(
@@ -28306,12 +28327,8 @@ const skills = {
 				}
 				if (evt.name == "chooseToUse") {
 					game.broadcastAll(
-						function (result, name) {
-							lib.skill.aocai_backup.viewAs = {
-								name: name,
-								cards: [result],
-								isCard: true,
-							};
+						(result, name) => {
+							lib.skill.aocai_backup.viewAs = { name: name, cards: [result], isCard: true };
 						},
 						card,
 						name
@@ -28322,9 +28339,9 @@ const skills = {
 				} else {
 					delete evt.result.skill;
 					delete evt.result.used;
-					evt.result.card = get.autoViewAs(result.links[0]);
+					evt.result.card = get.autoViewAs(card);
 					if (aozhan) evt.result.card.name = name;
-					evt.result.cards = [result.links[0]];
+					evt.result.cards = [card];
 					evt.redo();
 					return;
 				}
@@ -28333,7 +28350,7 @@ const skills = {
 		},
 		ai: {
 			effect: {
-				target: function (card, player, target, effect) {
+				target(card, player, target, effect) {
 					if (get.tag(card, "respondShan")) return 0.7;
 					if (get.tag(card, "respondSha")) return 0.7;
 				},
@@ -28342,30 +28359,29 @@ const skills = {
 			respondShan: true,
 			respondSha: true,
 			result: {
-				player: function (player) {
+				player(player) {
 					if (_status.event.dying) return get.attitude(player, _status.event.dying);
 					return 1;
 				},
 			},
 		},
-	},
-	aocai_backup: {
-		sourceSkill: "aocai",
-		precontent: function () {
-			delete event.result.skill;
-			var name = event.result.card.name,
-				cards = event.result.card.cards.slice(0);
-			event.result.cards = cards;
-			var rcard = cards[0],
-				card;
-			if (rcard.name == name) card = get.autoViewAs(rcard);
-			else card = get.autoViewAs({ name, isCard: true });
-			event.result.card = card;
+		subSkill: {
+			backup: {
+				precontent() {
+					delete event.result.skill;
+					var name = event.result.card.name,
+						cards = event.result.card.cards.slice(0);
+					event.result.cards = cards;
+					var rcard = cards[0],
+						card;
+					if (rcard.name == name) card = get.autoViewAs(rcard);
+					else card = get.autoViewAs({ name, isCard: true });
+					event.result.card = card;
+				},
+				filterCard: () => false,
+				selectCard: -1,
+			},
 		},
-		filterCard: function () {
-			return false;
-		},
-		selectCard: -1,
 	},
 	hongyuan: {
 		trigger: { player: "phaseDrawBegin2" },
