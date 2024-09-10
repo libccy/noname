@@ -120,7 +120,7 @@ const skills = {
 					},
 				},
 				intro: {
-					content: (storage, player) => `已摸点数：${get.translation(storage)}`,
+					content: (storage, player) => `已摸点数：${get.translation(storage).replace("13", "K").replace("12", "Q").replace("11", "J").replace("1", "A")}`,
 				},
 			},
 		},
