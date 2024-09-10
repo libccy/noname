@@ -557,7 +557,7 @@ export const Content = {
 			//第一轮初判断的event.cards会在后面的步骤被覆盖，所以此处安心修改
 			if (event.card) {
 				const cardx = get.cardPile(cardx => {
-					if (cardx.card !== event.card) return false;
+					if (cardx[cardx.cardSymbol] !== event.card) return false;
 					const owner = get.owner(cardx, "judge");
 					return owner && (owner != player || get.position(cardx) != "e");
 				}, "field");
@@ -8543,7 +8543,7 @@ export const Content = {
 		if (num < cards.length) {
 			if (event.es.includes(cards[num]) || cards[num].cards?.some(i => event.es.includes(i))) {
 				event.loseEquip = true;
-				const VEquip = cards[num].card;
+				const VEquip = cards[num][cards[num].cardSymbol];
 				if (VEquip) {
 					player.removeVirtualEquip(VEquip);
 					//player.removeEquipTrigger(cards[num]);
