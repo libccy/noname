@@ -105,6 +105,7 @@ const skills = {
 		subSkill: {
 			effect: {
 				charlotte: true,
+				trigger: { player: "useCardAfter" },
 				filter(event, player) {
 					const card = get.autoViewAs({ name: "jiedao", isCard: true });
 					return (
