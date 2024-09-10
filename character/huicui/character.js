@@ -61,7 +61,7 @@ const characters = {
 	zhangxun: ["male", "qun", 4, ["suizheng"]],
 	zongyu: ["male", "shu", 3, ["zyqiao", "chengshang"]],
 	dc_jiling: ["male", "qun", 4, ["dcshuangren"]],
-	dc_yanghu: ["male", "wei", 3, ["dcdeshao", "dcmingfa"]],
+	dc_yanghu: ["male", "wei", 3, ["dcdeshao", "dcmingfa"], ["border:jin"]],
 	caimaozhangyun: ["male", "wei", 4, ["lianzhou", "jinglan"], ["name:蔡|瑁-张|允"]],
 	tenggongzhu: ["female", "wu", 3, ["xingchong", "liunian"], ["name:孙|null"]],
 	dc_huangchengyan: ["male", "qun", 3, ["dcjiezhen", "dczecai", "dcyinshi"]],
