@@ -3271,10 +3271,72 @@ const skills = {
 		filter: function (event, player) {
 			var evt = lib.skill.dcjianying.getLastUsed(player, event);
 			if (!evt || !evt.card) return false;
-			return (lib.suit.includes(get.suit(evt.card)) && get.suit(evt.card) == get.suit(event.card)) || (typeof get.number(evt.card, false) == "number" && get.number(evt.card, false) == get.number(event.card));
+			return (
+				lib.suit.includes(get.suit(evt.card)) && get.suit(evt.card) == get.suit(event.card) ||
+				typeof get.number(evt.card, false) == "number" && get.number(evt.card, false) == get.number(event.card)
+			);
 		},
 		content: function () {
 			player.draw();
+		},
+		group: "dcjianying_mark",
+		subSkill: {
+			mark: {
+				init(player) {
+					let trigger = lib.skill.dcjianying.getLastUsed(player);
+					if (trigger) {
+						let suit = get.suit(trigger.card, player);
+						if (suit == "none" && typeof get.number(trigger.card, player) != "number") return;
+						player.storage.dcjianying_mark = trigger.card;
+						player.markSkill("dcjianying_mark");
+						game.broadcastAll(
+							(player, suit) => {
+								if (player.marks.dcjianying_mark) player.marks.dcjianying_mark.firstChild.innerHTML = suit;
+							},
+							player,
+							get.translation(suit)
+						);
+					}
+				},
+				onremove: true,
+				trigger: {
+					player: "useCard1"
+				},
+				forced: true,
+				popup: false,
+				firstDo: true,
+				charlotte: true,
+				content() {
+					let suit = get.suit(trigger.card, player);
+					if (suit == "none" && typeof get.number(trigger.card, player) != "number") player.unmarkSkill("dcjianying_mark");
+					else {
+						player.storage.dcjianying_mark = trigger.card;
+						player.markSkill("dcjianying_mark");
+						game.broadcastAll(
+							(player, suit) => {
+								if (player.marks.dcjianying_mark) player.marks.dcjianying_mark.firstChild.innerHTML = suit;
+							},
+							player,
+							get.translation(suit)
+						);
+					}
+				},
+				intro: {
+					markcount(card, player) {
+						let num = get.number(card, player);
+						if (typeof num === "number") return get.strNumber(num);
+					},
+					content(card, player) {
+						let num = get.number(card, player);
+						return (
+							"<li>上一张牌的花色：" +
+							get.translation(get.suit(card, player)) +
+							"<br><li>上一张牌的点数：" +
+							(typeof num === "number" ? get.strNumber(get.number(card, player)) : "无")
+						);
+					},
+				},
+			},
 		},
 	},
 	//十周年步练师
@@ -10013,6 +10075,10 @@ const skills = {
 			}
 			"step 5";
 			player.chooseControl("bazhen", "olhuoji", "olkanpo").set("prompt", "选择获得一个技能").ai = function () {
+				let player = get.event("player"), threaten = get.threaten(player);
+				if (!player.hasEmptySlot(2)) return "olhuoji";
+				if (threaten < 0.8) return "olkanpo";
+				if (threaten < 1.6) return "bazhen";
 				return ["olhuoji", "bazhen"].randomGet();
 			};
 			"step 6";
